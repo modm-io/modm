@@ -53,6 +53,8 @@ public:
 
 /**
  * Driver for SSD1306 based OLED-displays using I2C.
+ * This display is only rated to be driven with 400kHz, which limits
+ * the frame rate to about 40Hz.
  *
  * @author	Niklas Hauser
  * @ingroup	lcd
@@ -220,7 +222,8 @@ private:
 	{
 	public:
 		DataTransmissionAdapter(uint8_t address)
-		:	I2cWriteAdapter(address), control(0xff)
+		:	I2cWriteAdapter(address), control(0x40),
+			buffer{0x80, 0, 0x80, 0, 0x80, 0}
 		{
 		}
 
@@ -229,7 +232,6 @@ private:
 		{
 			if (I2cWriteAdapter::configureWrite(&buffer[0][0], size))
 			{
-				displayBuffer = buffer;
 				control = 0xff;
 				return true;
 			}
@@ -240,19 +242,35 @@ private:
 		virtual Writing
 		writing()
 		{
-			// the first byte is 0x40, which tells the display
-			// that (a lot of) data is coming next.
+			// we first tell the display the column address again
 			if (control == 0xff)
+			{
+				buffer[1] = Command::SetColumnAddress;
+				buffer[5] = 127;
+				control = 0xfe;
+				return Writing(buffer, 6, OperationAfterWrite::Restart);
+			}
+			// then the page address. again.
+			if (control == 0xfe)
+			{
+				buffer[1] = Command::SetPageAddress;
+				buffer[5] = 7;
+				control = 0xfd;
+				return Writing(buffer, 6, OperationAfterWrite::Restart);
+			}
+			// then we set the D/C bit to tell it data is coming
+			if (control == 0xfd)
 			{
 				control = 0x40;
 				return Writing(&control, 1, OperationAfterWrite::Write);
 			}
 
-			return Writing(&displayBuffer[0][0], size, OperationAfterWrite::Stop);
+			// now we write the entire frame buffer into it.
+			return Writing(I2cWriteAdapter::buffer, size, OperationAfterWrite::Stop);
 		}
 
 		uint8_t control;
-		uint8_t (*displayBuffer)[8];
+		uint8_t buffer[6];
 	};
 
 private:

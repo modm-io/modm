@@ -62,8 +62,8 @@ xpcc::Ssd1306<I2cMaster>::initialize(void *ctx)
 	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetV_DeselectLevel, 0x40));
 	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetEntireDisplayResumeToRam));
 	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetNormalDisplay));
-	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetColumnAddress, 0, 127));
-	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetPageAddress, 0, 7));
+//	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetColumnAddress, 0, 127));
+//	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetPageAddress, 0, 7));
 	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetDisplayOn));
 
 	if (initSuccessful)
@@ -134,20 +134,12 @@ xpcc::Ssd1306<I2cMaster>::setRotation(void *ctx, Rotation rotation)
 {
 	CO_BEGIN(ctx);
 
-	if (rotation == Rotation::Normal)
+	if ( CO_CALL(writeCommand(ctx, (rotation == Rotation::Normal) ?
+			Command::SetSegmentRemap127 : Command::SetSegmentRemap0)) )
 	{
-		if ( CO_CALL(writeCommand(ctx, Command::SetSegmentRemap127)) )
-		{
-			if ( CO_CALL(writeCommand(ctx, Command::SetComOutputScanDirectionDecrement)) )
-				CO_RETURN(true);
-		}
-	}
-	else {
-		if ( CO_CALL(writeCommand(ctx, Command::SetSegmentRemap0)) )
-		{
-			if ( CO_CALL(writeCommand(ctx, Command::SetComOutputScanDirectionIncrement)) )
-				CO_RETURN(true);
-		}
+		if ( CO_CALL(writeCommand(ctx, (rotation == Rotation::Normal) ?
+				Command::SetComOutputScanDirectionDecrement : Command::SetComOutputScanDirectionIncrement)) )
+			CO_RETURN(true);
 	}
 
 	CO_END();
