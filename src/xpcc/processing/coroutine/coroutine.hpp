@@ -193,7 +193,10 @@ protected:
 	NestedCoroutine()
 	:	coLevel(0), coContext(0)
 	{
-		this->stopCoroutine();
+		for (CoState &level : coStateArray)
+		{
+			level = CoStopped;
+		}
 	}
 
 public:
