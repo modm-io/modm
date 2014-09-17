@@ -59,6 +59,12 @@ xpcc::stm32::SpiHal{{ id }}::initialize(Prescaler prescaler,
 %% elif target is stm32f0 or target is stm32f3
 						;
 	SPI{{ id }}->CR2 = static_cast<uint32_t>(dataSize);
+
+	if(static_cast<uint8_t>(dataSize) <= static_cast<uint8_t>(DataSize::Bit8))
+	{
+		SPI{{ id }}->CR2 |= SPI_CR2_FRXTH;
+	}
+
 %% endif
 	if(masterSelection == MasterSelection::Master) {
 		SPI{{ id }}->CR2 |=  SPI_CR2_SSOE; // for master mode
@@ -105,11 +111,7 @@ xpcc::stm32::SpiHal{{ id }}::setMasterSelection(MasterSelection masterSelection)
 inline bool
 xpcc::stm32::SpiHal{{ id }}::isReceiveRegisterNotEmpty()
 {
-%% if target is stm32f0 or target is stm32f3
-	return getInterruptFlags() & InterruptFlag::FifoRxLevel;
-%% elif target is stm32f1 or target is stm32f2 or target is stm32f4
 	return getInterruptFlags() & InterruptFlag::RxBufferNotEmpty;
-%% endif
 }
 
 inline bool
