@@ -127,7 +127,12 @@ xpcc::stm32::SpiHal{{ id }}::write(uint16_t data)
 void inline
 xpcc::stm32::SpiHal{{ id }}::write(uint8_t data)
 {	
+%% if target is stm32f0 or target is stm32f3
 	*((__IO uint8_t *) &SPI{{ id}}->DR) = data;
+%% elif target is stm32f1 or target is stm32f2 or target is stm32f4
+	write(static_cast<uint16_t>(data));
+%% endif
+	
 }
 
 void inline
