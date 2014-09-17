@@ -83,6 +83,16 @@ public:
 	write(uint16_t data);
 
 	/**
+	 * Write 8 Bit to the data register
+	 *
+	 * @warning 	This method does NOT do any sanity checks!!
+	 *				It is your responsibility to check if the register
+	 *				is empty!
+	 */
+	static void
+	write(uint8_t data);
+	
+	/**
 	 * Returns the value of the data register
 	 *
 	 * @warning 	This method does NOT do any sanity checks!!
