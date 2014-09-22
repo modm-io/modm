@@ -3,46 +3,50 @@
 
 #include "nrf24_phy.hpp"
 
-enum class sendingState
-{
-	BUSY,
-	FINISHED_ACK,
-	FINISHED_NACK,
-	DONT_KNOW
-};
-
-typedef struct frame_t
-{
-	uint8_t src;
-	uint8_t dest;
-	uint8_t data[30];
-} frame_t;
-
-typedef struct packet_t
-{
-	uint8_t dest;
-	uint8_t* data;
-	uint8_t length;
-};
-
 template<typename Nrf24Phy>
 class Nrf24Data
 {
 
 public:
 
+	typedef uint64_t 	BaseAddress;
+	typedef uint8_t 	Address;
+
+	enum class SendingState
+	{
+		BUSY,
+		FINISHED_ACK,
+		FINISHED_NACK,
+		DONT_KNOW
+	};
+
+	typedef struct packet_t
+	{
+		Address		src;
+		Address 	dest;
+		uint8_t*	data;
+		uint8_t 	length;
+	} packet_t;
+
+
+public:
+
 	static void
-	initialize(uint64_t base_address)
+	initialize(BaseAddress base_address, Address broadcast_address = 0xFF)
 	{
 		baseAddress = base_address;
+		broadcastAddress = broadcast_address;
+
+		// ... configure phy
 	}
+
 
 public:
 
 	/* general data layer interface */
 
 	static bool
-	sendPacket();
+	sendPacket(packet_t&);
 
 	static bool
 	getPacket(packet_t&);
@@ -53,10 +57,10 @@ public:
 	static bool
 	isPacketAvailable();
 
-	static sendingState
+	static SendingState
 	getSendingFeedback();
 
-	static uint64_t
+	static Address
 	getAddress();
 
 	static void
@@ -66,6 +70,12 @@ public:
 	getPayloadLength()
 	{
 		return Nrf24Phy::getPayloadLength() - 2;
+	}
+
+	static Address
+	getBroadcastAddress()
+	{
+		return broadcastAddress;
 	}
 
 	/* nrf24 specific */
@@ -93,10 +103,11 @@ private:
 	 *	 | ---------------------------------- |
 	 *	 |   3 byte  |    4 byte    |  1 byte |
 	 */
-	uint64_t baseAddress;
+	static BaseAddress baseAddress;
 
+	static Address broadcastAddress;
 
-	uint8_t connections[4];
+	static Address connections[4];
 };
 
 
