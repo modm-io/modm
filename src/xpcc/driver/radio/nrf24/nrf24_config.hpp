@@ -1,3 +1,12 @@
+// coding: utf-8
+/* Copyright (c) 2014, Roboterclub Aachen e. V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+
 #ifndef NRF24_CONFIG_HPP
 #define NRF24_CONFIG_HPP
 
@@ -50,7 +59,7 @@ public:
 		Minus12dBm 	= 0x01,
 		Minus6dBm  	= 0x02,
 		dBm0 		= 0x03
-	}
+	};
 	enum class
 	AutoRetransmitDelay : uint8_t
 	{
