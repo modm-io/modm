@@ -7,10 +7,76 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef NRF24_CONFIG_HPP
-#define NRF24_CONFIG_HPP
+#ifndef XPCC__NRF24_CONFIG_HPP
+#define XPCC__NRF24_CONFIG_HPP
 
 #include "nrf24_phy.hpp"
+
+
+namespace xpcc
+{
+
+namespace nrf24
+{
+
+enum class
+Mode
+{
+	Rx,
+	Tx
+};
+enum class
+Speed
+{
+	kBps500,
+	MBps1,
+	MBps2
+};
+
+enum class
+Crc
+{
+	NoCrc,
+	Crc1Byte,
+	Crc2Byte
+};
+enum class
+AddressWidth : uint8_t
+{
+	/* 2 byte works in hardware but is illegal according to datasheet */
+	/* Byte2 = 0x00, */
+	Byte3 = 0x01,
+	Byte4 = 0x02,
+	Byte5 = 0x03
+};
+enum class
+RfPower : uint8_t
+{
+	Minus18dBm 	= 0x00,
+	Minus12dBm 	= 0x01,
+	Minus6dBm  	= 0x02,
+	dBm0 		= 0x03
+};
+enum class
+AutoRetransmitDelay : uint8_t
+{
+	us250 	= 0x00,
+	us500 	= 0x01,
+	us750 	= 0x02,
+	us1000 	= 0x03,
+	us1250 	= 0x04,
+	us1500 	= 0x05,
+	us1750 	= 0x06,
+	us2000 	= 0x07,
+	us2250 	= 0x08,
+	us2500 	= 0x09,
+	us2750 	= 0x0A,
+	us3000 	= 0x0B,
+	us3250 	= 0x0C,
+	us3500 	= 0x0D,
+	us3750 	= 0x0E,
+	us4000 	= 0x0F,
+};
 
 /** @brief Configuration interface for nRF24L01+
  *
@@ -21,66 +87,6 @@
 template<typename Nrf24Phy>
 class Nrf24Config
 {
-public:
-	enum class
-	Mode
-	{
-		Rx,
-		Tx
-	};
-	enum class
-	Speed
-	{
-		kBps500,
-		MBps1,
-		MBps2
-	};
-
-	enum class
-	Crc
-	{
-		NoCrc,
-		Crc1Byte,
-		Crc2Byte
-	};
-	enum class
-	AddressWidth : uint8_t
-	{
-		/* 2 byte works in hardware but is illegal according to datasheet */
-		/* Byte2 = 0x00, */
-		Byte3 = 0x01,
-		Byte4 = 0x02,
-		Byte5 = 0x03
-	};
-	enum class
-	RfPower : uint8_t
-	{
-		Minus18dBm 	= 0x00,
-		Minus12dBm 	= 0x01,
-		Minus6dBm  	= 0x02,
-		dBm0 		= 0x03
-	};
-	enum class
-	AutoRetransmitDelay : uint8_t
-	{
-		us250 	= 0x00,
-		us500 	= 0x01,
-		us750 	= 0x02,
-		us1000 	= 0x03,
-		us1250 	= 0x04,
-		us1500 	= 0x05,
-		us1750 	= 0x06,
-		us2000 	= 0x07,
-		us2250 	= 0x08,
-		us2500 	= 0x09,
-		us2750 	= 0x0A,
-		us3000 	= 0x0B,
-		us3250 	= 0x0C,
-		us3500 	= 0x0D,
-		us3750 	= 0x0E,
-		us4000 	= 0x0F,
-	};
-
 
 public:
 	static void
@@ -112,5 +118,9 @@ public:
 
 };
 
+}
+}
 
-#endif /* NRF24_CONFIG_HPP */
+#include "nrf24_config_impl.hpp"
+
+#endif /* XPCC__NRF24_CONFIG_HPP */
