@@ -335,27 +335,3 @@ xpcc::Nrf24Phy<Spi, Csn>::getTxAddress()
 }
 
 // --------------------------------------------------------------------------------------------------------------------
-
-template<typename Spi, typename Csn>
-void
-xpcc::Nrf24Phy<Spi, Csn>::enablePipe(uint8_t pipe)
-{
-	if(pipe >= rx_pipe_count)
-		return;
-
-	/* Set payload width for pipe */
-	writeRegister(toRegister(nrf24::Register::RX_PW_P0, pipe), getPayloadLength());
-
-	/* enable pipe */
-	setBits(nrf24::Register::EN_RX_ADDR, (1 << pipe));
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Spi, typename Csn>
-void
-xpcc::Nrf24Phy<Spi, Csn>::disablePipe(uint8_t pipe)
-{
-	/* disable pipe */
-	clearBits(nrf24::Register::EN_RX_ADDR, (1 << pipe));
-}

@@ -38,6 +38,8 @@ typedef struct packet_t
 	uint8_t 	length;
 } packet_t;
 
+}
+
 
 template<typename Nrf24Phy>
 class Nrf24Data
@@ -117,8 +119,6 @@ private:
 
 	static Address connections[4];
 };
-
-}
 
 }
 

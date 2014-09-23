@@ -28,7 +28,7 @@ Mode
 enum class
 Speed
 {
-	kBps500,
+	kBps250,
 	MBps1,
 	MBps2
 };
@@ -40,6 +40,7 @@ Crc
 	Crc1Byte,
 	Crc2Byte
 };
+
 enum class
 AddressWidth : uint8_t
 {
@@ -49,6 +50,7 @@ AddressWidth : uint8_t
 	Byte4 = 0x02,
 	Byte5 = 0x03
 };
+
 enum class
 RfPower : uint8_t
 {
@@ -57,6 +59,7 @@ RfPower : uint8_t
 	Minus6dBm  	= 0x02,
 	dBm0 		= 0x03
 };
+
 enum class
 AutoRetransmitDelay : uint8_t
 {
@@ -77,6 +80,40 @@ AutoRetransmitDelay : uint8_t
 	us3750 	= 0x0E,
 	us4000 	= 0x0F,
 };
+
+enum class
+AutoRetransmitCount : uint8_t
+{
+	Disable			= 0x00,
+	Retransmit1 	= 0x01,
+	Retransmit2 	= 0x02,
+	Retransmit3 	= 0x03,
+	Retransmit4 	= 0x04,
+	Retransmit5		= 0x05,
+	Retransmit6 	= 0x06,
+	Retransmit7 	= 0x07,
+	Retransmit8 	= 0x08,
+	Retransmit9 	= 0x09,
+	Retransmit10 	= 0x0A,
+	Retransmit11 	= 0x0B,
+	Retransmit12 	= 0x0C,
+	Retransmit13 	= 0x0D,
+	Retransmit14 	= 0x0E,
+	Retransmit15 	= 0x0F
+};
+
+enum class
+Pipe : uint8_t
+{
+	Pipe0 = 0x01,
+	Pipe1 = 0x02,
+	Pipe2 = 0x04,
+	Pipe3 = 0x08,
+	Pipe4 = 0x10,
+	Pipe5 = 0x20,
+};
+
+}
 
 /** @brief Configuration interface for nRF24L01+
  *
@@ -99,26 +136,42 @@ public:
 	setChannel(uint8_t channel);
 
 	static void
-	setMode(Mode mode);
+	setMode(nrf24::Mode mode);
 
 	static void
-	setSpeed(Speed speed);
+	setSpeed(nrf24::Speed speed);
 
 	static void
-	setCrc(Crc);
+	setCrc(nrf24::Crc crc);
 
 	static void
-	setAddressWidth(AddressWidth width);
+	setAddressWidth(nrf24::AddressWidth width);
 
 	static void
-	setRfPower(RfPower power);
+	setRfPower(nrf24::RfPower power);
 
 	static void
-	setAutoRetransmitDelay(AutoRetransmitDelay delay);
+	setAutoRetransmitDelay(nrf24::AutoRetransmitDelay delay);
+
+	static void
+	setAutoRetransmitCount(nrf24::AutoRetransmitCount count);
+
+	/** @brief Enable Rx Pipe and set payload width
+	 *
+	 *	@param pipe		Pipe Number
+	 */
+	static void
+	enablePipe(nrf24::Pipe pipe, bool enableAutoAck);
+
+	/** @brief Disable Rx Pipe and set payload width
+	 *
+	 *	@param pipe		Pipe Number
+	 */
+	static void
+	disablePipe(nrf24::Pipe pipe);
 
 };
 
-}
 }
 
 #include "nrf24_config_impl.hpp"

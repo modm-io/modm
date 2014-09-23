@@ -19,26 +19,26 @@ using namespace xpcc::nrf24;
 
 
 template<typename Nrf24Phy>
-BaseAddress Nrf24Data<Nrf24Phy>::baseAddress;
+BaseAddress xpcc::Nrf24Data<Nrf24Phy>::baseAddress;
 
 template<typename Nrf24Phy>
-Address Nrf24Data<Nrf24Phy>::broadcastAddress;
+Address xpcc::Nrf24Data<Nrf24Phy>::broadcastAddress;
 
 template<typename Nrf24Phy>
-Address Nrf24Data<Nrf24Phy>::connections[4];
+Address xpcc::Nrf24Data<Nrf24Phy>::connections[4];
 
 // --------------------------------------------------------------------------------------------------------------------
 
 /* typedef config layer for simplicity */
 template<typename Nrf24Phy>
-typedef Nrf24Config<Nrf24Phy> ConfigLayer;
+typedef xpcc::Nrf24Config<Nrf24Phy> ConfigLayer;
 
 // --------------------------------------------------------------------------------------------------------------------
 
 
 template<typename Nrf24Phy>
 void
-xpcc::nrf24::Nrf24Data<Nrf24Phy>::initialize(BaseAddress base_address, Address broadcast_address)
+xpcc::Nrf24Data<Nrf24Phy>::initialize(BaseAddress base_address, Address broadcast_address)
 {
 	baseAddress = base_address;
 	broadcastAddress = broadcast_address;
@@ -54,7 +54,7 @@ xpcc::nrf24::Nrf24Data<Nrf24Phy>::initialize(BaseAddress base_address, Address b
 
 template<typename Nrf24Phy>
 bool
-xpcc::nrf24::Nrf24Data<Nrf24Phy>::sendPacket(packet_t& packet)
+xpcc::Nrf24Data<Nrf24Phy>::sendPacket(packet_t& packet)
 {
 }
 
@@ -62,7 +62,7 @@ xpcc::nrf24::Nrf24Data<Nrf24Phy>::sendPacket(packet_t& packet)
 
 template<typename Nrf24Phy>
 bool
-xpcc::nrf24::Nrf24Data<Nrf24Phy>::getPacket(packet_t& packet)
+xpcc::Nrf24Data<Nrf24Phy>::getPacket(packet_t& packet)
 {
 }
 
@@ -70,7 +70,7 @@ xpcc::nrf24::Nrf24Data<Nrf24Phy>::getPacket(packet_t& packet)
 
 template<typename Nrf24Phy>
 bool
-xpcc::nrf24::Nrf24Data<Nrf24Phy>::isReadyToSend()
+xpcc::Nrf24Data<Nrf24Phy>::isReadyToSend()
 {
 }
 
@@ -78,7 +78,7 @@ xpcc::nrf24::Nrf24Data<Nrf24Phy>::isReadyToSend()
 
 template<typename Nrf24Phy>
 bool
-xpcc::nrf24::Nrf24Data<Nrf24Phy>::isPacketAvailable()
+xpcc::Nrf24Data<Nrf24Phy>::isPacketAvailable()
 {
 }
 
@@ -86,7 +86,7 @@ xpcc::nrf24::Nrf24Data<Nrf24Phy>::isPacketAvailable()
 
 template<typename Nrf24Phy>
 SendingState
-xpcc::nrf24::Nrf24Data<Nrf24Phy>::getSendingFeedback()
+xpcc::Nrf24Data<Nrf24Phy>::getSendingFeedback()
 {
 }
 
@@ -94,7 +94,7 @@ xpcc::nrf24::Nrf24Data<Nrf24Phy>::getSendingFeedback()
 
 template<typename Nrf24Phy>
 Address
-xpcc::nrf24::Nrf24Data<Nrf24Phy>::getAddress()
+xpcc::Nrf24Data<Nrf24Phy>::getAddress()
 {
 }
 
@@ -102,7 +102,7 @@ xpcc::nrf24::Nrf24Data<Nrf24Phy>::getAddress()
 
 template<typename Nrf24Phy>
 void
-xpcc::nrf24::Nrf24Data<Nrf24Phy>::setAddress(Address address)
+xpcc::Nrf24Data<Nrf24Phy>::setAddress(Address address)
 {
 }
 
@@ -110,7 +110,7 @@ xpcc::nrf24::Nrf24Data<Nrf24Phy>::setAddress(Address address)
 
 template<typename Nrf24Phy>
 bool
-xpcc::nrf24::Nrf24Data<Nrf24Phy>::establishConnection()
+xpcc::Nrf24Data<Nrf24Phy>::establishConnection()
 {
 	// not yet implemented
 	return false;
@@ -120,7 +120,7 @@ xpcc::nrf24::Nrf24Data<Nrf24Phy>::establishConnection()
 
 template<typename Nrf24Phy>
 bool
-xpcc::nrf24::Nrf24Data<Nrf24Phy>::destroyConnection()
+xpcc::Nrf24Data<Nrf24Phy>::destroyConnection()
 {
 	// not yet implemented
 	return false;
