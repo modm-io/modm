@@ -211,7 +211,7 @@ public:
  *
  * @ingroup	gpio
  */
-class GpioIO : GpioOutput, GpioInput
+class GpioIO : public GpioOutput, public GpioInput
 {
 	// there are no new methods here
 };
