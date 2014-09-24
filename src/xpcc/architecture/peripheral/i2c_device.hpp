@@ -49,12 +49,6 @@ protected:
 	{
 		return I2cMaster::start(transaction, this->configuration);
 	}
-
-	bool inline
-	startBlockingTransaction(xpcc::I2cTransaction *transaction)
-	{
-		return I2cMaster::startBlocking(transaction, this->configuration);
-	}
 };
 
 }	// namespace xpcc
