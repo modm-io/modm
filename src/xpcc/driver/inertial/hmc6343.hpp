@@ -10,7 +10,6 @@
 #ifndef XPCC_HMC6343_HPP
 #define XPCC_HMC6343_HPP
 
-#include <xpcc/architecture/peripheral/i2c_adapter.hpp>
 #include <xpcc/architecture/peripheral/i2c_device.hpp>
 #include <xpcc/processing/protothread.hpp>
 #include <xpcc/processing/coroutine.hpp>
@@ -48,12 +47,12 @@ struct hmc6343
 	enum class
 	Register16 : uint8_t
 	{
-		DeviceSerial = i(Register::DeviceSerialLsb),		//!< Device Serial Number
-		DeviationAngle = i(Register::DeviationAngleLsb),	//!< Deviation Angle (+-1800) in tenth of a degree
-		VariationAngle = i(Register::VariationAngleLsb),	//!< Variation Angle (+-1800) in tenth of a degree
-		X_Offset = i(Register::X_OffsetLsb),				//!< Hard-Iron Calibration Offset for the X-axis
-		Y_Offset = i(Register::Y_OffsetLsb),				//!< Hard-Iron Calibration Offset for the Y-axis
-		Z_Offset = i(Register::Z_OffsetLsb),				//!< Hard-Iron Calibration Offset for the Z-axis
+		DeviceSerial = Register::DeviceSerialLsb,		//!< Device Serial Number
+		DeviationAngle = Register::DeviationAngleLsb,	//!< Deviation Angle (+-1800) in tenth of a degree
+		VariationAngle = Register::VariationAngleLsb,	//!< Variation Angle (+-1800) in tenth of a degree
+		X_Offset = Register::X_OffsetLsb,				//!< Hard-Iron Calibration Offset for the X-axis
+		Y_Offset = Register::Y_OffsetLsb,				//!< Hard-Iron Calibration Offset for the Y-axis
+		Z_Offset = Register::Z_OffsetLsb,				//!< Hard-Iron Calibration Offset for the Z-axis
 	};
 
 protected:
@@ -83,9 +82,9 @@ public:
 	enum class
 	Orientation : uint8_t
 	{
-		Level = i(Command::LevelOrientation),
-		UprightSideways = i(Command::UprightSidewaysOrientation),
-		UprightFlatFront = i(Command::UprightFlatFrontOrientation)
+		Level = Command::LevelOrientation,
+		UprightSideways = Command::UprightSidewaysOrientation,
+		UprightFlatFront = Command::UprightFlatFrontOrientation
 	};
 
 	struct OperationMode
@@ -181,12 +180,12 @@ public:
 	/// sets a new deviation angle in eeprom
 	xpcc::co::Result<bool> inline
 	setDeviationAngle(void *ctx, int16_t angle)
-	{ return write16BitRegister(ctx, Register::DeviationAngle, static_cast<uint16_t>(angle)); }
+	{ return write16BitRegister(ctx, Register16::DeviationAngle, static_cast<uint16_t>(angle)); }
 
 	/// sets a new variation angle in eeprom
 	xpcc::co::Result<bool> inline
 	setVariationAngle(void *ctx, int16_t angle)
-	{ return write16BitRegister(ctx, Register::VariationAngle, static_cast<uint16_t>(angle)); }
+	{ return write16BitRegister(ctx, Register16::VariationAngle, static_cast<uint16_t>(angle)); }
 
 	/// sets a new IIR filter in eeprom
 	xpcc::co::Result<bool> ALWAYS_INLINE
@@ -338,10 +337,10 @@ private:
 	xpcc::co::Result<bool>
 	readPostData(void *ctx, Command command, uint8_t offset, uint8_t readSize);
 
-	uint16_t ALWAYS_INLINE
+	int16_t ALWAYS_INLINE
 	swapData(uint8_t index);
 
-	struct Task
+	struct I2cTask
 	{
 		enum
 		{

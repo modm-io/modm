@@ -7,16 +7,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__HMC6343_HPP
+#ifndef XPCC_HMC6343_HPP
 #	error  "Don't include this file directly, use 'hmc6343.hpp' instead!"
 #endif
 #include <xpcc/math/utils/operator.hpp>
-#include "hmc6343.hpp"
 
 // ----------------------------------------------------------------------------
 template < class I2cMaster >
 xpcc::Hmc6343<I2cMaster>::Hmc6343(uint8_t* data, uint8_t address)
-:	timeout(500), i2cTask(Task::Idle), i2cSuccess(0),
+:	timeout(500), i2cTask(I2cTask::Idle), i2cSuccess(0),
 	data(data), adapter(address, i2cTask, i2cSuccess)
 {
 }
@@ -51,18 +50,18 @@ xpcc::Hmc6343<I2cMaster>::writeCommand(void *ctx, Command command, uint16_t time
 	CO_BEGIN(ctx);
 
 	CO_WAIT_UNTIL(
-			timeout.isExpired() &&
+			this->timeout.isExpired() &&
 			!adapter.isBusy() && (
 					buffer[0] = i(command),
 					adapter.configureWrite(buffer, 1) && this->startTransaction(&adapter) )
 	);
 
-	i2cTask = i(command) + Task::PostCommandBase;
+	i2cTask = i(command) + I2cTask::PostCommandBase;
 	this->timeout.restart(timeout);
 
-	CO_WAIT_WHILE(i2cTask == (i(command) + Task::PostCommandBase));
+	CO_WAIT_WHILE(i2cTask == (i(command) + I2cTask::PostCommandBase));
 
-	if (i2cSuccess == (i(command) + Task::PostCommandBase))
+	if (i2cSuccess == (i(command) + I2cTask::PostCommandBase))
 		CO_RETURN(true);
 
 	CO_END();
@@ -84,12 +83,12 @@ xpcc::Hmc6343<I2cMaster>::writeRegister(void *ctx, Register reg, uint8_t value)
 					adapter.configureWrite(buffer, 3) && this->startTransaction(&adapter) )
 	);
 
-	i2cTask = i(reg) + Task::WriteEepromBase;
+	i2cTask = i(reg) + I2cTask::WriteEepromBase;
 	timeout.restart(10);
 
-	CO_WAIT_WHILE(i2cTask == (i(reg) + Task::WriteEepromBase));
+	CO_WAIT_WHILE(i2cTask == (i(reg) + I2cTask::WriteEepromBase));
 
-	if (i2cSuccess == (i(reg) + Task::WriteEepromBase))
+	if (i2cSuccess == (i(reg) + I2cTask::WriteEepromBase))
 		CO_RETURN(true);
 
 	CO_END();
@@ -129,21 +128,21 @@ xpcc::Hmc6343<I2cMaster>::readRegister(void *ctx, Register reg, uint8_t &value)
 					adapter.configureWrite(buffer, 2) && this->startTransaction(&adapter) )
 	);
 
-	i2cTask = i(reg) + Task::PostEepromBase;
+	i2cTask = i(reg) + I2cTask::PostEepromBase;
 	timeout.restart(10);
 
-	CO_WAIT_WHILE(i2cTask == (i(reg) + Task::WriteEepromBase));
+	CO_WAIT_WHILE(i2cTask == (i(reg) + I2cTask::WriteEepromBase));
 
-	if(i2cSuccess == (i(reg) + Task::WriteEepromBase))
+	if(i2cSuccess == (i(reg) + I2cTask::WriteEepromBase))
 	{
 		CO_WAIT_UNTIL(timeout.isExpired());
 		CO_WAIT_UNTIL(adapter.configureRead(&value, 1) && this->startTransaction(&adapter));
 
-		i2cTask = i(reg) + Task::ReadEepromBase;
+		i2cTask = i(reg) + I2cTask::ReadEepromBase;
 
-		CO_WAIT_WHILE(i2cTask == (i(reg) + Task::ReadEepromBase));
+		CO_WAIT_WHILE(i2cTask == (i(reg) + I2cTask::ReadEepromBase));
 
-		if (i2cSuccess == (i(reg) + Task::ReadEepromBase))
+		if (i2cSuccess == (i(reg) + I2cTask::ReadEepromBase))
 			CO_RETURN(true);
 	}
 
@@ -187,11 +186,11 @@ xpcc::Hmc6343<I2cMaster>::readPostData(void *ctx, Command command, uint8_t offse
 
 		CO_WAIT_UNTIL(adapter.configureRead(buffer + offset, readSize) && this->startTransaction(&adapter));
 
-		i2cTask = i(command) + Task::ReadCommandBase;
+		i2cTask = i(command) + I2cTask::ReadCommandBase;
 
-		CO_WAIT_WHILE(i2cTask == (i(command) + Task::ReadCommandBase));
+		CO_WAIT_WHILE(i2cTask == (i(command) + I2cTask::ReadCommandBase));
 
-		if (i2cSuccess == (i(command) + Task::ReadCommandBase))
+		if (i2cSuccess == (i(command) + I2cTask::ReadCommandBase))
 			CO_RETURN(true);
 	}
 
@@ -206,5 +205,5 @@ int16_t
 xpcc::Hmc6343<I2cMaster>::swapData(uint8_t index)
 {
 	uint16_t* rawData = reinterpret_cast<uint16_t*>(data);
-	return static_cast<int16_t>(xpcc::bigEndianToHost(rawData[index]));
+	return static_cast<int16_t>(xpcc::math::bigEndianToHost(rawData[index]));
 }
