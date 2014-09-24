@@ -50,9 +50,9 @@ namespace
 	static xpcc::I2cMaster::Error errorState(xpcc::I2cMaster::Error::NoError);
 
 	// buffer management
-	static xpcc::I2cTransaction::Starting starting;
-	static xpcc::I2cTransaction::Writing writing;
-	static xpcc::I2cTransaction::Reading reading;
+	static xpcc::I2cTransaction::Starting starting(0, xpcc::I2c::OperationAfterStart::Stop);
+	static xpcc::I2cTransaction::Writing writing(nullptr, 0, xpcc::I2c::OperationAfterWrite::Stop);
+	static xpcc::I2cTransaction::Reading reading(nullptr, 0, xpcc::I2c::OperationAfterRead::Stop);
 }
 
 // ----------------------------------------------------------------------------
@@ -248,7 +248,7 @@ xpcc::{{target.family}}::I2cMaster::getErrorState()
 bool
 xpcc::{{target.family}}::I2cMaster::start(I2cTransaction *transaction, Configuration_t configuration)
 {
-	if (!::transaction && transaction)
+	if (!xpcc::accessor::asVolatile(::transaction) && transaction)
 	{
 		if (transaction->attaching())
 		{
@@ -263,7 +263,7 @@ xpcc::{{target.family}}::I2cMaster::start(I2cTransaction *transaction, Configura
 			return true;
 		}
 		else {
-			transaction->detaching(xpcc::DetachCause::FailedToAttach);
+			transaction->detaching(xpcc::I2c::DetachCause::FailedToAttach);
 		}
 	}
 	return false;
@@ -279,7 +279,7 @@ xpcc::{{target.family}}::I2cMaster::startBlocking(I2cTransaction *transaction, C
 		// to make sure, ::transaction is set _before_ entering a deadlock
 		__asm__ volatile ("" ::: "memory");
 
-		while (::transaction)
+		while (xpcc::accessor::asVolatile(::transaction))
 			;
 		DEBUG('f');
 
