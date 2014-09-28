@@ -245,9 +245,11 @@ class DriverFile:
 			targets[build[1]] = build
 			return True
 		else:
+			# This does not work as intended. -Niklas
 			if targets[build[1]] != build:
-				self.log.warn("Two different builds for '%s' specified! "
-					"'%s' will be built while '%s' will be ignored." % (build[1], targets[build[1]], build))
+				pass
+				# self.log.warn("Two different builds for '%s' specified! "
+				# 	"'%s' will be built while '%s' will be ignored." % (build[1], targets[build[1]], build))
 			return False
 
 	def _makeRelativeToPlatform(self, file_name):
