@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-# 
+#
 # Copyright (c) 2013, Roboterclub Aachen e.V.
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
+#
 #     * Redistributions of source code must retain the above copyright
 #       notice, this list of conditions and the following disclaimer.
 #     * Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
 #     * Neither the name of the Roboterclub Aachen e.V. nor the
 #       names of its contributors may be used to endorse or promote products
 #       derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
 # EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -26,9 +26,9 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # -----------------------------------------------------------------------------
-# 
+#
 # DESCRIPTION
-# 
+#
 # This tool checks which files are needed for a specific target
 # using the xml device file and adds a custom builder for all template files
 # and for other files that need to be copied to the generated folder
@@ -50,6 +50,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'tools', 'de
 from device import DeviceFile
 from device_identifier import DeviceIdentifier
 from driver import DriverFile
+from parameters import ParameterDB
 
 
 #------------------------------------------------------------------------------
@@ -175,7 +176,7 @@ def platform_tools_generate(env, architecture_path):
 	drivers = dev.getDriverList(device, env['XPCC_PLATFORM_PATH'])
 	for driver in drivers:
 		ddic = {} # create dictionary describing the driver
-		d = DriverFile.fromDict(driver, env.GetLogger())
+		d = DriverFile.fromDict(driver, env['XPCC_PARAMETER_DB'], env.GetLogger())
 		ddic['name'] = d.name
 		ddic['type'] = d.type
 		ddic['headers'] = []
@@ -284,6 +285,9 @@ def generate(env, **kw):
 	env['XPCC_PLATFORM_GENERATED_DIR'] = 'generated_platform_' + env['XPCC_DEVICE']
 	env['XPCC_PLATFORM_GENERATED_PATH'] = \
 		os.path.join(env['XPCC_LIBRARY_PATH'], 'xpcc', 'architecture', env['XPCC_PLATFORM_GENERATED_DIR'])
+
+	# Create Parameter DB and parse User parameters
+	env['XPCC_PARAMETER_DB'] = ParameterDB(env['XPCC_USER_PARAMETERS'], env.GetLogger()).toDictionary()
 
 	# Remove Generated Folder if Clean Flag is set
 	# Scons does not remove the files on its own

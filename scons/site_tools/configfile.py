@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-# 
+#
 # Copyright (c) 2009, Roboterclub Aachen e.V.
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
+#
 #     * Redistributions of source code must retain the above copyright
 #       notice, this list of conditions and the following disclaimer.
 #     * Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
 #     * Neither the name of the Roboterclub Aachen e.V. nor the
 #       names of its contributors may be used to endorse or promote products
 #       derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
 # EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -43,13 +43,13 @@ class ParserException(Exception):
 	pass
 
 class Parser(ConfigParser.RawConfigParser):
-	
+
 	def read(self, filename):
 		try:
 			return ConfigParser.RawConfigParser.read(self, filename)
 		except ConfigParser.ParsingError as e:
 			raise SCons.Errors.UserError(str(e) + '\n')
-	
+
 	def get(self, section, option, default=None):
 		try:
 			return ConfigParser.RawConfigParser.get(self, section, option)
@@ -59,7 +59,7 @@ class Parser(ConfigParser.RawConfigParser):
 				return default
 			else:
 				raise ParserException(e)
-	
+
 	def getboolean(self, section, option, default=None):
 		try:
 			return ConfigParser.RawConfigParser.getboolean(self, section, option)
@@ -70,7 +70,7 @@ class Parser(ConfigParser.RawConfigParser):
 				return default
 			else:
 				raise ParserException(e)
-	
+
 	def items(self, section):
 		try:
 			return ConfigParser.RawConfigParser.items(self, section)
@@ -89,31 +89,31 @@ class FileList(list):
 			self.extend(item)
 		else:
 			self.__append(item)
-	
+
 	def __append(self, item):
 		if not isinstance(item, SCons.Node.Node):
 			item = SCons.Node.FS.default_fs.File(str(item))
 			# print dir(item)
 		if not self.__contains__(item):
 			list.append(self, item)
-	
+
 	def extend(self, l):
 		for item in l:
 			self.append(item)
-	
+
 	def __iadd__(self, item):
 		self.append(item)
 		return self
 
 # -----------------------------------------------------------------------------
 class Scanner:
-	
+
 	HEADER = ['.h', '.hpp']
 	SOURCE = ['.cpp', '.c', '.sx', '.S', '.s']
-	
+
 	def __init__(self, env, unittest=None):
 		""" Constructor
-		
+
 		Keyword arguments:
 		env		 -	SCons environment
 		unittest -	This variable has three states:
@@ -123,10 +123,10 @@ class Scanner:
 		"""
 		self.env = env
 		self.unittest = unittest
-	
+
 	def scan(self, path, ignore=None):
 		""" Scan directories for source files
-		
+
 		Provides the following attributes to collect the results:
 		sources		- list of source files
 		header		- list of header files
@@ -137,31 +137,31 @@ class Scanner:
 		else:
 			ignoreList = listify(ignore)
 		pathlist = listify(path)
-		
+
 		self.sources = FileList()
 		self.header = FileList()
 		self.defines = {}
-		
+
 		for basepath in pathlist:
 			for path, directories, files in os.walk(basepath):
 				if self._fileInList (path, ignoreList):
 					directories = self._excludeDirectories(directories)
 					continue
-				
+
 				if 'build.cfg' in files:
 					parser = Parser()
 					parser.read(os.path.join(path, 'build.cfg'))
-					
+
 					if self._directoryShouldBeExcluded(parser):
 						directories = self._excludeDirectories(directories)
 						continue
-					
+
 					try:
 						for item in parser.items('defines'):
 							self.defines[item[0]] = item[1]
 					except ParserException:
 						pass
-				
+
 				if self.unittest is None or not (self.unittest ^ path.endswith(os.sep + 'test')):
 					# only check this directory for files if all directories
 					# should be check or unittest is active and directory
@@ -169,22 +169,22 @@ class Scanner:
 					p = path + '/*'
 					for source in self.SOURCE:
 						files = self.env.Glob(p + source)
-						
+
 						for file in files[:]:
 							for ignoreFile in ignoreList:
 								if self._samefile(str(file), ignoreFile):
 									files.remove(file)
-						
+
 						self.sources.extend(files)
-						
+
 					if self.unittest is True:
 						for header in self.HEADER:
 							self.header.extend(self.env.Glob(p + header))
-	
+
 	def __iadd__(self, item):
 		self.append(item)
-		return self	
-		
+		return self
+
 	def append(self, files):
 		for file in listify(files):
 			filename = str(file)
@@ -193,24 +193,24 @@ class Scanner:
 				self.sources.append(file)
 			elif extension in self.HEADER:
 				self.header.append(file)
-	
+
 	def _directoryShouldBeExcluded(self, parser):
 		try:
 			target = parser.get('build', 'target')
-			
+
 			if target.startswith('!'):
 				target = target[1:]
 				invert = True
 			else:
 				invert = False
-			
+
 			if not re.search(target, self.env['ARCHITECTURE']):
 				return True ^ invert
 			else:
 				return False ^ invert
 		except ParserException:
 			return False
-	
+
 	def _excludeDirectories(self, directories):
 		# if the this directory should be excluded, remove all the
 		# subdirectories from the list to exclude them as well
@@ -218,7 +218,7 @@ class Scanner:
 		for d in tempDirectories:
 			directories.remove(d)
 		return directories
-	
+
 	def _samefile(self, src, dst):
 		# Macintosh, Unix
 		if hasattr(os.path,'samefile'):
@@ -226,16 +226,16 @@ class Scanner:
 				return os.path.samefile(src, dst)
 			except OSError:
 				return False
-		
+
 		# All other platforms: check for same pathname.
 		return (os.path.normcase(os.path.abspath(src)) ==
 				os.path.normcase(os.path.abspath(dst)))
-		
+
 	def __str__(self):
 		string = "Source files: "
 		if self.sources:
 			for s in self.sources:
-				 string += "\n  " + str(s)
+				string += "\n  " + str(s)
 		else:
 			string += "None"
 
@@ -243,14 +243,14 @@ class Scanner:
 		if self.header:
 			string += "\nHeader files:"
 			for h in self.header:
-				 string += "\n  " + str(h)	 
+				string += "\n  " + str(h)
 		else:
 			string += "None"
 
 		string += "\nDefines: "
 		if self.defines:
-	 		for d in self.defines:
-				 string += "\n  " + str(d)
+			for d in self.defines:
+				string += "\n  " + str(d)
 		else:
 			string += "None"
 		return string
@@ -266,14 +266,14 @@ class Scanner:
 def generate(env, **kw):
 	def generate_configparser(env):
 		return Parser()
-	
+
 	env.AddMethod(generate_configparser, 'ConfigParser')
-	
+
 	def find_files(env, path, unittest=None, ignore=None):
 		scanner = Scanner(env, unittest)
 		scanner.scan(path=path, ignore=ignore)
 		return scanner
-	
+
 	env.AddMethod(find_files, 'FindFiles')
 
 def exists(env):

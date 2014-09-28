@@ -35,8 +35,8 @@ xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::initialize(uint16_t prescale
 
 // ----------------------------------------------------------------------------
 %% if extended is not defined
-void
-xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::writeBlocking(uint8_t data)
+uint8_t
+xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::writeReadBlocking(uint8_t data)
 {
 	if (dataOrder == DataOrder::LsbFirst) {
 		data = xpcc::bitReverse(data);

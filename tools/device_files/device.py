@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-# 
+#
 # Copyright (c) 2013, Roboterclub Aachen e.V.
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
+#
 #  * Redistributions of source code must retain the above copyright
 #    notice, this list of conditions and the following disclaimer.
 #  * Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
 #  * Neither the name of the Roboterclub Aachen e.V. nor the
 #    names of its contributors may be used to endorse or promote products
 #    derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
 # EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -86,7 +86,7 @@ class DeviceFile:
 		TODO: Validate!!
 				try:
 					import lxml.etree		# for validating
-			
+
 					# validate against the embedded DTD file
 					try:
 						parser = lxml.etree.XMLParser(dtd_validation=True)
@@ -211,7 +211,6 @@ class DeviceFile:
 		s = DeviceIdentifier(device_string, self.log)
 		if s.valid == False:
 			return None
-		
 		drivers = []
 		# find software implementations of drivers
 		# these have to be added as too
@@ -224,8 +223,6 @@ class DeviceFile:
 					substitutions = s.getTargetDict()
 					substitutions.update(self.getSubstitutions())
 					drivers.append(d.toDict(platform_path, substitutions, s, self.properties))
-		
-		
 		# Loop Through Drivers
 		for d in self.drivers:
 			if d.appliesTo(s, self.properties):
@@ -339,8 +336,8 @@ class Driver(DeviceElementBase):
 			return None
 		else:
 			return f
-		
-	
+
+
 	def getDriverSubstitutions(self, device_id, properties):
 		"""
 		Returns a dict containing substitution values
@@ -362,7 +359,7 @@ class Driver(DeviceElementBase):
 
 	def _nodeToDict(self, node, device_id, properties):
 		"""
-		attribute of the node are turnded into key/value pairs
+		attribute of the node are turned into key/value pairs
 		child nodes are added to a list which is the value
 		of the child node name + 's' key.
 		Example:
@@ -412,9 +409,8 @@ class Driver(DeviceElementBase):
 					if instances != None:
 						# because we need a different seperator for everything...
 						instances = instances.split(',')
-					else:
-						# Add Parameter to Dictionary
-						parameters[name] = [value, instances]
+					# Add Parameter to Dictionary
+					parameters[name] = {'value': value, 'instances': instances}
 		self.log.debug("Found Parameters: %s" % parameters)
 		return parameters
 
