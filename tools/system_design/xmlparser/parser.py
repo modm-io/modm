@@ -13,6 +13,7 @@ import type
 import event
 import component
 import container
+import domain
 
 #logging.basicConfig(level=logging.DEBUG)
 logging.basicConfig(level=logging.WARNING)
@@ -26,12 +27,14 @@ class Tree(object):
 	events		-- List of all events
 	components	-- List of all components
 	container	-- List of all container
+	domains		-- List of all domains
 	"""
 	def __init__(self):
 		self.types = utils.SingleAssignDictionary("types")
 		self.events = utils.SingleAssignDictionary("events")
 		self.components = component.ComponentDictionary("components")
 		self.container = utils.SingleAssignDictionary("container")
+		self.domains = utils.SingleAssignDictionary("domain")
 	
 	def dump(self):
 		output = "Types:\n"
@@ -45,6 +48,9 @@ class Tree(object):
 			output += "- %s\n" % element
 		output += "\nContainer:\n"
 		for element in self.container:
+			output += "- %s\n" % element
+		output += "\Domains:\n"
+		for element in self.domains:
 			output += "- %s\n" % element
 		return output
 
@@ -72,6 +78,7 @@ class Parser(object):
 		 4. Parse all components without evaluating
 		 5. Evaluate all components
 		 6. Parse all container
+		 7. Parse all domains
 		
 		Step 1 and 4 are necessary because a type/component may reference to
 		another type/component with is not parsed at the moment. This
@@ -136,6 +143,8 @@ class Parser(object):
 		
 		self._parse_container(xmltree)
 		
+		self._parse_domains(xmltree)
+		
 		# create expanded versions for all types and components
 		for type in self.tree.types:
 			type.flattened()
@@ -185,6 +194,11 @@ class Parser(object):
 		for node in xmltree.findall('container'):
 			element = container.Container(node, self.tree)
 			self.tree.container[element.name] = element
+			
+	def _parse_domains(self, xmltree):
+		for node in xmltree.findall('domain'):
+			element = domain.Domain(node, self.tree)
+			self.tree.domains[element.name] = element
 	
 	def _check_events(self):
 		eventIds = {}
@@ -205,10 +219,10 @@ if __name__ == "__main__":
 	
 	tree = parser.tree
 	
-	#print tree.dump()
+	print tree.dump()
 	#print tree.types["Track Segment Line"].flattened().dump()
 	#print tree.components["driver"].dump()
 	#print tree.components["driver"].flattened().dump()
-	print tree.components["driver"].abstract
+	#print tree.components["driver"].abstract
 	
 	#print tree.container["drive"].subscriptions

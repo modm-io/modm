@@ -54,7 +54,8 @@ public:
 	};
 
 public:
-	template< class clockSource, uint32_t baudrate >
+	template< class clockSource, uint32_t baudrate,
+			uint16_t tolerance = xpcc::Tolerance::FivePercent >
 	static void
 	initialize();
 
@@ -64,26 +65,12 @@ public:
 	static void
 	setDataOrder(DataOrder order);
 
+
 	static uint8_t
 	writeReadBlocking(uint8_t data);
 
 	static void
-	writeBlocking(uint8_t data);
-
-	static bool
-	write(uint8_t data);
-
-	static bool
-	getResult(uint8_t &data);
-
-	static bool
-	transfer(uint8_t * tx, uint8_t * rx, std::size_t length);
-
-	static bool
-	isFinished();
-
-private:
-	static bool finished;
+	transferBlocking(uint8_t * tx, uint8_t * rx, std::size_t length);
 };
 
 } // namespace stm32

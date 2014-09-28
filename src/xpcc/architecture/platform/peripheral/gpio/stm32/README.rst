@@ -22,7 +22,7 @@ GPIOs like this:
 		<af id="2" peripheral-type="timer" peripheral-id="5"/>
 		<af id="3" peripheral-type="timer" peripheral-id="8"/>
 		<!-- According to the development summit 2012 the driver
-			 directory is call uard thus the type will always be
+			 directory is called uart thus the type will always be
 			 called uart and never usart! -->
 		<af id="7" peripheral-type="uart" peripheral-id="2"/>
 		<af id="8" peripheral-type="uart" peripheral-id="4"/>

@@ -11,6 +11,7 @@
 #define XPCC_TLC594X_HPP
 
 #include <stdint.h>
+#include <xpcc/architecture/platform.hpp>
 #include <xpcc/architecture/peripheral/gpio.hpp>
 #include <xpcc/architecture/driver/delay.hpp>
 

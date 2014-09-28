@@ -39,8 +39,8 @@ xpcc::Mcp4922<Spi, Cs, Ldac>::initialize()
 {
 	//spi.initialize();
 	
-	Cs::setOutput(xpcc::Gpio::HIGH);
-	Ldac::setOutput(xpcc::Gpio::HIGH);
+	Cs::setOutput(xpcc::Gpio::High);
+	Ldac::setOutput(xpcc::Gpio::High);
 }
 
 // ----------------------------------------------------------------------------
@@ -73,9 +73,9 @@ template <typename Spi, typename Cs, typename Ldac>
 void
 xpcc::Mcp4922<Spi, Cs, Ldac>::update()
 {
-	xpcc::delay_us(0.04);
+	xpcc::delayMicroseconds(1); // 40 nanoseconds
 	Ldac::reset();
-	xpcc::delay_us(0.1);
+	xpcc::delayMicroseconds(1); // 100 nanoseconds
 	Ldac::set();
 }
 

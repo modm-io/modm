@@ -64,6 +64,7 @@ class JavaGeneratorBuilder(builder_base.Builder):
 		
 		substitutions = {
 			'package' : self.options.package,
+			'domains':	self.tree.domains,
 			'components': self.tree.components,
 			'actions': self.tree.components.actions,
 			'events': self.tree.events,

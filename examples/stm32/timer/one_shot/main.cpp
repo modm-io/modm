@@ -32,7 +32,7 @@ MAIN_FUNCTION
 {
 	initClock();
 
-	LedStat::setOutput(xpcc::Gpio::HIGH);
+	LedStat::setOutput(xpcc::Gpio::High);
 	
 	// The Button has an external Pull-Down resistor
 	ButtonWakeUp::setInput(xpcc::stm32::FLOATING);
@@ -47,7 +47,7 @@ MAIN_FUNCTION
 	
 	while (1)
 	{
-		if (ButtonWakeUp::read() == xpcc::Gpio::HIGH)
+		if (ButtonWakeUp::read() == xpcc::Gpio::High)
 		{
 			// restart timer
 			Timer3::applyAndReset();

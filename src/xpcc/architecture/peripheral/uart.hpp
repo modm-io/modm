@@ -31,8 +31,11 @@ namespace xpcc
 class Uart : public ::xpcc::Peripheral
 {
 public:
-	/// Commonly used baudrates.
-	/// Most Serial-to-USB converters only support baudrates up to 115200 Baud
+	/**
+	 * Commonly used baudrates.
+	 *
+	 * Most Serial-to-USB converters only support baudrates up to 115200 Baud
+	 */
 	enum
 	Baudrate
 	{
@@ -61,10 +64,15 @@ public:
 	/**
 	 * Initializes the hardware and sets the baudrate.
 	 *
+	 * @tparam	clockSource
+	 * 		the currently active system clock
 	 * @tparam	baudrate
 	 *		desired baud rate in Hz
+	 * @tparam	tolerance
+	 * 		the allowed absolute tolerance for the resulting baudrate
 	 */
-	template< uint32_t baudrate >
+	template< class clockSource, uint32_t baudrate,
+			uint16_t tolerance = Tolerance::OnePercent >
 	static void
 	initialize();
 
@@ -120,7 +128,7 @@ public:
 	/**
 	 * Read a block of bytes.
 	 *
-	 * @param[out]	buffer
+	 * @param[out]	data
 	 *		Pointer to a buffer big enough to store `length` bytes
 	 * @param		length
 	 *		Number of bytes to be read
@@ -128,7 +136,7 @@ public:
 	 * @return	Number of bytes which could be read, maximal `length`
 	 */
 	static std::size_t
-	read(uint8_t *buffer, std::size_t length);
+	read(uint8_t *data, std::size_t length);
 
 	/**
 	 * Empty the receive FIFO queue and hardware buffer.

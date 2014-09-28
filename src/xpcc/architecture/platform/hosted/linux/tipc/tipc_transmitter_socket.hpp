@@ -31,6 +31,7 @@
  
 #include <cstring>
 #include <stdint.h>
+#include "header.hpp"
 
 namespace xpcc {
 	namespace tipc {
@@ -42,7 +43,7 @@ namespace xpcc {
 		 * \author		Carsten Schmitt < >
 		 */
 		class TransmitterSocket {
-			public:	
+			public:
 				TransmitterSocket();
 				~TransmitterSocket();
 		
@@ -50,7 +51,8 @@ namespace xpcc {
 				transmitPayload(	unsigned int typeId,
 									unsigned int instanceId,
 									const uint8_t* packet,
-									size_t length);
+									size_t length,
+									unsigned int domainId = Header::DOMAIN_ID_UNDEFINED );
 
 				/*
 				 * \brief Returns the ref part of the tipc port id.

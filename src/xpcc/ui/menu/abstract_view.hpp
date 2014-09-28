@@ -111,7 +111,7 @@ namespace xpcc
 			return this->identifier;
 		}
 
-	protected:
+	public:
 
 		xpcc::GraphicDisplay&
 		display();
@@ -131,6 +131,8 @@ namespace xpcc
 		
 	private:
 		xpcc::ViewStack* stack;
+
+	public:
 		const uint8_t identifier;
 		bool alive;
 	};

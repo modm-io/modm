@@ -35,7 +35,7 @@
 
 
 bool
-xpcc::CanLawicelFormatter::convertToCanMessage(const char* in,can::Message& out)
+xpcc::CanLawicelFormatter::convertToCanMessage(const char* in, can::Message& out)
 {
 	uint8_t dlc_pos;
 
@@ -67,7 +67,7 @@ xpcc::CanLawicelFormatter::convertToCanMessage(const char* in,can::Message& out)
 			return false;
 	}
 
-	// read the messge-identifier
+	// read the message-identifier
 	if (out.flags.extended)
 	{
 		uint16_t id;
@@ -185,5 +185,5 @@ xpcc::CanLawicelFormatter::byteToHex(uint8_t num)
 	if(num<10)
 		return '0' + num;
 	else
-		return  'A' + (num-10);
+		return 'A' + (num-10);
 }

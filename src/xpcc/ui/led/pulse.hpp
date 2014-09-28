@@ -90,9 +90,9 @@ public:
 
 	/// Must be called at least every ms
 	void
-	run()
+	update()
 	{
-		led.run();
+		led.update();
 
 		if (!led.isFading() && (isPulsing || !pulseDirection))
 		{

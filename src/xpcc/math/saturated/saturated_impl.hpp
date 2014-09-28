@@ -56,11 +56,11 @@ namespace xpcc
 	void
 	Saturated<T>::setValue(WideType in)
 	{
-		if (in > ArithmeticTraits<T>::max()) {
-			value = ArithmeticTraits<T>::max();
+		if (in > ArithmeticTraits<T>::max) {
+			value = ArithmeticTraits<T>::max;
 		}
-		else if (in < ArithmeticTraits<T>::min()) {
-			value = ArithmeticTraits<T>::min();
+		else if (in < ArithmeticTraits<T>::min) {
+			value = ArithmeticTraits<T>::min;
 		}
 		else {
 			value = static_cast<T>(in);

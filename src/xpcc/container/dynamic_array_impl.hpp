@@ -200,6 +200,23 @@ xpcc::DynamicArray<T, Allocator>::end()
 }
 
 template <typename T, typename Allocator>
+typename xpcc::DynamicArray<T, Allocator>::iterator
+xpcc::DynamicArray<T, Allocator>::find(const T& value)
+{
+	xpcc::DynamicArray<T, Allocator>::iterator iter = this->begin();
+
+	for(; iter != this->end(); ++iter)
+	{
+		if((*iter) == value) {
+			return iter;
+		}
+	}
+
+	// return end() if value has not been found
+	return iter;
+}
+
+template <typename T, typename Allocator>
 typename xpcc::DynamicArray<T, Allocator>::const_iterator 
 xpcc::DynamicArray<T, Allocator>::begin() const
 {
@@ -211,4 +228,21 @@ typename xpcc::DynamicArray<T, Allocator>::const_iterator
 xpcc::DynamicArray<T, Allocator>::end() const
 {
 	return const_iterator(this, size);
+}
+
+template <typename T, typename Allocator>
+typename xpcc::DynamicArray<T, Allocator>::const_iterator
+xpcc::DynamicArray<T, Allocator>::find(const T& value) const
+{
+	xpcc::DynamicArray<T, Allocator>::const_iterator iter = this->begin();
+
+	for(; iter != this->end(); ++iter)
+	{
+		if((*iter) == value) {
+			return iter;
+		}
+	}
+
+	// return end() if value has not been found
+	return iter;
 }

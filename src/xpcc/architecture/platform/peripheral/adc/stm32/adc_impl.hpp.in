@@ -78,8 +78,41 @@ xpcc::stm32::Adc{{ id }}::setChannel(const Channel channel,
 	// clear number of conversions in the sequence
 	// and set number of conversions to 1
 	ADC{{ id }}->SQR1 = 0;
-	ADC{{ id }}->SQR3 = static_cast<uint32_t>(channel) & 0b11111;
+	ADC{{ id }}->SQR2 = 0;
+	ADC{{ id }}->SQR3 = static_cast<uint32_t>(channel) & 0x1f;
 
+	setSampleTime(channel, sampleTime);
+}
+
+void
+xpcc::stm32::Adc{{ id }}::addChannel(const Channel channel,
+									const SampleTime sampleTime)
+{
+	// read channel count
+	uint8_t channel_count = (ADC{{ id }}->SQR1 & ADC_SQR1_L) >> 20;
+	++channel_count;
+	if(channel_count > 0x0f) return; // emergency exit
+	// write channel number
+	if(channel_count < 6) {
+		ADC{{ id }}->SQR3 |=
+			(static_cast<uint32_t>(channel) & 0x1f) << (channel_count*5);
+	} else 	if(channel_count < 12) {
+		ADC{{ id }}->SQR2 |=
+			(static_cast<uint32_t>(channel) & 0x1f) << ((channel_count-6)*5);
+	} else {
+		ADC{{ id }}->SQR1 |=
+			(static_cast<uint32_t>(channel) & 0x1f) << ((channel_count-12)*5);
+	}
+	// update channel count
+	ADC{{ id }}->SQR1 = (ADC{{ id }}->SQR1 & ~ADC_SQR1_L) | (channel_count << 20);
+
+	setSampleTime(channel, sampleTime);
+}
+
+void
+xpcc::stm32::Adc{{ id }}::setSampleTime(const Channel channel,
+										const SampleTime sampleTime)
+{
 	if (static_cast<uint32_t>(channel) < 10) {
 		ADC{{ id }}->SMPR2 |= static_cast<uint32_t>(sampleTime)
 								<< (static_cast<uint32_t>(channel) * 3);

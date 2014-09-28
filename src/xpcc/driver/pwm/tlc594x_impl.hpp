@@ -24,8 +24,8 @@ template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typenam
 void
 xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::initialize(uint16_t channels, uint8_t dots, bool writeCH, bool writeDC)
 {
-	Xlat::setOutput(xpcc::Gpio::LOW);
-	Vprog::setOutput(xpcc::Gpio::LOW);
+	Xlat::setOutput(xpcc::Gpio::Low);
+	Vprog::setOutput(xpcc::Gpio::Low);
 	Xerr::setInput();
 
 	if (dots != 0xff) setAllDotCorrection(dots, writeDC);
@@ -39,7 +39,7 @@ xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::latch()
 	Xlat::set();
 	// datasheet says 20ns but that is unreliable
 	// => wait for at least 900ns
-	xpcc::delay_us(0.9);
+	xpcc::delayMicroseconds(0.9);
 	Xlat::reset();
 }
 
@@ -211,9 +211,6 @@ xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::writeChannels(bool flush)
 		if (!Spi::transfer(gs, status, CHANNELS*3/2))
 			return false;
 
-		while(!Spi::isFinished())
-			;
-
 		latch();
 		return true;
 	}
@@ -233,9 +230,6 @@ xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::writeDotCorrection()
 		Vprog::reset();
 		return false;
 	}
-
-	while(!Spi::isFinished())
-		;
 
 	latch();
 

@@ -104,9 +104,9 @@ MAIN_FUNCTION
 		Clock::switchToPll();
 	}
 	
-	Led::setOutput(xpcc::gpio::LOW);
+	Led::setOutput(xpcc::Gpio::Low);
 
-	lcd::Reset::setOutput(xpcc::gpio::LOW);
+	lcd::Reset::setOutput(xpcc::Gpio::Low);
 
 	//------------------------------------------------------
 
@@ -192,7 +192,7 @@ MAIN_FUNCTION
 		display.update();
 		Led::reset();
 
-		xpcc::delay_ms(20);
+		xpcc::delayMilliseconds(20);
 
 		if (++x > 170)
 		{

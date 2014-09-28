@@ -8,7 +8,7 @@
 // ----------------------------------------------------------------------------
 /*
  * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.in file instead and rebuild this file.
+ * Please modify the corresponding *.in file instead and rebuild this file. 
  */
 // ----------------------------------------------------------------------------
 
@@ -17,7 +17,7 @@
 namespace xpcc
 {
 
-namespace led
+namespace ui
 {
 
 FLASH_STORAGE(uint16_t table12_256[]) =

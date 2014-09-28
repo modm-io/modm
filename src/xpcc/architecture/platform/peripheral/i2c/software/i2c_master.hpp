@@ -12,7 +12,7 @@
 
 #include <xpcc/architecture/driver/delay.hpp>
 #include <xpcc/architecture/peripheral/gpio.hpp>
-#include <xpcc/architecture/peripheral/i2c.hpp>
+#include <xpcc/architecture/peripheral/i2c_master.hpp>
 #include "type_ids.hpp"
 
 namespace xpcc
@@ -23,7 +23,7 @@ namespace xpcc
  *
  * @tparam	SCL			an Open-Drain Output pin
  * @tparam	SDA			an Open-Drain Output pin
- * @tparam	Frequency	in Hz (default frequency is 100kHz)
+ * @tparam	Baudrate	in Hz (default frequency is 100kHz)
  *
  * @ingroup	i2c
  * @author	Niklas Hauser
@@ -31,7 +31,7 @@ namespace xpcc
  */
 template< typename SCL,
 		  typename SDA,
-		  int32_t Frequency = 100000 >
+		  uint32_t BaudRate = xpcc::I2cMaster::Baudrate::Standard >
 class SoftwareI2cMaster : public xpcc::I2cMaster
 {
 public:
@@ -42,21 +42,23 @@ public:
 	/**
 	 * @brief	Initialize the hardware
 	 *
-	 * @param	rate	this will not set the data rate, use the Frequency template parameter for that
+	 * @warning	this call cannot modify the baudrate anymore, since it is defined
+	 * 			by the template parameter Baudrate.
 	 */
-	template<DataRate rate=DataRate::Standard>
+	template< class clockSource, uint32_t baudrate=Baudrate::Standard,
+			uint16_t tolerance = xpcc::Tolerance::FivePercent >
 	static void
 	initialize();
 
 public:
 	// start documentation inherited
 	static bool
-	start(xpcc::I2cDelegate *delegate);
+	start(I2cTransaction *transaction, Configuration_t configuration = nullptr);
 
 	static ALWAYS_INLINE bool
-	startBlocking(xpcc::I2cDelegate *delegate)
+	startBlocking(I2cTransaction *transaction, Configuration_t configuration = nullptr)
 	{
-		return start(delegate);
+		return start(transaction, configuration);
 	};
 
 	static Error
@@ -98,14 +100,18 @@ private:
 
 	// calculate the delay in microseconds needed to achieve the
 	// requested SPI frequency
-	static constexpr float delayTime = (1000000.0 / Frequency) / 2.0;
+	static constexpr float delayTime = (1000000.0 / BaudRate) / 2.0;
 
 	static SCL scl;
 	static SDA sda;
 
 	static xpcc::I2c::Operation nextOperation;
-	static xpcc::I2cDelegate *myDelegate;
+	static xpcc::I2cTransaction *delegate;
 	static Error errorState;
+
+	static xpcc::I2cTransaction::Starting starting;
+	static xpcc::I2cTransaction::Writing writing;
+	static xpcc::I2cTransaction::Reading reading;
 };
 
 } // namespace xpcc

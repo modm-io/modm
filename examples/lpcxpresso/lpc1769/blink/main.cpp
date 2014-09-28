@@ -14,8 +14,8 @@ main(void)
 	while (1)
 	{
 		Led::reset();
-		xpcc::delay_ms(100);
+		xpcc::delayMilliseconds(100);
 		Led::set();
-		xpcc::delay_ms(100);
+		xpcc::delayMilliseconds(100);
 	}
 }

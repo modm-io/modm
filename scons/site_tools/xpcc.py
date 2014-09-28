@@ -155,6 +155,7 @@ def xpcc_library(env, buildpath=None):
 def xpcc_communication_header(env, xmlfile, path='.'):
 	files  = env.SystemCppPackets(xmlfile, path=path)
 	files += env.SystemCppIdentifier(xmlfile, path=path)
+	files += env.SystemCppCommunication(xmlfile, path=path)
 	if 'communication' in env['XPCC_CONFIG']:
 		files += env.SystemCppPostman(
 				target='postman',
@@ -256,7 +257,7 @@ def generate(env, **kw):
 
 		architecture_derecated = parser.get('build', 'architecture', 'deprecated')
 		if architecture_derecated != "deprecated":
-			env.Warn("Specifying architecture is deprecated and replaced only by the Device ID.")
+			env.Warn("Specifying architecture is deprecated and replaced by only the Device ID ('device=...'.")
 
 		projectName = parser.get('general', 'name')
 
@@ -360,21 +361,10 @@ def generate(env, **kw):
 		# path to the headers of a very small and incomplete libstdc++ implementation
 		env.Append(CPPPATH = [os.path.join(rootpath, 'src', 'stdc++')])
 
-	elif env['ARCHITECTURE'] == 'hosted':
-		if device == 'linux':
-			libs = ['boost_thread-mt', 'boost_system']
-			libpath = ['/usr/lib/']
-		else:
-			libs = []
-			libpath = []
-		env['CXXCOM'] = []
-		env['LINKCOM'] = []
-		env['LIBS'] = libs
-		env['LIBPATH'] = libpath
-		env['ENV'] = os.environ
-		
+	elif env['ARCHITECTURE'].startswith('hosted'):
+		env['HOSTED_DEVICE'] = device
 		env.Tool('hosted')
-	elif env['ARCHITECTURE'] in ['arm7tdmi', 'cortex-m0', 'cortex-m3', 'cortex-m4', 'cortex-m4f']:
+	elif env['ARCHITECTURE'] in ['cortex-m0', 'cortex-m3', 'cortex-m4', 'cortex-m4f']:
 		if env['ARCHITECTURE'] == 'cortex-m4f':
 			env['ARM_ARCH'] = 'cortex-m4'
 		else:
@@ -383,14 +373,18 @@ def generate(env, **kw):
 		env['ARM_CLOCK'] = clock
 		
 		env.Tool('arm')
+		env.Tool('dfu_stm32_programmer')
 		
 		# load openocd tool if required
 		if parser.has_section('program'):
 			try:
 				if parser.get('program', 'tool') == 'openocd':
 					env.Tool('openocd')
+					env.Tool('openocd_remote')
 					env['OPENOCD_CONFIGFILE'] = parser.get('openocd', 'configfile')
 					env['OPENOCD_COMMANDS'] = parser.get('openocd', 'commands')
+					env['OPENOCD_REMOTE_HOST'] = parser.get('openocd', 'remote_host', 'localhost')
+					env['OPENOCD_REMOTE_USER'] = parser.get('openocd', 'remote_user', 'pi')
 				if parser.get('program', 'tool') == 'stlink':
 					env.Tool('stlink')
 				if parser.get('program', 'tool') == 'lpclink':
@@ -408,14 +402,7 @@ def generate(env, **kw):
 					env.Tool('gdb')
 			except configparser.ParserException as e:
 				env.Error("Error in Configuration: %s" % e)
-				Exit(1)			
-	elif env['ARCHITECTURE'] == 'avr32':
-		env['AVR32_DEVICE'] = device
-		env['AVR32_CLOCK']  = clock
-		env['LIBS']         = ['']
-		env['LIBPATH']      = []
-		env.Tool('avr32')
-		env.Tool('dfu-programmer')
+				Exit(1)
 	else:
 		env.Error("xpcc Error: Unknown architecture '%s'!" % env['ARCHITECTURE'])
 		Exit(1)
@@ -428,7 +415,13 @@ def generate(env, **kw):
 		if key.upper() == "CPPPATH":
 			value = value.split(':')
 		env.Append(**{ key.upper(): value } )
-	
+
+	# append defines from user config
+	user_conf = {}
+	for key,value in configuration['defines'].items():
+		user_conf[key.upper()] = value
+	env.Append(CPPDEFINES = user_conf)
+
 	# These emitters are used to build everything not in place but in a
 	# separate build-directory.
 	def defaultEmitter(target, source, env):

@@ -11,25 +11,71 @@
 #define XPCC_TMP102_HPP
 
 #include <stdint.h>
-#include <xpcc/architecture/peripheral/i2c_adapter.hpp>
+#include <xpcc/architecture/peripheral/i2c_device.hpp>
+#include <xpcc/architecture/peripheral/i2c_transaction.hpp>
+#include <xpcc/processing/protothread.hpp>
+#include <xpcc/processing/coroutine.hpp>
 
 namespace xpcc
 {
 
-namespace tmp102
+struct tmp102
 {
 	enum class
-	Register
+	ThermostatMode : uint8_t
 	{
-		Temperature = 0x00,
-		Configuration = 0x01,
-		LowTemperature = 0x02,
-		HighTemperature = 0x03
+		Comparator = 0,
+		Interrupt = 0x02
 	};
 
-	enum Temperature
+	enum class
+	AlertPolarity : uint8_t
 	{
-		TEMPERATURE_EXTENDED_MODE = 0x01
+		ActiveLow = 0,
+		ActiveHigh = 0x04
+	};
+
+	enum class
+	FaultQueue : uint8_t
+	{
+		Faults1 = 0,
+		Faults2 = 0x08,
+		Faults4 = 0x10,
+		Faults6 = 0x18,
+	};
+};
+
+/**
+ * TMP102 digital temperature sensor driver
+ *
+ * The TMP102 is a digital temperature sensor with a I2C interface
+ * and measures temperature over a range of -40 to +125 deg Celsius with a
+ * resolution of 1/16 (0.0625) deg C and an accuracy of up to 0.5 deg C.
+ *
+ * The sensor has a default refresh rate of 4Hz but can be set from
+ * 0.25Hz up to 33Hz using `setUpdateRate(rate)`.
+ * You can manually start a conversion with `startConversion()`, wait for
+ * 30ms and then `readTemperature()` to achieve other (less frequent)
+ * update rates.
+ *
+ * @see <a href="http://www.ti.com/lit/ds/symlink/tmp102.pdf">Datasheet</a>
+ *
+ * @ingroup temperature
+ * @author	Niklas Hauser
+ *
+ * @tparam I2cMaster Asynchronous Interface
+ */
+template < class I2cMaster >
+class Tmp102 :	public tmp102, public xpcc::I2cDevice< I2cMaster >,
+				private xpcc::pt::Protothread, public xpcc::co::NestedCoroutine<1>
+{
+private:
+	enum Register
+	{
+		REGISTER_TEMPERATURE = 0x00,
+		REGISTER_CONFIGURATION = 0x01,
+		REGISTER_LOW_TEMPERATURE = 0x02,
+		REGISTER_HIGH_TEMPERATURE = 0x03
 	};
 
 	enum Configuration
@@ -57,36 +103,7 @@ namespace tmp102
 		CONFIGURATION_CONVERSION_RATE_4HZ = 0x80,
 		CONFIGURATION_CONVERSION_RATE_8HZ = 0xc0
 	};
-}
 
-/**
- * @brief	TMP102 digital temperature sensor driver
- *
- * The TMP102 is a digital temperature sensor with a two-wire interface
- * and measures temperature over a range of -40 to +125 deg Celsius with a
- * resolution of 1/16 (0.0625) deg C and an accuracy of up to 0.5 deg C.
- *
- * The sensor has a default refresh rate of 4Hz but can be raised up to
- * 30Hz by repeatedly manually starting a conversion (with
- * startConversion()), which lasts 26ms.
- *
- * To convert the raw data into degrees Celsius, cast the MSB and LSB into
- * a signed 16bit integer, shift it right by 4 (or 3 in extended mode) and
- * devide by 16 (or use the getTemperature() method).
- *
- * If you are only interested in the integer value of the temperature,
- * simply only use the MSB (getData()[0]) when not in extended mode.
- *
- * @see <a href="http://www.ti.com/lit/ds/symlink/tmp102.pdf">Datasheet</a>
- *
- * @ingroup temperature
- * @author	Niklas Hauser
- *
- * @tparam I2cMaster Asynchronous Interface
- */
-template < typename I2cMaster >
-class Tmp102
-{
 public:
 	/**
 	 * @param	data		pointer to a 2 uint8_t buffer
@@ -94,58 +111,85 @@ public:
 	 */
 	Tmp102(uint8_t* data, uint8_t address=0x48);
 
+	/// @return pointer to 8bit array containing temperature as big endian int16_t
+	ALWAYS_INLINE uint8_t*
+	getData();
+
 	bool
-	configure(uint8_t lsb=tmp102::CONFIGURATION_CONVERSION_RATE_4HZ,
-			  uint8_t msb=tmp102::CONFIGURATION_CONVERTER_RESOLUTION_12BIT);
+	update();
+
+	// MARK: - Tasks
+	/// pings the sensor
+	xpcc::co::Result<bool>
+	ping(void *ctx);
+
+	// MARK: Configuration
+	// @param	rate	Update rate in Hz: 0 to 33. (Use 0 to update at 0.25Hz).
+	xpcc::co::Result<bool>
+	setUpdateRate(void *ctx, uint8_t rate);
+
+	/// Enables extended mode with 13 bit data format.
+	xpcc::co::Result<bool>
+	enableExtendedMode(void *ctx, bool enable = true);
+
+	xpcc::co::Result<bool>
+	configureAlertMode(void *ctx, ThermostatMode mode, AlertPolarity polarity, FaultQueue faults);
+
+	xpcc::co::Result<bool> ALWAYS_INLINE
+	writeUpperLimit(void *ctx, float temperature)
+	{ return writeLimitRegister(ctx, REGISTER_HIGH_TEMPERATURE, temperature); }
+
+	xpcc::co::Result<bool>
+	writeLowerLimit(void *ctx, float temperature)
+	{ return writeLimitRegister(ctx, REGISTER_LOW_TEMPERATURE, temperature); }
+
+	/// param[in]	result	contains comparator mode alert in the configured polarity
+	xpcc::co::Result<bool>
+	readComparatorMode(void *ctx, bool &result);
 
 	/// starts a temperature conversion right now
-	ALWAYS_INLINE void
-	startConversion();
+	xpcc::co::Result<bool>
+	startConversion(void *ctx);
 
-	/**
-	 * read the Temperature registers and buffer the results
-	 * sets isNewDataAvailable() to `true`
-	 */
-	ALWAYS_INLINE void
-	readTemperature();
-
-	/**
-	 * `true`, when new data has been read from the sensor and is buffered,
-	 * `false`, when the data has been accessed
-	 */
-	ALWAYS_INLINE bool
-	isNewDataAvailable();
-
-	/// @return pointer to 8bit array containing temperature as big endian int16_t
-	uint8_t*
-	getData();
+	/// reads the Temperature registers and buffers the results
+	xpcc::co::Result<bool>
+	readTemperature(void *ctx);
 
 	/// @return the temperature as a signed float in Celcius
 	float
 	getTemperature();
 
-	void
-	update();
-
 private:
-	xpcc::I2cWriteReadAdapter adapter;
+	xpcc::co::Result<bool>
+	writeConfiguration(void *ctx, uint8_t length=3);
 
-	enum class
-	Running {
-		Nothing,
-		ReadTemperature,
-		StartConversion
-	} running;
+	xpcc::co::Result<bool>
+	writeLimitRegister(void *ctx, Register reg, float temperature);
 
-	struct Status {
-		bool startConversionPending	: 1;
-		bool readTemperaturePending	: 1;
-		bool newTemperatureData		: 1;
-	} status;
+	struct I2cTask
+	{
+		enum
+		{
+			Idle = 0,
+			ReadTemperature,
+			StartConversion,
+			Configuration,
+			LimitRegister,
+			ReadAlert,
+			Ping
+		};
+	};
 
-	uint8_t config;
+	volatile uint8_t i2cTask;
+	volatile uint8_t i2cSuccess;
 	uint8_t* data;
 	uint8_t buffer[3];
+	uint8_t config_msb;
+	uint8_t config_lsb;
+	xpcc::Timeout<> timeout;
+	uint16_t updateTime;
+
+	xpcc::I2cTagAdapter< xpcc::I2cWriteReadAdapter > adapter;
 };
 
 } // namespace xpcc

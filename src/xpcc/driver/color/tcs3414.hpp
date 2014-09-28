@@ -40,7 +40,7 @@
 #include <stdint.h>
 
 #include <xpcc/ui/color.hpp>
-#include <xpcc/communication/i2c/write_read_adapter.hpp>
+#include <xpcc/architecture/peripheral/i2c_adapter.hpp>
 
 namespace xpcc
 {
@@ -163,10 +163,14 @@ namespace xpcc
 	 * \ingroup	driver_other
 	 */
 	template<typename I2cMaster>
-	class Tcs3414
+	class Tcs3414 : protected xpcc::I2cWriteReadAdapter
 	{
 	public:
-		//! \brief 	Power up sensor and start conversions
+		Tcs3414()
+		:	I2cWriteReadAdapter(0b0111001)
+		{}
+
+				//! \brief 	Power up sensor and start conversions
 		static inline OperationSuccess
 		initialize(){
 			return writeRegister(RegisterAddress::CONTROL, 0b11);	// control to power up and start conversion
@@ -289,13 +293,10 @@ namespace xpcc
 		static inline OperationSuccess
 		setIntegrationTime(
 				const IntegrationMode mode = IntegrationMode::DEFAULT,
-				const uint8_t time = 0){
+				const uint8_t time = 0) {
 			return writeRegister(RegisterAddress::TIMING,
 					static_cast<uint8_t>(mode) | time);
 		}
-
-		static constexpr uint8_t ADDRESS = 0b0111001 << 1; // The address needs to be shifted by one the the left for the xpcc::i2c::WriteReadAdapter
-		static i2c::WriteReadAdapter i2cWRadapter;
 		
 		class uint16_t_LOW_HIGH
 		{

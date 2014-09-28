@@ -273,6 +273,16 @@ public:
 	setChannel(const Channel channel,
 		const SampleTime sampleTime = static_cast<SampleTime>(0b000));
 
+	/// Add a channel to conversion group.
+	static inline void
+	addChannel(const Channel channel,
+		const SampleTime sampleTime = static_cast<SampleTime>(0b000));
+
+	/// change sample time of ADC channel
+	static inline void
+	setSampleTime(const Channel channel,
+		const SampleTime sampleTime = static_cast<SampleTime>(0b000));
+
 	/**
 	 * Enables free running mode
 	 *

@@ -76,10 +76,17 @@
 %% elif target is stm32f2 or target is stm32f4
 %% 	do i.update({18: ["ADC_IRQHandler", "ADC1, ADC2 and ADC3s"]})
 %% endif
-%% do i.update({19: ["CAN1_TX_IRQHandler", "CAN1 TX"]})
-%% do i.update({20: ["CAN1_RX0_IRQHandler", "CAN1 RX0"]})
-%% do i.update({21: ["CAN1_RX1_IRQHandler", "CAN1 RX1"]})
-%% do i.update({22: ["CAN1_SCE_IRQHandler", "CAN1 SCE"]})
+%% if target is stm32f3
+%%  do i.update({19: ["USB_HP_CAN_TX_IRQHandler", "USB HP CAN TX"]} )
+%%  do i.update({20: ["USB_LP_CAN_RX0_IRQHandler", "USB LP CAN RX0"]})
+%%  do i.update({21: ["CAN_RX1_IRQHandler", "CAN RX1"]})
+%%  do i.update({22: ["CAN_SCE_IRQHandler", "CAN SCE"]})
+%% elif target is stm32f2 or target is stm32f4
+%%  do i.update({19: ["CAN1_TX_IRQHandler", "CAN1 TX"]} )
+%%  do i.update({20: ["CAN1_RX0_IRQHandler", "CAN1 RX0"]})
+%%  do i.update({21: ["CAN1_RX1_IRQHandler", "CAN1 RX1"]})
+%%  do i.update({22: ["CAN1_SCE_IRQHandler", "CAN1 SCE"]})
+%% endif
 %% do i.update({23: ["EXTI9_5_IRQHandler", "EXTI Line 9..5"]})
 %% if target is stm32f3
 %% 	do i.update({24: ["TIM1_BRK_TIM15_IRQHandler", "TIM1 Break"]})

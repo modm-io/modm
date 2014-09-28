@@ -74,7 +74,7 @@ MAIN_FUNCTION
 		Timer1::setCompareValue(1, pwm * pwm);
 		Timer2::setCompareValue(2, (255 - pwm) * (255 - pwm));
 
-		xpcc::delay_ms(5);
+		xpcc::delayMilliseconds(5);
 	}
 }
 

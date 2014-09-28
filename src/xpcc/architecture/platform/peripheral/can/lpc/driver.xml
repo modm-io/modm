@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE rca SYSTEM "../../xml/driver.dtd">
+<rca version="1.0">
+	<driver type="can" name="lpc">
+		<static>c_can.cpp</static>
+		<static>c_can.hpp</static>
+		<static>c_can_filter.cpp</static>
+		<static>c_can_filter.hpp</static>
+		<static>c_can_registers.h</static>
+		<static>error_code.hpp</static>
+	</driver>
+</rca>

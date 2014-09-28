@@ -57,6 +57,9 @@ xpcc::ViewStack::update()
 {
 	xpcc::AbstractView* top = this->get();
 
+	if (top == NULL)
+		return;
+
 	top->update();
 	if (top->isAlive())
 	{

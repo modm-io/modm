@@ -7,10 +7,6 @@
 #ifndef XPCC__TCS3414_HPP
 #	error	"Don't include this file directly, use 'software_i2c.hpp' instead!"
 #endif
-
-template<typename I2cMaster>
-xpcc::i2c::WriteReadAdapter xpcc::Tcs3414<I2cMaster>::i2cWRadapter;
-
 template<typename I2cMaster>
 typename xpcc::Tcs3414<I2cMaster>::Data xpcc::Tcs3414<I2cMaster>::data;
 
@@ -35,10 +31,10 @@ xpcc::tcs3414::OperationSuccess xpcc::Tcs3414<I2cMaster>::writeRegister(
 			|	0x40							// with SMB read/write protocol
 			|	static_cast<uint8_t>(address);	// at this address
 	buffer_write[2] = value;
-	i2cWRadapter.initialize(ADDRESS, buffer_write, 3, NULL, 0);
-	if(!I2cMaster::startBlocking(&i2cWRadapter))
+	configureWriteRead(buffer_write, 3, nullptr, 0);
+	if(!I2cMaster::startBlocking(this))
 		return false;
-	if(i2cWRadapter.getState() != xpcc::i2c::adapter::State::NO_ERROR)
+	if(getAdapterState() != xpcc::I2cWriteReadAdapter::AdapterState::Idle)
 		return false;
 	return true;
 }
@@ -50,10 +46,10 @@ xpcc::tcs3414::OperationSuccess xpcc::Tcs3414<I2cMaster>::readRegisters(
 				static_cast<uint8_t>(0x80)		// write command
 			|	static_cast<uint8_t>(0x40)		// with SMB read/write protocol
 			|	static_cast<uint8_t>(address);	// at this address
-	i2cWRadapter.initialize(&buffer_write, 1, values, count);	// read registers
-	if(!I2cMaster::startBlocking(&i2cWRadapter))
+	configureWriteRead(&buffer_write, 1, values, count);	// read registers
+	if(!I2cMaster::startBlocking(this))
 		return false;
-	if(i2cWRadapter.getState() != xpcc::i2c::adapter::State::NO_ERROR)
+	if(getAdapterState() != xpcc::I2cWriteReadAdapter::AdapterState::Idle)
 		return false;
 	return true;
 }

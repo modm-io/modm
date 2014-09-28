@@ -46,8 +46,8 @@ globalIncludes = []
 # Add the STM32 Standard Peripheral Library
 if env['XPCC_DEVICE'].startswith('stm32f0'):
 	globalIncludes += [
-		'stm32f0xx_lib/CMSIS/Include',
-		'stm32f0xx_lib/CMSIS/Device/ST/STM32F0xx/Include',
+		'cmsis/stm32/Include',
+		'cmsis/stm32/Device/ST/STM32F0xx/Include',
 		]
 if env['XPCC_DEVICE'].startswith('stm32f10'):
 	# sourcePath += [
@@ -57,74 +57,28 @@ if env['XPCC_DEVICE'].startswith('stm32f10'):
 		'stm32f10x_lib/CMSIS/CM3/DeviceSupport/ST/STM32F10x']
 	#	'stm32f10x_lib/STM32F10x_StdPeriph_Driver/inc']
 
-if env['XPCC_DEVICE'].startswith('stm32f2'):
-	#sourcePath += [
-	#	'stm32f2xx_lib/STM32F2xx_StdPeriph_Driver/src']
-	globalIncludes += [
-		'stm32f2xx_lib/CMSIS/CM3/CoreSupport',
-		'stm32f2xx_lib/CMSIS/CM3/DeviceSupport/ST/STM32F2xx']
-	#	'stm32f2xx_lib/STM32F2xx_StdPeriph_Driver/inc']
-
 if env['XPCC_DEVICE'].startswith('stm32f3'):
-	#sourcePath += [
-	#	'stm32f3xx_lib/STM32F3xx_StdPeriph_Driver/src']
 	globalIncludes += [
-		'stm32f3xx_lib/CMSIS/Include',
-		'stm32f3xx_lib/CMSIS/Device/ST/STM32F30x/Include']
-	#	'stm32f3xx_lib/STM32F30x_StdPeriph_Driver/inc',
+		'cmsis/stm32/Include',
+		'cmsis/stm32/Device/ST/STM32F3xx/Include']
+
 if env['XPCC_DEVICE'].startswith('stm32f4'):
-	#sourcePath += [
-	#	'stm32f4xx_lib/STM32F4xx_StdPeriph_Driver/src']
 	globalIncludes += [
-		'stm32f4xx_lib/CMSIS/Include',
-		'stm32f4xx_lib/CMSIS/Device/ST/STM32F4xx/Include']
-	#	'stm32f4xx_lib/STM32F4xx_StdPeriph_Driver/inc']
+		'cmsis/stm32/Include',
+		'cmsis/stm32/Device/ST/STM32F4xx/Include']
 
 if 'stm32f' in env['XPCC_DEVICE'] and not env['XPCC_DEVICE'].startswith('stm32f0'):
 	sourcePath += ['freertos']		# FreeRTOS for STM32
 	sourcePath += ['fatfs']			# FatFS
 
 if env['XPCC_DEVICE'].startswith('lpc11'):
-	sourcePath += ['lpc11xx/cmsis', 'lpc11xx/driver']
+	#sourcePath += ['lpc11xx/cmsis', 'lpc11xx/driver']
 	globalIncludes += [
 		'lpc11xx/cmsis']
 
 if env['XPCC_DEVICE'].startswith('lpc17'):
 	sourcePath += ['lpc17xx/cmsis']
 	globalIncludes += []
-
-# Add portions of the Atmel ASF
-if env['ARCHITECTURE'].startswith('avr32'):
-	sourcePath += [
-		'asf/avr32',
-		'asf/common']
-	globalIncludes += [
-		'asf/avr32/boards',
-		'asf/avr32/boards/evk1101',
-		'asf/avr32/drivers/cpu',
-		'asf/avr32/drivers/flashc',
-		'asf/avr32/drivers/gpio',
-		'asf/avr32/drivers/intc',
-		'asf/avr32/drivers/pm',
-		'asf/avr32/drivers/tc',
-		'asf/avr32/drivers/usart',
-		'asf/avr32/drivers/usbb',
-		'asf/avr32/utils',
-		'asf/avr32/utils/preprocessor',
-		'asf/common/boards',
-		'asf/common/services',
-		'asf/common/services/clock',
-		'asf/common/services/sleepmgr',
-		'asf/common/services/usb',
-		'asf/common/services/usb/class',
-		'asf/common/services/usb/class/cdc',
-		'asf/common/services/usb/class/cdc/device',
-		'asf/common/services/usb/class/cdc/device/example',
-		'asf/common/services/usb/class/cdc/device/example/at32uc3b0256_evk1101',
-		'asf/common/services/usb/class/cdc/device/example/at32uc3b0256_evk1101/gcc',
-		'asf/common/services/usb/udc',
-		'asf/common/utils',
-		'asf/common/utils/interrupt']
 
 # -----------------------------------------------------------------------------
 includes = buildIncludes + globalIncludes

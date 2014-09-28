@@ -74,7 +74,7 @@
  *     while (1)
  *     {
  *         Led::toggle();
- *         xpcc::delay_ms(500);
+ *         xpcc::delayMilliseconds(500);
  *     }
  * }
  * @endcode
@@ -97,7 +97,7 @@
 8e: 84 27          eor  r24, r20
 90: 85 b9          out  0x05, r24
 
-92: c9 01          movw r24, r18       ; xpcc::delay_ms(500);
+92: c9 01          movw r24, r18       ; xpcc::delayMilliseconds(500);
 94: 01 97          sbiw r24, 0x01
 96: f1 f7          brne .-4            ; 0x94 <main+0x12>
 
@@ -117,7 +117,7 @@
 
 23e: 40 93 27 06   sts  0x0627, r20    ; Led::toggle();
 
-242: c9 01         movw r24, r18       ; xpcc::delay_ms(500);
+242: c9 01         movw r24, r18       ; xpcc::delayMilliseconds(500);
 244: 01 97         sbiw r24, 0x01
 246: f1 f7         brne .-4            ; 0x244 <main+0x16>
 
@@ -141,16 +141,16 @@ struct Gpio
 	 * The physical state is determined by the configuration and external connection.
 	 * @{
 	 */
-	static constexpr bool LOW = false;
-	static constexpr bool HIGH = true;
-	/// }@
+	static constexpr bool Low = false;
+	static constexpr bool High = true;
+	/// @}
 };
 
 /**
  * Input interface of an I/O pin.
  *
- * Even if the wrapped pin can only be used as input it is not configured that
- * way from the beginning. So remember to call `setInput()` after startup!
+ * The pin is not automatically set as an input after startup,
+ * so remember to call `setInput()` after startup!
  *
  * @ingroup	gpio
  */
@@ -171,8 +171,8 @@ public:
 /**
  * Output interface of an I/O pin.
  *
- * Even if the pin can only be used as output it is not configured that
- * way from the beginning. So remember to call `setOutput()` after startup!
+ * The pin is not automatically set as an output after startup,
+ * so remember to call `setOutput()` after startup!
  *
  * @ingroup	gpio
  */
@@ -211,7 +211,7 @@ public:
  *
  * @ingroup	gpio
  */
-class GpioIO : GpioOutput, GpioInput
+class GpioIO : public GpioOutput, public GpioInput
 {
 	// there are no new methods here
 };
@@ -233,6 +233,7 @@ class GpioPort
 public:
 	/// this can be used in drivers to assert the correct requirements
 	static constexpr uint16_t width;
+
 public:
 	static void
 	setOutput();

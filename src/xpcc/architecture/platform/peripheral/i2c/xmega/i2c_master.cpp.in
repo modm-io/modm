@@ -76,29 +76,29 @@ namespace
 		switch (s.next)
 		{
 			case xpcc::I2c::Operation::Read:
-				address = (s.address & 0xfe) | xpcc::I2c::READ;
+				address = (s.address & 0xfe) | xpcc::I2c::Read;
 				initializeRead(delegate->reading());
 				break;
 				
 			case xpcc::I2c::Operation::Write:
-				address = (s.address & 0xfe) | xpcc::I2c::WRITE;
+				address = (s.address & 0xfe) | xpcc::I2c::Write;
 				initializeWrite(delegate->writing());
 				break;
 				
 			default:
 			case xpcc::I2c::Operation::Stop:
-				address = (s.address & 0xfe) | xpcc::I2c::WRITE;
+				address = (s.address & 0xfe) | xpcc::I2c::Write;
 				initializeStopAfterAddress();
 				break;
 				
 			case xpcc::I2c::Operation::Restart:
-				address = (s.address & 0xfe) | xpcc::I2c::WRITE;
+				address = (s.address & 0xfe) | xpcc::I2c::Write;
 				initializeRestartAfterAddress();
 				break;
 		}
 		// This also generates a start condition
 		TWI{{ id }}_MASTER_ADDR = address;
-		TWI{{ id }}_MASTER_CTRLA |= (address & xpcc::I2c::READ) ? TWI_MASTER_RIEN_bm : TWI_MASTER_WIEN_bm;
+		TWI{{ id }}_MASTER_CTRLA |= (address & xpcc::I2c::Read) ? TWI_MASTER_RIEN_bm : TWI_MASTER_WIEN_bm;
 	}
 }
 
@@ -234,10 +234,6 @@ void
 xpcc::xmega::I2cMaster{{ id }}::initializeWithBaud(uint8_t baud)
 {
 	reset(xpcc::I2c::DetachCause::SoftwareReset);
-	
-//	Sda::setInput();
-//	Scl::setOutput();
-	
 	// SDA Hold Time and External Driver Interface disabled
 	TWI{{ id }}_CTRL = 0;
 	

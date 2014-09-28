@@ -105,9 +105,9 @@ public:
 
 	/// Must be called at least every ms
 	void
-	run()
+	update()
 	{
-		led.run();
+		led.update();
 
 		if (timer.isExpired() && (isBlinking || !blinkDirection))
 		{

@@ -56,7 +56,7 @@ MAIN_FUNCTION
 		}
 		Timer2::setCompareValue(2, pwm);
 
-		xpcc::delay_us(80);
+		xpcc::delayMicroseconds(80);
 	}
 }
 

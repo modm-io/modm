@@ -409,7 +409,7 @@ namespace xpcc
 	 * \tparam I2cMaster Asynchronous Two Wire interface
 	 */
 	template < typename I2cMaster >
-	class Bma180
+	class Bma180 : protected xpcc::I2cWriteReadAdapter
 	{
 	public:
 		/**
@@ -480,8 +480,6 @@ namespace xpcc
 		 */
 		uint8_t
 		readRegister(bma180::Register reg);
-		
-		xpcc::I2cWriteReadAdapter adapter;
 		
 		enum Status {
 			READ_ACCELEROMETER_PENDING = 0x01,

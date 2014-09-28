@@ -18,8 +18,8 @@ MAIN_FUNCTION
 	//StartupError err =
 	//	SystemClock<clockSource>::enable();
 
-	LedBlue::setOutput(xpcc::Gpio::HIGH);
-	LedGreen::setOutput(xpcc::Gpio::LOW);
+	LedBlue::setOutput(xpcc::Gpio::High);
+	LedGreen::setOutput(xpcc::Gpio::Low);
 
 	// Output SystemClock on PA8
 	// ClockOut::setOutput(Gpio::PUSH_PULL);
@@ -30,7 +30,7 @@ MAIN_FUNCTION
 	{
 		LedBlue::toggle();
 		LedGreen::toggle();
-		xpcc::delay_ms(500);
+		xpcc::delayMilliseconds(500);
 	}
 
 	return 0;

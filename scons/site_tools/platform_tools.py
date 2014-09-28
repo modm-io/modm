@@ -45,7 +45,7 @@ from configfile import Scanner # for header and source file endings
 
 # add device_file module from tools to path
 # this is apparently not pythonic, but I see no other way to do this
-# without polluting the site_tools directory or haveing duplicate code
+# without polluting the site_tools directory or having duplicate code
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'tools', 'device_files'))
 from device import DeviceFile
 from device_identifier import DeviceIdentifier
@@ -61,7 +61,7 @@ def platform_tools_find_device_file(env):
 	# Do not generate for hosted
 	# TODO: generate software peripherals for hosted
 	if device in ['darwin', 'linux', 'windows']:
-		env['ARCHITECTURE'] = 'hosted'
+		env['ARCHITECTURE'] = 'hosted/'+device
 		return
 	id = DeviceIdentifier(device)
 	env.Debug("Device String: %s" % device)
@@ -123,7 +123,7 @@ def platform_tools_find_device_file(env):
 	env['ARCHITECTURE'] = env['XPCC_DEVICE_FILE'].getProperties(device)['core']
 
 #------------------------------------------------------------------------------
-# env['XPCC_PLATFORM_PATH'] is used for abolute paths
+# env['XPCC_PLATFORM_PATH'] is used for absolute paths
 # architecture_path for relative build paths
 def platform_tools_generate(env, architecture_path):
 	device = env['XPCC_DEVICE']

@@ -52,7 +52,7 @@ xpcc::Mcp23s08<Spi, Cs, Int>::initialize()
 	cs.setOutput();
 	interrupt.setInput();
 	
-	xpcc::delay_us(0.1);
+	xpcc::delayMicroseconds(1);
 	
 	// disable address pins (as they are by default) and enable the
 	// open-drain output from the interrupt line
@@ -62,7 +62,7 @@ xpcc::Mcp23s08<Spi, Cs, Int>::initialize()
 	spi.write(1 << 2);
 	cs.set();
 	
-	xpcc::delay_us(0.1);
+	xpcc::delayMicroseconds(1);
 }
 
 template <typename Spi, typename Cs, typename Int>
@@ -75,7 +75,7 @@ xpcc::Mcp23s08<Spi, Cs, Int>::configure(uint8_t inputMask, uint8_t pullupMask)
 	spi.write(inputMask);
 	cs.set();
 	
-	xpcc::delay_us(0.1);
+	xpcc::delayMicroseconds(1);
 	
 	cs.reset();
 	spi.write(deviceAddress | WRITE);
@@ -83,7 +83,7 @@ xpcc::Mcp23s08<Spi, Cs, Int>::configure(uint8_t inputMask, uint8_t pullupMask)
 	spi.write(pullupMask);
 	cs.set();
 	
-	xpcc::delay_us(0.1);
+	xpcc::delayMicroseconds(1);
 }
 
 //void
@@ -101,7 +101,7 @@ xpcc::Mcp23s08<Spi, Cs, Int>::read()
 	uint8_t value = spi.write(0x00);
 	cs.set();
 	
-	xpcc::delay_us(0.1);
+	xpcc::delayMicroseconds(1);
 	
 	return value;
 }
@@ -116,5 +116,5 @@ xpcc::Mcp23s08<Spi, Cs, Int>::write(uint8_t output)
 	spi.write(output);
 	cs.set();
 	
-	xpcc::delay_us(0.1);
+	xpcc::delayMicroseconds(1);
 }

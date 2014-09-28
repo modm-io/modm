@@ -34,7 +34,7 @@ main()
 
 	// The LCD needs at least 50ms after power-up until it can be
 	// initialized. To make sure this is met we wait here
-	xpcc::delay_ms(50);
+	xpcc::delayMilliseconds(50);
 
 	display.initialize();
 	display.setCursor(0, 0);
@@ -52,6 +52,6 @@ main()
 
 		counter++;
 
-		xpcc::delay_ms(200);
+		xpcc::delayMilliseconds(200);
 	}
 }

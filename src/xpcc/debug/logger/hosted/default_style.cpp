@@ -55,7 +55,7 @@ namespace xpcc
 				}
 		};
 
-		static Wrapper< char[10], BLUE, NONE > debugWrapper("Debug:   ", device);
+		static Wrapper< char[10], TURQUOISE, NONE > debugWrapper("Debug:   ", device);
 		Logger ATTRIBUTE_WEAK debug(debugWrapper);
 
 		static Wrapper< char[10], GREEN, NONE > debugInfo("Info:    ", device);

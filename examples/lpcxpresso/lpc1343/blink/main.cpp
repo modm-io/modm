@@ -22,15 +22,15 @@ main(void)
 	// Set LED port pin to output
 	Led::setOutput(false);
 
-	// check delay_ms timing
+	// check delayMilliseconds timing
 	for (uint8_t ii = 10; ii > 0; --ii)
 	{
 		for (uint8_t jj = 4; jj > 0; --jj)
 		{
 			Led::toggle();
-			xpcc::delay_ms(100);
+			xpcc::delayMilliseconds(100);
 		}
-		xpcc::delay_ms(600);
+		xpcc::delayMilliseconds(600);
 	}
 	
 	while (1)

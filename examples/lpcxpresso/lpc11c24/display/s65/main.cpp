@@ -70,9 +70,9 @@ main(void)
 	{
 		static uint16_t ii = 500;
 		Led::toggle();
-		xpcc::delay_us(100);
+		xpcc::delayMicroseconds(100);
 		Led::toggle();
-		xpcc::delay_us(50);
+		xpcc::delayMicroseconds(50);
 
 		if (!--ii)
 			break;

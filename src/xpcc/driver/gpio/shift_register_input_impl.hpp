@@ -61,7 +61,7 @@ void
 xpcc::ShiftRegisterInput<Spi, Load, N>::initialize()
 {
 	spi.initialize();
-	store.setOutput(xpcc::Gpio::LOW);
+	store.setOutput(xpcc::Gpio::Low);
 	
 	for (uint_fast8_t i = 0; i < N; ++i) {
 		cache[i] = 0;

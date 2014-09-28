@@ -30,4 +30,9 @@ typedef GpioInputA0 Button;
 typedef GpioOutputA8 ClockOut;
 typedef GpioOutputC9 SystemClockOut;
 
+
+/// STM32F4 running at 168MHz (USB Clock qt 48MHz) generated from the
+/// external on-board 8MHz crystal
+typedef SystemClock<Pll<ExternalCrystal<MHz8>, MHz168, MHz48> > defaultSystemClock;
+
 #endif	// XPCC_STM32_F4_DISCOVERY_HPP

@@ -1,33 +1,13 @@
 # -*- coding: utf-8 -*-
-# 
 # Copyright (c) 2013, Roboterclub Aachen e.V.
 # All rights reserved.
 # 
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-# 
-#  * Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-#  * Redistributions in binary form must reproduce the above copyright
-#    notice, this list of conditions and the following disclaimer in the
-#    documentation and/or other materials provided with the distribution.
-#  * Neither the name of the Roboterclub Aachen e.V. nor the
-#    names of its contributors may be used to endorse or promote products
-#    derived from this software without specific prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
-# EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
-# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# The file is part of the xpcc library and is released under the 3-clause BSD
+# license. See the file `LICENSE` for the full license governing this code.
 # -----------------------------------------------------------------------------
 
 from lxml import etree
+from property import Property
 
 import os, sys, re
 # add python module logger to path
@@ -50,7 +30,8 @@ class XMLDeviceReader:
 		
 		self.file = path
 		self.tree = self._openDeviceXML(self.file)
-		self.properties = {'instances': [], 'id': DeviceIdentifier()}
+		self.id = DeviceIdentifier()
+		self.properties = []
 
 	def _openDeviceXML(self, filename):
 		self.log.debug("XMLDeviceReader: Opening XML file '%s'" % os.path.basename(self.file))
@@ -66,7 +47,7 @@ class XMLDeviceReader:
 	
 	def queryTree(self, query):
 		"""
-		This tries to apply the query to the device tree and returns eiher
+		This tries to apply the query to the device tree and returns either
 		- an array of element nodes,
 		- an array of strings or
 		- None, if the query failed.
@@ -92,6 +73,9 @@ class XMLDeviceReader:
 			return response
 		
 		return []
+	
+	def addProperty(self, name, value):
+		self.properties.append(Property(self.id, name, value, self.log))
 	
 	def compactQuery(self, query):
 		result = self.queryTree(query)

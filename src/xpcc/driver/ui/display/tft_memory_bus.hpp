@@ -137,13 +137,13 @@ public:
 		PORT::write(data);
 
 		// t_AS
-		xpcc::delay_us(1);
+		xpcc::delayMicroseconds(1);
 		WR::reset();
 
-		xpcc::delay_us(1);
+		xpcc::delayMicroseconds(1);
 		WR::set();
 
-		xpcc::delay_us(1);
+		xpcc::delayMicroseconds(1);
 		PORT::setInput();
 
 		CS::set();
@@ -156,11 +156,11 @@ public:
 		CS::reset();
 		WR::set();
 
-		xpcc::delay_us(1);
+		xpcc::delayMicroseconds(1);
 
 		RD::reset();
 
-		xpcc::delay_us(1);
+		xpcc::delayMicroseconds(1);
 		ret = PORT::read();
 
 		RD::set();

@@ -31,21 +31,22 @@
 #ifndef XPCC_PT__MACROS_HPP
 #define XPCC_PT__MACROS_HPP
 
+#include <xpcc/processing/coroutine.hpp>
+
 /**
  * Declare start of protothread
- * 
+ *
  * \warning	Use at start of the run() implementation!
  * \ingroup	protothread
  * \hideinitializer
  */
 #define PT_BEGIN() \
-	bool ptYielded ATTRIBUTE_UNUSED = true; \
 	switch (this->ptState) { \
-		case 0: 
+		case 0:
 
 /**
  * Stop protothread and end it
- * 
+ *
  * \warning	Use at end of the run() implementation!
  * \ingroup	protothread
  * \hideinitializer
@@ -58,37 +59,43 @@
 
 /**
  * Yield protothread till next call to its run().
- * 
+ *
  * \ingroup	protothread
  * \hideinitializer
  */
 #define PT_YIELD() \
     do { \
-		ptYielded = false; \
 		this->ptState = __LINE__; \
-		case __LINE__: \
-			if (!ptYielded) \
-				return true; \
+		return true; \
+		case __LINE__: ; \
 	} while (0)
 
 /**
- * Cause protothread to wait until given condition is true.
- * 
+ * Cause protothread to wait **while** given condition is true.
+ *
+ * \ingroup	protothread
+ * \hideinitializer
+ */
+#define PT_WAIT_WHILE(condition) \
+    do { \
+		this->ptState = __LINE__; \
+		case __LINE__: \
+			if (condition) \
+				return true; \
+    } while (0)
+
+/**
+ * Cause protothread to wait **until** given condition is true.
+ *
  * \ingroup	protothread
  * \hideinitializer
  */
 #define PT_WAIT_UNTIL(condition) \
-    do { \
-		this->ptState = __LINE__; \
-		case __LINE__: \
-			if (!(condition)) \
-				return true; \
-    } while (0)
-
+	PT_WAIT_WHILE(!(condition))
 
 /**
  * Cause protothread to wait until given child protothread completes.
- * 
+ *
  * \ingroup	protothread
  * \hideinitializer
  */
@@ -96,7 +103,7 @@
 
 /**
  * Restart and spawn given child protothread and wait until it completes.
- * 
+ *
  * \ingroup	protothread
  * \hideinitializer
  */
@@ -106,12 +113,31 @@
 		PT_WAIT_THREAD(child); \
     } while (0)
 
+
+/**
+ * Calls a given coroutine and returns
+ * whether it completed successfully or not.
+ *
+ * \ingroup	protothread
+ * \hideinitializer
+ */
+#define PT_CALL(coroutine) \
+	({ \
+		this->ptState = __LINE__; \
+		case __LINE__: \
+			auto coResult = coroutine; \
+			if (coResult.state > xpcc::co::NestingError) { \
+				return true; \
+			} \
+			coResult.result; \
+	})
+
 /**
  * Reset protothread to start from the beginning
- * 
+ *
  * In the next executing cycle the protothread will restart its execution at
  * its PT_BEGIN.
- * 
+ *
  * \ingroup	protothread
  * \hideinitializer
  */
@@ -123,7 +149,7 @@
 
 /**
  * Stop and exit from protothread.
- * 
+ *
  * \ingroup	protothread
  * \hideinitializer
  */

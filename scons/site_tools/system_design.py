@@ -98,6 +98,16 @@ def postman_emitter(target, source, env):
 	
 	return (target, source)
 
+def communication_emitter(target, source, env):
+	try:
+		path = env['path']
+	except KeyError:
+		path = '.'
+	
+	target = [os.path.join(path, "communication.hpp")]
+	
+	return (target, source)
+
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
 	env['BUILDERS']['SystemCppPackets'] = \
@@ -150,10 +160,27 @@ def generate(env, **kw):
 			target_factory = env.fs.Entry,
 			src_suffix = ".xml")
 	
+	env['BUILDERS']['SystemCppCommunication'] = \
+		SCons.Script.Builder(
+			action = SCons.Action.Action(
+				'python "${XPCC_SYSTEM_BUILDER}/cpp_communication.py" ' \
+					'--outpath ${TARGET.dir} ' \
+					'$SOURCE',
+				cmdstr="$SYSTEM_CPP_COMMUNICATION_COMSTR"),
+			emitter = communication_emitter,
+			source_scanner =
+				SCons.Script.Scanner(
+					function = xml_include_scanner,
+					skeys = ['.xml']),
+			single_source = True,
+			target_factory = env.fs.Entry,
+			src_suffix = ".xml")
+	
 	if SCons.Script.ARGUMENTS.get('verbose') != '1':
 		env['SYSTEM_CPP_PACKETS_COMSTR'] = "Generate packets from: $SOURCE"
 		env['SYSTEM_CPP_IDENTIFIER_COMSTR'] = "Generate identifier from: $SOURCE"
 		env['SYSTEM_CPP_POSTMAN_COMSTR'] = "Generate postman from: $SOURCE"
+		env['SYSTEM_CPP_COMMUNICATION_COMSTR'] = "Generate communication stubs from: $SOURCE"
 
 def exists(env):
 	return True

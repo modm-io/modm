@@ -35,9 +35,9 @@
 // ----------------------------------------------------------------------------
 template <typename I2cMaster>
 xpcc::Ds1631<I2cMaster>::Ds1631(uint8_t* data, uint8_t address)
-:	status(0), data(data)
+:	I2cWriteReadAdapter(address), status(0), data(data)
 {
-	adapter.initialize(address << 1, buffer, 0, data, 0);
+	configureWriteRead(buffer, 0, data, 0);
 }
 
 // ----------------------------------------------------------------------------
@@ -47,9 +47,9 @@ xpcc::Ds1631<I2cMaster>::configure(ds1631::Resolution resolution, bool continuou
 {
 	buffer[0] = 0xac;
 	buffer[1] = resolution | (continuousMode ? 0 : 0x01);
-	adapter.initialize(buffer, 3, data, 0);
+	configureWriteRead(buffer, 3, data, 0);
 	
-	return I2cMaster::startBlocking(&adapter);
+	return I2cMaster::startBlocking(this);
 }
 
 template <typename I2cMaster>
@@ -104,9 +104,9 @@ xpcc::Ds1631<I2cMaster>::isConversionDone()
 	if (running == NOTHING_RUNNING)
 	{
 		buffer[0] = 0xac;
-		adapter.initialize(buffer, 1, buffer, 1);
+		configureWriteRead(buffer, 1, buffer, 1);
 
-		if (I2cMaster::startBlocking(&adapter))
+		if (I2cMaster::startBlocking(this))
 			return (buffer[0] & 0x80);
 	}
 	return false;
@@ -125,7 +125,7 @@ xpcc::Ds1631<I2cMaster>::update()
 {
 	if (running != NOTHING_RUNNING)
 	{
-		switch (adapter.getState())
+		switch (getAdapterState())
 		{
 			case xpcc::I2c::AdapterState::Idle:
 				if (running == READ_TEMPERATURE_RUNNING) {
@@ -143,9 +143,9 @@ xpcc::Ds1631<I2cMaster>::update()
 		if (status & RESET_PENDING)
 		{
 			buffer[0] = 0x54;
-			adapter.initialize(buffer, 1, data, 0);
+			configureWriteRead(buffer, 1, data, 0);
 			
-			if (I2cMaster::start(&adapter)) {
+			if (I2cMaster::start(this)) {
 				status &= ~RESET_PENDING;
 				running = RESET_RUNNING;
 			}
@@ -153,9 +153,9 @@ xpcc::Ds1631<I2cMaster>::update()
 		else if (status & STOP_CONVERSION_PENDING)
 		{
 			buffer[0] = 0x22;
-			adapter.initialize(buffer, 1, data, 0);
+			configureWriteRead(buffer, 1, data, 0);
 			
-			if (I2cMaster::start(&adapter)) {
+			if (I2cMaster::start(this)) {
 				status &= ~STOP_CONVERSION_PENDING;
 				running = STOP_CONVERSION_RUNNING;
 			}
@@ -163,9 +163,9 @@ xpcc::Ds1631<I2cMaster>::update()
 		else if (status & START_CONVERSION_PENDING)
 		{
 			buffer[0] = 0x51;
-			adapter.initialize(buffer, 1, data, 0);
+			configureWriteRead(buffer, 1, data, 0);
 			
-			if (I2cMaster::start(&adapter)) {
+			if (I2cMaster::start(this)) {
 				status &= ~START_CONVERSION_PENDING;
 				running = START_CONVERSION_RUNNING;
 			}
@@ -173,9 +173,9 @@ xpcc::Ds1631<I2cMaster>::update()
 		else if (status & READ_TEMPERATURE_PENDING)
 		{
 			buffer[0] = 0xaa;
-			adapter.initialize(buffer, 1, data, 2);
+			configureWriteRead(buffer, 1, data, 2);
 			
-			if (I2cMaster::start(&adapter)) {
+			if (I2cMaster::start(this)) {
 				status &= ~READ_TEMPERATURE_PENDING;
 				running = READ_TEMPERATURE_RUNNING;
 			}

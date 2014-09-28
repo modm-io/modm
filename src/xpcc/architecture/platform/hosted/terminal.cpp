@@ -54,5 +54,6 @@ xpcc::pc::Terminal::flush()
 bool
 xpcc::pc::Terminal::read(char& value)
 {
-	return std::cin.get(value);
+	std::cin.get(value);
+	return std::cin.good();
 }

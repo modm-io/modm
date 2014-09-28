@@ -109,15 +109,15 @@ uint16_t
 xpcc::Ads7843<Spi, Cs, Int>::readData(uint8_t command)
 {
 	Cs::reset();
-	xpcc::delay_us(1);	// xpcc::delay_ns(100);
-	Spi::write(command);
-	xpcc::delay_us(1);
+	xpcc::delayMicroseconds(1);	// xpcc::delay_ns(100);
+	Spi::writeReadBlocking(command);
+	xpcc::delayMicroseconds(1);
 	
-	uint16_t temp = Spi::write(0x00);
+	uint16_t temp = Spi::writeReadBlocking(0x00);
 	temp <<= 8;
-	xpcc::delay_us(1);
+	xpcc::delayMicroseconds(1);
 	
-	temp |= Spi::write(0x00);
+	temp |= Spi::writeReadBlocking(0x00);
 	temp >>= 3;
 	
 	Cs::set();

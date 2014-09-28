@@ -109,13 +109,13 @@ Data:    %7d bytes (%2.1f%% Full)
 
 # -----------------------------------------------------------------------------
 def show_size(env, source, alias='__size'):
-	if env.has_key('DEVICE_SIZE'):
-		action = Action(size_action, cmdstr="$SIZECOMSTR")
-	else:
+	if env['ARCHITECTURE'] == 'avr8':
 		# use the raw output of the size tool
 		action = Action("$SIZE %s" % source[0].path, 
 					cmdstr="$SIZECOMSTR")
-	
+	else:
+		action = Action(size_action, cmdstr="$SIZECOMSTR")
+
 	return env.AlwaysBuild(env.Alias(alias, source, action))
 
 def list_symbols(env, source, alias='__symbols'):

@@ -115,12 +115,12 @@ template <typename SPI, typename CS, typename RS, typename Reset>
 void
 xpcc::SiemensS65Common<SPI, CS, RS, Reset>::lcdSettings(bool landscape) {
 	// Hardware reset is low from initialize
-	xpcc::delay_ms(50);
+	xpcc::delayMilliseconds(50);
 	Reset::set();
-	xpcc::delay_ms(50);
+	xpcc::delayMilliseconds(50);
 
 	writeCmd(0x07, 0x0000); //display off
-	xpcc::delay_ms(10);
+	xpcc::delayMilliseconds(10);
 
 	//power on sequence
 	writeCmd(0x02, 0x0400); //lcd drive control
@@ -133,11 +133,11 @@ xpcc::SiemensS65Common<SPI, CS, RS, Reset>::lcdSettings(bool landscape) {
 	writeCmd(0x03, 0x0000); //power control 1: BT        //step 2
 	writeCmd(0x03, 0x0000); //power control 1: DC
 	writeCmd(0x03, 0x000C); //power control 1: AP
-	xpcc::delay_ms(40);
+	xpcc::delayMilliseconds(40);
 	writeCmd(0x0E, 0x2D1F); //power control 5: VCOMG     //step 3
-	xpcc::delay_ms(40);
+	xpcc::delayMilliseconds(40);
 	writeCmd(0x0D, 0x0616); //power control 4: PON       //step 4
-	xpcc::delay_ms(100);
+	xpcc::delayMilliseconds(100);
 
 	//display options
 	if (landscape) {
@@ -157,7 +157,7 @@ xpcc::SiemensS65Common<SPI, CS, RS, Reset>::lcdSettings(bool landscape) {
 	writeCmd(0x07, 0x0025); //display control: GON
 	writeCmd(0x07, 0x0027); //display control: D1
 	writeCmd(0x07, 0x0037); //display control: DTE
-	xpcc::delay_ms(10);
+	xpcc::delayMilliseconds(10);
 	lcdCls(0x03e0);
 }
 

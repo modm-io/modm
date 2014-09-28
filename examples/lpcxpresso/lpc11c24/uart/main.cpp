@@ -8,8 +8,10 @@
 
 #include <xpcc/debug/logger.hpp>
 
-GPIO__OUTPUT(Led, 0, 7);
-GPIO__OUTPUT(WriteInd, 3, 1);
+using namespace xpcc::lpc;
+
+typedef GpioOutput0_7 Led;
+typedef GpioOutput3_1 WriteInd;
 
 // ----------------------------------------------------------------------------
 // Logging
@@ -36,13 +38,13 @@ testXpccLogger(void);
 
 extern xpcc::lpc::BufferedUart1 uart;
 
-using namespace xpcc::lpc;
+
 
 int
 main(void)
 {
 	StartupError err =
-		S::SystemClock<S::Pll<S::ExternalCrystal<MHz12>, MHz48> >::enable();
+		SystemClock<Pll<ExternalCrystal<MHz12>, MHz48> >::enable();
 
 	// Initialize 32-bit timer 0. TIME_INTERVAL is defined as 10mS
 	// You may also want to use the Cortex SysTick timer to do this
@@ -55,9 +57,9 @@ main(void)
 	// Set LED port pin to output
 	Led::setOutput();
 
-	xpcc::lpc::Uart1 uart(115200);
+	xpcc::lpc::Uart1::initialize(115200);
 
-	xpcc::delay_ms(100); // glitch ?
+	xpcc::delayMilliseconds(100); // glitch ?
 
 	uart.write('X');
 	uart.write('I');
@@ -98,14 +100,14 @@ testWriteSingle(void)
 			WriteInd::setOutput(false);
 		}
 
-		xpcc::delay_ms(2);
+		xpcc::delayMilliseconds(2);
 
 		// Some pause between burst otherwise USB is overloaded.
 		static uint8_t burst = 0;
 		if (burst++ > 5)
 		{
 			burst = 0;
-			xpcc::delay_ms(500);
+			xpcc::delayMilliseconds(500);
 		}
 	} // while (1)
 }
@@ -130,13 +132,13 @@ testWriteBuffer(void)
 		uart.write('\n');
 		WriteInd::setOutput(false);
 
-		xpcc::delay_ms(2);
+		xpcc::delayMilliseconds(2);
 
 		// Some pause between burst otherwise USB is overloaded.
 		static uint8_t burst = 0;
 		if (burst++ > 5) {
 			burst = 0;
-			xpcc::delay_ms(5000);
+			xpcc::delayMilliseconds(5000);
 		}
 	} // while (1)
 }

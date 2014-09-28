@@ -10,6 +10,32 @@
 
 namespace robot
 {
+	namespace domain
+	{
+		enum Identifier
+		{
+		{%- for item in domains -%}
+		{%- if item.id != None %}
+			{{ item.name | upper | replace(' ', '_') }} = {{ item.id }},
+		{%- endif -%}
+		{%- endfor %}
+		};
+				
+		inline const char* 
+		enumToString(Identifier e)
+		{
+			switch (e)
+			{
+			{%- for item in domains %}
+			{%- if item.id != None %}
+				case {{ item.name | upper | replace(' ', '_') }}: return "{{ item.name | upper | replace(' ', '_') }}";
+			{%- endif -%}
+			{%- endfor %}
+				default: return "__UNKNOWN__";
+			}
+		}
+	}
+	
 	namespace component
 	{
 		enum Identifier

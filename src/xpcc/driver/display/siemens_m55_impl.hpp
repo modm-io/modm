@@ -79,9 +79,9 @@ template <typename SPI, typename CS, typename RS, typename Reset>
 void
 xpcc::SiemensM55<SPI, CS, RS, Reset>::lcdSettings() {
 	// Hardware reset is low from initialize
-	xpcc::delay_ms(10);
+	xpcc::delayMilliseconds(10);
 	Reset::set();
-	xpcc::delay_ms(10);
+	xpcc::delayMilliseconds(10);
 
 	RS::set();	// command mode
 	CS::reset();	// select display
@@ -90,10 +90,10 @@ xpcc::SiemensM55<SPI, CS, RS, Reset>::lcdSettings() {
 	{
 	  SPI::write(initData_lm15[ii]);   // send initialization data
 	}
-	xpcc::delay_ms(1);
+	xpcc::delayMilliseconds(1);
 	CS::set();	// deactivate LCD CS
 
-	xpcc::delay_ms(1);
+	xpcc::delayMilliseconds(1);
 	CS::reset();	// activate LCD CS
 
 	SPI::write(0xF0);
@@ -116,7 +116,7 @@ xpcc::SiemensM55<SPI, CS, RS, Reset>::lcdSettings() {
 	CS::set();	 // deactivate LCD CS
 	RS::reset();	// set LCD to data mode
 
-	xpcc::delay_ms(10);
+	xpcc::delayMilliseconds(10);
 
 
 	static uint8_t contrast = 22;

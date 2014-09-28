@@ -22,12 +22,12 @@ main(void)
 {
 	initClock();
 
-	LedStat::setOutput(xpcc::Gpio::HIGH);
+	LedStat::setOutput(xpcc::Gpio::High);
 	
 	while (1)
 	{
 		LedStat::toggle();
-		xpcc::delay_ms(500);
+		xpcc::delayMilliseconds(500);
 	}
 }
 

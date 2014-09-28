@@ -154,12 +154,15 @@ namespace xpcc
 %% elif target is stm32f3
 	%% set sys_timer = 	{'name': "SystemTimer",
 					 'prescaler': "1/8" }
+	%% set apb1_timers = 	{'name': "APB1Timers",
+							 'prescaler': "2" ,
+							 'sinks': [ "Timer2",  "Timer3",  "Timer4",
+										"Timer6",  "Timer7" ] }
 	%% set apb1 = 	{'name': "APB1",
 					 'prescaler': "1/2",
-					 'sinks': [ "Can", "I2c1", "I2c2",
+					 'sinks': [ apb1_timers, "Can1", "I2c1", "I2c2",
 								"Usart2", "Usart3", "Uart4", "Uart5",
-								"Spi2", "Spi3",
-								"Timer2", "Timer3", "Timer4", "Timer6", "Timer7" ] }
+								"Spi2", "Spi3" ] }
 	%% set apb2 = 	{'name': "APB2",
 					 'prescaler': "1",
 					 'sinks': [ "Usart1", "Spi1",

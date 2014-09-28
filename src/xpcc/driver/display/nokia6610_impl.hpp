@@ -48,9 +48,9 @@ xpcc::Nokia6610<SPI, CS, Reset, GE12>::initialize()
 	// Reset pin
 	Reset::setOutput();
 	Reset::reset();
-	xpcc::delay_ms(1);
+	xpcc::delayMilliseconds(1);
 	Reset::set();
-	xpcc::delay_ms(10);
+	xpcc::delayMilliseconds(10);
 
 
 	lcdSettings();
@@ -124,9 +124,9 @@ xpcc::Nokia6610<SPI, CS, Reset, GE12>::lcdSettings() {
 	else{
 		// Hardware reset
 		Reset::reset();
-		xpcc::delay_ms(50);
+		xpcc::delayMilliseconds(50);
 		Reset::set();
-		xpcc::delay_ms(50);
+		xpcc::delayMilliseconds(50);
 
 		// Display vontrol
 		writeSpiCommand(nokia::NOKIA_GE8_DISCTL);
@@ -145,7 +145,7 @@ xpcc::Nokia6610<SPI, CS, Reset, GE12>::lcdSettings() {
 
 		CS::set();
 		// wait aproximetly 100ms
-		xpcc::delay_ms(100);
+		xpcc::delayMilliseconds(100);
 		CS::reset();
 
 		// Sleep out
@@ -236,7 +236,7 @@ xpcc::Nokia6610<SPI, CS, Reset, GE12>::update() {
 	else
 	{
 		// wait approximately 100ms
-		xpcc::delay_ms(100);
+		xpcc::delayMilliseconds(100);
 
 		// Display On
 		writeSpiCommand(nokia::NOKIA_GE8_DISON);

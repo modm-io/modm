@@ -19,6 +19,12 @@
 #include "error_code.hpp"
 #include "can_filter.hpp"
 
+%% if target is stm32f3
+	%% set reg = 'CAN'
+%% else
+	%% set reg = 'CAN' ~ id
+%% endif
+
 using namespace xpcc::clock; // for MHzxx
 
 namespace xpcc
@@ -60,19 +66,6 @@ public:
 		ListenOnlyLoopBack	= CAN_BTR_SILM | CAN_BTR_LBKM,
 	};
 
-	enum class
-	Bitrate : int
-	{
-		kBps10	= kHz10,
-		kBps20	= kHz20,
-		kBps50	= kHz50,
-		kBps100	= kHz100,
-		kBps125	= kHz125,
-		kBps250	= kHz250,
-		kBps500	= kHz500,
-		MBps1	= MHz1,
-	};
-
 public:
 %% if target is stm32f3
 	/// TypeId used to connect GPIO pins to this peripheral's rx.
@@ -106,7 +99,8 @@ public:
 	 * \warning	Has to called after connect(), but before any
 	 * 			other function from this class!
 	 */
-	template< class clockSource, Bitrate bitrate = Bitrate::kBps125>
+	template< class clockSource, uint32_t bitrate = Bitrate::kBps125,
+			uint16_t tolerance = Tolerance::OnePercent >
 	static inline void
 	initialize(	uint32_t interruptPriority, Mode startupMode = Mode::Normal,
 				bool overwriteOnOverrun = true)
@@ -133,7 +127,7 @@ public:
 								(clockSource::Can{{ id }} == MHz36)?  5 :
 								(clockSource::Can{{ id }} == MHz42)?  6 : 0;
 		constexpr uint16_t prescaler = 	clockSource::Can{{ id }} /
-								(static_cast<int>(bitrate) * (1 + bs1 + bs2));
+								(bitrate * (1 + bs1 + bs2));
 		static_assert(prescaler > 0,
 				"Unsupported frequency for Can peripheral. "
 				"Only 30 Mhz, 36 MHz and 42 MHz are supported at the moment.");
@@ -179,7 +173,7 @@ public:
 	static inline uint8_t
 	getReceiveErrorCounter()
 	{
-		return (CAN{{ id }}->ESR & CAN_ESR_REC) >> 24;
+		return ({{ reg }}->ESR & CAN_ESR_REC) >> 24;
 	}
 
 	/**
@@ -189,7 +183,7 @@ public:
 	static inline uint8_t
 	getTransmitErrorCounter()
 	{
-		return (CAN{{ id }}->ESR & CAN_ESR_TEC) >> 16;
+		return ({{ reg }}->ESR & CAN_ESR_TEC) >> 16;
 	}
 
 	static BusState

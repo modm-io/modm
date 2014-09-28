@@ -119,7 +119,7 @@ public:
  * @ingroup	gpio
  */
 template < class Pin >
-class GpioInverted : GpioIO
+class GpioInverted : Pin
 {
 public:
 	ALWAYS_INLINE static void

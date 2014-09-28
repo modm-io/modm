@@ -3,7 +3,7 @@
 <rca version="1.0">
 	<driver type="fsmc" name="stm32">
 		<template>fsmc.hpp.in</template>
-		<template>fsmc.cpp.in</template>
+		<static>fsmc.cpp</static>
 		<template>type_ids.hpp.in</template>
 	</driver>
 </rca>

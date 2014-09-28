@@ -1,4 +1,4 @@
-
+#include <xpcc/architecture.hpp>
 #include <xpcc/debug/logger.hpp>
 
 // Set the log level

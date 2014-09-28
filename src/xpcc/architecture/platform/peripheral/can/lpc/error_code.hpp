@@ -28,8 +28,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LPC11__ERROR_HPP
-#define XPCC_LPC11__ERROR_HPP
+#ifndef XPCC_LPC11_ERROR_HPP
+#define XPCC_LPC11_ERROR_HPP
 
 namespace xpcc
 {
@@ -46,4 +46,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_LPC11__ERROR_HPP
+#endif // XPCC_LPC11_ERROR_HPP

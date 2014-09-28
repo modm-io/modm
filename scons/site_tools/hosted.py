@@ -32,6 +32,15 @@ from SCons.Script import *
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
+	env['CXXCOM'] = []
+	env['LINKCOM'] = []
+	env['LIBS'] = []
+	env['LIBPATH'] = []
+	env['ENV'] = os.environ
+
+	if env['HOSTED_DEVICE'] == 'linux':
+		env['LIBS'] = ['boost_thread', 'boost_system']
+
 	c = env['XPCC_COMPILER']
 	if c in ['clang', 'clang++']:
 		c_compiler = 'clang'
@@ -43,7 +52,6 @@ def generate(env, **kw):
 	if platform.system() == 'Windows':
 		env.Append(ENV = {'PATH' : os.environ['PATH']})
 		env.Tool('default')
-		
 		env.Append(CXXFLAGS = "/EHsc")
 	else:
 		env.Append(ENV = {'PATH' : os.environ['PATH']})
@@ -52,13 +60,11 @@ def generate(env, **kw):
 		env.Tool('gnulink')
 		env.Tool('ar')
 		env.Tool('as')
-	
 		env['NM'] = "nm"
 		env['SIZE'] = "du -s -h"
-		
 		env['CC'] = c_compiler
 		env['CXX'] = cpp_compiler
-		
+
 		# build messages
 		if ARGUMENTS.get('verbose') != '1':
 			env['CCCOMSTR'] = "Compiling C: $TARGET"
@@ -71,7 +77,7 @@ def generate(env, **kw):
 			
 			env['SIZECOMSTR'] = "Size after:"
 			env['SYMBOLSCOMSTR'] = "Show symbols for '$SOURCE':"
-		
+
 		# flags for C and C++
 		env['CCFLAGS'] = [
 			"-funsigned-char",
@@ -84,10 +90,10 @@ def generate(env, **kw):
 
 		#if c_compiler == 'clang':
 		#	env['CCFLAGS'].append("-funsigned-bitfields")
-		
+
 		# C++ flags
 		env['CXXFLAGS'] = [
-			"-std=c++11",
+			"-std=c++0x",
 	#		"-Weffc++",
 			"-Woverloaded-virtual",
 		]

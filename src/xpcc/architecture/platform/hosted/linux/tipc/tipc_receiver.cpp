@@ -38,9 +38,11 @@
 #define XPCC_LOG_LEVEL xpcc::log::WARNING
 
 // ----------------------------------------------------------------------------
-xpcc::tipc::Receiver::Receiver(uint32_t ignoreTipcPortId) :
+xpcc::tipc::Receiver::Receiver(
+		uint32_t ignoreTipcPortId) :
 	tipcReceiverSocket_(),
 	ignoreTipcPortId_(ignoreTipcPortId),
+	domainId_( tipc::Header::DOMAIN_ID_UNDEFINED ),
 	packetQueue_(),
 	receiverThread_(),
 	receiverSocketLock_(),
@@ -56,6 +58,13 @@ xpcc::tipc::Receiver::~Receiver()
 {
 	this->isAlive_ = false;
 	this->receiverThread_->join();
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::tipc::Receiver::setDomainId( unsigned int domainId )
+{
+	this->domainId_ = domainId;
 }
 
 // ----------------------------------------------------------------------------
@@ -113,7 +122,8 @@ xpcc::tipc::Receiver::update()
 	while( this->tipcReceiverSocket_.receiveHeader( tipcPortId, tipcHeader ) )
 	{
 		// ignore messages, that are send by the port, that shoud be ignored
-		if (tipcPortId != this->ignoreTipcPortId_)
+		if 		(tipcPortId != this->ignoreTipcPortId_ &&
+				(this->domainId_==Header::DOMAIN_ID_UNDEFINED || this->domainId_==tipcHeader.domainId) )
 		{
 			XPCC_LOG_DEBUG << XPCC_FILE_INFO << "Header available." << xpcc::flush;
 			

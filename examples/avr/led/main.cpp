@@ -59,7 +59,7 @@ MAIN_FUNCTION // FINALLY ######################################################
 	xpcc::xmega::DmaController::initialize();
 	LedSpi::initialize(F_CPU/2);
 	Xerr::setInput(Configuration::PullUp);
-	Blank::setOutput(xpcc::Gpio::LOW);
+	Blank::setOutput(xpcc::Gpio::Low);
 
 	// initialize the tlc5940
 	ledController::initialize(0, 63, true, false);

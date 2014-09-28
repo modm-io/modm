@@ -1,17 +1,14 @@
-
 #include <xpcc/architecture.hpp>
-
-using namespace xpcc::stm32;
+#include "../../stm32f3_discovery.hpp"
 
 MAIN_FUNCTION
 {
-	StartupError err =
-		SystemClock<Pll<ExternalClock<MHz8>, MHz72>>::enable();
+	defaultSystemClock::enable();
 
 	// Initialize Usart Hal
 	GpioOutputA2::connect(UsartHal2::Tx);
-	GpioInputA3::connect(UsartHal2::Rx);
-	UsartHal2::initialize(115200, UsartHal2::Parity::Odd);
+	GpioInputA3::connect(UsartHal2::Rx, Gpio::InputType::PullUp);
+	UsartHal2::initialize<defaultSystemClock, 115200>(UsartHal2::Parity::Odd);
 	UsartHal2::enableInterruptVector(true, 14);
 	UsartHal2::enableInterrupt(UsartHal2::Interrupt::TxEmpty);
 	UsartHal2::setTransmitterEnable(true);

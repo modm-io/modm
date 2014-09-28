@@ -11,7 +11,6 @@
 #include <xpcc/architecture/driver/atomic.hpp>
 #include <xpcc/math/utils/bit_operation.hpp>
 
-bool xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::finished = true;
 %% if extended is not defined
 xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::DataOrder
 xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::dataOrder = DataOrder::MsbFirst;
@@ -29,7 +28,6 @@ xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::initialize(uint16_t prescale
 	UCSR{{ id }}B = (1 << RXEN{{id}}) | (1 << TXEN{{id}});
 	// set baudrate _after_ enabling transmitter
 	UBRR{{ id }} = prescaler;
-	finished = true;
 %% if extended is not defined
 	dataOrder = DataOrder::MsbFirst;
 %% endif
@@ -43,52 +41,29 @@ xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::writeBlocking(uint8_t data)
 	if (dataOrder == DataOrder::LsbFirst) {
 		data = xpcc::bitReverse(data);
 	}
-	while(!((UCSR{{id}}A & (1 << UDRE{{id}}) && finished)))
+
+	while(!((UCSR{{id}}A & (1 << UDRE{{id}}))))
 		;
-	UDR{{id}} = data;
-}
-
-bool
-xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::write(uint8_t data)
-{
-	if (!finished)
-		return false;
-
-	if (dataOrder == DataOrder::LsbFirst) {
-		data = xpcc::bitReverse(data);
-	}
-
-	if (!(UCSR{{id}}A & (1 << UDRE{{id}})))
-		return false;
 
 	UDR{{id}} = data;
-	return true;
-}
 
-bool
-xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::getResult(uint8_t &data)
-{
-	if (!((UCSR{{id}}A & (1 << RXC{{id}})) && finished))
-		return false;
+	while (!((UCSR{{id}}A & (1 << RXC{{id}}))))
+		;
 
 	data = UDR{{id}};
 
 	if (dataOrder == DataOrder::LsbFirst) {
 		data = xpcc::bitReverse(data);
 	}
+
 	return data;
 }
 %% endif
 
 bool
-xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::transfer(uint8_t *tx, uint8_t *rx,
+xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::transferBlocking(uint8_t *tx, uint8_t *rx,
 		std::size_t length)
 {
-	if (!isFinished())
-		return false;
-
-	finished = false;
-
 	uint8_t tx_byte = 0xff;
 	uint8_t rx_byte;
 
@@ -101,6 +76,5 @@ xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::transfer(uint8_t *tx, uint8_
 		if (rx) rx[i] = rx_byte;
 	}
 
-	finished = true;
 	return true;
 }

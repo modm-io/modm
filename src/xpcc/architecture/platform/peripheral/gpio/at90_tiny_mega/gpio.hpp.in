@@ -26,13 +26,12 @@ namespace {{target.family}}
 struct Gpio
 {
 	/**
-	 * Each Pin can be configured in one of these states.
-	 * @warning Only available for Pins configured as inputs!
+	 * Each Input Pin can be configured in one of these states.
 	 *
 	 * @ingroup	{{target.family}}
 	 */
 	enum class
-	Configuration : uint8_t
+	InputType : uint8_t
 	{
 		Floating,	///< The input pin is left floating
 		PullUp,		///< The input pin is pulled to Vcc
@@ -61,7 +60,7 @@ protected:
 	/// @private
 	/// @{
 	static constexpr uint8_t
-	i(Configuration config) { return static_cast<uint8_t>(config); }
+	i(InputType config) { return static_cast<uint8_t>(config); }
 	static constexpr uint8_t
 	i(InputTrigger trigger) { return static_cast<uint8_t>(trigger); }
 	/// @}
@@ -77,31 +76,35 @@ protected:
  * @{
  */
 %% for name in ['GpioOpenDrain', 'GpioOpenDrainWithPullUp']
-template< class IO >
-class {{name}} : Gpio
+template< class Pin >
+class {{name}} : public Gpio, public Pin
 {
 public:
+	ALWAYS_INLINE static void configure(InputType /*type*/) override {}
+	ALWAYS_INLINE static void setInput() override {}
+	ALWAYS_INLINE static void setInput(InputType /*type*/) override {}
+	ALWAYS_INLINE static void setOutput() override {}
+	ALWAYS_INLINE static void setOutput(bool status) override {
+		set(status);
+	}
 	%% if name == 'GpioOpenDrain'
-	/// maps to `setInput(Configuration::Floating)` 
-	ALWAYS_INLINE static void set() {
-		IO::setInput(Configuration::Floating);
+	/// maps to `setInput(InputType::Floating)`
+	ALWAYS_INLINE static void set() override {
+		Pin::setInput(InputType::Floating);
 	}
 	%% else
-	/// maps to `setInput(Configuration::PullUp)` 
-	ALWAYS_INLINE static void set() {
-		IO::setInput(Configuration::PullUp);
+	/// maps to `setInput(InputType::PullUp)`
+	ALWAYS_INLINE static void set() override {
+		Pin::setInput(InputType::PullUp);
 	}
 	%% endif
-	/// maps to `setOutput(::xpcc::Gpio::LOW)`
-	ALWAYS_INLINE static void reset() {
-		IO::setOutput(::xpcc::Gpio::LOW);
+	/// maps to `setOutput(::xpcc::Gpio::Low)`
+	ALWAYS_INLINE static void reset() override {
+		Pin::setOutput(::xpcc::Gpio::Low);
 	}
-	ALWAYS_INLINE static void set(bool status) {
+	ALWAYS_INLINE static void set(bool status) override {
 		if (status) { set(); }
 		else { reset(); }
-	}
-	ALWAYS_INLINE static bool read() {
-		return IO::read();
 	}
 	ALWAYS_INLINE static void
 	connect(::xpcc::TypeId::SoftwareI2cMasterSda) {
@@ -163,8 +166,8 @@ public:
 		%% endif
 		%% if type in ["", "Input"]
 	// GpioInput
-	ALWAYS_INLINE static void configure(Configuration config) {
-		if (config == Configuration::PullUp) {
+	ALWAYS_INLINE static void configure(InputType type) {
+		if (type == InputType::PullUp) {
 			PORT{{port}} |= mask;
 		}
 		else {
@@ -172,9 +175,9 @@ public:
 		}
 	}
 	ALWAYS_INLINE static void
-	setInput(Configuration config) {
+	setInput(InputType type) {
 		setInput();
-		configure(config);
+		configure(type);
 	}
 	// start documentation inherited
 	ALWAYS_INLINE static void setInput() {
@@ -244,14 +247,15 @@ public:
 			%% if 'pcint' in gpio
 				%% set af_id = gpio.pcint | int
 				%#- Go home Atmel, you're drunk!
+				%% set af_reg = (af_id / 8) | int
 				%% if target.family == 'attiny'
 					%% if (target.name in ['2313', '4313']) and af_id >= 11 and af_id <= 17
 						%% set af_reg = 2
 					%% elif (target.name in ['20', '40', '1634']) and af_id >= 12 and af_id <= 17
 						%% set af_reg = 2
+					%% elif (target.name in ['13', '25', '45', '85', '2313', '4313'])
+						%% set af_reg = ""
 					%% endif
-				%% else
-					%% set af_reg = (af_id / 8) | int
 				%% endif
 	ALWAYS_INLINE static void enablePCInterrupt() {
 		PCMSK{{af_reg}} |= (1 << PCINT{{af_id}});
@@ -374,12 +378,12 @@ class GpioPort : public ::xpcc::GpioPort, public GpioPortBase< StartPin::port, S
 
 
 %% for port in gpios | getPorts
-/// @private 
+/// @private
 template< uint8_t StartPin, uint8_t Width >
 class GpioPortBase<Gpio::Port::{{port.name}}, StartPin, Width> : public Gpio
 {
 	static_assert(StartPin < {{port.startPin + port.width}},
-			"StartPin too large, maximum {{port.startPin + port.width}}.");
+			"StartPin too large, maximum {{port.startPin + port.width - 1}}.");
 	static_assert(Width <= {{port.width}},
 			"Width too large, maximum {{port.width}}.");
 	static_assert(Width > 0,

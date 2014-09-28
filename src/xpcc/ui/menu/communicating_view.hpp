@@ -31,7 +31,7 @@
 #ifndef XPCC__COMMUNICATING_VIEW_HPP
 #define XPCC__COMMUNICATING_VIEW_HPP
 
-#include <xpcc/communication/communicatable.hpp>
+#include <xpcc/communication/xpcc/communicatable.hpp>
 
 #include "communicating_view_stack.hpp"
 

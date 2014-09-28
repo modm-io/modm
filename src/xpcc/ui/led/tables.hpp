@@ -29,6 +29,9 @@ namespace xpcc
  */
 namespace ui
 {
+	/// Provides 7bit resolution (0 to 127) in 256 steps, 256 bytes of flash.
+	EXTERN_FLASH_STORAGE(uint8_t table7_256[256]);
+
 	/// Provides 8bit resolution (0 to 255) in 256 steps, 256 bytes of flash.
 	EXTERN_FLASH_STORAGE(uint8_t table8_256[256]);
 

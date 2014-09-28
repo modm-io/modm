@@ -133,14 +133,14 @@ protected:
 
 private:
 	// R\W line
-	static constexpr bool RW_Write		= xpcc::Gpio::LOW;
-	static constexpr bool RW_Read		= xpcc::Gpio::HIGH;
+	static constexpr bool RW_Write		= xpcc::Gpio::Low;
+	static constexpr bool RW_Read		= xpcc::Gpio::High;
 	// Rs line
-	static constexpr bool RS_Command	= xpcc::Gpio::LOW;
-	static constexpr bool RS_RAM		= xpcc::Gpio::HIGH;
+	static constexpr bool RS_Command	= xpcc::Gpio::Low;
+	static constexpr bool RS_RAM		= xpcc::Gpio::High;
 	// Enable line
-	static constexpr bool E_Disable		= xpcc::Gpio::LOW;
-	static constexpr bool E_Enable		= xpcc::Gpio::HIGH;
+	static constexpr bool E_Disable		= xpcc::Gpio::Low;
+	static constexpr bool E_Enable		= xpcc::Gpio::High;
 
 	// Masks
 	static constexpr uint8_t CGRAM_AddressMask	= 0b00111111;
@@ -149,7 +149,7 @@ private:
 
 	// check correct Bus width
 	static_assert(DATA::width == 8 || DATA::width == 4,
-			"This driver only works with a 4bit or 8bit data bus!");
+			"This driver only works with 4bit or 8bit data bus width!");
 
 	/**
 	 *  Bus class for accessing the bus with either 4bit or 8bit width.

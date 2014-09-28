@@ -88,7 +88,17 @@
  * # interfaces to enable for TIPC
  * # the elements of this list are separated by spaces
  * TIPC_INTERFACES="eth0"
- * \endcode 
+ * \endcode
+ *
+ * \section tipc_domain_id Software Domain ID
+ * To be able to use multiple tipc connectors on one machine (e.g. simulating two robots),
+ * the xpcc::tipc module has a software domain. All members of the domain receive the transmitted
+ * messages. The implementation is on software level in this module. Actually every tipc-node receive
+ * all messages with the same type id and than filters.
+ *
+ * Per default all messages are send and received on the DOMAIN_ID_UNDEFINED domain. Via the methods
+ * setDomainId() it is possible to specify the domain id during runtime. Transmitter and receiver need
+ * to be members of the same domain id.
  */
 
 #include "tipc/tipc_receiver.hpp"

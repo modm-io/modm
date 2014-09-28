@@ -32,7 +32,7 @@
 #define XPCC__ADS7843_HPP
 
 #include <stdint.h>
-#include <xpcc/driver/ui/display/graphic_display.hpp>
+#include <xpcc/ui/display/graphic_display.hpp>
 
 namespace xpcc
 {

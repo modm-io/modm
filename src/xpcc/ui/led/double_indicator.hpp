@@ -120,9 +120,9 @@ public:
 
 	/// Must be called at least every ms
 	void
-	run()
+	update()
 	{
-		led.run();
+		led.update();
 
 		if (timer.isExpired() && (isBlinking || state == FIRST_BREAK || state == SECOND_BREAK))
 		{

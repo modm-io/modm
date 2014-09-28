@@ -55,7 +55,26 @@ namespace xpcc
 		 */
 		struct Header
 		{
+			enum {
+				DOMAIN_ID_UNDEFINED = 0, // no domain id set => listen to all messanges on the tipc
+			};
+
+			inline
+			Header() :
+				size( 0 ),
+				domainId( DOMAIN_ID_UNDEFINED )
+			{}
+
+			// \param size of the payload in byte
+			// \param id of the domain in that the message is transmitted
+			inline
+			Header( size_t size, unsigned int domainId = DOMAIN_ID_UNDEFINED) :
+				size( size ),
+				domainId( domainId )
+			{}
+
 			size_t size;
+			unsigned int domainId;
 		};
 	};
 };

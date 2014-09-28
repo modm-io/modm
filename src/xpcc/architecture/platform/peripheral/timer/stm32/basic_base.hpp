@@ -218,7 +218,7 @@ public:
 	 * \param flags		Bitmap of StateFlag
 	 */
 	static void
-	acknowledgeInterruptFlag(InterruptFlag flags);
+	acknowledgeInterruptFlags(InterruptFlag flags);
 };
 
 ENUM_CLASS_FLAG(BasicTimer::Interrupt)
