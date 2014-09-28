@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-# 
+#
 # Copyright (c) 2013, Roboterclub Aachen e.V.
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
+#
 #  * Redistributions of source code must retain the above copyright
 #    notice, this list of conditions and the following disclaimer.
 #  * Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
 #  * Neither the name of the Roboterclub Aachen e.V. nor the
 #    names of its contributors may be used to endorse or promote products
 #    derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
 # EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -34,7 +34,6 @@ from string import Template
 from parser_exception import ParserException
 from device_element import DeviceElementBase
 from device_identifier import DeviceIdentifier
-from parameters import ParameterDB
 
 # add python module logger to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
@@ -87,7 +86,7 @@ class DeviceFile:
 		TODO: Validate!!
 				try:
 					import lxml.etree		# for validating
-			
+
 					# validate against the embedded DTD file
 					try:
 						parser = lxml.etree.XMLParser(dtd_validation=True)
@@ -190,7 +189,7 @@ class DeviceFile:
 
 		return props
 
-	def getDriverList(self, device_string, platform_path, parameter_db_dict):
+	def getDriverList(self, device_string, platform_path):
 		"""
 		This function uses data gathered from the device file to generate
 		a list fo drivers that need to be built.
@@ -208,8 +207,6 @@ class DeviceFile:
 		'instances': list of instances that will be created of this driver
 		Please note: all paths are relative to the platform_path.
 		"""
-		# generate ParameterDB from dict
-		parameters = ParameterDB.fromDictionary(parameter_db_dict, self.log)
 		# Check Device string
 		s = DeviceIdentifier(device_string, self.log)
 		if s.valid == False:
@@ -290,7 +287,7 @@ class DeviceFile:
 ##------------- A Driver Node contains Driver and Property Nodes --------------
 class Driver(DeviceElementBase):
 
-	def __init__(self, device, node, parameters, logger=None):
+	def __init__(self, device, node, logger=None):
 		if logger == None:
 			self.log = Logger()
 		else:
@@ -339,8 +336,8 @@ class Driver(DeviceElementBase):
 			return None
 		else:
 			return f
-		
-	
+
+
 	def getDriverSubstitutions(self, device_id, properties):
 		"""
 		Returns a dict containing substitution values
@@ -362,7 +359,7 @@ class Driver(DeviceElementBase):
 
 	def _nodeToDict(self, node, device_id, properties):
 		"""
-		attribute of the node are turnded into key/value pairs
+		attribute of the node are turned into key/value pairs
 		child nodes are added to a list which is the value
 		of the child node name + 's' key.
 		Example:
@@ -412,9 +409,8 @@ class Driver(DeviceElementBase):
 					if instances != None:
 						# because we need a different seperator for everything...
 						instances = instances.split(',')
-					else:
-						# Add Parameter to Dictionary
-						parameters[name] = [value, instances]
+					# Add Parameter to Dictionary
+					parameters[name] = {'value': value, 'instances': instances}
 		self.log.debug("Found Parameters: %s" % parameters)
 		return parameters
 

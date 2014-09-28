@@ -26,7 +26,7 @@ class ParameterDB:
 		if items is None:
 			return
 		for item in items:
-			p = Parameter.fromUserConfigItem(item, self.log)
+			p = UserParameter.fromUserConfigItem(item, self.log)
 			if p is not None:
 				self._parameters.append(p)
 
@@ -35,13 +35,20 @@ class ParameterDB:
 		"""
 		self.log.error("Please implement ParameterDB.addDriverParameter")
 
+	def getParametersForDriver(self, driver):
+		parameters = []
+		for param in self._parameters:
+			if param.driver_type == driver.type and param.driver_name == driver.name:
+				parameters.append({'name': param.name, 'value': param.value, 'instance': param.driver_instance})
+		return parameters
+
 	@classmethod
 	def fromDictionary(self, dictionary, logger=None):
 		"""fromDictionary
 		"""
 		p = ParameterDB(userParameters=None, logger=logger)
 		for param in dictionary['_parameters']:
-			p._parameters.append(Parameter.fromDictionary(param, p.log))
+			p._parameters.append(UserParameter.fromDictionary(param, p.log))
 		return p
 
 
@@ -54,9 +61,9 @@ class ParameterDB:
 			param_dicts.append(p.toDictionary())
 		return { '_parameters': param_dicts }
 
-class Parameter:
-	""" Parameter
-	Represents a parameter ...
+class UserParameter:
+	""" UserParameter
+	Represents a parameter declared by the user...
 	"""
 
 	def __init__(self, logger=None):
@@ -78,12 +85,12 @@ class Parameter:
 		"""
 		incorrect_string_msg = 	("Incorrect parameter config line!\n"
 								 "Valid inputs are:\n"
-								 "driver_type.parameter_name = value\n"
-								 "driver_type.driver_instance.parameter_name = value\n"
-								 "driver_type.driver_name.parameter_name = value\n"
-								 "driver_type.driver_name.driver_instance.parameter_name = value")
+								 "\tdriver_type.parameter_name = value\n"
+								 "\tdriver_type.driver_instance.parameter_name = value\n"
+								 "\tdriver_type.driver_name.parameter_name = value\n"
+								 "\tdriver_type.driver_name.driver_instance.parameter_name = value")
 		# Create Parameter
-		p = Parameter(logger)
+		p = UserParameter(logger)
 		# Sanity check user input
 		parts = user_item[0].split('.')
 		if len(parts) not in [2,3,4]:
@@ -99,7 +106,7 @@ class Parameter:
 		elif len(parts) == 4:
 			p.driver_name = parts[1]
 			p.driver_instance = int(parts[2])
-		p.value = user_item[1]
+		p.value = int(user_item[1])
 		p.level = 'user' # this parameter comes directly from the user
 		return p
 
@@ -107,7 +114,7 @@ class Parameter:
 	def fromDictionary(self, dictionary, logger=None):
 		"""fromDictionary
 		"""
-		p = Parameter(logger)
+		p = UserParameter(logger)
 		p.driver_type     = dictionary['driver_type']
 		p.driver_name     = dictionary['driver_name']
 		p.driver_instance = dictionary['driver_instance']

@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-# 
+#
 # Copyright (c) 2013, Roboterclub Aachen e.V.
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
+#
 #     * Redistributions of source code must retain the above copyright
 #       notice, this list of conditions and the following disclaimer.
 #     * Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
 #     * Neither the name of the Roboterclub Aachen e.V. nor the
 #       names of its contributors may be used to endorse or promote products
 #       derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
 # EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -26,9 +26,9 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # -----------------------------------------------------------------------------
-# 
+#
 # DESCRIPTION
-# 
+#
 # This tool checks which files are needed for a specific target
 # using the xml device file and adds a custom builder for all template files
 # and for other files that need to be copied to the generated folder
@@ -173,10 +173,10 @@ def platform_tools_generate(env, architecture_path):
 	# Loop through Drivers
 	driver_list = []
 	type_id_headers = []
-	drivers = dev.getDriverList(device, env['XPCC_PLATFORM_PATH'], env['XPCC_PARAMETER_DB'])
+	drivers = dev.getDriverList(device, env['XPCC_PLATFORM_PATH'])
 	for driver in drivers:
 		ddic = {} # create dictionary describing the driver
-		d = DriverFile.fromDict(driver, env.GetLogger())
+		d = DriverFile.fromDict(driver, env['XPCC_PARAMETER_DB'], env.GetLogger())
 		ddic['name'] = d.name
 		ddic['type'] = d.type
 		ddic['headers'] = []

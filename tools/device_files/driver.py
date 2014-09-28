@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-# 
+#
 # Copyright (c) 2013, Roboterclub Aachen e.V.
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
+#
 #  * Redistributions of source code must retain the above copyright
 #    notice, this list of conditions and the following disclaimer.
 #  * Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
 #  * Neither the name of the Roboterclub Aachen e.V. nor the
 #    names of its contributors may be used to endorse or promote products
 #    derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
 # EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -38,6 +38,7 @@ import xml.parsers.expat
 from parser_exception import ParserException
 from device_identifier import DeviceIdentifier
 from device_element import DeviceElementBase
+from parameters import ParameterDB
 
 # add python module logger to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
@@ -51,11 +52,21 @@ class DriverFile:
 			self.log = Logger()
 		else:
 			self.log = logger
+
+		self.name = None
+		self.type = None
+		self.filename = None
+		self.path = None
+		# Parameters from the XML Device File
+		self.device_parameters = []
+		self.substitutions = None
+		self.instances = None
+		self.properties = None
 		# Parameters that can be set by the user (e.g. in the project.cfg file)
-		self.user_parameters = {}
+		self.user_parameters = []
 
 	@classmethod
-	def fromDict(self, dic, logger=None):
+	def fromDict(self, dic, user_parameters, logger=None):
 		"""
 		This is used to create a DriverFile instance from information about
 		a driver extracted from a device file and packaged into a dictionary.
@@ -73,12 +84,16 @@ class DriverFile:
 		d.substitutions = dic['substitutions']
 		d.instances = dic['instances']
 		d.properties = dic['properties']
+		# generate ParameterDB from dict
+		param_db = ParameterDB.fromDictionary(user_parameters, logger)
+		d.user_parameters = param_db.getParametersForDriver(d)
+
 		# Debug Output
 		# d.log.debug("DriverFile.fromDict(): %s" % dic)
 		# d.log.debug("d.device_core : %s" % d.device_core)
 		return d
 
-	def getBuildList(self, platform_path, device_id = None, source_file_extentions = ['.cpp', '.c', '.sx', '.S', '.h', '.hpp']):
+	def getBuildList(self, platform_path, device_id, source_file_extentions = ['.cpp', '.c', '.sx', '.S', '.h', '.hpp']):
 		"""
 		The data is put into a list of the format:
 		[ ['static_file_name', 'static_output_file_name'],
@@ -143,7 +158,7 @@ class DriverFile:
 			if node.tag == 'parameter':
 				p = Parameter(node, self.log)
 				# 1.) search for user parameters
-				value = p.getValueFromParameterDict(self.user_parameters, instance_id)
+				value = p.getValueFromUserParameterDict(self.user_parameters, instance_id)
 				# 2.) if none are found search for parameters in driver file
 				if value == None:
 					value = p.getValueFromParameterDict(self.device_parameters, instance_id)
@@ -152,7 +167,7 @@ class DriverFile:
 					value = p.default
 				# 4.) add value found to the substitution dict
 				p.addValueToSubstitutions(self.substitutions, value)
-			
+
 			elif node.tag not in ['static', 'template']:
 				f = DeviceElementBase(self, node)
 				if f.appliesTo(device_id, self.properties):
@@ -164,7 +179,7 @@ class DriverFile:
 			# Skip PArameters:
 			if node.tag == 'parameter':
 				continue
-			
+
 			# Check if instance id fits:
 			if node.get('instances') != None and instance_id != None:
 				if instance_id not in node.get('instances').split(','):
@@ -173,13 +188,13 @@ class DriverFile:
 			if node.text == None or len(node.text) <= 0:
 				self.log.error("Empty '%s' node in '%s/%s' driver xml." % (node.tag, self.type, self.name))
 				raise ParserException("Error: Empty '%s' node in '%s/%s' driver xml." % (node.tag, self.type, self.name))
-			
+
 			f = DeviceElementBase(self, node)
 			if not f.appliesTo(device_id, self.properties):
 				self.log.info("Tag '%s' does not apply to target '%s'. In '%s/%s' driver xml." % (node.tag, device_id.string, self.type, self.name))
 			else:
 				file_name = node.text.strip()
-				
+
 				if node.tag == 'static':
 					if file_name not in build_list: # if it has not been added before
 						static = file_name
@@ -190,7 +205,7 @@ class DriverFile:
 						output = self._makeRelativeToPlatform(output)
 						if self._checkTarget([static, output], targets):
 							build_list.append([static, output])# => add static file
-				
+
 				elif node.tag == 'template':
 					template = file_name
 					output = node.get('out')
@@ -206,14 +221,16 @@ class DriverFile:
 						sub_instance_id = int(instance_id)
 					else:
 						sub_instance_id = instance_id
+					substitutions = dict(self.substitutions)
+					if 'parameters' in substitutions:
+						substitutions['parameters'] = dict(substitutions['parameters'])
+					# substitutions['parameters'] = dict(substitutions['parameters'])
 					if node.get('instances') != None:
-						substitutions = dict({'id': sub_instance_id}.items() + self.substitutions.items())
-					else:
-						substitutions = dict(self.substitutions.items())
+						substitutions.update({'id': sub_instance_id})
 					substitutions.update({'output': os.path.split(output)[1]})
 					# self.log.debug("%s->%s: substitutions: %s" % (template, output, substitutions))
 					template_file = [template, output, substitutions]
-					if self._checkTarget([template, output, substitutions], targets):
+					if self._checkTarget(template_file, targets):
 						build_list.append(template_file) # always append template files since they will get a different id
 
 	def _checkTarget(self, build, targets):
@@ -282,11 +299,19 @@ class Parameter:
 
 	def getValueFromParameterDict(self, dic, instance_id):
 		if self.name in dic:
-			if dic[self.name][1] == None:
-				return dic[self.name][0]
+			if dic[self.name]['instances'] == None:
+				return dic[self.name]['value']
 			elif instance_id != None and instance_id != 'default':
-				if instance_id in dic[self.name][1]:
-					return dic[self.name][0]
+				if instance_id in dic[self.name]['instances']:
+					return dic[self.name]['value']
+		return None
+
+	def getValueFromUserParameterDict(self, dic, instance_id):
+		for param in dic:
+			if param['name'] == self.name:
+				if instance_id != None and instance_id != 'default':
+					if str(instance_id) == str(param['instance']):
+						return param['value']
 		return None
 
 	def addValueToSubstitutions(self, sub_dict, value):
