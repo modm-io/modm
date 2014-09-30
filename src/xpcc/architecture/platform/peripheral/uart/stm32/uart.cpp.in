@@ -24,8 +24,8 @@
 
 namespace
 {
-	static xpcc::atomic::Queue<char, {{ parameters.rx_buffer }}> rxBuffer;
-	static xpcc::atomic::Queue<char, {{ parameters.tx_buffer }}> txBuffer;
+	static xpcc::atomic::Queue<uint8_t, {{ parameters.rx_buffer }}> rxBuffer;
+	static xpcc::atomic::Queue<uint8_t, {{ parameters.tx_buffer }}> txBuffer;
 }
 %% endif
 
