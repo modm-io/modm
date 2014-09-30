@@ -86,13 +86,13 @@ MAIN_FUNCTION
 	GpioOutputB5::connect(SpiSimpleMaster1::Mosi);
 	GpioInputB4::connect(SpiSimpleMaster1::Miso);
 	GpioOutputB3::connect(SpiSimpleMaster1::Sck);
-	SpiSimpleMaster1::initialize<defaultSystemClock, MHz8>();
+	SpiSimpleMaster1::initialize<defaultSystemClock, 10500000, xpcc::Tolerance::Exact>();
 
 	// Enable SPI 2
 	GpioOutputB15::connect(SpiSimpleMaster2::Mosi);
 	GpioInputB14::connect(SpiSimpleMaster2::Miso);
 	GpioOutputB13::connect(SpiSimpleMaster2::Sck);
-	SpiSimpleMaster2::initialize<defaultSystemClock, MHz8>();
+	SpiSimpleMaster2::initialize<defaultSystemClock, 10500000, xpcc::Tolerance::Exact>();
 
 
 	// Enable UART 2
