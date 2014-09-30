@@ -46,7 +46,7 @@ MAIN_FUNCTION
     Cs::setOutput();
     Clk::setOutput();
 
-    Spi::initialize< 10000000 >();
+    Spi::initialize< defaultSystemClock, 10000000 >();
     
     ledMatrixDisplay.initialize();
 
