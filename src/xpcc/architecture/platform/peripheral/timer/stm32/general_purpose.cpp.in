@@ -52,7 +52,7 @@ xpcc::stm32::Timer{{ id }}::setMode(Mode mode, SlaveMode slaveMode,
 	}
 
 	// ARR Register is buffered, only Under/Overflow generates update interrupt
-	if(enableOnePulseMode) {
+	if (enableOnePulseMode) {
 		TIM{{ id }}->CR1 = TIM_CR1_ARPE | TIM_CR1_URS | TIM_CR1_OPM
 										| static_cast<uint32_t>(mode);
 	} else {

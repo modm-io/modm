@@ -116,8 +116,10 @@ public:
 	// only on st32f2 and st32f4
 %% if id in [2, 5] and (target is stm32f2 or target is stm32f3 or target is stm32f4)
 	typedef uint32_t Value;
+
 %% else
 	typedef uint16_t Value;
+
 %% endif
 
 	static void
@@ -139,7 +141,8 @@ public:
 	}
 
 	static void
-	setMode(Mode mode, SlaveMode slaveMode = SlaveMode::Disabled,
+	setMode(Mode mode, 
+			SlaveMode slaveMode = SlaveMode::Disabled,
 			SlaveModeTrigger slaveModeTrigger = static_cast<SlaveModeTrigger>(0),
 			MasterMode masterMode = MasterMode::Reset,
 			bool enableOnePulseMode = false);
