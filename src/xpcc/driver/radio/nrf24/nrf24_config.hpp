@@ -156,6 +156,12 @@ public:
 	static void
 	setAutoRetransmitCount(nrf24::AutoRetransmitCount count);
 
+	static void
+	enableFeatureNoAck();
+
+	static void
+	disableFeatureNoAck();
+
 	/** @brief Enable Rx Pipe and set payload width
 	 *
 	 *	@param pipe		Pipe Number

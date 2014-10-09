@@ -144,6 +144,24 @@ xpcc::Nrf24Config<Nrf24Phy>::setAutoRetransmitCount(AutoRetransmitCount count)
 
 template<typename Nrf24Phy>
 void
+xpcc::Nrf24Config<Nrf24Phy>::enableFeatureNoAck()
+{
+    Nrf24Phy::setBits(Register::FEATURE, Feature::EN_DYN_ACK);
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template<typename Nrf24Phy>
+void
+xpcc::Nrf24Config<Nrf24Phy>::disableFeatureNoAck()
+{
+    Nrf24Phy::clearBits(Register::FEATURE, Feature::EN_DYN_ACK);
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template<typename Nrf24Phy>
+void
 xpcc::Nrf24Config<Nrf24Phy>::enablePipe(nrf24::Pipe pipe, bool enableAutoAck)
 {
 
