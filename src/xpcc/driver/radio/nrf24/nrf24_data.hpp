@@ -30,15 +30,40 @@ enum class SendingState
 	DONT_KNOW
 };
 
+/*
+ * Data structure that user uses to pass data to the data layer
+ */
 typedef struct packet_t
 {
-	Address		src;
-	Address 	dest;
-	uint8_t*	data;
-	uint8_t 	length;
+	Address     dest;
+	Address     src;        // will be ignored when sending
+	uint8_t*    data;
+	uint8_t     length;     // max. 30!
 } packet_t;
 
+
+/*
+ * Data that will be sent over the air
+ */
+typedef struct frame_t
+{
+    uint8_t     src;
+    uint8_t     dest;
+    uint8_t     data[30];   // max. possible payload size (32 byte) - 2 byte (src + dest)
+} frame_t;
+
 }
+
+/* Pipe layout:
+ *
+ * ===== 0 ===== : Used to receive ACKs when communicating directly with another node
+ * ===== 1 ===== : Broadcast pipe, will determine upper 4 bytes of address of pipes 2 - 5
+ * ===== 2 ===== : Own address
+ * ===== 3 ===== : \
+ * ===== 4 ===== :  | Separte connections to neighbouring nodes
+ * ===== 5 ===== : /
+ *
+ */
 
 
 template<typename Nrf24Phy>
@@ -71,6 +96,9 @@ public:
 	static Address
 	getAddress();
 
+	/** @brief Set own address
+	 *
+	 */
 	static void
 	setAddress(Address address);
 
@@ -99,6 +127,11 @@ private:
 
 private:
 
+	static inline uint64_t
+	assembleAddress(Address address);
+
+private:
+
 	/** @brief Base address of the network
 	 *
 	 *	 The first 3 byte will be truncated, so the address is actually 5 bytes
@@ -117,7 +150,11 @@ private:
 
 	static Address broadcastAddress;
 
-	static Address connections[4];
+	static Address ownAddress;
+
+	static Address connections[3];
+
+	static frame_t assemblyFrame;
 };
 
 }
