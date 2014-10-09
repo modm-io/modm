@@ -2,6 +2,11 @@
 #include "../stm32f4_discovery.hpp"
 
 // ----------------------------------------------------------------------------
+/**
+ * Very basic example of USART usage. 
+ * The ASCII sequence 'A', 'B', 'C, ... , 'Z', 'A', 'B', 'C', ... 
+ * is printed with 9600 baud, 8N1 at pin PA3.
+ */
 MAIN_FUNCTION
 {
 	defaultSystemClock::enable();
@@ -23,7 +28,7 @@ MAIN_FUNCTION
 		LedGreen::toggle();
 		Usart2::write(c);
 		++c;
-		if (c == 'Z' + 1) {
+		if (c > 'Z') {
 			c = 'A';
 		}
 		xpcc::delay_ms(500);
