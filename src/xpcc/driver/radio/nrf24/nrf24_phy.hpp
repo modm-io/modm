@@ -246,6 +246,8 @@ public:
 	 * Call this function before using this class!
 	 *
 	 * @param payload_length	Set fixed payload length in bytes , set 0 for dynamic payload length
+	 *
+	 * Note: Dynamic payload length is *not yet implemented*
 	 */
 	static void
 	initialize(uint8_t payload_length = max_payload_length)
