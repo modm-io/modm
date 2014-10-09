@@ -12,8 +12,8 @@
 #define XPCC_STM32_I2C_{{ id }}_HPP
 
 #include "../../../device.hpp"
-#include <xpcc/architecture/peripheral/i2c.hpp>
 #include "type_ids.hpp"
+#include <xpcc/architecture/peripheral/i2c_master.hpp>
 
 namespace xpcc
 {
@@ -25,7 +25,7 @@ namespace stm32
  * I2cMaster implementation of I2C{{ id }} module.
  *
  * Interrupts must be enabled.
- * 
+ *
  * @author		Georgi Grinshpun
  * @author		Niklas Hauser
  * @ingroup		stm32
@@ -43,43 +43,64 @@ public:
 	 * @param	rate
 	 *		`Standard` or `Fast`, `High` datarate is not supported
 	 */
-	template<class clockSource, DataRate rate=DataRate::Standard>
+	template<class clockSource, uint32_t baudrate=Baudrate::Standard,
+			uint16_t tolerance = xpcc::Tolerance::FivePercent >
 	static ALWAYS_INLINE void
 	initialize()
 	{
-		constexpr int peripheralFrequency = clockSource::I2c{{ id }};
-		constexpr uint32_t rawRate = static_cast<uint32_t>(rate);
-		static_assert(rawRate <= 400000, "The STM32 does not support High I2C baudrate.");
-		static_assert(peripheralFrequency/2 >= rawRate, "The APB1 frequency needs to be at least 2x higher than I2C baudrate.");
+		// calculate the expected clock ratio
+		constexpr uint8_t scalar = (baudrate <= 100000) ? 2 : ((baudrate <= 300000) ? 3 : 25);
 
-		// set the prescaler rate register
-		// ccrPrescaler = peripheralFrequency / (2 * I2CFrequency)
-		constexpr uint16_t prescaler = peripheralFrequency / (2 * rawRate);
+		// calculate the fractional prescaler value
+		constexpr float pre_raw  = static_cast<float>(clockSource::I2c{{ id }}) / (scalar * baudrate);
+		// respect the prescaler range of 1 or 4 to 4095
+		constexpr uint32_t pre_ceil = std::ceil(pre_raw) > 4095 ? 4095 : std::ceil(pre_raw);
+		constexpr uint32_t pre_floor = std::floor(pre_raw) < ((scalar < 3) ? 4 : 1) ?
+				((scalar < 3) ? 4 : 1) : std::floor(pre_raw);
 
-		reset();
-		// Enable clock
-		RCC->APB1ENR |= RCC_APB1ENR_I2C{{ id }}EN;
+		// calculate the possible baudrates above and below the requested baudrate
+		constexpr uint32_t baud_lower = clockSource::I2c{{ id }} / ( scalar * pre_ceil  );
+		constexpr uint32_t baud_upper = clockSource::I2c{{ id }} / ( scalar * pre_floor );
 
-		I2C{{ id }}->CR1 = I2C_CR1_SWRST; 		// reset module
-		I2C{{ id }}->CR1 = 0;
+		// calculate the fractional prescaler value corresponding to the baudrate exactly
+		// between the upper and lower baudrate
+		constexpr float pre_middle = static_cast<float>(clockSource::I2c{{ id }}) /
+				( scalar * ((baud_upper - baud_lower) / 2.f + baud_lower) );
+		// decide which prescaler value is closer to a possible baudrate
+		constexpr uint32_t pre = (pre_raw >= pre_middle) ? pre_ceil : pre_floor;
 
-		NVIC_EnableIRQ(I2C{{ id }}_ER_IRQn);
-		NVIC_EnableIRQ(I2C{{ id }}_EV_IRQn);
+		// check if within baudrate tolerance
+		constexpr uint32_t generated_baudrate = clockSource::I2c{{ id }} / ( scalar * pre );
+		assertBaudrateInTolerance<
+				/* clostest available baudrate */ generated_baudrate,
+				/* desired baudrate */ baudrate,
+				tolerance >();
 
-		I2C{{ id }}->CR2 = static_cast<uint32_t>(peripheralFrequency) / 1000000;
-		I2C{{ id }}->CCR = prescaler;
-		// DEBUG_STREAM("ccrPrescaler=" << prescaler);
-		I2C{{ id }}->TRISE = 0x09;
+		// the final prescaler value is augmented with the F/S and DUTY bit.
+		constexpr uint32_t prescaler = pre |
+				((scalar >= 3) ? (1 << 15) : 0) |
+				((scalar == 25) ? (1 << 14) : 0);
 
-		I2C{{ id }}->CR1 |= I2C_CR1_PE; // Enable peripheral
+		// peripheral frequency clock
+		constexpr uint8_t freq = clockSource::I2c{{ id }} / 1000000;
+
+		// maximum rise time: assuming its linear:
+		// 1000ns @ 100kHz and 300ns @ 400kHz
+		//   => y = x * m + b, with m = -2ns/kHz, b = 1200ns
+		constexpr float max_rise_time = -2.f * (static_cast<float>(baudrate) / 100.f) + 1200.f;
+		// calculate trise
+		constexpr float trise_raw = max_rise_time < 0 ? 0 : std::floor(max_rise_time / (1000.f / freq));
+		constexpr uint8_t trise = trise_raw > 62 ? 63 : (trise_raw + 1);
+
+		initializeWithPrescaler(freq, trise, prescaler);
 	}
 
 	// start documentation inherited
 	static bool
-	start(xpcc::I2cDelegate *delegate);
+	start(I2cTransaction *transaction, Configuration_t configuration = nullptr);
 
 	static bool
-	startBlocking(xpcc::I2cDelegate *delegate);
+	startBlocking(I2cTransaction *transaction, Configuration_t configuration = nullptr);
 
 	static Error
 	getErrorState();
@@ -90,7 +111,7 @@ public:
 
 private:
 	static void
-	initializeWithPrescaler(uint16_t baud);
+	initializeWithPrescaler(uint8_t peripheralFrequency, uint8_t riseTime, uint16_t prescaler);
 };
 
 } // namespace stm32

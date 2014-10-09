@@ -66,7 +66,7 @@ MAIN_FUNCTION
 		
 		component::sender.update();
 		
-		xpcc::delay_us(100);
+		xpcc::delayMicroseconds(100);
 	}
 }
 

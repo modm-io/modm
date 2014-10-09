@@ -94,6 +94,6 @@ MAIN_FUNCTION
 
 		component::receiver.update();
 
-		xpcc::delay_us(100);
+		xpcc::delayMicroseconds(100);
 	}
 }

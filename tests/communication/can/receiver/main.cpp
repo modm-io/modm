@@ -142,7 +142,7 @@ main()
 	sei();
 
 	xpcc::log::info << "########## XPCC CAN communication TEST RECEIVER ##########" << xpcc::flush;
-	delay_ms(1000);
+	delayMilliseconds(1000);
 
 	int data(0);
 
@@ -171,7 +171,7 @@ main()
 		}
 		canConnector.update();
 		counter++;
-		delay_us(100);
+		delayMicroseconds(100);
 	}
 
 

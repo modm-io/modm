@@ -98,7 +98,7 @@ main()
 		touch::Left::setOutput();
 		touch::Right::set();
 		touch::Right::setOutput();
-		xpcc::delay_ms(2);
+		xpcc::delayMilliseconds(2);
 
 		int16_t xAdc = Adc::readChannel(0);
 
@@ -111,7 +111,7 @@ main()
 		touch::Bottom::setOutput();
 		touch::Top::set();
 		touch::Top::setOutput();
-		xpcc::delay_ms(2);
+		xpcc::delayMilliseconds(2);
 
 		int16_t yAdc = Adc::readChannel(1);
 

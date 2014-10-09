@@ -76,31 +76,35 @@ protected:
  * @{
  */
 %% for name in ['GpioOpenDrain', 'GpioOpenDrainWithPullUp']
-template< class IO >
-class {{name}} : Gpio
+template< class Pin >
+class {{name}} : public Gpio, public Pin
 {
 public:
+	ALWAYS_INLINE static void configure(InputType /*type*/) override {}
+	ALWAYS_INLINE static void setInput() override {}
+	ALWAYS_INLINE static void setInput(InputType /*type*/) override {}
+	ALWAYS_INLINE static void setOutput() override {}
+	ALWAYS_INLINE static void setOutput(bool status) override {
+		set(status);
+	}
 	%% if name == 'GpioOpenDrain'
-	/// maps to `setInput(InputType::Floating)` 
-	ALWAYS_INLINE static void set() {
-		IO::setInput(InputType::Floating);
+	/// maps to `setInput(InputType::Floating)`
+	ALWAYS_INLINE static void set() override {
+		Pin::setInput(InputType::Floating);
 	}
 	%% else
-	/// maps to `setInput(InputType::PullUp)` 
-	ALWAYS_INLINE static void set() {
-		IO::setInput(InputType::PullUp);
+	/// maps to `setInput(InputType::PullUp)`
+	ALWAYS_INLINE static void set() override {
+		Pin::setInput(InputType::PullUp);
 	}
 	%% endif
 	/// maps to `setOutput(::xpcc::Gpio::Low)`
-	ALWAYS_INLINE static void reset() {
-		IO::setOutput(::xpcc::Gpio::Low);
+	ALWAYS_INLINE static void reset() override {
+		Pin::setOutput(::xpcc::Gpio::Low);
 	}
-	ALWAYS_INLINE static void set(bool status) {
+	ALWAYS_INLINE static void set(bool status) override {
 		if (status) { set(); }
 		else { reset(); }
-	}
-	ALWAYS_INLINE static bool read() {
-		return IO::read();
 	}
 	ALWAYS_INLINE static void
 	connect(::xpcc::TypeId::SoftwareI2cMasterSda) {
@@ -374,12 +378,12 @@ class GpioPort : public ::xpcc::GpioPort, public GpioPortBase< StartPin::port, S
 
 
 %% for port in gpios | getPorts
-/// @private 
+/// @private
 template< uint8_t StartPin, uint8_t Width >
 class GpioPortBase<Gpio::Port::{{port.name}}, StartPin, Width> : public Gpio
 {
 	static_assert(StartPin < {{port.startPin + port.width}},
-			"StartPin too large, maximum {{port.startPin + port.width}}.");
+			"StartPin too large, maximum {{port.startPin + port.width - 1}}.");
 	static_assert(Width <= {{port.width}},
 			"Width too large, maximum {{port.width}}.");
 	static_assert(Width > 0,

@@ -35,9 +35,9 @@
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 xpcc::Itg3200<I2cMaster>::Itg3200(uint8_t* data, uint8_t address)
-:	status(0), data(data)
+:	I2cWriteReadAdapter(address), status(0), data(data)
 {
-	adapter.initialize(address << 1, buffer, 0, data, 0);
+	configureWriteRead(buffer, 0, data, 0);
 }
 
 template < typename I2cMaster >
@@ -51,9 +51,9 @@ xpcc::Itg3200<I2cMaster>::configure(uint8_t divider, itg3200::Filter filter, boo
 	buffer[2] = itg3200::SCALE_FS_2000 | filter;
 	// interrupt register
 	buffer[3] = interrupt ? itg3200::INTERRUPT_RAW_RDY_EN : 0;
-	adapter.initialize(buffer, 4, data, 0);
+	configureWriteRead(buffer, 4, data, 0);
 	
-	return I2cMaster::startBlocking(&adapter);
+	return I2cMaster::startBlocking(this);
 }
 
 template < typename I2cMaster >
@@ -127,7 +127,7 @@ xpcc::Itg3200<I2cMaster>::update()
 {
 	if (running != NOTHING_RUNNING)
 	{
-		switch (adapter.getState())
+		switch (getAdapterState())
 		{
 			case xpcc::I2c::AdapterState::Idle:
 				if (running == READ_BOTH_RUNNING) {
@@ -147,9 +147,9 @@ xpcc::Itg3200<I2cMaster>::update()
 		if (status & READ_BOTH_PENDING)
 		{
 			buffer[0] = itg3200::REGISTER_DATA_T0;
-			adapter.initialize(buffer, 1, data, 8);
+			configureWriteRead(buffer, 1, data, 8);
 			
-			if (I2cMaster::start(&adapter)) {
+			if (I2cMaster::start(this)) {
 				status &= ~READ_BOTH_PENDING;
 				running = READ_BOTH_RUNNING;
 			}
@@ -157,9 +157,9 @@ xpcc::Itg3200<I2cMaster>::update()
 		else if (status & READ_GYROSCOPE_PENDING)
 		{
 			buffer[0] = itg3200::REGISTER_DATA_X0;
-			adapter.initialize(buffer, 1, data+2, 6);
+			configureWriteRead(buffer, 1, data+2, 6);
 			
-			if (I2cMaster::start(&adapter)) {
+			if (I2cMaster::start(this)) {
 				status &= ~READ_GYROSCOPE_PENDING;
 				running = READ_GYROSCOPE_RUNNING;
 			}
@@ -172,25 +172,25 @@ template < typename I2cMaster >
 bool
 xpcc::Itg3200<I2cMaster>::writeRegister(itg3200::Register reg, uint8_t value)
 {
-	while (adapter.getState() == xpcc::I2c::AdapterState::Busy)
+	while (getAdapterState() == xpcc::I2c::AdapterState::Busy)
 		;
 	buffer[0] = reg;
 	buffer[1] = value;
-	adapter.initialize(buffer, 2, data, 0);
+	configureWriteRead(buffer, 2, data, 0);
 	
-	return I2cMaster::startBlocking(&adapter);
+	return I2cMaster::startBlocking(this);
 }
 
 template < typename I2cMaster >
 uint8_t
 xpcc::Itg3200<I2cMaster>::readRegister(itg3200::Register reg)
 {
-	while (adapter.getState() == xpcc::I2c::AdapterState::Busy)
+	while (getAdapterState() == xpcc::I2c::AdapterState::Busy)
 		;
 	buffer[0] = reg;
-	adapter.initialize(buffer, 1, buffer, 1);
+	configureWriteRead(buffer, 1, buffer, 1);
 	
-	while (!I2cMaster::startBlocking(&adapter))
+	while (!I2cMaster::startBlocking(this))
 		;
 	return buffer[0];
 }

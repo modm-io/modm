@@ -48,22 +48,9 @@ namespace lpc
 class Can : public ::xpcc::Can
 {
 public:
-	enum class
-	Bitrate : int
-	{
-		kBps10	= xpcc::clock::Frequency::kHz10,
-		kBps20	= xpcc::clock::Frequency::kHz20,
-		kBps50	= xpcc::clock::Frequency::kHz50,
-		kBps100	= xpcc::clock::Frequency::kHz100,
-		kBps125	= xpcc::clock::Frequency::kHz125,
-		kBps250	= xpcc::clock::Frequency::kHz250,
-		kBps500	= xpcc::clock::Frequency::kHz500,
-		MBps1	= xpcc::clock::Frequency::MHz1,
-	};
 
-public:
-
-	template< class clockSource, Bitrate bitrate = Bitrate::kBps125 >
+	template< class clockSource, uint32_t bitrate = Bitrate::kBps125,
+			uint16_t tolerance = Tolerance::OnePercent >
 	static inline void
 	initialize()
 	{

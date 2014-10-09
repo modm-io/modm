@@ -48,8 +48,8 @@
 
 namespace
 {
-	static xpcc::atomic::Queue<char, {{ className | upper }}{{ id }}_RX_BUFFER_SIZE> rxBuffer;
-	static xpcc::atomic::Queue<char, {{ className | upper }}{{ id }}_TX_BUFFER_SIZE> txBuffer;
+	static xpcc::atomic::Queue<uint8_t, {{ className | upper }}{{ id }}_RX_BUFFER_SIZE> rxBuffer;
+	static xpcc::atomic::Queue<uint8_t, {{ className | upper }}{{ id }}_TX_BUFFER_SIZE> txBuffer;
 	
 	static bool isBlocking = true;
 }

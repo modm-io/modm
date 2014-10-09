@@ -1,35 +1,14 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
- * All rights reserved.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__IODEVICE_WRAPPER_HPP
-#define XPCC__IODEVICE_WRAPPER_HPP
+#ifndef XPCC_IODEVICE_WRAPPER_HPP
+#define XPCC_IODEVICE_WRAPPER_HPP
 
 #include <stdint.h>
 
@@ -37,80 +16,147 @@
 
 namespace xpcc
 {
+
+/**
+ * Wrapper to use any peripheral device that supports static
+ * write() and read() as an IODevice.
+ * This implementation will not wait for the peripheral to be
+ * ready for data.
+ * If the peripheral buffers are full, the remaining data will
+ * be discarded.
+ *
+ * Example:
+ * @code
+ * // configure a UART
+ * xpcc::Uart0 uart;
+ *
+ * // wrap it into an IODevice
+ * xpcc::IODeviceWrapper<xpcc::Uart0> device;
+ *
+ * // use this device to print a message
+ * device.write("Hello");
+ *
+ * // or create a IOStream and use the stream to print something
+ * xpcc::IOStream stream(device);
+ * stream << " World!";
+ * @endcode
+ *
+ * @ingroup		io
+ * @tparam		T	Peripheral which should be wrapped
+ */
+template<typename T>
+class IODeviceWrapper : public IODevice
+{
+public:
 	/**
-	 * \brief		Wrapper to use any peripheral device that supports static
-	 * 				put() and get() as an IODevice
+	 * \brief	Constructor
 	 *
-	 * \tparam		T	Peripheral which should be wrapped
-	 *
-	 * Example:
-	 * \code
-	 * // configure a UART
-	 * xpcc::Uart0 uart;
-	 *
-	 * // wrap it into an IODevice
-	 * xpcc::IODeviceWrapper<xpcc::Uart0> device;
-	 *
-	 * // use this device to print a message
-	 * device.write("Hello");
-	 *
-	 * // or create a IOStream and use the stream to print something
-	 * xpcc::IOStream stream(device);
-	 * stream << " World!";
-	 * \endcode
-	 *
-	 * \ingroup		io
+	 * \param	device	configured object
 	 */
-	template<typename T>
-	class IODeviceWrapper : public IODevice
+	IODeviceWrapper(const T& /*device*/)
 	{
-	public:
-		/**
-		 * \brief	Constructor
-		 *
-		 * \param	device	configured object
-		 */
-		IODeviceWrapper(const T& /*device*/)
-		{
-		}
-		IODeviceWrapper()
-		{
-		}
+	}
+	IODeviceWrapper()
+	{
+	}
 
-		virtual void
-		write(char c)
-		{
-			T::write(c);
-		}
+	virtual void
+	write(char c)
+	{
+		T::write(c);
+	}
 
-		virtual void
-		write(const char *s)
-		{
-			char c;
-			while ((c = *s++)) {
-				T::write(static_cast<uint8_t>(c));
-			}
+	virtual void
+	write(const char *s)
+	{
+		char c;
+		while ((c = *s++)) {
+			T::write(static_cast<uint8_t>(c));
 		}
+	}
 
-		virtual void
-		flush()
-		{
-		}
+	virtual void
+	flush()
+	{
+	}
 
-		virtual bool
-		read(char& c)
-		{
-			// FIXME
-			uint8_t t;
-			if (T::read(t)) {
-				c = t;
-				return true;
-			}
-			else {
-				return false;
-			}
+	virtual bool
+	read(char& c)
+	{
+		// FIXME
+		uint8_t t;
+		if (T::read(t)) {
+			c = t;
+			return true;
 		}
-	};
+		else {
+			return false;
+		}
+	}
+};
+
+/**
+ * Wrapper to use any peripheral device that supports static
+ * write() and read() as an IODevice.
+ * This implementation will busy wait until the peripheral is
+ * ready for data.
+ *
+ * @ingroup		io
+ * @tparam		T	Peripheral which should be wrapped
+*/
+template<typename T>
+class IODeviceWrapperBlocking : public IODevice
+{
+public:
+	/**
+	* \brief	Constructor
+	*
+	* \param	device	configured object
+	*/
+	IODeviceWrapperBlocking(const T& /*device*/)
+	{
+	}
+	IODeviceWrapperBlocking()
+	{
+	}
+
+	virtual void
+	write(char c)
+	{
+		while( !T::write(c) )
+			;
+	}
+
+	virtual void
+	write(const char *s)
+	{
+		char c;
+		while ((c = *s++)) {
+			while( !T::write(static_cast<uint8_t>(c)) )
+				;
+		}
+	}
+
+	virtual void
+	flush()
+	{
+	}
+
+	virtual bool
+	read(char& c)
+	{
+		// FIXME
+		uint8_t t;
+		if (T::read(t)) {
+			c = t;
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+};
+
 }
 
-#endif // XPCC__IODEVICE_WRAPPER_HPP
+#endif // XPCC_IODEVICE_WRAPPER_HPP

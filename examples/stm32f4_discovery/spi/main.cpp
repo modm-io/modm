@@ -20,7 +20,7 @@ MAIN_FUNCTION
 
 	while (1)
 	{
-		SpiSimpleMaster2::writeBlocking(0xF0);
+		SpiSimpleMaster1::writeReadBlocking(0xF0);
 	}
 
 	return 0;

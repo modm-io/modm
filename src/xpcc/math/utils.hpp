@@ -34,5 +34,6 @@
 #include "utils/misc.hpp"
 #include "utils/bit_operation.hpp"
 #include "utils/operator.hpp"
+#include "utils/endianess.hpp"
 
 #endif // XPCC_MATH__UTILS_HPP

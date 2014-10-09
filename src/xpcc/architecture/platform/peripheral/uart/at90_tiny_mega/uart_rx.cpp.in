@@ -30,7 +30,7 @@ ISR(USART{{ id }}_RX_vect)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::{{target.family}}::Uart{{ id }}::initializeWithBaud(uint16_t ubrr)
+xpcc::{{target.family}}::Uart{{ id }}::initialize(uint16_t ubrr)
 {
 	atomic::Lock lock;
 	// Set baud rate

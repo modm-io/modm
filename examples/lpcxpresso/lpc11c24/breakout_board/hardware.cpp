@@ -26,7 +26,7 @@ Hardware::initialize()
 	{
 		led::Onboard::toggle();
 		led::Xpresso::toggle();
-		xpcc::delay_ms(50);
+		xpcc::delayMilliseconds(50);
 	}
 
 	led::DuoRed::setOutput();

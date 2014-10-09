@@ -92,7 +92,7 @@ MAIN_FUNCTION
 	gpio1.configure(0x001f, 0x001f);
 	gpio1.read();
 	
-	xpcc::delay_ms(200);
+	xpcc::delayMilliseconds(200);
 	
 	// timer initialization
 	// compare-match-interrupt every 1 ms at 14.7456 MHz

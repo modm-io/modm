@@ -47,7 +47,7 @@ namespace xpcc
 	 * \author	Niklas Hauser
 	 */
 	template <typename I2cMaster>
-	class I2cEeprom : public xpcc::I2cDelegate
+	class I2cEeprom : protected xpcc::I2cTransaction
 	{
 	public:
 		I2cEeprom(uint8_t address);
@@ -125,28 +125,28 @@ namespace xpcc
 		bool isReading;
 		
 		uint8_t buffer[3];
-		
-	private:
+
 		bool
 		initialize(const uint8_t* writeBuffer, uint8_t writeSize, uint8_t* readBuffer, uint8_t readSize);
 		
 		bool
 		initialize(const uint8_t* auxWriteBuffer, uint8_t auxWriteSize, const uint8_t* writeBuffer, uint8_t writeSize, uint8_t* readBuffer, uint8_t readSize);
-		
+
+	protected:
 		virtual bool
 		attaching();
-		
-		virtual Starting
-		starting();
-		
-		virtual Writing
-		writing();
-		
-		virtual Reading
-		reading();
+
+		virtual void
+		starting(Starting &starting);
 		
 		virtual void
-		stopped(DetachCause cause);
+		writing(Writing &writing);
+		
+		virtual void
+		reading(Reading &reading);
+
+		virtual void
+		detaching(DetachCause cause);
 	};
 }
 

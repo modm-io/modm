@@ -198,7 +198,7 @@ main()
 	display.drawImage(xpcc::glcd::Point(0, 0), xpcc::accessor::asFlash(bootscreen));
 	display.update();
 
-	xpcc::delay_ms(1500);
+	xpcc::delayMilliseconds(1500);
 
 	uint8_t units = 0;
 	uint8_t tens = 0;
@@ -217,6 +217,6 @@ main()
 		drawNumber(xpcc::glcd::Point(64, 0), units);
 		display.update();
 
-		xpcc::delay_ms(200);
+		xpcc::delayMilliseconds(200);
 	}
 }

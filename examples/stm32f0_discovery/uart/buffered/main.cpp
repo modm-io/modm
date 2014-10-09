@@ -44,7 +44,7 @@ MAIN_FUNCTION
 	// Send block 1 asynchronously
 	Usart1::write(block1, sizeof(block1));
 	// Wait for block 1 to be written to receive buffer
-	xpcc::delay_ms(500);
+	xpcc::delayMilliseconds(500);
 	// Read back from receive buffer
 	Usart1::read(return_block, sizeof(block1));
 	// Success ??
@@ -59,7 +59,7 @@ MAIN_FUNCTION
 	// Send block 2 asynchronously
 	Usart1::write(block2, sizeof(block2));
 	// Wait for block 1 to be written to receive buffer
-	xpcc::delay_ms(500);
+	xpcc::delayMilliseconds(500);
 	// Read back from receive buffer
 	Usart1::read(return_block, sizeof(block2));
 	// Success ??

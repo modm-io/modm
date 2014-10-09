@@ -203,7 +203,7 @@ calibrateTouchscreen(xpcc::GraphicDisplay& display, xpcc::glcd::Point *fixed_sam
 			display << "Touch crosshair to calibrate";
 
 			drawCross(display, calibrationPoint[i]);
-			xpcc::delay_ms(500);
+			xpcc::delayMilliseconds(500);
 
 			while (!ads7843.read(&sample[i])) {
 				// wait until a valid sample can be taken
@@ -259,7 +259,7 @@ touchActive()
 	bool m1, m2;
 
 	m1 = !IntTouchscreen::read();
-	xpcc::delay_us(130);
+	xpcc::delayMicroseconds(130);
 	m2 = !IntTouchscreen::read();
 
 	return (m1 || m2);

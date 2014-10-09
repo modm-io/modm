@@ -32,6 +32,7 @@
     <driver type="i2c" name="xmega" instances="C,D,E,F"/>
     <driver type="spi" name="xmega" instances="C,D,E,F"/>
     <driver type="adc" name="xmega" instances="A,B"/>
+    <driver type="clock" name="avr"/>
     <driver type="dac" name="xmega" instances="A,B"/>
     <driver type="timer" name="xmega" instances="C0,C1,D0,D1,E0,E1,F0,F1"/>
     <driver device-pin-id="u" type="timer" name="xmega" instances="C2,D2,E2,F2"/>

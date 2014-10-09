@@ -117,7 +117,7 @@ namespace xpcc
 	 * \tparam I2cMaster	I2C interface
 	 */
 	template < typename I2cMaster >
-	class Itg3200
+	class Itg3200 : protected xpcc::I2cWriteReadAdapter
 	{
 	public:
 		/**
@@ -211,8 +211,6 @@ namespace xpcc
 		 */
 		uint8_t
 		readRegister(itg3200::Register reg);
-		
-		xpcc::I2cWriteReadAdapter adapter;
 		
 		enum Running {
 			NOTHING_RUNNING,

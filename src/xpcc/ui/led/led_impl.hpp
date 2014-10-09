@@ -39,10 +39,7 @@ xpcc::ui::Led::isFading() const
 void inline
 xpcc::ui::Led::fadeTo(uint16_t time, uint8_t brightness)
 {
-	if (!brightnessAnimation.animateTo(time, brightness))
-	{
-		setValue(brightness);
-	}
+	brightnessAnimation.animateTo(time, brightness);
 }
 
 void ALWAYS_INLINE

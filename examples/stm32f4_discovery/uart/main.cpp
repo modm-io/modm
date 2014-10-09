@@ -31,7 +31,7 @@ MAIN_FUNCTION
 		if (c > 'Z') {
 			c = 'A';
 		}
-		xpcc::delay_ms(500);
+		xpcc::delayMilliseconds(500);
 	}
 
 	return 0;

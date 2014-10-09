@@ -25,7 +25,7 @@ namespace xmega
  * Asynchronous I2C master module for Port {{ id }}.
  *
  * Interrupts must be enabled.
- * 
+ *
  * @author Niklas Hauser
  * @ingroup	xmega
  */
@@ -39,19 +39,24 @@ public:
 	/**
 	 * Set up the I2C module for master operation.
 	 *
-	 * @param	rate
+	 * @param	baudrate
 	 *		`Standard` or `Fast`, `High` datarate is not supported by the Xmega
 	 */
-	template<DataRate rate=DataRate::Standard>
+	template<class clockSource, uint32_t baudrate=DataRate::Standard
+			uint16_t tolerance = xpcc::Tolerance::FivePercent >
 	static ALWAYS_INLINE void
 	initialize()
 	{
-		constexpr uint32_t rawRate = static_cast<uint32_t>(rate);
-		static_assert(rawRate <= 400000, "The Xmega does not support High I2C baudrate.");
-		static_assert(F_CPU/10 >= rawRate, "The CPU frequency needs to be at least 10x higher than I2C baudrate.");
+		static_assert(baudrate <= 400000, "The Xmega does not support I2C baudrates above 400kHz.");
+		static_assert(F_CPU/10 >= baudrate, "The CPU frequency needs to be at least 10x higher than I2C baudrate.");
 
 		// set the baud rate register
-		constexpr uint8_t baud = (F_CPU / (2 * rawRate)) - 5;
+		constexpr uint8_t baud = (F_CPU / (2 * baudrate)) - 5;
+		assertBaudrateInTolerance<
+				/* clostest available baudrate */ (F_CPU / (2*(baud + 5))),
+				/* desired baudrate */ baudrate,
+				tolerance >();
+
 		initializeWithBaud(baud);
 	}
 

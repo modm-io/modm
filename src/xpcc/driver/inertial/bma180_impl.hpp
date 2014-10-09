@@ -35,9 +35,9 @@
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 xpcc::Bma180<I2cMaster>::Bma180(uint8_t* data, uint8_t address)
-:	status(0), data(data)
+:	I2cWriteReadAdapter(address), status(0), data(data)
 {
-	adapter.initialize(address << 1, buffer, 0, data, 0);
+	configureWriteRead(buffer, 0, data, 0);
 }
 
 template < typename I2cMaster >
@@ -86,16 +86,16 @@ void
 xpcc::Bma180<I2cMaster>::update()
 {
 	if (status & READ_ACCELEROMETER_RUNNING &&
-		adapter.getState() == xpcc::I2c::AdapterState::Idle) {
+		getAdapterState() == xpcc::I2c::AdapterState::Idle) {
 		status &= ~READ_ACCELEROMETER_RUNNING;
 		status |= NEW_ACCELEROMETER_DATA;
 	}
 	else if (status & READ_ACCELEROMETER_PENDING)
 	{
 		buffer[0] = bma180::REGISTER_DATA_X0;
-		adapter.initialize(buffer, 1, data, 7);
+		configureWriteRead(buffer, 1, data, 7);
 		
-		if (I2cMaster::start(&adapter)) {
+		if (I2cMaster::start(this)) {
 			status &= ~READ_ACCELEROMETER_PENDING;
 			status |= READ_ACCELEROMETER_RUNNING;
 		}
@@ -122,25 +122,25 @@ template < typename I2cMaster >
 bool
 xpcc::Bma180<I2cMaster>::writeRegister(bma180::Register reg, uint8_t value)
 {
-	while (adapter.getState() == xpcc::I2c::AdapterState::Busy)
+	while (getAdapterState() == xpcc::I2c::AdapterState::Busy)
 		;
 	buffer[0] = reg;
 	buffer[1] = value;
-	adapter.initialize(buffer, 2, data, 0);
+	configureWriteRead(buffer, 2, data, 0);
 	
-	return I2cMaster::startBlocking(&adapter);
+	return I2cMaster::startBlocking(this);
 }
 
 template < typename I2cMaster >
 uint8_t
 xpcc::Bma180<I2cMaster>::readRegister(bma180::Register reg)
 {
-	while (adapter.getState() == xpcc::I2c::AdapterState::Busy)
+	while (getAdapterState() == xpcc::I2c::AdapterState::Busy)
 		;
 	buffer[0] = reg;
-	adapter.initialize(buffer, 1, buffer, 1);
+	configureWriteRead(buffer, 1, buffer, 1);
 	
-	while (!I2cMaster::startBlocking(&adapter))
+	while (!I2cMaster::startBlocking(this))
 		;
 	return buffer[0];
 }

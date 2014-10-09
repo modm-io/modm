@@ -19,6 +19,7 @@
 #include "../../../type_ids.hpp"
 #include "../../../device.hpp"
 #include "uart_base.hpp"
+#include "uart_baudrate.hpp"
 
 namespace xpcc
 {
@@ -48,11 +49,6 @@ private:
 	static inline void
 	setParity(const Parity parity);
 
-	/// Calculate settings for the UBR register
-	template<class clockSource, uint32_t baudrate, OversamplingMode>
-	static inline uint16_t
-	getBaudrateSettings();
-
 public:
 	/// TypeId used to connect GPIO pins to this peripheral's rx.
 	static const TypeId::Uart{{ id }}Rx Rx;
@@ -69,15 +65,37 @@ public:
 	disable();
 
 	/**
+	* Initialize Uart HAL Peripheral
+	*
+	* Enables clocks, the UART peripheral (but neither TX nor RX)
+	* Sets baudrate and parity.
+	*/
+	template<	class clockSource, uint32_t baudrate >
+	static void
+	initialize(	Parity parity = Parity::Disabled);
+
+	/**
 	 * Initialize Uart HAL Peripheral
 	 *
 	 * Enables clocks, the UART peripheral (but neither TX nor RX)
 	 * Sets baudrate and parity.
 	 */
 	template<	class clockSource, uint32_t baudrate,
-				OversamplingMode oversample = OversamplingMode::By16>
-	static inline void
+				OversamplingMode oversample = OversamplingMode::By16 >
+	static void
 	initialize(	Parity parity = Parity::Disabled);
+
+
+	/**
+	* Initialize Uart HAL Peripheral
+	*
+	* Enables clocks, the UART peripheral (but neither TX nor RX)
+	* Sets raw brr, parity and oversampling mode.
+	*/
+	static void
+	initializeWithBrr(uint16_t brr,
+			Parity parity,
+			OversamplingMode oversample);
 
 	/// Choose if you want to oversample by 16 (_default_) or by 8
 	static inline void

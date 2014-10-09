@@ -35,31 +35,6 @@ xpcc::stm32::{{ name }}::setParity(const Parity parity)
 	{{ peripheral }}->CR1 = flags;
 }
 
-template<class clockSource, uint32_t baudrate, xpcc::stm32::{{ name }}::OversamplingMode oversample>
-uint16_t
-xpcc::stm32::{{ name }}::getBaudrateSettings()
-{
-	if(oversample == OversamplingMode::By16){
-		static_assert((oversample != OversamplingMode::By16) ||
-			(baudrate <= clockSource::{{ uart ~ id }} / 16),
-			"Baudrate must be less or equal to the PeripheralClock divided by 16.");
-		// see http://www.mikrocontroller.net/topic/143715
-		return ((2 * clockSource::{{ uart ~ id }}) / baudrate + 1) / 2;
-	} else {
-		static_assert((oversample != OversamplingMode::By8) ||
-			(baudrate <= clockSource::{{ uart ~ id }} / 8),
-			"Baudrate must be less or equal to the PeripheralClock divided by 8.");
-		// see http://www.mikrocontroller.net/topic/143715
-		uint16_t brr = ((2 * clockSource::{{ uart ~ id }}) / (baudrate / 2) + 1) / 2;
-		// correct baudrate
-%% if target is stm32f1 or target is stm32f2 or target is stm32f4
-		return (USART_BRR_DIV_Mantissa & brr) | ((USART_BRR_DIV_Fraction & brr)>>1);
-%% elif target is stm32f3 or target is stm32f0
-		return (USART_BRR_DIV_MANTISSA & brr) | ((USART_BRR_DIV_FRACTION & brr)>>1);
-%% endif
-	}
-}
-
 void
 xpcc::stm32::{{ name }}::enable()
 {
@@ -99,16 +74,34 @@ xpcc::stm32::{{ name }}::disable()
 %% endif
 }
 
-template<class clockSource, uint32_t baudrate, xpcc::stm32::{{ name }}::OversamplingMode oversample>
-void
+template<class clockSource, uint32_t baudrate,
+		xpcc::stm32::{{ name }}::OversamplingMode oversample>
+void ALWAYS_INLINE
 xpcc::stm32::{{ name }}::initialize(Parity parity)
+{
+	initializeWithBrr(UartBaudrate::getBrr<clockSource::{{ name }}, baudrate>(),
+			parity,
+			oversample);
+}
+
+template<class clockSource, uint32_t baudrate>
+void ALWAYS_INLINE
+xpcc::stm32::{{ name }}::initialize(Parity parity)
+{
+	initialize<clockSource, baudrate,
+			UartBaudrate::getOversamplingMode(clockSource::{{ name }}, baudrate)>(parity);
+}
+
+
+void inline
+xpcc::stm32::{{ name }}::initializeWithBrr(uint16_t brr, Parity parity, OversamplingMode oversample)
 {
 	enable();
 	// DIRTY HACK: disable and reenable uart to be able to set
 	//             baud rate as well as parity
 	{{ peripheral }}->CR1 &= ~USART_CR1_UE;	// Uart Disable
 	// set baudrate
-	{{ peripheral }}->BRR = getBaudrateSettings<clockSource, baudrate, oversample>();
+	{{ peripheral }}->BRR = brr;
 	setParity(parity);
 	setOversamplingMode(oversample);
 	{{ peripheral }}->CR1 |=  USART_CR1_UE;	// Uart Reenable
@@ -221,7 +214,7 @@ xpcc::stm32::{{ name }}::enableInterruptVector(bool enable, uint32_t priority)
 	if (enable) {
 		// Set priority for the interrupt vector
 		NVIC_SetPriority({{ peripheral }}_IRQn, priority);
-		
+
 		// register IRQ at the NVIC
 		NVIC_EnableIRQ({{ peripheral }}_IRQn);
 	}
@@ -266,11 +259,11 @@ xpcc::stm32::{{ name }}::acknowledgeInterruptFlags(InterruptFlag flags)
 	// Writing a zero is (hopefully) ignored.
 	{{ peripheral }}->ICR = (flags & mask);
 %% elif target is stm32f2 or target is stm32f4
-	/* Interrupts must be cleared manually by accessing SR and DR. 
+	/* Interrupts must be cleared manually by accessing SR and DR.
 	 * Overrun Interrupt, Noise flag detected, Framing Error, Parity Error
 	 * p779: "It is cleared by a software sequence (an read to the
 	 * USART_SR register followed by a read to the USART_DR register"
-	 */ 
+	 */
 	if (flags & InterruptFlag::OverrunError) {
 		uint32_t tmp;
 		tmp = {{ peripheral }}->SR;

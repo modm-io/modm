@@ -68,9 +68,9 @@ main(void)
 	{
 		static uint16_t ii = 7;
 		Led::toggle();
-		xpcc::delay_ms(100);
+		xpcc::delayMilliseconds(100);
 		Led::toggle();
-		xpcc::delay_ms(50);
+		xpcc::delayMilliseconds(50);
 
 		if (!--ii)
 			break;
@@ -119,7 +119,7 @@ main(void)
 		// finished, copy to lcd
 		display.update();
 
-		xpcc::delay_ms(1000);
+		xpcc::delayMilliseconds(1000);
 	}
 
 

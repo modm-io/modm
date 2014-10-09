@@ -8,14 +8,34 @@
 // ----------------------------------------------------------------------------
 
 #include "uart_simple_spi_{{id}}.hpp"
+#include <xpcc/math/utils/bit_operation.hpp>
 
 xpcc::stm32::UartSpiSimpleMaster{{ id }}::DataOrder
 	xpcc::stm32::UartSpiSimpleMaster{{ id }}::dataOrder =
 	xpcc::stm32::UartSpiSimpleMaster{{ id }}::DataOrder::MsbFirst;
 
 // ----------------------------------------------------------------------------
-bool
-xpcc::stm32::UartSpiSimpleMaster{{ id }}::transfer(uint8_t *tx, uint8_t *rx,
+uint8_t
+xpcc::stm32::UartSpiSimpleMaster{{ id }}::writeReadBlocking(uint8_t data)
+{
+	if(dataOrder == DataOrder::MsbFirst) {
+		data = ::xpcc::bitReverse(data);
+	}
+	UsartHal{{ id }}::write(data);
+
+	while (!UsartHal{{ id }}::isReceiveRegisterNotEmpty())
+		;
+
+	UsartHal{{ id }}::read(data);
+	// the USART can only send LSB out first
+	if(dataOrder == DataOrder::MsbFirst) {
+		data = ::xpcc::bitReverse(data);
+	}
+	return data;
+}
+
+void
+xpcc::stm32::UartSpiSimpleMaster{{ id }}::transferBlocking(uint8_t *tx, uint8_t *rx,
 		std::size_t length)
 {
 	uint_fast8_t tx_byte = 0xff;
@@ -29,6 +49,4 @@ xpcc::stm32::UartSpiSimpleMaster{{ id }}::transfer(uint8_t *tx, uint8_t *rx,
 
 		if (rx) rx[i] = rx_byte;
 	}
-
-	return true;
 }

@@ -24,20 +24,17 @@
 
 namespace
 {
-	static xpcc::atomic::Queue<char, {{ parameters.rx_buffer }}> rxBuffer;
-	static xpcc::atomic::Queue<char, {{ parameters.tx_buffer }}> txBuffer;
-	static bool isBlocking = true;
+	static xpcc::atomic::Queue<uint8_t, {{ parameters.rx_buffer }}> rxBuffer;
+	static xpcc::atomic::Queue<uint8_t, {{ parameters.tx_buffer }}> txBuffer;
 }
 %% endif
 
 %% if parameters.buffered
 void
-xpcc::stm32::{{ name }}::initializeBuffered(uint32_t interruptPriority,
-											bool blocking)
+xpcc::stm32::{{ name }}::initializeBuffered(uint32_t interruptPriority)
 {
 	{{ hal }}::enableInterruptVector(true, interruptPriority);
 	{{ hal }}::enableInterrupt(Interrupt::RxNotEmpty);
-	isBlocking = blocking;
 }
 %% endif
 
@@ -73,11 +70,8 @@ xpcc::stm32::{{ name }}::write(uint8_t data)
 	if(txBuffer.isEmpty() && {{ hal }}::isTransmitRegisterEmpty()) {
 		{{ hal }}::write(data);
 	} else {
-		while (!txBuffer.push(data)) {
-			if (!isBlocking) {	// if queue is full => block
-				return false;	// if not supposed ot block return false
-			}
-		}
+		if (!txBuffer.push(data))
+			return false;
 		// Disable interrupts while enabling the transmit interrupt
 		atomic::Lock lock;
 		// Transmit Data Register Empty Interrupt Enable

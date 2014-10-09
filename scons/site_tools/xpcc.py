@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-# 
+#
 # Copyright (c) 2009, Roboterclub Aachen e.V.
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
+#
 #     * Redistributions of source code must retain the above copyright
 #       notice, this list of conditions and the following disclaimer.
 #     * Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
 #     * Neither the name of the Roboterclub Aachen e.V. nor the
 #       names of its contributors may be used to endorse or promote products
 #       derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
 # EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -39,10 +39,10 @@ import SCons.Tool		# to get the SCons default tool search path
 def exclude_from_scanner(path, filename='build.cfg'):
 	filename = os.path.join(path, filename)
 	dir = os.path.dirname(filename)
-	
+
 	if not os.path.exists(dir):
 		os.makedirs(dir)
-	
+
 	file = open(filename, 'w')
 	file.write("""[build]\ntarget = None""")
 	file.close()
@@ -54,7 +54,7 @@ def relocate_to_buildpath(env, path, strip_extension=False):
 	path = str(path)
 	if strip_extension:
 		path = os.path.splitext(path)[0]
-	
+
 	path = os.path.relpath(path, env['XPCC_BASEPATH'])
 	if path.startswith('..'):
 		# if the file is not in a subpath of the current directory
@@ -62,7 +62,7 @@ def relocate_to_buildpath(env, path, strip_extension=False):
 		while path.startswith('..'):
 			path = path[3:]
 		#path = os.path.basename(path)
-	
+
 	return os.path.abspath(os.path.join(env['XPCC_BUILDPATH'], path))
 
 def check_architecture(env, architecture):
@@ -75,7 +75,7 @@ def show_defines_action(target, source, env):
 	projectConfig = env['XPCC_CONFIG']['defines'].keys()
 	keys = env['XPCC_LIBRARY_DEFINES'].keys()
 	keys.sort()
-	
+
 	print ""
 	print "XPCC:"
 	for key in keys:
@@ -86,9 +86,9 @@ def show_defines_action(target, source, env):
 			if value != default:
 				print "  %s => %s (default: %s)" % (key.upper(), value, default)
 				continue
-		
+
 		print "  %s => %s" % (key.upper(), default)
-	
+
 	if projectConfig:
 		print "\nOther:"
 		for key in projectConfig:
@@ -102,37 +102,37 @@ def show_defines(env, alias="__show"):
 def xpcc_library(env, buildpath=None):
 	env.AppendUnique(CPPPATH = env['XPCC_LIBRARY_PATH'])
 	env.AppendUnique(CPPPATH = os.path.join(env['XPCC_ROOTPATH'], 'ext'))
-	
+
 	backup = env['XPCC_BUILDPATH'], env['XPCC_BASEPATH']
-	
+
 	# set a new buildpath for the library
 	if buildpath is None:
 		buildpath = os.path.join(env['XPCC_BUILDPATH'], 'libxpcc')
 	env['XPCC_BUILDPATH'] = os.path.abspath(buildpath)
 	env['XPCC_BASEPATH'] = env['XPCC_ROOTPATH']
-	
+
 	# exclude the buildpath from the FileScanner
 	exclude_from_scanner(env['XPCC_BUILDPATH'])
 
 	# exclude the generated path from the FileScanner
 	exclude_from_scanner(env['XPCC_PLATFORM_GENERATED_PATH'])
-	
+
 	# build the library
 	library, defines = env.SConscript(
 			os.path.join(env['XPCC_ROOTPATH'], 'src', 'SConscript'),
 			exports = 'env')
-	
+
 	# generate 'xpcc_config.hpp'
 	env['XPCC_LIBRARY_DEFINES'] = defines.copy()
 	env['XPCC_LIBRARY_DEFAULT_DEFINES'] = defines.copy()
 	for key in defines.iterkeys():
 		if key in env['XPCC_CONFIG']['defines']:
 			env['XPCC_LIBRARY_DEFINES'][key] = env['XPCC_CONFIG']['defines'][key]
-	
+
 	define_list = ["#define %s %s" % (key.upper(), value) \
 				for key, value in env['XPCC_LIBRARY_DEFINES'].iteritems()]
 	define_list.sort()
-	
+
 	substitutions = {
 		'defines': '\n'.join(define_list),
 		'name': env['XPCC_CONFIG']['general']['name']
@@ -140,16 +140,16 @@ def xpcc_library(env, buildpath=None):
 
 	file = env.Template(
 			target = os.path.join(env['XPCC_BUILDPATH'], 'xpcc_config.hpp'),
-			source = os.path.join(env['XPCC_ROOTPATH'], 
+			source = os.path.join(env['XPCC_ROOTPATH'],
 								  'templates/xpcc_config.hpp.in'),
 			substitutions = substitutions)
-	
+
 	env.PrependUnique(LIBS = ['xpcc'])
 	env.PrependUnique(LIBPATH = [os.path.join(env['XPCC_BUILDPATH'], 'src')])
-	
+
 	# restore original environment
 	env['XPCC_BUILDPATH'], env['XPCC_BASEPATH'] = backup
-	
+
 	return library
 
 def xpcc_communication_header(env, xmlfile, path='.'):
@@ -162,12 +162,12 @@ def xpcc_communication_header(env, xmlfile, path='.'):
 				source=xmlfile,
 				container=env['XPCC_CONFIG']['communication']['container'],
 				path=path)
-	
+
 	source = []
 	for file in files:
 		if file.name.endswith('.cpp'):
 			source.append(file)
-	
+
 	return source
 
 def generate_defines(env, filename='defines.hpp'):
@@ -178,7 +178,7 @@ def generate_defines(env, filename='defines.hpp'):
 	}
 	file = env.Template(
 			target = filename,
-			source = os.path.join(env['XPCC_ROOTPATH'], 
+			source = os.path.join(env['XPCC_ROOTPATH'],
 								  'templates/defines.hpp.in'),
 			substitutions = substitutions)
 	return file
@@ -209,38 +209,38 @@ def generate(env, **kw):
 
 	# detect the rootpath to the xpcc folder
 	rootpath = env.get('rootpath')
-	
+
 	if rootpath is None:
 		# Check if a global environment variable exists that point to
 		# the root of the xpcc-folder
 		rootpath = ARGUMENTS.get('XPCC_HOME', None)
 		if rootpath is not None:
 			env.Info("Use path from 'XPCC_HOME': '%s'" % rootpath)
-	
+
 	if rootpath is None:
 		# try to detect the rootpath
 		sitepath = os.path.join('scons', 'site_tools')
-		
+
 		# DefaultToolpath is used when the xpcc toolpath is added via --site-dir=$/xpcc/scons
 		searchpath = env.get('toolpath', []) + SCons.Tool.DefaultToolpath
-		
+
 		for path in searchpath:
 			path = os.path.normpath(path)
 			if path.endswith(sitepath):
 				p = path[:-len(sitepath) - 1]
 				# To avoid false detection of directories with a similar
-				# name check if at least a 'src' directory exists 
+				# name check if at least a 'src' directory exists
 				if os.path.exists(os.path.join(p, 'src')):
 					rootpath = p
 					env.Info("Extracted path from tool path: '%s'" % rootpath)
 					break
-		
+
 		if rootpath is None:
 			env.Error("Could not detect the path to the xpcc-library. Use " \
 				  "'Environment(rootpath=...)' to set the path to the root folder of xpcc.")
 			env.Exit(1)
 	rootpath = os.path.abspath(rootpath)
-	
+
 	# load the configuration file
 	configfile = ARGUMENTS.get('config', env.get('configfile', 'project.cfg'))
 	try:
@@ -265,6 +265,12 @@ def generate(env, **kw):
 		# put together build path
 		if buildpath is None:
 			buildpath = parser.get('build', 'buildpath', os.path.join(os.curdir, 'build/'))
+
+		# load parameters if available
+		if parser.has_section('parameters'):
+			env['XPCC_USER_PARAMETERS'] = parser.items('parameters')
+		else:
+			env['XPCC_USER_PARAMETERS'] = []
 
 	except configparser.ParserException, msg:
 		env.Error("Error parsing file configuration file '%s':\n%s" % (configfile, str(msg)))
@@ -368,10 +374,10 @@ def generate(env, **kw):
 			env['ARM_ARCH'] = env['ARCHITECTURE']
 		env['ARM_DEVICE'] = device
 		env['ARM_CLOCK'] = clock
-		
+
 		env.Tool('arm')
 		env.Tool('dfu_stm32_programmer')
-		
+
 		# load openocd tool if required
 		if parser.has_section('program'):
 			try:
@@ -428,15 +434,15 @@ def generate(env, **kw):
 			filename = env.Buildpath(file.path)
 			targets.append(filename)
 		return targets, source
-	
+
 	env['BUILDERS']['Object'].add_emitter('.cpp', defaultEmitter)
 	env['BUILDERS']['Object'].add_emitter('.c', defaultEmitter)
 	env['BUILDERS']['Object'].add_emitter('.sx', defaultEmitter)
 	env['BUILDERS']['Object'].add_emitter('.S', defaultEmitter)
-	
+
 	env['LIBEMITTER'] = defaultEmitter
 	env['PROGEMITTER'] = defaultEmitter
-	
+
 	env.AddMethod(relocate_to_buildpath, 'Buildpath')
 	env.AddMethod(check_architecture, 'CheckArchitecture')
 	env.AddMethod(show_defines, 'ShowDefines')

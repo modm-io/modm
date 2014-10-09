@@ -41,8 +41,8 @@ struct Spi
 		LsbFirst = 0b1,
 	};
 
-	/// This tells the `SpiDelegate` why it was detached
-	/// @see SpiDelegate
+	/// This tells the `SpiTransaction` why it was detached
+	/// @see SpiTransaction
 	enum class
 	DetachCause : uint8_t
 	{
@@ -81,11 +81,14 @@ public:
 	 * Initializes the hardware and sets the baudrate.
 	 *
 	 * @tparam	clockSource
-	 * 		the targets sytem clock
+	 * 		the currently active system clock
 	 * @tparam	baudrate
 	 * 		the desired baudrate in Hz
+	 * @tparam	tolerance
+	 * 		the allowed absolute tolerance for the resulting baudrate
 	 */
-	template< class clockSource, uint32_t baudrate >
+	template< class clockSource, uint32_t baudrate,
+			uint16_t tolerance = Tolerance::FivePercent >
 	static void
 	initialize();
 
@@ -97,38 +100,15 @@ public:
 	static void
 	setDataOrder(DataOrder order);
 
-	// blocking
 	/**
-	 * Write a single byte, wait for completion.
+	 * Swap a single byte and wait for completion.
 	 *
-	 * @return	received byte.
+	 * @param	data
+	 * 		data to be sent
+	 * @return	received data
 	 */
 	static uint8_t
 	writeReadBlocking(uint8_t data);
-
-	/// Write a single byte, wait for completion and discard received byte.
-	static void
-	writeBlocking(uint8_t data);
-
-	// non-blocking
-	/**
-	 * Write a single byte, and return immediately.
-	 *
-	 * @return	`true` if data has been sent, `false` if buffer is full
-	 */
-	static bool
-	write(uint8_t data);
-
-	/**
-	 * Get the last byte that was received.
-	 *
-	 * @param[out]	data
-	 *		Byte read, if any
-	 *
-	 * @return	`true` if receive buffer is valid, `false` if not
-	 */
-	static bool
-	getResult(uint8_t &data);
 
     /**
      * Set the data buffers and length with options and starts a transfer.
@@ -140,16 +120,9 @@ public:
      *      pointer to receive buffer, set to `0` to discard received bytes
      * @param       length
      *      number of bytes to be shifted out
-     *
-     * @return  `true`  if transfer request was successfully serviced,
-     *          `false` if another transfer is already progress.
      */
-    static bool
-    transfer(uint8_t * tx, uint8_t * rx, std::size_t length);
-
-	/// @return	`true` if last byte has been sent and the swapped byte can be read.
-	static bool
-	isFinished();
+    static void
+    transferBlocking(uint8_t *tx, uint8_t *rx, std::size_t length);
 #endif
 };
 
@@ -180,49 +153,38 @@ public:
 	 * @tparam	baudrate
 	 * 		the desired baudrate in Hz
 	 */
-	template< class clockSource, uint32_t baudrate >
+	template< class clockSource, uint32_t baudrate
+            uint16_t tolerance = Tolerance::FivePercent >
 	static void
 	initialize();
 
 	/**
 	 * Requests bus control and starts the transfer.
 	 *
-	 * @param	delegate
-	 * 		object that inherits from the SpiDelegate class.
-	 * @param	mode
-	 * 		desired data mode for this transfer
-	 * @param	order
-	 * 		desired data order for this transfer
+	 * @param	transaction
+	 * 		object that inherits from the SpiTransaction class.
 	 *
 	 * @return	Caller gains control if `true`. Call has no effect if `false`.
 	 */
 	static bool
-	start(SpiDelegate *delegate,
-			DataMode mode=DataMode::Mode0,
-			DataOrder order=DataOrder::MsbFirst);
+	start(SpiTransaction *transaction);
 
 	/**
-	 * Requests bus control and starts the transfer, blocks until delegate is detached.
+	 * Requests bus control and starts the transfer, blocks until the transaction completes.
 	 *
-	 * @param	delegate
-	 * 		object that inherits from the SpiDelegate class.
-	 * @param	mode
-	 * 		desired timing mode for this transfer
-	 * @param	order
-	 * 		desired data order for this transfer
+	 * @param	transaction
+	 * 		object that inherits from the SpiTransaction class.
 	 *
 	 * @return	Caller gains control if `true`. Call has no effect if `false`.
 	 */
 	static bool
-	startBlocking(SpiDelegate *delegate,
-			DataMode mode=DataMode::Mode0,
-			DataOrder order=DataOrder::MsbFirst);
+	startBlocking(SpiTransaction *transaction);
 
 	/**
 	 * Perform a software reset of the driver in case of an error.
 	 *
-	 * This method calls the `detaching()` Delegate method and then detaches
-	 * the delegate.
+	 * This method calls the `detaching()` method of the transaction object
+     * and then detaches it.
 	 */
 	static void
 	reset(DetachCause cause = DetachCause::SoftwareReset);
@@ -230,24 +192,24 @@ public:
 };
 
 /**
- * Abstract class for delegation.
+ * Abstract class for transactions.
  *
  * For true asynchronous operation, the communication driver should
  * inherit from this class, allowing resource control of the hardware.
- * This Delegate will stay attached to the `SpiMaster` during the operation.
+ * This transaction object will stay attached to the `SpiMaster` during the operation.
  *
  * @see SpiMaster
  *
  * @author	Niklas Hauser
  * @ingroup	spi
  */
-class SpiDelegate : public Spi
+class SpiTransaction : public Spi
 {
 public:
 	/// Contains the information required to make a SPI transfer
 	struct Transmission {
-		const uint8_t *writeBuffer;	///< data to write, set to `0` to transmit dummy bytes
-		uint8_t *readBuffer;		///< data to read, set `0` to discard received bytes
+		const uint8_t *writeBuffer;	///< data to write, set to `nullptr` to transmit dummy bytes
+		uint8_t *readBuffer;		///< data to read, set `nullptr` to discard received bytes
 		std::size_t length;			///< number of bytes to be transmitted
 		Operation next;				///< operation following the transmission
 	};
@@ -255,25 +217,25 @@ public:
 public:
 	/**
 	 * This method is called when the SpiMaster is not currently
-	 * in use by another delegate and can be attached.
+	 * in use by another transaction and can be attached.
 	 * Use this callback to pull the Slave Select pin low.
 	 *
-	 * @return	`true` if the SpiMaster should attach this delegate,
+	 * @return	`true` if the SpiMaster should attach this transaction,
 	 * 			`false` if it should not attach it.
 	 */
 	virtual bool
 	attaching() = 0;
 
 	/**
-	 * This is called when the SpiMaster is ready to start a transmission.
+	 * This is called when the SpiMaster is ready to start a data transmission.
 	 *
-	 * @return	the `Transmission` struct
+	 * @param[out]	transmission    `Transmission` struct containing write/read buffers, size and next operation
 	 */
-	virtual Transmission
-	transmitting() = 0;
+	virtual void
+	transmitting(Transmission &transmission) = 0;
 
 	/**
-	 * This is called when the transmission finished and delegate is about to
+	 * This is called when all transmissions finished and transaction object is about to
 	 * be detached. The SpiMaster will not be free until this method returns.
 	 * Use this callback to pull the Slave Select pin high.
 	 *

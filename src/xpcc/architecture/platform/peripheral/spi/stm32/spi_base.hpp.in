@@ -50,6 +50,8 @@ public:
 		Busy				= SPI_SR_BSY,
 %% if target is stm32f0 or target is stm32f3
 		FrameFormatError	= SPI_SR_FRE,
+		FifoRxLevel			= SPI_SR_FRLVL,
+		FifoTxLevel			= SPI_SR_FTLVL,
 %% endif
 	};
 

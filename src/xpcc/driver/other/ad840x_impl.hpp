@@ -49,7 +49,7 @@ inline void
 xpcc::AD840x<Spi, Cs, Rs, Shdn>::reset()
 {
 	Rs::reset();
-	xpcc::delay_us(1);		// wait at least 50ns
+	xpcc::delayMicroseconds(1);		// wait at least 50ns
 	Rs::set();
 }
 

@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__NRF24_HPP
-#define XPCC__NRF24_HPP
+#ifndef XPCC__NRF24_PHY_HPP
+#define XPCC__NRF24_PHY_HPP
 
 #include <stdint.h>
 
@@ -236,7 +236,7 @@ enum Command : uint8_t
 */
 
 template <typename Spi, typename Csn>
-class Nrf24Hal
+class Nrf24Phy
 {
 
 public:
@@ -252,7 +252,9 @@ public:
 	{
 		// When payload length is configured to 0, length will be polled every
 		// time a packet is fetched from Rx Fifo
-		payload_len = payload_length;
+
+		/* For now always use fixed payload size */
+		payload_len = (payload_length == 0) ? max_payload_length : payload_length;
 	}
 
 	/** @brief Get the maximum payload size the hardware can transmit in one packet
@@ -436,7 +438,10 @@ public:
 	 *
 	 */
 	static uint16_t
-	getPayloadLength();
+	getPayloadLength()
+	{
+		return payload_len;
+	}
 
 
 private:
@@ -485,6 +490,6 @@ private:
 
 }
 
-#include "nrf24_hal_impl.hpp"
+#include "nrf24_phy_impl.hpp"
 
 #endif

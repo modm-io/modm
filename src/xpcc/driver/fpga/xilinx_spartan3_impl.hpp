@@ -61,7 +61,7 @@ xpcc::XilinxSpartan3<Cclk, Din, ProgB, InitB, Done, DataSource>::configure(const
 		while (InitB::read() == xpcc::Gpio::High ||
 				Done::read() == xpcc::Gpio::High)
 		{
-			xpcc::delay_us(1);
+			xpcc::delayMicroseconds(1);
 			if (counter++ > 1000) {
 				// Timeout (1ms) reached, FPGA is not responding abort configuration
 				XPCC_LOG_ERROR << XPCC_FILE_INFO;
@@ -72,14 +72,14 @@ xpcc::XilinxSpartan3<Cclk, Din, ProgB, InitB, Done, DataSource>::configure(const
 	}
 	// Led1::reset();
 
-	xpcc::delay_us(1);
+	xpcc::delayMicroseconds(1);
 	ProgB::set();
 
 	// Wait until INIT_B goes high
 	uint32_t counter = 0;
 	while (InitB::read() == xpcc::Gpio::Low)
 	{
-		xpcc::delay_us(1);
+		xpcc::delayMicroseconds(1);
 		if (counter++ > 1000) {
 			// Timeout (1ms) reached, FPGA is not responding abort configuration
 			XPCC_LOG_ERROR << XPCC_FILE_INFO;
@@ -90,7 +90,7 @@ xpcc::XilinxSpartan3<Cclk, Din, ProgB, InitB, Done, DataSource>::configure(const
 	// Led2::reset();
 
 	// wait 0.5..4us before starting the configuration
-	xpcc::delay_us(4);
+	xpcc::delayMicroseconds(4);
 
 	uint8_t buffer[256];
 

@@ -119,25 +119,13 @@ public:
  * @ingroup	gpio
  */
 template < class Pin >
-class GpioInverted : GpioIO
+class GpioInverted : public Pin
 {
 public:
-	ALWAYS_INLINE static void
-	setOutput()
-	{
-		Pin::setOutput();
-	}
-
 	ALWAYS_INLINE static void
 	setOutput(bool value)
 	{
 		Pin::setOutput(!value);
-	}
-
-	ALWAYS_INLINE static void
-	setInput()
-	{
-		Pin::setInput();
 	}
 
 	ALWAYS_INLINE static void
@@ -156,12 +144,6 @@ public:
 	reset()
 	{
 		Pin::set();
-	}
-
-	ALWAYS_INLINE static void
-	toggle()
-	{
-		Pin::toggle();
 	}
 
 	ALWAYS_INLINE static bool

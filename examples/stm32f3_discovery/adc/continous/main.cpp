@@ -84,7 +84,7 @@ MAIN_FUNCTION
 
 	while (1)
 	{
-		xpcc::delay_ms(200);
+		xpcc::delayMilliseconds(200);
 		printAdc();
 	}
 
