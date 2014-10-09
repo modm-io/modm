@@ -155,6 +155,9 @@ public:
 	 */
 	static void
 	setMode(Mode mode);
+	
+	static void
+	setAutomaticRetransmission(bool retransmission);
 
 public:
 	// Can Interface Methods

@@ -299,6 +299,19 @@ xpcc::stm32::Can{{ id }}::setMode(Mode mode)
 }
 
 // ----------------------------------------------------------------------------
+void
+xpcc::stm32::Can{{ id }}::setAutomaticRetransmission(bool retransmission)
+{
+	if (retransmission) {
+		// Enable retransmission
+		{{ reg }}->MCR = ({{ reg }}->MCR & ~CAN_MCR_NART);
+	} else {
+		// Disable retransmission
+		{{ reg }}->MCR = ({{ reg }}->MCR | CAN_MCR_NART);
+	}
+}
+
+// ----------------------------------------------------------------------------
 bool
 xpcc::stm32::Can{{ id }}::isMessageAvailable()
 {
