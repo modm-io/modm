@@ -139,7 +139,7 @@ xpcc::IOStream::printf(const char *fmt, ...)
 				{
 					if (signedValue < 0)
 					{
-						signedValue = -signedValue; // make it positiv
+						signedValue = -signedValue; // make it positive
 						this->device->write('-');
 						if (width) {
 							--width;
