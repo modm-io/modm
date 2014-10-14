@@ -56,8 +56,8 @@ typedef GpioOutputE11 Ce2;
 typedef GpioOutputE12 Csn2;
 
 
-typedef xpcc::Nrf24Phy<SpiSimpleMaster1, Csn1> nrf24ptx;
-typedef xpcc::Nrf24Phy<SpiSimpleMaster2, Csn2> nrf24prx;
+typedef xpcc::Nrf24Phy<SpiSimpleMaster1, Csn1, Ce1> nrf24ptx;
+typedef xpcc::Nrf24Phy<SpiSimpleMaster2, Csn2, Ce2> nrf24prx;
 
 
 void

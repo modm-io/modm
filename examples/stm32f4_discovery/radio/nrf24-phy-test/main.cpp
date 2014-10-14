@@ -36,8 +36,11 @@ xpcc::log::Logger xpcc::log::error(loggerDevice);
 
 typedef GpioOutputE12 Csn;
 
+// just needed to make Nrf24Phy happy
+typedef GpioOutputA1  Ce;
 
-typedef xpcc::Nrf24Phy<SpiSimpleMaster2, Csn> nrf24phy;
+
+typedef xpcc::Nrf24Phy<SpiSimpleMaster2, Csn, Ce> nrf24phy;
 
 MAIN_FUNCTION
 {

@@ -235,7 +235,7 @@ enum Command : uint8_t
 * @author	Daniel Krebs
 */
 
-template <typename Spi, typename Csn>
+template <typename Spi, typename Csn, typename Ce>
 class Nrf24Phy
 {
 

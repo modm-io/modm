@@ -42,7 +42,7 @@ typedef GpioOutputE12 Csn;
 
 
 
-typedef xpcc::Nrf24Phy<SpiSimpleMaster2, Csn> nrf24hal;
+typedef xpcc::Nrf24Phy<SpiSimpleMaster2, Csn, Ce> nrf24hal;
 
 
 MAIN_FUNCTION
