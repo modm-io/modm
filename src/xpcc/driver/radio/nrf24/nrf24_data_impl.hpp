@@ -44,16 +44,17 @@ typedef xpcc::Nrf24Config<Nrf24Phy> ConfigLayer;
 
 template<typename Nrf24Phy>
 void
-xpcc::Nrf24Data<Nrf24Phy>::initialize(BaseAddress base_address, Address broadcast_address)
+xpcc::Nrf24Data<Nrf24Phy>::initialize(BaseAddress base_address, Address own_address, Address broadcast_address)
 {
 	baseAddress = base_address;
 	broadcastAddress = broadcast_address;
 
 	// Initialized with broadcast address means unset
-	ownAddress      = broadcastAddress;
 	connections[0]  = broadcastAddress;
 	connections[1]  = broadcastAddress;
 	connections[2]  = broadcastAddress;
+
+	setAddress(own_address);
 
 	// Clear assembly frame
 	memset(&assemblyFrame, 0, sizeof(frame_t));
@@ -103,15 +104,34 @@ xpcc::Nrf24Data<Nrf24Phy>::initialize(BaseAddress base_address, Address broadcas
 // --------------------------------------------------------------------------------------------------------------------
 
 template<typename Nrf24Phy>
+void
+xpcc::Nrf24Data<Nrf24Phy>::setAddress(Address address)
+{
+    // overwrite connection
+    ownAddress = address;
+
+    // address for pipe 2
+    Nrf24Phy::setRxAddress(2, address);
+
+    // enable pipe with auto ack
+    ConfigLayer::enablePipe(Pipe::Pipe2, true);
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template<typename Nrf24Phy>
 bool
 xpcc::Nrf24Data<Nrf24Phy>::sendPacket(packet_t& packet)
 {
     if(!isReadyToSend())
         return false;
 
+    if(packet.length > getPayloadLength())
+        return false;
+
     // assemble frame to transmit
-    assemblyFrame.src = ownAddress;
-    assemblyFrame.dest = packet.dest;
+    assemblyFrame.header.src = ownAddress;
+    assemblyFrame.header.dest = packet.dest;
     memcpy(assemblyFrame.data, packet.data, packet.length);
 
     // set receivers address as tx address
@@ -119,12 +139,12 @@ xpcc::Nrf24Data<Nrf24Phy>::sendPacket(packet_t& packet)
 
     if(packet.dest == getBroadcastAddress())
     {
-        Nrf24Phy::writeTxPayloadNoAck(&assemblyFrame, packet.length + 2);
+        Nrf24Phy::writeTxPayloadNoAck(&assemblyFrame, packet.length + sizeof(header_t));
     } else
     {
         // set pipe 0's address to tx address to receive ack packet
         Nrf24Phy::setRxAddress(0, assembleAddress(packet.dest));
-        Nrf24Phy::writeTxPayload(&assemblyFrame, packet.length + 2);
+        Nrf24Phy::writeTxPayload(&assemblyFrame, packet.length + sizeof(header_t));
     }
 
     return true;
@@ -185,22 +205,6 @@ Address
 xpcc::Nrf24Data<Nrf24Phy>::getAddress()
 {
     return ownAddress;
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Nrf24Phy>
-void
-xpcc::Nrf24Data<Nrf24Phy>::setAddress(Address address)
-{
-    // overwrite connection
-    ownAddress = address;
-
-    // address for pipe 2
-    Nrf24Phy::setRxAddress(2, address);
-
-    // enable pipe with auto ack
-    ConfigLayer::enablePipe(Pipe::Pipe2, true);
 }
 
 // --------------------------------------------------------------------------------------------------------------------

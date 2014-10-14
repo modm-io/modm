@@ -43,12 +43,20 @@ typedef struct packet_t
 
 
 /*
+ * Header of frame_t
+ */
+typedef struct header_t
+{
+    uint8_t     src;
+    uint8_t     dest;
+} header_t;
+
+/*
  * Data that will be sent over the air
  */
 typedef struct frame_t
 {
-    uint8_t     src;
-    uint8_t     dest;
+    header_t    header;
     uint8_t     data[30];   // max. possible payload size (32 byte) - 2 byte (src + dest)
 } frame_t;
 
@@ -72,7 +80,7 @@ class Nrf24Data
 public:
 
 	static void
-	initialize(BaseAddress base_address, Address broadcast_address = 0xFF);
+	initialize(BaseAddress base_address, Address own_address, Address broadcast_address = 0xFF);
 
 public:
 
@@ -105,7 +113,7 @@ public:
 	static uint8_t
 	getPayloadLength()
 	{
-		return Nrf24Phy::getPayloadLength() - 2;
+		return Nrf24Phy::getPayloadLength() - sizeof(header_t);
 	}
 
 	static Address
