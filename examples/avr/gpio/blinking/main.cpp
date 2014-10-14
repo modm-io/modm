@@ -8,25 +8,20 @@
 // ----------------------------------------------------------------------------
 #include <xpcc/architecture.hpp>
 
-using namespace xpcc::xmega;
+using namespace xpcc::atmega;
 
 typedef GpioOutputB0 Led;
-typedef xpcc::SoftwareGpioPort<GpioB6, GpioB5, GpioB4, GpioB3, GpioB2, GpioB1, GpioB0> Data3;
 
 int
 main(void)
 {
-	Data3::setOutput();
-
-	volatile uint16_t write = 0xaaaa;
-	volatile uint16_t read = 0;
-
-	Data3::write(write);
-
-	read = Data3::read();
-	(void) read;
+	Led::setOutput();
 
 	while(1)
-		;
+	{
+		Led::toggle();
+
+		xpcc::delayMilliseconds(1000);
+	}
 }
 
