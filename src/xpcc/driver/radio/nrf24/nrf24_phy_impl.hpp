@@ -335,3 +335,32 @@ xpcc::Nrf24Phy<Spi, Csn, Ce>::getTxAddress()
 }
 
 // --------------------------------------------------------------------------------------------------------------------
+
+template<typename Spi, typename Csn, typename Ce>
+void
+xpcc::Nrf24Phy<Spi, Csn, Ce>::pulseCe()
+{
+    Ce::set();
+
+    xpcc::delayMicroseconds(10);
+
+    Ce::reset();
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template<typename Spi, typename Csn, typename Ce>
+void
+xpcc::Nrf24Phy<Spi, Csn, Ce>::setCe()
+{
+    Ce::set();
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template<typename Spi, typename Csn, typename Ce>
+void
+xpcc::Nrf24Phy<Spi, Csn, Ce>::resetCe()
+{
+    Ce::reset();
+}

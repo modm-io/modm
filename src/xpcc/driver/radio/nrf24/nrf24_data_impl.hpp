@@ -147,6 +147,9 @@ xpcc::Nrf24Data<Nrf24Phy>::sendPacket(packet_t& packet)
         Nrf24Phy::writeTxPayload(&assemblyFrame, packet.length + sizeof(header_t));
     }
 
+    // send a pulse on Ce to send the packet
+    Nrf24Phy::pulseCe();
+
     return true;
 }
 

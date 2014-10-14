@@ -345,6 +345,25 @@ public:
 	writeAckPayload(uint8_t pipe, uint8_t* buffer, uint8_t len);
 
 
+	/** @brief Send a high pulse of 10us length on Ce pin (blocking)
+	 *
+	 */
+	static void
+	pulseCe();
+
+	/** @brief Set Ce pin high
+	 *
+	 *  If Ce was high before the pin won't be set low before waiting for 10us.
+	 */
+	static void
+	setCe();
+
+	/** @brief Set Ce pin low
+	 *
+	 */
+	static void
+	resetCe();
+
 	/**@brief Flush Tx Fifo
 	 *
 	 * Used in Tx mode
