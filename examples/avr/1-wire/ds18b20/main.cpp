@@ -15,7 +15,7 @@ int
 main()
 {
 	// Enable interrupts, this is needed for every buffered UART
-	sei();
+	enableInterrupts();
 
 	// Create a IOStream for complex formatting tasks
 	xpcc::IODeviceWrapper<Uart0> device(uart);
