@@ -6,7 +6,7 @@
 
 using namespace xpcc::atmega;
 
-typedef GpioC2 OneWirePin
+typedef GpioC2 OneWirePin;
 xpcc::SoftwareOneWireMaster<OneWirePin> ow;
 
 Uart0 uart(9600);
