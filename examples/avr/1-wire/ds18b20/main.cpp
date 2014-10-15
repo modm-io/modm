@@ -9,16 +9,17 @@ using namespace xpcc::atmega;
 typedef GpioC2 OneWirePin;
 xpcc::SoftwareOneWireMaster<OneWirePin> ow;
 
-Uart0 uart(9600);
-
 int
 main()
 {
+	typedef xpcc::avr::SystemClock c;
+	Uart0::initialize<c, 9600>();
+	
 	// Enable interrupts, this is needed for every buffered UART
 	enableInterrupts();
 
 	// Create a IOStream for complex formatting tasks
-	xpcc::IODeviceWrapper<Uart0> device(uart);
+	xpcc::IODeviceWrapper<Uart0> device;
 	xpcc::IOStream output(device);
 
 	output << "Welcome" << xpcc::endl;
