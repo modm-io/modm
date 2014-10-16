@@ -22,7 +22,7 @@ namespace xpcc
  *
  * This driver can handle 4-Bit or 8-Bit bus mode with read back.
  * For either data bus width the class will internally choose the right
- * bus implmentation, so the interface remains exactly the same.
+ * bus implementation, so the interface remains exactly the same.
  * You also need to connect all the control pins (RW, RS, E).
  *
  * @tparam	DATA	A 8bit or 4bit Port.
@@ -170,7 +170,7 @@ private:
 		write(uint8_t data);
 
 		/// only writes the high nibble of data
-		/// Use this in thei initialization, when bus width is not determined yet
+		/// Use this in the initialization, when bus width is not determined yet
 		static ALWAYS_INLINE void
 		writeHighNibble(uint8_t data);
 
@@ -182,7 +182,7 @@ private:
 		static constexpr uint8_t Mode = Set4BitBus;
 	};
 
-	/// 8Bit Bus implemenatation
+	/// 8Bit Bus implementation
 	template<typename Data, typename Enable>
 	struct Bus <Data, Enable, 8>
 	{
@@ -191,7 +191,7 @@ private:
 		write(uint8_t data);
 
 		/// only writes the high nibble of data
-		/// Use this in thei initialization, when bus width is not determined yet
+		/// Use this in the initialization, when bus width is not determined yet
 		static ALWAYS_INLINE void
 		writeHighNibble(uint8_t data);
 
