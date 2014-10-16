@@ -67,7 +67,7 @@ namespace tmp175
  *
  * To convert the raw data into degrees Celsius, cast the MSB and LSB into
  * a signed 16bit integer, shift it right by 4 (or 3 in extended mode) and
- * devide by 16 (or use the getTemperature() method).
+ * divide by 16 (or use the getTemperature() method).
  *
  * If you are only interested in the integer value of the temperature,
  * simply only use the MSB (getData()[0]) when not in extended mode.
