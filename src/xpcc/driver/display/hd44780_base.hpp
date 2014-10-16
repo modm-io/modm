@@ -155,7 +155,7 @@ private:
 	 *  Bus class for accessing the bus with either 4bit or 8bit width.
 	 *
 	 * We want the same write read interface for both 4bit and 8bit busses
-	 * to get that, we spezialize on the Port::width property.
+	 * to get that, we specialize on the Port::width property.
 	 * @warning you need to set RW externally, this only wraps the bus access!
 	 */
 	template<typename Data, typename Enable, uint8_t Width>

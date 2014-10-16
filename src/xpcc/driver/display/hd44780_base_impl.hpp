@@ -163,7 +163,7 @@ xpcc::Hd44780Base<DATA, RW, RS, E>::isBusy()
 	return false;
 }
 
-// MARK: bus spezialisation of 4bit port
+// MARK: bus specialisation of 4bit port
 template <typename DATA, typename RW, typename RS, typename E>
 template <typename Data, typename Enable>
 void
@@ -214,7 +214,7 @@ xpcc::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 4>::read()
 	return data;
 }
 
-// MARK: bus spezialisation of 8bit port
+// MARK: bus specialisation of 8bit port
 template <typename DATA, typename RW, typename RS, typename E>
 template <typename Data, typename Enable>
 void
