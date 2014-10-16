@@ -155,7 +155,7 @@ public:
 	xpcc::co::Result<bool>
 	readTemperature(void *ctx);
 
-	/// @return the temperature as a signed float in Celcius
+	/// @return the temperature as a signed float in Celsius
 	float
 	getTemperature();
 

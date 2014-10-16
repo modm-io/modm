@@ -397,7 +397,7 @@ namespace xpcc
 	 *
 	 * The following LSB-values are valid:
 	 * 1 LSB{ADC} = 0.25mg in 2g range; it scales with range
-	 * 1 LSB{TEMP} = 0.5 degrees Celcius
+	 * 1 LSB{TEMP} = 0.5 degrees Celsius
 	 *
 	 * For further information on the special sensing functions, consult the
 	 * <a href="http://www.bosch-sensortec.com/content/language1/downloads/BST-BMA180-FL000-03.pdf">

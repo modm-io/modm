@@ -114,7 +114,7 @@ public:
 	uint8_t*
 	getData();
 
-	/// @return the temperature as a signed float in Celcius
+	/// @return the temperature as a signed float in Celsius
 	float
 	getTemperature();
 
