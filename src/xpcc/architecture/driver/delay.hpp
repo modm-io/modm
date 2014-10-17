@@ -31,6 +31,8 @@
 #ifndef	XPCC__DELAY_HPP
 #define	XPCC__DELAY_HPP
 
+#include <stdint.h>
+
 #ifdef __DOXYGEN__
 
 namespace xpcc
