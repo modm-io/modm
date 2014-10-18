@@ -137,7 +137,8 @@ public:
 			this->responsePayload = *payload;
 			{%- endif %}
 		}
-		
+	
+	public:
 		bool
 		run()
 		{
@@ -163,7 +164,8 @@ public:
 		
 			return false;
 		}
-
+		
+	private:
 		{%- if action.parameterType %}
 		
 		// parameter
