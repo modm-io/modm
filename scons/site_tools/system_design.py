@@ -122,6 +122,16 @@ def communication_emitter(target, source, env):
 	
 	return (target, source)
 
+def xpcc_task_caller_emitter(target, source, env):
+	try:
+		path = env['path']
+	except KeyError:
+		path = '.'
+	
+	target = [os.path.join(path, "xpcc_task_caller.hpp")]
+	
+	return (target, source)
+
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
 	env.SetDefault(XPCC_SYSTEM_DESIGN_SCANNERS = {})
@@ -186,11 +196,25 @@ def generate(env, **kw):
 			target_factory = env.fs.Entry,
 			src_suffix = ".xml")
 	
+	env['BUILDERS']['SystemCppXpccTaskCaller'] = \
+		SCons.Script.Builder(
+			action = SCons.Action.Action(
+				'python "${XPCC_SYSTEM_BUILDER}/cpp_xpcc_task_caller.py" ' \
+					'--outpath ${TARGET.dir} ' \
+					'$SOURCE',
+				cmdstr="$SYSTEM_CPP_XPCC_TASK_CALLER_COMSTR"),
+			emitter = xpcc_task_caller_emitter,
+			source_scanner = env['XPCC_SYSTEM_DESIGN_SCANNERS']['XML'],
+			single_source = True,
+			target_factory = env.fs.Entry,
+			src_suffix = ".xml")
+	
 	if SCons.Script.ARGUMENTS.get('verbose') != '1':
 		env['SYSTEM_CPP_PACKETS_COMSTR'] = "Generate packets from: $SOURCE"
 		env['SYSTEM_CPP_IDENTIFIER_COMSTR'] = "Generate identifier from: $SOURCE"
 		env['SYSTEM_CPP_POSTMAN_COMSTR'] = "Generate postman from: $SOURCE"
 		env['SYSTEM_CPP_COMMUNICATION_COMSTR'] = "Generate communication stubs from: $SOURCE"
+		env['SYSTEM_CPP_XPCC_TASK_CALLER_COMSTR'] = "Generate xpcc task callers from: $SOURCE"
 
 def exists(env):
 	return True
