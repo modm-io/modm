@@ -57,7 +57,24 @@ public:
 
 		stream << "Device responded" << xpcc::endl;
 
-//		PT_CALL(portExpander.writePort(this, 0xaa));
+		// Configure the device until it responds
+		while(true)
+		{
+			// we wait until the task started
+			if (PT_CALL(barometer.configure(this)))
+				break;
+			// otherwise, try again in 100ms
+			this->timer.restart(100);
+			PT_WAIT_UNTIL(this->timer.isExpired());
+		}
+
+		stream << "Device configured" << xpcc::endl;
+
+		static uint16_t* cal = barometer.getCalibrationData();
+
+		for (uint8_t ii = 0; ii < 11; ++ii) {
+			stream.printf("%04x ", cal[ii]);
+		}
 
 		PT_END();
 	}
@@ -91,6 +108,31 @@ MAIN_FUNCTION
 	MyI2cMaster::initialize<defaultSystemClock, 50000>();
 
 	stream << "\n\nWelcome to BMP085 demo!\n\n";
+
+	/**
+	 *
+	 * OLD IMPLEMENTATION
+	 *
+	 * uint8_t barometerData[5];
+	 * xpcc::Bmp085< Twi1 > barometer(barometerData);
+	 *
+	 * barometer.configure(xpcc::bmp085::MODE_ULTRA_HIGH_RESOLUTION);
+	 *
+	 * while(1) {
+	 * if(barometerTimer.isExpired())
+	 *  barometer.startReadoutSequence();
+	 *
+	 * barometer.update();
+	 *
+	 * if(barometer.isNewDataAvailable())
+	 * {
+	 * 	barometer.getData();
+	 * 	int16_t* temp = barometer.getCalibratedTemperature();
+	 *  int32_t* press = barometer.getCalibratedPressure();
+	 * }
+	 * }
+	 *
+	 */
 
 	while (1)
 	{

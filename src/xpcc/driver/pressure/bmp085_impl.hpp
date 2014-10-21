@@ -26,7 +26,6 @@ xpcc::Bmp085<I2cMaster>::Bmp085(uint8_t* data, uint8_t address)
  	calculation(0),
  	data(data)
 {
-//	configureWriteRead(buffer, 0, data, 0);
 }
 
 // ----------------------------------------------------------------------------
@@ -50,15 +49,45 @@ xpcc::Bmp085<I2cMaster>::ping(void *ctx)
 }
 
 template < typename I2cMaster >
-bool
-xpcc::Bmp085<I2cMaster>::configure(bmp085::Mode mode)
+xpcc::co::Result<bool>
+xpcc::Bmp085<I2cMaster>::configure(void *ctx, bmp085::Mode mode)
 {
 	config = mode;
 	buffer[0] = bmp085::REGISTER_CAL_AC1;
-//	configureWriteRead(buffer, 1, reinterpret_cast<uint8_t*>(&calibration), 22);
-	status |= NEW_CALIBRATION_DATA;
 	
-//	return I2cMaster::startBlocking(this);
+	CO_BEGIN(ctx);
+
+	CO_WAIT_UNTIL(
+			!adapter.isBusy() && (
+					adapter.configureWriteRead(buffer, 1, reinterpret_cast<uint8_t*>(&calibration), 22) &&
+					this->startTransaction(&adapter)
+			)
+	);
+
+	i2cTask = I2cTask::Configure;
+
+	CO_WAIT_WHILE(i2cTask == I2cTask::Configure);
+
+	if (i2cSuccess == I2cTask::Configure) {
+		uint16_t* element = reinterpret_cast<uint16_t*>(&calibration);
+		element[ 0] = xpcc::swap(element[0]);
+		element[ 1] = xpcc::swap(element[1]);
+		element[ 2] = xpcc::swap(element[2]);
+		element[ 3] = xpcc::swap(element[3]);
+		element[ 4] = xpcc::swap(element[4]);
+		element[ 5] = xpcc::swap(element[5]);
+
+		element[ 6] = xpcc::swap(element[6]);
+		element[ 7] = xpcc::swap(element[7]);
+
+		element[ 8] = xpcc::swap(element[8]);
+		element[ 9] = xpcc::swap(element[9]);
+		element[10] = xpcc::swap(element[10]);
+
+		CO_RETURN(true);
+	}
+
+	CO_END();
 }
 
 template < typename I2cMaster >
@@ -177,24 +206,6 @@ template < typename I2cMaster >
 void
 xpcc::Bmp085<I2cMaster>::update()
 {
-	if (status & NEW_CALIBRATION_DATA) {
-		uint16_t* element = reinterpret_cast<uint16_t*>(&calibration);
-		element[0] = xpcc::swap(element[0]);
-		element[1] = xpcc::swap(element[1]);
-		element[2] = xpcc::swap(element[2]);
-		element[3] = xpcc::swap(element[3]);
-		element[4] = xpcc::swap(element[4]);
-		element[5] = xpcc::swap(element[5]);
-		
-		element[6] = xpcc::swap(element[6]);
-		element[7] = xpcc::swap(element[7]);
-		
-		element[8] = xpcc::swap(element[8]);
-		element[9] = xpcc::swap(element[9]);
-		element[10] = xpcc::swap(element[10]);
-		status &= ~NEW_CALIBRATION_DATA;
-	}
-	
 	if ((status & READOUT_SEQUENCE) && timeout.isExpired())
 	{
 		static uint8_t state(0);

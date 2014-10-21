@@ -91,10 +91,8 @@ public:
 	 */
 	Bmp085(uint8_t* data, uint8_t address=0x77);
 
-	/// Configures the sensor and reads out and stores the calibration bytes
-	bool
-	configure(bmp085::Mode mode = bmp085::MODE_STANDARD);
 
+	// Mark: - Set flags to start certain operations
 	/// starts a temperature conversion which lasts 4.5ms
 	ALWAYS_INLINE void
 	startTemperatureMeasurement();
@@ -156,20 +154,21 @@ private:
 		START_PRESSURE_RUNNING,
 		READ_PRESSURE_RUNNING,
 	};
+
 	enum Status {
 		START_TEMPERATURE_PENDING = 0x01,
-		READ_TEMPERATURE_PENDING = 0x02,
-		START_PRESSURE_PENDING = 0x04,
-		READ_PRESSURE_PENDING = 0x08,
+		READ_TEMPERATURE_PENDING  = 0x02,
+		START_PRESSURE_PENDING    = 0x04,
+		READ_PRESSURE_PENDING     = 0x08,
 
-		NEW_CALIBRATION_DATA = 0x10,
-		NEW_TEMPERATURE_DATA = 0x20,
-		NEW_PRESSURE_DATA = 0x40,
-		READOUT_SEQUENCE = 0x80,
+		NEW_TEMPERATURE_DATA      = 0x20,
+		NEW_PRESSURE_DATA         = 0x40,
+		READOUT_SEQUENCE          = 0x80,
 	};
+
 	enum Calculation {
 		TEMPERATURE_NEEDS_UPDATE = 0x01,
-		PRESSURE_NEEDS_UPDATE = 0x02,
+		PRESSURE_NEEDS_UPDATE    = 0x02,
 	};
 
 	bmp085::Mode config;
@@ -208,6 +207,7 @@ private:
 		enum
 		{
 			Idle = 0,
+			Configure,
 			Ping,
 		};
 	};
