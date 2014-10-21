@@ -10,13 +10,15 @@
 #ifndef XPCC__BMP085_HPP
 #define XPCC__BMP085_HPP
 
-#include <xpcc/architecture/peripheral/i2c_adapter.hpp>
+#include <xpcc/processing/protothread.hpp>
+#include <xpcc/processing/coroutine.hpp>
+#include <xpcc/architecture/peripheral/i2c_device.hpp>
 #include <xpcc/processing/timeout.hpp>
 
 namespace xpcc
 {
 
-namespace bmp085
+struct bmp085
 {
 	/// The addresses of the Configuration and Data Registers
 	enum Register
@@ -57,7 +59,7 @@ namespace bmp085
 		MODE_HIGH_RESOLUTION = (0x02 << 6),
 		MODE_ULTRA_HIGH_RESOLUTION = (0x03 << 6),
 	};
-}
+};
 
 /**
  * \brief BMP085 digital absolute pressure sensor driver
@@ -73,12 +75,14 @@ namespace bmp085
  * datasheet</a>.
  *
  * \author	Niklas Hauser
+ * \author  strongly-typed
  * \ingroup pressure
  *
  * \tparam I2cMaster I2C interface
  */
 template < typename I2cMaster >
-class Bmp085 : protected xpcc::I2cWriteReadAdapter
+class Bmp085 : public bmp085, public xpcc::I2cDevice<I2cMaster>,
+			   public xpcc::co::NestedCoroutine<1>
 {
 public:
 	/**
@@ -89,7 +93,7 @@ public:
 
 	/// Configures the sensor and reads out and stores the calibration bytes
 	bool
-	configure(bmp085::Mode mode=bmp085::MODE_STANDARD);
+	configure(bmp085::Mode mode = bmp085::MODE_STANDARD);
 
 	/// starts a temperature conversion which lasts 4.5ms
 	ALWAYS_INLINE void
@@ -136,6 +140,11 @@ public:
 	/// Must be called periodically
 	void
 	update();
+
+	// MARK: - TASKS
+	/// pings the sensor
+	xpcc::co::Result<bool>
+	ping(void *ctx);
 
 private:
 	xpcc::Timeout<> timeout;
@@ -191,6 +200,22 @@ private:
 	int32_t calibratedPressure;
 	// calculated in getTemperature, needed for getPressure
 	int32_t b5;
+
+private:
+
+	struct I2cTask
+	{
+		enum
+		{
+			Idle = 0,
+			Ping,
+		};
+	};
+
+	volatile uint8_t i2cTask;
+	volatile uint8_t i2cSuccess;
+
+	xpcc::I2cTagAdapter< xpcc::I2cWriteReadAdapter > adapter;
 };
 }
 

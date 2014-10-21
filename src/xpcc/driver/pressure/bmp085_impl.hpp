@@ -16,9 +16,37 @@
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 xpcc::Bmp085<I2cMaster>::Bmp085(uint8_t* data, uint8_t address)
-:	I2cWriteReadAdapter(address), running(NOTHING_RUNNING), status(0), calculation(0), data(data)
+:	I2cDevice<I2cMaster>(),
+ 	i2cTask(I2cTask::Idle),
+ 	i2cSuccess(0),
+ 	adapter(address, i2cTask, i2cSuccess),
+
+ 	running(NOTHING_RUNNING),
+ 	status(0),
+ 	calculation(0),
+ 	data(data)
 {
-	configureWriteRead(buffer, 0, data, 0);
+//	configureWriteRead(buffer, 0, data, 0);
+}
+
+// ----------------------------------------------------------------------------
+// MARK: - Tasks
+template < class I2cMaster >
+xpcc::co::Result<bool>
+xpcc::Bmp085<I2cMaster>::ping(void *ctx)
+{
+	CO_BEGIN(ctx);
+
+	CO_WAIT_UNTIL(adapter.configurePing() && this->startTransaction(&adapter));
+
+	i2cTask = I2cTask::Ping;
+
+	CO_WAIT_WHILE(i2cTask == I2cTask::Ping);
+
+	if (i2cSuccess == I2cTask::Ping)
+		CO_RETURN(true);
+
+	CO_END();
 }
 
 template < typename I2cMaster >
@@ -27,10 +55,10 @@ xpcc::Bmp085<I2cMaster>::configure(bmp085::Mode mode)
 {
 	config = mode;
 	buffer[0] = bmp085::REGISTER_CAL_AC1;
-	configureWriteRead(buffer, 1, reinterpret_cast<uint8_t*>(&calibration), 22);
+//	configureWriteRead(buffer, 1, reinterpret_cast<uint8_t*>(&calibration), 22);
 	status |= NEW_CALIBRATION_DATA;
 	
-	return I2cMaster::startBlocking(this);
+//	return I2cMaster::startBlocking(this);
 }
 
 template < typename I2cMaster >
@@ -211,67 +239,67 @@ xpcc::Bmp085<I2cMaster>::update()
 	
 	if (running != NOTHING_RUNNING)
 	{
-		switch (getAdapterState())
-		{
-			case xpcc::I2c::AdapterState::Idle:
-				if (running == READ_TEMPERATURE_RUNNING) {
-					status |= NEW_TEMPERATURE_DATA;
-					calculation |= TEMPERATURE_NEEDS_UPDATE;
-				}
-				else if (running == READ_PRESSURE_RUNNING) {
-					status |= NEW_PRESSURE_DATA;
-					calculation |= PRESSURE_NEEDS_UPDATE;
-				}
-				
-			case xpcc::I2c::AdapterState::Error:
-				running = NOTHING_RUNNING;
-				
-			default:
-				break;
-		}
+//		switch (getAdapterState())
+//		{
+//			case xpcc::I2c::AdapterState::Idle:
+//				if (running == READ_TEMPERATURE_RUNNING) {
+//					status |= NEW_TEMPERATURE_DATA;
+//					calculation |= TEMPERATURE_NEEDS_UPDATE;
+//				}
+//				else if (running == READ_PRESSURE_RUNNING) {
+//					status |= NEW_PRESSURE_DATA;
+//					calculation |= PRESSURE_NEEDS_UPDATE;
+//				}
+//
+//			case xpcc::I2c::AdapterState::Error:
+//				running = NOTHING_RUNNING;
+//
+//			default:
+//				break;
+//		}
 	}
 	else {
 		if (status & START_TEMPERATURE_PENDING)
 		{
 			buffer[0] = bmp085::REGISTER_CONTROL;
 			buffer[1] = bmp085::CONVERSION_TEMPERATURE;
-			configureWriteRead(buffer, 2, data, 0);
+//			configureWriteRead(buffer, 2, data, 0);
 			
-			if (I2cMaster::start(this)) {
-				status &= ~START_TEMPERATURE_PENDING;
-				running = START_TEMPERATURE_RUNNING;
-			}
+//			if (I2cMaster::start(this)) {
+//				status &= ~START_TEMPERATURE_PENDING;
+//				running = START_TEMPERATURE_RUNNING;
+//			}
 		}
 		else if (status & READ_TEMPERATURE_PENDING)
 		{
 			buffer[0] = bmp085::REGISTER_CONVERSION_MSB;
-			configureWriteRead(buffer, 1, data, 2);
+//			configureWriteRead(buffer, 1, data, 2);
 			
-			if (I2cMaster::start(this)) {
-				status &= ~READ_TEMPERATURE_PENDING;
-				running = READ_TEMPERATURE_RUNNING;
-			}
+//			if (I2cMaster::start(this)) {
+//				status &= ~READ_TEMPERATURE_PENDING;
+//				running = READ_TEMPERATURE_RUNNING;
+//			}
 		}
 		else if (status & START_PRESSURE_PENDING)
 		{
 			buffer[0] = bmp085::REGISTER_CONTROL;
 			buffer[1] = bmp085::CONVERSION_PRESSURE | config;
-			configureWriteRead(buffer, 2, data, 0);
+//			configureWriteRead(buffer, 2, data, 0);
 			
-			if (I2cMaster::start(this)) {
-				status &= ~START_PRESSURE_PENDING;
-				running = START_PRESSURE_RUNNING;
-			}
+//			if (I2cMaster::start(this)) {
+//				status &= ~START_PRESSURE_PENDING;
+//				running = START_PRESSURE_RUNNING;
+//			}
 		}
 		else if (status & READ_PRESSURE_PENDING)
 		{
 			buffer[0] = bmp085::REGISTER_CONVERSION_MSB;
-			configureWriteRead(buffer, 1, data+2, 3);
+//			configureWriteRead(buffer, 1, data+2, 3);
 			
-			if (I2cMaster::start(this)) {
-				status &= ~READ_PRESSURE_PENDING;
-				running = READ_PRESSURE_RUNNING;
-			}
+//			if (I2cMaster::start(this)) {
+//				status &= ~READ_PRESSURE_PENDING;
+//				running = READ_PRESSURE_RUNNING;
+//			}
 		}
 	}
 }
