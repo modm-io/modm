@@ -151,7 +151,7 @@ public:
 	}
 
 	// MARK: - TASKS
-	/// pings the diplay
+	/// pings the display
 	xpcc::co::Result<bool>
 	ping(void *ctx);
 
