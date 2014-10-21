@@ -115,6 +115,8 @@ public:
 	ALWAYS_INLINE void
 	startReadoutSequence();
 
+
+	// Mark: - Accessors to internally buffered data. No I2C transactions involved
 	/// \return pointer to 8bit array containing tp temperature and pressure
 	inline uint8_t*
 	getData();
@@ -125,15 +127,27 @@ public:
 	
 	/**
 	 * \c true, when new pressure data has been from the sensor and buffered,
-	 * \c false, when the data has been accessed, or data is being
+	 * \c false, when the data has been accessed once, or data is being
 	 * copied into the buffer.
 	 */
 	ALWAYS_INLINE bool
 	isNewDataAvailable();
 
+	/**
+	 * Get the calibrated temperature for the device in [ToDo unit]
+	 *
+	 * If recalculation is necessary it is done on the fly.
+	 * No I2C transaction.
+	 */
 	int16_t*
 	getCalibratedTemperature();
 
+	/**
+	 * Get the calibrated pressure from the device in [ToDo unit].
+	 *
+	 * If recalculation is necessary it is done on the fly.
+	 * No I2C transaction.
+	 */
 	int32_t*
 	getCalibratedPressure();
 
