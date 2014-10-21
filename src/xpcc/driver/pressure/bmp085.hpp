@@ -146,6 +146,11 @@ public:
 	xpcc::co::Result<bool>
 	ping(void *ctx);
 
+	/// Configures the sensor and reads out and stores the calibration bytes
+	xpcc::co::Result<bool>
+	configure(void *ctx, bmp085::Mode mode = bmp085::MODE_STANDARD);
+
+
 private:
 	xpcc::Timeout<> timeout;
 
