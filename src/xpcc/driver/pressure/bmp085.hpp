@@ -199,7 +199,8 @@ private:
 	uint8_t* data;
 	uint8_t buffer[3];
 
-	struct Calibration
+	struct __attribute__ ((packed))
+	Calibration
 	{
 		int16_t  ac1;
 		int16_t  ac2;
@@ -214,7 +215,7 @@ private:
 		int16_t  mb;
 		int16_t  mc;
 		int16_t  md;
-	} calibration __attribute__ ((packed));
+	} calibration ;
 
 	int16_t calibratedTemperature;
 	int32_t calibratedPressure;
