@@ -115,7 +115,7 @@ template < typename I2cMaster >
 uint16_t*
 xpcc::Bmp085<I2cMaster>::getCalibrationData()
 {
-	return reinterpret_cast<uint16_t*>(calibration);
+	return reinterpret_cast<uint16_t*>(&calibration);
 }
 
 template < typename I2cMaster >

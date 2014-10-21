@@ -194,7 +194,7 @@ private:
 		int16_t mb;
 		int16_t mc;
 		int16_t md;
-	} calibration;
+	} calibration __attribute__ ((packed));
 
 	int16_t calibratedTemperature;
 	int32_t calibratedPressure;
