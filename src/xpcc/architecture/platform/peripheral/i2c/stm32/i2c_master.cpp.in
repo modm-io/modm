@@ -22,7 +22,7 @@
  *	#
  *	- check ADDR bit
  *	- clear ADDR bit
- *	- if no bytes are to be written, check for next operation immidiately
+ *	- if no bytes are to be written, check for next operation immediately
  *	#
  *	- check TXE bit
  *	- write data
