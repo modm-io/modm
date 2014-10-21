@@ -237,7 +237,7 @@ namespace
 
 			ConfiguredTransaction next = queue.get();
 			queue.pop();
-			// configure the perihperal
+			// configure the peripheral
 			if (next.configuration)
 				next.configuration();
 
