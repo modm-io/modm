@@ -1,7 +1,7 @@
 #include <xpcc/architecture/platform.hpp>
 #include "../stm32f4_discovery.hpp"
 
-#include <xpcc/processing/timeout.hpp>
+#include <xpcc/processing.hpp>
 #include <xpcc/processing/protothread.hpp>
 #include <xpcc/driver/pressure/bmp085.hpp>
 
@@ -72,8 +72,29 @@ public:
 
 		static uint16_t* cal = barometer.getCalibrationData();
 
+		stream << "Calibration data is: ";
 		for (uint8_t ii = 0; ii < 11; ++ii) {
 			stream.printf("%04x ", cal[ii]);
+		}
+		stream << xpcc::endl ;
+
+		while (1)
+		{
+			static xpcc::PeriodicTimer<> timer(250);
+
+			PT_WAIT_UNTIL(timer.isExpired());
+
+			PT_CALL(barometer.readout(this));
+
+			PT_WAIT_UNTIL(barometer.isNewDataAvailable());
+
+			{
+				int16_t* temp  = barometer.getCalibratedTemperature();
+				int32_t* press = barometer.getCalibratedPressure();
+
+				stream.printf("Calibrated temperature in 0.1 degree Celsius is: %d\n",   *temp  );
+				stream.printf("Calibrated pressure in Pa is                   : %d\n\n", *press );
+			}
 		}
 
 		PT_END();

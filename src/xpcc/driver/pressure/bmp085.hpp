@@ -76,6 +76,8 @@ struct bmp085
  * <a href="http://www.bosch-sensortec.com/content/language1/downloads/BST-BMP085-DS000-06.pdf">
  * datasheet</a>.
  *
+ * Also compatible to BMP180.
+ *
  * \author	Niklas Hauser
  * \author  strongly-typed
  * \ingroup pressure
@@ -92,29 +94,6 @@ public:
 	 * \param	address		address defaults to 0x77
 	 */
 	Bmp085(uint8_t* data, uint8_t address=0x77);
-
-
-	// Mark: - Set flags to start certain operations
-	/// starts a temperature conversion which lasts 4.5ms
-	ALWAYS_INLINE void
-	startTemperatureMeasurement();
-
-	/// read the result registers and buffers the results
-	ALWAYS_INLINE void
-	readTemperature();
-
-	/// starts a pressure conversion which lasts from 4.5ms to 25.5ms
-	ALWAYS_INLINE void
-	startPressureMeasurement();
-
-	/// read the result registers and buffers the results
-	ALWAYS_INLINE void
-	readPressure();
-
-	/// starts all conversions and readouts in the right sequence using the right timing
-	ALWAYS_INLINE void
-	startReadoutSequence();
-
 
 	// Mark: - Accessors to internally buffered data. No I2C transactions involved
 	/// \return pointer to 8bit array containing tp temperature and pressure
@@ -134,7 +113,7 @@ public:
 	isNewDataAvailable();
 
 	/**
-	 * Get the calibrated temperature for the device in [ToDo unit]
+	 * Get the calibrated temperature for the device in 0.1 degree Celsius
 	 *
 	 * If recalculation is necessary it is done on the fly.
 	 * No I2C transaction.
@@ -156,7 +135,7 @@ public:
 	update();
 
 	// MARK: - TASKS
-	/// pings the sensor
+	/// Pings the sensor
 	xpcc::co::Result<bool>
 	ping(void *ctx);
 
@@ -164,36 +143,55 @@ public:
 	xpcc::co::Result<bool>
 	configure(void *ctx, bmp085::Mode mode = bmp085::MODE_STANDARD);
 
+	/// Do a readout sequence to convert and read temperature and then pressure from sensor
+	xpcc::co::Result<bool>
+	readout(void *ctx);
+
+private:
+
+	struct I2cTask
+	{
+		enum
+		{
+			Idle = 0,
+			Configure,
+			Readout,
+			Ping,
+		};
+	};
+
+	volatile uint8_t i2cTask;
+	volatile uint8_t i2cSuccess;
+
+	xpcc::I2cTagAdapter< xpcc::I2cWriteReadAdapter > adapter;
 
 private:
 	xpcc::Timeout<> timeout;
 
-	enum Running {
-		NOTHING_RUNNING,
-		START_TEMPERATURE_RUNNING,
-		READ_TEMPERATURE_RUNNING,
-		START_PRESSURE_RUNNING,
-		READ_PRESSURE_RUNNING,
-	};
+	/**
+	 * Maximum conversion time for pressure from datasheet for
+	 * different oversampling settings, from ultra low power to
+	 * ultra high resolution in milliseconds.
+	 */
+	static constexpr uint8_t conversionDelay[] = {5, 8, 14, 26};
 
+	/**
+	 * Bitfield: Remember that new data is available
+	 */
 	enum Status {
-		START_TEMPERATURE_PENDING = 0x01,
-		READ_TEMPERATURE_PENDING  = 0x02,
-		START_PRESSURE_PENDING    = 0x04,
-		READ_PRESSURE_PENDING     = 0x08,
-
-		NEW_TEMPERATURE_DATA      = 0x20,
-		NEW_PRESSURE_DATA         = 0x40,
-		READOUT_SEQUENCE          = 0x80,
+		NEW_TEMPERATURE_DATA      = 0x01,
+		NEW_PRESSURE_DATA         = 0x02,
 	};
 
+	/**
+	 * Bitfield: Take care that the calibration is only calculated once.
+	 */
 	enum Calculation {
 		TEMPERATURE_NEEDS_UPDATE = 0x01,
 		PRESSURE_NEEDS_UPDATE    = 0x02,
 	};
 
 	bmp085::Mode config;
-	Running running;
 	uint8_t status;
 	uint8_t calculation;
 	uint8_t* data;
@@ -219,25 +217,8 @@ private:
 
 	int16_t calibratedTemperature;
 	int32_t calibratedPressure;
-	// calculated in getTemperature, needed for getPressure
-	int32_t b5;
 
-private:
-
-	struct I2cTask
-	{
-		enum
-		{
-			Idle = 0,
-			Configure,
-			Ping,
-		};
-	};
-
-	volatile uint8_t i2cTask;
-	volatile uint8_t i2cSuccess;
-
-	xpcc::I2cTagAdapter< xpcc::I2cWriteReadAdapter > adapter;
+	int32_t b5; // calculated in getTemperature, needed for getPressure
 };
 }
 

@@ -21,7 +21,6 @@ xpcc::Bmp085<I2cMaster>::Bmp085(uint8_t* data, uint8_t address)
  	i2cSuccess(0),
  	adapter(address, i2cTask, i2cSuccess),
 
- 	running(NOTHING_RUNNING),
  	status(0),
  	calculation(0),
  	data(data)
@@ -91,38 +90,104 @@ xpcc::Bmp085<I2cMaster>::configure(void *ctx, bmp085::Mode mode)
 }
 
 template < typename I2cMaster >
-void
-xpcc::Bmp085<I2cMaster>::startTemperatureMeasurement()
+xpcc::co::Result<bool>
+xpcc::Bmp085<I2cMaster>::readout(void *ctx)
 {
-	status |= START_TEMPERATURE_PENDING;
-}
+	CO_BEGIN(ctx);
 
-template < typename I2cMaster >
-void
-xpcc::Bmp085<I2cMaster>::readTemperature()
-{
-	status |= READ_TEMPERATURE_PENDING;
-}
+	// Start temperature reading
+	buffer[0] = bmp085::REGISTER_CONTROL;
+	buffer[1] = bmp085::CONVERSION_TEMPERATURE;
 
-template < typename I2cMaster >
-void
-xpcc::Bmp085<I2cMaster>::startPressureMeasurement()
-{
-	status |= START_PRESSURE_PENDING;
-}
+	CO_WAIT_UNTIL(
+			!adapter.isBusy() && (
+					adapter.configureWrite(buffer, 2) &&
+					this->startTransaction(&adapter)
+			)
+	);
 
-template < typename I2cMaster >
-void
-xpcc::Bmp085<I2cMaster>::readPressure()
-{
-	status |= READ_PRESSURE_PENDING;
-}
+	i2cTask = I2cTask::Readout;
 
-template < typename I2cMaster >
-void
-xpcc::Bmp085<I2cMaster>::startReadoutSequence()
-{
-	status |= READOUT_SEQUENCE;
+	CO_WAIT_WHILE(i2cTask == I2cTask::Readout);
+
+	if (i2cSuccess != I2cTask::Readout) {
+		CO_RETURN(false);
+	}
+
+	// Wait until temperature reading is succeeded
+	timeout.restart(5);
+	CO_WAIT_UNTIL(timeout.isExpired());
+
+	// Get the temperature from sensor
+	buffer[0] = bmp085::REGISTER_CONVERSION_MSB;
+	CO_WAIT_UNTIL(
+			!adapter.isBusy() && (
+					adapter.configureWriteRead(buffer, 1, data, 2) &&
+					this->startTransaction(&adapter)
+			)
+	);
+
+	status |= NEW_TEMPERATURE_DATA;
+	calculation |= TEMPERATURE_NEEDS_UPDATE;
+
+	i2cTask = I2cTask::Readout;
+
+	CO_WAIT_WHILE(i2cTask == I2cTask::Readout);
+
+	if (i2cSuccess != I2cTask::Readout) {
+		CO_RETURN(false);
+	}
+
+	// Now start converting the pressure
+	buffer[0] = bmp085::REGISTER_CONTROL;
+	buffer[1] = bmp085::CONVERSION_PRESSURE | config;
+
+	CO_WAIT_UNTIL(
+			!adapter.isBusy() && (
+					adapter.configureWrite(buffer, 2) &&
+					this->startTransaction(&adapter)
+			)
+	);
+
+	i2cTask = I2cTask::Readout;
+
+	CO_WAIT_WHILE(i2cTask == I2cTask::Readout);
+
+	if (i2cSuccess != I2cTask::Readout) {
+		CO_RETURN(false);
+	}
+
+	// Wait until sensor has converted the pressure
+	{
+		uint8_t oss = ((config & bmp085::MODE) >> 6);
+		timeout.restart(conversionDelay[oss]);
+	}
+	CO_WAIT_UNTIL(timeout.isExpired());
+
+	// Get the pressure from sensor
+	buffer[0] = bmp085::REGISTER_CONVERSION_MSB;
+	CO_WAIT_UNTIL(
+			!adapter.isBusy() && (
+					adapter.configureWriteRead(buffer, 1, data + 2, 3) &&
+					this->startTransaction(&adapter)
+			)
+	);
+
+	calculation |= PRESSURE_NEEDS_UPDATE;
+	status |= NEW_PRESSURE_DATA;
+
+	i2cTask = I2cTask::Readout;
+
+	CO_WAIT_WHILE(i2cTask == I2cTask::Readout);
+
+	if (i2cSuccess != I2cTask::Readout) {
+		CO_RETURN(false);
+	}
+
+
+	CO_RETURN(true);
+
+	CO_END();
 }
 
 template < typename I2cMaster >
@@ -206,112 +271,8 @@ template < typename I2cMaster >
 void
 xpcc::Bmp085<I2cMaster>::update()
 {
-	if ((status & READOUT_SEQUENCE) && timeout.isExpired())
-	{
-		static uint8_t state(0);
-		static const uint8_t conversionDelay[] = {5, 8, 14, 26};
-		
-		switch(state)
-		{
-			case 0:
-				status &= ~READ_PRESSURE_PENDING;
-				status |= START_TEMPERATURE_PENDING;
-				++state;
-				timeout.restart(5);
-				break;
-				
-			case 1:
-				status &= ~START_TEMPERATURE_PENDING;
-				status |= READ_TEMPERATURE_PENDING;
-				timeout.restart(1);
-				++state;
-				break;
-				
-			case 2:
-				status &= ~READ_TEMPERATURE_PENDING;
-				status |= START_PRESSURE_PENDING;
-				++state;
-			{
-				uint8_t oss = ((config & bmp085::MODE) >> 6);
-				timeout.restart(conversionDelay[oss]);
-			}
-				break;
-				
-			case 3:
-				status &= ~START_PRESSURE_PENDING;
-				status |= READ_PRESSURE_PENDING;
-				
-			default:
-				status &= ~READOUT_SEQUENCE;
-				state = 0;
-				break;
-		}
-	}
-	
-	if (running != NOTHING_RUNNING)
-	{
-//		switch (getAdapterState())
-//		{
-//			case xpcc::I2c::AdapterState::Idle:
-//				if (running == READ_TEMPERATURE_RUNNING) {
-//					status |= NEW_TEMPERATURE_DATA;
-//					calculation |= TEMPERATURE_NEEDS_UPDATE;
-//				}
-//				else if (running == READ_PRESSURE_RUNNING) {
-//					status |= NEW_PRESSURE_DATA;
-//					calculation |= PRESSURE_NEEDS_UPDATE;
-//				}
-//
-//			case xpcc::I2c::AdapterState::Error:
-//				running = NOTHING_RUNNING;
-//
-//			default:
-//				break;
-//		}
-	}
-	else {
-		if (status & START_TEMPERATURE_PENDING)
-		{
-			buffer[0] = bmp085::REGISTER_CONTROL;
-			buffer[1] = bmp085::CONVERSION_TEMPERATURE;
-//			configureWriteRead(buffer, 2, data, 0);
-			
-//			if (I2cMaster::start(this)) {
-//				status &= ~START_TEMPERATURE_PENDING;
-//				running = START_TEMPERATURE_RUNNING;
-//			}
-		}
-		else if (status & READ_TEMPERATURE_PENDING)
-		{
-			buffer[0] = bmp085::REGISTER_CONVERSION_MSB;
-//			configureWriteRead(buffer, 1, data, 2);
-			
-//			if (I2cMaster::start(this)) {
-//				status &= ~READ_TEMPERATURE_PENDING;
-//				running = READ_TEMPERATURE_RUNNING;
-//			}
-		}
-		else if (status & START_PRESSURE_PENDING)
-		{
-			buffer[0] = bmp085::REGISTER_CONTROL;
-			buffer[1] = bmp085::CONVERSION_PRESSURE | config;
-//			configureWriteRead(buffer, 2, data, 0);
-			
-//			if (I2cMaster::start(this)) {
-//				status &= ~START_PRESSURE_PENDING;
-//				running = START_PRESSURE_RUNNING;
-//			}
-		}
-		else if (status & READ_PRESSURE_PENDING)
-		{
-			buffer[0] = bmp085::REGISTER_CONVERSION_MSB;
-//			configureWriteRead(buffer, 1, data+2, 3);
-			
-//			if (I2cMaster::start(this)) {
-//				status &= ~READ_PRESSURE_PENDING;
-//				running = READ_PRESSURE_RUNNING;
-//			}
-		}
-	}
 }
 
+template < typename I2cMaster >
+constexpr uint8_t
+xpcc::Bmp085< I2cMaster >::conversionDelay[];
