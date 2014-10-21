@@ -23,22 +23,22 @@ struct bmp085
 	/// The addresses of the Configuration and Data Registers
 	enum Register
 	{
-		REGISTER_CHIP_ID = 0xD0,
-		REGISTER_VERSION = 0xD1,
-		REGISTER_CAL_AC1 = 0xAA,
-		REGISTER_CAL_AC2 = 0xAC,
-		REGISTER_CAL_AC3 = 0xAE,
-		REGISTER_CAL_AC4 = 0xB0,
-		REGISTER_CAL_AC5 = 0xB2,
-		REGISTER_CAL_AC6 = 0xB4,
-		REGISTER_CAL_B1 = 0xB6,
-		REGISTER_CAL_B2 = 0xB8,
-		REGISTER_CAL_MB = 0xBA,
-		REGISTER_CAL_MC = 0xBC,
-		REGISTER_CAL_MD = 0xBE,
-		REGISTER_CONTROL = 0xF4,
-		REGISTER_CONVERSION_MSB = 0xF6,
-		REGISTER_CONVERSION_LSB = 0xF7,
+		REGISTER_CHIP_ID         = 0xD0,
+		REGISTER_VERSION         = 0xD1,
+		REGISTER_CAL_AC1         = 0xAA,
+		REGISTER_CAL_AC2         = 0xAC,
+		REGISTER_CAL_AC3         = 0xAE,
+		REGISTER_CAL_AC4         = 0xB0,
+		REGISTER_CAL_AC5         = 0xB2,
+		REGISTER_CAL_AC6         = 0xB4,
+		REGISTER_CAL_B1          = 0xB6,
+		REGISTER_CAL_B2          = 0xB8,
+		REGISTER_CAL_MB          = 0xBA,
+		REGISTER_CAL_MC          = 0xBC,
+		REGISTER_CAL_MD          = 0xBE,
+		REGISTER_CONTROL         = 0xF4,
+		REGISTER_CONVERSION_MSB  = 0xF6,
+		REGISTER_CONVERSION_LSB  = 0xF7,
 		REGISTER_CONVERSION_XLSB = 0xF8,
 	};
 
@@ -46,17 +46,19 @@ struct bmp085
 	enum ChipId {
 		CHIP_ID = 0x55
 	};
+
 	/// The options of REGISTER_CONTROL
 	enum Control {
-		CONVERSION = 0x3F,
+		CONVERSION             = 0x3F,
 		CONVERSION_TEMPERATURE = 0x2E,
-		CONVERSION_PRESSURE = 0x34
+		CONVERSION_PRESSURE    = 0x34
 	};
+
 	enum Mode {
-		MODE = (0x03 << 6),
-		MODE_ULTRA_LOW_POWER = (0x00 << 6),
-		MODE_STANDARD = (0x01 << 6),
-		MODE_HIGH_RESOLUTION = (0x02 << 6),
+		MODE                       = (0x03 << 6),
+		MODE_ULTRA_LOW_POWER       = (0x00 << 6),
+		MODE_STANDARD              = (0x01 << 6),
+		MODE_HIGH_RESOLUTION       = (0x02 << 6),
 		MODE_ULTRA_HIGH_RESOLUTION = (0x03 << 6),
 	};
 };
@@ -180,19 +182,19 @@ private:
 
 	struct Calibration
 	{
-		int16_t ac1;
-		int16_t ac2;
-		int16_t ac3;
+		int16_t  ac1;
+		int16_t  ac2;
+		int16_t  ac3;
 		uint16_t ac4;
 		uint16_t ac5;
 		uint16_t ac6;
 		
-		int16_t b1;
-		int16_t b2;
+		int16_t  b1;
+		int16_t  b2;
 		
-		int16_t mb;
-		int16_t mc;
-		int16_t md;
+		int16_t  mb;
+		int16_t  mc;
+		int16_t  md;
 	} calibration __attribute__ ((packed));
 
 	int16_t calibratedTemperature;
