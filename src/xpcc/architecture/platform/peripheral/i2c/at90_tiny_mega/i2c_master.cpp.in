@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -44,7 +44,7 @@ namespace
 {
 	// parameter advice
 	static xpcc::I2c::Operation nextOperation;
-	
+
 	// delegating
 	static xpcc::I2cTransaction *transaction(nullptr);
 	static xpcc::I2cMaster::Error errorState(xpcc::I2cMaster::Error::NoError);
@@ -79,7 +79,7 @@ ISR(TWI_vect)
 						reading = transaction->reading();
 						nextOperation = static_cast<xpcc::I2c::Operation>(reading.next);
 						break;
-						
+
 					case xpcc::I2c::OperationAfterStart::Write:
 						writing = transaction->writing();
 						nextOperation = static_cast<xpcc::I2c::Operation>(writing.next);
@@ -91,14 +91,14 @@ ISR(TWI_vect)
 						nextOperation = xpcc::I2c::Operation::Stop;
 						break;
 				}
-			
+
 				// Load data register with TWI slave address
 				TWDR = addressMode | (starting.address & 0xfe);
 				// clear interrupt flag to send address
 				TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWIE);
 			}
 			break;
-			
+
 		case TW_MT_SLA_ACK:
 			// SLA+W has been transmitted and ACK received
 			// Fall through...
@@ -125,12 +125,12 @@ ISR(TWI_vect)
 						TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWIE);
 						DEBUG('A');
 						break;
-						
+
 					case xpcc::I2c::Operation::Restart:
 						DEBUG('R');
 						TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN) | (1 << TWIE);
 						break;
-						
+
 					default:
 						DEBUG('S');
 						TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
@@ -140,17 +140,17 @@ ISR(TWI_vect)
 				}
 			}
 			break;
-			
+
 		case TW_MR_DATA_ACK:
 			*reading.buffer++ = TWDR;
 			DEBUG('0' + reading.length);
 			--reading.length;
-			
+
 			// Fall through...
 		case TW_MR_SLA_ACK:
 			// SLA+R has been transmitted and ACK received
 			// See if last expected byte will be received ...
-			if (reading.length > 0) {
+			if (reading.length > 1) {
 				// Send ACK after reception
 				TWCR = (1 << TWINT) | (1 << TWEA) | (1 << TWEN) | (1 << TWIE);
 				DEBUG('a');
@@ -161,21 +161,21 @@ ISR(TWI_vect)
 				DEBUG('n');
 			}
 			break;
-			
+
 		case TW_MR_DATA_NACK:
 			// Data byte has been received and NACK transmitted
 			// => Transfer finished
 			*reading.buffer++ = TWDR;
 			DEBUG('0' + reading.length);
 			--reading.length;
-			
+
 			switch (nextOperation)
 			{
 				case xpcc::I2c::Operation::Restart:
 					DEBUG('r');
 					TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN) | (1 << TWIE);
 					break;
-					
+
 				default:
 					DEBUG('S');
 					TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
@@ -184,7 +184,7 @@ ISR(TWI_vect)
 					break;
 			}
 			break;
-			
+
 		case TW_MT_SLA_NACK:	// SLA+W transmitted, NACK received
 		case TW_MR_SLA_NACK:	// SLA+R transmitted, NACK received
 			if (errorState == xpcc::{{target.family}}::I2cMaster::Error::NoError) {
