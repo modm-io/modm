@@ -105,8 +105,7 @@ xpcc::Hmc6343<I2cMaster>::write16BitRegister(void *ctx, Register16 reg, uint16_t
 	if ( CO_CALL( writeRegister(ctx, static_cast<Register>(reg), value) ) )
 	{
 		// MSB
-		if ( CO_CALL(
-				writeRegister(ctx, static_cast<Register>(i(reg)+1), (value >> 8)) ) )
+		if ( CO_CALL( writeRegister(ctx, static_cast<Register>(i(reg)+1), (value >> 8)) ) )
 			CO_RETURN(true);
 	}
 
@@ -131,9 +130,9 @@ xpcc::Hmc6343<I2cMaster>::readRegister(void *ctx, Register reg, uint8_t &value)
 	i2cTask = i(reg) + I2cTask::PostEepromBase;
 	timeout.restart(10);
 
-	CO_WAIT_WHILE(i2cTask == (i(reg) + I2cTask::WriteEepromBase));
+	CO_WAIT_WHILE(i2cTask == (i(reg) + I2cTask::PostEepromBase));
 
-	if(i2cSuccess == (i(reg) + I2cTask::WriteEepromBase))
+	if(i2cSuccess == (i(reg) + I2cTask::PostEepromBase))
 	{
 		CO_WAIT_UNTIL(timeout.isExpired());
 		CO_WAIT_UNTIL(adapter.configureRead(&value, 1) && this->startTransaction(&adapter));
@@ -161,9 +160,9 @@ xpcc::Hmc6343<I2cMaster>::read16BitRegister(void *ctx, Register16 reg, uint16_t 
 	{
 		// MSB
 		value = registerBufferLSB;
-		if ( CO_CALL( writeRegister(ctx, static_cast<Register>(i(reg)+1), registerBufferLSB) ) )
+		if ( CO_CALL( readRegister(ctx, static_cast<Register>(i(reg)+1), registerBufferLSB) ) )
 		{
-			// an opization would be to take the uint8_t addresses of value
+			// an optimization would be to take the uint8_t addresses of value
 			// but then we would have to deal with endianess, and that headache is annoying.
 			value |= (registerBufferLSB << 8);
 			CO_RETURN(true);
