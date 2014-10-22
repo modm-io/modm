@@ -77,32 +77,32 @@ protected:
  */
 %% for name in ['GpioOpenDrain', 'GpioOpenDrainWithPullUp']
 template< class Pin >
-class {{name}} : public Gpio, public Pin
+class {{name}} : public Pin
 {
 public:
-	ALWAYS_INLINE static void configure(InputType /*type*/) override {}
-	ALWAYS_INLINE static void setInput() override {}
-	ALWAYS_INLINE static void setInput(InputType /*type*/) override {}
-	ALWAYS_INLINE static void setOutput() override {}
-	ALWAYS_INLINE static void setOutput(bool status) override {
+	ALWAYS_INLINE static void configure(Gpio::InputType /*type*/) {}
+	ALWAYS_INLINE static void setInput() {}
+	ALWAYS_INLINE static void setInput(Gpio::InputType /*type*/) {}
+	ALWAYS_INLINE static void setOutput() {}
+	ALWAYS_INLINE static void setOutput(bool status) {
 		set(status);
 	}
 	%% if name == 'GpioOpenDrain'
 	/// maps to `setInput(InputType::Floating)`
-	ALWAYS_INLINE static void set() override {
-		Pin::setInput(InputType::Floating);
+	ALWAYS_INLINE static void set() {
+		Pin::setInput(Gpio::InputType::Floating);
 	}
 	%% else
 	/// maps to `setInput(InputType::PullUp)`
-	ALWAYS_INLINE static void set() override {
-		Pin::setInput(InputType::PullUp);
+	ALWAYS_INLINE static void set() {
+		Pin::setInput(Gpio::InputType::PullUp);
 	}
 	%% endif
 	/// maps to `setOutput(::xpcc::Gpio::Low)`
-	ALWAYS_INLINE static void reset() override {
+	ALWAYS_INLINE static void reset() {
 		Pin::setOutput(::xpcc::Gpio::Low);
 	}
-	ALWAYS_INLINE static void set(bool status) override {
+	ALWAYS_INLINE static void set(bool status) {
 		if (status) { set(); }
 		else { reset(); }
 	}
