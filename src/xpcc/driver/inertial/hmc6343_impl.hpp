@@ -97,7 +97,7 @@ xpcc::Hmc6343<I2cMaster>::writeRegister(void *ctx, Register reg, uint8_t value)
 // MARK: write 16bit register
 template < class I2cMaster >
 xpcc::co::Result<bool>
-xpcc::Hmc6343<I2cMaster>::write16BitRegister(void *ctx, Register16 reg, uint16_t value)
+xpcc::Hmc6343<I2cMaster>::writeRegister(void *ctx, Register16 reg, uint16_t value)
 {
 	CO_BEGIN(ctx);
 
@@ -151,7 +151,7 @@ xpcc::Hmc6343<I2cMaster>::readRegister(void *ctx, Register reg, uint8_t &value)
 // MARK: read 16bit register
 template < class I2cMaster >
 xpcc::co::Result<bool>
-xpcc::Hmc6343<I2cMaster>::read16BitRegister(void *ctx, Register16 reg, uint16_t &value)
+xpcc::Hmc6343<I2cMaster>::readRegister(void *ctx, Register16 reg, uint16_t &value)
 {
 	CO_BEGIN(ctx);
 

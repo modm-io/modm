@@ -175,17 +175,17 @@ public:
 	/// Configures the sensor to normal orientation mode with 10Hz data rate.
 	xpcc::co::Result<bool> ALWAYS_INLINE
 	setMeasurmentRate(void *ctx, MeasurementRate measurementRate=MeasurementRate::Hz10)
-	{ return startWriteRegister(ctx, Register::OperationMode2, i(measurementRate)); }
+	{ return writeRegister(ctx, Register::OperationMode2, i(measurementRate)); }
 
 	/// sets a new deviation angle in eeprom
 	xpcc::co::Result<bool> inline
 	setDeviationAngle(void *ctx, int16_t angle)
-	{ return write16BitRegister(ctx, Register16::DeviationAngle, static_cast<uint16_t>(angle)); }
+	{ return writeRegister(ctx, Register16::DeviationAngle, static_cast<uint16_t>(angle)); }
 
 	/// sets a new variation angle in eeprom
 	xpcc::co::Result<bool> inline
 	setVariationAngle(void *ctx, int16_t angle)
-	{ return write16BitRegister(ctx, Register16::VariationAngle, static_cast<uint16_t>(angle)); }
+	{ return writeRegister(ctx, Register16::VariationAngle, static_cast<uint16_t>(angle)); }
 
 	/// sets a new IIR filter in eeprom
 	xpcc::co::Result<bool> ALWAYS_INLINE
@@ -198,7 +198,7 @@ public:
 	/// reads the device id from eeprom
 	xpcc::co::Result<bool> ALWAYS_INLINE
 	readDeviceId(void *ctx, uint16_t &value)
-	{ return read16BitRegister(ctx, Register16::DeviceSerial, value); }
+	{ return readRegister(ctx, Register16::DeviceSerial, value); }
 
 
 
@@ -318,7 +318,7 @@ public:
 
 	/// write a 16bit value into the eeprom
 	xpcc::co::Result<bool>
-	write16BitRegister(void *ctx, Register16 reg, uint16_t value);
+	writeRegister(void *ctx, Register16 reg, uint16_t value);
 
 	/// read a 8bit value from the eeprom
 	xpcc::co::Result<bool>
@@ -326,7 +326,7 @@ public:
 
 	/// read a 16bit value from the eeprom
 	xpcc::co::Result<bool>
-	read16BitRegister(void *ctx, Register16 reg, uint16_t &value);
+	readRegister(void *ctx, Register16 reg, uint16_t &value);
 
 
 
