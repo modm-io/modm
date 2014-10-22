@@ -206,7 +206,7 @@ public:
 			this->readSize = readSize;
 			this->writeBuffer = writeBuffer;
 			this->writeSize = writeSize;
-			isReading = writeSize ? false : true;
+			isReading = (writeSize == 0);
 			return true;
 		}
 		return false;
