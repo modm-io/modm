@@ -33,7 +33,7 @@
 
 // uncomment to debug your driver using simple uart
 /*
-#include <xpcc/architecture/platform.hpp>
+#include "../../uart/at90_tiny_mega/uart0.hpp"
 #define DEBUG(x) xpcc::{{target.family}}::Uart0::write(x)
 /*/
 #define DEBUG(x)
