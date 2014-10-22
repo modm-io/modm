@@ -236,7 +236,7 @@ public:
 	/// exit user calibration mode
 	xpcc::co::Result<bool> ALWAYS_INLINE
 	exitUserCalibrationMode(void *ctx)
-	{ return writeCommand(ctx, Command::ExitUserCalibrationMode); }
+	{ return writeCommand(ctx, Command::ExitUserCalibrationMode, 50); }
 
 	/// resets the processor, any new command is delayed by 500ms
 	xpcc::co::Result<bool> ALWAYS_INLINE
