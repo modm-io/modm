@@ -189,7 +189,7 @@ public:
 
 	/// sets a new IIR filter in eeprom
 	xpcc::co::Result<bool> ALWAYS_INLINE
-	wetIIR_Filter(void *ctx, uint8_t filter)
+	setIIR_Filter(void *ctx, uint8_t filter)
 	{ return writeRegister(ctx, Register::FilterLsb, filter & 0x0f); }
 
 
