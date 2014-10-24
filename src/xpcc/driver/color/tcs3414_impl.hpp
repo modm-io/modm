@@ -5,7 +5,7 @@
  */
 
 #ifndef XPCC__TCS3414_HPP
-#	error	"Don't include this file directly, use 'software_i2c.hpp' instead!"
+#	error	"Don't include this file directly, use 'tcs3414.hpp' instead!"
 #endif
 template<typename I2cMaster>
 typename xpcc::Tcs3414<I2cMaster>::Data xpcc::Tcs3414<I2cMaster>::data;
