@@ -28,11 +28,11 @@ template <typename SCL, typename SDA, uint32_t BaudRate>
 xpcc::I2cMaster::Error xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::errorState(xpcc::I2cMaster::Error::NoError);
 
 template <typename SCL, typename SDA, uint32_t BaudRate>
-xpcc::I2cTransaction::Starting xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::starting;
+xpcc::I2cTransaction::Starting xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::starting(0, xpcc::I2c::OperationAfterStart::Stop);
 template <typename SCL, typename SDA, uint32_t BaudRate>
-xpcc::I2cTransaction::Writing xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::writing;
+xpcc::I2cTransaction::Writing xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::writing(nullptr, 0, xpcc::I2c::OperationAfterWrite::Stop);
 template <typename SCL, typename SDA, uint32_t BaudRate>
-xpcc::I2cTransaction::Reading xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::reading;
+xpcc::I2cTransaction::Reading xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::reading(nullptr, 0, xpcc::I2c::OperationAfterRead::Stop);
 
 // ----------------------------------------------------------------------------
 template <typename SCL, typename SDA, uint32_t BaudRate>
