@@ -30,6 +30,20 @@
 		case __LINE__: ;
 
 /**
+ * End the coroutine and return a result.
+ *
+ * @warning	Use at end of the `coroutine(ctx)` implementation!
+ * @ingroup	coroutine
+ * @hideinitializer
+ */
+#define CO_END_RETURN(result) \
+			this->stopCo(); \
+		default: \
+			this->popCo(); \
+			if (this->isStoppedCo()) return {xpcc::co::Stop, (result)}; else return {xpcc::co::WrongState, 0}; \
+	}
+
+/**
  * End the coroutine.
  *
  * @warning	Use at end of the `coroutine(ctx)` implementation!
@@ -37,11 +51,7 @@
  * @hideinitializer
  */
 #define CO_END() \
-			this->stopCo(); \
-		default: \
-			this->popCo(); \
-			if (this->isStoppedCo()) return {xpcc::co::Stop, 0}; else return {xpcc::co::WrongState, 0}; \
-	}
+	CO_END_RETURN(0)
 
 /**
  * Yield coroutine until next invocation.
@@ -106,7 +116,7 @@
 	{ \
 			this->stopCo(); \
 			this->popCo(); \
-			return {xpcc::co::Stop, result}; \
+			return {xpcc::co::Stop, (result)}; \
 	}
 
 #endif // XPCC_CO_MACROS_HPP
