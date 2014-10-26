@@ -352,29 +352,26 @@ private:
 	xpcc::co::Result<bool>
 	readPostData(void *ctx, Command command, uint8_t offset, uint8_t readSize);
 
-	struct I2cTask
+	enum I2cTask : uint8_t
 	{
-		enum
-		{
-			Idle = 0,
+		Idle = 0,
 
-			// insert all registers from 0x00 to 0x15 for writing (+0x01)
-			WriteEepromBase = 0x01,
-			// insert all registers from 0x00 to 0x15 for posting (+0x17)
-			PostEepromBase = 0x17,
-			// insert all registers from 0x00 to 0x15 for reading (+0x2C)
-			ReadEepromBase = 0x2C,
+		// insert all registers from 0x00 to 0x15 for writing (+0x01)
+		WriteEepromBase = 0x01,
+		// insert all registers from 0x00 to 0x15 for posting (+0x17)
+		PostEepromBase = 0x17,
+		// insert all registers from 0x00 to 0x15 for reading (+0x2C)
+		ReadEepromBase = 0x2C,
 
-			// insert all post commands from 0x40 to 0x65 for writing (+0x02)
-			PostCommandBase = 0x02,
-			// insert all post commands from 0x40 to 0x65 for reading (+0x03)
-			ReadCommandBase = 0x03,
-			// insert all remaining commands from 0x71 to 0xF1 (+0x02)
-			WriteCommandBase = PostCommandBase,
+		// insert all post commands from 0x40 to 0x65 for writing (+0x02)
+		PostCommandBase = 0x02,
+		// insert all post commands from 0x40 to 0x65 for reading (+0x03)
+		ReadCommandBase = 0x03,
+		// insert all remaining commands from 0x71 to 0xF1 (+0x02)
+		WriteCommandBase = PostCommandBase,
 
-			// ping \o/
-			Ping = 0xFF
-		};
+		// ping \o/
+		Ping = 0xFF
 	};
 
 private:
