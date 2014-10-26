@@ -31,13 +31,9 @@ xpcc::Hmc6343<I2cMaster>::ping(void *ctx)
 	CO_WAIT_UNTIL(adapter.configurePing() && this->startTransaction(&adapter));
 
 	i2cTask = I2cTask::Ping;
-
 	CO_WAIT_WHILE(i2cTask == I2cTask::Ping);
 
-	if (i2cSuccess == I2cTask::Ping)
-		CO_RETURN(true);
-
-	CO_END();
+	CO_END_RETURN(i2cSuccess == I2cTask::Ping);
 }
 
 // ----------------------------------------------------------------------------
@@ -50,7 +46,6 @@ xpcc::Hmc6343<I2cMaster>::writeCommand(void *ctx, Command command, uint16_t time
 	CO_BEGIN(ctx);
 
 	buffer[0] = i(command);
-
 	CO_WAIT_UNTIL(
 			this->timeout.isExpired() &&
 			adapter.configureWrite(buffer, 1) && this->startTransaction(&adapter)
@@ -58,13 +53,9 @@ xpcc::Hmc6343<I2cMaster>::writeCommand(void *ctx, Command command, uint16_t time
 
 	i2cTask = i(command) + I2cTask::PostCommandBase;
 	this->timeout.restart(timeout);
-
 	CO_WAIT_WHILE(i2cTask == (i(command) + I2cTask::PostCommandBase));
 
-	if (i2cSuccess == (i(command) + I2cTask::PostCommandBase))
-		CO_RETURN(true);
-
-	CO_END();
+	CO_END_RETURN(i2cSuccess == (i(command) + I2cTask::PostCommandBase));
 }
 
 // MARK: write register
@@ -85,13 +76,9 @@ xpcc::Hmc6343<I2cMaster>::writeRegister(void *ctx, Register reg, uint8_t value)
 
 	i2cTask = i(reg) + I2cTask::WriteEepromBase;
 	timeout.restart(10);
-
 	CO_WAIT_WHILE(i2cTask == (i(reg) + I2cTask::WriteEepromBase));
 
-	if (i2cSuccess == (i(reg) + I2cTask::WriteEepromBase))
-		CO_RETURN(true);
-
-	CO_END();
+	CO_END_RETURN(i2cSuccess == (i(reg) + I2cTask::WriteEepromBase));
 }
 
 // MARK: write 16bit register
@@ -109,7 +96,7 @@ xpcc::Hmc6343<I2cMaster>::writeRegister(void *ctx, Register16 reg, uint16_t valu
 			CO_RETURN(true);
 	}
 
-	CO_END();
+	CO_END_RETURN(false);
 }
 
 // MARK: read register
@@ -121,7 +108,6 @@ xpcc::Hmc6343<I2cMaster>::readRegister(void *ctx, Register reg, uint8_t &value)
 
 	buffer[0] = i(Command::ReadEeprom);
 	buffer[1] = i(reg);
-
 	CO_WAIT_UNTIL(
 			timeout.isExpired() &&
 			adapter.configureWrite(buffer, 2) && this->startTransaction(&adapter)
@@ -129,7 +115,6 @@ xpcc::Hmc6343<I2cMaster>::readRegister(void *ctx, Register reg, uint8_t &value)
 
 	i2cTask = i(reg) + I2cTask::PostEepromBase;
 	timeout.restart(10);
-
 	CO_WAIT_WHILE(i2cTask == (i(reg) + I2cTask::PostEepromBase));
 
 	if(i2cSuccess == (i(reg) + I2cTask::PostEepromBase))
@@ -140,14 +125,13 @@ xpcc::Hmc6343<I2cMaster>::readRegister(void *ctx, Register reg, uint8_t &value)
 		);
 
 		i2cTask = i(reg) + I2cTask::ReadEepromBase;
-
 		CO_WAIT_WHILE(i2cTask == (i(reg) + I2cTask::ReadEepromBase));
 
 		if (i2cSuccess == (i(reg) + I2cTask::ReadEepromBase))
 			CO_RETURN(true);
 	}
 
-	CO_END();
+	CO_END_RETURN(false);
 }
 
 // MARK: read 16bit register
@@ -171,7 +155,7 @@ xpcc::Hmc6343<I2cMaster>::readRegister(void *ctx, Register16 reg, uint16_t &valu
 		}
 	}
 
-	CO_END();
+	CO_END_RETURN(false);
 }
 
 // MARK: read 6 or 1 bytes of data
@@ -189,12 +173,11 @@ xpcc::Hmc6343<I2cMaster>::readPostData(void *ctx, Command command, uint8_t offse
 		);
 
 		i2cTask = i(command) + I2cTask::ReadCommandBase;
-
 		CO_WAIT_WHILE(i2cTask == (i(command) + I2cTask::ReadCommandBase));
 
 		if (i2cSuccess == (i(command) + I2cTask::ReadCommandBase))
 			CO_RETURN(true);
 	}
 
-	CO_END();
+	CO_END_RETURN(false);
 }

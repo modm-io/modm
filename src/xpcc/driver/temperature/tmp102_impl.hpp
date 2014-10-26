@@ -114,7 +114,7 @@ xpcc::Tmp102<I2cMaster>::enableExtendedMode(void *ctx, bool enable)
 	if (enable)	config_lsb |=  CONFIGURATION_EXTENDED_MODE;
 	else		config_lsb &= ~CONFIGURATION_EXTENDED_MODE;
 
-	CO_END_RETURN( CO_CALL(writeConfiguration(ctx, 3)) );
+	CO_END_CALL(writeConfiguration(ctx, 3));
 }
 
 // MARK: Alert mode
@@ -135,7 +135,7 @@ xpcc::Tmp102<I2cMaster>::configureAlertMode(void *ctx, ThermostatMode mode, Aler
 	config_msb &= ~CONFIGURATION_FAULT_QUEUE;
 	config_msb |= static_cast<uint8_t>(faults);
 
-	CO_END_RETURN( CO_CALL(writeConfiguration(ctx, 2)) );
+	CO_END_CALL(writeConfiguration(ctx, 2));
 }
 
 // MARK: conversion
