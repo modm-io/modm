@@ -21,48 +21,7 @@ namespace xpcc
 
 struct ssd1306
 {
-	enum class
-	Rotation : bool
-	{
-		Normal,
-		UpsideDown
-	};
-
-	enum class
-	ScrollStep : uint8_t
-	{
-		Frames2 = 0b111,
-		Frames3 = 0b100,
-		Frames4 = 0b101,
-		Frames5 = 0b000,
-		Frames25 = 0b110,
-		Frames64 = 0b001,
-		Frames128 = 0b010,
-		Frames256 = 0b011
-	};
-
-public:
-	enum class
-	ScrollDirection : bool
-	{
-		Right,
-		Left,
-	};
-};
-
-
-/**
- * Driver for SSD1306 based OLED-displays using I2C.
- * This display is only rated to be driven with 400kHz, which limits
- * the frame rate to about 40Hz.
- *
- * @author	Niklas Hauser
- * @ingroup	lcd
- */
-template < class I2cMaster >
-class Ssd1306 : public ssd1306, public xpcc::I2cDevice<I2cMaster>,
-				public xpcc::co::NestedCoroutine<1>, public BufferedGraphicDisplay<128, 64>
-{
+protected:
 	enum Command : uint8_t
 	{
 		// fundamental commands
@@ -109,18 +68,64 @@ class Ssd1306 : public ssd1306, public xpcc::I2cDevice<I2cMaster>,
 		Nop = 0xE3,
 	};
 
-	uint8_t
-	i(ScrollDirection direction)
+public:
+	enum class
+	Rotation : bool
 	{
-		return static_cast<uint8_t>(direction);
-	}
+		Normal,
+		UpsideDown
+	};
 
-	uint8_t
-	i(ScrollStep step)
+	enum class
+	ScrollStep : uint8_t
 	{
-		return static_cast<uint8_t>(step);
-	}
+		Frames2 = 0b111,
+		Frames3 = 0b100,
+		Frames4 = 0b101,
+		Frames5 = 0b000,
+		Frames25 = 0b110,
+		Frames64 = 0b001,
+		Frames128 = 0b010,
+		Frames256 = 0b011
+	};
 
+	enum class
+	ScrollDirection : uint8_t
+	{
+		Right = SetHorizontalScrollRight,
+		Left = SetHorizontalScrollLeft
+	};
+
+	enum class
+	DisplayMode : uint8_t
+	{
+		Normal = SetNormalDisplay,
+		Inverted = SetInvertedDisplay
+	};
+
+protected:
+	/// @{
+	/// @private enum class to integer helper functions.
+	static constexpr uint8_t
+	i(ScrollDirection direction) { return static_cast<uint8_t>(direction); }
+	static constexpr uint8_t
+	i(ScrollStep step) { return static_cast<uint8_t>(step); }
+	/// @}
+}; // struct ssd1306
+
+
+/**
+ * Driver for SSD1306 based OLED-displays using I2C.
+ * This display is only rated to be driven with 400kHz, which limits
+ * the frame rate to about 40Hz.
+ *
+ * @author	Niklas Hauser
+ * @ingroup	lcd
+ */
+template < class I2cMaster >
+class Ssd1306 : public ssd1306, public xpcc::I2cDevice<I2cMaster>,
+				public BufferedGraphicDisplay<128, 64>, protected xpcc::co::NestedCoroutine<1>
+		{
 public:
 	Ssd1306(uint8_t address = 0x3C);
 
@@ -138,7 +143,8 @@ public:
 	virtual void
 	update()
 	{
-		while(startWriteDisplay(this).state > xpcc::co::NestingError) ;
+		while(startWriteDisplay(this).state > xpcc::co::NestingError)
+			;
 	}
 
 	/// Use this method to synchronize writing to the displays buffer
@@ -159,20 +165,18 @@ public:
 	xpcc::co::Result<bool>
 	initialize(void *ctx);
 
-	/// Starts a frame transfer to the display
-	xpcc::co::Result<void>
-	startWriteDisplay(void *ctx);
-
 	// starts a frame transfer and waits for completion
 	xpcc::co::Result<bool>
 	writeDisplay(void *ctx);
 
 
-	xpcc::co::Result<bool>
-	invertDisplay(void *ctx, bool invert = true);
+	xpcc::co::Result<bool> ALWAYS_INLINE
+	setDisplayMode(void *ctx, DisplayMode mode = DisplayMode::Normal)
+	{ return writeCommand(ctx, static_cast<Command>(mode)); }
 
-	xpcc::co::Result<bool>
-	setContrast(void *ctx, uint8_t contrast = 0xCE);
+	xpcc::co::Result<bool> ALWAYS_INLINE
+	setContrast(void *ctx, uint8_t contrast = 0xCE)
+	{ return writeCommand(ctx, Command::SetContrastControl, contrast); }
 
 	xpcc::co::Result<bool>
 	setRotation(void *ctx, Rotation rotation=Rotation::Normal);
@@ -204,81 +208,48 @@ protected:
 	writeCommand(void *ctx, uint8_t command, uint8_t data1, uint8_t data2);
 
 private:
+	xpcc::co::Result<void>
+	startWriteDisplay(void *ctx);
+
 	bool
 	startTransactionWithLength(uint8_t length);
 
-	struct I2cTask
+	enum I2cTask : uint8_t
 	{
-		enum
-		{
-			Idle = 0,
-			// insert all ssd1306::Command
-			WriteDisplay = 0xFE,
-			Ping = 0xFF
-		};
+		Idle = 0,
+		// insert all ssd1306::Command
+		WriteDisplay = 0xFE,
+		Ping = 0xFF
 	};
 
 	class DataTransmissionAdapter : public xpcc::I2cWriteAdapter
 	{
 	public:
 		DataTransmissionAdapter(uint8_t address)
-		:	I2cWriteAdapter(address), control(0x40),
-			buffer{0x80, 0, 0x80, 0, 0x80, 0}
+		:	I2cWriteAdapter(address)
 		{
 		}
 
+		void ALWAYS_INLINE
+		setCommandBuffer(uint8_t *buffer)
+		{ commands = buffer; }
+
 		bool inline
-		configureWrite(uint8_t (*buffer)[8], std::size_t size)
-		{
-			if (I2cWriteAdapter::configureWrite(&buffer[0][0], size))
-			{
-				control = 0xff;
-				return true;
-			}
-			return false;
-		}
+		configureWrite(uint8_t (*buffer)[8], std::size_t size);
 
 	protected:
 		virtual Writing
-		writing()
-		{
-			// we first tell the display the column address again
-			if (control == 0xff)
-			{
-				buffer[1] = Command::SetColumnAddress;
-				buffer[5] = 127;
-				control = 0xfe;
-				return Writing(buffer, 6, OperationAfterWrite::Restart);
-			}
-			// then the page address. again.
-			if (control == 0xfe)
-			{
-				buffer[1] = Command::SetPageAddress;
-				buffer[5] = 7;
-				control = 0xfd;
-				return Writing(buffer, 6, OperationAfterWrite::Restart);
-			}
-			// then we set the D/C bit to tell it data is coming
-			if (control == 0xfd)
-			{
-				control = 0x40;
-				return Writing(&control, 1, OperationAfterWrite::Write);
-			}
+		writing();
 
-			// now we write the entire frame buffer into it.
-			return Writing(I2cWriteAdapter::buffer, size, OperationAfterWrite::Stop);
-		}
-
-		uint8_t control;
-		uint8_t buffer[6];
+		uint8_t *commands;
 	};
 
 private:
-	volatile uint8_t i2cTask;
-	volatile uint8_t i2cSuccess;
 	uint8_t commandBuffer[14];
 	bool initSuccessful;
 
+	volatile uint8_t i2cTask;
+	volatile uint8_t i2cSuccess;
 	xpcc::I2cTagAdapter<xpcc::I2cWriteAdapter> adapter;
 	xpcc::I2cTagAdapter<DataTransmissionAdapter> adapterData;
 };

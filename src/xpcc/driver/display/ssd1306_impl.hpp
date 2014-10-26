@@ -13,10 +13,12 @@
 
 template < class I2cMaster >
 xpcc::Ssd1306<I2cMaster>::Ssd1306(uint8_t address)
-:	I2cDevice<I2cMaster>(), i2cTask(I2cTask::Idle), i2cSuccess(0),
+:	I2cDevice<I2cMaster>(),
 	commandBuffer{0x80, 0, 0x80, 0, 0x80, 0, 0x80, 0, 0x80, 0, 0x80, 0, 0x80, 0},
+	i2cTask(I2cTask::Idle), i2cSuccess(0),
 	adapter(address, i2cTask, i2cSuccess), adapterData(address, i2cTask, i2cSuccess)
 {
+	adapterData.setCommandBuffer(commandBuffer);
 }
 
 // ----------------------------------------------------------------------------
@@ -30,13 +32,9 @@ xpcc::Ssd1306<I2cMaster>::ping(void *ctx)
 	CO_WAIT_UNTIL(adapter.configurePing() && this->startTransaction(&adapter));
 
 	i2cTask = I2cTask::Ping;
-
 	CO_WAIT_WHILE(i2cTask == I2cTask::Ping);
 
-	if (i2cSuccess == I2cTask::Ping)
-		CO_RETURN(true);
-
-	CO_END();
+	CO_END_RETURN(i2cSuccess == I2cTask::Ping);
 }
 
 // ----------------------------------------------------------------------------
@@ -66,10 +64,7 @@ xpcc::Ssd1306<I2cMaster>::initialize(void *ctx)
 //	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetPageAddress, 0, 7));
 	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetDisplayOn));
 
-	if (initSuccessful)
-		CO_RETURN(true);
-
-	CO_END();
+	CO_END_RETURN(initSuccessful);
 }
 
 // ----------------------------------------------------------------------------
@@ -82,10 +77,8 @@ xpcc::Ssd1306<I2cMaster>::startWriteDisplay(void *ctx)
 	CO_WAIT_UNTIL(adapterData.configureWrite(buffer, 1024) && this->startTransaction(&adapterData));
 
 	i2cTask = I2cTask::WriteDisplay;
-
 	CO_END();
 }
-
 
 template < class I2cMaster >
 xpcc::co::Result<bool>
@@ -94,38 +87,9 @@ xpcc::Ssd1306<I2cMaster>::writeDisplay(void *ctx)
 	CO_BEGIN(ctx);
 
 	CO_CALL(startWriteDisplay(ctx));
-
 	CO_WAIT_WHILE(i2cTask == I2cTask::WriteDisplay);
 
-	if (i2cSuccess == I2cTask::WriteDisplay)
-		CO_RETURN(true);
-
-	CO_END();
-}
-
-template < class I2cMaster >
-xpcc::co::Result<bool>
-xpcc::Ssd1306<I2cMaster>::invertDisplay(void *ctx, bool invert)
-{
-	CO_BEGIN(ctx);
-
-	if ( CO_CALL(writeCommand(ctx, invert ? Command::SetInvertedDisplay : Command::SetNormalDisplay)) )
-		CO_RETURN(true);
-
-	CO_END();
-}
-
-
-template < class I2cMaster >
-xpcc::co::Result<bool>
-xpcc::Ssd1306<I2cMaster>::setContrast(void *ctx, uint8_t contrast)
-{
-	CO_BEGIN(ctx);
-
-	if ( CO_CALL(writeCommand(ctx, Command::SetContrastControl, contrast)) )
-		CO_RETURN(true);
-
-	CO_END();
+	CO_END_RETURN(i2cSuccess == I2cTask::WriteDisplay);
 }
 
 template < class I2cMaster >
@@ -142,7 +106,7 @@ xpcc::Ssd1306<I2cMaster>::setRotation(void *ctx, Rotation rotation)
 			CO_RETURN(true);
 	}
 
-	CO_END();
+	CO_END_RETURN(false);
 }
 
 template < class I2cMaster >
@@ -155,18 +119,13 @@ xpcc::Ssd1306<I2cMaster>::configureScroll(void *ctx, uint8_t origin, uint8_t siz
 	if (!CO_CALL(disableScroll(ctx)))
 		CO_RETURN(false);
 
-	// we will wait until the adapter is finished,
-	// since we will be writing directly into the command buffer
-	CO_WAIT_UNTIL(!adapter.isBusy());
-
 	{
 		uint8_t beginY = (origin > 7) ? 7 : origin;
 
 		uint8_t endY = ((origin + size) > 7) ? 7 : (origin + size);
 		if (endY < beginY) endY = beginY;
 
-		commandBuffer[1] = (direction == ScrollDirection::Left) ?
-				Command::SetHorizontalScrollLeft : Command::SetHorizontalScrollRight;
+		commandBuffer[1] = static_cast<uint8_t>(direction);
 		commandBuffer[3] = 0x00;
 		commandBuffer[5] = beginY;
 		commandBuffer[7] = i(steps);
@@ -179,10 +138,7 @@ xpcc::Ssd1306<I2cMaster>::configureScroll(void *ctx, uint8_t origin, uint8_t siz
 
 	CO_WAIT_WHILE(i2cTask == commandBuffer[1]);
 
-	if (i2cSuccess == commandBuffer[1])
-		CO_RETURN(true);
-
-	CO_END();
+	CO_END_RETURN(i2cSuccess == commandBuffer[1]);
 }
 
 // ----------------------------------------------------------------------------
@@ -193,18 +149,12 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command)
 {
 	CO_BEGIN(ctx);
 
-	CO_WAIT_UNTIL(
-			!adapter.isBusy() && (
-					commandBuffer[1] = command,
-					startTransactionWithLength(2) )
-	);
+	commandBuffer[1] = command;
+	CO_WAIT_UNTIL( startTransactionWithLength(2) );
 
 	CO_WAIT_WHILE(i2cTask == command);
 
-	if (i2cSuccess == command)
-		CO_RETURN(true);
-
-	CO_END();
+	CO_END_RETURN(i2cSuccess == command);
 }
 
 template < class I2cMaster >
@@ -213,19 +163,13 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command, uint8_t data)
 {
 	CO_BEGIN(ctx);
 
-	CO_WAIT_UNTIL(
-			!adapter.isBusy() && (
-					commandBuffer[1] = command,
-					commandBuffer[3] = data,
-					startTransactionWithLength(4) )
-	);
+	commandBuffer[1] = command;
+	commandBuffer[3] = data;
+	CO_WAIT_UNTIL( startTransactionWithLength(4) );
 
 	CO_WAIT_WHILE(i2cTask == command);
 
-	if (i2cSuccess == command)
-		CO_RETURN(true);
-
-	CO_END();
+	CO_END_RETURN(i2cSuccess == command);
 }
 
 template < class I2cMaster >
@@ -234,20 +178,14 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command, uint8_t data1
 {
 	CO_BEGIN(ctx);
 
-	CO_WAIT_UNTIL(
-			!adapter.isBusy() && (
-					commandBuffer[1] = command,
-					commandBuffer[3] = data1,
-					commandBuffer[5] = data2,
-					startTransactionWithLength(6) )
-	);
+	commandBuffer[1] = command;
+	commandBuffer[3] = data1;
+	commandBuffer[5] = data2;
+	CO_WAIT_UNTIL( startTransactionWithLength(6) );
 
 	CO_WAIT_WHILE(i2cTask == command);
 
-	if (i2cSuccess == command)
-		CO_RETURN(true);
-
-	CO_END();
+	CO_END_RETURN(i2cSuccess == command);
 }
 
 // ----------------------------------------------------------------------------
@@ -262,4 +200,51 @@ xpcc::Ssd1306<I2cMaster>::startTransactionWithLength(uint8_t length)
 		return true;
 	}
 	return false;
+}
+
+// ----------------------------------------------------------------------------
+// MARK: DataTransmissionAdapter
+template < class I2cMaster >
+bool
+xpcc::Ssd1306<I2cMaster>::DataTransmissionAdapter::configureWrite(uint8_t (*buffer)[8], std::size_t size)
+{
+	if (I2cWriteAdapter::configureWrite(&buffer[0][0], size))
+	{
+		commands[13] = 0xff;
+		return true;
+	}
+	return false;
+}
+
+template < class I2cMaster >
+xpcc::I2cTransaction::Writing
+xpcc::Ssd1306<I2cMaster>::DataTransmissionAdapter::writing()
+{
+	// we first tell the display the column address again
+	if (commands[13] == 0xff)
+	{
+		commands[1] = Command::SetColumnAddress;
+		commands[3] = 0;
+		commands[5] = 127;
+		commands[13] = 0xfe;
+		return Writing(commands, 6, OperationAfterWrite::Restart);
+	}
+	// then the page address. again.
+	if (commands[13] == 0xfe)
+	{
+		commands[1] = Command::SetPageAddress;
+		commands[3] = 0;
+		commands[5] = 7;
+		commands[13] = 0xfd;
+		return Writing(commands, 6, OperationAfterWrite::Restart);
+	}
+	// then we set the D/C bit to tell it data is coming
+	if (commands[13] == 0xfd)
+	{
+		commands[13] = 0x40;
+		return Writing(&commands[13], 1, OperationAfterWrite::Write);
+	}
+
+	// now we write the entire frame buffer into it.
+	return Writing(buffer, size, OperationAfterWrite::Stop);
 }
