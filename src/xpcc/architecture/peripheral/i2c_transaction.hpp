@@ -540,7 +540,7 @@ public:
 	 * @param	tag		reference to a tag integer.
 	 * @param	success	reference to a success integer.
 	 */
-	I2cTagAdapter(uint8_t address, volatile uint8_t &tag, volatile uint8_t&success)
+	I2cTagAdapter(uint8_t address, volatile uint8_t &tag, volatile uint8_t &success)
 	:	I2cAdapter(address), tag(tag), success(success)
 	{
 	}

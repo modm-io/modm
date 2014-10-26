@@ -104,14 +104,10 @@ public:
  * @code
  * #include <xpcc/architecture/platform.hpp>
  *
- * namespace pin
- * {
- *     typedef GpioOutputB0 Led;
- * }
- *
- * typedef xpcc::GpioInverted< pin::Led > Led;
+ * typedef xpcc::GpioInverted< GpioOutputB0 > Led;
  *
  * ...
+ * Led::setOutput();
  * Led::reset();
  * @endcode
  *

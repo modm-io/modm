@@ -22,8 +22,8 @@ struct I2c
 	enum class
 	Prescaler : uint8_t
 	{
-		Div1 = 0,
-		Div4 = (1 << TWPS0),
+		Div1  = 0,
+		Div4  = (1 << TWPS0),
 		Div16 = (1 << TWPS1),
 		Div64 = (1 << TWPS1) | (1 << TWPS0)
 	};
