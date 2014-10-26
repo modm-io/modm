@@ -32,26 +32,53 @@
 /**
  * End the coroutine and return a result.
  *
- * @warning	Use at end of the `coroutine(ctx)` implementation!
+ * @warning	Use at end of the `coroutine(ctx)` implementation only!
  * @ingroup	coroutine
  * @hideinitializer
  */
 #define CO_END_RETURN(result) \
 			this->stopCo(); \
+			this->popCo(); \
+			return {xpcc::co::Stop, (result)}; \
 		default: \
 			this->popCo(); \
-			if (this->isStoppedCo()) return {xpcc::co::Stop, (result)}; else return {xpcc::co::WrongState, 0}; \
+			return {xpcc::co::WrongState, 0}; \
 	}
 
 /**
- * End the coroutine.
+ * End the coroutine. You can use this to return `void`, or if the result does not matter.
  *
- * @warning	Use at end of the `coroutine(ctx)` implementation!
+ * @warning	Use at end of the `coroutine(ctx)` implementation only!
  * @ingroup	coroutine
  * @hideinitializer
  */
 #define CO_END() \
 	CO_END_RETURN(0)
+
+/**
+ * End the coroutine by calling another coroutine and returning its result.
+ *
+ * @warning	Use at end of the `coroutine(ctx)` implementation only!
+ * @ingroup	coroutine
+ * @hideinitializer
+ */
+#define CO_END_CALL(coroutine) \
+			this->setCo(__LINE__); \
+		case __LINE__: \
+			{ \
+				auto coResult = coroutine; \
+				if (coResult.state > xpcc::co::NestingError) { \
+					this->popCo(); \
+					return {xpcc::co::Running, 0}; \
+				} \
+				this->stopCo(); \
+				this->popCo(); \
+				return {xpcc::co::Stop, coResult.result}; \
+			} \
+		default: \
+			this->popCo(); \
+			return {xpcc::co::WrongState, 0}; \
+	}
 
 /**
  * Yield coroutine until next invocation.
@@ -89,7 +116,7 @@
 	CO_WAIT_WHILE(!(condition))
 
 /**
- * Calls a coroutine and returns whether it completed successfully or not.
+ * Calls a coroutine and returns its result.
  *
  * @ingroup	coroutine
  * @hideinitializer
