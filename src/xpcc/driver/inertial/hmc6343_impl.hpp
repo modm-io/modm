@@ -14,9 +14,9 @@
 
 // ----------------------------------------------------------------------------
 template < class I2cMaster >
-xpcc::Hmc6343<I2cMaster>::Hmc6343(uint8_t* data, uint8_t address)
-:	timeout(500), i2cTask(I2cTask::Idle), i2cSuccess(0),
-	data(data), adapter(address, i2cTask, i2cSuccess)
+xpcc::Hmc6343<I2cMaster>::Hmc6343(Data &data, uint8_t address)
+:	data(data), timeout(500), i2cTask(I2cTask::Idle), i2cSuccess(0),
+	adapter(address, i2cTask, i2cSuccess)
 {
 }
 
@@ -49,11 +49,11 @@ xpcc::Hmc6343<I2cMaster>::writeCommand(void *ctx, Command command, uint16_t time
 {
 	CO_BEGIN(ctx);
 
+	buffer[0] = i(command);
+
 	CO_WAIT_UNTIL(
 			this->timeout.isExpired() &&
-			!adapter.isBusy() && (
-					buffer[0] = i(command),
-					adapter.configureWrite(buffer, 1) && this->startTransaction(&adapter) )
+			adapter.configureWrite(buffer, 1) && this->startTransaction(&adapter)
 	);
 
 	i2cTask = i(command) + I2cTask::PostCommandBase;
@@ -74,13 +74,13 @@ xpcc::Hmc6343<I2cMaster>::writeRegister(void *ctx, Register reg, uint8_t value)
 {
 	CO_BEGIN(ctx);
 
+	buffer[0] = i(Command::WriteEeprom);
+	buffer[1] = i(reg);
+	buffer[2] = value;
+
 	CO_WAIT_UNTIL(
 			timeout.isExpired() &&
-			!adapter.isBusy() && (
-					buffer[0] = i(Command::WriteEeprom),
-					buffer[1] = i(reg),
-					buffer[2] = value,
-					adapter.configureWrite(buffer, 3) && this->startTransaction(&adapter) )
+			adapter.configureWrite(buffer, 3) && this->startTransaction(&adapter)
 	);
 
 	i2cTask = i(reg) + I2cTask::WriteEepromBase;
@@ -119,12 +119,12 @@ xpcc::Hmc6343<I2cMaster>::readRegister(void *ctx, Register reg, uint8_t &value)
 {
 	CO_BEGIN(ctx);
 
+	buffer[0] = i(Command::ReadEeprom);
+	buffer[1] = i(reg);
+
 	CO_WAIT_UNTIL(
 			timeout.isExpired() &&
-			!adapter.isBusy() && (
-					buffer[0] = i(Command::ReadEeprom),
-					buffer[1] = i(reg),
-					adapter.configureWrite(buffer, 2) && this->startTransaction(&adapter) )
+			adapter.configureWrite(buffer, 2) && this->startTransaction(&adapter)
 	);
 
 	i2cTask = i(reg) + I2cTask::PostEepromBase;
@@ -134,8 +134,10 @@ xpcc::Hmc6343<I2cMaster>::readRegister(void *ctx, Register reg, uint8_t &value)
 
 	if(i2cSuccess == (i(reg) + I2cTask::PostEepromBase))
 	{
-		CO_WAIT_UNTIL(timeout.isExpired());
-		CO_WAIT_UNTIL(adapter.configureRead(&value, 1) && this->startTransaction(&adapter));
+		CO_WAIT_UNTIL(
+				timeout.isExpired() &&
+				adapter.configureRead(&value, 1) && this->startTransaction(&adapter)
+		);
 
 		i2cTask = i(reg) + I2cTask::ReadEepromBase;
 
@@ -156,15 +158,15 @@ xpcc::Hmc6343<I2cMaster>::readRegister(void *ctx, Register16 reg, uint16_t &valu
 	CO_BEGIN(ctx);
 
 	// LSB
-	if ( CO_CALL( readRegister(ctx, static_cast<Register>(reg), registerBufferLSB) ) )
+	if ( CO_CALL( readRegister(ctx, static_cast<Register>(reg), buffer[2]) ) )
 	{
 		// MSB
-		value = registerBufferLSB;
-		if ( CO_CALL( readRegister(ctx, static_cast<Register>(i(reg)+1), registerBufferLSB) ) )
+		value = buffer[2];
+		if ( CO_CALL( readRegister(ctx, static_cast<Register>(i(reg)+1), buffer[2]) ) )
 		{
 			// an optimization would be to take the uint8_t addresses of value
 			// but then we would have to deal with endianess, and that headache is annoying.
-			value |= (registerBufferLSB << 8);
+			value |= (buffer[2] << 8);
 			CO_RETURN(true);
 		}
 	}
@@ -181,9 +183,10 @@ xpcc::Hmc6343<I2cMaster>::readPostData(void *ctx, Command command, uint8_t offse
 
 	if (CO_CALL(writeCommand(ctx, command, 1)))
 	{
-		CO_WAIT_UNTIL(timeout.isExpired());
-
-		CO_WAIT_UNTIL(adapter.configureRead(buffer + offset, readSize) && this->startTransaction(&adapter));
+		CO_WAIT_UNTIL(
+				timeout.isExpired() &&
+				adapter.configureRead(data.getPointer() + offset, readSize) && this->startTransaction(&adapter)
+		);
 
 		i2cTask = i(command) + I2cTask::ReadCommandBase;
 
@@ -194,15 +197,4 @@ xpcc::Hmc6343<I2cMaster>::readPostData(void *ctx, Command command, uint8_t offse
 	}
 
 	CO_END();
-}
-
-
-// ----------------------------------------------------------------------------
-// MARK: - data access
-template < class I2cMaster >
-int16_t
-xpcc::Hmc6343<I2cMaster>::swapData(uint8_t index)
-{
-	uint16_t* rawData = reinterpret_cast<uint16_t*>(data);
-	return static_cast<int16_t>(xpcc::math::bigEndianToHost(rawData[index]));
 }

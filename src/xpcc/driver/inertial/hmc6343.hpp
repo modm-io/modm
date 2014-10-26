@@ -110,6 +110,73 @@ public:
 		Hz10 = 0x02,
 	};
 
+	struct Data
+	{
+		// DATA ACCESS
+		/// returns the acceleration in unknown units
+		///@{
+		int16_t ALWAYS_INLINE
+		getAccelerationX() { return swapData(0); }
+
+		int16_t ALWAYS_INLINE
+		getAccelerationY() { return swapData(1); }
+
+		int16_t ALWAYS_INLINE
+		getAccelerationZ() { return swapData(2); }
+		///@}
+
+		/// returns the magnetic field in unknown units
+		///@{
+		int16_t ALWAYS_INLINE
+		getMagneticFieldX() { return swapData(3); }
+
+		int16_t ALWAYS_INLINE
+		getMagneticFieldY() { return swapData(4); }
+
+		int16_t ALWAYS_INLINE
+		getMagneticFieldZ() { return swapData(5); }
+		///@}
+
+		/// returns the heading in tenth of degrees (0 -> 3600)
+		int16_t ALWAYS_INLINE
+		getHeading() { return swapData(6); }
+
+		/// returns the Pitch in tenth of degrees (-900 -> 0 -> 900)
+		int16_t ALWAYS_INLINE
+		getPitch() { return swapData(7); }
+
+		/// returns the Roll in tenth of degrees (-900 -> 0 -> 900)
+		int16_t ALWAYS_INLINE
+		getRoll() { return swapData(8); }
+
+		/// returns the temperature in unknown format (was not specified in datasheet)
+		int16_t ALWAYS_INLINE
+		getTemperature() { return swapData(9); }
+
+		/// returns the value of the operation mode register
+		uint8_t ALWAYS_INLINE
+		getOperationMode() { return data[20]; }
+
+
+		ALWAYS_INLINE uint8_t
+		operator [](size_t index)
+		{ return (index < 21) ? data[index] : 0; }
+
+		ALWAYS_INLINE uint8_t*
+		getPointer()
+		{ return data; }
+
+	private:
+		uint8_t data[21];
+
+		int16_t inline
+		swapData(uint8_t index)
+		{
+			uint16_t* rawData = reinterpret_cast<uint16_t*>(data);
+			return static_cast<int16_t>(xpcc::math::bigEndianToHost(rawData[index]));
+		}
+	};
+
 protected:
 	/// @{
 	/// @private enum class to integer helper functions.
@@ -140,19 +207,11 @@ protected:
  * @author	Niklas Hauser
  */
 template < class I2cMaster >
-class Hmc6343 : public xpcc::I2cDevice< I2cMaster >, public hmc6343, public xpcc::co::NestedCoroutine<1>
+class Hmc6343 : public hmc6343, public xpcc::I2cDevice< I2cMaster >, public xpcc::co::NestedCoroutine<1>
 {
 public:
 	/// \brief	Constructor, requires pointer to 21 byte array, sets address to default of 0x19
-	Hmc6343(uint8_t* data, uint8_t address=0x19);
-
-	/**
-	 * @return pointer to 8bit array containing Axyz Mxyz Heading Pitch Roll Temperature.
-	 * Be aware that the array is in BIG ENDIAN format, so you cannot
-	 * simply reinterpret the result as int16_t!!
-	 */
-	ALWAYS_INLINE uint8_t*
-	getData() { return data; }
+	Hmc6343(Data &data, uint8_t address=0x19);
 
 	/// pings the sensor
 	xpcc::co::Result<bool>
@@ -165,9 +224,6 @@ public:
 	xpcc::co::Result<bool> ALWAYS_INLINE
 	readOperationMode(void *ctx)
 	{ return readPostData(ctx, Command::PostOperationMode, 20, 1); }
-
-	uint8_t ALWAYS_INLINE
-	getOperationMode() { return data[20]; }
 
 
 
@@ -268,49 +324,6 @@ public:
 
 
 
-	// DATA ACCESS
-	/// returns the acceleration in unknown units
-	///@{
-	int16_t ALWAYS_INLINE
-	getAccelerationX() { return swapData(0); }
-
-	int16_t ALWAYS_INLINE
-	getAccelerationY() { return swapData(1); }
-
-	int16_t ALWAYS_INLINE
-	getAccelerationZ() { return swapData(2); }
-	///@}
-
-	/// returns the magnetic field in unknown units
-	///@{
-	int16_t ALWAYS_INLINE
-	getMagneticFieldX() { return swapData(3); }
-
-	int16_t ALWAYS_INLINE
-	getMagneticFieldY() { return swapData(4); }
-
-	int16_t ALWAYS_INLINE
-	getMagneticFieldZ() { return swapData(5); }
-	///@}
-
-	/// returns the heading in tenth of degrees (0 -> 3600)
-	int16_t ALWAYS_INLINE
-	getHeading() { return swapData(6); }
-
-	/// returns the Pitch in tenth of degrees (-900 -> 0 -> 900)
-	int16_t ALWAYS_INLINE
-	getPitch() { return swapData(7); }
-
-	/// returns the Roll in tenth of degrees (-900 -> 0 -> 900)
-	int16_t ALWAYS_INLINE
-	getRoll() { return swapData(8); }
-
-	/// returns the temperature in unknown format (was not specified in datasheet)
-	int16_t ALWAYS_INLINE
-	getTemperature() { return swapData(9); }
-
-
-
 	// RAW REGISTER ACCESS
 	/// write a 8bit value into the eeprom
 	xpcc::co::Result<bool>
@@ -329,6 +342,8 @@ public:
 	readRegister(void *ctx, Register16 reg, uint16_t &value);
 
 
+public:
+	Data &data;
 
 private:
 	xpcc::co::Result<bool>
@@ -336,9 +351,6 @@ private:
 
 	xpcc::co::Result<bool>
 	readPostData(void *ctx, Command command, uint8_t offset, uint8_t readSize);
-
-	int16_t ALWAYS_INLINE
-	swapData(uint8_t index);
 
 	struct I2cTask
 	{
@@ -365,13 +377,12 @@ private:
 		};
 	};
 
+private:
+	uint8_t buffer[3];
 	xpcc::Timeout<> timeout;
+
 	volatile uint8_t i2cTask;
 	volatile uint8_t i2cSuccess;
-	uint8_t* data;
-	uint8_t buffer[3];
-	uint8_t registerBufferLSB;
-
 	xpcc::I2cTagAdapter<xpcc::I2cWriteReadAdapter> adapter;
 };
 
