@@ -43,6 +43,34 @@ struct tmp102
 		Faults4 = 0x10,
 		Faults6 = 0x18,
 	};
+
+	struct Data
+	{
+	public:
+		/// @return the temperature as a signed float in Celsius
+		float
+		getTemperature()
+		{
+			int16_t temp = (data[1] << 8) | data[0];
+			if (data[1] & 0x01)
+			{
+				// temperature extended mode
+				return (temp >> 3) / 16.f;
+			}
+			return (temp >> 4) / 16.f;
+		}
+
+		ALWAYS_INLINE uint8_t
+		operator [](size_t index)
+		{ return (index < 2) ? data[index] : 0; }
+
+		ALWAYS_INLINE uint8_t*
+		getPointer()
+		{ return data; }
+
+	private:
+		uint8_t data[2];
+	};
 };
 
 /**
@@ -67,7 +95,7 @@ struct tmp102
  */
 template < class I2cMaster >
 class Tmp102 :	public tmp102, public xpcc::I2cDevice< I2cMaster >,
-				private xpcc::pt::Protothread, public xpcc::co::NestedCoroutine<1>
+				protected xpcc::pt::Protothread, protected xpcc::co::NestedCoroutine<1>
 {
 private:
 	enum Register
@@ -109,14 +137,11 @@ public:
 	 * @param	data		pointer to a 2 uint8_t buffer
 	 * @param	address		Default address is 0x48 (alternatives are 0x49, 0x4A and 0x4B)
 	 */
-	Tmp102(uint8_t* data, uint8_t address=0x48);
+	Tmp102(Data &data, uint8_t address=0x48);
 
-	/// @return pointer to 8bit array containing temperature as big endian int16_t
-	ALWAYS_INLINE uint8_t*
-	getData();
-
-	bool
-	update();
+	void
+	update()
+	{ run(); }
 
 	// MARK: - Tasks
 	/// pings the sensor
@@ -139,7 +164,7 @@ public:
 	writeUpperLimit(void *ctx, float temperature)
 	{ return writeLimitRegister(ctx, REGISTER_HIGH_TEMPERATURE, temperature); }
 
-	xpcc::co::Result<bool>
+	xpcc::co::Result<bool> ALWAYS_INLINE
 	writeLowerLimit(void *ctx, float temperature)
 	{ return writeLimitRegister(ctx, REGISTER_LOW_TEMPERATURE, temperature); }
 
@@ -155,11 +180,13 @@ public:
 	xpcc::co::Result<bool>
 	readTemperature(void *ctx);
 
-	/// @return the temperature as a signed float in Celsius
-	float
-	getTemperature();
+public:
+	Data &data;
 
 private:
+	bool
+	run();
+
 	xpcc::co::Result<bool>
 	writeConfiguration(void *ctx, uint8_t length=3);
 
@@ -180,15 +207,14 @@ private:
 		};
 	};
 
-	volatile uint8_t i2cTask;
-	volatile uint8_t i2cSuccess;
-	uint8_t* data;
 	uint8_t buffer[3];
 	uint8_t config_msb;
 	uint8_t config_lsb;
 	xpcc::Timeout<> timeout;
 	uint16_t updateTime;
 
+	volatile uint8_t i2cTask;
+	volatile uint8_t i2cSuccess;
 	xpcc::I2cTagAdapter< xpcc::I2cWriteReadAdapter > adapter;
 };
 
