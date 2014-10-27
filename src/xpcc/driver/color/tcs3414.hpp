@@ -13,8 +13,8 @@
  * \author	David Hebbeker
  */
 
-#ifndef XPCC__TCS3414_HPP
-#define XPCC__TCS3414_HPP
+#ifndef XPCC_TCS3414_HPP
+#define XPCC_TCS3414_HPP
 
 #include <stdint.h>
 
@@ -319,4 +319,4 @@ private:
 
 #include "tcs3414_impl.hpp"
 
-#endif // XPCC__TCS3414_HPP
+#endif // XPCC_TCS3414_HPP
