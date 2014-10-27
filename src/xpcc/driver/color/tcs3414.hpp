@@ -26,9 +26,16 @@
 namespace xpcc
 {
 /**
- * \brief 	Settings to configure the digital color sensor Tcs3414
+ * \brief 	Settings to configure the digital color sensor TCS3414 / TCS3413 / TCS3415 / TCS3416.
  * \see		Tcs3414
  * \ingroup	driver_other
+ *
+ * Device   Address
+ * TCS3413  0x29
+ *       4  0x39
+ *       5  0x49
+ *       6  0x59
+ *
  */
 namespace tcs3414
 {
@@ -124,7 +131,6 @@ namespace tcs3414
 		DATA5HIGH				= 0x17	//!< High byte of ADC green channel
 	};
 
-	typedef bool		OperationSuccess;	//!< false if an error occurred
 	typedef uint16_t	UnderlyingType;		//!< datatype of color values
 	typedef color::RgbT<UnderlyingType> Rgb;
 }
@@ -143,63 +149,75 @@ using namespace tcs3414;
  * \author	David Hebbeker
  * \ingroup	driver_other
  */
-template<typename I2cMaster>
-class Tcs3414 : protected xpcc::I2cWriteReadAdapter
+template < typename I2cMaster >
+class Tcs3414 : public xpcc::I2cDevice<I2cMaster>,
+				public xpcc::co::NestedCoroutine<1>
 {
 public:
-	Tcs3414()
-	:	I2cWriteReadAdapter(0b0111001)
-	{}
+	Tcs3414(uint8_t address = 0x39);
 
-			//! \brief 	Power up sensor and start conversions
-	static inline OperationSuccess
-	initialize(){
-		return writeRegister(RegisterAddress::CONTROL, 0b11);	// control to power up and start conversion
+	//! \brief 	Power up sensor and start conversions
+	// Blocking
+	bool inline
+	initialize()
+	{
+		xpcc::co::Result<bool> result;
+		while ((result = initialize(this)).state > xpcc::co::NestingError)
+			;
+		return result.result;
 	}
-	
+
 	//! \brief 	Configures some of the most important settings for the sensor.
-	static inline OperationSuccess
+	static inline bool
 	configure(
-			const Gain gain = Gain::DEFAULT,
-			const Prescaler prescaler = Prescaler::DEFAULT,
-			const IntegrationMode mode = IntegrationMode::DEFAULT,
-			const NominalIntegrationTime time = NominalIntegrationTime::DEFAULT) {
+			const Gain                   gain      = Gain::DEFAULT,
+			const Prescaler              prescaler = Prescaler::DEFAULT,
+			const IntegrationMode        mode      = IntegrationMode::DEFAULT,
+			const NominalIntegrationTime time      = NominalIntegrationTime::DEFAULT)
+	{
 		return configure(gain, prescaler, mode, static_cast<uint8_t>(time));
 	}
 
 	//! \brief	Configures some of the most important settings for the sensor.
-	static inline OperationSuccess
+	static inline bool
 	configure(
-			const Gain gain = Gain::DEFAULT,
-			const Prescaler prescaler = Prescaler::DEFAULT,
-			const IntegrationMode mode = IntegrationMode::DEFAULT,
-			const SyncPulseCount time = SyncPulseCount::DEFAULT) {
+			const Gain            gain      = Gain::DEFAULT,
+			const Prescaler       prescaler = Prescaler::DEFAULT,
+			const IntegrationMode mode      = IntegrationMode::DEFAULT,
+			const SyncPulseCount  time      = SyncPulseCount::DEFAULT)
+	{
 		return configure(gain, prescaler, mode, static_cast<uint8_t>(time));
 	}
 
 	//! \brief	The gain can be used to adjust the sensitivity of all ADC output channels.
-	static inline OperationSuccess
+	xpcc::co::Result<bool>
 	setGain(
-			const Gain gain = Gain::DEFAULT,
-			const Prescaler prescaler = Prescaler::DEFAULT) {
-		return writeRegister(RegisterAddress::GAIN,
+			void *ctx,
+			const Gain      gain      = Gain::DEFAULT,
+			const Prescaler prescaler = Prescaler::DEFAULT)
+	{
+		return writeRegister(ctx, RegisterAddress::GAIN,
 				static_cast<uint8_t>(gain) | static_cast<uint8_t>(prescaler));
 	}
 
 	//! \brief Sets the integration time for the ADCs.
-	static inline OperationSuccess
+	xpcc::co::Result<bool>
 	setIntegrationTime(
-			const IntegrationMode mode = IntegrationMode::DEFAULT,
-			const NominalIntegrationTime time = NominalIntegrationTime::DEFAULT){
-		return setIntegrationTime(mode, static_cast<uint8_t>(time));
+			void *ctx,
+			const IntegrationMode        mode = IntegrationMode::DEFAULT,
+			const NominalIntegrationTime time = NominalIntegrationTime::DEFAULT)
+	{
+		return setIntegrationTime(ctx, mode, static_cast<uint8_t>(time));
 	}
 
 	//! \brief Sets the integration time for the ADCs.
-	static inline OperationSuccess
+	xpcc::co::Result<bool>
 	setIntegrationTime(
+			void *ctx,
 			const IntegrationMode mode = IntegrationMode::DEFAULT,
-			const SyncPulseCount time = SyncPulseCount::DEFAULT){
-		return setIntegrationTime(mode, static_cast<uint8_t>(time));
+			const SyncPulseCount  time = SyncPulseCount::DEFAULT)
+	{
+		return setIntegrationTime(ctx, mode, static_cast<uint8_t>(time));
 	}
 
 	/**
@@ -208,7 +226,9 @@ public:
 	 */
 	inline static tcs3414::Rgb
 	getOldColors()
-	{ return color; };
+	{
+		return color;
+	};
 
 	//!@}
 
@@ -226,59 +246,116 @@ public:
 	//!@}
 
 	//! \brief	Read current samples of ADC conversions for all channels.
-	inline static OperationSuccess
-	refreshAllColors() {
-		const OperationSuccess success = readRegisters(RegisterAddress::DATA1LOW,
-				data.dataBytes, sizeof(data.dataBytes));
-		// adapt the values to the overall light intensity
-		// so that R+G+B = C
-		color.red	= data.red.get();
-		color.green	= data.green.get();
-		color.blue	= data.blue.get();
-		// START --> This part is not really necessary
-		// Rationale:
-		// Imagine a low band light. For example a green laser. In case the filters
-		// of this sensors do not transfer this wavelength well, it might
-		// result in all colors being very low. The clear value will not
-		// filter colors and thus it will see a bright light (intensity).
-		// In order to still have some signal the very low green value can be
-		// amplified with the clear value.
-		const float c =	static_cast<float>(color.red) +
-							static_cast<float>(color.green) +
-							static_cast<float>(color.blue);
-		const float f = data.clear.get() / c;
-		color.red	*= f;
-		color.green	*= f;
-		color.blue	*= f;
-		// <-- END
-		return success;
+	// Non-blocking
+	xpcc::co::Result<bool>
+	refreshAllColors(void *ctx)
+	{
+		CO_BEGIN(ctx);
+
+		if ( CO_CALL(readRegisters(
+				ctx,
+				RegisterAddress::DATA1LOW,
+				data.dataBytes,
+				sizeof(data.dataBytes)
+				) ) )
+		{
+			// adapt the values to the overall light intensity
+			// so that R + G + B = C
+			color.red	= data.red.get();
+			color.green	= data.green.get();
+			color.blue	= data.blue.get();
+
+			{
+				// START --> This part is not really necessary
+				// Rationale:
+				// Imagine a low band light. For example a green laser. In case the filters
+				// of this sensors do not transfer this wavelength well, it might
+				// result in all colors being very low. The clear value will not
+				// filter colors and thus it will see a bright light (intensity).
+				// In order to still have some signal the very low green value can be
+				// amplified with the clear value.
+				const float c =	static_cast<float>(color.red) +
+									static_cast<float>(color.green) +
+									static_cast<float>(color.blue);
+				const float f = data.clear.get() / c;
+				color.red	*= f;
+				color.green	*= f;
+				color.blue	*= f;
+			}
+
+			// <-- END
+			CO_RETURN(true);
+		}
+
+		CO_END();
 	}
 
+	// MARK: - TASKS
+	/// Pings the sensor
+	xpcc::co::Result<bool>
+	ping(void *ctx);
+
+	xpcc::co::Result<bool>
+	initialize(void *ctx);
+
+	xpcc::co::Result<bool>
+	configure(
+			void *ctx,
+			const Gain            gain      = Gain::DEFAULT,
+			const Prescaler       prescaler = Prescaler::DEFAULT,
+			const IntegrationMode mode      = IntegrationMode::DEFAULT,
+			const uint8_t time = 0);
+
+private:
+	//! \brief Sets the integration time for the ADCs.
+	xpcc::co::Result<bool>
+	setIntegrationTime(
+			void *ctx,
+			const IntegrationMode mode = IntegrationMode::DEFAULT,
+			const uint8_t         time = 0)
+	{
+		return writeRegister(
+				ctx,
+				RegisterAddress::TIMING,
+				static_cast<uint8_t>(mode) | time );
+	}
+
+private:
+
+	struct I2cTask
+	{
+		enum
+		{
+			Idle = 0,
+			WriteRegister,
+			ReadRegister,
+			Ping,
+		};
+	};
+
+	volatile uint8_t i2cTask;
+	volatile uint8_t i2cSuccess;
+	uint8_t commandBuffer[4];
+	bool success;
+
+	xpcc::I2cTagAdapter< xpcc::I2cWriteReadAdapter > adapter;
+
+private:
 	//! \brief	Read value of specific register.
-	static OperationSuccess
+	xpcc::co::Result<bool>
 	readRegisters(
+			void *ctx,
 			const RegisterAddress address,
 			uint8_t * const values,
 			const uint8_t count = 1);
 
+	xpcc::co::Result<bool>
+	writeRegister(
+			void *ctx,
+			const RegisterAddress address,
+			const uint8_t value);
+
 private:
-
-	static OperationSuccess
-	configure(
-			const Gain gain = Gain::DEFAULT,
-			const Prescaler prescaler = Prescaler::DEFAULT,
-			const IntegrationMode mode = IntegrationMode::DEFAULT,
-			const uint8_t time = 0);
-
-	//! \brief Sets the integration time for the ADCs.
-	static inline OperationSuccess
-	setIntegrationTime(
-			const IntegrationMode mode = IntegrationMode::DEFAULT,
-			const uint8_t time = 0) {
-		return writeRegister(RegisterAddress::TIMING,
-				static_cast<uint8_t>(mode) | time);
-	}
-
 	class uint16_t_LOW_HIGH
 	{
 	private:
@@ -295,11 +372,6 @@ private:
 		inline uint8_t getLSB()	const { return low; }
 		inline uint8_t getMSB()	const { return high; }
 	} __attribute__ ((packed));
-
-	static OperationSuccess
-	writeRegister(
-			const RegisterAddress address,
-			const uint8_t value);
 
 	static union Data
 	{
