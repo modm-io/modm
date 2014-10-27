@@ -40,7 +40,7 @@ void
 xpcc::Hd44780<DATA, RW, RS, E>::setCursor(uint8_t column, uint8_t line)
 {
 	this->column = (column <= this->lineWidth ? column : this->lineWidth);
-	this->line = (line <= this->lineCount ? line : this->lineCount);
+	this->line   = (line   <= this->lineCount ? line   : this->lineCount);
 
 	uint8_t address = this->column + 0x40 * this->line;
 	if (this->line >= 2) {
