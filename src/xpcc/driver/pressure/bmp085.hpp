@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__BMP085_HPP
-#define XPCC__BMP085_HPP
+#ifndef XPCC_BMP085_HPP
+#define XPCC_BMP085_HPP
 
 #include <xpcc/processing/protothread.hpp>
 #include <xpcc/processing/coroutine.hpp>
@@ -224,4 +224,4 @@ private:
 
 #include "bmp085_impl.hpp"
 
-#endif // XPCC__BMP085_HPP
+#endif // XPCC_BMP085_HPP
