@@ -20,18 +20,11 @@ typename xpcc::tcs3414::Rgb xpcc::Tcs3414<I2cMaster>::color;
 template < typename I2cMaster >
 xpcc::Tcs3414<I2cMaster>::Tcs3414(uint8_t address)
 : I2cDevice<I2cMaster>(),
-  i2cTask(I2cTask::Idle),
-  i2cSuccess(0),
+  commandBuffer{0,0,0,0},
+  i2cTask(I2cTask::Idle), i2cSuccess(0),
   adapter(address, i2cTask, i2cSuccess)
 {
 }
-
-template < class I2cMaster >
-xpcc::co::Result<bool>
-xpcc::Tcs3414<I2cMaster>::initialize(void *ctx)
-{
-	return writeRegister(ctx, RegisterAddress::CONTROL, 0b11);	// control to power up and start conversion
-};
 
 // ----------------------------------------------------------------------------
 template<typename I2cMaster>
@@ -45,13 +38,15 @@ xpcc::Tcs3414<I2cMaster>::configure(
 {
 	CO_BEGIN(ctx);
 
-	CO_CALL(setGain(ctx, gain, prescaler));
+	if ( CO_CALL(setGain(ctx, gain, prescaler)) )
+	{
+		if ( CO_CALL(setIntegrationTime(ctx, mode, time)) )
+		{
+			CO_RETURN(true);
+		}
+	}
 
-	CO_CALL(setIntegrationTime(ctx, mode, time));
-
-	CO_RETURN(true);
-
-	CO_END();
+	CO_END_RETURN(false);
 }
 
 // ----------------------------------------------------------------------------
@@ -65,15 +60,56 @@ xpcc::Tcs3414<I2cMaster>::ping(void *ctx)
 	CO_WAIT_UNTIL(adapter.configurePing() && this->startTransaction(&adapter));
 
 	i2cTask = I2cTask::Ping;
-
 	CO_WAIT_WHILE(i2cTask == I2cTask::Ping);
 
-	if (i2cSuccess == I2cTask::Ping)
-		CO_RETURN(true);
-
-	CO_END();
+	CO_END_RETURN(i2cSuccess == I2cTask::Ping);
 }
 
+template < class I2cMaster >
+xpcc::co::Result<bool>
+xpcc::Tcs3414<I2cMaster>::refreshAllColors(void *ctx)
+{
+	CO_BEGIN(ctx);
+
+	if ( CO_CALL(readRegisters(
+			ctx,
+			RegisterAddress::DATA1LOW,
+			data.dataBytes,
+			sizeof(data.dataBytes)
+	) ) )
+	{
+		// adapt the values to the overall light intensity
+		// so that R + G + B = C
+		color.red	= data.red.get();
+		color.green	= data.green.get();
+		color.blue	= data.blue.get();
+
+		{
+			// START --> This part is not really necessary
+			// Rationale:
+			// Imagine a low band light. For example a green laser. In case the filters
+			// of this sensors do not transfer this wavelength well, it might
+			// result in all colors being very low. The clear value will not
+			// filter colors and thus it will see a bright light (intensity).
+			// In order to still have some signal the very low green value can be
+			// amplified with the clear value.
+			const float c =	static_cast<float>(color.red) +
+					static_cast<float>(color.green) +
+					static_cast<float>(color.blue);
+			const float f = data.clear.get() / c;
+			color.red	*= f;
+			color.green	*= f;
+			color.blue	*= f;
+		}
+
+		// <-- END
+		CO_RETURN(true);
+	}
+
+	CO_END_RETURN(false);
+}
+
+// ----------------------------------------------------------------------------
 template<typename I2cMaster>
 xpcc::co::Result<bool>
 xpcc::Tcs3414<I2cMaster>::writeRegister(
@@ -83,27 +119,21 @@ xpcc::Tcs3414<I2cMaster>::writeRegister(
 {
 	CO_BEGIN(ctx);
 
+	commandBuffer[0] =
+				0x80							// write command
+			|	0x40							// with SMB read/write protocol
+			|	static_cast<uint8_t>(address);	// at this address
+	commandBuffer[2] = value;
+
 	CO_WAIT_UNTIL(
-			!adapter.isBusy() && (
-					commandBuffer[0] =
-							0x80							// write command
-						|	0x40							// with SMB read/write protocol
-						|	static_cast<uint8_t>(address),	// at this address
-					commandBuffer[2] = value,
-					adapter.configureWrite(commandBuffer, 3) &&
-					this->startTransaction(&adapter)
-			)
+			adapter.configureWrite(commandBuffer, 3) &&
+			this->startTransaction(&adapter)
 	);
 
 	i2cTask = I2cTask::WriteRegister;
-
 	CO_WAIT_WHILE(i2cTask == I2cTask::WriteRegister);
 
-	if (i2cSuccess == I2cTask::WriteRegister) {
-		CO_RETURN(true);
-	}
-
-	CO_END();
+	CO_END_RETURN(i2cSuccess == I2cTask::WriteRegister);
 }
 
 template<typename I2cMaster>
@@ -116,24 +146,18 @@ xpcc::Tcs3414<I2cMaster>::readRegisters(
 {
 	CO_BEGIN(ctx);
 
+	commandBuffer[0] =
+			static_cast<uint8_t>(0x80)		// write command
+			| static_cast<uint8_t>(0x40)		// with SMB read/write protocol
+			| static_cast<uint8_t>(address);	// at this address
+
 	CO_WAIT_UNTIL(
-			!adapter.isBusy() && (
-					commandBuffer[0] =
-							  static_cast<uint8_t>(0x80)		// write command
-							| static_cast<uint8_t>(0x40)		// with SMB read/write protocol
-							| static_cast<uint8_t>(address),	// at this address
-					adapter.configureWriteRead(commandBuffer, 1, values, count) &&
-					this->startTransaction(&adapter)
-			)
+			adapter.configureWriteRead(commandBuffer, 1, values, count) &&
+			this->startTransaction(&adapter)
 	);
 
 	i2cTask = I2cTask::ReadRegister;
-
 	CO_WAIT_WHILE(i2cTask == I2cTask::ReadRegister);
 
-	if (i2cSuccess == I2cTask::ReadRegister) {
-		CO_RETURN(true);
-	}
-
-	CO_END();
+	CO_END_RETURN(i2cSuccess == I2cTask::ReadRegister);
 }

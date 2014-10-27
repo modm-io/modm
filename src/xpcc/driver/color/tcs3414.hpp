@@ -37,7 +37,7 @@ namespace xpcc
  *       6  0x59
  *
  */
-namespace tcs3414
+struct tcs3414
 {
 	/** @name Gain_Register
 	 * @{
@@ -133,9 +133,8 @@ namespace tcs3414
 
 	typedef uint16_t	UnderlyingType;		//!< datatype of color values
 	typedef color::RgbT<UnderlyingType> Rgb;
-}
 
-using namespace tcs3414;
+};
 
 /**
  * \brief	TCS3414 Digital Color Sensors
@@ -150,7 +149,7 @@ using namespace tcs3414;
  * \ingroup	driver_other
  */
 template < typename I2cMaster >
-class Tcs3414 : public xpcc::I2cDevice<I2cMaster>,
+class Tcs3414 : public tcs3414, public xpcc::I2cDevice<I2cMaster>,
 				public xpcc::co::NestedCoroutine<1>
 {
 public:
@@ -248,47 +247,7 @@ public:
 	//! \brief	Read current samples of ADC conversions for all channels.
 	// Non-blocking
 	xpcc::co::Result<bool>
-	refreshAllColors(void *ctx)
-	{
-		CO_BEGIN(ctx);
-
-		if ( CO_CALL(readRegisters(
-				ctx,
-				RegisterAddress::DATA1LOW,
-				data.dataBytes,
-				sizeof(data.dataBytes)
-				) ) )
-		{
-			// adapt the values to the overall light intensity
-			// so that R + G + B = C
-			color.red	= data.red.get();
-			color.green	= data.green.get();
-			color.blue	= data.blue.get();
-
-			{
-				// START --> This part is not really necessary
-				// Rationale:
-				// Imagine a low band light. For example a green laser. In case the filters
-				// of this sensors do not transfer this wavelength well, it might
-				// result in all colors being very low. The clear value will not
-				// filter colors and thus it will see a bright light (intensity).
-				// In order to still have some signal the very low green value can be
-				// amplified with the clear value.
-				const float c =	static_cast<float>(color.red) +
-									static_cast<float>(color.green) +
-									static_cast<float>(color.blue);
-				const float f = data.clear.get() / c;
-				color.red	*= f;
-				color.green	*= f;
-				color.blue	*= f;
-			}
-
-			// <-- END
-			CO_RETURN(true);
-		}
-
-		CO_END();
-	}
+	refreshAllColors(void *ctx);
 
 	// MARK: - TASKS
 	/// Pings the sensor
@@ -296,7 +255,10 @@ public:
 	ping(void *ctx);
 
 	xpcc::co::Result<bool>
-	initialize(void *ctx);
+	initialize(void *ctx)
+	{
+		return writeRegister(ctx, RegisterAddress::CONTROL, 0b11);	// control to power up and start conversion
+	};
 
 	xpcc::co::Result<bool>
 	configure(
@@ -321,23 +283,19 @@ private:
 	}
 
 private:
-
-	struct I2cTask
+	enum I2cTask : uint8_t
 	{
-		enum
-		{
-			Idle = 0,
-			WriteRegister,
-			ReadRegister,
-			Ping,
-		};
+		Idle = 0,
+		WriteRegister,
+		ReadRegister,
+		Ping,
 	};
 
-	volatile uint8_t i2cTask;
-	volatile uint8_t i2cSuccess;
 	uint8_t commandBuffer[4];
 	bool success;
 
+	volatile uint8_t i2cTask;
+	volatile uint8_t i2cSuccess;
 	xpcc::I2cTagAdapter< xpcc::I2cWriteReadAdapter > adapter;
 
 private:
