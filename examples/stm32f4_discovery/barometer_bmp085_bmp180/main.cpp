@@ -130,31 +130,6 @@ MAIN_FUNCTION
 
 	stream << "\n\nWelcome to BMP085 demo!\n\n";
 
-	/**
-	 *
-	 * OLD IMPLEMENTATION
-	 *
-	 * uint8_t barometerData[5];
-	 * xpcc::Bmp085< Twi1 > barometer(barometerData);
-	 *
-	 * barometer.configure(xpcc::bmp085::MODE_ULTRA_HIGH_RESOLUTION);
-	 *
-	 * while(1) {
-	 * if(barometerTimer.isExpired())
-	 *  barometer.startReadoutSequence();
-	 *
-	 * barometer.update();
-	 *
-	 * if(barometer.isNewDataAvailable())
-	 * {
-	 * 	barometer.getData();
-	 * 	int16_t* temp = barometer.getCalibratedTemperature();
-	 *  int32_t* press = barometer.getCalibratedPressure();
-	 * }
-	 * }
-	 *
-	 */
-
 	while (1)
 	{
 		one.update();
