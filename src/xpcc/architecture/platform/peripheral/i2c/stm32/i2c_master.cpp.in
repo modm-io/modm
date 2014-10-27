@@ -603,7 +603,7 @@ xpcc::stm32::I2cMaster{{ id }}::start(I2cTransaction *transaction, Configuration
 			// if no current transaction is taking place
 			if (!xpcc::accessor::asVolatile(::transaction))
 			{
-				// configure the perihperal
+				// configure the peripheral
 				if (configuration)
 					configuration();
 
