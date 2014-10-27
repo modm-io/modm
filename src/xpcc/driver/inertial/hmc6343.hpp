@@ -282,7 +282,7 @@ public:
 	/// exit sleep mode
 	xpcc::co::Result<bool> ALWAYS_INLINE
 	exitSleepMode(void *ctx)
-	{ return writeCommand(ctx, Command::ExitSleepMode); }
+	{ return writeCommand(ctx, Command::ExitSleepMode, 20); }
 
 	/// enters user calibration mode
 	xpcc::co::Result<bool> ALWAYS_INLINE
