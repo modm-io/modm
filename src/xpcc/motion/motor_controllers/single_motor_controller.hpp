@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef SINGLE_MOTOR_CONTROLLER
-#define SINGLE_MOTOR_CONTROLLER
+#ifndef XPCC_SINGLE_MOTOR_CONTROLLER
+#define XPCC_SINGLE_MOTOR_CONTROLLER
 
 #include <xpcc/math/filter/s_curve_controller.hpp>
 #include <xpcc/math/filter/pid.hpp>
@@ -126,4 +126,4 @@ private:
 //#include "../motors/motor_unused.hpp"
 //template class IsSingleMotorController<SingleMotorController<MotorUnused> >;
 
-#endif /*SINGLE_MOTOR_CONTROLLER */
+#endif /* XPCC_SINGLE_MOTOR_CONTROLLER */

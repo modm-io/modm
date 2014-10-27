@@ -7,7 +7,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef SINGLE_MOTOR_CONTROLLER
+#ifndef XPCC_SINGLE_MOTOR_CONTROLLER
 #	error	"Don't include this file directly, use 'single_motor_control.hpp' instead!"
 #endif
 
