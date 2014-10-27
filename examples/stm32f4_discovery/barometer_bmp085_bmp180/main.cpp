@@ -124,8 +124,8 @@ MAIN_FUNCTION
 
 	GpioB9::connect(MyI2cMaster::Sda);
 	GpioB8::connect(MyI2cMaster::Scl);
-	GpioB9::configure(Gpio::InputType::PullUp);
-	GpioB8::configure(Gpio::InputType::PullUp);
+	GpioB9::setOutput(Gpio::OutputType::OpenDrain);
+	GpioB8::setOutput(Gpio::OutputType::OpenDrain);
 	MyI2cMaster::initialize<defaultSystemClock, 50000>();
 
 	stream << "\n\nWelcome to BMP085 demo!\n\n";
