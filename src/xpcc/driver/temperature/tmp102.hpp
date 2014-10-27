@@ -44,7 +44,8 @@ struct tmp102
 		Faults6 = 0x18,
 	};
 
-	struct Data
+	struct __attribute__ ((packed))
+	Data
 	{
 	public:
 		/// @return the temperature as a signed float in Celsius

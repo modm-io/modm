@@ -110,7 +110,8 @@ public:
 		Hz10 = 0x02,
 	};
 
-	struct Data
+	struct __attribute__ ((packed))
+	Data
 	{
 		// DATA ACCESS
 		/// returns the acceleration in unknown units
