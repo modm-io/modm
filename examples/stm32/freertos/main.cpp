@@ -3,44 +3,33 @@
 #include <xpcc/processing.hpp>
 #include <xpcc/debug.hpp>
 
-#include <xpcc/driver/gpio.hpp>
 #include <xpcc/driver/display.hpp>
 #include <xpcc/ui/display/font.hpp>
 
 #include <xpcc/processing/rtos.hpp>
 
+using namespace xpcc::stm32;
+
 // ----------------------------------------------------------------------------
-GPIO__OUTPUT(LedStatInverted, C, 12);	// inverted, 0=on, 1=off
-GPIO__OUTPUT(Led1, A, 1);
-GPIO__OUTPUT(Led2, A, 8);
+typedef SystemClock<Pll<ExternalCrystal<MHz8>, MHz168, MHz48> > defaultSystemClock;
 
-typedef xpcc::gpio::Invert<LedStatInverted> LedStat;
+typedef GpioOutputC12 LedStatInverted;	// inverted, 0=on, 1=off
+typedef GpioOutputA1  Led1;
+typedef GpioOutputA8  Led2;
 
-GPIO__INPUT(ButtonWakeUp, A, 0);		// 1=pressed, 0=not pressed
+typedef xpcc::GpioInverted<LedStatInverted> LedStat;
+
+typedef GpioInputA0 ButtonWakeUp;		// 1=pressed, 0=not pressed
 
 namespace lcd
 {
-	GPIO__OUTPUT(CS, C, 1);
-	GPIO__OUTPUT(A0, C, 3);
-	GPIO__OUTPUT(Reset, B, 5);
-}
-
-static bool
-initClock()
-{
-	typedef xpcc::stm32::Clock C;
-	
-	// use external 8MHz crystal, stm32f1
-	if (!C::enableHse(C::HseConfig::HSE_CRYSTAL)) {
-		return false;
-	}
-	
-	C::enablePll(C::PllSource::PLL_HSE, C::PllMul::PLL_MUL_9);
-	return C::switchToPll();
+    typedef GpioOutputC1 CS;
+    typedef GpioOutputC3 A0;
+    typedef GpioOutputB5 Reset;
 }
 
 // Graphic LCD
-xpcc::DogS102< xpcc::stm32::SpiMaster1, lcd::CS, lcd::A0, lcd::Reset, false > display;
+xpcc::DogS102< xpcc::stm32::SpiSimpleMaster1, lcd::CS, lcd::A0, lcd::Reset, false > display;
 
 // ----------------------------------------------------------------------------
 xpcc::rtos::BinarySemaphore event;
@@ -152,15 +141,15 @@ int
 main(void)
 {
 	// Switch to the external clock and enable the PLL to let
-	// the STM32 run at 72 MHz.
-	initClock();
+	// the STM32 run at 168 MHz.
+	defaultSystemClock::enable();
 
 	LedStat::setOutput(xpcc::Gpio::High);
 	Led1::setOutput(xpcc::Gpio::Low);
 	Led2::setOutput(xpcc::Gpio::Low);
 	
 	// The Button has an external Pull-Down resistor
-	ButtonWakeUp::setInput(xpcc::stm32::FLOATING);
+    ButtonWakeUp::setInput(Gpio::InputType::Floating);
 	
 	display.initialize();
 	display.setFont(xpcc::font::FixedWidth5x8);
