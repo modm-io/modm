@@ -54,7 +54,7 @@ public:
 		{
 			{
 				PT_CALL(temp.readComparatorMode(this, result));
-				float temperature = temp.getTemperature();
+				float temperature = temperatureData.getTemperature();
 				uint8_t tI = (int) temperature;
 				uint16_t tP = (temperature - tI) * 10000;
 				stream << "T= " << tI << ".";
@@ -84,7 +84,7 @@ public:
 private:
 	bool result;
 	xpcc::Timeout<> timer;
-	uint8_t temperatureData[2];
+    xpcc::tmp102::Data temperatureData;
 	xpcc::Tmp102<MyI2cMaster> temp;
 };
 
