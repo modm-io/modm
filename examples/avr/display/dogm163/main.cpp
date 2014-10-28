@@ -14,7 +14,7 @@ namespace lcd
 	typedef GpioOutputD3 Rs;
 }
 
-typedef xpcc::SoftwareSpiMaster< lcd::Scl, lcd::Mosi, lcd::Miso > SPI;
+typedef xpcc::SoftwareSpiSimpleMaster< lcd::Scl, lcd::Mosi, lcd::Miso > SPI;
 
 xpcc::DogM163< SPI, lcd::Cs, lcd::Rs > display;
 

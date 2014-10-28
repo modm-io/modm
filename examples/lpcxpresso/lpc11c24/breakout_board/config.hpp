@@ -50,7 +50,7 @@ namespace ssd
 	GPIO__OUTPUT(Pwm,  1, 1);
 
 	// software SPI, write only
-//	typedef xpcc::SoftwareSpiMaster<spi::Sck, spi::Mosi, xpcc::GpioUnused, 2000000> Spi;
+//	typedef xpcc::SoftwareSpiSimpleMaster<spi::Sck, spi::Mosi, xpcc::GpioUnused, 2000000> Spi;
 
 	// Hardware SPI1
 	typedef xpcc::lpc::SpiMaster1 Spi;

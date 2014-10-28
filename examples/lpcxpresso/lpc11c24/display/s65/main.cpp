@@ -35,7 +35,7 @@ namespace spi
 #ifdef USE_HARDWARE_SPI
 typedef xpcc::lpc::SpiMaster0 SpiDisplay;
 #else
-typedef xpcc::SoftwareSpiMaster<spi::Sck, spi::Mosi, xpcc::GpioUnused, 2000000> SpiDisplay;
+typedef xpcc::SoftwareSpiSimpleMaster<spi::Sck, spi::Mosi, xpcc::GpioUnused, 2000000> SpiDisplay;
 #endif
 
 //typedef xpcc::SiemensS65Portrait<SpiDisplay, lcd::Cs, lcd::Rs, lcd::Reset> Display;

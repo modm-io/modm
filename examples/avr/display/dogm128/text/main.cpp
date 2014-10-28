@@ -24,7 +24,7 @@ namespace lcd
 	typedef GpioOutputD4 Reset;
 }
 
-typedef xpcc::SoftwareSpiMaster< lcd::Scl, lcd::Mosi, lcd::Miso > SPI;
+typedef xpcc::SoftwareSpiSimpleMaster< lcd::Scl, lcd::Mosi, lcd::Miso > SPI;
 
 xpcc::DogM128< SPI, lcd::Cs, lcd::A0, lcd::Reset, true > display;
 
