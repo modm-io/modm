@@ -157,7 +157,7 @@ initTouchscreen()
 	GpioInputB14::connect(SpiSimpleMaster2::Miso);
 	GpioOutputB15::connect(SpiSimpleMaster2::Mosi);
 
-	SpiSimpleMaster2::initialize<defaultSystemClock, MHz1/2>();
+	SpiSimpleMaster2::initialize<defaultSystemClock, 656250ul>();
 	SpiSimpleMaster2::setDataMode(SpiSimpleMaster2::DataMode::Mode0);
 
 }
@@ -385,20 +385,20 @@ test_callback(const xpcc::gui::InputEvent& ev, xpcc::gui::Widget* w, void* data)
 }
 
 
-xpcc::gui::ColorPalette colorpalette[xpcc::gui::Color::PALETTE_SIZE] = {
-	xpcc::glcd::Color::black(),
-	xpcc::glcd::Color::white(),
-	xpcc::glcd::Color::gray(),
-	xpcc::glcd::Color::red(),
-	xpcc::glcd::Color::green(),
-	xpcc::glcd::Color::blue(),
-	xpcc::glcd::Color::blue(),		// BORDER
-	xpcc::glcd::Color::red(),		// TEXT
-	xpcc::glcd::Color::black(),		// BACKGROUND
-	xpcc::glcd::Color::red(),		// ACTIVATED
-	xpcc::glcd::Color::blue(),		// DEACTIVATED
-
-};
+//xpcc::gui::ColorPalette colorpalette[xpcc::gui::Color::PALETTE_SIZE] = {
+//	xpcc::glcd::Color::black(),
+//	xpcc::glcd::Color::white(),
+//	xpcc::glcd::Color::gray(),
+//	xpcc::glcd::Color::red(),
+//	xpcc::glcd::Color::green(),
+//	xpcc::glcd::Color::blue(),
+//	xpcc::glcd::Color::blue(),		// BORDER
+//	xpcc::glcd::Color::red(),		// TEXT
+//	xpcc::glcd::Color::black(),		// BACKGROUND
+//	xpcc::glcd::Color::red(),		// ACTIVATED
+//	xpcc::glcd::Color::blue(),		// DEACTIVATED
+//
+//};
 
 /*
  * empirically found calibration points
@@ -438,14 +438,14 @@ MAIN_FUNCTION
 	 * manipulate the color palette
 	 */
 
-	colorpalette[xpcc::gui::Color::TEXT] = xpcc::glcd::Color::yellow();
+//	colorpalette[xpcc::gui::Color::TEXT] = xpcc::glcd::Color::yellow();
 
 
 	/*
 	 * Create a view and some widgets
 	 */
 
-	xpcc::gui::View myView(&tft, colorpalette, &input_queue);
+//	xpcc::gui::View myView(&tft, colorpalette, &input_queue);
 
 	xpcc::gui::ButtonWidget toggleLedButton((char*)"Toggle Green", xpcc::gui::Dimension(100, 50));
 	xpcc::gui::ButtonWidget doNothingButton((char*)"Do nothing", xpcc::gui::Dimension(100, 50));
@@ -464,9 +464,9 @@ MAIN_FUNCTION
 	 * place widgets in view
 	 */
 
-	myView.pack(&toggleLedButton, xpcc::glcd::Point(110, 10));
-	myView.pack(&doNothingButton, xpcc::glcd::Point(110, 80));
-	myView.pack(&rocker1, xpcc::glcd::Point(60, 200));
+//	myView.pack(&toggleLedButton, xpcc::glcd::Point(110, 10));
+//	myView.pack(&doNothingButton, xpcc::glcd::Point(110, 80));
+//	myView.pack(&rocker1, xpcc::glcd::Point(60, 200));
 
 	/*
 	 * main loop
@@ -480,7 +480,7 @@ MAIN_FUNCTION
 		updateAsyncEvents();
 
 		// update view
-		myView.run();
+//		myView.run();
 
 		/*
 		 * display an arbitrary image
