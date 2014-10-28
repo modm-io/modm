@@ -5,6 +5,7 @@
 #include <xpcc/processing/periodic_timer.hpp>
 
 using namespace xpcc::atmega;
+typedef xpcc::avr::SystemClock clock;
 
 typedef GpioOutputB0 LedGreen;
 typedef GpioOutputB1 LedRed;
@@ -16,7 +17,7 @@ typedef GpioOutputB7 Sclk;
 typedef GpioOutputB5 Mosi;
 typedef GpioInputB6 Miso;
 
-typedef xpcc::SoftwareSpiMaster<Sclk, Mosi, Miso> SPI;
+typedef xpcc::SoftwareSpiSimpleMaster<Sclk, Mosi, Miso> SPI;
 
 xpcc::Mcp2515<SPI, Cs, Int> mcp2515;
 
@@ -36,7 +37,7 @@ FLASH_STORAGE(uint8_t canFilter[]) =
 };
 
 // Create a new UART object and configure it to a baudrate of 115200
-Uart0 uart(115200);
+Uart0 uart;
 
 // timer interrupt routine
 ISR(TIMER2_COMPA_vect)
@@ -56,6 +57,10 @@ main()
 	TCCR2B = (1 << CS22);
 	TIMSK2 = (1 << OCIE2A);
 	OCR2A = 230;
+    
+    GpioOutputD1::connect(Uart0::Tx);
+    GpioInputD0::connect(Uart0::Rx);
+    Uart0::initialize<clock, 115200>();
 
 	// Create a IOStream for complex formatting tasks
 	xpcc::IODeviceWrapper<Uart0> device(uart);
@@ -68,12 +73,13 @@ main()
 
 	// Initialize SPI interface and the other pins
 	// needed by the MCP2515
-	SPI::initialize();
-	Cs::setOutput();
-	Int::setInput(Gpio::Configuration::PullUp);
+	SPI::initialize<clock, 1000000>();
+    Cs::setOutput();
+	Int::setInput(Gpio::InputType::PullUp);
 
 	// Configure MCP2515 and set the filters
-	mcp2515.initialize(xpcc::can::BITRATE_125_KBPS);
+    // Fixme: xpcc::Can::Bitrate is incompatitlbe with device driver
+//	mcp2515.initialize(xpcc::can::BITRATE_125_KBPS);
 	mcp2515.setFilter(xpcc::accessor::asFlash(canFilter));
 
 	// Create a new message
