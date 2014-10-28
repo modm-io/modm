@@ -44,20 +44,20 @@ xpcc::St7565<SPI, CS, A0, Reset, Width, Height, TopView>::update()
 	{
 		// command mode
 		a0.reset();
-		spi.write(ST7565_PAGE_ADDRESS | y);		// Row select
-		spi.write(ST7565_COL_ADDRESS_MSB);		// Column select high
+		spi.writeReadBlocking(ST7565_PAGE_ADDRESS | y);		// Row select
+		spi.writeReadBlocking(ST7565_COL_ADDRESS_MSB);		// Column select high
 		
 		if (TopView) {
-			spi.write(ST7565_COL_ADDRESS_LSB | 4);	// Column select low
+			spi.writeReadBlocking(ST7565_COL_ADDRESS_LSB | 4);	// Column select low
 		}
 		else {
-			spi.write(ST7565_COL_ADDRESS_LSB);	// Column select low
+			spi.writeReadBlocking(ST7565_COL_ADDRESS_LSB);	// Column select low
 		}
 		
 		// switch to data mode
 		a0.set();
 		for(uint8_t x = 0; x < Width; ++x) {
-			spi.write(this->buffer[x][y]);
+			spi.writeReadBlocking(this->buffer[x][y]);
 		}
 	}
 	cs.set();
@@ -71,10 +71,10 @@ xpcc::St7565<SPI, CS, A0, Reset, Width, Height, TopView>::setInvert(bool invert)
 	a0.reset();
 	
 	if (invert) {
-		spi.write(ST7565_REVERSE);
+		spi.writeReadBlocking(ST7565_REVERSE);
 	}
 	else {
-		spi.write(ST7565_NORMAL);
+		spi.writeReadBlocking(ST7565_NORMAL);
 	}
 	cs.set();
 }
@@ -102,16 +102,16 @@ xpcc::St7565<SPI, CS, A0, Reset, Width, Height, TopView>::initialize(
 	
 	// View direction
 	if (TopView) {
-		spi.write(ST7565_ADC_NORMAL);		// ADC normal
-		spi.write(ST7565_SCAN_DIR_REVERSE);	// reverse COM0~COM63
+		spi.writeReadBlocking(ST7565_ADC_NORMAL);		// ADC normal
+		spi.writeReadBlocking(ST7565_SCAN_DIR_REVERSE);	// reverse COM0~COM63
 	}
 	else {
-		spi.write(ST7565_ADC_REVERSE);
-		spi.write(ST7565_SCAN_DIR_NORMAL);
+		spi.writeReadBlocking(ST7565_ADC_REVERSE);
+		spi.writeReadBlocking(ST7565_SCAN_DIR_NORMAL);
 	}
 	
 	for (uint8_t i = 0; i < size; ++i) {
-		spi.write(configuration[i]);
+		spi.writeReadBlocking(configuration[i]);
 	}
 	
 	cs.set();
