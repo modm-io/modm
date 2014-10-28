@@ -3,9 +3,9 @@
 
 #if !defined(STM32F3XX)
 // Not yet implemented for STM32 F3 series
-xpcc::stm32::Usart1             uart1(115200);
-xpcc::stm32::BufferedUsart2     uart2(115200, 15);
-xpcc::stm32::BufferedFlowUsart3 uart3(115200, 15);
+//xpcc::stm32::Usart1             uart1(115200);
+//xpcc::stm32::BufferedUsart2     uart2(115200, 15);
+//xpcc::stm32::BufferedFlowUsart3 uart3(115200, 15);
 #endif
 
 #if defined(STM32F10X_HD) || \
@@ -14,17 +14,17 @@ xpcc::stm32::BufferedFlowUsart3 uart3(115200, 15);
 	defined(STM32F2XX)    || \
 	defined(STM32F4XX)
 
-xpcc::stm32::Uart4          uart4(115200);
-xpcc::stm32::BufferedUart5  uart5(115200, 15);
+//xpcc::stm32::Uart4          uart4(115200);
+//xpcc::stm32::BufferedUart5  uart5(115200, 15);
 #endif
 
 #if defined(STM32F2XX) || defined(STM32F4XX)
-xpcc::stm32::BufferedFlowUsart6 uart6(115200, 15);
+//xpcc::stm32::BufferedFlowUsart6 uart6(115200, 15);
 #endif
 
-GPIO__OUTPUT(Out, A, 0);
-GPIO__INPUT(In, A, 1);
-GPIO__IO(Io, A, 2);
+typedef xpcc::stm32::GpioOutputA0 Out;
+typedef xpcc::stm32::GpioInputA1  In;
+typedef xpcc::stm32::GpioA2       Io;
 
 int
 main(void)
@@ -44,9 +44,9 @@ main(void)
 	Io::read();
 	
 #if !defined(STM32F3XX)
-	uart1.write('x');
-	uart2.write('x');
-	uart3.write('x');
+//	uart1.write('x');
+//	uart2.write('x');
+//	uart3.write('x');
 #endif
 
 #if defined(STM32F10X_HD) || \
@@ -55,12 +55,12 @@ main(void)
 	defined(STM32F2XX)    || \
 	defined(STM32F4XX)
 
-	uart4.write('x');
-	uart5.write('x');
+//	uart4.write('x');
+//	uart5.write('x');
 #endif
 
 #if defined(STM32F2XX) || defined(STM32F4XX)
-	uart6.write('x');
+//	uart6.write('x');
 #endif
 
 	while (1)

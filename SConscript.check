@@ -34,39 +34,39 @@ import string
 Import('env')
 
 devices = [
-	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega16',		'clock':   1000000 },
-	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega16a',		'clock':   1000000 },
-	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega644',		'clock':   1000000 },
-	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega8',		'clock':   1000000 },
-	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega168',		'clock':   1000000 },
-	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega328p',		'clock':   1000000 },
-	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega128',		'clock':   1000000 },
-	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega2561',		'clock':   1000000 },
-	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega2560',		'clock':   1000000 },
-	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'at90can128',		'clock':  16000000 },
-	{ 'path': 'release/tests/attiny',	'arch': 'avr',			'device': 'attiny44',		'clock':   1000000 },
-	{ 'path': 'release/tests/attiny',	'arch': 'avr',			'device': 'attiny45',		'clock':   1000000 },
-	{ 'path': 'release/tests/attiny',	'arch': 'avr',			'device': 'attiny26',		'clock':   1000000 },
-	{ 'path': 'release/tests/attiny',	'arch': 'avr',			'device': 'attiny2313',		'clock':   1000000 },
-	{ 'path': 'release/tests/atxmega',	'arch': 'avr',			'device': 'atxmega128a1',	'clock':   1000000 },
-	{ 'path': 'release/tests/atxmega',	'arch': 'avr',			'device': 'atxmega192a3',	'clock':   1000000 },
-	{ 'path': 'release/tests/atxmega',	'arch': 'avr',			'device': 'atxmega32a4',	'clock':   1000000 },
+#	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega16',		'clock':   1000000 },
+#	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega16a',		'clock':   1000000 },
+#	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega644',		'clock':   1000000 },
+#	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega8',		'clock':   1000000 },
+#	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega168',		'clock':   1000000 },
+#	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega328p',		'clock':   1000000 },
+#	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega128',		'clock':   1000000 },
+#	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega2561',		'clock':   1000000 },
+#	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega2560',		'clock':   1000000 },
+#	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'at90can128',		'clock':  16000000 },
+#	{ 'path': 'release/tests/attiny',	'arch': 'avr',			'device': 'attiny44',		'clock':   1000000 },
+#	{ 'path': 'release/tests/attiny',	'arch': 'avr',			'device': 'attiny45',		'clock':   1000000 },
+#	{ 'path': 'release/tests/attiny',	'arch': 'avr',			'device': 'attiny26',		'clock':   1000000 },
+#	{ 'path': 'release/tests/attiny',	'arch': 'avr',			'device': 'attiny2313',		'clock':   1000000 },
+#	{ 'path': 'release/tests/atxmega',	'arch': 'avr',			'device': 'atxmega128a1',	'clock':   1000000 },
+#	{ 'path': 'release/tests/atxmega',	'arch': 'avr',			'device': 'atxmega192a3',	'clock':   1000000 },
+#	{ 'path': 'release/tests/atxmega',	'arch': 'avr',			'device': 'atxmega32a4',	'clock':   1000000 },
 #	{ 'path': 'release/tests/lpc',		'arch': 'cortex-m0',	'device': 'lpc1112_301',	'clock':  12000000 },
 #	{ 'path': 'release/tests/lpc',		'arch': 'cortex-m0',	'device': 'lpc1114_301',	'clock':  12000000 },
 #	{ 'path': 'release/tests/lpc',		'arch': 'cortex-m0',	'device': 'lpc11c22_301',	'clock':  48000000 },
 #	{ 'path': 'release/tests/lpc',		'arch': 'cortex-m0',	'device': 'lpc11c24_301',	'clock':  48000000 },
 #	{ 'path': 'release/tests/lpc',		'arch': 'cortex-m3',	'device': 'lpc1343',		'clock':  12000000 },
 #	{ 'path': 'release/tests/lpc',		'arch': 'cortex-m3',	'device': 'lpc1769',		'clock':   8000000 },
-##	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f103t4',	'clock':  72000000 },	# low density
-	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f103rb',	'clock':  72000000 },	# medium density
-	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f103ze',	'clock':  72000000 },	# high density
-	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f103rg',	'clock':  72000000 },	# xl density
-	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f107vc',	'clock':  72000000 },	# connectivity
-	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f205ve',	'clock': 120000000 },
-	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f207ze',	'clock': 120000000 },
+#	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f103t4',	'clock':  72000000 },	# low density
+#	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f103rb',	'clock':  72000000 },	# medium density
+#	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f103ze',	'clock':  72000000 },	# high density
+#	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f103rg',	'clock':  72000000 },	# xl density
+#	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f107vc',	'clock':  72000000 },	# connectivity
+#	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f205ve',	'clock': 120000000 },
+#	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f207ze',	'clock': 120000000 },
 	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m4',	'device': 'stm32f303cb',	'clock':  72000000 },
 	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m4',	'device': 'stm32f303cc',	'clock':  72000000 },
-	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m4',	'device': 'stm32f405vg',	'clock': 168000000 },
+#	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m4',	'device': 'stm32f405vg',	'clock': 168000000 },
 	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m4',	'device': 'stm32f407vg',	'clock': 168000000 },
 ]
 
