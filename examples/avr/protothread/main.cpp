@@ -5,8 +5,8 @@
 
 using namespace xpcc::atmega;
 
-GPIO__OUTPUT(LedGreen, B, 0);
-GPIO__OUTPUT(LedRed, B, 1);
+typedef GpioOutputB0 LedGreen;
+typedef GpioOutputB1 LedRed;
 
 class BlinkingLightGreen : public xpcc::pt::Protothread
 {
