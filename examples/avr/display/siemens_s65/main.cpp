@@ -3,16 +3,18 @@
 #include <xpcc/driver/display.hpp>
 #include <xpcc/ui/button_group.hpp>
 
-typedef GpioOutputE5 Mosi;
-typedef GpioOutputE7 Sck;
+using namespace xpcc::atmega;
+
+typedef GpioOutputA0 Mosi;
+typedef GpioOutputA1 Sck;
 typedef xpcc::SoftwareSpiSimpleMaster<Sck, Mosi, xpcc::GpioUnused> SPI;
 
-typedef GpioOutputE2 Cs;
-typedef GpioOutputE3 Rs;
-typedef GpioOutputK3 Reset;
+typedef GpioOutputA2 Cs;
+typedef GpioOutputA3 Rs;
+typedef GpioOutputA4 Reset;
 typedef xpcc::SiemensS65Portrait<SPI, Cs, Rs, Reset> Display;
 
-typedef GpioOutputF0 Backlight;
+typedef GpioOutputA5 Backlight;
 
 MAIN_FUNCTION
 {
