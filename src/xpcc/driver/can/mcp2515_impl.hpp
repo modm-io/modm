@@ -63,7 +63,7 @@ xpcc::Mcp2515<SPI, CS, INT>::initialize(Can::Bitrate bitrate)
 	// software reset for the mcp2515, after this the chip is back in the
 	// configuration mode
 	chipSelect.reset();
-	spi.write(RESET);
+	spi.writeReadBlocking(RESET);
 	xpcc::delayMilliseconds(1);
 	chipSelect.set();
 
@@ -71,18 +71,18 @@ xpcc::Mcp2515<SPI, CS, INT>::initialize(Can::Bitrate bitrate)
 	xpcc::delayMilliseconds(30);
 
 	chipSelect.reset();
-	spi.write(WRITE);
-	spi.write(CNF3);
+	spi.writeReadBlocking(WRITE);
+	spi.writeReadBlocking(CNF3);
 
 	accessor::Flash<uint8_t> cfgPtr(mcp2515::configuration);
 	for (uint8_t i = 0; i < 3; ++i)
 	{
 		// load CNF1..3
-		spi.write(cfgPtr[static_cast<uint8_t>(bitrate) * 3 + i]);
+		spi.writeReadBlocking(cfgPtr[static_cast<uint8_t>(bitrate) * 3 + i]);
 	}
 
 	// enable interrupts
-	spi.write(RX1IE | RX0IE);
+	spi.writeReadBlocking(RX1IE | RX0IE);
 	chipSelect.set();
 
 	// set TXnRTS pins as inwrites
@@ -127,15 +127,15 @@ xpcc::Mcp2515<SPI, CS, INT>::setFilter(accessor::Flash<uint8_t> filter)
 	for (i = 0; i < 0x30; i += 0x10)
 	{
 		chipSelect.reset();
-		spi.write(WRITE);
-		spi.write(i);
+		spi.writeReadBlocking(WRITE);
+		spi.writeReadBlocking(i);
 
 		for (j = 0; j < 12; j++)
 		{
 			if (i == 0x20 && j >= 0x08)
 				break;
 
-			spi.write(*filter++);
+			spi.writeReadBlocking(*filter++);
 		}
 		chipSelect.set();
 	}
@@ -194,7 +194,7 @@ xpcc::Mcp2515<SPI, CS, INT>::getMessage(can::Message& message)
 	}
 
 	chipSelect.reset();
-	spi.write(address);
+	spi.writeReadBlocking(address);
 
 	message.flags.extended = readIdentifier(message.identifier);
 	if (status & FLAG_RTR) {
@@ -203,10 +203,10 @@ xpcc::Mcp2515<SPI, CS, INT>::getMessage(can::Message& message)
 	else {
 		message.flags.rtr = false;
 	}
-	message.length = spi.write(0xff) & 0x0f;
+	message.length = spi.writeReadBlocking(0xff) & 0x0f;
 
 	for (uint8_t i = 0; i < message.length; ++i) {
-		message.data[i] = spi.write(0xff);
+		message.data[i] = spi.writeReadBlocking(0xff);
 	}
 	chipSelect.set();
 
@@ -265,18 +265,18 @@ xpcc::Mcp2515<SPI, CS, INT>::sendMessage(const can::Message& message)
 	}
 
 	chipSelect.reset();
-	spi.write(WRITE_TX | address);
+	spi.writeReadBlocking(WRITE_TX | address);
 	writeIdentifier(message.identifier, message.flags.extended);
 
 	// if the message is a rtr-frame, is has a length but no attached data
 	if (message.flags.rtr) {
-		spi.write(MCP2515_RTR | message.length);
+		spi.writeReadBlocking(MCP2515_RTR | message.length);
 	}
 	else {
-		spi.write(message.length);
+		spi.writeReadBlocking(message.length);
 
 		for (uint8_t i = 0; i < message.length; ++i) {
-			spi.write(message.data[i]);
+			spi.writeReadBlocking(message.data[i]);
 		}
 	}
 	chipSelect.set();
@@ -286,7 +286,7 @@ xpcc::Mcp2515<SPI, CS, INT>::sendMessage(const can::Message& message)
 	// send message via RTS command
 	chipSelect.reset();
 	address = (address == 0) ? 1 : address;	// 0 2 4 => 1 2 4
-	spi.write(RTS | address);
+	spi.writeReadBlocking(RTS | address);
 	chipSelect.set();
 
 	return address;
@@ -300,9 +300,9 @@ xpcc::Mcp2515<SPI, CS, INT>::writeRegister(uint8_t address, uint8_t data)
 {
 	chipSelect.reset();
 
-	spi.write(WRITE);
-	spi.write(address);
-	spi.write(data);
+	spi.writeReadBlocking(WRITE);
+	spi.writeReadBlocking(address);
+	spi.writeReadBlocking(data);
 
 	chipSelect.set();
 }
@@ -313,9 +313,9 @@ xpcc::Mcp2515<SPI, CS, INT>::readRegister(uint8_t address)
 {
 	chipSelect.reset();
 
-	spi.write(READ);
-	spi.write(address);
-	uint8_t data = spi.write(0xff);
+	spi.writeReadBlocking(READ);
+	spi.writeReadBlocking(address);
+	uint8_t data = spi.writeReadBlocking(0xff);
 
 	chipSelect.set();
 
@@ -328,10 +328,10 @@ xpcc::Mcp2515<SPI, CS, INT>::bitModify(uint8_t address, uint8_t mask, uint8_t da
 {
 	chipSelect.reset();
 
-	spi.write(BIT_MODIFY);
-	spi.write(address);
-	spi.write(mask);
-	spi.write(data);
+	spi.writeReadBlocking(BIT_MODIFY);
+	spi.writeReadBlocking(address);
+	spi.writeReadBlocking(mask);
+	spi.writeReadBlocking(data);
 
 	chipSelect.set();
 }
@@ -342,8 +342,8 @@ xpcc::Mcp2515<SPI, CS, INT>::readStatus(uint8_t type)
 {
 	chipSelect.reset();
 
-	spi.write(type);
-	uint8_t data = spi.write(0xff);
+	spi.writeReadBlocking(type);
+	uint8_t data = spi.writeReadBlocking(0xff);
 
 	chipSelect.set();
 
@@ -363,7 +363,7 @@ xpcc::Mcp2515<SPI, CS, INT>::writeIdentifier(const uint32_t& identifier,
 
 	if (isExtendedFrame)
 	{
-		spi.write(*((uint16_t *) ptr + 1) >> 5);
+		spi.writeReadBlocking(*((uint16_t *) ptr + 1) >> 5);
 
 		// calculate the next values
 		uint8_t temp;
@@ -371,16 +371,16 @@ xpcc::Mcp2515<SPI, CS, INT>::writeIdentifier(const uint32_t& identifier,
 		temp |= MCP2515_IDE;
 		temp |= (*((uint8_t *) ptr + 2)) & 0x03;
 
-		spi.write(temp);
-		spi.write(*((uint8_t *) ptr + 1));
-		spi.write(*((uint8_t *) ptr));
+		spi.writeReadBlocking(temp);
+		spi.writeReadBlocking(*((uint8_t *) ptr + 1));
+		spi.writeReadBlocking(*((uint8_t *) ptr));
 	}
 	else
 	{
-		spi.write(*((uint16_t *) ptr) >> 3);
-		spi.write(*((uint8_t *) ptr) << 5);
-		spi.write(0);
-		spi.write(0);
+		spi.writeReadBlocking(*((uint16_t *) ptr) >> 3);
+		spi.writeReadBlocking(*((uint8_t *) ptr) << 5);
+		spi.writeReadBlocking(0);
+		spi.writeReadBlocking(0);
 	}
 }
 
@@ -392,31 +392,31 @@ xpcc::Mcp2515<SPI, CS, INT>::readIdentifier(uint32_t& identifier)
 
 	uint32_t *ptr = &identifier;
 
-	uint8_t first  = spi.write(0xff);
-	uint8_t second = spi.write(0xff);
+	uint8_t first  = spi.writeReadBlocking(0xff);
+	uint8_t second = spi.writeReadBlocking(0xff);
 
 	if (second & MCP2515_IDE)
 	{
 		*((uint16_t *) ptr + 1)  = (uint16_t) first << 5;
-		*((uint8_t *)  ptr + 1)  = spi.write(0xff);
+		*((uint8_t *)  ptr + 1)  = spi.writeReadBlocking(0xff);
 
 		*((uint8_t *)  ptr + 2) |= (second >> 3) & 0x1C;
 		*((uint8_t *)  ptr + 2) |=  second & 0x03;
 
-		*((uint8_t *)  ptr)      = spi.write(0xff);
+		*((uint8_t *)  ptr)      = spi.writeReadBlocking(0xff);
 
 		return true;
 	}
 	else
 	{
-		spi.write(0xff);
+		spi.writeReadBlocking(0xff);
 
 		*((uint8_t *)  ptr + 3) = 0;
 		*((uint8_t *)  ptr + 2) = 0;
 
 		*((uint16_t *) ptr) = (uint16_t) first << 3;
 
-		spi.write(0xff);
+		spi.writeReadBlocking(0xff);
 
 		*((uint8_t *) ptr) |= second >> 5;
 
