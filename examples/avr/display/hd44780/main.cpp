@@ -12,9 +12,9 @@ namespace lcd
 	typedef GpioOutputC5 Rw;
 	typedef GpioOutputC4 Rs;
 	// note: an 8bit data port
-	typedef GpioPortC<0,8> Data8Bit;
+	typedef GpioPort<GpioOutputC0, 8> Data8Bit;
 	// and a 4 bit data port
-	typedef GpioPortC<4,4> Data4Bit;
+	typedef GpioPort<GpioOutputC4, 4> Data4Bit;
 }
 
 // You can choose either port width simply by using it.
