@@ -135,7 +135,7 @@ namespace xpcc
 	template < typename SPI,
 			   typename CS,
 			   typename INT >
-	class Mcp2515
+    class Mcp2515 : public ::xpcc::Can
 	{
 	public:
 		static bool
