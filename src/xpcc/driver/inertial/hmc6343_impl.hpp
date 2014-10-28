@@ -28,9 +28,9 @@ xpcc::Hmc6343<I2cMaster>::ping(void *ctx)
 {
 	CO_BEGIN(ctx);
 
-	CO_WAIT_UNTIL(adapter.configurePing() && this->startTransaction(&adapter));
+	CO_WAIT_UNTIL(adapter.configurePing() &&
+			(i2cTask = I2cTask::Ping, this->startTransaction(&adapter)));
 
-	i2cTask = I2cTask::Ping;
 	CO_WAIT_WHILE(i2cTask == I2cTask::Ping);
 
 	CO_END_RETURN(i2cSuccess == I2cTask::Ping);
@@ -47,11 +47,10 @@ xpcc::Hmc6343<I2cMaster>::writeCommand(void *ctx, Command command, uint16_t time
 
 	buffer[0] = i(command);
 	CO_WAIT_UNTIL(
-			this->timeout.isExpired() &&
-			adapter.configureWrite(buffer, 1) && this->startTransaction(&adapter)
+			this->timeout.isExpired() && adapter.configureWrite(buffer, 1) &&
+			(i2cTask = i(command) + I2cTask::PostCommandBase, this->startTransaction(&adapter))
 	);
 
-	i2cTask = i(command) + I2cTask::PostCommandBase;
 	this->timeout.restart(timeout);
 	CO_WAIT_WHILE(i2cTask == (i(command) + I2cTask::PostCommandBase));
 
@@ -70,11 +69,10 @@ xpcc::Hmc6343<I2cMaster>::writeRegister(void *ctx, Register reg, uint8_t value)
 	buffer[2] = value;
 
 	CO_WAIT_UNTIL(
-			timeout.isExpired() &&
-			adapter.configureWrite(buffer, 3) && this->startTransaction(&adapter)
+			timeout.isExpired() && adapter.configureWrite(buffer, 3) &&
+			(i2cTask = i(reg) + I2cTask::WriteEepromBase, this->startTransaction(&adapter))
 	);
 
-	i2cTask = i(reg) + I2cTask::WriteEepromBase;
 	timeout.restart(10);
 	CO_WAIT_WHILE(i2cTask == (i(reg) + I2cTask::WriteEepromBase));
 
@@ -109,22 +107,20 @@ xpcc::Hmc6343<I2cMaster>::readRegister(void *ctx, Register reg, uint8_t &value)
 	buffer[0] = i(Command::ReadEeprom);
 	buffer[1] = i(reg);
 	CO_WAIT_UNTIL(
-			timeout.isExpired() &&
-			adapter.configureWrite(buffer, 2) && this->startTransaction(&adapter)
+			timeout.isExpired() && adapter.configureWrite(buffer, 2) &&
+			(i2cTask = i(reg) + I2cTask::PostEepromBase, this->startTransaction(&adapter))
 	);
 
-	i2cTask = i(reg) + I2cTask::PostEepromBase;
 	timeout.restart(10);
 	CO_WAIT_WHILE(i2cTask == (i(reg) + I2cTask::PostEepromBase));
 
 	if(i2cSuccess == (i(reg) + I2cTask::PostEepromBase))
 	{
 		CO_WAIT_UNTIL(
-				timeout.isExpired() &&
-				adapter.configureRead(&value, 1) && this->startTransaction(&adapter)
+				timeout.isExpired() && adapter.configureRead(&value, 1) &&
+				(i2cTask = i(reg) + I2cTask::ReadEepromBase, this->startTransaction(&adapter))
 		);
 
-		i2cTask = i(reg) + I2cTask::ReadEepromBase;
 		CO_WAIT_WHILE(i2cTask == (i(reg) + I2cTask::ReadEepromBase));
 
 		if (i2cSuccess == (i(reg) + I2cTask::ReadEepromBase))
@@ -168,11 +164,10 @@ xpcc::Hmc6343<I2cMaster>::readPostData(void *ctx, Command command, uint8_t offse
 	if (CO_CALL(writeCommand(ctx, command, 1)))
 	{
 		CO_WAIT_UNTIL(
-				timeout.isExpired() &&
-				adapter.configureRead(data.getPointer() + offset, readSize) && this->startTransaction(&adapter)
+				timeout.isExpired() && adapter.configureRead(data.getPointer() + offset, readSize) &&
+				(i2cTask = i(command) + I2cTask::ReadCommandBase, this->startTransaction(&adapter))
 		);
 
-		i2cTask = i(command) + I2cTask::ReadCommandBase;
 		CO_WAIT_WHILE(i2cTask == (i(command) + I2cTask::ReadCommandBase));
 
 		if (i2cSuccess == (i(command) + I2cTask::ReadCommandBase))

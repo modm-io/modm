@@ -29,9 +29,9 @@ xpcc::Ssd1306<I2cMaster>::ping(void *ctx)
 {
 	CO_BEGIN(ctx);
 
-	CO_WAIT_UNTIL(adapter.configurePing() && this->startTransaction(&adapter));
+	CO_WAIT_UNTIL(adapter.configurePing() &&
+			(i2cTask = I2cTask::Ping, this->startTransaction(&adapter)));
 
-	i2cTask = I2cTask::Ping;
 	CO_WAIT_WHILE(i2cTask == I2cTask::Ping);
 
 	CO_END_RETURN(i2cSuccess == I2cTask::Ping);
@@ -74,9 +74,9 @@ xpcc::Ssd1306<I2cMaster>::startWriteDisplay(void *ctx)
 {
 	CO_BEGIN(ctx);
 
-	CO_WAIT_UNTIL(adapterData.configureWrite(buffer, 1024) && this->startTransaction(&adapterData));
+	CO_WAIT_UNTIL(adapterData.configureWrite(buffer, 1024) &&
+			(i2cTask = I2cTask::WriteDisplay, this->startTransaction(&adapterData)));
 
-	i2cTask = I2cTask::WriteDisplay;
 	CO_END();
 }
 
@@ -194,12 +194,8 @@ template < class I2cMaster >
 bool
 xpcc::Ssd1306<I2cMaster>::startTransactionWithLength(uint8_t length)
 {
-	if (adapter.configureWrite(commandBuffer, length) && this->startTransaction(&adapter))
-	{
-		i2cTask = commandBuffer[1];
-		return true;
-	}
-	return false;
+	return (adapter.configureWrite(commandBuffer, length) &&
+			(i2cTask = commandBuffer[1], this->startTransaction(&adapter)));
 }
 
 // ----------------------------------------------------------------------------

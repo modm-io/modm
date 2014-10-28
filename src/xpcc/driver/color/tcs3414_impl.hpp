@@ -57,9 +57,9 @@ xpcc::Tcs3414<I2cMaster>::ping(void *ctx)
 {
 	CO_BEGIN(ctx);
 
-	CO_WAIT_UNTIL(adapter.configurePing() && this->startTransaction(&adapter));
+	CO_WAIT_UNTIL(adapter.configurePing() &&
+			(i2cTask = I2cTask::Ping, this->startTransaction(&adapter)));
 
-	i2cTask = I2cTask::Ping;
 	CO_WAIT_WHILE(i2cTask == I2cTask::Ping);
 
 	CO_END_RETURN(i2cSuccess == I2cTask::Ping);
@@ -127,10 +127,9 @@ xpcc::Tcs3414<I2cMaster>::writeRegister(
 
 	CO_WAIT_UNTIL(
 			adapter.configureWrite(commandBuffer, 3) &&
-			this->startTransaction(&adapter)
+			(i2cTask = I2cTask::WriteRegister, this->startTransaction(&adapter))
 	);
 
-	i2cTask = I2cTask::WriteRegister;
 	CO_WAIT_WHILE(i2cTask == I2cTask::WriteRegister);
 
 	CO_END_RETURN(i2cSuccess == I2cTask::WriteRegister);
@@ -153,10 +152,9 @@ xpcc::Tcs3414<I2cMaster>::readRegisters(
 
 	CO_WAIT_UNTIL(
 			adapter.configureWriteRead(commandBuffer, 1, values, count) &&
-			this->startTransaction(&adapter)
+			(i2cTask = I2cTask::ReadRegister, this->startTransaction(&adapter))
 	);
 
-	i2cTask = I2cTask::ReadRegister;
 	CO_WAIT_WHILE(i2cTask == I2cTask::ReadRegister);
 
 	CO_END_RETURN(i2cSuccess == I2cTask::ReadRegister);

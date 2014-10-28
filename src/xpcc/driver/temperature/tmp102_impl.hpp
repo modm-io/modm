@@ -54,9 +54,9 @@ xpcc::Tmp102<I2cMaster>::ping(void *ctx)
 {
 	CO_BEGIN(ctx);
 
-	CO_WAIT_UNTIL(adapter.configurePing() && this->startTransaction(&adapter));
+	CO_WAIT_UNTIL(adapter.configurePing() &&
+			(i2cTask = I2cTask::Ping, this->startTransaction(&adapter)));
 
-	i2cTask = I2cTask::Ping;
 	CO_WAIT_WHILE(i2cTask == I2cTask::Ping);
 
 	CO_END_RETURN(i2cSuccess == I2cTask::Ping);
@@ -164,12 +164,9 @@ xpcc::Tmp102<I2cMaster>::readTemperature(void *ctx)
 	CO_BEGIN(ctx);
 
 	buffer[0] = REGISTER_TEMPERATURE;
-	CO_WAIT_UNTIL(
-			adapter.configureWriteRead(buffer, 1, data.getPointer(), 2) &&
-			this->startTransaction(&adapter)
-	);
+	CO_WAIT_UNTIL(adapter.configureWriteRead(buffer, 1, data.getPointer(), 2) &&
+			(i2cTask = I2cTask::ReadTemperature, this->startTransaction(&adapter)));
 
-	i2cTask = I2cTask::ReadTemperature;
 	CO_WAIT_WHILE(i2cTask == I2cTask::ReadTemperature);
 
 	CO_END_RETURN(i2cSuccess == I2cTask::ReadTemperature);
@@ -183,12 +180,9 @@ xpcc::Tmp102<I2cMaster>::readComparatorMode(void *ctx, bool &result)
 	CO_BEGIN(ctx);
 
 	buffer[0] = REGISTER_CONFIGURATION;
-	CO_WAIT_UNTIL(
-			adapter.configureWriteRead(buffer, 1, buffer, 2) &&
-			this->startTransaction(&adapter)
-	);
+	CO_WAIT_UNTIL(adapter.configureWriteRead(buffer, 1, buffer, 2) &&
+			(i2cTask = I2cTask::ReadAlert, this->startTransaction(&adapter)));
 
-	i2cTask = I2cTask::ReadAlert;
 	CO_WAIT_WHILE(i2cTask == I2cTask::ReadAlert);
 
 	if (i2cSuccess == I2cTask::ReadAlert)
@@ -213,12 +207,9 @@ xpcc::Tmp102<I2cMaster>::writeConfiguration(void *ctx, uint8_t length)
 	buffer[1] = config_msb;
 	buffer[2] = config_lsb;
 
-	CO_WAIT_UNTIL(
-			adapter.configureWrite(buffer, length) &&
-			this->startTransaction(&adapter)
-	);
+	CO_WAIT_UNTIL(adapter.configureWrite(buffer, length) &&
+			(i2cTask = I2cTask::Configuration, this->startTransaction(&adapter)));
 
-	i2cTask = I2cTask::Configuration;
 	CO_WAIT_WHILE(i2cTask == I2cTask::Configuration);
 
 	CO_END_RETURN(i2cSuccess == I2cTask::Configuration);
@@ -241,12 +232,9 @@ xpcc::Tmp102<I2cMaster>::writeLimitRegister(void *ctx, Register reg, float tempe
 		buffer[2] = (temp >> 8);
 	}
 
-	CO_WAIT_UNTIL(
-			adapter.configureWrite(buffer, 3) &&
-			this->startTransaction(&adapter)
-	);
+	CO_WAIT_UNTIL(adapter.configureWrite(buffer, 3) &&
+			(i2cTask = I2cTask::LimitRegister, this->startTransaction(&adapter)));
 
-	i2cTask = I2cTask::LimitRegister;
 	CO_WAIT_WHILE(i2cTask == I2cTask::LimitRegister);
 
 	CO_END_RETURN(i2cSuccess == I2cTask::LimitRegister);
