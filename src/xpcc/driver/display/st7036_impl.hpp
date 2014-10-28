@@ -54,10 +54,6 @@ template <typename SPI, typename CS, typename RS, unsigned int Width, unsigned i
 void
 xpcc::St7036<SPI, CS, RS, Width, Heigth>::initialize()
 {
-	SPI::initialize();
-	CS::setOutput();
-	RS::setOutput();
-	
 	accessor::Flash<uint8_t> config(st7036::configuration);
 	for (uint8_t i = 0; i < 10; ++i)
 	{
