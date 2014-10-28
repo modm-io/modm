@@ -48,55 +48,60 @@ public:
 	template< class clockSource, uint32_t baudrate=Baudrate::Standard,
 			uint16_t tolerance = xpcc::Tolerance::FivePercent >
 	static void
-	initialize();
+	initialize()
+	{
+		scl.set();
+		sda.set();
+	}
 
 public:
 	// start documentation inherited
 	static bool
 	start(I2cTransaction *transaction, Configuration_t configuration = nullptr);
 
-	static ALWAYS_INLINE bool
-	startBlocking(I2cTransaction *transaction, Configuration_t configuration = nullptr)
-	{
-		return start(transaction, configuration);
-	};
-
 	static Error
-	getErrorState();
+	getErrorState()
+	{ return errorState; }
 
 	static void
-	reset(DetachCause cause=DetachCause::SoftwareReset);
+	reset();
 	// end documentation inherited
 
 private:
 	static void
-	error();
+	error(Error error);
 
 private:
-	static inline void
+	static inline bool
 	startCondition();
 
-	static inline void
+	static inline bool
 	stopCondition();
 
 	static inline bool
 	write(uint8_t data);
 
-	static inline uint8_t
-	read(bool ack);
+	static inline bool
+	read(uint8_t &data, bool ack);
 
 private:
 	static inline bool
-	readBit();
+	readBit(uint8_t &data);
 
-	static inline void
+	static inline bool
 	writeBit(bool bit);
 
-	static inline void
+	static inline bool
 	sclSetAndWait();
 
 	static ALWAYS_INLINE void
 	delay();
+
+	enum
+	{
+		ACK = true,
+		NACK = false,
+	};
 
 	// calculate the delay in microseconds needed to achieve the
 	// requested SPI frequency
@@ -106,7 +111,7 @@ private:
 	static SDA sda;
 
 	static xpcc::I2c::Operation nextOperation;
-	static xpcc::I2cTransaction *delegate;
+	static xpcc::I2cTransaction *transactionObject;
 	static Error errorState;
 
 	static xpcc::I2cTransaction::Starting starting;
