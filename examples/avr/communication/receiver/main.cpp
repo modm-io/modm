@@ -7,6 +7,7 @@
 #include <xpcc/driver/can/mcp2515.hpp>
 
 using namespace xpcc::atmega;
+typedef xpcc::avr::SystemClock clock;
 
 // set new log level
 #undef XPCC_LOG_LEVEL
@@ -20,7 +21,7 @@ using namespace xpcc::atmega;
 // ----------------------------------------------------------------------------
 // Logging
 
-Uart0 loggerUart(115200);
+Uart0 loggerUart;
 xpcc::IODeviceWrapper< Uart0 > loggerDevice(loggerUart);
 
 xpcc::log::Logger xpcc::log::debug(loggerDevice);
@@ -38,7 +39,7 @@ typedef GpioOutputB7 Sclk;
 typedef GpioOutputB5 Mosi;
 typedef GpioInputB6 Miso;
 
-typedef xpcc::SoftwareSpiMaster< Sclk, Mosi, Miso > SPI;
+typedef xpcc::SoftwareSpiSimpleMaster< Sclk, Mosi, Miso > SPI;
 typedef xpcc::Mcp2515< SPI, Cs, Int > CanDevice;
 
 static CanDevice device;
@@ -72,14 +73,19 @@ namespace component
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
+    GpioOutputD1::connect(Uart0::Tx);
+    GpioInputD0::connect(Uart0::Rx);
+    Uart0::initialize<clock, 115200>();
+    
 	// Initialize SPI interface and the other pins
 	// needed by the MCP2515
-	SPI::initialize();
+	SPI::initialize<clock, 1000000>();
 	Cs::setOutput();
-	Int::setInput(Gpio::PullType::PullUp);
+	Int::setInput(Gpio::InputType::PullUp);
 
 	// Configure MCP2515 and set the filters
-	device.initialize(xpcc::can::BITRATE_125_KBPS);
+    // Fixme: xpcc::Can::Bitrate is incompatitlbe with device driver
+//    device.initialize(xpcc::can::BitRate::kBps125);
 	device.setFilter(xpcc::accessor::asFlash(canFilter));
 
 	// Enable Interrupts
