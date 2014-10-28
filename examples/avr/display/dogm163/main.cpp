@@ -3,6 +3,9 @@
 #include <xpcc/driver/display.hpp>
 #include <xpcc/ui/display/font.hpp>
 
+using namespace xpcc::atmega;
+typedef xpcc::avr::SystemClock clock;
+
 // Graphic LCD
 namespace lcd
 {
@@ -20,6 +23,10 @@ xpcc::DogM163< SPI, lcd::Cs, lcd::Rs > display;
 
 MAIN_FUNCTION
 {
+    SPI::initialize<clock, 1000000>();
+    lcd::Cs::setOutput();
+    lcd::Rs::setOutput();
+    
 	display.initialize();
 
 	display.setCursor(0, 0);
