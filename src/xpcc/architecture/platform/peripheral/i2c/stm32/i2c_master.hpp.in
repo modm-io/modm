@@ -99,9 +99,6 @@ public:
 	static bool
 	start(I2cTransaction *transaction, Configuration_t configuration = nullptr);
 
-	static bool
-	startBlocking(I2cTransaction *transaction, Configuration_t configuration = nullptr);
-
 	static Error
 	getErrorState();
 

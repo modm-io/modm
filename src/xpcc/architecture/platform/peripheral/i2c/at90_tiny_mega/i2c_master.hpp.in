@@ -89,16 +89,13 @@ public:
 
 	// start documentation inherited
 	static bool
-	start(I2cTransaction *transaction, Configuration_t configuration);
-
-	static bool
-	startBlocking(I2cTransaction *transaction, Configuration_t configuration);
+	start(I2cTransaction *transaction, Configuration_t configuration = nullptr);
 
 	static Error
 	getErrorState();
 
 	static void
-	reset(DetachCause cause=DetachCause::SoftwareReset);
+	reset();
 	// end documentation inherited
 
 private:

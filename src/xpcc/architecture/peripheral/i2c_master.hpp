@@ -85,19 +85,7 @@ public:
 	start(I2cTransaction *transaction, Configuration_t configuration = nullptr);
 
 	/**
-	 * Requests transaction attachment and blocks until the transaction completes.
-	 *
-	 * @param	transaction
-	 *		object that inherits from the I2cTransaction class.
-	 * @param	configuration
-	 *		function which configures the master for this transaction.
-	 * @return	Caller gains control if `true`. Call has no effect if `false`.
-	 */
-	static bool
-	startBlocking(I2cTransaction *transaction, Configuration_t configuration = nullptr);
-
-	/**
-	 * Perform a software reset of the driver in case of an error and detache
+	 * Perform a software reset of the driver in case of an error and detach
      * the transaction object.
 	 */
 	static void

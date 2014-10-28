@@ -250,22 +250,3 @@ xpcc::{{target.family}}::I2cMaster::start(I2cTransaction *transaction, Configura
 	}
 	return false;
 }
-
-bool
-xpcc::{{target.family}}::I2cMaster::startBlocking(I2cTransaction *transaction, Configuration_t configuration)
-{
-	if (start(transaction, configuration))
-	{
-		// the compiler generates out of order code here
-		// so we introduce a memory barrier
-		// to make sure, ::transaction is set _before_ entering a deadlock
-		__asm__ volatile ("" ::: "memory");
-
-		while (xpcc::accessor::asVolatile(::transaction))
-			;
-		DEBUG('f');
-
-		return true;
-	}
-	return false;
-}

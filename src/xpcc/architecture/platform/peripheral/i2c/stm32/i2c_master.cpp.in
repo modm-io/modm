@@ -626,26 +626,6 @@ xpcc::stm32::I2cMaster{{ id }}::start(I2cTransaction *transaction, Configuration
 	return false;
 }
 
-bool
-xpcc::stm32::I2cMaster{{ id }}::startBlocking(I2cTransaction *transaction, Configuration_t configuration)
-{
-	if (start(transaction, configuration))
-	{
-		// memory barrier, yes you really need it
-		__asm__ volatile ("dmb" ::: "memory");
-
-		// busy wait until this transaction is being executed
-		while(xpcc::accessor::asVolatile(::transaction) != transaction)
-			;
-		// busy wait while this transaction is being executed
-		while(xpcc::accessor::asVolatile(::transaction) == transaction)
-			;
-
-		return true;
-	}
-	return false;
-}
-
 xpcc::I2cMaster::Error
 xpcc::stm32::I2cMaster{{ id }}::getErrorState()
 {
