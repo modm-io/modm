@@ -281,8 +281,10 @@ namespace xpcc
 			/// TypeId used to connect GPIO pins to the FsmcD{{ ii }}.
 			static const TypeId::FsmcD{{ ii }} D{{ ii }};
 		%% endfor
-			/// TypeId used to connect GPIO pins to the FsmcA16.
-			static const TypeId::FsmcA16 A16;
+		%% for ii in range(16, 24)
+			/// TypeId used to connect GPIO pins to the FsmcA{{ ii }}.
+			static const TypeId::FsmcA{{ ii }} A{{ ii }};
+		%% endfor
 			/// TypeId used to connect GPIO pins to the FsmcNoe.
 			static const TypeId::FsmcNoe Noe;
 			/// TypeId used to connect GPIO pins to the FsmcNwe.
