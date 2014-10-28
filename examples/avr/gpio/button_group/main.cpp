@@ -3,6 +3,8 @@
 #include <xpcc/architecture/peripheral/gpio.hpp>
 #include <xpcc/ui/button_group.hpp>
 
+using namespace xpcc::atmega;
+
 static xpcc::ButtonGroup<> buttons(0);
 
 typedef GpioOutputB0 Led;
