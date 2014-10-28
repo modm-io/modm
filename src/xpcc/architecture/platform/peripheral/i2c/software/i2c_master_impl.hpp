@@ -12,9 +12,8 @@
 #endif
 
 // debugging for serious dummies
-//*
+/*
 #include "../../uart/stm32/usart_2.hpp"
-
 #define DEBUG_SW_I2C(x) xpcc::stm32::Usart2::write(x)
 /*/
 #define DEBUG_SW_I2C(x)
