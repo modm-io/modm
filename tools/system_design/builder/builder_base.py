@@ -31,6 +31,7 @@
 import time
 import codecs		# utf-8 file support
 import sys
+import traceback
 import os
 import jinja2		# template engine
 import textwrap
@@ -106,6 +107,7 @@ class Builder(object):
 			parser.parse(self.xmlfile)
 		except ParserException as e:
 			sys.stderr.write("Parsing Error: %s\n" % str(e))
+			print traceback.format_exc()
 			sys.exit(1)
 		
 		self.tree = parser.tree

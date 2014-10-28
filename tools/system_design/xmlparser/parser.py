@@ -93,9 +93,12 @@ class Parser(object):
 		self.include_path = os.path.dirname(os.path.abspath(self.rootfile))
 		self._parse_file(filename)
 		
-	def _parse_file(self, filename):
+	def _parse_file(self, filename, include_path = None):
 		"""
 		"""
+		if (include_path == None):
+			include_path = self.include_path
+		
 		logging.debug("Parse %s" % filename)
 		try:
 			# read the time of the last change
@@ -127,9 +130,9 @@ class Parser(object):
 		for node in xmltree.findall('include'):
 			include_file = node.text
 			if not os.path.isabs(include_file):
-				include_file = os.path.join(self.include_path, include_file)
-			self.include_path = os.path.dirname(os.path.abspath(include_file))
-			self._parse_file(include_file)
+				include_file = os.path.join(include_path, include_file)
+			include_path_new = os.path.dirname(os.path.abspath(include_file))
+			self._parse_file(include_file, include_path_new)
 		
 		self._parse_types(xmltree)
 		self._evaluate_types(xmltree)
