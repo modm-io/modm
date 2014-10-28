@@ -68,7 +68,7 @@ xpcc::St7036<SPI, CS, RS, Width, Heigth>::writeRaw(char c)
 	RS::set();
 	
 	CS::reset();
-	SPI::write(c);
+	SPI::writeReadBlocking(c);
 	CS::set();
 }
 
@@ -99,7 +99,7 @@ xpcc::St7036<SPI, CS, RS, Width, Heigth>::writeCommand(uint8_t inCommand)
 	RS::reset();
 	
 	CS::reset();
-	SPI::write(inCommand);
+	SPI::writeReadBlocking(inCommand);
 	CS::set();
 	
 	// check if the command is 'clear display' oder 'return home', these
