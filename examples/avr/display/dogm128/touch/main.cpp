@@ -4,6 +4,7 @@
 #include <xpcc/io/iostream.hpp>
 
 using namespace xpcc::atmega;
+typedef xpcc::avr::SystemClock clock;
 
 namespace touch
 {
@@ -13,7 +14,7 @@ namespace touch
 	typedef GpioA3 Right;
 }
 
-Uart0 uart(9600);
+Uart0 uart;
 
 namespace led
 {
@@ -50,6 +51,10 @@ drawCross(uint8_t x, uint8_t y)
 int
 main()
 {
+    GpioOutputD1::connect(Uart0::Tx);
+    GpioInputD0::connect(Uart0::Rx);
+    Uart0::initialize<clock, 115200>();
+    
 	// Enable interrupts, this is needed for every buffered UART
 	sei();
 
