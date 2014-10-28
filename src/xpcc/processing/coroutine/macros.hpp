@@ -62,7 +62,7 @@
  * @ingroup	coroutine
  * @hideinitializer
  */
-#define CO_END_CALL(coroutine) \
+#define CO_END_RETURN_CALL(coroutine) \
 			this->setCo(__LINE__); \
 		case __LINE__: \
 			{ \

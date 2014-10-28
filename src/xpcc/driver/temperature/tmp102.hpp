@@ -141,7 +141,7 @@ public:
 	 */
 	Tmp102(Data &data, uint8_t address=0x48);
 
-	void
+	void ALWAYS_INLINE
 	update()
 	{ run(); }
 
