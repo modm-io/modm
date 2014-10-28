@@ -3,6 +3,7 @@
 #include <xpcc/driver/can/mcp2515.hpp>
 
 using namespace xpcc::atmega;
+typedef xpcc::avr::SystemClock clock;
 
 typedef GpioOutputB4 Cs;
 typedef GpioInputB2 Int;
@@ -35,13 +36,14 @@ main()
 {
 	// Initialize SPI interface and the other pins
 	// needed by the MCP2515
-	SPI::initialize();
+	SPI::initialize<clock, 1000000>();
 	Cs::setOutput();
-	Int::setInput(Gpio::PullType::PullUp);
+	Int::setInput(Gpio::InputType::PullUp);
 
 	// Configure MCP2515 and set the filters
-	mcp2515.initialize(xpcc::can::BITRATE_125_KBPS);
-	mcp2515.setFilter(xpcc::accessor::asFlash(canFilter));
+        // Fixme: xpcc::Can::Bitrate is incompatitlbe with device driver
+//  mcp2515.initialize(bitrate);
+//  mcp2515.setFilter(xpcc::accessor::asFlash(canFilter));
 
 	// Create a new message
 	xpcc::can::Message message(0x123456);
