@@ -24,7 +24,6 @@ main(void)
 	Led::setOutput();
 	Led::set();
 
-	LedInverted::setOutput();
 	LedInverted::reset();
 
 	while (1)
