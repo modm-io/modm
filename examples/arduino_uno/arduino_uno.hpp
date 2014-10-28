@@ -18,6 +18,7 @@
 #include <xpcc/debug/logger.hpp>
 
 using namespace xpcc::atmega;
+typedef xpcc::avr::SystemClock clock;
 
 // "Digital" Pins
 typedef GpioD0       Digital0;

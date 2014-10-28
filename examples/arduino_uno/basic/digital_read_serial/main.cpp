@@ -23,7 +23,7 @@ MAIN_FUNCTION
 	// initialize the serial communication module
 	DigitalInput0::connect(Uart0::Rx);
 	DigitalOutput1::connect(Uart0::Tx);
-	Uart0::initialize<9600>();
+	Uart0::initialize<clock, 9600>();
 
 	PushButton::setInput();
 
