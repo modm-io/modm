@@ -115,7 +115,7 @@ initTouchscreen()
 	GpioInputB14::connect(SpiSimpleMaster2::Miso);
 	GpioOutputB15::connect(SpiSimpleMaster2::Mosi);
 
-	SpiSimpleMaster2::initialize<defaultSystemClock, MHz1>();
+	SpiSimpleMaster2::initialize<defaultSystemClock, 1312500ul>();
 	SpiSimpleMaster2::setDataMode(SpiSimpleMaster2::DataMode::Mode0);
 
 }
