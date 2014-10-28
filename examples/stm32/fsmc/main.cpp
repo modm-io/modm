@@ -40,33 +40,33 @@
 
 #include <xpcc/architecture.hpp>
 #include <xpcc/driver/ui/display/tft_memory_bus.hpp>
-#include <xpcc/driver/ui/display/siemens_s75.hpp>
+#include <xpcc/driver/display/siemens_s75.hpp>
 
 // ----------------------------------------------------------------------------
-GPIO__OUTPUT(Led, A, 8);
-
 using namespace xpcc::stm32;
 using namespace xpcc::stm32::fsmc;
 
+typedef GpioOutputA8 Led;
+
 namespace lcd
 {
-	GPIO__IO(D0,   D, 14);
-	GPIO__IO(D1,   D, 15);
-	GPIO__IO(D2,   D,  0);
-	GPIO__IO(D3,   D,  1);
-	GPIO__IO(D4,   E,  7);
-	GPIO__IO(D5,   E,  8);
-	GPIO__IO(D6,   E,  9);
-	GPIO__IO(D7,   E, 10);
+    typedef GpioD14 D0;
+	typedef GpioD15 D1;
+	typedef GpioD0  D2;
+	typedef GpioD1  D3;
+	typedef GpioE7  D4;
+	typedef GpioE8  D5;
+	typedef GpioE9  D6;
+	typedef GpioE10 D7;
 
 	// The Command / Data Pin is mapped to an address pin of the FSMC.
 	// GPIO__OUTPUT(Cd,    D, 11);	// Command / Data,  FSMC: A16
-	GPIO__OUTPUT(Cd,    E,  2);		// Command / Data,  FSMC: A23
+	typedef GpioOutputE2 Cd;		// Command / Data,  FSMC: A23
 
-	GPIO__OUTPUT(Cs,    D,  7);		// Chip Select,     FSMC: NE1
-	GPIO__OUTPUT(Wr,    D,  5);		// Write operation, FSMC: NWE
+	typedef GpioOutputD7 Cs;		// Chip Select,     FSMC: NE1
+	typedef GpioOutputD5 Wr;		// Write operation, FSMC: NWE
 
-	GPIO__OUTPUT(Reset, E,  3);     // Reset, not part of FSMC
+	typedef GpioOutputE3 Reset;     // Reset, not part of FSMC
 
 	// FSMC
 	typedef xpcc::TftMemoryBus8Bit ParallelBus;
@@ -95,14 +95,13 @@ parallelBus(
 
 lcd::Display display(parallelBus);
 
+typedef SystemClock<Pll<ExternalCrystal<MHz25>, MHz168, MHz48> > defaultSystemClock;
+
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
 	// Switch STM32F4 to 168 MHz (HSE clocked by an 25 MHz external clock)
-	if (Clock::enableHse(Clock::HseConfig::HSE_BYPASS)) {
-		Clock::enablePll(Clock::PllSource::PLL_HSE, 25, 336);
-		Clock::switchToPll();
-	}
+    defaultSystemClock::enable();
 	
 	Led::setOutput(xpcc::Gpio::Low);
 
@@ -113,23 +112,24 @@ MAIN_FUNCTION
 	// FSMC
 	xpcc::stm32::Fsmc::initialize();
 
-	// A16
-	lcd::Cd::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
+	// A23
+    lcd::Cd::connect(Fsmc::A23, xpcc::stm32::Gpio::OutputType::PushPull, xpcc::stm32::Gpio::OutputSpeed::MHz100);
 
 	// FSMC_NE1
-	lcd::Cs::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
+    lcd::Cs::connect(Fsmc::Ne1, xpcc::stm32::Gpio::OutputType::PushPull, xpcc::stm32::Gpio::OutputSpeed::MHz100);
 
 	// FSMC_NWE
-	lcd::Wr::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
+	lcd::Wr::connect(Fsmc::Nwe, xpcc::stm32::Gpio::OutputType::PushPull, xpcc::stm32::Gpio::OutputSpeed::MHz100);
 
-	lcd::D0::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
-	lcd::D1::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
-	lcd::D2::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
-	lcd::D3::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
-	lcd::D4::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
-	lcd::D5::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
-	lcd::D6::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
-	lcd::D7::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
+    lcd::D0::connect(Fsmc::D0, xpcc::stm32::Gpio::OutputType::PushPull, xpcc::stm32::Gpio::OutputSpeed::MHz100);
+    lcd::D1::connect(Fsmc::D1, xpcc::stm32::Gpio::OutputType::PushPull, xpcc::stm32::Gpio::OutputSpeed::MHz100);
+    lcd::D2::connect(Fsmc::D2, xpcc::stm32::Gpio::OutputType::PushPull, xpcc::stm32::Gpio::OutputSpeed::MHz100);
+    lcd::D3::connect(Fsmc::D3, xpcc::stm32::Gpio::OutputType::PushPull, xpcc::stm32::Gpio::OutputSpeed::MHz100);
+    lcd::D4::connect(Fsmc::D4, xpcc::stm32::Gpio::OutputType::PushPull, xpcc::stm32::Gpio::OutputSpeed::MHz100);
+    lcd::D5::connect(Fsmc::D5, xpcc::stm32::Gpio::OutputType::PushPull, xpcc::stm32::Gpio::OutputSpeed::MHz100);
+    lcd::D6::connect(Fsmc::D6, xpcc::stm32::Gpio::OutputType::PushPull, xpcc::stm32::Gpio::OutputSpeed::MHz100);
+    lcd::D7::connect(Fsmc::D7, xpcc::stm32::Gpio::OutputType::PushPull, xpcc::stm32::Gpio::OutputSpeed::MHz100);
+
 
 	xpcc::stm32::fsmc::NorSram::AsynchronousTiming timing = {
 		// read
