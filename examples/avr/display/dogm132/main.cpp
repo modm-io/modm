@@ -3,18 +3,21 @@
 #include <xpcc/driver/display.hpp>
 #include <xpcc/ui/button_group.hpp>
 
-typedef GpioOutputE4 Cs;
-typedef GpioOutputE5 Mosi;
-typedef GpioOutputE7 Sck;
+using namespace xpcc::atmega;
+typedef xpcc::avr::SystemClock clock;
+
+typedef GpioOutputD2 Cs;
+typedef GpioOutputB6 Mosi;
+typedef GpioOutputB7 Sck;
 
 typedef xpcc::SoftwareSpiSimpleMaster<Sck, Mosi, xpcc::GpioUnused> SPI;
 
-typedef GpioOutputF1 A0;
-typedef GpioOutputK3 Reset;
+typedef GpioOutputD3 A0;
+typedef GpioOutputD4 Reset;
 
 typedef xpcc::DogM132<SPI, Cs, A0, Reset> Display;
 
-GPIO__OUTPUT(Backlight, F, 0);
+typedef GpioOutputD7 Backlight;
 
 MAIN_FUNCTION
 {
@@ -23,7 +26,7 @@ MAIN_FUNCTION
 	Backlight::setOutput();
 	Backlight::set();
 
-	SPI::initialize();
+	SPI::initialize<clock, 1000000>();
 
 	display.initialize();
 	display.setFont(xpcc::font::Assertion);
