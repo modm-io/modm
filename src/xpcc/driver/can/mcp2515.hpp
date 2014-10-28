@@ -169,6 +169,17 @@ namespace xpcc
 		 */
 		static bool
 		sendMessage(const can::Message& message);
+        
+    public:
+        // Extended Functionality
+        
+        /*
+         * Fixme: Empty implementation, required by connector
+         */
+        static BusState
+        getBusState() {
+            return BusState::Connected;
+        }
 
 	protected:
 		enum SpiCommand
