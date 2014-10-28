@@ -94,9 +94,9 @@ void
 xpcc::SiemensS65Common<SPI, CS, RS, Reset>::writeReg(uint8_t reg)
 {
 	CS::reset();
-	SPI::write(0x74); // start byte, RS = 0, R/W = 0, write index register
-	SPI::write(0x00);
-	SPI::write(reg);
+	SPI::writeReadBlocking(0x74); // start byte, RS = 0, R/W = 0, write index register
+	SPI::writeReadBlocking(0x00);
+	SPI::writeReadBlocking(reg);
 	CS::set();
 }
 
@@ -105,9 +105,9 @@ void
 xpcc::SiemensS65Common<SPI, CS, RS, Reset>::writeData(uint16_t data)
 {
 	CS::reset();
-	SPI::write(0x76);	// start byte, RS = 1, R/W = 0, write instruction or RAM data
-	SPI::write(data>>8);
-	SPI::write(data);
+	SPI::writeReadBlocking(0x76);	// start byte, RS = 1, R/W = 0, write instruction or RAM data
+	SPI::writeReadBlocking(data>>8);
+	SPI::writeReadBlocking(data);
 	CS::set();
 }
 
@@ -171,7 +171,7 @@ xpcc::SiemensS65Common<SPI, CS, RS, Reset>::lcdCls(uint16_t colour) {
 	writeReg(0x22);
 
 	CS::reset();
-	SPI::write(0x76);	// start byte
+	SPI::writeReadBlocking(0x76);	// start byte
 
 	// start data transmission
 
@@ -198,8 +198,8 @@ xpcc::SiemensS65Common<SPI, CS, RS, Reset>::lcdCls(uint16_t colour) {
 	uint8_t c1 = colour >> 8;
 	uint8_t c2 = colour & 0xff;
 	for (uint16_t i = 0; i < (132 * 176); ++i) {
-		SPI::write(c1);
-		SPI::write(c2);
+		SPI::writeReadBlocking(c1);
+		SPI::writeReadBlocking(c2);
 	}
 #endif
 
@@ -217,7 +217,7 @@ xpcc::SiemensS65Portrait<SPI, CS, RS, Reset>::update() {
 
 	// WRITE MEMORY
 	CS::reset();
-	SPI::write(0x76);	// start byte
+	SPI::writeReadBlocking(0x76);	// start byte
 
 	const uint16_t maskBlank  = 0x0000; // RRRR RGGG GGGB BBBB
 	const uint16_t maskFilled = 0x37e0; // RRRR RGGG GGGB BBBB
@@ -295,8 +295,7 @@ xpcc::SiemensS65Portrait<SPI, CS, RS, Reset>::update() {
 			} // pix
 
 			// use transfer() of SPI to transfer spiBuffer
-			SPI::setBuffer(16, spiBuffer);
-			SPI::transfer(SPI::TRANSFER_SEND_BUFFER_DISCARD_RECEIVE);
+			SPI::transferBlocking(spiBuffer, nullptr, 16);
 		} // y
 	} // x
 #endif
@@ -315,7 +314,7 @@ xpcc::SiemensS65Landscape<SPI, CS, RS, Reset>::update() {
 
 	// WRITE MEMORY
 	CS::reset();
-	SPI::write(0x76);	// start byte
+	SPI::writeReadBlocking(0x76);	// start byte
 
 	const uint16_t maskBlank  = 0x0000; // RRRR RGGG GGGB BBBB
 	const uint16_t maskFilled = 0x37e0; // RRRR RGGG GGGB BBBB
@@ -399,8 +398,7 @@ xpcc::SiemensS65Landscape<SPI, CS, RS, Reset>::update() {
 			} // pix
 
 			// use transfer() of SPI to transfer spiBuffer
-			SPI::setBuffer(bufSize, spiBuffer);
-			SPI::transfer(SPI::TRANSFER_SEND_BUFFER_DISCARD_RECEIVE);
+			SPI::transferBlocking(spiBuffer, nullptr, bufSize);
 		} // y
 	} // x
 #endif
