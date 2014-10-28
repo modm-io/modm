@@ -133,18 +133,14 @@ public:
 	bool inline
 	initialize()
 	{
-		xpcc::co::Result<bool> result;
-		while((result = initialize(this)).state > xpcc::co::NestingError)
-			;
-		return result.result;
+		return CO_CALL_BLOCKING(initialize(this));
 	}
 
 	/// Update the display with the content of the RAM buffer.
 	virtual void
 	update()
 	{
-		while(startWriteDisplay(this).state > xpcc::co::NestingError)
-			;
+		CO_CALL_BLOCKING(startWriteDisplay(this));
 	}
 
 	/// Use this method to synchronize writing to the displays buffer

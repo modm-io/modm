@@ -134,6 +134,21 @@
 	})
 
 /**
+ * Calls a coroutine, busy-waits and returns its result.
+ *
+ * @warning	Use this with extreme caution, this can cause deadlocks!
+ * @ingroup	coroutine
+ * @hideinitializer
+ */
+#define CO_CALL_BLOCKING(coroutine) \
+	({ \
+			auto coResult = coroutine; \
+			while (coResult.state > xpcc::co::NestingError) \
+			{ coResult = coroutine; } \
+			coResult.result; \
+	})
+
+/**
  * Stop and exit from coroutine.
  *
  * @ingroup	coroutine
