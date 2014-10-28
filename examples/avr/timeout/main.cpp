@@ -5,7 +5,7 @@
 using namespace xpcc::atmega;
 
 // create a output device for the led
-GPIO__OUTPUT(Led, B, 0);
+typedef GpioOutputB0 Led;
 
 // timer interrupt routine
 ISR(TIMER2_COMPA_vect)
