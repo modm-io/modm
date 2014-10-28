@@ -3,6 +3,8 @@
 
 #include <xpcc/driver/display.hpp>
 
+using namespace xpcc::atmega;
+
 namespace led
 {
 	typedef GpioOutputD7 R;

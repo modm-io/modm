@@ -13,6 +13,8 @@
 #include "images/image_64x64_8.hpp"
 #include "images/image_64x64_9.hpp"
 
+using namespace xpcc::atmega;
+
 namespace led
 {
 	typedef GpioOutputD7 R;

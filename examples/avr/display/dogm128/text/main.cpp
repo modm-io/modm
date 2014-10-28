@@ -4,6 +4,8 @@
 #include <xpcc/driver/display.hpp>
 #include <xpcc/ui/display/font.hpp>
 
+using namespace xpcc::atmega;
+
 // LCD Backlight
 namespace led
 {
