@@ -5,8 +5,9 @@
 
 using namespace xpcc::atmega;
 
-// Create a new UART object and configure it to a baudrate of 9600
-Uart0 uart(9600);
+// Create a new UART object
+typedef xpcc::avr::SystemClock clock;
+xpcc::atmega::Uart0 uart;
 
 // the three sensors are mapped: x = ch1, y = ch2, z = ch0
 uint8_t sensorMapping[3] = {1,2,0};
@@ -19,6 +20,10 @@ xpcc::PeriodicTimer<> sensorTimer(100);
 int
 main()
 {
+    GpioOutputD1::connect(Uart0::Tx);
+    GpioInputD0::connect(Uart0::Rx);
+    uart.initialize<clock, 115200>();
+    
 	// Enable interrupts, this is needed for every buffered UART
 	sei();
 	

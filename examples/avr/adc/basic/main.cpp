@@ -4,14 +4,19 @@
 #include <xpcc/io/iostream.hpp>
 
 using namespace xpcc::atmega;
+typedef xpcc::avr::SystemClock clock;
+xpcc::atmega::Uart0 uart;
 
-// Create a new UART object and configure it to a baudrate of 9600
-Uart0 uart(9600);
 
 int
 main()
 {
-	// Enable interrupts, this is needed for every buffered UART
+    // Create a new UART object and configure it to a baudrate of 9600
+    GpioOutputD1::connect(Uart0::Tx);
+    GpioInputD0::connect(Uart0::Rx);
+    uart.initialize<clock, 115200>();
+    
+    // Enable interrupts, this is needed for every buffered UART
 	sei();
 	
 	// Create a IOStream for complex formatting tasks
