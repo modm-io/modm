@@ -35,6 +35,7 @@ public:
 	Error : uint8_t
 	{
 		NoError,			///< No Error occurred
+		SoftwareReset,		///< The master was reset in software
 		AddressNack,		///< Address was transmitted and NACK received
 		DataNack,			///< Data was transmitted and NACK received
 		ArbitrationLost,	///< Arbitration was lost during writing or reading
@@ -100,7 +101,7 @@ public:
      * the transaction object.
 	 */
 	static void
-	reset(DetachCause cause = DetachCause::SoftwareReset);
+	reset();
 
 	/**
 	 * Check the error state of the driver.

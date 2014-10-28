@@ -35,7 +35,6 @@ struct I2c
 	DetachCause : uint8_t
 	{
 		NormalStop,		///< All operations finished normally
-		SoftwareReset,	///< The master was reset in software
 		ErrorCondition,	///< A bus error occurred and the bus was reset
 		FailedToAttach	///< The I2cTransaction failed to attach to the I2cMaster
 	};

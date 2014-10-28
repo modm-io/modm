@@ -106,7 +106,7 @@ public:
 	getErrorState();
 
 	static void
-	reset(DetachCause cause=DetachCause::SoftwareReset);
+	reset();
 	// end documentation inherited
 
 private:

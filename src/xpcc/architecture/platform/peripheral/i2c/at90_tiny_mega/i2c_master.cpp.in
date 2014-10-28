@@ -166,29 +166,32 @@ ISR(TWI_vect)
 
 		case TW_MT_SLA_NACK:	// SLA+W transmitted, NACK received
 		case TW_MR_SLA_NACK:	// SLA+R transmitted, NACK received
-			if (errorState == xpcc::{{target.family}}::I2cMaster::Error::NoError) {
-				errorState = xpcc::{{target.family}}::I2cMaster::Error::AddressNack;
+			if (errorState == xpcc::I2cMaster::Error::NoError) {
+				errorState = xpcc::I2cMaster::Error::AddressNack;
 			}
 			DEBUG('A');
 		case TW_MT_DATA_NACK:	// data transmitted, NACK received
-			if (errorState == xpcc::{{target.family}}::I2cMaster::Error::NoError) {
-				errorState = xpcc::{{target.family}}::I2cMaster::Error::DataNack;
+			if (errorState == xpcc::I2cMaster::Error::NoError) {
+				errorState = xpcc::I2cMaster::Error::DataNack;
 			}
 			DEBUG('d');
 			// generate a stop condition
 			TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
 		case TW_MT_ARB_LOST:	// arbitration lost in SLA+W or data
 //		case TW_MR_ARB_LOST:	// arbitration lost in SLA+R or NACK
-			if (errorState == xpcc::{{target.family}}::I2cMaster::Error::NoError) {
-				errorState = xpcc::{{target.family}}::I2cMaster::Error::ArbitrationLost;
+			if (errorState == xpcc::I2cMaster::Error::NoError) {
+				errorState = xpcc::I2cMaster::Error::ArbitrationLost;
 			}
 			DEBUG('d');
 		default:
-			if (errorState == xpcc::{{target.family}}::I2cMaster::Error::NoError) {
-				errorState = xpcc::{{target.family}}::I2cMaster::Error::Unknown;
+			if (errorState == xpcc::I2cMaster::Error::NoError) {
+				errorState = xpcc::I2cMaster::Error::Unknown;
 			}
 			DEBUG('r');
-			xpcc::{{target.family}}::I2cMaster::reset(xpcc::I2c::DetachCause::ErrorCondition);
+			if (transaction) transaction->detaching(DetachCause::ErrorCondition);
+			transaction = nullptr;
+			TWDR = 0xff;
+			TWCR = (1 << TWEN);
 			break;
 	}
 	DEBUG('\n');
@@ -209,12 +212,13 @@ xpcc::{{target.family}}::I2cMaster::initialize(uint8_t twbr, Prescaler prescaler
 }
 
 void
-xpcc::{{target.family}}::I2cMaster::reset(DetachCause cause)
+xpcc::{{target.family}}::I2cMaster::reset()
 {
 	DEBUG('T');
 	writing.length = 0;
 	reading.length = 0;
-	if (transaction) transaction->detaching(cause);
+	errorState = Error::SoftwareReset;
+	if (transaction) transaction->detaching(DetachCause::ErrorCondition);
 	transaction = nullptr;
 }
 
@@ -231,11 +235,10 @@ xpcc::{{target.family}}::I2cMaster::start(I2cTransaction *transaction, Configura
 	{
 		if (transaction->attaching())
 		{
-			if (configuration)
-				configuration();
+			if (configuration) configuration();
 
 			::transaction = transaction;
-			errorState = xpcc::{{target.family}}::I2cMaster::Error::NoError;
+			errorState = Error::NoError;
 			DEBUG('Y');
 			TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN) | (1 << TWIE);
 

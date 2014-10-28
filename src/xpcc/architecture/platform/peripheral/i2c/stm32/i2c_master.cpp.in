@@ -209,6 +209,7 @@ namespace
 	static inline void
 	callStarting()
 	{
+		error = xpcc::I2cMaster::Error::NoError;
 		DEBUG_STREAM("callStarting");
 
 		I2C{{ id }}->CR1 &= ~I2C_CR1_POS;
@@ -314,6 +315,7 @@ I2C{{ id }}_EV_IRQHandler(void)
 
 	else if (sr1 & I2C_SR1_ADDR)
 	{
+		starting.address = 0;
 		// EV6: ADDR=1, cleared by reading SR1 register followed by reading SR2.
 		DEBUG_STREAM("address sent");
 		DEBUG_STREAM("writing.length=" << writing.length);
@@ -514,7 +516,7 @@ I2C{{ id }}_ER_IRQHandler(void)
 		I2C{{ id }}->CR1 |= I2C_CR1_STOP;
 		DEBUG_STREAM("ACK FAIL");
 		 // may also be ADDRESS_NACK
-		error = xpcc::I2cMaster::Error::DataNack;
+		error = starting.address ? xpcc::I2cMaster::Error::AddressNack : xpcc::I2cMaster::Error::DataNack;
 	}
 	else if (sr1 & I2C_SR1_ARLO)
 	{	// arbitration lost
@@ -527,11 +529,8 @@ I2C{{ id }}_ER_IRQHandler(void)
 		error = xpcc::I2cMaster::Error::Unknown;
 	}
 
-	if (transaction)
-	{
-		transaction->detaching(xpcc::I2c::DetachCause::ErrorCondition);
-		transaction = nullptr;
-	}
+	if (transaction) transaction->detaching(xpcc::I2c::DetachCause::ErrorCondition);
+	transaction = nullptr;
 
 	// Overrun error is not handled here separately
 
@@ -574,17 +573,18 @@ xpcc::stm32::I2cMaster{{ id }}::initializeWithPrescaler(uint8_t peripheralFreque
 }
 
 void
-xpcc::stm32::I2cMaster{{ id }}::reset(DetachCause cause)
+xpcc::stm32::I2cMaster{{ id }}::reset()
 {
 	reading.length = 0;
 	writing.length = 0;
-	if (transaction) transaction->detaching(cause);
+	error = Error::SoftwareReset;
+	if (transaction) transaction->detaching(DetachCause::ErrorCondition);
 	transaction = nullptr;
 	// remove all queued transactions
 	while(!queue.isEmpty())
 	{
 		ConfiguredTransaction next = queue.get();
-		if (next.transaction) next.transaction->detaching(cause);
+		if (next.transaction) next.transaction->detaching(DetachCause::ErrorCondition);
 		queue.pop();
 	}
 }
