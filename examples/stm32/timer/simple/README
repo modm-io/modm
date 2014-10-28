@@ -1,9 +1,0 @@
-Timer Example
-=============
-
-Example for the [STM32_P103][1] board from Olimex.
-
-Toggles a LED connected to PC12 toggle every 200ms with the
-Timer 3 update interrupt.
-
-[1]: http://www.olimex.com/dev/stm32-p103.html

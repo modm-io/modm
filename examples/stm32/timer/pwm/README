@@ -1,8 +1,0 @@
-Timer Example
-=============
-
-Example for the [STM32_P103][1] board from Olimex.
-
-Uses Timer 2 (channel 2) to generate a PWM to dimm a LED connected to PA1.
-
-[1]: http://www.olimex.com/dev/stm32-p103.html
