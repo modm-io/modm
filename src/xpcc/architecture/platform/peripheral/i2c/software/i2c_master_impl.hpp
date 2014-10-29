@@ -20,11 +20,6 @@
 //*/
 
 template <typename SCL, typename SDA, uint32_t BaudRate>
-SCL xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::scl;
-template <typename SCL, typename SDA, uint32_t BaudRate>
-SDA xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::sda;
-
-template <typename SCL, typename SDA, uint32_t BaudRate>
 xpcc::I2c::Operation xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::nextOperation;
 template <typename SCL, typename SDA, uint32_t BaudRate>
 xpcc::I2cTransaction *xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::transactionObject(nullptr);
@@ -51,6 +46,7 @@ xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::start(xpcc::I2cTransaction *transac
 		}
 		else
 		{
+			// reset error state
 			errorState = Error::NoError;
 			// call the configuration function
 			if (configuration) configuration();
@@ -59,7 +55,7 @@ xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::start(xpcc::I2cTransaction *transac
 
 			while (1)
 			{
-				// generate Start condition
+				// generate (Re-)Start condition
 				if (!startCondition()) return true;
 
 				// ask the transaction object about address and next operation.
@@ -67,19 +63,18 @@ xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::start(xpcc::I2cTransaction *transac
 				uint8_t address = (starting.address & 0xfe);
 
 				// set the correct addressing bit
+				DEBUG_SW_I2C((starting.next == xpcc::I2c::OperationAfterStart::Read) ? 'r': 'w');
 				if (starting.next == xpcc::I2c::OperationAfterStart::Read)
-				{
 					address |= xpcc::I2c::Read;
-					DEBUG_SW_I2C('r');
-				}
-				else DEBUG_SW_I2C('w');
 
 				// write address
 				if (!write(address)) return true;
-				// we use address=0 as a hint for error management that write errors are now data NACKs
+				// we use address=0 as a hint for error management that write errors are now *data* NACKs
 				starting.address = 0;
 
+				// if the inner loop required a restart, we arrive here again
 				if (nextOperation == xpcc::I2c::Operation::Restart) {DEBUG_SW_I2C('R');}
+				// what is the first operation after (re-)start?
 				nextOperation = static_cast<xpcc::I2c::Operation>(starting.next);
 
 				do
@@ -87,24 +82,30 @@ xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::start(xpcc::I2cTransaction *transac
 					switch (nextOperation)
 					{
 						case xpcc::I2c::Operation::Read:
+							// ask TO about reading
 							reading = transactionObject->reading();
 							while (reading.length > 1)
 							{
-								if (!read(*reading.buffer, ACK)) return true;
-								reading.buffer++;
+								// continue reading, by sending ACKs
+								if (!read(*reading.buffer++, ACK)) return true;
 								reading.length--;
 							}
-							if (!read(*reading.buffer++, NACK)) return true;
+							// read last byte, conclude with NACK
+							if (!read(*reading.buffer, NACK)) return true;
+							// what next?
 							nextOperation = static_cast<xpcc::I2c::Operation>(reading.next);
 							break;
 
 						case xpcc::I2c::Operation::Write:
+							// ask TO about writing
 							writing = transactionObject->writing();
 							while (writing.length > 0)
 							{
+								// write the entire buffer
 								if (!write(*writing.buffer++)) return true;
 								writing.length--;
 							}
+							// what next?
 							nextOperation = static_cast<xpcc::I2c::Operation>(writing.next);
 							break;
 
@@ -115,7 +116,7 @@ xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::start(xpcc::I2cTransaction *transac
 							stopCondition();
 							return true;
 					}
-				}
+				} // continue doing this inner loop, until a restart is required
 				while (nextOperation != xpcc::I2c::Operation::Restart);
 			}
 		}
@@ -128,21 +129,25 @@ template <typename SCL, typename SDA, uint32_t BaudRate>
 void
 xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::reset()
 {
+	DEBUG_SW_I2C('E');
+	DEBUG_SW_I2C('0' + static_cast<uint8_t>(Error::SoftwareReset));
 	errorState = Error::SoftwareReset;
 	if (transactionObject) transactionObject->detaching(DetachCause::ErrorCondition);
 	transactionObject = nullptr;
 }
 
 // ----------------------------------------------------------------------------
-// MARK: - private
+// MARK: - error handling
 template <typename SCL, typename SDA, uint32_t BaudRate>
 void
 xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::error(Error error)
 {
 	DEBUG_SW_I2C('E');
 	DEBUG_SW_I2C('0' + static_cast<uint8_t>(error));
-	scl.set();
-	sda.set();
+	// release both lines
+	SCL::set();
+	SDA::set();
+	// save error state
 	errorState = error;
 
 	if (transactionObject) transactionObject->detaching(DetachCause::ErrorCondition);
@@ -150,32 +155,39 @@ xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::error(Error error)
 }
 
 // ----------------------------------------------------------------------------
-// MARK: bus control
+// MARK: - bus condition operations
 template <typename SCL, typename SDA, uint32_t BaudRate>
 bool
 xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::startCondition()
 {
 	DEBUG_SW_I2C('\n');
 	DEBUG_SW_I2C('s');
-	sda.set();
-	delay();
-	if(sda.read() == xpcc::Gpio::Low)
+	// release data line
+	SDA::set();
+	delay4();
+	if(SDA::read() == xpcc::Gpio::Low)
 	{
+		// could not release data line
 		error(Error::BusCondition);
 		return false;
 	}
+	// release the clock line
 	if (!sclSetAndWait())
 	{
+		// could not release clock line
 		error(Error::BusCondition);
 		return false;
 	}
-	// here both pins are High, ready for start
+	// now both pins are High, ready for start
 
-	sda.reset();
-	delay();
-	scl.reset();
-	delay();
+	// pull down data line
+	SDA::reset();
+	delay2();
+	// pull down clock line
+	SCL::reset();
+	delay2();
 
+	// start condition generated
 	return true;
 }
 
@@ -184,38 +196,64 @@ bool
 xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::stopCondition()
 {
 	DEBUG_SW_I2C('S');
-	scl.reset();
-	sda.reset();
+	// pull down both lines
+	SCL::reset();
+	SDA::reset();
 
+	// first release clock line
 	if (!sclSetAndWait())
 	{
+		// could not release clock line
 		error(Error::BusCondition);
 		return false;
 	}
+	delay2();
+	// release data line
+	SDA::set();
+	delay4();
 
-	delay();
-	sda.set();
-	delay();
-
-	if (sda.read() == xpcc::Gpio::Low)
+	if (SDA::read() == xpcc::Gpio::Low)
 	{
+		// could not release data line
 		error(Error::BusCondition);
 		return false;
 	}
 	return true;
 }
 
+template <typename SCL, typename SDA, uint32_t BaudRate>
+bool
+xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::sclSetAndWait()
+{
+	SCL::set();
+	// wait for clock stretching by slave
+	// only wait a maximum of 250 half clock cycles
+	uint_fast8_t deadlockPreventer = 250;
+	while (SCL::read() == xpcc::Gpio::Low && deadlockPreventer)
+	{
+		delay4();
+		deadlockPreventer--;
+		// double the read amount
+		if (SCL::read() == xpcc::Gpio::High) return true;
+		delay4();
+	}
+	// if extreme clock stretching occurs, then there might be an external error
+	return deadlockPreventer > 0;
+}
+
 // ----------------------------------------------------------------------------
-// MARK: byte operations
+// MARK: - byte operations
 template <typename SCL, typename SDA, uint32_t BaudRate>
 bool
 xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::write(uint8_t data)
 {
 	DEBUG_SW_I2C('W');
-	for(uint8_t i = 0; i < 8; ++i)
+	// shift through all 8 bits
+	for(uint_fast8_t i = 0; i < 8; ++i)
 	{
 		if (!writeBit(data & 0x80))
 		{
+			// arbitration error
 			error(Error::ArbitrationLost);
 			return false;
 		}
@@ -223,23 +261,29 @@ xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::write(uint8_t data)
 	}
 
 	// release sda
-	sda.set();
-	delay();
+	SDA::set();
+	delay2();
 
+	// rising clock edge for acknowledge bit
 	if (!sclSetAndWait())
 	{
-		error(Error::ArbitrationLost);
+		// the slave is allowed to stretch the clock, but not unreasonably long!
+		error(Error::BusCondition);
 		return false;
 	}
-	if(sda.read() == xpcc::Gpio::High)
+	// sample the data line for acknowledge bit
+	if(SDA::read() == xpcc::Gpio::High)
 	{
 		DEBUG_SW_I2C('n');
+		// we have not received an ACK
+		// depending on context, this could be AddressNack or DataNack
 		error(starting.address ? Error::AddressNack : Error::DataNack);
 		return false;
 	}
 	DEBUG_SW_I2C('a');
-	delay();
-	scl.reset();
+	delay2();
+	// falling clock edge
+	SCL::reset();
 
 	return true;
 }
@@ -249,14 +293,18 @@ bool
 xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::read(uint8_t &data, bool ack)
 {
 	DEBUG_SW_I2C('R');
-	sda.set();
+	// release data line
+	SDA::set();
 
+	// shift through the 8 bits
 	data = 0;
-	for(uint8_t i = 0; i < 8; ++i)
+	for(uint_fast8_t i = 0; i < 8; ++i)
 	{
 		data <<= 1;
 		if (!readBit(data))
 		{
+			// slaves don't stretch the clock here
+			// this must be arbitration.
 			error(Error::ArbitrationLost);
 			return false;
 		}
@@ -266,74 +314,56 @@ xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::read(uint8_t &data, bool ack)
 	// generate acknowledge bit
 	if (!writeBit(!ack))
 	{
+		// arbitration too
 		error(Error::ArbitrationLost);
 		return false;
 	}
-	// release sda
-	sda.set();
+	// release data line
+	SDA::set();
 	return true;
 }
 
 // ----------------------------------------------------------------------------
-// MARK: bit operations
-template <typename SCL, typename SDA, uint32_t BaudRate>
-bool
-xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::readBit(uint8_t &data)
-{
-	delay();
-	if (sclSetAndWait())
-	{
-		delay();
-		if(sda.read() == xpcc::Gpio::High)
-			data |= 0x01;
-
-		scl.reset();
-		return true;
-	}
-	return false;
-}
-
+// MARK: - bit operations
 template <typename SCL, typename SDA, uint32_t BaudRate>
 bool
 xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::writeBit(bool bit)
 {
-	sda.set(bit);
-	delay();
+	// set the data pin
+	SDA::set(bit);
+	delay2();
 
-	if (sclSetAndWait())
+	// rising clock edge, the slave samples the data line now
+	if ((SDA::read() == bit) && sclSetAndWait())
 	{
-		delay();
-		scl.reset();
-
+		delay2();
+		// falling clock edge
+		SCL::reset();
+		// everything ok
 		return true;
 	}
+	// too much clock stretching
 	return false;
 }
 
 template <typename SCL, typename SDA, uint32_t BaudRate>
 bool
-xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::sclSetAndWait()
+xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::readBit(uint8_t &data)
 {
-	scl.set();
-	// wait for clock stretching by slave
-	// only wait a maximum of 250 half clock cycles
-	uint_fast8_t deadlockPreventer = 250;
-	while (scl.read() == xpcc::Gpio::Low && deadlockPreventer)
+	// slave sets data line
+	delay2();
+	// rising clock edge, the master samples the data line now
+	if (sclSetAndWait())
 	{
-		xpcc::delayMicroseconds(delayTime/2);
-		deadlockPreventer--;
-		// double the read amount
-		if (scl.read() == xpcc::Gpio::High) return true;
-		xpcc::delayMicroseconds(delayTime/2);
-	}
-	// if extreme clock stretching occurs, then there might be an external error
-	return deadlockPreventer > 0;
-}
+		// copy bit into data
+		if(SDA::read() == xpcc::Gpio::High)
+			data |= 0x01;
 
-// ----------------------------------------------------------------------------
-template <typename SCL, typename SDA, uint32_t BaudRate>
-void
-xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::delay()
-{
-	xpcc::delayMicroseconds(delayTime);
+		delay2();
+		// falling clock edge
+		SCL::reset();
+		return true;
+	}
+	// too much clock stretching
+	return false;
 }

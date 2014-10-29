@@ -19,7 +19,7 @@ namespace xpcc
 {
 
 /**
- * @brief	Software emulation of a I2C master implementation
+ * Software emulation of a I2C master implementation
  *
  * @tparam	SCL			an Open-Drain Output pin
  * @tparam	SDA			an Open-Drain Output pin
@@ -40,7 +40,7 @@ public:
 
 public:
 	/**
-	 * @brief	Initialize the hardware
+	 * Initializes the hardware.
 	 *
 	 * @warning	this call cannot modify the baudrate anymore, since it is defined
 	 * 			by the template parameter Baudrate.
@@ -50,8 +50,8 @@ public:
 	static void
 	initialize()
 	{
-		scl.set();
-		sda.set();
+		SCL::set();
+		SDA::set();
 	}
 
 public:
@@ -59,43 +59,70 @@ public:
 	static bool
 	start(I2cTransaction *transaction, Configuration_t configuration = nullptr);
 
-	static Error
+	static Error ALWAYS_INLINE
 	getErrorState()
 	{ return errorState; }
 
-	static void
+	static inline void
 	reset();
 	// end documentation inherited
 
 private:
-	static void
+	// error handling
+	/// releases bus lines, sets error state and detaches the TO
+	static inline void
 	error(Error error);
 
-private:
+	// bus condition operations
+	/// generate a start or restart condition
+	/// @return	`true` if success, `false` if bus in unknown condition
 	static inline bool
 	startCondition();
 
+	/// generate a stop condition
+	/// @return	`true` if success, `false` if bus in unknown condition
 	static inline bool
 	stopCondition();
 
-	static inline bool
-	write(uint8_t data);
-
-	static inline bool
-	read(uint8_t &data, bool ack);
-
-private:
-	static inline bool
-	readBit(uint8_t &data);
-
-	static inline bool
-	writeBit(bool bit);
-
+	/// release the clock and wait for any slaves to release it too
+	/// @return	`true` if success, `false` if slave stretched the clock for too long
 	static inline bool
 	sclSetAndWait();
 
+	// byte operations
+	/// write one byte to the bus
+	/// @return	`true` if success, `false` if arbitation, too much clock stretching or NACK received
+	static inline bool
+	write(uint8_t data);
+
+	/// read one byte from the bus
+	/// @param	ack	acknowledge bit of read operation, `ACK` or `NACK`
+	/// @return	`true` if success, `false` if arbitation occured
+	static inline bool
+	read(uint8_t &data, bool ack);
+
+	/// write one bit to the bus
+	/// @return	`true` if success, `false` if slave stretched the clock for too long
+	static inline bool
+	writeBit(bool bit);
+
+	// bit operations
+	/// read one bit from the bus
+	/// @return	`true` if success, `false` if slave stretched the clock for too long
+	static inline bool
+	readBit(uint8_t &data);
+
+	// timings
+	/// busy waits a **half** clock cycle
 	static ALWAYS_INLINE void
-	delay();
+	delay2()
+	{ xpcc::delayMicroseconds(delayTime); }
+
+	// timings
+	/// busy waits **quarter** clock cycle
+	static ALWAYS_INLINE void
+	delay4()
+	{ xpcc::delayMicroseconds(delayTime/2); }
 
 	enum
 	{
@@ -106,9 +133,6 @@ private:
 	// calculate the delay in microseconds needed to achieve the
 	// requested SPI frequency
 	static constexpr float delayTime = (1000000.0 / BaudRate) / 2.0;
-
-	static SCL scl;
-	static SDA sda;
 
 	static xpcc::I2c::Operation nextOperation;
 	static xpcc::I2cTransaction *transactionObject;
