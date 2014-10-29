@@ -36,10 +36,10 @@ Import('env')
 devices = [
 #	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega16',		'clock':   1000000 },
 #	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega16a',		'clock':   1000000 },
-#	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega644',		'clock':   1000000 },
+	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega644',		'clock':  16000000 },
 #	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega8',		'clock':   1000000 },
 #	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega168',		'clock':   1000000 },
-#	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega328p',		'clock':   1000000 },
+	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega328p',		'clock':  16000000 },
 #	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega128',		'clock':   1000000 },
 #	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega2561',		'clock':   1000000 },
 #	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega2560',		'clock':   1000000 },
