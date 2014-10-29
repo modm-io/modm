@@ -109,8 +109,8 @@ namespace gui {
 	typedef void (*eventCallback)(const InputEvent&, Widget*, void*);
 
 	typedef struct Dimension {
-		Dimension(uint16_t w, uint16_t h) : width(w), height(h) {}
-		uint16_t width, height;
+		Dimension(int16_t w, int16_t h) : width(w), height(h) {}
+		int16_t width, height;
 		bool operator == (const Dimension& other) const
 		{
 			return (width == other.width) && (height == other.height);

@@ -231,7 +231,7 @@ public:
 	/**
 	 * Get width of widget. Shortcut for getDimension().width
 	 */
-	inline uint16_t
+	inline int16_t
 	getWidth()
 	{
 		return this->dimension.width;
@@ -240,7 +240,7 @@ public:
 	/**
 	 * Get height of widget. Shortcut for getDimension().height
 	 */
-	inline uint16_t
+	inline int16_t
 	getHeight()
 	{
 		return this->dimension.height;
