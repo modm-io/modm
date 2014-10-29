@@ -103,7 +103,7 @@ def jinja2_template_action(target, source, env):
 # http://stackoverflow.com/questions/8512677/how-to-include-a-template-with-relative-path-in-jinja2
 	class RelEnvironment(jinja2.Environment):
 		"""Override join_path() to enable relative template paths.
-		Take care of pathes. Jinja seems to use '/' as path separator in
+		Take care of paths. Jinja seems to use '/' as path separator in
 		templates.
 		"""
 		def join_path(self, template, parent):

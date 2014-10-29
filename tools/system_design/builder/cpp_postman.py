@@ -53,7 +53,7 @@ class PostmanBuilder(builder_base.Builder):
 		if not self.options.outpath:
 			raise builder_base.BuilderException("You need to provide an output path!")
 		if not self.options.container or self.options.container not in self.tree.container:
-			raise builder_base.BuilderException("Please specifiy a vaild container!")
+			raise builder_base.BuilderException("Please specify a valid container!")
 		
 		cppFilter = {
 			'camelcase': filter_lower,
