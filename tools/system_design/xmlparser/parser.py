@@ -98,7 +98,7 @@ class Parser(object):
 		another type/component with is not parsed at the moment. This
 		way is ensured that at least the shell of the objects exists.
 		
-		This function will be called recursive if an include-tag is found.
+		This function will be called recursively if an include-tag is found.
 		
 		Keyword arguments:
 		filename	-- xml file to load
