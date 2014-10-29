@@ -22,47 +22,47 @@ struct hmc6343
 	enum class
 	Register : uint8_t
 	{
-		SlaveAddress = 0x00,		//!< I2C Slave Address
-		SoftwareVersion = 0x02,		//!< Software Version Number
-		OperationMode1 = 0x04,		//!< Operation Mode Register 1
-		OperationMode2 = 0x05,		//!< Operation Mode Register 2
-		DeviceSerialLsb = 0x06,		//!< Device Serial Number
-		DeviceSerialMsb = 0x07,		//!< Device Serial Number
-		DateCodeYear = 0x08,		//!< Package Date Code: Last two digits of the year
-		DateCodeWeek = 0x09,		//!< Package Date Code: Fiscal Week
-		DeviationAngleLsb = 0x0A,	//!< Deviation Angle (+-1800) in tenth of a degree
-		DeviationAngleMsb = 0x0B,	//!< Deviation Angle (+-1800) in tenth of a degree
-		VariationAngleLsb = 0x0C,	//!< Variation Angle (+-1800) in tenth of a degree
-		VariationAngleMsb = 0x0D,	//!< Variation Angle (+-1800) in tenth of a degree
-		X_OffsetLsb = 0x0E,			//!< Hard-Iron Calibration Offset for the X-axis
-		X_OffsetMsb = 0x0F,			//!< Hard-Iron Calibration Offset for the X-axis
-		Y_OffsetLsb = 0x10,			//!< Hard-Iron Calibration Offset for the Y-axis
-		Y_OffsetMsb = 0x11,			//!< Hard-Iron Calibration Offset for the Y-axis
-		Z_OffsetLsb = 0x12,			//!< Hard-Iron Calibration Offset for the Z-axis
-		Z_OffsetMsb = 0x13,			//!< Hard-Iron Calibration Offset for the Z-axis
-		FilterLsb = 0x14,			//!< Heading IIR Filter (0x00 to 0x0F typical)
-		FilterMsb = 0x15,			//!< Heading IIR Filter (set at zero)
+		SlaveAddress = 0x00,		///< I2C Slave Address
+		SoftwareVersion = 0x02,		///< Software Version Number
+		OperationMode1 = 0x04,		///< Operation Mode Register 1
+		OperationMode2 = 0x05,		///< Operation Mode Register 2
+		DeviceSerialLsb = 0x06,		///< Device Serial Number
+		DeviceSerialMsb = 0x07,		///< Device Serial Number
+		DateCodeYear = 0x08,		///< Package Date Code: Last two digits of the year
+		DateCodeWeek = 0x09,		///< Package Date Code: Fiscal Week
+		DeviationAngleLsb = 0x0A,	///< Deviation Angle (+-1800) in tenth of a degree
+		DeviationAngleMsb = 0x0B,	///< Deviation Angle (+-1800) in tenth of a degree
+		VariationAngleLsb = 0x0C,	///< Variation Angle (+-1800) in tenth of a degree
+		VariationAngleMsb = 0x0D,	///< Variation Angle (+-1800) in tenth of a degree
+		X_OffsetLsb = 0x0E,			///< Hard-Iron Calibration Offset for the X-axis
+		X_OffsetMsb = 0x0F,			///< Hard-Iron Calibration Offset for the X-axis
+		Y_OffsetLsb = 0x10,			///< Hard-Iron Calibration Offset for the Y-axis
+		Y_OffsetMsb = 0x11,			///< Hard-Iron Calibration Offset for the Y-axis
+		Z_OffsetLsb = 0x12,			///< Hard-Iron Calibration Offset for the Z-axis
+		Z_OffsetMsb = 0x13,			///< Hard-Iron Calibration Offset for the Z-axis
+		FilterLsb = 0x14,			///< Heading IIR Filter (0x00 to 0x0F typical)
+		FilterMsb = 0x15,			///< Heading IIR Filter (set at zero)
 	};
 
 	enum class
 	Register16 : uint8_t
 	{
-		DeviceSerial = Register::DeviceSerialLsb,		//!< Device Serial Number
-		DeviationAngle = Register::DeviationAngleLsb,	//!< Deviation Angle (+-1800) in tenth of a degree
-		VariationAngle = Register::VariationAngleLsb,	//!< Variation Angle (+-1800) in tenth of a degree
-		X_Offset = Register::X_OffsetLsb,				//!< Hard-Iron Calibration Offset for the X-axis
-		Y_Offset = Register::Y_OffsetLsb,				//!< Hard-Iron Calibration Offset for the Y-axis
-		Z_Offset = Register::Z_OffsetLsb,				//!< Hard-Iron Calibration Offset for the Z-axis
+		DeviceSerial = Register::DeviceSerialLsb,		///< Device Serial Number
+		DeviationAngle = Register::DeviationAngleLsb,	///< Deviation Angle (+-1800) in tenth of a degree
+		VariationAngle = Register::VariationAngleLsb,	///< Variation Angle (+-1800) in tenth of a degree
+		X_Offset = Register::X_OffsetLsb,				///< Hard-Iron Calibration Offset for the X-axis
+		Y_Offset = Register::Y_OffsetLsb,				///< Hard-Iron Calibration Offset for the Y-axis
+		Z_Offset = Register::Z_OffsetLsb,				///< Hard-Iron Calibration Offset for the Z-axis
 	};
 
 protected:
 	enum class
 	Command : uint8_t
 	{
-		PostAccelData = 0x40,		//!< Post Accel Data. AxMSB, AxLSB, AyMSB, AyLSB, AzMSB, AzLSB
-		PostMagData = 0x45,			//!< Post Mag Data. MxMSB, MxLSB, MyMSB, MyLSB, MzMSB, MzLSB
-		PostHeadingData = 0x50,		//!< Post Heading Data. HeadMSB, HeadLSB, PitchMSB, PitchLSB, RollMSB, RollLSB
-		PostTiltData = 0x55,		//!< Post Tilt Data. PitchMSB, PitchLSB, RollMSB, RollLSB, TempMSB, TempLSB
+		PostAccelData = 0x40,		///< Post Accel Data. AxMSB, AxLSB, AyMSB, AyLSB, AzMSB, AzLSB
+		PostMagData = 0x45,			///< Post Mag Data. MxMSB, MxLSB, MyMSB, MyLSB, MzMSB, MzLSB
+		PostHeadingData = 0x50,		///< Post Heading Data. HeadMSB, HeadLSB, PitchMSB, PitchLSB, RollMSB, RollLSB
+		PostTiltData = 0x55,		///< Post Tilt Data. PitchMSB, PitchLSB, RollMSB, RollLSB, TempMSB, TempLSB
 		PostOperationMode = 0x65,
 		EnterUserCalibrationMode = 0x71,
 		LevelOrientation = 0x72,
@@ -91,14 +91,14 @@ public:
 	{
 		enum
 		{
-			Comp = 0x80,					//!< Calculating compass data if set. (read only)
-			Cal = 0x40,						//!< Calculating calibration offsets if set. (read only)
-			Filter = 0x20,					//!< IIR Heading Filter used if set.
-			Run = 0x10,						//!< Run Mode if set.
-			Standby = 0x08,					//!< Standby Mode if set.
-			UprightFrontOrientation = 0x04,	//!< Upright Front Orientation if set.
-			UprightEdgeOrientation = 0x02,	//!< Upright Edge Orientation if set.
-			LevelOrientation = 0x01,		//!< Level Orientation if set
+			Comp = 0x80,					///< Calculating compass data if set. (read only)
+			Cal = 0x40,						///< Calculating calibration offsets if set. (read only)
+			Filter = 0x20,					///< IIR Heading Filter used if set.
+			Run = 0x10,						///< Run Mode if set.
+			Standby = 0x08,					///< Standby Mode if set.
+			UprightFrontOrientation = 0x04,	///< Upright Front Orientation if set.
+			UprightEdgeOrientation = 0x02,	///< Upright Edge Orientation if set.
+			LevelOrientation = 0x01,		///< Level Orientation if set
 		};
 	};
 
@@ -208,7 +208,7 @@ protected:
  * @author	Niklas Hauser
  */
 template < class I2cMaster >
-class Hmc6343 : public hmc6343, public xpcc::I2cDevice< I2cMaster >, public xpcc::co::NestedCoroutine<1>
+class Hmc6343 : public hmc6343, public xpcc::I2cDevice< I2cMaster >, protected xpcc::co::NestedCoroutine<1>
 {
 public:
 	/// \brief	Constructor, requires pointer to 21 byte array, sets address to default of 0x19
@@ -344,6 +344,7 @@ public:
 
 
 public:
+	/// the data object for this sensor.
 	Data &data;
 
 private:
