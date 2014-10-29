@@ -353,8 +353,8 @@ DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>:
 {
 	// umrechnung von odometry steps zu motor steps
 	// eigentlich braucht man nicht zwischen fL und fR zu unterscheiden da sie fast gleich sind, aber egal
-	constexpr float fL = (Configuration::Odometry::BOW_FACTOR_LEFT  * 2) * constant::drive::TICK_PER_MM;
-	constexpr float fR = (Configuration::Odometry::BOW_FACTOR_RIGHT * 2) * constant::drive::TICK_PER_MM;
+	constexpr float fL = (Configuration::Odometry::BowFactorLeft  * 2) * constant::drive::TICK_PER_MM;
+	constexpr float fR = (Configuration::Odometry::BowFactorRight * 2) * constant::drive::TICK_PER_MM;
 
 //	const float odoAxisDist = constant::odometry::WHEELBASE;
 //	const float driveAxisDist = constant::drive::WHEELBASE;

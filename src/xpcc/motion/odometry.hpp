@@ -38,8 +38,8 @@ public:
 public:
 	enum Wheel
 	{
-		LEFT = 0,
-		RIGHT = 1,
+		LeftWheel = 0,	/// array index for the left wheel
+		RightWheel = 1,	/// array index for the right wheel
 	};
 	
 public:
