@@ -120,6 +120,7 @@ def generate(env, **kw):
 				'python "${XPCC_SYSTEM_BUILDER}/cpp_packets.py" ' \
 					'--source_path ${TARGETS[0].dir} ' \
 					'--header_path ${TARGETS[1].dir} ' \
+					'--dtdpath "${dtdPath}" ' \
 					'$SOURCE',
 				cmdstr="$SYSTEM_CPP_PACKETS_COMSTR"),
 			emitter = packet_emitter,
@@ -133,6 +134,7 @@ def generate(env, **kw):
 			action = SCons.Action.Action(
 				'python "${XPCC_SYSTEM_BUILDER}/cpp_identifier.py" ' \
 					'--outpath ${TARGET.dir} ' \
+					'--dtdpath "${dtdPath}" ' \
 					'$SOURCE',
 				cmdstr="$SYSTEM_CPP_IDENTIFIER_COMSTR"),
 			emitter = identifier_emitter,
@@ -147,6 +149,7 @@ def generate(env, **kw):
 				'python "${XPCC_SYSTEM_BUILDER}/cpp_postman.py" ' \
 					'--container "${container}" ' \
 					'--outpath ${TARGET.dir} ' \
+					'--dtdpath "${dtdPath}" ' \
 					'$SOURCE',
 				cmdstr="$SYSTEM_CPP_POSTMAN_COMSTR"),
 			emitter = postman_emitter,
@@ -160,6 +163,7 @@ def generate(env, **kw):
 			action = SCons.Action.Action(
 				'python "${XPCC_SYSTEM_BUILDER}/cpp_communication.py" ' \
 					'--outpath ${TARGET.dir} ' \
+					'--dtdpath "${dtdPath}" ' \
 					'$SOURCE',
 				cmdstr="$SYSTEM_CPP_COMMUNICATION_COMSTR"),
 			emitter = communication_emitter,

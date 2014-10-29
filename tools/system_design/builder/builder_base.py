@@ -91,6 +91,12 @@ class Builder(object):
 				default = None,
 				help = "Template path [optional]")
 		
+		optparser.add_option(
+				"-d", "--dtdpath",
+				dest = "dtdPath",
+				default = None,
+				help = "DTD path [optional]")
+		
 		self.setup(optparser)
 		
 		(self.options, args) = optparser.parse_args()
@@ -104,7 +110,7 @@ class Builder(object):
 		
 		try:
 			parser = Parser()
-			parser.parse(self.xmlfile)
+			parser.parse(self.xmlfile, dtdPath=self.options.dtdPath)
 		except ParserException as e:
 			sys.stderr.write("Parsing Error: %s\n" % str(e))
 			print traceback.format_exc()

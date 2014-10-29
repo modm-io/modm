@@ -3,6 +3,7 @@
 
 import xml.etree.ElementTree as et
 import xml.parsers.expat
+from lxml import etree
 import os
 import sys
 import logging
@@ -54,6 +55,19 @@ class Tree(object):
 			output += "- %s\n" % element
 		return output
 
+class DTDResolver(etree.Resolver):
+	def __init__(self, dtdPath):
+		self.dtdPath = dtdPath
+		
+	def resolve(self, url, id, context):
+		if os.path.isfile(url):
+			return None
+		else:
+			filename = os.path.basename(url)
+			if (self.dtdPath == None):
+				self.dtdPath = '.'
+			return self.resolve_filename(os.path.join(self.dtdPath, filename), context)
+
 class Parser(object):
 	"""
 	XPCC XML parser class
@@ -66,7 +80,7 @@ class Parser(object):
 		self.tree = Tree()
 		self.modify_time = 0
 	
-	def parse(self, filename):
+	def parse(self, filename, dtdPath = '.'):
 		"""
 		Parse a XML-file
 		
@@ -91,6 +105,7 @@ class Parser(object):
 		"""
 		self.rootfile = filename
 		self.include_path = os.path.dirname(os.path.abspath(self.rootfile))
+		self.dtdPath = dtdPath
 		self._parse_file(filename)
 		
 	def _parse_file(self, filename, include_path = None):
@@ -116,8 +131,13 @@ class Parser(object):
 			
 			# validate against the embedded DTD file
 			try:
-				parser = lxml.etree.XMLParser(dtd_validation=True)
+				parser = lxml.etree.XMLParser(dtd_validation=True, load_dtd=True)
+				
+				# Dynamically resolve DTD paths
+				parser.resolvers.add( DTDResolver(dtdPath = self.dtdPath) )
+				
 				dummy = lxml.etree.parse(filename, parser)
+				
 			except lxml.etree.XMLSyntaxError as e:
 				raise ParserException("Validation error in '%s': %s" % (filename, e))
 			else:
