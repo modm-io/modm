@@ -188,7 +188,7 @@ ISR(TWI_vect)
 				errorState = xpcc::I2cMaster::Error::Unknown;
 			}
 			DEBUG('r');
-			if (transaction) transaction->detaching(DetachCause::ErrorCondition);
+			if (transaction) transaction->detaching(xpcc::I2c::DetachCause::ErrorCondition);
 			transaction = nullptr;
 			TWDR = 0xff;
 			TWCR = (1 << TWEN);
