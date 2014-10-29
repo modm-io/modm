@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+
+<!--
+    DTD for rca.
+-->
+
+<!ELEMENT rca (description|include|event)*>
+<!ATTLIST rca 
+	version    CDATA    #REQUIRED
+>
+
+<!ELEMENT description (#PCDATA)>
+<!ELEMENT include (#PCDATA)>
+
+<!ELEMENT event (description?)>
+<!ATTLIST event
+	name CDATA #REQUIRED
+	id CDATA #REQUIRED
+	type CDATA #IMPLIED
+	rate CDATA #IMPLIED
+>

@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='utf-8'?>
+
+<!--DTD for Roboterclub Aachen e.V. -->
+
+<!ELEMENT rca (description|include|container|domain)*>
+<!ATTLIST rca
+	version    CDATA    #REQUIRED
+>
+
+<!ELEMENT description (#PCDATA)>
+<!ELEMENT include (#PCDATA)>
+
+<!ELEMENT container (description|bootloader|component)*>
+<!ATTLIST container
+	name CDATA #REQUIRED
+>
+
+<!ELEMENT domain (#PCDATA)>
+<!ATTLIST domain
+	name CDATA #REQUIRED
+	id CDATA #REQUIRED
+>
+
+<!ELEMENT bootloader (#PCDATA)>
+<!ATTLIST bootloader
+	type CDATA #REQUIRED
+>
+
+<!ELEMENT component EMPTY>
+<!ATTLIST component
+	name CDATA #REQUIRED
+	id CDATA #IMPLIED
+>

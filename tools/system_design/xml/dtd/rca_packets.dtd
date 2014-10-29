@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='utf-8'?>
+
+<!--
+    DTD for rca.
+-->
+
+<!ELEMENT rca (include|description|builtin|typedef|struct|enum)*>
+<!ATTLIST rca 
+	version    CDATA    #REQUIRED
+>
+
+<!ELEMENT description (#PCDATA)>
+<!ELEMENT include (#PCDATA)>
+
+<!ELEMENT builtin (description?)>
+<!ATTLIST builtin
+	description CDATA #IMPLIED
+	name CDATA #REQUIRED
+	size CDATA #REQUIRED
+>
+
+<!ELEMENT typedef (description?)>
+<!ATTLIST typedef
+	name CDATA #REQUIRED
+	type CDATA #REQUIRED
+	unit CDATA #IMPLIED
+>
+
+<!ELEMENT struct (description?,element*)>
+<!ATTLIST struct
+	name CDATA #REQUIRED
+	extends CDATA #IMPLIED
+	description CDATA #IMPLIED
+	typeIdentifier CDATA #IMPLIED
+>
+
+<!ELEMENT enum (description?,element*)>
+<!ATTLIST enum
+	name CDATA #REQUIRED
+>
+
+<!ELEMENT element (description?)>
+<!ATTLIST element
+	name CDATA #REQUIRED
+	value CDATA #IMPLIED
+	string CDATA #IMPLIED
+	type CDATA #IMPLIED
+	unit CDATA #IMPLIED
+	description CDATA #IMPLIED
+>
+
