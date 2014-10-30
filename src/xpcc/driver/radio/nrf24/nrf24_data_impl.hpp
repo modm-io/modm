@@ -33,6 +33,9 @@ Address xpcc::Nrf24Data<Nrf24Phy>::connections[3];
 template<typename Nrf24Phy>
 frame_t xpcc::Nrf24Data<Nrf24Phy>::assemblyFrame;
 
+template<typename Nrf24Phy>
+SendingState xpcc::Nrf24Data<Nrf24Phy>::state = SendingState::Undefined;
+
 // --------------------------------------------------------------------------------------------------------------------
 
 /* typedef config layer for simplicity */
@@ -55,6 +58,9 @@ xpcc::Nrf24Data<Nrf24Phy>::initialize(BaseAddress base_address, Address own_addr
 	connections[2]  = broadcastAddress;
 
 	setAddress(own_address);
+
+	// reset state
+	state = SendingState::Undefined;
 
 	// Clear assembly frame
 	memset(&assemblyFrame, 0, sizeof(frame_t));
@@ -140,11 +146,17 @@ xpcc::Nrf24Data<Nrf24Phy>::sendPacket(packet_t& packet)
     if(packet.dest == getBroadcastAddress())
     {
         Nrf24Phy::writeTxPayloadNoAck(&assemblyFrame, packet.length + sizeof(header_t));
+
+        // as frame was sent without requesting an acknowledgement we can't determine it's state
+        state = SendingState::DontKnow;
     } else
     {
         // set pipe 0's address to tx address to receive ack packet
         Nrf24Phy::setRxAddress(0, assembleAddress(packet.dest));
         Nrf24Phy::writeTxPayload(&assemblyFrame, packet.length + sizeof(header_t));
+
+        // mark state as busy, so when
+        state = SendingState::Busy;
     }
 
     // send a pulse on Ce to send the packet
@@ -181,6 +193,37 @@ xpcc::Nrf24Data<Nrf24Phy>::isReadyToSend()
 // --------------------------------------------------------------------------------------------------------------------
 
 template<typename Nrf24Phy>
+SendingState
+xpcc::Nrf24Data<Nrf24Phy>::updateSendingState()
+{
+    // directly return state if not busy, because nothing needs to be updated then
+	if(state != SendingState::Busy)
+		return state;
+
+
+    // read relevant status registers
+    uint8_t status = Nrf24Phy::readStatus();
+    uint8_t fifo_status = Nrf24Phy::readRegister(Register::FIFO_STATUS);
+
+    if(status & Status::MAX_RT)
+    {
+        state = SendingState::FinishedNack;
+
+        // clear MAX_RT bit to enable further communication
+        Nrf24Phy::setBits(Register::STATUS, Status::MAX_RT);
+    }
+
+    if(status & Status::TX_DS)
+    {
+        state = SendingState::FinishedAck;
+    }
+
+    return state;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template<typename Nrf24Phy>
 bool
 xpcc::Nrf24Data<Nrf24Phy>::isPacketAvailable()
 {
@@ -199,6 +242,7 @@ template<typename Nrf24Phy>
 SendingState
 xpcc::Nrf24Data<Nrf24Phy>::getSendingFeedback()
 {
+    return updateSendingState();
 }
 
 // --------------------------------------------------------------------------------------------------------------------

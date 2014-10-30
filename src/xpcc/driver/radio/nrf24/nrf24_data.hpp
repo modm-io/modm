@@ -26,10 +26,11 @@ typedef uint8_t 	Address;
 
 enum class SendingState
 {
-	BUSY,
-	FINISHED_ACK,
-	FINISHED_NACK,
-	DONT_KNOW
+	Busy,
+	FinishedAck,
+	FinishedNack,
+	DontKnow,
+	Undefined
 };
 
 /*
@@ -100,6 +101,9 @@ public:
 	static bool
 	isPacketAvailable();
 
+	/** @brief Returns feedback for the last packet sent
+	 *
+	 */
 	static SendingState
 	getSendingFeedback();
 
@@ -140,6 +144,9 @@ private:
 	static inline uint64_t
 	assembleAddress(Address address);
 
+	static SendingState
+	updateSendingState();
+
 private:
 
 	/** @brief Base address of the network
@@ -165,6 +172,9 @@ private:
 	static Address connections[3];
 
 	static frame_t assemblyFrame;
+
+	static SendingState state;
+
 };
 
 }
