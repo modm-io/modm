@@ -10,6 +10,8 @@
 #ifndef XPCC__NRF24_DATA_HPP
 #define XPCC__NRF24_DATA_HPP
 
+#include <stdint.h>
+
 #include "nrf24_phy.hpp"
 #include "nrf24_config.hpp"
 
