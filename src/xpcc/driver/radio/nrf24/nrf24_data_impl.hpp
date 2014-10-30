@@ -180,6 +180,27 @@ template<typename Nrf24Phy>
 bool
 xpcc::Nrf24Data<Nrf24Phy>::getPacket(packet_t& packet)
 {
+    if(!isPacketAvailable())
+        return false;
+
+    // Don't care about pipe numbers for now as we use our own header within each packet
+    //uint8_t pipe = ConfigLayer::getPayloadPipe();
+
+    /*
+     * TODO: Replace packet_t by frame_t because there's no reason to trade some bytes of RAM against the runtime
+     *       penalty of copying to and from assembly frame every cycle.
+     */
+
+    // First read into buffer frame
+    uint8_t payload_length = Nrf24Phy::readRxPayload(&assemblyFrame);
+
+    // Then copy to user packet
+    packet.dest = assemblyFrame.header.dest;
+    packet.src = assemblyFrame.header.src;
+    packet.length = payload_length;
+    memcpy(assemblyFrame.data, packet.data, packet.length);
+
+    return true;
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -190,9 +211,8 @@ xpcc::Nrf24Data<Nrf24Phy>::isReadyToSend()
 {
     uint8_t fifo_status = Nrf24Phy::readRegister(Register::FIFO_STATUS);
 
-    // Wait for TX Fifo to become empty, because otherwise we needed to make sure
+    // Wait for TX Fifo to become empty, because otherwise we would need to make sure
     // that every packet has the same destination
-
     if(fifo_status & FifoStatus::TX_EMPTY)
         return true;
     else
@@ -236,10 +256,10 @@ template<typename Nrf24Phy>
 bool
 xpcc::Nrf24Data<Nrf24Phy>::isPacketAvailable()
 {
-    uint8_t status = Nrf24Phy::readStatus();
     uint8_t fifo_status = Nrf24Phy::readRegister(Register::FIFO_STATUS);
 
-    if( (status & Status::RX_DR) || !(fifo_status & FifoStatus::RX_EMPTY) )
+    // only check Rx Fifo for now, Status:RX_DR will be needed when using interrupts
+    if( !(fifo_status & FifoStatus::RX_EMPTY) )
         return true;
     else
         return false;
