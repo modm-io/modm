@@ -105,6 +105,9 @@ xpcc::Nrf24Data<Nrf24Phy>::initialize(BaseAddress base_address, Address own_addr
     // Power up module in Rx mode
     ConfigLayer::setMode(Mode::Rx);
     ConfigLayer::powerUp();
+
+    // don't save power, always in Rx-mode or standby-2 (see table 15, p. 24)
+    Nrf24Phy::setCe();
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -159,8 +162,14 @@ xpcc::Nrf24Data<Nrf24Phy>::sendPacket(packet_t& packet)
         state = SendingState::Busy;
     }
 
-    // send a pulse on Ce to send the packet
-    Nrf24Phy::pulseCe();
+    // switch to Tx mode, CE should be always set
+    ConfigLayer::setMode(Mode::Tx);
+
+    // wait until packet is sent
+    while( !(Nrf24Phy::readRegister(Register::FIFO_STATUS) & FifoStatus::TX_EMPTY) );
+
+    // switch back to Rx mode
+    ConfigLayer::setMode(Mode::Rx);
 
     return true;
 }
