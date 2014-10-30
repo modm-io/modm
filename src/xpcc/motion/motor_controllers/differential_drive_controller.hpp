@@ -18,6 +18,8 @@
 #include <communication/packets.hpp>
 #include <component_logger/logger.hpp>
 
+#include <xpcc/motion/utils.hpp> // TicksPerTimeToPwm
+
 /**
  * Closed loop velocity control of two motors which form a differential drive of a robot.
  *
@@ -33,6 +35,7 @@
  *
  */
 template<
+	typename Configuration,
 	typename MotorLeft,    typename MotorRight,
 	typename OdometryLeft, typename OdometryRight> class DifferentialDriveController
 {
@@ -58,7 +61,7 @@ public:
 	 */
 	static void
 	setRobotSpeed(int16_t v, float omega);
-	
+
 	/**
 	 * Control forward speed but not the orientation.
 	 * 
@@ -79,8 +82,8 @@ public:
 	static void
 	setVelocityWeakControllerParameter(const xpcc::Pid< float, 10 >::Parameter& /*param*/)
 	{
-		// we don't have that yet
-//		vPidWeak.setParameter(param);
+		// FIXME: we don't have that yet
+		// vPidWeak.setParameter(param);
 	}
 
 	static void
@@ -243,6 +246,17 @@ private:
 	static xpcc::filter::Debounce<uint16_t> driftWheelsFilterForward;
 	static xpcc::filter::Debounce<uint16_t> driftWheelsFilterAngle;
 	static xpcc::filter::Ramp<float> speedTargetRamp;
+
+private:
+	// import constants into this classe's scope to make methods more readable
+	/// contains the encoder ticks per mm of motion
+	static constexpr float TicksPerMm          = Configuration::TicksPerMm;
+	/// track width in mm
+	static constexpr float WheelBase           = Configuration::WheelBase;
+	/// time between calls to the engine code in seconds
+	static constexpr float EngineTimestep      = Configuration::EngineTimestep;
+	/// time between calls to the engine code in milliseconds
+	static constexpr uint16_t EngineTimestepMs = Configuration::EngineTimestepMs;
 };
 
 #include "differential_drive_controller_impl.hpp"
