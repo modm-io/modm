@@ -82,6 +82,10 @@ class Nrf24Data
 {
 public:
 
+    /* typedef config layer for simplicity */
+    typedef xpcc::Nrf24Config<Nrf24Phy> ConfigLayer;
+
+
     static void
     initialize(BaseAddress base_address, Address own_address, Address broadcast_address = 0xFF);
 

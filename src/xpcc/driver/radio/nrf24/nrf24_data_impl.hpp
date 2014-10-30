@@ -36,11 +36,6 @@ frame_t xpcc::Nrf24Data<Nrf24Phy>::assemblyFrame;
 template<typename Nrf24Phy>
 SendingState xpcc::Nrf24Data<Nrf24Phy>::state = SendingState::Undefined;
 
-// --------------------------------------------------------------------------------------------------------------------
-
-/* typedef config layer for simplicity */
-template<typename Nrf24Phy>
-typedef xpcc::Nrf24Config<Nrf24Phy> ConfigLayer;
 
 // --------------------------------------------------------------------------------------------------------------------
 
