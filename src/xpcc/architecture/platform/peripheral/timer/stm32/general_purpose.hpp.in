@@ -218,6 +218,116 @@ public:
 	configureOutputChannel(uint32_t channel, OutputCompareMode mode,
 			Value compareValue, PinState out = PinState::Enable);
 
+
+	static void
+	setInvertedPwm(uint32_t channel)
+	{
+		channel -= 1;	// 1..2 -> 0..1
+		
+		{
+			uint32_t flags = 0b1110000;
+			
+			if (channel <= 1)
+			{
+				uint32_t offset = 8 * channel;
+
+				flags <<= offset;
+				flags |= TIM{{ id }}->CCMR1 & ~(TIM_CCMR1_OC1M << offset);
+				TIM{{ id }}->CCMR1 = flags;
+			}
+			else {
+				uint32_t offset = 8 * (channel - 2);
+
+				flags <<= offset;
+				flags |= TIM{{ id }}->CCMR2 & ~(TIM_CCMR1_OC1M << offset);
+
+				TIM{{ id }}->CCMR2 = flags;
+			}
+		}
+	}
+	
+	static void
+	setNormalPwm(uint32_t channel)
+	{
+		channel -= 1;	// 1..2 -> 0..1
+		
+		{
+			uint32_t flags = 0b1100000;
+			
+			if (channel <= 1)
+			{
+				uint32_t offset = 8 * channel;
+
+				flags <<= offset;
+				flags |= TIM{{ id }}->CCMR1 & ~(TIM_CCMR1_OC1M << offset);
+				TIM{{ id }}->CCMR1 = flags;
+			}
+			else {
+				uint32_t offset = 8 * (channel - 2);
+
+				flags <<= offset;
+				flags |= TIM{{ id }}->CCMR2 & ~(TIM_CCMR1_OC1M << offset);
+
+				TIM{{ id }}->CCMR2 = flags;
+			}
+		}
+	}
+	
+	static void
+	forceInactive(uint32_t channel)
+	{
+		channel -= 1;	// 1..2 -> 0..1
+		
+		{
+			uint32_t flags = 0b1000000;
+			
+			if (channel <= 1)
+			{
+				uint32_t offset = 8 * channel;
+
+				flags <<= offset;
+				flags |= TIM{{ id }}->CCMR1 & ~(TIM_CCMR1_OC1M << offset);
+				TIM{{ id }}->CCMR1 = flags;
+			}
+			else {
+				uint32_t offset = 8 * (channel - 2);
+
+				flags <<= offset;
+				flags |= TIM{{ id }}->CCMR2 & ~(TIM_CCMR1_OC1M << offset);
+
+				TIM{{ id }}->CCMR2 = flags;
+			}
+		}
+	}
+
+	static void
+	forceActive(uint32_t channel)
+	{
+		channel -= 1;	// 1..2 -> 0..1
+		
+		{
+			uint32_t flags = 0b1010000;
+			
+			if (channel <= 1)
+			{
+				uint32_t offset = 8 * channel;
+
+				flags <<= offset;
+				flags |= TIM{{ id }}->CCMR1 & ~(TIM_CCMR1_OC1M << offset);
+				TIM{{ id }}->CCMR1 = flags;
+			}
+			else {
+				uint32_t offset = 8 * (channel - 2);
+
+				flags <<= offset;
+				flags |= TIM{{ id }}->CCMR2 & ~(TIM_CCMR1_OC1M << offset);
+
+				TIM{{ id }}->CCMR2 = flags;
+			}
+		}
+	}
+	
+
 	static inline void
 	setCompareValue(uint32_t channel, Value value)
 	{
