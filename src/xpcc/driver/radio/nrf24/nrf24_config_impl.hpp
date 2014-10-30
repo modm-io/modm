@@ -204,3 +204,14 @@ xpcc::Nrf24Config<Nrf24Phy>::disablePipe(nrf24::Pipe pipe)
 	/* DISABLE pipe */
 	Nrf24Phy::clearBits(nrf24::Register::EN_RX_ADDR, static_cast<uint8_t>(pipe));
 }
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template<typename Nrf24Phy>
+uint8_t
+xpcc::Nrf24Config<Nrf24Phy>::getPayloadPipe()
+{
+    uint8_t status = Nrf24Phy::readStatus();
+
+    return ((status & Status::RX_P_NO) >> 1);
+}

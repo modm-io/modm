@@ -177,6 +177,11 @@ public:
 	static void
 	disablePipe(nrf24::Pipe pipe);
 
+	/** @brief Return number of pipe number that has payload available
+	 */
+	static uint8_t
+	getPayloadPipe();
+
 };
 
 }
