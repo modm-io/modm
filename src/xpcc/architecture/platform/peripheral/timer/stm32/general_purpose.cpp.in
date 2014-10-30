@@ -34,6 +34,13 @@
 
 // ----------------------------------------------------------------------------
 void
+xpcc::stm32::Timer{{ id }}::clockEnable()
+{
+	// enable clock
+	RCC->{{ apb }}ENR  |=  RCC_{{ apb }}ENR_TIM{{ id }}EN;
+}
+
+void
 xpcc::stm32::Timer{{ id }}::enable()
 {
 	// enable clock

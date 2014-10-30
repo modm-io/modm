@@ -121,7 +121,11 @@ public:
 	typedef uint16_t Value;
 
 %% endif
-
+	// Just enable the clock of the peripheral
+	static void
+	clockEnable();
+	
+	// Enables the clock and resets the timer
 	static void
 	enable();
 
