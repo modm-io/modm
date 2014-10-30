@@ -8,7 +8,7 @@
 // ----------------------------------------------------------------------------
 
 #ifndef XPCC__NRF24_DATA_HPP
-#	error "Don't include this file directly, use 'nrf24_data.hpp' instead!"
+#   error "Don't include this file directly, use 'nrf24_data.hpp' instead!"
 #endif
 
 #include "nrf24_data.hpp"
@@ -49,53 +49,53 @@ template<typename Nrf24Phy>
 void
 xpcc::Nrf24Data<Nrf24Phy>::initialize(BaseAddress base_address, Address own_address, Address broadcast_address)
 {
-	baseAddress = base_address;
-	broadcastAddress = broadcast_address;
+    baseAddress = base_address;
+    broadcastAddress = broadcast_address;
 
-	// Initialized with broadcast address means unset
-	connections[0]  = broadcastAddress;
-	connections[1]  = broadcastAddress;
-	connections[2]  = broadcastAddress;
+    // Initialized with broadcast address means unset
+    connections[0]  = broadcastAddress;
+    connections[1]  = broadcastAddress;
+    connections[2]  = broadcastAddress;
 
-	setAddress(own_address);
+    setAddress(own_address);
 
-	// reset state
-	state = SendingState::Undefined;
+    // reset state
+    state = SendingState::Undefined;
 
-	// Clear assembly frame
-	memset(&assemblyFrame, 0, sizeof(frame_t));
+    // Clear assembly frame
+    memset(&assemblyFrame, 0, sizeof(frame_t));
 
-	// Set to fixed address length of 5 byte for now
-	ConfigLayer::setAddressWidth(AddressWidth::Byte5);
+    // Set to fixed address length of 5 byte for now
+    ConfigLayer::setAddressWidth(AddressWidth::Byte5);
 
-	// Setup broadcast pipe
-	Nrf24Phy::setRxAddress(1, assembleAddress(broadcast_address));
+    // Setup broadcast pipe
+    Nrf24Phy::setRxAddress(1, assembleAddress(broadcast_address));
 
-	// Disable auto ack
-	ConfigLayer::enablePipe(Pipe::Pipe1, false);
+    // Disable auto ack
+    ConfigLayer::enablePipe(Pipe::Pipe1, false);
 
-	// Setup pipe 0 that will be used to receive acks and therefore configured
-	// with an address to listen for. We want to already enable it, but not
-	// setting an address could lead to erroneous packet coming from noise.
-	// So we set it to the bitwise negated base address.
-	Nrf24Phy::setRxAddress(0, ~assembleAddress(0x55));
+    // Setup pipe 0 that will be used to receive acks and therefore configured
+    // with an address to listen for. We want to already enable it, but not
+    // setting an address could lead to erroneous packet coming from noise.
+    // So we set it to the bitwise negated base address.
+    Nrf24Phy::setRxAddress(0, ~assembleAddress(0x55));
 
-	// don't enable auto ack here because we're not expecting data on this pipe
-	ConfigLayer::enablePipe(Pipe::Pipe0, false);
+    // don't enable auto ack here because we're not expecting data on this pipe
+    ConfigLayer::enablePipe(Pipe::Pipe0, false);
 
 
-	// Enable feature 'EN_DYN_ACK' to be able to send packets without expecting
-	// an ACK as response (used for transmitting to broadcast address)
-	ConfigLayer::enableFeatureNoAck();
+    // Enable feature 'EN_DYN_ACK' to be able to send packets without expecting
+    // an ACK as response (used for transmitting to broadcast address)
+    ConfigLayer::enableFeatureNoAck();
 
-	// Flush Fifos just to be sure
-	Nrf24Phy::flushRxFifo();
-	Nrf24Phy::flushTxFifo();
+    // Flush Fifos just to be sure
+    Nrf24Phy::flushRxFifo();
+    Nrf24Phy::flushTxFifo();
 
-	/*
-	 * Configure some sensible defaults, may be changed later by user, but
-	 * sould be consistent among all other nodes
-	 */
+    /*
+     * Configure some sensible defaults, may be changed later by user, but
+     * sould be consistent among all other nodes
+     */
     ConfigLayer::setCrc(Crc::Crc2Byte);
     ConfigLayer::setSpeed(Speed::MBps2);
     ConfigLayer::setAutoRetransmitDelay(AutoRetransmitDelay::us750);
@@ -226,8 +226,8 @@ SendingState
 xpcc::Nrf24Data<Nrf24Phy>::updateSendingState()
 {
     // directly return state if not busy, because nothing needs to be updated then
-	if(state != SendingState::Busy)
-		return state;
+    if(state != SendingState::Busy)
+        return state;
 
 
     // read relevant status registers
@@ -298,8 +298,8 @@ template<typename Nrf24Phy>
 bool
 xpcc::Nrf24Data<Nrf24Phy>::establishConnection()
 {
-	// not yet implemented
-	return false;
+    // not yet implemented
+    return false;
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -308,6 +308,6 @@ template<typename Nrf24Phy>
 bool
 xpcc::Nrf24Data<Nrf24Phy>::destroyConnection()
 {
-	// not yet implemented
-	return false;
+    // not yet implemented
+    return false;
 }

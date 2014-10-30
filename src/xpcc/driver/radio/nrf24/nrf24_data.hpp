@@ -21,16 +21,16 @@ namespace xpcc
 namespace nrf24
 {
 
-typedef uint64_t 	BaseAddress;
-typedef uint8_t 	Address;
+typedef uint64_t    BaseAddress;
+typedef uint8_t     Address;
 
 enum class SendingState
 {
-	Busy,
-	FinishedAck,
-	FinishedNack,
-	DontKnow,
-	Undefined
+    Busy,
+    FinishedAck,
+    FinishedNack,
+    DontKnow,
+    Undefined
 };
 
 /*
@@ -38,10 +38,10 @@ enum class SendingState
  */
 typedef struct packet_t
 {
-	Address     dest;
-	Address     src;        // will be ignored when sending
-	uint8_t*    data;
-	uint8_t     length;     // max. 30!
+    Address     dest;
+    Address     src;        // will be ignored when sending
+    uint8_t*    data;
+    uint8_t     length;     // max. 30!
 } packet_t;
 
 
@@ -82,98 +82,98 @@ class Nrf24Data
 {
 public:
 
-	static void
-	initialize(BaseAddress base_address, Address own_address, Address broadcast_address = 0xFF);
+    static void
+    initialize(BaseAddress base_address, Address own_address, Address broadcast_address = 0xFF);
 
 public:
 
-	/* general data layer interface */
+    /* general data layer interface */
 
-	static bool
-	sendPacket(packet_t& packet);
+    static bool
+    sendPacket(packet_t& packet);
 
-	static bool
-	getPacket(packet_t& packet);
+    static bool
+    getPacket(packet_t& packet);
 
-	static bool
-	isReadyToSend();
+    static bool
+    isReadyToSend();
 
-	static bool
-	isPacketAvailable();
+    static bool
+    isPacketAvailable();
 
-	/** @brief Returns feedback for the last packet sent
-	 *
-	 */
-	static SendingState
-	getSendingFeedback();
+    /** @brief Returns feedback for the last packet sent
+     *
+     */
+    static SendingState
+    getSendingFeedback();
 
-	static Address
-	getAddress();
+    static Address
+    getAddress();
 
-	/** @brief Set own address
-	 *
-	 */
-	static void
-	setAddress(Address address);
+    /** @brief Set own address
+     *
+     */
+    static void
+    setAddress(Address address);
 
-	static uint8_t
-	getPayloadLength()
-	{
-		return Nrf24Phy::getPayloadLength() - sizeof(header_t);
-	}
+    static uint8_t
+    getPayloadLength()
+    {
+        return Nrf24Phy::getPayloadLength() - sizeof(header_t);
+    }
 
-	static Address
-	getBroadcastAddress()
-	{
-		return broadcastAddress;
-	}
+    static Address
+    getBroadcastAddress()
+    {
+        return broadcastAddress;
+    }
 
-	/* nrf24 specific */
+    /* nrf24 specific */
 
 // not yet implemented
 private:
-	static bool
-	establishConnection();
+    static bool
+    establishConnection();
 
-	static bool
-	destroyConnection();
+    static bool
+    destroyConnection();
 
-
-private:
-
-	static inline uint64_t
-	assembleAddress(Address address);
-
-	static SendingState
-	updateSendingState();
 
 private:
 
-	/** @brief Base address of the network
-	 *
-	 *	 The first 3 byte will be truncated, so the address is actually 5 bytes
-	 *	 long. The last byte will be used to address individual modules or
-	 *	 connections between them respectively. Use different base address for
-	 *	 seperate networks, although it may impact performance seriously to run
-	 *	 overlapping networks.
-	 *
-	 *	 Format:
-	 *
-	 *	 | dont'care | base address | address |
-	 *	 | ---------------------------------- |
-	 *	 |   3 byte  |    4 byte    |  1 byte |
-	 */
-	static BaseAddress baseAddress;
+    static inline uint64_t
+    assembleAddress(Address address);
 
-	static Address broadcastAddress;
+    static SendingState
+    updateSendingState();
 
-	static Address ownAddress;
+private:
 
-	static Address connections[3];
+    /** @brief Base address of the network
+     *
+     *   The first 3 byte will be truncated, so the address is actually 5 bytes
+     *   long. The last byte will be used to address individual modules or
+     *   connections between them respectively. Use different base address for
+     *   seperate networks, although it may impact performance seriously to run
+     *   overlapping networks.
+     *
+     *   Format:
+     *
+     *   | dont'care | base address | address |
+     *   | ---------------------------------- |
+     *   |   3 byte  |    4 byte    |  1 byte |
+     */
+    static BaseAddress baseAddress;
 
-	static frame_t assemblyFrame;
+    static Address broadcastAddress;
 
-	static SendingState state;
+    static Address ownAddress;
+
+    static Address connections[3];
+
+    static frame_t assemblyFrame;
+
+    static SendingState state;
 
 };
 
