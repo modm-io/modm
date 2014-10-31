@@ -46,7 +46,7 @@ xpcc::ui::Animation<T>::stop()
 {
 	animationTime = -1;
 	endValue = currentValue;
-	computations.deltaValue = 0;
+	interpolation.reset();
 }
 
 template< typename T >
@@ -67,7 +67,7 @@ xpcc::ui::Animation<T>::animateTo(TimeType time, T value)
 
 	endValue = value;
 	animationTime = time;
-	computations.initialize(currentValue, endValue, animationTime);
+	interpolation.initialize(currentValue, endValue, animationTime);
 	previous = xpcc::Clock::now();
 	return true;
 }
@@ -109,7 +109,7 @@ xpcc::ui::Animation<T>::update() {
 					return true;
 				}
 
-				currentValue = computations.step();
+				currentValue = interpolation.step();
 			}
 
 			return true;

@@ -14,6 +14,7 @@
 #include <xpcc/architecture/driver/clock.hpp>
 #include <xpcc/utils/arithmetic_traits.hpp>
 #include <xpcc/utils/template_metaprogramming.hpp>
+#include "interpolation.hpp"
 
 namespace xpcc
 {
@@ -44,13 +45,8 @@ class Animation
 {
 private:
 	typedef typename xpcc::ArithmeticTraits<T>::UnsignedType UnsignedType;
-	// for (u)int8_t types, the time is limited to ~32s anyway,
-	// so we do not need uint32_t for the time, but we can use uint16_t
 public:
-	typedef typename xpcc::tmp::Select<
-			xpcc::tmp::SameType<UnsignedType, uint8_t>::value,
-			uint16_t,
-			uint32_t >::Result TimeType;
+	typedef typename LinearInterpolation<T>::StepType TimeType;
 
 	Animation(T &value);
 
@@ -89,130 +85,8 @@ private:
 	T endValue;
 	TimeType animationTime;
 	xpcc::Timestamp previous;
-
-	// the default implementation uses floating-point arithmetic
-	template< typename Type, typename Unsigned >
-	class Computations
-	{
-		float accumulatedValue;
-		float deltaValue;
-
-	public:
-		void inline
-		initialize(Type currentValue, Type endValue, uint32_t time)
-		{
-			accumulatedValue = static_cast<float>(currentValue);
-			float delta = (static_cast<float>(endValue) - currentValue);
-			deltaValue = delta / time;
-			if (deltaValue == 0)
-				deltaValue = delta > 0 ? xpcc::ArithmeticTraits<float>::epsilon : -xpcc::ArithmeticTraits<float>::epsilon;
-		}
-
-		Type inline
-		step()
-		{
-			accumulatedValue += deltaValue;
-			return static_cast<Type>(accumulatedValue);
-		}
-	};
-
-	// uint8_t implementation using signed 8.7 fixed-point arithmetic.
-	// The maximum change can be +-255 since the value type is 8 bit wide.
-	// The remaining 7 bits are used for fractional delta time:
-	// 1 step can take at most 128ms, which is equivalent to about 32s
-	// over the whole range.
-	template< typename Type >
-	struct Computations <Type, uint8_t>
-	{
-		uint16_t accumulatedValue;
-		int16_t deltaValue;
-
-		void inline
-		initialize(Type currentValue, Type endValue, uint16_t time)
-		{
-			accumulatedValue = static_cast<uint16_t>(currentValue) << 7;
-			int16_t delta = (static_cast<int16_t>(endValue) - currentValue) << 7;
-			deltaValue = delta / static_cast<int16_t>(time);
-			if (deltaValue == 0)
-				deltaValue = delta > 0 ? 1 : -1;
-		}
-
-		Type inline
-		step()
-		{
-			accumulatedValue += deltaValue;
-			return static_cast<Type>(accumulatedValue >> 7);
-		}
-	};
-
-	// uint16_t implementation using signed 16.15 fixed point arithmetic.
-	// The maximum change can be +-65535 since the value type is 16 bit wide.
-	// The remaining 15 bits are used for fractional delta time:
-	// 1 step can take at most 32768ms, which is equivalent to about 24 days
-	// over the whole range.
-	template< typename Type >
-	struct Computations <Type, uint16_t>
-	{
-		uint32_t accumulatedValue;
-		int32_t deltaValue;
-
-		void inline
-		initialize(Type currentValue, Type endValue, uint32_t time)
-		{
-			accumulatedValue = static_cast<uint32_t>(currentValue) << 15;
-			int32_t delta = (static_cast<int32_t>(endValue) - currentValue) << 15;
-			deltaValue = delta / static_cast<int32_t>(time);
-			if (deltaValue == 0)
-				deltaValue = delta > 0 ? 1 : -1;
-		}
-
-		Type inline
-		step()
-		{
-			accumulatedValue += deltaValue;
-			return static_cast<Type>(accumulatedValue >> 15);
-		}
-	};
-
-	// On the AVR 64bit variables do not exits, therefore this must be excluded,
-	// so that it may revert back to using floats.
-	// It's not pretty, but neither is using uint32_t on an 8bit CPU to begin with.
-#if !defined(XPCC__CPU_AVR)
-
-	// uint32_t implementation using signed 32.16 fixed point arithmetic.
-	// The maximum change can be +-2^32 since the value type is 32 bit wide.
-	// The remaining 16 bits are used for fractional delta time:
-	// 1 step can take at most 65356ms, which is equivalent to about 8900 years
-	// over the whole range.
-	// Note: we use 16 bits for the fractionals here, so that it is byte-aligned.
-	// This should allow CPUs without a barrelshifter to copy the value instead of shifting it.
-	template< typename Type >
-	struct Computations <Type, uint32_t>
-	{
-		uint64_t accumulatedValue;
-		int64_t deltaValue;
-
-		void inline
-		initialize(Type currentValue, Type endValue, uint32_t time)
-		{
-			accumulatedValue = static_cast<uint64_t>(currentValue) << 16;
-			int64_t delta = (static_cast<int64_t>(endValue) - currentValue) << 16;
-			deltaValue = delta / static_cast<int32_t>(time);
-			if (deltaValue == 0)
-				deltaValue = delta > 0 ? 1 : -1;
-		}
-
-		Type inline
-		step()
-		{
-			accumulatedValue += deltaValue;
-			return static_cast<Type>(accumulatedValue >> 16);
-		}
-	};
-#endif
-
 	// create an instance of the calculation helper
-	Computations<T, UnsignedType> computations;
+	LinearInterpolation<T> interpolation;
 };
 
 }	// namespace ui
