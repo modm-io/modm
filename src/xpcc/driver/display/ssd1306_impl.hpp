@@ -101,9 +101,8 @@ xpcc::Ssd1306<I2cMaster>::setRotation(void *ctx, Rotation rotation)
 	if ( CO_CALL(writeCommand(ctx, (rotation == Rotation::Normal) ?
 			Command::SetSegmentRemap127 : Command::SetSegmentRemap0)) )
 	{
-		if ( CO_CALL(writeCommand(ctx, (rotation == Rotation::Normal) ?
-				Command::SetComOutputScanDirectionDecrement : Command::SetComOutputScanDirectionIncrement)) )
-			CO_RETURN(true);
+		CO_RETURN_CALL(writeCommand(ctx, (rotation == Rotation::Normal) ?
+				Command::SetComOutputScanDirectionDecrement : Command::SetComOutputScanDirectionIncrement));
 	}
 
 	CO_END_RETURN(false);

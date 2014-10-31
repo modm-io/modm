@@ -69,17 +69,7 @@
  * @hideinitializer
  */
 #define CO_END_RETURN_CALL(coroutine) \
-			CO_INTERNAL_SET_CASE(__COUNTER__,); \
-			{ \
-				auto coResult = coroutine; \
-				if (coResult.state > xpcc::co::NestingError) { \
-					this->popCo(); \
-					return {xpcc::co::Running, 0}; \
-				} \
-				this->stopCo(); \
-				this->popCo(); \
-				return {xpcc::co::Stop, coResult.result}; \
-			} \
+			CO_RETURN_CALL(coroutine); \
 		default: \
 			this->popCo(); \
 			return {xpcc::co::WrongState, 0}; \
@@ -149,6 +139,27 @@
 			{ coResult = coroutine; } \
 			coResult.result; \
 	})
+
+/**
+* Exits a coroutine and returns another coroutine's result.
+*
+* @ingroup	coroutine
+* @hideinitializer
+*/
+#define CO_RETURN_CALL(coroutine) \
+		{ \
+			CO_INTERNAL_SET_CASE(__COUNTER__,); \
+			{ \
+				auto coResult = coroutine; \
+				if (coResult.state > xpcc::co::NestingError) { \
+					this->popCo(); \
+					return {xpcc::co::Running, 0}; \
+				} \
+				this->stopCo(); \
+				this->popCo(); \
+				return {xpcc::co::Stop, coResult.result}; \
+			} \
+		}
 
 /**
  * Stop and exit from coroutine.

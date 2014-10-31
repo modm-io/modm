@@ -90,8 +90,7 @@ xpcc::Hmc6343<I2cMaster>::writeRegister(void *ctx, Register16 reg, uint16_t valu
 	if ( CO_CALL( writeRegister(ctx, static_cast<Register>(reg), value) ) )
 	{
 		// MSB
-		if ( CO_CALL( writeRegister(ctx, static_cast<Register>(i(reg)+1), (value >> 8)) ) )
-			CO_RETURN(true);
+		CO_RETURN_CALL( writeRegister(ctx, static_cast<Register>(i(reg)+1), (value >> 8)) );
 	}
 
 	CO_END_RETURN(false);
@@ -123,8 +122,7 @@ xpcc::Hmc6343<I2cMaster>::readRegister(void *ctx, Register reg, uint8_t &value)
 
 		CO_WAIT_WHILE(i2cTask == (i(reg) + I2cTask::ReadEepromBase));
 
-		if (i2cSuccess == (i(reg) + I2cTask::ReadEepromBase))
-			CO_RETURN(true);
+		CO_RETURN(i2cSuccess == (i(reg) + I2cTask::ReadEepromBase));
 	}
 
 	CO_END_RETURN(false);
@@ -170,8 +168,7 @@ xpcc::Hmc6343<I2cMaster>::readPostData(void *ctx, Command command, uint8_t offse
 
 		CO_WAIT_WHILE(i2cTask == (i(command) + I2cTask::ReadCommandBase));
 
-		if (i2cSuccess == (i(command) + I2cTask::ReadCommandBase))
-			CO_RETURN(true);
+		CO_RETURN(i2cSuccess == (i(command) + I2cTask::ReadCommandBase));
 	}
 
 	CO_END_RETURN(false);
