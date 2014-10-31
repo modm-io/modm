@@ -214,14 +214,14 @@ public:
 	}
 
 	/// @return	`true` if a coroutine is running at the current nesting level, else `false`
-	bool ALWAYS_INLINE
+	bool inline
 	isCoroutineRunning() const
 	{
 		return !isStoppedCo();
 	}
 
 	/// @return the nesting depth in the current coroutine, or -1 if called outside any coroutine
-	int8_t ALWAYS_INLINE
+	int8_t inline
 	getCoroutineDepth() const
 	{
 		return static_cast<int8_t>(coLevel) - 1;
@@ -245,7 +245,7 @@ protected:
 
 	/// increases nesting level, call this in the switch statement!
 	/// @return current state before increasing nesting level
-	CoState ALWAYS_INLINE
+	CoState inline
 	pushCo()
 	{
 		return coStateArray[coLevel++];
@@ -253,7 +253,7 @@ protected:
 
 	/// always call this before returning from the run function!
 	/// decreases nesting level
-	void ALWAYS_INLINE
+	void inline
 	popCo()
 	{
 		coLevel--;
@@ -271,7 +271,7 @@ protected:
 
 	/// sets the state of the parent nesting level
 	/// @warning	be aware in which nesting level you call this! (before popCo()!)
-	void ALWAYS_INLINE
+	void inline
 	setCo(CoState state)
 	{
 		coStateArray[coLevel-1] = state;
@@ -279,14 +279,14 @@ protected:
 
 	/// @return `true` if the nesting depth allows for another level.
 	/// @warning	be aware in which nesting level you call this! (before pushCo()!)
-	bool ALWAYS_INLINE
+	bool inline
 	nestingOkCo() const
 	{
 		return (coLevel < Depth + 1);
 	}
 
 	/// @return	`true` if `stopCo()` has been called before
-	bool ALWAYS_INLINE
+	bool inline
 	isStoppedCo() const
 	{
 		return (coStateArray[coLevel] == CoStopped);
@@ -333,19 +333,19 @@ protected:
 	}
 
 public:
-	void ALWAYS_INLINE
+	void inline
 	stopCoroutine()
 	{
 		this->stopCo();
 	}
 
-	bool ALWAYS_INLINE
+	bool inline
 	isCoroutineRunning() const
 	{
 		return !isStoppedCo();
 	}
 
-	int8_t ALWAYS_INLINE
+	int8_t inline
 	getCoroutineDepth() const
 	{
 		return coLevel;
@@ -354,39 +354,39 @@ public:
 protected:
 	/// @internal
 	/// @{
-	CoState ALWAYS_INLINE
+	CoState inline
 	pushCo()
 	{
 		coLevel = 0;
 		return coState;
 	}
 
-	void ALWAYS_INLINE
+	void inline
 	popCo()
 	{
 		coLevel = -1;
 	}
 
-	void ALWAYS_INLINE
+	void inline
 	stopCo()
 	{
 		coState = CoStopped;
 		coContext = 0;
 	}
 
-	bool ALWAYS_INLINE
+	bool inline
 	nestingOkCo() const
 	{
 		return (coLevel != 0);
 	}
 
-	void ALWAYS_INLINE
+	void inline
 	setCo(CoState state)
 	{
 		coState = state;
 	}
 
-	bool ALWAYS_INLINE
+	bool inline
 	isStoppedCo() const
 	{
 		return (coState == CoStopped);
