@@ -12,6 +12,13 @@
 
 #include <xpcc/utils/arithmetic_traits.hpp>
 
+/// @internal Required macro to set the same unique number twice
+/// @hideinitializer
+#define CO_INTERNAL_SET_CASE(counter, sandwich) \
+			this->setCo((counter % 255) + 1); \
+			sandwich; \
+		case ((counter % 255) + 1): ;
+
 /**
  * Declare start of a coroutine.
  * This will immidiately return if the nesting is too deep
@@ -26,8 +33,7 @@
 	if (!this->beginCo(context)) return {xpcc::co::WrongContext, 0}; \
 	switch (this->pushCo()) { \
 		case CoStopped: \
-			this->setCo(__LINE__); \
-		case __LINE__: ;
+			CO_INTERNAL_SET_CASE(__COUNTER__,);
 
 /**
  * End the coroutine and return a result.
@@ -63,8 +69,7 @@
  * @hideinitializer
  */
 #define CO_END_RETURN_CALL(coroutine) \
-			this->setCo(__LINE__); \
-		case __LINE__: \
+			CO_INTERNAL_SET_CASE(__COUNTER__,); \
 			{ \
 				auto coResult = coroutine; \
 				if (coResult.state > xpcc::co::NestingError) { \
@@ -87,10 +92,9 @@
  * @hideinitializer
  */
 #define CO_YIELD() \
-			this->setCo(__LINE__); \
+			CO_INTERNAL_SET_CASE(__COUNTER__, \
 			this->popCo(); \
-			return {xpcc::co::Running, 0}; \
-		case __LINE__: ;
+			return {xpcc::co::Running, 0}); \
 
 /**
  * Cause coroutine to wait **while** given `condition` is true.
@@ -99,8 +103,7 @@
  * @hideinitializer
  */
 #define CO_WAIT_WHILE(condition) \
-			this->setCo(__LINE__); \
-		case __LINE__: \
+			CO_INTERNAL_SET_CASE(__COUNTER__,); \
 			if (condition) { \
 				this->popCo(); \
 				return {xpcc::co::Running, 0}; \
@@ -123,8 +126,7 @@
  */
 #define CO_CALL(coroutine) \
 	({ \
-			this->setCo(__LINE__); \
-		case __LINE__:\
+			CO_INTERNAL_SET_CASE(__COUNTER__,); \
 			auto coResult = coroutine; \
 			if (coResult.state > xpcc::co::NestingError) { \
 				this->popCo(); \

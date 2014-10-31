@@ -52,7 +52,7 @@ struct Result<void>
 
 /// Used to store a coroutines's position (what Dunkels calls a
 /// "local continuation").
-typedef uint16_t CoState;
+typedef uint8_t CoState;
 
 /**
  * An implementation of Coroutines which allow for nested calling.
