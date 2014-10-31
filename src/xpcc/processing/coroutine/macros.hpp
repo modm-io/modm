@@ -14,9 +14,14 @@
 
 /// @internal Required macro to set the same unique number twice
 /// @hideinitializer
-#define CO_INTERNAL_SET_CASE(counter, sandwich) \
+#define CO_INTERNAL_SET_CASE(counter) \
 			this->setCo((counter % 255) + 1); \
-			sandwich; \
+		case ((counter % 255) + 1): ;
+
+#define CO_INTERNAL_SET_CASE_YIELD(counter) \
+			this->setCo((counter % 255) + 1); \
+			this->popCo(); \
+			return {xpcc::co::Running, 0}; \
 		case ((counter % 255) + 1): ;
 
 /**
@@ -33,7 +38,7 @@
 	if (!this->beginCo(context)) return {xpcc::co::WrongContext, 0}; \
 	switch (this->pushCo()) { \
 		case CoStopped: \
-			CO_INTERNAL_SET_CASE(__COUNTER__,);
+			CO_INTERNAL_SET_CASE(__COUNTER__);
 
 /**
  * End the coroutine and return a result.
@@ -82,9 +87,7 @@
  * @hideinitializer
  */
 #define CO_YIELD() \
-			CO_INTERNAL_SET_CASE(__COUNTER__, \
-			this->popCo(); \
-			return {xpcc::co::Running, 0}); \
+			CO_INTERNAL_SET_CASE_YIELD(__COUNTER__)
 
 /**
  * Cause coroutine to wait **while** given `condition` is true.
@@ -93,7 +96,7 @@
  * @hideinitializer
  */
 #define CO_WAIT_WHILE(condition) \
-			CO_INTERNAL_SET_CASE(__COUNTER__,); \
+			CO_INTERNAL_SET_CASE(__COUNTER__); \
 			if (condition) { \
 				this->popCo(); \
 				return {xpcc::co::Running, 0}; \
@@ -116,7 +119,7 @@
  */
 #define CO_CALL(coroutine) \
 	({ \
-			CO_INTERNAL_SET_CASE(__COUNTER__,); \
+			CO_INTERNAL_SET_CASE(__COUNTER__); \
 			auto coResult = coroutine; \
 			if (coResult.state > xpcc::co::NestingError) { \
 				this->popCo(); \
@@ -148,7 +151,7 @@
 */
 #define CO_RETURN_CALL(coroutine) \
 		{ \
-			CO_INTERNAL_SET_CASE(__COUNTER__,); \
+			CO_INTERNAL_SET_CASE(__COUNTER__); \
 			{ \
 				auto coResult = coroutine; \
 				if (coResult.state > xpcc::co::NestingError) { \
