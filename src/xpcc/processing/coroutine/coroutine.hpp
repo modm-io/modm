@@ -20,18 +20,18 @@ namespace co
 {
 
 /// State of a coroutine.
-enum State : uint8_t
+enum State
 {
 	// reasons to stop
-	Stop = 0,					///< Coroutine finished
-	NestingError = (1 << 0),	///< Nested Coroutine has run out of nesting levels
+	Stop = 0,			///< Coroutine finished
+	NestingError = 1,	///< Nested Coroutine has run out of nesting levels
 
 	// reasons to wait
-	WrongContext = (1 << 5),	///< Coroutine already running in a different context
-	WrongState = (1 << 6),		///< Another coroutine of the same class is already running in this context
+	WrongContext = 2,	///< Coroutine already running in a different context
+	WrongState = 3,		///< Another coroutine of the same class is already running in this context
 
 	// reasons to keep running
-	Running = (1 << 7),			///< Coroutine is running
+	Running = 4,		///< Coroutine is running
 };
 
 /// All Coroutines return an encapsulated result type.
