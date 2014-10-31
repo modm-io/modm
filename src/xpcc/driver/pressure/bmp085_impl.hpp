@@ -15,15 +15,11 @@
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
-xpcc::Bmp085<I2cMaster>::Bmp085(uint8_t* data, uint8_t address)
-:	I2cDevice<I2cMaster>(),
+xpcc::Bmp085<I2cMaster>::Bmp085(Data &data, uint8_t address)
+:	data(data),
  	i2cTask(I2cTask::Idle),
  	i2cSuccess(0),
- 	adapter(address, i2cTask, i2cSuccess),
-
- 	status(0),
- 	calculation(0),
- 	data(data)
+ 	adapter(address, i2cTask, i2cSuccess)
 {
 }
 
@@ -51,14 +47,16 @@ template < typename I2cMaster >
 xpcc::co::Result<bool>
 xpcc::Bmp085<I2cMaster>::configure(void *ctx, bmp085::Mode mode)
 {
-	config = mode;
+	data.config = mode;
 	buffer[0] = bmp085::REGISTER_CAL_AC1;
 	
 	CO_BEGIN(ctx);
 
 	CO_WAIT_UNTIL(
 			!adapter.isBusy() && (
-					adapter.configureWriteRead(buffer, 1, reinterpret_cast<uint8_t*>(&calibration), 22) &&
+					adapter.configureWriteRead(
+							buffer, 1,
+							reinterpret_cast<uint8_t*>(&data.calibration), 22) &&
 					this->startTransaction(&adapter)
 			)
 	);
@@ -68,7 +66,7 @@ xpcc::Bmp085<I2cMaster>::configure(void *ctx, bmp085::Mode mode)
 	CO_WAIT_WHILE(i2cTask == I2cTask::Configure);
 
 	if (i2cSuccess == I2cTask::Configure) {
-		uint16_t* element = reinterpret_cast<uint16_t*>(&calibration);
+		uint16_t* element = reinterpret_cast<uint16_t*>(&data.calibration);
 		element[ 0] = xpcc::swap(element[0]);
 		element[ 1] = xpcc::swap(element[1]);
 		element[ 2] = xpcc::swap(element[2]);
@@ -86,7 +84,7 @@ xpcc::Bmp085<I2cMaster>::configure(void *ctx, bmp085::Mode mode)
 		CO_RETURN(true);
 	}
 
-	CO_END();
+	CO_END_RETURN(false);
 }
 
 template < typename I2cMaster >
@@ -122,13 +120,14 @@ xpcc::Bmp085<I2cMaster>::readout(void *ctx)
 	buffer[0] = bmp085::REGISTER_CONVERSION_MSB;
 	CO_WAIT_UNTIL(
 			!adapter.isBusy() && (
-					adapter.configureWriteRead(buffer, 1, data, 2) &&
+					adapter.configureWriteRead(
+							buffer, 1,
+							data.raw, 2) &&
 					this->startTransaction(&adapter)
 			)
 	);
 
-	status |= NEW_TEMPERATURE_DATA;
-	calculation |= TEMPERATURE_NEEDS_UPDATE;
+	data.temperatureCalculated = false;
 
 	i2cTask = I2cTask::Readout;
 
@@ -140,7 +139,7 @@ xpcc::Bmp085<I2cMaster>::readout(void *ctx)
 
 	// Now start converting the pressure
 	buffer[0] = bmp085::REGISTER_CONTROL;
-	buffer[1] = bmp085::CONVERSION_PRESSURE | config;
+	buffer[1] = bmp085::CONVERSION_PRESSURE | data.config;
 
 	CO_WAIT_UNTIL(
 			!adapter.isBusy() && (
@@ -159,7 +158,7 @@ xpcc::Bmp085<I2cMaster>::readout(void *ctx)
 
 	// Wait until sensor has converted the pressure
 	{
-		uint8_t oss = ((config & bmp085::MODE) >> 6);
+		uint8_t oss = ((data.config & bmp085::MODE) >> 6);
 		timeout.restart(conversionDelay[oss]);
 	}
 	CO_WAIT_UNTIL(timeout.isExpired());
@@ -168,13 +167,14 @@ xpcc::Bmp085<I2cMaster>::readout(void *ctx)
 	buffer[0] = bmp085::REGISTER_CONVERSION_MSB;
 	CO_WAIT_UNTIL(
 			!adapter.isBusy() && (
-					adapter.configureWriteRead(buffer, 1, data + 2, 3) &&
+					adapter.configureWriteRead(
+							buffer, 1,
+							data.raw + 2, 3) &&
 					this->startTransaction(&adapter)
 			)
 	);
 
-	calculation |= PRESSURE_NEEDS_UPDATE;
-	status |= NEW_PRESSURE_DATA;
+	data.pressureCalculated = false;
 
 	i2cTask = I2cTask::Readout;
 
@@ -184,93 +184,53 @@ xpcc::Bmp085<I2cMaster>::readout(void *ctx)
 		CO_RETURN(false);
 	}
 
-
-	CO_RETURN(true);
-
-	CO_END();
+	CO_END_RETURN(true);
 }
 
-template < typename I2cMaster >
-bool
-xpcc::Bmp085<I2cMaster>::isNewDataAvailable()
-{
-	return status & NEW_PRESSURE_DATA;
-}
-
-template < typename I2cMaster >
-uint8_t*
-xpcc::Bmp085<I2cMaster>::getData()
-{
-	status &= ~NEW_PRESSURE_DATA;
-	return data;
-}
-
-template < typename I2cMaster >
-uint16_t*
-xpcc::Bmp085<I2cMaster>::getCalibrationData()
-{
-	return reinterpret_cast<uint16_t*>(&calibration);
-}
-
-template < typename I2cMaster >
-int16_t*
-xpcc::Bmp085<I2cMaster>::getCalibratedTemperature()
-{
-	if (calculation & TEMPERATURE_NEEDS_UPDATE) {
-		int32_t x1, x2;
-		uint16_t ut = static_cast<uint16_t>(data[0]<<8|data[1]);
-		x1 = xpcc::math::mul(ut - calibration.ac6, calibration.ac5) >> 15;
-		x2 = (static_cast<int32_t>(calibration.mc) << 11) / (x1 + calibration.md);
-		b5 = x1 + x2;
-		calibratedTemperature = static_cast<int16_t>((b5 + 8) >> 4);
-		calculation &= ~TEMPERATURE_NEEDS_UPDATE;
-	}
-	return &calibratedTemperature;
-}
-
-template < typename I2cMaster >
-int32_t*
-xpcc::Bmp085<I2cMaster>::getCalibratedPressure()
-{
-	if (calculation & PRESSURE_NEEDS_UPDATE) {
-		int32_t x1, x2, x3, b3, p;
-		int16_t b6;
-		uint32_t b4, b7;
-		uint8_t oss = ((config & bmp085::MODE) >> 6);
-		
-		getCalibratedTemperature();
-		
-		uint32_t up = (static_cast<uint32_t>(data[2])<<16|static_cast<uint16_t>(data[3])<<8|data[4]) >> (8 - oss);
-		b6 = static_cast<int16_t>(b5 - 4000);
-		x1 = xpcc::math::mul(calibration.b2, xpcc::math::mul(b6, b6) >> 12) >> 11;
-		x2 = xpcc::math::mul(calibration.ac2, b6) >> 11;
-		x3 = x1 + x2;
-		b3 = (xpcc::math::mul(calibration.ac1, 4) + x3) << oss;
-		b3 = (b3 + 2) >> 2;
-		x1 = xpcc::math::mul(calibration.ac3, b6) >> 13;
-		x2 = xpcc::math::mul(calibration.b1, xpcc::math::mul(b6, b6) >> 12) >> 16;
-		x3 = ((x1 + x2) + 2) >> 2;
-		b4 = xpcc::math::mul(calibration.ac4, static_cast<uint16_t>(x3 + 32768)) >> 15;
-		b7 = (up - b3) * (50000 >> oss);
-		if (b7 < 0x80000000)
-			p = (b7 << 1) / b4;
-		else
-			p = (b7 / b4) << 1;
-		
-		x1 = xpcc::math::mul(static_cast<uint16_t>(p >> 8), static_cast<uint16_t>(p >> 8));
-		x1 = (x1 * 3038) >> 16;
-		x2 = (-7357 * p) >> 16;
-		calibratedPressure = p + ((x1 + x2 + 3791) >> 4);
-		calculation &= ~PRESSURE_NEEDS_UPDATE;
-	}
-	
-	return &calibratedPressure;
-}
-
-template < typename I2cMaster >
 void
-xpcc::Bmp085<I2cMaster>::update()
+xpcc::bmp085::Data::calculateCalibratedTemperature()
 {
+	int32_t x1, x2;
+	uint16_t ut = static_cast<uint16_t>(raw[0] << 8 | raw[1]);
+	x1 = xpcc::math::mul(ut - calibration.ac6, calibration.ac5) >> 15;
+	x2 = (static_cast<int32_t>(calibration.mc) << 11) / (x1 + calibration.md);
+	b5 = x1 + x2;
+	calibratedTemperature = static_cast<int16_t>((b5 + 8) >> 4);
+	temperatureCalculated = true;
+}
+
+void
+xpcc::bmp085::Data::calculateCalibratedPressure()
+{
+	int32_t x1, x2, x3, b3, p;
+	int16_t b6;
+	uint32_t b4, b7;
+	uint8_t oss = ((config & bmp085::MODE) >> 6);
+
+	calculateCalibratedTemperature();
+
+	uint32_t up = (static_cast<uint32_t>(raw[2])<<16|static_cast<uint16_t>(raw[3])<<8|raw[4]) >> (8 - oss);
+	b6 = static_cast<int16_t>(b5 - 4000);
+	x1 = xpcc::math::mul(calibration.b2, xpcc::math::mul(b6, b6) >> 12) >> 11;
+	x2 = xpcc::math::mul(calibration.ac2, b6) >> 11;
+	x3 = x1 + x2;
+	b3 = (xpcc::math::mul(calibration.ac1, 4) + x3) << oss;
+	b3 = (b3 + 2) >> 2;
+	x1 = xpcc::math::mul(calibration.ac3, b6) >> 13;
+	x2 = xpcc::math::mul(calibration.b1, xpcc::math::mul(b6, b6) >> 12) >> 16;
+	x3 = ((x1 + x2) + 2) >> 2;
+	b4 = xpcc::math::mul(calibration.ac4, static_cast<uint16_t>(x3 + 32768)) >> 15;
+	b7 = (up - b3) * (50000 >> oss);
+	if (b7 < 0x80000000)
+		p = (b7 << 1) / b4;
+	else
+		p = (b7 / b4) << 1;
+
+	x1 = xpcc::math::mul(static_cast<uint16_t>(p >> 8), static_cast<uint16_t>(p >> 8));
+	x1 = (x1 * 3038) >> 16;
+	x2 = (-7357 * p) >> 16;
+	calibratedPressure = p + ((x1 + x2 + 3791) >> 4);
+	pressureCalculated = false;
 }
 
 template < typename I2cMaster >
