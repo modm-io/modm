@@ -86,16 +86,23 @@ typedef uint8_t CoState;
  * coroutines to become available and then run them, so you usually do
  * not need to worry about those cases.
  *
- * You may exit and return a value by using `CO_RETURN(value)`.
- * This information is wrapped in `xpcc::co::Result<Type>` struct
+ * You may exit and return a value by using `CO_RETURN(value)` or
+ * return the result of another coroutine using `CO_RETURN_CALL(coroutine(ctx))`.
+ * This return value is wrapped in a `xpcc::co::Result<Type>` struct
  * and transparently returned by the `CO_CALL` macro so it can be used
  * to influence your program flow.
- * If the coroutine reaches `CO_END()` it will exit automatically,
- * however the return type is set to `0` or equivalent.
+ * If the coroutine reaches `CO_END()` it will exit automatically.
+ * Should you wish to return a value at the end, you may use
+ * `CO_END_RETURN(value)`.
+ * You may also return the result of another coroutine using
+ * `CO_END_RETURN_CALL(coroutine(ctx))`.
  *
  * Note that you should call coroutines within a protothreads.
  * It is sufficient to use the `this` pointer of the class as context
  * when calling the coroutines.
+ * You may use the `CO_CALL_BLOCKING(coroutine(ctx))` macro to execute
+ * a coroutine outside of a protothread, however, this which will
+ * force the CPU to busy-wait until the coroutine ended.
  *
  * Here is a (slightly over-engineered) example:
  *
@@ -144,9 +151,7 @@ typedef uint8_t CoState;
  *             CO_WAIT_UNTIL(timer.isExpired());
  *         }
  *
- *         // CO_RETURN is optional
- *
- *         CO_END();
+ *         CO_END_RETURN(false);
  *     }
  *
  *     xpcc::co::Result<bool>
@@ -161,7 +166,7 @@ typedef uint8_t CoState;
  *
  *         // clean up code goes here
  *
- *         CO_END();
+ *         CO_END_RETURN(false);
  *     }
  *
  * private:
