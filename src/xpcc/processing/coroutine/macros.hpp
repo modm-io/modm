@@ -18,6 +18,8 @@
 			this->setCo((counter % 255) + 1); \
 		case ((counter % 255) + 1): ;
 
+/// @internal Internal macro for yield
+/// @hideinitializer
 #define CO_INTERNAL_SET_CASE_YIELD(counter) \
 			this->setCo((counter % 255) + 1); \
 			this->popCo(); \

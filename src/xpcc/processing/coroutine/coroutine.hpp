@@ -19,6 +19,7 @@ namespace xpcc
 namespace co
 {
 
+/// @cond
 /// State of a coroutine.
 enum State
 {
@@ -33,6 +34,7 @@ enum State
 	// reasons to keep running
 	Running = 4,		///< Coroutine is running
 };
+/// @endcond
 
 /// All Coroutines return an encapsulated result type.
 template < typename T >
@@ -41,6 +43,7 @@ struct Result
 	uint8_t state;
 	T result;
 };
+/// @cond
 /// void is not an object type
 /// @internal
 template <>
@@ -51,14 +54,8 @@ struct Result<void>
 };
 
 /**
- * An implementation of Coroutines which allow for nested calling.
- *
- * This base class and its macros allows you to implement and use several
- * coroutines in one class.
- * This allows you to modularize your code by placing it into its own coroutines
- * instead of the placing everything into one big method.
- * It also allows you to call and run coroutines within your coroutines,
- * so you can reuse their functionality.
+ * This is the base class which must be inherited from for using
+ * coroutines in your class.
  *
  * You are responsible to choosing the right nesting depth!
  * This class will guard itself against calling another coroutine at too
@@ -87,99 +84,12 @@ struct Result<void>
  * This return value is wrapped in a `xpcc::co::Result<Type>` struct
  * and transparently returned by the `CO_CALL` macro so it can be used
  * to influence your program flow.
- * If the coroutine reaches `CO_END()` it will exit automatically.
+ * If the coroutine reaches `CO_END()` it will exit automatically,
+ * with the result of `0` cast to the return type.
  * Should you wish to return a value at the end, you may use
  * `CO_END_RETURN(value)`.
  * You may also return the result of another coroutine using
  * `CO_END_RETURN_CALL(coroutine(ctx))`.
- *
- * Note that you should call coroutines within a protothreads.
- * It is sufficient to use the `this` pointer of the class as context
- * when calling the coroutines.
- * You may use the `CO_CALL_BLOCKING(coroutine(ctx))` macro to execute
- * a coroutine outside of a protothread, however, this which will
- * force the CPU to busy-wait until the coroutine ended.
- *
- * Here is a (slightly over-engineered) example:
- *
- * @code
- * #include <xpcc/architecture.hpp>
- * #include <xpcc/processing/protothread.hpp>
- * #include <xpcc/coroutine/coroutine.hpp>
- * #include <xpcc/processing/timeout.hpp>
- *
- * typedef GpioOutputB0 Led;
- *
- * class BlinkingLight : public xpcc::pt::Protothread, private xpcc::pt::NestedCoroutine<1>
- * {
- * public:
- *     bool
- *     run()
- *     {
- *         PT_BEGIN();
- *
- *         // set everything up
- *         Led::setOutput();
- *         Led::set();
- *
- *         while (true)
- *         {
- *             Led::set();
- *             PT_CALL(waitForTimer(this)))
- *
- *             Led::reset();
- *             PT_CALL(setTimer(this, 200));
- *
- *             PT_WAIT_UNTIL(timer.isExpired());
- *         }
- *
- *         PT_END();
- *     }
- *
- *     xpcc::co::Result<bool>
- *     waitForTimer(void *ctx)
- *     {
- *         CO_BEGIN(ctx);
- *
- *         // nested calling is allowed
- *         if (CO_CALL(setTimer(ctx, 100)))
- *         {
- *             CO_WAIT_UNTIL(timer.isExpired());
- *         }
- *
- *         CO_END_RETURN(false);
- *     }
- *
- *     xpcc::co::Result<bool>
- *     setTimer(void *ctx, uint16_t timeout)
- *     {
- *         CO_BEGIN(ctx);
- *
- *         timer.restart(timeout);
- *
- *         if(timer.isRunning())
- *             CO_RETURN(true);
- *
- *         // clean up code goes here
- *
- *         CO_END_RETURN(false);
- *     }
- *
- * private:
- *     xpcc::Timeout<> timer;
- * };
- *
- *
- * ...
- * BlinkingLight light;
- *
- * while (...) {
- *     light.run();
- * }
- * @endcode
- *
- * For other examples take a look in the `examples` folder in the XPCC
- * root folder.
  *
  * @ingroup	coroutine
  * @author	Niklas Hauser
@@ -244,8 +154,7 @@ public:
 #endif
 
 protected:
-	/// @internal
-	/// @{
+	/// @cond
 
 	/// increases nesting level, call this in the switch statement!
 	/// @return current state before increasing nesting level
@@ -314,10 +223,10 @@ protected:
 
 		return false;
 	}
-	/// @}
 
 protected:
 	static constexpr CoState CoStopped = static_cast<CoState>(0);
+	/// @endcond
 private:
 	uint8_t coLevel;
 	CoState coStateArray[Depth+1];
@@ -357,8 +266,6 @@ public:
 	}
 
 protected:
-	/// @internal
-	/// @{
 	CoState inline
 	pushCo()
 	{
@@ -411,7 +318,6 @@ protected:
 
 		return false;
 	}
-	/// @}
 
 protected:
 	static constexpr CoState CoStopped = static_cast<CoState>(0);
