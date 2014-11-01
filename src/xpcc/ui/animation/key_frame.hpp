@@ -26,7 +26,7 @@ KeyFrameAnimationMode
 	Reverse = 0b10		///< reverse through keyframes
 };
 
-
+/// @cond
 template<typename T, typename... Args>
 struct KeyFrameBase
 {
@@ -35,7 +35,10 @@ struct KeyFrameBase
 	typename Animation<T>::TimeType time;
 	T value[size];
 
-	KeyFrameBase(typename Animation<T>::TimeType time, Args... values) : time(time), value{values...} {}
+	KeyFrameBase(typename Animation<T>::TimeType time, Args... values)
+	:	time(time), value{values...}
+	{
+	}
 };
 
 template<typename T, int rem, typename... Args>
@@ -49,23 +52,19 @@ struct KeyFrameHelper<T, 0, Args...>
 {
 	typedef KeyFrameBase<T, Args...> type;
 };
+/// @endcond
 
 /**
-* This struct specifies one key frame of an animation.
-*
-* @author	Niklas Hauser
-* @ingroup ui
-*/
+ * This struct specifies one key frame of an animation.
+ *
+ * @author	Niklas Hauser
+ * @ingroup ui
+ */
 template<typename T = uint8_t, uint8_t N = 1>
 using KeyFrame = typename KeyFrameHelper<T, N>::type;
 
 
-/**
-* This class takes an array of keyframes and applies them to an animation.
-*
-* @author	Niklas Hauser
-* @ingroup ui
-*/
+/// @cond
 template< typename T, class... Args >
 class KeyFrameAnimationBase
 {
@@ -133,13 +132,14 @@ struct KeyFrameAnimationHelper<T, 0, Args...>
 {
 	typedef KeyFrameAnimationBase<T, Args...> type;
 };
+/// @endcond
 
 /**
-* This class takes an array of keyframes and applies them to an animation.
-*
-* @author	Niklas Hauser
-* @ingroup ui
-*/
+ * This class takes an array of keyframes and applies them to an animation.
+ *
+ * @author	Niklas Hauser
+ * @ingroup ui
+ */
 template<typename T = uint8_t, uint8_t N = 1>
 using KeyFrameAnimation = typename KeyFrameAnimationHelper<T, N>::type;
 
