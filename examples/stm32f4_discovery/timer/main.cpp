@@ -10,9 +10,9 @@ GreenLed green;
 BlueLed blue;
 
 // apply some animations to the leds
-xpcc::ui::Pulse<uint8_t> pulse(red.brightnessAnimation);
-xpcc::ui::Indicator<uint8_t> indicator(blue.brightnessAnimation);
-xpcc::ui::Strobe<uint8_t> strobe(green.brightnessAnimation);
+xpcc::ui::Pulse<uint8_t> pulse(red.animation);
+xpcc::ui::Indicator<uint8_t> indicator(blue.animation);
+xpcc::ui::Strobe<uint8_t> strobe(green.animation);
 
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION

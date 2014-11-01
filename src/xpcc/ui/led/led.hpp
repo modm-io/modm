@@ -84,10 +84,11 @@ public:
 	void
 	update();
 
-	Animation<uint8_t> brightnessAnimation;
+public:
+	Animation<uint8_t> animation;
 
 private:
-	uint8_t currentBrightness;
+	uint8_t brightness;
 };
 
 }	// namespace ui

@@ -13,27 +13,27 @@
 
 // ----------------------------------------------------------------------------
 xpcc::ui::Led::Led()
-:	brightnessAnimation(currentBrightness), currentBrightness(0)
+:	animation(brightness), brightness(0)
 {
 }
 
 void inline
 xpcc::ui::Led::setBrightness(uint8_t brightness)
 {
-	brightnessAnimation.setValue(brightness);
 	setValue(currentBrightness);
+	animation.setValue(brightness);
 }
 
 uint8_t ALWAYS_INLINE
 xpcc::ui::Led::getBrightness() const
 {
-	return brightnessAnimation.getValue();
+	return animation.getValue();
 }
 
 bool ALWAYS_INLINE
 xpcc::ui::Led::isFading() const
 {
-	return brightnessAnimation.isAnimating();
+	return animation.isAnimating();
 }
 
 void inline
