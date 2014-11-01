@@ -50,10 +50,6 @@ struct Result<void>
 	uint8_t result;
 };
 
-/// Used to store a coroutines's position (what Dunkels calls a
-/// "local continuation").
-typedef uint8_t CoState;
-
 /**
  * An implementation of Coroutines which allow for nested calling.
  *
@@ -193,6 +189,9 @@ typedef uint8_t CoState;
 template< uint8_t Depth >
 class NestedCoroutine
 {
+	/// Used to store a coroutines's position (what Dunkels calls a
+	/// "local continuation").
+	typedef uint8_t CoState;
 protected:
 	/// Construct a new class with nested coroutines
 	NestedCoroutine()
@@ -331,6 +330,7 @@ private:
 template <>
 class NestedCoroutine<0>
 {
+	typedef uint8_t CoState;
 protected:
 	NestedCoroutine() :
 		coState(CoStopped), coLevel(-1), coContext(0)
