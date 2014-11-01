@@ -40,8 +40,13 @@ class Animation
 {
 public:
 	typedef typename FastRamp<T>::StepType TimeType;
+	using Callback_t = void(*)(T);
 
+public:
 	Animation(T &value);
+
+	void
+	attachCallback(Callback_t callback);
 
 	void
 	setValue(T value);
@@ -66,14 +71,14 @@ public:
 	animateTo(T value, TimeType time);
 
 	/// Can be called at an interval of 1ms or less.
-	/// If you do not need 1ms response time , you can calls this at larger intervals.
+	/// If you do not need 1ms response time, you may call this at intervals < 250ms.
 	/// @return	`true` if the value has been changed,
 	///			`false` otherwise
 	bool
 	update();
 
 private:
-
+	Callback_t callback;
 	T &currentValue;
 	T endValue;
 	TimeType animationTime;

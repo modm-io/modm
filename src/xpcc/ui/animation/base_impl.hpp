@@ -14,8 +14,16 @@
 
 template< typename T >
 xpcc::ui::Animation<T>::Animation(T &value)
-:	currentValue(value), endValue(0), animationTime(0), previous(0)
+:	callback(nullptr), currentValue(value), endValue(0),
+	animationTime(0), previous(0)
 {
+}
+
+template< typename T >
+void inline
+xpcc::ui::Animation<T>::attachCallback(Callback_t callback)
+{
+	this->callback = callback;
 }
 
 template< typename T >
@@ -24,6 +32,7 @@ xpcc::ui::Animation<T>::setValue(T value)
 {
 	animationTime = 0;
 	currentValue = value;
+	if (callback) callback(currentValue);
 }
 
 template< typename T >
@@ -44,25 +53,19 @@ template< typename T >
 void inline
 xpcc::ui::Animation<T>::stop()
 {
-	animationTime = -1;
 	endValue = currentValue;
 	interpolation.stop();
+	setValue(currentValue);
 }
 
 template< typename T >
 bool
 xpcc::ui::Animation<T>::animateTo(T value, TimeType time)
 {
-	if (value == currentValue) {
-		animationTime = -1;
-		return false;
-	}
-
-	// if the time is zero, or the value is already reached, set the value immediately
-	if (time == 0) {
+	if (value == currentValue || time == 0)
+	{
 		setValue(value);
-		animationTime = -1;
-		return true;
+		return false;
 	}
 
 	endValue = value;
@@ -74,16 +77,11 @@ xpcc::ui::Animation<T>::animateTo(T value, TimeType time)
 
 template< typename T >
 bool
-xpcc::ui::Animation<T>::update() {
-	// this should be called exactly once every 1 ms
+xpcc::ui::Animation<T>::update()
+{
+	// this should be called at least once every 1 ms
 	// but if the clock gets incremented by more than 1 ms, or the main loop is
 	// busy, then we need to count these "missing" steps and apply them.
-
-	// if we are not fading at the moment, we do not need to check anything
-	if (animationTime == static_cast<TimeType>(-1)) {
-		animationTime = 0;
-		return true;
-	}
 
 	if (animationTime > 0)
 	{
@@ -103,14 +101,15 @@ xpcc::ui::Animation<T>::update() {
 			// update the values for the number of passed ms
 			while (delta--)
 			{
-				if (--animationTime == 0) {
-					animationTime = 0;
-					currentValue = endValue;
+				if (--animationTime == 0)
+				{
+					setValue(endValue);
 					return true;
 				}
-
 				currentValue = interpolation.step();
 			}
+
+			if (callback) callback(currentValue);
 
 			return true;
 		}

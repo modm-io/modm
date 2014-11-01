@@ -4,10 +4,10 @@
 #include "leds.hpp"
 
 // create the leds
-OrangeLed orange;
-RedLed red;
-GreenLed green;
-BlueLed blue;
+xpcc::ui::Led orange(setOrange);
+xpcc::ui::Led red(setRed);
+xpcc::ui::Led green(setGreen);
+xpcc::ui::Led blue(setBlue);
 
 // apply some animations to the leds
 xpcc::ui::Pulse<uint8_t> pulse(red.animation);

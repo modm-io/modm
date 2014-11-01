@@ -34,12 +34,8 @@ namespace ui
  */
 class Led
 {
-	/// This method is specific to the implementation and must be overwritten.
-	virtual void
-	setValue(uint8_t /*brightness*/) {}
-
 public:
-	Led();
+	Led(Animation<uint8_t>::Callback_t callback);
 
 	/// @param	brightness
 	///		between 0 and length of lookup-table

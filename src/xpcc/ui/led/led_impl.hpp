@@ -12,15 +12,15 @@
 #endif
 
 // ----------------------------------------------------------------------------
-xpcc::ui::Led::Led()
+xpcc::ui::Led::Led(Animation<uint8_t>::Callback_t callback)
 :	animation(brightness), brightness(0)
 {
+	animation.attachCallback(callback);
 }
 
 void inline
 xpcc::ui::Led::setBrightness(uint8_t brightness)
 {
-	setValue(currentBrightness);
 	animation.setValue(brightness);
 }
 
@@ -57,8 +57,5 @@ xpcc::ui::Led::off(uint16_t time)
 void inline
 xpcc::ui::Led::update()
 {
-	if (brightnessAnimation.update())
-	{
-		setValue(currentBrightness);
-	}
+	animation.update();
 }
