@@ -13,7 +13,6 @@
 #include <stdint.h>
 #include <xpcc/architecture/driver/clock.hpp>
 #include <xpcc/utils/arithmetic_traits.hpp>
-#include <xpcc/utils/template_metaprogramming.hpp>
 #include "interpolation.hpp"
 
 namespace xpcc
@@ -24,10 +23,6 @@ namespace ui
 
 /**
  * This class allows the linear animation of one value over time.
- *
- * All integer types use binary scaling through a fixed-point
- * arithmetic, however, all other types default to floating-point
- * arithmetic with casting between types.
  *
  * Be aware that the algortihm for 8bit types is optimized for low computational costs,
  * developed for fast LED fading (@see xpcc::ui::Led).
@@ -43,10 +38,8 @@ namespace ui
 template< typename T = uint8_t >
 class Animation
 {
-private:
-	typedef typename xpcc::ArithmeticTraits<T>::UnsignedType UnsignedType;
 public:
-	typedef typename LinearInterpolation<T>::StepType TimeType;
+	typedef typename FastRamp<T>::StepType TimeType;
 
 	Animation(T &value);
 
@@ -86,7 +79,7 @@ private:
 	TimeType animationTime;
 	xpcc::Timestamp previous;
 	// create an instance of the calculation helper
-	LinearInterpolation<T> interpolation;
+	FastRamp<T> interpolation;
 };
 
 }	// namespace ui

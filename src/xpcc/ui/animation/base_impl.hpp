@@ -46,7 +46,7 @@ xpcc::ui::Animation<T>::stop()
 {
 	animationTime = -1;
 	endValue = currentValue;
-	interpolation.reset();
+	interpolation.stop();
 }
 
 template< typename T >
