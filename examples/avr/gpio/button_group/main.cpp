@@ -6,17 +6,20 @@
 using namespace xpcc::atmega;
 
 static xpcc::ButtonGroup<> buttons(0);
-
+enum
+{
+	BUTTON_1 = 0x01
+};
 typedef GpioOutputB0 Led;
+typedef GpioInputB3 Button;
 
 // Timer interrupt used to query the button status
 ISR(TIMER2_COMPA_vect)
 {
-	buttons.update(PINB & (1 << PB3));
+	buttons.update(Button::read() ? BUTTON_1 : 0);
 }
 
-int
-main()
+MAIN_FUNCTION
 {
 	Led::setOutput();
 	Led::reset();
@@ -27,14 +30,13 @@ main()
 	OCR2A = 23;			// 10 ms at 14.7456 MHz
 
 	// set PB3 as input with pullup
-	DDRB &= ~(1 << PB3);
-	PORTB |= (1 << PB3);
+	Button::setInput(Gpio::InputType::PullUp);
 
 	sei();
 
 	while (1)
 	{
-		if (buttons.isPressed(1 << PB3))
+		if (buttons.isPressed(BUTTON_1))
 		{
 			Led::toggle();
 		}
