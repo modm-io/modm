@@ -38,14 +38,14 @@ namespace xpcc
 {
 	/**
 	 * \brief	Internal timer
-	 * 
+	 *
 	 * This class is implemented using \c gettimeofday() from <sys/time.h> for
-	 * any Unix-OS. 
-	 * 
+	 * any Unix-OS.
+	 *
 	 * For the AVRs targets the user has to use the increment() method to
 	 * generate a suitable timebase, preferably by incrementing the time
 	 * value inside a timer interrupt function.
-	 * 
+	 *
 	 * Example:
 	 * \code
 	 * // Interrupt every 1ms
@@ -54,20 +54,20 @@ namespace xpcc
 	 *     xpcc::Clock::increment();
 	 * }
 	 * \endcode
-	 * 
+	 *
 	 * \ingroup	architecture
-	 */ 
+	 */
 	class Clock
 	{
 	public:
 		/**
 		 * \brief	Get the current time
-		 * 
+		 *
 		 * Provides an atomic access to the current time
 		 */
 		static Timestamp
 		now();
-		
+
 #if !defined(XPCC__CPU_HOSTED)
 		/// \brief	Set the current time
 		static inline void
@@ -76,7 +76,7 @@ namespace xpcc
 			time += step;
 		}
 #endif
-		
+
 	protected:
 		static uint_fast16_t time;
 	};
