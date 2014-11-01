@@ -77,7 +77,7 @@ xpcc::ui::KeyFrameAnimationBase<T, Args...>::update()
 		{
 			for (uint_fast8_t ii = 0; ii < size; ii++)
 			{
-				if (!animator[ii]->animateTo(keyFrames[currentFrame].time, keyFrames[currentFrame].value[ii]))
+				if (!animator[ii]->animateTo(keyFrames[currentFrame].value[ii], keyFrames[currentFrame].time))
 				{
 					timeout.restart(keyFrames[currentFrame].time);
 				}

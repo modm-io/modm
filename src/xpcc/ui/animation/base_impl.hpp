@@ -51,7 +51,7 @@ xpcc::ui::Animation<T>::stop()
 
 template< typename T >
 bool
-xpcc::ui::Animation<T>::animateTo(TimeType time, T value)
+xpcc::ui::Animation<T>::animateTo(T value, TimeType time)
 {
 	if (value == currentValue) {
 		animationTime = -1;

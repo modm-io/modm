@@ -59,7 +59,7 @@ public:
 	/// Fading times of more than ~32s are not possible. You must control
 	/// fading externally in that case.
 	void
-	fadeTo(uint16_t time, uint8_t brightness);
+	fadeTo(uint8_t brightness, uint16_t time);
 
 	/**
 	 * Mimmics the behaviour of normal lamps, which take a small amount

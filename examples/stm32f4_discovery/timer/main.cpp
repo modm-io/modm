@@ -48,8 +48,8 @@ MAIN_FUNCTION
 	pulse.start();
 	indicator.start();
 	strobe.start();
-	// fade this led for 15s
-	orange.fadeTo(32000, 255);
+	// fade this led for 32s
+	orange.fadeTo(255, 32000);
 
 	while (1)
 	{

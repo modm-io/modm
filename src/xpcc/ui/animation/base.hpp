@@ -63,7 +63,7 @@ public:
 	/// @return `true` if animation started,
 	///			`false` if otherwise
 	bool
-	animateTo(TimeType time, T value);
+	animateTo(T value, TimeType time);
 
 	/// Can be called at an interval of 1ms or less.
 	/// If you do not need 1ms response time , you can calls this at larger intervals.
