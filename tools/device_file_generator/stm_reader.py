@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2013, Roboterclub Aachen e.V.
 # All rights reserved.
-# 
+#
 # The file is part of the xpcc library and is released under the 3-clause BSD
 # license. See the file `LICENSE` for the full license governing this code.
 # -----------------------------------------------------------------------------
@@ -27,7 +27,7 @@ class STMDeviceReader(XMLDeviceReader):
 
 	def __init__(self, file, logger=None):
 		# we need to combine several xml files
-		
+
 		# The memory files are actually the best starting point, since they
 		# are named most specifically after the device
 		memoryFile = XMLDeviceReader(file, logger)
@@ -36,10 +36,10 @@ class STMDeviceReader(XMLDeviceReader):
 		name = memory.get('name')
 		# the device identifier parses it
 		dev = DeviceIdentifier(name.lower())
-		
+
 		if logger:
 			logger.info("Parsing STM32 PDF: %s" % dev.string)
-		
+
 		# now we have to search the correct peripheral configuration files
 		# they use the same file for several size_ids, therefore we have to
 		# filter them manually
@@ -60,22 +60,22 @@ class STMDeviceReader(XMLDeviceReader):
 					if name[-1:] in sizes:
 						device = deviceFile
 						break
-		
+
 		if device == None and logger:
 			logger.error("STMDeviceReader: Could not find device file for device '%s'" % dev.string)
 			logger.error("STMDeviceReader: Possible files are: " + str([os.path.basename(f) for f in files]))
 			exit()
-		
+
 		# this peripheral file is the actual, important file to work with
 		XMLDeviceReader.__init__(self, device, logger)
 		self.name = name
 		self.id = dev
-		
+
 		# lets load additional information about the GPIO IP
 		ip_file = self.query("//IP[@Name='GPIO']")[0].get('Version')
 		ip_file = os.path.join(os.path.dirname(device), 'IP', 'GPIO-'+ip_file+'_Modes.xml')
 		gpioFile = XMLDeviceReader(ip_file, logger)
-		
+
 		# Some information about core and architecture can be found in the
 		# propertyGroup.xml file
 		propertyGroup = XMLDeviceReader(os.path.join(os.path.dirname(file), 'propertyGroups.xml'), self.log)
@@ -89,10 +89,10 @@ class STMDeviceReader(XMLDeviceReader):
 			if cdef.startswith('STM32'):
 				self.addProperty('define', cdef)
 				break
-		
+
 		self.addProperty('core', core)
 		self.addProperty('architecture', architecture)
-		
+
 		self.addProperty('header', cdef.lower() + '.h')
 		if self.id.family == 'f3':
 			linkerscript = "%s_%s.ld" % ('stm32f3xx', dev.size_id)
@@ -125,7 +125,7 @@ class STMDeviceReader(XMLDeviceReader):
 		package = self.query("/Mcu/@Package")[0]
 		self.addProperty('pin-count', re.findall('[0-9]+', package)[0])
 		self.addProperty('package', re.findall('[A-Za-z\.]+', package)[0])
-		
+
 		for m in self.modules:
 			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'DAC', 'CAN', 'SPI', 'I2C', 'OTG', 'USB', 'FSMC']):
 				if m.startswith('ADC') and '_' in m:
@@ -133,7 +133,7 @@ class STMDeviceReader(XMLDeviceReader):
 						modules.append('ADC'+a)
 				else:
 					modules.append(m)
-		
+
 		invertMode = {'out': 'in', 'in': 'out', 'io': 'io'}
 		nameToMode = {'rx': 'in', 'tx': 'out', 'cts': 'in', 'rts': 'out', 'ck': 'out',	# Uart
 					 'miso': 'in', 'mosi': 'out', 'nss': 'io', 'sck': 'out',	# Spi
@@ -165,17 +165,17 @@ class STMDeviceReader(XMLDeviceReader):
 			# for some reason, the 417 and 427 series GPIO has no direct AF number mapping
 			if any(name in ip_file for name in ['217', '401', '407', '417', '427']):
 				altFunctions = { a : nameToAf[altFunctions[a]] for a in altFunctions }
-			
+
 			if '-' in name:
 				name = name.split('-')[0]
 			elif '/' in name:
 				name = name.split('/')[0]
-			
+
 			gpio = {'port': name[1:2], 'id': name[2:]}
 			gpios.append(gpio)
-			
+
 			afs = []
-			
+
 			for signal in [s.get('Name') for s in pin if s.get('Name') != 'GPIO']:
 				raw_names = signal.split('_')
 				instance = raw_names[0][-1]
@@ -186,7 +186,7 @@ class STMDeviceReader(XMLDeviceReader):
 				af_id = None
 				if signal in altFunctions:
 					af_id = altFunctions[signal]
-				
+
 				if signal.startswith('USART') or signal.startswith('UART'):
 					af = {'peripheral' : 'Uart' + instance,
 						  'name': name.capitalize()}
@@ -195,7 +195,7 @@ class STMDeviceReader(XMLDeviceReader):
 					if af_id:
 						af.update({'id': af_id})
 					afs.append(af)
-					
+
 					mapName = {'rx': 'miso', 'tx': 'mosi', 'ck': 'sck'}
 					if signal.startswith('USART') and name in mapName:
 						af = {'peripheral' : 'UartSpiMaster' + instance,
@@ -205,7 +205,7 @@ class STMDeviceReader(XMLDeviceReader):
 						if af_id:
 							af.update({'id': af_id})
 						afs.append(af)
-				
+
 				elif signal.startswith('SPI'):
 					af = {'peripheral' : 'SpiMaster' + instance,
 						  'name': name.capitalize()}
@@ -220,7 +220,7 @@ class STMDeviceReader(XMLDeviceReader):
 					if mode:
 						af.update({'type': invertMode[nameToMode[name]]})
 					afs.append(af)
-				
+
 				if signal.startswith('CAN'):
 					af = {'peripheral' : 'Can' + instance,
 						  'name': name.capitalize()}
@@ -229,7 +229,7 @@ class STMDeviceReader(XMLDeviceReader):
 					if af_id:
 						af.update({'id': af_id})
 					afs.append(af)
-				
+
 				if signal.startswith('I2C'):
 					if name in ['scl', 'sda']:
 						af = {'peripheral' : 'I2cMaster' + instance,
@@ -239,7 +239,7 @@ class STMDeviceReader(XMLDeviceReader):
 						if af_id:
 							af.update({'id': af_id})
 						afs.append(af)
-				
+
 				if signal.startswith('TIM'):
 					for tname in raw_names[1:]:
 						tinstance = raw_names[0].replace('TIM', '')
@@ -257,28 +257,30 @@ class STMDeviceReader(XMLDeviceReader):
 						if af_id:
 							af.update({'id': af_id})
 						afs.append(af)
-				
+
 				if signal.startswith('ADC'):
 					if 'exti' not in name:
 						af = {'peripheral' : 'Adc' + instance,
 							  'name': name.replace('in', 'Channel').capitalize(),
 							  'type': 'analog'}
 						afs.append(af)
-				
+
 				if signal.startswith('SYS'):
 					if 'mco' in name:
 						af = {'peripheral' : signal.replace('SYS', '').replace('_', ''),
 							  'type': 'out',
 							  'id': '0'}
 						afs.append(af)
-				
+
 				if signal.startswith('OTG_FS') and raw_names[2] in ['DM', 'DP']:
 					af = {'peripheral' : 'Usb',
 						  'name': raw_names[2].capitalize()}
 					if af_id:
 						af.update({'id': af_id})
+					else:
+						af.update({'id': '10'})
 					afs.append(af)
-				
+
 				if signal.startswith('USB'):
 					af = {'peripheral' : 'Usb',
 						  'name': name.capitalize()}
@@ -287,21 +289,21 @@ class STMDeviceReader(XMLDeviceReader):
 					if af_id:
 						af.update({'id': af_id})
 					afs.append(af)
-					
+
 				if signal.startswith('FSMC_NOR_MUX_'):
 					af = {'peripheral' : 'Fsmc',
 						  'name': raw_names[3].capitalize().replace('Da','D')}
 					if af_id:
 						af.update({'id': af_id})
 					afs.append(af)
-			
+
 			# sort after key id and then add all without ids
 			# this sorting only affect the way the debug information is displayed
 			# in stm_writer the AFs are sorted again anyway
 			sorted_afs = [a for a in afs if 'id' in a]
 			sorted_afs.sort(key=lambda k: (int(k['id']), k['peripheral']))
 			sorted_afs.extend([a for a in afs if 'id' not in a])
-			
+
 			for af in sorted_afs:
 				af['gpio_port'] = gpio['port']
 				af['gpio_id'] = gpio['id']
