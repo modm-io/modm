@@ -33,7 +33,7 @@ namespace ui
  * this limitation.
  *
  * @author	Niklas Hauser
- * @ingroup ui
+ * @ingroup animation
  */
 template< typename T = uint8_t >
 class Animation
@@ -43,11 +43,20 @@ public:
 	using Callback_t = void(*)(T);
 
 public:
+	/// @param	value	a reference to the value to be animated
 	Animation(T &value);
 
+	/// @param	value		a reference to the value to be animated
+	/// @param	callback	this function will be called whenever the
+	///						value has been changed
+	Animation(T &value, Callback_t callback);
+
+	/// @param	callback	this function will be called whenever the
+	///						value has been changed
 	void
 	attachCallback(Callback_t callback);
 
+	/// stop any running animation and set a value.
 	void
 	setValue(T value);
 
@@ -60,7 +69,7 @@ public:
 	bool
 	isAnimating() const;
 
-	/// stops the current running animation.
+	/// stops any running animation.
 	void
 	stop();
 
@@ -83,7 +92,6 @@ private:
 	T endValue;
 	TimeType animationTime;
 	xpcc::Timestamp previous;
-	// create an instance of the calculation helper
 	FastRamp<T> interpolation;
 };
 

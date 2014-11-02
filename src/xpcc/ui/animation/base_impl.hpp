@@ -14,8 +14,14 @@
 
 template< typename T >
 xpcc::ui::Animation<T>::Animation(T &value)
-:	callback(nullptr), currentValue(value), endValue(0),
-	animationTime(0), previous(0)
+:	Animation(value, nullptr)
+{
+}
+
+template< typename T >
+xpcc::ui::Animation<T>::Animation(T &value, Callback_t callback)
+:	callback(callback), currentValue(value), endValue(0),
+	 animationTime(0), previous(0)
 {
 }
 

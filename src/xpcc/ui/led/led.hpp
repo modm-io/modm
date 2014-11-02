@@ -22,23 +22,42 @@ namespace ui
 {
 
 /**
- * LED Interface.
- *
  * This class supplies a basic interface to fade an LED to any
  * brightness level.
  * A lookup-table should be used to store the alpha corrected PWM
  * values, so that no calculation has to be done at run time.
  *
+ * Here is an example for the STM32F4:
+ * @code
+ * #include <xpcc/ui/led.hpp>
+ * // use a 16bits lookup table with 256 values.
+ * xpcc::accessor::Flash<uint16_t> table(xpcc::ui::table16_256);
+ * void
+ * setOrange(uint8_t brightness)
+ * {
+ *     Timer4::setCompareValue(1, table[brightness]);
+ * }
+ * xpcc::ui::Led orange(setOrange);
+ * // setup Timer4 etc...
+ * @endcode
+ *
+ * This is just a very thin wrapper around xpcc::ui::Animation<uint8_t>.
+ * If you need more advanced features, have a look there.
+ *
+ * @see Animation
  * @author	Niklas Hauser
  * @ingroup led
  */
 class Led
 {
 public:
+	Led();
+
+	/// Requires a callback function pointer for value updates.
 	Led(Animation<uint8_t>::Callback_t callback);
 
 	/// @param	brightness
-	///		between 0 and length of lookup-table
+	///		between 0 and length of lookup-table (usually 255)
 	void
 	setBrightness(uint8_t brightness);
 
@@ -59,24 +78,25 @@ public:
 
 	/**
 	 * Mimmics the behaviour of normal lamps, which take a small amount
-	 * of time until achiving full brightness.
+	 * of time until achieving full brightness.
 	 * @param	time
-	 * 		specify the fade up time in ms, 0 turn the LED on instantly
+	 * 		specify the fade up time in ms, `0` to turn the LED on instantly
 	 */
 	void
 	on(uint16_t time=75);
 
 	/**
 	 * Mimmics the behaviour of normal lamps, which take a small amount
-	 * of time until fully extinguishing.
+	 * of time until fully extinguished.
 	 * @param	time
-	 * 		specify the fade up time in ms, 0 turn the LED off instantly
+	 * 		specify the fade up time in ms, `0` to turn the LED off instantly
 	 */
 	void
 	off(uint16_t time=120);
 
 	/// Can be called at a interval of 1ms or less.
-	/// If you do not need 1ms response time (e.g. for on(), off()), you can calls this at larger intervals.
+	/// If you do not need 1ms response time (e.g. for on(), off()),
+	/// you may call this at intervals < 255ms.
 	void
 	update();
 
