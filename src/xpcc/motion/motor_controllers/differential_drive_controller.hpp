@@ -69,7 +69,7 @@ public:
 		SpeedForwardStep,
 		SpeedRotationStep,
 		PwmForwardStep,
-		PwmRotation,
+		PwmRotationStep,
 	};
 
 public:
@@ -223,13 +223,14 @@ private:
 	static void
 	runDriftCalc();
 	
-	enum class ControlStrategy
+	enum class
+	ControlStrategy
 	{
-		NONE,				/**< Disable both motors. */
-		ROBOT,				/**< Control strategy that controls linear and angular velocity. */
-		ROBOT_FORWARD_ONLY,	/**< Control strategy that focuses on driving forward. */
-		CALIBRATION,		/**< Fixed PWM values for calibration at beginning of game. */
-		PWM,				/**< No control, motors get specified target pwm. */
+		None,				/// Disable both motors.
+		Robot,				/// Control strategy that controls linear and angular velocity.
+		RobotForwardOnly,	/// Control strategy that focuses on driving forward.
+		Calibration,		/// Fixed PWM values for calibration at beginning of game.
+		Pwm,				/// No control, motors get specified target pwm.
 	};
 	
 	typedef xpcc::Pid<float, 10> Pid;

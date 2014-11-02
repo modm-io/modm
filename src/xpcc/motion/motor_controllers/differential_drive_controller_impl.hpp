@@ -54,7 +54,7 @@ int16_t DifferentialDriveController<Configuration, MotorLeft, MotorRight, Odomet
 
 template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
 typename DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::ControlStrategy
-DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::controlStrategy = DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::ControlStrategy::NONE;
+DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::controlStrategy = DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::ControlStrategy::None;
 
 template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
 bool DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::calibrationInProgress = false;
@@ -124,7 +124,7 @@ template <typename Configuration, typename MotorLeft, typename MotorRight, typen
 void
 DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::initialize()
 {
-	controlStrategy = ControlStrategy::NONE;
+	controlStrategy = ControlStrategy::None;
 	calibrationInProgress = false;
 }
 
@@ -143,7 +143,7 @@ DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, 
 
 	{
 		xpcc::atomic::Lock lock;
-		controlStrategy = ControlStrategy::ROBOT;
+		controlStrategy = ControlStrategy::Robot;
 		omegaTarget = omegaTicks;
 		vTarget = vTicks;
 	}
@@ -154,7 +154,7 @@ template <typename Configuration, typename MotorLeft, typename MotorRight, typen
 void
 DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::setPwm(int16_t pwmLeft, int16_t pwmRight)
 {
-	controlStrategy = ControlStrategy::PWM;
+	controlStrategy = ControlStrategy::Pwm;
 	pwmTargetLeft = pwmLeft;
 	pwmTargetRight = pwmRight;
 }
@@ -173,7 +173,7 @@ DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, 
 
 	{
 		xpcc::atomic::Lock lock;
-		controlStrategy = ControlStrategy::ROBOT_FORWARD_ONLY;
+		controlStrategy = ControlStrategy::RobotForwardOnly;
 		omegaTarget = 0;
 		vTarget = vTicks;
 	}
@@ -220,7 +220,7 @@ DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, 
 
 	switch (controlStrategy)
 	{
-		case ControlStrategy::ROBOT:
+		case ControlStrategy::Robot:
 		{
 			vPid.update(vTarget - robotSpeedV, currentLimit);
 
@@ -238,7 +238,7 @@ DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, 
 
 			break;
 		}
-		case ControlStrategy::ROBOT_FORWARD_ONLY:
+		case ControlStrategy::RobotForwardOnly:
 		{
 			vPid.update(vTarget - robotSpeedV, currentLimit);
 
@@ -256,23 +256,23 @@ DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, 
 
 			break;
 		}
-		case ControlStrategy::CALIBRATION:
+		case ControlStrategy::Calibration:
 		{
 			if (calibrationMode == CalibrationMode::PwmForwardStep) {
 				pwmLeft  = 800;
 				pwmRight = 800;
 			}
-			else if (calibrationMode == CalibrationMode::PwmRotation) {
+			else if (calibrationMode == CalibrationMode::PwmRotationStep) {
 				pwmLeft  = -500;
 				pwmRight =  500;
 			}
 			break;
 		}
-		case ControlStrategy::NONE:
+		case ControlStrategy::None:
 		{
 			break;
 		}
-		case ControlStrategy::PWM:
+		case ControlStrategy::Pwm:
 		{
 			pwmLeft  = pwmTargetLeft;
 			pwmRight = pwmTargetRight;
@@ -282,11 +282,11 @@ DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, 
 
 	switch (controlStrategy)
 	{
-		case ControlStrategy::NONE:
+		case ControlStrategy::None:
 			MotorLeft::disable();
 			MotorRight::disable();
 			break;
-		case ControlStrategy::PWM:
+		case ControlStrategy::Pwm:
 			MotorLeft::setPwm(pwmLeft);
 			MotorRight::setPwm(pwmRight);
 			break;
@@ -372,7 +372,7 @@ DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, 
 {
 	// disable interrupts
 	xpcc::atomic::Lock lock;
-	controlStrategy = ControlStrategy::NONE;
+	controlStrategy = ControlStrategy::None;
 }
 
 // ----------------------------------------------------------------------------
@@ -399,14 +399,14 @@ DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, 
 		// disable interrupts
 		xpcc::atomic::Lock lock;
 
-		if (mode == CalibrationMode::SPEED_FORWARD_STEP) {
-			controlStrategy = ControlStrategy::ROBOT;
+		if (mode == CalibrationMode::SpeedForwardStep) {
+			controlStrategy = ControlStrategy::Robot;
 
 			vTarget = 50;
 			omegaTarget = 0;
 		}
-		else if (mode == CalibrationMode::SPEED_ROTATION_STEP) {
-			controlStrategy = ControlStrategy::ROBOT;
+		else if (mode == CalibrationMode::SpeedRotationStep) {
+			controlStrategy = ControlStrategy::Robot;
 
 			vTarget = 0;
 			omegaTarget = 40;
@@ -428,7 +428,7 @@ DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, 
 	if (calibrationInProgress && calibrationTimer.isExpired()) {
 		{
 			xpcc::atomic::Lock lock;
-			controlStrategy = ControlStrategy::NONE;
+			controlStrategy = ControlStrategy::None;
 			calibrationInProgress = false;
 		}
 		outputStream.close();
