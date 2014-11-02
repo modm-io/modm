@@ -92,7 +92,7 @@ public:
 
 	/// start indicating for ever
 	inline void
-	start(uint8_t repeat=-1)
+	start(uint8_t repeat=0)
 	{
 		animator.start(repeat);
 	}
