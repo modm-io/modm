@@ -30,4 +30,10 @@ setBlue(uint8_t brightness)
 	Timer4::setCompareValue(4, ledTable[brightness]);
 }
 
+// create the leds with these callbacks
+xpcc::ui::Led orange(setOrange);
+xpcc::ui::Led red(setRed);
+xpcc::ui::Led green(setGreen);
+xpcc::ui::Led blue(setBlue);
+
 #endif // LEDS_HPP
