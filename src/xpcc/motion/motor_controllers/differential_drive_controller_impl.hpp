@@ -412,7 +412,7 @@ DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, 
 			omegaTarget = 40;
 		}
 		else {
-			controlStrategy = ControlStrategy::CALIBRATION;
+			controlStrategy = ControlStrategy::Calibration;
 		}
 
 		calibrationInProgress = true;
