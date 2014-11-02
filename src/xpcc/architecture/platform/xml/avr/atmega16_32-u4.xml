@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE rca SYSTEM "../devicefile.dtd">
+<rca version="1.0">
+  <!-- WARNING: This file is generated automatically, do not edit!
+ 		Please modify the xpcc/tools/device_file_generator code instead and rebuild this file.
+ 		Be aware, that regenerated files might have a different composition due to technical reasons. -->
+  <device platform="avr" family="atmega" name="16|32" size_id="16|32" type="u4">
+    <flash device-name="16">16384</flash>
+    <flash device-name="32">32768</flash>
+    <ram device-name="16">1280</ram>
+    <ram device-name="32">2560</ram>
+    <eeprom device-name="16">512</eeprom>
+    <eeprom device-name="32">1024</eeprom>
+    <core>avr8</core>
+    <mcu device-name="32">m32u4</mcu>
+    <mcu device-name="16">unsupported</mcu>
+    <pin-count>0</pin-count>
+    <header>avr/io.h</header>
+    <header>avr/interrupt.h</header>
+    <driver type="core" name="avr">
+      <parameter device-name="16" name="ram_length">640</parameter>
+      <parameter device-name="32" name="ram_length">1536</parameter>
+    </driver>
+    <driver type="adc" name="atmega"/>
+    <driver type="clock" name="avr"/>
+    <driver device-name="32" type="i2c" name="at90_tiny_mega"/>
+    <driver type="spi" name="at90_tiny_mega"/>
+    <driver type="timer" name="atmega" instances="0,1,3,4"/>
+    <driver type="uart" name="at90_tiny_mega" instances="1"/>
+    <driver type="spi" name="at90_tiny_mega_uart" instances="1"/>
+    <driver type="gpio" name="at90_tiny_mega">
+      <gpio port="B" id="0" pcint="0">
+        <af peripheral="SpiMaster" type="out" name="Ss"/>
+        <af peripheral="SpiSlave" type="in" name="Ss"/>
+      </gpio>
+      <gpio port="B" id="1" pcint="1">
+        <af peripheral="SpiMaster" type="out" name="Sck"/>
+        <af peripheral="SpiSlave" type="in" name="Sck"/>
+      </gpio>
+      <gpio port="B" id="2" pcint="2">
+        <af peripheral="SpiMaster" type="out" name="Mosi"/>
+        <af peripheral="SpiSlave" type="in" name="Simo"/>
+      </gpio>
+      <gpio port="B" id="3" pcint="3">
+        <af peripheral="SpiMaster" type="in" name="Miso"/>
+        <af peripheral="SpiSlave" type="out" name="Somi"/>
+      </gpio>
+      <gpio port="B" id="4" pcint="4"/>
+      <gpio port="B" id="5" pcint="5"/>
+      <gpio port="B" id="6" pcint="6"/>
+      <gpio port="B" id="7" pcint="7"/>
+      <gpio port="C" id="6"/>
+      <gpio port="C" id="7"/>
+      <gpio port="D" id="0" extint="0">
+        <af peripheral="I2cMaster" type="out" name="Scl"/>
+      </gpio>
+      <gpio port="D" id="1" extint="1">
+        <af peripheral="I2cMaster" type="io" name="Sda"/>
+      </gpio>
+      <gpio port="D" id="2" extint="2">
+        <af peripheral="Uart1" type="in" name="Rxd"/>
+        <af peripheral="UartSpiMaster1" type="in" name="Miso"/>
+      </gpio>
+      <gpio port="D" id="3" extint="3">
+        <af peripheral="Uart1" type="out" name="Txd"/>
+        <af peripheral="UartSpiMaster1" type="out" name="Mosi"/>
+      </gpio>
+      <gpio port="D" id="4"/>
+      <gpio port="D" id="5">
+        <af peripheral="Uart1" type="out" name="Xck"/>
+        <af peripheral="UartSpiMaster1" type="out" name="Sck"/>
+      </gpio>
+      <gpio port="D" id="6"/>
+      <gpio port="D" id="7"/>
+      <gpio port="E" id="2"/>
+      <gpio port="E" id="6" extint="6"/>
+      <gpio port="F" id="0"/>
+      <gpio port="F" id="1"/>
+      <gpio port="F" id="4"/>
+      <gpio port="F" id="5"/>
+      <gpio port="F" id="6"/>
+      <gpio port="F" id="7"/>
+    </driver>
+  </device>
+</rca>
