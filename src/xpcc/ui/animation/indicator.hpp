@@ -61,21 +61,24 @@ public:
 		if (dutyCycle > 100) dutyCycle = 100;
 		frames[1].length = static_cast<uint32_t>(period) * dutyCycle / 100;
 		// subtract the on and off fade
-		frames[1].length -= (frames[0].length + frames[2].length);
+		uint32_t fadeLength = (frames[0].length + frames[2].length);
+		if (frames[1].length < fadeLength) frames[1].length = 0;
+		else frames[1].length -= fadeLength;
+
 		frames[3].length = period - frames[1].length;
 	}
 
 	/// @param	onFade		the time is takes to turn on in ms
 	/// @param	offFade		the time is takes to turn off in ms
 	inline void
-	setFadeTimes(TimeType onFadeTime, TimeType offFadeTime)
+	setFadeTimes(TimeType onFade, TimeType offFade)
 	{
-		frames[1].length += frames[0].length;
-		frames[3].length += frames[2].length;
-		frames[0].length = onFadeTime;
-		frames[2].length = offFadeTime;
-		frames[1].length -= onFadeTime;
-		frames[3].length -= offFadeTime;
+		frames[1].length += (frames[0].length + frames[2].length);
+		frames[0].length = onFade;
+		frames[2].length = offFade;
+		uint32_t fadeLength = (frames[0].length + frames[2].length);
+		if (frames[1].length < fadeLength) frames[1].length = 0;
+		else frames[1].length -= fadeLength;
 	}
 
 	void inline
