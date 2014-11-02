@@ -348,6 +348,10 @@ public:
 				%% if af.type == "analog"
 		setAnalogInput();
 				%% else
+					%% if (af.type|string in ['', 'out'] and
+							type != "Input" and af.name in ['Scl', 'Sda'])
+		setOutput(OutputType::OpenDrain);
+					%% endif
 		setAlternateFunction(AlternateFunction::AF_{{ af.id }});
 				%% endif
 	}
@@ -437,7 +441,7 @@ class GpioPortBase<Gpio::Port::{{port.name}}, StartPin, Width> : public Gpio
 			"Width should be at least 1.");
 	static_assert(StartPin + Width <= {{port.startPin + port.width}},
 			"StartPin + Width too large, maximum {{port.startPin + port.width}}.");
-	
+
 	static constexpr uint16_t dataMask = (1 << Width) - 1;
 	static constexpr uint16_t portMask = dataMask << StartPin;
 	static constexpr uint32_t portMask2 = portMask | (portMask << Width);
@@ -446,7 +450,7 @@ class GpioPortBase<Gpio::Port::{{port.name}}, StartPin, Width> : public Gpio
 
 public:
 	static constexpr uint8_t width = Width;
-	
+
 public:
 	ALWAYS_INLINE static void setOutput() {
 		GPIO{{port.name}}->MODER = (GPIO{{port.name}}->MODER & ~portMask2) | port01;
