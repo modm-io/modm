@@ -14,31 +14,14 @@
     <eeprom device-name="169">512</eeprom>
     <eeprom device-name="329">1024</eeprom>
     <eeprom device-name="649">2048</eeprom>
-    <mmcu device-name="169" device-type="a">atmega169a</mmcu>
-    <mmcu device-name="169" device-type="p">atmega169p</mmcu>
-    <mmcu device-name="169" device-type="pa">atmega169pa</mmcu>
-    <mmcu device-name="329" device-type="none">atmega329</mmcu>
-    <mmcu device-name="329" device-type="a">atmega329a</mmcu>
-    <mmcu device-name="329" device-type="p">atmega329p</mmcu>
-    <mmcu device-name="329" device-type="pa">atmega329pa</mmcu>
-    <mmcu device-name="649" device-type="none">atmega649</mmcu>
-    <mmcu device-name="649" device-type="a">atmega649a</mmcu>
-    <mmcu device-name="649" device-type="p">atmega649p</mmcu>
     <core>avr8</core>
+    <mcu device-name="169">m169</mcu>
+    <mcu device-name="329" device-type="a|none">m329</mcu>
+    <mcu device-name="329" device-type="p|pa">m329p</mcu>
+    <mcu device-name="649">m649</mcu>
     <pin-count>0</pin-count>
     <header>avr/io.h</header>
     <header>avr/interrupt.h</header>
-    <header>avr/sleep.h</header>
-    <define device-name="169" device-type="a">__AVR_ATmega169A__</define>
-    <define device-name="169" device-type="pa">__AVR_ATmega169PA__</define>
-    <define device-name="169" device-type="p">__AVR_ATmega169P__</define>
-    <define device-name="329" device-type="a">__AVR_ATmega329A__</define>
-    <define device-name="329" device-type="pa">__AVR_ATmega329PA__</define>
-    <define device-name="329" device-type="p">__AVR_ATmega329P__</define>
-    <define device-name="329" device-type="none">__AVR_ATmega329__</define>
-    <define device-name="649" device-type="a">__AVR_ATmega649A__</define>
-    <define device-name="649" device-type="p">__AVR_ATmega649P__</define>
-    <define device-name="649" device-type="none">__AVR_ATmega649__</define>
     <driver type="core" name="avr">
       <parameter device-name="169" name="ram_length">512</parameter>
       <parameter device-name="329" name="ram_length">1024</parameter>
