@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE rca SYSTEM "../devicefile.dtd">
+<rca version="1.0">
+  <!-- WARNING: This file is generated automatically, do not edit!
+ 		Please modify the xpcc/tools/device_file_generator code instead and rebuild this file.
+ 		Be aware, that regenerated files might have a different composition due to technical reasons. -->
+  <device platform="avr" family="attiny" name="25|45|85" size_id="2|4|8" type="none">
+    <flash device-name="25">2048</flash>
+    <flash device-name="45">4096</flash>
+    <flash device-name="85">8192</flash>
+    <ram device-name="25">128</ram>
+    <ram device-name="45">256</ram>
+    <ram device-name="85">512</ram>
+    <eeprom device-name="25">128</eeprom>
+    <eeprom device-name="45">256</eeprom>
+    <eeprom device-name="85">512</eeprom>
+    <core>avr8</core>
+    <mcu device-name="25">t25</mcu>
+    <mcu device-name="45">t45</mcu>
+    <mcu device-name="85">t85</mcu>
+    <pin-count>0</pin-count>
+    <header>avr/io.h</header>
+    <header>avr/interrupt.h</header>
+    <driver type="core" name="avr">
+      <parameter device-name="25" name="ram_length">64</parameter>
+      <parameter device-name="45" name="ram_length">128</parameter>
+      <parameter device-name="85" name="ram_length">256</parameter>
+    </driver>
+    <driver type="adc" name="attiny"/>
+    <driver type="clock" name="avr"/>
+    <driver type="timer" name="attiny" instances="0,1"/>
+    <driver type="usi" name="at90_tiny_mega"/>
+    <driver type="gpio" name="at90_tiny_mega">
+      <gpio port="B" id="0" pcint="0">
+        <af peripheral="Usi" type="in" name="Di"/>
+      </gpio>
+      <gpio port="B" id="1" pcint="1">
+        <af peripheral="SpiMaster" type="in" name="Miso"/>
+        <af peripheral="SpiSlave" type="out" name="Somi"/>
+        <af peripheral="Usi" type="out" name="Do"/>
+      </gpio>
+      <gpio port="B" id="2" pcint="2" extint="0">
+        <af peripheral="SpiMaster" type="out" name="Mosi"/>
+        <af peripheral="SpiSlave" type="in" name="Simo"/>
+        <af peripheral="Usi" type="out" name="Usck"/>
+      </gpio>
+      <gpio port="B" id="3" pcint="3">
+        <af peripheral="SpiMaster" type="out" name="Sck"/>
+        <af peripheral="SpiSlave" type="in" name="Sck"/>
+      </gpio>
+      <gpio port="B" id="4" pcint="4"/>
+      <gpio port="B" id="5" pcint="5"/>
+    </driver>
+  </device>
+</rca>

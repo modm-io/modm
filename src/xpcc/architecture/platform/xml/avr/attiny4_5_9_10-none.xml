@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE rca SYSTEM "../devicefile.dtd">
+<rca version="1.0">
+  <!-- WARNING: This file is generated automatically, do not edit!
+ 		Please modify the xpcc/tools/device_file_generator code instead and rebuild this file.
+ 		Be aware, that regenerated files might have a different composition due to technical reasons. -->
+  <device platform="avr" family="attiny" name="4|5|9|10" size_id="4" type="none">
+    <flash>512</flash>
+    <flash device-name="9|10">1024</flash>
+    <ram>32</ram>
+    <core>avr8l</core>
+    <mcu device-name="10">t10</mcu>
+    <mcu device-name="4">t4</mcu>
+    <mcu device-name="5">t5</mcu>
+    <mcu device-name="9">t9</mcu>
+    <pin-count>0</pin-count>
+    <header>avr/io.h</header>
+    <header>avr/interrupt.h</header>
+    <driver type="core" name="avr">
+      <parameter name="ram_length">16</parameter>
+    </driver>
+    <driver device-name="5|10" type="adc" name="attiny"/>
+    <driver type="clock" name="avr"/>
+    <driver type="timer" name="attiny" instances="0"/>
+    <driver type="gpio" name="at90_tiny_mega">
+      <gpio port="B" id="0" pcint="0">
+        <af peripheral="SpiMaster" type="in" name="Miso"/>
+        <af peripheral="SpiSlave" type="out" name="Somi"/>
+      </gpio>
+      <gpio port="B" id="1" pcint="1">
+        <af peripheral="SpiMaster" type="out" name="Mosi"/>
+        <af peripheral="SpiSlave" type="in" name="Simo"/>
+      </gpio>
+      <gpio port="B" id="2" pcint="2" extint="0">
+        <af peripheral="SpiMaster" type="out" name="Sck"/>
+        <af peripheral="SpiSlave" type="in" name="Sck"/>
+      </gpio>
+      <gpio port="B" id="3" pcint="3"/>
+    </driver>
+  </device>
+</rca>
