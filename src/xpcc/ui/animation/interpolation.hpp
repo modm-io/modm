@@ -34,8 +34,12 @@ namespace ui
  * If this is a problem, consider using a 16bit type, which does not have
  * this limitation.
  *
+ * @warning	This class does not know when to stop stepping.
+ * 			This means, that over- and underflows of the target value
+ * 			must be prevented externally.
+ *
  * @author	Niklas Hauser
- * @ingroup ui
+ * @ingroup animation
  */
 template< typename T = uint8_t >
 class FastRamp
@@ -63,19 +67,24 @@ private:
 		}
 
 		void inline
-		initialize(Type currentValue, Type endValue, uint32_t steps)
+		initialize(Type begin, Type end, uint32_t steps)
 		{
-			float delta = (static_cast<float>(endValue) - currentValue);
+			float delta = (static_cast<float>(end) - begin);
 			deltaValue = delta / steps;
 			if (deltaValue == 0)
 				deltaValue = delta > 0 ? xpcc::ArithmeticTraits<float>::epsilon : -xpcc::ArithmeticTraits<float>::epsilon;
-			accumulatedValue = static_cast<float>(currentValue) + deltaValue / 2;
+			accumulatedValue = static_cast<float>(begin) + deltaValue / 2;
 		}
 
-		Type inline
+		void inline
 		step()
 		{
 			accumulatedValue += deltaValue;
+		}
+
+		Type inline
+		get()
+		{
 			return static_cast<Type>(accumulatedValue);
 		}
 	};
@@ -99,19 +108,24 @@ private:
 		}
 
 		void inline
-		initialize(Type currentValue, Type endValue, uint16_t steps)
+		initialize(Type begin, Type end, uint16_t steps)
 		{
-			int16_t delta = (static_cast<int16_t>(endValue) - currentValue) << 7;
+			int16_t delta = (static_cast<int16_t>(end) - begin) << 7;
 			deltaValue = delta / static_cast<int16_t>(steps);
 			if (deltaValue == 0)
 				deltaValue = delta > 0 ? 1 : -1;
-			accumulatedValue = (static_cast<uint16_t>(currentValue) << 7) + deltaValue / 2;
+			accumulatedValue = (static_cast<uint16_t>(begin) << 7) + deltaValue / 2;
 		}
 
-		Type inline
+		void inline
 		step()
 		{
 			accumulatedValue += deltaValue;
+		}
+
+		Type inline
+		get()
+		{
 			return static_cast<Type>(accumulatedValue >> 7);
 		}
 	};
@@ -135,19 +149,24 @@ private:
 		}
 
 		void inline
-		initialize(Type currentValue, Type endValue, uint32_t steps)
+		initialize(Type begin, Type end, uint32_t steps)
 		{
-			int32_t delta = (static_cast<int32_t>(endValue) - currentValue) << 15;
+			int32_t delta = (static_cast<int32_t>(end) - begin) << 15;
 			deltaValue = delta / static_cast<int32_t>(steps);
 			if (deltaValue == 0)
 				deltaValue = delta > 0 ? 1 : -1;
-			accumulatedValue = (static_cast<uint32_t>(currentValue) << 15) + deltaValue / 2;
+			accumulatedValue = (static_cast<uint32_t>(begin) << 15) + deltaValue / 2;
 		}
 
-		Type inline
+		void inline
 		step()
 		{
 			accumulatedValue += deltaValue;
+		}
+
+		Type inline
+		get()
+		{
 			return static_cast<Type>(accumulatedValue >> 15);
 		}
 	};
@@ -178,19 +197,24 @@ private:
 		}
 
 		void inline
-		initialize(Type currentValue, Type endValue, uint32_t steps)
+		initialize(Type begin, Type end, uint32_t steps)
 		{
-			int64_t delta = (static_cast<int64_t>(endValue) - currentValue) << 16;
+			int64_t delta = (static_cast<int64_t>(end) - begin) << 16;
 			deltaValue = delta / static_cast<int32_t>(steps);
 			if (deltaValue == 0)
 				deltaValue = delta > 0 ? 1 : -1;
-			accumulatedValue = (static_cast<uint64_t>(currentValue) << 16) + deltaValue / 2;
+			accumulatedValue = (static_cast<uint64_t>(begin) << 16) + deltaValue / 2;
 		}
 
-		Type inline
+		void inline
 		step()
 		{
 			accumulatedValue += deltaValue;
+		}
+
+		Type inline
+		get()
+		{
 			return static_cast<Type>(accumulatedValue >> 16);
 		}
 	};
@@ -206,21 +230,33 @@ public:
 	}
 
 	/**
-	 * Initialize the interpolator.
+	 * This method calculates the incline of the ramp.
+	 * @param	begin	the beginning of the ramp
+	 * @param	end		the end of the ramp
+	 * @param	steps	the number of steps for the ramp.
 	 */
-	void inline
-	initialize(T currentValue, T endValue, StepType steps)
+	void ALWAYS_INLINE
+	initialize(T begin, T end, StepType steps)
 	{
-		computations.initialize(currentValue, endValue, steps);
+		computations.initialize(begin, end, steps);
 	}
 
-	T inline
+	/// update the intermediate value for one step
+	void ALWAYS_INLINE
 	step()
 	{
-		return computations.step();
+		computations.step();
 	}
 
-	void inline
+	/// @return the intermediate value.
+	T ALWAYS_INLINE
+	getValue()
+	{
+		return computations.get();
+	}
+
+	/// stops the interpolation.
+	void ALWAYS_INLINE
 	stop()
 	{
 		computations.deltaValue = 0;

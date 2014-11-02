@@ -38,6 +38,7 @@ xpcc::ui::Animation<T>::setValue(T value)
 {
 	animationTime = 0;
 	currentValue = value;
+	interpolation.stop();
 	if (callback) callback(currentValue);
 }
 
@@ -60,7 +61,6 @@ void inline
 xpcc::ui::Animation<T>::stop()
 {
 	endValue = currentValue;
-	interpolation.stop();
 	setValue(currentValue);
 }
 
@@ -68,10 +68,16 @@ template< typename T >
 bool
 xpcc::ui::Animation<T>::animateTo(T value, TimeType time)
 {
-	if (value == currentValue || time == 0)
+	if (value == currentValue)
 	{
 		setValue(value);
+		animationTime = time;
 		return false;
+	}
+	if(time == 0)
+	{
+		setValue(value);
+		return true;
 	}
 
 	endValue = value;
@@ -89,6 +95,7 @@ xpcc::ui::Animation<T>::update()
 	// but if the clock gets incremented by more than 1 ms, or the main loop is
 	// busy, then we need to count these "missing" steps and apply them.
 
+	// are we even running?
 	if (animationTime > 0)
 	{
 		// buffer the delta time
@@ -104,17 +111,22 @@ xpcc::ui::Animation<T>::update()
 			// save the current time for the next comparison
 			previous = now;
 
-			// update the values for the number of passed ms
-			while (delta--)
+			// check if we are going to be finished with the animation in delta ms
+			if (animationTime <= delta)
 			{
-				if (--animationTime == 0)
-				{
-					setValue(endValue);
-					return true;
-				}
-				currentValue = interpolation.step();
+				// don't bother with the calculations, just set the final value
+				setValue(endValue);
+				return true;
 			}
+			// subtract the current time steps
+			animationTime -= delta;
 
+			// run the calculations
+			while (delta--) interpolation.step();
+
+			// get the calculated value for this step
+			currentValue = interpolation.getValue();
+			// invoke the callback with this value
 			if (callback) callback(currentValue);
 
 			return true;
