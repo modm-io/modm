@@ -60,7 +60,8 @@ template <typename Configuration, typename MotorLeft, typename MotorRight, typen
 bool DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::calibrationInProgress = false;
 
 template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
-robot::packet::EngineCalibrationMode DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::calibrationMode;
+typename DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::CalibrationMode
+DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::calibrationMode;
 
 template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
 xpcc::Timeout<> DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::calibrationTimer;
@@ -115,13 +116,8 @@ xpcc::filter::Ramp<float>  DifferentialDriveController<Configuration, MotorLeft,
 
 // ----------------------------------------------------------------------------
 template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
-component::Logger::OutputStream<typename DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::StreamData>
+LoggerOutputStreamDummy<typename DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::StreamData>
 DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::outputStream;
-
-namespace component
-{
-	extern Logger logger;
-}
 
 // ----------------------------------------------------------------------------
 template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
@@ -186,16 +182,16 @@ DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, 
 
 template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
 void
-DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::run()
+DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::run(float engineVoltage)
 {
-	runMotorsControl();
+	runMotorsControl(engineVoltage);
 	runDriftCalc();
 }
 
 // ----------------------------------------------------------------------------
 template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
 void
-DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::runMotorsControl()
+DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::runMotorsControl(float engineVoltage)
 {
 	int16_t pwmLeft = 0;
 	int16_t pwmRight = 0;
@@ -262,11 +258,11 @@ DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, 
 		}
 		case ControlStrategy::CALIBRATION:
 		{
-			if (calibrationMode == robot::packet::EngineCalibrationMode::PWM_FORWARD_STEP) {
+			if (calibrationMode == CalibrationMode::PwmForwardStep) {
 				pwmLeft  = 800;
 				pwmRight = 800;
 			}
-			else if (calibrationMode == robot::packet::EngineCalibrationMode::PWM_ROTATION_STEP) {
+			else if (calibrationMode == CalibrationMode::PwmRotation) {
 				pwmLeft  = -500;
 				pwmRight =  500;
 			}
@@ -299,8 +295,8 @@ DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, 
 			// ToDo may move this to a motor
 
 			float factor = 1.0f;
-			if (global::engineVoltage > Configuration::BatteryVoltage::minimum) // avoid factors > 1
-				factor = Configuration::BatteryVoltage::minimum/global::engineVoltage;
+			if (engineVoltage > Configuration::BatteryVoltage::minimum) // avoid factors > 1
+				factor = Configuration::BatteryVoltage::minimum/engineVoltage;
 
 			MotorLeft::setPwm(pwmLeft   * factor);
 			MotorRight::setPwm(pwmRight * factor);
@@ -382,7 +378,7 @@ DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, 
 // ----------------------------------------------------------------------------
 template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
 void
-DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::startCalibration(robot::packet::EngineCalibrationMode mode)
+DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::startCalibration(CalibrationMode mode)
 {
 	if (calibrationInProgress) {
 		// Another calibration in progress => abort
@@ -390,7 +386,8 @@ DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, 
 	}
 
 	// create a new Output stream
-	outputStream = component::logger.createOutputStream<StreamData>();
+	// FIXME: generate stream
+//	outputStream = component::logger.createOutputStream<StreamData>();
 	if (!outputStream.isValid()) {
 		// Could not create a output stream => abort
 		return;
@@ -402,13 +399,13 @@ DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, 
 		// disable interrupts
 		xpcc::atomic::Lock lock;
 
-		if (mode == robot::packet::EngineCalibrationMode::SPEED_FORWARD_STEP) {
+		if (mode == CalibrationMode::SPEED_FORWARD_STEP) {
 			controlStrategy = ControlStrategy::ROBOT;
 
 			vTarget = 50;
 			omegaTarget = 0;
 		}
-		else if (mode == robot::packet::EngineCalibrationMode::SPEED_ROTATION_STEP) {
+		else if (mode == CalibrationMode::SPEED_ROTATION_STEP) {
 			controlStrategy = ControlStrategy::ROBOT;
 
 			vTarget = 0;

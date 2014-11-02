@@ -15,10 +15,33 @@
 #include <xpcc/processing/timeout.hpp>
 #include <xpcc/math/filter.hpp>
 
-#include <communication/packets.hpp>
-#include <component_logger/logger.hpp>
-
 #include <xpcc/motion/utils.hpp> // TicksPerTimeToPwm
+
+
+
+
+template <typename T>
+class LoggerOutputStreamDummy
+{
+public:
+	inline bool
+	isValid()
+	{
+		return false;
+	}
+
+	inline void
+	write(const T * /*data*/)
+	{
+	}
+
+	inline void
+	close()
+	{
+	}
+};
+
+
 
 /**
  * Closed loop velocity control of two motors which form a differential drive of a robot.
@@ -39,6 +62,16 @@ template<
 	typename MotorLeft,    typename MotorRight,
 	typename OdometryLeft, typename OdometryRight> class DifferentialDriveController
 {
+public:
+	enum class
+	CalibrationMode
+	{
+		SpeedForwardStep,
+		SpeedRotationStep,
+		PwmForwardStep,
+		PwmRotation,
+	};
+
 public:
 	static void
 	initialize();
@@ -71,7 +104,7 @@ public:
 	setRobotSpeedForward(int16_t v);
 	
 	static void
-	startCalibration(robot::packet::EngineCalibrationMode mode);
+	startCalibration(CalibrationMode mode);
 	
 	static void
 	setVelocityControllerParameter(const xpcc::Pid< float, 10 >::Parameter& param)
@@ -181,11 +214,11 @@ public:
 	 * uses motors uses odometry, so their internal values have to be updated before
 	 */
 	static void
-	run();
+	run(float engineVoltage);
 	
 private:
 	static void
-	runMotorsControl();
+	runMotorsControl(float engineVoltage);
 	
 	static void
 	runDriftCalc();
@@ -235,9 +268,10 @@ private:
 	} __attribute__((packed));
 
 	static bool calibrationInProgress;
-	static robot::packet::EngineCalibrationMode calibrationMode;
+	static CalibrationMode calibrationMode;
 	static xpcc::Timeout<> calibrationTimer;
-	static component::Logger::OutputStream<StreamData> outputStream;
+	//static component::Logger::OutputStream<StreamData> outputStream;
+	static LoggerOutputStreamDummy<StreamData> outputStream;
 	
 	static xpcc::filter::Debounce<> overcurrentFilterLeft;
 	static xpcc::filter::Debounce<> overcurrentFilterRight;
