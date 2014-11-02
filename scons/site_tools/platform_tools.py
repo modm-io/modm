@@ -121,6 +121,8 @@ def platform_tools_find_device_file(env):
 	env['XPCC_DEVICE_FILE'] = DeviceFile(device_file, env.GetLogger())
 	# for microcontrollers architecture = core
 	env['ARCHITECTURE'] = env['XPCC_DEVICE_FILE'].getProperties(device)['core']
+	if id.platform == 'avr':
+		env['AVRDUDE_DEVICE'] = env['XPCC_DEVICE_FILE'].getProperties(device)['mcu']
 
 #------------------------------------------------------------------------------
 # env['XPCC_PLATFORM_PATH'] is used for absolute paths
@@ -147,8 +149,8 @@ def platform_tools_generate(env, architecture_path):
 	env.Debug("Found properties: %s" % prop)
 	defines = prop['defines']
 	# FIXME: This is a hack to make everything build without arm_devices.py
-	# We realy need to look into which defines we want to be available via a
-	# xpp_config.hpp and which via a command line option
+	# We really need to look into which defines we want to be available via a
+	# xpcc_config.hpp and which via a command line option
 	env.Append(CPPDEFINES = defines)
 	device_headers = prop['headers']
 

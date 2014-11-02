@@ -172,7 +172,7 @@ class DeviceFile:
 		props['flash'] = self.getProperty('flash', device_string, True)[0]
 		props['ram'] = self.getProperty('ram', device_string, True)[0]
 		props['eeprom'] = self.getProperty('eeprom', device_string, True, 0)[0]
-		props['mmcu'] = self.getProperty('mmcu', device_string, True, "")[0]
+		props['mcu'] = self.getProperty('mcu', device_string, True, "")[0]
 		props['linkerscript'] = self.getProperty('linkerscript', device_string, True, "")[0]
 		props['defines'] = self.getProperty('define', device_string)
 		props['headers'] = self.getProperty('header', device_string)
@@ -186,6 +186,8 @@ class DeviceFile:
 		if self.platform == 'avr':
 			if props['linkerscript'] != "":
 				self.log.warn("On platform 'avr' there is no linkerscript.")
+			if props['mcu'] == "unsupported":
+				self.log.warn("This device is not supported by avrdude.")
 
 		return props
 
