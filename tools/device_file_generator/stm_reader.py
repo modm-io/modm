@@ -83,21 +83,16 @@ class STMDeviceReader(XMLDeviceReader):
 		core = propertyGroup.query("//groupEntry[@name='%s']/property[@name='arm_core_type']" % name)[0].get('value').lower()
 		if len(propertyGroup.query("//groupEntry[@name='%s']/property[@name='arm_fpu_type']" % name)) > 0:
 			core += 'f'
-		defines = propertyGroup.query("//groupEntry[@name='%s']/cdefine" % name)
-		for define in defines:
-			cdef = define.get('name')
-			if cdef.startswith('STM32'):
-				self.addProperty('define', cdef)
-				break
 
 		self.addProperty('core', core)
 		self.addProperty('architecture', architecture)
 
-		self.addProperty('header', cdef.lower() + '.h')
+		self.addProperty('header', 'stm32' + dev.family + 'xx.h')
+		self.addProperty('define', 'STM32F' + dev.name + 'xx')
 		if self.id.family == 'f3':
 			linkerscript = "%s_%s.ld" % ('stm32f3xx', dev.size_id)
 		else:
-			linkerscript = "%s_%s.ld" % (cdef.lower(), dev.size_id)
+			linkerscript = "%s_%s.ld" % ('stm32' + dev.family + 'xx', dev.size_id)
 		self.addProperty('linkerscript', linkerscript)
 
 		flash = memoryFile.query("//MemorySegment[@name='FLASH']")[0].get('size')
