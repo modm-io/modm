@@ -115,7 +115,8 @@ class STMDeviceReader(XMLDeviceReader):
 		self.addProperty('modules', modules)
 
 		self.modules = memoryFile.query("//RegisterGroup/@name")
-		self.modules = self.query("//IP/@InstanceName")
+		self.modules.extend(self.query("//IP/@InstanceName"))
+		self.modules = list(set(self.modules))
 		self.log.debug("Available Modules are:\n" + self._modulesToString())
 		package = self.query("/Mcu/@Package")[0]
 		self.addProperty('pin-count', re.findall('[0-9]+', package)[0])
@@ -128,10 +129,6 @@ class STMDeviceReader(XMLDeviceReader):
 						modules.append('ADC'+a)
 				else:
 					modules.append(m)
-
-		if 'DAC' in modules:
-			modules.append('TIM6')
-			modules.append('TIM7')
 
 		invertMode = {'out': 'in', 'in': 'out', 'io': 'io'}
 		nameToMode = {'rx': 'in', 'tx': 'out', 'cts': 'in', 'rts': 'out', 'ck': 'out',	# Uart
