@@ -123,7 +123,7 @@ class STMDeviceReader(XMLDeviceReader):
 		self.addProperty('package', re.findall('[A-Za-z\.]+', package)[0])
 
 		for m in self.modules:
-			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'DAC', 'CAN', 'SPI', 'I2C', 'OTG', 'USB', 'FSMC']):
+			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'DAC', 'CAN', 'SPI', 'I2C', 'OTG', 'DMA', 'USB', 'FSMC']):
 				if m.startswith('ADC') and '_' in m:
 					for a in m.replace('ADC','').split('_'):
 						modules.append('ADC'+a)
