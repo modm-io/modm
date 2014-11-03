@@ -31,7 +31,7 @@
     <driver type="i2c" name="stm32" instances="1,2,3"/>
     <driver type="spi" name="stm32" instances="1,2,3"/>
     <driver type="spi" name="stm32_uart" instances="1,2,3,4,5,6"/>
-    <driver type="timer" name="stm32" instances="1,2,3,4,5,8,9,10,11,12,13,14"/>
+    <driver type="timer" name="stm32" instances="1,2,3,4,5,6,7,8,9,10,11,12,13,14"/>
     <driver type="uart" name="stm32" instances="1,2,3,4,5,6"/>
     <driver type="usb" name="stm32_fs"/>
     <driver type="gpio" name="stm32">

@@ -134,6 +134,10 @@ class STMDeviceReader(XMLDeviceReader):
 				else:
 					modules.append(m)
 
+		if 'DAC' in modules:
+			modules.append('TIM6')
+			modules.append('TIM7')
+
 		invertMode = {'out': 'in', 'in': 'out', 'io': 'io'}
 		nameToMode = {'rx': 'in', 'tx': 'out', 'cts': 'in', 'rts': 'out', 'ck': 'out',	# Uart
 					 'miso': 'in', 'mosi': 'out', 'nss': 'io', 'sck': 'out',	# Spi
