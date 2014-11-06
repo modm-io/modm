@@ -15,19 +15,19 @@ xpcc::ui::Strobe<uint8_t> strobe(green.animation);
 // custom keyframes (time, value) for the orange led
 xpcc::ui::KeyFrame<uint8_t> frames[] =
 {
-		xpcc::ui::KeyFrame<uint8_t>(1000, 50),
-		xpcc::ui::KeyFrame<uint8_t>(900, 0),
-		xpcc::ui::KeyFrame<uint8_t>(800, 100),
-		xpcc::ui::KeyFrame<uint8_t>(700, 0),
-		xpcc::ui::KeyFrame<uint8_t>(600, 150),
-		xpcc::ui::KeyFrame<uint8_t>(500, 0),
-		xpcc::ui::KeyFrame<uint8_t>(400, 200),
-		xpcc::ui::KeyFrame<uint8_t>(300, 0),
-		xpcc::ui::KeyFrame<uint8_t>(200, 250),
-		xpcc::ui::KeyFrame<uint8_t>(100, 0),
+	xpcc::ui::KeyFrame<uint8_t>(1000, 50),
+	xpcc::ui::KeyFrame<uint8_t>(900, 0),
+	xpcc::ui::KeyFrame<uint8_t>(800, 100),
+	xpcc::ui::KeyFrame<uint8_t>(700, 0),
+	xpcc::ui::KeyFrame<uint8_t>(600, 150),
+	xpcc::ui::KeyFrame<uint8_t>(500, 0),
+	xpcc::ui::KeyFrame<uint8_t>(400, 200),
+	xpcc::ui::KeyFrame<uint8_t>(300, 0),
+	xpcc::ui::KeyFrame<uint8_t>(200, 250),
+	xpcc::ui::KeyFrame<uint8_t>(100, 0),
 };
 // create a new keyframe animator for the orange led
-xpcc::ui::KeyFrameAnimation<uint8_t> animator(frames, 10, orange.animation);
+xpcc::ui::KeyFrameAnimation<uint8_t> animator(frames, XPCC__ARRAY_SIZE(frames), orange.animation);
 
 // animate the period of the red pulse (Aniception?)
 uint16_t period = 500;
