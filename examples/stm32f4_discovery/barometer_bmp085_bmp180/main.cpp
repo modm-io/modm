@@ -126,12 +126,9 @@ MAIN_FUNCTION
 	GpioOutputA2::connect(Usart2::Tx);
 	Usart2::initialize<defaultSystemClock, xpcc::Uart::B115200>(10);
 
-
-	GpioB9::setOutput(Gpio::OutputType::OpenDrain);
-	GpioB8::setOutput(Gpio::OutputType::OpenDrain);
 	GpioB9::connect(MyI2cMaster::Sda);
 	GpioB8::connect(MyI2cMaster::Scl);
-	MyI2cMaster::initialize<defaultSystemClock, 50000>();
+    MyI2cMaster::initialize<defaultSystemClock, MyI2cMaster::Baudrate::Standard>();
 
 	stream << "\n\nWelcome to BMP085 demo!\n\n";
 
