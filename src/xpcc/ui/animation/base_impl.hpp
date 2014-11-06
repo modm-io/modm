@@ -103,7 +103,7 @@ xpcc::ui::Animation<T>::update()
 		// this cast requires us to be updates once at least every 255ms
 		// If this method is not called every few ms, the animation does
 		// not look good anyways, so this limitation is okay.
-		uint8_t delta = (now - previous).getTime();
+		uint_fast8_t delta = (now - previous).getTime();
 
 		// check if at least 1ms has passed
 		if (delta)
@@ -125,11 +125,15 @@ xpcc::ui::Animation<T>::update()
 			while (delta--) interpolation.step();
 
 			// get the calculated value for this step
-			currentValue = interpolation.getValue();
-			// invoke the callback with this value
-			if (callback) callback(currentValue);
+			T newValue = interpolation.getValue();
 
-			return true;
+			if (currentValue != newValue)
+			{
+				currentValue = newValue;
+				// invoke the callback with this value
+				if (callback) callback(currentValue);
+				return true;
+			}
 		}
 	}
 
