@@ -45,13 +45,13 @@ struct Result
 };
 /// @cond
 /// void is not an object type
-/// @internal
 template <>
 struct Result<void>
 {
 	uint8_t state;
 	uint8_t result;
 };
+/// @endcond
 
 /**
  * This is the base class which must be inherited from for using

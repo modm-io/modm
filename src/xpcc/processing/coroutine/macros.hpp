@@ -36,6 +36,7 @@
  * @hideinitializer
  */
 #define CO_BEGIN(context) \
+	constexpr uint32_t coCounter = __COUNTER__; \
 	if (!this->nestingOkCo()) return {xpcc::co::NestingError, 0}; \
 	if (!this->beginCo(context)) return {xpcc::co::WrongContext, 0}; \
 	switch (this->pushCo()) { \
@@ -56,7 +57,8 @@
 		default: \
 			this->popCo(); \
 			return {xpcc::co::WrongState, 0}; \
-	}
+	} \
+	static_assert(__COUNTER__ - coCounter < 256, "You have too many states in this coroutine!");
 
 /**
  * End the coroutine. You can use this to return `void`, or if the result does not matter.
@@ -80,7 +82,8 @@
 		default: \
 			this->popCo(); \
 			return {xpcc::co::WrongState, 0}; \
-	}
+	} \
+	static_assert(__COUNTER__ - coCounter < 256, "You have too many states in this coroutine!");
 
 /**
  * Yield coroutine until next invocation.
