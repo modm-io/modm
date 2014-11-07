@@ -134,6 +134,7 @@ def generate(env, **kw):
 		"-Wdouble-promotion",
 		"-mlong-calls",		# when using ".fastcode" without longcall
 		"-Wall",
+		"-Werror=maybe-uninitialized",
 		"-Wformat",
 		"-Wextra",
 		"-Wundef",
