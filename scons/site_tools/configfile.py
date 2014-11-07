@@ -26,11 +26,10 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import os
-import sys
-import re
+import re, os, sys
+import xml.etree.ElementTree as et
+import xml.parsers.expat
 import ConfigParser
-
 import SCons.Node
 import SCons.Errors
 
@@ -161,6 +160,17 @@ class Scanner:
 							self.defines[item[0]] = item[1]
 					except ParserException:
 						pass
+
+				if 'module.xml' in files:
+					try:
+						xmltree = et.parse(os.path.join(path, 'module.xml')).getroot()
+					except (OSError, xml.parsers.expat.ExpatError, xml.etree.ElementTree.ParseError) as e:
+						env.Error("while parsing xml-file '%s': %s" % (filename, e))
+					module_name = xmltree[0].get('name').lower()
+					if not module_name in self.env['XPCC_ACTIVE_MODULES']:
+						self.env.Debug('Excluding module "%s"' % (module_name))
+						directories = self._excludeDirectories(directories)
+						continue
 
 				if self.unittest is None or not (self.unittest ^ path.endswith(os.sep + 'test')):
 					# only check this directory for files if all directories

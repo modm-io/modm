@@ -273,6 +273,14 @@ def generate(env, **kw):
 		else:
 			env['XPCC_USER_PARAMETERS'] = []
 
+		# load modules if available
+		env['XPCC_ACTIVE_MODULES'] = []
+		if parser.has_section('modules'):
+			modules = parser.items('modules')
+			for m in modules:
+				if m[1].lower() == 'include':
+					env['XPCC_ACTIVE_MODULES'].append(m[0].lower())
+
 	except configparser.ParserException, msg:
 		env.Error("Error parsing file configuration file '%s':\n%s" % (configfile, str(msg)))
 		Exit(1)
