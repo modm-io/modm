@@ -51,9 +51,7 @@
  * @hideinitializer
  */
 #define CO_END_RETURN(result) \
-			this->stopCo(); \
-			this->popCo(); \
-			return {xpcc::co::Stop, (result)}; \
+			CO_RETURN(result); \
 		default: \
 			this->popCo(); \
 			return {xpcc::co::WrongState, 0}; \
@@ -163,9 +161,7 @@
 					this->popCo(); \
 					return {xpcc::co::Running, 0}; \
 				} \
-				this->stopCo(); \
-				this->popCo(); \
-				return {xpcc::co::Stop, coResult.result}; \
+				CO_RETURN(coResult.result); \
 			} \
 		}
 
