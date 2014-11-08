@@ -310,6 +310,8 @@ def generate(env, **kw):
 	# Will validate the env['XPCC_DEVICE'] and set env['ARCHITECTURE']
 	env.Tool('platform_tools')
 
+	env.Tool('git')
+
 	env.FindDeviceFile()
 
 	buildpath = string.Template(buildpath).safe_substitute({
