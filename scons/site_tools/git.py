@@ -18,7 +18,9 @@ def git_show(format, ref='HEAD'):
 		returns a string containing the output from git show
 	"""
 	r = subprocess.check_output(['git', '--no-pager', 'show', ref, '--quiet', '--pretty=format:"' + format + '"'])
-	return r[1:-1]
+	# only use first line, because quiet does not seem to have the expected
+	# results for older git versions
+	return r.split('\n', 1)[0][1:-1]
 
 
 def git_info_header(env):
