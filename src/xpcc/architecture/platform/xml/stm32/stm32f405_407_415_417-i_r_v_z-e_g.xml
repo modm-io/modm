@@ -16,6 +16,7 @@
     <pin-count device-pin-id="v">100</pin-count>
     <pin-count device-pin-id="r">64</pin-count>
     <header>stm32f4xx.h</header>
+	<define>STM32F4XX</define>
     <define device-name="405">STM32F405xx</define>
     <define device-name="407">STM32F407xx</define>
     <define device-name="415">STM32F415xx</define>
