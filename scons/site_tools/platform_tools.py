@@ -148,10 +148,6 @@ def platform_tools_generate(env, architecture_path):
 	prop = dev.getProperties(device)
 	env.Debug("Found properties: %s" % prop)
 	defines = prop['defines']
-	# FIXME: This is a hack to make everything build without arm_devices.py
-	# We really need to look into which defines we want to be available via a
-	# xpcc_config.hpp and which via a command line option
-	env.Append(CPPDEFINES = defines)
 	device_headers = prop['headers']
 
 	# Set Size
