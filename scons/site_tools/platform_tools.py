@@ -137,7 +137,6 @@ def platform_tools_generate(env, architecture_path):
 	# Initialize Return Lists/Dicts
 	sources = []
 	defines = {}
-	includes = []
 	# make paths
 	platform_path = os.path.join(architecture_path, 'platform')
 	generated_path = os.path.join(architecture_path, env['XPCC_PLATFORM_GENERATED_DIR'])
@@ -190,7 +189,6 @@ def platform_tools_generate(env, architecture_path):
 			if os.path.splitext(tar)[1] in Scanner.HEADER:
 				if not f[1].endswith("_impl.hpp"):
 					ddic['headers'].append(f[1]) # append path relative to platform dir
-				includes.append(os.path.dirname(tar))
 			# or source file
 			elif os.path.splitext(tar)[1] in Scanner.SOURCE:
 				sources.append(res)
@@ -230,7 +228,7 @@ def platform_tools_generate(env, architecture_path):
 	tar = os.path.join(generated_path, 'type_ids.hpp')
 	sub = {'headers': type_id_headers}
 	env.Jinja2Template(target = tar, source = src, substitutions = sub)
-	return sources, defines, includes
+	return sources, defines
 
 ############## Template Tests #################################################
 # -----------------------------------------------------------------------------
