@@ -445,4 +445,4 @@ class Property(DeviceElementBase):
 				self.content = self.value[self.value.find('=')+1:].strip()
 				self.value = self.value[:self.value.find('=')].strip()
 			else:
-				self.content = '1'
+				self.content = None
