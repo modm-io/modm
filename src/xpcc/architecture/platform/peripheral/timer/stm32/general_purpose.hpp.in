@@ -218,14 +218,18 @@ public:
 	configureOutputChannel(uint32_t channel, OutputCompareMode mode,
 			Value compareValue, PinState out = PinState::Enable);
 
-
+	/// Switch to Pwm Mode 2
+	///
+	/// While upcounting channel will be active as long as the time value is
+	/// smaller than the compare value, else inactive.
+	/// Timer will not be disabled while switching modes.
 	static void
 	setInvertedPwm(uint32_t channel)
 	{
 		channel -= 1;	// 1..2 -> 0..1
-		
+
 		{
-			uint32_t flags = 0b1110000;
+			uint32_t flags = static_cast<uint32_t>(OutputCompareMode::Pwm2);
 			
 			if (channel <= 1)
 			{
@@ -245,14 +249,19 @@ public:
 			}
 		}
 	}
-	
+
+	/// Switch to Pwm Mode 1
+	///
+	/// While upcounting channel will be inactive as long as the time value is
+	/// smaller than the compare value, else active.
+	/// **Please note**: Timer will not be disabled while switching modes.
 	static void
 	setNormalPwm(uint32_t channel)
 	{
 		channel -= 1;	// 1..2 -> 0..1
-		
+
 		{
-			uint32_t flags = 0b1100000;
+			uint32_t flags = static_cast<uint32_t>(OutputCompareMode::Pwm);
 			
 			if (channel <= 1)
 			{
@@ -272,15 +281,19 @@ public:
 			}
 		}
 	}
-	
+
+	/// Switch to Inactive Mode
+	///
+	/// The channel output will be forced to the inactive level.
+	/// **Please note**: Timer will not be disabled while switching modes.
 	static void
 	forceInactive(uint32_t channel)
 	{
 		channel -= 1;	// 1..2 -> 0..1
 		
 		{
-			uint32_t flags = 0b1000000;
-			
+			uint32_t flags = static_cast<uint32_t>(OutputCompareMode::ForceLow);
+
 			if (channel <= 1)
 			{
 				uint32_t offset = 8 * channel;
@@ -300,14 +313,18 @@ public:
 		}
 	}
 
+	/// Switch to Active Mode
+	///
+	/// The channel output will be forced to the active level.
+	/// **Please note**: Timer will not be disabled while switching modes.
 	static void
 	forceActive(uint32_t channel)
 	{
 		channel -= 1;	// 1..2 -> 0..1
 		
 		{
-			uint32_t flags = 0b1010000;
-			
+			uint32_t flags = static_cast<uint32_t>(OutputCompareMode::ForceHigh);
+
 			if (channel <= 1)
 			{
 				uint32_t offset = 8 * channel;
