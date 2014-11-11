@@ -132,7 +132,7 @@ def platform_tools_generate(env, architecture_path):
 	# Do not generate for hosted
 	# TODO: generate software peripherals for hosted
 	if device in ['darwin', 'linux', 'windows']:
-		return [], {}, []
+		return [], {}
 
 	# Initialize Return Lists/Dicts
 	sources = []
