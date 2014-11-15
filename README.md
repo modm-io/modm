@@ -24,12 +24,32 @@ Get the Code
     $ git clone git://github.com/roboterclubaachen/xpcc.git xpcc
     $ cd xpcc
 
+Use our virtual machine
+-------------------------------------------------------------------------------
+
+We configured a [headless virtual machine][rca-vm] for VirtualBox, which is 
+managed using Vagrant and contains all software required for compiling xpcc.
+
+If you do not want to install the compiler and build system tools on you computer,
+or you run a OS for which these tools are not available (Windows), you can install
+[VirtualBox][] and [Vagrant][] instead and use the VM like this:
+
+    $ cd xpcc
+    $ vagrant up
+    $ vagrant ssh
+
+You may then compile examples or your own code using VBs shared folders:
+
+    $ cd /vagrant
+    $ cd examples/arduino_uno/basic/blink
+    $ scons program
+
 
 Documentation
 -------------------------------------------------------------------------------
 
 The main documentation is created from doxygen files in the doc-folder. It can
-be found [online here] (http://xpcc.kreatives-chaos.com/api/).
+be found [online here](http://xpcc.kreatives-chaos.com/api/).
 
 Development Model
 -------------------------------------------------------------------------------
@@ -133,3 +153,7 @@ That way everybody can profit from it.
 
 Have fun!
 
+
+[virtualbox]: https://www.virtualbox.org/wiki/Downloads
+[vagrant]: http://www.vagrantup.com/downloads.html
+[rca-vm]: https://github.com/roboterclubaachen/rca-vm

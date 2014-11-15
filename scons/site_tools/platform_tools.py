@@ -121,6 +121,8 @@ def platform_tools_find_device_file(env):
 	env['XPCC_DEVICE_FILE'] = DeviceFile(device_file, env.GetLogger())
 	# for microcontrollers architecture = core
 	env['ARCHITECTURE'] = env['XPCC_DEVICE_FILE'].getProperties(device)['core']
+	if id.platform == 'avr':
+		env['AVRDUDE_DEVICE'] = env['XPCC_DEVICE_FILE'].getProperties(device)['mcu']
 
 #------------------------------------------------------------------------------
 # env['XPCC_PLATFORM_PATH'] is used for absolute paths
@@ -130,12 +132,11 @@ def platform_tools_generate(env, architecture_path):
 	# Do not generate for hosted
 	# TODO: generate software peripherals for hosted
 	if device in ['darwin', 'linux', 'windows']:
-		return [], {}, []
+		return [], {}
 
 	# Initialize Return Lists/Dicts
 	sources = []
 	defines = {}
-	includes = []
 	# make paths
 	platform_path = os.path.join(architecture_path, 'platform')
 	generated_path = os.path.join(architecture_path, env['XPCC_PLATFORM_GENERATED_DIR'])
@@ -146,10 +147,6 @@ def platform_tools_generate(env, architecture_path):
 	prop = dev.getProperties(device)
 	env.Debug("Found properties: %s" % prop)
 	defines = prop['defines']
-	# FIXME: This is a hack to make everything build without arm_devices.py
-	# We realy need to look into which defines we want to be available via a
-	# xpp_config.hpp and which via a command line option
-	env.Append(CPPDEFINES = defines)
 	device_headers = prop['headers']
 
 	# Set Size
@@ -192,7 +189,6 @@ def platform_tools_generate(env, architecture_path):
 			if os.path.splitext(tar)[1] in Scanner.HEADER:
 				if not f[1].endswith("_impl.hpp"):
 					ddic['headers'].append(f[1]) # append path relative to platform dir
-				includes.append(os.path.dirname(tar))
 			# or source file
 			elif os.path.splitext(tar)[1] in Scanner.SOURCE:
 				sources.append(res)
@@ -232,7 +228,7 @@ def platform_tools_generate(env, architecture_path):
 	tar = os.path.join(generated_path, 'type_ids.hpp')
 	sub = {'headers': type_id_headers}
 	env.Jinja2Template(target = tar, source = src, substitutions = sub)
-	return sources, defines, includes
+	return sources, defines
 
 ############## Template Tests #################################################
 # -----------------------------------------------------------------------------

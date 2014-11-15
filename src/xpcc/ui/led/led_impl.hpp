@@ -13,52 +13,53 @@
 
 // ----------------------------------------------------------------------------
 xpcc::ui::Led::Led()
-:	brightnessAnimation(currentBrightness), currentBrightness(0)
+:	Led(nullptr)
 {
 }
 
-void inline
+xpcc::ui::Led::Led(Animation<uint8_t>::Callback_t callback)
+:	animation(brightness, callback), brightness(0)
+{
+}
+
+void ALWAYS_INLINE
 xpcc::ui::Led::setBrightness(uint8_t brightness)
 {
-	brightnessAnimation.setValue(brightness);
-	setValue(currentBrightness);
+	animation.setValue(brightness);
 }
 
 uint8_t ALWAYS_INLINE
 xpcc::ui::Led::getBrightness() const
 {
-	return brightnessAnimation.getValue();
+	return animation.getValue();
 }
 
 bool ALWAYS_INLINE
 xpcc::ui::Led::isFading() const
 {
-	return brightnessAnimation.isAnimating();
+	return animation.isAnimating();
 }
 
-void inline
-xpcc::ui::Led::fadeTo(uint16_t time, uint8_t brightness)
+void ALWAYS_INLINE
+xpcc::ui::Led::fadeTo(uint8_t brightness, uint16_t time)
 {
-	brightnessAnimation.animateTo(time, brightness);
+	animation.animateTo(brightness, time);
 }
 
 void ALWAYS_INLINE
 xpcc::ui::Led::on(uint16_t time)
 {
-	fadeTo(time, 255);
+	fadeTo(255, time);
 }
 
 void ALWAYS_INLINE
 xpcc::ui::Led::off(uint16_t time)
 {
-	fadeTo(time, 0);
+	fadeTo(0, time);
 }
 
-void inline
+void ALWAYS_INLINE
 xpcc::ui::Led::update()
 {
-	if (brightnessAnimation.update())
-	{
-		setValue(currentBrightness);
-	}
+	animation.update();
 }

@@ -1,64 +1,43 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 # Copyright (c) 2012, Roboterclub Aachen e.V.
 # All rights reserved.
-# 
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-# 
-#  * Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-#  * Redistributions in binary form must reproduce the above copyright
-#    notice, this list of conditions and the following disclaimer in the
-#    documentation and/or other materials provided with the distribution.
-#  * Neither the name of the Roboterclub Aachen e.V. nor the
-#    names of its contributors may be used to endorse or promote products
-#    derived from this software without specific prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
-# EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
-# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+# The file is part of the xpcc library and is released under the 3-clause BSD
+# license. See the file `LICENSE` for the full license governing this code.
 # -----------------------------------------------------------------------------
 
 Import('env')
 
 generator = env['TemplateGenerator'](env, './')
 
-table = [(2.0,  7, 256),
-		 (2.0,  8, 256),
-		 (2.0, 10, 256),
-		 (2.0, 12, 256),
-		 (2.0, 16, 256)]
+table = [(2.2,  7, 256),
+		 (2.2,  8, 256),
+		 (2.2, 10, 256),
+		 (2.2, 12, 256),
+		 (2.2, 16, 256)]
 
 for gamma, bit, length in table:
 	# specifies how many values are written per line
 	values_per_line = 16
-	
+
 	# check which type width is needed
 	if bit <= 8:
 		type = "uint8_t"
 	else:
 		type = "uint16_t"
-	
+
 	string = ""
-	
+
 	for index in range(length):
 		# generate the value for the index
 		value = ( (2 ** bit - 1) / ((length - 1) ** gamma)) * (index ** gamma)
-		
+
 		# 0 only on index 0, otherwise at least 1
 		if index != 0 and index != length-1 and int(value) == 0:
 			value = 1
-		
+
 		# format it nicely
 		if bit <= 8:
 			string = string + "0x%02x," % value
@@ -66,20 +45,20 @@ for gamma, bit, length in table:
 			string = string + "0x%03x," % value
 		else:
 			string = string + "0x%04x," % value
-		
+
 		# add a newline, but not on the last line
 		if (index + 1) % values_per_line == 0 and index != length-1:
 			string = string + '\n'
-	
+
 	# remove trailing comma
 	string = string[:-1]
-	
+
 	substitutions = {
 		'type': type,
 		'bit': bit,
 		'length': length,
 		'table': string,
 	}
-	
+
 	generator.template('table%i_%i.cpp' % (bit, length), 'table.cpp.in', substitutions)
 

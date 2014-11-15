@@ -11,7 +11,7 @@
 #include "coroutine_test.hpp"
 
 // ----------------------------------------------------------------------------
-class TestingEmptyThread0 : public xpcc::co::NestedCoroutine<0>
+class TestingEmptyThread0 : public xpcc::co::Coroutine
 {
 public:
 	TestingEmptyThread0()
@@ -31,7 +31,7 @@ public:
 
 		state = 2;
 
-		CO_END();
+		CO_END_RETURN(false);
 	}
 
 	xpcc::co::Result<bool>
@@ -41,7 +41,7 @@ public:
 
 		state = 3;
 
-		CO_END();
+		CO_END_RETURN(true);
 	}
 
 	uint8_t state;
@@ -160,16 +160,30 @@ CoroutineTest::testClassMethods()
 	// state should still be 1
 	TEST_ASSERT_EQUALS(thread0.state, 1);
 	// but it should continue execution in the right context
-	TEST_ASSERT_EQUALS(thread0.task1(ctx1).state, xpcc::co::Stop);
+	auto result1 = thread0.task1(ctx1);
+	TEST_ASSERT_EQUALS(result1.state, xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(result1.result, false);
 	// state should be 2
 	TEST_ASSERT_EQUALS(thread0.state, 2);
 	// nothing is running anymore
 	TEST_ASSERT_FALSE(thread0.isCoroutineRunning());
 
 	// try the same with task2, which will end immediately
-	TEST_ASSERT_EQUALS(thread0.task2(ctx1).state, xpcc::co::Stop);
+	auto result2 = thread0.task2(ctx1);
+	TEST_ASSERT_EQUALS(result2.state, xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(result2.result, true);
 	// state should be 3
 	TEST_ASSERT_EQUALS(thread0.state, 3);
+	// not running anymore
+	TEST_ASSERT_FALSE(thread0.isCoroutineRunning());
+
+	TEST_ASSERT_EQUALS(thread0.getCoroutineDepth(), -1);
+	// lets start a task, which will yield
+	TEST_ASSERT_EQUALS(thread0.task1(ctx1).state, xpcc::co::Running);
+	// state should be 1
+	TEST_ASSERT_EQUALS(thread0.state, 1);
+	// stop coroutine of thread0
+	thread0.stopCoroutine();
 	// not running anymore
 	TEST_ASSERT_FALSE(thread0.isCoroutineRunning());
 
@@ -199,6 +213,12 @@ CoroutineTest::testClassMethods()
 	TEST_ASSERT_EQUALS(thread1.state, 3);
 	TEST_ASSERT_FALSE(thread1.isCoroutineRunning());
 
+	TEST_ASSERT_EQUALS(thread1.getCoroutineDepth(), -1);
+	TEST_ASSERT_EQUALS(thread1.task1(ctx1).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread1.state, 1);
+	thread1.stopCoroutine();
+	TEST_ASSERT_FALSE(thread1.isCoroutineRunning());
+
 
 	// generic implementation with 2 nesting levels
 	TestingEmptyThread2 thread2;
@@ -223,6 +243,12 @@ CoroutineTest::testClassMethods()
 
 	TEST_ASSERT_EQUALS(thread2.task2(ctx1).state, xpcc::co::Stop);
 	TEST_ASSERT_EQUALS(thread2.state, 3);
+	TEST_ASSERT_FALSE(thread2.isCoroutineRunning());
+
+	TEST_ASSERT_EQUALS(thread2.getCoroutineDepth(), -1);
+	TEST_ASSERT_EQUALS(thread2.task1(ctx1).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread2.state, 1);
+	thread2.stopCoroutine();
 	TEST_ASSERT_FALSE(thread2.isCoroutineRunning());
 }
 
@@ -478,7 +504,7 @@ protected:
 	{
 		CO_BEGIN(ctx);
 
-		CO_WAIT_WHILE(!startSpawningCoroutine(calls));
+		CO_WAIT_UNTIL(startSpawningCoroutine(calls));
 
 		state = 2;
 		CO_YIELD();
@@ -562,4 +588,258 @@ CoroutineTest::testSpawn()
 	// now parent task has finished
 	TEST_ASSERT_EQUALS(thread.parentCoroutine(this).state, xpcc::co::Stop);
 	TEST_ASSERT_EQUALS(thread.state, (waits == 2) ? 4 : 5);
+}
+
+#include <xpcc/math/filter/moving_average.hpp>
+
+class TestingSpawningComplexThread : public xpcc::co::NestedCoroutine<1>
+{
+public:
+	TestingSpawningComplexThread()
+	:	state(0),
+		result1(0), result2(0),
+		resultLocal1(0), resultLocal2(0),
+		resultIf1(0), resultIf2(0),
+		resultFunction1(0), resultFunction2(0),
+		resultStack1(0), resultStack2(0)
+	{
+	}
+
+	xpcc::co::Result<uint16_t>
+	parentCoroutine(void *ctx)
+	{
+		// this is an unelegant way of using 'local' variables in a Coroutine.
+		uint8_t rslt1;
+		int8_t rslt2;
+
+		CO_BEGIN(ctx);
+
+		state = 1;
+		CO_YIELD();
+
+		result1 = CO_CALL(spawningCoroutine1(ctx));
+		result2 = CO_CALL(spawningCoroutine2(ctx));
+
+		state = 2;
+		CO_YIELD();
+
+		rslt1 = CO_CALL(spawningCoroutine1(ctx));
+		resultLocal1 = rslt1;
+
+		rslt2 = CO_CALL(spawningCoroutine2(ctx));
+		resultLocal2 = rslt2;
+
+		state = 3;
+		CO_YIELD();
+
+		if (CO_CALL(spawningCoroutine1(ctx)) == 42)
+		{
+			resultIf1 = 42;
+		}
+		if (CO_CALL(spawningCoroutine2(ctx)) == 42)
+		{
+			resultIf2 = 42;
+		}
+
+		state = 4;
+		CO_YIELD();
+
+		setResultFunction1(CO_CALL(spawningCoroutine1(ctx)));
+		setResultFunction2(CO_CALL(spawningCoroutine2(ctx)));
+
+		state = 5;
+		CO_YIELD();
+
+		// I would expect this to work, especially after the previous examples,
+		// but this 'crosses initialization of rslt'
+//		{
+//			uint8_t rslt = CO_CALL(spawningCoroutine1(ctx));
+//			resultStack1 = rslt;
+//		}
+//		{
+//			int8_t rslt = CO_CALL(spawningCoroutine2(ctx));
+//			resultStack2 = rslt;
+//		}
+//
+//		state = 6;
+//		CO_YIELD();
+
+		CO_END_RETURN(static_cast<uint16_t>(result1 + resultLocal1));
+	}
+
+protected:
+	xpcc::co::Result<uint8_t>
+	spawningCoroutine1(void *ctx)
+	{
+		CO_BEGIN(ctx);
+
+		CO_RETURN(42);
+
+		CO_END();
+	}
+
+	xpcc::co::Result<int8_t>
+	spawningCoroutine2(void *ctx)
+	{
+		CO_BEGIN(ctx);
+
+		if (waits >= 2)
+		{
+			CO_RETURN(42);
+		}
+
+		CO_END_RETURN(-42);
+	}
+
+	void
+	setResultFunction1(uint8_t value)
+	{
+		resultFunction1 = value;
+	}
+
+	void
+	setResultFunction2(const int8_t &value)
+	{
+		resultFunction2 = value;
+	}
+
+public:
+	uint8_t state;
+	uint8_t result1;
+	int8_t result2;
+	uint8_t resultLocal1;
+	int8_t resultLocal2;
+	uint8_t resultIf1;
+	int8_t resultIf2;
+	uint8_t resultFunction1;
+	int8_t resultFunction2;
+	uint8_t resultStack1;
+	int8_t resultStack2;
+};
+
+
+void
+CoroutineTest::testComplexSpawn()
+{
+	TestingSpawningComplexThread thread;
+
+	// sanity checks
+	TEST_ASSERT_FALSE(thread.isCoroutineRunning());
+	TEST_ASSERT_EQUALS(thread.state, 0);
+	TEST_ASSERT_EQUALS(thread.getCoroutineDepth(), -1);
+
+	// should wait until the first condition
+	TEST_ASSERT_EQUALS(thread.parentCoroutine(this).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.state, 1);
+
+	waits = 1;
+	// now run all CO_CALLs until yield
+	TEST_ASSERT_EQUALS(thread.parentCoroutine(this).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.state, 2);
+
+	TEST_ASSERT_EQUALS(thread.result1, 42);
+	TEST_ASSERT_EQUALS(thread.result2, -42);
+
+	waits = 3;
+	// run second, local CO_CALLs
+	TEST_ASSERT_EQUALS(thread.parentCoroutine(this).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.state, 3);
+
+	TEST_ASSERT_EQUALS(thread.resultLocal1, 42);
+	TEST_ASSERT_EQUALS(thread.resultLocal2, 42);
+
+	waits = 1;
+	// run third, if CO_CALLs
+	TEST_ASSERT_EQUALS(thread.parentCoroutine(this).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.state, 4);
+
+	TEST_ASSERT_EQUALS(thread.resultIf1, 42);
+	TEST_ASSERT_EQUALS(thread.resultIf2, 0);
+
+	waits = 3;
+	// run third, if CO_CALLs
+	TEST_ASSERT_EQUALS(thread.parentCoroutine(this).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.state, 5);
+
+	TEST_ASSERT_EQUALS(thread.resultFunction1, 42);
+	TEST_ASSERT_EQUALS(thread.resultFunction2, 42);
+
+//	waits = 3;
+//	// run fourth, stack CO_CALLs
+//	TEST_ASSERT_EQUALS(thread.parentCoroutine(this).state, xpcc::co::Running);
+//	TEST_ASSERT_EQUALS(thread.state, 5);
+//
+//	TEST_ASSERT_EQUALS(thread.resultStack1, 42);
+//	TEST_ASSERT_EQUALS(thread.resultStack2, 42);
+
+	auto result = thread.parentCoroutine(this);
+	TEST_ASSERT_EQUALS(result.state, xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(result.result, 42+42);
+}
+
+
+class TestingCaseLabelThread : public xpcc::co::Coroutine
+{
+public:
+	xpcc::co::Result<bool>
+	coroutine(void *ctx)
+	{
+		CO_BEGIN(ctx);
+		// 1 case label
+
+		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
+		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
+		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
+		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
+		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
+		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
+		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
+		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
+		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
+		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
+		// 101 case labels
+
+		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
+		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
+		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
+		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
+		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
+		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
+		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
+		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
+		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
+		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
+		// 201 case labels
+
+		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
+		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
+		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
+		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
+		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
+		// 251 case labels
+
+		CO_YIELD();CO_YIELD();CO_YIELD();
+		// 254 case labels
+
+		// uncommenting this case label must now trigger a static assert warning!
+		//CO_YIELD();
+
+		CO_END_RETURN(true);
+	}
+};
+
+void
+CoroutineTest::testCaseNumbers()
+{
+	TestingCaseLabelThread thread;
+
+	// this routine must be called 253 times
+	for(uint32_t ii=0; ii < 253; ii++)
+	{
+		TEST_ASSERT_EQUALS(thread.coroutine(this).state, xpcc::co::Running);
+	}
+	// the 254th time must return
+	auto result = thread.coroutine(this);
+	TEST_ASSERT_EQUALS(result.state, xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(result.result, true);
 }

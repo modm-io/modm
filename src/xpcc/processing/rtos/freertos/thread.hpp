@@ -119,6 +119,9 @@ namespace xpcc
 		 * 
 		 * Use xpcc::rtos::Semaphore if you need to suspend the execution
 		 * of a thread.  
+         * 
+         * Sideeffects: 
+         * Thread constructor disables the SysTickTimer until the Scheduler is called.
 		 * 
 		 * \ingroup	freertos
 		 */

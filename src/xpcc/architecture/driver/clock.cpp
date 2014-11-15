@@ -34,9 +34,9 @@
 #include "xpcc_config.hpp"
 
 #if (XPCC__CLOCK_TESTMODE == 1)
-	
+
 	uint_fast16_t xpcc::Clock::time = 0;
-	
+
 	xpcc::Timestamp
 	xpcc::Clock::now()
 	{
@@ -51,7 +51,7 @@
 	{
 		struct timeval now;
 		gettimeofday(&now, 0);
-		
+
 		return Timestamp( now.tv_sec*1000 + now.tv_usec/1000 );
 	}
 
@@ -63,27 +63,31 @@
 	{
 		SYSTEMTIME now;
 		GetSystemTime(&now);
-		
+
 		return Timestamp( now.wMilliseconds + now.wSecond*1000 + now.wMinute*1000*60 );
 	}
-	
+
 #elif defined(XPCC__CPU_AVR) || defined(XPCC__CPU_ARM) || defined(XPCC__CPU_AVR32)
 #	include <xpcc/architecture/driver/atomic/lock.hpp>
-	
+
 	uint_fast16_t xpcc::Clock::time = 0;
-	
+
 	xpcc::Timestamp
 	xpcc::Clock::now()
 	{
 		uint_fast16_t tempTime;
 		{
+#if defined(XPCC__CPU_AVR)
+			// only applicable for 8bit memory access
+			// where reads are not atomic
 			atomic::Lock lock;
+#endif
 			tempTime = time;
 		}
-		
+
 		return Timestamp(tempTime);
 	}
-	
+
 #else
 #	error	"Don't know how to create a Timestamp for this target!"
 #endif

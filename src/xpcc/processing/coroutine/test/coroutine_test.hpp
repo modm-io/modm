@@ -22,4 +22,10 @@ public:
 
 	void
 	testSpawn();
+
+	void
+	testComplexSpawn();
+
+	void
+	testCaseNumbers();
 };

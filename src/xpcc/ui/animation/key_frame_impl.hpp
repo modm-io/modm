@@ -14,8 +14,16 @@
 // ----------------------------------------------------------------------------
 template< typename T, class... Args >
 xpcc::ui::KeyFrameAnimationBase<T, Args...>::KeyFrameAnimationBase(Animation<Args>&... animator)
-:	animator{(&animator)...}, keyFrames(0), numberOfFrames(0), currentFrame(-1),
-	repeat(-1), mode(modeCycleMask)
+:	KeyFrameAnimationBase(nullptr,0, animator...)
+{
+}
+
+template< typename T, class... Args >
+xpcc::ui::KeyFrameAnimationBase<T, Args...>::KeyFrameAnimationBase(
+		KeyFrame<T, size> *frames, uint16_t length,
+		Animation<Args>&... animator)
+:	animator{(&animator)...}, frames(frames), length(length),
+	currentFrame(0), repeat(0), mode(modeCycleMask)
 {
 }
 
@@ -23,11 +31,14 @@ template< typename T, class... Args >
 bool
 xpcc::ui::KeyFrameAnimationBase<T, Args...>::start(uint8_t repeat)
 {
-	// there must exist a keyframe array with at least one frame
-	if (keyFrames && numberOfFrames > 0) {
+	// sanity check
+	if (frames && length > 0)
+	{
+		// stop all animations
 		cancel();
-		currentFrame = 0;
-		this->repeat = repeat - 1;
+		// start
+		currentFrame = 1;
+		this->repeat = repeat;
 		return true;
 	}
 	return false;
@@ -37,11 +48,13 @@ template< typename T, class... Args >
 void
 xpcc::ui::KeyFrameAnimationBase<T, Args...>::stop()
 {
-	if (keyFrames)
+	if (frames && length > 0)
 	{
+		// for all animators
 		for (uint_fast8_t ii = 0; ii < size; ii++)
 		{
-			animator[ii]->setValue(keyFrames[(mode & reversedMask) ? 0 : numberOfFrames-1].value[ii]);
+			// it we are running reversed, the "last" frame is the first one!
+			animator[ii]->setValue(frames[(mode & reversedMask) ? 0 : length-1].value[ii]);
 		}
 	}
 	cancel();
@@ -51,66 +64,81 @@ template< typename T, class... Args >
 void
 xpcc::ui::KeyFrameAnimationBase<T, Args...>::cancel()
 {
-	currentFrame = -1;
+	// disable
+	currentFrame = 0;
 	mode &= ~reversedMask;
 	for (uint_fast8_t ii = 0; ii < size; ii++)
 	{
 		animator[ii]->stop();
 	}
-	timeout.stop();
 }
 
 template< typename T, class... Args >
 bool
 xpcc::ui::KeyFrameAnimationBase<T, Args...>::isAnimating() const
 {
-	return (currentFrame != static_cast<uint8_t>(-1));
+	return (currentFrame > 0);
 }
 
 template< typename T, class... Args >
 void
 xpcc::ui::KeyFrameAnimationBase<T, Args...>::update()
 {
-	if (currentFrame != static_cast<uint8_t>(-1))
+	// are we running?
+	if (currentFrame > 0)
 	{
-		if (!animator[0]->isAnimating() && timeout.isExpired())
+		// wait until the key frame finished
+		if (!animator[0]->isAnimating())
 		{
+			// set the next keyframe
 			for (uint_fast8_t ii = 0; ii < size; ii++)
 			{
-				if (!animator[ii]->animateTo(keyFrames[currentFrame].time, keyFrames[currentFrame].value[ii]))
-				{
-					timeout.restart(keyFrames[currentFrame].time);
-				}
+				animator[ii]->animateTo(
+						frames[currentFrame-1].value[ii],
+						frames[currentFrame-1].length);
 			}
 
+			// which frame is next?
 			if (mode & modeCycleMask)
 			{
-				if (currentFrame == numberOfFrames - 1)
+				// we are running in a cycle
+				// 1...N, 1...N, etc
+				if (currentFrame >= length)
 				{
+					// last frame = N
 					if (!checkRepeat()) return;
-					currentFrame = 0;
+					// start at the beginning again
+					currentFrame = 1;
 				}
 				else currentFrame++;
 			}
 			else
 			{
+				// we are running up, down, up, down
+				// 1...N, N...1, etc
 				if (!(mode & reversedMask))
 				{
-					if (currentFrame == numberOfFrames - 1)
+					// we are incrementing
+					if (currentFrame >= length)
 					{
-						if (!checkRepeat()) return;
-						currentFrame = numberOfFrames - 2;
-						mode &= ~reversedMask;
+						// next frame = N-1
+						currentFrame = length - 1;
+						// decrement next
+						mode |= reversedMask;
 					}
 					else currentFrame++;
 				}
 				else
 				{
-					if (currentFrame == 0)
+					// we are decrementing
+					if (currentFrame == 1)
 					{
+						// last frame = 1
 						if (!checkRepeat()) return;
-						currentFrame = 1;
-						mode |= reversedMask;
+						// next frame = 2
+						currentFrame = 2;
+						// increment next
+						mode &= ~reversedMask;
 					}
 					else currentFrame--;
 				}
@@ -123,46 +151,43 @@ template< typename T, class... Args >
 bool
 xpcc::ui::KeyFrameAnimationBase<T, Args...>::checkRepeat()
 {
-	if (repeat != static_cast<uint8_t>(-1))
+	if (repeat == 1)
 	{
-		if (repeat == 0)
-		{
-            repeat = 0;
-			currentFrame = -1;
-			return false;
-		}
-		repeat--;
+		// stop running
+		currentFrame = 0;
+		return false;
 	}
+
+	if (repeat > 0) repeat--;
 	return true;
 }
 
-// MARK: getters and setters
-
+// MARK: - getters and setters
 template< typename T, class... Args >
 xpcc::ui::KeyFrame<T, xpcc::ui::KeyFrameAnimationBase<T, Args...>::size> *
 xpcc::ui::KeyFrameAnimationBase<T, Args...>::getKeyFrames() const
 {
-	return keyFrames;
+	return frames;
 }
 
 template< typename T, class... Args >
 void
-xpcc::ui::KeyFrameAnimationBase<T, Args...>::setKeyFrames(KeyFrame<T, size> *frames, uint8_t numberOfFrames)
+xpcc::ui::KeyFrameAnimationBase<T, Args...>::setKeyFrames(KeyFrame<T, size> *frames, uint16_t length)
 {
 	cancel();
-	this->keyFrames = frames;
-	this->numberOfFrames = numberOfFrames;
+	this->frames = frames;
+	this->length = length;
 }
 
 template< typename T, class... Args >
-uint8_t
-xpcc::ui::KeyFrameAnimationBase<T, Args...>::getNumberOfFrames() const
+uint16_t
+xpcc::ui::KeyFrameAnimationBase<T, Args...>::getLength() const
 {
-	return numberOfFrames;
+	return length;
 }
 
 template< typename T, class... Args >
-xpcc::ui::KeyFrameAnimationMode const &
+xpcc::ui::KeyFrameAnimationMode
 xpcc::ui::KeyFrameAnimationBase<T, Args...>::getMode() const
 {
 	return mode;
@@ -170,7 +195,7 @@ xpcc::ui::KeyFrameAnimationBase<T, Args...>::getMode() const
 
 template< typename T, class... Args >
 void
-xpcc::ui::KeyFrameAnimationBase<T, Args...>::setMode(KeyFrameAnimationMode const &mode)
+xpcc::ui::KeyFrameAnimationBase<T, Args...>::setMode(KeyFrameAnimationMode const mode)
 {
 	// this clears the reversed bit mask!
 	this->mode = static_cast<uint8_t>(mode);

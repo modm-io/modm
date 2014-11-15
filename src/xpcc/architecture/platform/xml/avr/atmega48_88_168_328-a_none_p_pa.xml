@@ -15,51 +15,30 @@
     <eeprom device-name="48">256</eeprom>
     <eeprom device-name="88|168">512</eeprom>
     <eeprom device-name="328">1024</eeprom>
-    <mmcu device-name="168" device-type="none">atmega168</mmcu>
-    <mmcu device-name="168" device-type="a">atmega168a</mmcu>
-    <mmcu device-name="168" device-type="p">atmega168p</mmcu>
-    <mmcu device-name="168" device-type="pa">atmega168pa</mmcu>
-    <mmcu device-name="328" device-type="none">atmega328</mmcu>
-    <mmcu device-name="328" device-type="p">atmega328p</mmcu>
-    <mmcu device-name="48" device-type="none">atmega48</mmcu>
-    <mmcu device-name="48" device-type="a">atmega48a</mmcu>
-    <mmcu device-name="48" device-type="p">atmega48p</mmcu>
-    <mmcu device-name="48" device-type="pa">atmega48pa</mmcu>
-    <mmcu device-name="88" device-type="none">atmega88</mmcu>
-    <mmcu device-name="88" device-type="a">atmega88a</mmcu>
-    <mmcu device-name="88" device-type="p">atmega88p</mmcu>
-    <mmcu device-name="88" device-type="pa">atmega88pa</mmcu>
     <core>avr8</core>
+    <mcu device-name="168" device-type="a|none">m168</mcu>
+    <mcu device-name="168" device-type="p|pa">m168p</mcu>
+    <mcu device-name="328" device-type="none">m328</mcu>
+    <mcu device-name="328" device-type="p">m328p</mcu>
+    <mcu device-name="48" device-type="a|none">m48</mcu>
+    <mcu device-name="48" device-type="p|pa">m48p</mcu>
+    <mcu device-name="88" device-type="a|none">m88</mcu>
+    <mcu device-name="88" device-type="p|pa">m88p</mcu>
     <pin-count>0</pin-count>
     <header>avr/io.h</header>
     <header>avr/interrupt.h</header>
-    <header>avr/sleep.h</header>
-    <define device-name="168" device-type="a">__AVR_ATmega168A__</define>
-    <define device-name="168" device-type="pa">__AVR_ATmega168PA__</define>
-    <define device-name="168" device-type="p">__AVR_ATmega168P__</define>
-    <define device-name="168" device-type="none">__AVR_ATmega168__</define>
-    <define device-name="328" device-type="p">__AVR_ATmega328P__</define>
-    <define device-name="328" device-type="none">__AVR_ATmega328__</define>
-    <define device-name="48" device-type="a">__AVR_ATmega48A__</define>
-    <define device-name="48" device-type="pa">__AVR_ATmega48PA__</define>
-    <define device-name="48" device-type="p">__AVR_ATmega48P__</define>
-    <define device-name="48" device-type="none">__AVR_ATmega48__</define>
-    <define device-name="88" device-type="a">__AVR_ATmega88A__</define>
-    <define device-name="88" device-type="pa">__AVR_ATmega88PA__</define>
-    <define device-name="88" device-type="p">__AVR_ATmega88P__</define>
-    <define device-name="88" device-type="none">__AVR_ATmega88__</define>
     <driver type="core" name="avr">
       <parameter device-name="48" name="ram_length">256</parameter>
       <parameter device-name="88|168" name="ram_length">512</parameter>
       <parameter device-name="328" name="ram_length">1024</parameter>
     </driver>
-    <driver type="uart" name="at90_tiny_mega" instances="0"/>
-    <driver type="spi" name="at90_tiny_mega_uart" instances="0"/>
+    <driver type="adc" name="atmega"/>
     <driver type="clock" name="avr"/>
     <driver type="i2c" name="at90_tiny_mega"/>
     <driver type="spi" name="at90_tiny_mega"/>
-    <driver type="adc" name="atmega"/>
     <driver type="timer" name="atmega" instances="0,1,2"/>
+    <driver type="uart" name="at90_tiny_mega" instances="0"/>
+    <driver type="spi" name="at90_tiny_mega_uart" instances="0"/>
     <driver type="gpio" name="at90_tiny_mega">
       <gpio port="B" id="0" pcint="0"/>
       <gpio port="B" id="1" pcint="1"/>

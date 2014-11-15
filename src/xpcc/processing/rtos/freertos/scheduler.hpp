@@ -77,7 +77,7 @@ namespace xpcc
 			/**
 			 * \brief	Starts the real time kernel
 			 * 
-			 * Starts the SysTick Timer (1ms periode) and attaches to its
+			 * Starts the SysTick Timer (1ms period) and attaches to its
 			 * interrupt.
 			 * 
 			 * The idle thread is created automatically when schedule() is called.

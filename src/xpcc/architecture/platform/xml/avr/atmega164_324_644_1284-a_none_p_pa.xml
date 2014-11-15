@@ -17,53 +17,35 @@
     <eeprom device-name="324">1024</eeprom>
     <eeprom device-name="644">2048</eeprom>
     <eeprom device-name="1284">4096</eeprom>
-    <mmcu device-name="1284" device-type="none">atmega1284</mmcu>
-    <mmcu device-name="1284" device-type="p">atmega1284p</mmcu>
-    <mmcu device-name="164" device-type="a">atmega164a</mmcu>
-    <mmcu device-name="164" device-type="p">atmega164p</mmcu>
-    <mmcu device-name="164" device-type="pa">atmega164pa</mmcu>
-    <mmcu device-name="324" device-type="a">atmega324a</mmcu>
-    <mmcu device-name="324" device-type="p">atmega324p</mmcu>
-    <mmcu device-name="324" device-type="pa">atmega324pa</mmcu>
-    <mmcu device-name="644" device-type="none">atmega644</mmcu>
-    <mmcu device-name="644" device-type="a">atmega644a</mmcu>
-    <mmcu device-name="644" device-type="p">atmega644p</mmcu>
-    <mmcu device-name="644" device-type="pa">atmega644pa</mmcu>
     <core>avr8</core>
+    <mcu device-name="1284" device-type="p">m1284p</mcu>
+    <mcu device-name="164">m164p</mcu>
+    <mcu device-name="324" device-type="p">m324p</mcu>
+    <mcu device-name="324" device-type="pa">m324pa</mcu>
+    <mcu device-name="644" device-type="a|none">m644</mcu>
+    <mcu device-name="644" device-type="p|pa">m644p</mcu>
+    <mcu device-name="324|1284" device-type="a|none">unsupported</mcu>
     <pin-count>0</pin-count>
     <header>avr/io.h</header>
     <header>avr/interrupt.h</header>
-    <header>avr/sleep.h</header>
-    <define device-name="1284" device-type="p">__AVR_ATmega1284P__</define>
-    <define device-name="1284" device-type="none">__AVR_ATmega1284__</define>
-    <define device-name="164" device-type="a">__AVR_ATmega164A__</define>
-    <define device-name="164" device-type="pa">__AVR_ATmega164PA__</define>
-    <define device-name="164" device-type="p">__AVR_ATmega164P__</define>
-    <define device-name="324" device-type="a">__AVR_ATmega324A__</define>
-    <define device-name="324" device-type="pa">__AVR_ATmega324PA__</define>
-    <define device-name="324" device-type="p">__AVR_ATmega324P__</define>
-    <define device-name="644" device-type="a">__AVR_ATmega644A__</define>
-    <define device-name="644" device-type="pa">__AVR_ATmega644PA__</define>
-    <define device-name="644" device-type="p">__AVR_ATmega644P__</define>
-    <define device-name="644" device-type="none">__AVR_ATmega644__</define>
     <driver type="core" name="avr">
       <parameter device-name="164" name="ram_length">512</parameter>
       <parameter device-name="324" name="ram_length">1024</parameter>
       <parameter device-name="644" name="ram_length">3072</parameter>
       <parameter device-name="1284" name="ram_length">15360</parameter>
     </driver>
+    <driver type="adc" name="atmega"/>
     <driver type="clock" name="avr"/>
+    <driver type="i2c" name="at90_tiny_mega"/>
+    <driver type="spi" name="at90_tiny_mega"/>
+    <driver type="timer" name="atmega" instances="0,1,2"/>
+    <driver device-name="1284" type="timer" name="atmega" instances="3"/>
     <driver type="uart" name="at90_tiny_mega" instances="0"/>
     <driver type="spi" name="at90_tiny_mega_uart" instances="0"/>
     <driver device-name="164|324|1284" type="uart" name="at90_tiny_mega" instances="1"/>
     <driver device-name="164|324|1284" type="spi" name="at90_tiny_mega_uart" instances="1"/>
     <driver device-name="644" device-type="a|p|pa" type="uart" name="at90_tiny_mega" instances="1"/>
     <driver device-name="644" device-type="a|p|pa" type="spi" name="at90_tiny_mega_uart" instances="1"/>
-    <driver type="i2c" name="at90_tiny_mega"/>
-    <driver type="spi" name="at90_tiny_mega"/>
-    <driver type="adc" name="atmega"/>
-    <driver type="timer" name="atmega" instances="0,1,2"/>
-    <driver device-name="1284" type="timer" name="atmega" instances="3"/>
     <driver type="gpio" name="at90_tiny_mega">
       <gpio port="A" id="0" pcint="0"/>
       <gpio port="A" id="1" pcint="1"/>

@@ -7,6 +7,13 @@
  */
 // ----------------------------------------------------------------------------
 
+/**
+ * @defgroup	animation	Animators
+ * @brief		Various classes for animating values.
+ *
+ * @ingroup		ui
+ */
+
 #include "animation/base.hpp"
 #include "animation/key_frame.hpp"
 #include "animation/indicator.hpp"

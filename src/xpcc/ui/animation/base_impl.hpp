@@ -14,8 +14,22 @@
 
 template< typename T >
 xpcc::ui::Animation<T>::Animation(T &value)
-:	currentValue(value), endValue(0), animationTime(0), previous(0)
+:	Animation(value, nullptr)
 {
+}
+
+template< typename T >
+xpcc::ui::Animation<T>::Animation(T &value, Callback_t callback)
+:	callback(callback), currentValue(value), endValue(0),
+	 animationTime(0), previous(0)
+{
+}
+
+template< typename T >
+void inline
+xpcc::ui::Animation<T>::attachCallback(Callback_t callback)
+{
+	this->callback = callback;
 }
 
 template< typename T >
@@ -24,6 +38,8 @@ xpcc::ui::Animation<T>::setValue(T value)
 {
 	animationTime = 0;
 	currentValue = value;
+	interpolation.stop();
+	if (callback) callback(currentValue);
 }
 
 template< typename T >
@@ -44,47 +60,42 @@ template< typename T >
 void inline
 xpcc::ui::Animation<T>::stop()
 {
-	animationTime = -1;
 	endValue = currentValue;
-	computations.deltaValue = 0;
+	setValue(currentValue);
 }
 
 template< typename T >
 bool
-xpcc::ui::Animation<T>::animateTo(TimeType time, T value)
+xpcc::ui::Animation<T>::animateTo(T value, TimeType time)
 {
-	if (value == currentValue) {
-		animationTime = -1;
+	if (value == currentValue)
+	{
+		setValue(value);
+		animationTime = time;
 		return false;
 	}
-
-	// if the time is zero, or the value is already reached, set the value immediately
-	if (time == 0) {
+	if(time == 0)
+	{
 		setValue(value);
-		animationTime = -1;
 		return true;
 	}
 
 	endValue = value;
 	animationTime = time;
-	computations.initialize(currentValue, endValue, animationTime);
+	interpolation.initialize(currentValue, endValue, animationTime);
 	previous = xpcc::Clock::now();
 	return true;
 }
 
 template< typename T >
 bool
-xpcc::ui::Animation<T>::update() {
-	// this should be called exactly once every 1 ms
+xpcc::ui::Animation<T>::update()
+{
+	// this should be called at least once every 1 ms
 	// but if the clock gets incremented by more than 1 ms, or the main loop is
 	// busy, then we need to count these "missing" steps and apply them.
 
-	// if we are not fading at the moment, we do not need to check anything
-	if (animationTime == static_cast<TimeType>(-1)) {
-		animationTime = 0;
-		return true;
-	}
-
+	// are we even running?
 	if (animationTime > 0)
 	{
 		// buffer the delta time
@@ -92,7 +103,7 @@ xpcc::ui::Animation<T>::update() {
 		// this cast requires us to be updates once at least every 255ms
 		// If this method is not called every few ms, the animation does
 		// not look good anyways, so this limitation is okay.
-		uint8_t delta = (now - previous).getTime();
+		uint_fast8_t delta = (now - previous).getTime();
 
 		// check if at least 1ms has passed
 		if (delta)
@@ -100,19 +111,29 @@ xpcc::ui::Animation<T>::update() {
 			// save the current time for the next comparison
 			previous = now;
 
-			// update the values for the number of passed ms
-			while (delta--)
+			// check if we are going to be finished with the animation in delta ms
+			if (animationTime <= delta)
 			{
-				if (--animationTime == 0) {
-					animationTime = 0;
-					currentValue = endValue;
-					return true;
-				}
-
-				currentValue = computations.step();
+				// don't bother with the calculations, just set the final value
+				setValue(endValue);
+				return true;
 			}
+			// subtract the current time steps
+			animationTime -= delta;
 
-			return true;
+			// run the calculations
+			while (delta--) interpolation.step();
+
+			// get the calculated value for this step
+			T newValue = interpolation.getValue();
+
+			if (currentValue != newValue)
+			{
+				currentValue = newValue;
+				// invoke the callback with this value
+				if (callback) callback(currentValue);
+				return true;
+			}
 		}
 	}
 

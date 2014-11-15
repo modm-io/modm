@@ -78,20 +78,20 @@ public:
 	}
 
 	inline void
-	fadeTo(uint16_t time, ::xpcc::color::Rgb color)
+	fadeTo(::xpcc::color::Rgb color, uint16_t time)
 	{
 		absolute = color;
 
-		red.fadeTo(time, absolute.red);
-		green.fadeTo(time, absolute.green);
-		blue.fadeTo(time, absolute.blue);
+		red.fadeTo(absolute.red, time);
+		green.fadeTo(absolute.green, time);
+		blue.fadeTo(absolute.blue, time);
 	}
 
 	inline void
-	fadeTo(uint16_t time, ::xpcc::color::Hsv color)
+	fadeTo(::xpcc::color::Hsv color, uint16_t time)
 	{
 		color.toRgb(&absolute);
-		fadeTo(time, absolute);
+		fadeTo(absolute, time);
 	}
 
 	/// should be called every 1ms or more.

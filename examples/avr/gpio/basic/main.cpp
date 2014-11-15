@@ -11,20 +11,16 @@
 
 using namespace xpcc::atmega;
 
-// create a wrapper for a output pin
-
 typedef GpioOutputB0 Led;
-typedef GpioOutputB1 Led2;
+// create a wrapper for a output pin
+typedef xpcc::GpioInverted< GpioOutputB1 > LedInverted;
 
-typedef xpcc::GpioInverted< Led2 > LedInverted;
-
-int
-main(void)
+MAIN_FUNCTION
 {
 	Led::setOutput();
 	Led::set();
 
-	LedInverted::reset();
+	LedInverted::setOutput(xpcc::Gpio::Low);
 
 	while (1)
 	{

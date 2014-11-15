@@ -30,7 +30,7 @@ namespace stm32
  * @author		Niklas Hauser
  * @ingroup		stm32
  */
-class I2cMaster{{ id }} : ::xpcc::I2cMaster
+class I2cMaster{{ id }} : public ::xpcc::I2cMaster
 {
 public:
 	static const TypeId::I2cMaster{{ id }}Sda Sda;

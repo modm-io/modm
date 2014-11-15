@@ -12,6 +12,20 @@
 
 #include <xpcc/utils/arithmetic_traits.hpp>
 
+/// @internal Required macro to set the same unique number twice
+/// @hideinitializer
+#define CO_INTERNAL_SET_CASE(counter) \
+			this->setCo((counter % 255) + 1); \
+		case ((counter % 255) + 1): ;
+
+/// @internal Internal macro for yield
+/// @hideinitializer
+#define CO_INTERNAL_SET_CASE_YIELD(counter) \
+			this->setCo((counter % 255) + 1); \
+			this->popCo(); \
+			return {xpcc::co::Running, 0}; \
+		case ((counter % 255) + 1): ;
+
 /**
  * Declare start of a coroutine.
  * This will immidiately return if the nesting is too deep
@@ -22,12 +36,12 @@
  * @hideinitializer
  */
 #define CO_BEGIN(context) \
+	constexpr uint32_t coCounter = __COUNTER__; \
 	if (!this->nestingOkCo()) return {xpcc::co::NestingError, 0}; \
 	if (!this->beginCo(context)) return {xpcc::co::WrongContext, 0}; \
 	switch (this->pushCo()) { \
 		case CoStopped: \
-			this->setCo(__LINE__); \
-		case __LINE__: ;
+			CO_INTERNAL_SET_CASE(__COUNTER__);
 
 /**
  * End the coroutine and return a result.
@@ -37,13 +51,12 @@
  * @hideinitializer
  */
 #define CO_END_RETURN(result) \
-			this->stopCo(); \
-			this->popCo(); \
-			return {xpcc::co::Stop, (result)}; \
+			CO_RETURN(result); \
 		default: \
 			this->popCo(); \
 			return {xpcc::co::WrongState, 0}; \
-	}
+	} \
+	static_assert(__COUNTER__ - coCounter < 256, "You have too many states in this coroutine!");
 
 /**
  * End the coroutine. You can use this to return `void`, or if the result does not matter.
@@ -63,22 +76,12 @@
  * @hideinitializer
  */
 #define CO_END_RETURN_CALL(coroutine) \
-			this->setCo(__LINE__); \
-		case __LINE__: \
-			{ \
-				auto coResult = coroutine; \
-				if (coResult.state > xpcc::co::NestingError) { \
-					this->popCo(); \
-					return {xpcc::co::Running, 0}; \
-				} \
-				this->stopCo(); \
-				this->popCo(); \
-				return {xpcc::co::Stop, coResult.result}; \
-			} \
+			CO_RETURN_CALL(coroutine); \
 		default: \
 			this->popCo(); \
 			return {xpcc::co::WrongState, 0}; \
-	}
+	} \
+	static_assert(__COUNTER__ - coCounter < 256, "You have too many states in this coroutine!");
 
 /**
  * Yield coroutine until next invocation.
@@ -87,10 +90,7 @@
  * @hideinitializer
  */
 #define CO_YIELD() \
-			this->setCo(__LINE__); \
-			this->popCo(); \
-			return {xpcc::co::Running, 0}; \
-		case __LINE__: ;
+			CO_INTERNAL_SET_CASE_YIELD(__COUNTER__)
 
 /**
  * Cause coroutine to wait **while** given `condition` is true.
@@ -99,8 +99,7 @@
  * @hideinitializer
  */
 #define CO_WAIT_WHILE(condition) \
-			this->setCo(__LINE__); \
-		case __LINE__: \
+			CO_INTERNAL_SET_CASE(__COUNTER__); \
 			if (condition) { \
 				this->popCo(); \
 				return {xpcc::co::Running, 0}; \
@@ -123,8 +122,7 @@
  */
 #define CO_CALL(coroutine) \
 	({ \
-			this->setCo(__LINE__); \
-		case __LINE__:\
+			CO_INTERNAL_SET_CASE(__COUNTER__); \
 			auto coResult = coroutine; \
 			if (coResult.state > xpcc::co::NestingError) { \
 				this->popCo(); \
@@ -147,6 +145,25 @@
 			{ coResult = coroutine; } \
 			coResult.result; \
 	})
+
+/**
+* Exits a coroutine and returns another coroutine's result.
+*
+* @ingroup	coroutine
+* @hideinitializer
+*/
+#define CO_RETURN_CALL(coroutine) \
+		{ \
+			CO_INTERNAL_SET_CASE(__COUNTER__); \
+			{ \
+				auto coResult = coroutine; \
+				if (coResult.state > xpcc::co::NestingError) { \
+					this->popCo(); \
+					return {xpcc::co::Running, 0}; \
+				} \
+				CO_RETURN(coResult.result); \
+			} \
+		}
 
 /**
  * Stop and exit from coroutine.

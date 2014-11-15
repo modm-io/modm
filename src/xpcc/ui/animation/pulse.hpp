@@ -16,20 +16,29 @@
 
 namespace xpcc
 {
+
 namespace ui
 {
+
 /**
- * Pulser.
- *
  * This class animates a value up and down during the period.
  *
- * @see		Led
+ * @code
+ *  |--| duty cycle
+ *     /\      /\
+ *    /  \    /  \
+ *   /    \  /    \
+ *  /      \/      \ ...
+ *  |------| period
+ * @endcode
+ *
  * @author	Niklas Hauser
- * @ingroup led
+ * @ingroup animation
  */
 template< typename T = uint8_t >
 class Pulse
 {
+	typedef typename Animation<T>::TimeType TimeType;
 public:
 	Pulse(Animation<T> &animator)
 	:	animator(animator), frames{
@@ -38,27 +47,28 @@ public:
 		}
 	{
 		this->animator.setKeyFrames(frames, 2);
-		this->animator.setMode(xpcc::ui::KeyFrameAnimationMode::Cycle);
 	}
 
-	/// set new period
+	/// @param	period		in ms
+	/// @param	dutyCycle	in percent <= 100
 	inline void
-	setPeriod(typename Animation<T>::TimeType period, uint8_t dutyCycle=50)
+	setPeriod(TimeType period, uint8_t dutyCycle=50)
 	{
-		frames[0].time = period * dutyCycle / 100;
-		frames[1].time = period - frames[0].time;
+		if (dutyCycle > 100) dutyCycle = 100;
+		frames[0].length = static_cast<uint32_t>(period) * dutyCycle / 100;
+		frames[1].length = period - frames[0].length;
 	}
 
 	void inline
 	setRange(T minValue, T maxValue)
 	{
-		frames[0].value = maxValue;
-		frames[1].value = minValue;
+		frames[0].value[0] = maxValue;
+		frames[1].value[0] = minValue;
 	}
 
 	/// start indicating for ever
 	inline void
-	start(uint8_t repeat=-1)
+	start(uint8_t repeat=0)
 	{
 		animator.start(repeat);
 	}
@@ -68,12 +78,6 @@ public:
 	stop()
 	{
 		animator.stop();
-	}
-
-	inline void
-	cancel()
-	{
-		animator.cancel();
 	}
 
 	inline bool

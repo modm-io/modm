@@ -61,6 +61,114 @@ struct bmp085
 		MODE_HIGH_RESOLUTION       = (0x02 << 6),
 		MODE_ULTRA_HIGH_RESOLUTION = (0x03 << 6),
 	};
+
+	/**
+	 * Hold the calibration data from the sensor.
+	 * Values are used for calculation of calibrated
+	 * sensor values from raw sensor data
+	 */
+	struct __attribute__ ((packed))
+	Calibration
+	{
+		int16_t  ac1;
+		int16_t  ac2;
+		int16_t  ac3;
+		uint16_t ac4;
+		uint16_t ac5;
+		uint16_t ac6;
+
+		int16_t  b1;
+		int16_t  b2;
+
+		int16_t  mb;
+		int16_t  mc;
+		int16_t  md;
+	};
+
+	struct __attribute__ (( packed ))
+	Data
+	{
+		// DATA ACCESS
+		/// \return reference to the calibration data from the sensor
+		ALWAYS_INLINE Calibration&
+		getCalibrationData()
+		{ return (calibration); };
+
+		/**
+		 * Get the calibrated temperature for the device in 0.1 degree Celsius
+		 *
+		 * If recalculation is necessary it is done on the fly.
+		 * No I2C transaction.
+		 */
+		int16_t*
+		getCalibratedTemperature()
+		{
+			if (!temperatureCalculated) {
+				calculateCalibratedTemperature();
+			}
+			return &calibratedTemperature;
+		}
+
+		/**
+		 * Get the calibrated pressure from the device in [ToDo unit].
+		 *
+		 * If recalculation is necessary it is done on the fly.
+		 * No I2C transaction.
+		 */
+		int32_t*
+		getCalibratedPressure()
+		{
+			if (!pressureCalculated) {
+				calculateCalibratedPressure();
+			}
+			return &calibratedPressure;
+		}
+
+	private:
+		/**
+		 * Use the calibration data read from the sensor to
+		 * calculate the calibrated temperature from the
+		 * raw data.
+		 * The result is stored in this struct for further
+		 * access.
+		 */
+		void ALWAYS_INLINE
+		calculateCalibratedTemperature();
+
+		/**
+		 * See calculateCalibratedTemperature()
+		 */
+		void ALWAYS_INLINE
+		calculateCalibratedPressure();
+
+		/// \return pointer to 8bit array containing raw temperature and pressure
+		ALWAYS_INLINE uint8_t*
+		getPointer()
+		{ return raw; }
+
+	public:
+		/// The raw data that was read from the sensor
+		/// 0 .. 1 temperature data
+		/// 2 .. 4 pressure data
+		uint8_t raw[5];
+
+	public:
+		Calibration calibration;
+
+		int16_t calibratedTemperature; // in 0.1 degree Celsius
+		int32_t calibratedPressure;    // in Pa
+
+		int32_t b5; // calculated in calculateCalibratedTemperature, needed for calculateCalibratedPressure
+
+		/// The mode in which the sensor operates
+		bmp085::Mode config;
+
+		/// Remember if the raw data was already converted to calibrated temperature
+		bool temperatureCalculated;
+
+		/// Remember if the raw data was already converted to calibrated pressure
+		bool pressureCalculated;
+	};
 };
 
 /**
@@ -76,7 +184,7 @@ struct bmp085
  * <a href="http://www.bosch-sensortec.com/content/language1/downloads/BST-BMP085-DS000-06.pdf">
  * datasheet</a>.
  *
- * Also compatible to BMP180.
+ * Also compatible to and tested with BMP180.
  *
  * \author	Niklas Hauser
  * \author  strongly-typed
@@ -90,50 +198,11 @@ class Bmp085 : public bmp085, public xpcc::I2cDevice<I2cMaster>,
 {
 public:
 	/**
-	 * \param	data		pointer to buffer of 5 bytes
+	 * \param	data		pointer to buffer of the internal data of type Data
 	 * \param	address		address defaults to 0x77
 	 */
-	Bmp085(uint8_t* data, uint8_t address=0x77);
-
-	// Mark: - Accessors to internally buffered data. No I2C transactions involved
-	/// \return pointer to 8bit array containing tp temperature and pressure
-	inline uint8_t*
-	getData();
-
-	/// \return pointer to 8bit array containing calibration data
-	ALWAYS_INLINE uint16_t*
-	getCalibrationData();
+	Bmp085(Data &data, uint8_t address=0x77);
 	
-	/**
-	 * \c true, when new pressure data has been from the sensor and buffered,
-	 * \c false, when the data has been accessed once, or data is being
-	 * copied into the buffer.
-	 */
-	ALWAYS_INLINE bool
-	isNewDataAvailable();
-
-	/**
-	 * Get the calibrated temperature for the device in 0.1 degree Celsius
-	 *
-	 * If recalculation is necessary it is done on the fly.
-	 * No I2C transaction.
-	 */
-	int16_t*
-	getCalibratedTemperature();
-
-	/**
-	 * Get the calibrated pressure from the device in [ToDo unit].
-	 *
-	 * If recalculation is necessary it is done on the fly.
-	 * No I2C transaction.
-	 */
-	int32_t*
-	getCalibratedPressure();
-
-	/// Must be called periodically
-	void
-	update();
-
 	// MARK: - TASKS
 	/// Pings the sensor
 	xpcc::co::Result<bool>
@@ -146,6 +215,10 @@ public:
 	/// Do a readout sequence to convert and read temperature and then pressure from sensor
 	xpcc::co::Result<bool>
 	readout(void *ctx);
+
+public:
+	/// the data object for this sensor.
+	Data &data;
 
 private:
 
@@ -175,50 +248,8 @@ private:
 	 */
 	static constexpr uint8_t conversionDelay[] = {5, 8, 14, 26};
 
-	/**
-	 * Bitfield: Remember that new data is available
-	 */
-	enum Status {
-		NEW_TEMPERATURE_DATA      = 0x01,
-		NEW_PRESSURE_DATA         = 0x02,
-	};
-
-	/**
-	 * Bitfield: Take care that the calibration is only calculated once.
-	 */
-	enum Calculation {
-		TEMPERATURE_NEEDS_UPDATE = 0x01,
-		PRESSURE_NEEDS_UPDATE    = 0x02,
-	};
-
-	bmp085::Mode config;
-	uint8_t status;
-	uint8_t calculation;
-	uint8_t* data;
+	// Command buffer for writing to the device
 	uint8_t buffer[3];
-
-	struct __attribute__ ((packed))
-	Calibration
-	{
-		int16_t  ac1;
-		int16_t  ac2;
-		int16_t  ac3;
-		uint16_t ac4;
-		uint16_t ac5;
-		uint16_t ac6;
-		
-		int16_t  b1;
-		int16_t  b2;
-		
-		int16_t  mb;
-		int16_t  mc;
-		int16_t  md;
-	} calibration ;
-
-	int16_t calibratedTemperature;
-	int32_t calibratedPressure;
-
-	int32_t b5; // calculated in getTemperature, needed for getPressure
 };
 }
 

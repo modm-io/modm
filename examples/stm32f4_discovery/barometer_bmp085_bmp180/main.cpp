@@ -33,13 +33,9 @@ public:
 	{
 	}
 
-	uint8_t data[5];
-
 	bool
 	update()
 	{
-		barometer.update();
-
 		PT_BEGIN()
 
 		stream << "Ping the device from ThreadOne" << xpcc::endl;
@@ -70,13 +66,20 @@ public:
 
 		stream << "Device configured" << xpcc::endl;
 
-		static uint16_t* cal = barometer.getCalibrationData();
+		static xpcc::bmp085::Calibration & cal = data.getCalibrationData();
 
 		stream << "Calibration data is: ";
-		for (uint8_t ii = 0; ii < 11; ++ii) {
-			stream.printf("%04x ", cal[ii]);
-		}
-		stream << xpcc::endl ;
+		stream.printf(" ac1 %d\n", cal.ac1);
+		stream.printf(" ac2 %d\n", cal.ac2);
+		stream.printf(" ac3 %d\n", cal.ac3);
+		stream.printf(" ac4 %d\n", cal.ac4);
+		stream.printf(" ac5 %d\n", cal.ac5);
+		stream.printf(" ac6 %d\n", cal.ac6);
+		stream.printf(" b1 %d\n", cal.b1);
+		stream.printf(" b2 %d\n", cal.b2);
+		stream.printf(" mb %d\n", cal.mb);
+		stream.printf(" mc %d\n", cal.mc);
+		stream.printf(" md %d\n", cal.md);
 
 		while (1)
 		{
@@ -84,13 +87,12 @@ public:
 
 			PT_WAIT_UNTIL(timer.isExpired());
 
+			// Returns when new data was read from the sensor
 			PT_CALL(barometer.readout(this));
 
-			PT_WAIT_UNTIL(barometer.isNewDataAvailable());
-
 			{
-				int16_t* temp  = barometer.getCalibratedTemperature();
-				int32_t* press = barometer.getCalibratedPressure();
+				int16_t* temp  = data.getCalibratedTemperature();
+				int32_t* press = data.getCalibratedPressure();
 
 				stream.printf("Calibrated temperature in 0.1 degree Celsius is: %d\n",   *temp  );
 				stream.printf("Calibrated pressure in Pa is                   : %d\n\n", *press );
@@ -102,6 +104,8 @@ public:
 
 private:
 	xpcc::Timeout<> timer;
+
+	xpcc::bmp085::Data data;
 	xpcc::Bmp085<MyI2cMaster> barometer;
 };
 
@@ -124,9 +128,7 @@ MAIN_FUNCTION
 
 	GpioB9::connect(MyI2cMaster::Sda);
 	GpioB8::connect(MyI2cMaster::Scl);
-	GpioB9::setOutput(Gpio::OutputType::OpenDrain);
-	GpioB8::setOutput(Gpio::OutputType::OpenDrain);
-	MyI2cMaster::initialize<defaultSystemClock, 50000>();
+    MyI2cMaster::initialize<defaultSystemClock, MyI2cMaster::Baudrate::Standard>();
 
 	stream << "\n\nWelcome to BMP085 demo!\n\n";
 

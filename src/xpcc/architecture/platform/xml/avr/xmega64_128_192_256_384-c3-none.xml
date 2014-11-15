@@ -1,0 +1,288 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE rca SYSTEM "../devicefile.dtd">
+<rca version="1.0">
+  <!-- WARNING: This file is generated automatically, do not edit!
+ 		Please modify the xpcc/tools/device_file_generator code instead and rebuild this file.
+ 		Be aware, that regenerated files might have a different composition due to technical reasons. -->
+  <device platform="avr" family="xmega" name="64|128|192|256|384" pin_id="none" size_id="64|128|192|256|384" type="c3">
+    <flash device-name="64">65536</flash>
+    <flash device-name="128">131072</flash>
+    <flash device-name="192">196608</flash>
+    <flash device-name="256">262144</flash>
+    <flash device-name="384">393216</flash>
+    <ram device-name="64">4096</ram>
+    <ram device-name="128">8192</ram>
+    <ram device-name="192|256">16384</ram>
+    <ram device-name="384">32768</ram>
+    <eeprom device-name="64|128|192">2048</eeprom>
+    <eeprom device-name="256|384">4096</eeprom>
+    <core>avr8_xmega</core>
+    <mcu device-name="128">x128c3</mcu>
+    <mcu device-name="192">x192c3</mcu>
+    <mcu device-name="256">x256c3</mcu>
+    <mcu device-name="384">x384c3</mcu>
+    <mcu device-name="64">x64c3</mcu>
+    <pin-count>64</pin-count>
+    <header>avr/io.h</header>
+    <header>avr/interrupt.h</header>
+    <driver type="core" name="avr">
+      <parameter device-name="64" name="ram_length">3072</parameter>
+      <parameter device-name="128" name="ram_length">7168</parameter>
+      <parameter device-name="192|256" name="ram_length">15360</parameter>
+      <parameter device-name="384" name="ram_length">31744</parameter>
+    </driver>
+    <driver type="adc" name="xmega" instances="A"/>
+    <driver type="clock" name="avr"/>
+    <driver type="i2c" name="xmega" instances="C,E"/>
+    <driver type="spi" name="xmega" instances="C,D"/>
+    <driver type="timer" name="xmega" instances="C0,C1,C2,D0,D2,E0,E2,F0,F2"/>
+    <driver type="uart" name="xmega" instances="C0,D0,E0"/>
+    <driver type="spi" name="xmega_uart" instances="C0,D0,E0"/>
+    <driver device-name="384" type="uart" name="xmega" instances="C1,F0"/>
+    <driver device-name="384" type="spi" name="xmega_uart" instances="C1,F0"/>
+    <driver type="gpio" name="xmega">
+      <gpio port="A" id="0"/>
+      <gpio port="A" id="1"/>
+      <gpio port="A" id="2"/>
+      <gpio port="A" id="3"/>
+      <gpio port="A" id="4"/>
+      <gpio port="A" id="5"/>
+      <gpio port="A" id="6"/>
+      <gpio port="A" id="7"/>
+      <gpio port="B" id="0"/>
+      <gpio port="B" id="1"/>
+      <gpio port="B" id="2"/>
+      <gpio port="B" id="3"/>
+      <gpio port="B" id="4"/>
+      <gpio port="B" id="5"/>
+      <gpio port="B" id="6"/>
+      <gpio port="B" id="7"/>
+      <gpio port="C" id="0">
+        <af peripheral="I2cMasterC" type="io" name="Sda"/>
+        <af remap="False" peripheral="TimerCounterC0" type="out" name="Oca"/>
+      </gpio>
+      <gpio port="C" id="1">
+        <af peripheral="I2cMasterC" type="out" name="Scl"/>
+        <af remap="False" peripheral="TimerCounterC0" type="out" name="Ocb"/>
+        <af remap="False" peripheral="UartC0" type="out" name="Xck"/>
+        <af remap="False" peripheral="UartSpiMasterC0" type="out" name="Sck"/>
+      </gpio>
+      <gpio port="C" id="2">
+        <af remap="False" peripheral="TimerCounterC0" type="out" name="Occ"/>
+        <af remap="False" peripheral="UartC0" type="in" name="Rxd"/>
+        <af remap="False" peripheral="UartSpiMasterC0" type="in" name="Miso"/>
+      </gpio>
+      <gpio port="C" id="3">
+        <af remap="False" peripheral="TimerCounterC0" type="out" name="Ocd"/>
+        <af remap="False" peripheral="UartC0" type="out" name="Txd"/>
+        <af remap="False" peripheral="UartSpiMasterC0" type="out" name="Mosi"/>
+      </gpio>
+      <gpio port="C" id="4">
+        <af remap="True" peripheral="TimerCounterC0" type="out" name="Oca"/>
+        <af peripheral="TimerCounterC1" type="out" name="Oca"/>
+        <af peripheral="SpiMasterC" type="out" name="Ss"/>
+        <af peripheral="SpiSlaveC" type="in" name="Ss"/>
+      </gpio>
+      <gpio port="D" id="0">
+        <af remap="False" peripheral="TimerCounterD0" type="out" name="Oca"/>
+      </gpio>
+      <gpio port="D" id="1">
+        <af remap="False" peripheral="TimerCounterD0" type="out" name="Ocb"/>
+        <af remap="False" peripheral="UartD0" type="out" name="Xck"/>
+        <af remap="False" peripheral="UartSpiMasterD0" type="out" name="Sck"/>
+      </gpio>
+      <gpio port="D" id="2">
+        <af remap="False" peripheral="TimerCounterD0" type="out" name="Occ"/>
+        <af remap="False" peripheral="UartD0" type="in" name="Rxd"/>
+        <af remap="False" peripheral="UartSpiMasterD0" type="in" name="Miso"/>
+      </gpio>
+      <gpio port="D" id="3">
+        <af remap="False" peripheral="TimerCounterD0" type="out" name="Ocd"/>
+        <af remap="False" peripheral="UartD0" type="out" name="Txd"/>
+        <af remap="False" peripheral="UartSpiMasterD0" type="out" name="Mosi"/>
+      </gpio>
+      <gpio port="D" id="4">
+        <af remap="True" peripheral="TimerCounterD0" type="out" name="Oca"/>
+        <af peripheral="SpiMasterD" type="out" name="Ss"/>
+        <af peripheral="SpiSlaveD" type="in" name="Ss"/>
+      </gpio>
+      <gpio port="D" id="5">
+        <af remap="True" peripheral="TimerCounterD0" type="out" name="Ocb"/>
+        <af remap="True" peripheral="UartD0" type="out" name="Xck"/>
+        <af remap="True" peripheral="UartSpiMasterD0" type="out" name="Sck"/>
+        <af remap="False" peripheral="SpiMasterD" type="out" name="Mosi"/>
+        <af remap="False" peripheral="SpiSlaveD" type="in" name="Simo"/>
+        <af remap="True" peripheral="SpiMasterD" type="out" name="Sck"/>
+        <af remap="True" peripheral="SpiSlaveD" type="in" name="Sck"/>
+      </gpio>
+      <gpio port="D" id="6">
+        <af remap="True" peripheral="TimerCounterD0" type="out" name="Occ"/>
+        <af remap="True" peripheral="UartD0" type="in" name="Rxd"/>
+        <af remap="True" peripheral="UartSpiMasterD0" type="in" name="Miso"/>
+        <af peripheral="SpiMasterD" type="in" name="Miso"/>
+        <af peripheral="SpiSlaveD" type="out" name="Somi"/>
+      </gpio>
+      <gpio port="D" id="7">
+        <af remap="True" peripheral="TimerCounterD0" type="out" name="Ocd"/>
+        <af remap="True" peripheral="UartD0" type="out" name="Txd"/>
+        <af remap="True" peripheral="UartSpiMasterD0" type="out" name="Mosi"/>
+        <af remap="False" peripheral="SpiMasterD" type="out" name="Sck"/>
+        <af remap="False" peripheral="SpiSlaveD" type="in" name="Sck"/>
+        <af remap="True" peripheral="SpiMasterD" type="out" name="Mosi"/>
+        <af remap="True" peripheral="SpiSlaveD" type="in" name="Simo"/>
+      </gpio>
+      <gpio port="E" id="0">
+        <af peripheral="I2cMasterE" type="io" name="Sda"/>
+        <af remap="False" peripheral="TimerCounterE0" type="out" name="Oca"/>
+      </gpio>
+      <gpio port="E" id="1">
+        <af peripheral="I2cMasterE" type="out" name="Scl"/>
+        <af remap="False" peripheral="TimerCounterE0" type="out" name="Ocb"/>
+        <af remap="False" peripheral="UartE0" type="out" name="Xck"/>
+        <af remap="False" peripheral="UartSpiMasterE0" type="out" name="Sck"/>
+      </gpio>
+      <gpio port="E" id="2">
+        <af remap="False" peripheral="TimerCounterE0" type="out" name="Occ"/>
+        <af remap="False" peripheral="UartE0" type="in" name="Rxd"/>
+        <af remap="False" peripheral="UartSpiMasterE0" type="in" name="Miso"/>
+      </gpio>
+      <gpio port="E" id="3">
+        <af remap="False" peripheral="TimerCounterE0" type="out" name="Ocd"/>
+        <af remap="False" peripheral="UartE0" type="out" name="Txd"/>
+        <af remap="False" peripheral="UartSpiMasterE0" type="out" name="Mosi"/>
+      </gpio>
+      <gpio port="E" id="4">
+        <af remap="True" peripheral="TimerCounterE0" type="out" name="Oca"/>
+      </gpio>
+      <gpio port="E" id="5">
+        <af remap="True" peripheral="TimerCounterE0" type="out" name="Ocb"/>
+        <af remap="True" peripheral="UartE0" type="out" name="Xck"/>
+        <af remap="True" peripheral="UartSpiMasterE0" type="out" name="Sck"/>
+      </gpio>
+      <gpio port="E" id="6">
+        <af remap="True" peripheral="TimerCounterE0" type="out" name="Occ"/>
+        <af remap="True" peripheral="UartE0" type="in" name="Rxd"/>
+        <af remap="True" peripheral="UartSpiMasterE0" type="in" name="Miso"/>
+      </gpio>
+      <gpio port="E" id="7">
+        <af remap="True" peripheral="TimerCounterE0" type="out" name="Ocd"/>
+        <af remap="True" peripheral="UartE0" type="out" name="Txd"/>
+        <af remap="True" peripheral="UartSpiMasterE0" type="out" name="Mosi"/>
+      </gpio>
+      <gpio port="F" id="0">
+        <af remap="False" peripheral="TimerCounterF0" type="out" name="Oca"/>
+      </gpio>
+      <gpio port="F" id="4">
+        <af remap="True" peripheral="TimerCounterF0" type="out" name="Oca"/>
+      </gpio>
+      <gpio port="R" id="0"/>
+      <gpio port="R" id="1"/>
+      <gpio device-name="384" port="C" id="5">
+        <af remap="True" peripheral="TimerCounterC0" type="out" name="Ocb"/>
+        <af peripheral="TimerCounterC1" type="out" name="Ocb"/>
+        <af remap="True" peripheral="UartC0" type="out" name="Xck"/>
+        <af remap="True" peripheral="UartSpiMasterC0" type="out" name="Sck"/>
+        <af peripheral="UartC1" type="out" name="Xck"/>
+        <af peripheral="UartSpiMasterC1" type="out" name="Sck"/>
+        <af remap="False" peripheral="SpiMasterC" type="out" name="Mosi"/>
+        <af remap="False" peripheral="SpiSlaveC" type="in" name="Simo"/>
+        <af remap="True" peripheral="SpiMasterC" type="out" name="Sck"/>
+        <af remap="True" peripheral="SpiSlaveC" type="in" name="Sck"/>
+      </gpio>
+      <gpio device-name="384" port="C" id="6">
+        <af remap="True" peripheral="TimerCounterC0" type="out" name="Occ"/>
+        <af remap="True" peripheral="UartC0" type="in" name="Rxd"/>
+        <af remap="True" peripheral="UartSpiMasterC0" type="in" name="Miso"/>
+        <af peripheral="UartC1" type="in" name="Rxd"/>
+        <af peripheral="UartSpiMasterC1" type="in" name="Miso"/>
+        <af peripheral="SpiMasterC" type="in" name="Miso"/>
+        <af peripheral="SpiSlaveC" type="out" name="Somi"/>
+      </gpio>
+      <gpio device-name="384" port="C" id="7">
+        <af remap="True" peripheral="TimerCounterC0" type="out" name="Ocd"/>
+        <af remap="True" peripheral="UartC0" type="out" name="Txd"/>
+        <af remap="True" peripheral="UartSpiMasterC0" type="out" name="Mosi"/>
+        <af peripheral="UartC1" type="out" name="Txd"/>
+        <af peripheral="UartSpiMasterC1" type="out" name="Mosi"/>
+        <af remap="False" peripheral="SpiMasterC" type="out" name="Sck"/>
+        <af remap="False" peripheral="SpiSlaveC" type="in" name="Sck"/>
+        <af remap="True" peripheral="SpiMasterC" type="out" name="Mosi"/>
+        <af remap="True" peripheral="SpiSlaveC" type="in" name="Simo"/>
+      </gpio>
+      <gpio device-name="384" port="F" id="1">
+        <af remap="False" peripheral="TimerCounterF0" type="out" name="Ocb"/>
+        <af remap="False" peripheral="UartF0" type="out" name="Xck"/>
+        <af remap="False" peripheral="UartSpiMasterF0" type="out" name="Sck"/>
+      </gpio>
+      <gpio device-name="384" port="F" id="2">
+        <af remap="False" peripheral="TimerCounterF0" type="out" name="Occ"/>
+        <af remap="False" peripheral="UartF0" type="in" name="Rxd"/>
+        <af remap="False" peripheral="UartSpiMasterF0" type="in" name="Miso"/>
+      </gpio>
+      <gpio device-name="384" port="F" id="3">
+        <af remap="False" peripheral="TimerCounterF0" type="out" name="Ocd"/>
+        <af remap="False" peripheral="UartF0" type="out" name="Txd"/>
+        <af remap="False" peripheral="UartSpiMasterF0" type="out" name="Mosi"/>
+      </gpio>
+      <gpio device-name="384" port="F" id="5">
+        <af remap="True" peripheral="TimerCounterF0" type="out" name="Ocb"/>
+        <af remap="True" peripheral="UartF0" type="out" name="Xck"/>
+        <af remap="True" peripheral="UartSpiMasterF0" type="out" name="Sck"/>
+      </gpio>
+      <gpio device-name="384" port="F" id="6">
+        <af remap="True" peripheral="TimerCounterF0" type="out" name="Occ"/>
+        <af remap="True" peripheral="UartF0" type="in" name="Rxd"/>
+        <af remap="True" peripheral="UartSpiMasterF0" type="in" name="Miso"/>
+      </gpio>
+      <gpio device-name="384" port="F" id="7">
+        <af remap="True" peripheral="TimerCounterF0" type="out" name="Ocd"/>
+        <af remap="True" peripheral="UartF0" type="out" name="Txd"/>
+        <af remap="True" peripheral="UartSpiMasterF0" type="out" name="Mosi"/>
+      </gpio>
+      <gpio device-name="64|128|192|256" port="C" id="5">
+        <af remap="True" peripheral="TimerCounterC0" type="out" name="Ocb"/>
+        <af peripheral="TimerCounterC1" type="out" name="Ocb"/>
+        <af remap="True" peripheral="UartC0" type="out" name="Xck"/>
+        <af remap="True" peripheral="UartSpiMasterC0" type="out" name="Sck"/>
+        <af remap="False" peripheral="SpiMasterC" type="out" name="Mosi"/>
+        <af remap="False" peripheral="SpiSlaveC" type="in" name="Simo"/>
+        <af remap="True" peripheral="SpiMasterC" type="out" name="Sck"/>
+        <af remap="True" peripheral="SpiSlaveC" type="in" name="Sck"/>
+      </gpio>
+      <gpio device-name="64|128|192|256" port="C" id="6">
+        <af remap="True" peripheral="TimerCounterC0" type="out" name="Occ"/>
+        <af remap="True" peripheral="UartC0" type="in" name="Rxd"/>
+        <af remap="True" peripheral="UartSpiMasterC0" type="in" name="Miso"/>
+        <af peripheral="SpiMasterC" type="in" name="Miso"/>
+        <af peripheral="SpiSlaveC" type="out" name="Somi"/>
+      </gpio>
+      <gpio device-name="64|128|192|256" port="C" id="7">
+        <af remap="True" peripheral="TimerCounterC0" type="out" name="Ocd"/>
+        <af remap="True" peripheral="UartC0" type="out" name="Txd"/>
+        <af remap="True" peripheral="UartSpiMasterC0" type="out" name="Mosi"/>
+        <af remap="False" peripheral="SpiMasterC" type="out" name="Sck"/>
+        <af remap="False" peripheral="SpiSlaveC" type="in" name="Sck"/>
+        <af remap="True" peripheral="SpiMasterC" type="out" name="Mosi"/>
+        <af remap="True" peripheral="SpiSlaveC" type="in" name="Simo"/>
+      </gpio>
+      <gpio device-name="64|128|192|256" port="F" id="1">
+        <af remap="False" peripheral="TimerCounterF0" type="out" name="Ocb"/>
+      </gpio>
+      <gpio device-name="64|128|192|256" port="F" id="2">
+        <af remap="False" peripheral="TimerCounterF0" type="out" name="Occ"/>
+      </gpio>
+      <gpio device-name="64|128|192|256" port="F" id="3">
+        <af remap="False" peripheral="TimerCounterF0" type="out" name="Ocd"/>
+      </gpio>
+      <gpio device-name="64|128|192|256" port="F" id="5">
+        <af remap="True" peripheral="TimerCounterF0" type="out" name="Ocb"/>
+      </gpio>
+      <gpio device-name="64|128|192|256" port="F" id="6">
+        <af remap="True" peripheral="TimerCounterF0" type="out" name="Occ"/>
+      </gpio>
+      <gpio device-name="64|128|192|256" port="F" id="7">
+        <af remap="True" peripheral="TimerCounterF0" type="out" name="Ocd"/>
+      </gpio>
+    </driver>
+  </device>
+</rca>
