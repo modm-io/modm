@@ -15,8 +15,33 @@
 #include <xpcc/processing/timeout.hpp>
 #include <xpcc/math/filter.hpp>
 
-#include <communication/packets.hpp>
-#include <component_logger/logger.hpp>
+#include <xpcc/motion/utils.hpp> // TicksPerTimeToPwm
+
+
+
+
+template <typename T>
+class LoggerOutputStreamDummy
+{
+public:
+	inline bool
+	isValid()
+	{
+		return false;
+	}
+
+	inline void
+	write(const T * /*data*/)
+	{
+	}
+
+	inline void
+	close()
+	{
+	}
+};
+
+
 
 /**
  * Closed loop velocity control of two motors which form a differential drive of a robot.
@@ -33,9 +58,20 @@
  *
  */
 template<
+	typename Configuration,
 	typename MotorLeft,    typename MotorRight,
 	typename OdometryLeft, typename OdometryRight> class DifferentialDriveController
 {
+public:
+	enum class
+	CalibrationMode
+	{
+		SpeedForwardStep,
+		SpeedRotationStep,
+		PwmForwardStep,
+		PwmRotationStep,
+	};
+
 public:
 	static void
 	initialize();
@@ -58,7 +94,7 @@ public:
 	 */
 	static void
 	setRobotSpeed(int16_t v, float omega);
-	
+
 	/**
 	 * Control forward speed but not the orientation.
 	 * 
@@ -68,7 +104,7 @@ public:
 	setRobotSpeedForward(int16_t v);
 	
 	static void
-	startCalibration(robot::packet::EngineCalibrationMode mode);
+	startCalibration(CalibrationMode mode);
 	
 	static void
 	setVelocityControllerParameter(const xpcc::Pid< float, 10 >::Parameter& param)
@@ -79,8 +115,8 @@ public:
 	static void
 	setVelocityWeakControllerParameter(const xpcc::Pid< float, 10 >::Parameter& /*param*/)
 	{
-		// we don't have that yet
-//		vPidWeak.setParameter(param);
+		// FIXME: we don't have that yet
+		// vPidWeak.setParameter(param);
 	}
 
 	static void
@@ -178,22 +214,23 @@ public:
 	 * uses motors uses odometry, so their internal values have to be updated before
 	 */
 	static void
-	run();
+	run(float engineVoltage);
 	
 private:
 	static void
-	runMotorsControl();
+	runMotorsControl(float engineVoltage);
 	
 	static void
 	runDriftCalc();
 	
-	enum class ControlStrategy
+	enum class
+	ControlStrategy
 	{
-		NONE,				/**< Disable both motors. */
-		ROBOT,				/**< Control strategy that controls linear and angular velocity. */
-		ROBOT_FORWARD_ONLY,	/**< Control strategy that focuses on driving forward. */
-		CALIBRATION,		/**< Fixed PWM values for calibration at beginning of game. */
-		PWM,				/**< No control, motors get specified target pwm. */
+		None,				/// Disable both motors.
+		Robot,				/// Control strategy that controls linear and angular velocity.
+		RobotForwardOnly,	/// Control strategy that focuses on driving forward.
+		Calibration,		/// Fixed PWM values for calibration at beginning of game.
+		Pwm,				/// No control, motors get specified target pwm.
 	};
 	
 	typedef xpcc::Pid<float, 10> Pid;
@@ -232,9 +269,10 @@ private:
 	} __attribute__((packed));
 
 	static bool calibrationInProgress;
-	static robot::packet::EngineCalibrationMode calibrationMode;
+	static CalibrationMode calibrationMode;
 	static xpcc::Timeout<> calibrationTimer;
-	static component::Logger::OutputStream<StreamData> outputStream;
+	//static component::Logger::OutputStream<StreamData> outputStream;
+	static LoggerOutputStreamDummy<StreamData> outputStream;
 	
 	static xpcc::filter::Debounce<> overcurrentFilterLeft;
 	static xpcc::filter::Debounce<> overcurrentFilterRight;
@@ -243,6 +281,17 @@ private:
 	static xpcc::filter::Debounce<uint16_t> driftWheelsFilterForward;
 	static xpcc::filter::Debounce<uint16_t> driftWheelsFilterAngle;
 	static xpcc::filter::Ramp<float> speedTargetRamp;
+
+private:
+	// import constants into this classe's scope to make methods more readable
+	/// contains the encoder ticks per mm of motion
+	static constexpr float TicksPerMm          = Configuration::TicksPerMm;
+	/// track width in mm
+	static constexpr float WheelBase           = Configuration::WheelBase;
+	/// time between calls to the engine code in seconds
+	static constexpr float EngineTimestep      = Configuration::EngineTimestep;
+	/// time between calls to the engine code in milliseconds
+	static constexpr uint16_t EngineTimestepMs = Configuration::EngineTimestepMs;
 };
 
 #include "differential_drive_controller_impl.hpp"

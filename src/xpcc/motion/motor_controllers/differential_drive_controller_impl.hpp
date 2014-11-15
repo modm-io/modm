@@ -13,198 +13,185 @@
 
 #include <xpcc/architecture.hpp>
 #include <xpcc/math/interpolation/linear.hpp>
-
-// from big/little
-#include <configuration/drive.hpp>
-#include <configuration/engine.hpp>
-#include <configuration/odometry.hpp>
-
-// from common
 #include <xpcc/motion/odometry.hpp>
 
-template <typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
-typename DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::Pid
-DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::vPid(
-		Configuration::Drive::DifferentialDriveControllerV::kp,
-		Configuration::Drive::DifferentialDriveControllerV::ki,
-		Configuration::Drive::DifferentialDriveControllerV::kd,
-		Configuration::Drive::DifferentialDriveControllerV::maxErrorSum,
-		Configuration::Drive::DifferentialDriveControllerV::maxOutput);
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+typename DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::Pid
+DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::vPid(
+		Configuration::V::kp,
+		Configuration::V::ki,
+		Configuration::V::kd,
+		Configuration::V::maxErrorSum,
+		Configuration::V::maxOutput);
 
-template <typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
-typename DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::Pid DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::omegaPid(
-		Configuration::Drive::DifferentialDriveControllerOmega::kp,
-		Configuration::Drive::DifferentialDriveControllerOmega::ki,
-		Configuration::Drive::DifferentialDriveControllerOmega::kd,
-		Configuration::Drive::DifferentialDriveControllerOmega::maxErrorSum,
-		Configuration::Drive::DifferentialDriveControllerOmega::maxOutput);
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+typename DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::Pid DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::omegaPid(
+		Configuration::Omega::kp,
+		Configuration::Omega::ki,
+		Configuration::Omega::kd,
+		Configuration::Omega::maxErrorSum,
+		Configuration::Omega::maxOutput);
 
-template <typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
-typename DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::Pid DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::omegaPidWeak(
-		Configuration::Drive::DifferentialDriveControllerOmegaWeak::kp,
-		Configuration::Drive::DifferentialDriveControllerOmegaWeak::ki,
-		Configuration::Drive::DifferentialDriveControllerOmegaWeak::kd,
-		Configuration::Drive::DifferentialDriveControllerOmegaWeak::maxErrorSum,
-		Configuration::Drive::DifferentialDriveControllerOmegaWeak::maxOutput);
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+typename DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::Pid DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::omegaPidWeak(
+		Configuration::OmegaWeak::kp,
+		Configuration::OmegaWeak::ki,
+		Configuration::OmegaWeak::kd,
+		Configuration::OmegaWeak::maxErrorSum,
+		Configuration::OmegaWeak::maxOutput);
 
-template <typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
-int32_t DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::vTarget = 0;
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+int32_t DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::vTarget = 0;
 
-template <typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
-int32_t DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::omegaTarget = 0;
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+int32_t DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::omegaTarget = 0;
 
-template <typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
-int16_t DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::pwmTargetLeft = 0;
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+int16_t DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::pwmTargetLeft = 0;
 
-template <typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
-int16_t DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::pwmTargetRight = 0;
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+int16_t DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::pwmTargetRight = 0;
 
-template <typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
-typename DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::ControlStrategy
-DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::controlStrategy = DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::ControlStrategy::NONE;
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+typename DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::ControlStrategy
+DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::controlStrategy = DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::ControlStrategy::None;
 
-template <typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
-bool DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::calibrationInProgress = false;
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+bool DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::calibrationInProgress = false;
 
-template <typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
-robot::packet::EngineCalibrationMode DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::calibrationMode;
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+typename DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::CalibrationMode
+DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::calibrationMode;
 
-template <typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
-xpcc::Timeout<> DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::calibrationTimer;
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+xpcc::Timeout<> DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::calibrationTimer;
 
-template <typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
-xpcc::filter::Debounce<> DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::overcurrentFilterLeft(
-		Configuration::Drive::DifferentialDriveControllerOvercurrentFilterLeft::maxValue,
-		Configuration::Drive::DifferentialDriveControllerOvercurrentFilterLeft::lowerBound,
-		Configuration::Drive::DifferentialDriveControllerOvercurrentFilterLeft::upperBound);
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+xpcc::filter::Debounce<> DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::overcurrentFilterLeft(
+		Configuration::OvercurrentFilterLeft::maxValue,
+		Configuration::OvercurrentFilterLeft::lowerBound,
+		Configuration::OvercurrentFilterLeft::upperBound);
 
-template <typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
-xpcc::filter::Debounce<> DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::overcurrentFilterRight(
-		Configuration::Drive::DifferentialDriveControllerOvercurrentFilterRight::maxValue,
-		Configuration::Drive::DifferentialDriveControllerOvercurrentFilterRight::lowerBound,
-		Configuration::Drive::DifferentialDriveControllerOvercurrentFilterRight::upperBound);
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+xpcc::filter::Debounce<> DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::overcurrentFilterRight(
+		Configuration::OvercurrentFilterRight::maxValue,
+		Configuration::OvercurrentFilterRight::lowerBound,
+		Configuration::OvercurrentFilterRight::upperBound);
 
-template <typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
-xpcc::filter::Debounce<uint16_t> DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::overcurrentFilterLeftSlow(
-		Configuration::Drive::OvercurrentFilterLeftSlow::maxValue,
-		Configuration::Drive::OvercurrentFilterLeftSlow::lowerBound,
-		Configuration::Drive::OvercurrentFilterLeftSlow::upperBound);
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+xpcc::filter::Debounce<uint16_t> DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::overcurrentFilterLeftSlow(
+		Configuration::OvercurrentFilterLeftSlow::maxValue,
+		Configuration::OvercurrentFilterLeftSlow::lowerBound,
+		Configuration::OvercurrentFilterLeftSlow::upperBound);
 
-template <typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
-xpcc::filter::Debounce<uint16_t> DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::overcurrentFilterRightSlow(
-		Configuration::Drive::OvercurrentFilterRightSlow::maxValue,
-		Configuration::Drive::OvercurrentFilterRightSlow::lowerBound,
-		Configuration::Drive::OvercurrentFilterRightSlow::upperBound);
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+xpcc::filter::Debounce<uint16_t> DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::overcurrentFilterRightSlow(
+		Configuration::OvercurrentFilterRightSlow::maxValue,
+		Configuration::OvercurrentFilterRightSlow::lowerBound,
+		Configuration::OvercurrentFilterRightSlow::upperBound);
 
 
-template <typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
-xpcc::filter::Debounce<uint16_t> DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::driftWheelsFilterForward(
-		Configuration::Drive::DriftWheelsFilterForward::maxValue,
-		Configuration::Drive::DriftWheelsFilterForward::lowerBound,
-		Configuration::Drive::DriftWheelsFilterForward::upperBound);
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+xpcc::filter::Debounce<uint16_t> DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::driftWheelsFilterForward(
+		Configuration::DriftWheelsFilterForward::maxValue,
+		Configuration::DriftWheelsFilterForward::lowerBound,
+		Configuration::DriftWheelsFilterForward::upperBound);
 
-template <typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
-xpcc::filter::Debounce<uint16_t> DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::driftWheelsFilterAngle(
-		Configuration::Drive::DriftWheelsFilterAngle::maxValue,
-		Configuration::Drive::DriftWheelsFilterAngle::lowerBound,
-		Configuration::Drive::DriftWheelsFilterAngle::upperBound);
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+xpcc::filter::Debounce<uint16_t> DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::driftWheelsFilterAngle(
+		Configuration::DriftWheelsFilterAngle::maxValue,
+		Configuration::DriftWheelsFilterAngle::lowerBound,
+		Configuration::DriftWheelsFilterAngle::upperBound);
 
-template <typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
-float DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::incForward = 0;
-template <typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
-float DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::incAngle = 0;
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+float DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::incForward = 0;
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+float DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::incAngle = 0;
 
-template <typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
-xpcc::filter::Ramp<float>  DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::speedTargetRamp(
-		Configuration::Drive::SpeedTargetRamp::increment,
-		Configuration::Drive::SpeedTargetRamp::decrement,
-		Configuration::Drive::SpeedTargetRamp::initialValue);
-
-// ----------------------------------------------------------------------------
-template <typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
-component::Logger::OutputStream<typename DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::StreamData>
-DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::outputStream;
-
-namespace component
-{
-	extern Logger logger;
-}
-
-using namespace constant::drive;
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+xpcc::filter::Ramp<float>  DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::speedTargetRamp(
+		Configuration::SpeedTargetRamp::increment,
+		Configuration::SpeedTargetRamp::decrement,
+		Configuration::SpeedTargetRamp::initialValue);
 
 // ----------------------------------------------------------------------------
-template<typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+LoggerOutputStreamDummy<typename DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::StreamData>
+DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::outputStream;
+
+// ----------------------------------------------------------------------------
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
 void
-DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::initialize()
+DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::initialize()
 {
-	controlStrategy = ControlStrategy::NONE;
+	controlStrategy = ControlStrategy::None;
 	calibrationInProgress = false;
 }
 
 // ----------------------------------------------------------------------------
-template<typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
 void
-DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::setRobotSpeed(int16_t v, float omega)
+DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::setRobotSpeed(int16_t v, float omega)
 {
 	if (calibrationInProgress) {
 		// calibration in progress => abort
 		return;
 	}
 
-	int16_t omegaTicks = omega * (WHEELBASE / 2.0 * TICK_PER_MM * TIMESTEP_ENGINE) + 0.5;
-	int16_t vTicks = v * (TICK_PER_MM * TIMESTEP_ENGINE) + 0.5;
+	int16_t omegaTicks = omega * (WheelBase / 2.0 * TicksPerMm * EngineTimestep) + 0.5;
+	int16_t vTicks = v * (TicksPerMm * EngineTimestep) + 0.5;
 
 	{
 		xpcc::atomic::Lock lock;
-		controlStrategy = ControlStrategy::ROBOT;
+		controlStrategy = ControlStrategy::Robot;
 		omegaTarget = omegaTicks;
 		vTarget = vTicks;
 	}
 }
 
 // ----------------------------------------------------------------------------
-template<typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
 void
-DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::setPwm(int16_t pwmLeft, int16_t pwmRight)
+DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::setPwm(int16_t pwmLeft, int16_t pwmRight)
 {
-	controlStrategy = ControlStrategy::PWM;
+	controlStrategy = ControlStrategy::Pwm;
 	pwmTargetLeft = pwmLeft;
 	pwmTargetRight = pwmRight;
 }
 
 // ----------------------------------------------------------------------------
-template<typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
 void
-DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::setRobotSpeedForward(int16_t v)
+DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::setRobotSpeedForward(int16_t v)
 {
 	if (calibrationInProgress) {
 		// calibration in progress => abort
 		return;
 	}
 
-	int16_t vTicks = v * (TICK_PER_MM * TIMESTEP_ENGINE) + 0.5;
+	int16_t vTicks = v * (TicksPerMm * EngineTimestep) + 0.5;
 
 	{
 		xpcc::atomic::Lock lock;
-		controlStrategy = ControlStrategy::ROBOT_FORWARD_ONLY;
+		controlStrategy = ControlStrategy::RobotForwardOnly;
 		omegaTarget = 0;
 		vTarget = vTicks;
 	}
 }
 // ----------------------------------------------------------------------------
 
-template<typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
 void
-DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::run()
+DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::run(float engineVoltage)
 {
-	runMotorsControl();
+	runMotorsControl(engineVoltage);
 	runDriftCalc();
 }
 
 // ----------------------------------------------------------------------------
-template<typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
 void
-DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::runMotorsControl()
+DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::runMotorsControl(float engineVoltage)
 {
 	int16_t pwmLeft = 0;
 	int16_t pwmRight = 0;
@@ -233,7 +220,7 @@ DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>:
 
 	switch (controlStrategy)
 	{
-		case ControlStrategy::ROBOT:
+		case ControlStrategy::Robot:
 		{
 			vPid.update(vTarget - robotSpeedV, currentLimit);
 
@@ -246,12 +233,12 @@ DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>:
 			pwmRight +=  omegaPid.getValue();
 
 			// feed forward
-			pwmLeft  += constant::engine::ticksToPwm.interpolate(vTarget - omegaTarget);
-			pwmRight += constant::engine::ticksToPwm.interpolate(vTarget + omegaTarget);
+			pwmLeft  += TicksPerTimeToPwm<EngineTimestepMs>::interpolate(vTarget - omegaTarget);
+			pwmRight += TicksPerTimeToPwm<EngineTimestepMs>::interpolate(vTarget + omegaTarget);
 
 			break;
 		}
-		case ControlStrategy::ROBOT_FORWARD_ONLY:
+		case ControlStrategy::RobotForwardOnly:
 		{
 			vPid.update(vTarget - robotSpeedV, currentLimit);
 
@@ -264,28 +251,28 @@ DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>:
 			pwmRight +=  omegaPidWeak.getValue();
 
 			// feed forward
-			pwmLeft  += constant::engine::ticksToPwm.interpolate(vTarget - omegaTarget);
-			pwmRight += constant::engine::ticksToPwm.interpolate(vTarget + omegaTarget);
+			pwmLeft  += TicksPerTimeToPwm<EngineTimestepMs>::interpolate(vTarget - omegaTarget);
+			pwmRight += TicksPerTimeToPwm<EngineTimestepMs>::interpolate(vTarget + omegaTarget);
 
 			break;
 		}
-		case ControlStrategy::CALIBRATION:
+		case ControlStrategy::Calibration:
 		{
-			if (calibrationMode == robot::packet::EngineCalibrationMode::PWM_FORWARD_STEP) {
+			if (calibrationMode == CalibrationMode::PwmForwardStep) {
 				pwmLeft  = 800;
 				pwmRight = 800;
 			}
-			else if (calibrationMode == robot::packet::EngineCalibrationMode::PWM_ROTATION_STEP) {
+			else if (calibrationMode == CalibrationMode::PwmRotationStep) {
 				pwmLeft  = -500;
 				pwmRight =  500;
 			}
 			break;
 		}
-		case ControlStrategy::NONE:
+		case ControlStrategy::None:
 		{
 			break;
 		}
-		case ControlStrategy::PWM:
+		case ControlStrategy::Pwm:
 		{
 			pwmLeft  = pwmTargetLeft;
 			pwmRight = pwmTargetRight;
@@ -295,11 +282,11 @@ DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>:
 
 	switch (controlStrategy)
 	{
-		case ControlStrategy::NONE:
+		case ControlStrategy::None:
 			MotorLeft::disable();
 			MotorRight::disable();
 			break;
-		case ControlStrategy::PWM:
+		case ControlStrategy::Pwm:
 			MotorLeft::setPwm(pwmLeft);
 			MotorRight::setPwm(pwmRight);
 			break;
@@ -308,8 +295,8 @@ DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>:
 			// ToDo may move this to a motor
 
 			float factor = 1.0f;
-			if (global::engineVoltage > Configuration::Drive::BatteryVoltage::minimum) // avoid factors > 1
-				factor = Configuration::Drive::BatteryVoltage::minimum/global::engineVoltage;
+			if (engineVoltage > Configuration::BatteryVoltage::minimum) // avoid factors > 1
+				factor = Configuration::BatteryVoltage::minimum/engineVoltage;
 
 			MotorLeft::setPwm(pwmLeft   * factor);
 			MotorRight::setPwm(pwmRight * factor);
@@ -347,14 +334,14 @@ DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>:
 
 // ----------------------------------------------------------------------------
 
-template<typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
 void
-DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::runDriftCalc()
+DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::runDriftCalc()
 {
 	// umrechnung von odometry steps zu motor steps
 	// eigentlich braucht man nicht zwischen fL und fR zu unterscheiden da sie fast gleich sind, aber egal
-	constexpr float fL = (Configuration::Odometry::BOW_FACTOR_LEFT  * 2) * constant::drive::TICK_PER_MM;
-	constexpr float fR = (Configuration::Odometry::BOW_FACTOR_RIGHT * 2) * constant::drive::TICK_PER_MM;
+	constexpr float fL = (Configuration::Odometry::BowFactorLeft  * 2) * TicksPerMm;
+	constexpr float fR = (Configuration::Odometry::BowFactorRight * 2) * TicksPerMm;
 
 //	const float odoAxisDist = constant::odometry::WHEELBASE;
 //	const float driveAxisDist = constant::drive::WHEELBASE;
@@ -379,19 +366,19 @@ DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>:
 }
 
 // ----------------------------------------------------------------------------
-template<typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
 void
-DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::disable()
+DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::disable()
 {
 	// disable interrupts
 	xpcc::atomic::Lock lock;
-	controlStrategy = ControlStrategy::NONE;
+	controlStrategy = ControlStrategy::None;
 }
 
 // ----------------------------------------------------------------------------
-template<typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
 void
-DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::startCalibration(robot::packet::EngineCalibrationMode mode)
+DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::startCalibration(CalibrationMode mode)
 {
 	if (calibrationInProgress) {
 		// Another calibration in progress => abort
@@ -399,7 +386,8 @@ DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>:
 	}
 
 	// create a new Output stream
-	outputStream = component::logger.createOutputStream<StreamData>();
+	// FIXME: generate stream
+//	outputStream = component::logger.createOutputStream<StreamData>();
 	if (!outputStream.isValid()) {
 		// Could not create a output stream => abort
 		return;
@@ -411,20 +399,20 @@ DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>:
 		// disable interrupts
 		xpcc::atomic::Lock lock;
 
-		if (mode == robot::packet::EngineCalibrationMode::SPEED_FORWARD_STEP) {
-			controlStrategy = ControlStrategy::ROBOT;
+		if (mode == CalibrationMode::SpeedForwardStep) {
+			controlStrategy = ControlStrategy::Robot;
 
 			vTarget = 50;
 			omegaTarget = 0;
 		}
-		else if (mode == robot::packet::EngineCalibrationMode::SPEED_ROTATION_STEP) {
-			controlStrategy = ControlStrategy::ROBOT;
+		else if (mode == CalibrationMode::SpeedRotationStep) {
+			controlStrategy = ControlStrategy::Robot;
 
 			vTarget = 0;
 			omegaTarget = 40;
 		}
 		else {
-			controlStrategy = ControlStrategy::CALIBRATION;
+			controlStrategy = ControlStrategy::Calibration;
 		}
 
 		calibrationInProgress = true;
@@ -433,14 +421,14 @@ DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>:
 }
 
 // ----------------------------------------------------------------------------
-template<typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
 void
-DifferentialDriveController<MotorLeft, MotorRight, OdometryLeft, OdometryRight>::update()
+DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::update()
 {
 	if (calibrationInProgress && calibrationTimer.isExpired()) {
 		{
 			xpcc::atomic::Lock lock;
-			controlStrategy = ControlStrategy::NONE;
+			controlStrategy = ControlStrategy::None;
 			calibrationInProgress = false;
 		}
 		outputStream.close();

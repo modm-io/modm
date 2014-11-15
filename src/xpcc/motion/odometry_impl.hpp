@@ -44,23 +44,23 @@ template <typename L, typename R, typename C>
 void
 xpcc::motion::Odometry<L, R, C>::run()
 {
-	stepsTemp[LEFT]  += L::getEncoderSteps();
-	stepsTemp[RIGHT] += R::getEncoderSteps();
+	stepsTemp[LeftWheel]  += L::getEncoderSteps();
+	stepsTemp[RightWheel] += R::getEncoderSteps();
 	
 	// every 2ms
 	counterLocation++;
 	if (counterLocation >= 2) {
 		counterLocation = 0;
 		
-		accumulate[LEFT]  += stepsTemp[LEFT];
-		accumulate[RIGHT] += stepsTemp[RIGHT];
+		accumulate[LeftWheel]  += stepsTemp[LeftWheel];
+		accumulate[RightWheel] += stepsTemp[RightWheel];
 		
 		// convert to mm
-		const float sl = static_cast<float>(stepsTemp[LEFT])  * C::BOW_FACTOR_LEFT;
-		const float sr = static_cast<float>(stepsTemp[RIGHT]) * C::BOW_FACTOR_RIGHT;
+		const float sl = static_cast<float>(stepsTemp[LeftWheel])  * C::BowFactorLeft;
+		const float sr = static_cast<float>(stepsTemp[RightWheel]) * C::BowFactorRight;
 		
-		const float al = static_cast<float>(stepsTemp[LEFT])  * C::ANGLE_FACTOR_LEFT;
-		const float ar = static_cast<float>(stepsTemp[RIGHT]) * C::ANGLE_FACTOR_RIGHT;
+		const float al = static_cast<float>(stepsTemp[LeftWheel])  * C::AngleFactorLeft;
+		const float ar = static_cast<float>(stepsTemp[RightWheel]) * C::AngleFactorRight;
 		
 		// BOW_FACTOR_LEFT and BOW_FACTOR_RIGHT contain the divided by two
 		// so it isn't needed here!
@@ -75,8 +75,8 @@ xpcc::motion::Odometry<L, R, C>::run()
 		// Convert to world coordinates
 		robotLocation.move(distance, angle);
 		
-		stepsTemp[LEFT]  = 0;
-		stepsTemp[RIGHT] = 0;
+		stepsTemp[LeftWheel]  = 0;
+		stepsTemp[RightWheel] = 0;
 	}
 	
 	// every 10ms
@@ -113,8 +113,8 @@ xpcc::motion::Odometry<L, R, C>::setLocation(const xpcc::Location2D<>& location)
 	
 	robotLocation = location.convert<float>();
 	
-	accumulate[LEFT]  = 0;
-	accumulate[RIGHT] = 0;
+	accumulate[LeftWheel]  = 0;
+	accumulate[RightWheel] = 0;
 }
 
 // ----------------------------------------------------------------------------
