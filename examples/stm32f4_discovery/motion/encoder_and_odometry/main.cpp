@@ -9,10 +9,11 @@
 struct
 OdometryConfiguration
 {
-	static constexpr float BOW_FACTOR_LEFT    = 1.0f;
-	static constexpr float BOW_FACTOR_RIGHT   = 1.0f;
-	static constexpr float ANGLE_FACTOR_LEFT  = 1.0f;
-	static constexpr float ANGLE_FACTOR_RIGHT = 1.0f;
+	static constexpr float WheelBase = 285.2;
+	static constexpr float AngleFactorLeft =   1.2971385268961444E-4;
+	static constexpr float AngleFactorRight =  1.2975322755503696E-4;
+	static constexpr float BowFactorLeft  = (AngleFactorLeft  * WheelBase / 2);
+	static constexpr float BowFactorRight = (AngleFactorRight * WheelBase / 2);
 };
 
 MAIN_FUNCTION
