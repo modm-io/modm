@@ -80,7 +80,7 @@ class Parser(object):
 		self.tree = Tree()
 		self.modify_time = 0
 	
-	def parse(self, filename, dtdPath = '.'):
+	def parse(self, filename, dtdPath = '.', include_paths = []):
 		"""
 		Parse a XML-file
 		
@@ -104,19 +104,19 @@ class Parser(object):
 		filename	-- xml file to load
 		"""
 		self.rootfile = filename
-		self.include_path = os.path.dirname(os.path.abspath(self.rootfile))
 		self.dtdPath = dtdPath
+		# first include path is always the root file path
+		self.include_paths = [os.path.dirname(os.path.abspath(self.rootfile))]
+		# additional paths can be specified through the include_paths argument
+		self.include_paths = self.include_paths + include_paths
 		# used to make sure files are only included once, this has basically
 		# the same effect that "#include guards" in C++ have
 		self.included_files = []
 		self._parse_file(filename)
 		
-	def _parse_file(self, filename, include_path = None):
+	def _parse_file(self, filename):
 		"""
 		"""
-		if (include_path == None):
-			include_path = self.include_path
-
 		logging.debug("Parse %s" % filename)
 		try:
 			# read the time of the last change
@@ -151,11 +151,10 @@ class Parser(object):
 		# search for include and reference nodes and parse
 		# the specified files first
 		for node in xmltree.findall('include'):
-			include_file = os.path.abspath(self._find_include_file(node.text, include_path))
+			include_file = Parser.find_include_file(node.text, filename, self.include_paths)
 			if include_file not in self.included_files:
 				self.included_files.append(include_file)
-				include_path_new = os.path.dirname(include_file)
-				self._parse_file(include_file, include_path_new)
+				self._parse_file(include_file)
 			else:
 				logging.debug("'%s' already included." % include_file)
 
@@ -190,10 +189,10 @@ class Parser(object):
 		for container in self.tree.container:
 			container.updateIndex()
 
-	def _find_include_file(self, filename, include_path):
+	@staticmethod
+	def find_include_file(filename, include_file, include_paths, line_count=""):
 		""" Tries to find the include file and return it's absolute path """
-		relative_to_file = os.path.join(include_path, filename)
-		relative_to_include_path = os.path.join(self.include_path, filename)
+		relative_to_file = os.path.join(os.path.dirname(include_file), filename)
 		# 1.) include file name can be absolut
 		if os.path.isabs(filename):
 			return filename
@@ -202,11 +201,13 @@ class Parser(object):
 		elif os.path.isfile(relative_to_file):
 			return relative_to_file
 		# 3.) it could be a path relative to the include path
-		elif os.path.isfile(relative_to_include_path):
-			return relative_to_include_path
-		# 4.) Error!
 		else:
-			raise ParserException("Could not find include file '%s' in '%s:%s'" % (filename, file, line_count))
+			for path in include_paths:
+				relative_to_include_path = os.path.join(path, filename)
+				if os.path.isfile(relative_to_include_path):
+					return relative_to_include_path
+		# 4.) Error!
+		raise ParserException("Could not find include file '%s' in '%s:%s'" % (filename, include_file, line_count))
 
 	def _parse_types(self, xmltree):
 		self.__parse_body(xmltree, 'builtin', type.BuiltIn, self.tree.types)
