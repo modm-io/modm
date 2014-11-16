@@ -10,7 +10,7 @@
 import subprocess, os
 
 def is_git_available():
-	return (subprocess.call(["which git"]))
+	return (subprocess.call(['which', 'git'], stdout=open(os.devnull, 'wb')) is 0)
 
 # -----------------------------------------------------------------------------
 def git_show(format, ref='HEAD'):
