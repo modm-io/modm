@@ -35,28 +35,42 @@ import SCons.Errors
 includeExpression = re.compile(r'<include>(\S+)</include>', re.M)
 
 # -----------------------------------------------------------------------------
-def find_includes(file):
+def find_includes(env, file, include_path):
 	""" Find include directives in an XML file """
 	files = []
+	line_count = 0
 	for line in open(file).readlines():
+		line_count = line_count + 1
 		match = includeExpression.search(line)
 		if match:
 			filename = match.group(1)
-			if not os.path.isabs(filename):
-				filename = os.path.join(os.path.dirname(os.path.abspath(file)), filename)
-			files.append(filename)
+			relative_to_file = os.path.join(os.path.dirname(os.path.abspath(file)), filename)
+			relative_to_include_path = os.path.join(include_path, filename)
+			# 1.) include file name can be absolut
+			if os.path.isabs(filename):
+				files.append(filename)
+			# 2.) it could be a path relative to the files path
+			#     this works just like #include "{filename}" in C/C++
+			elif os.path.isfile(relative_to_file):
+				files.append(relative_to_file)
+			# 3.) it could be a path relative to the include path
+			elif os.path.isfile(relative_to_include_path):
+				files.append(relative_to_include_path)
+			# 4.) Error!
+			else:
+				env.Error("Could not find include file '%s' in '%s:%s'" % (filename, file, line_count))
 	return files
 
 def xml_include_scanner(node, env, path, arg=None):
 	""" Generates the dependencies for the XML files """
 	abspath, targetFilename = os.path.split(node.get_abspath())
-	
+
 	stack = [targetFilename]
 	dependencies = [targetFilename]
-	
+
 	while stack:
 		nextFile = stack.pop()
-		files = find_includes(os.path.join(abspath, nextFile))
+		files = find_includes(env, os.path.join(abspath, nextFile), abspath)
 		for file in files:
 			if file not in dependencies:
 				stack.append(file)

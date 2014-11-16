@@ -41,18 +41,34 @@ class IncludePathBuilder(builder_base.Builder):
 
 	# The following code is straight from the scons/site_tools/system_design.py
 	# file. Maybe there is a better way of sharing code.
-	def find_includes(self, file):
+	def find_includes(self, file, include_path):
 		""" Find include directives in an XML file """
 		includeExpression = re.compile(r'<include>(\S+)</include>', re.M)
 
 		files = []
+		line_count = 0
 		for line in open(file).readlines():
+			line_count = line_count + 1
 			match = includeExpression.search(line)
 			if match:
 				filename = match.group(1)
-				if not os.path.isabs(filename):
-					filename = os.path.join(os.path.dirname(os.path.abspath(file)), filename)
-				files.append(filename)
+				relative_to_file = os.path.join(os.path.dirname(os.path.abspath(file)), filename)
+				relative_to_include_path = os.path.join(include_path, filename)
+				# 1.) include file name can be absolut
+				if os.path.isabs(filename):
+					files.append(filename)
+				# 2.) it could be a path relative to the files path
+				#     this works just like #include "{filename}" in C/C++
+				elif os.path.isfile(relative_to_file):
+					files.append(relative_to_file)
+				# 3.) it could be a path relative to the include path
+				elif os.path.isfile(relative_to_include_path):
+					files.append(relative_to_include_path)
+				# 4.) Error!
+				else:
+					raise builder_base.BuilderException(
+						"Could not find include file '%s' in '%s:%s'"
+						% (filename, file, line_count))
 		return files
 
 	def generate_xml_include_vertices(self):
@@ -65,7 +81,7 @@ class IncludePathBuilder(builder_base.Builder):
 
 		while stack:
 			nextFile = stack.pop()
-			files = self.find_includes(os.path.join(path, nextFile))
+			files = self.find_includes(os.path.join(path, nextFile), path)
 			for file in files:
 				edges.append((os.path.basename(nextFile), os.path.basename(file)))
 				if len(stack) < max_stack_size:

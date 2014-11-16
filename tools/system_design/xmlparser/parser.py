@@ -113,7 +113,7 @@ class Parser(object):
 		"""
 		if (include_path == None):
 			include_path = self.include_path
-		
+
 		logging.debug("Parse %s" % filename)
 		try:
 			# read the time of the last change
@@ -148,9 +148,7 @@ class Parser(object):
 		# search for include and reference nodes and parse
 		# the specified files first
 		for node in xmltree.findall('include'):
-			include_file = node.text
-			if not os.path.isabs(include_file):
-				include_file = os.path.join(include_path, include_file)
+			include_file = self._find_include_file(node.text, include_path)
 			include_path_new = os.path.dirname(os.path.abspath(include_file))
 			self._parse_file(include_file, include_path_new)
 		
@@ -177,7 +175,25 @@ class Parser(object):
 		
 		for container in self.tree.container:
 			container.updateIndex()
-	
+
+	def _find_include_file(self, filename, include_path):
+		""" Tries to find the include file and return it's absolute path """
+		relative_to_file = os.path.join(include_path, filename)
+		relative_to_include_path = os.path.join(self.include_path, filename)
+		# 1.) include file name can be absolut
+		if os.path.isabs(filename):
+			return filename
+		# 2.) it could be a path relative to the files path
+		#     this works just like #include "{filename}" in C/C++
+		elif os.path.isfile(relative_to_file):
+			return relative_to_file
+		# 3.) it could be a path relative to the include path
+		elif os.path.isfile(relative_to_include_path):
+			return relative_to_include_path
+		# 4.) Error!
+		else:
+			raise ParserException("Could not find include file '%s' in '%s:%s'" % (filename, file, line_count))
+
 	def _parse_types(self, xmltree):
 		self.__parse_body(xmltree, 'builtin', type.BuiltIn, self.tree.types)
 		self.__parse_body(xmltree, 'struct', type.Struct, self.tree.types)
