@@ -151,24 +151,31 @@ class Parser(object):
 			include_file = self._find_include_file(node.text, include_path)
 			include_path_new = os.path.dirname(os.path.abspath(include_file))
 			self._parse_file(include_file, include_path_new)
-		
-		self._parse_types(xmltree)
-		self._evaluate_types(xmltree)
-		self._create_type_hierarchy()
-		
-		self._parse_events(xmltree)
-		self._check_events()
-		
-		self._parse_components(xmltree)
-		self._evaluate_components(xmltree)
-		
-		self._parse_container(xmltree)
-		
-		self._parse_domains(xmltree)
+
+		try:
+			self._parse_types(xmltree)
+			self._evaluate_types(xmltree)
+			self._create_type_hierarchy()
+
+			self._parse_events(xmltree)
+			self._check_events()
+
+			self._parse_components(xmltree)
+			self._evaluate_components(xmltree)
+
+			self._parse_container(xmltree)
+
+			self._parse_domains(xmltree)
+		except ParserException as e:
+			# Add file information that is not available in the lower classes
+			# to exception. See:
+			# http://www.ianbicking.org/blog/2007/09/re-raising-exceptions.html
+			e.args = ("'%s': %s" % (filename, e.message),) + e.args[1:0]
+			raise
 		
 		# create expanded versions for all types and components
-		for type in self.tree.types:
-			type.flattened()
+		for t in self.tree.types:
+			t.flattened()
 		for component in self.tree.components:
 			component.flattened()
 		self.tree.components.updateIndex()
