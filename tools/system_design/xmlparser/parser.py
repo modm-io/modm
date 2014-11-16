@@ -106,6 +106,9 @@ class Parser(object):
 		self.rootfile = filename
 		self.include_path = os.path.dirname(os.path.abspath(self.rootfile))
 		self.dtdPath = dtdPath
+		# used to make sure files are only included once, this has basically
+		# the same effect that "#include guards" in C++ have
+		self.included_files = []
 		self._parse_file(filename)
 		
 	def _parse_file(self, filename, include_path = None):
@@ -148,9 +151,13 @@ class Parser(object):
 		# search for include and reference nodes and parse
 		# the specified files first
 		for node in xmltree.findall('include'):
-			include_file = self._find_include_file(node.text, include_path)
-			include_path_new = os.path.dirname(os.path.abspath(include_file))
-			self._parse_file(include_file, include_path_new)
+			include_file = os.path.abspath(self._find_include_file(node.text, include_path))
+			if include_file not in self.included_files:
+				self.included_files.append(include_file)
+				include_path_new = os.path.dirname(include_file)
+				self._parse_file(include_file, include_path_new)
+			else:
+				logging.debug("'%s' already included." % include_file)
 
 		try:
 			self._parse_types(xmltree)
