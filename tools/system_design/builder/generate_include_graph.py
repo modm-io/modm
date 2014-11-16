@@ -16,13 +16,25 @@
 #
 # author: eKiwi <electron.kiwi@gmail.com>
 
-import os, re
+import os, re, sys
 import builder_base
+
+# This is neccessary in order to use a common find_include_file method
+sys.path = [os.path.join(os.path.dirname(__file__), '..')] + sys.path
+from xmlparser.parser import Parser
+from xmlparser.parser_exception import ParserException
 
 # -----------------------------------------------------------------------------
 class IncludePathBuilder(builder_base.Builder):
 
 	VERSION = '0.1'
+
+	def setup(self, optparser):
+		optparser.add_option(
+				"--label_path",
+				dest = "label_path",
+				default = None,
+				help = "the path the node labels will be relative to")
 
 	def generate(self):
 		# check the commandline options
@@ -31,16 +43,42 @@ class IncludePathBuilder(builder_base.Builder):
 		else:
 			raise builder_base.BuilderException("You need to provide an output path!")
 
+		path, filename = os.path.split(os.path.abspath(self.xmlfile))
+
+		if self.options.label_path:
+			label_path = os.path.abspath(self.options.label_path)
+		else:
+			label_path = path
+
 		template = self.template('templates/include_graph.dot.tpl')
-		substitutions = {'edges': self.generate_xml_include_vertices()}
+		edges = self.generate_xml_include_vertices(path, filename, label_path)
+		substitutions = {'edges': edges, 'label_path': label_path}
 
 		filename = os.path.basename(os.path.abspath(self.xmlfile))
 		file = os.path.join(outpath, filename[:-4] + '_include_graph.dot')
 		self.write(file, template.render(substitutions) + "\n")
 
+	def generate_xml_include_vertices(self, path, filename, label_path):
+		""" Generates the dependency graph edges for the xml file """
+		max_stack_size = 40 # some precaution, because we are not detecting dependency loops
+		stack = [filename]
+		edges = []
 
-	# The following code is straight from the scons/site_tools/system_design.py
-	# file. Maybe there is a better way of sharing code.
+		while stack:
+			nextFile = stack.pop()
+			files = self.find_includes(os.path.join(path, nextFile), path)
+			for file in files:
+				a = os.path.relpath(os.path.join(path, nextFile), label_path)
+				b = os.path.relpath(file, label_path)
+				edges.append((a, b))
+				if len(stack) < max_stack_size:
+					stack.append(file)
+				else:
+					raise builder_base.BuilderException("Too many recoursions. You might have an include loop.")
+
+		return edges
+
+
 	def find_includes(self, file, include_path):
 		""" Find include directives in an XML file """
 		includeExpression = re.compile(r'<include>(\S+)</include>', re.M)
@@ -51,45 +89,16 @@ class IncludePathBuilder(builder_base.Builder):
 			line_count = line_count + 1
 			match = includeExpression.search(line)
 			if match:
-				filename = match.group(1)
-				relative_to_file = os.path.join(os.path.dirname(os.path.abspath(file)), filename)
-				relative_to_include_path = os.path.join(include_path, filename)
-				# 1.) include file name can be absolut
-				if os.path.isabs(filename):
-					files.append(filename)
-				# 2.) it could be a path relative to the files path
-				#     this works just like #include "{filename}" in C/C++
-				elif os.path.isfile(relative_to_file):
-					files.append(relative_to_file)
-				# 3.) it could be a path relative to the include path
-				elif os.path.isfile(relative_to_include_path):
-					files.append(relative_to_include_path)
-				# 4.) Error!
-				else:
-					raise builder_base.BuilderException(
-						"Could not find include file '%s' in '%s:%s'"
-						% (filename, file, line_count))
+				try:
+					filename = Parser.find_include_file(
+						match.group(1),
+						os.path.abspath(file),
+						self.include_paths,
+						str(line_count))
+				except ParserException as e:
+					raise builder_base.BuilderException(e.message)
+				files.append(filename)
 		return files
-
-	def generate_xml_include_vertices(self):
-		""" Generates the dependency graph edges for the xml file """
-		path, filename = os.path.split(os.path.abspath(self.xmlfile))
-
-		max_stack_size = 40 # some precaution, because we are not detecting dependency loops
-		stack = [filename]
-		edges = []
-
-		while stack:
-			nextFile = stack.pop()
-			files = self.find_includes(os.path.join(path, nextFile), path)
-			for file in files:
-				edges.append((os.path.basename(nextFile), os.path.basename(file)))
-				if len(stack) < max_stack_size:
-					stack.append(file)
-				else:
-					raise builder_base.BuilderException("Too many recoursions. You might have an include loop.")
-
-		return edges
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
