@@ -70,7 +70,8 @@ class IncludePathBuilder(builder_base.Builder):
 			for file in files:
 				a = os.path.relpath(os.path.join(path, nextFile), label_path)
 				b = os.path.relpath(file, label_path)
-				edges.append((a, b))
+				if (a, b) not in edges:
+					edges.append((a, b))
 				if len(stack) < max_stack_size:
 					stack.append(file)
 				else:
