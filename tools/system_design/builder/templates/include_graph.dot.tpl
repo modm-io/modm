@@ -5,4 +5,7 @@ digraph include {
 	{%- for e in edges %}
 	"{{ e[0] }}" -> "{{ e[1] }}";
 	{%- endfor %}
+	{% if edges|length < 1 %}
+	"No Includes"
+	{% endif %}
 }
