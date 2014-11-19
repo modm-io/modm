@@ -22,22 +22,31 @@ def git_show(format, ref='HEAD'):
 	# results for older git versions
 	return r.split('\n', 1)[0][1:-1]
 
+def git_c_string_literal(string):
+	"""
+		Escapes string and adds quotes.
+	"""
+	# Warning: Order Matters! Replace '\\' first!
+	e = [("\\", "\\\\"), ("\'", "\\\'"), ("\"", "\\\""), ("\t", "\\t"), ("\n", "\\n")]
+	for r in e:
+		string = string.replace(r[0], r[1])
+	return "\"" + string + "\""
 
 def git_info_header(env):
 	defines = {}
 	try:
 		# Last Commit Values
-		defines['XPCC_GIT_SHA']             = '"{0}"'.format(git_show('%H'))
-		defines['XPCC_GIT_SHA_ABBR']        = '"{0}"'.format(git_show('%h'))
-		defines['XPCC_GIT_AUTHOR']          = '"{0}"'.format(git_show('%an'))
-		defines['XPCC_GIT_AUTHOR_EMAIL']    = '"{0}"'.format(git_show('%ae'))
-		defines['XPCC_GIT_AUTHOR_DATE']     = '"{0}"'.format(git_show('%ad'))
+		defines['XPCC_GIT_SHA']             = git_c_string_literal(git_show('%H'))
+		defines['XPCC_GIT_SHA_ABBR']        = git_c_string_literal(git_show('%h'))
+		defines['XPCC_GIT_AUTHOR']          = git_c_string_literal(git_show('%an'))
+		defines['XPCC_GIT_AUTHOR_EMAIL']    = git_c_string_literal(git_show('%ae'))
+		defines['XPCC_GIT_AUTHOR_DATE']     = git_c_string_literal(git_show('%ad'))
 		defines['XPCC_GIT_AUTHOR_DATE_TIMESTAMP'] = git_show('%at')
-		defines['XPCC_GIT_COMMITTER']       = '"{0}"'.format(git_show('%cn'))
-		defines['XPCC_GIT_COMMITTER_EMAIL'] = '"{0}"'.format(git_show('%ce'))
-		defines['XPCC_GIT_COMMITTER_DATE']  = '"{0}"'.format(git_show('%cd'))
+		defines['XPCC_GIT_COMMITTER']       = git_c_string_literal(git_show('%cn'))
+		defines['XPCC_GIT_COMMITTER_EMAIL'] = git_c_string_literal(git_show('%ce'))
+		defines['XPCC_GIT_COMMITTER_DATE']  = git_c_string_literal(git_show('%cd'))
 		defines['XPCC_GIT_COMMITTER_DATE_TIMESTAMP'] = git_show('%ct')
-		defines['XPCC_GIT_SUBJECT']         = '"{0}"'.format(git_show('%s'))
+		defines['XPCC_GIT_SUBJECT']         = git_c_string_literal(git_show('%s'))
 		# Status
 		s = subprocess.check_output(['git', '--no-pager', 'status', '--porcelain']).split('\n')
 		f = { 'M': 0, 'A': 0, 'D': 0, 'R': 0, 'C': 0, 'U': 0, '?': 0}
