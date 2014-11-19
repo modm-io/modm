@@ -221,6 +221,13 @@ def define_header(env, defines, header, comment, template="define_template.hpp.i
 		                 'comment':       comment})
 	env.AppendUnique(CPPPATH = env['XPCC_BUILDPATH'])
 
+def project_info_header(env):
+	defines = {}
+	defines['XPCC_PROJECT_NAME'] = env.CStringLiteral(env['XPCC_PROJECT_NAME'])
+	# TODO: add more values
+	c = "Its content is created by a call to env.ProjectInfoHeader() in your SConstruct file."
+	env.DefineHeader(defines=defines, header="xpcc_project_info.hpp", comment=c)
+
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
 	# We make sure that the installed version is 2.6 or higher because
@@ -297,7 +304,7 @@ def generate(env, **kw):
 		if architecture_derecated != "deprecated":
 			env.Warn("Specifying architecture is deprecated and replaced by only the Device ID ('device=...'.")
 
-		projectName = parser.get('general', 'name')
+		env['XPCC_PROJECT_NAME'] = parser.get('general', 'name')
 
 		buildpath = env.get('buildpath')
 		# put together build path
@@ -354,7 +361,7 @@ def generate(env, **kw):
 	buildpath = string.Template(buildpath).safe_substitute({
 				'arch': env['ARCHITECTURE'],
 				'device': device,
-				'name': projectName,
+				'name': env['XPCC_PROJECT_NAME'],
 				'xpccpath': rootpath
 			})
 	buildpath = os.path.abspath(buildpath)
@@ -499,7 +506,7 @@ def generate(env, **kw):
 	env.AddMethod(generate_defines, 'Defines')
 	env.AddMethod(c_string_literal, 'CStringLiteral')
 	env.AddMethod(define_header, 'DefineHeader')
-	# env.AddMethod(project_info_header, 'ProjectInfoHeader')
+	env.AddMethod(project_info_header, 'ProjectInfoHeader')
 
 def exists(env):
 	return True
