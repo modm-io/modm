@@ -22,31 +22,21 @@ def git_show(format, ref='HEAD'):
 	# results for older git versions
 	return r.split('\n', 1)[0][1:-1]
 
-def git_c_string_literal(string):
-	"""
-		Escapes string and adds quotes.
-	"""
-	# Warning: Order Matters! Replace '\\' first!
-	e = [("\\", "\\\\"), ("\'", "\\\'"), ("\"", "\\\""), ("\t", "\\t"), ("\n", "\\n")]
-	for r in e:
-		string = string.replace(r[0], r[1])
-	return "\"" + string + "\""
-
 def git_info_header(env):
 	defines = {}
 	try:
 		# Last Commit Values
-		defines['XPCC_GIT_SHA']             = git_c_string_literal(git_show('%H'))
-		defines['XPCC_GIT_SHA_ABBR']        = git_c_string_literal(git_show('%h'))
-		defines['XPCC_GIT_AUTHOR']          = git_c_string_literal(git_show('%an'))
-		defines['XPCC_GIT_AUTHOR_EMAIL']    = git_c_string_literal(git_show('%ae'))
-		defines['XPCC_GIT_AUTHOR_DATE']     = git_c_string_literal(git_show('%ad'))
+		defines['XPCC_GIT_SHA']             = env.CStringLiteral(git_show('%H'))
+		defines['XPCC_GIT_SHA_ABBR']        = env.CStringLiteral(git_show('%h'))
+		defines['XPCC_GIT_AUTHOR']          = env.CStringLiteral(git_show('%an'))
+		defines['XPCC_GIT_AUTHOR_EMAIL']    = env.CStringLiteral(git_show('%ae'))
+		defines['XPCC_GIT_AUTHOR_DATE']     = env.CStringLiteral(git_show('%ad'))
 		defines['XPCC_GIT_AUTHOR_DATE_TIMESTAMP'] = git_show('%at')
-		defines['XPCC_GIT_COMMITTER']       = git_c_string_literal(git_show('%cn'))
-		defines['XPCC_GIT_COMMITTER_EMAIL'] = git_c_string_literal(git_show('%ce'))
-		defines['XPCC_GIT_COMMITTER_DATE']  = git_c_string_literal(git_show('%cd'))
+		defines['XPCC_GIT_COMMITTER']       = env.CStringLiteral(git_show('%cn'))
+		defines['XPCC_GIT_COMMITTER_EMAIL'] = env.CStringLiteral(git_show('%ce'))
+		defines['XPCC_GIT_COMMITTER_DATE']  = env.CStringLiteral(git_show('%cd'))
 		defines['XPCC_GIT_COMMITTER_DATE_TIMESTAMP'] = git_show('%ct')
-		defines['XPCC_GIT_SUBJECT']         = git_c_string_literal(git_show('%s'))
+		defines['XPCC_GIT_SUBJECT']         = env.CStringLiteral(git_show('%s'))
 		# Status
 		s = subprocess.check_output(['git', '--no-pager', 'status', '--porcelain']).split('\n')
 		f = { 'M': 0, 'A': 0, 'D': 0, 'R': 0, 'C': 0, 'U': 0, '?': 0}
@@ -63,15 +53,8 @@ def git_info_header(env):
 		defines['XPCC_GIT_UNTRACKED'] = f['?']
 	except subprocess.CalledProcessError as e:
 		env.Error('failed to run git command: %s' % e)
-
-	# show scons how to build the git info header file
-	# this works just like building the xpcc_config.hpp in the xpcc.py tool
-	define_list = ["#define %s %s" % (key.upper(), value) for key, value in defines.iteritems()]
-	file = env.Template(
-		target = os.path.join(env['XPCC_BUILDPATH'], 'xpcc_git_info.hpp'),
-		source = os.path.join(env['XPCC_ROOTPATH'], 'templates', 'xpcc_git_info.hpp.in'),
-		substitutions = {'defines': '\n'.join(define_list)})
-	env.AppendUnique(CPPPATH = env['XPCC_BUILDPATH'])
+	c = "Its content is created by a call to env.GitInfoHeader() in your SConstruct file."
+	env.DefineHeader(defines=defines, header="xpcc_git_info.hpp", comment=c)
 
 def generate(env, **kw):
 	env.AddMethod(git_info_header, 'GitInfoHeader')

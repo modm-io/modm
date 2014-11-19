@@ -1,0 +1,10 @@
+// WARNING: This file is generated automatically, do not edit!
+${comment}
+// ----------------------------------------------------------------------------
+
+#ifndef ${include_guard}
+#define ${include_guard}
+
+${defines}
+
+#endif	// ${include_guard}

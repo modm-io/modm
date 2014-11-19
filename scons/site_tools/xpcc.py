@@ -31,6 +31,7 @@ import re
 import string
 import platform
 import configfile as configparser
+import textwrap
 
 from SCons.Script import *
 import SCons.Tool		# to get the SCons default tool search path
@@ -183,6 +184,42 @@ def generate_defines(env, filename='defines.hpp'):
 								  'templates/defines.hpp.in'),
 			substitutions = substitutions)
 	return file
+
+def c_string_literal(env, string):
+	"""
+		Escapes string and adds quotes.
+	"""
+	# Warning: Order Matters! Replace '\\' first!
+	e = [("\\", "\\\\"), ("\'", "\\\'"), ("\"", "\\\""), ("\t", "\\t"), ("\n", "\\n")]
+	for r in e:
+		string = string.replace(r[0], r[1])
+	return "\"" + string + "\""
+
+def define_header(env, defines, header, comment, template="define_template.hpp.in"):
+	"""
+		Shows Scons how to build a header file containing defines.
+		The headerfile will be created in the XPCC_BUILDPATH
+		and the XPCC_BUILDPATH will be added to the include
+		search path.
+		:param defines: dictionary containing key value pairs
+		:param header: name of the header, #include<${header}>
+		:param comment: say because of what this file was created
+	"""
+	include_guard = header.upper().replace('.', '_')
+	comment = textwrap.wrap(comment, 78-len("// "))
+	comment = "\n".join(["// " + c for c in comment])
+	#c = ""
+	#while len(comment) > 0:
+	#	c += "// " + comment[:70] + '\n'
+	#	comment = comment[70:]
+	define_list = ["#define %s %s" % (key.upper(), value) for key, value in defines.iteritems()]
+	file = env.Template(
+		target = os.path.join(env['XPCC_BUILDPATH'], header),
+		source = os.path.join(env['XPCC_ROOTPATH'], 'templates', template),
+		substitutions = {'defines':       '\n'.join(define_list),
+		                 'include_guard': include_guard,
+		                 'comment':       comment})
+	env.AppendUnique(CPPPATH = env['XPCC_BUILDPATH'])
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
@@ -460,6 +497,9 @@ def generate(env, **kw):
 	env.AddMethod(xpcc_library, 'XpccLibrary')
 	env.AddMethod(xpcc_communication_header, 'XpccCommunication')
 	env.AddMethod(generate_defines, 'Defines')
+	env.AddMethod(c_string_literal, 'CStringLiteral')
+	env.AddMethod(define_header, 'DefineHeader')
+	# env.AddMethod(project_info_header, 'ProjectInfoHeader')
 
 def exists(env):
 	return True
