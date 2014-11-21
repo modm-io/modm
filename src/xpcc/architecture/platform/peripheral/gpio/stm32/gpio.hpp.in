@@ -62,11 +62,13 @@ struct Gpio
 		BothEdges,
 	};
 
+	/// The Port a Gpio Pin is connected to.
+	/// @ingroup	stm32{{ target.family }}
 	enum class
 	Port
 	{
 %% for port in gpios | getPorts
-		{{ port.name | upper }},
+		{{ port.name | upper }} = {{ port.name | letterToNum }},
 %% endfor
 	};
 

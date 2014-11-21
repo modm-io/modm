@@ -273,6 +273,15 @@ def filter_get_ports(gpios):
 	return ports
 
 # -----------------------------------------------------------------------------
+def filter_letter_to_num(letter):
+	"""
+	This filter turns one letter into a number.
+	A is 0, B is 1, etc. This is not case sensitive.
+	"""
+	letter = letter[0].lower()
+	return ord(letter) - ord('a')
+
+# -----------------------------------------------------------------------------
 ###################### Generate Platform Tools ################################
 def generate(env, **kw):
 	# Set some paths used by this file
@@ -296,7 +305,8 @@ def generate(env, **kw):
 	env.AddMethod(platform_tools_find_device_file, 'FindDeviceFile')
 
 	# Add Filter for Gpio Drivers to Template Engine
-	env.AddTemplateJinja2Filter('getPorts', filter_get_ports)
+	env.AddTemplateJinja2Filter('getPorts',    filter_get_ports)
+	env.AddTemplateJinja2Filter('letterToNum', filter_letter_to_num)
 
 	########## Add Template Tests #############################################
 	# Generaic Tests (they accept a string)
