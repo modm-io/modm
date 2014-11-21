@@ -33,7 +33,7 @@ Examples include:
 		- `xmega64_128-a1-none_u.xml` for **ATXMEGA(64|128)A1(U)?**
 - stm32:
 	- STM32F: `stm32f` + `names-pins-sizes`
-		- `stm32f405_407_415_417-i_r_v_z-e_g.xml` for **STM32F(405|407|415|417)(I|R|V|Z)(E|G))**
+		- `stm32f405_407_415_417-i_r_v_z-e_g.xml` for **STM32F(405|407|415|417)(I|R|V|Z)(E|G)**
 
 
 ## File Format
@@ -41,7 +41,7 @@ Examples include:
 The device files encode information about one or several very similar devices using a tree representation.
 The device tree root declares its device scope using OR'ed device identifier elements.
 
-Here is the *ATmega328p* device family as an example:
+Here is the *ATmega328* device family as an example:
 
 ```xml
 <device platform="avr" family="atmega" name="48|88|168|328" size_id="4|8|16|32" type="a|none|p|pa">
@@ -70,13 +70,13 @@ Inside the device tag, the following elements describe the device:
 | define         | required device define(s)                      |
 | driver         | a peripheral driver implementation             |
 
-For example, all devices in the STM32F407 family have 196kB of RAM:
+For example, all devices in the STM32F407 family have 192kB of RAM:
 
 ```xml
 <ram>196608</ram>
 ```
 
-However, each element may also declare its device scope by including such device identifier attributes.
+However, each element may also declare its device scope by including device identifier attributes.
 To distinguish filterable device identifier attributes from declaration attributes, they must be prefixed with `device-`.
 
 For the ATmega328 family several RAM sizes exist depending on device name:
@@ -89,13 +89,13 @@ For the ATmega328 family several RAM sizes exist depending on device name:
 
 You are even able to use the value of these elements to further limit the scope of new elements.
 
-An example of this can be seen in the core driver file (discussed later), which uses the core element as a device-scope:
+An example of this can be seen in the core driver file (discussed later), which uses the core element as device-scope:
 
 ```xml
 <template core="cortex-m3|cortex-m4|cortex-m4f">hard_fault_handler.cpp.in</template>
 ```
 
-As the device file is declarative, the filtering engine will recursively resolve all dependencies and throw an error in case of unresolved elements or circular referencing.
+As the device file is declarative, the filtering engine will resolve all dependencies recursively and throw an error in case of unresolved elements or circular referencing.
 
 ### Available Drivers
 
@@ -141,7 +141,7 @@ Of course, drivers may also declare device scope. For the STM32F407 family, the 
 
 Any childen of a driver element will be available inside the driver instance template. Except for the reserved name `parameter`, there are no limitations on data structure or naming.
 
-For example, the GPIO driver needs to know, which pins are available for the requested device (with the `gpio` element), and what alternate functions to connect to them (with the `af` element).
+For example, the GPIO driver needs to know which pins are available for the requested device (with the `gpio` element), and what alternate functions to connect to them (with the `af` element).
 
 This information is encoded as driver element children (here for the ATmega328 device family):
 
@@ -157,7 +157,7 @@ This information is encoded as driver element children (here for the ATmega328 d
 </driver>
 ```
 
-Of course, device scope may also be declared for individual pins (here for the STM32F407 device family):
+Of course, device scope may also be declared for individual pins and even alternate functions (here for the STM32F407 device family):
 
 ```xml
 <driver type="gpio" name="stm32">
@@ -198,7 +198,7 @@ For the `at90_tiny_mega` GPIO driver it contains:
 
 Here the elements stand for:
 - `<static>`: copy source file without modification,
-- `<template>`: generate source file `gpio.hpp` from `gpio.hpp.in` template by substituting the value from device file dictionary
+- `<template>`: generate source file `gpio.hpp` from `gpio.hpp.in` template with the device file GPIO data
 
 Let's look at how to generate several driver instances using a driver file.
 Here is the `at90_tiny_meta` UART driver file:
@@ -249,8 +249,8 @@ Here the `notoggle` element will be added to the substitution dictionary only fo
 In order to customize drivers further parameters may be declared.
 There are currently three types available:
 - `int`: has a minimum and a maximum value
-- `bool`: True/False
-- `enum`: semi-colon-separated values
+- `bool`: true/false
+- `enum`: semicolon-separated values
 
 All buffered UART implementations have two parameters named `tx_buffer` and `rx_buffer`, which are of type `int` and set the size of the atomic transmit and receive buffer.
 
@@ -262,7 +262,7 @@ All buffered UART implementations have two parameters named `tx_buffer` and `rx_
 </driver>
 ```
 
-Each UART instance has their own two independent parameters.
+Each UART instance receives their own two independent parameters with these default values.
 
 The `stm32` core driver features the other two types:
 
@@ -276,7 +276,7 @@ The `stm32` core driver features the other two types:
 </driver>
 ```
 
-These parameter may be overwritten in either the device file, or in the `project.cfg` in the section `[parameters]`, which follows the naming scheme *type.name.instance.parameter* :
+These parameter may be overwritten in either the device file, or in the `project.cfg` in the section `[parameters]`, which follows the naming scheme `type.name.instance.parameter`:
 
 ```python
 [parameters]
