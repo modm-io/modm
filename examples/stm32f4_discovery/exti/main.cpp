@@ -24,13 +24,22 @@ typedef GpioInputE11 Irq;
  * Px10 to Px15: EXTI15_10_IRQHandler(void)
  */
 extern "C" void
-//EXTI15_10_IRQHandler(void)
 EXTI0_IRQHandler(void)
 {
-	Irq::acknowledgeExternalInterruptFlag();
+	Button::acknowledgeExternalInterruptFlag();
 	LedBlue::set();
 	xpcc::delayMicroseconds(1000);
 	LedBlue::reset();
+}
+
+
+extern "C" void
+EXTI15_10_IRQHandler(void)
+{
+	Irq::acknowledgeExternalInterruptFlag();
+	LedOrange::set();
+	xpcc::delayMicroseconds(1000);
+	LedOrange::reset();
 }
 
 // ----------------------------------------------------------------------------
@@ -38,15 +47,23 @@ MAIN_FUNCTION
 {
 	defaultSystemClock::enable();
 
-	LedOrange::setOutput(xpcc::Gpio::High);
-	LedGreen::setOutput(xpcc::Gpio::Low);
-	LedRed::setOutput(xpcc::Gpio::High);
+	// will be used to indicate external interrupts
+	LedOrange::setOutput(xpcc::Gpio::Low);
 	LedBlue::setOutput(xpcc::Gpio::Low);
 
-	Button::setInput();
-	Irq::setInput();
+	// will be toggled to indicate that the program is still running
+	LedGreen::setOutput(xpcc::Gpio::Low);
+	LedRed::setOutput(xpcc::Gpio::High);
 
-	Irq::setInputTrigger(Irq::InputTrigger::RisingEdge);
+	// push the button to see the blue led light up
+	Button::setInput(Gpio::InputType::Floating);
+	Button::setInputTrigger(Button::InputTrigger::RisingEdge);
+	Button::enableExternalInterrupt();
+	Button::enableExternalInterruptVector(14);
+
+	// pull pin E11 low to see the orange led light up
+	Irq::setInput(Gpio::InputType::PullUp);
+	Irq::setInputTrigger(Irq::InputTrigger::BothEdges);
 	Irq::enableExternalInterrupt();
 	Irq::enableExternalInterruptVector(14);
 
