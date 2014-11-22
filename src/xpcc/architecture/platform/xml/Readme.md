@@ -45,12 +45,16 @@ Here is the *ATmega328* device family as an example:
 
 ```xml
 <device platform="avr" family="atmega" name="48|88|168|328" size_id="4|8|16|32" type="a|none|p|pa">
+  ...
+</device>
 ```
 
 This looks very similar for the *STM32F407* device family:
 
 ```xml
 <device platform="stm32" family="f4" name="405|407|415|417" pin_id="i|r|v|z" size_id="e|g">
+  ...
+</device>
 ```
 
 ### Available Elements
@@ -284,5 +288,16 @@ uart.at90_tiny_mega.0.tx_buffer = 200
 uart.at90_tiny_mega.0.rx_buffer = 100
 ```
 
+## Generator
 
+We designed the device file format to use this form of XML to not only be human readable, but much more important, to be human-writeable.
 
+We decided to group multiple devices of the same functionality family into one device file, instead of providing one device file for each of these devices.
+
+This made accessing the devices files computationally more complex, since we have to evaluate the device-scope, however, it dramatically reduces redundancies and allows a much more natural description of devices in this language.
+
+While the first device files were still written manually, a device file generator soon became necessary to allow inclusion of many devices and to help with refactoring during API changes.
+
+This generator uses multiple manufacturer provided description files to extract data about multiple devices and compress them into one device file, while preserving readability and correctness.
+
+Further information about the device file generator can be found in the Readme at `/tools/device_file_generator`.
