@@ -58,18 +58,22 @@ from parameters import ParameterDB
 def platform_tools_find_device_file(env):
 	architecture_path = os.path.join(env['XPCC_LIBRARY_PATH'], 'xpcc', 'architecture')
 	device = env['XPCC_DEVICE']
-	# Do not generate for hosted
-	# TODO: generate software peripherals for hosted
-	if device in ['darwin', 'linux', 'windows']:
-		env['ARCHITECTURE'] = 'hosted/'+device
-		return
-	id = DeviceIdentifier(device)
 	env.Debug("Device String: %s" % device)
+
+	id = DeviceIdentifier(device)
+
 	# Find Device File
 	xml_path = os.path.join(env['XPCC_PLATFORM_PATH'], 'xml', id.platform)
 	files = []
 	device_file = None
-	if id.platform == 'avr':
+
+	if id.platform == 'hosted':
+		file = os.path.join(xml_path, id.family + '.xml')
+		print file
+		if os.path.exists(file):
+			device_file = file
+
+	elif id.platform == 'avr':
 		for file in os.listdir(xml_path):
 			if id.family in file:
 				fileArray = file.replace(id.family,"").replace(".xml","").split("-")
@@ -85,6 +89,7 @@ def platform_tools_find_device_file(env):
 							continue
 						device_file = os.path.join(xml_path, file)
 						break
+
 	elif id.platform == 'stm32':
 		for file in os.listdir(xml_path):
 			if 'stm32'+id.family in file:
@@ -98,17 +103,15 @@ def platform_tools_find_device_file(env):
 					device_file = os.path.join(xml_path, file)
 					break
 	else:
-		while device != None and len(device) > 0:
-			device_file = os.path.join(xml_path, device + '.xml')
+		temp_device = device
+		while temp_device != None and len(temp_device) > 0:
+			device_file = os.path.join(xml_path, temp_device + '.xml')
 			files.append(device_file)
 			if os.path.isfile(device_file):
 				break
 			else:
-				device = device[:-1]
+				temp_device = temp_device[:-1]
 				device_file = None
-
-	# Restore Device
-	device = env['XPCC_DEVICE']
 
 	# Check for error
 	if device_file == None:
@@ -116,23 +119,24 @@ def platform_tools_find_device_file(env):
 		# for f in files:
 		#	env.Error("Tried: " + f + os.linesep)
 		Exit(1)
+
 	# Now we need to parse the Xml File
 	env.Debug("Found device file: " + device_file)
 	env['XPCC_DEVICE_FILE'] = DeviceFile(device_file, env.GetLogger())
-	# for microcontrollers architecture = core
-	env['ARCHITECTURE'] = env['XPCC_DEVICE_FILE'].getProperties(device)['core']
-	if id.platform == 'avr':
-		env['AVRDUDE_DEVICE'] = env['XPCC_DEVICE_FILE'].getProperties(device)['mcu']
+
+	if id.platform == 'hosted':
+		env['ARCHITECTURE'] = 'hosted/' + id.family
+	else:
+		# for microcontrollers architecture = core
+		env['ARCHITECTURE'] = env['XPCC_DEVICE_FILE'].getProperties(device)['core']
+		if id.platform == 'avr':
+			env['AVRDUDE_DEVICE'] = env['XPCC_DEVICE_FILE'].getProperties(device)['mcu']
 
 #------------------------------------------------------------------------------
 # env['XPCC_PLATFORM_PATH'] is used for absolute paths
 # architecture_path for relative build paths
 def platform_tools_generate(env, architecture_path):
 	device = env['XPCC_DEVICE']
-	# Do not generate for hosted
-	# TODO: generate software peripherals for hosted
-	if device in ['darwin', 'linux', 'windows']:
-		return [], {}
 
 	# Initialize Return Lists/Dicts
 	sources = []
@@ -149,23 +153,24 @@ def platform_tools_generate(env, architecture_path):
 	defines = prop['defines']
 	device_headers = prop['headers']
 
-	# Set Size
-	env['DEVICE_SIZE'] = { "flash": prop['flash'], "ram": prop['ram'], "eeprom": prop['eeprom'] }
-	if (prop['linkerscript'] != ""):
-		# Find Linkerscript:
-		linkerfile = os.path.join(env['XPCC_PLATFORM_PATH'], 'linker', prop['linkerscript'])
-		if not os.path.isfile(linkerfile):
-			linkerfile = os.path.join(env['XPCC_PLATFORM_PATH'], 'linker', prop['target']['platform'], prop['linkerscript'])
+	if device not in ['darwin', 'linux', 'windows']:
+		# Set Size
+		env['DEVICE_SIZE'] = { "flash": prop['flash'], "ram": prop['ram'], "eeprom": prop['eeprom'] }
+		if (prop['linkerscript'] != ""):
+			# Find Linkerscript:
+			linkerfile = os.path.join(env['XPCC_PLATFORM_PATH'], 'linker', prop['linkerscript'])
 			if not os.path.isfile(linkerfile):
-				env.Error("Linkerscript for %s (%s) could not be found." % (device, linkerfile))
-				Exit(1)
-		linkdir, linkfile = os.path.split(linkerfile)
-		linkdir = linkdir.replace(env['XPCC_ROOTPATH'], "${XPCC_ROOTPATH}")
-		env['LINKPATH'] = str(linkdir)
-		env['LINKFILE'] = str(linkfile)
-	else:
-		env['LINKPATH'] = ""
-		env['LINKFILE'] = ""
+				linkerfile = os.path.join(env['XPCC_PLATFORM_PATH'], 'linker', prop['target']['platform'], prop['linkerscript'])
+				if not os.path.isfile(linkerfile):
+					env.Error("Linkerscript for %s (%s) could not be found." % (device, linkerfile))
+					Exit(1)
+			linkdir, linkfile = os.path.split(linkerfile)
+			linkdir = linkdir.replace(env['XPCC_ROOTPATH'], "${XPCC_ROOTPATH}")
+			env['LINKPATH'] = str(linkdir)
+			env['LINKFILE'] = str(linkfile)
+		else:
+			env['LINKPATH'] = ""
+			env['LINKFILE'] = ""
 
 	# Loop through Drivers
 	driver_list = []
