@@ -42,5 +42,3 @@
  */
 
 #include "can/message.hpp"
-#include "can/mcp2515.hpp"
-#include "can/canusb.hpp"

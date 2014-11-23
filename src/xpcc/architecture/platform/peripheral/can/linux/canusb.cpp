@@ -33,8 +33,8 @@
 #include <xpcc/architecture/driver.hpp>
 #include <xpcc/processing/timeout.hpp>
 
-#include "../can_lawicel_formatter/can_lawicel_formatter.hpp"
-#include "../canusb.hpp"
+#include <xpcc/communication/can/can_lawicel_formatter/can_lawicel_formatter.hpp>
+#include "canusb.hpp"
 
 xpcc::CanUsb::CanUsb() :
 	active(false)

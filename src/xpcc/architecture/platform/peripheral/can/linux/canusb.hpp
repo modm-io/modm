@@ -35,9 +35,9 @@
 #include <string>
 
 // FIXME: remove this dependency!
-#include <xpcc/architecture/platform/hosted/linux/serial_port.hpp>
+#include "../../uart/linux/serial_port.hpp"
 
-#include "message.hpp"
+#include <xpcc/communication/can/message.hpp>
 
 namespace xpcc
 {
