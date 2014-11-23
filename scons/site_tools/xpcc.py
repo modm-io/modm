@@ -27,11 +27,15 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
+import sys
 import re
 import string
 import platform
 import configfile as configparser
 import textwrap
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'tools', 'device_files'))
+from device_identifier import DeviceIdentifier
 
 from SCons.Script import *
 import SCons.Tool		# to get the SCons default tool search path
@@ -296,12 +300,15 @@ def generate(env, **kw):
 
 		hosted_device = {'Darwin': 'darwin', 'Linux': 'linux',
 						 'Windows': 'windows' }[platform.system()]
-		device = string.Template(device).safe_substitute({'hosted': hosted_device})
+		if device == 'hosted':
+			device = hosted_device
+		elif device.startswith('hosted/'):
+			device = device.replace('hosted/', '')
 
 		clock  = parser.get('build', 'clock', 'NaN')
 
-		architecture_derecated = parser.get('build', 'architecture', 'deprecated')
-		if architecture_derecated != "deprecated":
+		architecture_deprecated = parser.get('build', 'architecture', 'deprecated')
+		if architecture_deprecated != "deprecated":
 			env.Warn("Specifying architecture is deprecated and replaced by only the Device ID ('device=...'.")
 
 		env['XPCC_PROJECT_NAME'] = parser.get('general', 'name')
