@@ -24,96 +24,96 @@ namespace xpcc
 namespace gui
 {
 
-	// forward declaration
-	class GuiViewStack;
+// forward declaration
+class GuiViewStack;
+
+/**
+ * @brief The View class is the base class for all screens
+ *        handled by the ViewStack class
+ *
+ *\author Thorsten Lajewski
+ *\ingroup display_menu
+ */
+
+class View : public xpcc::AbstractView
+{
+	friend class GuiViewStack;
+
+public:
+	/**
+	 * @param stack pointer to the stack, the screen should be displayed on.
+	 * @param identifier can be used to determine which screen is the currently
+	 *        displayed on the graphicDisplay
+	 */
+	View(xpcc::gui::GuiViewStack* stack, uint8_t identifier, xpcc::gui::Dimension dimension);
+
+	virtual ~View() = 0;
 
 	/**
-	 * @brief The View class is the base class for all screens
-	 *        handled by the ViewStack class
-	 *
-	 *\author Thorsten Lajewski
-	 *\ingroup display_menu
+	 * @brief May be called as often as possible. Handles input events
+	 *        located in the parent GuiViewStack
 	 */
+	virtual void
+	update();
 
-	class View : public xpcc::AbstractView
+	virtual void
+	preUpdate()
 	{
-		friend class GuiViewStack;
+	}
 
-	public:
-		/**
-		 * @param stack pointer to the stack, the screen should be displayed on.
-		 * @param identifier can be used to determine which screen is the currently
-		 *        displayed on the graphicDisplay
-		 */
-		View(xpcc::gui::GuiViewStack* stack, uint8_t identifier, xpcc::gui::Dimension dimension);
+	virtual void
+	postUpdate()
+	{
+	}
 
-		virtual ~View() = 0;
+	/**
+	 * @brief draw determine the output on the Graphic Display
+	 */
+	virtual void
+	draw();
 
-		/**
-		 * @brief May be called as often as possible. Handles input events
-		 *        located in the parent GuiViewStack
-		 */
-		virtual void
-		update();
+	/**
+	 *  @brief add widget to view
+	 */
+	bool
+	pack(Widget *w, const xpcc::glcd::Point &coord);
 
-		virtual void
-		preUpdate()
-		{
-		}
+	/**
+	 * @brief remove the view from the screen. The viewStack handles the deletion.
+	 */
+	void
+	remove();
 
-		virtual void
-		postUpdate()
-		{
-		}
+	/**
+	 * @brief set color palette for every contained widget
+	 */
+	void
+	setColorPalette(ColorPalette& cp);
 
-		/**
-		 * @brief draw determine the output on the Graphic Display
-		 */
-		virtual void
-		draw();
+	ColorPalette&
+	getColorPalette()
+	{
+		return this->colorpalette;
+	}
 
-		/**
-		 *  @brief add widget to view
-		 */
-		bool
-		pack(Widget *w, const xpcc::glcd::Point &coord);
+	void
+	markDirty();
 
-		/**
-		 * @brief remove the view from the screen. The viewStack handles the deletion.
-		 */
-		void
-		remove();
+	void
+	markDrawn();
 
-		/**
-		 * @brief set color palette for every contained widget
-		 */
-		void
-		setColorPalette(ColorPalette& cp);
+	inline xpcc::gui::GuiViewStack*
+	getViewStack()
+	{
+		return stack;
+	}
 
-		ColorPalette&
-		getColorPalette()
-		{
-			return this->colorpalette;
-		}
-
-		void
-		markDirty();
-
-		void
-		markDrawn();
-
-		inline xpcc::gui::GuiViewStack*
-		getViewStack()
-		{
-			return stack;
-		}
-
-	protected:
-		xpcc::gui::GuiViewStack* stack;
-		Dimension dimension;
-		WidgetContainer widgets;
-		xpcc::gui::ColorPalette colorpalette;
-	};
+protected:
+	xpcc::gui::GuiViewStack* stack;
+	Dimension dimension;
+	WidgetContainer widgets;
+	xpcc::gui::ColorPalette colorpalette;
+};
 
 }	// namespace gui
 

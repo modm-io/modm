@@ -23,76 +23,76 @@ namespace xpcc
 namespace gui
 {
 
+/**
+* \brief Stack which handles the displaying
+*        of views on the graphic display.
+*
+* This class also deallocates the views passed
+* to the stack.
+*
+* \ingroup	display_menu
+* \author	Thorsten Lajewski
+*/
+
+class GuiViewStack : public xpcc::ViewStack
+{
+public:
+	GuiViewStack(xpcc::GraphicDisplay* display, xpcc::gui::inputQueue* queue);
+
+	virtual ~GuiViewStack();
+
 	/**
-	* \brief Stack which handles the displaying
-	*        of views on the graphic display.
-	*
-	* This class also deallocates the views passed
-	* to the stack.
-	*
-	* \ingroup	display_menu
-	* \author	Thorsten Lajewski
-	*/
+	 * @brief get the top view from the stack
+	 * @return pointer to view from stack
+	 */
 
-	class GuiViewStack : public xpcc::ViewStack
+	inline xpcc::gui::View*
+	get()
 	{
-	public:
-		GuiViewStack(xpcc::GraphicDisplay* display, xpcc::gui::inputQueue* queue);
+		return this->stack.get();
+	}
 
-		virtual ~GuiViewStack();
+	/**
+	 * @brief push new view on top of stack the new
+	 *        view will be displayed instead of the old
+	 *        one
+	 *
+	 * @param view next displayed view
+	 */
+	inline void
+	push(xpcc::gui::View* view)
+	{
+		this->stack.push(view);
+		this->getDisplay().clear();
+		xpcc::gui::View* top = this->get();
+		top->draw();
+		this->display->update();
+	}
 
-		/**
-		 * @brief get the top view from the stack
-		 * @return pointer to view from stack
-		 */
+	/**
+	 * @brief get event input queue from GuiViewStack
+	 */
+	inline xpcc::gui::inputQueue*
+	getInputQueue()
+	{
+		return this->input_queue;
+	}
 
-		inline xpcc::gui::View*
-		get()
-		{
-			return this->stack.get();
-		}
+	/**
+	 * @brief pop remove top view from the stack. The removed
+	 *        view is deleted
+	 */
 
-		/**
-		 * @brief push new view on top of stack the new
-		 *        view will be displayed instead of the old
-		 *        one
-		 *
-		 * @param view next displayed view
-		 */
-		inline void
-		push(xpcc::gui::View* view)
-		{
-			this->stack.push(view);
-			this->getDisplay().clear();
-			xpcc::gui::View* top = this->get();
-			top->draw();
-			this->display->update();
-		}
+	void
+	pop();
 
-		/**
-		 * @brief get event input queue from GuiViewStack
-		 */
-		inline xpcc::gui::inputQueue*
-		getInputQueue()
-		{
-			return this->input_queue;
-		}
+	virtual void
+	update();
 
-		/**
-		 * @brief pop remove top view from the stack. The removed
-		 *        view is deleted
-		 */
-
-		void
-		pop();
-
-		virtual void
-		update();
-
-	private:
-		xpcc::Stack< xpcc::gui::View* , xpcc::LinkedList< xpcc::gui::View* > > stack;
-		xpcc::gui::inputQueue *input_queue;
-	};
+private:
+	xpcc::Stack< xpcc::gui::View* , xpcc::LinkedList< xpcc::gui::View* > > stack;
+	xpcc::gui::inputQueue *input_queue;
+};
 
 }	// namespace gui
 
