@@ -7,7 +7,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "serial_interface.hpp"
+#include "../hosted/serial_interface.hpp"
 
 #include <iostream>
 #include <ios>
