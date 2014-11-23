@@ -16,9 +16,9 @@
 
 namespace xpcc
 {
+
 namespace gui
 {
-
 
 class TabPanel : public WidgetGroup {
 
@@ -48,7 +48,8 @@ public:
 	const Dimension buttonDimension;
 };
 
-}
-}
+}	// namespace gui
+
+}	// namespace xpcc
 
 #endif  // XPCC_GUI_TAB_PANE_HPP

@@ -14,10 +14,11 @@
 #include "../button.hpp"
 #include "../stringfield.hpp"
 
-namespace xpcc {
+namespace xpcc
+{
 
-namespace gui {
-
+namespace gui
+{
 
 class StringRocker : public WidgetGroup {
 
@@ -90,7 +91,8 @@ private:
 
 };
 
-}
-}
+}	// namespace gui
+
+}	// namespace xpcc
 
 #endif  // XPCC_GUI_STRINGROCKER_HPP

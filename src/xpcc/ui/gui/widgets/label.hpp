@@ -12,9 +12,11 @@
 
 #include "widget.hpp"
 
-namespace xpcc {
+namespace xpcc
+{
 
-namespace gui {
+namespace gui
+{
 
 class Label : public Widget {
 
@@ -88,7 +90,8 @@ private:
 //	}
 //};
 
-}
-}
+}	// namespace gui
+
+}	// namespace xpcc
 
 #endif  // XPCC_GUI_LABEL_HPP

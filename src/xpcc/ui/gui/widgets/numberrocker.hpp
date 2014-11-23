@@ -14,9 +14,11 @@
 #include "button.hpp"
 #include "numberfield.hpp"
 
-namespace xpcc {
+namespace xpcc
+{
 
-namespace gui {
+namespace gui
+{
 
 template<typename T = int16_t>
 class NumberRocker : public WidgetGroup {
@@ -77,8 +79,9 @@ typedef NumberRocker<int16_t> IntegerRocker;
 typedef NumberRocker<float> FloatRocker;
 
 
-}
-}
+}	// namespace gui
+
+}	// namespace xpcc
 
 #include "numberrocker_impl.hpp"
 

@@ -13,9 +13,11 @@
 #include "widget.hpp"
 #include "label.hpp"
 
-namespace xpcc {
+namespace xpcc
+{
 
-namespace gui {
+namespace gui
+{
 
 class StringField : public Widget {
 
@@ -49,7 +51,8 @@ private:
 	const char* value;
 };
 
-}
-}
+}	// namespace gui
+
+}	// namespace xpcc
 
 #endif  // XPCC_GUI_STRINGFIELD_HPP

@@ -12,9 +12,11 @@
 
 #include "widget.hpp"
 
-namespace xpcc {
+namespace xpcc
+{
 
-namespace gui {
+namespace gui
+{
 
 class CheckboxWidget : public Widget {
 
@@ -45,7 +47,8 @@ private:
 
 };
 
-}
-}
+}	// namespace gui
+
+}	// namespace xpcc
 
 #endif  // XPCC_GUI_CHECKBOX_HPP

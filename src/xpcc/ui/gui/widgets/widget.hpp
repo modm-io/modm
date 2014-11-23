@@ -19,9 +19,11 @@
 #include <xpcc/debug/logger.hpp>
 
 
-namespace xpcc {
+namespace xpcc
+{
 
-namespace gui {
+namespace gui
+{
 
 static int16_t uid_global = 0;
 
@@ -439,7 +441,8 @@ protected:
 	WidgetContainer widgets;
 };
 
-}
-}
+}	// namespace gui
+
+}	// namespace xpcc
 
 #endif  // XPCC_GUI_WIDGET_HPP

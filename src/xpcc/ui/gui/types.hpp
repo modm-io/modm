@@ -24,9 +24,11 @@
 #define NULL 0
 #endif
 
-namespace xpcc {
+namespace xpcc
+{
 
-namespace gui {
+namespace gui
+{
 
 	// forward declare so that everything compiles. can this be done better?
 	class View;
@@ -129,7 +131,8 @@ namespace gui {
 
 	typedef xpcc::glcd::Point Point;
 
-}
-}
+}	// namespace gui
+
+}	// namespace xpcc
 
 #endif  // XPCC_GUI_TYPES_HPP

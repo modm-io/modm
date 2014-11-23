@@ -19,8 +19,10 @@
 
 namespace xpcc
 {
+
 namespace gui
 {
+
 	/**
 	* \brief Stack which handles the displaying
 	*        of views on the graphic display.
@@ -91,7 +93,9 @@ namespace gui
 		xpcc::Stack< xpcc::gui::View* , xpcc::LinkedList< xpcc::gui::View* > > stack;
 		xpcc::gui::inputQueue *input_queue;
 	};
-}
-}
+
+}	// namespace gui
+
+}	// namespace xpcc
 
 #endif  // XPCC_GUI_VIEWSTACK_HPP

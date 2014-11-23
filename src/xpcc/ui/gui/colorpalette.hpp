@@ -13,9 +13,11 @@
 #include <xpcc/ui/display/graphic_display.hpp>
 
 
-namespace xpcc {
+namespace xpcc
+{
 
-namespace gui {
+namespace gui
+{
 
 	/*
 	 * TODO: find a way so that color options can be defined in user program
@@ -57,7 +59,8 @@ namespace gui {
 		}
 	}
 
-}
-}
+}	// namespace gui
+
+}	// namespace xpcc
 
 #endif  // XPCC_GUI_COLORPALETTE_HPP

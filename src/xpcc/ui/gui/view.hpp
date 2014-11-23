@@ -20,8 +20,10 @@
 
 namespace xpcc
 {
+
 namespace gui
 {
+
 	// forward declaration
 	class GuiViewStack;
 
@@ -112,7 +114,9 @@ namespace gui
 		WidgetContainer widgets;
 		xpcc::gui::ColorPalette colorpalette;
 	};
-}
-}
+
+}	// namespace gui
+
+}	// namespace xpcc
 
 #endif  // XPCC_GUI_VIEW_HPP

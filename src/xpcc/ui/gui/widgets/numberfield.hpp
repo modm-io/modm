@@ -12,9 +12,11 @@
 
 #include "widget.hpp"
 
-namespace xpcc {
+namespace xpcc
+{
 
-namespace gui {
+namespace gui
+{
 
 template<typename T>
 class NumberField : public Widget {
@@ -61,9 +63,9 @@ public:
 	render(View* view);
 };
 
+}	// namespace gui
 
-}
-}
+}	// namespace xpcc
 
 #include "numberfield_impl.hpp"
 

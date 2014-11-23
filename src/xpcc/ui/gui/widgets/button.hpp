@@ -13,9 +13,11 @@
 #include <xpcc/ui/display/font.hpp>
 #include "widget.hpp"
 
-namespace xpcc {
+namespace xpcc
+{
 
-namespace gui {
+namespace gui
+{
 
 class ButtonWidget : public Widget {
 
@@ -84,7 +86,8 @@ private:
 
 };
 
-}
-}
+}	// namespace gui
+
+}	// namespace xpcc
 
 #endif  // XPCC_GUI_BUTTON_HPP
