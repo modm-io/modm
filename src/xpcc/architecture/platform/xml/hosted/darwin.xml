@@ -1,11 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE rca SYSTEM "../devicefile.dtd">
 <rca version="1.0">
-  <device platform="hosted" family="linux">
-    <driver type="can" name="linux"/>
-    <driver type="graphics" name="hosted"/>
-    <driver type="tipc" name="linux"/>
+  <device platform="hosted" family="darwin">
     <driver type="uart" name="hosted"/>
-    <driver type="uart" name="linux"/>
   </device>
 </rca>
