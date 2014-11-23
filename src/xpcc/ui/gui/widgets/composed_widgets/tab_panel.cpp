@@ -9,7 +9,8 @@
 
 #include "tab_panel.hpp"
 
-void xpcc::gui::TabPanel::packPanel(Widget* w)
+void
+xpcc::gui::TabPanel::packPanel(Widget* w)
 {
 	if(w == NULL)
 		return;
@@ -20,7 +21,8 @@ void xpcc::gui::TabPanel::packPanel(Widget* w)
 	this->pack(w, xpcc::glcd::Point(0,0));
 }
 
-void xpcc::gui::TabPanel::packTabLeft(Widget* w)
+void
+xpcc::gui::TabPanel::packTabLeft(Widget* w)
 {
 	if(w == NULL)
 		return;
@@ -31,7 +33,8 @@ void xpcc::gui::TabPanel::packTabLeft(Widget* w)
 	this->pack(w, xpcc::glcd::Point(0,panelDimension.height));
 }
 
-void xpcc::gui::TabPanel::packTabMiddle(Widget* w)
+void
+xpcc::gui::TabPanel::packTabMiddle(Widget* w)
 {
 	if(w == NULL)
 		return;
@@ -42,7 +45,8 @@ void xpcc::gui::TabPanel::packTabMiddle(Widget* w)
 	this->pack(w, xpcc::glcd::Point(buttonDimension.width, panelDimension.height));
 }
 
-void xpcc::gui::TabPanel::packTabRight(Widget* w)
+void
+xpcc::gui::TabPanel::packTabRight(Widget* w)
 {
 	if(w == NULL)
 		return;

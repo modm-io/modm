@@ -11,7 +11,8 @@
 
 #include "stringfield.hpp"
 
-void xpcc::gui::StringField::render(View* view)
+void
+xpcc::gui::StringField::render(View* view)
 {
 	if(view == 0)
 		return;

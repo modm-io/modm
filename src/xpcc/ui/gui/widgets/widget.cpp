@@ -9,7 +9,8 @@
 
 #include "widget.hpp"
 
-bool xpcc::gui::WidgetGroup::pack(Widget* w, const xpcc::glcd::Point& coord)
+bool
+xpcc::gui::WidgetGroup::pack(Widget* w, const xpcc::glcd::Point& coord)
 {
 	if(coord.x > (this->dimension.width - w->dimension.width ) || coord.y > (this->dimension.height - w->dimension.height) || coord.x < 0 || coord.y < 0)
 		return false;
@@ -28,10 +29,12 @@ bool xpcc::gui::WidgetGroup::pack(Widget* w, const xpcc::glcd::Point& coord)
 	return true;
 }
 
-void xpcc::gui::WidgetGroup::render(View* view)
+void
+xpcc::gui::WidgetGroup::render(View* view)
 {
 	/* draw all widgets */
-	for(auto iter = widgets.begin(); iter != widgets.end(); ++iter) {
+	for(auto iter = widgets.begin(); iter != widgets.end(); ++iter)
+	{
 		if((*iter)->isDirty())
 		{
 			(*iter)->draw(view);
@@ -43,24 +46,28 @@ void xpcc::gui::WidgetGroup::setColorPalette(ColorPalette& cp)
 {
 	copyColorPalette(cp, this->color_palette);
 
-	for(auto iter = widgets.begin(); iter != widgets.end(); ++iter) {
+	for(auto iter = widgets.begin(); iter != widgets.end(); ++iter)
+	{
 		(*iter)->setColorPalette(cp);
 	}
 }
 
-void xpcc::gui::WidgetGroup::setPosition(const xpcc::glcd::Point& pos)
+void
+xpcc::gui::WidgetGroup::setPosition(const xpcc::glcd::Point& pos)
 {
 	/* the same as in Widget::setPosition() */
 	this->setRelativePosition(pos);
 	this->updatePosition();
 
 	/* We need to update the absolute positions of all child widgets */
-	for(auto iter = widgets.begin(); iter != widgets.end(); ++iter) {
+	for(auto iter = widgets.begin(); iter != widgets.end(); ++iter)
+	{
 		(*iter)->updatePosition();
 	}
 }
 
-void xpcc::gui::Widget::updateIntersections(WidgetContainer *widgets)
+void
+xpcc::gui::Widget::updateIntersections(WidgetContainer *widgets)
 {
 	/* clear list, but keep size. it won't shrink unless widgets will be removed */
 	this->intersecting_widgets.removeAll();
@@ -80,12 +87,14 @@ void xpcc::gui::Widget::updateIntersections(WidgetContainer *widgets)
 	}
 }
 
-bool xpcc::gui::Widget::hasIntersections()
+bool
+xpcc::gui::Widget::hasIntersections()
 {
 	return !this->intersecting_widgets.isEmpty();
 }
 
-bool xpcc::gui::Widget::checkIntersection(Widget* w)
+bool
+xpcc::gui::Widget::checkIntersection(Widget* w)
 {
 	/* intersection with itself makes no sense */
 	if(w->uid == this->uid)
@@ -114,7 +123,8 @@ bool xpcc::gui::Widget::checkIntersection(Widget* w)
 	return true;
 }
 
-bool xpcc::gui::Widget::handleInputEvent(const InputEvent* ev)
+bool
+xpcc::gui::Widget::handleInputEvent(const InputEvent* ev)
 {
 	/* absolute position of widget */
 	auto position = this->getPosition();
@@ -141,9 +151,9 @@ bool xpcc::gui::Widget::handleInputEvent(const InputEvent* ev)
 	return false;
 }
 
-bool xpcc::gui::WidgetGroup::handleInputEvent(const InputEvent* ev)
+bool
+xpcc::gui::WidgetGroup::handleInputEvent(const InputEvent* ev)
 {
-
 	for(auto iter = widgets.begin(); iter != widgets.end(); ++iter)
 	{
 		if((*iter)->handleInputEvent(ev))

@@ -18,10 +18,9 @@ namespace xpcc
 namespace gui
 {
 
-class CheckboxWidget : public Widget {
-
+class CheckboxWidget : public Widget
+{
 public:
-
 	CheckboxWidget(bool initial, Dimension d) :
 		Widget(d, true),
 		state(initial)
@@ -44,7 +43,6 @@ private:
 
 private:
 	bool state;
-
 };
 
 }	// namespace gui

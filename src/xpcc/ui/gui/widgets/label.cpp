@@ -10,7 +10,8 @@
 #include "label.hpp"
 #include <xpcc/ui/gui/colorpalette.hpp>
 
-void xpcc::gui::Label::render(View* view)
+void
+xpcc::gui::Label::render(View* view)
 {
 	if(view == NULL)
 		return;

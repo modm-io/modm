@@ -47,7 +47,8 @@ public:
 	 */
 	View(xpcc::gui::GuiViewStack* stack, uint8_t identifier, xpcc::gui::Dimension dimension);
 
-	virtual ~View() = 0;
+	virtual
+	~View() = 0;
 
 	/**
 	 * @brief May be called as often as possible. Handles input events

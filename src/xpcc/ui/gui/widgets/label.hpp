@@ -18,8 +18,8 @@ namespace xpcc
 namespace gui
 {
 
-class Label : public Widget {
-
+class Label : public Widget
+{
 public:
 	Label(const char* lbl, xpcc::glcd::Color color) :
 		Widget(Dimension(0,0), false),
@@ -62,7 +62,6 @@ public:
 	}
 
 private:
-
 	void
 	updateDimension()
 	{
@@ -76,7 +75,6 @@ private:
 private:
 	const char* label;
 	xpcc::glcd::Color color;
-
 };
 
 //

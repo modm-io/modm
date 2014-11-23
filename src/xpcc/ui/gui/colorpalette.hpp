@@ -23,7 +23,8 @@ namespace gui
  * TODO: find a way so that color options can be defined in user program
  */
 
-enum Color {
+enum
+Color {
 	BLACK,
 	WHITE,
 	GRAY,
@@ -54,7 +55,8 @@ extern ColorPalette DEFAULT_COLORPALETTE; //[xpcc::gui::Color::PALETTE_SIZE];
 static inline void
 copyColorPalette(ColorPalette& src, ColorPalette& dest)
 {
-	for(int ii = 0; ii < Color::PALETTE_SIZE; ++ii){
+	for(int ii = 0; ii < Color::PALETTE_SIZE; ++ii)
+	{
 		dest[ii] = src[ii];
 	}
 }

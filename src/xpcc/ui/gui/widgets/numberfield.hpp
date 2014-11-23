@@ -19,10 +19,9 @@ namespace gui
 {
 
 template<typename T>
-class NumberField : public Widget {
-
+class NumberField : public Widget
+{
 public:
-
 	NumberField(T default_value, Dimension d) :
 		Widget(d, false),
 		value(default_value)

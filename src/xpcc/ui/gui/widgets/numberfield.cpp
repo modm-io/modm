@@ -16,7 +16,8 @@ xpcc::gui::FloatField::FloatField(float value, Dimension d) :
 {
 }
 
-void xpcc::gui::FloatField::render(View* view)
+void
+xpcc::gui::FloatField::render(View* view)
 {
 	if(view == 0)
 		return;

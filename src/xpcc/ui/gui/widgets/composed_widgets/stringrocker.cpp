@@ -9,13 +9,14 @@
 
 #include "stringrocker.hpp"
 
-void xpcc::gui::StringRocker::next()
+void
+xpcc::gui::StringRocker::next()
 {
-
 	if(string_id >= end)
 	{
 		string_id = start;
-	} else {
+	}
+	else {
 		string_id++;
 	}
 
@@ -28,12 +29,14 @@ void xpcc::gui::StringRocker::next()
 
 }
 
-void xpcc::gui::StringRocker::previous()
+void
+xpcc::gui::StringRocker::previous()
 {
 	if(string_id <= start)
 	{
 		string_id = end;
-	} else {
+	}
+	else {
 		string_id--;
 	}
 
@@ -46,21 +49,24 @@ void xpcc::gui::StringRocker::previous()
 
 }
 
-void xpcc::gui::StringRocker::activate(const InputEvent& ev, void* data)
+void
+xpcc::gui::StringRocker::activate(const InputEvent& ev, void* data)
 {
 	(void) data;
 
 	this->handleInputEvent(&ev);
 }
 
-void xpcc::gui::StringRocker::deactivate(const InputEvent& ev, void* data)
+void
+xpcc::gui::StringRocker::deactivate(const InputEvent& ev, void* data)
 {
 	(void) data;
 
 	this->handleInputEvent(&ev);
 }
 
-void xpcc::gui::StringRocker::next_cb(const InputEvent& ev, Widget* w, void* data)
+void
+xpcc::gui::StringRocker::next_cb(const InputEvent& ev, Widget* w, void* data)
 {
 	(void) ev;
 	(void) data;
@@ -70,7 +76,8 @@ void xpcc::gui::StringRocker::next_cb(const InputEvent& ev, Widget* w, void* dat
 	rocker->next();
 }
 
-void xpcc::gui::StringRocker::previous_cb(const InputEvent& ev, Widget* w, void* data)
+void
+xpcc::gui::StringRocker::previous_cb(const InputEvent& ev, Widget* w, void* data)
 {
 	(void) ev;
 	(void) data;

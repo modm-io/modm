@@ -29,10 +29,9 @@ static int16_t uid_global = 0;
 
 class View;
 
-class Widget {
-
+class Widget
+{
 public:
-
 	Widget(Dimension dimension, bool is_interactive) :
 		parent(NULL),
 		dimension(dimension),
@@ -52,7 +51,9 @@ public:
 	}
 
 	virtual
-	~Widget() {}
+	~Widget()
+	{
+	}
 
 	/**
 	 * Draws the widget on screen. Each widget need to implement this.
@@ -67,13 +68,13 @@ public:
 	void
 	draw(View *view)
 	{
-
 		// render widget on screen
 		this->render(view);
 		this->markDrawn();
 
 		// if there are widgets on top, redraw them
-		if(this->hasIntersections()) {
+		if(this->hasIntersections())
+		{
 			for(auto iter = this->intersecting_widgets.begin(); iter != this->intersecting_widgets.end(); ++iter)
 			{
 				(*iter)->draw(view);
@@ -113,29 +114,29 @@ public:
 	 * Interface for activating widget. Calls callback function if specified.
 	 */
 	virtual void
-	activate(const InputEvent& ev, void* data) {
-
+	activate(const InputEvent& ev, void* data)
+	{
 		this->activated = true;
 		this->dirty = true;
 
 		// call callback when set
 		if(cb_activate != NULL)
 			this->cb_activate(ev, this, data);
-	};
+	}
 
 	/**
 	 * Interface for deactivating widget. Calls callback function if specified.
 	 */
 	virtual void
-	deactivate(const InputEvent& ev, void* data) {
-
+	deactivate(const InputEvent& ev, void* data)
+	{
 		this->activated = false;
 		this->dirty = true;
 
 		// call callback when set
 		if(cb_deactivate != NULL)
 			this->cb_deactivate(ev, this, data);
-	};
+	}
 
 	/**
 	 * Get widget-specific color palette. NOT YET USED
@@ -358,14 +359,12 @@ public:
 
 	// list of widgets that intersect with this widget
 	WidgetContainer intersecting_widgets;
-
 };
 
 
-class WidgetGroup : public Widget {
-
+class WidgetGroup : public Widget
+{
 public:
-
 	WidgetGroup(Dimension d) :
 		Widget(d, true),
 		widgets()
@@ -420,7 +419,6 @@ public:
 	void
 	updatePosition()
 	{
-
 		this->position = this->getRelativePosition();
 
 		Widget* w = this;

@@ -19,10 +19,9 @@ namespace xpcc
 namespace gui
 {
 
-class StringField : public Widget {
-
+class StringField : public Widget
+{
 public:
-
 	StringField(const char* value, Dimension d) :
 		Widget(d, false),
 		value(value)

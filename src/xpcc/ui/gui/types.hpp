@@ -41,16 +41,18 @@ typedef xpcc::DynamicArray<Widget*> WidgetContainer;
 typedef void (*genericCallback)(void*);
 
 // Input event that is collected when some input happens. Will be proccessed by View
-class InputEvent {
-
+class InputEvent
+{
 public:
 
-	enum class Type {
+	enum class
+	Type {
 		BUTTON,
 		TOUCH
 	};
 
-	enum class Direction {
+	enum class
+	Direction {
 		UP,
 		DOWN
 	};
@@ -62,7 +64,9 @@ public:
 	{
 	}
 
-	InputEvent() {}
+	InputEvent()
+	{
+	}
 
 	Type type;
 	Direction direction;
@@ -85,23 +89,21 @@ public:
 		timeout(delayMilliseconds),
 		already_run(false)
 	{
-
 	}
 
 	bool is_expired()
 	{
-		if(timeout.isExpired()) {
-			if(!already_run && ( cb != NULL )) {
+		if(timeout.isExpired())
+		{
+			if(!already_run && ( cb != NULL ))
+			{
 				already_run = true;
 				cb(cb_data);
 			}
-
 			return true;
-
-		} else {
-
+		}
+		else {
 			return false;
-
 		}
 	}
 
@@ -119,8 +121,13 @@ typedef xpcc::Queue<InputEvent*, xpcc::LinkedList<InputEvent*> > inputQueue;
 // Callback when an event happend
 typedef void (*eventCallback)(const InputEvent&, Widget*, void*);
 
-typedef struct Dimension {
-	Dimension(int16_t w, int16_t h) : width(w), height(h) {}
+typedef struct Dimension
+{
+	Dimension(int16_t w, int16_t h) :
+		width(w), height(h)
+	{
+	}
+
 	int16_t width, height;
 	bool operator == (const Dimension& other) const
 	{

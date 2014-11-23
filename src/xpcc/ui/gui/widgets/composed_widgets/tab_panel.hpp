@@ -20,8 +20,8 @@ namespace xpcc
 namespace gui
 {
 
-class TabPanel : public WidgetGroup {
-
+class TabPanel : public WidgetGroup
+{
 public:
 	TabPanel(Dimension d, float verticalRatio = 0.2) :
 		WidgetGroup(d),
@@ -41,7 +41,6 @@ public:
 
 	void
 	packTabRight(Widget* w);
-
 
 public:
 	const Dimension panelDimension;

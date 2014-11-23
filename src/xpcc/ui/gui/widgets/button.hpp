@@ -19,10 +19,9 @@ namespace xpcc
 namespace gui
 {
 
-class ButtonWidget : public Widget {
-
+class ButtonWidget : public Widget
+{
 public:
-
 	ButtonWidget(const char* lbl, Dimension d) :
 		Widget(d, true),
 		label(lbl)
@@ -43,8 +42,8 @@ private:
 };
 
 
-class ArrowButton : public Widget {
-
+class ArrowButton : public Widget
+{
 public:
 	ArrowButton(bool orientation, Dimension d) :
 		Widget(d, true),
@@ -58,13 +57,11 @@ public:
 private:
 	// Orientation of the arrow. false: left | true: right
 	bool orientation;
-
-
 };
 
 
-class FilledAreaButton : public Widget {
-
+class FilledAreaButton : public Widget
+{
 public:
 	FilledAreaButton(xpcc::glcd::Color color, Dimension d) :
 		Widget(d, true),
@@ -83,7 +80,6 @@ public:
 
 private:
 	xpcc::glcd::Color color;
-
 };
 
 }	// namespace gui

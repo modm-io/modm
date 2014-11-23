@@ -33,19 +33,18 @@ namespace gui
 * \ingroup	display_menu
 * \author	Thorsten Lajewski
 */
-
 class GuiViewStack : public xpcc::ViewStack
 {
 public:
 	GuiViewStack(xpcc::GraphicDisplay* display, xpcc::gui::inputQueue* queue);
 
-	virtual ~GuiViewStack();
+	virtual
+	~GuiViewStack();
 
 	/**
 	 * @brief get the top view from the stack
 	 * @return pointer to view from stack
 	 */
-
 	inline xpcc::gui::View*
 	get()
 	{
@@ -82,7 +81,6 @@ public:
 	 * @brief pop remove top view from the stack. The removed
 	 *        view is deleted
 	 */
-
 	void
 	pop();
 
