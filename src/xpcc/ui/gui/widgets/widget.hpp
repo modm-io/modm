@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef WIDGET_HPP_
-#define WIDGET_HPP_
+#ifndef XPCC_GUI_WIDGET_HPP
+#define XPCC_GUI_WIDGET_HPP
 
 #include <xpcc/ui/display/graphic_display.hpp>
 #include <xpcc/ui/gui/colorpalette.hpp>
@@ -442,4 +442,4 @@ protected:
 }
 }
 
-#endif /* WIDGET_HPP_ */
+#endif  // XPCC_GUI_WIDGET_HPP

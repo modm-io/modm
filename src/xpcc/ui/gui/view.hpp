@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__GUI_ABSTRACT_VIEW_HPP
-#define XPCC__GUI_ABSTRACT_VIEW_HPP
+#ifndef XPCC_GUI_VIEW_HPP
+#define XPCC_GUI_VIEW_HPP
 
 #include "../display/graphic_display.hpp"
 
@@ -115,4 +115,4 @@ namespace gui
 }
 }
 
-#endif // XPCC__GUI_ABSTRACT_VIEW_HPP
+#endif  // XPCC_GUI_VIEW_HPP

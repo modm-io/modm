@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef CHECKBOX_HPP_
-#define CHECKBOX_HPP_
+#ifndef XPCC_GUI_CHECKBOX_HPP
+#define XPCC_GUI_CHECKBOX_HPP
 
 #include "widget.hpp"
 
@@ -48,4 +48,4 @@ private:
 }
 }
 
-#endif /* CHECKBOX_HPP_ */
+#endif  // XPCC_GUI_CHECKBOX_HPP

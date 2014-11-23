@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef LABEL_HPP_
-#define LABEL_HPP_
+#ifndef XPCC_GUI_LABEL_HPP
+#define XPCC_GUI_LABEL_HPP
 
 #include "widget.hpp"
 
@@ -91,4 +91,4 @@ private:
 }
 }
 
-#endif /* LABEL_HPP_ */
+#endif  // XPCC_GUI_LABEL_HPP

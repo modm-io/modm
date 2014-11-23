@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef WIDGETS_HPP_
-#define WIDGETS_HPP_
+#ifndef XPCC_GUI_WIDGETS_HPP
+#define XPCC_GUI_WIDGETS_HPP
 
 #include "widgets/widget.hpp"
 #include "widgets/button.hpp"
@@ -20,4 +20,4 @@
 #include "widgets/composed_widgets/tab_panel.hpp"
 #include "widgets/composed_widgets/stringrocker.hpp"
 
-#endif /* WIDGETS_HPP_ */
+#endif  // XPCC_GUI_WIDGETS_HPP

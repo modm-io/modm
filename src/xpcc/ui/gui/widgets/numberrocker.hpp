@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef INTEGEROCKER_HPP_
-#define INTEGEROCKER_HPP_
+#ifndef XPCC_GUI_NUMBERROCKER_HPP
+#define XPCC_GUI_NUMBERROCKER_HPP
 
 #include "widget.hpp"
 #include "button.hpp"
@@ -82,4 +82,4 @@ typedef NumberRocker<float> FloatRocker;
 
 #include "numberrocker_impl.hpp"
 
-#endif /* INTEGEROCKER_HPP_ */
+#endif  // XPCC_GUI_NUMBERROCKER_HPP

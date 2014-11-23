@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef TAB_PANE_HPP_
-#define TAB_PANE_HPP_
+#ifndef XPCC_GUI_TAB_PANE_HPP
+#define XPCC_GUI_TAB_PANE_HPP
 
 #include <xpcc/debug/logger.hpp>
 
@@ -51,4 +51,4 @@ public:
 }
 }
 
-#endif /* TAB_PANE_HPP_ */
+#endif  // XPCC_GUI_TAB_PANE_HPP

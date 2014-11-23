@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef STRINGROCKER_HPP_
-#define STRINGROCKER_HPP_
+#ifndef XPCC_GUI_STRINGROCKER_HPP
+#define XPCC_GUI_STRINGROCKER_HPP
 
 #include "../widget.hpp"
 #include "../button.hpp"
@@ -93,4 +93,4 @@ private:
 }
 }
 
-#endif /* STRINGROCKER_HPP_ */
+#endif  // XPCC_GUI_STRINGROCKER_HPP

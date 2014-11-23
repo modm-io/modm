@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef INTEGERFIELD_HPP_
-#define INTEGERFIELD_HPP_
+#ifndef XPCC_GUI_NUMBERFIELD_HPP
+#define XPCC_GUI_NUMBERFIELD_HPP
 
 #include "widget.hpp"
 
@@ -67,4 +67,4 @@ public:
 
 #include "numberfield_impl.hpp"
 
-#endif /* INTEGERFIELD_HPP_ */
+#endif  // XPCC_GUI_NUMBERFIELD_HPP

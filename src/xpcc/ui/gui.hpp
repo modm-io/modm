@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef GUI_H_
-#define GUI_H_
+#ifndef XPCC_GUI_HPP
+#define XPCC_GUI_HPP
 
 /*
  * Include this file to use GUI framework in xpcc
@@ -21,4 +21,4 @@
 #include "gui/widgets.hpp"
 
 
-#endif /* GUI_H_ */
+#endif  // XPCC_GUI_HPP

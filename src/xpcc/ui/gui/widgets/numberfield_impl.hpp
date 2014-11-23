@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef INTEGERFIELD_HPP_
-	#error	"Don't include this file directly, use 'button_group.hpp' instead!"
+#ifndef XPCC_GUI_NUMBERFIELD_HPP
+#   error	"Don't include this file directly, use 'numberfield.hpp' instead!"
 #endif
 
 template<typename T>

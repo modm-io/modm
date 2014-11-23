@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef TYPES_HPP_
-#define TYPES_HPP_
+#ifndef XPCC_GUI_TYPES_HPP
+#define XPCC_GUI_TYPES_HPP
 
 #include <xpcc/ui/display.hpp>
 #include <xpcc/container/dynamic_array.hpp>
@@ -132,4 +132,4 @@ namespace gui {
 }
 }
 
-#endif /* TYPES_HPP_ */
+#endif  // XPCC_GUI_TYPES_HPP

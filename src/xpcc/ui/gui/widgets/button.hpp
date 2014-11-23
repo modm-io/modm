@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef BUTTON_HPP_
-#define BUTTON_HPP_
+#ifndef XPCC_GUI_BUTTON_HPP
+#define XPCC_GUI_BUTTON_HPP
 
 #include <xpcc/ui/display/font.hpp>
 #include "widget.hpp"
@@ -87,4 +87,4 @@ private:
 }
 }
 
-#endif /* BUTTON_HPP_ */
+#endif  // XPCC_GUI_BUTTON_HPP

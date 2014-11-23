@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef STRINGFIELD_HPP_
-#define STRINGFIELD_HPP_
+#ifndef XPCC_GUI_STRINGFIELD_HPP
+#define XPCC_GUI_STRINGFIELD_HPP
 
 #include "widget.hpp"
 #include "label.hpp"
@@ -52,4 +52,4 @@ private:
 }
 }
 
-#endif /* STRINGFIELD_HPP_ */
+#endif  // XPCC_GUI_STRINGFIELD_HPP

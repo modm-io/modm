@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef COLORPALETTE_HPP_
-#define COLORPALETTE_HPP_
+#ifndef XPCC_GUI_COLORPALETTE_HPP
+#define XPCC_GUI_COLORPALETTE_HPP
 
 #include <xpcc/ui/display/graphic_display.hpp>
 
@@ -60,4 +60,4 @@ namespace gui {
 }
 }
 
-#endif /* COLORPALETTE_HPP_ */
+#endif  // XPCC_GUI_COLORPALETTE_HPP

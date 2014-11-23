@@ -7,11 +7,9 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef INTEGEROCKER_HPP_
-	#error	"Don't include this file directly, use 'button_group.hpp' instead!"
+#ifndef XPCC_GUI_NUMBERROCKER_HPP
+#   error	"Don't include this file directly, use 'numberrocker.hpp' instead!"
 #endif
-
-#include "numberrocker.hpp"
 
 template<typename T>
 void xpcc::gui::NumberRocker<T>::increase()
