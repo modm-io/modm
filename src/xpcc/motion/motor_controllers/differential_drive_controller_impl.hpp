@@ -126,6 +126,35 @@ DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, 
 {
 	controlStrategy = ControlStrategy::None;
 	calibrationInProgress = false;
+	// start with enabled motors
+	MotorLeft::enable();
+	MotorRight::enable();
+}
+
+// ----------------------------------------------------------------------------
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+void
+DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::enable()
+{
+	// enable motors
+	MotorLeft::enable();
+	MotorRight::enable();
+	// change control strategy
+	xpcc::atomic::Lock lock;
+	controlStrategy = ControlStrategy::None;
+}
+
+// ----------------------------------------------------------------------------
+template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
+void
+DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::disable()
+{
+	// disable motors
+	MotorLeft::disable();
+	MotorRight::disable();
+	// change control strategy
+	xpcc::atomic::Lock lock;
+	controlStrategy = ControlStrategy::None;
 }
 
 // ----------------------------------------------------------------------------
@@ -154,6 +183,7 @@ template <typename Configuration, typename MotorLeft, typename MotorRight, typen
 void
 DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::setPwm(int16_t pwmLeft, int16_t pwmRight)
 {
+	xpcc::atomic::Lock lock;
 	controlStrategy = ControlStrategy::Pwm;
 	pwmTargetLeft = pwmLeft;
 	pwmTargetRight = pwmRight;
@@ -283,8 +313,6 @@ DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, 
 	switch (controlStrategy)
 	{
 		case ControlStrategy::None:
-			MotorLeft::disable();
-			MotorRight::disable();
 			break;
 		case ControlStrategy::Pwm:
 			MotorLeft::setPwm(pwmLeft);
@@ -363,16 +391,6 @@ DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, 
 
 	driftWheelsFilterForward.update( static_cast<float>(std::abs(odoSum)) < std::abs(vTarget)*0.04f );
 	driftWheelsFilterAngle.update( static_cast<float>(std::abs(odoDiff)) < std::abs(omegaTarget)*0.04f );
-}
-
-// ----------------------------------------------------------------------------
-template <typename Configuration, typename MotorLeft, typename MotorRight, typename OdometryLeft, typename OdometryRight>
-void
-DifferentialDriveController<Configuration, MotorLeft, MotorRight, OdometryLeft, OdometryRight>::disable()
-{
-	// disable interrupts
-	xpcc::atomic::Lock lock;
-	controlStrategy = ControlStrategy::None;
 }
 
 // ----------------------------------------------------------------------------

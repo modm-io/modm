@@ -32,6 +32,12 @@ public:
 	}
 
 	static inline void
+	enable()
+	{
+		Motor::enable();
+	}
+
+	static inline void
 	disable()
 	{
 		Motor::disable();

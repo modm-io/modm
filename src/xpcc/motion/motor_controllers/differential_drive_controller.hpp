@@ -75,7 +75,10 @@ public:
 public:
 	static void
 	initialize();
-	
+
+	static void
+	enable();
+
 	static void
 	disable();
 	
