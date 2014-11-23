@@ -2,6 +2,7 @@
 <!DOCTYPE rca SYSTEM "../devicefile.dtd">
 <rca version="1.0">
   <device platform="hosted" family="darwin">
+    <driver type="can" name="hosted"/>
     <driver type="uart" name="hosted"/>
   </device>
 </rca>
