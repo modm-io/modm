@@ -50,38 +50,28 @@ xpcc::gui::StringRocker::previous()
 }
 
 void
-xpcc::gui::StringRocker::activate(const InputEvent& ev, void* data)
+xpcc::gui::StringRocker::activate(const InputEvent& ev, void* /*data*/)
 {
-	(void) data;
-
 	this->handleInputEvent(&ev);
 }
 
 void
-xpcc::gui::StringRocker::deactivate(const InputEvent& ev, void* data)
+xpcc::gui::StringRocker::deactivate(const InputEvent& ev, void* /*data*/)
 {
-	(void) data;
-
 	this->handleInputEvent(&ev);
 }
 
 void
-xpcc::gui::StringRocker::next_cb(const InputEvent& ev, Widget* w, void* data)
+xpcc::gui::StringRocker::next_cb(const InputEvent& /*ev*/, Widget* w, void* /*data*/)
 {
-	(void) ev;
-	(void) data;
-
 	StringRocker *rocker = static_cast<StringRocker*>(w->parent);
 
 	rocker->next();
 }
 
 void
-xpcc::gui::StringRocker::previous_cb(const InputEvent& ev, Widget* w, void* data)
+xpcc::gui::StringRocker::previous_cb(const InputEvent& /*ev*/, Widget* w, void* /*data*/)
 {
-	(void) ev;
-	(void) data;
-
 	StringRocker *rocker = static_cast<StringRocker*>(w->parent);
 
 	rocker->previous();

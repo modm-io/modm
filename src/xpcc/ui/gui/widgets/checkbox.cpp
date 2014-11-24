@@ -50,11 +50,8 @@ xpcc::gui::CheckboxWidget::render(View* view)
 }
 
 void
-xpcc::gui::CheckboxWidget::click_cb(const InputEvent& ev, Widget* w, void* data)
+xpcc::gui::CheckboxWidget::click_cb(const InputEvent& /*ev*/, Widget* w, void* /*data*/)
 {
-	(void) ev;
-	(void) data;
-
 	auto checkbox = static_cast<CheckboxWidget*>(w);
 
 	checkbox->setState(!checkbox->getState());

@@ -41,29 +41,22 @@ xpcc::gui::NumberRocker<T>::decrease()
 
 template<typename T>
 void
-xpcc::gui::NumberRocker<T>::activate(const InputEvent& ev, void* data)
+xpcc::gui::NumberRocker<T>::activate(const InputEvent& ev, void* /*data*/)
 {
-	(void) data;
-
 	this->handleInputEvent(&ev);
 }
 
 template<typename T>
 void
-xpcc::gui::NumberRocker<T>::deactivate(const InputEvent& ev, void* data)
+xpcc::gui::NumberRocker<T>::deactivate(const InputEvent& ev, void* /*data*/)
 {
-	(void) data;
-
 	this->handleInputEvent(&ev);
 }
 
 template<typename T>
 void
-xpcc::gui::NumberRocker<T>::increase_cb(const InputEvent& ev, Widget* w, void* data)
+xpcc::gui::NumberRocker<T>::increase_cb(const InputEvent& /*ev*/, Widget* w, void* /*data*/)
 {
-	(void) ev;
-	(void) data;
-
 	NumberRocker *rocker = static_cast<NumberRocker*>(w->parent);
 
 	rocker->increase();
@@ -71,11 +64,8 @@ xpcc::gui::NumberRocker<T>::increase_cb(const InputEvent& ev, Widget* w, void* d
 
 template<typename T>
 void
-xpcc::gui::NumberRocker<T>::decrease_cb(const InputEvent& ev, Widget* w, void* data)
+xpcc::gui::NumberRocker<T>::decrease_cb(const InputEvent& /*ev*/, Widget* w, void* /*data*/)
 {
-	(void) ev;
-	(void) data;
-
 	NumberRocker *rocker = static_cast<NumberRocker*>(w->parent);
 
 	rocker->decrease();
