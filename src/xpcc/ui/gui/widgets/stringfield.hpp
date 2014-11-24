@@ -19,6 +19,10 @@ namespace xpcc
 namespace gui
 {
 
+/**
+ * @ingroup	gui
+ * @author	Daniel Krebs
+ */
 class StringField : public Widget
 {
 public:

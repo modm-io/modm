@@ -22,7 +22,6 @@ namespace gui
 /*
  * TODO: find a way so that color options can be defined in user program
  */
-
 enum
 Color {
 	BLACK,

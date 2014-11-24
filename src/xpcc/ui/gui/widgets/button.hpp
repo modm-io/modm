@@ -19,6 +19,10 @@ namespace xpcc
 namespace gui
 {
 
+/**
+ * @ingroup	gui
+ * @author	Daniel Krebs
+ */
 class ButtonWidget : public Widget
 {
 public:
@@ -41,7 +45,10 @@ private:
 	const char *label;
 };
 
-
+/**
+ * @ingroup	gui
+ * @author	Daniel Krebs
+ */
 class ArrowButton : public Widget
 {
 public:
@@ -59,7 +66,10 @@ private:
 	bool orientation;
 };
 
-
+/**
+ * @ingroup	gui
+ * @author	Daniel Krebs
+ */
 class FilledAreaButton : public Widget
 {
 public:

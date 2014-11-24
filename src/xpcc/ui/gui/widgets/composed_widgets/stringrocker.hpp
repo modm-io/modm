@@ -20,6 +20,10 @@ namespace xpcc
 namespace gui
 {
 
+/**
+ * @ingroup	gui
+ * @author	Daniel Krebs
+ */
 class StringRocker : public WidgetGroup
 {
 	typedef const char* (*toString)(uint32_t);

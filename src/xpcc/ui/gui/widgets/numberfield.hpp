@@ -18,6 +18,10 @@ namespace xpcc
 namespace gui
 {
 
+/**
+ * @ingroup	gui
+ * @author	Daniel Krebs
+ */
 template<typename T>
 class NumberField : public Widget
 {

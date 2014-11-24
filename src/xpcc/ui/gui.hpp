@@ -7,11 +7,11 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_GUI_HPP
-#define XPCC_GUI_HPP
-
-/*
- * Include this file to use GUI framework in xpcc
+/**
+ * @defgroup	gui		Graphical User Interface
+ * @brief		Various classes for creating GUI applications.
+ *
+ * @ingroup		ui
  */
 
 #include "gui/types.hpp"
@@ -19,6 +19,3 @@
 #include "gui/view_stack.hpp"
 #include "gui/view.hpp"
 #include "gui/widgets.hpp"
-
-
-#endif  // XPCC_GUI_HPP

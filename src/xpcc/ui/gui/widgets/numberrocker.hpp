@@ -20,6 +20,10 @@ namespace xpcc
 namespace gui
 {
 
+/**
+ * @ingroup	gui
+ * @author	Daniel Krebs
+ */
 template<typename T = int16_t>
 class NumberRocker : public WidgetGroup
 {

@@ -29,6 +29,10 @@ static int16_t uid_global = 0;
 
 class View;
 
+/**
+ * @ingroup	gui
+ * @author	Daniel Krebs
+ */
 class Widget
 {
 public:
@@ -55,9 +59,7 @@ public:
 	{
 	}
 
-	/**
-	 * Draws the widget on screen. Each widget need to implement this.
-	 */
+	/// Draws the widget on screen. Each widget need to implement this.
 	virtual void
 	render(View* view) = 0;
 
@@ -104,15 +106,11 @@ public:
 	void
 	updateIntersections(WidgetContainer *widgets);
 
-	/**
-	 * Whether there are other widgets overlapping this one *on top*
-	 */
+	/// Whether there are other widgets overlapping this one *on top*
 	bool
 	hasIntersections();
 
-	/**
-	 * Interface for activating widget. Calls callback function if specified.
-	 */
+	/// Interface for activating widget. Calls callback function if specified.
 	virtual void
 	activate(const InputEvent& ev, void* data)
 	{
@@ -124,9 +122,7 @@ public:
 			this->cb_activate(ev, this, data);
 	}
 
-	/**
-	 * Interface for deactivating widget. Calls callback function if specified.
-	 */
+	/// Interface for deactivating widget. Calls callback function if specified.
 	virtual void
 	deactivate(const InputEvent& ev, void* data)
 	{
@@ -138,18 +134,14 @@ public:
 			this->cb_deactivate(ev, this, data);
 	}
 
-	/**
-	 * Get widget-specific color palette. NOT YET USED
-	 */
+	/// Get widget-specific color palette. NOT YET USED
 	ColorPalette&
 	getColorPalette()
 	{
 		return this->color_palette;
 	}
 
-	/**
-	 * Set widget-specific color palette.
-	 */
+	/// Set widget-specific color palette.
 	virtual void
 	setColorPalette(ColorPalette& cp)
 	{
@@ -176,27 +168,21 @@ public:
 		this->updatePosition();
 	}
 
-	/**
-	 * Get absolute position of widget on screen.
-	 */
+	/// Get absolute position of widget on screen.
 	inline xpcc::glcd::Point
 	getPosition()
 	{
 		return this->position;
 	}
 
-	/**
-	 * Get position of widget relative to its parent.
-	 */
+	/// Get position of widget relative to its parent.
 	inline xpcc::glcd::Point
 	getRelativePosition()
 	{
 		return this->relative_position;
 	}
 
-	/**
-	 * Only set the relative position.
-	 */
+	/// Only set the relative position.
 	inline void
 	setRelativePosition(const xpcc::glcd::Point& pos)
 	{
@@ -221,9 +207,7 @@ public:
 		}
 	}
 
-	/**
-	 * Set parent for widget, updates the absolute position afterwards.
-	 */
+	/// Set parent for widget, updates the absolute position afterwards.
 	inline void
 	setParent(Widget* parent)
 	{
@@ -231,81 +215,63 @@ public:
 		this->updatePosition();
 	}
 
-	/**
-	 * Get dimension of widget.
-	 */
+	/// Get dimension of widget.
 	inline xpcc::gui::Dimension
 	getDimension()
 	{
 		return this->dimension;
 	}
 
-	/**
-	 * Get width of widget. Shortcut for getDimension().width
-	 */
+	/// Get width of widget. Shortcut for getDimension().width
 	inline int16_t
 	getWidth()
 	{
 		return this->dimension.width;
 	}
 
-	/**
-	 * Get height of widget. Shortcut for getDimension().height
-	 */
+	/// Get height of widget. Shortcut for getDimension().height
 	inline int16_t
 	getHeight()
 	{
 		return this->dimension.height;
 	}
 
-	/**
-	 * Whether widget needs to be redrawn or not.
-	 */
+	/// Whether widget needs to be redrawn or not.
 	virtual bool
 	isDirty()
 	{
 		return this->dirty;
 	}
 
-	/**
-	 * Whether widget can handle input events.
-	 */
+	/// Whether widget can handle input events.
 	bool
 	isInteractive()
 	{
 		return this->is_interactive;
 	}
 
-	/**
-	 * Mark widget, that it doesn't need to be redrawn anymore.
-	 */
+	/// Mark widget, that it doesn't need to be redrawn anymore.
 	virtual void
 	markDrawn()
 	{
 		this->dirty = false;
 	}
 
-	/**
-	 * Mark widget, that it needs to be redrawn.
-	 */
+	/// Mark widget, that it needs to be redrawn.
 	virtual void
 	markDirty()
 	{
 		this->dirty = true;
 	}
 
-	/**
-	 * Set widget-specific font. Use xpcc::font::FontName as argument.
-	 */
+	/// Set widget-specific font. Use xpcc::font::FontName as argument.
 	virtual void
 	setFont(const uint8_t *newFont)
 	{
 		this->font = xpcc::accessor::asFlash(newFont);
 	}
 
-	/**
-	 * Set widget-specific font. Use pointer to Flash as argument.
-	 */
+	/// Set widget-specific font. Use pointer to Flash as argument.
 	virtual void
 	setFont(const xpcc::accessor::Flash<uint8_t> *font)
 	{
@@ -319,49 +285,52 @@ public:
 	}
 
 public:
-	// Parent widget, NULL when there's no parent
+	/// Parent widget, NULL when there's no parent
 	Widget *parent;
 
 public:
-	// Unique id for every widget
+	/// Unique id for every widget
 	int16_t uid;
 
-	// dimensions
+	/// dimensions
 	Dimension dimension;
 
-	// where this widget is active or not (e.g. clicked)
+	/// where this widget is active or not (e.g. clicked)
 	bool activated;
 
-	// arbitrary data that is passed to callbacks
+	/// arbitrary data that is passed to callbacks
 	void* cbData;
 
-	// callbacks for activation and deactivation event
+	/// callbacks for activation and deactivation event
 	eventCallback cb_activate, cb_deactivate;
 
-	// for now unused, maybe needed later for custom styles
+	/// for now unused, maybe needed later for custom styles
 	ColorPalette color_palette;
 
-	// position on screen (used for rendering), may be recomputed based on
-	// relative position
+	/// position on screen (used for rendering), may be recomputed based on
+	/// relative position
 	xpcc::glcd::Point position;
 
-	// relative position inside a WidgetGroup for exemple
+	/// relative position inside a WidgetGroup for exemple
 	xpcc::glcd::Point relative_position;
 
-	// has changes to be drawed
+	/// has changes to be drawed
 	bool dirty;
 
-	// whether widget will receive events
+	/// whether widget will receive events
 	bool is_interactive;
 
-	// widget specific font
+	/// widget specific font
 	xpcc::accessor::Flash<uint8_t> font;
 
-	// list of widgets that intersect with this widget
+	/// list of widgets that intersect with this widget
 	WidgetContainer intersecting_widgets;
 };
 
-
+/**
+ * @ingroup	gui
+ * @author	Daniel Krebs
+ */
 class WidgetGroup : public Widget
 {
 public:
@@ -371,7 +340,7 @@ public:
 	{
 	}
 
-	// packs widgets inside WidgetGroup (relative coordinates!)
+	/// packs widgets inside WidgetGroup (relative coordinates!)
 	bool
 	pack(Widget* w, const xpcc::glcd::Point &coord);
 

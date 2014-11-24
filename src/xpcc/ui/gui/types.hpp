@@ -35,12 +35,17 @@ class View;
 class Widget;
 
 
-// Container used in view to store widgets
+/// Container used in view to store widgets
 typedef xpcc::DynamicArray<Widget*> WidgetContainer;
 
 typedef void (*genericCallback)(void*);
 
-// Input event that is collected when some input happens. Will be proccessed by View
+/**
+ * Input event that is collected when some input happens. Will be processed by View
+ *
+ * @ingroup	gui
+ * @author	Daniel Krebs
+ */
 class InputEvent
 {
 public:
@@ -79,6 +84,9 @@ public:
  *
  * is_expired() must be called repeatedly for the callback to get called. It is
  * garantueed that the callback will only be called once.
+ *
+ * @ingroup	gui
+ * @author	Daniel Krebs
  */
 class AsyncEvent
 {
@@ -118,7 +126,7 @@ typedef xpcc::DoublyLinkedList<AsyncEvent*> AsyncEventList;
 
 typedef xpcc::Queue<InputEvent*, xpcc::LinkedList<InputEvent*> > inputQueue;
 
-// Callback when an event happend
+/// Callback when an event happend
 typedef void (*eventCallback)(const InputEvent&, Widget*, void*);
 
 typedef struct Dimension

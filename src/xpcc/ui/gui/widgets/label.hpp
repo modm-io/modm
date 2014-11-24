@@ -18,6 +18,10 @@ namespace xpcc
 namespace gui
 {
 
+/**
+ * @ingroup	gui
+ * @author	Daniel Krebs
+ */
 class Label : public Widget
 {
 public:
@@ -65,8 +69,9 @@ private:
 	void
 	updateDimension()
 	{
-		/* Update label dimension */
-		if(this->font.isValid()) {
+		// Update label dimension
+		if(this->font.isValid())
+		{
 			this->dimension.width = xpcc::GraphicDisplay::getStringWidth(this->label, &(this->font));
 			this->dimension.height = xpcc::GraphicDisplay::getFontHeight(&(this->font));
 		}
@@ -76,17 +81,6 @@ private:
 	const char* label;
 	xpcc::glcd::Color color;
 };
-
-//
-//class InteractiveLabel : public Label {
-//
-//public:
-//	InteractiveLabel(const char* lbl) :
-//		Label(lbl)
-//	{
-//		this->is_interactive = true;
-//	}
-//};
 
 }	// namespace gui
 

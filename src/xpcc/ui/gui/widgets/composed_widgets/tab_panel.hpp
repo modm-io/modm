@@ -20,6 +20,10 @@ namespace xpcc
 namespace gui
 {
 
+/**
+ * @ingroup	gui
+ * @author	Daniel Krebs
+ */
 class TabPanel : public WidgetGroup
 {
 public:

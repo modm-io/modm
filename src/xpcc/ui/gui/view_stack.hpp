@@ -24,15 +24,15 @@ namespace gui
 {
 
 /**
-* \brief Stack which handles the displaying
-*        of views on the graphic display.
-*
-* This class also deallocates the views passed
-* to the stack.
-*
-* \ingroup	display_menu
-* \author	Thorsten Lajewski
-*/
+ * Stack which handles the displaying
+ *        of views on the graphic display.
+ *
+ * This class also deallocates the views passed
+ * to the stack.
+ *
+ * @ingroup	gui
+ * @author	Thorsten Lajewski
+ */
 class GuiViewStack : public xpcc::ViewStack
 {
 public:
@@ -41,23 +41,16 @@ public:
 	virtual
 	~GuiViewStack();
 
-	/**
-	 * @brief get the top view from the stack
-	 * @return pointer to view from stack
-	 */
+	/// Get the top view from the stack
+	/// @return	pointer to view from stack
 	inline xpcc::gui::View*
 	get()
 	{
 		return this->stack.get();
 	}
 
-	/**
-	 * @brief push new view on top of stack the new
-	 *        view will be displayed instead of the old
-	 *        one
-	 *
-	 * @param view next displayed view
-	 */
+	/// Push new view on top of stack the new view
+	/// will be displayed instead of the old one.
 	inline void
 	push(xpcc::gui::View* view)
 	{
@@ -68,19 +61,15 @@ public:
 		this->display->update();
 	}
 
-	/**
-	 * @brief get event input queue from GuiViewStack
-	 */
+	/// Get event input queue from GuiViewStack
 	inline xpcc::gui::inputQueue*
 	getInputQueue()
 	{
 		return this->input_queue;
 	}
 
-	/**
-	 * @brief pop remove top view from the stack. The removed
-	 *        view is deleted
-	 */
+	/// Pop remove top view from the stack.
+	/// The removed view is deleted.
 	void
 	pop();
 

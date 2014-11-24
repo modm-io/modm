@@ -18,6 +18,10 @@ namespace xpcc
 namespace gui
 {
 
+/**
+ * @ingroup	gui
+ * @author	Daniel Krebs
+ */
 class CheckboxWidget : public Widget
 {
 public:

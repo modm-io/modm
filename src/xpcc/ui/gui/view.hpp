@@ -28,13 +28,11 @@ namespace gui
 class GuiViewStack;
 
 /**
- * @brief The View class is the base class for all screens
- *        handled by the ViewStack class
+ * The View class is the base class for all screens handled by the ViewStack class
  *
- *\author Thorsten Lajewski
- *\ingroup display_menu
+ * @ingroup	gui
+ * @author	Thorsten Lajewski
  */
-
 class View : public xpcc::AbstractView
 {
 	friend class GuiViewStack;
@@ -50,10 +48,8 @@ public:
 	virtual
 	~View() = 0;
 
-	/**
-	 * @brief May be called as often as possible. Handles input events
-	 *        located in the parent GuiViewStack
-	 */
+	/// May be called as often as possible.
+	/// Handles input events located in the parent GuiViewStack.
 	virtual void
 	update();
 
@@ -67,27 +63,19 @@ public:
 	{
 	}
 
-	/**
-	 * @brief draw determine the output on the Graphic Display
-	 */
+	/// Draw determine the output on the Graphic Display
 	virtual void
 	draw();
 
-	/**
-	 *  @brief add widget to view
-	 */
+	/// Add widget to view
 	bool
 	pack(Widget *w, const xpcc::glcd::Point &coord);
 
-	/**
-	 * @brief remove the view from the screen. The viewStack handles the deletion.
-	 */
+	/// Remove the view from the screen. The viewStack handles the deletion.
 	void
 	remove();
 
-	/**
-	 * @brief set color palette for every contained widget
-	 */
+	/// Set color palette for every contained widget
 	void
 	setColorPalette(ColorPalette& cp);
 
