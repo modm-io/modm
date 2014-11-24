@@ -1,5 +1,14 @@
-#ifndef TAB_PANE_HPP_
-#define TAB_PANE_HPP_
+// coding: utf-8
+/* Copyright (c) 2014, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef XPCC_GUI_TAB_PANE_HPP
+#define XPCC_GUI_TAB_PANE_HPP
 
 #include <xpcc/debug/logger.hpp>
 
@@ -7,12 +16,16 @@
 
 namespace xpcc
 {
+
 namespace gui
 {
 
-
-class TabPanel : public WidgetGroup {
-
+/**
+ * @ingroup	gui
+ * @author	Daniel Krebs
+ */
+class TabPanel : public WidgetGroup
+{
 public:
 	TabPanel(Dimension d, float verticalRatio = 0.2) :
 		WidgetGroup(d),
@@ -33,13 +46,13 @@ public:
 	void
 	packTabRight(Widget* w);
 
-
 public:
 	const Dimension panelDimension;
 	const Dimension buttonDimension;
 };
 
-}
-}
+}	// namespace gui
 
-#endif /* TAB_PANE_HPP_ */
+}	// namespace xpcc
+
+#endif  // XPCC_GUI_TAB_PANE_HPP

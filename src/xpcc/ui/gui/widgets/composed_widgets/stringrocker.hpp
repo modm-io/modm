@@ -1,21 +1,34 @@
-#ifndef STRINGROCKER_HPP_
-#define STRINGROCKER_HPP_
+// coding: utf-8
+/* Copyright (c) 2014, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef XPCC_GUI_STRINGROCKER_HPP
+#define XPCC_GUI_STRINGROCKER_HPP
 
 #include "../widget.hpp"
 #include "../button.hpp"
 #include "../stringfield.hpp"
 
-namespace xpcc {
+namespace xpcc
+{
 
-namespace gui {
+namespace gui
+{
 
-
-class StringRocker : public WidgetGroup {
-
+/**
+ * @ingroup	gui
+ * @author	Daniel Krebs
+ */
+class StringRocker : public WidgetGroup
+{
 	typedef const char* (*toString)(uint32_t);
 
 public:
-
 	StringRocker(uint32_t string_id, uint32_t start, uint32_t end, toString string_function, Dimension d) :
 		WidgetGroup(d),
 		string_id(string_id),
@@ -34,7 +47,6 @@ public:
 		this->pack(&button_next, xpcc::glcd::Point(d.width - d.height,0));
 		this->pack(&button_previous, xpcc::glcd::Point(0, 0));
 		this->pack(&string_field, xpcc::glcd::Point(d.height, 0));
-
 	}
 
 	void
@@ -52,9 +64,8 @@ public:
 	const char*
 	getValue()
 	{
-		if(string_function == NULL) {
+		if(string_function == NULL)
 			return "";
-		}
 
 		return string_function(string_id);
 	}
@@ -78,10 +89,10 @@ private:
 	toString string_function;
 	ArrowButton button_next, button_previous;
 	StringField string_field;
-
 };
 
-}
-}
+}	// namespace gui
 
-#endif /* STRINGROCKER_HPP_ */
+}	// namespace xpcc
+
+#endif  // XPCC_GUI_STRINGROCKER_HPP
