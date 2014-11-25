@@ -19,6 +19,9 @@ namespace xpcc
 namespace gui
 {
 
+class ColorPalette;
+extern ColorPalette DefaultColorPalette;
+
 /*
  * TODO: find a way so that color options can be defined in user program
  */
@@ -39,26 +42,59 @@ Color {
 	PALETTE_SIZE
 };
 
-
-typedef xpcc::glcd::Color ColorPalette [Color::PALETTE_SIZE];
-
-//	typedef xpcc::glcd::Color ColorPalette;
-//	typedef std::array<xpcc::glcd::Color, Color::PALETTE_SIZE> ColorPalette;
-
-
-/*
- * TODO: make DEFAULT_COLORPALETTE const or even better constexpr
- */
-extern ColorPalette DEFAULT_COLORPALETTE; //[xpcc::gui::Color::PALETTE_SIZE];
-
-static inline void
-copyColorPalette(ColorPalette& src, ColorPalette& dest)
+class ColorPalette
 {
-	for(int ii = 0; ii < Color::PALETTE_SIZE; ++ii)
+public:
+	ColorPalette(xpcc::glcd::Color colors[Color::PALETTE_SIZE]) :
+		colors(colors)
 	{
-		dest[ii] = src[ii];
+		*this = DefaultColorPalette;
 	}
-}
+
+	ColorPalette&
+	operator=(ColorPalette rhs)
+	{
+		for(int ii = 0; ii < Color::PALETTE_SIZE; ++ii)
+		{
+			colors[ii] = rhs.colors[ii];
+		}
+		return *this;
+	}
+
+	void
+	setColor(xpcc::glcd::Color color, Color name)
+	{
+		if (name < Color::PALETTE_SIZE)
+		{
+			colors[name] = color;
+		}
+	}
+
+	const xpcc::glcd::Color
+	getColor(Color name) const
+	{
+		if (name >= Color::PALETTE_SIZE)
+			return xpcc::glcd::Color(0xffff);
+		return colors[name];
+	}
+
+	const xpcc::glcd::Color
+	operator[](Color name)
+	{
+		if (name >= Color::PALETTE_SIZE)
+			return xpcc::glcd::Color(0xffff);
+		return colors[name];
+	}
+
+	const xpcc::glcd::Color*
+	getPointer() const
+	{
+		return colors;
+	}
+
+private:
+	xpcc::glcd::Color *colors;
+};
 
 }	// namespace gui
 
