@@ -19,6 +19,9 @@ namespace xpcc
 namespace gui
 {
 
+class ColorPalette;
+extern ColorPalette DefaultColorPalette;
+
 /*
  * TODO: find a way so that color options can be defined in user program
  */
@@ -96,8 +99,6 @@ public:
 private:
 	xpcc::glcd::Color *colors;
 };
-
-extern ColorPalette DEFAULT_COLORPALETTE;
 
 }	// namespace gui
 

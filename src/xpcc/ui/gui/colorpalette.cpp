@@ -24,4 +24,4 @@ xpcc::glcd::Color defaultColors[] = {
 	xpcc::glcd::Color::blue(),		// DEACTIVATED
 };
 
-xpcc::gui::ColorPalette xpcc::gui::DEFAULT_COLORPALETTE(defaultColors);
+xpcc::gui::ColorPalette xpcc::gui::DefaultColorPalette(defaultColors);
