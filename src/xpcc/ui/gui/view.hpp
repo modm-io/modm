@@ -101,7 +101,9 @@ protected:
 	xpcc::gui::GuiViewStack* stack;
 	Dimension dimension;
 	WidgetContainer widgets;
+
 	xpcc::gui::ColorPalette colorpalette;
+	xpcc::glcd::Color palette_colors[xpcc::gui::PALETTE_SIZE];
 };
 
 }	// namespace gui

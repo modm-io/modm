@@ -16,7 +16,7 @@ xpcc::gui::View::View(xpcc::gui::GuiViewStack* stack, uint8_t identifier, xpcc::
 	AbstractView(stack, identifier),
 	stack(stack),
 	dimension(dimension),
-	colorpalette(DEFAULT_COLORPALETTE)
+	colorpalette(palette_colors)
 
 {
 	this->setColorPalette(DEFAULT_COLORPALETTE);
@@ -130,8 +130,8 @@ void
 xpcc::gui::View::setColorPalette(ColorPalette& cp)
 {
 
-	copyColorPalette(cp, this->colorpalette);
-	this->display().setBackgroundColor(cp[Color::BACKGROUND]);
+	this->colorpalette = cp;
+	this->display().setBackgroundColor(cp.getColor(Color::BACKGROUND));
 
 	/*
 	 * widget specific color palette disabled for now, so this isn't really needed

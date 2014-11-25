@@ -43,7 +43,7 @@ public:
 		cbData(NULL),
 		cb_activate(NULL),
 		cb_deactivate(NULL),
-		color_palette(DEFAULT_COLORPALETTE),
+		color_palette(palette_colors),
 		position(xpcc::glcd::Point(-10,-10)),
 		relative_position(xpcc::glcd::Point(-10,-10)),
 		dirty(true),
@@ -145,14 +145,14 @@ public:
 	virtual void
 	setColorPalette(ColorPalette& cp)
 	{
-		copyColorPalette(cp, this->color_palette);
+		this->color_palette = cp;
 		this->markDirty();
 	}
 
 	void
-	setColor(xpcc::gui::Color color, xpcc::glcd::Color value)
+	setColor(xpcc::glcd::Color color, xpcc::gui::Color name)
 	{
-		this->color_palette[color] = value;
+		this->color_palette.setColor(color, name);
 		this->markDirty();
 	}
 
@@ -306,6 +306,7 @@ public:
 
 	/// for now unused, maybe needed later for custom styles
 	ColorPalette color_palette;
+	xpcc::glcd::Color palette_colors[xpcc::gui::PALETTE_SIZE];
 
 	/// position on screen (used for rendering), may be recomputed based on
 	/// relative position
