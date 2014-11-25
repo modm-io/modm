@@ -17,9 +17,7 @@ xpcc::gui::View::View(xpcc::gui::GuiViewStack* stack, uint8_t identifier, xpcc::
 	stack(stack),
 	dimension(dimension),
 	colorpalette(palette_colors)
-
 {
-	this->setColorPalette(DEFAULT_COLORPALETTE);
 	this->display().clear();
 }
 
@@ -32,7 +30,6 @@ xpcc::gui::View::~View()
 void
 xpcc::gui::View::update()
 {
-
 	preUpdate();
 
 	InputEvent* ev;
@@ -129,7 +126,6 @@ void xpcc::gui::View::draw()
 void
 xpcc::gui::View::setColorPalette(ColorPalette& cp)
 {
-
 	this->colorpalette = cp;
 	this->display().setBackgroundColor(cp.getColor(Color::BACKGROUND));
 
@@ -144,7 +140,6 @@ xpcc::gui::View::setColorPalette(ColorPalette& cp)
 		(*iter)->setColorPalette(cp);
 		(*iter)->markDirty();
 	}
-
 }
 
 void xpcc::gui::View::markDirty()

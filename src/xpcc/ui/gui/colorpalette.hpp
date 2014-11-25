@@ -48,11 +48,7 @@ public:
 	ColorPalette(xpcc::glcd::Color colors[Color::PALETTE_SIZE]) :
 		colors(colors)
 	{
-	}
-
-	ColorPalette(ColorPalette &palette) :
-		colors(palette.colors)
-	{
+		*this = DefaultColorPalette;
 	}
 
 	ColorPalette&
