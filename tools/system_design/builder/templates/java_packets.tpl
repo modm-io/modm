@@ -9,6 +9,8 @@ package {{ package }};
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 public class Packets
 {
 	/** Every packet has to implement this interface */
@@ -140,6 +142,7 @@ public class Packets
 	
 	{% if packet.description %}/** {{ packet.description | xpcc.wordwrap(72) | xpcc.indent(1) }} */{% endif %}
 	{%- if packet.isStruct %}
+	@XmlRootElement
 	public static {% if (not packet.extending) %}final {% endif %}class {{ packet.flattened().name | typeName }} extends {% if packet.extends %}{{ packet.extends.name | typeName }}{% else %}Struct{% endif %}
 	{// packet.isStruct
 		{%- for element in packet.iter() %}
