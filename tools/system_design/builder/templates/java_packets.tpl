@@ -29,7 +29,7 @@ public class Packets
 		 * @param buffer It must have enough space for this packet.
 		 * @return passed buffer
 		 * @see ByteBuffer#put(byte)*/
-		abstract ByteBuffer toBuffer(ByteBuffer buffer);
+		ByteBuffer toBuffer(ByteBuffer buffer);
 	}
 	
 	/** Base class for all struct types */
@@ -161,6 +161,17 @@ public class Packets
 		
 		public {{ packet.name | typeName }} () {
 		}
+
+		{%- if packet.elements.__len__()>0 %}
+		public {{ packet.name | typeName }} (
+				{%- for element in packet.iter() %}
+				{{ element.subtype.name | typeName }} {{ element.name | variableName }}{% if not loop.last %},{% endif %}
+				{%- endfor %}) {
+			{%- for element in packet.iter() %}
+			this.{{ element.name | variableName }} = {{ element.name | variableName }};
+			{%- endfor %}
+		}
+		{%- endif %}
 		
 		@Override
 		public {% if (not packet.extending) %} final {% endif %} int getSize() {
