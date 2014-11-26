@@ -18,6 +18,7 @@ public class MetaCommunication {
 		public String getName();
 		public String getDescription();
 		public T getParameterType();
+		public Component getComponent();
 
 		void execute(P packet);
 		void tryExecute(Packets.Packet packet);
@@ -26,6 +27,7 @@ public class MetaCommunication {
 	public class Component {
 		private final List<Action<?,?>> actions;
 		private String name;
+		@SuppressWarnings("unused")
 		private String description;
 		
 		public Component(String name, String description) {
@@ -65,7 +67,8 @@ public class MetaCommunication {
 				>>(
 				"{{ action.name }}",
 				"{%- if action.description -%}{{ action.description | inStringDescription }}{%- endif -%}",
-				{% if action.parameterType -%}MetaPackets.{{ action.parameterType.flattened().name | typeObjectName }}{%- else -%}MetaPackets.Void{%- endif -%}) {
+				{% if action.parameterType -%}MetaPackets.{{ action.parameterType.flattened().name | typeObjectName }}{%- else -%}MetaPackets.Void{%- endif -%},
+				c) {
 				@Override
 				public void execute(
 				{%- if action.parameterType %}Packets.{{ action.parameterType.flattened().name | typeObjectName }}{%- else %}Packets.Void{%- endif %} packet){
@@ -85,11 +88,13 @@ public class MetaCommunication {
 		private final String name;
 		private final String description;
 		private final T parameterType;
+		private final Component component;
 		
-		public MyAction(String name, String description, T parameterType) {
+		public MyAction(String name, String description, T parameterType, Component component) {
 			this.name = name;
 			this.description = description;
 			this.parameterType = parameterType;
+			this.component = component;
 		}
 
 		@Override
@@ -117,9 +122,17 @@ public class MetaCommunication {
 			if (packet == null)
 				throw new NullPointerException("Parameter is null.");
 			
+			if (packet.getClass() != parameterType.type)
+				throw new RuntimeException("Type of value does not match my Type!");
+			
 			@SuppressWarnings("unchecked")
 			P p = (P)packet;
 			execute(p);
+		}
+		
+		@Override
+		public Component getComponent() {
+			return component;
 		}
 	}
 	
