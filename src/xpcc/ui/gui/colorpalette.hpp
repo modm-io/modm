@@ -48,16 +48,17 @@ public:
 	ColorPalette(xpcc::glcd::Color colors[Color::PALETTE_SIZE]) :
 		colors(colors)
 	{
-		*this = DefaultColorPalette;
+	}
+
+	ColorPalette(ColorPalette &rhs = DefaultColorPalette) :
+		colors(rhs.colors)
+	{
 	}
 
 	ColorPalette&
-	operator=(ColorPalette rhs)
+	operator=(ColorPalette &rhs)
 	{
-		for(int ii = 0; ii < Color::PALETTE_SIZE; ++ii)
-		{
-			colors[ii] = rhs.colors[ii];
-		}
+		colors = rhs.colors;
 		return *this;
 	}
 
@@ -81,9 +82,7 @@ public:
 	const xpcc::glcd::Color
 	operator[](Color name)
 	{
-		if (name >= Color::PALETTE_SIZE)
-			return xpcc::glcd::Color(0xffff);
-		return colors[name];
+		return getColor(name);
 	}
 
 	const xpcc::glcd::Color*

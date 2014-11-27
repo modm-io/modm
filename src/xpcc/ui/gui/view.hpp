@@ -103,7 +103,6 @@ protected:
 	WidgetContainer widgets;
 
 	xpcc::gui::ColorPalette colorpalette;
-	xpcc::glcd::Color palette_colors[xpcc::gui::PALETTE_SIZE];
 };
 
 }	// namespace gui

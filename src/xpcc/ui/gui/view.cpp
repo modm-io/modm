@@ -15,8 +15,7 @@
 xpcc::gui::View::View(xpcc::gui::GuiViewStack* stack, uint8_t identifier, xpcc::gui::Dimension dimension) :
 	AbstractView(stack, identifier),
 	stack(stack),
-	dimension(dimension),
-	colorpalette(palette_colors)
+	dimension(dimension)
 {
 	this->display().clear();
 }

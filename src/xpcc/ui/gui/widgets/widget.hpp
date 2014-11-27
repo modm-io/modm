@@ -43,7 +43,6 @@ public:
 		cbData(NULL),
 		cb_activate(NULL),
 		cb_deactivate(NULL),
-		color_palette(palette_colors),
 		position(xpcc::glcd::Point(-10,-10)),
 		relative_position(xpcc::glcd::Point(-10,-10)),
 		dirty(true),
@@ -306,7 +305,6 @@ public:
 
 	/// for now unused, maybe needed later for custom styles
 	ColorPalette color_palette;
-	xpcc::glcd::Color palette_colors[xpcc::gui::PALETTE_SIZE];
 
 	/// position on screen (used for rendering), may be recomputed based on
 	/// relative position
