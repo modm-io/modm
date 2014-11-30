@@ -13,6 +13,7 @@
 
 #include "../../../device.hpp"
 #include <xpcc/architecture/peripheral/spi.hpp>
+#include <xpcc/processing/coroutine.hpp>
 #include "type_ids.hpp"
 #include "spi.hpp"
 
@@ -72,15 +73,22 @@ public:
 	static ALWAYS_INLINE uint8_t
 	writeReadBlocking(uint8_t data);
 
+	static xpcc::co::Result<uint8_t>
+	writeRead(uint8_t data);
+
 	static void
-	transferBlocking(uint8_t * tx, uint8_t * rx, std::size_t length);
+	transferBlocking(uint8_t *tx, uint8_t *rx, std::size_t length);
+
+	static xpcc::co::Result<void>
+	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
 	// end documentation inherited
 
 protected:
 	static inline void
 	initialize(Prescaler prescaler);
 
-    static bool transferInProgress;
+	static uint8_t state;
+	static std::size_t index;
 };
 
 } // namespace {{target.family}}
