@@ -110,19 +110,53 @@ public:
 	static uint8_t
 	writeReadBlocking(uint8_t data);
 
-    /**
-     * Set the data buffers and length with options and starts a transfer.
-     * This may be hardware accelerated (DMA or Interrupt), but not guaranteed.
-     *
-     * @param[in]   tx
-     *      pointer to transmit buffer, set to `0` to send dummy bytes
-     * @param[out]  rx
-     *      pointer to receive buffer, set to `0` to discard received bytes
-     * @param       length
-     *      number of bytes to be shifted out
-     */
-    static void
-    transferBlocking(uint8_t *tx, uint8_t *rx, std::size_t length);
+	/**
+	 * Swap a single byte and wait for completion non-blocking!.
+	 *
+	 * You must call this inside a Protothread or Coroutine
+	 * using `PT_CALL` or `CO_CALL` respectively.
+	 * These methods differ from Coroutines by lacking context protection!
+	 * You must ensure that only one driver is accessing this coroutine.
+	 *
+	 * @param	data
+	 * 		data to be sent
+	 * @return	received data
+	 */
+	static xpcc::co::Result<uint8_t>
+	writeRead(uint8_t data);
+
+	/**
+	 * Set the data buffers and length with options and starts a transfer.
+	 * This may be hardware accelerated (DMA or Interrupt), but not guaranteed.
+	 *
+	 * @param[in]   tx
+	 *      pointer to transmit buffer, set to `nullptr` to send dummy bytes
+	 * @param[out]  rx
+	 *      pointer to receive buffer, set to `nullptr` to discard received bytes
+	 * @param       length
+	 *      number of bytes to be shifted out
+	 */
+	static void
+	transferBlocking(uint8_t *tx, uint8_t *rx, std::size_t length);
+
+	/**
+	 * Set the data buffers and length with options and
+	 * starts a non-blocking transfer.
+	 *
+	 * You must call this inside a Protothread or Coroutine
+	 * using `PT_CALL` or `CO_CALL` respectively.
+	 * These methods differ from Coroutines by lacking context protection!
+	 * You must ensure that only one driver is accessing this coroutine.
+	 *
+	 * @param[in]   tx
+	 *      pointer to transmit buffer, set to `nullptr` to send dummy bytes
+	 * @param[out]  rx
+	 *      pointer to receive buffer, set to `nullptr` to discard received bytes
+	 * @param       length
+	 *      number of bytes to be shifted out
+	 */
+	static xpcc::co::Result<void>
+	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
 #endif
 };
 
@@ -168,17 +202,6 @@ public:
 	 */
 	static bool
 	start(SpiTransaction *transaction);
-
-	/**
-	 * Requests bus control and starts the transfer, blocks until the transaction completes.
-	 *
-	 * @param	transaction
-	 * 		object that inherits from the SpiTransaction class.
-	 *
-	 * @return	Caller gains control if `true`. Call has no effect if `false`.
-	 */
-	static bool
-	startBlocking(SpiTransaction *transaction);
 
 	/**
 	 * Perform a software reset of the driver in case of an error.
