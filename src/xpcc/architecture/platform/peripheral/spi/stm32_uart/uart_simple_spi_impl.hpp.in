@@ -28,6 +28,7 @@ xpcc::stm32::UartSpiSimpleMaster{{ id }}::initialize()
 	UsartHal{{ id }}::setTransmitterEnable(true);
 	UsartHal{{ id }}::setReceiverEnable(true);
 	dataOrder = DataOrder::MsbFirst;
+	state = 0;
 }
 
 void ALWAYS_INLINE

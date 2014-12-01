@@ -14,7 +14,10 @@ xpcc::stm32::UartSpiSimpleMaster{{ id }}::DataOrder
 	xpcc::stm32::UartSpiSimpleMaster{{ id }}::dataOrder =
 	xpcc::stm32::UartSpiSimpleMaster{{ id }}::DataOrder::MsbFirst;
 
+uint8_t
+xpcc::stm32::UartSpiSimpleMaster{{ id }}::state = 0;
 // ----------------------------------------------------------------------------
+
 uint8_t
 xpcc::stm32::UartSpiSimpleMaster{{ id }}::writeReadBlocking(uint8_t data)
 {
@@ -48,5 +51,99 @@ xpcc::stm32::UartSpiSimpleMaster{{ id }}::transferBlocking(uint8_t *tx, uint8_t 
 		rx_byte = writeReadBlocking(tx_byte);
 
 		if (rx) rx[i] = rx_byte;
+	}
+}
+
+xpcc::co::Result<uint8_t>
+xpcc::stm32::UartSpiSimpleMaster{{ id }}::writeRead(uint8_t data)
+{
+	// this is a manually implemented "fast coroutine"
+	// there is no context or nesting protection, since we don't need it.
+	// there are only two states encoded into 1 bit (LSB of state):
+	//   1. waiting to start, and
+	//   2. waiting to finish.
+
+	// LSB == 0 ?
+	if ( !(state & 0x01) )
+	{
+		// wait for previous transfer to finish
+		if (!UsartHal{{ id }}::isTransmitRegisterEmpty())
+			return {xpcc::co::Running, 0};
+
+		// start transfer by copying data into register
+		if(dataOrder == DataOrder::MsbFirst) {
+			data = ::xpcc::bitReverse(data);
+		}
+		UsartHal{{ id }}::write(data);
+
+		// set LSB = 1
+		state |= 1;
+	}
+
+	if (!UsartHal{{ id }}::isReceiveRegisterNotEmpty())
+		return {xpcc::co::Running, 0};
+
+	UsartHal{{ id }}::read(data);
+
+	if(dataOrder == DataOrder::MsbFirst) {
+		data = ::xpcc::bitReverse(data);
+	}
+
+	// transfer finished
+	state &= ~0x01;
+	return {xpcc::co::Stop, data};
+}
+
+xpcc::co::Result<void>
+xpcc::stm32::UartSpiSimpleMaster{{ id }}::transfer(
+		uint8_t * tx, uint8_t * rx, std::size_t length)
+{
+	// this is a manually implemented "fast coroutine"
+	// there is no context or nesting protection, since we don't need it.
+	// there are only two states encoded into 1 bit (0x02 of state):
+	//   1. initialize index, and
+	//   2. wait for 1-byte transfer to finish.
+
+	// we need to globally remember which byte we are currently transferring
+	static std::size_t index = 0;
+
+	// we need to allocate this on the stack
+	uint8_t tx_byte = 0xff;
+
+	// we are only interested in 0x02
+	switch(state >> 1)
+	{
+		case 0:
+			// we will only visit this state once
+			state |= (1 << 1);
+
+			// initialize index and check range
+			index = 0;
+			while (index < length)
+			{
+
+		case 1:
+				// if tx == 0, we use a dummy byte 0xff
+				if (tx) tx_byte = tx[index];
+		{
+				// call the coroutine
+				xpcc::co::Result<uint8_t> result = writeRead(tx_byte);
+
+				// if the coroutine is still running, so are we
+				if (result.state > xpcc::co::NestingError)
+					return {xpcc::co::Running, 0};
+
+				// if rx != 0, we copy the result into the array
+				if (rx) rx[index] = result.result;
+		}
+				index++;
+			}
+
+			// clear the state
+			state &= 0x01;
+			return {xpcc::co::Stop, 0};
+
+		default:
+			return {xpcc::co::WrongState, 0};
 	}
 }

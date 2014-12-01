@@ -11,6 +11,7 @@
 #define XPCC_STM32_UART_SIMPLE_SPI{{ id }}_HPP
 
 #include <xpcc/architecture/peripheral/spi.hpp>
+#include <xpcc/processing/coroutine.hpp>
 #include "../../uart/stm32/usart_hal_{{ id }}.hpp"
 #include "type_ids.hpp"
 
@@ -71,6 +72,15 @@ public:
 
 	static void
 	transferBlocking(uint8_t * tx, uint8_t * rx, std::size_t length);
+
+	static xpcc::co::Result<uint8_t>
+	writeRead(uint8_t data);
+
+	static xpcc::co::Result<void>
+	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
+
+private:
+	static uint8_t state;
 };
 
 } // namespace stm32

@@ -52,6 +52,7 @@ xpcc::stm32::SpiSimpleMaster{{ id }}::initialize()
 
 	// initialize the Spi
 	SpiHal{{ id }}::initialize(prescaler);
+	state = 0;
 }
 
 void ALWAYS_INLINE
