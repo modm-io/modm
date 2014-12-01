@@ -64,13 +64,15 @@ public:
 	static inline void
 	initialize();
 
+
 	static inline void
 	setDataMode(DataMode mode);
 
 	static inline void
 	setDataOrder(DataOrder order);
 
-	static ALWAYS_INLINE uint8_t
+
+	static uint8_t
 	writeReadBlocking(uint8_t data);
 
 	static xpcc::co::Result<uint8_t>
@@ -83,12 +85,11 @@ public:
 	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
 	// end documentation inherited
 
-protected:
+private:
 	static inline void
 	initialize(Prescaler prescaler);
 
 	static uint8_t state;
-	static std::size_t index;
 };
 
 } // namespace {{target.family}}

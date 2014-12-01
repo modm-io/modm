@@ -13,9 +13,6 @@
 
 uint8_t
 xpcc::{{target.family}}::SpiSimpleMaster::state = 0;
-
-std::size_t
-xpcc::{{target.family}}::SpiSimpleMaster::index = 0;
 // ----------------------------------------------------------------------------
 
 template< class clockSource, uint32_t baudrate, uint16_t tolerance >
@@ -152,6 +149,9 @@ xpcc::{{target.family}}::SpiSimpleMaster::transfer(
 	//   1. initialize index, and
 	//   2. wait for 1-byte transfer to finish.
 
+	// we need to globally remember which byte we are currently transferring
+	static std::size_t index = 0;
+
 	// we need to allocate this on the stack
 	uint8_t tx_byte = 0xff;
 
@@ -163,7 +163,8 @@ xpcc::{{target.family}}::SpiSimpleMaster::transfer(
 			state |= (1 << 1);
 
 			// initialize index and check range
-			for (index = 0; index < length; index++)
+			index = 0;
+			while (index < length)
 			{
 
 		case 1:
@@ -180,6 +181,7 @@ xpcc::{{target.family}}::SpiSimpleMaster::transfer(
 				// if rx != 0, we copy the result into the array
 				if (rx) rx[index] = result.result;
 		}
+				index++;
 			}
 
 			// clear the state
