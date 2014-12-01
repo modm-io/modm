@@ -62,22 +62,3 @@ xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::setDataOrder(DataOrder order
 	dataOrder = order;
 %% endif
 }
-
-// ----------------------------------------------------------------------------
-%% if extended is defined
-uint8_t
-xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::writeReadBlocking(uint8_t data)
-{
-	while(!((UCSR{{id}}A & (1 << UDRE{{id}}))))
-		;
-
-	UDR{{id}} = data;
-
-	while (!((UCSR{{id}}A & (1 << RXC{{id}}))))
-		;
-
-	data = UDR{{id}};
-
-	return data;
-}
-%% endif
