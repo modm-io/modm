@@ -1,30 +1,9 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
-/* Copyright (c) 2011, Roboterclub Aachen e.V.
- * All rights reserved.
+/* Copyright (c) 2009, Roboterclub Aachen e.V.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
 
@@ -36,17 +15,16 @@
 #include <xpcc/communication/can/can_lawicel_formatter/can_lawicel_formatter.hpp>
 #include "canusb.hpp"
 
-xpcc::CanUsb::CanUsb()
+xpcc::hosted::CanUsb::CanUsb()
 :	active(false), busState(BusState::Off)
 {
 }
 
-xpcc::CanUsb::~CanUsb()
+xpcc::hosted::CanUsb::~CanUsb()
 {
 	if (this->active)
 	{
 		{
-
 			MutexGuard stateGuard(this->stateLock);
 			this->active = false;
 		}
@@ -55,19 +33,21 @@ xpcc::CanUsb::~CanUsb()
 		this->thread = 0;
 	}
 	this->serialPort.close();
-	while (this->serialPort.isOpen()) {
+	while (this->serialPort.isOpen())
+	{
 		//wait for port to close;
 	}
 }
 
-bool xpcc::CanUsb::open(std::string deviceName, unsigned int baudRate)
+bool
+xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int baudRate)
 {
 	if (this->serialPort.isOpen())
 		this->serialPort.close();
 
 	while (this->serialPort.isOpen())
 	{
-		//wait for port to close;
+		// wait for port to close;
 	}
 
 	this->serialPort.setDeviceName(deviceName);
@@ -78,7 +58,7 @@ bool xpcc::CanUsb::open(std::string deviceName, unsigned int baudRate)
 		std::cout << " SerialPort opened in canusb" << std::endl;
 		std::cout << "write C" << std::endl;
 		this->serialPort.write("C\r");
-		char a;
+
 		xpcc::Timeout<> timer;
 		timer.restart(500);
 		while (!timer.isExpired())
@@ -92,13 +72,16 @@ bool xpcc::CanUsb::open(std::string deviceName, unsigned int baudRate)
 		this->serialPort.write("S4\r");
 
 		timer.restart(500);
+		char a;
 		while (!this->serialPort.read(a))
 		{
-			if (timer.isExpired()) {
+			if (timer.isExpired())
+			{
 				std::cout << "Timer expired" << std::endl;
 				this->serialPort.close();
-				while (this->serialPort.isOpen()) {
-					//wait for port to close;
+				while (this->serialPort.isOpen())
+				{
+					// wait for port to close;
 				}
 				return false;
 			}
@@ -107,8 +90,9 @@ bool xpcc::CanUsb::open(std::string deviceName, unsigned int baudRate)
 		{
 			std::cout << "Wrong answer on S4: " << std::hex << (int) a	<< std::endl;
 			this->serialPort.close();
-			while (this->serialPort.isOpen()) {
-				//wait for port to close;
+			while (this->serialPort.isOpen())
+			{
+				// wait for port to close;
 			}
 			return false;
 		}
@@ -121,27 +105,32 @@ bool xpcc::CanUsb::open(std::string deviceName, unsigned int baudRate)
 			{
 				std::cout << "Timer expired" << std::endl;
 				this->serialPort.close();
-				while (this->serialPort.isOpen()) {
-					//wait for port to close;
+				while (this->serialPort.isOpen())
+				{
+					// wait for port to close;
 				}
 				return false;
 			}
 		}
+
 		if (a != '\r')
 		{
 			std::cout << "Wrong answer on O: " << std::hex << (int) a << std::endl;
 			this->serialPort.close();
-			while (this->serialPort.isOpen()) {
-				//wait for port to close;
+			while (this->serialPort.isOpen())
+			{
+				// wait for port to close;
 			}
 			return false;
 		}
+
 		{
 			MutexGuard stateGuard(this->stateLock);
 			this->active = true;
 		}
 		this->thread = new boost::thread(
-				boost::bind(&xpcc::CanUsb::update, this));
+				boost::bind(&xpcc::hosted::CanUsb::update, this));
+
 		busState = BusState::Connected;
 		this->tmpRead.clear();
 		return true;
@@ -154,7 +143,8 @@ bool xpcc::CanUsb::open(std::string deviceName, unsigned int baudRate)
 	}
 }
 
-void xpcc::CanUsb::close()
+void
+xpcc::hosted::CanUsb::close()
 {
 	this->serialPort.write("C\r");
 	{
@@ -168,15 +158,15 @@ void xpcc::CanUsb::close()
 	this->serialPort.close();
 	busState = BusState::Off;
 }
-;
 
 xpcc::Can::BusState
-xpcc::CanUsb::getBusState()
+xpcc::hosted::CanUsb::getBusState()
 {
 	return busState;
 }
 
-bool xpcc::CanUsb::getMessage(can::Message& message)
+bool
+xpcc::hosted::CanUsb::getMessage(can::Message& message)
 {
 	if (!this->readBuffer.empty())
 	{
@@ -189,9 +179,9 @@ bool xpcc::CanUsb::getMessage(can::Message& message)
 		return false;
 	}
 }
-;
 
-bool xpcc::CanUsb::sendMessage(const can::Message& message)
+bool
+xpcc::hosted::CanUsb::sendMessage(const can::Message& message)
 {
 	char str[128];
 	xpcc::CanLawicelFormatter::convertToString(message, str);
@@ -199,20 +189,19 @@ bool xpcc::CanUsb::sendMessage(const can::Message& message)
 	return true;
 }
 
-void xpcc::CanUsb::update()
+void
+xpcc::hosted::CanUsb::update()
 {
 	while (1)
 	{
 		char a;
 		if (this->serialPort.read(a))
 		{
-			if (a == 'T' || a == 't' || a == 'r' || a == 'R') {
+			if (a == 'T' || a == 't' || a == 'r' || a == 'R')
+			{
 				this->tmpRead.clear();
-				this->tmpRead += a;
 			}
-			else {
-				this->tmpRead += a;
-			}
+			this->tmpRead += a;
 
 			can::Message message;
 			if (xpcc::CanLawicelFormatter::convertToCanMessage(
