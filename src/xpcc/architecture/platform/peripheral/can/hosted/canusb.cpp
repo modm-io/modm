@@ -36,8 +36,8 @@
 #include <xpcc/communication/can/can_lawicel_formatter/can_lawicel_formatter.hpp>
 #include "canusb.hpp"
 
-xpcc::CanUsb::CanUsb() :
-	active(false)
+xpcc::CanUsb::CanUsb()
+:	active(false), busState(BusState::Off)
 {
 }
 
@@ -139,10 +139,13 @@ bool xpcc::CanUsb::open(std::string deviceName, unsigned int baudRate)
 		}
 		this->thread = new boost::thread(
 				boost::bind(&xpcc::CanUsb::update, this));
+		busState = BusState::Connected;
+		this->tmpRead.clear();
 		return true;
 	}
 	else
 	{
+		busState = BusState::Off;
 		std::cerr << " Could not open Canusb" << std::endl;
 		return false;
 	}
@@ -160,8 +163,15 @@ void xpcc::CanUsb::close()
 	delete this->thread;
 	this->thread = 0;
 	this->serialPort.close();
+	busState = BusState::Off;
 }
 ;
+
+xpcc::Can::BusState
+xpcc::CanUsb::getBusState()
+{
+	return busState;
+}
 
 bool xpcc::CanUsb::getMessage(can::Message& message)
 {

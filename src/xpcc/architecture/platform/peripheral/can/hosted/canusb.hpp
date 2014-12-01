@@ -37,7 +37,7 @@
 // FIXME: remove this dependency!
 #include "../../uart/hosted/serial_port.hpp"
 
-#include <xpcc/communication/can/message.hpp>
+#include <xpcc/architecture/peripheral/can.hpp>
 
 namespace xpcc
 {
@@ -48,7 +48,7 @@ namespace xpcc
 	 * \see		http://www.can232.com/
 	 * \ingroup	can
 	 */
-	class CanUsb
+	class CanUsb : public ::xpcc::Can
 	{
 	public:
 		CanUsb();
@@ -77,6 +77,9 @@ namespace xpcc
 			return true;
 		}
 
+		BusState
+		getBusState();
+
 		/*
 		 * Send a message over the CAN.
 		 *
@@ -103,6 +106,8 @@ namespace xpcc
 		bool active;
 
 		xpcc::hosted::SerialPort serialPort;
+		BusState busState;
+
 
 		std::string tmpRead;
 		std::queue<can::Message> readBuffer;
