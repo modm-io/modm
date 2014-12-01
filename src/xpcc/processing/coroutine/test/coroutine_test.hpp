@@ -28,4 +28,13 @@ public:
 
 	void
 	testCaseNumbers();
+
+	/// Test if coroutines can return enum class values
+	///
+	/// This was not the case for the first iteration of
+	/// coroutines, because the constant `0` cannot be
+	/// implicitly casted to an enum class value.
+	/// Thus this is a regression test.
+	void
+	testReturnEnumClass();
 };
