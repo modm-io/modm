@@ -35,9 +35,10 @@
 #include <string>
 
 // FIXME: remove this dependency!
-#include "../../uart/hosted/serial_port.hpp"
-
+#include "../../uart/hosted/serial_interface.hpp"
 #include <xpcc/architecture/peripheral/can.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread.hpp>
 
 namespace xpcc
 {
@@ -105,9 +106,9 @@ namespace xpcc
 		Mutex readBufferLock;
 		bool active;
 
-		xpcc::hosted::SerialPort serialPort;
 		BusState busState;
 
+		xpcc::hosted::SerialInterface serialPort;
 
 		std::string tmpRead;
 		std::queue<can::Message> readBuffer;
