@@ -56,7 +56,12 @@ struct Result<void>
 {
 	/// Return only the `state`. There is no result.
 	Result(uint8_t state) : state(state) {}
+	/// Constructor with dummy result needed by the `CO_CALL_BLOCKING` macro.
+	Result(uint8_t state, uint8_t /*dummy_result*/) : state(state) {}
+	/// The `co::State`.
 	uint8_t state;
+	/// Dummy result needed by the `CO_CALL_BLOCKING` macro.
+	uint8_t result;
 };
 /// @endcond
 
