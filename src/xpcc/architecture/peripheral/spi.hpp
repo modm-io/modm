@@ -10,6 +10,7 @@
 #ifndef XPCC_PERIPHERAL_SPI_HPP
 #define XPCC_PERIPHERAL_SPI_HPP
 
+#include <xpcc/processing/coroutine.hpp>
 #include "../peripheral.hpp"
 
 /**

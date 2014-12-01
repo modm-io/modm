@@ -13,7 +13,6 @@
 
 #include "../../../device.hpp"
 #include <xpcc/architecture/peripheral/spi.hpp>
-#include <xpcc/processing/coroutine.hpp>
 #include "type_ids.hpp"
 #include "spi.hpp"
 
