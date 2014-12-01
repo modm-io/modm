@@ -11,6 +11,7 @@
 #define XPCC_STM32_SIMPLE_SPI{{ id }}_HPP
 
 #include <xpcc/architecture/peripheral/spi.hpp>
+#include <xpcc/processing/coroutine.hpp>
 #include "spi_hal_{{ id }}.hpp"
 #include "type_ids.hpp"
 
@@ -22,7 +23,7 @@ namespace stm32
 
 /**
  * Serial peripheral interface (SPI{{ id }}).
- * 
+ *
  * Simple unbuffered implementation.
  * @ingroup	stm32
  */
@@ -44,7 +45,7 @@ public:
 		Mode3 = SPI_CR1_CPOL | SPI_CR1_CPHA
 		///< clock inverted, sample on rising edge
 	};
-	
+
 	/// Spi Data Order, MsbFirst is the most common mode
 	enum class
 	DataOrder : uint32_t
@@ -54,10 +55,12 @@ public:
 	};
 
 public:
+	// start documentation inherited
 	template< class clockSource, uint32_t baudrate,
 			uint16_t tolerance = xpcc::Tolerance::FivePercent >
 	static void
 	initialize();
+
 
 	static void
 	setDataMode(DataMode mode);
@@ -69,8 +72,18 @@ public:
 	static uint8_t
 	writeReadBlocking(uint8_t data);
 
+	static xpcc::co::Result<uint8_t>
+	writeRead(uint8_t data);
+
 	static void
 	transferBlocking(uint8_t * tx, uint8_t * rx, std::size_t length);
+
+	static xpcc::co::Result<void>
+	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
+	// end documentation inherited
+
+private:
+	static uint8_t state;
 };
 
 } // namespace stm32
