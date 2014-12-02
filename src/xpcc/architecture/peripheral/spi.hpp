@@ -109,7 +109,7 @@ public:
 	 * @return	received data
 	 */
 	static uint8_t
-	writeReadBlocking(uint8_t data);
+	transferBlocking(uint8_t data);
 
 	/**
 	 * Set the data buffers and length with options and starts a transfer.

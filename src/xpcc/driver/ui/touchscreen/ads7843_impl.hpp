@@ -37,7 +37,7 @@ template <typename Spi, typename Cs, typename Int>
 void
 xpcc::Ads7843<Spi, Cs, Int>::initialize()
 {
-	
+
 }
 
 // ----------------------------------------------------------------------------
@@ -49,15 +49,15 @@ xpcc::Ads7843<Spi, Cs, Int>::getAverage(uint16_t * buffer, int16_t & value)
 	temp[0] = (buffer[0] + buffer[1] + buffer[2]) / 3;
 	temp[1] = (buffer[3] + buffer[4] + buffer[5]) / 3;
 	temp[2] = (buffer[6] + buffer[7] + buffer[8]) / 3;
-	
+
 	uint16_t m0 = abs(temp[0] - temp[1]);
 	uint16_t m1 = abs(temp[1] - temp[2]);
 	uint16_t m2 = abs(temp[2] - temp[0]);
-	
+
 	if (m0 > threshold && m1 > threshold && m2 > threshold) {
 		return false;
 	}
-	
+
 	if (m0 < m1)
 	{
 		if (m2 < m0) {
@@ -73,7 +73,7 @@ xpcc::Ads7843<Spi, Cs, Int>::getAverage(uint16_t * buffer, int16_t & value)
 	else {
 		value = (temp[1] + temp[2]) / 2;
 	}
-	
+
 	return true;
 }
 
@@ -84,14 +84,14 @@ xpcc::Ads7843<Spi, Cs, Int>::read(glcd::Point * point)
 	uint_fast8_t count = 0;
 	uint16_t bufferX[9];
 	uint16_t bufferY[9];
-	
+
 	do
 	{
 		bufferX[count] = readX();
 		bufferY[count] = readY();
 		count++;
 	} while (!Int::read() && count < 9);
-	
+
 	if (count == 9) {
 		glcd::Point p;
 		if (getAverage(bufferX, p.x) && getAverage(bufferY, p.y)) {
@@ -99,7 +99,7 @@ xpcc::Ads7843<Spi, Cs, Int>::read(glcd::Point * point)
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 
@@ -110,17 +110,17 @@ xpcc::Ads7843<Spi, Cs, Int>::readData(uint8_t command)
 {
 	Cs::reset();
 	xpcc::delayMicroseconds(1);	// xpcc::delay_ns(100);
-	Spi::writeReadBlocking(command);
+	Spi::transferBlocking(command);
 	xpcc::delayMicroseconds(1);
-	
-	uint16_t temp = Spi::writeReadBlocking(0x00);
+
+	uint16_t temp = Spi::transferBlocking(0x00);
 	temp <<= 8;
 	xpcc::delayMicroseconds(1);
-	
-	temp |= Spi::writeReadBlocking(0x00);
+
+	temp |= Spi::transferBlocking(0x00);
 	temp >>= 3;
-	
+
 	Cs::set();
-	
+
 	return (temp & 0xfff);
 }

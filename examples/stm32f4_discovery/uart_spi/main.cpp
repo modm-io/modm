@@ -19,7 +19,7 @@ MAIN_FUNCTION
 
 	while (1)
 	{
-		UartSpiSimpleMaster2::writeReadBlocking(0xF0);
+		UartSpiSimpleMaster2::transferBlocking(0xF0);
 	}
 
 	return 0;

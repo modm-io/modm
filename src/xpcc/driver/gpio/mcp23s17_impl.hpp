@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -48,18 +48,18 @@ void
 xpcc::Mcp23s17<Spi, Cs, Int>::initialize()
 {
 	cs.set();
-	
+
 	xpcc::delayMicroseconds(1);
-	
+
 	// Disable address pins (as they are by default) and enable the
 	// open-drain output from the interrupt line. INTA and INTB mirrored.
 	cs.reset();
-	spi.writeReadBlocking(deviceAddress | WRITE);
-	spi.writeReadBlocking(MCP_IOCON);
-	spi.writeReadBlocking((1 << 6) | (1 << 2));
-	spi.writeReadBlocking((1 << 6) | (1 << 2));
+	spi.transferBlocking(deviceAddress | WRITE);
+	spi.transferBlocking(MCP_IOCON);
+	spi.transferBlocking((1 << 6) | (1 << 2));
+	spi.transferBlocking((1 << 6) | (1 << 2));
 	cs.set();
-	
+
 	xpcc::delayMicroseconds(1);
 }
 
@@ -68,21 +68,21 @@ void
 xpcc::Mcp23s17<Spi, Cs, Int>::configure(uint16_t inputMask, uint16_t pullupMask)
 {
 	cs.reset();
-	spi.writeReadBlocking(deviceAddress | WRITE);
-	spi.writeReadBlocking(MCP_IODIR);
-	spi.writeReadBlocking(inputMask & 0xff);
-	spi.writeReadBlocking(inputMask >> 8);
+	spi.transferBlocking(deviceAddress | WRITE);
+	spi.transferBlocking(MCP_IODIR);
+	spi.transferBlocking(inputMask & 0xff);
+	spi.transferBlocking(inputMask >> 8);
 	cs.set();
-	
+
 	xpcc::delayMicroseconds(1);
-	
+
 	cs.reset();
-	spi.writeReadBlocking(deviceAddress | WRITE);
-	spi.writeReadBlocking(MCP_GPPU);
-	spi.writeReadBlocking(pullupMask & 0xff);
-	spi.writeReadBlocking(pullupMask >> 8);
+	spi.transferBlocking(deviceAddress | WRITE);
+	spi.transferBlocking(MCP_GPPU);
+	spi.transferBlocking(pullupMask & 0xff);
+	spi.transferBlocking(pullupMask >> 8);
 	cs.set();
-	
+
 	xpcc::delayMicroseconds(1);
 }
 
@@ -95,15 +95,15 @@ uint16_t
 xpcc::Mcp23s17<Spi, Cs, Int>::read()
 {
 	cs.reset();
-	spi.writeReadBlocking(deviceAddress | READ);
-	spi.writeReadBlocking(MCP_GPIO);
-	
-	uint16_t value = spi.writeReadBlocking(0x00);
-	value |= spi.writeReadBlocking(0x00) << 8;
+	spi.transferBlocking(deviceAddress | READ);
+	spi.transferBlocking(MCP_GPIO);
+
+	uint16_t value = spi.transferBlocking(0x00);
+	value |= spi.transferBlocking(0x00) << 8;
 	cs.set();
-	
+
 	xpcc::delayMicroseconds(0.1);
-	
+
 	return value;
 }
 
@@ -112,11 +112,11 @@ void
 xpcc::Mcp23s17<Spi, Cs, Int>::write(uint16_t output)
 {
 	cs.reset();
-	spi.writeReadBlocking(deviceAddress | WRITE);
-	spi.writeReadBlocking(MCP_GPIO);
-	spi.writeReadBlocking(output & 0xff);
-	spi.writeReadBlocking(output >> 8);
+	spi.transferBlocking(deviceAddress | WRITE);
+	spi.transferBlocking(MCP_GPIO);
+	spi.transferBlocking(output & 0xff);
+	spi.transferBlocking(output >> 8);
 	cs.set();
-	
+
 	xpcc::delayMicroseconds(0.1);
 }

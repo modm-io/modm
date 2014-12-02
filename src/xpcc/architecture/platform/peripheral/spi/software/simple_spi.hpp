@@ -59,7 +59,7 @@ public:
 
 
 	static uint8_t
-	writeReadBlocking(uint8_t data);
+	transferBlocking(uint8_t data);
 
 	static void
 	transferBlocking(uint8_t *tx, uint8_t *rx, std::size_t length);

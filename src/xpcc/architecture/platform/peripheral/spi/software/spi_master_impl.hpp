@@ -61,7 +61,7 @@ xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::startBlocking(xpcc::SpiTrans
 			{
 				if (transmission.writeBuffer) tx_byte = *transmission.writeBuffer++;
 
-				rx_byte = SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::writeReadBlocking(tx_byte);
+				rx_byte = SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::transferBlocking(tx_byte);
 				DEBUG_SW_SPI('w');
 
 				if (transmission.readBuffer) *transmission.readBuffer++ = rx_byte;

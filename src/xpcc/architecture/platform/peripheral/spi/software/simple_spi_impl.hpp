@@ -46,7 +46,7 @@ xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::setDataOrder(DataOrder
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 uint8_t
-xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::writeReadBlocking(uint8_t data)
+xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::transferBlocking(uint8_t data)
 {
 	for (uint_fast8_t ii = 0; ii < 8; ++ii)
 	{
@@ -106,7 +106,7 @@ xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::transferBlocking(
 	{
 		if (tx) tx_byte = tx[i];
 
-		rx_byte = writeReadBlocking(tx_byte);
+		rx_byte = transferBlocking(tx_byte);
 
 		if (rx) rx[i] = rx_byte;
 	}
@@ -116,7 +116,7 @@ template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 xpcc::co::Result<uint8_t>
 xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::transfer(uint8_t data)
 {
-	data = writeReadBlocking(data);
+	data = transferBlocking(data);
 	return {xpcc::co::Stop, data};
 }
 
