@@ -138,7 +138,7 @@ public:
 	 * @return	received data
 	 */
 	static xpcc::co::Result<uint8_t>
-	writeRead(uint8_t data);
+	transfer(uint8_t data);
 
 	/**
 	 * Set the data buffers and length with options and

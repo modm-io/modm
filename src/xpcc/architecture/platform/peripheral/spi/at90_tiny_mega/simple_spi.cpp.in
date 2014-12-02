@@ -23,7 +23,7 @@ xpcc::{{target.family}}::SpiSimpleMaster::initialize(Prescaler prescaler)
 // ----------------------------------------------------------------------------
 
 xpcc::co::Result<uint8_t>
-xpcc::{{target.family}}::SpiSimpleMaster::writeRead(uint8_t data)
+xpcc::{{target.family}}::SpiSimpleMaster::transfer(uint8_t data)
 {
 	// this is a manually implemented "fast coroutine"
 	// there is no context or nesting protection, since we don't need it.
@@ -86,7 +86,7 @@ xpcc::{{target.family}}::SpiSimpleMaster::transfer(
 				if (tx) tx_byte = tx[index];
 		{
 				// call the coroutine
-				xpcc::co::Result<uint8_t> result = writeRead(tx_byte);
+				xpcc::co::Result<uint8_t> result = transfer(tx_byte);
 
 				// if the coroutine is still running, so are we
 				if (result.state > xpcc::co::NestingError)

@@ -66,7 +66,7 @@ public:
 
 
 	static xpcc::co::Result<uint8_t>
-	writeRead(uint8_t data);
+	transfer(uint8_t data);
 
 	static xpcc::co::Result<void>
 	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);

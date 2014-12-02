@@ -114,7 +114,7 @@ xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::transferBlocking(
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 xpcc::co::Result<uint8_t>
-xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::writeRead(uint8_t data)
+xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::transfer(uint8_t data)
 {
 	data = writeReadBlocking(data);
 	return {xpcc::co::Stop, data};
