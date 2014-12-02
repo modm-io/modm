@@ -7,49 +7,11 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_{{target.family | upper}}_SIMPLE_SPI_HPP
-#	error	"Don't include this file directly, use 'simple_spi.hpp' instead!"
-#endif
+#include "simple_spi.hpp"
 
 uint8_t
 xpcc::{{target.family}}::SpiSimpleMaster::state = 0;
 // ----------------------------------------------------------------------------
-
-template< class clockSource, uint32_t baudrate, uint16_t tolerance >
-void
-xpcc::{{target.family}}::SpiSimpleMaster::initialize()
-{
-	// calculate the nearest prescaler from the baudrate
-	constexpr float pre_raw = (static_cast<float>(clockSource::Spi) / baudrate);
-	constexpr uint16_t pre = (
-			(pre_raw >= ( 64 * 4.f/3)) ? 128 : (
-			(pre_raw >= ( 32 * 4.f/3)) ?  64 : (
-			(pre_raw >= ( 16 * 4.f/3)) ?  32 : (
-			(pre_raw >= (  8 * 4.f/3)) ?  16 : (
-			(pre_raw >= (  4 * 4.f/3)) ?   8 : (
-			(pre_raw >= (  2 * 4.f/3)) ?   4 :
-										   2
-			))))));
-
-	// check if we found a prescaler which generates a baudrate within the tolerance
-	assertBaudrateInTolerance<
-			clockSource::Spi / pre,
-			baudrate,
-			tolerance >();
-
-	// translate the prescaler into the bitmapping
-	constexpr Prescaler prescaler = (
-			(pre >= 128) ? Prescaler::Div128 : (
-			(pre >=  64) ? Prescaler::Div64  : (
-			(pre >=  32) ? Prescaler::Div32  : (
-			(pre >=  16) ? Prescaler::Div16  : (
-			(pre >=   8) ? Prescaler::Div8   : (
-			(pre >=   4) ? Prescaler::Div4   :
-						   Prescaler::Div2
-			))))));
-
-	initialize(prescaler);
-}
 
 void
 xpcc::{{target.family}}::SpiSimpleMaster::initialize(Prescaler prescaler)
@@ -57,23 +19,6 @@ xpcc::{{target.family}}::SpiSimpleMaster::initialize(Prescaler prescaler)
 	SPCR = (1 << SPE) | (1 << MSTR) | (static_cast<uint8_t>(prescaler) & ~0x80);
 	SPSR = (static_cast<uint8_t>(prescaler) & 0x80) ? (1 << SPI2X) : 0;
 	state = 0;
-}
-// ----------------------------------------------------------------------------
-
-void
-xpcc::{{target.family}}::SpiSimpleMaster::setDataMode(DataMode mode)
-{
-	SPCR = (SPCR & ~((1 << CPOL) | (1 << CPHA))) | static_cast<uint8_t>(mode);
-}
-
-void
-xpcc::{{target.family}}::SpiSimpleMaster::setDataOrder(DataOrder order)
-{
-	if (order == DataOrder::LsbFirst) {
-		SPCR |= (1 << DORD);
-	} else {
-		SPCR &= ~(1 << DORD);
-	}
 }
 // ----------------------------------------------------------------------------
 

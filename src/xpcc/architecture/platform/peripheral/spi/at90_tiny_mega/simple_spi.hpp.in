@@ -40,6 +40,7 @@ namespace {{target.family}}
  */
 class SpiSimpleMaster : public ::xpcc::SpiSimpleMaster, private Spi
 {
+	static uint8_t state;
 public:
 	static const TypeId::SpiMasterMosi Mosi;
 	static const TypeId::SpiMasterMiso Miso;
@@ -61,14 +62,56 @@ public:
 	template< class clockSource, uint32_t baudrate,
 			uint16_t tolerance = xpcc::Tolerance::FivePercent >
 	static inline void
-	initialize();
+	initialize()
+	{
+		// calculate the nearest prescaler from the baudrate
+		constexpr float pre_raw = (static_cast<float>(clockSource::Spi) / baudrate);
+		constexpr uint16_t pre = (
+				(pre_raw >= ( 64 * 4.f/3)) ? 128 : (
+				(pre_raw >= ( 32 * 4.f/3)) ?  64 : (
+				(pre_raw >= ( 16 * 4.f/3)) ?  32 : (
+				(pre_raw >= (  8 * 4.f/3)) ?  16 : (
+				(pre_raw >= (  4 * 4.f/3)) ?   8 : (
+				(pre_raw >= (  2 * 4.f/3)) ?   4 :
+											   2
+				))))));
+
+		// check if we found a prescaler which generates a baudrate within the tolerance
+		assertBaudrateInTolerance<
+				clockSource::Spi / pre,
+				baudrate,
+				tolerance >();
+
+		// translate the prescaler into the bitmapping
+		constexpr Prescaler prescaler = (
+				(pre >= 128) ? Prescaler::Div128 : (
+				(pre >=  64) ? Prescaler::Div64  : (
+				(pre >=  32) ? Prescaler::Div32  : (
+				(pre >=  16) ? Prescaler::Div16  : (
+				(pre >=   8) ? Prescaler::Div8   : (
+				(pre >=   4) ? Prescaler::Div4   :
+							   Prescaler::Div2
+				))))));
+
+		initialize(prescaler);
+	}
 
 
-	static inline void
-	setDataMode(DataMode mode);
+	static void
+	setDataMode(DataMode mode)
+	{
+		SPCR = (SPCR & ~((1 << CPOL) | (1 << CPHA))) | static_cast<uint8_t>(mode);
+	}
 
-	static inline void
-	setDataOrder(DataOrder order);
+	static void
+	setDataOrder(DataOrder order)
+	{
+		if (order == DataOrder::LsbFirst) {
+			SPCR |= (1 << DORD);
+		} else {
+			SPCR &= ~(1 << DORD);
+		}
+	}
 
 
 	static uint8_t
@@ -84,17 +127,13 @@ public:
 	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
 	// end documentation inherited
 
-private:
-	static inline void
+protected:
+	static void
 	initialize(Prescaler prescaler);
-
-	static uint8_t state;
 };
 
 } // namespace {{target.family}}
 
 } // namespace xpcc
-
-#include "simple_spi_impl.hpp"
 
 #endif // XPCC_{{target.family | upper}}_SIMPLE_SPI_HPP

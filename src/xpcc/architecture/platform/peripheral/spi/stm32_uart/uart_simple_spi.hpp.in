@@ -31,8 +31,8 @@ namespace stm32
  */
 class UartSpiSimpleMaster{{ id }} : public xpcc::SpiSimpleMaster, public UartBase
 {
-private:
 	static DataOrder dataOrder;
+	static uint8_t state;
 public:
 	static const TypeId::UartSpiMaster{{ id }}Sck  Sck;
 	static const TypeId::UartSpiMaster{{ id }}Miso Miso;
@@ -53,10 +53,29 @@ public:
 	template< 	class clockSource, uint32_t baudrate,
 				uint16_t tolerance = xpcc::Tolerance::FivePercent >
 	static void
-	initialize();
+	initialize()
+	{
+		constexpr UartBase::OversamplingMode oversample =
+				UartBaudrate::getOversamplingMode(clockSource::Usart{{ id }}, baudrate);
+
+		UsartHal{{ id }}::initializeWithBrr(
+				UartBaudrate::getBrr<clockSource::Usart{{ id }}, baudrate, tolerance>(),
+				UsartHal{{ id }}::Parity::Disabled,
+				oversample);
+
+		UsartHal{{ id }}::setLastBitClockPulse(UsartHal{{ id }}::LastBitClockPulse::Output);
+		UsartHal{{ id }}::setSpiClock(UsartHal{{ id }}::SpiClock::Enabled);
+		UsartHal{{ id }}::setTransmitterEnable(true);
+		UsartHal{{ id }}::setReceiverEnable(true);
+		dataOrder = DataOrder::MsbFirst;
+		state = 0;
+	}
 
 	static void
-	setDataMode(DataMode mode);
+	setDataMode(DataMode mode)
+	{
+		UsartHal{{ id }}::setSpiDataMode(static_cast<UartBase::SpiDataMode>(mode));
+	}
 
 	/// @warning 	On this target, only `DataOrder::LsbFirst` is natively
 	///				supported!
@@ -64,7 +83,10 @@ public:
 	///				xpcc::bitReverse(), which adds some overhead.
 	/// @see	xpcc::bitReverse()
 	static void
-	setDataOrder(DataOrder order);
+	setDataOrder(DataOrder order)
+	{
+		dataOrder = order;
+	}
 
 	static uint8_t
 	writeReadBlocking(uint8_t data);
@@ -77,15 +99,10 @@ public:
 
 	static xpcc::co::Result<void>
 	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
-
-private:
-	static uint8_t state;
 };
 
 } // namespace stm32
 
 } // namespace xpcc
-
-#include "uart_simple_spi_{{id}}_impl.hpp"
 
 #endif // XPCC_STM32_UART_SIMPLE_SPI{{ id }}_HPP

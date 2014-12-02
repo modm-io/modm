@@ -7,65 +7,11 @@
 */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32_SIMPLE_SPI{{ id }}_HPP
-#	error	"Don't include this file directly, use 'simple_spi.hpp' instead!"
-#endif
+#include "simple_spi_{{id}}.hpp"
 
 uint8_t
 xpcc::stm32::SpiSimpleMaster{{ id }}::state = 0;
 // ----------------------------------------------------------------------------
-
-template< class clockSource, uint32_t baudrate, uint16_t tolerance >
-void ALWAYS_INLINE
-xpcc::stm32::SpiSimpleMaster{{ id }}::initialize()
-{
-	// calculate the nearest prescaler from the baudrate
-	constexpr float pre_raw = (static_cast<float>(clockSource::Spi{{ id }}) / baudrate);
-	constexpr uint16_t pre = (
-			(pre_raw >= (128 * 4.f/3)) ? 256 : (
-			(pre_raw >= ( 64 * 4.f/3)) ? 128 : (
-			(pre_raw >= ( 32 * 4.f/3)) ?  64 : (
-			(pre_raw >= ( 16 * 4.f/3)) ?  32 : (
-			(pre_raw >= (  8 * 4.f/3)) ?  16 : (
-			(pre_raw >= (  4 * 4.f/3)) ?   8 : (
-			(pre_raw >= (  2 * 4.f/3)) ?   4 :
-										   2
-			)))))));
-
-	// check if we found a prescaler which generates a baudrate within the tolerance
-	assertBaudrateInTolerance<
-			/* nearest possible value */ clockSource::Spi{{ id }} / pre,
-			/* desired = */ baudrate,
-			tolerance >();
-
-	// translate the prescaler into the bitmapping
-	constexpr SpiHal{{ id }}::Prescaler prescaler = (
-			(pre >= 256) ? SpiHal{{ id }}::Prescaler::Div256 : (
-			(pre >= 128) ? SpiHal{{ id }}::Prescaler::Div128 : (
-			(pre >=  64) ? SpiHal{{ id }}::Prescaler::Div64  : (
-			(pre >=  32) ? SpiHal{{ id }}::Prescaler::Div32  : (
-			(pre >=  16) ? SpiHal{{ id }}::Prescaler::Div16  : (
-			(pre >=   8) ? SpiHal{{ id }}::Prescaler::Div8   : (
-			(pre >=   4) ? SpiHal{{ id }}::Prescaler::Div4   :
-						   SpiHal{{ id }}::Prescaler::Div2
-			)))))));
-
-	// initialize the Spi
-	SpiHal{{ id }}::initialize(prescaler);
-	state = 0;
-}
-
-void ALWAYS_INLINE
-xpcc::stm32::SpiSimpleMaster{{ id }}::setDataMode(DataMode mode)
-{
-	SpiHal{{ id }}::setDataMode(static_cast<SpiHal{{ id }}::DataMode>(mode));
-}
-
-void ALWAYS_INLINE
-xpcc::stm32::SpiSimpleMaster{{ id }}::setDataOrder(DataOrder order)
-{
-	SpiHal{{ id }}::setDataOrder(static_cast<SpiHal{{ id }}::DataOrder>(order));
-}
 
 // MARK: data transfers
 uint8_t
