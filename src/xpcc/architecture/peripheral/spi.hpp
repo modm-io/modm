@@ -21,6 +21,9 @@ namespace xpcc
 /// @ingroup spi
 struct Spi
 {
+	/// The signature of the configuration function.
+	using Configuration_t = void(*)();
+
 	/// Spi Data Mode, Mode0 is the most common mode
 	enum class
 	DataMode : uint8_t

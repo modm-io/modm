@@ -14,20 +14,12 @@
 #include "spi.hpp"
 #include "../peripheral.hpp"
 
-/**
- * @ingroup 	peripheral
- * @defgroup	spi		Serial Peripheral Interface (SPI)
- */
-
 namespace xpcc
 {
 
 /**
- * Interface for a simple SPI without resource management.
- * This interface should be more efficient than the SpiMaster, but it does not
- * synchronize multiple hardware access.
- * Use this interface if you need the *fastest possible* data transfer and only
- * have one slave on the bus or implement the resource management yourself.
+ * Interface for a Spi Master with resource management, which allows to
+ * synchronize multiple drivers requesting hardware access.
  *
  * @author	Niklas Hauser
  * @ingroup	spi
@@ -58,6 +50,27 @@ public:
 	/// Sets a new data order.
 	static void
 	setDataOrder(DataOrder order);
+
+	/**
+	 * Request access to the spi master within a context.
+	 * You may aquire the spi master multiple times within the same context.
+	 * @warning		Aquires releases must be balanced with releases of the **same** context!
+	 *
+	 * @return	`0` if another context is using the spi master, otherwise
+	 * 			`>0` as the number of times this context aquired the master.
+	 */
+	static uint8_t
+	aquire(void *ctx);
+
+	/**
+	 * Release access to the spi master within a context.
+	 * @warning		Releases must be balanced with aquires of the **same** context!
+	 *
+	 * @return	`0` if nothing can be released anymore (for any context)
+	 * 			`>0` as the number of times this context can still release the master.
+	 */
+	static uint8_t
+	release(void *ctx);
 
 	/**
 	 * Swap a single byte and wait for completion.
