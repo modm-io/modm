@@ -11,11 +11,10 @@
 #define XPCC_SOFTWARE_SPI_MASTER_HPP
 
 #include <stdint.h>
-#include <xpcc/architecture/peripheral/spi.hpp>
+#include <xpcc/architecture/peripheral/spi_master.hpp>
 #include <xpcc/architecture/driver/delay.hpp>
 #include "../../gpio/software/gpio.hpp"
 #include "type_ids.hpp"
-#include "../../gpio/software/gpio.hpp"
 
 namespace xpcc
 {
