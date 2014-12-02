@@ -39,54 +39,6 @@ xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::initialize(uint16_t prescale
 }
 // ----------------------------------------------------------------------------
 
-// ----------------------------------------------------------------------------
-uint8_t
-xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::writeReadBlocking(uint8_t data)
-{
-%% if extended is not defined
-	if (dataOrder == DataOrder::LsbFirst) {
-		data = xpcc::bitReverse(data);
-	}
-%% endif
-
-	while(!((UCSR{{id}}A & (1 << UDRE{{id}}))))
-		;
-
-	UDR{{id}} = data;
-
-	while (!((UCSR{{id}}A & (1 << RXC{{id}}))))
-		;
-
-	data = UDR{{id}};
-
-%% if extended is not defined
-	if (dataOrder == DataOrder::LsbFirst) {
-		data = xpcc::bitReverse(data);
-	}
-%% endif
-
-	return data;
-}
-
-bool
-xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::transferBlocking(uint8_t *tx, uint8_t *rx,
-		std::size_t length)
-{
-	uint8_t tx_byte = 0xff;
-	uint8_t rx_byte;
-
-	for (std::size_t i = 0; i < length; i++)
-	{
-		if (tx) tx_byte = tx[i];
-
-		rx_byte = writeReadBlocking(tx_byte);
-
-		if (rx) rx[i] = rx_byte;
-	}
-
-	return true;
-}
-
 xpcc::co::Result<uint8_t>
 xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::writeRead(uint8_t data)
 {

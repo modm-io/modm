@@ -112,10 +112,16 @@ public:
 
 
 	static uint8_t
-	writeReadBlocking(uint8_t data);
+	writeReadBlocking(uint8_t data)
+	{
+		return CO_CALL_BLOCKING(writeRead(data));
+	}
 
 	static void
-	transferBlocking(uint8_t * tx, uint8_t * rx, std::size_t length);
+	transferBlocking(uint8_t *tx, uint8_t *rx, std::size_t length)
+	{
+		CO_CALL_BLOCKING(transfer(tx, rx, length));
+	}
 
 
 	static xpcc::co::Result<uint8_t>

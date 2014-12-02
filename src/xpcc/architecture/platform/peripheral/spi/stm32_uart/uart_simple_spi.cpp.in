@@ -18,42 +18,6 @@ uint8_t
 xpcc::stm32::UartSpiSimpleMaster{{ id }}::state = 0;
 // ----------------------------------------------------------------------------
 
-uint8_t
-xpcc::stm32::UartSpiSimpleMaster{{ id }}::writeReadBlocking(uint8_t data)
-{
-	if(dataOrder == DataOrder::MsbFirst) {
-		data = ::xpcc::bitReverse(data);
-	}
-	UsartHal{{ id }}::write(data);
-
-	while (!UsartHal{{ id }}::isReceiveRegisterNotEmpty())
-		;
-
-	UsartHal{{ id }}::read(data);
-	// the USART can only send LSB out first
-	if(dataOrder == DataOrder::MsbFirst) {
-		data = ::xpcc::bitReverse(data);
-	}
-	return data;
-}
-
-void
-xpcc::stm32::UartSpiSimpleMaster{{ id }}::transferBlocking(uint8_t *tx, uint8_t *rx,
-		std::size_t length)
-{
-	uint_fast8_t tx_byte = 0xff;
-	uint_fast8_t rx_byte;
-
-	for (std::size_t i = 0; i < length; i++)
-	{
-		if (tx) tx_byte = tx[i];
-
-		rx_byte = writeReadBlocking(tx_byte);
-
-		if (rx) rx[i] = rx_byte;
-	}
-}
-
 xpcc::co::Result<uint8_t>
 xpcc::stm32::UartSpiSimpleMaster{{ id }}::writeRead(uint8_t data)
 {
