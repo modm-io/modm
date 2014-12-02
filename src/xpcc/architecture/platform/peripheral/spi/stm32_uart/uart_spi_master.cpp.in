@@ -15,7 +15,41 @@ xpcc::stm32::UartSpiMaster{{ id }}::DataOrder
 	xpcc::stm32::UartSpiMaster{{ id }}::DataOrder::MsbFirst;
 
 uint8_t
-xpcc::stm32::UartSpiMaster{{ id }}::state = 0;
+xpcc::stm32::UartSpiMaster{{ id }}::state(0);
+
+uint8_t
+xpcc::stm32::UartSpiMaster{{ id }}::count(0);
+
+void *
+xpcc::stm32::UartSpiMaster{{ id }}::context(nullptr);
+// ----------------------------------------------------------------------------
+
+uint8_t
+xpcc::stm32::UartSpiMaster{{ id }}::aquire(void *ctx)
+{
+	if (ctx == nullptr)
+	{
+		context = ctx;
+		count = 1;
+		return 1;
+	}
+
+	if (ctx == context)
+		return ++count;
+
+	return 0;
+}
+
+uint8_t
+xpcc::stm32::UartSpiMaster{{ id }}::release(void *ctx)
+{
+	if (ctx == context)
+	{
+		if (--count == 0)
+			context = nullptr;
+	}
+	return count;
+}
 // ----------------------------------------------------------------------------
 
 xpcc::co::Result<uint8_t>

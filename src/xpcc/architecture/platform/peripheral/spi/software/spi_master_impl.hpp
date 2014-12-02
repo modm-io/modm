@@ -12,13 +12,21 @@
 #endif
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
-uint8_t xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::operationMode(0);
+uint8_t
+xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::operationMode(0);
 
+template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
+uint8_t
+xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::count(0);
 
+template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
+void *
+xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::context(nullptr);
 // ----------------------------------------------------------------------------
+
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 template< class clockSource, uint32_t baudrate, uint16_t tolerance >
-void ALWAYS_INLINE
+void
 xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::initialize()
 {
 	SCK::reset();
@@ -26,7 +34,7 @@ xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::initialize()
 }
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
-void ALWAYS_INLINE
+void
 xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::setDataMode(DataMode mode)
 {
 	operationMode = (operationMode & ~0b11) | static_cast<uint8_t>(mode);
@@ -34,13 +42,43 @@ xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::setDataMode(DataMode mode)
 }
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
-void ALWAYS_INLINE
+void
 xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::setDataOrder(DataOrder order)
 {
 	if (order == DataOrder::LsbFirst)
 		operationMode |= 0b100;
 	else
 		operationMode &= ~0b100;
+}
+// ----------------------------------------------------------------------------
+
+template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
+uint8_t
+xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::aquire(void *ctx)
+{
+	if (ctx == nullptr)
+	{
+		context = ctx;
+		count = 1;
+		return 1;
+	}
+
+	if (ctx == context)
+		return ++count;
+
+	return 0;
+}
+
+template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
+uint8_t
+xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::release(void *ctx)
+{
+	if (ctx == context)
+	{
+		if (--count == 0)
+			context = nullptr;
+	}
+	return count;
 }
 // ----------------------------------------------------------------------------
 

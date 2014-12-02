@@ -29,6 +29,8 @@ namespace stm32
 class SpiMaster{{ id }} : public xpcc::SpiMaster
 {
 	static uint8_t state;
+	static uint8_t count;
+	static void *context;
 public:
 	static const TypeId::SpiMaster{{ id }}Nss  Nss;
 	static const TypeId::SpiMaster{{ id }}Sck  Sck;
@@ -109,6 +111,13 @@ public:
 	{
 		SpiHal{{ id }}::setDataOrder(static_cast<SpiHal{{ id }}::DataOrder>(order));
 	}
+
+
+	static uint8_t
+	aquire(void *ctx);
+
+	static uint8_t
+	release(void *ctx);
 
 
 	static uint8_t

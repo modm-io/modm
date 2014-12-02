@@ -33,6 +33,8 @@ class UartSpiMaster{{ id }} : public xpcc::SpiMaster, public UartBase
 {
 	static DataOrder dataOrder;
 	static uint8_t state;
+	static uint8_t count;
+	static void *context;
 public:
 	static const TypeId::UartSpiMaster{{ id }}Sck  Sck;
 	static const TypeId::UartSpiMaster{{ id }}Miso Miso;
@@ -88,6 +90,13 @@ public:
 	{
 		dataOrder = order;
 	}
+
+
+	static uint8_t
+	aquire(void *ctx);
+
+	static uint8_t
+	release(void *ctx);
 
 
 	static uint8_t

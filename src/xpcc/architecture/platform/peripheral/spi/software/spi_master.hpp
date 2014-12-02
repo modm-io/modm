@@ -58,6 +58,13 @@ public:
 
 
 	static uint8_t
+	aquire(void *ctx);
+
+	static uint8_t
+	release(void *ctx);
+
+
+	static uint8_t
 	transferBlocking(uint8_t data);
 
 	static void
@@ -78,6 +85,8 @@ private:
 	static constexpr uint32_t delayTime = (1000000.0 / Baudrate) / 2.0;
 
 	static uint8_t operationMode;
+	static uint8_t count;
+	static void *context;
 };
 
 } // namespace xpcc

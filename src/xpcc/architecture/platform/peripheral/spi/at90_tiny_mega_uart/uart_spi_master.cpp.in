@@ -17,7 +17,13 @@ xpcc::{{target.family}}::UartSpiMaster{{id}}::dataOrder = DataOrder::MsbFirst;
 %% endif
 
 uint8_t
-xpcc::{{target.family}}::UartSpiMaster{{id}}::state = 0;
+xpcc::{{target.family}}::UartSpiMaster{{id}}::state(0);
+
+uint8_t
+xpcc::{{target.family}}::UartSpiMaster{{id}}::count(0);
+
+void *
+xpcc::{{target.family}}::UartSpiMaster{{id}}::context(nullptr);
 // ----------------------------------------------------------------------------
 
 void
@@ -36,6 +42,34 @@ xpcc::{{target.family}}::UartSpiMaster{{id}}::initialize(uint16_t prescaler)
 	dataOrder = DataOrder::MsbFirst;
 %% endif
 	state = 0;
+}
+// ----------------------------------------------------------------------------
+
+uint8_t
+xpcc::{{target.family}}::UartSpiMaster{{id}}::aquire(void *ctx)
+{
+	if (ctx == nullptr)
+	{
+		context = ctx;
+		count = 1;
+		return 1;
+	}
+
+	if (ctx == context)
+		return ++count;
+
+	return 0;
+}
+
+uint8_t
+xpcc::{{target.family}}::UartSpiMaster{{id}}::release(void *ctx)
+{
+	if (ctx == context)
+	{
+		if (--count == 0)
+			context = nullptr;
+	}
+	return count;
 }
 // ----------------------------------------------------------------------------
 

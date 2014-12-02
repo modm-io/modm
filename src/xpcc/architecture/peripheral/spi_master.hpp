@@ -55,6 +55,7 @@ public:
 	 * Request access to the spi master within a context.
 	 * You may aquire the spi master multiple times within the same context.
 	 * @warning		Aquires releases must be balanced with releases of the **same** context!
+	 * @warning		Aquires are persistent even after calling `initialize()`!
 	 *
 	 * @return	`0` if another context is using the spi master, otherwise
 	 * 			`>0` as the number of times this context aquired the master.
@@ -65,6 +66,7 @@ public:
 	/**
 	 * Release access to the spi master within a context.
 	 * @warning		Releases must be balanced with aquires of the **same** context!
+	 * @warning		Releases are persistent even after calling `initialize()`!
 	 *
 	 * @return	`0` if nothing can be released anymore (for any context)
 	 * 			`>0` as the number of times this context can still release the master.
