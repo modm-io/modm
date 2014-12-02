@@ -50,17 +50,20 @@ public:
 	static void
 	initialize();
 
+
 	static void
 	setDataMode(DataMode mode);
 
 	static void
 	setDataOrder(DataOrder order);
 
+
 	static uint8_t
 	writeReadBlocking(uint8_t data);
 
 	static void
 	transferBlocking(uint8_t *tx, uint8_t *rx, std::size_t length);
+
 
 	static xpcc::co::Result<uint8_t>
 	writeRead(uint8_t data);

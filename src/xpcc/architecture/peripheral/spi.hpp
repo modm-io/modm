@@ -112,6 +112,20 @@ public:
 	writeReadBlocking(uint8_t data);
 
 	/**
+	 * Set the data buffers and length with options and starts a transfer.
+	 * This may be hardware accelerated (DMA or Interrupt), but not guaranteed.
+	 *
+	 * @param[in]   tx
+	 *      pointer to transmit buffer, set to `nullptr` to send dummy bytes
+	 * @param[out]  rx
+	 *      pointer to receive buffer, set to `nullptr` to discard received bytes
+	 * @param       length
+	 *      number of bytes to be shifted out
+	 */
+	static void
+	transferBlocking(uint8_t *tx, uint8_t *rx, std::size_t length);
+
+	/**
 	 * Swap a single byte and wait for completion non-blocking!.
 	 *
 	 * You must call this inside a Protothread or Coroutine
@@ -125,20 +139,6 @@ public:
 	 */
 	static xpcc::co::Result<uint8_t>
 	writeRead(uint8_t data);
-
-	/**
-	 * Set the data buffers and length with options and starts a transfer.
-	 * This may be hardware accelerated (DMA or Interrupt), but not guaranteed.
-	 *
-	 * @param[in]   tx
-	 *      pointer to transmit buffer, set to `nullptr` to send dummy bytes
-	 * @param[out]  rx
-	 *      pointer to receive buffer, set to `nullptr` to discard received bytes
-	 * @param       length
-	 *      number of bytes to be shifted out
-	 */
-	static void
-	transferBlocking(uint8_t *tx, uint8_t *rx, std::size_t length);
 
 	/**
 	 * Set the data buffers and length with options and

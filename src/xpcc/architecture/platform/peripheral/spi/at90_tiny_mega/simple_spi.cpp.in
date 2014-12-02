@@ -36,6 +36,23 @@ xpcc::{{target.family}}::SpiSimpleMaster::writeReadBlocking(uint8_t data)
 	return data;
 }
 
+void
+xpcc::{{target.family}}::SpiSimpleMaster::transferBlocking(
+		uint8_t *tx, uint8_t *rx, std::size_t length)
+{
+	uint8_t tx_byte = 0xff;
+	uint8_t rx_byte;
+
+	for (std::size_t i = 0; i < length; i++)
+	{
+		if (tx) tx_byte = tx[i];
+
+		rx_byte = writeReadBlocking(tx_byte);
+
+		if (rx) rx[i] = rx_byte;
+	}
+}
+
 xpcc::co::Result<uint8_t>
 xpcc::{{target.family}}::SpiSimpleMaster::writeRead(uint8_t data)
 {
@@ -65,23 +82,6 @@ xpcc::{{target.family}}::SpiSimpleMaster::writeRead(uint8_t data)
 	state &= ~0x01;
 	data = SPDR;
 	return {xpcc::co::Stop, data};
-}
-
-void
-xpcc::{{target.family}}::SpiSimpleMaster::transferBlocking(
-		uint8_t *tx, uint8_t *rx, std::size_t length)
-{
-	uint8_t tx_byte = 0xff;
-	uint8_t rx_byte;
-
-	for (std::size_t i = 0; i < length; i++)
-	{
-		if (tx) tx_byte = tx[i];
-
-		rx_byte = writeReadBlocking(tx_byte);
-
-		if (rx) rx[i] = rx_byte;
-	}
 }
 
 xpcc::co::Result<void>
