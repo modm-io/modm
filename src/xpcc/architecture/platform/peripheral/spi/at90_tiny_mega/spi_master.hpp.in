@@ -8,8 +8,8 @@
 // ----------------------------------------------------------------------------
 {{ generation_block }}
 
-#ifndef XPCC_{{target.family | upper}}_SIMPLE_SPI_HPP
-#define XPCC_{{target.family | upper}}_SIMPLE_SPI_HPP
+#ifndef XPCC_{{target.family | upper}}_SPI_MASTER_HPP
+#define XPCC_{{target.family | upper}}_SPI_MASTER_HPP
 
 #include "../../../device.hpp"
 #include <xpcc/architecture/peripheral/spi.hpp>
@@ -143,4 +143,4 @@ protected:
 
 } // namespace xpcc
 
-#endif // XPCC_{{target.family | upper}}_SIMPLE_SPI_HPP
+#endif // XPCC_{{target.family | upper}}_SPI_MASTER_HPP

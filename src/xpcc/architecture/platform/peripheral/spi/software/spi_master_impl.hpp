@@ -7,7 +7,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SOFTWARE_SIMPLE_SPI_HPP
+#ifndef XPCC_SOFTWARE_SPI_MASTER_HPP
 #	error	"Don't include this file directly, use 'simple_spi.hpp' instead!"
 #endif
 

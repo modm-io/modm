@@ -7,7 +7,7 @@
 */
 // ----------------------------------------------------------------------------
 
-#include "simple_spi_{{id}}.hpp"
+#include "spi_master_{{id}}.hpp"
 
 uint8_t
 xpcc::stm32::SpiMaster{{ id }}::state = 0;

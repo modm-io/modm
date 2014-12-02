@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SOFTWARE_SIMPLE_SPI_HPP
-#define XPCC_SOFTWARE_SIMPLE_SPI_HPP
+#ifndef XPCC_SOFTWARE_SPI_MASTER_HPP
+#define XPCC_SOFTWARE_SPI_MASTER_HPP
 
 #include <stdint.h>
 #include <xpcc/architecture/peripheral/spi.hpp>
@@ -83,6 +83,6 @@ private:
 
 } // namespace xpcc
 
-#include "simple_spi_impl.hpp"
+#include "spi_master_impl.hpp"
 
-#endif // XPCC_SOFTWARE_SIMPLE_SPI_HPP
+#endif // XPCC_SOFTWARE_SPI_MASTER_HPP

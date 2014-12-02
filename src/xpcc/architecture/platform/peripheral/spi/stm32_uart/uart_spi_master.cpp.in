@@ -7,7 +7,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "uart_simple_spi_{{id}}.hpp"
+#include "uart_spi_master_{{id}}.hpp"
 #include <xpcc/math/utils/bit_operation.hpp>
 
 xpcc::stm32::UartSpiMaster{{ id }}::DataOrder
