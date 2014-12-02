@@ -26,7 +26,7 @@ namespace stm32
  * Simple unbuffered implementation.
  * @ingroup	stm32
  */
-class SpiSimpleMaster{{ id }} : public xpcc::SpiSimpleMaster
+class SpiMaster{{ id }} : public xpcc::SpiMaster
 {
 	static uint8_t state;
 public:

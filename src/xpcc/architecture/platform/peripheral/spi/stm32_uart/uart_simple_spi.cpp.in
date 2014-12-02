@@ -10,16 +10,16 @@
 #include "uart_simple_spi_{{id}}.hpp"
 #include <xpcc/math/utils/bit_operation.hpp>
 
-xpcc::stm32::UartSpiSimpleMaster{{ id }}::DataOrder
-	xpcc::stm32::UartSpiSimpleMaster{{ id }}::dataOrder =
-	xpcc::stm32::UartSpiSimpleMaster{{ id }}::DataOrder::MsbFirst;
+xpcc::stm32::UartSpiMaster{{ id }}::DataOrder
+	xpcc::stm32::UartSpiMaster{{ id }}::dataOrder =
+	xpcc::stm32::UartSpiMaster{{ id }}::DataOrder::MsbFirst;
 
 uint8_t
-xpcc::stm32::UartSpiSimpleMaster{{ id }}::state = 0;
+xpcc::stm32::UartSpiMaster{{ id }}::state = 0;
 // ----------------------------------------------------------------------------
 
 xpcc::co::Result<uint8_t>
-xpcc::stm32::UartSpiSimpleMaster{{ id }}::transfer(uint8_t data)
+xpcc::stm32::UartSpiMaster{{ id }}::transfer(uint8_t data)
 {
 	// this is a manually implemented "fast coroutine"
 	// there is no context or nesting protection, since we don't need it.
@@ -59,7 +59,7 @@ xpcc::stm32::UartSpiSimpleMaster{{ id }}::transfer(uint8_t data)
 }
 
 xpcc::co::Result<void>
-xpcc::stm32::UartSpiSimpleMaster{{ id }}::transfer(
+xpcc::stm32::UartSpiMaster{{ id }}::transfer(
 		uint8_t * tx, uint8_t * rx, std::size_t length)
 {
 	// this is a manually implemented "fast coroutine"

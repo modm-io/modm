@@ -12,14 +12,14 @@
 #endif
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
-uint8_t xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::operationMode(0);
+uint8_t xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::operationMode(0);
 
 
 // ----------------------------------------------------------------------------
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 template< class clockSource, uint32_t baudrate, uint16_t tolerance >
 void ALWAYS_INLINE
-xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::initialize()
+xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::initialize()
 {
 	SCK::reset();
 	MOSI::reset();
@@ -27,7 +27,7 @@ xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::initialize()
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 void ALWAYS_INLINE
-xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::setDataMode(DataMode mode)
+xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::setDataMode(DataMode mode)
 {
 	operationMode = (operationMode & ~0b11) | static_cast<uint8_t>(mode);
 	SCK::set(operationMode & 0b10);
@@ -35,7 +35,7 @@ xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::setDataMode(DataMode m
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 void ALWAYS_INLINE
-xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::setDataOrder(DataOrder order)
+xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::setDataOrder(DataOrder order)
 {
 	if (order == DataOrder::LsbFirst)
 		operationMode |= 0b100;
@@ -46,7 +46,7 @@ xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::setDataOrder(DataOrder
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 uint8_t
-xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::transferBlocking(uint8_t data)
+xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::transferBlocking(uint8_t data)
 {
 	for (uint_fast8_t ii = 0; ii < 8; ++ii)
 	{
@@ -96,7 +96,7 @@ xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::transferBlocking(uint8
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 void
-xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::transferBlocking(
+xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::transferBlocking(
 		uint8_t *tx, uint8_t *rx, std::size_t length)
 {
 	uint8_t tx_byte = 0xff;
@@ -114,7 +114,7 @@ xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::transferBlocking(
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 xpcc::co::Result<uint8_t>
-xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::transfer(uint8_t data)
+xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::transfer(uint8_t data)
 {
 	data = transferBlocking(data);
 	return {xpcc::co::Stop, data};
@@ -122,7 +122,7 @@ xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::transfer(uint8_t data)
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 xpcc::co::Result<void>
-xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::transfer(
+xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::transfer(
 		uint8_t *tx, uint8_t *rx, std::size_t length)
 {
 	transferBlocking(tx, rx, length);
@@ -133,7 +133,7 @@ xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::transfer(
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 void ALWAYS_INLINE
-xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::delay()
+xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::delay()
 {
 	xpcc::delayMicroseconds(delayTime);
 }

@@ -56,8 +56,8 @@ typedef GpioOutputE11 Ce2;
 typedef GpioOutputE12 Csn2;
 
 
-typedef xpcc::Nrf24Phy<SpiSimpleMaster1, Csn1, Ce1> nrf24ptx;
-typedef xpcc::Nrf24Phy<SpiSimpleMaster2, Csn2, Ce2> nrf24prx;
+typedef xpcc::Nrf24Phy<SpiMaster1, Csn1, Ce1> nrf24ptx;
+typedef xpcc::Nrf24Phy<SpiMaster2, Csn2, Ce2> nrf24prx;
 
 
 void
@@ -83,16 +83,16 @@ MAIN_FUNCTION
 
 
 	// Enable SPI 1
-	GpioOutputB5::connect(SpiSimpleMaster1::Mosi);
-	GpioInputB4::connect(SpiSimpleMaster1::Miso);
-	GpioOutputB3::connect(SpiSimpleMaster1::Sck);
-	SpiSimpleMaster1::initialize<defaultSystemClock, 10500000, xpcc::Tolerance::Exact>();
+	GpioOutputB5::connect(SpiMaster1::Mosi);
+	GpioInputB4::connect(SpiMaster1::Miso);
+	GpioOutputB3::connect(SpiMaster1::Sck);
+	SpiMaster1::initialize<defaultSystemClock, 10500000, xpcc::Tolerance::Exact>();
 
 	// Enable SPI 2
-	GpioOutputB15::connect(SpiSimpleMaster2::Mosi);
-	GpioInputB14::connect(SpiSimpleMaster2::Miso);
-	GpioOutputB13::connect(SpiSimpleMaster2::Sck);
-	SpiSimpleMaster2::initialize<defaultSystemClock, 10500000, xpcc::Tolerance::Exact>();
+	GpioOutputB15::connect(SpiMaster2::Mosi);
+	GpioInputB14::connect(SpiMaster2::Miso);
+	GpioOutputB13::connect(SpiMaster2::Sck);
+	SpiMaster2::initialize<defaultSystemClock, 10500000, xpcc::Tolerance::Exact>();
 
 
 	// Enable UART 2

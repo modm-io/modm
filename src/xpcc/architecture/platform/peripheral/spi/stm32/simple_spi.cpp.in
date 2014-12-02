@@ -10,11 +10,11 @@
 #include "simple_spi_{{id}}.hpp"
 
 uint8_t
-xpcc::stm32::SpiSimpleMaster{{ id }}::state = 0;
+xpcc::stm32::SpiMaster{{ id }}::state = 0;
 // ----------------------------------------------------------------------------
 
 xpcc::co::Result<uint8_t>
-xpcc::stm32::SpiSimpleMaster{{ id }}::transfer(uint8_t data)
+xpcc::stm32::SpiMaster{{ id }}::transfer(uint8_t data)
 {
 	// this is a manually implemented "fast coroutine"
 	// there is no context or nesting protection, since we don't need it.
@@ -47,7 +47,7 @@ xpcc::stm32::SpiSimpleMaster{{ id }}::transfer(uint8_t data)
 }
 
 xpcc::co::Result<void>
-xpcc::stm32::SpiSimpleMaster{{ id }}::transfer(
+xpcc::stm32::SpiMaster{{ id }}::transfer(
 		uint8_t * tx, uint8_t * rx, std::size_t length)
 {
 	// this is a manually implemented "fast coroutine"

@@ -50,13 +50,10 @@ struct Spi
  * Use this interface if you need the *fastest possible* data transfer and only
  * have one slave on the bus or implement the resource management yourself.
  *
- * @warning	You can only either use the `SpiSimpleMaster` or `SpiMaster` driver
- * 			on the same hardware at the same time.
- *
  * @author	Niklas Hauser
  * @ingroup	spi
  */
-class SpiSimpleMaster : public ::xpcc::Peripheral, public Spi
+class SpiMaster : public ::xpcc::Peripheral, public Spi
 {
 #ifdef __DOXYGEN__
 public:

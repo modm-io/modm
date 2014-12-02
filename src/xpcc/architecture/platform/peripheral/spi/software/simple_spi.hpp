@@ -36,7 +36,7 @@ template< typename SCK,
 		  typename MOSI,
 		  typename MISO = GpioUnused,
 		  uint32_t Baudrate = 2000000UL >
-class SoftwareSpiSimpleMaster : public ::xpcc::SpiSimpleMaster
+class SoftwareSpiMaster : public ::xpcc::SpiMaster
 {
 public:
 	static const TypeId::SoftwareSpiMasterMosi Mosi;

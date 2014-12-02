@@ -10,7 +10,7 @@ typedef GpioOutputD2 Cs;
 typedef GpioOutputB6 Mosi;
 typedef GpioOutputB7 Sck;
 
-typedef xpcc::SoftwareSpiSimpleMaster<Sck, Mosi, xpcc::GpioUnused> SPI;
+typedef xpcc::SoftwareSpiMaster<Sck, Mosi, xpcc::GpioUnused> SPI;
 
 typedef GpioOutputD3 A0;
 typedef GpioOutputD4 Reset;

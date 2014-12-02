@@ -28,7 +28,7 @@ namespace {{target.family}}
  * @ingroup		{{target.family}}
  * @author		Niklas Hauser
  */
-class UartSpiSimpleMaster{{ id }} : public ::xpcc::SpiSimpleMaster
+class UartSpiMaster{{ id }} : public ::xpcc::SpiMaster
 {
 	static uint8_t state;
 %% if extended is not defined

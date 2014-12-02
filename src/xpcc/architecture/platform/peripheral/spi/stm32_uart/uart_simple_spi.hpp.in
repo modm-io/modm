@@ -29,7 +29,7 @@ namespace stm32
  * @author		Niklas Hauser
  * @ingroup		stm32
  */
-class UartSpiSimpleMaster{{ id }} : public xpcc::SpiSimpleMaster, public UartBase
+class UartSpiMaster{{ id }} : public xpcc::SpiMaster, public UartBase
 {
 	static DataOrder dataOrder;
 	static uint8_t state;

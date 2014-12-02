@@ -12,16 +12,16 @@
 #include <xpcc/math/utils/bit_operation.hpp>
 
 %% if extended is not defined
-xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::DataOrder
-xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::dataOrder = DataOrder::MsbFirst;
+xpcc::{{target.family}}::UartSpiMaster{{id}}::DataOrder
+xpcc::{{target.family}}::UartSpiMaster{{id}}::dataOrder = DataOrder::MsbFirst;
 %% endif
 
 uint8_t
-xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::state = 0;
+xpcc::{{target.family}}::UartSpiMaster{{id}}::state = 0;
 // ----------------------------------------------------------------------------
 
 void
-xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::initialize(uint16_t prescaler)
+xpcc::{{target.family}}::UartSpiMaster{{id}}::initialize(uint16_t prescaler)
 {
 	xpcc::atomic::Lock lock;
 
@@ -40,7 +40,7 @@ xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::initialize(uint16_t prescale
 // ----------------------------------------------------------------------------
 
 xpcc::co::Result<uint8_t>
-xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::transfer(uint8_t data)
+xpcc::{{target.family}}::UartSpiMaster{{id}}::transfer(uint8_t data)
 {
 	// this is a manually implemented "fast coroutine"
 	// there is no context or nesting protection, since we don't need it.
@@ -82,7 +82,7 @@ xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::transfer(uint8_t data)
 }
 
 xpcc::co::Result<void>
-xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::transfer(
+xpcc::{{target.family}}::UartSpiMaster{{id}}::transfer(
 		uint8_t *tx, uint8_t *rx, std::size_t length)
 {
 	// this is a manually implemented "fast coroutine"
