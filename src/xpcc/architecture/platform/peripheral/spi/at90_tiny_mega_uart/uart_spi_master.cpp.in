@@ -16,11 +16,11 @@ xpcc::{{target.family}}::UartSpiMaster{{id}}::DataOrder
 xpcc::{{target.family}}::UartSpiMaster{{id}}::dataOrder = DataOrder::MsbFirst;
 %% endif
 
+// bit 7 (0x80) is used for transfer 1 byte
+// bit 6 (0x40) is used for transfer multiple byte
+// bit 5-0 (0x3f) are used to store the aquire count
 uint8_t
 xpcc::{{target.family}}::UartSpiMaster{{id}}::state(0);
-
-uint8_t
-xpcc::{{target.family}}::UartSpiMaster{{id}}::count(0);
 
 void *
 xpcc::{{target.family}}::UartSpiMaster{{id}}::context(nullptr);
@@ -41,7 +41,7 @@ xpcc::{{target.family}}::UartSpiMaster{{id}}::initialize(uint16_t prescaler)
 %% if extended is not defined
 	dataOrder = DataOrder::MsbFirst;
 %% endif
-	state = 0;
+	state &= 0x3f;
 }
 // ----------------------------------------------------------------------------
 
@@ -51,12 +51,12 @@ xpcc::{{target.family}}::UartSpiMaster{{id}}::aquire(void *ctx)
 	if (ctx == nullptr)
 	{
 		context = ctx;
-		count = 1;
+		state = (state & ~0x3f) | 1;
 		return 1;
 	}
 
 	if (ctx == context)
-		return ++count;
+		return (++state & 0x3f);
 
 	return 0;
 }
@@ -66,10 +66,10 @@ xpcc::{{target.family}}::UartSpiMaster{{id}}::release(void *ctx)
 {
 	if (ctx == context)
 	{
-		if (--count == 0)
+		if ((--state & 0x3f) == 0)
 			context = nullptr;
 	}
-	return count;
+	return (state & 0x3f);
 }
 // ----------------------------------------------------------------------------
 
@@ -83,7 +83,7 @@ xpcc::{{target.family}}::UartSpiMaster{{id}}::transfer(uint8_t data)
 	//   2. waiting to finish.
 
 	// LSB == 0 ?
-	if ( !(state & 0x01) )
+	if ( !(state & 0x80) )
 	{
 		// wait for transmit register empty
 		if (!((UCSR{{id}}A & (1 << UDRE{{id}}))))
@@ -97,7 +97,7 @@ xpcc::{{target.family}}::UartSpiMaster{{id}}::transfer(uint8_t data)
 		UDR{{id}} = data;
 
 		// set LSB = 1
-		state |= 1;
+		state |= 0x80;
 	}
 
 	// wait for receive register not empty
@@ -111,7 +111,7 @@ xpcc::{{target.family}}::UartSpiMaster{{id}}::transfer(uint8_t data)
 	}
 %% endif
 	// transfer finished
-	state &= ~0x01;
+	state &= ~0x80;
 	return {xpcc::co::Stop, data};
 }
 
@@ -132,18 +132,18 @@ xpcc::{{target.family}}::UartSpiMaster{{id}}::transfer(
 	uint8_t tx_byte = 0xff;
 
 	// we are only interested in 0x02
-	switch(state >> 1)
+	switch(state & 0x40)
 	{
 		case 0:
 			// we will only visit this state once
-			state |= (1 << 1);
+			state |= 0x40;
 
 			// initialize index and check range
 			index = 0;
 			while (index < length)
 			{
 
-		case 1:
+		default:
 				// if tx == 0, we use a dummy byte 0xff
 				if (tx) tx_byte = tx[index];
 		{
@@ -163,8 +163,5 @@ xpcc::{{target.family}}::UartSpiMaster{{id}}::transfer(
 			// clear the state
 			state &= 0x01;
 			return {xpcc::co::Stop, 0};
-
-		default:
-			return {xpcc::co::WrongState, 0};
 	}
 }

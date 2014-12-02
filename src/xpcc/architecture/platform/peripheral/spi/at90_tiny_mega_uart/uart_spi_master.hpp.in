@@ -30,7 +30,6 @@ namespace {{target.family}}
 class UartSpiMaster{{ id }} : public ::xpcc::SpiMaster
 {
 	static uint8_t state;
-	static uint8_t count;
 	static void *context;
 %% if extended is not defined
 	static DataOrder dataOrder;

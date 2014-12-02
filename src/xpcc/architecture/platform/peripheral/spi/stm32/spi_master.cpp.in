@@ -108,7 +108,7 @@ xpcc::stm32::SpiMaster{{ id }}::transfer(
 			while (index < length)
 			{
 
-		case 1:
+		default:
 				// if tx == 0, we use a dummy byte 0xff
 				if (tx) tx_byte = tx[index];
 		{
@@ -128,8 +128,5 @@ xpcc::stm32::SpiMaster{{ id }}::transfer(
 			// clear the state
 			state &= 0x01;
 			return {xpcc::co::Stop, 0};
-
-		default:
-			return {xpcc::co::WrongState, 0};
 	}
 }

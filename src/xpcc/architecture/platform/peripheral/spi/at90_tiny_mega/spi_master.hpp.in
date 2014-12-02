@@ -40,7 +40,6 @@ namespace {{target.family}}
 class SpiMaster : public ::xpcc::SpiMaster, private Spi
 {
 	static uint8_t state;
-	static uint8_t count;
 	static void *context;
 public:
 	static const TypeId::SpiMasterMosi Mosi;
