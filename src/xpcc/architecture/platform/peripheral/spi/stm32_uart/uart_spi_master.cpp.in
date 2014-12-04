@@ -27,7 +27,7 @@ xpcc::stm32::UartSpiMaster{{ id }}::context(nullptr);
 uint8_t
 xpcc::stm32::UartSpiMaster{{ id }}::aquire(void *ctx)
 {
-	if (ctx == nullptr)
+	if (context == nullptr)
 	{
 		context = ctx;
 		count = 1;
