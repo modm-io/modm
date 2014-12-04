@@ -211,7 +211,7 @@ template < class I2cMaster >
 class Hmc6343 : public hmc6343, public xpcc::I2cDevice< I2cMaster >, protected xpcc::co::NestedCoroutine<1>
 {
 public:
-	/// \brief	Constructor, requires pointer to 21 byte array, sets address to default of 0x19
+	/// Constructor, requires a hmc6343::Data object, sets address to default of 0x19
 	Hmc6343(Data &data, uint8_t address=0x19);
 
 	/// pings the sensor
