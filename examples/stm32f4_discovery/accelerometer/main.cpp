@@ -20,7 +20,7 @@ typedef xpcc::Lis302SpiTransport< SpiMaster, Cs > SpiTransport;
 typedef GpioA5 Scl;
 typedef GpioA7 Sda;
 
-typedef xpcc::SoftwareI2cMaster<Scl, Sda, 100000> I2cMaster;
+typedef xpcc::SoftwareI2cMaster<Scl, Sda, 400000> I2cMaster;
 typedef xpcc::Lis302I2cTransport< I2cMaster > I2cTransport;
 
 // Interrupt lines
