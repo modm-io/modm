@@ -44,9 +44,9 @@ public:
 
 protected:
 	bool inline
-	aquireMaster()
+	aquireMaster(void *ctx)
 	{
-		uint8_t response = SpiMaster::aquire(this);
+		uint8_t response = SpiMaster::aquire(ctx);
 
 		// another context is using it
 		if (response == 0)
@@ -60,10 +60,10 @@ protected:
 		return true;
 	}
 
-	void inline
-	releaseMaster()
+	bool inline
+	releaseMaster(void *ctx)
 	{
-		SpiMaster::release(this);
+		return (SpiMaster::release(ctx) == 0);
 	}
 };
 

@@ -54,7 +54,7 @@ public:
 	/**
 	 * Request access to the spi master within a context.
 	 * You may aquire the spi master multiple times within the same context.
-	 * @warning		Aquires releases must be balanced with releases of the **same** context!
+	 * @warning		Aquires must be balanced with releases of the **same** context!
 	 * @warning		Aquires are persistent even after calling `initialize()`!
 	 *
 	 * @return	`0` if another context is using the spi master, otherwise
@@ -103,8 +103,9 @@ public:
 	 *
 	 * You must call this inside a Protothread or Coroutine
 	 * using `PT_CALL` or `CO_CALL` respectively.
-	 * These methods differ from Coroutines by lacking context protection!
-	 * You must ensure that only one driver is accessing this coroutine.
+	 * @warning	These methods differ from Coroutines by lacking context protection!
+	 * 			You must ensure that only one driver is accessing this coroutine
+	 * 			by using `aquire(ctx)` and `release(ctx)`.
 	 *
 	 * @param	data
 	 * 		data to be sent
@@ -116,11 +117,13 @@ public:
 	/**
 	 * Set the data buffers and length with options and
 	 * starts a non-blocking transfer.
+	 * This may be hardware accelerated (DMA or Interrupt), but not guaranteed.
 	 *
 	 * You must call this inside a Protothread or Coroutine
 	 * using `PT_CALL` or `CO_CALL` respectively.
-	 * These methods differ from Coroutines by lacking context protection!
-	 * You must ensure that only one driver is accessing this coroutine.
+	 * @warning	These methods differ from Coroutines by lacking context protection!
+	 * 			You must ensure that only one driver is accessing this coroutine
+	 * 			by using `aquire(ctx)` and `release(ctx)`.
 	 *
 	 * @param[in]   tx
 	 *      pointer to transmit buffer, set to `nullptr` to send dummy bytes
