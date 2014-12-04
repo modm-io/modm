@@ -174,7 +174,6 @@ xpcc::Lis302SpiTransport<SpiMaster, Cs>::read(void *ctx, uint8_t reg, uint8_t *b
 {
 	CO_BEGIN(ctx);
 
-	Cs::set();
 	CO_WAIT_UNTIL(this->aquireMaster(ctx));
 	Cs::reset();
 
