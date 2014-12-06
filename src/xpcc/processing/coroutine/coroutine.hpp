@@ -236,7 +236,7 @@ protected:
 		return false;
 	}
 
-protected:
+public:
 	static constexpr CoState CoStopped = static_cast<CoState>(0);
 	/// @endcond
 private:
@@ -331,7 +331,7 @@ protected:
 		return false;
 	}
 
-protected:
+public:
 	static constexpr CoState CoStopped = static_cast<CoState>(0);
 private:
 	CoState coState;

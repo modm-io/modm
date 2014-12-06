@@ -40,7 +40,7 @@
 	if (!this->nestingOkCo()) return {xpcc::co::NestingError}; \
 	if (!this->beginCo(context)) return {xpcc::co::WrongContext}; \
 	switch (this->pushCo()) { \
-		case CoStopped: \
+		case (::xpcc::co::Coroutine::CoStopped): \
 			CO_INTERNAL_SET_CASE(__COUNTER__);
 
 /**
