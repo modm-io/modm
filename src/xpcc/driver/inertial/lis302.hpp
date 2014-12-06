@@ -20,6 +20,7 @@ namespace xpcc
 
 struct lis302
 {
+protected:
 	enum class
 	Register : uint8_t
 	{
@@ -169,12 +170,12 @@ public:
 		enum
 		{
 			LIR = 0x40,		///< Latch interrupt request into CLICK_SRC reg with the CLICK_SRC reg refreshed by reading CLICK_SRC reg.
-			Double_Z = 0x20,
-			Single_Z = 0x10,
-			Double_Y = 0x08,
-			Single_Y = 0x04,
-			Double_X = 0x02,
-			Single_X = 0x01,
+			DoubleZ = 0x20,
+			SingleZ = 0x10,
+			DoubleY = 0x08,
+			SingleY = 0x04,
+			DoubleX = 0x02,
+			SingleX = 0x01,
 		};
 	};
 
@@ -184,23 +185,22 @@ public:
 		enum
 		{
 			IA = 0x40,		///< Interrupt Active.
-			Double_Z = 0x20,
-			Single_Z = 0x10,
-			Double_Y = 0x08,
-			Single_Y = 0x04,
-			Double_X = 0x02,
-			Single_X = 0x01,
+			DoubleZ = 0x20,
+			SingleZ = 0x10,
+			DoubleY = 0x08,
+			SingleY = 0x04,
+			DoubleX = 0x02,
+			SingleX = 0x01,
 		};
 	};
 
-public:
 	enum class
 	InterruptSource : uint8_t
 	{
 		GND = 0x00,
 		FF_WU_1 = 0x01,
 		FF_WU_2 = 0x02,
-		FF_WU_1_OR_2 = 0x02,
+		FF_WU_1_OR_2 = 0x03,
 		DataReady = 0x04,
 		Click = 0x07,
 	};
@@ -219,7 +219,21 @@ public:
 		G8 = Control1::FS,
 	};
 
-public:
+	enum class
+	Interrupt : uint8_t
+	{
+		One = 0,
+		Two = 0x04,
+	};
+
+	enum class
+	Axis : uint8_t
+	{
+		X = 0b00,
+		Y = 0b10,
+		Z = 0b01,
+	};
+
 	struct __attribute__ ((packed))
 	Data
 	{
@@ -230,13 +244,13 @@ public:
 		/// @{
 		/// returns the acceleration in g
 		float ALWAYS_INLINE
-		getX() { return data[0] * (data[3] ? 9.2f/128 : 2.3f/128); }
+		getX() { return data[0] * (data[3] & Control1::FS ? 9.2f/128 : 2.3f/128); }
 
 		float ALWAYS_INLINE
-		getY() { return data[1] * (data[3] ? 9.2f/128 : 2.3f/128); }
+		getY() { return data[1] * (data[3] & Control1::FS ? 9.2f/128 : 2.3f/128); }
 
 		float ALWAYS_INLINE
-		getZ() { return data[2] * (data[3] ? 9.2f/128 : 2.3f/128); }
+		getZ() { return data[2] * (data[3] & Control1::FS ? 9.2f/128 : 2.3f/128); }
 		/// @}
 
 
@@ -258,11 +272,15 @@ protected:
 	/// @{
 	/// @private enum class to integer helper functions.
 	static constexpr uint8_t
+	i(InterruptSource source) { return static_cast<uint8_t>(source); }
+	static constexpr uint8_t
 	i(Register reg) { return static_cast<uint8_t>(reg); }
 	static constexpr uint8_t
 	i(MeasurementRate rate) { return static_cast<uint8_t>(rate); }
 	static constexpr uint8_t
 	i(Scale scale) { return static_cast<uint8_t>(scale); }
+	static constexpr uint8_t
+	i(Interrupt interrupt) { return static_cast<uint8_t>(interrupt); }
 	/// @}
 }; // struct lis302
 
@@ -288,7 +306,7 @@ public:
 	/// For I2c this also sets the address to 0x1D (alternative: 0x1C).
 	Lis302(Data &data, uint8_t address=0x1D);
 
-	bool
+	bool inline
 	initialize(Scale scale, MeasurementRate rate = MeasurementRate::Hz100)
 	{
 		return CO_CALL_BLOCKING(initialize(this, scale, rate));
@@ -297,8 +315,74 @@ public:
 	xpcc::co::Result<bool>
 	initialize(void *ctx, Scale scale, MeasurementRate rate = MeasurementRate::Hz100);
 
+	// MARK: Control Registers
 	xpcc::co::Result<bool>
-	writeControlRegister(void *ctx, uint8_t index, uint8_t setMask, uint8_t clearMask = 0xff);
+	updateControlRegister(void *ctx, uint8_t index, uint8_t setMask, uint8_t clearMask = 0xff);
+
+	xpcc::co::Result<bool> inline
+	writeInterruptSource(void *ctx, Interrupt interrupt, InterruptSource source)
+	{
+		return updateControlRegister(ctx, 2, (interrupt == Interrupt::One) ? i(source) : i(source) << 3, (interrupt == Interrupt::One) ? 0b111 : 0b111000);
+	}
+
+	// MARK: Free Fall Registers
+	xpcc::co::Result<bool> inline
+	updateFreeFallConfiguration(void *ctx, Interrupt interrupt, uint8_t setMask, uint8_t clearMask = 0xff)
+	{
+		return updateRegister(ctx, i(Register::FfWuCfg1) | i(interrupt), setMask, clearMask);
+	}
+
+	xpcc::co::Result<bool> inline
+	readFreeFallSource(void *ctx, Interrupt interrupt, uint8_t &source)
+	{
+		return this->read(ctx, i(Register::FfWuSrc1) | i(interrupt), source);
+	}
+
+	xpcc::co::Result<bool> inline
+	writeFreeFallThreshold(void *ctx, Interrupt interrupt, uint8_t threshold)
+	{
+		return this->write(ctx, i(Register::FfWuThs1) | i(interrupt), threshold);
+	}
+
+	xpcc::co::Result<bool> inline
+	writeFreeFallDuration(void *ctx, Interrupt interrupt, uint8_t duration)
+	{
+		return this->write(ctx, i(Register::FfWuDuration1) | i(interrupt), duration);
+	}
+
+	// MARK: Clock Registers
+	xpcc::co::Result<bool> inline
+	updateClickConfiguration(void *ctx, uint8_t setMask, uint8_t clearMask = 0xff)
+	{
+		return updateRegister(ctx, i(Register::ClickCfg), setMask, clearMask);
+	}
+
+	xpcc::co::Result<bool> inline
+	readClickSource(void *ctx, uint8_t &source)
+	{
+		return this->read(ctx, i(Register::ClickSrc), source);
+	}
+
+	xpcc::co::Result<bool> inline
+	writeClickThreshold(void *ctx, Axis axis, uint8_t threshold);
+
+	xpcc::co::Result<bool> inline
+	writeClickTimeLimit(void *ctx, uint8_t limit)
+	{
+		return this->write(ctx, i(Register::ClickTimeLimit), limit);
+	}
+
+	xpcc::co::Result<bool> inline
+	writeClickLatency(void *ctx, uint8_t latency)
+	{
+		return this->write(ctx, i(Register::ClickLatency), latency);
+	}
+
+	xpcc::co::Result<bool> inline
+	writeClickWindow(void *ctx, uint8_t window)
+	{
+		return this->write(ctx, i(Register::ClickWindow), window);
+	}
 
 	xpcc::co::Result<bool>
 	readAcceleration(void *ctx);
@@ -307,19 +391,25 @@ public:
 	getStatus()
 	{ return rawBuffer[3]; }
 
-	uint8_t &
+	uint8_t
 	getControl(uint8_t index)
-	{ return rawBuffer[index]; }
+	{ return index < 3 ? rawBuffer[index] : 0; }
 
 public:
 	/// the data object for this sensor.
 	Data &data;
 
 private:
+	xpcc::co::Result<bool>
+	updateRegister(void *ctx, uint8_t reg, uint8_t setMask, uint8_t clearMask = 0xff);
+
 	// 0-2: control 0-2
 	// 3: status
+	// 4: -- buffer for updateRegister, but overridden in readAcceleration --
 	// 5: out x
+	// 6: -- unused, but overridden in readAcceleration --
 	// 7: out y
+	// 8: -- unused, but overridden in readAcceleration --
 	// 9: out z
 	uint8_t rawBuffer[10];
 };
@@ -388,7 +478,7 @@ private:
  * LIS302DL SPI Transport Layer.
  *
  * This class manages communication with the accelerometer via the SPI bus.
- * The SPI interface can be clocked with up to 10MHz.
+ * The SPI interface can be clocked with up to 10MHz and requires Mode3.
  *
  * @see Lis302
  *

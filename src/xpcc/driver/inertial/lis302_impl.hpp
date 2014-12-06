@@ -15,21 +15,20 @@
 // MARK: LIS302 DRIVER
 template < class Transport >
 xpcc::Lis302<Transport>::Lis302(Data &data, uint8_t address)
-:	Transport(address), data(data), rawBuffer{0x47,0,0,0,0,0,0,0,0,0}
+:	Transport(address), data(data), rawBuffer{0,0,0,0,0,0,0,0,0,0}
 {
 }
-
 
 template < class Transport >
 xpcc::co::Result<bool>
 xpcc::Lis302<Transport>::initialize(void *ctx, Scale scale, MeasurementRate rate)
 {
-	return writeControlRegister(ctx, 0, i(scale) | i(rate), Control1::DR | Control1::FS);
+	return updateControlRegister(ctx, 0, i(scale) | i(rate) | 0x47, 0xff);
 }
 
 template < class Transport >
 xpcc::co::Result<bool>
-xpcc::Lis302<Transport>::writeControlRegister(void *ctx, uint8_t index, uint8_t setMask, uint8_t clearMask)
+xpcc::Lis302<Transport>::updateControlRegister(void *ctx, uint8_t index, uint8_t setMask, uint8_t clearMask)
 {
 	CO_BEGIN(ctx);
 
@@ -37,12 +36,30 @@ xpcc::Lis302<Transport>::writeControlRegister(void *ctx, uint8_t index, uint8_t 
 	{
 		rawBuffer[index] = (rawBuffer[index] & ~clearMask) | setMask;
 		if (index == 0)
-			data.getPointer()[3] = (rawBuffer[0] & Control1::FS);
+			data.getPointer()[3] = rawBuffer[0];
 
 		CO_RETURN_CALL(this->write(ctx, i(Register::CtrlReg1) + index, rawBuffer[index]));
 	}
 
 	CO_END_RETURN(false);
+}
+
+template < class Transport >
+xpcc::co::Result<bool>
+xpcc::Lis302<Transport>::writeClickThreshold(void *ctx, Axis axis, uint8_t threshold)
+{
+	switch(axis)
+	{
+		case Axis::X:
+			return this->updateRegister(ctx, i(Register::ClickThsYX), threshold & 0x0F, 0x0F);
+
+		case Axis::Y:
+			return this->updateRegister(ctx, i(Register::ClickThsYX), threshold << 4, 0xF0);
+
+		default:
+//		case Axis::Z:
+			return this->write(ctx, i(Register::ClickThsZ), threshold & 0x0F);
+	}
 }
 
 template < class Transport >
@@ -63,6 +80,22 @@ xpcc::Lis302<Transport>::readAcceleration(void *ctx)
 }
 
 // ----------------------------------------------------------------------------
+template < class Transport >
+xpcc::co::Result<bool>
+xpcc::Lis302<Transport>::updateRegister(void *ctx, uint8_t reg, uint8_t setMask, uint8_t clearMask)
+{
+	CO_BEGIN(ctx);
+
+	if (CO_CALL(this->read(ctx, reg, rawBuffer[4])))
+	{
+		rawBuffer[4] = (rawBuffer[4] & ~clearMask) | setMask;
+		CO_RETURN_CALL(this->write(ctx, reg, rawBuffer[4]));
+	}
+
+	CO_END_RETURN(false);
+}
+
+// ============================================================================
 // MARK: I2C TRANSPORT
 template < class I2cMaster >
 xpcc::Lis302I2cTransport<I2cMaster>::Lis302I2cTransport(uint8_t address)
@@ -78,7 +111,7 @@ xpcc::Lis302I2cTransport<I2cMaster>::ping(void *ctx)
 {
 	CO_BEGIN(ctx);
 
-	CO_WAIT_UNTIL(adapter.configurePing() &&
+	CO_WAIT_UNTIL(adapter.configurePing() and
 			(i2cTask = I2cTask::Ping, this->startTransaction(&adapter)));
 
 	CO_WAIT_WHILE(i2cTask == I2cTask::Ping);
@@ -98,7 +131,7 @@ xpcc::Lis302I2cTransport<I2cMaster>::write(void *ctx, uint8_t reg, uint8_t value
 	buffer[1] = value;
 
 	CO_WAIT_UNTIL(
-			adapter.configureWrite(buffer, 2) &&
+			adapter.configureWrite(buffer, 2) and
 			(i2cTask = reg, this->startTransaction(&adapter))
 	);
 
@@ -117,7 +150,7 @@ xpcc::Lis302I2cTransport<I2cMaster>::read(void *ctx, uint8_t reg, uint8_t *buffe
 	this->buffer[0] = reg | AddressIncrement;
 
 	CO_WAIT_UNTIL(
-			adapter.configureWriteRead(this->buffer, 1, buffer, length) &&
+			adapter.configureWriteRead(this->buffer, 1, buffer, length) and
 			(i2cTask = reg, this->startTransaction(&adapter))
 	);
 
@@ -126,7 +159,7 @@ xpcc::Lis302I2cTransport<I2cMaster>::read(void *ctx, uint8_t reg, uint8_t *buffe
 	CO_END_RETURN(i2cSuccess == reg);
 }
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 // MARK: SPI TRANSPORT
 template < class SpiMaster, class Cs >
 xpcc::Lis302SpiTransport<SpiMaster, Cs>::Lis302SpiTransport(uint8_t /*address*/)
