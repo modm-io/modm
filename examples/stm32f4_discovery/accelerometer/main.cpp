@@ -40,6 +40,7 @@ xpcc::Lis302< lis302::SpiTransport > accel(data);
 #endif
 
 #include <xpcc/processing.hpp>
+#include <xpcc/math.hpp>
 
 class ReaderThread : public xpcc::pt::Protothread
 {
@@ -63,18 +64,21 @@ public:
 		}
 
 		// initialize with limited range of ~2.3G
-		PT_CALL(accel.initialize(this, accel.Scale::G2));
+		PT_CALL(accel.initialize(this, accel.Scale::G2, accel.MeasurementRate::Hz400));
 
 		while (true)
 		{
 			PT_CALL(accel.readAcceleration(this));
 
-			LedGreen::set(accel.data.getY() < -0.2);
-			LedRed::set(accel.data.getY() > 0.2);
-			LedBlue::set(accel.data.getX() > 0.2);
-			LedOrange::set(accel.data.getX() < -0.2);
+			averageX.update(accel.data.getX());
+			averageY.update(accel.data.getY());
 
-			this->timer.restart(50);
+			LedOrange::set(averageX.getValue() < -0.2);
+			LedBlue::set(averageX.getValue() > 0.2);
+			LedGreen::set(averageY.getValue() < -0.2);
+			LedRed::set(averageY.getValue() > 0.2);
+
+			this->timer.restart(5);
 			PT_WAIT_UNTIL(this->timer.isExpired());
 		}
 
@@ -83,6 +87,8 @@ public:
 
 private:
 	xpcc::Timeout<> timer;
+	xpcc::MovingAverage<float, 25> averageX;
+	xpcc::MovingAverage<float, 25> averageY;
 };
 
 ReaderThread reader;
