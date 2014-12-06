@@ -32,3 +32,4 @@
 #include "driver/accessor.hpp"
 #include "driver/delay.hpp"
 #include "driver/clock.hpp"
+#include "driver/register.hpp"
