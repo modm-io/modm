@@ -125,6 +125,18 @@ static constexpr uint32_t Bit31 = 0b10000000000000000000000000000000;
 
 }	// namespace xpcc
 
+
+#define REGISTER8(name, ...) \
+	struct name { \
+	uint8_t value; \
+	constexpr STest(uint8_t value) \
+	:	value(value) {} \
+	constexpr operator uint8_t() const \
+	{ return value; } \
+	enum : uint8_t { \
+		__VA_ARGS__ \
+	}; };
+
 #define REGISTER_GROUP(name, type) \
 struct name : public type { \
 	using type::type; \
