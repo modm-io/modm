@@ -101,5 +101,6 @@ public:
 #include "peripheral/one_wire.hpp"
 #include "peripheral/spi.hpp"
 #include "peripheral/i2c.hpp"
+#include "peripheral/register.hpp"
 
 #endif	// XPCC_PERIPHERAL_HPP

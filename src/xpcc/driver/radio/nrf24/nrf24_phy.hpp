@@ -11,23 +11,13 @@
 #define XPCC__NRF24_PHY_HPP
 
 #include <stdint.h>
+#include <xpcc/utils/bit_constants.hpp>
 
 namespace xpcc
 {
 
 namespace nrf24
 {
-
-/* Raw bits */
-constexpr uint8_t Bit0 = (1 << 0);
-constexpr uint8_t Bit1 = (1 << 1);
-constexpr uint8_t Bit2 = (1 << 2);
-constexpr uint8_t Bit3 = (1 << 3);
-constexpr uint8_t Bit4 = (1 << 4);
-constexpr uint8_t Bit5 = (1 << 5);
-constexpr uint8_t Bit6 = (1 << 6);
-constexpr uint8_t Bit7 = (1 << 7);
-
 
 enum Register : uint8_t
 {

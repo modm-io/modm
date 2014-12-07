@@ -23,7 +23,7 @@
 #define CO_INTERNAL_SET_CASE_YIELD(counter) \
 			this->setCo((counter % 255) + 1); \
 			this->popCo(); \
-			return {xpcc::co::Running, 0}; \
+			return {xpcc::co::Running}; \
 		case ((counter % 255) + 1): ;
 
 /**
@@ -37,10 +37,10 @@
  */
 #define CO_BEGIN(context) \
 	constexpr uint32_t coCounter = __COUNTER__; \
-	if (!this->nestingOkCo()) return {xpcc::co::NestingError, 0}; \
-	if (!this->beginCo(context)) return {xpcc::co::WrongContext, 0}; \
+	if (!this->nestingOkCo()) return {xpcc::co::NestingError}; \
+	if (!this->beginCo(context)) return {xpcc::co::WrongContext}; \
 	switch (this->pushCo()) { \
-		case this->CoStopped: \
+		case (::xpcc::co::Coroutine::CoStopped): \
 			CO_INTERNAL_SET_CASE(__COUNTER__);
 
 /**
@@ -54,7 +54,7 @@
 			CO_RETURN(result); \
 		default: \
 			this->popCo(); \
-			return {xpcc::co::WrongState, 0}; \
+			return {xpcc::co::WrongState}; \
 	} \
 	static_assert(__COUNTER__ - coCounter < 256, "You have too many states in this coroutine!");
 
@@ -79,7 +79,7 @@
 			CO_RETURN_CALL(coroutine); \
 		default: \
 			this->popCo(); \
-			return {xpcc::co::WrongState, 0}; \
+			return {xpcc::co::WrongState}; \
 	} \
 	static_assert(__COUNTER__ - coCounter < 256, "You have too many states in this coroutine!");
 
@@ -102,7 +102,7 @@
 			CO_INTERNAL_SET_CASE(__COUNTER__); \
 			if (condition) { \
 				this->popCo(); \
-				return {xpcc::co::Running, 0}; \
+				return {xpcc::co::Running}; \
 			} \
 
 /**
@@ -126,7 +126,7 @@
 			auto coResult = coroutine; \
 			if (coResult.state > xpcc::co::NestingError) { \
 				this->popCo(); \
-				return {xpcc::co::Running, 0}; \
+				return {xpcc::co::Running}; \
 			} \
 			coResult.result; \
 	})
@@ -159,7 +159,7 @@
 				auto coResult = coroutine; \
 				if (coResult.state > xpcc::co::NestingError) { \
 					this->popCo(); \
-					return {xpcc::co::Running, 0}; \
+					return {xpcc::co::Running}; \
 				} \
 				CO_RETURN(coResult.result); \
 			} \

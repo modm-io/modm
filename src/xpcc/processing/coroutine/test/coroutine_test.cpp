@@ -843,3 +843,38 @@ CoroutineTest::testCaseNumbers()
 	TEST_ASSERT_EQUALS(result.state, xpcc::co::Stop);
 	TEST_ASSERT_EQUALS(result.result, true);
 }
+
+class TestingCaseEnumClassThread : public xpcc::co::Coroutine
+{
+public:
+	enum class
+	Animal
+	{
+		Dog,
+		Cat,
+	};
+
+	xpcc::co::Result<Animal>
+	coroutine(void *ctx)
+	{
+		CO_BEGIN(ctx);
+
+		CO_YIELD();		// generate at least one additional case statement
+
+		CO_END_RETURN(Animal::Cat);
+	}
+};
+
+void
+CoroutineTest::testReturnEnumClass()
+{
+	TestingCaseEnumClassThread thread;
+
+	// run once; coroutine will yield
+	TEST_ASSERT_EQUALS(thread.coroutine(this).state, xpcc::co::Running);
+
+	// now we should get a cat
+	auto result = thread.coroutine(this);
+	TEST_ASSERT_EQUALS(result.state, xpcc::co::Stop);
+	TEST_ASSERT_TRUE(result.result == TestingCaseEnumClassThread::Animal::Cat);
+}
