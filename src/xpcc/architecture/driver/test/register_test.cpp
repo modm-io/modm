@@ -9,10 +9,23 @@
 
 #include "register_test.hpp"
 
+REGISTER8( Test,
+	A = 0x01,
+	B = 0x02,
+	C = 0x04,
+	D = 0x08,
+	E = 0x10,
+	F = 0x20,
+	G = 0x40,
+	H = 0x80,
+	Mask = 0xff,
+);
+
 void
 RegisterTest::testOperators()
 {
-	Test_t vD = Test::A | Test::B;
+	Test vD;
+	vD = Test::A | Test::B;
 	TEST_ASSERT_EQUALS(vD.value, 0b11);
 
 	vD = vD | Test::C;
@@ -21,25 +34,19 @@ RegisterTest::testOperators()
 	vD = Test::D | vD;
 	TEST_ASSERT_EQUALS(vD.value, 0b1111);
 
-	Test_t vI = Test::E;
+	Test vI;
+	vI = Test::E;
 	vD = vD | vI;
 	TEST_ASSERT_EQUALS(vD.value, 0b11111);
 
 	// simple raw access is possible
-	uint8_t raw = vD.value;
-	(void) raw;
+	xpcc::register8_t raw;
+	raw = vD;
 
-	// this is possible too
-	Register8 reg = vD;
-	// and then you cannot modify it anymore, which makes sense
-	// since you don't actually know which register this is)
-//	reg = reg | Test::A;
-	(void) reg;
-
-	// but this is *not possible*, but it must be possible, otherwise it makes no sense.
-//	reg = Test::A;
-	// neither is extracting the enum class value directly
-//	uint8_t raw2 = Test::A.value;
-
+	TEST_ASSERT_EQUALS(bool(raw), true);
+	TEST_ASSERT_TRUE(raw);
+	raw = 0;
+	TEST_ASSERT_EQUALS(bool(raw), false);
+	TEST_ASSERT_FALSE(raw);
 }
 
