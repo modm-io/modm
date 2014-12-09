@@ -274,6 +274,8 @@ protected:
 	/// @private enum class to integer helper functions.
 	static constexpr uint8_t
 	i(InterruptSource source) { return static_cast<uint8_t>(source); }
+	static constexpr Control3
+	r(InterruptSource source) { return static_cast<Control3>(source); }
 	static constexpr uint8_t
 	i(Register reg) { return static_cast<uint8_t>(reg); }
 	static constexpr uint8_t
@@ -321,18 +323,36 @@ public:
 	initialize(void *ctx, Scale scale, MeasurementRate rate = MeasurementRate::Hz100);
 
 	// MARK: Control Registers
-	xpcc::co::Result<bool>
-	updateControlRegister(void *ctx, uint8_t index, Control_t setMask, Control_t clearMask = static_cast<Control_t>(0xff));
+	xpcc::co::Result<bool> inline
+	updateControlRegister(void *ctx, Control1_t setMask, Control1_t clearMask = static_cast<Control1_t>(0xff))
+	{
+		return updateControlRegister(ctx, 0, setMask, clearMask);
+	}
+
+	xpcc::co::Result<bool> inline
+	updateControlRegister(void *ctx, Control2_t setMask, Control2_t clearMask = static_cast<Control2_t>(0xff))
+	{
+		return updateControlRegister(ctx, 1, setMask, clearMask);
+	}
+
+	xpcc::co::Result<bool> inline
+	updateControlRegister(void *ctx, Control3_t setMask, Control3_t clearMask = static_cast<Control3_t>(0xff))
+	{
+		return updateControlRegister(ctx, 2, setMask, clearMask);
+	}
 
 	xpcc::co::Result<bool> inline
 	writeInterruptSource(void *ctx, Interrupt interrupt, InterruptSource source)
 	{
-		return updateControlRegister(ctx, 2, (interrupt == Interrupt::One) ? i(source) : i(source) << 3, (interrupt == Interrupt::One) ? 0b111 : 0b111000);
+		if (interrupt == Interrupt::One)
+			return updateControlRegister(ctx, r(source), static_cast<Control3>(0b111));
+
+		return updateControlRegister(ctx, static_cast<Control3>(i(source) << 3), static_cast<Control3>(0b111000));
 	}
 
 	// MARK: Free Fall Registers
 	xpcc::co::Result<bool> inline
-	updateFreeFallConfiguration(void *ctx, Interrupt interrupt, Register_t setMask, Register_t clearMask = static_cast<Register_t>(0xff))
+	updateFreeFallConfiguration(void *ctx, Interrupt interrupt, FreeFallConfig_t setMask, FreeFallConfig_t clearMask = static_cast<FreeFallConfig_t>(0xff))
 	{
 		return updateRegister(ctx, i(Register::FfWuCfg1) | i(interrupt), setMask.value, clearMask.value);
 	}
@@ -405,6 +425,9 @@ public:
 	Data &data;
 
 private:
+	xpcc::co::Result<bool>
+	updateControlRegister(void *ctx, uint8_t index, Control_t setMask, Control_t clearMask = static_cast<Control_t>(0xff));
+
 	xpcc::co::Result<bool>
 	updateRegister(void *ctx, uint8_t reg, uint8_t setMask, uint8_t clearMask = 0xff);
 
