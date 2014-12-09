@@ -23,18 +23,18 @@ template < class Transport >
 xpcc::co::Result<bool>
 xpcc::Lis302<Transport>::initialize(void *ctx, Scale scale, MeasurementRate rate)
 {
-	return updateControlRegister(ctx, 0, i(scale) | i(rate) | 0x47, 0xff);
+	return updateControlRegister(ctx, 0, r(scale) | r(rate) | static_cast<Control1>(0x47));
 }
 
 template < class Transport >
 xpcc::co::Result<bool>
-xpcc::Lis302<Transport>::updateControlRegister(void *ctx, uint8_t index, uint8_t setMask, uint8_t clearMask)
+xpcc::Lis302<Transport>::updateControlRegister(void *ctx, uint8_t index, Control_t setMask, Control_t clearMask)
 {
 	CO_BEGIN(ctx);
 
 	if (index < 2)
 	{
-		rawBuffer[index] = (rawBuffer[index] & ~clearMask) | setMask;
+		rawBuffer[index] = (rawBuffer[index] & ~clearMask.value) | setMask.value;
 		if (index == 0)
 			data.getPointer()[3] = rawBuffer[0];
 

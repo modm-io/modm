@@ -57,143 +57,143 @@ protected:
 
 public:
 	/// CTRL_REG1 default value is 0x07
-	struct Control1
+	enum class
+	Control1 : uint8_t
 	{
-		enum
-		{
-			DR = 0x80,		///< Data rate selection. (0: 100 Hz output data rate; 1: 400 Hz output data rate)
-			PD = 0x40,		///< Power Down Control. (0: power down mode; 1: active mode)
-			FS = 0x20,		///< Full Scale selection. (refer to Table 3 for typical full scale value)
-			STP = 0x10,		///< Self Test Enable. (0: normal mode; 1: self test P enabled)
-			STM = 0x08,		///< Self Test Enable. (0: normal mode; 1: self test M enabled)
-			Zen = 0x04,		///< Z axis enable. (0: Z axis disabled; 1: Z axis enabled)
-			Yen = 0x02,		///< Y axis enable. (0: Y axis disabled; 1: Y axis enabled)
-			Xen = 0x01,		///< X axis enable. (0: X axis disabled; 1: X axis enabled)
-		};
+		DR = 0x80,		///< Data rate selection. (0: 100 Hz output data rate; 1: 400 Hz output data rate)
+		PD = 0x40,		///< Power Down Control. (0: power down mode; 1: active mode)
+		FS = 0x20,		///< Full Scale selection. (refer to Table 3 for typical full scale value)
+		STP = 0x10,		///< Self Test Enable. (0: normal mode; 1: self test P enabled)
+		STM = 0x08,		///< Self Test Enable. (0: normal mode; 1: self test M enabled)
+		Zen = 0x04,		///< Z axis enable. (0: Z axis disabled; 1: Z axis enabled)
+		Yen = 0x02,		///< Y axis enable. (0: Y axis disabled; 1: Y axis enabled)
+		Xen = 0x01,		///< X axis enable. (0: X axis disabled; 1: X axis enabled)
 	};
+	REGISTER8(Control1);
 
 	/// CTRL_REG2 default value is 0x00
-	struct Control2
+	enum class
+	Control2 : uint8_t
 	{
-		enum
-		{
-			SIM = 0x80,			///< SPI Serial Interface Mode selection. (0: 4-wire interface; 1: 3-wire interface)
-			BOOT = 0x40,		///< Reboot memory content. (0: normal mode; 1: reboot memory content)
+		SIM = 0x80,			///< SPI Serial Interface Mode selection. (0: 4-wire interface; 1: 3-wire interface)
+		BOOT = 0x40,		///< Reboot memory content. (0: normal mode; 1: reboot memory content)
 
-			FDS = 0x10,			///< Filtered Data Selection. (0: internal filter bypassed; 1: data from internal filter sent to output register)
-			HP_FF_WU2 = 0x08,	///< High Pass filter enabled for FreeFall/WakeUp # 2. (0: filter bypassed; 1: filter enabled)
-			HP_FF_WU1 = 0x04,	///< High Pass filter enabled for Free-Fall/Wake-Up #1. (0: filter bypassed; 1: filter enabled)
-			HP_COEFF2 = 0x02,	///< High pass filter cut-off frequency configuration.
-			HP_COEFF1 = 0x01,	///< High pass filter cut-off frequency configuration.
-		};
+		FDS = 0x10,			///< Filtered Data Selection. (0: internal filter bypassed; 1: data from internal filter sent to output register)
+		HP_FF_WU2 = 0x08,	///< High Pass filter enabled for FreeFall/WakeUp # 2. (0: filter bypassed; 1: filter enabled)
+		HP_FF_WU1 = 0x04,	///< High Pass filter enabled for Free-Fall/Wake-Up #1. (0: filter bypassed; 1: filter enabled)
+		HP_COEFF2 = 0x02,	///< High pass filter cut-off frequency configuration.
+		HP_COEFF1 = 0x01,	///< High pass filter cut-off frequency configuration.
 	};
+	REGISTER8(Control2);
 
 	/// CTRL_REG3 default value is 0x00
-	struct Control3
+	enum class
+	Control3 : uint8_t
 	{
-		enum
-		{
-			IHL = 0x80,		///< Interrupt active high, low. (0: active high; 1: active low)
-			PP_OD = 0x40,	///< Push-pull/Open Drain selection on interrupt pad. (0: push-pull; 1: open drain)
+		IHL = 0x80,		///< Interrupt active high, low. (0: active high; 1: active low)
+		PP_OD = 0x40,	///< Push-pull/Open Drain selection on interrupt pad. (0: push-pull; 1: open drain)
 
-			I2CFG2 = 0x20,	///< Data Signal on Int2 pad control bits.
-			I2CFG1 = 0x10,	///< Data Signal on Int2 pad control bits.
-			I2CFG0 = 0x08,	///< Data Signal on Int2 pad control bits.
+		I2CFG2 = 0x20,	///< Data Signal on Int2 pad control bits.
+		I2CFG1 = 0x10,	///< Data Signal on Int2 pad control bits.
+		I2CFG0 = 0x08,	///< Data Signal on Int2 pad control bits.
 
-			I1CFG2 = 0x04,	///< Data Signal on Int1 pad control bits.
-			I1CFG1 = 0x02,	///< Data Signal on Int1 pad control bits.
-			I1CFG0 = 0x01,	///< Data Signal on Int1 pad control bits.
-		};
+		I1CFG2 = 0x04,	///< Data Signal on Int1 pad control bits.
+		I1CFG1 = 0x02,	///< Data Signal on Int1 pad control bits.
+		I1CFG0 = 0x01,	///< Data Signal on Int1 pad control bits.
 	};
+	REGISTER8(Control3);
+
+	REGISTER8_GROUP(Control,
+			Control1, Control2, Control3);
 
 	/// STATUS_REG default value is 0x00
-	struct Status
+	enum class
+	Status : uint8_t
 	{
-		enum
-		{
-			ZYXOR = 0x80,	///< X, Y and Z axis data overrun.
-			ZOR = 0x40,		///< Z axis data overrun.
-			YOR = 0x20,		///< Y axis data overrun.
-			XOR = 0x10,		///< X axis data overrun.
+		ZYXOR = 0x80,	///< X, Y and Z axis data overrun.
+		ZOR = 0x40,		///< Z axis data overrun.
+		YOR = 0x20,		///< Y axis data overrun.
+		XOR = 0x10,		///< X axis data overrun.
 
-			ZYXDA = 0x08,	///< X, Y and Z axis new data available.
-			ZDA = 0x04,		///< Z axis new data available.
-			YDA = 0x02,		///< Y axis new data available.
-			XDA = 0x01,		///< X axis new data available.
-		};
+		ZYXDA = 0x08,	///< X, Y and Z axis new data available.
+		ZDA = 0x04,		///< Z axis new data available.
+		YDA = 0x02,		///< Y axis new data available.
+		XDA = 0x01,		///< X axis new data available.
 	};
+	REGISTER8(Status);
 
 	/// FF_WU_CFG default value is 0x00
-	struct FreeFallConfig
+	enum class
+	FreeFallConfig : uint8_t
 	{
-		enum
-		{
-			AOI = 0x80,		///< And/or combination of Interrupt events. (0: OR combination of interrupt events; 1: AND combination of interrupt events)
-			LIR = 0x40,		///< Latch Interrupt request into FF_WU_SRC reg with the FF_WU_SRC reg cleared by reading FF_WU_SRC_1 reg.
-			ZHIE = 0x20,	///< Enable interrupt generation on Z high event.
-			ZLIE = 0x10,	///< Enable interrupt generation on Z low event.
-			YHIE = 0x08,	///< Enable interrupt generation on Y high event.
-			YLIE = 0x04,	///< Enable interrupt generation on Y low event.
-			XHIE = 0x02,	///< Enable interrupt generation on X high event.
-			XLIE = 0x01,	///< Enable interrupt generation on X low event.
-		};
+		AOI = 0x80,		///< And/or combination of Interrupt events. (0: OR combination of interrupt events; 1: AND combination of interrupt events)
+		LIR = 0x40,		///< Latch Interrupt request into FF_WU_SRC reg with the FF_WU_SRC reg cleared by reading FF_WU_SRC_1 reg.
+		ZHIE = 0x20,	///< Enable interrupt generation on Z high event.
+		ZLIE = 0x10,	///< Enable interrupt generation on Z low event.
+		YHIE = 0x08,	///< Enable interrupt generation on Y high event.
+		YLIE = 0x04,	///< Enable interrupt generation on Y low event.
+		XHIE = 0x02,	///< Enable interrupt generation on X high event.
+		XLIE = 0x01,	///< Enable interrupt generation on X low event.
 	};
+	REGISTER8(FreeFallConfig);
 
 	/// FF_WU_SRC default value is 0x00
-	struct FreeFallSource
+	enum class
+	FreeFallSource : uint8_t
 	{
-		enum
-		{
-			IA = 0x40,	///< Interrupt Active.
-			ZH = 0x20,	///< Z high.
-			ZL = 0x10,	///< Z low.
-			YH = 0x08,	///< Y high.
-			YL = 0x04,	///< Y low.
-			XH = 0x02,	///< X high.
-			XL = 0x01,	///< X low.
-		};
+		IA = 0x40,	///< Interrupt Active.
+		ZH = 0x20,	///< Z high.
+		ZL = 0x10,	///< Z low.
+		YH = 0x08,	///< Y high.
+		YL = 0x04,	///< Y low.
+		XH = 0x02,	///< X high.
+		XL = 0x01,	///< X low.
 	};
+	REGISTER8(FreeFallSource);
 
 	/// FF_WU_THS default value is 0x00
-	struct FreeFallThreshold
+	enum class
+	FreeFallThreshold : uint8_t
 	{
-		enum
-		{
-			DRCM = 0x80,	///< Resetting mode selection.
-			THS = 0x7F,		///< Free-fall / wake-up Threshold.
-		};
+		DRCM = 0x80,	///< Resetting mode selection.
+		THS_Mask = 0x7F,		///< Free-fall / wake-up Threshold.
 	};
+	REGISTER8(FreeFallThreshold);
 
 	/// CLOCK_CFG default value is 0x00
-	struct ClickConfig
+	enum class
+	ClickConfig : uint8_t
 	{
-		enum
-		{
-			LIR = 0x40,		///< Latch interrupt request into CLICK_SRC reg with the CLICK_SRC reg refreshed by reading CLICK_SRC reg.
-			DoubleZ = 0x20,
-			SingleZ = 0x10,
-			DoubleY = 0x08,
-			SingleY = 0x04,
-			DoubleX = 0x02,
-			SingleX = 0x01,
-		};
+		LIR = 0x40,		///< Latch interrupt request into CLICK_SRC reg with the CLICK_SRC reg refreshed by reading CLICK_SRC reg.
+		DoubleZ = 0x20,
+		SingleZ = 0x10,
+		DoubleY = 0x08,
+		SingleY = 0x04,
+		DoubleX = 0x02,
+		SingleX = 0x01,
 	};
+	REGISTER8(ClickConfig);
 
 	/// CLOCK_SRC default value is 0x00
-	struct ClickSource
+	enum class
+	ClickSource : uint8_t
 	{
-		enum
-		{
-			IA = 0x40,		///< Interrupt Active.
-			DoubleZ = 0x20,
-			SingleZ = 0x10,
-			DoubleY = 0x08,
-			SingleY = 0x04,
-			DoubleX = 0x02,
-			SingleX = 0x01,
-		};
+		IA = 0x40,		///< Interrupt Active.
+		DoubleZ = 0x20,
+		SingleZ = 0x10,
+		DoubleY = 0x08,
+		SingleY = 0x04,
+		DoubleX = 0x02,
+		SingleX = 0x01,
 	};
+	REGISTER8(ClickSource);
 
+	REGISTER8_GROUP(Register,
+			Control1, Control2, Control3, Status,
+			FreeFallConfig, FreeFallSource, FreeFallThreshold,
+			ClickConfig, ClickSource);
+
+public:
 	enum class
 	InterruptSource : uint8_t
 	{
@@ -234,6 +234,7 @@ public:
 		Z = 0b01,
 	};
 
+public:
 	struct __attribute__ ((packed))
 	Data
 	{
@@ -244,13 +245,13 @@ public:
 		/// @{
 		/// returns the acceleration in g
 		float ALWAYS_INLINE
-		getX() { return data[0] * (data[3] & Control1::FS ? 9.2f/128 : 2.3f/128); }
+		getX() { return data[0] * (static_cast<Control1>(data[3]) & Control1::FS ? 9.2f/128 : 2.3f/128); }
 
 		float ALWAYS_INLINE
-		getY() { return data[1] * (data[3] & Control1::FS ? 9.2f/128 : 2.3f/128); }
+		getY() { return data[1] * (static_cast<Control1>(data[3]) & Control1::FS ? 9.2f/128 : 2.3f/128); }
 
 		float ALWAYS_INLINE
-		getZ() { return data[2] * (data[3] & Control1::FS ? 9.2f/128 : 2.3f/128); }
+		getZ() { return data[2] * (static_cast<Control1>(data[3]) & Control1::FS ? 9.2f/128 : 2.3f/128); }
 		/// @}
 
 
@@ -277,8 +278,12 @@ protected:
 	i(Register reg) { return static_cast<uint8_t>(reg); }
 	static constexpr uint8_t
 	i(MeasurementRate rate) { return static_cast<uint8_t>(rate); }
+	static constexpr Control1
+	r(MeasurementRate rate) { return static_cast<Control1>(rate); }
 	static constexpr uint8_t
 	i(Scale scale) { return static_cast<uint8_t>(scale); }
+	static constexpr Control1
+	r(Scale scale) { return static_cast<Control1>(scale); }
 	static constexpr uint8_t
 	i(Interrupt interrupt) { return static_cast<uint8_t>(interrupt); }
 	/// @}
@@ -317,7 +322,7 @@ public:
 
 	// MARK: Control Registers
 	xpcc::co::Result<bool>
-	updateControlRegister(void *ctx, uint8_t index, uint8_t setMask, uint8_t clearMask = 0xff);
+	updateControlRegister(void *ctx, uint8_t index, Control_t setMask, Control_t clearMask = static_cast<Control_t>(0xff));
 
 	xpcc::co::Result<bool> inline
 	writeInterruptSource(void *ctx, Interrupt interrupt, InterruptSource source)
@@ -327,15 +332,15 @@ public:
 
 	// MARK: Free Fall Registers
 	xpcc::co::Result<bool> inline
-	updateFreeFallConfiguration(void *ctx, Interrupt interrupt, uint8_t setMask, uint8_t clearMask = 0xff)
+	updateFreeFallConfiguration(void *ctx, Interrupt interrupt, Register_t setMask, Register_t clearMask = static_cast<Register_t>(0xff))
 	{
-		return updateRegister(ctx, i(Register::FfWuCfg1) | i(interrupt), setMask, clearMask);
+		return updateRegister(ctx, i(Register::FfWuCfg1) | i(interrupt), setMask.value, clearMask.value);
 	}
 
 	xpcc::co::Result<bool> inline
-	readFreeFallSource(void *ctx, Interrupt interrupt, uint8_t &source)
+	readFreeFallSource(void *ctx, Interrupt interrupt, FreeFallSource_t &source)
 	{
-		return this->read(ctx, i(Register::FfWuSrc1) | i(interrupt), source);
+		return this->read(ctx, i(Register::FfWuSrc1) | i(interrupt), source.value);
 	}
 
 	xpcc::co::Result<bool> inline
@@ -352,13 +357,13 @@ public:
 
 	// MARK: Clock Registers
 	xpcc::co::Result<bool> inline
-	updateClickConfiguration(void *ctx, uint8_t setMask, uint8_t clearMask = 0xff)
+	updateClickConfiguration(void *ctx, ClickConfig_t setMask, ClickConfig_t clearMask)
 	{
 		return updateRegister(ctx, i(Register::ClickCfg), setMask, clearMask);
 	}
 
 	xpcc::co::Result<bool> inline
-	readClickSource(void *ctx, uint8_t &source)
+	readClickSource(void *ctx, ClickSource_t &source)
 	{
 		return this->read(ctx, i(Register::ClickSrc), source);
 	}
