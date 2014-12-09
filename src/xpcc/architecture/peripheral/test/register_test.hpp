@@ -76,7 +76,9 @@ public:
 
 	void
 	testOperators();
-};
 
+	void
+	testCasting();
+};
 
 #endif // XPCC_UNITTEST_REGISTER_HPP

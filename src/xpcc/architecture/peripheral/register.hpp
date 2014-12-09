@@ -79,6 +79,8 @@ typedef Register<uint32_t> Register32;
 #define INTERNAL_REGISTER(type, name, scope) \
 	struct CONCAT(name, _t) : public ::xpcc::Register<type> { \
 		constexpr CONCAT(name, _t)() {} \
+		explicit constexpr CONCAT(name, _t)(type value) \
+		:	Register(value) {} \
 		constexpr CONCAT(name, _t)(name value) \
 		:	Register(static_cast<type>(value)) {} \
 		INTERNAL_REGISTER_OP(type, name, &) \
@@ -113,6 +115,8 @@ typedef Register<uint32_t> Register32;
 #define INTERNAL_REGISTER_GROUP(type, name, ...) \
 	struct CONCAT(name, _t) : public ::xpcc::Register<type> { \
 	constexpr CONCAT(name, _t)() {} \
+	explicit constexpr CONCAT(name, _t)(type value) \
+	:	Register(value) {} \
 	INT_RG_GET_MACRO(__VA_ARGS__, \
 			INT_RG_30,INT_RG_29,INT_RG_28,INT_RG_27,INT_RG_26, \
 			INT_RG_25,INT_RG_24,INT_RG_23,INT_RG_22,INT_RG_21, \
