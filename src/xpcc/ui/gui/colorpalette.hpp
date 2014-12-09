@@ -63,7 +63,7 @@ public:
 	}
 
 	void
-	setColor(xpcc::glcd::Color color, Color name)
+	setColor(Color name, xpcc::glcd::Color color)
 	{
 		if (name < Color::PALETTE_SIZE)
 		{

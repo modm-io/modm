@@ -149,9 +149,9 @@ public:
 	}
 
 	void
-	setColor(xpcc::glcd::Color color, xpcc::gui::Color name)
+	setColor(xpcc::gui::Color name, xpcc::glcd::Color color)
 	{
-		this->color_palette.setColor(color, name);
+		this->color_palette.setColor(name, color);
 		this->markDirty();
 	}
 
