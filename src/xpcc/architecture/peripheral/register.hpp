@@ -11,6 +11,7 @@
 #define XPCC_REGISTER_HPP
 
 #include <stdint.h>
+#include <xpcc/utils/bit_constants.hpp>
 
 /**
  * @ingroup		peripheral
