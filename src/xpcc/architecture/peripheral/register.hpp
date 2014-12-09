@@ -79,6 +79,8 @@ typedef Register<uint32_t> Register32;
 #define INTERNAL_REGISTER(type, name, scope) \
 	struct CONCAT(name, _t) : public ::xpcc::Register<type> { \
 		constexpr CONCAT(name, _t)() {} \
+		explicit constexpr CONCAT(name, _t)(type value) \
+		:	Register(value) {} \
 		constexpr CONCAT(name, _t)(name value) \
 		:	Register(static_cast<type>(value)) {} \
 		INTERNAL_REGISTER_OP(type, name, &) \
@@ -113,6 +115,8 @@ typedef Register<uint32_t> Register32;
 #define INTERNAL_REGISTER_GROUP(type, name, ...) \
 	struct CONCAT(name, _t) : public ::xpcc::Register<type> { \
 	constexpr CONCAT(name, _t)() {} \
+	explicit constexpr CONCAT(name, _t)(type value) \
+	:	Register(value) {} \
 	INT_RG_GET_MACRO(__VA_ARGS__, \
 			INT_RG_30,INT_RG_29,INT_RG_28,INT_RG_27,INT_RG_26, \
 			INT_RG_25,INT_RG_24,INT_RG_23,INT_RG_22,INT_RG_21, \
@@ -133,32 +137,32 @@ typedef Register<uint32_t> Register32;
 #define INT_RG_3(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_2(name, __VA_ARGS__)
 #define INT_RG_4(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_3(name, __VA_ARGS__)
 #define INT_RG_5(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_4(name, __VA_ARGS__)
-#define INT_RG_6(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_5(mask, __VA_ARGS__)
+#define INT_RG_6(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_5(name, __VA_ARGS__)
 #define INT_RG_7(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_6(name, __VA_ARGS__)
-#define INT_RG_8(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_7(mask, __VA_ARGS__)
+#define INT_RG_8(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_7(name, __VA_ARGS__)
 #define INT_RG_9(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_8(name, __VA_ARGS__)
-#define INT_RG_10(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_9(mask, __VA_ARGS__)
-#define INT_RG_11(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_10(mask, __VA_ARGS__)
-#define INT_RG_12(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_11(mask, __VA_ARGS__)
-#define INT_RG_13(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_12(mask, __VA_ARGS__)
-#define INT_RG_14(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_13(mask, __VA_ARGS__)
-#define INT_RG_15(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_14(mask, __VA_ARGS__)
-#define INT_RG_16(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_15(mask, __VA_ARGS__)
-#define INT_RG_17(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_16(mask, __VA_ARGS__)
-#define INT_RG_18(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_17(mask, __VA_ARGS__)
-#define INT_RG_19(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_18(mask, __VA_ARGS__)
-#define INT_RG_20(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_19(mask, __VA_ARGS__)
-#define INT_RG_21(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_20(mask, __VA_ARGS__)
-#define INT_RG_22(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_21(mask, __VA_ARGS__)
-#define INT_RG_23(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_22(mask, __VA_ARGS__)
-#define INT_RG_24(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_23(mask, __VA_ARGS__)
-#define INT_RG_25(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_24(mask, __VA_ARGS__)
-#define INT_RG_26(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_25(mask, __VA_ARGS__)
-#define INT_RG_27(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_26(mask, __VA_ARGS__)
-#define INT_RG_28(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_27(mask, __VA_ARGS__)
-#define INT_RG_29(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_28(mask, __VA_ARGS__)
-#define INT_RG_30(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_29(mask, __VA_ARGS__)
-#define INT_RG_31(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_30(mask, __VA_ARGS__)
+#define INT_RG_10(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_9(name, __VA_ARGS__)
+#define INT_RG_11(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_10(name, __VA_ARGS__)
+#define INT_RG_12(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_11(name, __VA_ARGS__)
+#define INT_RG_13(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_12(name, __VA_ARGS__)
+#define INT_RG_14(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_13(name, __VA_ARGS__)
+#define INT_RG_15(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_14(name, __VA_ARGS__)
+#define INT_RG_16(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_15(name, __VA_ARGS__)
+#define INT_RG_17(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_16(name, __VA_ARGS__)
+#define INT_RG_18(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_17(name, __VA_ARGS__)
+#define INT_RG_19(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_18(name, __VA_ARGS__)
+#define INT_RG_20(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_19(name, __VA_ARGS__)
+#define INT_RG_21(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_20(name, __VA_ARGS__)
+#define INT_RG_22(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_21(name, __VA_ARGS__)
+#define INT_RG_23(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_22(name, __VA_ARGS__)
+#define INT_RG_24(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_23(name, __VA_ARGS__)
+#define INT_RG_25(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_24(name, __VA_ARGS__)
+#define INT_RG_26(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_25(name, __VA_ARGS__)
+#define INT_RG_27(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_26(name, __VA_ARGS__)
+#define INT_RG_28(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_27(name, __VA_ARGS__)
+#define INT_RG_29(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_28(name, __VA_ARGS__)
+#define INT_RG_30(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_29(name, __VA_ARGS__)
+#define INT_RG_31(name, reg, ...) INTERNAL_RG(name, reg)INT_RG_30(name, __VA_ARGS__)
 
 #define INT_RG_GET_MACRO(_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,\
 		_16,_17,_18,_19,_20,_21,_22,_23,_24,_25,_26,_27,_28,_29,_30,_31,...) _31

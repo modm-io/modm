@@ -117,3 +117,17 @@ RegisterTest::testOperators()
 	v1 ^= v2;
 	TEST_ASSERT_EQUALS(v1.value, 0b000);
 }
+
+
+void
+RegisterTest::testCasting()
+{
+	Test_t v1 = static_cast<Test>(0xff);
+	TEST_ASSERT_EQUALS(v1.value, 0xff);
+
+	Test_t v2 = static_cast<Test_t>(0xff);
+	TEST_ASSERT_EQUALS(v2.value, 0xff);
+
+	Common_t c1 = static_cast<Common_t>(0xff);
+	TEST_ASSERT_EQUALS(c1.value, 0xff);
+}
