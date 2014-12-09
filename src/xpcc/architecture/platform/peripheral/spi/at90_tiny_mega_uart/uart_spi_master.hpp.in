@@ -31,9 +31,6 @@ class UartSpiMaster{{ id }} : public ::xpcc::SpiMaster
 {
 	static uint8_t state;
 	static void *context;
-%% if extended is not defined
-	static DataOrder dataOrder;
-%% endif
 public:
 	static const TypeId::UartSpiMaster{{ id }}Mosi Mosi;
 	static const TypeId::UartSpiMaster{{ id }}Miso Miso;
@@ -163,6 +160,11 @@ public:
 protected:
 	static void
 	initialize(uint16_t prescaler);
+
+private:
+%% if extended is not defined
+	static DataOrder dataOrder;
+%% endif
 };
 
 } // namespace {{target.family}}
