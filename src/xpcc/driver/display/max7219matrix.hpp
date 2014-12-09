@@ -62,8 +62,8 @@ public:
         CS::reset();
         for (uint8_t ii = 0; ii < MODULES; ++ii)
         {
-			SPI::writeReadBlocking(col + 1);
-			SPI::writeReadBlocking(*data++);
+			SPI::transferBlocking(col + 1);
+			SPI::transferBlocking(*data++);
         }
         CS::set();
     }
@@ -103,8 +103,8 @@ private:
         // Write the command multiple times, for each MODULES
         for (uint8_t ii = 0; ii < MODULES; ++ii)
         {
-			SPI::writeReadBlocking(cmd);
-			SPI::writeReadBlocking(data);
+			SPI::transferBlocking(cmd);
+			SPI::transferBlocking(data);
         }
         CS::set();
     }

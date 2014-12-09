@@ -12,15 +12,15 @@ MAIN_FUNCTION
 	LedBlue::setOutput(xpcc::Gpio::High);
 
 	// Enable SPI 2
-	GpioOutputB12::connect(SpiSimpleMaster2::Nss);
-	GpioOutputB15::connect(SpiSimpleMaster2::Mosi);
-	GpioInputB14::connect(SpiSimpleMaster2::Miso);
-	GpioOutputB13::connect(SpiSimpleMaster2::Sck);
-	SpiSimpleMaster2::initialize<defaultSystemClock, MHz20>();
+	GpioOutputB12::connect(SpiMaster2::Nss);
+	GpioOutputB15::connect(SpiMaster2::Mosi);
+	GpioInputB14::connect(SpiMaster2::Miso);
+	GpioOutputB13::connect(SpiMaster2::Sck);
+	SpiMaster2::initialize<defaultSystemClock, MHz20>();
 
 	while (1)
 	{
-		SpiSimpleMaster1::writeReadBlocking(0xF0);
+		SpiMaster1::transferBlocking(0xF0);
 	}
 
 	return 0;

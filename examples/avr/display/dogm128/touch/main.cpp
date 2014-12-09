@@ -33,7 +33,7 @@ namespace lcd
 	typedef GpioOutputD3 A0;
 	typedef GpioOutputD4 Reset;
 
-	typedef xpcc::SoftwareSpiSimpleMaster< Scl, Mosi, xpcc::GpioUnused > SPI;
+	typedef xpcc::SoftwareSpiMaster< Scl, Mosi, xpcc::GpioUnused > SPI;
 }
 
 xpcc::DogM128< lcd::SPI, lcd::Cs, lcd::A0, lcd::Reset, true > display;
@@ -54,7 +54,7 @@ main()
     GpioOutputD1::connect(Uart0::Tx);
     GpioInputD0::connect(Uart0::Rx);
     Uart0::initialize<clock, 115200>();
-    
+
 	// Enable interrupts, this is needed for every buffered UART
 	sei();
 

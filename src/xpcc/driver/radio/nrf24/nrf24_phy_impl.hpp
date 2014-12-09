@@ -29,7 +29,7 @@ xpcc::Nrf24Phy<Spi, Csn, Ce>::writeCommandNoData(nrf24::Command cmd)
 {
     Csn::reset();
 
-    status = Spi::writeReadBlocking(cmd);
+    status = Spi::transferBlocking(cmd);
 
     Csn::set();
 }
@@ -42,9 +42,9 @@ xpcc::Nrf24Phy<Spi, Csn, Ce>::writeCommandSingleData(nrf24::Command cmd, uint8_t
 {
     Csn::reset();
 
-    status = Spi::writeReadBlocking(cmd);
+    status = Spi::transferBlocking(cmd);
 
-    uint8_t ret = Spi::writeReadBlocking(data);
+    uint8_t ret = Spi::transferBlocking(data);
 
     Csn::set();
 
@@ -62,7 +62,7 @@ xpcc::Nrf24Phy<Spi, Csn, Ce>::writeCommandMultiData(nrf24::Command cmd, uint8_t*
 {
     Csn::reset();
 
-    status = Spi::writeReadBlocking(cmd);
+    status = Spi::transferBlocking(cmd);
 
     uint8_t i;
     for(i = 0; i < argc; i++)
@@ -75,7 +75,7 @@ xpcc::Nrf24Phy<Spi, Csn, Ce>::writeCommandMultiData(nrf24::Command cmd, uint8_t*
             arg = argv[i];
         }
 
-        data = Spi::writeReadBlocking(arg);
+        data = Spi::transferBlocking(arg);
 
         if(retv != nullptr)
         {

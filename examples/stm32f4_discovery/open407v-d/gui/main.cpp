@@ -82,7 +82,7 @@ xpcc::glcd::Point last_point;
 typedef GpioOutputC4 CsTouchscreen;
 typedef GpioInputC5  IntTouchscreen;
 
-xpcc::Ads7843<SpiSimpleMaster2, CsTouchscreen, IntTouchscreen> ads7843;
+xpcc::Ads7843<SpiMaster2, CsTouchscreen, IntTouchscreen> ads7843;
 xpcc::TouchscreenCalibrator touchscreen;
 
 typedef GpioOutputD7 CS;
@@ -92,7 +92,7 @@ initDisplay()
 {
 
 	Fsmc::initialize();
-	
+
 	GpioD14::connect(Fsmc::D0);
 	GpioD15::connect(Fsmc::D1);
 	GpioD0::connect(Fsmc::D2);
@@ -113,33 +113,33 @@ initDisplay()
 	GpioD4::connect(Fsmc::Noe);
 	GpioD5::connect(Fsmc::Nwe);
 	GpioD11::connect(Fsmc::A16);
-	
+
 
 	CS::setOutput();
 	CS::reset();
-	
+
 	fsmc::NorSram::AsynchronousTiming timing = {
 		// read
 		15,
 		0,
 		15,
-		
+
 		// write
 		15,
 		0,
 		15,
-		
-		// bus turn around 
+
+		// bus turn around
 		0
 	};
-	
+
 	fsmc::NorSram::configureAsynchronousRegion(
 			fsmc::NorSram::CHIP_SELECT_1,
 			fsmc::NorSram::NO_MULTIPLEX_16BIT,
 			fsmc::NorSram::SRAM_ROM,
 			fsmc::NorSram::MODE_A,
 			timing);
-	
+
 	fsmc::NorSram::enableRegion(fsmc::NorSram::CHIP_SELECT_1);
 
 	tft.initialize();
@@ -150,15 +150,15 @@ initTouchscreen()
 {
 	CsTouchscreen::setOutput();
 	CsTouchscreen::set();
-	
+
 	IntTouchscreen::setInput(Gpio::InputType::PullUp);
 
-	GpioOutputB13::connect(SpiSimpleMaster2::Sck);
-	GpioInputB14::connect(SpiSimpleMaster2::Miso);
-	GpioOutputB15::connect(SpiSimpleMaster2::Mosi);
+	GpioOutputB13::connect(SpiMaster2::Sck);
+	GpioInputB14::connect(SpiMaster2::Miso);
+	GpioOutputB15::connect(SpiMaster2::Mosi);
 
-	SpiSimpleMaster2::initialize<defaultSystemClock, 656250ul>();
-	SpiSimpleMaster2::setDataMode(SpiSimpleMaster2::DataMode::Mode0);
+	SpiMaster2::initialize<defaultSystemClock, 656250ul>();
+	SpiMaster2::setDataMode(SpiMaster2::DataMode::Mode0);
 
 }
 
@@ -192,7 +192,7 @@ calibrateTouchscreen(xpcc::GraphicDisplay& display, xpcc::glcd::Point *fixed_sam
 {
 	xpcc::glcd::Point calibrationPoint[3] = { { 45, 45 }, { 270, 90 }, { 100, 190 } };
 	xpcc::glcd::Point sample[3];
-	
+
 	if(!fixed_samples) {
 		for (uint8_t i = 0; i < 3; i++)
 		{
@@ -227,7 +227,7 @@ drawPoint(xpcc::GraphicDisplay& display, xpcc::glcd::Point point)
 	if (point.x < 0 || point.y < 0) {
 		return;
 	}
-	
+
 	display.drawPixel(point.x, point.y);
 	display.drawPixel(point.x + 1, point.y);
 	display.drawPixel(point.x, point.y + 1);
@@ -432,7 +432,7 @@ MAIN_FUNCTION
 	 */
 
 	calibrateTouchscreen(tft, calibration);
-	
+
 
 	/*
 	 * manipulate the color palette

@@ -55,10 +55,10 @@ xpcc::At45db0x1d<Spi, Cs>::initialize()
 		Cs::reset();
 
 		// send page size change sequence (fixed sequence)
-		Spi::writeReadBlocking(0x3d);
-		Spi::writeReadBlocking(0x2a);
-		Spi::writeReadBlocking(0x80);
-		Spi::writeReadBlocking(0xa6);
+		Spi::transferBlocking(0x3d);
+		Spi::transferBlocking(0x2a);
+		Spi::transferBlocking(0x80);
+		Spi::transferBlocking(0xa6);
 
 		Cs::set();
 	}
@@ -76,16 +76,16 @@ xpcc::At45db0x1d<Spi, Cs>::copyPageToBuffer(uint16_t pageAddress, at45db::Buffer
 	Cs::reset();
 
 	if (buffer == at45db::BUFFER_0) {
-		Spi::writeReadBlocking(MAIN_MEMORY_PAGE_TO_BUFFER_1_TRANSFER);
+		Spi::transferBlocking(MAIN_MEMORY_PAGE_TO_BUFFER_1_TRANSFER);
 	}
 	else {
-		Spi::writeReadBlocking(MAIN_MEMORY_PAGE_TO_BUFFER_2_TRANSFER);
+		Spi::transferBlocking(MAIN_MEMORY_PAGE_TO_BUFFER_2_TRANSFER);
 	}
 
 	// set address
-	Spi::writeReadBlocking(pageAddress >> 8);
-	Spi::writeReadBlocking(pageAddress & 0xff);
-	Spi::writeReadBlocking(0);
+	Spi::transferBlocking(pageAddress >> 8);
+	Spi::transferBlocking(pageAddress & 0xff);
+	Spi::transferBlocking(0);
 
 	Cs::set();
 }
@@ -98,16 +98,16 @@ xpcc::At45db0x1d<Spi, Cs>::comparePageToBuffer(uint16_t pageAddress, at45db::Buf
 	Cs::reset();
 
 	if (buffer == at45db::BUFFER_0) {
-		Spi::writeReadBlocking(MAIN_MEMORY_PAGE_TO_BUFFER_1_COMPARE);
+		Spi::transferBlocking(MAIN_MEMORY_PAGE_TO_BUFFER_1_COMPARE);
 	}
 	else {
-		Spi::writeReadBlocking(MAIN_MEMORY_PAGE_TO_BUFFER_2_COMPARE);
+		Spi::transferBlocking(MAIN_MEMORY_PAGE_TO_BUFFER_2_COMPARE);
 	}
 
 	// set address
-	Spi::writeReadBlocking(pageAddress >> 8);
-	Spi::writeReadBlocking(pageAddress & 0xff);
-	Spi::writeReadBlocking(0);
+	Spi::transferBlocking(pageAddress >> 8);
+	Spi::transferBlocking(pageAddress & 0xff);
+	Spi::transferBlocking(0);
 
 	Cs::set();
 }
@@ -128,16 +128,16 @@ xpcc::At45db0x1d<Spi, Cs>::copyBufferToPage(at45db::Buffer buffer, uint16_t page
 	Cs::reset();
 
 	if (buffer == at45db::BUFFER_0) {
-		Spi::writeReadBlocking(BUFFER_1_TO_MAIN_MEMORY_PAGE_PROGRAM_WITH_ERASE);
+		Spi::transferBlocking(BUFFER_1_TO_MAIN_MEMORY_PAGE_PROGRAM_WITH_ERASE);
 	}
 	else {
-		Spi::writeReadBlocking(BUFFER_2_TO_MAIN_MEMORY_PAGE_PROGRAM_WITH_ERASE);
+		Spi::transferBlocking(BUFFER_2_TO_MAIN_MEMORY_PAGE_PROGRAM_WITH_ERASE);
 	}
 
 	// set address
-	Spi::writeReadBlocking(pageAddress >> 8);
-	Spi::writeReadBlocking(pageAddress & 0xff);
-	Spi::writeReadBlocking(0);
+	Spi::transferBlocking(pageAddress >> 8);
+	Spi::transferBlocking(pageAddress & 0xff);
+	Spi::transferBlocking(0);
 
 	Cs::set();
 }
@@ -150,16 +150,16 @@ xpcc::At45db0x1d<Spi, Cs>::copyBufferToPageWithoutErase(at45db::Buffer buffer, u
 	Cs::reset();
 
 	if (buffer == at45db::BUFFER_0) {
-		Spi::writeReadBlocking(BUFFER_1_TO_MAIN_MEMORY_PAGE_PROGRAM_WITHOUT_ERASE);
+		Spi::transferBlocking(BUFFER_1_TO_MAIN_MEMORY_PAGE_PROGRAM_WITHOUT_ERASE);
 	}
 	else {
-		Spi::writeReadBlocking(BUFFER_2_TO_MAIN_MEMORY_PAGE_PROGRAM_WITHOUT_ERASE);
+		Spi::transferBlocking(BUFFER_2_TO_MAIN_MEMORY_PAGE_PROGRAM_WITHOUT_ERASE);
 	}
 
 	// set address
-	Spi::writeReadBlocking(pageAddress >> 8);
-	Spi::writeReadBlocking(pageAddress & 0xff);
-	Spi::writeReadBlocking(0);
+	Spi::transferBlocking(pageAddress >> 8);
+	Spi::transferBlocking(pageAddress & 0xff);
+	Spi::transferBlocking(0);
 
 	Cs::set();
 }
@@ -172,22 +172,22 @@ xpcc::At45db0x1d<Spi, Cs>::readFromBuffer(at45db::Buffer buffer,
 {
 	Cs::reset();
 	if (buffer == at45db::BUFFER_0) {
-		Spi::writeReadBlocking(BUFFER_1_READ);
+		Spi::transferBlocking(BUFFER_1_READ);
 	}
 	else {
-		Spi::writeReadBlocking(BUFFER_2_READ);
+		Spi::transferBlocking(BUFFER_2_READ);
 	}
 
 	// set address
-	Spi::writeReadBlocking(0);
-	Spi::writeReadBlocking(0);
-	Spi::writeReadBlocking(address);
+	Spi::transferBlocking(0);
+	Spi::transferBlocking(0);
+	Spi::transferBlocking(address);
 
 	// don't care byte
-	Spi::writeReadBlocking(0);
+	Spi::transferBlocking(0);
 
 	for (std::size_t i = 0; i < size; ++i) {
-		*data++ = Spi::writeReadBlocking(0);
+		*data++ = Spi::transferBlocking(0);
 	}
 	Cs::set();
 }
@@ -200,19 +200,19 @@ xpcc::At45db0x1d<Spi, Cs>::writeToBuffer(at45db::Buffer buffer,
 {
 	Cs::reset();
 	if (buffer == at45db::BUFFER_0) {
-		Spi::writeReadBlocking(BUFFER_1_WRITE);
+		Spi::transferBlocking(BUFFER_1_WRITE);
 	}
 	else {
-		Spi::writeReadBlocking(BUFFER_2_WRITE);
+		Spi::transferBlocking(BUFFER_2_WRITE);
 	}
 
 	// set address
-	Spi::writeReadBlocking(0);
-	Spi::writeReadBlocking(0);
-	Spi::writeReadBlocking(address);
+	Spi::transferBlocking(0);
+	Spi::transferBlocking(0);
+	Spi::transferBlocking(address);
 
 	for (std::size_t i = 0; i < size; ++i) {
-		Spi::writeReadBlocking(*data++);
+		Spi::transferBlocking(*data++);
 	}
 	Cs::set();
 }
@@ -223,15 +223,15 @@ void
 xpcc::At45db0x1d<Spi, Cs>::readFromMemory(uint32_t address, uint8_t *data, std::size_t size)
 {
 	Cs::reset();
-	Spi::writeReadBlocking(CONTINOUS_ARRAY_READ);
+	Spi::transferBlocking(CONTINOUS_ARRAY_READ);
 
 	// set address
-	Spi::writeReadBlocking(address >> 16);
-	Spi::writeReadBlocking(address >> 8);
-	Spi::writeReadBlocking(address);
+	Spi::transferBlocking(address >> 16);
+	Spi::transferBlocking(address >> 8);
+	Spi::transferBlocking(address);
 
 	for (std::size_t i = 0; i < size; ++i) {
-		*data++ = Spi::writeReadBlocking(0);
+		*data++ = Spi::transferBlocking(0);
 	}
 	Cs::set();
 }
@@ -242,21 +242,21 @@ void
 xpcc::At45db0x1d<Spi, Cs>::readPageFromMemory(uint32_t address, uint8_t *data, std::size_t size)
 {
 	Cs::reset();
-	Spi::writeReadBlocking(MAIN_MEMORY_PAGE_READ);
+	Spi::transferBlocking(MAIN_MEMORY_PAGE_READ);
 
 	// set address
-	Spi::writeReadBlocking(address >> 16);
-	Spi::writeReadBlocking(address >> 8);
-	Spi::writeReadBlocking(address);
+	Spi::transferBlocking(address >> 16);
+	Spi::transferBlocking(address >> 8);
+	Spi::transferBlocking(address);
 
 	// don't care
-	Spi::writeReadBlocking(0);
-	Spi::writeReadBlocking(0);
-	Spi::writeReadBlocking(0);
-	Spi::writeReadBlocking(0);
+	Spi::transferBlocking(0);
+	Spi::transferBlocking(0);
+	Spi::transferBlocking(0);
+	Spi::transferBlocking(0);
 
 	for (std::size_t i = 0; i < size; ++i) {
-		*data++ = Spi::writeReadBlocking(0);
+		*data++ = Spi::transferBlocking(0);
 	}
 	Cs::set();
 }
@@ -271,9 +271,9 @@ xpcc::At45db0x1d<Spi, Cs>::pageErase(uint16_t pageAddress)
 	Cs::reset();
 
 	// set address
-	Spi::writeReadBlocking(pageAddress >> 8);
-	Spi::writeReadBlocking(pageAddress & 0xff);
-	Spi::writeReadBlocking(0);
+	Spi::transferBlocking(pageAddress >> 8);
+	Spi::transferBlocking(pageAddress & 0xff);
+	Spi::transferBlocking(0);
 
 	Cs::set();
 }
@@ -286,16 +286,16 @@ xpcc::At45db0x1d<Spi, Cs>::pageRewrite(uint16_t pageAddress, at45db::Buffer buff
 	Cs::reset();
 
 	if (buffer == at45db::BUFFER_0) {
-		Spi::writeReadBlocking(BUFFER_1_PAGE_REWRITE);
+		Spi::transferBlocking(BUFFER_1_PAGE_REWRITE);
 	}
 	else {
-		Spi::writeReadBlocking(BUFFER_2_PAGE_REWRITE);
+		Spi::transferBlocking(BUFFER_2_PAGE_REWRITE);
 	}
 
 	// set address
-	Spi::writeReadBlocking(pageAddress >> 8);
-	Spi::writeReadBlocking(pageAddress & 0xff);
-	Spi::writeReadBlocking(0);
+	Spi::transferBlocking(pageAddress >> 8);
+	Spi::transferBlocking(pageAddress & 0xff);
+	Spi::transferBlocking(0);
 
 	Cs::set();
 }
@@ -310,9 +310,9 @@ xpcc::At45db0x1d<Spi, Cs>::blockErase(uint16_t blockAddress)
 	Cs::reset();
 
 	// set address
-	Spi::writeReadBlocking(blockAddress >> 8);
-	Spi::writeReadBlocking(blockAddress & 0xf8);
-	Spi::writeReadBlocking(0);
+	Spi::transferBlocking(blockAddress >> 8);
+	Spi::transferBlocking(blockAddress & 0xf8);
+	Spi::transferBlocking(0);
 
 	Cs::set();
 }
@@ -327,10 +327,10 @@ xpcc::At45db0x1d<Spi, Cs>::chipErase()
 	Cs::reset();
 
 	// send chip erase sequence (fixed sequence)
-	Spi::writeReadBlocking(0xc7);
-	Spi::writeReadBlocking(0x94);
-	Spi::writeReadBlocking(0x80);
-	Spi::writeReadBlocking(0x9a);
+	Spi::transferBlocking(0xc7);
+	Spi::transferBlocking(0x94);
+	Spi::transferBlocking(0x80);
+	Spi::transferBlocking(0x9a);
 
 	Cs::set();
 }
@@ -359,8 +359,8 @@ uint8_t
 xpcc::At45db0x1d<Spi, Cs>::readStatus()
 {
 	Cs::reset();
-	Spi::writeReadBlocking(READ_STATUS_REGISTER);
-	uint8_t result = Spi::writeReadBlocking(0);		// dummy write to get result
+	Spi::transferBlocking(READ_STATUS_REGISTER);
+	uint8_t result = Spi::transferBlocking(0);		// dummy write to get result
 	Cs::set();
 
 	return result;

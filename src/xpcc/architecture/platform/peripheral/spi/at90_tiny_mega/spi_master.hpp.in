@@ -1,0 +1,153 @@
+// coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+{{ generation_block }}
+
+#ifndef XPCC_{{target.family | upper}}_SPI_MASTER_HPP
+#define XPCC_{{target.family | upper}}_SPI_MASTER_HPP
+
+#include <xpcc/architecture/peripheral/spi_master.hpp>
+#include "type_ids.hpp"
+#include "spi.hpp"
+
+namespace xpcc
+{
+
+namespace {{target.family}}
+{
+
+/**
+ * Implementation of the SimpleSpi.
+ *
+ * The fast SPI clock speeds make it unreasonable to use an interrupt
+ * based approach to shifting out each byte of the data, since the interrupt
+ * handling might decrease performance over busy waiting especially for
+ * targets operating at low CPU frequencies.
+ * Therefore the asynchronous methods are implemented synchronously.
+ *
+ * @warning	When the !SS pin is configured in input mode and pulled low, the
+ *			hardware will switch into SPI slave mode. It is therefore necessary
+ *			to configure the pin either in output mode or to pull it high.
+ *
+ * @ingroup		{{target.family}}
+ * @author		Niklas Hauser
+ */
+class SpiMaster : public ::xpcc::SpiMaster, private Spi
+{
+	static uint8_t state;
+	static void *context;
+public:
+	static const TypeId::SpiMasterMosi Mosi;
+	static const TypeId::SpiMasterMiso Miso;
+	static const TypeId::SpiMasterSck  Sck;
+	static const TypeId::SpiMasterSs   Ss;
+
+	/// Spi Data Mode, Mode0 is the most common mode
+	enum class
+	DataMode : uint8_t
+	{
+		Mode0 = 0,	///< clock normal,   sample on rising  edge
+		Mode1 = (1 << CPOL),	///< clock normal,   sample on falling edge
+		Mode2 = (1 << CPHA),	///< clock inverted, sample on rising  edge
+		Mode3 = (1 << CPOL) | (1 << CPHA),	///< clock inverted, sample on falling edge
+	};
+
+public:
+	// start documentation inherited
+	template< class clockSource, uint32_t baudrate,
+			uint16_t tolerance = xpcc::Tolerance::FivePercent >
+	static inline void
+	initialize()
+	{
+		// calculate the nearest prescaler from the baudrate
+		constexpr float pre_raw = (static_cast<float>(clockSource::Spi) / baudrate);
+		constexpr uint16_t pre = (
+				(pre_raw >= ( 64 * 4.f/3)) ? 128 : (
+				(pre_raw >= ( 32 * 4.f/3)) ?  64 : (
+				(pre_raw >= ( 16 * 4.f/3)) ?  32 : (
+				(pre_raw >= (  8 * 4.f/3)) ?  16 : (
+				(pre_raw >= (  4 * 4.f/3)) ?   8 : (
+				(pre_raw >= (  2 * 4.f/3)) ?   4 :
+											   2
+				))))));
+
+		// check if we found a prescaler which generates a baudrate within the tolerance
+		assertBaudrateInTolerance<
+				clockSource::Spi / pre,
+				baudrate,
+				tolerance >();
+
+		// translate the prescaler into the bitmapping
+		constexpr Prescaler prescaler = (
+				(pre >= 128) ? Prescaler::Div128 : (
+				(pre >=  64) ? Prescaler::Div64  : (
+				(pre >=  32) ? Prescaler::Div32  : (
+				(pre >=  16) ? Prescaler::Div16  : (
+				(pre >=   8) ? Prescaler::Div8   : (
+				(pre >=   4) ? Prescaler::Div4   :
+							   Prescaler::Div2
+				))))));
+
+		initialize(prescaler);
+	}
+
+
+	static void
+	setDataMode(DataMode mode)
+	{
+		SPCR = (SPCR & ~((1 << CPOL) | (1 << CPHA))) | static_cast<uint8_t>(mode);
+	}
+
+	static void
+	setDataOrder(DataOrder order)
+	{
+		if (order == DataOrder::LsbFirst) {
+			SPCR |= (1 << DORD);
+		} else {
+			SPCR &= ~(1 << DORD);
+		}
+	}
+
+
+	static uint8_t
+	aquire(void *ctx);
+
+	static uint8_t
+	release(void *ctx);
+
+
+	static uint8_t
+	transferBlocking(uint8_t data)
+	{
+		return CO_CALL_BLOCKING(transfer(data));
+	}
+
+	static void
+	transferBlocking(uint8_t *tx, uint8_t *rx, std::size_t length)
+	{
+		CO_CALL_BLOCKING(transfer(tx, rx, length));
+	}
+
+
+	static xpcc::co::Result<uint8_t>
+	transfer(uint8_t data);
+
+	static xpcc::co::Result<void>
+	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
+	// end documentation inherited
+
+protected:
+	static void
+	initialize(Prescaler prescaler);
+};
+
+} // namespace {{target.family}}
+
+} // namespace xpcc
+
+#endif // XPCC_{{target.family | upper}}_SPI_MASTER_HPP
