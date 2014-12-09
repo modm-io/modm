@@ -10,6 +10,8 @@
 #ifndef XPCC_BIT_CONSTANTS_HPP
 #define XPCC_BIT_CONSTANTS_HPP
 
+#include <stdint.h>
+
 namespace xpcc
 {
 
