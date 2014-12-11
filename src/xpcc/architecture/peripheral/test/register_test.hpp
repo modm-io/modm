@@ -13,9 +13,12 @@
 #include <unittest/testsuite.hpp>
 #include <xpcc/architecture/peripheral/register.hpp>
 
-struct testing
+namespace xpcc
 {
 
+struct testing
+{
+protected:
 	enum class
 	Test
 	{
@@ -47,7 +50,6 @@ struct testing
 	REGISTER8(Test2);
 
 	REGISTER8_GROUP(Common, Test, Test2);
-
 };
 
 enum class
@@ -65,10 +67,12 @@ Test3
 };
 // test macro outside of struct
 // all enum operations must not be declared 'friend'
-INTERNAL_REGISTER(uint8_t, Test3,);
+INTERNAL_REGISTER(uint8_t, Test3, );
+
+}
 
 // @author Niklas Hauser
-class RegisterTest : public unittest::TestSuite, public testing
+class RegisterTest : public unittest::TestSuite, public xpcc::testing
 {
 public:
 	void

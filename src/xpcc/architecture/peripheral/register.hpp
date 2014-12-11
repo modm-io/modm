@@ -87,31 +87,30 @@ typedef Register<uint32_t> Register32;
 		INTERNAL_REGISTER_OP(type, name, &) \
 		INTERNAL_REGISTER_OP(type, name, |) \
 		INTERNAL_REGISTER_OP(type, name, ^) \
-		friend constexpr CONCAT(name, _t) operator compl (CONCAT(name, _t) const &lhs) \
-		{ return CONCAT(name, _t)(static_cast<name>(compl lhs.value)); } \
 	}; \
+	scope constexpr CONCAT(name, _t) operator compl (CONCAT(name, _t) const &lhs) \
+	{ return CONCAT(name, _t)(static_cast<name>(compl lhs.value)); } \
+	scope constexpr CONCAT(name, _t) operator compl (name const &lhs) \
+	{ return CONCAT(name, _t)(static_cast<name>(compl static_cast<type>(lhs))); } \
 	INTERNAL_REGISTER_EOP(type, name, &, scope) \
 	INTERNAL_REGISTER_EOP(type, name, |, scope) \
-	INTERNAL_REGISTER_EOP(type, name, ^, scope) \
-	scope constexpr CONCAT(name, _t) operator compl (name const &lhs) \
-	{ return CONCAT(name, _t)(static_cast<name>(compl static_cast<type>(lhs))); }
-
+	INTERNAL_REGISTER_EOP(type, name, ^, scope)
 
 #define INTERNAL_REGISTER_EOP(type, name, op, scope) \
+	scope constexpr CONCAT(name, _t) operator op (name const &lhs, CONCAT(name, _t) const &rhs) \
+	{ return CONCAT(name, _t)(static_cast<name>(static_cast<type>(lhs) op rhs.value)); } \
+	scope constexpr CONCAT(name, _t) operator op (CONCAT(name, _t) const &lhs, name const &rhs) \
+	{ return CONCAT(name, _t)(static_cast<name>(static_cast<type>(rhs) op lhs.value)); } \
+	scope constexpr CONCAT(name, _t) operator op (CONCAT(name, _t) const &lhs, CONCAT(name, _t) const &rhs) \
+	{ return CONCAT(name, _t)(static_cast<name>(lhs.value op rhs.value)); } \
 	scope constexpr CONCAT(name, _t) operator op (name const &lhs, name const &rhs) \
 	{ return CONCAT(name, _t)(static_cast<name>(static_cast<type>(lhs) op static_cast<type>(rhs))); }
 
 #define INTERNAL_REGISTER_OP(type, name, op) \
-	friend constexpr CONCAT(name, _t) operator op (name const &lhs, CONCAT(name, _t) const &rhs) \
-	{ return CONCAT(name, _t)(static_cast<name>(static_cast<type>(lhs) op rhs.value)); } \
-	friend constexpr CONCAT(name, _t) operator op (CONCAT(name, _t) const &lhs, name const &rhs) \
-	{ return CONCAT(name, _t)(static_cast<name>(static_cast<type>(rhs) op lhs.value)); } \
-	friend constexpr CONCAT(name, _t) operator op (CONCAT(name, _t) const &lhs, CONCAT(name, _t) const &rhs) \
-	{ return CONCAT(name, _t)(static_cast<name>(lhs.value op rhs.value)); } \
 	inline CONCAT(name, _t)& operator CONCAT(op, =) (CONCAT(name, _t) const &rhs) \
-	{ *this = *this op rhs; return *this; } \
+	{ value CONCAT(op, =) rhs.value; return *this; } \
 	inline CONCAT(name, _t)& operator CONCAT(op, =) (name const &rhs) \
-	{ *this = *this op rhs; return *this; }
+	{ value CONCAT(op, =) static_cast<type>(rhs); return *this; }
 
 #define INTERNAL_REGISTER_GROUP(type, name, ...) \
 	struct CONCAT(name, _t) : public ::xpcc::Register<type> { \
