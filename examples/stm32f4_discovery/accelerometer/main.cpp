@@ -1,7 +1,7 @@
 #include <xpcc/architecture/platform.hpp>
 #include "../stm32f4_discovery.hpp"
 
-#include <xpcc/driver/inertial/lis.hpp>
+#include <xpcc/driver/inertial/lis302.hpp>
 #define USE_I2C 0
 
 namespace lis
@@ -30,7 +30,7 @@ typedef GpioInputE1 Int2;
 } // namespace lis
 
 // Acceleration Data object
-xpcc::lis::Data data;
+xpcc::lis302::Data data;
 
 // LIS302DL Driver object
 #if USE_I2C
