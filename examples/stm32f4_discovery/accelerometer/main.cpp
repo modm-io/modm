@@ -1,10 +1,10 @@
 #include <xpcc/architecture/platform.hpp>
 #include "../stm32f4_discovery.hpp"
 
-#include <xpcc/driver/inertial/lis302.hpp>
+#include <xpcc/driver/inertial/lis.hpp>
 #define USE_I2C 0
 
-namespace lis302
+namespace lis
 {
 
 // Spi Transport Layer
@@ -27,16 +27,16 @@ typedef xpcc::Lis302I2cTransport< I2cMaster > I2cTransport;
 typedef GpioInputE0 Int1;
 typedef GpioInputE1 Int2;
 
-} // namespace lis302
+} // namespace lis
 
 // Acceleration Data object
-xpcc::lis302::Data data;
+xpcc::lis::Data data;
 
 // LIS302DL Driver object
 #if USE_I2C
-xpcc::Lis302< lis302::I2cTransport > accel(data, 0x1D);
+xpcc::Lis302< lis::I2cTransport > accel(data, 0x1D);
 #else
-xpcc::Lis302< lis302::SpiTransport > accel(data);
+xpcc::Lis302< lis::SpiTransport > accel(data);
 #endif
 
 #include <xpcc/processing.hpp>
@@ -104,22 +104,22 @@ MAIN_FUNCTION
 	LedBlue::setOutput(xpcc::Gpio::Low);
 
 #if USE_I2C
-	lis302::Cs::setOutput(xpcc::Gpio::High);
-	lis302::Mosi::setOutput(xpcc::Gpio::High);
+	lis::Cs::setOutput(xpcc::Gpio::High);
+	lis::Mosi::setOutput(xpcc::Gpio::High);
 
-	lis302::Scl::connect(lis302::I2cMaster::Scl);
-	lis302::Sda::connect(lis302::I2cMaster::Sda);
-	lis302::Scl::configure(Gpio::InputType::PullUp);
-	lis302::Sda::configure(Gpio::InputType::PullUp);
+	lis::Scl::connect(lis::I2cMaster::Scl);
+	lis::Sda::connect(lis::I2cMaster::Sda);
+	lis::Scl::configure(Gpio::InputType::PullUp);
+	lis::Sda::configure(Gpio::InputType::PullUp);
 
-	lis302::I2cMaster::initialize<defaultSystemClock, 400000>();
+	lis::I2cMaster::initialize<defaultSystemClock, 400000>();
 #else
-	lis302::Sck::connect(lis302::SpiMaster::Sck);
-	lis302::Miso::connect(lis302::SpiMaster::Miso);
-	lis302::Mosi::connect(lis302::SpiMaster::Mosi);
+	lis::Sck::connect(lis::SpiMaster::Sck);
+	lis::Miso::connect(lis::SpiMaster::Miso);
+	lis::Mosi::connect(lis::SpiMaster::Mosi);
 
-	lis302::SpiMaster::initialize<defaultSystemClock, MHz10>();
-	lis302::SpiMaster::setDataMode(lis302::SpiMaster::DataMode::Mode3);
+	lis::SpiMaster::initialize<defaultSystemClock, MHz10>();
+	lis::SpiMaster::setDataMode(lis::SpiMaster::DataMode::Mode3);
 #endif
 
 	while (1)
