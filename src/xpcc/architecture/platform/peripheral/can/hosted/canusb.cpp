@@ -65,14 +65,13 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int baudRate)
 		{
 		}
 
-//		this->serialPort.clearWriteBuffer();
-//		this->serialPort.clearReadBuffer();
+		char a;
+		while( this->serialPort.read(a) );
 
 		std::cout << "write S4" << std::endl;
 		this->serialPort.write("S4\r");
 
 		timer.restart(500);
-		char a;
 		while (!this->serialPort.read(a))
 		{
 			if (timer.isExpired())
