@@ -6,6 +6,6 @@
     <driver type="graphics" name="hosted"/>
     <driver type="tipc" name="linux"/>
     <driver type="uart" name="hosted"/>
-    <driver type="uart" name="linux"/>
+    <driver type="uart" name="posix"/>
   </device>
 </rca>

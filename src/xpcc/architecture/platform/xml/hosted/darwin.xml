@@ -4,5 +4,6 @@
   <device platform="hosted" family="darwin">
     <driver type="can" name="hosted"/>
     <driver type="uart" name="hosted"/>
+    <driver type="uart" name="posix"/>
   </device>
 </rca>
