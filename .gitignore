@@ -6,6 +6,8 @@
 .pydevproject
 .settings/
 build/
+.idea/
+.vagrant/
 
 # Directories containing device specific files generated from templates
 # in src/xpcc/architecture/
