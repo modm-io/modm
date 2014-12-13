@@ -1,11 +1,20 @@
-#ifndef INTEGERFIELD_HPP_
-	#error	"Don't include this file directly, use 'button_group.hpp' instead!"
+// coding: utf-8
+/* Copyright (c) 2014, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef XPCC_GUI_NUMBERFIELD_HPP
+#   error	"Don't include this file directly, use 'numberfield.hpp' instead!"
 #endif
 
 template<typename T>
-void xpcc::gui::NumberField<T>::render(View* view)
+void
+xpcc::gui::NumberField<T>::render(View* view)
 {
-
 	if(view == 0)
 		return;
 
@@ -37,5 +46,4 @@ void xpcc::gui::NumberField<T>::render(View* view)
 	out->setColor(cp[Color::TEXT]);
 	out->setCursor(box_x + 10, box_y + (box_height - stringHeight) / 2);
 	*out << this->value;
-
 }

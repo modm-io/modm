@@ -17,7 +17,7 @@ namespace lcd
 	typedef GpioOutputD3 Rs;
 }
 
-typedef xpcc::SoftwareSpiSimpleMaster< lcd::Scl, lcd::Mosi, lcd::Miso > SPI;
+typedef xpcc::SoftwareSpiMaster< lcd::Scl, lcd::Mosi, lcd::Miso > SPI;
 
 xpcc::DogM163< SPI, lcd::Cs, lcd::Rs > display;
 
@@ -26,7 +26,7 @@ MAIN_FUNCTION
     SPI::initialize<clock, 1000000>();
     lcd::Cs::setOutput();
     lcd::Rs::setOutput();
-    
+
 	display.initialize();
 
 	display.setCursor(0, 0);

@@ -1,8 +1,18 @@
+// coding: utf-8
+/* Copyright (c) 2014, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+
 #include <math.h>
 
 #include "stringfield.hpp"
 
-void xpcc::gui::StringField::render(View* view)
+void
+xpcc::gui::StringField::render(View* view)
 {
 	if(view == 0)
 		return;

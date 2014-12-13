@@ -42,7 +42,7 @@ typedef GpioOutputE12 Csn;
 
 
 
-typedef xpcc::Nrf24Phy<SpiSimpleMaster2, Csn, Ce> nrf24hal;
+typedef xpcc::Nrf24Phy<SpiMaster2, Csn, Ce> nrf24hal;
 
 
 MAIN_FUNCTION
@@ -56,10 +56,10 @@ MAIN_FUNCTION
 	LedOrange::setOutput(xpcc::Gpio::Low);
 
 	// Enable SPI 2
-	GpioOutputB15::connect(SpiSimpleMaster2::Mosi);
-	GpioInputB14::connect(SpiSimpleMaster2::Miso);
-	GpioOutputB13::connect(SpiSimpleMaster2::Sck);
-	SpiSimpleMaster2::initialize<defaultSystemClock, MHz10>();
+	GpioOutputB15::connect(SpiMaster2::Mosi);
+	GpioInputB14::connect(SpiMaster2::Miso);
+	GpioOutputB13::connect(SpiMaster2::Sck);
+	SpiMaster2::initialize<defaultSystemClock, MHz10>();
 
 	// Enable UART 2
 	GpioOutputA2::connect(Usart2::Tx);

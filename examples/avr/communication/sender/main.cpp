@@ -39,7 +39,7 @@ typedef GpioOutputB7 Sclk;
 typedef GpioOutputB5 Mosi;
 typedef GpioInputB6 Miso;
 
-typedef xpcc::SoftwareSpiSimpleMaster< Sclk, Mosi, Miso > SPI;
+typedef xpcc::SoftwareSpiMaster< Sclk, Mosi, Miso > SPI;
 typedef xpcc::Mcp2515< SPI, Cs, Int > CanDevice;
 
 static CanDevice device;

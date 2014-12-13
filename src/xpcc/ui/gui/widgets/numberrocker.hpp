@@ -1,19 +1,33 @@
-#ifndef INTEGEROCKER_HPP_
-#define INTEGEROCKER_HPP_
+// coding: utf-8
+/* Copyright (c) 2014, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef XPCC_GUI_NUMBERROCKER_HPP
+#define XPCC_GUI_NUMBERROCKER_HPP
 
 #include "widget.hpp"
 #include "button.hpp"
 #include "numberfield.hpp"
 
-namespace xpcc {
+namespace xpcc
+{
 
-namespace gui {
+namespace gui
+{
 
+/**
+ * @ingroup	gui
+ * @author	Daniel Krebs
+ */
 template<typename T = int16_t>
-class NumberRocker : public WidgetGroup {
-
+class NumberRocker : public WidgetGroup
+{
 public:
-
 	NumberRocker(T default_value, T step, Dimension d) :
 		WidgetGroup(d),
 		value(default_value),
@@ -28,7 +42,6 @@ public:
 		this->pack(&button_decrease, xpcc::glcd::Point(0,0));
 		this->pack(&button_increase, xpcc::glcd::Point(d.width - d.height,0));
 		this->pack(&num_field, xpcc::glcd::Point(d.height, 0));
-
 	}
 
 	void
@@ -61,16 +74,16 @@ private:
 	T step;
 	ArrowButton button_increase, button_decrease;
 	NumberField<T> num_field;
-
 };
 
 typedef NumberRocker<int16_t> IntegerRocker;
 typedef NumberRocker<float> FloatRocker;
 
 
-}
-}
+}	// namespace gui
+
+}	// namespace xpcc
 
 #include "numberrocker_impl.hpp"
 
-#endif /* INTEGEROCKER_HPP_ */
+#endif  // XPCC_GUI_NUMBERROCKER_HPP

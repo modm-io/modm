@@ -1,10 +1,20 @@
+// coding: utf-8
+/* Copyright (c) 2014, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+
 #include "checkbox.hpp"
 
 
-void xpcc::gui::CheckboxWidget::render(View* view)
+void
+xpcc::gui::CheckboxWidget::render(View* view)
 {
 	if(view == NULL)
-			return;
+		return;
 
 	constexpr uint16_t padding = 5;
 
@@ -30,23 +40,18 @@ void xpcc::gui::CheckboxWidget::render(View* view)
 	out->drawLine(box_x + box_width - 1, box_y + box_height - 1, box_x + box_width - 1, box_y);
 	out->drawLine(box_x + box_width, box_y + box_height - 1, box_x, box_y + box_height - 1);
 
-	if(state) {
-
+	if(state)
+	{
 		// draw cross
-
 		out->setColor(cp[Color::TEXT]);
 		out->drawLine(box_x + padding, box_y + padding, box_x + box_width - padding, box_y + box_height - padding);
 		out->drawLine(box_x + padding, box_y + box_height - padding, box_x + box_width - padding, box_y + padding);
-
-
 	}
 }
 
-void xpcc::gui::CheckboxWidget::click_cb(const InputEvent& ev, Widget* w, void* data)
+void
+xpcc::gui::CheckboxWidget::click_cb(const InputEvent& /*ev*/, Widget* w, void* /*data*/)
 {
-	(void) ev;
-	(void) data;
-
 	auto checkbox = static_cast<CheckboxWidget*>(w);
 
 	checkbox->setState(!checkbox->getState());

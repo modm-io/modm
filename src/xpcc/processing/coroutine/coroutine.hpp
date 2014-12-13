@@ -40,7 +40,13 @@ enum State
 template < typename T >
 struct Result
 {
+	/// Return only the `state`. The `result` will be initialized by it's default constructor.
+	Result(uint8_t state) : state(state) {}
+	/// Return `state` and valid `result`.
+	Result(uint8_t state, T result) : state(state), result(result) {}
+	/// The `co::State`.
 	uint8_t state;
+	/// Custom return value.
 	T result;
 };
 /// @cond
@@ -48,7 +54,13 @@ struct Result
 template <>
 struct Result<void>
 {
+	/// Return only the `state`. There is no result.
+	Result(uint8_t state) : state(state) {}
+	/// Constructor with dummy result needed by the `CO_CALL_BLOCKING` macro.
+	Result(uint8_t state, uint8_t /*dummy_result*/) : state(state) {}
+	/// The `co::State`.
 	uint8_t state;
+	/// Dummy result needed by the `CO_CALL_BLOCKING` macro.
 	uint8_t result;
 };
 /// @endcond
@@ -224,7 +236,7 @@ protected:
 		return false;
 	}
 
-protected:
+public:
 	static constexpr CoState CoStopped = static_cast<CoState>(0);
 	/// @endcond
 private:
@@ -319,7 +331,7 @@ protected:
 		return false;
 	}
 
-protected:
+public:
 	static constexpr CoState CoStopped = static_cast<CoState>(0);
 private:
 	CoState coState;

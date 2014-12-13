@@ -1,8 +1,17 @@
+// coding: utf-8
+/* Copyright (c) 2014, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+
 #include "button.hpp"
 
-void xpcc::gui::ButtonWidget::render(View* view)
+void
+xpcc::gui::ButtonWidget::render(View* view)
 {
-
 	if(view == NULL)
 		return;
 
@@ -52,10 +61,10 @@ void xpcc::gui::ButtonWidget::render(View* view)
 	out->setColor(cp[Color::TEXT]);
 	out->setCursor(x + (width - stringWidth) / 2, y + (height - stringHeight) / 2);
 	*out << this->label;
-
 }
 
-void xpcc::gui::ArrowButton::render(View* view)
+void
+xpcc::gui::ArrowButton::render(View* view)
 {
 	if(view == NULL)
 		return;
@@ -105,10 +114,10 @@ void xpcc::gui::ArrowButton::render(View* view)
 	out->drawLine(x, y, x, y + height - 1);
 	out->drawLine(x + width - 1, y + height - 1, x + width - 1, y);
 	out->drawLine(x + width, y + height - 1, x, y + height - 1);
-
 }
 
-void xpcc::gui::FilledAreaButton::render(View* view)
+void
+xpcc::gui::FilledAreaButton::render(View* view)
 {
 	if(view == NULL)
 		return;

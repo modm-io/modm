@@ -1,17 +1,31 @@
-#ifndef INTEGERFIELD_HPP_
-#define INTEGERFIELD_HPP_
+// coding: utf-8
+/* Copyright (c) 2014, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef XPCC_GUI_NUMBERFIELD_HPP
+#define XPCC_GUI_NUMBERFIELD_HPP
 
 #include "widget.hpp"
 
-namespace xpcc {
+namespace xpcc
+{
 
-namespace gui {
+namespace gui
+{
 
+/**
+ * @ingroup	gui
+ * @author	Daniel Krebs
+ */
 template<typename T>
-class NumberField : public Widget {
-
+class NumberField : public Widget
+{
 public:
-
 	NumberField(T default_value, Dimension d) :
 		Widget(d, false),
 		value(default_value)
@@ -52,10 +66,10 @@ public:
 	render(View* view);
 };
 
+}	// namespace gui
 
-}
-}
+}	// namespace xpcc
 
 #include "numberfield_impl.hpp"
 
-#endif /* INTEGERFIELD_HPP_ */
+#endif  // XPCC_GUI_NUMBERFIELD_HPP

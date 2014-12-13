@@ -2,10 +2,10 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -44,20 +44,20 @@ xpcc::St7565<SPI, CS, A0, Reset, Width, Height, TopView>::update()
 	{
 		// command mode
 		a0.reset();
-		spi.writeReadBlocking(ST7565_PAGE_ADDRESS | y);		// Row select
-		spi.writeReadBlocking(ST7565_COL_ADDRESS_MSB);		// Column select high
-		
+		spi.transferBlocking(ST7565_PAGE_ADDRESS | y);		// Row select
+		spi.transferBlocking(ST7565_COL_ADDRESS_MSB);		// Column select high
+
 		if (TopView) {
-			spi.writeReadBlocking(ST7565_COL_ADDRESS_LSB | 4);	// Column select low
+			spi.transferBlocking(ST7565_COL_ADDRESS_LSB | 4);	// Column select low
 		}
 		else {
-			spi.writeReadBlocking(ST7565_COL_ADDRESS_LSB);	// Column select low
+			spi.transferBlocking(ST7565_COL_ADDRESS_LSB);	// Column select low
 		}
-		
+
 		// switch to data mode
 		a0.set();
 		for(uint8_t x = 0; x < Width; ++x) {
-			spi.writeReadBlocking(this->buffer[x][y]);
+			spi.transferBlocking(this->buffer[x][y]);
 		}
 	}
 	cs.set();
@@ -69,12 +69,12 @@ xpcc::St7565<SPI, CS, A0, Reset, Width, Height, TopView>::setInvert(bool invert)
 {
 	cs.reset();
 	a0.reset();
-	
+
 	if (invert) {
-		spi.writeReadBlocking(ST7565_REVERSE);
+		spi.transferBlocking(ST7565_REVERSE);
 	}
 	else {
-		spi.writeReadBlocking(ST7565_NORMAL);
+		spi.transferBlocking(ST7565_NORMAL);
 	}
 	cs.set();
 }
@@ -88,34 +88,34 @@ xpcc::St7565<SPI, CS, A0, Reset, Width, Height, TopView>::initialize(
 	//spi.initialize();
 	cs.set();
 	cs.setOutput();
-	
+
 	a0.setOutput();
-	
+
 	// reset the controller
 	reset.setOutput();
 	reset.reset();
 	xpcc::delayMilliseconds(50);
 	reset.set();
-	
+
 	cs.reset();
 	a0.reset();
-	
+
 	// View direction
 	if (TopView) {
-		spi.writeReadBlocking(ST7565_ADC_NORMAL);		// ADC normal
-		spi.writeReadBlocking(ST7565_SCAN_DIR_REVERSE);	// reverse COM0~COM63
+		spi.transferBlocking(ST7565_ADC_NORMAL);		// ADC normal
+		spi.transferBlocking(ST7565_SCAN_DIR_REVERSE);	// reverse COM0~COM63
 	}
 	else {
-		spi.writeReadBlocking(ST7565_ADC_REVERSE);
-		spi.writeReadBlocking(ST7565_SCAN_DIR_NORMAL);
+		spi.transferBlocking(ST7565_ADC_REVERSE);
+		spi.transferBlocking(ST7565_SCAN_DIR_NORMAL);
 	}
-	
+
 	for (uint8_t i = 0; i < size; ++i) {
-		spi.writeReadBlocking(configuration[i]);
+		spi.transferBlocking(configuration[i]);
 	}
-	
+
 	cs.set();
-	
+
 	this->clear();
 	this->update();
 }

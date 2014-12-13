@@ -23,6 +23,41 @@ def openocd_remote_run(env, source, alias='openocd_remote_run'):
 		action = Action("scp $SOURCE $OPENOCD_REMOTE_USER@$OPENOCD_REMOTE_HOST:/tmp/openocd.hex; echo %s | nc $OPENOCD_REMOTE_HOST 4444" % ' '.join(['"%s;"' % c for c in commands]),
 			cmdstr="$OPENOCD_COMSTR")
 		return env.AlwaysBuild(env.Alias(alias, source, action))
+# -----------------------------------------------------------------------------
+# Program elf file via a remote gdb session
+def gdb_remote_program(env, source, alias='gdb_remote_program'):
+	if platform.system() == "Windows":
+		print "Not supported under windows"
+		exit(1)
+	else:
+		gdb = "arm-none-eabi-gdb"
+		cmd = [gdb, '-q',
+			'-ex "target remote $OPENOCD_REMOTE_HOST:3333"',
+			'-ex "load"',
+			'-ex "monitor reset"',
+			'-ex "disconnect"',
+			'-ex "quit"',
+			'$SOURCE']
+
+		action = Action(' '.join(cmd))
+		return env.AlwaysBuild(env.Alias(alias, source, action))
+
+# -----------------------------------------------------------------------------
+# Reset processor via remote gdb session
+def gdb_remote_reset(env, alias='gdb_remote_reset'):
+	if platform.system() == "Windows":
+		print "Not supported under windows"
+		exit(1)
+	else:
+		gdb = "arm-none-eabi-gdb"
+		cmd = [gdb, '-q',
+			'-ex "target remote $OPENOCD_REMOTE_HOST:3333"',
+			'-ex "monitor reset"',
+			'-ex "disconnect"',
+			'-ex "quit"']
+
+		action = Action(' '.join(cmd))
+		return env.AlwaysBuild(env.Alias(alias, '', action))
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
@@ -33,6 +68,8 @@ def generate(env, **kw):
 	env['OPENOCD'] = 'openocd'
 
 	env.AddMethod(openocd_remote_run,  'OpenOcdRemote')
+	env.AddMethod(gdb_remote_program,  'GdbRemoteProgram')
+	env.AddMethod(gdb_remote_reset,    'GdbRemoteReset')
 
 def exists(env):
 	return env.Detect('openocd_remote')

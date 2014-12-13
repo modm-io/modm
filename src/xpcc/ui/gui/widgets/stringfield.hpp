@@ -1,17 +1,31 @@
-#ifndef STRINGFIELD_HPP_
-#define STRINGFIELD_HPP_
+// coding: utf-8
+/* Copyright (c) 2014, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef XPCC_GUI_STRINGFIELD_HPP
+#define XPCC_GUI_STRINGFIELD_HPP
 
 #include "widget.hpp"
 #include "label.hpp"
 
-namespace xpcc {
+namespace xpcc
+{
 
-namespace gui {
+namespace gui
+{
 
-class StringField : public Widget {
-
+/**
+ * @ingroup	gui
+ * @author	Daniel Krebs
+ */
+class StringField : public Widget
+{
 public:
-
 	StringField(const char* value, Dimension d) :
 		Widget(d, false),
 		value(value)
@@ -40,7 +54,8 @@ private:
 	const char* value;
 };
 
-}
-}
+}	// namespace gui
 
-#endif /* STRINGFIELD_HPP_ */
+}	// namespace xpcc
+
+#endif  // XPCC_GUI_STRINGFIELD_HPP

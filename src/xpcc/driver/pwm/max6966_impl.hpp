@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -38,7 +38,7 @@ void
 xpcc::MAX6966<Spi, Cs, DRIVERS>::initialize(max6966::Current current, uint8_t config)
 {
 	Cs::setOutput(xpcc::Gpio::High);
-	
+
 	setAllConfiguration(config | max6966::CONFIG_RUN_MODE);
 	setAllCurrent(current);
 }
@@ -51,8 +51,8 @@ xpcc::MAX6966<Spi, Cs, DRIVERS>::setAllConfiguration(uint8_t config)
 	Cs::reset();
 	for (uint_fast8_t i=0; i < DRIVERS; ++i)
 	{
-		Spi::writeReadBlocking(max6966::REGISTER_CONFIGURATION);
-		Spi::writeReadBlocking(config);
+		Spi::transferBlocking(max6966::REGISTER_CONFIGURATION);
+		Spi::transferBlocking(config);
 	}
 	Cs::set();
 }
@@ -64,10 +64,10 @@ xpcc::MAX6966<Spi, Cs, DRIVERS>::setChannel(uint16_t channel, uint8_t value)
 {
 	if (channel >= DRIVERS*10)
 		return;
-	
+
 	uint8_t driver = channel / 10;
 	uint8_t reg = channel % 10;
-	
+
 	writeToDriver(driver, static_cast<max6966::Register>(reg), value);
 }
 
@@ -82,8 +82,8 @@ xpcc::MAX6966<Spi, Cs, DRIVERS>::setChannels(uint8_t * values)
 		// for all drivers
 		for (uint_fast8_t dr = 0; dr < DRIVERS; ++dr)
 		{
-			Spi::writeReadBlocking(max6966::REGISTER_PORT0 + ch);
-			Spi::writeReadBlocking(values[ch + dr * 10]);
+			Spi::transferBlocking(max6966::REGISTER_PORT0 + ch);
+			Spi::transferBlocking(values[ch + dr * 10]);
 		}
 		Cs::set();
 	}
@@ -96,8 +96,8 @@ xpcc::MAX6966<Spi, Cs, DRIVERS>::setAllChannels(uint8_t value)
 	Cs::reset();
 	for (uint_fast8_t i=0; i < DRIVERS; ++i)
 	{
-		Spi::writeReadBlocking(max6966::REGISTER_PORT0_9);
-		Spi::writeReadBlocking(value);
+		Spi::transferBlocking(max6966::REGISTER_PORT0_9);
+		Spi::transferBlocking(value);
 	}
 	Cs::set();
 }
@@ -108,10 +108,10 @@ xpcc::MAX6966<Spi, Cs, DRIVERS>::getChannel(uint16_t channel)
 {
 	if (channel >= DRIVERS*10)
 		return 0;
-	
+
 	uint8_t driver = channel / 10;
 	uint8_t reg = channel % 10;
-	
+
 	return readFromDriver(driver, static_cast<max6966::Register>(reg));
 }
 
@@ -121,12 +121,12 @@ xpcc::MAX6966<Spi, Cs, DRIVERS>::setHalfCurrent(uint16_t channel, bool full)
 {
 	if (channel >= DRIVERS*10)
 		return;
-	
+
 	uint8_t driver = channel / 10;
 	uint8_t driverChannel = channel % 10;
 	uint8_t mask;
 	max6966::Register reg;
-	
+
 	if (driverChannel <= 7)
 	{
 		mask = (1 << driverChannel);
@@ -137,7 +137,7 @@ xpcc::MAX6966<Spi, Cs, DRIVERS>::setHalfCurrent(uint16_t channel, bool full)
 		reg = max6966::REGISTER_CURRENT9_8;
 	}
 	uint8_t bit = full ? mask : 0;
-	
+
 	writeToDriverMasked(driver, reg, bit, mask);
 }
 
@@ -148,8 +148,8 @@ xpcc::MAX6966<Spi, Cs, DRIVERS>::setAllCurrent(max6966::Current current)
 	Cs::reset();
 	for (uint_fast8_t i=0; i < DRIVERS; ++i)
 	{
-		Spi::writeReadBlocking(max6966::REGISTER_GLOBAL_CURRENT);
-		Spi::writeReadBlocking(current);
+		Spi::transferBlocking(max6966::REGISTER_GLOBAL_CURRENT);
+		Spi::transferBlocking(current);
 	}
 	Cs::set();
 }
@@ -162,8 +162,8 @@ xpcc::MAX6966<Spi, Cs, DRIVERS>::writeToDriver(uint8_t driver, max6966::Register
 	Cs::reset();
 	for (uint_fast8_t i=0; i < DRIVERS; ++i)
 	{
-		Spi::writeReadBlocking((i == driver) ? (reg | max6966::WRITE) : max6966::REGISTER_NO_OP);
-		Spi::writeReadBlocking(data);
+		Spi::transferBlocking((i == driver) ? (reg | max6966::WRITE) : max6966::REGISTER_NO_OP);
+		Spi::transferBlocking(data);
 	}
 	Cs::set();
 }
@@ -176,25 +176,25 @@ xpcc::MAX6966<Spi, Cs, DRIVERS>::readFromDriver(uint8_t driver, max6966::Registe
 	Cs::reset();
 	for (uint_fast8_t i=0; i < DRIVERS; ++i)
 	{
-		Spi::writeReadBlocking((i == driver) ? (reg | max6966::READ) : max6966::REGISTER_NO_OP);
-		Spi::writeReadBlocking(0xff);
+		Spi::transferBlocking((i == driver) ? (reg | max6966::READ) : max6966::REGISTER_NO_OP);
+		Spi::transferBlocking(0xff);
 	}
 	Cs::set();
-	
+
 	// TODO: Add delay here?
 //	xpcc::delayMilliseconds(1);
-	
+
 	// send dummy data and get the right register
 	uint8_t data=0;
 	uint8_t buffer;
 	Cs::reset();
 	for (uint_fast8_t i=0; i < DRIVERS; ++i)
 	{
-		Spi::writeReadBlocking(max6966::REGISTER_NO_OP);
-		buffer = Spi::writeReadBlocking(0xff);
+		Spi::transferBlocking(max6966::REGISTER_NO_OP);
+		buffer = Spi::transferBlocking(0xff);
 		if (i == driver) data = buffer;
 	}
 	Cs::set();
-	
+
 	return data;
 }

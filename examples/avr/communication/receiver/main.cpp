@@ -39,7 +39,7 @@ typedef GpioOutputB7 Sclk;
 typedef GpioOutputB5 Mosi;
 typedef GpioInputB6 Miso;
 
-typedef xpcc::SoftwareSpiSimpleMaster< Sclk, Mosi, Miso > SPI;
+typedef xpcc::SoftwareSpiMaster< Sclk, Mosi, Miso > SPI;
 typedef xpcc::Mcp2515< SPI, Cs, Int > CanDevice;
 
 static CanDevice device;
@@ -76,7 +76,7 @@ MAIN_FUNCTION
     GpioOutputD1::connect(Uart0::Tx);
     GpioInputD0::connect(Uart0::Rx);
     Uart0::initialize<clock, 115200>();
-    
+
 	// Initialize SPI interface and the other pins
 	// needed by the MCP2515
 	SPI::initialize<clock, 1000000>();

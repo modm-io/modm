@@ -1,0 +1,148 @@
+// coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+* All Rights Reserved.
+*
+* The file is part of the xpcc library and is released under the 3-clause BSD
+* license. See the file `LICENSE` for the full license governing this code.
+*/
+// ----------------------------------------------------------------------------
+
+#ifndef XPCC_STM32_SPI_MASTER{{ id }}_HPP
+#define XPCC_STM32_SPI_MASTER{{ id }}_HPP
+
+#include <xpcc/architecture/peripheral/spi_master.hpp>
+#include "spi_hal_{{ id }}.hpp"
+#include "type_ids.hpp"
+
+namespace xpcc
+{
+
+namespace stm32
+{
+
+/**
+ * Serial peripheral interface (SPI{{ id }}).
+ *
+ * Simple unbuffered implementation.
+ * @ingroup	stm32
+ */
+class SpiMaster{{ id }} : public xpcc::SpiMaster
+{
+	static uint8_t state;
+	static uint8_t count;
+	static void *context;
+public:
+	static const TypeId::SpiMaster{{ id }}Nss  Nss;
+	static const TypeId::SpiMaster{{ id }}Sck  Sck;
+	static const TypeId::SpiMaster{{ id }}Miso Miso;
+	static const TypeId::SpiMaster{{ id }}Mosi Mosi;
+
+	/// Spi Data Mode, Mode0 is the most common mode
+	enum class
+	DataMode : uint32_t
+	{
+		Mode0 = 0b00,			///< clock normal,   sample on rising  edge
+		Mode1 = SPI_CR1_CPHA,	///< clock normal,   sample on falling edge
+		Mode2 = SPI_CR1_CPOL,	///< clock inverted, sample on falling  edge
+		Mode3 = SPI_CR1_CPOL | SPI_CR1_CPHA
+		///< clock inverted, sample on rising edge
+	};
+
+	/// Spi Data Order, MsbFirst is the most common mode
+	enum class
+	DataOrder : uint32_t
+	{
+		MsbFirst = 0b0,
+		LsbFirst = SPI_CR1_LSBFIRST
+	};
+
+public:
+	// start documentation inherited
+	template< class clockSource, uint32_t baudrate,
+			uint16_t tolerance = xpcc::Tolerance::FivePercent >
+	static void
+	initialize()
+	{
+		// calculate the nearest prescaler from the baudrate
+		constexpr float pre_raw = (static_cast<float>(clockSource::Spi{{ id }}) / baudrate);
+		constexpr uint16_t pre = (
+				(pre_raw >= (128 * 4.f/3)) ? 256 : (
+				(pre_raw >= ( 64 * 4.f/3)) ? 128 : (
+				(pre_raw >= ( 32 * 4.f/3)) ?  64 : (
+				(pre_raw >= ( 16 * 4.f/3)) ?  32 : (
+				(pre_raw >= (  8 * 4.f/3)) ?  16 : (
+				(pre_raw >= (  4 * 4.f/3)) ?   8 : (
+				(pre_raw >= (  2 * 4.f/3)) ?   4 :
+											   2
+				)))))));
+
+		// check if we found a prescaler which generates a baudrate within the tolerance
+		assertBaudrateInTolerance<
+				/* nearest possible value */ clockSource::Spi{{ id }} / pre,
+				/* desired = */ baudrate,
+				tolerance >();
+
+		// translate the prescaler into the bitmapping
+		constexpr SpiHal{{ id }}::Prescaler prescaler = (
+				(pre >= 256) ? SpiHal{{ id }}::Prescaler::Div256 : (
+				(pre >= 128) ? SpiHal{{ id }}::Prescaler::Div128 : (
+				(pre >=  64) ? SpiHal{{ id }}::Prescaler::Div64  : (
+				(pre >=  32) ? SpiHal{{ id }}::Prescaler::Div32  : (
+				(pre >=  16) ? SpiHal{{ id }}::Prescaler::Div16  : (
+				(pre >=   8) ? SpiHal{{ id }}::Prescaler::Div8   : (
+				(pre >=   4) ? SpiHal{{ id }}::Prescaler::Div4   :
+							   SpiHal{{ id }}::Prescaler::Div2
+				)))))));
+
+		// initialize the Spi
+		SpiHal{{ id }}::initialize(prescaler);
+		state = 0;
+	}
+
+
+	static void
+	setDataMode(DataMode mode)
+	{
+		SpiHal{{ id }}::setDataMode(static_cast<SpiHal{{ id }}::DataMode>(mode));
+	}
+
+	static void
+	setDataOrder(DataOrder order)
+	{
+		SpiHal{{ id }}::setDataOrder(static_cast<SpiHal{{ id }}::DataOrder>(order));
+	}
+
+
+	static uint8_t
+	aquire(void *ctx);
+
+	static uint8_t
+	release(void *ctx);
+
+
+	static uint8_t
+	transferBlocking(uint8_t data)
+	{
+		return CO_CALL_BLOCKING(transfer(data));
+	}
+
+	static void
+	transferBlocking(uint8_t *tx, uint8_t *rx, std::size_t length)
+	{
+		CO_CALL_BLOCKING(transfer(tx, rx, length));
+	}
+
+
+	static xpcc::co::Result<uint8_t>
+	transfer(uint8_t data);
+
+	static xpcc::co::Result<void>
+	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
+	// end documentation inherited
+};
+
+} // namespace stm32
+
+} // namespace xpcc
+
+#endif // XPCC_STM32_SPI_MASTER{{ id }}_HPP

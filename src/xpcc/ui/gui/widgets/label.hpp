@@ -1,14 +1,29 @@
-#ifndef LABEL_HPP_
-#define LABEL_HPP_
+// coding: utf-8
+/* Copyright (c) 2014, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef XPCC_GUI_LABEL_HPP
+#define XPCC_GUI_LABEL_HPP
 
 #include "widget.hpp"
 
-namespace xpcc {
+namespace xpcc
+{
 
-namespace gui {
+namespace gui
+{
 
-class Label : public Widget {
-
+/**
+ * @ingroup	gui
+ * @author	Daniel Krebs
+ */
+class Label : public Widget
+{
 public:
 	Label(const char* lbl, xpcc::glcd::Color color) :
 		Widget(Dimension(0,0), false),
@@ -51,12 +66,12 @@ public:
 	}
 
 private:
-
 	void
 	updateDimension()
 	{
-		/* Update label dimension */
-		if(this->font.isValid()) {
+		// Update label dimension
+		if(this->font.isValid())
+		{
 			this->dimension.width = xpcc::GraphicDisplay::getStringWidth(this->label, &(this->font));
 			this->dimension.height = xpcc::GraphicDisplay::getFontHeight(&(this->font));
 		}
@@ -65,21 +80,10 @@ private:
 private:
 	const char* label;
 	xpcc::glcd::Color color;
-
 };
 
-//
-//class InteractiveLabel : public Label {
-//
-//public:
-//	InteractiveLabel(const char* lbl) :
-//		Label(lbl)
-//	{
-//		this->is_interactive = true;
-//	}
-//};
+}	// namespace gui
 
-}
-}
+}	// namespace xpcc
 
-#endif /* LABEL_HPP_ */
+#endif  // XPCC_GUI_LABEL_HPP

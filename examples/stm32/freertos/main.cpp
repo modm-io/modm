@@ -29,7 +29,7 @@ namespace lcd
 }
 
 // Graphic LCD
-xpcc::DogS102< xpcc::stm32::SpiSimpleMaster1, lcd::CS, lcd::A0, lcd::Reset, false > display;
+xpcc::DogS102< xpcc::stm32::SpiMaster1, lcd::CS, lcd::A0, lcd::Reset, false > display;
 
 // ----------------------------------------------------------------------------
 xpcc::rtos::BinarySemaphore event;
@@ -42,7 +42,7 @@ public:
 		xpcc::rtos::Thread(2)
 	{
 	}
-	
+
 	virtual void
 	run()
 	{
@@ -50,10 +50,10 @@ public:
 		{
 			// synchronize with LedThread2
 			event.release();
-			
+
 			LedStat::set();
 			this->sleep(50 * MILLISECONDS);
-			
+
 			LedStat::reset();
 			this->sleep(1000 * MILLISECONDS);
 		}
@@ -68,14 +68,14 @@ public:
 		xpcc::rtos::Thread(2)
 	{
 	}
-	
+
 	virtual void
 	run()
 	{
 		while (1)
 		{
 			Led2::toggle();
-			
+
 			// wait for the other task
 			event.acquire();
 		}
@@ -91,7 +91,7 @@ public:
 		xpcc::rtos::Thread(0), index(0)
 	{
 	}
-	
+
 	virtual void
 	run()
 	{
@@ -99,19 +99,19 @@ public:
 		{
 			const xpcc::glcd::Point center(80, 32);
 			const uint16_t radius = 20;
-			
+
 			index = (index + 1) % 360;
-			
+
 			display.clear();
-			
+
 			display.setCursor(4, 10);
 			display.setFont(xpcc::font::FixedWidth5x8);
 			display << "angle=";
-			
+
 			display.setCursor(4, 20);
 			display.setFont(xpcc::font::Numbers14x32);
 			display << index;
-			
+
 			display.drawCircle(center, radius);
 			float angle = (index * M_PI) / 180.0;
 			display.drawLine(center,
@@ -119,9 +119,9 @@ public:
 							 sin(angle) * radius,
 							-cos(angle) * radius));
 			display.update();
-			
+
 			Led1::set(ButtonWakeUp::read());
-			
+
 			this->sleep(100);
 		}
 	}
@@ -147,13 +147,13 @@ main(void)
 	LedStat::setOutput(xpcc::Gpio::High);
 	Led1::setOutput(xpcc::Gpio::Low);
 	Led2::setOutput(xpcc::Gpio::Low);
-	
+
 	// The Button has an external Pull-Down resistor
     ButtonWakeUp::setInput(Gpio::InputType::Floating);
-	
+
 	display.initialize();
 	display.setFont(xpcc::font::FixedWidth5x8);
-	
+
 	// Start the FreeRTOS scheduler
 	xpcc::rtos::Scheduler::schedule();
 }

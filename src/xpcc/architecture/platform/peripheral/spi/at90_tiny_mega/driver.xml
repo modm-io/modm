@@ -2,8 +2,8 @@
 <!DOCTYPE rca SYSTEM "../../xml/driver.dtd">
 <rca version="1.0">
 	<driver type="spi" name="at90_tiny_mega">
-		<template>simple_spi.hpp.in</template>
-		<template>simple_spi_impl.hpp.in</template>
+		<template>spi_master.hpp.in</template>
+		<template>spi_master.cpp.in</template>
 		<template>type_ids.hpp.in</template>
 		<template>spi.hpp.in</template>
 	</driver>

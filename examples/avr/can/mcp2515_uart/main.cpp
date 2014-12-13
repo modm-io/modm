@@ -17,7 +17,7 @@ typedef GpioOutputB7 Sclk;
 typedef GpioOutputB5 Mosi;
 typedef GpioInputB6 Miso;
 
-typedef xpcc::SoftwareSpiSimpleMaster<Sclk, Mosi, Miso> SPI;
+typedef xpcc::SoftwareSpiMaster<Sclk, Mosi, Miso> SPI;
 
 xpcc::Mcp2515<SPI, Cs, Int> mcp2515;
 
@@ -57,7 +57,7 @@ main()
 	TCCR2B = (1 << CS22);
 	TIMSK2 = (1 << OCIE2A);
 	OCR2A = 230;
-    
+
     GpioOutputD1::connect(Uart0::Tx);
     GpioInputD0::connect(Uart0::Rx);
     Uart0::initialize<clock, 115200>();

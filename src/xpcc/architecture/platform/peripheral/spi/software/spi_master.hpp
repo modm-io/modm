@@ -11,9 +11,8 @@
 #define XPCC_SOFTWARE_SPI_MASTER_HPP
 
 #include <stdint.h>
-#include <xpcc/architecture/peripheral/spi.hpp>
+#include <xpcc/architecture/peripheral/spi_master.hpp>
 #include <xpcc/architecture/driver/delay.hpp>
-#include "simple_spi.hpp"
 #include "../../gpio/software/gpio.hpp"
 #include "type_ids.hpp"
 
@@ -21,7 +20,7 @@ namespace xpcc
 {
 
 /**
- * Software emulation of a Spi Master.
+ * Software emulation of a Simple Spi.
  *
  * @tparam	SCK			clock pin [output]
  * @tparam	MOSI		master out slave in pin [output]
@@ -50,19 +49,44 @@ public:
 	static void
 	initialize();
 
-	static bool
-	start(SpiTransaction *transaction);
-
-	static bool
-	startBlocking(SpiTransaction *transaction);
 
 	static void
-	reset(DetachCause cause = DetachCause::SoftwareReset);
+	setDataMode(DataMode mode);
+
+	static void
+	setDataOrder(DataOrder order);
+
+
+	static uint8_t
+	aquire(void *ctx);
+
+	static uint8_t
+	release(void *ctx);
+
+
+	static uint8_t
+	transferBlocking(uint8_t data);
+
+	static void
+	transferBlocking(uint8_t *tx, uint8_t *rx, std::size_t length);
+
+
+	static xpcc::co::Result<uint8_t>
+	transfer(uint8_t data);
+
+	static xpcc::co::Result<void>
+	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
 	// end documentation inherited
 
 private:
-	static xpcc::SpiTransaction *delegate;
-	static xpcc::SpiTransaction::Transmission transmission;
+	static void
+	delay();
+
+	static constexpr uint32_t delayTime = (1000000.0 / Baudrate) / 2.0;
+
+	static uint8_t operationMode;
+	static uint8_t count;
+	static void *context;
 };
 
 } // namespace xpcc

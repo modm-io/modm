@@ -30,7 +30,7 @@ typedef xpcc::stm32::GpioOutputE1 Data;
 typedef xpcc::stm32::GpioOutputE3 Cs;
 typedef xpcc::stm32::GpioOutputE5 Clk;
 
-typedef xpcc::SoftwareSpiSimpleMaster< Clk, Data > Spi;
+typedef xpcc::SoftwareSpiMaster< Clk, Data > Spi;
 
 // The array of 3 modules which all are placed horizontally
 xpcc::Max7219matrix<Spi, Cs, 3, 1> ledMatrixDisplay;
@@ -47,7 +47,7 @@ MAIN_FUNCTION
     Clk::setOutput();
 
     Spi::initialize< defaultSystemClock, 10000000 >();
-    
+
     ledMatrixDisplay.initialize();
 
     ledMatrixDisplay.setFont(xpcc::font::FixedWidth5x8);
