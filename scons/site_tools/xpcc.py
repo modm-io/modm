@@ -32,6 +32,7 @@ import string
 import platform
 import configfile as configparser
 import textwrap
+import getpass, subprocess
 
 from SCons.Script import *
 import SCons.Tool		# to get the SCons default tool search path
@@ -221,12 +222,31 @@ def define_header(env, defines, header, comment, template="define_template.hpp.i
 		                 'comment':       comment})
 	env.AppendUnique(CPPPATH = env['XPCC_BUILDPATH'])
 
-def project_info_header(env):
+def build_info_header(env):
 	defines = {}
-	defines['XPCC_PROJECT_NAME'] = env.CStringLiteral(env['XPCC_PROJECT_NAME'])
-	# TODO: add more values
-	c = "Its content is created by a call to env.ProjectInfoHeader() in your SConstruct file."
-	env.DefineHeader(defines=defines, header="xpcc_project_info.hpp", comment=c)
+	defines['XPCC_BUILD_PROJECT_NAME'] = env.CStringLiteral(env['XPCC_PROJECT_NAME'])
+	defines['XPCC_BUILD_MACHINE'] = env.CStringLiteral(platform.node())
+	defines['XPCC_BUILD_USER'] = env.CStringLiteral(getpass.getuser())
+	# Generate OS String
+	if platform.system() == 'Linux':
+		os = " ".join(platform.linux_distribution())
+	elif platform.system() == 'Windows':
+		os = " ".join(platform.win32_ver())
+	elif platform.system() == 'Darwin':
+		os = " ".join(platform.mac_ver())
+	else:
+		os = platform.system()
+	defines['XPCC_BUILD_OS'] = env.CStringLiteral(os)
+	# This contains the version of the compiler that is used to build the project
+	c = subprocess.check_output([env['CXX'], '--version']).split('\n', 1)[0]
+	m = re.match("(?P<name>[a-z\-\+]+)[a-zA-Z\(\) ]* (?P<version>\d+\.\d+\.\d+)", c)
+	if m: comp = "{0} {1}".format(m.group('name'), m.group('version'))
+	else: comp = c
+	defines['XPCC_BUILD_COMPILER'] = env.CStringLiteral(comp)
+	c = "Its content is created by a call to env.BuildInfoHeader() in your SConstruct file."
+	env.DefineHeader(defines=defines, header="xpcc_build_info.hpp", comment=c)
+
+#def get_compiler_version_string
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
@@ -506,7 +526,7 @@ def generate(env, **kw):
 	env.AddMethod(generate_defines, 'Defines')
 	env.AddMethod(c_string_literal, 'CStringLiteral')
 	env.AddMethod(define_header, 'DefineHeader')
-	env.AddMethod(project_info_header, 'ProjectInfoHeader')
+	env.AddMethod(build_info_header, 'BuildInfoHeader')
 
 def exists(env):
 	return True

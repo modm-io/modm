@@ -15,8 +15,8 @@ program = env.Program(target = env['XPCC_CONFIG']['general']['name'], source = f
 # build the xpcc library
 env.XpccLibrary()
 
-# build xpcc_project_info.hpp file
-env.ProjectInfoHeader()
+# build xpcc_build_info.hpp file
+env.BuildInfoHeader()
 
 # create a file called 'defines.hpp' with all preprocessor defines if necessary
 env.Defines()
