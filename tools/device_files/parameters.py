@@ -106,7 +106,7 @@ class UserParameter:
 		elif len(parts) == 4:
 			p.driver_name = parts[1]
 			p.driver_instance = int(parts[2])
-		p.value = int(user_item[1])
+		p.value = user_item[1]
 		p.level = 'user' # this parameter comes directly from the user
 		return p
 
