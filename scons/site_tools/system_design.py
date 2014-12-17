@@ -201,6 +201,7 @@ def generate(env, **kw):
 			action = SCons.Action.Action(
 				'python "${XPCC_SYSTEM_BUILDER}/cpp_xpcc_task_caller.py" ' \
 					'--outpath ${TARGET.dir} ' \
+					'--dtdpath "${dtdPath}" ' \
 					'$SOURCE',
 				cmdstr="$SYSTEM_CPP_XPCC_TASK_CALLER_COMSTR"),
 			emitter = xpcc_task_caller_emitter,
