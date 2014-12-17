@@ -4,8 +4,6 @@
 #include <xpcc/debug/logger.hpp>
 #include <xpcc/processing.hpp>
 
-using namespace xpcc::nrf24;
-
 /*
  * A simple 2.4GHz "spectrum analyzer". Please use a terminal
  * application for UART monitoring such as picocom or screen
@@ -80,11 +78,11 @@ MAIN_FUNCTION
 	 * puts("\033[5A");  // move cursor up 5 lines
 	 */
 
-	nrf24hal::setBits(Register::CONFIG, Config::PWR_UP);
-	nrf24hal::setBits(Register::CONFIG, Config::PRIM_RX);
+	nrf24hal::setBits(nrf24hal::NrfRegister::CONFIG, nrf24hal::Config::PWR_UP);
+	nrf24hal::setBits(nrf24hal::NrfRegister::CONFIG, nrf24hal::Config::PRIM_RX);
 
-	nrf24hal::writeRegister(Register::EN_AA, 0x00);
-	nrf24hal::writeRegister(Register::RF_SETUP, 0x0f);
+	nrf24hal::writeRegister(nrf24hal::NrfRegister::EN_AA, 0x00);
+	nrf24hal::writeRegister(nrf24hal::NrfRegister::RF_SETUP, 0x0f);
 
 
 	constexpr const uint8_t channel_start = 25;
@@ -122,13 +120,13 @@ MAIN_FUNCTION
 		max = 0;
 		for(i = 0; i < max_channel; i++)
 		{
-			nrf24hal::writeRegister(Register::RF_CH, i + channel_start);
+			nrf24hal::writeRegister(nrf24hal::NrfRegister::RF_CH, i + channel_start);
 
 			Ce::set();
 			xpcc::delayMicroseconds(rx_settle);
 			Ce::reset();
 			xpcc::delayMicroseconds(2);
-			channel_info[i] += 5*nrf24hal::readRegister(Register::RPD);
+			channel_info[i] += 5*nrf24hal::readRegister(nrf24hal::NrfRegister::RPD);
 
 			if(channel_info[i] > max)
 				max = channel_info[i];

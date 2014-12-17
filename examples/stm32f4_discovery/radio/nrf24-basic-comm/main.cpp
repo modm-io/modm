@@ -4,7 +4,10 @@
 #include <xpcc/debug/logger.hpp>
 #include <xpcc/processing.hpp>
 
-using namespace xpcc::nrf24;
+#include <xpcc/driver/radio/nrf24/nrf24_definitions.hpp>
+
+using xpcc::Nrf24Register;
+using xpcc::Nrf24Phy;
 
 /*
  * Basic communication with least config possible
@@ -56,12 +59,19 @@ typedef GpioOutputE11 Ce2;
 typedef GpioOutputE12 Csn2;
 
 
-typedef xpcc::Nrf24Phy<SpiMaster1, Csn1, Ce1> nrf24ptx;
-typedef xpcc::Nrf24Phy<SpiMaster2, Csn2, Ce2> nrf24prx;
+typedef Nrf24Phy<SpiMaster1, Csn1, Ce1> nrf24ptx;
+typedef Nrf24Phy<SpiMaster2, Csn2, Ce2> nrf24prx;
 
+typedef nrf24ptx::NrfRegister Register;
+typedef nrf24ptx::NrfRegister_t Register_t;
+
+typedef nrf24ptx::Config Config;
+typedef nrf24ptx::Status Status;
+typedef nrf24ptx::Pipe Pipe;
+typedef nrf24ptx::FifoStatus FifoStatus;
 
 void
-configureBoth(xpcc::nrf24::Register reg, uint8_t value)
+configureBoth(Register_t reg, uint8_t value)
 {
 	nrf24ptx::writeRegister(reg, value);
 	nrf24prx::writeRegister(reg, value);
@@ -130,8 +140,8 @@ MAIN_FUNCTION
 	XPCC_LOG_INFO << "Hello from nrf24-basic-comm example" << xpcc::endl;
 
 	/* set RF channel */
-	nrf24ptx::writeRegister(Register::RF_CH, rf_channel);
-	nrf24prx::writeRegister(Register::RF_CH, rf_channel);
+	nrf24ptx::writeRegister(nrf24ptx::NrfRegister::RF_CH, rf_channel);
+	nrf24prx::writeRegister(nrf24prx::NrfRegister::RF_CH, rf_channel);
 
 	/* Set payload length for pipe 1 on receiver */
 	nrf24prx::writeRegister(Register::RX_PW_P1, payload_length);
@@ -141,10 +151,10 @@ MAIN_FUNCTION
 	 * from prx.
 	 */
 	nrf24ptx::setTxAddress(prx_address);
-	nrf24ptx::setRxAddress(0, prx_address);
+	nrf24ptx::setRxAddress(Pipe::PIPE_0, prx_address);
 
 	/* Set receive pipe 1 of prx device to receive packets from ptx */
-	nrf24prx::setRxAddress(1, prx_address);
+	nrf24prx::setRxAddress(Pipe::PIPE_1, prx_address);
 
 	/* Configure ptx as primary sender and power up */
 	nrf24ptx::clearBits(Register::CONFIG, Config::PRIM_RX);
@@ -188,15 +198,16 @@ MAIN_FUNCTION
 			if(nrf24ptx::readStatus() & (uint8_t)Status::MAX_RT)
 			{
 				XPCC_LOG_INFO.printf("Packet lost, MAX_RT reached\n");
-				nrf24ptx::setBits(Register::STATUS, (uint8_t)Status::MAX_RT);
+				XPCC_LOG_INFO.printf("  Status: %x\n", nrf24ptx::readStatus());
+				nrf24ptx::setBits(Register::STATUS, Status::MAX_RT);
+				XPCC_LOG_INFO.printf("  Status: %x\n", nrf24ptx::readStatus());
 			} else
 			{
 				XPCC_LOG_INFO.printf("Packet successfully sent\n");
-				nrf24ptx::setBits(Register::STATUS, (uint8_t)Status::TX_DS);
+				nrf24ptx::setBits(Register::STATUS, Status::TX_DS);
 			}
 
 			LedBlue::toggle();
-
 		}
 
 
@@ -211,7 +222,7 @@ MAIN_FUNCTION
 			pl = nrf24prx::readRxPayload(received_data);
 
 			/* Clear RX_DR flag after payload is read */
-			nrf24prx::setBits(Register::STATUS, (uint8_t)Status::RX_DR);
+			nrf24prx::setBits(Register::STATUS, Status::RX_DR);
 
 			XPCC_LOG_INFO.printf("Received packet, pl=%d, data: %x %x %x %x\n", pl, received_data[3], received_data[2], received_data[1], received_data[0]);
 

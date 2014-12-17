@@ -12,7 +12,7 @@
 #endif
 
 #include "nrf24_phy.hpp"
-
+#include "nrf24_definitions.hpp"
 
 template <typename Spi, typename Csn, typename Ce>
 uint8_t xpcc::Nrf24Phy<Spi, Csn, Ce>::status;
@@ -25,11 +25,11 @@ uint8_t xpcc::Nrf24Phy<Spi, Csn, Ce>::payload_len;
 
 template<typename Spi, typename Csn, typename Ce>
 void
-xpcc::Nrf24Phy<Spi, Csn, Ce>::writeCommandNoData(nrf24::Command cmd)
+xpcc::Nrf24Phy<Spi, Csn, Ce>::writeCommandNoData(Command_t cmd)
 {
     Csn::reset();
 
-    status = Spi::transferBlocking(cmd);
+    status = Spi::transferBlocking(cmd.value);
 
     Csn::set();
 }
@@ -38,11 +38,11 @@ xpcc::Nrf24Phy<Spi, Csn, Ce>::writeCommandNoData(nrf24::Command cmd)
 
 template<typename Spi, typename Csn, typename Ce>
 uint8_t
-xpcc::Nrf24Phy<Spi, Csn, Ce>::writeCommandSingleData(nrf24::Command cmd, uint8_t data)
+xpcc::Nrf24Phy<Spi, Csn, Ce>::writeCommandSingleData(Command_t cmd, uint8_t data)
 {
     Csn::reset();
 
-    status = Spi::transferBlocking(cmd);
+    status = Spi::transferBlocking(cmd.value);
 
     uint8_t ret = Spi::transferBlocking(data);
 
@@ -58,11 +58,11 @@ xpcc::Nrf24Phy<Spi, Csn, Ce>::writeCommandSingleData(nrf24::Command cmd, uint8_t
  */
 template<typename Spi, typename Csn, typename Ce>
 void
-xpcc::Nrf24Phy<Spi, Csn, Ce>::writeCommandMultiData(nrf24::Command cmd, uint8_t* argv, uint8_t* retv, uint8_t argc)
+xpcc::Nrf24Phy<Spi, Csn, Ce>::writeCommandMultiData(Command_t cmd, uint8_t* argv, uint8_t* retv, uint8_t argc)
 {
     Csn::reset();
 
-    status = Spi::transferBlocking(cmd);
+    status = Spi::transferBlocking(cmd.value);
 
     uint8_t i;
     for(i = 0; i < argc; i++)
@@ -91,40 +91,44 @@ xpcc::Nrf24Phy<Spi, Csn, Ce>::writeCommandMultiData(nrf24::Command cmd, uint8_t*
 
 template<typename Spi, typename Csn, typename Ce>
 uint8_t
-xpcc::Nrf24Phy<Spi, Csn, Ce>::readRegister(nrf24::Register reg)
+xpcc::Nrf24Phy<Spi, Csn, Ce>::readRegister(NrfRegister_t reg)
 {
-    return writeCommandSingleData(toCommand(nrf24::Command::R_REGISTER, reg, 0), 0x00);
+    Command_t cmd = Command::R_REGISTER;
+    cmd.value |= reg.value;
+    return writeCommandSingleData(cmd, 0x00);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
 
 template<typename Spi, typename Csn, typename Ce>
 void
-xpcc::Nrf24Phy<Spi, Csn, Ce>::writeRegister(nrf24::Register reg, uint8_t data)
+xpcc::Nrf24Phy<Spi, Csn, Ce>::writeRegister(NrfRegister_t reg, uint8_t data)
 {
-    writeCommandSingleData(toCommand(nrf24::Command::W_REGISTER, reg, 0), data);
+    Command_t cmd = Command::W_REGISTER;
+    cmd.value |= reg.value;
+    writeCommandSingleData(cmd, data);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
 
 template<typename Spi, typename Csn, typename Ce>
 void
-xpcc::Nrf24Phy<Spi, Csn, Ce>::setBits(nrf24::Register reg, uint8_t flags)
+xpcc::Nrf24Phy<Spi, Csn, Ce>::setBits(NrfRegister_t reg, Flags_t flags)
 {
     uint8_t old = readRegister(reg);
 
-    writeRegister(reg, old | flags);
+    writeRegister(reg, old | flags.value);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
 
 template<typename Spi, typename Csn, typename Ce>
 void
-xpcc::Nrf24Phy<Spi, Csn, Ce>::clearBits(nrf24::Register reg, uint8_t flags)
+xpcc::Nrf24Phy<Spi, Csn, Ce>::clearBits(NrfRegister_t reg, Flags_t flags)
 {
     uint8_t old = readRegister(reg);
 
-    writeRegister(reg, old & ~flags);
+    writeRegister(reg, old & ~flags.value);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -133,7 +137,7 @@ template<typename Spi, typename Csn, typename Ce>
 void
 xpcc::Nrf24Phy<Spi, Csn, Ce>::flushTxFifo()
 {
-    writeCommandNoData(nrf24::Command::FLUSH_TX);
+    writeCommandNoData(Command::FLUSH_TX);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -142,7 +146,7 @@ template<typename Spi, typename Csn, typename Ce>
 void
 xpcc::Nrf24Phy<Spi, Csn, Ce>::flushRxFifo()
 {
-    writeCommandNoData(nrf24::Command::FLUSH_RX);
+    writeCommandNoData(Command::FLUSH_RX);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -151,7 +155,7 @@ template<typename Spi, typename Csn, typename Ce>
 uint8_t
 xpcc::Nrf24Phy<Spi, Csn, Ce>::readRxPayloadWidth()
 {
-    return writeCommandSingleData(nrf24::Command::R_RX_PL_WID, 0x00);
+    return writeCommandSingleData(Command::R_RX_PL_WID, 0x00);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -168,7 +172,7 @@ xpcc::Nrf24Phy<Spi, Csn, Ce>::readRxPayload(uint8_t* buffer)
         cur_pl_len = readRxPayloadWidth();
     }
 
-    writeCommandMultiData(nrf24::Command::R_RX_PAYLOAD, nullptr, buffer, cur_pl_len);
+    writeCommandMultiData(Command::R_RX_PAYLOAD, nullptr, buffer, cur_pl_len);
 
 
     return cur_pl_len;
@@ -183,7 +187,7 @@ xpcc::Nrf24Phy<Spi, Csn, Ce>::writeTxPayload(uint8_t* buffer, uint8_t len)
     if(len > payload_len)
         return;
 
-    writeCommandMultiData(nrf24::Command::W_TX_PAYLOAD, buffer, nullptr, len);
+    writeCommandMultiData(Command::W_TX_PAYLOAD, buffer, nullptr, len);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -194,18 +198,20 @@ xpcc::Nrf24Phy<Spi, Csn, Ce>::writeTxPayloadNoAck(uint8_t* buffer, uint8_t len)
 {
     if(len > payload_len)
         return;
-    writeCommandMultiData(nrf24::Command::W_TX_PAYLOAD_NOACK, buffer, nullptr, len);
+    writeCommandMultiData(Command::W_TX_PAYLOAD_NOACK, buffer, nullptr, len);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
 
 template<typename Spi, typename Csn, typename Ce>
 void
-xpcc::Nrf24Phy<Spi, Csn, Ce>::writeAckPayload(uint8_t pipe, uint8_t* buffer, uint8_t len)
+xpcc::Nrf24Phy<Spi, Csn, Ce>::writeAckPayload(Pipe_t pipe, uint8_t* buffer, uint8_t len)
 {
     if(len > payload_len)
         return;
-    writeCommandMultiData(toCommand(nrf24::Command::W_ACK_PAYLOAD, pipe), buffer, nullptr, len);
+    Command_t cmd = Command::W_ACK_PAYLOAD;
+    cmd.value |= pipe.value;
+    writeCommandMultiData(cmd, buffer, nullptr, len);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -214,7 +220,7 @@ template<typename Spi, typename Csn, typename Ce>
 void
 xpcc::Nrf24Phy<Spi, Csn, Ce>::reuseTxPayload()
 {
-    writeCommandNoData(nrf24::Command::REUSE_TX_PL);
+    writeCommandNoData(Command::REUSE_TX_PL);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -223,8 +229,7 @@ template<typename Spi, typename Csn, typename Ce>
 uint8_t
 xpcc::Nrf24Phy<Spi, Csn, Ce>::readStatus()
 {
-    writeCommandNoData(nrf24::Command::NOP);
-
+    writeCommandNoData(Command::NOP);
     return status;
 }
 
@@ -232,9 +237,16 @@ xpcc::Nrf24Phy<Spi, Csn, Ce>::readStatus()
 
 template<typename Spi, typename Csn, typename Ce>
 void
-xpcc::Nrf24Phy<Spi, Csn, Ce>::setRxAddress(uint8_t pipe, uint64_t address)
+xpcc::Nrf24Phy<Spi, Csn, Ce>::setRxAddress(Pipe_t pipe, uint64_t address)
 {
-    if(pipe <= 1)
+
+    Command_t cmd = Command::W_REGISTER;
+    cmd.value |= static_cast<uint8_t>(NrfRegister::RX_ADDR_P0);
+
+    // add pipe value so register will be RX_ADDR_Px if pipe is 'x'
+    cmd.value += pipe.value;
+
+    if(pipe.value <= 1)
     {
         /* register RX_ADDR_P0|1 are 40 bit wide */
 
@@ -247,12 +259,15 @@ xpcc::Nrf24Phy<Spi, Csn, Ce>::setRxAddress(uint8_t pipe, uint64_t address)
             address >>= 8;
         }
 
-        writeCommandMultiData(toCommand(nrf24::Command::W_REGISTER, nrf24::Register::RX_ADDR_P0, pipe), addr, nullptr, address_size);
+        writeCommandMultiData(cmd, addr, nullptr, address_size);
 
-    } else if(pipe < rx_pipe_count)
+    } else if(pipe.value < rx_pipe_count)
     {
+        NrfRegister_t reg = NrfRegister::RX_ADDR_P0;
+        reg.value += pipe.value;
+
         /* register RX_ADDR_P2-5 are just 8 bit wide */
-        writeRegister(toRegister(nrf24::Register::RX_ADDR_P0, pipe), static_cast<uint8_t>(address & 0xff));
+        writeRegister(reg, static_cast<uint8_t>(address & 0xff));
 
     }
 }
@@ -271,24 +286,32 @@ xpcc::Nrf24Phy<Spi, Csn, Ce>::setTxAddress(uint64_t address)
         address >>= 8;
     }
 
-    writeCommandMultiData(toCommand(nrf24::Command::W_REGISTER, nrf24::Register::TX_ADDR, 0), addr, nullptr, address_size);
+    Command_t cmd = Command::W_REGISTER;
+    cmd.value |= static_cast<uint8_t>(NrfRegister::TX_ADDR);
+
+    writeCommandMultiData(cmd, addr, nullptr, address_size);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
 
 template<typename Spi, typename Csn, typename Ce>
 uint64_t
-xpcc::Nrf24Phy<Spi, Csn, Ce>::getRxAddress(uint8_t pipe)
+xpcc::Nrf24Phy<Spi, Csn, Ce>::getRxAddress(Pipe_t pipe)
 {
-    if(pipe <= 1)
+    if(pipe.value <= 1)
     {
-        /* register RX_ADDR_P0|1 are 40 bit wide */
+        /* register RX_ADDR_P0|1 are 40 bit wide, so they need special treatment */
+
+        Command_t cmd = Command::R_REGISTER;
+        cmd.value |= static_cast<uint8_t>(NrfRegister::RX_ADDR_P0);
+
+        // add pipe value so register will be RX_ADDR_Px if pipe is 'x'
+        cmd.value += pipe.value;
 
         uint8_t addr[address_size];
         uint64_t address = 0;
 
-        writeCommandMultiData(toCommand(nrf24::Command::R_REGISTER, nrf24::Register::RX_ADDR_P0, pipe),
-                                nullptr, addr,  address_size);
+        writeCommandMultiData(cmd, nullptr, addr,  address_size);
 
         uint8_t i = address_size;
         do
@@ -300,10 +323,13 @@ xpcc::Nrf24Phy<Spi, Csn, Ce>::getRxAddress(uint8_t pipe)
 
         return address;
 
-    } else if(pipe <= address_size)
+    } else if(pipe.value <= address_size)
     {
+        NrfRegister_t reg = NrfRegister::RX_ADDR_P0;
+        reg.value += pipe.value;
+
         /* register RX_ADDR_P2-5 are just 8 bit wide */
-        return readRegister(toRegister(nrf24::Register::RX_ADDR_P0, pipe));
+        return readRegister(reg);
 
     }
 
@@ -320,8 +346,10 @@ xpcc::Nrf24Phy<Spi, Csn, Ce>::getTxAddress()
     uint8_t addr[address_size];
     uint64_t address = 0;
 
-    writeCommandMultiData(toCommand(nrf24::Command::R_REGISTER, nrf24::Register::TX_ADDR, 0),
-                            nullptr, addr,  address_size);
+    Command_t cmd = Command::R_REGISTER;
+    cmd.value |= static_cast<uint8_t>(NrfRegister::TX_ADDR);
+
+    writeCommandMultiData(cmd, nullptr, addr, address_size);
 
     uint8_t i = address_size;
     do
