@@ -129,6 +129,13 @@ class Ssd1306 : public ssd1306, public xpcc::I2cDevice<I2cMaster>,
 public:
 	Ssd1306(uint8_t address = 0x3C);
 
+	/// Pings the display
+	bool inline
+	ping()
+	{
+		return CO_CALL_BLOCKING(ping(this));
+	}
+
 	/// initializes for 3V3 with charge-pump
 	bool inline
 	initialize()
