@@ -234,7 +234,7 @@ def build_info_header(env):
 	elif platform.system() == 'Windows':
 		os = " ".join(platform.win32_ver())
 	elif platform.system() == 'Darwin':
-		os = " ".join(platform.mac_ver())
+		os = "Mac {0} ({2})".format(*platform.mac_ver())
 	else:
 		os = platform.system()
 	defines['XPCC_BUILD_OS'] = env.CStringLiteral(os)
