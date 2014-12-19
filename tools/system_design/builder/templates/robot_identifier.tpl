@@ -16,7 +16,7 @@ namespace robot
 		{
 		{%- for item in domains -%}
 		{%- if item.id != None %}
-			{{ item.name | upper | replace(' ', '_') }} = {{ item.id }},
+			{{ item.name | upper | replace(' ', '_') }} = {{ "0x%02x"|format(item.id) }},
 		{%- endif -%}
 		{%- endfor %}
 		};
@@ -41,7 +41,7 @@ namespace robot
 		enum Identifier
 		{
 		{%- for item in components %}
-			{{ item.name | upper | replace(' ', '_') }} = {{ item.id }},
+			{{ item.name | upper | replace(' ', '_') }} = {{ "0x%02x"|format(item.id) }},
 		{%- endfor %}
 		};
 				
@@ -63,7 +63,7 @@ namespace robot
 		enum Identifier
 		{
 		{%- for item in actions %}
-			{{ item.name | upper | replace(' ', '_') }} = {{ item.id }},
+			{{ item.name | upper | replace(' ', '_') }} = {{ "0x%02x"|format(item.id) }},
 		{%- endfor %}
 		};
 				
@@ -85,7 +85,7 @@ namespace robot
 		enum Identifier
 		{
 		{%- for item in events %}
-			{{ item.name | upper | replace(' ', '_') }} = {{ item.id }},
+			{{ item.name | upper | replace(' ', '_') }} = {{ "0x%02x"|format(item.id) }},
 		{%- endfor %}
 		};
 		
