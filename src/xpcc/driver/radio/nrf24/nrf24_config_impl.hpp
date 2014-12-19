@@ -175,17 +175,19 @@ xpcc::Nrf24Config<Nrf24Phy>::enablePipe(Pipe_t pipe, bool enableAutoAck)
     Nrf24Phy::writeRegister(reg, payload_length);
 
 
+    Flags_t pipe_flag = static_cast<Flags_t>(1 << pipe.value);
+
     /* Enable or disable auto acknowledgement for this pipe */
     if(enableAutoAck)
     {
-        Nrf24Phy::setBits(NrfRegister::EN_AA, (1 << pipe.value));
+        Nrf24Phy::setBits(NrfRegister::EN_AA, pipe_flag);
     } else
     {
-        Nrf24Phy::clearBits(NrfRegister::EN_AA, (1 << pipe.value));
+        Nrf24Phy::clearBits(NrfRegister::EN_AA, pipe_flag);
     }
 
     /* enable pipe */
-    Nrf24Phy::setBits(NrfRegister::EN_RX_ADDR, (1 << pipe.value));
+    Nrf24Phy::setBits(NrfRegister::EN_RX_ADDR, pipe_flag);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
