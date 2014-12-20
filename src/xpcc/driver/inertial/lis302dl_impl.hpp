@@ -8,7 +8,7 @@
 // ----------------------------------------------------------------------------
 
 #ifndef XPCC_LIS302DL_HPP
-#	error  "Don't include this file directly, use 'lis302.hpp' instead!"
+#	error  "Don't include this file directly, use 'lis302dl.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------

@@ -59,14 +59,14 @@ public:
 	enum class
 	Control1 : uint8_t
 	{
-		DR = 0x80,		///< Data rate selection. (0: 100 Hz output data rate; 1: 400 Hz output data rate)
-		PD = 0x40,		///< Power Down Control. (0: power down mode; 1: active mode)
-		FS = 0x20,		///< Full Scale selection. (refer to Table 3 for typical full scale value)
-		STP = 0x10,		///< Self Test Enable. (0: normal mode; 1: self test P enabled)
-		STM = 0x08,		///< Self Test Enable. (0: normal mode; 1: self test M enabled)
-		Zen = 0x04,		///< Z axis enable. (0: Z axis disabled; 1: Z axis enabled)
-		Yen = 0x02,		///< Y axis enable. (0: Y axis disabled; 1: Y axis enabled)
-		Xen = 0x01,		///< X axis enable. (0: X axis disabled; 1: X axis enabled)
+		DR = Bit7,		///< Data rate selection. (0: 100 Hz output data rate; 1: 400 Hz output data rate)
+		PD = Bit6,		///< Power Down Control. (0: power down mode; 1: active mode)
+		FS = Bit5,		///< Full Scale selection. (refer to Table 3 for typical full scale value)
+		STP = Bit4,		///< Self Test Enable. (0: normal mode; 1: self test P enabled)
+		STM = Bit3,		///< Self Test Enable. (0: normal mode; 1: self test M enabled)
+		Zen = Bit2,		///< Z axis enable. (0: Z axis disabled; 1: Z axis enabled)
+		Yen = Bit1,		///< Y axis enable. (0: Y axis disabled; 1: Y axis enabled)
+		Xen = Bit0,		///< X axis enable. (0: X axis disabled; 1: X axis enabled)
 	};
 	REGISTER8(Control1);
 
@@ -74,14 +74,14 @@ public:
 	enum class
 	Control2 : uint8_t
 	{
-		SIM = 0x80,			///< SPI Serial Interface Mode selection. (0: 4-wire interface; 1: 3-wire interface)
-		BOOT = 0x40,		///< Reboot memory content. (0: normal mode; 1: reboot memory content)
+		SIM = Bit7,			///< SPI Serial Interface Mode selection. (0: 4-wire interface; 1: 3-wire interface)
+		BOOT = Bit6,		///< Reboot memory content. (0: normal mode; 1: reboot memory content)
 
-		FDS = 0x10,			///< Filtered Data Selection. (0: internal filter bypassed; 1: data from internal filter sent to output register)
-		HP_FF_WU2 = 0x08,	///< High Pass filter enabled for FreeFall/WakeUp # 2. (0: filter bypassed; 1: filter enabled)
-		HP_FF_WU1 = 0x04,	///< High Pass filter enabled for Free-Fall/Wake-Up #1. (0: filter bypassed; 1: filter enabled)
-		HP_COEFF2 = 0x02,	///< High pass filter cut-off frequency configuration.
-		HP_COEFF1 = 0x01,	///< High pass filter cut-off frequency configuration.
+		FDS = Bit4,			///< Filtered Data Selection. (0: internal filter bypassed; 1: data from internal filter sent to output register)
+		HP_FF_WU2 = Bit3,	///< High Pass filter enabled for FreeFall/WakeUp # 2. (0: filter bypassed; 1: filter enabled)
+		HP_FF_WU1 = Bit2,	///< High Pass filter enabled for Free-Fall/Wake-Up #1. (0: filter bypassed; 1: filter enabled)
+		HP_COEFF2 = Bit1,	///< High pass filter cut-off frequency configuration.
+		HP_COEFF1 = Bit0,	///< High pass filter cut-off frequency configuration.
 	};
 	REGISTER8(Control2);
 
@@ -89,16 +89,16 @@ public:
 	enum class
 	Control3 : uint8_t
 	{
-		IHL = 0x80,		///< Interrupt active high, low. (0: active high; 1: active low)
-		PP_OD = 0x40,	///< Push-pull/Open Drain selection on interrupt pad. (0: push-pull; 1: open drain)
+		IHL = Bit7,		///< Interrupt active high, low. (0: active high; 1: active low)
+		PP_OD = Bit6,	///< Push-pull/Open Drain selection on interrupt pad. (0: push-pull; 1: open drain)
 
-		I2CFG2 = 0x20,	///< Data Signal on Int2 pad control bits.
-		I2CFG1 = 0x10,	///< Data Signal on Int2 pad control bits.
-		I2CFG0 = 0x08,	///< Data Signal on Int2 pad control bits.
+		I2CFG2 = Bit5,	///< Data Signal on Int2 pad control bits.
+		I2CFG1 = Bit4,	///< Data Signal on Int2 pad control bits.
+		I2CFG0 = Bit3,	///< Data Signal on Int2 pad control bits.
 
-		I1CFG2 = 0x04,	///< Data Signal on Int1 pad control bits.
-		I1CFG1 = 0x02,	///< Data Signal on Int1 pad control bits.
-		I1CFG0 = 0x01,	///< Data Signal on Int1 pad control bits.
+		I1CFG2 = Bit2,	///< Data Signal on Int1 pad control bits.
+		I1CFG1 = Bit1,	///< Data Signal on Int1 pad control bits.
+		I1CFG0 = Bit0,	///< Data Signal on Int1 pad control bits.
 	};
 	REGISTER8(Control3);
 
@@ -109,15 +109,15 @@ public:
 	enum class
 	Status : uint8_t
 	{
-		ZYXOR = 0x80,	///< X, Y and Z axis data overrun.
-		ZOR = 0x40,		///< Z axis data overrun.
-		YOR = 0x20,		///< Y axis data overrun.
-		XOR = 0x10,		///< X axis data overrun.
+		ZYXOR = Bit7,	///< X, Y and Z axis data overrun.
+		ZOR = Bit6,		///< Z axis data overrun.
+		YOR = Bit5,		///< Y axis data overrun.
+		XOR = Bit4,		///< X axis data overrun.
 
-		ZYXDA = 0x08,	///< X, Y and Z axis new data available.
-		ZDA = 0x04,		///< Z axis new data available.
-		YDA = 0x02,		///< Y axis new data available.
-		XDA = 0x01,		///< X axis new data available.
+		ZYXDA = Bit3,	///< X, Y and Z axis new data available.
+		ZDA = Bit2,		///< Z axis new data available.
+		YDA = Bit1,		///< Y axis new data available.
+		XDA = Bit0,		///< X axis new data available.
 	};
 	REGISTER8(Status);
 
@@ -125,14 +125,14 @@ public:
 	enum class
 	FreeFallConfig : uint8_t
 	{
-		AOI = 0x80,		///< And/or combination of Interrupt events. (0: OR combination of interrupt events; 1: AND combination of interrupt events)
-		LIR = 0x40,		///< Latch Interrupt request into FF_WU_SRC reg with the FF_WU_SRC reg cleared by reading FF_WU_SRC_1 reg.
-		ZHIE = 0x20,	///< Enable interrupt generation on Z high event.
-		ZLIE = 0x10,	///< Enable interrupt generation on Z low event.
-		YHIE = 0x08,	///< Enable interrupt generation on Y high event.
-		YLIE = 0x04,	///< Enable interrupt generation on Y low event.
-		XHIE = 0x02,	///< Enable interrupt generation on X high event.
-		XLIE = 0x01,	///< Enable interrupt generation on X low event.
+		AOI = Bit7,		///< And/or combination of Interrupt events. (0: OR combination of interrupt events; 1: AND combination of interrupt events)
+		LIR = Bit6,		///< Latch Interrupt request into FF_WU_SRC reg with the FF_WU_SRC reg cleared by reading FF_WU_SRC_1 reg.
+		ZHIE = Bit5,	///< Enable interrupt generation on Z high event.
+		ZLIE = Bit4,	///< Enable interrupt generation on Z low event.
+		YHIE = Bit3,	///< Enable interrupt generation on Y high event.
+		YLIE = Bit2,	///< Enable interrupt generation on Y low event.
+		XHIE = Bit1,	///< Enable interrupt generation on X high event.
+		XLIE = Bit0,	///< Enable interrupt generation on X low event.
 	};
 	REGISTER8(FreeFallConfig);
 
@@ -140,13 +140,13 @@ public:
 	enum class
 	FreeFallSource : uint8_t
 	{
-		IA = 0x40,	///< Interrupt Active.
-		ZH = 0x20,	///< Z high.
-		ZL = 0x10,	///< Z low.
-		YH = 0x08,	///< Y high.
-		YL = 0x04,	///< Y low.
-		XH = 0x02,	///< X high.
-		XL = 0x01,	///< X low.
+		IA = Bit6,	///< Interrupt Active.
+		ZH = Bit5,	///< Z high.
+		ZL = Bit4,	///< Z low.
+		YH = Bit3,	///< Y high.
+		YL = Bit2,	///< Y low.
+		XH = Bit1,	///< X high.
+		XL = Bit0,	///< X low.
 	};
 	REGISTER8(FreeFallSource);
 
@@ -154,8 +154,8 @@ public:
 	enum class
 	FreeFallThreshold : uint8_t
 	{
-		DRCM = 0x80,	///< Resetting mode selection.
-		THS_Mask = 0x7F,		///< Free-fall / wake-up Threshold.
+		DRCM = Bit7,		///< Resetting mode selection.
+		THS_Mask = 0x7F,	///< Free-fall / wake-up Threshold.
 	};
 	REGISTER8(FreeFallThreshold);
 
@@ -163,13 +163,13 @@ public:
 	enum class
 	ClickConfig : uint8_t
 	{
-		LIR = 0x40,		///< Latch interrupt request into CLICK_SRC reg with the CLICK_SRC reg refreshed by reading CLICK_SRC reg.
-		DoubleZ = 0x20,
-		SingleZ = 0x10,
-		DoubleY = 0x08,
-		SingleY = 0x04,
-		DoubleX = 0x02,
-		SingleX = 0x01,
+		LIR = Bit6,		///< Latch interrupt request into CLICK_SRC reg with the CLICK_SRC reg refreshed by reading CLICK_SRC reg.
+		DoubleZ = Bit5,
+		SingleZ = Bit4,
+		DoubleY = Bit3,
+		SingleY = Bit2,
+		DoubleX = Bit1,
+		SingleX = Bit0,
 	};
 	REGISTER8(ClickConfig);
 
@@ -177,13 +177,13 @@ public:
 	enum class
 	ClickSource : uint8_t
 	{
-		IA = 0x40,		///< Interrupt Active.
-		DoubleZ = 0x20,
-		SingleZ = 0x10,
-		DoubleY = 0x08,
-		SingleY = 0x04,
-		DoubleX = 0x02,
-		SingleX = 0x01,
+		IA = Bit6,		///< Interrupt Active.
+		DoubleZ = Bit5,
+		SingleZ = Bit4,
+		DoubleY = Bit3,
+		SingleY = Bit2,
+		DoubleX = Bit1,
+		SingleX = Bit0,
 	};
 	REGISTER8(ClickSource);
 
@@ -298,8 +298,8 @@ protected:
  * acceleration to the external world through an I2C/SPI serial interface.
  *
  * @tparam	Transport	Either the I2C or SPI Transport Layer.
- * @see Lis302I2cTransport
- * @see Lis302SpiTransport
+ * @see Lis3TransportI2c
+ * @see Lis3TransportSpi
  *
  * @ingroup inertial
  * @author	Niklas Hauser
@@ -308,7 +308,7 @@ template < class Transport >
 class Lis302dl : public lis302dl, public Transport
 {
 public:
-	/// Constructor, requires a lis302::Data object.
+	/// Constructor, requires a lis302dl::Data object.
 	/// For I2c this also sets the address to 0x1D (alternative: 0x1C).
 	Lis302dl(Data &data, uint8_t address=0x1D);
 
@@ -443,6 +443,6 @@ private:
 
 } // namespace xpcc
 
-#include "lis302_impl.hpp"
+#include "lis302dl_impl.hpp"
 
 #endif	// XPCC_LIS302DL_HPP

@@ -1,7 +1,7 @@
 #include <xpcc/architecture/platform.hpp>
 #include "../stm32f4_discovery.hpp"
 
-#include <xpcc/driver/inertial/lis302.hpp>
+#include <xpcc/driver/inertial/lis302dl.hpp>
 #define USE_I2C 0
 
 namespace lis
