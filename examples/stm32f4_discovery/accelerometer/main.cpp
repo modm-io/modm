@@ -14,14 +14,14 @@ typedef GpioOutputA7 Mosi;
 typedef GpioOutputE3 Cs;
 
 typedef SpiMaster1 SpiMaster;
-typedef xpcc::Lis302SpiTransport< SpiMaster, Cs > SpiTransport;
+typedef xpcc::Lis3TransportSpi< SpiMaster, Cs > SpiTransport;
 
 // I2c Transport Layer
 typedef GpioA5 Scl;
 typedef GpioA7 Sda;
 
 typedef xpcc::SoftwareI2cMaster<Scl, Sda, 400000> I2cMaster;
-typedef xpcc::Lis302I2cTransport< I2cMaster > I2cTransport;
+typedef xpcc::Lis3TransportI2c< I2cMaster > I2cTransport;
 
 // Interrupt lines
 typedef GpioInputE0 Int1;
