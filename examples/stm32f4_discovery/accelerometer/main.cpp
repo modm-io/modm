@@ -30,13 +30,13 @@ typedef GpioInputE1 Int2;
 } // namespace lis
 
 // Acceleration Data object
-xpcc::lis302::Data data;
+xpcc::lis302dl::Data data;
 
 // LIS302DL Driver object
 #if USE_I2C
-xpcc::Lis302< lis::I2cTransport > accel(data, 0x1D);
+xpcc::Lis302dl< lis::I2cTransport > accel(data, 0x1D);
 #else
-xpcc::Lis302< lis::SpiTransport > accel(data);
+xpcc::Lis302dl< lis::SpiTransport > accel(data);
 #endif
 
 #include <xpcc/processing.hpp>

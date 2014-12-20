@@ -17,7 +17,7 @@
 namespace xpcc
 {
 
-struct lis302
+struct lis302dl
 {
 protected:
 	enum class
@@ -305,12 +305,12 @@ protected:
  * @author	Niklas Hauser
  */
 template < class Transport >
-class Lis302 : public lis302, public Transport, protected xpcc::pt::Protothread
+class Lis302dl : public lis302dl, public Transport
 {
 public:
 	/// Constructor, requires a lis302::Data object.
 	/// For I2c this also sets the address to 0x1D (alternative: 0x1C).
-	Lis302(Data &data, uint8_t address=0x1D);
+	Lis302dl(Data &data, uint8_t address=0x1D);
 
 	bool inline
 	initialize(Scale scale, MeasurementRate rate = MeasurementRate::Hz100)

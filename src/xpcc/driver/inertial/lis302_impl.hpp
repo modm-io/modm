@@ -14,21 +14,21 @@
 // ----------------------------------------------------------------------------
 // MARK: LIS302 DRIVER
 template < class Transport >
-xpcc::Lis302<Transport>::Lis302(Data &data, uint8_t address)
+xpcc::Lis302dl<Transport>::Lis302dl(Data &data, uint8_t address)
 :	Transport(address), data(data), rawBuffer{0,0,0,0,0,0,0,0,0,0}
 {
 }
 
 template < class Transport >
 xpcc::co::Result<bool>
-xpcc::Lis302<Transport>::initialize(void *ctx, Scale scale, MeasurementRate rate)
+xpcc::Lis302dl<Transport>::initialize(void *ctx, Scale scale, MeasurementRate rate)
 {
 	return updateControlRegister(ctx, r(scale) | r(rate) | static_cast<Control1>(0x47));
 }
 
 template < class Transport >
 xpcc::co::Result<bool>
-xpcc::Lis302<Transport>::updateControlRegister(void *ctx, uint8_t index, Control_t setMask, Control_t clearMask)
+xpcc::Lis302dl<Transport>::updateControlRegister(void *ctx, uint8_t index, Control_t setMask, Control_t clearMask)
 {
 	CO_BEGIN(ctx);
 
@@ -41,7 +41,7 @@ xpcc::Lis302<Transport>::updateControlRegister(void *ctx, uint8_t index, Control
 
 template < class Transport >
 xpcc::co::Result<bool>
-xpcc::Lis302<Transport>::writeClickThreshold(void *ctx, Axis axis, uint8_t threshold)
+xpcc::Lis302dl<Transport>::writeClickThreshold(void *ctx, Axis axis, uint8_t threshold)
 {
 	switch(axis)
 	{
@@ -59,7 +59,7 @@ xpcc::Lis302<Transport>::writeClickThreshold(void *ctx, Axis axis, uint8_t thres
 
 template < class Transport >
 xpcc::co::Result<bool>
-xpcc::Lis302<Transport>::readAcceleration(void *ctx)
+xpcc::Lis302dl<Transport>::readAcceleration(void *ctx)
 {
 	CO_BEGIN(ctx);
 
@@ -77,7 +77,7 @@ xpcc::Lis302<Transport>::readAcceleration(void *ctx)
 // ----------------------------------------------------------------------------
 template < class Transport >
 xpcc::co::Result<bool>
-xpcc::Lis302<Transport>::updateRegister(void *ctx, uint8_t reg, uint8_t setMask, uint8_t clearMask)
+xpcc::Lis302dl<Transport>::updateRegister(void *ctx, uint8_t reg, uint8_t setMask, uint8_t clearMask)
 {
 	CO_BEGIN(ctx);
 
