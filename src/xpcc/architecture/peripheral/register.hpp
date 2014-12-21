@@ -26,6 +26,7 @@
 namespace xpcc
 {
 
+/// Register Base class
 template< typename T >
 struct Register
 {
@@ -35,8 +36,10 @@ struct Register
 	constexpr Register()
 	:	value(0) {}
 
-	constexpr operator bool() const
+	explicit constexpr operator bool() const
 	{ return value != 0; }
+	constexpr bool operator!() const
+	{ return value == 0; }
 
 	// do NOT cast to anything else
 	template<typename U>
@@ -50,7 +53,66 @@ typedef Register<uint8_t> Register8;
 typedef Register<uint16_t> Register16;
 typedef Register<uint32_t> Register32;
 
+
+///
+template < typename Enum, typename T = uint8_t >
+struct Flags : public ::xpcc::Register<T>
+{
+	constexpr Flags() {}
+	explicit constexpr Flags(T flag) :
+		Register<T>(flag) {}
+	constexpr Flags(Enum flag) :
+		Register<T>(T(flag)) {}
+	constexpr Flags(const Flags & o) :
+		Register<T>(o.value) {}
+
+	constexpr Flags operator~() const { return Flags(~Register<T>::value); }
+	constexpr Flags operator&(Flags o) const { return Flags(Register<T>::value & o.value); }
+	constexpr Flags operator|(Flags o) const { return Flags(Register<T>::value | o.value); }
+	constexpr Flags operator^(Flags o) const { return Flags(Register<T>::value ^ o.value); }
+	Flags & operator&=(const Flags & o) {  return (Register<T>::value &= o.value, *this); }
+	Flags & operator|=(Flags o) { return (Register<T>::value |= o.value, *this); }
+	Flags & operator^=(Flags o) { return (Register<T>::value ^= o.value, *this); }
+	constexpr Flags operator&(Enum flag) const { return operator&(Flags(flag)); }
+	constexpr Flags operator|(Enum flag) const { return operator|(Flags(flag)); }
+	constexpr Flags operator^(Enum flag) const { return operator^(Flags(flag)); }
+	Flags & operator&=(Enum flag) { return operator&=(Flags(flag)); }
+	Flags & operator|=(Enum flag) { return operator|=(Flags(flag)); }
+	Flags & operator^=(Enum flag) { return operator^=(Flags(flag)); }
+	Flags & operator=(Flags o) { return (Register<T>::value = o.value, *this); }
+
+	constexpr bool has(Enum const &flag) const
+	{ return Register<T>::value & T(flag); }
+	constexpr bool has_all(Flags const &o) const
+	{ return (Register<T>::value & o.value) == o.value; }
+	static constexpr Flags all()
+	{ return Flags(-1); }
+
+	friend constexpr Flags operator|(Enum const &a, Flags const &b) { return b | a; }
+	friend constexpr Flags operator&(Enum const &a, Flags const &b) { return b & a; }
+	friend constexpr Flags operator^(Enum const &a, Flags const &b) { return b ^ a; }
+};
+
+template < typename Enum >
+using Flags8 = Flags<Enum, uint8_t>;
+template < typename Enum >
+using Flags16 = Flags<Enum, uint16_t>;
+template < typename Enum >
+using Flags32 = Flags<Enum, uint32_t>;
+
 }	// namespace xpcc
+
+// these operator overloadings will overload *ALL* possible enum classes
+/*
+template <typename Enum>
+constexpr ::xpcc::Flags<Enum> operator compl (Enum const &lhs) { return compl ::xpcc::Flags<Enum>(lhs); }
+template <typename Enum>
+constexpr ::xpcc::Flags<Enum> operator|(Enum const &a, Enum const &b) { return ::xpcc::Flags<Enum>(a) | b;  }
+template <typename Enum>
+constexpr ::xpcc::Flags<Enum> operator&(Enum const &a, Enum const &b) { return ::xpcc::Flags<Enum>(a) & b; }
+template <typename Enum>
+constexpr ::xpcc::Flags<Enum> operator^(Enum const &a, Enum const &b) { return ::xpcc::Flags<Enum>(a) ^ b; }
+//*/
 
 /// @hideinitializer
 #define REGISTER8(name) \
@@ -78,39 +140,17 @@ typedef Register<uint32_t> Register32;
 
 /// @cond
 #define INTERNAL_REGISTER(type, name, scope) \
-	struct CONCAT(name, _t) : public ::xpcc::Register<type> { \
-		constexpr CONCAT(name, _t)() {} \
-		explicit constexpr CONCAT(name, _t)(type value) \
-		:	Register(value) {} \
-		constexpr CONCAT(name, _t)(name value) \
-		:	Register(type(value)) {} \
-		INTERNAL_REGISTER_OP(type, name, &) \
-		INTERNAL_REGISTER_OP(type, name, |) \
-		INTERNAL_REGISTER_OP(type, name, ^) \
-	}; \
-	scope constexpr CONCAT(name, _t) operator compl (CONCAT(name, _t) const &lhs) \
-	{ return CONCAT(name, _t)(name(compl lhs.value)); } \
+	typedef ::xpcc::Flags<name, type> CONCAT(name, _t); \
 	scope constexpr CONCAT(name, _t) operator compl (name const &lhs) \
-	{ return CONCAT(name, _t)(name(compl type(lhs))); } \
+	{ return compl CONCAT(name, _t)(lhs); } \
 	INTERNAL_REGISTER_EOP(type, name, &, scope) \
 	INTERNAL_REGISTER_EOP(type, name, |, scope) \
 	INTERNAL_REGISTER_EOP(type, name, ^, scope)
 
 #define INTERNAL_REGISTER_EOP(type, name, op, scope) \
-	scope constexpr CONCAT(name, _t) operator op (name const &lhs, CONCAT(name, _t) const &rhs) \
-	{ return CONCAT(name, _t)(name(type(lhs) op rhs.value)); } \
-	scope constexpr CONCAT(name, _t) operator op (CONCAT(name, _t) const &lhs, name const &rhs) \
-	{ return CONCAT(name, _t)(name(type(rhs) op lhs.value)); } \
-	scope constexpr CONCAT(name, _t) operator op (CONCAT(name, _t) const &lhs, CONCAT(name, _t) const &rhs) \
-	{ return CONCAT(name, _t)(name(lhs.value op rhs.value)); } \
 	scope constexpr CONCAT(name, _t) operator op (name const &lhs, name const &rhs) \
 	{ return CONCAT(name, _t)(name(type(lhs) op type(rhs))); }
 
-#define INTERNAL_REGISTER_OP(type, name, op) \
-	inline CONCAT(name, _t)& operator CONCAT(op, =) (CONCAT(name, _t) const &rhs) \
-	{ value CONCAT(op, =) rhs.value; return *this; } \
-	inline CONCAT(name, _t)& operator CONCAT(op, =) (name const &rhs) \
-	{ value CONCAT(op, =) type(rhs); return *this; }
 
 #define INTERNAL_REGISTER_GROUP(type, name, ...) \
 	struct CONCAT(name, _t) : public ::xpcc::Register<type> { \
