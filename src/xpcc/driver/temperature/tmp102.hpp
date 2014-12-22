@@ -10,12 +10,11 @@
 #ifndef XPCC_TMP102_HPP
 #define XPCC_TMP102_HPP
 
-#include <stdint.h>
 #include <xpcc/architecture/peripheral/register.hpp>
 #include <xpcc/architecture/peripheral/i2c_device.hpp>
-#include <xpcc/architecture/peripheral/i2c_transaction.hpp>
 #include <xpcc/processing/protothread.hpp>
 #include <xpcc/processing/coroutine.hpp>
+#include <xpcc/math/utils/endianess.hpp>
 
 namespace xpcc
 {
@@ -100,8 +99,8 @@ public:
 		float
 		getTemperature()
 		{
-			uint16_t *rData = reinterpret_cast<uint16_t*>(data);
-			int16_t temp = static_cast<int16_t>(xpcc::math::bigEndianToHost(*rData));
+			int16_t *rData = reinterpret_cast<int16_t*>(data);
+			int16_t temp = xpcc::math::fromBigEndian(*rData);
 			if (data[1] & 0x01)
 			{
 				// temperature extended mode

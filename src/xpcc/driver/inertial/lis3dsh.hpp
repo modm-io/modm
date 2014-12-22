@@ -12,6 +12,7 @@
 
 #include <xpcc/architecture/peripheral/register.hpp>
 #include <xpcc/processing/coroutine.hpp>
+#include <xpcc/math/utils/endianess.hpp>
 #include "lis3_transport.hpp"
 
 namespace xpcc
@@ -446,24 +447,31 @@ public:
 		/// @{
 		/// returns the acceleration in g
 		float inline
-		getX() { return int16_t((data[1] << 8) | data[0]) * float(meta)/0x7FFF; }
+		getX() { return getData(0) * float(meta)/0x7FFF; }
 
 		float inline
-		getY() { return int16_t((data[3] << 8) | data[2]) * float(meta)/0x7FFF; }
+		getY() { return getData(1) * float(meta)/0x7FFF; }
 
 		float inline
-		getZ() { return int16_t((data[5] << 8) | data[4]) * float(meta)/0x7FFF; }
+		getZ() { return getData(2) * float(meta)/0x7FFF; }
 		/// @}
 
 		inline int16_t
 		operator [](uint8_t index)
-		{ return (index < 3) ? int16_t((data[2*index+1] << 8) | data[2*index]) : 0; }
+		{ return (index < 3) ? getData(index) : 0; }
 
 		inline uint8_t*
 		getPointer()
 		{ return data; }
 
 	private:
+		int16_t inline
+		getData(uint8_t index)
+		{
+			int16_t *rData = reinterpret_cast<int16_t*>(data);
+			return xpcc::math::fromLittleEndian(rData[index]);
+		}
+
 		// data 0-5 = xl,xh,yl,yh,zl,zh
 		uint8_t data[6];
 		// contains scale in g (5bit LSB)

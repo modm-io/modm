@@ -10,6 +10,9 @@
 #ifndef XPCC_MATH_ENDIANESS_HPP
 #define XPCC_MATH_ENDIANESS_HPP
 
+#include <stdint.h>
+#include "bit_operation.hpp"
+
 namespace xpcc
 {
 
@@ -38,35 +41,105 @@ isLittleEndian()
 
 // MARK: - to host
 inline uint16_t
-littleEndianToHost(uint16_t value);
+fromLittleEndian(uint16_t value)
+{
+	return isLittleEndian() ? value : swap(value);
+}
+
+inline int16_t
+fromLittleEndian(int16_t value)
+{
+	return int16_t(fromLittleEndian(uint16_t(value)));
+}
 
 inline uint32_t
-littleEndianToHost(uint32_t value);
+fromLittleEndian(uint32_t value)
+{
+	return isLittleEndian() ? value : swap(value);
+}
+
+inline int32_t
+fromLittleEndian(int32_t value)
+{
+	return int32_t(fromLittleEndian(uint32_t(value)));
+}
 
 inline uint16_t
-bigEndianToHost(uint16_t value);
+fromBigEndian(uint16_t value)
+{
+	return isBigEndian() ? value : swap(value);
+}
+
+inline int16_t
+fromBigEndian(int16_t value)
+{
+	return int16_t(fromBigEndian(uint16_t(value)));
+}
 
 inline uint32_t
-bigEndianToHost(uint32_t value);
+fromBigEndian(uint32_t value)
+{
+	return isBigEndian() ? value : swap(value);
+}
+
+inline int32_t
+fromBigEndian(int32_t value)
+{
+	return int32_t(fromBigEndian(uint32_t(value)));
+}
 
 // MARK: - from host
 inline uint16_t
-hostToLittleEndian(uint16_t value);
+toLittleEndian(uint16_t value)
+{
+	return isLittleEndian() ? value : swap(value);
+}
+
+inline int16_t
+toLittleEndian(int16_t value)
+{
+	return int16_t(toLittleEndian(uint16_t(value)));
+}
 
 inline uint32_t
-hostToLittleEndian(uint32_t value);
+toLittleEndian(uint32_t value)
+{
+	return isLittleEndian() ? value : swap(value);
+}
+
+inline int32_t
+toLittleEndian(int32_t value)
+{
+	return int32_t(toLittleEndian(uint32_t(value)));
+}
 
 inline uint16_t
-hostToBigEndian(uint16_t value);
+toBigEndian(uint16_t value)
+{
+	return isBigEndian() ? value : swap(value);
+}
+
+inline int16_t
+toBigEndian(int16_t value)
+{
+	return int16_t(toBigEndian(uint16_t(value)));
+}
 
 inline uint32_t
-hostToBigEndian(uint32_t value);
+toBigEndian(uint32_t value)
+{
+	return isBigEndian() ? value : swap(value);
+}
+
+inline int32_t
+toBigEndian(int32_t value)
+{
+	return int32_t(toBigEndian(uint32_t(value)));
+}
 
 
 } // namespace math
 
 } // namespace xpcc
-
-#include "endianess_impl.hpp"
 
 #endif // XPCC_MATH_ENDIANESS_HPP

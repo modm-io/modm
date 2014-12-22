@@ -11,8 +11,6 @@
 #	error  "Don't include this file directly, use 'tmp102.hpp' instead!"
 #endif
 
-#include <xpcc/math/utils/endianess.hpp>
-
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 xpcc::Tmp102<I2cMaster>::Tmp102(Data &data, uint8_t address)
@@ -225,7 +223,7 @@ xpcc::Tmp102<I2cMaster>::writeLimitRegister(void *ctx, Register reg, float tempe
 	{
 		int16_t temp = temperature * 16.f;
 		temp <<= (config_lsb & Config2::ExtendedMode) ? 3 : 4;
-		temp = xpcc::math::bigEndianToHost(static_cast<uint16_t>(temp));
+		temp = xpcc::math::fromBigEndian(static_cast<uint16_t>(temp));
 
 		buffer[0] = i(reg);
 		buffer[1] = temp;

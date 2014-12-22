@@ -173,8 +173,8 @@ public:
 		int16_t inline
 		swapData(uint8_t index)
 		{
-			uint16_t* rawData = reinterpret_cast<uint16_t*>(data);
-			return static_cast<int16_t>(xpcc::math::bigEndianToHost(rawData[index]));
+			int16_t* rawData = reinterpret_cast<int16_t*>(data);
+			return xpcc::math::fromBigEndian(rawData[index]);
 		}
 	};
 
