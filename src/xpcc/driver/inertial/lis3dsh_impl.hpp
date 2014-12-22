@@ -31,6 +31,12 @@ xpcc::Lis3dsh<Transport>::initialize(void *ctx, Scale scale, MeasurementRate rat
 	rawBuffer[0] = i(rate) | 0x07;
 	// Scale must be set in Control5
 	rawBuffer[4] = i(scale);
+	{
+		// see updateControlRegister
+		uint8_t s = rawBuffer[4] >> 2;
+		data.meta = (s == 8) ? s + 8 : s + 2;
+	}
+
 	rawBuffer[5] = uint8_t(Control6::ADD_INC);
 
 	if ( CO_CALL(this->write(ctx, i(Register::CTRL_REG4), rawBuffer[0])) )
@@ -57,7 +63,7 @@ xpcc::Lis3dsh<Transport>::updateControlRegister(void *ctx, uint8_t index, Contro
 		uint8_t scale = (Control5_t(rawBuffer[4]) & Control5::FSCALE_Mask).value >> 2;
 		// for G2, G6, G8 we can simply add 2 to the result.
 		// this does not work for G16, where we have to add 8
-//		data.meta = (scale == 8) ? scale + 8 : scale + 2;
+		data.meta = (scale == 8) ? scale + 8 : scale + 2;
 	}
 
 	CO_END_RETURN_CALL(this->write(ctx, 0x20 + index, rawBuffer[index]));

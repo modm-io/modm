@@ -446,13 +446,13 @@ public:
 		/// @{
 		/// returns the acceleration in g
 		float inline
-		getX() { return int16_t((data[1] << 8) | data[0]) * float(2)/0x7FFF; }
+		getX() { return int16_t((data[1] << 8) | data[0]) * float(meta)/0x7FFF; }
 
 		float inline
-		getY() { return int16_t((data[3] << 8) | data[2]) * float(2)/0x7FFF; }
+		getY() { return int16_t((data[3] << 8) | data[2]) * float(meta)/0x7FFF; }
 
 		float inline
-		getZ() { return int16_t((data[5] << 8) | data[4]) * float(2)/0x7FFF; }
+		getZ() { return int16_t((data[5] << 8) | data[4]) * float(meta)/0x7FFF; }
 		/// @}
 
 		inline int16_t
