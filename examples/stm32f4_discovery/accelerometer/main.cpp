@@ -1,8 +1,18 @@
 #include <xpcc/architecture/platform.hpp>
 #include "../stm32f4_discovery.hpp"
 
-#include <xpcc/driver/inertial/lis302dl.hpp>
-#define USE_I2C 0
+// ST changed the accelerometer in the C revision (MB997C)
+// change this to `false`, if you have MB997A or MB997B!
+#define REVISION_C true
+
+// if you want to use Software I2c change this to `true`
+#define USE_I2C false
+
+#if REVISION_C
+#	include <xpcc/driver/inertial/lis3dsh.hpp>
+#else
+#	include <xpcc/driver/inertial/lis302dl.hpp>
+#endif
 
 namespace lis
 {
@@ -12,31 +22,32 @@ typedef GpioOutputA5 Sck;
 typedef GpioInputA6 Miso;
 typedef GpioOutputA7 Mosi;
 typedef GpioOutputE3 Cs;
-
 typedef SpiMaster1 SpiMaster;
-typedef xpcc::Lis3TransportSpi< SpiMaster, Cs > SpiTransport;
 
 // I2c Transport Layer
 typedef GpioA5 Scl;
 typedef GpioA7 Sda;
-
 typedef xpcc::SoftwareI2cMaster<Scl, Sda, 400000> I2cMaster;
-typedef xpcc::Lis3TransportI2c< I2cMaster > I2cTransport;
 
 // Interrupt lines
 typedef GpioInputE0 Int1;
 typedef GpioInputE1 Int2;
 
+#if USE_I2C
+typedef xpcc::Lis3TransportI2c< I2cMaster > Transport;
+#else
+typedef xpcc::Lis3TransportSpi< SpiMaster, Cs > Transport;
+#endif
+
 } // namespace lis
 
-// Acceleration Data object
-xpcc::lis302dl::Data data;
-
-// LIS302DL Driver object
-#if USE_I2C
-xpcc::Lis302dl< lis::I2cTransport > accel(data, 0x1D);
+// Data and Driver object
+#if REVISION_C
+xpcc::lis3dsh::Data data;
+xpcc::Lis3dsh< lis::Transport > accel(data);
 #else
-xpcc::Lis302dl< lis::SpiTransport > accel(data);
+xpcc::lis302dl::Data data;
+xpcc::Lis302dl< lis::Transport > accel(data);
 #endif
 
 #include <xpcc/processing.hpp>
@@ -70,8 +81,13 @@ public:
 		{
 			PT_CALL(accel.readAcceleration(this));
 
+#if REVISION_C
+			averageX.update(-accel.data.getY());
+			averageY.update(accel.data.getX());
+#else
 			averageX.update(accel.data.getX());
 			averageY.update(accel.data.getY());
+#endif
 
 			LedOrange::set(averageX.getValue() < -0.2);
 			LedBlue::set(averageX.getValue() > 0.2);
