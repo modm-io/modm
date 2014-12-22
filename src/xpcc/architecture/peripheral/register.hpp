@@ -41,7 +41,12 @@ struct Register
 	constexpr Register()
 	:	value(0) {}
 
-	explicit constexpr operator bool() const
+
+	// The safe-bool idiom is not required here, since we are not
+	// dealing with complex objects, but with one integral value.
+	// So there is not need for it.
+	/* explicit */
+	constexpr operator bool() const
 	{ return value != 0; }
 	constexpr bool operator!() const
 	{ return value == 0; }
