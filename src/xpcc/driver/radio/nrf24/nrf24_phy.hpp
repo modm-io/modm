@@ -206,12 +206,9 @@ public:
     readStatus();
 
 
-    /** @brief Read new status
+    /** @brief Read Fifo status register
      *
-     * Note: status will be automatically updated every time a command is
-     *       issued, so it might not be necessary to call this explicitly.
-     *
-     *  @return Status register
+     *  @return Fifo Status register
      */
     static uint8_t
     readFifoStatus();
