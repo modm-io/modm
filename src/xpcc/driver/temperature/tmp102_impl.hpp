@@ -122,16 +122,16 @@ xpcc::Tmp102<I2cMaster>::configureAlertMode(void *ctx, ThermostatMode mode, Aler
 {
 	CO_BEGIN(ctx);
 
-	if (static_cast<uint8_t>(mode))
+	if (bool(mode))
 			config_msb |=  Config1::ThermostatMode;
 	else	config_msb &= ~Config1::ThermostatMode;
 
-	if (static_cast<uint8_t>(polarity))
+	if (bool(polarity))
 			config_msb |=  Config1::Polarity;
 	else	config_msb &= ~Config1::Polarity;
 
 	config_msb &= ~Config1::FaultQueueMask;
-	config_msb |= static_cast<Config1>(faults);
+	config_msb |= Config1(faults);
 
 	CO_END_RETURN_CALL(writeConfiguration(ctx, 2));
 }
@@ -161,7 +161,7 @@ xpcc::Tmp102<I2cMaster>::readTemperature(void *ctx)
 {
 	CO_BEGIN(ctx);
 
-	buffer[0] = static_cast<uint8_t>(Register::Temperature);
+	buffer[0] = uint8_t(Register::Temperature);
 	CO_WAIT_UNTIL(adapter.configureWriteRead(buffer, 1, data.getPointer(), 2) &&
 			(i2cTask = I2cTask::ReadTemperature, this->startTransaction(&adapter)));
 
@@ -185,9 +185,9 @@ xpcc::Tmp102<I2cMaster>::readComparatorMode(void *ctx, bool &result)
 
 	if (i2cSuccess == I2cTask::ReadAlert)
 	{
-		config_msb = static_cast<Config1_t>(buffer[0]) & ~Config1::ResolutionMask;
-		result =     static_cast<Config2_t>(buffer[1]) &  Config2::Alert;
-		config_lsb = static_cast<Config2_t>(buffer[1]) & ~Config2::Alert;
+		config_msb = Config1_t(buffer[0]) & ~Config1::ResolutionMask;
+		result =     Config2_t(buffer[1]) &  Config2::Alert;
+		config_lsb = Config2_t(buffer[1]) & ~Config2::Alert;
 		CO_RETURN(true);
 	}
 
@@ -223,7 +223,7 @@ xpcc::Tmp102<I2cMaster>::writeLimitRegister(void *ctx, Register reg, float tempe
 	{
 		int16_t temp = temperature * 16.f;
 		temp <<= (config_lsb & Config2::ExtendedMode) ? 3 : 4;
-		temp = xpcc::math::fromBigEndian(static_cast<uint16_t>(temp));
+		temp = xpcc::math::fromBigEndian(temp);
 
 		buffer[0] = i(reg);
 		buffer[1] = temp;

@@ -242,7 +242,7 @@ private:
 
 	protected:
 		virtual Writing
-		writing();
+		writing() override;
 
 		uint8_t *commands;
 	};

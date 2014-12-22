@@ -87,20 +87,19 @@ public:
 		UprightFlatFront = Command::UprightFlatFrontOrientation
 	};
 
-	struct OperationMode
+	enum class
+	OperationMode : uint8_t
 	{
-		enum
-		{
-			Comp = 0x80,					///< Calculating compass data if set. (read only)
-			Cal = 0x40,						///< Calculating calibration offsets if set. (read only)
-			Filter = 0x20,					///< IIR Heading Filter used if set.
-			Run = 0x10,						///< Run Mode if set.
-			Standby = 0x08,					///< Standby Mode if set.
-			UprightFrontOrientation = 0x04,	///< Upright Front Orientation if set.
-			UprightEdgeOrientation = 0x02,	///< Upright Edge Orientation if set.
-			LevelOrientation = 0x01,		///< Level Orientation if set
-		};
+		Comp = Bit7,					///< Calculating compass data if set. (read only)
+		Cal = Bit6,						///< Calculating calibration offsets if set. (read only)
+		Filter = Bit5,					///< IIR Heading Filter used if set.
+		Run = Bit4,						///< Run Mode if set.
+		Standby = Bit3,					///< Standby Mode if set.
+		UprightFrontOrientation = Bit2,	///< Upright Front Orientation if set.
+		UprightEdgeOrientation = Bit1,	///< Upright Edge Orientation if set.
+		LevelOrientation = Bit0,		///< Level Orientation if set
 	};
+	REGISTER8(OperationMode);
 
 	enum class
 	MeasurementRate : uint8_t
@@ -159,9 +158,9 @@ public:
 		getOperationMode() { return data[20]; }
 
 
-		ALWAYS_INLINE uint8_t
+		inline int16_t
 		operator [](size_t index)
-		{ return (index < 21) ? data[index] : 0; }
+		{ return (index < 10) ? swapData(index) : 0; }
 
 		ALWAYS_INLINE uint8_t*
 		getPointer()
@@ -182,15 +181,15 @@ protected:
 	/// @{
 	/// @private enum class to integer helper functions.
 	static constexpr uint8_t
-	i(Command command) { return static_cast<uint8_t>(command); }
+	i(Command command) { return uint8_t(command); }
 	static constexpr uint8_t
-	i(Register reg) { return static_cast<uint8_t>(reg); }
+	i(Register reg) { return uint8_t(reg); }
 	static constexpr uint8_t
-	i(Register16 reg) { return static_cast<uint8_t>(reg); }
+	i(Register16 reg) { return uint8_t(reg); }
 	static constexpr uint8_t
-	i(Orientation orientation) { return static_cast<uint8_t>(orientation); }
+	i(Orientation orientation) { return uint8_t(orientation); }
 	static constexpr uint8_t
-	i(MeasurementRate rate) { return static_cast<uint8_t>(rate); }
+	i(MeasurementRate rate) { return uint8_t(rate); }
 	/// @}
 }; // struct hmc6343
 

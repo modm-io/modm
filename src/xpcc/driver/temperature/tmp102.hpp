@@ -65,7 +65,7 @@ protected:
 			Config1, Config2);
 
 	static constexpr uint8_t
-	i(Register reg) { return static_cast<uint8_t>(reg); }
+	i(Register reg) { return uint8_t(reg); }
 
 public:
 	enum class
