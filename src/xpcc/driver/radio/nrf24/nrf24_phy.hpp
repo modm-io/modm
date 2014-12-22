@@ -206,6 +206,17 @@ public:
     readStatus();
 
 
+    /** @brief Read new status
+     *
+     * Note: status will be automatically updated every time a command is
+     *       issued, so it might not be necessary to call this explicitly.
+     *
+     *  @return Status register
+     */
+    static uint8_t
+    readFifoStatus();
+
+
     /** @brief Set Rx address for a pipe
      *
      *  Note: pipe 0 and pipe 1 have a 5 byte wide address while pipes 2 to 5

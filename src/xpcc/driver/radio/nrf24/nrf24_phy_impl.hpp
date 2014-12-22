@@ -236,6 +236,15 @@ xpcc::Nrf24Phy<Spi, Csn, Ce>::readStatus()
 // --------------------------------------------------------------------------------------------------------------------
 
 template<typename Spi, typename Csn, typename Ce>
+uint8_t
+xpcc::Nrf24Phy<Spi, Csn, Ce>::readFifoStatus()
+{
+    return readRegister(NrfRegister::FIFO_STATUS);
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template<typename Spi, typename Csn, typename Ce>
 void
 xpcc::Nrf24Phy<Spi, Csn, Ce>::setRxAddress(Pipe_t pipe, uint64_t address)
 {
