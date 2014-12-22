@@ -32,6 +32,7 @@
 #define	XPCC__ANGLE_HPP
 
 #include <cmath>
+#include <math.h>
 
 // The circumference of a circle with diameter 1
 #ifndef M_PI
@@ -39,7 +40,23 @@
 #endif
 
 #ifndef M_PI_2
-#define M_PI_2 (M_PI/2.0)
+#define M_PI_2 1.57079632679489661923
+#endif
+
+#ifndef M_PI_4
+#define M_PI_4 0.78539816339744830962
+#endif
+
+#ifndef M_TWOPI
+#define M_TWOPI (M_PI * 2.0)
+#endif
+
+#ifndef M_1_PI
+#define M_1_PI 0.31830988618379067154
+#endif
+
+#ifdef M_2_PI
+#define M_2_PI 0.63661977236758134308
 #endif
 
 // The square root of 2.
