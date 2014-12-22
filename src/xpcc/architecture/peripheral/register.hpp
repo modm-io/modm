@@ -26,7 +26,12 @@
 namespace xpcc
 {
 
-/// Register Base class
+/**
+ * Register Base class
+ *
+ * @ingroup	register
+ * @author	Niklas Hauser
+ */
 template< typename T >
 struct Register
 {
@@ -45,6 +50,9 @@ struct Register
 	template<typename U>
 	operator U() const = delete;
 
+	static constexpr Register all()
+	{ return Register(-1); }
+
 protected:
 	constexpr Register(T value)
 	:	value(value) {}
@@ -53,9 +61,13 @@ typedef Register<uint8_t> Register8;
 typedef Register<uint16_t> Register16;
 typedef Register<uint32_t> Register32;
 
-
-///
-template < typename Enum, typename T = uint8_t >
+/**
+ * Flags class
+ *
+ * @ingroup	register
+ * @author	Niklas Hauser
+ */
+template < typename Enum, typename T >
 struct Flags : public ::xpcc::Register<T>
 {
 	constexpr Flags() {}
@@ -63,30 +75,28 @@ struct Flags : public ::xpcc::Register<T>
 		Register<T>(flag) {}
 	constexpr Flags(Enum flag) :
 		Register<T>(T(flag)) {}
-	constexpr Flags(const Flags & o) :
+	constexpr Flags(Flags const &o) :
 		Register<T>(o.value) {}
 
 	constexpr Flags operator~() const { return Flags(~Register<T>::value); }
-	constexpr Flags operator&(Flags o) const { return Flags(Register<T>::value & o.value); }
-	constexpr Flags operator|(Flags o) const { return Flags(Register<T>::value | o.value); }
-	constexpr Flags operator^(Flags o) const { return Flags(Register<T>::value ^ o.value); }
-	Flags & operator&=(const Flags & o) {  return (Register<T>::value &= o.value, *this); }
-	Flags & operator|=(Flags o) { return (Register<T>::value |= o.value, *this); }
-	Flags & operator^=(Flags o) { return (Register<T>::value ^= o.value, *this); }
-	constexpr Flags operator&(Enum flag) const { return operator&(Flags(flag)); }
-	constexpr Flags operator|(Enum flag) const { return operator|(Flags(flag)); }
-	constexpr Flags operator^(Enum flag) const { return operator^(Flags(flag)); }
-	Flags & operator&=(Enum flag) { return operator&=(Flags(flag)); }
-	Flags & operator|=(Enum flag) { return operator|=(Flags(flag)); }
-	Flags & operator^=(Enum flag) { return operator^=(Flags(flag)); }
-	Flags & operator=(Flags o) { return (Register<T>::value = o.value, *this); }
+	constexpr Flags operator&(Flags const &o) const { return Flags(Register<T>::value & o.value); }
+	constexpr Flags operator|(Flags const &o) const { return Flags(Register<T>::value | o.value); }
+	constexpr Flags operator^(Flags const &o) const { return Flags(Register<T>::value ^ o.value); }
+	Flags & operator&=(Flags const &o) {  return (Register<T>::value &= o.value, *this); }
+	Flags & operator|=(Flags const &o) { return (Register<T>::value |= o.value, *this); }
+	Flags & operator^=(Flags const &o) { return (Register<T>::value ^= o.value, *this); }
+	constexpr Flags operator&(Enum const &flag) const { return operator&(Flags(flag)); }
+	constexpr Flags operator|(Enum const &flag) const { return operator|(Flags(flag)); }
+	constexpr Flags operator^(Enum const &flag) const { return operator^(Flags(flag)); }
+	Flags & operator&=(Enum const &flag) { return operator&=(Flags(flag)); }
+	Flags & operator|=(Enum const &flag) { return operator|=(Flags(flag)); }
+	Flags & operator^=(Enum const &flag) { return operator^=(Flags(flag)); }
+	Flags & operator=(Flags const &o) { return (Register<T>::value = o.value, *this); }
 
 	constexpr bool has(Enum const &flag) const
 	{ return Register<T>::value & T(flag); }
 	constexpr bool has_all(Flags const &o) const
 	{ return (Register<T>::value & o.value) == o.value; }
-	static constexpr Flags all()
-	{ return Flags(-1); }
 
 	friend constexpr Flags operator|(Enum const &a, Flags const &b) { return b | a; }
 	friend constexpr Flags operator&(Enum const &a, Flags const &b) { return b & a; }
