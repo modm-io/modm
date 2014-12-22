@@ -43,7 +43,7 @@ xpcc::Lis3TransportI2c<I2cMaster>::write(void *ctx, uint8_t reg, uint8_t value)
 {
 	CO_BEGIN(ctx);
 
-	buffer[0] = reg | AddressStatic;
+	buffer[0] = reg;
 	buffer[1] = value;
 
 	CO_WAIT_UNTIL(
@@ -63,7 +63,7 @@ xpcc::Lis3TransportI2c<I2cMaster>::read(void *ctx, uint8_t reg, uint8_t *buffer,
 {
 	CO_BEGIN(ctx);
 
-	this->buffer[0] = reg | AddressIncrement;
+	this->buffer[0] = reg;
 
 	CO_WAIT_UNTIL(
 			adapter.configureWriteRead(this->buffer, 1, buffer, length) and
@@ -109,7 +109,7 @@ xpcc::Lis3TransportSpi<SpiMaster, Cs>::write(void *ctx, uint8_t reg, uint8_t val
 	CO_WAIT_UNTIL(this->aquireMaster(ctx));
 	Cs::reset();
 
-	CO_CALL(SpiMaster::transfer(reg | Write | AddressStatic));
+	CO_CALL(SpiMaster::transfer(reg | Write));
 	CO_CALL(SpiMaster::transfer(value));
 
 	if (this->releaseMaster(ctx))
@@ -128,7 +128,7 @@ xpcc::Lis3TransportSpi<SpiMaster, Cs>::read(void *ctx, uint8_t reg, uint8_t *buf
 	CO_WAIT_UNTIL(this->aquireMaster(ctx));
 	Cs::reset();
 
-	CO_CALL(SpiMaster::transfer(reg | Read | AddressIncrement));
+	CO_CALL(SpiMaster::transfer(reg | Read));
 
 	for (lengthBuffer = 0; lengthBuffer < length; lengthBuffer++)
 	{

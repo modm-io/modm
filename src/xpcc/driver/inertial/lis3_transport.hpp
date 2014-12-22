@@ -60,6 +60,10 @@ protected:
 	xpcc::co::Result<bool>
 	read(void *ctx, uint8_t reg, uint8_t *buffer, uint8_t length);
 
+	// increment address or not?
+	static constexpr uint8_t AddressIncrement = 0x80;
+	static constexpr uint8_t AddressStatic = 0x00;
+
 private:
 	enum I2cTask : uint8_t
 	{
@@ -72,10 +76,6 @@ private:
 	volatile uint8_t i2cTask;
 	volatile uint8_t i2cSuccess;
 	I2cTagAdapter<I2cWriteReadAdapter> adapter;
-
-	// increment address or not?
-	static constexpr uint8_t AddressIncrement = 0x80;
-	static constexpr uint8_t AddressStatic = 0x00;
 };
 
 /**
@@ -119,6 +119,10 @@ protected:
 	xpcc::co::Result<bool>
 	read(void *ctx, uint8_t reg, uint8_t *buffer, uint8_t length);
 
+	// increment address or not?
+	static constexpr uint8_t AddressIncrement = 0x40;
+	static constexpr uint8_t AddressStatic = 0x00;
+
 private:
 	uint8_t lengthBuffer;
 	uint8_t whoAmI;
@@ -126,10 +130,6 @@ private:
 	// write read bit on the address
 	static constexpr uint8_t Read = 0x80;
 	static constexpr uint8_t Write = 0x00;
-
-	// increment address or not?
-	static constexpr uint8_t AddressIncrement = 0x40;
-	static constexpr uint8_t AddressStatic = 0x00;
 };
 
 } // namespace xpcc

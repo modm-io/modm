@@ -63,7 +63,7 @@ xpcc::Lis302dl<Transport>::readAcceleration(void *ctx)
 {
 	CO_BEGIN(ctx);
 
-	if (CO_CALL(this->read(ctx, i(Register::Status), rawBuffer + 3, 7)))
+	if (CO_CALL(this->read(ctx, i(Register::Status) | Transport::AddressIncrement, rawBuffer + 3, 7)))
 	{
 		data.getPointer()[0] = rawBuffer[5];
 		data.getPointer()[1] = rawBuffer[7];
