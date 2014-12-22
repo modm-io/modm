@@ -23,7 +23,7 @@ template < class Transport >
 xpcc::co::Result<bool>
 xpcc::Lis302dl<Transport>::initialize(void *ctx, Scale scale, MeasurementRate rate)
 {
-	return updateControlRegister(ctx, r(scale) | r(rate) | static_cast<Control1>(0x47));
+	return updateControlRegister(ctx, r(scale) | r(rate) | Control1_t(0x47));
 }
 
 template < class Transport >
@@ -34,7 +34,7 @@ xpcc::Lis302dl<Transport>::updateControlRegister(void *ctx, uint8_t index, Contr
 
 	rawBuffer[index] = (rawBuffer[index] & ~clearMask.value) | setMask.value;
 	if (index == 0)
-		data.getPointer()[3] = rawBuffer[0];
+		data.meta = bool(Control1_t(rawBuffer[0]) & Control1::FS);
 
 	CO_END_RETURN_CALL(this->write(ctx, i(Register::CtrlReg1) + index, rawBuffer[index]));
 }
@@ -65,9 +65,9 @@ xpcc::Lis302dl<Transport>::readAcceleration(void *ctx)
 
 	if (CO_CALL(this->read(ctx, i(Register::Status) | Transport::AddressIncrement, rawBuffer + 3, 7)))
 	{
-		data.getPointer()[0] = rawBuffer[5];
-		data.getPointer()[1] = rawBuffer[7];
-		data.getPointer()[2] = rawBuffer[9];
+		data.data[0] = rawBuffer[5];
+		data.data[1] = rawBuffer[7];
+		data.data[2] = rawBuffer[9];
 		CO_RETURN(true);
 	}
 

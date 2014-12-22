@@ -17,6 +17,10 @@
 namespace xpcc
 {
 
+// forward declaration for friending with lis3dsh::Data
+template < class Transport >
+class Lis302dl;
+
 struct lis302dl
 {
 protected:
@@ -237,35 +241,39 @@ public:
 	struct __attribute__ ((packed))
 	Data
 	{
-		Data()
-		:	data{0,0,0,0}
+		template < class Transport >
+		friend class Lis302dl;
+
+		Data() :
+			data{0,0,0}, meta(0)
 		{}
 		// DATA ACCESS
 		/// @{
 		/// returns the acceleration in g
-		float ALWAYS_INLINE
-		getX() { return data[0] * (static_cast<Control1>(data[3]) & Control1::FS ? 9.2f/128 : 2.3f/128); }
+		float inline
+		getX() { return data[0] * (meta ? 9.2f/128 : 2.3f/128); }
 
-		float ALWAYS_INLINE
-		getY() { return data[1] * (static_cast<Control1>(data[3]) & Control1::FS ? 9.2f/128 : 2.3f/128); }
+		float inline
+		getY() { return data[1] * (meta ? 9.2f/128 : 2.3f/128); }
 
-		float ALWAYS_INLINE
-		getZ() { return data[2] * (static_cast<Control1>(data[3]) & Control1::FS ? 9.2f/128 : 2.3f/128); }
+		float inline
+		getZ() { return data[2] * (meta ? 9.2f/128 : 2.3f/128); }
 		/// @}
 
 
-		ALWAYS_INLINE uint8_t
+		inline int8_t
 		operator [](uint8_t index)
 		{ return (index < 3) ? data[index] : 0; }
 
-		ALWAYS_INLINE int8_t*
+		inline int8_t*
 		getPointer()
 		{ return data; }
 
 	private:
 		// data 0-2 = x,y,z
-		// data 3 = bool
-		int8_t data[4];
+		int8_t data[3];
+		// meta = false if G2, true if G8
+		uint8_t meta;
 	};
 
 protected:
@@ -323,19 +331,19 @@ public:
 
 	// MARK: Control Registers
 	xpcc::co::Result<bool> inline
-	updateControlRegister(void *ctx, Control1_t setMask, Control1_t clearMask = static_cast<Control1_t>(0xff))
+	updateControlRegister(void *ctx, Control1_t setMask, Control1_t clearMask = Control1_t(0xff))
 	{
 		return updateControlRegister(ctx, 0, setMask, clearMask);
 	}
 
 	xpcc::co::Result<bool> inline
-	updateControlRegister(void *ctx, Control2_t setMask, Control2_t clearMask = static_cast<Control2_t>(0xff))
+	updateControlRegister(void *ctx, Control2_t setMask, Control2_t clearMask = Control2_t(0xff))
 	{
 		return updateControlRegister(ctx, 1, setMask, clearMask);
 	}
 
 	xpcc::co::Result<bool> inline
-	updateControlRegister(void *ctx, Control3_t setMask, Control3_t clearMask = static_cast<Control3_t>(0xff))
+	updateControlRegister(void *ctx, Control3_t setMask, Control3_t clearMask = Control3_t(0xff))
 	{
 		return updateControlRegister(ctx, 2, setMask, clearMask);
 	}
@@ -344,14 +352,14 @@ public:
 	writeInterruptSource(void *ctx, Interrupt interrupt, InterruptSource source)
 	{
 		if (interrupt == Interrupt::One)
-			return updateControlRegister(ctx, r(source), static_cast<Control3>(0b111));
+			return updateControlRegister(ctx, r(source), Control3(0b111));
 
-		return updateControlRegister(ctx, static_cast<Control3>(i(source) << 3), static_cast<Control3>(0b111000));
+		return updateControlRegister(ctx, Control3(i(source) << 3), Control3(0b111000));
 	}
 
 	// MARK: Free Fall Registers
 	xpcc::co::Result<bool> inline
-	updateFreeFallConfiguration(void *ctx, Interrupt interrupt, FreeFallConfig_t setMask, FreeFallConfig_t clearMask = static_cast<FreeFallConfig_t>(0xff))
+	updateFreeFallConfiguration(void *ctx, Interrupt interrupt, FreeFallConfig_t setMask, FreeFallConfig_t clearMask = FreeFallConfig_t(0xff))
 	{
 		return updateRegister(ctx, i(Register::FfWuCfg1) | i(interrupt), setMask.value, clearMask.value);
 	}
@@ -411,13 +419,21 @@ public:
 	xpcc::co::Result<bool>
 	readAcceleration(void *ctx);
 
-	uint8_t
+	Status_t
 	getStatus()
-	{ return rawBuffer[3]; }
+	{ return Status_t(rawBuffer[3]); }
 
-	uint8_t
-	getControl(uint8_t index)
-	{ return index < 3 ? rawBuffer[index] : 0; }
+	Control1_t
+	getControl1()
+	{ return Control1_t(rawBuffer[0]); }
+
+	Control2_t
+	getControl2()
+	{ return Control2_t(rawBuffer[1]); }
+
+	Control3_t
+	getControl3()
+	{ return Control3_t(rawBuffer[3]); }
 
 public:
 	/// the data object for this sensor.
@@ -425,7 +441,7 @@ public:
 
 private:
 	xpcc::co::Result<bool>
-	updateControlRegister(void *ctx, uint8_t index, Control_t setMask, Control_t clearMask = static_cast<Control_t>(0xff));
+	updateControlRegister(void *ctx, uint8_t index, Control_t setMask, Control_t clearMask = Control_t(0xff));
 
 	xpcc::co::Result<bool>
 	updateRegister(void *ctx, uint8_t reg, uint8_t setMask, uint8_t clearMask = 0xff);
