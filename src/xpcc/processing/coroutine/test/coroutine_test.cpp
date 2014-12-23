@@ -904,7 +904,7 @@ CoroutineTest::testReturnVoidClass()
 	auto result = thread.coroutine(this);
 	TEST_ASSERT_EQUALS(result.state, xpcc::co::Stop);
 	TEST_ASSERT_EQUALS(result.result, xpcc::co::Stop);
-	TEST_ASSERT_EQUALS(sizeof(result), 1ul);
+	TEST_ASSERT_TRUE(sizeof(result) == 1);
 
 	// this now returns the state
 	auto result2 = CO_CALL_BLOCKING(thread.coroutine(this));
