@@ -104,18 +104,22 @@ public:
 			if (data[1] & 0x01)
 			{
 				// temperature extended mode
-				return (temp >> 3) / 16.f;
+				return temp / 128.f;
 			}
-			return (temp >> 4) / 16.f;
+			return temp / 256.f;
 		}
 
-		inline uint8_t
-		operator [](size_t index)
-		{ return (index < 2) ? data[index] : 0; }
-
-		inline uint8_t*
-		getPointer()
-		{ return data; }
+		/// @return only the signed integer part of the temperature in Celsius
+		int16_t
+		getTemperatureInteger()
+		{
+			if (data[1] & 0x01)
+			{
+				// temperature extended mode
+				return int16_t((uint16_t(data[0]) << 1) | (data[1] >> 7));
+			}
+			return int16_t(data[0]);
+		}
 
 	private:
 		uint8_t data[2];
@@ -147,8 +151,10 @@ class Tmp102 :	public tmp102, public xpcc::I2cDevice< I2cMaster >,
 				protected xpcc::pt::Protothread, protected xpcc::co::NestedCoroutine<1>
 {
 public:
+	/// Constructor, requires a tmp102::Data object,
+	/// sets address to default of 0x48 (alternatives are 0x49, 0x4A and 0x4B)
 	/**
-	 * @param	data		pointer to a 2 uint8_t buffer
+	 * @param	data		the associated Data object
 	 * @param	address		Default address is 0x48 (alternatives are 0x49, 0x4A and 0x4B)
 	 */
 	Tmp102(Data &data, uint8_t address=0x48);
