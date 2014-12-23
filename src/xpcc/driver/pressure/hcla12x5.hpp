@@ -1,99 +1,130 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
 /* Copyright (c) 2012, Roboterclub Aachen e.V.
- * All rights reserved.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_HCLA12X5_HPP
-#define XPCC_HCLA12X5_HPP
+#ifndef XPCC_HCLAX_HPP
+#define XPCC_HCLAX_HPP
 
-#include <xpcc/communication/i2c/read_adapter.hpp>
+#include <xpcc/architecture/peripheral/i2c_device.hpp>
+#include <xpcc/processing/coroutine.hpp>
+#include <xpcc/math/utils/endianess.hpp>
 
 namespace xpcc
 {
-	/**
-	 * \brief	Driver for the HCLA12X5 differential pressure sensor.
-	 * \ingroup sensors
-	 * \tparam	I2cMaster	I2C interface
-	 * \author	Niklas Hauser
-	 */
-	template < typename I2cMaster >
-	class Hcla12x5 : protected xpcc::I2cReadAdapter
+
+template < typename I2cMaster >
+class HclaX;
+
+struct hclax
+{
+	struct __attribute__ ((packed))
+	Data
 	{
+		template < typename I2cMaster >
+		friend class HclaX;
+
 	public:
 		/**
-		 * \brief	Constructor
-		 * \param	data		pointer to a 2 uint8_t buffer
-		 * \param	address		Default address is 0x78.
-		 * \bug The address of the sensor is by factory default set to 0x78.
-		 *      This means you cannot use two HCLA sensors on the same bus!
-		 *      You have to use a MUX or two seperate TWI busses.
-		 */
-		Hcla12x5(uint8_t *data, uint8_t address=0x78)
-		:	I2cReadAdapter(address), data(data), newData(false);
+		 * This method returns the pressure as a normalized float from 0-1.
+		 * You have to scale and offset this according to the specific sensor
+		 * you have.
+		 * So if you have HCLA12X5U, you can measure +12.5mBar, you need to
+		 * multiply it with 12.5f to get the pressure in mBar.
+		 * If you have HCLA12X5B, which can measure ±12.5mBar you first need to
+		 * subtract 0.5f and then multiply it with 12.5f!
+ 		 */
+		float
+		getPressure()
 		{
-			configureRead(data, 2);
+			// Full scale span is 0x6666, with offset 0x0666
+			uint16_t *rData = reinterpret_cast<uint16_t*>(data);
+			uint16_t pressure = xpcc::math::fromBigEndian(*rData) - 0x0666;
+			return float(pressure) / 0x6666;
 		}
-		
-		/**
-		 * read the pressure registers and buffer the results
-		 * sets isNewDataAvailable() to \c true
-		 */
-		inline bool
-		readPressure()
-		{
-			if (I2cMaster::start(this)) {
-				newData = true;
-				return true;
-			}
-			return false;
-		}
-		
-		/**
-		 * \c true, when new data has been read from the sensor
-		 */
-		inline bool
-		isNewDataAvailable()
-		{
-			return (newData && getAdapterState() == xpcc::i2c::ReadAdapter::NO_ERROR)
-		}
-		
-		/// \return pointer to 8bit array containing pressure
-		inline uint8_t *
-		getData()
-		{
-			newData = false;
-			return data;
-		}
-		
-	private:
-		uint8_t *data;
-		bool newData;
-	};
-}
 
-#endif // XPCC_HCLA12X5_HPP
+	private:
+		// 0: MSB
+		// 1: LSB
+		uint8_t data[2];
+	};
+};
+
+/**
+ * Driver for the HCLA differential pressure sensors.
+ *
+ * The device runs a cyclic program, which will store a corrected pressure value with
+ * 12 bit resolution about every 250 μs within the output registers of the internal ASIC.
+ *
+ * @ingroup pressure
+ * @author	Niklas Hauser
+ */
+template < typename I2cMaster >
+class HclaX : public hclax, public xpcc::I2cDevice<I2cMaster>,
+			  protected xpcc::co::Coroutine
+{
+public:
+	/**
+	 * @param	data	a hclax::Data object
+	 * @bug The address of the sensor is by factory default set to 0x78.
+	 *      This means you cannot use two HCLA sensors on the same bus!
+	 *      You have to use a MUX or two seperate I2C busses.
+	 */
+	HclaX(Data &data)
+	:	data(data), i2cTask(I2cTask::Idle), i2cSuccess(0),
+		adapter(0x78, i2cTask, i2cSuccess)
+	{
+	}
+
+	/// pings the sensor
+	xpcc::co::Result<bool>
+	ping(void *ctx)
+	{
+		CO_BEGIN(ctx);
+
+		CO_WAIT_UNTIL(adapter.configurePing() and
+				(i2cTask = I2cTask::Ping, this->startTransaction(&adapter)));
+
+		CO_WAIT_WHILE(i2cTask == I2cTask::Ping);
+
+		CO_END_RETURN(i2cSuccess == I2cTask::Ping);
+	}
+
+	/// reads the Pressure registers and buffers the results
+	xpcc::co::Result<bool>
+	readPressure(void *ctx)
+	{
+		CO_BEGIN(ctx);
+
+		CO_WAIT_UNTIL(adapter.configureRead(data.data, 2) and
+				(i2cTask = I2cTask::ReadPressure, this->startTransaction(&adapter)));
+
+		CO_WAIT_WHILE(i2cTask == I2cTask::ReadPressure);
+
+		CO_END_RETURN(i2cSuccess == I2cTask::ReadPressure);
+	}
+
+public:
+	Data &data;
+
+private:
+	enum
+	I2cTask : uint8_t
+	{
+		Idle = 0,
+		Ping,
+		ReadPressure
+	};
+
+	volatile uint8_t i2cTask;
+	volatile uint8_t i2cSuccess;
+	xpcc::I2cTagAdapter< xpcc::I2cReadAdapter > adapter;
+};
+
+}	// namespace xpcc
+
+#endif // XPCC_HCLAX_HPP
