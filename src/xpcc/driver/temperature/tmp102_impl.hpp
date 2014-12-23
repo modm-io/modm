@@ -162,7 +162,7 @@ xpcc::Tmp102<I2cMaster>::readTemperature(void *ctx)
 	CO_BEGIN(ctx);
 
 	buffer[0] = uint8_t(Register::Temperature);
-	CO_WAIT_UNTIL(adapter.configureWriteRead(buffer, 1, data.getPointer(), 2) &&
+	CO_WAIT_UNTIL(adapter.configureWriteRead(buffer, 1, data.data, 2) &&
 			(i2cTask = I2cTask::ReadTemperature, this->startTransaction(&adapter)));
 
 	CO_WAIT_WHILE(i2cTask == I2cTask::ReadTemperature);

@@ -19,6 +19,10 @@
 namespace xpcc
 {
 
+// forward declaration for friending with tmp102::Data
+template < class I2cMaster >
+class Tmp102;
+
 struct tmp102
 {
 protected:
@@ -94,6 +98,9 @@ public:
 	struct __attribute__ ((packed))
 	Data
 	{
+		template < class I2cMaster >
+		friend class Tmp102;
+
 	public:
 		/// @return the temperature as a signed float in Celsius
 		float

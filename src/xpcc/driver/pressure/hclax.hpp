@@ -17,6 +17,7 @@
 namespace xpcc
 {
 
+// forward declaration for friending with hclax::Data
 template < typename I2cMaster >
 class HclaX;
 
