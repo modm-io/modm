@@ -107,9 +107,9 @@ protected:
 	/// @{
 	/// @private enum class to integer helper functions.
 	static constexpr uint8_t
-	i(ScrollDirection direction) { return static_cast<uint8_t>(direction); }
+	i(ScrollDirection direction) { return uint8_t(direction); }
 	static constexpr uint8_t
-	i(ScrollStep step) { return static_cast<uint8_t>(step); }
+	i(ScrollStep step) { return uint8_t(step); }
 	/// @}
 }; // struct ssd1306
 
@@ -217,6 +217,7 @@ private:
 	bool
 	startTransactionWithLength(uint8_t length);
 
+private:
 	enum I2cTask : uint8_t
 	{
 		Idle = 0,
@@ -228,17 +229,14 @@ private:
 	class DataTransmissionAdapter : public xpcc::I2cWriteAdapter
 	{
 	public:
-		DataTransmissionAdapter(uint8_t address)
-		:	I2cWriteAdapter(address)
-		{
-		}
+		DataTransmissionAdapter(uint8_t address);
 
 		void ALWAYS_INLINE
 		setCommandBuffer(uint8_t *buffer)
 		{ commands = buffer; }
 
 		bool inline
-		configureWrite(uint8_t (*buffer)[8], std::size_t size);
+		configureDisplayWrite(uint8_t (*buffer)[8], std::size_t size);
 
 	protected:
 		virtual Writing
@@ -253,8 +251,7 @@ private:
 
 	volatile uint8_t i2cTask;
 	volatile uint8_t i2cSuccess;
-	xpcc::I2cTagAdapter<xpcc::I2cWriteAdapter> adapter;
-	xpcc::I2cTagAdapter<DataTransmissionAdapter> adapterData;
+	xpcc::I2cTagAdapter<DataTransmissionAdapter> adapter;
 };
 
 } // namespace xpcc
