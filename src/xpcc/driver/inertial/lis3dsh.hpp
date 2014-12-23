@@ -434,7 +434,7 @@ public:
 	};
 
 public:
-	struct __attribute__ ((packed))
+	struct ATTRIBUTE_PACKED
 	Data
 	{
 		template < class Transport >

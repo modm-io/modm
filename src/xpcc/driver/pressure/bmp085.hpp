@@ -67,7 +67,7 @@ struct bmp085
 	 * Values are used for calculation of calibrated
 	 * sensor values from raw sensor data
 	 */
-	struct __attribute__ ((packed))
+	struct ATTRIBUTE_PACKED
 	Calibration
 	{
 		int16_t  ac1;
@@ -85,7 +85,7 @@ struct bmp085
 		int16_t  md;
 	};
 
-	struct __attribute__ (( packed ))
+	struct ATTRIBUTE_PACKED
 	Data
 	{
 		// DATA ACCESS
@@ -202,7 +202,7 @@ public:
 	 * \param	address		address defaults to 0x77
 	 */
 	Bmp085(Data &data, uint8_t address=0x77);
-	
+
 	// MARK: - TASKS
 	/// Pings the sensor
 	xpcc::co::Result<bool>

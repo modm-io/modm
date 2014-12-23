@@ -95,7 +95,7 @@ public:
 		Faults6 = Config1::FaultQueue6
 	};
 
-	struct __attribute__ ((packed))
+	struct ATTRIBUTE_PACKED
 	Data
 	{
 		template < class I2cMaster >

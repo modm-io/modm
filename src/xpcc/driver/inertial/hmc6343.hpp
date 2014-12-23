@@ -109,7 +109,7 @@ public:
 		Hz10 = 0x02,
 	};
 
-	struct __attribute__ ((packed))
+	struct ATTRIBUTE_PACKED
 	Data
 	{
 		// DATA ACCESS

@@ -329,7 +329,7 @@ private:
 		}
 		inline uint8_t getLSB()	const { return low; }
 		inline uint8_t getMSB()	const { return high; }
-	} __attribute__ ((packed));
+	} ATTRIBUTE_PACKED;
 
 	static union Data
 	{
@@ -340,7 +340,7 @@ private:
 			uint16_t_LOW_HIGH red;
 			uint16_t_LOW_HIGH blue;
 			uint16_t_LOW_HIGH clear;
-		} __attribute__ ((packed));
+		} ATTRIBUTE_PACKED;
 	} data;
 
 	static Rgb	color;
