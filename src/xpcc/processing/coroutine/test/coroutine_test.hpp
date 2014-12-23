@@ -37,4 +37,7 @@ public:
 	/// Thus this is a regression test.
 	void
 	testReturnEnumClass();
+
+	void
+	testReturnVoidClass();
 };

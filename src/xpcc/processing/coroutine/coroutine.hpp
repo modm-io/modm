@@ -58,10 +58,15 @@ struct Result<void>
 	Result(uint8_t state) : state(state) {}
 	/// Constructor with dummy result needed by the `CO_CALL_BLOCKING` macro.
 	Result(uint8_t state, uint8_t /*dummy_result*/) : state(state) {}
-	/// The `co::State`.
-	uint8_t state;
-	/// Dummy result needed by the `CO_CALL_BLOCKING` macro.
-	uint8_t result;
+	// This anonymous union reduces the size to only 1 byte, instead of two
+	// `CO_CALL_BLOCKING` will still return something, but it will be either 0 or 1 (`Stop` or `NestingError`).
+	union
+	{
+		/// The `co::State`.
+		uint8_t state;
+		/// Dummy result needed by the `CO_CALL_BLOCKING` macro.
+		uint8_t result;
+	};
 };
 /// @endcond
 

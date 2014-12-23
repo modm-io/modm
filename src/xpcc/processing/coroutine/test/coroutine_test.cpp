@@ -878,3 +878,35 @@ CoroutineTest::testReturnEnumClass()
 	TEST_ASSERT_EQUALS(result.state, xpcc::co::Stop);
 	TEST_ASSERT_TRUE(result.result == TestingCaseEnumClassThread::Animal::Cat);
 }
+
+class TestingCaseVoidClassThread : public xpcc::co::Coroutine
+{
+public:
+	xpcc::co::Result<void>
+	coroutine(void *ctx)
+	{
+		CO_BEGIN(ctx);
+
+		CO_YIELD();		// generate at least one additional case statement
+
+		CO_END();	// return nothing!
+	}
+};
+
+void
+CoroutineTest::testReturnVoidClass()
+{
+	TestingCaseVoidClassThread thread;
+
+	// run once; coroutine will yield
+	TEST_ASSERT_EQUALS(thread.coroutine(this).state, xpcc::co::Running);
+
+	auto result = thread.coroutine(this);
+	TEST_ASSERT_EQUALS(result.state, xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(result.result, xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(sizeof(result), 1ul);
+
+	// this now returns the state
+	auto result2 = CO_CALL_BLOCKING(thread.coroutine(this));
+	TEST_ASSERT_EQUALS(result2, xpcc::co::Stop);
+}
