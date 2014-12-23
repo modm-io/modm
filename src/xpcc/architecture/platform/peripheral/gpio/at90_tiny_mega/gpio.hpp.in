@@ -127,7 +127,7 @@ public:
 		%% set superclass = "Gpio" ~ (type if type != "" else "IO")
 
 /// {{type if type != "" else "IO"}} class for Pin {{port ~ pin}}
-/// @ingroup	atmega
+/// @ingroup	{{target.family}}
 struct {{name}} : public Gpio, ::xpcc::{{superclass}}
 {
 public:
