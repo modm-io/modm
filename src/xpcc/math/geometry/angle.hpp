@@ -55,7 +55,7 @@
 #define M_1_PI 0.31830988618379067154
 #endif
 
-#ifdef M_2_PI
+#ifndef M_2_PI
 #define M_2_PI 0.63661977236758134308
 #endif
 
