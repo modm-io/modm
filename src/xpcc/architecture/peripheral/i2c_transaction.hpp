@@ -206,7 +206,33 @@ public:
 			this->readSize = readSize;
 			this->writeBuffer = writeBuffer;
 			this->writeSize = writeSize;
+
+			/* `isReading` a bit tricky to understand, so here is an explanation:
+			 *
+			 * There are three possibilities right after an I2C start:
+			 * 1. Stop communication (used for ping),
+			 * 2. Start Writing something,
+			 * 3. Start Reading something.
+			 *
+			 * Number 1 is easy, we can simply check if both readSize and writeSize are zero.
+			 *
+			 * 2 and 3 seem easy too, simply check if writeSize or readSize is non-zero respectively. No?
+			 * NO! We want to keep the writeSize and readSize persistent, so that you do not need to
+			 * reconfigure the adapter if nothing changed.
+			 *
+			 * So assume the following sequence with both writeSize and readSize non-zero:
+			 * start - write - restart - read - ...
+			 *
+			 * During the first `starting()`, we check `writeSize != 0`, and request next operation `Write`.
+			 * Then, during the next restart we will check `writeSize != 0`, but because it has not changed,
+			 * we will never be able to enter the reading phase.
+			 * We cannot check `readSize != 0` first either, because we encounter the same problem.
+			 *
+			 * Ok, so we use `isReading` here to signal, whether we want to write or read during `starting()`.
+			 */
 			isReading = (writeSize == 0);
+			// however, there is another problem with `isReading`, see description in `writing()`
+
 			return true;
 		}
 		return false;
@@ -262,7 +288,9 @@ protected:
 		else {
 			if (writeSize) starting.next = OperationAfterStart::Write;
 		}
-		isReading = !isReading;
+
+		// This won't work here, see `writing()` for reason
+		// isReading = !isReading;
 
 		return starting;
 	}
@@ -270,8 +298,37 @@ protected:
 	virtual Writing
 	writing()
 	{
+		/* So the `isReading` adventure continues here.
+		 * The code shown in `starting()` does work, but only for the specific sequence of this adapter:
+		 *     `start - write - restart - read - stop`
+		 *
+		 * The code starts to break once you have the sequence:
+		 *     `start - write - write - ...`
+		 * because during the second write `isReading` is suddenly true and we either Stop or start Reading.
+		 *
+		 * While the I2C standard prohibits any continued readings, as in
+		 *     `start - read - read - ...`,
+		 * the sequence:
+		 *     `start - read - restart - read - ...`
+		 * would lead to similar problems.
+		 *
+		 * When would these sequences ever arise, you ask?
+		 * Well, when this Adapter is subclassed and `writing()` is overwritten so that
+		 * a few bytes can be prepended to the actual payload.
+		 *
+		 * This would be implemented as such (prepending 2 address bytes to a block of data taken from I2cEeprom):
+		 *
+		 *     if (writeAddress) {
+		 *         writeAddress = false;
+		 *         return Writing(addressBuffer, 2, OperationAfterWrite::Write);
+		 *     }
+		 *     return I2cWriteReadAdapter::writing();
+		 *
+		 * This would call `starting()` twice, without modifying `isReading` until this method is called.
+		 */
+		isReading = (readSize != 0);
 		return  Writing(writeBuffer, writeSize,
-						readSize ? OperationAfterWrite::Restart : OperationAfterWrite::Stop);
+						isReading ? OperationAfterWrite::Restart : OperationAfterWrite::Stop);
 	}
 
 	virtual Reading
@@ -283,7 +340,6 @@ protected:
 	virtual void
 	detaching(DetachCause cause)
 	{
-		isReading = false;
 		state = (cause == DetachCause::NormalStop) ? AdapterState::Idle : AdapterState::Error;
 	}
 
