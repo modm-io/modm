@@ -43,7 +43,7 @@ using xpcc::Nrf24Phy;
 #define	XPCC_LOG_LEVEL xpcc::log::INFO
 
 // Create an IODeviceWrapper around the Uart Peripheral we want to use
-xpcc::IODeviceWrapper< Usart2 > loggerDevice;
+xpcc::IODeviceWrapper< Usart2, xpcc::IODevice::BufferBehavior::BusyWait > loggerDevice;
 
 // Set all four logger streams to use the UART
 xpcc::log::Logger xpcc::log::debug(loggerDevice);

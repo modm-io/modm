@@ -2,7 +2,7 @@
 #include <xpcc/debug/logger.hpp>
 #include "../stm32f4_discovery.hpp"
 
-xpcc::IODeviceWrapper< Usart2 > loggerDevice;
+xpcc::IODeviceWrapper< Usart2, xpcc::IODevice::BufferBehavior::BusyWait > loggerDevice;
 xpcc::log::Logger xpcc::log::info(loggerDevice);
 
 // Set the log level

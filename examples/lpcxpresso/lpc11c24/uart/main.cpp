@@ -17,7 +17,7 @@ typedef GpioOutput3_1 WriteInd;
 // Logging
 
 extern xpcc::lpc::Uart1 loggerUart;
-xpcc::IODeviceWrapper<xpcc::lpc::Uart1> loggerDevice(loggerUart);
+xpcc::IODeviceWrapper< xpcc::lpc::Uart1, xpcc::IODevice::BufferBehavior::BusyWait > loggerDevice(loggerUart);
 
 xpcc::log::Logger xpcc::log::debug(loggerDevice);
 xpcc::log::Logger xpcc::log::info(loggerDevice);

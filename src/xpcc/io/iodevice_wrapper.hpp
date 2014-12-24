@@ -66,7 +66,7 @@ namespace xpcc
  * @tparam		Device		Peripheral which should be wrapped
  * @tparam		behavior	preferred behavior when the Device buffer is full
  */
-template< class Device, IODevice::BufferBehavior behavior = IODevice::BufferBehavior::Discard >
+template< class Device, IODevice::BufferBehavior behavior >
 class IODeviceWrapper : public IODevice
 {
 public:

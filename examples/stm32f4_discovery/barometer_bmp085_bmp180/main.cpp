@@ -9,7 +9,7 @@
 
 #include <xpcc/architecture/peripheral/gpio.hpp>
 
-xpcc::IODeviceWrapper<Usart2> device;
+xpcc::IODeviceWrapper< Usart2, xpcc::IODevice::BufferBehavior::BusyWait > device;
 xpcc::IOStream stream(device);
 
 /**
