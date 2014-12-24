@@ -17,19 +17,15 @@ Main Features
 -------------
 
 - efficient object-oriented C++ API:
-
   - new- and delete-operators
   - STL-containers
   - IO-stream interface to hardware (console, RS232, CAN)
-
 - support of AVR and ARM Cortex-M based microcontrollers from Atmel and ST,
 - build system based on SCons and Jinja2 template engine,
 - cross platform peripheral interfaces (incl. bit banging):
-
   - GPIO, 
-  - UART, |I2C|, SPI,
+  - UART, I2C, SPI,
   - CAN
-
 - write once, run anywhere external IC drivers using these interfaces,
 - Debug/Logging system,
 - lightweight, non-blocking workflow using timers and cooperative multitasking,
@@ -41,6 +37,8 @@ Main Features
 
 Get the Code
 ------------
+
+We recommend cloning the source code using Git:
 
     $ git clone git://github.com/roboterclubaachen/xpcc.git xpcc
     $ cd xpcc
