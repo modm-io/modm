@@ -68,8 +68,14 @@ Documentation
 -------------
 
 The project homepage is located at [xpcc.io](http://develop.xpcc.io).
+
 The main API documentation is created from doxygen files in the doc-folder. It can
 be found [online here](http://xpcc.kreatives-chaos.com/api/).
+Please be aware that this API documentation reflects the master branch.
+
+If you want to have up-to-date documentation of the develop branch, execute `scons doc`
+in the xpcc root directory and the current development documentation will be available
+in `xpcc/doc/build/api/index.html`.
 
 Development Model
 -----------------
@@ -77,6 +83,7 @@ The new things we are working on are created on feature branches, and as
 soon as they compile, merged into the `develop` branch.
 We do annual releases on our `master` branch. They contain the code that has
 been tested on our robot for the past season.
+
 So if you want to have a somewhat stable and tested codebase and you are
 satisfied with the features it contains, we recommend you use one of our
 releases. On the other hand, if you want to use the most recent code
