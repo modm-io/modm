@@ -61,13 +61,22 @@ You may then compile examples or your own code using VBs shared folders:
 
     $ cd /vagrant
     $ cd examples/arduino_uno/basic/blink
-    $ scons program
+    $ scons
 
+If you want to program the examples onto hardware, don't forget to forward your USB
+port to the virtual machine in the "Ports" settings tab of your virtual machine in Virtualbox.
+Depending on your programmer, you might need to install the [Extension Pack](virtualbox).
+
+Once your programmer is connected to the virtual machine, you may simply program your board using:
+
+	$ scons program
 
 Documentation
 -------------
 
 The project homepage is located at [xpcc.io](http://develop.xpcc.io).
+
+Complete installation instructions for our build system and toolchains can [be found here](http://develop.xpcc.io/install.html).
 
 The main API documentation is created from doxygen files in the doc-folder. It can
 be found [online here](http://xpcc.kreatives-chaos.com/api/).
@@ -76,6 +85,36 @@ Please be aware that this API documentation reflects the master branch.
 If you want to have up-to-date documentation of the develop branch, execute `scons doc`
 in the xpcc root directory and the current development documentation will be available
 in `xpcc/doc/build/api/index.html`.
+
+Hardware support
+----------------
+
+While the xpcc API is designed to be extremely portable, we are only a small team of developers and
+therefore are limited in the amount of platforms we can support.
+
+Here is a list of supported **and tested** microcontrollers:
+
+- ATtiny44 family
+- ATtiny85 family
+- ATmega644 family
+- **ATmega328p** family (Arduino Uno)
+- ATmega1280 family (Arduino Mega)
+- **STM32F407** family (STM32F4 Discovery Board)
+- STM32F303 family (STM32F3 Discovery Board)
+- LPC11C24 (LPCxpresso Board)
+
+Please see [our examples](https://github.com/roboterclubaachen/xpcc/tree/develop/examples) 
+for a complete list of tested projects.
+
+The following microcontrollers should be able to compile, but *have not been tested extensively* in hardware:
+
+- All AT90's
+- All ATtiny's
+- All ATmega's
+
+There are more platforms which we have prepared, but currently not finished support for (Xmega, STM32F0, STM32F2).
+Drop us an email, if you want to get your hands dirty and help us finish the support.
+
 
 Development Model
 -----------------
