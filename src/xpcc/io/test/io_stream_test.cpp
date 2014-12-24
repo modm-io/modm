@@ -1,30 +1,9 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
- * All rights reserved.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
 
@@ -39,35 +18,35 @@ class MemoryWriter : public xpcc::IODevice
 public:
 	MemoryWriter() :
 		bytesWritten(0) {}
-	
+
 	virtual void
 	write(char c)
 	{
 		this->buffer[this->bytesWritten] = c;
 		this->bytesWritten++;
 	}
-	
+
 	using xpcc::IODevice::write;
-	
+
 	virtual void
 	flush()
 	{
 		// TODO
 		write('\b');
 	}
-	
+
 	virtual bool
 	read(char& /*c*/)
 	{
 		return false;
 	}
-	
+
 	void
 	clear()
 	{
 		this->bytesWritten = 0;
 	}
-	
+
 	char buffer[100];
 	int bytesWritten;
 };
@@ -93,9 +72,9 @@ void
 IoStreamTest::testString()
 {
 	char string[] = "abc d ";
-	
+
 	(*stream) << string;
-	
+
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 6);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 6);
 }
@@ -106,9 +85,9 @@ void
 IoStreamTest::testFlashString()
 {
 	char string[] = "abc";
-	
+
 	(*stream) << xpcc::accessor::asFlash(flashString);
-	
+
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 3);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 3);
 }
@@ -118,9 +97,9 @@ void
 IoStreamTest::testStreamUint8()
 {
 	char string[] = "244";
-	
+
 	(*stream) << static_cast<uint8_t>(244);
-	
+
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 3);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 3);
 }
@@ -129,9 +108,9 @@ void
 IoStreamTest::testStreamInt8()
 {
 	char string[] = "-123";
-	
+
 	(*stream) << static_cast<int8_t>(-123);
-	
+
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 4);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 4);
 }
@@ -141,9 +120,9 @@ void
 IoStreamTest::testStreamUint16()
 {
 	char string[] = "62412";
-	
+
 	(*stream) << static_cast<uint16_t>(62412);
-	
+
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 5);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 5);
 }
@@ -152,9 +131,9 @@ void
 IoStreamTest::testStreamUint16_2()
 {
 	char string[] = "65535";
-	
+
 	(*stream) << static_cast<uint16_t>(0xffff);
-	
+
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 5);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 5);
 }
@@ -164,9 +143,9 @@ void
 IoStreamTest::testStreamInt16()
 {
 	char string[] = "-12345";
-	
+
 	(*stream) << static_cast<int16_t>(-12345);
-	
+
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 6);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 6);
 }
@@ -175,9 +154,9 @@ void
 IoStreamTest::testStreamInt16_2()
 {
 	char string[] = "-32768";
-	
+
 	(*stream) << static_cast<int16_t>(-32768);
-	
+
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 6);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 6);
 }
@@ -187,9 +166,9 @@ void
 IoStreamTest::testStreamUint32()
 {
 	char string[] = "123";
-	
+
 	(*stream) << static_cast<uint32_t>(123);
-	
+
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 3);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 3);
 }
@@ -198,9 +177,9 @@ void
 IoStreamTest::testStreamUint32_2()
 {
 	char string[] = "4294967295";
-	
+
 	(*stream) << static_cast<uint32_t>(0xffffffff);
-	
+
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 10);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 10);
 }
@@ -210,9 +189,9 @@ void
 IoStreamTest::testStreamInt32()
 {
 	char string[] = "-12345678";
-	
+
 	(*stream) << static_cast<int32_t>(-12345678);
-	
+
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 9);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 9);
 }
@@ -221,10 +200,10 @@ void
 IoStreamTest::testStreamInt32_2()
 {
 	char string[] = "-2147483648";
-	
+
 	// avoid a warning about overflow
 	(*stream) << static_cast<int32_t>(-2147483647 - 1);
-	
+
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 11);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 11);
 }
@@ -233,9 +212,9 @@ void
 IoStreamTest::testStreamInt32_3()
 {
 	char string[] = "0";
-	
+
 	(*stream) << static_cast<int32_t>(0);
-	
+
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 1);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 1);
 }
@@ -246,9 +225,9 @@ IoStreamTest::testStreamUint64()
 {
 #ifndef __AVR__
 	char string[] = "12345678901234";
-	
+
 	(*stream) << static_cast<uint64_t>(12345678901234ULL);
-	
+
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 14);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 14);
 #endif
@@ -259,9 +238,9 @@ IoStreamTest::testStreamInt64()
 {
 #ifndef __AVR__
 	char string[] = "-12345678901234";
-	
+
 	(*stream) << static_cast<int64_t>(-12345678901234LL);
-	
+
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 15);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 15);
 #endif
@@ -272,9 +251,9 @@ void
 IoStreamTest::testFloat()
 {
 	char string[] = "1.23000e+00";
-	
+
 	(*stream) << 1.23f;
-	
+
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 11);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 11);
 }
@@ -283,9 +262,9 @@ void
 IoStreamTest::testFloat2()
 {
 	char string[] = "4.57000e+02";
-	
+
 	(*stream) << 457.0f;
-	
+
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 11);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 11);
 }
@@ -294,9 +273,9 @@ void
 IoStreamTest::testFloat3()
 {
 	char string[] = "-5.12314e+07";
-	
+
 	(*stream) << -51231400.0f;
-	
+
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 12);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 12);
 }
@@ -305,9 +284,9 @@ void
 IoStreamTest::testFloat4()
 {
 	char string[] = "-7.23400e-04";
-	
+
 	(*stream) << -0.0007234f;
-	
+
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 12);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 12);
 }
@@ -369,9 +348,9 @@ void
 IoStreamTest::testHex3()
 {
 	char string[] = "0123";
-	
+
 	int16_t i = 0x123;
-	
+
 	(*stream) << xpcc::hex << i;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 4);
@@ -382,9 +361,9 @@ void
 IoStreamTest::testHex4()
 {
 	char string[] = "12345645";
-	
+
 	int32_t i = 0x12345645;
-	
+
 	(*stream) << xpcc::hex << i;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 8);
