@@ -97,9 +97,9 @@ Here is a list of supported **and tested** microcontrollers:
 - ATtiny44 family
 - ATtiny85 family
 - ATmega644 family
-- **ATmega328p** family (Arduino Uno)
+- ATmega328p family (Arduino Uno)
 - ATmega1280 family (Arduino Mega)
-- **STM32F407** family (STM32F4 Discovery Board)
+- STM32F407 family (STM32F4 Discovery Board)
 - STM32F303 family (STM32F3 Discovery Board)
 - LPC11C24 (LPCxpresso Board)
 
