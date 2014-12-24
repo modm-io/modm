@@ -53,7 +53,6 @@ protected:
 		CHIP_ID = 0x55
 	};
 
-public:
 	/// The options of REGISTER_CONTROL
 	enum class
 	Conversion : uint8_t
@@ -62,6 +61,7 @@ public:
 		Pressure = 0x34,
 	};
 
+public:
 	enum class
 	Mode : uint8_t
 	{
@@ -234,6 +234,10 @@ public:
 	xpcc::co::Result<bool>
 	configure(void *ctx, Mode mode = Mode::Standard);
 
+	/// Do a readout sequence to convert and read temperature and then pressure from sensor
+	xpcc::co::Result<bool>
+	readout(void *ctx);
+
 	/// Configures the sensor
 	void inline
 	setMode(Mode mode)
@@ -241,10 +245,6 @@ public:
 		data.meta &= ~i(Mode::Mask);
 		data.meta |= i(mode);
 	}
-
-	/// Do a readout sequence to convert and read temperature and then pressure from sensor
-	xpcc::co::Result<bool>
-	readout(void *ctx);
 
 public:
 	/// the data object for this sensor.
@@ -269,7 +269,6 @@ private:
 
 	xpcc::I2cTagAdapter< xpcc::I2cWriteReadAdapter > adapter;
 
-private:
 	xpcc::Timeout<> timeout;
 
 	/**
@@ -280,7 +279,7 @@ private:
 	static constexpr uint8_t conversionDelay[] = {5, 8, 14, 26};
 
 	// Command buffer for writing to the device
-	uint8_t buffer[3];
+	uint8_t buffer[2];
 	uint8_t bufferedMode;
 };
 
