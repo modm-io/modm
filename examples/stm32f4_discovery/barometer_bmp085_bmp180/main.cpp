@@ -66,7 +66,7 @@ public:
 
 		stream << "Device configured" << xpcc::endl;
 
-		static xpcc::bmp085::Calibration & cal = data.getCalibrationData();
+		static xpcc::bmp085::Calibration &cal = data.getCalibration();
 
 		stream << "Calibration data is: ";
 		stream.printf(" ac1 %d\n", cal.ac1);
@@ -91,11 +91,11 @@ public:
 			PT_CALL(barometer.readout(this));
 
 			{
-				int16_t* temp  = data.getCalibratedTemperature();
-				int32_t* press = data.getCalibratedPressure();
+				int16_t temp  = data.getTemperature();
+				int32_t press = data.getPressure();
 
-				stream.printf("Calibrated temperature in 0.1 degree Celsius is: %d\n",   *temp  );
-				stream.printf("Calibrated pressure in Pa is                   : %d\n\n", *press );
+				stream.printf("Calibrated temperature in 0.1 degree Celsius is: %d\n",   temp  );
+				stream.printf("Calibrated pressure in Pa is                   : %d\n\n", press );
 			}
 		}
 

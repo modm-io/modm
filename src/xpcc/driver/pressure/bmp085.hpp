@@ -18,48 +18,58 @@
 namespace xpcc
 {
 
+template < typename I2cMaster >
+class Bmp085;
+
 struct bmp085
 {
+protected:
 	/// The addresses of the Configuration and Data Registers
-	enum Register
+	enum class
+	Register : uint8_t
 	{
-		REGISTER_CHIP_ID         = 0xD0,
-		REGISTER_VERSION         = 0xD1,
-		REGISTER_CAL_AC1         = 0xAA,
-		REGISTER_CAL_AC2         = 0xAC,
-		REGISTER_CAL_AC3         = 0xAE,
-		REGISTER_CAL_AC4         = 0xB0,
-		REGISTER_CAL_AC5         = 0xB2,
-		REGISTER_CAL_AC6         = 0xB4,
-		REGISTER_CAL_B1          = 0xB6,
-		REGISTER_CAL_B2          = 0xB8,
-		REGISTER_CAL_MB          = 0xBA,
-		REGISTER_CAL_MC          = 0xBC,
-		REGISTER_CAL_MD          = 0xBE,
-		REGISTER_CONTROL         = 0xF4,
-		REGISTER_CONVERSION_MSB  = 0xF6,
-		REGISTER_CONVERSION_LSB  = 0xF7,
-		REGISTER_CONVERSION_XLSB = 0xF8,
+		CHIP_ID = 0xD0,
+		VERSION = 0xD1,
+		CAL_AC1 = 0xAA,
+		CAL_AC2 = 0xAC,
+		CAL_AC3 = 0xAE,
+		CAL_AC4 = 0xB0,
+		CAL_AC5 = 0xB2,
+		CAL_AC6 = 0xB4,
+		CAL_B1 = 0xB6,
+		CAL_B2 = 0xB8,
+		CAL_MB = 0xBA,
+		CAL_MC = 0xBC,
+		CAL_MD = 0xBE,
+		CONTROL = 0xF4,
+		MSB = 0xF6,
+		LSB = 0xF7,
+		XLSB = 0xF8,
 	};
 
 	/// The options of REGISTER_CHIP_ID
-	enum ChipId {
+	enum ChipId
+	{
 		CHIP_ID = 0x55
 	};
 
+public:
 	/// The options of REGISTER_CONTROL
-	enum Control {
-		CONVERSION             = 0x3F,
-		CONVERSION_TEMPERATURE = 0x2E,
-		CONVERSION_PRESSURE    = 0x34
+	enum class
+	Conversion : uint8_t
+	{
+		Temperature = 0x2E,
+		Pressure = 0x34,
 	};
 
-	enum Mode {
-		MODE                       = (0x03 << 6),
-		MODE_ULTRA_LOW_POWER       = (0x00 << 6),
-		MODE_STANDARD              = (0x01 << 6),
-		MODE_HIGH_RESOLUTION       = (0x02 << 6),
-		MODE_ULTRA_HIGH_RESOLUTION = (0x03 << 6),
+	enum class
+	Mode : uint8_t
+	{
+		Mask = (0x03 << 6),
+		UltraLowPower = (0x00 << 6),
+		Standard = (0x01 << 6),
+		HighResolution = (0x02 << 6),
+		UltraHighResolution = (0x03 << 6),
 	};
 
 	/**
@@ -88,11 +98,15 @@ struct bmp085
 	struct ATTRIBUTE_PACKED
 	Data
 	{
+		template < typename I2cMaster >
+		friend class Bmp085;
+
 		// DATA ACCESS
-		/// \return reference to the calibration data from the sensor
-		ALWAYS_INLINE Calibration&
-		getCalibrationData()
-		{ return (calibration); };
+		inline Calibration &
+		getCalibration()
+		{
+			return calibration;
+		}
 
 		/**
 		 * Get the calibrated temperature for the device in 0.1 degree Celsius
@@ -100,28 +114,28 @@ struct bmp085
 		 * If recalculation is necessary it is done on the fly.
 		 * No I2C transaction.
 		 */
-		int16_t*
-		getCalibratedTemperature()
+		int16_t inline
+		getTemperature()
 		{
-			if (!temperatureCalculated) {
+			if (!(meta & TEMPERATURE_CALCULATED)) {
 				calculateCalibratedTemperature();
 			}
-			return &calibratedTemperature;
+			return calibratedTemperature;
 		}
 
 		/**
-		 * Get the calibrated pressure from the device in [ToDo unit].
+		 * Get the calibrated pressure from the device in Pascal.
 		 *
 		 * If recalculation is necessary it is done on the fly.
 		 * No I2C transaction.
 		 */
-		int32_t*
-		getCalibratedPressure()
+		int32_t inline
+		getPressure()
 		{
-			if (!pressureCalculated) {
+			if (!(meta & PRESSURE_CALCULATED)) {
 				calculateCalibratedPressure();
 			}
-			return &calibratedPressure;
+			return calibratedPressure;
 		}
 
 	private:
@@ -132,27 +146,16 @@ struct bmp085
 		 * The result is stored in this struct for further
 		 * access.
 		 */
-		void ALWAYS_INLINE
+		void inline
 		calculateCalibratedTemperature();
 
 		/**
 		 * See calculateCalibratedTemperature()
 		 */
-		void ALWAYS_INLINE
+		void inline
 		calculateCalibratedPressure();
 
-		/// \return pointer to 8bit array containing raw temperature and pressure
-		ALWAYS_INLINE uint8_t*
-		getPointer()
-		{ return raw; }
-
-	public:
-		/// The raw data that was read from the sensor
-		/// 0 .. 1 temperature data
-		/// 2 .. 4 pressure data
-		uint8_t raw[5];
-
-	public:
+		// the order of these private variable is optimized for alignment of 4
 		Calibration calibration;
 
 		int16_t calibratedTemperature; // in 0.1 degree Celsius
@@ -160,19 +163,38 @@ struct bmp085
 
 		int32_t b5; // calculated in calculateCalibratedTemperature, needed for calculateCalibratedPressure
 
-		/// The mode in which the sensor operates
-		bmp085::Mode config;
+		/// The raw data that was read from the sensor
+		/// 0 .. 1 temperature data
+		/// 2 .. 4 pressure data
+		uint8_t raw[5];
 
-		/// Remember if the raw data was already converted to calibrated temperature
-		bool temperatureCalculated;
+		// bit 7-6: The mode in which the sensor operates
+		// bit 1: temperatureCalculated
+		// bit 0: pressureCalculated
+		uint8_t meta;
 
-		/// Remember if the raw data was already converted to calibrated pressure
-		bool pressureCalculated;
+		enum
+		{
+			/// Remember if the raw data was already converted to calibrated temperature
+			TEMPERATURE_CALCULATED = 0x02,
+			/// Remember if the raw data was already converted to calibrated pressure
+			PRESSURE_CALCULATED = 0x01,
+		};
 	};
+
+protected:
+	/// @cond
+	static constexpr uint8_t
+	i(Mode mode) { return uint8_t(mode); }
+	static constexpr uint8_t
+	i(Conversion conv) { return uint8_t(conv); }
+	static constexpr uint8_t
+	i(Register reg) { return uint8_t(reg); }
+	/// @endcond
 };
 
 /**
- * \brief BMP085 digital absolute pressure sensor driver
+ * BMP085 digital absolute pressure sensor driver
  *
  * The BMP085 is a high precision digital pressure sensor with I2C interface.
  * Unfortunately this sensor is so sensitive, it will give you wrong results
@@ -186,20 +208,20 @@ struct bmp085
  *
  * Also compatible to and tested with BMP180.
  *
- * \author	Niklas Hauser
- * \author  strongly-typed
- * \ingroup pressure
+ * @author	Niklas Hauser
+ * @author  strongly-typed
+ * @ingroup pressure
  *
- * \tparam I2cMaster I2C interface
+ * @tparam I2cMaster I2C interface
  */
 template < typename I2cMaster >
 class Bmp085 : public bmp085, public xpcc::I2cDevice<I2cMaster>,
-			   public xpcc::co::NestedCoroutine<1>
+			   protected xpcc::co::Coroutine
 {
 public:
 	/**
-	 * \param	data		pointer to buffer of the internal data of type Data
-	 * \param	address		address defaults to 0x77
+	 * @param	data		pointer to buffer of the internal data of type Data
+	 * @param	address		address defaults to 0x77
 	 */
 	Bmp085(Data &data, uint8_t address=0x77);
 
@@ -208,9 +230,17 @@ public:
 	xpcc::co::Result<bool>
 	ping(void *ctx);
 
-	/// Configures the sensor and reads out and stores the calibration bytes
+	/// Reads out and stores the calibration bytes
 	xpcc::co::Result<bool>
-	configure(void *ctx, bmp085::Mode mode = bmp085::MODE_STANDARD);
+	configure(void *ctx, Mode mode = Mode::Standard);
+
+	/// Configures the sensor
+	void inline
+	setMode(Mode mode)
+	{
+		data.meta &= ~i(Mode::Mask);
+		data.meta |= i(mode);
+	}
 
 	/// Do a readout sequence to convert and read temperature and then pressure from sensor
 	xpcc::co::Result<bool>
@@ -221,16 +251,17 @@ public:
 	Data &data;
 
 private:
-
-	struct I2cTask
+	enum
+	I2cTask : uint8_t
 	{
-		enum
-		{
-			Idle = 0,
-			Configure,
-			Readout,
-			Ping,
-		};
+		Idle = 0,
+		Ping,
+		Configure,
+		ReadCalibration,
+		ConvertTemperature,
+		ReadTemperature,
+		ConvertPressure,
+		ReadPressure,
 	};
 
 	volatile uint8_t i2cTask;
@@ -250,8 +281,10 @@ private:
 
 	// Command buffer for writing to the device
 	uint8_t buffer[3];
+	uint8_t bufferedMode;
 };
-}
+
+}	// namespace xpcc
 
 #include "bmp085_impl.hpp"
 
