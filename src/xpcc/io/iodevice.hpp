@@ -42,6 +42,14 @@ namespace xpcc
 	class IODevice
 	{
 	public :
+		/// The preferred behavior when the IODevice buffer is full
+		enum class
+		BufferBehavior
+		{
+			BusyWait,
+			Discard,
+		};
+
 		IODevice()
 		{
 		}

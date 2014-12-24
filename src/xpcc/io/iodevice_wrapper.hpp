@@ -20,18 +20,39 @@ namespace xpcc
 /**
  * Wrapper to use any peripheral device that supports static
  * write() and read() as an IODevice.
- * This implementation will not wait for the peripheral to be
- * ready for data.
- * If the peripheral buffers are full, the remaining data will
- * be discarded.
+ *
+ * You have to decide what happens when the device buffer is full
+ * and you cannot write to it at the moment.
+ * There are two options:
+ *  1. busy wait until the buffer is free, or
+ *  2. discard the bytes that cannot be written.
+ *
+ * Option 1 has the advantage, that none of your data will be lost,
+ * however, busy-waiting can take a long time and can mess up your
+ * program timings.
+ * There is also a **high risk of deadlock**, when writing to a
+ * IODevice inside of an interrupt and then busy-waiting forever
+ * because the IODevice requires interrupts itself to send out
+ * the data.
+ *
+ * It is therefore highly recommended to use option 2, where surplus
+ * data will be discarded.
+ * You should increase the IODevice buffer size, if you experience
+ * missing data from your connection.
+ * This behavior is also deadlock safe when called from inside another
+ * interrupt, and your program timing is minimally affected (essentially
+ * only coping data into the buffer).
+ *
+ * There is no default template argument, so that you hopefully make
+ * a concious decision and be aware of this behavior.
  *
  * Example:
  * @code
  * // configure a UART
- * xpcc::Uart0 uart;
+ * Uart0 uart;
  *
  * // wrap it into an IODevice
- * xpcc::IODeviceWrapper<xpcc::Uart0> device;
+ * xpcc::IODeviceWrapper<Uart0, xpcc::IODevice::BufferBehavior::Discard> device;
  *
  * // use this device to print a message
  * device.write("Hello");
@@ -42,18 +63,19 @@ namespace xpcc
  * @endcode
  *
  * @ingroup		io
- * @tparam		T	Peripheral which should be wrapped
+ * @tparam		Device		Peripheral which should be wrapped
+ * @tparam		behavior	preferred behavior when the Device buffer is full
  */
-template<typename T>
+template< class Device, IODevice::BufferBehavior behavior = IODevice::BufferBehavior::Discard >
 class IODeviceWrapper : public IODevice
 {
 public:
 	/**
-	 * \brief	Constructor
+	 * Constructor
 	 *
-	 * \param	device	configured object
+	 * @param	device	configured object
 	 */
-	IODeviceWrapper(const T& /*device*/)
+	IODeviceWrapper(const Device& /*device*/)
 	{
 	}
 	IODeviceWrapper()
@@ -63,81 +85,41 @@ public:
 	virtual void
 	write(char c)
 	{
-		T::write(c);
-	}
-
-	virtual void
-	write(const char *s)
-	{
-		char c;
-		while ((c = *s++)) {
-			T::write(static_cast<uint8_t>(c));
+		// this branch will be optimized away, since `behavior` is a template argument
+		if (behavior == IODevice::BufferBehavior::Discard)
+		{
+			Device::write(static_cast<uint8_t>(c));
 		}
-	}
-
-	virtual void
-	flush()
-	{
-	}
-
-	virtual bool
-	read(char& c)
-	{
-		// FIXME
-		uint8_t t;
-		if (T::read(t)) {
-			c = t;
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-};
-
-/**
- * Wrapper to use any peripheral device that supports static
- * write() and read() as an IODevice.
- * This implementation will busy wait until the peripheral is
- * ready for data.
- *
- * @ingroup		io
- * @tparam		T	Peripheral which should be wrapped
-*/
-template<typename T>
-class IODeviceWrapperBlocking : public IODevice
-{
-public:
-	/**
-	* \brief	Constructor
-	*
-	* \param	device	configured object
-	*/
-	IODeviceWrapperBlocking(const T& /*device*/)
-	{
-	}
-	IODeviceWrapperBlocking()
-	{
-	}
-
-	virtual void
-	write(char c)
-	{
-		while( !T::write(c) )
-			;
-	}
-
-	virtual void
-	write(const char *s)
-	{
-		char c;
-		while ((c = *s++)) {
-			while( !T::write(static_cast<uint8_t>(c)) )
+		else
+		{
+			while( !Device::write(static_cast<uint8_t>(c)) )
 				;
 		}
 	}
 
 	virtual void
+	write(const char *s)
+	{
+		// this branch will be optimized away, since `behavior` is a template argument
+		if (behavior == IODevice::BufferBehavior::Discard)
+		{
+			while (*s)
+			{
+				Device::write(static_cast<uint8_t>(*s));
+				s++;
+			}
+		}
+		else
+		{
+			while (*s) {
+				while( !Device::write(static_cast<uint8_t>(*s)) )
+					;
+				s++;
+			}
+		}
+	}
+
+	virtual void
 	flush()
 	{
 	}
@@ -145,15 +127,7 @@ public:
 	virtual bool
 	read(char& c)
 	{
-		// FIXME
-		uint8_t t;
-		if (T::read(t)) {
-			c = t;
-			return true;
-		}
-		else {
-			return false;
-		}
+		return Device::read(reinterpret_cast<uint8_t&>(c));
 	}
 };
 
