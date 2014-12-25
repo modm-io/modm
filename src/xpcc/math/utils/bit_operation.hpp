@@ -35,6 +35,7 @@
 #include <cmath>
 #include <stdint.h>
 
+#include <xpcc/architecture/detect.hpp>
 #include <xpcc/architecture/utils.hpp>
 
 namespace xpcc
@@ -51,7 +52,7 @@ namespace xpcc
 	ALWAYS_INLINE uint8_t
 	swap(uint8_t n)
 	{
-#ifdef __AVR__
+#ifdef XPCC__CPU_AVR
 		if (__builtin_constant_p(n)) {
 			n = (n << 4) | (n >> 4);
 		}
@@ -90,9 +91,14 @@ namespace xpcc
 	ALWAYS_INLINE uint16_t
 	swap(uint16_t n)
 	{
-#ifdef __ARM__
-		return __REV16(n);
-#elif defined __AVR__
+#ifdef XPCC__CPU_ARM
+		asm volatile(
+			"rev16 %0,%0"	"\n\t"
+			 : "=r" (n)
+			 : "0" (n)
+		);
+		return n;
+#elif defined XPCC__CPU_AVR
 		if (__builtin_constant_p(n)) {
 			n = (n << 8) | (n >> 8);
 		}
@@ -124,8 +130,13 @@ namespace xpcc
 	ALWAYS_INLINE uint32_t
 	swap(uint32_t n)
 	{
-#ifdef __ARM__
-		return __REV(n);
+#ifdef XPCC__CPU_ARM
+		asm volatile(
+			"rev %0,%0"		"\n\t"
+			 : "=r" (n)
+			 : "0" (n)
+		);
+		return n;
 #else
 		n = (n << 24) | ((n << 8) & 0xff0000) | ((n >> 8) & 0xff00) | (n >> 24);
 		return n;
@@ -152,24 +163,76 @@ namespace xpcc
 	 *
 	 * \ingroup	math
 	 */
-	uint8_t
-	bitReverse(uint8_t n);
+	inline uint8_t
+	bitReverse(uint8_t n)
+	{
+#ifdef XPCC__CPU_ARM
+		asm volatile(
+			"rbit %0,%0"	"\n\t"
+			"rev %0,%0"		"\n\t"
+			 : "=r" (n)
+			 : "0" (n)
+		);
+		return n;
+#else
+		n = ((uint8_t) (n >> 1) & 0x55) | ((uint8_t) (n << 1) & 0xaa);
+		n = ((uint8_t) (n >> 2) & 0x33) | ((uint8_t) (n << 2) & 0xcc);
+
+		return swap(n);
+#endif
+	}
 
 	/**
 	 * \brief	Reverse the bits in a 16-bit integer
 	 *
 	 * \ingroup	math
 	 */
-	uint16_t
-	bitReverse(uint16_t n);
+	inline uint16_t
+	bitReverse(uint16_t n)
+	{
+#ifdef XPCC__CPU_ARM
+		asm volatile(
+			"rbit %0,%0"	"\n\t"
+			"rev16 %0,%0"	"\n\t"
+			"rev %0,%0"		"\n\t"
+			 : "=r" (n)
+			 : "0" (n)
+		);
+		return n;
+#else
+		n = ((n >>  1) & 0x5555) | ((n <<  1) & 0xaaaa);
+		n = ((n >>  2) & 0x3333) | ((n <<  2) & 0xcccc);
+		n = ((n >>  4) & 0x0f0f) | ((n <<  4) & 0xf0f0);
+
+		return swap(n);
+#endif
+	}
 
 	/**
 	 * \brief	Reverse the bits in a 32-bit integer
 	 *
 	 * \ingroup	math
 	 */
-	uint32_t
-	bitReverse(uint32_t n);
+	inline uint32_t
+	bitReverse(uint32_t n)
+	{
+#ifdef XPCC__CPU_ARM
+		asm volatile(
+			"rbit %0,%0"	"\n\t"
+			 : "=r" (n)
+			 : "0" (n)
+		);
+		return n;
+#else
+		n = ((n >>  1) & 0x55555555) | ((n <<  1) & 0xaaaaaaaa);
+		n = ((n >>  2) & 0x33333333) | ((n <<  2) & 0xcccccccc);
+		n = ((n >>  4) & 0x0f0f0f0f) | ((n <<  4) & 0xf0f0f0f0);
+		n = ((n >>  8) & 0x00ff00ff) | ((n <<  8) & 0xff00ff00);
+		n = ((n >> 16) & 0x0000ffff) | ((n << 16) & 0xffff0000);
+
+		return n;
+#endif
+	}
 
 	// --------------------------------------------------------------------
 	/**
