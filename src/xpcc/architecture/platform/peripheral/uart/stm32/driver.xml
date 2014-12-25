@@ -17,7 +17,7 @@
         <static>uart_baudrate.hpp</static>
 		<parameter name="buffered" type="bool">true</parameter>
 		<parameter name="flow" type="bool">false</parameter>
-		<parameter name="tx_buffer" type="int" min="1" max="65534">8</parameter>
-		<parameter name="rx_buffer" type="int" min="1" max="65534">8</parameter>
+		<parameter name="tx_buffer" type="int" min="1" max="65534">250</parameter>
+		<parameter name="rx_buffer" type="int" min="1" max="65534">16</parameter>
 	</driver>
 </rca>
