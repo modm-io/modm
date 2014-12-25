@@ -227,6 +227,18 @@ class AVRDeviceWriter(XMLDeviceWriter):
 					if uartSpi:
 						spiDriver.setAttribute('instances', ",".join(instances))
 
+					ram_sizes = self.device.getProperty('ram')
+					for ram_size in ram_sizes.values:
+						size = ram_size.value
+						# for small RAM sizes, reserve only 16 bytes for the tx buffer
+						if size < 1024 or size > 1024*4:
+							for ram_id in ram_size.ids.differenceFromIds(self.device.ids):
+								attr = self._getAttributeDictionaryFromId(ram_id)
+								attr['name'] = 'tx_buffer'
+								ram_size_child = driver.addChild('parameter')
+								ram_size_child.setAttributes(attr)
+								ram_size_child.setValue(16 if size < 1024 else 250)
+
 	def addGpioToNode(self, node):
 		family = 'at90_tiny_mega' if (self.family in ['at90', 'attiny', 'atmega']) else self.family
 		props = self.device.getProperty('gpios')

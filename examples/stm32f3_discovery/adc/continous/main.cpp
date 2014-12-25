@@ -13,7 +13,7 @@ typedef GpioInputC2  Adc2In;
 typedef GpioInputB13 Adc3In;
 typedef GpioInputB12 Adc4In;
 
-xpcc::IODeviceWrapper<Usart2> loggerDevice;
+xpcc::IODeviceWrapper< Usart2, xpcc::IOBufferBehavior::BusyWait > loggerDevice;
 xpcc::log::Logger xpcc::log::info(loggerDevice);
 
 static void

@@ -21,7 +21,9 @@
     <driver type="clock" name="avr"/>
     <driver type="spi" name="at90_tiny_mega"/>
     <driver type="timer" name="at90" instances="0,1"/>
-    <driver type="uart" name="at90_tiny_mega" instances="1"/>
+    <driver type="uart" name="at90_tiny_mega" instances="1">
+      <parameter name="tx_buffer">16</parameter>
+    </driver>
     <driver type="spi" name="at90_tiny_mega_uart" instances="1"/>
     <driver type="gpio" name="at90_tiny_mega">
       <gpio port="B" id="0" pcint="0"/>

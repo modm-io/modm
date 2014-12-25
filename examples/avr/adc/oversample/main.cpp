@@ -23,23 +23,23 @@ main()
     GpioOutputD1::connect(Uart0::Tx);
     GpioInputD0::connect(Uart0::Rx);
     uart.initialize<clock, 115200>();
-    
+
 	// Enable interrupts, this is needed for every buffered UART
 	sei();
-	
+
 	// Create a IOStream for complex formatting tasks
-	xpcc::IODeviceWrapper<Uart0> device(uart);
+	xpcc::IODeviceWrapper< Uart0, xpcc::IOBufferBehavior::BusyWait > device(uart);
 	xpcc::IOStream output(device);
-	
+
 	output << "Welcome!" << xpcc::endl;
-	
+
 	// Initialize the analog to digital converter
 	// With the AVR running at 14.7456Mhz and a prescaler of 128 the
 	// ADC is running at 115kHz.
 	Adc::initialize(Adc::Reference::InternalAVcc, Adc::Prescaler::Div128);
-	
+
 	sensor::initialize(sensorMapping, sensorData);
-	
+
 	while (1)
 	{
 		if (sensorTimer.isExpired())

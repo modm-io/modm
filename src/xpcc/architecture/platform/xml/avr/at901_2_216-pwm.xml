@@ -25,7 +25,9 @@
     <driver type="dac" name="at90"/>
     <driver type="spi" name="at90_tiny_mega"/>
     <driver type="timer" name="at90" instances="0,1"/>
-    <driver type="uart" name="at90_tiny_mega" instances="0"/>
+    <driver type="uart" name="at90_tiny_mega" instances="0">
+      <parameter device-name="1|2" name="tx_buffer">16</parameter>
+    </driver>
     <driver type="gpio" name="at90_tiny_mega">
       <gpio port="B" id="0">
         <af peripheral="SpiMaster" type="out" name="Mosi"/>

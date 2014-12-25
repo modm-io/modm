@@ -40,9 +40,13 @@
     <driver type="spi" name="at90_tiny_mega"/>
     <driver type="timer" name="atmega" instances="0,1,2"/>
     <driver device-name="1284" type="timer" name="atmega" instances="3"/>
-    <driver type="uart" name="at90_tiny_mega" instances="0"/>
+    <driver type="uart" name="at90_tiny_mega" instances="0">
+      <parameter device-name="1284" name="tx_buffer">250</parameter>
+    </driver>
     <driver type="spi" name="at90_tiny_mega_uart" instances="0"/>
-    <driver device-name="164|324|1284" type="uart" name="at90_tiny_mega" instances="1"/>
+    <driver device-name="164|324|1284" type="uart" name="at90_tiny_mega" instances="1">
+      <parameter device-name="1284" name="tx_buffer">250</parameter>
+    </driver>
     <driver device-name="164|324|1284" type="spi" name="at90_tiny_mega_uart" instances="1"/>
     <driver device-name="644" device-type="a|p|pa" type="uart" name="at90_tiny_mega" instances="1"/>
     <driver device-name="644" device-type="a|p|pa" type="spi" name="at90_tiny_mega_uart" instances="1"/>

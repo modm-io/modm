@@ -14,12 +14,12 @@ main()
 {
 	typedef xpcc::avr::SystemClock c;
 	Uart0::initialize<c, 9600>();
-	
+
 	// Enable interrupts, this is needed for every buffered UART
 	enableInterrupts();
 
 	// Create a IOStream for complex formatting tasks
-	xpcc::IODeviceWrapper<Uart0> device;
+	xpcc::IODeviceWrapper< Uart0, xpcc::IOBufferBehavior::BusyWait > device;
 	xpcc::IOStream output(device);
 
 	output << "Welcome" << xpcc::endl;
