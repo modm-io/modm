@@ -63,7 +63,7 @@ main()
     Uart0::initialize<clock, 115200>();
 
 	// Create a IOStream for complex formatting tasks
-	xpcc::IODeviceWrapper< Uart0, xpcc::IODevice::BufferBehavior::BusyWait > device(uart);
+	xpcc::IODeviceWrapper< Uart0, xpcc::IOBufferBehavior::BusyWait > device(uart);
 	xpcc::IOStream stream(device);
 
 	// enable interrupts

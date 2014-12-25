@@ -17,6 +17,15 @@
 namespace xpcc
 {
 
+/// The preferred behavior when the IODevice buffer is full
+/// @ingroup	io
+enum class
+IOBufferBehavior
+{
+	BusyWait,
+	Discard,
+};
+
 /**
  * Wrapper to use any peripheral device that supports static
  * write() and read() as an IODevice.
@@ -52,7 +61,7 @@ namespace xpcc
  * Uart0 uart;
  *
  * // wrap it into an IODevice
- * xpcc::IODeviceWrapper<Uart0, xpcc::IODevice::BufferBehavior::Discard> device;
+ * xpcc::IODeviceWrapper<Uart0, xpcc::IOBufferBehavior::Discard> device;
  *
  * // use this device to print a message
  * device.write("Hello");
@@ -66,7 +75,7 @@ namespace xpcc
  * @tparam		Device		Peripheral which should be wrapped
  * @tparam		behavior	preferred behavior when the Device buffer is full
  */
-template< class Device, IODevice::BufferBehavior behavior >
+template< class Device, IOBufferBehavior behavior >
 class IODeviceWrapper : public IODevice
 {
 public:
@@ -86,7 +95,7 @@ public:
 	write(char c)
 	{
 		// this branch will be optimized away, since `behavior` is a template argument
-		if (behavior == IODevice::BufferBehavior::Discard)
+		if (behavior == IOBufferBehavior::Discard)
 		{
 			Device::write(static_cast<uint8_t>(c));
 		}
@@ -101,7 +110,7 @@ public:
 	write(const char *s)
 	{
 		// this branch will be optimized away, since `behavior` is a template argument
-		if (behavior == IODevice::BufferBehavior::Discard)
+		if (behavior == IOBufferBehavior::Discard)
 		{
 			while (*s)
 			{

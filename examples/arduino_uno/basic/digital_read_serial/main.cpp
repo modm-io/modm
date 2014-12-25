@@ -12,7 +12,7 @@
 #include "../../arduino_uno.hpp"
 
 // create a device wrapper and a stream in oder to be able to send strings
-xpcc::IODeviceWrapper< Uart0, xpcc::IODevice::BufferBehavior::BusyWait > serialDevice;
+xpcc::IODeviceWrapper< Uart0, xpcc::IOBufferBehavior::BusyWait > serialDevice;
 xpcc::IOStream serialStream(serialDevice);
 
 // name pin2

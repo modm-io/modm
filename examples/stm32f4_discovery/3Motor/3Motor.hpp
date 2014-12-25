@@ -4,7 +4,7 @@
 using namespace xpcc::stm32;
 
 // Create an IODeviceWrapper around the Uart Peripheral we want to use
-xpcc::IODeviceWrapper< Usart3, xpcc::IODevice::BufferBehavior::Discard > loggerDevice;
+xpcc::IODeviceWrapper< Usart3, xpcc::IOBufferBehavior::Discard > loggerDevice;
 
 // Set all four logger streams to use the UART
 xpcc::log::Logger xpcc::log::debug(loggerDevice);

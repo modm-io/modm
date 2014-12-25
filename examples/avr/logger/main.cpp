@@ -7,7 +7,7 @@ typedef xpcc::avr::SystemClock clock;
 
 // Create a new UART object and configure it to a baudrate of 115200
 Uart0 uart;
-xpcc::IODeviceWrapper< Uart0, xpcc::IODevice::BufferBehavior::BusyWait > loggerDevice(uart);
+xpcc::IODeviceWrapper< Uart0, xpcc::IOBufferBehavior::BusyWait > loggerDevice(uart);
 
 // Set all four logger streams to use the UART
 xpcc::log::Logger xpcc::log::debug(loggerDevice);
