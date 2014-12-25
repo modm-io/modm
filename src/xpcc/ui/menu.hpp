@@ -29,6 +29,7 @@
 // ----------------------------------------------------------------------------
 /**
  * \defgroup display_menu Display Menu
+ * \ingroup	ui
  *
  * \brief Simple to use classes for implementing menu structures
  *        on graphic displays.
