@@ -14,7 +14,7 @@
 #include <xpcc/architecture/peripheral/i2c_device.hpp>
 #include <xpcc/processing/protothread.hpp>
 #include <xpcc/processing/coroutine.hpp>
-#include <xpcc/math/utils/endianess.hpp>
+#include <xpcc/math/utils/endianness.hpp>
 
 namespace xpcc
 {

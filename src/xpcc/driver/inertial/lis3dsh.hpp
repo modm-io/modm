@@ -12,7 +12,7 @@
 
 #include <xpcc/architecture/peripheral/register.hpp>
 #include <xpcc/processing/coroutine.hpp>
-#include <xpcc/math/utils/endianess.hpp>
+#include <xpcc/math/utils/endianness.hpp>
 #include "lis3_transport.hpp"
 
 namespace xpcc

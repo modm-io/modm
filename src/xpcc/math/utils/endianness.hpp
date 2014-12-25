@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_MATH_ENDIANESS_HPP
-#define XPCC_MATH_ENDIANESS_HPP
+#ifndef XPCC_MATH_ENDIANNESS_HPP
+#define XPCC_MATH_ENDIANNESS_HPP
 
 #include <stdint.h>
 #include "bit_operation.hpp"
@@ -169,4 +169,4 @@ toBigEndian(int32_t value)
 
 } // namespace xpcc
 
-#endif // XPCC_MATH_ENDIANESS_HPP
+#endif // XPCC_MATH_ENDIANNESS_HPP
