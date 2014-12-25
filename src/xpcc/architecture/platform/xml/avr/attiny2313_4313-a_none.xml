@@ -23,7 +23,10 @@
     </driver>
     <driver type="clock" name="avr"/>
     <driver type="timer" name="attiny" instances="0,1"/>
-    <driver type="uart" name="at90_tiny_mega" instances="0"/>
+    <driver type="uart" name="at90_tiny_mega" instances="0">
+      <parameter device-name="2313" name="tx_buffer">16</parameter>
+      <parameter device-name="4313" name="tx_buffer">16</parameter>
+    </driver>
     <driver type="spi" name="at90_tiny_mega_uart" instances="0"/>
     <driver type="usi" name="at90_tiny_mega"/>
     <driver type="gpio" name="at90_tiny_mega">
