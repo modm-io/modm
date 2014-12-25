@@ -65,10 +65,3 @@
  * \ingroup		driver
  * \defgroup	pwm			PWM Drivers
  */
-
-/**
- * \ingroup		driver
- * \defgroup	ui			User interface
- * 
- * Displays, Buttons etc.
- */
