@@ -59,19 +59,19 @@ xpcc::Bmp085<I2cMaster>::configure(void *ctx, Mode mode)
 
 	if (i2cSuccess == I2cTask::ReadCalibration) {
 		uint16_t* element = reinterpret_cast<uint16_t*>(&data.calibration);
-		element[ 0] = xpcc::math::fromBigEndian(element[0]);
-		element[ 1] = xpcc::math::fromBigEndian(element[1]);
-		element[ 2] = xpcc::math::fromBigEndian(element[2]);
-		element[ 3] = xpcc::math::fromBigEndian(element[3]);
-		element[ 4] = xpcc::math::fromBigEndian(element[4]);
-		element[ 5] = xpcc::math::fromBigEndian(element[5]);
+		element[ 0] = xpcc::fromBigEndian(element[0]);
+		element[ 1] = xpcc::fromBigEndian(element[1]);
+		element[ 2] = xpcc::fromBigEndian(element[2]);
+		element[ 3] = xpcc::fromBigEndian(element[3]);
+		element[ 4] = xpcc::fromBigEndian(element[4]);
+		element[ 5] = xpcc::fromBigEndian(element[5]);
 
-		element[ 6] = xpcc::math::fromBigEndian(element[6]);
-		element[ 7] = xpcc::math::fromBigEndian(element[7]);
+		element[ 6] = xpcc::fromBigEndian(element[6]);
+		element[ 7] = xpcc::fromBigEndian(element[7]);
 
-		element[ 8] = xpcc::math::fromBigEndian(element[8]);
-		element[ 9] = xpcc::math::fromBigEndian(element[9]);
-		element[10] = xpcc::math::fromBigEndian(element[10]);
+		element[ 8] = xpcc::fromBigEndian(element[8]);
+		element[ 9] = xpcc::fromBigEndian(element[9]);
+		element[10] = xpcc::fromBigEndian(element[10]);
 
 		CO_RETURN(true);
 	}

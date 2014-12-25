@@ -469,7 +469,7 @@ public:
 		getData(uint8_t index)
 		{
 			int16_t *rData = reinterpret_cast<int16_t*>(data);
-			return xpcc::math::fromLittleEndian(rData[index]);
+			return xpcc::fromLittleEndian(rData[index]);
 		}
 
 		// data 0-5 = xl,xh,yl,yh,zl,zh

@@ -18,9 +18,6 @@
 namespace xpcc
 {
 
-namespace math
-{
-
 constexpr bool
 isBigEndian()
 {
@@ -163,9 +160,6 @@ toBigEndian(int32_t value)
 {
 	return int32_t(toBigEndian(uint32_t(value)));
 }
-
-
-} // namespace math
 
 } // namespace xpcc
 

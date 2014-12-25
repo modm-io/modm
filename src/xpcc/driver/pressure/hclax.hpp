@@ -44,7 +44,7 @@ struct hclax
 		{
 			// Full scale span is 0x6666, with offset 0x0666
 			uint16_t *rData = reinterpret_cast<uint16_t*>(data);
-			uint16_t pressure = xpcc::math::fromBigEndian(*rData) - 0x0666;
+			uint16_t pressure = xpcc::fromBigEndian(*rData) - 0x0666;
 			return float(pressure) / 0x6666;
 		}
 

@@ -173,7 +173,7 @@ public:
 		swapData(uint8_t index)
 		{
 			int16_t* rawData = reinterpret_cast<int16_t*>(data);
-			return xpcc::math::fromBigEndian(rawData[index]);
+			return xpcc::fromBigEndian(rawData[index]);
 		}
 	};
 

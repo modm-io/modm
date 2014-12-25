@@ -176,9 +176,9 @@ public:
 		enum
 		{
 			/// Remember if the raw data was already converted to calibrated temperature
-			TEMPERATURE_CALCULATED = 0x02,
+			TEMPERATURE_CALCULATED = Bit1,
 			/// Remember if the raw data was already converted to calibrated pressure
-			PRESSURE_CALCULATED = 0x01,
+			PRESSURE_CALCULATED = Bit0,
 		};
 	};
 

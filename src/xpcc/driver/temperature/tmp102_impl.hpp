@@ -223,11 +223,10 @@ xpcc::Tmp102<I2cMaster>::writeLimitRegister(void *ctx, Register reg, float tempe
 	{
 		int16_t temp = temperature * 16.f;
 		temp <<= (config_lsb & Config2::ExtendedMode) ? 3 : 4;
-		temp = xpcc::math::fromBigEndian(temp);
 
 		buffer[0] = i(reg);
-		buffer[1] = temp;
-		buffer[2] = (temp >> 8);
+		buffer[1] = (temp >> 8);
+		buffer[2] = temp;
 	}
 
 	CO_WAIT_UNTIL(adapter.configureWrite(buffer, 3) &&

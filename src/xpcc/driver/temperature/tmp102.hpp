@@ -107,7 +107,7 @@ public:
 		getTemperature()
 		{
 			int16_t *rData = reinterpret_cast<int16_t*>(data);
-			int16_t temp = xpcc::math::fromBigEndian(*rData);
+			int16_t temp = xpcc::fromBigEndian(*rData);
 			if (data[1] & 0x01)
 			{
 				// temperature extended mode
