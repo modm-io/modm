@@ -28,77 +28,74 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_X86__GPIO_HPP
-#define XPCC_X86__GPIO_HPP
-
-#ifndef __DOXYGEN__
-
-#include <xpcc/architecture/utils.hpp>
-#include <xpcc/architecture/peripheral/gpio.hpp>
+#include "windows.hpp"
+#include <xpcc/math/utils/operator.hpp>
+#include <math.h>
 
 // ----------------------------------------------------------------------------
-/**
- * \ingroup	hosted
- */
-#define	GPIO__IO(name, port, pin) \
-	struct name \
-	{ \
-		ALWAYS_INLINE static void setOutput() {} \
-		ALWAYS_INLINE static void setOutput(bool) {} \
-		ALWAYS_INLINE static void setInput() {} \
-		ALWAYS_INLINE static void set() {} \
-		ALWAYS_INLINE static void set(bool) {} \
-		ALWAYS_INLINE static void reset() {} \
-		ALWAYS_INLINE static void toggle() {} \
-		\
-		ALWAYS_INLINE static bool read() { return false; } \
-	}
+int
+snprintf(char *buffer, int buff_size, const char *format, ...)
+{
+	va_list ap;
+	
+	// changes e.g. 1.2340e+002 to 1.2340e+02 so that the output is compatible
+	// to the GCC output.
+	_set_output_format(_TWO_DIGIT_EXPONENT);
+
+	va_start(ap, format);
+	int result = vsnprintf(buffer, buff_size, format, ap);
+	va_end(ap);
+	
+	return result;
+}
 
 // ----------------------------------------------------------------------------
-/**
- * \ingroup	hosted
- */
-#define	GPIO__OUTPUT(name, port, pin) \
-	struct name \
-	{ \
-		ALWAYS_INLINE static void setOutput() {} \
-		ALWAYS_INLINE static void setOutput(bool) {} \
-		ALWAYS_INLINE static void set() {} \
-		ALWAYS_INLINE static void set(bool) {} \
-		ALWAYS_INLINE static void reset() {} \
-		ALWAYS_INLINE static void toggle() {} \
+namespace std
+{
+	uint16_t
+	sqrt(uint16_t x)
+	{
+		return xpcc::math::sqrt(x);
 	}
 
-// ----------------------------------------------------------------------------
-/**
- * \ingroup	hosted
- */
-#define GPIO__INPUT(name, port, pin) \
-	struct name \
-	{ \
-		ALWAYS_INLINE static void setInput() {} \
-		ALWAYS_INLINE static bool read() { return false; } \
+	uint16_t
+	sqrt(int16_t x)
+	{
+		return xpcc::math::sqrt(x);
 	}
 
-// ----------------------------------------------------------------------------
-/**
- * \brief	Use a full 8-Bit port
- * 
- * \see		xpcc::gpio::Port()
- * 
- * \ingroup	hosted
- */
-#define GPIO__PORT(name, port) \
-	struct name { \
-		ALWAYS_INLINE static void setOutput() {} \
-		ALWAYS_INLINE static void setInput() {} \
-		ALWAYS_INLINE static uint8_t read() { \
-			return 0; \
-		} \
-		ALWAYS_INLINE static void write(uint8_t data) { \
-			(void) data; \
-		} \
+	uint16_t
+	sqrt(uint32_t x)
+	{
+		return xpcc::math::sqrt(x);
 	}
 
-#endif	// !__DOXYGEN__
-#endif	// XPCC_X86__GPIO_HPP
+	uint16_t
+	sqrt(int32_t x)
+	{
+		return xpcc::math::sqrt(x);
+	}
+
+	float
+	atan2(int16_t y, int16_t x)
+	{
+		return std::atan2(static_cast<float>(y), static_cast<float>(x));
+	}
+
+	float
+	atan2(int32_t y, int32_t x)
+	{
+		return std::atan2(static_cast<float>(y), static_cast<float>(x));
+	}
+
+	bool
+	isnan(float f)
+	{
+		return _isnanf(f);
+	}
+
+	bool
+	isinf(float f)	{
+		return !_finitef(f);
+	}
+}

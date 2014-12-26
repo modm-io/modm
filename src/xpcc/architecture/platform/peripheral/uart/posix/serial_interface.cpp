@@ -7,7 +7,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "serial_interface.hpp"
+#include "../hosted/serial_interface.hpp"
 
 #include <iostream>
 #include <ios>
@@ -19,7 +19,6 @@
 #include <termios.h>	// POSIX terminal control
 #include <unistd.h>
 #include <sys/socket.h>
-#include <asm/socket.h>
 
 #include <errno.h>
 
@@ -88,12 +87,6 @@ xpcc::hosted::SerialInterface::setBaudRate(unsigned int rate)
 		(rate == 38400) ? B38400 :
 		(rate == 57600) ? B57600 :
 		(rate == 115200) ? B115200 : B0;
-
-	if ((baudRateConstant & CBAUD) == 0)
-	{
-		XPCC_LOG_ERROR << "Invalid baud rate!" << xpcc::endl;
-		return false;
-	}
 
 	// Change the configuration structure
 	result1 = cfsetispeed(&configuration, baudRateConstant);
@@ -180,7 +173,6 @@ xpcc::hosted::SerialInterface::initSerial()
 
 	XPCC_LOG_INFO << "Set new configuration" << xpcc::endl;
 
-	configuration.c_cflag &= ~CBAUD;    // clear old baud rate
 	configuration.c_cflag &= ~PARENB;   // no parity
 	configuration.c_cflag &= ~CSIZE;    // clear old data bit value
 	configuration.c_cflag |= CS8;       // 8 data bits
@@ -193,12 +185,12 @@ xpcc::hosted::SerialInterface::initSerial()
 	configuration.c_lflag &= ~ICANON;   // RAW mode
 	configuration.c_lflag &= ~ECHO;     // no echo
 	configuration.c_lflag &= ~ECHOE;    // no echo for the backspace character
-	configuration.c_lflag &= ~(XCASE | ECHOK | ECHONL | NOFLSH | IEXTEN | ECHOCTL | ECHOPRT | ECHOKE | FLUSHO | PENDIN | TOSTOP); // ??
+	configuration.c_lflag &= ~(ECHOK | ECHONL | NOFLSH | IEXTEN | ECHOCTL | ECHOPRT | ECHOKE | FLUSHO | PENDIN | TOSTOP); // ??
 	configuration.c_iflag &= ~INPCK;    // no parity check
 	configuration.c_iflag |= IGNPAR;    // ignore parity errors (as we don't use parity)
 	configuration.c_iflag &= ~(IXOFF | IXON | IXANY); // no soft-handshake
 	configuration.c_iflag |= IGNBRK;    // ignore connection break
-	configuration.c_iflag &= ~(INLCR | IGNCR | ICRNL | IUCLC); // don't do anything funny with my data :)
+	configuration.c_iflag &= ~(INLCR | IGNCR | ICRNL); // don't do anything funny with my data :)
 	configuration.c_oflag &= ~OPOST;    // no post-processing
 	configuration.c_oflag &= ~ONLCR;    //
 //	configStatus.c_cc[VMIN] = 1;        // read() should block until a character is read
@@ -388,7 +380,7 @@ xpcc::hosted::SerialInterface::dump()
 			<< "ready:        " << ((configStatus.c_cflag & CREAD) 	? "yes" : "no") << xpcc::endl
 			<< "input speed:  " << configStatus.c_ispeed << xpcc::endl
 			<< "output speed: " << configStatus.c_ospeed << xpcc::endl
-			<< "speed:        " << ( configStatus.c_cflag & CBAUD ) << xpcc::endl;
+			<< "speed:        " << ( configStatus.c_cflag ) << xpcc::endl;
 	}
 }
 

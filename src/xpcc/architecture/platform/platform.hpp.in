@@ -13,7 +13,7 @@
 /**
  * \ingroup 	architecture
  * \defgroup	platform	Supported Platforms
- * 
+ *
  */
 
 #include <stdint.h>
@@ -21,11 +21,8 @@
 #include "detect.hpp"		// sets XPCC__CPU_xx etc. macros
 #include "utils.hpp"
 
-#if defined XPCC__CPU_HOSTED
-	#include "platform/hosted.hpp"
-#else
-	// Include generated Platform sources:
-	#include "${include_path}"
-#endif
+
+// Include generated Platform sources:
+#include "${include_path}"
 
 #endif	// XPCC__PLATFORM_HPP

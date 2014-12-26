@@ -101,5 +101,5 @@
  * to be members of the same domain id.
  */
 
-#include "tipc/tipc_receiver.hpp"
-#include "tipc/tipc_transmitter.hpp"
+#include "tipc_receiver.hpp"
+#include "tipc_transmitter.hpp"

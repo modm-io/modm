@@ -39,6 +39,7 @@ public:
 	enum
 	Baudrate
 	{
+#ifndef B300	// termios.h defines B300 .. B38400
 		    B300 =     300,
 		    B600 =     600,
 		   B1200 =    1200,
@@ -57,6 +58,7 @@ public:
 		 B250000 =  250000,
 		 B500000 =  500000,
 		B1000000 = 1000000
+#endif
 	};
 
 #ifdef __DOXYGEN__

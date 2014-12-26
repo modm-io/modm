@@ -34,7 +34,7 @@
 #include "../style/std_colour.hpp"
 
 #include <xpcc/architecture/utils.hpp>
-#include <xpcc/architecture/platform/hosted/terminal.hpp>
+#include <xpcc/architecture/platform/peripheral/uart/hosted/terminal.hpp>
 
 static xpcc::pc::Terminal device;
 
