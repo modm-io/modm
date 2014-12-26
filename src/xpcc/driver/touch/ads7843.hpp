@@ -47,7 +47,7 @@ namespace xpcc
 	 * All of these are 100% compatible with the ADS7843.
 	 *
 	 * @author	Fabian Greif <fabian.greif@rwth-aachen.de>
-	 * @ingroup driver_other
+	 * @ingroup driver_touch
 	 */
 	template <typename Spi, typename Cs, typename Int>
 	class Ads7843

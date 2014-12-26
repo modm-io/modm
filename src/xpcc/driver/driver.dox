@@ -58,6 +58,13 @@
 
  /**
   * \ingroup	driver
+  * \defgroup	driver_touch	Touch Detection
+  *
+  * Resistive or capacitive touchbuttons, touchsliders or touchscreens.
+  */
+
+ /**
+  * \ingroup	driver
   * \defgroup	driver_radio	Radio
   *
   * Wireless communication drivers
