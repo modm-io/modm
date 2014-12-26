@@ -96,6 +96,7 @@ public:
 
 } // namespace xpcc
 
+#include "peripheral/can.hpp"
 #include "peripheral/gpio.hpp"
 #include "peripheral/uart.hpp"
 #include "peripheral/one_wire.hpp"

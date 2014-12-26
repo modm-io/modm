@@ -21,5 +21,4 @@
  * and medical equipment.
  */
 
-#include "can/message.hpp"
 #include "can/canusb.hpp"

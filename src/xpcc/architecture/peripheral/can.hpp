@@ -11,7 +11,7 @@
 #define XPCC_PERIPHERAL_CAN_HPP
 
 #include "../peripheral.hpp"
-#include <xpcc/communication/can/message.hpp>
+#include "can_message.hpp"
 
 /**
  * @ingroup 	peripheral
@@ -88,7 +88,7 @@ public:
 
 	/// Returns true if a message was copied into the message buffer
 	static bool
-	getMessage(can::Message& message);
+	getMessage(CanMessage& message);
 
 	/**
 	 * The CAN controller has a free slot to send a new message.
@@ -102,7 +102,7 @@ public:
 	 * @return true if the message was send, false otherwise
 	 */
 	static bool
-	sendMessage(const can::Message& message);
+	sendMessage(const CanMessage& message);
 
 	// Optional
 	/// Get Receive Error Counter.
