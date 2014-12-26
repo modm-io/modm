@@ -21,13 +21,11 @@ namespace xpcc
 //{
 
 /**
-* @brief Hardware abstraction layer for nRF24L01+
-*
-*
-* @ingroup  radio
-* @author   Daniel Krebs
-*/
-
+ * @brief Hardware abstraction layer for nRF24L01+
+ *
+ * @ingroup  nrf24
+ * @author   Daniel Krebs
+ */
 template <typename Spi, typename Csn, typename Ce>
 class Nrf24Phy : public Nrf24Register
 {

@@ -21,9 +21,13 @@ namespace xpcc
 namespace nrf24
 {
 
+/// @{
+/// @ingroup	nrf24
 typedef uint64_t    BaseAddress;
 typedef uint8_t     Address;
+/// @}
 
+/// @ingroup	nrf24
 enum class SendingState
 {
 	Busy,
@@ -33,9 +37,9 @@ enum class SendingState
 	Undefined
 };
 
-/*
- * Data structure that user uses to pass data to the data layer
- */
+/// @{
+/// @ingroup	nrf24
+/// Data structure that user uses to pass data to the data layer
 typedef struct packet_t
 {
 	Address     dest;
@@ -45,23 +49,20 @@ typedef struct packet_t
 } packet_t;
 
 
-/*
- * Header of frame_t
- */
+/// Header of frame_t
 typedef struct header_t
 {
 	uint8_t     src;
 	uint8_t     dest;
 } header_t;
 
-/*
- * Data that will be sent over the air
- */
+/// Data that will be sent over the air
 typedef struct frame_t
 {
 	header_t    header;
 	uint8_t     data[30];   // max. possible payload size (32 byte) - 2 byte (src + dest)
 } frame_t;
+/// @}
 
 }
 
@@ -77,6 +78,8 @@ typedef struct frame_t
  */
 
 
+/// @ingroup	nrf24
+/// @author		Daniel Krebs
 template<typename Nrf24Phy>
 class Nrf24Data
 {

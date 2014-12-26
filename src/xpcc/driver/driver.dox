@@ -56,6 +56,13 @@
  * Everything without a distinct group yet.
  */
 
+ /**
+  * \ingroup	driver
+  * \defgroup	driver_radio	Radio
+  *
+  * Wireless communication drivers
+  */
+
 /**
  * \ingroup		driver
  * \defgroup	driver_pressure	Pressure sensors
