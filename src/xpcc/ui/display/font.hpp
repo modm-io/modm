@@ -29,8 +29,9 @@
 // ----------------------------------------------------------------------------
 /**
  * \ingroup		graphics
- * \defgroup	font	Various fonts for graphical displays
+ * \defgroup	font	Fonts
  *
+ * Various fonts for graphical displays.
  * The fonts are created with the "FontCreator 3.0", see \c tools/font_creator.
  */
 
