@@ -78,9 +78,8 @@ The project homepage is located at [xpcc.io](http://develop.xpcc.io).
 
 Complete installation instructions for our build system and toolchains can [be found here](http://develop.xpcc.io/install.html).
 
-The main API documentation is created from doxygen files in the doc-folder. It can
-be found [online here](http://xpcc.kreatives-chaos.com/api/).
-Please be aware that this API documentation reflects the master branch.
+The API documentation is created from doxygen files in the doc-folder and can be found [online here](http://develop.xpcc.io/api/).
+For the stable master [have a look here](http://xpcc.kreatives-chaos.com/api/).
 
 If you want to have up-to-date documentation of the develop branch, execute `scons doc`
 in the xpcc root directory and the current development documentation will be available
