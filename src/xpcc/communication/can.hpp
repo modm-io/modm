@@ -21,4 +21,5 @@
  * and medical equipment.
  */
 
-#include "can/canusb.hpp"
+//#include "can/canusb.hpp"
+#include "can/can_lawicel_formatter.hpp"

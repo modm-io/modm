@@ -32,7 +32,7 @@
 #define XPCC__SIEMENS_S75_HPP
 
 #include <xpcc/architecture/driver/delay.hpp>
-#include <xpcc/driver/connectivity/memory_interface/bitbang_memory_interface.hpp>
+#include <xpcc/driver/bus/bitbang_memory_interface.hpp>
 
 #include <xpcc/ui/display/buffered_graphic_display.hpp>
 

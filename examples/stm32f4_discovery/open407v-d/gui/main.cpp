@@ -1,10 +1,10 @@
 
 #include <xpcc/architecture.hpp>
 #include <xpcc/debug/logger.hpp>
-#include <xpcc/driver/ui/display/parallel_tft.hpp>
-#include <xpcc/driver/ui/display/tft_memory_bus.hpp>
+#include <xpcc/driver/display/parallel_tft.hpp>
+#include <xpcc/driver/bus//tft_memory_bus.hpp>
 #include <xpcc/ui/display/image.hpp>
-#include <xpcc/driver/ui/touchscreen/ads7843.hpp>
+#include <xpcc/driver/touch/ads7843.hpp>
 #include <xpcc/processing.hpp>
 #include <xpcc/container.hpp>
 #include <xpcc/utils/allocator.hpp>

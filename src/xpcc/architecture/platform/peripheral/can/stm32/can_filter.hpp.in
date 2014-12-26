@@ -10,7 +10,7 @@
 #ifndef XPCC_STM32_CAN_FILTER_HPP
 #define XPCC_STM32_CAN_FILTER_HPP
 
-#include <xpcc/communication/can/message.hpp>
+#include <xpcc/architecture/peripheral/can.hpp>
 #include "../../../device.hpp"
 
 namespace xpcc
@@ -21,7 +21,7 @@ namespace stm32
 
 /**
  * @brief		Filters for the Basic Extended CAN Module
- * 
+ *
  * @author		Fabian Greif <fabian.greif@rwth-aachen.de>
  * @ingroup		stm32
  */
@@ -74,7 +74,7 @@ private:
 			return value;
 		}
 	};
-	
+
 public:
 	/**
 	 * Message with a 29-Bit Identifier.
@@ -167,9 +167,9 @@ public:
 	/**
 	 * Generate an identifier for the Dual Filter mode from an extended
 	 * (29-bit) identifier.
-	 * 
+	 *
 	 * @warning	Uses only the upper 14-bit of the 29-bit identifier!
-	 * 			The lower 15-bit will be don't care! 
+	 * 			The lower 15-bit will be don't care!
 	 */
 	struct ExtendedIdentifierShort : public IdentifierShort
 	{
@@ -185,9 +185,9 @@ public:
 
 	/**
 	 * Generates a mask for a 29-bit identifier.
-	 * 
+	 *
 	 * @warning	Uses only the upper 14-bit of the 29-bit mask!
-	 * 			The lower 15-bit will be don't care! 
+	 * 			The lower 15-bit will be don't care!
 	 */
 	struct ExtendedFilterMaskShort
 	{
@@ -244,10 +244,10 @@ public:
 	// ----------------------------------------------------------------
 	/**
 	 * Use bank as masked filter for extended messages.
-	 * 
+	 *
 	 * @param	bank	Number of the filter bank
 	 * @param	fifo	FIFO assignment (message will be stored in Fifo 0 or Fifo 1)
-	 * 
+	 *
 	 * @param	id		29-bit identifier
 	 * @param	mask	29-bit mask
 	 */
@@ -259,10 +259,10 @@ public:
 
 	/**
 	 * Use bank as masked filter for standard messages.
-	 * 
+	 *
 	 * @param	bank	Number of the filter bank
 	 * @param	fifo	FIFO assignment (message will be stored in Fifo 0 or Fifo 1)
-	 * 
+	 *
 	 * @param	id		11-bit identifier
 	 * @param	mask	11-bit mask
 	 */
@@ -274,12 +274,12 @@ public:
 
 	/**
 	 * Use bank as identifier filter for standard or extended messages.
-	 * 
+	 *
 	 * The message have to match the given identifier exactly!
-	 * 
+	 *
 	 * @param	bank	Number of the filter bank
 	 * @param	fifo	FIFO assignment (message will be stored in Fifo 0 or Fifo 1)
-	 * 
+	 *
 	 * @param	id		11 or 29-bit identifier
 	 * @param	id2		11 or 29-bit identifier
 	 */
@@ -332,14 +332,14 @@ public:
 
 	/**
 	 * Use bank as identifier filter for standard or extended messages.
-	 * 
+	 *
 	 * The message have to match the given identifier exactly! For
 	 * extended messages only the upper 14-bit are checked. The lower
 	 * 15-bit are don't care!
-	 * 
+	 *
 	 * @param	bank	Number of the filter bank
 	 * @param	fifo	FIFO assignment (message will be stored in Fifo 0 or Fifo 1)
-	 * 
+	 *
 	 * @param	id1		11 or 29-bit identifier
 	 * @param	id2		11 or 29-bit identifier
 	 * @param	id3		11 or 29-bit identifier
@@ -364,10 +364,10 @@ public:
 %% if target is stm32f1 or target is stm32f4
 	/**
 	 * Set the first filter bank for CAN2.
-	 * 
+	 *
 	 * All banks lower than this value belong to CAN1 then.
 	 * Only available on connectivity line devices.
-	 * 
+	 *
 	 * @param	startBank	The start bank for the CAN2 interface (Slave)
 	 * 						in the range 1 to 27.
 	 */
