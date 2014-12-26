@@ -41,6 +41,7 @@
 
 namespace xpcc
 {
+	/// @ingroup	graphics
 	namespace glcd
 	{
 		typedef Vector<int16_t, 2> Point;
@@ -135,7 +136,7 @@ namespace xpcc
 	 * is drawn one pixel wide, the pixels will be rendered to the right and
 	 * below the mathematically defined points.
 	 *
-	 * \ingroup	lcd
+	 * \ingroup	graphics
 	 */
 	/*
 	 * TODO
