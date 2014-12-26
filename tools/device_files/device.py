@@ -226,7 +226,7 @@ class DeviceFile:
 
 		# find software implementations of drivers
 		# these have to be added as too
-		per_dir = os.path.join(platform_path, 'peripheral')
+		per_dir = os.path.join(platform_path, 'driver')
 		for peripheral in [p for p in os.listdir(per_dir) if os.path.isdir(os.path.join(per_dir, p))]:
 			name_dir = os.path.join(per_dir, peripheral)
 			for name in [n for n in os.listdir(name_dir) if os.path.isdir(os.path.join(name_dir, n)) and n == 'generic']:
@@ -315,7 +315,7 @@ class Driver(DeviceElementBase):
 		if self.instances != None:
 			self.instances = self.instances.split(',')
 		# Calculate driver path relative to architecture
-		self.path = os.path.join('peripheral', self.type)
+		self.path = os.path.join('driver', self.type)
 		self.path = os.path.join(self.path, os.sep.join(self.name.split('/')))
 
 	def toDict(self, platform_path, substitutions, device_id, properties):
