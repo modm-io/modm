@@ -19,7 +19,7 @@ main()
 	enableInterrupts();
 
 	// Create a IOStream for complex formatting tasks
-	xpcc::IODeviceWrapper< Uart0, xpcc::IOBufferBehavior::BusyWait > device;
+	xpcc::IODeviceWrapper< Uart0, xpcc::IOBuffer::BlockIfFull > device;
 	xpcc::IOStream output(device);
 
 	output << "Welcome" << xpcc::endl;

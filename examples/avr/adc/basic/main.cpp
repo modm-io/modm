@@ -20,7 +20,7 @@ main()
 	sei();
 
 	// Create a IOStream for complex formatting tasks
-	xpcc::IODeviceWrapper< Uart0, xpcc::IOBufferBehavior::BusyWait > device(uart);
+	xpcc::IODeviceWrapper< Uart0, xpcc::IOBuffer::BlockIfFull > device(uart);
 	xpcc::IOStream output(device);
 
 	output << "Welcome!" << xpcc::endl;

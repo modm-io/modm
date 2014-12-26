@@ -22,7 +22,7 @@ typedef xpcc::avr::SystemClock clock;
 // Logging
 
 Uart0 loggerUart;
-xpcc::IODeviceWrapper< Uart0, xpcc::IOBufferBehavior::BusyWait > loggerDevice(loggerUart);
+xpcc::IODeviceWrapper< Uart0, xpcc::IOBuffer::BlockIfFull > loggerDevice(loggerUart);
 
 xpcc::log::Logger xpcc::log::debug(loggerDevice);
 xpcc::log::Logger xpcc::log::info(loggerDevice);

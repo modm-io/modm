@@ -7,7 +7,7 @@
 
 #include <xpcc/io/iostream.hpp>
 
-xpcc::IODeviceWrapper< Usart2, xpcc::IOBufferBehavior::BusyWait > device;
+xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > device;
 xpcc::IOStream stream(device);
 
 typedef I2cMaster1 MyI2cMaster;
