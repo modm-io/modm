@@ -21,7 +21,7 @@ Notice that type and pin-id have different interpretations on the STM32 and AVR 
 
 ## Naming Scheme
 
-All device files can be currently found in the `xpcc/architecture/platform/xml/`, with the naming schemes dependend on architecture.
+All device files can be currently found in the `xpcc/architecture/platform/devices/`, with the naming schemes dependend on architecture.
 Examples include:
 
 - avr:
@@ -108,26 +108,26 @@ Each driver is divided into several hardware dependend implementations.
 
 A selection of the most important drivers are:
 
-	peripheral
+	driver
 	|-- adc
 	|-- can
 	|-- clock
 	|-- fsmc
 	|-- gpio
 	|   |-- at90_tiny_mega
-	|   |-- software
+	|   |-- generic
 	|   `-- stm32
 	|-- i2c
 	|-- spi
 	|   |-- at90_tiny_mega
 	|   |-- at90_tiny_mega_uart
-	|   |-- software
+	|   |-- generic
 	|   |-- stm32
 	|   `-- stm32_uart
 	|-- timer
 	`-- uart
 
-Notice the `software` folders. These are available for all platforms and are automatically included.
+Notice the `generic` folders. These are available for all platforms and are automatically included.
 
 Also, notice how there exist two implementations for **spi** for the **stm32** and **at90_tiny_mega** platform.
 One is for using the dedicated SPI hardware, and the other is for the UART hardware in SPI mode, however, both conform to the same SPI interface:

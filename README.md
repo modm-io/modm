@@ -113,7 +113,7 @@ The following microcontrollers should be able to compile, but *have not been tes
 
 There are more platforms which we have prepared, but currently not finished support for (Xmega, STM32F{0,1,2}).
 A complete support list of tested and/or compilable and/or potentially portable microcontrollers is available in our
-[device file section](https://github.com/roboterclubaachen/xpcc/tree/develop/src/xpcc/architecture/platform/xml).
+[device file section](https://github.com/roboterclubaachen/xpcc/tree/develop/src/xpcc/architecture/platform/devices).
 
 Drop us an email, if you want to get your hands dirty and help us finish the support.
 
