@@ -63,7 +63,7 @@ def platform_tools_find_device_file(env):
 	id = DeviceIdentifier(device)
 
 	# Find Device File
-	xml_path = os.path.join(env['XPCC_PLATFORM_PATH'], 'xml', id.platform)
+	xml_path = os.path.join(env['XPCC_PLATFORM_PATH'], 'devices', id.platform)
 	files = []
 	device_file = None
 
