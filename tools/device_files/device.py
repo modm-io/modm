@@ -217,11 +217,13 @@ class DeviceFile:
 		'instances': list of instances that will be created of this driver
 		Please note: all paths are relative to the platform_path.
 		"""
+
 		# Check Device string
 		s = DeviceIdentifier(device_string, self.log)
 		if s.valid == False:
 			return None
 		drivers = []
+
 		# find software implementations of drivers
 		# these have to be added as too
 		per_dir = os.path.join(platform_path, 'peripheral')
@@ -233,6 +235,7 @@ class DeviceFile:
 					substitutions = s.getTargetDict()
 					substitutions.update(self.getSubstitutions())
 					drivers.append(d.toDict(platform_path, substitutions, s, self.properties))
+
 		# Loop Through Drivers
 		for d in self.drivers:
 			if d.appliesTo(s, self.properties):
@@ -241,6 +244,7 @@ class DeviceFile:
 					substitutions['target']['core'] = prop.value
 				substitutions.update(self.getSubstitutions())
 				drivers.append(d.toDict(platform_path, substitutions, s, self.properties))
+
 		return drivers
 
 ##-----------------------------------------------------------------------------
@@ -311,10 +315,7 @@ class Driver(DeviceElementBase):
 		if self.instances != None:
 			self.instances = self.instances.split(',')
 		# Calculate driver path relative to architecture
-		if self.type == 'core':
-			self.path = 'core'
-		else:
-			self.path = os.path.join('peripheral', self.type)
+		self.path = os.path.join('peripheral', self.type)
 		self.path = os.path.join(self.path, os.sep.join(self.name.split('/')))
 
 	def toDict(self, platform_path, substitutions, device_id, properties):

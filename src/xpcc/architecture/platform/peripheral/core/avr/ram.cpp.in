@@ -21,8 +21,7 @@
 #ifdef	__AVR__
 	
 	// Needed for definition of AVR_STACK_POINTER_REG.
-	#include "../../device.hpp"
-	
+	#include "../../../device.hpp"
 	#define STACK_POINTER() ((char *)AVR_STACK_POINTER_REG)
 	
 	extern char	__heap_start;

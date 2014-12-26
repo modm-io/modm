@@ -53,13 +53,13 @@
 
 #include <stdint.h>
 #include <xpcc/architecture/utils.hpp>
-#include "../../device.hpp"
+#include "../../../device.hpp"
 #include "xpcc_config.hpp"
 %% if parameters.enable_gpio
 %%	if target is stm32f0 or target is stm32f2 or target is stm32f3 or target is stm32f4
-#include "../../peripheral/gpio/stm32/gpio_enable.h"
+#include "../../gpio/stm32/gpio_enable.h"
 %%	elif target is lpc
-#include "../../peripheral/gpio/lpc/gpio_enable.h"
+#include "../../gpio/lpc/gpio_enable.h"
 %%	endif
 %% endif
 
@@ -97,7 +97,7 @@ extern uint32_t __stack_end;
 
 %% if parameters.vector_table_in_ram
 // Define the vector table
-FunctionPointer flashVectors[4] 
+FunctionPointer flashVectors[4]
 __attribute__ ((section(".reset"))) =
 {
 	(FunctionPointer) &__stack_end,	// stack pointer
@@ -168,7 +168,7 @@ Reset_Handler(void)
 	for (volatile unsigned long i = 0; i < 500000; i++)
 	{
 	}
-	
+
 	// Copy functions to RAM (.fastcode)
 	uint32_t* src = &__fastcode_load;
 	uint32_t* dest = &__fastcode_start;
@@ -176,7 +176,7 @@ Reset_Handler(void)
 	{
 		*(dest++) = *(src++);
 	}
-	
+
 	// Copy the data segment initializers from flash to RAM (.data)
 	src = &__data_load;
 	dest = &__data_start;
@@ -184,7 +184,7 @@ Reset_Handler(void)
 	{
 		*(dest++) = *(src++);
 	}
-	
+
 	// Fill the bss segment with zero (.bss)
 	dest = &__bss_start;
 	while (dest < &__bss_end)
@@ -240,9 +240,9 @@ Reset_Handler(void)
 
 	// Call the application's entry point
 	main();
-	
+
 	exit(1);
-	
+
 	while (1)
 	{
 	}
@@ -251,7 +251,7 @@ Reset_Handler(void)
 // ----------------------------------------------------------------------------
 /**
  * @brief	Default interrupt handler
- * 
+ *
  * This functions gets called if an interrupt handler is not defined. It just
  * enters an infinite loop leaving the processor state intact for a debugger
  * to be examined.

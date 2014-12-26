@@ -11,7 +11,7 @@
 #ifndef XPCC_AVR_INTERRUPTS_HPP
 #define XPCC_AVR_INTERRUPTS_HPP
 
-#include "../../device.hpp"
+#include "../../../device.hpp"
 
 namespace xpcc
 {
@@ -107,4 +107,3 @@ disableInterruptLevel(InterruptControlLevel level)
 
 
 #endif	// XPCC_AVR_INTERRUPTS_HPP
- 

@@ -11,7 +11,7 @@
 #include <xpcc/architecture/driver/clock.hpp>
 #include <xpcc/utils/dummy.hpp>
 
-#include "../../../device.hpp"
+#include "../../../../device.hpp"
 #include "systick_timer.hpp"
 
 
@@ -30,7 +30,7 @@ xpcc::cortex::SysTickTimer::enable(uint32_t reload)
 {
 	// Lower systick interrupt priority to lowest level
 	NVIC_SetPriority(SysTick_IRQn, 0xf);
-	
+
 	SysTick->LOAD = reload;
 	SysTick->CTRL =
 			SysTick_CTRL_CLKSOURCE_Msk |
