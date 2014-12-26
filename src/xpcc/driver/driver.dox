@@ -10,43 +10,41 @@
 
 /**
  * \ingroup		driver
- * \defgroup	adc			Analog/Digital Converters
+ * \defgroup	driver_adc			Analog/Digital Converters
  */
 
 /**
  * \ingroup		driver
- * \defgroup	connectivity	Connectivity
- *
- * Interface classes for I2C, SPI, CAN, etc.
+ * \defgroup	driver_dac			Digital/Analog Converters
+ */
+
+ /**
+  * \ingroup	driver
+  * \defgroup	driver_can			CAN bus driver
+  */
+
+/**
+ * \ingroup		driver
+ * \defgroup	driver_gpio		IO-Expander
  */
 
 /**
  * \ingroup		driver
- * \defgroup	dac			Digital/Analog Converters
- */
-
-/**
- * \ingroup		driver
- * \defgroup	gpio		IO-Expander
- */
-
-/**
- * \ingroup		driver
- * \defgroup	inertial	Inertial measurement
+ * \defgroup	driver_inertial	Inertial measurement
  *
  * Gyroscopes, Acceleration sensors and compasses
  */
 
 /**
  * \ingroup		driver
- * \defgroup	storage		Storage
+ * \defgroup	driver_storage		Storage
  *
  * Driver for SPI Flash, SPI RAM, I2C Eeprom, SD card etc.
  */
 
 /**
  * \ingroup		driver
- * \defgroup	bus		Busses
+ * \defgroup	driver_bus		Busses
  *
  * Interfaces and software implementations of memory busses.
  */
@@ -60,15 +58,15 @@
 
 /**
  * \ingroup		driver
- * \defgroup	pressure	Pressure sensors
+ * \defgroup	driver_pressure	Pressure sensors
  */
 
 /**
  * \ingroup		driver
- * \defgroup	temperature	Temperature sensors
+ * \defgroup	driver_temperature	Temperature sensors
  */
 
 /**
  * \ingroup		driver
- * \defgroup	pwm			PWM Drivers
+ * \defgroup	driver_pwm			PWM Drivers
  */

@@ -56,7 +56,7 @@ namespace xpcc
 	 * In portrait mode the connector is at the bottom.
 	 * In landscape mode the connector is at the right border.
 	 *
-	 * \ingroup	display
+	 * \ingroup	driver_display
 	 */
 
 	// common for landscape and portrait

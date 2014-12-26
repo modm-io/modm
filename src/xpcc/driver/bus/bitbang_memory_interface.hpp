@@ -24,7 +24,7 @@ namespace xpcc
 	 * \tparam	WR		Write strobe GPIO pin
 	 *
 	 * \author	strongly typed
-	 * \ingroup	bus
+	 * \ingroup	driver_bus
 	 */
 	template < typename PORT,
 				typename CS,

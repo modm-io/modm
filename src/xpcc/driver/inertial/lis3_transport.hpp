@@ -30,7 +30,7 @@ namespace xpcc
  * @see Lis302dl
  * @see Lis3dsh
  *
- * @ingroup inertial
+ * @ingroup driver_inertial
  * @author	Niklas Hauser
  */
 template < class I2cMaster >
@@ -61,8 +61,10 @@ protected:
 	read(void *ctx, uint8_t reg, uint8_t *buffer, uint8_t length);
 
 	// increment address or not?
+	/// @cond
 	static constexpr uint8_t AddressIncrement = 0x80;
 	static constexpr uint8_t AddressStatic = 0x00;
+	/// @endcond
 
 private:
 	enum I2cTask : uint8_t
@@ -89,7 +91,7 @@ private:
  *
  * @tparam	Cs	connected Chip Select Pin
  *
- * @ingroup inertial
+ * @ingroup driver_inertial
  * @author	Niklas Hauser
  */
 template < class SpiMaster, class Cs >
@@ -120,8 +122,10 @@ protected:
 	read(void *ctx, uint8_t reg, uint8_t *buffer, uint8_t length);
 
 	// increment address or not?
+	/// @cond
 	static constexpr uint8_t AddressIncrement = 0x40;
 	static constexpr uint8_t AddressStatic = 0x00;
+	/// @endcond
 
 private:
 	uint8_t lengthBuffer;

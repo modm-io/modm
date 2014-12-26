@@ -25,7 +25,7 @@ namespace xpcc
  * An arbitrary number of these chips can be daisy-chained
  *
  * @author	strongly-typed
- * @ingroup	display
+ * @ingroup	driver_display
  */
 template < typename SPI, typename CS, uint8_t MODULES = 1 >
 class Max7219

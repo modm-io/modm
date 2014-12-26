@@ -80,7 +80,7 @@ namespace xpcc
 	 * The backlight (VLED +, VLED -) consists of four white
 	 * LEDs in series. The forward voltage is about 12 volts.
 	 *
-	 * \ingroup	display
+	 * \ingroup	driver_display
 	 */
 
 	enum class Orientation : uint8_t

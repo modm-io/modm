@@ -444,7 +444,7 @@ public:
 		:	data{0,0,0}, meta(2)
 		{}
 		// DATA ACCESS
-		/// @{
+		///@{
 		/// returns the acceleration in g
 		float inline
 		getX() { return getData(0) * float(meta)/0x7FFF; }
@@ -454,7 +454,7 @@ public:
 
 		float inline
 		getZ() { return getData(2) * float(meta)/0x7FFF; }
-		/// @}
+		///@}
 
 		inline int16_t
 		operator [](uint8_t index)
@@ -479,8 +479,7 @@ public:
 	};
 
 protected:
-	/// @{
-	/// @private enum class to integer helper functions.
+	/// @cond
 	static constexpr uint8_t
 	i(Register reg) { return uint8_t(reg); }
 	static constexpr uint8_t
@@ -497,7 +496,7 @@ protected:
 	r(Scale scale) { return Control5(scale); }
 	static constexpr uint8_t
 	i(Interrupt interrupt) { return uint8_t(interrupt); }
-	/// @}
+	/// @endcond
 }; // struct lis3dsh
 
 /**
@@ -512,7 +511,7 @@ protected:
  * @see Lis3TransportI2c
  * @see Lis3TransportSpi
  *
- * @ingroup inertial
+ * @ingroup driver_inertial
  * @author	Niklas Hauser
  */
 template < class Transport >

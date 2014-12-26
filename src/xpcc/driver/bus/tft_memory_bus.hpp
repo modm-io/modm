@@ -14,7 +14,7 @@ namespace xpcc
 {
 /**
  * @author	Fabian Greif
- * @ingroup	bus
+ * @ingroup	driver_bus
  */
 class TftMemoryBus16Bit
 {
@@ -63,7 +63,7 @@ private:
 	volatile uint16_t * const ptrData;
 };
 
-/// @ingroup	bus
+/// @ingroup	driver_bus
 class TftMemoryBus8Bit
 {
 public:
@@ -117,7 +117,7 @@ private:
  * 8080-style parallel bus made of a parallel PORT, chip select CS, read strobe RD and write strobe WR
  *
  * @author	strongly-typed
- * @ingroup	bus
+ * @ingroup	driver_bus
  */
 template <
 	typename PORT,	/* Port */
@@ -180,7 +180,7 @@ public:
 	}
 };
 
-/// @ingroup	bus
+/// @ingroup	driver_bus
 template <
 	typename PORT,	/* Port */
 	typename CS,	/* Chip select */

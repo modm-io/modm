@@ -28,7 +28,7 @@
  */
 // ----------------------------------------------------------------------------
 /**
- * \defgroup	display		Displays
+ * \defgroup	driver_display		Displays
  * \brief		Drivers to transfer bitmaps onto displays.
  *
  * \ingroup		driver

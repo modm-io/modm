@@ -41,7 +41,7 @@
 
 /**
  * \defgroup	mcp2515	MCP2515
- * \ingroup		can
+ * \ingroup		driver_can
  */
 
 /**
@@ -169,10 +169,10 @@ namespace xpcc
 		 */
 		static bool
 		sendMessage(const can::Message& message);
-        
+
     public:
         // Extended Functionality
-        
+
         /*
          * Fixme: Empty implementation, required by connector
          */

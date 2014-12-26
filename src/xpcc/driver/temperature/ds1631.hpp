@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -37,7 +37,7 @@ namespace xpcc
 {
 	/**
 	 * \see		DS1631
-	 * \ingroup	temperature
+	 * \ingroup	driver_temperature
 	 */
 	namespace ds1631
 	{
@@ -49,13 +49,13 @@ namespace xpcc
 			RESOLUTION_12BIT = 0x0c		///< 12 Bit
 		};
 	}
-		
+
 	/**
 	 * \brief	DS1631 Temperature Sensor
-	 * 
+	 *
 	 * \see		ds1631
-	 * 
-	 * \ingroup	temperature
+	 *
+	 * \ingroup	driver_temperature
 	 * \author	Fabian Greif
 	 */
 	template < typename I2cMaster >
@@ -67,29 +67,29 @@ namespace xpcc
 		 * \param	address		Default address is 0x90
 		 */
 		Ds1631(uint8_t* data, uint8_t address=0x90);
-		
+
 		/**
 		 * \brief	Configure DS1631
-		 * 
+		 *
 		 * \code
 		 * Resolution | Conversion Time
 		 * -----------+----------------
 		 *     9 Bit  |  93.75ms
 		 *    10 Bit  | 187.50ms
 		 *    11 Bit  | 375.00ms
-		 *    12 Bit  | 750.00ms 
+		 *    12 Bit  | 750.00ms
 		 * \endcode
-		 * 
+		 *
 		 * \param resolution		Conversion result resolution
 		 * \param continuousMode	Enable the continuous mode
 		 */
 		bool
 		configure(ds1631::Resolution resolution=ds1631::RESOLUTION_12BIT,
 				  bool continuousMode=true);
-		
+
 		/**
 		 * \brief	Initiates temperature conversions
-		 * 
+		 *
 		 * If the part is in one-shot mode, only one conversion is
 		 * performed. In continuous mode, continuous temperature
 		 * conversions are performed until a Stop Convert command is
@@ -97,48 +97,48 @@ namespace xpcc
 		 */
 		ALWAYS_INLINE void
 		startConversion();
-		
+
 		ALWAYS_INLINE void
 		stopConversion();
-		
+
 		bool
 		isConversionDone();
-		
+
 		/**
 		 * read the Temperature registers and buffer the results
 		 * sets isNewDataAvailable() to \c true
 		 */
 		ALWAYS_INLINE void
 		readTemperature();
-		
+
 		/**
 		 * \c true, when new data has been read from the sensor and is buffered,
 		 * \c false, when the data has been accessed
 		 */
 		bool
 		isNewDataAvailable();
-		
+
 		/// \return pointer to 8bit array containing raw temperature
 		uint8_t*
 		getData();
-		
+
 		/**
 		 * \brief	Perform a software reset
 		 */
 		ALWAYS_INLINE void
 		reset();
-		
+
 		void
 		update();
-		
+
 		/**
 		 * \return	Temperature in degree
-		 * 
+		 *
 		 * Output format is Q7.8
 		 */
 		int16_t
 		getTemperature();
-		
+
 	private:
 		enum Running {
 			NOTHING_RUNNING,
@@ -147,7 +147,7 @@ namespace xpcc
 			STOP_CONVERSION_RUNNING,
 			RESET_RUNNING,
 		};
-		
+
 		enum Status {
 			START_CONVERSION_PENDING = 0x01,
 			STOP_CONVERSION_PENDING = 0x02,
@@ -155,7 +155,7 @@ namespace xpcc
 			READ_TEMPERATURE_PENDING = 0x08,
 			NEW_TEMPERATURE_DATA = 0x10,
 		};
-		
+
 		Running running;
 		uint8_t status;
 		uint8_t* data;

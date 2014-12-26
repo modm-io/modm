@@ -43,7 +43,7 @@ namespace xpcc
 	 * - WaveShare 3,2" TFT (Model B), Controller SSD1289
 	 *
 	 * @author	Fabian Greif
-	 * @ingroup	display
+	 * @ingroup	driver_display
 	 */
 	template <typename INTERFACE>
 	class ParallelTft : public GraphicDisplay

@@ -54,7 +54,7 @@ namespace xpcc
 	 * 					GPIO__PORT() for more details.
 	 *
 	 * \author	Fabian Greif
-	 * \ingroup	display
+	 * \ingroup	driver_display
 	 */
 	template < typename E, typename RW, typename RS,
 			   typename PIN_CS1, typename PIN_CS2, typename PORT >

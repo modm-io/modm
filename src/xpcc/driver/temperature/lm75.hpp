@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -37,8 +37,8 @@ namespace xpcc
 {
 	/**
 	 * \brief	LM75
-	 * 
-	 * \ingroup	temperature
+	 *
+	 * \ingroup	driver_temperature
 	 * \author	Fabian Greif
 	 */
 	template <typename I2cMaster >
@@ -54,7 +54,7 @@ namespace xpcc
 		{
 			configureWriteRead(address << 1, data, 2);
 		}
-		
+
 		/**
 		 * read the temperature registers and buffer the results
 		 * sets isNewDataAvailable() to \c true
@@ -64,7 +64,7 @@ namespace xpcc
 		{
 			status |= READ_TEMPERATURE_PENDING;
 		}
-		
+
 		/**
 		 * \c true, when new data has been read from the sensor
 		 */
@@ -73,7 +73,7 @@ namespace xpcc
 		{
 			return status & NEW_TEMPERATURE_DATA;
 		}
-		
+
 		/// \return pointer to 8bit array containing temperature
 		inline uint8_t*
 		getData()
@@ -81,7 +81,7 @@ namespace xpcc
 			newData = false;
 			return data;
 		}
-		
+
 		void
 		update()
 		{
@@ -97,14 +97,14 @@ namespace xpcc
 				}
 			}
 		}
-		
+
 	private:
 		enum Status {
 			READ_TEMPERATURE_PENDING = 0x01,
 			READ_TEMPERATURE_RUNNING = 0x02,
 			NEW_TEMPERATURE_DATA = 0x04,
 		};
-		
+
 		uint8_t status;
 		uint8_t *data;
 	};

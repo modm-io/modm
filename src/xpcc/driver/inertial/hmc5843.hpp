@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -38,7 +38,7 @@ namespace xpcc
 	namespace hmc5843
 	{
 		using namespace hmc58;
-		
+
 		/// device specific data output rate options of REGISTER_CONFIG_A
 		enum DataOutputRate {
 			DATA_OUTPUT_RATE_0_5HZ = 0x00,
@@ -49,7 +49,7 @@ namespace xpcc
 			DATA_OUTPUT_RATE_20HZ = 0x14,
 			DATA_OUTPUT_RATE_50HZ = 0x18
 		};
-		
+
 		/// device specific data gain options of REGISTER_CONFIG_B
 		enum Gain {
 			GAIN_0_7,
@@ -62,7 +62,7 @@ namespace xpcc
 			GAIN_6_5
 		};
 	}
-	
+
 	/**
 	 * \brief	HMC5843 digital compass driver.
 	 *
@@ -75,7 +75,7 @@ namespace xpcc
 	 * <a href="http://www.sparkfun.com/datasheets/Sensors/Magneto/HMC5843.pdf">
 	 * datasheet</a>.
 	 *
-	 * \ingroup inertial
+	 * \ingroup driver_inertial
 	 * \author	Niklas Hauser
 	 *
 	 * \tparam I2cMaster Asynchronous Two Wire interface

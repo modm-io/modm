@@ -42,7 +42,7 @@ namespace xpcc
 	 * \brief	Driver for ST7565 based LC-displays
 	 *
 	 * \author	Fabian Greif
-	 * \ingroup	display
+	 * \ingroup	driver_display
 	 */
 	template <typename SPI, typename CS, typename A0, typename Reset,
 			  unsigned int Width, unsigned int Height, bool TopView>

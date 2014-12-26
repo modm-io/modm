@@ -42,7 +42,7 @@ namespace xpcc
 	 *
 	 * (also shared with A60, A65, C60, MC60 and S55 models)
 	 *
-	 * \ingroup	display
+	 * \ingroup	driver_display
 	 */
 	template <typename SPI, typename CS, typename RS, typename Reset>
 	class SiemensM55 : public BufferedGraphicDisplay<101, 80>

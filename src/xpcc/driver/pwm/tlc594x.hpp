@@ -54,7 +54,7 @@ namespace xpcc
  * @tparam	Xerr	Error pin, use xpcc::GpioUnused if not connected
  *
  * @author	Niklas Hauser
- * @ingroup	pwm
+ * @ingroup	driver_pwm
  */
 template<
 	uint16_t CHANNELS,

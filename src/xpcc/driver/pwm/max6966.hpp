@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -41,7 +41,7 @@ namespace xpcc
 	{
 		static const uint8_t WRITE = 0x00;
 		static const uint8_t READ = 0x80;
-		
+
 		enum Register
 		{
 			REGISTER_PORT0 = 0x00,
@@ -54,7 +54,7 @@ namespace xpcc
 			REGISTER_PORT7 = 0x07,
 			REGISTER_PORT8 = 0x08,
 			REGISTER_PORT9 = 0x09,
-			
+
 			REGISTER_PORT0_9 = 0x0A,
 			REGISTER_PORT0_3 = 0x0B,
 			REGISTER_PORT4_7 = 0x0C,
@@ -62,18 +62,18 @@ namespace xpcc
 			// no write, just read
 			REGISTER_READ_PORT7_0 = 0x0E,
 			REGISTER_READ_PORT9_8 = 0x0F,
-			
+
 			REGISTER_CONFIGURATION = 0x10,
 			REGISTER_RAMP_UP = 0x11,
 			REGISTER_RAMP_DOWN = 0x12,
 			REGISTER_CURRENT7_0 = 0x13,
 			REGISTER_CURRENT9_8 = 0x14,
 			REGISTER_GLOBAL_CURRENT = 0x15,
-			
+
 			REGISTER_NO_OP = 0x20,
 //			REGISTER_RESERVED = 0x7D,
 		};
-		
+
 		enum Config
 		{
 			CONFIG_RUN_MODE = 0x01,
@@ -85,7 +85,7 @@ namespace xpcc
 //			CONFIG_RESERVED = 0x40,
 			CONFIG_DOUT_OSC = 0x80
 		};
-		
+
 		enum Time
 		{
 			TIME_OFF = 0x00,
@@ -97,7 +97,7 @@ namespace xpcc
 			TIME_2s = 0x06,
 			TIME_4s = 0x07,
 		};
-		
+
 		enum Current
 		{
 			CURRENT_2_5mA = 0x00,
@@ -120,16 +120,16 @@ namespace xpcc
 			MIN = 0x03
 		};
 	}
-	
+
 	/**
 	 * \brief	MAX6966 10-channel, daisy-chainable, constant-current sink, 8bit PWM LED driver.
 	 *
 	 * \tparam	Spi		Spi interface
 	 * \tparam	Cs		Chip Select Pin
 	 * \tparam	DRIVERS	Number of daisy-chained chips
-	 * 
+	 *
 	 * \author	Niklas Hauser
-	 * \ingroup	pwm
+	 * \ingroup	driver_pwm
 	 */
 	template<
 		typename Spi,
@@ -144,48 +144,48 @@ namespace xpcc
 		 */
 		static void
 		initialize(max6966::Current current, uint8_t config=0);
-		
-		
+
+
 		/// configure the Chip
 		static inline void
 		setConfiguration(uint8_t config, uint8_t driver=0)
 		{
 			writeToDriver(driver, max6966::REGISTER_CONFIGURATION, config);
 		}
-		
+
 		/// configure the Chip
 		static void
 		setAllConfiguration(uint8_t config);
-		
+
 		/// get Chip configuration
 		static inline uint8_t
 		getConfiguration(uint8_t driver=0)
 		{
 			return readFromDriver(driver, max6966::REGISTER_CONFIGURATION);
 		}
-		
+
 		/// configure the ramp up time
 		static inline void
 		setRampUpTime(max6966::Time time=max6966::TIME_1s, uint8_t driver=0)
 		{
 			writeToDriverMasked(driver, max6966::REGISTER_RAMP_UP, time, 0x07);
 		}
-		
+
 		/// configure the hold time
 		static inline void
 		setHoldTime(max6966::Time time=max6966::TIME_1s, uint8_t driver=0)
 		{
 			writeToDriverMasked(driver, max6966::REGISTER_RAMP_UP, (time << 3), (0x07 << 3));
 		}
-		
+
 		/// configure the ramp down time
 		static inline void
 		setRampDownTime(max6966::Time time=max6966::TIME_1s, uint8_t driver=0)
 		{
 			writeToDriver(driver, max6966::REGISTER_RAMP_DOWN, time);
 		}
-		
-		
+
+
 		/// set the 8bit value of a single channel
 		static void
 		setChannel(uint16_t channel, uint8_t value);
@@ -203,7 +203,7 @@ namespace xpcc
 		/// \param values	array with all pwm values for all channels and drivers.
 		static void
 		setChannels(uint8_t * values);
-		
+
 		static void
 		setChannelsIntensity(uint8_t * intensity)
 		{
@@ -218,7 +218,7 @@ namespace xpcc
 		/// \param value	the 8bit value of all channels (same value for all channels)
 		static void
 		setAllChannels(uint8_t value);
-		
+
 		static void
 		setAllChannelsIntensity(uint8_t value)
 		{
@@ -228,28 +228,28 @@ namespace xpcc
 		/// get the 8bit value of a channel from the chip
 		static uint8_t
 		getChannel(uint16_t channel);
-		
+
 		static void
 		setHalfCurrent(uint16_t channel, bool full=true);
-		
+
 		/// set peak current of one driver
 		static inline void
 		setCurrent(max6966::Current current, uint8_t driver=0)
 		{
 			writeToDriver(driver, max6966::REGISTER_GLOBAL_CURRENT, current);
 		}
-		
+
 		/// set peak current of all drivers
 		static void
 		setAllCurrent(max6966::Current current);
-		
+
 	protected:
 		static void
 		writeToDriver(uint8_t driver, max6966::Register reg, uint8_t data);
-		
+
 		static uint8_t
 		readFromDriver(uint8_t driver, max6966::Register reg);
-		
+
 		static inline void
 		writeToDriverMasked(uint8_t driver, max6966::Register reg, uint8_t data, uint8_t mask)
 		{

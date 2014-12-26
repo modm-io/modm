@@ -47,7 +47,7 @@ namespace xpcc
 	 *
 	 * GE12 not implemented yet
 	 *
-	 * \ingroup	display
+	 * \ingroup	driver_display
 	 */
 	template <typename SPI, typename CS, typename Reset, bool GE12>
 	class Nokia6610 : public BufferedGraphicDisplay<130, 128>

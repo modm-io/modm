@@ -61,7 +61,7 @@ namespace xpcc
 		 * It because the Load signal must be strobe when all data is shifted out
 		 * this blocks until the SPI has finished.
 		 *
-		 * \ingroup	display
+		 * \ingroup	driver_display
 		 */
 		template<
 			typename Spi,

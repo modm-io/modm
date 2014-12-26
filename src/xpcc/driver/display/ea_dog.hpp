@@ -49,7 +49,7 @@ namespace xpcc
 	 * SPI needs to operate in Mode 3. Maximum SPI frequency is 33 MHz.
 	 *
 	 * \see		<a href="http://www.lcd-module.de/eng/pdf/grafik/dogs102-6e.pdf">Datasheet</a>
-	 * \ingroup	display
+	 * \ingroup	driver_display
 	 */
 	template <typename SPI, typename CS, typename A0, typename Reset, bool TopView = false>
 	class DogS102 : public St7565<SPI, CS, A0, Reset, 102, 64, TopView>

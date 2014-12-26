@@ -203,7 +203,7 @@ protected:
  * support circuits, microprocessor and algorithms required for
  * heading computation.
  *
- * @ingroup inertial
+ * @ingroup driver_inertial
  * @author	Niklas Hauser
  */
 template < class I2cMaster >

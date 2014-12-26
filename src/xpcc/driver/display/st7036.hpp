@@ -47,7 +47,7 @@ namespace xpcc
 	 * \see		Lcd
 	 *
 	 * \author	Fabian Greif
-	 * \ingroup	display
+	 * \ingroup	driver_display
 	 */
 	template <typename SPI, typename CS, typename RS, unsigned int Width, unsigned int Heigth>
 	class St7036 : public CharacterDisplay

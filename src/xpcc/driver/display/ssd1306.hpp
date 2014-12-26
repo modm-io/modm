@@ -120,7 +120,7 @@ protected:
  * the frame rate to about 40Hz.
  *
  * @author	Niklas Hauser
- * @ingroup	display
+ * @ingroup	driver_display
  */
 template < class I2cMaster >
 class Ssd1306 : public ssd1306, public xpcc::I2cDevice<I2cMaster>,

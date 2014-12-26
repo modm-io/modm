@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -37,15 +37,15 @@ namespace xpcc
 {
 	/**
 	 * \brief	256kBit (64kB) Serial SRAM
-	 * 
+	 *
 	 * Works with 23K256 (and other).
-	 * 
+	 *
 	 * - max. 20 MHz SPI
 	 * - 2.7-3.6V supply voltage
-	 * 
+	 *
 	 * \see		<a href="http://ww1.microchip.com/downloads/en/DeviceDoc/22100D.pdf">Datasheet</a>
-	 * 
-	 * \ingroup	storage
+	 *
+	 * \ingroup	driver_storage
 	 * \author	Fabian Greif
 	 */
 	template <typename Spi, typename Cs, typename Hold>
@@ -54,82 +54,82 @@ namespace xpcc
 	public:
 		/**
 		 * \brief	Initialize
-		 * 
+		 *
 		 * Sets used pins as output and switches to continuous operation mode.
-		 * 
+		 *
 		 * \return	\c true if the device is accessible and the change to
 		 * 			continuous mode was successful, \c false otherwise.
 		 */
 		static bool
 		initialize();
-		
+
 		/**
 		 * \brief	Start a read transaction
-		 * 
+		 *
 		 * Make sure to call finish() when all data is written!
-		 * 
+		 *
 		 * \param	address		15-bit address
 		 */
 		static void
 		startWrite(uint16_t address);
-		
+
 		/// Write one byte
 		static void
 		writeByte(uint8_t data);
-		
+
 		/// Write a block of data
 		static void
 		write(const uint8_t *data, std::size_t size);
-		
+
 		/**
 		 * \brief	Start a read transaction
-		 * 
+		 *
 		 * Make sure to call finish() when all data is read!
-		 * 
+		 *
 		 * \param	address		15-bit address
 		 */
 		static void
 		startRead(uint16_t address);
-		
+
 		/// Read one byte
 		static uint8_t
 		readByte();
-		
+
 		/// Read a block of data
 		static void
 		read(uint8_t *data, std::size_t size);
-		
+
 		/**
 		 * \brief	Hold communication status
-		 * 
+		 *
 		 * The device must stay selected during the hold period (CS low). All
 		 * pins will go into high impedance state.
-		 * 
+		 *
 		 * \see		resume()
 		 */
 		static inline void
 		suspend();
-		
+
 		/**
 		 * \brief	Resume communication
 		 * \see		suspend()
 		 */
 		static inline void
 		resume();
-		
+
 		/**
 		 * \brief	Complete transaction
-		 * 
-		 * Must be called after a transaction is completed to deselect the 
+		 *
+		 * Must be called after a transaction is completed to deselect the
 		 * device and release the bus for other operations.
 		 */
 		static void
 		finish();
-		
-		
+
+
 		/**
 		 * \brief	Convenience function
-		 * 
+		 *
 		 * Same as:
 		 * \code
 		 * startWrite(address);
@@ -139,10 +139,10 @@ namespace xpcc
 		 */
 		void
 		writeData(uint16_t address, const uint8_t *data, std::size_t size);
-		
+
 		/**
 		 * \brief	Convenience function
-		 * 
+		 *
 		 * Same as:
 		 * \code
 		 * startRead(address);
@@ -152,7 +152,7 @@ namespace xpcc
 		 */
 		void
 		readData(uint16_t address, uint8_t *data, std::size_t size);
-		
+
 	protected:
 		/// Possible SPI instruction codes
 		enum Instruction
@@ -162,17 +162,17 @@ namespace xpcc
 			READ_STATUS_REGISTER = 0x05,
 			WRITE_STATUS_REGISTER = 0x01
 		};
-		
+
 		/// Content of the status register
 		enum StatusRegister
 		{
 			BYTE_MODE = 0x00,
 			PAGE_MODE = 0x80,
 			SEQUENTIAL_MODE = 0x40,
-			
+
 			HOLD = (1 << 1),	///< 0 = enable hold pin, 1 = disable hold pin
 		};
-		
+
 		static Spi spi;
 		static Cs cs;
 		static Hold hold;
