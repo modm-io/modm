@@ -28,7 +28,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/driver/time/time.hpp>
+#include <xpcc/ui/time/time.hpp>
 
 #include "time_test.hpp"
 

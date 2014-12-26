@@ -17,7 +17,7 @@ main()
 	sei();
 
 	// Create a IOStream for complex formatting tasks
-	xpcc::IODeviceWrapper< Uart0, xpcc::IOBufferBehavior::BusyWait > device;
+	xpcc::IODeviceWrapper< Uart0, xpcc::IOBuffer::BlockIfFull > device;
 	xpcc::IOStream stream(device);
 
 	// Now we can print numbers and other objects to the stream

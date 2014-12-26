@@ -27,7 +27,7 @@
 
 
 // Create an IODeviceWrapper around the Uart Peripheral we want to use
-xpcc::IODeviceWrapper< Usart2, xpcc::IOBufferBehavior::BusyWait > loggerDevice;
+xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > loggerDevice;
 
 // Set all four logger streams to use the UART
 xpcc::log::Logger xpcc::log::debug(loggerDevice);
