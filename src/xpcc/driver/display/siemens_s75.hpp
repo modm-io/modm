@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -32,7 +32,7 @@
 #define XPCC__SIEMENS_S75_HPP
 
 #include <xpcc/architecture/driver/delay.hpp>
-#include <xpcc/driver/connectivity/memory_interface/bitbang_memory_interface.hpp>
+#include <xpcc/driver/bus/bitbang_memory_interface.hpp>
 
 #include <xpcc/ui/display/buffered_graphic_display.hpp>
 
@@ -80,7 +80,7 @@ namespace xpcc
 	 * The backlight (VLED +, VLED -) consists of four white
 	 * LEDs in series. The forward voltage is about 12 volts.
 	 *
-	 * \ingroup	lcd
+	 * \ingroup	driver_display
 	 */
 
 	enum class Orientation : uint8_t

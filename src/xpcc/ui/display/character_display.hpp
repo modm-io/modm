@@ -30,7 +30,7 @@ namespace xpcc
  * class to create a IODevice seems unnecessary complicated.
  *
  * @author	Fabian Greif
- * @ingroup	lcd
+ * @ingroup	graphics
  */
 class CharacterDisplay : public IOStream
 {

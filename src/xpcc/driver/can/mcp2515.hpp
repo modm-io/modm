@@ -37,11 +37,10 @@
 #include <xpcc/architecture/peripheral/can.hpp>
 
 #include "mcp2515_definitions.hpp"
-#include <xpcc/communication/can/message.hpp>
 
 /**
  * \defgroup	mcp2515	MCP2515
- * \ingroup		can
+ * \ingroup		driver_can
  */
 
 /**
@@ -169,10 +168,10 @@ namespace xpcc
 		 */
 		static bool
 		sendMessage(const can::Message& message);
-        
+
     public:
         // Extended Functionality
-        
+
         /*
          * Fixme: Empty implementation, required by connector
          */

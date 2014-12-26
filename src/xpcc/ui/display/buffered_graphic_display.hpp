@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -38,28 +38,28 @@ namespace xpcc
 {
 	/**
 	 * Base class for graphical displays with a RAM buffer.
-	 * 
+	 *
 	 * Every operation works on the internal RAM buffer, therefore the content
 	 * of the real display is not changed until a call of update().
-	 * 
+	 *
 	 * \tparam	Width	Width of the display.
 	 * \tparam	Height	Height of the display. Must be a multiple of 8!
-	 * 
+	 *
 	 * \author	Fabian Greif
-	 * \ingroup	lcd
+	 * \ingroup	graphics
 	 */
 	template <uint16_t Width, uint16_t Height>
 	class BufferedGraphicDisplay : public GraphicDisplay
 	{
 		// Height must be a multiple of 8
 		XPCC__STATIC_ASSERT((Height % 8) == 0, "height must be a multiple of 8");
-		
+
 	public:
 		virtual
 		~BufferedGraphicDisplay()
 		{
 		}
-		
+
 		virtual  inline uint16_t
 		getWidth() const
 		{
@@ -74,36 +74,36 @@ namespace xpcc
 
 		/**
 		 * \brief	Clear the complete screen
-		 * 
+		 *
 		 * Use fillRectangle() to clear certain areas of the screen.
 		 */
 		virtual void
 		clear();
-		
+
 		// Faster version adapted for the RAM buffer
 		virtual void
 		drawImageRaw(glcd::Point upperLeft,
 				uint16_t width, uint16_t height,
 				xpcc::accessor::Flash<uint8_t> data);
-		
+
 	protected:
 		// Faster version adapted for the RAM buffer
 		virtual void
 		drawHorizontalLine(glcd::Point start, uint16_t length);
-		
+
 		// TODO Faster version adapted for the RAM buffer
 		//virtual void
 		//drawVerticalLine(glcd::Point start, uint8_t length);
-		
+
 		virtual void
 		setPixel(int16_t x, int16_t y);
-		
+
 		virtual void
 		clearPixel(int16_t x, int16_t y);
-		
+
 		virtual bool
 		getPixel(int16_t x, int16_t y);
-		
+
 		uint8_t buffer[Width][Height / 8];
 	};
 }

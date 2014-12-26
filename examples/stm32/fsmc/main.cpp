@@ -39,7 +39,7 @@
  */
 
 #include <xpcc/architecture.hpp>
-#include <xpcc/driver/ui/display/tft_memory_bus.hpp>
+#include <xpcc/driver/bus/tft_memory_bus.hpp>
 #include <xpcc/driver/display/siemens_s75.hpp>
 
 // ----------------------------------------------------------------------------
@@ -102,7 +102,7 @@ MAIN_FUNCTION
 {
 	// Switch STM32F4 to 168 MHz (HSE clocked by an 25 MHz external clock)
     defaultSystemClock::enable();
-	
+
 	Led::setOutput(xpcc::Gpio::Low);
 
 	lcd::Reset::setOutput(xpcc::Gpio::Low);
@@ -199,6 +199,6 @@ MAIN_FUNCTION
 			x = 0;
 		}
 	}
-	
+
 	return 0;
 }

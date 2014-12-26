@@ -210,7 +210,7 @@ protected:
  *
  * @author	Niklas Hauser
  * @author  strongly-typed
- * @ingroup pressure
+ * @ingroup driver_pressure
  *
  * @tparam I2cMaster I2C interface
  */

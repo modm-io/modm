@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-# 
+#
 # Copyright (c) 2009, Roboterclub Aachen e.V.
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
+#
 #     * Redistributions of source code must retain the above copyright
 #       notice, this list of conditions and the following disclaimer.
 #     * Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
 #     * Neither the name of the Roboterclub Aachen e.V. nor the
 #       names of its contributors may be used to endorse or promote products
 #       derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
 # EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -57,11 +57,13 @@ namespace bitmap
 {
 	/**
 	 * \\brief	Generated bitmap
-	 * 
+	 *
 	 * Generated from file "${filename}".
-	 * 
+	 *
 	 * - Width  : ${width}
 	 * - Height : ${height}
+	 *
+	 * \\ingroup	image
 	 */
 	EXTERN_FLASH_STORAGE(uint8_t ${name}[]);
 }
@@ -73,48 +75,48 @@ namespace bitmap
 # -----------------------------------------------------------------------------
 def bitmap_action(target, source, env):
 	filename = str(source[0])
-	
+
 	input = open(filename).read()
 	if input[0:3] != "P1\n":
 		env.Error("Error: format needs to be a portable bitmap in ascii format (file descriptor 'P1')!")
 		exit(1)
-	
+
 	input = input[3:]
-	
+
 	while input[0] == "#" or input[0] in string.whitespace:
 		# switch to the next line
 		input = input[input.find("\n") + 1:]
-	
+
 	result = re.match("^(\d+) (\d+)\n", input)
 	if not result:
 		env.Error("Error: bad format!")
-	
+
 	width = int(result.group(1))
 	height = int(result.group(2))
-	
+
 	rows = int(math.ceil(height / 8.0))
-	
+
 	# now we finally have the raw data
 	input = input[result.end():]
 	input = input.replace("\n", "")
-	
+
 	data = []
 	for y in range(rows):
 		data.append([0 for row in range(width)])
-	
+
 	for y in range(height):
 		for x in range(width):
 			index = x + y * width
 			if input[index] == "1":
 				data[y / 8][x] |= 1 << (y % 8)
-	
+
 	array = []
 	for y in range(rows):
 		line = []
 		for x in range(width):
 			line.append("0x%02x," % data[y][x])
 		array.append(" ".join(line))
-	
+
 	basename = os.path.splitext(os.path.basename(str(target[0])))[0]
 	substitutions = {
 		'name': basename,
@@ -124,10 +126,10 @@ def bitmap_action(target, source, env):
 		'array': "\n\t\t".join(array),
 		'include_guard': "BITMAP__" + basename.upper().replace(" ", "_") + "_HPP"
 	}
-	
+
 	output = string.Template(template_source).safe_substitute(substitutions)
 	open(target[0].path, 'w').write(output)
-		
+
 	output = string.Template(template_header).safe_substitute(substitutions)
 	open(target[1].path, 'w').write(output)
 

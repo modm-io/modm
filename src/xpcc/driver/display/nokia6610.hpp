@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -39,7 +39,7 @@ namespace xpcc
 {
 	/**
 	 * \brief	Driver for Nokia6610 displays
-	 * 
+	 *
 	 * Adapted from www.olimex.com
 	 *
 	 * bool GE12 = true generates driver for GE12 Philips PCF8833 132 x 132 x 3 driver
@@ -47,7 +47,7 @@ namespace xpcc
 	 *
 	 * GE12 not implemented yet
 	 *
-	 * \ingroup	lcd
+	 * \ingroup	driver_display
 	 */
 	template <typename SPI, typename CS, typename Reset, bool GE12>
 	class Nokia6610 : public BufferedGraphicDisplay<130, 128>

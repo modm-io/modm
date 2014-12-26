@@ -1,35 +1,15 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
 /* Copyright (c) 2012, Roboterclub Aachen e.V.
- * All rights reserved.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
+
 /**
- * \ingroup		connectivity
- * \defgroup	rpr		Resilient Packet Ring
+ * @ingroup		communication
+ * @defgroup	rpr		Resilient Packet Ring
  *
  * This is a simplified version of the [Resilient Packet Ring]
  * ( http://en.wikipedia.org/wiki/Resilient_Packet_Ring ).
@@ -40,14 +20,14 @@
  *
  * Frame Format
  * ------------
-\verbatim
+@verbatim
 	   |<------ FCS Coverage ----->|
 +------+-------+-------+-----------+-------+------+
 |  SD  |  DA   |  SA   |  Payload  |  FCS  |  ED  |
 +------+-------+-------+-----------+-------+------+
 | 8bit | 16bit | 16bit | >=0 bytes | 16bit | 8bit |
 +------+-------+-------+-----------+-------+------+
-\endverbatim
+@endverbatim
  *
  *
  * Frame Fields
@@ -62,13 +42,13 @@
  * This uses the official MAC scheme for 2 Byte addressing.
  *
  * The Destination Address (DA) byte format:
-\verbatim
+@verbatim
   15   14  13  12  11  10   9   8      7    6   5   4   3   2   1   0
 +-----+---+---+---+---+---+---+---+ +-----+---+---+---+---+---+---+---+
 | I/G |   Upper (Group) Address   | |      Lower (Group) Address      |
 +-----+---+---+---+---+---+---+---+ +-----+---+---+---+---+---+---+---+
       |<----- (Ring Number) ----->| |<---- (Station Subaddress) ----->|
-\endverbatim
+@endverbatim
  * - I/G bit: address is an individual (0) or a group address (1).
  *
  * Individual Addresses identify a perticular station on the LAN and shall be
@@ -85,12 +65,12 @@
  * and the 8bit Lower Address as a station subaddress.
  *
  * The Source Address (SA) byte format:
-\verbatim
+@verbatim
    15   14  13  12  11  10   9   8     7   6   5   4   3   2   1   0
 +------+---+---+---+---+---+---+---+ +---+---+---+---+---+---+---+---+
 | Zero |        Upper Address      | |         Lower Address         |
 +------+---+---+---+---+---+---+---+ +---+---+---+---+---+---+---+---+
-\endverbatim
+@endverbatim
  *
  * The Frame Check Sequence (FCS) uses CRC-16-IBM (0xa001) polynomial with the
  * initial value of 0xffff.
@@ -99,7 +79,7 @@
  * and break down longer payload into multiple frames.
  * The longer the payload the more buffer each station has to allocate.
  *
- * \author	Niklas Hauser
+ * @author	Niklas Hauser
  */
 
 #include "rpr/node.hpp"

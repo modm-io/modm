@@ -23,7 +23,7 @@ namespace xpcc
  * I2C eeprom with an 16-bit address pointer.
  * Base address for most 24xxyyyy eeproms is 0xA0.
  *
- * @ingroup	storage
+ * @ingroup	driver_storage
  * @author	Fabian Greif
  * @author	Niklas Hauser
  */

@@ -21,13 +21,15 @@ namespace xpcc
  *
  * This can be used to guarantee the quality of certain parameters,
  * mostly baudrate or datarate.
+ *
+ * @ingroup	math
  */
 class
 Tolerance
 {
 public:
-	/// Common tolerances in percent
 	///@{
+	/// Common tolerances in percent
 	static constexpr uint16_t Exact			=    0;
 	static constexpr uint16_t HalfPercent	=    5;
 	static constexpr uint16_t OnePercent	=   10;

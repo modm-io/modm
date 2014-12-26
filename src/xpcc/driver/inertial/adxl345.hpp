@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -71,7 +71,7 @@ namespace xpcc
 			REGISTER_FIFO_CTL = 0x38,		///< FIFO control
 			REGISTER_FIFO_STATUS = 0x39		///< FIFO Status
 		};
-		
+
 		/// The bandwidth options of REGISTER_BW_RATE.
 		/// Output frequency = 2 * bandwidth
 		enum Bandwidth {
@@ -86,7 +86,7 @@ namespace xpcc
 			BANDWIDTH_6HZ = 0x07,
 			BANDWIDTH_3HZ = 0x06
 		};
-		
+
 		/// The power options of REGISTER_POWER_CTL.
 		enum Power {
 			POWER_LINK = 0x20,
@@ -101,7 +101,7 @@ namespace xpcc
 			// BW_RATE register
 			POWER_LOW_POWER = 0x10
 		};
-		
+
 		/// The interrupt bit masks of REGISTER_INT_ENABLE, REGISTER_INT_MAP and
 		/// REGISTER_INT_SOURCE.
 		enum Interrupt {
@@ -114,7 +114,7 @@ namespace xpcc
 			INTERRUPT_WATERMARK = 0x02,
 			INTERRUPT_OVERRUN = 0x01,
 		};
-		
+
 		/// The options of REGISTER_DATA_FORMAT
 		enum DataFormat {
 			DATAFORMAT_SELF_TEST = 0x80,
@@ -128,7 +128,7 @@ namespace xpcc
 			DATAFORMAT_RANGE_4G = 0x01,
 			DATAFORMAT_RANGE_2G = 0x00
 		};
-		
+
 		/// The options of REGISTER_FIFO_CTL and REGISTER_FIFO_STATUS
 		enum FIFO {
 			FIFO_CTL_MODE_gm = 0xc0,
@@ -143,7 +143,7 @@ namespace xpcc
 			FIFO_STATUS_ENTRIES_gm = 0x3f
 		};
 	}
-	
+
 	/**
 	 * \brief Basic ADXL345 digital accelerometer sensor driver
 	 *
@@ -151,7 +151,7 @@ namespace xpcc
 	 * measurement at up to +-16 g. Digital output data is formatted as 16-bit
 	 * twos complement and is accessible through I2C digital interface.
 	 *
-	 * Its high resolution (4 mg/LSB) enables measurement of inclination 
+	 * Its high resolution (4 mg/LSB) enables measurement of inclination
 	 * changes less than 1.0 degree.
 	 * Several special sensing functions are provided. Activity and inactivity
 	 * sensing detect the presence or lack of motion and if the acceleration on
@@ -167,9 +167,9 @@ namespace xpcc
 	 * For further information on the special sensing functions, consult the
 	 * <a href="http://www.analog.com/static/imported-files/data_sheets/ADXL345.pdf">
 	 * datasheet</a>.
-	 *  
+	 *
 	 * \author	Niklas Hauser
-	 * \ingroup inertial
+	 * \ingroup driver_inertial
 	 *
 	 * \tparam I2cMaster Asynchronous Two Wire interface
 	 */
@@ -182,45 +182,45 @@ namespace xpcc
 		 * \param	address		address is 0x53 with SDO pin low else 0x1d
 		 */
 		Adxl345(uint8_t* data, uint8_t address=0x1d);
-		
+
 		/**
 		 * Configures the sensor to measurement mode with full resolution with
 		 * the 32-level buffer in Stream Mode and the specified bandwidth.
 		 */
 		bool
 		configure(adxl345::Bandwidth bandwidth=adxl345::BANDWIDTH_50HZ, bool streamMode=false, bool enableInterrupt=true);
-		
+
 		/**
 		 * read the X-ZDATA0-1 registers and buffer the results
 		 * sets isNewDataAvailable() to \c true
 		 */
 		void
 		readAccelerometer();
-		
+
 		/// \return pointer to 8bit array containing xyz accelerations
 		/// Use reinterpret_cast<int16*>(&getData()) to get the results.
 		/// Devide by approx. 256 LSB/g to get the data in gravity.
 		uint8_t*
 		getData();
-		
+
 		/**
 		 * \c true, when new data has been from the sensor and buffered,
-		 * \c false, when the data has already been read, or data is being 
+		 * \c false, when the data has already been read, or data is being
 		 * copied into the buffer (by readAccelerationAverage()).
 		 */
 		bool
 		isNewDataAvailable();
-		
+
 		/**
 		 * Reads the sensor register if new results have been computed.
 		 * Use this for low Bandwidth checks.
 		 */
 		bool
 		isDataReady();
-		
+
 		void
 		update();
-		
+
 	private:
 		/**
 		 * writes 8bit data to a register, blocking!
@@ -229,7 +229,7 @@ namespace xpcc
 		 */
 		bool
 		writeRegister(adxl345::Register reg, uint8_t value);
-		
+
 		/**
 		 * reads a 8bit register, blocking!
 		 * \param reg the 8bit register to read
@@ -237,18 +237,18 @@ namespace xpcc
 		 */
 		uint8_t
 		readRegister(adxl345::Register reg);
-		
+
 		enum Status {
 			READ_ACCELEROMETER_PENDING = 0x01,
 			READ_ACCELEROMETER_RUNNING = 0x02,
 			NEW_ACCELEROMETER_DATA = 0x04,
 		};
-		
+
 		uint8_t status;
 		uint8_t* data;
 		uint8_t buffer[2];
 	};
-	
+
 }
 
 #include "adxl345_impl.hpp"

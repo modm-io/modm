@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -52,7 +52,7 @@ namespace xpcc
 			REGISTER_DATARD16 = 0x20,
 			REGISTER_TEMPOUT = 0x21
 		};
-		
+
 		/// The operation options of REGISTER_OPERATION.
 		enum Operation
 		{
@@ -68,7 +68,7 @@ namespace xpcc
 			OPERATION_LOW_POWER_AQUISITION = 0x0C,
 			OPERATION_ASIC_TEST = 0x0F
 		};
-		
+
 		/// The status bitmasks of REGISTER_STATUS.
 		enum Status
 		{
@@ -77,21 +77,21 @@ namespace xpcc
 			STATUS_REAL_TIME_ERROR = 0x10,
 			STATUS_STARTUP_RUNNING = 0x01
 		};
-		
+
 		/// The status of REGISTER_OPSTATUS.
 		enum OperationStatus
 		{
 			OPERATION_STATUS_FINISHED = 0x00,
 			OPERATION_STATUS_RUNNING = 0x01
 		};
-		
+
 		enum Reset
 		{
 			NO_RESET = 0x00,
 			RESET = 0x01
 		};
 	}
-	
+
 	/**
 	 * \brief SCP1000-D01 absolute pressure sensor driver
 	 *
@@ -108,21 +108,21 @@ High Resolution :  1.8Hz  |  17bit   |   14bit
 High Speed      :   ~9Hz  |  15bit   |   14bit
 Ultra Low Power :   ~1Hz  |  15bit   |   14bit
 \endverbatim
-	 * 
+	 *
 	 * DRDY pin pulled high, when new data is available.
 	 * DRDY pin pulled low, when DATARD16 is being read.
 	 *
 	 * You do not have to read out the temperature as it is only used by the
-	 * sensor for internal calculations, but it is important to read the 
+	 * sensor for internal calculations, but it is important to read the
 	 * 16 bit pressure register as the last one in the cycle.
 	 * A typical reading sequence: TEMPOUT => DATARD8 => DATARD16
 	 *
 	 * For further information on how to process the sensors data, consult the
 	 * <a href="http://www.sparkfun.com/datasheets/Components/SCP1000-D01.pdf">
 	 * datasheet</a>.
-	 *  
+	 *
 	 * \author	Niklas Hauser
-	 * \ingroup pressure
+	 * \ingroup driver_pressure
 	 *
 	 * \tparam Spi	software or hardware Spi interface
 	 * \tparam Cs	Chip Select pin
@@ -139,102 +139,102 @@ Ultra Low Power :   ~1Hz  |  15bit   |   14bit
 		 */
 		static bool
 		initialize(scp1000::Operation opMode=scp1000::OPERATION_HIGH_RESOLUTION_MODE_START);
-		
+
 		/**
 		 * Reads the temperature register and buffers the result
 		 * sets isTemperatureAvailable() to \c true
 		 */
 		static void
 		readTemperature();
-		
+
 		/**
 		 * Reads the pressure MSB and LSB registers and buffers the results
 		 * sets isPressureAvailable() to \c true
 		 */
 		static void
 		readPressure();
-		
+
 		//// \return pointer to the temperature buffer array
 		static uint8_t*
 		getTemperature();
-		
+
 		/// \return pointer to the pressure buffer array
 		static uint8_t*
 		getPressure();
-		
+
 		/**
 		 * Writes the operation mode to REGISTER_OPERATION and waits
 		 * until the operation completed (up to 16ms).
-		 * 
+		 *
 		 * \param	opMode Operation Mode.
-		 * \return	\c true if the operation completed correctly, 
+		 * \return	\c true if the operation completed correctly,
 		 * 			\c false if it took longer then 16ms to complete.
 		 */
 		static bool
 		setOperation(scp1000::Operation opMode);
-		
+
 		/**
 		 * \param opStatus set to true to read operation status.
 		 * \return the (operation) status.
 		 */
 		static uint8_t
 		readStatus(bool opStatus=false);
-		
+
 		/**
 		 * Resets the chip, waits 151ms, then starts checking the
 		 * status register if the startup completed.
-		 * 
+		 *
 		 * \param timeout time until the startup is declared as failed
 		 * \return false if a timeout occurred, true if reset correctly
 		 */
 		static bool
 		reset(uint8_t timeout);
-		
+
 		/// \return true, if temperature buffer has been refreshed, but not read
 		static bool
 		isNewTemperatureAvailable();
-		
+
 		/// \return true, if pressure buffer has been refreshed, but not read
 		static bool
 		isNewPressureAvailable();
-		
+
 		/// \return state of the INT pin, not buffered!
 		static bool
 		isNewDataReady();
-		
+
 	private:
 		/**
 		 * Writes 8bit data to a Direct Access Register.
-		 * 
+		 *
 		 * \param reg the Register address
 		 * \param data the data to write
 		 */
 		static void
 		writeRegister(scp1000::Register reg, uint8_t data);
-		
+
 		/**
 		 * Reads a 8bit Direct Access Register in three SPI cycles.
-		 * 
+		 *
 		 * \param reg the 8bit Register to read.
 		 * \return the 8bit content of the Register
 		 */
 		static uint8_t
 		read8BitRegister(scp1000::Register reg);
-		
+
 		/**
 		 * Reads a 16bit Direct Access Register in three SPI cycles.
-		 * 
+		 *
 		 * \param reg the 16bit Register to read.
 		 * \param buffer pointer to the receiver array
 		 * \return the 16bit content of the Register
 		 */
 		static void
 		read16BitRegister(scp1000::Register reg, uint8_t *buffer);
-		
+
 		static Spi spi;
 		static Cs chipSelect;
 		static Int interruptPin;
-		
+
 		static bool newTemperature;
 		static bool newPressure;
 		static uint8_t temperature[2];

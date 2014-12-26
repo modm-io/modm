@@ -39,31 +39,31 @@ namespace xpcc
 {
 	/**
 	 * \brief	FT245 USB FIFO
-	 * 
+	 *
 	 * The FT245R USB FIFO from Future Technology Devices International is a
 	 * single chip USB to parallel FIFO bidirectional data transfer interface.
 	 *
 	 * \section ft245_example Example
-	 * 
+	 *
 	 * \code
 	 * #include <xpcc/architecture.hpp>
 	 * #include <xpcc/communication/ft245.hpp>
-	 * 
+	 *
 	 * GPIO__PORT(FtPort, A);
 	 * GPIO__OUTPUT(FtRd, B, 0);
 	 * GPIO__OUTPUT(FtWr, B, 1);
 	 * GPIO__INPUT(FtTxe, B, 2);
 	 * GPIO__INPUT(FtRxf, B, 3);
-	 * 
+	 *
 	 * MAIN_FUNCTION
 	 * {
 	 *     xpcc::Ft245<FtPort, FtRd, FtWr, FtRxf, FtTxe> ft245;
-	 *     
+	 *
 	 *     uint8_t out = 0;
 	 *     while(1)
 	 *     {
 	 *          ft245.write(out++);
-	 *     	    
+	 *
 	 *     	    char loop;
 	 *     	    if (ft245.read(loop)) {
 	 *              ft245.write(0xff ^ loop);
@@ -71,9 +71,8 @@ namespace xpcc
 	 *     }
 	 * }
 	 * \endcode
-	 * 
-	 * \author	Sascha
-	 * \ingroup	connectivity
+	 *
+	 * \ingroup	driver_other
 	 */
 	template < typename PORT,
 	           typename RD,
@@ -90,7 +89,7 @@ namespace xpcc
 
 		/**
 		 * \brief	Initialize the port pins.
-		 * 
+		 *
 		 * This function is called by the constructor to initialize all port pins
 		 * correctly and sets the default values.
 		 */
@@ -104,7 +103,7 @@ namespace xpcc
 		 */
 		static void
 		write(uint8_t data);
-		
+
 		/**
 		 * \brief	Write a block of bytes to the FIFO
 		 *

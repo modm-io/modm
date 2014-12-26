@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -37,17 +37,17 @@ namespace xpcc
 {
 	/**
 	 * \brief	Driver for ST7036 based LC-displays
-	 * 
+	 *
 	 * \todo	make this class adaptable to other line counts!
 	 * \todo	documentation
-	 * 
+	 *
 	 * Available defines:
 	 * - ST7036_VOLTAGE = 3|5
-	 * 
+	 *
 	 * \see		Lcd
-	 * 
+	 *
 	 * \author	Fabian Greif
-	 * \ingroup	lcd
+	 * \ingroup	driver_display
 	 */
 	template <typename SPI, typename CS, typename RS, unsigned int Width, unsigned int Heigth>
 	class St7036 : public CharacterDisplay
@@ -55,29 +55,29 @@ namespace xpcc
 	public:
 		/// Constructor
 		St7036();
-		
+
 		/**
 		 * \brief	Initialize the display
-		 * 
+		 *
 		 * The display needs some time to initialize after startup. You have
 		 * to wait at least 50 ms until calling this method.
 		 */
 		virtual void
 		initialize();
-		
+
 		virtual void
 		writeRaw(char c);
-		
+
 		virtual void
 		execute(Command command);
-		
+
 		virtual void
 		setCursor(uint8_t column, uint8_t line);
-		
+
 		// TODO
 		//void
 		//setContrast();
-	
+
 	protected:
 		void
 		writeCommand(uint8_t command);

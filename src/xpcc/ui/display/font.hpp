@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -28,9 +28,10 @@
  */
 // ----------------------------------------------------------------------------
 /**
- * \ingroup		lcd
- * \defgroup	font	Various fonts for graphical displays
- * 
+ * \ingroup		graphics
+ * \defgroup	font	Fonts
+ *
+ * Various fonts for graphical displays.
  * The fonts are created with the "FontCreator 3.0", see \c tools/font_creator.
  */
 

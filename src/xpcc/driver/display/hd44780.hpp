@@ -34,7 +34,7 @@ namespace xpcc
  *
  * @author	Fabian Greif
  * @author	Niklas Hauser
- * @ingroup	lcd
+ * @ingroup	driver_display
  */
 template <typename DATA, typename RW, typename RS, typename E>
 class Hd44780 : public CharacterDisplay
@@ -85,7 +85,7 @@ protected:
  * @see		http://en.wikipedia.org/wiki/HD44780_Character_LCD
  *
  * @author	Niklas Hauser
- * @ingroup	lcd
+ * @ingroup	driver_display
  */
 template <typename DATA, typename RW, typename RS, typename E1, typename E2>
 class Hd44780Dual : public CharacterDisplay

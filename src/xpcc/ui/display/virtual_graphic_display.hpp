@@ -35,6 +35,7 @@
 
 namespace xpcc
 {
+	/// @ingroup	graphics
 	class VirtualGraphicDisplay:
 			public xpcc::GraphicDisplay
 	{

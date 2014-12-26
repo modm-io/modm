@@ -30,6 +30,7 @@ namespace xpcc
  *
  * Adapter between SPI flash and DataSource
  *
+ * @ingroup driver_other
  */
 template <	typename Cclk,			///< Clock output to FPGA
 			typename DataLow,		///< Data  output to FPGA, 8 bit parallel port

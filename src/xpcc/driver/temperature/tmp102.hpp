@@ -148,7 +148,7 @@ public:
  *
  * @see <a href="http://www.ti.com/lit/ds/symlink/tmp102.pdf">Datasheet</a>
  *
- * @ingroup temperature
+ * @ingroup driver_temperature
  * @author	Niklas Hauser
  *
  * @tparam I2cMaster Asynchronous Interface

@@ -61,7 +61,7 @@ struct hclax
  * The device runs a cyclic program, which will store a corrected pressure value with
  * 12 bit resolution about every 250 μs within the output registers of the internal ASIC.
  *
- * @ingroup pressure
+ * @ingroup driver_pressure
  * @author	Niklas Hauser
  */
 template < typename I2cMaster >

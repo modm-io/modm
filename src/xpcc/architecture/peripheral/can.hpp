@@ -11,7 +11,7 @@
 #define XPCC_PERIPHERAL_CAN_HPP
 
 #include "../peripheral.hpp"
-#include <xpcc/communication/can/message.hpp>
+#include "can_message.hpp"
 
 /**
  * @ingroup 	peripheral

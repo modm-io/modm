@@ -23,6 +23,9 @@ namespace xpcc
  *  This class allows for configuration of some aspects of the nRF24L01+
  *  wireless modules. It doesn't implement every aspect, but hopefully
  *  all the often used ones.
+ *
+ *  @ingroup	nrf24
+ *  @author		Daniel Krebs
  */
 template<typename Nrf24Phy>
 class Nrf24Config : public Nrf24Register
