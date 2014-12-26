@@ -37,7 +37,6 @@
 #include <xpcc/architecture/peripheral/can.hpp>
 
 #include "mcp2515_definitions.hpp"
-#include <xpcc/communication/can/message.hpp>
 
 /**
  * \defgroup	mcp2515	MCP2515

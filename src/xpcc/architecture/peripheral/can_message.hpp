@@ -17,11 +17,14 @@
 namespace xpcc
 {
 
+namespace can
+{
+
 /// Representation of a CAN message
 /// @ingroup	can
-struct CanMessage
+struct Message
 {
-	CanMessage(const uint32_t& inIdentifier = 0, uint8_t inLength = 0) :
+	Message(const uint32_t& inIdentifier = 0, uint8_t inLength = 0) :
 		identifier(inIdentifier), flags(), length(inLength)
 	{
 	}
@@ -77,6 +80,8 @@ public:
 	} flags;
 	uint8_t length;
 };
+
+}	// namespace can
 
 }	// namespace xpcc
 

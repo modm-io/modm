@@ -88,7 +88,7 @@ public:
 
 	/// Returns true if a message was copied into the message buffer
 	static bool
-	getMessage(CanMessage& message);
+	getMessage(can::Message& message);
 
 	/**
 	 * The CAN controller has a free slot to send a new message.
@@ -102,7 +102,7 @@ public:
 	 * @return true if the message was send, false otherwise
 	 */
 	static bool
-	sendMessage(const CanMessage& message);
+	sendMessage(const can::Message& message);
 
 	// Optional
 	/// Get Receive Error Counter.
