@@ -1,5 +1,5 @@
 // coding: utf-8
-// 
+//
 
 /**
 \defgroup	driver	Device drivers
@@ -16,7 +16,7 @@
 /**
  * \ingroup		driver
  * \defgroup	connectivity	Connectivity
- * 
+ *
  * Interface classes for I2C, SPI, CAN, etc.
  */
 
@@ -33,21 +33,28 @@
 /**
  * \ingroup		driver
  * \defgroup	inertial	Inertial measurement
- * 
+ *
  * Gyroscopes, Acceleration sensors and compasses
  */
 
 /**
  * \ingroup		driver
  * \defgroup	storage		Storage
- * 
+ *
  * Driver for SPI Flash, SPI RAM, I2C Eeprom, SD card etc.
  */
 
 /**
  * \ingroup		driver
+ * \defgroup	bus		Busses
+ *
+ * Interfaces and software implementations of memory busses.
+ */
+
+/**
+ * \ingroup		driver
  * \defgroup	driver_other	Other
- * 
+ *
  * Everything without a distinct group yet.
  */
 
