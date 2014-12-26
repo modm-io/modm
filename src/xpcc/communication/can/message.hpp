@@ -17,13 +17,13 @@
 namespace xpcc
 {
 	/**
-	 * \ingroup	can
+	 * \ingroup	can_comm
 	 */
 	namespace can
 	{
 		/**
 		 * \brief	Representation of a CAN message
-		 * \ingroup	can
+		 * \ingroup	can_comm
 		 */
 		struct Message
 		{
@@ -31,43 +31,43 @@ namespace xpcc
 				identifier(inIdentifier), flags(), length(inLength)
 			{
 			}
-			
+
 			inline uint32_t
 			getIdentifier() const
 			{
 				return identifier;
 			}
-			
+
 			inline void
 			setExtended(bool extended = true)
 			{
 				flags.extended = (extended) ? 1 : 0;
 			}
-			
+
 			inline bool
 			isExtended() const
 			{
 				return (flags.extended != 0);
 			}
-			
+
 			inline void
 			setRemoteTransmitRequest(bool rtr = true)
 			{
 				flags.rtr = (rtr) ? 1 : 0;
 			}
-			
+
 			inline bool
 			isRemoteTransmitRequest() const
 			{
 				return (flags.rtr != 0);
 			}
-			
+
 			inline uint8_t
 			getLength() const
 			{
 				return length;
 			}
-			
+
 		public:
 			uint32_t identifier;
 			uint8_t ATTRIBUTE_ALIGNED(4) data[8];
@@ -77,7 +77,7 @@ namespace xpcc
 					rtr(0), extended(1)
 				{
 				}
-				
+
 				bool rtr : 1;
 				bool extended : 1;
 			} flags;

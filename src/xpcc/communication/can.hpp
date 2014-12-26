@@ -9,7 +9,7 @@
 
 /**
  * @ingroup		communication
- * @defgroup 	can (CAN) Controller Area Network
+ * @defgroup 	can_comm (CAN) Controller Area Network
  * @brief 		Interface to the CAN-Communication BUS.
  *
  * Controller–area network (CAN or CAN-bus) is a vehicle bus standard designed

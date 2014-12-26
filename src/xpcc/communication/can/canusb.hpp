@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -43,40 +43,40 @@ namespace xpcc
 {
 	/**
 	 * \brief	Driver for a CAN232 or CANUSB adapter
-	 * 
+	 *
 	 * \see		http://www.canusb.com/
 	 * \see		http://www.can232.com/
-	 * \ingroup	can
+	 * \ingroup	can_comm
 	 */
 	class CanUsb
 	{
 	public:
 		CanUsb();
-		
+
 		~CanUsb();
-		
+
 		bool
 		open(std::string deviceName, unsigned int baudRate);
-		
+
 		void
 		close();
-		
+
 		inline bool
 		isMessageAvailable()
 		{
 			return (!this->readBuffer.empty());
 		}
-		
+
 		bool
 		getMessage(can::Message& message);
-		
+
 		inline bool
 		isReadyToSend()
 		{
 			// TODO
 			return true;
 		}
-		
+
 		/*
 		 * Send a message over the CAN.
 		 *
@@ -84,29 +84,29 @@ namespace xpcc
 		 */
 		bool
 		sendMessage(const can::Message& message);
-		
+
 		bool
 		isOpen()
 		{
 			return this->serialPort.isOpen();
 		}
-		
+
 		void
 		update();
 
 	private:
 		typedef boost::mutex				Mutex;
 		typedef boost::mutex::scoped_lock	MutexGuard;
-		
+
 		Mutex stateLock;
 		Mutex readBufferLock;
 		bool active;
-		
+
 		xpcc::hosted::SerialPort serialPort;
-		
+
 		std::string tmpRead;
 		std::queue<can::Message> readBuffer;
-		
+
 		boost::thread* thread;
 	};
 }
