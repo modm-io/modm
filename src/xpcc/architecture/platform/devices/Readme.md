@@ -103,7 +103,7 @@ As the device file is declarative, the filtering engine will resolve all depende
 
 ### Available Drivers
 
-The driver elements link the device hardware peripheral with a software implementation, which are found in `xpcc/architecture/platform/peripheral/`.
+The driver elements link the device hardware peripheral with a software implementation, which are found in `xpcc/architecture/platform/driver/`.
 Each driver is divided into several hardware dependend implementations.
 
 A selection of the most important drivers are:
