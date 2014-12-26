@@ -14,7 +14,7 @@
 #include "../../../device.hpp"
 #include "../../../type_ids.hpp"
 
-#include "../../clock/common/common_clock.hpp"
+#include "../../clock/generic/common_clock.hpp"
 #include "error_code.hpp"
 #include "can_filter.hpp"
 

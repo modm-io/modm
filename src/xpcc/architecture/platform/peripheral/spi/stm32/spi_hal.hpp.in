@@ -10,7 +10,7 @@
 #ifndef XPCC_STM32_SPI_HAL{{ id }}_HPP
 #define XPCC_STM32_SPI_HAL{{ id }}_HPP
 
-#include "../../clock/common/common_clock.hpp"
+#include "../../clock/generic/common_clock.hpp"
 #include "spi_base.hpp"
 
 namespace xpcc
@@ -91,7 +91,7 @@ public:
 	 */
 	static void
 	write(uint8_t data);
-	
+
 	/**
 	 * Returns the value of the data register
 	 *
@@ -125,7 +125,7 @@ public:
 	getInterruptFlags();
 
 	/**
-	 * 
+	 *
 	 *
 	 * @warning 	Not all InterruptFlags can be cleared this way.
 	 */

@@ -13,7 +13,7 @@
 #include <stdint.h>
 #include <xpcc/architecture/peripheral/spi_master.hpp>
 #include <xpcc/architecture/driver/delay.hpp>
-#include "../../gpio/software/gpio.hpp"
+#include "../../gpio/generic/gpio.hpp"
 #include "type_ids.hpp"
 
 namespace xpcc

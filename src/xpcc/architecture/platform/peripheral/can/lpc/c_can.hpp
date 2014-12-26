@@ -9,7 +9,7 @@
 
 #include <lpc11xx/driver/rom_drivers.h>
 
-#include "../../clock/common/common_clock.hpp"
+#include "../../clock/generic/common_clock.hpp"
 
 // at least one queue, so activate interrupts
 #define LPC11C_USING_CAN_INTERRUPTS ((LPC11C_CAN_TX_BUFFER_SIZE > 0) || (LPC11C_CAN_RX_BUFFER_SIZE > 0))
