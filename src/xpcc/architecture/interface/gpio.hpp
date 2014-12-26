@@ -14,7 +14,7 @@
 #include <xpcc/architecture/utils.hpp>
 
 /**
- * @ingroup		peripheral
+ * @ingroup		interface
  * @defgroup	gpio	General purpose input and/or output pins (GPIO)
  *
  * These classes are used to create architecture independent

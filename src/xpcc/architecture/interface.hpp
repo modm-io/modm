@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PERIPHERAL_HPP
-#define XPCC_PERIPHERAL_HPP
+#ifndef XPCC_INTERFACE_HPP
+#define XPCC_INTERFACE_HPP
 
 #include <stdint.h>
 #include <cstddef>
@@ -16,7 +16,7 @@
 
 /**
  * @ingroup 	architecture
- * @defgroup	peripheral	Peripherals
+ * @defgroup	interface	Architecture Interfaces
  *
  * All hardware peripherals with common interfaces.
  */
@@ -104,4 +104,4 @@ public:
 #include "interface/i2c.hpp"
 #include "interface/register.hpp"
 
-#endif	// XPCC_PERIPHERAL_HPP
+#endif	// XPCC_INTERFACE_HPP

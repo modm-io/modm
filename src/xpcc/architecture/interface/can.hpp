@@ -14,7 +14,7 @@
 #include "can_message.hpp"
 
 /**
- * @ingroup 	peripheral
+ * @ingroup		interface
  * @defgroup	can		Controller Area Network (CAN)
  */
 

@@ -13,7 +13,7 @@
 #include "../interface.hpp"
 
 /**
- * @ingroup 	peripheral
+ * @ingroup		interface
  * @defgroup	uart	Universal Asynchronous Receiver/Transmitter (UART)
  */
 

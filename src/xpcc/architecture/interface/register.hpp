@@ -14,7 +14,7 @@
 #include <xpcc/utils/bit_constants.hpp>
 
 /**
- * @ingroup		peripheral
+ * @ingroup		interface
  * @defgroup	register	General Purpose Register classes
  *
  * These data structures are used to describe the relationship of single bits,

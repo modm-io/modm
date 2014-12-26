@@ -11,7 +11,7 @@
 #define XPCC_PERIPHERAL_SPI_HPP
 
 /**
- * @ingroup 	peripheral
+ * @ingroup		interface
  * @defgroup	spi		Serial Peripheral Interface (SPI)
  */
 

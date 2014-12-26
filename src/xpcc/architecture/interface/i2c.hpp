@@ -13,7 +13,7 @@
 #include "../interface.hpp"
 
 /**
- * @ingroup 	peripheral
+ * @ingroup		interface
  * @defgroup	i2c		Inter-Integrated Circuit (I2C)
  */
 
