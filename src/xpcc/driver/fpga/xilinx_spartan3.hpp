@@ -2,7 +2,7 @@
 #define XPCC__XILINX_SPARTAN_3
 
 #include <xpcc/architecture.hpp>
-#include <xpcc/architecture/peripheral/gpio.hpp>
+#include <xpcc/architecture/interface/gpio.hpp>
 #include "fpga_type.hpp"
 
 namespace xpcc

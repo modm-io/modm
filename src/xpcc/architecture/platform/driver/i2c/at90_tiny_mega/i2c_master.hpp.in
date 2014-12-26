@@ -1,0 +1,110 @@
+// coding: utf-8
+/* Copyright (c) 2009, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+{{ generation_block }}
+
+#ifndef XPCC_{{target.family | upper}}_I2C_MASTER_HPP
+#define XPCC_{{target.family | upper}}_I2C_MASTER_HPP
+
+#include "../../../device.hpp"
+#include <xpcc/architecture/interface/i2c_master.hpp>
+#include "type_ids.hpp"
+#include "i2c.hpp"
+
+namespace xpcc
+{
+
+namespace {{target.family}}
+{
+
+/**
+ * Interrupt-driven I2C master module.
+ *
+ * Interrupts must be enabled.
+ *
+ * @author Niklas Hauser
+ * @ingroup	{{target.family}}
+ */
+class I2cMaster : public ::xpcc::I2cMaster, I2c
+{
+public:
+	static const TypeId::I2cMasterSda Sda;
+	static const TypeId::I2cMasterScl Scl;
+
+	template< class clockSource, uint32_t baudrate=Baudrate::Standard,
+			uint16_t tolerance = xpcc::Tolerance::FivePercent >
+	static ALWAYS_INLINE void
+	initialize()
+	{
+		// Prescalers: 1, 4, 16, 64
+		// SCL freq = CPU / (16 + 2 * TWBR * Pre)
+
+		constexpr uint32_t pre = (
+				(baudrate * 64ul * 255ul < clockSource::I2c) ? 64 : (
+				(baudrate * 16ul * 255ul < clockSource::I2c) ? 16 : (
+				(baudrate *  4ul * 255ul < clockSource::I2c) ?  4 :
+																1
+				)));
+
+		// calculate the fractional prescaler value
+		constexpr float pre_part_raw = static_cast<float>(clockSource::I2c) / ( 2 * baudrate );
+		constexpr float pre_raw = std::floor(pre_part_raw) < 8 ? 0 : (pre_part_raw - 8) / pre;
+		// respect the prescaler range of 0 to 255
+		constexpr uint32_t pre_ceil = std::ceil(pre_raw) > 255 ? 255 : std::ceil(pre_raw);
+		constexpr uint32_t pre_floor = std::floor(pre_raw);
+
+		// calculate the possible baudrates above and below the requested baudrate
+		constexpr uint32_t baud_lower = clockSource::I2c / ( 16 + 2 * pre_ceil  * pre );
+		constexpr uint32_t baud_upper = clockSource::I2c / ( 16 + 2 * pre_floor * pre );
+
+		// calculate the fractional prescaler value corresponding to the baudrate exactly
+		// between the upper and lower baudrate
+		constexpr float pre_middle = (static_cast<float>(clockSource::I2c) /
+				( 2 * ((baud_upper - baud_lower) / 2.f + baud_lower) ) - 8) / pre;
+		// decide which prescaler value is closer to a possible baudrate
+		constexpr uint32_t twbr = (pre_raw >= pre_middle) ? pre_ceil : pre_floor;
+
+		// check if within baudrate tolerance
+		constexpr uint32_t generated_baudrate = clockSource::I2c / ( 16 + 2 * twbr * pre );
+		assertBaudrateInTolerance<
+				/* clostest available baudrate */ generated_baudrate,
+				/* desired baudrate */ baudrate,
+				tolerance >();
+
+		// translate the prescaler into the bitmapping
+		constexpr Prescaler prescaler = (
+				(pre >=  64) ? Prescaler::Div64  : (
+				(pre >=  16) ? Prescaler::Div16  : (
+				(pre >=   4) ? Prescaler::Div4   :
+							   Prescaler::Div1
+				)));
+
+		initialize(twbr, prescaler);
+	};
+
+	// start documentation inherited
+	static bool
+	start(I2cTransaction *transaction, Configuration_t configuration = nullptr);
+
+	static Error
+	getErrorState();
+
+	static void
+	reset();
+	// end documentation inherited
+
+private:
+	static void
+	initialize(uint8_t twbr, Prescaler prescaler=Prescaler::Div1);
+};
+
+} // namespace {{target.family}}
+
+} // namespace xpcc
+
+#endif // XPCC_{{target.family | upper}}_I2C_MASTER_HPP

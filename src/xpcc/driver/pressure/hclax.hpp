@@ -10,7 +10,7 @@
 #ifndef XPCC_HCLAX_HPP
 #define XPCC_HCLAX_HPP
 
-#include <xpcc/architecture/peripheral/i2c_device.hpp>
+#include <xpcc/architecture/interface/i2c_device.hpp>
 #include <xpcc/processing/coroutine.hpp>
 #include <xpcc/math/utils/endianness.hpp>
 

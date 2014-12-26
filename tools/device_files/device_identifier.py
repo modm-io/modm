@@ -1,35 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
-# Copyright (c) 2013, Roboterclub Aachen e.V.
+# Copyright (c) 2014, Roboterclub Aachen e.V.
 # All rights reserved.
-# 
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-# 
-#  * Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-#  * Redistributions in binary form must reproduce the above copyright
-#    notice, this list of conditions and the following disclaimer in the
-#    documentation and/or other materials provided with the distribution.
-#  * Neither the name of the Roboterclub Aachen e.V. nor the
-#    names of its contributors may be used to endorse or promote products
-#    derived from this software without specific prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
-# EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
-# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# The file is part of the xpcc library and is released under the 3-clause BSD
+# license. See the file `LICENSE` for the full license governing this code.
 # -----------------------------------------------------------------------------
 #
 
-import re, sys, os
+import re
+import sys
+import os
+import platform
 
 # add python module logger to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
@@ -54,7 +36,7 @@ class DeviceIdentifier:
 			self.size_id  = string.size_id
 			self.valid    = string.valid
 			return
-		
+
 		if logger == None:
 			self.log = Logger()
 		else:
@@ -63,18 +45,45 @@ class DeviceIdentifier:
 		self._string = string
 		# default for properties is None
 		self.platform = None # e.g. stm32, avr
-		self.family   = None # e.g.	f4, atmega
-		self.name	 = None # e.g.   405, 16
-		self.type	 = None # e.g. -----, m1
-		self.pin_id   = None # e.g.	 r, -----
-		self.size_id  = None # e.g.	 g, 16
+		self.family   = None # e.g.	   f4, atmega
+		self.name     = None # e.g.   407, 328
+		self.type     = None # e.g.      , p
+		self.pin_id   = None # e.g.	    v,
+		self.size_id  = None # e.g.	    g, 32
 		self.valid = False
-		
+
 		if string == None:
 			return
-		
+
 		# try to determine platform and to parse string accordingly
-		if string.startswith('stm32f'):
+		if 'darwin' in string:
+			self.platform = 'hosted'
+			self.family = 'darwin'
+			self.name = 'osx'
+			self.type, _, _ = platform.mac_ver()
+			if self.type == '':
+				self.log.warn("No distribution version found!")
+			else:
+				self.type = self.type[:-2]
+			self.valid = True
+
+		elif 'linux' in string:
+			self.platform = 'hosted'
+			self.family = 'linux'
+			self.name, self.type, _ = platform.linux_distribution()
+			if self.name == '':
+				self.log.warn("No distribution name found!")
+			if self.type == '':
+				self.log.warn("No distribution version found!")
+			self.valid = True
+
+		elif 'windows' in string:
+			self.platform = 'hosted'
+			self.family = 'windows'
+			# TODO: platform.win32_ver()
+			self.valid = True
+
+		elif string.startswith('stm32f'):
 			self.platform = "stm32"
 			self.family = string[5:7]
 			self.name = string[6:9]
@@ -123,7 +132,7 @@ class DeviceIdentifier:
 					# The ATxmega is the 'extreme ATmega' and actually quite different from the ATmega.
 					# We call this the xmega, without the 'at' prefix, to remind you of the differences.
 					self.family = 'xmega'
-				
+
 				self.valid = True
 		# LPC Platform
 		elif string.startswith('lpc'):
@@ -172,23 +181,23 @@ class DeviceIdentifier:
 		dict['pin_id'] = self.pin_id
 		dict['size_id'] = self.size_id
 		return dict
-	
+
 	def getTargetDict(self):
 		return {'target': self.properties}
-	
+
 	def isEmpty(self):
 		target = self.properties
 		for key in target:
 			if target[key] != None:
 				return False
 		return True
-	
+
 	def __contains__(self, id):
 		assert isinstance(id, DeviceIdentifier)
 		# simple check uses hash
 		if id == self:
 			return True
-		
+
 		for attr in self.properties:
 			id_prop = id.properties[attr]
 			self_prop = self.properties[attr]
@@ -198,14 +207,14 @@ class DeviceIdentifier:
 			# they are not equal, maybe one of them is None?
 			if (id_prop == None or self_prop == None):
 				return False
-			
+
 			# they are not equal, but both have valid attributes
-			
+
 			# id is a union, but self is not a union
 			# self can obviously only contain on item then
 			if '|' in id_prop and '|' not in self_prop:
 				return False
-			
+
 			# both of them are unions, check for containment
 			# we need to check if all types of id are in self
 			# not the other way around
@@ -216,7 +225,7 @@ class DeviceIdentifier:
 					return False
 				# this attribute is contained in self, check the others
 				continue
-			
+
 			# self is a union, but id is not
 			# we need to check if the id attribute is in self
 			if '|' not in id_prop and '|' in self_prop:
@@ -225,40 +234,40 @@ class DeviceIdentifier:
 					return False
 				# this attribute is contained in self, check the others
 				continue
-			
+
 			# neither of them is a union, but they cannot be equal anyway
 			return False
-		
+
 		return True
-		
-	
+
+
 	def intersectionWithDeviceIdentifier(self, other):
 		dev = DeviceIdentifier(self)
 		for attr in dev.properties:
 			if dev.properties[attr] != other.properties[attr]:
 					setattr(dev, attr, None)
 		return dev
-	
+
 	def unionWithDeviceIdentifier(self, other):
 		dev = DeviceIdentifier(self)
 		for attr in dev.properties:
 			props = [None]
-			
+
 			if (dev.properties[attr] != None):
 				props = dev.properties[attr].split("|")
 			if (other.properties[attr] != None):
 				props.extend(other.properties[attr].split("|"))
-				
+
 			props = list(set(props))
 			props = [p for p in props if p != None]
-			
+
 			if all(p.isdigit() for p in props):
 				props.sort(key=int)
 			else:
 				props.sort()
-				
+
 			setattr(dev, attr, "|".join(props) if len(props) else None)
-			
+
 		return dev
 
 	def __hash__(self):

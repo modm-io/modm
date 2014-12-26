@@ -11,7 +11,7 @@
 #define XPCC_I2C_EEPROM_HPP
 
 #include <xpcc/processing/coroutine.hpp>
-#include <xpcc/architecture/peripheral/i2c_device.hpp>
+#include <xpcc/architecture/interface/i2c_device.hpp>
 
 namespace xpcc
 {

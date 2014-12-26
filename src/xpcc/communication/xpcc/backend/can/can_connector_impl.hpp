@@ -33,7 +33,7 @@
 #endif
 
 #include <xpcc/math/utils/bit_operation.hpp>
-#include <xpcc/architecture/peripheral/can_message.hpp>
+#include <xpcc/architecture/interface/can_message.hpp>
 
 // ----------------------------------------------------------------------------
 template<typename Driver>

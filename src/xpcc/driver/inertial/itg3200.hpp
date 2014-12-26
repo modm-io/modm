@@ -31,7 +31,7 @@
 #ifndef XPCC__ITG3200_HPP
 #define XPCC__ITG3200_HPP
 
-#include <xpcc/architecture/peripheral/i2c_adapter.hpp>
+#include <xpcc/architecture/interface/i2c_adapter.hpp>
 
 namespace xpcc
 {

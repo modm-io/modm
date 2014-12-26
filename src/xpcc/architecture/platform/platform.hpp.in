@@ -13,7 +13,7 @@
 /**
  * \ingroup 	architecture
  * \defgroup	platform	Supported Platforms
- * 
+ *
  */
 
 #include <stdint.h>
@@ -21,11 +21,17 @@
 #include "detect.hpp"		// sets XPCC__CPU_xx etc. macros
 #include "utils.hpp"
 
+// hack to enable compilation of hosted targets at the same time as embedded targets
+// this should go away when the library generator is finished
 #if defined XPCC__CPU_HOSTED
-	#include "platform/hosted.hpp"
+#	if defined XPCC__OS_OSX
+#		include "generated_platform_darwin/drivers.hpp"
+#	else
+#		include "generated_platform_linux/drivers.hpp"
+#	endif
 #else
-	// Include generated Platform sources:
-	#include "${include_path}"
+// Include generated Platform sources:
+#	include "${include_path}"
 #endif
 
 #endif	// XPCC__PLATFORM_HPP

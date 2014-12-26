@@ -31,7 +31,7 @@
 #ifndef XPCC__CAN_LAWICEL_FORMATTER_HPP
 #define XPCC__CAN_LAWICEL_FORMATTER_HPP
 
-#include <xpcc/architecture/peripheral/can_message.hpp>
+#include <xpcc/architecture/interface/can_message.hpp>
 
 namespace xpcc
 {

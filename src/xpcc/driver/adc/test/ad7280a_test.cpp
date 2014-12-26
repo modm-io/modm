@@ -29,7 +29,7 @@
 // ----------------------------------------------------------------------------
 
 #include <xpcc/driver/adc/ad7280a.hpp>
-#include <xpcc/architecture/platform/peripheral/gpio/software/gpio.hpp>
+#include <xpcc/architecture/platform/driver/gpio/generic/gpio.hpp>
 
 #include "ad7280a_test.hpp"
 
@@ -57,13 +57,13 @@ struct Cs
 	{
 		device.deselect();
 	}
-	
+
 	static inline void
 	reset()
 	{
 		device.select();
 	}
-	
+
 	static void
 	setOutput(bool)
 	{
@@ -91,13 +91,13 @@ Ad7280aTest::testCrcMessage()
 {
 	// Datasheet Example 1
 	TEST_ASSERT_EQUALS(Ad7280a::calculateCrc(0x003430), 0x51);
-	
+
 	// Datasheet Example 2
 	TEST_ASSERT_EQUALS(Ad7280a::calculateCrc(0x103430), 0x74);
-	
+
 	// Datasheet Example 3
 	TEST_ASSERT_EQUALS(Ad7280a::calculateCrc(0x0070A1), 0x9A);
-	
+
 	// Datasheet Example 4
 	TEST_ASSERT_EQUALS(Ad7280a::calculateCrc(0x205335), 0x46);
 }
@@ -124,11 +124,11 @@ Ad7280aTest::testChainSetup()
 		test::Transmission(XPCC__ARRAY_SIZE(arg3Rx), arg3Rx, arg3Tx),
 		test::Transmission(XPCC__ARRAY_SIZE(arg4Rx), arg4Rx, arg4Tx),
 	};
-	
+
 	device.start(transmissionsInitialize, ARRAY_SIZE(transmissionsInitialize), __LINE__);
-	
+
 	TEST_ASSERT_TRUE(Ad7280a::chainSetup());
-	
+
 	device.finish();
 }
 
@@ -152,15 +152,15 @@ Ad7280aTest::testSelftest()
 		test::Transmission(XPCC__ARRAY_SIZE(arg1Rx), arg1Rx, arg1Tx),
 		test::Transmission(XPCC__ARRAY_SIZE(arg2Rx), arg2Rx, arg2Tx),
 		test::Transmission(XPCC__ARRAY_SIZE(arg3Rx), arg3Rx, arg3Tx),
-		
+
 		// Read the self-test conversion result (value = 980)
 		test::Transmission(XPCC__ARRAY_SIZE(arg4Rx), arg4Rx, arg4Tx),
 	};
-	
+
 	device.start(transmissionsInitialize, ARRAY_SIZE(transmissionsInitialize), __LINE__);
-	
+
 	TEST_ASSERT_TRUE(Ad7280a::performSelftest());
-	
+
 	device.finish();
 }
 
@@ -178,11 +178,11 @@ Ad7280aTest::testSoftwareReset()
 		test::Transmission(XPCC__ARRAY_SIZE(arg1Rx), arg1Rx, arg1Tx),
 		test::Transmission(XPCC__ARRAY_SIZE(arg2Rx), arg2Rx, arg2Tx),
 	};
-	
+
 	device.start(transmissionsInitialize, ARRAY_SIZE(transmissionsInitialize), __LINE__);
-	
+
 	Ad7280a::softwareReset();
-	
+
 	device.finish();
 }
 
@@ -209,14 +209,14 @@ Ad7280aTest::testChannelRead()
 
 		test::Transmission(XPCC__ARRAY_SIZE(arg4Rx), arg4Rx, arg4Tx),
 	};
-	
+
 	device.start(transmissionsInitialize, ARRAY_SIZE(transmissionsInitialize), __LINE__);
-	
+
 	uint16_t value;
 	TEST_ASSERT_TRUE(Ad7280a::readChannel(0, xpcc::ad7280a::CELL_VOLTAGE_4, &value));
-	
+
 	TEST_ASSERT_EQUALS(value, 549);
-	
+
 	device.finish();
 }
 
@@ -259,19 +259,19 @@ Ad7280aTest::testAllChannelRead()
 		test::Transmission(XPCC__ARRAY_SIZE(arg7Rx), arg7Rx, arg7Tx),
 		test::Transmission(XPCC__ARRAY_SIZE(arg8Rx), arg8Rx, arg8Tx),
 	};
-	
+
 	device.start(transmissionsInitialize, ARRAY_SIZE(transmissionsInitialize), __LINE__);
-	
+
 	uint16_t values[6];
 	TEST_ASSERT_TRUE(Ad7280a::readAllChannels(values));
-	
+
 	TEST_ASSERT_EQUALS(values[0], 100);
 	TEST_ASSERT_EQUALS(values[1], 200);
 	TEST_ASSERT_EQUALS(values[2], 300);
 	TEST_ASSERT_EQUALS(values[3], 400);
 	TEST_ASSERT_EQUALS(values[4], 500);
 	TEST_ASSERT_EQUALS(values[5], 600);
-	
+
 	device.finish();
 }
 
@@ -285,10 +285,10 @@ Ad7280aTest::testBalancer()
 	test::Transmission transmissionsInitialize[] = {
 		test::Transmission(XPCC__ARRAY_SIZE(arg1Rx), arg1Rx, arg1Tx),
 	};
-	
+
 	device.start(transmissionsInitialize, ARRAY_SIZE(transmissionsInitialize), __LINE__);
-	
+
 	Ad7280a::enableBalancer(0, xpcc::ad7280a::CB1 | xpcc::ad7280a::CB2);
-	
+
 	device.finish();
 }

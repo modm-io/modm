@@ -33,7 +33,7 @@
 
 #include <stdint.h>
 
-#include <xpcc/architecture/peripheral/gpio.hpp>
+#include <xpcc/architecture/interface/gpio.hpp>
 #include <xpcc/architecture/driver/delay.hpp>
 
 #include <xpcc/io/iostream.hpp>

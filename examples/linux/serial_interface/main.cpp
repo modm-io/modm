@@ -1,6 +1,6 @@
 
 #include <xpcc/debug/logger.hpp>
-#include <xpcc/architecture/platform/hosted/linux/serial_interface.hpp>
+#include <xpcc/architecture.hpp>
 
 int
 main()

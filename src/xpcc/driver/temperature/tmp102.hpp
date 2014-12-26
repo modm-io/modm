@@ -10,8 +10,8 @@
 #ifndef XPCC_TMP102_HPP
 #define XPCC_TMP102_HPP
 
-#include <xpcc/architecture/peripheral/register.hpp>
-#include <xpcc/architecture/peripheral/i2c_device.hpp>
+#include <xpcc/architecture/interface/register.hpp>
+#include <xpcc/architecture/interface/i2c_device.hpp>
 #include <xpcc/processing/protothread.hpp>
 #include <xpcc/processing/coroutine.hpp>
 #include <xpcc/math/utils/endianness.hpp>

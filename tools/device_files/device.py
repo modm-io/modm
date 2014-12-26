@@ -150,6 +150,12 @@ class DeviceFile:
 				self.log.error("Unknown family '%s' for platform %s."
 				" Valid families for this platform are: %s" %
 				(self.family, self.platform, families))
+		elif self.platform == 'hosted':
+			families = ['linux', 'darwin', 'windows']
+			if self.family not in families:
+				self.log.error("Unknown family '%s' for platform %s."
+				" Valid families for this platform are: %s" %
+				(self.family, self.platform, families))
 		else:
 			self.log.error("Unknown platform '%s'" % self.platform)
 
@@ -169,14 +175,16 @@ class DeviceFile:
 		if s.valid == False:
 			return None
 		props = {}
-		props['flash'] = self.getProperty('flash', device_string, True)[0]
-		props['ram'] = self.getProperty('ram', device_string, True)[0]
-		props['eeprom'] = self.getProperty('eeprom', device_string, True, 0)[0]
-		props['mcu'] = self.getProperty('mcu', device_string, True, "")[0]
-		props['linkerscript'] = self.getProperty('linkerscript', device_string, True, "")[0]
 		props['defines'] = self.getProperty('define', device_string)
 		props['headers'] = self.getProperty('header', device_string)
-		props['core'] = self.getProperty('core', device_string, True)[0]
+
+		if s.platform != 'hosted':
+			props['flash'] = self.getProperty('flash', device_string, True)[0]
+			props['ram'] = self.getProperty('ram', device_string, True)[0]
+			props['eeprom'] = self.getProperty('eeprom', device_string, True, 0)[0]
+			props['mcu'] = self.getProperty('mcu', device_string, True, "")[0]
+			props['linkerscript'] = self.getProperty('linkerscript', device_string, True, "")[0]
+			props['core'] = self.getProperty('core', device_string, True)[0]
 		props.update(s.getTargetDict())
 
 		#Check Some Properties
@@ -209,22 +217,25 @@ class DeviceFile:
 		'instances': list of instances that will be created of this driver
 		Please note: all paths are relative to the platform_path.
 		"""
+
 		# Check Device string
 		s = DeviceIdentifier(device_string, self.log)
 		if s.valid == False:
 			return None
 		drivers = []
+
 		# find software implementations of drivers
 		# these have to be added as too
-		per_dir = os.path.join(platform_path, 'peripheral')
+		per_dir = os.path.join(platform_path, 'driver')
 		for peripheral in [p for p in os.listdir(per_dir) if os.path.isdir(os.path.join(per_dir, p))]:
 			name_dir = os.path.join(per_dir, peripheral)
-			for name in [n for n in os.listdir(name_dir) if os.path.isdir(os.path.join(name_dir, n)) and n == 'software']:
-				d = Driver(self, et.Element('driver', {'type': peripheral, 'name': 'software'}))
+			for name in [n for n in os.listdir(name_dir) if os.path.isdir(os.path.join(name_dir, n)) and n == 'generic']:
+				d = Driver(self, et.Element('driver', {'type': peripheral, 'name': 'generic'}))
 				if d.appliesTo(s, self.properties):
 					substitutions = s.getTargetDict()
 					substitutions.update(self.getSubstitutions())
 					drivers.append(d.toDict(platform_path, substitutions, s, self.properties))
+
 		# Loop Through Drivers
 		for d in self.drivers:
 			if d.appliesTo(s, self.properties):
@@ -233,6 +244,7 @@ class DeviceFile:
 					substitutions['target']['core'] = prop.value
 				substitutions.update(self.getSubstitutions())
 				drivers.append(d.toDict(platform_path, substitutions, s, self.properties))
+
 		return drivers
 
 ##-----------------------------------------------------------------------------
@@ -303,10 +315,7 @@ class Driver(DeviceElementBase):
 		if self.instances != None:
 			self.instances = self.instances.split(',')
 		# Calculate driver path relative to architecture
-		if self.type == 'core':
-			self.path = 'core'
-		else:
-			self.path = os.path.join('peripheral', self.type)
+		self.path = os.path.join('driver', self.type)
 		self.path = os.path.join(self.path, os.sep.join(self.name.split('/')))
 
 	def toDict(self, platform_path, substitutions, device_id, properties):

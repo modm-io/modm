@@ -69,11 +69,11 @@
  */
 #define	XPCC__CPU_STRING
 
+//@{
 /**
  * \brief	Possible CPU definitions
  * \ingroup	platform
  */
-//@{
 #define	XPCC__CPU_AVR
 #define	XPCC__CPU_ATXMEGA
 #define	XPCC__CPU_ATMEGA
@@ -90,6 +90,11 @@
 #define	XPCC__CPU_HOSTED
 #define	XPCC__CPU_HOSTED_64
 
+//@{
+/**
+ * \brief	Memory descriptions
+ * \ingroup	platform
+ */
 #define XPCC__ALIGNMENT
 
 #define XPCC__ORDER_BIG_ENDIAN
@@ -100,13 +105,7 @@
 
 #define XPCC__IS_BIG_ENDIAN
 #define XPCC__IS_LITTLE_ENDIAN
-//@}
 
-/**
- * \brief	Additional information
- * \ingroup	platform
- */
-//@{
 #define	XPCC__SIZEOF_POINTER
 //@}
 

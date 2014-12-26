@@ -1,0 +1,152 @@
+// coding: utf-8
+/* Copyright (c) 2009, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+{{ generation_block }}
+
+#ifndef XPCC_{{target.family | upper}}__UART{{ id }}_HPP
+#define XPCC_{{target.family | upper}}__UART{{ id }}_HPP
+
+#include "../../../device.hpp"
+#include <xpcc/architecture/interface/uart.hpp>
+#include "type_ids.hpp"
+
+namespace xpcc
+{
+
+namespace {{target.family}}
+{
+
+/**
+ * (Non-)Buffered Uart{{ id }}
+ *
+ * This implementation uses a ringbuffer. The size of the ringbuffer
+ * can be changed in the `project.cfg` file.
+ *
+ * Just add add a value for `Uart{{ id }}.tx_buffer` and/or
+ * `Uart{{ id }}.rx_buffer` in the `defines` section. The size can
+ * be any value between 1 and 254 for buffered and 0 for
+ * non-buffered operation.
+ *
+ * Example:
+ * @code
+ * [defines]
+ * Uart{{ id }}.tx_buffer = 20
+ * Uart{{ id }}.rx_buffer = 30
+ * @endcode
+ *
+ * @author	Fabian Greif
+ * @author	Niklas Hauser
+ * @ingroup	{{target.family}}
+ */
+class Uart{{ id }} : public ::xpcc::Uart
+{
+public:
+	static const TypeId::Uart{{ id }}Txd Tx;
+	static const TypeId::Uart{{ id }}Rxd Rx;
+
+public:
+	// start documentation inherited
+	template< class clockSource, uint32_t baudrate,
+			uint16_t tolerance = xpcc::Tolerance::FivePercent >
+	static ALWAYS_INLINE void
+	initialize()
+	{
+		// use double speed when necessary
+		constexpr uint32_t scalar = (baudrate * 16l > clockSource::Uart) ? 8 : 16;
+
+		// calculate the fractional prescaler value
+		constexpr float pre_raw = static_cast<float>(clockSource::Uart) / ( scalar * baudrate );
+		// respect the prescaler range of 1 to 4096
+		constexpr uint32_t pre_ceil = std::ceil(pre_raw) > 4096 ? 4096 : std::ceil(pre_raw);
+		constexpr uint32_t pre_floor = std::floor(pre_raw) < 1 ? 1 : std::floor(pre_raw);
+
+		// calculate the possible baudrates above and below the requested baudrate
+		constexpr uint32_t baud_lower = clockSource::Uart / ( scalar * pre_ceil );
+		constexpr uint32_t baud_upper = clockSource::Uart / ( scalar * pre_floor );
+
+		// calculate the fractional prescaler value corresponding to the baudrate exactly
+		// between the upper and lower baudrate
+		constexpr float pre_middle = static_cast<float>(clockSource::Uart) /
+				( scalar * ((baud_upper - baud_lower) / 2.f + baud_lower) );
+		// decide which prescaler value is closer to a possible baudrate
+		constexpr uint32_t prescaler = (pre_raw >= pre_middle) ? pre_ceil : pre_floor;
+
+		// check if within baudrate tolerance
+		constexpr uint32_t generated_baudrate = clockSource::Uart / ( scalar * prescaler );
+		assertBaudrateInTolerance<
+				/* clostest available baudrate */ generated_baudrate,
+				/* desired baudrate */ baudrate,
+				tolerance >();
+
+		constexpr uint16_t ubrr = (prescaler - 1) | ((scalar == 8) ? 0x80 : 0);
+
+		initialize(ubrr);
+	}
+
+	// MARK: write blocking
+	static void
+	writeBlocking(uint8_t data);
+
+	static void
+	writeBlocking(const uint8_t *data, std::size_t length);
+
+	static void
+	flushWriteBuffer();
+
+	// MARK: write
+	static bool
+	write(uint8_t data);
+
+	static std::size_t
+	write(const uint8_t *data, std::size_t length);
+
+	static bool
+	isWriteFinished();
+
+	// MARK: read
+	static bool
+	read(uint8_t& data);
+
+	static std::size_t
+	read(uint8_t *buffer, std::size_t length);
+
+	// MARK: discard
+	static std::size_t
+	discardReceiveBuffer();
+
+	static std::size_t
+	discardTransmitBuffer();
+	// end documentation inherited
+
+	// MARK: error
+	/**
+	 * Check whether any errors occurred during receiving.
+	 * Be aware that these indicate an error that occurred somewhere
+	 * since resetting the Error Flags (with `acknowledgeErrorFlags()`), so
+	 * you cannot tell which byte had the error.
+	 *
+	 * @return	`0` if no errors occurred, otherwise a value that
+	 *			corresponds to the Error Flags in register A.
+	 */
+	static uint8_t
+	getErrorFlags();
+
+	/// Clears the error flags.
+	static void
+	acknowledgeErrorFlags();
+
+protected:
+	static void
+	initialize(uint16_t ubrr);
+};
+
+} // namespace {{target.family}}
+
+} // namespace xpcc
+
+#endif // XPCC_{{target.family | upper}}__UART{{ id }}_HPP

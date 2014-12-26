@@ -10,8 +10,8 @@
 #ifndef XPCC_LIS3_TRANSPORT_HPP
 #define XPCC_LIS3_TRANSPORT_HPP
 
-#include <xpcc/architecture/peripheral/spi_device.hpp>
-#include <xpcc/architecture/peripheral/i2c_device.hpp>
+#include <xpcc/architecture/interface/spi_device.hpp>
+#include <xpcc/architecture/interface/i2c_device.hpp>
 #include <xpcc/processing/coroutine.hpp>
 
 namespace xpcc
