@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -31,16 +31,15 @@
  * \ingroup		connectivity
  * \defgroup 	can (CAN) Controller Area Network
  * \brief 		Interface to the CAN-Communication BUS.
- * 
- * Controller–area network (CAN or CAN-bus) is a vehicle bus standard designed 
- * to allow microcontrollers and devices to communicate with each other within 
+ *
+ * Controller–area network (CAN or CAN-bus) is a vehicle bus standard designed
+ * to allow microcontrollers and devices to communicate with each other within
  * a vehicle without a host computer.
- * 
- * CAN is a message based protocol, designed specifically for automotive 
- * applications but now also used in other areas such as industrial automation 
+ *
+ * CAN is a message based protocol, designed specifically for automotive
+ * applications but now also used in other areas such as industrial automation
  * and medical equipment.
  */
 
 #include "can/message.hpp"
-#include "can/mcp2515.hpp"
 #include "can/canusb.hpp"
