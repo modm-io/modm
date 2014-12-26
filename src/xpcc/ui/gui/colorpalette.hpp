@@ -42,6 +42,8 @@ Color {
 	PALETTE_SIZE
 };
 
+/// @author	Niklas Hauser
+/// @ingroup	gui
 class ColorPalette
 {
 public:

@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -37,11 +37,12 @@ namespace xpcc
 {
 	// forward declaration
 	class Date;
-	
+
 	/**
 	 * Number of Seconds since 00:00, Jan 1 1970 UTC
-	 * 
+	 *
 	 * @author	Fabian Greif
+	 * @ingroup	ui
 	 */
 	class UnixTime
 	{
@@ -50,27 +51,28 @@ namespace xpcc
 			time(t)
 		{
 		}
-		
+
 		operator uint32_t () const
 		{
 			return time;
 		}
-		
+
 		/**
 		 * Converts given time since epoch as xpcc::UnixTime value into
 		 * calendar time, expressed in Coordinated Universal Time (UTC).
 		 */
 		void
 		toDate(Date* date) const;
-		
+
 	private:
 		uint32_t time;
 	};
-	
+
 	/**
 	 * @brief	Calender Date and Time
-	 * 
+	 *
 	 * @author	Fabian Greif
+	 * @ingroup	ui
 	 */
 	class Date
 	{
@@ -81,12 +83,12 @@ namespace xpcc
 		 */
 		UnixTime
 		toUnixTimestamp() const;
-		
+
 	public:
 		uint8_t second;			///< Seconds after the minute [0, 60]
-		uint8_t minute;			///< Minutes after the hour [0, 59] 
-		uint8_t hour;			///< Hours since midnight [0, 23] 
-		uint8_t day;			///< Day of the month [1, 31] 
+		uint8_t minute;			///< Minutes after the hour [0, 59]
+		uint8_t hour;			///< Hours since midnight [0, 23]
+		uint8_t day;			///< Day of the month [1, 31]
 		uint8_t month;			///< Months since January [0, 11]
 		uint8_t year;			///< Years since 1900 (up to 2099)
 		uint8_t dayOfTheWeek;	///< Days since Sunday [0, 6] (0=Sunday, 6=Saturday)
