@@ -32,7 +32,7 @@
 #define XPCC__FT245_HPP
 
 #include "../../../drivers.hpp"
-#include <xpcc/architecture/peripheral/gpio.hpp>
+#include <xpcc/architecture/interface/gpio.hpp>
 
 
 namespace xpcc

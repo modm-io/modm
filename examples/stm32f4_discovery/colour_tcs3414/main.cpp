@@ -7,7 +7,7 @@
 
 #include <xpcc/io/iostream.hpp>
 
-#include <xpcc/architecture/peripheral/gpio.hpp>
+#include <xpcc/architecture/interface/gpio.hpp>
 
 xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > device;
 xpcc::IOStream stream(device);

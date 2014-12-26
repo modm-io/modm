@@ -10,7 +10,7 @@
 #ifndef XPCC_LIS3DSH_HPP
 #define XPCC_LIS3DSH_HPP
 
-#include <xpcc/architecture/peripheral/register.hpp>
+#include <xpcc/architecture/interface/register.hpp>
 #include <xpcc/processing/coroutine.hpp>
 #include <xpcc/math/utils/endianness.hpp>
 #include "lis3_transport.hpp"

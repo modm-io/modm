@@ -10,7 +10,7 @@
 #ifndef XPCC_HMC6343_HPP
 #define XPCC_HMC6343_HPP
 
-#include <xpcc/architecture/peripheral/i2c_device.hpp>
+#include <xpcc/architecture/interface/i2c_device.hpp>
 #include <xpcc/processing/protothread.hpp>
 #include <xpcc/processing/coroutine.hpp>
 

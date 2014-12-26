@@ -11,8 +11,8 @@
 #define XPCC_SOFTWARE_I2C_HPP
 
 #include <xpcc/architecture/driver/delay.hpp>
-#include <xpcc/architecture/peripheral/gpio.hpp>
-#include <xpcc/architecture/peripheral/i2c_master.hpp>
+#include <xpcc/architecture/interface/gpio.hpp>
+#include <xpcc/architecture/interface/i2c_master.hpp>
 #include "type_ids.hpp"
 
 namespace xpcc

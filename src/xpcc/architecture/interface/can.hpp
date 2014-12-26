@@ -10,7 +10,7 @@
 #ifndef XPCC_PERIPHERAL_CAN_HPP
 #define XPCC_PERIPHERAL_CAN_HPP
 
-#include "../peripheral.hpp"
+#include "../interface.hpp"
 #include "can_message.hpp"
 
 /**

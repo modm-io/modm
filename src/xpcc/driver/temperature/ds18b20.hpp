@@ -31,7 +31,7 @@
 #ifndef XPCC__DS18B20_HPP
 #define XPCC__DS18B20_HPP
 
-#include <xpcc/architecture/peripheral/one_wire.hpp>
+#include <xpcc/architecture/interface/one_wire.hpp>
 
 namespace xpcc
 {

@@ -12,7 +12,7 @@
 
 #include <xpcc/processing/coroutine.hpp>
 #include "spi.hpp"
-#include "../peripheral.hpp"
+#include "../interface.hpp"
 
 namespace xpcc
 {

@@ -13,7 +13,7 @@
 
 #include "../../../device.hpp"
 #include "type_ids.hpp"
-#include <xpcc/architecture/peripheral/i2c_master.hpp>
+#include <xpcc/architecture/interface/i2c_master.hpp>
 
 namespace xpcc
 {

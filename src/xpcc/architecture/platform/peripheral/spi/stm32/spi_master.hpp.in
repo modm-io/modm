@@ -10,7 +10,7 @@
 #ifndef XPCC_STM32_SPI_MASTER{{ id }}_HPP
 #define XPCC_STM32_SPI_MASTER{{ id }}_HPP
 
-#include <xpcc/architecture/peripheral/spi_master.hpp>
+#include <xpcc/architecture/interface/spi_master.hpp>
 #include "spi_hal_{{ id }}.hpp"
 #include "type_ids.hpp"
 

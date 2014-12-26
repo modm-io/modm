@@ -11,7 +11,7 @@
 #define XPCC_SOFTWARE_GPIO_HPP
 
 #include <xpcc/architecture/utils.hpp>
-#include <xpcc/architecture/peripheral/gpio.hpp>
+#include <xpcc/architecture/interface/gpio.hpp>
 #include <xpcc/utils/template_metaprogramming.hpp>
 
 namespace xpcc

@@ -12,7 +12,7 @@
 #define XPCC_ATXMEGA_I2C_MASTER_{{ id }}_HPP
 
 #include "../../../device.hpp"
-#include <xpcc/architecture/peripheral/i2c.hpp>
+#include <xpcc/architecture/interface/i2c.hpp>
 #include "type_ids.hpp"
 
 namespace xpcc

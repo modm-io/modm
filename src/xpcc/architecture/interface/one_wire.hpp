@@ -48,7 +48,7 @@
 #define XPCC__ONE_WIRE_HPP
 
 #include <xpcc/architecture/utils.hpp>
-#include <xpcc/architecture/peripheral.hpp>
+#include <xpcc/architecture/interface.hpp>
 
 namespace xpcc
 {

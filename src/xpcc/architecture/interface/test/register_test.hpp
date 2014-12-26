@@ -11,7 +11,7 @@
 #define XPCC_UNITTEST_REGISTER_HPP
 
 #include <unittest/testsuite.hpp>
-#include <xpcc/architecture/peripheral/register.hpp>
+#include <xpcc/architecture/interface/register.hpp>
 
 namespace xpcc
 {

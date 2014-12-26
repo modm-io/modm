@@ -12,7 +12,7 @@
 #define XPCC_{{target.family | upper}}_UART_SPI_MASTER{{id}}_HPP
 
 #include "../../uart/at90_tiny_mega/uart_defines.h"
-#include <xpcc/architecture/peripheral/spi_master.hpp>
+#include <xpcc/architecture/interface/spi_master.hpp>
 #include "type_ids.hpp"
 
 namespace xpcc

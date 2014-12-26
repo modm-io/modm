@@ -10,7 +10,7 @@
 #ifndef XPCC_PERIPHERAL_UART_HPP
 #define XPCC_PERIPHERAL_UART_HPP
 
-#include "../peripheral.hpp"
+#include "../interface.hpp"
 
 /**
  * @ingroup 	peripheral

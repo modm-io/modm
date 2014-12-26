@@ -32,7 +32,7 @@
 #define XPCC__MAX6966_HPP
 
 #include <stdint.h>
-#include <xpcc/architecture/peripheral/gpio.hpp>
+#include <xpcc/architecture/interface/gpio.hpp>
 #include <xpcc/architecture/driver/delay.hpp>
 
 namespace xpcc

@@ -10,7 +10,7 @@
 #ifndef XPCC_LIS302DL_HPP
 #define XPCC_LIS302DL_HPP
 
-#include <xpcc/architecture/peripheral/register.hpp>
+#include <xpcc/architecture/interface/register.hpp>
 #include <xpcc/processing/coroutine.hpp>
 #include "lis3_transport.hpp"
 

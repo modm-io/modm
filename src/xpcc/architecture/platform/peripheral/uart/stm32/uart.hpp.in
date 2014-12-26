@@ -16,7 +16,7 @@
 #ifndef XPCC_STM32_{{ uart | upper }}_{{ id }}_HPP
 #define XPCC_STM32_{{ uart | upper }}_{{ id }}_HPP
 
-#include <xpcc/architecture/peripheral/uart.hpp>
+#include <xpcc/architecture/interface/uart.hpp>
 #include "../../../type_ids.hpp"
 #include "uart_base.hpp"
 #include "uart_baudrate.hpp"

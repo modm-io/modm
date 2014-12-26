@@ -10,7 +10,7 @@
 #ifndef XPCC_PERIPHERAL_I2C_HPP
 #define XPCC_PERIPHERAL_I2C_HPP
 
-#include "../peripheral.hpp"
+#include "../interface.hpp"
 
 /**
  * @ingroup 	peripheral

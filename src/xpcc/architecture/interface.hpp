@@ -96,12 +96,12 @@ public:
 
 } // namespace xpcc
 
-#include "peripheral/can.hpp"
-#include "peripheral/gpio.hpp"
-#include "peripheral/uart.hpp"
-#include "peripheral/one_wire.hpp"
-#include "peripheral/spi.hpp"
-#include "peripheral/i2c.hpp"
-#include "peripheral/register.hpp"
+#include "interface/can.hpp"
+#include "interface/gpio.hpp"
+#include "interface/uart.hpp"
+#include "interface/one_wire.hpp"
+#include "interface/spi.hpp"
+#include "interface/i2c.hpp"
+#include "interface/register.hpp"
 
 #endif	// XPCC_PERIPHERAL_HPP
