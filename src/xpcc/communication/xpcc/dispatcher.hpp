@@ -2,10 +2,10 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -41,34 +41,34 @@
 namespace xpcc
 {
 	/**
-	 * \brief	
-	 * 
+	 * \brief
+	 *
 	 * \todo	Documentation
-	 * 
+	 *
 	 * \author	Georgi Grinshpun
-	 * \ingroup	communication
+	 * \ingroup	xpcc_comm
 	 */
 	class Dispatcher
 	{
 	public:
 		static const uint16_t acknowledgeTimeout = 100;
 		static const uint16_t responseTimeout = 100;
-		
+
 	public:
 		Dispatcher(BackendInterface *backend, Postman* postman);
-		
+
 		void
 		update();
-		
+
 	private:
 		/// Does not handle requests which are not acknowledge.
 		void
 		handlePacket(const Header& header, const SmartPointer& payload);
-		
+
 		/// Sends messages which are waiting in the list.
 		void
 		handleWaitingMessages();
-		
+
 		/**
 		 * \brief 	This class holds information about a Message being send.
 		 * 			This is the superclass of all entries.
@@ -81,7 +81,7 @@ namespace xpcc
 				DEFAULT,
 				CALLBACK,
 			};
-			
+
 			/**
 			 * \brief 	Communication info, state of sending and
 			 * 			retrieving messages and acks.
@@ -92,7 +92,7 @@ namespace xpcc
 				WAIT_FOR_ACK,
 				WAIT_FOR_RESPONSE,
 			};
-			
+
 		public:
 			/**
 			 * \brief 	Creates one Entry with given header.
@@ -109,28 +109,28 @@ namespace xpcc
 				time(), tries(0)
 			{
 			}
-			
+
 			Entry(const Header& inHeader, SmartPointer& inPayload) :
 				type(DEFAULT), next(0),
 				header(inHeader), payload(inPayload),
 				time(), tries(0)
 			{
 			}
-			
+
 			Entry(const Header& inHeader) :
 				type(DEFAULT), next(0),
 				header(inHeader), payload(),
 				time(), tries(0)
 			{
 			}
-			
+
 			/**
 			 * \brief 	Checks if a Response or Acknowledge fits to the
 			 * 			Message represented by this Entry.
 			 */
 			bool
 			headerFits(const Header& header) const;
-			
+
 			/**
 			 * \brief 	List-handling, return pointer to the next entry.
 			 */
@@ -139,7 +139,7 @@ namespace xpcc
 			{
 				return next;
 			}
-			
+
 			const Type type;
 			Entry *next;			///< List-handling, holds pointer to the next entry.
 			const Header header;
@@ -158,31 +158,31 @@ namespace xpcc
 				callback(callback_)
 			{
 			}
-			
+
 			ResponseCallback callback;
 		};
-		
+
 		void
 		addMessage(const Header& header, SmartPointer& smartPayload);
-		
+
 		void
 		addMessage(const Header& header, SmartPointer& smartPayload,
 				ResponseCallback& responseCallback);
-		
+
 		void
 		addResponse(const Header& header, SmartPointer& smartPayload);
-		
-		
+
+
 		/**
 		 * \brief 		Appends one ore more entries to this->last. this->last is updated to the tail of next.
 		 *
 		 */
 		void
 		append(Entry *next);
-		
+
 		/**
 		 * \brief 		fix->next will be set to next. the old entry of fix->next will be set
-		 *				to the tail of next. this->last will be updated to tail of next if 
+		 *				to the tail of next. this->last will be updated to tail of next if
 		 *				fix->next==Null, which is equivalent to fix==last.
 		 *
 		 * \param fix has to be one element already appended to the list.
@@ -190,7 +190,7 @@ namespace xpcc
 		 */
 		inline void
 		insertAfter(Entry *fix, Entry *next);
-		
+
 		/**
 		 * \brief 		if (entry->next) then entry->next will be set to entry->next->next. this->last
 		 *				will be set to entry if entry->next was the last element.
@@ -202,26 +202,26 @@ namespace xpcc
 		 */
 		Entry *
 		removeNextEntryFromList(Entry *entry);
-		
+
 		Entry *
 		deleteEntry(Entry *entry, Entry *prev);
-		
+
 		inline void
 		handleActionCall(const Header& header, const SmartPointer& payload);
-		
+
 		void
 		sendAcknowledge(const Header& header);
-		
+
 		inline Entry *
 		sendMessageToInnerComponent(Entry *entry, Entry *prev);
-		
+
 		BackendInterface * const backend;
 		Postman * const postman;
-		
+
 		Entry dummyFirst;
 		Entry *first;
 		Entry *last;
-		
+
 	private:
 		friend class Communicator;
 		friend class Response;

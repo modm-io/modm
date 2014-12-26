@@ -8,13 +8,11 @@
 // ----------------------------------------------------------------------------
 
 /**
- * @defgroup 	communication Communication
- * @brief 		Communication systems
+ * @ingroup		communication
+ * @defgroup 	xpcc_comm XPCC
+ * @brief 		XPCC communication system
  */
 
-#include "communication/xpcc.hpp"
-#include "communication/rpr.hpp"
-#include "communication/anmb.hpp"
-#include "communication/can.hpp"
-#include "communication/sab.hpp"
-#include "communication/sab2.hpp"
+#include "xpcc/communicatable.hpp"
+#include "xpcc/abstract_component.hpp"
+#include "xpcc/dispatcher.hpp"
