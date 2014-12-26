@@ -1,3 +1,11 @@
+// coding: utf-8
+/* Copyright (c) 2014, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
 
 #ifndef TFT_MEMORY_BUS_HPP_
 #define TFT_MEMORY_BUS_HPP_
@@ -5,8 +13,8 @@
 namespace xpcc
 {
 /**
- *
  * @author	Fabian Greif
+ * @ingroup	bus
  */
 class TftMemoryBus16Bit
 {
@@ -55,6 +63,7 @@ private:
 	volatile uint16_t * const ptrData;
 };
 
+/// @ingroup	bus
 class TftMemoryBus8Bit
 {
 public:
@@ -108,6 +117,7 @@ private:
  * 8080-style parallel bus made of a parallel PORT, chip select CS, read strobe RD and write strobe WR
  *
  * @author	strongly-typed
+ * @ingroup	bus
  */
 template <
 	typename PORT,	/* Port */
@@ -170,6 +180,7 @@ public:
 	}
 };
 
+/// @ingroup	bus
 template <
 	typename PORT,	/* Port */
 	typename CS,	/* Chip select */

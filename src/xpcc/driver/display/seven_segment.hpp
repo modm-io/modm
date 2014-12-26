@@ -1,11 +1,23 @@
+// coding: utf-8
+/* Copyright (c) 2009, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+
 #ifndef XPCC__SEVEN_SEGMENT_DISPLAY_HPP
 #define XPCC__SEVEN_SEGMENT_DISPLAY_HPP
 
 #include <stdint.h>
 #include <xpcc/architecture/peripheral/gpio.hpp>
 
-namespace xpcc {
-	namespace sevenSegment {
+namespace xpcc
+{
+
+	namespace sevenSegment
+	{
 
 		// config: left to right, right to left.
 
@@ -48,6 +60,8 @@ namespace xpcc {
 		 *
 		 * It because the Load signal must be strobe when all data is shifted out
 		 * this blocks until the SPI has finished.
+		 *
+		 * \ingroup	lcd
 		 */
 		template<
 			typename Spi,

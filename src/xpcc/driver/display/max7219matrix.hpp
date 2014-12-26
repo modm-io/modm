@@ -1,6 +1,14 @@
+// coding: utf-8
+/* Copyright (c) 2014, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
 
-#ifndef MAX7219MATRIX_HPP_
-#define MAX7219MATRIX_HPP_
+#ifndef XPCC_MAX7219_MATRIX_HPP
+#define XPCC_MAX7219_MATRIX_HPP
 
 #include <xpcc/ui/display/buffered_graphic_display.hpp>
 
@@ -205,4 +213,4 @@ xpcc::Max7219matrix< SPI, CS, COLUMNS, ROWS >::update()
 	}
 }
 
-#endif /* MAX7219MATRIX_HPP_ */
+#endif	// XPCC_MAX7219_MATRIX_HPP

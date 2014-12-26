@@ -1,3 +1,12 @@
+// coding: utf-8
+/* Copyright (c) 2014, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+
 #ifndef XPCC__BITBANG_MEMORY_INTERFACE_HPP
 #define XPCC__BITBANG_MEMORY_INTERFACE_HPP
 
@@ -14,7 +23,8 @@ namespace xpcc
 	 * \tparam	CD		Command / Data GPIO pin
 	 * \tparam	WR		Write strobe GPIO pin
 	 *
-	 * \author	Strongly typed
+	 * \author	strongly typed
+	 * \ingroup	bus
 	 */
 	template < typename PORT,
 				typename CS,
