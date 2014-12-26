@@ -11,7 +11,7 @@
 #define XPCC_AVR_CLOCK_HPP
 
 #include <stdint.h>
-#include "../common/common_clock.hpp"
+#include "../generic/common_clock.hpp"
 
 using namespace xpcc::clock;
 

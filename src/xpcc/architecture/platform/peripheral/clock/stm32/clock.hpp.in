@@ -32,7 +32,7 @@
 #define XPCC_STM32__CLOCK_HPP
 
 #include <stdint.h>
-#include "../common/common_clock.hpp"
+#include "../generic/common_clock.hpp"
 // #include "static.hpp"
 
 using namespace xpcc::clock;
@@ -43,7 +43,7 @@ namespace xpcc
 	{
 		/**
 		 * Clock management.
-		 * 
+		 *
 		 * For using the internal clock (which is 16MHz) use:
 		 * \code
 		 * typedef xpcc::stm32::Clock C;
@@ -51,7 +51,7 @@ namespace xpcc
 		 * enablePll(C::PllSource::PLL_HSI, 8, 168);	// for STM32F4xx
 		 * switchToPll();
 		 * \endcode
-		 * 
+		 *
 		 * For using an external crystal with 8 MHz use:
 		 * \code
 		 * typedef xpcc::stm32::Clock C;
@@ -72,7 +72,7 @@ namespace xpcc
 		 *     switchToPll();
 		 * }
 		 * \endcode
-		 * 
+		 *
 		 * \ingroup	stm32f2_4
 		 */
 		class ClockTree
@@ -157,13 +157,13 @@ namespace xpcc
 %% if target is stm32f2 or target is stm32f4
 			/**
 			 * Enable PLL.
-			 * 
+			 *
 			 * \code
 			 * VCO input frequency = PLL input clock frequency / PLLM [with 2 ≤ PLLM ≤ 63]
 			 * VCO output frequency = VCO input frequency × PLLN [with 64 ≤ PLLN ≤ 432]
 			 * \endcode
-			 * 
-			 * \param	source 
+			 *
+			 * \param	source
 			 * 		Source select for PLL and for plli2s. If you are using
 			 * 		HSE you must enable it first (see enableHse()).
 			 *
@@ -173,16 +173,16 @@ namespace xpcc
 			 *		The software has to set these bits correctly to ensure
 			 *		that frequency of selected source divided by pllM
 			 *		is in ranges from 1 to 2 MHz.
-			 * 
+			 *
 			 * \param	pllN
 			 * 		Main PLL (PLL) multiplication factor for VCO (with 64 ≤ pllN ≤ 432).
 			 * 		The software has to set these bits correctly to ensure
 			 * 		that the VCO output frequency is
 			 * 		 - 336 MHz for ST32F4. Core will run at 168 MHz.
 			 *		 - 240 MHz for ST32F2. Core will run at 120 MHz.
-			 * 
+			 *
 			 * Example:
-			 * 
+			 *
 			 */
 			static inline void
 			enablePll(PllSource source, uint8_t pllM,

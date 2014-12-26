@@ -229,8 +229,8 @@ class DeviceFile:
 		per_dir = os.path.join(platform_path, 'peripheral')
 		for peripheral in [p for p in os.listdir(per_dir) if os.path.isdir(os.path.join(per_dir, p))]:
 			name_dir = os.path.join(per_dir, peripheral)
-			for name in [n for n in os.listdir(name_dir) if os.path.isdir(os.path.join(name_dir, n)) and n == 'software']:
-				d = Driver(self, et.Element('driver', {'type': peripheral, 'name': 'software'}))
+			for name in [n for n in os.listdir(name_dir) if os.path.isdir(os.path.join(name_dir, n)) and n == 'generic']:
+				d = Driver(self, et.Element('driver', {'type': peripheral, 'name': 'generic'}))
 				if d.appliesTo(s, self.properties):
 					substitutions = s.getTargetDict()
 					substitutions.update(self.getSubstitutions())

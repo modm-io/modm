@@ -3,6 +3,5 @@
 <rca version="1.0">
 	<driver type="clock" name="avr">
         <static>static.hpp</static>
-		<static>../common/common_clock.hpp</static>
 	</driver>
 </rca>

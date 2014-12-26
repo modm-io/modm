@@ -28,7 +28,7 @@
  */
 // ----------------------------------------------------------------------------
 
-%%	import '../common/static.macros' as static with context
+%%	import '../generic/static.macros' as static with context
 
 #ifndef XPCC_STM32__STATIC_HPP
 #define XPCC_STM32__STATIC_HPP
@@ -36,7 +36,7 @@
 #include <stdint.h>		// uint32_t
 #include "../../../device.hpp"
 #include "../../../type_ids.hpp"
-#include "../common/common_clock.hpp"
+#include "../generic/common_clock.hpp"
 #include "pll_calculator.hpp"
 #include "clock.hpp"
 

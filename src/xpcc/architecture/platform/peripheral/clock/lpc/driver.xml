@@ -6,6 +6,5 @@
 		<template>clock.cpp.in</template>
 		<template>clock.hpp.in</template>
 		<static>pll_calculator.hpp</static>
-		<static>../common/common_clock.hpp</static>
 	</driver>
 </rca>
