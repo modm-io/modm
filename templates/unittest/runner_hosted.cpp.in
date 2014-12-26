@@ -6,7 +6,7 @@
 #include <unittest/controller.hpp>
 
 #include <xpcc/debug/logger.hpp>
-#include <xpcc/architecture/platform/hosted.hpp>
+#include <xpcc/architecture/platform.hpp>
 
 xpcc::pc::Terminal outputDevice;
 
@@ -35,11 +35,11 @@ main(void)
 {
 	unittest::Reporter reporter(outputDevice);
 	unittest::Controller::instance().setReporter(reporter);
-	
+
 	// run tests
 ${tests}
-	
+
 	unittest::Controller::instance().getReporter().printSummary();
-	
+
 	return 0;
 }
