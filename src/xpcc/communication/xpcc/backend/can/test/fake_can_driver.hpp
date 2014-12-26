@@ -31,7 +31,6 @@
 #ifndef FAKE_CAN_DRIVER_HPP
 #define FAKE_CAN_DRIVER_HPP
 
-#include <xpcc/communication/can/message.hpp>
 #include <xpcc/container/linked_list.hpp>
 #include <xpcc/architecture/peripheral/can.hpp>
 
