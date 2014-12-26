@@ -8,11 +8,13 @@ namespace bitmap
 {
 	/**
 	 * \brief	Generated bitmap
-	 * 
+	 *
 	 * Generated from file "src/xpcc/ui/display/image/home_16x16.pbm".
-	 * 
+	 *
 	 * - Width  : 16
 	 * - Height : 16
+	 *
+	 * @ingroup	image
 	 */
 	EXTERN_FLASH_STORAGE(uint8_t home_16x16[]);
 }

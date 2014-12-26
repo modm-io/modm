@@ -29,7 +29,9 @@
 // ----------------------------------------------------------------------------
 /**
  * \ingroup		graphics
- * \defgroup	image	Images for graphical displays
+ * \defgroup	image	Images
+ *
+ * Images are generated out of PBM format, see \c tools/bitmap.
  */
 
 #include "image/logo_xpcc_90x64.hpp"
