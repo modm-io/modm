@@ -28,8 +28,8 @@
  */
 // ----------------------------------------------------------------------------
 /**
- * \defgroup	lcd		LCD
- * \brief		Liquid crystal display
+ * \defgroup	display		Displays
+ * \brief		Drivers to transfer bitmaps onto displays.
  *
  * \ingroup		driver
  */

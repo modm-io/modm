@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -39,22 +39,22 @@ namespace xpcc
 {
 	/**
 	 * \brief	Driver for KS0108 based LC-displays
-	 * 
+	 *
 	 * One KS0108 can control 64x64 pixels. Therefore two chips are needed
 	 * for a normal 128x64 pixel display. One chip controls the left half, the
 	 * other the right half (see PIN_CS1 and PIN_CS2).
-	 * 
+	 *
 	 * \tparam	E		Enable Pin
 	 * \tparam	RW		Read/Write-Select Pin (Low = write, High = read)
 	 * \tparam	RS		Command/Data-Select Pin
 	 * 					(Low = instruction, High = data)
 	 * \tparam	PIN_CS1	Chip-Select 1
-	 * \tparam	PIN_CS2	Chip-Select 2 
+	 * \tparam	PIN_CS2	Chip-Select 2
 	 * \tparam	PORT	Needs to be a 8-Bit Port. See xpcc::gpio::Port() or
 	 * 					GPIO__PORT() for more details.
-	 * 
+	 *
 	 * \author	Fabian Greif
-	 * \ingroup	lcd
+	 * \ingroup	display
 	 */
 	template < typename E, typename RW, typename RS,
 			   typename PIN_CS1, typename PIN_CS2, typename PORT >
@@ -66,59 +66,59 @@ namespace xpcc
 		 */
 		void
 		initialize();
-		
+
 		/**
 		 * \brief	Update the display with the content of the RAM buffer
 		 */
 		virtual void
 		update();
-		
+
 	protected:
 		// Timing constants form the datasheet
 		static constexpr float DATA_SET_UP_TIME = 0.14f;
 		static constexpr float MIN_E_HIGH_TIME = 0.45f;
 		static constexpr float MIN_E_LOW_TIME = 0.45f;
-		
+
 	protected:
 		/// Write one byte (Sets RW and E)
 		void
 		writeByte(uint8_t data);
-		
+
 		/// Read one byte (Sets RW and E)
 		uint8_t
 		readByte();
-		
+
 		/**
 		 * \brief	Wait until the busy flag is cleared
-		 * 
+		 *
 		 * To avoid a complete blocking of the microcontroller the waiting
 		 * will be aborted after approximately 60µs.
 		 */
 		void
 		waitBusy();
-		
+
 		/// Sets RS (= data) and calls writeByte()
 		void
 		writeData(uint8_t data);
-		
+
 		/// Clears RS (= instruction) and calls writeByte()
 		void
 		writeCommand(uint8_t command);
-		
+
 		inline void
 		selectLeftChip()
 		{
 			cs1.set();
 			cs2.reset();
 		}
-		
+
 		inline void
 		selectRightChip()
 		{
 			cs1.reset();
 			cs2.set();
 		}
-		
+
 		E e;
 		RW rw;
 		RS rs;

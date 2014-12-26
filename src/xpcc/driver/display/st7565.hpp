@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -40,9 +40,9 @@ namespace xpcc
 {
 	/**
 	 * \brief	Driver for ST7565 based LC-displays
-	 * 
+	 *
 	 * \author	Fabian Greif
-	 * \ingroup	lcd
+	 * \ingroup	display
 	 */
 	template <typename SPI, typename CS, typename A0, typename Reset,
 			  unsigned int Width, unsigned int Height, bool TopView>
@@ -52,21 +52,21 @@ namespace xpcc
 		virtual ~St7565()
 		{
 		}
-		
+
 		/**
 		 * \brief	Update the display with the content of the RAM buffer
 		 */
 		virtual void
 		update();
-		
+
 		/// Invert the display content
 		void
 		setInvert(bool invert);
-		
+
 	protected:
 		ALWAYS_INLINE void
 		initialize(xpcc::accessor::Flash<uint8_t> configuration, uint8_t size);
-		
+
 		SPI spi;
 		CS cs;
 		A0 a0;

@@ -2,10 +2,10 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2013, Roboterclub Aachen e.V.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -38,33 +38,34 @@ namespace xpcc
 {
 	/**
 	 * TFT display connected to a 16 bit parallel bus
-	 * 
+	 *
 	 * Supports (among others) the following displays:
 	 * - WaveShare 3,2" TFT (Model B), Controller SSD1289
-	 * 
+	 *
 	 * @author	Fabian Greif
+	 * @ingroup	display
 	 */
 	template <typename INTERFACE>
 	class ParallelTft : public GraphicDisplay
 	{
 	public:
 		ParallelTft(INTERFACE& interface);
-		
+
 		void
 		initialize();
-		
+
 		// see GraphicDisplay::getWidth()
 		virtual uint16_t
 		getWidth() const;
-	
+
 		// see GraphicDisplay::getHeight()
 		virtual uint16_t
 		getHeight() const;
-	
+
 		// set GraphicDisplay::clear()
 		virtual void
 		clear();
-		
+
 		/**
 		 * Not used here as all operations are performed directly
 		 * on the display.
@@ -73,7 +74,7 @@ namespace xpcc
 		update()
 		{
 		}
-		
+
 	private:
 		enum class Device
 		{
@@ -86,28 +87,28 @@ namespace xpcc
 			ST7781,		// device code = 0x7783
 			LGDP4531,	// device code = 0x4531
 			SPFD5408B,	// device code = 0x5408
-			R61505U,	// device code = 0x1505 or 0x0505	   
+			R61505U,	// device code = 0x1505 or 0x0505
 			//HX8347D,	// device code = 0x0047
-			//HX8347A,	// device code = 0x0047	
-			LGDP4535,	// device code = 0x4535  
+			//HX8347A,	// device code = 0x0047
+			LGDP4535,	// device code = 0x4535
 			//SSD2119,	// 3.5 LCD, device code = 0x9919
 		};
-		
+
 		virtual void
 		setPixel(int16_t x, int16_t y);
-		
+
 		virtual void
 		clearPixel(int16_t x, int16_t y);
-		
+
 		virtual bool
 		getPixel(int16_t x, int16_t y);
-		
+
 		void
 		writeCursor(uint16_t x, uint16_t y);
-		
+
 		void
 		writeRegister(uint16_t reg, uint16_t value);
-		
+
 		INTERFACE& interface;
 		Device deviceCode;
 	};

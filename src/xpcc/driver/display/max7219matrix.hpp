@@ -23,6 +23,9 @@ namespace xpcc
  * @tparam	DRIVERS	Number of chips in daisy chain
  *
  * An arbitrary number of these chips can be daisy-chained
+ *
+ * @author	strongly-typed
+ * @ingroup	display
  */
 template < typename SPI, typename CS, uint8_t MODULES = 1 >
 class Max7219

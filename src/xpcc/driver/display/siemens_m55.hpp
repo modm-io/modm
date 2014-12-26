@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -42,7 +42,7 @@ namespace xpcc
 	 *
 	 * (also shared with A60, A65, C60, MC60 and S55 models)
 	 *
-	 * \ingroup	lcd
+	 * \ingroup	display
 	 */
 	template <typename SPI, typename CS, typename RS, typename Reset>
 	class SiemensM55 : public BufferedGraphicDisplay<101, 80>
