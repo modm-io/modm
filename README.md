@@ -46,8 +46,8 @@ We recommend cloning the source code using Git:
 Use our virtual machine
 -----------------------
 
-We configured a [headless virtual machine][rca-vm] for VirtualBox, which is 
-managed using Vagrant and contains all software required for compiling xpcc.
+We configured a [headless virtual machine][rca-vm] for VirtualBox (size: ~1.2GB), which
+is managed using Vagrant and contains all software required for compiling xpcc.
 
 If you do not want to install the compiler and build system tools on you computer,
 or you run a OS for which these tools are not available (Windows), you can install
