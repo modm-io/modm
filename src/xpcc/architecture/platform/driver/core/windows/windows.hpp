@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -27,11 +27,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
-/**
- * \ingroup		hosted
- * \defgroup	windows	Windows
- * 
- */
 
 #ifndef XPCC__WINDOWS_HPP
 #define XPCC__WINDOWS_HPP
@@ -39,10 +34,10 @@
 /**
  * \internal
  * \file	windows.hpp
- * 
+ *
  * Provides some defines and functions which are missing in a default
  * windows environment.
- * 
+ *
  * \ingroup	windows
  */
 #include <ciso646>
@@ -88,7 +83,7 @@
 #ifndef __DBL_MAX__
 #define	__DBL_MAX__			1.79769e+308
 #endif
-	
+
 #ifndef __DBL_EPSILON__
 #define	__DBL_EPSILON__		2.2204460492503131e-16
 #endif
