@@ -26,7 +26,7 @@ struct Nrf24Register
 		W_TX_PAYLOAD_NOACK  = 0b10110000,   ///< 1 - 32 data bytes
 		NOP                 = 0b11111111    ///<      0 data bytes
 	};
-	REGISTER8(Command);
+	XPCC_FLAGS8(Command);
 
 	enum class
 	Pipe : uint8_t
@@ -39,7 +39,7 @@ struct Nrf24Register
 		PIPE_5 = 0b101,
 		//PIPE_6 = 0b110    // TODO: check if this is legal, data sheet says it isn't ...
 	};
-	REGISTER8(Pipe);
+	XPCC_FLAGS8(Pipe);
 
 	enum class
 	NrfRegister : uint8_t
@@ -71,13 +71,13 @@ struct Nrf24Register
 		DYNPD = 0x1c,           ///< Enable dynamic payload length
 		FEATURE = 0x1d          ///< Feature Register
 	};
-	REGISTER8(NrfRegister);
+	XPCC_FLAGS8(NrfRegister);
 
 	/* Not every element possible is legal, please refer to RawCommand or to
 	 * data sheet on page 51. Only certain RawCommands have to be combined with
 	 * a register or pipe.
 	 */
-	//REGISTER8_GROUP(Command, RawCommand, Register, Pipe);
+	//XPCC_FLAGS_GROUP(Command_t, RawCommand_t, Register_t, Pipe_t);
 
 
 	/* Register defintions */
@@ -93,7 +93,7 @@ struct Nrf24Register
 		MASK_TX_DS   = Bit5,
 		MASK_RX_DR   = Bit6
 	};
-	REGISTER8(Config);
+	XPCC_FLAGS8(Config);
 
 	enum class
 	EnAA : uint8_t
@@ -105,7 +105,7 @@ struct Nrf24Register
 		ENAA_P4 = Bit4,
 		ENAA_P5 = Bit5
 	};
-	REGISTER8(EnAA);
+	XPCC_FLAGS8(EnAA);
 
 	enum class
 	EnRxAddr : uint8_t
@@ -117,14 +117,14 @@ struct Nrf24Register
 		ERX_P4 = Bit4,
 		ERX_P5 = Bit5
 	};
-	REGISTER8(EnRxAddr);
+	XPCC_FLAGS8(EnRxAddr);
 
 	enum class
 	SetupAw : uint8_t
 	{
 		AW = Bit0 | Bit1
 	};
-	REGISTER8(SetupAw);
+	XPCC_FLAGS8(SetupAw);
 
 	enum class
 	SetupRetr : uint8_t
@@ -132,14 +132,14 @@ struct Nrf24Register
 		ARC = Bit0 | Bit1 | Bit2 | Bit3,
 		ARD = Bit4 | Bit5 | Bit6 | Bit7
 	};
-	REGISTER8(SetupRetr);
+	XPCC_FLAGS8(SetupRetr);
 
 	enum class
 	RfCh : uint8_t
 	{
 		RF_CH = Bit0 | Bit1 | Bit2 | Bit3 | Bit4 | Bit5 | Bit6
 	};
-	REGISTER8(RfCh);
+	XPCC_FLAGS8(RfCh);
 
 	enum class
 	RfSetup : uint8_t
@@ -150,7 +150,7 @@ struct Nrf24Register
 		RF_DR_LOW    = Bit5,
 		CONT_WAVE    = Bit7
 	};
-	REGISTER8(RfSetup);
+	XPCC_FLAGS8(RfSetup);
 
 	enum class
 	Status : uint8_t
@@ -161,7 +161,7 @@ struct Nrf24Register
 		TX_DS    = Bit5,
 		RX_DR    = Bit6
 	};
-	REGISTER8(Status);
+	XPCC_FLAGS8(Status);
 
 	enum class
 	ObserveTx : uint8_t
@@ -169,56 +169,56 @@ struct Nrf24Register
 		ARC_CNT  = Bit0 | Bit1 | Bit2 | Bit3,
 		PLOS_CNT = Bit4 | Bit5 | Bit6 | Bit7
 	};
-	REGISTER8(ObserveTx);
+	XPCC_FLAGS8(ObserveTx);
 
 	enum class
 	Rpd : uint8_t
 	{
 		RPD = Bit0
 	};
-	REGISTER8(Rpd);
+	XPCC_FLAGS8(Rpd);
 
 	enum class
 	RxPwP0 : uint8_t
 	{
 		RX_PW_P0 = Bit0 | Bit1 | Bit2 | Bit3 | Bit4 | Bit5
 	};
-	REGISTER8(RxPwP0);
+	XPCC_FLAGS8(RxPwP0);
 
 	enum class
 	RxPwP1 : uint8_t
 	{
 		RX_PW_P1 = Bit0 | Bit1 | Bit2 | Bit3 | Bit4 | Bit5
 	};
-	REGISTER8(RxPwP1);
+	XPCC_FLAGS8(RxPwP1);
 
 	enum class
 	RxPwP2 : uint8_t
 	{
 		RX_PW_P2 = Bit0 | Bit1 | Bit2 | Bit3 | Bit4 | Bit5
 	};
-	REGISTER8(RxPwP2);
+	XPCC_FLAGS8(RxPwP2);
 
 	enum class
 	RxPwP3 : uint8_t
 	{
 		RX_PW_P3 = Bit0 | Bit1 | Bit2 | Bit3 | Bit4 | Bit5
 	};
-	REGISTER8(RxPwP3);
+	XPCC_FLAGS8(RxPwP3);
 
 	enum class
 	RxPwP4 : uint8_t
 	{
 		RX_PW_P4 = Bit0 | Bit1 | Bit2 | Bit3 | Bit4 | Bit5
 	};
-	REGISTER8(RxPwP4);
+	XPCC_FLAGS8(RxPwP4);
 
 	enum class
 	RxPwP5 : uint8_t
 	{
 		RX_PW_P5 = Bit0 | Bit1 | Bit2 | Bit3 | Bit4 | Bit5
 	};
-	REGISTER8(RxPwP5);
+	XPCC_FLAGS8(RxPwP5);
 
 	enum class
 	FifoStatus : uint8_t
@@ -229,7 +229,7 @@ struct Nrf24Register
 		TX_FULL  = Bit5,
 		TX_REUSE = Bit6
 	};
-	REGISTER8(FifoStatus);
+	XPCC_FLAGS8(FifoStatus);
 
 	enum class
 	DynPd : uint8_t
@@ -241,7 +241,7 @@ struct Nrf24Register
 		DPL_P4 = Bit4,
 		DPL_P5 = Bit5
 	};
-	REGISTER8(DynPd);
+	XPCC_FLAGS8(DynPd);
 
 	enum class
 	Feature : uint8_t
@@ -250,10 +250,10 @@ struct Nrf24Register
 		EN_ACK_PAY   = Bit1,
 		EN_DPL       = Bit2
 	};
-	REGISTER8(Feature);
+	XPCC_FLAGS8(Feature);
 
-	REGISTER8_GROUP(Flags, Feature, DynPd, FifoStatus, Rpd, ObserveTx, Status,
-					RfSetup, SetupRetr, SetupAw, EnRxAddr, EnAA, Config);
+	XPCC_FLAGS_GROUP(Flags_t, Feature_t, DynPd_t, FifoStatus_t, Rpd_t, ObserveTx_t, Status_t,
+					RfSetup_t, SetupRetr_t, SetupAw_t, EnRxAddr_t, EnAA_t, Config_t);
 };
 
 }   // namespace xpcc

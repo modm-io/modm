@@ -135,7 +135,7 @@ public:
 		VFILT = Bit2,	///< Vector filter enable/disable.
 		STRT = Bit0,	///< Soft reset bit.
 	};
-	REGISTER8(Control3);
+	XPCC_FLAGS8(Control3);
 
 	/// CTRL_REG4 default value is 0x07
 	enum class
@@ -152,7 +152,7 @@ public:
 		YEN = Bit1,		///< Y axis enable
 		XEN = Bit0,		///< X axis enable
 	};
-	REGISTER8(Control4);
+	XPCC_FLAGS8(Control4);
 
 
 	/// CTRL_REG5 default value is 0x00
@@ -172,7 +172,7 @@ public:
 
 		SIM = Bit0,		///< PI serial interface mode selection.
 	};
-	REGISTER8(Control5);
+	XPCC_FLAGS8(Control5);
 
 	/// CTRL_REG6 default value is 0x00
 	enum class
@@ -187,7 +187,7 @@ public:
 		P1_OVERRUN = Bit1,	///< FIFO overrun interrupt on int1.
 		P2_BOOT = Bit0,		///< PI serial interface mode selection.
 	};
-	REGISTER8(Control6);
+	XPCC_FLAGS8(Control6);
 
 	/// STATUS is read-only
 	enum class
@@ -202,7 +202,7 @@ public:
 		YDA = Bit1,		///< Y axis new data available.
 		XDA = Bit0,		///< X axis new data available.
 	};
-	REGISTER8(Status);
+	XPCC_FLAGS8(Status);
 
 	/// STAT is read-only
 	enum class
@@ -217,7 +217,7 @@ public:
 		DOR = Bit1,		///< Data overrun indicates not read data from output register when next data samples measure start;
 		DRDY = Bit0,	///< data ready from output register
 	};
-	REGISTER8(IntStatus);
+	XPCC_FLAGS8(IntStatus);
 
 	/// FIFO_CTRL default value is 0x00
 	enum class
@@ -234,7 +234,7 @@ public:
 		WTMP0 = Bit0,
 		WTMP_Mask = Bit4 | Bit3 | Bit2 | Bit1 | Bit0,
 	};
-	REGISTER8(FifoControl);
+	XPCC_FLAGS8(FifoControl);
 
 	/// FIFO_SRC is read-only
 	enum class
@@ -251,7 +251,7 @@ public:
 		FSS0 = Bit0,
 		FSS_Mask = Bit4 | Bit3 | Bit2 | Bit1 | Bit0,
 	};
-	REGISTER8(FifoSource);
+	XPCC_FLAGS8(FifoSource);
 
 public:
 	/// MASK1_A, MASK1_B, MASK2_A, MASK2_B, OUTS1, OUTS2
@@ -270,7 +270,7 @@ public:
 		P_V = Bit1,
 		N_V = Bit0,
 	};
-	REGISTER8(AxisSign);
+	XPCC_FLAGS8(AxisSign);
 
 	/// CTRL_REG1, CTRL_REG2
 	enum class
@@ -285,7 +285,7 @@ public:
 
 		SM_EN = Bit0,
 	};
-	REGISTER8(SmControl);
+	XPCC_FLAGS8(SmControl);
 
 	/// SETT1, SETT2
 	enum class
@@ -299,10 +299,10 @@ public:
 		R_TAM = Bit1,
 		SITR = Bit0,
 	};
-	REGISTER8(Sett);
+	XPCC_FLAGS8(Sett);
 
-	REGISTER8_GROUP(Control,
-			SmControl, Control3, Control4, Control5, Control6);
+	XPCC_FLAGS_GROUP(Control_t,
+			SmControl_t, Control3_t, Control4_t, Control5_t, Control6_t);
 
 public:
 

@@ -50,7 +50,7 @@ protected:
 		ThermostatMode = 0x02,
 		ShutdownMode = 0x02,
 	};
-	REGISTER8(Config1);
+	XPCC_FLAGS8(Config1);
 
 	enum class
 	Config2 : uint8_t
@@ -63,10 +63,10 @@ protected:
 		ConversionRate8Hz = 0xc0,
 		ConversionRateMask = 0xc0,
 	};
-	REGISTER8(Config2);
+	XPCC_FLAGS8(Config2);
 
-	REGISTER8_GROUP(Register,
-			Config1, Config2);
+	XPCC_FLAGS_GROUP(Register_t,
+			Config1_t, Config2_t);
 
 	static constexpr uint8_t
 	i(Register reg) { return uint8_t(reg); }

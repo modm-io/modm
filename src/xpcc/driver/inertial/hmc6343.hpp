@@ -99,7 +99,7 @@ public:
 		UprightEdgeOrientation = Bit1,	///< Upright Edge Orientation if set.
 		LevelOrientation = Bit0,		///< Level Orientation if set
 	};
-	REGISTER8(OperationMode);
+	XPCC_FLAGS8(OperationMode);
 
 	enum class
 	MeasurementRate : uint8_t

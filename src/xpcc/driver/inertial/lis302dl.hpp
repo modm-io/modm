@@ -72,7 +72,7 @@ public:
 		Yen = Bit1,		///< Y axis enable. (0: Y axis disabled; 1: Y axis enabled)
 		Xen = Bit0,		///< X axis enable. (0: X axis disabled; 1: X axis enabled)
 	};
-	REGISTER8(Control1);
+	XPCC_FLAGS8(Control1);
 
 	/// CTRL_REG2 default value is 0x00
 	enum class
@@ -87,7 +87,7 @@ public:
 		HP_COEFF2 = Bit1,	///< High pass filter cut-off frequency configuration.
 		HP_COEFF1 = Bit0,	///< High pass filter cut-off frequency configuration.
 	};
-	REGISTER8(Control2);
+	XPCC_FLAGS8(Control2);
 
 	/// CTRL_REG3 default value is 0x00
 	enum class
@@ -104,10 +104,10 @@ public:
 		I1CFG1 = Bit1,	///< Data Signal on Int1 pad control bits.
 		I1CFG0 = Bit0,	///< Data Signal on Int1 pad control bits.
 	};
-	REGISTER8(Control3);
+	XPCC_FLAGS8(Control3);
 
-	REGISTER8_GROUP(Control,
-			Control1, Control2, Control3);
+	XPCC_FLAGS_GROUP(Control_t,
+			Control1_t, Control2_t, Control3_t);
 
 	/// STATUS_REG default value is 0x00
 	enum class
@@ -123,7 +123,7 @@ public:
 		YDA = Bit1,		///< Y axis new data available.
 		XDA = Bit0,		///< X axis new data available.
 	};
-	REGISTER8(Status);
+	XPCC_FLAGS8(Status);
 
 	/// FF_WU_CFG default value is 0x00
 	enum class
@@ -138,7 +138,7 @@ public:
 		XHIE = Bit1,	///< Enable interrupt generation on X high event.
 		XLIE = Bit0,	///< Enable interrupt generation on X low event.
 	};
-	REGISTER8(FreeFallConfig);
+	XPCC_FLAGS8(FreeFallConfig);
 
 	/// FF_WU_SRC default value is 0x00
 	enum class
@@ -152,7 +152,7 @@ public:
 		XH = Bit1,	///< X high.
 		XL = Bit0,	///< X low.
 	};
-	REGISTER8(FreeFallSource);
+	XPCC_FLAGS8(FreeFallSource);
 
 	/// FF_WU_THS default value is 0x00
 	enum class
@@ -161,7 +161,7 @@ public:
 		DRCM = Bit7,		///< Resetting mode selection.
 		THS_Mask = 0x7F,	///< Free-fall / wake-up Threshold.
 	};
-	REGISTER8(FreeFallThreshold);
+	XPCC_FLAGS8(FreeFallThreshold);
 
 	/// CLOCK_CFG default value is 0x00
 	enum class
@@ -175,7 +175,7 @@ public:
 		DoubleX = Bit1,
 		SingleX = Bit0,
 	};
-	REGISTER8(ClickConfig);
+	XPCC_FLAGS8(ClickConfig);
 
 	/// CLOCK_SRC default value is 0x00
 	enum class
@@ -189,12 +189,12 @@ public:
 		DoubleX = Bit1,
 		SingleX = Bit0,
 	};
-	REGISTER8(ClickSource);
+	XPCC_FLAGS8(ClickSource);
 
-	REGISTER8_GROUP(Register,
-			Control1, Control2, Control3, Status,
-			FreeFallConfig, FreeFallSource, FreeFallThreshold,
-			ClickConfig, ClickSource);
+	XPCC_FLAGS_GROUP(Register_t,
+			Control1_t, Control2_t, Control3_t, Status_t,
+			FreeFallConfig_t, FreeFallSource_t, FreeFallThreshold_t,
+			ClickConfig_t, ClickSource_t);
 
 public:
 	enum class
