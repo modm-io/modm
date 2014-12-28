@@ -128,7 +128,10 @@
  * $arm-none-eabi-g++ -dM -E -mcpu=cortex-m0 -mthumb -D__ARM_LPC1114_301__ -D__ARM_LPC11XX__ - < /dev/null
  */
 
-#if defined __GNUC__
+#if defined __clang__
+#	define XPCC__COMPILER_STRING	"Clang"
+#	define XPCC__COMPILER_CLANG 1
+#elif defined __GNUC__
 #	define XPCC__COMPILER_STRING	"Gnu GCC"
 #	define XPCC__COMPILER_GCC 1
 #endif
