@@ -218,16 +218,19 @@ def platform_tools_generate(env, architecture_path):
 			os.remove(tar)
 	sub = {'include_path': platform_include_path}
 	env.Template(target = tar, source = src, substitutions = sub)
+
 	# Show SCons how to build the drivers.hpp.in file:
 	src = os.path.join(platform_path, 'drivers.hpp.in')
 	tar = os.path.join(generated_path, 'drivers.hpp')
 	sub = {'drivers': driver_list}
 	env.Jinja2Template(target = tar, source = src, substitutions = sub)
+
 	# Show SCons how to build device.hpp.in file:
 	src = os.path.join(platform_path, 'device.hpp.in')
 	tar = os.path.join(generated_path, 'device.hpp')
 	sub = {'headers': device_headers}
 	env.Jinja2Template(target = tar, source = src, substitutions = sub)
+
 	# Show SCons how to build type_ids.hpp.in file:
 	src = os.path.join(platform_path, 'type_ids.hpp.in')
 	tar = os.path.join(generated_path, 'type_ids.hpp')

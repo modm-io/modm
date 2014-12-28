@@ -100,11 +100,5 @@ def generate(env, **kw):
 			"-Woverloaded-virtual",
 		]
 
-	# Show SCons how to build the architecture/platform.hpp file:
-	# this file needs to be generated in order for hosted to be included correctly
-	src = os.path.join(env['XPCC_LIBRARY_PATH'], 'xpcc', 'architecture', 'platform', 'platform.hpp.in')
-	tar = os.path.join(env['XPCC_LIBRARY_PATH'], 'xpcc', 'architecture', 'platform.hpp')
-	env.Template(target = tar, source = src, substitutions = {'include_path': "platform/hosted.hpp"})
-
 def exists(env):
 	return env.Detect('g++')
