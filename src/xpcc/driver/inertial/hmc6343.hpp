@@ -26,10 +26,13 @@ struct hmc6343
 		SoftwareVersion = 0x02,		///< Software Version Number
 		OperationMode1 = 0x04,		///< Operation Mode Register 1
 		OperationMode2 = 0x05,		///< Operation Mode Register 2
+		/// @cond
 		DeviceSerialLsb = 0x06,		///< Device Serial Number
 		DeviceSerialMsb = 0x07,		///< Device Serial Number
+		/// @endcond
 		DateCodeYear = 0x08,		///< Package Date Code: Last two digits of the year
 		DateCodeWeek = 0x09,		///< Package Date Code: Fiscal Week
+		/// @cond
 		DeviationAngleLsb = 0x0A,	///< Deviation Angle (+-1800) in tenth of a degree
 		DeviationAngleMsb = 0x0B,	///< Deviation Angle (+-1800) in tenth of a degree
 		VariationAngleLsb = 0x0C,	///< Variation Angle (+-1800) in tenth of a degree
@@ -40,8 +43,8 @@ struct hmc6343
 		Y_OffsetMsb = 0x11,			///< Hard-Iron Calibration Offset for the Y-axis
 		Z_OffsetLsb = 0x12,			///< Hard-Iron Calibration Offset for the Z-axis
 		Z_OffsetMsb = 0x13,			///< Hard-Iron Calibration Offset for the Z-axis
-		FilterLsb = 0x14,			///< Heading IIR Filter (0x00 to 0x0F typical)
-		FilterMsb = 0x15,			///< Heading IIR Filter (set at zero)
+		/// @endcond
+		Filter = 0x14,				///< Heading IIR Filter (0x00 to 0x0F typical)
 	};
 
 	enum class
@@ -56,6 +59,7 @@ struct hmc6343
 	};
 
 protected:
+	/// @cond
 	enum class
 	Command : uint8_t
 	{
@@ -77,6 +81,7 @@ protected:
 		ReadEeprom = 0xE1,
 		WriteEeprom = 0xF1,
 	};
+	/// @endcond
 
 public:
 	enum class
@@ -154,17 +159,13 @@ public:
 		getTemperature() { return swapData(9); }
 
 		/// returns the value of the operation mode register
-		uint8_t ALWAYS_INLINE
-		getOperationMode() { return data[20]; }
+		OperationMode_t ALWAYS_INLINE
+		getOperationMode() { return OperationMode_t(data[20]); }
 
 
 		inline int16_t
 		operator [](size_t index)
 		{ return (index < 10) ? swapData(index) : 0; }
-
-		ALWAYS_INLINE uint8_t*
-		getPointer()
-		{ return data; }
 
 	private:
 		uint8_t data[21];
@@ -178,8 +179,7 @@ public:
 	};
 
 protected:
-	/// @{
-	/// @private enum class to integer helper functions.
+	/// @cond
 	static constexpr uint8_t
 	i(Command command) { return uint8_t(command); }
 	static constexpr uint8_t
@@ -190,7 +190,7 @@ protected:
 	i(Orientation orientation) { return uint8_t(orientation); }
 	static constexpr uint8_t
 	i(MeasurementRate rate) { return uint8_t(rate); }
-	/// @}
+	/// @endcond
 }; // struct hmc6343
 
 /**
@@ -246,7 +246,7 @@ public:
 	/// sets a new IIR filter in eeprom
 	xpcc::co::Result<bool> ALWAYS_INLINE
 	setIIR_Filter(void *ctx, uint8_t filter)
-	{ return writeRegister(ctx, Register::FilterLsb, filter & 0x0f); }
+	{ return writeRegister(ctx, Register::Filter, filter & 0x0f); }
 
 
 
@@ -323,6 +323,8 @@ public:
 	{ return readPostData(ctx, Command::PostTiltData, 14, 6); }
 
 
+	/// @{
+	/// Use these methods with caution!
 
 	// RAW REGISTER ACCESS
 	/// write a 8bit value into the eeprom
@@ -341,6 +343,7 @@ public:
 	xpcc::co::Result<bool>
 	readRegister(void *ctx, Register16 reg, uint16_t &value);
 
+	/// @}
 
 public:
 	/// the data object for this sensor.
