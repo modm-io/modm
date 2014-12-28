@@ -22,6 +22,7 @@ namespace xpcc
 struct ssd1306
 {
 protected:
+	/// @cond
 	enum Command : uint8_t
 	{
 		// fundamental commands
@@ -67,6 +68,7 @@ protected:
 		SetV_DeselectLevel = 0xDB,
 		Nop = 0xE3,
 	};
+	/// @endcond
 
 public:
 	enum class
@@ -104,13 +106,12 @@ public:
 	};
 
 protected:
-	/// @{
-	/// @private enum class to integer helper functions.
+	/// @cond
 	static constexpr uint8_t
 	i(ScrollDirection direction) { return uint8_t(direction); }
 	static constexpr uint8_t
 	i(ScrollStep step) { return uint8_t(step); }
-	/// @}
+	/// @endcond
 }; // struct ssd1306
 
 
