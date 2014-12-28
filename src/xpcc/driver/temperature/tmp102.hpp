@@ -66,7 +66,7 @@ protected:
 		Hz4 = Bit7,
 		Hz8 = Bit7 | Bit6,
 	};
-	typedef Configuration< Config2_t, ConversionRate, 2 > ConversionRate_t;
+	typedef Configuration< Config2_t, ConversionRate, (Bit7 | Bit6) > ConversionRate_t;
 
 	XPCC_FLAGS_GROUP(Register_t,
 			Config1_t, Config2_t);
@@ -100,7 +100,7 @@ public:
 	};
 protected:
 	/// @cond
-	typedef Configuration< Config1_t, FaultQueue, 2 > FaultQueue_t;
+	typedef Configuration< Config1_t, FaultQueue, (Bit4 | Bit3) > FaultQueue_t;
 	/// @endcond
 public:
 

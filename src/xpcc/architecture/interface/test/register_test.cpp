@@ -90,6 +90,8 @@ RegisterTest::testOperators()
 	// flags = flags op enum
 	v1 = v2 | Test::B;
 	TEST_ASSERT_EQUALS(v1.value, 0b11);
+	v1 = Test::B | v2;
+	TEST_ASSERT_EQUALS(v1.value, 0b11);
 
 	v1 = v2 & Test::B;
 	TEST_ASSERT_EQUALS(v1.value, 0b00);
@@ -238,6 +240,9 @@ RegisterTest::testConfigurations()
 	Test3_t v1 = Config0(Config::One);
 	TEST_ASSERT_EQUALS(v1.value, 0b01);
 
+	v1 = Direct0(Direct::One);
+	TEST_ASSERT_EQUALS(v1.value, 0b0100);
+
 	v1 = Test3::Bit | Config0(Config::Two);
 	TEST_ASSERT_EQUALS(v1.value, (xpcc::Bit4 | 0b10));
 
@@ -261,6 +266,7 @@ RegisterTest::testConfigurations()
 
 	TEST_ASSERT_EQUALS(Config0::mask(), Test3_t(0b11));
 	TEST_ASSERT_EQUALS(Config2::mask(), Test3_t(0b11 << 2));
+	TEST_ASSERT_EQUALS(Direct0::mask(), Test3_t(0b1100));
 }
 
 void

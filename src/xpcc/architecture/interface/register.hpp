@@ -213,13 +213,12 @@ public:
  * @ingroup	register
  * @author	Niklas Hauser
  */
-template < typename Parent, typename Enum, typename Parent::UnderlyingType Length, typename Parent::UnderlyingType Position = 0 >
+template < typename Parent, typename Enum, typename Parent::UnderlyingType Mask, typename Parent::UnderlyingType Position = 0 >
 struct Configuration : public ::xpcc::Register<typename Parent::UnderlyingType>
 {
 private:
 	typedef typename Parent::UnderlyingType PType;
 	typedef typename Parent::Type PEnum;
-	static constexpr PType Mask = ((1 << Length) - 1) << Position;
 public:
 	explicit constexpr Configuration(PType config) :
 		Register<PType>(config << Position) {}
@@ -232,16 +231,16 @@ public:
 	{	return Parent(Register<PType>::value); }
 
 	static constexpr Enum get(Parent const &parent)
-	{	return Enum((parent.value & Mask) >> Position); }
+	{	return Enum((parent.value & (Mask << Position)) >> Position); }
 
 	static inline void reset(Parent &parent)
-	{	parent.value &= ~Mask; }
+	{	parent.value &= ~(Mask << Position); }
 
 	static inline void set(Parent &parent, Enum config)
-	{	parent.value = (parent.value & ~Mask) | (PType(config) << Position); }
+	{	parent.value = (parent.value & ~(Mask << Position)) | (PType(config) << Position); }
 
 	static constexpr Parent mask()
-	{ return Parent(Mask); }
+	{ return Parent((Mask << Position)); }
 };
 
 }	// namespace xpcc

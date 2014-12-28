@@ -76,8 +76,19 @@ protected:
 	XPCC_TYPE_FLAGS(Test3_t);
 
 	typedef Value< Test3_t, 3, 5 > Address;
-	typedef Configuration< Test3_t, Config, 2, 2 > Config2;
-	typedef Configuration< Test3_t, Config, 2 > Config0;
+	typedef Configuration< Test3_t, Config, 0b11, 2 > Config2;
+	typedef Configuration< Test3_t, Config, 0b11 > Config0;
+
+
+	enum class
+	Direct : uint8_t
+	{
+		Zero = 0b0000,
+		One = 0b0100,
+		Two = 0b1000,
+		Three = 0b1100,
+	};
+	typedef Configuration< Test3_t, Direct, 0b1100 > Direct0;
 
 	typedef Flags8<> Test5_t;
 };
