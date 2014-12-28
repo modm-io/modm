@@ -26,6 +26,7 @@ class Tmp102;
 struct tmp102
 {
 protected:
+	/// @cond
 	enum class
 	Register : uint8_t
 	{
@@ -39,37 +40,40 @@ protected:
 	enum class
 	Config1 : uint8_t
 	{
-		OneShot = 0x80,
-		ResolutionMask = 0x60,
-		FaultQueue1 = 0x00,
-		FaultQueue2 = 0x08,
-		FaultQueue4 = 0x10,
-		FaultQueue6 = 0x18,
-		FaultQueueMask = 0x18,
-		Polarity = 0x04,
-		ThermostatMode = 0x02,
-		ShutdownMode = 0x02,
+		OneShot = Bit7,
+		// Resolution 6:5
+		// Fault Queue 4:3
+		Polarity = Bit2,
+		ThermostatMode = Bit1,
+		ShutdownMode = Bit0,
 	};
 	XPCC_FLAGS8(Config1);
+	typedef Value< Config1_t, 2, 5 > Resolution_t;
 
 	enum class
 	Config2 : uint8_t
 	{
-		ExtendedMode = 0x10,
-		Alert = 0x20,
-		ConversionRate0_25Hz = 0x00,
-		ConversionRate1Hz = 0x40,
-		ConversionRate4Hz = 0x80,
-		ConversionRate8Hz = 0xc0,
-		ConversionRateMask = 0xc0,
+		Alert = Bit5,
+		ExtendedMode = Bit4,
 	};
 	XPCC_FLAGS8(Config2);
+
+	enum class
+	ConversionRate : uint8_t
+	{
+		Hz0_25 = 0,
+		Hz1 = Bit6,
+		Hz4 = Bit7,
+		Hz8 = Bit7 | Bit6,
+	};
+	typedef Configuration< Config2_t, ConversionRate, 2 > ConversionRate_t;
 
 	XPCC_FLAGS_GROUP(Register_t,
 			Config1_t, Config2_t);
 
 	static constexpr uint8_t
 	i(Register reg) { return uint8_t(reg); }
+	/// @endcond
 
 public:
 	enum class
@@ -89,11 +93,16 @@ public:
 	enum class
 	FaultQueue : uint8_t
 	{
-		Faults1 = Config1::FaultQueue1,
-		Faults2 = Config1::FaultQueue2,
-		Faults4 = Config1::FaultQueue4,
-		Faults6 = Config1::FaultQueue6
+		Faults1 = 0,
+		Faults2 = Bit3,
+		Faults4 = Bit4,
+		Faults6 = Bit4 | Bit3
 	};
+protected:
+	/// @cond
+	typedef Configuration< Config1_t, FaultQueue, 2 > FaultQueue_t;
+	/// @endcond
+public:
 
 	struct ATTRIBUTE_PACKED
 	Data
@@ -233,10 +242,11 @@ private:
 	};
 
 	uint8_t buffer[3];
-	Config1_t config_msb;
-	Config2_t config_lsb;
 	xpcc::Timeout<> timeout;
 	uint16_t updateTime;
+
+	Config1_t config_msb;
+	Config2_t config_lsb;
 
 	volatile uint8_t i2cTask;
 	volatile uint8_t i2cSuccess;
