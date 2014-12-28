@@ -15,7 +15,7 @@
 template < typename I2cMaster >
 xpcc::Tmp102<I2cMaster>::Tmp102(Data &data, uint8_t address)
 :	data(data), updateTime(250),
-	config_msb(0), config_lsb(ConversionRate_t(ConversionRate::Hz4).value),
+	config_msb(0), config_lsb(ConversionRate_t(ConversionRate::Hz4)),
 	i2cTask(I2cTask::Idle), i2cSuccess(0), adapter(address, i2cTask, i2cSuccess)
 {
 }

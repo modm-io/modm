@@ -81,8 +81,12 @@ struct Flags : public ::xpcc::Register<T>
 	typedef Enum Type;
 
 	constexpr Flags() {}
+
 	explicit constexpr Flags(T flag) :
 		Register<T>(flag) {}
+	explicit constexpr Flags(Register<T> const &o) :
+		Register<T>(o.value) {}
+
 	constexpr Flags(Enum flag) :
 		Register<T>(T(flag)) {}
 	constexpr Flags(Flags const &o) :
