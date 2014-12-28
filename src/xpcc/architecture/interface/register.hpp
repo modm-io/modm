@@ -12,6 +12,7 @@
 
 #include <stdint.h>
 #include <xpcc/utils/bit_constants.hpp>
+#include <xpcc/architecture/detect.hpp>
 
 /**
  * @ingroup		interface
@@ -52,9 +53,12 @@ struct Register
 	constexpr bool operator!() const
 	{ return value == 0; }
 
+	// GCC is broken here, matches overloads for deleted operators
+#if not (defined XPCC__CPU_HOSTED and XPCC__COMPILER_GCC)
 	// do NOT cast to anything else
-//	template<typename U>
-//	operator U() const = delete;
+	template<typename U>
+	constexpr operator U() const = delete;
+#endif
 	/// @endcond
 
 protected:
