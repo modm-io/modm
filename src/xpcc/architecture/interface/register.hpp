@@ -97,6 +97,18 @@ struct Flags : public ::xpcc::Register<T>
 	inline void reset(Flags const &o)
 	{ *this &= ~o; }
 
+	// update
+	inline void update(Enum const &flag, bool value)
+	{
+		if (value) *this |= flag;
+		else *this &= ~flag;
+	}
+	inline void update(Flags const &o, bool value)
+	{
+		if (value) *this |= o;
+		else *this &= ~o;
+	}
+
 	// read single bits
 	constexpr bool all(Enum const &flag) const
 	{ return (*this & flag); }
@@ -167,7 +179,7 @@ using Flags32 = Flags<Enum, uint32_t>;
  * @ingroup	register
  * @author	Niklas Hauser
  */
-template < typename Parent, typename Parent::UnderlyingType Position, typename Parent::UnderlyingType Length >
+template < typename Parent, typename Parent::UnderlyingType Length, typename Parent::UnderlyingType Position >
 struct Value : public ::xpcc::Register<typename Parent::UnderlyingType>
 {
 private:
@@ -201,16 +213,17 @@ public:
  * @ingroup	register
  * @author	Niklas Hauser
  */
-template < typename Parent, typename Enum, typename Parent::UnderlyingType Position = 0 >
+template < typename Parent, typename Enum, typename Parent::UnderlyingType Length, typename Parent::UnderlyingType Position = 0 >
 struct Configuration : public ::xpcc::Register<typename Parent::UnderlyingType>
 {
 private:
 	typedef typename Parent::UnderlyingType PType;
 	typedef typename Parent::Type PEnum;
+	static constexpr PType Mask = ((1 << Length) - 1) << Position;
 public:
 	explicit constexpr Configuration(PType config) :
 		Register<PType>(config << Position) {}
-	constexpr Configuration(Enum config) :
+	explicit constexpr Configuration(Enum config) :
 		Register<PType>(PType(config) << Position) {}
 	constexpr Configuration(Configuration const &o) :
 		Register<PType>(o.value) {}
@@ -219,16 +232,16 @@ public:
 	{	return Parent(Register<PType>::value); }
 
 	static constexpr Enum get(Parent const &parent)
-	{	return Enum((parent.value >> Position) & PType(Enum::Mask)); }
+	{	return Enum((parent.value & Mask) >> Position); }
 
 	static inline void reset(Parent &parent)
-	{	parent.value &= ~(PType(Enum::Mask) << Position); }
+	{	parent.value &= ~Mask; }
 
 	static inline void set(Parent &parent, Enum config)
-	{	parent.value = (parent.value & ~(PType(Enum::Mask) << Position)) | (PType(config) << Position); }
+	{	parent.value = (parent.value & ~Mask) | (PType(config) << Position); }
 
 	static constexpr Parent mask()
-	{ return Parent(PType(Enum::Mask) << Position); }
+	{ return Parent(Mask); }
 };
 
 }	// namespace xpcc

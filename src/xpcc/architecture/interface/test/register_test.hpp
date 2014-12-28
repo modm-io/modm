@@ -70,17 +70,16 @@ protected:
 		One = 0b01,
 		Two = 0b10,
 		Three = 0b11,
-		Mask = 0b11,
 	};
 
 	typedef Flags8<Test3> Test3_t;
 	XPCC_TYPE_FLAGS(Test3_t);
 
-	typedef Value< Test3_t, 5, 3 > Address;
-	typedef Configuration< Test3_t, Config, 2 > Config2;
-	typedef Configuration< Test3_t, Config > Config0;
+	typedef Value< Test3_t, 3, 5 > Address;
+	typedef Configuration< Test3_t, Config, 2, 2 > Config2;
+	typedef Configuration< Test3_t, Config, 2 > Config0;
 
-	typedef Flags8<> Test4_t;
+	typedef Flags8<> Test5_t;
 };
 
 enum class

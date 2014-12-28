@@ -185,6 +185,18 @@ RegisterTest::testFunctions()
 	v1.reset(Test::A);
 	TEST_ASSERT_EQUALS(v1.value, 0);
 
+	v1.update(Test::A, true);
+	TEST_ASSERT_EQUALS(v1.value, 0b1);
+
+	v1.update(Test::B, false);
+	TEST_ASSERT_EQUALS(v1.value, 0b1);
+
+	v1.update(v2, false);
+	TEST_ASSERT_EQUALS(v1.value, 0b1);
+
+	v1.update(v2, true);
+	TEST_ASSERT_EQUALS(v1.value, 0b1 | 0x80);
+
 	v1 = Test::A;
 	TEST_ASSERT_TRUE(v1.all(Test::A));
 	TEST_ASSERT_FALSE(v1.all(Test::B));
@@ -223,7 +235,10 @@ RegisterTest::testCasting()
 void
 RegisterTest::testConfigurations()
 {
-	Test3_t v1 = Test3::Bit | Config0(Config::Two);
+	Test3_t v1 = Config0(Config::One);
+	TEST_ASSERT_EQUALS(v1.value, 0b01);
+
+	v1 = Test3::Bit | Config0(Config::Two);
 	TEST_ASSERT_EQUALS(v1.value, (xpcc::Bit4 | 0b10));
 
 	v1 = Test3::Bit | Config2(Config::Three) | Config0(Config::Two);
