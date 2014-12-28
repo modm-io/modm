@@ -13,6 +13,42 @@
 #include "macros.hpp"
 #include <xpcc/utils/arithmetic_traits.hpp>
 
+#ifdef __DOXYGEN__
+
+/**
+ * Nested Coroutines protect against memory corruption by checking if the nesting level
+ * is within the allocated nesting level depth.
+ * If the allocated nesting level is exceeded, the coroutine does not execute, but returns
+ * the `xpcc::co::NestingError` state value.
+ * However, the `PT_CALL()` or `CO_CALL()` macros are not constructed to handle this error and
+ * will interpret this error as a normal coroutine stop and therefore immediately continue program
+ * execution.
+ *
+ * Since the required nesting depth of a nested coroutine can be known before runtime
+ * by looking at the source code and counting the nesting levels, this check acts only as a
+ * protection against executing random code, when entering too many levels.
+ * So instead of the entire program crashing, the coroutine simply does not execute at all,
+ * which can make it easier to track down the problem too few allocated nesting levels.
+ *
+ * You as a programmer are responible for allocating the correct amount of nesting levels!
+ * However, if you are sure that you have counted the levels correctly and your code is
+ * not breaking, you may remove this check from all coroutines in your `project.cfg`:
+ *
+ * [defines]
+ * XPCC_COROUTINE_CHECK_NESTING_DEPTH = false
+ *
+ * @see	NestedCoroutine
+ * @ingroup	coroutine
+ */
+#define XPCC_COROUTINE_CHECK_NESTING_DEPTH	true
+
+#else
+// by default we check all nesting level depths
+#	ifndef	XPCC_COROUTINE_CHECK_NESTING_DEPTH
+#		define XPCC_COROUTINE_CHECK_NESTING_DEPTH	true
+#	endif
+#endif
+
 namespace xpcc
 {
 
@@ -214,7 +250,11 @@ protected:
 	bool inline
 	nestingOkCo() const
 	{
+#if XPCC_COROUTINE_CHECK_NESTING_DEPTH
 		return (coLevel < Depth + 1);
+#else
+		return true;
+#endif
 	}
 
 	/// @return	`true` if `stopCo()` has been called before
@@ -308,7 +348,11 @@ protected:
 	bool inline
 	nestingOkCo() const
 	{
+#if XPCC_COROUTINE_CHECK_NESTING_DEPTH
 		return (coLevel != 0);
+#else
+		return true;
+#endif
 	}
 
 	void inline
