@@ -159,6 +159,7 @@ public:
 	}
 
 #ifdef __DOXYGEN__
+	/// @cond
 	/**
 	 * Run the coroutine.
 	 *
@@ -168,6 +169,7 @@ public:
 	 */
 	xpcc::co::Result< ReturnType >
 	coroutine(void *ctx, ...);
+	/// @endcond
 #endif
 
 protected:
