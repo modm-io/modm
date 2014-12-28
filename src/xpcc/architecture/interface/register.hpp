@@ -53,8 +53,8 @@ struct Register
 	{ return value == 0; }
 
 	// do NOT cast to anything else
-	template<typename U>
-	operator U() const = delete;
+//	template<typename U>
+//	operator U() const = delete;
 	/// @endcond
 
 protected:
