@@ -69,7 +69,6 @@ def platform_tools_find_device_file(env):
 
 	if id.platform == 'hosted':
 		file = os.path.join(xml_path, id.family + '.xml')
-		print file
 		if os.path.exists(file):
 			device_file = file
 
