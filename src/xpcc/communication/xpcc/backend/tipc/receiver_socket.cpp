@@ -27,7 +27,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "tipc_receiver_socket.hpp"
+#include "receiver_socket.hpp"
 
 #include <sys/socket.h>
 #include <linux/tipc.h>
@@ -55,7 +55,7 @@ xpcc::tipc::ReceiverSocket::~ReceiverSocket()
 	close(this->socketDescriptor_);
 }
 // ----------------------------------------------------------------------------
-void 
+void
 xpcc::tipc::ReceiverSocket::registerOnPacket(	unsigned int typeId,
 												unsigned int lowerInstance,
 												unsigned int upperInstance)
@@ -63,7 +63,7 @@ xpcc::tipc::ReceiverSocket::registerOnPacket(	unsigned int typeId,
 
 	int result = 0;
 	sockaddr_tipc fromAddress;
-	
+
 	fromAddress.family				=	AF_TIPC;
 	fromAddress.addrtype			=	TIPC_ADDR_NAMESEQ;
 	fromAddress.addr.nameseq.type	=	typeId;
@@ -74,7 +74,7 @@ xpcc::tipc::ReceiverSocket::registerOnPacket(	unsigned int typeId,
 	XPCC_LOG_INFO << XPCC_FILE_INFO << "(typeId, lowerBound, upperBound) = (" << typeId << ", " << lowerInstance << ", " << upperInstance << ")" << xpcc::flush;
 
 	// Binding means registering to a specific packet
-	result = 	bind (	this->socketDescriptor_, 
+	result = 	bind (	this->socketDescriptor_,
 						(struct sockaddr*)&fromAddress,
 						sizeof(sockaddr_tipc) );
 
@@ -86,18 +86,18 @@ xpcc::tipc::ReceiverSocket::registerOnPacket(	unsigned int typeId,
 	}
 }
 // ----------------------------------------------------------------------------
-// This method gets the header of the current TIPC data in the queue. 
+// This method gets the header of the current TIPC data in the queue.
 // It returns the true if a header was available - otherwise false.
-bool 
+bool
 xpcc::tipc::ReceiverSocket::receiveHeader(
 		uint32_t& transmitterPort,
 		Header& tipcHeader )
-{	
+{
 	sockaddr_tipc fromAddress;
 	socklen_t addressLength = sizeof( struct sockaddr_tipc );
 	Header localTipcHeader;
   	int result = 0;
-	
+
 	// First receive the tipc-header
 	result = recvfrom(
 			this->socketDescriptor_,
@@ -138,24 +138,24 @@ xpcc::tipc::ReceiverSocket::receiveHeader(
 // This method gets payload form the TIPC socket form the given length
 // without deleting it. It returns true if the payload could be received
 // correctly from the TIPC socket - otherwise false.
-bool 
+bool
 xpcc::tipc::ReceiverSocket::receivePayload(uint8_t* payloadPointer, size_t payloadLength)
-{		
+{
 	int result = 0;
 
-	// Allocate memory for the whole packet inclusive header			
+	// Allocate memory for the whole packet inclusive header
 	boost::scoped_array<uint8_t> packetPointer ( new uint8_t[ sizeof(Header) + payloadLength ] );
 
 	result = recv(	this->socketDescriptor_,
 					packetPointer.get(),
 					sizeof(Header) + payloadLength,
 					MSG_PEEK | MSG_DONTWAIT);	// Do not delete data from TIPC and do not wait for data
-											
+
 	if( result > 0 ) {
-		
+
 		// Copy the payload-part of the packet to it's destination!
 		memcpy(payloadPointer, packetPointer.get()+sizeof(Header), payloadLength);
-		
+
 /*		XPCC_LOG_DEBUG << __FILE__ << __FUNCTION__;
 		for(unsigned int i=0; i<payloadLength; i++) {
 			XPCC_LOG_DEBUG << " " << (int)(*(payloadPointer+i));
@@ -183,25 +183,25 @@ xpcc::tipc::ReceiverSocket::receivePayload(uint8_t* payloadPointer, size_t paylo
 				<< xpcc::flush;
 		// TODO: Error handling??!!
 	}
-	
+
 	return false;
-}		
+}
 // ----------------------------------------------------------------------------
 // This method removes the current packet from the TIPC message queue.
 // If the method was successful (if a message could be removed) the
 // method returns true - otherwise false.
-bool 
+bool
 xpcc::tipc::ReceiverSocket::popPayload()
 {
  	int result = 0;
-	
+
 	char c;	// TODO: Better way?
 	result = recv(	this->socketDescriptor_,
 					&c,		// We need no space for data
 					1,		// We read no data
 					MSG_DONTWAIT);	// Delete data from TIPC but do not wait for data
-	
-	if( result > 0 ) {		
+
+	if( result > 0 ) {
 		return true;
 	}
 	else if ( errno == EWOULDBLOCK ) {
@@ -223,7 +223,7 @@ xpcc::tipc::ReceiverSocket::popPayload()
 				<< xpcc::flush;
 		// TODO: Error handling??!!
 	}
-	
+
 	return false;
 }
 // ----------------------------------------------------------------------------

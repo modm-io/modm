@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -31,9 +31,9 @@
 #ifndef XPCC__TIPC_HPP
 #define XPCC__TIPC_HPP
 
-#include <xpcc/architecture/platform/driver/tipc/linux/header.hpp>
-#include <xpcc/architecture/platform/driver/tipc/linux/tipc_receiver.hpp>
-#include <xpcc/architecture/platform/driver/tipc/linux/tipc_transmitter.hpp>
+#include "header.hpp"
+#include "tipc_receiver.hpp"
+#include "tipc_transmitter.hpp"
 
 #include <xpcc/container/smart_pointer.hpp>
 
@@ -43,12 +43,12 @@ namespace xpcc
 {
 	/**
 	 * \brief	Class that connects the communication to the TIPC
-	 * 
+	 *
 	 * Messages that are received by the same connector, that has transmitted
 	 * them, will be ignored.
-	 * 
+	 *
 	 * \see 	tipc
-	 * 
+	 *
 	 * \ingroup	backend
 	 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 	 */
@@ -56,9 +56,9 @@ namespace xpcc
 	{
 	public :
 		TipcConnector();
-		
+
 		~TipcConnector();
-		
+
 		/**
 		 * \brief	Change the domain id during runtime
 		 */
@@ -67,9 +67,9 @@ namespace xpcc
 
 		/**
 		 * \brief	Add a new event to receive
-		 * 
+		 *
 		 * Call this method for every event you want to receive.
-		 * 
+		 *
 		 * \param	id	Identifier of the event.
 		 */
 		inline void
@@ -77,13 +77,13 @@ namespace xpcc
 		{
 			this->receiver.addEventId(id);
 		}
-		
+
 		/**
 		 * \brief	Add a new receiver
-		 * 
+		 *
 		 * You need to call this method for every component implemented in
 		 * this module.
-		 * 
+		 *
 		 * \param	id	Identifier of the receiving component.
 		 */
 		inline void
@@ -91,54 +91,54 @@ namespace xpcc
 		{
 			this->receiver.addReceiverId(id);
 		}
-		
+
 		/// Check if a new packet was received by the backend
 		virtual bool
 		isPacketAvailable() const;
-		
+
 		/**
 		 * \brief	Access the packet header
-		 * 
+		 *
 		 * Only valid if isPacketAvailable() returns \c true.
 		 */
 		virtual const Header&
 		getPacketHeader() const;
-		
+
 		/**
 		 * \brief	Access the packet payload
-		 * 
+		 *
 		 * Only valid if isPacketAvailable() returns \c true.
 		 */
 		virtual const SmartPointer
 		getPacketPayload() const;
-		
+
 		/**
 		 * \brief	Delete the current packet
-		 * 
+		 *
 		 * Only valid if isPacketAvailable() returns \c true.
 		 */
 		virtual void
 		dropPacket();
-		
+
 		/**
 		 * \brief	Update method
-		 * 
+		 *
 		 * Does nothing here as TIPC is implemented with threads.
 		 */
 		virtual void
 		update();
-		
+
 		/**
 		 * Send a Message.
 		 */
 		virtual void
 		sendPacket(const Header &header,
 				   SmartPointer payload = SmartPointer());
-		
+
 	private:
 		tipc::Transmitter transmitter;
 		tipc::Receiver receiver;
 	};
 };
- 
+
 #endif	// XPCC__TIPC_HPP

@@ -27,7 +27,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "tipc_transmitter_socket.hpp"
+#include "transmitter_socket.hpp"
 
 #include <sys/socket.h>
 #include <unistd.h> // close()
@@ -55,7 +55,7 @@ xpcc::tipc::TransmitterSocket::~TransmitterSocket()
 }
 
 // ----------------------------------------------------------------------------
-void 
+void
 xpcc::tipc::TransmitterSocket::transmitPayload(
 		unsigned int typeId,
 		unsigned int instanceId,
@@ -64,7 +64,7 @@ xpcc::tipc::TransmitterSocket::transmitPayload(
 		unsigned int domainId)
 {
 	int sendToResult	=	0;
-	
+
 	sockaddr_tipc tipcToAddresse;
 
 	// Initialize the toAddress struct of TIPC. For further documentation have a look

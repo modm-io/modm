@@ -2,10 +2,10 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -30,7 +30,7 @@
 
 #include <stdlib.h>
 
-#include "can_connector.hpp"
+#include "connector.hpp"
 
 // ----------------------------------------------------------------------------
 uint8_t xpcc::CanConnectorBase::messageCounter = 0;
@@ -41,7 +41,7 @@ xpcc::CanConnectorBase::convertToIdentifier(const Header & header,
 		bool fragmentated)
 {
 	uint32_t identifier;
-	
+
 	switch (header.type)
 	{
 		case xpcc::Header::REQUEST:
@@ -57,7 +57,7 @@ xpcc::CanConnectorBase::convertToIdentifier(const Header & header,
 			identifier = 0;
 			break;
 	}
-	
+
 	identifier = identifier << 1;
 	if (header.isAcknowledge){
 		identifier |= 1;
@@ -65,7 +65,7 @@ xpcc::CanConnectorBase::convertToIdentifier(const Header & header,
 	identifier = identifier << 1;
 	// Message counter
 	identifier = identifier << 1;
-	
+
 	if (fragmentated){
 		identifier |= 1;
 	}
@@ -75,7 +75,7 @@ xpcc::CanConnectorBase::convertToIdentifier(const Header & header,
 	identifier |= header.source;
 	identifier = identifier << 8;
 	identifier |= header.packetIdentifier;
-	
+
 	return identifier;
 }
 
@@ -85,20 +85,20 @@ xpcc::CanConnectorBase::convertToHeader(const uint32_t & identifier,
 		xpcc::Header & header)
 {
 	const uint8_t *ptr = reinterpret_cast<const uint8_t *>(&identifier);
-	
+
 	header.packetIdentifier = ptr[0];
 	header.source 			= ptr[1];
 	header.destination		= ptr[2];
-	
+
 	uint8_t flags = ptr[3];
-	
+
 	if (flags & 0x04) {
 		header.isAcknowledge = true;
 	}
 	else {
 		header.isAcknowledge = false;
 	}
-	
+
 	switch (flags & 0x18)
 	{
 		case 0x00:
@@ -115,7 +115,7 @@ xpcc::CanConnectorBase::convertToHeader(const uint32_t & identifier,
 			//XPCC_LOG_ERROR << "Unknown Type" << xpcc::flush;
 			header.type = xpcc::Header::REQUEST;
 	}
-	
+
 	// check if the message is a fragment
 	return isFragment(identifier);
 }

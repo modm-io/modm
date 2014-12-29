@@ -27,7 +27,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "tipc_receiver.hpp"
+#include "receiver.hpp"
 #include "header.hpp"
 
 #include <boost/bind.hpp>
@@ -73,7 +73,7 @@ xpcc::tipc::Receiver::dropPacket()
 {
 	// Set the mutex guard for the packetQueue
 	MutexGuard packetQueueGuard(this->packetQueueLock_);
-	
+
 	this->packetQueue_.pop();
 }
 
@@ -83,7 +83,7 @@ xpcc::tipc::Receiver::hasPacket() const
 {
 	// Set the mutex guard for the packetQueue
 	MutexGuard packetQueueGuard(this->packetQueueLock_);
-	
+
 	return !this->packetQueue_.empty();
 }
 
@@ -103,7 +103,7 @@ xpcc::tipc::Receiver::runReceiver()
 		this->update();
 		usleep(1000);
 	}
-	
+
 	XPCC_LOG_INFO << XPCC_FILE_INFO << "Thread terminates." << xpcc::flush;
 	return 0;
 }
@@ -126,16 +126,16 @@ xpcc::tipc::Receiver::update()
 				(this->domainId_==Header::DOMAIN_ID_UNDEFINED || this->domainId_==tipcHeader.domainId) )
 		{
 			XPCC_LOG_DEBUG << XPCC_FILE_INFO << "Header available." << xpcc::flush;
-			
+
 			// Try to allocate memory for the packet
 			Payload payload ( tipcHeader.size );
-			
+
 			// Get the payload by passing a void pointer by reference and the length
 			// of the payload to be read from the socket.
 			this->tipcReceiverSocket_.receivePayload(
 					payload.getPointer(),
 					tipcHeader.size);
-			
+
 			// Set the mutex guard for the packetQueue
 			MutexGuard packetQueueGuard( this->packetQueueLock_);
 
@@ -169,13 +169,13 @@ xpcc::tipc::Receiver::addEventId(uint8_t id)
 {
 	// Set the mutex guard for the receiver socket
 	MutexGuard receiverSocketGuard(this->receiverSocketLock_);
-	
+
 	// TODO: Logging on which packet one is registered..
-	
+
 	// Ranges dürfen sich nicht überschneiden. Eine Range gilt fürs gesamte TIPC,
 	// daher ist es nicht möglich in die InstanceId auch die Komponenten ID
 	// mit einzubeziehen
-	
+
 	this->tipcReceiverSocket_.registerOnPacket(	EVENT_OFFSET + id + TYPE_ID_OFFSET,
 												0x00,
 												0x00);
@@ -187,13 +187,13 @@ xpcc::tipc::Receiver::addReceiverId(uint8_t id)
 {
 	// Set the mutex guard for the receiver socket
 	MutexGuard receiverSocketGuard(this->receiverSocketLock_);
-	
+
 	// TODO: Logging on which packet one is registered..
-	
+
 	// Ranges dürfen sich nicht überschneiden. Eine Range gilt fürs gesamte TIPC,
 	// daher ist es nicht möglich in die InstanceId auch die Komponenten ID
 	// mit einzubeziehen
-	
+
 	this->tipcReceiverSocket_.registerOnPacket(	REQUEST_OFFSET + id + TYPE_ID_OFFSET,
 												0x00,
 												0x00);

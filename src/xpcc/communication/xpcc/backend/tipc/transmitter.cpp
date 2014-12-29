@@ -27,99 +27,60 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "tipc.hpp"
+#include "transmitter.hpp"
+#include "header.hpp"
+
 #include <xpcc/debug/logger.hpp>
 
-#undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::WARNING
+// TODO: IMPORTANT! If the TIPC-Module is not loaded terminate with appropriate
+// error message!!!!
 
 // ----------------------------------------------------------------------------
-xpcc::TipcConnector::TipcConnector() :
-	receiver(this->transmitter.getPortId())
+xpcc::tipc::Transmitter::Transmitter( ) :
+	domainId_( xpcc::tipc::Header::DOMAIN_ID_UNDEFINED )
 {
 }
 
 // ----------------------------------------------------------------------------
-xpcc::TipcConnector::~TipcConnector()
+xpcc::tipc::Transmitter::~Transmitter()
 {
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::TipcConnector::setDomainId(unsigned int domainId)
-{
-	this->transmitter.setDomainId( domainId );
-	this->receiver.setDomainId( domainId );
-}
-
-// ----------------------------------------------------------------------------
-bool
-xpcc::TipcConnector::isPacketAvailable() const
-{
-	return this->receiver.hasPacket();
-}
-
-// ----------------------------------------------------------------------------
-const xpcc::Header&
-xpcc::TipcConnector::getPacketHeader() const
-{
-	return *(xpcc::Header*) this->receiver.getPacket().getPointer();
-}
-
-// ----------------------------------------------------------------------------
-const xpcc::SmartPointer
-xpcc::TipcConnector::getPacketPayload() const
-{
-	SmartPointer payload( this->receiver.getPacket().getSize() - sizeof(xpcc::Header) );
-	if( payload.getSize() > 0 ) {
-		memcpy(
-				payload.getPointer(),
-				this->receiver.getPacket().getPointer() + sizeof(xpcc::Header),
-				payload.getSize() );
-	}
-	return payload;
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::TipcConnector::dropPacket()
+xpcc::tipc::Transmitter::setDomainId(unsigned int id)
 {
-	this->receiver.dropPacket();
+	this->domainId_ = id;
+}
+
+
+// ----------------------------------------------------------------------------
+void
+xpcc::tipc::Transmitter::transmitRequest( uint8_t destination, const SmartPointer& payload )
+{
+	this->tipcTransmitterSocket_.transmitPayload(
+			REQUEST_OFFSET + destination + TYPE_ID_OFFSET,
+			0,
+			payload.getPointer(),
+			payload.getSize(),
+			this->domainId_);
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::TipcConnector::sendPacket(const xpcc::Header &header, SmartPointer payload)
+xpcc::tipc::Transmitter::transmitEvent( uint8_t event, const SmartPointer& payload )
 {
-//	XPCC_LOG_DEBUG << XPCC_FILE_INFO
-//			<< " payload size=" << payload.getSize()
-//			<< " payload=" << payload
-//			<< xpcc::flush;
-	
-	SmartPointer combinedPayload( sizeof(xpcc::Header) + payload.getSize() );
-
-	memcpy(	combinedPayload.getPointer(), &header, sizeof(xpcc::Header) );
-
-	// place payload behind the header
-	if ( payload.getSize() > 0 ) {
-		memcpy(	combinedPayload.getPointer() + sizeof(xpcc::Header),
-				payload.getPointer(),
-				payload.getSize());
-	}
-
-	if ( header.destination != 0 ) {
-		// transmit a REQUENST
-		this->transmitter.transmitRequest( header.destination, combinedPayload );;
-	}
-	else {
-		// transmit an EVENT
-		this->transmitter.transmitEvent( header.packetIdentifier, combinedPayload );
-	}
+	this->tipcTransmitterSocket_.transmitPayload(
+			EVENT_OFFSET + event + TYPE_ID_OFFSET,
+			0,
+			payload.getPointer(),
+			payload.getSize(),
+			this->domainId_);
 }
 
 // ----------------------------------------------------------------------------
-void
-xpcc::TipcConnector::update()
+uint32_t
+xpcc::tipc::Transmitter::getPortId()
 {
-	// nothing to do, because TipcReceiver is using threads
+	return this->tipcTransmitterSocket_.getPortId();
 }
