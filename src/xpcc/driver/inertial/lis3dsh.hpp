@@ -301,8 +301,9 @@ public:
 	};
 	XPCC_FLAGS8(Sett);
 
-	XPCC_FLAGS_GROUP(Control_t,
-			SmControl_t, Control3_t, Control4_t, Control5_t, Control6_t);
+	typedef FlagsGroup<
+			SmControl_t, Control3_t, Control4_t, Control5_t, Control6_t
+	> Control_t;
 
 public:
 

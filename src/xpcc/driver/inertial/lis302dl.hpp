@@ -24,6 +24,7 @@ class Lis302dl;
 struct lis302dl
 {
 protected:
+	/// @cond
 	enum class
 	Register : uint8_t
 	{
@@ -57,6 +58,7 @@ protected:
 		ClickLatency = 0x3E,	///< Click latency register
 		ClickWindow = 0x3F,		///< Click window register
 	};
+	/// @endcond
 
 public:
 	/// CTRL_REG1 default value is 0x07
@@ -106,8 +108,7 @@ public:
 	};
 	XPCC_FLAGS8(Control3);
 
-	XPCC_FLAGS_GROUP(Control_t,
-			Control1_t, Control2_t, Control3_t);
+	typedef FlagsGroup<Control1_t, Control2_t, Control3_t> Control_t;
 
 	/// STATUS_REG default value is 0x00
 	enum class
@@ -191,10 +192,11 @@ public:
 	};
 	XPCC_FLAGS8(ClickSource);
 
-	XPCC_FLAGS_GROUP(Register_t,
+	typedef FlagsGroup<
 			Control1_t, Control2_t, Control3_t, Status_t,
 			FreeFallConfig_t, FreeFallSource_t, FreeFallThreshold_t,
-			ClickConfig_t, ClickSource_t);
+			ClickConfig_t, ClickSource_t
+	> Register_t;
 
 public:
 	enum class

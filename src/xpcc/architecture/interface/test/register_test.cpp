@@ -35,6 +35,19 @@ RegisterTest::testAssignments()
 	TEST_ASSERT_EQUALS(c1.value, 0b1);
 	Common_t c2 = v2;
 	TEST_ASSERT_EQUALS(c2.value, 0b1);
+	Common_t c3(0x42);
+	TEST_ASSERT_EQUALS(c3.value, 0x42);
+
+	uint8_t a0 = translateCommonArgument(Test::A);
+	TEST_ASSERT_EQUALS(a0, 0b1);
+	a0 = translateCommonArgument(Test2::A);
+	TEST_ASSERT_EQUALS(a0, 0b1);
+	a0 = translateCommonArgument(v2);
+	TEST_ASSERT_EQUALS(a0, 0b1);
+	a0 = translateCommonArgument(v1);
+	TEST_ASSERT_EQUALS(a0, 0b1);
+	a0 = translateCommonArgument(c3);
+	TEST_ASSERT_EQUALS(a0, 0x42);
 
 	// to register
 
@@ -54,6 +67,11 @@ RegisterTest::testAssignments()
 	TEST_ASSERT_EQUALS(u2, 0b1);
 }
 
+uint8_t
+RegisterTest::translateCommonArgument(Common_t common)
+{
+	return common.value;
+}
 
 void
 RegisterTest::testOperators()
@@ -226,11 +244,15 @@ RegisterTest::testCasting()
 {
 	Test_t v1 = static_cast<Test>(0xff);
 	TEST_ASSERT_EQUALS(v1.value, 0xff);
+	v1 = Test(0xee);
+	TEST_ASSERT_EQUALS(v1.value, 0xee);
+	v1 = Test_t(0xdd);
+	TEST_ASSERT_EQUALS(v1.value, 0xdd);
 
-	Test_t v2 = static_cast<Test_t>(0xff);
+	Test_t v2(0xff);
 	TEST_ASSERT_EQUALS(v2.value, 0xff);
 
-	Common_t c1 = static_cast<Common_t>(0xff);
+	Common_t c1 = Common_t(0xff);
 	TEST_ASSERT_EQUALS(c1.value, 0xff);
 }
 

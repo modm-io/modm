@@ -49,7 +49,7 @@ protected:
 	};
 	XPCC_FLAGS8(Test2);
 
-	XPCC_FLAGS_GROUP(Common_t, Test_t, Test2_t);
+	typedef FlagsGroup< Test_t, Test2_t > Common_t;
 
 
 	enum class
@@ -134,6 +134,10 @@ public:
 
 	void
 	testValue();
+
+	uint8_t
+	translateCommonArgument(Common_t common);
+
 };
 
 #endif // XPCC_UNITTEST_REGISTER_HPP

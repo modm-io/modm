@@ -77,7 +77,9 @@ struct Nrf24Register
 	 * data sheet on page 51. Only certain RawCommands have to be combined with
 	 * a register or pipe.
 	 */
-	//XPCC_FLAGS_GROUP(Command_t, RawCommand_t, Register_t, Pipe_t);
+//	typedef FlagsGroup<
+//			RawCommand_t, Register_t, Pipe_t
+//	> Command_t;
 
 
 	/* Register defintions */
@@ -252,8 +254,10 @@ struct Nrf24Register
 	};
 	XPCC_FLAGS8(Feature);
 
-	XPCC_FLAGS_GROUP(Flags_t, Feature_t, DynPd_t, FifoStatus_t, Rpd_t, ObserveTx_t, Status_t,
-					RfSetup_t, SetupRetr_t, SetupAw_t, EnRxAddr_t, EnAA_t, Config_t);
+	typedef FlagsGroup<
+			Feature_t, DynPd_t, FifoStatus_t, Rpd_t, ObserveTx_t, Status_t,
+			RfSetup_t, SetupRetr_t, SetupAw_t, EnRxAddr_t, EnAA_t, Config_t
+	> Flags_t;
 };
 
 }   // namespace xpcc

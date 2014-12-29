@@ -68,8 +68,9 @@ protected:
 	};
 	typedef Configuration< Config2_t, ConversionRate, (Bit7 | Bit6) > ConversionRate_t;
 
-	XPCC_FLAGS_GROUP(Register_t,
-			Config1_t, Config2_t);
+	typedef FlagsGroup<
+			Config1_t, Config2_t
+	> Register_t;
 
 	static constexpr uint8_t
 	i(Register reg) { return uint8_t(reg); }
