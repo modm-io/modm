@@ -1,7 +1,7 @@
 
 #include <xpcc/architecture.hpp>
 #include <xpcc/communication.hpp>
-#include <xpcc/communication/xpcc/backend/can/can_connector.hpp>
+#include <xpcc/communication/xpcc/backend/can.hpp>
 #include <xpcc/debug/logger.hpp>
 
 #include <xpcc/driver/can/mcp2515.hpp>

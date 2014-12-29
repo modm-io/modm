@@ -61,7 +61,7 @@ xpcc::log::StyleWrapper< xpcc::log::Prefix< char[10] > > loggerDeviceError (
 xpcc::log::Logger xpcc::log::error( loggerDeviceError );
 
 // COMMUNICATION ###############################################################
-#include <xpcc/communication/backend/can/can.hpp>
+#include <xpcc/communication/backend/can.hpp>
 #include <xpcc/driver/can/mcp2515.hpp>
 #include <xpcc/driver/software_spi.hpp>
 
