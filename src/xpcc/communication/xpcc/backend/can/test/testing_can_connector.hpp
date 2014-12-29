@@ -31,14 +31,14 @@
 #ifndef TESTING_CAN_CONNECTOR_HPP
 #define TESTING_CAN_CONNECTOR_HPP
 
-#include <xpcc/communication/xpcc/backend/can/can_connector.hpp>
+#include "../connector.hpp"
 #include "fake_can_driver.hpp"
 
 class TestingCanConnector : public xpcc::CanConnector<FakeCanDriver>
 {
 public:
 	TestingCanConnector(FakeCanDriver *driver);
-	
+
 	// expose the internal variable for testing
 	using xpcc::CanConnector<FakeCanDriver>::messageCounter;
 };

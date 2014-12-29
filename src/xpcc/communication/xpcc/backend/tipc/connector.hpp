@@ -32,8 +32,8 @@
 #define XPCC__TIPC_HPP
 
 #include "header.hpp"
-#include "tipc_receiver.hpp"
-#include "tipc_transmitter.hpp"
+#include "receiver.hpp"
+#include "transmitter.hpp"
 
 #include <xpcc/container/smart_pointer.hpp>
 

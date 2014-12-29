@@ -28,13 +28,13 @@
 // ----------------------------------------------------------------------------
 #ifndef XPCC__TIPC_TRANSMITTER_HPP
 #define XPCC__TIPC_TRANSMITTER_HPP
- 
-// STD exceptions... 
+
+// STD exceptions...
 //#include <stdexcept>
 
 #include <bitset>
 
-#include "tipc_transmitter_socket.hpp"
+#include "transmitter_socket.hpp"
 #include <xpcc/container/smart_pointer.hpp>
 
 namespace xpcc
@@ -44,9 +44,9 @@ namespace xpcc
 		/**
 		 * \class		Transmitter
 		 * \brief		Transmit packets over the TIPC.
-		 * 
+		 *
 		 * \todo		exception handling : now it writs only log-messages
-		 * 
+		 *
 		 * \ingroup		tipc
 		 * \author		Carsten Schmitt < >
 		 */
@@ -59,8 +59,8 @@ namespace xpcc
 
 			void
 			setDomainId( unsigned int id );
-	
-			void 
+
+			void
 			transmitRequest( uint8_t destination, const SmartPointer& payload );
 
 			void
@@ -68,7 +68,7 @@ namespace xpcc
 
 			uint32_t
 			getPortId();
-	
+
 		private:
 			TransmitterSocket 	tipcTransmitterSocket_;
 			unsigned int 	domainId_;

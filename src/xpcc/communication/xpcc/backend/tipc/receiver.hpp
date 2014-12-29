@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -39,7 +39,7 @@
 
 #include <xpcc/container/smart_pointer.hpp>
 
-#include "tipc_receiver_socket.hpp"
+#include "receiver_socket.hpp"
 
 namespace xpcc
 {
@@ -47,9 +47,9 @@ namespace xpcc
 	{
 		/**
 		 * \brief	Receive Packets over the TIPC and store them.
-		 * 
+		 *
 		 * In a separate thread the packets are taken from the TIPC and saved local.
-		 * 
+		 *
 		 * \ingroup	tipc
 		 * \author	Carsten Schmitt
 		 */
@@ -70,55 +70,55 @@ namespace xpcc
 
 			void
 			addEventId(uint8_t id);
-			
+
 			void
 			addReceiverId(uint8_t id);
-			
+
 			/// Check if a new packet has arrived
 			bool
 			hasPacket() const;
-			
+
 			/**
 			 * \brief	Read the packet
-			 * 
+			 *
 			 * This is only valid if hasPacket() has returned \c true.
 			 */
 			const xpcc::SmartPointer&
 			getPacket() const;
-			
+
 			/**
 			 * \brief	Drop the current Packet
-			 * 
+			 *
 			 * This is only valid if hasPacket() has returned \c true.
 			 */
-			void 
+			void
 			dropPacket();
-			
+
 		private:
 			typedef xpcc::SmartPointer			Payload;
 			typedef boost::mutex				Mutex;
 			typedef boost::mutex::scoped_lock	MutexGuard;
 			typedef	boost::thread				Thread;
-			
-			bool 
+
+			bool
 			isAlive();
-	
-			void* 
+
+			void*
 			runReceiver();
-			
-			void 
+
+			void
 			update();
-			
+
 			ReceiverSocket tipcReceiverSocket_;
 			uint32_t ignoreTipcPortId_;	// the tipc port ID from that all messages will be ignored
 			unsigned int domainId_;
-			
+
 			std::queue<Payload>	packetQueue_;
-			
+
 			boost::scoped_ptr<Thread> receiverThread_;
 			mutable Mutex receiverSocketLock_;
 			mutable Mutex packetQueueLock_;
-			
+
 			bool isAlive_;
 
 		};

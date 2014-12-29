@@ -2,10 +2,10 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -62,45 +62,45 @@ namespace xpcc
 		/// Convert a packet header to a can identifier
 		static uint32_t
 		convertToIdentifier(const Header & header, bool fragmentated);
-		
+
 		/**
 		 * \brief	Convert a can identifier to a packet header
-		 * 
+		 *
 		 * \param[in]	identifier	29-bit CAN identifier
 		 * \param[out]	header		Packet header
-		 * 
+		 *
 		 * \return	\c true if the message is part of a fragmented packet,
 		 * 			\c false otherwise.
 		 */
 		static bool
 		convertToHeader(const uint32_t & identifier, Header & header);
-		
+
 		static inline bool
 		isFragment(const uint32_t & identifier)
 		{
 			const uint8_t *ptr = reinterpret_cast<const uint8_t *>(&identifier);
 			return (ptr[3] & 0x01);
 		}
-		
+
 		/**
 		 * \brief	Calculate the number of fragments needed to send a message
 		 * 			with a length of \p messageSize.
 		 */
 		static uint8_t
 		getNumberOfFragments(uint8_t messageSize);
-		
+
 	protected:
 		static uint8_t messageCounter;
 	};
-	
+
 	/**
 	 * \brief	The CAN connector to the XPCC communication
 	 *
 	 * \section can_interface_definition The Needed Interface
-	 * 
+	 *
 	 * The interface of the per template parameter given driver has to
 	 * provide the following static methods.
-	 * 
+	 *
 	 * \code
 	 * static bool
 	 * isMessageAvailable();
@@ -112,7 +112,7 @@ namespace xpcc
 	 * /// \return true if a slot is available, false otherwise
 	 * static bool
 	 * isReadyToSend();
-	 * 
+	 *
 	 * /// Send a message over the CAN.
 	 * /// \return true if the message was send, false otherwise
 	 * static bool
@@ -120,7 +120,7 @@ namespace xpcc
 	 * \endcode
 	 *
 	 * \section structure Definition of the structure of a CAN message
-	 * 
+	 *
 	 * \image html xpcc_can_identifier.png
 	 *
 	 * Changes in the highest 4 bits:
@@ -129,7 +129,7 @@ namespace xpcc
 	 * - 1 bit: Message Counter active [1] / not active [1]
 	 *
 	 * Every event is send with the destination identifier \c 0x00.
-	 * 
+	 *
 	 * \todo timeout
 	 *
 	 * \ingroup	backend
@@ -139,30 +139,30 @@ namespace xpcc
 	{
 	public:
 		CanConnector(Driver *driver);
-		
+
 		virtual
 		~CanConnector();
-		
+
 		virtual void
 		sendPacket(const Header &header, SmartPointer payload);
-		
-		
+
+
 		virtual bool
 		isPacketAvailable() const;
-		
+
 		virtual const Header&
 		getPacketHeader() const;
-		
+
 		virtual const xpcc::SmartPointer
 		getPacketPayload() const;
-		
+
 		virtual void
 		dropPacket();
-		
-		
+
+
 		virtual void
 		update();
-	
+
 	protected:
 		CanConnector(const CanConnector&);
 
@@ -171,22 +171,22 @@ namespace xpcc
 
 		/**
 		 * \brief	Try to send a CAN message via CAN Driver
-		 * 
+		 *
 		 * \return	\b true if the message could be send, \b false otherwise
 		 */
 		bool
 		sendMessage(const uint32_t & identifier,
 				const uint8_t *data, uint8_t size);
-		
+
 		void
 		sendWaitingMessages();
-		
+
 		bool
 		retrieveMessage();
-		
+
 		void
 		checkAndReceiveMessages();
-		
+
 	protected:
 		class SendListItem
 		{
@@ -198,24 +198,24 @@ namespace xpcc
 				fragmentIndex(0)
 			{
 			}
-			
+
 			SendListItem(const SendListItem& other) :
 				identifier(other.identifier),
 				payload(other.payload),
 				fragmentIndex(other.fragmentIndex)
 			{
 			}
-			
+
 			uint32_t identifier;
 			SmartPointer payload;
-			
+
 			uint8_t fragmentIndex;
-			
+
 		private:
 			SendListItem&
 			operator = (const SendListItem& other);
 		};
-		
+
 		class ReceiveListItem
 		{
 		public:
@@ -226,37 +226,37 @@ namespace xpcc
 				counter(messageCounter)
 			{
 			}
-			
+
 			ReceiveListItem(const ReceiveListItem& other) :
 				header(other.header), payload(other.payload),
 				receivedFragments(other.receivedFragments),
 				counter(other.counter)
 			{
 			}
-			
+
 			Header header;
 			SmartPointer payload;
-			
+
 			uint8_t receivedFragments;
 			const uint8_t counter;
-			
+
 		private:
 			ReceiveListItem&
 			operator = (const ReceiveListItem& other);
 		};
-		
+
 		typedef xpcc::LinkedList< SendListItem > SendList;
 		typedef xpcc::LinkedList< ReceiveListItem > ReceiveList;
-		
+
 	protected:
 		SendList sendList;
 		ReceiveList pendingMessages;
 		ReceiveList receivedMessages;
-		
+
 		Driver *canDriver;
 	};
 }
 
-#include "can_connector_impl.hpp"
+#include "connector_impl.hpp"
 
 #endif	// XPCC__CAN_CONNECTOR_HPP
