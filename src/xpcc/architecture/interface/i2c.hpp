@@ -47,36 +47,36 @@ struct I2c
 	enum class
 	Operation : uint8_t
 	{
-		Stop = 0,		///< Generate a Stop Condition
+		Stop    = 0,	///< Generate a Stop Condition
 		Restart = 1,	///< Generate a Restart
-		Write = 2,		///< Write data to the slave
-		Read = 3,		///< Read data from the slave
+		Write   = 2,	///< Write data to the slave
+		Read    = 3,	///< Read data from the slave
 	};
 
 	/// Further operations after start operation.
 	enum class
 	OperationAfterStart : uint8_t
 	{
-		Stop = static_cast<uint8_t>(Operation::Stop),		///< Generate a Stop Condition
-		Write = static_cast<uint8_t>(Operation::Write),		///< Write data to the slave
-		Read = static_cast<uint8_t>(Operation::Read),		///< Read data from the slave
+		Stop  = Operation::Stop,		///< Generate a Stop Condition
+		Write = Operation::Write,		///< Write data to the slave
+		Read  = Operation::Read,		///< Read data from the slave
 	};
 
 	/// Further operations after write operation.
 	enum class
 	OperationAfterWrite : uint8_t
 	{
-		Stop = static_cast<uint8_t>(Operation::Stop),		///< Generate a Stop Condition
-		Restart = static_cast<uint8_t>(Operation::Restart),	///< Generate a Restart
-		Write = static_cast<uint8_t>(Operation::Write),		///< Write data to the slave
+		Stop    = Operation::Stop,		///< Generate a Stop Condition
+		Restart = Operation::Restart,	///< Generate a Restart
+		Write   = Operation::Write,	///< Write data to the slave
 	};
 
 	/// Further operations after read operation.
 	enum class
 	OperationAfterRead : uint8_t
 	{
-		Stop = static_cast<uint8_t>(Operation::Stop),		///< Generate a Stop Condition
-		Restart = static_cast<uint8_t>(Operation::Restart),	///< Generate a Restart
+		Stop    = Operation::Stop,		///< Generate a Stop Condition
+		Restart = Operation::Restart,	///< Generate a Restart
 	};
 	///@}
 
