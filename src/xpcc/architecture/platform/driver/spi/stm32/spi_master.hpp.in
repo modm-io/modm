@@ -100,13 +100,13 @@ public:
 	}
 
 
-	static void
+	static ALWAYS_INLINE void
 	setDataMode(DataMode mode)
 	{
 		SpiHal{{ id }}::setDataMode(static_cast<SpiHal{{ id }}::DataMode>(mode));
 	}
 
-	static void
+	static ALWAYS_INLINE void
 	setDataOrder(DataOrder order)
 	{
 		SpiHal{{ id }}::setDataOrder(static_cast<SpiHal{{ id }}::DataOrder>(order));

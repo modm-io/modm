@@ -46,7 +46,7 @@ protected:
 	bool inline
 	aquireMaster(void *ctx)
 	{
-		uint8_t response = SpiMaster::aquire(ctx);
+		uint_fast8_t response = SpiMaster::aquire(ctx);
 
 		// another context is using it
 		if (response == 0)

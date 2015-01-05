@@ -8,7 +8,10 @@
 // ----------------------------------------------------------------------------
 
 #include "spi_master_{{id}}.hpp"
+#include <xpcc/architecture/interface/register.hpp>
 
+// Bit0: single transfer state
+// Bit1: block transfer state
 uint8_t
 xpcc::stm32::SpiMaster{{ id }}::state(0);
 
@@ -56,27 +59,27 @@ xpcc::stm32::SpiMaster{{ id }}::transfer(uint8_t data)
 	//   1. waiting to start, and
 	//   2. waiting to finish.
 
-	// LSB == 0 ?
-	if ( !(state & 0x01) )
+	// LSB == Bit0 ?
+	if ( !(state & Bit0) )
 	{
 		// wait for previous transfer to finish
 		if (!SpiHal{{ id }}::isTransmitRegisterEmpty())
-			return {xpcc::co::Running, 0};
+			return {xpcc::co::Running};
 
 		// start transfer by copying data into register
 		SpiHal{{ id }}::write(data);
 
 		// set LSB = 1
-		state |= 1;
+		state |= Bit0;
 	}
 
 	if (!SpiHal{{ id }}::isReceiveRegisterNotEmpty())
-		return {xpcc::co::Running, 0};
+		return {xpcc::co::Running};
 
 	SpiHal{{ id }}::read(data);
 
 	// transfer finished
-	state &= ~0x01;
+	state &= ~Bit0;
 	return {xpcc::co::Stop, data};
 }
 
@@ -86,7 +89,7 @@ xpcc::stm32::SpiMaster{{ id }}::transfer(
 {
 	// this is a manually implemented "fast coroutine"
 	// there is no context or nesting protection, since we don't need it.
-	// there are only two states encoded into 1 bit (0x02 of state):
+	// there are only two states encoded into 1 bit (Bit1 of state):
 	//   1. initialize index, and
 	//   2. wait for 1-byte transfer to finish.
 
@@ -94,14 +97,14 @@ xpcc::stm32::SpiMaster{{ id }}::transfer(
 	static std::size_t index = 0;
 
 	// we need to allocate this on the stack
-	uint8_t tx_byte = 0xff;
+	uint8_t tx_byte = 0;
 
-	// we are only interested in 0x02
-	switch(state >> 1)
+	// we are only interested in Bit1
+	switch(state & Bit1)
 	{
 		case 0:
 			// we will only visit this state once
-			state |= (1 << 1);
+			state |= Bit1;
 
 			// initialize index and check range
 			index = 0;
@@ -109,7 +112,8 @@ xpcc::stm32::SpiMaster{{ id }}::transfer(
 			{
 
 		default:
-				// if tx == 0, we use a dummy byte 0xff
+				// if tx == 0, we use a dummy byte 0x00
+				// else we copy it from the array
 				if (tx) tx_byte = tx[index];
 		{
 				// call the coroutine
@@ -117,7 +121,7 @@ xpcc::stm32::SpiMaster{{ id }}::transfer(
 
 				// if the coroutine is still running, so are we
 				if (result.state > xpcc::co::NestingError)
-					return {xpcc::co::Running, 0};
+					return {xpcc::co::Running};
 
 				// if rx != 0, we copy the result into the array
 				if (rx) rx[index] = result.result;
@@ -126,7 +130,7 @@ xpcc::stm32::SpiMaster{{ id }}::transfer(
 			}
 
 			// clear the state
-			state &= 0x01;
-			return {xpcc::co::Stop, 0};
+			state &= ~Bit1;
+			return {xpcc::co::Stop};
 	}
 }
