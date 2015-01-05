@@ -28,7 +28,7 @@
  */
 // ----------------------------------------------------------------------------
 /**
- * \ingroup		communication
+ * \ingroup		backend
  * \defgroup 	tipc	(TIPC) Transparent Inter-Process Communication
  * \brief 		Interface to the Linux-TIPC.
  *
