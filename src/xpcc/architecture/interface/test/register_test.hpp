@@ -22,30 +22,28 @@ protected:
 	enum class
 	Test : uint8_t
 	{
-		A = 0x01,
-		B = 0x02,
-		C = 0x04,
-		D = 0x08,
-		E = 0x10,
-		F = 0x20,
-		G = 0x40,
-		H = 0x80,
-		Mask = 0xff,
+		A = Bit0,
+		B = Bit1,
+		C = Bit2,
+		D = Bit3,
+		E = Bit4,
+		F = Bit5,
+		G = Bit6,
+		H = Bit7,
 	};
 	XPCC_FLAGS8(Test);
 
 	enum class
 	Test2 : uint8_t
 	{
-		A = 0x01,
-		B = 0x02,
-		C = 0x04,
-		D = 0x08,
-		E = 0x10,
-		F = 0x20,
-		G = 0x40,
-		H = 0x80,
-		Mask = 0xff,
+		A = Bit0,
+		B = Bit1,
+		C = Bit2,
+		D = Bit3,
+		E = Bit4,
+		F = Bit5,
+		G = Bit6,
+		H = Bit7,
 	};
 	XPCC_FLAGS8(Test2);
 
@@ -66,29 +64,29 @@ protected:
 	enum class
 	Config : uint8_t
 	{
-		Zero = 0b00,
-		One = 0b01,
-		Two = 0b10,
-		Three = 0b11,
+		Zero = 0,
+		One = Bit0,
+		Two = Bit1,
+		Three = Bit1 | Bit0,
 	};
 
 	typedef Flags8<Test3> Test3_t;
 	XPCC_TYPE_FLAGS(Test3_t);
 
 	typedef Value< Test3_t, 3, 5 > Address;
-	typedef Configuration< Test3_t, Config, 0b11, 2 > Config2;
-	typedef Configuration< Test3_t, Config, 0b11 > Config0;
+	typedef Configuration< Test3_t, Config, Bit1 | Bit0, 2 > Config2;
+	typedef Configuration< Test3_t, Config, Bit1 | Bit0 > Config0;
 
 
 	enum class
 	Direct : uint8_t
 	{
-		Zero = 0b0000,
-		One = 0b0100,
-		Two = 0b1000,
-		Three = 0b1100,
+		Zero = 0,
+		One = Bit2,
+		Two = Bit3,
+		Three = Bit3 | Bit2,
 	};
-	typedef Configuration< Test3_t, Direct, 0b1100 > Direct0;
+	typedef Configuration< Test3_t, Direct, Bit3 | Bit2 > Direct0;
 
 	typedef Flags8<> Test5_t;
 };
