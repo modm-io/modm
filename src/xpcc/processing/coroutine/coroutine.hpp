@@ -77,11 +77,11 @@ template < typename T >
 struct Result
 {
 	/// Return only the `state`. The `result` will be initialized by it's default constructor.
-	Result(uint8_t state) : state(state) {}
+	Result(uint_fast8_t state) : state(state) {}
 	/// Return `state` and valid `result`.
-	Result(uint8_t state, T result) : state(state), result(result) {}
+	Result(uint_fast8_t state, T result) : state(state), result(result) {}
 	/// The `co::State`.
-	uint8_t state;
+	uint_fast8_t state;
 	/// Custom return value.
 	T result;
 };
@@ -91,17 +91,17 @@ template <>
 struct Result<void>
 {
 	/// Return only the `state`. There is no result.
-	Result(uint8_t state) : state(state) {}
+	Result(uint_fast8_t state) : state(state) {}
 	/// Constructor with dummy result needed by the `CO_CALL_BLOCKING` macro.
-	Result(uint8_t state, uint8_t /*dummy_result*/) : state(state) {}
+	Result(uint_fast8_t state, uint_fast8_t /*dummy_result*/) : state(state) {}
 	// This anonymous union reduces the size to only 1 byte, instead of two
 	// `CO_CALL_BLOCKING` will still return something, but it will be either 0 or 1 (`Stop` or `NestingError`).
 	union
 	{
 		/// The `co::State`.
-		uint8_t state;
+		uint_fast8_t state;
 		/// Dummy result needed by the `CO_CALL_BLOCKING` macro.
-		uint8_t result;
+		uint_fast8_t result;
 	};
 };
 /// @endcond
@@ -287,7 +287,7 @@ public:
 	static constexpr CoState CoStopped = static_cast<CoState>(0);
 	/// @endcond
 private:
-	uint8_t coLevel;
+	uint_fast8_t coLevel;
 	CoState coStateArray[Depth+1];
 	void *coContext;
 };
@@ -386,7 +386,7 @@ public:
 	static constexpr CoState CoStopped = static_cast<CoState>(0);
 private:
 	CoState coState;
-	int8_t coLevel;
+	int_fast8_t coLevel;
 	void *coContext;
 };
 /// @endcond
