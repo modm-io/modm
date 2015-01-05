@@ -116,6 +116,8 @@ struct Result<void>
  * `xpcc::co::NestingError` from your called `coroutine(ctx)`.
  * It is then up to you to recognise this in your program design
  * and increase the nesting depth or rethink your code.
+ * You may disable the check by setting `XPCC_COROUTINE_CHECK_NESTING_DEPTH`
+ * to `false` in your project configuration.
  *
  * Be aware that only one coroutine of the same object can run at the
  * same time. Even if you call another coroutine, it will simply not
