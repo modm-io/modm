@@ -365,7 +365,7 @@ template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 void
 xpcc::Matrix<T, ROWS, COLUMNS>::transpose()
 {
-	XPCC__STATIC_ASSERT(ROWS == COLUMNS, "transpose() only possible for square matrices");
+	static_assert(ROWS == COLUMNS, "transpose() only possible for square matrices");
 	
 	*this = asTransposed();
 }
@@ -375,7 +375,7 @@ template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 inline T
 xpcc::Matrix<T, ROWS, COLUMNS>::determinant() const
 {
-	XPCC__STATIC_ASSERT(ROWS == COLUMNS, "determinant() only possible for square matrices");
+	static_assert(ROWS == COLUMNS, "determinant() only possible for square matrices");
 	
 	return xpcc::determinant(*this);
 }
@@ -464,8 +464,8 @@ template <uint8_t MR, uint8_t MC>
 xpcc::Matrix<T, MR, MC>
 xpcc::Matrix<T, ROWS, COLUMNS>::subMatrix(uint8_t row, uint8_t column) const
 {
-	XPCC__STATIC_ASSERT(MR <= ROWS, "sub matrix must be smaller than the original");
-	XPCC__STATIC_ASSERT(MC <= COLUMNS, "sub matrix must be smaller than the original");
+	static_assert(MR <= ROWS, "sub matrix must be smaller than the original");
+	static_assert(MC <= COLUMNS, "sub matrix must be smaller than the original");
 	
 	Matrix<T, MR, MC> sub;
 	for (uint_fast8_t i = 0; i < MR; ++i) {
@@ -495,8 +495,8 @@ template <uint8_t MR, uint8_t MC>
 xpcc::Matrix<T, ROWS, COLUMNS>&
 xpcc::Matrix<T, ROWS, COLUMNS>::replace(uint8_t row, uint8_t column, const xpcc::Matrix<T, MR, MC> &m)
 {
-	XPCC__STATIC_ASSERT(MR <= ROWS, "replacement matrix can't be larger than the original");
-	XPCC__STATIC_ASSERT(MC <= COLUMNS, "replacement matrix can't be larger than the original");
+	static_assert(MR <= ROWS, "replacement matrix can't be larger than the original");
+	static_assert(MC <= COLUMNS, "replacement matrix can't be larger than the original");
 	
 	for (uint_fast8_t i = 0; i < MR && (i + row) < ROWS; ++i)
 	{

@@ -91,7 +91,7 @@ namespace xpcc
 			// WARNING:
 			// Only floating point types are allowed as second type of xpcc::Pair
 			// because the calculation will deliver wrong results otherwise!
-			XPCC__STATIC_ASSERT(xpcc::ArithmeticTraits<OutputType>::isFloatingPoint, 
+			static_assert(xpcc::ArithmeticTraits<OutputType>::isFloatingPoint, 
 					"Only floating point types are allowed as second type of xpcc::Pair");
 		public:
 			/**

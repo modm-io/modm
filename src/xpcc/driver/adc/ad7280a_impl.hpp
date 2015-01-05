@@ -156,7 +156,7 @@ template <typename Spi, typename Cs, typename Cnvst, int N>
 void
 xpcc::Ad7280a<Spi, Cs, Cnvst, N>::initialize(ad7280a::Average average)
 {
-	XPCC__STATIC_ASSERT(N == 1, "Daisy chain length is currently limited to 1!");
+	static_assert(N == 1, "Daisy chain length is currently limited to 1!");
 	
 	controlHighByte = average;
 	

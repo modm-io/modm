@@ -52,7 +52,7 @@ namespace xpcc
 	class BufferedGraphicDisplay : public GraphicDisplay
 	{
 		// Height must be a multiple of 8
-		XPCC__STATIC_ASSERT((Height % 8) == 0, "height must be a multiple of 8");
+		static_assert((Height % 8) == 0, "height must be a multiple of 8");
 
 	public:
 		virtual

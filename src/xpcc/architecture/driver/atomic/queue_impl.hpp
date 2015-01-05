@@ -38,7 +38,7 @@ xpcc::atomic::Queue<T, N>::Queue() :
 	head(0), tail(0)
 {
 #if defined(XPCC__CPU_AVR)
-	XPCC__STATIC_ASSERT(N <= 254, "A maximum of 254 elements is allowed for AVRs!");
+	static_assert(N <= 254, "A maximum of 254 elements is allowed for AVRs!");
 #endif
 }
 
@@ -58,7 +58,7 @@ template<typename T, std::size_t N>
 bool
 xpcc::atomic::Queue<T, N>::isNearlyFull() const
 {
-	XPCC__STATIC_ASSERT(N > 3, "Not possible the check for 'nearly full' of such a small queue.");
+	static_assert(N > 3, "Not possible the check for 'nearly full' of such a small queue.");
 	
 	Index tmphead = xpcc::accessor::asVolatile(this->head);
 	Index tmptail = xpcc::accessor::asVolatile(this->tail);
@@ -85,7 +85,7 @@ template<typename T, std::size_t N>
 bool
 xpcc::atomic::Queue<T, N>::isNearlyEmpty() const
 {
-	XPCC__STATIC_ASSERT(N > 3, "Not possible the check for 'nearly empty' of such a small queue. ");
+	static_assert(N > 3, "Not possible the check for 'nearly empty' of such a small queue. ");
 
 	uint8_t tmphead = xpcc::accessor::asVolatile(this->head);
 	uint8_t tmptail = xpcc::accessor::asVolatile(this->tail);
