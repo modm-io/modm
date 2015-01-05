@@ -31,6 +31,7 @@ public:
 	///@{
 	/// Common tolerances in percent
 	static constexpr uint16_t Exact			=    0;
+	static constexpr uint16_t ZeroPercent	=    0;
 	static constexpr uint16_t HalfPercent	=    5;
 	static constexpr uint16_t OnePercent	=   10;
 	static constexpr uint16_t TwoPercent	=   20;
