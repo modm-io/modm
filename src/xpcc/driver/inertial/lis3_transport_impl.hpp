@@ -79,7 +79,7 @@ xpcc::Lis3TransportI2c<I2cMaster>::read(void *ctx, uint8_t reg, uint8_t *buffer,
 // MARK: SPI TRANSPORT
 template < class SpiMaster, class Cs >
 xpcc::Lis3TransportSpi<SpiMaster, Cs>::Lis3TransportSpi(uint8_t /*address*/)
-:	lengthBuffer(0), whoAmI(0)
+:	whoAmI(0)
 {
 	Cs::setOutput(xpcc::Gpio::High);
 }
@@ -130,11 +130,7 @@ xpcc::Lis3TransportSpi<SpiMaster, Cs>::read(void *ctx, uint8_t reg, uint8_t *buf
 
 	CO_CALL(SpiMaster::transfer(reg | Read));
 
-	for (lengthBuffer = 0; lengthBuffer < length; lengthBuffer++)
-	{
-		whoAmI = CO_CALL(SpiMaster::transfer(0));
-		buffer[lengthBuffer] = whoAmI;
-	}
+	CO_CALL(SpiMaster::transfer(nullptr, buffer, length));
 
 	if (this->releaseMaster(ctx))
 		Cs::set();

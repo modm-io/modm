@@ -128,7 +128,6 @@ protected:
 	/// @endcond
 
 private:
-	uint8_t lengthBuffer;
 	uint8_t whoAmI;
 
 	// write read bit on the address
