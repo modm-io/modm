@@ -39,7 +39,7 @@ struct KeyFrameBase
 	:	length(length), value{values...}
 	{
 	}
-} __attribute__((packed));
+} ATTRIBUTE_PACKED;
 
 template<typename T, int remaining, typename... Args>
 struct KeyFrameHelper
@@ -76,7 +76,7 @@ struct KeyFrame
 	T value[N];
 
 	/// Constructor with length and multiple values of type T
-	KeyFrameBase(TimeType length, T... values);
+	KeyFrame(TimeType length, T... values);
 };
 #endif
 
