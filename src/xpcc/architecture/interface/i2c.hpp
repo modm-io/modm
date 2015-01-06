@@ -57,26 +57,26 @@ struct I2c
 	enum class
 	OperationAfterStart : uint8_t
 	{
-		Stop  = Operation::Stop,		///< Generate a Stop Condition
-		Write = Operation::Write,		///< Write data to the slave
-		Read  = Operation::Read,		///< Read data from the slave
+		Stop  = uint8_t(Operation::Stop),		///< Generate a Stop Condition
+		Write = uint8_t(Operation::Write),		///< Write data to the slave
+		Read  = uint8_t(Operation::Read),		///< Read data from the slave
 	};
 
 	/// Further operations after write operation.
 	enum class
 	OperationAfterWrite : uint8_t
 	{
-		Stop    = Operation::Stop,		///< Generate a Stop Condition
-		Restart = Operation::Restart,	///< Generate a Restart
-		Write   = Operation::Write,	///< Write data to the slave
+		Stop    = uint8_t(Operation::Stop),		///< Generate a Stop Condition
+		Restart = uint8_t(Operation::Restart),	///< Generate a Restart
+		Write   = uint8_t(Operation::Write),	///< Write data to the slave
 	};
 
 	/// Further operations after read operation.
 	enum class
 	OperationAfterRead : uint8_t
 	{
-		Stop    = Operation::Stop,		///< Generate a Stop Condition
-		Restart = Operation::Restart,	///< Generate a Restart
+		Stop    = uint8_t(Operation::Stop),		///< Generate a Stop Condition
+		Restart = uint8_t(Operation::Restart),	///< Generate a Restart
 	};
 	///@}
 
