@@ -97,15 +97,12 @@ xpcc::{{target.family}}::SpiMaster::transfer(
 {
 	// this is a manually implemented "fast coroutine"
 	// there is no context or nesting protection, since we don't need it.
-	// there are only two states encoded into 1 bit (0x02 of state):
+	// there are only two states encoded into 1 bit (Bit6 of state):
 	//   1. initialize index, and
 	//   2. wait for 1-byte transfer to finish.
 
 	// we need to globally remember which byte we are currently transferring
 	static std::size_t index = 0;
-
-	// we need to allocate this on the stack
-	uint8_t tx_byte = 0;
 
 	// we are only interested in Bit6
 	switch(state & Bit6)
@@ -118,13 +115,10 @@ xpcc::{{target.family}}::SpiMaster::transfer(
 			index = 0;
 			while (index < length)
 			{
-
 		default:
-				// if tx == 0, we use a dummy byte 0xff
-				if (tx) tx_byte = tx[index];
 		{
 				// call the coroutine
-				xpcc::co::Result<uint8_t> result = transfer(tx_byte);
+				xpcc::co::Result<uint8_t> result = transfer(tx ? tx[index] : 0);
 
 				// if the coroutine is still running, so are we
 				if (result.state > xpcc::co::NestingError)
