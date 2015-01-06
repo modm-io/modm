@@ -10,6 +10,7 @@
 #include "uart_spi_master_{{ id }}.hpp"
 #include <xpcc/architecture/driver/atomic.hpp>
 #include <xpcc/math/utils/bit_operation.hpp>
+#include <xpcc/architecture/interface/register.hpp>
 
 %% if extended is not defined
 xpcc::{{target.family}}::UartSpiMaster{{id}}::DataOrder
@@ -82,12 +83,12 @@ xpcc::{{target.family}}::UartSpiMaster{{id}}::transfer(uint8_t data)
 	//   1. waiting to start, and
 	//   2. waiting to finish.
 
-	// LSB == 0 ?
-	if ( !(state & 0x80) )
+	// LSB == Bit7 ?
+	if ( !(state & Bit7) )
 	{
 		// wait for transmit register empty
 		if (!((UCSR{{id}}A & (1 << UDRE{{id}}))))
-			return {xpcc::co::Running, 0};
+			return {xpcc::co::Running};
 
 %% if extended is not defined
 		if(dataOrder == DataOrder::MsbFirst) {
@@ -96,13 +97,13 @@ xpcc::{{target.family}}::UartSpiMaster{{id}}::transfer(uint8_t data)
 %% endif
 		UDR{{id}} = data;
 
-		// set LSB = 1
-		state |= 0x80;
+		// set LSB = Bit7
+		state |= Bit7;
 	}
 
 	// wait for receive register not empty
 	if (!((UCSR{{id}}A & (1 << RXC{{id}}))))
-		return {xpcc::co::Running, 0};
+		return {xpcc::co::Running};
 
 	data = UDR{{id}};
 %% if extended is not defined
@@ -111,7 +112,7 @@ xpcc::{{target.family}}::UartSpiMaster{{id}}::transfer(uint8_t data)
 	}
 %% endif
 	// transfer finished
-	state &= ~0x80;
+	state &= ~Bit7;
 	return {xpcc::co::Stop, data};
 }
 
@@ -129,14 +130,14 @@ xpcc::{{target.family}}::UartSpiMaster{{id}}::transfer(
 	static std::size_t index = 0;
 
 	// we need to allocate this on the stack
-	uint8_t tx_byte = 0xff;
+	uint8_t tx_byte = 0;
 
 	// we are only interested in 0x02
-	switch(state & 0x40)
+	switch(state & Bit6)
 	{
 		case 0:
 			// we will only visit this state once
-			state |= 0x40;
+			state |= Bit6;
 
 			// initialize index and check range
 			index = 0;
@@ -152,7 +153,7 @@ xpcc::{{target.family}}::UartSpiMaster{{id}}::transfer(
 
 				// if the coroutine is still running, so are we
 				if (result.state > xpcc::co::NestingError)
-					return {xpcc::co::Running, 0};
+					return {xpcc::co::Running};
 
 				// if rx != 0, we copy the result into the array
 				if (rx) rx[index] = result.result;
@@ -161,7 +162,7 @@ xpcc::{{target.family}}::UartSpiMaster{{id}}::transfer(
 			}
 
 			// clear the state
-			state &= 0x01;
-			return {xpcc::co::Stop, 0};
+			state &= ~Bit6;
+			return {xpcc::co::Stop};
 	}
 }

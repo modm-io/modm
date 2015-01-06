@@ -8,6 +8,8 @@
 // ----------------------------------------------------------------------------
 
 #include "spi_master.hpp"
+#include <xpcc/architecture/interface/register.hpp>
+#include <xpcc/architecture/driver/atomic.hpp>
 
 // bit 7 (0x80) is used for transfer 1 byte
 // bit 6 (0x40) is used for transfer multiple byte
@@ -22,6 +24,8 @@ xpcc::{{target.family}}::SpiMaster::context(nullptr);
 void
 xpcc::{{target.family}}::SpiMaster::initialize(Prescaler prescaler)
 {
+	xpcc::atomic::Lock lock;
+
 	SPCR = (1 << SPE) | (1 << MSTR) | (static_cast<uint8_t>(prescaler) & ~0x80);
 	SPSR = (static_cast<uint8_t>(prescaler) & 0x80) ? (1 << SPI2X) : 0;
 	state &= 0x3f;
@@ -67,22 +71,22 @@ xpcc::{{target.family}}::SpiMaster::transfer(uint8_t data)
 
 	// always wait for any transfers to finish
 	if (!(SPSR & (1 << SPIF)))
-		return {xpcc::co::Running, 0};
+		return {xpcc::co::Running};
 
-	// LSB == 0 ?
-	if ( !(state & 0x80) )
+	// LSB == Bit7 ?
+	if ( !(state & Bit7) )
 	{
 		// start transfer by copying data into register
 		SPDR = data;
 
-		// set LSB = 1
-		state |= 0x80;
-		return {xpcc::co::Running, 0};
+		// set LSB = Bit7
+		state |= Bit7;
+		return {xpcc::co::Running};
 		// this then waits above for transfer to finish
 	}
 
 	// transfer finished
-	state &= ~0x80;
+	state &= ~Bit7;
 	data = SPDR;
 	return {xpcc::co::Stop, data};
 }
@@ -101,14 +105,14 @@ xpcc::{{target.family}}::SpiMaster::transfer(
 	static std::size_t index = 0;
 
 	// we need to allocate this on the stack
-	uint8_t tx_byte = 0xff;
+	uint8_t tx_byte = 0;
 
-	// we are only interested in 0x02
-	switch(state & 0x40)
+	// we are only interested in Bit6
+	switch(state & Bit6)
 	{
 		case 0:
 			// we will only visit this state once
-			state |= 0x40;
+			state |= Bit6;
 
 			// initialize index and check range
 			index = 0;
@@ -124,7 +128,7 @@ xpcc::{{target.family}}::SpiMaster::transfer(
 
 				// if the coroutine is still running, so are we
 				if (result.state > xpcc::co::NestingError)
-					return {xpcc::co::Running, 0};
+					return {xpcc::co::Running};
 
 				// if rx != 0, we copy the result into the array
 				if (rx) rx[index] = result.result;
@@ -133,7 +137,7 @@ xpcc::{{target.family}}::SpiMaster::transfer(
 			}
 
 			// clear the state
-			state &= 0x01;
-			return {xpcc::co::Stop, 0};
+			state &= ~Bit6;
+			return {xpcc::co::Stop};
 	}
 }
