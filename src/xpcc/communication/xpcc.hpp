@@ -9,7 +9,7 @@
 
 /**
  * @ingroup		communication
- * @defgroup	xpcc_comm XPCC
+ * @defgroup	xpcc_comm	Cross Platform Component Communication (XPCC)
  * @brief 		XPCC communication system
  */
 

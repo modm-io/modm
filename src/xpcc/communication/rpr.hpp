@@ -9,7 +9,7 @@
 
 /**
  * @ingroup		communication
- * @defgroup	rpr		Resilient Packet Ring
+ * @defgroup	rpr		Resilient Packet Ring (RPR)
  *
  * This is a simplified version of the [Resilient Packet Ring]
  * ( http://en.wikipedia.org/wiki/Resilient_Packet_Ring ).

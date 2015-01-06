@@ -129,7 +129,7 @@ namespace xpcc
 	 * need to do this by yourself before calling the initialize method!
 	 *
 	 * \author	Fabian Greif
-	 * \ingroup	can
+	 * \ingroup	mcp2515
 	 */
 	template < typename SPI,
 			   typename CS,

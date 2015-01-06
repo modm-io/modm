@@ -2,11 +2,9 @@
 //
 
 /**
-\defgroup	driver	Device drivers
-\brief 		Drivers to control external devices
-
-
-*/
+ * \defgroup	driver	Device drivers
+ * \brief 		Drivers to control external devices
+ */
 
 /**
  * \ingroup		driver
@@ -18,10 +16,10 @@
  * \defgroup	driver_dac			Digital/Analog Converters
  */
 
- /**
-  * \ingroup	driver
-  * \defgroup	driver_can			CAN bus driver
-  */
+/**
+ * \ingroup	driver
+ * \defgroup	driver_can			CAN drivers
+ */
 
 /**
  * \ingroup		driver
@@ -56,19 +54,19 @@
  * Everything without a distinct group yet.
  */
 
- /**
-  * \ingroup	driver
-  * \defgroup	driver_touch	Touch Detection
-  *
-  * Resistive or capacitive touchbuttons, touchsliders or touchscreens.
-  */
+/**
+ * \ingroup	driver
+ * \defgroup	driver_touch	Touch Detection
+ *
+ * Resistive or capacitive touchbuttons, touchsliders or touchscreens.
+ */
 
- /**
-  * \ingroup	driver
-  * \defgroup	driver_radio	Radio
-  *
-  * Wireless communication drivers
-  */
+/**
+ * \ingroup	driver
+ * \defgroup	driver_radio	Radio
+ *
+ * Wireless communication drivers
+ */
 
 /**
  * \ingroup		driver
@@ -82,5 +80,5 @@
 
 /**
  * \ingroup		driver
- * \defgroup	driver_pwm			PWM Drivers
+ * \defgroup	driver_pwm		PWM Drivers
  */

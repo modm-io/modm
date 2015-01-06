@@ -9,7 +9,7 @@
 
 /**
  * @ingroup		communication
- * @defgroup	amnb		(AMNB) Asynchronous Multi-Node Bus
+ * @defgroup	amnb		Asynchronous Multi-Node Bus (AMNB)
  *
  * @section amnb_intro	Introduction
  *

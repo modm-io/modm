@@ -9,7 +9,7 @@
 
 /**
  * @ingroup		communication
- * @defgroup	sab		(SAB) Sensor Actuator Bus
+ * @defgroup	sab		Sensor Actuator Bus (SAB)
  *
  * @section sab_intro	Introduction
  *
