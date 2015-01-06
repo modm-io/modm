@@ -69,25 +69,22 @@ xpcc::{{target.family}}::SpiMaster::transfer(uint8_t data)
 	//   1. waiting to start, and
 	//   2. waiting to finish.
 
-	// always wait for any transfers to finish
-	if (!(SPSR & (1 << SPIF)))
-		return {xpcc::co::Running};
-
-	// LSB == Bit7 ?
+	// MSB != Bit7 ?
 	if ( !(state & Bit7) )
 	{
 		// start transfer by copying data into register
 		SPDR = data;
 
-		// set LSB = Bit7
+		// set MSB = Bit7
 		state |= Bit7;
-		return {xpcc::co::Running};
-		// this then waits above for transfer to finish
 	}
 
-	// transfer finished
-	state &= ~Bit7;
+	// wait for transfer to finish
+	if (!(SPSR & (1 << SPIF)))
+		return {xpcc::co::Running};
+
 	data = SPDR;
+	state &= ~Bit7;
 	return {xpcc::co::Stop, data};
 }
 
