@@ -99,8 +99,9 @@ private:
 	template< typename Type >
 	struct Computations <Type, uint8_t>
 	{
-		uint16_t accumulatedValue;
-		int16_t deltaValue;
+		// fast types get promoted to uint32 which makes this faster on ARM
+		uint_fast16_t accumulatedValue;
+		int_fast16_t deltaValue;
 
 		Computations()
 		:	accumulatedValue(0), deltaValue(0)
@@ -108,13 +109,13 @@ private:
 		}
 
 		void inline
-		initialize(Type begin, Type end, uint16_t steps)
+		initialize(Type begin, Type end, uint_fast16_t steps)
 		{
-			int16_t delta = (static_cast<int16_t>(end) - begin) << 7;
-			deltaValue = delta / static_cast<int16_t>(steps);
+			int_fast16_t delta = (static_cast<int_fast16_t>(end) - begin) << 7;
+			deltaValue = delta / static_cast<int_fast16_t>(steps);
 			if (deltaValue == 0)
 				deltaValue = delta > 0 ? 1 : -1;
-			accumulatedValue = (static_cast<uint16_t>(begin) << 7) + deltaValue / 2;
+			accumulatedValue = (static_cast<uint_fast16_t>(begin) << 7) + deltaValue / 2;
 		}
 
 		void inline
