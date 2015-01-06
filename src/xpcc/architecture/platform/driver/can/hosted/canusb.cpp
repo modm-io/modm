@@ -12,7 +12,7 @@
 #include <xpcc/architecture/driver.hpp>
 #include <xpcc/processing/timeout.hpp>
 
-#include <xpcc/communication/can/can_lawicel_formatter.hpp>
+#include <xpcc/driver/can/can_lawicel_formatter.hpp>
 #include "canusb.hpp"
 
 xpcc::hosted::CanUsb::CanUsb()
