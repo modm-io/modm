@@ -9,6 +9,8 @@ package {{ package }};
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 public class Packets
 {
 	/** Every packet has to implement this interface */
@@ -29,7 +31,7 @@ public class Packets
 		 * @param buffer It must have enough space for this packet.
 		 * @return passed buffer
 		 * @see ByteBuffer#put(byte)*/
-		abstract ByteBuffer toBuffer(ByteBuffer buffer);
+		ByteBuffer toBuffer(ByteBuffer buffer);
 	}
 	
 	/** Base class for all struct types */
@@ -140,6 +142,7 @@ public class Packets
 	
 	{% if packet.description %}/** {{ packet.description | xpcc.wordwrap(72) | xpcc.indent(1) }} */{% endif %}
 	{%- if packet.isStruct %}
+	@XmlRootElement
 	public static {% if (not packet.extending) %}final {% endif %}class {{ packet.flattened().name | typeName }} extends {% if packet.extends %}{{ packet.extends.name | typeName }}{% else %}Struct{% endif %}
 	{// packet.isStruct
 		{%- for element in packet.iter() %}
@@ -161,6 +164,17 @@ public class Packets
 		
 		public {{ packet.name | typeName }} () {
 		}
+
+		{%- if packet.elements.__len__()>0 %}
+		public {{ packet.name | typeName }} (
+				{%- for element in packet.iter() %}
+				{{ element.subtype.name | typeName }} {{ element.name | variableName }}{% if not loop.last %},{% endif %}
+				{%- endfor %}) {
+			{%- for element in packet.iter() %}
+			this.{{ element.name | variableName }} = {{ element.name | variableName }};
+			{%- endfor %}
+		}
+		{%- endif %}
 		
 		@Override
 		public {% if (not packet.extending) %} final {% endif %} int getSize() {
