@@ -27,18 +27,30 @@
     <header>avr/interrupt.h</header>
     <driver type="core" name="avr">
       <parameter device-name="64" name="ram_length">3072</parameter>
+      <parameter device-name="64" name="ram_block_length">32</parameter>
       <parameter device-name="128" name="ram_length">7168</parameter>
+      <parameter device-name="128" name="ram_block_length">64</parameter>
       <parameter device-name="192|256" name="ram_length">15360</parameter>
+      <parameter device-name="192|256" name="ram_block_length">128</parameter>
       <parameter device-name="384" name="ram_length">31744</parameter>
+      <parameter device-name="384" name="ram_block_length">256</parameter>
     </driver>
     <driver type="adc" name="xmega" instances="A"/>
     <driver type="clock" name="avr"/>
     <driver type="i2c" name="xmega" instances="C,E"/>
     <driver type="spi" name="xmega" instances="C,D"/>
     <driver type="timer" name="xmega" instances="C0,C1,C2,D0,D2,E0,E2,F0,F2"/>
-    <driver type="uart" name="xmega" instances="C0,D0,E0"/>
+    <driver type="uart" name="xmega" instances="C0,D0,E0">
+      <parameter device-name="128" name="tx_buffer">250</parameter>
+      <parameter device-name="192|256" name="tx_buffer">250</parameter>
+      <parameter device-name="384" name="tx_buffer">250</parameter>
+    </driver>
     <driver type="spi" name="xmega_uart" instances="C0,D0,E0"/>
-    <driver device-name="384" type="uart" name="xmega" instances="C1,F0"/>
+    <driver device-name="384" type="uart" name="xmega" instances="C1,F0">
+      <parameter device-name="128" name="tx_buffer">250</parameter>
+      <parameter device-name="192|256" name="tx_buffer">250</parameter>
+      <parameter device-name="384" name="tx_buffer">250</parameter>
+    </driver>
     <driver device-name="384" type="spi" name="xmega_uart" instances="C1,F0"/>
     <driver type="gpio" name="xmega">
       <gpio port="A" id="0"/>

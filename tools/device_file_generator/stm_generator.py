@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2013, Roboterclub Aachen e.V.
 # All rights reserved.
-# 
+#
 # The file is part of the xpcc library and is released under the 3-clause BSD
 # license. See the file `LICENSE` for the full license governing this code.
 # -----------------------------------------------------------------------------
@@ -24,7 +24,7 @@ if __name__ == "__main__":
 	level = 'info'
 	logger = Logger(level)
 	devices = []
-	
+
 	for arg in sys.argv[1:]:
 		if arg in ['error', 'warn', 'info', 'debug', 'disabled']:
 			level = arg
@@ -35,12 +35,12 @@ if __name__ == "__main__":
 		for file in files:
 			part = STMDeviceReader(file, logger)
 			devices.append(Device(part, logger))
-	
+
 	merger = DeviceMerger(devices, logger)
 	merger.mergedByPlatform('stm32')
-	
-	folder = os.path.join(os.path.dirname(__file__), '..', '..', 'src', 'xpcc', 'architecture', 'platform', 'xml', 'stm32')
-	
+
+	folder = os.path.join(os.path.dirname(__file__), '..', '..', 'src', 'xpcc', 'architecture', 'platform', 'devices', 'stm32')
+
 	for dev in merger.mergedDevices:
 		writer = STMDeviceWriter(dev, logger)
 		writer.write(folder)

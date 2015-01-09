@@ -15,6 +15,7 @@
     <header>avr/interrupt.h</header>
     <driver type="core" name="avr">
       <parameter name="ram_length">32</parameter>
+      <parameter name="ram_block_length">4</parameter>
     </driver>
     <driver type="adc" name="attiny"/>
     <driver type="clock" name="avr"/>

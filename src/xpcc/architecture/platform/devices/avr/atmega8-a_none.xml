@@ -15,6 +15,7 @@
     <header>avr/interrupt.h</header>
     <driver type="core" name="avr">
       <parameter name="ram_length">512</parameter>
+      <parameter name="ram_block_length">8</parameter>
     </driver>
     <driver type="adc" name="atmega"/>
     <driver type="clock" name="avr"/>

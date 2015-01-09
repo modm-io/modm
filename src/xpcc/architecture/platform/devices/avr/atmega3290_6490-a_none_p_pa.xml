@@ -20,7 +20,9 @@
     <header>avr/interrupt.h</header>
     <driver type="core" name="avr">
       <parameter device-name="3290" name="ram_length">1024</parameter>
+      <parameter device-name="3290" name="ram_block_length">16</parameter>
       <parameter device-name="6490" name="ram_length">3072</parameter>
+      <parameter device-name="6490" name="ram_block_length">32</parameter>
     </driver>
     <driver type="adc" name="atmega"/>
     <driver type="clock" name="avr"/>

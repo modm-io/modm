@@ -23,8 +23,11 @@
     <header>avr/interrupt.h</header>
     <driver type="core" name="avr">
       <parameter device-name="261" name="ram_length">64</parameter>
+      <parameter device-name="261" name="ram_block_length">4</parameter>
       <parameter device-name="461" name="ram_length">128</parameter>
+      <parameter device-name="461" name="ram_block_length">4</parameter>
       <parameter device-name="861" name="ram_length">256</parameter>
+      <parameter device-name="861" name="ram_block_length">4</parameter>
     </driver>
     <driver type="adc" name="attiny"/>
     <driver type="clock" name="avr"/>

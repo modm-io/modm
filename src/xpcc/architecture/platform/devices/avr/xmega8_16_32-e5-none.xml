@@ -22,8 +22,11 @@
     <header>avr/interrupt.h</header>
     <driver type="core" name="avr">
       <parameter device-name="8" name="ram_length">512</parameter>
+      <parameter device-name="8" name="ram_block_length">8</parameter>
       <parameter device-name="16" name="ram_length">1024</parameter>
+      <parameter device-name="16" name="ram_block_length">16</parameter>
       <parameter device-name="32" name="ram_length">3072</parameter>
+      <parameter device-name="32" name="ram_block_length">32</parameter>
     </driver>
     <driver type="adc" name="xmega" instances="A"/>
     <driver type="clock" name="avr"/>

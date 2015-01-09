@@ -79,6 +79,16 @@ class AVRDeviceWriter(XMLDeviceWriter):
 				ram_size_child.setAttributes(attr)
 				ram_size_child.setValue(size)
 
+				attr2 = self._getAttributeDictionaryFromId(id)
+				attr2['name'] = 'ram_block_length'
+				block_size = 4
+				while (size / block_size > 127):
+					block_size *= 2
+
+				ram_block_child = core_child.addChild('parameter')
+				ram_block_child.setAttributes(attr2)
+				ram_block_child.setValue(block_size)
+
 		# ADC
 		self.addAdcToNode(self.root)
 		# Clock

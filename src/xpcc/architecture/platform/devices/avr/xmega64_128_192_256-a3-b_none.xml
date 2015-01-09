@@ -25,8 +25,11 @@
     <header>avr/interrupt.h</header>
     <driver type="core" name="avr">
       <parameter device-name="64" name="ram_length" device-pin-id="none">3072</parameter>
+      <parameter device-name="64" name="ram_block_length" device-pin-id="none">32</parameter>
       <parameter device-name="128" name="ram_length" device-pin-id="none">7168</parameter>
+      <parameter device-name="128" name="ram_block_length" device-pin-id="none">64</parameter>
       <parameter device-name="192|256" name="ram_length">15360</parameter>
+      <parameter device-name="192|256" name="ram_block_length">128</parameter>
     </driver>
     <driver type="adc" name="xmega" instances="A,B"/>
     <driver type="clock" name="avr"/>
@@ -35,9 +38,15 @@
     <driver type="spi" name="xmega" instances="C,D,F"/>
     <driver device-pin-id="none" type="spi" name="xmega" instances="E"/>
     <driver type="timer" name="xmega" instances="C0,C1,D0,D1,E0,E1,F0"/>
-    <driver type="uart" name="xmega" instances="C0,C1,D0,D1,E0,F0,F1"/>
+    <driver type="uart" name="xmega" instances="C0,C1,D0,D1,E0,F0,F1">
+      <parameter device-name="128" name="tx_buffer" device-pin-id="none">250</parameter>
+      <parameter device-name="192|256" name="tx_buffer">250</parameter>
+    </driver>
     <driver type="spi" name="xmega_uart" instances="C0,C1,D0,D1,E0,F0,F1"/>
-    <driver device-pin-id="none" type="uart" name="xmega" instances="E1"/>
+    <driver device-pin-id="none" type="uart" name="xmega" instances="E1">
+      <parameter device-name="128" name="tx_buffer" device-pin-id="none">250</parameter>
+      <parameter device-name="192|256" name="tx_buffer">250</parameter>
+    </driver>
     <driver device-pin-id="none" type="spi" name="xmega_uart" instances="E1"/>
     <driver type="gpio" name="xmega">
       <gpio port="A" id="0"/>

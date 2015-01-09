@@ -18,7 +18,9 @@
     <header>avr/interrupt.h</header>
     <driver type="core" name="avr">
       <parameter device-name="1|2" name="ram_length">256</parameter>
+      <parameter device-name="1|2" name="ram_block_length">4</parameter>
       <parameter device-name="216" name="ram_length">512</parameter>
+      <parameter device-name="216" name="ram_block_length">8</parameter>
     </driver>
     <driver type="adc" name="at90"/>
     <driver type="clock" name="avr"/>

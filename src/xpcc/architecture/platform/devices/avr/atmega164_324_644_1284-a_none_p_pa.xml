@@ -30,9 +30,13 @@
     <header>avr/interrupt.h</header>
     <driver type="core" name="avr">
       <parameter device-name="164" name="ram_length">512</parameter>
+      <parameter device-name="164" name="ram_block_length">8</parameter>
       <parameter device-name="324" name="ram_length">1024</parameter>
+      <parameter device-name="324" name="ram_block_length">16</parameter>
       <parameter device-name="644" name="ram_length">3072</parameter>
+      <parameter device-name="644" name="ram_block_length">32</parameter>
       <parameter device-name="1284" name="ram_length">15360</parameter>
+      <parameter device-name="1284" name="ram_block_length">128</parameter>
     </driver>
     <driver type="adc" name="atmega"/>
     <driver type="clock" name="avr"/>
@@ -48,7 +52,9 @@
       <parameter device-name="1284" name="tx_buffer">250</parameter>
     </driver>
     <driver device-name="164|324|1284" type="spi" name="at90_tiny_mega_uart" instances="1"/>
-    <driver device-name="644" device-type="a|p|pa" type="uart" name="at90_tiny_mega" instances="1"/>
+    <driver device-name="644" device-type="a|p|pa" type="uart" name="at90_tiny_mega" instances="1">
+      <parameter device-name="1284" name="tx_buffer">250</parameter>
+    </driver>
     <driver device-name="644" device-type="a|p|pa" type="spi" name="at90_tiny_mega_uart" instances="1"/>
     <driver type="gpio" name="at90_tiny_mega">
       <gpio port="A" id="0" pcint="0"/>

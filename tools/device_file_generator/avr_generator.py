@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2013, Roboterclub Aachen e.V.
 # All rights reserved.
-# 
+#
 # The file is part of the xpcc library and is released under the 3-clause BSD
 # license. See the file `LICENSE` for the full license governing this code.
 # -----------------------------------------------------------------------------
@@ -24,7 +24,7 @@ if __name__ == "__main__":
 	level = 'info'
 	logger = Logger(level)
 	devices = []
-	
+
 	for arg in sys.argv[1:]:
 		if arg in ['error', 'warn', 'info', 'debug', 'disabled']:
 			level = arg
@@ -38,12 +38,12 @@ if __name__ == "__main__":
 				part = AVRDeviceReader(file, logger)
 				device = Device(part, logger)
 				devices.append(device)
-	
+
 	merger = DeviceMerger(devices, logger)
 	merger.mergedByPlatform('avr')
-	
-	folder = os.path.join(os.path.dirname(__file__), '..', '..', 'src', 'xpcc', 'architecture', 'platform', 'xml', 'avr')
- 	
+
+	folder = os.path.join(os.path.dirname(__file__), '..', '..', 'src', 'xpcc', 'architecture', 'platform', 'devices', 'avr')
+
 	for dev in merger.mergedDevices:
 		writer = AVRDeviceWriter(dev, logger)
 		writer.write(folder)
