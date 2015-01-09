@@ -60,6 +60,9 @@
 	 */
 	#define	MAIN_FUNCTION
 
+	/** Same as MAIN_FUNCTION but avoids warning about unused parameters */
+	#define	MAIN_FUNCTION_NAKED
+
 	/**
 	 * \brief	Force inlining
 	 *
@@ -125,10 +128,13 @@
 	#ifdef XPCC__CPU_AVR
 	#	define	MAIN_FUNCTION	int main(void) __attribute__((OS_main)); \
 								int main(void)
+	#	define	MAIN_FUNCTION_NAKED MAIN_FUNCTION
 	#elif defined XPCC__CPU_HOSTED
-	#	define 	MAIN_FUNCTION	int main( int argc, char* argv[] )
+	#	define 	MAIN_FUNCTION		int main( int argc, char* argv[] )
+	#	define	MAIN_FUNCTION_NAKED	int main( int,      char**       )
 	#else
 	#	define	MAIN_FUNCTION	int main(void)
+	#	define	MAIN_FUNCTION_NAKED MAIN_FUNCTION
 	#endif
 
 	#define XPCC__ARRAY_SIZE(x)	(sizeof(x) / sizeof(x[0]))
