@@ -19,18 +19,15 @@
     <header>avr/interrupt.h</header>
     <driver type="core" name="avr">
       <parameter device-name="2313" name="ram_length">64</parameter>
-      <parameter device-name="2313" name="ram_block_length">4</parameter>
       <parameter device-name="4313" device-type="none" name="ram_length">128</parameter>
-      <parameter device-name="4313" device-type="none" name="ram_block_length">4</parameter>
+      <parameter name="ram_block_length">4</parameter>
     </driver>
     <driver type="clock" name="avr"/>
     <driver type="timer" name="attiny" instances="0,1"/>
     <driver type="uart" name="at90_tiny_mega" instances="0">
-      <parameter device-name="2313" name="tx_buffer">16</parameter>
-      <parameter device-name="4313" device-type="none" name="tx_buffer">16</parameter>
+      <parameter name="tx_buffer">16</parameter>
     </driver>
     <driver type="spi" name="at90_tiny_mega_uart" instances="0"/>
-    <driver type="usi" name="at90_tiny_mega"/>
     <driver type="gpio" name="at90_tiny_mega">
       <gpio port="A" id="0" pcint="8"/>
       <gpio port="A" id="1" pcint="9"/>
@@ -40,15 +37,9 @@
       <gpio port="B" id="2" pcint="2"/>
       <gpio port="B" id="3" pcint="3"/>
       <gpio port="B" id="4" pcint="4"/>
-      <gpio port="B" id="5" pcint="5">
-        <af peripheral="Usi" type="in" name="Di"/>
-      </gpio>
-      <gpio port="B" id="6" pcint="6">
-        <af peripheral="Usi" type="out" name="Do"/>
-      </gpio>
-      <gpio port="B" id="7" pcint="7">
-        <af peripheral="Usi" type="out" name="Usck"/>
-      </gpio>
+      <gpio port="B" id="5" pcint="5"/>
+      <gpio port="B" id="6" pcint="6"/>
+      <gpio port="B" id="7" pcint="7"/>
       <gpio port="D" id="0" pcint="11">
         <af peripheral="Uart0" type="in" name="Rxd"/>
         <af peripheral="UartSpiMaster0" type="in" name="Miso"/>

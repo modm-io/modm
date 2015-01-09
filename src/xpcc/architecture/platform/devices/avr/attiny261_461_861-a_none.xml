@@ -23,16 +23,13 @@
     <header>avr/interrupt.h</header>
     <driver type="core" name="avr">
       <parameter device-name="261" name="ram_length">64</parameter>
-      <parameter device-name="261" name="ram_block_length">4</parameter>
       <parameter device-name="461" name="ram_length">128</parameter>
-      <parameter device-name="461" name="ram_block_length">4</parameter>
       <parameter device-name="861" name="ram_length">256</parameter>
-      <parameter device-name="861" name="ram_block_length">4</parameter>
+      <parameter name="ram_block_length">4</parameter>
     </driver>
     <driver type="adc" name="attiny"/>
     <driver type="clock" name="avr"/>
     <driver type="timer" name="attiny" instances="0,1"/>
-    <driver type="usi" name="at90_tiny_mega"/>
     <driver type="gpio" name="at90_tiny_mega">
       <gpio port="A" id="0" pcint="0"/>
       <gpio port="A" id="1" pcint="1"/>
@@ -42,15 +39,9 @@
       <gpio port="A" id="5" pcint="5"/>
       <gpio port="A" id="6" pcint="6"/>
       <gpio port="A" id="7" pcint="7"/>
-      <gpio port="B" id="0" pcint="8">
-        <af peripheral="Usi" type="in" name="Di"/>
-      </gpio>
-      <gpio port="B" id="1" pcint="9">
-        <af peripheral="Usi" type="out" name="Do"/>
-      </gpio>
-      <gpio port="B" id="2" pcint="10">
-        <af peripheral="Usi" type="out" name="Usck"/>
-      </gpio>
+      <gpio port="B" id="0" pcint="8"/>
+      <gpio port="B" id="1" pcint="9"/>
+      <gpio port="B" id="2" pcint="10"/>
       <gpio port="B" id="3" pcint="11"/>
       <gpio port="B" id="4" pcint="12"/>
       <gpio port="B" id="5" pcint="13"/>

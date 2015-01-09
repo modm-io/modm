@@ -176,7 +176,7 @@ class AVRDeviceReader(XMLDeviceReader):
 					gpios.extend(self._gpioFromModule(module))
 					continue
 
-				if any(name.startswith(per) for per in ["EXTERNAL_INT", "TWI", "USART", "SPI", "AD_CON", "USB", "CAN", "DA_CON", "USI", "TIMER"]):
+				if any(name.startswith(per) for per in ["EXTERNAL_INT", "TWI", "USART", "SPI", "AD_CON", "USB", "CAN", "DA_CON", "TIMER"]):
 					modules.append(name)
 					module = self.createModule(name)
 					peripherals.append(module)
@@ -189,7 +189,7 @@ class AVRDeviceReader(XMLDeviceReader):
 							for gpio in [g for g in gpios if g['port'] == module['port'] and g['id'] == module['id']]:
 								gpio[name] = module['int']
 
-				for name in ['spi', 'i2c', 'usi']:
+				for name in ['spi', 'i2c']:
 					if name in pin_array:
 						for module in pin_array[name]:
 							for gpio in [g for g in gpios if g['port'] == module['port'] and g['id'] == module['id']]:
@@ -209,11 +209,11 @@ class AVRDeviceReader(XMLDeviceReader):
 										  'name': repl[module['name']].capitalize(),
 										  'type': negate[module['dir']]}
 									gpio['af'].append(af2)
-								elif name == 'usi':
-									af = {'peripheral' : 'Usi',
-										  'name': module['name'].capitalize(),
-										  'type': module['dir']}
-									gpio['af'].append(af)
+								# elif name == 'usi':
+								# 	af = {'peripheral' : 'Usi',
+								# 		  'name': module['name'].capitalize(),
+								# 		  'type': module['dir']}
+								# 	gpio['af'].append(af)
 
 				for name in ['uart0', 'uart1', 'uart2', 'uart3']:
 					if name in pin_array:

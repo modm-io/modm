@@ -104,8 +104,8 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		self.addTimerToNode(self.root)
 		# UART
 		self.addUartToNode(self.root)
-		# USI
-		self.addUsiToNode(self.root)
+		# USI can be used to emulate UART, SPI and I2C, so there should not be a seperate driver for it.
+		# self.addUsiToNode(self.root)
 		# GPIO
 		self.addGpioToNode(self.root)
 

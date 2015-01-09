@@ -20,7 +20,6 @@
     <driver type="adc" name="attiny"/>
     <driver type="clock" name="avr"/>
     <driver type="timer" name="attiny" instances="0,1"/>
-    <driver type="usi" name="at90_tiny_mega"/>
     <driver type="gpio" name="at90_tiny_mega">
       <gpio port="A" id="0" pcint="0"/>
       <gpio port="A" id="1" pcint="1"/>
@@ -34,15 +33,9 @@
       <gpio port="B" id="1" pcint="9"/>
       <gpio port="B" id="2" pcint="10"/>
       <gpio port="B" id="3" pcint="11"/>
-      <gpio port="B" id="4" pcint="12">
-        <af peripheral="Usi" type="in" name="Di"/>
-      </gpio>
-      <gpio port="B" id="5" pcint="13">
-        <af peripheral="Usi" type="out" name="Do"/>
-      </gpio>
-      <gpio port="B" id="6" pcint="14">
-        <af peripheral="Usi" type="out" name="Usck"/>
-      </gpio>
+      <gpio port="B" id="4" pcint="12"/>
+      <gpio port="B" id="5" pcint="13"/>
+      <gpio port="B" id="6" pcint="14"/>
       <gpio port="B" id="7" pcint="15" extint="0"/>
     </driver>
   </device>
