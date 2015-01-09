@@ -42,7 +42,38 @@ namespace robot
 				case {{ element.name | enumElement }}: return "{{ element.name | enumElement }}";
 			{%- endif %}
 			{%- endfor %}
-				default: return "__UNKNOWN__";
+				default: return "__UNKNOWN_ENUM__";
+			}
+		}
+	{% elif packet.isEnumClass %}
+		enum class
+		{%- if packet.underlyingType == None %}
+		{{ packet.name | typeName }}
+		{%- else %}
+		{{ packet.name | typeName }} : {{ packet.underlyingType }}
+		{%- endif %}
+		{
+			{%- for element in packet.iter() %}
+			{%- if element.description %}
+			/** {{ element.description | xpcc.wordwrap(63) | xpcc.indent(3, " * ") }} */
+			{%- endif %}
+			{{ element.name }} = {{ element.value }},
+			{%- endfor %}
+		};
+
+		inline const char*
+		enumToString({{ packet.name | typeName }} e)
+		{
+			switch (e)
+			{
+			{%- for element in packet.iter() %}
+			{%- if element.string %}
+				case {{ packet.name | typeName }}::{{ element.name }}: return "{{ packet.name | typeName }}::{{ element.string }}";
+			{%- else %}
+				case {{ packet.name | typeName }}::{{ element.name }}: return "{{ packet.name | typeName }}::{{ element.name }}";
+			{%- endif %}
+			{%- endfor %}
+				default: return "{{ packet.name | typeName }}::Unknown";
 			}
 		}
 	{% elif packet.isStruct %}

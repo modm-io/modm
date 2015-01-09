@@ -31,7 +31,7 @@ namespace robot
 				case {{ item.name | upper | replace(' ', '_') }}: return "{{ item.name | upper | replace(' ', '_') }}";
 			{%- endif -%}
 			{%- endfor %}
-				default: return "__UNKNOWN__";
+				default: return "__UNKNOWN_DOMAIN__";
 			}
 		}
 	}
@@ -53,7 +53,7 @@ namespace robot
 			{%- for item in components %}
 				case {{ item.name | upper | replace(' ', '_') }}: return "{{ item.name | upper | replace(' ', '_') }}";
 			{%- endfor %}
-				default: return "__UNKNOWN__";
+				default: return "__UNKNOWN_COMPONENT__";
 			}
 		}
 	}
@@ -75,7 +75,7 @@ namespace robot
 			{%- for item in actions %}
 				case {{ item.name | upper | replace(' ', '_') }}: return "{{ item.name | upper | replace(' ', '_') }}";
 			{%- endfor %}
-				default: return "__UNKNOWN__";
+				default: return "__UNKNOWN_ACTION__";
 			}
 		}
 	}
@@ -97,7 +97,7 @@ namespace robot
 			{%- for item in events %}
 				case {{ item.name | upper | replace(' ', '_') }}: return "{{ item.name | upper | replace(' ', '_') }}";
 			{%- endfor %}
-				default: return "__UNKNOWN__";
+				default: return "__UNKNOWN_EVENT__";
 			}
 		}
 	}

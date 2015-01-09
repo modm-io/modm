@@ -34,6 +34,7 @@ class BaseType(object):
 		self.string = None
 		
 		self.isEnum = False
+		self.isEnumClass = False
 		self.isStruct = False
 		self.isTypedef = False
 		self.isBuiltIn = False
@@ -166,7 +167,7 @@ class Enum(BaseType):
 	def __add(self, element):
 		""" Add an element to the enum.
 		
-		This has to be done in the order the elements should apear later.
+		This has to be done in the order the elements should appear later.
 		"""
 		if element.value == None:
 			element.value = self._last_value
@@ -190,6 +191,90 @@ class Enum(BaseType):
 	
 	def __str__(self):
 		return "%s : enum|%i" % (self.name, self.level)
+
+
+class EnumClass(BaseType):
+
+	class Element(object):
+		""" Sub-element of an enum-type """
+		def __init__(self, node):
+			""" Constructor
+
+			The name of the element has to be all upper case with underscores.
+			"""
+			self.name = node.get('name')
+			# if not re.match("^[0-9A-Z_]*$", self.name):
+			# 	raise ParserException("Attribute name of element in enum has to be UPPER_UNDERSCORE_STYLE (found: '%s')" % (self.name))
+
+			self.string = node.get('string')
+			if self.string is None:
+				self.string = self.name
+
+			self.description = xml_utils.get_description(node)
+			self.string = xml_utils.get_string(node)
+
+			value = node.get('value')
+			self.value = None if (value is None) else int(value, 0)
+
+		def __str__(self):
+			return "%s = %s" % (self.name, self.value)
+
+	def __init__(self, node):
+		BaseType.__init__(self, node)
+
+		self._last_value = 0
+		self.elements = []
+
+		self.isEnumClass = True
+
+		# an enum don't depend on other types
+		self.level = 0
+		self.size = 1
+		self.underlyingType = node.get('underlyingType')
+
+	def iter(self):
+		""" Iterate over all sub-elements of the enum """
+		for element in self.elements:
+			yield element
+
+	def evaluate(self, tree):
+		if self.node is None:
+			return
+
+		self.description = xml_utils.get_description(self.node)
+		self.string = xml_utils.get_string(self.node)
+		for node in self.node.findall('element'):
+			self.__add(self.Element(node))
+
+		self.node = None
+
+	def __add(self, element):
+		""" Add an element to the enum.
+
+		This has to be done in the order the elements should appear later.
+		"""
+		if element.value == None:
+			element.value = self._last_value
+			self._last_value += 1
+		else:
+			try:
+				self._last_value = element.value + 1
+			except ValueError:
+				pass
+
+		self.elements.append(element)
+
+	def create_hierarchy(self):
+		pass
+
+	def dump(self):
+		str = "%s : enum class|%i [%i]\n" % (self.name, self.level, self.size)
+		for element in self.iter():
+			str += "  + %s\n" % element
+		return str[:-1]
+
+	def __str__(self):
+		return "%s : enum class|%i" % (self.name, self.level)
 
 
 class SubType:

@@ -4,8 +4,8 @@
     DTD for rca.
 -->
 
-<!ELEMENT rca (include|description|builtin|typedef|struct|enum)*>
-<!ATTLIST rca 
+<!ELEMENT rca (include|description|builtin|typedef|struct|enum|enumclass)*>
+<!ATTLIST rca
 	version    CDATA    #REQUIRED
 >
 
@@ -37,6 +37,12 @@
 <!ELEMENT enum (description?,element*)>
 <!ATTLIST enum
 	name CDATA #REQUIRED
+>
+
+<!ELEMENT enumclass (description?,element*)>
+<!ATTLIST enumclass
+	name CDATA #REQUIRED
+	underlyingType CDATA #IMPLIED
 >
 
 <!ELEMENT element (description?)>

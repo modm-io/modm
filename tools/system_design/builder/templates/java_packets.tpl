@@ -238,7 +238,7 @@ public class Packets
 			return o;
 		}
 	}
-	{%- elif packet.isEnum %}
+	{%- elif packet.isEnum or packet.isEnumClass %}
 	public enum {{ packet.name | typeName }} implements Packet
 	{// packet.isEnum
 	{%- for element in packet.iter() %}
