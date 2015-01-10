@@ -17,7 +17,7 @@
       <parameter name="ram_length">256</parameter>
       <parameter name="ram_block_length">4</parameter>
     </driver>
-    <driver type="adc" name="atmega"/>
+    <driver type="adc" name="at90_tiny_mega"/>
     <driver type="clock" name="avr"/>
     <driver type="i2c" name="at90_tiny_mega"/>
     <driver type="spi" name="at90_tiny_mega"/>

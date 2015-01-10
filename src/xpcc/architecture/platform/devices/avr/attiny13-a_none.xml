@@ -17,7 +17,7 @@
       <parameter name="ram_length">32</parameter>
       <parameter name="ram_block_length">4</parameter>
     </driver>
-    <driver type="adc" name="attiny"/>
+    <driver type="adc" name="at90_tiny_mega"/>
     <driver type="clock" name="avr"/>
     <driver type="timer" name="attiny" instances="0"/>
     <driver type="gpio" name="at90_tiny_mega">

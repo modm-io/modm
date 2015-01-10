@@ -23,7 +23,7 @@
       <parameter device-name="6450" name="ram_length">3072</parameter>
       <parameter device-name="6450" name="ram_block_length">32</parameter>
     </driver>
-    <driver type="adc" name="atmega"/>
+    <driver type="adc" name="at90_tiny_mega"/>
     <driver type="clock" name="avr"/>
     <driver type="spi" name="at90_tiny_mega"/>
     <driver type="timer" name="atmega" instances="0,1,2"/>

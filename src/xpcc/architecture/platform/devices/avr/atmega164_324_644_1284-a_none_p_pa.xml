@@ -38,7 +38,7 @@
       <parameter device-name="1284" name="ram_length">15360</parameter>
       <parameter device-name="1284" name="ram_block_length">128</parameter>
     </driver>
-    <driver type="adc" name="atmega"/>
+    <driver type="adc" name="at90_tiny_mega"/>
     <driver type="clock" name="avr"/>
     <driver type="i2c" name="at90_tiny_mega"/>
     <driver type="spi" name="at90_tiny_mega"/>

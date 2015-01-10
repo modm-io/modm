@@ -20,22 +20,13 @@
       <parameter name="ram_length">16</parameter>
       <parameter name="ram_block_length">4</parameter>
     </driver>
-    <driver device-name="5|10" type="adc" name="attiny"/>
+    <driver device-name="5|10" type="adc" name="at90_tiny_mega"/>
     <driver type="clock" name="avr"/>
     <driver type="timer" name="attiny" instances="0"/>
     <driver type="gpio" name="at90_tiny_mega">
-      <gpio port="B" id="0" pcint="0">
-        <af peripheral="SpiMaster" type="in" name="Miso"/>
-        <af peripheral="SpiSlave" type="out" name="Somi"/>
-      </gpio>
-      <gpio port="B" id="1" pcint="1">
-        <af peripheral="SpiMaster" type="out" name="Mosi"/>
-        <af peripheral="SpiSlave" type="in" name="Simo"/>
-      </gpio>
-      <gpio port="B" id="2" pcint="2" extint="0">
-        <af peripheral="SpiMaster" type="out" name="Sck"/>
-        <af peripheral="SpiSlave" type="in" name="Sck"/>
-      </gpio>
+      <gpio port="B" id="0" pcint="0"/>
+      <gpio port="B" id="1" pcint="1"/>
+      <gpio port="B" id="2" pcint="2" extint="0"/>
       <gpio port="B" id="3" pcint="3"/>
     </driver>
   </device>
