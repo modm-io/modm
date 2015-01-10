@@ -10,6 +10,8 @@
 #ifndef XPCC_PERIPHERAL_SPI_HPP
 #define XPCC_PERIPHERAL_SPI_HPP
 
+#include <xpcc/architecture/interface.hpp>
+
 /**
  * @ingroup		interface
  * @defgroup	spi		Serial Peripheral Interface (SPI)

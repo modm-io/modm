@@ -12,7 +12,6 @@
 
 #include <xpcc/processing/coroutine.hpp>
 #include "spi.hpp"
-#include "../interface.hpp"
 
 namespace xpcc
 {
