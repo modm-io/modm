@@ -1,10 +1,10 @@
 // coding: utf-8
-/* Copyright (c) 2012-2013, Roboterclub Aachen e.V.
-* All Rights Reserved.
-*
-* The file is part of the xpcc library and is released under the 3-clause BSD
-* license. See the file `LICENSE` for the full license governing this code.
-*/
+/* Copyright (c) 2012, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
 // ----------------------------------------------------------------------------
 %#
 %% if target is stm32f2 or target is stm32f4 or (target is stm32f1 and id == 1)
@@ -17,12 +17,55 @@
 #	error 	"Don't include this file directly, use 'adc_{{ id }}.hpp' instead!"
 #endif
 
+template< class clockSource, uint32_t frequency, uint16_t tolerance >
 void
-xpcc::stm32::Adc{{ id }}::initialize(Prescaler prescaler)
+xpcc::stm32::Adc{{ id }}::initialize()
 {
-	// Initialize ADC
+	constexpr float pre_raw = (static_cast<float>(clockSource::Adc) / (frequency > 14000000 ? 14000000 : frequency));
+
+	// respect the prescaler range of 2, 4, 6, 8
+	constexpr uint32_t pre_ceil = (
+			std::ceil(pre_raw) > 6 ? 8 : (
+			std::ceil(pre_raw) > 4 ? 6 : (
+			std::ceil(pre_raw) > 2 ? 4 :
+									 2
+			)));
+	constexpr uint32_t pre_floor = (
+			std::floor(pre_raw) < 4 ? 2 : (
+			std::floor(pre_raw) < 6 ? 4 : (
+			std::floor(pre_raw) < 8 ? 6 :
+									  8
+			)));
+
+	// calculate the possible baudrates above and below the requested baudrate
+	constexpr uint32_t baud_lower = clockSource::Adc / ( pre_ceil );
+	constexpr uint32_t baud_upper = clockSource::Adc / ( pre_floor );
+
+	// calculate the fractional prescaler value corresponding to the baudrate exactly
+	// between the upper and lower baudrate
+	constexpr float pre_middle = static_cast<float>(clockSource::Adc) /
+			( ((baud_upper - baud_lower) / 2.f + baud_lower) );
+	// decide which prescaler value is closer to a possible baudrate
+	constexpr uint8_t pre = (pre_raw >= pre_middle) ? pre_ceil : pre_floor;
+
+	// check if within baudrate tolerance
+	constexpr uint32_t generated_frequency = clockSource::Adc / ( pre );
+	assertBaudrateInTolerance<
+			/* nearest possible value */ generated_frequency,
+			/* desired = */ frequency,
+			tolerance >();
+
+	// translate the prescaler into the bitmapping
+	constexpr Prescaler prescaler = (
+			(pre >= 8) ? Prescaler::Div8 : (
+			(pre >= 6) ? Prescaler::Div6 : (
+			(pre >= 4) ? Prescaler::Div4 :
+						 Prescaler::Div2
+			)));
+
 	RCC->APB2ENR |= RCC_APB2ENR_ADC{{ id }}EN;	// start ADC Clock
 	ADC{{ id }}->CR2 |= ADC_CR2_ADON;			// switch on ADC
+
 	setPrescaler(prescaler);
 }
 
@@ -30,17 +73,15 @@ void
 xpcc::stm32::Adc{{ id }}::setPrescaler(const Prescaler prescaler)
 {
 %% if target is stm32f2 or target is stm32f4
-	ADC->CCR &= ~(0b11 << 17);								// clear prescaler
-	ADC->CCR |= static_cast<uint32_t>(prescaler) << 17;		// set prescaler
+	ADC->CCR = (ADC->CCR & ~(0b11 << 17)) | (uint32_t(prescaler) << 17);
 %% elif target is stm32f1
-	RCC->CFGR &= ~(0b11 << 14);								// clear prescaler
-	RCC->CFGR |= static_cast<uint32_t>(prescaler) << 14;	// set prescaler
+	RCC->CFGR = (RCC->CFGR & ~(0b11 << 14)) | (uint32_t(prescaler) << 14);
 %% endif
 }
 
 %% if temperature_available
 void
-xpcc::stm32::Adc{{ id }}::enableTemperatureRefVMeasurement(void)
+xpcc::stm32::Adc{{ id }}::enableTemperatureRefVMeasurement()
 {
 	%% if target is stm32f2 or target is stm32f4
 	ADC->CCR |= ADC_CCR_TSVREFE;
@@ -50,7 +91,7 @@ xpcc::stm32::Adc{{ id }}::enableTemperatureRefVMeasurement(void)
 }
 
 void
-xpcc::stm32::Adc{{ id }}::disableTemperatureRefVMeasurement(void)
+xpcc::stm32::Adc{{ id }}::disableTemperatureRefVMeasurement()
 {
 	%% if target is stm32f2 or target is stm32f4
 	ADC->CCR &= ~ADC_CCR_TSVREFE;
@@ -61,111 +102,134 @@ xpcc::stm32::Adc{{ id }}::disableTemperatureRefVMeasurement(void)
 %% endif
 
 void
-xpcc::stm32::Adc{{ id }}::setLeftAdjustResult(const bool enable)
+xpcc::stm32::Adc{{ id }}::setLeftAdjustResult()
 {
-	if (enable) {
-		ADC{{ id }}->CR2 |= ADC_CR2_ALIGN;
-	}
-	else {
-		ADC{{ id }}->CR2 &= ~ADC_CR2_ALIGN;
-	}
+	ADC{{ id }}->CR2 |= ADC_CR2_ALIGN;
 }
 
 void
+xpcc::stm32::Adc{{ id }}::setRightAdjustResult()
+{
+	ADC{{ id }}->CR2 &= ~ADC_CR2_ALIGN;
+}
+
+bool
 xpcc::stm32::Adc{{ id }}::setChannel(const Channel channel,
 									 const SampleTime sampleTime)
 {
+	if (uint32_t(channel) >= 18) return false;
 	// clear number of conversions in the sequence
 	// and set number of conversions to 1
 	ADC{{ id }}->SQR1 = 0;
 	ADC{{ id }}->SQR2 = 0;
-	ADC{{ id }}->SQR3 = static_cast<uint32_t>(channel) & 0x1f;
+	ADC{{ id }}->SQR3 = uint32_t(channel) & 0x1f;
 
 	setSampleTime(channel, sampleTime);
+	return true;
 }
 
-void
+xpcc::stm32::Adc{{ id }}::Channel
+xpcc::stm32::Adc{{ id }}::getChannel()
+{
+	return Channel(ADC{{ id }}->SQR3 & 0x1f);
+}
+
+bool
 xpcc::stm32::Adc{{ id }}::addChannel(const Channel channel,
 									const SampleTime sampleTime)
 {
 	// read channel count
 	uint8_t channel_count = (ADC{{ id }}->SQR1 & ADC_SQR1_L) >> 20;
 	++channel_count;
-	if(channel_count > 0x0f) return; // emergency exit
+	if(channel_count > 0x0f) return false; // emergency exit
 	// write channel number
 	if(channel_count < 6) {
 		ADC{{ id }}->SQR3 |=
-			(static_cast<uint32_t>(channel) & 0x1f) << (channel_count*5);
+			(uint32_t(channel) & 0x1f) << (channel_count*5);
 	} else 	if(channel_count < 12) {
 		ADC{{ id }}->SQR2 |=
-			(static_cast<uint32_t>(channel) & 0x1f) << ((channel_count-6)*5);
+			(uint32_t(channel) & 0x1f) << ((channel_count-6)*5);
 	} else {
 		ADC{{ id }}->SQR1 |=
-			(static_cast<uint32_t>(channel) & 0x1f) << ((channel_count-12)*5);
+			(uint32_t(channel) & 0x1f) << ((channel_count-12)*5);
 	}
 	// update channel count
 	ADC{{ id }}->SQR1 = (ADC{{ id }}->SQR1 & ~ADC_SQR1_L) | (channel_count << 20);
 
 	setSampleTime(channel, sampleTime);
+	return true;
 }
 
 void
 xpcc::stm32::Adc{{ id }}::setSampleTime(const Channel channel,
 										const SampleTime sampleTime)
 {
-	if (static_cast<uint32_t>(channel) < 10) {
-		ADC{{ id }}->SMPR2 |= static_cast<uint32_t>(sampleTime)
-								<< (static_cast<uint32_t>(channel) * 3);
+	if (uint32_t(channel) < 10) {
+		ADC{{ id }}->SMPR2 |= uint32_t(sampleTime)
+								<< (uint32_t(channel) * 3);
 	}
 	else {
-		ADC{{ id }}->SMPR1 |= static_cast<uint32_t>(sampleTime)
-								<< ((static_cast<uint32_t>(channel)-10) * 3);
+		ADC{{ id }}->SMPR1 |= uint32_t(sampleTime)
+								<< ((uint32_t(channel)-10) * 3);
 	}
 }
 
 void
-xpcc::stm32::Adc{{ id }}::enableFreeRunningMode(void)
+xpcc::stm32::Adc{{ id }}::enableFreeRunningMode()
 {
 	ADC{{ id }}->CR2 |= ADC_CR2_CONT;	// set to continuous mode
 }
 
 void
-xpcc::stm32::Adc{{ id }}::disableFreeRunningMode(void)
+xpcc::stm32::Adc{{ id }}::disableFreeRunningMode()
 {
 	ADC{{ id }}->CR2 &= ~ADC_CR2_CONT;		// set to single mode
 }
 
 void
-xpcc::stm32::Adc{{ id }}::shutdownAdc(void)
+xpcc::stm32::Adc{{ id }}::disable()
 {
 	ADC{{ id }}->CR2 &= ~(ADC_CR2_ADON);		// switch off ADC
 	RCC->APB2ENR &= ~RCC_APB2ENR_ADC{{ id }}EN; // stop ADC Clock
 }
 
 void
-xpcc::stm32::Adc{{ id }}::startConversion(void)
+xpcc::stm32::Adc{{ id }}::startConversion()
 {
-	acknowledgeInterruptFlag(InterruptFlag::All);
+	acknowledgeInterruptFlags(InterruptFlag::All);
 %% if target is stm32f1
 	// select the SWSTART event used to trigger the start of
 	// conversion of a regular group
-	ADC{{ id }}->CR2 |= ADC_CR2_EXTTRIG | ADC_CR2_EXTSEL_0 |
-			ADC_CR2_EXTSEL_1 | ADC_CR2_EXTSEL_2;
+	ADC{{ id }}->CR2 |= ADC_CR2_EXTTRIG | ADC_CR2_EXTSEL_0 | ADC_CR2_EXTSEL_1 | ADC_CR2_EXTSEL_2;
 %% endif
 	// starts single conversion for the regular group
 	ADC{{ id }}->CR2 |= ADC_CR2_SWSTART;
 }
 
 bool
-xpcc::stm32::Adc{{ id }}::isConversionFinished(void)
+xpcc::stm32::Adc{{ id }}::isConversionFinished()
 {
 	return (ADC{{ id }}->SR & ADC_SR_EOC);
 }
 
 uint16_t
-xpcc::stm32::Adc{{ id }}::getValue(void)
+xpcc::stm32::Adc{{ id }}::getValue()
 {
 	return ADC{{ id }}->DR;
+}
+
+
+uint16_t
+xpcc::stm32::Adc{{ id }}::readChannel(Channel channel)
+{
+	if (!setChannel(channel)) return 0;
+
+	startConversion();
+	// wait until the conversion is finished
+	while (!isConversionFinished())
+		;
+
+	return getValue();
 }
 
 // ----------------------------------------------------------------------------
@@ -180,8 +244,7 @@ xpcc::stm32::Adc{{ id }}::getValue(void)
 static ALWAYS_INLINE void
 nvicEnableInterrupt(const IRQn_Type IRQn)
 {
-	NVIC->ISER[(static_cast<uint32_t>(IRQn) >> 5)] =
-								(1 << ((uint32_t)(IRQn) & 0x1F));
+	NVIC->ISER[(uint32_t(IRQn) >> 5)] = (1 << (uint32_t(IRQn) & 0x1F));
 }
 
 static ALWAYS_INLINE void
@@ -215,27 +278,27 @@ xpcc::stm32::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
 }
 
 void
-xpcc::stm32::Adc{{ id }}::enableInterrupt(const Interrupt interrupt)
+xpcc::stm32::Adc{{ id }}::enableInterrupt(const Interrupt_t interrupt)
 {
-	ADC{{ id }}->CR1 |= static_cast<uint32_t>(interrupt);
+	ADC{{ id }}->CR1 |= interrupt.value;
 }
 
 void
-xpcc::stm32::Adc{{ id }}::disableInterrupt(const Interrupt interrupt)
+xpcc::stm32::Adc{{ id }}::disableInterrupt(const Interrupt_t interrupt)
 {
-	ADC{{ id }}->CR1 &= ~static_cast<uint32_t>(interrupt);
+	ADC{{ id }}->CR1 &= ~interrupt.value;
 }
 
-xpcc::stm32::Adc{{ id }}::InterruptFlag
+xpcc::stm32::Adc{{ id }}::InterruptFlag_t
 xpcc::stm32::Adc{{ id }}::getInterruptFlags()
 {
-	return static_cast<InterruptFlag>(ADC{{ id }}->SR);
+	return InterruptFlag_t(ADC{{ id }}->SR);
 }
 
 void
-xpcc::stm32::Adc{{ id }}::acknowledgeInterruptFlag(const InterruptFlag flags)
+xpcc::stm32::Adc{{ id }}::acknowledgeInterruptFlags(const InterruptFlag_t flags)
 {
 	// Flags are cleared by writing a one to the flag position.
 	// Writing a zero is ignored.
-	ADC{{ id }}->SR = static_cast<uint32_t>(flags);
+	ADC{{ id }}->SR = flags.value;
 }
