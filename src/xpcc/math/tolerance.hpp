@@ -36,6 +36,8 @@ public:
 	static constexpr uint16_t OnePercent	=   10;
 	static constexpr uint16_t TwoPercent	=   20;
 	static constexpr uint16_t FivePercent	=   50;
+	static constexpr uint16_t TenPercent	=  100;
+	static constexpr uint16_t TwentyPercent	=  200;
 	static constexpr uint16_t DontCare		= 1000;
 	///@}
 

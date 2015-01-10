@@ -10,13 +10,14 @@
 #ifndef XPCC_ATMEGA_ADC_HPP
 #define XPCC_ATMEGA_ADC_HPP
 
+#include <xpcc/architecture/interface/adc.hpp>
 #include "../../../device.hpp"
 
 #if defined (__AVR_ATmega64HVE__) || defined(__AVR_ATmega64HVE2__)
 #	error "The ATmega64HVE2 is not supported by this ADC class."
 #endif
 
-{# The ATmega ADC module is incredibly fragmented, these defines help a tiny bit #}
+{#- The ATmega ADC module is incredibly fragmented, these defines help a tiny bit #}
 %% if target.name in ['16', '32', '64'] and target.type in ['m1', 'c1']
 	%% set adcsrb = 'AREFEN'
 %% elif target.name in ['64', '128', '256', '644', '1284', '2564'] and target.type in ['rfa1', 'rfr2']
@@ -24,6 +25,15 @@
 %% endif
 %% if target.name in ['8', '16', '32'] and target.type in ['hva', 'hvab', 'hvabrevb']
 	%% set vadc = 1
+// sane register definitions
+#define ADC		VADC
+#define ADCSRA	VADCSR
+
+// sane bit definitions
+#define ADSC	VADSC
+#define ADEN	VADEN
+#define ADIF	VADCCIF
+#define ADIE	VADCCIE
 %% endif
 %% if target.name in ['8', '128'] and target.type in ['a', None]
 	%% set adfr = 1
@@ -61,41 +71,13 @@ namespace atmega
  * ADC clock frequency should be between 50 and 200 kHz for maximum
  * resolution. If less than 10-bits are needed the frequency can be higher.
  *
- * Synchronous mode (waits until the ADC is finished):
- * @code
- * Adc::initialize(Adc::Reference::Internal2V56, Adc::Prescaler::Div64);
- * ...
- * // read channel 2
- * uint16_t value = Adc::readChannel(2);
- * ...
- * @endcode
- *
- * Asynchronous mode:
- * @code
- * // start a new conversion on channel 3
- * Adc::startConversion(3);
- *
- * // do something useful while waiting for the result
- * while (!Adc::isFinished())
- *     ;
- *
- * // read the converted value
- * uint16_t value = Adc::getValue();
- * @endcode
- *
- * Alternatively you can use the AdcInterrupt class to attach a function
- * to the ADC Interrupt handler for true asynchonous mode.
- *
- * For a detailed example see the \c adc folder in the examples folder.
- *
- * @see 	AdcInterrupt
  * @author	Niklas Hauser
- * @author	Fabian Greif
  * @ingroup	atmega
  */
-class Adc
+class Adc : public xpcc::Adc
 {
 public:
+%% if not vadc
 	enum class
 	Reference : uint8_t
 	{
@@ -117,6 +99,7 @@ public:
 		Internal1V1 = 0xc0,
 	%% endif
 	};
+%% endif
 
 	enum class
 	Prescaler : uint8_t
@@ -131,8 +114,175 @@ public:
 	};
 
 public:
-//------------ ADMUX register -------------------------------------------------
-	%% if not vadc
+	// start inherited documentation
+	template< class clockSource, uint32_t frequency=100000,
+			uint16_t tolerance = xpcc::Tolerance::TenPercent >
+	static void
+	initialize()
+	{
+		// calculate the nearest prescaler from the frequency
+		constexpr float pre_raw = (static_cast<float>(clockSource::Adc) / frequency);
+		constexpr uint16_t pre = (
+				(pre_raw >= ( 64 * 4.f/3)) ? 128 : (
+				(pre_raw >= ( 32 * 4.f/3)) ?  64 : (
+				(pre_raw >= ( 16 * 4.f/3)) ?  32 : (
+				(pre_raw >= (  8 * 4.f/3)) ?  16 : (
+				(pre_raw >= (  4 * 4.f/3)) ?   8 : (
+				(pre_raw >= (  2 * 4.f/3)) ?   4 :
+											   2
+				))))));
+
+		// check if we found a prescaler which generates a frequency within the tolerance
+		assertBaudrateInTolerance<
+				clockSource::Adc / pre,
+				frequency,
+				tolerance >();
+
+		// translate the prescaler into the bitmapping
+		constexpr Prescaler prescaler = (
+				(pre >= 128) ? Prescaler::Div128 : (
+				(pre >=  64) ? Prescaler::Div64  : (
+				(pre >=  32) ? Prescaler::Div32  : (
+				(pre >=  16) ? Prescaler::Div16  : (
+				(pre >=   8) ? Prescaler::Div8   : (
+				(pre >=   4) ? Prescaler::Div4   :
+							   Prescaler::Div2
+				))))));
+
+		disable();
+		setPrescaler(prescaler);
+		// enable the module
+		ADCSRA |= (1<<ADEN);
+	}
+
+	static inline void
+	disable()
+	{
+		ADCSRA &= ~(1<<ADEN);
+	}
+
+
+	static inline void
+	startConversion()
+	{
+		acknowledgeInterruptFlag();
+		ADCSRA |= (1<<ADSC);
+	}
+
+	static inline bool
+	isConversionFinished()
+	{
+		return getInterruptFlag();
+	}
+
+	static inline uint16_t
+	getValue()
+	{
+		return ADC;
+	}
+
+
+	/**
+	 * Read the value an analog channel
+	 *
+	 * A normal conversion takes 13 ADC clock cycles. With a clock frequency
+	 * of for example 200 kHz a conversion therefore needs 65 microseconds.
+	 * This time increases with a lower frequency.
+	 */
+	static inline uint16_t
+	readChannel(uint8_t channel)
+	{
+		if (!setChannel(channel)) return 0;
+
+		startConversion();
+		// wait until the conversion is finished
+		while (!isConversionFinished())
+			;
+
+		return getValue();
+	}
+
+
+	static inline bool
+	setChannel(uint8_t channel)
+	{
+%% if adcsrb and adcsrb == 'AREFEN'
+		if (channel > 0x12) return false;
+%% elif mux5
+		if (channel > 0x3f) return false;
+		ADCSRB = (ADCSRB & ~(1<<MUX5)) | ((channel & 0x20) ? (1<<MUX5) : 0);
+%% elif nomux4 or vadc
+		if (channel > 0x0f) return false;
+%% else
+		if (channel > 0x1f) return false;
+%% endif
+%% if vadc
+		VADMUX = (VADMUX & ~0x0f) | (channel & 0x0f);
+%% else
+		ADMUX = (ADMUX & ~0x1f) | (channel & 0x1f);
+%% endif
+		return true;
+	}
+
+	static inline uint8_t
+	getChannel()
+	{
+%% if vadc
+		return (VADMUX & 0x0f);
+%% elif mux5
+		return (ADMUX & 0x1f) | ((ADCSRB & (1<<MUX5)) ? 0x20 : 0);
+%% else
+		return (ADMUX & 0x1f);
+%% endif
+	}
+
+
+	static inline void
+	enableFreeRunningMode()
+	{
+%% if not vadc
+	%% if adfr
+		ADCSRA |= (1<<ADFR);
+	%% else
+		enableAutoTrigger();
+		setAutoTriggerSource(0);
+	%% endif
+%% endif
+	}
+
+	static inline void
+	diableFreeRunningMode()
+	{
+%% if not vadc
+	%% if adfr
+		ADCSRA |= (1<<ADFR);
+	%% else
+		disableAutoTrigger();
+	%% endif
+%% endif
+	}
+
+
+	static inline void
+	setLeftAdjustResult()
+	{
+%% if not vadc
+		ADMUX |= (1 << ADLAR);
+%% endif
+	}
+
+	static inline void
+	setRightAdjustResult()
+	{
+%% if not vadc
+		ADMUX &= ~(1 << ADLAR);
+%% endif
+	}
+	// stop inherited documentation
+
+
+
+%% if not vadc
 	/**
 	 * voltage reference for the ADC
 	 *
@@ -140,202 +290,66 @@ public:
 	 * external reference voltage is being applied to the AREF pin.
 	 */
 	static inline void
-	setReferenceVoltage(Reference referenceVoltage)
+	setReference(Reference reference)
 	{
 	%% if acdsrb and adcsrb == 'AREFEN'
-		ADCSRB = (ADCSRB & ~(1 << AREFEN)) | (static_cast<uint8_t>(referenceVoltage) & (1 << AREFEN));
+		ADCSRB = (ADCSRB & ~(1 << AREFEN)) | (uint8_t(reference) & (1 << AREFEN));
 	%% endif
-		ADMUX = (ADMUX & ~0xc0) | (static_cast<uint8_t>(referenceVoltage) & 0xc0);
+		ADMUX = (ADMUX & ~0xc0) | (uint8_t(reference) & 0xc0);
 	}
+%% endif
 
-	/**
-	 * Change the presentation of the ADC conversion result
-	 *
-	 * Change will affect the ADC Data Register immediately, regardless
-	 * of any ongoing conversions.
-	 */
-	static inline void
-	setLeftAdjustResult()
-	{
-		ADMUX |= (1 << ADLAR);
-	}
-	/// Change the presentation of the ADC conversion result
-	static inline void
-	setRightAdjustResult()
-	{
-		ADMUX &= ~(1 << ADLAR);
-	}
-	%% endif
-	/**
-	 * Analog channel selection
-	 *
-	 * Selects which analog inputs are connected to the ADC.
-	 * If this is changed during a conversion, the change will not go
-	 * in effect until this conversion is complete.
-	 */
-	static inline bool
-	setChannel(uint8_t channel)
-	{
-	%% if adcsrb and adcsrb == 'AREFEN'
-		if (channel > 0x12) return false;
-	%% elif mux5
-		if (channel > 0x3f) return false;
-		ADCSRB = (ADCSRB & ~(1<<MUX5)) | ((channel & 0x20) ? (1<<MUX5) : 0);
-	%% elif nomux4 or vadc
-		if (channel > 0x0f) return false;
-	%% else
-		if (channel > 0x1f) return false;
-	%% endif
-	%% if vadc
-		VADMUX = (VADMUX & ~0x0f) | (channel & 0x0f);
-	%% else
-		ADMUX = (ADMUX & ~0x1f) | (channel & 0x1f);
-	%% endif
-		return true;
-	}
 
-	/// @return The analog channel connected to the ADC
-	static inline uint8_t
-	getChannel()
-	{
-	%% if vadc
-		return (VADMUX & 0x0f);
-	%% elif mux5
-		return (ADMUX & 0x1f) | ((ADCSRB & (1<<MUX5)) ? 0x20 : 0);
-	%% else
-		return (ADMUX & 0x1f);
-	%% endif
-	}
-
-//------------ ADCSRA register ------------------------------------------------
-	/// Enables the ADC
-	static ALWAYS_INLINE void
-	enable()
-	{
-	%% if vadc
-		VADCSR |= (1<<VADEN);
-	%% else
-		ADCSRA |= (1<<ADEN);
-	%% endif
-	}
-	/// Disables the ADC
-	static ALWAYS_INLINE void
-	disable()
-	{
-	%% if vadc
-		VADCSR &= ~(1<<VADEN);
-	%% else
-		ADCSRA &= ~(1<<ADEN);
-	%% endif
-	}
-	/**
-	 * In Single Conversion mode, this starts each conversion.
-	 * In Free Running mode, this starts the first conversion.
-	 */
-	static ALWAYS_INLINE void
-	startConversion()
-	{
-	%% if vadc
-		VADCSR |= (1<<VADSC);
-	%% else
-		ADCSRA |= (1<<ADSC);
-	%% endif
-	}
 	/// @return	`true` if the flag is set,
 	///			`false` otherwise
 	static inline bool
 	getInterruptFlag()
 	{
-	%% if vadc
-		return (VADCSR & (1<<VADCCIF));
-	%% else
 		return (ADCSRA & (1<<ADIF));
-	%% endif
 	}
+
 	/// Clears the interrupt flag
 	static inline void
 	acknowledgeInterruptFlag()
 	{
-	%% if vadc
-		VADCSR &= ~(1<<VADCCIF);
-	%% else
 		ADCSRA &= ~(1<<ADIF);
-	%% endif
 	}
+
 	/// Enables the ADC Conversion Complete Interrupt
 	static inline void
 	enableInterrupt()
 	{
-	%% if vadc
-		VADCSR |= (1<<VADCCIE);
-	%% else
 		ADCSRA |= (1<<ADIE);
-	%% endif
 	}
+
 	/// Disables the ADC Conversion Complete Interrupt
 	static inline void
 	disableInterrupt()
 	{
-	%% if vadc
-		VADCSR &= ~(1<<VADCCIE);
-	%% else
 		ADCSRA &= ~(1<<ADIE);
-	%% endif
-	}
-	/**
-	 * Set the division factor between the system clock frequency
-	 * and the input clock to the ADC.
-	 */
-	static inline void
-	setPrescaler(Prescaler prescaler)
-	{
-		ADCSRA = (ADCSRA & ~0x07) | static_cast<uint8_t>(prescaler);
 	}
 
-	%% if not vadc
-	%% if adfr
-	/**
-	 * Enables free running mode
-	 *
-	 * The ADC will continously start conversions and provide the most
-	 * recent result in the ADC register.
-	 */
-	static inline void
-	enableFreeRunningMode()
-	{
-		ADCSRA |= (1<<ADFR);
-	}
-	/// Disables free running mode
-	static inline void
-	diableFreeRunningMode()
-	{
-		ADCSRA &= ~(1<<ADFR);
-	}
-	%% else
+%% if not vadc and not adfr
 	/**
 	 * Enable auto triggering of the ADC
 	 *
 	 * The ADC will start a conversion on a positive edge of the
 	 * selected trigger signal.
-	 * \see setAutoTriggerSource
+	 * @see setAutoTriggerSource
 	 */
 	static inline void
 	enableAutoTrigger()
 	{
 		ADCSRA |= (1<<ADATE);
 	}
+
 	/// Disable auto triggering of the ADC
 	static inline void
 	disableAutoTrigger()
 	{
 		ADCSRA &= ~(1<<ADATE);
 	}
-	%% endif
-	%% endif
 
-
-//------------ ADCSRB register ------------------------------------------------
-	%% if not adfr and not vadc
 	/**
 	 * Selects which source will trigger an ADC conversion
 	 *
@@ -359,9 +373,10 @@ public:
 		ADCSRB = (ADCSRB & ~0x0f) | source;
 	%% endif
 	}
-	%% endif
+%% endif
 
-	%% if mux5 or (acdsrb and adcsrb == 'AREFEN')
+	// MARK: special operation modes
+%% if mux5 or (acdsrb and adcsrb == 'AREFEN')
 	/**
 	 * Enable the ADC High Speed mode
 	 *
@@ -375,30 +390,32 @@ public:
 	{
 		ADCSRB |= (1<<ADHSM);
 	}
+
 	/// Disable the ADC High Speed mode
 	static inline void
 	disableHighSpeedMode()
 	{
 		ADCSRB &= ~(1<<ADHSM);
 	}
-	%% endif
+%% endif
 
-	%% if acdsrb and adcsrb == 'AREFEN'
+%% if acdsrb and adcsrb == 'AREFEN'
 	/// Source a 100uA current to the AREF pin
 	static inline void
 	enableCurrentSource()
 	{
 		ADCSRB |= (1<<ISRCEN);
 	}
+
 	/// Use AREF pin as Analog Reference pin.
 	static inline void
 	disableCurrentSource()
 	{
 		ADCSRB &= ~(1<<ISRCEN);
 	}
-	%% endif
+%% endif
 
-	%% if acdsrb and adcsrb == 'REFOK'
+%% if acdsrb and adcsrb == 'REFOK'
 	/**
 	 * The analog functions of the ADC are powered from the AVDD domain.
 	 * AVDD is supplied from an internal voltage regulator.
@@ -441,94 +458,13 @@ public:
 	{
 		ADCSRB |= (1<<ACCH);
 	}
-	%% endif
+%% endif
 
-//------------ ADC register ---------------------------------------------------
-	static inline uint16_t
-	getDataRegister()
-	{
-	%% if vadc
-		return VADC;
-	%% else
-		return ADC;
-	%% endif
-	}
-
-//-----------------------------------------------------------------------------
-	%% if vadc
-	/// Initialize and enable the A/D converter
+protected:
 	static inline void
-	initialize()
+	setPrescaler(Prescaler prescaler)
 	{
-		enable();
-	}
-	%% else
-	/// Initialize and enable the A/D converter
-	static inline void
-	initialize(Reference referenceVoltage,
-			   Prescaler prescaler)
-	{
-		setReferenceVoltage(referenceVoltage);
-		setPrescaler(prescaler);
-		enable();
-	}
-	%% endif
-
-	/// Correctly enables Free Running Mode
-	static inline void
-	freeRunningMode()
-	{
-	%% if adfr
-		enableFreeRunningMode();
-	%% else
-		enableAutoTrigger();
-		setAutoTriggerSource(0);
-	%% endif
-	}
-
-	/**
-	 * Read the value an analog channel
-	 *
-	 * A normal conversion takes 13 ADC clock cycles. With a clock frequency
-	 * of for example 200 kHz a conversion therefore needs 65 microseconds.
-	 * This time increases with a lower frequency.
-	 */
-	static inline uint16_t
-	readChannel(uint8_t channel)
-	{
-		if (!startConversion(channel)) return 0;
-
-		while (!getInterruptFlag()) {
-			// wait until the conversion is finished
-		}
-
-		return getDataRegister();
-	}
-
-	/// Start a new conversion
-	static inline bool
-	startConversion(uint8_t channel)
-	{
-		if (!setChannel(channel)) return false;
-
-		acknowledgeInterruptFlag();
-		startConversion();
-
-		return true;
-	}
-
-	/// Check if the conversion is finished
-	static inline bool
-	isFinished()
-	{
-		return getInterruptFlag();
-	}
-
-	/// the most recent 16bit result of the ADC conversion
-	static inline uint16_t
-	getValue()
-	{
-		return getDataRegister();
+		ADCSRA = (ADCSRA & ~0x07) | static_cast<uint8_t>(prescaler);
 	}
 };
 
