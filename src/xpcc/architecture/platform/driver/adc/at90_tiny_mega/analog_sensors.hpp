@@ -7,16 +7,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ATMEGA_ANALOG_SENSORS_HPP
-#define XPCC_ATMEGA_ANALOG_SENSORS_HPP
+#ifndef XPCC_ANALOG_SENSORS_HPP
+#define XPCC_ANALOG_SENSORS_HPP
 
 #include "adc_interrupt.hpp"
 #include "../../../device.hpp"
 
 namespace xpcc
-{
-
-namespace atmega
 {
 
 /**
@@ -38,14 +35,14 @@ namespace atmega
  * Be aware that averaging more than 64 values (SAMPLES>6) could cause
  * a 16bit overflow depending on your ADC values (10bit * 64 = 16bit).
  *
- * @ingroup atmega
+ * @ingroup adc
  * @author	Niklas Hauser
  *
  * @tparam CHANNELS	number of ADC channels connected to sensor(s)
  * @tparam SAMPLES	2^SAMPLES number of samples to average for each channel
  * @tparam ADConv	AdcInterrupt class
  */
-template < uint8_t CHANNELS, uint8_t SAMPLES=0, class ADConv=AdcInterrupt >
+template < uint8_t CHANNELS, uint8_t SAMPLES, class AdcInterrupt >
 class AnalogSensors
 {
 public:
@@ -55,7 +52,7 @@ public:
 	 * @param sensorData
 	 */
 	static void
-	initialize(uint8_t* sensorMapping, uint16_t* sensorData);
+	initialize(const uint8_t* sensorMapping, uint16_t* sensorData);
 
 	/**
 	 * Starts the ADC readout routine and buffers the results,
@@ -89,18 +86,14 @@ private:
 	static void
 	sampleAdc();
 
-	static ADConv adc;
-
 	static bool newData;
-	static uint8_t* map;
+	static const uint8_t* map;
 	static uint16_t *data;
 	static uint16_t numberOfSamples;
 };
-
-}	// namespace atmega
 
 }	// namespace xpcc
 
 #include "analog_sensors_impl.hpp"
 
-#endif // XPCC_ATMEGA_ANALOG_SENSORS_HPP
+#endif // XPCC_ANALOG_SENSORS_HPP

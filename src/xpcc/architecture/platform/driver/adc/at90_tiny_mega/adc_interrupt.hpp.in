@@ -1,0 +1,58 @@
+// coding: utf-8
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+
+
+#ifndef XPCC_{{ target.family | upper }}_ADC_INTERRUPT_HPP
+#define XPCC_{{ target.family | upper }}_ADC_INTERRUPT_HPP
+
+#include <xpcc/utils/dummy.hpp>
+#include "adc.hpp"
+#include "../../../device.hpp"
+
+
+namespace xpcc
+{
+
+namespace {{ target.family }}
+{
+
+/**
+ * ADC Interrupt module
+ *
+ * This class allows you to attach functions to the ADC Conversion
+ * Complete Interrupt via function pointers.
+ * Be aware however, that this implementation is slower and requires
+ * more resources than writing the function code directly into
+ * the interrupt service routines.
+ *
+ * @see AnalogSensors uses this implemenation.
+ *
+ * @ingroup		{{ target.family }}
+ * @author		Niklas Hauser
+ */
+class AdcInterrupt : public Adc
+{
+public:
+	typedef void (*Function) ();
+
+	static inline void
+	attachConversionCompleteInterrupt(Function function=xpcc::dummy)
+	{
+		conversionComplete = function;
+	}
+
+public:
+	static Function conversionComplete;
+};
+
+}	// namespace {{ target.family }}
+
+}	// namespace xpcc
+
+#endif // XPCC_{{ target.family | upper }}_ADC_INTERRUPT_HPP
