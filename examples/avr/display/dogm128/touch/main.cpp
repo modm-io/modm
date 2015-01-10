@@ -83,9 +83,8 @@ main()
 
 	display.update();
 
-	Adc::initialize(
-			Adc::Reference::Internal2V56,
-			Adc::Prescaler::Div64);
+	Adc::initialize<clock>();
+	Adc::setReference(Adc::Reference::Internal2V56);
 
 	touch::Bottom::setInput();
 	touch::Bottom::reset();

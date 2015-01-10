@@ -1,6 +1,6 @@
 /*
  * Example for a simple IO extension
- * 
+ *
  * This program enables a master to use the A/D converter and PORTD
  * from extern.
  */
@@ -9,6 +9,7 @@
 #include <xpcc/communication/sab/slave.hpp>
 
 using namespace xpcc::atmega;
+typedef xpcc::avr::SystemClock clock;
 
 // ----------------------------------------------------------------------------
 // wrapper class for the A/D converter
@@ -18,10 +19,10 @@ public:
 	AnalogDigital()
 	{
 		// initialize the analog to digital converter
-		Adc::initialize(
-				Adc::Reference::InternalAVcc, Adc::Prescaler::Div64);
+		Adc::initialize<clock, 115000>();
+		Adc::setReference(Adc::Reference::InternalVcc);
 	}
-    
+
 	void
 	readChannel(xpcc::sab::Response& response, const uint8_t *channel)
 	{
@@ -39,18 +40,18 @@ public:
 	setDirection(xpcc::sab::Response& response, const uint8_t *direction)
 	{
 		DDRD = *direction;
-		
+
 		// send a response without any attached data
 		response.send();
 	}
-	
+
 	void
 	readInput(xpcc::sab::Response& response)
 	{
 		uint8_t value = PIND;
 		response.send(value);
 	}
-	
+
 	void
 	setOutput(xpcc::sab::Response& response, const uint8_t *output)
 	{
@@ -84,10 +85,10 @@ MAIN_FUNCTION
 	Slave slave(0x02,
 			xpcc::accessor::asFlash(actionList),
 			sizeof(actionList) / sizeof(xpcc::sab::Action));
-	
+
 	// enable interrupts
-	sei();
-	
+	enableInterrupts();
+
 	while (1)
 	{
 		// decode received messages etc.

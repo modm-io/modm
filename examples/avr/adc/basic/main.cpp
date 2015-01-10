@@ -28,9 +28,8 @@ main()
 	// Initialize the analog to digital converter
 	// With the AVR running at 14.7456Mhz and a prescaler of 128 the
 	// ADC is running at 115kHz.
-	Adc::initialize(
-			Adc::Reference::InternalAVcc,
-			Adc::Prescaler::Div128);
+	Adc::initialize<clock, 115000>();
+	Adc::setReference(Adc::Reference::InternalVcc);
 
 	// read the value of channel 0 (=> ADC0 => PA0) and wait until
 	// it is finished
@@ -41,11 +40,12 @@ main()
 
 	// now lets use the asynchronous version the be able to do other stuff
 	// while waiting for the result
-	Adc::startConversion(0);
+	Adc::setChannel(0);
+	Adc::startConversion();
 
 	while (1)
 	{
-		if (Adc::isFinished())
+		if (Adc::isConversionFinished())
 		{
 			// send the result
 			output << Adc::getValue() << xpcc::endl;
@@ -57,7 +57,8 @@ main()
 			xpcc::delayMilliseconds(300);
 
 			// restart the conversion
-			Adc::startConversion(0);
+			Adc::setChannel(0);
+			Adc::startConversion();
 		}
 	}
 }

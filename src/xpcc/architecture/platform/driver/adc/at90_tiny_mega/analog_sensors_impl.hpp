@@ -54,7 +54,8 @@ xpcc::AnalogSensors<CHANNELS,SAMPLES,AdcInterrupt>::sampleAdc()
 		if (++numberOfSamples <= xpcc::pow(2,SAMPLES) * CHANNELS) {
 			// continue sampling on next channel
 			if (++indexOfChannel >= CHANNELS) indexOfChannel = 0;
-			AdcInterrupt::startConversion(map[indexOfChannel]);
+			AdcInterrupt::setChannel(map[indexOfChannel]);
+			AdcInterrupt::startConversion();
 		}
 		else {
 			// stop getting values and calculate the average of the 2^N samples
@@ -73,7 +74,8 @@ xpcc::AnalogSensors<CHANNELS,SAMPLES,AdcInterrupt>::sampleAdc()
 		data[numberOfSamples] = AdcInterrupt::getValue();
 
 		if (++numberOfSamples < CHANNELS) {
-			AdcInterrupt::startConversion(map[numberOfSamples]);
+			AdcInterrupt::setChannel(map[numberOfSamples]);
+			AdcInterrupt::startConversion();
 		} else {
 			numberOfSamples = 0;
 			newData = true;
@@ -87,7 +89,8 @@ bool inline
 xpcc::AnalogSensors<CHANNELS,SAMPLES,AdcInterrupt>::readSensors()
 {
 	if (numberOfSamples > 0) return false;
-	AdcInterrupt::startConversion(map[0]);
+	AdcInterrupt::setChannel(map[0]);
+	AdcInterrupt::startConversion();
 	return true;
 }
 

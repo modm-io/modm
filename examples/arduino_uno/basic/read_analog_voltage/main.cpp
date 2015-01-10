@@ -25,7 +25,8 @@ MAIN_FUNCTION
 	// Initialize the analog to digital converter
 	// With the AVR running at 16Mhz and a prescaler of 128 the
 	// ADC is running at 125kHz.
-	Adc::initialize(Adc::Reference::InternalAVcc, Adc::Prescaler::Div128);
+	Adc::initialize<clock, 125000>();
+	Adc::setReference(Adc::Reference::InternalVcc);
 
 	while (1)
 	{
