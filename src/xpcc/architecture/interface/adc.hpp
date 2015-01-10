@@ -76,6 +76,7 @@ public:
 
 
 	/// starts a conversion on the selected analog channel
+	/// @pre A channel must be selected with setChannel().
 	static void
 	startConversion();
 
@@ -124,7 +125,12 @@ public:
 	static void
 	enableFreeRunningMode();
 
-	/// disables free running mode
+	/**
+	 * Disables free running mode
+	 *
+	 * The ADC will do only one sample and stop. The result will be in
+	 * the ADC register.
+	 */
 	static void
 	disableFreeRunningMode();
 

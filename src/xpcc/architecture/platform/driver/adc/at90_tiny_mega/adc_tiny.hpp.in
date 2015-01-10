@@ -139,6 +139,7 @@ public:
 	};
 %% endif
 
+private:
 	enum class
 	Prescaler : uint8_t
 	{
@@ -401,7 +402,7 @@ public:
 %% endif
 
 
-protected:
+private:
 	static inline void
 	setPrescaler(Prescaler prescaler)
 	{

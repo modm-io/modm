@@ -48,6 +48,7 @@ namespace xpcc
 class Peripheral
 {
 #ifdef __DOXYGEN__
+	/// @cond
 	/// initializes the peripheral, must be called before use.
 	static void
 	initialize();
@@ -76,6 +77,7 @@ class Peripheral
 	 */
 	static void
 	acknowledgeInterruptFlag();
+	/// @endcond
 #endif
 
 public:

@@ -82,25 +82,26 @@ public:
 	Reference : uint8_t
 	{
 	%% if adcsrb and adcsrb == 'AREFEN'
-		ExternalARef = 0x20,
-		InternalAVcc = 0x60,
-		internalAVccNoCapacitor = 0x40,
+		ExternalRef = 0x20,
+		InternalVcc = 0x60,
+		internalVccNoCapacitor = 0x40,
 		Internal2V56 = 0xe0,
 		Internal2V56NoCapacitor = 0xc0,
 	%% elif adcsrb and adcsrb == 'REFOK'
-		InternalARef = 0,
-		InternalAVddNoCapacitor = 0x40,
+		InternalRef = 0,
+		InternalVddNoCapacitor = 0x40,
 		Internal1V5NoCapacitor = 0x80,
 		Internal1V6NoCapacitor = 0xc0,
 	%% else
-		ExternalARef = 0,
-		InternalAVcc = 0x40,
+		ExternalRef = 0,
+		InternalVcc = 0x40,
 		Internal2V56 = 0xe0,
 		Internal1V1 = 0xc0,
 	%% endif
 	};
 %% endif
 
+private:
 	enum class
 	Prescaler : uint8_t
 	{
@@ -460,7 +461,7 @@ public:
 	}
 %% endif
 
-protected:
+private:
 	static inline void
 	setPrescaler(Prescaler prescaler)
 	{
