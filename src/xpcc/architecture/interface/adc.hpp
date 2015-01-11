@@ -56,6 +56,13 @@ class Adc : public ::xpcc::Peripheral
 {
 #ifdef __DOXYGEN__
 public:
+	/// this type may also be an enum or enum class
+	typedef uint8_t Channel;
+
+	/// describes the maximum resolution in bits
+	static constexpr uint8_t Resolution;
+
+public:
 	/**
 	 * Initializes the hardware and sets the datarate.
 	 *
@@ -99,7 +106,7 @@ public:
 	 * @return	result of the conversion
 	 */
 	static uint16_t
-	readChannel(uint8_t channel);
+	readChannel(Channel channel);
 
 
 	/**
@@ -109,7 +116,7 @@ public:
 	 *			`false` otherwise
 	 */
 	static bool
-	setChannel(uint8_t channel);
+	setChannel(Channel channel);
 
 	/// @return the currently selected analog channel
 	static uint8_t

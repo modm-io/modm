@@ -48,6 +48,8 @@
 	%% set sfior = 1
 %% endif
 
+%% set resolution = 10
+
 namespace xpcc
 {
 
@@ -69,7 +71,9 @@ namespace atmega
  * supported functionality.
  *
  * ADC clock frequency should be between 50 and 200 kHz for maximum
- * resolution. If less than 10-bits are needed the frequency can be higher.
+ * resolution.
+ * If less than the full resolution of {{ resolution }} bits are
+ * needed the frequency can be higher.
  *
  * @author	Niklas Hauser
  * @ingroup	atmega
@@ -77,6 +81,9 @@ namespace atmega
 class Adc : public xpcc::Adc
 {
 public:
+	typedef uint8_t Channel;
+	static constexpr uint8_t Resolution = {{ resolution }};
+
 %% if not vadc
 	enum class
 	Reference : uint8_t
@@ -191,7 +198,7 @@ public:
 	 * This time increases with a lower frequency.
 	 */
 	static inline uint16_t
-	readChannel(uint8_t channel)
+	readChannel(Channel channel)
 	{
 		if (!setChannel(channel)) return 0;
 
@@ -205,7 +212,7 @@ public:
 
 
 	static inline bool
-	setChannel(uint8_t channel)
+	setChannel(Channel channel)
 	{
 %% if adcsrb and adcsrb == 'AREFEN'
 		if (channel > 0x12) return false;

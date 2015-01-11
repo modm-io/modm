@@ -29,6 +29,8 @@
 %% endif
 %#
 
+%% set resolution = 12
+
 #ifndef XPCC_STM32_ADC{{ id }}_HPP
 #define XPCC_STM32_ADC{{ id }}_HPP
 
@@ -48,8 +50,8 @@ namespace stm32
 /**
  * Analog/Digital-Converter module (ADC{{ id }}).
  *
- * The 12-bit ADC is a successive approximation analog-to-digital
- * converter. It has up to 18 multiplexed channels allowing it measure
+ * The {{resolution}}-bit ADC is a successive approximation analog-to-digital
+ * converter. It has up to 18 multiplexed channels allowing it to measure
  * signals from 16 external and two internal sources.
  * The result of the ADC is stored in a left-aligned or right-aligned
  * 16-bit data register.
@@ -70,6 +72,8 @@ public:
 	/// TypeId used to connect GPIO pins to this adc's Channel{{ channel }}.
 	static const TypeId::Adc{{ id }}Channel{{ channel }} Channel{{ channel }};
 %% endfor
+
+	static constexpr uint8_t Resolution = {{ resolution }};
 
 public:
 	/**

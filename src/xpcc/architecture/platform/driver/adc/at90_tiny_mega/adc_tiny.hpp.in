@@ -75,6 +75,7 @@
 	%% set mux_mask = '0b00001111'
 %% endif
 
+%% set resolution = 8 if target.name in ['5', '10'] else 10
 
 namespace xpcc
 {
@@ -97,7 +98,9 @@ namespace attiny
  * supported functionality.
  *
  * ADC clock frequency should be between 50 and 200 kHz for maximum
- * resolution. If less than 10-bits are needed the frequency can be higher.
+ * resolution.
+ * If less than the full resolution of {{ resolution }} bits are
+ * needed the frequency can be higher.
  *
  * @author	Niklas Hauser
  * @ingroup	attiny
@@ -105,6 +108,9 @@ namespace attiny
 class Adc : public xpcc::Adc
 {
 public:
+	typedef uint8_t Channel;
+	static constexpr uint8_t Resolution = {{ resolution }};
+
 %% if has_ref
 	enum class
 	Reference : uint8_t
@@ -229,7 +235,7 @@ public:
 	 * This time increases with a lower frequency.
 	 */
 	static inline uint16_t
-	readChannel(uint8_t channel)
+	readChannel(Channel channel)
 	{
 		if (!setChannel(channel)) return 0;
 
@@ -243,7 +249,7 @@ public:
 
 
 	static inline bool
-	setChannel(uint8_t channel)
+	setChannel(Channel channel)
 	{
 		if (channel > {{ channels - 1}}) return false;
 %% if mux5
