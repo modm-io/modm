@@ -26,7 +26,7 @@ MAIN_FUNCTION
 	ADC12_IN4_BAT::connect(Adc1::Channel4);
 	ADC12_IN5_12V::connect(Adc1::Channel5);
 	ADC12_IN14_5V::connect(Adc1::Channel14);
-	Adc1::initialize( Adc1::Prescaler::Div8 );
+	Adc1::initialize<defaultSystemClock>();
 	Adc1::enableTemperatureRefVMeasurement();
 
 

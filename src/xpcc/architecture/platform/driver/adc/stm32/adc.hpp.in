@@ -246,7 +246,7 @@ public:
 	getValue();
 
 
-	static uint16_t
+	static inline uint16_t
 	readChannel(Channel channel);
 
 
@@ -271,7 +271,7 @@ public:
 	setChannel(const Channel channel,
 			   const SampleTime sampleTime = static_cast<SampleTime>(0b000));
 
-	static Channel
+	static inline Channel
 	getChannel();
 
 

@@ -83,7 +83,7 @@ main()
 
 	display.update();
 
-	Adc::initialize<clock>();
+	Adc::initialize<clock, 115000>();
 	Adc::setReference(Adc::Reference::Internal2V56);
 
 	touch::Bottom::setInput();

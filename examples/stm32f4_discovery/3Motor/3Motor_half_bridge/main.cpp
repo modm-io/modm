@@ -47,7 +47,7 @@ MAIN_FUNCTION
 
 
 	uint32_t offsetOversampling = 128;
-	xpcc::stm32::Adc1::initialize( xpcc::stm32::Adc1::Prescaler::Div8 );
+	xpcc::stm32::Adc1::initialize<defaultSystemClock>();
 
 	{
 		using namespace CurrentSensors;
