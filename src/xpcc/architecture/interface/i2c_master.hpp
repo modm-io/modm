@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PERIPHERAL_I2C_MASTER_HPP
-#define XPCC_PERIPHERAL_I2C_MASTER_HPP
+#ifndef XPCC_INTERFACE_I2C_MASTER_HPP
+#define XPCC_INTERFACE_I2C_MASTER_HPP
 
 #include "i2c.hpp"
 #include "i2c_transaction.hpp"
@@ -103,4 +103,4 @@ public:
 
 }	// namespace xpcc
 
-#endif // XPCC_PERIPHERAL_I2C_MASTER_HPP
+#endif // XPCC_INTERFACE_I2C_MASTER_HPP

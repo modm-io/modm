@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PERIPHERAL_SPI_HPP
-#define XPCC_PERIPHERAL_SPI_HPP
+#ifndef XPCC_INTERFACE_SPI_HPP
+#define XPCC_INTERFACE_SPI_HPP
 
 #include <xpcc/architecture/interface.hpp>
 
@@ -47,4 +47,4 @@ struct Spi
 
 } // namespace xpcc
 
-#endif // XPCC_PERIPHERAL_SPI_HPP
+#endif // XPCC_INTERFACE_SPI_HPP

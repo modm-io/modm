@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PERIPHERAL_SPI_MASTER_HPP
-#define XPCC_PERIPHERAL_SPI_MASTER_HPP
+#ifndef XPCC_INTERFACE_SPI_MASTER_HPP
+#define XPCC_INTERFACE_SPI_MASTER_HPP
 
 #include <xpcc/processing/coroutine.hpp>
 #include "spi.hpp"
@@ -138,4 +138,4 @@ public:
 
 } // namespace xpcc
 
-#endif // XPCC_PERIPHERAL_SPI_MASTER_HPP
+#endif // XPCC_INTERFACE_SPI_MASTER_HPP

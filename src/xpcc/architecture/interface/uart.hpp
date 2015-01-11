@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PERIPHERAL_UART_HPP
-#define XPCC_PERIPHERAL_UART_HPP
+#ifndef XPCC_INTERFACE_UART_HPP
+#define XPCC_INTERFACE_UART_HPP
 
 #include <xpcc/architecture/interface.hpp>
 
@@ -160,4 +160,4 @@ public:
 
 }	// namespace xpcc
 
-#endif // XPCC_PERIPHERAL_UART_HPP
+#endif // XPCC_INTERFACE_UART_HPP

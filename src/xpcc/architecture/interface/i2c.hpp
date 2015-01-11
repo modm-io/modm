@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PERIPHERAL_I2C_HPP
-#define XPCC_PERIPHERAL_I2C_HPP
+#ifndef XPCC_INTERFACE_I2C_HPP
+#define XPCC_INTERFACE_I2C_HPP
 
 #include <xpcc/architecture/interface.hpp>
 
@@ -92,4 +92,4 @@ struct I2c
 
 }	// namespace xpcc
 
-#endif // XPCC_PERIPHERAL_I2C_HPP
+#endif // XPCC_INTERFACE_I2C_HPP

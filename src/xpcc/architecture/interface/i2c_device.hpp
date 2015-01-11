@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PERIPHERAL_I2C_DEVICE_HPP
-#define XPCC_PERIPHERAL_I2C_DEVICE_HPP
+#ifndef XPCC_INTERFACE_I2C_DEVICE_HPP
+#define XPCC_INTERFACE_I2C_DEVICE_HPP
 
 #include "i2c.hpp"
 #include "i2c_master.hpp"
@@ -53,4 +53,4 @@ protected:
 
 }	// namespace xpcc
 
-#endif // XPCC_PERIPHERAL_I2C_DEVICE_HPP
+#endif // XPCC_INTERFACE_I2C_DEVICE_HPP

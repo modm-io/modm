@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PERIPHERAL_ADC_HPP
-#define XPCC_PERIPHERAL_ADC_HPP
+#ifndef XPCC_INTERFACE_ADC_HPP
+#define XPCC_INTERFACE_ADC_HPP
 
 #include <xpcc/architecture/interface.hpp>
 
@@ -154,4 +154,4 @@ public:
 
 }	// namespace xpcc
 
-#endif // XPCC_PERIPHERAL_ADC_HPP
+#endif // XPCC_INTERFACE_ADC_HPP
