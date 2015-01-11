@@ -6,7 +6,5 @@
 		<template device-family="attiny" out="adc.hpp">adc_tiny.hpp.in</template>
 		<template>adc_interrupt.hpp.in</template>
 		<template>adc_interrupt.cpp.in</template>
-		<static>analog_sensors.hpp</static>
-		<static>analog_sensors_impl.hpp</static>
 	</driver>
 </rca>

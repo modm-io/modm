@@ -7,16 +7,9 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "adc_interrupt.hpp"
-#include "../../../device.hpp"
+#include "adc_interrupt_{{ id }}.hpp"
 
 // ----------------------------------------------------------------------------
-xpcc::{{ target.family }}::AdcInterrupt::Handler
-xpcc::{{ target.family }}::AdcInterrupt::handler(xpcc::dummy);
-
-// ----------------------------------------------------------------------------
-ISR(ADC_vect, ATTRIBUTE_WEAK)
-{
-	xpcc::{{ target.family }}::AdcInterrupt::handler();
-}
+xpcc::stm32::AdcInterrupt{{ id }}::Handler
+xpcc::stm32::AdcInterrupt{{ id }}::handler(xpcc::dummy);
 
