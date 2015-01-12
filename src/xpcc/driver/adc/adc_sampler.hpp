@@ -41,16 +41,23 @@ namespace xpcc
  *
  * @warning	The averaging algorithm only works for unsigned ADC data!
  *
- * @tparam AdcInterrupt	a class implementing the @see AdcInterrupt interface
+ * @tparam AdcInterrupt	a class implementing the AdcInterrupt interface
  * @tparam Channels		number of ADC channels connected to sensor(s)
  * @tparam Oversamples	`2^Oversamples` samples to average for each channel
  *
- * @ingroup adc
+ * @ingroup driver_adc
  * @author	Niklas Hauser
  */
 template < class AdcInterrupt, uint8_t Channels, uint8_t Oversamples=0 >
 class AdcSampler
 {
+// doxygen gets confused by template metaprogramming
+#ifdef __DOXYGEN__
+public:
+	/// this type is chosen automatically, it may be uint8_t, uint16_t or uint32_t
+	typedef uint16_t DataType;
+private:
+#else
 	typedef typename AdcInterrupt::Channel Channel;
 
 	static constexpr uint32_t totalSamples = xpcc::pow(2, Oversamples) * Channels;
@@ -60,9 +67,6 @@ class AdcSampler
 			uint32_t >::Result SampleType;
 
 public:
-#ifdef __DOXYGEN__
-	typedef uint32_t DataType;
-#else
 	typedef typename xpcc::tmp::Select<
 			(AdcInterrupt::Resolution + Oversamples) <= 16,
 			typename xpcc::tmp::Select<
@@ -82,13 +86,17 @@ public:
 	static void
 	initialize(const Channel* mapping, DataType* data);
 
-	/**
-	 * Starts the ADC readout routine and buffers the results
-	 * @return `false` when a readout is in progress, `true` otherwise
-	 */
+	/// Starts the ADC readout routine and buffers the results
+	/// @return `false` when a readout is in progress, `true` otherwise
 	static bool
 	startReadout();
 
+	/**
+	 * @return `true` if sampling finshed,
+	 *			`false` if sampling is currently on-going
+	 * @warning	The class adds and divides the oversamples in-place, so
+ 	 * 			the data is invalid while `isReadoutFinished()` returns false!
+ 	 */
 	static bool
 	isReadoutFinished();
 

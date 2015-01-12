@@ -40,7 +40,6 @@ namespace xpcc
  * @endcode
  *
  * @see Adc			for the synchronous method.
- * @see AdcMaster	requires this class for a channel-mapped oversampling method.
  *
  * @author	Niklas Hauser
  * @ingroup adc

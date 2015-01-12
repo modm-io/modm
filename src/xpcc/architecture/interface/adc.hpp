@@ -47,7 +47,6 @@ namespace xpcc
  * @endcode
  *
  * @see AdcInterrupt	for the asynchronous method.
- * @see AdcMaster		for a generic interrupt-based channel-mapped oversampling method.
  *
  * @author	Niklas Hauser
  * @ingroup adc
