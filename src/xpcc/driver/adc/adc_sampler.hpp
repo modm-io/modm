@@ -42,7 +42,7 @@ namespace xpcc
  * @warning	The averaging algorithm only works for unsigned ADC data!
  *
  * @tparam AdcInterrupt	a class implementing the AdcInterrupt interface
- * @tparam Channels		number of ADC channels connected to sensor(s)
+ * @tparam Channels		number of ADC channels connected to sensor(s) >= 1
  * @tparam Oversamples	`2^Oversamples` samples to average for each channel
  *
  * @ingroup driver_adc
@@ -58,6 +58,8 @@ public:
 	typedef uint16_t DataType;
 private:
 #else
+	static_assert(Channels > 0, "There must be at least one Channel to be sampled!");
+
 	typedef typename AdcInterrupt::Channel Channel;
 
 	static constexpr uint32_t totalSamples = xpcc::pow(2, Oversamples) * Channels;

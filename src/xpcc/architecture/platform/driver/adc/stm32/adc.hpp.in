@@ -218,10 +218,6 @@ public:
 %% else
 	 * The ADC clock must not exceed 14 MHz.
 %% endif
-	 *
-	 * @param prescaler
-	 * 		The prescaler specifies by which factor the
-	 * 		APB2 clock (72 MHz) will be divided.
 	 */
 	template< class clockSource, uint32_t frequency=10000000,
 			uint16_t tolerance = xpcc::Tolerance::TenPercent >

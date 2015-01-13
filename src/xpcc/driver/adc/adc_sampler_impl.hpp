@@ -14,23 +14,23 @@
 // ----------------------------------------------------------------------------
 template < class AdcInterrupt, uint8_t Channels, uint8_t Oversamples >
 const typename xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::Channel*
-xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::map;
+xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::map(nullptr);
 
 template < class AdcInterrupt, uint8_t Channels, uint8_t Oversamples >
 typename xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::DataType*
-xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::data;
+xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::data(nullptr);
 
 template < class AdcInterrupt, uint8_t Channels, uint8_t Oversamples >
 typename xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::SampleType
-xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::samples;
+xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::samples(0);
 
 template < class AdcInterrupt, uint8_t Channels, uint8_t Oversamples >
 uint8_t
-xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::index;
+xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::index(0);
 
 template < class AdcInterrupt, uint8_t Channels, uint8_t Oversamples >
 bool
-xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::newData;
+xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::newData(false);
 
 // ----------------------------------------------------------------------------
 template < class AdcInterrupt, uint8_t Channels, uint8_t Oversamples >
