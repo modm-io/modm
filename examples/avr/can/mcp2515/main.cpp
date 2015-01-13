@@ -12,7 +12,8 @@ typedef GpioOutputB7 Sclk;
 typedef GpioOutputB5 Mosi;
 typedef GpioInputB6 Miso;
 
-typedef xpcc::SoftwareSpiMaster<Sclk, Mosi, Miso> SPI;
+//typedef xpcc::SoftwareSpiMaster<Sclk, Mosi, Miso> SPI;
+typedef SpiMaster SPI;
 
 xpcc::Mcp2515<SPI, Cs, Int> mcp2515;
 
@@ -36,7 +37,7 @@ main()
 {
 	// Initialize SPI interface and the other pins
 	// needed by the MCP2515
-	SPI::initialize<clock, 1000000>();
+	SPI::initialize<clock, 921600>();
 	Cs::setOutput();
 	Int::setInput(Gpio::InputType::PullUp);
 

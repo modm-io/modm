@@ -63,6 +63,16 @@ xpcc::{{target.family}}::SpiMaster::release(void *ctx)
 xpcc::co::Result<uint8_t>
 xpcc::{{target.family}}::SpiMaster::transfer(uint8_t data)
 {
+%% if parameters.busywait
+	SPDR = data;
+
+	// wait for transfer to finish
+	while (!(SPSR & (1 << SPIF)))
+		;
+
+	data = SPDR;
+	return {xpcc::co::Stop, data};
+%% else
 	// this is a manually implemented "fast coroutine"
 	// there is no context or nesting protection, since we don't need it.
 	// there are only two states encoded into 1 bit (LSB of state):
@@ -86,12 +96,21 @@ xpcc::{{target.family}}::SpiMaster::transfer(uint8_t data)
 	data = SPDR;
 	state &= ~Bit7;
 	return {xpcc::co::Stop, data};
+%% endif
 }
 
 xpcc::co::Result<void>
 xpcc::{{target.family}}::SpiMaster::transfer(
 		uint8_t *tx, uint8_t *rx, std::size_t length)
 {
+%% if parameters.busywait
+	for (std::size_t index = 0; index < length; index++)
+	{
+		xpcc::co::Result<uint8_t> result = transfer(tx ? tx[index] : 0);
+		if (rx) rx[index] = result.result;
+	}
+	return {xpcc::co::Stop};
+%% else
 	// this is a manually implemented "fast coroutine"
 	// there is no context or nesting protection, since we don't need it.
 	// there are only two states encoded into 1 bit (Bit6 of state):
@@ -131,4 +150,5 @@ xpcc::{{target.family}}::SpiMaster::transfer(
 			state &= ~Bit6;
 			return {xpcc::co::Stop};
 	}
+%% endif
 }

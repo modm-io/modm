@@ -314,6 +314,8 @@ class Parameter:
 				if instance_id != None and instance_id != 'default':
 					if str(instance_id) == str(param['instance']):
 						return param['value']
+				elif instance_id == 'default':
+					return param['value']
 		return None
 
 	def addValueToSubstitutions(self, sub_dict, value):

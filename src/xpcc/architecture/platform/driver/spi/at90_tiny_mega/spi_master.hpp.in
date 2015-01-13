@@ -124,13 +124,21 @@ public:
 	static uint8_t
 	transferBlocking(uint8_t data)
 	{
+%% if parameters.busywait
+		return transfer(data).result;
+%% else
 		return CO_CALL_BLOCKING(transfer(data));
+%% endif
 	}
 
 	static void
 	transferBlocking(uint8_t *tx, uint8_t *rx, std::size_t length)
 	{
+%% if parameters.busywait
+		transfer(tx, rx, length);
+%% else
 		CO_CALL_BLOCKING(transfer(tx, rx, length));
+%% endif
 	}
 
 
