@@ -213,8 +213,11 @@ public:
 	 * Enables the ADC clock and switches on the ADC. The ADC clock
 	 * prescaler will be set as well.
 	 *
-	 * The ADC clock must not exceed 14 MHz. Default is a prescaler
-	 * of 8 which gives a 9 Mhz ADC clock at 72 MHz APB2 clock.
+%% if target is stm32f4
+	 * The ADC clock must not exceed 36 MHz for Vdd > 2.4V, or 18MHz for Vdd < 2.4V.
+%% else
+	 * The ADC clock must not exceed 14 MHz.
+%% endif
 	 *
 	 * @param prescaler
 	 * 		The prescaler specifies by which factor the

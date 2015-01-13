@@ -12,6 +12,12 @@
 %% else
 	%% set temperature_available = false
 %% endif
+
+%% if target is stm32f4
+	%% set max_frequency = 36000000
+%% else
+	%% set max_frequency = 14000000
+%% endif
 %#
 #ifndef XPCC_STM32_ADC{{ id }}_HPP
 #	error 	"Don't include this file directly, use 'adc_{{ id }}.hpp' instead!"
@@ -21,7 +27,7 @@ template< class clockSource, uint32_t frequency, uint16_t tolerance >
 void
 xpcc::stm32::Adc{{ id }}::initialize()
 {
-	constexpr float pre_raw = (static_cast<float>(clockSource::Adc) / (frequency > 14000000 ? 14000000 : frequency));
+	constexpr float pre_raw = (static_cast<float>(clockSource::Adc) / (frequency > {{ max_frequency }} ? {{ max_frequency }} : frequency));
 
 	// respect the prescaler range of 2, 4, 6, 8
 	constexpr uint32_t pre_ceil = (
