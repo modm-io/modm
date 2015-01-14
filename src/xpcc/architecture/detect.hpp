@@ -192,7 +192,7 @@
 #		define XPCC__CPU_ATXMEGA	1
 #		define XPCC__CPU_STRING		"Atmel XMEGA"
 #	else
-		// see http://www.nongnu.org/avr-libc/user-manual/using__tools.html
+		// see http://www.nongnu.org/avr-libc/user-manual/using_tools.html
 #		if __AVR_ARCH__ == 2 || __AVR_ARCH__ == 25 || __AVR_ARCH__ == 1
 #			define XPCC__CPU_ATTINY	1
 #			define XPCC__CPU_STRING	"Atmel tinyAVR"
