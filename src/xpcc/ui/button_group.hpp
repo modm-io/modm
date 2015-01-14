@@ -98,9 +98,9 @@ public:
 	 * 		Repeat mask, only buttons listed here can be used with the methods
 	 * 		isRepeated(), isPressedShort() and isPressedLong()
 	 * @param	timeout
-	 * 		Timeout for the repeat operation
+	 * 		Timeout for the repeat operation (number of update cycles)
 	 * @param	interval
-	 * 		Repeat interval
+	 * 		Repeat interval (number of update cycles)
 	 */
 	ButtonGroup(T mask, uint16_t timeout = 50, uint16_t interval = 20);
 
