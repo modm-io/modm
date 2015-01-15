@@ -56,7 +56,7 @@ namespace xpcc
 // ----------------------------------------------------------------------------
 template <typename SPI, typename CS, typename INT>
 bool
-xpcc::Mcp2515<SPI, CS, INT>::initialize(Can::Bitrate bitrate)
+xpcc::Mcp2515<SPI, CS, INT>::initialize(uint32_t bitrate)
 {
 	using namespace mcp2515;
 

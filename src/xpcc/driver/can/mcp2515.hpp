@@ -138,7 +138,7 @@ namespace xpcc
 	{
 	public:
 		static bool
-		initialize(Can::Bitrate bitrate);
+		initialize(uint32_t bitrate);
 
 		static void
 		setFilter(accessor::Flash<uint8_t> filter);
