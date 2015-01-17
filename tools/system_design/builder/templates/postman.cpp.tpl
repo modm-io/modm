@@ -107,3 +107,9 @@ Postman::isComponentAvaliable(uint8_t component) const
 			return false;
 	}
 }
+
+void
+Postman::update()
+{
+	// tumbleweed
+}

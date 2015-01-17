@@ -75,7 +75,9 @@ xpcc::Dispatcher::update()
 		
 		this->backend->dropPacket();
 	}
-	
+
+	postman->update();
+
 	// check if there are packets to send
 	this->handleWaitingMessages();
 }

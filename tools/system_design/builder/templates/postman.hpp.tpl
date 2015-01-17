@@ -18,6 +18,9 @@ public:
 	
 	bool
 	isComponentAvaliable(uint8_t component) const;
+
+	void
+	update();
 };
 
 #endif	// POSTMAN_HPP

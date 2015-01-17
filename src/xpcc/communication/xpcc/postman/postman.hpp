@@ -71,6 +71,9 @@ namespace xpcc
 		 */
 		virtual bool
 		isComponentAvaliable(uint8_t component) const = 0;
+
+		virtual void
+		update() = 0;
 	};
 }
 
