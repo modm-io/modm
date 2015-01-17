@@ -39,7 +39,7 @@ def generate(env, **kw):
 	env['ENV'] = os.environ
 
 	if env['HOSTED_DEVICE'] == 'linux':
-		env['LIBS'] = ['boost_thread', 'boost_system']
+		env['LIBS'] = ['boost_thread', 'boost_system', 'pthread']
 	elif env['HOSTED_DEVICE'] == 'darwin':
 		env['LIBS'] = ['boost_thread-mt', 'boost_system']
 
