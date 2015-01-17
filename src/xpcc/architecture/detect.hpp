@@ -148,16 +148,19 @@
 // Determine target operating system
 
 #if defined linux || defined __linux__
+#	define XPCC__OS_HOSTED 1
 #	define XPCC__OS_LINUX 1
 #	define XPCC__OS_STRING 			"Linux"
 #endif
 
 #if (defined __MWERKS__ && defined __powerc && !defined macintosh) || defined __APPLE_CC__ || defined macosx
+#	define XPCC__OS_HOSTED 1
 #	define XPCC__OS_OSX 1
 #	define XPCC__OS_STRING			"MacOS X"
 #endif
 
 #if defined __unix__
+#	define XPCC__OS_HOSTED 1
 #	define XPCC__OS_UNIX 1
 #	if !defined XPCC__OS_STRING
 #		define XPCC__OS_STRING 		"Unix-like(generic)"
@@ -165,6 +168,7 @@
 #endif
 
 #if defined _WIN32 || defined WIN32 || defined __NT__ || defined __WIN32__
+#	define XPCC__OS_HOSTED 1
 #	define XPCC__OS_WIN32 1
 #	if defined _WIN64
 #		define XPCC__OS_WIN64 1
@@ -180,11 +184,16 @@
 #define XPCC__ORDER_LITTLE_ENDIAN 1234
 #define XPCC__ORDER_PDP_ENDIAN 3412
 
+// If we did not detect any of Linux, OS X or Windows
+#if !defined(XPCC__OS_HOSTED)
+#	define XPCC__OS_NONE	1
+#endif
+
 // ----------------------------------------------------------------------------
 // Determine CPU type
 
 #if defined __AVR__
-#	define	XPCC__CPU_AVR	1
+#	define XPCC__CPU_AVR	1
 #	define XPCC__ALIGNMENT	1
 #	if defined __AVR_XMEGA__
 #		define XPCC__CPU_ATXMEGA	1
@@ -202,12 +211,12 @@
 #endif
 
 #if defined __X86__ || defined __i386__ || defined i386 || defined _M_IX86 || defined __386__ || defined __x86_64__ || defined _M_X64
-#	define XPCC__CPU_HOSTED 1
 #	if defined __x86_64__ || defined _M_X64
-#		define XPCC__CPU_HOSTED_64	1
+#		define XPCC__CPU_AMD64 1
 #		define XPCC__CPU_STRING		"AMD x86-64"
 #		define XPCC__ALIGNMENT	8
 #	else
+#		define XPCC__CPU_I386 1
 #		define XPCC__CPU_STRING		"Intel 386+"
 #		define XPCC__ALIGNMENT	4
 #	endif
@@ -228,6 +237,9 @@
 #	elif defined __ARM_ARCH_7EM__
 #		define XPCC__CPU_CORTEX_M4	1
 #		define XPCC__CPU_STRING		"Cortex-M4"
+#	elif defined __ARM_ARCH_7A__
+#		define XPCC__CPU_CORTEX_A7	1
+#		define XPCC__CPU_STRING		"Cortex-A7"
 #	endif
 #endif
 
