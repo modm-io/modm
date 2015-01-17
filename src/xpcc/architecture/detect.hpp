@@ -85,8 +85,6 @@
 #define	XPCC__CPU_CORTEX_M4
 #define	XPCC__CPU_CORTEX_M4
 
-#define XPCC__CPU_AVR32
-
 #define	XPCC__CPU_HOSTED
 #define	XPCC__CPU_HOSTED_64
 
@@ -201,12 +199,6 @@
 #			define XPCC__CPU_STRING	"Atmel megaAVR"
 #		endif
 #	endif
-#endif
-
-#if defined __AVR32__
-#	define XPCC__CPU_AVR32 		1
-#	define XPCC__CPU_STRING		"AVR32"
-#	define XPCC__ALIGNMENT	4
 #endif
 
 #if defined __X86__ || defined __i386__ || defined i386 || defined _M_IX86 || defined __386__ || defined __x86_64__ || defined _M_X64
