@@ -221,13 +221,13 @@
 #		define XPCC__CPU_STRING		"ARM7TDMI"
 #	elif defined __ARM_ARCH_6SM__ || defined __ARM_ARCH_6M__
 #		define XPCC__CPU_CORTEX_M0	1
-#		define XPCC__CPU_STRING		"Cortex M0"
+#		define XPCC__CPU_STRING		"Cortex-M0"
 #	elif defined __ARM_ARCH_7M__
 #		define XPCC__CPU_CORTEX_M3	1
-#		define XPCC__CPU_STRING		"Cortex M3"
+#		define XPCC__CPU_STRING		"Cortex-M3"
 #	elif defined __ARM_ARCH_7EM__
 #		define XPCC__CPU_CORTEX_M4	1
-#		define XPCC__CPU_STRING		"Cortex M4"
+#		define XPCC__CPU_STRING		"Cortex-M4"
 #	endif
 #endif
 
