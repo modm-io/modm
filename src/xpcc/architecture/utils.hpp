@@ -129,7 +129,7 @@
 	#	define	MAIN_FUNCTION	int main(void) __attribute__((OS_main)); \
 								int main(void)
 	#	define	MAIN_FUNCTION_NAKED MAIN_FUNCTION
-	#elif defined XPCC__CPU_HOSTED
+	#elif defined XPCC__OS_HOSTED
 	#	define 	MAIN_FUNCTION		int main( int argc, char* argv[] )
 	#	define	MAIN_FUNCTION_NAKED	int main( int,      char**       )
 	#else

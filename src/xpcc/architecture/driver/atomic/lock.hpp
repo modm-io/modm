@@ -222,7 +222,7 @@ namespace xpcc
 		asm volatile ("msr PRIMASK, %0" : : "r" (cpsr) );
 	}
 
-#elif defined(XPCC__CPU_HOSTED)
+#elif defined(XPCC__OS_HOSTED)
 	
 	xpcc::atomic::Lock::Lock()
 	{

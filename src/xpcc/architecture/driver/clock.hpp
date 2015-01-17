@@ -68,7 +68,7 @@ namespace xpcc
 		static Timestamp
 		now();
 
-#if !defined(XPCC__CPU_HOSTED)
+#if !defined(XPCC__OS_HOSTED)
 		/// \brief	Set the current time
 		static inline void
 		increment(uint_fast16_t step = 1)

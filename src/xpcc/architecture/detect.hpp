@@ -85,8 +85,8 @@
 #define	XPCC__CPU_CORTEX_M4
 #define	XPCC__CPU_CORTEX_M4
 
-#define	XPCC__CPU_HOSTED
-#define	XPCC__CPU_HOSTED_64
+#define	XPCC__OS_HOSTED
+#define	XPCC__OS_HOSTED_64
 
 //@{
 /**
@@ -254,9 +254,9 @@
 #if defined __SIZEOF_POINTER__
 #	define XPCC__SIZEOF_POINTER			__SIZEOF_POINTER__
 #else
-#	if defined(XPCC__CPU_HOSTED_64)
+#	if defined(XPCC__OS_HOSTED_64)
 #		define XPCC__SIZEOF_POINTER		8
-#	elif defined(XPCC__CPU_HOSTED_32)
+#	elif defined(XPCC__OS_HOSTED_32)
 #		define XPCC__SIZEOF_POINTER		4
 #	endif
 #endif

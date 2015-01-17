@@ -54,7 +54,7 @@ struct Register
 	{ return value == 0; }
 
 	// GCC is broken here, matches overloads for deleted operators
-#if not (defined XPCC__CPU_HOSTED and defined XPCC__COMPILER_GCC)
+#if not (defined XPCC__OS_HOSTED and defined XPCC__COMPILER_GCC)
 	// do NOT cast to anything else
 	template<typename U>
 	constexpr operator U() const = delete;

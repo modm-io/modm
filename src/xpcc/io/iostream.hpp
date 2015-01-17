@@ -231,7 +231,7 @@ public :
 	}
 #endif
 
-#if defined(XPCC__CPU_ARM) || defined(XPCC__CPU_AVR32)
+#if defined(XPCC__CPU_ARM) && defined(XPCC__OS_NONE)
 	// For ARM 'int32_t' is of type 'long'. Therefore there is no
 	// function here for the default type 'int'. As 'int' has the same
 	// width as 'int32_t' we just use a typedef here.

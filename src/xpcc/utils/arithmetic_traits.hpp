@@ -183,7 +183,7 @@ struct ArithmeticTraits<uint32_t>
 	static constexpr uint32_t max = 4294967295UL;
 };
 
-#if defined(XPCC__CPU_ARM)
+#if defined(XPCC__CPU_ARM) && defined(XPCC__OS_NONE)
 // ------------------------------------------------------------------------
 // For ARM 'int32_t' is of type 'long'. Therefore there is no
 // class here for the default type 'int'.
