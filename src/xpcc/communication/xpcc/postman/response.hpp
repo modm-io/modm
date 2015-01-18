@@ -11,6 +11,7 @@
 #define	XPCC_RESPONSE_HPP
 
 #include "../backend/backend_interface.hpp"
+#include <xpcc/processing/coroutine.hpp>
 
 namespace xpcc
 {
@@ -33,18 +34,18 @@ Response : bool
  * @ingroup	xpcc_comm
  */
 template< typename T = void>
-class ActionResponse
+class ActionResult
 {
 public:
-	ActionResponse()
+	ActionResult()
 	:	response(Response::Negative)
 	{}
 
-	ActionResponse(Response response)
+	ActionResult(Response response)
 	:	response(response)
 	{}
 
-	ActionResponse(T data)
+	ActionResult(T data)
 	:	response(Response::Positive), data(data)
 	{}
 
@@ -53,19 +54,22 @@ public:
 };
 
 template<>
-class ActionResponse<void>
+class ActionResult<void>
 {
 public:
-	ActionResponse()
+	ActionResult()
 	:	response(Response::Negative)
 	{}
 
-	ActionResponse(Response response)
+	ActionResult(Response response)
 	:	response(response)
 	{}
 
 	Response response;
 };
+
+template < typename T >
+using ActionResponse = xpcc::co::Result< xpcc::ActionResult< T > >;
 
 }	// namespace xpcc
 
