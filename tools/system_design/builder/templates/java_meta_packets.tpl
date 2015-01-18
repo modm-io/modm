@@ -203,7 +203,7 @@ public class MetaPackets
 			};
 		}
 	};
-	{%- elif (packet.isEnum or packet.isEnumClass) %}
+	{%- elif packet.isEnum %}
 	public static EnumImpl<Packets.{{ packet.name | typeObjectName }}> {{ packet.name | typeObjectName }} = new EnumImpl<Packets.{{ packet.name | typeObjectName }}>(// packet.isEnum
 						"{{ packet.flattened().name }}",
 						"{%- if packet.description -%}{{ packet.description | inStringDescription }}{%- endif -%}",

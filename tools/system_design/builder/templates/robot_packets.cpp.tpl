@@ -28,9 +28,9 @@ namespace robot
 {
 	namespace packet
 	{
-{% for packet in packets %}
+{%- for packet in packets %}
 {%- if packet.isBuiltIn %}{% continue %}{% endif %}
-	{%- if packet.isEnumClass %}
+	{%- if packet.isEnum and packet.isStronglyTyped %}
 		xpcc::IOStream&
 		operator << (xpcc::IOStream& s, const {{ packet.name | typeName }} e)
 		{

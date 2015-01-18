@@ -131,6 +131,7 @@ class TypeBuilder(builder_base.Builder):
 		
 		cppFilter = {
 			'enumElement': filter.enumElement,
+			'enumElementStrong': filter.typeName,
 			'variableName': filter.variableName,
 			'typeName': filter.typeName,
 			'subtype': filter_subtype,

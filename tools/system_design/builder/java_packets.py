@@ -116,6 +116,7 @@ class JavaPacketsBuilder(builder_base.Builder):
 		
 		javaFilter = {
 			'enumElement': filter.enumElement,
+			'enumElementStrong': filter.typeName,
 			'typeName': filter.typeName,
 			'typeObjectName': filter.typeObjectName,
 			'variableName': filter.variableName,
