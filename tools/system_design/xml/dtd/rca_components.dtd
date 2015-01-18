@@ -5,7 +5,7 @@
 -->
 
 <!ELEMENT rca (description|include|component)*>
-<!ATTLIST rca 
+<!ATTLIST rca
 	version    CDATA    #REQUIRED
 >
 
@@ -37,6 +37,7 @@
 	function CDATA #IMPLIED
 	parameterType CDATA #IMPLIED
 	returnType CDATA #IMPLIED
+	call CDATA #IMPLIED
 >
 
 
