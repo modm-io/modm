@@ -214,7 +214,6 @@ class Parser(object):
 		self.__parse_body(xmltree, 'struct', type.Struct, self.tree.types)
 		self.__parse_body(xmltree, 'typedef', type.Typedef, self.tree.types)
 		self.__parse_body(xmltree, 'enum', type.Enum, self.tree.types)
-		self.__parse_body(xmltree, 'enumclass', type.EnumClass, self.tree.types)
 
 	def __parse_body(self, xmltree, name, object, list):
 		"""

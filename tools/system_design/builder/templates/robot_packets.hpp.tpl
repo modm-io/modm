@@ -9,6 +9,7 @@
 #define	ROBOT__PACKETS_HPP
 
 #include <stdint.h>
+#include <xpcc/io/iostream.hpp>
 
 namespace robot
 {
@@ -20,67 +21,56 @@ namespace robot
 		/** {{ packet.description | xpcc.wordwrap(67) | xpcc.indent(2, " * ") }} */
 		{%- endif %}
 	{%- if packet.isEnum %}
-		enum {{ packet.name | typeName }}
+		enum {%- if packet.isStronglyTyped %} class{%- endif %}
+		{{ packet.name | typeName }}{%- if packet.underlyingType != None %} : {{ packet.underlyingType }}{%- endif %}
 		{
 			{%- for element in packet.iter() %}
-			{%- if element.description %}
+				{%- if element.description %}
 			/** {{ element.description | xpcc.wordwrap(63) | xpcc.indent(3, " * ") }} */
-			{%- endif %}
+				{%- endif %}
+				{%- if packet.isStronglyTyped %}
+			{{ element.name | enumElementStrong }} = {{ element.value }},
+				{%- else %}
 			{{ element.name | enumElement }} = {{ element.value }},
+				{%- endif %}
 			{%- endfor %}
-		} __attribute__((packed));
-		
-		inline const char* 
-		enumToString({{ packet.name | typeName }} e)
-		{
-			switch (e)
-			{
-			{%- for element in packet.iter() %}
-			{%- if element.string %}
-				case {{ element.name | enumElement }}: return "{{ element.string }}";
-			{%- else %}
-				case {{ element.name | enumElement }}: return "{{ element.name | enumElement }}";
-			{%- endif %}
-			{%- endfor %}
-				default: return "__UNKNOWN_ENUM__";
-			}
-		}
-	{% elif packet.isEnumClass %}
-		enum class
-		{%- if packet.underlyingType == None %}
-		{{ packet.name | typeName }}
-		{%- else %}
-		{{ packet.name | typeName }} : {{ packet.underlyingType }}
-		{%- endif %}
-		{
-			{%- for element in packet.iter() %}
-			{%- if element.description %}
-			/** {{ element.description | xpcc.wordwrap(63) | xpcc.indent(3, " * ") }} */
-			{%- endif %}
-			{{ element.name }} = {{ element.value }},
-			{%- endfor %}
-		};
+		} {%- if not packet.isStronglyTyped %} __attribute__((packed)){%- endif %};
 
 		inline const char*
 		enumToString({{ packet.name | typeName }} e)
 		{
 			switch (e)
 			{
-			{%- for element in packet.iter() %}
-			{%- if element.string %}
-				case {{ packet.name | typeName }}::{{ element.name }}: return "{{ packet.name | typeName }}::{{ element.string }}";
+		{%- for element in packet.iter() %}
+			{%- if packet.isStronglyTyped %}
+				{%- set enumName = element.name | enumElementStrong %}
+				{%- set prefix = (packet.name | typeName) ~ "::" %}
 			{%- else %}
-				case {{ packet.name | typeName }}::{{ element.name }}: return "{{ packet.name | typeName }}::{{ element.name }}";
+				{%- set enumName = element.name | enumElement %}
+				{%- set prefix = "" %}
 			{%- endif %}
-			{%- endfor %}
+			{%- if element.string %}
+				case {{ prefix ~ enumName }}: return "{{ element.string }}";
+			{%- else %}
+				case {{ prefix ~ enumName }}: return "{{ prefix ~ enumName }}";
+			{%- endif %}
+		{%- endfor %}
+		{%- if packet.isStronglyTyped %}
 				default: return "{{ packet.name | typeName }}::Unknown";
+		{%- else %}
+				default: return "__UNKNOWN_ENUM__";
+		{%- endif %}
 			}
 		}
+		
+		xpcc::IOStream&
+		operator << (xpcc::IOStream& s, const {{ packet.name | typeName }} e);
+		
 	{% elif packet.isStruct %}
 		struct {{ packet.name | typeName }}
 		{
 			{{ packet.flattened() | generateConstructor }};
-			
+
 			{% if packet.flattened().size > 0 -%}
 			{{ packet.flattened() | generateConstructor(default=False) }};
 			{%- endif %}
