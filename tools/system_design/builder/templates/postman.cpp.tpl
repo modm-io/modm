@@ -26,11 +26,11 @@ xpcc::Postman::DeliverInfo
 Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& payload)
 {
 	xpcc::ResponseHandle response(header);
-	
+
 	// Avoid warnings about unused variables
 	(void) payload;
 	(void) response;
-	
+
 	switch (header.destination)
 	{
 {%- for component in components %}
@@ -39,29 +39,37 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 			switch (header.packetIdentifier)
 			{
 	{%- for action in component.actions %}
-				case robot::action::{{ action.name | CAMELCASE }}:
 		{%- if action.parameterType != None %}
-			{%- if action.parameterType.isBuiltIn %}
-					// void action{{ action.name | CamelCase }}(const xpcc::ResponseHandle& responseHandle, const {{ action.parameterType.name | CamelCase }} *payload );
-					component::{{ component.name | camelCase }}.action{{ action.name | CamelCase }}(response, &payload.get<{{ action.parameterType.name | CamelCase }}>());
-			{%- else %}
-					// void action{{ action.name | CamelCase }}(const xpcc::ResponseHandle& responseHandle, const robot::packet::{{ action.parameterType.name | CamelCase }} *payload );
-					component::{{ component.name | camelCase }}.action{{ action.name | CamelCase }}(response, &payload.get<robot::packet::{{ action.parameterType.name | CamelCase }}>());
-			{%- endif %}
+			{%- set typePrefix = "" if action.parameterType.isBuiltIn else "robot::packet::" %}
+			{%- set payload = ", payload.get<" ~ typePrefix ~ (action.parameterType.name | CamelCase) ~ ">()" %}
+			{%- set arguments = "const " ~ typePrefix ~ (action.parameterType.name | CamelCase) ~ "& payload" %}
 		{%- else %}
-					// void action{{ action.name | CamelCase }}(const xpcc::ResponseHandle& responseHandle);
-					component::{{ component.name | camelCase }}.action{{ action.name | CamelCase }}(response);
+			{%- set payload = "" %}
+			{%- set arguments = "" %}
+		{%- endif %}
+				case robot::action::{{ action.name | CAMELCASE }}:
+		{%- if action.call == "coroutine" %}
+					if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(response{{ payload }}) > xpcc::co::NestingError) {
+						// put into queue
+					}
+		{%- else %}
+			{%- if action.parameterType != None %}
+				{%- set payload = ", &payload.get<" ~ typePrefix ~ (action.parameterType.name | CamelCase) ~ ">()" %}
+				{%- set arguments = ", const " ~ typePrefix ~ (action.parameterType.name | CamelCase) ~ " *payload" %}
+			{%- endif %}
+					// void action{{ action.name | CamelCase }}(const xpcc::ResponseHandle& responseHandle{{ arguments }});
+					component::{{ component.name | camelCase }}.action{{ action.name | CamelCase }}(response{{ payload }});
 		{%- endif %}
 					return OK;
 	{%- endfor %}
-				
+
 				default:
 					return NO_ACTION;
 			}
 			break;
 		}
 {% endfor %}
-		
+
 		// Events
 		case 0:
 			switch (header.packetIdentifier)
@@ -83,11 +91,11 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 					break;
 			}
 			return OK;
-		
+
 		default:
 			return NO_COMPONENT;
 	}
-	
+
 	return NOT_IMPLEMENTED_YET_ERROR;
 }
 
@@ -102,7 +110,7 @@ Postman::isComponentAvaliable(uint8_t component) const
 {%- endfor %}
 			return true;
 			break;
-		
+
 		default:
 			return false;
 	}
@@ -113,3 +121,36 @@ Postman::update()
 {
 	// tumbleweed
 }
+
+// ----------------------------------------------------------------------------
+{%- for component in components %}
+	{%- for action in component.actions %}
+		{%- if action.call == "coroutine" %}
+uint8_t
+			{%- if action.parameterType != None %}
+				{%- set typePrefix = "" if action.parameterType.isBuiltIn else "robot::packet::" %}
+				{%- set arguments = ", const " ~ typePrefix ~ (action.parameterType.name | CamelCase) ~ "& payload" %}
+				{%- set payload = "payload" %}
+			{%- else %}
+				{%- set arguments = "" %}
+				{%- set payload = "" %}
+			{%- endif %}
+Postman::component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(const xpcc::ResponseHandle& response{{ arguments }})
+{
+	auto result = component::{{ component.name | camelCase }}.action{{ action.name | CamelCase }}({{ payload }});
+	if (result.state <= xpcc::co::NestingError) {
+		if (result.result.response == xpcc::Response::Positive) {
+			{%- if action.returnType != None %}
+			component::{{component.name | camelCase}}.getCommunicator()->sendResponse(response, result.result.data);
+			{%- else %}
+			component::{{component.name | camelCase}}.getCommunicator()->sendResponse(response);
+			{%- endif %}
+		} else {
+			component::{{component.name | camelCase}}.getCommunicator()->sendNegativeResponse(response);
+		}
+	}
+	return result.state;
+}
+		{%- endif %}
+	{%- endfor %}
+{%- endfor %}
