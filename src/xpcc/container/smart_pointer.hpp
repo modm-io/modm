@@ -97,7 +97,21 @@ namespace xpcc
 		{
 			return ptr[1];
 		}
-		
+
+		inline void
+		retain()
+		{
+			ptr[0]++;
+		}
+
+		inline void
+		release()
+		{
+			if (--ptr[0] == 0) {
+				delete[] ptr;
+			}
+		}
+
 		/**
 		 * Get the value that are stored in the pointer casted to the given type.
 		 * \note This method has no checking mechanism, use get(T) to have at least some.

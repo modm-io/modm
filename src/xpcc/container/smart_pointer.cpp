@@ -43,7 +43,7 @@ xpcc::SmartPointer::SmartPointer() :
 xpcc::SmartPointer::SmartPointer(const SmartPointer& other) :
 	ptr(other.ptr)
 {
-	ptr[0]++;
+	retain();
 }
 
 // must allocate at least three bytes, so getPointer() does return
@@ -57,9 +57,7 @@ xpcc::SmartPointer::SmartPointer(uint8_t size) :
 
 xpcc::SmartPointer::~SmartPointer()
 {
-	if (--ptr[0] == 0) {
-		delete[] ptr;
-	}
+	release();
 }
 
 // ----------------------------------------------------------------------------
