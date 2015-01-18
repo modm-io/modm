@@ -9,6 +9,7 @@
 #define	ROBOT__PACKETS_HPP
 
 #include <stdint.h>
+#include <xpcc/io/iostream.hpp>
 
 namespace robot
 {
@@ -76,6 +77,10 @@ namespace robot
 				default: return "{{ packet.name | typeName }}::Unknown";
 			}
 		}
+		
+		xpcc::IOStream&
+		operator << (xpcc::IOStream& s, const {{ packet.name | typeName }} e);
+		
 	{% elif packet.isStruct %}
 		struct {{ packet.name | typeName }}
 		{

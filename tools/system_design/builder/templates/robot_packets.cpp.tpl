@@ -20,3 +20,24 @@ robot::packet::{{ packet.flattened().name | typeName }}::{{ packet.flattened() |
 }
 {% endif %}
 {%- endfor -%}
+
+// ----------------------------------------------------------------------------
+// IOStream Helpers
+
+namespace robot
+{
+	namespace packet
+	{
+{% for packet in packets %}
+{%- if packet.isBuiltIn %}{% continue %}{% endif %}
+	{%- if packet.isEnumClass %}
+		xpcc::IOStream&
+		operator << (xpcc::IOStream& s, const {{ packet.name | typeName }} e)
+		{
+			s << enumToString(e);
+			return s;
+		}
+	{% endif -%}
+{%- endfor -%}
+	} // packet namespace
+} // robot namespace
