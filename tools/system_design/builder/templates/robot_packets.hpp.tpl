@@ -63,8 +63,10 @@ namespace robot
 			}
 		}
 		
+		{%- if packet.isEnum and packet.isStronglyTyped %}
 		xpcc::IOStream&
 		operator << (xpcc::IOStream& s, const {{ packet.name | typeName }} e);
+		{%- endif %}
 		
 	{% elif packet.isStruct %}
 		struct {{ packet.name | typeName }}
