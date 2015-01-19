@@ -30,7 +30,7 @@ namespace robot
 	{
 {%- for packet in packets %}
 {%- if packet.isBuiltIn %}{% continue %}{% endif %}
-	{%- if packet.isEnum and packet.isStronglyTyped %}
+	{%- if packet.isEnum %}
 		xpcc::IOStream&
 		operator << (xpcc::IOStream& s, const {{ packet.name | typeName }} e)
 		{

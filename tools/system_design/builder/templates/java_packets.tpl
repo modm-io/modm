@@ -242,11 +242,7 @@ public class Packets
 	public enum {{ packet.name | typeName }} implements Packet
 	{// packet.isEnum
 	{%- for element in packet.iter() %}
-		{%- if packet.isStronglyTyped %}
-		{{ element.name | enumElementStrong }}({{ element.value }}){% if loop.last %};{% else %},{% endif %}
-		{%- else %}
 		{{ element.name | enumElement }}({{ element.value }}){% if loop.last %};{% else %},{% endif %}
-		{%- endif %}
 	{%- endfor %}
 		public final int value;
 		
