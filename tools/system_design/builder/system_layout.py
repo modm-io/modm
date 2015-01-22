@@ -45,11 +45,17 @@ class SystemLayoutBuilder(builder_base.Builder):
 	Generate a visual map of all containers, components and events. 
 	
 	A common call would be like:
-	$python system_layout.py ../../../../roboter/2012_captain/software/global/xml/robot.xml -o /tmp  -s simulator -s "drive simulation" -s "External"
+
+	# 2012
+	$ python system_layout.py ../../../../roboter/2012_captain/software/global/xml/robot.xml -o /tmp  -s simulator -s "drive simulation" -s "External"
+
+	# 2015
+	$ python system_layout.py ../../../../season/common/robot.xml --dtdpath ../../../tools/system_design/xml/dtd -o /tmp
+	$ python system_layout.py ../../../../season/common/robot.xml --dtdpath ../../../tools/system_design/xml/dtd -o /tmp -s "drive big simulation" -s "drive little simulation" -s "External" -s "simulator" -s "drive big"
 	
 	A PDF called system.pdf is generated in /tmp/system.pdf.
 	
-	If you want to display actions add the -a switch.
+	If you want to display callable actions for each component add the -a switch.
 	"""
 	
 	VERSION = "0.1"
