@@ -96,7 +96,7 @@ class SystemLayoutBuilder(builder_base.Builder):
 	    width = 0
 	    for container in tree.container:
 	        # skip containers that the user asked to skip
-	        if container.name in self.options.skipList:
+	        if self.options.skipList is not None and container.name in self.options.skipList:
 	            continue
 	
 	        width = width + self.get_container_width(container) + 0.1
@@ -167,7 +167,9 @@ class SystemLayoutBuilder(builder_base.Builder):
 		self.eventsSorted = []
 
 		for container in self.tree.container:
-			if container.name in self.options.skipList:
+			if container.name is None:
+				continue
+			if self.options.skipList is not None and container.name in self.options.skipList:
 				continue
 			for component in container.components:
 				# include actions from abstract component
@@ -205,7 +207,7 @@ class SystemLayoutBuilder(builder_base.Builder):
 				# include actions from abstract component
 				component = component.flattened()
 		
-				if component.name in self.options.skipList:
+				if self.options.skipList is not None and component.name in self.options.skipList:
 					continue
 				for event_cmp in component.events.publish:
 					if event_cmp == event:
@@ -233,16 +235,17 @@ class SystemLayoutBuilder(builder_base.Builder):
 		c.insert(text.text(1, 9.7, r"\bf %s" % self.xmlfile.replace('_', '\_'), self.textattrs))
 		c.insert(text.text(1, 9.5, r"\bf Skipped containers:", self.textattrs))
 		y = 9.40
-		for s in self.options.skipList:	   
-			A = text.text(1, y, r"\bf %s" % s, self.textattrs)
-			c.insert(A)
-			y = y - .1
+		if self.options.skipList is not None:			
+			for s in self.options.skipList:	   
+				A = text.text(1, y, r"\bf %s" % s, self.textattrs)
+				c.insert(A)
+				y = y - .1
 
 		# Draw containers at the top
 		container_x = 2.0
 		for container in self.tree.container:
 			# skip containers that are requested to skip
-			if container.name in self.options.skipList:
+			if self.options.skipList is not None and container.name in self.options.skipList:
 				continue
 					
 			A = text.text(container_x + 0.15, 9.90, r"\bf %s" % container, self.textcontainerattrs)
