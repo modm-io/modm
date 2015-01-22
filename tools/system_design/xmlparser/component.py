@@ -96,7 +96,7 @@ class ComponentDictionary(utils.SingleAssignDictionary):
 				try:
 					while True:
 						item = self.list.pop(0)
-						if self.abstract != None and item.abstract != self.abstract:
+						if self.abstract is not None and item.abstract != self.abstract:
 							continue
 						return item
 				except IndexError:

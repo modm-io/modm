@@ -154,14 +154,14 @@ class Enum(BaseType):
 		self.isStronglyTyped = False
 
 		typed = node.get('typed')
-		if typed != None:
+		if typed is not None:
 			if typed in ["strong", "weak"]:
 				self.isStronglyTyped = (typed == "strong")
 			else:
 				raise ParserException("Attribute typed of element in enum has to be either `strong` or `weak` (found: '%s')" % (self.typed))
 
 		self.underlyingType = node.get('underlyingType')
-		if self.underlyingType != None and self.underlyingType not in BUILTIN:
+		if self.underlyingType is not None and self.underlyingType not in BUILTIN:
 			raise ParserException("Attribute underlyingType of element in enum has to be a built in value (found: '%s')" % (self.underlyingType))
 
 		# an enum don't depend on other types
