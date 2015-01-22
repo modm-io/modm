@@ -164,7 +164,7 @@ class Enum(BaseType):
 		if self.underlyingType is not None and self.underlyingType not in BUILTIN:
 			raise ParserException("Attribute underlyingType of element in enum has to be a built in value (found: '%s')" % (self.underlyingType))
 
-		# an enum don't depend on other types
+		# an enum does not depend on other types
 		self.level = 0
 		self.size = 1		# FIXME calculate actual size depending on the value for the enum elements
 
