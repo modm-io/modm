@@ -168,6 +168,8 @@ class Enum(BaseType):
 		self.level = 0
 		self.size = 1		# FIXME calculate actual size depending on the value for the enum elements
 
+		self.numberOfElements = None
+
 	def iter(self):
 		""" Iterate over all sub-elements of the enum """
 		for element in self.elements:
@@ -183,6 +185,7 @@ class Enum(BaseType):
 			self.__add(self.Element(node, self.isStronglyTyped))
 
 		self.node = None
+		self.numberOfElements = len(self.elements)
 
 	def __add(self, element):
 		""" Add an element to the enum.

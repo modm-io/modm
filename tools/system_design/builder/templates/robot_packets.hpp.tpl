@@ -9,6 +9,7 @@
 #define	ROBOT__PACKETS_HPP
 
 #include <stdint.h>
+#include <cstdlib>
 #include <xpcc/io/iostream.hpp>
 
 namespace robot
@@ -35,6 +36,21 @@ namespace robot
 				{%- endif %}
 			{%- endfor %}
 		} {%- if not packet.isStronglyTyped %} __attribute__((packed)){%- endif %};
+
+		{%- if packet.isStronglyTyped %}
+		inline size_t
+		value({{ packet.name | typeName }} e ) {
+			switch (e) {
+				{%- for element in packet.iter() %}
+				case {{ packet.name | typeName }}::{{ element.name | enumElementStrong }}: return {{ element.value }}; break;
+				{%- endfor %}
+				default:
+					__builtin_unreachable();
+			}
+		}
+		{%- endif %}
+
+		static constexpr int {{ packet.name | typeName }}NumberOfElements = {{ packet.numberOfElements }};
 
 		inline const char*
 		enumToString({{ packet.name | typeName }} e)
