@@ -134,12 +134,12 @@ class SystemLayoutBuilder(builder_base.Builder):
 		actionText = []
 
 		### Text Attributes
-		self.textattrs = [text.halign.center, text.vshift.middlezero]
-		self.textcontainerattrs = [text.halign.left, text.vshift.middlezero]
-		self.texteventattrs = [text.halign.left, text.vshift(-0.6)]
-		self.texteventrotattrs = [text.halign.left, text.vshift(-0.6), trafo.rotate(90), color.rgb.red]
-		self.texteventsubscribedrotattrs = [text.halign.left, text.vshift(-0.6), trafo.rotate(90), color.rgb.blue]
-		self.textactionrotattrs = [text.halign.left, text.vshift(-0.6), trafo.rotate(90), color.rgb(0.0, 0.5, 0.1)]
+		self.textattrs                   = [text.halign.center, text.vshift.middlezero]
+		self.textcontainerattrs          = [text.halign.left,   text.vshift.middlezero]
+		self.texteventattrs              = [text.halign.left,   text.vshift(-0.6)]
+		self.texteventrotattrs           = [text.halign.left,   text.vshift(-0.6), trafo.rotate(90), color.rgb.red]
+		self.texteventsubscribedrotattrs = [text.halign.left,   text.vshift(-0.6), trafo.rotate(90), color.rgb.blue]
+		self.textactionrotattrs          = [text.halign.left,   text.vshift(-0.6), trafo.rotate(90), color.rgb(0.0, 0.5, 0.1)]
 
 
 		# raster for design
@@ -196,13 +196,13 @@ class SystemLayoutBuilder(builder_base.Builder):
 			c.insert(A)
 
 
-		sinklessDict = dict()
+		sinklessDict   = dict()
 		sourcelessDict = dict()
 			
 		# Write sink and sourceless events
 		for event in self.tree.events:
 			sourceless = True
-			sinkless = True
+			sinkless   = True
 			for component in self.tree.components:
 				# include actions from abstract component
 				component = component.flattened()
