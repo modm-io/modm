@@ -45,20 +45,26 @@ class SystemLayoutBuilder(builder_base.Builder):
 	Generate a visual map of all containers, components and events. 
 	
 	A common call would be like:
-	$python system_layout.py ../../../../roboter/2012_captain/software/global/xml/robot.xml -o /tmp  -s simulator -s "drive simulation" -s "External"
+
+	# 2012
+	$ python system_layout.py ../../../../roboter/2012_captain/software/global/xml/robot.xml -o /tmp  -s simulator -s "drive simulation" -s "External"
+
+	# 2015
+	$ python system_layout.py ../../../../season/common/robot.xml --dtdpath ../../../tools/system_design/xml/dtd -o /tmp
+	$ python system_layout.py ../../../../season/common/robot.xml --dtdpath ../../../tools/system_design/xml/dtd -o /tmp -s "drive big simulation" -s "drive little simulation" -s "External" -s "simulator" -s "drive big"
 	
 	A PDF called system.pdf is generated in /tmp/system.pdf.
 	
-	If you want to display actions add the -a switch.
+	If you want to display callable actions for each component add the -a switch.
 	"""
 	
-	VERSION = "$Id$"
+	VERSION = "0.1"
 	
 	def get_y(self, event):
 	    """
 	    Get the vertical coordinate for an event line
 	    """
-	    return 8.5 - (self.eventsSorted.index(event) * 0.1)
+	    return 8.0 - (self.eventsSorted.index(event) * 0.1)
 
 	def get_component_width(self, component):
 		"""
@@ -96,7 +102,7 @@ class SystemLayoutBuilder(builder_base.Builder):
 	    width = 0
 	    for container in tree.container:
 	        # skip containers that the user asked to skip
-	        if container.name in self.options.skipList:
+	        if self.options.skipList is not None and container.name in self.options.skipList:
 	            continue
 	
 	        width = width + self.get_container_width(container) + 0.1
@@ -134,12 +140,12 @@ class SystemLayoutBuilder(builder_base.Builder):
 		actionText = []
 
 		### Text Attributes
-		self.textattrs = [text.halign.center, text.vshift.middlezero]
-		self.textcontainerattrs = [text.halign.left, text.vshift.middlezero]
-		self.texteventattrs = [text.halign.left, text.vshift(-0.6)]
-		self.texteventrotattrs = [text.halign.left, text.vshift(-0.6), trafo.rotate(90), color.rgb.red]
-		self.texteventsubscribedrotattrs = [text.halign.left, text.vshift(-0.6), trafo.rotate(90), color.rgb.blue]
-		self.textactionrotattrs = [text.halign.left, text.vshift(-0.6), trafo.rotate(90), color.rgb(0.0, 0.5, 0.1)]
+		self.textattrs                   = [text.halign.center, text.vshift.middlezero]
+		self.textcontainerattrs          = [text.halign.left,   text.vshift.middlezero]
+		self.texteventattrs              = [text.halign.left,   text.vshift(-0.6)]
+		self.texteventrotattrs           = [text.halign.left,   text.vshift(-0.6), trafo.rotate(90), color.rgb.red]
+		self.texteventsubscribedrotattrs = [text.halign.left,   text.vshift(-0.6), trafo.rotate(90), color.rgb.blue]
+		self.textactionrotattrs          = [text.halign.left,   text.vshift(-0.6), trafo.rotate(90), color.rgb(0.0, 0.5, 0.1)]
 
 
 		# raster for design
@@ -166,8 +172,16 @@ class SystemLayoutBuilder(builder_base.Builder):
 		# Sort events by publishing component. Makes graph more structured. 
 		self.eventsSorted = []
 
+		print("Analysing containers:")
 		for container in self.tree.container:
-			if container.name in self.options.skipList:
+			print " * " + container.name
+
+		print("Done. Creating graph")
+
+		for container in self.tree.container:
+			if container.name is None:
+				continue
+			if self.options.skipList is not None and container.name in self.options.skipList:
 				continue
 			for component in container.components:
 				# include actions from abstract component
@@ -183,29 +197,44 @@ class SystemLayoutBuilder(builder_base.Builder):
 			if not (event in self.eventsSorted):
 				self.eventsSorted.append(event)
 		
-		# Draw light gray horizontal lines for events		
+		# Draw light gray horizontal lines for all events		
 		graph_width = self.get_graph_width(self.tree) + 2.1
 		for event in self.tree.events:
 			event_y = self.get_y(event)
 			c.stroke(path.line(0, event_y, graph_width, event_y),
 					 [style.linewidth.THick, color.grey(0.90)])
 			
+			# Draw Id and name of event
 			A = text.text(0, event_y, r"\bf \texttt{[0x%02x]} %s" % (event.id, event.name), self.texteventattrs)
 			c.insert(A)
 
+			# Draw type of Event
+			if event.type is not None:
+				A = text.text(1.1, event_y, r"%s" % (event.type.name), self.texteventattrs)
+				c.insert(A)
 
-		sinklessDict = dict()
+		# Legend
+		A = text.text(  0, 8.1, r"\textbf{%s}" % ("Id"), self.texteventattrs)
+		c.insert(A)
+
+		A = text.text(0.175, 8.1, r"\textbf{%s}" % ("Name"), self.texteventattrs)
+		c.insert(A)
+
+		A = text.text(1.1, 8.1, r"\textbf{%s}" % ("Type"), self.texteventattrs)
+		c.insert(A)
+
+		sinklessDict   = dict()
 		sourcelessDict = dict()
 			
 		# Write sink and sourceless events
 		for event in self.tree.events:
 			sourceless = True
-			sinkless = True
+			sinkless   = True
 			for component in self.tree.components:
 				# include actions from abstract component
 				component = component.flattened()
 		
-				if component.name in self.options.skipList:
+				if self.options.skipList is not None and component.name in self.options.skipList:
 					continue
 				for event_cmp in component.events.publish:
 					if event_cmp == event:
@@ -214,11 +243,11 @@ class SystemLayoutBuilder(builder_base.Builder):
 					if event_cmp == event:
 						sinkless = False
 			if sourceless:
-				A = text.text(1.2, self.get_y(event), r"\bf sourceless", self.texteventattrs)
+				A = text.text(1.8, self.get_y(event), r"\bf sourceless", self.texteventattrs)
 				c.insert(A)
 			sourcelessDict[event.name] = sourceless
 			if sinkless:
-				A = text.text(1.5, self.get_y(event), r"\bf sinkless", self.texteventattrs)
+				A = text.text(2.1, self.get_y(event), r"\bf sinkless", self.texteventattrs)
 				c.insert(A)
 			sinklessDict[event.name] = sinkless
 
@@ -233,16 +262,17 @@ class SystemLayoutBuilder(builder_base.Builder):
 		c.insert(text.text(1, 9.7, r"\bf %s" % self.xmlfile.replace('_', '\_'), self.textattrs))
 		c.insert(text.text(1, 9.5, r"\bf Skipped containers:", self.textattrs))
 		y = 9.40
-		for s in self.options.skipList:	   
-			A = text.text(1, y, r"\bf %s" % s, self.textattrs)
-			c.insert(A)
-			y = y - .1
+		if self.options.skipList is not None:			
+			for s in self.options.skipList:	   
+				A = text.text(1, y, r"\bf %s" % s, self.textattrs)
+				c.insert(A)
+				y = y - .1
 
 		# Draw containers at the top
-		container_x = 2.0
+		container_x = 2.5
 		for container in self.tree.container:
 			# skip containers that are requested to skip
-			if container.name in self.options.skipList:
+			if self.options.skipList is not None and container.name in self.options.skipList:
 				continue
 					
 			A = text.text(container_x + 0.15, 9.90, r"\bf %s" % container, self.textcontainerattrs)
@@ -277,7 +307,7 @@ class SystemLayoutBuilder(builder_base.Builder):
 						eventCirclesSinkless.append([event_x, self.get_y(event)])
 					
 					# write name of event
-					A = text.text(event_x, 8.6, r"\bf \texttt{[0x%02x]} %s" % (event.id, event.name), self.texteventrotattrs)				
+					A = text.text(event_x, 8.1, r"\bf \texttt{[0x%02x]} %s" % (event.id, event.name), self.texteventrotattrs)				
 					c.insert(A)
 					
 					# Store most left position
@@ -299,7 +329,7 @@ class SystemLayoutBuilder(builder_base.Builder):
 						eventCirclesSink.append([event_x, self.get_y(event)])
 	
 					
-					A = text.text(event_x, 8.6, r"\bf \texttt{[0x%02x]} %s" % (event.id, event.name), self.texteventsubscribedrotattrs)
+					A = text.text(event_x, 8.1, r"\bf \texttt{[0x%02x]} %s" % (event.id, event.name), self.texteventsubscribedrotattrs)
 					c.insert(A)
 				   
 					# Store most left position
@@ -316,12 +346,12 @@ class SystemLayoutBuilder(builder_base.Builder):
 				if self.options.actions:
 					action_x = event_x
 					for action in component.actions:
-						c.stroke(path.line(action_x, 8.55, action_x, 9.75),
+						c.stroke(path.line(action_x, 8.05, action_x, 9.75),
 								 [style.linewidth.THick, color.rgb(0.0, 0.5, 0.1),
 								  deco.earrow([deco.stroked([color.rgb(0.0, 0.5, 0.1), style.linejoin.round]),
 											   deco.filled([color.rgb(0.0, 0.5, 0.1)])], size=0.05)])
 										
-						A = text.text(action_x, 8.6, r"\bf %s" % action.name, self.textactionrotattrs)
+						A = text.text(action_x, 8.1, r"\bf %s" % action.name, self.textactionrotattrs)
 						c.insert(A)
 					   
 						action_x = action_x + 0.1

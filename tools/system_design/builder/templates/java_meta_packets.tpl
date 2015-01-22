@@ -1,7 +1,6 @@
 /*
  * WARNING: This file is generated automatically from java_meta_packets.tpl.
- * Do not edit!
- * Please modify the corresponding XML file instead.
+ * Do not edit! Please modify the corresponding XML file instead.
  */
 // ----------------------------------------------------------------------------
 
