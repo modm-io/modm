@@ -50,7 +50,7 @@ class Tree(object):
 		output += "\nContainer:\n"
 		for element in self.container:
 			output += "- %s\n" % element
-		output += "\Domains:\n"
+		output += "\nDomains:\n"
 		for element in self.domains:
 			output += "- %s\n" % element
 		return output
