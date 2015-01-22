@@ -58,7 +58,7 @@ class SystemLayoutBuilder(builder_base.Builder):
 	    """
 	    Get the vertical coordinate for an event line
 	    """
-	    return 8.5 - (self.eventsSorted.index(event) * 0.1)
+	    return 8.0 - (self.eventsSorted.index(event) * 0.1)
 
 	def get_component_width(self, component):
 		"""
@@ -166,6 +166,12 @@ class SystemLayoutBuilder(builder_base.Builder):
 		# Sort events by publishing component. Makes graph more structured. 
 		self.eventsSorted = []
 
+		print("Analysing containers:")
+		for container in self.tree.container:
+			print " * " + container.name
+
+		print("Done. Creating graph")
+
 		for container in self.tree.container:
 			if container.name is None:
 				continue
@@ -185,16 +191,31 @@ class SystemLayoutBuilder(builder_base.Builder):
 			if not (event in self.eventsSorted):
 				self.eventsSorted.append(event)
 		
-		# Draw light gray horizontal lines for events		
+		# Draw light gray horizontal lines for all events		
 		graph_width = self.get_graph_width(self.tree) + 2.1
 		for event in self.tree.events:
 			event_y = self.get_y(event)
 			c.stroke(path.line(0, event_y, graph_width, event_y),
 					 [style.linewidth.THick, color.grey(0.90)])
 			
+			# Draw Id and name of event
 			A = text.text(0, event_y, r"\bf \texttt{[0x%02x]} %s" % (event.id, event.name), self.texteventattrs)
 			c.insert(A)
 
+			# Draw type of Event
+			if event.type is not None:
+				A = text.text(1.1, event_y, r"%s" % (event.type.name), self.texteventattrs)
+				c.insert(A)
+
+		# Legend
+		A = text.text(  0, 8.1, r"\textbf{%s}" % ("Id"), self.texteventattrs)
+		c.insert(A)
+
+		A = text.text(0.175, 8.1, r"\textbf{%s}" % ("Name"), self.texteventattrs)
+		c.insert(A)
+
+		A = text.text(1.1, 8.1, r"\textbf{%s}" % ("Type"), self.texteventattrs)
+		c.insert(A)
 
 		sinklessDict   = dict()
 		sourcelessDict = dict()
@@ -216,11 +237,11 @@ class SystemLayoutBuilder(builder_base.Builder):
 					if event_cmp == event:
 						sinkless = False
 			if sourceless:
-				A = text.text(1.2, self.get_y(event), r"\bf sourceless", self.texteventattrs)
+				A = text.text(1.8, self.get_y(event), r"\bf sourceless", self.texteventattrs)
 				c.insert(A)
 			sourcelessDict[event.name] = sourceless
 			if sinkless:
-				A = text.text(1.5, self.get_y(event), r"\bf sinkless", self.texteventattrs)
+				A = text.text(2.1, self.get_y(event), r"\bf sinkless", self.texteventattrs)
 				c.insert(A)
 			sinklessDict[event.name] = sinkless
 
@@ -242,7 +263,7 @@ class SystemLayoutBuilder(builder_base.Builder):
 				y = y - .1
 
 		# Draw containers at the top
-		container_x = 2.0
+		container_x = 2.5
 		for container in self.tree.container:
 			# skip containers that are requested to skip
 			if self.options.skipList is not None and container.name in self.options.skipList:
@@ -280,7 +301,7 @@ class SystemLayoutBuilder(builder_base.Builder):
 						eventCirclesSinkless.append([event_x, self.get_y(event)])
 					
 					# write name of event
-					A = text.text(event_x, 8.6, r"\bf \texttt{[0x%02x]} %s" % (event.id, event.name), self.texteventrotattrs)				
+					A = text.text(event_x, 8.1, r"\bf \texttt{[0x%02x]} %s" % (event.id, event.name), self.texteventrotattrs)				
 					c.insert(A)
 					
 					# Store most left position
@@ -302,7 +323,7 @@ class SystemLayoutBuilder(builder_base.Builder):
 						eventCirclesSink.append([event_x, self.get_y(event)])
 	
 					
-					A = text.text(event_x, 8.6, r"\bf \texttt{[0x%02x]} %s" % (event.id, event.name), self.texteventsubscribedrotattrs)
+					A = text.text(event_x, 8.1, r"\bf \texttt{[0x%02x]} %s" % (event.id, event.name), self.texteventsubscribedrotattrs)
 					c.insert(A)
 				   
 					# Store most left position
@@ -319,12 +340,12 @@ class SystemLayoutBuilder(builder_base.Builder):
 				if self.options.actions:
 					action_x = event_x
 					for action in component.actions:
-						c.stroke(path.line(action_x, 8.55, action_x, 9.75),
+						c.stroke(path.line(action_x, 8.05, action_x, 9.75),
 								 [style.linewidth.THick, color.rgb(0.0, 0.5, 0.1),
 								  deco.earrow([deco.stroked([color.rgb(0.0, 0.5, 0.1), style.linejoin.round]),
 											   deco.filled([color.rgb(0.0, 0.5, 0.1)])], size=0.05)])
 										
-						A = text.text(action_x, 8.6, r"\bf %s" % action.name, self.textactionrotattrs)
+						A = text.text(action_x, 8.1, r"\bf %s" % action.name, self.textactionrotattrs)
 						c.insert(A)
 					   
 						action_x = action_x + 0.1
