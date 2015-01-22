@@ -52,7 +52,7 @@ class SystemLayoutBuilder(builder_base.Builder):
 	If you want to display actions add the -a switch.
 	"""
 	
-	VERSION = "$Id$"
+	VERSION = "0.1"
 	
 	def get_y(self, event):
 	    """
