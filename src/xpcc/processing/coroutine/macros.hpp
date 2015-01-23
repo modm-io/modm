@@ -93,6 +93,14 @@
 			CO_INTERNAL_SET_CASE_YIELD(__COUNTER__)
 
 /**
+ * Cause coroutine to wait until given child protothread completes.
+ *
+ * @ingroup	coroutine
+ * @hideinitializer
+ */
+#define CO_WAIT_THREAD(child) 	CO_WAIT_UNTIL(!(child).run())
+
+/**
  * Cause coroutine to wait **while** given `condition` is true.
  *
  * @ingroup	coroutine
