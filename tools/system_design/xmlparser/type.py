@@ -8,9 +8,10 @@ from parser_exception import ParserException
 import utils
 import xml_utils
 
-BUILTIN = [	'int8_t', 'int16_t', 'int32_t',
-			'uint8_t', 'uint16_t', 'uint32_t',
-			'char', 'float' ]
+VALID_UNDERLYING_TYPES_FOR_ENUMS = [
+	'int8_t', 'uint8_t' ]
+
+# Not allowed are 'int16_t', 'int32_t', 'uint16_t', 'uint32_t' 'char'
 
 class BaseType(object):
 	""" Abstract base class for all types
@@ -161,7 +162,11 @@ class Enum(BaseType):
 				raise ParserException("Attribute typed of element in enum has to be either `strong` or `weak` (found: '%s')" % (self.typed))
 
 		self.underlyingType = node.get('underlyingType')
-		if self.underlyingType is not None and self.underlyingType not in BUILTIN:
+		
+		if self.underlyingType is None:
+			self.underlyingType = "uint8_t"
+		
+		if self.underlyingType is not None and self.underlyingType not in VALID_UNDERLYING_TYPES_FOR_ENUMS:
 			raise ParserException("Attribute underlyingType of element in enum has to be a built in value (found: '%s')" % (self.underlyingType))
 
 		# an enum does not depend on other types
