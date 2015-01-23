@@ -52,23 +52,21 @@ private:
 	ActionBuffer
 	{
 		ActionBuffer()
-		: payload(nullptr), destination(0) {}
+		: destination(0) {}
 
 		ActionBuffer(const xpcc::Header& header, const xpcc::SmartPointer& payload)
-		: payload(const_cast<xpcc::SmartPointer *>(&payload)), response(header), destination(header.destination)
+		:	payload(payload), response(header), destination(header.destination)
 		{
-			this->payload->retain();
 		}
 
 		void
 		remove()
 		{
 			destination = 0;
-			payload->release();
-			payload = nullptr;
+			payload = xpcc::SmartPointer();
 		}
 
-		xpcc::SmartPointer *payload;	// 2B (AVR), 4B (ARM)
+		xpcc::SmartPointer payload;		// 2B (AVR), 4B (ARM)
 		xpcc::ResponseHandle response;	// 2B
 		uint8_t destination;			// 1B
 	};	// 5B (AVR), 7B(ARM)

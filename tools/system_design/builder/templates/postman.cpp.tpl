@@ -87,7 +87,6 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 						actionBufferNoArg[{{ actionNumber }}] = ActionBufferNoArg(header);
 						{%- set actionNumberNoArg = actionNumberNoArg + 1 %}
 			{%- endif %}
-
 					}
 		{%- else %}
 			{%- if action.parameterType != None %}
@@ -179,7 +178,7 @@ Postman::update()
 				{%- if action.call == "coroutine" and action.parameterType != None %}
 					{%- set typePrefix = "" if action.parameterType.isBuiltIn else "robot::packet::" %}
 					case robot::action::{{ action.name | CAMELCASE }}:
-						if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(action.response, action.payload->get<{{ typePrefix ~ (action.parameterType.name | CamelCase) }}>()) <= xpcc::co::NestingError) {
+						if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(action.response, action.payload.get<{{ typePrefix ~ (action.parameterType.name | CamelCase) }}>()) <= xpcc::co::NestingError) {
 							action.remove();
 						}
 						break;
