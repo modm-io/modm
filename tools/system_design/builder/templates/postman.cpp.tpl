@@ -52,6 +52,7 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 
 	switch (header.destination)
 	{
+{%- set actionNumber = 0 %}
 {%- for component in components %}
 		case robot::component::{{ component.name | CAMELCASE }}:
 		{
@@ -70,8 +71,20 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 		{%- endif %}
 				case robot::action::{{ action.name | CAMELCASE }}:
 		{%- if action.call == "coroutine" %}
-					if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(response{{ payload }}) > xpcc::co::NestingError) {
-						pushIntoBuffer(header{{ pointer }});
+			{%- if action.parameterType != None %}
+					if (actionBuffer[{{ actionNumber }}].destination != 0) {
+			{%- else %}
+					if (actionBufferNoArg[{{ actionNumber }}].destination != 0) {
+			{%- endif %}
+						component::{{component.name | camelCase}}.getCommunicator()->sendNegativeResponse(response);
+					} 
+					else if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(response{{ payload }}) > xpcc::co::NestingError) {
+			{%- if action.parameterType != None %}
+						actionBuffer[{{ actionNumber }}] = ActionBuffer(header, payload);
+			{%- else %}
+						actionBufferNoArg[{{ actionNumber }}] = ActionBufferNoArg(header);
+			{%- endif %}
+			{%- set actionNumber = actionNumber + 1 %}
 					}
 		{%- else %}
 			{%- if action.parameterType != None %}
@@ -140,15 +153,9 @@ Postman::isComponentAvaliable(uint8_t component) const
 void
 Postman::update()
 {
-{%- if coAcLen > 0 or coAcNoArgLen > 0 %}
-	uint_fast8_t currentAction = 0;
-{%- endif %}
-
 {%- if coAcLen > 0 %}
-	while(currentAction < runningCoroutineActions)
+	for(ActionBuffer &action : actionBuffer)
 	{
-		ActionBuffer &action = actionBuffer[currentAction];
-
 		switch (action.destination)
 		{
 	{%- for component in components %}
@@ -171,8 +178,6 @@ Postman::update()
 					case robot::action::{{ action.name | CAMELCASE }}:
 						if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(action.response, action.payload->get<{{ typePrefix ~ (action.parameterType.name | CamelCase) }}>()) <= xpcc::co::NestingError) {
 							action.remove();
-							if (currentAction == runningCoroutineActions - 1)
-								runningCoroutineActions--;
 						}
 						break;
 				{%- endif %}
@@ -189,15 +194,11 @@ Postman::update()
 			default:
 				break;
 		}
-
-		currentAction++;
 	}
 {%- endif %}
 {%- if coAcNoArgLen > 0 %}
-	while(currentAction < runningCoroutineActionsNoArg)
+	for(ActionBufferNoArg &action : actionBufferNoArg)
 	{
-		ActionBufferNoArg &action = actionBufferNoArg[currentAction];
-
 		switch (action.destination)
 		{
 	{%- for component in components %}
@@ -219,8 +220,6 @@ Postman::update()
 					case robot::action::{{ action.name | CAMELCASE }}:
 						if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(action.response) <= xpcc::co::NestingError) {
 							action.remove();
-							if (currentAction == runningCoroutineActionsNoArg - 1)
-								runningCoroutineActionsNoArg--;
 						}
 						break;
 				{%- endif %}
@@ -237,69 +236,10 @@ Postman::update()
 			default:
 				break;
 		}
-
-		currentAction++;
 	}
 {%- endif %}
 }
 
-// ----------------------------------------------------------------------------
-{%- if coAcLen > 0 %}
-bool
-Postman::pushIntoBuffer(const xpcc::Header& header, const xpcc::SmartPointer& payload)
-{
-	// this is the easy part
-	if (runningCoroutineActions <= coroutineActions)
-	{
-		// simply copy it to the end
-		actionBuffer[runningCoroutineActions] = ActionBuffer(header, payload);
-		runningCoroutineActions++;
-		return true;
-	}
-
-	// search for a free slot
-	for (ActionBuffer &buffer : actionBuffer)
-	{
-		if (buffer.destination == 0)
-		{
-			buffer = ActionBuffer(header, payload);
-			runningCoroutineActions++;
-			return true;
-		}
-	}
-
-	// this should never be reached, there are enough slots for all actions in parallel!
-	return false;
-}
-{%- endif %}
-{%- if coAcNoArgLen > 0 %}
-bool
-Postman::pushIntoBuffer(const xpcc::Header& header)
-{
-	// this is the easy part
-	if (runningCoroutineActionsNoArg <= coroutineActionsNoArg)
-	{
-		// simply copy it to the end
-		actionBufferNoArg[runningCoroutineActionsNoArg] = ActionBufferNoArg(header);
-		runningCoroutineActionsNoArg++;
-		return true;
-	}
-
-	// search for a free slot
-	for (ActionBufferNoArg &buffer : actionBufferNoArg)
-	{
-		if (buffer.destination == 0)
-		{
-			buffer = ActionBufferNoArg(header);
-			runningCoroutineActionsNoArg++;
-			return true;
-		}
-	}
-
-	// this should never be reached, there are enough slots for all actions in parallel!
-	return false;
-}
-{%- endif %}
 // ----------------------------------------------------------------------------
 {%- for component in components %}
 	{%- for action in component.actions %}

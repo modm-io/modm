@@ -73,9 +73,7 @@ private:
 		uint8_t destination;			// 1B
 	};	// 5B (AVR), 7B(ARM)
 
-	static constexpr uint_fast8_t coroutineActions = {{ coAcLen }};
-	// 0 means no action is running, so 1 means one is running.
-	uint_fast8_t runningCoroutineActions;
+	static constexpr uint8_t coroutineActions = {{ coAcLen }};
 	ActionBuffer actionBuffer[coroutineActions];
 
 	bool
@@ -100,13 +98,8 @@ private:
 		uint8_t destination;			// 1B
 	};	// 3B
 
-	static constexpr uint_fast8_t coroutineActionsNoArg = {{ coAcNoArgLen }};
-	// 0 means no action is running, so 1 means one is running.
-	uint_fast8_t runningCoroutineActionsNoArg;
+	static constexpr uint8_t coroutineActionsNoArg = {{ coAcNoArgLen }};
 	ActionBufferNoArg actionBufferNoArg[coroutineActionsNoArg];
-
-	bool
-	pushIntoBuffer(const xpcc::Header& header);
 {%- endif %}
 
 private:
