@@ -37,16 +37,10 @@ namespace robot
 			{%- endfor %}
 		} {%- if not packet.isStronglyTyped %} __attribute__((packed)){%- endif %};
 
-		{%- if packet.isStronglyTyped %}
-		inline size_t
-		value({{ packet.name | typeName }} e ) {
-			switch (e) {
-				{%- for element in packet.iter() %}
-				case {{ packet.name | typeName }}::{{ element.name | enumElementStrong }}: return {{ element.value }}; break;
-				{%- endfor %}
-				default:
-					__builtin_unreachable();
-			}
+		{% if packet.isStronglyTyped %}
+		constexpr {{ packet.underlyingType }}
+		value({{ packet.name | typeName }} e) {
+			return {{ packet.underlyingType }}(e);
 		}
 		{%- endif %}
 
