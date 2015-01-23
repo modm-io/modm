@@ -21,23 +21,22 @@ namespace robot_call_tasks
 class {{ component.name | CamelCase }}
 {
 public:
-	{% for action in component.flattened().actions %}
-	
-	{% if action.description -%}
-	{% if action.parameterType -%}
+	{%- for action in component.flattened().actions %}
+	{%- if action.description %}
+	{%- if action.parameterType %}
 	/** {{ action.description | xpcc.wordwrap(72) | xpcc.indent(2) }}
 	Parameter: robot::packet::{{ action.parameterType.flattened().name | CamelCase }}&
 	 */
-	{% else -%}
+	{%- else %}
 	/** {{ action.description | xpcc.wordwrap(72) | xpcc.indent(2) }} */
-	{% endif -%}
-	{% else -%}
-	{% if action.parameterType -%}
+	{%- endif %}
+	{%- else %}
+	{%- if action.parameterType %}
 	/**
 	Parameter: robot::packet::{{ action.parameterType.flattened().name | CamelCase }}&
 	 */
-	{% endif -%}
-	{% endif -%}
+	{%- endif %}
+	{%- endif %}
 	class {{ action.name | CamelCase }} : public xpcc::CommunicatableTask, private xpcc::pt::Protothread
 	{
 	public:
@@ -55,7 +54,7 @@ public:
 		typedef robot::packet::{{ action.returnType.name | CamelCase }} ReturnType;
 		{%- endif %}
 		{%- endif %}
-		
+
 		{{ action.name | CamelCase }}( xpcc::Communicator *c ) :
 			CommunicatableTask( c ),
 			responseCallback( this, &{{ action.name | CamelCase }}::responseHandler ),
@@ -77,33 +76,32 @@ public:
 		{
 			{% if action.parameterType -%}
 			this->parameter = parameter;
-			
+
 			{% endif -%}
 			this->waitForResponse = false;
-		
+
 			this->restart();	/* restarting Proto-Thread */
 			return this;
 		}
-		
+
 		virtual bool
 		isFinished()
 		{
 			return !this->isRunning();
 		}
-		
 
 		virtual void
 		update()
 		{
 			this->run();
 		}
-		
+
 		xpcc::Header getResponseHeader()
 		{
 			return responseHeader;
 		}
 		{%- if action.returnType %}
-		
+
 		{% if action.returnType.isBuiltIn -%}
 		const {{ action.returnType.name | CamelCase }}& getResponsePayload()
 		{% else -%}
@@ -113,7 +111,7 @@ public:
 			return responsePayload;
 		}
 		{%- endif %}
-		
+
 	private:
 		xpcc::ResponseCallback responseCallback;
 
@@ -137,17 +135,17 @@ public:
 			this->responsePayload = *payload;
 			{%- endif %}
 		}
-	
+
 	public:
 		bool
 		run()
 		{
 			PT_BEGIN();
-		
+
 		//	XPCC_LOG_INFO << XPCC_FILE_INFO << " run : {{ action.name | CamelCase }} " << xpcc::endl;
-		
+
 			this->waitForResponse = true;
-		
+
 			parent->callAction(
 					robot::component::Identifier::{{ component.name | CAMELCASE }},
 					robot::action::Identifier::{{ action.name | CAMELCASE }},
@@ -155,19 +153,19 @@ public:
 					this->parameter,
 					{% endif -%}
 					this->responseCallback );
-		
+
 			PT_WAIT_UNTIL( !this->waitForResponse );
-		
+
 		//	XPCC_LOG_INFO << XPCC_FILE_INFO << " ready : {{ action.name | CamelCase }} " << xpcc::endl;
-		
+
 			PT_END();
-		
+
 			return false;
 		}
-		
+
 	private:
 		{%- if action.parameterType %}
-		
+
 		// parameter
 		{% if action.parameterType.isBuiltIn -%}
 		{{ action.parameterType.name | CamelCase }} parameter;
@@ -189,7 +187,7 @@ public:
 		// internal
 		bool waitForResponse;
 	};
-	
+
 	{%- endfor %}
 
 }; // class {{ component.name | CamelCase }}
