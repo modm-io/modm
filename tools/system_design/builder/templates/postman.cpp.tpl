@@ -53,6 +53,7 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 	switch (header.destination)
 	{
 {%- set actionNumber = 0 %}
+{%- set actionNumberNoArg = 0 %}
 {%- for component in components %}
 		case robot::component::{{ component.name | CAMELCASE }}:
 		{
@@ -77,14 +78,16 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 					if (actionBufferNoArg[{{ actionNumber }}].destination != 0) {
 			{%- endif %}
 						component::{{component.name | camelCase}}.getCommunicator()->sendNegativeResponse(response);
-					} 
+					}
 					else if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(response{{ payload }}) > xpcc::co::NestingError) {
 			{%- if action.parameterType != None %}
 						actionBuffer[{{ actionNumber }}] = ActionBuffer(header, payload);
+						{%- set actionNumber = actionNumber + 1 %}
 			{%- else %}
 						actionBufferNoArg[{{ actionNumber }}] = ActionBufferNoArg(header);
+						{%- set actionNumberNoArg = actionNumberNoArg + 1 %}
 			{%- endif %}
-			{%- set actionNumber = actionNumber + 1 %}
+
 					}
 		{%- else %}
 			{%- if action.parameterType != None %}
