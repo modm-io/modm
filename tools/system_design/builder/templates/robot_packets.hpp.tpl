@@ -35,8 +35,7 @@ namespace robot
 			{{ element.name | enumElement }} = {{ element.value }},
 				{%- endif %}
 			{%- endfor %}
-		} {%- if not packet.isStronglyTyped %} __attribute__((packed)){%- endif %};
-
+		} {%- if packet.underlyingType == None %} __attribute__((packed)){%- endif %};
 		{% if packet.isStronglyTyped %}
 		constexpr {{ packet.underlyingType }}
 		value({{ packet.name | typeName }} e) {
