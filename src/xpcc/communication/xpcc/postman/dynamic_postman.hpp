@@ -32,10 +32,11 @@
 #define	XPCC__DYNAMIC_POSTMAN_HPP
 
 #include "postman.hpp"
-#include "../action_callback.hpp"
+#include "action_callback.hpp"
 #include "../response_callback.hpp"
 
 #include <map>
+
 
 namespace xpcc
 {
@@ -58,7 +59,7 @@ namespace xpcc
 		DynamicPostman();
 
 		DynamicPostman(const EventMap *eventMap,
-				const RequestMap *requenstMap);
+				const RequestMap *requestMap);
 
 		virtual DeliverInfo
 		deliverPacket(const Header &header, const SmartPointer& payload);
@@ -66,9 +67,12 @@ namespace xpcc
 		virtual bool
 		isComponentAvaliable(uint8_t component) const;
 
+		virtual void
+		update();
+
 	private:
 		const EventMap *eventMap;
-		const RequestMap *requenstMap;
+		const RequestMap *requestMap;
 	};
 }
 

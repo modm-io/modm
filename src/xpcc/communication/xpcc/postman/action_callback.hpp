@@ -33,9 +33,9 @@
 
 #include <xpcc/container/smart_pointer.hpp>
 
-#include "backend/backend_interface.hpp"
-#include "abstract_component.hpp"
-#include "response_handle.hpp"
+#include "../backend/backend_interface.hpp"
+#include "../abstract_component.hpp"
+#include "../response_handle.hpp"
 
 namespace xpcc
 {

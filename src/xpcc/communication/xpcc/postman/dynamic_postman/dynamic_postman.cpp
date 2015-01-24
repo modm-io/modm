@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -33,14 +33,14 @@
 // ----------------------------------------------------------------------------
 xpcc::DynamicPostman::DynamicPostman() :
 	eventMap(0),
-	requenstMap(0)
+	requestMap(0)
 {
 }
 
 // ----------------------------------------------------------------------------
-xpcc::DynamicPostman::DynamicPostman(const EventMap* eventMap, const RequestMap* requenstMap) :
+xpcc::DynamicPostman::DynamicPostman(const EventMap* eventMap, const RequestMap* requestMap) :
 	eventMap(eventMap),
-	requenstMap(requenstMap)
+	requestMap(requestMap)
 {
 }
 
@@ -68,8 +68,8 @@ xpcc::DynamicPostman::deliverPacket(const Header &header, const SmartPointer& pa
 		else
 		{
 			// REQUEST
-			RequestMap::const_iterator iterDestination(this->requenstMap->find(header.destination));
-			if (iterDestination != this->requenstMap->end())
+			RequestMap::const_iterator iterDestination(this->requestMap->find(header.destination));
+			if (iterDestination != this->requestMap->end())
 			{
 				CallbackMap::const_iterator iterCallback(iterDestination->second.find(header.packetIdentifier));
 				if (iterCallback != iterDestination->second.end())
@@ -97,10 +97,16 @@ xpcc::DynamicPostman::deliverPacket(const Header &header, const SmartPointer& pa
 bool
 xpcc::DynamicPostman::isComponentAvaliable(uint8_t component) const
 {
-	if (this->requenstMap != 0) {
-		return (this->requenstMap->find(component) != this->requenstMap->end());
+	if (this->requestMap != 0) {
+		return (this->requestMap->find(component) != this->requestMap->end());
 	}
 	else {
 		return false;
 	}
+}
+
+void
+xpcc::DynamicPostman::update()
+{
+	// tumbleweed
 }
