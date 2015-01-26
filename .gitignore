@@ -16,3 +16,4 @@ build/
 /src/xpcc/architecture/platform.hpp
 # xpcc_config.hpp is generated from a template file
 src/xpcc_config.hpp
+src/libxpcc.a
