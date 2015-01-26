@@ -58,7 +58,7 @@ xpcc::DynamicPostman::deliverPacket(const Header &header, const SmartPointer& pa
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::DynamicPostman::isComponentAvaliable(uint8_t component) const
+xpcc::DynamicPostman::isComponentAvailable(uint8_t component) const
 {
 	return (this->actionMap.find(component) != this->actionMap.end());
 }

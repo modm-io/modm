@@ -67,7 +67,7 @@ xpcc::Dispatcher::update()
 			this->handlePacket(header, payload);
 			if (!header.isAcknowledge && header.destination != 0)
 			{
-				if (postman->isComponentAvaliable(header.destination)) {
+				if (postman->isComponentAvailable(header.destination)) {
 					this->sendAcknowledge(header);
 				}
 			}
@@ -326,7 +326,7 @@ xpcc::Dispatcher::handleWaitingMessages()
 			else
 			{
 				// action or response
-				if (postman->isComponentAvaliable(entry->header.destination))
+				if (postman->isComponentAvailable(entry->header.destination))
 				{
 					prev = sendMessageToInnerComponent(entry, prev);
 				}

@@ -137,7 +137,7 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 
 // ----------------------------------------------------------------------------
 bool
-Postman::isComponentAvaliable(uint8_t component) const
+Postman::isComponentAvailable(uint8_t component) const
 {
 	switch (component)
 	{
