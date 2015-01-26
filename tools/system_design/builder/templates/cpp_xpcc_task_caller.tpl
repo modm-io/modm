@@ -4,8 +4,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef ROBOT__CPP_COMMUNICATION_XPCC_TASK_CALLER_HPP
-#define ROBOT__CPP_COMMUNICATION_XPCC_TASK_CALLER_HPP
+#ifndef {{ namespace | upper }}_CPP_COMMUNICATION_XPCC_TASK_CALLER_HPP
+#define {{ namespace | upper }}_CPP_COMMUNICATION_XPCC_TASK_CALLER_HPP
 
 #include "identifier.hpp"
 #include "packets.hpp"
@@ -195,4 +195,4 @@ public:
 
 } // namespace robot_call_tasks
 
-#endif // ROBOT__CPP_COMMUNICATION_XPCC_TASK_CALLER_HPP
+#endif // {{ namespace | upper }}_CPP_COMMUNICATION_XPCC_TASK_CALLER_HPP

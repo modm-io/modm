@@ -47,14 +47,24 @@ class PostmanBuilder(builder_base.Builder):
 				dest = "container",
 				default = None,
 				help = "name of the container in the XML file")
-	
+		optparser.add_option(
+				"--namespace",
+				dest = "namespace",
+				default = "robot",
+				help = "Namespace of the generated identifiers.")
+
 	def generate(self):
 		# check the commandline options
 		if not self.options.outpath:
 			raise builder_base.BuilderException("You need to provide an output path!")
 		if not self.options.container or self.options.container not in self.tree.container:
 			raise builder_base.BuilderException("Please specify a valid container!")
-		
+
+		if self.options.namespace:
+			namespace = self.options.namespace
+		else:
+			raise builder_base.BuilderException("You need to provide a namespace!")
+
 		cppFilter = {
 			'camelcase': filter_lower,
 			'camelCase': filter.variableName,
@@ -73,6 +83,7 @@ class PostmanBuilder(builder_base.Builder):
 			'events': self.tree.events,
 			'container': container,
 			'eventSubscriptions': container.subscriptions,
+			'namespace': namespace
 		}
 		
 		file = os.path.join(self.options.outpath, 'postman.hpp')

@@ -4,14 +4,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef ROBOT__CPP_COMMUNICATION_HPP
-#define ROBOT__CPP_COMMUNICATION_HPP
+#ifndef {{ namespace | upper }}_CPP_COMMUNICATION_HPP
+#define {{ namespace | upper }}_CPP_COMMUNICATION_HPP
 
 #include "identifier.hpp"
 #include "packets.hpp"
 #include <xpcc/communication/xpcc/communicator.hpp>
 
-namespace robot
+namespace {{ namespace }}
 {
 
 	/** Using this class you can publish events.*/
@@ -123,6 +123,6 @@ namespace robot
 	
 {%- endfor %}
 
-} // namespace robot
+} // namespace {{ namespace }}
 
-#endif // ROBOT__CPP_COMMUNICATION_HPP
+#endif // {{ namespace | upper }}_CPP_COMMUNICATION_HPP
