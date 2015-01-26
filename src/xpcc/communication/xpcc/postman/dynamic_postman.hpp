@@ -52,7 +52,7 @@ public:
 	template< class C, typename P >
 	bool
 	registerEventListener(const uint8_t eventId, C *componentObject,
-						  void (C::*memberFunction)(const Header&, const P*));
+						  void (C::*memberFunction)(const Header&, const P&));
 
 	template< class C >
 	bool
@@ -62,13 +62,13 @@ public:
 	template< class C, typename P >
 	bool
 	registerActionHandler(const uint8_t componentId, const uint8_t actionId, C *componentObject,
-						  void (C::*memberFunction)(const ResponseHandle&, const P*));
+						  void (C::*memberFunction)(const ResponseHandle&, const P&));
 
 private:
-	typedef std::function<void (const Header&, const uint8_t*)> EventCallback;
+	typedef std::function<void (const Header&, const uint8_t&)> EventCallback;
 	typedef std::function<void (const Header&)> EventCallbackSimple;
 
-	typedef std::function<void (const ResponseHandle&, const uint8_t*)> ActionCallback;
+	typedef std::function<void (const ResponseHandle&, const uint8_t&)> ActionCallback;
 	typedef std::function<void (const ResponseHandle&)> ActionCallbackSimple;
 
 	class EventListener

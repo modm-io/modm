@@ -85,7 +85,7 @@ xpcc::DynamicPostman::EventListener::operator()(
 		const SmartPointer& payload) const
 {
 	if (hasPayload > 0) {
-		call(header, payload.getPointer());
+		call(header, *(payload.getPointer()));
 	} else if (hasPayload == 0) {
 		callSimple(header);
 	}
@@ -113,7 +113,7 @@ xpcc::DynamicPostman::ActionHandler::operator()(
 		const SmartPointer& payload) const
 {
 	if (hasPayload > 0) {
-		call(response, payload.getPointer());
+		call(response, *(payload.getPointer()));
 	} else if (hasPayload == 0) {
 		callSimple(response);
 	}
