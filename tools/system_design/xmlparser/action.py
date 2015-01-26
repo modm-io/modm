@@ -24,7 +24,7 @@ class Action(object):
 
 	def __get_type(self, node, name, tree):
 		type = node.get(name)
-		if type != None:
+		if type is not None:
 			try:
 				type = tree.types[type]
 			except KeyError as e:

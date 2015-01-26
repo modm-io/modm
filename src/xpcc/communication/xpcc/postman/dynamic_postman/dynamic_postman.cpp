@@ -1,46 +1,16 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
- * All rights reserved.
+/* Copyright (c) 2015, Roboterclub Aachen e.V.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
 
 #include "../dynamic_postman.hpp"
 
 // ----------------------------------------------------------------------------
-xpcc::DynamicPostman::DynamicPostman() :
-	eventMap(0),
-	requestMap(0)
-{
-}
-
-// ----------------------------------------------------------------------------
-xpcc::DynamicPostman::DynamicPostman(const EventMap* eventMap, const RequestMap* requestMap) :
-	eventMap(eventMap),
-	requestMap(requestMap)
+xpcc::DynamicPostman::DynamicPostman()
 {
 }
 
@@ -48,65 +18,103 @@ xpcc::DynamicPostman::DynamicPostman(const EventMap* eventMap, const RequestMap*
 xpcc::DynamicPostman::DeliverInfo
 xpcc::DynamicPostman::deliverPacket(const Header &header, const SmartPointer& payload)
 {
-	if (this->eventMap != 0)
+	if (header.destination == 0)
 	{
-		if (header.destination == 0)
+		// EVENT
+		EventMap::const_iterator lowerBound(this->eventMap.lower_bound(header.packetIdentifier));
+		EventMap::const_iterator upperBound(this->eventMap.upper_bound(header.packetIdentifier));
+		if (lowerBound != upperBound) {
+			do {
+				lowerBound->second(header, payload);
+				lowerBound++;
+			}
+			while (lowerBound != upperBound);
+			return OK;
+		}
+		return NO_EVENT;
+	}
+	else
+	{
+		// REQUEST
+		ActionMap::const_iterator iterDestination(this->actionMap.find(header.destination));
+		if (iterDestination != this->actionMap.end())
 		{
-			// EVENT
-			EventMap::const_iterator lowerBound(this->eventMap->lower_bound(header.packetIdentifier));
-			EventMap::const_iterator upperBound(this->eventMap->upper_bound(header.packetIdentifier));
-			if (lowerBound != upperBound) {
-				do {
-					lowerBound->second.call(header, payload);
-					lowerBound++;
-				}
-				while (lowerBound != upperBound);
+			CallbackMap::const_iterator iterCallback(iterDestination->second.find(header.packetIdentifier));
+			if (iterCallback != iterDestination->second.end())
+			{
+				xpcc::ResponseHandle response(header);
+				iterCallback->second(response, payload);
 				return OK;
 			}
-			return NO_EVENT;
-		}
-		else
-		{
-			// REQUEST
-			RequestMap::const_iterator iterDestination(this->requestMap->find(header.destination));
-			if (iterDestination != this->requestMap->end())
-			{
-				CallbackMap::const_iterator iterCallback(iterDestination->second.find(header.packetIdentifier));
-				if (iterCallback != iterDestination->second.end())
-				{
-					ResponseHandle response(header);
-					iterCallback->second.call(response, payload);
-					return OK;
-				}
-				else {
-					return NO_ACTION;
-				}
-			}
 			else {
-				return NO_COMPONENT;
+				return NO_ACTION;
 			}
 		}
-	}
-	else {
-		return NO_COMPONENT;
+		else {
+			return NO_COMPONENT;
+		}
 	}
 }
 
 // ----------------------------------------------------------------------------
-
 bool
 xpcc::DynamicPostman::isComponentAvaliable(uint8_t component) const
 {
-	if (this->requestMap != 0) {
-		return (this->requestMap->find(component) != this->requestMap->end());
-	}
-	else {
-		return false;
-	}
+	return (this->actionMap.find(component) != this->actionMap.end());
+}
+
+// ----------------------------------------------------------------------------
+xpcc::DynamicPostman::EventListener::EventListener() :
+		hasPayload(-1)
+{
+}
+
+xpcc::DynamicPostman::EventListener::EventListener(EventCallback call) :
+		call(call), hasPayload(1)
+{
+}
+
+xpcc::DynamicPostman::EventListener::EventListener(EventCallbackSimple call) :
+		callSimple(call), hasPayload(0)
+{
 }
 
 void
-xpcc::DynamicPostman::update()
+xpcc::DynamicPostman::EventListener::operator()(
+		const Header& header,
+		const SmartPointer& payload) const
 {
-	// tumbleweed
+	if (hasPayload > 0) {
+		call(header, payload.getPointer());
+	} else if (hasPayload == 0) {
+		callSimple(header);
+	}
+}
+
+// ----------------------------------------------------------------------------
+xpcc::DynamicPostman::ActionHandler::ActionHandler() :
+		hasPayload(-1)
+{
+}
+
+xpcc::DynamicPostman::ActionHandler::ActionHandler(ActionCallback call) :
+		call(call), hasPayload(1)
+{
+}
+
+xpcc::DynamicPostman::ActionHandler::ActionHandler(ActionCallbackSimple call) :
+		callSimple(call), hasPayload(0)
+{
+}
+
+void
+xpcc::DynamicPostman::ActionHandler::operator()(
+		const ResponseHandle& response,
+		const SmartPointer& payload) const
+{
+	if (hasPayload > 0) {
+		call(response, payload.getPointer());
+	} else if (hasPayload == 0) {
+		callSimple(response);
+	}
 }

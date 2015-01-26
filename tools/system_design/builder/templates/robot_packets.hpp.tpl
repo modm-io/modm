@@ -9,6 +9,7 @@
 #define	ROBOT__PACKETS_HPP
 
 #include <stdint.h>
+#include <cstdlib>
 #include <xpcc/io/iostream.hpp>
 
 namespace robot
@@ -34,7 +35,15 @@ namespace robot
 			{{ element.name | enumElement }} = {{ element.value }},
 				{%- endif %}
 			{%- endfor %}
-		} {%- if not packet.isStronglyTyped %} __attribute__((packed)){%- endif %};
+		} {%- if packet.underlyingType == None %} __attribute__((packed)){%- endif %};
+		{% if packet.isStronglyTyped %}
+		constexpr {{ packet.underlyingType }}
+		value({{ packet.name | typeName }} e) {
+			return {{ packet.underlyingType }}(e);
+		}
+		{%- endif %}
+
+		static constexpr int {{ packet.name | typeName }}NumberOfElements = {{ packet.numberOfElements }};
 
 		inline const char*
 		enumToString({{ packet.name | typeName }} e)

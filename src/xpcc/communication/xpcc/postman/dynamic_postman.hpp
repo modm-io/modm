@@ -1,79 +1,119 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
- * All rights reserved.
+/* Copyright (c) 2015, Roboterclub Aachen e.V.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__DYNAMIC_POSTMAN_HPP
-#define	XPCC__DYNAMIC_POSTMAN_HPP
+#ifndef	XPCC_DYNAMIC_POSTMAN_HPP
+#define	XPCC_DYNAMIC_POSTMAN_HPP
 
 #include "postman.hpp"
-#include "action_callback.hpp"
 #include "../response_callback.hpp"
+#include "../backend/header.hpp"
+#include "../response_handle.hpp"
 
 #include <map>
-
+#include <functional>
 
 namespace xpcc
 {
-	typedef ResponseCallback EventCallback;
 
-	/**
-	 * \brief 		Default Postman can be used if no other more efficient
-	 * 				Postman is available.
-	 *
-	 * \ingroup		xpcc_comm
-	 */
-	class DynamicPostman : public Postman
+/**
+ * The Dynamic Postman is a generic Postman, which allows components to
+ * add Action Handlers and Event Listeners at runtime.
+ * This class should be used in hosted targets only, as the static Postman generated
+ * by XPCC is much more efficient.
+ *
+ * On hosted however, this class allows for much easier registering of callbacks.
+ *
+ * @ingroup	xpcc_comm
+ * @author	Niklas Hauser
+ */
+class DynamicPostman : public Postman
+{
+public:
+	DynamicPostman();
+
+	DeliverInfo
+	deliverPacket(const Header &header, const SmartPointer& payload) override;
+
+	bool
+	isComponentAvaliable(uint8_t component) const override;
+
+public:
+	template< class C >
+	bool
+	registerEventListener(const uint8_t eventId, C *componentObject,
+						  void (C::*memberFunction)(const Header&));
+
+	template< class C, typename P >
+	bool
+	registerEventListener(const uint8_t eventId, C *componentObject,
+						  void (C::*memberFunction)(const Header&, const P*));
+
+	template< class C >
+	bool
+	registerActionHandler(const uint8_t componentId, const uint8_t actionId, C *componentObject,
+						  void (C::*memberFunction)(const ResponseHandle&));
+
+	template< class C, typename P >
+	bool
+	registerActionHandler(const uint8_t componentId, const uint8_t actionId, C *componentObject,
+						  void (C::*memberFunction)(const ResponseHandle&, const P*));
+
+private:
+	typedef std::function<void (const Header&, const uint8_t*)> EventCallback;
+	typedef std::function<void (const Header&)> EventCallbackSimple;
+
+	typedef std::function<void (const ResponseHandle&, const uint8_t*)> ActionCallback;
+	typedef std::function<void (const ResponseHandle&)> ActionCallbackSimple;
+
+	class EventListener
 	{
-	public:
-		typedef ::std::multimap<uint16_t, EventCallback> EventMap;
-		typedef ::std::map<uint16_t, ActionCallback > CallbackMap; ///< packetIdentifier -> callback
-		typedef ::std::map<uint16_t, CallbackMap > RequestMap; ///< destination -> callbackMap
+		EventCallback call;
+		EventCallbackSimple callSimple;
+		int8_t hasPayload;
 
 	public:
-		DynamicPostman();
+		EventListener();
+		EventListener(EventCallback call);
+		EventListener(EventCallbackSimple call);
 
-		DynamicPostman(const EventMap *eventMap,
-				const RequestMap *requestMap);
-
-		virtual DeliverInfo
-		deliverPacket(const Header &header, const SmartPointer& payload);
-
-		virtual bool
-		isComponentAvaliable(uint8_t component) const;
-
-		virtual void
-		update();
-
-	private:
-		const EventMap *eventMap;
-		const RequestMap *requestMap;
+		void operator()(const Header& header, const SmartPointer& payload) const;
 	};
-}
 
-#endif	// XPCC__DYNAMIC_POSTMAN_HPP
+	class ActionHandler
+	{
+		ActionCallback call;
+		ActionCallbackSimple callSimple;
+		int8_t hasPayload;
+
+	public:
+		ActionHandler();
+		ActionHandler(ActionCallback call);
+		ActionHandler(ActionCallbackSimple call);
+
+		void operator()(const ResponseHandle& response, const SmartPointer& payload) const;
+	};
+
+	/// packetIdentifier -> callback
+	typedef std::multimap<uint8_t, EventListener> EventMap;
+
+	/// packetIdentifier -> callback
+	typedef std::map<uint8_t, ActionHandler > CallbackMap;
+	///< destination -> callbackMap
+	typedef std::map<uint8_t, CallbackMap > ActionMap;
+
+private:
+	EventMap eventMap;
+	ActionMap actionMap;
+};
+
+}	// namespace xpcc
+
+#include "dynamic_postman_impl.hpp"
+
+#endif	// XPCC_DYNAMIC_POSTMAN_HPP

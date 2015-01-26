@@ -50,7 +50,7 @@ class Tree(object):
 		output += "\nContainer:\n"
 		for element in self.container:
 			output += "- %s\n" % element
-		output += "\Domains:\n"
+		output += "\nDomains:\n"
 		for element in self.domains:
 			output += "- %s\n" % element
 		return output
@@ -269,7 +269,7 @@ class Parser(object):
 # -----------------------------------------------------------------------------
 if __name__ == "__main__":
 	parser = Parser()
-	parser.parse("../../../global/xml/robot.xml")
+	parser.parse("../../../../season/common/robot.xml", dtdPath="../../../tools/system_design/xml/dtd")
 	
 	tree = parser.tree
 	

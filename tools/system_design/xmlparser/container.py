@@ -37,7 +37,7 @@ class Container:
 		utils.check_name(self.name)
 		
 		bootloader = node.find('bootloader')
-		if bootloader != None:
+		if bootloader is not None:
 			bootloader = bootloader.attrib
 		self.bootloader = bootloader
 		
