@@ -70,7 +70,7 @@ namespace xpcc
 		 * 			to the given component, \c false otherwise.
 		 */
 		virtual bool
-		isComponentAvaliable(uint8_t component) const = 0;
+		isComponentAvailable(uint8_t component) const = 0;
 	};
 }
 

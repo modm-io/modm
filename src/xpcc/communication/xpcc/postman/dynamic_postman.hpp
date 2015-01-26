@@ -41,7 +41,7 @@ public:
 	deliverPacket(const Header &header, const SmartPointer& payload) override;
 
 	bool
-	isComponentAvaliable(uint8_t component) const override;
+	isComponentAvailable(uint8_t component) const override;
 
 public:
 	template< class C >

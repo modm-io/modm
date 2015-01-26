@@ -17,7 +17,7 @@ public:
 	deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& payload);
 	
 	bool
-	isComponentAvaliable(uint8_t component) const;
+	isComponentAvailable(uint8_t component) const;
 };
 
 #endif	// POSTMAN_HPP

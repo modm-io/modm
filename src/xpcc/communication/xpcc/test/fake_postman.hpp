@@ -51,7 +51,7 @@ public:
 			const xpcc::SmartPointer& payload);
 	
 	virtual bool
-	isComponentAvaliable(uint8_t component) const;
+	isComponentAvailable(uint8_t component) const;
 	
 public:
 	xpcc::LinkedList<Message> messagesToDeliver;

@@ -114,7 +114,7 @@ FakePostman::deliverPacket(const xpcc::Header& header,
 }
 
 bool
-FakePostman::isComponentAvaliable(uint8_t component) const
+FakePostman::isComponentAvailable(uint8_t component) const
 {
 	return (component == 1 || component == 2);
 }
