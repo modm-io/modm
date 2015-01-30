@@ -162,7 +162,7 @@ xpcc::Hmc6343<I2cMaster>::readPostData(Command command, uint8_t offset, uint8_t 
 	if (CO_CALL(writeCommand(command, 1)))
 	{
 		CO_WAIT_UNTIL(
-				timeout.isExpired() && adapter.configureRead(data.getPointer() + offset, readSize) &&
+				timeout.isExpired() && adapter.configureRead(data.data + offset, readSize) &&
 				(i2cTask = i(command) + I2cTask::ReadCommandBase, this->startTransaction(&adapter))
 		);
 

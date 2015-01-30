@@ -17,6 +17,10 @@
 namespace xpcc
 {
 
+// forward declaration for friending with hmc6343::Data
+template < class I2cMaster >
+class Hmc6343;
+
 struct hmc6343
 {
 	enum class
@@ -117,6 +121,9 @@ public:
 	struct ATTRIBUTE_PACKED
 	Data
 	{
+		template < class I2cMaster >
+		friend class Hmc6343;
+
 		// DATA ACCESS
 		/// returns the acceleration in unknown units
 		///@{
@@ -253,8 +260,13 @@ public:
 	// READING EEPROM
 	/// reads the device id from eeprom
 	xpcc::co::Result<bool> ALWAYS_INLINE
-	readDeviceId(void *ctx, uint16_t &value)
-	{ return readRegister(ctx, Register16::DeviceSerial, value); }
+	getDeviceId(uint16_t &value)
+	{ return readRegister(Register16::DeviceSerial, value); }
+
+	/// sets a new IIR filter in eeprom
+	xpcc::co::Result<bool> ALWAYS_INLINE
+	getIIR_Filter(uint8_t &value)
+	{ return readRegister(Register::Filter, value); }
 
 
 
