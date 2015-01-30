@@ -21,9 +21,9 @@ xpcc::I2cEeprom<I2cMaster>::I2cEeprom(uint8_t address)
 // // MARK: - write operations
 template <typename I2cMaster>
 xpcc::co::Result<bool>
-xpcc::I2cEeprom<I2cMaster>::ping(void *ctx)
+xpcc::I2cEeprom<I2cMaster>::ping()
 {
-	CO_BEGIN(ctx);
+	CO_BEGIN();
 
 	CO_WAIT_UNTIL(adapter.configurePing() and
 			(i2cTask = I2cTask::Ping, this->startTransaction(&adapter)));
@@ -35,9 +35,9 @@ xpcc::I2cEeprom<I2cMaster>::ping(void *ctx)
 
 template <typename I2cMaster>
 xpcc::co::Result<bool>
-xpcc::I2cEeprom<I2cMaster>::write(void *ctx, uint16_t address, const uint8_t *data, std::size_t length)
+xpcc::I2cEeprom<I2cMaster>::write(uint16_t address, const uint8_t *data, std::size_t length)
 {
-	CO_BEGIN(ctx);
+	CO_BEGIN();
 
 	CO_WAIT_UNTIL(adapter.configureWrite(address, data, length) and
 			(i2cTask = I2cTask::Write, this->startTransaction(&adapter)));
@@ -50,9 +50,9 @@ xpcc::I2cEeprom<I2cMaster>::write(void *ctx, uint16_t address, const uint8_t *da
 // MARK: - read operations
 template <typename I2cMaster>
 xpcc::co::Result<bool>
-xpcc::I2cEeprom<I2cMaster>::read(void *ctx, uint16_t address, uint8_t *data, std::size_t length)
+xpcc::I2cEeprom<I2cMaster>::read(uint16_t address, uint8_t *data, std::size_t length)
 {
-	CO_BEGIN(ctx);
+	CO_BEGIN();
 
 	CO_WAIT_UNTIL(adapter.configureRead(address, data, length) and
 			(i2cTask = I2cTask::Read, this->startTransaction(&adapter)));
