@@ -27,18 +27,17 @@
 		case ((counter % 255) + 1): ;
 
 /**
- * Declare start of a coroutine.
+ * Declare start of a nested coroutine.
  * This will immidiately return if the nesting is too deep
  * or if it was called in a different context than it was started in.
  *
- * @warning	Use at start of the `coroutine(ctx)` implementation!
+ * @warning	Use at start of the `coroutine()` implementation!
  * @ingroup	coroutine
  * @hideinitializer
  */
-#define CO_BEGIN(context) \
-	constexpr uint32_t coCounter = __COUNTER__; \
+#define CO_BEGIN() \
+	constexpr uint16_t coCounter = __COUNTER__; \
 	if (!this->nestingOkCo()) return {xpcc::co::NestingError}; \
-	if (!this->beginCo(context)) return {xpcc::co::WrongContext}; \
 	switch (this->pushCo()) { \
 		case (::xpcc::co::Coroutine::CoStopped): \
 			CO_INTERNAL_SET_CASE(__COUNTER__);
@@ -46,7 +45,7 @@
 /**
  * End the coroutine and return a result.
  *
- * @warning	Use at end of the `coroutine(ctx)` implementation only!
+ * @warning	Use at end of the `coroutine()` implementation only!
  * @ingroup	coroutine
  * @hideinitializer
  */
@@ -56,12 +55,12 @@
 			this->popCo(); \
 			return {xpcc::co::WrongState}; \
 	} \
-	static_assert(__COUNTER__ - coCounter < 256, "You have too many states in this coroutine!");
+	static_assert(uint16_t(__COUNTER__) - coCounter < 256, "You have too many states in this coroutine!");
 
 /**
  * End the coroutine. You can use this to return `void`, or if the result does not matter.
  *
- * @warning	Use at end of the `coroutine(ctx)` implementation only!
+ * @warning	Use at end of the `coroutine()` implementation only!
  * @ingroup	coroutine
  * @hideinitializer
  */
@@ -71,7 +70,7 @@
 /**
  * End the coroutine by calling another coroutine and returning its result.
  *
- * @warning	Use at end of the `coroutine(ctx)` implementation only!
+ * @warning	Use at end of the `coroutine()` implementation only!
  * @ingroup	coroutine
  * @hideinitializer
  */
@@ -81,7 +80,7 @@
 			this->popCo(); \
 			return {xpcc::co::WrongState}; \
 	} \
-	static_assert(__COUNTER__ - coCounter < 256, "You have too many states in this coroutine!");
+	static_assert(uint16_t(__COUNTER__) - coCounter < 256, "You have too many states in this coroutine!");
 
 /**
  * Yield coroutine until next invocation.

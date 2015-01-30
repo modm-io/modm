@@ -57,22 +57,23 @@ namespace co
 
 /// @cond
 /// State of a coroutine.
-enum State
+enum
+State
 {
 	// reasons to stop
 	Stop = 0,			///< Coroutine finished
 	NestingError = 1,	///< Nested Coroutine has run out of nesting levels
 
 	// reasons to wait
-	WrongContext = 2,	///< Coroutine already running in a different context
-	WrongState = 3,		///< Another coroutine of the same class is already running in this context
+	WrongState = 254,		///< Another coroutine of the same class is already running in this context
 
 	// reasons to keep running
-	Running = 4,		///< Coroutine is running
+	Running = 255,		///< Coroutine is running
 };
 /// @endcond
 
 /// All Coroutines return an encapsulated result type.
+/// @warning The result type **must** have a default constructor!
 template < typename T >
 struct Result
 {
@@ -108,34 +109,26 @@ struct Result<void>
 
 /**
  * This is the base class which must be inherited from for using
- * coroutines in your class.
+ * nested coroutines in your class.
  *
  * You are responsible to choosing the right nesting depth!
  * This class will guard itself against calling another coroutine at too
  * deep a nesting level and inform you gently of this by returning
- * `xpcc::co::NestingError` from your called `coroutine(ctx)`.
+ * `xpcc::co::NestingError` from your called `coroutine()`.
  * It is then up to you to recognise this in your program design
  * and increase the nesting depth or rethink your code.
  * You may disable the check by setting `XPCC_COROUTINE_CHECK_NESTING_DEPTH`
  * to `false` in your project configuration.
  *
  * Be aware that only one coroutine of the same object can run at the
- * same time. Even if you call another coroutine, it will simply not
- * run until the conflicting coroutine finished.
- *
- * Each coroutine requires a context pointer, which is used to ensure the
- * coroutine only executes in the context that it was originally started from.
- * If you call a coroutine in a different context, it will return
- * `xpcc::co::WrongContext`.
- * Similarly, if you call a different coroutine of the same class in
- * the same context, while another coroutine is running, it will return
+ * same time. Even if you call another coroutine, it will simply return
  * `xpcc::co::WrongState`.
- * Using the `CO_CALL(coroutine(ctx))` macro, you can wait for these
+ * Using the `CO_CALL(coroutine())` macro, you can wait for these
  * coroutines to become available and then run them, so you usually do
  * not need to worry about those cases.
  *
  * You may exit and return a value by using `CO_RETURN(value)` or
- * return the result of another coroutine using `CO_RETURN_CALL(coroutine(ctx))`.
+ * return the result of another coroutine using `CO_RETURN_CALL(coroutine())`.
  * This return value is wrapped in a `xpcc::co::Result<Type>` struct
  * and transparently returned by the `CO_CALL` macro so it can be used
  * to influence your program flow.
@@ -144,14 +137,14 @@ struct Result<void>
  * Should you wish to return a value at the end, you may use
  * `CO_END_RETURN(value)`.
  * You may also return the result of another coroutine using
- * `CO_END_RETURN_CALL(coroutine(ctx))`.
+ * `CO_END_RETURN_CALL(coroutine())`.
  *
  * @ingroup	coroutine
  * @author	Niklas Hauser
  * @tparam	Depth	maximum nesting depth: the maximum number of
  * 					coroutines that are called within coroutines (should be <128).
  */
-template< uint8_t Depth >
+template< uint8_t Depth = 0>
 class NestedCoroutine
 {
 	/// Used to store a coroutines's position (what Dunkels calls a
@@ -160,7 +153,7 @@ class NestedCoroutine
 protected:
 	/// Construct a new class with nested coroutines
 	NestedCoroutine()
-	:	coLevel(0), coContext(0)
+	:	coLevel(0)
 	{
 		for (CoState &level : coStateArray)
 		{
@@ -178,8 +171,6 @@ public:
 		{
 			coStateArray[level++] = CoStopped;
 		}
-		if (coLevel == 0)
-			coContext = 0;
 	}
 
 	/// @return	`true` if a coroutine is running at the current nesting level, else `false`
@@ -235,8 +226,6 @@ protected:
 	stopCo()
 	{
 		coStateArray[coLevel-1] = CoStopped;
-		if (coLevel == 1)
-			coContext = 0;
 	}
 
 	/// sets the state of the parent nesting level
@@ -266,32 +255,12 @@ protected:
 		return (coStateArray[coLevel] == CoStopped);
 	}
 
-	/// @return `true` if the coroutine is called in the same context, or the context is not set
-	///			`false` if the coroutine is claimed by another context
-	bool inline
-	beginCo(void *ctx)
-	{
-		// only one comparison, if this coroutine is called in the same context
-		if (ctx == coContext)
-			return true;
-
-		// two comparisons + assignment, if this coroutine is called for the first time
-		if (coContext == 0)
-		{
-			coContext = ctx;
-			return true;
-		}
-
-		return false;
-	}
-
 public:
 	static constexpr CoState CoStopped = static_cast<CoState>(0);
 	/// @endcond
 private:
 	uint_fast8_t coLevel;
 	CoState coStateArray[Depth+1];
-	void *coContext;
 };
 
 // ----------------------------------------------------------------------------
@@ -303,7 +272,7 @@ class NestedCoroutine<0>
 	typedef uint8_t CoState;
 protected:
 	NestedCoroutine() :
-		coState(CoStopped), coLevel(-1), coContext(0)
+		coState(CoStopped), coLevel(-1)
 	{
 	}
 
@@ -344,7 +313,6 @@ protected:
 	stopCo()
 	{
 		coState = CoStopped;
-		coContext = 0;
 	}
 
 	bool inline
@@ -369,27 +337,11 @@ protected:
 		return (coState == CoStopped);
 	}
 
-	bool inline
-	beginCo(void *ctx)
-	{
-		if (ctx == coContext)
-			return true;
-
-		if (coContext == 0)
-		{
-			coContext = ctx;
-			return true;
-		}
-
-		return false;
-	}
-
 public:
 	static constexpr CoState CoStopped = static_cast<CoState>(0);
 private:
 	CoState coState;
 	int_fast8_t coLevel;
-	void *coContext;
 };
 /// @endcond
 
