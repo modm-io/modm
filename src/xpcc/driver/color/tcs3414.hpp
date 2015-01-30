@@ -158,12 +158,9 @@ public:
 	//! \brief 	Power up sensor and start conversions
 	// Blocking
 	bool inline
-	initialize()
+	initializeBlocking()
 	{
-		xpcc::co::Result<bool> result;
-		while ((result = initialize(this)).state > xpcc::co::NestingError)
-			;
-		return result.result;
+		return CO_CALL_BLOCKING(initialize());
 	}
 
 	//! \brief 	Configures some of the most important settings for the sensor.
@@ -191,32 +188,29 @@ public:
 	//! \brief	The gain can be used to adjust the sensitivity of all ADC output channels.
 	xpcc::co::Result<bool>
 	setGain(
-			void *ctx,
 			const Gain      gain      = Gain::DEFAULT,
 			const Prescaler prescaler = Prescaler::DEFAULT)
 	{
-		return writeRegister(ctx, RegisterAddress::GAIN,
+		return writeRegister(RegisterAddress::GAIN,
 				static_cast<uint8_t>(gain) | static_cast<uint8_t>(prescaler));
 	}
 
 	//! \brief Sets the integration time for the ADCs.
 	xpcc::co::Result<bool>
 	setIntegrationTime(
-			void *ctx,
 			const IntegrationMode        mode = IntegrationMode::DEFAULT,
 			const NominalIntegrationTime time = NominalIntegrationTime::DEFAULT)
 	{
-		return setIntegrationTime(ctx, mode, static_cast<uint8_t>(time));
+		return setIntegrationTime(mode, static_cast<uint8_t>(time));
 	}
 
 	//! \brief Sets the integration time for the ADCs.
 	xpcc::co::Result<bool>
 	setIntegrationTime(
-			void *ctx,
 			const IntegrationMode mode = IntegrationMode::DEFAULT,
 			const SyncPulseCount  time = SyncPulseCount::DEFAULT)
 	{
-		return setIntegrationTime(ctx, mode, static_cast<uint8_t>(time));
+		return setIntegrationTime(mode, static_cast<uint8_t>(time));
 	}
 
 	/**
@@ -247,22 +241,21 @@ public:
 	//! \brief	Read current samples of ADC conversions for all channels.
 	// Non-blocking
 	xpcc::co::Result<bool>
-	refreshAllColors(void *ctx);
+	refreshAllColors();
 
 	// MARK: - TASKS
 	/// Pings the sensor
 	xpcc::co::Result<bool>
-	ping(void *ctx);
+	ping();
 
 	xpcc::co::Result<bool>
-	initialize(void *ctx)
+	initialize()
 	{
-		return writeRegister(ctx, RegisterAddress::CONTROL, 0b11);	// control to power up and start conversion
+		return writeRegister(RegisterAddress::CONTROL, 0b11);	// control to power up and start conversion
 	};
 
 	xpcc::co::Result<bool>
 	configure(
-			void *ctx,
 			const Gain            gain      = Gain::DEFAULT,
 			const Prescaler       prescaler = Prescaler::DEFAULT,
 			const IntegrationMode mode      = IntegrationMode::DEFAULT,
@@ -272,12 +265,10 @@ private:
 	//! \brief Sets the integration time for the ADCs.
 	xpcc::co::Result<bool>
 	setIntegrationTime(
-			void *ctx,
 			const IntegrationMode mode = IntegrationMode::DEFAULT,
 			const uint8_t         time = 0)
 	{
 		return writeRegister(
-				ctx,
 				RegisterAddress::TIMING,
 				static_cast<uint8_t>(mode) | time );
 	}
@@ -302,14 +293,12 @@ private:
 	//! \brief	Read value of specific register.
 	xpcc::co::Result<bool>
 	readRegisters(
-			void *ctx,
 			const RegisterAddress address,
 			uint8_t * const values,
 			const uint8_t count = 1);
 
 	xpcc::co::Result<bool>
 	writeRegister(
-			void *ctx,
 			const RegisterAddress address,
 			const uint8_t value);
 

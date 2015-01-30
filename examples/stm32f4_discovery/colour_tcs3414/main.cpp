@@ -47,7 +47,7 @@ public:
 		while (true)
 		{
 			// we wait until the task started
-			if (PT_CALL(colorSensor.ping(this))) {
+			if (PT_CALL(colorSensor.ping())) {
 			 	break;
 			}
 			// otherwise, try again in 100ms
@@ -59,7 +59,7 @@ public:
 
 		while (true)
 		{
-			if (PT_CALL(colorSensor.initialize(this))) {
+			if (PT_CALL(colorSensor.initialize())) {
 				break;
 			}
 			// otherwise, try again in 100ms
@@ -72,7 +72,6 @@ public:
 		while (true)
 		{
 			if (PT_CALL(colorSensor.configure(
-					this,
 					xpcc::tcs3414::Gain::X16,
 					xpcc::tcs3414::Prescaler::DEFAULT,
 					xpcc::tcs3414::IntegrationMode::INTERNAL,
@@ -88,7 +87,7 @@ public:
 
 		while (true)
 		{
-			if (PT_CALL(colorSensor.refreshAllColors(this))) {
+			if (PT_CALL(colorSensor.refreshAllColors())) {
 				auto colors = colorSensor.getOldColors();
 				stream.printf("RGB: %5d %5d %5d", colors.red, colors.green, colors.blue);
 				xpcc::color::HsvT<xpcc::tcs3414::UnderlyingType> hsv;
