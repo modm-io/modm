@@ -73,7 +73,7 @@ public:
 	 * 		the allowed absolute tolerance for the resulting clock frequency
 	 */
 	template< class clockSource, uint32_t frequency=200000,
-			Tolerance tolerance = Tolerance::TenPercent >
+			uint16_t tolerance = Tolerance::TenPercent >
 	static void
 	initialize();
 

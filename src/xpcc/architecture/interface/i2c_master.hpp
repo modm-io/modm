@@ -68,7 +68,7 @@ public:
 	 * 		the allowed absolute tolerance for the resulting baudrate
 	 */
 	template< class clockSource, uint32_t baudrate=Baudrate::Standard,
-			Tolerance tolerance = Tolerance::FivePercent >
+			uint16_t tolerance = Tolerance::FivePercent >
 	static void
 	initialize();
 
