@@ -27,9 +27,9 @@ xpcc::Bmp085<I2cMaster>::Bmp085(Data &data, uint8_t address)
 // MARK: - Tasks
 template < class I2cMaster >
 xpcc::co::Result<bool>
-xpcc::Bmp085<I2cMaster>::ping(void *ctx)
+xpcc::Bmp085<I2cMaster>::ping()
 {
-	CO_BEGIN(ctx);
+	CO_BEGIN();
 
 	CO_WAIT_UNTIL(
 			adapter.configurePing() and
@@ -43,9 +43,9 @@ xpcc::Bmp085<I2cMaster>::ping(void *ctx)
 
 template < typename I2cMaster >
 xpcc::co::Result<bool>
-xpcc::Bmp085<I2cMaster>::configure(void *ctx, Mode mode)
+xpcc::Bmp085<I2cMaster>::configure(Mode mode)
 {
-	CO_BEGIN(ctx);
+	CO_BEGIN();
 
 	setMode(mode);
 	buffer[0] = i(Register::CAL_AC1);
@@ -81,9 +81,9 @@ xpcc::Bmp085<I2cMaster>::configure(void *ctx, Mode mode)
 
 template < typename I2cMaster >
 xpcc::co::Result<bool>
-xpcc::Bmp085<I2cMaster>::readout(void *ctx)
+xpcc::Bmp085<I2cMaster>::readout()
 {
-	CO_BEGIN(ctx);
+	CO_BEGIN();
 
 	// Start temperature reading
 	buffer[0] = i(Register::CONTROL);
