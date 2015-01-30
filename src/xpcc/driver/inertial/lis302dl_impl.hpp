@@ -21,49 +21,49 @@ xpcc::Lis302dl<Transport>::Lis302dl(Data &data, uint8_t address)
 
 template < class Transport >
 xpcc::co::Result<bool>
-xpcc::Lis302dl<Transport>::initialize(void *ctx, Scale scale, MeasurementRate rate)
+xpcc::Lis302dl<Transport>::initialize(Scale scale, MeasurementRate rate)
 {
-	return updateControlRegister(ctx, r(scale) | r(rate) | Control1_t(0x47));
+	return updateControlRegister(r(scale) | r(rate) | Control1_t(0x47));
 }
 
 template < class Transport >
 xpcc::co::Result<bool>
-xpcc::Lis302dl<Transport>::updateControlRegister(void *ctx, uint8_t index, Control_t setMask, Control_t clearMask)
+xpcc::Lis302dl<Transport>::updateControlRegister(uint8_t index, Control_t setMask, Control_t clearMask)
 {
-	CO_BEGIN(ctx);
+	CO_BEGIN();
 
 	rawBuffer[index] = (rawBuffer[index] & ~clearMask.value) | setMask.value;
 	if (index == 0)
 		data.meta = bool(Control1_t(rawBuffer[0]) & Control1::FS);
 
-	CO_END_RETURN_CALL(this->write(ctx, i(Register::CtrlReg1) + index, rawBuffer[index]));
+	CO_END_RETURN_CALL(this->write(i(Register::CtrlReg1) + index, rawBuffer[index]));
 }
 
 template < class Transport >
 xpcc::co::Result<bool>
-xpcc::Lis302dl<Transport>::writeClickThreshold(void *ctx, Axis axis, uint8_t threshold)
+xpcc::Lis302dl<Transport>::writeClickThreshold(Axis axis, uint8_t threshold)
 {
 	switch(axis)
 	{
 		case Axis::X:
-			return this->updateRegister(ctx, i(Register::ClickThsYX), threshold & 0x0F, 0x0F);
+			return this->updateRegister(i(Register::ClickThsYX), threshold & 0x0F, 0x0F);
 
 		case Axis::Y:
-			return this->updateRegister(ctx, i(Register::ClickThsYX), threshold << 4, 0xF0);
+			return this->updateRegister(i(Register::ClickThsYX), threshold << 4, 0xF0);
 
 		default:
 //		case Axis::Z:
-			return this->write(ctx, i(Register::ClickThsZ), threshold & 0x0F);
+			return this->write(i(Register::ClickThsZ), threshold & 0x0F);
 	}
 }
 
 template < class Transport >
 xpcc::co::Result<bool>
-xpcc::Lis302dl<Transport>::readAcceleration(void *ctx)
+xpcc::Lis302dl<Transport>::readAcceleration()
 {
-	CO_BEGIN(ctx);
+	CO_BEGIN();
 
-	if (CO_CALL(this->read(ctx, i(Register::Status) | Transport::AddressIncrement, rawBuffer + 3, 7)))
+	if (CO_CALL(this->read(i(Register::Status) | Transport::AddressIncrement, rawBuffer + 3, 7)))
 	{
 		data.data[0] = rawBuffer[5];
 		data.data[1] = rawBuffer[7];
@@ -77,14 +77,14 @@ xpcc::Lis302dl<Transport>::readAcceleration(void *ctx)
 // ----------------------------------------------------------------------------
 template < class Transport >
 xpcc::co::Result<bool>
-xpcc::Lis302dl<Transport>::updateRegister(void *ctx, uint8_t reg, uint8_t setMask, uint8_t clearMask)
+xpcc::Lis302dl<Transport>::updateRegister(uint8_t reg, uint8_t setMask, uint8_t clearMask)
 {
-	CO_BEGIN(ctx);
+	CO_BEGIN();
 
-	if (CO_CALL(this->read(ctx, reg, rawBuffer[4])))
+	if (CO_CALL(this->read(reg, rawBuffer[4])))
 	{
 		rawBuffer[4] = (rawBuffer[4] & ~clearMask) | setMask;
-		CO_RETURN_CALL(this->write(ctx, reg, rawBuffer[4]));
+		CO_RETURN_CALL(this->write(reg, rawBuffer[4]));
 	}
 
 	CO_END_RETURN(false);

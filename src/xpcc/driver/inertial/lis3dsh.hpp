@@ -524,55 +524,55 @@ public:
 	Lis3dsh(Data &data, uint8_t address=0x1D);
 
 	bool inline
-	initialize(Scale scale, MeasurementRate rate = MeasurementRate::Hz100)
+	initializeBlocking(Scale scale, MeasurementRate rate = MeasurementRate::Hz100)
 	{
-		return CO_CALL_BLOCKING(initialize(this, scale, rate));
+		return CO_CALL_BLOCKING(initialize(scale, rate));
 	}
 
 	xpcc::co::Result<bool>
-	initialize(void *ctx, Scale scale, MeasurementRate rate = MeasurementRate::Hz100);
+	initialize(Scale scale, MeasurementRate rate = MeasurementRate::Hz100);
 
 	// MARK: Control Registers
 	xpcc::co::Result<bool> inline
-	updateSmControl1(void *ctx, SmControl_t setMask, SmControl_t clearMask = SmControl_t(0xff))
+	updateSmControl1(SmControl_t setMask, SmControl_t clearMask = SmControl_t(0xff))
 	{
-		return updateControlRegister(ctx, 1, setMask, clearMask);
+		return updateControlRegister(1, setMask, clearMask);
 	}
 
 	xpcc::co::Result<bool> inline
-	updateSmControl2(void *ctx, SmControl_t setMask, SmControl_t clearMask = SmControl_t(0xff))
+	updateSmControl2(SmControl_t setMask, SmControl_t clearMask = SmControl_t(0xff))
 	{
-		return updateControlRegister(ctx, 2, setMask, clearMask);
+		return updateControlRegister(2, setMask, clearMask);
 	}
 
 	xpcc::co::Result<bool> inline
-	updateControl(void *ctx, Control3_t setMask, Control3_t clearMask = Control3_t(0xff))
+	updateControl(Control3_t setMask, Control3_t clearMask = Control3_t(0xff))
 	{
-		return updateControlRegister(ctx, 3, setMask, clearMask);
+		return updateControlRegister(3, setMask, clearMask);
 	}
 
 	xpcc::co::Result<bool> inline
-	updateControl(void *ctx, Control4_t setMask, Control4_t clearMask = Control4_t(0xff))
+	updateControl(Control4_t setMask, Control4_t clearMask = Control4_t(0xff))
 	{
-		return updateControlRegister(ctx, 0, setMask, clearMask);
+		return updateControlRegister(0, setMask, clearMask);
 	}
 
 	xpcc::co::Result<bool> inline
-	updateControl(void *ctx, Control5_t setMask, Control5_t clearMask = Control5_t(0xff))
+	updateControl(Control5_t setMask, Control5_t clearMask = Control5_t(0xff))
 	{
-		return updateControlRegister(ctx, 4, setMask, clearMask);
+		return updateControlRegister(4, setMask, clearMask);
 	}
 
 	xpcc::co::Result<bool> inline
-	updateControl(void *ctx, Control6_t setMask, Control6_t clearMask = Control6_t(0xff))
+	updateControl(Control6_t setMask, Control6_t clearMask = Control6_t(0xff))
 	{
-		return updateControlRegister(ctx, 5, setMask, clearMask);
+		return updateControlRegister(5, setMask, clearMask);
 	}
 
 
 	// MARK: Read access
 	xpcc::co::Result<bool>
-	readAcceleration(void *ctx);
+	readAcceleration();
 
 	// instant access
 	SmControl_t getControl1()
@@ -609,17 +609,17 @@ public:
 
 private:
 	xpcc::co::Result<bool>
-	updateControlRegister(void *ctx, uint8_t index, Control_t setMask, Control_t clearMask = static_cast<Control_t>(0xff));
+	updateControlRegister(uint8_t index, Control_t setMask, Control_t clearMask = static_cast<Control_t>(0xff));
 
 	xpcc::co::Result<bool>
-	updateRegister(void *ctx, uint8_t reg, uint8_t setMask, uint8_t clearMask = 0xff);
+	updateRegister(uint8_t reg, uint8_t setMask, uint8_t clearMask = 0xff);
 
 	// the read buffer is for a continous read from address 0x20 -> 0x2F
 	// 0: control 4
 	// 1-3: control 1-3
 	// 4-5: control 5-6
 	// 6: status (read-only)
-	// 7: out x low -- also use for readBuffer in updateRegister!
+	// 7: out x low -- also used for readBuffer in updateRegister!
 	// 8: out x high
 	// 9: out y low
 	// 10: out y high
