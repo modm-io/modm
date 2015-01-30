@@ -27,7 +27,7 @@ MAIN_FUNCTION
 	Scl::connect(MyI2cMaster::Scl);
 	MyI2cMaster::initialize<defaultSystemClock, 420000>();
 
-	display.initialize();
+	display.initializeBlocking();
 	display.setFont(xpcc::font::Assertion);
 	display << "Hello World!";
 	display.update();
