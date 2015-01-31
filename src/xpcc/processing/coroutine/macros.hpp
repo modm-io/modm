@@ -44,7 +44,7 @@
 			this->popCo(); \
 			return {xpcc::co::WrongState}; \
 	} \
-	static_assert(uint16_t(__COUNTER__) - coCounter < 256, "You have too many states in this coroutine!");
+	static_assert(uint16_t(__COUNTER__) - coCounter < 255, "You have too many states in this coroutine!");
 
 /**
  * End the coroutine. You can use this to return `void`, or if the result does not matter.
@@ -69,7 +69,7 @@
 			this->popCo(); \
 			return {xpcc::co::WrongState}; \
 	} \
-	static_assert(uint16_t(__COUNTER__) - coCounter < 256, "You have too many states in this coroutine!");
+	static_assert(uint16_t(__COUNTER__) - coCounter < 255, "You have too many states in this coroutine!");
 
 /**
  * Yield coroutine until next invocation.
@@ -170,15 +170,15 @@
 #ifndef __DOXYGEN__
 /// Required macro to set the same unique number twice
 #define CO_INTERNAL_SET_CASE(counter) \
-			this->setCo((counter % 255) + 1, coIndex); \
-		case ((counter % 255) + 1): ;
+			this->setCo((counter % 254) + 2, coIndex); \
+		case ((counter % 254) + 2): ;
 
 /// Internal macro for yield
 #define CO_INTERNAL_SET_CASE_YIELD(counter) \
-			this->setCo((counter % 255) + 1, coIndex); \
+			this->setCo((counter % 254) + 2, coIndex); \
 			this->popCo(); \
 			return {xpcc::co::Running}; \
-		case ((counter % 255) + 1): ;
+		case ((counter % 254) + 2): ;
 
 /// Beginner structure for nested coroutines
 #define CO_BEGIN_1() \

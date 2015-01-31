@@ -30,7 +30,8 @@ State
 	NestingError = 1,	///< Nested Coroutine has run out of nesting levels
 
 	// reasons to wait
-	WrongState = 254,		///< Another coroutine of the same class is already running in this context
+	WrongState = 254,	///< A conflicting nested coroutine of the same class is already running
+	Blocked = 254,		///< A conflicting coroutine has blocked this coroutine
 
 	// reasons to keep running
 	Running = 255,		///< Coroutine is running
@@ -78,6 +79,8 @@ struct Result<void>
 typedef uint8_t CoState;
 /// We use 0 instead of -1 since it might be fast to check
 static constexpr CoState CoStopped = CoState(0);
+/// Blocked coroutines return `WrongState` when called
+static constexpr CoState CoBlocked = CoState(1);
 /// @endcond
 
 /**
@@ -148,6 +151,28 @@ public:
 		{
 			if (level != CoStopped)
 				return true;
+		}
+		return false;
+	}
+
+	bool inline
+	blockCoroutine(uint8_t index)
+	{
+		if (index < Methods && coStateArray[index] != CoStopped)
+		{
+			coStateArray[index] = CoBlocked;
+			return true;
+		}
+		return false;
+	}
+
+	bool inline
+	unblockCoroutine(uint8_t index)
+	{
+		if (index < Methods && coStateArray[index] == CoBlocked)
+		{
+			coStateArray[index] = CoStopped;
+			return true;
 		}
 		return false;
 	}
