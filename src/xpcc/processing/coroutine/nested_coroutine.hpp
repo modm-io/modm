@@ -294,8 +294,6 @@ private:
 };
 /// @endcond
 
-typedef NestedCoroutine<0> Coroutine;
-
 } // namespace co
 
 } // namespace xpcc

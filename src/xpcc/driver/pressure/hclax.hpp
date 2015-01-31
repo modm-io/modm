@@ -66,7 +66,7 @@ struct hclax
  */
 template < typename I2cMaster >
 class HclaX : public hclax, public xpcc::I2cDevice<I2cMaster>,
-			  protected xpcc::co::Coroutine
+			  protected xpcc::co::NestedCoroutine<>
 {
 public:
 	/**

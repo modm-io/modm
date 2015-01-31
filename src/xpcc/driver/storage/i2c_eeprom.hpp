@@ -28,7 +28,7 @@ namespace xpcc
  * @author	Niklas Hauser
  */
 template <typename I2cMaster>
-class I2cEeprom : public xpcc::I2cDevice<I2cMaster>, protected xpcc::co::Coroutine
+class I2cEeprom : public xpcc::I2cDevice<I2cMaster>, protected xpcc::co::NestedCoroutine<>
 {
 public:
 	I2cEeprom(uint8_t address = 0xA0);

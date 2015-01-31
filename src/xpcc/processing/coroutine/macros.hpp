@@ -39,7 +39,7 @@
 	constexpr uint16_t coCounter = __COUNTER__; \
 	if (!this->nestingOkCo()) return {xpcc::co::NestingError}; \
 	switch (this->pushCo()) { \
-		case (::xpcc::co::Coroutine::CoStopped): \
+		case (::xpcc::co::NestedCoroutine<>::CoStopped): \
 			CO_INTERNAL_SET_CASE(__COUNTER__);
 
 /**
