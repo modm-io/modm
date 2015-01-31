@@ -173,7 +173,7 @@ CoroutineTest::testClassMethods()
 	// state should be 1
 	TEST_ASSERT_EQUALS(thread0.state, 1);
 	// stop coroutine of thread0
-	thread0.stopCoroutine();
+	thread0.stopAllCoroutines();
 	// not running anymore
 	TEST_ASSERT_FALSE(thread0.isCoroutineRunning());
 
@@ -204,7 +204,7 @@ CoroutineTest::testClassMethods()
 	TEST_ASSERT_EQUALS(thread1.getCoroutineDepth(), -1);
 	TEST_ASSERT_EQUALS(thread1.task1().state, xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread1.state, 1);
-	thread1.stopCoroutine();
+	thread1.stopAllCoroutines();
 	TEST_ASSERT_FALSE(thread1.isCoroutineRunning());
 
 
@@ -234,7 +234,7 @@ CoroutineTest::testClassMethods()
 	TEST_ASSERT_EQUALS(thread2.getCoroutineDepth(), -1);
 	TEST_ASSERT_EQUALS(thread2.task1().state, xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread2.state, 1);
-	thread2.stopCoroutine();
+	thread2.stopAllCoroutines();
 	TEST_ASSERT_FALSE(thread2.isCoroutineRunning());
 }
 
@@ -360,7 +360,7 @@ CoroutineTest::testNesting()
 	// it should be running
 	TEST_ASSERT_TRUE(thread.isCoroutineRunning());
 	// we should be able to stop this task though
-	thread.stopCoroutine();
+	thread.stopAllCoroutines();
 	TEST_ASSERT_FALSE(thread.isCoroutineRunning());
 	// and restart it
 	thread.state1 = 0;

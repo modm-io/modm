@@ -11,7 +11,7 @@
 #define XPCC_NESTED_COROUTINE_HPP
 
 #include "macros.hpp"
-#include <xpcc/utils/arithmetic_traits.hpp>
+#include <xpcc/architecture/utils.hpp>
 #include <stdint.h>
 
 #ifdef __DOXYGEN__
@@ -69,13 +69,14 @@ namespace co
  * You may disable the check by setting `XPCC_COROUTINE_CHECK_NESTING_DEPTH`
  * to `false` in your project configuration.
  *
- * Be aware that only one coroutine of the same object can run at the
- * same time. Even if you call another coroutine, it will simply return
- * `xpcc::co::WrongState`.
+ * The coroutines of this class are mutually exclusive, so only one
+ * coroutine of the same object can run at the same time. Even if you
+ * call another coroutine, it will simply return `xpcc::co::WrongState`.
  * Using the `CO_CALL(coroutine())` macro, you can wait for these
  * coroutines to become available and then run them, so you usually do
  * not need to worry about those cases.
  *
+ * You must begin each coroutine using `CO_BEGIN()`.
  * You may exit and return a value by using `CO_RETURN(value)` or
  * return the result of another coroutine using `CO_RETURN_CALL(coroutine())`.
  * This return value is wrapped in a `xpcc::co::Result<Type>` struct
@@ -88,6 +89,9 @@ namespace co
  * You may also return the result of another coroutine using
  * `CO_END_RETURN_CALL(coroutine())`.
  *
+ * @warning	**Coroutines are not thread-safe!** If two threads access the
+ * 			same coroutine, you must use a Mutex to regulate access to it.
+ *
  * @ingroup	coroutine
  * @author	Niklas Hauser
  * @tparam	Depth	maximum nesting depth: the maximum number of
@@ -96,9 +100,6 @@ namespace co
 template< uint8_t Depth = 0>
 class NestedCoroutine
 {
-	/// Used to store a coroutines's position (what Dunkels calls a
-	/// "local continuation").
-	typedef uint8_t CoState;
 protected:
 	/// Construct a new class with nested coroutines
 	NestedCoroutine()
@@ -113,7 +114,7 @@ protected:
 public:
 	/// Force all coroutines to stop running at the current nesting level
 	inline void
-	stopCoroutine()
+	stopAllCoroutines()
 	{
 		uint_fast8_t level = coLevel;
 		while (level < Depth + 1)
@@ -146,7 +147,7 @@ public:
 	 * @return	>`NestingError` if still running, <=`NestingError` if it has finished.
 	 */
 	xpcc::co::Result< ReturnType >
-	coroutine(void *ctx, ...);
+	coroutine(...);
 	/// @endcond
 #endif
 
@@ -172,7 +173,7 @@ protected:
 	// invalidates the parent nesting level
 	// @warning	be aware in which nesting level you call this! (before popCo()!)
 	void inline
-	stopCo()
+	stopCo(uint8_t /*index*/)
 	{
 		coStateArray[coLevel-1] = CoStopped;
 	}
@@ -180,7 +181,7 @@ protected:
 	/// sets the state of the parent nesting level
 	/// @warning	be aware in which nesting level you call this! (before popCo()!)
 	void inline
-	setCo(CoState state)
+	setCo(CoState state, uint8_t /*index*/)
 	{
 		coStateArray[coLevel-1] = state;
 	}
@@ -203,9 +204,6 @@ protected:
 	{
 		return (coStateArray[coLevel] == CoStopped);
 	}
-
-public:
-	static constexpr CoState CoStopped = static_cast<CoState>(0);
 	/// @endcond
 private:
 	uint_fast8_t coLevel;
@@ -218,7 +216,6 @@ private:
 template <>
 class NestedCoroutine<0>
 {
-	typedef uint8_t CoState;
 protected:
 	NestedCoroutine() :
 		coState(CoStopped), coLevel(-1)
@@ -227,9 +224,9 @@ protected:
 
 public:
 	void inline
-	stopCoroutine()
+	stopAllCoroutines()
 	{
-		this->stopCo();
+		coState = CoStopped;
 	}
 
 	bool inline
@@ -259,7 +256,7 @@ protected:
 	}
 
 	void inline
-	stopCo()
+	stopCo(uint8_t /*index*/)
 	{
 		coState = CoStopped;
 	}
@@ -275,7 +272,7 @@ protected:
 	}
 
 	void inline
-	setCo(CoState state)
+	setCo(CoState state, uint8_t /*index*/)
 	{
 		coState = state;
 	}
@@ -286,8 +283,6 @@ protected:
 		return (coState == CoStopped);
 	}
 
-public:
-	static constexpr CoState CoStopped = static_cast<CoState>(0);
 private:
 	CoState coState;
 	int_fast8_t coLevel;
