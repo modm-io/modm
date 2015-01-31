@@ -32,7 +32,7 @@ public:
 		while(true)
 		{
 			// we wait until the task started
-			if (PT_CALL(temp.ping(this)))
+			if (PT_CALL(temp.ping()))
 				break;
 			// otherwise, try again in 100ms
 			this->timer.restart(100);
@@ -40,20 +40,20 @@ public:
 		}
 
 
-		PT_CALL(temp.setUpdateRate(this, 200));
-		PT_CALL(temp.enableExtendedMode(this));
+		PT_CALL(temp.setUpdateRate(200));
+		PT_CALL(temp.enableExtendedMode());
 
-		PT_CALL(temp.configureAlertMode(this,
+		PT_CALL(temp.configureAlertMode(
 				xpcc::tmp102::ThermostatMode::Comparator,
 				xpcc::tmp102::AlertPolarity::ActiveLow,
 				xpcc::tmp102::FaultQueue::Faults6));
-		PT_CALL(temp.writeLowerLimit(this, 28.f));
-		PT_CALL(temp.writeUpperLimit(this, 30.f));
+		PT_CALL(temp.writeLowerLimit(28.f));
+		PT_CALL(temp.writeUpperLimit(30.f));
 
 		while (true)
 		{
 			{
-				PT_CALL(temp.readComparatorMode(this, result));
+				PT_CALL(temp.readComparatorMode(result));
 				float temperature = temperatureData.getTemperature();
 				uint8_t tI = (int) temperature;
 				uint16_t tP = (temperature - tI) * 10000;
