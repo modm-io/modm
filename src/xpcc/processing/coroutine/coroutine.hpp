@@ -31,7 +31,6 @@ State
 	NestingError = 1,	///< Nested Coroutine has run out of nesting levels
 
 	// reasons to wait
-	Blocked = 50,		///< A conflicting coroutine has blocked this coroutine
 	WrongState = 100,	///< A conflicting nested coroutine of the same class is already running
 
 	// reasons to keep running
@@ -80,8 +79,6 @@ struct Result<void>
 typedef uint8_t CoState;
 /// We use 0 instead of -1 since it might be fast to check
 static constexpr CoState CoStopped = CoState(0);
-/// Blocked coroutines return `WrongState` when called
-static constexpr CoState CoBlocked = CoState(1);
 /// @endcond
 
 /**
@@ -138,64 +135,59 @@ public:
 	inline void
 	stopAllCoroutines()
 	{
-		for (CoState &level : coStateArray)
+		for (CoState &state : coStateArray)
 		{
-			level = CoStopped;
+			state = CoStopped;
 		}
 	}
 
-	/// @return	`true` if a coroutine is running, else `false`
-	bool inline
-	isCoroutineRunning() const
+	/// Force one coroutines to stop running
+	inline bool
+	stopCoroutine(uint8_t id)
 	{
-		for (CoState &level : coStateArray)
+		if (id < Methods) {
+			coStateArray[id] = CoStopped;
+			return true;
+		}
+		return false;
+	}
+
+	/// @return	`true` if any coroutine is running, else `false`
+	bool inline
+	isAnyCoroutineRunning() const
+	{
+		for (const CoState state : coStateArray)
 		{
-			if (level != CoStopped)
+			if (state != CoStopped)
 				return true;
 		}
 		return false;
 	}
 
+	/// @return	`true` if the selected coroutine is running, else `false`
 	bool inline
-	blockCoroutines(uint8_t index)
+	isCoroutineRunning(uint8_t id) const
 	{
-		return blockCoroutines({index});
+		return (id < Methods and coStateArray[id] != CoStopped);
 	}
 
+	/// @return	`true` if the selected coroutine is not running, else `false`
 	bool inline
-	unblockCoroutines(uint8_t index)
+	joinCoroutine(uint8_t id) const
 	{
-		return unblockCoroutines({index});
+		return joinCoroutines({id});
 	}
 
+	/// @return	`true` if the selected coroutines are not running, else `false`
 	bool inline
-	blockCoroutines(std::initializer_list<uint8_t> indexi)
+	joinCoroutines(std::initializer_list<uint8_t> ids) const
 	{
-		for (uint8_t index : indexi)
+		for (uint8_t id : ids)
 		{
-			if (index >= Methods || coStateArray[index] > CoBlocked)
+			if (id >= Methods or coStateArray[id] != CoStopped)
 				return false;
 		}
-
-		for (uint8_t index : indexi)
-		{
-			coStateArray[index] = CoBlocked;
-		}
 		return true;
-	}
-
-	bool inline
-	unblockCoroutines(std::initializer_list<uint8_t> indexi)
-	{
-		bool success = true;
-		for (uint8_t index : indexi)
-		{
-			if (index < Methods && coStateArray[index] == CoBlocked) {
-				coStateArray[index] = CoStopped;
-			}
-			else success = false;
-		}
-		return success;
 	}
 
 #ifdef __DOXYGEN__
@@ -218,7 +210,7 @@ protected:
 	/// increases nesting level, call this in the switch statement!
 	/// @return current state before increasing nesting level
 	CoState ALWAYS_INLINE
-	pushCo(uint_fast8_t index)
+	pushCo(uint_fast8_t index) const
 	{
 		return coStateArray[index];
 	}
@@ -226,7 +218,7 @@ protected:
 	/// always call this before returning from the run function!
 	/// decreases nesting level
 	void ALWAYS_INLINE
-	popCo()
+	popCo() const
 	{}
 
 	// invalidates the parent nesting level

@@ -40,4 +40,7 @@ public:
 
 	void
 	testReturnVoidClass();
+
+	void
+	testNonNestedCoroutines();
 };
