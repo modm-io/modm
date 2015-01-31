@@ -183,37 +183,22 @@
 /// Beginner structure for nested coroutines
 #define CO_BEGIN_1() \
 	constexpr uint16_t coCounter = __COUNTER__; \
+	this->template checkCoType<true>(); \
 	constexpr uint8_t coIndex = 0; \
 	if (!this->nestingOkCo()) return {xpcc::co::NestingError}; \
-	switch (this->pushCo()) { \
+	switch (this->pushCo(0)) { \
 		case (::xpcc::co::CoStopped): \
 			CO_INTERNAL_SET_CASE(__COUNTER__);
 
 /// Beginner structure for conventional coroutines
 #define CO_BEGIN_0(index) \
 	constexpr uint16_t coCounter = __COUNTER__; \
+	this->template checkCoMethods<index>(); \
+	this->template checkCoType<false>(); \
 	constexpr uint_fast8_t coIndex = index; \
 	switch (this->pushCo(index)) { \
 		case (::xpcc::co::CoStopped): \
 			CO_INTERNAL_SET_CASE(__COUNTER__);
-
-// These static_asserts would be very useful, but we can only access
-// inherited member variables from template classes using `this->variable`,
-// which is not allowed in a `static_assert`.
-// Maybe this will change in the future. clang++ can already deal with accessing
-// inherited members without using `this->`.
-// Note that these asserts require static constexpr `coIsNested` and `coMethods`
-// in the Coroutine and NestedCoroutine classes respectively.
-
-// this should go into CO_BEGIN_1
-//	static_assert(coIsNested == true,
-//			"You must declare the index for this method!");
-
-// this should go into CO_BEGIN_0
-//	static_assert(coIsNested == false,
-//			"You must _not_ declare an index for this method!");
-//	static_assert(index < coMethods,
-//			"Index out of bounds! Increase the number of methods of your Coroutine class.");
 
 // the following completely unreadable preprocessor macro magic is based on this
 // https://gustedt.wordpress.com/2010/06/08/detect-empty-macro-arguments/

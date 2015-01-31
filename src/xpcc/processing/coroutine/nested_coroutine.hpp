@@ -157,7 +157,7 @@ protected:
 	/// increases nesting level, call this in the switch statement!
 	/// @return current state before increasing nesting level
 	CoState inline
-	pushCo()
+	pushCo(uint8_t /*index*/)
 	{
 		return coStateArray[coLevel++];
 	}
@@ -204,6 +204,20 @@ protected:
 	{
 		return (coStateArray[coLevel] == CoStopped);
 	}
+
+	/// compatibility with Coroutine class
+	template<uint8_t index>
+	static void
+	checkCoMethods()
+	{}
+
+	/// asserts that this method is called in this parent class
+	template<bool isNested>
+	static void
+	checkCoType()
+	{
+		static_assert(isNested == true, "You cannot declare an index for a _nested_ coroutine!");
+	}
 	/// @endcond
 private:
 	uint_fast8_t coLevel;
@@ -243,7 +257,7 @@ public:
 
 protected:
 	CoState inline
-	pushCo()
+	pushCo(uint8_t /*index*/)
 	{
 		coLevel = 0;
 		return coState;
@@ -281,6 +295,18 @@ protected:
 	isStoppedCo() const
 	{
 		return (coState == CoStopped);
+	}
+
+	template<uint8_t index>
+	static void
+	checkCoMethods()
+	{}
+
+	template<bool isNested>
+	static void
+	checkCoType()
+	{
+		static_assert(isNested == true, "You cannot declare an index for a _nested_ coroutine!");
 	}
 
 private:

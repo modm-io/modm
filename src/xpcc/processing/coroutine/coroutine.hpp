@@ -88,7 +88,7 @@ static constexpr CoState CoStopped = CoState(0);
  * You need to declare the number of coroutines in your class!
  *
  * You must begin each coroutine using `CO_BEGIN(index)` where `index` is
- * the unique index of your coroutine starting a zero.
+ * the unique index of your coroutine starting at zero.
  * You may exit and return a value by using `CO_RETURN(value)` or
  * return the result of another coroutine using `CO_RETURN_CALL(coroutine())`.
  * This return value is wrapped in a `xpcc::co::Result<Type>` struct
@@ -199,12 +199,36 @@ protected:
 		coStateArray[index] = state;
 	}
 
+	bool ALWAYS_INLINE
+	nestingOkCo() const
+	{
+		return true;
+	}
+
 	/// @return	`true` if `stopCo()` has been called before
 	bool ALWAYS_INLINE
 	isStoppedCo(uint_fast8_t index) const
 	{
 		return (coStateArray[index] == CoStopped);
 	}
+
+	/// asserts the index is not out of bounds.
+	template<uint8_t index>
+	static void
+	checkCoMethods()
+	{
+		static_assert(index < Methods,
+				"Index out of bounds! Increase the `Methods` template argument of your Coroutine class.");
+	}
+
+	/// asserts that this method is called in this parent class
+	template<bool isNested>
+	static void
+	checkCoType()
+	{
+		static_assert(isNested == false, "You must declare an index for this coroutine!");
+	}
+	/// @endcond
 
 private:
 	CoState coStateArray[Methods];
