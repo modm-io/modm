@@ -797,8 +797,8 @@ public:
 		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
 		// 251 case labels
 
-		CO_YIELD();CO_YIELD();
-		// 253 case labels
+		CO_YIELD();CO_YIELD();CO_YIELD();
+		// 254 case labels
 
 		// uncommenting this case label must now trigger a static assert warning!
 //		CO_YIELD();
@@ -812,8 +812,8 @@ CoroutineTest::testCaseNumbers()
 {
 	TestingCaseLabelThread thread;
 
-	// this routine must be called 252 times
-	for(uint32_t ii=0; ii < 252; ii++)
+	// this routine must be called 253 times
+	for(uint32_t ii=0; ii < 253; ii++)
 	{
 		TEST_ASSERT_EQUALS(thread.coroutine().state, xpcc::co::Running);
 	}
