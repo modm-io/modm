@@ -13,6 +13,7 @@
 #include "macros.hpp"
 #include <xpcc/architecture/utils.hpp>
 #include <stdint.h>
+#include <initializer_list>
 
 namespace xpcc
 {
@@ -30,8 +31,8 @@ State
 	NestingError = 1,	///< Nested Coroutine has run out of nesting levels
 
 	// reasons to wait
-	WrongState = 254,	///< A conflicting nested coroutine of the same class is already running
-	Blocked = 254,		///< A conflicting coroutine has blocked this coroutine
+	Blocked = 50,		///< A conflicting coroutine has blocked this coroutine
+	WrongState = 100,	///< A conflicting nested coroutine of the same class is already running
 
 	// reasons to keep running
 	Running = 255,		///< Coroutine is running
@@ -156,25 +157,45 @@ public:
 	}
 
 	bool inline
-	blockCoroutine(uint8_t index)
+	blockCoroutines(uint8_t index)
 	{
-		if (index < Methods && coStateArray[index] != CoStopped)
-		{
-			coStateArray[index] = CoBlocked;
-			return true;
-		}
-		return false;
+		return blockCoroutines({index});
 	}
 
 	bool inline
-	unblockCoroutine(uint8_t index)
+	unblockCoroutines(uint8_t index)
 	{
-		if (index < Methods && coStateArray[index] == CoBlocked)
+		return unblockCoroutines({index});
+	}
+
+	bool inline
+	blockCoroutines(std::initializer_list<uint8_t> indexi)
+	{
+		for (uint8_t index : indexi)
 		{
-			coStateArray[index] = CoStopped;
-			return true;
+			if (index >= Methods || coStateArray[index] > CoBlocked)
+				return false;
 		}
-		return false;
+
+		for (uint8_t index : indexi)
+		{
+			coStateArray[index] = CoBlocked;
+		}
+		return true;
+	}
+
+	bool inline
+	unblockCoroutines(std::initializer_list<uint8_t> indexi)
+	{
+		bool success = true;
+		for (uint8_t index : indexi)
+		{
+			if (index < Methods && coStateArray[index] == CoBlocked) {
+				coStateArray[index] = CoStopped;
+			}
+			else success = false;
+		}
+		return success;
 	}
 
 #ifdef __DOXYGEN__

@@ -79,7 +79,7 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 			{%- endif %}
 						component::{{component.name | camelCase}}.getCommunicator()->sendNegativeResponse(response);
 					}
-					else if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(response{{ payload }}) > xpcc::co::NestingError) {
+					else if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(response{{ payload }}) == xpcc::co::Running) {
 			{%- if action.parameterType != None %}
 						actionBuffer[{{ actionNumber }}] = ActionBuffer(header, payload);
 						{%- set actionNumber = actionNumber + 1 %}
@@ -220,7 +220,7 @@ Postman::update()
 			{%- for action in component.actions %}
 				{%- if action.call == "coroutine" and action.parameterType == None %}
 					case robot::action::{{ action.name | CAMELCASE }}:
-						if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(action.response) <= xpcc::co::NestingError) {
+						if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(action.response) < xpcc::co::Running) {
 							action.remove();
 						}
 						break;
@@ -258,8 +258,8 @@ uint8_t
 Postman::component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(const xpcc::ResponseHandle& response{{ arguments }})
 {
 	auto result = component::{{ component.name | camelCase }}.action{{ action.name | CamelCase }}({{ payload }});
-	if (result.state <= xpcc::co::NestingError) {
-		if (result.result.response == xpcc::Response::Positive) {
+	if (result.state < xpcc::co::Running) {
+		if (result.state == xpcc::co::Stop && result.result.response == xpcc::Response::Positive) {
 			{%- if action.returnType != None %}
 			component::{{component.name | camelCase}}.getCommunicator()->sendResponse(response, result.result.data);
 			{%- else %}

@@ -205,6 +205,8 @@
 	this->template checkCoType<false>(); \
 	constexpr uint_fast8_t coIndex = index; \
 	switch (this->pushCo(index)) { \
+		case (::xpcc::co::CoBlocked): \
+			return {xpcc::co::Blocked}; \
 		case (::xpcc::co::CoStopped): \
 			CO_INTERNAL_SET_CASE(__COUNTER__);
 
