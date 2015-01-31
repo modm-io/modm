@@ -66,7 +66,7 @@ struct hclax
  */
 template < typename I2cMaster >
 class HclaX : public hclax, public xpcc::I2cDevice<I2cMaster>,
-			  protected xpcc::co::Coroutine
+			  protected xpcc::co::NestedCoroutine<>
 {
 public:
 	/**
@@ -83,9 +83,9 @@ public:
 
 	/// pings the sensor
 	xpcc::co::Result<bool>
-	ping(void *ctx)
+	ping()
 	{
-		CO_BEGIN(ctx);
+		CO_BEGIN();
 
 		CO_WAIT_UNTIL(adapter.configurePing() and
 				(i2cTask = I2cTask::Ping, this->startTransaction(&adapter)));
@@ -97,9 +97,9 @@ public:
 
 	/// reads the Pressure registers and buffers the results
 	xpcc::co::Result<bool>
-	readPressure(void *ctx)
+	readPressure()
 	{
-		CO_BEGIN(ctx);
+		CO_BEGIN();
 
 		CO_WAIT_UNTIL(adapter.configureRead(data.data, 2) and
 				(i2cTask = I2cTask::ReadPressure, this->startTransaction(&adapter)));

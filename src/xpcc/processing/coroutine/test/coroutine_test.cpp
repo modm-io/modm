@@ -11,7 +11,7 @@
 #include "coroutine_test.hpp"
 
 // ----------------------------------------------------------------------------
-class TestingEmptyThread0 : public xpcc::co::Coroutine
+class TestingEmptyThread0 : public xpcc::co::NestedCoroutine<0>
 {
 public:
 	TestingEmptyThread0()
@@ -20,9 +20,9 @@ public:
 	}
 
 	xpcc::co::Result<bool>
-	task1(void *ctx)
+	task1()
 	{
-		CO_BEGIN(ctx);
+		CO_BEGIN();
 
 		state = 1;
 		depth = getCoroutineDepth();
@@ -35,9 +35,9 @@ public:
 	}
 
 	xpcc::co::Result<bool>
-	task2(void *ctx)
+	task2()
 	{
-		CO_BEGIN(ctx);
+		CO_BEGIN();
 
 		state = 3;
 
@@ -57,9 +57,9 @@ public:
 	}
 
 	xpcc::co::Result<bool>
-	task1(void *ctx)
+	task1()
 	{
-		CO_BEGIN(ctx);
+		CO_BEGIN();
 
 		state = 1;
 		depth = getCoroutineDepth();
@@ -72,9 +72,9 @@ public:
 	}
 
 	xpcc::co::Result<bool>
-	task2(void *ctx)
+	task2()
 	{
-		CO_BEGIN(ctx);
+		CO_BEGIN();
 
 		state = 3;
 
@@ -94,9 +94,9 @@ public:
 	}
 
 	xpcc::co::Result<bool>
-	task1(void *ctx)
+	task1()
 	{
-		CO_BEGIN(ctx);
+		CO_BEGIN();
 
 		state = 1;
 		depth = getCoroutineDepth();
@@ -109,9 +109,9 @@ public:
 	}
 
 	xpcc::co::Result<bool>
-	task2(void *ctx)
+	task2()
 	{
-		CO_BEGIN(ctx);
+		CO_BEGIN();
 
 		state = 3;
 
@@ -125,10 +125,6 @@ public:
 void
 CoroutineTest::testClassMethods()
 {
-	uint8_t ctx_helper;
-	void *ctx1 = this;
-	void *ctx2 = &ctx_helper;
-
 	// Nesting Depth of zero is specialized
 	TestingEmptyThread0 thread0;
 	// outside the nesting depth should be -1
@@ -140,7 +136,7 @@ CoroutineTest::testClassMethods()
 	TEST_ASSERT_FALSE(thread0.isCoroutineRunning());
 
 	// lets start a task, which will yield
-	TEST_ASSERT_EQUALS(thread0.task1(ctx1).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread0.task1().state, xpcc::co::Running);
 	// now it should be running
 	TEST_ASSERT_TRUE(thread0.isCoroutineRunning());
 	// state should be 1
@@ -149,18 +145,12 @@ CoroutineTest::testClassMethods()
 	TEST_ASSERT_EQUALS(thread0.depth, 0);
 
 	// two tasks cannot run in the same context
-	TEST_ASSERT_EQUALS(thread0.task2(ctx1).state, xpcc::co::WrongState);
-	// but starting a task of the same class in another context
-	// returns WrongContext, which can make parent class wait
-	TEST_ASSERT_EQUALS(thread0.task2(ctx2).state, xpcc::co::WrongContext);
-	// Similarly calling a running task1 in another context
-	// also returns WrongContext
-	TEST_ASSERT_EQUALS(thread0.task1(ctx2).state, xpcc::co::WrongContext);
+	TEST_ASSERT_EQUALS(thread0.task2().state, xpcc::co::WrongState);
 
 	// state should still be 1
 	TEST_ASSERT_EQUALS(thread0.state, 1);
 	// but it should continue execution in the right context
-	auto result1 = thread0.task1(ctx1);
+	auto result1 = thread0.task1();
 	TEST_ASSERT_EQUALS(result1.state, xpcc::co::Stop);
 	TEST_ASSERT_EQUALS(result1.result, false);
 	// state should be 2
@@ -169,7 +159,7 @@ CoroutineTest::testClassMethods()
 	TEST_ASSERT_FALSE(thread0.isCoroutineRunning());
 
 	// try the same with task2, which will end immediately
-	auto result2 = thread0.task2(ctx1);
+	auto result2 = thread0.task2();
 	TEST_ASSERT_EQUALS(result2.state, xpcc::co::Stop);
 	TEST_ASSERT_EQUALS(result2.result, true);
 	// state should be 3
@@ -179,11 +169,11 @@ CoroutineTest::testClassMethods()
 
 	TEST_ASSERT_EQUALS(thread0.getCoroutineDepth(), -1);
 	// lets start a task, which will yield
-	TEST_ASSERT_EQUALS(thread0.task1(ctx1).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread0.task1().state, xpcc::co::Running);
 	// state should be 1
 	TEST_ASSERT_EQUALS(thread0.state, 1);
 	// stop coroutine of thread0
-	thread0.stopCoroutine();
+	thread0.stopAllCoroutines();
 	// not running anymore
 	TEST_ASSERT_FALSE(thread0.isCoroutineRunning());
 
@@ -195,28 +185,26 @@ CoroutineTest::testClassMethods()
 	TEST_ASSERT_EQUALS(thread1.depth, 0);
 	TEST_ASSERT_FALSE(thread1.isCoroutineRunning());
 
-	TEST_ASSERT_EQUALS(thread1.task1(ctx1).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread1.task1().state, xpcc::co::Running);
 	TEST_ASSERT_TRUE(thread1.isCoroutineRunning());
 	TEST_ASSERT_EQUALS(thread1.state, 1);
 	TEST_ASSERT_EQUALS(thread1.depth, 0);
 
-	TEST_ASSERT_EQUALS(thread1.task2(ctx1).state, xpcc::co::WrongState);
-	TEST_ASSERT_EQUALS(thread1.task2(ctx2).state, xpcc::co::WrongContext);
-	TEST_ASSERT_EQUALS(thread1.task1(ctx2).state, xpcc::co::WrongContext);
+	TEST_ASSERT_EQUALS(thread1.task2().state, xpcc::co::WrongState);
 
 	TEST_ASSERT_EQUALS(thread1.state, 1);
-	TEST_ASSERT_EQUALS(thread1.task1(ctx1).state, xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(thread1.task1().state, xpcc::co::Stop);
 	TEST_ASSERT_EQUALS(thread1.state, 2);
 	TEST_ASSERT_FALSE(thread1.isCoroutineRunning());
 
-	TEST_ASSERT_EQUALS(thread1.task2(ctx1).state, xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(thread1.task2().state, xpcc::co::Stop);
 	TEST_ASSERT_EQUALS(thread1.state, 3);
 	TEST_ASSERT_FALSE(thread1.isCoroutineRunning());
 
 	TEST_ASSERT_EQUALS(thread1.getCoroutineDepth(), -1);
-	TEST_ASSERT_EQUALS(thread1.task1(ctx1).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread1.task1().state, xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread1.state, 1);
-	thread1.stopCoroutine();
+	thread1.stopAllCoroutines();
 	TEST_ASSERT_FALSE(thread1.isCoroutineRunning());
 
 
@@ -227,28 +215,26 @@ CoroutineTest::testClassMethods()
 	TEST_ASSERT_EQUALS(thread2.depth, 0);
 	TEST_ASSERT_FALSE(thread2.isCoroutineRunning());
 
-	TEST_ASSERT_EQUALS(thread2.task1(ctx1).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread2.task1().state, xpcc::co::Running);
 	TEST_ASSERT_TRUE(thread2.isCoroutineRunning());
 	TEST_ASSERT_EQUALS(thread2.state, 1);
 	TEST_ASSERT_EQUALS(thread2.depth, 0);
 
-	TEST_ASSERT_EQUALS(thread2.task2(ctx1).state, xpcc::co::WrongState);
-	TEST_ASSERT_EQUALS(thread2.task2(ctx2).state, xpcc::co::WrongContext);
-	TEST_ASSERT_EQUALS(thread2.task1(ctx2).state, xpcc::co::WrongContext);
+	TEST_ASSERT_EQUALS(thread2.task2().state, xpcc::co::WrongState);
 
 	TEST_ASSERT_EQUALS(thread2.state, 1);
-	TEST_ASSERT_EQUALS(thread2.task1(ctx1).state, xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(thread2.task1().state, xpcc::co::Stop);
 	TEST_ASSERT_EQUALS(thread2.state, 2);
 	TEST_ASSERT_FALSE(thread2.isCoroutineRunning());
 
-	TEST_ASSERT_EQUALS(thread2.task2(ctx1).state, xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(thread2.task2().state, xpcc::co::Stop);
 	TEST_ASSERT_EQUALS(thread2.state, 3);
 	TEST_ASSERT_FALSE(thread2.isCoroutineRunning());
 
 	TEST_ASSERT_EQUALS(thread2.getCoroutineDepth(), -1);
-	TEST_ASSERT_EQUALS(thread2.task1(ctx1).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread2.task1().state, xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread2.state, 1);
-	thread2.stopCoroutine();
+	thread2.stopAllCoroutines();
 	TEST_ASSERT_FALSE(thread2.isCoroutineRunning());
 }
 
@@ -266,9 +252,9 @@ public:
 	}
 
 	xpcc::co::Result<bool>
-	task1(void *ctx)
+	task1()
 	{
-		CO_BEGIN(ctx);
+		CO_BEGIN();
 
 		state1 = 1;
 
@@ -280,7 +266,7 @@ public:
 		CO_YIELD();
 
 		// manual spawn
-		CO_WAIT_WHILE((callResult1 = task2(ctx)).state > xpcc::co::NestingError);
+		CO_WAIT_WHILE((callResult1 = task2()).state > xpcc::co::NestingError);
 
 		state1 = 3;
 
@@ -293,9 +279,9 @@ public:
 
 protected:
 	xpcc::co::Result<bool>
-	task2(void *ctx)
+	task2()
 	{
-		CO_BEGIN(ctx);
+		CO_BEGIN();
 
 		state2 = 1;
 
@@ -306,7 +292,7 @@ protected:
 
 		CO_YIELD();
 
-		CO_WAIT_WHILE((callResult2 = task3(ctx)).state > xpcc::co::NestingError);
+		CO_WAIT_WHILE((callResult2 = task3()).state > xpcc::co::NestingError);
 
 		state2 = 3;
 
@@ -318,9 +304,9 @@ protected:
 	}
 
 	xpcc::co::Result<bool>
-	task3(void *ctx)
+	task3()
 	{
-		CO_BEGIN(ctx);
+		CO_BEGIN();
 
 		state3 = 1;
 
@@ -330,7 +316,7 @@ protected:
 		depth3 = getCoroutineDepth();
 		// this must return NestingError, since there is no more space
 		// to buffer the next nested local continuation anymore!
-		callResult3 = task3(ctx);
+		callResult3 = task3();
 
 		CO_YIELD();
 
@@ -358,10 +344,6 @@ public:
 void
 CoroutineTest::testNesting()
 {
-	uint8_t ctx_helper;
-	void *ctx1 = this;
-	void *ctx2 = &ctx_helper;
-
 	TestingNestedThread thread;
 	// sanity checks
 	TEST_ASSERT_FALSE(thread.isCoroutineRunning());
@@ -369,45 +351,42 @@ CoroutineTest::testNesting()
 	TEST_ASSERT_EQUALS(thread.getCoroutineDepth(), -1);
 
 	// should wait until the first condition
-	TEST_ASSERT_EQUALS(thread.task1(ctx1).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.task1().state, xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread.state1, 1);
 	// task should wait here
-	TEST_ASSERT_EQUALS(thread.task1(ctx1).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.task1().state, xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread.state1, 1);
 
 	// it should be running
 	TEST_ASSERT_TRUE(thread.isCoroutineRunning());
 	// we should be able to stop this task though
-	thread.stopCoroutine();
+	thread.stopAllCoroutines();
 	TEST_ASSERT_FALSE(thread.isCoroutineRunning());
 	// and restart it
 	thread.state1 = 0;
-	TEST_ASSERT_EQUALS(thread.task1(ctx1).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.task1().state, xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread.state1, 1);
 
 	// lets release start condition 1
 	thread.condition1 = true;
 	// task should continue and yield
-	TEST_ASSERT_EQUALS(thread.task1(ctx1).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.task1().state, xpcc::co::Running);
 	// check the state and depth
 	TEST_ASSERT_EQUALS(thread.state1, 2);
 	TEST_ASSERT_EQUALS(thread.depth1, 0);
 
 	// first manual spawn
-	TEST_ASSERT_EQUALS(thread.task1(ctx1).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.task1().state, xpcc::co::Running);
 	// the callResult1 should be Starting
 	TEST_ASSERT_EQUALS(thread.callResult1.state, xpcc::co::Running);
 	// after another run, callResult1 should still be Starting
-	TEST_ASSERT_EQUALS(thread.task1(ctx1).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.task1().state, xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread.callResult1.state, xpcc::co::Running);
-
-	// task1 should reject any other contexts, even when currently spawning
-	TEST_ASSERT_EQUALS(thread.task1(ctx2).state, xpcc::co::WrongContext);
 
 	// lets release start condition 2
 	thread.condition2 = true;
 	// task2 will progress to first yield
-	TEST_ASSERT_EQUALS(thread.task1(ctx1).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.task1().state, xpcc::co::Running);
 	// callResult1 should be Running
 	TEST_ASSERT_EQUALS(thread.callResult1.state, xpcc::co::Running);
 	// check the state and depth
@@ -416,21 +395,21 @@ CoroutineTest::testNesting()
 	TEST_ASSERT_EQUALS(thread.depth2, 1);
 
 	// task2 will progress to spawning task3
-	TEST_ASSERT_EQUALS(thread.task1(ctx1).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.task1().state, xpcc::co::Running);
 	// callResult1 should be Running
 	TEST_ASSERT_EQUALS(thread.callResult1.state, xpcc::co::Running);
 	// callResult2 should be Starting
 	TEST_ASSERT_EQUALS(thread.callResult2.state, xpcc::co::Running);
 
 	// after another run, this should not change
-	TEST_ASSERT_EQUALS(thread.task1(ctx1).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.task1().state, xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread.callResult1.state, xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread.callResult2.state, xpcc::co::Running);
 
 	// lets release start condition 3
 	thread.condition3 = true;
 	// task3 will progress to first yield
-	TEST_ASSERT_EQUALS(thread.task1(ctx1).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.task1().state, xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread.callResult1.state, xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread.callResult2.state, xpcc::co::Running);
 	// check the states and depths
@@ -442,7 +421,7 @@ CoroutineTest::testNesting()
 	TEST_ASSERT_EQUALS(thread.callResult3.state, xpcc::co::NestingError);
 
 	// now we will begin to strip down the nestings
-	TEST_ASSERT_EQUALS(thread.task1(ctx1).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.task1().state, xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread.callResult1.state, xpcc::co::Running);
 	// task3 will complete
 	TEST_ASSERT_EQUALS(thread.state3, 3);
@@ -451,7 +430,7 @@ CoroutineTest::testNesting()
 	// task2 will continue until next yield
 	TEST_ASSERT_EQUALS(thread.state2, 3);
 
-	TEST_ASSERT_EQUALS(thread.task1(ctx1).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.task1().state, xpcc::co::Running);
 	// task2 will complete
 	TEST_ASSERT_EQUALS(thread.state2, 4);
 	// callResult1 will return Stop
@@ -460,7 +439,7 @@ CoroutineTest::testNesting()
 	TEST_ASSERT_EQUALS(thread.state1, 3);
 
 	// task1 should end now
-	TEST_ASSERT_EQUALS(thread.task1(ctx1).state, xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(thread.task1().state, xpcc::co::Stop);
 	TEST_ASSERT_EQUALS(thread.state1, 4);
 
 	// nothing is running
@@ -478,14 +457,14 @@ public:
 	}
 
 	xpcc::co::Result<bool>
-	parentCoroutine(void *ctx)
+	parentCoroutine()
 	{
-		CO_BEGIN(ctx);
+		CO_BEGIN();
 
 		state = 1;
 		CO_YIELD();
 
-		success = CO_CALL(spawningCoroutine(ctx, waits));
+		success = CO_CALL(spawningCoroutine(waits));
 
 		state = 3;
 		CO_YIELD();
@@ -500,9 +479,9 @@ public:
 
 protected:
 	xpcc::co::Result<bool>
-	spawningCoroutine(void *ctx, uint8_t calls)
+	spawningCoroutine(uint8_t calls)
 	{
-		CO_BEGIN(ctx);
+		CO_BEGIN();
 
 		CO_WAIT_UNTIL(startSpawningCoroutine(calls));
 
@@ -563,30 +542,30 @@ CoroutineTest::testSpawn()
 	TEST_ASSERT_EQUALS(thread.getCoroutineDepth(), -1);
 
 	// should wait until the first condition
-	TEST_ASSERT_EQUALS(thread.parentCoroutine(this).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.parentCoroutine().state, xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread.state, 1);
 	// task should require `waits` number of calls
 	for (uint8_t ii = 0; ii < waits; ++ii)
 	{
-		TEST_ASSERT_EQUALS(thread.parentCoroutine(this).state, xpcc::co::Running);
+		TEST_ASSERT_EQUALS(thread.parentCoroutine().state, xpcc::co::Running);
 		TEST_ASSERT_EQUALS(thread.state, 1);
 	}
 	// now spawning task has started
-	TEST_ASSERT_EQUALS(thread.parentCoroutine(this).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.parentCoroutine().state, xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread.state, 2);
 	// task should require `waits` number of calls again
 	for (uint8_t ii = 0; ii < waits; ++ii)
 	{
-		TEST_ASSERT_EQUALS(thread.parentCoroutine(this).state, xpcc::co::Running);
+		TEST_ASSERT_EQUALS(thread.parentCoroutine().state, xpcc::co::Running);
 		TEST_ASSERT_EQUALS(thread.state, 2);
 	}
 	// now spawning task has finished
-	TEST_ASSERT_EQUALS(thread.parentCoroutine(this).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.parentCoroutine().state, xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread.state, 3);
 	TEST_ASSERT_EQUALS(thread.success, (waits == 2) ? true : false);
 
 	// now parent task has finished
-	TEST_ASSERT_EQUALS(thread.parentCoroutine(this).state, xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(thread.parentCoroutine().state, xpcc::co::Stop);
 	TEST_ASSERT_EQUALS(thread.state, (waits == 2) ? 4 : 5);
 }
 
@@ -606,37 +585,37 @@ public:
 	}
 
 	xpcc::co::Result<uint16_t>
-	parentCoroutine(void *ctx)
+	parentCoroutine()
 	{
 		// this is an unelegant way of using 'local' variables in a Coroutine.
 		uint8_t rslt1;
 		int8_t rslt2;
 
-		CO_BEGIN(ctx);
+		CO_BEGIN();
 
 		state = 1;
 		CO_YIELD();
 
-		result1 = CO_CALL(spawningCoroutine1(ctx));
-		result2 = CO_CALL(spawningCoroutine2(ctx));
+		result1 = CO_CALL(spawningCoroutine1());
+		result2 = CO_CALL(spawningCoroutine2());
 
 		state = 2;
 		CO_YIELD();
 
-		rslt1 = CO_CALL(spawningCoroutine1(ctx));
+		rslt1 = CO_CALL(spawningCoroutine1());
 		resultLocal1 = rslt1;
 
-		rslt2 = CO_CALL(spawningCoroutine2(ctx));
+		rslt2 = CO_CALL(spawningCoroutine2());
 		resultLocal2 = rslt2;
 
 		state = 3;
 		CO_YIELD();
 
-		if (CO_CALL(spawningCoroutine1(ctx)) == 42)
+		if (CO_CALL(spawningCoroutine1()) == 42)
 		{
 			resultIf1 = 42;
 		}
-		if (CO_CALL(spawningCoroutine2(ctx)) == 42)
+		if (CO_CALL(spawningCoroutine2()) == 42)
 		{
 			resultIf2 = 42;
 		}
@@ -644,8 +623,8 @@ public:
 		state = 4;
 		CO_YIELD();
 
-		setResultFunction1(CO_CALL(spawningCoroutine1(ctx)));
-		setResultFunction2(CO_CALL(spawningCoroutine2(ctx)));
+		setResultFunction1(CO_CALL(spawningCoroutine1()));
+		setResultFunction2(CO_CALL(spawningCoroutine2()));
 
 		state = 5;
 		CO_YIELD();
@@ -653,11 +632,11 @@ public:
 		// I would expect this to work, especially after the previous examples,
 		// but this 'crosses initialization of rslt'
 //		{
-//			uint8_t rslt = CO_CALL(spawningCoroutine1(ctx));
+//			uint8_t rslt = CO_CALL(spawningCoroutine1());
 //			resultStack1 = rslt;
 //		}
 //		{
-//			int8_t rslt = CO_CALL(spawningCoroutine2(ctx));
+//			int8_t rslt = CO_CALL(spawningCoroutine2());
 //			resultStack2 = rslt;
 //		}
 //
@@ -669,9 +648,9 @@ public:
 
 protected:
 	xpcc::co::Result<uint8_t>
-	spawningCoroutine1(void *ctx)
+	spawningCoroutine1()
 	{
-		CO_BEGIN(ctx);
+		CO_BEGIN();
 
 		CO_RETURN(42);
 
@@ -679,9 +658,9 @@ protected:
 	}
 
 	xpcc::co::Result<int8_t>
-	spawningCoroutine2(void *ctx)
+	spawningCoroutine2()
 	{
-		CO_BEGIN(ctx);
+		CO_BEGIN();
 
 		if (waits >= 2)
 		{
@@ -729,12 +708,12 @@ CoroutineTest::testComplexSpawn()
 	TEST_ASSERT_EQUALS(thread.getCoroutineDepth(), -1);
 
 	// should wait until the first condition
-	TEST_ASSERT_EQUALS(thread.parentCoroutine(this).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.parentCoroutine().state, xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread.state, 1);
 
 	waits = 1;
 	// now run all CO_CALLs until yield
-	TEST_ASSERT_EQUALS(thread.parentCoroutine(this).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.parentCoroutine().state, xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread.state, 2);
 
 	TEST_ASSERT_EQUALS(thread.result1, 42);
@@ -742,7 +721,7 @@ CoroutineTest::testComplexSpawn()
 
 	waits = 3;
 	// run second, local CO_CALLs
-	TEST_ASSERT_EQUALS(thread.parentCoroutine(this).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.parentCoroutine().state, xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread.state, 3);
 
 	TEST_ASSERT_EQUALS(thread.resultLocal1, 42);
@@ -750,7 +729,7 @@ CoroutineTest::testComplexSpawn()
 
 	waits = 1;
 	// run third, if CO_CALLs
-	TEST_ASSERT_EQUALS(thread.parentCoroutine(this).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.parentCoroutine().state, xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread.state, 4);
 
 	TEST_ASSERT_EQUALS(thread.resultIf1, 42);
@@ -758,7 +737,7 @@ CoroutineTest::testComplexSpawn()
 
 	waits = 3;
 	// run third, if CO_CALLs
-	TEST_ASSERT_EQUALS(thread.parentCoroutine(this).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.parentCoroutine().state, xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread.state, 5);
 
 	TEST_ASSERT_EQUALS(thread.resultFunction1, 42);
@@ -766,25 +745,25 @@ CoroutineTest::testComplexSpawn()
 
 //	waits = 3;
 //	// run fourth, stack CO_CALLs
-//	TEST_ASSERT_EQUALS(thread.parentCoroutine(this).state, xpcc::co::Running);
+//	TEST_ASSERT_EQUALS(thread.parentCoroutine().state, xpcc::co::Running);
 //	TEST_ASSERT_EQUALS(thread.state, 5);
 //
 //	TEST_ASSERT_EQUALS(thread.resultStack1, 42);
 //	TEST_ASSERT_EQUALS(thread.resultStack2, 42);
 
-	auto result = thread.parentCoroutine(this);
+	auto result = thread.parentCoroutine();
 	TEST_ASSERT_EQUALS(result.state, xpcc::co::Stop);
 	TEST_ASSERT_EQUALS(result.result, 42+42);
 }
 
 
-class TestingCaseLabelThread : public xpcc::co::Coroutine
+class TestingCaseLabelThread : public xpcc::co::NestedCoroutine<>
 {
 public:
 	xpcc::co::Result<bool>
-	coroutine(void *ctx)
+	coroutine()
 	{
-		CO_BEGIN(ctx);
+		CO_BEGIN();
 		// 1 case label
 
 		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
@@ -818,11 +797,11 @@ public:
 		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
 		// 251 case labels
 
-		CO_YIELD();CO_YIELD();CO_YIELD();
-		// 254 case labels
+		CO_YIELD();CO_YIELD();
+		// 253 case labels
 
 		// uncommenting this case label must now trigger a static assert warning!
-		//CO_YIELD();
+//		CO_YIELD();
 
 		CO_END_RETURN(true);
 	}
@@ -833,18 +812,18 @@ CoroutineTest::testCaseNumbers()
 {
 	TestingCaseLabelThread thread;
 
-	// this routine must be called 253 times
-	for(uint32_t ii=0; ii < 253; ii++)
+	// this routine must be called 252 times
+	for(uint32_t ii=0; ii < 252; ii++)
 	{
-		TEST_ASSERT_EQUALS(thread.coroutine(this).state, xpcc::co::Running);
+		TEST_ASSERT_EQUALS(thread.coroutine().state, xpcc::co::Running);
 	}
 	// the 254th time must return
-	auto result = thread.coroutine(this);
+	auto result = thread.coroutine();
 	TEST_ASSERT_EQUALS(result.state, xpcc::co::Stop);
 	TEST_ASSERT_EQUALS(result.result, true);
 }
 
-class TestingCaseEnumClassThread : public xpcc::co::Coroutine
+class TestingCaseEnumClassThread : public xpcc::co::NestedCoroutine<>
 {
 public:
 	enum class
@@ -855,9 +834,9 @@ public:
 	};
 
 	xpcc::co::Result<Animal>
-	coroutine(void *ctx)
+	coroutine()
 	{
-		CO_BEGIN(ctx);
+		CO_BEGIN();
 
 		CO_YIELD();		// generate at least one additional case statement
 
@@ -871,21 +850,21 @@ CoroutineTest::testReturnEnumClass()
 	TestingCaseEnumClassThread thread;
 
 	// run once; coroutine will yield
-	TEST_ASSERT_EQUALS(thread.coroutine(this).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.coroutine().state, xpcc::co::Running);
 
 	// now we should get a cat
-	auto result = thread.coroutine(this);
+	auto result = thread.coroutine();
 	TEST_ASSERT_EQUALS(result.state, xpcc::co::Stop);
 	TEST_ASSERT_TRUE(result.result == TestingCaseEnumClassThread::Animal::Cat);
 }
 
-class TestingCaseVoidClassThread : public xpcc::co::Coroutine
+class TestingCaseVoidClassThread : public xpcc::co::NestedCoroutine<>
 {
 public:
 	xpcc::co::Result<void>
-	coroutine(void *ctx)
+	coroutine()
 	{
-		CO_BEGIN(ctx);
+		CO_BEGIN();
 
 		CO_YIELD();		// generate at least one additional case statement
 
@@ -899,14 +878,14 @@ CoroutineTest::testReturnVoidClass()
 	TestingCaseVoidClassThread thread;
 
 	// run once; coroutine will yield
-	TEST_ASSERT_EQUALS(thread.coroutine(this).state, xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.coroutine().state, xpcc::co::Running);
 
-	auto result = thread.coroutine(this);
+	auto result = thread.coroutine();
 	TEST_ASSERT_EQUALS(result.state, xpcc::co::Stop);
 	TEST_ASSERT_EQUALS(result.result, xpcc::co::Stop);
 	TEST_ASSERT_TRUE(sizeof(result) == 1);
 
 	// this now returns the state
-	auto result2 = CO_CALL_BLOCKING(thread.coroutine(this));
+	auto result2 = CO_CALL_BLOCKING(thread.coroutine());
 	TEST_ASSERT_EQUALS(result2, xpcc::co::Stop);
 }

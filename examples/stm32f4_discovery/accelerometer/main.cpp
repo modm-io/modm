@@ -65,7 +65,7 @@ public:
 		while(true)
 		{
 			// we wait until the task started
-			if (PT_CALL(accel.ping(this)))
+			if (PT_CALL(accel.ping()))
 				break;
 			// otherwise, try again in 100ms
 			this->timer.restart(100);
@@ -75,11 +75,11 @@ public:
 		}
 
 		// initialize with limited range of ~2.3G
-		PT_CALL(accel.initialize(this, accel.Scale::G2, accel.MeasurementRate::Hz400));
+		PT_CALL(accel.initialize(accel.Scale::G2, accel.MeasurementRate::Hz400));
 
 		while (true)
 		{
-			PT_CALL(accel.readAcceleration(this));
+			PT_CALL(accel.readAcceleration());
 
 #if REVISION_C
 			averageX.update(-accel.data.getY());

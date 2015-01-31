@@ -37,7 +37,7 @@ public:
 	 * Most Serial-to-USB converters only support baudrates up to 115200 Baud
 	 */
 	enum
-	Baudrate
+	Baudrate : uint32_t
 	{
 #ifndef B300	// termios.h defines B300 .. B38400
 		    B300 =     300,

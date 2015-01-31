@@ -216,7 +216,7 @@ protected:
  */
 template < typename I2cMaster >
 class Bmp085 : public bmp085, public xpcc::I2cDevice<I2cMaster>,
-			   protected xpcc::co::Coroutine
+			   protected xpcc::co::NestedCoroutine<>
 {
 public:
 	/**
@@ -228,15 +228,15 @@ public:
 	// MARK: - TASKS
 	/// Pings the sensor
 	xpcc::co::Result<bool>
-	ping(void *ctx);
+	ping();
 
 	/// Reads out and stores the calibration bytes
 	xpcc::co::Result<bool>
-	configure(void *ctx, Mode mode = Mode::Standard);
+	configure(Mode mode = Mode::Standard);
 
 	/// Do a readout sequence to convert and read temperature and then pressure from sensor
 	xpcc::co::Result<bool>
-	readout(void *ctx);
+	readout();
 
 	/// Configures the sensor
 	void inline

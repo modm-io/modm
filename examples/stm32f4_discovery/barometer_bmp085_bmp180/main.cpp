@@ -44,7 +44,7 @@ public:
 		while(true)
 		{
 			// we wait until the task started
-			if (PT_CALL(barometer.ping(this)))
+			if (PT_CALL(barometer.ping()))
 				break;
 			// otherwise, try again in 100ms
 			this->timer.restart(100);
@@ -57,7 +57,7 @@ public:
 		while(true)
 		{
 			// we wait until the task started
-			if (PT_CALL(barometer.configure(this)))
+			if (PT_CALL(barometer.configure()))
 				break;
 			// otherwise, try again in 100ms
 			this->timer.restart(100);
@@ -88,7 +88,7 @@ public:
 			PT_WAIT_UNTIL(timer.isExpired());
 
 			// Returns when new data was read from the sensor
-			PT_CALL(barometer.readout(this));
+			PT_CALL(barometer.readout());
 
 			{
 				int16_t temp  = data.getTemperature();

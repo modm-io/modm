@@ -28,14 +28,14 @@ namespace xpcc
  * @author	Niklas Hauser
  */
 template <typename I2cMaster>
-class I2cEeprom : public xpcc::I2cDevice<I2cMaster>, protected xpcc::co::Coroutine
+class I2cEeprom : public xpcc::I2cDevice<I2cMaster>, protected xpcc::co::NestedCoroutine<>
 {
 public:
 	I2cEeprom(uint8_t address = 0xA0);
 
 	/// Ping the device
 	xpcc::co::Result<bool>
-	ping(void *ctx);
+	ping();
 
 	/**
 	 * Write byte
@@ -47,9 +47,9 @@ public:
 	 * 			`false` otherwise
 	 */
 	inline xpcc::co::Result<bool>
-	writeByte(void *ctx, uint16_t address, uint8_t data)
+	writeByte(uint16_t address, uint8_t data)
 	{
-		return write(ctx, address, &data, 1);
+		return write(address, &data, 1);
 	}
 
 	/**
@@ -63,33 +63,33 @@ public:
 	 * 			`false` otherwise
 	 */
 	xpcc::co::Result<bool>
-	write(void *ctx, uint16_t address, const uint8_t *data, std::size_t length);
+	write(uint16_t address, const uint8_t *data, std::size_t length);
 
 	/**
 	 * Convenience function
 	 *
 	 * Shortcut for:
 	 * @code
-	 * return write(ctx, address, static_cast<const uint8_t *>(&data), sizeof(T));
+	 * return write(address, static_cast<const uint8_t *>(&data), sizeof(T));
 	 * @endcode
 	 */
 	template <typename T>
 	inline xpcc::co::Result<bool>
-	write(void *ctx, uint16_t address, const T& data)
+	write(uint16_t address, const T& data)
 	{
-		return write(ctx, address, static_cast<const uint8_t *>(&data), sizeof(T));
+		return write(address, static_cast<const uint8_t *>(&data), sizeof(T));
 	}
 
 	/// Read byte
 	inline xpcc::co::Result<bool>
-	readByte(void *ctx, uint16_t address, uint8_t &data)
+	readByte(uint16_t address, uint8_t &data)
 	{
-		return read(ctx, address, &data, 1);
+		return read(address, &data, 1);
 	}
 
 	/// Read block
 	xpcc::co::Result<bool>
-	read(void *ctx, uint16_t address, uint8_t *data, std::size_t length);
+	read(uint16_t address, uint8_t *data, std::size_t length);
 
 	/**
 	 * Convenience function
@@ -101,9 +101,9 @@ public:
 	 */
 	template <typename T>
 	inline xpcc::co::Result<bool>
-	read(void *ctx, uint16_t address, T& data)
+	read(uint16_t address, T& data)
 	{
-		return read(ctx, address, static_cast<uint8_t *>(&data), sizeof(T));
+		return read(address, static_cast<uint8_t *>(&data), sizeof(T));
 	}
 
 private:

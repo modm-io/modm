@@ -41,24 +41,24 @@ public:
 
 	/// pings the sensor
 	xpcc::co::Result<bool>
-	ping(void *ctx);
+	ping();
 
 protected:
 	// RAW REGISTER ACCESS
 	/// write a 8bit value
 	xpcc::co::Result<bool>
-	write(void *ctx, uint8_t reg, uint8_t value);
+	write(uint8_t reg, uint8_t value);
 
 	/// read a 8bit value
 	xpcc::co::Result<bool> ALWAYS_INLINE
-	read(void *ctx, uint8_t reg, uint8_t &value)
+	read(uint8_t reg, uint8_t &value)
 	{
-		return read(ctx, reg, &value, 1);
+		return read(reg, &value, 1);
 	}
 
 	/// read multiple 8bit values from a start register
 	xpcc::co::Result<bool>
-	read(void *ctx, uint8_t reg, uint8_t *buffer, uint8_t length);
+	read(uint8_t reg, uint8_t *buffer, uint8_t length);
 
 	// increment address or not?
 	/// @cond
@@ -102,24 +102,24 @@ public:
 
 	/// pings the sensor
 	xpcc::co::Result<bool>
-	ping(void *ctx);
+	ping();
 
 protected:
 	// RAW REGISTER ACCESS
 	/// write a 8bit value
 	xpcc::co::Result<bool>
-	write(void *ctx, uint8_t reg, uint8_t value);
+	write(uint8_t reg, uint8_t value);
 
 	/// read a 8bit value
 	xpcc::co::Result<bool> ALWAYS_INLINE
-	read(void *ctx, uint8_t reg, uint8_t &value)
+	read(uint8_t reg, uint8_t &value)
 	{
-		return read(ctx, reg, &value, 1);
+		return read(reg, &value, 1);
 	}
 
 	/// read multiple 8bit values from a start register
 	xpcc::co::Result<bool>
-	read(void *ctx, uint8_t reg, uint8_t *buffer, uint8_t length);
+	read(uint8_t reg, uint8_t *buffer, uint8_t length);
 
 	// increment address or not?
 	/// @cond

@@ -45,19 +45,17 @@ public:
 	};
 
 	/// Supported CAN bitrates; maybe different on a per device basis
-	struct Bitrate
+	enum
+	Bitrate : uint32_t
 	{
-		enum
-		{
-			kBps10  =   10000,
-			kBps20  =   20000,
-			kBps50  =   50000,
-			kBps100 =  100000,
-			kBps125 =  125000,
-			kBps250 =  250000,
-			kBps500 =  500000,
-			MBps1   = 1000000,
-		};
+		kBps10  =   10000,
+		kBps20  =   20000,
+		kBps50  =   50000,
+		kBps100 =  100000,
+		kBps125 =  125000,
+		kBps250 =  250000,
+		kBps500 =  500000,
+		MBps1   = 1000000,
 	};
 
 	enum class
@@ -87,7 +85,7 @@ public:
 	 * 		the allowed relative tolerance for the resulting baudrate
 	 */
 	template< class clockSource, uint32_t bitrate = Bitrate::kBps125,
-			Tolerance tolerance = Tolerance::OnePercent >
+			uint16_t tolerance = Tolerance::OnePercent >
 	static void
 	initialize(Mode startupMode);
 

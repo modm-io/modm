@@ -317,103 +317,103 @@ public:
 	Lis302dl(Data &data, uint8_t address=0x1D);
 
 	bool inline
-	initialize(Scale scale, MeasurementRate rate = MeasurementRate::Hz100)
+	initializeBlocking(Scale scale, MeasurementRate rate = MeasurementRate::Hz100)
 	{
-		return CO_CALL_BLOCKING(initialize(this, scale, rate));
+		return CO_CALL_BLOCKING(initialize(scale, rate));
 	}
 
 	xpcc::co::Result<bool>
-	initialize(void *ctx, Scale scale, MeasurementRate rate = MeasurementRate::Hz100);
+	initialize(Scale scale, MeasurementRate rate = MeasurementRate::Hz100);
 
 	// MARK: Control Registers
 	xpcc::co::Result<bool> inline
-	updateControlRegister(void *ctx, Control1_t setMask, Control1_t clearMask = Control1_t(0xff))
+	updateControlRegister(Control1_t setMask, Control1_t clearMask = Control1_t(0xff))
 	{
-		return updateControlRegister(ctx, 0, setMask, clearMask);
+		return updateControlRegister(0, setMask, clearMask);
 	}
 
 	xpcc::co::Result<bool> inline
-	updateControlRegister(void *ctx, Control2_t setMask, Control2_t clearMask = Control2_t(0xff))
+	updateControlRegister(Control2_t setMask, Control2_t clearMask = Control2_t(0xff))
 	{
-		return updateControlRegister(ctx, 1, setMask, clearMask);
+		return updateControlRegister(1, setMask, clearMask);
 	}
 
 	xpcc::co::Result<bool> inline
-	updateControlRegister(void *ctx, Control3_t setMask, Control3_t clearMask = Control3_t(0xff))
+	updateControlRegister(Control3_t setMask, Control3_t clearMask = Control3_t(0xff))
 	{
-		return updateControlRegister(ctx, 2, setMask, clearMask);
+		return updateControlRegister(2, setMask, clearMask);
 	}
 
 	xpcc::co::Result<bool> inline
-	writeInterruptSource(void *ctx, Interrupt interrupt, InterruptSource source)
+	writeInterruptSource(Interrupt interrupt, InterruptSource source)
 	{
 		if (interrupt == Interrupt::One)
-			return updateControlRegister(ctx, r(source), Control3(0b111));
+			return updateControlRegister(r(source), Control3(0b111));
 
-		return updateControlRegister(ctx, Control3(i(source) << 3), Control3(0b111000));
+		return updateControlRegister(Control3(i(source) << 3), Control3(0b111000));
 	}
 
 	// MARK: Free Fall Registers
 	xpcc::co::Result<bool> inline
-	updateFreeFallConfiguration(void *ctx, Interrupt interrupt, FreeFallConfig_t setMask, FreeFallConfig_t clearMask = FreeFallConfig_t(0xff))
+	updateFreeFallConfiguration(Interrupt interrupt, FreeFallConfig_t setMask, FreeFallConfig_t clearMask = FreeFallConfig_t(0xff))
 	{
-		return updateRegister(ctx, i(Register::FfWuCfg1) | i(interrupt), setMask.value, clearMask.value);
+		return updateRegister(i(Register::FfWuCfg1) | i(interrupt), setMask.value, clearMask.value);
 	}
 
 	xpcc::co::Result<bool> inline
-	readFreeFallSource(void *ctx, Interrupt interrupt, FreeFallSource_t &source)
+	readFreeFallSource(Interrupt interrupt, FreeFallSource_t &source)
 	{
-		return this->read(ctx, i(Register::FfWuSrc1) | i(interrupt), source.value);
+		return this->read(i(Register::FfWuSrc1) | i(interrupt), source.value);
 	}
 
 	xpcc::co::Result<bool> inline
-	writeFreeFallThreshold(void *ctx, Interrupt interrupt, uint8_t threshold)
+	writeFreeFallThreshold(Interrupt interrupt, uint8_t threshold)
 	{
-		return this->write(ctx, i(Register::FfWuThs1) | i(interrupt), threshold);
+		return this->write(i(Register::FfWuThs1) | i(interrupt), threshold);
 	}
 
 	xpcc::co::Result<bool> inline
-	writeFreeFallDuration(void *ctx, Interrupt interrupt, uint8_t duration)
+	writeFreeFallDuration(Interrupt interrupt, uint8_t duration)
 	{
-		return this->write(ctx, i(Register::FfWuDuration1) | i(interrupt), duration);
+		return this->write(i(Register::FfWuDuration1) | i(interrupt), duration);
 	}
 
 	// MARK: Clock Registers
 	xpcc::co::Result<bool> inline
-	updateClickConfiguration(void *ctx, ClickConfig_t setMask, ClickConfig_t clearMask)
+	updateClickConfiguration(ClickConfig_t setMask, ClickConfig_t clearMask)
 	{
-		return updateRegister(ctx, i(Register::ClickCfg), setMask, clearMask);
+		return updateRegister(i(Register::ClickCfg), setMask, clearMask);
 	}
 
 	xpcc::co::Result<bool> inline
-	readClickSource(void *ctx, ClickSource_t &source)
+	readClickSource(ClickSource_t &source)
 	{
-		return this->read(ctx, i(Register::ClickSrc), source);
+		return this->read(i(Register::ClickSrc), source);
 	}
 
 	xpcc::co::Result<bool> inline
-	writeClickThreshold(void *ctx, Axis axis, uint8_t threshold);
+	writeClickThreshold(Axis axis, uint8_t threshold);
 
 	xpcc::co::Result<bool> inline
-	writeClickTimeLimit(void *ctx, uint8_t limit)
+	writeClickTimeLimit(uint8_t limit)
 	{
-		return this->write(ctx, i(Register::ClickTimeLimit), limit);
+		return this->write(i(Register::ClickTimeLimit), limit);
 	}
 
 	xpcc::co::Result<bool> inline
-	writeClickLatency(void *ctx, uint8_t latency)
+	writeClickLatency(uint8_t latency)
 	{
-		return this->write(ctx, i(Register::ClickLatency), latency);
+		return this->write(i(Register::ClickLatency), latency);
 	}
 
 	xpcc::co::Result<bool> inline
-	writeClickWindow(void *ctx, uint8_t window)
+	writeClickWindow(uint8_t window)
 	{
-		return this->write(ctx, i(Register::ClickWindow), window);
+		return this->write(i(Register::ClickWindow), window);
 	}
 
 	xpcc::co::Result<bool>
-	readAcceleration(void *ctx);
+	readAcceleration();
 
 	Status_t
 	getStatus()
@@ -437,10 +437,10 @@ public:
 
 private:
 	xpcc::co::Result<bool>
-	updateControlRegister(void *ctx, uint8_t index, Control_t setMask, Control_t clearMask = Control_t(0xff));
+	updateControlRegister(uint8_t index, Control_t setMask, Control_t clearMask = Control_t(0xff));
 
 	xpcc::co::Result<bool>
-	updateRegister(void *ctx, uint8_t reg, uint8_t setMask, uint8_t clearMask = 0xff);
+	updateRegister(uint8_t reg, uint8_t setMask, uint8_t clearMask = 0xff);
 
 	// 0-2: control 0-2
 	// 3: status

@@ -183,39 +183,39 @@ public:
 	// MARK: - Tasks
 	/// pings the sensor
 	xpcc::co::Result<bool>
-	ping(void *ctx);
+	ping();
 
 	// MARK: Configuration
 	// @param	rate	Update rate in Hz: 0 to 33. (Use 0 to update at 0.25Hz).
 	xpcc::co::Result<bool>
-	setUpdateRate(void *ctx, uint8_t rate);
+	setUpdateRate(uint8_t rate);
 
 	/// Enables extended mode with 13 bit data format.
 	xpcc::co::Result<bool>
-	enableExtendedMode(void *ctx, bool enable = true);
+	enableExtendedMode(bool enable = true);
 
 	xpcc::co::Result<bool>
-	configureAlertMode(void *ctx, ThermostatMode mode, AlertPolarity polarity, FaultQueue faults);
+	configureAlertMode(ThermostatMode mode, AlertPolarity polarity, FaultQueue faults);
 
 	xpcc::co::Result<bool> ALWAYS_INLINE
-	writeUpperLimit(void *ctx, float temperature)
-	{ return writeLimitRegister(ctx, Register::TemperatureMsb, temperature); }
+	writeUpperLimit(float temperature)
+	{ return writeLimitRegister(Register::TemperatureMsb, temperature); }
 
 	xpcc::co::Result<bool> ALWAYS_INLINE
-	writeLowerLimit(void *ctx, float temperature)
-	{ return writeLimitRegister(ctx, Register::TemperatureLsb, temperature); }
+	writeLowerLimit(float temperature)
+	{ return writeLimitRegister(Register::TemperatureLsb, temperature); }
 
 	/// param[in]	result	contains comparator mode alert in the configured polarity
 	xpcc::co::Result<bool>
-	readComparatorMode(void *ctx, bool &result);
+	readComparatorMode(bool &result);
 
 	/// starts a temperature conversion right now
 	xpcc::co::Result<bool>
-	startConversion(void *ctx);
+	startConversion();
 
 	/// reads the Temperature registers and buffers the results
 	xpcc::co::Result<bool>
-	readTemperature(void *ctx);
+	readTemperature();
 
 public:
 	Data &data;
@@ -225,10 +225,10 @@ private:
 	run();
 
 	xpcc::co::Result<bool>
-	writeConfiguration(void *ctx, uint8_t length=3);
+	writeConfiguration(uint8_t length=3);
 
 	xpcc::co::Result<bool>
-	writeLimitRegister(void *ctx, Register reg, float temperature);
+	writeLimitRegister(Register reg, float temperature);
 
 	enum
 	I2cTask : uint8_t

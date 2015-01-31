@@ -68,7 +68,7 @@
  *     xpcc::co::Result<bool>
  *     waitForTimer(void *ctx)
  *     {
- *         CO_BEGIN(ctx);
+ *         CO_BEGIN();
  *
  *         // nested calling is allowed
  *         if (CO_CALL(setTimer(ctx, 100)))
@@ -82,7 +82,7 @@
  *     xpcc::co::Result<bool>
  *     setTimer(void *ctx, uint16_t timeout)
  *     {
- *         CO_BEGIN(ctx);
+ *         CO_BEGIN();
  *
  *         timer.restart(timeout);
  *
@@ -112,3 +112,4 @@
  */
 
 #include "coroutine/coroutine.hpp"
+#include "coroutine/nested_coroutine.hpp"

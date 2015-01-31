@@ -32,14 +32,14 @@ xpcc::Tmp102<I2cMaster>::run()
 
 		if (updateTime & (1 << 15))
 		{
-			PT_CALL(startConversion(this));
+			PT_CALL(startConversion());
 			timeout.restart(29);
 		}
 
 		PT_WAIT_UNTIL(timeout.isExpired());
 		timeout.restart(updateTime & ~(1 << 15));
 
-		PT_CALL(readTemperature(this));
+		PT_CALL(readTemperature());
 	}
 
 	PT_END();
@@ -49,9 +49,9 @@ xpcc::Tmp102<I2cMaster>::run()
 // MARK: ping
 template < typename I2cMaster >
 xpcc::co::Result<bool>
-xpcc::Tmp102<I2cMaster>::ping(void *ctx)
+xpcc::Tmp102<I2cMaster>::ping()
 {
-	CO_BEGIN(ctx);
+	CO_BEGIN();
 
 	CO_WAIT_UNTIL(adapter.configurePing() and
 			(i2cTask = I2cTask::Ping, this->startTransaction(&adapter)));
@@ -64,9 +64,9 @@ xpcc::Tmp102<I2cMaster>::ping(void *ctx)
 // MARK: - tasks
 template < typename I2cMaster >
 xpcc::co::Result<bool>
-xpcc::Tmp102<I2cMaster>::setUpdateRate(void *ctx, uint8_t rate)
+xpcc::Tmp102<I2cMaster>::setUpdateRate(uint8_t rate)
 {
-	CO_BEGIN(ctx);
+	CO_BEGIN();
 
 	this->restart();
 	// clamp conversion rate to max 33Hz (=~30ms)
@@ -85,7 +85,7 @@ xpcc::Tmp102<I2cMaster>::setUpdateRate(void *ctx, uint8_t rate)
 		// 8 to 0b11
 		if (rate & 0b1001) ConversionRate_t::set(config_lsb, ConversionRate::Hz1);
 		if (rate & 0b1100) ConversionRate_t::set(config_lsb, ConversionRate::Hz4);
-		if ( CO_CALL(writeConfiguration(ctx, 3)) )
+		if ( CO_CALL(writeConfiguration(3)) )
 		{
 			if (rate == 0) updateTime = 4000;
 			else updateTime = 1000/rate;
@@ -106,39 +106,39 @@ xpcc::Tmp102<I2cMaster>::setUpdateRate(void *ctx, uint8_t rate)
 // MARK: Extended mode
 template < typename I2cMaster >
 xpcc::co::Result<bool>
-xpcc::Tmp102<I2cMaster>::enableExtendedMode(void *ctx, bool enable)
+xpcc::Tmp102<I2cMaster>::enableExtendedMode(bool enable)
 {
-	CO_BEGIN(ctx);
+	CO_BEGIN();
 
 	config_lsb.update(Config2::ExtendedMode, enable);
 
-	CO_END_RETURN_CALL(writeConfiguration(ctx, 3));
+	CO_END_RETURN_CALL(writeConfiguration(3));
 }
 
 // MARK: Alert mode
 template < typename I2cMaster >
 xpcc::co::Result<bool>
-xpcc::Tmp102<I2cMaster>::configureAlertMode(void *ctx, ThermostatMode mode, AlertPolarity polarity, FaultQueue faults)
+xpcc::Tmp102<I2cMaster>::configureAlertMode(ThermostatMode mode, AlertPolarity polarity, FaultQueue faults)
 {
-	CO_BEGIN(ctx);
+	CO_BEGIN();
 
 	config_msb.update(Config1::ThermostatMode, bool(mode));
 	config_msb.update(Config1::Polarity, bool(polarity));
 	FaultQueue_t::set(config_msb, faults);
 
-	CO_END_RETURN_CALL(writeConfiguration(ctx, 2));
+	CO_END_RETURN_CALL(writeConfiguration(2));
 }
 
 // MARK: conversion
 template < typename I2cMaster >
 xpcc::co::Result<bool>
-xpcc::Tmp102<I2cMaster>::startConversion(void *ctx)
+xpcc::Tmp102<I2cMaster>::startConversion()
 {
-	CO_BEGIN(ctx);
+	CO_BEGIN();
 
 	config_msb.set(Config1::OneShot);
 
-	if ( CO_CALL(writeConfiguration(ctx, 2)) )
+	if ( CO_CALL(writeConfiguration(2)) )
 	{
 		config_msb.reset(Config1::OneShot);
 		CO_RETURN(true);
@@ -150,9 +150,9 @@ xpcc::Tmp102<I2cMaster>::startConversion(void *ctx)
 // MARK: read temperature
 template < typename I2cMaster >
 xpcc::co::Result<bool>
-xpcc::Tmp102<I2cMaster>::readTemperature(void *ctx)
+xpcc::Tmp102<I2cMaster>::readTemperature()
 {
-	CO_BEGIN(ctx);
+	CO_BEGIN();
 
 	buffer[0] = uint8_t(Register::Temperature);
 	CO_WAIT_UNTIL(adapter.configureWriteRead(buffer, 1, data.data, 2) and
@@ -166,9 +166,9 @@ xpcc::Tmp102<I2cMaster>::readTemperature(void *ctx)
 // MARK: read temperature
 template < typename I2cMaster >
 xpcc::co::Result<bool>
-xpcc::Tmp102<I2cMaster>::readComparatorMode(void *ctx, bool &result)
+xpcc::Tmp102<I2cMaster>::readComparatorMode(bool &result)
 {
-	CO_BEGIN(ctx);
+	CO_BEGIN();
 
 	buffer[0] = i(Register::Configuration);
 	CO_WAIT_UNTIL(adapter.configureWriteRead(buffer, 1, buffer, 2) and
@@ -190,9 +190,9 @@ xpcc::Tmp102<I2cMaster>::readComparatorMode(void *ctx, bool &result)
 // MARK: configuration
 template < typename I2cMaster >
 xpcc::co::Result<bool>
-xpcc::Tmp102<I2cMaster>::writeConfiguration(void *ctx, uint8_t length)
+xpcc::Tmp102<I2cMaster>::writeConfiguration(uint8_t length)
 {
-	CO_BEGIN(ctx);
+	CO_BEGIN();
 
 	buffer[0] = i(Register::Configuration);
 	buffer[1] = config_msb.value;
@@ -209,9 +209,9 @@ xpcc::Tmp102<I2cMaster>::writeConfiguration(void *ctx, uint8_t length)
 // MARK: configuration
 template < typename I2cMaster >
 xpcc::co::Result<bool>
-xpcc::Tmp102<I2cMaster>::writeLimitRegister(void *ctx, Register reg, float temperature)
+xpcc::Tmp102<I2cMaster>::writeLimitRegister(Register reg, float temperature)
 {
-	CO_BEGIN(ctx);
+	CO_BEGIN();
 
 	{
 		int16_t temp = temperature * 16.f;

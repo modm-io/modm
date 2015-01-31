@@ -30,17 +30,16 @@ xpcc::Tcs3414<I2cMaster>::Tcs3414(uint8_t address)
 template<typename I2cMaster>
 xpcc::co::Result<bool>
 xpcc::Tcs3414<I2cMaster>::configure(
-		void *ctx,
 		const Gain gain,
 		const Prescaler prescaler,
 		const IntegrationMode mode,
 		const uint8_t time)
 {
-	CO_BEGIN(ctx);
+	CO_BEGIN();
 
-	if ( CO_CALL(setGain(ctx, gain, prescaler)) )
+	if ( CO_CALL(setGain(gain, prescaler)) )
 	{
-		if ( CO_CALL(setIntegrationTime(ctx, mode, time)) )
+		if ( CO_CALL(setIntegrationTime(mode, time)) )
 		{
 			CO_RETURN(true);
 		}
@@ -53,9 +52,9 @@ xpcc::Tcs3414<I2cMaster>::configure(
 // MARK: - Tasks
 template < class I2cMaster >
 xpcc::co::Result<bool>
-xpcc::Tcs3414<I2cMaster>::ping(void *ctx)
+xpcc::Tcs3414<I2cMaster>::ping()
 {
-	CO_BEGIN(ctx);
+	CO_BEGIN();
 
 	CO_WAIT_UNTIL(adapter.configurePing() &&
 			(i2cTask = I2cTask::Ping, this->startTransaction(&adapter)));
@@ -67,12 +66,11 @@ xpcc::Tcs3414<I2cMaster>::ping(void *ctx)
 
 template < class I2cMaster >
 xpcc::co::Result<bool>
-xpcc::Tcs3414<I2cMaster>::refreshAllColors(void *ctx)
+xpcc::Tcs3414<I2cMaster>::refreshAllColors()
 {
-	CO_BEGIN(ctx);
+	CO_BEGIN();
 
 	if ( CO_CALL(readRegisters(
-			ctx,
 			RegisterAddress::DATA1LOW,
 			data.dataBytes,
 			sizeof(data.dataBytes)
@@ -113,11 +111,10 @@ xpcc::Tcs3414<I2cMaster>::refreshAllColors(void *ctx)
 template<typename I2cMaster>
 xpcc::co::Result<bool>
 xpcc::Tcs3414<I2cMaster>::writeRegister(
-		void *ctx,
 		const RegisterAddress address,
 		const uint8_t value)
 {
-	CO_BEGIN(ctx);
+	CO_BEGIN();
 
 	commandBuffer[0] =
 				0x80							// write command
@@ -138,12 +135,11 @@ xpcc::Tcs3414<I2cMaster>::writeRegister(
 template<typename I2cMaster>
 xpcc::co::Result<bool>
 xpcc::Tcs3414<I2cMaster>::readRegisters(
-		void* ctx,
 		const RegisterAddress address,
 		uint8_t* const values,
 		const uint8_t count)
 {
-	CO_BEGIN(ctx);
+	CO_BEGIN();
 
 	commandBuffer[0] =
 			static_cast<uint8_t>(0x80)		// write command

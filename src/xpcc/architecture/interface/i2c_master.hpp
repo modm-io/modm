@@ -44,15 +44,13 @@ public:
 	};
 
 	/// Baudrate of the I2C bus. Most slaves only work in Standard or Fast mode.
-	struct Baudrate
+	enum
+	Baudrate : uint32_t
 	{
-		enum
-		{
-			Standard =  100000,	///< Standard datarate of 100kHz
-			Fast     =  400000,	///< Fast datarate of 400kHz
-			High     = 1700000,	///< High datarate of 1.7MHz (rarely supported)
-			Super    = 3400000	///< Super datarate of 3.4MHz (rarely supported)
-		};
+		Standard =  100000,	///< Standard datarate of 100kHz
+		Fast     =  400000,	///< Fast datarate of 400kHz
+		High     = 1700000,	///< High datarate of 1.7MHz (rarely supported)
+		Super    = 3400000	///< Super datarate of 3.4MHz (rarely supported)
 	};
 
 #ifdef __DOXYGEN__
@@ -68,7 +66,7 @@ public:
 	 * 		the allowed absolute tolerance for the resulting baudrate
 	 */
 	template< class clockSource, uint32_t baudrate=Baudrate::Standard,
-			Tolerance tolerance = Tolerance::FivePercent >
+			uint16_t tolerance = Tolerance::FivePercent >
 	static void
 	initialize();
 
