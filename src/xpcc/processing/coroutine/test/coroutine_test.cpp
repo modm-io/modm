@@ -952,7 +952,7 @@ CoroutineTest::testNonNestedCoroutines()
 	TestingNonMutuallyExclusiveCoroutines thread;
 
 	// nothing should be running
-	TEST_ASSERT_FALSE(thread.isAnyCoroutineRunning());
+	TEST_ASSERT_FALSE(thread.areAnyCoroutinesRunning());
 	TEST_ASSERT_FALSE(thread.isCoroutineRunning(0));
 	TEST_ASSERT_FALSE(thread.isCoroutineRunning(1));
 	TEST_ASSERT_FALSE(thread.isCoroutineRunning(2));
@@ -962,19 +962,21 @@ CoroutineTest::testNonNestedCoroutines()
 	TEST_ASSERT_EQUALS(thread.call0().state, xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread.state0, 0);
 
-	// something should be running
-	TEST_ASSERT_TRUE(thread.isAnyCoroutineRunning());
+	// coroutine 0 should be running
+	TEST_ASSERT_TRUE(thread.areAnyCoroutinesRunning());
 	TEST_ASSERT_TRUE(thread.isCoroutineRunning(0));
 	TEST_ASSERT_FALSE(thread.isCoroutineRunning(1));
 	TEST_ASSERT_FALSE(thread.isCoroutineRunning(2));
 	TEST_ASSERT_FALSE(thread.isCoroutineRunning(100));
 
-	// coroutine 0 should not be joinable
-	TEST_ASSERT_FALSE(thread.joinCoroutine(0));
+	TEST_ASSERT_FALSE(thread.areAllCoroutinesRunning({0, 1}));
 	TEST_ASSERT_FALSE(thread.joinCoroutines({0, 1}));
-	TEST_ASSERT_TRUE(thread.joinCoroutine(1));
 	TEST_ASSERT_TRUE(thread.joinCoroutines({1, 2}));
-	TEST_ASSERT_FALSE(thread.joinCoroutine(100));
+	TEST_ASSERT_FALSE(thread.areAllCoroutinesRunning({1, 2}));
+	TEST_ASSERT_TRUE(thread.areAnyCoroutinesRunning({0, 1}));
+	TEST_ASSERT_FALSE(thread.areAnyCoroutinesRunning({1, 2}));
+	TEST_ASSERT_TRUE(thread.areAnyCoroutinesRunning({0, 1, 100}));
+	TEST_ASSERT_FALSE(thread.areAllCoroutinesRunning({0, 100}));
 
 	// the other coroutines should be able to run at the same time
 	TEST_ASSERT_EQUALS(thread.call1().state, xpcc::co::Running);

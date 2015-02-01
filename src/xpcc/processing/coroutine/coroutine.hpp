@@ -141,7 +141,7 @@ public:
 		}
 	}
 
-	/// Force one coroutines to stop running
+	/// Force the specified coroutine to stop running
 	inline bool
 	stopCoroutine(uint8_t id)
 	{
@@ -152,9 +152,16 @@ public:
 		return false;
 	}
 
-	/// @return	`true` if any coroutine is running, else `false`
+	/// @return	`true` if the specified coroutine is running, else `false`
 	bool inline
-	isAnyCoroutineRunning() const
+	isCoroutineRunning(uint8_t id) const
+	{
+		return (id < Methods and coStateArray[id] != CoStopped);
+	}
+
+	/// @return	`true` if any coroutine of this class is running, else `false`
+	bool inline
+	areAnyCoroutinesRunning() const
 	{
 		for (const CoState state : coStateArray)
 		{
@@ -164,30 +171,35 @@ public:
 		return false;
 	}
 
-	/// @return	`true` if the selected coroutine is running, else `false`
+	/// @return	`true` if any of the specified coroutine are running, else `false`
 	bool inline
-	isCoroutineRunning(uint8_t id) const
-	{
-		return (id < Methods and coStateArray[id] != CoStopped);
-	}
-
-	/// @return	`true` if the selected coroutine is not running, else `false`
-	bool inline
-	joinCoroutine(uint8_t id) const
-	{
-		return joinCoroutines({id});
-	}
-
-	/// @return	`true` if the selected coroutines are not running, else `false`
-	bool inline
-	joinCoroutines(std::initializer_list<uint8_t> ids) const
+	areAnyCoroutinesRunning(std::initializer_list<uint8_t> ids) const
 	{
 		for (uint8_t id : ids)
 		{
-			if (id >= Methods or coStateArray[id] != CoStopped)
+			if (id < Methods and coStateArray[id] != CoStopped)
+				return true;
+		}
+		return false;
+	}
+
+	/// @return	`true` if all of the specified coroutine are running, else `false`
+	bool inline
+	areAllCoroutinesRunning(std::initializer_list<uint8_t> ids) const
+	{
+		for (uint8_t id : ids)
+		{
+			if (id >= Methods or coStateArray[id] == CoStopped)
 				return false;
 		}
 		return true;
+	}
+
+	/// @return	`true` if none of the specified coroutine are running, else `false`
+	bool inline
+	joinCoroutines(std::initializer_list<uint8_t> ids) const
+	{
+		return not areAnyCoroutinesRunning(ids);
 	}
 
 #ifdef __DOXYGEN__
