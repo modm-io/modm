@@ -178,7 +178,7 @@ Postman::update()
 				{%- if action.call == "coroutine" and action.parameterType != None %}
 					{%- set typePrefix = "" if action.parameterType.isBuiltIn else namespace ~ "::packet::" %}
 					case {{ namespace }}::action::{{ action.name | CAMELCASE }}:
-						if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(action.response, action.payload.get<{{ typePrefix ~ (action.parameterType.name | CamelCase) }}>()) <= xpcc::co::NestingError) {
+						if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(action.response, action.payload.get<{{ typePrefix ~ (action.parameterType.name | CamelCase) }}>()) < xpcc::co::Running) {
 							action.remove();
 						}
 						break;
@@ -259,7 +259,7 @@ Postman::component_{{ component.name | camelCase }}_action{{ action.name | Camel
 {
 	auto result = component::{{ component.name | camelCase }}.action{{ action.name | CamelCase }}({{ payload }});
 	if (result.state < xpcc::co::Running) {
-		if (result.state == xpcc::co::Stop && result.result.response == xpcc::Response::Positive) {
+		if (result.state == xpcc::co::Stop and result.result.response == xpcc::Response::Positive) {
 			{%- if action.returnType != None %}
 			component::{{component.name | camelCase}}.getCommunicator()->sendResponse(response, result.result.data);
 			{%- else %}
