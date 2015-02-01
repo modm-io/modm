@@ -18,23 +18,23 @@ namespace {{ namespace }}
 	class EventPublisher
 	{
 	public:
-		
+
 	{%- for event in events.iter() %}
 		{% if event.type -%}
 		{% if event.description %}/** {{ event.description | xpcc.wordwrap(72) | xpcc.indent(2) }}
-		* \param const robot::packet::{{ event.type.name | CamelCase -}}& */{% endif %}
+		* \param const {{ namespace }}::packet::{{ event.type.name | CamelCase -}}& */{% endif %}
 		static inline void
 		{{ event.name | camelCase }}(
 				xpcc::Communicator *communicator,
-				
+
 				{%- if event.type.isBuiltIn %}
 				const {{ event.type.name | CamelCase }}& packet)
 				{%- else %}
-				const robot::packet::{{ event.type.name | CamelCase }}& packet)
+				const {{ namespace }}::packet::{{ event.type.name | CamelCase }}& packet)
 				{%- endif %}
 		{
 			communicator->publishEvent(
-				robot::event::Identifier::{{ event.name | CAMELCASE }},
+				{{ namespace }}::event::Identifier::{{ event.name | CAMELCASE }},
 				packet);
 		}
 		{% else -%}
@@ -42,14 +42,14 @@ namespace {{ namespace }}
 		static inline void
 		{{ event.name | camelCase }}(xpcc::Communicator *communicator) {
 			communicator->publishEvent(
-				robot::event::Identifier::{{ event.name | CAMELCASE }});
+				{{ namespace }}::event::Identifier::{{ event.name | CAMELCASE }});
 		}
 		{% endif -%}
 	{% endfor %}
 	};
 
 {%- for component in components.iter() %}
-	
+
 	{% if component.description %}/** {{ component.description | xpcc.wordwrap(72) | xpcc.indent(2) }} */{% endif %}
 	class {{ component.name | CamelCase }}
 	{
@@ -58,7 +58,7 @@ namespace {{ namespace }}
 		{% if action.description -%}
 		{% if action.parameterType -%}
 		/** {{ action.description | xpcc.wordwrap(72) | xpcc.indent(2) }}
-		\param packet robot::packet::{{ action.parameterType.flattened().name | CamelCase }}&
+		\param packet {{ namespace }}::packet::{{ action.parameterType.flattened().name | CamelCase }}&
 		 */
 		{% else -%}
 		/** {{ action.description | xpcc.wordwrap(72) | xpcc.indent(2) }} */
@@ -66,7 +66,7 @@ namespace {{ namespace }}
 		{% else -%}
 		{% if action.parameterType -%}
 		/**
-		\param packet robot::packet::{{ action.parameterType.flattened().name | CamelCase }}&
+		\param packet {{ namespace }}::packet::{{ action.parameterType.flattened().name | CamelCase }}&
 		 */
 		{% endif -%}
 		{% endif -%}
@@ -77,12 +77,12 @@ namespace {{ namespace }}
 				{%- if action.parameterType.isBuiltIn %}
 				const {{ action.parameterType.name | CamelCase }}& packet)
 				{%- else %}
-				const robot::packet::{{ action.parameterType.name | CamelCase }}& packet)
+				const {{ namespace }}::packet::{{ action.parameterType.name | CamelCase }}& packet)
 				{%- endif %}
 		{
 			communicator->callAction(
-				robot::component::Identifier::{{ component.name | CAMELCASE }},
-				robot::action::Identifier::{{ action.name | CAMELCASE }},
+				{{ namespace }}::component::Identifier::{{ component.name | CAMELCASE }},
+				{{ namespace }}::action::Identifier::{{ action.name | CAMELCASE }},
 				packet);
 		}
 		static inline void
@@ -91,13 +91,13 @@ namespace {{ namespace }}
 				{%- if action.parameterType.isBuiltIn %}
 				const {{ action.parameterType.name | CamelCase }}& packet,
 				{%- else %}
-				const robot::packet::{{ action.parameterType.name | CamelCase }}& packet,
+				const {{ namespace }}::packet::{{ action.parameterType.name | CamelCase }}& packet,
 				{%- endif %}
 				xpcc::ResponseCallback& responseCallback)
 		{
 			communicator->callAction(
-				robot::component::Identifier::{{ component.name | CAMELCASE }},
-				robot::action::Identifier::{{ action.name | CAMELCASE }},
+				{{ namespace }}::component::Identifier::{{ component.name | CAMELCASE }},
+				{{ namespace }}::action::Identifier::{{ action.name | CAMELCASE }},
 				packet,
 				responseCallback);
 		}
@@ -105,22 +105,22 @@ namespace {{ namespace }}
 		static inline void
 		{{ action.name | camelCase }} (xpcc::Communicator *communicator) {
 			communicator->callAction(
-				robot::component::Identifier::{{ component.name | CAMELCASE }},
-				robot::action::Identifier::{{ action.name | CAMELCASE }});
+				{{ namespace }}::component::Identifier::{{ component.name | CAMELCASE }},
+				{{ namespace }}::action::Identifier::{{ action.name | CAMELCASE }});
 		}
 		static inline void
 		{{ action.name | camelCase }} (xpcc::Communicator *communicator, xpcc::ResponseCallback& responseCallback) {
 			communicator->callAction(
-				robot::component::Identifier::{{ component.name | CAMELCASE }},
-				robot::action::Identifier::{{ action.name | CAMELCASE }},
+				{{ namespace }}::component::Identifier::{{ component.name | CAMELCASE }},
+				{{ namespace }}::action::Identifier::{{ action.name | CAMELCASE }},
 				responseCallback);
 		}
 		{% endif %}
 		{%- endfor %}
-		
+
 	};
 
-	
+
 {%- endfor %}
 
 } // namespace {{ namespace }}

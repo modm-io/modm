@@ -25,7 +25,7 @@ public:
 	{%- if action.description %}
 	{%- if action.parameterType %}
 	/** {{ action.description | xpcc.wordwrap(72) | xpcc.indent(2) }}
-	Parameter: robot::packet::{{ action.parameterType.flattened().name | CamelCase }}&
+	Parameter: {{ namespace }}::packet::{{ action.parameterType.flattened().name | CamelCase }}&
 	 */
 	{%- else %}
 	/** {{ action.description | xpcc.wordwrap(72) | xpcc.indent(2) }} */
@@ -33,7 +33,7 @@ public:
 	{%- else %}
 	{%- if action.parameterType %}
 	/**
-	Parameter: robot::packet::{{ action.parameterType.flattened().name | CamelCase }}&
+	Parameter: {{ namespace }}::packet::{{ action.parameterType.flattened().name | CamelCase }}&
 	 */
 	{%- endif %}
 	{%- endif %}
@@ -44,14 +44,14 @@ public:
 		{%- if action.parameterType.isBuiltIn %}
 		typedef {{ action.parameterType.name | CamelCase }} ParameterType;
 		{%- else %}
-		typedef robot::packet::{{ action.parameterType.name | CamelCase }} ParameterType;
+		typedef {{ namespace }}::packet::{{ action.parameterType.name | CamelCase }} ParameterType;
 		{%- endif %}
 		{%- endif %}
 		{%- if action.returnType %}
 		{%- if action.returnType.isBuiltIn %}
 		typedef {{ action.returnType.name | CamelCase }} ReturnType;
 		{%- else %}
-		typedef robot::packet::{{ action.returnType.name | CamelCase }} ReturnType;
+		typedef {{ namespace }}::packet::{{ action.returnType.name | CamelCase }} ReturnType;
 		{%- endif %}
 		{%- endif %}
 
@@ -69,7 +69,7 @@ public:
 				{%- if action.parameterType.isBuiltIn %}
 				const {{ action.parameterType.name | CamelCase }}& parameter
 				{%- else -%}
-				const robot::packet::{{ action.parameterType.name | CamelCase }}& parameter
+				const {{ namespace }}::packet::{{ action.parameterType.name | CamelCase }}& parameter
 				{%- endif -%}
 				{%- endif -%}
 				)
@@ -105,7 +105,7 @@ public:
 		{% if action.returnType.isBuiltIn -%}
 		const {{ action.returnType.name | CamelCase }}& getResponsePayload()
 		{% else -%}
-		const robot::packet::{{ action.returnType.name | CamelCase }}& getResponsePayload()
+		const {{ namespace }}::packet::{{ action.returnType.name | CamelCase }}& getResponsePayload()
 		{% endif -%}
 		{
 			return responsePayload;
@@ -123,7 +123,7 @@ public:
 				const {{ action.returnType.name | CamelCase }} *payload)
 		{%- else %}
 				const xpcc::Header& header,
-				const robot::packet::{{ action.returnType.name | CamelCase }} *payload)
+				const {{ namespace }}::packet::{{ action.returnType.name | CamelCase }} *payload)
 		{%- endif %}
 		{%- else %}
 				const xpcc::Header& header)
@@ -147,8 +147,8 @@ public:
 			this->waitForResponse = true;
 
 			parent->callAction(
-					robot::component::Identifier::{{ component.name | CAMELCASE }},
-					robot::action::Identifier::{{ action.name | CAMELCASE }},
+					{{ namespace }}::component::Identifier::{{ component.name | CAMELCASE }},
+					{{ namespace }}::action::Identifier::{{ action.name | CAMELCASE }},
 					{% if action.parameterType -%}
 					this->parameter,
 					{% endif -%}
@@ -170,7 +170,7 @@ public:
 		{% if action.parameterType.isBuiltIn -%}
 		{{ action.parameterType.name | CamelCase }} parameter;
 		{% else -%}
-		robot::packet::{{ action.parameterType.name | CamelCase }} parameter;
+		{{ namespace }}::packet::{{ action.parameterType.name | CamelCase }} parameter;
 		{%- endif %}
 		{%- endif %}
 
@@ -179,7 +179,7 @@ public:
 		{% if action.returnType.isBuiltIn -%}
 		{{ action.returnType.name | CamelCase }} responsePayload;
 		{% else -%}
-		robot::packet::{{ action.returnType.name | CamelCase }} responsePayload;
+		{{ namespace }}::packet::{{ action.returnType.name | CamelCase }} responsePayload;
 		{%- endif %}
 		{%- endif %}
 		xpcc::Header responseHeader;

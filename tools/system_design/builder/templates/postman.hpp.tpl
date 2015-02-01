@@ -106,7 +106,7 @@ private:
 		{%- if action.call == "coroutine" %}
 	uint8_t
 			{%- if action.parameterType != None %}
-				{%- set typePrefix = "" if action.parameterType.isBuiltIn else "robot::packet::" %}
+				{%- set typePrefix = "" if action.parameterType.isBuiltIn else namespace ~ "::packet::" %}
 				{%- set arguments = ", const " ~ typePrefix ~ (action.parameterType.name | CamelCase) ~ "& payload" %}
 			{%- else %}
 				{%- set arguments = "" %}

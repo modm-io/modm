@@ -55,13 +55,13 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 {%- set actionNumber = 0 %}
 {%- set actionNumberNoArg = 0 %}
 {%- for component in components %}
-		case robot::component::{{ component.name | CAMELCASE }}:
+		case {{ namespace }}::component::{{ component.name | CAMELCASE }}:
 		{
 			switch (header.packetIdentifier)
 			{
 	{%- for action in component.actions %}
 		{%- if action.parameterType != None %}
-			{%- set typePrefix = "" if action.parameterType.isBuiltIn else "robot::packet::" %}
+			{%- set typePrefix = "" if action.parameterType.isBuiltIn else namespace ~ "::packet::" %}
 			{%- set payload = ", payload.get<" ~ typePrefix ~ (action.parameterType.name | CamelCase) ~ ">()" %}
 			{%- set arguments = "const " ~ typePrefix ~ (action.parameterType.name | CamelCase) ~ "& payload" %}
 			{%- set pointer = ", payload" %}
@@ -70,7 +70,7 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 			{%- set arguments = "" %}
 			{%- set pointer = "" %}
 		{%- endif %}
-				case robot::action::{{ action.name | CAMELCASE }}:
+				case {{ namespace }}::action::{{ action.name | CAMELCASE }}:
 		{%- if action.call == "coroutine" %}
 			{%- if action.parameterType != None %}
 					if (actionBuffer[{{ actionNumber }}].destination != 0) {
@@ -111,11 +111,11 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 			switch (header.packetIdentifier)
 			{
 {%- for event in container.events.subscribe %}
-				case robot::event::{{ event.name | CAMELCASE }}:
+				case {{ namespace }}::event::{{ event.name | CAMELCASE }}:
 	{%- for component in eventSubscriptions[event.name] %}
 		{%- if events[event.name].type != None %}
-					// void event{{ event.name | CamelCase }}(const xpcc::Header& header, const robot::packet::{{ events[event.name].type.name | CamelCase }} *payload);
-					component::{{ component.name | camelCase }}.event{{ event.name | CamelCase }}(header, &payload.get<robot::packet::{{ events[event.name].type.name | CamelCase }}>());
+					// void event{{ event.name | CamelCase }}(const xpcc::Header& header, const {{ namespace }}::packet::{{ events[event.name].type.name | CamelCase }} *payload);
+					component::{{ component.name | camelCase }}.event{{ event.name | CamelCase }}(header, &payload.get<{{ namespace }}::packet::{{ events[event.name].type.name | CamelCase }}>());
 		{%- else %}
 					// void event{{ event.name | CamelCase }}(const xpcc::Header& header);
 					component::{{ component.name | camelCase }}.event{{ event.name | CamelCase }}(header);
@@ -142,7 +142,7 @@ Postman::isComponentAvailable(uint8_t component) const
 	switch (component)
 	{
 {%- for component in components %}
-		case robot::component::{{ component.name | CAMELCASE }}:
+		case {{ namespace }}::component::{{ component.name | CAMELCASE }}:
 {%- endfor %}
 			return true;
 			break;
@@ -170,14 +170,14 @@ Postman::update()
 		{%- set has_actions = ac.__len__() > 0 %}
 
 		{%- if has_actions %}
-			case robot::component::{{ component.name | CAMELCASE }}:
+			case {{ namespace }}::component::{{ component.name | CAMELCASE }}:
 			{
 				switch (action.response.getIdentifier())
 				{
 			{%- for action in component.actions %}
 				{%- if action.call == "coroutine" and action.parameterType != None %}
-					{%- set typePrefix = "" if action.parameterType.isBuiltIn else "robot::packet::" %}
-					case robot::action::{{ action.name | CAMELCASE }}:
+					{%- set typePrefix = "" if action.parameterType.isBuiltIn else namespace ~ "::packet::" %}
+					case {{ namespace }}::action::{{ action.name | CAMELCASE }}:
 						if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(action.response, action.payload.get<{{ typePrefix ~ (action.parameterType.name | CamelCase) }}>()) <= xpcc::co::NestingError) {
 							action.remove();
 						}
@@ -213,13 +213,13 @@ Postman::update()
 		{%- set has_actions = ac.__len__() > 0 %}
 
 		{%- if has_actions %}
-			case robot::component::{{ component.name | CAMELCASE }}:
+			case {{ namespace }}::component::{{ component.name | CAMELCASE }}:
 			{
 				switch (action.response.getIdentifier())
 				{
 			{%- for action in component.actions %}
 				{%- if action.call == "coroutine" and action.parameterType == None %}
-					case robot::action::{{ action.name | CAMELCASE }}:
+					case {{ namespace }}::action::{{ action.name | CAMELCASE }}:
 						if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(action.response) < xpcc::co::Running) {
 							action.remove();
 						}
@@ -248,7 +248,7 @@ Postman::update()
 		{%- if action.call == "coroutine" %}
 uint8_t
 			{%- if action.parameterType != None %}
-				{%- set typePrefix = "" if action.parameterType.isBuiltIn else "robot::packet::" %}
+				{%- set typePrefix = "" if action.parameterType.isBuiltIn else namespace ~ "::packet::" %}
 				{%- set arguments = ", const " ~ typePrefix ~ (action.parameterType.name | CamelCase) ~ "& payload" %}
 				{%- set payload = "payload" %}
 			{%- else %}
