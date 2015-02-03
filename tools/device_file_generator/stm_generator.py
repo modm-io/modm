@@ -24,17 +24,29 @@ if __name__ == "__main__":
 	level = 'info'
 	logger = Logger(level)
 	devices = []
+	supported_families = ['STM32F0', 'STM32F1', 'STM32F2', 'STM32F3', 'STM32F4']
+	family = None
 
 	for arg in sys.argv[1:]:
 		if arg in ['error', 'warn', 'info', 'debug', 'disabled']:
 			level = arg
 			logger.setLogLevel(level)
 			continue
-		xml_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'STM_devices', 'Memory', (arg + '*'))
-		files = glob.glob(xml_path)
-		for file in files:
-			part = STMDeviceReader(file, logger)
-			devices.append(Device(part, logger))
+		if arg in supported_families:
+			family = arg
+		else:
+			logger.error("Invalid family! Valid input is '{}', found '{}'".format(", ".join(supported_families), arg))
+			exit(1)
+
+	if family is None:
+		logger.error("Please provide a device family: '{}'".format(", ".join(supported_families)))
+		exit(1)
+
+	devicesFromFamily = STMDeviceReader.getDevicesFromFamily(family, logger)
+
+	for deviceName in devicesFromFamily:
+		device = STMDeviceReader(deviceName, logger)
+		devices.append(Device(device, logger))
 
 	merger = DeviceMerger(devices, logger)
 	merger.mergedByPlatform('stm32')

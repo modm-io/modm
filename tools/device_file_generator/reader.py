@@ -89,4 +89,4 @@ class XMLDeviceReader:
 		return self.__str__()
 
 	def __str__(self):
-		return "XMLDeviceReader(%s)" % os.path.basename(self.file)
+		return "XMLDeviceReader({}, [\n{}])".format(os.path.basename(self.file), ",\n".join(map(str, self.properties)))
