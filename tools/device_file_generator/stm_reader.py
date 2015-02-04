@@ -71,7 +71,11 @@ class STMDeviceReader(XMLDeviceReader):
 			sizeArray = match.group(0)[1:-1].lower().split("-")
 			sizeIndex = sizeArray.index(self.id.size_id)
 
-		ram = int(self.query("//Ram")[sizeIndex].text) * 1024
+		rams = self.query("//Ram")
+		if len(rams) <= sizeIndex:
+			sizeIndex = 0
+
+		ram = int(rams[sizeIndex].text) * 1024
 		flash = int(self.query("//Flash")[sizeIndex].text) * 1024
 		self.addProperty('ram', ram)
 		self.addProperty('flash', flash)
@@ -135,7 +139,7 @@ class STMDeviceReader(XMLDeviceReader):
 		self.gpioFile = XMLDeviceReader(ip_file, logger)
 
 		pins = self.query("//Pin[@Type='I/O'][starts-with(@Name,'P')]")
-		pins = sorted(pins, key=lambda p: [p.get('Name')[1:2], int(p.get('Name').split('-')[0].split('/')[0][2:])])
+		pins = sorted(pins, key=lambda p: [p.get('Name')[1:2], int(p.get('Name')[:4].split('-')[0].split('/')[0][2:])])
 
 		for pin in pins:
 			name = pin.get('Name')
@@ -144,10 +148,7 @@ class STMDeviceReader(XMLDeviceReader):
 			analogSignals = self.compactQuery("//Pin[@Name='{}']/Signal[starts-with(@Name,'ADC')]".format(name))
 			pinSignals.extend(analogSignals)
 
-			if '-' in name:
-				name = name.split('-')[0].strip()
-			elif '/' in name:
-				name = name.split('/')[0].strip()
+			name = name[:4].split('-')[0].split('/')[0].strip()
 
 			gpio = {'port': name[1:2], 'id': name[2:]}
 			gpios.append(gpio)
