@@ -183,13 +183,12 @@ private:
 	static constexpr IRQn_Type ExternalInterruptIRQ = EXTI15_10_IRQn;
 %% endif
 
-	/// TODO: Document
 	ALWAYS_INLINE static void
 	setAlternateFunction(AlternateFunction alt) {
-		{{reg}}->MODER = ({{reg}}->MODER   & ~mask2)
-							| (i(Mode::AlternateFunction) << (pin * 2));
 		{{reg}}->AFR[af_id] = ({{reg}}->AFR[af_id] & ~af_mask)
 								| (i(alt) << af_offset);
+		{{reg}}->MODER = ({{reg}}->MODER   & ~mask2)
+								| (i(Mode::AlternateFunction) << (pin * 2));
 	}
 
 	/// Enable Analog Mode which is needed to use this pin as an ADC input.
