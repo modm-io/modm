@@ -349,20 +349,18 @@ public:
 								(af.type == "analog" and type == "Output") or
 								(af.type == "out" and type == "Input" ))
 			%% if use
+				%% if af.name not in ['Scl', 'Sda']
 	/// Connect {{name}} as {{af.name}} to {{af.peripheral}}.
 	ALWAYS_INLINE static void
 	connect(TypeId::{{ af.peripheral }}{{ af.name }} /* t */) {
-				%% if af.type == "analog"
+					%% if af.type == "analog"
 		setAnalogInput();
-				%% else
-					%% if (af.type|string in ['', 'out'] and
-							type != "Input" and af.name in ['Scl', 'Sda'])
-		setOutput(OutputType::OpenDrain);
-					%% endif
+					%% else
 		setAlternateFunction(AlternateFunction::AF_{{ af.id }});
-				%% endif
+					%% endif
 	}
-				%% if af.type|string in ['', 'out'] and type != "Input"
+				%% endif
+				%% if af.type|string in ['', 'out'] and type != "Input" and af.name not in ['Scl', 'Sda']
 	/// Connect {{name}} as {{af.name}} to {{af.peripheral}}.
 	ALWAYS_INLINE static void
 	connect(TypeId::{{ af.peripheral }}{{ af.name }} /* t */,
@@ -371,7 +369,16 @@ public:
 		setAlternateFunction(AlternateFunction::AF_{{ af.id }});
 	}
 				%% endif
-				%% if af.type|string in ['', 'in'] and type != "Output"
+				%% if af.type|string in ['', 'out'] and type != "Input" and af.name in ['Scl', 'Sda']
+	/// Connect {{name}} as {{af.name}} to {{af.peripheral}}.
+	ALWAYS_INLINE static void
+	connect(TypeId::{{ af.peripheral }}{{ af.name }} /* t */, InputType type=InputType::Floating) {
+		setAlternateFunction(AlternateFunction::AF_{{ af.id }});
+		configure(OutputType::OpenDrain);
+		configure(type);
+	}
+				%% endif
+				%% if af.type|string in ['', 'in'] and type != "Output" and af.name not in ['Scl', 'Sda']
 	/// Connect {{name}} as {{af.name}} to {{af.peripheral}}.
 	ALWAYS_INLINE static void
 	connect(TypeId::{{ af.peripheral }}{{ af.name }} /* t */, InputType type) {
@@ -397,9 +404,9 @@ public:
 									'SoftwareI2cMasterScl']
 	/// Connect to `{{peripheral}}`.
 	ALWAYS_INLINE static void
-	connect(::xpcc::TypeId::{{ peripheral }}) {
+	connect(::xpcc::TypeId::{{ peripheral }}, InputType type=InputType::Floating) {
 		configure(OutputType::OpenDrain);
-		setOutput();
+		configure(type);
 		set();
 	}
 			%% endfor
