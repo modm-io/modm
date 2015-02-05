@@ -226,7 +226,7 @@ public:
 		setOutput();
 	}
 	ALWAYS_INLINE static void set() {
-		{{reg}}->BSRRL = mask;
+		{{reg}}->BSRR = mask;
 	}
 	ALWAYS_INLINE static void set(bool status) {
 		if (status) {
@@ -236,7 +236,7 @@ public:
 		}
 	}
 	ALWAYS_INLINE static void reset() {
-		{{reg}}->BSRRH = mask;
+		{{reg}}->BSRR = (uint32_t(mask) << 16);
 	}
 	ALWAYS_INLINE static void toggle() {
 		if ({{reg}}->ODR & mask) {
