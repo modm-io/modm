@@ -58,6 +58,10 @@ public:
 	/**
 	 * Initializes the hardware and sets the datarate.
 	 *
+	 * It is strongly recommended to reset the slave devices on the bus
+	 * after a master reset.
+	 * @see xpcc::I2c::resetDevices< Scl >
+	 *
 	 * @tparam	clockSource
 	 * 		the currently active system clock
 	 * @tparam	baudrate
