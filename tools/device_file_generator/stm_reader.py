@@ -26,6 +26,55 @@ class STMDeviceReader(XMLDeviceReader):
 	"""
 	familyFile = None
 	rootpath = None
+	deviceDefines = {
+		'f0': [
+			'STM32F030x6',	# STM32F030x4, STM32F030x6 Devices (STM32F030xx microcontrollers where the Flash memory ranges between 16 and 32 Kbytes)
+			'STM32F030x8',	# STM32F030x8 Devices (STM32F030xx microcontrollers where the Flash memory is 64 Kbytes)
+			'STM32F031x6',	# STM32F031x4, STM32F031x6 Devices (STM32F031xx microcontrollers where the Flash memory ranges between 16 and 32 Kbytes)
+			'STM32F038xx',	# STM32F038xx Devices (STM32F038xx microcontrollers where the Flash memory is 32 Kbytes)
+			'STM32F042x6',	# STM32F042x4, STM32F042x6 Devices (STM32F042xx microcontrollers where the Flash memory ranges between 16 and 32 Kbytes)
+			'STM32F048x6',	# STM32F048xx Devices (STM32F042xx microcontrollers where the Flash memory is 32 Kbytes)
+			'STM32F051x8',	# STM32F051x4, STM32F051x6, STM32F051x8 Devices (STM32F051xx microcontrollers where the Flash memory ranges between 16 and 64 Kbytes)
+			'STM32F058xx',	# STM32F058xx Devices (STM32F058xx microcontrollers where the Flash memory is 64 Kbytes)
+			'STM32F070x6',	# STM32F070x6 Devices (STM32F070x6 microcontrollers where the Flash memory ranges between 16 and 32 Kbytes)
+			'STM32F070xB',	# STM32F070xB Devices (STM32F070xB microcontrollers where the Flash memory ranges between 64 and 128 Kbytes)
+			'STM32F071xB',	# STM32F071x8, STM32F071xB Devices (STM32F071xx microcontrollers where the Flash memory ranges between 64 and 128 Kbytes)
+			'STM32F072xB',	# STM32F072x8, STM32F072xB Devices (STM32F072xx microcontrollers where the Flash memory ranges between 64 and 128 Kbytes)
+			'STM32F078xx',	# STM32F078xx Devices (STM32F078xx microcontrollers where the Flash memory is 128 Kbytes)
+			'STM32F030xC',	# STM32F030xC Devices (STM32F030xC microcontrollers where the Flash memory is 256 Kbytes)
+			'STM32F091xC',	# STM32F091xC Devices (STM32F091xx microcontrollers where the Flash memory is 256 Kbytes)
+			'STM32F098xx',	# STM32F098xx Devices (STM32F098xx microcontrollers where the Flash memory is 256 Kbytes)
+		],
+		'f3': [
+			'STM32F301x8',	# STM32F301K6, STM32F301K8, STM32F301C6, STM32F301C8, STM32F301R6 and STM32F301R8 Devices
+			'STM32F302x8',	# STM32F302K6, STM32F302K8, STM32F302C6, STM32F302C8, STM32F302R6 and STM32F302R8 Devices
+			'STM32F302xC',	# STM32F302CB, STM32F302CC, STM32F302RB, STM32F302RC, STM32F302VB and STM32F302VC Devices
+			'STM32F302xE',	# STM32F302CE, STM32F302RE, and STM32F302VE Devices
+			'STM32F303x8',	# STM32F303K6, STM32F303K8, STM32F303C6, STM32F303C8, STM32F303R6 and STM32F303R8 Devices
+			'STM32F303xC',	# STM32F303CB, STM32F303CC, STM32F303RB, STM32F303RC, STM32F303VB and STM32F303VC Devices
+			'STM32F303xE',	# STM32F303RE, STM32F303VE and STM32F303ZE Devices
+			'STM32F373xC',	# STM32F373C8, STM32F373CB, STM32F373CC, STM32F373R8, STM32F373RB, STM32F373RC, STM32F373V8, STM32F373VB and STM32F373VC Devices
+			'STM32F334x8',	# STM32F334C4, STM32F334C6, STM32F334C8, STM32F334R4, STM32F334R6 and STM32F334R8 Devices
+			'STM32F318xx',	# STM32F318K8, STM32F318C8: STM32F301x8 with regulator off: STM32F318xx Devices
+			'STM32F328xx',	# STM32F328C8, STM32F328R8: STM32F334x8 with regulator off: STM32F328xx Devices
+			'STM32F358xx',	# STM32F358CC, STM32F358RC, STM32F358VC: STM32F303xC with regulator off: STM32F358xx Devices
+			'STM32F378xx',	# STM32F378CC, STM32F378RC, STM32F378VC: STM32F373xC with regulator off: STM32F378xx Devices
+			'STM32F398xx',	# STM32F398CE, STM32F398RE, STM32F398VE: STM32F303xE with regulator off: STM32F398xx Devices
+		],
+		'f4': [
+			'STM32F405xx',	# STM32F405RG, STM32F405VG and STM32F405ZG Devices
+			'STM32F415xx',	# STM32F415RG, STM32F415VG and STM32F415ZG Devices
+			'STM32F407xx',	# STM32F407VG, STM32F407VE, STM32F407ZG, STM32F407ZE, STM32F407IG and STM32F407IE Devices
+			'STM32F417xx',	# STM32F417VG, STM32F417VE, STM32F417ZG, STM32F417ZE, STM32F417IG and STM32F417IE Devices
+			'STM32F427xx',	# STM32F427VG, STM32F427VI, STM32F427ZG, STM32F427ZI, STM32F427IG and STM32F427II Devices
+			'STM32F437xx',	# STM32F437VG, STM32F437VI, STM32F437ZG, STM32F437ZI, STM32F437IG and STM32F437II Devices
+			'STM32F429xx',	# STM32F429VG, STM32F429VI, STM32F429ZG, STM32F429ZI, STM32F429BG, STM32F429BI, STM32F429NG, STM32F439NI, STM32F429IG and STM32F429II Devices
+			'STM32F439xx',	# STM32F439VG, STM32F439VI, STM32F439ZG, STM32F439ZI, STM32F439BG, STM32F439BI, STM32F439NG, STM32F439NI, STM32F439IG and STM32F439II Devices
+			'STM32F401xC',	# STM32F401CB, STM32F401CC, STM32F401RB, STM32F401RC, STM32F401VB and STM32F401VC Devices
+			'STM32F401xE',	# STM32F401CD, STM32F401RD, STM32F401VD, STM32F401CE, STM32F401RE and STM32F401VE Devices
+			'STM32F411xE',	#STM32F411CD, STM32F411RD, STM32F411VD, STM32F411CE, STM32F411RE and STM32F411VE Devices
+		]
+	}
 
 	@staticmethod
 	def getDevicesFromFamily(family, logger=None, rootpath=None):
@@ -85,8 +134,20 @@ class STMDeviceReader(XMLDeviceReader):
 		self.addProperty('pin-count', re.findall('[0-9]+', package)[0])
 		self.addProperty('package', re.findall('[A-Za-z\.]+', package)[0])
 
-		# self.addProperty('header', 'stm32' + dev.family + 'xx.h')
-		# self.addProperty('define', 'STM32F' + dev.name + 'xx')
+		# device header
+		self.addProperty('header', 'stm32' + self.id.family + 'xx.h')
+
+		# device defines
+		define = self._getDeviceDefine()
+		if define is None:
+			logger.warn("STMDeviceReader: Define not found for device '{}'".format(self.id.string))
+		else:
+			self.addProperty('define', define)
+
+		if self.id.family == 'f4':
+			# required for our FreeRTOS
+			self.addProperty('define', 'STM32F4XX')
+
 		# if self.id.family == 'f3':
 		# 	linkerscript = "%s_%s.ld" % ('stm32f3xx', dev.size_id)
 		# else:
@@ -114,24 +175,6 @@ class STMDeviceReader(XMLDeviceReader):
 		nameToMode = {'rx': 'in', 'tx': 'out', 'cts': 'in', 'rts': 'out', 'ck': 'out',	# Uart
 					 'miso': 'in', 'mosi': 'out', 'nss': 'io', 'sck': 'out',	# Spi
 					 'scl': 'out', 'sda': 'io'}	# I2c
-		# this look up table is only used for chips using the STM32Fxx7 GPIO IP
-		# nameToAf = {'RTC_50Hz': '0', 'MCO': '0', 'TAMPER': '0', 'SWJ': '0', 'TRACE': '0',
-		# 			'TIM1': '1', 'TIM2': '1',
-		# 			'TIM3': '2', 'TIM4': '2', 'TIM5': '2',
-		# 			'TIM8': '3', 'TIM9': '3', 'TIM10': '3', 'TIM11': '3',
-		# 			'I2C1': '4', 'I2C2': '4', 'I2C3': '4',
-		# 			'SPI1': '5', 'SPI2': '5', 'SPI4': '5', 'SPI5': '5', 'SPI6': '5',
-		# 			'SPI3': '6', 'SAI1': '6',
-		# 			'USART1': '7', 'USART2': '7', 'USART3': '7', 'I2S3ext': '7',
-		# 			'UART4': '8', 'UART5': '8', 'USART6': '8', 'UART7': '8', 'UART8': '8',
-		# 			'CAN1': '9', 'CAN2': '9', 'TIM12': '9', 'TIM13': '9', 'TIM14': '9',
-		# 			'OTG_FS': '10', 'OTG_HS': '10',
-		# 			'ETH': '11',
-		# 			'FSMC': '12', 'SDIO': '12', 'OTG_HS_FS': '12',
-		# 			'DCMI': '13',
-		# 			'LCD': '14',
-		# 			'EVENTOUT': '15' }
-
 
 		# lets load additional information about the GPIO IP
 		ip_file = self.query("//IP[@Name='GPIO']")[0].get('Version')
@@ -145,6 +188,7 @@ class STMDeviceReader(XMLDeviceReader):
 			name = pin.get('Name')
 			pinSignals = self.gpioFile.compactQuery("//GPIO_Pin[@Name='%s']/PinSignal/SpecificParameter[@Name='GPIO_AF']/.." % name)
 			altFunctions = { a.get('Name') : a[0][0].text.replace('GPIO_AF', '')[:2].replace('_','') for a in pinSignals }
+			# the analog channels are only available in the Mcu file, not the GPIO file
 			analogSignals = self.compactQuery("//Pin[@Name='{}']/Signal[starts-with(@Name,'ADC')]".format(name))
 			pinSignals.extend(analogSignals)
 
@@ -301,6 +345,26 @@ class STMDeviceReader(XMLDeviceReader):
 			string += module + " \t"
 			char = module[0][0:1]
 		return string
+
+	def _getDeviceDefine(self):
+		if self.id.family not in STMDeviceReader.deviceDefines:
+			return None
+		# get the defines for this device family
+		familyDefines = STMDeviceReader.deviceDefines[self.id.family]
+		# get all defines for this device name
+		devName = 'STM32F{}'.format(self.id.name)
+		deviceDefines = sorted([define for define in familyDefines if define.startswith(devName)])
+		# if there is only one define thats the one
+		if len(deviceDefines) == 1:
+			return deviceDefines[0]
+
+		# now we match for the size-id.
+		devName += 'x{}'.format(self.id.size_id.upper())
+		for define in deviceDefines:
+			if devName <= define:
+				return define
+
+		return None
 
 	def __repr__(self):
 		return self.__str__()
