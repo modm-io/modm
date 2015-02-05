@@ -178,14 +178,18 @@ xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::startCondition()
 	if(SDA::read() == xpcc::Gpio::Low)
 	{
 		// could not release data line
-		error(Error::BusCondition);
+		errorState = Error::BusBusy;
+		if (transactionObject) transactionObject->detaching(DetachCause::ErrorCondition);
+		transactionObject = nullptr;
 		return false;
 	}
 	// release the clock line
 	if (!sclSetAndWait())
 	{
 		// could not release clock line
-		error(Error::BusCondition);
+		errorState = Error::BusBusy;
+		if (transactionObject) transactionObject->detaching(DetachCause::ErrorCondition);
+		transactionObject = nullptr;
 		return false;
 	}
 	// now both pins are High, ready for start

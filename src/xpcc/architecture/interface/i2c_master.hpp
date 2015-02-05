@@ -40,6 +40,7 @@ public:
 		DataNack,			///< Data was transmitted and NACK received
 		ArbitrationLost,	///< Arbitration was lost during writing or reading
 		BusCondition,		///< Misplaced Start or Stop condition
+		BusBusy,			///< Bus is busy during Start condition
 		Unknown				///< Unknown error condition
 	};
 

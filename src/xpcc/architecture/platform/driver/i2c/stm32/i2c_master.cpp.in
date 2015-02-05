@@ -210,7 +210,7 @@ namespace
 			// either SDA or SCL is low, which is can lead to a unrecoverable deadlock.
 			// Call error handler manually to detach the transaction object and resolve the deadlock.
 			// Further transactions may not succeed either, but will not lead to a deadlock.
-			error = xpcc::I2cMaster::Error::BusCondition;
+			error = xpcc::I2cMaster::Error::BusBusy;
 			I2C{{ id }}_ER_IRQHandler();
 			return;
 		}
