@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    stm32f302xc.h
   * @author  MCD Application Team
-  * @version V2.0.1
-  * @date    18-June-2014
+  * @version V1.1.0
+  * @date    12-Sept-2014
   * @brief   CMSIS STM32F302xB/STM32F302xC Devices Peripheral Access Layer Header File.
   *
   *          This file contains:
@@ -316,14 +316,14 @@ typedef struct
   __IO uint32_t DHR12R1;  /*!< DAC channel1 12-bit right-aligned data holding register, Address offset: 0x08 */
   __IO uint32_t DHR12L1;  /*!< DAC channel1 12-bit left aligned data holding register,  Address offset: 0x0C */
   __IO uint32_t DHR8R1;   /*!< DAC channel1 8-bit right aligned data holding register,  Address offset: 0x10 */
-  __IO uint32_t DHR12R2;  /*!< DAC channel2 12-bit right aligned data holding register, Address offset: 0x14 */
-  __IO uint32_t DHR12L2;  /*!< DAC channel2 12-bit left aligned data holding register,  Address offset: 0x18 */
-  __IO uint32_t DHR8R2;   /*!< DAC channel2 8-bit right-aligned data holding register,  Address offset: 0x1C */
+  __IO uint32_t RESERVED0; /*!< Reserved,                                                                0x14 */
+  __IO uint32_t RESERVED1; /*!< Reserved,                                                                0x18 */
+  __IO uint32_t RESERVED2; /*!< Reserved,                                                                0x1C */
   __IO uint32_t DHR12RD;  /*!< Dual DAC 12-bit right-aligned data holding register,     Address offset: 0x20 */
   __IO uint32_t DHR12LD;  /*!< DUAL DAC 12-bit left aligned data holding register,      Address offset: 0x24 */
   __IO uint32_t DHR8RD;   /*!< DUAL DAC 8-bit right aligned data holding register,      Address offset: 0x28 */
   __IO uint32_t DOR1;     /*!< DAC channel1 data output register,                       Address offset: 0x2C */
-  __IO uint32_t DOR2;     /*!< DAC channel2 data output register,                       Address offset: 0x30 */
+  __IO uint32_t RESERVED3; /*!< Reserved,                                                                0x30 */
   __IO uint32_t SR;       /*!< DAC status register,                                     Address offset: 0x34 */
 } DAC_TypeDef;
 
@@ -3205,31 +3205,9 @@ typedef struct
 
 #define  DAC_CR_DMAEN1                       ((uint32_t)0x00001000)        /*!< DAC channel1 DMA enable */
 #define  DAC_CR_DMAUDRIE1                    ((uint32_t)0x00002000)        /*!< DAC channel1 DMA underrun IT enable */ 
-#define  DAC_CR_EN2                          ((uint32_t)0x00010000)        /*!< DAC channel2 enable */
-#define  DAC_CR_BOFF2                        ((uint32_t)0x00020000)        /*!< DAC channel2 output buffer disable */
-#define  DAC_CR_TEN2                         ((uint32_t)0x00040000)        /*!< DAC channel2 Trigger enable */
-
-#define  DAC_CR_TSEL2                        ((uint32_t)0x00380000)        /*!< TSEL2[2:0] (DAC channel2 Trigger selection) */
-#define  DAC_CR_TSEL2_0                      ((uint32_t)0x00080000)        /*!< Bit 0 */
-#define  DAC_CR_TSEL2_1                      ((uint32_t)0x00100000)        /*!< Bit 1 */
-#define  DAC_CR_TSEL2_2                      ((uint32_t)0x00200000)        /*!< Bit 2 */
-
-#define  DAC_CR_WAVE2                        ((uint32_t)0x00C00000)        /*!< WAVE2[1:0] (DAC channel2 noise/triangle wave generation enable) */
-#define  DAC_CR_WAVE2_0                      ((uint32_t)0x00400000)        /*!< Bit 0 */
-#define  DAC_CR_WAVE2_1                      ((uint32_t)0x00800000)        /*!< Bit 1 */
-
-#define  DAC_CR_MAMP2                        ((uint32_t)0x0F000000)        /*!< MAMP2[3:0] (DAC channel2 Mask/Amplitude selector) */
-#define  DAC_CR_MAMP2_0                      ((uint32_t)0x01000000)        /*!< Bit 0 */
-#define  DAC_CR_MAMP2_1                      ((uint32_t)0x02000000)        /*!< Bit 1 */
-#define  DAC_CR_MAMP2_2                      ((uint32_t)0x04000000)        /*!< Bit 2 */
-#define  DAC_CR_MAMP2_3                      ((uint32_t)0x08000000)        /*!< Bit 3 */
-
-#define  DAC_CR_DMAEN2                       ((uint32_t)0x10000000)        /*!< DAC channel2 DMA enabled */
-#define  DAC_CR_DMAUDRIE2                    ((uint32_t)0x20000000)        /*!< DAC channel2 DMA underrun IT enable */ 
 
 /*****************  Bit definition for DAC_SWTRIGR register  ******************/
 #define  DAC_SWTRIGR_SWTRIG1                 ((uint32_t)0x00000001)        /*!< DAC channel1 software trigger */
-#define  DAC_SWTRIGR_SWTRIG2                 ((uint32_t)0x00000002)        /*!< DAC channel2 software trigger */
 
 /*****************  Bit definition for DAC_DHR12R1 register  ******************/
 #define  DAC_DHR12R1_DACC1DHR                ((uint32_t)0x00000FFF)        /*!< DAC channel1 12-bit Right aligned data */
@@ -3240,36 +3218,20 @@ typedef struct
 /******************  Bit definition for DAC_DHR8R1 register  ******************/
 #define  DAC_DHR8R1_DACC1DHR                 ((uint32_t)0x000000FF)        /*!< DAC channel1 8-bit Right aligned data */
 
-/*****************  Bit definition for DAC_DHR12R2 register  ******************/
-#define  DAC_DHR12R2_DACC2DHR                ((uint32_t)0x00000FFF)        /*!< DAC channel2 12-bit Right aligned data */
-
-/*****************  Bit definition for DAC_DHR12L2 register  ******************/
-#define  DAC_DHR12L2_DACC2DHR                ((uint32_t)0x0000FFF0)        /*!< DAC channel2 12-bit Left aligned data */
-
-/******************  Bit definition for DAC_DHR8R2 register  ******************/
-#define  DAC_DHR8R2_DACC2DHR                 ((uint32_t)0x000000FF)        /*!< DAC channel2 8-bit Right aligned data */
-
 /*****************  Bit definition for DAC_DHR12RD register  ******************/
 #define  DAC_DHR12RD_DACC1DHR                ((uint32_t)0x00000FFF)        /*!< DAC channel1 12-bit Right aligned data */
-#define  DAC_DHR12RD_DACC2DHR                ((uint32_t)0x0FFF0000)        /*!< DAC channel2 12-bit Right aligned data */
 
 /*****************  Bit definition for DAC_DHR12LD register  ******************/
 #define  DAC_DHR12LD_DACC1DHR                ((uint32_t)0x0000FFF0)        /*!< DAC channel1 12-bit Left aligned data */
-#define  DAC_DHR12LD_DACC2DHR                ((uint32_t)0xFFF00000)        /*!< DAC channel2 12-bit Left aligned data */
 
 /******************  Bit definition for DAC_DHR8RD register  ******************/
 #define  DAC_DHR8RD_DACC1DHR                 ((uint32_t)0x000000FF)        /*!< DAC channel1 8-bit Right aligned data */
-#define  DAC_DHR8RD_DACC2DHR                 ((uint32_t)0x0000FF00)        /*!< DAC channel2 8-bit Right aligned data */
 
 /*******************  Bit definition for DAC_DOR1 register  *******************/
 #define  DAC_DOR1_DACC1DOR                   ((uint32_t)0x00000FFF)        /*!< DAC channel1 data output */
 
-/*******************  Bit definition for DAC_DOR2 register  *******************/
-#define  DAC_DOR2_DACC2DOR                   ((uint32_t)0x00000FFF)        /*!< DAC channel2 data output */
-
 /********************  Bit definition for DAC_SR register  ********************/
 #define  DAC_SR_DMAUDR1                      ((uint32_t)0x00002000)        /*!< DAC channel1 DMA underrun flag */
-#define  DAC_SR_DMAUDR2                      ((uint32_t)0x20000000)        /*!< DAC channel2 DMA underrun flag */
 
 /******************************************************************************/
 /*                                                                            */
@@ -5574,13 +5536,6 @@ typedef struct
 #define TIM1_OR_ETR_RMP_2                    ((uint32_t)0x00000004)            /*!<Bit 2 */
 #define TIM1_OR_ETR_RMP_3                    ((uint32_t)0x00000008)            /*!<Bit 3 */
 
-/*******************  Bit definition for TIM8_OR register  *********************/
-#define TIM8_OR_ETR_RMP                      ((uint32_t)0x0000000F)            /*!<ETR_RMP[3:0] bits (TIM8 ETR remap) */
-#define TIM8_OR_ETR_RMP_0                    ((uint32_t)0x00000001)            /*!<Bit 0 */
-#define TIM8_OR_ETR_RMP_1                    ((uint32_t)0x00000002)            /*!<Bit 1 */
-#define TIM8_OR_ETR_RMP_2                    ((uint32_t)0x00000004)            /*!<Bit 2 */
-#define TIM8_OR_ETR_RMP_3                    ((uint32_t)0x00000008)            /*!<Bit 3 */
-
 /******************  Bit definition for TIM_CCMR3 register  *******************/
 #define  TIM_CCMR3_OC5FE                     ((uint32_t)0x00000004)            /*!<Output Compare 5 Fast enable */
 #define  TIM_CCMR3_OC5PE                     ((uint32_t)0x00000008)            /*!<Output Compare 5 Preload enable */
@@ -6159,8 +6114,7 @@ typedef struct
 
 #define IS_DAC_CHANNEL_INSTANCE(INSTANCE, CHANNEL) \
      (((INSTANCE) == DAC1) &&                   \
-     (((CHANNEL) == DAC_CHANNEL_1) ||          \
-      ((CHANNEL) == DAC_CHANNEL_2)))
+     ((CHANNEL) == DAC_CHANNEL_1))
 
 /****************************** DMA Instances *********************************/
 #define IS_DMA_ALL_INSTANCE(INSTANCE) (((INSTANCE) == DMA1_Channel1) || \

@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    stm32f328xx.h
   * @author  MCD Application Team
-  * @version V2.0.1
-  * @date    18-June-2014
+  * @version V1.1.0
+  * @date    12-Sept-2014
   * @brief   CMSIS STM32F328xx Devices Peripheral Access Layer Header File.
   *
   *          This file contains:
