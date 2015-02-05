@@ -144,6 +144,16 @@ xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::error(Error error)
 {
 	DEBUG_SW_I2C('E');
 	DEBUG_SW_I2C('0' + static_cast<uint8_t>(error));
+	delay2();
+	SCL::reset();
+	SDA::reset();
+	delay2();
+	// attempt a stop condition, if it fails there is nothing else we can do
+	if (!stopCondition()) {
+		errorState = error;
+		return;
+	}
+
 	// release both lines
 	SCL::set();
 	SDA::set();
@@ -204,7 +214,9 @@ xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::stopCondition()
 	if (!sclSetAndWait())
 	{
 		// could not release clock line
-		error(Error::BusCondition);
+		errorState = Error::BusCondition;
+		if (transactionObject) transactionObject->detaching(DetachCause::ErrorCondition);
+		transactionObject = nullptr;
 		return false;
 	}
 	delay2();
@@ -215,7 +227,9 @@ xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::stopCondition()
 	if (SDA::read() == xpcc::Gpio::Low)
 	{
 		// could not release data line
-		error(Error::BusCondition);
+		errorState = Error::BusCondition;
+		if (transactionObject) transactionObject->detaching(DetachCause::ErrorCondition);
+		transactionObject = nullptr;
 		return false;
 	}
 	return true;
