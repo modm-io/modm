@@ -40,6 +40,7 @@ public:
 		DataNack,			///< Data was transmitted and NACK received
 		ArbitrationLost,	///< Arbitration was lost during writing or reading
 		BusCondition,		///< Misplaced Start or Stop condition
+		BusBusy,			///< Bus is busy during Start condition
 		Unknown				///< Unknown error condition
 	};
 
@@ -57,6 +58,10 @@ public:
 public:
 	/**
 	 * Initializes the hardware and sets the datarate.
+	 *
+	 * It is strongly recommended to reset the slave devices on the bus
+	 * after a master reset.
+	 * This is usually done in the Gpio Scl connect method.
 	 *
 	 * @tparam	clockSource
 	 * 		the currently active system clock

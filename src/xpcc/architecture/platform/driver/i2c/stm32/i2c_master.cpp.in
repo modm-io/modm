@@ -153,21 +153,13 @@
 #	define DEBUG(x)
 #endif
 
-/*
- * It is mildly recommended to wait for the STOP operation to finish, before
- * reading the shift register, however since no interrupt is generated after a
- * STOP condition, the only solution is to busy wait until the STOP bit is
- * cleared by hardware.
- * Busy waiting in this interrupt is potentially dangerous and can make program
- * behavior unpredictable and debugging very cumbersome.
- * Therefore, this is disabled by default, you _can_ reenable it with this define.
- */
-#define WAIT_FOR_STOP_LOW 0
-
 #include "i2c_master_{{ id }}.hpp"
 #include <xpcc/architecture/driver/accessor.hpp>
 #include <xpcc/architecture/driver/atomic.hpp>
 #include <xpcc/container.hpp>
+
+extern "C" void
+I2C{{ id }}_ER_IRQHandler(void);
 
 namespace
 {
@@ -209,21 +201,45 @@ namespace
 	static inline void
 	callStarting()
 	{
-		error = xpcc::I2cMaster::Error::NoError;
+		uint_fast32_t deadlockPreventer = 100000;
+		while ((I2C{{ id }}->CR1 & I2C_CR1_STOP) and (deadlockPreventer-- > 0))
+			;
+
+		// If the bus is busy during a starting condition, we generate an error and detach the transaction
+		// Before a restart condition the clock line is pulled low, and this check would trigger falsely.
+		if ((I2C{{ id }}->SR2 & I2C_SR2_BUSY) and (nextOperation != xpcc::I2c::Operation::Restart))
+		{
+			// we wait a short amount of time for the bus to become free.
+			deadlockPreventer = 10000;
+			while ((I2C{{ id }}->SR2 & I2C_SR2_BUSY) and (deadlockPreventer-- > 0))
+				;
+
+			if (I2C{{ id }}->SR2 & I2C_SR2_BUSY)
+			{
+				// either SDA or SCL is low, which leads to irrecoverable deadlock.
+				// Call error handler manually to detach the transaction object and resolve the deadlock.
+				// Further transactions may not succeed either, but will not lead to a deadlock.
+				error = xpcc::I2cMaster::Error::BusBusy;
+				I2C{{ id }}_ER_IRQHandler();
+				return;
+			}
+		}
+
 		DEBUG_STREAM("callStarting");
+		checkNextOperation = CHECK_NEXT_OPERATION_NO;
+		error = xpcc::I2cMaster::Error::NoError;
 
 		I2C{{ id }}->CR1 &= ~I2C_CR1_POS;
 		I2C{{ id }}->SR1 = 0;
 		I2C{{ id }}->SR2 = 0;
 
-		// generate startcondition
-		I2C{{ id }}->CR1 |= I2C_CR1_START;
-		checkNextOperation = CHECK_NEXT_OPERATION_NO;
-
 		// and enable interrupts
 		DEBUG_STREAM("enable interrupts");
 		I2C{{ id }}->CR2 &= ~I2C_CR2_ITBUFEN;
 		I2C{{ id }}->CR2 |= I2C_CR2_ITEVTEN | I2C_CR2_ITERREN;
+
+		// generate startcondition
+		I2C{{ id }}->CR1 |= I2C_CR1_START;
 	}
 
 	static inline void
@@ -232,7 +248,7 @@ namespace
 		if (!queue.isEmpty())
 		{
 			// wait until the stop condition has been generated
-			uint_fast32_t deadlockPreventer = 50000;
+			uint_fast32_t deadlockPreventer = 100000;
 			while (I2C{{ id }}->CR1 & I2C_CR1_STOP && deadlockPreventer-- > 0)
 				;
 
@@ -343,11 +359,10 @@ I2C{{ id }}_EV_IRQHandler(void)
 			DEBUG_STREAM("STOP");
 			I2C{{ id }}->CR1 |= I2C_CR1_STOP;
 
-#if WAIT_FOR_STOP_LOW
 			DEBUG_STREAM("waiting for stop");
-			while (I2C{{ id }}->CR1 & I2C_CR1_STOP)
+			uint_fast32_t deadlockPreventer = 100000;
+			while (I2C{{ id }}->CR1 & I2C_CR1_STOP && deadlockPreventer-- > 0)
 				;
-#endif
 
 			uint16_t dr = I2C{{ id }}->DR;
 			*reading.buffer++ = dr & 0xff;
@@ -420,11 +435,10 @@ I2C{{ id }}_EV_IRQHandler(void)
 			uint16_t dr = I2C{{ id }}->DR;
 			*reading.buffer++ = dr & 0xff;
 
-#if WAIT_FOR_STOP_LOW
 			DEBUG_STREAM("waiting for stop");
-			while (I2C{{ id }}->CR1 & I2C_CR1_STOP)
+			uint_fast32_t deadlockPreventer = 100000;
+			while (I2C{{ id }}->CR1 & I2C_CR1_STOP && deadlockPreventer-- > 0)
 				;
-#endif
 
 			DEBUG_STREAM("reading data2");
 			dr = I2C{{ id }}->DR;
@@ -523,7 +537,7 @@ I2C{{ id }}_ER_IRQHandler(void)
 		DEBUG_STREAM("ARBITRATION LOST");
 		error = xpcc::I2cMaster::Error::ArbitrationLost;
 	}
-	else
+	else if (error == xpcc::I2cMaster::Error::NoError)
 	{
 		DEBUG_STREAM("UNKNOWN");
 		error = xpcc::I2cMaster::Error::Unknown;
@@ -560,7 +574,9 @@ xpcc::stm32::I2cMaster{{ id }}::initializeWithPrescaler(uint8_t peripheralFreque
 	I2C{{ id }}->CR1 = I2C_CR1_SWRST; 		// reset module
 	I2C{{ id }}->CR1 = 0;
 
+	NVIC_SetPriority(I2C{{ id }}_ER_IRQn, 10);
 	NVIC_EnableIRQ(I2C{{ id }}_ER_IRQn);
+	NVIC_SetPriority(I2C{{ id }}_EV_IRQn, 11);
 	NVIC_EnableIRQ(I2C{{ id }}_EV_IRQn);
 
 	I2C{{ id }}->CR2 = peripheralFrequency;

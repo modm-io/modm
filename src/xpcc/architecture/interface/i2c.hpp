@@ -11,6 +11,7 @@
 #define XPCC_INTERFACE_I2C_HPP
 
 #include <xpcc/architecture/interface.hpp>
+#include <xpcc/architecture/driver/delay.hpp>
 
 /**
  * @ingroup		interface
@@ -88,6 +89,41 @@ struct I2c
 		Busy,	///< The adapter is busy with data transfer
 		Error	///< An error occurred, check the masters `getErrorCode()`
 	};
+
+	/**
+	 * Reset all slave devices connected to an I2C bus.
+	 *
+	 * During normal operation, I2C slave device may pull the SDA line low.
+	 * However, if the master is resetted during a transaction, the I2C clock
+	 * may stop while the slave is outputting a low data bit and the slave will
+	 * continue to hold this bit (forever, and ever and ever).
+	 * The I2C master is then unable to generate a I2C start condition, since SDA
+	 * is still held low by the slave device, resulting in a deadlock.
+	 *
+	 * "You can always get it back to standby mode by allowing the SDA line to
+	 * float high and give it 9 clocks.
+	 * This assures that the device will not receive the acknowledge bit at
+	 * the end the current byte and will abort the command and go to standby."
+	 *
+	 * @see	Application Note AN572 by Microchip
+	 * @warning	Must be called **before** connecting SDA and SCL to I2cMaster!
+	 * @warning	The clock frequency is hardcoded to 50kHz, so this function blocks for 180µs.
+	 *
+	 * @tparam	Scl		The clock pin of the bus to be reset.
+ 	 */
+	template< class Scl >
+	static void
+	resetDevices()
+	{
+		Scl::setInput();
+
+		for (uint_fast8_t ii = 0; ii < 9; ++ii) {
+			Scl::setOutput(xpcc::Gpio::Low);
+			xpcc::delayMicroseconds(10);
+			Scl::setInput();
+			xpcc::delayMicroseconds(10);
+		}
+	}
 };
 
 }	// namespace xpcc
