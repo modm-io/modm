@@ -551,7 +551,9 @@ xpcc::stm32::I2cMaster{{ id }}::initializeWithPrescaler(uint8_t peripheralFreque
 	I2C{{ id }}->CR1 = I2C_CR1_SWRST; 		// reset module
 	I2C{{ id }}->CR1 = 0;
 
+	NVIC_SetPriority(I2C{{ id }}_ER_IRQn, 10);
 	NVIC_EnableIRQ(I2C{{ id }}_ER_IRQn);
+	NVIC_SetPriority(I2C{{ id }}_EV_IRQn, 11);
 	NVIC_EnableIRQ(I2C{{ id }}_EV_IRQn);
 
 	I2C{{ id }}->CR2 = peripheralFrequency;
