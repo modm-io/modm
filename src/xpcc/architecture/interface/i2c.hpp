@@ -106,21 +106,23 @@ struct I2c
 	 * the end the current byte and will abort the command and go to standby."
 	 *
 	 * @see	Application Note AN572 by Microchip
-	 * @warning	Must be called **after** connecting SDA and SCL to I2cMaster!
+	 * @warning	Must be called **before** connecting SDA and SCL to I2cMaster!
 	 * @warning	The clock frequency is hardcoded to 50kHz, so this function blocks for 180µs.
 	 *
-	 * @tparam	Scl		The I2C clock pin of the bus to be reset.
+	 * @tparam	Scl		The clock pin of the bus to be reset.
  	 */
 	template< class Scl >
-	void
+	static void
 	resetDevices()
 	{
-		Scl::reset();
-		for (uint_fast8_t ii = 0; ii < 9*2; ++ii) {
-			Scl::toggle();
+		Scl::setInput();
+
+		for (uint_fast8_t ii = 0; ii < 9; ++ii) {
+			Scl::setOutput(xpcc::Gpio::Low);
+			xpcc::delayMicroseconds(10);
+			Scl::setInput();
 			xpcc::delayMicroseconds(10);
 		}
-		Scl::set();
 	}
 };
 

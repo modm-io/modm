@@ -60,7 +60,7 @@ public:
 	 *
 	 * It is strongly recommended to reset the slave devices on the bus
 	 * after a master reset.
-	 * @see xpcc::I2c::resetDevices< Scl >
+	 * This is usually done in the Gpio Scl connect method.
 	 *
 	 * @tparam	clockSource
 	 * 		the currently active system clock
