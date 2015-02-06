@@ -57,7 +57,7 @@ public:
 public:
 	// start documentation inherited
 	static bool
-	start(I2cTransaction *transaction, Configuration_t configuration = nullptr);
+	start(I2cTransaction *transaction, ConfigurationHandler configuration = nullptr);
 
 	static Error ALWAYS_INLINE
 	getErrorState()

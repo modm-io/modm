@@ -229,7 +229,7 @@ xpcc::{{target.family}}::I2cMaster::getErrorState()
 }
 
 bool
-xpcc::{{target.family}}::I2cMaster::start(I2cTransaction *transaction, Configuration_t configuration)
+xpcc::{{target.family}}::I2cMaster::start(I2cTransaction *transaction, ConfigurationHandler configuration)
 {
 	if (!xpcc::accessor::asVolatile(::transaction) && transaction)
 	{
