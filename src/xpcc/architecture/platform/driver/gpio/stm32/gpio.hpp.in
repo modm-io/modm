@@ -140,21 +140,21 @@ protected:
 
 // Gpio Classes created from the XML Device File Gpio Description
 %% for gpio in gpios
-	%% set reg  = "GPIO" ~ gpio.port|upper
+	%% set port = gpio.port | upper
+	%% set reg  = "GPIO" ~ port
 	%% set pin  = gpio.id
 
 	%% for type in ["Output", "Input", ""]
-		%% set name = "Gpio" ~ type ~ gpio.port|upper ~ gpio.id
+		%% set name = "Gpio" ~ type ~ port ~ gpio.id
 		%% set superclass = "Gpio" ~ (type if type != "" else "IO")
 
-/// {{type if type != "" else "IO"}} class for Pin {{gpio.port|upper ~ pin}}
-/// {{gpio.port|upper}}{{gpio.id}} {{type}}
+/// {{type if type != "" else "IO"}} class for Pin {{port ~ pin}}
 /// @ingroup	stm32
 struct {{name}} : public Gpio, ::xpcc::{{superclass}}
 {
 public:
 	/// Port name.
-	static constexpr Port port = Port::{{gpio.port|upper}};
+	static constexpr Port port = Port::{{port}};
 	/// Pin Number.
 	static constexpr uint8_t pin = {{pin}};
 	/// Bitmask for registers that contain a 1bit value for every pin.
@@ -346,9 +346,9 @@ public:
 		%% endif
 	// connect: Hardware Gpio
 		%% for af in gpio.afs
-			%% set use = not (	(af.type == "in"  and type == "Output") or
+			%% set use = not (	(af.type == "in"     and type == "Output") or
 								(af.type == "analog" and type == "Output") or
-								(af.type == "out" and type == "Input" ))
+								(af.type == "out"    and type == "Input" ))
 			%% if use
 				%% if af.name not in ['Scl', 'Sda']
 	/// Connect {{name}} as {{af.name}} to {{af.peripheral}}.
@@ -382,7 +382,7 @@ public:
 		setAlternateFunction(AlternateFunction::AF_{{ af.id }});
 	}
 				%% endif
-				%% if af.type|string in ['', 'in'] and type != "" and af.name not in ['Scl', 'Sda']
+				%% if af.type|string in ['', 'in'] and type != "Output" and af.name not in ['Scl', 'Sda']
 	/// Connect {{name}} as {{af.name}} to {{af.peripheral}}.
 	ALWAYS_INLINE static void
 	connect(TypeId::{{ af.peripheral }}{{ af.name }} /* t */, InputType type) {
