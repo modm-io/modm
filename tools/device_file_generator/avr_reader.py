@@ -174,9 +174,8 @@ class AVRDeviceReader(XMLDeviceReader):
 				if "PORT" in name:
 					module = self.createModule(name)
 					gpios.extend(self._gpioFromModule(module))
-					continue
 
-				if any(name.startswith(per) for per in ["EXTERNAL_INT", "TWI", "USART", "SPI", "AD_CON", "USB", "CAN", "DA_CON", "TIMER"]):
+				if any(name.startswith(per) for per in ["EXTERNAL_INT", "TWI", "USART", "SPI", "AD_CON", "USB", "CAN", "DA_CON", "TIMER", "PORT"]):
 					modules.append(name)
 					module = self.createModule(name)
 					peripherals.append(module)
