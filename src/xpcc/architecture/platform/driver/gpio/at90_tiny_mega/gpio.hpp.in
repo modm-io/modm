@@ -114,7 +114,7 @@ public:
 	ALWAYS_INLINE static void
 	connect(::xpcc::TypeId::SoftwareI2cMasterScl) {
 		set();
-		xpcc::I2c::resetDevices< {{name}} >();
+		xpcc::I2c::resetDevices< Pin >();
 		set();
 	}
 };
