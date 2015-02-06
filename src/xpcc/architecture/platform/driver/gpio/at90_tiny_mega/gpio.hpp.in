@@ -15,6 +15,7 @@
 #include "../../../type_ids.hpp"
 #include "gpio_define.h"
 #include <xpcc/architecture/interface/gpio.hpp>
+#include <xpcc/architecture/interface/i2c.hpp>
 
 
 namespace xpcc
@@ -112,6 +113,8 @@ public:
 	}
 	ALWAYS_INLINE static void
 	connect(::xpcc::TypeId::SoftwareI2cMasterScl) {
+		set();
+		xpcc::I2c::resetDevices< {{name}} >();
 		set();
 	}
 };
@@ -327,6 +330,9 @@ public:
 				%% elif af.type == "in"
 		setInput();
 				%% endif
+				%% if af.name == "Scl" and type == ''
+		xpcc::I2c::resetDevices< {{name}} >();
+				%% endif
 	}
 			%% endif
 		%% endfor
@@ -350,11 +356,6 @@ public:
 	}
 			%% endfor
 		%% endif
-		%% for peripheral in []
-	/// Connect to `{{peripheral}}`.
-	ALWAYS_INLINE static void
-	connect(::xpcc::TypeId::{{ peripheral }}) {}
-		%% endfor
 };
 
 	%% endfor
