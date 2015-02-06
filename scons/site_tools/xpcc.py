@@ -402,7 +402,7 @@ def generate(env, **kw):
 	env['CPPPATH'] = []
 
 	# architecture specific settings and tools
-	if env['ARCHITECTURE'] == 'avr8':
+	if env['ARCHITECTURE'] in ['avr8', 'avr8l']:
 		env['AVR_DEVICE'] = device
 		env['AVR_CLOCK'] = clock
 		env['LIBS'] = ['']
