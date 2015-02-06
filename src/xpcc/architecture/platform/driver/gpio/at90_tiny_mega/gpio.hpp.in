@@ -17,20 +17,16 @@
 #include <xpcc/architecture/interface/gpio.hpp>
 #include <xpcc/architecture/interface/i2c.hpp>
 
-
 namespace xpcc
 {
 
 namespace {{target.family}}
 {
 
+/// @ingroup	{{target.family}}
 struct Gpio
 {
-	/**
-	 * Each Input Pin can be configured in one of these states.
-	 *
-	 * @ingroup	{{target.family}}
-	 */
+	/// Each Input Pin can be configured in one of these states.
 	enum class
 	InputType : uint8_t
 	{
@@ -39,16 +35,16 @@ struct Gpio
 	};
 
 	/// Each External Interrupt can be configured to trigger on these conditions.
-	/// @ingroup	{{target.family}}
 	enum class
 	InputTrigger : uint8_t
 	{
-		LowLevel = 0b00,	///< triggers **continously** during low level
+		LowLevel = 0b00,	///< triggers **continuously** during low level
 		BothEdges = 0b01,	///< triggers on both rising and falling edge
 		FallingEdge = 0b10,	///< triggers on falling edge
 		RisingEdge = 0b11,	///< triggers on rising edge
 	};
 
+	/// Available ports on this device.
 	enum class
 	Port
 	{
@@ -58,18 +54,17 @@ struct Gpio
 	};
 
 protected:
-	/// @private
-	/// @{
+	/// @cond
 	static constexpr uint8_t
 	i(InputType config) { return static_cast<uint8_t>(config); }
 	static constexpr uint8_t
 	i(InputTrigger trigger) { return static_cast<uint8_t>(trigger); }
-	/// @}
+	/// @endcond
 };
 
 /**
  * Gpio OpenDrain template, which remaps the behavior of the Gpio pin to
- * simulate an open-drain Output (with internal pullups if needed).
+ * simulate an open-drain output (with internal pullups if needed).
  * You must use this class for `SoftwareI2cMaster`!
  *
  * @see ::xpcc::SoftwareI2cMaster
@@ -139,12 +134,10 @@ public:
 	static constexpr uint8_t mask = (1 << pin);	///< the mask of this GPIO
 
 		%% if type in ["", "Output"]
-	// GpioOutput
 	ALWAYS_INLINE static void setOutput(bool status) {
 		setOutput();
 		set(status);
 	}
-	// start documentation inherited
 	ALWAYS_INLINE static void setOutput() {
 		DDR{{port}} |= mask;
 	}
@@ -165,10 +158,8 @@ public:
 		PIN{{port}} = mask;
 			%% endif
 	}
-	// end documentation inherited
 		%% endif
 		%% if type in ["", "Input"]
-	// GpioInput
 	ALWAYS_INLINE static void configure(InputType type) {
 		if (type == InputType::PullUp) {
 			PORT{{port}} |= mask;
@@ -182,14 +173,12 @@ public:
 		setInput();
 		configure(type);
 	}
-	// start documentation inherited
 	ALWAYS_INLINE static void setInput() {
 		DDR{{port}} &= ~mask;
 	}
 	ALWAYS_INLINE static bool read() {
 		return (PIN{{port}} & mask);
 	}
-	// end documentation inherited
 			%% if 'extint' in gpio
 				%% set af_id = gpio.extint | int
 				%% if eicra is not defined
@@ -250,7 +239,6 @@ public:
 	}
 			%% endif
 		%% endif
-	// connect: Hardware Gpio
 		%% for af in gpio.afs
 			%% if (	(af.type == 'in' and type == 'Input') or
 					(af.type == 'out' and type == 'Output') or
@@ -272,7 +260,6 @@ public:
 	}
 			%% endif
 		%% endfor
-	// connect: Software Gpio
 		%% if type in ['', 'Output']
 			%% for peripheral in   ['SoftwareSpiMasterMosi',
 									'SoftwareSpiMasterSck']
@@ -298,9 +285,10 @@ public:
 %% endfor
 
 %# Ports
-/// @private
+/// @cond
 template< Gpio::Port Port, uint8_t StartPin, uint8_t Width>
 class GpioPortBase;
+/// @endcond
 
 /**
  * Creates a hardware port with StartPin as LSB and with Width.
@@ -309,13 +297,12 @@ class GpioPortBase;
  * @tparam	Width		required width of the port (up to 8)
  * @ingroup {{target.family}}
  */
-template< typename StartPin, uint8_t Width >
-class GpioPort : public ::xpcc::GpioPort, public GpioPortBase< StartPin::port, StartPin::pin, Width>
+template< class StartPin, uint8_t Width >
+class GpioPort : public ::xpcc::GpioPort, /** @cond */ public GpioPortBase< StartPin::port, StartPin::pin, Width> /** @endcond */
 {};
 
-
+/// @cond
 %% for port in gpios | getPorts
-/// @private
 template< uint8_t StartPin, uint8_t Width >
 class GpioPortBase<Gpio::Port::{{port.name}}, StartPin, Width> : public Gpio
 {
@@ -388,11 +375,10 @@ public:
 	%% endif
 
 %% endfor
-
+/// @endcond
 
 }	// namespace {{target.family}}
 
 }	// namespace xpcc
-
 
 #endif
