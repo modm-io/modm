@@ -139,6 +139,9 @@ public:
 		set(status);
 	}
 	ALWAYS_INLINE static void setOutput() {
+			%% if pue is defined
+		PUE{{port}} &= ~mask;
+			%% else
 		DDR{{port}} |= mask;
 	}
 	ALWAYS_INLINE static void set() {
@@ -162,10 +165,18 @@ public:
 		%% if type in ["", "Input"]
 	ALWAYS_INLINE static void configure(InputType type) {
 		if (type == InputType::PullUp) {
+			%% if pue is defined
+			PUE{{port}} |= mask;
+			%% else
 			PORT{{port}} |= mask;
+			%% endif
 		}
 		else {
+			%% if pue is defined
+			PUE{{port}} &= ~mask;
+			%% else
 			PORT{{port}} &= ~mask;
+			%% endif
 		}
 	}
 	ALWAYS_INLINE static void

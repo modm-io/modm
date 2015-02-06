@@ -8,6 +8,8 @@
 		<notoggle device-family="atmega" device-name="8|16|32|64|128|162|8515|8535">True</notoggle>
 		<notoggle device-family="attiny" device-name="26">True</notoggle>
 
+		<pue device-family="attiny" device-name="4|5|9|10|20|40|828|1634">True</pue>
+
 		<eicra device-family="atmega" device-name="8|16|32|162|8515|8535">MCUCR</eicra>
 		<eicra device-family="attiny" device-name="13|24|25|44|45|84|85|261|461|861">MCUCR</eicra>
 		<isc2 device-family="atmega" device-name="8|16|32|8515|8535">MCUCSR</isc2>
