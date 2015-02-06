@@ -21,16 +21,16 @@ namespace xpcc
 /**
  * Software emulation of a I2C master implementation
  *
- * @tparam	SCL			an Open-Drain Output pin
- * @tparam	SDA			an Open-Drain Output pin
+ * @tparam	SCL			an Open-Drain pin
+ * @tparam	SDA			an Open-Drain pin
  * @tparam	Baudrate	in Hz (default frequency is 100kHz)
  *
  * @ingroup	i2c
  * @author	Niklas Hauser
  * @see		gpio
  */
-template< typename SCL,
-		  typename SDA,
+template< class SCL,
+		  class SDA,
 		  uint32_t BaudRate = xpcc::I2cMaster::Baudrate::Standard >
 class SoftwareI2cMaster : public xpcc::I2cMaster
 {
