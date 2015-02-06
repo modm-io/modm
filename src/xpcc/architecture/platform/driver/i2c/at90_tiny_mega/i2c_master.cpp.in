@@ -27,6 +27,7 @@ namespace
 	// delegating
 	static xpcc::I2cTransaction *transaction(nullptr);
 	static xpcc::I2cMaster::Error errorState(xpcc::I2cMaster::Error::NoError);
+	static uint8_t configTag(0);
 
 	// buffer management
 	static xpcc::I2cTransaction::Starting starting(0, xpcc::I2c::OperationAfterStart::Stop);
@@ -235,7 +236,7 @@ xpcc::{{target.family}}::I2cMaster::start(I2cTransaction *transaction, Configura
 	{
 		if (transaction->attaching())
 		{
-			if (configuration) configuration();
+			if (configuration) configuration(configTag);
 
 			::transaction = transaction;
 			errorState = Error::NoError;

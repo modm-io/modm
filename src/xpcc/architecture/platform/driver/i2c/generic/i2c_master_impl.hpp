@@ -25,6 +25,8 @@ template <typename SCL, typename SDA, uint32_t BaudRate>
 xpcc::I2cTransaction *xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::transactionObject(nullptr);
 template <typename SCL, typename SDA, uint32_t BaudRate>
 xpcc::I2cMaster::Error xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::errorState(xpcc::I2cMaster::Error::NoError);
+template <typename SCL, typename SDA, uint32_t BaudRate>
+uint8_t xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::configTag(0);
 
 template <typename SCL, typename SDA, uint32_t BaudRate>
 xpcc::I2cTransaction::Starting xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::starting(0, xpcc::I2c::OperationAfterStart::Stop);
@@ -49,7 +51,7 @@ xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::start(xpcc::I2cTransaction *transac
 			// reset error state
 			errorState = Error::NoError;
 			// call the configuration function
-			if (configuration) configuration();
+			if (configuration) configuration(configTag);
 			// save the transaction object
 			transactionObject = transaction;
 
