@@ -26,6 +26,7 @@ class Hmc5883;
 struct hmc58x3
 {
 protected:
+	/// @cond
 	/// The addresses of the Configuration and Data Registers
 	enum class
 	Register : uint8_t
@@ -44,6 +45,7 @@ protected:
 		IdB = 0x11,
 		IdC = 0x12,
 	};
+	/// @endcond
 
 public:
 	/// Configuration Register A
@@ -214,11 +216,14 @@ public:
 
 
 protected:
+	/// @cond
 	xpcc::co::Result<bool>
 	configureRaw(uint8_t rate, uint8_t gain, const uint8_t* gainValues, uint8_t average=0);
 
 	xpcc::co::Result<bool>
 	setGainRaw(uint8_t gain, const uint8_t* gainValues);
+	/// @endcond
+
 
 protected:
 	// MARK: Control Registers
@@ -255,6 +260,7 @@ public:
 	Data &data;
 
 protected:
+	/// @cond
 	/// write a 8bit value a register
 	xpcc::co::Result<bool> ALWAYS_INLINE
 	write(Register reg, uint8_t &value)
@@ -276,6 +282,7 @@ protected:
 private:
 	xpcc::co::Result<bool>
 	updateRegister(uint8_t index, uint8_t setMask, uint8_t clearMask = 0xff);
+	/// @endcond
 
 private:
 	enum I2cTask : uint8_t
@@ -294,6 +301,7 @@ private:
 	xpcc::I2cTagAdapter<xpcc::I2cWriteReadAdapter> adapter;
 
 protected:
+	/// @cond
 	// the read buffer is for a continous read from address 0x00 -> 0x09
 	// 0: config A
 	// 1: config B
@@ -306,6 +314,7 @@ protected:
 	// 8: out z high
 	// 9: status
 	uint8_t rawBuffer[10];
+	/// @endcond
 };
 
 }
