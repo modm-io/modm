@@ -21,7 +21,7 @@ xpcc::Lis302dl<Transport>::Lis302dl(Data &data, uint8_t address)
 
 template < class Transport >
 xpcc::co::Result<bool>
-xpcc::Lis302dl<Transport>::initialize(Scale scale, MeasurementRate rate)
+xpcc::Lis302dl<Transport>::configure(Scale scale, MeasurementRate rate)
 {
 	return updateControlRegister(r(scale) | r(rate) | Control1_t(0x47));
 }

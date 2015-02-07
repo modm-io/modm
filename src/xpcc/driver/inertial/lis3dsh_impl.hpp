@@ -23,7 +23,7 @@ xpcc::Lis3dsh<Transport>::Lis3dsh(Data &data, uint8_t address)
 
 template < class Transport >
 xpcc::co::Result<bool>
-xpcc::Lis3dsh<Transport>::initialize(Scale scale, MeasurementRate rate)
+xpcc::Lis3dsh<Transport>::configure(Scale scale, MeasurementRate rate)
 {
 	CO_BEGIN();
 

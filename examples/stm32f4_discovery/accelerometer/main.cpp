@@ -75,7 +75,7 @@ public:
 		}
 
 		// initialize with limited range of ~2.3G
-		PT_CALL(accel.initialize(accel.Scale::G2, accel.MeasurementRate::Hz400));
+		PT_CALL(accel.configure(accel.Scale::G2, accel.MeasurementRate::Hz400));
 
 		while (true)
 		{
