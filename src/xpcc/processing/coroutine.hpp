@@ -39,7 +39,7 @@
  *
  * typedef GpioOutputB0 Led;
  *
- * class BlinkingLight : public xpcc::pt::Protothread, private xpcc::pt::NestedCoroutine<1>
+ * class BlinkingLight : public xpcc::pt::Protothread, private xpcc::co::NestedCoroutine<2>
  * {
  * public:
  *     bool

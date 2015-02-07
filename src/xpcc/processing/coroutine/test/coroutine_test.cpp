@@ -11,7 +11,7 @@
 #include "coroutine_test.hpp"
 
 // ----------------------------------------------------------------------------
-class TestingEmptyThread0 : public xpcc::co::NestedCoroutine<0>
+class TestingEmptyThread0 : public xpcc::co::NestedCoroutine<1>
 {
 public:
 	TestingEmptyThread0()
@@ -48,7 +48,7 @@ public:
 	int8_t depth;
 };
 
-class TestingEmptyThread1 : public xpcc::co::NestedCoroutine<1>
+class TestingEmptyThread1 : public xpcc::co::NestedCoroutine<2>
 {
 public:
 	TestingEmptyThread1()
@@ -85,7 +85,7 @@ public:
 	int8_t depth;
 };
 
-class TestingEmptyThread2 : public xpcc::co::NestedCoroutine<2>
+class TestingEmptyThread2 : public xpcc::co::NestedCoroutine<3>
 {
 public:
 	TestingEmptyThread2()
@@ -240,7 +240,7 @@ CoroutineTest::testClassMethods()
 
 
 // ----------------------------------------------------------------------------
-class TestingNestedThread : public xpcc::co::NestedCoroutine<2>
+class TestingNestedThread : public xpcc::co::NestedCoroutine<3>
 {
 public:
 	TestingNestedThread()
@@ -448,7 +448,7 @@ CoroutineTest::testNesting()
 
 uint8_t waits = 3;
 
-class TestingSpawningThread : public xpcc::co::NestedCoroutine<1>
+class TestingSpawningThread : public xpcc::co::NestedCoroutine<2>
 {
 public:
 	TestingSpawningThread()
@@ -571,7 +571,7 @@ CoroutineTest::testSpawn()
 
 #include <xpcc/math/filter/moving_average.hpp>
 
-class TestingSpawningComplexThread : public xpcc::co::NestedCoroutine<1>
+class TestingSpawningComplexThread : public xpcc::co::NestedCoroutine<2>
 {
 public:
 	TestingSpawningComplexThread()

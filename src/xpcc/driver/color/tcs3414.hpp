@@ -150,7 +150,7 @@ struct tcs3414
  */
 template < typename I2cMaster >
 class Tcs3414 : public tcs3414, public xpcc::I2cDevice<I2cMaster>,
-				public xpcc::co::NestedCoroutine<1>
+				public xpcc::co::NestedCoroutine<2>
 {
 public:
 	Tcs3414(uint8_t address = 0x39);

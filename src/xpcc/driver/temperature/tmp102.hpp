@@ -165,7 +165,7 @@ public:
  */
 template < class I2cMaster >
 class Tmp102 :	public tmp102, public xpcc::I2cDevice< I2cMaster >,
-				protected xpcc::pt::Protothread, protected xpcc::co::NestedCoroutine<1>
+				protected xpcc::pt::Protothread, protected xpcc::co::NestedCoroutine<2>
 {
 public:
 	/// Constructor, requires a tmp102::Data object,
