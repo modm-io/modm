@@ -171,7 +171,7 @@ public:
 
 
 		inline int16_t
-		operator [](size_t index)
+		operator [](uint8_t index)
 		{ return (index < 10) ? swapData(index) : 0; }
 
 	private:
@@ -335,6 +335,7 @@ public:
 	{ return readPostData(Command::PostTiltData, 14, 6); }
 
 
+protected:
 	/// Use these methods with caution!
 	/// @{
 
