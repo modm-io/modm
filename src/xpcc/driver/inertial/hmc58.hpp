@@ -1,213 +1,315 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
 /* Copyright (c) 2011, Roboterclub Aachen e.V.
- * All rights reserved.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__HMC58_HPP
-#define XPCC__HMC58_HPP
+#ifndef XPCC_HMC58X3_HPP
+#define XPCC_HMC58X3_HPP
 
-#include <xpcc/architecture/interface/i2c_adapter.hpp>
+#include <xpcc/architecture/interface/i2c_device.hpp>
 
 namespace xpcc
 {
-	namespace hmc58
+
+// forward declaration for friending with hmc58x3::Data
+template < class I2cMaster >
+class Hmc58x3;
+template < class I2cMaster >
+class Hmc5843;
+template < class I2cMaster >
+class Hmc5883;
+
+struct hmc58x3
+{
+protected:
+	/// The addresses of the Configuration and Data Registers
+	enum class
+	Register : uint8_t
 	{
-		/// The addresses of the Configuration and Data Registers
-		enum Register
-		{
-			REGISTER_CONFIG_A,
-			REGISTER_CONFIG_B,
-			REGISTER_MODE,
-			REGISTER_DATA_X0,	//!< x-axis MSB
-			REGISTER_DATA_X1,	//!< x-axis LSB
-			REGISTER_DATA_Y0,	//!< y-axis MSB
-			REGISTER_DATA_Y1,	//!< y-axis LSB
-			REGISTER_DATA_Z0,	//!< z-axis MSB
-			REGISTER_DATA_Z1,	//!< z-axis LSB
-			REGISTER_STATUS,
-			REGISTER_ID_A,
-			REGISTER_ID_B,
-			REGISTER_ID_C
-		};
+		ConfigA = 0x00,
+		ConfigB = 0x01,
+		Mode = 0x02,
+		DataX_Lsb = 0x03,
+		DataX_Msb = 0x04,
+		DataY_Lsb = 0x05,
+		DataY_Msb = 0x06,
+		DataZ_Lsb = 0x07,
+		DataZ_Msb = 0x08,
+		Status = 0x09,
+		IdA = 0x10,
+		IdB = 0x11,
+		IdC = 0x12,
+	};
 
-		/// Averaging modes of REGISTER_CONFIG_A
-		enum MeasurementAverage {
-			MEASUREMENT_AVERAGE_gm = 0x60,
-			MEASUREMENT_AVERAGE_8 = 0x60,
-			MEASUREMENT_AVERAGE_4 = 0x20,
-			MEASUREMENT_AVERAGE_2 = 0x10,
-			MEASUREMENT_AVERAGE_1 = 0x00
-		};
-
-		enum _DataOutputRate {
-			DATA_OUTPUT_RATE_gm = 0x1c
-			// customize for each part
-		};
-
-		/// measurement mode option of REGISTER_CONFIG_A
-		enum MeasurementMode {
-			MEASUREMENT_MODE_NORMAL,
-			MEASUREMENT_MODE_POSITIVE,
-			MEASUREMENT_MODE_NEGATIVE,
-			MEASUREMENT_MODE_gm
-		};
-
-		// configuration register B
-		enum _Gain {
-			GAIN_gm = 0xe0
-			// customize for each part
-		};
-
-		/// operating mode options of REGISTER_MODE
-		enum OperationMode {
-			OPERATION_MODE_CONTINUOUS,
-			OPERATION_MODE_SINGLE,
-			OPERATION_MODE_IDLE,
-			OPERATION_MODE_SLEEP,
-			OPERATION_MODE_gm = 0x03
-		};
-
-		/// REGISTER_STATUS bit masks
-		enum Status {
-			STATUS_REGULATOR_ENABLED = 0x04,
-			STATUS_DATA_REGISTER_LOCK = 0x02,
-			STATUS_DATA_READY = 0x01
-		};
-
-		/// Content of the identification registers
-		enum Identification {
-			IDENTIFICATION_A = 'H',
-			IDENTIFICATION_B = '4',
-			IDENTIFICATION_C = '3'
-		};
-	}
-
-	/**
-	 * \brief	HMC58* 3-axis digital magnetometer family driver.
-	 *
-	 * The HMC58* is a surface-mount, multi-chip module designed for low-field
-	 * magnetic sensing with a digital interface for applications such as
-	 * low-cost compassing and magnetometry. The HMC58* includes high-resolution
-	 * magneto-resistive sensors plus an ASIC containing amplification,
-	 * automatic degaussing strap drivers, offset cancellation, and a 12-bit
-	 * ADC that enables 1-2 degrees compass heading accuracy.
-	 *
-	 * \ingroup driver_inertial
-	 * \author	Niklas Hauser
-	 *
-	 * \tparam I2cMaster Asynchronous Two Wire interface
-	 */
-	template < typename I2cMaster >
-	class Hmc58 : protected xpcc::I2cWriteReadAdapter
+public:
+	/// Configuration Register A
+	enum class
+	ConfigA : uint8_t
 	{
-	public:
-		/// \brief	Constructor, sets address to default of 0x1e
-		Hmc58(uint8_t* data, uint8_t address=0x1e);
+		MA1 = Bit6,				///< *HMC5883L only*
+		MA0 = Bit5,				///< *HMC5883L only*
+		MA_Mask = Bit6 | Bit5,	///< *HMC5883L only*
 
-		/**
-		 * Configures the sensor to normal measurement mode with default gain of
-		 * ~1Gs and 8 sample averaging in continous updates at the specified
-		 * data output rate.
-		 */
-		bool
-		configure(uint8_t dataOutputRate=0x10);
+		DO2 = Bit4,
+		DO1 = Bit3,
+		DO0 = Bit2,
+		DO_Mask = Bit4 | Bit3 | Bit2,
 
-		/**
-		 * read the X-ZDATA0-1 registers and buffer the results
-		 * sets isNewDataAvailable() to \c true
-		 */
-		ALWAYS_INLINE void
-		readMagnetometer();
+		MS1 = Bit1,
+		MS0 = Bit0,
+		MS_Mask = Bit1 | Bit0,
+	};
+	XPCC_FLAGS8(ConfigA);
 
-		/**
-		 * \return pointer to 8bit array containing xyz Gauss.
-		 * Be aware that the array is in BIG ENDIAN format, so you cannot
-		 * simply reinterpret the result as int16_t!!
-		 */
-		inline uint8_t*
-		getData();
+	/// Configuration Register B
+	enum class
+	ConfigB : uint8_t
+	{
+		GN2 = Bit7,
+		GN1 = Bit6,
+		GN0 = Bit5,
+		GN_Mask = Bit7 | Bit6 | Bit5,
+	};
+	XPCC_FLAGS8(ConfigB);
 
-		/**
-		 * \c true, when new data has been from the sensor and buffered,
-		 * \c false, when the data has already been read
-		 */
-		ALWAYS_INLINE bool
-		isNewDataAvailable();
+	/// Mode Register
+	enum class
+	Mode : uint8_t
+	{
+		MD1 = Bit1,
+		MD0 = Bit0,
+		MD_Mask = Bit1 | Bit0,
+	};
+	XPCC_FLAGS8(Mode);
 
-		void
-		update();
+	/// Status Register
+	enum class
+	Status : uint8_t
+	{
+		REN = Bit2,		///< Internal voltage regulator enabled, *HMC5843 only*
+		LOCK = Bit1,	///< This bit is set when some but not all for of the six data output registers have been read.
+		RDY = Bit0,		///< Set when data is written to all six data registers
+	};
+	XPCC_FLAGS8(Status);
 
-		/// Reads the sensor register if new results have been computed.
-		bool
-		isDataReady();
+public:
+	/// Operation modes
+	enum class
+	OperationMode : uint8_t
+	{
+		ContinousConversion = 0,
+		SingleConversion = Mode::MD0,
+		Idle = Mode::MD1,
+		Sleep = int(Mode::MD1) | int(Mode::MD0),	///< *HMC5843 only*
+	};
 
-		/// Sets the specified measurement mode
-		bool
-		setMeasurementMode(hmc58::MeasurementMode mode=hmc58::MEASUREMENT_MODE_NORMAL);
+public:
+	struct ATTRIBUTE_PACKED
+	Data
+	{
+		template < class I2cMaster >
+		friend class Hmc58x3;
+		template < class I2cMaster >
+		friend class Hmc5843;
+		template < class I2cMaster >
+		friend class Hmc5883;
 
-		/// Sets the specified data output mode
-		bool
-		setDataOutputRate(uint8_t dataOutputRate=0x10);
+		/// returns the magnetic field in Gauss
+		///@{
+		inline float
+		getMagneticFieldX() { return getField(0); }
 
-		/// Sets the specified gain
-		bool
-		setGain(uint8_t gain=0x20);
+		inline float
+		getMagneticFieldY() { return getField(1); }
+
+		inline float
+		getMagneticFieldZ() { return getField(2); }
+		///@}
+
+		/// returns `true` if the readings under- or overflowed
+		///@{
+		inline bool
+		isOverflowX() { return isOverflow(0); }
+
+		inline bool
+		isOverflowY() { return isOverflow(1); }
+
+		inline bool
+		isOverflowZ() { return isOverflow(2); }
+		///@}
+
+		/// returns the current gain in Gauss
+		inline float
+		getGain() { return gain / 30.f; };
+
+		inline float
+		operator [](uint8_t index)
+		{ return (index < 3) ? getField(index) : 0; }
 
 	private:
-		/**
-		 * writes 8bit data to a register, blocking!
-		 * \param reg register address
-		 * \param data 8bit data to write
-		 */
-		bool
-		writeRegister(hmc58::Register reg, uint8_t value);
+		uint8_t data[6];
+		uint8_t gain;
 
-		/**
-		 * reads a 8bit register, blocking!
-		 * \param reg the 8bit register to read
-		 * \return 8bit content
-		 */
-		uint8_t
-		readRegister(hmc58::Register reg);
+		inline bool
+		isOverflow(uint8_t index)
+		{
+			int16_t* rawData = reinterpret_cast<int16_t*>(data);
+			int16_t fieldValue = xpcc::fromBigEndian(rawData[index]);
+			return (fieldValue == -4096);
+		}
 
-		enum Status {
-			READ_MAGNETOMETER_PENDING = 0x01,
-			READ_MAGNETOMETER_RUNNING = 0x02,
-			NEW_MAGNETOMETER_DATA = 0x04,
-		};
-
-		uint8_t status;
-		uint8_t* data;
-		uint8_t buffer[4];
+		float inline
+		getField(uint8_t index)
+		{
+			int16_t* rawData = reinterpret_cast<int16_t*>(data);
+			int16_t fieldValue = xpcc::fromBigEndian((int16_t)rawData[index]);
+			return (fieldValue / 2048.f) * getGain();
+		}
 	};
+
+protected:
+	/// @cond
+	static constexpr uint8_t
+	i(Register reg) { return uint8_t(reg); }
+	/// @endcond
+}; // struct hmc58x3
+
+/**
+ * HMC58x3 3-axis digital magnetometer family driver.
+ *
+ * The HMC58x3 is a surface-mount, multi-chip module designed for low-field
+ * magnetic sensing with a digital interface for applications such as
+ * low-cost compassing and magnetometry. The HMC58x3 includes high-resolution
+ * magneto-resistive sensors plus an ASIC containing amplification,
+ * automatic degaussing strap drivers, offset cancellation, and a 12-bit
+ * ADC that enables 1-2 degrees compass heading accuracy.
+ *
+ * @ingroup driver_inertial
+ * @author	Niklas Hauser
+ */
+template < typename I2cMaster >
+class Hmc58x3 : public hmc58x3, public xpcc::I2cDevice< I2cMaster >, protected xpcc::co::NestedCoroutine<2>
+{
+protected:
+	/// Constructor, requires a hmc58x3::Data object, sets address to default of 0x1e
+	Hmc58x3(Data &data, uint8_t address=0x1e);
+
+public:
+	/// pings the sensor
+	xpcc::co::Result<bool>
+	ping();
+
+	xpcc::co::Result<bool> inline
+	setOperationMode(OperationMode mode)
+	{ return updateMode(Mode_t(uint8_t(mode)), Mode::MD_Mask); }
+
+
+	// MARK: Read access
+	xpcc::co::Result<bool>
+	readMagneticField();
+
+
+protected:
+	xpcc::co::Result<bool>
+	configureRaw(uint8_t rate, uint8_t gain, const uint8_t* gainValues, uint8_t average=0);
+
+	xpcc::co::Result<bool>
+	setGainRaw(uint8_t gain, const uint8_t* gainValues);
+
+protected:
+	// MARK: Control Registers
+	xpcc::co::Result<bool> inline
+	updateConfigA(ConfigA_t setMask, ConfigA_t clearMask = ConfigA_t(0x7f))
+	{ return updateRegister(0, setMask.value, clearMask.value); }
+
+	xpcc::co::Result<bool> inline
+	updateConfigB(ConfigB_t setMask, ConfigB_t clearMask = ConfigB_t(0xe0))
+	{ return updateRegister(1, setMask.value, clearMask.value); }
+
+	xpcc::co::Result<bool> inline
+	updateMode(Mode_t setMask, Mode_t clearMask = Mode::MD_Mask)
+	{ return updateRegister(2, setMask.value, clearMask.value); }
+
+
+	// MARK: Registers with instant access
+	ConfigA_t getConfigA()
+	{ return ConfigA_t(rawBuffer[0]); }
+
+	ConfigB_t getConfigB()
+	{ return ConfigB_t(rawBuffer[1]); }
+
+	Mode_t getMode()
+	{ return Mode_t(rawBuffer[2]); }
+
+public:
+	// MARK: Registers with buffered access
+	Status_t getStatus()
+	{ return Status_t(rawBuffer[9]); }
+
+public:
+	/// the data object for this sensor.
+	Data &data;
+
+protected:
+	/// write a 8bit value a register
+	xpcc::co::Result<bool> ALWAYS_INLINE
+	write(Register reg, uint8_t &value)
+	{ return write(reg, &value, 1); }
+
+	/// write multiple 8bit values from a start register
+	xpcc::co::Result<bool>
+	write(Register reg, uint8_t *buffer, uint8_t length);
+
+	/// read a 8bit value from a register
+	xpcc::co::Result<bool> ALWAYS_INLINE
+	read(Register reg, uint8_t &value)
+	{ return read(reg, &value, 1); }
+
+	/// read multiple 8bit values from a start register
+	xpcc::co::Result<bool>
+	read(Register reg, uint8_t *buffer, uint8_t length);
+
+private:
+	xpcc::co::Result<bool>
+	updateRegister(uint8_t index, uint8_t setMask, uint8_t clearMask = 0xff);
+
+private:
+	enum I2cTask : uint8_t
+	{
+		Idle = 0,
+
+		WriteRegister = 1,
+		ReadRegister = 2,
+		Readout = 3,
+
+		Ping = 0xff
+	};
+
+	volatile uint8_t i2cTask;
+	volatile uint8_t i2cSuccess;
+	xpcc::I2cTagAdapter<xpcc::I2cWriteReadAdapter> adapter;
+
+protected:
+	// the read buffer is for a continous read from address 0x00 -> 0x09
+	// 0: config A
+	// 1: config B
+	// 2: mode
+	// 3: out x low  -- also used for write address of register
+	// 4: out x high -- also used for write buffer[0]
+	// 5: out y low  -- also used for write buffer[1]
+	// 6: out y high -- also used for write buffer[2]
+	// 7: out z low
+	// 8: out z high
+	// 9: status
+	uint8_t rawBuffer[10];
+};
 
 }
 
 #include "hmc58_impl.hpp"
 
-#endif // XPCC__HMC58_HPP
+#endif // XPCC_HMC58X3_HPP
