@@ -8,7 +8,7 @@
 // ----------------------------------------------------------------------------
 
 #ifndef XPCC_HMC58X3_HPP
-#	error "Don't include this file directly, use 'hmc58.hpp' instead!"
+#	error "Don't include this file directly, use 'hmc58x3.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------

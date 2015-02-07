@@ -10,7 +10,7 @@
 #ifndef XPCC_HMC5843_HPP
 #define XPCC_HMC5843_HPP
 
-#include "hmc58.hpp"
+#include "hmc58x3.hpp"
 #include <cmath>
 
 namespace xpcc

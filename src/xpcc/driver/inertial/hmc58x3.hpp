@@ -310,6 +310,6 @@ protected:
 
 }
 
-#include "hmc58_impl.hpp"
+#include "hmc58x3_impl.hpp"
 
 #endif // XPCC_HMC58X3_HPP
