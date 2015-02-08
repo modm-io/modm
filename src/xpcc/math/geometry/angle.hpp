@@ -60,39 +60,51 @@
 #endif
 
 // The square root of 2.
-#ifndef M_SQRT2 
-#define M_SQRT2  1.41421356237309504880 
-#endif 
+#ifndef M_SQRT2
+#define M_SQRT2  1.41421356237309504880
+#endif
 
 namespace xpcc
 {
+	static constexpr float
+	toRadian(float angle)
+	{
+		return (angle * M_PI) / 180.f;
+	}
+
+	static constexpr float
+	toDegree(float angle)
+	{
+		return (angle * 180.f) / M_PI;
+	}
+
 	/**
 	 * \brief	Collection of functions for handling of angles
-	 * 
+	 *
 	 * Angles are always represented by float values in the range
 	 * from -Pi to Pi.
-	 * 
+	 *
 	 * \ingroup	geometry
 	 */
 	class Angle
 	{
 	public:
 		typedef float Type;
-		
+
 		/**
 		 * \brief	Normalize angle
-		 * 
+		 *
 		 * Normalize the given angle to [-Pi,Pi] by repeatedly
 		 * adding/subtracting 2*Pi.
 		 */
 		static float
 		normalize(float angle);
-		
+
 		/**
 		 * \brief	Reverse the angle
-		 * 
+		 *
 		 * Reverse the angle and keep it normalized to [-Pi,Pi].
-		 * 
+		 *
 		 * Equivalent to:
 		 * \code
 		 * float angle = xpcc::Angle::normalize(angle + M_PI);
@@ -100,7 +112,7 @@ namespace xpcc
 		 */
 		static float
 		reverse(float angle);
-		
+
 		/**
 		 * \brief	Find a perpendicular angle
 		 *
@@ -111,17 +123,17 @@ namespace xpcc
 
 		static float
 		perpendicular(float angle, const bool cw);
-		
-		static inline float
+
+		static constexpr float
 		toRadian(float angle)
 		{
-			return (angle * M_PI) / 180.0;
+			return ::xpcc::toRadian(angle);
 		}
-		
-		static inline float
+
+		static constexpr float
 		toDegree(float angle)
 		{
-			return (angle * 180.0) / M_PI;
+			return ::xpcc::toDegree(angle);
 		}
 	};
 }
