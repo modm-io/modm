@@ -27,7 +27,7 @@ template< class Clock, class TimestampType >
 bool
 xpcc::TimeoutBase<Clock, TimestampType>::isExpired()
 {
-	if (state == ACTIVE)
+	if (isActive())
 	{
 		if (Clock::template now<TimestampType>() >= endTime)
 		{
@@ -45,16 +45,15 @@ template< class Clock, class TimestampType >
 bool
 xpcc::TimeoutBase<Clock, TimestampType>::isActive() const
 {
-	return (this->state != STOPPED);
+	return (state >= ACTIVE);
 }
 
 template< class Clock, class TimestampType >
 void
 xpcc::TimeoutBase<Clock, TimestampType>::stop()
 {
-	this->state = STOPPED;
+	state = STOPPED;
 }
-
 
 template< class Clock, class TimestampType >
 void

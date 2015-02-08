@@ -98,9 +98,10 @@ public:
 private:
 	enum State
 	{
-		STOPPED,
-		ACTIVE,
-		EXPIRED
+		STOPPED = 0,
+		EXPIRED = 2,
+		ACTIVE = 4,
+		RUNNING = 6,	// used for PeriodicTimer
 	};
 
 	TimestampType endTime;

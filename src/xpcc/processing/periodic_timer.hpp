@@ -89,10 +89,8 @@ public:
 	isExpired();
 
 private:
-	TimeoutBase<Clock, TimestampType> timeout;
-
 	TimestampType interval;
-	bool isRunning_;
+	TimeoutBase<Clock, TimestampType> timeout;
 };
 
 template< class Clock = ::xpcc::Clock >

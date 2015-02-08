@@ -13,11 +13,10 @@
 
 template< class Clock , typename TimestampType >
 xpcc::PeriodicTimerBase<Clock, TimestampType>::PeriodicTimerBase(const TimestampType interval) :
-	timeout(interval), interval(interval), isRunning_(true)
+	interval(interval), timeout(interval)
 {
-	if (interval == 0) {
-		stop();
-	}
+	if (interval == 0) stop();
+	else timeout.state = timeout.RUNNING;
 }
 
 template< class Clock , typename TimestampType >
@@ -25,23 +24,21 @@ void
 xpcc::PeriodicTimerBase<Clock, TimestampType>::stop()
 {
 	timeout.stop();
-	isRunning_ = false;
 }
 
 template< class Clock , typename TimestampType >
 bool
 xpcc::PeriodicTimerBase<Clock, TimestampType>::isRunning() const
 {
-	return isRunning_;
+	return (timeout.state == timeout.RUNNING);
 }
 
 template< class Clock , typename TimestampType >
 void
 xpcc::PeriodicTimerBase<Clock, TimestampType>::restart(const TimestampType interval)
 {
-	timeout.restart(interval);
 	this->interval = interval;
-	this->isRunning_ = true;
+	restart();
 }
 
 template< class Clock , typename TimestampType >
@@ -49,18 +46,18 @@ void
 xpcc::PeriodicTimerBase<Clock, TimestampType>::restart()
 {
 	timeout.restart(this->interval);
-	this->isRunning_ = true;
+	timeout.state = timeout.RUNNING;
 }
 
 template< class Clock , typename TimestampType >
 bool
 xpcc::PeriodicTimerBase<Clock, TimestampType>::isExpired()
 {
-	if (isRunning_ and timeout.isExpired()) {
+	if ((timeout.state == timeout.RUNNING) and timeout.isExpired())
+	{
 		timeout.restart(interval);
+		timeout.state = timeout.RUNNING;
 		return true;
 	}
-	else {
-		return false;
-	}
+	return false;
 }
