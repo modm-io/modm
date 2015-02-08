@@ -20,11 +20,11 @@ namespace xpcc
 {
 
 /**
- * \brief	Fast check if a float variable is positive
+ * Fast check if a float variable is positive
  *
  * Checks only the sign bit for the AVR.
  *
- * \ingroup	math
+ * @ingroup	math
  */
 inline bool
 isPositive(const float& a)
@@ -54,16 +54,16 @@ isPositive(const float& a)
  * at compile time.
  * Otherwise the result is computed at runtime, which might be very expensive.
  *
- * \code
+ * @code
  * constexpr int value = xpcc::pow(10, 2);
- * \endcode
+ * @endcode
  *
- * \ingroup	math
+ * @ingroup	math
  */
 constexpr uint32_t
-pow(uint32_t base, uint32_t exponent)
+pow(uint32_t base, uint8_t exponent)
 {
-	return (exponent > 0) ? exponent * pow(base, exponent - 1) : 0;
+	return (exponent > 0) ? base * pow(base, exponent - 1) : 1;
 }
 
 }	// namespace xpcc
