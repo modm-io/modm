@@ -73,16 +73,16 @@ public:
 	/**
 	 * Check if the timer was started and was not stopped.
 	 *
-	 * If isActive() changes to `false`, it will keep this value until
+	 * If isRunning() changes to `false`, it will keep this value until
 	 * a call of restart().
 	 */
 	inline bool
-	isActive() const;
+	isRunning() const;
 
 	/**
 	 * Stop the timer
 	 *
-	 * Sets isExpired() to `true`, and isActive() to `false`.
+	 * Sets isExpired() to `true`, and isRunning() to `false`.
 	 */
 	inline void
 	stop();
@@ -99,9 +99,8 @@ private:
 	enum State
 	{
 		STOPPED = 0,
-		EXPIRED = 2,
-		ACTIVE = 4,
-		RUNNING = 6,	// used for PeriodicTimer
+		EXPIRED = 1,
+		RUNNING = 2,
 	};
 
 	TimestampType endTime;

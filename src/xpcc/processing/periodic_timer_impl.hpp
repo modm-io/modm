@@ -15,8 +15,6 @@ template< class Clock , typename TimestampType >
 xpcc::PeriodicTimerBase<Clock, TimestampType>::PeriodicTimerBase(const TimestampType interval) :
 	interval(interval), timeout(interval)
 {
-	if (interval == 0) stop();
-	else timeout.state = timeout.RUNNING;
 }
 
 template< class Clock , typename TimestampType >
@@ -30,7 +28,7 @@ template< class Clock , typename TimestampType >
 bool
 xpcc::PeriodicTimerBase<Clock, TimestampType>::isRunning() const
 {
-	return (timeout.state == timeout.RUNNING);
+	return timeout.isRunning();
 }
 
 template< class Clock , typename TimestampType >
@@ -45,19 +43,25 @@ template< class Clock , typename TimestampType >
 void
 xpcc::PeriodicTimerBase<Clock, TimestampType>::restart()
 {
-	timeout.restart(this->interval);
-	timeout.state = timeout.RUNNING;
+	timeout.restart(interval);
 }
 
 template< class Clock , typename TimestampType >
 bool
 xpcc::PeriodicTimerBase<Clock, TimestampType>::isExpired()
 {
-	if ((timeout.state == timeout.RUNNING) and timeout.isExpired())
+	if (timeout.isExpired())
 	{
 		timeout.restart(interval);
-		timeout.state = timeout.RUNNING;
 		return true;
 	}
 	return false;
 }
+
+template< class Clock, class TimestampType >
+TimestampType
+xpcc::PeriodicTimerBase<Clock, TimestampType>::remaining()
+{
+	return timeout.remaining();
+}
+

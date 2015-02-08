@@ -60,11 +60,11 @@ public:
 	isRunning() const;
 
 	/// Restart the current interval.
-	void
+	inline void
 	restart();
 
 	/// Set a new interval
-	void
+	inline void
 	restart(const TimestampType interval);
 
 	/**
@@ -85,8 +85,12 @@ public:
 	 *
 	 * @return	`true` if entering a new period, `false` otherwise
 	 */
-	bool
+	inline bool
 	isExpired();
+
+	/// Returns the remaining time until a timeout.
+	inline TimestampType
+	remaining();
 
 private:
 	TimestampType interval;
