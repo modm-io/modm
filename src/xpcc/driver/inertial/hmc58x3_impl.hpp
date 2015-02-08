@@ -51,14 +51,16 @@ xpcc::Hmc58x3<I2cMaster>::readMagneticField()
 	CO_END_RETURN(false);
 }
 
+// ----------------------------------------------------------------------------
+// MARK: - base methods
 template < typename I2cMaster >
 xpcc::co::Result<bool>
 xpcc::Hmc58x3<I2cMaster>::configureRaw(uint8_t rate, uint8_t gain, const uint8_t* gainValues, uint8_t average)
 {
 	CO_BEGIN();
 
-	rawBuffer[0] = (rawBuffer[0] & ~(ConfigA::MA_Mask | ConfigA::DO_Mask).value) | (rate | average);
-	rawBuffer[1] = (rawBuffer[1] & ~uint8_t(ConfigB::GN_Mask)) | gain;
+	rawBuffer[0] = rate | average;
+	rawBuffer[1] = gain;
 	rawBuffer[2] = uint8_t(OperationMode::ContinousConversion);
 
 	if (CO_CALL(write(Register::ConfigA, rawBuffer, 3)))
@@ -91,6 +93,13 @@ xpcc::Hmc58x3<I2cMaster>::setGainRaw(uint8_t gain, const uint8_t* gainValues)
 
 // ----------------------------------------------------------------------------
 // MARK: - register access
+template < typename I2cMaster >
+xpcc::co::Result<bool>
+xpcc::Hmc58x3<I2cMaster>::readStatus()
+{
+	return read(Register::Status, rawBuffer[9]);
+}
+
 // MARK: update register
 template < typename I2cMaster >
 xpcc::co::Result<bool>

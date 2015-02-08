@@ -168,16 +168,10 @@ public:
 		getField(uint8_t index)
 		{
 			int16_t* rawData = reinterpret_cast<int16_t*>(data);
-			int16_t fieldValue = xpcc::fromBigEndian((int16_t)rawData[index]);
+			int16_t fieldValue = xpcc::fromBigEndian(rawData[index]);
 			return (fieldValue / 2048.f) * getGain();
 		}
 	};
-
-protected:
-	/// @cond
-	static constexpr uint8_t
-	i(Register reg) { return uint8_t(reg); }
-	/// @endcond
 }; // struct hmc58x3
 
 /**
@@ -201,7 +195,6 @@ protected:
 	Hmc58x3(Data &data, uint8_t address=0x1e);
 
 public:
-	/// pings the sensor
 	xpcc::co::Result<bool>
 	ping();
 
@@ -254,6 +247,9 @@ public:
 	// MARK: Registers with buffered access
 	Status_t getStatus()
 	{ return Status_t(rawBuffer[9]); }
+
+	xpcc::co::Result<bool>
+	readStatus();
 
 public:
 	/// the data object for this sensor.

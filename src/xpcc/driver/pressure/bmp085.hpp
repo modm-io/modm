@@ -24,6 +24,7 @@ class Bmp085;
 struct bmp085
 {
 protected:
+	/// @cond
 	/// The addresses of the Configuration and Data Registers
 	enum class
 	Register : uint8_t
@@ -60,6 +61,7 @@ protected:
 		Temperature = 0x2E,
 		Pressure = 0x34,
 	};
+	/// @endcond
 
 public:
 	enum class
@@ -73,7 +75,7 @@ public:
 	};
 
 	/**
-	 * Hold the calibration data from the sensor.
+	 * Holds the calibration data from the sensor.
 	 * Values are used for calculation of calibrated
 	 * sensor values from raw sensor data
 	 */
