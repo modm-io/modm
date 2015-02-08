@@ -1,197 +1,139 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
 /* Copyright (c) 2012, Roboterclub Aachen e.V.
- * All rights reserved.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__ITG3200_HPP
-#	error  "Don't include this file directly, use 'itg3200.hpp' instead!"
+#ifndef XPCC_ITG3200_HPP
+#	error "Don't include this file directly, use 'itg3200.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
-xpcc::Itg3200<I2cMaster>::Itg3200(uint8_t* data, uint8_t address)
-:	I2cWriteReadAdapter(address), status(0), data(data)
+xpcc::Itg3200<I2cMaster>::Itg3200(Data &data, uint8_t address)
+:	data(data), i2cTask(I2cTask::Idle), i2cSuccess(0),
+	adapter(address, i2cTask, i2cSuccess),
+	rawBuffer{0x00, 0x00, 0x00, 0,0,0,0,0,0,0,0, 0x00}
 {
-	configureWriteRead(buffer, 0, data, 0);
+}
+
+// MARK: - i2cTasks
+// MARK: ping
+template < class I2cMaster >
+xpcc::co::Result<bool>
+xpcc::Itg3200<I2cMaster>::ping()
+{
+	CO_BEGIN();
+
+	CO_WAIT_UNTIL(adapter.configurePing() &&
+			(i2cTask = I2cTask::Ping, this->startTransaction(&adapter)));
+
+	CO_WAIT_WHILE(i2cTask == I2cTask::Ping);
+
+	CO_END_RETURN(i2cSuccess == I2cTask::Ping);
 }
 
 template < typename I2cMaster >
-bool
-xpcc::Itg3200<I2cMaster>::configure(uint8_t divider, itg3200::Filter filter, bool interrupt)
+xpcc::co::Result<bool>
+xpcc::Itg3200<I2cMaster>::configure(LowPassFilter filter, uint8_t divider)
 {
-	buffer[0] = itg3200::REGISTER_SMPLRT_DIV;
-	// sample rate register
-	buffer[1] = divider;
-	// scale and filter register
-	buffer[2] = itg3200::SCALE_FS_2000 | filter;
-	// interrupt register
-	buffer[3] = interrupt ? itg3200::INTERRUPT_RAW_RDY_EN : 0;
-	configureWriteRead(buffer, 4, data, 0);
-	
-	return I2cMaster::startBlocking(this);
+	CO_BEGIN();
+
+	rawBuffer[4] = divider;
+	rawBuffer[5] = rawBuffer[0] = LowPassFilter_t(filter).value | uint8_t(Filter::FullScale);
+	rawBuffer[6] = rawBuffer[1] = 0;
+
+	CO_END_RETURN_CALL(write(Register::SMPLRT_DIV, rawBuffer, 3, false));
 }
 
 template < typename I2cMaster >
-void
-xpcc::Itg3200<I2cMaster>::readGyroscope()
+xpcc::co::Result<bool>
+xpcc::Itg3200<I2cMaster>::readRotationRate()
 {
-	status |= READ_GYROSCOPE_PENDING;
+	CO_BEGIN();
+
+	if (CO_CALL(read(Register::INT_STATUS, rawBuffer+2, 9)))
+	{
+		std::memcpy(data.data, rawBuffer+3, 8);
+		CO_RETURN(true);
+	}
+
+	CO_END_RETURN(false);
 }
 
 template < typename I2cMaster >
-void
-xpcc::Itg3200<I2cMaster>::readTemperatureGyroscope()
-{
-	status |= READ_BOTH_PENDING;
-}
-
-template < typename I2cMaster >
-bool
-xpcc::Itg3200<I2cMaster>::isDataReady()
-{
-	return readRegister(itg3200::REGISTER_STATUS) & itg3200::STATUS_RAW_RDY;
-}
-
-template < typename I2cMaster >
-bool
-xpcc::Itg3200<I2cMaster>::isNewDataAvailable()
-{
-	return status & NEW_GYROSCOPE_DATA;
-}
-
-template < typename I2cMaster >
-bool
-xpcc::Itg3200<I2cMaster>::isNewTemperatureDataAvailable()
-{
-	return status & NEW_TEMPERATURE_DATA;
-}
-
-template < typename I2cMaster >
-uint8_t*
-xpcc::Itg3200<I2cMaster>::getData()
-{
-	status &= ~NEW_GYROSCOPE_DATA;
-	return &data[2];
-}
-
-template < typename I2cMaster >
-uint8_t*
-xpcc::Itg3200<I2cMaster>::getTemperatureData()
-{
-	status &= ~NEW_TEMPERATURE_DATA;
-	return data;
-}
-
-template < typename I2cMaster >
-bool
+xpcc::co::Result<bool>
 xpcc::Itg3200<I2cMaster>::setSampleRateDivider(uint8_t divider)
 {
-	return writeRegister(itg3200::REGISTER_SMPLRT_DIV, divider);
+	CO_BEGIN();
+
+	rawBuffer[4] = divider;
+
+	CO_END_RETURN_CALL(write(Register::SMPLRT_DIV, rawBuffer+4, 1, false));
 }
 
+// ----------------------------------------------------------------------------
+// MARK: - register access
 template < typename I2cMaster >
-bool
-xpcc::Itg3200<I2cMaster>::setInterrupts(itg3200::Interrupt interrupts)
+xpcc::co::Result<bool>
+xpcc::Itg3200<I2cMaster>::readStatus()
 {
-	return writeRegister(itg3200::REGISTER_INTERRUPT, interrupts);
+	return read(Register::INT_STATUS, rawBuffer[2]);
 }
 
+// MARK: update register
 template < typename I2cMaster >
-void
-xpcc::Itg3200<I2cMaster>::update()
+xpcc::co::Result<bool>
+xpcc::Itg3200<I2cMaster>::updateRegister(uint8_t index, uint8_t setMask, uint8_t clearMask)
 {
-	if (running != NOTHING_RUNNING)
-	{
-		switch (getAdapterState())
-		{
-			case xpcc::I2c::AdapterState::Idle:
-				if (running == READ_BOTH_RUNNING) {
-					status |= NEW_GYROSCOPE_DATA | NEW_TEMPERATURE_DATA;
-				}
-				else if (running == READ_GYROSCOPE_RUNNING) {
-					status |= NEW_GYROSCOPE_DATA;
-				}
-			case xpcc::I2c::AdapterState::Error:
-				running = NOTHING_RUNNING;
-				
-			default:
-				break;
-		}
-	}
-	else {
-		if (status & READ_BOTH_PENDING)
-		{
-			buffer[0] = itg3200::REGISTER_DATA_T0;
-			configureWriteRead(buffer, 1, data, 8);
-			
-			if (I2cMaster::start(this)) {
-				status &= ~READ_BOTH_PENDING;
-				running = READ_BOTH_RUNNING;
-			}
-		}
-		else if (status & READ_GYROSCOPE_PENDING)
-		{
-			buffer[0] = itg3200::REGISTER_DATA_X0;
-			configureWriteRead(buffer, 1, data+2, 6);
-			
-			if (I2cMaster::start(this)) {
-				status &= ~READ_GYROSCOPE_PENDING;
-				running = READ_GYROSCOPE_RUNNING;
-			}
-		}
-	}
+	CO_BEGIN();
+
+	rawBuffer[index] = (rawBuffer[index] & ~clearMask) | setMask;
+
+	CO_END_RETURN_CALL(write(Register(index), rawBuffer[index]));
 }
 
-// MARK: - private
-template < typename I2cMaster >
-bool
-xpcc::Itg3200<I2cMaster>::writeRegister(itg3200::Register reg, uint8_t value)
+// MARK: write multilength register
+template < class I2cMaster >
+xpcc::co::Result<bool>
+xpcc::Itg3200<I2cMaster>::write(Register reg, uint8_t *buffer, uint8_t length, bool copyBuffer)
 {
-	while (getAdapterState() == xpcc::I2c::AdapterState::Busy)
-		;
-	buffer[0] = reg;
-	buffer[1] = value;
-	configureWriteRead(buffer, 2, data, 0);
-	
-	return I2cMaster::startBlocking(this);
+	CO_BEGIN();
+
+	if (length > 7)
+		CO_RETURN(false);
+
+	rawBuffer[3] = uint8_t(reg);
+	if (copyBuffer) std::memcpy(rawBuffer+4, buffer, length);
+
+	CO_WAIT_UNTIL(
+			adapter.configureWrite(rawBuffer+3, length+1) and
+					(i2cTask = I2cTask::WriteRegister, this->startTransaction(&adapter))
+	);
+
+	CO_WAIT_WHILE(i2cTask == I2cTask::WriteRegister);
+
+	CO_END_RETURN(i2cSuccess == I2cTask::WriteRegister);
 }
 
-template < typename I2cMaster >
-uint8_t
-xpcc::Itg3200<I2cMaster>::readRegister(itg3200::Register reg)
+// MARK: read multilength register
+template < class I2cMaster >
+xpcc::co::Result<bool>
+xpcc::Itg3200<I2cMaster>::read(Register reg, uint8_t *buffer, uint8_t length)
 {
-	while (getAdapterState() == xpcc::I2c::AdapterState::Busy)
-		;
-	buffer[0] = reg;
-	configureWriteRead(buffer, 1, buffer, 1);
-	
-	while (!I2cMaster::startBlocking(this))
-		;
-	return buffer[0];
-}
+	CO_BEGIN();
 
+	rawBuffer[3] = uint8_t(reg);
+
+	CO_WAIT_UNTIL(
+			adapter.configureWriteRead(rawBuffer+3, 1, buffer, length) and
+					(i2cTask = I2cTask::ReadRegister, this->startTransaction(&adapter))
+	);
+
+	CO_WAIT_WHILE(i2cTask == I2cTask::ReadRegister);
+
+	CO_END_RETURN(i2cSuccess == I2cTask::ReadRegister);
+}
