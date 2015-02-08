@@ -141,7 +141,7 @@ public:
 	ALWAYS_INLINE static void setOutput() {
 			%% if pue is defined
 		PUE{{port}} &= ~mask;
-			%% else
+			%% endif
 		DDR{{port}} |= mask;
 	}
 	ALWAYS_INLINE static void set() {
