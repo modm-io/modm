@@ -33,8 +33,14 @@ public:
 		return TimestampType(time);
 	}
 
+	static LongTimestamp
+	nowLong()
+	{
+		return LongTimestamp(time);
+	}
+
 	static void
-	setTime(const Timestamp::Type time)
+	setTime(const Type time)
 	{
 		ClockDummy::time = time;
 	}

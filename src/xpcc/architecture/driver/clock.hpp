@@ -54,6 +54,12 @@ public:
 	static TimestampType
 	now();
 
+	static inline LongTimestamp
+	nowLong()
+	{
+		return now<LongTimestamp>();
+	}
+
 #if !defined(XPCC__OS_HOSTED)
 	/// Set the current time
 	static inline void
