@@ -44,48 +44,59 @@ void
 TimeoutTest::testBasics()
 {
 	xpcc::Timeout<xpcc::ClockDummy> timeout(10);
-	
+	xpcc::LongTimeout<xpcc::ClockDummy> timeoutLong(10);
+
 	TEST_ASSERT_FALSE(timeout.isExpired());
-	
+	TEST_ASSERT_FALSE(timeoutLong.isExpired());
+
 	int i;
 	for (i = 0; i < 9; ++i) {
 		xpcc::ClockDummy::setTime(i);
 		TEST_ASSERT_FALSE(timeout.isExpired());
+		TEST_ASSERT_FALSE(timeoutLong.isExpired());
 	}
-	
+
 	xpcc::ClockDummy::setTime(10);
 	TEST_ASSERT_TRUE(timeout.isExpired());
-	
+	TEST_ASSERT_TRUE(timeoutLong.isExpired());
+
 	// check if the class holds the state
 	xpcc::ClockDummy::setTime(9);
 	TEST_ASSERT_TRUE(timeout.isExpired());
+	TEST_ASSERT_TRUE(timeoutLong.isExpired());
 }
 
 void
 TimeoutTest::testDefaultConstructor()
 {
 	xpcc::Timeout<xpcc::ClockDummy> timeout;
-	TEST_ASSERT_TRUE(timeout.isExpired());
+	xpcc::LongTimeout<xpcc::ClockDummy> timeoutLong;
+
+	TEST_ASSERT_FALSE(timeout.isExpired());
+	TEST_ASSERT_FALSE(timeoutLong.isExpired());
 }
 
 void
 TimeoutTest::testTimeOverflow()
 {
 	xpcc::Timestamp::Type time = xpcc::ArithmeticTraits<xpcc::Timestamp::Type>::max;
-	
+	TEST_ASSERT_EQUALS(time, 65535);
+
 	// overflow after 65535 for uint16_t => 32767+100 = 32867
 	xpcc::ClockDummy::setTime(time / 2 + 100);
-	
-	xpcc::Timeout<xpcc::ClockDummy> timeout(time / 2 - 1);	//=> 32867 + 32767 = 65634 - 65535 = 99
-	
+	TEST_ASSERT_EQUALS((time / 2 + 100), 32867);
+
+	xpcc::Timeout<xpcc::ClockDummy> timeout(time / 2 - 1);	//=> 32867 + 32766 = 97
+	TEST_ASSERT_EQUALS((time / 2 - 1), 32766);
+
 	TEST_ASSERT_FALSE(timeout.isExpired());
-	
+
 	xpcc::ClockDummy::setTime(time);
 	TEST_ASSERT_FALSE(timeout.isExpired());
-	
+
 	xpcc::ClockDummy::setTime(0);
 	TEST_ASSERT_FALSE(timeout.isExpired());
-	
+
 	// Overflow happened. This needs to be avoided by the user!
 	xpcc::ClockDummy::setTime(100);
 	TEST_ASSERT_TRUE(timeout.isExpired());
@@ -95,14 +106,21 @@ void
 TimeoutTest::testRestart()
 {
 	xpcc::Timeout<xpcc::ClockDummy> timeout;
-	TEST_ASSERT_TRUE(timeout.isExpired());
-	
-	timeout.restart(42);
+	xpcc::LongTimeout<xpcc::ClockDummy> timeoutLong;
+
 	TEST_ASSERT_FALSE(timeout.isExpired());
-	
+	TEST_ASSERT_FALSE(timeoutLong.isExpired());
+
+	timeout.restart(42);
+	timeoutLong.restart(42);
+	TEST_ASSERT_FALSE(timeout.isExpired());
+	TEST_ASSERT_FALSE(timeoutLong.isExpired());
+
 	xpcc::ClockDummy::setTime(10);
 	TEST_ASSERT_FALSE(timeout.isExpired());
-	
+	TEST_ASSERT_FALSE(timeoutLong.isExpired());
+
 	xpcc::ClockDummy::setTime(600);
 	TEST_ASSERT_TRUE(timeout.isExpired());
+	TEST_ASSERT_TRUE(timeoutLong.isExpired());
 }

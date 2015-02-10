@@ -39,12 +39,21 @@ TimestampTest::testConstructors()
 {
 	xpcc::Timestamp t1;
 	TEST_ASSERT_TRUE(t1 == 0);
-	
+
+	xpcc::LongTimestamp t1Long;
+	TEST_ASSERT_TRUE(t1Long == 0);
+
 	xpcc::Timestamp t2(1000);
 	TEST_ASSERT_TRUE(t2 == 1000);
-	
+
+	xpcc::LongTimestamp t2Long(1000);
+	TEST_ASSERT_TRUE(t2Long == 1000);
+
 	t1 = 500;
 	TEST_ASSERT_TRUE(t1 == 500);
+
+	t1Long = 500;
+	TEST_ASSERT_TRUE(t1Long == 500);
 }
 
 void
@@ -53,9 +62,16 @@ TimestampTest::testArithmetics()
 	xpcc::Timestamp t1(200);
 	xpcc::Timestamp t2(500);
 	xpcc::Timestamp t3;
-	
+
 	t3 = t1 + t2;
 	TEST_ASSERT_TRUE(t3 == 700);
+
+	xpcc::LongTimestamp t1Long(200);
+	xpcc::LongTimestamp t2Long(500);
+	xpcc::LongTimestamp t3Long;
+
+	t3Long = t1Long + t2Long;
+	TEST_ASSERT_TRUE(t3Long == 700);
 }
 
 void
@@ -63,20 +79,32 @@ TimestampTest::testComparisons()
 {
 	xpcc::Timestamp t1;
 	xpcc::Timestamp t2;
-	
+	xpcc::LongTimestamp t1Long;
+	xpcc::LongTimestamp t2Long;
+
 	TEST_ASSERT_TRUE(t1 == t2);
 	TEST_ASSERT_FALSE(t1 != t2);
-	
+	TEST_ASSERT_TRUE(t1Long == t2Long);
+	TEST_ASSERT_FALSE(t1Long != t2Long);
+
 	t1 = xpcc::ArithmeticTraits<xpcc::Timestamp::Type>::max / 2;
-	
+	t1Long = xpcc::ArithmeticTraits<xpcc::LongTimestamp::Type>::max / 2;
+
 	TEST_ASSERT_FALSE(t1 == t2);
 	TEST_ASSERT_TRUE(t1 != t2);
-	
+	TEST_ASSERT_FALSE(t1Long == t2Long);
+	TEST_ASSERT_TRUE(t1Long != t2Long);
+
 	TEST_ASSERT_TRUE(t1 > t2);
 	TEST_ASSERT_TRUE(t1 >= t2);
-	
+	TEST_ASSERT_TRUE(t1Long > t2Long);
+	TEST_ASSERT_TRUE(t1Long >= t2Long);
+
 	t1 = xpcc::ArithmeticTraits<xpcc::Timestamp::Type>::max / 2 + 1;
-	
+	t1Long = xpcc::ArithmeticTraits<xpcc::LongTimestamp::Type>::max / 2 + 1;
+
 	TEST_ASSERT_TRUE(t1 < t2);
 	TEST_ASSERT_TRUE(t1 <= t2);
+	TEST_ASSERT_TRUE(t1Long < t2Long);
+	TEST_ASSERT_TRUE(t1Long <= t2Long);
 }
