@@ -30,10 +30,10 @@ namespace xpcc
  *
  * @warning	Never use this timer when a precise timebase is needed!
  *
- * @tparam	T	Used timer, default is xpcc::Clock() which should have
- * 				a millisecond resolution.
+ * @tparam	Clock	Used timer, default is xpcc::Clock() which should have
+ * 					a millisecond resolution.
  *
- * @see		Timeout
+ * @see		TimeoutBase
  * @author	Fabian Greif
  * @author	Niklas Hauser
  * @ingroup	processing
@@ -43,13 +43,18 @@ class PeriodicTimerBase
 {
 public:
 	/**
+	 * Create a stopped timer.
+	 */
+	PeriodicTimerBase();
+
+	/**
 	 * Create and start the timer.
 	 *
 	 * @param interval
 	 * 			Timed interval in millisecond resolution (depends on
-	 * 			xpcc::Clock). Set to zero to create a stopped timer.
+	 * 			xpcc::Clock).
 	 */
-	PeriodicTimerBase(const TimestampType interval = 0);
+	PeriodicTimerBase(const TimestampType interval);
 
 	/// Stop the timer
 	inline void

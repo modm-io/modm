@@ -12,6 +12,12 @@
 #endif
 
 template< class Clock , typename TimestampType >
+xpcc::PeriodicTimerBase<Clock, TimestampType>::PeriodicTimerBase() :
+	interval(0)
+{
+}
+
+template< class Clock , typename TimestampType >
 xpcc::PeriodicTimerBase<Clock, TimestampType>::PeriodicTimerBase(const TimestampType interval) :
 	interval(interval), timeout(interval)
 {

@@ -13,7 +13,7 @@
 
 template< class Clock, class TimestampType >
 xpcc::TimeoutBase<Clock, TimestampType>::TimeoutBase() :
-	endTime(0), state(EXPIRED)
+	endTime(0), state(STOPPED)
 {
 }
 
@@ -33,13 +33,13 @@ xpcc::TimeoutBase<Clock, TimestampType>::isExpired()
 		if (Clock::template now<TimestampType>() >= endTime)
 		{
 			state = EXPIRED;
+			return true;
 		}
-		else {
-			return false;
-		}
+		return false;
 	}
 
-	return true;
+	// return false for STOPPED!
+	return (state == EXPIRED);
 }
 
 template< class Clock, class TimestampType >
@@ -61,15 +61,15 @@ void
 xpcc::TimeoutBase<Clock, TimestampType>::restart(TimestampType time)
 {
 	endTime = Clock::template now<TimestampType>() + time;
-	state = RUNNING;
+	state = (time > 0 ? RUNNING : EXPIRED);
 }
 
 template< class Clock, class TimestampType >
 TimestampType
 xpcc::TimeoutBase<Clock, TimestampType>::remaining()
 {
-	if (isExpired())
-		return 0;
-	else
+	if (isRunning())
 		return (endTime - Clock::template now<TimestampType>());
+
+	return 0;
 }
