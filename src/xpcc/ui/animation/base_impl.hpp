@@ -83,7 +83,7 @@ xpcc::ui::Animation<T>::animateTo(T value, TimeType time)
 	endValue = value;
 	animationTime = time;
 	interpolation.initialize(currentValue, endValue, animationTime);
-	previous = xpcc::Clock::now();
+	previous = xpcc::Clock::nowShort();
 	return true;
 }
 
@@ -99,7 +99,7 @@ xpcc::ui::Animation<T>::update()
 	if (animationTime > 0)
 	{
 		// buffer the delta time
-		xpcc::Timestamp now = xpcc::Clock::now();
+		xpcc::ShortTimestamp now = xpcc::Clock::nowShort();
 		// this cast requires us to be updates once at least every 255ms
 		// If this method is not called every few ms, the animation does
 		// not look good anyways, so this limitation is okay.

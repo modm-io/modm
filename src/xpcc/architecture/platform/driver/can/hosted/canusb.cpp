@@ -59,7 +59,7 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int baudRate)
 		std::cout << "write C" << std::endl;
 		this->serialPort.write("C\r");
 
-		xpcc::Timeout<> timer;
+		xpcc::ShortTimeout timer;
 		timer.restart(500);
 		while (!timer.isExpired())
 		{

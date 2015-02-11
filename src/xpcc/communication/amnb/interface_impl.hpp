@@ -108,7 +108,7 @@ template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 bool xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::transmitting = false;
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
-xpcc::Timeout<> xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::resetTimer;
+xpcc::ShortTimeout xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::resetTimer;
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 xpcc::Timeout<xpcc::amnb::Clock> xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::rescheduleTimer;

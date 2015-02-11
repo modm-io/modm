@@ -229,7 +229,7 @@ namespace xpcc
 			static uint8_t length;
 			static uint8_t lengthOfReceivedMessage;
 			static uint8_t lengthOfTransmitMessage;
-			static xpcc::Timeout<> resetTimer;
+			static xpcc::ShortTimeout resetTimer;
 			static const uint8_t resetTimeout = 4;
 			
 			static bool rescheduleTransmit;

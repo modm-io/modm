@@ -102,7 +102,7 @@ public:
 	}
 
 private:
-	xpcc::Timeout<> timer;
+	xpcc::ShortTimeout timer;
 	xpcc::Tcs3414<MyI2cMaster> colorSensor;
 };
 
@@ -132,7 +132,7 @@ MAIN_FUNCTION
 
 	stream << "\n\nWelcome to TCS3414 demo!\n\n";
 
-	xpcc::PeriodicTimer<> tmr(500);
+	xpcc::ShortPeriodicTimer tmr(500);
 
 	while (1)
 	{

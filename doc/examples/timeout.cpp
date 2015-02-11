@@ -1,5 +1,5 @@
 // create a new 20 ms timeout
-Timeout<> delay(20);
+ShortTimeout delay(20);
 
 while (!delay.isExpired()) {
 	// wait until the 20 ms have passed

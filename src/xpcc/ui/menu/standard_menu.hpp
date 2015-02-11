@@ -136,7 +136,7 @@ namespace xpcc
 		uint16_t display_update_time; //after this time the display is redrawn,
 									  // important for scrolling
 
-		xpcc::PeriodicTimer<> timer;
+		xpcc::ShortPeriodicTimer timer;
 		bool buttonAction;
 
 		const char* title;

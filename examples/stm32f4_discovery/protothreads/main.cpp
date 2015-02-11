@@ -83,7 +83,7 @@ public:
 
 private:
 	bool result;
-	xpcc::Timeout<> timer;
+	xpcc::ShortTimeout timer;
     xpcc::tmp102::Data temperatureData;
 	xpcc::Tmp102<MyI2cMaster> temp;
 };

@@ -393,7 +393,7 @@ private:
 
 private:
 	uint8_t buffer[3];
-	xpcc::Timeout<> timeout;
+	xpcc::ShortTimeout timeout;
 
 	volatile uint8_t i2cTask;
 	volatile uint8_t i2cSuccess;

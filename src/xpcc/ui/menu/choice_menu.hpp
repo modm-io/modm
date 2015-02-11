@@ -82,7 +82,7 @@ namespace xpcc{
 	private:
 		uint16_t display_update_time;
 
-		xpcc::PeriodicTimer<> timer;
+		xpcc::ShortPeriodicTimer timer;
 		bool buttonAction;
 
 		const char* title;

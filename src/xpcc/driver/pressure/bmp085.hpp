@@ -271,7 +271,7 @@ private:
 
 	xpcc::I2cTagAdapter< xpcc::I2cWriteReadAdapter > adapter;
 
-	xpcc::Timeout<> timeout;
+	xpcc::ShortTimeout timeout;
 
 	/**
 	 * Maximum conversion time for pressure from datasheet for

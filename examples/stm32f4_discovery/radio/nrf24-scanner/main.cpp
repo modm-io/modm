@@ -102,9 +102,9 @@ MAIN_FUNCTION
 		channel_info[i] = 0;
 	}
 
-//	xpcc::PeriodicTimer<> divide_timer((max_channel*rx_settle)/1000 * divider);
-	xpcc::PeriodicTimer<> divide_timer(500);
-	xpcc::PeriodicTimer<> refreshTerminal(500);
+//	xpcc::ShortPeriodicTimer divide_timer((max_channel*rx_settle)/1000 * divider);
+	xpcc::ShortPeriodicTimer divide_timer(500);
+	xpcc::ShortPeriodicTimer refreshTerminal(500);
 
 	bool divide_now = false;
 

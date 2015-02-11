@@ -83,7 +83,7 @@ public:
 
 		while (1)
 		{
-			static xpcc::PeriodicTimer<> timer(250);
+			static xpcc::ShortPeriodicTimer timer(250);
 
 			PT_WAIT_UNTIL(timer.isExpired());
 
@@ -103,7 +103,7 @@ public:
 	}
 
 private:
-	xpcc::Timeout<> timer;
+	xpcc::ShortTimeout timer;
 
 	xpcc::bmp085::Data data;
 	xpcc::Bmp085<MyI2cMaster> barometer;

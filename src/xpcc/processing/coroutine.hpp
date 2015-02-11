@@ -95,7 +95,7 @@
  *     }
  *
  * private:
- *     xpcc::Timeout<> timer;
+ *     xpcc::ShortTimeout timer;
  * };
  *
  *

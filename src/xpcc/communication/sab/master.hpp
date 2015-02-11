@@ -133,7 +133,7 @@ namespace xpcc
 			
 			static QueryStatus queryStatus;
 			static uint8_t expectedResponseLength;
-			static xpcc::Timeout<> timer;
+			static xpcc::ShortTimeout timer;
 			
 			static const uint8_t timeout = 10;		///< timeout value in milliseconds
 		};

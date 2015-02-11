@@ -102,7 +102,7 @@ public:
 	}
 
 private:
-	xpcc::Timeout<> timer;
+	xpcc::ShortTimeout timer;
 	xpcc::MovingAverage<float, 25> averageX;
 	xpcc::MovingAverage<float, 25> averageY;
 };

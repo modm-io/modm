@@ -89,7 +89,7 @@ MAIN_FUNCTION
 	msg1.data[0] = 0x11;
 	Can1::sendMessage(msg1);
 
-	xpcc::PeriodicTimer<> pTimer(100);
+	xpcc::ShortPeriodicTimer pTimer(100);
 
 	while (1)
 	{

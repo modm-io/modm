@@ -37,7 +37,7 @@ public:
 	}
 
 private:
-	xpcc::Timeout<> timer;
+	xpcc::ShortTimeout timer;
 };
 
 class BlinkingLightRed : public xpcc::pt::Protothread
@@ -79,7 +79,7 @@ public:
 	}
 
 private:
-	xpcc::Timeout<> timer;
+	xpcc::ShortTimeout timer;
 };
 
 // timer interrupt routine

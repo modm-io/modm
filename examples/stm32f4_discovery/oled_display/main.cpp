@@ -32,7 +32,7 @@ MAIN_FUNCTION
 	display << "Hello World!";
 	display.update();
 
-	xpcc::PeriodicTimer<> timer(1000);
+	xpcc::ShortPeriodicTimer timer(1000);
 	uint16_t counter(0);
 
 	while (1)
