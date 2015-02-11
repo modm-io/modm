@@ -215,7 +215,7 @@ namespace xpcc
 #	define	FILENAME	STRINGIFY(BASENAME)
 #endif
 
-#define	XPCC_FILE_INFO		FILENAME "(" STRINGIFY(__LINE__) ") >> "
+#define	XPCC_FILE_INFO		"[" FILENAME "(" STRINGIFY(__LINE__) ")] "
 
 #endif	// __DOXYGEN__
 #endif // XPCC__LOGGER_HPP
