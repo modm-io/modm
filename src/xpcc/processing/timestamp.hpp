@@ -19,16 +19,14 @@ namespace xpcc
 {
 
 /**
- * Simple timestamp
- *
- * The timestamp is calculated in milliseconds.
+ * Generic timestamp for 16bit and 32bit timestamps of variable timebase.
  *
  * @author	Fabian Greif
  * @author	Niklas Hauser
  * @ingroup	processing
  */
 template< typename T >
-class TimestampBase
+class GenericTimestamp
 {
 public:
 	typedef T Type;
@@ -36,12 +34,12 @@ public:
 
 public:
 	/// @param time in ms
-	TimestampBase(const Type time = 0) :
+	GenericTimestamp(const Type time = 0) :
 		time(time)
 	{
 	}
 
-	TimestampBase(const TimestampBase<T> &other) :
+	GenericTimestamp(const GenericTimestamp<T> &other) :
 		time(other.time)
 	{
 	}
@@ -52,50 +50,50 @@ public:
 		return time;
 	}
 
-	inline TimestampBase<T>
-	operator + (const TimestampBase<T>& other) const
+	inline GenericTimestamp<T>
+	operator + (const GenericTimestamp<T>& other) const
 	{
-		return TimestampBase<T>(time + other.time);
+		return GenericTimestamp<T>(time + other.time);
 	}
 
-	inline TimestampBase<T>
-	operator - (const TimestampBase<T>& other) const
+	inline GenericTimestamp<T>
+	operator - (const GenericTimestamp<T>& other) const
 	{
-		return TimestampBase<T>(time - other.time);
+		return GenericTimestamp<T>(time - other.time);
 	}
 
 	inline bool
-	operator == (const TimestampBase<T>& other) const
+	operator == (const GenericTimestamp<T>& other) const
 	{
 		return (time == other.time);
 	}
 
 	inline bool
-	operator != (const TimestampBase<T>& other) const
+	operator != (const GenericTimestamp<T>& other) const
 	{
 		return (time != other.time);
 	}
 
 	inline bool
-	operator < (const TimestampBase<T>& other) const
+	operator < (const GenericTimestamp<T>& other) const
 	{
 		return SignedType(time - other.time) < 0;
 	}
 
 	inline bool
-	operator > (const TimestampBase<T>& other) const
+	operator > (const GenericTimestamp<T>& other) const
 	{
 		return SignedType(time - other.time) > 0;
 	}
 
 	inline bool
-	operator <= (const TimestampBase<T>& other) const
+	operator <= (const GenericTimestamp<T>& other) const
 	{
 		return SignedType(time - other.time) <= 0;
 	}
 
 	inline bool
-	operator >= (const TimestampBase<T>& other) const
+	operator >= (const GenericTimestamp<T>& other) const
 	{
 		return SignedType(time - other.time) >= 0;
 	}
@@ -104,13 +102,16 @@ private:
 	Type time;
 };
 
-typedef TimestampBase<uint_fast16_t> Timestamp;
-typedef TimestampBase<uint32_t> LongTimestamp;
+/// 16bit timestamp, which can hold up to 65 seconds at millisecond resolution.
+using ShortTimestamp = GenericTimestamp<uint_fast16_t>;
+
+/// 32bit timestamp, which can hold up to 49 days at millisecond resolution.
+using Timestamp      = GenericTimestamp<uint32_t>;
 
 // ------------------------------------------------------------------------
 template< typename T >
 inline IOStream&
-operator << (IOStream& os, const TimestampBase<T>& t)
+operator << (IOStream& os, const GenericTimestamp<T>& t)
 {
 	os << t.getTime();
 	return os;

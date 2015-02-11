@@ -42,105 +42,174 @@ PeriodicTimerTest::setUp()
 void
 PeriodicTimerTest::testConstructor()
 {
-	xpcc::PeriodicTimer<xpcc::ClockDummy> timer(10);
-	xpcc::LongPeriodicTimer<xpcc::ClockDummy> timerLong(10);
+	xpcc::GenericPeriodicTimer<xpcc::ClockDummy, xpcc::ShortTimestamp> timerShort(10);
+	xpcc::GenericPeriodicTimer<xpcc::ClockDummy, xpcc::Timestamp> timer(10);
 
-	TEST_ASSERT_TRUE(timer.isRunning());
-	TEST_ASSERT_TRUE(timerLong.isRunning());
+	TEST_ASSERT_FALSE(timerShort.isStopped());
+	TEST_ASSERT_FALSE(timer.isStopped());
 
+	TEST_ASSERT_FALSE(timerShort.hasFired());
+	TEST_ASSERT_FALSE(timer.hasFired());
+
+	TEST_ASSERT_FALSE(timerShort.isExpired());
 	TEST_ASSERT_FALSE(timer.isExpired());
-	TEST_ASSERT_FALSE(timerLong.isExpired());
+
+	TEST_ASSERT_FALSE(timerShort.hasFired());
+	TEST_ASSERT_FALSE(timer.hasFired());
 }
 
 void
 PeriodicTimerTest::testTimer()
 {
-	xpcc::PeriodicTimer<xpcc::ClockDummy> timer(10);
-	xpcc::LongPeriodicTimer<xpcc::ClockDummy> timerLong(10);
+	xpcc::GenericPeriodicTimer<xpcc::ClockDummy, xpcc::ShortTimestamp> timerShort(10);
+	xpcc::GenericPeriodicTimer<xpcc::ClockDummy, xpcc::Timestamp> timer(10);
 
+	TEST_ASSERT_FALSE(timerShort.isExpired());
 	TEST_ASSERT_FALSE(timer.isExpired());
-	TEST_ASSERT_FALSE(timerLong.isExpired());
 
 	int i;
 	for (i = 0; i < 9; ++i) {
 		xpcc::ClockDummy::setTime(i);
-		TEST_ASSERT_FALSE(timer.isExpired());
+		TEST_ASSERT_FALSE(timerShort.isExpired());
 	}
 
+	TEST_ASSERT_FALSE(timerShort.hasFired());
+	TEST_ASSERT_FALSE(timer.hasFired());
+
 	xpcc::ClockDummy::setTime(10);
+	TEST_ASSERT_FALSE(timerShort.hasFired());
+	TEST_ASSERT_FALSE(timer.hasFired());
+
+	TEST_ASSERT_TRUE(timerShort.isExpired());
+	TEST_ASSERT_FALSE(timerShort.isExpired());
+
 	TEST_ASSERT_TRUE(timer.isExpired());
 	TEST_ASSERT_FALSE(timer.isExpired());
 
-	TEST_ASSERT_TRUE(timerLong.isExpired());
-	TEST_ASSERT_FALSE(timerLong.isExpired());
+	TEST_ASSERT_TRUE(timerShort.hasFired());
+	TEST_ASSERT_TRUE(timer.hasFired());
 
 
 	xpcc::ClockDummy::setTime(20);
+	TEST_ASSERT_FALSE(timerShort.hasFired());
+	TEST_ASSERT_FALSE(timer.hasFired());
+
+	TEST_ASSERT_TRUE(timerShort.isExpired());
+	TEST_ASSERT_FALSE(timerShort.isExpired());
+
 	TEST_ASSERT_TRUE(timer.isExpired());
 	TEST_ASSERT_FALSE(timer.isExpired());
 
-	TEST_ASSERT_TRUE(timerLong.isExpired());
-	TEST_ASSERT_FALSE(timerLong.isExpired());
+	TEST_ASSERT_TRUE(timerShort.hasFired());
+	TEST_ASSERT_TRUE(timer.hasFired());
 
 
+	// we are going to miss the 30, 40, 50, 60, 70, 80, 90 periods
+	// however, isExpired() should still only return exactly once
 	xpcc::ClockDummy::setTime(100);
+	TEST_ASSERT_FALSE(timerShort.hasFired());
+	TEST_ASSERT_FALSE(timer.hasFired());
+
+	TEST_ASSERT_TRUE(timerShort.isExpired());
+	TEST_ASSERT_FALSE(timerShort.isExpired());
+
 	TEST_ASSERT_TRUE(timer.isExpired());
 	TEST_ASSERT_FALSE(timer.isExpired());
 
-	TEST_ASSERT_TRUE(timerLong.isExpired());
-	TEST_ASSERT_FALSE(timerLong.isExpired());
+	TEST_ASSERT_TRUE(timerShort.hasFired());
+	TEST_ASSERT_TRUE(timer.hasFired());
 
+	// we are going to miss a couple of periods more
+	xpcc::ClockDummy::setTime(150);
+	TEST_ASSERT_FALSE(timerShort.hasFired());
+	TEST_ASSERT_FALSE(timer.hasFired());
 
+	// lets call isExpired() with a delay of 5ms after period expiration.
+	// it should expired once, and then reschedule for 160ms, not 165ms!!
 	xpcc::ClockDummy::setTime(155);
+	TEST_ASSERT_FALSE(timerShort.hasFired());
+	TEST_ASSERT_FALSE(timer.hasFired());
+
+	TEST_ASSERT_TRUE(timerShort.isExpired());
+	TEST_ASSERT_FALSE(timerShort.isExpired());
+
 	TEST_ASSERT_TRUE(timer.isExpired());
 	TEST_ASSERT_FALSE(timer.isExpired());
 
-	TEST_ASSERT_TRUE(timerLong.isExpired());
-	TEST_ASSERT_FALSE(timerLong.isExpired());
+	TEST_ASSERT_TRUE(timerShort.hasFired());
+	TEST_ASSERT_TRUE(timer.hasFired());
 
+	// not yet
+	xpcc::ClockDummy::setTime(159);
+	TEST_ASSERT_FALSE(timerShort.isExpired());
+	TEST_ASSERT_FALSE(timer.isExpired());
 
+	TEST_ASSERT_TRUE(timerShort.hasFired());
+	TEST_ASSERT_TRUE(timer.hasFired());
+
+	// now it should expire
 	xpcc::ClockDummy::setTime(160);
-	TEST_ASSERT_FALSE(timer.isExpired());
+	TEST_ASSERT_FALSE(timerShort.hasFired());
+	TEST_ASSERT_FALSE(timer.hasFired());
+
+	TEST_ASSERT_TRUE(timerShort.isExpired());
+	TEST_ASSERT_FALSE(timerShort.isExpired());
+
+	TEST_ASSERT_TRUE(timer.isExpired());
 	TEST_ASSERT_FALSE(timer.isExpired());
 
-	TEST_ASSERT_FALSE(timerLong.isExpired());
-	TEST_ASSERT_FALSE(timerLong.isExpired());
+	// it should not fire at 165ms
+	xpcc::ClockDummy::setTime(165);
+	TEST_ASSERT_FALSE(timerShort.isExpired());
+	TEST_ASSERT_FALSE(timer.isExpired());
+
+	TEST_ASSERT_TRUE(timerShort.hasFired());
+	TEST_ASSERT_TRUE(timer.hasFired());
 }
 
 void
 PeriodicTimerTest::testRestart()
 {
-	xpcc::PeriodicTimer<xpcc::ClockDummy> timer(10);
-	xpcc::PeriodicTimer<xpcc::ClockDummy> timerLong(10);
+	xpcc::GenericPeriodicTimer<xpcc::ClockDummy, xpcc::ShortTimestamp> timerShort(10);
+	xpcc::GenericPeriodicTimer<xpcc::ClockDummy, xpcc::ShortTimestamp> timer(10);
 
-	TEST_ASSERT_TRUE(timer.isRunning());
+	TEST_ASSERT_FALSE(timerShort.hasFired());
+	TEST_ASSERT_FALSE(timer.hasFired());
+
+	TEST_ASSERT_FALSE(timerShort.isStopped());
+	TEST_ASSERT_FALSE(timer.isStopped());
+
+	TEST_ASSERT_FALSE(timerShort.isExpired());
 	TEST_ASSERT_FALSE(timer.isExpired());
 
-	TEST_ASSERT_TRUE(timerLong.isRunning());
-	TEST_ASSERT_FALSE(timerLong.isExpired());
 
-
+	timerShort.stop();
 	timer.stop();
-	timerLong.stop();
 
-	TEST_ASSERT_FALSE(timer.isRunning());
-	TEST_ASSERT_FALSE(timerLong.isRunning());
+	TEST_ASSERT_FALSE(timerShort.hasFired());
+	TEST_ASSERT_FALSE(timer.hasFired());
+
+	TEST_ASSERT_TRUE(timerShort.isStopped());
+	TEST_ASSERT_TRUE(timer.isStopped());
 
 
+	timerShort.restart(5);
 	timer.restart(5);
-	timerLong.restart(5);
 
-	TEST_ASSERT_TRUE(timer.isRunning());
+	TEST_ASSERT_FALSE(timerShort.isStopped());
+	TEST_ASSERT_FALSE(timer.isStopped());
+
+	TEST_ASSERT_FALSE(timerShort.hasFired());
+	TEST_ASSERT_FALSE(timer.hasFired());
+
+	TEST_ASSERT_FALSE(timerShort.isExpired());
 	TEST_ASSERT_FALSE(timer.isExpired());
-
-	TEST_ASSERT_TRUE(timerLong.isRunning());
-	TEST_ASSERT_FALSE(timerLong.isExpired());
 
 
 	xpcc::ClockDummy::setTime(5);
+	TEST_ASSERT_TRUE(timerShort.isExpired());
+	TEST_ASSERT_FALSE(timerShort.isExpired());
+
 	TEST_ASSERT_TRUE(timer.isExpired());
 	TEST_ASSERT_FALSE(timer.isExpired());
-
-	TEST_ASSERT_TRUE(timerLong.isExpired());
-	TEST_ASSERT_FALSE(timerLong.isExpired());
 }

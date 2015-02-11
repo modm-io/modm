@@ -33,10 +33,10 @@ public:
 		return TimestampType(time);
 	}
 
-	static LongTimestamp
-	nowLong()
+	static ShortTimestamp
+	nowShort()
 	{
-		return LongTimestamp(time);
+		return ShortTimestamp(time);
 	}
 
 	static void

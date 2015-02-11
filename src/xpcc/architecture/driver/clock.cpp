@@ -75,5 +75,5 @@
 #endif
 
 // explicit declaration of what member function templates we need to generate
+template xpcc::ShortTimestamp xpcc::Clock::now();
 template xpcc::Timestamp xpcc::Clock::now();
-template xpcc::LongTimestamp xpcc::Clock::now();

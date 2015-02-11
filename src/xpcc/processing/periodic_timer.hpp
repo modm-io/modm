@@ -16,97 +16,92 @@ namespace xpcc
 {
 
 /**
- * Software timer
- *
- * Extra care must be taken when not calling the isExpired() method
- * for more than ~30000 ticks (which corresponds to about 30s with the
- * default millisecond resolution). Due to an overflow in the implementation
- * this might add an additional delay of up to ~30000 ticks in the worst
- * case.
- * Just call restart() without any parameter before reusing the timer
- * to avoid this behaviour.
- *
- * This won't happen during normal operation.
+ * Generic software timeout class for variable timebase and timestamp width.
  *
  * @warning	Never use this timer when a precise timebase is needed!
  *
- * @tparam	Clock	Used timer, default is xpcc::Clock() which should have
- * 					a millisecond resolution.
+ * @see		GenericTimeout
  *
- * @see		TimeoutBase
+ * @tparam	Clock
+ * 		Used clock which inherits from xpcc::Clock, may have a variable timebase.
+ * @tparam	TimestampType
+ * 		Used timestamp which is compatible with the chosen Clock.
+ *
  * @author	Fabian Greif
  * @author	Niklas Hauser
  * @ingroup	processing
  */
 template< class Clock, typename TimestampType >
-class PeriodicTimerBase
+class GenericPeriodicTimer
 {
 public:
-	/**
-	 * Create a stopped timer.
-	 */
-	PeriodicTimerBase();
+	/// Create and start the timer
+	GenericPeriodicTimer(const TimestampType period);
 
-	/**
-	 * Create and start the timer.
-	 *
-	 * @param interval
-	 * 			Timed interval in millisecond resolution (depends on
-	 * 			xpcc::Clock).
-	 */
-	PeriodicTimerBase(const TimestampType interval);
-
-	/// Stop the timer
-	inline void
-	stop();
-
-	/// Check if the timer is running
-	inline bool
-	isRunning() const;
-
-	/// Restart the current interval.
+	/// Restart the timer with the current interval.
 	inline void
 	restart();
 
-	/// Set a new interval
+	/// Restart the timer with a new interval value.
 	inline void
 	restart(const TimestampType interval);
 
+	/// Stops the timer and sets isStopped() to `true`, and isExpired() to `false`.
+	inline void
+	stop();
+
+	/// @return `true` if the timer has been stopped, `false` otherwise
+	inline bool
+	isStopped() const;
+
 	/**
-	 * Check if a new period has started
-	 *
-	 * This function can be used to easily write sections that are
-	 * executed at defined periods.
-	 *
-	 * @code
-	 * xpcc::PeriodicTimer<> timer(50);
-	 * while (1)
-	 * {
-	 *     if (timer.isExpired()) {
-	 *         // will be executed approximately every 50 ms
-	 *     }
-	 * }
-	 * @endcode
-	 *
-	 * @return	`true` if entering a new period, `false` otherwise
+	 * Returns `true` **once**, when the period has expired.
+	 * Calling this function sets hasFired() to `true`.
 	 */
 	inline bool
 	isExpired();
 
-	/// Returns the remaining time until a timeout.
+	/**
+	 * Check if the timer has been fired since it expired
+	 * (i.e. has isExpired() been called since expiration).
+	 * The state will be kept even when the timer is stopped,
+	 * however, a call to restart(time) will reset this.
+	 */
+	bool
+	hasFired();
+
+	/// @return the time until expiration, or 0 if stopped
 	inline TimestampType
-	remaining();
+	remaining() const;
+
+//	/// @return the time until (negative time) or since (positive time) expiration, or 0 if stopped
+//	inline TimeDelta
+//	remaining() const;
 
 private:
-	TimestampType interval;
-	TimeoutBase<Clock, TimestampType> timeout;
+	TimestampType period;
+	GenericTimeout<Clock, TimestampType> timeout;
 };
 
-template< class Clock = ::xpcc::Clock >
-using PeriodicTimer = PeriodicTimerBase<Clock, Timestamp>;
+/**
+ * Periodic software timer for up to 32 seconds with millisecond resolution.
+ *
+ * Extra care must be taken when not calling the isExpired() method
+ * for more than 32 seconds. Due to an overflow in the implementation
+ * this might add an additional delay of up to 32s ticks in the worst
+ * case.
+ * Always call restart() or restart(time) before reusing the timer
+ * to avoid this behaviour.
+ *
+ * If you need a longer time period, use PeriodicTimer.
+ *
+ * @ingroup	processing
+ */
+using ShortPeriodicTimer = GenericPeriodicTimer<::xpcc::Clock, ShortTimestamp>;
 
-template< class Clock = ::xpcc::Clock >
-using LongPeriodicTimer = PeriodicTimerBase<Clock, LongTimestamp>;
+/// Periodic software timer for up to 24 days with millisecond resolution.
+/// @ingroup	processing
+using PeriodicTimer      = GenericPeriodicTimer<::xpcc::Clock, Timestamp>;
 
 }	// namespace
 

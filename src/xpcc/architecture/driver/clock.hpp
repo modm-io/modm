@@ -54,10 +54,10 @@ public:
 	static TimestampType
 	now();
 
-	static inline LongTimestamp
-	nowLong()
+	static inline ShortTimestamp
+	nowShort()
 	{
-		return now<LongTimestamp>();
+		return now<ShortTimestamp>();
 	}
 
 #if !defined(XPCC__OS_HOSTED)

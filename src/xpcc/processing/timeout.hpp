@@ -19,99 +19,106 @@ namespace xpcc
 
 // forward declaration for friending
 template< class Clock, class TimestampType >
-class PeriodicTimerBase;
+class GenericPeriodicTimer;
 
 /**
- * Software timer
+ * Generic software timeout class for variable timebase and timestamp width.
  *
- * Has to be polled to check if it has expired.
+ * @warning	Never use this timer when a precise timebase is needed!
  *
- * Extra care must be taken when not calling the isExpired() method
- * for more than ~30000 ticks (which corresponds to about 30s with the
- * default millisecond resolution) when the timeout is active. Due to an
- * overflow in the implementation this might add an additional delay of
- * up to ~30000 ticks in the worst case.
+ * @see		GenericPeriodicTimer
  *
- * Call isExpired() at least once every 30000 ticks before the timeout
- * value is reached to avoid this behaviour.
- *
- * @see		PeriodicTimer
- * @tparam	T	Used timer, default is xpcc::Clock() which has
- * 				a millisecond resolution.
- *
- * Usage:
- * @include	timeout.cpp
- *
- * Complete example for the ATMega644:
- * @include timeout/main.cpp
+ * @tparam	Clock
+ * 		Used clock which inherits from xpcc::Clock, may have a variable timebase.
+ * @tparam	TimestampType
+ * 		Used timestamp which is compatible with the chosen Clock.
  *
  * @author	Fabian Greif
  * @author	Niklas Hauser
  * @ingroup	processing
  */
 template< class Clock, class TimestampType >
-class TimeoutBase
+class GenericTimeout
 {
 	friend class
-	PeriodicTimerBase<Clock, TimestampType>;
+	GenericPeriodicTimer<Clock, TimestampType>;
 
 public:
-	TimeoutBase();
+	GenericTimeout();
 
 	/// Create and start the timeout
-	TimeoutBase(const TimestampType time);
-
-	/**
-	 * Check if the given time has passed.
-	 *
-	 * If isExpired() changes to `true`, it will keep this value until
-	 * a call of restart().
-	 */
-	bool
-	isExpired();
-
-	/**
-	 * Check if the timer was started and was not stopped.
-	 *
-	 * If isRunning() changes to `false`, it will keep this value until
-	 * a call of restart().
-	 */
-	inline bool
-	isRunning() const;
-
-	/**
-	 * Stop the timer
-	 *
-	 * Sets isExpired() to `true`, and isRunning() to `false`.
-	 */
-	inline void
-	stop();
+	GenericTimeout(const TimestampType time);
 
 	/// Set a new timeout value.
 	void
 	restart(TimestampType time);
 
-	/// Returns the remaining time until a timeout.
+	/// Stops the timer and sets isStopped() to `true`, and isExpired() to `false`.
+	inline void
+	stop();
+
+	/// @return `true` if the timer has been stopped, `false` otherwise
+	inline bool
+	isStopped() const;
+
+	/// Returns `true` **once**, when the timeout has expired.
+	/// Calling this function sets hasFired() to `true`.
+	bool
+	isExpired();
+
+	/**
+	 * Check if the timer has been fired since it expired
+	 * (i.e. has isExpired() been called since expiration).
+	 * The state will be kept even when the timer is stopped,
+	 * however, a call to restart(time) will reset this.
+	 */
+	bool
+	hasFired();
+
+	/// @return the time until expiration, or 0 if stopped
 	inline TimestampType
-	remaining();
+	remaining() const;
+
+//	/// @return the time until (negative time) or since (positive time) expiration, or 0 if stopped
+//	inline TimeDelta
+//	remaining() const;
 
 private:
-	enum State
-	{
-		STOPPED = 0,
-		EXPIRED = 1,
-		RUNNING = 2,
-	};
+	inline bool
+	checkExpiration() const;
 
+private:
 	TimestampType endTime;
-	State state;
+
+	enum
+	State : uint8_t
+	{
+		FIRED   = 0b001,
+		EXPIRED = 0b010, // only internal
+		RUNNING = 0b100,
+		// STOPPED is not (EXPIRED or RUNNING) = not EXPIRED and not RUNNING
+	};
+	uint8_t state;
 };
 
-template< class Clock = ::xpcc::Clock >
-using Timeout = TimeoutBase<Clock, Timestamp>;
+/**
+ * Software timeout for up to 32 seconds with millisecond resolution.
+ *
+ * Extra care must be taken when not calling the isExpired() method
+ * for more than 32 seconds. Due to an overflow in the implementation
+ * this might add an additional delay of up to 32s ticks in the worst
+ * case.
+ * Always call restart(time) before reusing the timer to avoid this behaviour.
+ *
+ * If you need a longer time period, use Timeout.
+ *
+ * @ingroup	processing
+ */
+using ShortTimeout = GenericTimeout<::xpcc::Clock, ShortTimestamp>;
 
-template< class Clock = ::xpcc::Clock >
-using LongTimeout = TimeoutBase<Clock, LongTimestamp>;
+/// Software timeout for up to 24 days with millisecond resolution.
+/// @ingroup	processing
+using Timeout      = GenericTimeout<::xpcc::Clock, Timestamp>;
 
 }	// namespace xpcc
 
