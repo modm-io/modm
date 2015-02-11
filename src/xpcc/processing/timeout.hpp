@@ -37,7 +37,7 @@ class GenericPeriodicTimer;
  * @author	Niklas Hauser
  * @ingroup	processing
  */
-template< class Clock, class TimestampType >
+template< class Clock, class TimestampType = xpcc::Timestamp >
 class GenericTimeout
 {
 	friend class

@@ -31,7 +31,7 @@ namespace xpcc
  * @author	Niklas Hauser
  * @ingroup	processing
  */
-template< class Clock, typename TimestampType >
+template< class Clock, typename TimestampType = xpcc::Timestamp >
 class GenericPeriodicTimer
 {
 public:
