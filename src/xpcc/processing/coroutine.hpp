@@ -59,7 +59,7 @@
  *             Led::reset();
  *             PT_CALL(setTimer(this, 200));
  *
- *             PT_WAIT_UNTIL(timer.isExpired());
+ *             PT_WAIT_UNTIL(timeout.isExpired());
  *         }
  *
  *         PT_END();
@@ -73,7 +73,7 @@
  *         // nested calling is allowed
  *         if (CO_CALL(setTimer(ctx, 100)))
  *         {
- *             CO_WAIT_UNTIL(timer.isExpired());
+ *             CO_WAIT_UNTIL(timeout.isExpired());
  *         }
  *
  *         CO_END_RETURN(false);
@@ -84,9 +84,9 @@
  *     {
  *         CO_BEGIN();
  *
- *         timer.restart(timeout);
+ *         timeout.restart(timeout);
  *
- *         if(timer.isRunning())
+ *         if(timeout.isRunning())
  *             CO_RETURN(true);
  *
  *         // clean up code goes here
@@ -95,7 +95,7 @@
  *     }
  *
  * private:
- *     xpcc::ShortTimeout timer;
+ *     xpcc::ShortTimeout timeout;
  * };
  *
  *

@@ -37,7 +37,7 @@ MAIN_FUNCTION
 
 	while (1)
 	{
-		if (timer.isExpired())
+		if (timer.execute())
 		{
 			display.setCursor(0,20);
 			display << counter++;

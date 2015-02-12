@@ -59,9 +59,9 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int baudRate)
 		std::cout << "write C" << std::endl;
 		this->serialPort.write("C\r");
 
-		xpcc::ShortTimeout timer;
-		timer.restart(500);
-		while (!timer.isExpired())
+		xpcc::ShortTimeout timeout;
+		timeout.restart(500);
+		while (!timeout.isExpired())
 		{
 		}
 
@@ -71,10 +71,10 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int baudRate)
 		std::cout << "write S4" << std::endl;
 		this->serialPort.write("S4\r");
 
-		timer.restart(500);
+		timeout.restart(500);
 		while (!this->serialPort.read(a))
 		{
-			if (timer.isExpired())
+			if (timeout.isExpired())
 			{
 				std::cout << "Timer expired" << std::endl;
 				this->serialPort.close();
@@ -97,10 +97,10 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int baudRate)
 		}
 		this->serialPort.write("O\r");
 		std::cout << "written O" << std::endl;
-		timer.restart(500);
+		timeout.restart(500);
 		while (!this->serialPort.read(a))
 		{
-			if (timer.isExpired())
+			if (timeout.isExpired())
 			{
 				std::cout << "Timer expired" << std::endl;
 				this->serialPort.close();

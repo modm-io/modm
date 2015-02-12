@@ -101,7 +101,7 @@ MAIN_FUNCTION
 			displayMessage(message);
 		}
 
-		if (pTimer.isExpired()) {
+		if (pTimer.execute()) {
 			LedNorth::toggle();
 
 			static uint8_t idx = 0;

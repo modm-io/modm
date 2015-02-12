@@ -68,9 +68,9 @@ public:
 			if (PT_CALL(accel.ping()))
 				break;
 			// otherwise, try again in 100ms
-			this->timer.restart(100);
+			this->timeout.restart(100);
 			LedOrange::set();
-			PT_WAIT_UNTIL(this->timer.isExpired());
+			PT_WAIT_UNTIL(this->timeout.isExpired());
 			LedOrange::reset();
 		}
 
@@ -94,15 +94,15 @@ public:
 			LedGreen::set(averageY.getValue() < -0.2);
 			LedRed::set(averageY.getValue() > 0.2);
 
-			this->timer.restart(5);
-			PT_WAIT_UNTIL(this->timer.isExpired());
+			this->timeout.restart(5);
+			PT_WAIT_UNTIL(this->timeout.isExpired());
 		}
 
 		PT_END();
 	}
 
 private:
-	xpcc::ShortTimeout timer;
+	xpcc::ShortTimeout timeout;
 	xpcc::MovingAverage<float, 25> averageX;
 	xpcc::MovingAverage<float, 25> averageY;
 };

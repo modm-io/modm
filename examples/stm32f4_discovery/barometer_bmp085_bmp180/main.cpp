@@ -47,8 +47,8 @@ public:
 			if (PT_CALL(barometer.ping()))
 				break;
 			// otherwise, try again in 100ms
-			this->timer.restart(100);
-			PT_WAIT_UNTIL(this->timer.isExpired());
+			this->timeout.restart(100);
+			PT_WAIT_UNTIL(this->timeout.isExpired());
 		}
 
 		stream << "Device responded" << xpcc::endl;
@@ -60,8 +60,8 @@ public:
 			if (PT_CALL(barometer.configure()))
 				break;
 			// otherwise, try again in 100ms
-			this->timer.restart(100);
-			PT_WAIT_UNTIL(this->timer.isExpired());
+			this->timeout.restart(100);
+			PT_WAIT_UNTIL(this->timeout.isExpired());
 		}
 
 		stream << "Device configured" << xpcc::endl;
@@ -85,7 +85,7 @@ public:
 		{
 			static xpcc::ShortPeriodicTimer timer(250);
 
-			PT_WAIT_UNTIL(timer.isExpired());
+			PT_WAIT_UNTIL(timer.execute());
 
 			// Returns when new data was read from the sensor
 			PT_CALL(barometer.readout());
@@ -103,7 +103,7 @@ public:
 	}
 
 private:
-	xpcc::ShortTimeout timer;
+	xpcc::ShortTimeout timeout;
 
 	xpcc::bmp085::Data data;
 	xpcc::Bmp085<MyI2cMaster> barometer;

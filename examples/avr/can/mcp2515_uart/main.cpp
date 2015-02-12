@@ -125,7 +125,7 @@ main()
 			}
 		}
 
-		if (timer.isExpired())
+		if (timer.execute())
 		{
 			LedGreen::toggle();
 		}

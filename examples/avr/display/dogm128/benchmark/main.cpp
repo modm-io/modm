@@ -151,7 +151,7 @@ MAIN_FUNCTION
 	while (1)
 	{
 		uint8_t iter = 0;
-		while (!timer.isExpired())
+		while (!timer.execute())
 		{
 			// rectangle in left side of screen
 			display.setColor(Color::black());

@@ -35,8 +35,8 @@ public:
 			if (PT_CALL(temp.ping()))
 				break;
 			// otherwise, try again in 100ms
-			this->timer.restart(100);
-			PT_WAIT_UNTIL(this->timer.isExpired());
+			this->timeout.restart(100);
+			PT_WAIT_UNTIL(this->timeout.isExpired());
 		}
 
 
@@ -73,8 +73,8 @@ public:
 				stream << xpcc::endl;
 				if (result) stream << "Heat me up!" << xpcc::endl;
 			}
-			this->timer.restart(200);
-			PT_WAIT_UNTIL(this->timer.isExpired());
+			this->timeout.restart(200);
+			PT_WAIT_UNTIL(this->timeout.isExpired());
 			LedRed::toggle();
 		}
 
@@ -83,7 +83,7 @@ public:
 
 private:
 	bool result;
-	xpcc::ShortTimeout timer;
+	xpcc::ShortTimeout timeout;
     xpcc::tmp102::Data temperatureData;
 	xpcc::Tmp102<MyI2cMaster> temp;
 };

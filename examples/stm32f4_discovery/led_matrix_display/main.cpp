@@ -57,7 +57,7 @@ MAIN_FUNCTION
 
     while (1)
     {
-		if (countdownTimer.isExpired())
+		if (countdownTimer.execute())
 		{
 			for (int16_t sec = 9999; sec >= 0; --sec)
 			{

@@ -51,8 +51,8 @@ public:
 			 	break;
 			}
 			// otherwise, try again in 100ms
-			this->timer.restart(100);
-			PT_WAIT_UNTIL(this->timer.isExpired());
+			this->timeout.restart(100);
+			PT_WAIT_UNTIL(this->timeout.isExpired());
 		}
 
 		stream << "Device responded" << xpcc::endl;
@@ -63,8 +63,8 @@ public:
 				break;
 			}
 			// otherwise, try again in 100ms
-			this->timer.restart(100);
-			PT_WAIT_UNTIL(this->timer.isExpired());
+			this->timeout.restart(100);
+			PT_WAIT_UNTIL(this->timeout.isExpired());
 		}
 
 		stream << "Device initialized" << xpcc::endl;
@@ -79,8 +79,8 @@ public:
 				break;
 			}
 			// otherwise, try again in 100ms
-			this->timer.restart(100);
-			PT_WAIT_UNTIL(this->timer.isExpired());
+			this->timeout.restart(100);
+			PT_WAIT_UNTIL(this->timeout.isExpired());
 		}
 
 		stream << "Device configured" << xpcc::endl;
@@ -94,15 +94,15 @@ public:
 				colors.toHsv(&hsv);
 				stream.printf("  %5d\n", hsv.hue);
 			}
-			this->timer.restart(500);
-			PT_WAIT_UNTIL(this->timer.isExpired());
+			this->timeout.restart(500);
+			PT_WAIT_UNTIL(this->timeout.isExpired());
 		}
 
 		PT_END();
 	}
 
 private:
-	xpcc::ShortTimeout timer;
+	xpcc::ShortTimeout timeout;
 	xpcc::Tcs3414<MyI2cMaster> colorSensor;
 };
 
@@ -137,7 +137,7 @@ MAIN_FUNCTION
 	while (1)
 	{
 		one.update();
-		if (tmr.isExpired()) {
+		if (tmr.execute()) {
 			LedOrange::toggle();
 		}
 	}

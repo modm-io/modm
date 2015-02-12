@@ -114,7 +114,7 @@ MAIN_FUNCTION
 
 	while (1)
 	{
-		if(divide_timer.isExpired())
+		if(divide_timer.execute())
 			divide_now = true;
 
 		max = 0;
@@ -144,7 +144,7 @@ MAIN_FUNCTION
 
 
 
-		if(refreshTerminal.isExpired())
+		if(refreshTerminal.execute())
 		{
 			XPCC_LOG_INFO.printf("\033[2J");
 			XPCC_LOG_INFO.printf("\033[1;10H");
