@@ -15,6 +15,8 @@
 namespace xpcc
 {
 
+using PeriodicTimerState = TimeoutState;
+
 /**
  * Generic software timeout class for variable timebase and timestamp width.
  *
@@ -38,45 +40,36 @@ public:
 	/// Create and start the timer
 	GenericPeriodicTimer(const TimestampType period);
 
-	/// Restart the timer with the current interval.
+	/// Restart the timer with the current period.
 	inline void
 	restart();
 
-	/// Restart the timer with a new interval value.
+	/// Restart the timer with a new period value.
 	inline void
-	restart(const TimestampType interval);
+	restart(const TimestampType period);
 
 	/// Stops the timer and sets isStopped() to `true`, and isExpired() to `false`.
 	inline void
 	stop();
 
+
+	/// @return `true` exactly once during each period
+	bool
+	execute();
+
+
+	/// @return the (positive) time until the next period, or 0 if stopped
+	inline typename TimestampType::Type
+	remaining() const;
+
+
+	/// @return the current state of the timer
+	PeriodicTimerState
+	getState();
+
 	/// @return `true` if the timer has been stopped, `false` otherwise
 	inline bool
 	isStopped() const;
-
-	/**
-	 * Returns `true` **once**, when the period has expired.
-	 * Calling this function sets hasFired() to `true`.
-	 */
-	inline bool
-	isExpired();
-
-	/**
-	 * Check if the timer has been fired since it expired
-	 * (i.e. has isExpired() been called since expiration).
-	 * The state will be kept even when the timer is stopped,
-	 * however, a call to restart(time) will reset this.
-	 */
-	bool
-	hasFired();
-
-	/// @return the time until expiration, or 0 if stopped
-	inline TimestampType
-	remaining() const;
-
-//	/// @return the time until (negative time) or since (positive time) expiration, or 0 if stopped
-//	inline TimeDelta
-//	remaining() const;
 
 private:
 	TimestampType period;

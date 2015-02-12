@@ -13,7 +13,7 @@
 
 template< class Clock, class TimestampType >
 xpcc::GenericTimeout<Clock, TimestampType>::GenericTimeout() :
-	endTime(0), state(0)
+	endTime(0), state(STOPPED)
 {
 }
 
@@ -28,32 +28,27 @@ void
 xpcc::GenericTimeout<Clock, TimestampType>::restart(TimestampType time)
 {
 	endTime = Clock::template now<TimestampType>() + time;
-	// clear FIRED flag
-	state = RUNNING;
+	state = ARMED;
 }
 
 template< class Clock, class TimestampType >
 void
 xpcc::GenericTimeout<Clock, TimestampType>::stop()
 {
-	state &= ~(EXPIRED | RUNNING);
+	state = STOPPED;
 }
 
 // ----------------------------------------------------------------------------
 template< class Clock, class TimestampType >
 bool
-xpcc::GenericTimeout<Clock, TimestampType>::isStopped() const
+xpcc::GenericTimeout<Clock, TimestampType>::execute()
 {
-	return !(state & (EXPIRED | RUNNING));
-}
+	if (state & EXECUTED)
+		return false;
 
-template< class Clock, class TimestampType >
-bool
-xpcc::GenericTimeout<Clock, TimestampType>::isExpired()
-{
-	if (checkExpiration())
+	if (state == EXPIRED || checkExpiration())
 	{
-		state = EXPIRED | FIRED;
+		state = EXPIRED | EXECUTED;
 		return true;
 	}
 
@@ -62,26 +57,47 @@ xpcc::GenericTimeout<Clock, TimestampType>::isExpired()
 }
 
 template< class Clock, class TimestampType >
-bool
-xpcc::GenericTimeout<Clock, TimestampType>::hasFired()
+typename TimestampType::SignedType
+xpcc::GenericTimeout<Clock, TimestampType>::remaining() const
+{
+	if (state != STOPPED)
+		return (endTime - Clock::template now<TimestampType>()).getTime();
+
+	return 0;
+}
+
+// ----------------------------------------------------------------------------
+template< class Clock, class TimestampType >
+xpcc::TimeoutState
+xpcc::GenericTimeout<Clock, TimestampType>::getState()
 {
 	if (checkExpiration())
 	{
-		state &= ~FIRED;
-		return false;
+		state &= ~ARMED;
+		state |= EXPIRED;
 	}
-	return (state & FIRED);
+	return TimeoutState(state & STATUS_MASK);
 }
 
+template< class Clock, class TimestampType >
+bool
+xpcc::GenericTimeout<Clock, TimestampType>::isStopped() const
+{
+	return state == STOPPED;
+}
 
 template< class Clock, class TimestampType >
-TimestampType
-xpcc::GenericTimeout<Clock, TimestampType>::remaining() const
+bool
+xpcc::GenericTimeout<Clock, TimestampType>::isArmed()
 {
-	if (state >= RUNNING)
-		return (endTime - Clock::template now<TimestampType>());
+	return getState() == TimeoutState::Armed;
+}
 
-	return 0;
+template< class Clock, class TimestampType >
+bool
+xpcc::GenericTimeout<Clock, TimestampType>::isExpired()
+{
+	return getState() == TimeoutState::Expired;
 }
 
 // ----------------------------------------------------------------------------
@@ -89,5 +105,5 @@ template< class Clock, class TimestampType >
 bool
 xpcc::GenericTimeout<Clock, TimestampType>::checkExpiration() const
 {
-	return (state >= RUNNING) and (Clock::template now<TimestampType>() >= endTime);
+	return (state & ARMED) and (Clock::template now<TimestampType>() >= endTime);
 }

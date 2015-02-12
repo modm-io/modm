@@ -17,6 +17,14 @@
 namespace xpcc
 {
 
+enum class
+TimeoutState : uint8_t
+{
+	Stopped = 0,
+	Expired = 0b010,
+	Armed  = 0b100,
+};
+
 // forward declaration for friending
 template< class Clock, class TimestampType >
 class GenericPeriodicTimer;
@@ -40,9 +48,6 @@ class GenericPeriodicTimer;
 template< class Clock, class TimestampType = xpcc::Timestamp >
 class GenericTimeout
 {
-	friend class
-	GenericPeriodicTimer<Clock, TimestampType>;
-
 public:
 	GenericTimeout();
 
@@ -57,48 +62,53 @@ public:
 	inline void
 	stop();
 
-	/// @return `true` if the timer has been stopped, `false` otherwise
+
+	/// @return `true` exactly once, after the timeout expired
+	bool
+	execute();
+
+
+	/// @return the time until (positive time) or since (negative time) expiration, or 0 if stopped
+	inline typename TimestampType::SignedType
+	remaining() const;
+
+
+	/// @return the current state of the timeout
+	TimeoutState
+	getState();
+
+	/// @return `true` if the timeout is stopped, `false` otherwise
 	inline bool
 	isStopped() const;
 
-	/// Returns `true` **once**, when the timeout has expired.
-	/// Calling this function sets hasFired() to `true`.
-	bool
+	/// @return `true` if the timeout has expired, `false` otherwise
+	inline bool
 	isExpired();
 
-	/**
-	 * Check if the timer has been fired since it expired
-	 * (i.e. has isExpired() been called since expiration).
-	 * The state will be kept even when the timer is stopped,
-	 * however, a call to restart(time) will reset this.
-	 */
-	bool
-	hasFired();
-
-	/// @return the time until expiration, or 0 if stopped
-	inline TimestampType
-	remaining() const;
-
-//	/// @return the time until (negative time) or since (positive time) expiration, or 0 if stopped
-//	inline TimeDelta
-//	remaining() const;
+	/// @return `true` if the timeout is armed (not stopped and not expired), `false` otherwise
+	inline bool
+	isArmed();
 
 private:
 	inline bool
 	checkExpiration() const;
 
 private:
-	TimestampType endTime;
-
 	enum
-	State : uint8_t
+	InternalState : uint8_t
 	{
-		FIRED   = 0b001,
-		EXPIRED = 0b010, // only internal
-		RUNNING = 0b100,
-		// STOPPED is not (EXPIRED or RUNNING) = not EXPIRED and not RUNNING
+		STOPPED  = 0b000,
+		EXECUTED = 0b001,
+		EXPIRED  = 0b010,
+		ARMED    = 0b100,
+		STATUS_MASK = 0b110
 	};
+
+	TimestampType endTime;
 	uint8_t state;
+
+	friend class
+	GenericPeriodicTimer<Clock, TimestampType>;
 };
 
 /**

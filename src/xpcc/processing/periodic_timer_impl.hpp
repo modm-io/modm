@@ -39,6 +39,13 @@ xpcc::GenericPeriodicTimer<Clock, TimestampType>::stop()
 	timeout.stop();
 }
 
+template< class Clock, class TimestampType >
+xpcc::PeriodicTimerState
+xpcc::GenericPeriodicTimer<Clock, TimestampType>::getState()
+{
+	return PeriodicTimerState(timeout.getState());
+}
+
 template< class Clock , typename TimestampType >
 bool
 xpcc::GenericPeriodicTimer<Clock, TimestampType>::isStopped() const
@@ -48,9 +55,9 @@ xpcc::GenericPeriodicTimer<Clock, TimestampType>::isStopped() const
 
 template< class Clock , typename TimestampType >
 bool
-xpcc::GenericPeriodicTimer<Clock, TimestampType>::isExpired()
+xpcc::GenericPeriodicTimer<Clock, TimestampType>::execute()
 {
-	if (timeout.isExpired())
+	if (timeout.execute())
 	{
 		TimestampType now = Clock::template now<TimestampType>();
 
@@ -60,22 +67,14 @@ xpcc::GenericPeriodicTimer<Clock, TimestampType>::isExpired()
 		}
 		while(timeout.endTime <= now);
 
-		// do **not** clear FIRED here!
-		timeout.state = (timeout.state & ~timeout.EXPIRED) | timeout.RUNNING;
+		timeout.state = timeout.ARMED;
 		return true;
 	}
 	return false;
 }
 
-template< class Clock , typename TimestampType >
-bool
-xpcc::GenericPeriodicTimer<Clock, TimestampType>::hasFired()
-{
-	return timeout.hasFired();
-}
-
 template< class Clock, class TimestampType >
-TimestampType
+typename TimestampType::Type
 xpcc::GenericPeriodicTimer<Clock, TimestampType>::remaining() const
 {
 	return timeout.remaining();

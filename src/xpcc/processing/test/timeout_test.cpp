@@ -41,57 +41,6 @@ TimeoutTest::setUp()
 }
 
 void
-TimeoutTest::testBasics()
-{
-	xpcc::GenericTimeout<xpcc::ClockDummy, xpcc::ShortTimestamp> timeoutShort(10);
-	xpcc::GenericTimeout<xpcc::ClockDummy, xpcc::Timestamp> timeout(10);
-
-	TEST_ASSERT_FALSE(timeoutShort.isExpired());
-	TEST_ASSERT_FALSE(timeout.isExpired());
-
-	int i;
-	for (i = 0; i < 9; ++i) {
-		xpcc::ClockDummy::setTime(i);
-		TEST_ASSERT_FALSE(timeoutShort.isExpired());
-		TEST_ASSERT_FALSE(timeout.isExpired());
-	}
-
-	TEST_ASSERT_FALSE(timeoutShort.hasFired());
-	TEST_ASSERT_FALSE(timeout.hasFired());
-
-	xpcc::ClockDummy::setTime(10);
-	TEST_ASSERT_FALSE(timeoutShort.hasFired());
-	TEST_ASSERT_FALSE(timeout.hasFired());
-
-	TEST_ASSERT_TRUE(timeoutShort.isExpired());
-	TEST_ASSERT_TRUE(timeout.isExpired());
-
-	TEST_ASSERT_TRUE(timeoutShort.hasFired());
-	TEST_ASSERT_TRUE(timeout.hasFired());
-
-	// check that the class does not hold the state
-	xpcc::ClockDummy::setTime(11);
-	TEST_ASSERT_FALSE(timeoutShort.isExpired());
-	TEST_ASSERT_FALSE(timeout.isExpired());
-
-	// but hasFired remains
-	TEST_ASSERT_TRUE(timeoutShort.hasFired());
-	TEST_ASSERT_TRUE(timeout.hasFired());
-
-	timeoutShort.stop();
-	timeout.stop();
-
-	TEST_ASSERT_TRUE(timeoutShort.isStopped());
-	TEST_ASSERT_TRUE(timeout.isStopped());
-
-	TEST_ASSERT_FALSE(timeoutShort.isExpired());
-	TEST_ASSERT_FALSE(timeout.isExpired());
-
-	TEST_ASSERT_TRUE(timeoutShort.hasFired());
-	TEST_ASSERT_TRUE(timeout.hasFired());
-}
-
-void
 TimeoutTest::testDefaultConstructor()
 {
 	xpcc::GenericTimeout<xpcc::ClockDummy, xpcc::ShortTimestamp> timeoutShort;
@@ -100,11 +49,86 @@ TimeoutTest::testDefaultConstructor()
 	TEST_ASSERT_TRUE(timeoutShort.isStopped());
 	TEST_ASSERT_TRUE(timeout.isStopped());
 
-	TEST_ASSERT_FALSE(timeoutShort.hasFired());
-	TEST_ASSERT_FALSE(timeout.hasFired());
+	TEST_ASSERT_FALSE(timeoutShort.isArmed());
+	TEST_ASSERT_FALSE(timeout.isArmed());
 
 	TEST_ASSERT_FALSE(timeoutShort.isExpired());
 	TEST_ASSERT_FALSE(timeout.isExpired());
+
+	TEST_ASSERT_FALSE(timeoutShort.execute());
+	TEST_ASSERT_FALSE(timeout.execute());
+
+	TEST_ASSERT_FALSE(timeoutShort.isExpired());
+	TEST_ASSERT_FALSE(timeout.isExpired());
+}
+
+void
+TimeoutTest::testBasics()
+{
+	xpcc::GenericTimeout<xpcc::ClockDummy, xpcc::ShortTimestamp> timeoutShort(10);
+	xpcc::GenericTimeout<xpcc::ClockDummy, xpcc::Timestamp> timeout(10);
+
+	TEST_ASSERT_FALSE(timeoutShort.execute());
+	TEST_ASSERT_FALSE(timeout.execute());
+
+	TEST_ASSERT_TRUE(timeoutShort.isArmed());
+	TEST_ASSERT_TRUE(timeout.isArmed());
+
+	TEST_ASSERT_FALSE(timeoutShort.isExpired());
+	TEST_ASSERT_FALSE(timeout.isExpired());
+
+	int i;
+	for (i = 0; i < 9; ++i) {
+		xpcc::ClockDummy::setTime(i);
+		TEST_ASSERT_FALSE(timeoutShort.execute());
+		TEST_ASSERT_FALSE(timeout.execute());
+
+		TEST_ASSERT_FALSE(timeoutShort.isExpired());
+		TEST_ASSERT_FALSE(timeout.isExpired());
+	}
+
+	xpcc::ClockDummy::setTime(10);
+	TEST_ASSERT_TRUE(timeoutShort.isExpired());
+	TEST_ASSERT_TRUE(timeout.isExpired());
+
+	TEST_ASSERT_FALSE(timeoutShort.isArmed());
+	TEST_ASSERT_FALSE(timeout.isArmed());
+
+	TEST_ASSERT_TRUE(timeoutShort.execute());
+	TEST_ASSERT_TRUE(timeout.execute());
+
+	TEST_ASSERT_FALSE(timeoutShort.execute());
+	TEST_ASSERT_FALSE(timeout.execute());
+
+	TEST_ASSERT_TRUE(timeoutShort.isExpired());
+	TEST_ASSERT_TRUE(timeout.isExpired());
+
+	TEST_ASSERT_FALSE(timeoutShort.isArmed());
+	TEST_ASSERT_FALSE(timeout.isArmed());
+
+
+	// check that the class does not hold the state
+	xpcc::ClockDummy::setTime(11);
+	TEST_ASSERT_FALSE(timeoutShort.execute());
+	TEST_ASSERT_FALSE(timeout.execute());
+
+	TEST_ASSERT_TRUE(timeoutShort.isExpired());
+	TEST_ASSERT_TRUE(timeout.isExpired());
+
+	TEST_ASSERT_FALSE(timeoutShort.isArmed());
+	TEST_ASSERT_FALSE(timeout.isArmed());
+
+	timeoutShort.stop();
+	timeout.stop();
+
+	TEST_ASSERT_TRUE(timeoutShort.isStopped());
+	TEST_ASSERT_TRUE(timeout.isStopped());
+
+	TEST_ASSERT_FALSE(timeoutShort.execute());
+	TEST_ASSERT_FALSE(timeout.execute());
+
+	TEST_ASSERT_FALSE(timeoutShort.isArmed());
+	TEST_ASSERT_FALSE(timeout.isArmed());
 }
 
 void
@@ -120,17 +144,17 @@ TimeoutTest::testTimeOverflow()
 	xpcc::GenericTimeout<xpcc::ClockDummy, xpcc::ShortTimestamp> timeoutShort(time / 2 - 1);	//=> 32867 + 32766 = 97
 	TEST_ASSERT_EQUALS((time / 2 - 1), 32766);
 
-	TEST_ASSERT_FALSE(timeoutShort.isExpired());
+	TEST_ASSERT_FALSE(timeoutShort.execute());
 
 	xpcc::ClockDummy::setTime(time);
-	TEST_ASSERT_FALSE(timeoutShort.isExpired());
+	TEST_ASSERT_FALSE(timeoutShort.execute());
 
 	xpcc::ClockDummy::setTime(0);
-	TEST_ASSERT_FALSE(timeoutShort.isExpired());
+	TEST_ASSERT_FALSE(timeoutShort.execute());
 
 	// Overflow happened. This needs to be avoided by the user!
 	xpcc::ClockDummy::setTime(100);
-	TEST_ASSERT_TRUE(timeoutShort.isExpired());
+	TEST_ASSERT_TRUE(timeoutShort.execute());
 }
 
 void
@@ -139,52 +163,79 @@ TimeoutTest::testRestart()
 	xpcc::GenericTimeout<xpcc::ClockDummy, xpcc::ShortTimestamp> timeoutShort;
 	xpcc::GenericTimeout<xpcc::ClockDummy, xpcc::Timestamp> timeout;
 
+	TEST_ASSERT_FALSE(timeoutShort.execute());
+	TEST_ASSERT_FALSE(timeout.execute());
+
+	TEST_ASSERT_FALSE(timeoutShort.isArmed());
+	TEST_ASSERT_FALSE(timeout.isArmed());
+
 	TEST_ASSERT_FALSE(timeoutShort.isExpired());
 	TEST_ASSERT_FALSE(timeout.isExpired());
+
 
 	timeoutShort.restart(42);
 	timeout.restart(42);
+	TEST_ASSERT_FALSE(timeoutShort.execute());
+	TEST_ASSERT_FALSE(timeout.execute());
+
+	TEST_ASSERT_TRUE(timeoutShort.isArmed());
+	TEST_ASSERT_TRUE(timeout.isArmed());
+
 	TEST_ASSERT_FALSE(timeoutShort.isExpired());
 	TEST_ASSERT_FALSE(timeout.isExpired());
 
-	TEST_ASSERT_FALSE(timeoutShort.hasFired());
-	TEST_ASSERT_FALSE(timeout.hasFired());
 
 	xpcc::ClockDummy::setTime(10);
+	TEST_ASSERT_FALSE(timeoutShort.execute());
+	TEST_ASSERT_FALSE(timeout.execute());
+
+	TEST_ASSERT_TRUE(timeoutShort.isArmed());
+	TEST_ASSERT_TRUE(timeout.isArmed());
+
 	TEST_ASSERT_FALSE(timeoutShort.isExpired());
 	TEST_ASSERT_FALSE(timeout.isExpired());
 
 	xpcc::ClockDummy::setTime(50);
+	TEST_ASSERT_FALSE(timeoutShort.isArmed());
+	TEST_ASSERT_FALSE(timeout.isArmed());
+
 	TEST_ASSERT_TRUE(timeoutShort.isExpired());
 	TEST_ASSERT_TRUE(timeout.isExpired());
 
-	TEST_ASSERT_FALSE(timeoutShort.isExpired());
-	TEST_ASSERT_FALSE(timeout.isExpired());
+	TEST_ASSERT_TRUE(timeoutShort.execute());
+	TEST_ASSERT_TRUE(timeout.execute());
 
-	TEST_ASSERT_TRUE(timeoutShort.hasFired());
-	TEST_ASSERT_TRUE(timeout.hasFired());
+	TEST_ASSERT_FALSE(timeoutShort.execute());
+	TEST_ASSERT_FALSE(timeout.execute());
+
+	TEST_ASSERT_FALSE(timeoutShort.isArmed());
+	TEST_ASSERT_FALSE(timeout.isArmed());
+
+	TEST_ASSERT_TRUE(timeoutShort.isExpired());
+	TEST_ASSERT_TRUE(timeout.isExpired());
+
 
 	timeoutShort.restart(60);
 	timeout.restart(60);
 
+	TEST_ASSERT_TRUE(timeoutShort.isArmed());
+	TEST_ASSERT_TRUE(timeout.isArmed());
+
+	TEST_ASSERT_FALSE(timeoutShort.execute());
+	TEST_ASSERT_FALSE(timeout.execute());
+
 	TEST_ASSERT_FALSE(timeoutShort.isExpired());
 	TEST_ASSERT_FALSE(timeout.isExpired());
 
-	TEST_ASSERT_FALSE(timeoutShort.hasFired());
-	TEST_ASSERT_FALSE(timeout.hasFired());
 
 	xpcc::ClockDummy::setTime(150);
 
-	TEST_ASSERT_FALSE(timeoutShort.hasFired());
-	TEST_ASSERT_FALSE(timeout.hasFired());
+	TEST_ASSERT_TRUE(timeoutShort.execute());
+	TEST_ASSERT_TRUE(timeout.execute());
+
+	TEST_ASSERT_FALSE(timeoutShort.execute());
+	TEST_ASSERT_FALSE(timeout.execute());
 
 	TEST_ASSERT_TRUE(timeoutShort.isExpired());
 	TEST_ASSERT_TRUE(timeout.isExpired());
-
-	TEST_ASSERT_FALSE(timeoutShort.isExpired());
-	TEST_ASSERT_FALSE(timeout.isExpired());
-
-	TEST_ASSERT_TRUE(timeoutShort.hasFired());
-	TEST_ASSERT_TRUE(timeout.hasFired());
-
 }
