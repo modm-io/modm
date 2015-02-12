@@ -1,96 +1,109 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
- * All rights reserved.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__TIMEOUT_HPP
-	#error	"Don't include this file directly, use 'timeout.hpp' instead!"
+#ifndef	XPCC_TIMEOUT_HPP
+#	error	"Don't include this file directly, use 'timeout.hpp' instead!"
 #endif
 
-template<typename T>
-xpcc::Timeout<T>::Timeout() :
-	endTime(0), state(EXPIRED)
+template< class Clock, class TimestampType >
+xpcc::GenericTimeout<Clock, TimestampType>::GenericTimeout() :
+	endTime(0), state(STOPPED)
 {
 }
 
-template<typename T>
-xpcc::Timeout<T>::Timeout(const Timestamp time) :
-	endTime(T::now() + time), state(ACTIVE)
+template< class Clock, class TimestampType >
+xpcc::GenericTimeout<Clock, TimestampType>::GenericTimeout(const TimestampType time)
 {
+	restart(time);
 }
 
-template<typename T>
+template< class Clock, class TimestampType >
+void
+xpcc::GenericTimeout<Clock, TimestampType>::restart(TimestampType time)
+{
+	endTime = Clock::template now<TimestampType>() + time;
+	state = ARMED;
+}
+
+template< class Clock, class TimestampType >
+void
+xpcc::GenericTimeout<Clock, TimestampType>::stop()
+{
+	state = STOPPED;
+}
+
+// ----------------------------------------------------------------------------
+template< class Clock, class TimestampType >
 bool
-xpcc::Timeout<T>::isExpired()
+xpcc::GenericTimeout<Clock, TimestampType>::execute()
 {
-	if (state == ACTIVE)
+	if (state & EXECUTED)
+		return false;
+
+	if (state == EXPIRED || checkExpiration())
 	{
-		if (T::now() >= endTime)
-		{
-			state = EXPIRED;
-		}
-		else {
-			return false;
-		}
+		state = EXPIRED | EXECUTED;
+		return true;
 	}
-	
-	return true;
+
+	// can only be fired once!
+	return false;
 }
 
-template<typename T>
+template< class Clock, class TimestampType >
+typename TimestampType::SignedType
+xpcc::GenericTimeout<Clock, TimestampType>::remaining() const
+{
+	if (state != STOPPED)
+		return (endTime - Clock::template now<TimestampType>()).getTime();
+
+	return 0;
+}
+
+// ----------------------------------------------------------------------------
+template< class Clock, class TimestampType >
+xpcc::TimeoutState
+xpcc::GenericTimeout<Clock, TimestampType>::getState()
+{
+	if (checkExpiration())
+	{
+		state &= ~ARMED;
+		state |= EXPIRED;
+	}
+	return TimeoutState(state & STATUS_MASK);
+}
+
+template< class Clock, class TimestampType >
 bool
-xpcc::Timeout<T>::isActive() const
+xpcc::GenericTimeout<Clock, TimestampType>::isStopped() const
 {
-	return (this->state != STOPPED);
+	return state == STOPPED;
 }
 
-template<typename T>
-void
-xpcc::Timeout<T>::stop()
+template< class Clock, class TimestampType >
+bool
+xpcc::GenericTimeout<Clock, TimestampType>::isArmed()
 {
-	this->state = STOPPED;
+	return getState() == TimeoutState::Armed;
 }
 
-
-template<typename T>
-void
-xpcc::Timeout<T>::restart(Timestamp time)
+template< class Clock, class TimestampType >
+bool
+xpcc::GenericTimeout<Clock, TimestampType>::isExpired()
 {
-	endTime = T::now() + time;
-	state = ACTIVE;
+	return getState() == TimeoutState::Expired;
 }
 
-template<typename T>
-xpcc::Timestamp
-xpcc::Timeout<T>::remaining()
+// ----------------------------------------------------------------------------
+template< class Clock, class TimestampType >
+bool
+xpcc::GenericTimeout<Clock, TimestampType>::checkExpiration() const
 {
-	if (isExpired())
-		return 0;
-	else
-		return (endTime - T::now());
+	return (state & ARMED) and (Clock::template now<TimestampType>() >= endTime);
 }

@@ -1,87 +1,82 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
- * All rights reserved.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__TIMEOUT_HPP
-	#error	"Don't include this file directly, use 'periodic_timer.hpp' instead!"
+#ifndef	XPCC_PERIODIC_TIMER_HPP
+#	error	"Don't include this file directly, use 'periodic_timeout.hpp' instead!"
 #endif
 
-template<typename T>
-xpcc::PeriodicTimer<T>::PeriodicTimer(const Timestamp interval) :
-	timer(interval), interval(interval), isRunning_(true)
+template< class Clock , typename TimestampType >
+xpcc::GenericPeriodicTimer<Clock, TimestampType>::GenericPeriodicTimer(const TimestampType period) :
+	period(period), timeout(period)
 {
-	if (interval == 0) {
-		stop();
-	}
 }
 
-template<typename T>
+template< class Clock , typename TimestampType >
 void
-xpcc::PeriodicTimer<T>::stop()
+xpcc::GenericPeriodicTimer<Clock, TimestampType>::restart()
 {
-	timer.stop();
-	isRunning_ = false;
+	timeout.restart(period);
 }
 
-template<typename T>
+template< class Clock , typename TimestampType >
+void
+xpcc::GenericPeriodicTimer<Clock, TimestampType>::restart(const TimestampType period)
+{
+	this->period = period;
+	restart();
+}
+
+template< class Clock , typename TimestampType >
+void
+xpcc::GenericPeriodicTimer<Clock, TimestampType>::stop()
+{
+	timeout.stop();
+}
+
+template< class Clock, class TimestampType >
+xpcc::PeriodicTimerState
+xpcc::GenericPeriodicTimer<Clock, TimestampType>::getState()
+{
+	return PeriodicTimerState(timeout.getState());
+}
+
+template< class Clock , typename TimestampType >
 bool
-xpcc::PeriodicTimer<T>::isRunning() const
+xpcc::GenericPeriodicTimer<Clock, TimestampType>::isStopped() const
 {
-	return isRunning_;
+	return timeout.isStopped();
 }
 
-template<typename T>
-void
-xpcc::PeriodicTimer<T>::restart(const Timestamp interval)
-{
-	timer.restart(interval);
-	this->interval = interval;
-	this->isRunning_ = true;
-}
-
-template<typename T>
-void
-xpcc::PeriodicTimer<T>::restart()
-{
-	timer.restart(this->interval);
-	this->isRunning_ = true;
-}
-
-template<typename T>
+template< class Clock , typename TimestampType >
 bool
-xpcc::PeriodicTimer<T>::isExpired()
+xpcc::GenericPeriodicTimer<Clock, TimestampType>::execute()
 {
-	if (isRunning_ and timer.isExpired()) {
-		timer.restart(interval);
+	if (timeout.execute())
+	{
+		TimestampType now = Clock::template now<TimestampType>();
+
+		do
+		{
+			timeout.endTime = timeout.endTime + period;
+		}
+		while(timeout.endTime <= now);
+
+		timeout.state = timeout.ARMED;
 		return true;
 	}
-	else {
-		return false;
-	}
+	return false;
 }
+
+template< class Clock, class TimestampType >
+typename TimestampType::Type
+xpcc::GenericPeriodicTimer<Clock, TimestampType>::remaining() const
+{
+	return timeout.remaining();
+}
+

@@ -19,7 +19,7 @@ protected:
 	run();
 	
 	xpcc::GraphicDisplay *display;
-	xpcc::Timeout<> timer;
+	xpcc::ShortTimeout timer;
 	
 	bool flying;
 	uint8_t x;

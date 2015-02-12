@@ -145,7 +145,7 @@ namespace xpcc
 			const Header header;
 			const SmartPointer payload;
 			State state;
-			Timeout<> time;
+			ShortTimeout time;
 			uint8_t tries;
 		};
 

@@ -90,7 +90,7 @@ main()
 
 	mcp2515.sendMessage(message);
 
-	xpcc::PeriodicTimer<> timer(200);
+	xpcc::ShortPeriodicTimer timer(200);
 	while (1)
 	{
 		if (mcp2515.isMessageAvailable())
@@ -125,7 +125,7 @@ main()
 			}
 		}
 
-		if (timer.isExpired())
+		if (timer.execute())
 		{
 			LedGreen::toggle();
 		}

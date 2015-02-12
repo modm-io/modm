@@ -61,7 +61,7 @@ component::Sender::getPositionCallback(const xpcc::Header&,
 void
 component::Sender::update()
 {
-	if (timer.isExpired())
+	if (timer.execute())
 	{
 		XPCC_LOG_INFO << XPCC_FILE_INFO << "sender update" << xpcc::endl;
 		

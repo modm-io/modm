@@ -29,7 +29,7 @@ main()
 	// enable interrupts
 	enableInterrupts();
 	
-	xpcc::Timeout<> timeout(200);
+	xpcc::ShortTimeout timeout(200);
 	while (1)
 	{
 		if (timeout.isExpired())

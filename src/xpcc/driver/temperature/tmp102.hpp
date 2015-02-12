@@ -243,7 +243,7 @@ private:
 	};
 
 	uint8_t buffer[3];
-	xpcc::Timeout<> timeout;
+	xpcc::ShortTimeout timeout;
 	uint16_t updateTime;
 
 	Config1_t config_msb;

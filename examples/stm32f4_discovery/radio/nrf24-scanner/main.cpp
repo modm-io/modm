@@ -102,9 +102,9 @@ MAIN_FUNCTION
 		channel_info[i] = 0;
 	}
 
-//	xpcc::PeriodicTimer<> divide_timer((max_channel*rx_settle)/1000 * divider);
-	xpcc::PeriodicTimer<> divide_timer(500);
-	xpcc::PeriodicTimer<> refreshTerminal(500);
+//	xpcc::ShortPeriodicTimer divide_timer((max_channel*rx_settle)/1000 * divider);
+	xpcc::ShortPeriodicTimer divide_timer(500);
+	xpcc::ShortPeriodicTimer refreshTerminal(500);
 
 	bool divide_now = false;
 
@@ -114,7 +114,7 @@ MAIN_FUNCTION
 
 	while (1)
 	{
-		if(divide_timer.isExpired())
+		if(divide_timer.execute())
 			divide_now = true;
 
 		max = 0;
@@ -144,7 +144,7 @@ MAIN_FUNCTION
 
 
 
-		if(refreshTerminal.isExpired())
+		if(refreshTerminal.execute())
 		{
 			XPCC_LOG_INFO.printf("\033[2J");
 			XPCC_LOG_INFO.printf("\033[1;10H");

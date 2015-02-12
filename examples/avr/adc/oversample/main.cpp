@@ -21,7 +21,7 @@ typedef xpcc::AdcSampler< AdcInterrupt, 3, 5 > sensors;
 // the results are up to 16 bit wide
 sensors::DataType sensorData[3];
 
-xpcc::Timeout<> timeout(100);
+xpcc::ShortTimeout timeout(100);
 
 int
 main()

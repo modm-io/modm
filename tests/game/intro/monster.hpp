@@ -21,7 +21,7 @@ protected:
 	xpcc::glcd::Point targetPosition;
 	xpcc::glcd::Point position;
 	xpcc::GraphicDisplay *display;
-	xpcc::PeriodicTimer<> timer;
+	xpcc::ShortPeriodicTimer timer;
 	int8_t i;
 };
 

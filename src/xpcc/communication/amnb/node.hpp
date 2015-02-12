@@ -415,7 +415,7 @@ namespace xpcc
 			QueryStatus queryStatus;
 			uint8_t expectedAddress;
 			uint8_t expectedResponseLength;
-			xpcc::Timeout<> timer;
+			xpcc::ShortTimeout timer;
 			
 			static const uint8_t timeout = 10;		///< timeout value in milliseconds
 		};

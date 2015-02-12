@@ -147,11 +147,11 @@ MAIN_FUNCTION
 
 	display.setFont(xpcc::font::FixedWidth5x8);
 
-	xpcc::PeriodicTimer<> timer(1000);
+	xpcc::ShortPeriodicTimer timer(1000);
 	while (1)
 	{
 		uint8_t iter = 0;
-		while (!timer.isExpired())
+		while (!timer.execute())
 		{
 			// rectangle in left side of screen
 			display.setColor(Color::black());

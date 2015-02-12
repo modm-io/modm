@@ -20,7 +20,7 @@ protected:
 	
 	xpcc::glcd::Point position;
 	xpcc::GraphicDisplay *display;
-	xpcc::Timeout<> timer;
+	xpcc::ShortTimeout timer;
 	
 	uint8_t i;
 	bool visible;

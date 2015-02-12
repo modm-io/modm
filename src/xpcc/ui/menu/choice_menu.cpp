@@ -135,7 +135,7 @@ xpcc::ChoiceMenu::draw()
 bool
 xpcc::ChoiceMenu::hasChanged()
 {
-	if (timer.isExpired() || this->buttonAction)
+	if (timer.execute() || this->buttonAction)
 	{
 		if (this->buttonAction) this->buttonAction=false;
 
