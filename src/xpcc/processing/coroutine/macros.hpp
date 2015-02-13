@@ -23,7 +23,7 @@
 
 /**
  * Declare start of a nested coroutine.
- * This will immidiately return if the nesting is too deep/
+ * This will immidiately return if the nesting is too deep.
  *
  * @warning	Use at start of the `coroutine()` implementation!
  * @ingroup	coroutine

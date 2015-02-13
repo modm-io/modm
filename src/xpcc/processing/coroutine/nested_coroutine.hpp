@@ -35,8 +35,10 @@
  * However, if you are sure that you have counted the levels correctly and your code is
  * not breaking, you may remove this check from all coroutines in your `project.cfg`:
  *
- * [defines]
- * XPCC_COROUTINE_CHECK_NESTING_DEPTH = false
+@verbatim
+[defines]
+XPCC_COROUTINE_CHECK_NESTING_DEPTH = false
+@endverbatim
  *
  * @see	NestedCoroutine
  * @ingroup	coroutine
