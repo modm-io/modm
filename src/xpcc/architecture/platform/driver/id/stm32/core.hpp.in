@@ -38,7 +38,7 @@ public:
 %% elif target is stm32f1
 		uint32_t *baseaddress = (uint32_t*) 0x1FFFF7E8;
 %% else
-# error "Core only supported on STM32F2,F1 and F4. Please port to yout target."
+# error "Core only supported on STM32F2,F1 and F4. Please port to your target."
 %% endif
 		return *(baseaddress + offset);
 	}
