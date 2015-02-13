@@ -16,7 +16,7 @@ namespace xpcc
 {
 
 /// Possible states of a timer
-/// @ingroup	processing
+/// @ingroup	software_timer
 enum class
 PeriodicTimerState : uint8_t
 {
@@ -92,7 +92,7 @@ Remaining:     +    |0|   +   |     -     |0|  +  | -|  + |0| +| -  |0|+| 0
  *
  * @author	Fabian Greif
  * @author	Niklas Hauser
- * @ingroup	processing
+ * @ingroup	software_timer
  */
 template< class Clock, typename TimestampType = xpcc::Timestamp >
 class GenericPeriodicTimer
@@ -149,12 +149,12 @@ private:
  *
  * If you need a longer time period, use PeriodicTimer.
  *
- * @ingroup	processing
+ * @ingroup		software_timer
  */
 using ShortPeriodicTimer = GenericPeriodicTimer<::xpcc::Clock, ShortTimestamp>;
 
 /// Periodic software timer for up to 24 days with millisecond resolution.
-/// @ingroup	processing
+/// @ingroup	software_timer
 using PeriodicTimer      = GenericPeriodicTimer<::xpcc::Clock, Timestamp>;
 
 }	// namespace

@@ -18,7 +18,7 @@ namespace xpcc
 {
 
 /// Possible states of a timeout
-/// @ingroup	processing
+/// @ingroup	software_timer
 enum class
 TimeoutState : uint8_t
 {
@@ -98,7 +98,7 @@ Remaining:   0  |   +   |      -      |     0      |     +     |   -
  *
  * @author	Fabian Greif
  * @author	Niklas Hauser
- * @ingroup	processing
+ * @ingroup	software_timer
  */
 template< class Clock, class TimestampType = xpcc::Timestamp >
 class GenericTimeout
@@ -178,12 +178,12 @@ private:
  *
  * If you need a longer time period, use Timeout.
  *
- * @ingroup	processing
+ * @ingroup		software_timer
  */
 using ShortTimeout = GenericTimeout<::xpcc::Clock, ShortTimestamp>;
 
 /// Software timeout for up to 24 days with millisecond resolution.
-/// @ingroup	processing
+/// @ingroup	software_timer
 using Timeout      = GenericTimeout<::xpcc::Clock, Timestamp>;
 
 }	// namespace xpcc
