@@ -103,9 +103,11 @@ private:
 };
 
 /// 16bit timestamp, which can hold up to 65 seconds at millisecond resolution.
+/// @ingroup	processing
 using ShortTimestamp = GenericTimestamp<uint16_t>;
 
 /// 32bit timestamp, which can hold up to 49 days at millisecond resolution.
+/// @ingroup	processing
 using Timestamp      = GenericTimestamp<uint32_t>;
 
 // ------------------------------------------------------------------------

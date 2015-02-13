@@ -17,6 +17,8 @@
 namespace xpcc
 {
 
+/// Possible states of a timeout
+/// @ingroup	processing
 enum class
 TimeoutState : uint8_t
 {
@@ -32,7 +34,60 @@ class GenericPeriodicTimer;
 /**
  * Generic software timeout class for variable timebase and timestamp width.
  *
- * @warning	Never use this timer when a precise timebase is needed!
+ * This class allows for a signal to be generated after a period of time,
+ * which can also be used to execute code once after timeout expiration.
+ *
+ * Its logic can be described by the following annotated waveform:
+ *
+ * - C: Default Constructor
+ * - S: (Re-)Start timeout
+ * - E: Timeout Expired
+ * - H: Code handler (`execute()` returned `true`)
+ * - P: Stop timeout
+ *
+@verbatim
+Event:    C      S      E     H       P            S          E H
+                         _____________                         ______________
+Expired:  ______________/             \_______________________/              ...
+                  ______                            __________
+Armed:    _______/      \__________________________/          \______________...
+          _______                      ____________
+Stopped:         \____________________/            \_________________________...
+
+                              _                                 _
+Handle:   ___________________/ \_______________________________/ \___________...
+
+Remaining:   0  |   +   |      -      |     0      |     +     |   -
+@endverbatim
+ *
+ * The default constructor initializes the timeout in the `Stopped` state,
+ * in which `isExpired()` and `execute()` never return `true`.
+ * If you need a timeout to expire immidiately after construction, you need
+ * to explicitly initialize the constructor with time `0`, which has the
+ * same behavior as `restart(0)`.
+ *
+ * If you want to execute code once after the timeout expired, poll the
+ * `execute()` method, which returns `true` exactly once after expiration.
+ *
+ * @code
+ * if (timeout.execute())
+ * {
+ *     // called once after timeout
+ *     Led::toggle();
+ * }
+ * @endcode
+ *
+ * Be aware, however, that since this method is polled, it cannot execute
+ * exactly at the time of expiration, but some time after expiration, as
+ * indicated in the above waveform graph.
+ *
+ * @warning	Never use this class when a precise timebase is needed!
+ *
+ * The `remaining()` time until expiration is signed positive before, and
+ * negative after expiration. This means `Clock::now() + Timeout::remaining()`
+ * will yield the timestamp of the expiration.
+ * If the timeout is stopped, `remaining()` returns zero.
+ *
  *
  * @see		GenericPeriodicTimer
  *
@@ -49,6 +104,7 @@ template< class Clock, class TimestampType = xpcc::Timestamp >
 class GenericTimeout
 {
 public:
+	/// Creates a stopped timeout
 	GenericTimeout();
 
 	/// Create and start the timeout
