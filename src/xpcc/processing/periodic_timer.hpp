@@ -58,8 +58,8 @@ public:
 	execute();
 
 
-	/// @return the (positive) time until the next period, or 0 if stopped
-	inline typename TimestampType::Type
+	/// @return the time until (positive time) or since (negative time) expiration, or 0 if stopped
+	inline typename TimestampType::SignedType
 	remaining() const;
 
 

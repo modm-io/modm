@@ -74,7 +74,7 @@ xpcc::GenericPeriodicTimer<Clock, TimestampType>::execute()
 }
 
 template< class Clock, class TimestampType >
-typename TimestampType::Type
+typename TimestampType::SignedType
 xpcc::GenericPeriodicTimer<Clock, TimestampType>::remaining() const
 {
 	return timeout.remaining();

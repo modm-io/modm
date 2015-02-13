@@ -1,30 +1,9 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
- * All rights reserved.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
 
@@ -46,6 +25,9 @@ TimeoutTest::testDefaultConstructor()
 	xpcc::GenericTimeout<xpcc::ClockDummy, xpcc::ShortTimestamp> timeoutShort;
 	xpcc::GenericTimeout<xpcc::ClockDummy, xpcc::Timestamp> timeout;
 
+	TEST_ASSERT_EQUALS(timeoutShort.remaining(), 0l);
+	TEST_ASSERT_EQUALS(timeout.remaining(), 0l);
+
 	TEST_ASSERT_TRUE(timeoutShort.isStopped());
 	TEST_ASSERT_TRUE(timeout.isStopped());
 
@@ -60,6 +42,9 @@ TimeoutTest::testDefaultConstructor()
 
 	TEST_ASSERT_FALSE(timeoutShort.isExpired());
 	TEST_ASSERT_FALSE(timeout.isExpired());
+
+	TEST_ASSERT_EQUALS(timeoutShort.remaining(), 0l);
+	TEST_ASSERT_EQUALS(timeout.remaining(), 0l);
 }
 
 void
@@ -67,6 +52,9 @@ TimeoutTest::testBasics()
 {
 	xpcc::GenericTimeout<xpcc::ClockDummy, xpcc::ShortTimestamp> timeoutShort(10);
 	xpcc::GenericTimeout<xpcc::ClockDummy, xpcc::Timestamp> timeout(10);
+
+	TEST_ASSERT_EQUALS(timeoutShort.remaining(), 10l);
+	TEST_ASSERT_EQUALS(timeout.remaining(), 10l);
 
 	TEST_ASSERT_FALSE(timeoutShort.execute());
 	TEST_ASSERT_FALSE(timeout.execute());
@@ -85,6 +73,9 @@ TimeoutTest::testBasics()
 
 		TEST_ASSERT_FALSE(timeoutShort.isExpired());
 		TEST_ASSERT_FALSE(timeout.isExpired());
+
+		TEST_ASSERT_EQUALS(timeoutShort.remaining(), (10l-i));
+		TEST_ASSERT_EQUALS(timeout.remaining(), (10l-i));
 	}
 
 	xpcc::ClockDummy::setTime(10);
@@ -93,6 +84,9 @@ TimeoutTest::testBasics()
 
 	TEST_ASSERT_FALSE(timeoutShort.isArmed());
 	TEST_ASSERT_FALSE(timeout.isArmed());
+
+	TEST_ASSERT_EQUALS(timeoutShort.remaining(), 0l);
+	TEST_ASSERT_EQUALS(timeout.remaining(), 0l);
 
 	TEST_ASSERT_TRUE(timeoutShort.execute());
 	TEST_ASSERT_TRUE(timeout.execute());
@@ -106,6 +100,9 @@ TimeoutTest::testBasics()
 	TEST_ASSERT_FALSE(timeoutShort.isArmed());
 	TEST_ASSERT_FALSE(timeout.isArmed());
 
+	TEST_ASSERT_EQUALS(timeoutShort.remaining(), 0l);
+	TEST_ASSERT_EQUALS(timeout.remaining(), 0l);
+
 
 	// check that the class does not hold the state
 	xpcc::ClockDummy::setTime(11);
@@ -118,6 +115,9 @@ TimeoutTest::testBasics()
 	TEST_ASSERT_FALSE(timeoutShort.isArmed());
 	TEST_ASSERT_FALSE(timeout.isArmed());
 
+	TEST_ASSERT_EQUALS(timeoutShort.remaining(), -1l);
+	TEST_ASSERT_EQUALS(timeout.remaining(), -1l);
+
 	timeoutShort.stop();
 	timeout.stop();
 
@@ -129,6 +129,9 @@ TimeoutTest::testBasics()
 
 	TEST_ASSERT_FALSE(timeoutShort.isArmed());
 	TEST_ASSERT_FALSE(timeout.isArmed());
+
+	TEST_ASSERT_EQUALS(timeoutShort.remaining(), 0l);
+	TEST_ASSERT_EQUALS(timeout.remaining(), 0l);
 }
 
 void
@@ -172,9 +175,16 @@ TimeoutTest::testRestart()
 	TEST_ASSERT_FALSE(timeoutShort.isExpired());
 	TEST_ASSERT_FALSE(timeout.isExpired());
 
+	TEST_ASSERT_EQUALS(timeoutShort.remaining(), 0l);
+	TEST_ASSERT_EQUALS(timeout.remaining(), 0l);
+
 
 	timeoutShort.restart(42);
 	timeout.restart(42);
+
+	TEST_ASSERT_EQUALS(timeoutShort.remaining(), 42l);
+	TEST_ASSERT_EQUALS(timeout.remaining(), 42l);
+
 	TEST_ASSERT_FALSE(timeoutShort.execute());
 	TEST_ASSERT_FALSE(timeout.execute());
 
@@ -195,6 +205,9 @@ TimeoutTest::testRestart()
 	TEST_ASSERT_FALSE(timeoutShort.isExpired());
 	TEST_ASSERT_FALSE(timeout.isExpired());
 
+	TEST_ASSERT_EQUALS(timeoutShort.remaining(), 32l);
+	TEST_ASSERT_EQUALS(timeout.remaining(), 32l);
+
 	xpcc::ClockDummy::setTime(50);
 	TEST_ASSERT_FALSE(timeoutShort.isArmed());
 	TEST_ASSERT_FALSE(timeout.isArmed());
@@ -214,6 +227,9 @@ TimeoutTest::testRestart()
 	TEST_ASSERT_TRUE(timeoutShort.isExpired());
 	TEST_ASSERT_TRUE(timeout.isExpired());
 
+	TEST_ASSERT_EQUALS(timeoutShort.remaining(), -8l);
+	TEST_ASSERT_EQUALS(timeout.remaining(), -8l);
+
 
 	timeoutShort.restart(60);
 	timeout.restart(60);
@@ -227,6 +243,9 @@ TimeoutTest::testRestart()
 	TEST_ASSERT_FALSE(timeoutShort.isExpired());
 	TEST_ASSERT_FALSE(timeout.isExpired());
 
+	TEST_ASSERT_EQUALS(timeoutShort.remaining(), 60l);
+	TEST_ASSERT_EQUALS(timeout.remaining(), 60l);
+
 
 	xpcc::ClockDummy::setTime(150);
 
@@ -238,4 +257,7 @@ TimeoutTest::testRestart()
 
 	TEST_ASSERT_TRUE(timeoutShort.isExpired());
 	TEST_ASSERT_TRUE(timeout.isExpired());
+
+	TEST_ASSERT_EQUALS(timeoutShort.remaining(), -40l);
+	TEST_ASSERT_EQUALS(timeout.remaining(), -40l);
 }
