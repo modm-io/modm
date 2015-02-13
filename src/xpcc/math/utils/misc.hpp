@@ -29,20 +29,7 @@ namespace xpcc
 inline bool
 isPositive(const float& a)
 {
-#ifdef __AVR__
-	// IEEE 754-1985: the most significant bit is the sign bit
-	// sign = 0 => positive
-	// sign = 1 => negative
-	uint8_t *t = (uint8_t *) &a;
-	if (*(t + 3) & 0x80) {
-		return false;
-	}
-	else {
-		return true;
-	}
-#else
-	return (a > 0.0);
-#endif
+	return !std::signbit(a);
 }
 
 // --------------------------------------------------------------------
