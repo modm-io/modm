@@ -15,15 +15,25 @@
 #include <xpcc/architecture/interface/i2c.hpp>
 #include "gpio_enable.h"
 
+/**
+ * @ingroup 	platform
+ * @defgroup	{{target.string}}
+ */
+
+/**
+ * @ingroup 	{{target.string}}
+ * @defgroup	{{target.string}}_gpio GPIO
+ */
+
 namespace xpcc
 {
 
 namespace stm32
 {
 
+/// @ingroup {{target.string}}_gpio
 struct Gpio
 {
-	/// @ingroup	stm32{{ target.family }}
 	enum class
 	InputType
 	{
@@ -32,7 +42,6 @@ struct Gpio
 		PullDown = 0x2,	///< pull-down on input
 	};
 
-	/// @ingroup	stm32{{ target.family }}
 	enum class
 	OutputType
 	{
@@ -40,7 +49,6 @@ struct Gpio
 		OpenDrain = 0x1,	///< open-drain on output
 	};
 
-	/// @ingroup	stm32{{ target.family }}
 	enum class
 	OutputSpeed
 	{
@@ -64,7 +72,6 @@ struct Gpio
 	};
 
 	/// The Port a Gpio Pin is connected to.
-	/// @ingroup	stm32{{ target.family }}
 	enum class
 	Port
 	{
@@ -73,14 +80,12 @@ struct Gpio
 %% endfor
 	};
 
-	/// @ingroup	stm32{{ target.family }}
 	static void
 	enable()
 	{
 		xpcc_gpio_enable();
 	}
 
-	/// @ingroup	stm32{{ target.family }}
 	static void
 	disable()
 	{
@@ -99,7 +104,6 @@ protected:
 		Mask   = 0x3,
 	};
 
-	/// @ingroup	stm32{{ target.family }}
 	// 0..7 = AFRL[31:0]
 	// 8..15 = AFRH[31:0]
 	enum class
@@ -123,8 +127,8 @@ protected:
 		AF_15 = 0x0f,		///< EVENTOUT
 	};
 
-	/// @private Enum Class To Integer helper functions.
-	/// @{
+	/// @cond
+	// Enum Class To Integer helper functions.
 	static constexpr uint32_t
 	i(InputType pull) { return static_cast<uint32_t>(pull); }
 	static constexpr uint32_t
@@ -135,7 +139,7 @@ protected:
 	i(Mode mode) { return static_cast<uint32_t>(mode); }
 	static constexpr uint32_t
 	i(AlternateFunction af) { return static_cast<uint32_t>(af); }
-	/// @}
+	/// @endcond
 };
 
 // Gpio Classes created from the XML Device File Gpio Description
@@ -149,7 +153,7 @@ protected:
 		%% set superclass = "Gpio" ~ (type if type != "" else "IO")
 
 /// {{type if type != "" else "IO"}} class for Pin {{port ~ pin}}
-/// @ingroup	stm32
+/// @ingroup	{{target.string}}_gpio
 struct {{name}} : public Gpio, ::xpcc::{{superclass}}
 {
 public:
@@ -436,23 +440,24 @@ public:
 %% endfor
 
 %# Ports
-/// @private
+/// @cond
 template< Gpio::Port Port, uint8_t StartPin, uint8_t Width>
 class GpioPortBase;
+/// @endcond
 
 /**
  * Creates a hardware port with StartPin as LSB and with Width.
  *
  * @tparam	StartPin	a Gpio pin
  * @tparam	Width		required width of the port (up to 16)
- * @ingroup stm32
+ * @ingroup {{target.string}}_gpio
  */
 template< typename StartPin, uint8_t Width >
 class GpioPort : public ::xpcc::GpioPort, public GpioPortBase< StartPin::port, StartPin::pin, Width>
 {};
 
+/// @cond
 %% for port in gpios | getPorts
-/// @private
 template< uint8_t StartPin, uint8_t Width >
 class GpioPortBase<Gpio::Port::{{port.name}}, StartPin, Width> : public Gpio
 {
@@ -519,6 +524,7 @@ public:
 };
 
 %% endfor
+/// @endcond
 
 } // namespace stm32
 

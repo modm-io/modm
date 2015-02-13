@@ -26,11 +26,17 @@
 
 using namespace xpcc::clock; // for MHzxx
 
+/**
+ * @ingroup 	{{target.string}}
+ * @defgroup	{{target.string}}_can CAN
+ */
+
 namespace xpcc
 {
 
 namespace stm32
 {
+
 /**
  * @brief		Basic Extended CAN{{ id }}
  *
@@ -51,7 +57,7 @@ namespace stm32
  * You can set the buffer size using the `tx_buffer` and `rx_buffer` parameters.
  *
  * @author		Fabian Greif <fabian.greif@rwth-aachen.de>
- * @ingroup		stm32
+ * @ingroup		{{target.string}}_can
  */
 class Can{{ id }} : public ::xpcc::Can
 {
@@ -226,7 +232,10 @@ public:
 	enableStatusChangeInterrupt(uint32_t interruptEnable,
 			uint32_t interruptPriority);
 };
-}
-}
+
+}	// namespace stm32
+
+}	// namespace xpcc
+
 #endif	//  XPCC_STM32_CAN{{ id }}_HPP
 

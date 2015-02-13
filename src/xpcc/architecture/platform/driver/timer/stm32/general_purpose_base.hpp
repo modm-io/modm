@@ -18,6 +18,7 @@ namespace xpcc
 namespace stm32
 {
 
+/// @ingroup	{{target.string}}_timer
 class GeneralPurposeTimer : public BasicTimer
 {
 public:
@@ -193,7 +194,7 @@ public:
 	static void
 	setMode(Mode mode, SlaveMode slaveMode = SlaveMode::Disabled,
 			SlaveModeTrigger slaveModeTrigger = (SlaveModeTrigger) 0);
-	
+
 public:
 	/**
 	 * TODO Description

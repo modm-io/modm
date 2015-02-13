@@ -24,7 +24,9 @@ namespace stm32
  * Serial peripheral interface (SPI{{ id }}).
  *
  * Simple unbuffered implementation.
- * @ingroup	stm32
+ *
+ * @author	Niklas Hauser
+ * @ingroup	{{target.string}}_spi
  */
 class SpiMaster{{ id }} : public xpcc::SpiMaster
 {

@@ -15,6 +15,11 @@
 #include "type_ids.hpp"
 #include <xpcc/architecture/interface/i2c_master.hpp>
 
+/**
+ * @ingroup 	{{target.string}}
+ * @defgroup	{{target.string}}_i2c I2C
+ */
+
 namespace xpcc
 {
 
@@ -28,7 +33,7 @@ namespace stm32
  *
  * @author		Georgi Grinshpun
  * @author		Niklas Hauser
- * @ingroup		stm32
+ * @ingroup		{{target.string}}_i2c
  */
 class I2cMaster{{ id }} : public ::xpcc::I2cMaster
 {

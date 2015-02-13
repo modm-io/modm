@@ -32,7 +32,7 @@ namespace stm32
  *
  * @author	Kevin Laeufer
  * @author	Niklas Hauser
- * @ingroup	stm32
+ * @ingroup	{{target.string}}_uart
  */
 class UartBaudrate : protected xpcc::Peripheral
 {
@@ -96,9 +96,9 @@ public:
 
 };
 
-} // stm32 namespace
+}	// namespace stm32
 
-} // xpcc namespace
+}	// namespace xpcc
 
 #endif // XPCC_STM32_UART_BAUDRATE_HPP
 

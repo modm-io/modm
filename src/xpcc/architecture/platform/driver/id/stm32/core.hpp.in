@@ -20,12 +20,13 @@ namespace cortex
 
 typedef void (*InterruptHandler)(void);
 
+/// @ingroup	{{target.string}}_core
 class Core
 {
 public:
 	/**
 	 * Get unique device id (96-bits)
-	 * 
+	 *
 	 * @param offset	0..2
 	 * @return	32-bit of the unique id
 	 */

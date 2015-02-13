@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -32,6 +32,11 @@
 #ifndef XPCC_STM32__COMP{{ id }}_HPP
 #define XPCC_STM32__COMP{{ id }}_HPP
 
+/**
+ * @ingroup 	{{target.string}}
+ * @defgroup	{{target.string}}_comp Comparator
+ */
+
 #if defined(STM32F3XX)
 namespace xpcc
 {
@@ -39,12 +44,12 @@ namespace xpcc
 	{
 		/**
 		 * @brief		Comparator Class for STM32F3 series
-		 * 
+		 *
 		 * The class provides an interface to the comparators 1-7 availably on
 		 * ST's STM32F3 microcontroller series.
-		 * 
+		 *
 		 * @internal
-		 * @ingroup		stm32
+		 * @ingroup		{{target.string}}_comp
 		 */
 		class Comp{{ id }}
 		{
@@ -432,7 +437,7 @@ namespace xpcc
 			 * Initialize and enable the comparator.
 			 *
 			 * Enables the comperator and sets important values.
-			 * 
+			 *
 			 * Do NOT set lock = true if you want to be able to set other values
 			 * later.
 			 */
@@ -459,7 +464,7 @@ namespace xpcc
 				setEnabled(true);	// enable comparator
 				if(lock_comp) lock();
 			}
-			
+
 
 
 			/**
@@ -514,7 +519,7 @@ namespace xpcc
 
 			/**
 			 * \brief	Sets the mode that determins speed/power consumption.
-			 * 
+			 *
 			 * This setting is also called "output mode".
 			 */
 			static inline void
@@ -527,7 +532,7 @@ namespace xpcc
 
 			/**
 			 * \brief	Sets the mode that determins speed/power consumption.
-			 * 
+			 *
 			 * This setting is also called "output mode".
 			 */
 			static inline Mode
@@ -698,7 +703,7 @@ namespace xpcc
 			}
 
 			/**
-			 * \brief	Locks the comparator. 
+			 * \brief	Locks the comparator.
 			 *
 			 * Comparator can only be unlocked by a system reset.
 			 */

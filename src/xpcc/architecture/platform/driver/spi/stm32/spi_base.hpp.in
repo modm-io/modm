@@ -13,6 +13,11 @@
 #include <stdint.h>
 #include "../../../device.hpp"
 
+/**
+ * @ingroup 	{{target.string}}
+ * @defgroup	{{target.string}}_spi SPI
+ */
+
 namespace xpcc
 {
 
@@ -26,7 +31,7 @@ namespace stm32
  *
  * @author Kevin Laeufer
  * @internal
- * @ingroup		stm32
+ * @ingroup		{{target.string}}_spi
  */
 class SpiBase
 {
@@ -122,8 +127,10 @@ public:
 
 };
 
+/// @cond
 ENUM_CLASS_FLAG(SpiBase::Interrupt)
 ENUM_CLASS_FLAG(SpiBase::InterruptFlag)
+/// @endcond
 
 } // namespace stm32
 
