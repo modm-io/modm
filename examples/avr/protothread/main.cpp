@@ -1,7 +1,7 @@
 
 #include <xpcc/architecture/platform.hpp>
 #include <xpcc/processing/protothread.hpp>
-#include <xpcc/processing/timeout.hpp>
+#include <xpcc/processing/timer.hpp>
 
 using namespace xpcc::atmega;
 

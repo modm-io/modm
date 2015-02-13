@@ -35,7 +35,7 @@
  * #include <xpcc/architecture.hpp>
  * #include <xpcc/processing/protothread.hpp>
  * #include <xpcc/coroutine/coroutine.hpp>
- * #include <xpcc/processing/timeout.hpp>
+ * #include <xpcc/processing/timer.hpp>
  *
  * typedef GpioOutputB0 Led;
  *

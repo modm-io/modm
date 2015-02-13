@@ -10,7 +10,7 @@
 #include <iostream>
 
 #include <xpcc/architecture/driver.hpp>
-#include <xpcc/processing/timeout.hpp>
+#include <xpcc/processing/timer.hpp>
 
 #include <xpcc/driver/can/can_lawicel_formatter.hpp>
 #include "canusb.hpp"

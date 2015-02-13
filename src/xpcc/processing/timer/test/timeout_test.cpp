@@ -7,7 +7,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/processing/timeout.hpp>
+#include <xpcc/processing/timer.hpp>
 #include <xpcc/architecture/driver/clock_dummy.hpp>
 
 #include "timeout_test.hpp"

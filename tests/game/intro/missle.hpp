@@ -3,7 +3,7 @@
 #define MISSLE_HPP
 
 #include <xpcc/processing/protothread.hpp>
-#include <xpcc/processing/timeout.hpp>
+#include <xpcc/processing/timer.hpp>
 #include <xpcc/driver/lcd/graphic_display.hpp>
 
 class Missle : public xpcc::Protothread

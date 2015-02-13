@@ -14,7 +14,7 @@
 #include <xpcc/processing/protothread.hpp>
 #include <xpcc/processing/coroutine.hpp>
 #include <xpcc/architecture/interface/i2c_device.hpp>
-#include <xpcc/processing/periodic_timer.hpp>
+#include <xpcc/processing/timer.hpp>
 
 namespace xpcc
 {

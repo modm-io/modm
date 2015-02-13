@@ -35,7 +35,7 @@
 #include "scrollable_text.hpp"
 #include "menu_entry_callback.hpp"
 #include <xpcc/container/doubly_linked_list.hpp>
-#include <xpcc/processing/periodic_timer.hpp>
+#include <xpcc/processing/timer.hpp>
 
 
 namespace xpcc

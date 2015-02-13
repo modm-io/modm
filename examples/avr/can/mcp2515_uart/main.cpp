@@ -2,7 +2,7 @@
 #include <xpcc/architecture.hpp>
 
 #include <xpcc/driver/can/mcp2515.hpp>
-#include <xpcc/processing/periodic_timer.hpp>
+#include <xpcc/processing/timer.hpp>
 
 using namespace xpcc::atmega;
 typedef xpcc::avr::SystemClock clock;

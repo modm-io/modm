@@ -1,7 +1,7 @@
 #include <xpcc/architecture/platform.hpp>
 #include "../stm32f4_discovery.hpp"
 
-#include <xpcc/processing/timeout.hpp>
+#include <xpcc/processing/timer.hpp>
 #include <xpcc/processing/protothread.hpp>
 #include <xpcc/driver/temperature/tmp102.hpp>
 

@@ -7,7 +7,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/processing/timestamp.hpp>
+#include <xpcc/processing/timer/timestamp.hpp>
 #include <xpcc/utils/arithmetic_traits.hpp>
 
 #include "timestamp_test.hpp"

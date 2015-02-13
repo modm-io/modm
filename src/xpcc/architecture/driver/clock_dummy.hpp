@@ -10,7 +10,7 @@
 #ifndef	XPCC_CLOCK_DUMMY_HPP
 #define XPCC_CLOCK_DUMMY_HPP
 
-#include <xpcc/processing/timestamp.hpp>
+#include <xpcc/processing/timer/timestamp.hpp>
 
 namespace xpcc
 {

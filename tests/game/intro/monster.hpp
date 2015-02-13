@@ -3,7 +3,7 @@
 #define MONSTER_HPP
 
 #include <xpcc/processing/protothread.hpp>
-#include <xpcc/processing/periodic_timer.hpp>
+#include <xpcc/processing/timer.hpp>
 #include <xpcc/driver/lcd/graphic_display.hpp>
 
 class Monster : public xpcc::Protothread

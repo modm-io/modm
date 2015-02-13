@@ -7,7 +7,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/processing/periodic_timer.hpp>
+#include <xpcc/processing/timer.hpp>
 #include <xpcc/architecture/driver/clock_dummy.hpp>
 
 #include "periodic_timer_test.hpp"

@@ -32,7 +32,7 @@
 #define XPCC_SAB__MASTER_HPP
 
 #include <stdint.h>
-#include <xpcc/processing/timeout.hpp>
+#include <xpcc/processing/timer.hpp>
 
 #include "interface.hpp"
 
