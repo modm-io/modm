@@ -7,6 +7,11 @@
  */
 // ----------------------------------------------------------------------------
 
+/**
+ * @ingroup 	{{target.string}}
+ * @defgroup	{{target.string}}_adc ADC
+ */
+
 #ifndef XPCC_ATMEGA_ADC_HPP
 #define XPCC_ATMEGA_ADC_HPP
 
@@ -76,7 +81,7 @@ namespace atmega
  * needed the frequency can be higher.
  *
  * @author	Niklas Hauser
- * @ingroup	atmega
+ * @ingroup	{{target.string}}_adc
  */
 class Adc : public xpcc::Adc
 {

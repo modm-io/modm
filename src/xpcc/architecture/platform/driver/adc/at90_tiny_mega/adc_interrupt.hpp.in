@@ -23,8 +23,9 @@ namespace {{ target.family }}
 {
 
 /**
- * @ingroup		{{ target.family }}
  * @author		Niklas Hauser
+ *
+ * @ingroup		{{target.string}}_adc
  */
 class AdcInterrupt : public Adc, public xpcc::AdcInterrupt
 {

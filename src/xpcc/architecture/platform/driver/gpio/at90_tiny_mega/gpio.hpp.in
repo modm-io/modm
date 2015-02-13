@@ -17,13 +17,24 @@
 #include <xpcc/architecture/interface/gpio.hpp>
 #include <xpcc/architecture/interface/i2c.hpp>
 
+/**
+ * @ingroup 	platform
+ * @defgroup	{{target.string}}
+ */
+
+/**
+ * @ingroup 	{{target.string}}
+ * @defgroup	{{target.string}}_gpio GPIO
+ */
+
+
 namespace xpcc
 {
 
 namespace {{target.family}}
 {
 
-/// @ingroup	{{target.family}}
+/// @ingroup	{{target.string}}_gpio
 struct Gpio
 {
 	/// Each Input Pin can be configured in one of these states.
@@ -68,7 +79,7 @@ protected:
  * You must use this class for `SoftwareI2cMaster`!
  *
  * @see ::xpcc::SoftwareI2cMaster
- * @ingroup	{{target.family}}
+ * @ingroup	{{target.string}}_gpio
  * @{
  */
 %% for name in ['GpioOpenDrain', 'GpioOpenDrainWithPullUp']
@@ -120,12 +131,12 @@ public:
 	%% set port = gpio.port | upper
 	%% set pin  = gpio.id
 
-	%% for type in ["Output", "Input", ""]
-		%% set name = "Gpio" ~ type ~ port ~ pin
-		%% set superclass = "Gpio" ~ (type if type != "" else "IO")
+	%% for type in ["Output", "Input", "IO"]
+		%% set name = "Gpio" ~ (type if type != "IO" else "") ~ port ~ pin
+		%% set superclass = "Gpio" ~ type
 
-/// {{type if type != "" else "IO"}} class for Pin {{port ~ pin}}
-/// @ingroup	{{target.family}}
+/// {{type}} class for Pin {{port ~ pin}}
+/// @ingroup	{{target.string}}_gpio
 struct {{name}} : public Gpio, ::xpcc::{{superclass}}
 {
 public:
@@ -133,7 +144,7 @@ public:
 	static constexpr uint8_t pin = {{pin}};			///< the pin  of this GPIO
 	static constexpr uint8_t mask = (1 << pin);	///< the mask of this GPIO
 
-		%% if type in ["", "Output"]
+		%% if type in ["IO", "Output"]
 	ALWAYS_INLINE static void setOutput(bool status) {
 		setOutput();
 		set(status);
@@ -162,7 +173,7 @@ public:
 			%% endif
 	}
 		%% endif
-		%% if type in ["", "Input"]
+		%% if type in ["IO", "Input"]
 	ALWAYS_INLINE static void configure(InputType type) {
 		if (type == InputType::PullUp) {
 			%% if pue is defined
@@ -253,7 +264,7 @@ public:
 		%% for af in gpio.afs
 			%% if (	(af.type == 'in' and type == 'Input') or
 					(af.type == 'out' and type == 'Output') or
-					(af.type == 'io' or type == '')	)
+					(af.type == 'io' or type == 'IO')	)
 	/// Connect `{{port~pin}}` as `{{af.name}}` to `{{af.peripheral}}`.
 	ALWAYS_INLINE static void
 	connect(TypeId::{{ af.peripheral }}{{ af.name }}) {
@@ -265,13 +276,13 @@ public:
 				%% elif af.type == "in"
 		setInput();
 				%% endif
-				%% if af.name == "Scl" and type == ''
+				%% if af.name == "Scl" and type == 'IO'
 		xpcc::I2c::resetDevices< {{name}} >();
 				%% endif
 	}
 			%% endif
 		%% endfor
-		%% if type in ['', 'Output']
+		%% if type in ['IO', 'Output']
 			%% for peripheral in   ['SoftwareSpiMasterMosi',
 									'SoftwareSpiMasterSck']
 	/// Connect to `{{peripheral}}`.
@@ -281,7 +292,7 @@ public:
 	}
 			%% endfor
 		%% endif
-		%% if type in ['', 'Input']
+		%% if type in ['IO', 'Input']
 			%% for peripheral in ['SoftwareSpiMasterMiso']
 	/// Connect to `{{peripheral}}`.
 	ALWAYS_INLINE static void
@@ -306,7 +317,7 @@ class GpioPortBase;
  *
  * @tparam	StartPin	a Gpio pin
  * @tparam	Width		required width of the port (up to 8)
- * @ingroup {{target.family}}
+ * @ingroup {{target.string}}_gpio
  */
 template< class StartPin, uint8_t Width >
 class GpioPort : public ::xpcc::GpioPort, /** @cond */ public GpioPortBase< StartPin::port, StartPin::pin, Width> /** @endcond */

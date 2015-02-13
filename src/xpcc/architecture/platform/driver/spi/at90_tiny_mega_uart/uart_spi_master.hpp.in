@@ -24,7 +24,7 @@ namespace {{target.family}}
 /**
  * Implementation of the SimpleSpi of the Uart in Spi Master mode.
  *
- * @ingroup		{{target.family}}
+ * @ingroup		{{target.string}}_spi
  * @author		Niklas Hauser
  */
 class UartSpiMaster{{ id }} : public ::xpcc::SpiMaster

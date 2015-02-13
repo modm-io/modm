@@ -34,7 +34,7 @@ namespace {{target.family}}
  *			hardware will switch into SPI slave mode. It is therefore necessary
  *			to configure the pin either in output mode or to pull it high.
  *
- * @ingroup		{{target.family}}
+ * @ingroup		{{target.string}}_spi
  * @author		Niklas Hauser
  */
 class SpiMaster : public ::xpcc::SpiMaster, private Spi
