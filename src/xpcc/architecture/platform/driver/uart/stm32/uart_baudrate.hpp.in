@@ -34,7 +34,7 @@ namespace stm32
  * @author	Niklas Hauser
  * @ingroup	{{target.string}}_uart
  */
-class UartBaudrate : protected xpcc::Peripheral
+class UartBaudrate : /** @cond */protected xpcc::Peripheral /** @endcond */
 {
 public:
 	/**
