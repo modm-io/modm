@@ -43,12 +43,14 @@ def generate(env, **kw):
 	elif env['HOSTED_DEVICE'] == 'darwin':
 		env['LIBS'] = ['boost_thread-mt', 'boost_system']
 
-	c = env['XPCC_COMPILER']
-	if c in ['clang', 'clang++']:
-		c_compiler = 'clang'
-		cpp_compiler = 'clang++'
+	if 'CC' in os.environ:
+		c_compiler = os.environ['CC']
 	else:
 		c_compiler = 'gcc'
+
+	if 'CXX' in os.environ:
+		cpp_compiler = os.environ['CXX']
+	else:
 		cpp_compiler = 'g++'
 
 	if platform.system() == 'Windows':

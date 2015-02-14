@@ -269,14 +269,6 @@ def generate(env, **kw):
 		log_level = 'warn'
 	env.SetLogLevel(log_level)
 
-	# Chose Compiler
-	c = ARGUMENTS.get('COMPILER', None)
-	if c == None:
-		c = ARGUMENTS.get('compiler', None)
-	if c == None:
-		c = ARGUMENTS.get('c', None)
-	env['XPCC_COMPILER'] = c
-
 	# detect the rootpath to the xpcc folder
 	rootpath = env.get('rootpath')
 
