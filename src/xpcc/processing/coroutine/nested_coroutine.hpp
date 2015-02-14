@@ -35,8 +35,10 @@
  * However, if you are sure that you have counted the levels correctly and your code is
  * not breaking, you may remove this check from all coroutines in your `project.cfg`:
  *
- * [defines]
- * XPCC_COROUTINE_CHECK_NESTING_DEPTH = false
+@verbatim
+[defines]
+XPCC_COROUTINE_CHECK_NESTING_DEPTH = false
+@endverbatim
  *
  * @see	NestedCoroutine
  * @ingroup	coroutine
@@ -94,12 +96,14 @@ namespace co
  *
  * @ingroup	coroutine
  * @author	Niklas Hauser
- * @tparam	Depth	maximum nesting depth: the maximum number of
- * 					coroutines that are called within coroutines (should be <128).
+ * @tparam	Levels	maximum number of nesting levels (should be <128):
+ * 					max(number of coroutines that are called within coroutines) + 1
  */
-template< uint8_t Depth = 0>
+template< uint8_t Levels = 1>
 class NestedCoroutine
 {
+	static_assert(Levels > 0, "The number of coroutine nesting levels must be at least 1!");
+
 protected:
 	/// Construct a new class with nested coroutines
 	NestedCoroutine()
@@ -117,7 +121,7 @@ public:
 	stopCoroutine()
 	{
 		uint_fast8_t level = coLevel;
-		while (level < Depth + 1)
+		while (level < Levels)
 		{
 			coStateArray[level++] = CoStopped;
 		}
@@ -192,7 +196,7 @@ protected:
 	nestingOkCo() const
 	{
 #if XPCC_COROUTINE_CHECK_NESTING_DEPTH
-		return (coLevel < Depth + 1);
+		return (coLevel < Levels);
 #else
 		return true;
 #endif
@@ -221,18 +225,18 @@ protected:
 	/// @endcond
 private:
 	uint_fast8_t coLevel;
-	CoState coStateArray[Depth+1];
+	CoState coStateArray[Levels];
 };
 
 // ----------------------------------------------------------------------------
 // we won't document the specialisation again
 /// @cond
 template <>
-class NestedCoroutine<0>
+class NestedCoroutine<1>
 {
 protected:
 	NestedCoroutine() :
-		coState(CoStopped), coLevel(-1)
+		coLevel(-1), coState(CoStopped)
 	{
 	}
 
@@ -310,8 +314,8 @@ protected:
 	}
 
 private:
-	CoState coState;
 	int_fast8_t coLevel;
+	CoState coState;
 };
 /// @endcond
 

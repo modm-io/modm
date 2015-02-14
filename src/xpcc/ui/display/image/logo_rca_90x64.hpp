@@ -14,7 +14,7 @@ namespace bitmap
 	 * - Width  : 90
 	 * - Height : 64
 	 *
-	 * @ingroup	image
+	 * \ingroup	image
 	 */
 	EXTERN_FLASH_STORAGE(uint8_t logo_rca_90x64[]);
 }

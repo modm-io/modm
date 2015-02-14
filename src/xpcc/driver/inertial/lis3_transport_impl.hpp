@@ -106,13 +106,13 @@ xpcc::Lis3TransportSpi<SpiMaster, Cs>::write(uint8_t reg, uint8_t value)
 {
 	CO_BEGIN();
 
-	CO_WAIT_UNTIL(this->aquireMaster(this));
+	CO_WAIT_UNTIL(this->aquireMaster());
 	Cs::reset();
 
 	CO_CALL(SpiMaster::transfer(reg | Write));
 	CO_CALL(SpiMaster::transfer(value));
 
-	if (this->releaseMaster(this))
+	if (this->releaseMaster())
 		Cs::set();
 
 	CO_END_RETURN(true);
@@ -125,14 +125,14 @@ xpcc::Lis3TransportSpi<SpiMaster, Cs>::read(uint8_t reg, uint8_t *buffer, uint8_
 {
 	CO_BEGIN();
 
-	CO_WAIT_UNTIL(this->aquireMaster(this));
+	CO_WAIT_UNTIL(this->aquireMaster());
 	Cs::reset();
 
 	CO_CALL(SpiMaster::transfer(reg | Read));
 
 	CO_CALL(SpiMaster::transfer(nullptr, buffer, length));
 
-	if (this->releaseMaster(this))
+	if (this->releaseMaster())
 		Cs::set();
 
 	CO_END_RETURN(true);

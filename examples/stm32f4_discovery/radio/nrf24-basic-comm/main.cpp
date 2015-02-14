@@ -170,7 +170,7 @@ MAIN_FUNCTION
 
 
 	/* Timer to send packets every 1000ms */
-	xpcc::PeriodicTimer<> sendPacket(1000);
+	xpcc::ShortPeriodicTimer sendPacket(1000);
 
 	/* Buffer for received payload */
 	uint8_t received_data[payload_length];
@@ -180,7 +180,7 @@ MAIN_FUNCTION
 		// ------------------------- Primary sender ---------------------------
 
 		/* Send packet every 1000ms */
-		if(sendPacket.isExpired())
+		if(sendPacket.execute())
 		{
 			/* Copy packet into ptx device. Because CE is always high here, the
 			 * packet will be transmitted immediately

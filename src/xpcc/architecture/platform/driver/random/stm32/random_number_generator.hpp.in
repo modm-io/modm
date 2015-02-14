@@ -13,6 +13,11 @@
 #include <stdint.h>
 #include "../../../device.hpp"
 
+/**
+ * @ingroup 	{{target.string}}
+ * @defgroup	{{target.string}}_random Random
+ */
+
 namespace xpcc
 {
 
@@ -21,11 +26,11 @@ namespace stm32
 
 /**
  * Random Number Generator
- * 
- * TODO check error status
- * 
+ *
+ * @todo check error status
+ *
  * @author	Fabian Greif
- * @ingroup	stm32
+ * @ingroup	{{target.string}}_random
  */
 class RandomNumberGenerator
 {
@@ -38,7 +43,7 @@ public:
 
 	/**
 	 * Check if a new random number is ready
-	 * 
+	 *
 	 * @return	 `true` if a new random number has been generated
 	 * 			and can be read via getValue()
 	 */
@@ -50,7 +55,7 @@ public:
 
 	/**
 	 * Read the generated 32-bit random number
-	 * 
+	 *
 	 * Once read isReady() will return `false` until a new number
 	 * has be generated.
 	 */

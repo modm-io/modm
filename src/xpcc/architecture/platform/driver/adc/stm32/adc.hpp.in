@@ -40,6 +40,10 @@
 #include <xpcc/architecture/interface/adc.hpp>
 #include <xpcc/architecture/interface/register.hpp>
 
+/**
+ * @ingroup 	{{target.string}}
+ * @defgroup	{{target.string}}_adc ADC
+ */
 
 namespace xpcc
 {
@@ -63,7 +67,7 @@ namespace stm32
  * @author	Stephan Kugelmann
  * @author	David Hebbeker
  * @author	ekiwi
- * @ingroup	stm32
+ * @ingroup	{{target.string}}_adc
  */
 class Adc{{ id }} : public xpcc::Adc
 {

@@ -10,7 +10,7 @@
 #include "identifier.hpp"
 #include "packets.hpp"
 
-#include <xpcc/processing/communicatable_task.hpp>
+#include <xpcc/communication/xpcc/communicatable_task.hpp>
 #include <xpcc/processing/protothread.hpp>
 
 namespace robot_call_tasks

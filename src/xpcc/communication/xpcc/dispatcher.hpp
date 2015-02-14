@@ -31,7 +31,7 @@
 #ifndef	XPCC__DISPATCHER_HPP
 #define	XPCC__DISPATCHER_HPP
 
-#include <xpcc/processing/timeout.hpp>
+#include <xpcc/processing/timer.hpp>
 
 #include "backend/backend_interface.hpp"
 #include "postman/postman.hpp"
@@ -145,7 +145,7 @@ namespace xpcc
 			const Header header;
 			const SmartPointer payload;
 			State state;
-			Timeout<> time;
+			ShortTimeout time;
 			uint8_t tries;
 		};
 

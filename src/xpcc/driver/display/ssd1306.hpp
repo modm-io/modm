@@ -14,7 +14,7 @@
 #include <xpcc/processing/protothread.hpp>
 #include <xpcc/processing/coroutine.hpp>
 #include <xpcc/architecture/interface/i2c_device.hpp>
-#include <xpcc/processing/periodic_timer.hpp>
+#include <xpcc/processing/timer.hpp>
 
 namespace xpcc
 {
@@ -125,7 +125,7 @@ protected:
  */
 template < class I2cMaster >
 class Ssd1306 : public ssd1306, public xpcc::I2cDevice<I2cMaster>,
-				public BufferedGraphicDisplay<128, 64>, protected xpcc::co::NestedCoroutine<1>
+				public BufferedGraphicDisplay<128, 64>, protected xpcc::co::NestedCoroutine<2>
 		{
 public:
 	Ssd1306(uint8_t address = 0x3C);

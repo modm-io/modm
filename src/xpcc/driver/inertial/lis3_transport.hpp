@@ -34,7 +34,7 @@ namespace xpcc
  * @author	Niklas Hauser
  */
 template < class I2cMaster >
-class Lis3TransportI2c : public xpcc::I2cDevice< I2cMaster >, protected xpcc::co::NestedCoroutine<1>
+class Lis3TransportI2c : public xpcc::I2cDevice< I2cMaster >, protected xpcc::co::NestedCoroutine<2>
 {
 public:
 	Lis3TransportI2c(uint8_t address);
@@ -95,7 +95,7 @@ private:
  * @author	Niklas Hauser
  */
 template < class SpiMaster, class Cs >
-class Lis3TransportSpi : public xpcc::SpiDevice< SpiMaster >, protected xpcc::co::NestedCoroutine<1>
+class Lis3TransportSpi : public xpcc::SpiDevice< SpiMaster >, protected xpcc::co::NestedCoroutine<2>
 {
 public:
 	Lis3TransportSpi(uint8_t /*address*/);

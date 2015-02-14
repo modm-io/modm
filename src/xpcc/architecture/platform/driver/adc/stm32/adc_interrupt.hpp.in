@@ -33,7 +33,7 @@ namespace stm32
  *
  * @see AnalogSensors uses this implemenation.
  *
- * @ingroup		stm32
+ * @ingroup		{{target.string}}_adc
  * @author		Niklas Hauser
  */
 class AdcInterrupt{{ id }} : public Adc{{ id }}, public xpcc::AdcInterrupt

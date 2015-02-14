@@ -35,11 +35,11 @@
  * #include <xpcc/architecture.hpp>
  * #include <xpcc/processing/protothread.hpp>
  * #include <xpcc/coroutine/coroutine.hpp>
- * #include <xpcc/processing/timeout.hpp>
+ * #include <xpcc/processing/timer.hpp>
  *
  * typedef GpioOutputB0 Led;
  *
- * class BlinkingLight : public xpcc::pt::Protothread, private xpcc::pt::NestedCoroutine<1>
+ * class BlinkingLight : public xpcc::pt::Protothread, private xpcc::co::NestedCoroutine<2>
  * {
  * public:
  *     bool
@@ -59,7 +59,7 @@
  *             Led::reset();
  *             PT_CALL(setTimer(this, 200));
  *
- *             PT_WAIT_UNTIL(timer.isExpired());
+ *             PT_WAIT_UNTIL(timeout.isExpired());
  *         }
  *
  *         PT_END();
@@ -73,7 +73,7 @@
  *         // nested calling is allowed
  *         if (CO_CALL(setTimer(ctx, 100)))
  *         {
- *             CO_WAIT_UNTIL(timer.isExpired());
+ *             CO_WAIT_UNTIL(timeout.isExpired());
  *         }
  *
  *         CO_END_RETURN(false);
@@ -84,9 +84,9 @@
  *     {
  *         CO_BEGIN();
  *
- *         timer.restart(timeout);
+ *         timeout.restart(timeout);
  *
- *         if(timer.isRunning())
+ *         if(timeout.isRunning())
  *             CO_RETURN(true);
  *
  *         // clean up code goes here
@@ -95,7 +95,7 @@
  *     }
  *
  * private:
- *     xpcc::Timeout<> timer;
+ *     xpcc::ShortTimeout timeout;
  * };
  *
  *

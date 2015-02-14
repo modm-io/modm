@@ -21,6 +21,7 @@ namespace xpcc
 namespace avr
 {
 
+/// @ingroup avr
 class
 SystemClock
 {

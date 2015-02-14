@@ -35,6 +35,7 @@ namespace xpcc
 {
 	namespace stm32
 	{
+		/// @ingroup {{target.string}}_can
 		enum ErrorCode
 		{
 			CAN1_ERROR_PASSIVE_MODE = 0x0010,
@@ -42,7 +43,7 @@ namespace xpcc
 			CAN1_FIFO0_OVERFLOW = 0x0012,
 			CAN1_FIFO1_OVERFLOW = 0x0013,
 			CAN1_TX_OVERFLOW = 0x0014,
-			
+
 			CAN2_ERROR_PASSIVE_MODE = 0x0010,
 			CAN2_BUS_OFF_MODE = 0x0011,
 			CAN2_FIFO0_OVERFLOW = 0x0012,

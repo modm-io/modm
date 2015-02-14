@@ -58,7 +58,7 @@ namespace xpcc
 		 * #include <xpcc/utils/protothread.hpp>
 		 * #include <xpcc/utils/timeout.hpp>
 		 *
-		 * GPIO__OUTPUT(Led, B, 0);
+		 * typedef GpioOutputB0 Led;
 		 *
 		 * class BlinkingLight : public xpcc::pt::Protothread
 		 * {
@@ -74,20 +74,20 @@ namespace xpcc
 		 *
 		 *         while (true)
 		 *         {
-		 *             this->timer.start(100);
+		 *             timeout.start(100);
 		 *             Led::set();
-		 *             PT_WAIT_UNTIL(this->timer.isExpired());
+		 *             PT_WAIT_UNTIL(timeout.isExpired());
 		 *
-		 *             this->timer.start(200);
+		 *             timeout.start(200);
 		 *             Led::reset();
-		 *             PT_WAIT_UNTIL(this->timer.isExpired());
+		 *             PT_WAIT_UNTIL(timeout.isExpired());
 		 *         }
 		 *
 		 *         PT_END();
 		 *     }
 		 *
 		 * private:
-		 *     xpcc::Timeout<> timer;
+		 *     xpcc::ShortTimeout timeout;
 		 * };
 		 *
 		 *

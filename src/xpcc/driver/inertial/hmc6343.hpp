@@ -171,7 +171,7 @@ public:
 
 
 		inline int16_t
-		operator [](size_t index)
+		operator [](uint8_t index)
 		{ return (index < 10) ? swapData(index) : 0; }
 
 	private:
@@ -214,7 +214,7 @@ protected:
  * @author	Niklas Hauser
  */
 template < class I2cMaster >
-class Hmc6343 : public hmc6343, public xpcc::I2cDevice< I2cMaster >, protected xpcc::co::NestedCoroutine<1>
+class Hmc6343 : public hmc6343, public xpcc::I2cDevice< I2cMaster >, protected xpcc::co::NestedCoroutine<2>
 {
 public:
 	/// Constructor, requires a hmc6343::Data object, sets address to default of 0x19
@@ -335,6 +335,7 @@ public:
 	{ return readPostData(Command::PostTiltData, 14, 6); }
 
 
+protected:
 	/// Use these methods with caution!
 	/// @{
 
@@ -392,7 +393,7 @@ private:
 
 private:
 	uint8_t buffer[3];
-	xpcc::Timeout<> timeout;
+	xpcc::ShortTimeout timeout;
 
 	volatile uint8_t i2cTask;
 	volatile uint8_t i2cSuccess;

@@ -11,7 +11,7 @@
 #define XPCC_UI_LED_HPP
 
 #include <stdint.h>
-#include <xpcc/processing/periodic_timer.hpp>
+#include <xpcc/processing/timer.hpp>
 #include <xpcc/architecture/driver/clock.hpp>
 #include <xpcc/ui/animation.hpp>
 

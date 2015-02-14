@@ -317,13 +317,13 @@ public:
 	Lis302dl(Data &data, uint8_t address=0x1D);
 
 	bool inline
-	initializeBlocking(Scale scale, MeasurementRate rate = MeasurementRate::Hz100)
+	configureBlocking(Scale scale, MeasurementRate rate = MeasurementRate::Hz100)
 	{
-		return CO_CALL_BLOCKING(initialize(scale, rate));
+		return CO_CALL_BLOCKING(configure(scale, rate));
 	}
 
 	xpcc::co::Result<bool>
-	initialize(Scale scale, MeasurementRate rate = MeasurementRate::Hz100);
+	configure(Scale scale, MeasurementRate rate = MeasurementRate::Hz100);
 
 	// MARK: Control Registers
 	xpcc::co::Result<bool> inline

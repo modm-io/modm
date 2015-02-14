@@ -14,10 +14,11 @@
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 xpcc::Tmp102<I2cMaster>::Tmp102(Data &data, uint8_t address)
-:	data(data), updateTime(250),
+:	data(data), timeout(250), updateTime(250),
 	config_msb(0), config_lsb(ConversionRate_t(ConversionRate::Hz4)),
 	i2cTask(I2cTask::Idle), i2cSuccess(0), adapter(address, i2cTask, i2cSuccess)
 {
+	this->stop();
 }
 
 template < typename I2cMaster >
@@ -89,12 +90,14 @@ xpcc::Tmp102<I2cMaster>::setUpdateRate(uint8_t rate)
 		{
 			if (rate == 0) updateTime = 4000;
 			else updateTime = 1000/rate;
+			timeout.restart(updateTime & ~(1 << 15));
 			CO_RETURN(true);
 		}
 	}
 	else
 	{
 		updateTime = (1000/rate - 29) | (1 << 15);
+		timeout.restart(updateTime & ~(1 << 15));
 		CO_RETURN(true);
 	}
 

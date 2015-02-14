@@ -42,16 +42,16 @@ namespace xpcc
 	/**
 	 * \ingroup	processing
 	 * \brief	%Scheduler
-	 * 
+	 *
 	 * If the schedule() method is call from a timer interrupt, this scheduler
 	 * is a priority based preemptive scheduler, meaning that always the task
 	 * with the highest priority is executed. It will only change tasks if a
 	 * task with a higher priority becomes ready or the current task ends.
-	 * 
+	 *
 	 * \image	html	scheduler.png
-	 * 
+	 *
 	 * \warning	Works for ATmega, but currently not for the ATxmega!
-	 * 
+	 *
 	 * \author	Fabian Greif
 	 * \todo	Check that this implementation works from inside an interrupt
 	 */
@@ -59,7 +59,7 @@ namespace xpcc
 	{
 	public:
 		typedef uint8_t Priority;
-		
+
 		/**
 		 * \brief	%Scheduler task
 		 */
@@ -69,25 +69,25 @@ namespace xpcc
 			virtual void
 			run() = 0;
 		};
-	
+
 	public:
 		Scheduler();
-		
+
 		void
 		scheduleTask(Task& task,
 					 uint16_t period,
 					 Priority priority = 127);
-		
+
 		// TODO	Implement this function
 		/*bool
 		removeTask(const Task& task);*/
-		
+
 		void
 		schedule();
-		
+
 		ALWAYS_INLINE void
 		scheduleInterupt();
-		
+
 	private:
 		struct TaskListItem
 		{
@@ -99,24 +99,26 @@ namespace xpcc
 				state(WAITING)
 			{
 			}
-			
+
 			TaskListItem *nextTask;
 			TaskListItem *nextReady;
-			
+
 			Task& task;
 			uint16_t period;
 			uint16_t time;
 			Priority priority;
+			/// @cond
 			enum {
 				RUNNING,
 				READY,
 				WAITING
 			} state;
+			/// @endcond
 		};
-		
+
 		TaskListItem *taskList;
 		TaskListItem *readyList;
-		
+
 		Priority currentPriority;
 	};
 }

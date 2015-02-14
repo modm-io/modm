@@ -21,18 +21,18 @@ namespace stm32
 
 /**
  * @brief		Basic Timer {{ id }}
- * 
+ *
  * Interrupt handler:
  * \code
  * extern "C" void
  * TIM{{ id }}_IRQHandler(void)
  * {
  *     Timer{{ id }}::resetInterruptFlags(Timer{{ id }}::FLAG_UPDATE);
- *     
+ *
  *     ...
  * }
  * \endcode
- * 
+ *
  {% if id == 6 -%}
  * For the STM32F2xx and STM32F4xx:
  * \code
@@ -40,14 +40,14 @@ namespace stm32
  * TIM{{ id }}_DAC_IRQHandler(void)
  * {
  *     Timer{{ id }}::resetInterruptFlags(Timer{{ id }}::FLAG_UPDATE);
- *     
+ *
  *     ...
  * }
  * \endcode
  {%- endif %}
- * 
+ *
  * @author		Fabian Greif
- * @ingroup		stm32
+ * @ingroup		{{target.string}}_timer
  */
 class Timer{{ id }} : public BasicTimer
 {
@@ -63,25 +63,25 @@ public:
 public:
 	static void
 	enable();
-	
+
 	static void
 	disable();
-	
+
 	static inline void
 	pause()
 	{
 		TIM{{ id }}->CR1 &= ~TIM_CR1_CEN;
 	}
-	
+
 	static inline void
 	start()
 	{
 		TIM{{ id }}->CR1 |= TIM_CR1_CEN;
 	}
-	
+
 	static void
 	setMode(Mode mode);
-	
+
 	static inline void
 	setPrescaler(uint16_t prescaler)
 	{
@@ -89,7 +89,7 @@ public:
 		// prescaler value is \p prescaler - 1 (see Datasheet)
 		TIM{{ id }}->PSC = prescaler - 1;
 	}
-	
+
 	static inline void
 	setOverflow(uint16_t overflow)
 	{
@@ -125,40 +125,40 @@ public:
 		// Generate Update Event to apply the new settings for ARR
 		TIM{{ id }}->EGR |= TIM_EGR_UG;
 	}
-	
+
 	static inline uint16_t
 	getValue()
 	{
 		return TIM{{ id }}->CNT;
 	}
-	
+
 	static inline void
 	setValue(uint16_t value)
 	{
 		TIM{{ id }}->CNT = value;
 	}
-	
+
 	static void
 	enableInterruptVector(bool enable, uint32_t priority);
-	
+
 	static inline void
 	enableInterrupt(Interrupt interrupt)
 	{
 		TIM{{ id }}->DIER |= static_cast<uint32_t>(interrupt);
 	}
-	
+
 	static inline void
 	disableInterrupt(Interrupt interrupt)
 	{
 		TIM{{ id }}->DIER &= ~static_cast<uint32_t>(interrupt);
 	}
-	
+
 	static inline InterruptFlag
 	getInterruptFlags()
 	{
 		return static_cast<InterruptFlag>(TIM{{ id }}->SR);
 	}
-	
+
 	static void
 	acknowledgeInterruptFlags(InterruptFlag interrupt)
 	{
@@ -168,8 +168,8 @@ public:
 	}
 };
 
-}
+}	// namespace stm32
 
-}
+}	// namespace xpcc
 
 #endif // XPCC_STM32_TIMER_{{ id }}_HPP

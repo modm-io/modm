@@ -21,6 +21,10 @@
 #define	USART_BRR_DIV_FRACTION	USART_BRR_DIV_Fraction
 %% endif
 
+/**
+* @ingroup 	{{target.string}}
+* @defgroup	{{target.string}}_uart UART
+*/
 
 namespace xpcc
 {
@@ -33,7 +37,7 @@ namespace stm32
  *
  * @author Kevin Laeufer
  * @internal
- * @ingroup		stm32
+ * @ingroup		{{target.string}}_uart
  */
 class UartBase
 {
@@ -118,9 +122,14 @@ public:
 	};
 
 };
+
+/// @cond
 ENUM_CLASS_FLAG(UartBase::Interrupt)
 ENUM_CLASS_FLAG(UartBase::InterruptFlag)
-}
-}
+/// @endcond
+
+}	// namespace stm32
+
+}	// namespace xpcc
 
 #endif // XPCC_STM32_UART_BASE_HPP

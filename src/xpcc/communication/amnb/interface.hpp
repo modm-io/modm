@@ -34,11 +34,11 @@
 #include <cstddef>
 #include <stdint.h>
 #include <xpcc/architecture/utils.hpp>
-#include <xpcc/processing/timeout.hpp>
+#include <xpcc/processing/timer.hpp>
 #include <xpcc/architecture/driver/delay.hpp>
 #include <stdlib.h>
 #include <xpcc/architecture/driver/clock.hpp>
-#include <xpcc/processing/timestamp.hpp>
+#include <xpcc/processing/timer/timestamp.hpp>
 
 #include "constants.hpp"
 
@@ -229,7 +229,7 @@ namespace xpcc
 			static uint8_t length;
 			static uint8_t lengthOfReceivedMessage;
 			static uint8_t lengthOfTransmitMessage;
-			static xpcc::Timeout<> resetTimer;
+			static xpcc::ShortTimeout resetTimer;
 			static const uint8_t resetTimeout = 4;
 			
 			static bool rescheduleTransmit;

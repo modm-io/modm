@@ -33,7 +33,7 @@
 
 #include <cstddef>
 #include <xpcc/architecture/driver/accessor/flash.hpp>
-#include <xpcc/processing/timeout.hpp>
+#include <xpcc/processing/timer.hpp>
 
 #include "interface.hpp"
 
@@ -415,7 +415,7 @@ namespace xpcc
 			QueryStatus queryStatus;
 			uint8_t expectedAddress;
 			uint8_t expectedResponseLength;
-			xpcc::Timeout<> timer;
+			xpcc::ShortTimeout timer;
 			
 			static const uint8_t timeout = 10;		///< timeout value in milliseconds
 		};

@@ -13,7 +13,7 @@
 #include <xpcc/processing/protothread.hpp>
 #include <xpcc/processing/coroutine.hpp>
 #include <xpcc/architecture/interface/i2c_device.hpp>
-#include <xpcc/processing/timeout.hpp>
+#include <xpcc/processing/timer.hpp>
 
 namespace xpcc
 {
@@ -24,6 +24,7 @@ class Bmp085;
 struct bmp085
 {
 protected:
+	/// @cond
 	/// The addresses of the Configuration and Data Registers
 	enum class
 	Register : uint8_t
@@ -60,6 +61,7 @@ protected:
 		Temperature = 0x2E,
 		Pressure = 0x34,
 	};
+	/// @endcond
 
 public:
 	enum class
@@ -73,7 +75,7 @@ public:
 	};
 
 	/**
-	 * Hold the calibration data from the sensor.
+	 * Holds the calibration data from the sensor.
 	 * Values are used for calculation of calibrated
 	 * sensor values from raw sensor data
 	 */
@@ -269,7 +271,7 @@ private:
 
 	xpcc::I2cTagAdapter< xpcc::I2cWriteReadAdapter > adapter;
 
-	xpcc::Timeout<> timeout;
+	xpcc::ShortTimeout timeout;
 
 	/**
 	 * Maximum conversion time for pressure from datasheet for

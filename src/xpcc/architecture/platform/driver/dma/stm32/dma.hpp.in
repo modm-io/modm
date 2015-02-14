@@ -14,6 +14,11 @@
 #include "../../../type_ids.hpp"
 #include "../../../device.hpp"
 
+/**
+ * @ingroup 	{{target.string}}
+ * @defgroup	{{target.string}}_dma DMA
+ */
+
 %% if target is stm32f4
 	%% set streams = range(0,8)
 %% elif target is stm32f3
@@ -26,15 +31,17 @@
 
 namespace xpcc
 {
+
 namespace stm32
 {
+
 /**
  * DMA
  *
  * Does not support - among other things - double buffering or FIFO usage
  *
- * \author	Kevin Laeufer
- * \ingroup	stm32
+ * @author	Kevin Laeufer
+ * @ingroup	{{target.string}}_dma
  */
 class Dma{{ id }}
 {
@@ -125,8 +132,10 @@ public:
 	};
 %% endfor
 };
-}
-}
+
+}	// namespace stm32
+
+}	// namespace xpcc
 
 #include "dma_{{ id }}_impl.hpp"
 

@@ -27,7 +27,7 @@ namespace stm32
  *			Therefore the data is bit reversed in software for DataOrder::MsbFirst.
  *
  * @author		Niklas Hauser
- * @ingroup		stm32
+ * @ingroup		{{target.string}}_spi
  */
 class UartSpiMaster{{ id }} : public xpcc::SpiMaster, public UartBase
 {

@@ -91,7 +91,7 @@ private:
 	T &currentValue;
 	T endValue;
 	TimeType animationTime;
-	xpcc::Timestamp previous;
+	xpcc::ShortTimestamp previous;
 	FastRamp<T> interpolation;
 };
 

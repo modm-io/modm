@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2013, Roboterclub Aachen e.V.
 # All rights reserved.
-# 
+#
 # The file is part of the xpcc library and is released under the 3-clause BSD
 # license. See the file `LICENSE` for the full license governing this code.
 # -----------------------------------------------------------------------------
@@ -24,13 +24,13 @@ if __name__ == "__main__":
 	devices = []
 	peri_name = "all"
 	bitfield_pattern = ""
-	
+
 	for arg in sys.argv[1:]:
 		if arg in ['error', 'warn', 'info', 'debug', 'disabled']:
 			level = arg
 			logger.setLogLevel(level)
 			continue
-		
+
 		if "ATtiny" in arg or "ATmega" in arg or 'AT90' in arg:
 			xml_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'AVR_devices', (arg + '*'))
 			files = glob.glob(xml_path)
@@ -40,53 +40,53 @@ if __name__ == "__main__":
 					part = AVRDeviceReader(file, logger)
 					devices.append(Device(part, logger))
 			continue
-		
-		if any(arg.startswith(per) for per in ["EXT", "TWI", "USART", "SPI", "AD_CON", "USB", "CAN", "DA_CON", "USI", "TIMER"]):
+
+		if any(arg.startswith(per) for per in ["EXT", "TWI", "USART", "SPI", "AD_CON", "USB", "CAN", "DA_CON", "USI", "TIMER", "PORT"]):
 			peri_name = arg
 			continue
-		
+
 		bitfield_pattern = arg
-	
+
 	logger.setLogLevel('debug')
-	
+
 	peripherals = []
 	for dev in devices:
 		attributes = dev.getProperty('peripherals')
 		for attribute in attributes.values:
 			for peripheral in [p for p in attribute.value if p.name.startswith(peri_name)]:
 				peripherals.append({'ids': [dev.id], 'peripheral': peripheral})
-	
+
 	registers = []
 	for peri in peripherals:
 		for reg in peri['peripheral'].registers:
 			registers.append({'ids': list(peri['ids']), 'register': reg})
-	
+
 	registers.sort(key=lambda k : k['register'].name)
 	merged = []
-	
+
 	while len(registers) > 0:
 		current = registers[0]
 		registers.remove(current)
-		
+
 		matches = []
-		
+
 		for peri in registers:
 			if current['register'] == peri['register']:
 				matches.append(peri)
-		
+
 		for match in matches:
 			current['ids'].extend(match['ids'])
 			registers.remove(match)
-		
+
 		if len(matches) == 0:
 			logger.warn("No match for register: " + current['register'].name + " of " + str([id.string for id in current['ids']]))
-		
+
 		merged.append(current)
-	
+
 	filtered_devices = []
 	filtered_registers = []
 	all_names = []
-	
+
 	for dev in merged:
 		reg = dev['register']
 		dev['ids'].sort(key=lambda k : (int(k.name or 0), k.type))
@@ -103,11 +103,11 @@ if __name__ == "__main__":
 					s += "\n"
 			logger.debug(s)
 			logger.info(str(reg) + "\n")
-		
+
 		if reg.getFieldsWithPattern(bitfield_pattern) != None:
 			filtered_registers.append(dev['register'].name)
 			filtered_devices.append(dev)
-	
+
 	all_filtered_names = []
 	if bitfield_pattern != "":
 		logger.info("Registers containing BitField pattern '" + bitfield_pattern + "':")
@@ -123,10 +123,10 @@ if __name__ == "__main__":
 					s += "\n"
 			logger.debug(s)
 			logger.info(str(dev['register']) + "\n")
-	
+
 	filtered_registers = list(set(filtered_registers))
 	filtered_registers.sort()
-	
+
 	logger.info("Summary registers:")
 	for name in filtered_registers:
 		logger.debug(name)

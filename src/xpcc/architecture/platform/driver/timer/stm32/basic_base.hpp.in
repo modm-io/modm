@@ -12,12 +12,18 @@
 #include <stdint.h>
 #include "../../../device.hpp"
 
+/**
+ * @ingroup 	{{target.string}}
+ * @defgroup	{{target.string}}_timer Timer
+ */
+
 namespace xpcc
 {
 
 namespace stm32
 {
 
+/// @ingroup	{{target.string}}_timer
 class BasicTimer
 {
 public:
@@ -155,10 +161,10 @@ public:
 	 */
 	static inline void
 	setValue(uint16_t value);
-	
+
 	/**
 	 * Enables or disables the Interrupt Vector.
-	 * 
+	 *
 	 * \param	enable
 	 * 				Enable/disable the interrupt vector
 	 * \param	priority
@@ -167,13 +173,13 @@ public:
 	 */
 	static void
 	enableInterruptVector(bool enable, uint8_t priority);
-	
+
 	/**
 	 * Enables interrupts. Don't forget to enable the Interrupt Vector.
-	 * 
-	 * \param	interrupt	
+	 *
+	 * \param	interrupt
 	 * 				Interrupts to enable
-	 * 
+	 *
 	 * \see		enableInterruptVector()
 	 */
 	static void
@@ -211,7 +217,7 @@ public:
 	 */
 	static InterruptFlag
 	getInterruptFlags();
-	
+
 	/**
 	 * Clears one or multiple flags.
 	 *
@@ -221,8 +227,10 @@ public:
 	acknowledgeInterruptFlags(InterruptFlag flags);
 };
 
+/// @cond
 ENUM_CLASS_FLAG(BasicTimer::Interrupt)
 ENUM_CLASS_FLAG(BasicTimer::InterruptFlag)
+/// @endcond
 
 } // namespace stm32
 

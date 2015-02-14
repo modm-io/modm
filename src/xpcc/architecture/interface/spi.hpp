@@ -24,7 +24,7 @@ namespace xpcc
 struct Spi
 {
 	/// The signature of the configuration function.
-	using Configuration_t = void(*)();
+	using ConfigurationHandler = void(*)();
 
 	/// Spi Data Mode, Mode0 is the most common mode
 	enum class

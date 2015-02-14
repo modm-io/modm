@@ -152,8 +152,11 @@ public:
  *
  * The sensor has a default refresh rate of 4Hz but can be set from
  * 0.25Hz up to 33Hz using `setUpdateRate(rate)`.
- * You can manually start a conversion with `startConversion()`, wait for
- * 30ms and then `readTemperature()` to achieve other (less frequent)
+ * The sensor will then read itself out when calling the `update()` method
+ * frequently.
+ *
+ * However, you may manually start a conversion with `startConversion()`, wait
+ * for 30ms and then `readTemperature()` to achieve other (less frequent)
  * update rates.
  *
  * @see <a href="http://www.ti.com/lit/ds/symlink/tmp102.pdf">Datasheet</a>
@@ -165,15 +168,11 @@ public:
  */
 template < class I2cMaster >
 class Tmp102 :	public tmp102, public xpcc::I2cDevice< I2cMaster >,
-				protected xpcc::pt::Protothread, protected xpcc::co::NestedCoroutine<1>
+				protected xpcc::pt::Protothread, protected xpcc::co::NestedCoroutine<2>
 {
 public:
 	/// Constructor, requires a tmp102::Data object,
-	/// sets address to default of 0x48 (alternatives are 0x49, 0x4A and 0x4B)
-	/**
-	 * @param	data		the associated Data object
-	 * @param	address		Default address is 0x48 (alternatives are 0x49, 0x4A and 0x4B)
-	 */
+	/// sets address to default of 0x48 (alternatives are 0x49, 0x4A and 0x4B).
 	Tmp102(Data &data, uint8_t address=0x48);
 
 	void ALWAYS_INLINE
@@ -243,7 +242,7 @@ private:
 	};
 
 	uint8_t buffer[3];
-	xpcc::Timeout<> timeout;
+	xpcc::ShortTimeout timeout;
 	uint16_t updateTime;
 
 	Config1_t config_msb;

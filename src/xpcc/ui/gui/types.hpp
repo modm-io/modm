@@ -118,7 +118,7 @@ public:
 private:
 	genericCallback cb;
 	void* cb_data;
-	xpcc::Timeout<> timeout;
+	xpcc::ShortTimeout timeout;
 	bool already_run;
 };
 

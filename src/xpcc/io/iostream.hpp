@@ -46,6 +46,18 @@ public :
 		return *this;
 	}
 
+	static constexpr char eof = -1;
+
+	/// Reads one character and returns it if available. Otherwise, returns IOStream::eof.
+	inline IOStream&
+	get(char c)
+	{
+		if(!this->device->read(c)) {
+			c = IOStream::eof;
+		}
+		return *this;
+	}
+
 	inline IOStream&
 	flush()
 	{

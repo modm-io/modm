@@ -43,7 +43,7 @@ template <typename Interface>
 uint8_t xpcc::sab::Master<Interface>::expectedResponseLength;
 
 template <typename Interface>
-xpcc::Timeout<> xpcc::sab::Master<Interface>::timer;
+xpcc::ShortTimeout xpcc::sab::Master<Interface>::timer;
 
 // ----------------------------------------------------------------------------
 template <typename Interface>

@@ -12,7 +12,18 @@
 #include "../../../device.hpp"
 #include "../../../type_ids.hpp"
 #include <xpcc/architecture/interface/gpio.hpp>
+#include <xpcc/architecture/interface/i2c.hpp>
 #include "gpio_enable.h"
+
+/**
+ * @ingroup 	platform
+ * @defgroup	{{target.string}}
+ */
+
+/**
+ * @ingroup 	{{target.string}}
+ * @defgroup	{{target.string}}_gpio GPIO
+ */
 
 namespace xpcc
 {
@@ -20,9 +31,9 @@ namespace xpcc
 namespace stm32
 {
 
+/// @ingroup {{target.string}}_gpio
 struct Gpio
 {
-	/// @ingroup	stm32{{ target.family }}
 	enum class
 	InputType
 	{
@@ -31,7 +42,6 @@ struct Gpio
 		PullDown = 0x2,	///< pull-down on input
 	};
 
-	/// @ingroup	stm32{{ target.family }}
 	enum class
 	OutputType
 	{
@@ -39,7 +49,6 @@ struct Gpio
 		OpenDrain = 0x1,	///< open-drain on output
 	};
 
-	/// @ingroup	stm32{{ target.family }}
 	enum class
 	OutputSpeed
 	{
@@ -63,7 +72,6 @@ struct Gpio
 	};
 
 	/// The Port a Gpio Pin is connected to.
-	/// @ingroup	stm32{{ target.family }}
 	enum class
 	Port
 	{
@@ -72,14 +80,12 @@ struct Gpio
 %% endfor
 	};
 
-	/// @ingroup	stm32{{ target.family }}
 	static void
 	enable()
 	{
 		xpcc_gpio_enable();
 	}
 
-	/// @ingroup	stm32{{ target.family }}
 	static void
 	disable()
 	{
@@ -98,7 +104,6 @@ protected:
 		Mask   = 0x3,
 	};
 
-	/// @ingroup	stm32{{ target.family }}
 	// 0..7 = AFRL[31:0]
 	// 8..15 = AFRH[31:0]
 	enum class
@@ -122,8 +127,8 @@ protected:
 		AF_15 = 0x0f,		///< EVENTOUT
 	};
 
-	/// @private Enum Class To Integer helper functions.
-	/// @{
+	/// @cond
+	// Enum Class To Integer helper functions.
 	static constexpr uint32_t
 	i(InputType pull) { return static_cast<uint32_t>(pull); }
 	static constexpr uint32_t
@@ -134,26 +139,26 @@ protected:
 	i(Mode mode) { return static_cast<uint32_t>(mode); }
 	static constexpr uint32_t
 	i(AlternateFunction af) { return static_cast<uint32_t>(af); }
-	/// @}
+	/// @endcond
 };
 
 // Gpio Classes created from the XML Device File Gpio Description
 %% for gpio in gpios
-	%% set reg  = "GPIO" ~ gpio.port|upper
+	%% set port = gpio.port | upper
+	%% set reg  = "GPIO" ~ port
 	%% set pin  = gpio.id
 
 	%% for type in ["Output", "Input", ""]
-		%% set name = "Gpio" ~ type ~ gpio.port|upper ~ gpio.id
+		%% set name = "Gpio" ~ type ~ port ~ gpio.id
 		%% set superclass = "Gpio" ~ (type if type != "" else "IO")
 
-/// {{type if type != "" else "IO"}} class for Pin {{gpio.port|upper ~ pin}}
-/// {{gpio.port|upper}}{{gpio.id}} {{type}}
-/// @ingroup	stm32
+/// {{type if type != "" else "IO"}} class for Pin {{port ~ pin}}
+/// @ingroup	{{target.string}}_gpio
 struct {{name}} : public Gpio, ::xpcc::{{superclass}}
 {
 public:
 	/// Port name.
-	static constexpr Port port = Port::{{gpio.port|upper}};
+	static constexpr Port port = Port::{{port}};
 	/// Pin Number.
 	static constexpr uint8_t pin = {{pin}};
 	/// Bitmask for registers that contain a 1bit value for every pin.
@@ -183,13 +188,12 @@ private:
 	static constexpr IRQn_Type ExternalInterruptIRQ = EXTI15_10_IRQn;
 %% endif
 
-	/// TODO: Document
 	ALWAYS_INLINE static void
 	setAlternateFunction(AlternateFunction alt) {
-		{{reg}}->MODER = ({{reg}}->MODER   & ~mask2)
-							| (i(Mode::AlternateFunction) << (pin * 2));
 		{{reg}}->AFR[af_id] = ({{reg}}->AFR[af_id] & ~af_mask)
 								| (i(alt) << af_offset);
+		{{reg}}->MODER = ({{reg}}->MODER   & ~mask2)
+								| (i(Mode::AlternateFunction) << (pin * 2));
 	}
 
 	/// Enable Analog Mode which is needed to use this pin as an ADC input.
@@ -346,24 +350,22 @@ public:
 		%% endif
 	// connect: Hardware Gpio
 		%% for af in gpio.afs
-			%% set use = not (	(af.type == "in"  and type == "Output") or
+			%% set use = not (	(af.type == "in"     and type == "Output") or
 								(af.type == "analog" and type == "Output") or
-								(af.type == "out" and type == "Input" ))
+								(af.type == "out"    and type == "Input" ))
 			%% if use
+				%% if af.name not in ['Scl', 'Sda']
 	/// Connect {{name}} as {{af.name}} to {{af.peripheral}}.
 	ALWAYS_INLINE static void
 	connect(TypeId::{{ af.peripheral }}{{ af.name }} /* t */) {
-				%% if af.type == "analog"
+					%% if af.type == "analog"
 		setAnalogInput();
-				%% else
-					%% if (af.type|string in ['', 'out'] and
-							type != "Input" and af.name in ['Scl', 'Sda'])
-		setOutput(OutputType::OpenDrain);
-					%% endif
+					%% else
 		setAlternateFunction(AlternateFunction::AF_{{ af.id }});
-				%% endif
+					%% endif
 	}
-				%% if af.type|string in ['', 'out'] and type != "Input"
+				%% endif
+				%% if af.type|string in ['', 'out'] and type != "Input" and af.name not in ['Scl', 'Sda']
 	/// Connect {{name}} as {{af.name}} to {{af.peripheral}}.
 	ALWAYS_INLINE static void
 	connect(TypeId::{{ af.peripheral }}{{ af.name }} /* t */,
@@ -372,7 +374,19 @@ public:
 		setAlternateFunction(AlternateFunction::AF_{{ af.id }});
 	}
 				%% endif
-				%% if af.type|string in ['', 'in'] and type != "Output"
+				%% if type == '' and af.name in ['Scl', 'Sda']
+	/// Connect {{name}} as {{af.name}} to {{af.peripheral}}.
+	ALWAYS_INLINE static void
+	connect(TypeId::{{ af.peripheral }}{{ af.name }} /* t */, InputType type=InputType::Floating) {
+		configure(OutputType::OpenDrain);
+		configure(type);
+					%% if af.name in ['Scl']
+		I2c::resetDevices< {{name}} >();
+					%% endif
+		setAlternateFunction(AlternateFunction::AF_{{ af.id }});
+	}
+				%% endif
+				%% if af.type|string in ['', 'in'] and type != "Output" and af.name not in ['Scl', 'Sda']
 	/// Connect {{name}} as {{af.name}} to {{af.peripheral}}.
 	ALWAYS_INLINE static void
 	connect(TypeId::{{ af.peripheral }}{{ af.name }} /* t */, InputType type) {
@@ -394,14 +408,19 @@ public:
 		set();
 	}
 			%% endfor
+		%% endif
+		%% if type in ['']
 			%% for peripheral in   ['SoftwareI2cMasterSda',
 									'SoftwareI2cMasterScl']
 	/// Connect to `{{peripheral}}`.
 	ALWAYS_INLINE static void
-	connect(::xpcc::TypeId::{{ peripheral }}) {
-		configure(OutputType::OpenDrain);
-		setOutput();
+	connect(::xpcc::TypeId::{{ peripheral }}, InputType type=InputType::Floating) {
+		configure(type);
+				%% if peripheral in ['SoftwareI2cMasterScl']
+		I2c::resetDevices< {{name}} >();
+				%% endif
 		set();
+		setOutput(OutputType::OpenDrain);
 	}
 			%% endfor
 		%% endif
@@ -421,23 +440,24 @@ public:
 %% endfor
 
 %# Ports
-/// @private
+/// @cond
 template< Gpio::Port Port, uint8_t StartPin, uint8_t Width>
 class GpioPortBase;
+/// @endcond
 
 /**
  * Creates a hardware port with StartPin as LSB and with Width.
  *
  * @tparam	StartPin	a Gpio pin
  * @tparam	Width		required width of the port (up to 16)
- * @ingroup stm32
+ * @ingroup {{target.string}}_gpio
  */
 template< typename StartPin, uint8_t Width >
 class GpioPort : public ::xpcc::GpioPort, public GpioPortBase< StartPin::port, StartPin::pin, Width>
 {};
 
+/// @cond
 %% for port in gpios | getPorts
-/// @private
 template< uint8_t StartPin, uint8_t Width >
 class GpioPortBase<Gpio::Port::{{port.name}}, StartPin, Width> : public Gpio
 {
@@ -504,6 +524,7 @@ public:
 };
 
 %% endfor
+/// @endcond
 
 } // namespace stm32
 

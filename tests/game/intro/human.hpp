@@ -3,7 +3,7 @@
 #define HUMAN_HPP
 
 #include <xpcc/processing/protothread.hpp>
-#include <xpcc/processing/timeout.hpp>
+#include <xpcc/processing/timer.hpp>
 #include <xpcc/driver/lcd/graphic_display.hpp>
 
 class Human : public xpcc::Protothread
@@ -20,7 +20,7 @@ protected:
 	
 	xpcc::glcd::Point position;
 	xpcc::GraphicDisplay *display;
-	xpcc::Timeout<> timer;
+	xpcc::ShortTimeout timer;
 	uint8_t i;
 	
 	enum { STAND, WAVE0, WAVE1 } state;
