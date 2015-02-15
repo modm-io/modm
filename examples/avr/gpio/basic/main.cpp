@@ -8,8 +8,6 @@
 // ----------------------------------------------------------------------------
 
 #include <xpcc/architecture/platform.hpp>
-#include <xpcc/math/utils/misc.hpp>
-#include <cmath>
 
 using namespace xpcc::atmega;
 
@@ -17,19 +15,12 @@ typedef GpioOutputB0 Led;
 // create a wrapper for a output pin
 typedef xpcc::GpioInverted< GpioOutputB1 > LedInverted;
 
-int32_t clock(0);
-volatile bool isPositive(false);
-
 MAIN_FUNCTION
 {
-//	Led::setOutput();
-//	Led::set();
-//
-//	LedInverted::setOutput(xpcc::Gpio::Low);
+	Led::setOutput();
+	Led::set();
 
-//	isPositive = clock > 0;
-	isPositive = xpcc::isPositive(*((float*)&clock));
-	(void) isPositive;
+	LedInverted::setOutput(xpcc::Gpio::Low);
 
 	while (1)
 	{
