@@ -177,7 +177,7 @@ public:
 	{
 		for (uint8_t id : ids)
 		{
-			if (id < Methods and coStateArray[id] != CoStopped)
+			if (isCoroutineRunning(id))
 				return true;
 		}
 		return false;
@@ -189,6 +189,7 @@ public:
 	{
 		for (uint8_t id : ids)
 		{
+			// = not isCoroutineRunning(id)
 			if (id >= Methods or coStateArray[id] == CoStopped)
 				return false;
 		}
