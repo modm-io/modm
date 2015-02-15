@@ -5,27 +5,6 @@
  */
 // ----------------------------------------------------------------------------
 
-{#- Calculates the number of coroutines with and without arguments, hacky #}
-{%- set ac = [] %}
-{%- for component in components %}
-	{%- for action in component.actions %}
-		{%- if action.call == "coroutine" and action.parameterType != None %}
-			{%- if ac.append(1)%}{%- endif %}
-		{%- endif %}
-	{%- endfor %}
-{%- endfor %}
-{%- set coAcLen = ac.__len__() %}
-
-{%- set ac = [] %}
-{%- for component in components %}
-	{%- for action in component.actions %}
-		{%- if action.call == "coroutine" and action.parameterType == None %}
-			{%- if ac.append(1)%}{%- endif %}
-		{%- endif %}
-	{%- endfor %}
-{%- endfor %}
-{%- set coAcNoArgLen = ac.__len__() %}
-
 {% for component in components %}
 #include "component_{{ component.name | camelcase }}/{{ component.name | camelcase }}.hpp"
 {%- endfor %}
@@ -53,7 +32,7 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 	switch (header.destination)
 	{
 {%- set actionNumber = 0 %}
-{%- set actionNumberNoArg = 0 %}
+{%- set payloadNumber = 0 %}
 {%- for component in components %}
 		case {{ namespace }}::component::{{ component.name | CAMELCASE }}:
 		{
@@ -72,20 +51,15 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 		{%- endif %}
 				case {{ namespace }}::action::{{ action.name | CAMELCASE }}:
 		{%- if action.call == "coroutine" %}
-			{%- if action.parameterType != None %}
 					if (actionBuffer[{{ actionNumber }}].destination != 0) {
-			{%- else %}
-					if (actionBufferNoArg[{{ actionNumber }}].destination != 0) {
-			{%- endif %}
 						component::{{component.name | camelCase}}.getCommunicator()->sendNegativeResponse(response);
 					}
 					else if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(response{{ payload }}) == xpcc::co::Running) {
+						actionBuffer[{{ actionNumber }}] = ActionBuffer(header);
+			{%- set actionNumber = actionNumber + 1 %}
 			{%- if action.parameterType != None %}
-						actionBuffer[{{ actionNumber }}] = ActionBuffer(header, payload);
-						{%- set actionNumber = actionNumber + 1 %}
-			{%- else %}
-						actionBufferNoArg[{{ actionNumber }}] = ActionBufferNoArg(header);
-						{%- set actionNumberNoArg = actionNumberNoArg + 1 %}
+						payloadBuffer[{{ payloadNumber }}] = PayloadBuffer(payload);
+				{%- set payloadNumber = payloadNumber + 1 %}
 			{%- endif %}
 					}
 		{%- else %}
@@ -155,73 +129,32 @@ Postman::isComponentAvailable(uint8_t component) const
 void
 Postman::update()
 {
-{%- if coAcLen > 0 %}
+{%- set payloadNumber = 0 %}
+{%- if coroutines > 0 %}
 	for(ActionBuffer &action : actionBuffer)
 	{
 		switch (action.destination)
 		{
 	{%- for component in components %}
-		{%- set ac = [] %}
-		{%- for action in component.actions %}
-			{%- if action.call == "coroutine" and action.parameterType != None %}
-				{%- if ac.append(1)%}{%- endif %}
-			{%- endif %}
-		{%- endfor %}
-		{%- set has_actions = ac.__len__() > 0 %}
-
-		{%- if has_actions %}
+		{%- if component.coroutines > 0 %}
 			case {{ namespace }}::component::{{ component.name | CAMELCASE }}:
 			{
 				switch (action.response.getIdentifier())
 				{
 			{%- for action in component.actions %}
-				{%- if action.call == "coroutine" and action.parameterType != None %}
-					{%- set typePrefix = "" if action.parameterType.isBuiltIn else namespace ~ "::packet::" %}
+				{%- if action.call == "coroutine" %}
+					{%- set payload = "" %}
+					{%- if action.parameterType != None %}
+						{%- set typePrefix = "" if action.parameterType.isBuiltIn else namespace ~ "::packet::" %}
+						{%- set payload = ", payloadBuffer[" ~ payloadNumber ~ "].payload.get<" ~ typePrefix ~ (action.parameterType.name | CamelCase) ~ ">()" %}
+					{%- endif %}
 					case {{ namespace }}::action::{{ action.name | CAMELCASE }}:
-						if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(action.response, action.payload.get<{{ typePrefix ~ (action.parameterType.name | CamelCase) }}>()) < xpcc::co::Running) {
+						if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(action.response{{ payload }}) != xpcc::co::Running) {
 							action.remove();
-						}
-						break;
-				{%- endif %}
-			{%- endfor %}
-
-					default:
-						break;
-				}
-				break;
-			}
-		{%- endif %}
-	{%- endfor %}
-
-			default:
-				break;
-		}
-	}
-{%- endif %}
-{%- if coAcNoArgLen > 0 %}
-	for(ActionBufferNoArg &action : actionBufferNoArg)
-	{
-		switch (action.destination)
-		{
-	{%- for component in components %}
-		{%- set ac = [] %}
-		{%- for action in component.actions %}
-			{%- if action.call == "coroutine" and action.parameterType == None %}
-				{%- if ac.append(1)%}{%- endif %}
-			{%- endif %}
-		{%- endfor %}
-		{%- set has_actions = ac.__len__() > 0 %}
-
-		{%- if has_actions %}
-			case {{ namespace }}::component::{{ component.name | CAMELCASE }}:
-			{
-				switch (action.response.getIdentifier())
-				{
-			{%- for action in component.actions %}
-				{%- if action.call == "coroutine" and action.parameterType == None %}
-					case {{ namespace }}::action::{{ action.name | CAMELCASE }}:
-						if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(action.response) < xpcc::co::Running) {
-							action.remove();
+					{%- if action.parameterType != None %}
+							payloadBuffer[{{ payloadNumber }}].remove();
+						{%- set payloadNumber = payloadNumber + 1 %}
+					{%- endif %}
 						}
 						break;
 				{%- endif %}

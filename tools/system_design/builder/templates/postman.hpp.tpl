@@ -5,27 +5,6 @@
  */
 // ----------------------------------------------------------------------------
 
-{#- Calculates the number of coroutines with and without arguments, hacky #}
-{%- set ac = [] %}
-{%- for component in components %}
-	{%- for action in component.actions %}
-		{%- if action.call == "coroutine" and action.parameterType != None %}
-			{%- if ac.append(1)%}{%- endif %}
-		{%- endif %}
-	{%- endfor %}
-{%- endfor %}
-{%- set coAcLen = ac.__len__() %}
-
-{%- set ac = [] %}
-{%- for component in components %}
-	{%- for action in component.actions %}
-		{%- if action.call == "coroutine" and action.parameterType == None %}
-			{%- if ac.append(1)%}{%- endif %}
-		{%- endif %}
-	{%- endfor %}
-{%- endfor %}
-{%- set coAcNoArgLen = ac.__len__() %}
-
 #ifndef	POSTMAN_HPP
 #define	POSTMAN_HPP
 
@@ -45,48 +24,16 @@ public:
 	void
 	update();
 
+{%- if coroutines > 0 %}
 private:
-{%- if coAcLen > 0 %}
-	// Coroutine Actions with Arguments
 	struct
 	ActionBuffer
 	{
 		ActionBuffer()
 		: destination(0) {}
 
-		ActionBuffer(const xpcc::Header& header, const xpcc::SmartPointer& payload)
-		:	payload(payload), response(header), destination(header.destination)
-		{
-		}
-
-		void
-		remove()
-		{
-			destination = 0;
-			payload = xpcc::SmartPointer();
-		}
-
-		xpcc::SmartPointer payload;		// 2B (AVR), 4B (ARM)
-		xpcc::ResponseHandle response;	// 2B
-		uint8_t destination;			// 1B
-	};	// 5B (AVR), 7B(ARM)
-
-	static constexpr uint8_t coroutineActions = {{ coAcLen }};
-	ActionBuffer actionBuffer[coroutineActions];
-
-	bool
-	pushIntoBuffer(const xpcc::Header& header, const xpcc::SmartPointer& payload);
-{%- endif %}
-{% if coAcNoArgLen > 0 %}
-	// Coroutine Actions without Arguments
-	struct
-	ActionBufferNoArg
-	{
-		ActionBufferNoArg()
-		: destination(0) {}
-
-		ActionBufferNoArg(const xpcc::Header& header)
-		: response(header), destination(header.destination) {}
+		ActionBuffer(const xpcc::Header& header)
+		:	response(header), destination(header.destination) {}
 
 		void
 		remove()
@@ -96,8 +43,29 @@ private:
 		uint8_t destination;			// 1B
 	};	// 3B
 
-	static constexpr uint8_t coroutineActionsNoArg = {{ coAcNoArgLen }};
-	ActionBufferNoArg actionBufferNoArg[coroutineActionsNoArg];
+	static constexpr uint8_t coroutineActions = {{ coroutines }};
+	ActionBuffer actionBuffer[coroutineActions];
+
+	{%- if coroutinePayloads > 0 %}
+	struct
+	PayloadBuffer
+	{
+		PayloadBuffer()
+		{}
+
+		PayloadBuffer(const xpcc::SmartPointer& payload)
+		:	payload(payload) {}
+
+		void
+		remove()
+		{ payload = xpcc::SmartPointer(); }
+
+		xpcc::SmartPointer payload;
+	};	// 2B (AVR), 4B (ARM) + 3B HEAP
+
+	static constexpr uint8_t coroutinePayloads = {{ coroutinePayloads }};
+	PayloadBuffer payloadBuffer[coroutinePayloads];
+	{%- endif %}
 {%- endif %}
 
 private:

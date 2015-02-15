@@ -78,7 +78,19 @@ class PostmanBuilder(builder_base.Builder):
 		for component in container.components:
 			components.append(component.flattened())
 		
+		# coroutine information
+		coroutineActions = 0;
+		coroutineActionsWithPayload = 0;
+		for component in components:
+			for action in component.actions:
+				if action.call == "coroutine":
+					coroutineActions += 1
+					if action.parameterType is not None:
+						coroutineActionsWithPayload += 1
+
 		substitutions = {
+			'coroutines': coroutineActions,
+			'coroutinePayloads': coroutineActionsWithPayload,
 			'components': components,
 			'events': self.tree.events,
 			'container': container,
