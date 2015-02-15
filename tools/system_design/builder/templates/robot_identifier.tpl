@@ -5,10 +5,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	ROBOT__IDENTIFIER_HPP
-#define	ROBOT__IDENTIFIER_HPP
+#ifndef	{{ namespace | upper }}_IDENTIFIER_HPP
+#define	{{ namespace | upper }}_IDENTIFIER_HPP
 
-namespace robot
+namespace {{ namespace }}
 {
 	namespace domain
 	{
@@ -101,6 +101,6 @@ namespace robot
 			}
 		}
 	}
-}
+}	// namespace {{ namespace }}
 
-#endif	// ROBOT__IDENTIFIER_HPP
+#endif	// {{ namespace | upper }}_IDENTIFIER_HPP

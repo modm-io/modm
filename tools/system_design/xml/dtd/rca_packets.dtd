@@ -37,8 +37,8 @@
 <!ELEMENT enum (description?,element*)>
 <!ATTLIST enum
 	name CDATA #REQUIRED
-	typed CDATA #IMPLIED
-	underlyingType CDATA #IMPLIED
+	typed (weak|strong) #IMPLIED
+	underlyingType (int8_t|uint8_t) #IMPLIED
 >
 
 <!ELEMENT element (description?)>

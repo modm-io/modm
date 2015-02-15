@@ -94,10 +94,10 @@ namespace xpcc
 		update(...);
 #endif
 
-	protected:
 		inline xpcc::Communicator *
 		getCommunicator();
 
+	protected:
 		inline void
 		callAction(uint8_t receiver, uint8_t actionIdentifier);
 

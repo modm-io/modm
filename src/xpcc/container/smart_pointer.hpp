@@ -2,10 +2,10 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -43,12 +43,12 @@ namespace xpcc
 	/**
 	 * \brief 	Container which destroys itself when the last
 	 * 			copy is destroyed.
-	 * 
+	 *
 	 * This container saves a copy of the given data on the heap. It
 	 * provides the functionality of a shared pointer => pointer object
 	 * records when it is copied - when the last copy is destroyed the
 	 * memory is released.
-	 * 
+	 *
 	 * \ingroup container
 	 */
 	class SmartPointer
@@ -56,15 +56,15 @@ namespace xpcc
 	public:
 		/// default constructor with empty payload
 		SmartPointer();
-		
+
 		/**
 		 * \brief	Allocates memory from the given size
-		 * 
+		 *
 		 * \param	size	the amount of memory to be allocated, has to be
 		 * 					smaller than 252
 		 */
 		SmartPointer(uint8_t size);
-		
+
 		// Must use a pointer to T here, otherwise the compiler can't distinguish
 		// between constructor and copy constructor!
 		template<typename T>
@@ -85,19 +85,20 @@ namespace xpcc
 		{
 			return &ptr[2];
 		}
-		
+
 		inline uint8_t *
 		getPointer()
 		{
 			return &ptr[2];
 		}
-		
+
 		inline uint8_t
 		getSize() const
 		{
 			return ptr[1];
 		}
-		
+
+	public:
 		/**
 		 * Get the value that are stored in the pointer casted to the given type.
 		 * \note This method has no checking mechanism, use get(T) to have at least some.
@@ -114,7 +115,7 @@ namespace xpcc
 		/**
 		 * Get the value that are stored in the pointer casted to the given type.
 		 * The method checks only the size but not the type of the stored data
-		 * 
+		 *
 		 * \return \c true if the type fit
 		 */
 		template<typename T>
@@ -130,19 +131,19 @@ namespace xpcc
 				return false;
 			}
 		}
-		
+
 		bool
 		operator == (const SmartPointer& other);
-		
+
+		SmartPointer&
+		operator = (const SmartPointer& other);
+
 	protected:
-		uint8_t * const ptr;
-		
+		uint8_t * ptr;
+
 	protected:
 		friend IOStream&
 		operator <<( IOStream&, const SmartPointer&);
-		
-		SmartPointer&
-		operator = (const SmartPointer& other);
 	};
 
 	/**

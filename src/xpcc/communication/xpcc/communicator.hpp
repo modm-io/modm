@@ -53,7 +53,6 @@ namespace xpcc
 	 */
 	class Communicator : public Communicatable
 	{
-		friend class Response;
 		friend class AbstractComponent;
 
 	private:

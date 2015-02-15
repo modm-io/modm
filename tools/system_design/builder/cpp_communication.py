@@ -51,13 +51,22 @@ class CppCommunicationBuilder(builder_base.Builder):
 	VERSION = "0.1"
 	
 	def setup(self, optparser):
-		pass
-				
+		optparser.add_option(
+				"--namespace",
+				dest = "namespace",
+				default = "robot",
+				help = "Namespace of the generated identifiers.")
+
 	def generate(self):
 		# check the commandline options
 		if not self.options.outpath:
 			raise builder_base.BuilderException("You need to provide an output path!")
-		
+
+		if self.options.namespace:
+			namespace = self.options.namespace
+		else:
+			raise builder_base.BuilderException("You need to provide a namespace!")
+
 		cppFilter = {
 			'camelcase': filter_lower,
 			'camelCase': filter.variableName,
@@ -74,6 +83,7 @@ class CppCommunicationBuilder(builder_base.Builder):
 		substitutions = {
 			'components': components,
 			'events': self.tree.events,
+			'namespace': namespace
 		}
 		
 		file = os.path.join(self.options.outpath, 'communication.hpp')

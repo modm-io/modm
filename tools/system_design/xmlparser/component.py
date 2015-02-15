@@ -214,6 +214,10 @@ class Component(object):
 			except KeyError:
 				raise ParserException("Found unknown event '%s' in component '%s'!" % (event, self.name))
 	
+	@property
+	def coroutines(self):
+		return len([a for a in self.actions if a.call == "coroutine"])
+
 	def flattened(self):
 		""" Access the version with the flattened hierarchy
 		

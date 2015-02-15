@@ -118,7 +118,7 @@ protected:
 public:
 	/// Force all coroutines to stop running at the current nesting level
 	inline void
-	stopAllCoroutines()
+	stopCoroutine()
 	{
 		uint_fast8_t level = coLevel;
 		while (level < Levels)
@@ -242,7 +242,7 @@ protected:
 
 public:
 	void inline
-	stopAllCoroutines()
+	stopCoroutine()
 	{
 		coState = CoStopped;
 	}

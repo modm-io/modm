@@ -224,7 +224,6 @@ namespace xpcc
 
 	private:
 		friend class Communicator;
-		friend class Response;
 	};
 }
 

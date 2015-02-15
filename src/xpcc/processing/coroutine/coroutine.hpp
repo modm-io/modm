@@ -13,6 +13,7 @@
 #include "macros.hpp"
 #include <xpcc/architecture/utils.hpp>
 #include <stdint.h>
+#include <initializer_list>
 
 namespace xpcc
 {
@@ -30,8 +31,7 @@ State
 	NestingError = 1,	///< Nested Coroutine has run out of nesting levels
 
 	// reasons to wait
-	WrongState = 254,	///< A conflicting nested coroutine of the same class is already running
-	Blocked = 254,		///< A conflicting coroutine has blocked this coroutine
+	WrongState = 100,	///< A conflicting nested coroutine of the same class is already running
 
 	// reasons to keep running
 	Running = 255,		///< Coroutine is running
@@ -79,8 +79,6 @@ struct Result<void>
 typedef uint8_t CoState;
 /// We use 0 instead of -1 since it might be fast to check
 static constexpr CoState CoStopped = CoState(0);
-/// Blocked coroutines return `WrongState` when called
-static constexpr CoState CoBlocked = CoState(1);
 /// @endcond
 
 /**
@@ -137,44 +135,72 @@ public:
 	inline void
 	stopAllCoroutines()
 	{
-		for (CoState &level : coStateArray)
+		for (CoState &state : coStateArray)
 		{
-			level = CoStopped;
+			state = CoStopped;
 		}
 	}
 
-	/// @return	`true` if a coroutine is running, else `false`
-	bool inline
-	isCoroutineRunning() const
+	/// Force the specified coroutine to stop running
+	inline bool
+	stopCoroutine(uint8_t id)
 	{
-		for (CoState &level : coStateArray)
+		if (id < Methods) {
+			coStateArray[id] = CoStopped;
+			return true;
+		}
+		return false;
+	}
+
+	/// @return	`true` if the specified coroutine is running, else `false`
+	bool inline
+	isCoroutineRunning(uint8_t id) const
+	{
+		return (id < Methods and coStateArray[id] != CoStopped);
+	}
+
+	/// @return	`true` if any coroutine of this class is running, else `false`
+	bool inline
+	areAnyCoroutinesRunning() const
+	{
+		for (const CoState state : coStateArray)
 		{
-			if (level != CoStopped)
+			if (state != CoStopped)
 				return true;
 		}
 		return false;
 	}
 
+	/// @return	`true` if any of the specified coroutine are running, else `false`
 	bool inline
-	blockCoroutine(uint8_t index)
+	areAnyCoroutinesRunning(std::initializer_list<uint8_t> ids) const
 	{
-		if (index < Methods && coStateArray[index] != CoStopped)
+		for (uint8_t id : ids)
 		{
-			coStateArray[index] = CoBlocked;
-			return true;
+			if (isCoroutineRunning(id))
+				return true;
 		}
 		return false;
 	}
 
+	/// @return	`true` if all of the specified coroutine are running, else `false`
 	bool inline
-	unblockCoroutine(uint8_t index)
+	areAllCoroutinesRunning(std::initializer_list<uint8_t> ids) const
 	{
-		if (index < Methods && coStateArray[index] == CoBlocked)
+		for (uint8_t id : ids)
 		{
-			coStateArray[index] = CoStopped;
-			return true;
+			// = not isCoroutineRunning(id)
+			if (id >= Methods or coStateArray[id] == CoStopped)
+				return false;
 		}
-		return false;
+		return true;
+	}
+
+	/// @return	`true` if none of the specified coroutine are running, else `false`
+	bool inline
+	joinCoroutines(std::initializer_list<uint8_t> ids) const
+	{
+		return not areAnyCoroutinesRunning(ids);
 	}
 
 #ifdef __DOXYGEN__
@@ -197,7 +223,7 @@ protected:
 	/// increases nesting level, call this in the switch statement!
 	/// @return current state before increasing nesting level
 	CoState ALWAYS_INLINE
-	pushCo(uint_fast8_t index)
+	pushCo(uint_fast8_t index) const
 	{
 		return coStateArray[index];
 	}
@@ -205,7 +231,7 @@ protected:
 	/// always call this before returning from the run function!
 	/// decreases nesting level
 	void ALWAYS_INLINE
-	popCo()
+	popCo() const
 	{}
 
 	// invalidates the parent nesting level

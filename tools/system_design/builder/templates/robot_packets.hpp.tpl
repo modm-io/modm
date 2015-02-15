@@ -5,14 +5,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	ROBOT__PACKETS_HPP
-#define	ROBOT__PACKETS_HPP
+#ifndef	{{ namespace | upper }}_PACKETS_HPP
+#define	{{ namespace | upper }}_PACKETS_HPP
 
 #include <stdint.h>
 #include <cstdlib>
 #include <xpcc/io/iostream.hpp>
 
-namespace robot
+namespace {{ namespace }}
 {
 	namespace packet
 	{
@@ -71,10 +71,10 @@ namespace robot
 		{%- endif %}
 			}
 		}
-		
+
 		xpcc::IOStream&
 		operator << (xpcc::IOStream& s, const {{ packet.name | typeName }} e);
-		
+
 	{% elif packet.isStruct %}
 		struct {{ packet.name | typeName }}
 		{
@@ -95,6 +95,6 @@ namespace robot
 	{% endif %}
 {%- endfor -%}
 	} // namespace packet
-} // namespace robot
+} // namespace {{ namespace }}
 
-#endif	// ROBOT__PACKETS_HPP
+#endif	// {{ namespace | upper }}_PACKETS_HPP
