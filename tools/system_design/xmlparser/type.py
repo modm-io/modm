@@ -129,8 +129,7 @@ class Enum(BaseType):
 				if not re.match("^[0-9A-Z_]*$", self.name):
 					raise ParserException("Attribute name of element in enum has to be `UPPER_UNDERSCORE_STYLE` (found: '%s')" % (self.name))
 			else:
-				if not all(part.istitle() for part in self.name.split(' ')):
-					raise ParserException("Attribute name of element in enum has to be `Capitalized Spaced Style` (found: '%s')" % (self.name))
+				utils.check_name(self.name)
 
 			self.string = node.get('string')
 			if self.string is None:
