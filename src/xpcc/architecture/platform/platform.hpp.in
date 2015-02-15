@@ -18,20 +18,10 @@
 
 #include <stdint.h>
 
-#include "detect.hpp"		// sets XPCC__CPU_xx etc. macros
-#include "utils.hpp"
+#include <xpcc/architecture/detect.hpp>		// sets XPCC__CPU_xx etc. macros
+#include <xpcc/architecture/utils.hpp>
 
-// hack to enable compilation of hosted targets at the same time as embedded targets
-// this should go away when the library generator is finished
-#if defined XPCC__OS_HOSTED
-#	if defined XPCC__OS_OSX
-#		include "generated_platform_darwin/drivers.hpp"
-#	else
-#		include "generated_platform_linux/drivers.hpp"
-#	endif
-#else
 // Include generated Platform sources:
-#	include "${include_path}"
-#endif
+#include "${include_path}"
 
 #endif	// XPCC__PLATFORM_HPP

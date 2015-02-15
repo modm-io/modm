@@ -45,7 +45,7 @@ defines = scan.defines
 
 # Platform Files
 architecture_path = os.path.join('.', 'xpcc', 'architecture')
-p_sources, p_defines = env.GeneratePlatform(architecture_path)
+p_sources, p_defines, p_includes = env.GeneratePlatform(architecture_path)
 
 # add sources to xpcc library in order for them to be built
 sources.append(p_sources)
@@ -53,6 +53,9 @@ sources.append(p_sources)
 # hand defines to gcc through the -D flag for both xpcc and user code
 envOld.Append(CPPDEFINES = p_defines)
 env.Append(CPPDEFINES = p_defines)
+
+for path in p_includes:
+	envOld.AppendUnique(CPPPATH = os.path.join(env['XPCC_ROOTPATH'], 'src', path))
 
 # Update Enivronment Vars set by env.GeneratePlatform for "envOld"
 # TODO: check if GeneratePlatform could just be called through the
