@@ -138,11 +138,11 @@ def platform_tools_generate(env, architecture_path):
 # 	# Set some paths used by this file
 	env['XPCC_PLATFORM_GENERATED_PATH_OLD'] = \
 		os.path.join(env['XPCC_LIBRARY_PATH'], 'xpcc', 'architecture', 'generated_platform_' + env['XPCC_DEVICE'])
- 		
+
 	env['XPCC_PLATFORM_GENERATED_PATH'] = \
 		os.path.join(env['XPCC_BUILDPATH'], 'generated_platform')
-	
-	
+
+
 	device = env['XPCC_DEVICE']
 
 	# Initialize Return Lists/Dicts
@@ -152,12 +152,12 @@ def platform_tools_generate(env, architecture_path):
 	platform_path = os.path.join(architecture_path, 'platform')
 	old_generated_path = env['XPCC_PLATFORM_GENERATED_PATH_OLD']
 	generated_path = env['XPCC_PLATFORM_GENERATED_PATH']
-	
+
 	#remove the old platform. Delete these lines in a fiew days.
 	#remove also the XPCC_PLATFORM_GENERATED_PATH_OLD
 	if os.path.exists(old_generated_path):
 		Execute(Delete(old_generated_path))
-	
+
 	dev = env['XPCC_DEVICE_FILE']
 
 	# Parse Properties
@@ -308,8 +308,8 @@ def filter_letter_to_num(letter):
 # -----------------------------------------------------------------------------
 ###################### Generate Platform Tools ################################
 def generate(env, **kw):
- 	env['XPCC_PLATFORM_PATH'] = \
- 		os.path.join(env['XPCC_LIBRARY_PATH'], 'xpcc', 'architecture', 'platform')
+	env['XPCC_PLATFORM_PATH'] = \
+		os.path.join(env['XPCC_LIBRARY_PATH'], 'xpcc', 'architecture', 'platform')
 
 	# Create Parameter DB and parse User parameters
 	env['XPCC_PARAMETER_DB'] = ParameterDB(env['XPCC_USER_PARAMETERS'], env.GetLogger()).toDictionary()
