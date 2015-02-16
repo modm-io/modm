@@ -41,8 +41,9 @@ def gdb_remote_program(env, source, alias='gdb_remote_program'):
 		gdb = "arm-none-eabi-gdb"
 		cmd = [gdb, '-q',
 			'-ex "target remote $OPENOCD_REMOTE_HOST:3333"',
+			'-ex "monitor reset halt"',
 			'-ex "load"',
-			'-ex "monitor reset"',
+			'-ex "monitor reset "',
 			'-ex "disconnect"',
 			'-ex "quit"',
 			'$SOURCE']
