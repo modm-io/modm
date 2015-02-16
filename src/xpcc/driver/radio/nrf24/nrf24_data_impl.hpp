@@ -134,10 +134,19 @@ bool
 xpcc::Nrf24Data<Nrf24Phy>::sendPacket(packet_t& packet)
 {
 	if(!isReadyToSend())
+	{
+		state = SendingState::Failed;
 		return false;
+	}
 
 	if(packet.length > getPayloadLength())
+	{
+		state = SendingState::Failed;
 		return false;
+	}
+
+	// switch to Tx mode
+	Config::setMode(Config::Mode::Tx);
 
 	// assemble frame to transmit
 	assemblyFrame.header.src = ownAddress;
@@ -156,19 +165,24 @@ xpcc::Nrf24Data<Nrf24Phy>::sendPacket(packet_t& packet)
 	} else
 	{
 		// set pipe 0's address to tx address to receive ack packet
-		Phy::setRxAddress(Pipe::PIPE_0, assembleAddress(assemblyFrame.header.dest));
+		Phy::setRxAddress(Pipe::PIPE_0, assembleAddress(packet.dest));
+		Config::enablePipe(Pipe::PIPE_0, true);
+
 		Phy::writeTxPayload((uint8_t*)&assemblyFrame, packet.length + sizeof(header_t));
 
 		// mark state as busy, so when
 		state = SendingState::Busy;
+
+		/*
+		 * TODO: Waiting is neccessary, because we want to switch back to RX
+		 *       mode as soon as possible, but this wastes CPU cycles, so find
+		 *       a non-blocking solution later.
+		 */
+		// wait until packet is sent
+		while( updateSendingState() == SendingState::Busy )
+		{
+		}
 	}
-
-	// switch to Tx mode, CE should be always set
-	Config::setMode(Config::Mode::Tx);
-
-
-	// wait until packet is sent
-	while( !(Phy::readFifoStatus() & (uint8_t)FifoStatus::TX_EMPTY));
 
 	// switch back to Rx mode
 	Config::setMode(Config::Mode::Rx);
@@ -200,8 +214,7 @@ xpcc::Nrf24Data<Nrf24Phy>::getPacket(packet_t& packet)
 	packet.dest = assemblyFrame.header.dest;
 	packet.src = assemblyFrame.header.src;
 	packet.length = payload_length;
-	packet.data = 0;	// only needed to make compiler happy
-	memcpy(assemblyFrame.data, packet.data, packet.length);
+	memcpy(packet.data, assemblyFrame.data, payload_length);
 
 	// Acknowledge RX_DR interrupt
 	Phy::setBits(NrfRegister::STATUS, Status::RX_DR);
@@ -215,6 +228,9 @@ template<typename Nrf24Phy>
 bool
 xpcc::Nrf24Data<Nrf24Phy>::isReadyToSend()
 {
+	if(state == SendingState::Failed)
+		return true;
+
 	uint8_t fifo_status = Phy::readFifoStatus();
 
 	// Wait for TX Fifo to become empty, because otherwise we would need to make sure
@@ -262,8 +278,6 @@ template<typename Nrf24Phy>
 bool
 xpcc::Nrf24Data<Nrf24Phy>::isPacketAvailable()
 {
-	Config::setMode(Config::Mode::Rx);
-
 	uint8_t fifo_status = Phy::readFifoStatus();
 	uint8_t status = Phy::readStatus();
 

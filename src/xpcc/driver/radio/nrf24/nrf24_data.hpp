@@ -50,6 +50,7 @@ public:
 		FinishedAck,
 		FinishedNack,
 		DontKnow,
+		Failed,
 		Undefined
 	};
 
