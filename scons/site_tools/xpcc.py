@@ -120,9 +120,6 @@ def xpcc_library(env, buildpath=None):
 	# exclude the buildpath from the FileScanner
 	exclude_from_scanner(env['XPCC_BUILDPATH'])
 
-	# exclude the generated path from the FileScanner
-	exclude_from_scanner(env['XPCC_PLATFORM_GENERATED_PATH'])
-
 	# build the library
 	library, defines = env.SConscript(
 			os.path.join(env['XPCC_ROOTPATH'], 'src', 'SConscript'),

@@ -55,7 +55,10 @@ envOld.Append(CPPDEFINES = p_defines)
 env.Append(CPPDEFINES = p_defines)
 
 for path in p_includes:
-	envOld.AppendUnique(CPPPATH = os.path.join(env['XPCC_ROOTPATH'], 'src', path))
+	if os.path.isabs(path):
+		envOld.AppendUnique(CPPPATH = path)
+	else:
+		envOld.AppendUnique(CPPPATH = os.path.join(env['XPCC_ROOTPATH'], 'src', path))
 
 # Update Enivronment Vars set by env.GeneratePlatform for "envOld"
 # TODO: check if GeneratePlatform could just be called through the
