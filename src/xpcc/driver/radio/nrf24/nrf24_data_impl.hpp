@@ -14,8 +14,6 @@
 #include "nrf24_data.hpp"
 #include <string.h>
 
-using namespace xpcc::nrf24;
-
 // --------------------------------------------------------------------------------------------------------------------
 
 template<typename Nrf24Phy>
@@ -181,6 +179,13 @@ xpcc::Nrf24Data<Nrf24Phy>::sendPacket(packet_t& packet)
 		// wait until packet is sent
 		while( updateSendingState() == SendingState::Busy )
 		{
+		}
+
+		// If packet wasn't sent successfully, we need to flush the Tx fifo,
+		// because it won't be deleted from fifo when not ACKed
+		if(state != SendingState::FinishedAck)
+		{
+			Phy::flushTxFifo();
 		}
 	}
 
