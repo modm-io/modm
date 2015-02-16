@@ -277,6 +277,18 @@ xpcc::Nrf24Data<Nrf24Phy>::isPacketAvailable()
 // --------------------------------------------------------------------------------------------------------------------
 
 template<typename Nrf24Phy>
+typename xpcc::Nrf24Data<Nrf24Phy>::packet_t*
+xpcc::Nrf24Data<Nrf24Phy>::allocatePacket(uint8_t payloadLength)
+{
+	packet_t* packet = (packet_t*)malloc(sizeof(packet_t));
+	packet->data = (uint8_t*)malloc(payloadLength);
+
+	return packet;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template<typename Nrf24Phy>
 typename xpcc::Nrf24Data<Nrf24Phy>::SendingState
 xpcc::Nrf24Data<Nrf24Phy>::getSendingFeedback()
 {

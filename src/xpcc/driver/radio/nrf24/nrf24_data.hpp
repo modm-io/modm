@@ -133,6 +133,9 @@ public:
 		return broadcastAddress;
 	}
 
+	static packet_t*
+	allocatePacket(uint8_t payloadLength);
+
 	/* nrf24 specific */
 
 // not yet implemented
