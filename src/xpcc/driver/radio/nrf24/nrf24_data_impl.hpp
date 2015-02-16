@@ -168,7 +168,7 @@ xpcc::Nrf24Data<Nrf24Phy>::sendPacket(packet_t& packet)
 
 
 	// wait until packet is sent
-	while( !(Phy::readRegister(NrfRegister::FIFO_STATUS) & (uint8_t)FifoStatus::TX_EMPTY));
+	while( !(Phy::readFifoStatus() & (uint8_t)FifoStatus::TX_EMPTY));
 
 	// switch back to Rx mode
 	Config::setMode(Config::Mode::Rx);
@@ -215,7 +215,7 @@ template<typename Nrf24Phy>
 bool
 xpcc::Nrf24Data<Nrf24Phy>::isReadyToSend()
 {
-	uint8_t fifo_status = Phy::readRegister(NrfRegister::FIFO_STATUS);
+	uint8_t fifo_status = Phy::readFifoStatus();
 
 	// Wait for TX Fifo to become empty, because otherwise we would need to make sure
 	// that every packet has the same destination
@@ -237,7 +237,7 @@ xpcc::Nrf24Data<Nrf24Phy>::updateSendingState()
 
 	// read relevant status registers
 	uint8_t status = Phy::readStatus();
-	uint8_t fifo_status = Phy::readRegister(NrfRegister::FIFO_STATUS);
+	uint8_t fifo_status = Phy::readFifoStatus();
 
 	if(status & (uint8_t)Status::MAX_RT)
 	{
@@ -264,12 +264,11 @@ xpcc::Nrf24Data<Nrf24Phy>::isPacketAvailable()
 {
 	Config::setMode(Config::Mode::Rx);
 
-	uint8_t fifo_status = Phy::readRegister(NrfRegister::FIFO_STATUS);
+	uint8_t fifo_status = Phy::readFifoStatus();
 	uint8_t status = Phy::readStatus();
 
-	// only check Rx Fifo for now, Status:RX_DR will be needed when using interrupts
-	//if( !(fifo_status & (uint8_t)FifoStatus::RX_EMPTY) )
-	if(status & (uint8_t)Status::RX_DR)
+	if( (status & (uint8_t)Status::RX_DR) ||
+	    !(fifo_status & (uint8_t)FifoStatus::RX_EMPTY))
 		return true;
 	else
 		return false;
