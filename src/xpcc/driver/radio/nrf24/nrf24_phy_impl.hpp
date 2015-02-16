@@ -377,11 +377,12 @@ template<typename Spi, typename Csn, typename Ce>
 void
 xpcc::Nrf24Phy<Spi, Csn, Ce>::pulseCe()
 {
-	Ce::set();
+	Ce::toggle();
 
-	xpcc::delayMicroseconds(10);
+	// delay might not be precise enough
+	xpcc::delayMicroseconds(15);
 
-	Ce::reset();
+	Ce::toggle();
 }
 
 // --------------------------------------------------------------------------------------------------------------------
