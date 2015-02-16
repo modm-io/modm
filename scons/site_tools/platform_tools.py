@@ -152,8 +152,6 @@ def platform_tools_generate(env, architecture_path):
 	platform_path = os.path.join(architecture_path, 'platform')
 	old_generated_path = env['XPCC_PLATFORM_GENERATED_PATH_OLD']
 	generated_path = env['XPCC_PLATFORM_GENERATED_PATH']
-	path_of_generated_xpcc_source = os.path.join(env['XPCC_BUILDPATH'], 'src')
-
 	
 	#remove the old platform. Delete these lines in a fiew days.
 	#remove also the XPCC_PLATFORM_GENERATED_PATH_OLD
@@ -228,12 +226,12 @@ def platform_tools_generate(env, architecture_path):
 		Execute(Delete(oldTarget))
 	
 	src = os.path.join(platform_path, 'platform.hpp.in')
-	tar = os.path.join(path_of_generated_xpcc_source, architecture_path, 'platform.hpp')
+	tar = env.Buildpath(os.path.join(architecture_path, 'platform.hpp'))
 	sub = {'include_path': '../../../generated_platform/drivers.hpp'}
 	env.Template(target = tar, source = src, substitutions = sub)
 	
 	#append and return additional CPPPATH
-	cppIncludes = [path_of_generated_xpcc_source]
+	cppIncludes = [env.Buildpath('.')]
 	env.AppendUnique(CPPPATH = cppIncludes)
 
 	# Show SCons how to build the drivers.hpp.in file:
