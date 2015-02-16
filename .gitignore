@@ -10,10 +10,6 @@ build/
 .vagrant/
 
 # Directories containing device specific files generated from templates
-# in src/xpcc/architecture/
-/src/xpcc/architecture/generated*
-# platform.hpp is generate from a template
-/src/xpcc/architecture/platform.hpp
 # xpcc_config.hpp is generated from a template file
 src/xpcc_config.hpp
 src/libxpcc.a
