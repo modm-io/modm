@@ -61,7 +61,10 @@ def relocate_to_buildpath(env, path, strip_extension=False):
 	if strip_extension:
 		path = os.path.splitext(path)[0]
 
-	path = os.path.relpath(path, env['XPCC_BASEPATH'])
+	# needed when xpcc path has a symlink
+	base = os.path.realpath(env['XPCC_BASEPATH'])
+
+	path = os.path.relpath(path, base)
 	if path.startswith('..'):
 		# if the file is not in a subpath of the current directory
 		# build it in the root directory of the build path
