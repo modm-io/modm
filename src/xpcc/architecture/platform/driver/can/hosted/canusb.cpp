@@ -8,12 +8,16 @@
 // ----------------------------------------------------------------------------
 
 #include <iostream>
+#include <xpcc/debug/logger.hpp>
 
 #include <xpcc/architecture/driver.hpp>
 #include <xpcc/processing/timer.hpp>
 
 #include <xpcc/driver/can/can_lawicel_formatter.hpp>
 #include "canusb.hpp"
+
+#undef  XPCC_LOG_LEVEL
+#define XPCC_LOG_LEVEL xpcc::log::INFO
 
 xpcc::hosted::CanUsb::CanUsb()
 :	active(false), busState(BusState::Off)
@@ -55,8 +59,8 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int baudRate)
 
 	if (this->serialPort.open())
 	{
-		std::cout << " SerialPort opened in canusb" << std::endl;
-		std::cout << "write C" << std::endl;
+		XPCC_LOG_DEBUG << XPCC_FILE_INFO << "SerialPort opened in canusb" << xpcc::endl;
+		XPCC_LOG_DEBUG << XPCC_FILE_INFO << "write 'C'" << xpcc::endl;
 		this->serialPort.write("C\r");
 
 		xpcc::ShortTimeout timeout;
@@ -68,7 +72,7 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int baudRate)
 		char a;
 		while( this->serialPort.read(a) );
 
-		std::cout << "write S4" << std::endl;
+		XPCC_LOG_DEBUG << XPCC_FILE_INFO << "write 'S4'" << xpcc::endl;
 		this->serialPort.write("S4\r");
 
 		timeout.restart(500);
@@ -76,7 +80,7 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int baudRate)
 		{
 			if (timeout.isExpired())
 			{
-				std::cout << "Timer expired" << std::endl;
+				XPCC_LOG_DEBUG << XPCC_FILE_INFO << "Timer expired" << xpcc::endl;
 				this->serialPort.close();
 				while (this->serialPort.isOpen())
 				{
@@ -87,7 +91,7 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int baudRate)
 		}
 		if (a != '\r')
 		{
-			std::cout << "Wrong answer on S4: " << std::hex << (int) a	<< std::endl;
+			XPCC_LOG_ERROR << XPCC_FILE_INFO << "Wrong answer on S4: " << xpcc::hex << (int) a	<< xpcc::endl;
 			this->serialPort.close();
 			while (this->serialPort.isOpen())
 			{
@@ -96,13 +100,13 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int baudRate)
 			return false;
 		}
 		this->serialPort.write("O\r");
-		std::cout << "written O" << std::endl;
+		XPCC_LOG_DEBUG << XPCC_FILE_INFO << "written 'O'" << xpcc::endl;
 		timeout.restart(500);
 		while (!this->serialPort.read(a))
 		{
 			if (timeout.isExpired())
 			{
-				std::cout << "Timer expired" << std::endl;
+				XPCC_LOG_DEBUG << XPCC_FILE_INFO << "Timer expired" << xpcc::endl;
 				this->serialPort.close();
 				while (this->serialPort.isOpen())
 				{
@@ -114,7 +118,7 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int baudRate)
 
 		if (a != '\r')
 		{
-			std::cout << "Wrong answer on O: " << std::hex << (int) a << std::endl;
+			XPCC_LOG_ERROR << XPCC_FILE_INFO << "Wrong answer on O: " << xpcc::hex << (int) a << xpcc::endl;
 			this->serialPort.close();
 			while (this->serialPort.isOpen())
 			{
@@ -137,7 +141,7 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int baudRate)
 	else
 	{
 		busState = BusState::Off;
-		std::cerr << " Could not open Canusb" << std::endl;
+		XPCC_LOG_ERROR << XPCC_FILE_INFO << "Could not open Canusb" << xpcc::endl;
 		return false;
 	}
 }
