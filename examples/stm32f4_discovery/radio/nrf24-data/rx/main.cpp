@@ -1,5 +1,5 @@
 #include <xpcc/architecture/platform.hpp>
-#include "../../stm32f4_discovery.hpp"
+#include "../../../stm32f4_discovery.hpp"
 #include <xpcc/debug/logger.hpp>
 #include <xpcc/processing.hpp>
 
