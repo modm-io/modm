@@ -1,4 +1,6 @@
-<img src="https://github.com/roboterclubaachen/xpcc/raw/master/doc/images/logo_xpcc.png" alt="xpcc logo" />
+[![Build Status](https://travis-ci.org/roboterclubaachen/xpcc.svg?branch=develop)](https://travis-ci.org/roboterclubaachen/xpcc)
+
+![xpcc logo](https://github.com/roboterclubaachen/xpcc/raw/master/doc/images/logo_xpcc.png)
 
 
 xpcc microcontroller framework
