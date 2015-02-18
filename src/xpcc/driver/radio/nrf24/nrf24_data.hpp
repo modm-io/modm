@@ -59,10 +59,20 @@ public:
 	/// Data structure that user uses to pass data to the data layer
 	typedef struct packet_t
 	{
+		packet_t(uint8_t payload_length = Nrf24Data::getPayloadLength()) :
+			dest(0), src(0), length(payload_length)
+		{
+			data = new uint8_t[length];
+			if(data)
+				memset(data, 0, length);
+		}
+
 		Address     dest;
 		Address     src;        // will be ignored when sending
 		uint8_t*    data;
 		uint8_t     length;     // max. 30!
+
+		~packet_t() { delete data; }
 	} packet_t;
 
 
@@ -133,9 +143,6 @@ public:
 	{
 		return broadcastAddress;
 	}
-
-	static packet_t*
-	allocatePacket(uint8_t payloadLength);
 
 	/* nrf24 specific */
 
