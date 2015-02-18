@@ -14,57 +14,10 @@
 
 #include "nrf24_phy.hpp"
 #include "nrf24_config.hpp"
+#include "nrf24_definitions.hpp"
 
 namespace xpcc
 {
-
-namespace nrf24
-{
-
-/// @{
-/// @ingroup	nrf24
-typedef uint64_t    BaseAddress;
-typedef uint8_t     Address;
-/// @}
-
-/// @ingroup	nrf24
-enum class SendingState
-{
-	Busy,
-	FinishedAck,
-	FinishedNack,
-	DontKnow,
-	Undefined
-};
-
-/// @{
-/// @ingroup	nrf24
-/// Data structure that user uses to pass data to the data layer
-typedef struct packet_t
-{
-	Address     dest;
-	Address     src;        // will be ignored when sending
-	uint8_t*    data;
-	uint8_t     length;     // max. 30!
-} packet_t;
-
-
-/// Header of frame_t
-typedef struct header_t
-{
-	uint8_t     src;
-	uint8_t     dest;
-} header_t;
-
-/// Data that will be sent over the air
-typedef struct frame_t
-{
-	header_t    header;
-	uint8_t     data[30];   // max. possible payload size (32 byte) - 2 byte (src + dest)
-} frame_t;
-/// @}
-
-}
 
 /* Pipe layout:
  *
@@ -77,16 +30,62 @@ typedef struct frame_t
  *
  */
 
-
 /// @ingroup	nrf24
 /// @author		Daniel Krebs
 template<typename Nrf24Phy>
-class Nrf24Data
+class Nrf24Data : xpcc::Nrf24Register
 {
 public:
 
-	/* typedef config layer for simplicity */
-	typedef xpcc::Nrf24Config<Nrf24Phy> ConfigLayer;
+	/// @{
+	/// @ingroup	nrf24
+	typedef uint64_t    BaseAddress;
+	typedef uint8_t     Address;
+	/// @}
+
+	/// @ingroup	nrf24
+	enum class SendingState
+	{
+		Busy,
+		FinishedAck,
+		FinishedNack,
+		DontKnow,
+		Failed,
+		Undefined
+	};
+
+	/// @{
+	/// @ingroup	nrf24
+	/// Data structure that user uses to pass data to the data layer
+	typedef struct packet_t
+	{
+		Address     dest;
+		Address     src;        // will be ignored when sending
+		uint8_t*    data;
+		uint8_t     length;     // max. 30!
+	} packet_t;
+
+
+	/// Header of frame_t
+	typedef struct header_t
+	{
+		uint8_t     src;
+		uint8_t     dest;
+	} header_t;
+
+	/// Data that will be sent over the air
+	typedef struct frame_t
+	{
+		header_t    header;
+		uint8_t     data[30];   // max. possible payload size (32 byte) - 2 byte (src + dest)
+	} frame_t;
+	/// @}
+
+public:
+
+	/* typedef config and pyhsical layer for simplicity */
+	typedef xpcc::Nrf24Config<Nrf24Phy> Config;
+	typedef Nrf24Phy Phy;
 
 
 	static void
@@ -126,7 +125,7 @@ public:
 	static uint8_t
 	getPayloadLength()
 	{
-		return Nrf24Phy::getPayloadLength() - sizeof(header_t);
+		return Phy::getPayloadLength() - sizeof(header_t);
 	}
 
 	static Address
@@ -134,6 +133,9 @@ public:
 	{
 		return broadcastAddress;
 	}
+
+	static packet_t*
+	allocatePacket(uint8_t payloadLength);
 
 	/* nrf24 specific */
 
@@ -184,7 +186,7 @@ private:
 
 };
 
-}
+}	// namespace xpcc
 
 #include "nrf24_data_impl.hpp"
 
