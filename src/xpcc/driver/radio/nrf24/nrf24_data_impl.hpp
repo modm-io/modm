@@ -48,7 +48,10 @@ template<typename Nrf24Phy>
 void
 xpcc::Nrf24Data<Nrf24Phy>::initialize(BaseAddress base_address, Address own_address, Address broadcast_address)
 {
-	baseAddress = base_address;
+	// Set base address and clear lower byte. When assembling full addresses,
+	// each Address (1 byte) will be ORed to the lower byte of this base address
+	baseAddress = base_address & ~(0xff);
+
 	broadcastAddress = broadcast_address;
 
 	// Initialized with broadcast address means unset
@@ -258,7 +261,6 @@ xpcc::Nrf24Data<Nrf24Phy>::updateSendingState()
 
 	// read relevant status registers
 	uint8_t status = Phy::readStatus();
-	uint8_t fifo_status = Phy::readFifoStatus();
 
 	if(status & (uint8_t)Status::MAX_RT)
 	{
