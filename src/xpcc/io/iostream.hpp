@@ -10,6 +10,7 @@
 #ifndef XPCC_IOSTREAM_HPP
 #define XPCC_IOSTREAM_HPP
 
+#include <xpcc/architecture/detect.hpp>
 #include <xpcc/architecture/utils.hpp>
 
 #include "iodevice.hpp"
@@ -224,8 +225,8 @@ public :
 		return *this;
 	}
 
-#if defined(XPCC__OS_OSX)
-	// For APPLE 'int64_t' is of type 'int'. Therefore there is no
+#if defined(XPCC__OS_HOSTED)
+	// For HOSTED 'int64_t' is of type 'int'. Therefore there is no
 	// function here for the default type 'long int'. As 'long int' has the same
 	// width as 'int64_t' we just use a typedef here.
 	ALWAYS_INLINE IOStream&
