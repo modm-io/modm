@@ -29,7 +29,7 @@
 // ----------------------------------------------------------------------------
 /**
  * \defgroup architecture	Architecture
- * 
+ *
  * Supported platforms
  */
 
@@ -38,7 +38,7 @@
 
 // platform.hpp is hidden in 'generated_platform_xx/include_platform_hack'. See platform_tools.py
 // The folder will be included in CPPPATH, so for everyone it is still available as usual like this:
-#include <xpcc/architecture/platform.hpp>
+//#include <xpcc/architecture/platform.hpp>
 #include "architecture/driver.hpp"
 
 #endif	// XPCC__ARCHITECTURE_HPP
