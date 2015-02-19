@@ -1,5 +1,9 @@
 language: cpp
 compiler: gcc
+env:
+ - TEST_SUITE=unittest
+ - TEST_SUITE=devices
+ - TEST_SUITE=examples
 before_install:
  - sudo apt-get update -qq
  - sudo apt-get install -y software-properties-common
@@ -17,6 +21,4 @@ before_script:
  - wget http://www.atmel.com/images/avr8-gnu-toolchain-3.4.5.1522-linux.any.x86.tar.gz -O avr8.tar.gz
  - tar -zxf avr8.tar.gz
  - export PATH="$PATH:$TRAVIS_BUILD_DIR/avr8-gnu-toolchain-linux_x86/bin"
-script:
- - scons check
- - scons unittest
+script: "scons $TEST_SUITE"
