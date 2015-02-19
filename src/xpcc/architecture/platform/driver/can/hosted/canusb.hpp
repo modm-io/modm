@@ -78,6 +78,8 @@ public:
 		return this->serialPort.isOpen();
 	}
 
+private:
+	// updated by boost thread
 	void
 	update();
 
