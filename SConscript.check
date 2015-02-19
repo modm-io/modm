@@ -104,10 +104,8 @@ devices = [
 #	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m4',	'device': 'stm32f405vg',	'clock': 168000000 },
 	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m4',	'device': 'stm32f407vg',	'clock': 168000000 },
 ]
-check = 'all' if 'check' in BUILD_TARGETS else None
-check = 'examples' if 'examples' in BUILD_TARGETS else check
-check = 'devices' if 'devices' in BUILD_TARGETS else check
 
+check = 'all' if 'check' in BUILD_TARGETS else ARGUMENTS.get('check')
 if check is not None:
 	result = []
 	everythingOk = True

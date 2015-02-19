@@ -19,8 +19,8 @@ before_install:
  - export PATH="$PATH:$TRAVIS_BUILD_DIR/avr8-gnu-toolchain-linux_x86/bin"
 
 env:
- - TEST_SUITE=unittest
- - TEST_SUITE=devices
- - TEST_SUITE=examples
+ - TEST_SUITE="unittest"
+ - TEST_SUITE="check=devices"
+ - TEST_SUITE="check=examples"
 
 script: "scons $TEST_SUITE"
