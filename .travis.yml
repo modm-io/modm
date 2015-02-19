@@ -1,16 +1,12 @@
 language: cpp
 compiler: gcc
-env:
- - TEST_SUITE=unittest
- - TEST_SUITE=devices
- - TEST_SUITE=examples
+
 before_install:
  - sudo apt-get update -qq
  - sudo apt-get install -y software-properties-common
  - sudo add-apt-repository -y ppa:terry.guo/gcc-arm-embedded
  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
  - sudo add-apt-repository -y ppa:mapnik/boost
-before_script:
  - sudo apt-get update -qq
  - sudo apt-get install -y scons python python-jinja2 python-lxml
  - sudo apt-get install -y libsdl1.2-dev libsdl-image1.2-dev libgtkmm-2.4-dev
@@ -21,4 +17,10 @@ before_script:
  - wget http://www.atmel.com/images/avr8-gnu-toolchain-3.4.5.1522-linux.any.x86.tar.gz -O avr8.tar.gz
  - tar -zxf avr8.tar.gz
  - export PATH="$PATH:$TRAVIS_BUILD_DIR/avr8-gnu-toolchain-linux_x86/bin"
+
+env:
+ - TEST_SUITE=unittest
+ - TEST_SUITE=devices
+ - TEST_SUITE=examples
+
 script: "scons $TEST_SUITE"
