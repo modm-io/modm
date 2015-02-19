@@ -188,6 +188,12 @@ xpcc::hosted::CanUsb::sendMessage(const can::Message& message)
 {
 	char str[128];
 	xpcc::CanLawicelFormatter::convertToString(message, str);
+	XPCC_LOG_DEBUG.printf("Sending ");
+	char *p = str;
+	while (*p != '\0') {
+		XPCC_LOG_DEBUG.printf("%02x %c, ", *p, *p);
+		++p;
+	}
 	this->serialPort.write(str);
 	return true;
 }
@@ -200,6 +206,7 @@ xpcc::hosted::CanUsb::update()
 		char a;
 		if (this->serialPort.read(a))
 		{
+			XPCC_LOG_DEBUG.printf("Received %02x\n", a);
 			if (a == 'T' || a == 't' || a == 'r' || a == 'R')
 			{
 				this->tmpRead.clear();
