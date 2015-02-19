@@ -195,6 +195,7 @@ xpcc::hosted::CanUsb::sendMessage(const can::Message& message)
 		++p;
 	}
 	this->serialPort.write(str);
+	this->serialPort.write("\r");
 	return true;
 }
 
