@@ -58,13 +58,16 @@ namespace xpcc
 	template <typename T>
 	class Polygon2D : public PointSet2D<T>
 	{
-		typedef std::size_t SizeType;
+		using SizeType = std::size_t;
+		using PointType = typename PointSet2D<T>::PointType;
 	public:
 		/**
 		 * \brief	Constructs a polygon capable of holding n points
 		 */
 		Polygon2D(SizeType n);
-		
+
+		Polygon2D(std::initializer_list<PointType> init);
+
 		Polygon2D(const Polygon2D& other);
 		
 		Polygon2D&
@@ -72,7 +75,7 @@ namespace xpcc
 		
 		/// append a point to the polygon
 		Polygon2D&
-		operator << (const Vector<T, 2>& point);
+		operator << (const PointType& point);
 		
 		/**
 		 * \brief	Check if a intersection exists
@@ -113,7 +116,7 @@ namespace xpcc
 		 *          it is outside.
 		 */
 		bool
-		isInside(const Vector<T, 2>& point);
+		isInside(const PointType& point);
 	};
 }
 
