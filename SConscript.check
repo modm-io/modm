@@ -106,6 +106,17 @@ devices = [
 ]
 
 check = 'all' if 'check' in BUILD_TARGETS else ARGUMENTS.get('check')
+
+# make it possible to only check the examples from one example directory
+if ARGUMENTS.get('examples'):
+	examples_dir = os.path.join('examples', ARGUMENTS.get('examples'))
+	if not os.path.isdir(examples_dir):
+		print("\033[0;33mWarning: invalid argument value: {} does not exist!\033[0m".format(examples_dir))
+		examples_dir = 'examples'
+else:
+	examples_dir = 'examples'
+
+
 if check is not None:
 	result = []
 	everythingOk = True
@@ -125,7 +136,7 @@ if check is not None:
 	# examples is not checked!
 	if check in ['all', 'examples']:
 		result.append("Examples")
-		for path, directories, files in os.walk('examples'):
+		for path, directories, files in os.walk(examples_dir):
 			if 'SConstruct' in files:
 				exitStatus = os.system("scons -Q -C %s build" % path)
 				if exitStatus == 0:
