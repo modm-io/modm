@@ -53,14 +53,17 @@ namespace xpcc
 	class PointSet2D
 	{
 	public:
-		typedef std::size_t SizeType;
+		using SizeType = std::size_t;
+		using PointType = Vector<T, 2>;
 
 	public:
 		/**
 		 * \brief	Constructs a set capable of holding n points (default = 2)
 		 */
 		PointSet2D(SizeType n = 2);
-		
+
+		PointSet2D(std::initializer_list<PointType> init);
+
 		PointSet2D(const PointSet2D& other);
 		
 		PointSet2D&
@@ -72,12 +75,12 @@ namespace xpcc
 		
 		
 		inline void
-		append(const Vector<T, 2>& point);
+		append(const PointType& point);
 
-		inline Vector<T, 2>&
+		inline PointType&
 		operator [](SizeType index);
 
-		inline const Vector<T, 2>&
+		inline const PointType&
 		operator [](SizeType index) const;
 		
 		/**
@@ -87,8 +90,8 @@ namespace xpcc
 		removeAll();
 		
 	public:
-		typedef typename xpcc::DynamicArray< Vector<T, 2> >::iterator iterator;
-		typedef typename xpcc::DynamicArray< Vector<T, 2> >::const_iterator const_iterator;
+		typedef typename xpcc::DynamicArray< PointType >::iterator iterator;
+		typedef typename xpcc::DynamicArray< PointType >::const_iterator const_iterator;
 		
 		inline iterator
 		begin();
@@ -103,7 +106,7 @@ namespace xpcc
 		end() const;
 		
 	protected:
-		xpcc::DynamicArray< Vector<T, 2> > points;
+		xpcc::DynamicArray< PointType > points;
 	};
 }
 

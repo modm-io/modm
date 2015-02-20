@@ -35,10 +35,13 @@ class PointSet2DTest : public unittest::TestSuite
 public:
 	void
 	testConstructor();
-	
+
+	void
+	testInitializerListConstructor();
+
 	void
 	testAppendAndAccess();
-	
+
 	void
 	testIterator();
 };
