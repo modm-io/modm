@@ -21,6 +21,14 @@ before_install:
 env:
  - TEST_SUITE="unittest"
  - TEST_SUITE="check=devices"
- - TEST_SUITE="check=examples"
+ - TEST_SUITE="check=examples examples=arduino_uno"
+ - TEST_SUITE="check=examples examples=avr"
+ - TEST_SUITE="check=examples examples=linux"
+ - TEST_SUITE="check=examples examples=lpcxpresso"
+ - TEST_SUITE="check=examples examples=stm32"
+ - TEST_SUITE="check=examples examples=stm32f3_discovery"
+ - TEST_SUITE="check=examples examples=stm32f4_discovery"
+ - TEST_SUITE="check=examples examples=stm32f4_loa_v2b"
+ - TEST_SUITE="check=examples examples=unittest"
 
 script: "scons $TEST_SUITE"
