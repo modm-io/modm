@@ -82,7 +82,7 @@ struct Nrf24Register
 //	> Command_t;
 
 
-	/* Register defintions */
+	/* Register definitions */
 
 	enum class
 	Config : uint8_t

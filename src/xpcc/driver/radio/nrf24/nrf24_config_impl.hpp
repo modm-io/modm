@@ -59,7 +59,7 @@ xpcc::Nrf24Config<Nrf24Phy>::setMode(Mode mode)
 		Nrf24Phy::setBits(NrfRegister::STATUS, Status::TX_DS);
 		Nrf24Phy::clearBits(NrfRegister::CONFIG, Config::PRIM_RX);
 
-		// pulsing CE seems to be neccessary to enter TX mode
+		// pulsing CE seems to be necessary to enter TX mode
 		Nrf24Phy::pulseCe();
 	}
 
@@ -186,7 +186,7 @@ xpcc::Nrf24Config<Nrf24Phy>::enablePipe(Pipe_t pipe, bool enableAutoAck)
 
 	Flags_t pipe_flag = static_cast<Flags_t>(1 << pipe.value);
 
-	/* Enable or disable auto acknowledgement for this pipe */
+	/* Enable or disable auto acknowledgment for this pipe */
 	if(enableAutoAck)
 	{
 		Nrf24Phy::setBits(NrfRegister::EN_AA, pipe_flag);

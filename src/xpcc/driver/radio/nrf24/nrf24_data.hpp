@@ -25,7 +25,7 @@ namespace xpcc
  * ===== 1 ===== : Broadcast pipe, will determine upper 4 bytes of address of pipes 2 - 5
  * ===== 2 ===== : Own address
  * ===== 3 ===== : \
- * ===== 4 ===== :  | Separte connections to neighbouring nodes
+ * ===== 4 ===== :  | Separate connections to neighbouring nodes
  * ===== 5 ===== : /
  *
  */
@@ -93,7 +93,7 @@ public:
 
 public:
 
-	/* typedef config and pyhsical layer for simplicity */
+	/* typedef config and physical layer for simplicity */
 	typedef xpcc::Nrf24Config<Nrf24Phy> Config;
 	typedef Nrf24Phy Phy;
 
@@ -170,7 +170,7 @@ private:
 	 *   The first 3 byte will be truncated, so the address is actually 5 bytes
 	 *   long. The last byte will be used to address individual modules or
 	 *   connections between them respectively. Use different base address for
-	 *   seperate networks, although it may impact performance seriously to run
+	 *   separate networks, although it may impact performance seriously to run
 	 *   overlapping networks.
 	 *
 	 *   Format:

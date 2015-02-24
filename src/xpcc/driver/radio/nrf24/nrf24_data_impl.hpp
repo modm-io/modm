@@ -96,7 +96,7 @@ xpcc::Nrf24Data<Nrf24Phy>::initialize(BaseAddress base_address, Address own_addr
 
 	/*
 	 * Configure some sensible defaults, may be changed later by user, but
-	 * sould be consistent among all other nodes
+	 * should be consistent among all other nodes
 	 */
 	Config::setCrc(Config::Crc::Crc1Byte);
 	Config::setSpeed(Config::Speed::kBps250);
@@ -161,7 +161,7 @@ xpcc::Nrf24Data<Nrf24Phy>::sendPacket(packet_t& packet)
 	{
 		Phy::writeTxPayloadNoAck((uint8_t*)&assemblyFrame, packet.length + sizeof(header_t));
 
-		// as frame was sent without requesting an acknowledgement we can't determine it's state
+		// as frame was sent without requesting an acknowledgment we can't determine it's state
 		state = SendingState::DontKnow;
 	} else
 	{
@@ -175,7 +175,7 @@ xpcc::Nrf24Data<Nrf24Phy>::sendPacket(packet_t& packet)
 		state = SendingState::Busy;
 
 		/*
-		 * TODO: Waiting is neccessary, because we want to switch back to RX
+		 * TODO: Waiting is necessary, because we want to switch back to RX
 		 *       mode as soon as possible, but this wastes CPU cycles, so find
 		 *       a non-blocking solution later.
 		 */
