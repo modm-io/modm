@@ -121,10 +121,12 @@ public:
 	 *
 	 */
 	static SendingState
-	getSendingFeedback();
+	getSendingFeedback()
+	{ return updateSendingState(); }
 
 	static Address
-	getAddress();
+	getAddress()
+	{ return ownAddress; }
 
 	/** @brief Set own address
 	 *
@@ -134,15 +136,11 @@ public:
 
 	static uint8_t
 	getPayloadLength()
-	{
-		return Phy::getPayloadLength() - sizeof(header_t);
-	}
+	{ return Phy::getPayloadLength() - sizeof(header_t); }
 
 	static Address
 	getBroadcastAddress()
-	{
-		return broadcastAddress;
-	}
+	{ return broadcastAddress; }
 
 	/* nrf24 specific */
 
@@ -158,7 +156,8 @@ private:
 private:
 
 	static inline uint64_t
-	assembleAddress(Address address);
+	assembleAddress(Address address)
+	{ return static_cast<uint64_t>((uint64_t)baseAddress | (uint64_t)address); }
 
 	static SendingState
 	updateSendingState();

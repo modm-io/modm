@@ -120,13 +120,16 @@ public:
 
 public:
 	static void
-	powerUp();
+	powerUp()
+	{ Nrf24Phy::setBits(NrfRegister::CONFIG, Config::PWR_UP); }
 
 	static void
-	powerDown();
+	powerDown()
+	{ Nrf24Phy::clearBits(NrfRegister::CONFIG, Config::PWR_UP); }
 
 	static void
-	setChannel(uint8_t channel);
+	setChannel(uint8_t channel)
+	{ Nrf24Phy::writeRegister(NrfRegister::RF_CH, channel); }
 
 	static void
 	setMode(Mode mode);
@@ -138,22 +141,28 @@ public:
 	setCrc(Crc crc);
 
 	static void
-	setAddressWidth(AddressWidth width);
+	setAddressWidth(AddressWidth width)
+	{ Nrf24Phy::writeRegister(NrfRegister::SETUP_AW, static_cast<uint8_t>(width)); }
 
 	static void
-	setRfPower(RfPower power);
+	setRfPower(RfPower power)
+	{ Nrf24Phy::writeRegister(NrfRegister::RF_SETUP, static_cast<uint8_t>(power) << 1); }
 
 	static void
-	setAutoRetransmitDelay(AutoRetransmitDelay delay);
+	setAutoRetransmitDelay(AutoRetransmitDelay delay)
+	{ Nrf24Phy::writeRegister(NrfRegister::SETUP_RETR, static_cast<uint8_t>(delay) << 4); }
 
 	static void
-	setAutoRetransmitCount(AutoRetransmitCount count);
+	setAutoRetransmitCount(AutoRetransmitCount count)
+	{ Nrf24Phy::writeRegister(NrfRegister::SETUP_RETR, static_cast<uint8_t>(count)); }
 
 	static void
-	enableFeatureNoAck();
+	enableFeatureNoAck()
+	{ Nrf24Phy::setBits(NrfRegister::FEATURE, Feature::EN_DYN_ACK); }
 
 	static void
-	disableFeatureNoAck();
+	disableFeatureNoAck()
+	{ Nrf24Phy::clearBits(NrfRegister::FEATURE, Feature::EN_DYN_ACK); }
 
 	/** @brief Enable Rx Pipe and set payload width
 	 *
@@ -167,7 +176,8 @@ public:
 	 *  @param pipe     Pipe Number
 	 */
 	static void
-	disablePipe(Pipe_t pipe);
+	disablePipe(Pipe_t pipe)
+	{ Nrf24Phy::clearBits(NrfRegister::EN_RX_ADDR, (1 << pipe.value)); }
 
 	/** @brief Return number of pipe number that has payload available
 	 */

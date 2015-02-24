@@ -134,33 +134,6 @@ xpcc::Nrf24Phy<Spi, Csn, Ce>::clearBits(NrfRegister_t reg, Flags_t flags)
 // --------------------------------------------------------------------------------------------------------------------
 
 template<typename Spi, typename Csn, typename Ce>
-void
-xpcc::Nrf24Phy<Spi, Csn, Ce>::flushTxFifo()
-{
-	writeCommandNoData(Command::FLUSH_TX);
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Spi, typename Csn, typename Ce>
-void
-xpcc::Nrf24Phy<Spi, Csn, Ce>::flushRxFifo()
-{
-	writeCommandNoData(Command::FLUSH_RX);
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Spi, typename Csn, typename Ce>
-uint8_t
-xpcc::Nrf24Phy<Spi, Csn, Ce>::readRxPayloadWidth()
-{
-	return writeCommandSingleData(Command::R_RX_PL_WID, 0x00);
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Spi, typename Csn, typename Ce>
 uint8_t
 xpcc::Nrf24Phy<Spi, Csn, Ce>::readRxPayload(uint8_t* buffer)
 {
@@ -198,6 +171,7 @@ xpcc::Nrf24Phy<Spi, Csn, Ce>::writeTxPayloadNoAck(uint8_t* buffer, uint8_t len)
 {
 	if(len > payload_len)
 		return;
+
 	writeCommandMultiData(Command::W_TX_PAYLOAD_NOACK, buffer, nullptr, len);
 }
 
@@ -209,18 +183,10 @@ xpcc::Nrf24Phy<Spi, Csn, Ce>::writeAckPayload(Pipe_t pipe, uint8_t* buffer, uint
 {
 	if(len > payload_len)
 		return;
+
 	Command_t cmd = Command::W_ACK_PAYLOAD;
 	cmd.value |= pipe.value;
 	writeCommandMultiData(cmd, buffer, nullptr, len);
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Spi, typename Csn, typename Ce>
-void
-xpcc::Nrf24Phy<Spi, Csn, Ce>::reuseTxPayload()
-{
-	writeCommandNoData(Command::REUSE_TX_PL);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -231,15 +197,6 @@ xpcc::Nrf24Phy<Spi, Csn, Ce>::readStatus()
 {
 	writeCommandNoData(Command::NOP);
 	return status;
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Spi, typename Csn, typename Ce>
-uint8_t
-xpcc::Nrf24Phy<Spi, Csn, Ce>::readFifoStatus()
-{
-	return readRegister(NrfRegister::FIFO_STATUS);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -383,22 +340,4 @@ xpcc::Nrf24Phy<Spi, Csn, Ce>::pulseCe()
 	xpcc::delayMicroseconds(15);
 
 	Ce::toggle();
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Spi, typename Csn, typename Ce>
-void
-xpcc::Nrf24Phy<Spi, Csn, Ce>::setCe()
-{
-	Ce::set();
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Spi, typename Csn, typename Ce>
-void
-xpcc::Nrf24Phy<Spi, Csn, Ce>::resetCe()
-{
-	Ce::reset();
 }

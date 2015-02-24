@@ -298,33 +298,6 @@ xpcc::Nrf24Data<Nrf24Phy>::isPacketAvailable()
 // --------------------------------------------------------------------------------------------------------------------
 
 template<typename Nrf24Phy>
-typename xpcc::Nrf24Data<Nrf24Phy>::SendingState
-xpcc::Nrf24Data<Nrf24Phy>::getSendingFeedback()
-{
-	return updateSendingState();
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Nrf24Phy>
-typename xpcc::Nrf24Data<Nrf24Phy>::Address
-xpcc::Nrf24Data<Nrf24Phy>::getAddress()
-{
-	return ownAddress;
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Nrf24Phy>
-uint64_t
-xpcc::Nrf24Data<Nrf24Phy>::assembleAddress(Address address)
-{
-	return static_cast<uint64_t>((uint64_t)baseAddress | (uint64_t)address);
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Nrf24Phy>
 bool
 xpcc::Nrf24Data<Nrf24Phy>::establishConnection()
 {

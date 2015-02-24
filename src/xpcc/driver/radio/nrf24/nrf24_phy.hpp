@@ -54,9 +54,7 @@ public:
 	 */
 	static uint16_t
 	getMaxPayload()
-	{
-		return max_payload_length;
-	}
+	{ return max_payload_length; }
 
 
 	/** @brief Read simple 8 bit register
@@ -147,20 +145,23 @@ public:
 	 *  If Ce was high before the pin won't be set low before waiting for 10us.
 	 */
 	static void
-	setCe();
+	setCe()
+	{ Ce::set(); }
 
 	/** @brief Set Ce pin low
 	 *
 	 */
 	static void
-	resetCe();
+	resetCe()
+	{ Ce::reset(); }
 
 	/**@brief Flush Tx Fifo
 	 *
 	 * Used in Tx mode
 	 */
 	static void
-	flushTxFifo();
+	flushTxFifo()
+	{ writeCommandNoData(Command::FLUSH_TX); }
 
 
 	/** @brief Flush Rx Fifo
@@ -171,7 +172,8 @@ public:
 	 * not be completed.
 	 */
 	static void
-	flushRxFifo();
+	flushRxFifo()
+	{ writeCommandNoData(Command::FLUSH_RX); }
 
 
 	/** @brief Reuse last transmitted payload
@@ -182,7 +184,8 @@ public:
 	 * during package transmission.
 	 */
 	static void
-	reuseTxPayload();
+	reuseTxPayload()
+	{ writeCommandNoData(Command::REUSE_TX_PL);	}
 
 
 	/** @brief Read Rx payload width for top of Rx Fifo
@@ -190,7 +193,8 @@ public:
 	 * Note: Flush RX FIFO if the read value is larger than 32 bytes.
 	 */
 	static uint8_t
-	readRxPayloadWidth();
+	readRxPayloadWidth()
+	{ return writeCommandSingleData(Command::R_RX_PL_WID, 0x00); }
 
 
 	/** @brief Read new status
@@ -209,7 +213,8 @@ public:
 	 *  @return Fifo Status register
 	 */
 	static uint8_t
-	readFifoStatus();
+	readFifoStatus()
+	{ return readRegister(NrfRegister::FIFO_STATUS); }
 
 
 	/** @brief Set Rx address for a pipe
