@@ -117,7 +117,7 @@ public:
 	static bool
 	isPacketAvailable();
 
-	/** @brief Returns feedback for the last packet sent
+	/** Returns feedback for the last packet sent
 	 *
 	 */
 	static SendingState
@@ -128,7 +128,7 @@ public:
 	getAddress()
 	{ return ownAddress; }
 
-	/** @brief Set own address
+	/** Set own address
 	 *
 	 */
 	static void
@@ -164,7 +164,7 @@ private:
 
 private:
 
-	/** @brief Base address of the network
+	/**  Base address of the network
 	 *
 	 *   The first 3 byte will be truncated, so the address is actually 5 bytes
 	 *   long. The last byte will be used to address individual modules or
