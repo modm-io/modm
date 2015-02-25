@@ -71,7 +71,7 @@ protected:
 	};
 
 	typedef Flags8<Test3> Test3_t;
-	XPCC_TYPE_FLAGS(Test3_t);
+	XPCC_INT_TYPE_FLAGS(Test3_t);
 
 	typedef Value< Test3_t, 3, 5 > Address;
 	typedef Configuration< Test3_t, Config, Bit1 | Bit0, 2 > Config2;
@@ -107,7 +107,7 @@ Test4
 typedef Flags8<Test4> Test4_t;
 // test macro outside of struct
 // all enum operations must not be declared 'friend'
-XPCC_EXT_TYPE_FLAGS(Test4_t)
+XPCC_TYPE_FLAGS(Test4_t)
 
 }
 
