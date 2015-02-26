@@ -44,7 +44,7 @@ xpcc::hosted::CanUsb::~CanUsb()
 }
 
 bool
-xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int baudRate)
+xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int serialBaudRate, xpcc::Can::Bitrate canBitrate)
 {
 	if (this->serialPort.isOpen())
 		this->serialPort.close();
@@ -55,7 +55,7 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int baudRate)
 	}
 
 	this->serialPort.setDeviceName(deviceName);
-	this->serialPort.setBaudRate(baudRate);
+	this->serialPort.setBaudRate(serialBaudRate);
 
 	if (this->serialPort.open())
 	{
@@ -72,8 +72,38 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int baudRate)
 		char a;
 		while( this->serialPort.read(a) );
 
-		XPCC_LOG_DEBUG << XPCC_FILE_INFO << "write 'S4'" << xpcc::endl;
-		this->serialPort.write("S4\r");
+		// Set CAN bitrate
+		XPCC_LOG_DEBUG << XPCC_FILE_INFO << "Set CAN bitrate" << xpcc::endl;
+		
+		switch (canBitrate)
+		{
+			case kBps10:
+				this->serialPort.write("S0\r");
+			break;
+			case kBps20:
+				this->serialPort.write("S1\r");
+			break;
+			case kBps50:
+				this->serialPort.write("S2\r");
+			break;
+			case kBps100:
+				this->serialPort.write("S3\r");
+			break;
+			case kBps125:
+				this->serialPort.write("S4\r");
+			break;
+			case kBps250:
+				this->serialPort.write("S5\r");
+			break;
+			case kBps500:
+				this->serialPort.write("S6\r");
+			break;
+			case MBps1:
+				this->serialPort.write("S8\r");
+			break;
+		}
+
+		
 
 		timeout.restart(500);
 		while (!this->serialPort.read(a))
@@ -91,7 +121,7 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int baudRate)
 		}
 		if (a != '\r')
 		{
-			XPCC_LOG_ERROR << XPCC_FILE_INFO << "Wrong answer on S4: " << xpcc::hex << (int) a	<< xpcc::endl;
+			XPCC_LOG_ERROR << XPCC_FILE_INFO << "Wrong answer on set CAN bitrate: " << xpcc::hex << (int) a	<< xpcc::endl;
 			this->serialPort.close();
 			while (this->serialPort.isOpen())
 			{
@@ -99,6 +129,8 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int baudRate)
 			}
 			return false;
 		}
+		
+		// Open CAN channel
 		this->serialPort.write("O\r");
 		XPCC_LOG_DEBUG << XPCC_FILE_INFO << "written 'O'" << xpcc::endl;
 		timeout.restart(500);
