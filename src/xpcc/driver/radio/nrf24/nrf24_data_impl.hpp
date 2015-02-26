@@ -33,7 +33,7 @@ typename xpcc::Nrf24Data<Nrf24Phy>::Address
 xpcc::Nrf24Data<Nrf24Phy>::connections[3];
 
 template<typename Nrf24Phy>
-typename xpcc::Nrf24Data<Nrf24Phy>::frame_t
+typename xpcc::Nrf24Data<Nrf24Phy>::Frame
 xpcc::Nrf24Data<Nrf24Phy>::assemblyFrame;
 
 template<typename Nrf24Phy>
@@ -65,7 +65,7 @@ xpcc::Nrf24Data<Nrf24Phy>::initialize(BaseAddress base_address, Address own_addr
 	state = SendingState::Undefined;
 
 	// Clear assembly frame
-	memset(&assemblyFrame, 0, sizeof(frame_t));
+	memset(&assemblyFrame, 0, sizeof(Frame));
 
 	// Set to fixed address length of 5 byte for now
 	Config::setAddressWidth(Config::AddressWidth::Byte5);
@@ -132,7 +132,7 @@ xpcc::Nrf24Data<Nrf24Phy>::setAddress(Address address)
 
 template<typename Nrf24Phy>
 bool
-xpcc::Nrf24Data<Nrf24Phy>::sendPacket(packet_t& packet)
+xpcc::Nrf24Data<Nrf24Phy>::sendPacket(Packet& packet)
 {
 	if(!isReadyToSend())
 	{
@@ -159,7 +159,7 @@ xpcc::Nrf24Data<Nrf24Phy>::sendPacket(packet_t& packet)
 
 	if(packet.dest == getBroadcastAddress())
 	{
-		Phy::writeTxPayloadNoAck((uint8_t*)&assemblyFrame, packet.length + sizeof(header_t));
+		Phy::writeTxPayloadNoAck((uint8_t*)&assemblyFrame, packet.length + sizeof(Header));
 
 		// as frame was sent without requesting an acknowledgment we can't determine it's state
 		state = SendingState::DontKnow;
@@ -169,7 +169,7 @@ xpcc::Nrf24Data<Nrf24Phy>::sendPacket(packet_t& packet)
 		Phy::setRxAddress(Pipe::PIPE_0, assembleAddress(packet.dest));
 		Config::enablePipe(Pipe::PIPE_0, true);
 
-		Phy::writeTxPayload((uint8_t*)&assemblyFrame, packet.length + sizeof(header_t));
+		Phy::writeTxPayload((uint8_t*)&assemblyFrame, packet.length + sizeof(Header));
 
 		// mark state as busy, so when
 		state = SendingState::Busy;
@@ -202,7 +202,7 @@ xpcc::Nrf24Data<Nrf24Phy>::sendPacket(packet_t& packet)
 
 template<typename Nrf24Phy>
 bool
-xpcc::Nrf24Data<Nrf24Phy>::getPacket(packet_t& packet)
+xpcc::Nrf24Data<Nrf24Phy>::getPacket(Packet& packet)
 {
 	if(!isPacketAvailable())
 		return false;
@@ -211,7 +211,7 @@ xpcc::Nrf24Data<Nrf24Phy>::getPacket(packet_t& packet)
 	//uint8_t pipe = Config::getPayloadPipe();
 
 	/*
-	 * TODO: Replace packet_t by frame_t because there's no reason to trade some bytes of RAM against the runtime
+	 * TODO: Replace Packet by Frame because there's no reason to trade some bytes of RAM against the runtime
 	 *       penalty of copying to and from assembly frame every cycle.
 	 */
 

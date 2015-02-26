@@ -102,7 +102,7 @@ MAIN_FUNCTION
 
 	// Using the data layer, we send and receive packets, so we need to allocate
 	// one. It's automatically allocated with the max. payload length configured.
-	nrf24data::packet_t packet;
+	nrf24data::Packet packet;
 
 	// Send this packet to the other endpoint of this example
 	packet.dest = address_rx_side;

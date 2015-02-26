@@ -57,9 +57,9 @@ public:
 	/// @{
 	/// @ingroup	nrf24
 	/// Data structure that user uses to pass data to the data layer
-	typedef struct packet_t
+	struct Packet
 	{
-		packet_t(uint8_t payload_length = Nrf24Data::getPayloadLength()) :
+		Packet(uint8_t payload_length = Nrf24Data::getPayloadLength()) :
 			dest(0), src(0), length(payload_length)
 		{
 			data = new uint8_t[length];
@@ -72,23 +72,23 @@ public:
 		uint8_t*    data;
 		uint8_t     length;     // max. 30!
 
-		~packet_t() { delete data; }
-	} packet_t;
+		~Packet() { delete data; }
+	};
 
 
-	/// Header of frame_t
-	typedef struct header_t
+	/// Header of Frame
+	struct Header
 	{
 		uint8_t     src;
 		uint8_t     dest;
-	} header_t;
+	};
 
 	/// Data that will be sent over the air
-	typedef struct frame_t
+	struct Frame
 	{
-		header_t    header;
+		Header    header;
 		uint8_t     data[30];   // max. possible payload size (32 byte) - 2 byte (src + dest)
-	} frame_t;
+	};
 	/// @}
 
 public:
@@ -106,10 +106,10 @@ public:
 	/* general data layer interface */
 
 	static bool
-	sendPacket(packet_t& packet);
+	sendPacket(Packet& packet);
 
 	static bool
-	getPacket(packet_t& packet);
+	getPacket(Packet& packet);
 
 	static bool
 	isReadyToSend();
@@ -136,7 +136,7 @@ public:
 
 	static uint8_t
 	getPayloadLength()
-	{ return Phy::getPayloadLength() - sizeof(header_t); }
+	{ return Phy::getPayloadLength() - sizeof(Header); }
 
 	static Address
 	getBroadcastAddress()
@@ -186,7 +186,7 @@ private:
 
 	static Address connections[3];
 
-	static frame_t assemblyFrame;
+	static Frame assemblyFrame;
 
 	static SendingState state;
 
