@@ -277,11 +277,4 @@
 #define XPCC__IS_BIG_ENDIAN		(XPCC__BYTE_ORDER == XPCC__ORDER_BIG_ENDIAN)
 #define XPCC__IS_LITTLE_ENDIAN	(XPCC__BYTE_ORDER == XPCC__ORDER_LITTLE_ENDIAN)
 
-// ----------------------------------------------------------------------------
-// Windows lacks support for some C99 macros and functions we need to
-// provide here
-#if defined XPCC__OS_WIN32
-#	include "platform/hosted/windows.hpp"
-#endif
-
 #endif	// !__DOXYGEN__

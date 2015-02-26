@@ -53,12 +53,11 @@ def generate(env, **kw):
 	else:
 		cpp_compiler = 'g++'
 
+	env.Append(ENV = {'PATH' : os.environ['PATH']})
+
 	if platform.system() == 'Windows':
-		env.Append(ENV = {'PATH' : os.environ['PATH']})
-		env.Tool('default')
-		env.Append(CXXFLAGS = "/EHsc")
+		env.Tool('mingw')
 	else:
-		env.Append(ENV = {'PATH' : os.environ['PATH']})
 		env.Tool('gcc')
 		env.Tool('g++')
 		env.Tool('gnulink')
@@ -69,38 +68,38 @@ def generate(env, **kw):
 		env['CC'] = c_compiler
 		env['CXX'] = cpp_compiler
 
-		# build messages
-		if ARGUMENTS.get('verbose') != '1':
-			env['CCCOMSTR'] = "Compiling C: $TARGET"
-			env['CXXCOMSTR'] = "Compiling C++: $TARGET"
-			env['ASCOMSTR'] = "Assembling: $TARGET"
-			env['ASPPCOMSTR'] = "Assembling: $TARGET"
-			env['LINKCOMSTR'] = "Linking: $TARGET"
-			env['RANLIBCOMSTR'] = "Indexing: $TARGET"
-			env['ARCOMSTR'] = "Create Library: $TARGET"
+	# build messages
+	if ARGUMENTS.get('verbose') != '1':
+		env['CCCOMSTR'] = "Compiling C: $TARGET"
+		env['CXXCOMSTR'] = "Compiling C++: $TARGET"
+		env['ASCOMSTR'] = "Assembling: $TARGET"
+		env['ASPPCOMSTR'] = "Assembling: $TARGET"
+		env['LINKCOMSTR'] = "Linking: $TARGET"
+		env['RANLIBCOMSTR'] = "Indexing: $TARGET"
+		env['ARCOMSTR'] = "Create Library: $TARGET"
 
-			env['SIZECOMSTR'] = "Size after:"
-			env['SYMBOLSCOMSTR'] = "Show symbols for '$SOURCE':"
+		env['SIZECOMSTR'] = "Size after:"
+		env['SYMBOLSCOMSTR'] = "Show symbols for '$SOURCE':"
 
-		# flags for C and C++
-		env['CCFLAGS'] = [
-			"-funsigned-char",
-			"-Wall",
-			"-Wextra",
-			"-Wundef",
-			"-ggdb",
-			"-DBASENAME=${SOURCE.file}",
-		]
+	# flags for C and C++
+	env['CCFLAGS'] = [
+		"-funsigned-char",
+		"-Wall",
+		"-Wextra",
+		"-Wundef",
+		"-ggdb",
+		"-DBASENAME=${SOURCE.file}",
+	]
 
-		#if c_compiler == 'clang':
-		#	env['CCFLAGS'].append("-funsigned-bitfields")
+	#if c_compiler == 'clang':
+	#	env['CCFLAGS'].append("-funsigned-bitfields")
 
-		# C++ flags
-		env['CXXFLAGS'] = [
-			"-std=c++11",
-	#		"-Weffc++",
-			"-Woverloaded-virtual",
-		]
+	# C++ flags
+	env['CXXFLAGS'] = [
+		"-std=c++11",
+#		"-Weffc++",
+		"-Woverloaded-virtual",
+	]
 
 def exists(env):
 	return env.Detect('g++')
