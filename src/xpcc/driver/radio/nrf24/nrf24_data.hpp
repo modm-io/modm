@@ -117,12 +117,34 @@ public:
 	static bool
 	isPacketAvailable();
 
+	/*
+	 * Returns true if the last packet has been fully processed, i.e. sending
+	 * process is over (successful or not). Only return true one time per packet
+	 */
+	static bool
+	isPacketProcessed()
+	{
+		if(packetProcessed)
+		{
+			packetProcessed = false;
+			return true;
+		}
+
+		return false;
+	}
+
+	/*
+	 * Call this function in your main loop
+	 */
+	static void
+	update();
+
 	/** Returns feedback for the last packet sent
 	 *
 	 */
 	static SendingState
 	getSendingFeedback()
-	{ return updateSendingState(); }
+	{ return state; }
 
 	static Address
 	getAddress()
@@ -159,7 +181,7 @@ private:
 	assembleAddress(Address address)
 	{ return static_cast<uint64_t>((uint64_t)baseAddress | (uint64_t)address); }
 
-	static SendingState
+	static bool
 	updateSendingState();
 
 private:
@@ -190,6 +212,7 @@ private:
 
 	static SendingState state;
 
+	static bool packetProcessed;
 };
 
 }	// namespace xpcc

@@ -40,6 +40,9 @@ template<typename Nrf24Phy>
 typename xpcc::Nrf24Data<Nrf24Phy>::SendingState
 xpcc::Nrf24Data<Nrf24Phy>::state = SendingState::Undefined;
 
+template<typename Nrf24Phy>
+bool
+xpcc::Nrf24Data<Nrf24Phy>::packetProcessed = false;
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -146,6 +149,10 @@ xpcc::Nrf24Data<Nrf24Phy>::sendPacket(Packet& packet)
 		return false;
 	}
 
+	// Clear processed status. This is needed when status was not polled for the
+	// last packet.
+	packetProcessed = false;
+
 	// switch to Tx mode
 	Config::setMode(Config::Mode::Tx);
 
@@ -163,6 +170,9 @@ xpcc::Nrf24Data<Nrf24Phy>::sendPacket(Packet& packet)
 
 		// as frame was sent without requesting an acknowledgment we can't determine it's state
 		state = SendingState::DontKnow;
+
+		// no further action needed, this is fire-and-forget
+		packetProcessed = true;
 	} else
 	{
 		// set pipe 0's address to tx address to receive ack packet
@@ -171,29 +181,10 @@ xpcc::Nrf24Data<Nrf24Phy>::sendPacket(Packet& packet)
 
 		Phy::writeTxPayload((uint8_t*)&assemblyFrame, packet.length + sizeof(Header));
 
-		// mark state as busy, so when
+		// mark state as busy, so update() will switch back to Rx mode when
+		// state has changed
 		state = SendingState::Busy;
-
-		/*
-		 * TODO: Waiting is necessary, because we want to switch back to RX
-		 *       mode as soon as possible, but this wastes CPU cycles, so find
-		 *       a non-blocking solution later.
-		 */
-		// wait until packet is sent
-		while( updateSendingState() == SendingState::Busy )
-		{
-		}
-
-		// If packet wasn't sent successfully, we need to flush the Tx fifo,
-		// because it won't be deleted from fifo when not ACKed
-		if(state != SendingState::FinishedAck)
-		{
-			Phy::flushTxFifo();
-		}
 	}
-
-	// switch back to Rx mode
-	Config::setMode(Config::Mode::Rx);
 
 	return true;
 }
@@ -252,12 +243,12 @@ xpcc::Nrf24Data<Nrf24Phy>::isReadyToSend()
 // --------------------------------------------------------------------------------------------------------------------
 
 template<typename Nrf24Phy>
-typename xpcc::Nrf24Data<Nrf24Phy>::SendingState
+bool
 xpcc::Nrf24Data<Nrf24Phy>::updateSendingState()
 {
 	// directly return state if not busy, because nothing needs to be updated then
 	if(state != SendingState::Busy)
-		return state;
+		return false;
 
 	// read relevant status registers
 	uint8_t status = Phy::readStatus();
@@ -266,19 +257,41 @@ xpcc::Nrf24Data<Nrf24Phy>::updateSendingState()
 	{
 		state = SendingState::FinishedNack;
 
-		// clear MAX_RT bit to enable further communication
+		// clear MAX_RT bit to enable further communication and flush Tx fifo,
+		// because the failed packet still resides there
 		Phy::setBits(NrfRegister::STATUS, Status::MAX_RT);
-	}
-
-	if(status & (uint8_t)Status::TX_DS)
+		Phy::flushTxFifo();
+	} else if(status & (uint8_t)Status::TX_DS)
 	{
 		state = SendingState::FinishedAck;
+
+		// acknowledge TX_DS interrupt
 		Phy::setBits(NrfRegister::STATUS, Status::TX_DS);
+	} else {
+		// still busy
+		return false;
 	}
 
-	return state;
+	// We are now finished with this packet, so user may take further action
+	packetProcessed = true;
+
+	return true;
 }
 
+// --------------------------------------------------------------------------------------------------------------------
+
+template<typename Nrf24Phy>
+void
+xpcc::Nrf24Data<Nrf24Phy>::update()
+{
+	// When sending state changed the communication has finished and we switch
+	// back to Rx mode
+	if(updateSendingState())
+	{
+		// switch back to Rx mode
+		Config::setMode(Config::Mode::Rx);
+	}
+}
 // --------------------------------------------------------------------------------------------------------------------
 
 template<typename Nrf24Phy>

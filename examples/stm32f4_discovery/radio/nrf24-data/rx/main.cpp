@@ -106,10 +106,8 @@ MAIN_FUNCTION
 
 	while(1)
 	{
-		if (nrf24data::isPacketAvailable())
+		if (nrf24data::getPacket(packet))
 		{
-			nrf24data::getPacket(packet);
-
 			XPCC_LOG_INFO.printf("Received packet from 0x%02x\n", packet.src);
 			XPCC_LOG_INFO.printf("Data: %02x %02x %02x %02x\n",
 					packet.data[3],
@@ -122,6 +120,8 @@ MAIN_FUNCTION
 		{
 			XPCC_LOG_INFO << "Rx is still alive" << xpcc::endl;
 		}
+
+		nrf24data::update();
 	}
 
 	return 0;

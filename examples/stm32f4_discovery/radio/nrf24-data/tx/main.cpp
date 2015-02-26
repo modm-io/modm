@@ -120,6 +120,8 @@ MAIN_FUNCTION
 
 			*data += 1;
 		}
+
+		nrf24data::update();
 	}
 
 	return 0;
