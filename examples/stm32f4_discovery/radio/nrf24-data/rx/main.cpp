@@ -102,26 +102,26 @@ MAIN_FUNCTION
 
 	// Using the data layer, we send and receive packets, so we need to allocate
 	// one. It's automatically allocated with the max. payload length configured.
-	auto packet = new nrf24data::packet_t;
+	nrf24data::Packet packet;
 
 	while(1)
 	{
-		if (nrf24data::isPacketAvailable())
+		if (nrf24data::getPacket(packet))
 		{
-			nrf24data::getPacket(*packet);
-
-			XPCC_LOG_INFO.printf("Received packet from 0x%02x\n", packet->src);
+			XPCC_LOG_INFO.printf("Received packet from 0x%02x\n", packet.src);
 			XPCC_LOG_INFO.printf("Data: %02x %02x %02x %02x\n",
-					packet->data[3],
-					packet->data[2],
-					packet->data[1],
-					packet->data[0]);
+					packet.data[3],
+					packet.data[2],
+					packet.data[1],
+					packet.data[0]);
 		}
 
 		if(aliveTimer.execute())
 		{
 			XPCC_LOG_INFO << "Rx is still alive" << xpcc::endl;
 		}
+
+		nrf24data::update();
 	}
 
 	return 0;

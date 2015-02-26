@@ -102,24 +102,26 @@ MAIN_FUNCTION
 
 	// Using the data layer, we send and receive packets, so we need to allocate
 	// one. It's automatically allocated with the max. payload length configured.
-	auto packet = new nrf24data::packet_t;
+	nrf24data::Packet packet;
 
 	// Send this packet to the other endpoint of this example
-	packet->dest = address_rx_side;
+	packet.dest = address_rx_side;
 
 	// We have 4 bytes payload, so interpret them as an uint32_t and increment
 	// over time
-	uint32_t* data = reinterpret_cast<uint32_t*>(packet->data);
+	uint32_t* data = reinterpret_cast<uint32_t*>(packet.data);
 
 	while(1)
 	{
 		if(sendTimer.execute())
 		{
 			XPCC_LOG_INFO << "Send packet" << xpcc::endl;
-			nrf24data::sendPacket(*packet);
+			nrf24data::sendPacket(packet);
 
 			*data += 1;
 		}
+
+		nrf24data::update();
 	}
 
 	return 0;

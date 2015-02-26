@@ -21,7 +21,7 @@ namespace xpcc
 //{
 
 /**
- * @brief Hardware abstraction layer for nRF24L01+
+ * Hardware abstraction layer for nRF24L01+
  *
  * @ingroup  nrf24
  * @author   Daniel Krebs
@@ -32,7 +32,8 @@ class Nrf24Phy : public Nrf24Register
 
 public:
 
-	/** @brief Initialize nRF24-HAL
+	/**
+	 * Initialize nRF24-HAL
 	 *
 	 * Call this function before using this class!
 	 *
@@ -50,28 +51,24 @@ public:
 		payload_len = (payload_length == 0) ? max_payload_length : payload_length;
 	}
 
-	/** @brief Get the maximum payload size the hardware can transmit in one packet
-	 */
+	/// Get the maximum payload size the hardware can transmit in one packet
 	static uint16_t
 	getMaxPayload()
-	{
-		return max_payload_length;
-	}
+	{ return max_payload_length; }
 
 
-	/** @brief Read simple 8 bit register
-	 */
+	/// Read simple 8 bit register
 	static uint8_t
 	readRegister(NrfRegister_t reg);
 
 
-	/** @brief Write simple 8 bit register
-	 */
+	/// Write simple 8 bit register
 	static void
 	writeRegister(NrfRegister_t, uint8_t data);
 
 
-	/** @brief Set bits inside a register
+	/**
+	 * Set bits inside a register
 	 *
 	 * Only set individual bits and leave the rest untouched
 	 *
@@ -82,7 +79,8 @@ public:
 	setBits(NrfRegister_t reg, Flags_t flags);
 
 
-	/** @brief Clear bits inside a register
+	/**
+	 * Clear bits inside a register
 	 *
 	 * Only clear individual bits and leave the rest untouched.
 	 *
@@ -94,7 +92,8 @@ public:
 	static void
 	clearBits(NrfRegister_t reg, Flags_t flags);
 
-	/** @brief Read received payload
+	/**
+	 * Read received payload
 	 *
 	 * Used in RX mode.
 	 * Payload is deleted from FIFO after it is read.
@@ -106,7 +105,8 @@ public:
 	readRxPayload(uint8_t* buffer);
 
 
-	/** @brief Write payload to be send
+	/**
+	 * Write payload to be send
 	 *
 	 *  @param buffer   Buffer from where to read the payload
 	 *  @param len      How many bytes the payload is wide
@@ -115,13 +115,13 @@ public:
 	writeTxPayload(uint8_t* buffer, uint8_t len);
 
 
-	/** @brief Same as writeTxPayload() but disable auto ACK for this packet
-	 */
+	/// Same as writeTxPayload() but disable auto ACK for this packet
 	static void
 	writeTxPayloadNoAck(uint8_t* buffer, uint8_t len);
 
 
-	/** @brief Write payload to be transmitted together with ACK packet
+	/**
+	 * Write payload to be transmitted together with ACK packet
 	 *
 	 * Used in RX mode.
 	 * Maximum three ACK packet payloads can be pending. Payloads with
@@ -136,34 +136,30 @@ public:
 	writeAckPayload(Pipe_t pipe, uint8_t* buffer, uint8_t len);
 
 
-	/** @brief Send a high pulse of 10us length on Ce pin (blocking)
-	 *
-	 */
+	/// Send a high pulse of 10us length on Ce pin (blocking)
 	static void
 	pulseCe();
 
-	/** @brief Set Ce pin high
-	 *
-	 *  If Ce was high before the pin won't be set low before waiting for 10us.
-	 */
+	/// Set Ce pin high
+	/// If Ce was high before the pin won't be set low before waiting for 10us.
 	static void
-	setCe();
+	setCe()
+	{ Ce::set(); }
 
-	/** @brief Set Ce pin low
-	 *
-	 */
+	/// Set Ce pin low
 	static void
-	resetCe();
+	resetCe()
+	{ Ce::reset(); }
 
-	/**@brief Flush Tx Fifo
-	 *
-	 * Used in Tx mode
-	 */
+	/// Flush Tx Fifo
+	/// Used in Tx mode
 	static void
-	flushTxFifo();
+	flushTxFifo()
+	{ writeCommandNoData(Command::FLUSH_TX); }
 
 
-	/** @brief Flush Rx Fifo
+	/**
+	 * Flush Rx Fifo
 	 *
 	 * Used in Rx mode.
 	 * Should not be executed during transmission of
@@ -171,10 +167,12 @@ public:
 	 * not be completed.
 	 */
 	static void
-	flushRxFifo();
+	flushRxFifo()
+	{ writeCommandNoData(Command::FLUSH_RX); }
 
 
-	/** @brief Reuse last transmitted payload
+	/**
+	 * Reuse last transmitted payload
 	 *
 	 * Used in PTX mode.
 	 * TX payload reuse is active until W_TX_PAYLOAD or FLUSH TX is
@@ -182,18 +180,19 @@ public:
 	 * during package transmission.
 	 */
 	static void
-	reuseTxPayload();
+	reuseTxPayload()
+	{ writeCommandNoData(Command::REUSE_TX_PL);	}
 
 
-	/** @brief Read Rx payload width for top of Rx Fifo
-	 *
-	 * Note: Flush RX FIFO if the read value is larger than 32 bytes.
-	 */
+	/// Read Rx payload width for top of Rx Fifo
+	/// Note: Flush RX FIFO if the read value is larger than 32 bytes.
 	static uint8_t
-	readRxPayloadWidth();
+	readRxPayloadWidth()
+	{ return writeCommandSingleData(Command::R_RX_PL_WID, 0x00); }
 
 
-	/** @brief Read new status
+	/**
+	 * Read new status
 	 *
 	 * Note: status will be automatically updated every time a command is
 	 *       issued, so it might not be necessary to call this explicitly.
@@ -204,29 +203,30 @@ public:
 	readStatus();
 
 
-	/** @brief Read Fifo status register
-	 *
-	 *  @return Fifo Status register
-	 */
+	/// Read Fifo status register
+	/// @return Fifo Status register
 	static uint8_t
-	readFifoStatus();
+	readFifoStatus()
+	{ return readRegister(NrfRegister::FIFO_STATUS); }
 
 
-	/** @brief Set Rx address for a pipe
+	/**
+	 * Set Rx address for a pipe
 	 *
-	 *  Note: pipe 0 and pipe 1 have a 5 byte wide address while pipes 2 to 5
-	 *        share the upper 4 bytes with pipe 1, so when setting the address
-	 *        of a pipes 2 to 5, only 1 byte (LSB) will be written to SPI.
+	 * Note: pipe 0 and pipe 1 have a 5 byte wide address while pipes 2 to 5
+	 *       share the upper 4 bytes with pipe 1, so when setting the address
+	 *       of a pipes 2 to 5, only 1 byte (LSB) will be written to SPI.
 	 *
-	 *  @param pipe     Pipe number, must be in range 0 to 5
-	 *  @param address  Address for which packets will be put into pipe, see
-	 *                  description concerning differences by pipe
+	 * @param pipe     Pipe number, must be in range 0 to 5
+	 * @param address  Address for which packets will be put into pipe, see
+	 *                 description concerning differences by pipe
 	 */
 	static void
 	setRxAddress(Pipe_t pipe, uint64_t address);
 
 
-	/** @brief Set Tx address
+	/**
+	 * Set Tx address
 	 *
 	 * Used in PTX mode only.
 	 * Set RX_ADDR_P0 equal to this address to handle
@@ -239,7 +239,8 @@ public:
 	setTxAddress(uint64_t address);
 
 
-	/** @brief Get Rx address of pipe
+	/**
+	 * Get Rx address of pipe
 	 *
 	 *  @param pipe     Pipe number
 	 *  @return         Address set for pipe
@@ -248,20 +249,15 @@ public:
 	getRxAddress(Pipe_t pipe);
 
 
-	/** @brief Get Tx address
-	 */
+	/// Get Tx address
 	static uint64_t
 	getTxAddress();
 
 
-	/** @brief
-	 *
-	 */
+	///
 	static uint16_t
 	getPayloadLength()
-	{
-		return payload_len;
-	}
+	{ return payload_len; }
 
 
 private:
@@ -271,7 +267,8 @@ private:
 	static void
 	writeCommandNoData(Command_t cmd);
 
-	/** @brief Read and write multiple bytes via SPI
+	/**
+	 * Read and write multiple bytes via SPI
 	 *
 	 * Supplying NULL as argv or retv is allowed.
 	 *  argv = nullptr  -> 0x00 is send
@@ -279,6 +276,7 @@ private:
 	 */
 	static void
 	writeCommandMultiData(Command_t cmd, uint8_t* argv, uint8_t* retv, uint8_t argc);
+
 /*
 	static Command_t
 	toCommand(nrf24::Command cmd, nrf24::Register reg, uint8_t offset)

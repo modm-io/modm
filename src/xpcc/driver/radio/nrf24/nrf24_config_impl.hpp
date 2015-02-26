@@ -20,33 +20,6 @@
 
 template<typename Nrf24Phy>
 void
-xpcc::Nrf24Config<Nrf24Phy>::powerUp()
-{
-	Nrf24Phy::setBits(NrfRegister::CONFIG, Config::PWR_UP);
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Nrf24Phy>
-void
-xpcc::Nrf24Config<Nrf24Phy>::powerDown()
-{
-	Nrf24Phy::clearBits(NrfRegister::CONFIG, Config::PWR_UP);
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Nrf24Phy>
-void
-xpcc::Nrf24Config<Nrf24Phy>::setChannel(uint8_t channel)
-{
-	Nrf24Phy::writeRegister(NrfRegister::RF_CH, channel);
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Nrf24Phy>
-void
 xpcc::Nrf24Config<Nrf24Phy>::setMode(Mode mode)
 {
 	if(mode == Mode::Rx)
@@ -118,60 +91,6 @@ void xpcc::Nrf24Config<Nrf24Phy>::setCrc(Crc crc)
 
 template<typename Nrf24Phy>
 void
-xpcc::Nrf24Config<Nrf24Phy>::setAddressWidth(AddressWidth width)
-{
-	Nrf24Phy::writeRegister(NrfRegister::SETUP_AW, static_cast<uint8_t>(width));
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Nrf24Phy>
-void
-xpcc::Nrf24Config<Nrf24Phy>::setRfPower(RfPower power)
-{
-	Nrf24Phy::writeRegister(NrfRegister::RF_SETUP, static_cast<uint8_t>(power) << 1);
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Nrf24Phy>
-void
-xpcc::Nrf24Config<Nrf24Phy>::setAutoRetransmitDelay(AutoRetransmitDelay delay)
-{
-	Nrf24Phy::writeRegister(NrfRegister::SETUP_RETR, static_cast<uint8_t>(delay) << 4);
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Nrf24Phy>
-void
-xpcc::Nrf24Config<Nrf24Phy>::setAutoRetransmitCount(AutoRetransmitCount count)
-{
-	Nrf24Phy::writeRegister(NrfRegister::SETUP_RETR, static_cast<uint8_t>(count));
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Nrf24Phy>
-void
-xpcc::Nrf24Config<Nrf24Phy>::enableFeatureNoAck()
-{
-	Nrf24Phy::setBits(NrfRegister::FEATURE, Feature::EN_DYN_ACK);
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Nrf24Phy>
-void
-xpcc::Nrf24Config<Nrf24Phy>::disableFeatureNoAck()
-{
-	Nrf24Phy::clearBits(NrfRegister::FEATURE, Feature::EN_DYN_ACK);
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Nrf24Phy>
-void
 xpcc::Nrf24Config<Nrf24Phy>::enablePipe(Pipe_t pipe, bool enableAutoAck)
 {
 
@@ -197,16 +116,6 @@ xpcc::Nrf24Config<Nrf24Phy>::enablePipe(Pipe_t pipe, bool enableAutoAck)
 
 	/* enable pipe */
 	Nrf24Phy::setBits(NrfRegister::EN_RX_ADDR, pipe_flag);
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Nrf24Phy>
-void
-xpcc::Nrf24Config<Nrf24Phy>::disablePipe(Pipe_t pipe)
-{
-	/* DISABLE pipe */
-	Nrf24Phy::clearBits(NrfRegister::EN_RX_ADDR, (1 << pipe.value));
 }
 
 // --------------------------------------------------------------------------------------------------------------------

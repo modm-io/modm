@@ -57,9 +57,9 @@ public:
 	/// @{
 	/// @ingroup	nrf24
 	/// Data structure that user uses to pass data to the data layer
-	typedef struct packet_t
+	struct Packet
 	{
-		packet_t(uint8_t payload_length = Nrf24Data::getPayloadLength()) :
+		Packet(uint8_t payload_length = Nrf24Data::getPayloadLength()) :
 			dest(0), src(0), length(payload_length)
 		{
 			data = new uint8_t[length];
@@ -72,23 +72,23 @@ public:
 		uint8_t*    data;
 		uint8_t     length;     // max. 30!
 
-		~packet_t() { delete data; }
-	} packet_t;
+		~Packet() { delete data; }
+	};
 
 
-	/// Header of frame_t
-	typedef struct header_t
+	/// Header of Frame
+	struct Header
 	{
 		uint8_t     src;
 		uint8_t     dest;
-	} header_t;
+	};
 
 	/// Data that will be sent over the air
-	typedef struct frame_t
+	struct Frame
 	{
-		header_t    header;
+		Header    header;
 		uint8_t     data[30];   // max. possible payload size (32 byte) - 2 byte (src + dest)
-	} frame_t;
+	};
 	/// @}
 
 public:
@@ -106,10 +106,10 @@ public:
 	/* general data layer interface */
 
 	static bool
-	sendPacket(packet_t& packet);
+	sendPacket(Packet& packet);
 
 	static bool
-	getPacket(packet_t& packet);
+	getPacket(Packet& packet);
 
 	static bool
 	isReadyToSend();
@@ -117,16 +117,40 @@ public:
 	static bool
 	isPacketAvailable();
 
-	/** @brief Returns feedback for the last packet sent
+	/*
+	 * Returns true if the last packet has been fully processed, i.e. sending
+	 * process is over (successful or not). Only return true one time per packet
+	 */
+	static bool
+	isPacketProcessed()
+	{
+		if(packetProcessed)
+		{
+			packetProcessed = false;
+			return true;
+		}
+
+		return false;
+	}
+
+	/*
+	 * Call this function in your main loop
+	 */
+	static void
+	update();
+
+	/** Returns feedback for the last packet sent
 	 *
 	 */
 	static SendingState
-	getSendingFeedback();
+	getSendingFeedback()
+	{ return state; }
 
 	static Address
-	getAddress();
+	getAddress()
+	{ return ownAddress; }
 
-	/** @brief Set own address
+	/** Set own address
 	 *
 	 */
 	static void
@@ -134,15 +158,11 @@ public:
 
 	static uint8_t
 	getPayloadLength()
-	{
-		return Phy::getPayloadLength() - sizeof(header_t);
-	}
+	{ return Phy::getPayloadLength() - sizeof(Header); }
 
 	static Address
 	getBroadcastAddress()
-	{
-		return broadcastAddress;
-	}
+	{ return broadcastAddress; }
 
 	/* nrf24 specific */
 
@@ -158,14 +178,15 @@ private:
 private:
 
 	static inline uint64_t
-	assembleAddress(Address address);
+	assembleAddress(Address address)
+	{ return static_cast<uint64_t>((uint64_t)baseAddress | (uint64_t)address); }
 
-	static SendingState
+	static bool
 	updateSendingState();
 
 private:
 
-	/** @brief Base address of the network
+	/**  Base address of the network
 	 *
 	 *   The first 3 byte will be truncated, so the address is actually 5 bytes
 	 *   long. The last byte will be used to address individual modules or
@@ -187,10 +208,11 @@ private:
 
 	static Address connections[3];
 
-	static frame_t assemblyFrame;
+	static Frame assemblyFrame;
 
 	static SendingState state;
 
+	static bool packetProcessed;
 };
 
 }	// namespace xpcc
