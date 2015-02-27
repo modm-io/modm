@@ -225,7 +225,7 @@ public :
 		return *this;
 	}
 
-#if defined(XPCC__OS_OSX) || defined(XPCC__CPU_I368)
+#if defined(XPCC__OS_OSX) || defined(XPCC__CPU_I386)
 	// For OSX 'int64_t' is of type 'int'. Therefore there is no
 	// function here for the default type 'long int'. As 'long int' has the same
 	// width as 'int64_t' we just use a typedef here.
