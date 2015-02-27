@@ -65,6 +65,9 @@ template<
 class TLC594X
 {
 public:
+	static_assert(CHANNELS % 4 ==  0, "Template parameter CHANNELS must be a multiple of 4.");
+	static_assert(CHANNELS     >= 16, "Template parameter CHANNELS must be larger than 16 (one TLC chip).");
+
 	/**
 	 * @param channels	initialize channels buffer with value, disable with -1
 	 * @param dots		initialize dot correction buffer with value, disable with -1
