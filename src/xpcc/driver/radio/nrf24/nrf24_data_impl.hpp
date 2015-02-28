@@ -207,13 +207,13 @@ xpcc::Nrf24Data<Nrf24Phy>::getPacket(Packet& packet)
 	 */
 
 	// First read into buffer frame
-	uint8_t payload_length = Phy::readRxPayload((uint8_t*)&assemblyFrame);
+	uint8_t frame_size = Phy::readRxPayload((uint8_t*)&assemblyFrame);
 
 	// Then copy to user packet
 	packet.dest = assemblyFrame.header.dest;
 	packet.src = assemblyFrame.header.src;
-	packet.length = payload_length;
-	memcpy(packet.data, assemblyFrame.data, payload_length);
+	packet.length = frame_size - sizeof(Header);
+	memcpy(packet.data, assemblyFrame.data, packet.length);
 
 	// Acknowledge RX_DR interrupt
 	Phy::setBits(NrfRegister::STATUS, Status::RX_DR);
