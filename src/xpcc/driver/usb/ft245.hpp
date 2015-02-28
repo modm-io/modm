@@ -10,45 +10,46 @@
 #ifndef XPCC__FT245_HPP
 #define XPCC__FT245_HPP
 
-#include "../../../drivers.hpp"
 #include <xpcc/architecture/interface/gpio.hpp>
-
 
 namespace xpcc
 {
 	/**
-	 * \brief	FT245 USB FIFO
+	 * FT245 USB FIFO
 	 *
 	 * The FT245R USB FIFO from Future Technology Devices International is a
 	 * single chip USB to parallel FIFO bidirectional data transfer interface.
+	 *
+	 * Wr and Rd must be GpioOutputs and set to output mode before.
+	 * Rxf and Txe must be GpioInputs.
+	 * Port is switched between input and output mode.
 	 *
 	 * \section ft245_example Example
 	 *
 	 * \code
 	 * #include <xpcc/architecture.hpp>
-	 * #include <xpcc/communication/ft245.hpp>
+	 * #include <xpcc/driver/usb/ft245.hpp>
 	 *
-	 * GPIO__PORT(FtPort, A);
-	 * GPIO__OUTPUT(FtRd, B, 0);
-	 * GPIO__OUTPUT(FtWr, B, 1);
-	 * GPIO__INPUT(FtTxe, B, 2);
-	 * GPIO__INPUT(FtRxf, B, 3);
-	 *
+	 * typedef xpcc::stm32::GpioPort<xpcc::stm32::GpioD0, 8> myPort;
+	 * typedef xpcc::stm32::GpioInputC11  Rxf;
+	 * typedef xpcc::stm32::GpioInputC10  Txe;
+	 * typedef xpcc::stm32::GpioOutputA15 Rd;
+	 * typedef xpcc::stm32::GpioOutputA9  Wr;
+     *
+	 * typedef xpcc::Ft245<myPort, Rd, Wr, Rxf, Txe> myFt;
+     *
 	 * MAIN_FUNCTION
 	 * {
-	 *     xpcc::Ft245<FtPort, FtRd, FtWr, FtRxf, FtTxe> ft245;
+	 *   Rd::setOutput(xpcc::Gpio::High);
+	 *   Wr::setOutput(xpcc::Gpio::Low);
 	 *
-	 *     uint8_t out = 0;
-	 *     while(1)
-	 *     {
-	 *          ft245.write(out++);
-	 *
-	 *     	    char loop;
-	 *     	    if (ft245.read(loop)) {
-	 *              ft245.write(0xff ^ loop);
-	 *     	    }
-	 *     }
-	 * }
+	 *   while (1)
+	 *   {
+	 *     uint8_t c;
+	 *     if (myFt::read(c)) {
+	 *     myFt::write(c + 1);
+	 *   }
+     * }
 	 * \endcode
 	 *
 	 * \ingroup	driver_other
@@ -61,30 +62,13 @@ namespace xpcc
 	class Ft245
 	{
 	public:
-		Ft245()
-		{
-			this->initialize();
-		}
-
-		/**
-		 * \brief	Initialize the port pins.
-		 *
-		 * This function is called by the constructor to initialize all port pins
-		 * correctly and sets the default values.
-		 */
-		static void
-		initialize();
-
-		/**
-		 * \brief	Write a single byte to the FIFO
-		 *
-		 * \param	data	Single byte to write
-		 */
+		/// Write a single byte to the FIFO
+		/// \param	data	Single byte to write
 		static void
 		write(uint8_t data);
 
 		/**
-		 * \brief	Write a block of bytes to the FIFO
+		 * Write a block of bytes to the FIFO
 		 *
 		 * This blocks until the buffer is written.
 		 *
@@ -96,7 +80,7 @@ namespace xpcc
 		write(const uint8_t *buffer, uint8_t nbyte);
 
 		/**
-		 * \brief	Read a single byte from the FIFO
+		 * Read a single byte from the FIFO
 		 *
 		 * \param	c		Byte read, if any
 		 *
@@ -106,7 +90,7 @@ namespace xpcc
 		read(uint8_t &c);
 
 		/**
-		 * \brief	Read a block of bytes from the FIFO
+		 * Read a block of bytes from the FIFO
 		 *
 		 * This is blocking.
 		 *
