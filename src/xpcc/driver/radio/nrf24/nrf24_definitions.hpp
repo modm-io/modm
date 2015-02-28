@@ -258,6 +258,16 @@ struct Nrf24Register
 			Feature_t, DynPd_t, FifoStatus_t, Rpd_t, ObserveTx_t, Status_t,
 			RfSetup_t, SetupRetr_t, SetupAw_t, EnRxAddr_t, EnAA_t, Config_t
 	> Flags_t;
+
+	enum class
+	InterruptFlag : uint8_t
+	{
+		MAX_RT = Bit4,
+		TX_DS  = Bit5,
+		RX_DR  = Bit6,
+		ALL    = Bit4 | Bit5 | Bit6
+	};
+	XPCC_FLAGS8(InterruptFlag);
 };
 
 }   // namespace xpcc

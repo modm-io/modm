@@ -11,8 +11,12 @@
 #define XPCC__NRF24_PHY_HPP
 
 #include <stdint.h>
+#include <xpcc/debug/logger.hpp>
 
 #include "nrf24_definitions.hpp"
+
+#undef  XPCC_LOG_LEVEL
+#define XPCC_LOG_LEVEL xpcc::log::DISABLED
 
 namespace xpcc
 {
@@ -91,6 +95,10 @@ public:
 	 */
 	static void
 	clearBits(NrfRegister_t reg, Flags_t flags);
+
+
+	static void
+	clearInterrupt(InterruptFlag_t flag);
 
 	/**
 	 * Read received payload

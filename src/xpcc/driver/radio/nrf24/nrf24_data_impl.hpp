@@ -139,12 +139,15 @@ xpcc::Nrf24Data<Nrf24Phy>::sendPacket(Packet& packet)
 {
 	if(!isReadyToSend())
 	{
+		XPCC_LOG_WARNING << "Warning: Not ready to send" << xpcc::endl;
 		state = SendingState::Failed;
 		return false;
 	}
 
-	if(packet.length > getPayloadLength())
+	if(packet.payload.length > getPayloadLength())
 	{
+		XPCC_LOG_ERROR << "Error: Payload length was " << packet.payload.length
+		               << ", max is " << getPayloadLength() << xpcc::endl;
 		state = SendingState::Failed;
 		return false;
 	}
@@ -159,14 +162,14 @@ xpcc::Nrf24Data<Nrf24Phy>::sendPacket(Packet& packet)
 	// assemble frame to transmit
 	assemblyFrame.header.src = ownAddress;
 	assemblyFrame.header.dest = packet.dest;
-	memcpy(assemblyFrame.data, packet.data, packet.length);
+	memcpy(assemblyFrame.data, packet.payload.data, packet.payload.length);
 
 	// set receivers address as tx address
 	Phy::setTxAddress(assembleAddress(packet.dest));
 
 	if(packet.dest == getBroadcastAddress())
 	{
-		Phy::writeTxPayloadNoAck((uint8_t*)&assemblyFrame, packet.length + sizeof(Header));
+		Phy::writeTxPayloadNoAck((uint8_t*)&assemblyFrame, packet.payload.length + sizeof(Header));
 
 		// as frame was sent without requesting an acknowledgment we can't determine it's state
 		state = SendingState::DontKnow;
@@ -179,7 +182,7 @@ xpcc::Nrf24Data<Nrf24Phy>::sendPacket(Packet& packet)
 		Phy::setRxAddress(Pipe::PIPE_0, assembleAddress(packet.dest));
 		Config::enablePipe(Pipe::PIPE_0, true);
 
-		Phy::writeTxPayload((uint8_t*)&assemblyFrame, packet.length + sizeof(Header));
+		Phy::writeTxPayload((uint8_t*)&assemblyFrame, packet.payload.length + sizeof(Header));
 
 		// mark state as busy, so update() will switch back to Rx mode when
 		// state has changed
@@ -207,16 +210,17 @@ xpcc::Nrf24Data<Nrf24Phy>::getPacket(Packet& packet)
 	 */
 
 	// First read into buffer frame
-	uint8_t payload_length = Phy::readRxPayload((uint8_t*)&assemblyFrame);
+	uint8_t frame_size = Phy::readRxPayload((uint8_t*)&assemblyFrame);
 
 	// Then copy to user packet
 	packet.dest = assemblyFrame.header.dest;
 	packet.src = assemblyFrame.header.src;
-	packet.length = payload_length;
-	memcpy(packet.data, assemblyFrame.data, payload_length);
+	packet.payload.length = frame_size - sizeof(Header);
+	memcpy(packet.payload.data, assemblyFrame.data, packet.payload.length);
 
 	// Acknowledge RX_DR interrupt
-	Phy::setBits(NrfRegister::STATUS, Status::RX_DR);
+	Phy::clearInterrupt(InterruptFlag::RX_DR);
+
 
 	return true;
 }
@@ -255,18 +259,24 @@ xpcc::Nrf24Data<Nrf24Phy>::updateSendingState()
 
 	if(status & (uint8_t)Status::MAX_RT)
 	{
+		XPCC_LOG_DEBUG << "Interrupt: MAX_RT" << xpcc::endl;
+
 		state = SendingState::FinishedNack;
 
 		// clear MAX_RT bit to enable further communication and flush Tx fifo,
 		// because the failed packet still resides there
-		Phy::setBits(NrfRegister::STATUS, Status::MAX_RT);
+		Phy::clearInterrupt(InterruptFlag::MAX_RT);
 		Phy::flushTxFifo();
+
 	} else if(status & (uint8_t)Status::TX_DS)
 	{
+		XPCC_LOG_DEBUG << "Interrupt: TX_DS" << xpcc::endl;
+
 		state = SendingState::FinishedAck;
 
 		// acknowledge TX_DS interrupt
-		Phy::setBits(NrfRegister::STATUS, Status::TX_DS);
+		Phy::clearInterrupt(InterruptFlag::TX_DS);
+
 	} else {
 		// still busy
 		return false;
