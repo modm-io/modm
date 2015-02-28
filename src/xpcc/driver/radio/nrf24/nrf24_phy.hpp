@@ -96,6 +96,10 @@ public:
 	static void
 	clearBits(NrfRegister_t reg, Flags_t flags);
 
+
+	static void
+	clearInterrupt(InterruptFlag_t flag);
+
 	/**
 	 * Read received payload
 	 *

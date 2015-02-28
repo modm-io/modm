@@ -219,7 +219,8 @@ xpcc::Nrf24Data<Nrf24Phy>::getPacket(Packet& packet)
 	memcpy(packet.data, assemblyFrame.data, packet.length);
 
 	// Acknowledge RX_DR interrupt
-	Phy::setBits(NrfRegister::STATUS, Status::RX_DR);
+	Phy::clearInterrupt(InterruptFlag::RX_DR);
+
 
 	return true;
 }
@@ -264,8 +265,9 @@ xpcc::Nrf24Data<Nrf24Phy>::updateSendingState()
 
 		// clear MAX_RT bit to enable further communication and flush Tx fifo,
 		// because the failed packet still resides there
-		Phy::setBits(NrfRegister::STATUS, Status::MAX_RT);
+		Phy::clearInterrupt(InterruptFlag::MAX_RT);
 		Phy::flushTxFifo();
+
 	} else if(status & (uint8_t)Status::TX_DS)
 	{
 		XPCC_LOG_DEBUG << "Interrupt: TX_DS" << xpcc::endl;
@@ -273,7 +275,8 @@ xpcc::Nrf24Data<Nrf24Phy>::updateSendingState()
 		state = SendingState::FinishedAck;
 
 		// acknowledge TX_DS interrupt
-		Phy::setBits(NrfRegister::STATUS, Status::TX_DS);
+		Phy::clearInterrupt(InterruptFlag::TX_DS);
+
 	} else {
 		// still busy
 		return false;

@@ -122,6 +122,16 @@ xpcc::Nrf24Phy<Spi, Csn, Ce>::setBits(NrfRegister_t reg, Flags_t flags)
 
 // --------------------------------------------------------------------------------------------------------------------
 
+
+template<typename Spi, typename Csn, typename Ce>
+void
+xpcc::Nrf24Phy<Spi, Csn, Ce>::clearInterrupt(InterruptFlag_t flag)
+{
+	writeRegister(NrfRegister::STATUS, flag.value);
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
 template<typename Spi, typename Csn, typename Ce>
 void
 xpcc::Nrf24Phy<Spi, Csn, Ce>::clearBits(NrfRegister_t reg, Flags_t flags)
