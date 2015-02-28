@@ -108,11 +108,11 @@ public:
 	getDotCorrection(uint16_t channel);
 
 	/// transfer channel data to driver chip
-	static bool
+	static void
 	writeChannels(bool flush=true);
 
 	/// transfer dot correction data to driver chip
-	static bool
+	static void
 	writeDotCorrection();
 
 	/// writes data from the input shift register to either GS  or DC register.
