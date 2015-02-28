@@ -139,12 +139,15 @@ xpcc::Nrf24Data<Nrf24Phy>::sendPacket(Packet& packet)
 {
 	if(!isReadyToSend())
 	{
+		XPCC_LOG_WARNING << "Warning: Not ready to send" << xpcc::endl;
 		state = SendingState::Failed;
 		return false;
 	}
 
 	if(packet.length > getPayloadLength())
 	{
+		XPCC_LOG_ERROR << "Error: Payload length was " << packet.length
+		               << ", max is " << getPayloadLength() << xpcc::endl;
 		state = SendingState::Failed;
 		return false;
 	}
@@ -255,6 +258,8 @@ xpcc::Nrf24Data<Nrf24Phy>::updateSendingState()
 
 	if(status & (uint8_t)Status::MAX_RT)
 	{
+		XPCC_LOG_DEBUG << "Interrupt: MAX_RT" << xpcc::endl;
+
 		state = SendingState::FinishedNack;
 
 		// clear MAX_RT bit to enable further communication and flush Tx fifo,
@@ -263,6 +268,8 @@ xpcc::Nrf24Data<Nrf24Phy>::updateSendingState()
 		Phy::flushTxFifo();
 	} else if(status & (uint8_t)Status::TX_DS)
 	{
+		XPCC_LOG_DEBUG << "Interrupt: TX_DS" << xpcc::endl;
+
 		state = SendingState::FinishedAck;
 
 		// acknowledge TX_DS interrupt

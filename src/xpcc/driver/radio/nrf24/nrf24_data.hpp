@@ -11,10 +11,14 @@
 #define XPCC__NRF24_DATA_HPP
 
 #include <stdint.h>
+#include <xpcc/debug/logger.hpp>
 
 #include "nrf24_phy.hpp"
 #include "nrf24_config.hpp"
 #include "nrf24_definitions.hpp"
+
+#undef  XPCC_LOG_LEVEL
+#define XPCC_LOG_LEVEL xpcc::log::DISABLED
 
 namespace xpcc
 {
