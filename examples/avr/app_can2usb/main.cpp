@@ -21,6 +21,7 @@
  */
 
 #include <xpcc/architecture/platform.hpp>
+#include <xpcc/driver/usb/ft245.hpp>
 
 using namespace xpcc::at90;
 
@@ -42,6 +43,19 @@ typedef GpioOutputF4 Led4High;
 // LED5
 typedef GpioOutputF6 Led5Low;
 typedef GpioOutputF3 Led5High;
+
+// ----------------------------------------------------------------------------
+typedef GpioPort<GpioA0, 8> myPort;
+typedef GpioInputE7  Rxf;
+typedef GpioInputE6  Txe;
+typedef GpioOutputG1 Rd;
+typedef GpioOutputG0  WrInverted;
+
+typedef xpcc::GpioInverted<WrInverted> Wr;
+
+
+typedef xpcc::Ft245<myPort, Rd, Wr, Rxf, Txe> myFt;
+
 
 MAIN_FUNCTION
 {
@@ -65,9 +79,14 @@ MAIN_FUNCTION
 	Led4High::set();
 	Led5Low::set();
 
+
+	Rd::setOutput(xpcc::Gpio::High);
+	WrInverted::setOutput(xpcc::Gpio::Low);
+
+
 	while (1)
 	{
-		xpcc::delayMilliseconds(1000);
+		xpcc::delayMilliseconds(100);
 		LedStatus::toggle();
 		LedRxHigh::toggle();
 		LedRxLow::toggle();
@@ -75,8 +94,13 @@ MAIN_FUNCTION
 		LedTxLow::toggle();
 		Led4Low::toggle();
 		Led4High::toggle();
-		Led5Low::toggle();
-		Led5High::toggle();
+
+		uint8_t c;
+		if (myFt::read(c)) {
+			Led5Low::toggle();
+			Led5High::toggle();
+			myFt::write(c);
+		}
 
 	}
 }
