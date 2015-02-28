@@ -50,47 +50,53 @@ public:
 	/// @ingroup	nrf24
 	enum class SendingState
 	{
-		Busy,
-		FinishedAck,
-		FinishedNack,
-		DontKnow,
-		Failed,
-		Undefined
+		Busy,           ///< Waiting for ACK
+		FinishedAck,    ///< Packet sent and ACK received
+		FinishedNack,   ///< Packet sent but no ACK received in time
+		DontKnow,       ///< When a packet was sent without requesting ACK
+		Failed,         ///< Packet could not be sent
+		Undefined       ///< Initial state before a packet has been handled
 	};
 
 	/// @{
 	/// @ingroup	nrf24
 	/// Data structure that user uses to pass data to the data layer
-	struct Packet
+	struct ATTRIBUTE_PACKED Packet
 	{
 		Packet(uint8_t payload_length = Nrf24Data::getPayloadLength()) :
-			dest(0), src(0), length(payload_length)
+			dest(0), src(0)
 		{
-			data = new uint8_t[length];
-			if(data)
-				memset(data, 0, length);
+			payload.length = payload_length;
+			payload.data = new uint8_t[payload.length];
+			if(payload.data)
+				memset(payload.data, 0, payload.length);
 		}
 
-		Address     dest;
-		Address     src;        // will be ignored when sending
-		uint8_t*    data;
-		uint8_t     length;     // max. 30!
+		struct ATTRIBUTE_PACKED Payload
+		{
+			uint8_t* data;
+			uint8_t length;      // max. 30!
+		};
 
-		~Packet() { delete data; }
+		Payload     payload;
+		Address     dest;
+		Address     src;         // will be ignored when sending
+
+		~Packet() { delete payload.data; }
 	};
 
 
 	/// Header of Frame
-	struct Header
+	struct ATTRIBUTE_PACKED Header
 	{
 		uint8_t     src;
 		uint8_t     dest;
 	};
 
 	/// Data that will be sent over the air
-	struct Frame
+	struct ATTRIBUTE_PACKED Frame
 	{
-		Header    header;
+		Header      header;
 		uint8_t     data[30];   // max. possible payload size (32 byte) - 2 byte (src + dest)
 	};
 	/// @}

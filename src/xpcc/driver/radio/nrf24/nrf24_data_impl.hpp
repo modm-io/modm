@@ -144,9 +144,9 @@ xpcc::Nrf24Data<Nrf24Phy>::sendPacket(Packet& packet)
 		return false;
 	}
 
-	if(packet.length > getPayloadLength())
+	if(packet.payload.length > getPayloadLength())
 	{
-		XPCC_LOG_ERROR << "Error: Payload length was " << packet.length
+		XPCC_LOG_ERROR << "Error: Payload length was " << packet.payload.length
 		               << ", max is " << getPayloadLength() << xpcc::endl;
 		state = SendingState::Failed;
 		return false;
@@ -162,14 +162,14 @@ xpcc::Nrf24Data<Nrf24Phy>::sendPacket(Packet& packet)
 	// assemble frame to transmit
 	assemblyFrame.header.src = ownAddress;
 	assemblyFrame.header.dest = packet.dest;
-	memcpy(assemblyFrame.data, packet.data, packet.length);
+	memcpy(assemblyFrame.data, packet.payload.data, packet.payload.length);
 
 	// set receivers address as tx address
 	Phy::setTxAddress(assembleAddress(packet.dest));
 
 	if(packet.dest == getBroadcastAddress())
 	{
-		Phy::writeTxPayloadNoAck((uint8_t*)&assemblyFrame, packet.length + sizeof(Header));
+		Phy::writeTxPayloadNoAck((uint8_t*)&assemblyFrame, packet.payload.length + sizeof(Header));
 
 		// as frame was sent without requesting an acknowledgment we can't determine it's state
 		state = SendingState::DontKnow;
@@ -182,7 +182,7 @@ xpcc::Nrf24Data<Nrf24Phy>::sendPacket(Packet& packet)
 		Phy::setRxAddress(Pipe::PIPE_0, assembleAddress(packet.dest));
 		Config::enablePipe(Pipe::PIPE_0, true);
 
-		Phy::writeTxPayload((uint8_t*)&assemblyFrame, packet.length + sizeof(Header));
+		Phy::writeTxPayload((uint8_t*)&assemblyFrame, packet.payload.length + sizeof(Header));
 
 		// mark state as busy, so update() will switch back to Rx mode when
 		// state has changed
@@ -215,8 +215,8 @@ xpcc::Nrf24Data<Nrf24Phy>::getPacket(Packet& packet)
 	// Then copy to user packet
 	packet.dest = assemblyFrame.header.dest;
 	packet.src = assemblyFrame.header.src;
-	packet.length = frame_size - sizeof(Header);
-	memcpy(packet.data, assemblyFrame.data, packet.length);
+	packet.payload.length = frame_size - sizeof(Header);
+	memcpy(packet.payload.data, assemblyFrame.data, packet.payload.length);
 
 	// Acknowledge RX_DR interrupt
 	Phy::clearInterrupt(InterruptFlag::RX_DR);
