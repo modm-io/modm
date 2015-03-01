@@ -110,10 +110,10 @@ MAIN_FUNCTION
 		{
 			XPCC_LOG_INFO.printf("Received packet from 0x%02x\n", packet.src);
 			XPCC_LOG_INFO.printf("Data: %02x %02x %02x %02x\n",
-					packet.data[3],
-					packet.data[2],
-					packet.data[1],
-					packet.data[0]);
+					packet.payload.data[3],
+					packet.payload.data[2],
+					packet.payload.data[1],
+					packet.payload.data[0]);
 		}
 
 		if(aliveTimer.execute())
