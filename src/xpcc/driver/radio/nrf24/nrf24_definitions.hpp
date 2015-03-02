@@ -2,6 +2,7 @@
 #define XPCC__NRF24_DEFINITIONS_HPP
 
 #include <stdint.h>
+#include <xpcc/architecture/interface/register.hpp>
 #include <xpcc/utils/bit_constants.hpp>
 
 namespace xpcc
