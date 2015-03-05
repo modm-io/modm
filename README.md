@@ -18,11 +18,11 @@ use of advanced capabilities found on the 32bit ARM Cortex-M.
 Main Features
 -------------
 
-- efficient object-oriented C++ API:
+- efficient object-oriented C++11 API:
   - new- and delete-operators
   - STL-containers
   - IO-stream interface to hardware (console, RS232, CAN)
-- support of AVR and ARM Cortex-M based microcontrollers from Atmel and ST,
+- support of AVR and ARM Cortex-M based microcontrollers from Atmel, ST and NXP,
 - build system based on SCons and Jinja2 template engine,
 - cross platform peripheral interfaces (incl. bit banging):
   - GPIO, 
@@ -76,16 +76,15 @@ Once your programmer is connected to the virtual machine, you may simply program
 Documentation
 -------------
 
-The project homepage is located at [xpcc.io](http://develop.xpcc.io).
+The project homepage is located at [xpcc.io](http://xpcc.io).  
+Complete installation instructions for our build system and toolchains can [be found here](http://xpcc.io/install.html).
 
-Complete installation instructions for our build system and toolchains can [be found here](http://develop.xpcc.io/install.html).
-
-The API documentation is created from doxygen files in the doc-folder and can be found [online here](http://develop.xpcc.io/api/).
-For the stable master [have a look here](http://xpcc.kreatives-chaos.com/api/).
-
+The API documentation is created from doxygen files in the doc-folder and can be found [online here](http://xpcc.io/api/).  
 If you want to have up-to-date documentation of the develop branch, execute `scons doc`
 in the xpcc root directory and the current development documentation will be available
 in `xpcc/doc/build/api/index.html`.
+
+xpcc also has [a blog for in-depth write ups](http://blog.xpcc.io) of the programming techniques used.
 
 Hardware support
 ----------------
@@ -95,6 +94,7 @@ therefore are limited in the amount of platforms we can support.
 
 Here is a list of supported **and tested** microcontrollers:
 
+- AT90CAN family
 - ATtiny44 family
 - ATtiny85 family
 - ATmega644 family
