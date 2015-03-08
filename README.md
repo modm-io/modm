@@ -1,9 +1,6 @@
-[![Build Status](https://travis-ci.org/roboterclubaachen/xpcc.svg?branch=develop)](https://travis-ci.org/roboterclubaachen/xpcc)
-
 ![xpcc logo](https://github.com/roboterclubaachen/xpcc/raw/master/doc/images/logo_xpcc.png)
 
-
-xpcc microcontroller framework
+xpcc microcontroller framework [![Build Status](https://travis-ci.org/roboterclubaachen/xpcc.svg?branch=develop)](https://travis-ci.org/roboterclubaachen/xpcc)
 ==============================
 
 The xpcc framework consists of powerful hardware abstraction layers for many
