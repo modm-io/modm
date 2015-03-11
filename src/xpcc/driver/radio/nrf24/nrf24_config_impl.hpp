@@ -51,20 +51,20 @@ template<typename Nrf24Phy>
 void
 xpcc::Nrf24Config<Nrf24Phy>::setSpeed(Speed speed)
 {
-	if(speed == Speed::kBps250)
+	switch (speed)
 	{
+	case Speed::kBps250:
 		Nrf24Phy::clearBits(NrfRegister::RF_SETUP, RfSetup::RF_DR_HIGH);
-		Nrf24Phy::setBits(NrfRegister::RF_SETUP, RfSetup::RF_DR_LOW);
-	}
-	else if(speed == Speed::MBps1)
-	{
+		Nrf24Phy::setBits  (NrfRegister::RF_SETUP, RfSetup::RF_DR_LOW);
+		break;
+	case Speed::MBps1:
 		Nrf24Phy::clearBits(NrfRegister::RF_SETUP, RfSetup::RF_DR_LOW);
 		Nrf24Phy::clearBits(NrfRegister::RF_SETUP, RfSetup::RF_DR_HIGH);
-	}
-	else if(speed == Speed::MBps1)
-	{
-		Nrf24Phy::setBits(NrfRegister::RF_SETUP, RfSetup::RF_DR_HIGH);
+		break;
+	case Speed::MBps2:
+		Nrf24Phy::setBits  (NrfRegister::RF_SETUP, RfSetup::RF_DR_HIGH);
 		Nrf24Phy::clearBits(NrfRegister::RF_SETUP, RfSetup::RF_DR_LOW);
+		break;
 	}
 }
 
