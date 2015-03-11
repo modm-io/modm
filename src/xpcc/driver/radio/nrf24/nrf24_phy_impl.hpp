@@ -356,7 +356,8 @@ template<typename Spi, typename Csn, typename Ce>
 void
 xpcc::Nrf24Phy<Spi, Csn, Ce>::dumpRegisters()
 {
-	XPCC_LOG_DEBUG.printf(" --------------------- Register Dump -------------------------\n");
+	XPCC_LOG_DEBUG.printf(" --------------------- Register Dump Begin -------------------------\n");
+
 	XPCC_LOG_DEBUG.printf("CONFIG          0x%02x\n", readRegister(NrfRegister::CONFIG));
 	XPCC_LOG_DEBUG.printf("EN_AA           0x%02x\n", readRegister(NrfRegister::EN_AA));
 	XPCC_LOG_DEBUG.printf("EN_RX_ADDR      0x%02x\n", readRegister(NrfRegister::EN_RX_ADDR));
@@ -390,4 +391,7 @@ xpcc::Nrf24Phy<Spi, Csn, Ce>::dumpRegisters()
 	XPCC_LOG_DEBUG.printf("RX_PW_P5        0x%02x\n", readRegister(NrfRegister::RX_PW_P5));
 	XPCC_LOG_DEBUG.printf("FIFO_STATUS     0x%02x\n", readRegister(NrfRegister::FIFO_STATUS));
 	XPCC_LOG_DEBUG.printf("DYNPD           0x%02x\n", readRegister(NrfRegister::DYNPD));
+
+	XPCC_LOG_DEBUG.printf(" ---------------------- Register Dump End --------------------------\n");
+
 }
