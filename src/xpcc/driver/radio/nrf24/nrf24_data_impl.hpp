@@ -202,7 +202,8 @@ xpcc::Nrf24Data<Nrf24Phy>::getPacket(Packet& packet)
 		return false;
 
 	// Don't care about pipe numbers for now as we use our own header within each packet
-	//uint8_t pipe = Config::getPayloadPipe();
+	// Pipe_t pipe = Config::getPayloadPipe();
+	// XPCC_LOG_DEBUG.printf("Received on pipe %d\n", pipe.value);
 
 	/*
 	 * TODO: Replace Packet by Frame because there's no reason to trade some bytes of RAM against the runtime
