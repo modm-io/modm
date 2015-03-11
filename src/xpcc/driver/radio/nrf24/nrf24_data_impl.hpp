@@ -105,7 +105,7 @@ xpcc::Nrf24Data<Nrf24Phy>::initialize(BaseAddress base_address, Address own_addr
 	Config::setSpeed(Config::Speed::kBps250);
 	Config::setAutoRetransmitDelay(Config::AutoRetransmitDelay::us1000);
 	Config::setAutoRetransmitCount(Config::AutoRetransmitCount::Retransmit15);
-	Config::setRfPower(Config::RfPower::dBm0);
+	Config::setRfPower(Config::RfPower::dBm0); // Fixme: Unintentionally sets Data Rate to 1 MBps.
 
 	// Power up module in Rx mode
 	Config::setMode(Config::Mode::Rx);
