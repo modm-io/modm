@@ -86,6 +86,7 @@ xpcc::Nrf24Data<Nrf24Phy>::initialize(BaseAddress base_address, Address own_addr
 	Phy::setRxAddress(Pipe::PIPE_0, ~assembleAddress(0x55));
 
 	// don't enable auto ack here because we're not expecting data on this pipe
+	// It was observed that when set to 'false' no packet is received until the module sends a packet once.
 	Config::enablePipe(Pipe::PIPE_0, false);
 
 
