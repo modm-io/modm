@@ -268,6 +268,10 @@ public:
 	getPayloadLength()
 	{ return payload_len; }
 
+public:
+	static void
+	dumpRegisters();
+
 
 private:
 	static uint8_t
