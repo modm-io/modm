@@ -313,10 +313,11 @@ xpcc::Nrf24Data<Nrf24Phy>::isPacketAvailable()
 	uint8_t status = Phy::readStatus();
 
 	if( (status & (uint8_t)Status::RX_DR) ||
-	    !(fifo_status & (uint8_t)FifoStatus::RX_EMPTY))
+	    !(fifo_status & (uint8_t)FifoStatus::RX_EMPTY)) {
 		return true;
-	else
+	} else {
 		return false;
+	}
 }
 
 // --------------------------------------------------------------------------------------------------------------------
