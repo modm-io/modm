@@ -95,6 +95,39 @@ void xpcc::Nrf24Config<Nrf24Phy>::setCrc(Crc crc)
 // --------------------------------------------------------------------------------------------------------------------
 
 template<typename Nrf24Phy>
+void xpcc::Nrf24Config<Nrf24Phy>::setRfPower(RfPower power)
+{
+	uint8_t reg = Nrf24Phy::readRegister(NrfRegister::RF_SETUP);
+	reg &= ~(static_cast<uint8_t>(RfSetup::RF_PWR));	// Clear bits
+	reg |=  ((static_cast<uint8_t>(power)) << 1); 		// Set bits
+	Nrf24Phy::writeRegister(NrfRegister::RF_SETUP, reg);
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template<typename Nrf24Phy>
+void xpcc::Nrf24Config<Nrf24Phy>::setAutoRetransmitDelay(AutoRetransmitDelay delay)
+{
+	uint8_t reg = Nrf24Phy::readRegister(NrfRegister::SETUP_RETR);
+	reg &= ~(static_cast<uint8_t>(SetupRetr::ARD));		// Clear bits
+	reg |=  ((static_cast<uint8_t>(delay)) << 4); 		// Set bits
+	Nrf24Phy::writeRegister(NrfRegister::SETUP_RETR, reg);
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template<typename Nrf24Phy>
+void xpcc::Nrf24Config<Nrf24Phy>::setAutoRetransmitCount(AutoRetransmitCount count)
+{
+	uint8_t reg = Nrf24Phy::readRegister(NrfRegister::SETUP_RETR);
+	reg &= ~(static_cast<uint8_t>(SetupRetr::ARC));		// Clear bits
+	reg |=  (static_cast<uint8_t>(count)); 				// Set bits
+	Nrf24Phy::writeRegister(NrfRegister::SETUP_RETR, reg);
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template<typename Nrf24Phy>
 void
 xpcc::Nrf24Config<Nrf24Phy>::enablePipe(Pipe_t pipe, bool enableAutoAck)
 {

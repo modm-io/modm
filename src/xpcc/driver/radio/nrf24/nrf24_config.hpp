@@ -150,16 +150,13 @@ public:
 	{ Nrf24Phy::writeRegister(NrfRegister::SETUP_AW, static_cast<uint8_t>(width)); }
 
 	static void
-	setRfPower(RfPower power)
-	{ Nrf24Phy::writeRegister(NrfRegister::RF_SETUP, static_cast<uint8_t>(power) << 1); }
+	setRfPower(RfPower power);
 
 	static void
-	setAutoRetransmitDelay(AutoRetransmitDelay delay)
-	{ Nrf24Phy::writeRegister(NrfRegister::SETUP_RETR, static_cast<uint8_t>(delay) << 4); }
+	setAutoRetransmitDelay(AutoRetransmitDelay delay);
 
 	static void
-	setAutoRetransmitCount(AutoRetransmitCount count)
-	{ Nrf24Phy::writeRegister(NrfRegister::SETUP_RETR, static_cast<uint8_t>(count)); }
+	setAutoRetransmitCount(AutoRetransmitCount count);
 
 	static void
 	enableFeatureNoAck()
