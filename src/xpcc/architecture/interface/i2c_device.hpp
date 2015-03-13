@@ -40,14 +40,14 @@ public:
 	void inline
 	attachConfigurationHandler(I2c::ConfigurationHandler handler)
 	{
-		this->configuration = handler;
+		configuration = handler;
 	}
 
 protected:
 	bool inline
 	startTransaction(xpcc::I2cTransaction *transaction)
 	{
-		return I2cMaster::start(transaction, this->configuration);
+		return I2cMaster::start(transaction, configuration);
 	}
 };
 

@@ -27,7 +27,7 @@ namespace
 	// delegating
 	static xpcc::I2cTransaction *transaction(nullptr);
 	static xpcc::I2cMaster::Error errorState(xpcc::I2cMaster::Error::NoError);
-	static uint8_t configTag(0);
+	static xpcc::I2c::ConfigurationHandler configuration(nullptr);
 
 	// buffer management
 	static xpcc::I2cTransaction::Starting starting(0, xpcc::I2c::OperationAfterStart::Stop);
@@ -230,13 +230,16 @@ xpcc::{{target.family}}::I2cMaster::getErrorState()
 }
 
 bool
-xpcc::{{target.family}}::I2cMaster::start(I2cTransaction *transaction, ConfigurationHandler configuration)
+xpcc::{{target.family}}::I2cMaster::start(I2cTransaction *transaction, ConfigurationHandler handler)
 {
 	if (!xpcc::accessor::asVolatile(::transaction) && transaction)
 	{
 		if (transaction->attaching())
 		{
-			if (configuration) configuration(configTag);
+			if (handler and configuration != handler) {
+				configuration = handler;
+				configuration();
+			}
 
 			::transaction = transaction;
 			errorState = Error::NoError;

@@ -85,7 +85,7 @@ public:
 	 * @return	Caller gains control if `true`. Call has no effect if `false`.
 	 */
 	static bool
-	start(I2cTransaction *transaction, ConfigurationHandler configuration = nullptr);
+	start(I2cTransaction *transaction, ConfigurationHandler handler = nullptr);
 
 	/**
 	 * Perform a software reset of the driver in case of an error and detach

@@ -102,7 +102,7 @@ public:
 
 	// start documentation inherited
 	static bool
-	start(I2cTransaction *transaction, ConfigurationHandler configuration = nullptr);
+	start(I2cTransaction *transaction, ConfigurationHandler handler = nullptr);
 
 	static Error
 	getErrorState();

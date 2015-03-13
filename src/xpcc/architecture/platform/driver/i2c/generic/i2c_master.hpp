@@ -57,7 +57,7 @@ public:
 public:
 	// start documentation inherited
 	static bool
-	start(I2cTransaction *transaction, ConfigurationHandler configuration = nullptr);
+	start(I2cTransaction *transaction, ConfigurationHandler handler = nullptr);
 
 	static Error ALWAYS_INLINE
 	getErrorState()
@@ -137,7 +137,7 @@ private:
 	static xpcc::I2c::Operation nextOperation;
 	static xpcc::I2cTransaction *transactionObject;
 	static Error errorState;
-	static uint8_t configTag;
+	static xpcc::I2c::ConfigurationHandler configuration;
 
 	static xpcc::I2cTransaction::Starting starting;
 	static xpcc::I2cTransaction::Writing writing;

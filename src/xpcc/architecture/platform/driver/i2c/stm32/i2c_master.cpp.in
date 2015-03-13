@@ -188,7 +188,7 @@ namespace
 	};
 
 	static xpcc::BoundedQueue<ConfiguredTransaction, {{ parameters.transaction_buffer }}> queue;
-	static uint8_t configTag(0);
+	static xpcc::I2c::ConfigurationHandler configuration(nullptr);
 
 	// delegating
 	static xpcc::I2cTransaction *transaction(nullptr);
@@ -257,8 +257,10 @@ namespace
 			ConfiguredTransaction next = queue.get();
 			queue.pop();
 			// configure the peripheral
-			if (next.configuration)
-				next.configuration(configTag);
+			if (next.configuration and configuration != next.configuration) {
+				configuration = next.configuration;
+				configuration();
+			}
 
 			DEBUG_STREAM("\n###\n");
 			::transaction = next.transaction;
@@ -609,7 +611,7 @@ xpcc::stm32::I2cMaster{{ id }}::reset()
 
 // MARK: - ownership
 bool
-xpcc::stm32::I2cMaster{{ id }}::start(I2cTransaction *transaction, ConfigurationHandler configuration)
+xpcc::stm32::I2cMaster{{ id }}::start(I2cTransaction *transaction, ConfigurationHandler handler)
 {
 	xpcc::atomic::Lock lock;
 	// if we have a place in the queue and the transaction object is valid
@@ -622,7 +624,10 @@ xpcc::stm32::I2cMaster{{ id }}::start(I2cTransaction *transaction, Configuration
 			if (!xpcc::accessor::asVolatile(::transaction))
 			{
 				// configure the peripheral
-				if (configuration) configuration(configTag);
+				if (handler and configuration != handler) {
+					configuration = handler;
+					configuration();
+				}
 
 				DEBUG_STREAM("\n###\n");
 				::transaction = transaction;

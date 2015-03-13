@@ -28,7 +28,7 @@ struct I2c
 	static constexpr uint8_t Read  = 0x01;	///< Add the Read bit to the slave address
 
 	/// The signature of the configuration function.
-	using ConfigurationHandler = void(*)(uint8_t& tag);
+	using ConfigurationHandler = void(*)();
 
 	/// This tells the `I2cTransaction` why it was detached
 	/// @see I2cTransaction
