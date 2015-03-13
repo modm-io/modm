@@ -53,6 +53,10 @@ public:
 	/**
 	 * Request access to the spi master within a context.
 	 * You may aquire the spi master multiple times within the same context.
+	 *
+	 * The configuration handler will only be called when aquiring the spi
+	 * master for the first time (if it is not a `nullptr`).
+	 *
 	 * @warning		Aquires must be balanced with releases of the **same** context!
 	 * @warning		Aquires are persistent even after calling `initialize()`!
 	 *
@@ -60,10 +64,11 @@ public:
 	 * 			`>0` as the number of times this context aquired the master.
 	 */
 	static uint8_t
-	aquire(void *ctx);
+	aquire(void *ctx, ConfigurationHandler handler = nullptr);
 
 	/**
 	 * Release access to the spi master within a context.
+	 *
 	 * @warning		Releases must be balanced with aquires of the **same** context!
 	 * @warning		Releases are persistent even after calling `initialize()`!
 	 *

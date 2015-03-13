@@ -58,7 +58,7 @@ public:
 
 
 	static uint8_t
-	aquire(void *ctx);
+	aquire(void *ctx, ConfigurationHandler handler = nullptr);
 
 	static uint8_t
 	release(void *ctx);
@@ -87,6 +87,7 @@ private:
 	static uint8_t operationMode;
 	static uint8_t count;
 	static void *context;
+	static ConfigurationHandler configuration;
 };
 
 } // namespace xpcc

@@ -20,15 +20,23 @@ xpcc::stm32::SpiMaster{{ id }}::count(0);
 
 void *
 xpcc::stm32::SpiMaster{{ id }}::context(nullptr);
+
+xpcc::Spi::ConfigurationHandler
+xpcc::stm32::SpiMaster{{ id }}::configuration(nullptr);
 // ----------------------------------------------------------------------------
 
 uint8_t
-xpcc::stm32::SpiMaster{{ id }}::aquire(void *ctx)
+xpcc::stm32::SpiMaster{{ id }}::aquire(void *ctx, ConfigurationHandler handler = nullptr)
 {
 	if (context == nullptr)
 	{
 		context = ctx;
 		count = 1;
+		// if handler is not nullptr and is different from previous configuration
+		if (handler && configuration != handler) {
+			configuration = handler;
+			configuration();
+		}
 		return 1;
 	}
 

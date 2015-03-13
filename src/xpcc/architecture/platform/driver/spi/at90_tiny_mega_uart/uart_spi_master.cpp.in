@@ -25,6 +25,9 @@ xpcc::{{target.family}}::UartSpiMaster{{id}}::state(0);
 
 void *
 xpcc::{{target.family}}::UartSpiMaster{{id}}::context(nullptr);
+
+xpcc::Spi::ConfigurationHandler
+xpcc::{{target.family}}::UartSpiMaster{{id}}::configuration(nullptr);
 // ----------------------------------------------------------------------------
 
 void
@@ -47,12 +50,17 @@ xpcc::{{target.family}}::UartSpiMaster{{id}}::initialize(uint16_t prescaler)
 // ----------------------------------------------------------------------------
 
 uint8_t
-xpcc::{{target.family}}::UartSpiMaster{{id}}::aquire(void *ctx)
+xpcc::{{target.family}}::UartSpiMaster{{id}}::aquire(void *ctx, ConfigurationHandler handler = nullptr)
 {
 	if (context == nullptr)
 	{
 		context = ctx;
 		state = (state & ~0x3f) | 1;
+		// if handler is not nullptr and is different from previous configuration
+		if (handler && configuration != handler) {
+			configuration = handler;
+			configuration();
+		}
 		return 1;
 	}
 

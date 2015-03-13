@@ -31,6 +31,7 @@ class UartSpiMaster{{ id }} : public ::xpcc::SpiMaster
 {
 	static uint8_t state;
 	static void *context;
+	static ConfigurationHandler configuration;
 public:
 	static const TypeId::UartSpiMaster{{ id }}Mosi Mosi;
 	static const TypeId::UartSpiMaster{{ id }}Miso Miso;
@@ -131,7 +132,7 @@ public:
 
 
 	static uint8_t
-	aquire(void *ctx);
+	aquire(void *ctx, ConfigurationHandler handler = nullptr);
 
 	static uint8_t
 	release(void *ctx);

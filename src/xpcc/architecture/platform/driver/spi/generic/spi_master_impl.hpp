@@ -22,6 +22,10 @@ xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::count(0);
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 void *
 xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::context(nullptr);
+
+template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
+xpcc::Spi::ConfigurationHandler
+xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::configuration(nullptr);
 // ----------------------------------------------------------------------------
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
@@ -54,12 +58,17 @@ xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::setDataOrder(DataOrder order
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 uint8_t
-xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::aquire(void *ctx)
+xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::aquire(void *ctx, ConfigurationHandler handler = nullptr)
 {
 	if (ctx == nullptr)
 	{
 		context = ctx;
 		count = 1;
+		// if handler is not nullptr and is different from previous configuration
+		if (handler && configuration != handler) {
+			configuration = handler;
+			configuration();
+		}
 		return 1;
 	}
 

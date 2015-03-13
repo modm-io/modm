@@ -33,6 +33,7 @@ class SpiMaster{{ id }} : public xpcc::SpiMaster
 	static uint8_t state;
 	static uint8_t count;
 	static void *context;
+	static ConfigurationHandler configuration;
 public:
 	static const TypeId::SpiMaster{{ id }}Nss  Nss;
 	static const TypeId::SpiMaster{{ id }}Sck  Sck;
@@ -116,7 +117,7 @@ public:
 
 
 	static uint8_t
-	aquire(void *ctx);
+	aquire(void *ctx, ConfigurationHandler handler = nullptr);
 
 	static uint8_t
 	release(void *ctx);

@@ -39,25 +39,14 @@ public:
 	void inline
 	attachConfigurationHandler(Spi::ConfigurationHandler handler)
 	{
-		this->configuration = handler;
+		configuration = handler;
 	}
 
 protected:
 	bool inline
 	aquireMaster()
 	{
-		uint_fast8_t response = SpiMaster::aquire(this);
-
-		// another context is using it
-		if (response == 0)
-			return false;
-
-		// call configure only on the first aquire
-		if (response == 1 && this->configuration)
-			this->configuration();
-
-		// we have successfully aquired the master
-		return true;
+		return (SpiMaster::aquire(this, configuration) != 0);
 	}
 
 	bool inline

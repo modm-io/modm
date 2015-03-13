@@ -41,6 +41,7 @@ class SpiMaster : public ::xpcc::SpiMaster, private Spi
 {
 	static uint8_t state;
 	static void *context;
+	static ConfigurationHandler configuration;
 public:
 	static const TypeId::SpiMasterMosi Mosi;
 	static const TypeId::SpiMasterMiso Miso;
@@ -115,7 +116,7 @@ public:
 
 
 	static uint8_t
-	aquire(void *ctx);
+	aquire(void *ctx, ConfigurationHandler handler = nullptr);
 
 	static uint8_t
 	release(void *ctx);
