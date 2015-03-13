@@ -50,7 +50,7 @@ xpcc::{{target.family}}::UartSpiMaster{{id}}::initialize(uint16_t prescaler)
 // ----------------------------------------------------------------------------
 
 uint8_t
-xpcc::{{target.family}}::UartSpiMaster{{id}}::aquire(void *ctx, ConfigurationHandler handler = nullptr)
+xpcc::{{target.family}}::UartSpiMaster{{id}}::aquire(void *ctx, ConfigurationHandler handler)
 {
 	if (context == nullptr)
 	{

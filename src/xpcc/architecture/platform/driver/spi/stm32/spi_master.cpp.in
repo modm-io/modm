@@ -26,7 +26,7 @@ xpcc::stm32::SpiMaster{{ id }}::configuration(nullptr);
 // ----------------------------------------------------------------------------
 
 uint8_t
-xpcc::stm32::SpiMaster{{ id }}::aquire(void *ctx, ConfigurationHandler handler = nullptr)
+xpcc::stm32::SpiMaster{{ id }}::aquire(void *ctx, ConfigurationHandler handler)
 {
 	if (context == nullptr)
 	{

@@ -36,7 +36,7 @@ xpcc::{{target.family}}::SpiMaster::initialize(Prescaler prescaler)
 // ----------------------------------------------------------------------------
 
 uint8_t
-xpcc::{{target.family}}::SpiMaster::aquire(void *ctx, ConfigurationHandler handler = nullptr)
+xpcc::{{target.family}}::SpiMaster::aquire(void *ctx, ConfigurationHandler handler)
 {
 	if (context == nullptr)
 	{

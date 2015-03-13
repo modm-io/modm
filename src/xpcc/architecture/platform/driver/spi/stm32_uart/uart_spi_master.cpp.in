@@ -31,7 +31,7 @@ xpcc::stm32::UartSpiMaster{{ id }}::configuration(nullptr);
 // ----------------------------------------------------------------------------
 
 uint8_t
-xpcc::stm32::UartSpiMaster{{ id }}::aquire(void *ctx, ConfigurationHandler handler = nullptr)
+xpcc::stm32::UartSpiMaster{{ id }}::aquire(void *ctx, ConfigurationHandler handler)
 {
 	if (context == nullptr)
 	{
