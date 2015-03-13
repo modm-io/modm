@@ -65,7 +65,7 @@ xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::aquire(void *ctx, Configurat
 		context = ctx;
 		count = 1;
 		// if handler is not nullptr and is different from previous configuration
-		if (handler && configuration != handler) {
+		if (handler and configuration != handler) {
 			configuration = handler;
 			configuration();
 		}

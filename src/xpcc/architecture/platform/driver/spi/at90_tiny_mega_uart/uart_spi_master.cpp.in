@@ -57,7 +57,7 @@ xpcc::{{target.family}}::UartSpiMaster{{id}}::aquire(void *ctx, ConfigurationHan
 		context = ctx;
 		state = (state & ~0x3f) | 1;
 		// if handler is not nullptr and is different from previous configuration
-		if (handler && configuration != handler) {
+		if (handler and configuration != handler) {
 			configuration = handler;
 			configuration();
 		}
