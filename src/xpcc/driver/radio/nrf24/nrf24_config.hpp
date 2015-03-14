@@ -186,6 +186,10 @@ public:
 	static Pipe_t
 	getPayloadPipe();
 
+	static uint8_t
+	getRetryCount()
+	{ return (Nrf24Phy::readRegister(NrfRegister::OBSERVE_TX) & (uint8_t)ObserveTx::ARC_CNT); }
+
 };
 
 }   // namespace xpcc
