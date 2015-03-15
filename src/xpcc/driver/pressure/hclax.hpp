@@ -79,6 +79,7 @@ public:
 	:	data(data), i2cTask(I2cTask::Idle), i2cSuccess(0),
 		adapter(0x78, i2cTask, i2cSuccess)
 	{
+		adapter.configureRead(data.data, 2);
 	}
 
 	/// pings the sensor
@@ -92,6 +93,8 @@ public:
 
 		CO_WAIT_WHILE(i2cTask == I2cTask::Ping);
 
+		adapter.configureRead(data.data, 2);
+
 		CO_END_RETURN(i2cSuccess == I2cTask::Ping);
 	}
 
@@ -101,8 +104,8 @@ public:
 	{
 		CO_BEGIN();
 
-		CO_WAIT_UNTIL(adapter.configureRead(data.data, 2) and
-				(i2cTask = I2cTask::ReadPressure, this->startTransaction(&adapter)));
+		CO_WAIT_UNTIL((i2cTask = I2cTask::ReadPressure,
+				this->startTransaction(&adapter)));
 
 		CO_WAIT_WHILE(i2cTask == I2cTask::ReadPressure);
 
