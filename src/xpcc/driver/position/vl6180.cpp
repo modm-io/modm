@@ -80,7 +80,6 @@ FLASH_STORAGE(BinaryConfiguration configuration[]) =
 	// 46
 };
 
-/// binary scaled gain values (scalar is 1638)
 FLASH_STORAGE(float gain[]) =
 {
 	20,		//0x40

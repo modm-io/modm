@@ -92,11 +92,18 @@ public:
 
 			if (PT_CALL(distance.readDistance()))
 			{
-				uint8_t mm = distance.data.getDistance();
-				XPCC_LOG_DEBUG << "mm: " << mm;
-				LedGreen::set(mm > 100);
-				LedBlue::set(mm > 50);
-				LedRed::set(mm > 10);
+				xpcc::vl6180::RangeErrorCode error = distance.getRangeError();
+				if (error == distance.RangeErrorCode::NoError)
+				{
+					uint8_t mm = distance.data.getDistance();
+					XPCC_LOG_DEBUG << "mm: " << mm;
+					LedGreen::set(mm > 100);
+					LedBlue::set(mm > 50);
+					LedRed::set(mm > 10);
+				}
+				else {
+					XPCC_LOG_DEBUG << "Error: " << (uint8_t(error) >> 4);
+				}
 			}
 
 			XPCC_LOG_DEBUG << "\tt=" << (xpcc::Clock::now() - stamp);
@@ -104,8 +111,15 @@ public:
 
 			if (PT_CALL(distance.readAmbientLight()))
 			{
-				uint32_t lux = distance.data.getAmbientLight();
-				XPCC_LOG_DEBUG << "\tLux: " << lux;
+				xpcc::vl6180::ALS_ErrorCode error = distance.getALS_Error();
+				if (error == distance.ALS_ErrorCode::NoError)
+				{
+					uint32_t lux = distance.data.getAmbientLight();
+					XPCC_LOG_DEBUG << "\tLux: " << lux;
+				}
+				else {
+					XPCC_LOG_DEBUG << "\tError: " << (uint8_t(error) >> 4);
+				}
 			}
 
 			XPCC_LOG_DEBUG << " \tt=" << (xpcc::Clock::now() - stamp) << xpcc::endl;

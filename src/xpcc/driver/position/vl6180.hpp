@@ -364,22 +364,32 @@ public:
 	xpcc::co::Result<bool>
 	setAddress(uint8_t address);
 
-	/// reads the distance and buffer the results (can take 10-30ms).
-	xpcc::co::Result<bool>
-	readDistance()
-	{ return readSensor(true); }
-
-	/// reads the ambient light and buffer the results (can take 10-30ms).
-	xpcc::co::Result<bool>
-	readAmbientLight()
-	{ return readSensor(false); }
-
 	xpcc::co::Result<bool>
 	setGain(AnalogGain gain);
 
 	/// @param	time	integration time in ms, max ~500ms.
 	xpcc::co::Result<bool>
 	setIntegrationTime(uint16_t time);
+
+	/// Reads the distance and buffer the results (can take 10-55ms).
+	xpcc::co::Result<bool>
+	readDistance()
+	{ return readSensor(true); }
+
+	/// Reads the ambient light and buffer the results
+	/// This takes as long as the chosen integration time (100ms default).
+	xpcc::co::Result<bool>
+	readAmbientLight()
+	{ return readSensor(false); }
+
+	inline RangeErrorCode
+	getRangeError()
+	{ return rangeError; }
+
+	inline ALS_ErrorCode
+	getALS_Error()
+	{ return alsError; }
+
 
 	template <typename T>
 	xpcc::co::Result<bool>
@@ -394,10 +404,13 @@ public:
 	write(Register reg, uint8_t value)
 	{ return write(reg, value, 1); }
 
+protected:
+	/// @cond
 	/// read a 8bit value from a register
 	xpcc::co::Result<bool> ALWAYS_INLINE
 	read(Register reg, uint8_t &value)
 	{ return read(reg, &value, 1); }
+	/// @endcond
 
 public:
 	/// the data object for this sensor.
@@ -408,13 +421,17 @@ protected:
 	/// write multiple 8bit values from a start register
 	xpcc::co::Result<bool>
 	write(Register reg, uint8_t value, uint8_t length);
+	/// @endcond
 
+public:
 	/// read multiple 8bit values from a start register
 	xpcc::co::Result<bool>
 	read(Register reg, uint8_t *buffer, uint8_t length);
 
+protected:
+	/// @cond
 	xpcc::co::Result<bool>
-	updateControlRegister(Register reg, Control_t setMask, Control_t clearMask = 0xff);
+	updateControlRegister(Register reg, Control_t setMask, Control_t clearMask = Control_t(0xff));
 	/// @endcond
 
 private:
@@ -442,7 +459,6 @@ private:
 
 	xpcc::accessor::Flash<vl6180_private::BinaryConfiguration> configuration;
 
-protected:
 	/// @cond
 	// Internal write buffer
 	// 0: Index[15:8]
