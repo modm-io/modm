@@ -171,6 +171,7 @@ public:
 	XPCC_FLAGS8(InterruptClear);
 
 	/// SYSRANGE__START
+	/// SYSALS__START
 	enum class
 	Start : uint8_t
 	{
@@ -390,7 +391,6 @@ private:
 
 		WriteRegister = 1,
 		ReadRegister = 2,
-		Readout = 3,
 
 		Ping = 0xff
 	};

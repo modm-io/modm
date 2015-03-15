@@ -69,7 +69,7 @@ xpcc::Vl6180<I2cMaster>::readDistance()
 	if ( CO_CALL(write(Register::SYSRANGE__START, rawBuffer[2])) )
 	{
 		// Measurement will take 7.5ms + convergence time (< ~10ms)
-		timeout.restart(8);
+		timeout.restart(10);
 		CO_WAIT_UNTIL(timeout.isExpired());
 
 		// When the measurement is completed, bit 2 of RESULT__INTERRUPT_STATUS_GPIO{0x4F} will be set.
@@ -83,8 +83,8 @@ xpcc::Vl6180<I2cMaster>::readDistance()
 			if ( RangeInterruptStatus_t::get(InterruptStatus_t(rawBuffer[2])) == InterruptSource::NewSampleReady )
 				break;
 
-			// otherwise wait 1ms and try again
-			timeout.restart(1);
+			// otherwise wait 2ms and try again
+			timeout.restart(2);
 			CO_WAIT_UNTIL(timeout.isExpired());
 		}
 
@@ -111,8 +111,8 @@ xpcc::Vl6180<I2cMaster>::readDistance()
 						break;
 					}
 
-					// otherwise wait 1ms and try again
-					timeout.restart(1);
+					// otherwise wait 2ms and try again
+					timeout.restart(2);
 					CO_WAIT_UNTIL(timeout.isExpired());
 				}
 
