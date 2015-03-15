@@ -60,15 +60,37 @@ FLASH_STORAGE(BinaryConfiguration configuration[]) =
 	{0x10a, 0x30},	// Set the averaging sample period (compromise between lower noise and increased execution time)
 	{0x03f, 0x46},	// Sets the light and dark gain (upper nibble). Dark gain should not be changed.
 	{0x031, 0xff},	// sets the # of range measurements after which auto calibration of system is performed
-	{0x040, 0x63},	// Set ALS integration time to 100ms
+	{0x040, 0x00},	// Set ALS integration time to 100ms MSB
 	// 35
+	{0x041, 0x63},	// Set ALS integration time to 100ms LSB
 	{0x02e, 0x01},	// perform a single temperature calibration of the ranging sensor
 
 	// Optional: Public registers
+	{0x014, 0x24},	// Configures interrupt on `New Sample Ready threshold event`
 	{0x01b, 0x09},	// Set default ranging inter-measurement period to 100ms
 	{0x03e, 0x31},	// Set default ALS inter-measurement period to 500ms
-	{0x014, 0x24},	// Configures interrupt on `New Sample Ready threshold event`
-	// 39
+	// 40
+//	{0x120, 0x01},	// Firmware scaler of 1
+//	{0x01c, 0x00},	// Set max convergence time to 30ms MSB
+//	{0x01d, 30},	// Set max convergence time to 30ms LSB
+//	{0x022, 0x00},	// Early convergence estimate cut off at 80% MSB
+//	{0x023, 204},	// Early convergence estimate cut off at 80% LSB
+//	// 45
+//	{0x02D, 0x11},	// Range check enabled: SNR and ECE
+	// 46
+};
+
+/// binary scaled gain values (scalar is 1638)
+FLASH_STORAGE(float gain[]) =
+{
+	20,		//0x40
+	10.32,	//0x41
+	5.21,	//0x42
+	2.6,	//0x43
+	1.72,	//0x44
+	1.28,	//0x45
+	1.01,	//0x46
+	40		//0x47
 };
 
 }	// namespace vl6180_private

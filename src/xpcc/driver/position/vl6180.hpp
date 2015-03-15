@@ -27,7 +27,10 @@ namespace vl6180_private
 		uint8_t value;
 	};
 	// see Application Note AN4545 page 24: SR03 settings
-	EXTERN_FLASH_STORAGE(BinaryConfiguration configuration[39]);
+	EXTERN_FLASH_STORAGE(BinaryConfiguration configuration[40]);
+
+	// gain settings
+	EXTERN_FLASH_STORAGE(float gain[8]);
 }	// namespace vl6180_private
 /// @endcond
 
@@ -43,15 +46,15 @@ public:
 	enum class
 	Register : uint16_t
 	{
-		IDENTIFICATION__MODEL_ID = 0x0,
-		IDENTIFICATION__MODEL_REV_MAJOR = 0x1,
-		IDENTIFICATION__MODEL_REV_MINOR = 0x2,
-		IDENTIFICATION__MODULE_REV_MAJOR = 0x3,
-		IDENTIFICATION__MODULE_REV_MINOR = 0x4,
-		IDENTIFICATION__DATE_HI = 0x6,
-		IDENTIFICATION__DATE_LO = 0x7,
-		IDENTIFICATION__TIME_HI = 0x8,
-		IDENTIFICATION__TIME_LO = 0x9,
+		IDENTIFICATION__MODEL_ID = 0x00,
+		IDENTIFICATION__MODEL_REV_MAJOR = 0x01,
+		IDENTIFICATION__MODEL_REV_MINOR = 0x02,
+		IDENTIFICATION__MODULE_REV_MAJOR = 0x03,
+		IDENTIFICATION__MODULE_REV_MINOR = 0x04,
+		IDENTIFICATION__DATE_HI = 0x06,
+		IDENTIFICATION__DATE_LO = 0x07,
+		IDENTIFICATION__TIME_HI = 0x08,
+		IDENTIFICATION__TIME_LO = 0x09,
 
 		SYSTEM__MODE_GPIO0 = 0x10,
 		SYSTEM__MODE_GPIO1 = 0x11,
@@ -210,7 +213,7 @@ public:
 
 	/// SYSALS__ANALOGUE_GAIN
 	enum class
-	AnalogLight : uint8_t
+	AnalogGain : uint8_t
 	{
 		Gain1_0  = 0x46,
 		Gain1_25 = 0x45,
@@ -307,16 +310,28 @@ public:
 		template< class I2cMaster >
 		friend class Vl6180;
 
-		/// returns the distance in millimeters
-		inline uint8_t
-		getDistance() { return data; }
+		Data()
+		:	gain(6), time(100) {}
 
+		/// @return the distance in millimeters, 255 if error
+		inline uint8_t
+		getDistance() { return data[0]; }
+
+		/// @return the ambient light in calibrated LUX
 		inline float
-		operator [](uint8_t index)
-		{ return (index == 0) ? data : 0; }
+		getAmbientLight()
+		{
+			uint16_t* rawData = reinterpret_cast<uint16_t*>(data+1);
+			uint16_t value = xpcc::fromBigEndian(*rawData);
+			float lux = (32.f * value);
+			lux /= (vl6180_private::gain[gain & 0x7] * time);
+			return lux;
+		}
 
 	private:
-		uint8_t data;
+		uint8_t data[3];
+		uint8_t gain;
+		uint16_t time;
 	};
 }; // struct vl6180
 
@@ -344,9 +359,27 @@ public:
 	xpcc::co::Result<bool>
 	initialize();
 
-	/// reads the distance and buffer the results (can take 20-35ms).
+	/// Set a new address (< 128) for this device.
+	/// Address is not permanent and must be set again after every device boot.
 	xpcc::co::Result<bool>
-	readDistance();
+	setAddress(uint8_t address);
+
+	/// reads the distance and buffer the results (can take 10-30ms).
+	xpcc::co::Result<bool>
+	readDistance()
+	{ return readSensor(true); }
+
+	/// reads the ambient light and buffer the results (can take 10-30ms).
+	xpcc::co::Result<bool>
+	readAmbientLight()
+	{ return readSensor(false); }
+
+	xpcc::co::Result<bool>
+	setGain(AnalogGain gain);
+
+	/// @param	time	integration time in ms, max ~500ms.
+	xpcc::co::Result<bool>
+	setIntegrationTime(uint16_t time);
 
 	template <typename T>
 	xpcc::co::Result<bool>
@@ -358,8 +391,8 @@ public:
 public:
 	/// write a 8bit value a register
 	xpcc::co::Result<bool> ALWAYS_INLINE
-	write(Register reg, uint8_t &value)
-	{ return write(reg, &value, 1); }
+	write(Register reg, uint8_t value)
+	{ return write(reg, value, 1); }
 
 	/// read a 8bit value from a register
 	xpcc::co::Result<bool> ALWAYS_INLINE
@@ -374,7 +407,7 @@ protected:
 	/// @cond
 	/// write multiple 8bit values from a start register
 	xpcc::co::Result<bool>
-	write(Register reg, uint8_t *buffer, uint8_t length);
+	write(Register reg, uint8_t value, uint8_t length);
 
 	/// read multiple 8bit values from a start register
 	xpcc::co::Result<bool>
@@ -383,6 +416,10 @@ protected:
 	xpcc::co::Result<bool>
 	updateControlRegister(Register reg, Control_t setMask, Control_t clearMask = 0xff);
 	/// @endcond
+
+private:
+	xpcc::co::Result<bool>
+	readSensor(bool isDistance = true);
 
 private:
 	enum I2cTask : uint8_t
@@ -401,6 +438,7 @@ private:
 
 	xpcc::ShortTimeout timeout;
 	RangeErrorCode rangeError;
+	ALS_ErrorCode alsError;
 
 	xpcc::accessor::Flash<vl6180_private::BinaryConfiguration> configuration;
 
@@ -411,9 +449,8 @@ protected:
 	// 1: Index[7:0]
 	// 2: Data[0]
 	// 3: Data[1]
-	// 4: Data[2]
-	// 5: Data[3]
-	uint8_t rawBuffer[6];
+	uint8_t i2cBuffer[4];
+	uint8_t logicBuffer[2];
 	/// @endcond
 };
 
