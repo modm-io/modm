@@ -25,7 +25,7 @@ namespace xpcc
  *
  * If any special behavior is expected, you can copy and modify these
  * tables into your own project.
- * Most of these use a gamma of 2.0.
+ * Most of these use a gamma of 2.2.
  */
 namespace ui
 {
