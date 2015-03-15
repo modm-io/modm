@@ -158,6 +158,13 @@ public:
 	{
 	}
 
+	///	@param	address	the slave address not yet shifted left (address < 128).
+	void inline
+	setAddress(uint8_t address)
+	{
+		this->address = address << 1;
+	}
+
 	/// @return `Busy` while an I2C operation is ongoing. Reinitialization
 	///			is not permitted during this phase.
 	AdapterState inline
@@ -176,7 +183,7 @@ public:
 	/**
 	 * Initializes the adapter to only send the address without payload.
 	 *
-	 * @return  `true` if adapter was not in use and accepted the information,
+	 * @return  `true` if adapter was not in use,
 	 *          `false` otherwise
 	 */
 	bool ALWAYS_INLINE
@@ -193,7 +200,7 @@ public:
 	 * @param[out]	readBuffer	buffer to write the read bytes from the slave
 	 * @param		readSize	number of bytes to be read, set to `0` to read nothing
 	 *
-	 * @return  `true` if adapter was not in use and accepted the information,
+	 * @return  `true` if adapter was not in use,
 	 *          `false` otherwise
 	 */
 	bool inline
@@ -244,7 +251,7 @@ public:
 	 * @param[in] 	buffer	buffer to be written to the slave
 	 * @param		size	number of bytes to be written, set to `0` to write nothing
 	 *
-	 * @return  `true` if adapter was not in use and accepted the information,
+	 * @return  `true` if adapter was not in use,
 	 *          `false` otherwise
 	 */
 	bool ALWAYS_INLINE
@@ -259,7 +266,7 @@ public:
 	 * @param[out] 	buffer	buffer to be read from the slave
 	 * @param		size	number of bytes to be read, set to `0` to read nothing
 	 *
-	 * @return  `true` if adapter was not in use and accepted the information,
+	 * @return  `true` if adapter was not in use,
 	 *          `false` otherwise
 	 */
 	bool ALWAYS_INLINE
@@ -374,6 +381,13 @@ public:
 	{
 	}
 
+	///	@param	address	the slave address not yet shifted left (address < 128).
+	void inline
+	setAddress(uint8_t address)
+	{
+		this->address = address << 1;
+	}
+
 	/// @return `Busy` while an I2C operation is ongoing. Reinitialization
 	///			is not permitted during this phase.
 	AdapterState inline
@@ -392,7 +406,7 @@ public:
 	/**
 	 * Initializes the adapter to only send the address without payload.
 	 *
-	 * @return  `true` if adapter was not in use and accepted the information,
+	 * @return  `true` if adapter was not in use,
 	 *          `false` otherwise
 	 */
 	bool ALWAYS_INLINE
@@ -407,7 +421,7 @@ public:
 	 * @param[in] 	buffer	buffer to be written to the slave
 	 * @param		size	number of bytes to be written, set to `0` to write nothing
 	 *
-	 * @return  `true` if adapter was not in use and accepted the information,
+	 * @return  `true` if adapter was not in use,
 	 *          `false` otherwise
 	 */
 	bool inline
@@ -484,6 +498,13 @@ public:
 	{
 	}
 
+	///	@param	address	the slave address not yet shifted left (address < 128).
+	void inline
+	setAddress(uint8_t address)
+	{
+		this->address = address << 1;
+	}
+
 	/// @return `Busy` while an I2C operation is ongoing. Reinitialization
 	///			is not permitted during this phase.
 	AdapterState inline
@@ -502,7 +523,7 @@ public:
 	/**
 	 * Initializes the adapter to only send the address without payload.
 	 *
-	 * @return  `true` if adapter was not in use and accepted the information,
+	 * @return  `true` if adapter was not in use,
 	 *          `false` otherwise
 	 */
 	bool ALWAYS_INLINE
@@ -517,11 +538,11 @@ public:
 	 * @param[out] 	buffer	buffer to be read from the slave
 	 * @param		size	number of bytes to be read, set to `0` to read nothing
 	 *
-	 * @return  `true` if adapter was not in use and accepted the information,
+	 * @return  `true` if adapter was not in use,
 	 *          `false` otherwise
 	 */
 	bool inline
-	configureRead(uint8_t * buffer, std::size_t size)
+	configureRead(uint8_t *buffer, std::size_t size)
 	{
 		if (state != AdapterState::Busy)
 		{
