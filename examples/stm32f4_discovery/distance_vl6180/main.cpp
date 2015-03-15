@@ -19,21 +19,20 @@ xpcc::log::Logger xpcc::log::error(device);
 #define	XPCC_LOG_LEVEL xpcc::log::DEBUG
 
 /**
- * Example to demonstrate a XPCC driver for position sensor VL6180
+ * Example to demonstrate a XPCC driver for distance sensor VL6180
  *
  * This example uses I2cMaster2 of STM32F407
  *
- * SDA PB11
- * SCL PB10
+ * SDA		PB11
+ * SCL		PB10
+ * GPIO0	PB14
  *
- * GND and +3V3 are connected to the colour sensor.
- *
+ * GND and +3V are connected to the sensor.
  */
 
-// typedef I2cMaster1 MyI2cMaster;
 typedef I2cMaster2 MyI2cMaster;
 // typedef xpcc::SoftwareI2cMaster<GpioB10, GpioB11> MyI2cMaster;
-
+typedef GpioOutputB14 VlReset;
 
 xpcc::vl6180::Data data;
 xpcc::Vl6180<MyI2cMaster> distance(data);
@@ -45,6 +44,16 @@ public:
 	update()
 	{
 		PT_BEGIN();
+
+		VlReset::reset();
+		this->timeout.restart(1);
+		PT_WAIT_UNTIL(this->timeout.isExpired());
+
+		// bring device out of reset
+		VlReset::set();
+		// wait 5ms
+		this->timeout.restart(5);
+		PT_WAIT_UNTIL(this->timeout.isExpired());
 
 		XPCC_LOG_DEBUG << "Ping the device from ThreadOne" << xpcc::endl;
 
@@ -72,26 +81,45 @@ public:
 		}
 
 		XPCC_LOG_DEBUG << "Device initialized" << xpcc::endl;
+		this->timeout.restart(1);
+
+		PT_CALL(distance.setIntegrationTime(10));
+		PT_CALL(distance.setAddress(100));
 
 		while (true)
 		{
+			stamp = xpcc::Clock::now();
+
 			if (PT_CALL(distance.readDistance()))
 			{
 				uint8_t mm = distance.data.getDistance();
-				XPCC_LOG_DEBUG << "distance in mm: " << mm << xpcc::endl;
+				XPCC_LOG_DEBUG << "mm: " << mm;
 				LedGreen::set(mm > 100);
 				LedBlue::set(mm > 50);
 				LedRed::set(mm > 10);
 			}
-			this->timeout.restart(50);
+
+			XPCC_LOG_DEBUG << "\tt=" << (xpcc::Clock::now() - stamp);
+			stamp = xpcc::Clock::now();
+
+			if (PT_CALL(distance.readAmbientLight()))
+			{
+				uint32_t lux = distance.data.getAmbientLight();
+				XPCC_LOG_DEBUG << "\tLux: " << lux;
+			}
+
+			XPCC_LOG_DEBUG << " \tt=" << (xpcc::Clock::now() - stamp) << xpcc::endl;
+
 			PT_WAIT_UNTIL(this->timeout.isExpired());
+			this->timeout.restart(40);
 		}
 
 		PT_END();
 	}
 
 private:
-	xpcc::ShortTimeout timeout;
+	xpcc::Timeout timeout;
+	xpcc::Timestamp stamp;
 };
 
 ThreadOne one;
@@ -106,6 +134,7 @@ MAIN_FUNCTION
 	LedGreen::setOutput(xpcc::Gpio::Low);
 	LedRed::setOutput(xpcc::Gpio::Low);
 	LedBlue::setOutput(xpcc::Gpio::Low);
+	VlReset::setOutput(Gpio::OutputType::OpenDrain);
 
 	GpioOutputA2::connect(Usart2::Tx);
 	Usart2::initialize<defaultSystemClock, xpcc::Uart::B115200>(10);
@@ -116,7 +145,7 @@ MAIN_FUNCTION
 	GpioB11::connect(I2cMaster2::Sda);
 	GpioB10::connect(I2cMaster2::Scl);
 
-	MyI2cMaster::initialize<defaultSystemClock, 100000>();
+	MyI2cMaster::initialize<defaultSystemClock, 400000>();
 
 	XPCC_LOG_INFO << "\n\nWelcome to VL6180X demo!\n\n";
 
