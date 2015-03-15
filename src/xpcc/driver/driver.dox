@@ -70,6 +70,13 @@
 
 /**
  * \ingroup		driver
+ * \defgroup	driver_position	Position sensors
+ *
+ * Absolute or relative position and distance sensors.
+ */
+
+/**
+ * \ingroup		driver
  * \defgroup	driver_pressure	Pressure sensors
  */
 

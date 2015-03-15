@@ -41,7 +41,6 @@ class Vl6180;
 struct vl6180
 {
 public:
-	/// @cond
 	/// The addresses of the Configuration and Data Registers
 	enum class
 	Register : uint16_t
@@ -291,7 +290,7 @@ public:
 	typedef xpcc::Configuration<InterruptStatus_t, InterruptError, (3 << 6)> InterruptError_t;
 
 public:
-	typedef xpcc::FlagsGroup<
+	using Control_t = xpcc::FlagsGroup<
 			GpioMode_t,
 			HistoryControl_t,
 			InterruptConfig_t,
@@ -301,7 +300,7 @@ public:
 			VhvRecalibrate_t,
 			RangeStatus_t,
 			ALS_Status_t,
-			InterruptStatus_t> Control_t;
+			InterruptStatus_t>;
 
 public:
 	struct ATTRIBUTE_PACKED
@@ -317,7 +316,7 @@ public:
 		inline uint8_t
 		getDistance() { return data[0]; }
 
-		/// @return the ambient light in calibrated LUX
+		/// @return the ambient light in calibrated LUX, values depend on chosen analog gain!
 		inline float
 		getAmbientLight()
 		{
@@ -364,9 +363,11 @@ public:
 	xpcc::co::Result<bool>
 	setAddress(uint8_t address);
 
+	/// Sets a new analog gain for ALS.
 	xpcc::co::Result<bool>
 	setGain(AnalogGain gain);
 
+	/// Sets a new integration time for ALS.
 	/// @param	time	integration time in ms, max ~500ms.
 	xpcc::co::Result<bool>
 	setIntegrationTime(uint16_t time);
@@ -376,7 +377,7 @@ public:
 	readDistance()
 	{ return readSensor(true); }
 
-	/// Reads the ambient light and buffer the results
+	/// Reads the ambient light and buffer the results.
 	/// This takes as long as the chosen integration time (100ms default).
 	xpcc::co::Result<bool>
 	readAmbientLight()
