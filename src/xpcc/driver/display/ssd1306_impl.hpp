@@ -43,27 +43,27 @@ xpcc::Ssd1306<I2cMaster>::initialize()
 {
 	CO_BEGIN();
 
-	initSuccessful = true;
-	initSuccessful &= CO_CALL(writeCommand(Command::SetDisplayOff));
-	initSuccessful &= CO_CALL(writeCommand(Command::SetDisplayClockDivideRatio, 0xF0));
-	initSuccessful &= CO_CALL(writeCommand(Command::SetMultiplexRatio, 0x3F));
-	initSuccessful &= CO_CALL(writeCommand(Command::SetDisplayOffset, 0x00));
-	initSuccessful &= CO_CALL(writeCommand(Command::SetDisplayStartLine | 0x00));
-	initSuccessful &= CO_CALL(writeCommand(Command::SetChargePump, 0x14));
-	initSuccessful &= CO_CALL(writeCommand(Command::SetMemoryMode, 0x01));
-	initSuccessful &= CO_CALL(writeCommand(Command::SetSegmentRemap127));
-	initSuccessful &= CO_CALL(writeCommand(Command::SetComOutputScanDirectionDecrement));
-	initSuccessful &= CO_CALL(writeCommand(Command::SetComPins, 0x12));
-	initSuccessful &= CO_CALL(writeCommand(Command::SetContrastControl, 0xCE));
-	initSuccessful &= CO_CALL(writeCommand(Command::SetPreChargePeriod, 0xF1));
-	initSuccessful &= CO_CALL(writeCommand(Command::SetV_DeselectLevel, 0x40));
-	initSuccessful &= CO_CALL(writeCommand(Command::SetEntireDisplayResumeToRam));
-	initSuccessful &= CO_CALL(writeCommand(Command::SetNormalDisplay));
-//	initSuccessful &= CO_CALL(writeCommand(Command::SetColumnAddress, 0, 127));
-//	initSuccessful &= CO_CALL(writeCommand(Command::SetPageAddress, 0, 7));
-	initSuccessful &= CO_CALL(writeCommand(Command::SetDisplayOn));
+	commandBuffer[13] = true;
+	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetDisplayOff));
+	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetDisplayClockDivideRatio, 0xF0));
+	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetMultiplexRatio, 0x3F));
+	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetDisplayOffset, 0x00));
+	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetDisplayStartLine | 0x00));
+	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetChargePump, 0x14));
+	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetMemoryMode, 0x01));
+	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetSegmentRemap127));
+	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetComOutputScanDirectionDecrement));
+	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetComPins, 0x12));
+	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetContrastControl, 0xCE));
+	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetPreChargePeriod, 0xF1));
+	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetV_DeselectLevel, 0x40));
+	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetEntireDisplayResumeToRam));
+	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetNormalDisplay));
+//	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetColumnAddress, 0, 127));
+//	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetPageAddress, 0, 7));
+	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetDisplayOn));
 
-	CO_END_RETURN(initSuccessful);
+	CO_END_RETURN(commandBuffer[13]);
 }
 
 // ----------------------------------------------------------------------------

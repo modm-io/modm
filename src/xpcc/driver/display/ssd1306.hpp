@@ -248,7 +248,6 @@ private:
 
 private:
 	uint8_t commandBuffer[14];
-	bool initSuccessful;
 
 	volatile uint8_t i2cTask;
 	volatile uint8_t i2cSuccess;
