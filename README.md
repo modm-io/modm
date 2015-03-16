@@ -1,7 +1,7 @@
-![xpcc logo](https://github.com/roboterclubaachen/xpcc/raw/master/doc/images/logo_xpcc.png)
+[![Build Status](https://travis-ci.org/roboterclubaachen/xpcc.svg?branch=develop)](https://travis-ci.org/roboterclubaachen/xpcc)
 
-xpcc microcontroller framework [![Build Status](https://travis-ci.org/roboterclubaachen/xpcc.svg?branch=develop)](https://travis-ci.org/roboterclubaachen/xpcc)
-==============================
+xpcc: C++ microcontroller framework
+===================================
 
 The xpcc framework consists of powerful hardware abstraction layers for many
 different microcontrollers, a set of drivers for various external chips, 
@@ -11,6 +11,7 @@ and a general purpose toolbox for building hardware orientated applications.
 The main goal of xpcc is to provide a simple API for barebone microcontroller programming, 
 which is efficient enough to be deployed on a small ATtiny, yet powerful enough to make
 use of advanced capabilities found on the 32bit ARM Cortex-M.
+
 
 Main Features
 -------------
@@ -34,6 +35,53 @@ Main Features
 - graphical user interface for small screens.
 
 
+Hardware support
+----------------
+
+Here is a list of supported **and tested** microcontrollers:
+
+- AT90CAN family
+- ATtiny44 family
+- ATtiny85 family
+- ATmega644 family
+- ATmega328p family (Arduino Uno)
+- ATmega1280 family (Arduino Mega)
+- STM32F407 family (STM32F4 Discovery Board)
+- STM32F303 family (STM32F3 Discovery Board)
+- LPC11C24 (LPCxpresso Board)
+
+Please see [our examples](https://github.com/roboterclubaachen/xpcc/tree/develop/examples) 
+for a complete list of tested projects.
+
+While the xpcc API is designed to be extremely portable, we are only a small team of developers and
+therefore are limited in the amount of platforms we can support.
+The following microcontrollers should be able to compile, but *have not been tested extensively* in hardware:
+
+- All AT90's
+- All ATtiny's
+- All ATmega's
+
+There are more platforms which we have prepared, but currently not finished support for (Xmega, STM32F{0,1,2}).
+A complete support list of tested and/or compilable and/or potentially portable microcontrollers is available in our
+[device file section](https://github.com/roboterclubaachen/xpcc/tree/develop/src/xpcc/architecture/platform/devices).
+
+Drop us an email, if you want to get your hands dirty and help us finish the support.
+
+
+Documentation
+-------------
+
+The project homepage is located at [xpcc.io](http://xpcc.io).  
+Complete installation instructions for our build system and toolchains can [be found here](http://xpcc.io/install.html).
+
+The API documentation is created from doxygen files in the doc-folder and can be found [online here](http://xpcc.io/api/).  
+If you want to have up-to-date documentation of the develop branch, execute `scons doc`
+in the xpcc root directory and the current development documentation will be available
+in `xpcc/doc/build/api/index.html`.
+
+xpcc also has [a blog for in-depth write ups](http://blog.xpcc.io) of the programming techniques used.
+
+
 Get the Code
 ------------
 
@@ -41,6 +89,7 @@ We recommend cloning the source code using Git:
 
     $ git clone git://github.com/roboterclubaachen/xpcc.git xpcc
     $ cd xpcc
+
 
 Use our virtual machine
 -----------------------
@@ -70,53 +119,6 @@ Once your programmer is connected to the virtual machine, you may simply program
 
 	$ scons program
 
-Documentation
--------------
-
-The project homepage is located at [xpcc.io](http://xpcc.io).  
-Complete installation instructions for our build system and toolchains can [be found here](http://xpcc.io/install.html).
-
-The API documentation is created from doxygen files in the doc-folder and can be found [online here](http://xpcc.io/api/).  
-If you want to have up-to-date documentation of the develop branch, execute `scons doc`
-in the xpcc root directory and the current development documentation will be available
-in `xpcc/doc/build/api/index.html`.
-
-xpcc also has [a blog for in-depth write ups](http://blog.xpcc.io) of the programming techniques used.
-
-Hardware support
-----------------
-
-While the xpcc API is designed to be extremely portable, we are only a small team of developers and
-therefore are limited in the amount of platforms we can support.
-
-Here is a list of supported **and tested** microcontrollers:
-
-- AT90CAN family
-- ATtiny44 family
-- ATtiny85 family
-- ATmega644 family
-- ATmega328p family (Arduino Uno)
-- ATmega1280 family (Arduino Mega)
-- STM32F407 family (STM32F4 Discovery Board)
-- STM32F303 family (STM32F3 Discovery Board)
-- LPC11C24 (LPCxpresso Board)
-
-Please see [our examples](https://github.com/roboterclubaachen/xpcc/tree/develop/examples) 
-for a complete list of tested projects.
-
-The following microcontrollers should be able to compile, but *have not been tested extensively* in hardware:
-
-- All AT90's
-- All ATtiny's
-- All ATmega's
-
-There are more platforms which we have prepared, but currently not finished support for (Xmega, STM32F{0,1,2}).
-A complete support list of tested and/or compilable and/or potentially portable microcontrollers is available in our
-[device file section](https://github.com/roboterclubaachen/xpcc/tree/develop/src/xpcc/architecture/platform/devices).
-
-Drop us an email, if you want to get your hands dirty and help us finish the support.
-
-
 
 Development Model
 -----------------
@@ -130,6 +132,7 @@ satisfied with the features it contains, we recommend you use one of our
 releases. On the other hand, if you want to use the most recent code
 (and don't mind us breaking APIs now and then), or if you want
 to develop for xpcc, you should use the `develop` branch.
+
 
 How can I contribute?
 ---------------------
