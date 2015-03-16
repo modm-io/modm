@@ -32,7 +32,7 @@ namespace xpcc
  * are in the wrong order, just remap them with the array {7,0,2}.
  *
  * To make use of oversampling and averaging, set `Oversamples > 0`.
- * This will loop `2^Oversamples` times through the ADC channels, adding
+ * This will loop `Oversamples` times through the ADC channels, adding
  * the average of each result to the buffer.
  *
  * This class will choose the smallest data width for you.
@@ -43,12 +43,12 @@ namespace xpcc
  *
  * @tparam AdcInterrupt	a class implementing the AdcInterrupt interface
  * @tparam Channels		number of ADC channels connected to sensor(s) >= 1
- * @tparam Oversamples	`2^Oversamples` samples to average for each channel
+ * @tparam Oversamples	# of samples to average for each channel
  *
  * @ingroup driver_adc
  * @author	Niklas Hauser
  */
-template < class AdcInterrupt, uint8_t Channels, uint8_t Oversamples=0 >
+template < class AdcInterrupt, uint8_t Channels, uint32_t Oversamples=1 >
 class AdcSampler
 {
 // doxygen gets confused by template metaprogramming
@@ -56,23 +56,27 @@ class AdcSampler
 public:
 	/// this type is chosen automatically, it may be uint8_t, uint16_t or uint32_t
 	typedef uint16_t DataType;
-private:
 #else
 	static_assert(Channels > 0, "There must be at least one Channel to be sampled!");
+	static_assert(Oversamples > 0, "Must sample each channel at least once (Oversamples must be > 0)!");
 
 	typedef typename AdcInterrupt::Channel Channel;
 
-	static constexpr uint32_t totalSamples = xpcc::pow(2, Oversamples) * Channels;
+	static constexpr uint32_t totalSamples = Oversamples * Channels;
+
 	typedef typename xpcc::tmp::Select<
-			totalSamples <= xpcc::pow(2, 16),
-			uint16_t,
+			totalSamples < xpcc::pow(2, 16),
+			typename xpcc::tmp::Select<
+					totalSamples < 256,
+					uint8_t,
+					uint16_t >::Result,
 			uint32_t >::Result SampleType;
 
 public:
 	typedef typename xpcc::tmp::Select<
-			(AdcInterrupt::Resolution + Oversamples) <= 16,
+			(xpcc::pow(2, AdcInterrupt::Resolution) * Oversamples) < xpcc::pow(2, 16),
 			typename xpcc::tmp::Select<
-					(AdcInterrupt::Resolution + Oversamples) <= 8,
+					(xpcc::pow(2, AdcInterrupt::Resolution) * Oversamples) < 256,
 					uint8_t,
 					uint16_t >::Result,
 			uint32_t >::Result DataType;

@@ -24,9 +24,9 @@ Adc3::Channel sensorMapping[3] = {
 };
 // the results are up to 16 bit wide
 uint32_t sensorData[3];
-// 3 channels and averages of 2^7 bits = 128 oversamples
+// 3 channels and averages of 100 oversamples
 #include <xpcc/driver/adc/adc_sampler.hpp>
-typedef xpcc::AdcSampler< AdcInterrupt3, 3, 7 > sensors;
+typedef xpcc::AdcSampler< AdcInterrupt3, 3, 100 > sensors;
 xpcc::ShortTimeout timeout(100);
 
 // ----------------------------------------------------------------------------
