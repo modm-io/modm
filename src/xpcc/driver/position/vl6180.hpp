@@ -467,7 +467,12 @@ private:
 	// 2: Data[0]
 	// 3: Data[1]
 	uint8_t i2cBuffer[4];
-	uint8_t logicBuffer[2];
+	union
+	{
+		Register reg;
+		uint8_t byte[2];
+	} logicBuffer;
+
 	/// @endcond
 };
 
