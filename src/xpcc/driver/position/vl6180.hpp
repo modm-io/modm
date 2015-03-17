@@ -358,8 +358,8 @@ public:
 	xpcc::co::Result<bool>
 	initialize();
 
-	/// Set a new address (< 128) for this device.
-	/// Address is not permanent and must be set again after every device boot.
+	/// Set a new I2C address (< 128) for this device.
+	/// The address is not permanent and must be set again after every device boot.
 	xpcc::co::Result<bool>
 	setAddress(uint8_t address);
 

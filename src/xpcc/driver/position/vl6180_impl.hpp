@@ -188,7 +188,8 @@ xpcc::Vl6180<I2cMaster>::setIntegrationTime(uint16_t time)
 	CO_BEGIN();
 
 	// 0 is 1ms, we need to substract 1 UNLESS the time is 0!
-	if (time) time -= 1;
+	if (time > 0) time -= 1;
+	if (time > 0x1ff) time = 0x1ff;
 	i2cBuffer[2] = time >> 8;
 	i2cBuffer[3] = time;
 

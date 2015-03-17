@@ -25,14 +25,12 @@ xpcc::log::Logger xpcc::log::error(device);
  *
  * SDA		PB11
  * SCL		PB10
- * GPIO0	PB14
  *
  * GND and +3V are connected to the sensor.
  */
 
 typedef I2cMaster2 MyI2cMaster;
 // typedef xpcc::SoftwareI2cMaster<GpioB10, GpioB11> MyI2cMaster;
-typedef GpioOutputB14 VlReset;
 
 xpcc::vl6180::Data data;
 xpcc::Vl6180<MyI2cMaster> distance(data);
@@ -44,16 +42,6 @@ public:
 	update()
 	{
 		PT_BEGIN();
-
-		VlReset::reset();
-		this->timeout.restart(1);
-		PT_WAIT_UNTIL(this->timeout.isExpired());
-
-		// bring device out of reset
-		VlReset::set();
-		// wait 5ms
-		this->timeout.restart(5);
-		PT_WAIT_UNTIL(this->timeout.isExpired());
 
 		XPCC_LOG_DEBUG << "Ping the device from ThreadOne" << xpcc::endl;
 
@@ -84,7 +72,6 @@ public:
 		this->timeout.restart(1);
 
 		PT_CALL(distance.setIntegrationTime(10));
-		PT_CALL(distance.setAddress(100));
 
 		while (true)
 		{
@@ -97,12 +84,15 @@ public:
 				{
 					uint8_t mm = distance.data.getDistance();
 					XPCC_LOG_DEBUG << "mm: " << mm;
-					LedGreen::set(mm > 100);
-					LedBlue::set(mm > 50);
-					LedRed::set(mm > 10);
+					LedGreen::set(mm > 160);
+					LedBlue::set(mm > 110);
+					LedRed::set(mm > 25);
 				}
 				else {
 					XPCC_LOG_DEBUG << "Error: " << (uint8_t(error) >> 4);
+					LedGreen::set();
+					LedBlue::set();
+					LedRed::set();
 				}
 			}
 
@@ -148,7 +138,6 @@ MAIN_FUNCTION
 	LedGreen::setOutput(xpcc::Gpio::Low);
 	LedRed::setOutput(xpcc::Gpio::Low);
 	LedBlue::setOutput(xpcc::Gpio::Low);
-	VlReset::setOutput(Gpio::OutputType::OpenDrain);
 
 	GpioOutputA2::connect(Usart2::Tx);
 	Usart2::initialize<defaultSystemClock, xpcc::Uart::B115200>(10);
