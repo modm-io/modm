@@ -69,7 +69,7 @@ xpcc::GenericTimeout<Clock, TimestampType>::remaining() const
 // ----------------------------------------------------------------------------
 template< class Clock, class TimestampType >
 xpcc::TimeoutState
-xpcc::GenericTimeout<Clock, TimestampType>::getState()
+xpcc::GenericTimeout<Clock, TimestampType>::getState() const
 {
 	if (checkExpiration())
 	{
@@ -83,19 +83,21 @@ template< class Clock, class TimestampType >
 bool
 xpcc::GenericTimeout<Clock, TimestampType>::isStopped() const
 {
+	// we do not need to use `getState()` here, since stopping a timeout
+	// has to be done by the user, it will not stop itself.
 	return state == STOPPED;
 }
 
 template< class Clock, class TimestampType >
 bool
-xpcc::GenericTimeout<Clock, TimestampType>::isArmed()
+xpcc::GenericTimeout<Clock, TimestampType>::isArmed() const
 {
 	return getState() == TimeoutState::Armed;
 }
 
 template< class Clock, class TimestampType >
 bool
-xpcc::GenericTimeout<Clock, TimestampType>::isExpired()
+xpcc::GenericTimeout<Clock, TimestampType>::isExpired() const
 {
 	return getState() == TimeoutState::Expired;
 }

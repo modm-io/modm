@@ -41,7 +41,7 @@ xpcc::GenericPeriodicTimer<Clock, TimestampType>::stop()
 
 template< class Clock, class TimestampType >
 xpcc::PeriodicTimerState
-xpcc::GenericPeriodicTimer<Clock, TimestampType>::getState()
+xpcc::GenericPeriodicTimer<Clock, TimestampType>::getState() const
 {
 	return PeriodicTimerState(timeout.getState());
 }

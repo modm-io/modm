@@ -131,7 +131,7 @@ public:
 
 	/// @return the current state of the timeout
 	TimeoutState
-	getState();
+	getState() const;
 
 	/// @return `true` if the timeout is stopped, `false` otherwise
 	inline bool
@@ -139,11 +139,11 @@ public:
 
 	/// @return `true` if the timeout has expired, `false` otherwise
 	inline bool
-	isExpired();
+	isExpired() const;
 
 	/// @return `true` if the timeout is armed (not stopped and not expired), `false` otherwise
 	inline bool
-	isArmed();
+	isArmed() const;
 
 private:
 	inline bool
@@ -161,7 +161,7 @@ private:
 	};
 
 	TimestampType endTime;
-	uint8_t state;
+	mutable uint8_t state;
 
 	friend class
 	GenericPeriodicTimer<Clock, TimestampType>;

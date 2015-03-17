@@ -126,7 +126,7 @@ public:
 
 	/// @return the current state of the timer
 	PeriodicTimerState
-	getState();
+	getState() const;
 
 	/// @return `true` if the timer has been stopped, `false` otherwise
 	inline bool
