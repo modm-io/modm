@@ -43,27 +43,27 @@ xpcc::Ssd1306<I2cMaster>::initialize()
 {
 	CO_BEGIN();
 
-	commandBuffer[13] = true;
-	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetDisplayOff));
-	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetDisplayClockDivideRatio, 0xF0));
-	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetMultiplexRatio, 0x3F));
-	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetDisplayOffset, 0x00));
-	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetDisplayStartLine | 0x00));
-	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetChargePump, 0x14));
-	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetMemoryMode, 0x01));
-	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetSegmentRemap127));
-	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetComOutputScanDirectionDecrement));
-	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetComPins, 0x12));
-	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetContrastControl, 0xCE));
-	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetPreChargePeriod, 0xF1));
-	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetV_DeselectLevel, 0x40));
-	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetEntireDisplayResumeToRam));
-	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetNormalDisplay));
-//	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetColumnAddress, 0, 127));
-//	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetPageAddress, 0, 7));
-	commandBuffer[13] &= CO_CALL(writeCommand(Command::SetDisplayOn));
+	commandBuffer[11] = true;
+	commandBuffer[11] &= CO_CALL(writeCommand(Command::SetDisplayOff));
+	commandBuffer[11] &= CO_CALL(writeCommand(Command::SetDisplayClockDivideRatio, 0xF0));
+	commandBuffer[11] &= CO_CALL(writeCommand(Command::SetMultiplexRatio, 0x3F));
+	commandBuffer[11] &= CO_CALL(writeCommand(Command::SetDisplayOffset, 0x00));
+	commandBuffer[11] &= CO_CALL(writeCommand(Command::SetDisplayStartLine | 0x00));
+	commandBuffer[11] &= CO_CALL(writeCommand(Command::SetChargePump, 0x14));
+	commandBuffer[11] &= CO_CALL(writeCommand(Command::SetMemoryMode, 0x01));
+	commandBuffer[11] &= CO_CALL(writeCommand(Command::SetSegmentRemap127));
+	commandBuffer[11] &= CO_CALL(writeCommand(Command::SetComOutputScanDirectionDecrement));
+	commandBuffer[11] &= CO_CALL(writeCommand(Command::SetComPins, 0x12));
+	commandBuffer[11] &= CO_CALL(writeCommand(Command::SetContrastControl, 0xCE));
+	commandBuffer[11] &= CO_CALL(writeCommand(Command::SetPreChargePeriod, 0xF1));
+	commandBuffer[11] &= CO_CALL(writeCommand(Command::SetV_DeselectLevel, 0x40));
+	commandBuffer[11] &= CO_CALL(writeCommand(Command::SetEntireDisplayResumeToRam));
+	commandBuffer[11] &= CO_CALL(writeCommand(Command::SetNormalDisplay));
+//	commandBuffer[11] &= CO_CALL(writeCommand(Command::SetColumnAddress, 0, 127));
+//	commandBuffer[11] &= CO_CALL(writeCommand(Command::SetPageAddress, 0, 7));
+	commandBuffer[11] &= CO_CALL(writeCommand(Command::SetDisplayOn));
 
-	CO_END_RETURN(commandBuffer[13]);
+	CO_END_RETURN(commandBuffer[11]);
 }
 
 // ----------------------------------------------------------------------------
@@ -209,7 +209,7 @@ xpcc::Ssd1306<I2cMaster>::DataTransmissionAdapter::configureDisplayWrite(uint8_t
 {
 	if (I2cWriteAdapter::configureWrite(&buffer[0][0], size))
 	{
-		commands[13] = 0xff;
+		commands[13] = 0xfe;
 		return true;
 	}
 	return false;
@@ -220,25 +220,25 @@ xpcc::I2cTransaction::Writing
 xpcc::Ssd1306<I2cMaster>::DataTransmissionAdapter::writing()
 {
 	// we first tell the display the column address again
-	if (commands[13] == 0xff)
+	if (commands[13] == 0xfe)
 	{
 		commands[1] = Command::SetColumnAddress;
 		commands[3] = 0;
 		commands[5] = 127;
-		commands[13] = 0xfe;
+		commands[13] = 0xfd;
 		return Writing(commands, 6, OperationAfterWrite::Restart);
 	}
 	// then the page address. again.
-	if (commands[13] == 0xfe)
+	if (commands[13] == 0xfd)
 	{
 		commands[1] = Command::SetPageAddress;
 		commands[3] = 0;
 		commands[5] = 7;
-		commands[13] = 0xfd;
+		commands[13] = 0xfc;
 		return Writing(commands, 6, OperationAfterWrite::Restart);
 	}
 	// then we set the D/C bit to tell it data is coming
-	if (commands[13] == 0xfd)
+	if (commands[13] == 0xfc)
 	{
 		commands[13] = 0x40;
 		return Writing(&commands[13], 1, OperationAfterWrite::Write);
