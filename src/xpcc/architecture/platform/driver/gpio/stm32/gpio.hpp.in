@@ -378,11 +378,11 @@ public:
 	/// Connect {{name}} as {{af.name}} to {{af.peripheral}}.
 	ALWAYS_INLINE static void
 	connect(TypeId::{{ af.peripheral }}{{ af.name }} /* t */, InputType type=InputType::Floating) {
-		configure(OutputType::OpenDrain);
 		configure(type);
 					%% if af.name in ['Scl']
 		I2c::resetDevices< {{name}} >();
 					%% endif
+		configure(OutputType::OpenDrain);
 		setAlternateFunction(AlternateFunction::AF_{{ af.id }});
 	}
 				%% endif
