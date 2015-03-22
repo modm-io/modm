@@ -86,6 +86,7 @@ xpcc::Vl6180<I2cMaster>::readSensor(bool isDistance)
 
 		// When the measurement is completed, the interrupt source of ALS or range
 		// in RESULT__INTERRUPT_STATUS_GPIO will set to New Sample Ready.
+		logicBuffer.byte[0] = 3;	// 3ms initial wait
 		while(true)
 		{
 			// read the byte
@@ -102,8 +103,9 @@ xpcc::Vl6180<I2cMaster>::readSensor(bool isDistance)
 					break;
 			}
 
-			// otherwise wait 2ms and try again
-			timeout.restart(2);
+			// otherwise wait 2ms longer on every try
+			timeout.restart(logicBuffer.byte[0]);
+			logicBuffer.byte[0] += 2;
 			CO_WAIT_UNTIL(timeout.isExpired());
 		}
 
@@ -137,8 +139,8 @@ xpcc::Vl6180<I2cMaster>::readSensor(bool isDistance)
 						break;
 					}
 
-					// otherwise wait 2ms and try again
-					timeout.restart(2);
+					// otherwise wait 4ms and try again
+					timeout.restart(4);
 					CO_WAIT_UNTIL(timeout.isExpired());
 				}
 
