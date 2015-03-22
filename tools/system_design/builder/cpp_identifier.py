@@ -30,6 +30,7 @@
 
 import os
 import builder_base
+import filter.cpp as filter
 
 class IdentifierBuilder(builder_base.Builder):
 	
@@ -52,7 +53,12 @@ class IdentifierBuilder(builder_base.Builder):
 		else:
 			raise builder_base.BuilderException("You need to provide a namespace!")
 
-		template = self.template('templates/robot_identifier.tpl')
+		cppFilter = {
+			'enumElement': filter.enumElement,
+			'enumValue': filter.toHexValue,
+		}
+		
+		template = self.template('templates/robot_identifier.tpl', filter=cppFilter)
 			
 		components = []
 		for component in self.tree.components.iter(abstract=False):
