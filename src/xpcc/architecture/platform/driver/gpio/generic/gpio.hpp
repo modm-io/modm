@@ -118,8 +118,6 @@ template < class Pin >
 class GpioInverted : public Pin
 {
 public:
-	using Pin::setOutput;
-
 	ALWAYS_INLINE static void
 	setOutput(bool value)
 	{
