@@ -10,6 +10,9 @@
 #	error	"Don't include this file directly, use 'color.hpp' instead!"
 #endif
 
+// FIXME: <algorithm> broke in arm-none-eabi-gcc 4.9-2015-q1
+#include "../../stdc++/algorithm"
+
 /**
  * @see http://de.wikipedia.org/wiki/HSV-Farbraum#Umrechnung_RGB_in_HSV.2FHSL
  * @param color

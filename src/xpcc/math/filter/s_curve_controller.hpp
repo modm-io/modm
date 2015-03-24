@@ -31,7 +31,6 @@
 #ifndef XPCC__S_CURVE_CONTROLLER_HPP
 #define XPCC__S_CURVE_CONTROLLER_HPP
 
-#include <algorithm>
 #include <cmath>
 
 namespace xpcc

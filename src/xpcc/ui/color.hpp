@@ -13,7 +13,6 @@
 #include <stdint.h>
 #include <xpcc/io/iostream.hpp>
 #include <xpcc/utils/arithmetic_traits.hpp>
-#include <algorithm>
 
 namespace xpcc
 {
