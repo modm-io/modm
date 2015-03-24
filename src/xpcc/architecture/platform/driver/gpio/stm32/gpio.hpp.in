@@ -243,11 +243,14 @@ public:
 		{{reg}}->BSRRH = mask;
 	}
 	ALWAYS_INLINE static void toggle() {
-		if ({{reg}}->ODR & mask) {
+		if (isSet()) {
 			reset();
 		} else {
 			set();
 		}
+	}
+	ALWAYS_INLINE static bool isSet() {
+		return ({{reg}}->ODR & mask);
 	}
 	// stop documentation inherited
 	ALWAYS_INLINE static void
@@ -268,9 +271,22 @@ public:
 		{{reg}}->OSPEEDR &= ~mask2;
 	}
 	ALWAYS_INLINE static bool read() {
-		return {{reg}}->IDR & mask;
+		return ({{reg}}->IDR & mask);
 	}
 	// end documentation inherited
+		%% if type in [""]
+	// GpioIO
+	// start documentation inherited
+	ALWAYS_INLINE static Direction getDirection() {
+		uint32_t mode = ({{reg}}->MODER & mask2);
+		if (mode == (i(Mode::Input) << pin * 2))
+			return Direction::In;
+		if (mode == (i(Mode::Output) << pin * 2))
+			return Direction::Out;
+		return Direction::Special;
+	}
+	// end documentation inherited
+		%% endif
 	ALWAYS_INLINE static void setInput(InputType type) {
 		configure(type);
 		setInput();
