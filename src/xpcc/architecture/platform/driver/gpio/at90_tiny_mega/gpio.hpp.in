@@ -86,6 +86,10 @@ protected:
 template< class Pin >
 class {{name}} : public Pin
 {
+	static_assert(Pin::direction == xpcc::Gpio::Direction::InOut, "Pin must inherit from xpcc::GpioIO");
+public:
+	static constexpr xpcc::Gpio::Direction direction = xpcc::Gpio::Direction::Out;
+
 public:
 	ALWAYS_INLINE static void configure(Gpio::InputType /*type*/) {}
 	ALWAYS_INLINE static void setInput() {}
@@ -112,6 +116,12 @@ public:
 	ALWAYS_INLINE static void set(bool status) {
 		if (status) { set(); }
 		else { reset(); }
+	}
+	ALWAYS_INLINE static bool isSet() {
+		return (Pin::getDirection() == xpcc::Gpio::Direction::In);
+	}
+	ALWAYS_INLINE static xpcc::Gpio::Direction getDirection() {
+		return xpcc::Gpio::Direction::Out;
 	}
 	ALWAYS_INLINE static void
 	connect(::xpcc::TypeId::SoftwareI2cMasterSda) {
@@ -171,6 +181,9 @@ public:
 			%% else
 		PIN{{port}} = mask;
 			%% endif
+	}
+	ALWAYS_INLINE static bool isSet() {
+		return (PORT{{port}} & mask);
 	}
 		%% endif
 		%% if type in ["IO", "Input"]
@@ -260,6 +273,11 @@ public:
 		PCIFR |= (1 << PCIF{{af_reg}});
 	}
 			%% endif
+		%% endif
+		%% if type in ["IO"]
+	ALWAYS_INLINE static Direction getDirection() {
+		return (DDR{{port}} & mask) ? Direction::Out : Direction::In;
+	}
 		%% endif
 		%% for af in gpio.afs
 			%% if (	(af.type == 'in' and type == 'Input') or
