@@ -202,6 +202,12 @@ public:
 	{
 		TIM{{ id }}->BDTR |= TIM_BDTR_MOE;
 	}
+	
+	static inline void
+	disableOutput()
+	{
+		TIM{{ id }}->BDTR &= ~(TIM_BDTR_MOE);
+	}
 
 	/*
 	 * Enable/Disable automatic set of MOE bit at the next update event
