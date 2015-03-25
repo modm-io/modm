@@ -10,8 +10,12 @@
 #	error	"Don't include this file directly, use 'color.hpp' instead!"
 #endif
 
+#ifdef XPCC__OS_HOSTED
+#	include <algorithm>
+#else
 // FIXME: <algorithm> broke in arm-none-eabi-gcc 4.9-2015-q1
-#include "../../stdc++/algorithm"
+#	include "../../stdc++/algorithm"
+#endif
 
 /**
  * @see http://de.wikipedia.org/wiki/HSV-Farbraum#Umrechnung_RGB_in_HSV.2FHSL
