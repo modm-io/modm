@@ -10,12 +10,7 @@
 #	error	"Don't include this file directly, use 'color.hpp' instead!"
 #endif
 
-#ifdef XPCC__OS_HOSTED
-#	include <algorithm>
-#else
-// FIXME: <algorithm> broke in arm-none-eabi-gcc 4.9-2015-q1
-#	include "../../stdc++/algorithm"
-#endif
+#include <xpcc/math/utils.hpp>
 
 /**
  * @see http://de.wikipedia.org/wiki/HSV-Farbraum#Umrechnung_RGB_in_HSV.2FHSL
@@ -25,7 +20,6 @@ template<typename UnderlyingType> template<typename T>
 inline void
 xpcc::color::RgbT<UnderlyingType>::toHsv(HsvT<T>* color) const
 {
-	using namespace std;
 	typedef float CalcType;
 	const CalcType maxValue = xpcc::ArithmeticTraits<T>::max;
 	const CalcType _red		= static_cast<CalcType>(red) / maxValue;
