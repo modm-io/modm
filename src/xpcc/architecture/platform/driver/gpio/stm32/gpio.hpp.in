@@ -274,19 +274,6 @@ public:
 		return ({{reg}}->IDR & mask);
 	}
 	// end documentation inherited
-		%% if type in [""]
-	// GpioIO
-	// start documentation inherited
-	ALWAYS_INLINE static Direction getDirection() {
-		uint32_t mode = ({{reg}}->MODER & mask2);
-		if (mode == (i(Mode::Input) << pin * 2))
-			return Direction::In;
-		if (mode == (i(Mode::Output) << pin * 2))
-			return Direction::Out;
-		return Direction::Special;
-	}
-	// end documentation inherited
-		%% endif
 	ALWAYS_INLINE static void setInput(InputType type) {
 		configure(type);
 		setInput();
@@ -364,6 +351,17 @@ public:
 		EXTI->PR |= mask;
 	}
 		%% endif
+	// GpioIO
+	// start documentation inherited
+	ALWAYS_INLINE static Direction getDirection() {
+		uint32_t mode = ({{reg}}->MODER & mask2);
+		if (mode == (i(Mode::Input) << pin * 2))
+			return Direction::In;
+		if (mode == (i(Mode::Output) << pin * 2))
+			return Direction::Out;
+		return Direction::Special;
+	}
+	// end documentation inherited
 	// connect: Hardware Gpio
 		%% for af in gpio.afs
 			%% set use = not (	(af.type == "in"     and type == "Output") or

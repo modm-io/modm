@@ -150,7 +150,7 @@ struct Gpio
 	Direction
 	{
 		In = 0,			//< GPIO is an Input
-		Out = 1,		//< GPIO is an Ouput
+		Out = 1,		//< GPIO is an Output
 		InOut = 2,		//< GPIO is both Input and Output
 		Special = 3,	//< GPIO is configured with a special purpose
 	};
