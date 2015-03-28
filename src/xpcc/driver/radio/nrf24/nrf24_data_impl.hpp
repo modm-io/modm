@@ -138,10 +138,11 @@ template<typename Nrf24Phy>
 bool
 xpcc::Nrf24Data<Nrf24Phy>::sendPacket(Packet& packet)
 {
-	if(!isReadyToSend())
+	if(not isReadyToSend())
 	{
 		XPCC_LOG_WARNING << "Warning: Not ready to send" << xpcc::endl;
 		state = SendingState::Failed;
+		packetProcessed = true;
 		return false;
 	}
 
