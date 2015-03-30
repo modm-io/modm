@@ -91,7 +91,14 @@ extern "C" {
 
 /* Architecture specifics. */
 #define portSTACK_GROWTH			( -1 )
-#define portTICK_RATE_MS			( ( portTickType ) 1000 / configTICK_RATE_HZ )		
+/*
+    this is a really ugly hack, the smallest time is 1ms here, we want 0.1ms.
+    But we do not want to divide floating point either, because that will promote the entre value for float.
+    The only code that uses this, divides by the value ('500 / portTICK_RATE_MS')
+    So we replace the macro with '1 * 10' -> '500 / 1 * 10', which only works in this case!!!
+*/
+
+#define portTICK_RATE_MS			1 * 10
 #define portBYTE_ALIGNMENT			8
 /*-----------------------------------------------------------*/	
 

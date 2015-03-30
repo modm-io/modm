@@ -70,7 +70,7 @@
 
 #define configUSE_PREEMPTION			1
 #define configCPU_CLOCK_HZ				F_CPU	// set by xpcc
-#define configTICK_RATE_HZ				1000
+#define configTICK_RATE_HZ				10000
 #define configMAX_PRIORITIES			255
 #define configMINIMAL_STACK_SIZE		128
 #define configTOTAL_HEAP_SIZE			( ( size_t ) ( 8 * 1024 ) )
