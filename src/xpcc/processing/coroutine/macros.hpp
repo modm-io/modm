@@ -54,7 +54,14 @@
  * @hideinitializer
  */
 #define CO_END() \
-	CO_END_RETURN(0)
+ 			this->stopCo(coIndex); \
+			this->popCo(); \
+			return {xpcc::co::Stop}; \
+	default: \
+			this->popCo(); \
+			return {xpcc::co::WrongState}; \
+	} \
+	static_assert(uint16_t(__COUNTER__) - coCounter < 256, "You have too many states in this coroutine!");
 
 /**
  * End the coroutine by calling another coroutine and returning its result.
