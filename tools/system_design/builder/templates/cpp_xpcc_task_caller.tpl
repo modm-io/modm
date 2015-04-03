@@ -12,6 +12,7 @@
 
 #include <xpcc/communication/xpcc/communicatable_task.hpp>
 #include <xpcc/processing/protothread.hpp>
+#include <xpcc/processing/coroutine.hpp>
 
 namespace robot_call_tasks
 {
@@ -37,22 +38,25 @@ public:
 	 */
 	{%- endif %}
 	{%- endif %}
-	class {{ action.name | CamelCase }} : public xpcc::CommunicatableTask, private xpcc::pt::Protothread
+	class {{ action.name | CamelCase }} : public xpcc::CommunicatableTask, private xpcc::pt::Protothread, private xpcc::co::Coroutine<1>
 	{
 	public:
 		{%- if action.parameterType %}
-		{%- if action.parameterType.isBuiltIn %}
+			{%- if action.parameterType.isBuiltIn %}
 		typedef {{ action.parameterType.name | CamelCase }} ParameterType;
-		{%- else %}
+			{%- else %}
 		typedef {{ namespace }}::packet::{{ action.parameterType.name | CamelCase }} ParameterType;
+			{%- endif %}
 		{%- endif %}
-		{%- endif %}
+
 		{%- if action.returnType %}
-		{%- if action.returnType.isBuiltIn %}
+			{%- if action.returnType.isBuiltIn %}
 		typedef {{ action.returnType.name | CamelCase }} ReturnType;
-		{%- else %}
+			{%- else %}
 		typedef {{ namespace }}::packet::{{ action.returnType.name | CamelCase }} ReturnType;
-		{%- endif %}
+			{%- endif %}
+		{%- else %}
+		typedef void ReturnType;
 		{%- endif %}
 
 		{{ action.name | CamelCase }}( xpcc::Communicator *c ) :
@@ -64,15 +68,7 @@ public:
 		}
 
 		inline {{ action.name | CamelCase }}*
-		start (
-				{%- if action.parameterType %}
-				{%- if action.parameterType.isBuiltIn %}
-				const {{ action.parameterType.name | CamelCase }}& parameter
-				{%- else -%}
-				const {{ namespace }}::packet::{{ action.parameterType.name | CamelCase }}& parameter
-				{%- endif -%}
-				{%- endif -%}
-				)
+		start({% if action.parameterType %} const ParameterType& parameter {% endif %})
 		{
 			{% if action.parameterType -%}
 			this->parameter = parameter;
@@ -101,16 +97,47 @@ public:
 			return responseHeader;
 		}
 		{%- if action.returnType %}
-
-		{% if action.returnType.isBuiltIn -%}
-		const {{ action.returnType.name | CamelCase }}& getResponsePayload()
-		{% else -%}
-		const {{ namespace }}::packet::{{ action.returnType.name | CamelCase }}& getResponsePayload()
-		{% endif -%}
+		const ReturnType& getResponsePayload()
 		{
 			return responsePayload;
 		}
 		{%- endif %}
+
+		{%- if action.returnType.name == "Bool" %}
+		xpcc::co::Result<bool>
+		{%- else %}
+			{% if action.returnType %}
+		xpcc::ActionResponse<ReturnType*>
+			{%- else %}
+		xpcc::ActionResponse<void>
+			{%- endif %}
+		{%- endif %}
+		execute({% if action.parameterType %} const ParameterType& parameter {% endif %})
+		{
+			CO_BEGIN(0);
+
+			{%- if action.parameterType %}
+			start(parameter);
+			{%- else %}
+			start();
+			{%- endif %}
+
+			CO_WAIT_WHILE(this->run());
+
+			{%- if action.returnType.name == "Bool" %}
+			// return true when positive response and payload true
+			CO_END_RETURN(responseHeader.type == xpcc::Header::RESPONSE and bool(responsePayload));
+			{%- else %}
+			if (responseHeader.type == xpcc::Header::RESPONSE) {
+				{%- if action.returnType %}
+				CO_RETURN(&responsePayload);	/* returns positive response with payload */
+				{%- else %}
+				CO_RETURN(xpcc::Response::Positive); /* returns positive response without payload */
+				{%- endif %}
+			}
+			CO_END();	/* automatically returns negative response */
+			{%- endif %}
+		}
 
 	private:
 		xpcc::ResponseCallback responseCallback;
@@ -118,13 +145,8 @@ public:
 		void
 		responseHandler(
 		{%- if action.returnType %}
-		{%- if action.returnType.isBuiltIn %}
 				const xpcc::Header& header,
-				const {{ action.returnType.name | CamelCase }} *payload)
-		{%- else %}
-				const xpcc::Header& header,
-				const {{ namespace }}::packet::{{ action.returnType.name | CamelCase }} *payload)
-		{%- endif %}
+				const ReturnType *payload)
 		{%- else %}
 				const xpcc::Header& header)
 		{%- endif %}
@@ -165,22 +187,13 @@ public:
 
 	private:
 		{%- if action.parameterType %}
-
 		// parameter
-		{% if action.parameterType.isBuiltIn -%}
-		{{ action.parameterType.name | CamelCase }} parameter;
-		{% else -%}
-		{{ namespace }}::packet::{{ action.parameterType.name | CamelCase }} parameter;
-		{%- endif %}
+		ParameterType parameter;
 		{%- endif %}
 
 		// return
 		{%- if action.returnType %}
-		{% if action.returnType.isBuiltIn -%}
-		{{ action.returnType.name | CamelCase }} responsePayload;
-		{% else -%}
-		{{ namespace }}::packet::{{ action.returnType.name | CamelCase }} responsePayload;
-		{%- endif %}
+		ReturnType responsePayload;
 		{%- endif %}
 		xpcc::Header responseHeader;
 
