@@ -103,14 +103,10 @@ public:
 		}
 		{%- endif %}
 
-		{%- if action.returnType.name == "Bool" %}
-		xpcc::co::Result<bool>
-		{%- else %}
-			{% if action.returnType %}
+		{% if action.returnType %}
 		xpcc::ActionResponse<ReturnType*>
-			{%- else %}
+		{%- else %}
 		xpcc::ActionResponse<void>
-			{%- endif %}
 		{%- endif %}
 		execute({% if action.parameterType %} const ParameterType& parameter {% endif %})
 		{
@@ -124,10 +120,6 @@ public:
 
 			CO_WAIT_WHILE(this->run());
 
-			{%- if action.returnType.name == "Bool" %}
-			// return true when positive response and payload true
-			CO_END_RETURN(responseHeader.type == xpcc::Header::RESPONSE and bool(responsePayload));
-			{%- else %}
 			if (responseHeader.type == xpcc::Header::RESPONSE) {
 				{%- if action.returnType %}
 				CO_RETURN(&responsePayload);	/* returns positive response with payload */
@@ -136,7 +128,6 @@ public:
 				{%- endif %}
 			}
 			CO_END();	/* automatically returns negative response */
-			{%- endif %}
 		}
 
 	private:
