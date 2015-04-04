@@ -104,6 +104,22 @@ public:
 		{%- endif %}
 
 		{% if action.returnType %}
+		const xpcc::ActionResult<ReturnType*>
+		{%- else %}
+		const xpcc::ActionResult<void>
+		{%- endif %}
+		getResult()
+		{
+			if (responseHeader.type == xpcc::Header::RESPONSE)
+				{%- if action.returnType %}
+				return &responsePayload;	/* returns positive response with payload */
+				{%- else %}
+				return xpcc::Response::Positive; /* returns positive response without payload */
+				{%- endif %}
+			return xpcc::Response::Negative;
+		}
+
+		{% if action.returnType %}
 		xpcc::ActionResponse<ReturnType*>
 		{%- else %}
 		xpcc::ActionResponse<void>
@@ -112,22 +128,11 @@ public:
 		{
 			CO_BEGIN(0);
 
-			{%- if action.parameterType %}
-			start(parameter);
-			{%- else %}
-			start();
-			{%- endif %}
+			start({%- if action.parameterType %} parameter {%- endif %});
 
 			CO_WAIT_WHILE(this->run());
 
-			if (responseHeader.type == xpcc::Header::RESPONSE) {
-				{%- if action.returnType %}
-				CO_RETURN(&responsePayload);	/* returns positive response with payload */
-				{%- else %}
-				CO_RETURN(xpcc::Response::Positive); /* returns positive response without payload */
-				{%- endif %}
-			}
-			CO_END();	/* automatically returns negative response */
+			CO_END_RETURN(getResult());
 		}
 
 	private:
