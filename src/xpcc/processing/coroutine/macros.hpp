@@ -127,11 +127,11 @@
 	({ \
 			CO_INTERNAL_SET_CASE(__COUNTER__); \
 			auto coResult = coroutine; \
-			if (coResult.state > xpcc::co::NestingError) { \
+			if (coResult.getState() > xpcc::co::NestingError) { \
 				this->popCo(); \
 				return {xpcc::co::Running}; \
 			} \
-			coResult.result; \
+			coResult.getResult(); \
 	})
 
 /**
@@ -144,9 +144,9 @@
 #define CO_CALL_BLOCKING(coroutine) \
 	({ \
 			auto coResult = coroutine; \
-			while (coResult.state > xpcc::co::NestingError) \
+			while (coResult.getState() > xpcc::co::NestingError) \
 			{ coResult = coroutine; } \
-			coResult.result; \
+			coResult.getResult(); \
 	})
 
 /**
@@ -160,11 +160,11 @@
 			CO_INTERNAL_SET_CASE(__COUNTER__); \
 			{ \
 				auto coResult = coroutine; \
-				if (coResult.state > xpcc::co::NestingError) { \
+				if (coResult.getState() > xpcc::co::NestingError) { \
 					this->popCo(); \
 					return {xpcc::co::Running}; \
 				} \
-				CO_RETURN(coResult.result); \
+				CO_RETURN(coResult.getResult()); \
 			} \
 		}
 

@@ -154,11 +154,11 @@ xpcc::{{target.family}}::UartSpiMaster{{id}}::transfer(
 				xpcc::co::Result<uint8_t> result = transfer(tx ? tx[index] : 0);
 
 				// if the coroutine is still running, so are we
-				if (result.state > xpcc::co::NestingError)
+				if (result.getState() > xpcc::co::NestingError)
 					return {xpcc::co::Running};
 
 				// if rx != 0, we copy the result into the array
-				if (rx) rx[index] = result.result;
+				if (rx) rx[index] = result.getResult();
 		}
 				index++;
 			}

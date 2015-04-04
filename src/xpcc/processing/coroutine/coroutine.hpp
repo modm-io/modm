@@ -47,6 +47,16 @@ struct Result
 	Result(uint_fast8_t state) : state(state) {}
 	/// Return `state` and valid `result`.
 	Result(uint_fast8_t state, T result) : state(state), result(result) {}
+
+	inline uint_fast8_t
+	getState()
+	{ return state; }
+
+	inline T
+	getResult()
+	{ return result; }
+
+private:
 	/// The `co::State`.
 	uint_fast8_t state;
 	/// Custom return value.
@@ -61,15 +71,18 @@ struct Result<void>
 	Result(uint_fast8_t state) : state(state) {}
 	/// Constructor with dummy result needed by the `CO_CALL_BLOCKING` macro.
 	Result(uint_fast8_t state, uint_fast8_t /*dummy_result*/) : state(state) {}
-	// This anonymous union reduces the size to only 1 byte, instead of two
-	// `CO_CALL_BLOCKING` will still return something, but it will be either 0 or 1 (`Stop` or `NestingError`).
-	union
-	{
-		/// The `co::State`.
-		uint_fast8_t state;
-		/// Dummy result needed by the `CO_CALL_BLOCKING` macro.
-		uint_fast8_t result;
-	};
+
+	inline uint_fast8_t
+	getState()
+	{ return state; }
+
+	inline uint_fast8_t
+	getResult()
+	{ return state; }
+
+private:
+	/// The `co::State`.
+	uint_fast8_t state;
 };
 /// @endcond
 

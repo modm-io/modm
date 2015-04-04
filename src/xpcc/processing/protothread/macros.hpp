@@ -126,10 +126,10 @@
 		this->ptState = __LINE__; \
 		case __LINE__: \
 			auto coResult = coroutine; \
-			if (coResult.state > xpcc::co::NestingError) { \
+			if (coResult.getState() > xpcc::co::NestingError) { \
 				return true; \
 			} \
-			coResult.result; \
+			coResult.getResult(); \
 	})
 
 /**

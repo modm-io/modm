@@ -126,7 +126,7 @@ public:
 	transferBlocking(uint8_t data)
 	{
 %% if parameters.busywait
-		return transfer(data).result;
+		return transfer(data).getResult();
 %% else
 		return CO_CALL_BLOCKING(transfer(data));
 %% endif

@@ -191,10 +191,10 @@ uint8_t
 Postman::component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(const xpcc::ResponseHandle& response{{ arguments }})
 {
 	auto result = component::{{ component.name | camelCase }}.action{{ action.name | CamelCase }}({{ payload }});
-	if (result.state < xpcc::co::Running) {
-		if (result.state == xpcc::co::Stop and result.result.response == xpcc::Response::Positive) {
+	if (result.getState() < xpcc::co::Running) {
+		if (result.getState() == xpcc::co::Stop and result.getResult().response == xpcc::Response::Positive) {
 			{%- if action.returnType != None %}
-			component::{{component.name | camelCase}}.getCommunicator()->sendResponse(response, result.result.data);
+			component::{{component.name | camelCase}}.getCommunicator()->sendResponse(response, result.getResult().data);
 			{%- else %}
 			component::{{component.name | camelCase}}.getCommunicator()->sendResponse(response);
 			{%- endif %}
@@ -202,7 +202,7 @@ Postman::component_{{ component.name | camelCase }}_action{{ action.name | Camel
 			component::{{component.name | camelCase}}.getCommunicator()->sendNegativeResponse(response);
 		}
 	}
-	return result.state;
+	return result.getState();
 }
 		{%- endif %}
 	{%- endfor %}
