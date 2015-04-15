@@ -20,7 +20,7 @@ namespace xpcc
 {
 
 /**
- * This Formats all primary types into a string stream for
+ * This formats all primary types into a string stream for
  * output or it reads values from a input and converts them to
  * a given type;
  *
