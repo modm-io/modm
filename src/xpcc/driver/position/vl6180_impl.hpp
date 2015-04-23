@@ -42,13 +42,9 @@ xpcc::Vl6180<I2cMaster>::initialize()
 
 	CO_BEGIN();
 
-	CO_CALL( read(Register::SYSTEM__FRESH_OUT_OF_RESET, i2cBuffer[2]) );
-
 	// logicBuffer[0] => success of config
 	logicBuffer.byte[0] = true;
 	// logicBuffer[1] => index of array
-	// we do not need to set the private registers again if already done
-	// logicBuffer.byte[1] = (i2cBuffer[2]) ? 0 : 29;
 	logicBuffer.byte[1] = 0;
 
 	// write the configuration
@@ -60,9 +56,6 @@ xpcc::Vl6180<I2cMaster>::initialize()
 		// prematurely abort if something failed
 		if (!logicBuffer.byte[0]) CO_RETURN(false);
 	}
-
-	// only clear bit, if config successful
-	if (logicBuffer.byte[0]) CO_CALL( write(Register::SYSTEM__FRESH_OUT_OF_RESET, 0) );
 
 	CO_END_RETURN(logicBuffer.byte[0]);
 }
