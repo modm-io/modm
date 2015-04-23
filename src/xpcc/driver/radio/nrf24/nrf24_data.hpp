@@ -63,26 +63,21 @@ public:
 	/// Data structure that user uses to pass data to the data layer
 	struct ATTRIBUTE_PACKED Packet
 	{
-		Packet(uint8_t payload_length = Nrf24Data::getPayloadLength()) :
+		Packet() :
 			dest(0), src(0)
 		{
-			payload.length = payload_length;
-			payload.data = new uint8_t[payload.length];
-			if(payload.data)
-				memset(payload.data, 0, payload.length);
+			payload.length = Nrf24Phy::getMaxPayload();
 		}
 
 		struct ATTRIBUTE_PACKED Payload
 		{
-			uint8_t* data;
+			uint8_t data[Nrf24Phy::getMaxPayload()];
 			uint8_t length;      // max. 30!
 		};
 
 		Payload     payload;
 		Address     dest;
 		Address     src;         // will be ignored when sending
-
-		~Packet() { delete payload.data; }
 	};
 
 

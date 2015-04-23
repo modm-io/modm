@@ -57,7 +57,7 @@ public:
 	}
 
 	/// Get the maximum payload size the hardware can transmit in one packet
-	static uint16_t
+	static uint16_t constexpr
 	getMaxPayload()
 	{ return max_payload_length; }
 
