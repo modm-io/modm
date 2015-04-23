@@ -44,6 +44,10 @@ template<typename Nrf24Phy>
 bool
 xpcc::Nrf24Data<Nrf24Phy>::packetProcessed = false;
 
+template<typename Nrf24Phy>
+xpcc::Timeout
+xpcc::Nrf24Data<Nrf24Phy>::sendingInterruptTimeout;
+
 // --------------------------------------------------------------------------------------------------------------------
 
 
@@ -191,6 +195,8 @@ xpcc::Nrf24Data<Nrf24Phy>::sendPacket(Packet& packet)
 		state = SendingState::Busy;
 	}
 
+	sendingInterruptTimeout.restart(interruptTimeoutAfterSending);
+
 	return true;
 }
 
@@ -260,7 +266,18 @@ xpcc::Nrf24Data<Nrf24Phy>::updateSendingState()
 	// read relevant status registers
 	uint8_t status = Phy::readStatus();
 
-	if(status & (uint8_t)Status::MAX_RT)
+
+	if(sendingInterruptTimeout.execute())
+	{
+		XPCC_LOG_ERROR << "[nrf24-data] IRQ timed out" << xpcc::endl;
+
+		state = SendingState::DontKnow;
+
+		// We should flush the Tx Fifo because we have no clue if the
+		// packet could be sent
+		Phy::flushTxFifo();
+
+	} else if(status & (uint8_t)Status::MAX_RT)
 	{
 		XPCC_LOG_DEBUG << "Interrupt: MAX_RT" << xpcc::endl;
 

@@ -12,6 +12,7 @@
 
 #include <stdint.h>
 #include <xpcc/debug/logger.hpp>
+#include <xpcc/processing/timer.hpp>
 
 #include "nrf24_phy.hpp"
 #include "nrf24_config.hpp"
@@ -218,6 +219,11 @@ private:
 	static SendingState state;
 
 	static bool packetProcessed;
+
+	/* This is a workaround because some times the radio module doesn't
+	 * throw an interrupt after sending */
+	static xpcc::Timeout sendingInterruptTimeout;
+	static constexpr int interruptTimeoutAfterSending = 15; // in ms
 };
 
 }	// namespace xpcc
