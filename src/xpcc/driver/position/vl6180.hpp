@@ -363,6 +363,12 @@ public:
 	xpcc::co::Result<bool>
 	setAddress(uint8_t address);
 
+	/// Only sets a new I2C address for this driver, not on the external sensor!
+	/// The address is not permanent and must be set again after every device boot.
+	void
+	forceSetAddress(uint8_t address)
+	{ adapter.setAddress(address); }
+
 	/// Sets a new analog gain for ALS.
 	xpcc::co::Result<bool>
 	setGain(AnalogGain gain);

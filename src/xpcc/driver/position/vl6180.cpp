@@ -79,7 +79,7 @@ FLASH_STORAGE(BinaryConfiguration configurationFlash[]) =
 //	{0x02D, 0x11},	// Range check enabled: SNR and ECE
 	// 46
 };
-xpcc::accessor::Flash<vl6180_private::BinaryConfiguration> configuration(configurationFlash);
+xpcc::accessor::Flash<BinaryConfiguration> configuration(configurationFlash);
 
 FLASH_STORAGE(float gainFlash[]) =
 {

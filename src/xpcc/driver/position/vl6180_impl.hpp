@@ -28,12 +28,10 @@ xpcc::Vl6180<I2cMaster>::ping()
 {
 	CO_BEGIN();
 
-	CO_WAIT_UNTIL(adapter.configurePing() &&
-			(i2cTask = I2cTask::Ping, this->startTransaction(&adapter)));
+	if (not CO_CALL(read(Register::IDENTIFICATION__MODEL_ID, i2cBuffer[2])))
+		CO_RETURN(false);
 
-	CO_WAIT_WHILE(i2cTask == I2cTask::Ping);
-
-	CO_END_RETURN(i2cSuccess == I2cTask::Ping);
+	CO_END_RETURN(i2cBuffer[2] == 0xB4);
 }
 
 template < typename I2cMaster >
@@ -50,7 +48,8 @@ xpcc::Vl6180<I2cMaster>::initialize()
 	logicBuffer.byte[0] = true;
 	// logicBuffer[1] => index of array
 	// we do not need to set the private registers again if already done
-	logicBuffer.byte[1] = (i2cBuffer[2]) ? 0 : 29;
+	// logicBuffer.byte[1] = (i2cBuffer[2]) ? 0 : 29;
+	logicBuffer.byte[1] = 0;
 
 	// write the configuration
 	for (; logicBuffer.byte[1] < 40; logicBuffer.byte[1]++)
@@ -162,7 +161,7 @@ xpcc::Vl6180<I2cMaster>::setAddress(uint8_t address)
 
 	if ( CO_CALL(write(Register::I2C_SLAVE__DEVICE_ADDRESS, (address & 0x7f))) )
 	{
-		adapter.setAddress(address & 0x7f);
+		adapter.setAddress(address);
 		CO_RETURN(true);
 	}
 
