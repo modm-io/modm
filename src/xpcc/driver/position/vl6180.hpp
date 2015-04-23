@@ -27,10 +27,10 @@ namespace vl6180_private
 		uint8_t value;
 	};
 	// see Application Note AN4545 page 24: SR03 settings
-	EXTERN_FLASH_STORAGE(BinaryConfiguration configuration[40]);
+	extern xpcc::accessor::Flash<vl6180_private::BinaryConfiguration> configuration;
 
 	// gain settings
-	EXTERN_FLASH_STORAGE(float gain[8]);
+	extern xpcc::accessor::Flash<float> gain;
 }	// namespace vl6180_private
 /// @endcond
 
@@ -457,8 +457,6 @@ private:
 	xpcc::ShortTimeout timeout;
 	RangeErrorCode rangeError;
 	ALS_ErrorCode alsError;
-
-	xpcc::accessor::Flash<vl6180_private::BinaryConfiguration> configuration;
 
 	/// @cond
 	// Internal write buffer

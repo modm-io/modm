@@ -16,7 +16,6 @@ template < typename I2cMaster >
 xpcc::Vl6180<I2cMaster>::Vl6180(Data &data, uint8_t address)
 :	data(data), i2cTask(I2cTask::Idle), i2cSuccess(0),
 	adapter(address, i2cTask, i2cSuccess),
-	configuration(vl6180_private::configuration),
 	i2cBuffer{0,0,0,0}, logicBuffer{Register(0)}
 {
 }
@@ -41,6 +40,8 @@ template < typename I2cMaster >
 xpcc::co::Result<bool>
 xpcc::Vl6180<I2cMaster>::initialize()
 {
+	using namespace vl6180_private;
+
 	CO_BEGIN();
 
 	CO_CALL( read(Register::SYSTEM__FRESH_OUT_OF_RESET, i2cBuffer[2]) );

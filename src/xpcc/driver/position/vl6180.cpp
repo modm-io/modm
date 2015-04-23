@@ -15,7 +15,7 @@ namespace xpcc
 namespace vl6180_private
 {
 
-FLASH_STORAGE(BinaryConfiguration configuration[]) =
+FLASH_STORAGE(BinaryConfiguration configurationFlash[]) =
 {
 	// Mandatory : private registers (the infamous binary blob of black magic)
 	{0x207, 0x01},
@@ -79,8 +79,9 @@ FLASH_STORAGE(BinaryConfiguration configuration[]) =
 //	{0x02D, 0x11},	// Range check enabled: SNR and ECE
 	// 46
 };
+xpcc::accessor::Flash<vl6180_private::BinaryConfiguration> configuration(configurationFlash);
 
-FLASH_STORAGE(float gain[]) =
+FLASH_STORAGE(float gainFlash[]) =
 {
 	20,		//0x40
 	10.32,	//0x41
@@ -91,6 +92,7 @@ FLASH_STORAGE(float gain[]) =
 	1.01,	//0x46
 	40		//0x47
 };
+xpcc::accessor::Flash<float> gain(gainFlash);
 
 }	// namespace vl6180_private
 
