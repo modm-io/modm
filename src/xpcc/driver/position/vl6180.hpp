@@ -310,7 +310,7 @@ public:
 		friend class Vl6180;
 
 		Data()
-		:	gain(6), time(100) {}
+		:	data{255,0,0}, gain(6), time(100) {}
 
 		/// @return the distance in millimeters, 255 if error
 		inline uint8_t
