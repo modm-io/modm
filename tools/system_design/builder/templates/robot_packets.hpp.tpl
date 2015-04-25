@@ -90,6 +90,10 @@ namespace {{ namespace }}
 			{{ element | subtype }};
 			{%- endfor %}
 		} __attribute__((packed));
+
+		xpcc::IOStream&
+		operator << (xpcc::IOStream& s, const {{ packet.name | typeName }} e);
+
 	{% elif packet.isTypedef %}
 		typedef {{ packet.subtype.name | typeName }} {{ packet.name | typeName }};
 	{% endif %}

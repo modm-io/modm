@@ -24,7 +24,8 @@
 // ----------------------------------------------------------------------------
 // IOStream Helpers
 {%- for packet in packets %}
-{%- if packet.isBuiltIn %}{% continue %}{% endif %}
+	{%- if packet.isBuiltIn %}{% continue %}{% endif %}
+
 	{%- if packet.isEnum %}
 xpcc::IOStream&
 {{ namespace }}::packet::operator << (xpcc::IOStream& s, const {{ packet.name | typeName }} e)
@@ -32,5 +33,16 @@ xpcc::IOStream&
 	s << enumToString(e);
 	return s;
 }
-{% endif -%}
+	{% elif packet.flattened().isStruct %}
+xpcc::IOStream&
+{{ namespace }}::packet::operator << (xpcc::IOStream& s, const {{ packet.flattened().name | typeName }} e)
+{
+	s << "{{ packet.flattened().name | typeName }}(";
+		{%- for element in packet.flattened().iter() %}
+	s << " {{ element.name | variableName }}=" << e.{{ element.name | variableName }};
+		{%- endfor %}
+	s << " )";
+	return s;
+}
+	{%- endif %}
 {%- endfor -%}
