@@ -15,32 +15,13 @@
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
-xpcc::Bmp085<I2cMaster>::Bmp085(Data &data, uint8_t address)
-:	data(data),
- 	i2cTask(I2cTask::Idle),
- 	i2cSuccess(0),
- 	adapter(address, i2cTask, i2cSuccess)
+xpcc::Bmp085<I2cMaster>::Bmp085(Data &data, uint8_t address) :
+	I2cDevice<I2cMaster, 1>(address), data(data)
 {
 }
 
 // ----------------------------------------------------------------------------
 // MARK: - Tasks
-template < class I2cMaster >
-xpcc::co::Result<bool>
-xpcc::Bmp085<I2cMaster>::ping()
-{
-	CO_BEGIN();
-
-	CO_WAIT_UNTIL(
-			adapter.configurePing() and
-			(i2cTask = I2cTask::Ping, this->startTransaction(&adapter))
-	);
-
-	CO_WAIT_WHILE(i2cTask == I2cTask::Ping);
-
-	CO_END_RETURN(i2cSuccess == I2cTask::Ping);
-}
-
 template < typename I2cMaster >
 xpcc::co::Result<bool>
 xpcc::Bmp085<I2cMaster>::configure(Mode mode)
@@ -50,14 +31,11 @@ xpcc::Bmp085<I2cMaster>::configure(Mode mode)
 	setMode(mode);
 	buffer[0] = i(Register::CAL_AC1);
 
-	CO_WAIT_UNTIL(
-			adapter.configureWriteRead(buffer, 1, reinterpret_cast<uint8_t*>(&data.calibration), 22) and
-			(i2cTask = I2cTask::ReadCalibration, this->startTransaction(&adapter))
-	);
+	CO_WAIT_UNTIL( this->startWriteRead(buffer, 1, reinterpret_cast<uint8_t*>(&data.calibration), 22) );
 
-	CO_WAIT_WHILE(i2cTask == I2cTask::ReadCalibration);
+	CO_WAIT_WHILE( this->isTransactionRunning() );
 
-	if (i2cSuccess == I2cTask::ReadCalibration) {
+	if ( this->wasTransactionSuccessful() ) {
 		uint16_t* element = reinterpret_cast<uint16_t*>(&data.calibration);
 		element[ 0] = xpcc::fromBigEndian(element[0]);
 		element[ 1] = xpcc::fromBigEndian(element[1]);
@@ -89,14 +67,11 @@ xpcc::Bmp085<I2cMaster>::readout()
 	buffer[0] = i(Register::CONTROL);
 	buffer[1] = i(Conversion::Temperature);
 
-	CO_WAIT_UNTIL(
-			adapter.configureWrite(buffer, 2) and
-			(i2cTask = I2cTask::ConvertTemperature, this->startTransaction(&adapter))
-	);
+	CO_WAIT_UNTIL( this->startWrite(buffer, 2) );
 
-	CO_WAIT_WHILE(i2cTask == I2cTask::ConvertTemperature);
+	CO_WAIT_WHILE( this->isTransactionRunning() );
 
-	if (i2cSuccess != I2cTask::ConvertTemperature) {
+	if (not this->wasTransactionSuccessful()) {
 		CO_RETURN(false);
 	}
 
@@ -106,16 +81,13 @@ xpcc::Bmp085<I2cMaster>::readout()
 
 	// Get the temperature from sensor
 	buffer[0] = i(Register::MSB);
-	CO_WAIT_UNTIL(
-			adapter.configureWriteRead(buffer, 1, data.raw, 2) and
-			(i2cTask = I2cTask::ReadTemperature, this->startTransaction(&adapter))
-	);
+	CO_WAIT_UNTIL( this->startWriteRead(buffer, 1, data.raw, 2) );
 
 	data.meta &= ~data.TEMPERATURE_CALCULATED;
 
-	CO_WAIT_WHILE(i2cTask == I2cTask::ReadTemperature);
+	CO_WAIT_WHILE( this->isTransactionRunning() );
 
-	if (i2cSuccess != I2cTask::ReadTemperature) {
+	if (not this->wasTransactionSuccessful()) {
 		CO_RETURN(false);
 	}
 
@@ -125,14 +97,11 @@ xpcc::Bmp085<I2cMaster>::readout()
 	buffer[0] = i(Register::CONTROL);
 	buffer[1] = i(Conversion::Pressure) | bufferedMode;
 
-	CO_WAIT_UNTIL(
-			adapter.configureWrite(buffer, 2) and
-			(i2cTask = I2cTask::ConvertPressure, this->startTransaction(&adapter))
-	);
+	CO_WAIT_UNTIL( this->startWrite(buffer, 2) );
 
-	CO_WAIT_WHILE(i2cTask == I2cTask::ConvertPressure);
+	CO_WAIT_WHILE( this->isTransactionRunning() );
 
-	if (i2cSuccess != I2cTask::ConvertPressure) {
+	if (not this->wasTransactionSuccessful()) {
 		CO_RETURN(false);
 	}
 
@@ -142,16 +111,13 @@ xpcc::Bmp085<I2cMaster>::readout()
 
 	// Get the pressure from sensor
 	buffer[0] = i(Register::MSB);
-	CO_WAIT_UNTIL(
-			adapter.configureWriteRead(buffer, 1, data.raw + 2, 3) and
-			(i2cTask = I2cTask::ReadPressure, this->startTransaction(&adapter))
-	);
+	CO_WAIT_UNTIL( this->startWriteRead(buffer, 1, data.raw + 2, 3) );
 
 	data.meta &= ~data.PRESSURE_CALCULATED;
 
-	CO_WAIT_WHILE(i2cTask == I2cTask::ReadPressure);
+	CO_WAIT_WHILE( this->isTransactionRunning() );
 
-	CO_END_RETURN(i2cSuccess == I2cTask::ReadPressure);
+	CO_END_RETURN( this->wasTransactionSuccessful() );
 }
 
 void
