@@ -15,25 +15,8 @@
 // ----------------------------------------------------------------------------
 template < class I2cMaster >
 xpcc::Hmc6343<I2cMaster>::Hmc6343(Data &data, uint8_t address)
-:	data(data), timeout(500), i2cTask(I2cTask::Idle), i2cSuccess(0),
-	adapter(address, i2cTask, i2cSuccess)
+:	I2cDevice<I2cMaster,2>(address), data(data), timeout(500)
 {
-}
-
-// MARK: - i2cTasks
-// MARK: ping
-template < class I2cMaster >
-xpcc::co::Result<bool>
-xpcc::Hmc6343<I2cMaster>::ping()
-{
-	CO_BEGIN();
-
-	CO_WAIT_UNTIL(adapter.configurePing() &&
-			(i2cTask = I2cTask::Ping, this->startTransaction(&adapter)));
-
-	CO_WAIT_WHILE(i2cTask == I2cTask::Ping);
-
-	CO_END_RETURN(i2cSuccess == I2cTask::Ping);
 }
 
 // ----------------------------------------------------------------------------
@@ -46,15 +29,12 @@ xpcc::Hmc6343<I2cMaster>::writeCommand(Command command, uint16_t timeout)
 	CO_BEGIN();
 
 	buffer[0] = i(command);
-	CO_WAIT_UNTIL(
-			this->timeout.isExpired() && adapter.configureWrite(buffer, 1) &&
-			(i2cTask = i(command) + I2cTask::PostCommandBase, this->startTransaction(&adapter))
-	);
+	CO_WAIT_UNTIL( this->timeout.isExpired() and this->startWrite(buffer, 1) );
 
 	this->timeout.restart(timeout);
-	CO_WAIT_WHILE(i2cTask == (i(command) + I2cTask::PostCommandBase));
+	CO_WAIT_WHILE( this->isTransactionRunning() );
 
-	CO_END_RETURN(i2cSuccess == (i(command) + I2cTask::PostCommandBase));
+	CO_END_RETURN( this->wasTransactionSuccessful() );
 }
 
 // MARK: write register
@@ -68,15 +48,12 @@ xpcc::Hmc6343<I2cMaster>::writeRegister(Register reg, uint8_t value)
 	buffer[1] = i(reg);
 	buffer[2] = value;
 
-	CO_WAIT_UNTIL(
-			timeout.isExpired() && adapter.configureWrite(buffer, 3) &&
-			(i2cTask = i(reg) + I2cTask::WriteEepromBase, this->startTransaction(&adapter))
-	);
+	CO_WAIT_UNTIL( timeout.isExpired() and this->startWrite(buffer, 3) );
 
 	timeout.restart(10);
-	CO_WAIT_WHILE(i2cTask == (i(reg) + I2cTask::WriteEepromBase));
+	CO_WAIT_WHILE( this->isTransactionRunning() );
 
-	CO_END_RETURN(i2cSuccess == (i(reg) + I2cTask::WriteEepromBase));
+	CO_END_RETURN( this->wasTransactionSuccessful() );
 }
 
 // MARK: write 16bit register
@@ -105,24 +82,18 @@ xpcc::Hmc6343<I2cMaster>::readRegister(Register reg, uint8_t &value)
 
 	buffer[0] = i(Command::ReadEeprom);
 	buffer[1] = i(reg);
-	CO_WAIT_UNTIL(
-			timeout.isExpired() && adapter.configureWrite(buffer, 2) &&
-			(i2cTask = i(reg) + I2cTask::PostEepromBase, this->startTransaction(&adapter))
-	);
+	CO_WAIT_UNTIL( timeout.isExpired() and this->startWrite(buffer, 2) );
 
 	timeout.restart(10);
-	CO_WAIT_WHILE(i2cTask == (i(reg) + I2cTask::PostEepromBase));
+	CO_WAIT_WHILE( this->isTransactionRunning() );
 
-	if(i2cSuccess == (i(reg) + I2cTask::PostEepromBase))
+	if( this->wasTransactionSuccessful() )
 	{
-		CO_WAIT_UNTIL(
-				timeout.isExpired() && adapter.configureRead(&value, 1) &&
-				(i2cTask = i(reg) + I2cTask::ReadEepromBase, this->startTransaction(&adapter))
-		);
+		CO_WAIT_UNTIL( timeout.isExpired() and this->startRead(&value, 1) );
 
-		CO_WAIT_WHILE(i2cTask == (i(reg) + I2cTask::ReadEepromBase));
+		CO_WAIT_WHILE( this->isTransactionRunning() );
 
-		CO_RETURN(i2cSuccess == (i(reg) + I2cTask::ReadEepromBase));
+		CO_RETURN( this->wasTransactionSuccessful() );
 	}
 
 	CO_END_RETURN(false);
@@ -142,7 +113,7 @@ xpcc::Hmc6343<I2cMaster>::readRegister(Register16 reg, uint16_t &value)
 		value = buffer[2];
 		if ( CO_CALL( readRegister(static_cast<Register>(i(reg)+1), buffer[2]) ) )
 		{
-			// an optimization would be to take the uint8_t addresses of value
+			// an optimization would be to take the uint8_t address of the MSB value
 			// but then we would have to deal with endianess, and that headache is annoying.
 			value |= (buffer[2] << 8);
 			CO_RETURN(true);
@@ -161,14 +132,11 @@ xpcc::Hmc6343<I2cMaster>::readPostData(Command command, uint8_t offset, uint8_t 
 
 	if (CO_CALL(writeCommand(command, 1)))
 	{
-		CO_WAIT_UNTIL(
-				timeout.isExpired() && adapter.configureRead(data.data + offset, readSize) &&
-				(i2cTask = i(command) + I2cTask::ReadCommandBase, this->startTransaction(&adapter))
-		);
+		CO_WAIT_UNTIL( timeout.isExpired() and this->startRead(data.data + offset, readSize) );
 
-		CO_WAIT_WHILE(i2cTask == (i(command) + I2cTask::ReadCommandBase));
+		CO_WAIT_WHILE( this->isTransactionRunning() );
 
-		CO_RETURN(i2cSuccess == (i(command) + I2cTask::ReadCommandBase));
+		CO_RETURN( this->wasTransactionSuccessful() );
 	}
 
 	CO_END_RETURN(false);

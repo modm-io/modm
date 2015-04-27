@@ -12,7 +12,6 @@
 
 #include <xpcc/architecture/interface/i2c_device.hpp>
 #include <xpcc/processing/protothread.hpp>
-#include <xpcc/processing/coroutine.hpp>
 
 namespace xpcc
 {
@@ -214,16 +213,11 @@ protected:
  * @author	Niklas Hauser
  */
 template < class I2cMaster >
-class Hmc6343 : public hmc6343, public xpcc::I2cDevice< I2cMaster >, protected xpcc::co::NestedCoroutine<2>
+class Hmc6343 : public hmc6343, public xpcc::I2cDevice< I2cMaster, 2 >
 {
 public:
 	/// Constructor, requires a hmc6343::Data object, sets address to default of 0x19
 	Hmc6343(Data &data, uint8_t address=0x19);
-
-	/// pings the sensor
-	xpcc::co::Result<bool>
-	ping();
-
 
 
 	// READING RAM
@@ -369,35 +363,9 @@ private:
 	xpcc::co::Result<bool>
 	readPostData(Command command, uint8_t offset, uint8_t readSize);
 
-	enum I2cTask : uint8_t
-	{
-		Idle = 0,
-
-		// insert all registers from 0x00 to 0x15 for writing (+0x01)
-		WriteEepromBase = 0x01,
-		// insert all registers from 0x00 to 0x15 for posting (+0x17)
-		PostEepromBase = 0x17,
-		// insert all registers from 0x00 to 0x15 for reading (+0x2C)
-		ReadEepromBase = 0x2C,
-
-		// insert all post commands from 0x40 to 0x65 for writing (+0x02)
-		PostCommandBase = 0x02,
-		// insert all post commands from 0x40 to 0x65 for reading (+0x03)
-		ReadCommandBase = 0x03,
-		// insert all remaining commands from 0x71 to 0xF1 (+0x02)
-		WriteCommandBase = PostCommandBase,
-
-		// ping \o/
-		Ping = 0xFF
-	};
-
 private:
 	uint8_t buffer[3];
 	xpcc::ShortTimeout timeout;
-
-	volatile uint8_t i2cTask;
-	volatile uint8_t i2cSuccess;
-	xpcc::I2cTagAdapter<xpcc::I2cWriteReadAdapter> adapter;
 };
 
 } // namespace xpcc
