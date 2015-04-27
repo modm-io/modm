@@ -149,8 +149,7 @@ struct tcs3414
  * \ingroup	driver_other
  */
 template < typename I2cMaster >
-class Tcs3414 : public tcs3414, public xpcc::I2cDevice<I2cMaster>,
-				public xpcc::co::NestedCoroutine<2>
+class Tcs3414 : public tcs3414, public xpcc::I2cDevice< I2cMaster, 2 >
 {
 public:
 	Tcs3414(uint8_t address = 0x39);
@@ -244,10 +243,6 @@ public:
 	refreshAllColors();
 
 	// MARK: - TASKS
-	/// Pings the sensor
-	xpcc::co::Result<bool>
-	ping();
-
 	xpcc::co::Result<bool>
 	initialize()
 	{
@@ -274,20 +269,8 @@ private:
 	}
 
 private:
-	enum I2cTask : uint8_t
-	{
-		Idle = 0,
-		WriteRegister,
-		ReadRegister,
-		Ping,
-	};
-
 	uint8_t commandBuffer[4];
 	bool success;
-
-	volatile uint8_t i2cTask;
-	volatile uint8_t i2cSuccess;
-	xpcc::I2cTagAdapter< xpcc::I2cWriteReadAdapter > adapter;
 
 private:
 	//! \brief	Read value of specific register.
