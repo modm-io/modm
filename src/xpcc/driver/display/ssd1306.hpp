@@ -111,9 +111,33 @@ protected:
 	i(ScrollDirection direction) { return uint8_t(direction); }
 	static constexpr uint8_t
 	i(ScrollStep step) { return uint8_t(step); }
+
+	class DataTransmissionAdapter : public xpcc::I2cWriteAdapter
+	{
+	public:
+		DataTransmissionAdapter(uint8_t address);
+
+		void ALWAYS_INLINE
+		setCommandBuffer(uint8_t *buffer)
+		{ commands = buffer; }
+
+		bool inline
+		configureDisplayWrite(uint8_t (*buffer)[8], std::size_t size);
+
+	protected:
+		virtual Writing
+		writing() override;
+
+		virtual void
+		detaching(xpcc::I2c::DetachCause cause);
+
+	private:
+		uint8_t *commands;
+	public:
+		bool writeable;
+	};
 	/// @endcond
 }; // struct ssd1306
-
 
 /**
  * Driver for SSD1306 based OLED-displays using I2C.
@@ -124,9 +148,9 @@ protected:
  * @ingroup	driver_display
  */
 template < class I2cMaster >
-class Ssd1306 : public ssd1306, public xpcc::I2cDevice<I2cMaster>,
-				public BufferedGraphicDisplay<128, 64>, protected xpcc::co::NestedCoroutine<2>
-		{
+class Ssd1306 : public ssd1306, public BufferedGraphicDisplay<128, 64>,
+				public I2cDevice<I2cMaster, 2, ssd1306::DataTransmissionAdapter>
+{
 public:
 	Ssd1306(uint8_t address = 0x3C);
 
@@ -134,7 +158,7 @@ public:
 	bool inline
 	pingBlocking()
 	{
-		return CO_CALL_BLOCKING(ping());
+		return CO_CALL_BLOCKING(this->ping());
 	}
 
 	/// initializes for 3V3 with charge-pump
@@ -157,14 +181,10 @@ public:
 	bool ALWAYS_INLINE
 	isWritable()
 	{
-		return (i2cTask != I2cTask::WriteDisplay);
+		return this->adapter.writeable;
 	}
 
 	// MARK: - TASKS
-	/// pings the display
-	xpcc::co::Result<bool>
-	ping();
-
 	/// initializes for 3V3 with charge-pump asynchronously
 	xpcc::co::Result<bool>
 	initialize();
@@ -219,39 +239,7 @@ private:
 	startTransactionWithLength(uint8_t length);
 
 private:
-	enum I2cTask : uint8_t
-	{
-		Idle = 0,
-		// insert all ssd1306::Command
-		WriteDisplay = 0xFE,
-		Ping = 0xFF
-	};
-
-	class DataTransmissionAdapter : public xpcc::I2cWriteAdapter
-	{
-	public:
-		DataTransmissionAdapter(uint8_t address);
-
-		void ALWAYS_INLINE
-		setCommandBuffer(uint8_t *buffer)
-		{ commands = buffer; }
-
-		bool inline
-		configureDisplayWrite(uint8_t (*buffer)[8], std::size_t size);
-
-	protected:
-		virtual Writing
-		writing() override;
-
-		uint8_t *commands;
-	};
-
-private:
 	uint8_t commandBuffer[14];
-
-	volatile uint8_t i2cTask;
-	volatile uint8_t i2cSuccess;
-	xpcc::I2cTagAdapter<DataTransmissionAdapter> adapter;
 };
 
 } // namespace xpcc
