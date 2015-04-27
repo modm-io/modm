@@ -24,10 +24,10 @@ struct i2cEeprom
 	public:
 		DataTransmissionAdapter(uint8_t address);
 
-		bool inline
+		bool
 		configureWrite(uint16_t address, const uint8_t *buffer, std::size_t size);
 
-		bool inline
+		bool
 		configureRead(uint16_t address, uint8_t *buffer, std::size_t size);
 
 	protected:

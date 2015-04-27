@@ -121,7 +121,7 @@ protected:
 		setCommandBuffer(uint8_t *buffer)
 		{ commands = buffer; }
 
-		bool inline
+		bool
 		configureDisplayWrite(uint8_t (*buffer)[8], std::size_t size);
 
 	protected:
