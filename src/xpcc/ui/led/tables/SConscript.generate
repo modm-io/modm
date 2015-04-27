@@ -54,6 +54,7 @@ for gamma, bit, length in table:
 	string = string[:-1]
 
 	substitutions = {
+		'gamma': int(10 * gamma),
 		'type': type,
 		'bit': bit,
 		'length': length,

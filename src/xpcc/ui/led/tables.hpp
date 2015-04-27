@@ -25,24 +25,24 @@ namespace xpcc
  *
  * If any special behavior is expected, you can copy and modify these
  * tables into your own project.
- * Most of these use a gamma of 2.2.
+ * All tables use a gamma of 2.2.
  */
 namespace ui
 {
 	/// Provides 7bit resolution (0 to 127) in 256 steps, 256 bytes of flash.
-	EXTERN_FLASH_STORAGE(uint8_t table7_256[256]);
+	extern xpcc::accessor::Flash<uint8_t> table22_7_256;
 
 	/// Provides 8bit resolution (0 to 255) in 256 steps, 256 bytes of flash.
-	EXTERN_FLASH_STORAGE(uint8_t table8_256[256]);
+	extern xpcc::accessor::Flash<uint8_t> table22_8_256;
 
 	/// Provides 10bit resolution (0 to 1023) in 256 steps, 512 bytes of flash.
-	EXTERN_FLASH_STORAGE(uint16_t table10_256[256]);
+	extern xpcc::accessor::Flash<uint16_t> table22_10_256;
 
 	/// Provides 12bit resolution (0 to 4095) in 256 steps, 512 bytes of flash.
-	EXTERN_FLASH_STORAGE(uint16_t table12_256[256]);
+	extern xpcc::accessor::Flash<uint16_t> table22_12_256;
 
 	/// Provides 16bit resolution (0 to 65535) in 256 steps, 512 bytes of flash.
-	EXTERN_FLASH_STORAGE(uint16_t table16_256[256]);
+	extern xpcc::accessor::Flash<uint16_t> table22_16_256;
 }
 
 }
