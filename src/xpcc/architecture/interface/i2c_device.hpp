@@ -21,21 +21,35 @@ namespace xpcc
 /**
  * Base class of an I2C Device.
  *
- * This class provides functions for configuring the peripheral.
+ * This class provides functions for configuring the adapter and peripheral and starting transactions.
+ * It also provides a basic `ping()` coroutine, which checks if the device responds to its address.
+ *
+ * You need to provide the number of required nesting levels for your driver here.
+ * By default, 10 levels are chosen, which should be more than enough in any case.
+ *
+ * You can choose to use your own custom I2c Transaction Adapter, by providing a class subclassed from
+ * an existing I2cAdapter or which implements the I2cTransaction interface manually.
+ *
+ * @tparam	I2cMaster		an I2cMaster conforming to the I2cMaster interface.
+ * @tparam	NestingLevels	number of nesting levels required for your driver
+ * @tparam	Adapter			an I2c Adapter conforming to the I2cTransaction interface.
  *
  * @author	Georgi Grinshpun
  * @author	Niklas Hauser
  * @ingroup i2c
  */
-template < class I2cMaster, uint8_t Levels = 10, class Adapter = I2cWriteReadAdapter >
-class I2cDevice : protected xpcc::co::NestedCoroutine< Levels >
+template < class I2cMaster, uint8_t NestingLevels = 10, class Adapter = I2cWriteReadAdapter >
+class I2cDevice : protected xpcc::co::NestedCoroutine< NestingLevels >
 {
 public:
+	///	@param	address	the slave address not yet shifted left (address < 128).
 	I2cDevice(uint8_t address)
 	:	adapter(address), configuration(nullptr)
 	{
 	}
 
+	/// Sets a new address of the slave device.
+	///	@param	address	the slave address not yet shifted left (address < 128).
 	void
 	setAddress(uint8_t address)
 	{
@@ -48,6 +62,8 @@ public:
 		configuration = handler;
 	}
 
+	/// @retval `true`	device responds to address
+	/// @retval `false`	not device with address found
 	xpcc::co::Result<bool>
 	ping()
 	{
@@ -61,6 +77,7 @@ public:
 	}
 
 protected:
+	/// Configures the adapter with a write/read operation and starts the transaction.
 	bool inline
 	startWriteRead(const uint8_t *writeBuffer, std::size_t writeSize,
 			uint8_t *readBuffer, std::size_t readSize)
@@ -69,6 +86,7 @@ protected:
 				startTransaction() );
 	}
 
+	/// Configures the adapter with a write operation and starts the transaction.
 	bool inline
 	startWrite(const uint8_t *buffer, std::size_t size)
 	{
@@ -76,6 +94,7 @@ protected:
 				startTransaction() );
 	}
 
+	/// Configures the adapter with a read operation and starts the transaction.
 	bool inline
 	startRead(uint8_t *buffer, std::size_t size)
 	{
@@ -83,6 +102,8 @@ protected:
 				startTransaction() );
 	}
 
+	/// Starts the transaction with the declared transaction object.
+	/// @param	transaction	pointer to transaction object, `nullptr` for own adapter.
 	bool inline
 	startTransaction(xpcc::I2cTransaction *transaction = nullptr)
 	{
@@ -90,12 +111,14 @@ protected:
 	}
 
 protected:
+	/// @returns `true` when adapter is busy.
 	bool inline
 	isTransactionRunning()
 	{
 		return adapter.isBusy();
 	}
 
+	/// @returns `true` when adapter did not return an error.
 	bool inline
 	wasTransactionSuccessful()
 	{
