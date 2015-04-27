@@ -66,27 +66,27 @@ protected:
 			uint8_t *readBuffer, std::size_t readSize)
 	{
 		return ( adapter.configureWriteRead(writeBuffer, writeSize, readBuffer, readSize) and
-				startTransaction(&adapter) );
+				startTransaction() );
 	}
 
 	bool inline
 	startWrite(const uint8_t *buffer, std::size_t size)
 	{
 		return ( adapter.configureWrite(buffer, size) and
-				startTransaction(&adapter) );
+				startTransaction() );
 	}
 
 	bool inline
 	startRead(uint8_t *buffer, std::size_t size)
 	{
 		return ( adapter.configureRead(buffer, size) and
-				startTransaction(&adapter) );
+				startTransaction() );
 	}
 
 	bool inline
-	startTransaction(xpcc::I2cTransaction *transaction)
+	startTransaction(xpcc::I2cTransaction *transaction = nullptr)
 	{
-		return I2cMaster::start(transaction, configuration);
+		return I2cMaster::start(transaction ? transaction : &adapter, configuration);
 	}
 
 protected:

@@ -85,7 +85,7 @@ public:
 	{
 		CO_BEGIN();
 
-		CO_WAIT_UNTIL(this->adapter.configurePing() and this->startTransaction(&this->adapter));
+		CO_WAIT_UNTIL(this->adapter.configurePing() and this->startTransaction());
 
 		CO_WAIT_WHILE( this->isTransactionRunning() );
 
@@ -100,7 +100,7 @@ public:
 	{
 		CO_BEGIN();
 
-		CO_WAIT_UNTIL( this->startTransaction(&this->adapter) );
+		CO_WAIT_UNTIL( this->startTransaction() );
 
 		CO_WAIT_WHILE( this->isTransactionRunning() );
 

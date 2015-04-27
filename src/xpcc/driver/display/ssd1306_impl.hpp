@@ -57,8 +57,7 @@ xpcc::Ssd1306<I2cMaster>::startWriteDisplay()
 {
 	CO_BEGIN();
 
-	CO_WAIT_UNTIL( this->adapter.configureDisplayWrite(buffer, 1024) and
-					this->startTransaction(&this->adapter) );
+	CO_WAIT_UNTIL( this->adapter.configureDisplayWrite(buffer, 1024) and this->startTransaction() );
 
 	CO_END();
 }
