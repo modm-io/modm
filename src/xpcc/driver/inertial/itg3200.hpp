@@ -193,14 +193,11 @@ public:
  * @ingroup driver_inertial
  */
 template < typename I2cMaster >
-class Itg3200 : public itg3200, public xpcc::I2cDevice< I2cMaster >, protected xpcc::co::NestedCoroutine<2>
+class Itg3200 : public itg3200, public xpcc::I2cDevice< I2cMaster, 2 >
 {
 public:
 	/// Constructor, requires an itg3200::Data object, sets address to default of 0x68 (AD0 low: 0x69)
 	Itg3200(Data &data, uint8_t address=0x68);
-
-	xpcc::co::Result<bool>
-	ping();
 
 
 	xpcc::co::Result<bool>
@@ -283,22 +280,6 @@ private:
 	xpcc::co::Result<bool>
 	updateRegister(uint8_t index, uint8_t setMask, uint8_t clearMask = 0xff);
 	/// @endcond
-
-private:
-	enum I2cTask : uint8_t
-	{
-		Idle = 0,
-
-		WriteRegister = 1,
-		ReadRegister = 2,
-		Readout = 3,
-
-		Ping = 0xff
-	};
-
-	volatile uint8_t i2cTask;
-	volatile uint8_t i2cSuccess;
-	xpcc::I2cTagAdapter<xpcc::I2cWriteReadAdapter> adapter;
 
 protected:
 	/// @cond
