@@ -36,6 +36,12 @@ public:
 	{
 	}
 
+	void
+	setDeviceAddress(uint8_t address)
+	{
+		adapter.setAddress(address);
+	}
+
 	void inline
 	attachConfigurationHandler(I2c::ConfigurationHandler handler)
 	{
