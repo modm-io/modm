@@ -152,7 +152,7 @@ public:
  *
  * The sensor has a default refresh rate of 4Hz but can be set from
  * 0.25Hz up to 33Hz using `setUpdateRate(rate)`.
- * The sensor will then read itself out when calling the `update()` method
+ * The sensor will then read itself when calling the `update()` method
  * frequently.
  *
  * However, you may manually start a conversion with `startConversion()`, wait
@@ -167,8 +167,8 @@ public:
  * @tparam I2cMaster Asynchronous Interface
  */
 template < class I2cMaster >
-class Tmp102 :	public tmp102, public xpcc::I2cDevice< I2cMaster >,
-				protected xpcc::pt::Protothread, protected xpcc::co::NestedCoroutine<2>
+class Tmp102 :	public tmp102, public I2cDevice< I2cMaster, 2 >,
+				protected xpcc::pt::Protothread
 {
 public:
 	/// Constructor, requires a tmp102::Data object,
@@ -178,11 +178,6 @@ public:
 	void ALWAYS_INLINE
 	update()
 	{ run(); }
-
-	// MARK: - Tasks
-	/// pings the sensor
-	xpcc::co::Result<bool>
-	ping();
 
 	// MARK: Configuration
 	// @param	rate	Update rate in Hz: 0 to 33. (Use 0 to update at 0.25Hz).
@@ -204,7 +199,7 @@ public:
 	writeLowerLimit(float temperature)
 	{ return writeLimitRegister(Register::TemperatureLsb, temperature); }
 
-	/// param[in]	result	contains comparator mode alert in the configured polarity
+	/// param[out]	result	contains comparator mode alert in the configured polarity
 	xpcc::co::Result<bool>
 	readComparatorMode(bool &result);
 
@@ -229,28 +224,12 @@ private:
 	xpcc::co::Result<bool>
 	writeLimitRegister(Register reg, float temperature);
 
-	enum
-	I2cTask : uint8_t
-	{
-		Idle = 0,
-		ReadTemperature,
-		StartConversion,
-		Configuration,
-		LimitRegister,
-		ReadAlert,
-		Ping
-	};
-
 	uint8_t buffer[3];
 	xpcc::ShortTimeout timeout;
 	uint16_t updateTime;
 
 	Config1_t config_msb;
 	Config2_t config_lsb;
-
-	volatile uint8_t i2cTask;
-	volatile uint8_t i2cSuccess;
-	xpcc::I2cTagAdapter< xpcc::I2cWriteReadAdapter > adapter;
 };
 
 } // namespace xpcc

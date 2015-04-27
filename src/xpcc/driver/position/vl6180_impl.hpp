@@ -14,8 +14,7 @@
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 xpcc::Vl6180<I2cMaster>::Vl6180(Data &data, uint8_t address)
-:	data(data), i2cTask(I2cTask::Idle), i2cSuccess(0),
-	adapter(address, i2cTask, i2cSuccess),
+:	I2cDevice<I2cMaster,2>(address), data(data),
 	i2cBuffer{0,0,0,0}, logicBuffer{Register(0)}
 {
 }
@@ -158,13 +157,13 @@ xpcc::Vl6180<I2cMaster>::readSensor(bool isDistance)
 
 template < typename I2cMaster >
 xpcc::co::Result<bool>
-xpcc::Vl6180<I2cMaster>::setAddress(uint8_t address)
+xpcc::Vl6180<I2cMaster>::setDeviceAddress(uint8_t address)
 {
 	CO_BEGIN();
 
 	if ( CO_CALL(write(Register::I2C_SLAVE__DEVICE_ADDRESS, (address & 0x7f))) )
 	{
-		adapter.setAddress(address);
+		this->setAddress(address);
 		CO_RETURN(true);
 	}
 
@@ -236,14 +235,11 @@ xpcc::Vl6180<I2cMaster>::write(Register reg, uint8_t value, uint8_t length)
 	i2cBuffer[1] = uint8_t(reg);
 	i2cBuffer[2] = value;
 
-	CO_WAIT_UNTIL(
-			adapter.configureWrite(i2cBuffer, length+2) and
-					(i2cTask = I2cTask::WriteRegister, this->startTransaction(&adapter))
-	);
+	CO_WAIT_UNTIL( this->startWrite(i2cBuffer, length+2) );
 
-	CO_WAIT_WHILE(i2cTask == I2cTask::WriteRegister);
+	CO_WAIT_WHILE( this->isTransactionRunning() );
 
-	CO_END_RETURN(i2cSuccess == I2cTask::WriteRegister);
+	CO_END_RETURN( this->wasTransactionSuccessful() );
 }
 
 // MARK: read multilength register
@@ -256,12 +252,9 @@ xpcc::Vl6180<I2cMaster>::read(Register reg, uint8_t *buffer, uint8_t length)
 	i2cBuffer[0] = uint16_t(reg) >> 8;
 	i2cBuffer[1] = uint8_t(reg);
 
-	CO_WAIT_UNTIL(
-			adapter.configureWriteRead(i2cBuffer, 2, buffer, length) and
-					(i2cTask = I2cTask::ReadRegister, this->startTransaction(&adapter))
-	);
+	CO_WAIT_UNTIL( this->startWriteRead(i2cBuffer, 2, buffer, length) );
 
-	CO_WAIT_WHILE(i2cTask == I2cTask::ReadRegister);
+	CO_WAIT_WHILE( this->isTransactionRunning() );
 
-	CO_END_RETURN(i2cSuccess == I2cTask::ReadRegister);
+	CO_END_RETURN( this->wasTransactionSuccessful() );
 }

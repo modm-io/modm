@@ -36,9 +36,9 @@
 
 // ----------------------------------------------------------------------------
 template<typename I2cMaster>
-xpcc::Pca9685<I2cMaster>::Pca9685(uint8_t address)
-  : adapter(address, i2cTask, i2cSuccess)
-{ }
+xpcc::Pca9685<I2cMaster>::Pca9685(uint8_t address) :
+	I2cDevice<I2cMaster, 1, I2cWriteAdapter>(address)
+{}
 
 template<typename I2cMaster>
 xpcc::co::Result<bool>
@@ -47,33 +47,28 @@ xpcc::Pca9685<I2cMaster>::initialize(uint8_t mode1, uint8_t mode2)
 	CO_BEGIN();
 
 	// set the first mode register
+	buffer[0] = REG_MODE1;
+	buffer[1] = mode1 | MODE1_AI;  // ensure that auto increment is enabled
 
-	buffer[0] = pca9685::REG_MODE1;
-	buffer[1] = mode1 | pca9685::MODE1_AI;  // ensure that auto increment is enabled
+	CO_WAIT_UNTIL( this->startWrite(buffer, 2) );
 
-	CO_WAIT_UNTIL(adapter.configureWrite(buffer, 2) and
-	             (i2cTask = I2cTask::SetMode1, this->startTransaction(&adapter))
-	);
+	CO_WAIT_WHILE( this->isTransactionRunning() );
 
-	CO_WAIT_WHILE(i2cTask == I2cTask::SetMode1);
-
-	if (i2cSuccess != I2cTask::SetMode1)
+	if (not this->wasTransactionSuccessful())
 	{
 		CO_RETURN(false);
 	}
 
 	// set the second mode register
 
-	buffer[0] = pca9685::REG_MODE2;
+	buffer[0] = REG_MODE2;
 	buffer[1] = mode2;
 
-	CO_WAIT_UNTIL(adapter.configureWrite(buffer, 2) and
-	             (i2cTask = I2cTask::SetMode2, this->startTransaction(&adapter))
-	);
+	CO_WAIT_UNTIL( this->startWrite(buffer, 2) );
 
-	CO_WAIT_WHILE(i2cTask == I2cTask::SetMode2);
+	CO_WAIT_WHILE( this->isTransactionRunning() );
 
-	if (i2cSuccess != I2cTask::SetMode2)
+	if (not this->wasTransactionSuccessful())
 	{
 		CO_RETURN(false);
 	}
@@ -81,17 +76,15 @@ xpcc::Pca9685<I2cMaster>::initialize(uint8_t mode1, uint8_t mode2)
 	// Always turn on all LEDs at tick 0 and switch them of later according
 	// to the current value
 
-	buffer[0] = pca9685::REG_ALL_LED_ON_L;
+	buffer[0] = REG_ALL_LED_ON_L;
 	buffer[1] = 0x00;
 	buffer[2] = 0x00;
 
-	CO_WAIT_UNTIL(adapter.configureWrite(buffer, 3) and
-				 (i2cTask = I2cTask::SetAllOn, this->startTransaction(&adapter))
-	);
+	CO_WAIT_UNTIL( this->startWrite(buffer, 3) );
 
-	CO_WAIT_WHILE(i2cTask == I2cTask::SetAllOn);
+	CO_WAIT_WHILE( this->isTransactionRunning() );
 
-	if (i2cSuccess != I2cTask::SetAllOn)
+	if (not this->wasTransactionSuccessful())
 	{
 		CO_RETURN(false);
 	}
@@ -109,19 +102,17 @@ xpcc::Pca9685<I2cMaster>::setChannel(uint8_t channel, uint16_t value)
 	if (channel >= 16)
 		CO_RETURN(false);
 
-	buffer[0] = pca9685::REG_LED0_OFF_L + 4 * channel;
+	buffer[0] = REG_LED0_OFF_L + 4 * channel;
 	// The Controller turns all LEDs on at tick 0
 	// and turns this LED of at value
-	buffer[1] = static_cast<uint8_t>(value);
-	buffer[2] = static_cast<uint8_t>(value >> 8) & 0x0f;
+	buffer[1] = uint8_t(value);
+	buffer[2] = uint8_t(value >> 8) & 0x0f;
 
-	CO_WAIT_UNTIL(adapter.configureWrite(buffer, 3) and
-	             (i2cTask = I2cTask::SetLedOff, this->startTransaction(&adapter))
-	);
+	CO_WAIT_UNTIL( this->startWrite(buffer, 3) );
 
-	CO_WAIT_WHILE(i2cTask == I2cTask::SetLedOff);
+	CO_WAIT_WHILE( this->isTransactionRunning() );
 
-	CO_END_RETURN(i2cSuccess == I2cTask::SetLedOff);
+	CO_END_RETURN( this->wasTransactionSuccessful() );
 }
 
 template<typename I2cMaster>
@@ -130,17 +121,15 @@ xpcc::Pca9685<I2cMaster>::setAllChannels(uint16_t value)
 {
 	CO_BEGIN();
 
-	buffer[0] = pca9685::REG_ALL_LED_OFF_L;
+	buffer[0] = REG_ALL_LED_OFF_L;
 	// The Controller turns all LEDs on at tick 0
 	// and turns this LED of at tick $value
-	buffer[1] = static_cast<uint8_t>(value);
-	buffer[2] = static_cast<uint8_t>(value >> 8) & 0x0f;
+	buffer[1] = uint8_t(value);
+	buffer[2] = uint8_t(value >> 8) & 0x0f;
 
-	CO_WAIT_UNTIL(adapter.configureWrite(buffer, 3) and
-	             (i2cTask = I2cTask::SetAllOff, this->startTransaction(&adapter))
-	);
+	CO_WAIT_UNTIL( this->startWrite(buffer, 3) );
 
-	CO_WAIT_WHILE(i2cTask == I2cTask::SetAllOff);
+	CO_WAIT_WHILE( this->isTransactionRunning() );
 
-	CO_END_RETURN(i2cSuccess == I2cTask::SetAllOff);
+	CO_END_RETURN( this->wasTransactionSuccessful() );
 }

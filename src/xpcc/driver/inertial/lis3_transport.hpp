@@ -34,14 +34,10 @@ namespace xpcc
  * @author	Niklas Hauser
  */
 template < class I2cMaster >
-class Lis3TransportI2c : public xpcc::I2cDevice< I2cMaster >, protected xpcc::co::NestedCoroutine<2>
+class Lis3TransportI2c : public xpcc::I2cDevice< I2cMaster, 2 >
 {
 public:
 	Lis3TransportI2c(uint8_t address);
-
-	/// pings the sensor
-	xpcc::co::Result<bool>
-	ping();
 
 protected:
 	// RAW REGISTER ACCESS
@@ -67,17 +63,7 @@ protected:
 	/// @endcond
 
 private:
-	enum I2cTask : uint8_t
-	{
-		Idle = 0,
-		Ping = 0x01,
-		// Insert all registers from 0x0F to 0x3F
-	};
-
 	uint8_t buffer[2];
-	volatile uint8_t i2cTask;
-	volatile uint8_t i2cSuccess;
-	I2cTagAdapter<I2cWriteReadAdapter> adapter;
 };
 
 /**

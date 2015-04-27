@@ -19,10 +19,8 @@ typename xpcc::tcs3414::Rgb xpcc::Tcs3414<I2cMaster>::color;
 
 template < typename I2cMaster >
 xpcc::Tcs3414<I2cMaster>::Tcs3414(uint8_t address)
-: I2cDevice<I2cMaster>(),
-  commandBuffer{0,0,0,0},
-  i2cTask(I2cTask::Idle), i2cSuccess(0),
-  adapter(address, i2cTask, i2cSuccess)
+: I2cDevice<I2cMaster,2>(address),
+  commandBuffer{0,0,0,0}
 {
 }
 
@@ -50,20 +48,6 @@ xpcc::Tcs3414<I2cMaster>::configure(
 
 // ----------------------------------------------------------------------------
 // MARK: - Tasks
-template < class I2cMaster >
-xpcc::co::Result<bool>
-xpcc::Tcs3414<I2cMaster>::ping()
-{
-	CO_BEGIN();
-
-	CO_WAIT_UNTIL(adapter.configurePing() &&
-			(i2cTask = I2cTask::Ping, this->startTransaction(&adapter)));
-
-	CO_WAIT_WHILE(i2cTask == I2cTask::Ping);
-
-	CO_END_RETURN(i2cSuccess == I2cTask::Ping);
-}
-
 template < class I2cMaster >
 xpcc::co::Result<bool>
 xpcc::Tcs3414<I2cMaster>::refreshAllColors()
@@ -122,14 +106,11 @@ xpcc::Tcs3414<I2cMaster>::writeRegister(
 			|	static_cast<uint8_t>(address);	// at this address
 	commandBuffer[2] = value;
 
-	CO_WAIT_UNTIL(
-			adapter.configureWrite(commandBuffer, 3) &&
-			(i2cTask = I2cTask::WriteRegister, this->startTransaction(&adapter))
-	);
+	CO_WAIT_UNTIL( this->startWrite(commandBuffer, 3) );
 
-	CO_WAIT_WHILE(i2cTask == I2cTask::WriteRegister);
+	CO_WAIT_WHILE( this->isTransactionRunning() );
 
-	CO_END_RETURN(i2cSuccess == I2cTask::WriteRegister);
+	CO_END_RETURN( this->wasTransactionSuccessful() );
 }
 
 template<typename I2cMaster>
@@ -146,12 +127,9 @@ xpcc::Tcs3414<I2cMaster>::readRegisters(
 			| static_cast<uint8_t>(0x40)		// with SMB read/write protocol
 			| static_cast<uint8_t>(address);	// at this address
 
-	CO_WAIT_UNTIL(
-			adapter.configureWriteRead(commandBuffer, 1, values, count) &&
-			(i2cTask = I2cTask::ReadRegister, this->startTransaction(&adapter))
-	);
+	CO_WAIT_UNTIL( this->startWriteRead(commandBuffer, 1, values, count) );
 
-	CO_WAIT_WHILE(i2cTask == I2cTask::ReadRegister);
+	CO_WAIT_WHILE( this->isTransactionRunning() );
 
-	CO_END_RETURN(i2cSuccess == I2cTask::ReadRegister);
+	CO_END_RETURN( this->wasTransactionSuccessful() );
 }

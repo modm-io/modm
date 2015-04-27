@@ -15,24 +15,8 @@
 // MARK: I2C TRANSPORT
 template < class I2cMaster >
 xpcc::Lis3TransportI2c<I2cMaster>::Lis3TransportI2c(uint8_t address)
-:	i2cTask(I2cTask::Idle), i2cSuccess(0),
-	adapter(address, i2cTask, i2cSuccess)
+:	I2cDevice<I2cMaster, 2>(address)
 {
-}
-
-// MARK: ping
-template < class I2cMaster >
-xpcc::co::Result<bool>
-xpcc::Lis3TransportI2c<I2cMaster>::ping()
-{
-	CO_BEGIN();
-
-	CO_WAIT_UNTIL(adapter.configurePing() and
-			(i2cTask = I2cTask::Ping, this->startTransaction(&adapter)));
-
-	CO_WAIT_WHILE(i2cTask == I2cTask::Ping);
-
-	CO_END_RETURN(i2cSuccess == I2cTask::Ping);
 }
 
 // MARK: - register access
@@ -46,14 +30,11 @@ xpcc::Lis3TransportI2c<I2cMaster>::write(uint8_t reg, uint8_t value)
 	buffer[0] = reg;
 	buffer[1] = value;
 
-	CO_WAIT_UNTIL(
-			adapter.configureWrite(buffer, 2) and
-			(i2cTask = reg, this->startTransaction(&adapter))
-	);
+	CO_WAIT_UNTIL( this->startWrite(buffer, 2) );
 
-	CO_WAIT_WHILE(i2cTask == reg);
+	CO_WAIT_WHILE( this->isTransactionRunning() );
 
-	CO_END_RETURN(i2cSuccess == reg);
+	CO_END_RETURN( this->wasTransactionSuccessful() );
 }
 
 // MARK: read register
@@ -65,14 +46,11 @@ xpcc::Lis3TransportI2c<I2cMaster>::read(uint8_t reg, uint8_t *buffer, uint8_t le
 
 	this->buffer[0] = reg;
 
-	CO_WAIT_UNTIL(
-			adapter.configureWriteRead(this->buffer, 1, buffer, length) and
-			(i2cTask = reg, this->startTransaction(&adapter))
-	);
+	CO_WAIT_UNTIL( this->startWriteRead(this->buffer, 1, buffer, length) );
 
-	CO_WAIT_WHILE(i2cTask == reg);
+	CO_WAIT_WHILE( this->isTransactionRunning() );
 
-	CO_END_RETURN(i2cSuccess == reg);
+	CO_END_RETURN( this->wasTransactionSuccessful() );
 }
 
 // ============================================================================

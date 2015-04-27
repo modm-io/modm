@@ -346,7 +346,7 @@ public:
  * @ingroup driver_position
  */
 template < typename I2cMaster >
-class Vl6180 : public vl6180, public xpcc::I2cDevice< I2cMaster >, protected xpcc::co::NestedCoroutine<2>
+class Vl6180 : public vl6180, public xpcc::I2cDevice< I2cMaster, 2 >
 {
 public:
 	/// Constructor, requires an vl6180::Data object, sets address to default of 0x29
@@ -361,13 +361,7 @@ public:
 	/// Set a new I2C address (< 128) for this device.
 	/// The address is not permanent and must be set again after every device boot.
 	xpcc::co::Result<bool>
-	setAddress(uint8_t address);
-
-	/// Only sets a new I2C address for this driver, not on the external sensor!
-	/// The address is not permanent and must be set again after every device boot.
-	void
-	forceSetAddress(uint8_t address)
-	{ adapter.setAddress(address); }
+	setDeviceAddress(uint8_t address);
 
 	/// Sets a new analog gain for ALS.
 	xpcc::co::Result<bool>
@@ -446,20 +440,6 @@ private:
 	readSensor(bool isDistance = true);
 
 private:
-	enum I2cTask : uint8_t
-	{
-		Idle = 0,
-
-		WriteRegister = 1,
-		ReadRegister = 2,
-
-		Ping = 0xff
-	};
-
-	volatile uint8_t i2cTask;
-	volatile uint8_t i2cSuccess;
-	xpcc::I2cTagAdapter<xpcc::I2cWriteReadAdapter> adapter;
-
 	xpcc::ShortTimeout timeout;
 	RangeErrorCode rangeError;
 	ALS_ErrorCode alsError;

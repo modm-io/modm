@@ -13,30 +13,14 @@
 
 template < class I2cMaster >
 xpcc::Ssd1306<I2cMaster>::Ssd1306(uint8_t address)
-:	I2cDevice<I2cMaster>(),
-	commandBuffer{0x80, 0, 0x80, 0, 0x80, 0, 0x80, 0, 0x80, 0, 0x80, 0, 0x80, 0},
-	i2cTask(I2cTask::Idle), i2cSuccess(0), adapter(address, i2cTask, i2cSuccess)
+:	I2cDevice<I2cMaster, 2, ssd1306::DataTransmissionAdapter>(address),
+	commandBuffer{0x80, 0, 0x80, 0, 0x80, 0, 0x80, 0, 0x80, 0, 0x80, 0, 0x80, 0}
 {
-	adapter.setCommandBuffer(commandBuffer);
+	this->adapter.setCommandBuffer(commandBuffer);
 }
 
 // ----------------------------------------------------------------------------
 // MARK: - Tasks
-template < class I2cMaster >
-xpcc::co::Result<bool>
-xpcc::Ssd1306<I2cMaster>::ping()
-{
-	CO_BEGIN();
-
-	CO_WAIT_UNTIL(adapter.configurePing() &&
-			(i2cTask = I2cTask::Ping, this->startTransaction(&adapter)));
-
-	CO_WAIT_WHILE(i2cTask == I2cTask::Ping);
-
-	CO_END_RETURN(i2cSuccess == I2cTask::Ping);
-}
-
-// ----------------------------------------------------------------------------
 template < class I2cMaster >
 xpcc::co::Result<bool>
 xpcc::Ssd1306<I2cMaster>::initialize()
@@ -73,8 +57,7 @@ xpcc::Ssd1306<I2cMaster>::startWriteDisplay()
 {
 	CO_BEGIN();
 
-	CO_WAIT_UNTIL(adapter.configureDisplayWrite(buffer, 1024) and
-			(i2cTask = I2cTask::WriteDisplay, this->startTransaction(&adapter)));
+	CO_WAIT_UNTIL( this->adapter.configureDisplayWrite(buffer, 1024) and this->startTransaction() );
 
 	CO_END();
 }
@@ -86,9 +69,10 @@ xpcc::Ssd1306<I2cMaster>::writeDisplay()
 	CO_BEGIN();
 
 	CO_CALL(startWriteDisplay());
-	CO_WAIT_WHILE(i2cTask == I2cTask::WriteDisplay);
 
-	CO_END_RETURN(i2cSuccess == I2cTask::WriteDisplay);
+	CO_WAIT_WHILE(this->isTransactionRunning());
+
+	CO_END_RETURN(this->wasTransactionSuccessful());
 }
 
 template < class I2cMaster >
@@ -134,9 +118,9 @@ xpcc::Ssd1306<I2cMaster>::configureScroll(uint8_t origin, uint8_t size,
 
 	CO_WAIT_UNTIL( startTransactionWithLength(14) );
 
-	CO_WAIT_WHILE(i2cTask == commandBuffer[1]);
+	CO_WAIT_WHILE(this->isTransactionRunning());
 
-	CO_END_RETURN(i2cSuccess == commandBuffer[1]);
+	CO_END_RETURN(this->wasTransactionSuccessful());
 }
 
 // ----------------------------------------------------------------------------
@@ -150,9 +134,9 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(uint8_t command)
 	commandBuffer[1] = command;
 	CO_WAIT_UNTIL( startTransactionWithLength(2) );
 
-	CO_WAIT_WHILE(i2cTask == command);
+	CO_WAIT_WHILE(this->isTransactionRunning());
 
-	CO_END_RETURN(i2cSuccess == command);
+	CO_END_RETURN(this->wasTransactionSuccessful());
 }
 
 template < class I2cMaster >
@@ -165,9 +149,9 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(uint8_t command, uint8_t data)
 	commandBuffer[3] = data;
 	CO_WAIT_UNTIL( startTransactionWithLength(4) );
 
-	CO_WAIT_WHILE(i2cTask == command);
+	CO_WAIT_WHILE(this->isTransactionRunning());
 
-	CO_END_RETURN(i2cSuccess == command);
+	CO_END_RETURN(this->wasTransactionSuccessful());
 }
 
 template < class I2cMaster >
@@ -181,69 +165,15 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(uint8_t command, uint8_t data1, uint8_t d
 	commandBuffer[5] = data2;
 	CO_WAIT_UNTIL( startTransactionWithLength(6) );
 
-	CO_WAIT_WHILE(i2cTask == command);
+	CO_WAIT_WHILE(this->isTransactionRunning());
 
-	CO_END_RETURN(i2cSuccess == command);
+	CO_END_RETURN(this->wasTransactionSuccessful());
 }
 
 // ----------------------------------------------------------------------------
-// MARK: start transaction
 template < class I2cMaster >
 bool
 xpcc::Ssd1306<I2cMaster>::startTransactionWithLength(uint8_t length)
 {
-	return (adapter.configureWrite(commandBuffer, length) and
-			(i2cTask = commandBuffer[1], this->startTransaction(&adapter)));
-}
-
-// ----------------------------------------------------------------------------
-// MARK: DataTransmissionAdapter
-template < class I2cMaster >
-xpcc::Ssd1306<I2cMaster>::DataTransmissionAdapter::DataTransmissionAdapter(uint8_t address)
-:	I2cWriteAdapter(address)
-{}
-
-template < class I2cMaster >
-bool
-xpcc::Ssd1306<I2cMaster>::DataTransmissionAdapter::configureDisplayWrite(uint8_t (*buffer)[8], std::size_t size)
-{
-	if (I2cWriteAdapter::configureWrite(&buffer[0][0], size))
-	{
-		commands[13] = 0xfe;
-		return true;
-	}
-	return false;
-}
-
-template < class I2cMaster >
-xpcc::I2cTransaction::Writing
-xpcc::Ssd1306<I2cMaster>::DataTransmissionAdapter::writing()
-{
-	// we first tell the display the column address again
-	if (commands[13] == 0xfe)
-	{
-		commands[1] = Command::SetColumnAddress;
-		commands[3] = 0;
-		commands[5] = 127;
-		commands[13] = 0xfd;
-		return Writing(commands, 6, OperationAfterWrite::Restart);
-	}
-	// then the page address. again.
-	if (commands[13] == 0xfd)
-	{
-		commands[1] = Command::SetPageAddress;
-		commands[3] = 0;
-		commands[5] = 7;
-		commands[13] = 0xfc;
-		return Writing(commands, 6, OperationAfterWrite::Restart);
-	}
-	// then we set the D/C bit to tell it data is coming
-	if (commands[13] == 0xfc)
-	{
-		commands[13] = 0x40;
-		return Writing(&commands[13], 1, OperationAfterWrite::Write);
-	}
-
-	// now we write the entire frame buffer into it.
-	return Writing(buffer, size, OperationAfterWrite::Stop);
+	return this->startWrite(commandBuffer, length);
 }

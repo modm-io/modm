@@ -217,8 +217,7 @@ protected:
  * @tparam I2cMaster I2C interface
  */
 template < typename I2cMaster >
-class Bmp085 : public bmp085, public xpcc::I2cDevice<I2cMaster>,
-			   protected xpcc::co::NestedCoroutine<>
+class Bmp085 : public bmp085, public xpcc::I2cDevice<I2cMaster, 1>
 {
 public:
 	/**
@@ -228,10 +227,6 @@ public:
 	Bmp085(Data &data, uint8_t address=0x77);
 
 	// MARK: - TASKS
-	/// Pings the sensor
-	xpcc::co::Result<bool>
-	ping();
-
 	/// Reads out and stores the calibration bytes
 	xpcc::co::Result<bool>
 	configure(Mode mode = Mode::Standard);
@@ -253,24 +248,6 @@ public:
 	Data &data;
 
 private:
-	enum
-	I2cTask : uint8_t
-	{
-		Idle = 0,
-		Ping,
-		Configure,
-		ReadCalibration,
-		ConvertTemperature,
-		ReadTemperature,
-		ConvertPressure,
-		ReadPressure,
-	};
-
-	volatile uint8_t i2cTask;
-	volatile uint8_t i2cSuccess;
-
-	xpcc::I2cTagAdapter< xpcc::I2cWriteReadAdapter > adapter;
-
 	xpcc::ShortTimeout timeout;
 
 	/**
