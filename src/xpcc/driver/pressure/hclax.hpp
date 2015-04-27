@@ -11,7 +11,6 @@
 #define XPCC_HCLAX_HPP
 
 #include <xpcc/architecture/interface/i2c_device.hpp>
-#include <xpcc/processing/coroutine.hpp>
 #include <xpcc/math/utils/endianness.hpp>
 
 namespace xpcc
@@ -65,8 +64,7 @@ struct hclax
  * @author	Niklas Hauser
  */
 template < typename I2cMaster >
-class HclaX : public hclax, public xpcc::I2cDevice<I2cMaster>,
-			  protected xpcc::co::NestedCoroutine<>
+class HclaX : public hclax, public xpcc::I2cDevice<I2cMaster, 1, I2cReadAdapter>
 {
 public:
 	/**
@@ -76,10 +74,9 @@ public:
 	 *      You have to use a MUX or two seperate I2C busses.
 	 */
 	HclaX(Data &data)
-	:	data(data), i2cTask(I2cTask::Idle), i2cSuccess(0),
-		adapter(0x78, i2cTask, i2cSuccess)
+	:	I2cDevice<I2cMaster,1,I2cReadAdapter>(0x78), data(data)
 	{
-		adapter.configureRead(data.data, 2);
+		this->adapter.configureRead(data.data, 2);
 	}
 
 	/// pings the sensor
@@ -88,14 +85,13 @@ public:
 	{
 		CO_BEGIN();
 
-		CO_WAIT_UNTIL(adapter.configurePing() and
-				(i2cTask = I2cTask::Ping, this->startTransaction(&adapter)));
+		CO_WAIT_UNTIL(this->adapter.configurePing() and this->startTransaction(&this->adapter));
 
-		CO_WAIT_WHILE(i2cTask == I2cTask::Ping);
+		CO_WAIT_WHILE( this->isTransactionRunning() );
 
-		adapter.configureRead(data.data, 2);
+		this->adapter.configureRead(data.data, 2);
 
-		CO_END_RETURN(i2cSuccess == I2cTask::Ping);
+		CO_END_RETURN( this->wasTransactionSuccessful() );
 	}
 
 	/// reads the Pressure registers and buffers the results
@@ -104,29 +100,15 @@ public:
 	{
 		CO_BEGIN();
 
-		CO_WAIT_UNTIL((i2cTask = I2cTask::ReadPressure,
-				this->startTransaction(&adapter)));
+		CO_WAIT_UNTIL( this->startTransaction(&this->adapter) );
 
-		CO_WAIT_WHILE(i2cTask == I2cTask::ReadPressure);
+		CO_WAIT_WHILE( this->isTransactionRunning() );
 
-		CO_END_RETURN(i2cSuccess == I2cTask::ReadPressure);
+		CO_END_RETURN( this->wasTransactionSuccessful() );
 	}
 
 public:
 	Data &data;
-
-private:
-	enum
-	I2cTask : uint8_t
-	{
-		Idle = 0,
-		Ping,
-		ReadPressure
-	};
-
-	volatile uint8_t i2cTask;
-	volatile uint8_t i2cSuccess;
-	xpcc::I2cTagAdapter< xpcc::I2cReadAdapter > adapter;
 };
 
 }	// namespace xpcc
