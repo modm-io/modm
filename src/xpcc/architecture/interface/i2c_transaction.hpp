@@ -416,6 +416,18 @@ public:
 	}
 
 	/**
+	 * This adapter cannot do a write/read operation!
+	 * This method exists for compatibilty with TagAdapter.
+	 *
+	 * @return  `false`
+	 */
+	bool ALWAYS_INLINE
+	configureWriteRead(const uint8_t *, std::size_t, uint8_t *, std::size_t)
+	{
+		return false;
+	}
+
+	/**
 	 * Initializes the adapter with the required information for a write operation.
 	 *
 	 * @param[in] 	buffer	buffer to be written to the slave
@@ -433,6 +445,18 @@ public:
 			this->size = buffer ? size : 0;
 			return true;
 		}
+		return false;
+	}
+
+	/**
+	 * This adapter cannot do a read operation!
+	 * This method exists for compatibilty with TagAdapter.
+	 *
+	 * @return  `false`
+	 */
+	bool ALWAYS_INLINE
+	configureRead(uint8_t *, std::size_t)
+	{
 		return false;
 	}
 
@@ -530,6 +554,30 @@ public:
 	configurePing()
 	{
 		return configureRead(nullptr, 0);
+	}
+
+	/**
+	 * This adapter cannot do a write/read operation!
+	 * This method exists for compatibilty with TagAdapter.
+	 *
+	 * @return  `false`
+	 */
+	bool ALWAYS_INLINE
+	configureWriteRead(const uint8_t *, std::size_t, uint8_t *, std::size_t)
+	{
+		return false;
+	}
+
+	/**
+	 * This adapter cannot do a write operation!
+	 * This method exists for compatibilty with TagAdapter.
+	 *
+	 * @return  `false`
+	 */
+	bool ALWAYS_INLINE
+	configureWrite(uint8_t *, std::size_t)
+	{
+		return false;
 	}
 
 	/**

@@ -106,6 +106,7 @@ struct I2c
 	 * the end the current byte and will abort the command and go to standby."
 	 *
 	 * @see	Application Note AN572 by Microchip
+	 *
 	 * @warning	Must be called **before** connecting SDA and SCL to I2cMaster!
 	 * @warning	The clock frequency is hardcoded to 50kHz, so this function blocks for 180µs.
 	 *

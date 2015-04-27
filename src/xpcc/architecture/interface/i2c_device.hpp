@@ -13,6 +13,7 @@
 #include "i2c.hpp"
 #include "i2c_master.hpp"
 #include "i2c_transaction.hpp"
+#include <xpcc/processing/coroutine.hpp>
 
 namespace xpcc
 {
@@ -26,14 +27,12 @@ namespace xpcc
  * @author	Niklas Hauser
  * @ingroup i2c
  */
-template < class I2cMaster >
-class I2cDevice
+template < class I2cMaster, uint8_t Levels = 10, class Adapter = I2cWriteReadAdapter >
+class I2cDevice : protected xpcc::co::NestedCoroutine< Levels >
 {
-	I2c::ConfigurationHandler configuration;
-
 public:
-	I2cDevice()
-	:	configuration(nullptr)
+	I2cDevice(uint8_t address)
+	:	adapter(address), configuration(nullptr)
 	{
 	}
 
@@ -43,12 +42,64 @@ public:
 		configuration = handler;
 	}
 
+	xpcc::co::Result<bool>
+	ping()
+	{
+		CO_BEGIN();
+
+		CO_WAIT_UNTIL( adapter.configurePing() and startTransaction(&adapter) );
+
+		CO_WAIT_WHILE( isTransactionBusy() );
+
+		CO_END_RETURN( wasTransactionSuccessful() );
+	}
+
 protected:
+	bool inline
+	startWriteRead(const uint8_t *writeBuffer, std::size_t writeSize,
+			uint8_t *readBuffer, std::size_t readSize)
+	{
+		return ( adapter.configureWriteRead(writeBuffer, writeSize, readBuffer, readSize) and
+				startTransaction(&adapter) );
+	}
+
+	bool inline
+	startWrite(const uint8_t *buffer, std::size_t size)
+	{
+		return ( adapter.configureWrite(buffer, size) and
+				startTransaction(&adapter) );
+	}
+
+	bool inline
+	startRead(uint8_t *buffer, std::size_t size)
+	{
+		return ( adapter.configureRead(buffer, size) and
+				startTransaction(&adapter) );
+	}
+
 	bool inline
 	startTransaction(xpcc::I2cTransaction *transaction)
 	{
 		return I2cMaster::start(transaction, configuration);
 	}
+
+protected:
+	bool inline
+	isTransactionBusy()
+	{
+		return adapter.isBusy();
+	}
+
+	bool inline
+	wasTransactionSuccessful()
+	{
+		return (adapter.getState() != xpcc::I2c::AdapterState::Error);
+	}
+
+protected:
+	Adapter adapter;
+private:
+	I2c::ConfigurationHandler configuration;
 };
 
 }	// namespace xpcc
