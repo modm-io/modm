@@ -37,7 +37,7 @@ public:
 	}
 
 	void
-	setDeviceAddress(uint8_t address)
+	setAddress(uint8_t address)
 	{
 		adapter.setAddress(address);
 	}
