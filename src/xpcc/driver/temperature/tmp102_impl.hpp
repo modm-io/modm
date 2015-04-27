@@ -145,7 +145,7 @@ xpcc::Tmp102<I2cMaster>::readTemperature()
 	buffer[0] = uint8_t(Register::Temperature);
 	CO_WAIT_UNTIL( this->startWriteRead(buffer, 1, data.data, 2) );
 
-	CO_WAIT_WHILE( this->isTransactionBusy() );
+	CO_WAIT_WHILE( this->isTransactionRunning() );
 
 	CO_END_RETURN( this->wasTransactionSuccessful() );
 }
@@ -160,7 +160,7 @@ xpcc::Tmp102<I2cMaster>::readComparatorMode(bool &result)
 	buffer[0] = i(Register::Configuration);
 	CO_WAIT_UNTIL( this->startWriteRead(buffer, 1, buffer, 2) );
 
-	CO_WAIT_WHILE( this->isTransactionBusy() );
+	CO_WAIT_WHILE( this->isTransactionRunning() );
 
 	if (this->wasTransactionSuccessful())
 	{
@@ -186,7 +186,7 @@ xpcc::Tmp102<I2cMaster>::writeConfiguration(uint8_t length)
 
 	CO_WAIT_UNTIL( this->startWrite(buffer, length) );
 
-	CO_WAIT_WHILE( this->isTransactionBusy() );
+	CO_WAIT_WHILE( this->isTransactionRunning() );
 
 	CO_END_RETURN( this->wasTransactionSuccessful() );
 }
@@ -209,7 +209,7 @@ xpcc::Tmp102<I2cMaster>::writeLimitRegister(Register reg, float temperature)
 
 	CO_WAIT_UNTIL( this->startWrite(buffer, 3) );
 
-	CO_WAIT_WHILE( this->isTransactionBusy() );
+	CO_WAIT_WHILE( this->isTransactionRunning() );
 
 	CO_END_RETURN( this->wasTransactionSuccessful() );
 }

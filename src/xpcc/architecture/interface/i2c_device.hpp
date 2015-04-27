@@ -49,7 +49,7 @@ public:
 
 		CO_WAIT_UNTIL( adapter.configurePing() and startTransaction(&adapter) );
 
-		CO_WAIT_WHILE( isTransactionBusy() );
+		CO_WAIT_WHILE( isTransactionRunning() );
 
 		CO_END_RETURN( wasTransactionSuccessful() );
 	}
@@ -85,7 +85,7 @@ protected:
 
 protected:
 	bool inline
-	isTransactionBusy()
+	isTransactionRunning()
 	{
 		return adapter.isBusy();
 	}
