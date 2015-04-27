@@ -14,9 +14,9 @@
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 xpcc::Tmp102<I2cMaster>::Tmp102(Data &data, uint8_t address)
-:	data(data), timeout(250), updateTime(250),
-	config_msb(0), config_lsb(ConversionRate_t(ConversionRate::Hz4)),
-	i2cTask(I2cTask::Idle), i2cSuccess(0), adapter(address, i2cTask, i2cSuccess)
+:	I2cDevice<I2cMaster, 2>(address),
+	data(data), timeout(250), updateTime(250),
+	config_msb(0), config_lsb(ConversionRate_t(ConversionRate::Hz4))
 {
 	this->stop();
 }
@@ -47,21 +47,6 @@ xpcc::Tmp102<I2cMaster>::run()
 }
 
 // ----------------------------------------------------------------------------
-// MARK: ping
-template < typename I2cMaster >
-xpcc::co::Result<bool>
-xpcc::Tmp102<I2cMaster>::ping()
-{
-	CO_BEGIN();
-
-	CO_WAIT_UNTIL(adapter.configurePing() and
-			(i2cTask = I2cTask::Ping, this->startTransaction(&adapter)));
-
-	CO_WAIT_WHILE(i2cTask == I2cTask::Ping);
-
-	CO_END_RETURN(i2cSuccess == I2cTask::Ping);
-}
-
 // MARK: - tasks
 template < typename I2cMaster >
 xpcc::co::Result<bool>
@@ -158,12 +143,11 @@ xpcc::Tmp102<I2cMaster>::readTemperature()
 	CO_BEGIN();
 
 	buffer[0] = uint8_t(Register::Temperature);
-	CO_WAIT_UNTIL(adapter.configureWriteRead(buffer, 1, data.data, 2) and
-			(i2cTask = I2cTask::ReadTemperature, this->startTransaction(&adapter)));
+	CO_WAIT_UNTIL( this->startWriteRead(buffer, 1, data.data, 2) );
 
-	CO_WAIT_WHILE(i2cTask == I2cTask::ReadTemperature);
+	CO_WAIT_WHILE( this->isTransactionBusy() );
 
-	CO_END_RETURN(i2cSuccess == I2cTask::ReadTemperature);
+	CO_END_RETURN( this->wasTransactionSuccessful() );
 }
 
 // MARK: read temperature
@@ -174,12 +158,11 @@ xpcc::Tmp102<I2cMaster>::readComparatorMode(bool &result)
 	CO_BEGIN();
 
 	buffer[0] = i(Register::Configuration);
-	CO_WAIT_UNTIL(adapter.configureWriteRead(buffer, 1, buffer, 2) and
-			(i2cTask = I2cTask::ReadAlert, this->startTransaction(&adapter)));
+	CO_WAIT_UNTIL( this->startWriteRead(buffer, 1, buffer, 2) );
 
-	CO_WAIT_WHILE(i2cTask == I2cTask::ReadAlert);
+	CO_WAIT_WHILE( this->isTransactionBusy() );
 
-	if (i2cSuccess == I2cTask::ReadAlert)
+	if (this->wasTransactionSuccessful())
 	{
 		config_msb = Config1_t(buffer[0]) & ~Resolution_t::mask();
 		result =     Config2_t(buffer[1]) &  Config2::Alert;
@@ -201,12 +184,11 @@ xpcc::Tmp102<I2cMaster>::writeConfiguration(uint8_t length)
 	buffer[1] = config_msb.value;
 	buffer[2] = config_lsb.value;
 
-	CO_WAIT_UNTIL(adapter.configureWrite(buffer, length) and
-			(i2cTask = I2cTask::Configuration, this->startTransaction(&adapter)));
+	CO_WAIT_UNTIL( this->startWrite(buffer, length) );
 
-	CO_WAIT_WHILE(i2cTask == I2cTask::Configuration);
+	CO_WAIT_WHILE( this->isTransactionBusy() );
 
-	CO_END_RETURN(i2cSuccess == I2cTask::Configuration);
+	CO_END_RETURN( this->wasTransactionSuccessful() );
 }
 
 // MARK: configuration
@@ -225,10 +207,9 @@ xpcc::Tmp102<I2cMaster>::writeLimitRegister(Register reg, float temperature)
 		buffer[2] = temp;
 	}
 
-	CO_WAIT_UNTIL(adapter.configureWrite(buffer, 3) and
-			(i2cTask = I2cTask::LimitRegister, this->startTransaction(&adapter)));
+	CO_WAIT_UNTIL( this->startWrite(buffer, 3) );
 
-	CO_WAIT_WHILE(i2cTask == I2cTask::LimitRegister);
+	CO_WAIT_WHILE( this->isTransactionBusy() );
 
-	CO_END_RETURN(i2cSuccess == I2cTask::LimitRegister);
+	CO_END_RETURN( this->wasTransactionSuccessful() );
 }
