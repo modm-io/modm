@@ -47,8 +47,8 @@ xpcc::Pca9685<I2cMaster>::initialize(uint8_t mode1, uint8_t mode2)
 	CO_BEGIN();
 
 	// set the first mode register
-	buffer[0] = pca9685::REG_MODE1;
-	buffer[1] = mode1 | pca9685::MODE1_AI;  // ensure that auto increment is enabled
+	buffer[0] = REG_MODE1;
+	buffer[1] = mode1 | MODE1_AI;  // ensure that auto increment is enabled
 
 	CO_WAIT_UNTIL( this->startWrite(buffer, 2) );
 
@@ -61,7 +61,7 @@ xpcc::Pca9685<I2cMaster>::initialize(uint8_t mode1, uint8_t mode2)
 
 	// set the second mode register
 
-	buffer[0] = pca9685::REG_MODE2;
+	buffer[0] = REG_MODE2;
 	buffer[1] = mode2;
 
 	CO_WAIT_UNTIL( this->startWrite(buffer, 2) );
@@ -76,7 +76,7 @@ xpcc::Pca9685<I2cMaster>::initialize(uint8_t mode1, uint8_t mode2)
 	// Always turn on all LEDs at tick 0 and switch them of later according
 	// to the current value
 
-	buffer[0] = pca9685::REG_ALL_LED_ON_L;
+	buffer[0] = REG_ALL_LED_ON_L;
 	buffer[1] = 0x00;
 	buffer[2] = 0x00;
 
@@ -102,7 +102,7 @@ xpcc::Pca9685<I2cMaster>::setChannel(uint8_t channel, uint16_t value)
 	if (channel >= 16)
 		CO_RETURN(false);
 
-	buffer[0] = pca9685::REG_LED0_OFF_L + 4 * channel;
+	buffer[0] = REG_LED0_OFF_L + 4 * channel;
 	// The Controller turns all LEDs on at tick 0
 	// and turns this LED of at value
 	buffer[1] = uint8_t(value);
@@ -121,7 +121,7 @@ xpcc::Pca9685<I2cMaster>::setAllChannels(uint16_t value)
 {
 	CO_BEGIN();
 
-	buffer[0] = pca9685::REG_ALL_LED_OFF_L;
+	buffer[0] = REG_ALL_LED_OFF_L;
 	// The Controller turns all LEDs on at tick 0
 	// and turns this LED of at tick $value
 	buffer[1] = uint8_t(value);

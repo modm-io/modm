@@ -38,7 +38,7 @@
 namespace xpcc
 {
 
-namespace pca9685
+struct pca9685
 {
 	enum Register
 	{
@@ -123,7 +123,8 @@ namespace pca9685
 		REG_TestMode      = 0xfe,
 	};
 
-	enum Mode1 {
+	enum Mode1
+	{
 		MODE1_RESTART = 0x80,
 		MODE1_EXTCLK  = 0x40,
 		MODE1_AI      = 0x20,
@@ -134,14 +135,15 @@ namespace pca9685
 		MODE1_ALLCALL = 0x01,
 	};
 
-	enum Mode2 {
+	enum Mode2
+	{
 		MODE2_INVRT   = 0x10,
 		MODE2_OCH     = 0x08,
 		MODE2_OUTDRV  = 0x04,
 		MODE2_OUTNE1  = 0x02,
 		MODE2_OUTNE0  = 0x01,
 	};
-}	// namespace pca9685
+};	// namespace pca9685
 
 /**
  * PCA9685 16-channel, 12-bit PWM LED controller, I2C-bus
@@ -163,7 +165,7 @@ namespace pca9685
  * @ingroup driver_pwm
  */
 template<typename I2cMaster>
-class Pca9685 : public xpcc::I2cDevice< I2cMaster, 1, I2cWriteAdapter >
+class Pca9685 : public pca9685, public xpcc::I2cDevice< I2cMaster, 1, I2cWriteAdapter >
 {
 	uint8_t buffer[3];
 
