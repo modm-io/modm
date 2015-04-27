@@ -33,8 +33,6 @@
 #ifndef XPCC__PCA9685_HPP
 #define XPCC__PCA9685_HPP
 
-#include <xpcc/processing/protothread.hpp>
-#include <xpcc/processing/coroutine.hpp>
 #include <xpcc/architecture/interface/i2c_device.hpp>
 
 namespace xpcc
@@ -164,30 +162,11 @@ namespace xpcc
 	 * @ingroup driver_pwm
 	 */
 	template<typename I2cMaster>
-	class Pca9685 : public xpcc::I2cDevice<I2cMaster>,
-	                protected xpcc::co::NestedCoroutine<>
+	class Pca9685 : public xpcc::I2cDevice< I2cMaster, 1, I2cWriteAdapter >
 	{
-	private:
-
-		enum I2cTask : uint8_t
-		{
-			Idle = 0,
-			SetMode1,
-			SetMode2,
-			SetAllOn,
-			SetAllOff,
-			SetLedOff,
-		};
-
-		volatile uint8_t i2cTask;
-		volatile uint8_t i2cSuccess;
-
 		uint8_t buffer[3];
 
-		xpcc::I2cTagAdapter< xpcc::I2cWriteReadAdapter >  adapter;
-
 	public:
-
 		/**
 		 * Constructor.
 		 *
