@@ -16,6 +16,30 @@
 namespace xpcc
 {
 
+/// @cond
+struct i2cEeprom
+{
+	class DataTransmissionAdapter : public xpcc::I2cWriteReadAdapter
+	{
+	public:
+		DataTransmissionAdapter(uint8_t address);
+
+		bool inline
+		configureWrite(uint16_t address, const uint8_t *buffer, std::size_t size);
+
+		bool inline
+		configureRead(uint16_t address, uint8_t *buffer, std::size_t size);
+
+	protected:
+		virtual Writing
+		writing() override;
+
+		uint8_t addressBuffer[2];
+		bool writeAddress;
+	};
+};
+/// @endcond
+
 /**
  * I2C Eeprom
  *
@@ -28,14 +52,10 @@ namespace xpcc
  * @author	Niklas Hauser
  */
 template <typename I2cMaster>
-class I2cEeprom : public xpcc::I2cDevice<I2cMaster>, protected xpcc::co::NestedCoroutine<>
+class I2cEeprom : public xpcc::I2cDevice< I2cMaster, 1, i2cEeprom::DataTransmissionAdapter >
 {
 public:
 	I2cEeprom(uint8_t address = 0xA0);
-
-	/// Ping the device
-	xpcc::co::Result<bool>
-	ping();
 
 	/**
 	 * Write byte
@@ -105,38 +125,6 @@ public:
 	{
 		return read(address, static_cast<uint8_t *>(&data), sizeof(T));
 	}
-
-private:
-	enum I2cTask : uint8_t
-	{
-		Idle = 0,
-		Ping,
-		Write,
-		Read,
-	};
-
-	class DataTransmissionAdapter : public xpcc::I2cWriteReadAdapter
-	{
-	public:
-		DataTransmissionAdapter(uint8_t address);
-
-		bool inline
-		configureWrite(uint16_t address, const uint8_t *buffer, std::size_t size);
-
-		bool inline
-		configureRead(uint16_t address, uint8_t *buffer, std::size_t size);
-
-	protected:
-		virtual Writing
-		writing() override;
-
-		uint8_t addressBuffer[2];
-		bool writeAddress;
-	};
-
-	volatile uint8_t i2cTask;
-	volatile uint8_t i2cSuccess;
-	xpcc::I2cTagAdapter<DataTransmissionAdapter> adapter;
 };
 
 }	// namespace xpcc

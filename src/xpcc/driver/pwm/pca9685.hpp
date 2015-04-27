@@ -143,7 +143,7 @@ struct pca9685
 		MODE2_OUTNE1  = 0x02,
 		MODE2_OUTNE0  = 0x01,
 	};
-};	// namespace pca9685
+};	// struct pca9685
 
 /**
  * PCA9685 16-channel, 12-bit PWM LED controller, I2C-bus
