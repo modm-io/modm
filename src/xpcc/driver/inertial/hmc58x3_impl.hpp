@@ -14,28 +14,12 @@
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 xpcc::Hmc58x3<I2cMaster>::Hmc58x3(Data &data, uint8_t address)
-:	data(data), i2cTask(I2cTask::Idle), i2cSuccess(0),
-	adapter(address, i2cTask, i2cSuccess),
+:	I2cDevice<I2cMaster,2>(address), data(data),
 	rawBuffer{0x10, 0x20, 0x01, 0,0,0,0,0,0, 0x00}
 {
 }
 
-// MARK: - i2cTasks
-// MARK: ping
-template < class I2cMaster >
-xpcc::co::Result<bool>
-xpcc::Hmc58x3<I2cMaster>::ping()
-{
-	CO_BEGIN();
-
-	CO_WAIT_UNTIL(adapter.configurePing() &&
-			(i2cTask = I2cTask::Ping, this->startTransaction(&adapter)));
-
-	CO_WAIT_WHILE(i2cTask == I2cTask::Ping);
-
-	CO_END_RETURN(i2cSuccess == I2cTask::Ping);
-}
-
+// MARK: - Tasks
 template < typename I2cMaster >
 xpcc::co::Result<bool>
 xpcc::Hmc58x3<I2cMaster>::readMagneticField()
@@ -125,14 +109,11 @@ xpcc::Hmc58x3<I2cMaster>::write(Register reg, uint8_t *buffer, uint8_t length)
 	rawBuffer[3] = uint8_t(reg);
 	std::memcpy(rawBuffer+4, buffer, length);
 
-	CO_WAIT_UNTIL(
-			adapter.configureWrite(rawBuffer+3, length+1) and
-					(i2cTask = I2cTask::WriteRegister, this->startTransaction(&adapter))
-	);
+	CO_WAIT_UNTIL( this->startWrite(rawBuffer+3, length+1) );
 
-	CO_WAIT_WHILE(i2cTask == I2cTask::WriteRegister);
+	CO_WAIT_WHILE( this->isTransactionRunning() );
 
-	CO_END_RETURN(i2cSuccess == I2cTask::WriteRegister);
+	CO_END_RETURN( this->wasTransactionSuccessful() );
 }
 
 // MARK: read multilength register
@@ -144,12 +125,9 @@ xpcc::Hmc58x3<I2cMaster>::read(Register reg, uint8_t *buffer, uint8_t length)
 
 	rawBuffer[3] = uint8_t(reg);
 
-	CO_WAIT_UNTIL(
-			adapter.configureWriteRead(rawBuffer+3, 1, buffer, length) and
-					(i2cTask = I2cTask::ReadRegister, this->startTransaction(&adapter))
-	);
+	CO_WAIT_UNTIL( this->startWriteRead(rawBuffer+3, 1, buffer, length) );
 
-	CO_WAIT_WHILE(i2cTask == I2cTask::ReadRegister);
+	CO_WAIT_WHILE( this->isTransactionRunning() );
 
-	CO_END_RETURN(i2cSuccess == I2cTask::ReadRegister);
+	CO_END_RETURN( this->wasTransactionSuccessful() );
 }

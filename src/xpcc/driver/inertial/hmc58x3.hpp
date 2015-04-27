@@ -188,16 +188,13 @@ public:
  * @author	Niklas Hauser
  */
 template < typename I2cMaster >
-class Hmc58x3 : public hmc58x3, public xpcc::I2cDevice< I2cMaster >, protected xpcc::co::NestedCoroutine<2>
+class Hmc58x3 : public hmc58x3, public xpcc::I2cDevice< I2cMaster, 2 >
 {
 protected:
 	/// Constructor, requires a hmc58x3::Data object, sets address to default of 0x1e
 	Hmc58x3(Data &data, uint8_t address=0x1e);
 
 public:
-	xpcc::co::Result<bool>
-	ping();
-
 	xpcc::co::Result<bool> inline
 	setOperationMode(OperationMode mode)
 	{ return updateMode(Mode_t(uint8_t(mode)), Mode::MD_Mask); }
@@ -279,22 +276,6 @@ private:
 	xpcc::co::Result<bool>
 	updateRegister(uint8_t index, uint8_t setMask, uint8_t clearMask = 0xff);
 	/// @endcond
-
-private:
-	enum I2cTask : uint8_t
-	{
-		Idle = 0,
-
-		WriteRegister = 1,
-		ReadRegister = 2,
-		Readout = 3,
-
-		Ping = 0xff
-	};
-
-	volatile uint8_t i2cTask;
-	volatile uint8_t i2cSuccess;
-	xpcc::I2cTagAdapter<xpcc::I2cWriteReadAdapter> adapter;
 
 protected:
 	/// @cond
