@@ -37,7 +37,7 @@
 // ----------------------------------------------------------------------------
 template<typename I2cMaster>
 xpcc::Pca9685<I2cMaster>::Pca9685(uint8_t address) :
-	I2cDevice<I2cMaster, 1, I2cWriteAdapter>(address)
+	I2cDevice<I2cMaster, 1, I2cWriteTransaction>(address)
 {}
 
 template<typename I2cMaster>

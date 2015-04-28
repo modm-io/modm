@@ -165,7 +165,7 @@ struct pca9685
  * @ingroup driver_pwm
  */
 template<typename I2cMaster>
-class Pca9685 : public pca9685, public xpcc::I2cDevice< I2cMaster, 1, I2cWriteAdapter >
+class Pca9685 : public pca9685, public xpcc::I2cDevice< I2cMaster, 1, I2cWriteTransaction >
 {
 	uint8_t buffer[3];
 

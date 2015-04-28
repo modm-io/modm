@@ -88,6 +88,82 @@ public:
 	};
 
 public:
+	///	@param	address	the slave address not yet shifted left (address < 128).
+	I2cTransaction(uint8_t address) :
+		address(address << 1), state(TransactionState::Idle)
+	{}
+
+	///	@param	address	the slave address not yet shifted left (address < 128).
+	void inline
+	setAddress(uint8_t address)
+	{
+		this->address = address;
+	}
+
+	/// @return `Busy` while an I2C operation is ongoing. Reinitialization
+	///			is not permitted during this phase.
+	TransactionState
+	getState() const
+	{
+		return state;
+	}
+
+	/// @return `true` while adapter is busy
+	bool
+	isBusy() const
+	{
+		return (state == TransactionState::Busy);
+	}
+
+	/**
+	 * Initializes the adapter to only send the address without payload.
+	 *
+	 * @retval `true` adapter configured successfully,
+	 * @retval `false` adapter busy
+	 */
+	bool
+	configurePing();
+
+	/**
+	 * Initializes the adapter with the required information for a write/read operation.
+	 *
+	 * @param[in] 	writeBuffer	buffer to be written to the slave
+	 * @param		writeSize	number of bytes to be written, set to `0` to write nothing
+	 * @param[out]	readBuffer	buffer to write the read bytes from the slave
+	 * @param		readSize	number of bytes to be read, set to `0` to read nothing
+	 *
+	 * @retval `true` adapter configured successfully,
+	 * @retval `false` adapter busy
+	 */
+	bool
+	configureWriteRead(const uint8_t *writeBuffer, std::size_t writeSize,
+							 uint8_t *readBuffer,  std::size_t readSize);
+
+	/**
+	 * Initializes the adapter with the required information for a write operation.
+	 *
+	 * @param[in] 	buffer	buffer to be written to the slave
+	 * @param		size	number of bytes to be written, set to `0` to write nothing
+	 *
+	 * @retval `true` adapter configured successfully,
+	 * @retval `false` adapter busy
+	 */
+	bool
+	configureWrite(uint8_t *buffer, std::size_t size);
+
+	/**
+	 * Initializes the adapter with the required information for a read operation.
+	 *
+	 * @param[out] 	buffer	buffer to be read from the slave
+	 * @param		size	number of bytes to be read, set to `0` to read nothing
+	 *
+	 * @retval `true` adapter configured successfully,
+	 * @retval `false` adapter busy
+	 */
+	bool
+	configureRead(uint8_t *buffer, std::size_t size);
+
+public:
 	/**
 	 * This method is called when the I2cMaster is not currently
 	 * in use by another transaction and can be attached.
@@ -96,7 +172,13 @@ public:
 	 * 			`false` if it should not attach it.
 	 */
 	virtual bool
-	attaching() = 0;
+	attaching()
+	{
+		if (state == TransactionState::Busy)
+			return false;
+		state = TransactionState::Busy;
+		return true;
+	}
 
 	/**
 	 * This method is called when the I2cMaster is ready to (re-)start an operation.
@@ -131,7 +213,14 @@ public:
 	 * 					to be reacted upon.
 	 */
 	virtual void
-	detaching(DetachCause cause) = 0;
+	detaching(DetachCause cause)
+	{
+		state = (cause == DetachCause::NormalStop) ? TransactionState::Idle : TransactionState::Error;
+	}
+
+protected:
+	uint8_t address;
+	volatile TransactionState state;
 };
 
 /**
@@ -147,67 +236,26 @@ public:
  * @author	Niklas Hauser
  * @ingroup	i2c
  */
-class I2cWriteReadAdapter : public I2cTransaction
+class I2cWriteReadTransaction : public I2cTransaction
 {
 public:
-	///	@param	address	the slave address not yet shifted left (address < 128).
-	I2cWriteReadAdapter(uint8_t address)
-	:	address(address << 1), readSize(0), writeSize(0),
-		readBuffer(nullptr), writeBuffer(nullptr),
-		state(AdapterState::Idle), isReading(false)
+	I2cWriteReadTransaction(uint8_t address) :
+		I2cTransaction(address), readSize(0), writeSize(0),
+		readBuffer(nullptr), writeBuffer(nullptr), isReading(false)
 	{
 	}
 
-	///	@param	address	the slave address not yet shifted left (address < 128).
-	void inline
-	setAddress(uint8_t address)
-	{
-		this->address = address << 1;
-	}
-
-	/// @return `Busy` while an I2C operation is ongoing. Reinitialization
-	///			is not permitted during this phase.
-	AdapterState inline
-	getState()
-	{
-		return state;
-	}
-
-	/// @return `true` while adapter is busy
-	bool inline
-	isBusy()
-	{
-		return (state == AdapterState::Busy);
-	}
-
-	/**
-	 * Initializes the adapter to only send the address without payload.
-	 *
-	 * @return  `true` if adapter was not in use,
-	 *          `false` otherwise
-	 */
 	bool ALWAYS_INLINE
 	configurePing()
 	{
 		return configureWriteRead(nullptr, 0, nullptr, 0);
 	}
 
-	/**
-	 * Initializes the adapter with the required information for a write/read operation.
-	 *
-	 * @param[in] 	writeBuffer	buffer to be written to the slave
-	 * @param		writeSize	number of bytes to be written, set to `0` to write nothing
-	 * @param[out]	readBuffer	buffer to write the read bytes from the slave
-	 * @param		readSize	number of bytes to be read, set to `0` to read nothing
-	 *
-	 * @return  `true` if adapter was not in use,
-	 *          `false` otherwise
-	 */
 	bool inline
 	configureWriteRead(const uint8_t *writeBuffer, std::size_t writeSize,
 			uint8_t *readBuffer, std::size_t readSize)
 	{
-		if (state != AdapterState::Busy)
+		if (state != TransactionState::Busy)
 		{
 			this->readBuffer = readBuffer;
 			this->readSize = readSize;
@@ -276,15 +324,6 @@ public:
 	}
 
 protected:
-	virtual bool
-	attaching()
-	{
-		if (state == AdapterState::Busy)
-			return false;
-		state = AdapterState::Busy;
-		return true;
-	}
-
 	virtual Starting
 	starting()
 	{
@@ -344,18 +383,11 @@ protected:
 		return Reading(readBuffer, readSize, OperationAfterRead::Stop);
 	}
 
-	virtual void
-	detaching(DetachCause cause)
-	{
-		state = (cause == DetachCause::NormalStop) ? AdapterState::Idle : AdapterState::Error;
-	}
-
-	uint8_t address;
+protected:
 	std::size_t readSize;
 	std::size_t writeSize;
 	uint8_t *readBuffer;
 	const uint8_t *writeBuffer;
-	volatile AdapterState state;
 	bool isReading;
 };
 
@@ -372,74 +404,30 @@ protected:
  * @author	Niklas Hauser
  * @ingroup	i2c
  */
-class I2cWriteAdapter : public I2cTransaction
+class I2cWriteTransaction : public I2cTransaction
 {
 public:
-	///	@param	address	the slave address not yet shifted left (address < 128).
-	I2cWriteAdapter(uint8_t address)
-	:	address(address << 1), size(0), buffer(nullptr), state(AdapterState::Idle)
+	I2cWriteTransaction(uint8_t address)
+	:	I2cTransaction(address), size(0), buffer(nullptr)
 	{
 	}
 
-	///	@param	address	the slave address not yet shifted left (address < 128).
-	void inline
-	setAddress(uint8_t address)
-	{
-		this->address = address << 1;
-	}
-
-	/// @return `Busy` while an I2C operation is ongoing. Reinitialization
-	///			is not permitted during this phase.
-	AdapterState inline
-	getState()
-	{
-		return state;
-	}
-
-	/// @return `true` while adapter is busy
-	bool inline
-	isBusy()
-	{
-		return (state == AdapterState::Busy);
-	}
-
-	/**
-	 * Initializes the adapter to only send the address without payload.
-	 *
-	 * @return  `true` if adapter was not in use,
-	 *          `false` otherwise
-	 */
 	bool ALWAYS_INLINE
 	configurePing()
 	{
 		return configureWrite(nullptr, 0);
 	}
 
-	/**
-	 * This adapter cannot do a write/read operation!
-	 * This method exists for compatibilty with TagAdapter.
-	 *
-	 * @return  `false`
-	 */
 	bool ALWAYS_INLINE
 	configureWriteRead(const uint8_t *, std::size_t, uint8_t *, std::size_t)
 	{
 		return false;
 	}
 
-	/**
-	 * Initializes the adapter with the required information for a write operation.
-	 *
-	 * @param[in] 	buffer	buffer to be written to the slave
-	 * @param		size	number of bytes to be written, set to `0` to write nothing
-	 *
-	 * @return  `true` if adapter was not in use,
-	 *          `false` otherwise
-	 */
 	bool inline
 	configureWrite(const uint8_t *buffer, std::size_t size)
 	{
-		if (state != AdapterState::Busy)
+		if (state != TransactionState::Busy)
 		{
 			this->buffer = buffer;
 			this->size = buffer ? size : 0;
@@ -448,12 +436,6 @@ public:
 		return false;
 	}
 
-	/**
-	 * This adapter cannot do a read operation!
-	 * This method exists for compatibilty with TagAdapter.
-	 *
-	 * @return  `false`
-	 */
 	bool ALWAYS_INLINE
 	configureRead(uint8_t *, std::size_t)
 	{
@@ -461,15 +443,6 @@ public:
 	}
 
 protected:
-	virtual bool
-	attaching()
-	{
-		if (state == AdapterState::Busy)
-			return false;
-		state = AdapterState::Busy;
-		return true;
-	}
-
 	virtual Starting
 	starting()
 	{
@@ -488,16 +461,9 @@ protected:
 		return Reading(nullptr, 0, OperationAfterRead::Stop);
 	}
 
-	virtual void
-	detaching(DetachCause cause)
-	{
-		state = (cause == DetachCause::NormalStop) ? AdapterState::Idle : AdapterState::Error;
-	}
-
-	uint8_t address;
+protected:
 	std::size_t size;
 	const uint8_t *buffer;
-	volatile AdapterState state;
 };
 
 /**
@@ -513,86 +479,36 @@ protected:
  * @author	Niklas Hauser
  * @ingroup	i2c
  */
-class I2cReadAdapter : public I2cTransaction
+class I2cReadTransaction : public I2cTransaction
 {
 public:
-	///	@param	address	the slave address not yet shifted left (address < 128).
-	I2cReadAdapter(uint8_t address)
-	:	address(address << 1), size(0), buffer(nullptr), state(AdapterState::Idle)
+	I2cReadTransaction(uint8_t address)
+	:	I2cTransaction(address), size(0), buffer(nullptr)
 	{
 	}
 
-	///	@param	address	the slave address not yet shifted left (address < 128).
-	void inline
-	setAddress(uint8_t address)
-	{
-		this->address = address << 1;
-	}
-
-	/// @return `Busy` while an I2C operation is ongoing. Reinitialization
-	///			is not permitted during this phase.
-	AdapterState inline
-	getState()
-	{
-		return state;
-	}
-
-	/// @return `true` while adapter is busy
-	bool inline
-	isBusy()
-	{
-		return (state == AdapterState::Busy);
-	}
-
-	/**
-	 * Initializes the adapter to only send the address without payload.
-	 *
-	 * @return  `true` if adapter was not in use,
-	 *          `false` otherwise
-	 */
 	bool ALWAYS_INLINE
 	configurePing()
 	{
 		return configureRead(nullptr, 0);
 	}
 
-	/**
-	 * This adapter cannot do a write/read operation!
-	 * This method exists for compatibilty with TagAdapter.
-	 *
-	 * @return  `false`
-	 */
 	bool ALWAYS_INLINE
 	configureWriteRead(const uint8_t *, std::size_t, uint8_t *, std::size_t)
 	{
 		return false;
 	}
 
-	/**
-	 * This adapter cannot do a write operation!
-	 * This method exists for compatibilty with TagAdapter.
-	 *
-	 * @return  `false`
-	 */
 	bool ALWAYS_INLINE
 	configureWrite(uint8_t *, std::size_t)
 	{
 		return false;
 	}
 
-	/**
-	 * Initializes the adapter with the required information for a read operation.
-	 *
-	 * @param[out] 	buffer	buffer to be read from the slave
-	 * @param		size	number of bytes to be read, set to `0` to read nothing
-	 *
-	 * @return  `true` if adapter was not in use,
-	 *          `false` otherwise
-	 */
 	bool inline
 	configureRead(uint8_t *buffer, std::size_t size)
 	{
-		if (state != AdapterState::Busy)
+		if (state != TransactionState::Busy)
 		{
 			this->buffer = buffer;
 			this->size = size;
@@ -602,15 +518,6 @@ public:
 	}
 
 protected:
-	virtual bool
-	attaching()
-	{
-		if (state == AdapterState::Busy)
-			return false;
-		state = AdapterState::Busy;
-		return true;
-	}
-
 	virtual Starting
 	starting()
 	{
@@ -629,57 +536,8 @@ protected:
 		return Reading(buffer, size, OperationAfterRead::Stop);
 	}
 
-	virtual void
-	detaching(DetachCause cause)
-	{
-		state = (cause == DetachCause::NormalStop) ? AdapterState::Idle : AdapterState::Error;
-	}
-
-	uint8_t address;
 	std::size_t size;
 	uint8_t *buffer;
-	volatile AdapterState state;
-};
-
-/**
- * This wrapper allows assigning a tag to an I2C transaction, to synchronize multiple
- * access to the I2C resource.
- *
- * After a transaction successfully started, the tag will be set to a non-zero value,
- * and will be reset to zero by this wrapper upon detaching.
- * If the transaction concluded without error, the tag's value will be copied into
- * the `success` integer, otherwise it will also be reset to zero.
- *
- * @author	Niklas Hauser
- * @ingroup	i2c
- */
-template< class I2cAdapter >
-class I2cTagAdapter : public I2cAdapter
-{
-	volatile uint8_t &tag;
-	volatile uint8_t &success;
-
-public:
-	/**
-	 * @param	address	the slave address not yet shifted left (address < 128).
-	 * @param	tag		reference to a tag integer.
-	 * @param	success	reference to a success integer.
-	 */
-	I2cTagAdapter(uint8_t address, volatile uint8_t &tag, volatile uint8_t &success)
-	:	I2cAdapter(address), tag(tag), success(success)
-	{
-	}
-
-protected:
-	virtual void
-	detaching(xpcc::I2c::DetachCause cause)
-	{
-		I2cAdapter::detaching(cause);
-		// if no error occurred, copy the tag, else set success to zero
-		success = (I2cAdapter::getState() != xpcc::I2c::AdapterState::Error) ? tag : 0;
-		// delete the tag
-		tag = 0;
-	}
 };
 
 }	// namespace xpcc

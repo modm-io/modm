@@ -35,7 +35,7 @@
 // ----------------------------------------------------------------------------
 template <typename I2cMaster>
 xpcc::Ds1631<I2cMaster>::Ds1631(uint8_t* data, uint8_t address)
-:	I2cWriteReadAdapter(address), status(0), data(data)
+:	I2cWriteReadTransaction(address), status(0), data(data)
 {
 	configureWriteRead(buffer, 0, data, 0);
 }

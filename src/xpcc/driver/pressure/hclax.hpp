@@ -64,7 +64,7 @@ struct hclax
  * @author	Niklas Hauser
  */
 template < typename I2cMaster >
-class HclaX : public hclax, public xpcc::I2cDevice<I2cMaster, 1, I2cReadAdapter>
+class HclaX : public hclax, public xpcc::I2cDevice<I2cMaster, 1, I2cReadTransaction>
 {
 public:
 	/**
@@ -74,7 +74,7 @@ public:
 	 *      You have to use a MUX or two seperate I2C busses.
 	 */
 	HclaX(Data &data)
-	:	I2cDevice<I2cMaster,1,I2cReadAdapter>(0x78), data(data)
+	:	I2cDevice<I2cMaster,1,I2cReadTransaction>(0x78), data(data)
 	{
 		this->adapter.configureRead(data.data, 2);
 	}

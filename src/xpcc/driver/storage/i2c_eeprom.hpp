@@ -19,7 +19,7 @@ namespace xpcc
 /// @cond
 struct i2cEeprom
 {
-	class DataTransmissionAdapter : public xpcc::I2cWriteReadAdapter
+	class DataTransmissionAdapter : public xpcc::I2cWriteReadTransaction
 	{
 	public:
 		DataTransmissionAdapter(uint8_t address);

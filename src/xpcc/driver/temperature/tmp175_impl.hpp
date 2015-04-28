@@ -14,7 +14,7 @@
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 xpcc::Tmp175<I2cMaster>::Tmp175(uint8_t* data, uint8_t address)
-:	I2cWriteReadAdapter(address), running(Running::Nothing), config(0), data(data)
+:	I2cWriteReadTransaction(address), running(Running::Nothing), config(0), data(data)
 {
 	configureWriteRead(buffer, 0, data, 0);
 }

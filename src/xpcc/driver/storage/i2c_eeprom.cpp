@@ -11,13 +11,13 @@
 
 // ----------------------------------------------------------------------------
 xpcc::i2cEeprom::DataTransmissionAdapter::DataTransmissionAdapter(uint8_t address) :
-	I2cWriteReadAdapter(address), writeAddress(false)
+	I2cWriteReadTransaction(address), writeAddress(false)
 {}
 
 bool
 xpcc::i2cEeprom::DataTransmissionAdapter::configureWrite(uint16_t address, const uint8_t *buffer, std::size_t size)
 {
-	if (I2cWriteReadAdapter::configureWrite(buffer, size))
+	if (I2cWriteReadTransaction::configureWrite(buffer, size))
 	{
 		addressBuffer[0] = address >> 8;
 		addressBuffer[1] = address;
@@ -33,7 +33,7 @@ xpcc::i2cEeprom::DataTransmissionAdapter::configureRead(uint16_t address, uint8_
 	addressBuffer[0] = address >> 8;
 	addressBuffer[1] = address;
 	writeAddress = false;
-	return I2cWriteReadAdapter::configureWriteRead(addressBuffer, 2, buffer, size);
+	return I2cWriteReadTransaction::configureWriteRead(addressBuffer, 2, buffer, size);
 }
 
 xpcc::I2cTransaction::Writing
@@ -44,5 +44,5 @@ xpcc::i2cEeprom::DataTransmissionAdapter::writing()
 		writeAddress = false;
 		return Writing(addressBuffer, 2, OperationAfterWrite::Write);
 	}
-	return I2cWriteReadAdapter::writing();
+	return I2cWriteReadTransaction::writing();
 }

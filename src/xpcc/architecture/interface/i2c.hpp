@@ -81,12 +81,12 @@ struct I2c
 	};
 	///@}
 
-	/// State of a Transaction Adapter
+	/// State of a I2c Transaction
 	enum class
-	AdapterState : uint8_t
+	TransactionState : uint8_t
 	{
 		Idle,	///< No error occurred, detached normally
-		Busy,	///< The adapter is busy with data transfer
+		Busy,	///< The transaction object is busy with data transfer
 		Error	///< An error occurred, check the masters `getErrorCode()`
 	};
 

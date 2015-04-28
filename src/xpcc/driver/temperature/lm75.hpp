@@ -42,7 +42,7 @@ namespace xpcc
 	 * \author	Fabian Greif
 	 */
 	template <typename I2cMaster >
-	class Lm75 : protected xpcc::I2cWriteReadAdapter
+	class Lm75 : protected xpcc::I2cWriteReadTransaction
 	{
 	public:
 		/**
@@ -50,7 +50,7 @@ namespace xpcc
 		 * \param	address		Default address is 0x90.
 		 */
 		Lm75(uint8_t *data, uint8_t address=0x90)
-		:	I2cWriteReadAdapter(address), status(0), data(data)
+		:	I2cWriteReadTransaction(address), status(0), data(data)
 		{
 			configureWriteRead(address << 1, data, 2);
 		}
