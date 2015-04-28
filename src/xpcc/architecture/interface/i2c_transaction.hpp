@@ -324,8 +324,8 @@ public:
 	}
 
 protected:
-	virtual Starting
-	starting()
+	Starting
+	starting() override
 	{
 		Starting starting(address, OperationAfterStart::Stop);
 		if (isReading) {
@@ -341,8 +341,8 @@ protected:
 		return starting;
 	}
 
-	virtual Writing
-	writing()
+	Writing
+	writing() override
 	{
 		/* So the `isReading` adventure continues here.
 		 * The code shown in `starting()` does work, but only for the specific sequence of this adapter:
@@ -377,8 +377,8 @@ protected:
 						isReading ? OperationAfterWrite::Restart : OperationAfterWrite::Stop);
 	}
 
-	virtual Reading
-	reading()
+	Reading
+	reading() override
 	{
 		return Reading(readBuffer, readSize, OperationAfterRead::Stop);
 	}
@@ -443,20 +443,20 @@ public:
 	}
 
 protected:
-	virtual Starting
-	starting()
+	Starting
+	starting() override
 	{
 		return Starting(address, size ? OperationAfterStart::Write : OperationAfterStart::Stop);
 	}
 
-	virtual Writing
-	writing()
+	Writing
+	writing() override
 	{
 		return Writing(buffer, size, OperationAfterWrite::Stop);
 	}
 
-	virtual Reading
-	reading()
+	Reading
+	reading() override
 	{
 		return Reading(nullptr, 0, OperationAfterRead::Stop);
 	}
@@ -518,20 +518,20 @@ public:
 	}
 
 protected:
-	virtual Starting
-	starting()
+	Starting
+	starting() override
 	{
 		return Starting(address, size ? OperationAfterStart::Read : OperationAfterStart::Stop);
 	}
 
-	virtual Writing
-	writing()
+	Writing
+	writing() override
 	{
 		return Writing(nullptr, 0, OperationAfterWrite::Stop);
 	}
 
-	virtual Reading
-	reading()
+	Reading
+	reading() override
 	{
 		return Reading(buffer, size, OperationAfterRead::Stop);
 	}
