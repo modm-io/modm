@@ -456,7 +456,6 @@ private:
 		Register reg;
 		uint8_t byte[2];
 	} logicBuffer;
-
 	/// @endcond
 };
 

@@ -368,7 +368,7 @@ protected:
 		 *         writeAddress = false;
 		 *         return Writing(addressBuffer, 2, OperationAfterWrite::Write);
 		 *     }
-		 *     return I2cWriteReadAdapter::writing();
+		 *     return I2cWriteReadTransaction::writing();
 		 *
 		 * This would call `starting()` twice, without modifying `isReading` until this method is called.
 		 */

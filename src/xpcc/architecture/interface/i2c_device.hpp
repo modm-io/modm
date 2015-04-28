@@ -32,7 +32,7 @@ namespace xpcc
  *
  * @tparam	I2cMaster		an I2cMaster conforming to the I2cMaster interface.
  * @tparam	NestingLevels	number of nesting levels required for your driver
- * @tparam	Adapter			an I2c Adapter conforming to the I2cTransaction interface.
+ * @tparam	Transaction		a class conforming to the I2cTransaction interface.
  *
  * @author	Georgi Grinshpun
  * @author	Niklas Hauser
@@ -56,6 +56,8 @@ public:
 		transaction.setAddress(address);
 	}
 
+	/// Attaches a configuration handler, which is called before a transaction,
+	/// whenever the configuration has to be changed.
 	void inline
 	attachConfigurationHandler(I2c::ConfigurationHandler handler)
 	{
@@ -63,7 +65,7 @@ public:
 	}
 
 	/// @retval `true`	device responds to address
-	/// @retval `false`	not device with address found
+	/// @retval `false`	no device with address found
 	xpcc::co::Result<bool>
 	ping()
 	{
@@ -77,7 +79,7 @@ public:
 	}
 
 protected:
-	/// Configures the adapter with a write/read operation and starts the transaction.
+	/// Configures the transaction with a write/read operation and starts it.
 	bool inline
 	startWriteRead(const uint8_t *writeBuffer, std::size_t writeSize,
 			uint8_t *readBuffer, std::size_t readSize)
@@ -86,7 +88,7 @@ protected:
 				startTransaction() );
 	}
 
-	/// Configures the adapter with a write operation and starts the transaction.
+	/// Configures the transaction with a write operation and starts it.
 	bool inline
 	startWrite(const uint8_t *buffer, std::size_t size)
 	{
@@ -94,7 +96,7 @@ protected:
 				startTransaction() );
 	}
 
-	/// Configures the adapter with a read operation and starts the transaction.
+	/// Configures the transaction with a read operation and starts it.
 	bool inline
 	startRead(uint8_t *buffer, std::size_t size)
 	{
@@ -111,14 +113,14 @@ protected:
 	}
 
 protected:
-	/// @returns `true` when adapter is busy.
+	/// @returns `true` when transaction is busy.
 	bool inline
 	isTransactionRunning()
 	{
 		return transaction.isBusy();
 	}
 
-	/// @returns `true` when adapter did not return an error.
+	/// @returns `true` when transaction did not return an error.
 	bool inline
 	wasTransactionSuccessful()
 	{

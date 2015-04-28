@@ -143,7 +143,6 @@ xpcc::Vl6180<I2cMaster>::readSensor(bool isDistance)
 
 					if (i2cBuffer[3]++ > 15)
 						CO_RETURN(false);
-
 				}
 
 				// the sequence was executed successfully
