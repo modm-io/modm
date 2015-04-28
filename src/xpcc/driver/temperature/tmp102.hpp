@@ -13,7 +13,6 @@
 #include <xpcc/architecture/interface/register.hpp>
 #include <xpcc/architecture/interface/i2c_device.hpp>
 #include <xpcc/processing/protothread.hpp>
-#include <xpcc/processing/coroutine.hpp>
 #include <xpcc/math/utils/endianness.hpp>
 
 namespace xpcc
@@ -30,11 +29,11 @@ protected:
 	enum class
 	Register : uint8_t
 	{
+		Temperature = 0x00,
 		Configuration = 0x01,
 
-		Temperature = 0x00,
-		TemperatureLsb = 0x02,
-		TemperatureMsb = 0x03
+		TemperatureLowerLimit = 0x02,
+		TemperatureUpperLimit = 0x03
 	};
 
 	enum class
@@ -146,7 +145,7 @@ public:
 /**
  * TMP102 digital temperature sensor driver
  *
- * The TMP102 is a digital temperature sensor with a I2C interface
+ * The TMP102 is a digital temperature sensor with an I2C interface
  * and measures temperature over a range of -40 to +125 deg Celsius with a
  * resolution of 1/16 (0.0625) deg C and an accuracy of up to 0.5 deg C.
  *
@@ -159,12 +158,8 @@ public:
  * for 30ms and then `readTemperature()` to achieve other (less frequent)
  * update rates.
  *
- * @see <a href="http://www.ti.com/lit/ds/symlink/tmp102.pdf">Datasheet</a>
- *
  * @ingroup driver_temperature
  * @author	Niklas Hauser
- *
- * @tparam I2cMaster Asynchronous Interface
  */
 template < class I2cMaster >
 class Tmp102 :	public tmp102, public I2cDevice< I2cMaster, 2 >,
@@ -191,13 +186,15 @@ public:
 	xpcc::co::Result<bool>
 	configureAlertMode(ThermostatMode mode, AlertPolarity polarity, FaultQueue faults);
 
+	/// Writes the upper limit of the alarm.
 	xpcc::co::Result<bool> ALWAYS_INLINE
 	writeUpperLimit(float temperature)
-	{ return writeLimitRegister(Register::TemperatureMsb, temperature); }
+	{ return writeLimitRegister(Register::TemperatureUpperLimit, temperature); }
 
+	/// Writes the lower limit of the alarm.
 	xpcc::co::Result<bool> ALWAYS_INLINE
 	writeLowerLimit(float temperature)
-	{ return writeLimitRegister(Register::TemperatureLsb, temperature); }
+	{ return writeLimitRegister(Register::TemperatureLowerLimit, temperature); }
 
 	/// param[out]	result	contains comparator mode alert in the configured polarity
 	xpcc::co::Result<bool>
