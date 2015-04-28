@@ -49,29 +49,19 @@ xpcc::Pca9685<I2cMaster>::initialize(uint8_t mode1, uint8_t mode2)
 	// set the first mode register
 	buffer[0] = REG_MODE1;
 	buffer[1] = mode1 | MODE1_AI;  // ensure that auto increment is enabled
+	this->transaction.configureWrite(buffer, 2);
 
-	CO_WAIT_UNTIL( this->startWrite(buffer, 2) );
-
-	CO_WAIT_WHILE( this->isTransactionRunning() );
-
-	if (not this->wasTransactionSuccessful())
-	{
+	if (not CO_CALL( this->runTransaction() ))
 		CO_RETURN(false);
-	}
 
 	// set the second mode register
 
 	buffer[0] = REG_MODE2;
 	buffer[1] = mode2;
+	this->transaction.configureWrite(buffer, 2);
 
-	CO_WAIT_UNTIL( this->startWrite(buffer, 2) );
-
-	CO_WAIT_WHILE( this->isTransactionRunning() );
-
-	if (not this->wasTransactionSuccessful())
-	{
+	if (not CO_CALL( this->runTransaction() ))
 		CO_RETURN(false);
-	}
 
 	// Always turn on all LEDs at tick 0 and switch them of later according
 	// to the current value
@@ -79,17 +69,9 @@ xpcc::Pca9685<I2cMaster>::initialize(uint8_t mode1, uint8_t mode2)
 	buffer[0] = REG_ALL_LED_ON_L;
 	buffer[1] = 0x00;
 	buffer[2] = 0x00;
+	this->transaction.configureWrite(buffer, 3);
 
-	CO_WAIT_UNTIL( this->startWrite(buffer, 3) );
-
-	CO_WAIT_WHILE( this->isTransactionRunning() );
-
-	if (not this->wasTransactionSuccessful())
-	{
-		CO_RETURN(false);
-	}
-
-	CO_END_RETURN(true);
+	CO_END_RETURN_CALL( this->runTransaction() );
 }
 
 template<typename I2cMaster>
@@ -107,12 +89,9 @@ xpcc::Pca9685<I2cMaster>::setChannel(uint8_t channel, uint16_t value)
 	// and turns this LED of at value
 	buffer[1] = uint8_t(value);
 	buffer[2] = uint8_t(value >> 8) & 0x0f;
+	this->transaction.configureWrite(buffer, 3);
 
-	CO_WAIT_UNTIL( this->startWrite(buffer, 3) );
-
-	CO_WAIT_WHILE( this->isTransactionRunning() );
-
-	CO_END_RETURN( this->wasTransactionSuccessful() );
+	CO_END_RETURN_CALL( this->runTransaction() );
 }
 
 template<typename I2cMaster>
@@ -126,10 +105,7 @@ xpcc::Pca9685<I2cMaster>::setAllChannels(uint16_t value)
 	// and turns this LED of at tick $value
 	buffer[1] = uint8_t(value);
 	buffer[2] = uint8_t(value >> 8) & 0x0f;
+	this->transaction.configureWrite(buffer, 3);
 
-	CO_WAIT_UNTIL( this->startWrite(buffer, 3) );
-
-	CO_WAIT_WHILE( this->isTransactionRunning() );
-
-	CO_END_RETURN( this->wasTransactionSuccessful() );
+	CO_END_RETURN_CALL( this->runTransaction() );
 }

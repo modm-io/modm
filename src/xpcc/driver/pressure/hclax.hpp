@@ -100,11 +100,7 @@ public:
 	{
 		CO_BEGIN();
 
-		CO_WAIT_UNTIL( this->startTransaction() );
-
-		CO_WAIT_WHILE( this->isTransactionRunning() );
-
-		CO_END_RETURN( this->wasTransactionSuccessful() );
+		CO_END_RETURN_CALL( this->runTransaction() );
 	}
 
 public:

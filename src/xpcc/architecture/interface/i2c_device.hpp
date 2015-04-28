@@ -39,7 +39,7 @@ namespace xpcc
  * @ingroup i2c
  */
 template < class I2cMaster, uint8_t NestingLevels = 10, class Transaction = I2cWriteReadTransaction >
-class I2cDevice : protected xpcc::co::NestedCoroutine< NestingLevels >
+class I2cDevice : protected xpcc::co::NestedCoroutine< NestingLevels + 1 >
 {
 public:
 	///	@param	address	the slave address not yet shifted left (address < 128).
@@ -64,8 +64,8 @@ public:
 		configuration = handler;
 	}
 
-	/// @retval `true`	device responds to address
-	/// @retval `false`	no device with address found
+	/// @retval true	device responds to address
+	/// @retval false	no device with address found
 	xpcc::co::Result<bool>
 	ping()
 	{
@@ -104,6 +104,7 @@ protected:
 				startTransaction() );
 	}
 
+protected:
 	/// Starts the transaction with the declared transaction object.
 	/// @param	transaction	pointer to transaction object, `nullptr` for own object.
 	bool inline
@@ -112,7 +113,6 @@ protected:
 		return I2cMaster::start(transaction ? transaction : &this->transaction, configuration);
 	}
 
-protected:
 	/// @returns `true` when transaction is busy.
 	bool inline
 	isTransactionRunning()
@@ -125,6 +125,19 @@ protected:
 	wasTransactionSuccessful()
 	{
 		return (transaction.getState() != xpcc::I2c::TransactionState::Error);
+	}
+
+	/// Starts our own transaction and waits until finished.
+	xpcc::co::Result<bool>
+	runTransaction()
+	{
+		CO_BEGIN();
+
+		CO_WAIT_UNTIL( startTransaction() );
+
+		CO_WAIT_WHILE( isTransactionRunning() );
+
+		CO_END_RETURN( wasTransactionSuccessful() );
 	}
 
 protected:

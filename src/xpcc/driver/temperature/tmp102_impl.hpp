@@ -143,11 +143,9 @@ xpcc::Tmp102<I2cMaster>::readTemperature()
 	CO_BEGIN();
 
 	buffer[0] = uint8_t(Register::Temperature);
-	CO_WAIT_UNTIL( this->startWriteRead(buffer, 1, data.data, 2) );
+	this->transaction.configureWriteRead(buffer, 1, data.data, 2);
 
-	CO_WAIT_WHILE( this->isTransactionRunning() );
-
-	CO_END_RETURN( this->wasTransactionSuccessful() );
+	CO_END_RETURN_CALL( this->runTransaction() );
 }
 
 // MARK: read temperature
@@ -158,11 +156,9 @@ xpcc::Tmp102<I2cMaster>::readComparatorMode(bool &result)
 	CO_BEGIN();
 
 	buffer[0] = i(Register::Configuration);
-	CO_WAIT_UNTIL( this->startWriteRead(buffer, 1, buffer, 2) );
+	this->transaction.configureWriteRead(buffer, 1, buffer, 2);
 
-	CO_WAIT_WHILE( this->isTransactionRunning() );
-
-	if (this->wasTransactionSuccessful())
+	if (CO_CALL( this->runTransaction() ))
 	{
 		config_msb = Config1_t(buffer[0]) & ~Resolution_t::mask();
 		result =     Config2_t(buffer[1]) &  Config2::Alert;
@@ -184,11 +180,9 @@ xpcc::Tmp102<I2cMaster>::writeConfiguration(uint8_t length)
 	buffer[1] = config_msb.value;
 	buffer[2] = config_lsb.value;
 
-	CO_WAIT_UNTIL( this->startWrite(buffer, length) );
+	this->transaction.configureWrite(buffer, length);
 
-	CO_WAIT_WHILE( this->isTransactionRunning() );
-
-	CO_END_RETURN( this->wasTransactionSuccessful() );
+	CO_END_RETURN_CALL( this->runTransaction() );
 }
 
 // MARK: configuration
@@ -207,9 +201,7 @@ xpcc::Tmp102<I2cMaster>::writeLimitRegister(Register reg, float temperature)
 		buffer[2] = temp;
 	}
 
-	CO_WAIT_UNTIL( this->startWrite(buffer, 3) );
+	this->transaction.configureWrite(buffer, 3);
 
-	CO_WAIT_WHILE( this->isTransactionRunning() );
-
-	CO_END_RETURN( this->wasTransactionSuccessful() );
+	CO_END_RETURN_CALL( this->runTransaction() );
 }

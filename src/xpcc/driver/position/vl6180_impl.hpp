@@ -234,11 +234,9 @@ xpcc::Vl6180<I2cMaster>::write(Register reg, uint8_t value, uint8_t length)
 	i2cBuffer[1] = uint8_t(reg);
 	i2cBuffer[2] = value;
 
-	CO_WAIT_UNTIL( this->startWrite(i2cBuffer, length+2) );
+	this->transaction.configureWrite(i2cBuffer, length+2);
 
-	CO_WAIT_WHILE( this->isTransactionRunning() );
-
-	CO_END_RETURN( this->wasTransactionSuccessful() );
+	CO_END_RETURN_CALL( this->runTransaction() );
 }
 
 // MARK: read multilength register
@@ -251,9 +249,7 @@ xpcc::Vl6180<I2cMaster>::read(Register reg, uint8_t *buffer, uint8_t length)
 	i2cBuffer[0] = uint16_t(reg) >> 8;
 	i2cBuffer[1] = uint8_t(reg);
 
-	CO_WAIT_UNTIL( this->startWriteRead(i2cBuffer, 2, buffer, length) );
+	this->transaction.configureWriteRead(i2cBuffer, 2, buffer, length);
 
-	CO_WAIT_WHILE( this->isTransactionRunning() );
-
-	CO_END_RETURN( this->wasTransactionSuccessful() );
+	CO_END_RETURN_CALL( this->runTransaction() );
 }

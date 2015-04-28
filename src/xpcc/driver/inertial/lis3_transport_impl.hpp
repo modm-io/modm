@@ -30,11 +30,9 @@ xpcc::Lis3TransportI2c<I2cMaster>::write(uint8_t reg, uint8_t value)
 	buffer[0] = reg;
 	buffer[1] = value;
 
-	CO_WAIT_UNTIL( this->startWrite(buffer, 2) );
+	this->transaction.configureWrite(buffer, 2);
 
-	CO_WAIT_WHILE( this->isTransactionRunning() );
-
-	CO_END_RETURN( this->wasTransactionSuccessful() );
+	CO_END_RETURN_CALL( this->runTransaction() );
 }
 
 // MARK: read register
@@ -45,12 +43,9 @@ xpcc::Lis3TransportI2c<I2cMaster>::read(uint8_t reg, uint8_t *buffer, uint8_t le
 	CO_BEGIN();
 
 	this->buffer[0] = reg;
+	this->transaction.configureWriteRead(this->buffer, 1, buffer, length);
 
-	CO_WAIT_UNTIL( this->startWriteRead(this->buffer, 1, buffer, length) );
-
-	CO_WAIT_WHILE( this->isTransactionRunning() );
-
-	CO_END_RETURN( this->wasTransactionSuccessful() );
+	CO_END_RETURN_CALL( this->runTransaction() );
 }
 
 // ============================================================================

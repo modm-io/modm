@@ -134,9 +134,9 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(uint8_t command)
 	commandBuffer[1] = command;
 	CO_WAIT_UNTIL( startTransactionWithLength(2) );
 
-	CO_WAIT_WHILE(this->isTransactionRunning());
+	CO_WAIT_WHILE( this->isTransactionRunning() );
 
-	CO_END_RETURN(this->wasTransactionSuccessful());
+	CO_END_RETURN( this->wasTransactionSuccessful() );
 }
 
 template < class I2cMaster >
@@ -149,9 +149,9 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(uint8_t command, uint8_t data)
 	commandBuffer[3] = data;
 	CO_WAIT_UNTIL( startTransactionWithLength(4) );
 
-	CO_WAIT_WHILE(this->isTransactionRunning());
+	CO_WAIT_WHILE( this->isTransactionRunning() );
 
-	CO_END_RETURN(this->wasTransactionSuccessful());
+	CO_END_RETURN( this->wasTransactionSuccessful() );
 }
 
 template < class I2cMaster >
@@ -165,9 +165,9 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(uint8_t command, uint8_t data1, uint8_t d
 	commandBuffer[5] = data2;
 	CO_WAIT_UNTIL( startTransactionWithLength(6) );
 
-	CO_WAIT_WHILE(this->isTransactionRunning());
+	CO_WAIT_WHILE( this->isTransactionRunning() );
 
-	CO_END_RETURN(this->wasTransactionSuccessful());
+	CO_END_RETURN( this->wasTransactionSuccessful() );
 }
 
 // ----------------------------------------------------------------------------

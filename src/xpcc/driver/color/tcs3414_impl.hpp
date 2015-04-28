@@ -106,11 +106,9 @@ xpcc::Tcs3414<I2cMaster>::writeRegister(
 			|	static_cast<uint8_t>(address);	// at this address
 	commandBuffer[2] = value;
 
-	CO_WAIT_UNTIL( this->startWrite(commandBuffer, 3) );
+	this->transaction.configureWrite(commandBuffer, 3);
 
-	CO_WAIT_WHILE( this->isTransactionRunning() );
-
-	CO_END_RETURN( this->wasTransactionSuccessful() );
+	CO_END_RETURN_CALL( this->runTransaction() );
 }
 
 template<typename I2cMaster>
@@ -127,9 +125,7 @@ xpcc::Tcs3414<I2cMaster>::readRegisters(
 			| static_cast<uint8_t>(0x40)		// with SMB read/write protocol
 			| static_cast<uint8_t>(address);	// at this address
 
-	CO_WAIT_UNTIL( this->startWriteRead(commandBuffer, 1, values, count) );
+	this->transaction.configureWriteRead(commandBuffer, 1, values, count);
 
-	CO_WAIT_WHILE( this->isTransactionRunning() );
-
-	CO_END_RETURN( this->wasTransactionSuccessful() );
+	CO_END_RETURN_CALL( this->runTransaction() );
 }

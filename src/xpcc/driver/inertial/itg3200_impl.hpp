@@ -93,11 +93,9 @@ xpcc::Itg3200<I2cMaster>::write(Register reg, uint8_t *buffer, uint8_t length, b
 	rawBuffer[3] = uint8_t(reg);
 	if (copyBuffer) std::memcpy(rawBuffer+4, buffer, length);
 
-	CO_WAIT_UNTIL( this->startWrite(rawBuffer+3, length+1) );
+	this->transaction.configureWrite(rawBuffer+3, length+1);
 
-	CO_WAIT_WHILE( this->isTransactionRunning() );
-
-	CO_END_RETURN( this->wasTransactionSuccessful() );
+	CO_END_RETURN_CALL( this->runTransaction() );
 }
 
 // MARK: read multilength register
@@ -108,10 +106,7 @@ xpcc::Itg3200<I2cMaster>::read(Register reg, uint8_t *buffer, uint8_t length)
 	CO_BEGIN();
 
 	rawBuffer[3] = uint8_t(reg);
+	this->transaction.configureWriteRead(rawBuffer+3, 1, buffer, length);
 
-	CO_WAIT_UNTIL( this->startWriteRead(rawBuffer+3, 1, buffer, length) );
-
-	CO_WAIT_WHILE( this->isTransactionRunning() );
-
-	CO_END_RETURN( this->wasTransactionSuccessful() );
+	CO_END_RETURN_CALL( this->runTransaction() );
 }
