@@ -15,6 +15,8 @@
 #include <xpcc/processing/protothread.hpp>
 #include <xpcc/math/utils/endianness.hpp>
 
+#include "lm75.hpp"
+
 namespace xpcc
 {
 
@@ -22,20 +24,10 @@ namespace xpcc
 template < class I2cMaster >
 class Tmp102;
 
-struct tmp102
+struct tmp102 : public lm75
 {
 protected:
 	/// @cond
-	enum class
-	Register : uint8_t
-	{
-		Temperature = 0x00,
-		Configuration = 0x01,
-
-		TemperatureLowerLimit = 0x02,
-		TemperatureUpperLimit = 0x03
-	};
-
 	enum class
 	Config1 : uint8_t
 	{
@@ -67,41 +59,6 @@ protected:
 	};
 	typedef Configuration< Config2_t, ConversionRate, (Bit7 | Bit6) > ConversionRate_t;
 
-	typedef FlagsGroup<
-			Config1_t, Config2_t
-	> Register_t;
-
-	static constexpr uint8_t
-	i(Register reg) { return uint8_t(reg); }
-	/// @endcond
-
-public:
-	enum class
-	ThermostatMode : uint8_t
-	{
-		Comparator = 0,
-		Interrupt = Config1::ThermostatMode
-	};
-
-	enum class
-	AlertPolarity : uint8_t
-	{
-		ActiveLow = 0,
-		ActiveHigh = Config1::Polarity
-	};
-
-	enum class
-	FaultQueue : uint8_t
-	{
-		Faults1 = 0,
-		Faults2 = Bit3,
-		Faults4 = Bit4,
-		Faults6 = Bit4 | Bit3
-	};
-protected:
-	/// @cond
-	typedef Configuration< Config1_t, FaultQueue, (Bit4 | Bit3) > FaultQueue_t;
-	/// @endcond
 public:
 
 	struct ATTRIBUTE_PACKED
@@ -162,7 +119,7 @@ public:
  * @author	Niklas Hauser
  */
 template < class I2cMaster >
-class Tmp102 :	public tmp102, public I2cDevice< I2cMaster, 2 >,
+class Tmp102 :	public tmp102, public Lm75< I2cMaster >,
 				protected xpcc::pt::Protothread
 {
 public:
@@ -183,8 +140,9 @@ public:
 	xpcc::co::Result<bool>
 	enableExtendedMode(bool enable = true);
 
+	/// param[out]	result	contains comparator mode alert in the configured polarity
 	xpcc::co::Result<bool>
-	configureAlertMode(ThermostatMode mode, AlertPolarity polarity, FaultQueue faults);
+	readComparatorMode(bool &result);
 
 	/// Writes the upper limit of the alarm.
 	xpcc::co::Result<bool> ALWAYS_INLINE
@@ -196,20 +154,12 @@ public:
 	writeLowerLimit(float temperature)
 	{ return writeLimitRegister(Register::TemperatureLowerLimit, temperature); }
 
-	/// param[out]	result	contains comparator mode alert in the configured polarity
-	xpcc::co::Result<bool>
-	readComparatorMode(bool &result);
-
 	/// starts a temperature conversion right now
 	xpcc::co::Result<bool>
 	startConversion();
 
-	/// reads the Temperature registers and buffers the results
-	xpcc::co::Result<bool>
-	readTemperature();
-
-public:
-	Data &data;
+	Data& inline
+	getData();
 
 private:
 	bool
@@ -221,11 +171,9 @@ private:
 	xpcc::co::Result<bool>
 	writeLimitRegister(Register reg, float temperature);
 
-	uint8_t buffer[3];
 	xpcc::ShortTimeout timeout;
 	uint16_t updateTime;
 
-	Config1_t config_msb;
 	Config2_t config_lsb;
 };
 

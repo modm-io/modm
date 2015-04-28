@@ -14,9 +14,9 @@
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 xpcc::Tmp102<I2cMaster>::Tmp102(Data &data, uint8_t address)
-:	I2cDevice<I2cMaster, 2>(address),
-	data(data), timeout(250), updateTime(250),
-	config_msb(0), config_lsb(ConversionRate_t(ConversionRate::Hz4))
+:	Lm75<I2cMaster>(reinterpret_cast<lm75::Data&>(data), address),
+	timeout(250), updateTime(250),
+	config_lsb(ConversionRate_t(ConversionRate::Hz4))
 {
 	this->stop();
 }
@@ -40,10 +40,17 @@ xpcc::Tmp102<I2cMaster>::run()
 		PT_WAIT_UNTIL(timeout.isExpired());
 		timeout.restart(updateTime & ~(1 << 15));
 
-		PT_CALL(readTemperature());
+		PT_CALL(this->readTemperature());
 	}
 
 	PT_END();
+}
+
+template < typename I2cMaster >
+xpcc::tmp102::Data&
+xpcc::Tmp102<I2cMaster>::getData()
+{
+	return reinterpret_cast<Data&>(this->data);
 }
 
 // ----------------------------------------------------------------------------
@@ -61,7 +68,7 @@ xpcc::Tmp102<I2cMaster>::setUpdateRate(uint8_t rate)
 	if (rate == 0 || rate == 1 || rate == 4 || rate == 8)
 	{
 		// clear shutdown mode
-		config_msb.reset(Config1::ShutdownMode);
+		reinterpret_cast<Config1_t&>(this->config_msb).reset(Config1::ShutdownMode);
 		// clear conversion rate bits
 		ConversionRate_t::reset(config_lsb);
 		// maps:
@@ -103,20 +110,6 @@ xpcc::Tmp102<I2cMaster>::enableExtendedMode(bool enable)
 	CO_END_RETURN_CALL(writeConfiguration(3));
 }
 
-// MARK: Alert mode
-template < typename I2cMaster >
-xpcc::co::Result<bool>
-xpcc::Tmp102<I2cMaster>::configureAlertMode(ThermostatMode mode, AlertPolarity polarity, FaultQueue faults)
-{
-	CO_BEGIN();
-
-	config_msb.update(Config1::ThermostatMode, bool(mode));
-	config_msb.update(Config1::Polarity, bool(polarity));
-	FaultQueue_t::set(config_msb, faults);
-
-	CO_END_RETURN_CALL(writeConfiguration(2));
-}
-
 // MARK: conversion
 template < typename I2cMaster >
 xpcc::co::Result<bool>
@@ -124,11 +117,11 @@ xpcc::Tmp102<I2cMaster>::startConversion()
 {
 	CO_BEGIN();
 
-	config_msb.set(Config1::OneShot);
+	reinterpret_cast<Config1_t&>(this->config_msb).set(Config1::OneShot);
 
 	if ( CO_CALL(writeConfiguration(2)) )
 	{
-		config_msb.reset(Config1::OneShot);
+		reinterpret_cast<Config1_t&>(this->config_msb).reset(Config1::OneShot);
 		CO_RETURN(true);
 	}
 
@@ -138,31 +131,18 @@ xpcc::Tmp102<I2cMaster>::startConversion()
 // MARK: read temperature
 template < typename I2cMaster >
 xpcc::co::Result<bool>
-xpcc::Tmp102<I2cMaster>::readTemperature()
-{
-	CO_BEGIN();
-
-	buffer[0] = uint8_t(Register::Temperature);
-	this->transaction.configureWriteRead(buffer, 1, data.data, 2);
-
-	CO_END_RETURN_CALL( this->runTransaction() );
-}
-
-// MARK: read temperature
-template < typename I2cMaster >
-xpcc::co::Result<bool>
 xpcc::Tmp102<I2cMaster>::readComparatorMode(bool &result)
 {
 	CO_BEGIN();
 
-	buffer[0] = i(Register::Configuration);
-	this->transaction.configureWriteRead(buffer, 1, buffer, 2);
+	this->buffer[0] = uint8_t(Register::Configuration);
+	this->transaction.configureWriteRead(this->buffer, 1, this->buffer, 2);
 
 	if (CO_CALL( this->runTransaction() ))
 	{
-		config_msb = Config1_t(buffer[0]) & ~Resolution_t::mask();
-		result =     Config2_t(buffer[1]) &  Config2::Alert;
-		config_lsb = Config2_t(buffer[1]) & ~Config2::Alert;
+		reinterpret_cast<Config1_t&>(this->config_msb) = Config1_t(this->buffer[0]) & ~Resolution_t::mask();
+		result =     Config2_t(this->buffer[1]) &  Config2::Alert;
+		config_lsb = Config2_t(this->buffer[1]) & ~Config2::Alert;
 		CO_RETURN(true);
 	}
 
@@ -176,11 +156,11 @@ xpcc::Tmp102<I2cMaster>::writeConfiguration(uint8_t length)
 {
 	CO_BEGIN();
 
-	buffer[0] = i(Register::Configuration);
-	buffer[1] = config_msb.value;
-	buffer[2] = config_lsb.value;
+	this->buffer[0] = uint8_t(Register::Configuration);
+	this->buffer[1] = reinterpret_cast<Config1_t&>(this->config_msb).value;
+	this->buffer[2] = config_lsb.value;
 
-	this->transaction.configureWrite(buffer, length);
+	this->transaction.configureWrite(this->buffer, length);
 
 	CO_END_RETURN_CALL( this->runTransaction() );
 }
@@ -196,12 +176,12 @@ xpcc::Tmp102<I2cMaster>::writeLimitRegister(Register reg, float temperature)
 		int16_t temp = temperature * 16.f;
 		temp <<= (config_lsb & Config2::ExtendedMode) ? 3 : 4;
 
-		buffer[0] = i(reg);
-		buffer[1] = (temp >> 8);
-		buffer[2] = temp;
+		this->buffer[0] = uint8_t(reg);
+		this->buffer[1] = (temp >> 8);
+		this->buffer[2] = temp;
 	}
 
-	this->transaction.configureWrite(buffer, 3);
+	this->transaction.configureWrite(this->buffer, 3);
 
 	CO_END_RETURN_CALL( this->runTransaction() );
 }

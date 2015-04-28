@@ -17,8 +17,12 @@ namespace xpcc
 {
 
 // forward declaration for friending with lm75::Data
-template < typename I2cMaster >
+template < class I2cMaster >
 class Lm75;
+
+// forward declaration for friending with Lm75
+template < class I2cMaster >
+class Tmp102;
 
 struct lm75
 {
@@ -76,7 +80,7 @@ public:
 	struct ATTRIBUTE_PACKED
 	Data
 	{
-		template < typename I2cMaster >
+		template < class I2cMaster >
 		friend class Lm75;
 
 	public:
@@ -116,9 +120,11 @@ public:
  * @author	Fabian Greif
  * @author	Niklas Hauser
  */
-template <typename I2cMaster >
+template < class I2cMaster >
 class Lm75 : public lm75, public I2cDevice< I2cMaster, 2 >
 {
+	template < class OtherI2cMaster >
+	friend class Tmp102;
 public:
 	/// Constructor, requires a lm75::Data object,
 	/// sets address to default of 0x48 (7 alternative addresses up to 0x4F possible).
@@ -141,13 +147,15 @@ public:
 	xpcc::co::Result<bool>
 	readTemperature();
 
-public:
-	Data &data;
+	Data& inline
+	getData()
+	{ return data; }
 
 private:
 	xpcc::co::Result<bool>
 	writeLimitRegister(Register reg, float temperature);
 
+	Data &data;
 	uint8_t buffer[3];
 	Config1_t config_msb;
 };
