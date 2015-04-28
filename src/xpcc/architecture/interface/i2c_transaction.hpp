@@ -97,7 +97,7 @@ public:
 	void inline
 	setAddress(uint8_t address)
 	{
-		this->address = address;
+		this->address = address << 1;
 	}
 
 	/// @return `Busy` while an I2C operation is ongoing. Reinitialization
