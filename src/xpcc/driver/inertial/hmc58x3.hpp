@@ -249,8 +249,10 @@ public:
 	readStatus();
 
 public:
-	/// the data object for this sensor.
-	Data &data;
+	/// Get the data object for this sensor.
+	inline Data&
+	getData()
+	{ return data; }
 
 protected:
 	/// @cond
@@ -279,6 +281,8 @@ private:
 
 protected:
 	/// @cond
+	Data &data;
+
 	// the read buffer is for a continous read from address 0x00 -> 0x09
 	// 0: config A
 	// 1: config B

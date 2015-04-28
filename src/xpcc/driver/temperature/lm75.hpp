@@ -147,7 +147,7 @@ public:
 	xpcc::co::Result<bool>
 	readTemperature();
 
-	Data& inline
+	inline Data&
 	getData()
 	{ return data; }
 

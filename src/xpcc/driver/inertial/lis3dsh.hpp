@@ -604,8 +604,10 @@ public:
 	{ return FifoSource_t(rawBuffer[14]); }
 
 public:
-	/// the data object for this sensor.
-	Data &data;
+	/// Get the data object for this sensor.
+	inline Data&
+	getData()
+	{ return data; }
 
 private:
 	xpcc::co::Result<bool>
@@ -614,6 +616,7 @@ private:
 	xpcc::co::Result<bool>
 	updateRegister(uint8_t reg, uint8_t setMask, uint8_t clearMask = 0xff);
 
+	Data &data;
 	// the read buffer is for a continous read from address 0x20 -> 0x2F
 	// 0: control 4
 	// 1-3: control 1-3

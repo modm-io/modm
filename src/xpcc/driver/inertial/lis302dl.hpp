@@ -432,8 +432,10 @@ public:
 	{ return Control3_t(rawBuffer[3]); }
 
 public:
-	/// the data object for this sensor.
-	Data &data;
+	/// Get the data object for this sensor.
+	inline Data&
+	getData()
+	{ return data; }
 
 private:
 	xpcc::co::Result<bool>
@@ -442,6 +444,7 @@ private:
 	xpcc::co::Result<bool>
 	updateRegister(uint8_t reg, uint8_t setMask, uint8_t clearMask = 0xff);
 
+	Data &data;
 	// 0-2: control 0-2
 	// 3: status
 	// 4: -- buffer for updateRegister, but overridden in readAcceleration --

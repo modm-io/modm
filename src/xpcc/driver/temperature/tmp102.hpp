@@ -158,7 +158,7 @@ public:
 	xpcc::co::Result<bool>
 	startConversion();
 
-	Data& inline
+	inline Data&
 	getData();
 
 private:

@@ -415,7 +415,9 @@ protected:
 
 public:
 	/// the data object for this sensor.
-	Data &data;
+	inline Data&
+	getData()
+	{ return data; }
 
 protected:
 	/// @cond
@@ -440,11 +442,12 @@ private:
 	readSensor(bool isDistance = true);
 
 private:
+	Data &data;
+
 	xpcc::ShortTimeout timeout;
 	RangeErrorCode rangeError;
 	ALS_ErrorCode alsError;
 
-	/// @cond
 	// Internal write buffer
 	// 0: Index[15:8]
 	// 1: Index[7:0]
@@ -456,7 +459,6 @@ private:
 		Register reg;
 		uint8_t byte[2];
 	} logicBuffer;
-	/// @endcond
 };
 
 }	// namespace xpcc

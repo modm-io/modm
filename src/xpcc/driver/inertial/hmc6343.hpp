@@ -353,8 +353,10 @@ protected:
 	/// @}
 
 public:
-	/// the data object for this sensor.
-	Data &data;
+	/// Get the data object for this sensor.
+	inline Data&
+	getData()
+	{ return data; }
 
 private:
 	xpcc::co::Result<bool>
@@ -364,6 +366,7 @@ private:
 	readPostData(Command command, uint8_t offset, uint8_t readSize);
 
 private:
+	Data &data;
 	uint8_t buffer[3];
 	xpcc::ShortTimeout timeout;
 };

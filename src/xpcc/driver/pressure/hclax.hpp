@@ -104,6 +104,12 @@ public:
 	}
 
 public:
+	/// Get the data object for this sensor.
+	inline Data&
+	getData()
+	{ return data; }
+
+private:
 	Data &data;
 };
 

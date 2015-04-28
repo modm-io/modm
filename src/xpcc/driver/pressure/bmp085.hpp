@@ -244,10 +244,13 @@ public:
 	}
 
 public:
-	/// the data object for this sensor.
-	Data &data;
+	/// Get the data object for this sensor.
+	inline Data&
+	getData()
+	{ return data; }
 
 private:
+	Data &data;
 	xpcc::ShortTimeout timeout;
 
 	/**
