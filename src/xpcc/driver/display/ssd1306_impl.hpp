@@ -16,7 +16,7 @@ xpcc::Ssd1306<I2cMaster>::Ssd1306(uint8_t address)
 :	I2cDevice<I2cMaster, 2, ssd1306::DataTransmissionAdapter>(address),
 	commandBuffer{0x80, 0, 0x80, 0, 0x80, 0, 0x80, 0, 0x80, 0, 0x80, 0, 0x80, 0}
 {
-	this->adapter.setCommandBuffer(commandBuffer);
+	this->transaction.setCommandBuffer(commandBuffer);
 }
 
 // ----------------------------------------------------------------------------
@@ -57,7 +57,7 @@ xpcc::Ssd1306<I2cMaster>::startWriteDisplay()
 {
 	CO_BEGIN();
 
-	CO_WAIT_UNTIL( this->adapter.configureDisplayWrite(buffer, 1024) and this->startTransaction() );
+	CO_WAIT_UNTIL( this->transaction.configureDisplayWrite(buffer, 1024) and this->startTransaction() );
 
 	CO_END();
 }

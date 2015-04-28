@@ -26,7 +26,7 @@ xpcc::I2cEeprom<I2cMaster>::write(uint16_t address, const uint8_t *data, std::si
 {
 	CO_BEGIN();
 
-	CO_WAIT_UNTIL( this->adapter.configureWrite(address, data, length) and this->startTransaction() );
+	CO_WAIT_UNTIL( this->transaction.configureWrite(address, data, length) and this->startTransaction() );
 
 	CO_WAIT_WHILE( this->isTransactionRunning() );
 
@@ -40,7 +40,7 @@ xpcc::I2cEeprom<I2cMaster>::read(uint16_t address, uint8_t *data, std::size_t le
 {
 	CO_BEGIN();
 
-	CO_WAIT_UNTIL( this->adapter.configureRead(address, data, length) and this->startTransaction() );
+	CO_WAIT_UNTIL( this->transaction.configureRead(address, data, length) and this->startTransaction() );
 
 	CO_WAIT_WHILE( this->isTransactionRunning() );
 

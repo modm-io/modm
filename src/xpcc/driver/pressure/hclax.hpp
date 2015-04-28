@@ -76,7 +76,7 @@ public:
 	HclaX(Data &data)
 	:	I2cDevice<I2cMaster,1,I2cReadTransaction>(0x78), data(data)
 	{
-		this->adapter.configureRead(data.data, 2);
+		this->transaction.configureRead(data.data, 2);
 	}
 
 	/// pings the sensor
@@ -85,11 +85,11 @@ public:
 	{
 		CO_BEGIN();
 
-		CO_WAIT_UNTIL(this->adapter.configurePing() and this->startTransaction());
+		CO_WAIT_UNTIL(this->transaction.configurePing() and this->startTransaction());
 
 		CO_WAIT_WHILE( this->isTransactionRunning() );
 
-		this->adapter.configureRead(data.data, 2);
+		this->transaction.configureRead(data.data, 2);
 
 		CO_END_RETURN( this->wasTransactionSuccessful() );
 	}

@@ -181,7 +181,7 @@ public:
 	bool ALWAYS_INLINE
 	isWritable()
 	{
-		return this->adapter.writeable;
+		return this->transaction.writeable;
 	}
 
 	// MARK: - TASKS

@@ -38,13 +38,13 @@ namespace xpcc
  * @author	Niklas Hauser
  * @ingroup i2c
  */
-template < class I2cMaster, uint8_t NestingLevels = 10, class Adapter = I2cWriteReadAdapter >
+template < class I2cMaster, uint8_t NestingLevels = 10, class Transaction = I2cWriteReadTransaction >
 class I2cDevice : protected xpcc::co::NestedCoroutine< NestingLevels >
 {
 public:
 	///	@param	address	the slave address not yet shifted left (address < 128).
 	I2cDevice(uint8_t address)
-	:	adapter(address), configuration(nullptr)
+	:	transaction(address), configuration(nullptr)
 	{
 	}
 
@@ -53,7 +53,7 @@ public:
 	void
 	setAddress(uint8_t address)
 	{
-		adapter.setAddress(address);
+		transaction.setAddress(address);
 	}
 
 	void inline
@@ -69,7 +69,7 @@ public:
 	{
 		CO_BEGIN();
 
-		CO_WAIT_UNTIL( adapter.configurePing() and startTransaction(&adapter) );
+		CO_WAIT_UNTIL( transaction.configurePing() and startTransaction() );
 
 		CO_WAIT_WHILE( isTransactionRunning() );
 
@@ -82,7 +82,7 @@ protected:
 	startWriteRead(const uint8_t *writeBuffer, std::size_t writeSize,
 			uint8_t *readBuffer, std::size_t readSize)
 	{
-		return ( adapter.configureWriteRead(writeBuffer, writeSize, readBuffer, readSize) and
+		return ( transaction.configureWriteRead(writeBuffer, writeSize, readBuffer, readSize) and
 				startTransaction() );
 	}
 
@@ -90,7 +90,7 @@ protected:
 	bool inline
 	startWrite(const uint8_t *buffer, std::size_t size)
 	{
-		return ( adapter.configureWrite(buffer, size) and
+		return ( transaction.configureWrite(buffer, size) and
 				startTransaction() );
 	}
 
@@ -98,16 +98,16 @@ protected:
 	bool inline
 	startRead(uint8_t *buffer, std::size_t size)
 	{
-		return ( adapter.configureRead(buffer, size) and
+		return ( transaction.configureRead(buffer, size) and
 				startTransaction() );
 	}
 
 	/// Starts the transaction with the declared transaction object.
-	/// @param	transaction	pointer to transaction object, `nullptr` for own adapter.
+	/// @param	transaction	pointer to transaction object, `nullptr` for own object.
 	bool inline
 	startTransaction(xpcc::I2cTransaction *transaction = nullptr)
 	{
-		return I2cMaster::start(transaction ? transaction : &adapter, configuration);
+		return I2cMaster::start(transaction ? transaction : &this->transaction, configuration);
 	}
 
 protected:
@@ -115,18 +115,18 @@ protected:
 	bool inline
 	isTransactionRunning()
 	{
-		return adapter.isBusy();
+		return transaction.isBusy();
 	}
 
 	/// @returns `true` when adapter did not return an error.
 	bool inline
 	wasTransactionSuccessful()
 	{
-		return (adapter.getState() != xpcc::I2c::AdapterState::Error);
+		return (transaction.getState() != xpcc::I2c::TransactionState::Error);
 	}
 
 protected:
-	Adapter adapter;
+	Transaction transaction;
 private:
 	I2c::ConfigurationHandler configuration;
 };
