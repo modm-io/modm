@@ -48,10 +48,11 @@ public:
 	enum
 	Baudrate : uint32_t
 	{
+		LowSpeed =   10000,	///< Low-Speed datarate of 10kHz
 		Standard =  100000,	///< Standard datarate of 100kHz
 		Fast     =  400000,	///< Fast datarate of 400kHz
-		High     = 1700000,	///< High datarate of 1.7MHz (rarely supported)
-		Super    = 3400000	///< Super datarate of 3.4MHz (rarely supported)
+		FastPlus = 1000000,	///< Fast Plus datarate of 1.0MHz (rarely supported)
+		High     = 3400000	///< Super datarate of 3.4MHz (rarely supported)
 	};
 
 #ifdef __DOXYGEN__
