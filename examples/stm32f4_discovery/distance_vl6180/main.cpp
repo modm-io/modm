@@ -82,7 +82,7 @@ public:
 				xpcc::vl6180::RangeErrorCode error = distance.getRangeError();
 				if (error == distance.RangeErrorCode::NoError)
 				{
-					uint8_t mm = distance.data.getDistance();
+					uint8_t mm = distance.getData().getDistance();
 					XPCC_LOG_DEBUG << "mm: " << mm;
 					LedGreen::set(mm > 160);
 					LedBlue::set(mm > 110);
@@ -104,7 +104,7 @@ public:
 				xpcc::vl6180::ALS_ErrorCode error = distance.getALS_Error();
 				if (error == distance.ALS_ErrorCode::NoError)
 				{
-					uint32_t lux = distance.data.getAmbientLight();
+					uint32_t lux = distance.getData().getAmbientLight();
 					XPCC_LOG_DEBUG << "\tLux: " << lux;
 				}
 				else {

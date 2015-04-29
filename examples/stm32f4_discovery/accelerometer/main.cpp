@@ -82,11 +82,11 @@ public:
 			PT_CALL(accel.readAcceleration());
 
 #if REVISION_C
-			averageX.update(-accel.data.getY());
-			averageY.update(accel.data.getX());
+			averageX.update(-accel.getData().getY());
+			averageY.update(accel.getData().getX());
 #else
-			averageX.update(accel.data.getX());
-			averageY.update(accel.data.getY());
+			averageX.update(accel.getData().getX());
+			averageY.update(accel.getData().getY());
 #endif
 
 			LedOrange::set(averageX.getValue() < -0.2);
