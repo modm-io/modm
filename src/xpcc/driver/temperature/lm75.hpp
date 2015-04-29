@@ -24,6 +24,10 @@ class Lm75;
 template < class I2cMaster >
 class Tmp102;
 
+// forward declaration for friending with Lm75
+template < class I2cMaster >
+class Tmp175;
+
 struct lm75
 {
 protected:
@@ -125,6 +129,10 @@ class Lm75 : public lm75, public I2cDevice< I2cMaster, 2 >
 {
 	template < class OtherI2cMaster >
 	friend class Tmp102;
+
+	template < class OtherI2cMaster >
+	friend class Tmp175;
+
 public:
 	/// Constructor, requires a lm75::Data object,
 	/// sets address to default of 0x48 (7 alternative addresses up to 0x4F possible).

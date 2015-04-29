@@ -44,8 +44,9 @@ protected:
 	enum class
 	Config2 : uint8_t
 	{
+		// Conversion 6:7
 		Alert = Bit5,
-		ExtendedMode = Bit4,
+		ExtendedMode = Bit4
 	};
 	XPCC_FLAGS8(Config2);
 
@@ -58,7 +59,7 @@ protected:
 		Hz8 = Bit7 | Bit6,
 	};
 	typedef Configuration< Config2_t, ConversionRate, (Bit7 | Bit6) > ConversionRate_t;
-
+	/// @endcond
 public:
 
 	struct ATTRIBUTE_PACKED

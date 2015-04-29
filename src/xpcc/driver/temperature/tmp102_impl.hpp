@@ -165,7 +165,6 @@ xpcc::Tmp102<I2cMaster>::writeConfiguration(uint8_t length)
 	CO_END_RETURN_CALL( this->runTransaction() );
 }
 
-// MARK: configuration
 template < typename I2cMaster >
 xpcc::co::Result<bool>
 xpcc::Tmp102<I2cMaster>::writeLimitRegister(Register reg, float temperature)
