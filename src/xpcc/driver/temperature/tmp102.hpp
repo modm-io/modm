@@ -147,13 +147,13 @@ public:
 
 	/// Writes the upper limit of the alarm.
 	xpcc::co::Result<bool> ALWAYS_INLINE
-	writeUpperLimit(float temperature)
-	{ return writeLimitRegister(Register::TemperatureUpperLimit, temperature); }
+	setUpperLimit(float temperature)
+	{ return setLimitRegister(Register::TemperatureUpperLimit, temperature); }
 
 	/// Writes the lower limit of the alarm.
 	xpcc::co::Result<bool> ALWAYS_INLINE
-	writeLowerLimit(float temperature)
-	{ return writeLimitRegister(Register::TemperatureLowerLimit, temperature); }
+	setLowerLimit(float temperature)
+	{ return setLimitRegister(Register::TemperatureLowerLimit, temperature); }
 
 	/// starts a temperature conversion right now
 	xpcc::co::Result<bool>
@@ -170,7 +170,7 @@ private:
 	writeConfiguration(uint8_t length=3);
 
 	xpcc::co::Result<bool>
-	writeLimitRegister(Register reg, float temperature);
+	setLimitRegister(Register reg, float temperature);
 
 	xpcc::ShortTimeout timeout;
 	uint16_t updateTime;

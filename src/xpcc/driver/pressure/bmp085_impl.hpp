@@ -24,7 +24,7 @@ xpcc::Bmp085<I2cMaster>::Bmp085(Data &data, uint8_t address) :
 // MARK: - Tasks
 template < typename I2cMaster >
 xpcc::co::Result<bool>
-xpcc::Bmp085<I2cMaster>::configure(Mode mode)
+xpcc::Bmp085<I2cMaster>::initialize(Mode mode)
 {
 	CO_BEGIN();
 

@@ -57,7 +57,7 @@ public:
 		while(true)
 		{
 			// we wait until the task started
-			if (PT_CALL(barometer.configure()))
+			if (PT_CALL(barometer.initialize()))
 				break;
 			// otherwise, try again in 100ms
 			this->timeout.restart(100);

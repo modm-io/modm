@@ -167,7 +167,7 @@ xpcc::Tmp102<I2cMaster>::writeConfiguration(uint8_t length)
 
 template < typename I2cMaster >
 xpcc::co::Result<bool>
-xpcc::Tmp102<I2cMaster>::writeLimitRegister(Register reg, float temperature)
+xpcc::Tmp102<I2cMaster>::setLimitRegister(Register reg, float temperature)
 {
 	CO_BEGIN();
 

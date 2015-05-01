@@ -367,13 +367,13 @@ public:
 	}
 
 	xpcc::co::Result<bool> inline
-	writeFreeFallThreshold(Interrupt interrupt, uint8_t threshold)
+	setFreeFallThreshold(Interrupt interrupt, uint8_t threshold)
 	{
 		return this->write(i(Register::FfWuThs1) | i(interrupt), threshold);
 	}
 
 	xpcc::co::Result<bool> inline
-	writeFreeFallDuration(Interrupt interrupt, uint8_t duration)
+	setFreeFallDuration(Interrupt interrupt, uint8_t duration)
 	{
 		return this->write(i(Register::FfWuDuration1) | i(interrupt), duration);
 	}
@@ -392,22 +392,22 @@ public:
 	}
 
 	xpcc::co::Result<bool> inline
-	writeClickThreshold(Axis axis, uint8_t threshold);
+	setClickThreshold(Axis axis, uint8_t threshold);
 
 	xpcc::co::Result<bool> inline
-	writeClickTimeLimit(uint8_t limit)
+	setClickTimeLimit(uint8_t limit)
 	{
 		return this->write(i(Register::ClickTimeLimit), limit);
 	}
 
 	xpcc::co::Result<bool> inline
-	writeClickLatency(uint8_t latency)
+	setClickLatency(uint8_t latency)
 	{
 		return this->write(i(Register::ClickLatency), latency);
 	}
 
 	xpcc::co::Result<bool> inline
-	writeClickWindow(uint8_t window)
+	setClickWindow(uint8_t window)
 	{
 		return this->write(i(Register::ClickWindow), window);
 	}

@@ -112,6 +112,7 @@ protected:
 	static constexpr uint8_t
 	i(ScrollStep step) { return uint8_t(step); }
 
+public:
 	class DataTransmissionAdapter : public xpcc::I2cWriteTransaction
 	{
 	public:

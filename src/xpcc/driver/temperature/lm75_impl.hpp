@@ -56,7 +56,7 @@ xpcc::Lm75<I2cMaster>::readTemperature()
 // MARK: configuration
 template < typename I2cMaster >
 xpcc::co::Result<bool>
-xpcc::Lm75<I2cMaster>::writeLimitRegister(Register reg, float temperature)
+xpcc::Lm75<I2cMaster>::setLimitRegister(Register reg, float temperature)
 {
 	CO_BEGIN();
 

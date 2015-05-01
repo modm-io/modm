@@ -13,6 +13,7 @@
 #include <xpcc/architecture/interface/register.hpp>
 #include <xpcc/architecture/interface/i2c_device.hpp>
 #include <xpcc/processing/protothread.hpp>
+#include "lm75.hpp"
 
 namespace xpcc
 {
@@ -23,6 +24,7 @@ class Tmp175;
 
 struct tmp175 : public lm75
 {
+protected:
 	/// @cond
 	enum class
 	Config1 : uint8_t
@@ -41,10 +43,10 @@ public:
 	enum class
 	Resolution : uint8_t
 	{
-		Bits9 = 0,
-		Bits10 = Bit0,
-		Bits11 = Bit1,
-		Bits12 = Bit1 | Bit0
+		Bits9 = 0,				///< Conversion Time:  28ms
+		Bits10 = Bit0,			///< Conversion Time:  55ms
+		Bits11 = Bit1,			///< Conversion Time: 110ms
+		Bits12 = Bit1 | Bit0	///< Conversion Time: 220ms
 	};
 protected:
 	/// @cond
@@ -90,13 +92,13 @@ public:
 
 	/// Writes the upper limit of the alarm.
 	xpcc::co::Result<bool> ALWAYS_INLINE
-	writeUpperLimit(float temperature)
-	{ return writeLimitRegister(Register::TemperatureUpperLimit, temperature); }
+	setUpperLimit(float temperature)
+	{ return setLimitRegister(Register::TemperatureUpperLimit, temperature); }
 
 	/// Writes the lower limit of the alarm.
 	xpcc::co::Result<bool> ALWAYS_INLINE
-	writeLowerLimit(float temperature)
-	{ return writeLimitRegister(Register::TemperatureLowerLimit, temperature); }
+	setLowerLimit(float temperature)
+	{ return setLimitRegister(Register::TemperatureLowerLimit, temperature); }
 
 	/// starts a temperature conversion right now
 	xpcc::co::Result<bool>
@@ -113,7 +115,7 @@ private:
 	writeConfiguration();
 
 	xpcc::co::Result<bool>
-	writeLimitRegister(Register reg, float temperature);
+	setLimitRegister(Register reg, float temperature);
 
 	xpcc::ShortTimeout periodTimeout;
 	xpcc::ShortTimeout conversionTimeout;

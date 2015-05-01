@@ -229,7 +229,7 @@ public:
 	// MARK: - TASKS
 	/// Reads out and stores the calibration bytes
 	xpcc::co::Result<bool>
-	configure(Mode mode = Mode::Standard);
+	initialize(Mode mode = Mode::Standard);
 
 	/// Do a readout sequence to convert and read temperature and then pressure from sensor
 	xpcc::co::Result<bool>

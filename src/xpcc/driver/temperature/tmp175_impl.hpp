@@ -112,14 +112,14 @@ xpcc::Tmp175<I2cMaster>::writeConfiguration()
 
 template < typename I2cMaster >
 xpcc::co::Result<bool>
-xpcc::Tmp175<I2cMaster>::writeLimitRegister(Register reg, float temperature)
+xpcc::Tmp175<I2cMaster>::setLimitRegister(Register reg, float temperature)
 {
 	CO_BEGIN();
 
 	{
 		uint8_t res = uint8_t(Resolution_t::get(reinterpret_cast<Config1_t&>(this->config_msb)));
 
-		int16_t temp = temperature * 16.f * (1 << res);
+		int16_t temp = temperature * (2 << res);
 		temp <<= 4 + res;
 
 		this->buffer[0] = uint8_t(reg);
