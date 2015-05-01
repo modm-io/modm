@@ -1,184 +1,177 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
- * All rights reserved.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__DS1631_HPP
-	#error	"Don't include this file directly, use 'ds1631.hpp' instead!"
+#ifndef XPCC_DS1631_HPP
+#	error	"Don't include this file directly, use 'ds1631.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template <typename I2cMaster>
-xpcc::Ds1631<I2cMaster>::Ds1631(uint8_t* data, uint8_t address)
-:	I2cWriteReadTransaction(address), status(0), data(data)
+xpcc::Ds1631<I2cMaster>::Ds1631(Data &data, uint8_t address) :
+	I2cDevice<I2cMaster,2>(address), data(data), config(0),
+	periodTimeout(250), conversionTimeout(250), updateTime(250), conversionTime(232)
 {
-	configureWriteRead(buffer, 0, data, 0);
+	this->stop();
 }
 
-// ----------------------------------------------------------------------------
-template <typename I2cMaster>
-bool
-xpcc::Ds1631<I2cMaster>::configure(ds1631::Resolution resolution, bool continuousMode)
+template < typename I2cMaster >
+xpcc::co::Result<bool>
+xpcc::Ds1631<I2cMaster>::initialize()
 {
-	buffer[0] = 0xac;
-	buffer[1] = resolution | (continuousMode ? 0 : 0x01);
-	configureWriteRead(buffer, 3, data, 0);
-	
-	return I2cMaster::startBlocking(this);
-}
+	CO_BEGIN();
 
-template <typename I2cMaster>
-void
-xpcc::Ds1631<I2cMaster>::reset()
-{
-	status |= RESET_PENDING;
+	buffer[0] = uint8_t(Command::Configuration);
+
+	this->transaction.configureWriteRead(buffer, 1, &config, 1);
+
+	CO_END_RETURN_CALL( this->runTransaction() );
 }
 
 template < typename I2cMaster >
 bool
-xpcc::Ds1631<I2cMaster>::isNewDataAvailable()
+xpcc::Ds1631<I2cMaster>::run()
 {
-	return status & NEW_TEMPERATURE_DATA;
-}
+	PT_BEGIN();
 
-template < typename I2cMaster >
-int16_t
-xpcc::Ds1631<I2cMaster>::getTemperature()
-{
-	int16_t temp = data[0] | (data[1] << 8);
-	return temp;
-}
-
-template < typename I2cMaster >
-uint8_t*
-xpcc::Ds1631<I2cMaster>::getData()
-{
-	status &= ~NEW_TEMPERATURE_DATA;
-	return data;
-}
-
-// ----------------------------------------------------------------------------
-template <typename I2cMaster>
-void
-xpcc::Ds1631<I2cMaster>::startConversion()
-{
-	status |= START_CONVERSION_PENDING;
-}
-
-template <typename I2cMaster>
-void
-xpcc::Ds1631<I2cMaster>::stopConversion()
-{
-	status |= STOP_CONVERSION_PENDING;
-}
-
-template <typename I2cMaster>
-bool
-xpcc::Ds1631<I2cMaster>::isConversionDone()
-{
-	if (running == NOTHING_RUNNING)
+	while(true)
 	{
-		buffer[0] = 0xac;
-		configureWriteRead(buffer, 1, buffer, 1);
+		PT_WAIT_UNTIL(periodTimeout.isExpired());
+		periodTimeout.restart(updateTime);
 
-		if (I2cMaster::startBlocking(this))
-			return (buffer[0] & 0x80);
+		if (config.none(Config::OneShot))
+		{
+			PT_CALL(startConversion());
+
+			conversionTimeout.restart(conversionTime);
+			PT_WAIT_UNTIL(conversionTimeout.isExpired());
+		}
+
+		PT_CALL(readTemperature());
 	}
-	return false;
+
+	PT_END();
 }
 
-template <typename I2cMaster>
-void
+template < typename I2cMaster >
+xpcc::co::Result<bool>
+xpcc::Ds1631<I2cMaster>::setUpdateRate(uint8_t rate)
+{
+	CO_BEGIN();
+
+	// clamp conversion rate to max 33Hz (=~30ms)
+	if (rate == 0) rate = 1;
+	if (rate > 33) rate = 33;
+
+	if (config.any(Config::OneShot))
+	{
+		if (not CO_CALL(startConversion()))
+			CO_RETURN(false);
+	}
+
+	updateTime = (1000/rate - 29);
+	periodTimeout.restart(updateTime);
+	this->restart();
+
+	CO_END_RETURN(true);
+}
+
+template < typename I2cMaster >
+xpcc::co::Result<bool>
+xpcc::Ds1631<I2cMaster>::setResolution(Resolution resolution)
+{
+	CO_BEGIN();
+
+	Resolution_t::set(config, resolution);
+
+	CO_END_RETURN_CALL( writeConfiguration() );
+}
+
+template < typename I2cMaster >
+xpcc::co::Result<bool>
+xpcc::Ds1631<I2cMaster>::setAlertPolarity(AlertPolarity polarity)
+{
+	CO_BEGIN();
+
+	config.update(Config::Polarity, bool(polarity));
+
+	CO_END_RETURN_CALL( writeConfiguration() );
+}
+
+template < typename I2cMaster >
+xpcc::co::Result<bool>
+xpcc::Ds1631<I2cMaster>::setConversionMode(ConversionMode mode)
+{
+	CO_BEGIN();
+
+	config.update(Config::OneShot, bool(mode));
+
+	CO_END_RETURN_CALL( writeConfiguration() );
+}
+
+// MARK: read temperature
+template < typename I2cMaster >
+xpcc::co::Result<bool>
 xpcc::Ds1631<I2cMaster>::readTemperature()
 {
-	status |= READ_TEMPERATURE_PENDING;
+	CO_BEGIN();
+
+	buffer[0] = uint8_t(Command::Temperature);
+	this->transaction.configureWriteRead(buffer, 1, data.data, 2);
+
+	CO_END_RETURN_CALL( this->runTransaction() );
+}
+
+// MARK: configuration
+template < typename I2cMaster >
+xpcc::co::Result<bool>
+xpcc::Ds1631<I2cMaster>::writeConfiguration()
+{
+	CO_BEGIN();
+
+	buffer[0] = uint8_t(Command::Configuration);
+	buffer[1] = config.value;
+
+	this->transaction.configureWrite(buffer, 2);
+
+	CO_END_RETURN_CALL( this->runTransaction() );
 }
 
 template < typename I2cMaster >
-void
-xpcc::Ds1631<I2cMaster>::update()
+xpcc::co::Result<bool>
+xpcc::Ds1631<I2cMaster>::writeCommand(Command cmd)
 {
-	if (running != NOTHING_RUNNING)
+	CO_BEGIN();
+
+	buffer[0] = uint8_t(cmd);
+	this->transaction.configureWrite(buffer, 1);
+
+	CO_END_RETURN_CALL( this->runTransaction() );
+}
+
+template < typename I2cMaster >
+xpcc::co::Result<bool>
+xpcc::Ds1631<I2cMaster>::setLimitRegister(Command cmd, float temperature)
+{
+	CO_BEGIN();
+
 	{
-		switch (getAdapterState())
-		{
-			case xpcc::I2c::AdapterState::Idle:
-				if (running == READ_TEMPERATURE_RUNNING) {
-					status |= NEW_TEMPERATURE_DATA;
-				}
-				
-			case xpcc::I2c::AdapterState::Error:
-				running = NOTHING_RUNNING;
-				
-			default:
-				break;
-		}
+		uint8_t res = uint8_t(Resolution_t::get(config));
+
+		int16_t temp = temperature * (2 << res);
+		temp <<= 4 + res;
+
+		buffer[0] = uint8_t(cmd);
+		buffer[1] = (temp >> 8);
+		buffer[2] = temp;
 	}
-	else  {
-		if (status & RESET_PENDING)
-		{
-			buffer[0] = 0x54;
-			configureWriteRead(buffer, 1, data, 0);
-			
-			if (I2cMaster::start(this)) {
-				status &= ~RESET_PENDING;
-				running = RESET_RUNNING;
-			}
-		}
-		else if (status & STOP_CONVERSION_PENDING)
-		{
-			buffer[0] = 0x22;
-			configureWriteRead(buffer, 1, data, 0);
-			
-			if (I2cMaster::start(this)) {
-				status &= ~STOP_CONVERSION_PENDING;
-				running = STOP_CONVERSION_RUNNING;
-			}
-		}
-		else if (status & START_CONVERSION_PENDING)
-		{
-			buffer[0] = 0x51;
-			configureWriteRead(buffer, 1, data, 0);
-			
-			if (I2cMaster::start(this)) {
-				status &= ~START_CONVERSION_PENDING;
-				running = START_CONVERSION_RUNNING;
-			}
-		}
-		else if (status & READ_TEMPERATURE_PENDING)
-		{
-			buffer[0] = 0xaa;
-			configureWriteRead(buffer, 1, data, 2);
-			
-			if (I2cMaster::start(this)) {
-				status &= ~READ_TEMPERATURE_PENDING;
-				running = READ_TEMPERATURE_RUNNING;
-			}
-		}
-	}
+
+	this->transaction.configureWrite(buffer, 3);
+
+	CO_END_RETURN_CALL( this->runTransaction() );
 }
