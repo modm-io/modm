@@ -47,8 +47,8 @@ public:
 				xpcc::tmp102::ThermostatMode::Comparator,
 				xpcc::tmp102::AlertPolarity::ActiveLow,
 				xpcc::tmp102::FaultQueue::Faults6));
-		PT_CALL(temp.writeLowerLimit(28.f));
-		PT_CALL(temp.writeUpperLimit(30.f));
+		PT_CALL(temp.setLowerLimit(28.f));
+		PT_CALL(temp.setUpperLimit(30.f));
 
 		while (true)
 		{
