@@ -105,12 +105,18 @@ protected:
 	}
 
 protected:
-	/// Starts the transaction with the declared transaction object.
-	/// @param	transaction	pointer to transaction object, `nullptr` for own object.
+	/// Starts the transaction with our own transaction object.
 	bool inline
-	startTransaction(xpcc::I2cTransaction *transaction = nullptr)
+	startTransaction()
 	{
-		return I2cMaster::start(transaction ? transaction : &this->transaction, configuration);
+		return startTransaction(&this->transaction);
+	}
+
+	/// Starts the transaction with a seperate transaction object.
+	bool inline
+	startTransaction(xpcc::I2cTransaction *transaction)
+	{
+		return I2cMaster::start(transaction, configuration);
 	}
 
 	/// @returns `true` when transaction is busy.
