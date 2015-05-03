@@ -26,35 +26,35 @@ xpcc::Tcs3414<I2cMaster>::Tcs3414(uint8_t address)
 
 // ----------------------------------------------------------------------------
 template<typename I2cMaster>
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Tcs3414<I2cMaster>::configure(
 		const Gain gain,
 		const Prescaler prescaler,
 		const IntegrationMode mode,
 		const uint8_t time)
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
-	if ( CO_CALL(setGain(gain, prescaler)) )
+	if ( RF_CALL(setGain(gain, prescaler)) )
 	{
-		if ( CO_CALL(setIntegrationTime(mode, time)) )
+		if ( RF_CALL(setIntegrationTime(mode, time)) )
 		{
-			CO_RETURN(true);
+			RF_RETURN(true);
 		}
 	}
 
-	CO_END_RETURN(false);
+	RF_END_RETURN(false);
 }
 
 // ----------------------------------------------------------------------------
 // MARK: - Tasks
 template < class I2cMaster >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Tcs3414<I2cMaster>::refreshAllColors()
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
-	if ( CO_CALL(readRegisters(
+	if ( RF_CALL(readRegisters(
 			RegisterAddress::DATA1LOW,
 			data.dataBytes,
 			sizeof(data.dataBytes)
@@ -85,20 +85,20 @@ xpcc::Tcs3414<I2cMaster>::refreshAllColors()
 		}
 
 		// <-- END
-		CO_RETURN(true);
+		RF_RETURN(true);
 	}
 
-	CO_END_RETURN(false);
+	RF_END_RETURN(false);
 }
 
 // ----------------------------------------------------------------------------
 template<typename I2cMaster>
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Tcs3414<I2cMaster>::writeRegister(
 		const RegisterAddress address,
 		const uint8_t value)
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	commandBuffer[0] =
 				0x80							// write command
@@ -108,17 +108,17 @@ xpcc::Tcs3414<I2cMaster>::writeRegister(
 
 	this->transaction.configureWrite(commandBuffer, 3);
 
-	CO_END_RETURN_CALL( this->runTransaction() );
+	RF_END_RETURN_CALL( this->runTransaction() );
 }
 
 template<typename I2cMaster>
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Tcs3414<I2cMaster>::readRegisters(
 		const RegisterAddress address,
 		uint8_t* const values,
 		const uint8_t count)
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	commandBuffer[0] =
 			static_cast<uint8_t>(0x80)		// write command
@@ -127,5 +127,5 @@ xpcc::Tcs3414<I2cMaster>::readRegisters(
 
 	this->transaction.configureWriteRead(commandBuffer, 1, values, count);
 
-	CO_END_RETURN_CALL( this->runTransaction() );
+	RF_END_RETURN_CALL( this->runTransaction() );
 }

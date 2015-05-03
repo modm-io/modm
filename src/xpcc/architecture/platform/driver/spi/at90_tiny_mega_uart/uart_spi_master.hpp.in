@@ -141,20 +141,20 @@ public:
 	static uint8_t
 	transferBlocking(uint8_t data)
 	{
-		return CO_CALL_BLOCKING(transfer(data));
+		return RF_CALL_BLOCKING(transfer(data));
 	}
 
 	static void
 	transferBlocking(uint8_t *tx, uint8_t *rx, std::size_t length)
 	{
-		CO_CALL_BLOCKING(transfer(tx, rx, length));
+		RF_CALL_BLOCKING(transfer(tx, rx, length));
 	}
 
 
-	static xpcc::co::Result<uint8_t>
+	static xpcc::ResumableResult<uint8_t>
 	transfer(uint8_t data);
 
-	static xpcc::co::Result<void>
+	static xpcc::ResumableResult<void>
 	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
 	// end documentation inherited
 

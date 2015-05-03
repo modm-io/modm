@@ -22,30 +22,30 @@ xpcc::Lis3TransportI2c<I2cMaster>::Lis3TransportI2c(uint8_t address)
 // MARK: - register access
 // MARK: write register
 template < class I2cMaster >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Lis3TransportI2c<I2cMaster>::write(uint8_t reg, uint8_t value)
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	buffer[0] = reg;
 	buffer[1] = value;
 
 	this->transaction.configureWrite(buffer, 2);
 
-	CO_END_RETURN_CALL( this->runTransaction() );
+	RF_END_RETURN_CALL( this->runTransaction() );
 }
 
 // MARK: read register
 template < class I2cMaster >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Lis3TransportI2c<I2cMaster>::read(uint8_t reg, uint8_t *buffer, uint8_t length)
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	this->buffer[0] = reg;
 	this->transaction.configureWriteRead(this->buffer, 1, buffer, length);
 
-	CO_END_RETURN_CALL( this->runTransaction() );
+	RF_END_RETURN_CALL( this->runTransaction() );
 }
 
 // ============================================================================
@@ -59,55 +59,55 @@ xpcc::Lis3TransportSpi<SpiMaster, Cs>::Lis3TransportSpi(uint8_t /*address*/)
 
 // MARK: ping
 template < class SpiMaster, class Cs >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Lis3TransportSpi<SpiMaster, Cs>::ping()
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	whoAmI = 0;
 
-	CO_CALL(read(0x0F, whoAmI));
+	RF_CALL(read(0x0F, whoAmI));
 
-	CO_END_RETURN(whoAmI != 0);
+	RF_END_RETURN(whoAmI != 0);
 }
 
 // MARK: - register access
 // MARK: write register
 template < class SpiMaster, class Cs >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Lis3TransportSpi<SpiMaster, Cs>::write(uint8_t reg, uint8_t value)
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
-	CO_WAIT_UNTIL(this->aquireMaster());
+	RF_WAIT_UNTIL(this->aquireMaster());
 	Cs::reset();
 
-	CO_CALL(SpiMaster::transfer(reg | Write));
-	CO_CALL(SpiMaster::transfer(value));
+	RF_CALL(SpiMaster::transfer(reg | Write));
+	RF_CALL(SpiMaster::transfer(value));
 
 	if (this->releaseMaster())
 		Cs::set();
 
-	CO_END_RETURN(true);
+	RF_END_RETURN(true);
 }
 
 // MARK: read register
 template < class SpiMaster, class Cs >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Lis3TransportSpi<SpiMaster, Cs>::read(uint8_t reg, uint8_t *buffer, uint8_t length)
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
-	CO_WAIT_UNTIL(this->aquireMaster());
+	RF_WAIT_UNTIL(this->aquireMaster());
 	Cs::reset();
 
-	CO_CALL(SpiMaster::transfer(reg | Read));
+	RF_CALL(SpiMaster::transfer(reg | Read));
 
-	CO_CALL(SpiMaster::transfer(nullptr, buffer, length));
+	RF_CALL(SpiMaster::transfer(nullptr, buffer, length));
 
 	if (this->releaseMaster())
 		Cs::set();
 
-	CO_END_RETURN(true);
+	RF_END_RETURN(true);
 }
 

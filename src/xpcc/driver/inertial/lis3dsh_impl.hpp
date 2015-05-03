@@ -22,10 +22,10 @@ xpcc::Lis3dsh<Transport>::Lis3dsh(Data &data, uint8_t address)
 }
 
 template < class Transport >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Lis3dsh<Transport>::configure(Scale scale, MeasurementRate rate)
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	// MeasurementRate must be set in Control4
 	rawBuffer[0] = i(rate) | 0x07;
@@ -39,21 +39,21 @@ xpcc::Lis3dsh<Transport>::configure(Scale scale, MeasurementRate rate)
 
 	rawBuffer[5] = uint8_t(Control6::ADD_INC);
 
-	if ( CO_CALL(this->write(i(Register::CTRL_REG4), rawBuffer[0])) )
+	if ( RF_CALL(this->write(i(Register::CTRL_REG4), rawBuffer[0])) )
 	{
-		if ( CO_CALL(this->write(i(Register::CTRL_REG5), rawBuffer[4])) )
+		if ( RF_CALL(this->write(i(Register::CTRL_REG5), rawBuffer[4])) )
 		{
-			CO_RETURN_CALL(this->write(i(Register::CTRL_REG6), rawBuffer[5]));
+			RF_RETURN_CALL(this->write(i(Register::CTRL_REG6), rawBuffer[5]));
 		}
 	}
-	CO_END_RETURN(false);
+	RF_END_RETURN(false);
 }
 
 template < class Transport >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Lis3dsh<Transport>::updateControlRegister(uint8_t index, Control_t setMask, Control_t clearMask)
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	rawBuffer[index] = (rawBuffer[index] & ~clearMask.value) | setMask.value;
 	// update the scale in the data object, if we update CTRL_REG5 (index 4)
@@ -66,37 +66,37 @@ xpcc::Lis3dsh<Transport>::updateControlRegister(uint8_t index, Control_t setMask
 		data.meta = (scale == 8) ? scale + 8 : scale + 2;
 	}
 
-	CO_END_RETURN_CALL(this->write(0x20 + index, rawBuffer[index]));
+	RF_END_RETURN_CALL(this->write(0x20 + index, rawBuffer[index]));
 }
 
 template < class Transport >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Lis3dsh<Transport>::readAcceleration()
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
-	if (CO_CALL(this->read(i(Register::STATUS), rawBuffer + 6, 9)))
+	if (RF_CALL(this->read(i(Register::STATUS), rawBuffer + 6, 9)))
 	{
 		// copy the memory
 		std::memcpy(data.data, rawBuffer + 7, 6);
-		CO_RETURN(true);
+		RF_RETURN(true);
 	}
 
-	CO_END_RETURN(false);
+	RF_END_RETURN(false);
 }
 
 // ----------------------------------------------------------------------------
 template < class Transport >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Lis3dsh<Transport>::updateRegister(uint8_t reg, uint8_t setMask, uint8_t clearMask)
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
-	if (CO_CALL(this->read(reg, rawBuffer[7])))
+	if (RF_CALL(this->read(reg, rawBuffer[7])))
 	{
 		rawBuffer[7] = (rawBuffer[7] & ~clearMask) | setMask;
-		CO_RETURN_CALL(this->write(reg, rawBuffer[7]));
+		RF_RETURN_CALL(this->write(reg, rawBuffer[7]));
 	}
 
-	CO_END_RETURN(false);
+	RF_END_RETURN(false);
 }

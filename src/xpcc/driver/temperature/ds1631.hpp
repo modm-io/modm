@@ -114,47 +114,47 @@ public:
 	update()
 	{ run(); }
 
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	initialize();
 
 	// @param	rate	Update rate in Hz: 1 to 33.
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	setUpdateRate(uint8_t rate);
 
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	setResolution(Resolution resolution);
 
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	setAlertPolarity(AlertPolarity polarity);
 
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	setConversionMode(ConversionMode mode);
 
 	/// Writes the upper limit of the alarm.
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	setUpperLimit(float temperature)
 	{ return setLimitRegister(Command::TemperatureUpperLimit, temperature); }
 
 	/// Writes the lower limit of the alarm.
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	setLowerLimit(float temperature)
 	{ return setLimitRegister(Command::TemperatureLowerLimit, temperature); }
 
 
 	/// reads the Temperature registers and buffers the results
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	readTemperature();
 
 
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	startConversion()
 	{ return writeCommand(Command::StartConvert); }
 
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	stopConversion()
 	{ return writeCommand(Command::StopConvert); }
 
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	reset()
 	{ return writeCommand(Command::SoftwareReset); }
 
@@ -167,13 +167,13 @@ private:
 	bool
 	run();
 
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	writeCommand(Command cmd);
 
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	writeConfiguration();
 
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	setLimitRegister(Command cmd, float temperature);
 
 	Data &data;

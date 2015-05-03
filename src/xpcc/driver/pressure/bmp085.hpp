@@ -11,7 +11,7 @@
 #define XPCC_BMP085_HPP
 
 #include <xpcc/processing/protothread.hpp>
-#include <xpcc/processing/coroutine.hpp>
+#include <xpcc/processing/resumable.hpp>
 #include <xpcc/architecture/interface/i2c_device.hpp>
 #include <xpcc/processing/timer.hpp>
 
@@ -228,11 +228,11 @@ public:
 
 	// MARK: - TASKS
 	/// Reads out and stores the calibration bytes
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	initialize(Mode mode = Mode::Standard);
 
 	/// Do a readout sequence to convert and read temperature and then pressure from sensor
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	readout();
 
 	/// Configures the sensor

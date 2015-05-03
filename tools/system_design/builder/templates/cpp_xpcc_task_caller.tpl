@@ -12,7 +12,7 @@
 
 #include <xpcc/communication/xpcc/communicatable_task.hpp>
 #include <xpcc/processing/protothread.hpp>
-#include <xpcc/processing/coroutine.hpp>
+#include <xpcc/processing/resumable.hpp>
 
 namespace robot_call_tasks
 {
@@ -38,7 +38,7 @@ public:
 	 */
 	{%- endif %}
 	{%- endif %}
-	class {{ action.name | CamelCase }} : public xpcc::CommunicatableTask, private xpcc::pt::Protothread, private xpcc::co::Coroutine<1>
+	class {{ action.name | CamelCase }} : public xpcc::CommunicatableTask, private xpcc::pt::Protothread, private xpcc::Resumable<1>
 	{
 	public:
 		{%- if action.parameterType %}
@@ -126,13 +126,13 @@ public:
 		{%- endif %}
 		execute({% if action.parameterType %} const ParameterType& parameter {% endif %})
 		{
-			CO_BEGIN(0);
+			RF_BEGIN(0);
 
 			start({%- if action.parameterType %} parameter {%- endif %});
 
-			CO_WAIT_WHILE(this->run());
+			RF_WAIT_WHILE(this->run());
 
-			CO_END_RETURN(getResult());
+			RF_END_RETURN(getResult());
 		}
 
 	private:

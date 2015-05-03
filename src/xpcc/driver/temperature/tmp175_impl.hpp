@@ -65,56 +65,56 @@ xpcc::Tmp175<I2cMaster>::setUpdateRate(uint8_t rate)
 }
 
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Tmp175<I2cMaster>::setResolution(Resolution resolution)
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	Resolution_t::set(reinterpret_cast<Config1_t&>(this->config_msb), resolution);
 
 	conversionTime = (uint8_t(resolution) + 1) * 29;
 
-	CO_END_RETURN_CALL( writeConfiguration() );
+	RF_END_RETURN_CALL( writeConfiguration() );
 }
 
 // MARK: conversion
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Tmp175<I2cMaster>::startConversion()
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	reinterpret_cast<Config1_t&>(this->config_msb).set(Config1::OneShot);
 
-	if ( CO_CALL(writeConfiguration()) )
+	if ( RF_CALL(writeConfiguration()) )
 	{
 		reinterpret_cast<Config1_t&>(this->config_msb).reset(Config1::OneShot);
-		CO_RETURN(true);
+		RF_RETURN(true);
 	}
 
-	CO_END_RETURN(false);
+	RF_END_RETURN(false);
 }
 
 // MARK: configuration
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Tmp175<I2cMaster>::writeConfiguration()
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	this->buffer[0] = uint8_t(Register::Configuration);
 	this->buffer[1] = reinterpret_cast<Config1_t&>(this->config_msb).value;
 
 	this->transaction.configureWrite(this->buffer, 2);
 
-	CO_END_RETURN_CALL( this->runTransaction() );
+	RF_END_RETURN_CALL( this->runTransaction() );
 }
 
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Tmp175<I2cMaster>::setLimitRegister(Register reg, float temperature)
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	{
 		uint8_t res = uint8_t(Resolution_t::get(reinterpret_cast<Config1_t&>(this->config_msb)));
@@ -129,6 +129,6 @@ xpcc::Tmp175<I2cMaster>::setLimitRegister(Register reg, float temperature)
 
 	this->transaction.configureWrite(this->buffer, 3);
 
-	CO_END_RETURN_CALL( this->runTransaction() );
+	RF_END_RETURN_CALL( this->runTransaction() );
 }
 

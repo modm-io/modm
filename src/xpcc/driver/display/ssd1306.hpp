@@ -12,7 +12,7 @@
 
 #include <xpcc/ui/display/buffered_graphic_display.hpp>
 #include <xpcc/processing/protothread.hpp>
-#include <xpcc/processing/coroutine.hpp>
+#include <xpcc/processing/resumable.hpp>
 #include <xpcc/architecture/interface/i2c_device.hpp>
 #include <xpcc/processing/timer.hpp>
 
@@ -159,21 +159,21 @@ public:
 	bool inline
 	pingBlocking()
 	{
-		return CO_CALL_BLOCKING(this->ping());
+		return RF_CALL_BLOCKING(this->ping());
 	}
 
 	/// initializes for 3V3 with charge-pump
 	bool inline
 	initializeBlocking()
 	{
-		return CO_CALL_BLOCKING(initialize());
+		return RF_CALL_BLOCKING(initialize());
 	}
 
 	/// Update the display with the content of the RAM buffer.
 	void
 	update() override
 	{
-		CO_CALL_BLOCKING(startWriteDisplay());
+		RF_CALL_BLOCKING(startWriteDisplay());
 	}
 
 	/// Use this method to synchronize writing to the displays buffer
@@ -187,53 +187,53 @@ public:
 
 	// MARK: - TASKS
 	/// initializes for 3V3 with charge-pump asynchronously
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	initialize();
 
 	// starts a frame transfer and waits for completion
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	writeDisplay();
 
 
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	setDisplayMode(DisplayMode mode = DisplayMode::Normal)
 	{ return writeCommand(static_cast<Command>(mode)); }
 
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	setContrast(uint8_t contrast = 0xCE)
 	{ return writeCommand(Command::SetContrastControl, contrast); }
 
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	setRotation(Rotation rotation=Rotation::Normal);
 
 
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	configureScroll(uint8_t origin, uint8_t size,
 			ScrollDirection direction, ScrollStep steps);
 
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	enableScroll()
 	{ return writeCommand(Command::SetEnableScroll); }
 
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	disableScroll()
 	{ return writeCommand(Command::SetDisableScroll); }
 
 protected:
 	/// Write a command without data
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	writeCommand(uint8_t command);
 
 	/// Write a command with one byte data
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	writeCommand(uint8_t command, uint8_t data);
 
 	/// Write a command with two bytes data
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	writeCommand(uint8_t command, uint8_t data1, uint8_t data2);
 
 private:
-	xpcc::co::Result<void>
+	xpcc::ResumableResult<void>
 	startWriteDisplay();
 
 	bool

@@ -37,7 +37,7 @@
 	function CDATA #IMPLIED
 	parameterType CDATA #IMPLIED
 	returnType CDATA #IMPLIED
-	call (coroutine|simple) #IMPLIED
+	call (resumable|simple) #IMPLIED
 >
 
 

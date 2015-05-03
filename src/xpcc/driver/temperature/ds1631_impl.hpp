@@ -21,16 +21,16 @@ xpcc::Ds1631<I2cMaster>::Ds1631(Data &data, uint8_t address) :
 }
 
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Ds1631<I2cMaster>::initialize()
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	buffer[0] = uint8_t(Command::Configuration);
 
 	this->transaction.configureWriteRead(buffer, 1, &config, 1);
 
-	CO_END_RETURN_CALL( this->runTransaction() );
+	RF_END_RETURN_CALL( this->runTransaction() );
 }
 
 template < typename I2cMaster >
@@ -59,10 +59,10 @@ xpcc::Ds1631<I2cMaster>::run()
 }
 
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Ds1631<I2cMaster>::setUpdateRate(uint8_t rate)
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	// clamp conversion rate to max 33Hz (=~30ms)
 	if (rate == 0) rate = 1;
@@ -70,95 +70,95 @@ xpcc::Ds1631<I2cMaster>::setUpdateRate(uint8_t rate)
 
 	if (config.any(Config::OneShot))
 	{
-		if (not CO_CALL(startConversion()))
-			CO_RETURN(false);
+		if (not RF_CALL(startConversion()))
+			RF_RETURN(false);
 	}
 
 	updateTime = (1000/rate - 29);
 	periodTimeout.restart(updateTime);
 	this->restart();
 
-	CO_END_RETURN(true);
+	RF_END_RETURN(true);
 }
 
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Ds1631<I2cMaster>::setResolution(Resolution resolution)
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	Resolution_t::set(config, resolution);
 
-	CO_END_RETURN_CALL( writeConfiguration() );
+	RF_END_RETURN_CALL( writeConfiguration() );
 }
 
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Ds1631<I2cMaster>::setAlertPolarity(AlertPolarity polarity)
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	config.update(Config::Polarity, bool(polarity));
 
-	CO_END_RETURN_CALL( writeConfiguration() );
+	RF_END_RETURN_CALL( writeConfiguration() );
 }
 
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Ds1631<I2cMaster>::setConversionMode(ConversionMode mode)
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	config.update(Config::OneShot, bool(mode));
 
-	CO_END_RETURN_CALL( writeConfiguration() );
+	RF_END_RETURN_CALL( writeConfiguration() );
 }
 
 // MARK: read temperature
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Ds1631<I2cMaster>::readTemperature()
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	buffer[0] = uint8_t(Command::Temperature);
 	this->transaction.configureWriteRead(buffer, 1, data.data, 2);
 
-	CO_END_RETURN_CALL( this->runTransaction() );
+	RF_END_RETURN_CALL( this->runTransaction() );
 }
 
 // MARK: configuration
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Ds1631<I2cMaster>::writeConfiguration()
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	buffer[0] = uint8_t(Command::Configuration);
 	buffer[1] = config.value;
 
 	this->transaction.configureWrite(buffer, 2);
 
-	CO_END_RETURN_CALL( this->runTransaction() );
+	RF_END_RETURN_CALL( this->runTransaction() );
 }
 
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Ds1631<I2cMaster>::writeCommand(Command cmd)
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	buffer[0] = uint8_t(cmd);
 	this->transaction.configureWrite(buffer, 1);
 
-	CO_END_RETURN_CALL( this->runTransaction() );
+	RF_END_RETURN_CALL( this->runTransaction() );
 }
 
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Ds1631<I2cMaster>::setLimitRegister(Command cmd, float temperature)
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	{
 		uint8_t res = uint8_t(Resolution_t::get(config));
@@ -173,5 +173,5 @@ xpcc::Ds1631<I2cMaster>::setLimitRegister(Command cmd, float temperature)
 
 	this->transaction.configureWrite(buffer, 3);
 
-	CO_END_RETURN_CALL( this->runTransaction() );
+	RF_END_RETURN_CALL( this->runTransaction() );
 }

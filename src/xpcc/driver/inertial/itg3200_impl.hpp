@@ -21,48 +21,48 @@ xpcc::Itg3200<I2cMaster>::Itg3200(Data &data, uint8_t address)
 
 // MARK: - Tasks
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Itg3200<I2cMaster>::configure(LowPassFilter filter, uint8_t divider)
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	rawBuffer[4] = divider;
 	rawBuffer[5] = rawBuffer[0] = LowPassFilter_t(filter).value | uint8_t(Filter::FullScale);
 	rawBuffer[6] = rawBuffer[1] = 0;
 
-	CO_END_RETURN_CALL(write(Register::SMPLRT_DIV, rawBuffer, 3, false));
+	RF_END_RETURN_CALL(write(Register::SMPLRT_DIV, rawBuffer, 3, false));
 }
 
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Itg3200<I2cMaster>::readRotationRate()
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
-	if (CO_CALL(read(Register::INT_STATUS, rawBuffer+2, 9)))
+	if (RF_CALL(read(Register::INT_STATUS, rawBuffer+2, 9)))
 	{
 		std::memcpy(data.data, rawBuffer+3, 8);
-		CO_RETURN(true);
+		RF_RETURN(true);
 	}
 
-	CO_END_RETURN(false);
+	RF_END_RETURN(false);
 }
 
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Itg3200<I2cMaster>::setSampleRateDivider(uint8_t divider)
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	rawBuffer[4] = divider;
 
-	CO_END_RETURN_CALL(write(Register::SMPLRT_DIV, rawBuffer+4, 1, false));
+	RF_END_RETURN_CALL(write(Register::SMPLRT_DIV, rawBuffer+4, 1, false));
 }
 
 // ----------------------------------------------------------------------------
 // MARK: - register access
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Itg3200<I2cMaster>::readStatus()
 {
 	return read(Register::INT_STATUS, rawBuffer[2]);
@@ -70,43 +70,43 @@ xpcc::Itg3200<I2cMaster>::readStatus()
 
 // MARK: update register
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Itg3200<I2cMaster>::updateRegister(uint8_t index, uint8_t setMask, uint8_t clearMask)
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	rawBuffer[index] = (rawBuffer[index] & ~clearMask) | setMask;
 
-	CO_END_RETURN_CALL(write(Register(index), rawBuffer[index]));
+	RF_END_RETURN_CALL(write(Register(index), rawBuffer[index]));
 }
 
 // MARK: write multilength register
 template < class I2cMaster >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Itg3200<I2cMaster>::write(Register reg, uint8_t *buffer, uint8_t length, bool copyBuffer)
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	if (length > 7)
-		CO_RETURN(false);
+		RF_RETURN(false);
 
 	rawBuffer[3] = uint8_t(reg);
 	if (copyBuffer) std::memcpy(rawBuffer+4, buffer, length);
 
 	this->transaction.configureWrite(rawBuffer+3, length+1);
 
-	CO_END_RETURN_CALL( this->runTransaction() );
+	RF_END_RETURN_CALL( this->runTransaction() );
 }
 
 // MARK: read multilength register
 template < class I2cMaster >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Itg3200<I2cMaster>::read(Register reg, uint8_t *buffer, uint8_t length)
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	rawBuffer[3] = uint8_t(reg);
 	this->transaction.configureWriteRead(rawBuffer+3, 1, buffer, length);
 
-	CO_END_RETURN_CALL( this->runTransaction() );
+	RF_END_RETURN_CALL( this->runTransaction() );
 }

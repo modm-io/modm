@@ -82,15 +82,15 @@ public:
 	{
 	}
 
-	xpcc::co::Result<bool> inline
+	xpcc::ResumableResult<bool> inline
 	configure(MeasurementRate rate=MeasurementRate::Hz10, Gain gain=Gain::Ga1_0)
 	{ return this->configureRaw(uint8_t(rate), uint8_t(gain), gainValues); }
 
-	xpcc::co::Result<bool> inline
+	xpcc::ResumableResult<bool> inline
 	setMeasurementRate(MeasurementRate rate)
 	{ return this->updateConfigA(ConfigA_t(uint8_t(rate)), ConfigA::DO_Mask); }
 
-	xpcc::co::Result<bool> inline
+	xpcc::ResumableResult<bool> inline
 	setGain(Gain gain)
 	{ return this->setGainRaw(uint8_t(gain), gainValues); }
 };

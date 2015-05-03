@@ -80,27 +80,27 @@ public:
 	}
 
 	/// pings the sensor
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	ping()
 	{
-		CO_BEGIN();
+		RF_BEGIN();
 
-		CO_WAIT_UNTIL(this->transaction.configurePing() and this->startTransaction());
+		RF_WAIT_UNTIL(this->transaction.configurePing() and this->startTransaction());
 
-		CO_WAIT_WHILE( this->isTransactionRunning() );
+		RF_WAIT_WHILE( this->isTransactionRunning() );
 
 		this->transaction.configureRead(data.data, 2);
 
-		CO_END_RETURN( this->wasTransactionSuccessful() );
+		RF_END_RETURN( this->wasTransactionSuccessful() );
 	}
 
 	/// reads the Pressure registers and buffers the results
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	readPressure()
 	{
-		CO_BEGIN();
+		RF_BEGIN();
 
-		CO_END_RETURN_CALL( this->runTransaction() );
+		RF_END_RETURN_CALL( this->runTransaction() );
 	}
 
 public:

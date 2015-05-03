@@ -138,21 +138,21 @@ public:
 	/// sets address to default of 0x48 (7 alternative addresses up to 0x4F possible).
 	Lm75(Data &data, uint8_t address=0x48);
 
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	configureAlertMode(ThermostatMode mode, AlertPolarity polarity, FaultQueue faults);
 
 	/// Writes the upper limit of the alarm.
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	setUpperLimit(float temperature)
 	{ return setLimitRegister(Register::TemperatureUpperLimit, temperature); }
 
 	/// Writes the lower limit of the alarm.
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	setLowerLimit(float temperature)
 	{ return setLimitRegister(Register::TemperatureLowerLimit, temperature); }
 
 	/// reads the Temperature registers and buffers the results
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	readTemperature();
 
 	inline Data&
@@ -160,7 +160,7 @@ public:
 	{ return data; }
 
 private:
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	setLimitRegister(Register reg, float temperature);
 
 	Data &data;

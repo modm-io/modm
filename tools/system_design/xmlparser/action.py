@@ -19,7 +19,7 @@ class Action(object):
 		self.returnType = self.__get_type(node, "returnType", tree)
 
 		self.call = node.get('call')
-		if self.call not in ["once", "coroutine"]:
+		if self.call not in ["once", "resumable"]:
 			self.call = "once"
 
 	def __get_type(self, node, name, tree):

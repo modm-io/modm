@@ -10,7 +10,7 @@
 #ifndef XPCC_I2C_EEPROM_HPP
 #define XPCC_I2C_EEPROM_HPP
 
-#include <xpcc/processing/coroutine.hpp>
+#include <xpcc/processing/resumable.hpp>
 #include <xpcc/architecture/interface/i2c_device.hpp>
 
 namespace xpcc
@@ -66,7 +66,7 @@ public:
 	 * @return	`true`	if the data could be written,
 	 * 			`false` otherwise
 	 */
-	inline xpcc::co::Result<bool>
+	inline xpcc::ResumableResult<bool>
 	writeByte(uint16_t address, uint8_t data)
 	{
 		return write(address, &data, 1);
@@ -82,7 +82,7 @@ public:
 	 * @return	`true`	if the data could be written,
 	 * 			`false` otherwise
 	 */
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	write(uint16_t address, const uint8_t *data, std::size_t length);
 
 	/**
@@ -94,21 +94,21 @@ public:
 	 * @endcode
 	 */
 	template <typename T>
-	inline xpcc::co::Result<bool>
+	inline xpcc::ResumableResult<bool>
 	write(uint16_t address, const T& data)
 	{
 		return write(address, static_cast<const uint8_t *>(&data), sizeof(T));
 	}
 
 	/// Read byte
-	inline xpcc::co::Result<bool>
+	inline xpcc::ResumableResult<bool>
 	readByte(uint16_t address, uint8_t &data)
 	{
 		return read(address, &data, 1);
 	}
 
 	/// Read block
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	read(uint16_t address, uint8_t *data, std::size_t length);
 
 	/**
@@ -120,7 +120,7 @@ public:
 	 * @endcode
 	 */
 	template <typename T>
-	inline xpcc::co::Result<bool>
+	inline xpcc::ResumableResult<bool>
 	read(uint16_t address, T& data)
 	{
 		return read(address, static_cast<uint8_t *>(&data), sizeof(T));

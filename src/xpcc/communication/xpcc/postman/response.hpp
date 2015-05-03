@@ -11,7 +11,7 @@
 #define	XPCC_RESPONSE_HPP
 
 #include "../backend/backend_interface.hpp"
-#include <xpcc/processing/coroutine.hpp>
+#include <xpcc/processing/resumable.hpp>
 
 namespace xpcc
 {
@@ -69,7 +69,7 @@ public:
 };
 
 template < typename T >
-using ActionResponse = xpcc::co::Result< xpcc::ActionResult< T > >;
+using ActionResponse = xpcc::ResumableResult< xpcc::ActionResult< T > >;
 
 }	// namespace xpcc
 

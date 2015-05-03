@@ -10,7 +10,7 @@
 #ifndef XPCC_INTERFACE_SPI_MASTER_HPP
 #define XPCC_INTERFACE_SPI_MASTER_HPP
 
-#include <xpcc/processing/coroutine.hpp>
+#include <xpcc/processing/resumable.hpp>
 #include "spi.hpp"
 
 namespace xpcc
@@ -105,17 +105,17 @@ public:
 	/**
 	 * Swap a single byte and wait for completion non-blocking!.
 	 *
-	 * You must call this inside a Protothread or Coroutine
-	 * using `PT_CALL` or `CO_CALL` respectively.
-	 * @warning	These methods differ from Coroutines by lacking context protection!
-	 * 			You must ensure that only one driver is accessing this coroutine
+	 * You must call this inside a Protothread or Resumable
+	 * using `PT_CALL` or `RF_CALL` respectively.
+	 * @warning	These methods differ from Resumables by lacking context protection!
+	 * 			You must ensure that only one driver is accessing this resumable function
 	 * 			by using `aquire(ctx)` and `release(ctx)`.
 	 *
 	 * @param	data
 	 * 		data to be sent
 	 * @return	received data
 	 */
-	static xpcc::co::Result<uint8_t>
+	static xpcc::ResumableResult<uint8_t>
 	transfer(uint8_t data);
 
 	/**
@@ -123,10 +123,10 @@ public:
 	 * starts a non-blocking transfer.
 	 * This may be hardware accelerated (DMA or Interrupt), but not guaranteed.
 	 *
-	 * You must call this inside a Protothread or Coroutine
-	 * using `PT_CALL` or `CO_CALL` respectively.
-	 * @warning	These methods differ from Coroutines by lacking context protection!
-	 * 			You must ensure that only one driver is accessing this coroutine
+	 * You must call this inside a Protothread or Resumable
+	 * using `PT_CALL` or `RF_CALL` respectively.
+	 * @warning	These methods differ from Resumables by lacking context protection!
+	 * 			You must ensure that only one driver is accessing this resumable function
 	 * 			by using `aquire(ctx)` and `release(ctx)`.
 	 *
 	 * @param[in]   tx
@@ -136,7 +136,7 @@ public:
 	 * @param       length
 	 *      number of bytes to be shifted out
 	 */
-	static xpcc::co::Result<void>
+	static xpcc::ResumableResult<void>
 	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
 #endif
 };

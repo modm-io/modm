@@ -186,7 +186,7 @@ public:
 	 * @param mode1 value to be written to MODE1 register
 	 * @param mode2 value to be written to MODE2 register
 	 */
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	initialize(uint8_t mode1 = 0, uint8_t mode2 = 0);
 
 	/**
@@ -199,7 +199,7 @@ public:
 	 * @param channel one of the 16 channels (0-15)
 	 * @param value   12-bit PWM value to be written
 	 */
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	setChannel(uint8_t channel, uint16_t value);
 
 	/**
@@ -210,7 +210,7 @@ public:
 	 *
 	 * @param value 12-bit PWM value to be written
 	 */
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	setAllChannels(uint16_t value);
 };
 

@@ -23,10 +23,10 @@ xpcc::Lm75<I2cMaster>::Lm75(Data &data, uint8_t address) :
 // MARK: - tasks
 // MARK: Alert mode
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Lm75<I2cMaster>::configureAlertMode(ThermostatMode mode, AlertPolarity polarity, FaultQueue faults)
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	config_msb.update(Config1::ThermostatMode, bool(mode));
 	config_msb.update(Config1::Polarity, bool(polarity));
@@ -37,28 +37,28 @@ xpcc::Lm75<I2cMaster>::configureAlertMode(ThermostatMode mode, AlertPolarity pol
 
 	this->transaction.configureWrite(buffer, 2);
 
-	CO_END_RETURN_CALL( this->runTransaction() );
+	RF_END_RETURN_CALL( this->runTransaction() );
 }
 
 // MARK: read temperature
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Lm75<I2cMaster>::readTemperature()
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	buffer[0] = uint8_t(Register::Temperature);
 	this->transaction.configureWriteRead(buffer, 1, data.data, 2);
 
-	CO_END_RETURN_CALL( this->runTransaction() );
+	RF_END_RETURN_CALL( this->runTransaction() );
 }
 
 // MARK: configuration
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Lm75<I2cMaster>::setLimitRegister(Register reg, float temperature)
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	{
 		int16_t temp = temperature * 2.f;
@@ -71,5 +71,5 @@ xpcc::Lm75<I2cMaster>::setLimitRegister(Register reg, float temperature)
 
 	this->transaction.configureWrite(buffer, 3);
 
-	CO_END_RETURN_CALL( this->runTransaction() );
+	RF_END_RETURN_CALL( this->runTransaction() );
 }

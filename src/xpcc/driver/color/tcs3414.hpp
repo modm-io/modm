@@ -20,7 +20,7 @@
 
 #include <xpcc/ui/color.hpp>
 #include <xpcc/processing/protothread.hpp>
-#include <xpcc/processing/coroutine.hpp>
+#include <xpcc/processing/resumable.hpp>
 #include <xpcc/architecture/interface/i2c_device.hpp>
 
 namespace xpcc
@@ -159,7 +159,7 @@ public:
 	bool inline
 	initializeBlocking()
 	{
-		return CO_CALL_BLOCKING(initialize());
+		return RF_CALL_BLOCKING(initialize());
 	}
 
 	//! \brief 	Configures some of the most important settings for the sensor.
@@ -185,7 +185,7 @@ public:
 	}
 
 	//! \brief	The gain can be used to adjust the sensitivity of all ADC output channels.
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	setGain(
 			const Gain      gain      = Gain::DEFAULT,
 			const Prescaler prescaler = Prescaler::DEFAULT)
@@ -195,7 +195,7 @@ public:
 	}
 
 	//! \brief Sets the integration time for the ADCs.
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	setIntegrationTime(
 			const IntegrationMode        mode = IntegrationMode::DEFAULT,
 			const NominalIntegrationTime time = NominalIntegrationTime::DEFAULT)
@@ -204,7 +204,7 @@ public:
 	}
 
 	//! \brief Sets the integration time for the ADCs.
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	setIntegrationTime(
 			const IntegrationMode mode = IntegrationMode::DEFAULT,
 			const SyncPulseCount  time = SyncPulseCount::DEFAULT)
@@ -239,17 +239,17 @@ public:
 
 	//! \brief	Read current samples of ADC conversions for all channels.
 	// Non-blocking
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	refreshAllColors();
 
 	// MARK: - TASKS
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	initialize()
 	{
 		return writeRegister(RegisterAddress::CONTROL, 0b11);	// control to power up and start conversion
 	};
 
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	configure(
 			const Gain            gain      = Gain::DEFAULT,
 			const Prescaler       prescaler = Prescaler::DEFAULT,
@@ -258,7 +258,7 @@ public:
 
 private:
 	//! \brief Sets the integration time for the ADCs.
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	setIntegrationTime(
 			const IntegrationMode mode = IntegrationMode::DEFAULT,
 			const uint8_t         time = 0)
@@ -274,13 +274,13 @@ private:
 
 private:
 	//! \brief	Read value of specific register.
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	readRegisters(
 			const RegisterAddress address,
 			uint8_t * const values,
 			const uint8_t count = 1);
 
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	writeRegister(
 			const RegisterAddress address,
 			const uint8_t value);

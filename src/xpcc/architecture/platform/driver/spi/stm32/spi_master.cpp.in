@@ -58,10 +58,10 @@ xpcc::stm32::SpiMaster{{ id }}::release(void *ctx)
 }
 // ----------------------------------------------------------------------------
 
-xpcc::co::Result<uint8_t>
+xpcc::ResumableResult<uint8_t>
 xpcc::stm32::SpiMaster{{ id }}::transfer(uint8_t data)
 {
-	// this is a manually implemented "fast coroutine"
+	// this is a manually implemented "fast resumable function"
 	// there is no context or nesting protection, since we don't need it.
 	// there are only two states encoded into 1 bit (LSB of state):
 	//   1. waiting to start, and
@@ -72,7 +72,7 @@ xpcc::stm32::SpiMaster{{ id }}::transfer(uint8_t data)
 	{
 		// wait for previous transfer to finish
 		if (!SpiHal{{ id }}::isTransmitRegisterEmpty())
-			return {xpcc::co::Running};
+			return {xpcc::rf::Running};
 
 		// start transfer by copying data into register
 		SpiHal{{ id }}::write(data);
@@ -82,20 +82,20 @@ xpcc::stm32::SpiMaster{{ id }}::transfer(uint8_t data)
 	}
 
 	if (!SpiHal{{ id }}::isReceiveRegisterNotEmpty())
-		return {xpcc::co::Running};
+		return {xpcc::rf::Running};
 
 	SpiHal{{ id }}::read(data);
 
 	// transfer finished
 	state &= ~Bit0;
-	return {xpcc::co::Stop, data};
+	return {xpcc::rf::Stop, data};
 }
 
-xpcc::co::Result<void>
+xpcc::ResumableResult<void>
 xpcc::stm32::SpiMaster{{ id }}::transfer(
 		uint8_t * tx, uint8_t * rx, std::size_t length)
 {
-	// this is a manually implemented "fast coroutine"
+	// this is a manually implemented "fast resumable function"
 	// there is no context or nesting protection, since we don't need it.
 	// there are only two states encoded into 1 bit (Bit1 of state):
 	//   1. initialize index, and
@@ -119,12 +119,12 @@ xpcc::stm32::SpiMaster{{ id }}::transfer(
 		{
 				// if tx == 0, we use a dummy byte 0x00
 				// else we copy it from the array
-				// call the coroutine
-				xpcc::co::Result<uint8_t> result = transfer(tx ? tx[index] : 0);
+				// call the resumable function
+				xpcc::ResumableResult<uint8_t> result = transfer(tx ? tx[index] : 0);
 
-				// if the coroutine is still running, so are we
-				if (result.getState() > xpcc::co::NestingError)
-					return {xpcc::co::Running};
+				// if the resumable function is still running, so are we
+				if (result.getState() > xpcc::rf::NestingError)
+					return {xpcc::rf::Running};
 
 				// if rx != 0, we copy the result into the array
 				if (rx) rx[index] = result.getResult();
@@ -134,6 +134,6 @@ xpcc::stm32::SpiMaster{{ id }}::transfer(
 
 			// clear the state
 			state &= ~Bit1;
-			return {xpcc::co::Stop};
+			return {xpcc::rf::Stop};
 	}
 }

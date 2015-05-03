@@ -10,7 +10,7 @@
 #include <unittest/testsuite.hpp>
 
 // @author Niklas Hauser
-class CoroutineTest : public unittest::TestSuite
+class ResumableTest : public unittest::TestSuite
 {
 public:
 	// uses an empty protothread to test the basic methods of the class
@@ -29,10 +29,10 @@ public:
 	void
 	testCaseNumbers();
 
-	/// Test if coroutines can return enum class values
+	/// Test if resumables can return enum class values
 	///
 	/// This was not the case for the first iteration of
-	/// coroutines, because the constant `0` cannot be
+	/// resumables, because the constant `0` cannot be
 	/// implicitly casted to an enum class value.
 	/// Thus this is a regression test.
 	void
@@ -42,5 +42,5 @@ public:
 	testReturnVoidClass();
 
 	void
-	testNonNestedCoroutines();
+	testNonNestedResumables();
 };

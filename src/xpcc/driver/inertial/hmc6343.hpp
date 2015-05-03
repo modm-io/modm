@@ -222,7 +222,7 @@ public:
 
 	// READING RAM
 	/// read operation mode register 2
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	readOperationMode()
 	{ return readPostData(Command::PostOperationMode, 20, 1); }
 
@@ -230,22 +230,22 @@ public:
 
 	// WRITING EEPROM
 	/// Configures the sensor to normal orientation mode with 10Hz data rate.
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	setMeasurmentRate(MeasurementRate measurementRate=MeasurementRate::Hz10)
 	{ return writeRegister(Register::OperationMode2, i(measurementRate)); }
 
 	/// sets a new deviation angle in eeprom
-	xpcc::co::Result<bool> inline
+	xpcc::ResumableResult<bool> inline
 	setDeviationAngle(int16_t angle)
 	{ return writeRegister(Register16::DeviationAngle, static_cast<uint16_t>(angle)); }
 
 	/// sets a new variation angle in eeprom
-	xpcc::co::Result<bool> inline
+	xpcc::ResumableResult<bool> inline
 	setVariationAngle(int16_t angle)
 	{ return writeRegister(Register16::VariationAngle, static_cast<uint16_t>(angle)); }
 
 	/// sets a new IIR filter in eeprom
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	setIIR_Filter(uint8_t filter)
 	{ return writeRegister(Register::Filter, filter & 0x0f); }
 
@@ -253,12 +253,12 @@ public:
 
 	// READING EEPROM
 	/// reads the device id from eeprom
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	getDeviceId(uint16_t &value)
 	{ return readRegister(Register16::DeviceSerial, value); }
 
 	/// sets a new IIR filter in eeprom
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	getIIR_Filter(uint8_t &value)
 	{ return readRegister(Register::Filter, value); }
 
@@ -266,42 +266,42 @@ public:
 
 	// COMMANDS
 	/// Sets the specified orientation
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	setOrientation(Orientation orientation)
 	{ return writeCommand(static_cast<Command>(orientation)); }
 
 	/// enters run mode
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	enterRunMode()
 	{ return writeCommand(Command::EnterRunMode); }
 
 	/// enters standby mode
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	enterStandbyMode()
 	{ return writeCommand(Command::EnterStandbyMode); }
 
 	/// enters sleep mode
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	enterSleepMode()
 	{ return writeCommand(Command::EnterSleepMode); }
 
 	/// exit sleep mode
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	exitSleepMode()
 	{ return writeCommand(Command::ExitSleepMode, 20); }
 
 	/// enters user calibration mode
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	enterUserCalibrationMode()
 	{ return writeCommand(Command::EnterUserCalibrationMode); }
 
 	/// exit user calibration mode
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	exitUserCalibrationMode()
 	{ return writeCommand(Command::ExitUserCalibrationMode, 50); }
 
 	/// resets the processor, any new command is delayed by 500ms
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	resetProcessor()
 	{ return writeCommand(Command::ResetProcessor, 500); }
 
@@ -309,22 +309,22 @@ public:
 
 	// DATA REQUESTS
 	/// reads the Acceleration registers and buffer the results
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	readAcceleration()
 	{ return readPostData(Command::PostAccelData, 0, 6); }
 
 	/// reads the Magnetometer registers and buffer the results
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	readMagneticField()
 	{ return readPostData(Command::PostMagData, 6, 6); }
 
 	/// reads the Heading registers and buffer the results
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	readHeading()
 	{ return readPostData(Command::PostHeadingData, 12, 6); }
 
 	/// reads the Tilt registers and buffer the results
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	readTilt()
 	{ return readPostData(Command::PostTiltData, 14, 6); }
 
@@ -335,19 +335,19 @@ protected:
 
 	// RAW REGISTER ACCESS
 	/// write a 8bit value into the eeprom
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	writeRegister(Register reg, uint8_t value);
 
 	/// write a 16bit value into the eeprom
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	writeRegister(Register16 reg, uint16_t value);
 
 	/// read a 8bit value from the eeprom
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	readRegister(Register reg, uint8_t &value);
 
 	/// read a 16bit value from the eeprom
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	readRegister(Register16 reg, uint16_t &value);
 
 	/// @}
@@ -359,10 +359,10 @@ public:
 	{ return data; }
 
 private:
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	writeCommand(Command command, uint16_t timeout = 1);
 
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	readPostData(Command command, uint8_t offset, uint8_t readSize);
 
 private:
