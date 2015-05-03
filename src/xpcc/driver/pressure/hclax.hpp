@@ -80,7 +80,7 @@ public:
 	}
 
 	/// pings the sensor
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	ping()
 	{
 		CO_BEGIN();
@@ -95,7 +95,7 @@ public:
 	}
 
 	/// reads the Pressure registers and buffers the results
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	readPressure()
 	{
 		CO_BEGIN();

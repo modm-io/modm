@@ -39,7 +39,7 @@ namespace xpcc
  * @ingroup i2c
  */
 template < class I2cMaster, uint8_t NestingLevels = 10, class Transaction = I2cWriteReadTransaction >
-class I2cDevice : protected xpcc::co::NestedResumable< NestingLevels + 1 >
+class I2cDevice : protected xpcc::NestedResumable< NestingLevels + 1 >
 {
 public:
 	///	@param	address	the slave address not yet shifted left (address < 128).
@@ -66,7 +66,7 @@ public:
 
 	/// @retval true	device responds to address
 	/// @retval false	no device with address found
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	ping()
 	{
 		CO_BEGIN();
@@ -134,7 +134,7 @@ protected:
 	}
 
 	/// Starts our own transaction and waits until finished.
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	runTransaction()
 	{
 		CO_BEGIN();

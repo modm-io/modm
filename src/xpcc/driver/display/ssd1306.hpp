@@ -187,53 +187,53 @@ public:
 
 	// MARK: - TASKS
 	/// initializes for 3V3 with charge-pump asynchronously
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	initialize();
 
 	// starts a frame transfer and waits for completion
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	writeDisplay();
 
 
-	xpcc::co::ResumableResult<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	setDisplayMode(DisplayMode mode = DisplayMode::Normal)
 	{ return writeCommand(static_cast<Command>(mode)); }
 
-	xpcc::co::ResumableResult<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	setContrast(uint8_t contrast = 0xCE)
 	{ return writeCommand(Command::SetContrastControl, contrast); }
 
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	setRotation(Rotation rotation=Rotation::Normal);
 
 
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	configureScroll(uint8_t origin, uint8_t size,
 			ScrollDirection direction, ScrollStep steps);
 
-	xpcc::co::ResumableResult<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	enableScroll()
 	{ return writeCommand(Command::SetEnableScroll); }
 
-	xpcc::co::ResumableResult<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	disableScroll()
 	{ return writeCommand(Command::SetDisableScroll); }
 
 protected:
 	/// Write a command without data
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	writeCommand(uint8_t command);
 
 	/// Write a command with one byte data
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	writeCommand(uint8_t command, uint8_t data);
 
 	/// Write a command with two bytes data
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	writeCommand(uint8_t command, uint8_t data1, uint8_t data2);
 
 private:
-	xpcc::co::ResumableResult<void>
+	xpcc::ResumableResult<void>
 	startWriteDisplay();
 
 	bool

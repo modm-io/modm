@@ -18,13 +18,13 @@
 namespace xpcc
 {
 
-namespace co
+namespace rf
 {
 
 /// @cond
 /// State of a resumable function.
 enum
-State
+ResultState
 {
 	// reasons to stop
 	Stop = 0,			///< Resumable function finished
@@ -36,7 +36,15 @@ State
 	// reasons to keep running
 	Running = 255,		///< Resumable function is running
 };
+
+/// Used to store a resumable function's position (what Dunkels calls a
+/// "local continuation").
+typedef uint8_t State;
+/// We use 0 instead of -1 since it might be fast to check
+static constexpr State Stopped = State(0);
 /// @endcond
+
+} // namespace rf
 
 /// All resumable functions return an encapsulated result type.
 /// @warning The result type **must** have a default constructor!
@@ -57,7 +65,7 @@ struct ResumableResult
 	{ return result; }
 
 private:
-	/// The `co::State`.
+	/// The `rf::ResultState`.
 	uint_fast8_t state;
 	/// Custom return value.
 	T result;
@@ -81,17 +89,9 @@ struct ResumableResult<void>
 	{ return state; }
 
 private:
-	/// The `co::State`.
+	/// The `rf::ResultState`.
 	uint_fast8_t state;
 };
-/// @endcond
-
-/// @cond
-/// Used to store a resumable function's position (what Dunkels calls a
-/// "local continuation").
-typedef uint8_t RfState;
-/// We use 0 instead of -1 since it might be fast to check
-static constexpr RfState RfStopped = RfState(0);
 /// @endcond
 
 /**
@@ -105,7 +105,7 @@ static constexpr RfState RfStopped = RfState(0);
  * the unique index of your resumable function starting at zero.
  * You may exit and return a value by using `CO_RETURN(value)` or
  * return the result of another resumable function using `CO_RETURN_CALL(resumable())`.
- * This return value is wrapped in a `xpcc::co::ResumableResult<Type>` struct
+ * This return value is wrapped in a `xpcc::ResumableResult<Type>` struct
  * and transparently returned by the `CO_CALL` macro so it can be used
  * to influence your program flow.
  * If the resumable function reaches `CO_END()` it will exit automatically,
@@ -147,9 +147,9 @@ public:
 	inline void
 	stopAllResumables()
 	{
-		for (RfState &state : rfStateArray)
+		for (rf::State &state : rfStateArray)
 		{
-			state = RfStopped;
+			state = rf::Stopped;
 		}
 	}
 
@@ -158,7 +158,7 @@ public:
 	stopResumable(uint8_t id)
 	{
 		if (id < Functions) {
-			rfStateArray[id] = RfStopped;
+			rfStateArray[id] = rf::Stopped;
 			return true;
 		}
 		return false;
@@ -168,16 +168,16 @@ public:
 	bool inline
 	isResumableRunning(uint8_t id) const
 	{
-		return (id < Functions and rfStateArray[id] != RfStopped);
+		return (id < Functions and rfStateArray[id] != rf::Stopped);
 	}
 
 	/// @return	`true` if any resumable function of this class is running, else `false`
 	bool inline
 	areAnyResumablesRunning() const
 	{
-		for (const RfState state : rfStateArray)
+		for (const rf::State state : rfStateArray)
 		{
-			if (state != RfStopped)
+			if (state != rf::Stopped)
 				return true;
 		}
 		return false;
@@ -202,7 +202,7 @@ public:
 		for (uint8_t id : ids)
 		{
 			// = not isResumableRunning(id)
-			if (id >= Functions or rfStateArray[id] == RfStopped)
+			if (id >= Functions or rfStateArray[id] == rf::Stopped)
 				return false;
 		}
 		return true;
@@ -224,7 +224,7 @@ public:
 	 *
 	 * @return	>`NestingError` if still running, <=`NestingError` if it has finished.
 	 */
-	xpcc::co::ResumableResult< ReturnType >
+	xpcc::ResumableResult< ReturnType >
 	resumable(...);
 	/// @endcond
 #endif
@@ -234,7 +234,7 @@ protected:
 
 	/// increases nesting level, call this in the switch statement!
 	/// @return current state before increasing nesting level
-	RfState ALWAYS_INLINE
+	rf::State ALWAYS_INLINE
 	pushRf(uint_fast8_t index) const
 	{
 		return rfStateArray[index];
@@ -251,13 +251,13 @@ protected:
 	void ALWAYS_INLINE
 	stopRf(uint_fast8_t index)
 	{
-		rfStateArray[index] = RfStopped;
+		rfStateArray[index] = rf::Stopped;
 	}
 
 	/// sets the state of the parent nesting level
 	/// @warning	be aware in which nesting level you call this! (before popRf()!)
 	void ALWAYS_INLINE
-	setRf(RfState state, uint_fast8_t index)
+	setRf(rf::State state, uint_fast8_t index)
 	{
 		rfStateArray[index] = state;
 	}
@@ -272,7 +272,7 @@ protected:
 	bool ALWAYS_INLINE
 	isStoppedRf(uint_fast8_t index) const
 	{
-		return (rfStateArray[index] == RfStopped);
+		return (rfStateArray[index] == rf::Stopped);
 	}
 
 	/// asserts the index is not out of bounds.
@@ -294,10 +294,8 @@ protected:
 	/// @endcond
 
 private:
-	RfState rfStateArray[Functions];
+	rf::State rfStateArray[Functions];
 };
-
-} // namespace co
 
 } // namespace xpcc
 

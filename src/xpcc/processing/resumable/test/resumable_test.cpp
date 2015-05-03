@@ -11,7 +11,7 @@
 #include "resumable_test.hpp"
 
 // ----------------------------------------------------------------------------
-class TestingEmptyThread0 : public xpcc::co::NestedResumable<1>
+class TestingEmptyThread0 : public xpcc::NestedResumable<1>
 {
 public:
 	TestingEmptyThread0()
@@ -19,7 +19,7 @@ public:
 	{
 	}
 
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	task1()
 	{
 		CO_BEGIN();
@@ -34,7 +34,7 @@ public:
 		CO_END_RETURN(false);
 	}
 
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	task2()
 	{
 		CO_BEGIN();
@@ -48,7 +48,7 @@ public:
 	int8_t depth;
 };
 
-class TestingEmptyThread1 : public xpcc::co::NestedResumable<2>
+class TestingEmptyThread1 : public xpcc::NestedResumable<2>
 {
 public:
 	TestingEmptyThread1()
@@ -56,7 +56,7 @@ public:
 	{
 	}
 
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	task1()
 	{
 		CO_BEGIN();
@@ -71,7 +71,7 @@ public:
 		CO_END();
 	}
 
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	task2()
 	{
 		CO_BEGIN();
@@ -85,7 +85,7 @@ public:
 	int8_t depth;
 };
 
-class TestingEmptyThread2 : public xpcc::co::NestedResumable<3>
+class TestingEmptyThread2 : public xpcc::NestedResumable<3>
 {
 public:
 	TestingEmptyThread2()
@@ -93,7 +93,7 @@ public:
 	{
 	}
 
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	task1()
 	{
 		CO_BEGIN();
@@ -108,7 +108,7 @@ public:
 		CO_END();
 	}
 
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	task2()
 	{
 		CO_BEGIN();
@@ -136,7 +136,7 @@ ResumableTest::testClassMethods()
 	TEST_ASSERT_FALSE(thread0.isResumableRunning());
 
 	// lets start a task, which will yield
-	TEST_ASSERT_EQUALS(thread0.task1().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread0.task1().getState(), xpcc::rf::Running);
 	// now it should be running
 	TEST_ASSERT_TRUE(thread0.isResumableRunning());
 	// state should be 1
@@ -145,13 +145,13 @@ ResumableTest::testClassMethods()
 	TEST_ASSERT_EQUALS(thread0.depth, 0);
 
 	// two tasks cannot run in the same context
-	TEST_ASSERT_EQUALS(thread0.task2().getState(), xpcc::co::WrongState);
+	TEST_ASSERT_EQUALS(thread0.task2().getState(), xpcc::rf::WrongState);
 
 	// state should still be 1
 	TEST_ASSERT_EQUALS(thread0.state, 1);
 	// but it should continue execution in the right context
 	auto result1 = thread0.task1();
-	TEST_ASSERT_EQUALS(result1.getState(), xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(result1.getState(), xpcc::rf::Stop);
 	TEST_ASSERT_EQUALS(result1.getResult(), false);
 	// state should be 2
 	TEST_ASSERT_EQUALS(thread0.state, 2);
@@ -160,7 +160,7 @@ ResumableTest::testClassMethods()
 
 	// try the same with task2, which will end immediately
 	auto result2 = thread0.task2();
-	TEST_ASSERT_EQUALS(result2.getState(), xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(result2.getState(), xpcc::rf::Stop);
 	TEST_ASSERT_EQUALS(result2.getResult(), true);
 	// state should be 3
 	TEST_ASSERT_EQUALS(thread0.state, 3);
@@ -169,7 +169,7 @@ ResumableTest::testClassMethods()
 
 	TEST_ASSERT_EQUALS(thread0.getResumableDepth(), -1);
 	// lets start a task, which will yield
-	TEST_ASSERT_EQUALS(thread0.task1().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread0.task1().getState(), xpcc::rf::Running);
 	// state should be 1
 	TEST_ASSERT_EQUALS(thread0.state, 1);
 	// stop resumable of thread0
@@ -185,24 +185,24 @@ ResumableTest::testClassMethods()
 	TEST_ASSERT_EQUALS(thread1.depth, 0);
 	TEST_ASSERT_FALSE(thread1.isResumableRunning());
 
-	TEST_ASSERT_EQUALS(thread1.task1().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread1.task1().getState(), xpcc::rf::Running);
 	TEST_ASSERT_TRUE(thread1.isResumableRunning());
 	TEST_ASSERT_EQUALS(thread1.state, 1);
 	TEST_ASSERT_EQUALS(thread1.depth, 0);
 
-	TEST_ASSERT_EQUALS(thread1.task2().getState(), xpcc::co::WrongState);
+	TEST_ASSERT_EQUALS(thread1.task2().getState(), xpcc::rf::WrongState);
 
 	TEST_ASSERT_EQUALS(thread1.state, 1);
-	TEST_ASSERT_EQUALS(thread1.task1().getState(), xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(thread1.task1().getState(), xpcc::rf::Stop);
 	TEST_ASSERT_EQUALS(thread1.state, 2);
 	TEST_ASSERT_FALSE(thread1.isResumableRunning());
 
-	TEST_ASSERT_EQUALS(thread1.task2().getState(), xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(thread1.task2().getState(), xpcc::rf::Stop);
 	TEST_ASSERT_EQUALS(thread1.state, 3);
 	TEST_ASSERT_FALSE(thread1.isResumableRunning());
 
 	TEST_ASSERT_EQUALS(thread1.getResumableDepth(), -1);
-	TEST_ASSERT_EQUALS(thread1.task1().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread1.task1().getState(), xpcc::rf::Running);
 	TEST_ASSERT_EQUALS(thread1.state, 1);
 	thread1.stopResumable();
 	TEST_ASSERT_FALSE(thread1.isResumableRunning());
@@ -215,24 +215,24 @@ ResumableTest::testClassMethods()
 	TEST_ASSERT_EQUALS(thread2.depth, 0);
 	TEST_ASSERT_FALSE(thread2.isResumableRunning());
 
-	TEST_ASSERT_EQUALS(thread2.task1().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread2.task1().getState(), xpcc::rf::Running);
 	TEST_ASSERT_TRUE(thread2.isResumableRunning());
 	TEST_ASSERT_EQUALS(thread2.state, 1);
 	TEST_ASSERT_EQUALS(thread2.depth, 0);
 
-	TEST_ASSERT_EQUALS(thread2.task2().getState(), xpcc::co::WrongState);
+	TEST_ASSERT_EQUALS(thread2.task2().getState(), xpcc::rf::WrongState);
 
 	TEST_ASSERT_EQUALS(thread2.state, 1);
-	TEST_ASSERT_EQUALS(thread2.task1().getState(), xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(thread2.task1().getState(), xpcc::rf::Stop);
 	TEST_ASSERT_EQUALS(thread2.state, 2);
 	TEST_ASSERT_FALSE(thread2.isResumableRunning());
 
-	TEST_ASSERT_EQUALS(thread2.task2().getState(), xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(thread2.task2().getState(), xpcc::rf::Stop);
 	TEST_ASSERT_EQUALS(thread2.state, 3);
 	TEST_ASSERT_FALSE(thread2.isResumableRunning());
 
 	TEST_ASSERT_EQUALS(thread2.getResumableDepth(), -1);
-	TEST_ASSERT_EQUALS(thread2.task1().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread2.task1().getState(), xpcc::rf::Running);
 	TEST_ASSERT_EQUALS(thread2.state, 1);
 	thread2.stopResumable();
 	TEST_ASSERT_FALSE(thread2.isResumableRunning());
@@ -240,7 +240,7 @@ ResumableTest::testClassMethods()
 
 
 // ----------------------------------------------------------------------------
-class TestingNestedThread : public xpcc::co::NestedResumable<3>
+class TestingNestedThread : public xpcc::NestedResumable<3>
 {
 public:
 	TestingNestedThread()
@@ -251,7 +251,7 @@ public:
 	{
 	}
 
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	task1()
 	{
 		CO_BEGIN();
@@ -266,7 +266,7 @@ public:
 		CO_YIELD();
 
 		// manual spawn
-		CO_WAIT_WHILE((callResult1 = task2()).getState() > xpcc::co::NestingError);
+		CO_WAIT_WHILE((callResult1 = task2()).getState() > xpcc::rf::NestingError);
 
 		state1 = 3;
 
@@ -278,7 +278,7 @@ public:
 	}
 
 protected:
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	task2()
 	{
 		CO_BEGIN();
@@ -292,7 +292,7 @@ protected:
 
 		CO_YIELD();
 
-		CO_WAIT_WHILE((callResult2 = task3()).getState() > xpcc::co::NestingError);
+		CO_WAIT_WHILE((callResult2 = task3()).getState() > xpcc::rf::NestingError);
 
 		state2 = 3;
 
@@ -303,7 +303,7 @@ protected:
 		CO_END();
 	}
 
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	task3()
 	{
 		CO_BEGIN();
@@ -335,9 +335,9 @@ public:
 	bool condition1;
 	bool condition2;
 	bool condition3;
-	xpcc::co::ResumableResult<bool> callResult1;
-	xpcc::co::ResumableResult<bool> callResult2;
-	xpcc::co::ResumableResult<bool> callResult3;
+	xpcc::ResumableResult<bool> callResult1;
+	xpcc::ResumableResult<bool> callResult2;
+	xpcc::ResumableResult<bool> callResult3;
 };
 //*/
 
@@ -351,10 +351,10 @@ ResumableTest::testNesting()
 	TEST_ASSERT_EQUALS(thread.getResumableDepth(), -1);
 
 	// should wait until the first condition
-	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::rf::Running);
 	TEST_ASSERT_EQUALS(thread.state1, 1);
 	// task should wait here
-	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::rf::Running);
 	TEST_ASSERT_EQUALS(thread.state1, 1);
 
 	// it should be running
@@ -364,82 +364,82 @@ ResumableTest::testNesting()
 	TEST_ASSERT_FALSE(thread.isResumableRunning());
 	// and restart it
 	thread.state1 = 0;
-	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::rf::Running);
 	TEST_ASSERT_EQUALS(thread.state1, 1);
 
 	// lets release start condition 1
 	thread.condition1 = true;
 	// task should continue and yield
-	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::rf::Running);
 	// check the state and depth
 	TEST_ASSERT_EQUALS(thread.state1, 2);
 	TEST_ASSERT_EQUALS(thread.depth1, 0);
 
 	// first manual spawn
-	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::rf::Running);
 	// the callResult1 should be Starting
-	TEST_ASSERT_EQUALS(thread.callResult1.getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.callResult1.getState(), xpcc::rf::Running);
 	// after another run, callResult1 should still be Starting
-	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::co::Running);
-	TEST_ASSERT_EQUALS(thread.callResult1.getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::rf::Running);
+	TEST_ASSERT_EQUALS(thread.callResult1.getState(), xpcc::rf::Running);
 
 	// lets release start condition 2
 	thread.condition2 = true;
 	// task2 will progress to first yield
-	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::rf::Running);
 	// callResult1 should be Running
-	TEST_ASSERT_EQUALS(thread.callResult1.getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.callResult1.getState(), xpcc::rf::Running);
 	// check the state and depth
 	TEST_ASSERT_EQUALS(thread.state1, 2);
 	TEST_ASSERT_EQUALS(thread.state2, 2);
 	TEST_ASSERT_EQUALS(thread.depth2, 1);
 
 	// task2 will progress to spawning task3
-	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::rf::Running);
 	// callResult1 should be Running
-	TEST_ASSERT_EQUALS(thread.callResult1.getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.callResult1.getState(), xpcc::rf::Running);
 	// callResult2 should be Starting
-	TEST_ASSERT_EQUALS(thread.callResult2.getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.callResult2.getState(), xpcc::rf::Running);
 
 	// after another run, this should not change
-	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::co::Running);
-	TEST_ASSERT_EQUALS(thread.callResult1.getState(), xpcc::co::Running);
-	TEST_ASSERT_EQUALS(thread.callResult2.getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::rf::Running);
+	TEST_ASSERT_EQUALS(thread.callResult1.getState(), xpcc::rf::Running);
+	TEST_ASSERT_EQUALS(thread.callResult2.getState(), xpcc::rf::Running);
 
 	// lets release start condition 3
 	thread.condition3 = true;
 	// task3 will progress to first yield
-	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::co::Running);
-	TEST_ASSERT_EQUALS(thread.callResult1.getState(), xpcc::co::Running);
-	TEST_ASSERT_EQUALS(thread.callResult2.getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::rf::Running);
+	TEST_ASSERT_EQUALS(thread.callResult1.getState(), xpcc::rf::Running);
+	TEST_ASSERT_EQUALS(thread.callResult2.getState(), xpcc::rf::Running);
 	// check the states and depths
 	TEST_ASSERT_EQUALS(thread.state1, 2);
 	TEST_ASSERT_EQUALS(thread.state2, 2);
 	TEST_ASSERT_EQUALS(thread.state3, 2);
 	TEST_ASSERT_EQUALS(thread.depth3, 2);
 	// we have exhausted the nesting capabilities
-	TEST_ASSERT_EQUALS(thread.callResult3.getState(), xpcc::co::NestingError);
+	TEST_ASSERT_EQUALS(thread.callResult3.getState(), xpcc::rf::NestingError);
 
 	// now we will begin to strip down the nestings
-	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::co::Running);
-	TEST_ASSERT_EQUALS(thread.callResult1.getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::rf::Running);
+	TEST_ASSERT_EQUALS(thread.callResult1.getState(), xpcc::rf::Running);
 	// task3 will complete
 	TEST_ASSERT_EQUALS(thread.state3, 3);
 	// callResult2 will return Stop
-	TEST_ASSERT_EQUALS(thread.callResult2.getState(), xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(thread.callResult2.getState(), xpcc::rf::Stop);
 	// task2 will continue until next yield
 	TEST_ASSERT_EQUALS(thread.state2, 3);
 
-	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::rf::Running);
 	// task2 will complete
 	TEST_ASSERT_EQUALS(thread.state2, 4);
 	// callResult1 will return Stop
-	TEST_ASSERT_EQUALS(thread.callResult1.getState(), xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(thread.callResult1.getState(), xpcc::rf::Stop);
 	// task1 will continure until next yield
 	TEST_ASSERT_EQUALS(thread.state1, 3);
 
 	// task1 should end now
-	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::rf::Stop);
 	TEST_ASSERT_EQUALS(thread.state1, 4);
 
 	// nothing is running
@@ -448,7 +448,7 @@ ResumableTest::testNesting()
 
 uint8_t waits = 3;
 
-class TestingSpawningThread : public xpcc::co::NestedResumable<2>
+class TestingSpawningThread : public xpcc::NestedResumable<2>
 {
 public:
 	TestingSpawningThread()
@@ -456,7 +456,7 @@ public:
 	{
 	}
 
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	parentResumable()
 	{
 		CO_BEGIN();
@@ -478,7 +478,7 @@ public:
 	}
 
 protected:
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	spawningResumable(uint8_t calls)
 	{
 		CO_BEGIN();
@@ -542,36 +542,36 @@ ResumableTest::testSpawn()
 	TEST_ASSERT_EQUALS(thread.getResumableDepth(), -1);
 
 	// should wait until the first condition
-	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::rf::Running);
 	TEST_ASSERT_EQUALS(thread.state, 1);
 	// task should require `waits` number of calls
 	for (uint8_t ii = 0; ii < waits; ++ii)
 	{
-		TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::co::Running);
+		TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::rf::Running);
 		TEST_ASSERT_EQUALS(thread.state, 1);
 	}
 	// now spawning task has started
-	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::rf::Running);
 	TEST_ASSERT_EQUALS(thread.state, 2);
 	// task should require `waits` number of calls again
 	for (uint8_t ii = 0; ii < waits; ++ii)
 	{
-		TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::co::Running);
+		TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::rf::Running);
 		TEST_ASSERT_EQUALS(thread.state, 2);
 	}
 	// now spawning task has finished
-	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::rf::Running);
 	TEST_ASSERT_EQUALS(thread.state, 3);
 	TEST_ASSERT_EQUALS(thread.success, (waits == 3) ? true : false);
 
 	// now parent task has finished
-	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::rf::Stop);
 	TEST_ASSERT_EQUALS(thread.state, (waits == 3) ? 4 : 5);
 }
 
 #include <xpcc/math/filter/moving_average.hpp>
 
-class TestingSpawningComplexThread : public xpcc::co::NestedResumable<2>
+class TestingSpawningComplexThread : public xpcc::NestedResumable<2>
 {
 public:
 	TestingSpawningComplexThread()
@@ -584,7 +584,7 @@ public:
 	{
 	}
 
-	xpcc::co::ResumableResult<uint16_t>
+	xpcc::ResumableResult<uint16_t>
 	parentResumable()
 	{
 		// this is an unelegant way of using 'local' variables in a Resumable.
@@ -647,7 +647,7 @@ public:
 	}
 
 protected:
-	xpcc::co::ResumableResult<uint8_t>
+	xpcc::ResumableResult<uint8_t>
 	spawningResumable1()
 	{
 		CO_BEGIN();
@@ -657,7 +657,7 @@ protected:
 		CO_END();
 	}
 
-	xpcc::co::ResumableResult<int8_t>
+	xpcc::ResumableResult<int8_t>
 	spawningResumable2()
 	{
 		CO_BEGIN();
@@ -708,12 +708,12 @@ ResumableTest::testComplexSpawn()
 	TEST_ASSERT_EQUALS(thread.getResumableDepth(), -1);
 
 	// should wait until the first condition
-	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::rf::Running);
 	TEST_ASSERT_EQUALS(thread.state, 1);
 
 	waits = 1;
 	// now run all CO_CALLs until yield
-	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::rf::Running);
 	TEST_ASSERT_EQUALS(thread.state, 2);
 
 	TEST_ASSERT_EQUALS(thread.result1, 42);
@@ -721,7 +721,7 @@ ResumableTest::testComplexSpawn()
 
 	waits = 3;
 	// run second, local CO_CALLs
-	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::rf::Running);
 	TEST_ASSERT_EQUALS(thread.state, 3);
 
 	TEST_ASSERT_EQUALS(thread.resultLocal1, 42);
@@ -729,7 +729,7 @@ ResumableTest::testComplexSpawn()
 
 	waits = 1;
 	// run third, if CO_CALLs
-	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::rf::Running);
 	TEST_ASSERT_EQUALS(thread.state, 4);
 
 	TEST_ASSERT_EQUALS(thread.resultIf1, 42);
@@ -737,7 +737,7 @@ ResumableTest::testComplexSpawn()
 
 	waits = 3;
 	// run third, if CO_CALLs
-	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::rf::Running);
 	TEST_ASSERT_EQUALS(thread.state, 5);
 
 	TEST_ASSERT_EQUALS(thread.resultFunction1, 42);
@@ -745,22 +745,22 @@ ResumableTest::testComplexSpawn()
 
 //	waits = 3;
 //	// run fourth, stack CO_CALLs
-//	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::co::Running);
+//	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::rf::Running);
 //	TEST_ASSERT_EQUALS(thread.state, 5);
 //
 //	TEST_ASSERT_EQUALS(thread.resultStack1, 42);
 //	TEST_ASSERT_EQUALS(thread.resultStack2, 42);
 
 	auto result = thread.parentResumable();
-	TEST_ASSERT_EQUALS(result.getState(), xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(result.getState(), xpcc::rf::Stop);
 	TEST_ASSERT_EQUALS(result.getResult(), 42+42);
 }
 
 
-class TestingCaseLabelThread : public xpcc::co::NestedResumable<>
+class TestingCaseLabelThread : public xpcc::NestedResumable<>
 {
 public:
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	resumable()
 	{
 		CO_BEGIN();
@@ -815,15 +815,15 @@ ResumableTest::testCaseNumbers()
 	// this routine must be called 253 times
 	for(uint32_t ii=0; ii < 253; ii++)
 	{
-		TEST_ASSERT_EQUALS(thread.resumable().getState(), xpcc::co::Running);
+		TEST_ASSERT_EQUALS(thread.resumable().getState(), xpcc::rf::Running);
 	}
 	// the 254th time must return
 	auto result = thread.resumable();
-	TEST_ASSERT_EQUALS(result.getState(), xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(result.getState(), xpcc::rf::Stop);
 	TEST_ASSERT_EQUALS(result.getResult(), true);
 }
 
-class TestingCaseEnumClassThread : public xpcc::co::NestedResumable<>
+class TestingCaseEnumClassThread : public xpcc::NestedResumable<>
 {
 public:
 	enum class
@@ -833,7 +833,7 @@ public:
 		Cat,
 	};
 
-	xpcc::co::ResumableResult<Animal>
+	xpcc::ResumableResult<Animal>
 	resumable()
 	{
 		CO_BEGIN();
@@ -850,18 +850,18 @@ ResumableTest::testReturnEnumClass()
 	TestingCaseEnumClassThread thread;
 
 	// run once; resumable will yield
-	TEST_ASSERT_EQUALS(thread.resumable().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.resumable().getState(), xpcc::rf::Running);
 
 	// now we should get a cat
 	auto result = thread.resumable();
-	TEST_ASSERT_EQUALS(result.getState(), xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(result.getState(), xpcc::rf::Stop);
 	TEST_ASSERT_TRUE(result.getResult() == TestingCaseEnumClassThread::Animal::Cat);
 }
 
-class TestingCaseVoidClassThread : public xpcc::co::NestedResumable<>
+class TestingCaseVoidClassThread : public xpcc::NestedResumable<>
 {
 public:
-	xpcc::co::ResumableResult<void>
+	xpcc::ResumableResult<void>
 	resumable()
 	{
 		CO_BEGIN();
@@ -878,22 +878,22 @@ ResumableTest::testReturnVoidClass()
 	TestingCaseVoidClassThread thread;
 
 	// run once; resumable will yield
-	TEST_ASSERT_EQUALS(thread.resumable().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.resumable().getState(), xpcc::rf::Running);
 
 	auto result = thread.resumable();
-	TEST_ASSERT_EQUALS(result.getState(), xpcc::co::Stop);
-	TEST_ASSERT_EQUALS(result.getResult(), xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(result.getState(), xpcc::rf::Stop);
+	TEST_ASSERT_EQUALS(result.getResult(), xpcc::rf::Stop);
 	TEST_ASSERT_TRUE(sizeof(result) == 1);
 
 	// this now returns the state
 	auto result2 = CO_CALL_BLOCKING(thread.resumable());
-	TEST_ASSERT_EQUALS(result2, xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(result2, xpcc::rf::Stop);
 }
 
-class TestingNonMutuallyExclusiveResumables : public xpcc::co::Resumable<3>
+class TestingNonMutuallyExclusiveResumables : public xpcc::Resumable<3>
 {
 public:
-	xpcc::co::ResumableResult<void>
+	xpcc::ResumableResult<void>
 	call0()
 	{
 		CO_BEGIN(0);
@@ -905,7 +905,7 @@ public:
 		CO_END();
 	}
 
-	xpcc::co::ResumableResult<void>
+	xpcc::ResumableResult<void>
 	call1()
 	{
 		CO_BEGIN(1);
@@ -920,7 +920,7 @@ public:
 		CO_END();
 	}
 
-	xpcc::co::ResumableResult<void>
+	xpcc::ResumableResult<void>
 	call2()
 	{
 		CO_BEGIN(2);
@@ -959,7 +959,7 @@ ResumableTest::testNonNestedResumables()
 	TEST_ASSERT_FALSE(thread.isResumableRunning(100));
 
 	// run once; resumable will yield, but not finish
-	TEST_ASSERT_EQUALS(thread.call0().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.call0().getState(), xpcc::rf::Running);
 	TEST_ASSERT_EQUALS(thread.state0, 0);
 
 	// resumable 0 should be running
@@ -979,50 +979,50 @@ ResumableTest::testNonNestedResumables()
 	TEST_ASSERT_FALSE(thread.areAllResumablesRunning({0, 100}));
 
 	// the other resumables should be able to run at the same time
-	TEST_ASSERT_EQUALS(thread.call1().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.call1().getState(), xpcc::rf::Running);
 	TEST_ASSERT_EQUALS(thread.state1, 0);
-	TEST_ASSERT_EQUALS(thread.call2().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.call2().getState(), xpcc::rf::Running);
 	TEST_ASSERT_EQUALS(thread.state2, 0);
 
 	// second round of calls, call0 stops
-	TEST_ASSERT_EQUALS(thread.call0().getState(), xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(thread.call0().getState(), xpcc::rf::Stop);
 	TEST_ASSERT_EQUALS(thread.state0, 1);
 	// other cos keep running
-	TEST_ASSERT_EQUALS(thread.call1().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.call1().getState(), xpcc::rf::Running);
 	TEST_ASSERT_EQUALS(thread.state1, 1);
-	TEST_ASSERT_EQUALS(thread.call2().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.call2().getState(), xpcc::rf::Running);
 	TEST_ASSERT_EQUALS(thread.state2, 1);
 
 	// call1 stops
-	TEST_ASSERT_EQUALS(thread.call1().getState(), xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(thread.call1().getState(), xpcc::rf::Stop);
 	TEST_ASSERT_EQUALS(thread.state1, 2);
 
 	// call2 spawns call1
-	TEST_ASSERT_EQUALS(thread.call2().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.call2().getState(), xpcc::rf::Running);
 	TEST_ASSERT_EQUALS(thread.state2, 2);
 	TEST_ASSERT_EQUALS(thread.state1, 0);
 
 	// call0 should be able to run before call2 finishes spawning call1
-	TEST_ASSERT_EQUALS(thread.call0().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.call0().getState(), xpcc::rf::Running);
 	TEST_ASSERT_EQUALS(thread.state0, 0);
 
 	// continue call2
-	TEST_ASSERT_EQUALS(thread.call2().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.call2().getState(), xpcc::rf::Running);
 	TEST_ASSERT_EQUALS(thread.state2, 2);
 	TEST_ASSERT_EQUALS(thread.state1, 1);
 
 	// call0 should be able to run before call2 finishes spawning call1
-	TEST_ASSERT_EQUALS(thread.call0().getState(), xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(thread.call0().getState(), xpcc::rf::Stop);
 	TEST_ASSERT_EQUALS(thread.state0, 1);
 
 	// continue call2, which starts call0
-	TEST_ASSERT_EQUALS(thread.call2().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.call2().getState(), xpcc::rf::Running);
 	TEST_ASSERT_EQUALS(thread.state2, 3);
 	TEST_ASSERT_EQUALS(thread.state1, 2);
 	TEST_ASSERT_EQUALS(thread.state0, 0);
 
 	// continue call2, call0 ends
-	TEST_ASSERT_EQUALS(thread.call2().getState(), xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(thread.call2().getState(), xpcc::rf::Stop);
 	TEST_ASSERT_EQUALS(thread.state2, 4);
 	TEST_ASSERT_EQUALS(thread.state1, 2);
 	TEST_ASSERT_EQUALS(thread.state0, 1);

@@ -41,7 +41,7 @@ xpcc::Pca9685<I2cMaster>::Pca9685(uint8_t address) :
 {}
 
 template<typename I2cMaster>
-xpcc::co::ResumableResult<bool>
+xpcc::ResumableResult<bool>
 xpcc::Pca9685<I2cMaster>::initialize(uint8_t mode1, uint8_t mode2)
 {
 	CO_BEGIN();
@@ -75,7 +75,7 @@ xpcc::Pca9685<I2cMaster>::initialize(uint8_t mode1, uint8_t mode2)
 }
 
 template<typename I2cMaster>
-xpcc::co::ResumableResult<bool>
+xpcc::ResumableResult<bool>
 xpcc::Pca9685<I2cMaster>::setChannel(uint8_t channel, uint16_t value)
 {
 	CO_BEGIN();
@@ -95,7 +95,7 @@ xpcc::Pca9685<I2cMaster>::setChannel(uint8_t channel, uint16_t value)
 }
 
 template<typename I2cMaster>
-xpcc::co::ResumableResult<bool>
+xpcc::ResumableResult<bool>
 xpcc::Pca9685<I2cMaster>::setAllChannels(uint16_t value)
 {
 	CO_BEGIN();

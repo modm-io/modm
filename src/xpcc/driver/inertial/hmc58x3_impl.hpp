@@ -21,7 +21,7 @@ xpcc::Hmc58x3<I2cMaster>::Hmc58x3(Data &data, uint8_t address)
 
 // MARK: - Tasks
 template < typename I2cMaster >
-xpcc::co::ResumableResult<bool>
+xpcc::ResumableResult<bool>
 xpcc::Hmc58x3<I2cMaster>::readMagneticField()
 {
 	CO_BEGIN();
@@ -38,7 +38,7 @@ xpcc::Hmc58x3<I2cMaster>::readMagneticField()
 // ----------------------------------------------------------------------------
 // MARK: - base methods
 template < typename I2cMaster >
-xpcc::co::ResumableResult<bool>
+xpcc::ResumableResult<bool>
 xpcc::Hmc58x3<I2cMaster>::configureRaw(uint8_t rate, uint8_t gain, const uint8_t* gainValues, uint8_t average)
 {
 	CO_BEGIN();
@@ -58,7 +58,7 @@ xpcc::Hmc58x3<I2cMaster>::configureRaw(uint8_t rate, uint8_t gain, const uint8_t
 }
 
 template < typename I2cMaster >
-xpcc::co::ResumableResult<bool>
+xpcc::ResumableResult<bool>
 xpcc::Hmc58x3<I2cMaster>::setGainRaw(uint8_t gain, const uint8_t* gainValues)
 {
 	CO_BEGIN();
@@ -78,7 +78,7 @@ xpcc::Hmc58x3<I2cMaster>::setGainRaw(uint8_t gain, const uint8_t* gainValues)
 // ----------------------------------------------------------------------------
 // MARK: - register access
 template < typename I2cMaster >
-xpcc::co::ResumableResult<bool>
+xpcc::ResumableResult<bool>
 xpcc::Hmc58x3<I2cMaster>::readStatus()
 {
 	return read(Register::Status, rawBuffer[9]);
@@ -86,7 +86,7 @@ xpcc::Hmc58x3<I2cMaster>::readStatus()
 
 // MARK: update register
 template < typename I2cMaster >
-xpcc::co::ResumableResult<bool>
+xpcc::ResumableResult<bool>
 xpcc::Hmc58x3<I2cMaster>::updateRegister(uint8_t index, uint8_t setMask, uint8_t clearMask)
 {
 	CO_BEGIN();
@@ -98,7 +98,7 @@ xpcc::Hmc58x3<I2cMaster>::updateRegister(uint8_t index, uint8_t setMask, uint8_t
 
 // MARK: write multilength register
 template < class I2cMaster >
-xpcc::co::ResumableResult<bool>
+xpcc::ResumableResult<bool>
 xpcc::Hmc58x3<I2cMaster>::write(Register reg, uint8_t *buffer, uint8_t length)
 {
 	CO_BEGIN();
@@ -116,7 +116,7 @@ xpcc::Hmc58x3<I2cMaster>::write(Register reg, uint8_t *buffer, uint8_t length)
 
 // MARK: read multilength register
 template < class I2cMaster >
-xpcc::co::ResumableResult<bool>
+xpcc::ResumableResult<bool>
 xpcc::Hmc58x3<I2cMaster>::read(Register reg, uint8_t *buffer, uint8_t length)
 {
 	CO_BEGIN();

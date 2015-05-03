@@ -39,7 +39,7 @@
  *
  * typedef GpioOutputB0 Led;
  *
- * class BlinkingLight : public xpcc::pt::Protothread, private xpcc::co::NestedResumable<2>
+ * class BlinkingLight : public xpcc::pt::Protothread, private xpcc::NestedResumable<2>
  * {
  * public:
  *     bool
@@ -65,7 +65,7 @@
  *         PT_END();
  *     }
  *
- *     xpcc::co::ResumableResult<bool>
+ *     xpcc::ResumableResult<bool>
  *     waitForTimer(void *ctx)
  *     {
  *         CO_BEGIN();
@@ -79,7 +79,7 @@
  *         CO_END_RETURN(false);
  *     }
  *
- *     xpcc::co::ResumableResult<bool>
+ *     xpcc::ResumableResult<bool>
  *     setTimer(void *ctx, uint16_t timeout)
  *     {
  *         CO_BEGIN();

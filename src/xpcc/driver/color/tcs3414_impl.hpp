@@ -26,7 +26,7 @@ xpcc::Tcs3414<I2cMaster>::Tcs3414(uint8_t address)
 
 // ----------------------------------------------------------------------------
 template<typename I2cMaster>
-xpcc::co::ResumableResult<bool>
+xpcc::ResumableResult<bool>
 xpcc::Tcs3414<I2cMaster>::configure(
 		const Gain gain,
 		const Prescaler prescaler,
@@ -49,7 +49,7 @@ xpcc::Tcs3414<I2cMaster>::configure(
 // ----------------------------------------------------------------------------
 // MARK: - Tasks
 template < class I2cMaster >
-xpcc::co::ResumableResult<bool>
+xpcc::ResumableResult<bool>
 xpcc::Tcs3414<I2cMaster>::refreshAllColors()
 {
 	CO_BEGIN();
@@ -93,7 +93,7 @@ xpcc::Tcs3414<I2cMaster>::refreshAllColors()
 
 // ----------------------------------------------------------------------------
 template<typename I2cMaster>
-xpcc::co::ResumableResult<bool>
+xpcc::ResumableResult<bool>
 xpcc::Tcs3414<I2cMaster>::writeRegister(
 		const RegisterAddress address,
 		const uint8_t value)
@@ -112,7 +112,7 @@ xpcc::Tcs3414<I2cMaster>::writeRegister(
 }
 
 template<typename I2cMaster>
-xpcc::co::ResumableResult<bool>
+xpcc::ResumableResult<bool>
 xpcc::Tcs3414<I2cMaster>::readRegisters(
 		const RegisterAddress address,
 		uint8_t* const values,

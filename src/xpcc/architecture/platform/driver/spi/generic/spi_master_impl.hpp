@@ -160,20 +160,20 @@ xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::transferBlocking(
 }
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
-xpcc::co::ResumableResult<uint8_t>
+xpcc::ResumableResult<uint8_t>
 xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::transfer(uint8_t data)
 {
 	data = transferBlocking(data);
-	return {xpcc::co::Stop, data};
+	return {xpcc::rf::Stop, data};
 }
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
-xpcc::co::ResumableResult<void>
+xpcc::ResumableResult<void>
 xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::transfer(
 		uint8_t *tx, uint8_t *rx, std::size_t length)
 {
 	transferBlocking(tx, rx, length);
-	return {xpcc::co::Stop, 0};
+	return {xpcc::rf::Stop, 0};
 }
 
 // ----------------------------------------------------------------------------

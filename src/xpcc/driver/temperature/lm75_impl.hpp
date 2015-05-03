@@ -23,7 +23,7 @@ xpcc::Lm75<I2cMaster>::Lm75(Data &data, uint8_t address) :
 // MARK: - tasks
 // MARK: Alert mode
 template < typename I2cMaster >
-xpcc::co::ResumableResult<bool>
+xpcc::ResumableResult<bool>
 xpcc::Lm75<I2cMaster>::configureAlertMode(ThermostatMode mode, AlertPolarity polarity, FaultQueue faults)
 {
 	CO_BEGIN();
@@ -42,7 +42,7 @@ xpcc::Lm75<I2cMaster>::configureAlertMode(ThermostatMode mode, AlertPolarity pol
 
 // MARK: read temperature
 template < typename I2cMaster >
-xpcc::co::ResumableResult<bool>
+xpcc::ResumableResult<bool>
 xpcc::Lm75<I2cMaster>::readTemperature()
 {
 	CO_BEGIN();
@@ -55,7 +55,7 @@ xpcc::Lm75<I2cMaster>::readTemperature()
 
 // MARK: configuration
 template < typename I2cMaster >
-xpcc::co::ResumableResult<bool>
+xpcc::ResumableResult<bool>
 xpcc::Lm75<I2cMaster>::setLimitRegister(Register reg, float temperature)
 {
 	CO_BEGIN();

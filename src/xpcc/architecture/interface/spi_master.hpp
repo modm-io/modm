@@ -115,7 +115,7 @@ public:
 	 * 		data to be sent
 	 * @return	received data
 	 */
-	static xpcc::co::ResumableResult<uint8_t>
+	static xpcc::ResumableResult<uint8_t>
 	transfer(uint8_t data);
 
 	/**
@@ -136,7 +136,7 @@ public:
 	 * @param       length
 	 *      number of bytes to be shifted out
 	 */
-	static xpcc::co::ResumableResult<void>
+	static xpcc::ResumableResult<void>
 	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
 #endif
 };

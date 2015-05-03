@@ -126,7 +126,7 @@
 		this->ptState = __LINE__; \
 		case __LINE__: \
 			auto rfResult = resumable; \
-			if (rfResult.getState() > xpcc::co::NestingError) { \
+			if (rfResult.getState() > xpcc::rf::NestingError) { \
 				return true; \
 			} \
 			rfResult.getResult(); \

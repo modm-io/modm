@@ -20,7 +20,7 @@
  * Nested Resumables protect against memory corruption by checking if the nesting level
  * is within the allocated nesting level depth.
  * If the allocated nesting level is exceeded, the resumable function does not execute, but returns
- * the `xpcc::co::NestingError` state value.
+ * the `xpcc::rf::NestingError` state value.
  * However, the `PT_CALL()` or `CO_CALL()` macros are not constructed to handle this error and
  * will interpret this error as a normal resumable function stop and therefore immediately continue program
  * execution.
@@ -55,9 +55,6 @@ XPCC_RESUMABLE_CHECK_NESTING_DEPTH = false
 namespace xpcc
 {
 
-namespace co
-{
-
 /**
  * This is the base class which must be inherited from for using
  * nested resumable functions in your class.
@@ -65,7 +62,7 @@ namespace co
  * You are responsible to choosing the right nesting depth!
  * This class will guard itself against calling another resumable function at too
  * deep a nesting level and inform you gently of this by returning
- * `xpcc::co::NestingError` from your called `resumable()`.
+ * `xpcc::rf::NestingError` from your called `resumable()`.
  * It is then up to you to recognise this in your program design
  * and increase the nesting depth or rethink your code.
  * You may disable the check by setting `XPCC_RESUMABLE_CHECK_NESTING_DEPTH`
@@ -73,7 +70,7 @@ namespace co
  *
  * The resumable functions of this class are mutually exclusive, so only one
  * resumable function of the same object can run at the same time. Even if you
- * call another resumable function, it will simply return `xpcc::co::WrongState`.
+ * call another resumable function, it will simply return `xpcc::rf::WrongState`.
  * Using the `CO_CALL(resumable())` macro, you can wait for these
  * resumable functions to become available and then run them, so you usually do
  * not need to worry about those cases.
@@ -81,7 +78,7 @@ namespace co
  * You must begin each resumable function using `CO_BEGIN()`.
  * You may exit and return a value by using `CO_RETURN(value)` or
  * return the result of another resumable function using `CO_RETURN_CALL(resumable())`.
- * This return value is wrapped in a `xpcc::co::ResumableResult<Type>` struct
+ * This return value is wrapped in a `xpcc::ResumableResult<Type>` struct
  * and transparently returned by the `CO_CALL` macro so it can be used
  * to influence your program flow.
  * If the resumable function reaches `CO_END()` it will exit automatically,
@@ -109,9 +106,9 @@ protected:
 	NestedResumable()
 	:	rfLevel(0)
 	{
-		for (RfState &level : rfStateArray)
+		for (rf::State &level : rfStateArray)
 		{
-			level = RfStopped;
+			level = rf::Stopped;
 		}
 	}
 
@@ -123,7 +120,7 @@ public:
 		uint_fast8_t level = rfLevel;
 		while (level < Levels)
 		{
-			rfStateArray[level++] = RfStopped;
+			rfStateArray[level++] = rf::Stopped;
 		}
 	}
 
@@ -150,7 +147,7 @@ public:
 	 *
 	 * @return	>`NestingError` if still running, <=`NestingError` if it has finished.
 	 */
-	xpcc::co::ResumableResult< ReturnType >
+	xpcc::ResumableResult< ReturnType >
 	resumable function(...);
 	/// @endcond
 #endif
@@ -160,7 +157,7 @@ protected:
 
 	/// increases nesting level, call this in the switch statement!
 	/// @return current state before increasing nesting level
-	RfState inline
+	rf::State inline
 	pushRf(uint8_t /*index*/)
 	{
 		return rfStateArray[rfLevel++];
@@ -179,13 +176,13 @@ protected:
 	void inline
 	stopRf(uint8_t /*index*/)
 	{
-		rfStateArray[rfLevel-1] = RfStopped;
+		rfStateArray[rfLevel-1] = rf::Stopped;
 	}
 
 	/// sets the state of the parent nesting level
 	/// @warning	be aware in which nesting level you call this! (before popRf()!)
 	void inline
-	setRf(RfState state, uint8_t /*index*/)
+	setRf(rf::State state, uint8_t /*index*/)
 	{
 		rfStateArray[rfLevel-1] = state;
 	}
@@ -206,7 +203,7 @@ protected:
 	bool inline
 	isStoppedRf() const
 	{
-		return (rfStateArray[rfLevel] == RfStopped);
+		return (rfStateArray[rfLevel] == rf::Stopped);
 	}
 
 	/// compatibility with Resumable class
@@ -225,7 +222,7 @@ protected:
 	/// @endcond
 private:
 	uint_fast8_t rfLevel;
-	RfState rfStateArray[Levels];
+	rf::State rfStateArray[Levels];
 };
 
 // ----------------------------------------------------------------------------
@@ -236,7 +233,7 @@ class NestedResumable<1>
 {
 protected:
 	NestedResumable() :
-		rfLevel(-1), rfState(RfStopped)
+		rfLevel(-1), rfState(rf::Stopped)
 	{
 	}
 
@@ -244,7 +241,7 @@ public:
 	void inline
 	stopResumable()
 	{
-		rfState = RfStopped;
+		rfState = rf::Stopped;
 	}
 
 	bool inline
@@ -260,7 +257,7 @@ public:
 	}
 
 protected:
-	RfState inline
+	rf::State inline
 	pushRf(uint8_t /*index*/)
 	{
 		rfLevel = 0;
@@ -276,7 +273,7 @@ protected:
 	void inline
 	stopRf(uint8_t /*index*/)
 	{
-		rfState = RfStopped;
+		rfState = rf::Stopped;
 	}
 
 	bool inline
@@ -290,7 +287,7 @@ protected:
 	}
 
 	void inline
-	setRf(RfState state, uint8_t /*index*/)
+	setRf(rf::State state, uint8_t /*index*/)
 	{
 		rfState = state;
 	}
@@ -298,7 +295,7 @@ protected:
 	bool inline
 	isStoppedRf() const
 	{
-		return (rfState == RfStopped);
+		return (rfState == rf::Stopped);
 	}
 
 	template<uint8_t index>
@@ -315,11 +312,9 @@ protected:
 
 private:
 	int_fast8_t rfLevel;
-	RfState rfState;
+	rf::State rfState;
 };
 /// @endcond
-
-} // namespace co
 
 } // namespace xpcc
 

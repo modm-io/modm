@@ -42,7 +42,7 @@
 			CO_RETURN(result); \
 		default: \
 			this->popRf(); \
-			return {xpcc::co::WrongState}; \
+			return {xpcc::rf::WrongState}; \
 	} \
 	static_assert(uint16_t(__COUNTER__) - rfCounter < 256, "You have too many states in this resumable function!");
 
@@ -56,10 +56,10 @@
 #define CO_END() \
  			this->stopRf(rfIndex); \
 			this->popRf(); \
-			return {xpcc::co::Stop}; \
+			return {xpcc::rf::Stop}; \
 	default: \
 			this->popRf(); \
-			return {xpcc::co::WrongState}; \
+			return {xpcc::rf::WrongState}; \
 	} \
 	static_assert(uint16_t(__COUNTER__) - rfCounter < 256, "You have too many states in this resumable function!");
 
@@ -74,7 +74,7 @@
 			CO_RETURN_CALL(resumable); \
 		default: \
 			this->popRf(); \
-			return {xpcc::co::WrongState}; \
+			return {xpcc::rf::WrongState}; \
 	} \
 	static_assert(uint16_t(__COUNTER__) - rfCounter < 256, "You have too many states in this resumable function!");
 
@@ -105,7 +105,7 @@
 			CO_INTERNAL_SET_CASE(__COUNTER__); \
 			if (condition) { \
 				this->popRf(); \
-				return {xpcc::co::Running}; \
+				return {xpcc::rf::Running}; \
 			} \
 
 /**
@@ -127,9 +127,9 @@
 	({ \
 			CO_INTERNAL_SET_CASE(__COUNTER__); \
 			auto rfResult = resumable; \
-			if (rfResult.getState() > xpcc::co::NestingError) { \
+			if (rfResult.getState() > xpcc::rf::NestingError) { \
 				this->popRf(); \
-				return {xpcc::co::Running}; \
+				return {xpcc::rf::Running}; \
 			} \
 			rfResult.getResult(); \
 	})
@@ -144,7 +144,7 @@
 #define CO_CALL_BLOCKING(resumable) \
 	({ \
 			auto rfResult = resumable; \
-			while (rfResult.getState() > xpcc::co::NestingError) \
+			while (rfResult.getState() > xpcc::rf::NestingError) \
 			{ rfResult = resumable; } \
 			rfResult.getResult(); \
 	})
@@ -160,9 +160,9 @@
 			CO_INTERNAL_SET_CASE(__COUNTER__); \
 			{ \
 				auto rfResult = resumable; \
-				if (rfResult.getState() > xpcc::co::NestingError) { \
+				if (rfResult.getState() > xpcc::rf::NestingError) { \
 					this->popRf(); \
-					return {xpcc::co::Running}; \
+					return {xpcc::rf::Running}; \
 				} \
 				CO_RETURN(rfResult.getResult()); \
 			} \
@@ -178,7 +178,7 @@
 	{ \
 			this->stopRf(rfIndex); \
 			this->popRf(); \
-			return {xpcc::co::Stop, (result)}; \
+			return {xpcc::rf::Stop, (result)}; \
 	}
 
 
@@ -192,7 +192,7 @@
 #define CO_INTERNAL_SET_CASE_YIELD(counter) \
 			this->setRf((counter % 255) + 1, rfIndex); \
 			this->popRf(); \
-			return {xpcc::co::Running}; \
+			return {xpcc::rf::Running}; \
 		case ((counter % 255) + 1): ;
 
 /// Beginner structure for nested resumable functions
@@ -200,9 +200,9 @@
 	constexpr uint16_t rfCounter = __COUNTER__; \
 	this->template checkRfType<true>(); \
 	constexpr uint8_t rfIndex = 0; \
-	if (!this->nestingOkRf()) return {xpcc::co::NestingError}; \
+	if (!this->nestingOkRf()) return {xpcc::rf::NestingError}; \
 	switch (this->pushRf(0)) { \
-		case (::xpcc::co::RfStopped): \
+		case (::xpcc::rf::Stopped): \
 			CO_INTERNAL_SET_CASE(__COUNTER__);
 
 /// Beginner structure for conventional resumable functions
@@ -212,7 +212,7 @@
 	this->template checkRfType<false>(); \
 	constexpr uint_fast8_t rfIndex = index; \
 	switch (this->pushRf(index)) { \
-		case (::xpcc::co::RfStopped): \
+		case (::xpcc::rf::Stopped): \
 			CO_INTERNAL_SET_CASE(__COUNTER__);
 
 // the following completely unreadable preprocessor macro magic is based on this

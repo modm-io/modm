@@ -200,27 +200,27 @@ public:
 	Itg3200(Data &data, uint8_t address=0x68);
 
 
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	configure(LowPassFilter filter=LowPassFilter::Hz20, uint8_t divider=0);
 
 	/// reads the temperature and gyro registers and buffer the results
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	readRotationRate();
 
 
-	xpcc::co::ResumableResult<bool> inline
+	xpcc::ResumableResult<bool> inline
 	setLowPassFilter(LowPassFilter filter)
 	{ return updateFilter(filter, Filter::DLPF_CFG_Mask); }
 
-	xpcc::co::ResumableResult<bool> inline
+	xpcc::ResumableResult<bool> inline
 	setSampleRateDivider(uint8_t divider);
 
 
-	xpcc::co::ResumableResult<bool> inline
+	xpcc::ResumableResult<bool> inline
 	updateInterrupt(Interrupt_t setMask, Interrupt_t clearMask = Interrupt_t(0xf5))
 	{ return updateRegister(1, setMask.value, clearMask.value); }
 
-	xpcc::co::ResumableResult<bool> inline
+	xpcc::ResumableResult<bool> inline
 	updatePower(Power_t setMask, Power_t clearMask = Power_t(0xff))
 	{ return updateRegister(11, setMask.value, clearMask.value); }
 
@@ -239,12 +239,12 @@ public:
 	Status_t getStatus()
 	{ return Status_t(rawBuffer[2]); }
 
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	readStatus();
 
 protected:
 	/// @cond
-	xpcc::co::ResumableResult<bool> inline
+	xpcc::ResumableResult<bool> inline
 	updateFilter(Filter_t setMask, Filter_t clearMask = Filter_t(0x1f))
 	{ return updateRegister(0, setMask.value, clearMask.value); }
 
@@ -262,25 +262,25 @@ public:
 protected:
 	/// @cond
 	/// write a 8bit value a register
-	xpcc::co::ResumableResult<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	write(Register reg, uint8_t &value)
 	{ return write(reg, &value, 1); }
 
 	/// write multiple 8bit values from a start register
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	write(Register reg, uint8_t *buffer, uint8_t length, bool copyBuffer=true);
 
 	/// read a 8bit value from a register
-	xpcc::co::ResumableResult<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	read(Register reg, uint8_t &value)
 	{ return read(reg, &value, 1); }
 
 	/// read multiple 8bit values from a start register
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	read(Register reg, uint8_t *buffer, uint8_t length);
 
 private:
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	updateRegister(uint8_t index, uint8_t setMask, uint8_t clearMask = 0xff);
 	/// @endcond
 

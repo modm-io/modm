@@ -87,21 +87,21 @@ public:
 	void
 	setUpdateRate(uint8_t rate);
 
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	setResolution(Resolution resolution);
 
 	/// Writes the upper limit of the alarm.
-	xpcc::co::ResumableResult<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	setUpperLimit(float temperature)
 	{ return setLimitRegister(Register::TemperatureUpperLimit, temperature); }
 
 	/// Writes the lower limit of the alarm.
-	xpcc::co::ResumableResult<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> ALWAYS_INLINE
 	setLowerLimit(float temperature)
 	{ return setLimitRegister(Register::TemperatureLowerLimit, temperature); }
 
 	/// starts a temperature conversion right now
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	startConversion();
 
 	inline Data&
@@ -111,10 +111,10 @@ private:
 	bool
 	run();
 
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	writeConfiguration();
 
-	xpcc::co::ResumableResult<bool>
+	xpcc::ResumableResult<bool>
 	setLimitRegister(Register reg, float temperature);
 
 	xpcc::ShortTimeout periodTimeout;

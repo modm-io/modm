@@ -54,7 +54,7 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 					if (actionBuffer[{{ actionNumber }}].destination != 0) {
 						component::{{component.name | camelCase}}.getCommunicator()->sendNegativeResponse(response);
 					}
-					else if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(response{{ payload }}) == xpcc::co::Running) {
+					else if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(response{{ payload }}) == xpcc::rf::Running) {
 						actionBuffer[{{ actionNumber }}] = ActionBuffer(header);
 			{%- set actionNumber = actionNumber + 1 %}
 			{%- if action.parameterType != None %}
@@ -149,7 +149,7 @@ Postman::update()
 						{%- set payload = ", payloadBuffer[" ~ payloadNumber ~ "].payload.get<" ~ typePrefix ~ (action.parameterType.name | CamelCase) ~ ">()" %}
 					{%- endif %}
 					case {{ namespace }}::action::{{ action.name | CAMELCASE }}:
-						if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(action.response{{ payload }}) != xpcc::co::Running) {
+						if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(action.response{{ payload }}) != xpcc::rf::Running) {
 							action.remove();
 					{%- if action.parameterType != None %}
 							payloadBuffer[{{ payloadNumber }}].remove();
@@ -191,8 +191,8 @@ uint8_t
 Postman::component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(const xpcc::ResponseHandle& response{{ arguments }})
 {
 	auto result = component::{{ component.name | camelCase }}.action{{ action.name | CamelCase }}({{ payload }});
-	if (result.getState() < xpcc::co::Running) {
-		if (result.getState() == xpcc::co::Stop and result.getResult().response == xpcc::Response::Positive) {
+	if (result.getState() < xpcc::rf::Running) {
+		if (result.getState() == xpcc::rf::Stop and result.getResult().response == xpcc::Response::Positive) {
 			{%- if action.returnType != None %}
 			component::{{component.name | camelCase}}.getCommunicator()->sendResponse(response, result.getResult().data);
 			{%- else %}

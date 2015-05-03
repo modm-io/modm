@@ -21,7 +21,7 @@ xpcc::I2cEeprom<I2cMaster>::I2cEeprom(uint8_t address) :
 // MARK: - write operations
 
 template <typename I2cMaster>
-xpcc::co::ResumableResult<bool>
+xpcc::ResumableResult<bool>
 xpcc::I2cEeprom<I2cMaster>::write(uint16_t address, const uint8_t *data, std::size_t length)
 {
 	CO_BEGIN();
@@ -35,7 +35,7 @@ xpcc::I2cEeprom<I2cMaster>::write(uint16_t address, const uint8_t *data, std::si
 
 // MARK: - read operations
 template <typename I2cMaster>
-xpcc::co::ResumableResult<bool>
+xpcc::ResumableResult<bool>
 xpcc::I2cEeprom<I2cMaster>::read(uint16_t address, uint8_t *data, std::size_t length)
 {
 	CO_BEGIN();

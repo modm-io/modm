@@ -21,7 +21,7 @@ xpcc::Ds1631<I2cMaster>::Ds1631(Data &data, uint8_t address) :
 }
 
 template < typename I2cMaster >
-xpcc::co::ResumableResult<bool>
+xpcc::ResumableResult<bool>
 xpcc::Ds1631<I2cMaster>::initialize()
 {
 	CO_BEGIN();
@@ -59,7 +59,7 @@ xpcc::Ds1631<I2cMaster>::run()
 }
 
 template < typename I2cMaster >
-xpcc::co::ResumableResult<bool>
+xpcc::ResumableResult<bool>
 xpcc::Ds1631<I2cMaster>::setUpdateRate(uint8_t rate)
 {
 	CO_BEGIN();
@@ -82,7 +82,7 @@ xpcc::Ds1631<I2cMaster>::setUpdateRate(uint8_t rate)
 }
 
 template < typename I2cMaster >
-xpcc::co::ResumableResult<bool>
+xpcc::ResumableResult<bool>
 xpcc::Ds1631<I2cMaster>::setResolution(Resolution resolution)
 {
 	CO_BEGIN();
@@ -93,7 +93,7 @@ xpcc::Ds1631<I2cMaster>::setResolution(Resolution resolution)
 }
 
 template < typename I2cMaster >
-xpcc::co::ResumableResult<bool>
+xpcc::ResumableResult<bool>
 xpcc::Ds1631<I2cMaster>::setAlertPolarity(AlertPolarity polarity)
 {
 	CO_BEGIN();
@@ -104,7 +104,7 @@ xpcc::Ds1631<I2cMaster>::setAlertPolarity(AlertPolarity polarity)
 }
 
 template < typename I2cMaster >
-xpcc::co::ResumableResult<bool>
+xpcc::ResumableResult<bool>
 xpcc::Ds1631<I2cMaster>::setConversionMode(ConversionMode mode)
 {
 	CO_BEGIN();
@@ -116,7 +116,7 @@ xpcc::Ds1631<I2cMaster>::setConversionMode(ConversionMode mode)
 
 // MARK: read temperature
 template < typename I2cMaster >
-xpcc::co::ResumableResult<bool>
+xpcc::ResumableResult<bool>
 xpcc::Ds1631<I2cMaster>::readTemperature()
 {
 	CO_BEGIN();
@@ -129,7 +129,7 @@ xpcc::Ds1631<I2cMaster>::readTemperature()
 
 // MARK: configuration
 template < typename I2cMaster >
-xpcc::co::ResumableResult<bool>
+xpcc::ResumableResult<bool>
 xpcc::Ds1631<I2cMaster>::writeConfiguration()
 {
 	CO_BEGIN();
@@ -143,7 +143,7 @@ xpcc::Ds1631<I2cMaster>::writeConfiguration()
 }
 
 template < typename I2cMaster >
-xpcc::co::ResumableResult<bool>
+xpcc::ResumableResult<bool>
 xpcc::Ds1631<I2cMaster>::writeCommand(Command cmd)
 {
 	CO_BEGIN();
@@ -155,7 +155,7 @@ xpcc::Ds1631<I2cMaster>::writeCommand(Command cmd)
 }
 
 template < typename I2cMaster >
-xpcc::co::ResumableResult<bool>
+xpcc::ResumableResult<bool>
 xpcc::Ds1631<I2cMaster>::setLimitRegister(Command cmd, float temperature)
 {
 	CO_BEGIN();

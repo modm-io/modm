@@ -71,10 +71,10 @@ public:
 	transferBlocking(uint8_t *tx, uint8_t *rx, std::size_t length);
 
 
-	static xpcc::co::ResumableResult<uint8_t>
+	static xpcc::ResumableResult<uint8_t>
 	transfer(uint8_t data);
 
-	static xpcc::co::ResumableResult<void>
+	static xpcc::ResumableResult<void>
 	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
 	// end documentation inherited
 
