@@ -133,11 +133,11 @@ namespace xpcc
 %% if target is stm32f3
 			enum class MCOSource : uint32_t
 			{
-				SystemClock   = RCC_CFGR_MRF_SYSCLK,
-				InternalClock = RCC_CFGR_MRF_HSI,
-				ExternalClock = RCC_CFGR_MRF_HSE,
-				ExternalCrystal = RCC_CFGR_MRF_HSE,
-				Pll = RCC_CFGR_MRF_PLL,	///< divided by 2
+				SystemClock   = RCC_CFGR_MCO_SYSCLK,
+				InternalClock = RCC_CFGR_MCO_HSI,
+				ExternalClock = RCC_CFGR_MCO_HSE,
+				ExternalCrystal = RCC_CFGR_MCO_HSE,
+				Pll = RCC_CFGR_MCO_PLL,	///< divided by 2
 			};
 
 			enum class UsbPrescaler : uint32_t
