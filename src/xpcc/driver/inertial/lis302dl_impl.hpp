@@ -20,14 +20,14 @@ xpcc::Lis302dl<Transport>::Lis302dl(Data &data, uint8_t address)
 }
 
 template < class Transport >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Lis302dl<Transport>::configure(Scale scale, MeasurementRate rate)
 {
 	return updateControlRegister(r(scale) | r(rate) | Control1_t(0x47));
 }
 
 template < class Transport >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Lis302dl<Transport>::updateControlRegister(uint8_t index, Control_t setMask, Control_t clearMask)
 {
 	CO_BEGIN();
@@ -40,7 +40,7 @@ xpcc::Lis302dl<Transport>::updateControlRegister(uint8_t index, Control_t setMas
 }
 
 template < class Transport >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Lis302dl<Transport>::writeClickThreshold(Axis axis, uint8_t threshold)
 {
 	switch(axis)
@@ -58,7 +58,7 @@ xpcc::Lis302dl<Transport>::writeClickThreshold(Axis axis, uint8_t threshold)
 }
 
 template < class Transport >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Lis302dl<Transport>::readAcceleration()
 {
 	CO_BEGIN();
@@ -76,7 +76,7 @@ xpcc::Lis302dl<Transport>::readAcceleration()
 
 // ----------------------------------------------------------------------------
 template < class Transport >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Lis302dl<Transport>::updateRegister(uint8_t reg, uint8_t setMask, uint8_t clearMask)
 {
 	CO_BEGIN();

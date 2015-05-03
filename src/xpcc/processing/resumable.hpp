@@ -65,7 +65,7 @@
  *         PT_END();
  *     }
  *
- *     xpcc::co::Result<bool>
+ *     xpcc::co::ResumableResult<bool>
  *     waitForTimer(void *ctx)
  *     {
  *         CO_BEGIN();
@@ -79,7 +79,7 @@
  *         CO_END_RETURN(false);
  *     }
  *
- *     xpcc::co::Result<bool>
+ *     xpcc::co::ResumableResult<bool>
  *     setTimer(void *ctx, uint16_t timeout)
  *     {
  *         CO_BEGIN();

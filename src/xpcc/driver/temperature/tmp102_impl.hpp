@@ -56,7 +56,7 @@ xpcc::Tmp102<I2cMaster>::getData()
 // ----------------------------------------------------------------------------
 // MARK: - tasks
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Tmp102<I2cMaster>::setUpdateRate(uint8_t rate)
 {
 	CO_BEGIN();
@@ -100,7 +100,7 @@ xpcc::Tmp102<I2cMaster>::setUpdateRate(uint8_t rate)
 
 // MARK: Extended mode
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Tmp102<I2cMaster>::enableExtendedMode(bool enable)
 {
 	CO_BEGIN();
@@ -112,7 +112,7 @@ xpcc::Tmp102<I2cMaster>::enableExtendedMode(bool enable)
 
 // MARK: conversion
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Tmp102<I2cMaster>::startConversion()
 {
 	CO_BEGIN();
@@ -130,7 +130,7 @@ xpcc::Tmp102<I2cMaster>::startConversion()
 
 // MARK: read temperature
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Tmp102<I2cMaster>::readComparatorMode(bool &result)
 {
 	CO_BEGIN();
@@ -151,7 +151,7 @@ xpcc::Tmp102<I2cMaster>::readComparatorMode(bool &result)
 
 // MARK: configuration
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Tmp102<I2cMaster>::writeConfiguration(uint8_t length)
 {
 	CO_BEGIN();
@@ -166,7 +166,7 @@ xpcc::Tmp102<I2cMaster>::writeConfiguration(uint8_t length)
 }
 
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Tmp102<I2cMaster>::setLimitRegister(Register reg, float temperature)
 {
 	CO_BEGIN();

@@ -65,7 +65,7 @@ xpcc::Tmp175<I2cMaster>::setUpdateRate(uint8_t rate)
 }
 
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Tmp175<I2cMaster>::setResolution(Resolution resolution)
 {
 	CO_BEGIN();
@@ -79,7 +79,7 @@ xpcc::Tmp175<I2cMaster>::setResolution(Resolution resolution)
 
 // MARK: conversion
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Tmp175<I2cMaster>::startConversion()
 {
 	CO_BEGIN();
@@ -97,7 +97,7 @@ xpcc::Tmp175<I2cMaster>::startConversion()
 
 // MARK: configuration
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Tmp175<I2cMaster>::writeConfiguration()
 {
 	CO_BEGIN();
@@ -111,7 +111,7 @@ xpcc::Tmp175<I2cMaster>::writeConfiguration()
 }
 
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Tmp175<I2cMaster>::setLimitRegister(Register reg, float temperature)
 {
 	CO_BEGIN();

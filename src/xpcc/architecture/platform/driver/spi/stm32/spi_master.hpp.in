@@ -136,10 +136,10 @@ public:
 	}
 
 
-	static xpcc::co::Result<uint8_t>
+	static xpcc::co::ResumableResult<uint8_t>
 	transfer(uint8_t data);
 
-	static xpcc::co::Result<void>
+	static xpcc::co::ResumableResult<void>
 	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
 	// end documentation inherited
 };

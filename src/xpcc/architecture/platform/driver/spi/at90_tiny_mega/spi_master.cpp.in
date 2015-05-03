@@ -68,7 +68,7 @@ xpcc::{{target.family}}::SpiMaster::release(void *ctx)
 }
 // ----------------------------------------------------------------------------
 
-xpcc::co::Result<uint8_t>
+xpcc::co::ResumableResult<uint8_t>
 xpcc::{{target.family}}::SpiMaster::transfer(uint8_t data)
 {
 %% if parameters.busywait
@@ -107,14 +107,14 @@ xpcc::{{target.family}}::SpiMaster::transfer(uint8_t data)
 %% endif
 }
 
-xpcc::co::Result<void>
+xpcc::co::ResumableResult<void>
 xpcc::{{target.family}}::SpiMaster::transfer(
 		uint8_t *tx, uint8_t *rx, std::size_t length)
 {
 %% if parameters.busywait
 	for (std::size_t index = 0; index < length; index++)
 	{
-		xpcc::co::Result<uint8_t> result = transfer(tx ? tx[index] : 0);
+		xpcc::co::ResumableResult<uint8_t> result = transfer(tx ? tx[index] : 0);
 		if (rx) rx[index] = result.getResult();
 	}
 	return {xpcc::co::Stop};
@@ -142,7 +142,7 @@ xpcc::{{target.family}}::SpiMaster::transfer(
 		default:
 		{
 				// call the resumable function
-				xpcc::co::Result<uint8_t> result = transfer(tx ? tx[index] : 0);
+				xpcc::co::ResumableResult<uint8_t> result = transfer(tx ? tx[index] : 0);
 
 				// if the resumable function is still running, so are we
 				if (result.getState() > xpcc::co::NestingError)

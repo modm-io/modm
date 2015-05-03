@@ -42,18 +42,18 @@ public:
 protected:
 	// RAW REGISTER ACCESS
 	/// write a 8bit value
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	write(uint8_t reg, uint8_t value);
 
 	/// read a 8bit value
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::co::ResumableResult<bool> ALWAYS_INLINE
 	read(uint8_t reg, uint8_t &value)
 	{
 		return read(reg, &value, 1);
 	}
 
 	/// read multiple 8bit values from a start register
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	read(uint8_t reg, uint8_t *buffer, uint8_t length);
 
 	// increment address or not?
@@ -87,24 +87,24 @@ public:
 	Lis3TransportSpi(uint8_t /*address*/);
 
 	/// pings the sensor
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	ping();
 
 protected:
 	// RAW REGISTER ACCESS
 	/// write a 8bit value
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	write(uint8_t reg, uint8_t value);
 
 	/// read a 8bit value
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::co::ResumableResult<bool> ALWAYS_INLINE
 	read(uint8_t reg, uint8_t &value)
 	{
 		return read(reg, &value, 1);
 	}
 
 	/// read multiple 8bit values from a start register
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	read(uint8_t reg, uint8_t *buffer, uint8_t length);
 
 	// increment address or not?

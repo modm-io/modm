@@ -23,7 +23,7 @@ xpcc::Hmc6343<I2cMaster>::Hmc6343(Data &data, uint8_t address)
 // MARK: - register access
 // MARK: write command
 template < class I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Hmc6343<I2cMaster>::writeCommand(Command command, uint16_t timeout)
 {
 	CO_BEGIN();
@@ -39,7 +39,7 @@ xpcc::Hmc6343<I2cMaster>::writeCommand(Command command, uint16_t timeout)
 
 // MARK: write register
 template < class I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Hmc6343<I2cMaster>::writeRegister(Register reg, uint8_t value)
 {
 	CO_BEGIN();
@@ -58,7 +58,7 @@ xpcc::Hmc6343<I2cMaster>::writeRegister(Register reg, uint8_t value)
 
 // MARK: write 16bit register
 template < class I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Hmc6343<I2cMaster>::writeRegister(Register16 reg, uint16_t value)
 {
 	CO_BEGIN();
@@ -75,7 +75,7 @@ xpcc::Hmc6343<I2cMaster>::writeRegister(Register16 reg, uint16_t value)
 
 // MARK: read register
 template < class I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Hmc6343<I2cMaster>::readRegister(Register reg, uint8_t &value)
 {
 	CO_BEGIN();
@@ -101,7 +101,7 @@ xpcc::Hmc6343<I2cMaster>::readRegister(Register reg, uint8_t &value)
 
 // MARK: read 16bit register
 template < class I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Hmc6343<I2cMaster>::readRegister(Register16 reg, uint16_t &value)
 {
 	CO_BEGIN();
@@ -125,7 +125,7 @@ xpcc::Hmc6343<I2cMaster>::readRegister(Register16 reg, uint16_t &value)
 
 // MARK: read 6 or 1 bytes of data
 template < class I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Hmc6343<I2cMaster>::readPostData(Command command, uint8_t offset, uint8_t readSize)
 {
 	CO_BEGIN();

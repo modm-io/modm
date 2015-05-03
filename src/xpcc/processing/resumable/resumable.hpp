@@ -41,12 +41,12 @@ State
 /// All resumable functions return an encapsulated result type.
 /// @warning The result type **must** have a default constructor!
 template < typename T >
-struct Result
+struct ResumableResult
 {
 	/// Return only the `state`. The `result` will be initialized by it's default constructor.
-	Result(uint_fast8_t state) : state(state) {}
+	ResumableResult(uint_fast8_t state) : state(state) {}
 	/// Return `state` and valid `result`.
-	Result(uint_fast8_t state, T result) : state(state), result(result) {}
+	ResumableResult(uint_fast8_t state, T result) : state(state), result(result) {}
 
 	inline uint_fast8_t
 	getState()
@@ -65,12 +65,12 @@ private:
 /// @cond
 /// void is not an object type
 template <>
-struct Result<void>
+struct ResumableResult<void>
 {
 	/// Return only the `state`. There is no result.
-	Result(uint_fast8_t state) : state(state) {}
+	ResumableResult(uint_fast8_t state) : state(state) {}
 	/// Constructor with dummy result needed by the `CO_CALL_BLOCKING` macro.
-	Result(uint_fast8_t state, uint_fast8_t /*dummy_result*/) : state(state) {}
+	ResumableResult(uint_fast8_t state, uint_fast8_t /*dummy_result*/) : state(state) {}
 
 	inline uint_fast8_t
 	getState()
@@ -105,7 +105,7 @@ static constexpr RfState RfStopped = RfState(0);
  * the unique index of your resumable function starting at zero.
  * You may exit and return a value by using `CO_RETURN(value)` or
  * return the result of another resumable function using `CO_RETURN_CALL(resumable())`.
- * This return value is wrapped in a `xpcc::co::Result<Type>` struct
+ * This return value is wrapped in a `xpcc::co::ResumableResult<Type>` struct
  * and transparently returned by the `CO_CALL` macro so it can be used
  * to influence your program flow.
  * If the resumable function reaches `CO_END()` it will exit automatically,
@@ -224,7 +224,7 @@ public:
 	 *
 	 * @return	>`NestingError` if still running, <=`NestingError` if it has finished.
 	 */
-	xpcc::co::Result< ReturnType >
+	xpcc::co::ResumableResult< ReturnType >
 	resumable(...);
 	/// @endcond
 #endif

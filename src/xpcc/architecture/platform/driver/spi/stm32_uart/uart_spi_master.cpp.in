@@ -63,7 +63,7 @@ xpcc::stm32::UartSpiMaster{{ id }}::release(void *ctx)
 }
 // ----------------------------------------------------------------------------
 
-xpcc::co::Result<uint8_t>
+xpcc::co::ResumableResult<uint8_t>
 xpcc::stm32::UartSpiMaster{{ id }}::transfer(uint8_t data)
 {
 	// this is a manually implemented "fast resumable function"
@@ -103,7 +103,7 @@ xpcc::stm32::UartSpiMaster{{ id }}::transfer(uint8_t data)
 	return {xpcc::co::Stop, data};
 }
 
-xpcc::co::Result<void>
+xpcc::co::ResumableResult<void>
 xpcc::stm32::UartSpiMaster{{ id }}::transfer(
 		uint8_t * tx, uint8_t * rx, std::size_t length)
 {
@@ -130,7 +130,7 @@ xpcc::stm32::UartSpiMaster{{ id }}::transfer(
 		default:
 		{
 				// call the resumable function
-				xpcc::co::Result<uint8_t> result = transfer(tx ? tx[index] : 0);
+				xpcc::co::ResumableResult<uint8_t> result = transfer(tx ? tx[index] : 0);
 
 				// if the resumable function is still running, so are we
 				if (result.getState() > xpcc::co::NestingError)

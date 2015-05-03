@@ -66,7 +66,7 @@ public:
 
 	/// @retval true	device responds to address
 	/// @retval false	no device with address found
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	ping()
 	{
 		CO_BEGIN();
@@ -134,7 +134,7 @@ protected:
 	}
 
 	/// Starts our own transaction and waits until finished.
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	runTransaction()
 	{
 		CO_BEGIN();

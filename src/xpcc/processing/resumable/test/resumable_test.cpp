@@ -19,7 +19,7 @@ public:
 	{
 	}
 
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	task1()
 	{
 		CO_BEGIN();
@@ -34,7 +34,7 @@ public:
 		CO_END_RETURN(false);
 	}
 
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	task2()
 	{
 		CO_BEGIN();
@@ -56,7 +56,7 @@ public:
 	{
 	}
 
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	task1()
 	{
 		CO_BEGIN();
@@ -71,7 +71,7 @@ public:
 		CO_END();
 	}
 
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	task2()
 	{
 		CO_BEGIN();
@@ -93,7 +93,7 @@ public:
 	{
 	}
 
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	task1()
 	{
 		CO_BEGIN();
@@ -108,7 +108,7 @@ public:
 		CO_END();
 	}
 
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	task2()
 	{
 		CO_BEGIN();
@@ -251,7 +251,7 @@ public:
 	{
 	}
 
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	task1()
 	{
 		CO_BEGIN();
@@ -278,7 +278,7 @@ public:
 	}
 
 protected:
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	task2()
 	{
 		CO_BEGIN();
@@ -303,7 +303,7 @@ protected:
 		CO_END();
 	}
 
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	task3()
 	{
 		CO_BEGIN();
@@ -335,9 +335,9 @@ public:
 	bool condition1;
 	bool condition2;
 	bool condition3;
-	xpcc::co::Result<bool> callResult1;
-	xpcc::co::Result<bool> callResult2;
-	xpcc::co::Result<bool> callResult3;
+	xpcc::co::ResumableResult<bool> callResult1;
+	xpcc::co::ResumableResult<bool> callResult2;
+	xpcc::co::ResumableResult<bool> callResult3;
 };
 //*/
 
@@ -456,7 +456,7 @@ public:
 	{
 	}
 
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	parentResumable()
 	{
 		CO_BEGIN();
@@ -478,7 +478,7 @@ public:
 	}
 
 protected:
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	spawningResumable(uint8_t calls)
 	{
 		CO_BEGIN();
@@ -584,7 +584,7 @@ public:
 	{
 	}
 
-	xpcc::co::Result<uint16_t>
+	xpcc::co::ResumableResult<uint16_t>
 	parentResumable()
 	{
 		// this is an unelegant way of using 'local' variables in a Resumable.
@@ -647,7 +647,7 @@ public:
 	}
 
 protected:
-	xpcc::co::Result<uint8_t>
+	xpcc::co::ResumableResult<uint8_t>
 	spawningResumable1()
 	{
 		CO_BEGIN();
@@ -657,7 +657,7 @@ protected:
 		CO_END();
 	}
 
-	xpcc::co::Result<int8_t>
+	xpcc::co::ResumableResult<int8_t>
 	spawningResumable2()
 	{
 		CO_BEGIN();
@@ -760,7 +760,7 @@ ResumableTest::testComplexSpawn()
 class TestingCaseLabelThread : public xpcc::co::NestedResumable<>
 {
 public:
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	resumable()
 	{
 		CO_BEGIN();
@@ -833,7 +833,7 @@ public:
 		Cat,
 	};
 
-	xpcc::co::Result<Animal>
+	xpcc::co::ResumableResult<Animal>
 	resumable()
 	{
 		CO_BEGIN();
@@ -861,7 +861,7 @@ ResumableTest::testReturnEnumClass()
 class TestingCaseVoidClassThread : public xpcc::co::NestedResumable<>
 {
 public:
-	xpcc::co::Result<void>
+	xpcc::co::ResumableResult<void>
 	resumable()
 	{
 		CO_BEGIN();
@@ -893,7 +893,7 @@ ResumableTest::testReturnVoidClass()
 class TestingNonMutuallyExclusiveResumables : public xpcc::co::Resumable<3>
 {
 public:
-	xpcc::co::Result<void>
+	xpcc::co::ResumableResult<void>
 	call0()
 	{
 		CO_BEGIN(0);
@@ -905,7 +905,7 @@ public:
 		CO_END();
 	}
 
-	xpcc::co::Result<void>
+	xpcc::co::ResumableResult<void>
 	call1()
 	{
 		CO_BEGIN(1);
@@ -920,7 +920,7 @@ public:
 		CO_END();
 	}
 
-	xpcc::co::Result<void>
+	xpcc::co::ResumableResult<void>
 	call2()
 	{
 		CO_BEGIN(2);

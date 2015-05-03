@@ -22,7 +22,7 @@ xpcc::Lis3dsh<Transport>::Lis3dsh(Data &data, uint8_t address)
 }
 
 template < class Transport >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Lis3dsh<Transport>::configure(Scale scale, MeasurementRate rate)
 {
 	CO_BEGIN();
@@ -50,7 +50,7 @@ xpcc::Lis3dsh<Transport>::configure(Scale scale, MeasurementRate rate)
 }
 
 template < class Transport >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Lis3dsh<Transport>::updateControlRegister(uint8_t index, Control_t setMask, Control_t clearMask)
 {
 	CO_BEGIN();
@@ -70,7 +70,7 @@ xpcc::Lis3dsh<Transport>::updateControlRegister(uint8_t index, Control_t setMask
 }
 
 template < class Transport >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Lis3dsh<Transport>::readAcceleration()
 {
 	CO_BEGIN();
@@ -87,7 +87,7 @@ xpcc::Lis3dsh<Transport>::readAcceleration()
 
 // ----------------------------------------------------------------------------
 template < class Transport >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Lis3dsh<Transport>::updateRegister(uint8_t reg, uint8_t setMask, uint8_t clearMask)
 {
 	CO_BEGIN();

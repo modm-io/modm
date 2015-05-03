@@ -134,29 +134,29 @@ public:
 
 	// MARK: Configuration
 	// @param	rate	Update rate in Hz: 0 to 33. (Use 0 to update at 0.25Hz).
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	setUpdateRate(uint8_t rate);
 
 	/// Enables extended mode with 13 bit data format.
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	enableExtendedMode(bool enable = true);
 
 	/// param[out]	result	contains comparator mode alert in the configured polarity
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	readComparatorMode(bool &result);
 
 	/// Writes the upper limit of the alarm.
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::co::ResumableResult<bool> ALWAYS_INLINE
 	setUpperLimit(float temperature)
 	{ return setLimitRegister(Register::TemperatureUpperLimit, temperature); }
 
 	/// Writes the lower limit of the alarm.
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::co::ResumableResult<bool> ALWAYS_INLINE
 	setLowerLimit(float temperature)
 	{ return setLimitRegister(Register::TemperatureLowerLimit, temperature); }
 
 	/// starts a temperature conversion right now
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	startConversion();
 
 	inline Data&
@@ -166,10 +166,10 @@ private:
 	bool
 	run();
 
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	writeConfiguration(uint8_t length=3);
 
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	setLimitRegister(Register reg, float temperature);
 
 	xpcc::ShortTimeout timeout;

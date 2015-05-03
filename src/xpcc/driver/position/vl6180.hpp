@@ -352,34 +352,34 @@ public:
 	/// Constructor, requires an vl6180::Data object, sets address to default of 0x29
 	Vl6180(Data &data, uint8_t address=0x29);
 
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	ping();
 
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	initialize();
 
 	/// Set a new I2C address (< 128) for this device.
 	/// The address is not permanent and must be set again after every device boot.
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	setDeviceAddress(uint8_t address);
 
 	/// Sets a new analog gain for ALS.
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	setGain(AnalogGain gain);
 
 	/// Sets a new integration time for ALS.
 	/// @param	time	integration time in ms, max ~500ms.
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	setIntegrationTime(uint16_t time);
 
 	/// Reads the distance and buffer the results (can take 10-55ms).
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	readDistance()
 	{ return readSensor(true); }
 
 	/// Reads the ambient light and buffer the results.
 	/// This takes as long as the chosen integration time (100ms default).
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	readAmbientLight()
 	{ return readSensor(false); }
 
@@ -393,7 +393,7 @@ public:
 
 
 	template <typename T>
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	updateRegister(Register reg, T setMask, T clearMask = T(0xff))
 	{
 		return updateControlRegister(reg, Control_t(setMask), Control_t(clearMask));
@@ -401,14 +401,14 @@ public:
 
 public:
 	/// write a 8bit value a register
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::co::ResumableResult<bool> ALWAYS_INLINE
 	write(Register reg, uint8_t value)
 	{ return write(reg, value, 1); }
 
 protected:
 	/// @cond
 	/// read a 8bit value from a register
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::co::ResumableResult<bool> ALWAYS_INLINE
 	read(Register reg, uint8_t &value)
 	{ return read(reg, &value, 1); }
 	/// @endcond
@@ -422,23 +422,23 @@ public:
 protected:
 	/// @cond
 	/// write multiple 8bit values from a start register
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	write(Register reg, uint8_t value, uint8_t length);
 	/// @endcond
 
 public:
 	/// read multiple 8bit values from a start register
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	read(Register reg, uint8_t *buffer, uint8_t length);
 
 protected:
 	/// @cond
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	updateControlRegister(Register reg, Control_t setMask, Control_t clearMask = Control_t(0xff));
 	/// @endcond
 
 private:
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	readSensor(bool isDistance = true);
 
 private:

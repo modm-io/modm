@@ -21,7 +21,7 @@ xpcc::Itg3200<I2cMaster>::Itg3200(Data &data, uint8_t address)
 
 // MARK: - Tasks
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Itg3200<I2cMaster>::configure(LowPassFilter filter, uint8_t divider)
 {
 	CO_BEGIN();
@@ -34,7 +34,7 @@ xpcc::Itg3200<I2cMaster>::configure(LowPassFilter filter, uint8_t divider)
 }
 
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Itg3200<I2cMaster>::readRotationRate()
 {
 	CO_BEGIN();
@@ -49,7 +49,7 @@ xpcc::Itg3200<I2cMaster>::readRotationRate()
 }
 
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Itg3200<I2cMaster>::setSampleRateDivider(uint8_t divider)
 {
 	CO_BEGIN();
@@ -62,7 +62,7 @@ xpcc::Itg3200<I2cMaster>::setSampleRateDivider(uint8_t divider)
 // ----------------------------------------------------------------------------
 // MARK: - register access
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Itg3200<I2cMaster>::readStatus()
 {
 	return read(Register::INT_STATUS, rawBuffer[2]);
@@ -70,7 +70,7 @@ xpcc::Itg3200<I2cMaster>::readStatus()
 
 // MARK: update register
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Itg3200<I2cMaster>::updateRegister(uint8_t index, uint8_t setMask, uint8_t clearMask)
 {
 	CO_BEGIN();
@@ -82,7 +82,7 @@ xpcc::Itg3200<I2cMaster>::updateRegister(uint8_t index, uint8_t setMask, uint8_t
 
 // MARK: write multilength register
 template < class I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Itg3200<I2cMaster>::write(Register reg, uint8_t *buffer, uint8_t length, bool copyBuffer)
 {
 	CO_BEGIN();
@@ -100,7 +100,7 @@ xpcc::Itg3200<I2cMaster>::write(Register reg, uint8_t *buffer, uint8_t length, b
 
 // MARK: read multilength register
 template < class I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Itg3200<I2cMaster>::read(Register reg, uint8_t *buffer, uint8_t length)
 {
 	CO_BEGIN();

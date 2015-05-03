@@ -22,7 +22,7 @@ xpcc::Ssd1306<I2cMaster>::Ssd1306(uint8_t address)
 // ----------------------------------------------------------------------------
 // MARK: - Tasks
 template < class I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Ssd1306<I2cMaster>::initialize()
 {
 	CO_BEGIN();
@@ -52,7 +52,7 @@ xpcc::Ssd1306<I2cMaster>::initialize()
 
 // ----------------------------------------------------------------------------
 template < class I2cMaster >
-xpcc::co::Result<void>
+xpcc::co::ResumableResult<void>
 xpcc::Ssd1306<I2cMaster>::startWriteDisplay()
 {
 	CO_BEGIN();
@@ -63,7 +63,7 @@ xpcc::Ssd1306<I2cMaster>::startWriteDisplay()
 }
 
 template < class I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Ssd1306<I2cMaster>::writeDisplay()
 {
 	CO_BEGIN();
@@ -76,7 +76,7 @@ xpcc::Ssd1306<I2cMaster>::writeDisplay()
 }
 
 template < class I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Ssd1306<I2cMaster>::setRotation(Rotation rotation)
 {
 	CO_BEGIN();
@@ -92,7 +92,7 @@ xpcc::Ssd1306<I2cMaster>::setRotation(Rotation rotation)
 }
 
 template < class I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Ssd1306<I2cMaster>::configureScroll(uint8_t origin, uint8_t size,
 		ScrollDirection direction, ScrollStep steps)
 {
@@ -126,7 +126,7 @@ xpcc::Ssd1306<I2cMaster>::configureScroll(uint8_t origin, uint8_t size,
 // ----------------------------------------------------------------------------
 // MARK: write command
 template < class I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Ssd1306<I2cMaster>::writeCommand(uint8_t command)
 {
 	CO_BEGIN();
@@ -140,7 +140,7 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(uint8_t command)
 }
 
 template < class I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Ssd1306<I2cMaster>::writeCommand(uint8_t command, uint8_t data)
 {
 	CO_BEGIN();
@@ -155,7 +155,7 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(uint8_t command, uint8_t data)
 }
 
 template < class I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::ResumableResult<bool>
 xpcc::Ssd1306<I2cMaster>::writeCommand(uint8_t command, uint8_t data1, uint8_t data2)
 {
 	CO_BEGIN();

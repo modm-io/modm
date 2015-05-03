@@ -81,7 +81,7 @@ namespace co
  * You must begin each resumable function using `CO_BEGIN()`.
  * You may exit and return a value by using `CO_RETURN(value)` or
  * return the result of another resumable function using `CO_RETURN_CALL(resumable())`.
- * This return value is wrapped in a `xpcc::co::Result<Type>` struct
+ * This return value is wrapped in a `xpcc::co::ResumableResult<Type>` struct
  * and transparently returned by the `CO_CALL` macro so it can be used
  * to influence your program flow.
  * If the resumable function reaches `CO_END()` it will exit automatically,
@@ -150,7 +150,7 @@ public:
 	 *
 	 * @return	>`NestingError` if still running, <=`NestingError` if it has finished.
 	 */
-	xpcc::co::Result< ReturnType >
+	xpcc::co::ResumableResult< ReturnType >
 	resumable function(...);
 	/// @endcond
 #endif

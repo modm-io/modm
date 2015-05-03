@@ -195,37 +195,37 @@ protected:
 	Hmc58x3(Data &data, uint8_t address=0x1e);
 
 public:
-	xpcc::co::Result<bool> inline
+	xpcc::co::ResumableResult<bool> inline
 	setOperationMode(OperationMode mode)
 	{ return updateMode(Mode_t(uint8_t(mode)), Mode::MD_Mask); }
 
 
 	// MARK: Read access
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	readMagneticField();
 
 
 protected:
 	/// @cond
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	configureRaw(uint8_t rate, uint8_t gain, const uint8_t* gainValues, uint8_t average=0);
 
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	setGainRaw(uint8_t gain, const uint8_t* gainValues);
 	/// @endcond
 
 
 protected:
 	// MARK: Control Registers
-	xpcc::co::Result<bool> inline
+	xpcc::co::ResumableResult<bool> inline
 	updateConfigA(ConfigA_t setMask, ConfigA_t clearMask = ConfigA_t(0x7f))
 	{ return updateRegister(0, setMask.value, clearMask.value); }
 
-	xpcc::co::Result<bool> inline
+	xpcc::co::ResumableResult<bool> inline
 	updateConfigB(ConfigB_t setMask, ConfigB_t clearMask = ConfigB_t(0xe0))
 	{ return updateRegister(1, setMask.value, clearMask.value); }
 
-	xpcc::co::Result<bool> inline
+	xpcc::co::ResumableResult<bool> inline
 	updateMode(Mode_t setMask, Mode_t clearMask = Mode::MD_Mask)
 	{ return updateRegister(2, setMask.value, clearMask.value); }
 
@@ -245,7 +245,7 @@ public:
 	Status_t getStatus()
 	{ return Status_t(rawBuffer[9]); }
 
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	readStatus();
 
 public:
@@ -257,25 +257,25 @@ public:
 protected:
 	/// @cond
 	/// write a 8bit value a register
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::co::ResumableResult<bool> ALWAYS_INLINE
 	write(Register reg, uint8_t &value)
 	{ return write(reg, &value, 1); }
 
 	/// write multiple 8bit values from a start register
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	write(Register reg, uint8_t *buffer, uint8_t length);
 
 	/// read a 8bit value from a register
-	xpcc::co::Result<bool> ALWAYS_INLINE
+	xpcc::co::ResumableResult<bool> ALWAYS_INLINE
 	read(Register reg, uint8_t &value)
 	{ return read(reg, &value, 1); }
 
 	/// read multiple 8bit values from a start register
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	read(Register reg, uint8_t *buffer, uint8_t length);
 
 private:
-	xpcc::co::Result<bool>
+	xpcc::co::ResumableResult<bool>
 	updateRegister(uint8_t index, uint8_t setMask, uint8_t clearMask = 0xff);
 	/// @endcond
 
