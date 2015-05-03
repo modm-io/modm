@@ -107,11 +107,11 @@ class NestedResumable
 protected:
 	/// Construct a new class with nested resumable functions
 	NestedResumable()
-	:	coLevel(0)
+	:	rfLevel(0)
 	{
-		for (CoState &level : coStateArray)
+		for (RfState &level : rfStateArray)
 		{
-			level = CoStopped;
+			level = RfStopped;
 		}
 	}
 
@@ -120,10 +120,10 @@ public:
 	inline void
 	stopResumable()
 	{
-		uint_fast8_t level = coLevel;
+		uint_fast8_t level = rfLevel;
 		while (level < Levels)
 		{
-			coStateArray[level++] = CoStopped;
+			rfStateArray[level++] = RfStopped;
 		}
 	}
 
@@ -131,14 +131,14 @@ public:
 	bool inline
 	isResumableRunning() const
 	{
-		return !isStoppedCo();
+		return !isStoppedRf();
 	}
 
 	/// @return the nesting depth in the current resumable function, or -1 if called outside any resumable function
 	int8_t inline
 	getResumableDepth() const
 	{
-		return static_cast<int8_t>(coLevel) - 1;
+		return static_cast<int8_t>(rfLevel) - 1;
 	}
 
 #ifdef __DOXYGEN__
@@ -160,72 +160,72 @@ protected:
 
 	/// increases nesting level, call this in the switch statement!
 	/// @return current state before increasing nesting level
-	CoState inline
-	pushCo(uint8_t /*index*/)
+	RfState inline
+	pushRf(uint8_t /*index*/)
 	{
-		return coStateArray[coLevel++];
+		return rfStateArray[rfLevel++];
 	}
 
 	/// always call this before returning from the run function!
 	/// decreases nesting level
 	void inline
-	popCo()
+	popRf()
 	{
-		coLevel--;
+		rfLevel--;
 	}
 
 	// invalidates the parent nesting level
-	// @warning	be aware in which nesting level you call this! (before popCo()!)
+	// @warning	be aware in which nesting level you call this! (before popRf()!)
 	void inline
-	stopCo(uint8_t /*index*/)
+	stopRf(uint8_t /*index*/)
 	{
-		coStateArray[coLevel-1] = CoStopped;
+		rfStateArray[rfLevel-1] = RfStopped;
 	}
 
 	/// sets the state of the parent nesting level
-	/// @warning	be aware in which nesting level you call this! (before popCo()!)
+	/// @warning	be aware in which nesting level you call this! (before popRf()!)
 	void inline
-	setCo(CoState state, uint8_t /*index*/)
+	setRf(RfState state, uint8_t /*index*/)
 	{
-		coStateArray[coLevel-1] = state;
+		rfStateArray[rfLevel-1] = state;
 	}
 
 	/// @return `true` if the nesting depth allows for another level.
-	/// @warning	be aware in which nesting level you call this! (before pushCo()!)
+	/// @warning	be aware in which nesting level you call this! (before pushRf()!)
 	bool inline
-	nestingOkCo() const
+	nestingOkRf() const
 	{
 #if XPCC_RESUMABLE_CHECK_NESTING_DEPTH
-		return (coLevel < Levels);
+		return (rfLevel < Levels);
 #else
 		return true;
 #endif
 	}
 
-	/// @return	`true` if `stopCo()` has been called before
+	/// @return	`true` if `stopRf()` has been called before
 	bool inline
-	isStoppedCo() const
+	isStoppedRf() const
 	{
-		return (coStateArray[coLevel] == CoStopped);
+		return (rfStateArray[rfLevel] == RfStopped);
 	}
 
 	/// compatibility with Resumable class
 	template<uint8_t index>
 	static void
-	checkCoMethods()
+	checkRfFunctions()
 	{}
 
 	/// asserts that this method is called in this parent class
 	template<bool isNested>
 	static void
-	checkCoType()
+	checkRfType()
 	{
 		static_assert(isNested == true, "You cannot declare an index for a _nested_ resumable function!");
 	}
 	/// @endcond
 private:
-	uint_fast8_t coLevel;
-	CoState coStateArray[Levels];
+	uint_fast8_t rfLevel;
+	RfState rfStateArray[Levels];
 };
 
 // ----------------------------------------------------------------------------
@@ -236,7 +236,7 @@ class NestedResumable<1>
 {
 protected:
 	NestedResumable() :
-		coLevel(-1), coState(CoStopped)
+		rfLevel(-1), rfState(RfStopped)
 	{
 	}
 
@@ -244,78 +244,78 @@ public:
 	void inline
 	stopResumable()
 	{
-		coState = CoStopped;
+		rfState = RfStopped;
 	}
 
 	bool inline
 	isResumableRunning() const
 	{
-		return !isStoppedCo();
+		return !isStoppedRf();
 	}
 
 	int8_t inline
 	getResumableDepth() const
 	{
-		return coLevel;
+		return rfLevel;
 	}
 
 protected:
-	CoState inline
-	pushCo(uint8_t /*index*/)
+	RfState inline
+	pushRf(uint8_t /*index*/)
 	{
-		coLevel = 0;
-		return coState;
+		rfLevel = 0;
+		return rfState;
 	}
 
 	void inline
-	popCo()
+	popRf()
 	{
-		coLevel = -1;
+		rfLevel = -1;
 	}
 
 	void inline
-	stopCo(uint8_t /*index*/)
+	stopRf(uint8_t /*index*/)
 	{
-		coState = CoStopped;
+		rfState = RfStopped;
 	}
 
 	bool inline
-	nestingOkCo() const
+	nestingOkRf() const
 	{
 #if XPCC_RESUMABLE_CHECK_NESTING_DEPTH
-		return (coLevel != 0);
+		return (rfLevel != 0);
 #else
 		return true;
 #endif
 	}
 
 	void inline
-	setCo(CoState state, uint8_t /*index*/)
+	setRf(RfState state, uint8_t /*index*/)
 	{
-		coState = state;
+		rfState = state;
 	}
 
 	bool inline
-	isStoppedCo() const
+	isStoppedRf() const
 	{
-		return (coState == CoStopped);
+		return (rfState == RfStopped);
 	}
 
 	template<uint8_t index>
 	static void
-	checkCoMethods()
+	checkRfFunctions()
 	{}
 
 	template<bool isNested>
 	static void
-	checkCoType()
+	checkRfType()
 	{
 		static_assert(isNested == true, "You cannot declare an index for a _nested_ resumable function!");
 	}
 
 private:
-	int_fast8_t coLevel;
-	CoState coState;
+	int_fast8_t rfLevel;
+	RfState rfState;
 };
 /// @endcond
 

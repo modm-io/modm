@@ -89,9 +89,9 @@ private:
 /// @cond
 /// Used to store a resumable function's position (what Dunkels calls a
 /// "local continuation").
-typedef uint8_t CoState;
+typedef uint8_t RfState;
 /// We use 0 instead of -1 since it might be fast to check
-static constexpr CoState CoStopped = CoState(0);
+static constexpr RfState RfStopped = RfState(0);
 /// @endcond
 
 /**
@@ -147,9 +147,9 @@ public:
 	inline void
 	stopAllResumables()
 	{
-		for (CoState &state : coStateArray)
+		for (RfState &state : rfStateArray)
 		{
-			state = CoStopped;
+			state = RfStopped;
 		}
 	}
 
@@ -157,8 +157,8 @@ public:
 	inline bool
 	stopResumable(uint8_t id)
 	{
-		if (id < Methods) {
-			coStateArray[id] = CoStopped;
+		if (id < Functions) {
+			rfStateArray[id] = RfStopped;
 			return true;
 		}
 		return false;
@@ -168,16 +168,16 @@ public:
 	bool inline
 	isResumableRunning(uint8_t id) const
 	{
-		return (id < Functions and coStateArray[id] != CoStopped);
+		return (id < Functions and rfStateArray[id] != RfStopped);
 	}
 
 	/// @return	`true` if any resumable function of this class is running, else `false`
 	bool inline
 	areAnyResumablesRunning() const
 	{
-		for (const CoState state : coStateArray)
+		for (const RfState state : rfStateArray)
 		{
-			if (state != CoStopped)
+			if (state != RfStopped)
 				return true;
 		}
 		return false;
@@ -202,7 +202,7 @@ public:
 		for (uint8_t id : ids)
 		{
 			// = not isResumableRunning(id)
-			if (id >= Functions or coStateArray[id] == CoStopped)
+			if (id >= Functions or rfStateArray[id] == RfStopped)
 				return false;
 		}
 		return true;
@@ -234,67 +234,67 @@ protected:
 
 	/// increases nesting level, call this in the switch statement!
 	/// @return current state before increasing nesting level
-	CoState ALWAYS_INLINE
-	pushCo(uint_fast8_t index) const
+	RfState ALWAYS_INLINE
+	pushRf(uint_fast8_t index) const
 	{
-		return coStateArray[index];
+		return rfStateArray[index];
 	}
 
 	/// always call this before returning from the run function!
 	/// decreases nesting level
 	void ALWAYS_INLINE
-	popCo() const
+	popRf() const
 	{}
 
 	// invalidates the parent nesting level
-	// @warning	be aware in which nesting level you call this! (before popCo()!)
+	// @warning	be aware in which nesting level you call this! (before popRf()!)
 	void ALWAYS_INLINE
-	stopCo(uint_fast8_t index)
+	stopRf(uint_fast8_t index)
 	{
-		coStateArray[index] = CoStopped;
+		rfStateArray[index] = RfStopped;
 	}
 
 	/// sets the state of the parent nesting level
-	/// @warning	be aware in which nesting level you call this! (before popCo()!)
+	/// @warning	be aware in which nesting level you call this! (before popRf()!)
 	void ALWAYS_INLINE
-	setCo(CoState state, uint_fast8_t index)
+	setRf(RfState state, uint_fast8_t index)
 	{
-		coStateArray[index] = state;
+		rfStateArray[index] = state;
 	}
 
 	bool ALWAYS_INLINE
-	nestingOkCo() const
+	nestingOkRf() const
 	{
 		return true;
 	}
 
-	/// @return	`true` if `stopCo()` has been called before
+	/// @return	`true` if `stopRf()` has been called before
 	bool ALWAYS_INLINE
-	isStoppedCo(uint_fast8_t index) const
+	isStoppedRf(uint_fast8_t index) const
 	{
-		return (coStateArray[index] == CoStopped);
+		return (rfStateArray[index] == RfStopped);
 	}
 
 	/// asserts the index is not out of bounds.
 	template<uint8_t index>
 	static void
-	checkCoMethods()
+	checkRfFunctions()
 	{
 		static_assert(index < Functions,
-				"Index out of bounds! Increase the `Methods` template argument of your Resumable class.");
+				"Index out of bounds! Increase the `Functions` template argument of your Resumable class.");
 	}
 
 	/// asserts that this method is called in this parent class
 	template<bool isNested>
 	static void
-	checkCoType()
+	checkRfType()
 	{
 		static_assert(isNested == false, "You must declare an index for this resumable function!");
 	}
 	/// @endcond
 
 private:
-	CoState coStateArray[Functions];
+	RfState rfStateArray[Functions];
 };
 
 } // namespace co
