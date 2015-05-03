@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_NESTED_COROUTINE_HPP
-#define XPCC_NESTED_COROUTINE_HPP
+#ifndef XPCC_NESTED_RESUMABLE_HPP
+#define XPCC_NESTED_RESUMABLE_HPP
 
 #include "macros.hpp"
 #include <xpcc/architecture/utils.hpp>
@@ -37,18 +37,18 @@
  *
 @verbatim
 [defines]
-XPCC_COROUTINE_CHECK_NESTING_DEPTH = false
+XPCC_RESUMABLE_CHECK_NESTING_DEPTH = false
 @endverbatim
  *
  * @see	NestedResumable
  * @ingroup	coroutine
  */
-#define XPCC_COROUTINE_CHECK_NESTING_DEPTH	true
+#define XPCC_RESUMABLE_CHECK_NESTING_DEPTH	true
 
 #else
 // by default we check all nesting level depths
-#	ifndef	XPCC_COROUTINE_CHECK_NESTING_DEPTH
-#		define XPCC_COROUTINE_CHECK_NESTING_DEPTH	true
+#	ifndef	XPCC_RESUMABLE_CHECK_NESTING_DEPTH
+#		define XPCC_RESUMABLE_CHECK_NESTING_DEPTH	true
 #	endif
 #endif
 
@@ -68,7 +68,7 @@ namespace co
  * `xpcc::co::NestingError` from your called `coroutine()`.
  * It is then up to you to recognise this in your program design
  * and increase the nesting depth or rethink your code.
- * You may disable the check by setting `XPCC_COROUTINE_CHECK_NESTING_DEPTH`
+ * You may disable the check by setting `XPCC_RESUMABLE_CHECK_NESTING_DEPTH`
  * to `false` in your project configuration.
  *
  * The coroutines of this class are mutually exclusive, so only one
@@ -195,7 +195,7 @@ protected:
 	bool inline
 	nestingOkCo() const
 	{
-#if XPCC_COROUTINE_CHECK_NESTING_DEPTH
+#if XPCC_RESUMABLE_CHECK_NESTING_DEPTH
 		return (coLevel < Levels);
 #else
 		return true;
@@ -282,7 +282,7 @@ protected:
 	bool inline
 	nestingOkCo() const
 	{
-#if XPCC_COROUTINE_CHECK_NESTING_DEPTH
+#if XPCC_RESUMABLE_CHECK_NESTING_DEPTH
 		return (coLevel != 0);
 #else
 		return true;
@@ -323,4 +323,4 @@ private:
 
 } // namespace xpcc
 
-#endif // XPCC_NESTED_COROUTINE_HPP
+#endif // XPCC_NESTED_RESUMABLE_HPP

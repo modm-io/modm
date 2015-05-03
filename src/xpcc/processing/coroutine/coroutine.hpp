@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_COROUTINE_HPP
-#define XPCC_COROUTINE_HPP
+#ifndef XPCC_RESUMABLE_HPP
+#define XPCC_RESUMABLE_HPP
 
 #include "macros.hpp"
 #include <xpcc/architecture/utils.hpp>
@@ -302,4 +302,4 @@ private:
 
 } // namespace xpcc
 
-#endif // XPCC_COROUTINE_HPP
+#endif // XPCC_RESUMABLE_HPP
