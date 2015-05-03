@@ -8,10 +8,10 @@
 // ----------------------------------------------------------------------------
 
 #include <xpcc/processing/coroutine.hpp>
-#include "coroutine_test.hpp"
+#include "resumable_test.hpp"
 
 // ----------------------------------------------------------------------------
-class TestingEmptyThread0 : public xpcc::co::NestedCoroutine<1>
+class TestingEmptyThread0 : public xpcc::co::NestedResumable<1>
 {
 public:
 	TestingEmptyThread0()
@@ -25,7 +25,7 @@ public:
 		CO_BEGIN();
 
 		state = 1;
-		depth = getCoroutineDepth();
+		depth = getResumableDepth();
 
 		CO_YIELD();
 
@@ -48,7 +48,7 @@ public:
 	int8_t depth;
 };
 
-class TestingEmptyThread1 : public xpcc::co::NestedCoroutine<2>
+class TestingEmptyThread1 : public xpcc::co::NestedResumable<2>
 {
 public:
 	TestingEmptyThread1()
@@ -62,7 +62,7 @@ public:
 		CO_BEGIN();
 
 		state = 1;
-		depth = getCoroutineDepth();
+		depth = getResumableDepth();
 
 		CO_YIELD();
 
@@ -85,7 +85,7 @@ public:
 	int8_t depth;
 };
 
-class TestingEmptyThread2 : public xpcc::co::NestedCoroutine<3>
+class TestingEmptyThread2 : public xpcc::co::NestedResumable<3>
 {
 public:
 	TestingEmptyThread2()
@@ -99,7 +99,7 @@ public:
 		CO_BEGIN();
 
 		state = 1;
-		depth = getCoroutineDepth();
+		depth = getResumableDepth();
 
 		CO_YIELD();
 
@@ -123,22 +123,22 @@ public:
 };
 
 void
-CoroutineTest::testClassMethods()
+ResumableTest::testClassMethods()
 {
 	// Nesting Depth of zero is specialized
 	TestingEmptyThread0 thread0;
 	// outside the nesting depth should be -1
-	TEST_ASSERT_EQUALS(thread0.getCoroutineDepth(), -1);
+	TEST_ASSERT_EQUALS(thread0.getResumableDepth(), -1);
 	// nothing should have been modified
 	TEST_ASSERT_EQUALS(thread0.state, 0);
 	TEST_ASSERT_EQUALS(thread0.depth, 0);
 	// still not running
-	TEST_ASSERT_FALSE(thread0.isCoroutineRunning());
+	TEST_ASSERT_FALSE(thread0.isResumableRunning());
 
 	// lets start a task, which will yield
 	TEST_ASSERT_EQUALS(thread0.task1().getState(), xpcc::co::Running);
 	// now it should be running
-	TEST_ASSERT_TRUE(thread0.isCoroutineRunning());
+	TEST_ASSERT_TRUE(thread0.isResumableRunning());
 	// state should be 1
 	TEST_ASSERT_EQUALS(thread0.state, 1);
 	// depth should be 0
@@ -156,7 +156,7 @@ CoroutineTest::testClassMethods()
 	// state should be 2
 	TEST_ASSERT_EQUALS(thread0.state, 2);
 	// nothing is running anymore
-	TEST_ASSERT_FALSE(thread0.isCoroutineRunning());
+	TEST_ASSERT_FALSE(thread0.isResumableRunning());
 
 	// try the same with task2, which will end immediately
 	auto result2 = thread0.task2();
@@ -165,28 +165,28 @@ CoroutineTest::testClassMethods()
 	// state should be 3
 	TEST_ASSERT_EQUALS(thread0.state, 3);
 	// not running anymore
-	TEST_ASSERT_FALSE(thread0.isCoroutineRunning());
+	TEST_ASSERT_FALSE(thread0.isResumableRunning());
 
-	TEST_ASSERT_EQUALS(thread0.getCoroutineDepth(), -1);
+	TEST_ASSERT_EQUALS(thread0.getResumableDepth(), -1);
 	// lets start a task, which will yield
 	TEST_ASSERT_EQUALS(thread0.task1().getState(), xpcc::co::Running);
 	// state should be 1
 	TEST_ASSERT_EQUALS(thread0.state, 1);
 	// stop coroutine of thread0
-	thread0.stopCoroutine();
+	thread0.stopResumable();
 	// not running anymore
-	TEST_ASSERT_FALSE(thread0.isCoroutineRunning());
+	TEST_ASSERT_FALSE(thread0.isResumableRunning());
 
 
 	// generic implementation with 1 nesting levels
 	TestingEmptyThread1 thread1;
-	TEST_ASSERT_EQUALS(thread1.getCoroutineDepth(), -1);
+	TEST_ASSERT_EQUALS(thread1.getResumableDepth(), -1);
 	TEST_ASSERT_EQUALS(thread1.state, 0);
 	TEST_ASSERT_EQUALS(thread1.depth, 0);
-	TEST_ASSERT_FALSE(thread1.isCoroutineRunning());
+	TEST_ASSERT_FALSE(thread1.isResumableRunning());
 
 	TEST_ASSERT_EQUALS(thread1.task1().getState(), xpcc::co::Running);
-	TEST_ASSERT_TRUE(thread1.isCoroutineRunning());
+	TEST_ASSERT_TRUE(thread1.isResumableRunning());
 	TEST_ASSERT_EQUALS(thread1.state, 1);
 	TEST_ASSERT_EQUALS(thread1.depth, 0);
 
@@ -195,28 +195,28 @@ CoroutineTest::testClassMethods()
 	TEST_ASSERT_EQUALS(thread1.state, 1);
 	TEST_ASSERT_EQUALS(thread1.task1().getState(), xpcc::co::Stop);
 	TEST_ASSERT_EQUALS(thread1.state, 2);
-	TEST_ASSERT_FALSE(thread1.isCoroutineRunning());
+	TEST_ASSERT_FALSE(thread1.isResumableRunning());
 
 	TEST_ASSERT_EQUALS(thread1.task2().getState(), xpcc::co::Stop);
 	TEST_ASSERT_EQUALS(thread1.state, 3);
-	TEST_ASSERT_FALSE(thread1.isCoroutineRunning());
+	TEST_ASSERT_FALSE(thread1.isResumableRunning());
 
-	TEST_ASSERT_EQUALS(thread1.getCoroutineDepth(), -1);
+	TEST_ASSERT_EQUALS(thread1.getResumableDepth(), -1);
 	TEST_ASSERT_EQUALS(thread1.task1().getState(), xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread1.state, 1);
-	thread1.stopCoroutine();
-	TEST_ASSERT_FALSE(thread1.isCoroutineRunning());
+	thread1.stopResumable();
+	TEST_ASSERT_FALSE(thread1.isResumableRunning());
 
 
 	// generic implementation with 2 nesting levels
 	TestingEmptyThread2 thread2;
-	TEST_ASSERT_EQUALS(thread2.getCoroutineDepth(), -1);
+	TEST_ASSERT_EQUALS(thread2.getResumableDepth(), -1);
 	TEST_ASSERT_EQUALS(thread2.state, 0);
 	TEST_ASSERT_EQUALS(thread2.depth, 0);
-	TEST_ASSERT_FALSE(thread2.isCoroutineRunning());
+	TEST_ASSERT_FALSE(thread2.isResumableRunning());
 
 	TEST_ASSERT_EQUALS(thread2.task1().getState(), xpcc::co::Running);
-	TEST_ASSERT_TRUE(thread2.isCoroutineRunning());
+	TEST_ASSERT_TRUE(thread2.isResumableRunning());
 	TEST_ASSERT_EQUALS(thread2.state, 1);
 	TEST_ASSERT_EQUALS(thread2.depth, 0);
 
@@ -225,22 +225,22 @@ CoroutineTest::testClassMethods()
 	TEST_ASSERT_EQUALS(thread2.state, 1);
 	TEST_ASSERT_EQUALS(thread2.task1().getState(), xpcc::co::Stop);
 	TEST_ASSERT_EQUALS(thread2.state, 2);
-	TEST_ASSERT_FALSE(thread2.isCoroutineRunning());
+	TEST_ASSERT_FALSE(thread2.isResumableRunning());
 
 	TEST_ASSERT_EQUALS(thread2.task2().getState(), xpcc::co::Stop);
 	TEST_ASSERT_EQUALS(thread2.state, 3);
-	TEST_ASSERT_FALSE(thread2.isCoroutineRunning());
+	TEST_ASSERT_FALSE(thread2.isResumableRunning());
 
-	TEST_ASSERT_EQUALS(thread2.getCoroutineDepth(), -1);
+	TEST_ASSERT_EQUALS(thread2.getResumableDepth(), -1);
 	TEST_ASSERT_EQUALS(thread2.task1().getState(), xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread2.state, 1);
-	thread2.stopCoroutine();
-	TEST_ASSERT_FALSE(thread2.isCoroutineRunning());
+	thread2.stopResumable();
+	TEST_ASSERT_FALSE(thread2.isResumableRunning());
 }
 
 
 // ----------------------------------------------------------------------------
-class TestingNestedThread : public xpcc::co::NestedCoroutine<3>
+class TestingNestedThread : public xpcc::co::NestedResumable<3>
 {
 public:
 	TestingNestedThread()
@@ -261,7 +261,7 @@ public:
 		CO_WAIT_UNTIL(condition1);
 
 		state1 = 2;
-		depth1 = getCoroutineDepth();
+		depth1 = getResumableDepth();
 
 		CO_YIELD();
 
@@ -288,7 +288,7 @@ protected:
 		CO_WAIT_UNTIL(condition2);
 
 		state2 = 2;
-		depth2 = getCoroutineDepth();
+		depth2 = getResumableDepth();
 
 		CO_YIELD();
 
@@ -313,7 +313,7 @@ protected:
 		CO_WAIT_UNTIL(condition3);
 
 		state3 = 2;
-		depth3 = getCoroutineDepth();
+		depth3 = getResumableDepth();
 		// this must return NestingError, since there is no more space
 		// to buffer the next nested local continuation anymore!
 		callResult3 = task3();
@@ -342,13 +342,13 @@ public:
 //*/
 
 void
-CoroutineTest::testNesting()
+ResumableTest::testNesting()
 {
 	TestingNestedThread thread;
 	// sanity checks
-	TEST_ASSERT_FALSE(thread.isCoroutineRunning());
+	TEST_ASSERT_FALSE(thread.isResumableRunning());
 	TEST_ASSERT_EQUALS(thread.state1, 0);
-	TEST_ASSERT_EQUALS(thread.getCoroutineDepth(), -1);
+	TEST_ASSERT_EQUALS(thread.getResumableDepth(), -1);
 
 	// should wait until the first condition
 	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::co::Running);
@@ -358,10 +358,10 @@ CoroutineTest::testNesting()
 	TEST_ASSERT_EQUALS(thread.state1, 1);
 
 	// it should be running
-	TEST_ASSERT_TRUE(thread.isCoroutineRunning());
+	TEST_ASSERT_TRUE(thread.isResumableRunning());
 	// we should be able to stop this task though
-	thread.stopCoroutine();
-	TEST_ASSERT_FALSE(thread.isCoroutineRunning());
+	thread.stopResumable();
+	TEST_ASSERT_FALSE(thread.isResumableRunning());
 	// and restart it
 	thread.state1 = 0;
 	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::co::Running);
@@ -443,12 +443,12 @@ CoroutineTest::testNesting()
 	TEST_ASSERT_EQUALS(thread.state1, 4);
 
 	// nothing is running
-	TEST_ASSERT_FALSE(thread.isCoroutineRunning());
+	TEST_ASSERT_FALSE(thread.isResumableRunning());
 }
 
 uint8_t waits = 3;
 
-class TestingSpawningThread : public xpcc::co::NestedCoroutine<2>
+class TestingSpawningThread : public xpcc::co::NestedResumable<2>
 {
 public:
 	TestingSpawningThread()
@@ -457,14 +457,14 @@ public:
 	}
 
 	xpcc::co::Result<bool>
-	parentCoroutine()
+	parentResumable()
 	{
 		CO_BEGIN();
 
 		state = 1;
 		CO_YIELD();
 
-		success = CO_CALL(spawningCoroutine(waits));
+		success = CO_CALL(spawningResumable(waits));
 
 		state = 3;
 		CO_YIELD();
@@ -479,25 +479,25 @@ public:
 
 protected:
 	xpcc::co::Result<bool>
-	spawningCoroutine(uint8_t calls)
+	spawningResumable(uint8_t calls)
 	{
 		CO_BEGIN();
 
-		CO_WAIT_UNTIL(startSpawningCoroutine(calls));
+		CO_WAIT_UNTIL(startSpawningResumable(calls));
 
 		state = 2;
 		CO_YIELD();
 
-		CO_WAIT_WHILE(runSpawningCoroutine(calls));
+		CO_WAIT_WHILE(runSpawningResumable(calls));
 
-		if(isSpawningCoroutineSuccessful(calls))
+		if(isSpawningResumableSuccessful(calls))
 			CO_RETURN(true);
 
 		CO_END();
 	}
 
 	bool
-	startSpawningCoroutine(uint8_t calls)
+	startSpawningResumable(uint8_t calls)
 	{
 		// manually implemented "protothread" without any side-effects on the NPT
 		static uint8_t st_calls(0);
@@ -510,7 +510,7 @@ protected:
 	}
 
 	bool
-	runSpawningCoroutine(uint8_t calls)
+	runSpawningResumable(uint8_t calls)
 	{
 		// manually implemented "protothread" without any side-effects on the NPT
 		static uint8_t st_calls(0);
@@ -523,7 +523,7 @@ protected:
 	}
 
 	bool
-	isSpawningCoroutineSuccessful(uint8_t calls)
+	isSpawningResumableSuccessful(uint8_t calls)
 	{ return (calls == 2); }
 
 public:
@@ -532,46 +532,46 @@ public:
 };
 
 void
-CoroutineTest::testSpawn()
+ResumableTest::testSpawn()
 {
 	TestingSpawningThread thread;
 
 	// sanity checks
-	TEST_ASSERT_FALSE(thread.isCoroutineRunning());
+	TEST_ASSERT_FALSE(thread.isResumableRunning());
 	TEST_ASSERT_EQUALS(thread.state, 0);
-	TEST_ASSERT_EQUALS(thread.getCoroutineDepth(), -1);
+	TEST_ASSERT_EQUALS(thread.getResumableDepth(), -1);
 
 	// should wait until the first condition
-	TEST_ASSERT_EQUALS(thread.parentCoroutine().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread.state, 1);
 	// task should require `waits` number of calls
 	for (uint8_t ii = 0; ii < waits; ++ii)
 	{
-		TEST_ASSERT_EQUALS(thread.parentCoroutine().getState(), xpcc::co::Running);
+		TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::co::Running);
 		TEST_ASSERT_EQUALS(thread.state, 1);
 	}
 	// now spawning task has started
-	TEST_ASSERT_EQUALS(thread.parentCoroutine().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread.state, 2);
 	// task should require `waits` number of calls again
 	for (uint8_t ii = 0; ii < waits; ++ii)
 	{
-		TEST_ASSERT_EQUALS(thread.parentCoroutine().getState(), xpcc::co::Running);
+		TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::co::Running);
 		TEST_ASSERT_EQUALS(thread.state, 2);
 	}
 	// now spawning task has finished
-	TEST_ASSERT_EQUALS(thread.parentCoroutine().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread.state, 3);
 	TEST_ASSERT_EQUALS(thread.success, (waits == 3) ? true : false);
 
 	// now parent task has finished
-	TEST_ASSERT_EQUALS(thread.parentCoroutine().getState(), xpcc::co::Stop);
+	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::co::Stop);
 	TEST_ASSERT_EQUALS(thread.state, (waits == 3) ? 4 : 5);
 }
 
 #include <xpcc/math/filter/moving_average.hpp>
 
-class TestingSpawningComplexThread : public xpcc::co::NestedCoroutine<2>
+class TestingSpawningComplexThread : public xpcc::co::NestedResumable<2>
 {
 public:
 	TestingSpawningComplexThread()
@@ -585,9 +585,9 @@ public:
 	}
 
 	xpcc::co::Result<uint16_t>
-	parentCoroutine()
+	parentResumable()
 	{
-		// this is an unelegant way of using 'local' variables in a Coroutine.
+		// this is an unelegant way of using 'local' variables in a Resumable.
 		uint8_t rslt1;
 		int8_t rslt2;
 
@@ -596,26 +596,26 @@ public:
 		state = 1;
 		CO_YIELD();
 
-		result1 = CO_CALL(spawningCoroutine1());
-		result2 = CO_CALL(spawningCoroutine2());
+		result1 = CO_CALL(spawningResumable1());
+		result2 = CO_CALL(spawningResumable2());
 
 		state = 2;
 		CO_YIELD();
 
-		rslt1 = CO_CALL(spawningCoroutine1());
+		rslt1 = CO_CALL(spawningResumable1());
 		resultLocal1 = rslt1;
 
-		rslt2 = CO_CALL(spawningCoroutine2());
+		rslt2 = CO_CALL(spawningResumable2());
 		resultLocal2 = rslt2;
 
 		state = 3;
 		CO_YIELD();
 
-		if (CO_CALL(spawningCoroutine1()) == 42)
+		if (CO_CALL(spawningResumable1()) == 42)
 		{
 			resultIf1 = 42;
 		}
-		if (CO_CALL(spawningCoroutine2()) == 42)
+		if (CO_CALL(spawningResumable2()) == 42)
 		{
 			resultIf2 = 42;
 		}
@@ -623,8 +623,8 @@ public:
 		state = 4;
 		CO_YIELD();
 
-		setResultFunction1(CO_CALL(spawningCoroutine1()));
-		setResultFunction2(CO_CALL(spawningCoroutine2()));
+		setResultFunction1(CO_CALL(spawningResumable1()));
+		setResultFunction2(CO_CALL(spawningResumable2()));
 
 		state = 5;
 		CO_YIELD();
@@ -632,11 +632,11 @@ public:
 		// I would expect this to work, especially after the previous examples,
 		// but this 'crosses initialization of rslt'
 //		{
-//			uint8_t rslt = CO_CALL(spawningCoroutine1());
+//			uint8_t rslt = CO_CALL(spawningResumable1());
 //			resultStack1 = rslt;
 //		}
 //		{
-//			int8_t rslt = CO_CALL(spawningCoroutine2());
+//			int8_t rslt = CO_CALL(spawningResumable2());
 //			resultStack2 = rslt;
 //		}
 //
@@ -648,7 +648,7 @@ public:
 
 protected:
 	xpcc::co::Result<uint8_t>
-	spawningCoroutine1()
+	spawningResumable1()
 	{
 		CO_BEGIN();
 
@@ -658,7 +658,7 @@ protected:
 	}
 
 	xpcc::co::Result<int8_t>
-	spawningCoroutine2()
+	spawningResumable2()
 	{
 		CO_BEGIN();
 
@@ -698,22 +698,22 @@ public:
 
 
 void
-CoroutineTest::testComplexSpawn()
+ResumableTest::testComplexSpawn()
 {
 	TestingSpawningComplexThread thread;
 
 	// sanity checks
-	TEST_ASSERT_FALSE(thread.isCoroutineRunning());
+	TEST_ASSERT_FALSE(thread.isResumableRunning());
 	TEST_ASSERT_EQUALS(thread.state, 0);
-	TEST_ASSERT_EQUALS(thread.getCoroutineDepth(), -1);
+	TEST_ASSERT_EQUALS(thread.getResumableDepth(), -1);
 
 	// should wait until the first condition
-	TEST_ASSERT_EQUALS(thread.parentCoroutine().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread.state, 1);
 
 	waits = 1;
 	// now run all CO_CALLs until yield
-	TEST_ASSERT_EQUALS(thread.parentCoroutine().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread.state, 2);
 
 	TEST_ASSERT_EQUALS(thread.result1, 42);
@@ -721,7 +721,7 @@ CoroutineTest::testComplexSpawn()
 
 	waits = 3;
 	// run second, local CO_CALLs
-	TEST_ASSERT_EQUALS(thread.parentCoroutine().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread.state, 3);
 
 	TEST_ASSERT_EQUALS(thread.resultLocal1, 42);
@@ -729,7 +729,7 @@ CoroutineTest::testComplexSpawn()
 
 	waits = 1;
 	// run third, if CO_CALLs
-	TEST_ASSERT_EQUALS(thread.parentCoroutine().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread.state, 4);
 
 	TEST_ASSERT_EQUALS(thread.resultIf1, 42);
@@ -737,7 +737,7 @@ CoroutineTest::testComplexSpawn()
 
 	waits = 3;
 	// run third, if CO_CALLs
-	TEST_ASSERT_EQUALS(thread.parentCoroutine().getState(), xpcc::co::Running);
+	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread.state, 5);
 
 	TEST_ASSERT_EQUALS(thread.resultFunction1, 42);
@@ -745,19 +745,19 @@ CoroutineTest::testComplexSpawn()
 
 //	waits = 3;
 //	// run fourth, stack CO_CALLs
-//	TEST_ASSERT_EQUALS(thread.parentCoroutine().getState(), xpcc::co::Running);
+//	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::co::Running);
 //	TEST_ASSERT_EQUALS(thread.state, 5);
 //
 //	TEST_ASSERT_EQUALS(thread.resultStack1, 42);
 //	TEST_ASSERT_EQUALS(thread.resultStack2, 42);
 
-	auto result = thread.parentCoroutine();
+	auto result = thread.parentResumable();
 	TEST_ASSERT_EQUALS(result.getState(), xpcc::co::Stop);
 	TEST_ASSERT_EQUALS(result.getResult(), 42+42);
 }
 
 
-class TestingCaseLabelThread : public xpcc::co::NestedCoroutine<>
+class TestingCaseLabelThread : public xpcc::co::NestedResumable<>
 {
 public:
 	xpcc::co::Result<bool>
@@ -808,7 +808,7 @@ public:
 };
 
 void
-CoroutineTest::testCaseNumbers()
+ResumableTest::testCaseNumbers()
 {
 	TestingCaseLabelThread thread;
 
@@ -823,7 +823,7 @@ CoroutineTest::testCaseNumbers()
 	TEST_ASSERT_EQUALS(result.getResult(), true);
 }
 
-class TestingCaseEnumClassThread : public xpcc::co::NestedCoroutine<>
+class TestingCaseEnumClassThread : public xpcc::co::NestedResumable<>
 {
 public:
 	enum class
@@ -845,7 +845,7 @@ public:
 };
 
 void
-CoroutineTest::testReturnEnumClass()
+ResumableTest::testReturnEnumClass()
 {
 	TestingCaseEnumClassThread thread;
 
@@ -858,7 +858,7 @@ CoroutineTest::testReturnEnumClass()
 	TEST_ASSERT_TRUE(result.getResult() == TestingCaseEnumClassThread::Animal::Cat);
 }
 
-class TestingCaseVoidClassThread : public xpcc::co::NestedCoroutine<>
+class TestingCaseVoidClassThread : public xpcc::co::NestedResumable<>
 {
 public:
 	xpcc::co::Result<void>
@@ -873,7 +873,7 @@ public:
 };
 
 void
-CoroutineTest::testReturnVoidClass()
+ResumableTest::testReturnVoidClass()
 {
 	TestingCaseVoidClassThread thread;
 
@@ -890,7 +890,7 @@ CoroutineTest::testReturnVoidClass()
 	TEST_ASSERT_EQUALS(result2, xpcc::co::Stop);
 }
 
-class TestingNonMutuallyExclusiveCoroutines : public xpcc::co::Coroutine<3>
+class TestingNonMutuallyExclusiveResumables : public xpcc::co::Resumable<3>
 {
 public:
 	xpcc::co::Result<void>
@@ -947,36 +947,36 @@ public:
 };
 
 void
-CoroutineTest::testNonNestedCoroutines()
+ResumableTest::testNonNestedResumables()
 {
-	TestingNonMutuallyExclusiveCoroutines thread;
+	TestingNonMutuallyExclusiveResumables thread;
 
 	// nothing should be running
-	TEST_ASSERT_FALSE(thread.areAnyCoroutinesRunning());
-	TEST_ASSERT_FALSE(thread.isCoroutineRunning(0));
-	TEST_ASSERT_FALSE(thread.isCoroutineRunning(1));
-	TEST_ASSERT_FALSE(thread.isCoroutineRunning(2));
-	TEST_ASSERT_FALSE(thread.isCoroutineRunning(100));
+	TEST_ASSERT_FALSE(thread.areAnyResumablesRunning());
+	TEST_ASSERT_FALSE(thread.isResumableRunning(0));
+	TEST_ASSERT_FALSE(thread.isResumableRunning(1));
+	TEST_ASSERT_FALSE(thread.isResumableRunning(2));
+	TEST_ASSERT_FALSE(thread.isResumableRunning(100));
 
 	// run once; coroutine will yield, but not finish
 	TEST_ASSERT_EQUALS(thread.call0().getState(), xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread.state0, 0);
 
 	// coroutine 0 should be running
-	TEST_ASSERT_TRUE(thread.areAnyCoroutinesRunning());
-	TEST_ASSERT_TRUE(thread.isCoroutineRunning(0));
-	TEST_ASSERT_FALSE(thread.isCoroutineRunning(1));
-	TEST_ASSERT_FALSE(thread.isCoroutineRunning(2));
-	TEST_ASSERT_FALSE(thread.isCoroutineRunning(100));
+	TEST_ASSERT_TRUE(thread.areAnyResumablesRunning());
+	TEST_ASSERT_TRUE(thread.isResumableRunning(0));
+	TEST_ASSERT_FALSE(thread.isResumableRunning(1));
+	TEST_ASSERT_FALSE(thread.isResumableRunning(2));
+	TEST_ASSERT_FALSE(thread.isResumableRunning(100));
 
-	TEST_ASSERT_FALSE(thread.areAllCoroutinesRunning({0, 1}));
-	TEST_ASSERT_FALSE(thread.joinCoroutines({0, 1}));
-	TEST_ASSERT_TRUE(thread.joinCoroutines({1, 2}));
-	TEST_ASSERT_FALSE(thread.areAllCoroutinesRunning({1, 2}));
-	TEST_ASSERT_TRUE(thread.areAnyCoroutinesRunning({0, 1}));
-	TEST_ASSERT_FALSE(thread.areAnyCoroutinesRunning({1, 2}));
-	TEST_ASSERT_TRUE(thread.areAnyCoroutinesRunning({0, 1, 100}));
-	TEST_ASSERT_FALSE(thread.areAllCoroutinesRunning({0, 100}));
+	TEST_ASSERT_FALSE(thread.areAllResumablesRunning({0, 1}));
+	TEST_ASSERT_FALSE(thread.joinResumables({0, 1}));
+	TEST_ASSERT_TRUE(thread.joinResumables({1, 2}));
+	TEST_ASSERT_FALSE(thread.areAllResumablesRunning({1, 2}));
+	TEST_ASSERT_TRUE(thread.areAnyResumablesRunning({0, 1}));
+	TEST_ASSERT_FALSE(thread.areAnyResumablesRunning({1, 2}));
+	TEST_ASSERT_TRUE(thread.areAnyResumablesRunning({0, 1, 100}));
+	TEST_ASSERT_FALSE(thread.areAllResumablesRunning({0, 100}));
 
 	// the other coroutines should be able to run at the same time
 	TEST_ASSERT_EQUALS(thread.call1().getState(), xpcc::co::Running);

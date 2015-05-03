@@ -8,7 +8,7 @@
 // ----------------------------------------------------------------------------
 /**
  * @ingroup		processing
- * @defgroup	coroutine		Coroutines
+ * @defgroup	coroutine		Resumables
  *
  * An implementation of lightweight coroutines which allow for nested calling.
  *
@@ -39,7 +39,7 @@
  *
  * typedef GpioOutputB0 Led;
  *
- * class BlinkingLight : public xpcc::pt::Protothread, private xpcc::co::NestedCoroutine<2>
+ * class BlinkingLight : public xpcc::pt::Protothread, private xpcc::co::NestedResumable<2>
  * {
  * public:
  *     bool

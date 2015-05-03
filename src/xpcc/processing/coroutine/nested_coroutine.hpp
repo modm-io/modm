@@ -17,7 +17,7 @@
 #ifdef __DOXYGEN__
 
 /**
- * Nested Coroutines protect against memory corruption by checking if the nesting level
+ * Nested Resumables protect against memory corruption by checking if the nesting level
  * is within the allocated nesting level depth.
  * If the allocated nesting level is exceeded, the coroutine does not execute, but returns
  * the `xpcc::co::NestingError` state value.
@@ -40,7 +40,7 @@
 XPCC_COROUTINE_CHECK_NESTING_DEPTH = false
 @endverbatim
  *
- * @see	NestedCoroutine
+ * @see	NestedResumable
  * @ingroup	coroutine
  */
 #define XPCC_COROUTINE_CHECK_NESTING_DEPTH	true
@@ -91,7 +91,7 @@ namespace co
  * You may also return the result of another coroutine using
  * `CO_END_RETURN_CALL(coroutine())`.
  *
- * @warning	**Coroutines are not thread-safe!** If two threads access the
+ * @warning	**Resumables are not thread-safe!** If two threads access the
  * 			same coroutine, you must use a Mutex to regulate access to it.
  *
  * @ingroup	coroutine
@@ -100,13 +100,13 @@ namespace co
  * 					max(number of coroutines that are called within coroutines) + 1
  */
 template< uint8_t Levels = 1>
-class NestedCoroutine
+class NestedResumable
 {
 	static_assert(Levels > 0, "The number of coroutine nesting levels must be at least 1!");
 
 protected:
 	/// Construct a new class with nested coroutines
-	NestedCoroutine()
+	NestedResumable()
 	:	coLevel(0)
 	{
 		for (CoState &level : coStateArray)
@@ -118,7 +118,7 @@ protected:
 public:
 	/// Force all coroutines to stop running at the current nesting level
 	inline void
-	stopCoroutine()
+	stopResumable()
 	{
 		uint_fast8_t level = coLevel;
 		while (level < Levels)
@@ -129,14 +129,14 @@ public:
 
 	/// @return	`true` if a coroutine is running at the current nesting level, else `false`
 	bool inline
-	isCoroutineRunning() const
+	isResumableRunning() const
 	{
 		return !isStoppedCo();
 	}
 
 	/// @return the nesting depth in the current coroutine, or -1 if called outside any coroutine
 	int8_t inline
-	getCoroutineDepth() const
+	getResumableDepth() const
 	{
 		return static_cast<int8_t>(coLevel) - 1;
 	}
@@ -209,7 +209,7 @@ protected:
 		return (coStateArray[coLevel] == CoStopped);
 	}
 
-	/// compatibility with Coroutine class
+	/// compatibility with Resumable class
 	template<uint8_t index>
 	static void
 	checkCoMethods()
@@ -232,29 +232,29 @@ private:
 // we won't document the specialisation again
 /// @cond
 template <>
-class NestedCoroutine<1>
+class NestedResumable<1>
 {
 protected:
-	NestedCoroutine() :
+	NestedResumable() :
 		coLevel(-1), coState(CoStopped)
 	{
 	}
 
 public:
 	void inline
-	stopCoroutine()
+	stopResumable()
 	{
 		coState = CoStopped;
 	}
 
 	bool inline
-	isCoroutineRunning() const
+	isResumableRunning() const
 	{
 		return !isStoppedCo();
 	}
 
 	int8_t inline
-	getCoroutineDepth() const
+	getResumableDepth() const
 	{
 		return coLevel;
 	}

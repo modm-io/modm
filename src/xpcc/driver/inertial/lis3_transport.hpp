@@ -81,7 +81,7 @@ private:
  * @author	Niklas Hauser
  */
 template < class SpiMaster, class Cs >
-class Lis3TransportSpi : public xpcc::SpiDevice< SpiMaster >, protected xpcc::co::NestedCoroutine<2>
+class Lis3TransportSpi : public xpcc::SpiDevice< SpiMaster >, protected xpcc::co::NestedResumable<2>
 {
 public:
 	Lis3TransportSpi(uint8_t /*address*/);

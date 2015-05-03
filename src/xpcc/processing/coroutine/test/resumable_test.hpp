@@ -10,7 +10,7 @@
 #include <unittest/testsuite.hpp>
 
 // @author Niklas Hauser
-class CoroutineTest : public unittest::TestSuite
+class ResumableTest : public unittest::TestSuite
 {
 public:
 	// uses an empty protothread to test the basic methods of the class
@@ -42,5 +42,5 @@ public:
 	testReturnVoidClass();
 
 	void
-	testNonNestedCoroutines();
+	testNonNestedResumables();
 };

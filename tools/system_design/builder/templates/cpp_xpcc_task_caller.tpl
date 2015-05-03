@@ -38,7 +38,7 @@ public:
 	 */
 	{%- endif %}
 	{%- endif %}
-	class {{ action.name | CamelCase }} : public xpcc::CommunicatableTask, private xpcc::pt::Protothread, private xpcc::co::Coroutine<1>
+	class {{ action.name | CamelCase }} : public xpcc::CommunicatableTask, private xpcc::pt::Protothread, private xpcc::co::Resumable<1>
 	{
 	public:
 		{%- if action.parameterType %}

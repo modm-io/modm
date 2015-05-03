@@ -27,18 +27,18 @@ enum
 State
 {
 	// reasons to stop
-	Stop = 0,			///< Coroutine finished
-	NestingError = 1,	///< Nested Coroutine has run out of nesting levels
+	Stop = 0,			///< Resumable finished
+	NestingError = 1,	///< Nested Resumable has run out of nesting levels
 
 	// reasons to wait
 	WrongState = 100,	///< A conflicting nested coroutine of the same class is already running
 
 	// reasons to keep running
-	Running = 255,		///< Coroutine is running
+	Running = 255,		///< Resumable is running
 };
 /// @endcond
 
-/// All Coroutines return an encapsulated result type.
+/// All Resumables return an encapsulated result type.
 /// @warning The result type **must** have a default constructor!
 template < typename T >
 struct Result
@@ -95,7 +95,7 @@ static constexpr CoState CoStopped = CoState(0);
 /// @endcond
 
 /**
- * Coroutine base class.
+ * Resumable base class.
  *
  * This is the base class which must be inherited from for using
  * coroutines in your class.
@@ -119,13 +119,13 @@ static constexpr CoState CoStopped = CoState(0);
  * This allows each coroutine to be run at the same time.
  * This might require the use of an internal Semaphore or Mutex if such
  * dependencies exist in your use case.
- * Take a look at the `NestedCoroutine` class for mutually exclusive coroutines,
+ * Take a look at the `NestedResumable` class for mutually exclusive coroutines,
  * which also require a little less memory.
  *
- * @warning	**Coroutines are not thread-safe!** If two threads access the
+ * @warning	**Resumables are not thread-safe!** If two threads access the
  * 			same coroutine, you must use a Mutex to regulate access to it.
  *
- * @see NestedCoroutine
+ * @see NestedResumable
  *
  * @ingroup	coroutine
  * @author	Niklas Hauser
@@ -133,20 +133,20 @@ static constexpr CoState CoStopped = CoState(0);
  * 					available in this class. Must be non-zero!
  */
 template< uint8_t Methods = 1>
-class Coroutine
+class Resumable
 {
 	static_assert(Methods > 0, "The number of coroutine methods must be at least 1!");
 
 protected:
-	Coroutine()
+	Resumable()
 	{
-		stopAllCoroutines();
+		stopAllResumables();
 	}
 
 public:
 	/// Force all coroutines to stop running
 	inline void
-	stopAllCoroutines()
+	stopAllResumables()
 	{
 		for (CoState &state : coStateArray)
 		{
@@ -156,7 +156,7 @@ public:
 
 	/// Force the specified coroutine to stop running
 	inline bool
-	stopCoroutine(uint8_t id)
+	stopResumable(uint8_t id)
 	{
 		if (id < Methods) {
 			coStateArray[id] = CoStopped;
@@ -167,14 +167,14 @@ public:
 
 	/// @return	`true` if the specified coroutine is running, else `false`
 	bool inline
-	isCoroutineRunning(uint8_t id) const
+	isResumableRunning(uint8_t id) const
 	{
 		return (id < Methods and coStateArray[id] != CoStopped);
 	}
 
 	/// @return	`true` if any coroutine of this class is running, else `false`
 	bool inline
-	areAnyCoroutinesRunning() const
+	areAnyResumablesRunning() const
 	{
 		for (const CoState state : coStateArray)
 		{
@@ -186,11 +186,11 @@ public:
 
 	/// @return	`true` if any of the specified coroutine are running, else `false`
 	bool inline
-	areAnyCoroutinesRunning(std::initializer_list<uint8_t> ids) const
+	areAnyResumablesRunning(std::initializer_list<uint8_t> ids) const
 	{
 		for (uint8_t id : ids)
 		{
-			if (isCoroutineRunning(id))
+			if (isResumableRunning(id))
 				return true;
 		}
 		return false;
@@ -198,11 +198,11 @@ public:
 
 	/// @return	`true` if all of the specified coroutine are running, else `false`
 	bool inline
-	areAllCoroutinesRunning(std::initializer_list<uint8_t> ids) const
+	areAllResumablesRunning(std::initializer_list<uint8_t> ids) const
 	{
 		for (uint8_t id : ids)
 		{
-			// = not isCoroutineRunning(id)
+			// = not isResumableRunning(id)
 			if (id >= Methods or coStateArray[id] == CoStopped)
 				return false;
 		}
@@ -211,9 +211,9 @@ public:
 
 	/// @return	`true` if none of the specified coroutine are running, else `false`
 	bool inline
-	joinCoroutines(std::initializer_list<uint8_t> ids) const
+	joinResumables(std::initializer_list<uint8_t> ids) const
 	{
-		return not areAnyCoroutinesRunning(ids);
+		return not areAnyResumablesRunning(ids);
 	}
 
 #ifdef __DOXYGEN__
@@ -282,7 +282,7 @@ protected:
 	checkCoMethods()
 	{
 		static_assert(index < Methods,
-				"Index out of bounds! Increase the `Methods` template argument of your Coroutine class.");
+				"Index out of bounds! Increase the `Methods` template argument of your Resumable class.");
 	}
 
 	/// asserts that this method is called in this parent class

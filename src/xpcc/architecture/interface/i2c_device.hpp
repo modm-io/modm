@@ -39,7 +39,7 @@ namespace xpcc
  * @ingroup i2c
  */
 template < class I2cMaster, uint8_t NestingLevels = 10, class Transaction = I2cWriteReadTransaction >
-class I2cDevice : protected xpcc::co::NestedCoroutine< NestingLevels + 1 >
+class I2cDevice : protected xpcc::co::NestedResumable< NestingLevels + 1 >
 {
 public:
 	///	@param	address	the slave address not yet shifted left (address < 128).
