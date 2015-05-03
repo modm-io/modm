@@ -11,7 +11,7 @@
 #define XPCC_BMP085_HPP
 
 #include <xpcc/processing/protothread.hpp>
-#include <xpcc/processing/coroutine.hpp>
+#include <xpcc/processing/resumable.hpp>
 #include <xpcc/architecture/interface/i2c_device.hpp>
 #include <xpcc/processing/timer.hpp>
 

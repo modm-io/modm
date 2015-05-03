@@ -20,7 +20,7 @@
 
 #include <xpcc/ui/color.hpp>
 #include <xpcc/processing/protothread.hpp>
-#include <xpcc/processing/coroutine.hpp>
+#include <xpcc/processing/resumable.hpp>
 #include <xpcc/architecture/interface/i2c_device.hpp>
 
 namespace xpcc

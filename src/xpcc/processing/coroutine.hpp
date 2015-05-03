@@ -8,33 +8,33 @@
 // ----------------------------------------------------------------------------
 /**
  * @ingroup		processing
- * @defgroup	coroutine		Resumables
+ * @defgroup	resumable		Resumables
  *
- * An implementation of lightweight coroutines which allow for nested calling.
+ * An implementation of lightweight resumable functions which allow for nested calling.
  *
  * This base class and its macros allows you to implement and use several
- * coroutines in one class.
- * This allows you to modularize your code by placing it into its own coroutines
+ * resumable functions in one class.
+ * This allows you to modularize your code by placing it into its own resumable functions
  * instead of the placing everything into one big method.
- * It also allows you to call and run coroutines within your coroutines,
+ * It also allows you to call and run resumable functions within your resumables,
  * so you can reuse their functionality.
  *
- * Note that you should call coroutines within a protothreads.
+ * Note that you should call resumable functions within a protothreads.
  * It is sufficient to use the `this` pointer of the class as context
- * when calling the coroutines.
- * So calling a coroutine is done using `PT_CALL(coroutine(this))`
- * which will return the result of the coroutine.
+ * when calling the resumables.
+ * So calling a resumable function is done using `PT_CALL(resumable(this))`
+ * which will return the result of the resumable function.
  *
- * You may use the `CO_CALL_BLOCKING(coroutine(ctx))` macro to execute
- * a coroutine outside of a protothread, however, this which will
- * force the CPU to busy-wait until the coroutine ended.
+ * You may use the `CO_CALL_BLOCKING(resumable(ctx))` macro to execute
+ * a resumable function outside of a protothread, however, this which will
+ * force the CPU to busy-wait until the resumable function ended.
  *
  * Here is a (slightly over-engineered) example:
  *
  * @code
  * #include <xpcc/architecture.hpp>
  * #include <xpcc/processing/protothread.hpp>
- * #include <xpcc/coroutine/coroutine.hpp>
+ * #include <xpcc/resumable/resumable.hpp>
  * #include <xpcc/processing/timer.hpp>
  *
  * typedef GpioOutputB0 Led;
@@ -111,5 +111,5 @@
  * root folder.
  */
 
-#include "coroutine/coroutine.hpp"
-#include "coroutine/nested_coroutine.hpp"
+#include "resumable/resumable.hpp"
+#include "resumable/nested_resumable.hpp"

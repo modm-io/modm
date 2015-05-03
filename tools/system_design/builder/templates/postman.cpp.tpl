@@ -50,7 +50,7 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 			{%- set pointer = "" %}
 		{%- endif %}
 				case {{ namespace }}::action::{{ action.name | CAMELCASE }}:
-		{%- if action.call == "coroutine" %}
+		{%- if action.call == "resumable" %}
 					if (actionBuffer[{{ actionNumber }}].destination != 0) {
 						component::{{component.name | camelCase}}.getCommunicator()->sendNegativeResponse(response);
 					}
@@ -130,19 +130,19 @@ void
 Postman::update()
 {
 {%- set payloadNumber = 0 %}
-{%- if coroutines > 0 %}
+{%- if resumables > 0 %}
 	for(ActionBuffer &action : actionBuffer)
 	{
 		switch (action.destination)
 		{
 	{%- for component in components %}
-		{%- if component.coroutines > 0 %}
+		{%- if component.resumables > 0 %}
 			case {{ namespace }}::component::{{ component.name | CAMELCASE }}:
 			{
 				switch (action.response.getIdentifier())
 				{
 			{%- for action in component.actions %}
-				{%- if action.call == "coroutine" %}
+				{%- if action.call == "resumable" %}
 					{%- set payload = "" %}
 					{%- if action.parameterType != None %}
 						{%- set typePrefix = "" if action.parameterType.isBuiltIn else namespace ~ "::packet::" %}
@@ -178,7 +178,7 @@ Postman::update()
 // ----------------------------------------------------------------------------
 {%- for component in components %}
 	{%- for action in component.actions %}
-		{%- if action.call == "coroutine" %}
+		{%- if action.call == "resumable" %}
 uint8_t
 			{%- if action.parameterType != None %}
 				{%- set typePrefix = "" if action.parameterType.isBuiltIn else namespace ~ "::packet::" %}

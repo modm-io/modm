@@ -13,7 +13,7 @@
 #include "i2c.hpp"
 #include "i2c_master.hpp"
 #include "i2c_transaction.hpp"
-#include <xpcc/processing/coroutine.hpp>
+#include <xpcc/processing/resumable.hpp>
 
 namespace xpcc
 {
@@ -22,7 +22,7 @@ namespace xpcc
  * Base class of an I2C Device.
  *
  * This class provides functions for configuring the adapter and peripheral and starting transactions.
- * It also provides a basic `ping()` coroutine, which checks if the device responds to its address.
+ * It also provides a basic `ping()` resumable function, which checks if the device responds to its address.
  *
  * You need to provide the number of required nesting levels for your driver here.
  * By default, 10 levels are chosen, which should be more than enough in any case.

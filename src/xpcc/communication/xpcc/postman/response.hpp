@@ -11,7 +11,7 @@
 #define	XPCC_RESPONSE_HPP
 
 #include "../backend/backend_interface.hpp"
-#include <xpcc/processing/coroutine.hpp>
+#include <xpcc/processing/resumable.hpp>
 
 namespace xpcc
 {

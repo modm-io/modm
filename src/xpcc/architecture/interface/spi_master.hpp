@@ -10,7 +10,7 @@
 #ifndef XPCC_INTERFACE_SPI_MASTER_HPP
 #define XPCC_INTERFACE_SPI_MASTER_HPP
 
-#include <xpcc/processing/coroutine.hpp>
+#include <xpcc/processing/resumable.hpp>
 #include "spi.hpp"
 
 namespace xpcc
@@ -108,7 +108,7 @@ public:
 	 * You must call this inside a Protothread or Resumable
 	 * using `PT_CALL` or `CO_CALL` respectively.
 	 * @warning	These methods differ from Resumables by lacking context protection!
-	 * 			You must ensure that only one driver is accessing this coroutine
+	 * 			You must ensure that only one driver is accessing this resumable function
 	 * 			by using `aquire(ctx)` and `release(ctx)`.
 	 *
 	 * @param	data
@@ -126,7 +126,7 @@ public:
 	 * You must call this inside a Protothread or Resumable
 	 * using `PT_CALL` or `CO_CALL` respectively.
 	 * @warning	These methods differ from Resumables by lacking context protection!
-	 * 			You must ensure that only one driver is accessing this coroutine
+	 * 			You must ensure that only one driver is accessing this resumable function
 	 * 			by using `aquire(ctx)` and `release(ctx)`.
 	 *
 	 * @param[in]   tx

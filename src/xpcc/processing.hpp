@@ -19,7 +19,7 @@
 #include "processing/timer.hpp"
 
 #include "processing/protothread.hpp"
-#include "processing/coroutine.hpp"
+#include "processing/resumable.hpp"
 
 #include "processing/task.hpp"
 #include "processing/scheduler/scheduler.hpp"

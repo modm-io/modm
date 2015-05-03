@@ -24,7 +24,7 @@ public:
 	void
 	update();
 
-{%- if coroutines > 0 %}
+{%- if resumables > 0 %}
 private:
 	struct
 	ActionBuffer
@@ -43,10 +43,10 @@ private:
 		uint8_t destination;			// 1B
 	};	// 3B
 
-	static constexpr uint8_t coroutineActions = {{ coroutines }};
-	ActionBuffer actionBuffer[coroutineActions];
+	static constexpr uint8_t resumableActions = {{ resumables }};
+	ActionBuffer actionBuffer[resumableActions];
 
-	{%- if coroutinePayloads > 0 %}
+	{%- if resumablePayloads > 0 %}
 	struct
 	PayloadBuffer
 	{
@@ -63,15 +63,15 @@ private:
 		xpcc::SmartPointer payload;
 	};	// 2B (AVR), 4B (ARM) + 3B HEAP
 
-	static constexpr uint8_t coroutinePayloads = {{ coroutinePayloads }};
-	PayloadBuffer payloadBuffer[coroutinePayloads];
+	static constexpr uint8_t resumablePayloads = {{ resumablePayloads }};
+	PayloadBuffer payloadBuffer[resumablePayloads];
 	{%- endif %}
 {%- endif %}
 
 private:
 {%- for component in components %}
 	{%- for action in component.actions %}
-		{%- if action.call == "coroutine" %}
+		{%- if action.call == "resumable" %}
 	uint8_t
 			{%- if action.parameterType != None %}
 				{%- set typePrefix = "" if action.parameterType.isBuiltIn else namespace ~ "::packet::" %}

@@ -12,7 +12,7 @@
 
 #include <xpcc/communication/xpcc/communicatable_task.hpp>
 #include <xpcc/processing/protothread.hpp>
-#include <xpcc/processing/coroutine.hpp>
+#include <xpcc/processing/resumable.hpp>
 
 namespace robot_call_tasks
 {

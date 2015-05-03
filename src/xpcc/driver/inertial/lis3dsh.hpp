@@ -11,7 +11,7 @@
 #define XPCC_LIS3DSH_HPP
 
 #include <xpcc/architecture/interface/register.hpp>
-#include <xpcc/processing/coroutine.hpp>
+#include <xpcc/processing/resumable.hpp>
 #include <xpcc/math/utils/endianness.hpp>
 #include "lis3_transport.hpp"
 

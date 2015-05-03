@@ -22,23 +22,23 @@ namespace co
 {
 
 /// @cond
-/// State of a coroutine.
+/// State of a resumable function.
 enum
 State
 {
 	// reasons to stop
-	Stop = 0,			///< Resumable finished
-	NestingError = 1,	///< Nested Resumable has run out of nesting levels
+	Stop = 0,			///< Resumable function finished
+	NestingError = 1,	///< Nested resumable function has run out of nesting levels
 
 	// reasons to wait
-	WrongState = 100,	///< A conflicting nested coroutine of the same class is already running
+	WrongState = 127,	///< A conflicting nested resumable function of the same class is already running
 
 	// reasons to keep running
-	Running = 255,		///< Resumable is running
+	Running = 255,		///< Resumable function is running
 };
 /// @endcond
 
-/// All Resumables return an encapsulated result type.
+/// All resumable functions return an encapsulated result type.
 /// @warning The result type **must** have a default constructor!
 template < typename T >
 struct Result
@@ -87,7 +87,7 @@ private:
 /// @endcond
 
 /// @cond
-/// Used to store a coroutines's position (what Dunkels calls a
+/// Used to store a resumable function's position (what Dunkels calls a
 /// "local continuation").
 typedef uint8_t CoState;
 /// We use 0 instead of -1 since it might be fast to check
@@ -98,44 +98,43 @@ static constexpr CoState CoStopped = CoState(0);
  * Resumable base class.
  *
  * This is the base class which must be inherited from for using
- * coroutines in your class.
- * You need to declare the number of coroutines in your class!
+ * resumable functions in your class.
+ * You need to declare the number of resumable functions in your class!
  *
- * You must begin each coroutine using `CO_BEGIN(index)` where `index` is
- * the unique index of your coroutine starting at zero.
+ * You must begin each resumable function using `CO_BEGIN(index)` where `index` is
+ * the unique index of your resumable function starting at zero.
  * You may exit and return a value by using `CO_RETURN(value)` or
- * return the result of another coroutine using `CO_RETURN_CALL(coroutine())`.
+ * return the result of another resumable function using `CO_RETURN_CALL(resumable())`.
  * This return value is wrapped in a `xpcc::co::Result<Type>` struct
  * and transparently returned by the `CO_CALL` macro so it can be used
  * to influence your program flow.
- * If the coroutine reaches `CO_END()` it will exit automatically,
+ * If the resumable function reaches `CO_END()` it will exit automatically,
  * with the result of `0` cast to the return type.
  * Should you wish to return a value at the end, you may use
  * `CO_END_RETURN(value)`.
- * You may also return the result of another coroutine using
- * `CO_END_RETURN_CALL(coroutine())`.
+ * You may also return the result of another resumable function using
+ * `CO_END_RETURN_CALL(resumable())`.
  *
- * Be aware that this class keeps a seperate state for each of your coroutines.
- * This allows each coroutine to be run at the same time.
+ * Be aware that this class keeps a seperate state for each of your resumable functions.
+ * This allows each resumable function to be run at the same time.
  * This might require the use of an internal Semaphore or Mutex if such
  * dependencies exist in your use case.
- * Take a look at the `NestedResumable` class for mutually exclusive coroutines,
+ * Take a look at the `NestedResumable` class for mutually exclusive resumable functions,
  * which also require a little less memory.
  *
- * @warning	**Resumables are not thread-safe!** If two threads access the
- * 			same coroutine, you must use a Mutex to regulate access to it.
+ * @warning	**Resumable functions are not thread-safe!** If two threads access the
+ * 			same resumable function, you must use a Mutex to regulate access to it.
  *
  * @see NestedResumable
  *
- * @ingroup	coroutine
+ * @ingroup	resumable
  * @author	Niklas Hauser
- * @tparam	Methods	number of coroutines: the number of coroutines that are
- * 					available in this class. Must be non-zero!
+ * @tparam	Functions	the number of resumable functions that are available in this class. Must be non-zero!
  */
-template< uint8_t Methods = 1>
+template< uint8_t Functions = 1>
 class Resumable
 {
-	static_assert(Methods > 0, "The number of coroutine methods must be at least 1!");
+	static_assert(Functions > 0, "The number of resumable functions must be at least 1!");
 
 protected:
 	Resumable()
@@ -144,7 +143,7 @@ protected:
 	}
 
 public:
-	/// Force all coroutines to stop running
+	/// Force all resumable functions to stop running
 	inline void
 	stopAllResumables()
 	{
@@ -154,7 +153,7 @@ public:
 		}
 	}
 
-	/// Force the specified coroutine to stop running
+	/// Force the specified resumable function to stop running
 	inline bool
 	stopResumable(uint8_t id)
 	{
@@ -165,14 +164,14 @@ public:
 		return false;
 	}
 
-	/// @return	`true` if the specified coroutine is running, else `false`
+	/// @return	`true` if the specified resumable function is running, else `false`
 	bool inline
 	isResumableRunning(uint8_t id) const
 	{
-		return (id < Methods and coStateArray[id] != CoStopped);
+		return (id < Functions and coStateArray[id] != CoStopped);
 	}
 
-	/// @return	`true` if any coroutine of this class is running, else `false`
+	/// @return	`true` if any resumable function of this class is running, else `false`
 	bool inline
 	areAnyResumablesRunning() const
 	{
@@ -184,7 +183,7 @@ public:
 		return false;
 	}
 
-	/// @return	`true` if any of the specified coroutine are running, else `false`
+	/// @return	`true` if any of the specified resumable function are running, else `false`
 	bool inline
 	areAnyResumablesRunning(std::initializer_list<uint8_t> ids) const
 	{
@@ -196,20 +195,20 @@ public:
 		return false;
 	}
 
-	/// @return	`true` if all of the specified coroutine are running, else `false`
+	/// @return	`true` if all of the specified resumable function are running, else `false`
 	bool inline
 	areAllResumablesRunning(std::initializer_list<uint8_t> ids) const
 	{
 		for (uint8_t id : ids)
 		{
 			// = not isResumableRunning(id)
-			if (id >= Methods or coStateArray[id] == CoStopped)
+			if (id >= Functions or coStateArray[id] == CoStopped)
 				return false;
 		}
 		return true;
 	}
 
-	/// @return	`true` if none of the specified coroutine are running, else `false`
+	/// @return	`true` if none of the specified resumable function are running, else `false`
 	bool inline
 	joinResumables(std::initializer_list<uint8_t> ids) const
 	{
@@ -219,14 +218,14 @@ public:
 #ifdef __DOXYGEN__
 	/// @cond
 	/**
-	 * Run the coroutine.
+	 * Run the resumable function.
 	 *
 	 * You need to implement this method in you subclass yourself.
 	 *
 	 * @return	>`NestingError` if still running, <=`NestingError` if it has finished.
 	 */
 	xpcc::co::Result< ReturnType >
-	coroutine(...);
+	resumable(...);
 	/// @endcond
 #endif
 
@@ -281,7 +280,7 @@ protected:
 	static void
 	checkCoMethods()
 	{
-		static_assert(index < Methods,
+		static_assert(index < Functions,
 				"Index out of bounds! Increase the `Methods` template argument of your Resumable class.");
 	}
 
@@ -290,12 +289,12 @@ protected:
 	static void
 	checkCoType()
 	{
-		static_assert(isNested == false, "You must declare an index for this coroutine!");
+		static_assert(isNested == false, "You must declare an index for this resumable function!");
 	}
 	/// @endcond
 
 private:
-	CoState coStateArray[Methods];
+	CoState coStateArray[Functions];
 };
 
 } // namespace co

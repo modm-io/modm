@@ -12,7 +12,7 @@
 
 #include <xpcc/architecture/interface/spi_device.hpp>
 #include <xpcc/architecture/interface/i2c_device.hpp>
-#include <xpcc/processing/coroutine.hpp>
+#include <xpcc/processing/resumable.hpp>
 
 namespace xpcc
 {

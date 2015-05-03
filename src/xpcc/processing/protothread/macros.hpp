@@ -31,7 +31,7 @@
 #ifndef XPCC_PT__MACROS_HPP
 #define XPCC_PT__MACROS_HPP
 
-#include <xpcc/processing/coroutine.hpp>
+#include <xpcc/processing/resumable.hpp>
 
 /**
  * Declare start of protothread
@@ -115,17 +115,17 @@
 
 
 /**
- * Calls a given coroutine and returns
+ * Calls a given resumable function and returns
  * whether it completed successfully or not.
  *
  * \ingroup	protothread
  * \hideinitializer
  */
-#define PT_CALL(coroutine) \
+#define PT_CALL(resumable) \
 	({ \
 		this->ptState = __LINE__; \
 		case __LINE__: \
-			auto coResult = coroutine; \
+			auto coResult = resumable; \
 			if (coResult.getState() > xpcc::co::NestingError) { \
 				return true; \
 			} \

@@ -11,7 +11,7 @@
 #define XPCC_LIS302DL_HPP
 
 #include <xpcc/architecture/interface/register.hpp>
-#include <xpcc/processing/coroutine.hpp>
+#include <xpcc/processing/resumable.hpp>
 #include "lis3_transport.hpp"
 
 namespace xpcc

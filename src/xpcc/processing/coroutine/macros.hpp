@@ -14,28 +14,28 @@
 
 #ifdef __DOXYGEN__
 /**
- * Declare start of coroutine with index.
+ * Declare start of resumable function with index.
  *
- * @warning	Use at start of the `coroutine()` implementation!
- * @ingroup	coroutine
+ * @warning	Use at start of the `resumable()` implementation!
+ * @ingroup	resumable
  */
 #define CO_BEGIN(index)
 
 /**
- * Declare start of a nested coroutine.
+ * Declare start of a nested resumable function.
  * This will immidiately return if the nesting is too deep.
  *
- * @warning	Use at start of the `coroutine()` implementation!
- * @ingroup	coroutine
+ * @warning	Use at start of the `resumable()` implementation!
+ * @ingroup	resumable
  */
 #define CO_BEGIN()
 #endif
 
 /**
- * End the coroutine and return a result.
+ * End the resumable function and return a result.
  *
- * @warning	Use at end of the `coroutine()` implementation only!
- * @ingroup	coroutine
+ * @warning	Use at end of the `resumable()` implementation only!
+ * @ingroup	resumable
  * @hideinitializer
  */
 #define CO_END_RETURN(result) \
@@ -44,13 +44,13 @@
 			this->popCo(); \
 			return {xpcc::co::WrongState}; \
 	} \
-	static_assert(uint16_t(__COUNTER__) - coCounter < 256, "You have too many states in this coroutine!");
+	static_assert(uint16_t(__COUNTER__) - coCounter < 256, "You have too many states in this resumable function!");
 
 /**
- * End the coroutine. You can use this to return `void`, or if the result does not matter.
+ * End the resumable function. You can use this to return `void`, or if the result does not matter.
  *
- * @warning	Use at end of the `coroutine()` implementation only!
- * @ingroup	coroutine
+ * @warning	Use at end of the `resumable()` implementation only!
+ * @ingroup	resumable
  * @hideinitializer
  */
 #define CO_END() \
@@ -61,44 +61,44 @@
 			this->popCo(); \
 			return {xpcc::co::WrongState}; \
 	} \
-	static_assert(uint16_t(__COUNTER__) - coCounter < 256, "You have too many states in this coroutine!");
+	static_assert(uint16_t(__COUNTER__) - coCounter < 256, "You have too many states in this resumable function!");
 
 /**
- * End the coroutine by calling another coroutine and returning its result.
+ * End the resumable function by calling another resumable function and returning its result.
  *
- * @warning	Use at end of the `coroutine()` implementation only!
- * @ingroup	coroutine
+ * @warning	Use at end of the `resumable()` implementation only!
+ * @ingroup	resumable
  * @hideinitializer
  */
-#define CO_END_RETURN_CALL(coroutine) \
-			CO_RETURN_CALL(coroutine); \
+#define CO_END_RETURN_CALL(resumable) \
+			CO_RETURN_CALL(resumable); \
 		default: \
 			this->popCo(); \
 			return {xpcc::co::WrongState}; \
 	} \
-	static_assert(uint16_t(__COUNTER__) - coCounter < 256, "You have too many states in this coroutine!");
+	static_assert(uint16_t(__COUNTER__) - coCounter < 256, "You have too many states in this resumable function!");
 
 /**
- * Yield coroutine until next invocation.
+ * Yield resumable function until next invocation.
  *
- * @ingroup	coroutine
+ * @ingroup	resumable
  * @hideinitializer
  */
 #define CO_YIELD() \
 			CO_INTERNAL_SET_CASE_YIELD(__COUNTER__)
 
 /**
- * Cause coroutine to wait until given child protothread completes.
+ * Cause resumable function to wait until given child protothread completes.
  *
- * @ingroup	coroutine
+ * @ingroup	resumable
  * @hideinitializer
  */
 #define CO_WAIT_THREAD(child) 	CO_WAIT_UNTIL(!(child).run())
 
 /**
- * Cause coroutine to wait **while** given `condition` is true.
+ * Cause resumable function to wait **while** given `condition` is true.
  *
- * @ingroup	coroutine
+ * @ingroup	resumable
  * @hideinitializer
  */
 #define CO_WAIT_WHILE(condition) \
@@ -109,24 +109,24 @@
 			} \
 
 /**
- * Cause coroutine to wait **until** given `condition` is true.
+ * Cause resumable function to wait **until** given `condition` is true.
  *
- * @ingroup	coroutine
+ * @ingroup	resumable
  * @hideinitializer
  */
 #define CO_WAIT_UNTIL(condition) \
 	CO_WAIT_WHILE(!(condition))
 
 /**
- * Calls a coroutine and returns its result.
+ * Calls a resumable function and returns its result.
  *
- * @ingroup	coroutine
+ * @ingroup	resumable
  * @hideinitializer
  */
-#define CO_CALL(coroutine) \
+#define CO_CALL(resumable) \
 	({ \
 			CO_INTERNAL_SET_CASE(__COUNTER__); \
-			auto coResult = coroutine; \
+			auto coResult = resumable; \
 			if (coResult.getState() > xpcc::co::NestingError) { \
 				this->popCo(); \
 				return {xpcc::co::Running}; \
@@ -135,31 +135,31 @@
 	})
 
 /**
- * Calls a coroutine, busy-waits and returns its result.
+ * Calls a resumable function, busy-waits and returns its result.
  *
  * @warning	Use this with extreme caution, this can cause deadlocks!
- * @ingroup	coroutine
+ * @ingroup	resumable
  * @hideinitializer
  */
-#define CO_CALL_BLOCKING(coroutine) \
+#define CO_CALL_BLOCKING(resumable) \
 	({ \
-			auto coResult = coroutine; \
+			auto coResult = resumable; \
 			while (coResult.getState() > xpcc::co::NestingError) \
-			{ coResult = coroutine; } \
+			{ coResult = resumable; } \
 			coResult.getResult(); \
 	})
 
 /**
-* Exits a coroutine and returns another coroutine's result.
+* Exits a resumable function and returns another resumable function's result.
 *
-* @ingroup	coroutine
+* @ingroup	resumable
 * @hideinitializer
 */
-#define CO_RETURN_CALL(coroutine) \
+#define CO_RETURN_CALL(resumable) \
 		{ \
 			CO_INTERNAL_SET_CASE(__COUNTER__); \
 			{ \
-				auto coResult = coroutine; \
+				auto coResult = resumable; \
 				if (coResult.getState() > xpcc::co::NestingError) { \
 					this->popCo(); \
 					return {xpcc::co::Running}; \
@@ -169,9 +169,9 @@
 		}
 
 /**
- * Stop and exit from coroutine.
+ * Stop and exit from resumable function.
  *
- * @ingroup	coroutine
+ * @ingroup	resumable
  * @hideinitializer
  */
 #define CO_RETURN(result) \
@@ -195,7 +195,7 @@
 			return {xpcc::co::Running}; \
 		case ((counter % 255) + 1): ;
 
-/// Beginner structure for nested coroutines
+/// Beginner structure for nested resumable functions
 #define CO_BEGIN_1() \
 	constexpr uint16_t coCounter = __COUNTER__; \
 	this->template checkCoType<true>(); \
@@ -205,7 +205,7 @@
 		case (::xpcc::co::CoStopped): \
 			CO_INTERNAL_SET_CASE(__COUNTER__);
 
-/// Beginner structure for conventional coroutines
+/// Beginner structure for conventional resumable functions
 #define CO_BEGIN_0(index) \
 	constexpr uint16_t coCounter = __COUNTER__; \
 	this->template checkCoMethods<index>(); \

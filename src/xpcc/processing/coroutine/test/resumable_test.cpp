@@ -7,7 +7,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/processing/coroutine.hpp>
+#include <xpcc/processing/resumable.hpp>
 #include "resumable_test.hpp"
 
 // ----------------------------------------------------------------------------
@@ -172,7 +172,7 @@ ResumableTest::testClassMethods()
 	TEST_ASSERT_EQUALS(thread0.task1().getState(), xpcc::co::Running);
 	// state should be 1
 	TEST_ASSERT_EQUALS(thread0.state, 1);
-	// stop coroutine of thread0
+	// stop resumable of thread0
 	thread0.stopResumable();
 	// not running anymore
 	TEST_ASSERT_FALSE(thread0.isResumableRunning());
@@ -761,7 +761,7 @@ class TestingCaseLabelThread : public xpcc::co::NestedResumable<>
 {
 public:
 	xpcc::co::Result<bool>
-	coroutine()
+	resumable()
 	{
 		CO_BEGIN();
 		// 1 case label
@@ -815,10 +815,10 @@ ResumableTest::testCaseNumbers()
 	// this routine must be called 253 times
 	for(uint32_t ii=0; ii < 253; ii++)
 	{
-		TEST_ASSERT_EQUALS(thread.coroutine().getState(), xpcc::co::Running);
+		TEST_ASSERT_EQUALS(thread.resumable().getState(), xpcc::co::Running);
 	}
 	// the 254th time must return
-	auto result = thread.coroutine();
+	auto result = thread.resumable();
 	TEST_ASSERT_EQUALS(result.getState(), xpcc::co::Stop);
 	TEST_ASSERT_EQUALS(result.getResult(), true);
 }
@@ -834,7 +834,7 @@ public:
 	};
 
 	xpcc::co::Result<Animal>
-	coroutine()
+	resumable()
 	{
 		CO_BEGIN();
 
@@ -849,11 +849,11 @@ ResumableTest::testReturnEnumClass()
 {
 	TestingCaseEnumClassThread thread;
 
-	// run once; coroutine will yield
-	TEST_ASSERT_EQUALS(thread.coroutine().getState(), xpcc::co::Running);
+	// run once; resumable will yield
+	TEST_ASSERT_EQUALS(thread.resumable().getState(), xpcc::co::Running);
 
 	// now we should get a cat
-	auto result = thread.coroutine();
+	auto result = thread.resumable();
 	TEST_ASSERT_EQUALS(result.getState(), xpcc::co::Stop);
 	TEST_ASSERT_TRUE(result.getResult() == TestingCaseEnumClassThread::Animal::Cat);
 }
@@ -862,7 +862,7 @@ class TestingCaseVoidClassThread : public xpcc::co::NestedResumable<>
 {
 public:
 	xpcc::co::Result<void>
-	coroutine()
+	resumable()
 	{
 		CO_BEGIN();
 
@@ -877,16 +877,16 @@ ResumableTest::testReturnVoidClass()
 {
 	TestingCaseVoidClassThread thread;
 
-	// run once; coroutine will yield
-	TEST_ASSERT_EQUALS(thread.coroutine().getState(), xpcc::co::Running);
+	// run once; resumable will yield
+	TEST_ASSERT_EQUALS(thread.resumable().getState(), xpcc::co::Running);
 
-	auto result = thread.coroutine();
+	auto result = thread.resumable();
 	TEST_ASSERT_EQUALS(result.getState(), xpcc::co::Stop);
 	TEST_ASSERT_EQUALS(result.getResult(), xpcc::co::Stop);
 	TEST_ASSERT_TRUE(sizeof(result) == 1);
 
 	// this now returns the state
-	auto result2 = CO_CALL_BLOCKING(thread.coroutine());
+	auto result2 = CO_CALL_BLOCKING(thread.resumable());
 	TEST_ASSERT_EQUALS(result2, xpcc::co::Stop);
 }
 
@@ -958,11 +958,11 @@ ResumableTest::testNonNestedResumables()
 	TEST_ASSERT_FALSE(thread.isResumableRunning(2));
 	TEST_ASSERT_FALSE(thread.isResumableRunning(100));
 
-	// run once; coroutine will yield, but not finish
+	// run once; resumable will yield, but not finish
 	TEST_ASSERT_EQUALS(thread.call0().getState(), xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread.state0, 0);
 
-	// coroutine 0 should be running
+	// resumable 0 should be running
 	TEST_ASSERT_TRUE(thread.areAnyResumablesRunning());
 	TEST_ASSERT_TRUE(thread.isResumableRunning(0));
 	TEST_ASSERT_FALSE(thread.isResumableRunning(1));
@@ -978,7 +978,7 @@ ResumableTest::testNonNestedResumables()
 	TEST_ASSERT_TRUE(thread.areAnyResumablesRunning({0, 1, 100}));
 	TEST_ASSERT_FALSE(thread.areAllResumablesRunning({0, 100}));
 
-	// the other coroutines should be able to run at the same time
+	// the other resumables should be able to run at the same time
 	TEST_ASSERT_EQUALS(thread.call1().getState(), xpcc::co::Running);
 	TEST_ASSERT_EQUALS(thread.state1, 0);
 	TEST_ASSERT_EQUALS(thread.call2().getState(), xpcc::co::Running);
