@@ -69,13 +69,13 @@ public:
 	xpcc::ResumableResult<bool>
 	ping()
 	{
-		CO_BEGIN();
+		RF_BEGIN();
 
-		CO_WAIT_UNTIL( transaction.configurePing() and startTransaction() );
+		RF_WAIT_UNTIL( transaction.configurePing() and startTransaction() );
 
-		CO_WAIT_WHILE( isTransactionRunning() );
+		RF_WAIT_WHILE( isTransactionRunning() );
 
-		CO_END_RETURN( wasTransactionSuccessful() );
+		RF_END_RETURN( wasTransactionSuccessful() );
 	}
 
 protected:
@@ -137,13 +137,13 @@ protected:
 	xpcc::ResumableResult<bool>
 	runTransaction()
 	{
-		CO_BEGIN();
+		RF_BEGIN();
 
-		CO_WAIT_UNTIL( startTransaction() );
+		RF_WAIT_UNTIL( startTransaction() );
 
-		CO_WAIT_WHILE( isTransactionRunning() );
+		RF_WAIT_WHILE( isTransactionRunning() );
 
-		CO_END_RETURN( wasTransactionSuccessful() );
+		RF_END_RETURN( wasTransactionSuccessful() );
 	}
 
 protected:

@@ -52,7 +52,7 @@ xpcc::Bma180<I2cMaster>::configure(bma180::Range range, bma180::Bandwidth bandwi
 	// set bandwidth
 	ok &= writeRegister(bma180::REGISTER_BW_TCS, bandwidth);
 	// set mode configuration
-	ok &= writeMaskedRegister(bma180::REGISTER_TCO_Z, bma180::MODE_CONFIG, mode);
+	ok &= writeMaskedRegister(bma180::REGISTER_TRF_Z, bma180::MODE_CONFIG, mode);
 	// set interrupt
 	if (interrupt) ok &= writeRegister(bma180::REGISTER_CTRL3, bma180::NEW_DATA_INT);
 	

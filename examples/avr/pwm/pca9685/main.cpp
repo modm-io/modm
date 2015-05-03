@@ -49,18 +49,18 @@ int main()
 
 	// Initialize the controller. I use RGB-LEDs with common annode.
 	// Therfore the controllers output needs to be inverted.
-	CO_CALL_BLOCKING(pwmController.initialize(0, xpcc::pca9685::MODE2_INVRT));
+	RF_CALL_BLOCKING(pwmController.initialize(0, xpcc::pca9685::MODE2_INVRT));
 
 	uint16_t pwm = 0;
 
 	while (true)
 	{
 		// Fade all LEDS but LED 5 and 11
-		CO_CALL_BLOCKING(pwmController.setAllChannels(pwm));
+		RF_CALL_BLOCKING(pwmController.setAllChannels(pwm));
 		// LED 5 is always off
-		CO_CALL_BLOCKING(pwmController.setChannel(5, 0));
+		RF_CALL_BLOCKING(pwmController.setChannel(5, 0));
 		// LED 11 is always on
-		CO_CALL_BLOCKING(pwmController.setChannel(11, 0xfff));
+		RF_CALL_BLOCKING(pwmController.setChannel(11, 0xfff));
 
 		// Increase brighness with each cycle. It would be better to use a
 		// timer instead...

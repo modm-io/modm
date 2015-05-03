@@ -128,7 +128,7 @@ public:
 %% if parameters.busywait
 		return transfer(data).getResult();
 %% else
-		return CO_CALL_BLOCKING(transfer(data));
+		return RF_CALL_BLOCKING(transfer(data));
 %% endif
 	}
 
@@ -138,7 +138,7 @@ public:
 %% if parameters.busywait
 		transfer(tx, rx, length);
 %% else
-		CO_CALL_BLOCKING(transfer(tx, rx, length));
+		RF_CALL_BLOCKING(transfer(tx, rx, length));
 %% endif
 	}
 

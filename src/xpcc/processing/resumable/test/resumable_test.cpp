@@ -22,26 +22,26 @@ public:
 	xpcc::ResumableResult<bool>
 	task1()
 	{
-		CO_BEGIN();
+		RF_BEGIN();
 
 		state = 1;
 		depth = getResumableDepth();
 
-		CO_YIELD();
+		RF_YIELD();
 
 		state = 2;
 
-		CO_END_RETURN(false);
+		RF_END_RETURN(false);
 	}
 
 	xpcc::ResumableResult<bool>
 	task2()
 	{
-		CO_BEGIN();
+		RF_BEGIN();
 
 		state = 3;
 
-		CO_END_RETURN(true);
+		RF_END_RETURN(true);
 	}
 
 	uint8_t state;
@@ -59,26 +59,26 @@ public:
 	xpcc::ResumableResult<bool>
 	task1()
 	{
-		CO_BEGIN();
+		RF_BEGIN();
 
 		state = 1;
 		depth = getResumableDepth();
 
-		CO_YIELD();
+		RF_YIELD();
 
 		state = 2;
 
-		CO_END();
+		RF_END();
 	}
 
 	xpcc::ResumableResult<bool>
 	task2()
 	{
-		CO_BEGIN();
+		RF_BEGIN();
 
 		state = 3;
 
-		CO_END();
+		RF_END();
 	}
 
 	uint8_t state;
@@ -96,26 +96,26 @@ public:
 	xpcc::ResumableResult<bool>
 	task1()
 	{
-		CO_BEGIN();
+		RF_BEGIN();
 
 		state = 1;
 		depth = getResumableDepth();
 
-		CO_YIELD();
+		RF_YIELD();
 
 		state = 2;
 
-		CO_END();
+		RF_END();
 	}
 
 	xpcc::ResumableResult<bool>
 	task2()
 	{
-		CO_BEGIN();
+		RF_BEGIN();
 
 		state = 3;
 
-		CO_END();
+		RF_END();
 	}
 
 	uint8_t state;
@@ -254,63 +254,63 @@ public:
 	xpcc::ResumableResult<bool>
 	task1()
 	{
-		CO_BEGIN();
+		RF_BEGIN();
 
 		state1 = 1;
 
-		CO_WAIT_UNTIL(condition1);
+		RF_WAIT_UNTIL(condition1);
 
 		state1 = 2;
 		depth1 = getResumableDepth();
 
-		CO_YIELD();
+		RF_YIELD();
 
 		// manual spawn
-		CO_WAIT_WHILE((callResult1 = task2()).getState() > xpcc::rf::NestingError);
+		RF_WAIT_WHILE((callResult1 = task2()).getState() > xpcc::rf::NestingError);
 
 		state1 = 3;
 
-		CO_YIELD();
+		RF_YIELD();
 
 		state1 = 4;
 
-		CO_END();
+		RF_END();
 	}
 
 protected:
 	xpcc::ResumableResult<bool>
 	task2()
 	{
-		CO_BEGIN();
+		RF_BEGIN();
 
 		state2 = 1;
 
-		CO_WAIT_UNTIL(condition2);
+		RF_WAIT_UNTIL(condition2);
 
 		state2 = 2;
 		depth2 = getResumableDepth();
 
-		CO_YIELD();
+		RF_YIELD();
 
-		CO_WAIT_WHILE((callResult2 = task3()).getState() > xpcc::rf::NestingError);
+		RF_WAIT_WHILE((callResult2 = task3()).getState() > xpcc::rf::NestingError);
 
 		state2 = 3;
 
-		CO_YIELD();
+		RF_YIELD();
 
 		state2 = 4;
 
-		CO_END();
+		RF_END();
 	}
 
 	xpcc::ResumableResult<bool>
 	task3()
 	{
-		CO_BEGIN();
+		RF_BEGIN();
 
 		state3 = 1;
 
-		CO_WAIT_UNTIL(condition3);
+		RF_WAIT_UNTIL(condition3);
 
 		state3 = 2;
 		depth3 = getResumableDepth();
@@ -318,11 +318,11 @@ protected:
 		// to buffer the next nested local continuation anymore!
 		callResult3 = task3();
 
-		CO_YIELD();
+		RF_YIELD();
 
 		state3 = 3;
 
-		CO_END();
+		RF_END();
 	}
 
 public:
@@ -459,41 +459,41 @@ public:
 	xpcc::ResumableResult<bool>
 	parentResumable()
 	{
-		CO_BEGIN();
+		RF_BEGIN();
 
 		state = 1;
-		CO_YIELD();
+		RF_YIELD();
 
-		success = CO_CALL(spawningResumable(waits));
+		success = RF_CALL(spawningResumable(waits));
 
 		state = 3;
-		CO_YIELD();
+		RF_YIELD();
 
 		if (success)
 			state = 4;
 		else
 			state = 5;
 
-		CO_END();
+		RF_END();
 	}
 
 protected:
 	xpcc::ResumableResult<bool>
 	spawningResumable(uint8_t calls)
 	{
-		CO_BEGIN();
+		RF_BEGIN();
 
-		CO_WAIT_UNTIL(startSpawningResumable(calls));
+		RF_WAIT_UNTIL(startSpawningResumable(calls));
 
 		state = 2;
-		CO_YIELD();
+		RF_YIELD();
 
-		CO_WAIT_WHILE(runSpawningResumable(calls));
+		RF_WAIT_WHILE(runSpawningResumable(calls));
 
 		if(isSpawningResumableSuccessful(calls))
-			CO_RETURN(true);
+			RF_RETURN(true);
 
-		CO_END();
+		RF_END();
 	}
 
 	bool
@@ -591,83 +591,83 @@ public:
 		uint8_t rslt1;
 		int8_t rslt2;
 
-		CO_BEGIN();
+		RF_BEGIN();
 
 		state = 1;
-		CO_YIELD();
+		RF_YIELD();
 
-		result1 = CO_CALL(spawningResumable1());
-		result2 = CO_CALL(spawningResumable2());
+		result1 = RF_CALL(spawningResumable1());
+		result2 = RF_CALL(spawningResumable2());
 
 		state = 2;
-		CO_YIELD();
+		RF_YIELD();
 
-		rslt1 = CO_CALL(spawningResumable1());
+		rslt1 = RF_CALL(spawningResumable1());
 		resultLocal1 = rslt1;
 
-		rslt2 = CO_CALL(spawningResumable2());
+		rslt2 = RF_CALL(spawningResumable2());
 		resultLocal2 = rslt2;
 
 		state = 3;
-		CO_YIELD();
+		RF_YIELD();
 
-		if (CO_CALL(spawningResumable1()) == 42)
+		if (RF_CALL(spawningResumable1()) == 42)
 		{
 			resultIf1 = 42;
 		}
-		if (CO_CALL(spawningResumable2()) == 42)
+		if (RF_CALL(spawningResumable2()) == 42)
 		{
 			resultIf2 = 42;
 		}
 
 		state = 4;
-		CO_YIELD();
+		RF_YIELD();
 
-		setResultFunction1(CO_CALL(spawningResumable1()));
-		setResultFunction2(CO_CALL(spawningResumable2()));
+		setResultFunction1(RF_CALL(spawningResumable1()));
+		setResultFunction2(RF_CALL(spawningResumable2()));
 
 		state = 5;
-		CO_YIELD();
+		RF_YIELD();
 
 		// I would expect this to work, especially after the previous examples,
 		// but this 'crosses initialization of rslt'
 //		{
-//			uint8_t rslt = CO_CALL(spawningResumable1());
+//			uint8_t rslt = RF_CALL(spawningResumable1());
 //			resultStack1 = rslt;
 //		}
 //		{
-//			int8_t rslt = CO_CALL(spawningResumable2());
+//			int8_t rslt = RF_CALL(spawningResumable2());
 //			resultStack2 = rslt;
 //		}
 //
 //		state = 6;
-//		CO_YIELD();
+//		RF_YIELD();
 
-		CO_END_RETURN(static_cast<uint16_t>(result1 + resultLocal1));
+		RF_END_RETURN(static_cast<uint16_t>(result1 + resultLocal1));
 	}
 
 protected:
 	xpcc::ResumableResult<uint8_t>
 	spawningResumable1()
 	{
-		CO_BEGIN();
+		RF_BEGIN();
 
-		CO_RETURN(42);
+		RF_RETURN(42);
 
-		CO_END();
+		RF_END();
 	}
 
 	xpcc::ResumableResult<int8_t>
 	spawningResumable2()
 	{
-		CO_BEGIN();
+		RF_BEGIN();
 
 		if (waits >= 2)
 		{
-			CO_RETURN(42);
+			RF_RETURN(42);
 		}
 
-		CO_END_RETURN(-42);
+		RF_END_RETURN(-42);
 	}
 
 	void
@@ -712,7 +712,7 @@ ResumableTest::testComplexSpawn()
 	TEST_ASSERT_EQUALS(thread.state, 1);
 
 	waits = 1;
-	// now run all CO_CALLs until yield
+	// now run all RF_CALLs until yield
 	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::rf::Running);
 	TEST_ASSERT_EQUALS(thread.state, 2);
 
@@ -720,7 +720,7 @@ ResumableTest::testComplexSpawn()
 	TEST_ASSERT_EQUALS(thread.result2, -42);
 
 	waits = 3;
-	// run second, local CO_CALLs
+	// run second, local RF_CALLs
 	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::rf::Running);
 	TEST_ASSERT_EQUALS(thread.state, 3);
 
@@ -728,7 +728,7 @@ ResumableTest::testComplexSpawn()
 	TEST_ASSERT_EQUALS(thread.resultLocal2, 42);
 
 	waits = 1;
-	// run third, if CO_CALLs
+	// run third, if RF_CALLs
 	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::rf::Running);
 	TEST_ASSERT_EQUALS(thread.state, 4);
 
@@ -736,7 +736,7 @@ ResumableTest::testComplexSpawn()
 	TEST_ASSERT_EQUALS(thread.resultIf2, 0);
 
 	waits = 3;
-	// run third, if CO_CALLs
+	// run third, if RF_CALLs
 	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::rf::Running);
 	TEST_ASSERT_EQUALS(thread.state, 5);
 
@@ -744,7 +744,7 @@ ResumableTest::testComplexSpawn()
 	TEST_ASSERT_EQUALS(thread.resultFunction2, 42);
 
 //	waits = 3;
-//	// run fourth, stack CO_CALLs
+//	// run fourth, stack RF_CALLs
 //	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::rf::Running);
 //	TEST_ASSERT_EQUALS(thread.state, 5);
 //
@@ -763,47 +763,47 @@ public:
 	xpcc::ResumableResult<bool>
 	resumable()
 	{
-		CO_BEGIN();
+		RF_BEGIN();
 		// 1 case label
 
-		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
-		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
-		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
-		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
-		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
-		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
-		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
-		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
-		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
-		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
+		RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();
+		RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();
+		RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();
+		RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();
+		RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();
+		RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();
+		RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();
+		RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();
+		RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();
+		RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();
 		// 101 case labels
 
-		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
-		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
-		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
-		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
-		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
-		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
-		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
-		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
-		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
-		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
+		RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();
+		RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();
+		RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();
+		RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();
+		RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();
+		RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();
+		RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();
+		RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();
+		RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();
+		RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();
 		// 201 case labels
 
-		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
-		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
-		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
-		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
-		CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();CO_YIELD();
+		RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();
+		RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();
+		RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();
+		RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();
+		RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();RF_YIELD();
 		// 251 case labels
 
-		CO_YIELD();CO_YIELD();CO_YIELD();
+		RF_YIELD();RF_YIELD();RF_YIELD();
 		// 254 case labels
 
 		// uncommenting this case label must now trigger a static assert warning!
-//		CO_YIELD();
+//		RF_YIELD();
 
-		CO_END_RETURN(true);
+		RF_END_RETURN(true);
 	}
 };
 
@@ -836,11 +836,11 @@ public:
 	xpcc::ResumableResult<Animal>
 	resumable()
 	{
-		CO_BEGIN();
+		RF_BEGIN();
 
-		CO_YIELD();		// generate at least one additional case statement
+		RF_YIELD();		// generate at least one additional case statement
 
-		CO_END_RETURN(Animal::Cat);
+		RF_END_RETURN(Animal::Cat);
 	}
 };
 
@@ -864,11 +864,11 @@ public:
 	xpcc::ResumableResult<void>
 	resumable()
 	{
-		CO_BEGIN();
+		RF_BEGIN();
 
-		CO_YIELD();		// generate at least one additional case statement
+		RF_YIELD();		// generate at least one additional case statement
 
-		CO_END();	// return nothing!
+		RF_END();	// return nothing!
 	}
 };
 
@@ -886,7 +886,7 @@ ResumableTest::testReturnVoidClass()
 	TEST_ASSERT_TRUE(sizeof(result) == 1);
 
 	// this now returns the state
-	auto result2 = CO_CALL_BLOCKING(thread.resumable());
+	auto result2 = RF_CALL_BLOCKING(thread.resumable());
 	TEST_ASSERT_EQUALS(result2, xpcc::rf::Stop);
 }
 
@@ -896,49 +896,49 @@ public:
 	xpcc::ResumableResult<void>
 	call0()
 	{
-		CO_BEGIN(0);
+		RF_BEGIN(0);
 
 		state0 = 0;
-		CO_YIELD();
+		RF_YIELD();
 
 		state0 = 1;
-		CO_END();
+		RF_END();
 	}
 
 	xpcc::ResumableResult<void>
 	call1()
 	{
-		CO_BEGIN(1);
+		RF_BEGIN(1);
 
 		state1 = 0;
-		CO_YIELD();
+		RF_YIELD();
 
 		state1 = 1;
-		CO_YIELD();
+		RF_YIELD();
 
 		state1 = 2;
-		CO_END();
+		RF_END();
 	}
 
 	xpcc::ResumableResult<void>
 	call2()
 	{
-		CO_BEGIN(2);
+		RF_BEGIN(2);
 
 		state2 = 0;
-		CO_YIELD();
+		RF_YIELD();
 
 		state2 = 1;
-		CO_YIELD();
+		RF_YIELD();
 
 		state2 = 2;
-		CO_CALL(call1());
+		RF_CALL(call1());
 
 		state2 = 3;
-		CO_CALL(call0());
+		RF_CALL(call0());
 
 		state2 = 4;
-		CO_END();
+		RF_END();
 	}
 
 	uint8_t state0;

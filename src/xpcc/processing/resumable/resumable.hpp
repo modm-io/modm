@@ -77,7 +77,7 @@ struct ResumableResult<void>
 {
 	/// Return only the `state`. There is no result.
 	ResumableResult(uint_fast8_t state) : state(state) {}
-	/// Constructor with dummy result needed by the `CO_CALL_BLOCKING` macro.
+	/// Constructor with dummy result needed by the `RF_CALL_BLOCKING` macro.
 	ResumableResult(uint_fast8_t state, uint_fast8_t /*dummy_result*/) : state(state) {}
 
 	inline uint_fast8_t
@@ -101,19 +101,19 @@ private:
  * resumable functions in your class.
  * You need to declare the number of resumable functions in your class!
  *
- * You must begin each resumable function using `CO_BEGIN(index)` where `index` is
+ * You must begin each resumable function using `RF_BEGIN(index)` where `index` is
  * the unique index of your resumable function starting at zero.
- * You may exit and return a value by using `CO_RETURN(value)` or
- * return the result of another resumable function using `CO_RETURN_CALL(resumable())`.
+ * You may exit and return a value by using `RF_RETURN(value)` or
+ * return the result of another resumable function using `RF_RETURN_CALL(resumable())`.
  * This return value is wrapped in a `xpcc::ResumableResult<Type>` struct
- * and transparently returned by the `CO_CALL` macro so it can be used
+ * and transparently returned by the `RF_CALL` macro so it can be used
  * to influence your program flow.
- * If the resumable function reaches `CO_END()` it will exit automatically,
+ * If the resumable function reaches `RF_END()` it will exit automatically,
  * with the result of `0` cast to the return type.
  * Should you wish to return a value at the end, you may use
- * `CO_END_RETURN(value)`.
+ * `RF_END_RETURN(value)`.
  * You may also return the result of another resumable function using
- * `CO_END_RETURN_CALL(resumable())`.
+ * `RF_END_RETURN_CALL(resumable())`.
  *
  * Be aware that this class keeps a seperate state for each of your resumable functions.
  * This allows each resumable function to be run at the same time.

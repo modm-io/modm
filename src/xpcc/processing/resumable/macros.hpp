@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_CO_MACROS_HPP
-#define XPCC_CO_MACROS_HPP
+#ifndef XPCC_RF_MACROS_HPP
+#define XPCC_RF_MACROS_HPP
 
 #include <xpcc/utils/arithmetic_traits.hpp>
 
@@ -19,7 +19,7 @@
  * @warning	Use at start of the `resumable()` implementation!
  * @ingroup	resumable
  */
-#define CO_BEGIN(index)
+#define RF_BEGIN(index)
 
 /**
  * Declare start of a nested resumable function.
@@ -28,7 +28,7 @@
  * @warning	Use at start of the `resumable()` implementation!
  * @ingroup	resumable
  */
-#define CO_BEGIN()
+#define RF_BEGIN()
 #endif
 
 /**
@@ -38,8 +38,8 @@
  * @ingroup	resumable
  * @hideinitializer
  */
-#define CO_END_RETURN(result) \
-			CO_RETURN(result); \
+#define RF_END_RETURN(result) \
+			RF_RETURN(result); \
 		default: \
 			this->popRf(); \
 			return {xpcc::rf::WrongState}; \
@@ -53,7 +53,7 @@
  * @ingroup	resumable
  * @hideinitializer
  */
-#define CO_END() \
+#define RF_END() \
  			this->stopRf(rfIndex); \
 			this->popRf(); \
 			return {xpcc::rf::Stop}; \
@@ -70,8 +70,8 @@
  * @ingroup	resumable
  * @hideinitializer
  */
-#define CO_END_RETURN_CALL(resumable) \
-			CO_RETURN_CALL(resumable); \
+#define RF_END_RETURN_CALL(resumable) \
+			RF_RETURN_CALL(resumable); \
 		default: \
 			this->popRf(); \
 			return {xpcc::rf::WrongState}; \
@@ -84,8 +84,8 @@
  * @ingroup	resumable
  * @hideinitializer
  */
-#define CO_YIELD() \
-			CO_INTERNAL_SET_CASE_YIELD(__COUNTER__)
+#define RF_YIELD() \
+			RF_INTERNAL_SET_CASE_YIELD(__COUNTER__)
 
 /**
  * Cause resumable function to wait until given child protothread completes.
@@ -93,7 +93,7 @@
  * @ingroup	resumable
  * @hideinitializer
  */
-#define CO_WAIT_THREAD(child) 	CO_WAIT_UNTIL(!(child).run())
+#define RF_WAIT_THREAD(child) 	RF_WAIT_UNTIL(!(child).run())
 
 /**
  * Cause resumable function to wait **while** given `condition` is true.
@@ -101,8 +101,8 @@
  * @ingroup	resumable
  * @hideinitializer
  */
-#define CO_WAIT_WHILE(condition) \
-			CO_INTERNAL_SET_CASE(__COUNTER__); \
+#define RF_WAIT_WHILE(condition) \
+			RF_INTERNAL_SET_CASE(__COUNTER__); \
 			if (condition) { \
 				this->popRf(); \
 				return {xpcc::rf::Running}; \
@@ -114,8 +114,8 @@
  * @ingroup	resumable
  * @hideinitializer
  */
-#define CO_WAIT_UNTIL(condition) \
-	CO_WAIT_WHILE(!(condition))
+#define RF_WAIT_UNTIL(condition) \
+	RF_WAIT_WHILE(!(condition))
 
 /**
  * Calls a resumable function and returns its result.
@@ -123,9 +123,9 @@
  * @ingroup	resumable
  * @hideinitializer
  */
-#define CO_CALL(resumable) \
+#define RF_CALL(resumable) \
 	({ \
-			CO_INTERNAL_SET_CASE(__COUNTER__); \
+			RF_INTERNAL_SET_CASE(__COUNTER__); \
 			auto rfResult = resumable; \
 			if (rfResult.getState() > xpcc::rf::NestingError) { \
 				this->popRf(); \
@@ -141,7 +141,7 @@
  * @ingroup	resumable
  * @hideinitializer
  */
-#define CO_CALL_BLOCKING(resumable) \
+#define RF_CALL_BLOCKING(resumable) \
 	({ \
 			auto rfResult = resumable; \
 			while (rfResult.getState() > xpcc::rf::NestingError) \
@@ -155,16 +155,16 @@
 * @ingroup	resumable
 * @hideinitializer
 */
-#define CO_RETURN_CALL(resumable) \
+#define RF_RETURN_CALL(resumable) \
 		{ \
-			CO_INTERNAL_SET_CASE(__COUNTER__); \
+			RF_INTERNAL_SET_CASE(__COUNTER__); \
 			{ \
 				auto rfResult = resumable; \
 				if (rfResult.getState() > xpcc::rf::NestingError) { \
 					this->popRf(); \
 					return {xpcc::rf::Running}; \
 				} \
-				CO_RETURN(rfResult.getResult()); \
+				RF_RETURN(rfResult.getResult()); \
 			} \
 		}
 
@@ -174,7 +174,7 @@
  * @ingroup	resumable
  * @hideinitializer
  */
-#define CO_RETURN(result) \
+#define RF_RETURN(result) \
 	{ \
 			this->stopRf(rfIndex); \
 			this->popRf(); \
@@ -184,66 +184,66 @@
 
 #ifndef __DOXYGEN__
 /// Required macro to set the same unique number twice
-#define CO_INTERNAL_SET_CASE(counter) \
+#define RF_INTERNAL_SET_CASE(counter) \
 			this->setRf((counter % 255) + 1, rfIndex); \
 		case ((counter % 255) + 1): ;
 
 /// Internal macro for yield
-#define CO_INTERNAL_SET_CASE_YIELD(counter) \
+#define RF_INTERNAL_SET_CASE_YIELD(counter) \
 			this->setRf((counter % 255) + 1, rfIndex); \
 			this->popRf(); \
 			return {xpcc::rf::Running}; \
 		case ((counter % 255) + 1): ;
 
 /// Beginner structure for nested resumable functions
-#define CO_BEGIN_1() \
+#define RF_BEGIN_1() \
 	constexpr uint16_t rfCounter = __COUNTER__; \
 	this->template checkRfType<true>(); \
 	constexpr uint8_t rfIndex = 0; \
 	if (!this->nestingOkRf()) return {xpcc::rf::NestingError}; \
 	switch (this->pushRf(0)) { \
 		case (::xpcc::rf::Stopped): \
-			CO_INTERNAL_SET_CASE(__COUNTER__);
+			RF_INTERNAL_SET_CASE(__COUNTER__);
 
 /// Beginner structure for conventional resumable functions
-#define CO_BEGIN_0(index) \
+#define RF_BEGIN_0(index) \
 	constexpr uint16_t rfCounter = __COUNTER__; \
 	this->template checkRfFunctions<index>(); \
 	this->template checkRfType<false>(); \
 	constexpr uint_fast8_t rfIndex = index; \
 	switch (this->pushRf(index)) { \
 		case (::xpcc::rf::Stopped): \
-			CO_INTERNAL_SET_CASE(__COUNTER__);
+			RF_INTERNAL_SET_CASE(__COUNTER__);
 
 // the following completely unreadable preprocessor macro magic is based on this
 // https://gustedt.wordpress.com/2010/06/08/detect-empty-macro-arguments/
 // http://efesx.com/2010/07/17/variadic-macro-to-count-number-of-arguments/#comment-255
-#define CO_ARG3(_0, _1, _2, ...) _2
-#define CO_HAS_COMMA(...) CO_ARG3(__VA_ARGS__, 1, 0)
-#define CO_TRIGGER_PARENTHESIS_(...) ,
+#define RF_ARG3(_0, _1, _2, ...) _2
+#define RF_HAS_COMMA(...) RF_ARG3(__VA_ARGS__, 1, 0)
+#define RF_TRIGGER_PARENTHESIS_(...) ,
 
-#define CO_ISEMPTY(...) _CO_ISEMPTY( \
+#define RF_ISEMPTY(...) _RF_ISEMPTY( \
 			/* test if there is just one argument, eventually an empty one */ \
-			CO_HAS_COMMA(__VA_ARGS__), \
+			RF_HAS_COMMA(__VA_ARGS__), \
 			/* test if _TRIGGER_PARENTHESIS_ together with the argument adds a comma */ \
-			CO_HAS_COMMA(CO_TRIGGER_PARENTHESIS_ __VA_ARGS__), \
+			RF_HAS_COMMA(RF_TRIGGER_PARENTHESIS_ __VA_ARGS__), \
 			/* test if the argument together with a parenthesis adds a comma */ \
-			CO_HAS_COMMA(__VA_ARGS__ (/*empty*/)), \
+			RF_HAS_COMMA(__VA_ARGS__ (/*empty*/)), \
 			/* test if placing it between _TRIGGER_PARENTHESIS_ and the parenthesis adds a comma */ \
-			CO_HAS_COMMA(CO_TRIGGER_PARENTHESIS_ __VA_ARGS__ (/*empty*/)) \
+			RF_HAS_COMMA(RF_TRIGGER_PARENTHESIS_ __VA_ARGS__ (/*empty*/)) \
 			)
 
-#define CO_PASTE5(_0, _1, _2, _3, _4) _0 ## _1 ## _2 ## _3 ## _4
-#define _CO_ISEMPTY(_0, _1, _2, _3) CO_HAS_COMMA(CO_PASTE5(CO_IS_EMPTY_CASE_, _0, _1, _2, _3))
-#define CO_IS_EMPTY_CASE_0001 ,
+#define RF_PASTE5(_0, _1, _2, _3, _4) _0 ## _1 ## _2 ## _3 ## _4
+#define _RF_ISEMPTY(_0, _1, _2, _3) RF_HAS_COMMA(RF_PASTE5(RF_IS_EMPTY_CASE_, _0, _1, _2, _3))
+#define RF_IS_EMPTY_CASE_0001 ,
 
-// all we wanted is to call CO_BEGIN_0 for 1 argument
-// and call CO_BEGIN_1 for 0 arguments. Makes total sense.
-#define CO_GET_MACRO3(n) CO_BEGIN_ ## n
-#define CO_GET_MACRO2(n) CO_GET_MACRO3(n)
-#define CO_GET_MACRO(...) CO_GET_MACRO2(CO_ISEMPTY(__VA_ARGS__))
-#define CO_BEGIN(...) CO_GET_MACRO(__VA_ARGS__)(__VA_ARGS__)
+// all we wanted is to call RF_BEGIN_0 for 1 argument
+// and call RF_BEGIN_1 for 0 arguments. Makes total sense.
+#define RF_GET_MACRO3(n) RF_BEGIN_ ## n
+#define RF_GET_MACRO2(n) RF_GET_MACRO3(n)
+#define RF_GET_MACRO(...) RF_GET_MACRO2(RF_ISEMPTY(__VA_ARGS__))
+#define RF_BEGIN(...) RF_GET_MACRO(__VA_ARGS__)(__VA_ARGS__)
 
 #endif
 
-#endif // XPCC_CO_MACROS_HPP
+#endif // XPCC_RF_MACROS_HPP

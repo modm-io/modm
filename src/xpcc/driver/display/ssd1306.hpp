@@ -159,21 +159,21 @@ public:
 	bool inline
 	pingBlocking()
 	{
-		return CO_CALL_BLOCKING(this->ping());
+		return RF_CALL_BLOCKING(this->ping());
 	}
 
 	/// initializes for 3V3 with charge-pump
 	bool inline
 	initializeBlocking()
 	{
-		return CO_CALL_BLOCKING(initialize());
+		return RF_CALL_BLOCKING(initialize());
 	}
 
 	/// Update the display with the content of the RAM buffer.
 	void
 	update() override
 	{
-		CO_CALL_BLOCKING(startWriteDisplay());
+		RF_CALL_BLOCKING(startWriteDisplay());
 	}
 
 	/// Use this method to synchronize writing to the displays buffer

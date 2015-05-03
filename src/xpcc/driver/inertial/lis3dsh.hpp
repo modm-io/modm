@@ -526,7 +526,7 @@ public:
 	bool inline
 	configureBlocking(Scale scale, MeasurementRate rate = MeasurementRate::Hz100)
 	{
-		return CO_CALL_BLOCKING(configure(scale, rate));
+		return RF_CALL_BLOCKING(configure(scale, rate));
 	}
 
 	xpcc::ResumableResult<bool>

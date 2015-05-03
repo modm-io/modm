@@ -21,7 +21,7 @@
  * is within the allocated nesting level depth.
  * If the allocated nesting level is exceeded, the resumable function does not execute, but returns
  * the `xpcc::rf::NestingError` state value.
- * However, the `PT_CALL()` or `CO_CALL()` macros are not constructed to handle this error and
+ * However, the `PT_CALL()` or `RF_CALL()` macros are not constructed to handle this error and
  * will interpret this error as a normal resumable function stop and therefore immediately continue program
  * execution.
  *
@@ -71,22 +71,22 @@ namespace xpcc
  * The resumable functions of this class are mutually exclusive, so only one
  * resumable function of the same object can run at the same time. Even if you
  * call another resumable function, it will simply return `xpcc::rf::WrongState`.
- * Using the `CO_CALL(resumable())` macro, you can wait for these
+ * Using the `RF_CALL(resumable())` macro, you can wait for these
  * resumable functions to become available and then run them, so you usually do
  * not need to worry about those cases.
  *
- * You must begin each resumable function using `CO_BEGIN()`.
- * You may exit and return a value by using `CO_RETURN(value)` or
- * return the result of another resumable function using `CO_RETURN_CALL(resumable())`.
+ * You must begin each resumable function using `RF_BEGIN()`.
+ * You may exit and return a value by using `RF_RETURN(value)` or
+ * return the result of another resumable function using `RF_RETURN_CALL(resumable())`.
  * This return value is wrapped in a `xpcc::ResumableResult<Type>` struct
- * and transparently returned by the `CO_CALL` macro so it can be used
+ * and transparently returned by the `RF_CALL` macro so it can be used
  * to influence your program flow.
- * If the resumable function reaches `CO_END()` it will exit automatically,
+ * If the resumable function reaches `RF_END()` it will exit automatically,
  * with the result of `0` cast to the return type.
  * Should you wish to return a value at the end, you may use
- * `CO_END_RETURN(value)`.
+ * `RF_END_RETURN(value)`.
  * You may also return the result of another resumable function using
- * `CO_END_RETURN_CALL(resumable())`.
+ * `RF_END_RETURN_CALL(resumable())`.
  *
  * @warning	**Resumables are not thread-safe!** If two threads access the
  * 			same resumable function, you must use a Mutex to regulate access to it.

@@ -126,13 +126,13 @@ public:
 		{%- endif %}
 		execute({% if action.parameterType %} const ParameterType& parameter {% endif %})
 		{
-			CO_BEGIN(0);
+			RF_BEGIN(0);
 
 			start({%- if action.parameterType %} parameter {%- endif %});
 
-			CO_WAIT_WHILE(this->run());
+			RF_WAIT_WHILE(this->run());
 
-			CO_END_RETURN(getResult());
+			RF_END_RETURN(getResult());
 		}
 
 	private:

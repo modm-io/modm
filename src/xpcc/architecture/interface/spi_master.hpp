@@ -106,7 +106,7 @@ public:
 	 * Swap a single byte and wait for completion non-blocking!.
 	 *
 	 * You must call this inside a Protothread or Resumable
-	 * using `PT_CALL` or `CO_CALL` respectively.
+	 * using `PT_CALL` or `RF_CALL` respectively.
 	 * @warning	These methods differ from Resumables by lacking context protection!
 	 * 			You must ensure that only one driver is accessing this resumable function
 	 * 			by using `aquire(ctx)` and `release(ctx)`.
@@ -124,7 +124,7 @@ public:
 	 * This may be hardware accelerated (DMA or Interrupt), but not guaranteed.
 	 *
 	 * You must call this inside a Protothread or Resumable
-	 * using `PT_CALL` or `CO_CALL` respectively.
+	 * using `PT_CALL` or `RF_CALL` respectively.
 	 * @warning	These methods differ from Resumables by lacking context protection!
 	 * 			You must ensure that only one driver is accessing this resumable function
 	 * 			by using `aquire(ctx)` and `release(ctx)`.

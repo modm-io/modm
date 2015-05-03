@@ -159,7 +159,7 @@ public:
 	bool inline
 	initializeBlocking()
 	{
-		return CO_CALL_BLOCKING(initialize());
+		return RF_CALL_BLOCKING(initialize());
 	}
 
 	//! \brief 	Configures some of the most important settings for the sensor.

@@ -77,9 +77,9 @@ namespace xpcc
 			REGISTER_CD1 = 0x2C,
 			REGISTER_CD2 = 0x2D,
 
-			REGISTER_TCO_X = 0x2E,			///< factory calibrated
-			REGISTER_TCO_Y = 0x2F,			///< factory calibrated
-			REGISTER_TCO_Z = 0x30,			///< factory calibrated
+			REGISTER_TRF_X = 0x2E,			///< factory calibrated
+			REGISTER_TRF_Y = 0x2F,			///< factory calibrated
+			REGISTER_TRF_Z = 0x30,			///< factory calibrated
 			REGISTER_GAIN_T = 0x31,			///< factory calibrated
 			REGISTER_GAIN_X = 0x32,			///< factory calibrated
 			REGISTER_GAIN_Y = 0x33,			///< factory calibrated
@@ -291,7 +291,7 @@ namespace xpcc
 		/// The options of REGISTER_LOW_DUR
 		enum LowDur {
 			LOW_DUR = (0x7F << 1),
-			TCO_RANGE = 0x01,
+			TRF_RANGE = 0x01,
 		};
 		/// The options of REGISTER_HIGH_DUR
 		enum HighDur {
@@ -307,27 +307,27 @@ namespace xpcc
 		// REGISTER_CD2
 
 		// MARK: Image Registers, TCO
-		/// The options of REGISTER_TCO_X
+		/// The options of REGISTER_TRF_X
 		enum SlopeDuration {
-			TCO_X = (0x3F << 2),
+			TRF_X = (0x3F << 2),
 			SLOPE_DURATION = 0x03,
 			SLOPE_DURATION_1 = 0x00,
 			SLOPE_DURATION_3 = 0x01,
 			SLOPE_DURATION_5 = 0x02,
 			SLOPE_DURATION_7 = 0x03
 		};
-		/// The options of REGISTER_TCO_Y
+		/// The options of REGISTER_TRF_Y
 		enum WakeUpDuration {
-			TCO_Y = (0x3F << 2),
+			TRF_Y = (0x3F << 2),
 			WAKE_UP_DURATION = 0x03,
 			WAKE_UP_DURATION_20MS = 0x00,
 			WAKE_UP_DURATION_80MS = 0x01,
 			WAKE_UP_DURATION_320MS = 0x02,
 			WAKE_UP_DURATION_2560MS = 0x03
 		};
-		/// The options of REGISTER_TCO_Z
+		/// The options of REGISTER_TRF_Z
 		enum ModeConfig {
-			TCO_Z = (0x3F << 2),
+			TRF_Z = (0x3F << 2),
 			MODE_CONFIG = 0x03,
 			MODE_CONFIG_LOW_NOISE = 0x00,
 			MODE_CONFIG_ULTRA_LOW_NOISE = 0x01,

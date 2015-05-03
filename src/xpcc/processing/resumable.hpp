@@ -25,7 +25,7 @@
  * So calling a resumable function is done using `PT_CALL(resumable(this))`
  * which will return the result of the resumable function.
  *
- * You may use the `CO_CALL_BLOCKING(resumable(ctx))` macro to execute
+ * You may use the `RF_CALL_BLOCKING(resumable(ctx))` macro to execute
  * a resumable function outside of a protothread, however, this which will
  * force the CPU to busy-wait until the resumable function ended.
  *
@@ -68,30 +68,30 @@
  *     xpcc::ResumableResult<bool>
  *     waitForTimer(void *ctx)
  *     {
- *         CO_BEGIN();
+ *         RF_BEGIN();
  *
  *         // nested calling is allowed
- *         if (CO_CALL(setTimer(ctx, 100)))
+ *         if (RF_CALL(setTimer(ctx, 100)))
  *         {
- *             CO_WAIT_UNTIL(timeout.isExpired());
+ *             RF_WAIT_UNTIL(timeout.isExpired());
  *         }
  *
- *         CO_END_RETURN(false);
+ *         RF_END_RETURN(false);
  *     }
  *
  *     xpcc::ResumableResult<bool>
  *     setTimer(void *ctx, uint16_t timeout)
  *     {
- *         CO_BEGIN();
+ *         RF_BEGIN();
  *
  *         timeout.restart(timeout);
  *
  *         if(timeout.isRunning())
- *             CO_RETURN(true);
+ *             RF_RETURN(true);
  *
  *         // clean up code goes here
  *
- *         CO_END_RETURN(false);
+ *         RF_END_RETURN(false);
  *     }
  *
  * private:
