@@ -31,8 +31,9 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 
 	switch (header.destination)
 	{
-{%- set actionNumber = 0 %}
-{%- set payloadNumber = 0 %}
+{%- set actionNumber = [] %}
+{%- set payloadNumber = [] %}
+
 {%- for component in components %}
 		case {{ namespace }}::component::{{ component.name | CAMELCASE }}:
 		{
@@ -51,15 +52,15 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 		{%- endif %}
 				case {{ namespace }}::action::{{ action.name | CAMELCASE }}:
 		{%- if action.call == "resumable" %}
-					if (actionBuffer[{{ actionNumber }}].destination != 0) {
+					if (actionBuffer[{{ actionNumber.__len__() }}].destination != 0) {
 						component::{{component.name | camelCase}}.getCommunicator()->sendNegativeResponse(response);
 					}
 					else if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(response{{ payload }}) == xpcc::rf::Running) {
-						actionBuffer[{{ actionNumber }}] = ActionBuffer(header);
-			{%- set actionNumber = actionNumber + 1 %}
+						actionBuffer[{{ actionNumber.__len__() }}] = ActionBuffer(header);
+			{%- if actionNumber.append(1)%}{%- endif %}
 			{%- if action.parameterType != None %}
-						payloadBuffer[{{ payloadNumber }}] = PayloadBuffer(payload);
-				{%- set payloadNumber = payloadNumber + 1 %}
+						payloadBuffer[{{ payloadNumber.__len__() }}] = PayloadBuffer(payload);
+				{%- if payloadNumber.append(1)%}{%- endif %}
 			{%- endif %}
 					}
 		{%- else %}
@@ -129,7 +130,7 @@ Postman::isComponentAvailable(uint8_t component) const
 void
 Postman::update()
 {
-{%- set payloadNumber = 0 %}
+{%- set payloadNumber = [] %}
 {%- if resumables > 0 %}
 	for(ActionBuffer &action : actionBuffer)
 	{
@@ -146,14 +147,14 @@ Postman::update()
 					{%- set payload = "" %}
 					{%- if action.parameterType != None %}
 						{%- set typePrefix = "" if action.parameterType.isBuiltIn else namespace ~ "::packet::" %}
-						{%- set payload = ", payloadBuffer[" ~ payloadNumber ~ "].payload.get<" ~ typePrefix ~ (action.parameterType.name | CamelCase) ~ ">()" %}
+						{%- set payload = ", payloadBuffer[" ~ payloadNumber.__len__() ~ "].payload.get<" ~ typePrefix ~ (action.parameterType.name | CamelCase) ~ ">()" %}
 					{%- endif %}
 					case {{ namespace }}::action::{{ action.name | CAMELCASE }}:
 						if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(action.response{{ payload }}) != xpcc::rf::Running) {
 							action.remove();
 					{%- if action.parameterType != None %}
-							payloadBuffer[{{ payloadNumber }}].remove();
-						{%- set payloadNumber = payloadNumber + 1 %}
+							payloadBuffer[{{ payloadNumber.__len__() }}].remove();
+						{%- if payloadNumber.append(1)%}{%- endif %}
 					{%- endif %}
 						}
 						break;
