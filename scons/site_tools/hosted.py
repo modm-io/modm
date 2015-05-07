@@ -108,5 +108,9 @@ def generate(env, **kw):
 		flags = "".join(os.environ['LDFLAGS'])
 		env['LINKFLAGS'] = flags
 
+	# required for __attribute__((packed))
+	if platform.system() == 'Windows':
+		env['CXXFLAGS'].append("-mno-ms-bitfields")
+
 def exists(env):
 	return env.Detect('g++')
