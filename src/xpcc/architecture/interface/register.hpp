@@ -480,7 +480,7 @@ struct Flags : public ::xpcc::Register<T>
 	friend constexpr bool operator!=(Enum const &a, Flags const &b);
 	/// @}
 #endif
-};
+} ATTRIBUTE_PACKED;
 
 /// @ingroup	register
 /// @{
@@ -495,7 +495,7 @@ using Flags32 = Flags<Enum, uint32_t>;	///< Flags class with 32-bit wide underly
 
 /// @cond
 template < typename... T >
-struct FlagsGroup {};
+struct FlagsGroup {} ATTRIBUTE_PACKED;
 
 
 template < typename T, typename... Ts >
@@ -513,7 +513,7 @@ struct FlagsGroup<T, Ts...> : public FlagsGroup<Ts...>
 	// Flags class
 	constexpr FlagsGroup(T value)
 	:	FlagsGroup<Ts...>(value.value) {}
-};
+} ATTRIBUTE_PACKED;
 /// @endcond
 
 /**
@@ -571,7 +571,7 @@ struct FlagsGroup<T> : public Register<typename T::UnderlyingType>
 	/// Flags type constructor
 	constexpr FlagsGroup(T value)
 	:	Register<typename T::UnderlyingType>(value.value) {}
-};
+} ATTRIBUTE_PACKED;
 
 /**
  * Class for accessing a configuration in a register.
@@ -692,7 +692,7 @@ public:
 	constexpr operator Parent() const
 	{	return Parent(Register<UType>::value); }
 	/// @endcond
-};
+} ATTRIBUTE_PACKED;
 
 /**
  * Class for accessing a numeric value in a register.
@@ -754,7 +754,7 @@ public:
 	constexpr operator Parent() const
 	{	return Parent(Register<PType>::value); }
 	/// @endcond
-};
+} ATTRIBUTE_PACKED;
 
 }	// namespace xpcc
 
