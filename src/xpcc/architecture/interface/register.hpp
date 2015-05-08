@@ -277,7 +277,7 @@ using Register32 = Register<uint32_t>;	///< Register class with 32-bit wide unde
  * The macro `XPCC_FLAGS8(Enum)` expands as follows:
  * @code
  * typedef xpcc::Flags8<Enum> Enum_t;
- * XPCC_TYPE_FLAGS(Enum);
+ * XPCC_INT_TYPE_FLAGS(Enum_t);
  * @endcode
  *
  * The `XPCC_FLAGS` macro by default only works in a class or struct, as this is
@@ -285,7 +285,7 @@ using Register32 = Register<uint32_t>;	///< Register class with 32-bit wide unde
  * To use it outside of a struct, use this:
  * @code
  * typedef xpcc::Flags8<Enum> Enum_t;
- * XPCC_TYPE_FLAGS(Enum);
+ * XPCC_TYPE_FLAGS(Enum_t);
  * @endcode
  *
  * @tparam	Enum	a strongly-typed enum containing the bit masks

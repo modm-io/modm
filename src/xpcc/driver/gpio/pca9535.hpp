@@ -69,7 +69,7 @@ public:
  *
  * Notice that you can specify multiple pins at the same time for functions
  * with argument type `Pins`, either by ORing the according pins, or
- * converting a 16bit value using `Pins(uint16_t)` converting constructor.
+ * converting a 16bit value using the `Pins(uint16_t)` converting constructor.
  *
  * Other functions with argument type `Pin` can only take one pin.
  * If you want to operate on all 16bit, use the `get(Inputs|Outputs|Directions|Polarities)()`
@@ -79,16 +79,16 @@ public:
  * typedef xpcc::pca9535::Pin Pin;
  * typedef xpcc::pca9535::Pins Pins;
  *
- * RF_CALL(expander.setOutput(Pin(0xff));	// set all lower 8 pins to output
- * RF_CALL(expander.set(Pin::P0_0));		// set only pin 00 high
- * RF_CALL(expander.reset(Pin::P0_1 | Pin::P0_2));	// reset 2 pins
- * RF_CALL(expander.toggle(Pin::P0_3 | Pin::P0_4 | Pin::P0_5));	// toggle 3 pins
+ * RF_CALL_BLOCKING(expander.setOutput(Pins(0xff));	// set all lower 8 pins to output
+ * RF_CALL_BLOCKING(expander.set(Pin::P0_0));		// set only pin 00 high
+ * RF_CALL_BLOCKING(expander.reset(Pin::P0_1 | Pin::P0_2));	// reset 2 pins
+ * RF_CALL_BLOCKING(expander.toggle(Pin::P0_3 | Pin::P0_4 | Pin::P0_5));	// toggle 3 pins
  *
- * RF_CALL(expander.readInput());	// transfer input states from the external chip
+ * RF_CALL_BLOCKING(expander.readInput());	// transfer input states from the external chip
  * bool high = expander.read(Pin::P1_0);	// check a single pin
  *
  * Pins input = expander.getInputs();	// get all 16 input states
- * bool isAnyPinHigh = inputs.any(Pin::P1_1 | Pins::P1_2 | Pins::P1_3); // check if any of 3 pins is high
+ * bool isAnyPinHigh = input.any(Pin::P1_1 | Pin::P1_2 | Pin::P1_3); // check if any of 3 pins is high
  * @endcode
  *
  * @author	Niklas Hauser
@@ -214,7 +214,7 @@ private:
 	union
 	{
 		Memory memory;
-		uint8_t buffer[sizeof(Memory)];
+		uint8_t buffer[4 * 3];
 	};
 	/// @endcond
 };

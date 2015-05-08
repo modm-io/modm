@@ -1541,7 +1541,7 @@ PREDEFINED             = __DOXYGEN__ \
                          "XPCC_FLAGS16(x):=typedef xpcc::Flags16< x > x ## _t" \
                          "XPCC_FLAGS32(x):=typedef xpcc::Flags32< x > x ## _t" \
                          XPCC_TYPE_FLAGS(x)= \
-                         XPCC_EXT_TYPE_FLAGS(x)= \
+                         XPCC_INT_TYPE_FLAGS(x)= \
                          __attribute__(x)= \
                          ATTRIBUTE_PACKED=
 

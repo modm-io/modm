@@ -33,9 +33,7 @@
  *
  * @code
  * #include <xpcc/architecture.hpp>
- * #include <xpcc/processing/protothread.hpp>
- * #include <xpcc/resumable/resumable.hpp>
- * #include <xpcc/processing/timer.hpp>
+ * #include <xpcc/processing.hpp>
  *
  * typedef GpioOutputB0 Led;
  *
@@ -54,10 +52,10 @@
  *         while (true)
  *         {
  *             Led::set();
- *             PT_CALL(waitForTimer(this)))
+ *             PT_CALL(waitForTimer()))
  *
  *             Led::reset();
- *             PT_CALL(setTimer(this, 200));
+ *             PT_CALL(setTimer(200));
  *
  *             PT_WAIT_UNTIL(timeout.isExpired());
  *         }
@@ -66,12 +64,12 @@
  *     }
  *
  *     xpcc::ResumableResult<bool>
- *     waitForTimer(void *ctx)
+ *     waitForTimer()
  *     {
  *         RF_BEGIN();
  *
  *         // nested calling is allowed
- *         if (RF_CALL(setTimer(ctx, 100)))
+ *         if (RF_CALL(setTimer(100)))
  *         {
  *             RF_WAIT_UNTIL(timeout.isExpired());
  *         }
@@ -80,7 +78,7 @@
  *     }
  *
  *     xpcc::ResumableResult<bool>
- *     setTimer(void *ctx, uint16_t timeout)
+ *     setTimer(uint16_t timeout)
  *     {
  *         RF_BEGIN();
  *
