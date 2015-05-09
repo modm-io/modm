@@ -110,7 +110,7 @@ xpcc::Pca9535<I2cMaster>::writeMemory(Index index)
 {
 	RF_BEGIN();
 
-	this->transaction.configureWrite(buffer + uint8_t(index) * 3, 3);
+	this->transaction.configureWrite(buffer + uint8_t(index), 3);
 
 	RF_END_RETURN_CALL( this->runTransaction() );
 }
@@ -123,8 +123,8 @@ xpcc::Pca9535<I2cMaster>::readMemory(Index index)
 	RF_BEGIN();
 
 	this->transaction.configureWriteRead(
-			buffer + uint8_t(index) * 3    , 1,
-			buffer + uint8_t(index) * 3 + 1, 2);
+			buffer + uint8_t(index)    , 1,
+			buffer + uint8_t(index) + 1, 2);
 
 	RF_END_RETURN_CALL( this->runTransaction() );
 }

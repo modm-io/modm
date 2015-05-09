@@ -101,9 +101,9 @@ class Pca9535 : public pca9535, public xpcc::I2cDevice< I2cMaster, 2 >
 	Index : uint8_t
 	{
 		Input = 0,
-		Output = 1,
-		Configuration = 2,
-		Polarity = 3,
+		Output = 3,
+		Configuration = 6,
+		Polarity = 9
 	};
 
 public:
@@ -134,7 +134,7 @@ public:
 	getDirection(Pin pin)
 	{
 		// output is 0, input is 1
-		return memory.configuration.all(pin) ? Direction::In : Direction::Out;
+		return memory.configuration.any(pin) ? Direction::In : Direction::Out;
 	}
 
 public:
@@ -168,9 +168,10 @@ public:
 	getInputs()
 	{ return memory.input; }
 
+	/// 0 is input, 1 is output
 	Pins inline
-	getConfigurations()
-	{ return memory.direction ^ Pins(0xffff); }
+	getDirections()
+	{ return memory.configuration ^ Pins(0xffff); }
 
 	Pins inline
 	getPolarities()
