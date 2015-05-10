@@ -50,8 +50,14 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 			{%- set arguments = "" %}
 			{%- set pointer = "" %}
 		{%- endif %}
+		{%- if action.returnType != None %}
+			{%- set returns = ("" if action.returnType.isBuiltIn else namespace ~ "::packet::") ~ action.returnType.name %}
+		{%- else %}
+			{%- set returns = "void" %}
+		{%- endif %}
 				case {{ namespace }}::action::{{ action.name | CAMELCASE }}:
 		{%- if action.call == "resumable" %}
+					// xpcc::ActionResponse<{{ returns }}> action{{ action.name | CamelCase }}({{ arguments }});
 					if (actionBuffer[{{ actionNumber.__len__() }}].destination != 0) {
 						component::{{component.name | camelCase}}.getCommunicator()->sendNegativeResponse(response);
 					}
@@ -183,15 +189,23 @@ Postman::update()
 uint8_t
 			{%- if action.parameterType != None %}
 				{%- set typePrefix = "" if action.parameterType.isBuiltIn else namespace ~ "::packet::" %}
-				{%- set arguments = ", const " ~ typePrefix ~ (action.parameterType.name | CamelCase) ~ "& payload" %}
+				{%- set typePayload = "const " ~ typePrefix ~ (action.parameterType.name | CamelCase) ~ "& payload" %}
+				{%- set arguments = ", " ~ typePayload %}
 				{%- set payload = "payload" %}
 			{%- else %}
+				{%- set typePayload = "" %}
 				{%- set arguments = "" %}
 				{%- set payload = "" %}
 			{%- endif %}
+			{%- if action.returnType != None %}
+				{%- set returns = ("" if action.returnType.isBuiltIn else namespace ~ "::packet::") ~ action.returnType.name %}
+			{%- else %}
+				{%- set returns = "void" %}
+			{%- endif %}
 Postman::component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(const xpcc::ResponseHandle& response{{ arguments }})
 {
-	auto result = component::{{ component.name | camelCase }}.action{{ action.name | CamelCase }}({{ payload }});
+	// xpcc::ActionResponse<{{ returns }}> action{{ action.name | CamelCase }}({{ typePayload }});
+	xpcc::ActionResponse<{{ returns }}> result = component::{{ component.name | camelCase }}.action{{ action.name | CamelCase }}({{ payload }});
 	if (result.getState() < xpcc::rf::Running) {
 		if (result.getState() == xpcc::rf::Stop and result.getResult().response == xpcc::Response::Positive) {
 			{%- if action.returnType != None %}
