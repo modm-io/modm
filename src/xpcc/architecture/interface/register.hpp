@@ -354,6 +354,13 @@ struct Flags : public ::xpcc::Register<T>
 	inline void reset(Flags const &o)
 	{ *this &= ~o; }
 
+	/// Toggles a single bit.
+	inline void toggle(Enum const &flag)
+	{ *this ^= flag; }
+	/// Toggles multiple bits.
+	inline void toggle(Flags const &o)
+	{ *this ^= o; }
+
 	/// Sets a single bit, when `value` is true, clears it otherwise
 	inline void update(Enum const &flag, bool value)
 	{
