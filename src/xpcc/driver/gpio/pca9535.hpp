@@ -102,8 +102,8 @@ class Pca9535 : public pca9535, public xpcc::I2cDevice< I2cMaster, 2 >
 	{
 		Input = 0,
 		Output = 3,
-		Configuration = 6,
-		Polarity = 9
+		Polarity = 6,
+		Configuration = 9
 	};
 
 public:
@@ -199,16 +199,16 @@ private:
 			configuration(0)
 		{}
 
-		const uint8_t commandInput;
+		const Command commandInput;
 		Pins input;
 
-		const uint8_t commandOutput;
+		const Command commandOutput;
 		Pins output;
 
-		const uint8_t commandPolarity;
+		const Command commandPolarity;
 		Pins polarity;
 
-		const uint8_t commandConfiguration;
+		const Command commandConfiguration;
 		Pins configuration;
 	};
 

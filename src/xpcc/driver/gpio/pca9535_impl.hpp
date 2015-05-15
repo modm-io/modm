@@ -7,14 +7,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ITG3200_HPP
-#	error "Don't include this file directly, use 'itg3200.hpp' instead!"
+#ifndef XPCC_PCA9535_HPP
+#	error "Don't include this file directly, use 'pca9535.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 xpcc::Pca9535<I2cMaster>::Pca9535(uint8_t address)
-:	I2cDevice<I2cMaster,2>(address)
+:	I2cDevice<I2cMaster,2>(address), memory()
 {
 }
 
@@ -28,7 +28,7 @@ xpcc::Pca9535<I2cMaster>::setOutput(Pins pins)
 	// output is 0, input is 1
 	memory.configuration.reset(pins);
 
-	RF_END_RETURN_CALL( writeMemory(Index::Polarity) );
+	RF_END_RETURN_CALL( writeMemory(Index::Configuration) );
 }
 
 template < typename I2cMaster >
@@ -76,7 +76,7 @@ xpcc::Pca9535<I2cMaster>::setInput(Pins pins)
 	// output is 0, input is 1
 	memory.configuration.set(pins);
 
-	RF_END_RETURN_CALL( writeMemory(Index::Polarity) );
+	RF_END_RETURN_CALL( writeMemory(Index::Configuration) );
 }
 
 template < typename I2cMaster >
@@ -88,7 +88,7 @@ xpcc::Pca9535<I2cMaster>::setInvertInput(Pins pins)
 	// inverted is 1, normal is 0
 	memory.polarity.set(pins);
 
-	RF_END_RETURN_CALL( writeMemory(Index::Configuration) );
+	RF_END_RETURN_CALL( writeMemory(Index::Polarity) );
 }
 
 template < typename I2cMaster >
@@ -100,7 +100,7 @@ xpcc::Pca9535<I2cMaster>::resetInvertInput(Pins pins)
 	// inverted is 1, normal is 0
 	memory.polarity.reset(pins);
 
-	RF_END_RETURN_CALL( writeMemory(Index::Configuration) );
+	RF_END_RETURN_CALL( writeMemory(Index::Polarity) );
 }
 
 // MARK: write multilength register
