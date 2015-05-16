@@ -69,6 +69,18 @@ xpcc::Pca9535<I2cMaster>::toggle(Pins pins)
 
 template < typename I2cMaster >
 xpcc::ResumableResult<bool>
+xpcc::Pca9535<I2cMaster>::update(Pins pins, bool value)
+{
+	RF_BEGIN();
+
+	// high is 1, low is 0
+	memory.output.update(pins, value);
+
+	RF_END_RETURN_CALL( writeMemory(Index::Output) );
+}
+
+template < typename I2cMaster >
+xpcc::ResumableResult<bool>
 xpcc::Pca9535<I2cMaster>::setInput(Pins pins)
 {
 	RF_BEGIN();

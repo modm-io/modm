@@ -123,6 +123,9 @@ public:
 	xpcc::ResumableResult<bool>
 	toggle(Pins pins);
 
+	xpcc::ResumableResult<bool>
+	update(Pins pins, bool value);
+
 	bool
 	isSet(Pin pin)
 	{
