@@ -130,15 +130,15 @@ protected:
 	/// @cond
 	// Enum Class To Integer helper functions.
 	static constexpr uint32_t
-	i(InputType pull) { return static_cast<uint32_t>(pull); }
+	i(InputType pull) { return uint32_t(pull); }
 	static constexpr uint32_t
-	i(OutputType out) { return static_cast<uint32_t>(out); }
+	i(OutputType out) { return uint32_t(out); }
 	static constexpr uint32_t
-	i(OutputSpeed speed) { return static_cast<uint32_t>(speed); }
+	i(OutputSpeed speed) { return uint32_t(speed); }
 	static constexpr uint32_t
-	i(Mode mode) { return static_cast<uint32_t>(mode); }
+	i(Mode mode) { return uint32_t(mode); }
 	static constexpr uint32_t
-	i(AlternateFunction af) { return static_cast<uint32_t>(af); }
+	i(AlternateFunction af) { return uint32_t(af); }
 	/// @endcond
 };
 

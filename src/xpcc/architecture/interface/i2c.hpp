@@ -94,7 +94,7 @@ struct I2c
 	 * Reset all slave devices connected to an I2C bus.
 	 *
 	 * During normal operation, I2C slave device may pull the SDA line low.
-	 * However, if the master is resetted during a transaction, the I2C clock
+	 * However, if the master is reset during a transaction, the I2C clock
 	 * may stop while the slave is outputting a low data bit and the slave will
 	 * continue to hold this bit (forever, and ever and ever).
 	 * The I2C master is then unable to generate a I2C start condition, since SDA
@@ -108,7 +108,7 @@ struct I2c
 	 * @see	Application Note AN572 by Microchip
 	 *
 	 * @warning	Must be called **before** connecting SDA and SCL to I2cMaster!
-	 * @warning	The clock frequency is hardcoded to 50kHz, so this function blocks for 180µs.
+	 * @warning	The clock frequency is hardcoded to 100kHz, so this function blocks for 90µs.
 	 *
 	 * @tparam	Scl		The clock pin of the bus to be reset.
  	 */
@@ -120,9 +120,9 @@ struct I2c
 
 		for (uint_fast8_t ii = 0; ii < 9; ++ii) {
 			Scl::setOutput(xpcc::Gpio::Low);
-			xpcc::delayMicroseconds(10);
+			xpcc::delayMicroseconds(5);
 			Scl::setInput();
-			xpcc::delayMicroseconds(10);
+			xpcc::delayMicroseconds(5);
 		}
 	}
 };
