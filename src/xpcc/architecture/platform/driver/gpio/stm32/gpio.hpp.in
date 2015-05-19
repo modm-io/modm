@@ -362,6 +362,11 @@ public:
 		return Direction::Special;
 	}
 	// end documentation inherited
+	ALWAYS_INLINE static void
+	disconnect() {
+		{{reg}}->MODER = ({{reg}}->MODER   & ~mask2) | (i(Mode::Input) << (pin * 2));
+		{{reg}}->AFR[af_id] = ({{reg}}->AFR[af_id] & ~af_mask);
+	}
 	// connect: Hardware Gpio
 		%% for af in gpio.afs
 			%% set use = not (	(af.type == "in"     and type == "Output") or
