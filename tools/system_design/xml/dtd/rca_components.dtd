@@ -33,7 +33,7 @@
 <!ELEMENT action (description?,errorcode*)>
 <!ATTLIST action
 	name CDATA #REQUIRED
-	id CDATA #IMPLIED
+	id CDATA #REQUIRED
 	function CDATA #IMPLIED
 	parameterType CDATA #IMPLIED
 	returnType CDATA #IMPLIED
