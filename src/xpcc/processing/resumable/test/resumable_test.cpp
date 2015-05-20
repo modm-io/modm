@@ -562,11 +562,11 @@ ResumableTest::testSpawn()
 	// now spawning task has finished
 	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::rf::Running);
 	TEST_ASSERT_EQUALS(thread.state, 3);
-	TEST_ASSERT_EQUALS(thread.success, (waits == 3) ? true : false);
+	TEST_ASSERT_EQUALS(thread.success, (waits != 3) ? true : false);
 
 	// now parent task has finished
 	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::rf::Stop);
-	TEST_ASSERT_EQUALS(thread.state, (waits == 3) ? 4 : 5);
+	TEST_ASSERT_EQUALS(thread.state, (waits != 3) ? 4 : 5);
 }
 
 #include <xpcc/math/filter/moving_average.hpp>
@@ -938,6 +938,22 @@ public:
 		RF_CALL(call0());
 
 		state2 = 4;
+		RF_END();
+	}
+
+	xpcc::ResumableResult<void>
+	call3()
+	{
+		RF_BEGIN(0);
+
+		state0 = 0;
+		RF_YIELD();
+
+		if (state0 == 0) {
+			RF_RETURN();
+		}
+
+		state0 = 1;
 		RF_END();
 	}
 

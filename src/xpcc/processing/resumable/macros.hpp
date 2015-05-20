@@ -168,18 +168,24 @@
 			} \
 		}
 
+#ifdef __DOXYGEN__
 /**
- * Stop and exit from resumable function.
+ * Stop and exit from resumable function with a result.
  *
  * @ingroup	resumable
  * @hideinitializer
  */
-#define RF_RETURN(result) \
-	{ \
-			this->stopRf(rfIndex); \
-			this->popRf(); \
-			return {xpcc::rf::Stop, (result)}; \
-	}
+#define RF_RETURN(result)
+
+/**
+ * Stop and exit from resumable function of `void` return type.
+ *
+ * @ingroup	resumable
+ * @hideinitializer
+ */
+#define RF_RETURN()
+
+#endif
 
 
 #ifndef __DOXYGEN__
@@ -194,6 +200,20 @@
 			this->popRf(); \
 			return {xpcc::rf::Running}; \
 		case ((counter % 255) + 1): ;
+
+#define RF_RETURN_1() \
+	{ \
+			this->stopRf(rfIndex); \
+			this->popRf(); \
+			return {xpcc::rf::Stop}; \
+	}
+
+#define RF_RETURN_0(result) \
+	{ \
+			this->stopRf(rfIndex); \
+			this->popRf(); \
+			return {xpcc::rf::Stop, (result)}; \
+	}
 
 /// Beginner structure for nested resumable functions
 #define RF_BEGIN_1() \
@@ -239,10 +259,17 @@
 
 // all we wanted is to call RF_BEGIN_0 for 1 argument
 // and call RF_BEGIN_1 for 0 arguments. Makes total sense.
-#define RF_GET_MACRO3(n) RF_BEGIN_ ## n
-#define RF_GET_MACRO2(n) RF_GET_MACRO3(n)
-#define RF_GET_MACRO(...) RF_GET_MACRO2(RF_ISEMPTY(__VA_ARGS__))
-#define RF_BEGIN(...) RF_GET_MACRO(__VA_ARGS__)(__VA_ARGS__)
+#define RF_GET_BEGIN_MACRO3(n) RF_BEGIN_ ## n
+#define RF_GET_BEGIN_MACRO2(n) RF_GET_BEGIN_MACRO3(n)
+#define RF_GET_BEGIN_MACRO(...) RF_GET_BEGIN_MACRO2(RF_ISEMPTY(__VA_ARGS__))
+#define RF_BEGIN(...) RF_GET_BEGIN_MACRO(__VA_ARGS__)(__VA_ARGS__)
+
+// all we wanted is to call RF_RETURN_0 for 1 argument
+// and call RF_RETURN_1 for 0 arguments. Makes total sense.
+#define RF_GET_RETURN_MACRO3(n) RF_RETURN_ ## n
+#define RF_GET_RETURN_MACRO2(n) RF_GET_RETURN_MACRO3(n)
+#define RF_GET_RETURN_MACRO(...) RF_GET_RETURN_MACRO2(RF_ISEMPTY(__VA_ARGS__))
+#define RF_RETURN(...) RF_GET_RETURN_MACRO(__VA_ARGS__)(__VA_ARGS__)
 
 #endif
 
