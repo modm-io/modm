@@ -151,11 +151,11 @@ private:
  *
  * @ingroup		software_timer
  */
-using ShortPeriodicTimer = GenericPeriodicTimer<::xpcc::Clock, ShortTimestamp>;
+using ShortPeriodicTimer = GenericPeriodicTimer< ::xpcc::Clock, ShortTimestamp>;
 
 /// Periodic software timer for up to 24 days with millisecond resolution.
 /// @ingroup	software_timer
-using PeriodicTimer      = GenericPeriodicTimer<::xpcc::Clock, Timestamp>;
+using PeriodicTimer      = GenericPeriodicTimer< ::xpcc::Clock, Timestamp>;
 
 }	// namespace
 

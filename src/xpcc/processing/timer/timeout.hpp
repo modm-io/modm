@@ -180,11 +180,11 @@ private:
  *
  * @ingroup		software_timer
  */
-using ShortTimeout = GenericTimeout<::xpcc::Clock, ShortTimestamp>;
+using ShortTimeout = GenericTimeout< ::xpcc::Clock, ShortTimestamp>;
 
 /// Software timeout for up to 24 days with millisecond resolution.
 /// @ingroup	software_timer
-using Timeout      = GenericTimeout<::xpcc::Clock, Timestamp>;
+using Timeout      = GenericTimeout< ::xpcc::Clock, Timestamp>;
 
 }	// namespace xpcc
 
