@@ -174,7 +174,7 @@ public:
 	/// 0 is input, 1 is output
 	Pins inline
 	getDirections()
-	{ return memory.configuration ^ Pins(0xffff); }
+	{ return ~memory.configuration; }
 
 	Pins inline
 	getPolarities()
