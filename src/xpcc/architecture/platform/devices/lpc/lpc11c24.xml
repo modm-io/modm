@@ -20,10 +20,6 @@
 		<!-- set to a value > 0 to enable software buffering of CAN messages -->
 		<define>LPC11C_CAN_TX_BUFFER_SIZE = 16</define>
 		<define>LPC11C_CAN_RX_BUFFER_SIZE = 16</define>
-		<!-- The UART is already hardware buffered with a 16 bytes FIFO. -->
-		<!-- If you need a longer queue interrupts are used -->
-		<define>LPC11_UART1_TX_BUFFER_SIZE = 16</define>
-		<define>LPC11_UART1_RX_BUFFER_SIZE = 16</define>
 		<!-- Core Driver -->
 		<driver type="core" name="cortex">
 			<parameter name="allocator">block_allocator</parameter>
