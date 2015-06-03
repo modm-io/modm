@@ -27,7 +27,7 @@ typedef SpiMaster1 SpiMaster;
 // I2c Transport Layer
 typedef GpioA5 Scl;
 typedef GpioA7 Sda;
-typedef xpcc::SoftwareI2cMaster<Scl, Sda, 400000> I2cMaster;
+typedef xpcc::SoftwareI2cMaster<Scl, Sda> I2cMaster;
 
 // Interrupt lines
 typedef GpioInputE0 Int1;
