@@ -43,10 +43,10 @@ namespace
 // If requested buffer size is larger than hardware buffer size create a
 // software queue for the remaining bytes.
 %% if parameters.rx_buffer > 16
-	static xpcc::atomic::Queue<uint8_t, LPC11_UART1_RX_BUFFER_SIZE - 16> rxBuffer;
+	static xpcc::atomic::Queue<uint8_t, {{ parameters.rx_buffer }} - 16> rxBuffer;
 %% endif
 %% if parameters.tx_buffer > 16
-	static xpcc::atomic::Queue<uint8_t, LPC11_UART1_TX_BUFFER_SIZE - 16> txBuffer;
+	static xpcc::atomic::Queue<uint8_t, {{ parameters.tx_buffer }} - 16> txBuffer;
 %% endif
 
 	static bool isBlocking = true;
