@@ -23,15 +23,13 @@ namespace xpcc
  *
  * @tparam	SCL			an Open-Drain pin
  * @tparam	SDA			an Open-Drain pin
- * @tparam	Baudrate	in Hz (default frequency is 100kHz)
  *
  * @ingroup	i2c
  * @author	Niklas Hauser
  * @see		gpio
  */
 template< class SCL,
-		  class SDA,
-		  uint32_t BaudRate = xpcc::I2cMaster::Baudrate::Standard >
+		  class SDA >
 class SoftwareI2cMaster : public xpcc::I2cMaster
 {
 public:
@@ -39,17 +37,15 @@ public:
 	static const TypeId::SoftwareI2cMasterScl Scl;
 
 public:
-	/**
-	 * Initializes the hardware.
-	 *
-	 * @warning	this call cannot modify the baudrate anymore, since it is defined
-	 * 			by the template parameter Baudrate.
-	 */
+	/// Initializes the hardware, with the baudrate limited to about 250kbps.
 	template< class clockSource, uint32_t baudrate=Baudrate::Standard,
 			uint16_t tolerance = xpcc::Tolerance::FivePercent >
 	static void
 	initialize()
 	{
+		delayTime = 250000 / baudrate;
+		if (delayTime == 0) delayTime = 1;
+
 		SCL::set();
 		SDA::set();
 	}
@@ -116,13 +112,13 @@ private:
 	/// busy waits a **half** clock cycle
 	static ALWAYS_INLINE void
 	delay2()
-	{ xpcc::delayMicroseconds(delayTime); }
+	{ xpcc::delayMicroseconds(delayTime*2); }
 
 	// timings
 	/// busy waits **quarter** clock cycle
 	static ALWAYS_INLINE void
 	delay4()
-	{ xpcc::delayMicroseconds(delayTime/2); }
+	{ xpcc::delayMicroseconds(delayTime); }
 
 	enum
 	{
@@ -131,8 +127,8 @@ private:
 	};
 
 	// calculate the delay in microseconds needed to achieve the
-	// requested SPI frequency
-	static constexpr float delayTime = (1000000.0 / BaudRate) / 2.0;
+	// requested I2C frequency
+	static uint16_t delayTime;
 
 	static xpcc::I2c::Operation nextOperation;
 	static xpcc::I2cTransaction *transactionObject;
