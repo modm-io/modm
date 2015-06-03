@@ -25,7 +25,6 @@ namespace xpcc
  * @tparam	SCK			clock pin [output]
  * @tparam	MOSI		master out slave in pin [output]
  * @tparam	MISO		master in slave out pin [input]
- * @tparam	Baudrate	requested SPI baudrate in Hz (default = 2 MHz)
  *
  * @ingroup	spi
  * @author	Niklas Hauser
@@ -33,8 +32,7 @@ namespace xpcc
  */
 template< typename SCK,
 		  typename MOSI,
-		  typename MISO = GpioUnused,
-		  uint32_t Baudrate = 2000000UL >
+		  typename MISO = GpioUnused >
 class SoftwareSpiMaster : public ::xpcc::SpiMaster
 {
 public:
@@ -44,6 +42,7 @@ public:
 
 public:
 	// start documentation inherited
+	/// Baudrate is limited to 500kbps.
 	template< class clockSource, uint32_t baudrate,
 			uint16_t tolerance = Tolerance::FivePercent >
 	static void
@@ -82,7 +81,7 @@ private:
 	static void
 	delay();
 
-	static constexpr uint32_t delayTime = (1000000.0 / Baudrate) / 2.0;
+	static uint16_t delayTime;
 
 	static uint8_t operationMode;
 	static uint8_t count;
