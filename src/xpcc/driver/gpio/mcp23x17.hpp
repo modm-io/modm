@@ -10,8 +10,8 @@
 #ifndef XPCC_MCP23X17_HPP
 #define XPCC_MCP23X17_HPP
 
-#include <xpcc/architecture/utils.hpp>
 #include <xpcc/architecture/interface/gpio.hpp>
+#include <xpcc/architecture/interface/register.hpp>
 #include "mcp23_transport.hpp"
 
 namespace xpcc
@@ -96,10 +96,12 @@ public:
  * getters.
  *
  * @tparam	Transport	Either the I2C or SPI Transport Layer.
- * @see Lis3TransportI2c
- * @see Lis3TransportSpi
+ *
+ * @see Mcp23TransportI2c
+ * @see Mcp23TransportSpi
  *
  * @ingroup driver_gpio
+ *
  * @author	Fabian Greif
  * @author	Niklas Hauser
  */
