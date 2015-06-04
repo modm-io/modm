@@ -3,10 +3,9 @@
 <rca version="1.0">
 	<driver type="uart" name="lpc">
 		<static>lpc11_uart_registers.hpp</static>
+		<static>type_ids.hpp</static>
 		<template instances="1" out="uart_{{id}}.cpp">uart.cpp.in</template>
 		<template instances="1" out="uart_{{id}}.hpp">uart.hpp.in</template>
-		<static>uart_base.cpp</static>
-		<static>uart_base.hpp</static>
 		<parameter name="tx_buffer" type="int" min="1" max="65534">250</parameter>
 		<parameter name="rx_buffer" type="int" min="1" max="65534">16</parameter>
 	</driver>

@@ -1,30 +1,9 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
-/* Copyright (c) 2013, Roboterclub Aachen e.V.
- * All rights reserved.
+/* Copyright (c) 2012, Roboterclub Aachen e.V.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
 
@@ -49,8 +28,6 @@ namespace
 	static xpcc::atomic::Queue<uint8_t, {{ parameters.tx_buffer }} - 16> txBuffer;
 %% endif
 
-	static bool isBlocking = true;
-
 	/**
 	 * The FIFO only tells when it is entirly empty by setting THRE.
 	 * So after putting one char to the FIFO it is not possible to know
@@ -62,69 +39,11 @@ namespace
 }
 
 // ----------------------------------------------------------------------------
-
-bool
-xpcc::lpc::Uart1::write(uint8_t data)
-{
-	while ( !(LPC_UART->LSR & LSR_THRE) );
-	LPC_UART->THR = data;
-	return true;
-}
-
-// ----------------------------------------------------------------------------
-
-void
-xpcc::lpc::Uart1::write(const uint8_t *buffer, uint8_t n)
-{
-	  while (n != 0)
-	  {
-			while ( !(LPC_UART->LSR & LSR_THRE) );
-			LPC_UART->THR = *buffer;
-			--n; ++buffer;
-	  }
-}
-
-// ----------------------------------------------------------------------------
-
-bool
-xpcc::lpc::Uart1::read(uint8_t & c)
-{
-	if (LPC_UART->LSR & LSR_RDR) {
-		// Receive data available
-		c = LPC_UART->RBR;
-		return true;
-	}
-
-	return false;
-}
-
-// ----------------------------------------------------------------------------
-
-uint8_t
-xpcc::lpc::Uart1::read(uint8_t *buffer, uint8_t n)
-{
-	uint8_t ret = 0;
-
-	while ((n != 0) && (LPC_UART->LSR & LSR_RDR))
-	{
-		// Receive data available and space in buffer left
-		*buffer = LPC_UART->RBR;
-		--n; ++buffer; ++ret;
-	}
-
-	return ret;
-}
-
-// ----------------------------------------------------------------------------
-
-xpcc::lpc::Uart1::Uart1(uint32_t baudrate)
-{
-	initialize(baudrate);
-} // Uart1 constructor
-
 void
 xpcc::lpc::Uart1::initialize(uint32_t baudrate)
 {
+	atomic::Lock lock;
+
 	/*  UART I/O config. PIO1_6 and PIO1_7 are always Rx/Tx */
 	LPC_IOCON->PIO1_6 &= ~0x07;
 	LPC_IOCON->PIO1_6 |= 0x01;     /* UART RXD */
@@ -135,14 +54,21 @@ xpcc::lpc::Uart1::initialize(uint32_t baudrate)
 	LPC_SYSCON->SYSAHBCLKCTRL |= (1<<12);
 	LPC_SYSCON->UARTCLKDIV = 0x1;     /* divided by 1 */
 
-	setBaudrate(baudrate);
+	LPC_UART->LCR = LCR_DLAB;
+	uint32_t regVal = LPC_SYSCON->UARTCLKDIV;
+	uint32_t   Fdiv = (((F_CPU * LPC_SYSCON->SYSAHBCLKDIV)/regVal)/16)/baudrate ; //390;
+	LPC_UART->DLM = Fdiv >>    8;
+	LPC_UART->DLL = Fdiv  & 0xff;
+	//LPC_UART->DLM = 0;
+	//LPC_UART->DLL = 26;
+
+	LPC_UART->LCR = LCR_WLS_8_BIT;		/* 8 bits, no Parity, 1 Stop bit, DLAB = 0 */
 
 	/* Enable and reset TX and RX FIFO. */
 	LPC_UART->FCR = FCR_TXFIFORES | FCR_RXFIFORES | FCR_FIFOEN;
 
 	/* Read to clear the line status. */
-	uint32_t regVal = LPC_UART->LSR;
-	(void)regVal; // unused, just read to clear.
+	regVal = LPC_UART->LSR;
 
 	/* Ensure a clean start, no data in either TX or RX FIFO. */
 	while (( LPC_UART->LSR & (LSR_THRE|LSR_TEMT)) != (LSR_THRE|LSR_TEMT) );
@@ -151,55 +77,10 @@ xpcc::lpc::Uart1::initialize(uint32_t baudrate)
 		regVal = LPC_UART->RBR;	/* Dump data from RX FIFO */
 	}
 
-} // Uart1 initialize
-
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
-
-xpcc::lpc::BufferedUart1::BufferedUart1(uint32_t baudrate)
-{
-	/*  UART I/O config. PIO1_6 and PIO1_7 are always Rx/Tx */
-	LPC_IOCON->PIO1_6 &= ~0x07;
-	LPC_IOCON->PIO1_6 |= 0x01;     /* UART RXD */
-	LPC_IOCON->PIO1_7 &= ~0x07;
-	LPC_IOCON->PIO1_7 |= 0x01;     /* UART TXD */
-
-	/* Enable UART clock */
-	LPC_SYSCON->SYSAHBCLKCTRL |= (1<<12);
-	LPC_SYSCON->UARTCLKDIV = 0x1;     /* divided by 1 */
-
-	Uart1::setBaudrate(baudrate);
-
-	/* Enable and reset TX and RX FIFO. */
-	LPC_UART->FCR = FCR_TXFIFORES | FCR_RXFIFORES | FCR_FIFOEN;
-
-	/* Read to clear the line status. */
-	uint32_t regVal = LPC_UART->LSR;
-	(void)regVal; // unused, just read to clear.
-
-	/* Ensure a clean start, no data in either TX or RX FIFO. */
-	while (( LPC_UART->LSR & (LSR_THRE|LSR_TEMT)) != (LSR_THRE|LSR_TEMT) );
-	while ( LPC_UART->LSR & LSR_RDR )
-	{
-		regVal = LPC_UART->RBR;	/* Dump data from RX FIFO */
-	}
-
-%% if parameters.tx_buffer > 16 and parameters.rx_buffer <= 16
-	/* If TX buffering with more than 16 bytes is requested a software queue
-	 * must be used for sending. This involves the Tx Interrupt only. */
-	LPC_UART->IER = IER_THREIE;
-%% endif
-
-%% if parameters.tx_buffer <= 16 and parameters.rx_buffer > 16
+%% if parameters.rx_buffer > 16
 	/* If RX buffering with more than 16 bytes is requested a software queue
 	 * must be used for receiving. This involves the Rx Interrupt only. */
 	LPC_UART->IER = IER_RBRIE;
-%% endif
-
-%% if parameters.tx_buffer > 16 and parameters.rx_buffer > 16
-	/* If both Rx and Tx buffering with more than 16 bytes is requested
-	 * two software queues muste be used. This involves the Rx and Tx interrupt. */
-	LPC_UART->IER = IER_RBRIE | IER_THREIE;
 %% endif
 
 %% if parameters.tx_buffer > 16 or parameters.rx_buffer > 16
@@ -208,160 +89,224 @@ xpcc::lpc::BufferedUart1::BufferedUart1(uint32_t baudrate)
 %% endif
 
 	// TODO Care about Line status and its interrupt.
-} // BufferedUart1 constructor
-
-// ----------------------------------------------------------------------------
+}
 
 void
-xpcc::lpc::BufferedUart1::write(uint8_t data)
+xpcc::lpc::Uart1::writeBlocking(uint8_t data)
 {
-	if (LPC_UART->LSR & LSR_THRE) {
+	while (not write(data));
+}
+
+void
+xpcc::lpc::Uart1::writeBlocking(const uint8_t *data, std::size_t length)
+{
+	while (length--)
+	{
+		writeBlocking(*data++);
+	}
+}
+
+void
+xpcc::lpc::Uart1::flushWriteBuffer()
+{
+	while(!isWriteFinished())
+		;
+}
+
+// ----------------------------------------------------------------------------
+bool
+xpcc::lpc::Uart1::write(uint8_t data)
+{
+%% if parameters.tx_buffer <= 16
+	// No software buffer necessary, use hardware buffer only.
+	if (LPC_UART->LSR & LSR_THRE)
+	{
 		// If the FIFO is empty 16 bytes can be send.
 		charsLeft = 16;
 	}
 
-%% if parameters.tx_buffer <= 16
-	// No software buffer necessary, use hardware buffer only.
-	if (charsLeft > 0) {
+	if (charsLeft > 0)
+	{
 		// There is at least charsLeft bytes free in the FIFO
 		LPC_UART->THR = data;
 		--charsLeft;
+		return true;
 	}
-	else {
-		// Well, it's not known how many chars are really available in the FIFO.
-		// Since the FIFO was completly empty 16 bytes have been sent to the FIFO.
-		// Even though some bytes are already transmitted and some space is
-		// available again we only can detect if the FIFO is completely empty.
-		if (isBlocking) {
-			// If blocking was selected we need to wait until the FIFO
-			// is completly empty to guarantee that the byte is sent.
-			while ( !(LPC_UART->LSR & LSR_THRE) );
-			// FIFO is empty, 16 bytes can be send.
-			charsLeft = 16;
-		}
-		// Send the byte.
-		// In non-blocking mode it is pure luck if it can be transmitted or not.
-		// There may are may not be some space in the FIFO.
-		// That is absolutly what you want in your system!
-		LPC_UART->THR = data;
-		--charsLeft;
-	}
+	// Well, it's not known how many chars are really available in the FIFO.
+	// Since the FIFO was completly empty 16 bytes have been sent to the FIFO.
+	// Even though some bytes are already transmitted and some space is
+	// available again we only can detect if the FIFO is completely empty.
+	return false;
 %% else
+	atomic::Lock lock;
 	// Use hardware buffer and additional software buffer.
+	LPC_UART->IER |= IER_THREIE;
 
-	if (txBuffer.isEmpty()) {
+	if (txBuffer.isEmpty() and charsLeft > 0)
+	{
 		// If software buffer is empty try to write to hardware buffer directly.
 		// Do not write to hardware buffer while there is some data in the
 		// software buffer to maintain byte order.
-		if (charsLeft > 0) {
-			// There is at least charsLeft bytes free in the FIFO
-			LPC_UART->THR = data;
-			--charsLeft;
-			return; // success
-		}
-		else {
-			// Hardware buffer is full, so try software buffer.
-			// Software buffer is empty so this will succeed.
-			// Hardware buffer is not empty so at least one Tx interrupt
-			// will be generated soon.
-			txBuffer.push(data);
-			return; // success
-		}
+		// There is at least charsLeft bytes free in the FIFO
+		LPC_UART->THR = data;
+		--charsLeft;
+		return true; // success
 	}
-	else {
-		// Software buffer is not empty. Try to write to software buffer and
-		// block if configured to do so.
-		while ( !txBuffer.push(data) ) {
-			if (!isBlocking) {
-				return; // data dropped
-			}
-		}
-		return; // success
-	} // if(txBuffer.empty())
+
+	// Hardware buffer is full, so try software buffer.
+	// Software buffer is empty so this will succeed.
+	// Hardware buffer is not empty so at least one Tx interrupt
+	// will be generated soon.
+
+	return txBuffer.push(data);
 %% endif
-} // write
+}
 
 // ----------------------------------------------------------------------------
-
-void
-xpcc::lpc::BufferedUart1::write(const uint8_t *buffer, uint8_t n)
+std::size_t
+xpcc::lpc::Uart1::write(const uint8_t *buffer, std::size_t length)
 {
-	if (LPC_UART->LSR & LSR_THRE) {
+	std::size_t written(0);
+
+%% if parameters.tx_buffer <= 16
+	// No software buffer necessary, use hardware buffer only.
+	if (LPC_UART->LSR & LSR_THRE)
+	{
 		// If the FIFO is empty 16 bytes can be send.
 		charsLeft = 16;
 	}
 
-%% if parameters.tx_buffer <= 16
-	// No software buffer necessary, use hardware buffer only.
-
-	while (n > 0) {
-		// Copy max(charsLeft, n) chars from buffer to hardware FIFO.
-		while ((charsLeft > 0) && (n > 0)) {
-			LPC_UART->THR = *buffer;
-			--n; ++buffer; --charsLeft;
-		}
-		if (charsLeft == 0) {
-			// no space left in FIFO
-			if (isBlocking) {
-				// If blocking was selected we need to wait until the FIFO
-				// is completly empty to guarantee that the byte is sent.
-				while ( !(LPC_UART->LSR & LSR_THRE) ) {
-				}
-				// FIFO is empty, 16 bytes can be send.
-				charsLeft = 16;
-			}
-			else {
-				// Return in non-blocking mode with some data dropped.
-				return;
-			} // blocking
-		} // charsLeft == 0
-	} // while (n > 0)
-
-	// Fine, everything put into FIFO
-	return;
+	// Copy max(charsLeft, length) chars from buffer to hardware FIFO.
+	while ((charsLeft > 0) and (written < length))
+	{
+		LPC_UART->THR = *buffer++;
+		written++;
+		--charsLeft;
+	}
 %% else
+	atomic::Lock lock;
 	// Use hardware buffer and additional software buffer.
+	LPC_UART->IER |= IER_THREIE;
 
-	if (txBuffer.isEmpty()) {
+	if (txBuffer.isEmpty())
+	{
 		// If software buffer is completly empty try to write to hardware buffer directly.
 		// Do not write to hardware buffer while there is some data in the
 		// software buffer to maintain byte order.
 
-		// First Copy max(charsLeft, n) chars from buffer to hardware FIFO.
-		while ((charsLeft > 0) && (n > 0)) {
-			LPC_UART->THR = *buffer;
-			--n; ++buffer; --charsLeft;
+		// First Copy max(charsLeft, length) chars from buffer to hardware FIFO.
+		while ((charsLeft > 0) and (written < length))
+		{
+			LPC_UART->THR = *buffer++;
+			written++;
+			--charsLeft;
 		}
 	}
 
 	// If there is remaining data, put it into the software buffer
-	if (n > 0) {
-		// Try software buffer
-		while (n > 0) {
-			while (!txBuffer.push(*buffer)) {
-				if (!isBlocking) {
-					// Hardware and Software buffer full.
-					// Non-blocking, so return
-					return;
-				}
-			}
-			--n; ++buffer;
-		}
-	} // n > 0
-
-	// All data put into Hardware and Software buffers
-	return;
+	while (written < length)
+	{
+		if (not txBuffer.push(*buffer++)) break;
+		written++;
+	}
 %% endif
-} // write buffer
+	return written;
+}
 
 bool
-xpcc::lpc::BufferedUart1::read(uint8_t & c)
+xpcc::lpc::Uart1::isWriteFinished()
 {
-	return xpcc::lpc::Uart1::read(c);
+%% if parameters.tx_buffer > 16
+	return txBuffer.isEmpty() and (LPC_UART->LSR & LSR_THRE);
+%% else
+	return (LPC_UART->LSR & LSR_THRE);
+%% endif
+}
+
+std::size_t
+xpcc::lpc::Uart1::discardTransmitBuffer()
+{
+%% if parameters.tx_buffer > 16
+	atomic::Lock lock;
+	std::size_t count(0);
+	// disable interrupt since buffer will be cleared
+	LPC_UART->IER &= ~IER_THREIE;
+	while(not txBuffer.isEmpty())
+	{
+		++count;
+		txBuffer.pop();
+	}
+	return count;
+%% else
+	return 0;
+%% endif
+}
+
+bool
+xpcc::lpc::Uart1::read(uint8_t& data)
+{
+%% if parameters.rx_buffer > 16
+	if (not rxBuffer.isEmpty())
+	{
+		data = rxBuffer.get();
+		rxBuffer.pop();
+		// if the hardware buffer has been used, copy all into rxBuffer
+		while(LPC_UART->LSR & LSR_RDR and not rxBuffer.isFull())
+		{
+			rxBuffer.push(LPC_UART->RBR);
+		}
+		if (not rxBuffer.isFull())
+		{
+			atomic::Lock lock;
+			LPC_UART->IER |= IER_RBRIE;
+		}
+		return true;
+	}
+%% else
+	if (LPC_UART->LSR & LSR_RDR)
+	{
+		// Receive data available
+		data = LPC_UART->RBR;
+		return true;
+	}
+%% endif
+	return false;
+}
+
+std::size_t
+xpcc::lpc::Uart1::read(uint8_t *buffer, std::size_t length)
+{
+	std::size_t ret = 0;
+
+	while (ret < length)
+	{
+		if (not read(*buffer++)) break;
+		ret++;
+	}
+
+	return ret;
+}
+
+std::size_t
+xpcc::lpc::Uart1::discardReceiveBuffer()
+{
+	std::size_t count(0);
+%% if parameters.rx_buffer > 16
+	while(!rxBuffer.isEmpty())
+	{
+		++count;
+		rxBuffer.pop();
+	}
+%% endif
+	while(LPC_UART->LSR & LSR_RDR)
+	{
+		(void)LPC_UART->RBR;
+		++count;
+	}
+	return count;
 }
 
 // ----------------------------------------------------------------------------
-
 extern "C" void
 UART_IRQHandler()
 {
@@ -392,25 +337,22 @@ UART_IRQHandler()
 
 		if (txBuffer.isEmpty()) {
 			// Transmission to FIFO finished, FIFO empty, software buffer empty.
-			// No need to switch of TRHE interrupt.
+			// No need to switch off TRHE interrupt.
 			return;
 		}
 
-		while (!txBuffer.isEmpty() && (charsLeft-- > 0)) {
+		while (!txBuffer.isEmpty() and (charsLeft-- > 0))
+		{
 			// Write to the hardware buffer
 			LPC_UART->THR = txBuffer.get();
 			txBuffer.pop();
 		}
 %% endif
 		break;
-	case IIR_INTID_CTI:
-		// Character Time-out
-		break;
+	case IIR_INTID_CTI:		// Character Time-out
 	case IIR_INTID_MI:		// Modem interrupt
-	case IIR_INTID_RLS: 	// Receive line status
-	default:
-		// don't care
+	case IIR_INTID_RLS:		// Receive line status
+	default:				// don't care
 		break;
-	} // switch
-
+	}
 }
