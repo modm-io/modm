@@ -231,7 +231,7 @@ public:
 	// WRITING EEPROM
 	/// Configures the sensor to normal orientation mode with 10Hz data rate.
 	xpcc::ResumableResult<bool> ALWAYS_INLINE
-	setMeasurmentRate(MeasurementRate measurementRate=MeasurementRate::Hz10)
+	setMeasurementRate(MeasurementRate measurementRate=MeasurementRate::Hz10)
 	{ return writeRegister(Register::OperationMode2, i(measurementRate)); }
 
 	/// sets a new deviation angle in eeprom
