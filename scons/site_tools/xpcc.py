@@ -270,6 +270,9 @@ def generate(env, **kw):
 		log_level = 'warn'
 	env.SetLogLevel(log_level)
 
+	# copy terminal settings from os.environ for color output
+	env['ENV']['TERM'] = os.environ['TERM']
+
 	# detect the rootpath to the xpcc folder
 	rootpath = env.get('rootpath')
 
