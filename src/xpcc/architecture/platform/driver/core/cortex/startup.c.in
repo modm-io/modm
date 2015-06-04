@@ -55,13 +55,6 @@
 #include <xpcc/architecture/utils.hpp>
 #include "../../../device.hpp"
 #include "xpcc_config.hpp"
-%% if parameters.enable_gpio
-%%	if target is stm32f0 or target is stm32f2 or target is stm32f3 or target is stm32f4
-#include "../../gpio/stm32/gpio_enable.h"
-%%	elif target is lpc
-#include "../../gpio/lpc/gpio_enable.h"
-%%	endif
-%% endif
 
 // ----------------------------------------------------------------------------
 {{ platform.defines() }}
@@ -152,6 +145,10 @@ exit(int) __attribute__ ((noreturn, weak));
 
 %% if parameters.allocator == "block_allocator"
 extern void __xpcc_initialize_memory(void);
+%% endif
+
+%% if parameters.enable_gpio
+extern void xpcc_gpio_enable(void);
 %% endif
 
 // ----------------------------------------------------------------------------

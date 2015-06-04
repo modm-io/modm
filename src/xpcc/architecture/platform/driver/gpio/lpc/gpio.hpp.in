@@ -11,9 +11,13 @@
 #define XPCC_LPC_GPIO_HPP
 
 #include "../../../device.hpp"
+#include "../../../type_ids.hpp"
+
+// TODO: Move to common file
+#define SYSAHBCLKCTRL_GPIO		(1<<6)
+#define IOCON_ADMODE_DIGITAL	(1<<7)
 
 #include <xpcc/architecture/interface/gpio.hpp>
-#include "gpio_enable.h"
 
 namespace xpcc
 {

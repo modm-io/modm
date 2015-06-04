@@ -6,12 +6,11 @@
  * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
-#ifndef XPCC_STM32_GPIO_ENABLE_H
-#define XPCC_STM32_GPIO_ENABLE_H
 
 #include "../../../device.hpp"
 
-static void
+extern "C"
+void
 xpcc_gpio_enable(void)
 {
 	// FIXME: add possibility to switch individual clocks on and off
@@ -22,33 +21,31 @@ xpcc_gpio_enable(void)
 %% endif
 
 	// Enable GPIO clock
-RCC->{{ clock_tree }}ENR  |=
+	RCC->{{ clock_tree }}ENR  |=
 %% for port in gpios|xpcc.values('port')|sort
 %%	if not loop.last
-	RCC_{{ clock_tree }}ENR_GPIO{{ port }}EN |
+		RCC_{{ clock_tree }}ENR_GPIO{{ port }}EN |
 %%	else
-	RCC_{{ clock_tree }}ENR_GPIO{{ port }}EN;
+		RCC_{{ clock_tree }}ENR_GPIO{{ port }}EN;
 %%	endif
 %% endfor
 
 	// Reset GPIO peripheral
-RCC->{{ clock_tree }}RSTR |=
+	RCC->{{ clock_tree }}RSTR |=
 %% for port in gpios|xpcc.values('port')|sort
 %%	if not loop.last
-	RCC_{{ clock_tree }}RSTR_GPIO{{ port }}RST |
+		RCC_{{ clock_tree }}RSTR_GPIO{{ port }}RST |
 %%	else
-	RCC_{{ clock_tree }}RSTR_GPIO{{ port }}RST;
+		RCC_{{ clock_tree }}RSTR_GPIO{{ port }}RST;
 %%	endif
 %% endfor
 
-RCC->{{ clock_tree }}RSTR &= ~(
+	RCC->{{ clock_tree }}RSTR &= ~(
 %% for port in gpios|xpcc.values('port')|sort
 %%	if not loop.last
-	RCC_{{ clock_tree }}RSTR_GPIO{{ port }}RST |
+		RCC_{{ clock_tree }}RSTR_GPIO{{ port }}RST |
 %%	else
-	RCC_{{ clock_tree }}RSTR_GPIO{{ port }}RST);
+		RCC_{{ clock_tree }}RSTR_GPIO{{ port }}RST);
 %%	endif
 %% endfor
 }
-
-#endif // XPCC_STM32_GPIO_ENABLE_H

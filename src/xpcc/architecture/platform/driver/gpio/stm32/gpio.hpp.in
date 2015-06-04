@@ -13,7 +13,8 @@
 #include "../../../type_ids.hpp"
 #include <xpcc/architecture/interface/gpio.hpp>
 #include <xpcc/architecture/interface/i2c.hpp>
-#include "gpio_enable.h"
+
+extern void xpcc_gpio_enable(void);
 
 /**
  * @ingroup 	platform
