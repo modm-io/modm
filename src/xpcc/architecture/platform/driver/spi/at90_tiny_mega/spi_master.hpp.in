@@ -34,13 +34,14 @@ namespace {{target.family}}
  *			hardware will switch into SPI slave mode. It is therefore necessary
  *			to configure the pin either in output mode or to pull it high.
  *
- * @ingroup		{{target.family}}
+ * @ingroup		{{target.string}}_spi
  * @author		Niklas Hauser
  */
 class SpiMaster : public ::xpcc::SpiMaster, private Spi
 {
 	static uint8_t state;
 	static void *context;
+	static ConfigurationHandler configuration;
 public:
 	static const TypeId::SpiMasterMosi Mosi;
 	static const TypeId::SpiMasterMiso Miso;
@@ -115,7 +116,7 @@ public:
 
 
 	static uint8_t
-	aquire(void *ctx);
+	aquire(void *ctx, ConfigurationHandler handler = nullptr);
 
 	static uint8_t
 	release(void *ctx);
@@ -125,9 +126,9 @@ public:
 	transferBlocking(uint8_t data)
 	{
 %% if parameters.busywait
-		return transfer(data).result;
+		return transfer(data).getResult();
 %% else
-		return CO_CALL_BLOCKING(transfer(data));
+		return RF_CALL_BLOCKING(transfer(data));
 %% endif
 	}
 
@@ -137,15 +138,15 @@ public:
 %% if parameters.busywait
 		transfer(tx, rx, length);
 %% else
-		CO_CALL_BLOCKING(transfer(tx, rx, length));
+		RF_CALL_BLOCKING(transfer(tx, rx, length));
 %% endif
 	}
 
 
-	static xpcc::co::Result<uint8_t>
+	static xpcc::ResumableResult<uint8_t>
 	transfer(uint8_t data);
 
-	static xpcc::co::Result<void>
+	static xpcc::ResumableResult<void>
 	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
 	// end documentation inherited
 

@@ -59,7 +59,9 @@ devices = [
 #	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega1280',		'clock':  16000000 },
 #	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega2561',		'clock':  16000000 },
 #	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega2560',		'clock':  16000000 },
-#	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'at90can128',		'clock':  16000000 },
+	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'at90can32',		'clock':  16000000 },
+	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'at90can64',		'clock':  16000000 },
+	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'at90can128',		'clock':  16000000 },
 #	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega8515',		'clock':  16000000 },
 #	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega8535',		'clock':  16000000 },
 #   { 'path': 'release/tests/attiny',   'arch': 'avr',            'device': 'attiny13',        'clock':   1000000 },
@@ -106,6 +108,17 @@ devices = [
 ]
 
 check = 'all' if 'check' in BUILD_TARGETS else ARGUMENTS.get('check')
+
+# make it possible to only check the examples from one example directory
+if ARGUMENTS.get('examples'):
+	examples_dir = os.path.join('examples', ARGUMENTS.get('examples'))
+	if not os.path.isdir(examples_dir):
+		print("\033[0;33mWarning: invalid argument value: {} does not exist!\033[0m".format(examples_dir))
+		examples_dir = 'examples'
+else:
+	examples_dir = 'examples'
+
+
 if check is not None:
 	result = []
 	everythingOk = True
@@ -125,7 +138,7 @@ if check is not None:
 	# examples is not checked!
 	if check in ['all', 'examples']:
 		result.append("Examples")
-		for path, directories, files in os.walk('examples'):
+		for path, directories, files in os.walk(examples_dir):
 			if 'SConstruct' in files:
 				exitStatus = os.system("scons -Q -C %s build" % path)
 				if exitStatus == 0:

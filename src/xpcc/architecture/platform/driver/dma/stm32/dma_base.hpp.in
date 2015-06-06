@@ -22,13 +22,15 @@
 
 namespace xpcc
 {
+
 namespace stm32
 {
+
 /**
  * DMA
  *
- * \author	Kevin Laeufer
- * \ingroup	stm32
+ * @author	Kevin Laeufer
+ * @ingroup	{{target.string}}_dma
  */
 class DmaBase
 {
@@ -178,9 +180,11 @@ protected:
 			DMA_CCR_CIRC     |						// CircularMode
 			DMA_CCR_PL_1     | DMA_CCR_PL_0;		// Priority
 %% endif
-
 };
-}
-}
+
+}	// namespace stm32
+
+}	// namespace xpcc
+
 #endif	// XPCC_STM32F3_DMA_BASE_HPP
 

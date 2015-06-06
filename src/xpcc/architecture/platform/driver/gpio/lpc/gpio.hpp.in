@@ -6,31 +6,25 @@
  * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
+
 #ifndef XPCC_LPC_GPIO_HPP
 #define XPCC_LPC_GPIO_HPP
 
 #include "../../../device.hpp"
+#include "../../../type_ids.hpp"
 
 // TODO: Move to common file
 #define SYSAHBCLKCTRL_GPIO		(1<<6)
 #define IOCON_ADMODE_DIGITAL	(1<<7)
 
-
-static void
-xpcc_gpio_enable()
-{
-	LPC_SYSCON->SYSAHBCLKCTRL |= SYSAHBCLKCTRL_GPIO;
-}
-
-
-
-%% if output != 'gpio_enable.h'
 #include <xpcc/architecture/interface/gpio.hpp>
 
 namespace xpcc
 {
+
 namespace lpc
 {
+
 struct Gpio
 {
 	/// @ingroup	lpc11xx
@@ -305,9 +299,9 @@ public:
 };
 		%% endfor
 %% endfor
-} /* namespace lpc */
-} /* xpcc */
 
-%% endif
+}	// namespace lpc
+
+}	// namespace xpcc
 
 #endif // XPCC_LPC_GPIO_HPP

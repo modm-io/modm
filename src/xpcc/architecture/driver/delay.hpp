@@ -64,15 +64,15 @@ namespace xpcc
 	namespace xpcc
 	{
 		ALWAYS_INLINE void
-		delayMicroseconds(uint32_t us)
+		delayMicroseconds(uint16_t us)
 		{
-			_delay_us(us);
+			while(us--) _delay_us(1);
 		}
 		
 		ALWAYS_INLINE void
-		delayMilliseconds(uint32_t ms)
+		delayMilliseconds(uint16_t ms)
 		{
-			_delay_ms(ms);
+			while(ms--) _delay_ms(1);
 		}
 	}
 

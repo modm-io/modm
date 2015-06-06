@@ -38,10 +38,10 @@ template< class C, typename P >
 bool
 xpcc::DynamicPostman::registerEventListener(const uint8_t eventId,
 		C *componentObject,
-		void (C::*memberFunction)(const Header&, const P*))
+		void (C::*memberFunction)(const Header&, const P&))
 {
 	using namespace std::placeholders;
-	typedef void (C::*Function)(const Header&, const uint8_t*);
+	typedef void (C::*Function)(const Header&, const uint8_t&);
 
 	eventMap.insert(
 			std::pair<uint8_t, EventListener>(
@@ -82,10 +82,10 @@ bool
 xpcc::DynamicPostman::registerActionHandler(const uint8_t componentId,
 		const uint8_t actionId,
 		C *componentObject,
-		void (C::*memberFunction)(const ResponseHandle&, const P*))
+		void (C::*memberFunction)(const ResponseHandle&, const P&))
 {
 	using namespace std::placeholders;
-	typedef void (C::*Function)(const ResponseHandle&, const uint8_t*);
+	typedef void (C::*Function)(const ResponseHandle&, const uint8_t&);
 
 	actionMap[componentId][actionId] = ActionHandler(
 			std::bind(

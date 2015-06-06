@@ -28,7 +28,7 @@ namespace {{target.family}}
  * Interrupts must be enabled.
  *
  * @author Niklas Hauser
- * @ingroup	{{target.family}}
+ * @ingroup	{{target.string}}_i2c
  */
 class I2cMaster : public ::xpcc::I2cMaster, I2c
 {
@@ -89,7 +89,7 @@ public:
 
 	// start documentation inherited
 	static bool
-	start(I2cTransaction *transaction, Configuration_t configuration = nullptr);
+	start(I2cTransaction *transaction, ConfigurationHandler handler = nullptr);
 
 	static Error
 	getErrorState();

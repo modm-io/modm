@@ -33,6 +33,7 @@
 
 #include <cstddef>
 #include <xpcc/utils/allocator.hpp>
+#include <initializer_list>
 
 namespace xpcc
 {
@@ -88,7 +89,16 @@ namespace xpcc
 		 * repetition, n times, of copies of value.
 		 */
 		DynamicArray(SizeType n, const T& value, const Allocator& allocator = Allocator());
-		
+
+		/**
+		 * \brief	Initializer List constructor
+		 *
+		 * Construct a dynamic array that holds the values specified in the
+		 * initialize list
+		 */
+		DynamicArray(std::initializer_list<T> init,
+			const Allocator& allocator = Allocator());
+
 		DynamicArray(const DynamicArray& other);
 		
 		~DynamicArray();

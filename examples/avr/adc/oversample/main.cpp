@@ -15,13 +15,13 @@ xpcc::IOStream output(device);
 
 // the three sensors are mapped: x = ch1, y = ch2, z = ch0
 Adc::Channel sensorMapping[3] = {1,2,0};
-// 3 channels and averages of 2^5 bits = 32 oversamples
+// 3 channels and averages 32 oversamples
 #include <xpcc/driver/adc/adc_sampler.hpp>
-typedef xpcc::AdcSampler< AdcInterrupt, 3, 5 > sensors;
+typedef xpcc::AdcSampler< AdcInterrupt, 3, 32 > sensors;
 // the results are up to 16 bit wide
 sensors::DataType sensorData[3];
 
-xpcc::Timeout<> timeout(100);
+xpcc::ShortTimeout timeout(100);
 
 int
 main()

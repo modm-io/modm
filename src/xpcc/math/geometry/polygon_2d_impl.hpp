@@ -46,6 +46,12 @@ xpcc::Polygon2D<T>::Polygon2D(const Polygon2D<T>& other) :
 }
 
 template <typename T>
+xpcc::Polygon2D<T>::Polygon2D(std::initializer_list<xpcc::Polygon2D<T>::PointType> init) :
+	PointSet2D<T>(init)
+{
+}
+
+template <typename T>
 xpcc::Polygon2D<T>&
 xpcc::Polygon2D<T>::operator = (const Polygon2D<T>& other)
 {
@@ -56,7 +62,7 @@ xpcc::Polygon2D<T>::operator = (const Polygon2D<T>& other)
 // ----------------------------------------------------------------------------
 template <typename T>
 xpcc::Polygon2D<T>&
-xpcc::Polygon2D<T>::operator << (const Vector<T, 2>& point)
+xpcc::Polygon2D<T>::operator << (const xpcc::Polygon2D<T>::PointType& point)
 {
 	this->append(point);
 	return *this;
@@ -164,7 +170,7 @@ xpcc::Polygon2D<T>::getIntersections(const LineSegment2D<T>& segment, PointSet2D
 // ----------------------------------------------------------------------------
 template <typename T>
 bool
-xpcc::Polygon2D<T>::isInside(const Vector<T, 2>& point)
+xpcc::Polygon2D<T>::isInside(const xpcc::Polygon2D<T>::PointType& point)
 {
 	bool cw = true;
 	bool ccw = true;

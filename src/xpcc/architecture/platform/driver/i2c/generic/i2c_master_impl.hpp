@@ -19,25 +19,30 @@
 #define DEBUG_SW_I2C(x)
 //*/
 
-template <typename SCL, typename SDA, uint32_t BaudRate>
-xpcc::I2c::Operation xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::nextOperation;
-template <typename SCL, typename SDA, uint32_t BaudRate>
-xpcc::I2cTransaction *xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::transactionObject(nullptr);
-template <typename SCL, typename SDA, uint32_t BaudRate>
-xpcc::I2cMaster::Error xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::errorState(xpcc::I2cMaster::Error::NoError);
+template <class SCL, class SDA>
+uint16_t xpcc::SoftwareI2cMaster<SCL, SDA>::delayTime(3);
 
-template <typename SCL, typename SDA, uint32_t BaudRate>
-xpcc::I2cTransaction::Starting xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::starting(0, xpcc::I2c::OperationAfterStart::Stop);
-template <typename SCL, typename SDA, uint32_t BaudRate>
-xpcc::I2cTransaction::Writing xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::writing(nullptr, 0, xpcc::I2c::OperationAfterWrite::Stop);
-template <typename SCL, typename SDA, uint32_t BaudRate>
-xpcc::I2cTransaction::Reading xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::reading(nullptr, 0, xpcc::I2c::OperationAfterRead::Stop);
+template <class SCL, class SDA>
+xpcc::I2c::Operation xpcc::SoftwareI2cMaster<SCL, SDA>::nextOperation;
+template <class SCL, class SDA>
+xpcc::I2cTransaction *xpcc::SoftwareI2cMaster<SCL, SDA>::transactionObject(nullptr);
+template <class SCL, class SDA>
+xpcc::I2cMaster::Error xpcc::SoftwareI2cMaster<SCL, SDA>::errorState(xpcc::I2cMaster::Error::NoError);
+template <class SCL, class SDA>
+xpcc::I2c::ConfigurationHandler xpcc::SoftwareI2cMaster<SCL, SDA>::configuration(nullptr);
 
-template <typename SCL, typename SDA, uint32_t BaudRate>
+template <class SCL, class SDA>
+xpcc::I2cTransaction::Starting xpcc::SoftwareI2cMaster<SCL, SDA>::starting(0, xpcc::I2c::OperationAfterStart::Stop);
+template <class SCL, class SDA>
+xpcc::I2cTransaction::Writing xpcc::SoftwareI2cMaster<SCL, SDA>::writing(nullptr, 0, xpcc::I2c::OperationAfterWrite::Stop);
+template <class SCL, class SDA>
+xpcc::I2cTransaction::Reading xpcc::SoftwareI2cMaster<SCL, SDA>::reading(nullptr, 0, xpcc::I2c::OperationAfterRead::Stop);
+
+template <class SCL, class SDA>
 bool
-xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::start(xpcc::I2cTransaction *transaction, Configuration_t configuration)
+xpcc::SoftwareI2cMaster<SCL, SDA>::start(xpcc::I2cTransaction *transaction, ConfigurationHandler handler)
 {
-	if (!transactionObject && transaction)
+	if (!transactionObject and transaction)
 	{
 		if (!transaction->attaching())
 		{
@@ -49,7 +54,10 @@ xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::start(xpcc::I2cTransaction *transac
 			// reset error state
 			errorState = Error::NoError;
 			// call the configuration function
-			if (configuration) configuration();
+			if (handler and configuration != handler) {
+				configuration = handler;
+				configuration();
+			}
 			// save the transaction object
 			transactionObject = transaction;
 
@@ -125,9 +133,9 @@ xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::start(xpcc::I2cTransaction *transac
 }
 
 // ----------------------------------------------------------------------------
-template <typename SCL, typename SDA, uint32_t BaudRate>
+template <class SCL, class SDA>
 void
-xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::reset()
+xpcc::SoftwareI2cMaster<SCL, SDA>::reset()
 {
 	DEBUG_SW_I2C('E');
 	DEBUG_SW_I2C('0' + static_cast<uint8_t>(Error::SoftwareReset));
@@ -138,12 +146,22 @@ xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::reset()
 
 // ----------------------------------------------------------------------------
 // MARK: - error handling
-template <typename SCL, typename SDA, uint32_t BaudRate>
+template <class SCL, class SDA>
 void
-xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::error(Error error)
+xpcc::SoftwareI2cMaster<SCL, SDA>::error(Error error)
 {
 	DEBUG_SW_I2C('E');
 	DEBUG_SW_I2C('0' + static_cast<uint8_t>(error));
+	delay2();
+	SCL::reset();
+	SDA::reset();
+	delay2();
+	// attempt a stop condition, if it fails there is nothing else we can do
+	if (!stopCondition()) {
+		errorState = error;
+		return;
+	}
+
 	// release both lines
 	SCL::set();
 	SDA::set();
@@ -156,9 +174,9 @@ xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::error(Error error)
 
 // ----------------------------------------------------------------------------
 // MARK: - bus condition operations
-template <typename SCL, typename SDA, uint32_t BaudRate>
+template <class SCL, class SDA>
 bool
-xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::startCondition()
+xpcc::SoftwareI2cMaster<SCL, SDA>::startCondition()
 {
 	DEBUG_SW_I2C('\n');
 	DEBUG_SW_I2C('s');
@@ -168,14 +186,18 @@ xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::startCondition()
 	if(SDA::read() == xpcc::Gpio::Low)
 	{
 		// could not release data line
-		error(Error::BusCondition);
+		errorState = Error::BusBusy;
+		if (transactionObject) transactionObject->detaching(DetachCause::ErrorCondition);
+		transactionObject = nullptr;
 		return false;
 	}
 	// release the clock line
 	if (!sclSetAndWait())
 	{
 		// could not release clock line
-		error(Error::BusCondition);
+		errorState = Error::BusBusy;
+		if (transactionObject) transactionObject->detaching(DetachCause::ErrorCondition);
+		transactionObject = nullptr;
 		return false;
 	}
 	// now both pins are High, ready for start
@@ -191,9 +213,9 @@ xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::startCondition()
 	return true;
 }
 
-template <typename SCL, typename SDA, uint32_t BaudRate>
+template <class SCL, class SDA>
 bool
-xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::stopCondition()
+xpcc::SoftwareI2cMaster<SCL, SDA>::stopCondition()
 {
 	DEBUG_SW_I2C('S');
 	// pull down both lines
@@ -204,7 +226,9 @@ xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::stopCondition()
 	if (!sclSetAndWait())
 	{
 		// could not release clock line
-		error(Error::BusCondition);
+		errorState = Error::BusCondition;
+		if (transactionObject) transactionObject->detaching(DetachCause::ErrorCondition);
+		transactionObject = nullptr;
 		return false;
 	}
 	delay2();
@@ -215,15 +239,17 @@ xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::stopCondition()
 	if (SDA::read() == xpcc::Gpio::Low)
 	{
 		// could not release data line
-		error(Error::BusCondition);
+		errorState = Error::BusCondition;
+		if (transactionObject) transactionObject->detaching(DetachCause::ErrorCondition);
+		transactionObject = nullptr;
 		return false;
 	}
 	return true;
 }
 
-template <typename SCL, typename SDA, uint32_t BaudRate>
+template <class SCL, class SDA>
 bool
-xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::sclSetAndWait()
+xpcc::SoftwareI2cMaster<SCL, SDA>::sclSetAndWait()
 {
 	SCL::set();
 	// wait for clock stretching by slave
@@ -243,9 +269,9 @@ xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::sclSetAndWait()
 
 // ----------------------------------------------------------------------------
 // MARK: - byte operations
-template <typename SCL, typename SDA, uint32_t BaudRate>
+template <class SCL, class SDA>
 bool
-xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::write(uint8_t data)
+xpcc::SoftwareI2cMaster<SCL, SDA>::write(uint8_t data)
 {
 	DEBUG_SW_I2C('W');
 	// shift through all 8 bits
@@ -288,9 +314,9 @@ xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::write(uint8_t data)
 	return true;
 }
 
-template <typename SCL, typename SDA, uint32_t BaudRate>
+template <class SCL, class SDA>
 bool
-xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::read(uint8_t &data, bool ack)
+xpcc::SoftwareI2cMaster<SCL, SDA>::read(uint8_t &data, bool ack)
 {
 	DEBUG_SW_I2C('R');
 	// release data line
@@ -325,9 +351,9 @@ xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::read(uint8_t &data, bool ack)
 
 // ----------------------------------------------------------------------------
 // MARK: - bit operations
-template <typename SCL, typename SDA, uint32_t BaudRate>
+template <class SCL, class SDA>
 bool
-xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::writeBit(bool bit)
+xpcc::SoftwareI2cMaster<SCL, SDA>::writeBit(bool bit)
 {
 	// set the data pin
 	SDA::set(bit);
@@ -346,9 +372,9 @@ xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::writeBit(bool bit)
 	return false;
 }
 
-template <typename SCL, typename SDA, uint32_t BaudRate>
+template <class SCL, class SDA>
 bool
-xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::readBit(uint8_t &data)
+xpcc::SoftwareI2cMaster<SCL, SDA>::readBit(uint8_t &data)
 {
 	// slave sets data line
 	delay2();

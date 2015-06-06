@@ -61,7 +61,10 @@ def relocate_to_buildpath(env, path, strip_extension=False):
 	if strip_extension:
 		path = os.path.splitext(path)[0]
 
-	path = os.path.relpath(path, env['XPCC_BASEPATH'])
+	# needed when xpcc path has a symlink
+	base = os.path.realpath(env['XPCC_BASEPATH'])
+
+	path = os.path.relpath(path, base)
 	if path.startswith('..'):
 		# if the file is not in a subpath of the current directory
 		# build it in the root directory of the build path
@@ -120,9 +123,6 @@ def xpcc_library(env, buildpath=None):
 	# exclude the buildpath from the FileScanner
 	exclude_from_scanner(env['XPCC_BUILDPATH'])
 
-	# exclude the generated path from the FileScanner
-	exclude_from_scanner(env['XPCC_PLATFORM_GENERATED_PATH'])
-
 	# build the library
 	library, defines = env.SConscript(
 			os.path.join(env['XPCC_ROOTPATH'], 'src', 'SConscript'),
@@ -158,18 +158,19 @@ def xpcc_library(env, buildpath=None):
 
 	return library
 
-def xpcc_communication_header(env, xmlfile, path='.', dtdPath=None):
-	files  = env.SystemCppPackets(xmlfile, path=path, dtdPath=dtdPath)
-	files += env.SystemCppIdentifier(xmlfile, path=path, dtdPath=dtdPath)
-	files += env.SystemCppCommunication(xmlfile, path=path, dtdPath=dtdPath)
-	files += env.SystemCppXpccTaskCaller(xmlfile, path=path, dtdPath=dtdPath)
+def xpcc_communication_header(env, xmlfile, path='.', dtdPath=None, namespace='robot'):
+	files  = env.SystemCppPackets(xmlfile, path=path, dtdPath=dtdPath, namespace=namespace)
+	files += env.SystemCppIdentifier(xmlfile, path=path, dtdPath=dtdPath, namespace=namespace)
+	files += env.SystemCppCommunication(xmlfile, path=path, dtdPath=dtdPath, namespace=namespace)
+	files += env.SystemCppXpccTaskCaller(xmlfile, path=path, dtdPath=dtdPath, namespace=namespace)
 	if 'communication' in env['XPCC_CONFIG']:
 		files += env.SystemCppPostman(
 				target='postman',
 				source=xmlfile,
 				container=env['XPCC_CONFIG']['communication']['container'],
 				path=path,
-				dtdPath=dtdPath)
+				dtdPath=dtdPath,
+				namespace=namespace)
 
 	source = []
 	for file in files:
@@ -269,13 +270,9 @@ def generate(env, **kw):
 		log_level = 'warn'
 	env.SetLogLevel(log_level)
 
-	# Chose Compiler
-	c = ARGUMENTS.get('COMPILER', None)
-	if c == None:
-		c = ARGUMENTS.get('compiler', None)
-	if c == None:
-		c = ARGUMENTS.get('c', None)
-	env['XPCC_COMPILER'] = c
+	if 'TERM' in os.environ:
+		# copy terminal settings from os.environ for color output
+		env['ENV']['TERM'] = os.environ['TERM']
 
 	# detect the rootpath to the xpcc folder
 	rootpath = env.get('rootpath')
@@ -402,7 +399,7 @@ def generate(env, **kw):
 	env['CPPPATH'] = []
 
 	# architecture specific settings and tools
-	if env['ARCHITECTURE'] == 'avr8':
+	if env['ARCHITECTURE'] in ['avr8', 'avr8l']:
 		env['AVR_DEVICE'] = device
 		env['AVR_CLOCK'] = clock
 		env['LIBS'] = ['']

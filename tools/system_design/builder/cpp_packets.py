@@ -90,6 +90,11 @@ class TypeBuilder(builder_base.Builder):
 	
 	def setup(self, optparser):
 		optparser.add_option(
+				"--namespace",
+				dest = "namespace",
+				default = "robot",
+				help = "Namespace of the generated identifiers.")
+		optparser.add_option(
 				"--source_path",
 				dest = "source_path",
 				default = None,
@@ -127,8 +132,12 @@ class TypeBuilder(builder_base.Builder):
 			includeDirective = '"%s"' % os.path.join(self.options.system_include_path, 'packets.hpp')
 		else:
 			includeDirective = '"%s"' % 'packets.hpp'
-			
-		
+
+		if self.options.namespace:
+			namespace = self.options.namespace
+		else:
+			raise builder_base.BuilderException("You need to provide a namespace!")
+
 		cppFilter = {
 			'enumElement': filter.enumElement,
 			'enumElementStrong': filter.typeName,
@@ -147,7 +156,8 @@ class TypeBuilder(builder_base.Builder):
 			'actions': self.tree.components.actions,
 			'events': self.tree.events,
 			'packets': self.tree.types,
-			'includeDirective': includeDirective
+			'includeDirective': includeDirective,
+			'namespace': namespace
 		}
 		
 		file = os.path.join(header_path, 'packets.hpp')

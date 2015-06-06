@@ -145,6 +145,7 @@ def generate(env, **kw):
 					'--source_path ${TARGETS[0].dir} ' \
 					'--header_path ${TARGETS[1].dir} ' \
 					'--dtdpath "${dtdPath}" ' \
+					'--namespace "${namespace}" ' \
 					'$SOURCE',
 				cmdstr="$SYSTEM_CPP_PACKETS_COMSTR"),
 			emitter = packet_emitter,
@@ -159,6 +160,7 @@ def generate(env, **kw):
 				'python "${XPCC_SYSTEM_BUILDER}/cpp_identifier.py" ' \
 					'--outpath ${TARGET.dir} ' \
 					'--dtdpath "${dtdPath}" ' \
+					'--namespace "${namespace}" ' \
 					'$SOURCE',
 				cmdstr="$SYSTEM_CPP_IDENTIFIER_COMSTR"),
 			emitter = identifier_emitter,
@@ -174,6 +176,7 @@ def generate(env, **kw):
 					'--container "${container}" ' \
 					'--outpath ${TARGET.dir} ' \
 					'--dtdpath "${dtdPath}" ' \
+					'--namespace "${namespace}" ' \
 					'$SOURCE',
 				cmdstr="$SYSTEM_CPP_POSTMAN_COMSTR"),
 			emitter = postman_emitter,
@@ -188,6 +191,7 @@ def generate(env, **kw):
 				'python "${XPCC_SYSTEM_BUILDER}/cpp_communication.py" ' \
 					'--outpath ${TARGET.dir} ' \
 					'--dtdpath "${dtdPath}" ' \
+					'--namespace "${namespace}" ' \
 					'$SOURCE',
 				cmdstr="$SYSTEM_CPP_COMMUNICATION_COMSTR"),
 			emitter = communication_emitter,
@@ -202,6 +206,7 @@ def generate(env, **kw):
 				'python "${XPCC_SYSTEM_BUILDER}/cpp_xpcc_task_caller.py" ' \
 					'--outpath ${TARGET.dir} ' \
 					'--dtdpath "${dtdPath}" ' \
+					'--namespace "${namespace}" ' \
 					'$SOURCE',
 				cmdstr="$SYSTEM_CPP_XPCC_TASK_CALLER_COMSTR"),
 			emitter = xpcc_task_caller_emitter,

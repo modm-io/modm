@@ -49,6 +49,9 @@ public:
 	testCopyConstructor();
 
 	void
+	testInitializerListConstructor();
+
+	void
 	testReserve();
 
 	void

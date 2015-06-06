@@ -1,6 +1,6 @@
 
 #include <xpcc/architecture/platform.hpp>
-#include <xpcc/processing/timeout.hpp>
+#include <xpcc/processing/timer.hpp>
 
 using namespace xpcc::atmega;
 
@@ -29,7 +29,7 @@ main()
 	// enable interrupts
 	enableInterrupts();
 	
-	xpcc::Timeout<> timeout(200);
+	xpcc::ShortTimeout timeout(200);
 	while (1)
 	{
 		if (timeout.isExpired())

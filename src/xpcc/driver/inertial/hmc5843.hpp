@@ -1,95 +1,100 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
 /* Copyright (c) 2011, Roboterclub Aachen e.V.
- * All rights reserved.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__HMC5843_HPP
-#define XPCC__HMC5843_HPP
+#ifndef XPCC_HMC5843_HPP
+#define XPCC_HMC5843_HPP
 
-#include "hmc58.hpp"
+#include "hmc58x3.hpp"
+#include <cmath>
 
 namespace xpcc
 {
-	namespace hmc5843
+
+struct hmc5843 : public hmc58x3
+{
+	enum class
+	Gain : uint8_t
 	{
-		using namespace hmc58;
+		Ga0_7 = 0,
+		Ga1_0 = ConfigB::GN0,
+		Ga1_5 = ConfigB::GN1,
+		Ga2_0 = int(ConfigB::GN1) | int(ConfigB::GN0),
+		Ga3_2 = ConfigB::GN2,
+		Ga3_8 = int(ConfigB::GN2) | int(ConfigB::GN0),
+		Ga4_5 = int(ConfigB::GN2) | int(ConfigB::GN1),
+		Ga6_5 = int(ConfigB::GN2) | int(ConfigB::GN1) | int(ConfigB::GN0),
+	};
 
-		/// device specific data output rate options of REGISTER_CONFIG_A
-		enum DataOutputRate {
-			DATA_OUTPUT_RATE_0_5HZ = 0x00,
-			DATA_OUTPUT_RATE_1HZ = 0x04,
-			DATA_OUTPUT_RATE_2HZ = 0x08,
-			DATA_OUTPUT_RATE_5HZ = 0x0c,
-			DATA_OUTPUT_RATE_10HZ = 0x10,
-			DATA_OUTPUT_RATE_20HZ = 0x14,
-			DATA_OUTPUT_RATE_50HZ = 0x18
-		};
+	enum class
+	MeasurementRate : uint8_t
+	{
+		Hz0_5 = 0,
+		Hz1 = ConfigA::DO0,
+		Hz2 = int(ConfigA::DO1),
+		Hz5 = int(ConfigA::DO1) | int(ConfigA::DO0),
+		Hz10 = ConfigA::DO2,
+		Hz20 = int(ConfigA::DO2) | int(ConfigA::DO0),
+		Hz50 = int(ConfigA::DO2) | int(ConfigA::DO1),
+	};
 
-		/// device specific data gain options of REGISTER_CONFIG_B
-		enum Gain {
-			GAIN_0_7,
-			GAIN_1_0,
-			GAIN_1_5,
-			GAIN_2_0,
-			GAIN_3_2,
-			GAIN_3_8,
-			GAIN_4_5,
-			GAIN_6_5
-		};
+};	// struct hmc5843
+
+/**
+ * HMC5843 digital compass driver.
+ *
+ * This class extends the Hmc58x3 family driver only by the addition of
+ * device specific Register bit masks.
+ *
+ * For further information on this device consult the
+ * <a href="http://www.sparkfun.com/datasheets/Sensors/Magneto/HMC5843.pdf">
+ * datasheet</a>.
+ *
+ * @see Hmc58x3
+ *
+ * @ingroup driver_inertial
+ * @author	Niklas Hauser
+ */
+template < typename I2cMaster >
+class Hmc5843 : public hmc5843, public Hmc58x3< I2cMaster >
+{
+	/// binary scaled gain values (scalar is 30)
+	static constexpr uint8_t gainValues[8] = {
+			lround(0.7 * 30),
+			lround(1.0 * 30),
+			lround(1.5 * 30),
+			lround(2.0 * 30),
+			lround(3.2 * 30),
+			lround(3.8 * 30),
+			lround(4.5 * 30),
+			lround(6.5 * 30),
+	};
+
+public:
+	/// Constructor, requires a hmc58x3::Data object, sets address to default of 0x1e
+	Hmc5843(Data &data, uint8_t address=0x1e)
+	:	Hmc58x3<I2cMaster>(data, address)
+	{
 	}
 
-	/**
-	 * \brief	HMC5843 digital compass driver.
-	 *
-	 * This class extends the HMC58* family driver only by the addition of
-	 * device specific Register bit masks.
-	 *
-	 * \see HMC58
-	 *
-	 * For further information on this device consult the
-	 * <a href="http://www.sparkfun.com/datasheets/Sensors/Magneto/HMC5843.pdf">
-	 * datasheet</a>.
-	 *
-	 * \ingroup driver_inertial
-	 * \author	Niklas Hauser
-	 *
-	 * \tparam I2cMaster Asynchronous Two Wire interface
-	 */
-	template < typename I2cMaster >
-	class Hmc5843 : public Hmc58< I2cMaster >
-	{
-	public:
-		/// \brief	Constructor, sets address to default of 0x1e
-		Hmc5843(uint8_t* data, uint8_t address=0x1e)
-		:	Hmc58<I2cMaster>(data, address)
-		{
-		}
-	};
-}
+	xpcc::ResumableResult<bool> inline
+	configure(MeasurementRate rate=MeasurementRate::Hz10, Gain gain=Gain::Ga1_0)
+	{ return this->configureRaw(uint8_t(rate), uint8_t(gain), gainValues); }
 
-#endif // XPCC__HMC5843_HPP
+	xpcc::ResumableResult<bool> inline
+	setMeasurementRate(MeasurementRate rate)
+	{ return this->updateConfigA(ConfigA_t(uint8_t(rate)), ConfigA::DO_Mask); }
+
+	xpcc::ResumableResult<bool> inline
+	setGain(Gain gain)
+	{ return this->setGainRaw(uint8_t(gain), gainValues); }
+};
+
+}	// namespace xpcc
+
+#endif // XPCC_HMC5843_HPP

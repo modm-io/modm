@@ -21,17 +21,15 @@ namespace xpcc
 /**
  * Software emulation of a I2C master implementation
  *
- * @tparam	SCL			an Open-Drain Output pin
- * @tparam	SDA			an Open-Drain Output pin
- * @tparam	Baudrate	in Hz (default frequency is 100kHz)
+ * @tparam	SCL			an Open-Drain pin
+ * @tparam	SDA			an Open-Drain pin
  *
  * @ingroup	i2c
  * @author	Niklas Hauser
  * @see		gpio
  */
-template< typename SCL,
-		  typename SDA,
-		  uint32_t BaudRate = xpcc::I2cMaster::Baudrate::Standard >
+template< class SCL,
+		  class SDA >
 class SoftwareI2cMaster : public xpcc::I2cMaster
 {
 public:
@@ -39,17 +37,15 @@ public:
 	static const TypeId::SoftwareI2cMasterScl Scl;
 
 public:
-	/**
-	 * Initializes the hardware.
-	 *
-	 * @warning	this call cannot modify the baudrate anymore, since it is defined
-	 * 			by the template parameter Baudrate.
-	 */
+	/// Initializes the hardware, with the baudrate limited to about 250kbps.
 	template< class clockSource, uint32_t baudrate=Baudrate::Standard,
 			uint16_t tolerance = xpcc::Tolerance::FivePercent >
 	static void
 	initialize()
 	{
+		delayTime = 250000 / baudrate;
+		if (delayTime == 0) delayTime = 1;
+
 		SCL::set();
 		SDA::set();
 	}
@@ -57,7 +53,7 @@ public:
 public:
 	// start documentation inherited
 	static bool
-	start(I2cTransaction *transaction, Configuration_t configuration = nullptr);
+	start(I2cTransaction *transaction, ConfigurationHandler handler = nullptr);
 
 	static Error ALWAYS_INLINE
 	getErrorState()
@@ -116,13 +112,13 @@ private:
 	/// busy waits a **half** clock cycle
 	static ALWAYS_INLINE void
 	delay2()
-	{ xpcc::delayMicroseconds(delayTime); }
+	{ xpcc::delayMicroseconds(delayTime*2); }
 
 	// timings
 	/// busy waits **quarter** clock cycle
 	static ALWAYS_INLINE void
 	delay4()
-	{ xpcc::delayMicroseconds(delayTime/2); }
+	{ xpcc::delayMicroseconds(delayTime); }
 
 	enum
 	{
@@ -131,12 +127,13 @@ private:
 	};
 
 	// calculate the delay in microseconds needed to achieve the
-	// requested SPI frequency
-	static constexpr float delayTime = (1000000.0 / BaudRate) / 2.0;
+	// requested I2C frequency
+	static uint16_t delayTime;
 
 	static xpcc::I2c::Operation nextOperation;
 	static xpcc::I2cTransaction *transactionObject;
 	static Error errorState;
+	static xpcc::I2c::ConfigurationHandler configuration;
 
 	static xpcc::I2cTransaction::Starting starting;
 	static xpcc::I2cTransaction::Writing writing;

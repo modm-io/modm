@@ -23,7 +23,7 @@ namespace stm32
  * @brief		Filters for the Basic Extended CAN Module
  *
  * @author		Fabian Greif <fabian.greif@rwth-aachen.de>
- * @ingroup		stm32
+ * @ingroup		{{target.string}}_can
  */
 class CanFilter
 {

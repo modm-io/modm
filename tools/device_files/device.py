@@ -240,6 +240,7 @@ class DeviceFile:
 		for d in self.drivers:
 			if d.appliesTo(s, self.properties):
 				substitutions = s.getTargetDict()
+				substitutions['target']['string'] = s.string
 				for prop in [p for p in self.properties if p.type == 'core']:
 					substitutions['target']['core'] = prop.value
 				substitutions.update(self.getSubstitutions())

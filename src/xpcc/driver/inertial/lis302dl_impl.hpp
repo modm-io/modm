@@ -20,27 +20,27 @@ xpcc::Lis302dl<Transport>::Lis302dl(Data &data, uint8_t address)
 }
 
 template < class Transport >
-xpcc::co::Result<bool>
-xpcc::Lis302dl<Transport>::initialize(Scale scale, MeasurementRate rate)
+xpcc::ResumableResult<bool>
+xpcc::Lis302dl<Transport>::configure(Scale scale, MeasurementRate rate)
 {
 	return updateControlRegister(r(scale) | r(rate) | Control1_t(0x47));
 }
 
 template < class Transport >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Lis302dl<Transport>::updateControlRegister(uint8_t index, Control_t setMask, Control_t clearMask)
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	rawBuffer[index] = (rawBuffer[index] & ~clearMask.value) | setMask.value;
 	if (index == 0)
 		data.meta = bool(Control1_t(rawBuffer[0]) & Control1::FS);
 
-	CO_END_RETURN_CALL(this->write(i(Register::CtrlReg1) + index, rawBuffer[index]));
+	RF_END_RETURN_CALL(this->write(i(Register::CtrlReg1) + index, rawBuffer[index]));
 }
 
 template < class Transport >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Lis302dl<Transport>::writeClickThreshold(Axis axis, uint8_t threshold)
 {
 	switch(axis)
@@ -58,34 +58,34 @@ xpcc::Lis302dl<Transport>::writeClickThreshold(Axis axis, uint8_t threshold)
 }
 
 template < class Transport >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Lis302dl<Transport>::readAcceleration()
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
-	if (CO_CALL(this->read(i(Register::Status) | Transport::AddressIncrement, rawBuffer + 3, 7)))
+	if (RF_CALL(this->read(i(Register::Status) | Transport::AddressIncrement, rawBuffer + 3, 7)))
 	{
 		data.data[0] = rawBuffer[5];
 		data.data[1] = rawBuffer[7];
 		data.data[2] = rawBuffer[9];
-		CO_RETURN(true);
+		RF_RETURN(true);
 	}
 
-	CO_END_RETURN(false);
+	RF_END_RETURN(false);
 }
 
 // ----------------------------------------------------------------------------
 template < class Transport >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Lis302dl<Transport>::updateRegister(uint8_t reg, uint8_t setMask, uint8_t clearMask)
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
-	if (CO_CALL(this->read(reg, rawBuffer[4])))
+	if (RF_CALL(this->read(reg, rawBuffer[4])))
 	{
 		rawBuffer[4] = (rawBuffer[4] & ~clearMask) | setMask;
-		CO_RETURN_CALL(this->write(reg, rawBuffer[4]));
+		RF_RETURN_CALL(this->write(reg, rawBuffer[4]));
 	}
 
-	CO_END_RETURN(false);
+	RF_END_RETURN(false);
 }

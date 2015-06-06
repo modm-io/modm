@@ -30,17 +30,35 @@
 
 import os
 import builder_base
+import filter.cpp as filter
 
 class IdentifierBuilder(builder_base.Builder):
 	
 	VERSION = "0.1"
-	
+
+	def setup(self, optparser):
+		optparser.add_option(
+				"--namespace",
+				dest = "namespace",
+				default = "robot",
+				help = "Namespace of the generated identifiers.")
+
 	def generate(self):
 		# check the commandline options
 		if not self.options.outpath:
 			raise builder_base.BuilderException("You need to provide an output path!")
+
+		if self.options.namespace:
+			namespace = self.options.namespace
+		else:
+			raise builder_base.BuilderException("You need to provide a namespace!")
+
+		cppFilter = {
+			'enumElement': filter.enumElement,
+			'enumValue': filter.toHexValue,
+		}
 		
-		template = self.template('templates/robot_identifier.tpl')
+		template = self.template('templates/robot_identifier.tpl', filter=cppFilter)
 			
 		components = []
 		for component in self.tree.components.iter(abstract=False):
@@ -50,7 +68,8 @@ class IdentifierBuilder(builder_base.Builder):
 			'domains' : self.tree.domains,
 			'components': components,
 			'actions': self.tree.components.actions,
-			'events': self.tree.events
+			'events': self.tree.events,
+			'namespace': namespace
 		}
 					
 		if os.path.splitext(self.options.outpath)[1] == '':

@@ -53,11 +53,11 @@ MAIN_FUNCTION
     ledMatrixDisplay.setFont(xpcc::font::FixedWidth5x8);
 	ledMatrixDisplay.setCursor(0, 0);
 
-	xpcc::PeriodicTimer<> countdownTimer(100);
+	xpcc::ShortPeriodicTimer countdownTimer(100);
 
     while (1)
     {
-		if (countdownTimer.isExpired())
+		if (countdownTimer.execute())
 		{
 			for (int16_t sec = 9999; sec >= 0; --sec)
 			{

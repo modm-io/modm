@@ -5,7 +5,7 @@
 -->
 
 <!ELEMENT rca (description|include|component)*>
-<!ATTLIST rca 
+<!ATTLIST rca
 	version    CDATA    #REQUIRED
 >
 
@@ -33,10 +33,11 @@
 <!ELEMENT action (description?,errorcode*)>
 <!ATTLIST action
 	name CDATA #REQUIRED
-	id CDATA #IMPLIED
+	id CDATA #REQUIRED
 	function CDATA #IMPLIED
 	parameterType CDATA #IMPLIED
 	returnType CDATA #IMPLIED
+	call (resumable|simple) #IMPLIED
 >
 
 

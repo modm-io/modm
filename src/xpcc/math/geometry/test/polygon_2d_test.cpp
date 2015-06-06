@@ -41,6 +41,23 @@ Polygon2DTest::testConstructor()
 }
 
 void
+Polygon2DTest::testInitializerListConstructor()
+{
+	xpcc::Polygon2D<int16_t> polygon {
+		xpcc::Vector2i(1,35), xpcc::Vector2i(56,2), xpcc::Vector2i(3,76),
+		xpcc::Vector2i(19,4), xpcc::Vector2i(93,5), xpcc::Vector2i(6,66) };
+
+	TEST_ASSERT_EQUALS(polygon.getNumberOfPoints(), 6U);
+	TEST_ASSERT_EQUALS(polygon[0], xpcc::Vector2i(1,35));
+	TEST_ASSERT_EQUALS(polygon[1], xpcc::Vector2i(56,2));
+	TEST_ASSERT_EQUALS(polygon[2], xpcc::Vector2i(3,76));
+	TEST_ASSERT_EQUALS(polygon[3], xpcc::Vector2i(19,4));
+	TEST_ASSERT_EQUALS(polygon[4], xpcc::Vector2i(93,5));
+	TEST_ASSERT_EQUALS(polygon[5], xpcc::Vector2i(6,66));
+
+}
+
+void
 Polygon2DTest::testAppendAndAccess()
 {
 	xpcc::Polygon2D<int16_t> polygon(5);

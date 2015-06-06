@@ -23,8 +23,10 @@
 
 namespace xpcc
 {
+
 namespace stm32
 {
+
 /**
  * Universal asynchronous receiver transmitter ({{ uart ~ id }})
  *
@@ -34,7 +36,7 @@ namespace stm32
  * the regular Usart classes.
  *
  * @author		Kevin Laeufer
- * @ingroup		stm32
+ * @ingroup		{{target.string}}_uart
  */
 class {{ uart ~ "Hal" ~ id }} : public UartBase
 {
@@ -167,8 +169,10 @@ public:
 	static inline void
 	acknowledgeInterruptFlags(InterruptFlag flags);
 };
-}
-}
+
+}	// namespace stm32
+
+}	// namespace xpcc
 
 #include "{{ uart | lower }}_hal_{{ id }}_impl.hpp"
 

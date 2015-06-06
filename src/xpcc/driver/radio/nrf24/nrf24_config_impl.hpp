@@ -20,42 +20,29 @@
 
 template<typename Nrf24Phy>
 void
-xpcc::Nrf24Config<Nrf24Phy>::powerUp()
-{
-	Nrf24Phy::setBits(NrfRegister::CONFIG, Config::PWR_UP);
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Nrf24Phy>
-void
-xpcc::Nrf24Config<Nrf24Phy>::powerDown()
-{
-	Nrf24Phy::clearBits(NrfRegister::CONFIG, Config::PWR_UP);
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Nrf24Phy>
-void
-xpcc::Nrf24Config<Nrf24Phy>::setChannel(uint8_t channel)
-{
-	Nrf24Phy::writeRegister(NrfRegister::RF_CH, channel);
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Nrf24Phy>
-void
 xpcc::Nrf24Config<Nrf24Phy>::setMode(Mode mode)
 {
+	Nrf24Phy::clearInterrupt(InterruptFlag::ALL);
+
 	if(mode == Mode::Rx)
 	{
+		XPCC_LOG_DEBUG << "Set mode Rx" << xpcc::endl;
+
+		Nrf24Phy::flushRxFifo();
 		Nrf24Phy::setBits(NrfRegister::CONFIG, Config::PRIM_RX);
 	} else
 	{
+		XPCC_LOG_DEBUG << "Set mode Tx" << xpcc::endl;
+
+		Nrf24Phy::clearInterrupt(Nrf24Phy::InterruptFlag::ALL);		// Not sure if needed
 		Nrf24Phy::clearBits(NrfRegister::CONFIG, Config::PRIM_RX);
+
+		// pulsing CE seems to be necessary to enter TX mode
+		Nrf24Phy::pulseCe();
 	}
+
+	// don't go to standby
+	Nrf24Phy::setCe();
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -64,20 +51,20 @@ template<typename Nrf24Phy>
 void
 xpcc::Nrf24Config<Nrf24Phy>::setSpeed(Speed speed)
 {
-	if(speed == Speed::kBps250)
+	switch (speed)
 	{
+	case Speed::kBps250:
 		Nrf24Phy::clearBits(NrfRegister::RF_SETUP, RfSetup::RF_DR_HIGH);
-		Nrf24Phy::setBits(NrfRegister::RF_SETUP, RfSetup::RF_DR_LOW);
-	}
-	else if(speed == Speed::MBps1)
-	{
+		Nrf24Phy::setBits  (NrfRegister::RF_SETUP, RfSetup::RF_DR_LOW);
+		break;
+	case Speed::MBps1:
 		Nrf24Phy::clearBits(NrfRegister::RF_SETUP, RfSetup::RF_DR_LOW);
 		Nrf24Phy::clearBits(NrfRegister::RF_SETUP, RfSetup::RF_DR_HIGH);
-	}
-	else if(speed == Speed::MBps1)
-	{
-		Nrf24Phy::setBits(NrfRegister::RF_SETUP, RfSetup::RF_DR_HIGH);
+		break;
+	case Speed::MBps2:
+		Nrf24Phy::setBits  (NrfRegister::RF_SETUP, RfSetup::RF_DR_HIGH);
 		Nrf24Phy::clearBits(NrfRegister::RF_SETUP, RfSetup::RF_DR_LOW);
+		break;
 	}
 }
 
@@ -108,55 +95,34 @@ void xpcc::Nrf24Config<Nrf24Phy>::setCrc(Crc crc)
 // --------------------------------------------------------------------------------------------------------------------
 
 template<typename Nrf24Phy>
-void
-xpcc::Nrf24Config<Nrf24Phy>::setAddressWidth(AddressWidth width)
+void xpcc::Nrf24Config<Nrf24Phy>::setRfPower(RfPower power)
 {
-	Nrf24Phy::writeRegister(NrfRegister::SETUP_AW, static_cast<uint8_t>(width));
+	uint8_t reg = Nrf24Phy::readRegister(NrfRegister::RF_SETUP);
+	reg &= ~(static_cast<uint8_t>(RfSetup::RF_PWR));	// Clear bits
+	reg |=  ((static_cast<uint8_t>(power)) << 1); 		// Set bits
+	Nrf24Phy::writeRegister(NrfRegister::RF_SETUP, reg);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
 
 template<typename Nrf24Phy>
-void
-xpcc::Nrf24Config<Nrf24Phy>::setRfPower(RfPower power)
+void xpcc::Nrf24Config<Nrf24Phy>::setAutoRetransmitDelay(AutoRetransmitDelay delay)
 {
-	Nrf24Phy::writeRegister(NrfRegister::RF_SETUP, static_cast<uint8_t>(power) << 1);
+	uint8_t reg = Nrf24Phy::readRegister(NrfRegister::SETUP_RETR);
+	reg &= ~(static_cast<uint8_t>(SetupRetr::ARD));		// Clear bits
+	reg |=  ((static_cast<uint8_t>(delay)) << 4); 		// Set bits
+	Nrf24Phy::writeRegister(NrfRegister::SETUP_RETR, reg);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
 
 template<typename Nrf24Phy>
-void
-xpcc::Nrf24Config<Nrf24Phy>::setAutoRetransmitDelay(AutoRetransmitDelay delay)
+void xpcc::Nrf24Config<Nrf24Phy>::setAutoRetransmitCount(AutoRetransmitCount count)
 {
-	Nrf24Phy::writeRegister(NrfRegister::SETUP_RETR, static_cast<uint8_t>(delay) << 4);
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Nrf24Phy>
-void
-xpcc::Nrf24Config<Nrf24Phy>::setAutoRetransmitCount(AutoRetransmitCount count)
-{
-	Nrf24Phy::writeRegister(NrfRegister::SETUP_RETR, static_cast<uint8_t>(count));
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Nrf24Phy>
-void
-xpcc::Nrf24Config<Nrf24Phy>::enableFeatureNoAck()
-{
-	Nrf24Phy::setBits(NrfRegister::FEATURE, Feature::EN_DYN_ACK);
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Nrf24Phy>
-void
-xpcc::Nrf24Config<Nrf24Phy>::disableFeatureNoAck()
-{
-	Nrf24Phy::clearBits(NrfRegister::FEATURE, Feature::EN_DYN_ACK);
+	uint8_t reg = Nrf24Phy::readRegister(NrfRegister::SETUP_RETR);
+	reg &= ~(static_cast<uint8_t>(SetupRetr::ARC));		// Clear bits
+	reg |=  (static_cast<uint8_t>(count)); 				// Set bits
+	Nrf24Phy::writeRegister(NrfRegister::SETUP_RETR, reg);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -177,7 +143,7 @@ xpcc::Nrf24Config<Nrf24Phy>::enablePipe(Pipe_t pipe, bool enableAutoAck)
 
 	Flags_t pipe_flag = static_cast<Flags_t>(1 << pipe.value);
 
-	/* Enable or disable auto acknowledgement for this pipe */
+	/* Enable or disable auto acknowledgment for this pipe */
 	if(enableAutoAck)
 	{
 		Nrf24Phy::setBits(NrfRegister::EN_AA, pipe_flag);
@@ -188,16 +154,6 @@ xpcc::Nrf24Config<Nrf24Phy>::enablePipe(Pipe_t pipe, bool enableAutoAck)
 
 	/* enable pipe */
 	Nrf24Phy::setBits(NrfRegister::EN_RX_ADDR, pipe_flag);
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Nrf24Phy>
-void
-xpcc::Nrf24Config<Nrf24Phy>::disablePipe(Pipe_t pipe)
-{
-	/* DISABLE pipe */
-	Nrf24Phy::clearBits(NrfRegister::EN_RX_ADDR, (1 << pipe.value));
 }
 
 // --------------------------------------------------------------------------------------------------------------------

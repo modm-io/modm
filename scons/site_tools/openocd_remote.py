@@ -30,25 +30,18 @@ def openocd_remote_run(env, source, alias='openocd_remote_run'):
 # -----------------------------------------------------------------------------
 # Program elf file via a remote gdb session
 def gdb_remote_program(env, source, alias='gdb_remote_program'):
-	if platform.system() == "Windows":
-	
-		def fail(target, source, env):
-			raise Exception("Not supported under windows")
-		
-		action = fail
-		return env.AlwaysBuild(env.Alias(alias, source, action))
-	else:
-		gdb = "arm-none-eabi-gdb"
-		cmd = [gdb, '-q',
-			'-ex "target remote $OPENOCD_REMOTE_HOST:3333"',
-			'-ex "load"',
-			'-ex "monitor reset"',
-			'-ex "disconnect"',
-			'-ex "quit"',
-			'$SOURCE']
+	gdb = "arm-none-eabi-gdb"
+	cmd = [gdb, '-q',
+		'-ex "target remote $OPENOCD_REMOTE_HOST:3333"',
+		'-ex "monitor reset halt"',
+		'-ex "load"',
+		'-ex "monitor reset "',
+		'-ex "disconnect"',
+		'-ex "quit"',
+		'$SOURCE']
 
-		action = Action(' '.join(cmd))
-		return env.AlwaysBuild(env.Alias(alias, source, action))
+	action = Action(' '.join(cmd))
+	return env.AlwaysBuild(env.Alias(alias, source, action))
 
 # -----------------------------------------------------------------------------
 # Reset processor via remote gdb session

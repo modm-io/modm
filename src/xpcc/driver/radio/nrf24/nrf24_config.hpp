@@ -11,21 +11,26 @@
 #define XPCC__NRF24_CONFIG_HPP
 
 #include <stdint.h>
+#include <xpcc/debug/logger.hpp>
+
 #include "nrf24_phy.hpp"
 #include "nrf24_definitions.hpp"
 
+#undef  XPCC_LOG_LEVEL
+#define XPCC_LOG_LEVEL xpcc::log::DISABLED
 
 namespace xpcc
 {
 
-/** @brief Configuration interface for nRF24L01+
+/**
+ * Configuration interface for nRF24L01+
  *
- *  This class allows for configuration of some aspects of the nRF24L01+
- *  wireless modules. It doesn't implement every aspect, but hopefully
- *  all the often used ones.
+ * This class allows for configuration of some aspects of the nRF24L01+
+ * wireless modules. It doesn't implement every aspect, but hopefully
+ * all the often used ones.
  *
- *  @ingroup	nrf24
- *  @author		Daniel Krebs
+ * @ingroup	nrf24
+ * @author		Daniel Krebs
  */
 template<typename Nrf24Phy>
 class Nrf24Config : public Nrf24Register
@@ -120,13 +125,16 @@ public:
 
 public:
 	static void
-	powerUp();
+	powerUp()
+	{ Nrf24Phy::setBits(NrfRegister::CONFIG, Config::PWR_UP); }
 
 	static void
-	powerDown();
+	powerDown()
+	{ Nrf24Phy::clearBits(NrfRegister::CONFIG, Config::PWR_UP); }
 
 	static void
-	setChannel(uint8_t channel);
+	setChannel(uint8_t channel)
+	{ Nrf24Phy::writeRegister(NrfRegister::RF_CH, channel); }
 
 	static void
 	setMode(Mode mode);
@@ -138,7 +146,8 @@ public:
 	setCrc(Crc crc);
 
 	static void
-	setAddressWidth(AddressWidth width);
+	setAddressWidth(AddressWidth width)
+	{ Nrf24Phy::writeRegister(NrfRegister::SETUP_AW, static_cast<uint8_t>(width)); }
 
 	static void
 	setRfPower(RfPower power);
@@ -150,10 +159,12 @@ public:
 	setAutoRetransmitCount(AutoRetransmitCount count);
 
 	static void
-	enableFeatureNoAck();
+	enableFeatureNoAck()
+	{ Nrf24Phy::setBits(NrfRegister::FEATURE, Feature::EN_DYN_ACK); }
 
 	static void
-	disableFeatureNoAck();
+	disableFeatureNoAck()
+	{ Nrf24Phy::clearBits(NrfRegister::FEATURE, Feature::EN_DYN_ACK); }
 
 	/** @brief Enable Rx Pipe and set payload width
 	 *
@@ -167,12 +178,17 @@ public:
 	 *  @param pipe     Pipe Number
 	 */
 	static void
-	disablePipe(Pipe_t pipe);
+	disablePipe(Pipe_t pipe)
+	{ Nrf24Phy::clearBits(NrfRegister::EN_RX_ADDR, (1 << pipe.value)); }
 
 	/** @brief Return number of pipe number that has payload available
 	 */
 	static Pipe_t
 	getPayloadPipe();
+
+	static uint8_t
+	getRetryCount()
+	{ return (Nrf24Phy::readRegister(NrfRegister::OBSERVE_TX) & (uint8_t)ObserveTx::ARC_CNT); }
 
 };
 

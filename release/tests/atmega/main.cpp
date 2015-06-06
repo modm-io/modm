@@ -1,7 +1,12 @@
 
 #include <xpcc/architecture.hpp>
 
+#if defined(__AVR_AT90CAN128__) || defined(__AVR_AT90CAN64__) || defined(__AVR_AT90CAN32__)
+using namespace xpcc::at90;
+#else
 using namespace xpcc::atmega;
+#endif
+
 typedef xpcc::avr::SystemClock clock;
 
 typedef Uart0 uart;
@@ -30,7 +35,10 @@ main(void)
 #if defined(__AVR_ATmega64__)   || \
 	defined(__AVR_ATmega645__)  || \
 	defined(__AVR_ATmega6490__) || \
-	defined(__AVR_ATmega128__) 
+	defined(__AVR_ATmega128__)  || \
+	defined(__AVR_AT90CAN128__) || \
+	defined(__AVR_AT90CAN64__)  || \
+	defined(__AVR_AT90CAN32__)
 	typedef Uart0 uart;
 	GpioOutputE1::connect(Uart0::Tx);
 	GpioInputE0::connect(Uart0::Rx);
@@ -39,7 +47,7 @@ main(void)
 	defined(__AVR_ATmega1281__)
 	typedef Uart1 uart;
 	GpioOutputD3::connect(Uart1::Tx);
-	GpioInputD2::connect(Uart1::Rx);	
+	GpioInputD2::connect(Uart1::Rx);
 #else
 	typedef Uart0 uart;
 	GpioOutputD1::connect(Uart0::Tx);

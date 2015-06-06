@@ -5,10 +5,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	ROBOT__IDENTIFIER_HPP
-#define	ROBOT__IDENTIFIER_HPP
+#ifndef	{{ namespace | upper }}_IDENTIFIER_HPP
+#define	{{ namespace | upper }}_IDENTIFIER_HPP
 
-namespace robot
+namespace {{ namespace }}
 {
 	namespace domain
 	{
@@ -16,7 +16,7 @@ namespace robot
 		{
 		{%- for item in domains -%}
 		{%- if item.id != None %}
-			{{ item.name | upper | replace(' ', '_') }} = {{ "0x%02x"|format(item.id) }},
+			{{ item.name | enumElement }} = {{ item.id | enumValue }},
 		{%- endif -%}
 		{%- endfor %}
 		};
@@ -28,7 +28,7 @@ namespace robot
 			{
 			{%- for item in domains %}
 			{%- if item.id != None %}
-				case {{ item.name | upper | replace(' ', '_') }}: return "{{ item.name | upper | replace(' ', '_') }}";
+				case {{ item.name | enumElement }}: return "{{ item.name | enumElement }}";
 			{%- endif -%}
 			{%- endfor %}
 				default: return "__UNKNOWN_DOMAIN__";
@@ -41,7 +41,7 @@ namespace robot
 		enum Identifier
 		{
 		{%- for item in components %}
-			{{ item.name | upper | replace(' ', '_') }} = {{ "0x%02x"|format(item.id) }},
+			{{ item.name | enumElement }} = {{ item.id | enumValue }},
 		{%- endfor %}
 		};
 				
@@ -51,7 +51,7 @@ namespace robot
 			switch (e)
 			{
 			{%- for item in components %}
-				case {{ item.name | upper | replace(' ', '_') }}: return "{{ item.name | upper | replace(' ', '_') }}";
+				case {{ item.name | enumElement }}: return "{{ item.name | enumElement }}";
 			{%- endfor %}
 				default: return "__UNKNOWN_COMPONENT__";
 			}
@@ -63,7 +63,7 @@ namespace robot
 		enum Identifier
 		{
 		{%- for item in actions %}
-			{{ item.name | upper | replace(' ', '_') }} = {{ "0x%02x"|format(item.id) }},
+			{{ item.name | enumElement }} = {{ item.id | enumValue }},
 		{%- endfor %}
 		};
 				
@@ -73,7 +73,7 @@ namespace robot
 			switch (e)
 			{
 			{%- for item in actions %}
-				case {{ item.name | upper | replace(' ', '_') }}: return "{{ item.name | upper | replace(' ', '_') }}";
+				case {{ item.name | enumElement }}: return "{{ item.name | enumElement }}";
 			{%- endfor %}
 				default: return "__UNKNOWN_ACTION__";
 			}
@@ -85,7 +85,7 @@ namespace robot
 		enum Identifier
 		{
 		{%- for item in events %}
-			{{ item.name | upper | replace(' ', '_') }} = {{ "0x%02x"|format(item.id) }},
+			{{ item.name | enumElement }} = {{ item.id | enumValue }},
 		{%- endfor %}
 		};
 		
@@ -95,12 +95,12 @@ namespace robot
 			switch (e)
 			{
 			{%- for item in events %}
-				case {{ item.name | upper | replace(' ', '_') }}: return "{{ item.name | upper | replace(' ', '_') }}";
+				case {{ item.name | enumElement }}: return "{{ item.name | enumElement }}";
 			{%- endfor %}
 				default: return "__UNKNOWN_EVENT__";
 			}
 		}
 	}
-}
+}	// namespace {{ namespace }}
 
-#endif	// ROBOT__IDENTIFIER_HPP
+#endif	// {{ namespace | upper }}_IDENTIFIER_HPP

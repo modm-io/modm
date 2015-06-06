@@ -4,7 +4,7 @@
 #include "scrollable_text.hpp"
 #include "choice_menu_entry.hpp"
 #include <xpcc/container/doubly_linked_list.hpp>
-#include <xpcc/processing/periodic_timer.hpp>
+#include <xpcc/processing/timer.hpp>
 
 namespace xpcc{
 
@@ -82,7 +82,7 @@ namespace xpcc{
 	private:
 		uint16_t display_update_time;
 
-		xpcc::PeriodicTimer<> timer;
+		xpcc::ShortPeriodicTimer timer;
 		bool buttonAction;
 
 		const char* title;

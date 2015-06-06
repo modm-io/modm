@@ -7,6 +7,11 @@
  */
 // ----------------------------------------------------------------------------
 
+/**
+ * @ingroup 	{{target.string}}
+ * @defgroup	{{target.string}}_adc ADC
+ */
+
 #ifndef XPCC_ATTINY_ADC_HPP
 #define XPCC_ATTINY_ADC_HPP
 
@@ -103,7 +108,7 @@ namespace attiny
  * needed the frequency can be higher.
  *
  * @author	Niklas Hauser
- * @ingroup	attiny
+ * @ingroup	{{target.string}}_adc
  */
 class Adc : public xpcc::Adc
 {

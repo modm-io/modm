@@ -11,7 +11,7 @@
 #define XPCC_LIS3DSH_HPP
 
 #include <xpcc/architecture/interface/register.hpp>
-#include <xpcc/processing/coroutine.hpp>
+#include <xpcc/processing/resumable.hpp>
 #include <xpcc/math/utils/endianness.hpp>
 #include "lis3_transport.hpp"
 
@@ -524,46 +524,46 @@ public:
 	Lis3dsh(Data &data, uint8_t address=0x1D);
 
 	bool inline
-	initializeBlocking(Scale scale, MeasurementRate rate = MeasurementRate::Hz100)
+	configureBlocking(Scale scale, MeasurementRate rate = MeasurementRate::Hz100)
 	{
-		return CO_CALL_BLOCKING(initialize(scale, rate));
+		return RF_CALL_BLOCKING(configure(scale, rate));
 	}
 
-	xpcc::co::Result<bool>
-	initialize(Scale scale, MeasurementRate rate = MeasurementRate::Hz100);
+	xpcc::ResumableResult<bool>
+	configure(Scale scale, MeasurementRate rate = MeasurementRate::Hz100);
 
 	// MARK: Control Registers
-	xpcc::co::Result<bool> inline
+	xpcc::ResumableResult<bool> inline
 	updateSmControl1(SmControl_t setMask, SmControl_t clearMask = SmControl_t(0xff))
 	{
 		return updateControlRegister(1, setMask, clearMask);
 	}
 
-	xpcc::co::Result<bool> inline
+	xpcc::ResumableResult<bool> inline
 	updateSmControl2(SmControl_t setMask, SmControl_t clearMask = SmControl_t(0xff))
 	{
 		return updateControlRegister(2, setMask, clearMask);
 	}
 
-	xpcc::co::Result<bool> inline
+	xpcc::ResumableResult<bool> inline
 	updateControl(Control3_t setMask, Control3_t clearMask = Control3_t(0xff))
 	{
 		return updateControlRegister(3, setMask, clearMask);
 	}
 
-	xpcc::co::Result<bool> inline
+	xpcc::ResumableResult<bool> inline
 	updateControl(Control4_t setMask, Control4_t clearMask = Control4_t(0xff))
 	{
 		return updateControlRegister(0, setMask, clearMask);
 	}
 
-	xpcc::co::Result<bool> inline
+	xpcc::ResumableResult<bool> inline
 	updateControl(Control5_t setMask, Control5_t clearMask = Control5_t(0xff))
 	{
 		return updateControlRegister(4, setMask, clearMask);
 	}
 
-	xpcc::co::Result<bool> inline
+	xpcc::ResumableResult<bool> inline
 	updateControl(Control6_t setMask, Control6_t clearMask = Control6_t(0xff))
 	{
 		return updateControlRegister(5, setMask, clearMask);
@@ -571,10 +571,10 @@ public:
 
 
 	// MARK: Read access
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	readAcceleration();
 
-	// instant access
+	// MARK: Registers with instant access
 	SmControl_t getControl1()
 	{ return SmControl_t(rawBuffer[1]); }
 
@@ -596,7 +596,7 @@ public:
 	FifoControl_t getFifoControl()
 	{ return FifoControl_t(rawBuffer[13]); }
 
-	// buffered access
+	// MARK: Registers with buffered access
 	Status_t getStatus()
 	{ return Status_t(rawBuffer[6]); }
 
@@ -604,16 +604,19 @@ public:
 	{ return FifoSource_t(rawBuffer[14]); }
 
 public:
-	/// the data object for this sensor.
-	Data &data;
+	/// Get the data object for this sensor.
+	inline Data&
+	getData()
+	{ return data; }
 
 private:
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	updateControlRegister(uint8_t index, Control_t setMask, Control_t clearMask = static_cast<Control_t>(0xff));
 
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	updateRegister(uint8_t reg, uint8_t setMask, uint8_t clearMask = 0xff);
 
+	Data &data;
 	// the read buffer is for a continous read from address 0x20 -> 0x2F
 	// 0: control 4
 	// 1-3: control 1-3

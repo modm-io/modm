@@ -40,6 +40,12 @@ xpcc::PointSet2D<T>::PointSet2D(SizeType n) :
 }
 
 template <typename T>
+xpcc::PointSet2D<T>::PointSet2D(std::initializer_list<xpcc::PointSet2D<T>::PointType> init) :
+	points(init)
+{
+}
+
+template <typename T>
 xpcc::PointSet2D<T>::PointSet2D(const PointSet2D<T>& other) :
 	points(other.points)
 {
@@ -64,21 +70,21 @@ xpcc::PointSet2D<T>::getNumberOfPoints() const
 // ----------------------------------------------------------------------------
 template <typename T>
 void
-xpcc::PointSet2D<T>::append(const Vector<T, 2>& point)
+xpcc::PointSet2D<T>::append(const xpcc::PointSet2D<T>::PointType& point)
 {
 	points.append(point);
 }
 
 // ----------------------------------------------------------------------------
 template <typename T>
-xpcc::Vector<T, 2>&
+typename xpcc::PointSet2D<T>::PointType&
 xpcc::PointSet2D<T>::operator [](SizeType index)
 {
 	return points[index];
 }
 
 template <typename T>
-const xpcc::Vector<T, 2>&
+const typename xpcc::PointSet2D<T>::PointType&
 xpcc::PointSet2D<T>::operator [](SizeType index) const
 {
 	return points[index];

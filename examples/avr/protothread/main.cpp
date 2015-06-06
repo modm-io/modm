@@ -1,7 +1,7 @@
 
 #include <xpcc/architecture/platform.hpp>
 #include <xpcc/processing/protothread.hpp>
-#include <xpcc/processing/timeout.hpp>
+#include <xpcc/processing/timer.hpp>
 
 using namespace xpcc::atmega;
 
@@ -24,20 +24,20 @@ public:
 		{
 			LedGreen::set();
 			
-			this->timer.restart(100);
-			PT_WAIT_UNTIL(this->timer.isExpired());
+			this->timeout.restart(100);
+			PT_WAIT_UNTIL(this->timeout.isExpired());
 			
 			LedGreen::reset();
 			
-			this->timer.restart(600);
-			PT_WAIT_UNTIL(this->timer.isExpired());
+			this->timeout.restart(600);
+			PT_WAIT_UNTIL(this->timeout.isExpired());
 		}
 		
 		PT_END();
 	}
 
 private:
-	xpcc::Timeout<> timer;
+	xpcc::ShortTimeout timeout;
 };
 
 class BlinkingLightRed : public xpcc::pt::Protothread
@@ -56,30 +56,30 @@ public:
 		{
 			LedRed::set();
 			
-			this->timer.restart(200);
-			PT_WAIT_UNTIL(this->timer.isExpired());
+			this->timeout.restart(200);
+			PT_WAIT_UNTIL(this->timeout.isExpired());
 			
 			LedRed::reset();
 			
-			this->timer.restart(300);
-			PT_WAIT_UNTIL(this->timer.isExpired());
+			this->timeout.restart(300);
+			PT_WAIT_UNTIL(this->timeout.isExpired());
 			
 			LedRed::set();
 			
-			this->timer.restart(200);
-			PT_WAIT_UNTIL(this->timer.isExpired());
+			this->timeout.restart(200);
+			PT_WAIT_UNTIL(this->timeout.isExpired());
 			
 			LedRed::reset();
 			
-			this->timer.restart(1000);
-			PT_WAIT_UNTIL(this->timer.isExpired());
+			this->timeout.restart(1000);
+			PT_WAIT_UNTIL(this->timeout.isExpired());
 		}
 		
 		PT_END();
 	}
 
 private:
-	xpcc::Timeout<> timer;
+	xpcc::ShortTimeout timeout;
 };
 
 // timer interrupt routine
@@ -91,7 +91,7 @@ ISR(TIMER2_COMPA_vect)
 int
 main()
 {
-	// timer initialization
+	// timeout initialization
 	// compare-match-interrupt every 1 ms at 14.7456 MHz
 	TCCR2A = (1 << WGM21);
 	TCCR2B = (1 << CS22);

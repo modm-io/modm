@@ -12,28 +12,28 @@
 #endif
 
 // ----------------------------------------------------------------------------
-template < class AdcInterrupt, uint8_t Channels, uint8_t Oversamples >
+template < class AdcInterrupt, uint8_t Channels, uint32_t Oversamples >
 const typename xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::Channel*
 xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::map(nullptr);
 
-template < class AdcInterrupt, uint8_t Channels, uint8_t Oversamples >
+template < class AdcInterrupt, uint8_t Channels, uint32_t Oversamples >
 typename xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::DataType*
 xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::data(nullptr);
 
-template < class AdcInterrupt, uint8_t Channels, uint8_t Oversamples >
+template < class AdcInterrupt, uint8_t Channels, uint32_t Oversamples >
 typename xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::SampleType
 xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::samples(0);
 
-template < class AdcInterrupt, uint8_t Channels, uint8_t Oversamples >
+template < class AdcInterrupt, uint8_t Channels, uint32_t Oversamples >
 uint8_t
 xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::index(0);
 
-template < class AdcInterrupt, uint8_t Channels, uint8_t Oversamples >
+template < class AdcInterrupt, uint8_t Channels, uint32_t Oversamples >
 bool
 xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::newData(false);
 
 // ----------------------------------------------------------------------------
-template < class AdcInterrupt, uint8_t Channels, uint8_t Oversamples >
+template < class AdcInterrupt, uint8_t Channels, uint32_t Oversamples >
 void
 xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::initialize(const Channel* mapping, DataType* data)
 {
@@ -46,30 +46,33 @@ xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::initialize(const Channel* m
 	AdcInterrupt::attachInterruptHandler(sampleAdc);
 }
 
-template < class AdcInterrupt, uint8_t Channels, uint8_t Oversamples >
+template < class AdcInterrupt, uint8_t Channels, uint32_t Oversamples >
 void
 xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::sampleAdc()
 {
-	if (Oversamples) {
+	if (Oversamples > 1) {
 
 		// reset array to zero at the beginning of sampling
 		if (samples <= Channels) data[index] = 0;
 
 		data[index] += AdcInterrupt::getValue();
 
-		if (++samples <= totalSamples) {
+		if (++samples <= totalSamples)
+		{
 			// continue sampling on next index
 			if (++index >= Channels) index = 0;
+
 			AdcInterrupt::setChannel(map[index]);
 			AdcInterrupt::startConversion();
 		}
-		else {
-			// stop getting values and calculate the average of the 2^N samples
-			for (uint_fast8_t ii=0; ii < Channels; ++ii) {
-				// lazy divide: (value / 2^n) => (value >> n)
-				data[ii] >>= Oversamples;
-			}
-			samples = index = 0;
+		else
+		{
+			// stop getting values and calculate the average of the n samples
+			for (uint_fast8_t ii=0; ii < Channels; ++ii)
+				data[ii] /= Oversamples;
+
+			samples = 0;
+			index = 0;
 			newData = true;
 		}
 
@@ -89,7 +92,7 @@ xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::sampleAdc()
 	}
 }
 
-template < class AdcInterrupt, uint8_t Channels, uint8_t Oversamples >
+template < class AdcInterrupt, uint8_t Channels, uint32_t Oversamples >
 bool
 xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::startReadout()
 {
@@ -103,14 +106,14 @@ xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::startReadout()
 	return true;
 }
 
-template < class AdcInterrupt, uint8_t Channels, uint8_t Oversamples >
+template < class AdcInterrupt, uint8_t Channels, uint32_t Oversamples >
 bool
 xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::isReadoutFinished()
 {
 	return newData;
 }
 
-template < class AdcInterrupt, uint8_t Channels, uint8_t Oversamples >
+template < class AdcInterrupt, uint8_t Channels, uint32_t Oversamples >
 typename xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::DataType*
 xpcc::AdcSampler<AdcInterrupt,Channels,Oversamples>::getData()
 {

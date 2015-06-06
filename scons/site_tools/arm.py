@@ -146,6 +146,7 @@ def generate(env, **kw):
 		"-Wunused",
 		"-Wa,-adhlns=${TARGET.base}.lst",
 		"-DBASENAME=${SOURCE.file}",
+		"-fdiagnostics-color=auto",
 	]
 	
 	# C++ flags

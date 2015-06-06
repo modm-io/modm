@@ -119,6 +119,12 @@ class GpioInverted : public Pin
 {
 public:
 	ALWAYS_INLINE static void
+	setOutput()
+	{
+		Pin::setOutput();
+	}
+
+	ALWAYS_INLINE static void
 	setOutput(bool value)
 	{
 		Pin::setOutput(!value);
@@ -172,9 +178,10 @@ public:
  * @ingroup	gpio
  */
 template<typename... Gpios>
-class SoftwareGpioPort : public GpioPort {};
+class SoftwareGpioPort : public GpioPort
+{};
 
-/// @private
+/// @cond
 template<typename Gpio, typename... Gpios>
 class SoftwareGpioPort<Gpio, Gpios...> : private SoftwareGpioPort<Gpios...>
 {
@@ -226,7 +233,6 @@ public:
 	}
 };
 
-/// @private
 template<>
 class SoftwareGpioPort<>
 {
@@ -248,6 +254,8 @@ public:
 	static void
 	toggle() {}
 };
-}
+/// @endcond
+
+}	// namespace xpcc
 
 #endif // XPCC_SOFTWARE_GPIO_HPP

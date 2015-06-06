@@ -75,7 +75,7 @@ xpcc::Dispatcher::update()
 		
 		this->backend->dropPacket();
 	}
-	
+
 	// check if there are packets to send
 	this->handleWaitingMessages();
 }

@@ -59,7 +59,7 @@
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::lpc::ClockTree::enableSource(ClockSource src, uint32_t f_kHz, uint32_t waitCycles)
+xpcc::lpc::ClockTree::enableSource(ClockSource src, uint32_t f_kHz, uint32_t /*waitCycles*/)
 {
 	if (src == ClockSource::InternalClock) {
 		return true;	// InternalClock is on by default (PDRUNCFG: IRC_PD)
@@ -108,7 +108,7 @@ xpcc::lpc::ClockTree::enablePll(PllSource source, uint8_t pllM, uint8_t pllP)
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::lpc::ClockTree::switchSystemClockTo(SystemClockSource src, uint32_t waitCycles)
+xpcc::lpc::ClockTree::switchSystemClockTo(SystemClockSource src, uint32_t /*waitCycles*/)
 {
 	LPC_SYSCON->MAINCLKSEL = static_cast<uint32_t>(src);
 	LPC_SYSCON->MAINCLKUEN = 0x01;	// toggle update enable register

@@ -58,6 +58,18 @@ xpcc::DynamicArray<T, Allocator>::DynamicArray(SizeType n, const T& value, const
 }
 
 template <typename T, typename Allocator>
+xpcc::DynamicArray<T, Allocator>::DynamicArray(std::initializer_list<T> init, const Allocator& alloc) :
+	allocator(alloc), size(init.size()), capacity(init.size())
+{
+	this->values = this->allocator.allocate(init.size());
+	std::size_t ii = 0;
+	for (auto value : init) {
+		allocator.construct(&this->values[ii], value);
+		++ii;
+	}
+}
+
+template <typename T, typename Allocator>
 xpcc::DynamicArray<T, Allocator>::DynamicArray(const DynamicArray& other) :
 	allocator(other.allocator),
 	size(other.size), capacity(other.capacity)

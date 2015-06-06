@@ -8,6 +8,11 @@
 // ----------------------------------------------------------------------------
 {{ generation_block }}
 
+/**
+ * @ingroup 	{{target.string}}
+ * @defgroup	{{target.string}}_uart UART
+ */
+
 #ifndef XPCC_{{target.family | upper}}__UART{{ id }}_HPP
 #define XPCC_{{target.family | upper}}__UART{{ id }}_HPP
 
@@ -27,21 +32,20 @@ namespace {{target.family}}
  * This implementation uses a ringbuffer. The size of the ringbuffer
  * can be changed in the `project.cfg` file.
  *
- * Just add add a value for `Uart{{ id }}.tx_buffer` and/or
- * `Uart{{ id }}.rx_buffer` in the `defines` section. The size can
- * be any value between 1 and 254 for buffered and 0 for
- * non-buffered operation.
+ * Just add add a value for `tx_buffer` and/or `rx_buffer` in the
+ * `parameters` section. The size can be any value between 1 and 254
+ * for buffered and 0 for non-buffered operation.
  *
  * Example:
  * @code
- * [defines]
- * Uart{{ id }}.tx_buffer = 20
- * Uart{{ id }}.rx_buffer = 30
+ * [parameters]
+ * uart.at90_tiny_mega.{{ id }}.tx_buffer = 20
+ * uart.at90_tiny_mega.{{ id }}.rx_buffer = 30
  * @endcode
  *
  * @author	Fabian Greif
  * @author	Niklas Hauser
- * @ingroup	{{target.family}}
+ * @ingroup	{{target.string}}_uart
  */
 class Uart{{ id }} : public ::xpcc::Uart
 {

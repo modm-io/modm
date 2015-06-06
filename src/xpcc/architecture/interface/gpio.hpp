@@ -144,6 +144,16 @@ struct Gpio
 	static constexpr bool Low = false;
 	static constexpr bool High = true;
 	/// @}
+
+	/// Declares the direction of a GPIO
+	enum class
+	Direction
+	{
+		In = 0,			//< GPIO is an Input
+		Out = 1,		//< GPIO is an Output
+		InOut = 2,		//< GPIO is both Input and Output
+		Special = 3,	//< GPIO is configured with a special purpose
+	};
 };
 
 /**
@@ -154,10 +164,13 @@ struct Gpio
  *
  * @ingroup	gpio
  */
-class GpioInput
+class GpioInput : public Gpio
 {
-#ifdef __DOXYGEN__
 public:
+	/// Declares the Pin direction
+	static constexpr Direction direction = Direction::In;
+
+#ifdef __DOXYGEN__
 	/// configure pin as input
 	static void
 	setInput();
@@ -176,10 +189,13 @@ public:
  *
  * @ingroup	gpio
  */
-class GpioOutput
+class GpioOutput : public Gpio
 {
-#ifdef __DOXYGEN__
 public:
+	/// Declares the Pin direction
+	static constexpr Direction direction = Direction::Out;
+
+#ifdef __DOXYGEN__
 	/// configure pin as output
 	static void
 	setOutput();
@@ -203,6 +219,11 @@ public:
 	/// toggle output level
 	static void
 	toggle();
+
+	/// Returns the set logical output state of the pin.
+	/// This may be different from the physical state!
+	static bool
+	isSet();
 #endif
 };
 
@@ -213,7 +234,15 @@ public:
  */
 class GpioIO : public GpioOutput, public GpioInput
 {
-	// there are no new methods here
+public:
+	/// Declares the Pin direction
+	static constexpr Direction direction = Direction::InOut;
+
+#ifdef __DOXYGEN__
+	/// returns the pin direction at run-time
+	static Direction
+	getDirection();
+#endif
 };
 
 /**

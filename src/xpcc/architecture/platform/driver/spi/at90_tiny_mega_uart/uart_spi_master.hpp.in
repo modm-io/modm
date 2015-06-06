@@ -24,13 +24,14 @@ namespace {{target.family}}
 /**
  * Implementation of the SimpleSpi of the Uart in Spi Master mode.
  *
- * @ingroup		{{target.family}}
+ * @ingroup		{{target.string}}_spi
  * @author		Niklas Hauser
  */
 class UartSpiMaster{{ id }} : public ::xpcc::SpiMaster
 {
 	static uint8_t state;
 	static void *context;
+	static ConfigurationHandler configuration;
 public:
 	static const TypeId::UartSpiMaster{{ id }}Mosi Mosi;
 	static const TypeId::UartSpiMaster{{ id }}Miso Miso;
@@ -131,7 +132,7 @@ public:
 
 
 	static uint8_t
-	aquire(void *ctx);
+	aquire(void *ctx, ConfigurationHandler handler = nullptr);
 
 	static uint8_t
 	release(void *ctx);
@@ -140,20 +141,20 @@ public:
 	static uint8_t
 	transferBlocking(uint8_t data)
 	{
-		return CO_CALL_BLOCKING(transfer(data));
+		return RF_CALL_BLOCKING(transfer(data));
 	}
 
 	static void
 	transferBlocking(uint8_t *tx, uint8_t *rx, std::size_t length)
 	{
-		CO_CALL_BLOCKING(transfer(tx, rx, length));
+		RF_CALL_BLOCKING(transfer(tx, rx, length));
 	}
 
 
-	static xpcc::co::Result<uint8_t>
+	static xpcc::ResumableResult<uint8_t>
 	transfer(uint8_t data);
 
-	static xpcc::co::Result<void>
+	static xpcc::ResumableResult<void>
 	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
 	// end documentation inherited
 

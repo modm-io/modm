@@ -1,75 +1,55 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
 /* Copyright (c) 2011, Roboterclub Aachen e.V.
- * All rights reserved.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
 
 #ifndef XPCC__FT245_HPP
 #define XPCC__FT245_HPP
 
-#include "../../../drivers.hpp"
 #include <xpcc/architecture/interface/gpio.hpp>
-
 
 namespace xpcc
 {
 	/**
-	 * \brief	FT245 USB FIFO
+	 * FT245 USB FIFO
 	 *
 	 * The FT245R USB FIFO from Future Technology Devices International is a
 	 * single chip USB to parallel FIFO bidirectional data transfer interface.
+	 *
+	 * Wr and Rd must be GpioOutputs and set to output mode before.
+	 * Rxf and Txe must be GpioInputs.
+	 * Port is switched between input and output mode.
 	 *
 	 * \section ft245_example Example
 	 *
 	 * \code
 	 * #include <xpcc/architecture.hpp>
-	 * #include <xpcc/communication/ft245.hpp>
+	 * #include <xpcc/driver/usb/ft245.hpp>
 	 *
-	 * GPIO__PORT(FtPort, A);
-	 * GPIO__OUTPUT(FtRd, B, 0);
-	 * GPIO__OUTPUT(FtWr, B, 1);
-	 * GPIO__INPUT(FtTxe, B, 2);
-	 * GPIO__INPUT(FtRxf, B, 3);
-	 *
+	 * typedef xpcc::stm32::GpioPort<xpcc::stm32::GpioD0, 8> myPort;
+	 * typedef xpcc::stm32::GpioInputC11  Rxf;
+	 * typedef xpcc::stm32::GpioInputC10  Txe;
+	 * typedef xpcc::stm32::GpioOutputA15 Rd;
+	 * typedef xpcc::stm32::GpioOutputA9  Wr;
+     *
+	 * typedef xpcc::Ft245<myPort, Rd, Wr, Rxf, Txe> myFt;
+     *
 	 * MAIN_FUNCTION
 	 * {
-	 *     xpcc::Ft245<FtPort, FtRd, FtWr, FtRxf, FtTxe> ft245;
+	 *   Rd::setOutput(xpcc::Gpio::High);
+	 *   Wr::setOutput(xpcc::Gpio::Low);
 	 *
-	 *     uint8_t out = 0;
-	 *     while(1)
-	 *     {
-	 *          ft245.write(out++);
-	 *
-	 *     	    char loop;
-	 *     	    if (ft245.read(loop)) {
-	 *              ft245.write(0xff ^ loop);
-	 *     	    }
-	 *     }
-	 * }
+	 *   while (1)
+	 *   {
+	 *     uint8_t c;
+	 *     if (myFt::read(c)) {
+	 *     myFt::write(c + 1);
+	 *   }
+     * }
 	 * \endcode
 	 *
 	 * \ingroup	driver_other
@@ -82,30 +62,13 @@ namespace xpcc
 	class Ft245
 	{
 	public:
-		Ft245()
-		{
-			this->initialize();
-		}
-
-		/**
-		 * \brief	Initialize the port pins.
-		 *
-		 * This function is called by the constructor to initialize all port pins
-		 * correctly and sets the default values.
-		 */
-		static void
-		initialize();
-
-		/**
-		 * \brief	Write a single byte to the FIFO
-		 *
-		 * \param	data	Single byte to write
-		 */
+		/// Write a single byte to the FIFO
+		/// \param	data	Single byte to write
 		static void
 		write(uint8_t data);
 
 		/**
-		 * \brief	Write a block of bytes to the FIFO
+		 * Write a block of bytes to the FIFO
 		 *
 		 * This blocks until the buffer is written.
 		 *
@@ -117,7 +80,7 @@ namespace xpcc
 		write(const uint8_t *buffer, uint8_t nbyte);
 
 		/**
-		 * \brief	Read a single byte from the FIFO
+		 * Read a single byte from the FIFO
 		 *
 		 * \param	c		Byte read, if any
 		 *
@@ -127,7 +90,7 @@ namespace xpcc
 		read(uint8_t &c);
 
 		/**
-		 * \brief	Read a block of bytes from the FIFO
+		 * Read a block of bytes from the FIFO
 		 *
 		 * This is blocking.
 		 *

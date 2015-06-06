@@ -174,7 +174,7 @@ namespace xpcc
 	 * \tparam I2cMaster Asynchronous Two Wire interface
 	 */
 	template < typename I2cMaster >
-	class Adxl345 : protected xpcc::I2cWriteReadAdapter
+	class Adxl345 : protected xpcc::I2cWriteReadTransaction
 	{
 	public:
 		/**

@@ -40,7 +40,7 @@ public:
 	~CanUsb();
 
 	bool
-	open(std::string deviceName, unsigned int baudRate);
+	open(std::string deviceName, unsigned int serialBaudRate, xpcc::Can::Bitrate canBitrate = xpcc::Can::kBps125);
 
 	void
 	close();
@@ -78,6 +78,8 @@ public:
 		return this->serialPort.isOpen();
 	}
 
+private:
+	// updated by boost thread
 	void
 	update();
 

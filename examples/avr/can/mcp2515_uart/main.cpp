@@ -2,7 +2,7 @@
 #include <xpcc/architecture.hpp>
 
 #include <xpcc/driver/can/mcp2515.hpp>
-#include <xpcc/processing/periodic_timer.hpp>
+#include <xpcc/processing/timer.hpp>
 
 using namespace xpcc::atmega;
 typedef xpcc::avr::SystemClock clock;
@@ -90,7 +90,7 @@ main()
 
 	mcp2515.sendMessage(message);
 
-	xpcc::PeriodicTimer<> timer(200);
+	xpcc::ShortPeriodicTimer timer(200);
 	while (1)
 	{
 		if (mcp2515.isMessageAvailable())
@@ -125,7 +125,7 @@ main()
 			}
 		}
 
-		if (timer.isExpired())
+		if (timer.execute())
 		{
 			LedGreen::toggle();
 		}

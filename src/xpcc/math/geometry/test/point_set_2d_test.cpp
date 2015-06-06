@@ -32,12 +32,27 @@
 
 #include "point_set_2d_test.hpp"
 
+
 void
 PointSet2DTest::testConstructor()
 {
 	xpcc::PointSet2D<int16_t> set(5);
 	
 	TEST_ASSERT_EQUALS(set.getNumberOfPoints(), 0U);
+}
+
+void
+PointSet2DTest::testInitializerListConstructor()
+{
+	xpcc::PointSet2D<int16_t> set
+		{ xpcc::Vector2i(0, 0),   xpcc::Vector2i(10, 0),
+		  xpcc::Vector2i(10, 10), xpcc::Vector2i(0, 10) };
+
+	TEST_ASSERT_EQUALS(set.getNumberOfPoints(), 4U);
+	TEST_ASSERT_EQUALS(set[0], xpcc::Vector2i( 0,  0));
+	TEST_ASSERT_EQUALS(set[1], xpcc::Vector2i(10,  0));
+	TEST_ASSERT_EQUALS(set[2], xpcc::Vector2i(10, 10));
+	TEST_ASSERT_EQUALS(set[3], xpcc::Vector2i( 0, 10));
 }
 
 void

@@ -13,20 +13,26 @@
 
 #include "../../../device.hpp"
 
+/**
+ * @ingroup 	{{target.string}}
+ * @defgroup	{{target.string}}_core Core
+ */
+
 namespace xpcc
 {
 
+/// @ingroup	{{target.string}}_core
 namespace {{ target.family }}
 {
 
-/// @ingroup	{{ target.family }}
+/// enables global interrupts
 static ALWAYS_INLINE void
 enableInterrupts()
 {
 	sei();
 }
 
-/// @ingroup	{{ target.family }}
+/// disables global interrupts
 static ALWAYS_INLINE void
 disableInterrupts()
 {

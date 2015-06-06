@@ -10,11 +10,35 @@
 #ifndef XPCC_I2C_EEPROM_HPP
 #define XPCC_I2C_EEPROM_HPP
 
-#include <xpcc/processing/coroutine.hpp>
+#include <xpcc/processing/resumable.hpp>
 #include <xpcc/architecture/interface/i2c_device.hpp>
 
 namespace xpcc
 {
+
+/// @cond
+struct i2cEeprom
+{
+	class DataTransmissionAdapter : public xpcc::I2cWriteReadTransaction
+	{
+	public:
+		DataTransmissionAdapter(uint8_t address);
+
+		bool
+		configureWrite(uint16_t address, const uint8_t *buffer, std::size_t size);
+
+		bool
+		configureRead(uint16_t address, uint8_t *buffer, std::size_t size);
+
+	protected:
+		virtual Writing
+		writing() override;
+
+		uint8_t addressBuffer[2];
+		bool writeAddress;
+	};
+};
+/// @endcond
 
 /**
  * I2C Eeprom
@@ -28,14 +52,10 @@ namespace xpcc
  * @author	Niklas Hauser
  */
 template <typename I2cMaster>
-class I2cEeprom : public xpcc::I2cDevice<I2cMaster>, protected xpcc::co::NestedCoroutine<>
+class I2cEeprom : public xpcc::I2cDevice< I2cMaster, 1, i2cEeprom::DataTransmissionAdapter >
 {
 public:
 	I2cEeprom(uint8_t address = 0xA0);
-
-	/// Ping the device
-	xpcc::co::Result<bool>
-	ping();
 
 	/**
 	 * Write byte
@@ -46,7 +66,7 @@ public:
 	 * @return	`true`	if the data could be written,
 	 * 			`false` otherwise
 	 */
-	inline xpcc::co::Result<bool>
+	inline xpcc::ResumableResult<bool>
 	writeByte(uint16_t address, uint8_t data)
 	{
 		return write(address, &data, 1);
@@ -62,7 +82,7 @@ public:
 	 * @return	`true`	if the data could be written,
 	 * 			`false` otherwise
 	 */
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	write(uint16_t address, const uint8_t *data, std::size_t length);
 
 	/**
@@ -74,21 +94,21 @@ public:
 	 * @endcode
 	 */
 	template <typename T>
-	inline xpcc::co::Result<bool>
+	inline xpcc::ResumableResult<bool>
 	write(uint16_t address, const T& data)
 	{
 		return write(address, static_cast<const uint8_t *>(&data), sizeof(T));
 	}
 
 	/// Read byte
-	inline xpcc::co::Result<bool>
+	inline xpcc::ResumableResult<bool>
 	readByte(uint16_t address, uint8_t &data)
 	{
 		return read(address, &data, 1);
 	}
 
 	/// Read block
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	read(uint16_t address, uint8_t *data, std::size_t length);
 
 	/**
@@ -100,43 +120,11 @@ public:
 	 * @endcode
 	 */
 	template <typename T>
-	inline xpcc::co::Result<bool>
+	inline xpcc::ResumableResult<bool>
 	read(uint16_t address, T& data)
 	{
 		return read(address, static_cast<uint8_t *>(&data), sizeof(T));
 	}
-
-private:
-	enum I2cTask : uint8_t
-	{
-		Idle = 0,
-		Ping,
-		Write,
-		Read,
-	};
-
-	class DataTransmissionAdapter : public xpcc::I2cWriteReadAdapter
-	{
-	public:
-		DataTransmissionAdapter(uint8_t address);
-
-		bool inline
-		configureWrite(uint16_t address, const uint8_t *buffer, std::size_t size);
-
-		bool inline
-		configureRead(uint16_t address, uint8_t *buffer, std::size_t size);
-
-	protected:
-		virtual Writing
-		writing() override;
-
-		uint8_t addressBuffer[2];
-		bool writeAddress;
-	};
-
-	volatile uint8_t i2cTask;
-	volatile uint8_t i2cSuccess;
-	xpcc::I2cTagAdapter<DataTransmissionAdapter> adapter;
 };
 
 }	// namespace xpcc

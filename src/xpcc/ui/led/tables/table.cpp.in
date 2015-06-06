@@ -16,10 +16,12 @@ namespace xpcc
 namespace ui
 {
 
-FLASH_STORAGE({{ type }} table{{ bit }}_{{ length }}{{ inverted }}[]) =
+FLASH_STORAGE({{ type }} table[]) =
 {
 	{{ table | xpcc.indent(1) }}
 };
+
+xpcc::accessor::Flash<{{ type }}> table{{ gamma }}_{{ bit }}_{{ length }}{{ inverted }}(table);
 
 }
 

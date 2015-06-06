@@ -45,3 +45,8 @@ def variableName(value):
 
 def enumElement(value):
 	return value.upper().replace(' ', '_')
+
+def toHexValue(value):
+	if value != None:
+		return "0x%02x" % value
+	raise ParserException("Value may not be None. Check xml files for missing ids.")

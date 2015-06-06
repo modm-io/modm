@@ -4,14 +4,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef ROBOT__CPP_COMMUNICATION_XPCC_TASK_CALLER_HPP
-#define ROBOT__CPP_COMMUNICATION_XPCC_TASK_CALLER_HPP
+#ifndef {{ namespace | upper }}_CPP_COMMUNICATION_XPCC_TASK_CALLER_HPP
+#define {{ namespace | upper }}_CPP_COMMUNICATION_XPCC_TASK_CALLER_HPP
 
 #include "identifier.hpp"
 #include "packets.hpp"
 
-#include <xpcc/processing/communicatable_task.hpp>
+#include <xpcc/communication/xpcc/communicatable_task.hpp>
 #include <xpcc/processing/protothread.hpp>
+#include <xpcc/processing/resumable.hpp>
 
 namespace robot_call_tasks
 {
@@ -21,41 +22,43 @@ namespace robot_call_tasks
 class {{ component.name | CamelCase }}
 {
 public:
-	{% for action in component.flattened().actions %}
-	
-	{% if action.description -%}
-	{% if action.parameterType -%}
+	{%- for action in component.flattened().actions %}
+	{%- if action.description %}
+	{%- if action.parameterType %}
 	/** {{ action.description | xpcc.wordwrap(72) | xpcc.indent(2) }}
-	Parameter: robot::packet::{{ action.parameterType.flattened().name | CamelCase }}&
+	Parameter: {{ namespace }}::packet::{{ action.parameterType.flattened().name | CamelCase }}&
 	 */
-	{% else -%}
+	{%- else %}
 	/** {{ action.description | xpcc.wordwrap(72) | xpcc.indent(2) }} */
-	{% endif -%}
-	{% else -%}
-	{% if action.parameterType -%}
+	{%- endif %}
+	{%- else %}
+	{%- if action.parameterType %}
 	/**
-	Parameter: robot::packet::{{ action.parameterType.flattened().name | CamelCase }}&
+	Parameter: {{ namespace }}::packet::{{ action.parameterType.flattened().name | CamelCase }}&
 	 */
-	{% endif -%}
-	{% endif -%}
-	class {{ action.name | CamelCase }} : public xpcc::CommunicatableTask, private xpcc::pt::Protothread
+	{%- endif %}
+	{%- endif %}
+	class {{ action.name | CamelCase }} : public xpcc::CommunicatableTask, private xpcc::pt::Protothread, private xpcc::Resumable<1>
 	{
 	public:
 		{%- if action.parameterType %}
-		{%- if action.parameterType.isBuiltIn %}
+			{%- if action.parameterType.isBuiltIn %}
 		typedef {{ action.parameterType.name | CamelCase }} ParameterType;
-		{%- else %}
-		typedef robot::packet::{{ action.parameterType.name | CamelCase }} ParameterType;
+			{%- else %}
+		typedef {{ namespace }}::packet::{{ action.parameterType.name | CamelCase }} ParameterType;
+			{%- endif %}
 		{%- endif %}
-		{%- endif %}
+
 		{%- if action.returnType %}
-		{%- if action.returnType.isBuiltIn %}
+			{%- if action.returnType.isBuiltIn %}
 		typedef {{ action.returnType.name | CamelCase }} ReturnType;
+			{%- else %}
+		typedef {{ namespace }}::packet::{{ action.returnType.name | CamelCase }} ReturnType;
+			{%- endif %}
 		{%- else %}
-		typedef robot::packet::{{ action.returnType.name | CamelCase }} ReturnType;
+		typedef void ReturnType;
 		{%- endif %}
-		{%- endif %}
-		
+
 		{{ action.name | CamelCase }}( xpcc::Communicator *c ) :
 			CommunicatableTask( c ),
 			responseCallback( this, &{{ action.name | CamelCase }}::responseHandler ),
@@ -65,68 +68,81 @@ public:
 		}
 
 		inline {{ action.name | CamelCase }}*
-		start (
-				{%- if action.parameterType %}
-				{%- if action.parameterType.isBuiltIn %}
-				const {{ action.parameterType.name | CamelCase }}& parameter
-				{%- else -%}
-				const robot::packet::{{ action.parameterType.name | CamelCase }}& parameter
-				{%- endif -%}
-				{%- endif -%}
-				)
+		start({% if action.parameterType %} const ParameterType& parameter {% endif %})
 		{
 			{% if action.parameterType -%}
 			this->parameter = parameter;
-			
+
 			{% endif -%}
 			this->waitForResponse = false;
-		
+
 			this->restart();	/* restarting Proto-Thread */
 			return this;
 		}
-		
+
 		virtual bool
 		isFinished()
 		{
 			return !this->isRunning();
 		}
-		
 
 		virtual void
 		update()
 		{
 			this->run();
 		}
-		
+
 		xpcc::Header getResponseHeader()
 		{
 			return responseHeader;
 		}
 		{%- if action.returnType %}
-		
-		{% if action.returnType.isBuiltIn -%}
-		const {{ action.returnType.name | CamelCase }}& getResponsePayload()
-		{% else -%}
-		const robot::packet::{{ action.returnType.name | CamelCase }}& getResponsePayload()
-		{% endif -%}
+		const ReturnType& getResponsePayload()
 		{
 			return responsePayload;
 		}
 		{%- endif %}
-		
+
+		{% if action.returnType %}
+		const xpcc::ActionResult<ReturnType*>
+		{%- else %}
+		const xpcc::ActionResult<void>
+		{%- endif %}
+		getResult()
+		{
+			if (responseHeader.type == xpcc::Header::RESPONSE)
+				{%- if action.returnType %}
+				return &responsePayload;	/* returns positive response with payload */
+				{%- else %}
+				return xpcc::Response::Positive; /* returns positive response without payload */
+				{%- endif %}
+			return xpcc::Response::Negative;
+		}
+
+		{% if action.returnType %}
+		xpcc::ActionResponse<ReturnType*>
+		{%- else %}
+		xpcc::ActionResponse<void>
+		{%- endif %}
+		execute({% if action.parameterType %} const ParameterType& parameter {% endif %})
+		{
+			RF_BEGIN(0);
+
+			start({%- if action.parameterType %} parameter {%- endif %});
+
+			RF_WAIT_WHILE(this->run());
+
+			RF_END_RETURN(getResult());
+		}
+
 	private:
 		xpcc::ResponseCallback responseCallback;
 
 		void
 		responseHandler(
 		{%- if action.returnType %}
-		{%- if action.returnType.isBuiltIn %}
 				const xpcc::Header& header,
-				const {{ action.returnType.name | CamelCase }} *payload)
-		{%- else %}
-				const xpcc::Header& header,
-				const robot::packet::{{ action.returnType.name | CamelCase }} *payload)
-		{%- endif %}
+				const ReturnType *payload)
 		{%- else %}
 				const xpcc::Header& header)
 		{%- endif %}
@@ -137,59 +153,50 @@ public:
 			this->responsePayload = *payload;
 			{%- endif %}
 		}
-	
+
 	public:
 		bool
 		run()
 		{
 			PT_BEGIN();
-		
+
 		//	XPCC_LOG_INFO << XPCC_FILE_INFO << " run : {{ action.name | CamelCase }} " << xpcc::endl;
-		
+
 			this->waitForResponse = true;
-		
+
 			parent->callAction(
-					robot::component::Identifier::{{ component.name | CAMELCASE }},
-					robot::action::Identifier::{{ action.name | CAMELCASE }},
+					{{ namespace }}::component::Identifier::{{ component.name | CAMELCASE }},
+					{{ namespace }}::action::Identifier::{{ action.name | CAMELCASE }},
 					{% if action.parameterType -%}
 					this->parameter,
 					{% endif -%}
 					this->responseCallback );
-		
+
 			PT_WAIT_UNTIL( !this->waitForResponse );
-		
+
 		//	XPCC_LOG_INFO << XPCC_FILE_INFO << " ready : {{ action.name | CamelCase }} " << xpcc::endl;
-		
+
 			PT_END();
-		
+
 			return false;
 		}
-		
+
 	private:
 		{%- if action.parameterType %}
-		
 		// parameter
-		{% if action.parameterType.isBuiltIn -%}
-		{{ action.parameterType.name | CamelCase }} parameter;
-		{% else -%}
-		robot::packet::{{ action.parameterType.name | CamelCase }} parameter;
-		{%- endif %}
+		ParameterType parameter;
 		{%- endif %}
 
 		// return
 		{%- if action.returnType %}
-		{% if action.returnType.isBuiltIn -%}
-		{{ action.returnType.name | CamelCase }} responsePayload;
-		{% else -%}
-		robot::packet::{{ action.returnType.name | CamelCase }} responsePayload;
-		{%- endif %}
+		ReturnType responsePayload;
 		{%- endif %}
 		xpcc::Header responseHeader;
 
 		// internal
 		bool waitForResponse;
 	};
-	
+
 	{%- endfor %}
 
 }; // class {{ component.name | CamelCase }}
@@ -197,4 +204,4 @@ public:
 
 } // namespace robot_call_tasks
 
-#endif // ROBOT__CPP_COMMUNICATION_XPCC_TASK_CALLER_HPP
+#endif // {{ namespace | upper }}_CPP_COMMUNICATION_XPCC_TASK_CALLER_HPP

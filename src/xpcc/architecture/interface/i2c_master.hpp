@@ -40,6 +40,7 @@ public:
 		DataNack,			///< Data was transmitted and NACK received
 		ArbitrationLost,	///< Arbitration was lost during writing or reading
 		BusCondition,		///< Misplaced Start or Stop condition
+		BusBusy,			///< Bus is busy during Start condition
 		Unknown				///< Unknown error condition
 	};
 
@@ -47,16 +48,21 @@ public:
 	enum
 	Baudrate : uint32_t
 	{
+		LowSpeed =   10000,	///< Low-Speed datarate of 10kHz
 		Standard =  100000,	///< Standard datarate of 100kHz
 		Fast     =  400000,	///< Fast datarate of 400kHz
-		High     = 1700000,	///< High datarate of 1.7MHz (rarely supported)
-		Super    = 3400000	///< Super datarate of 3.4MHz (rarely supported)
+		FastPlus = 1000000,	///< Fast Plus datarate of 1.0MHz (rarely supported)
+		High     = 3400000	///< Super datarate of 3.4MHz (rarely supported)
 	};
 
 #ifdef __DOXYGEN__
 public:
 	/**
 	 * Initializes the hardware and sets the datarate.
+	 *
+	 * It is strongly recommended to reset the slave devices on the bus
+	 * after a master reset.
+	 * This is usually done in the Gpio Scl connect method.
 	 *
 	 * @tparam	clockSource
 	 * 		the currently active system clock
@@ -80,7 +86,7 @@ public:
 	 * @return	Caller gains control if `true`. Call has no effect if `false`.
 	 */
 	static bool
-	start(I2cTransaction *transaction, Configuration_t configuration = nullptr);
+	start(I2cTransaction *transaction, ConfigurationHandler handler = nullptr);
 
 	/**
 	 * Perform a software reset of the driver in case of an error and detach

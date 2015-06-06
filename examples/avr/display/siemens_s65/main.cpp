@@ -7,7 +7,7 @@ using namespace xpcc::atmega;
 
 typedef GpioOutputA0 Mosi;
 typedef GpioOutputA1 Sck;
-typedef xpcc::SoftwareSpiMaster<Sck, Mosi, xpcc::GpioUnused> SPI;
+typedef xpcc::SoftwareSpiMaster<Sck, Mosi> SPI;
 
 typedef GpioOutputA2 Cs;
 typedef GpioOutputA3 Rs;

@@ -122,6 +122,16 @@ xpcc::Nrf24Phy<Spi, Csn, Ce>::setBits(NrfRegister_t reg, Flags_t flags)
 
 // --------------------------------------------------------------------------------------------------------------------
 
+
+template<typename Spi, typename Csn, typename Ce>
+void
+xpcc::Nrf24Phy<Spi, Csn, Ce>::clearInterrupt(InterruptFlag_t flag)
+{
+	writeRegister(NrfRegister::STATUS, flag.value);
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
 template<typename Spi, typename Csn, typename Ce>
 void
 xpcc::Nrf24Phy<Spi, Csn, Ce>::clearBits(NrfRegister_t reg, Flags_t flags)
@@ -129,33 +139,6 @@ xpcc::Nrf24Phy<Spi, Csn, Ce>::clearBits(NrfRegister_t reg, Flags_t flags)
 	uint8_t old = readRegister(reg);
 
 	writeRegister(reg, old & ~flags.value);
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Spi, typename Csn, typename Ce>
-void
-xpcc::Nrf24Phy<Spi, Csn, Ce>::flushTxFifo()
-{
-	writeCommandNoData(Command::FLUSH_TX);
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Spi, typename Csn, typename Ce>
-void
-xpcc::Nrf24Phy<Spi, Csn, Ce>::flushRxFifo()
-{
-	writeCommandNoData(Command::FLUSH_RX);
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Spi, typename Csn, typename Ce>
-uint8_t
-xpcc::Nrf24Phy<Spi, Csn, Ce>::readRxPayloadWidth()
-{
-	return writeCommandSingleData(Command::R_RX_PL_WID, 0x00);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -198,6 +181,7 @@ xpcc::Nrf24Phy<Spi, Csn, Ce>::writeTxPayloadNoAck(uint8_t* buffer, uint8_t len)
 {
 	if(len > payload_len)
 		return;
+
 	writeCommandMultiData(Command::W_TX_PAYLOAD_NOACK, buffer, nullptr, len);
 }
 
@@ -209,18 +193,10 @@ xpcc::Nrf24Phy<Spi, Csn, Ce>::writeAckPayload(Pipe_t pipe, uint8_t* buffer, uint
 {
 	if(len > payload_len)
 		return;
+
 	Command_t cmd = Command::W_ACK_PAYLOAD;
 	cmd.value |= pipe.value;
 	writeCommandMultiData(cmd, buffer, nullptr, len);
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Spi, typename Csn, typename Ce>
-void
-xpcc::Nrf24Phy<Spi, Csn, Ce>::reuseTxPayload()
-{
-	writeCommandNoData(Command::REUSE_TX_PL);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -231,15 +207,6 @@ xpcc::Nrf24Phy<Spi, Csn, Ce>::readStatus()
 {
 	writeCommandNoData(Command::NOP);
 	return status;
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template<typename Spi, typename Csn, typename Ce>
-uint8_t
-xpcc::Nrf24Phy<Spi, Csn, Ce>::readFifoStatus()
-{
-	return readRegister(NrfRegister::FIFO_STATUS);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -377,27 +344,54 @@ template<typename Spi, typename Csn, typename Ce>
 void
 xpcc::Nrf24Phy<Spi, Csn, Ce>::pulseCe()
 {
-	Ce::set();
+	Ce::toggle();
 
-	xpcc::delayMicroseconds(10);
+	// delay might not be precise enough
+	xpcc::delayMicroseconds(15);
 
-	Ce::reset();
+	Ce::toggle();
 }
-
-// --------------------------------------------------------------------------------------------------------------------
 
 template<typename Spi, typename Csn, typename Ce>
 void
-xpcc::Nrf24Phy<Spi, Csn, Ce>::setCe()
+xpcc::Nrf24Phy<Spi, Csn, Ce>::dumpRegisters()
 {
-	Ce::set();
-}
+	XPCC_LOG_DEBUG.printf(" --------------------- Register Dump Begin -------------------------\n");
 
-// --------------------------------------------------------------------------------------------------------------------
+	XPCC_LOG_DEBUG.printf("CONFIG          0x%02x\n", readRegister(NrfRegister::CONFIG));
+	XPCC_LOG_DEBUG.printf("EN_AA           0x%02x\n", readRegister(NrfRegister::EN_AA));
+	XPCC_LOG_DEBUG.printf("EN_RX_ADDR      0x%02x\n", readRegister(NrfRegister::EN_RX_ADDR));
+	XPCC_LOG_DEBUG.printf("SETUP_AW        0x%02x\n", readRegister(NrfRegister::SETUP_AW));
+	XPCC_LOG_DEBUG.printf("SETUP_RETR      0x%02x\n", readRegister(NrfRegister::SETUP_RETR));
+	XPCC_LOG_DEBUG.printf("RF_CH           0x%02x\n", readRegister(NrfRegister::RF_CH));
+	XPCC_LOG_DEBUG.printf("RF_SETUP        0x%02x\n", readRegister(NrfRegister::RF_SETUP));
+	XPCC_LOG_DEBUG.printf("STATUS          0x%02x\n", readRegister(NrfRegister::STATUS));
+	XPCC_LOG_DEBUG.printf("OBSERVE_TX      0x%02x\n", readRegister(NrfRegister::OBSERVE_TX));
+	XPCC_LOG_DEBUG.printf("RPD             0x%02x\n", readRegister(NrfRegister::RPD));
 
-template<typename Spi, typename Csn, typename Ce>
-void
-xpcc::Nrf24Phy<Spi, Csn, Ce>::resetCe()
-{
-	Ce::reset();
+	auto addr = getRxAddress(Pipe::PIPE_0);
+	XPCC_LOG_DEBUG.printf("RX_ADDR_P0      0x%02x %02x %02x %02x %02x\n", (uint8_t)(addr >> 32), (uint8_t)(addr >> 24), (uint8_t)(addr >> 16), (uint8_t)(addr >> 8), (uint8_t)(addr >> 0));
+
+	addr = getRxAddress(Pipe::PIPE_1);
+	XPCC_LOG_DEBUG.printf("RX_ADDR_P1      0x%02x %02x %02x %02x %02x\n", (uint8_t)(addr >> 32), (uint8_t)(addr >> 24), (uint8_t)(addr >> 16), (uint8_t)(addr >> 8), (uint8_t)(addr >> 0));
+
+	XPCC_LOG_DEBUG.printf("RX_ADDR_P2      0x%02x\n", getRxAddress(Pipe::PIPE_2));
+	XPCC_LOG_DEBUG.printf("RX_ADDR_P3      0x%02x\n", getRxAddress(Pipe::PIPE_3));
+	XPCC_LOG_DEBUG.printf("RX_ADDR_P4      0x%02x\n", getRxAddress(Pipe::PIPE_4));
+	XPCC_LOG_DEBUG.printf("RX_ADDR_P5      0x%02x\n", getRxAddress(Pipe::PIPE_5));
+
+	addr = getTxAddress();
+	XPCC_LOG_DEBUG.printf("TX_ADDR         0x%02x %02x %02x %02x %02x\n", (uint8_t)(addr >> 32), (uint8_t)(addr >> 24), (uint8_t)(addr >> 16), (uint8_t)(addr >> 8), (uint8_t)(addr >> 0));
+
+	XPCC_LOG_DEBUG.printf("RX_PW_P0        0x%02x\n", readRegister(NrfRegister::RX_PW_P0));
+	XPCC_LOG_DEBUG.printf("RX_PW_P1        0x%02x\n", readRegister(NrfRegister::RX_PW_P1));
+	XPCC_LOG_DEBUG.printf("RX_PW_P2        0x%02x\n", readRegister(NrfRegister::RX_PW_P2));
+	XPCC_LOG_DEBUG.printf("RX_PW_P3        0x%02x\n", readRegister(NrfRegister::RX_PW_P3));
+	XPCC_LOG_DEBUG.printf("RX_PW_P4        0x%02x\n", readRegister(NrfRegister::RX_PW_P4));
+	XPCC_LOG_DEBUG.printf("RX_PW_P5        0x%02x\n", readRegister(NrfRegister::RX_PW_P5));
+	XPCC_LOG_DEBUG.printf("FIFO_STATUS     0x%02x\n", readRegister(NrfRegister::FIFO_STATUS));
+	XPCC_LOG_DEBUG.printf("DYNPD           0x%02x\n", readRegister(NrfRegister::DYNPD));
+
+	XPCC_LOG_DEBUG.printf(" ---------------------- Register Dump End --------------------------\n");
+
 }

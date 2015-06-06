@@ -14,13 +14,28 @@
 #include "../../../../device.hpp"
 #include "systick_timer.hpp"
 
+// this define is here because we use FreeRTOS with 10kHz system tick,
+// which is not the default (1kHz is the fastest for FreeRTOS).
+#ifndef XPCC_CORTEX_SYSTICK_HZ
+#define XPCC_CORTEX_SYSTICK_HZ (1000)
+#endif
+
+#define XPCC_CORTEX_SYSTICK_CALLS_PER_MS (XPCC_CORTEX_SYSTICK_HZ / 1000)
 
 static xpcc::cortex::InterruptHandler sysTickHandler = &xpcc::dummy;
 
 extern "C" void
 SysTick_Handler(void)
 {
+#if XPCC_CORTEX_SYSTICK_CALLS_PER_MS > 1
+	static uint8_t counter(XPCC_CORTEX_SYSTICK_CALLS_PER_MS);
+	if (--counter == 0) {
+		xpcc::Clock::increment();
+		counter = XPCC_CORTEX_SYSTICK_CALLS_PER_MS;
+	}
+#else
 	xpcc::Clock::increment();
+#endif
 	sysTickHandler();
 }
 
@@ -31,7 +46,12 @@ xpcc::cortex::SysTickTimer::enable(uint32_t reload)
 	// Lower systick interrupt priority to lowest level
 	NVIC_SetPriority(SysTick_IRQn, 0xf);
 
+#if XPCC_CORTEX_SYSTICK_HZ > 1000
+	(void) reload;
+	SysTick->LOAD = (F_CPU / XPCC_CORTEX_SYSTICK_HZ) - 1;
+#else
 	SysTick->LOAD = reload;
+#endif
 	SysTick->CTRL =
 			SysTick_CTRL_CLKSOURCE_Msk |
 			SysTick_CTRL_ENABLE_Msk |

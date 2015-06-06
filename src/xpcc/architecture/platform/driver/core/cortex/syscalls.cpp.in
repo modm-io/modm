@@ -30,14 +30,19 @@
 /**
  * @file	syscalls.cpp
  * @brief	Stubs for newlib
- * 
+ *
  * Except for _sbrk_r() (which is needed for malloc()) all these stubs are
  * only dummy functions which don't do anything useful.
- * 
+ *
  * _exit() and exit() are defined in the file "startup.S". They are marked
  * as weak references, so they can be easily overwritten by user code.
  */
 // ----------------------------------------------------------------------------
+
+/**
+ * @ingroup 	{{target.string}}
+ * @defgroup	{{target.string}}_core Core
+ */
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -55,9 +60,9 @@ extern uint8_t __heap_end;
 // ----------------------------------------------------------------------------
 /*
  * @brief	Simple abort implementation
- * 
+ *
  * Does nothing except starting a infinite loop
- */ 
+ */
 extern "C"
 void
 abort(void)
@@ -124,7 +129,7 @@ _isatty(int /*file*/)
 // ----------------------------------------------------------------------------
 /* Support function. Adjusts end of heap to provide more memory to
  * memory allocator. Simple and dumb with no sanity checks.
- * 
+ *
  *  struct _reent *r -- re-entrancy structure, used by newlib to
  *                      support multiple threads of operation.
  *  ptrdiff_t size   -- number of bytes to add.
@@ -132,7 +137,7 @@ _isatty(int /*file*/)
  *
  *  Note:  This implementation is not thread safe (despite taking a
  *         _reent structure as a parameter).
- *         Since the _reent struct is not used in the current implementation, 
+ *         Since the _reent struct is not used in the current implementation,
  *         the following messages must be suppressed.
  */
 %% if parameters.allocator == "newlib"
@@ -145,12 +150,12 @@ _sbrk_r(struct _reent *,  ptrdiff_t size)
 	// move heap pointer
 	uint8_t *heap = __brkval;
 	__brkval += size;
-	
+
 	if (__brkval >= &__heap_end) {
 		// ERROR: heap and stack collision!
 		abort();
 	}
-	
+
 	//  Return pointer to start of new heap area.
 	return heap;
 }

@@ -15,49 +15,26 @@
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
-xpcc::Bmp085<I2cMaster>::Bmp085(Data &data, uint8_t address)
-:	data(data),
- 	i2cTask(I2cTask::Idle),
- 	i2cSuccess(0),
- 	adapter(address, i2cTask, i2cSuccess)
+xpcc::Bmp085<I2cMaster>::Bmp085(Data &data, uint8_t address) :
+	I2cDevice<I2cMaster, 1>(address), data(data)
 {
 }
 
 // ----------------------------------------------------------------------------
 // MARK: - Tasks
-template < class I2cMaster >
-xpcc::co::Result<bool>
-xpcc::Bmp085<I2cMaster>::ping()
-{
-	CO_BEGIN();
-
-	CO_WAIT_UNTIL(
-			adapter.configurePing() and
-			(i2cTask = I2cTask::Ping, this->startTransaction(&adapter))
-	);
-
-	CO_WAIT_WHILE(i2cTask == I2cTask::Ping);
-
-	CO_END_RETURN(i2cSuccess == I2cTask::Ping);
-}
-
 template < typename I2cMaster >
-xpcc::co::Result<bool>
-xpcc::Bmp085<I2cMaster>::configure(Mode mode)
+xpcc::ResumableResult<bool>
+xpcc::Bmp085<I2cMaster>::initialize(Mode mode)
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	setMode(mode);
 	buffer[0] = i(Register::CAL_AC1);
 
-	CO_WAIT_UNTIL(
-			adapter.configureWriteRead(buffer, 1, reinterpret_cast<uint8_t*>(&data.calibration), 22) and
-			(i2cTask = I2cTask::ReadCalibration, this->startTransaction(&adapter))
-	);
+	this->transaction.configureWriteRead(buffer, 1, reinterpret_cast<uint8_t*>(&data.calibration), 22);
 
-	CO_WAIT_WHILE(i2cTask == I2cTask::ReadCalibration);
-
-	if (i2cSuccess == I2cTask::ReadCalibration) {
+	if (RF_CALL( this->runTransaction() ))
+	{
 		uint16_t* element = reinterpret_cast<uint16_t*>(&data.calibration);
 		element[ 0] = xpcc::fromBigEndian(element[0]);
 		element[ 1] = xpcc::fromBigEndian(element[1]);
@@ -73,51 +50,39 @@ xpcc::Bmp085<I2cMaster>::configure(Mode mode)
 		element[ 9] = xpcc::fromBigEndian(element[9]);
 		element[10] = xpcc::fromBigEndian(element[10]);
 
-		CO_RETURN(true);
+		RF_RETURN(true);
 	}
 
-	CO_END_RETURN(false);
+	RF_END_RETURN(false);
 }
 
 template < typename I2cMaster >
-xpcc::co::Result<bool>
+xpcc::ResumableResult<bool>
 xpcc::Bmp085<I2cMaster>::readout()
 {
-	CO_BEGIN();
+	RF_BEGIN();
 
 	// Start temperature reading
 	buffer[0] = i(Register::CONTROL);
 	buffer[1] = i(Conversion::Temperature);
 
-	CO_WAIT_UNTIL(
-			adapter.configureWrite(buffer, 2) and
-			(i2cTask = I2cTask::ConvertTemperature, this->startTransaction(&adapter))
-	);
+	this->transaction.configureWrite(buffer, 2);
 
-	CO_WAIT_WHILE(i2cTask == I2cTask::ConvertTemperature);
-
-	if (i2cSuccess != I2cTask::ConvertTemperature) {
-		CO_RETURN(false);
-	}
+	if (not RF_CALL( this->runTransaction() ))
+		RF_RETURN(false);
 
 	// Wait until temperature reading is succeeded
 	timeout.restart(5);
-	CO_WAIT_UNTIL(timeout.isExpired());
+	RF_WAIT_UNTIL(timeout.isExpired());
 
 	// Get the temperature from sensor
 	buffer[0] = i(Register::MSB);
-	CO_WAIT_UNTIL(
-			adapter.configureWriteRead(buffer, 1, data.raw, 2) and
-			(i2cTask = I2cTask::ReadTemperature, this->startTransaction(&adapter))
-	);
+	this->transaction.configureWriteRead(buffer, 1, data.raw, 2);
 
 	data.meta &= ~data.TEMPERATURE_CALCULATED;
 
-	CO_WAIT_WHILE(i2cTask == I2cTask::ReadTemperature);
-
-	if (i2cSuccess != I2cTask::ReadTemperature) {
-		CO_RETURN(false);
-	}
+	if (not RF_CALL( this->runTransaction() ))
+		RF_RETURN(false);
 
 	// buffer the mode for the timer later
 	bufferedMode = data.meta & i(Mode::Mask);
@@ -125,33 +90,22 @@ xpcc::Bmp085<I2cMaster>::readout()
 	buffer[0] = i(Register::CONTROL);
 	buffer[1] = i(Conversion::Pressure) | bufferedMode;
 
-	CO_WAIT_UNTIL(
-			adapter.configureWrite(buffer, 2) and
-			(i2cTask = I2cTask::ConvertPressure, this->startTransaction(&adapter))
-	);
+	this->transaction.configureWrite(buffer, 2);
 
-	CO_WAIT_WHILE(i2cTask == I2cTask::ConvertPressure);
-
-	if (i2cSuccess != I2cTask::ConvertPressure) {
-		CO_RETURN(false);
-	}
+	if (not RF_CALL( this->runTransaction() ))
+		RF_RETURN(false);
 
 	// Wait until sensor has converted the pressure
 	timeout.restart(conversionDelay[bufferedMode >> 6]);
-	CO_WAIT_UNTIL(timeout.isExpired());
+	RF_WAIT_UNTIL(timeout.isExpired());
 
 	// Get the pressure from sensor
 	buffer[0] = i(Register::MSB);
-	CO_WAIT_UNTIL(
-			adapter.configureWriteRead(buffer, 1, data.raw + 2, 3) and
-			(i2cTask = I2cTask::ReadPressure, this->startTransaction(&adapter))
-	);
+	this->transaction.configureWriteRead(buffer, 1, data.raw + 2, 3);
 
 	data.meta &= ~data.PRESSURE_CALCULATED;
 
-	CO_WAIT_WHILE(i2cTask == I2cTask::ReadPressure);
-
-	CO_END_RETURN(i2cSuccess == I2cTask::ReadPressure);
+	RF_END_RETURN_CALL( this->runTransaction() );
 }
 
 void

@@ -13,17 +13,17 @@ using namespace xpcc::lpc;
 typedef GpioOutput0_7 Led;
 typedef GpioOutput3_1 WriteInd;
 
+typedef SystemClock<Pll<ExternalCrystal<MHz12>, MHz48>> systemClock;
+
 // ----------------------------------------------------------------------------
 // Logging
-
-extern xpcc::lpc::Uart1 loggerUart;
-xpcc::IODeviceWrapper< xpcc::lpc::Uart1, xpcc::IOBuffer::BlockIfFull > loggerDevice(loggerUart);
+typedef Uart1 Uart;
+xpcc::IODeviceWrapper< Uart, xpcc::IOBuffer::BlockIfFull > loggerDevice;
 
 xpcc::log::Logger xpcc::log::debug(loggerDevice);
 xpcc::log::Logger xpcc::log::info(loggerDevice);
 xpcc::log::Logger xpcc::log::warning(loggerDevice);
 xpcc::log::Logger xpcc::log::error(loggerDevice);
-
 // ----------------------------------------------------------------------------
 
 
@@ -36,15 +36,10 @@ testWriteBuffer(void);
 void
 testXpccLogger(void);
 
-extern xpcc::lpc::BufferedUart1 uart;
-
-
-
 int
 main(void)
 {
-	StartupError err =
-		SystemClock<Pll<ExternalCrystal<MHz12>, MHz48> >::enable();
+	systemClock::enable();
 
 	// Initialize 32-bit timer 0. TIME_INTERVAL is defined as 10mS
 	// You may also want to use the Cortex SysTick timer to do this
@@ -57,13 +52,13 @@ main(void)
 	// Set LED port pin to output
 	Led::setOutput();
 
-	xpcc::lpc::Uart1::initialize(115200);
+	Uart::initialize<systemClock, 115200>();
 
 	xpcc::delayMilliseconds(100); // glitch ?
 
-	uart.write('X');
-	uart.write('I');
-	uart.write('X');
+	Uart::write('X');
+	Uart::write('I');
+	Uart::write('X');
 
 //	testWriteSingle();
 //	testWriteBuffer();
@@ -74,15 +69,15 @@ main(void)
 
 		// Single byte reading and writing, loopback.
 //		uint8_t c;
-//		if (uart.read(c))
+//		if (Uart::read(c))
 //		{
-//			uart.write(c);
+//			Uart::write(c);
 //		}
 
 		// Buffer reading and writing
 //		uint8_t buf[16];
-//		uint8_t rr = uart.read(buf, 16);
-//		uart.write(buf, rr);
+//		uint8_t rr = Uart::read(buf, 16);
+//		Uart::write(buf, rr);
 }
 
 void
@@ -93,10 +88,10 @@ testWriteSingle(void)
 		Led::toggle();
 
 		// Multiple single byte writes in blocking mode
-		uart.write('\n');
+		Uart::write('\n');
 		for (uint8_t ii = 'a'; ii < 't'; ++ii) {
 			WriteInd::setOutput(true);
-			uart.write(ii);
+			Uart::write(ii);
 			WriteInd::setOutput(false);
 		}
 
@@ -126,10 +121,10 @@ testWriteBuffer(void)
 		Led::toggle();
 
 		WriteInd::setOutput(true);
-		uart.write(buf, 40);
+		Uart::write(buf, 40);
 		WriteInd::setOutput(false);
 		WriteInd::setOutput(true);
-		uart.write('\n');
+		Uart::write('\n');
 		WriteInd::setOutput(false);
 
 		xpcc::delayMilliseconds(2);

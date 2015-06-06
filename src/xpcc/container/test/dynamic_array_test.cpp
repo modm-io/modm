@@ -94,6 +94,20 @@ DynamicArrayTest::testCopyConstructor()
 }
 
 void
+DynamicArrayTest::testInitializerListConstructor()
+{
+	Container array{1, 2, 3, 4, 5};
+
+	TEST_ASSERT_FALSE(array.isEmpty());
+	TEST_ASSERT_EQUALS(array.getSize(), 5U);
+	TEST_ASSERT_EQUALS(array[0], 1);
+	TEST_ASSERT_EQUALS(array[1], 2);
+	TEST_ASSERT_EQUALS(array[2], 3);
+	TEST_ASSERT_EQUALS(array[3], 4);
+	TEST_ASSERT_EQUALS(array[4], 5);
+}
+
+void
 DynamicArrayTest::testReserve()
 {
 	Container array;

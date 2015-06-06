@@ -20,14 +20,14 @@ namespace stm32
 
 /**
  * @brief		Advanced Control Timer {{ id }}
- * 
+ *
  * {% if id == 1 %}
  * Interrupt handler (for LD, MD, HD and CL):
  * - TIM1_BRK_IRQHandler
  * - TIM1_UP_IRQHandler
  * - TIM1_TRG_COM_IRQHandler
  * - TIM1_CC_IRQHandler
- * 
+ *
  * Interrupt handler for XL Density:
  * - TIM1_BRK_TIM9_IRQHandler
  * - TIM1_UP_TIM10_IRQn
@@ -39,32 +39,32 @@ namespace stm32
  * - TIM8_UP_IRQHandler
  * - TIM8_TRG_COM_IRQHandler
  * - TIM8_CC_IRQHandler
- * 
+ *
  * Interrupt handler for XL Density:
  * - TIM8_BRK_TIM12_IRQn
  * - TIM8_UP_TIM13_IRQn
  * - TIM8_TRG_COM_TIM14_IRQn
  * - TIM8_CC_IRQn
  * {% endif %}
- * 
+ *
  * Example:
- * \code
+ * @code
  * extern "C" void
  * TIM{{ id }}_UP_IRQHandler(void)
  * {
  *     Timer{{ id }}::resetInterruptFlags(Timer{{ id }}::...);
- *     
+ *
  *     ...
  * }
- * \endcode
- * 
- * \warning	The Timer has much more possibilities than presented by this
+ * @endcode
+ *
+ * @warning	The Timer has much more possibilities than presented by this
  * 			interface (e.g. Input Capture, Trigger for other Timers, DMA).
  * 			It might be expanded in the future.
- * 
+ *
  * @author		Fabian Greif
  * @author		Kevin Laeufer
- * @ingroup		stm32
+ * @ingroup		{{target.string}}_timer
  */
 class Timer{{ id }} : public AdvancedControlTimer
 {
@@ -134,7 +134,7 @@ public:
 	{
 		TIM{{ id }}->CR2 &= ~TIM_CR2_CCPC;
 	}
-	
+
 	static inline void
 	setPrescaler(uint16_t prescaler)
 	{
@@ -160,7 +160,7 @@ public:
 		uint16_t overflow = cycles / prescaler;
 
 		overflow = overflow - 1;	// e.g. 36000 cycles are from 0 to 35999
-	
+
 		setPrescaler(prescaler);
 		setOverflow(overflow);
 
@@ -201,6 +201,12 @@ public:
 	enableOutput()
 	{
 		TIM{{ id }}->BDTR |= TIM_BDTR_MOE;
+	}
+	
+	static inline void
+	disableOutput()
+	{
+		TIM{{ id }}->BDTR &= ~(TIM_BDTR_MOE);
 	}
 
 	/*
@@ -368,11 +374,11 @@ public:
 public:
 	/**
 	 * Enables or disables Interrupt Vectors.
-	 * 
+	 *
 	 * You must pass an or-conjuncted list of entries from the
-	 * Interrupt enum. Interrupt vectors which fit to 
+	 * Interrupt enum. Interrupt vectors which fit to
 	 * will be enabled (or disabled if \p enable = false).
-	 * 
+	 *
 	 * The Adanvced timers have four interrupt vectors:
 	 * - UP (used by INTERRUPT_UPDATE)
 	 * - BRK (used by INTERRUPT_BREAK)
@@ -420,7 +426,9 @@ public:
 		TIM{{ id }}->SR = ~static_cast<uint32_t>(flags);
 	}
 };
-}
-}
+
+}	// namespace stm32
+
+}	// namespace xpcc
 
 #endif // XPCC_STM32_TIMER_{{ id }}_HPP

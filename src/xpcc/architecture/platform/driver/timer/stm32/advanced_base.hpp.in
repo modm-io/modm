@@ -18,6 +18,7 @@ namespace xpcc
 namespace stm32
 {
 
+/// @ingroup	{{target.string}}_timer
 class AdvancedControlTimer : public GeneralPurposeTimer
 {
 public:
@@ -94,7 +95,7 @@ public:
 		TimerInput2Filtered = TIM_SMCR_TS_2 | TIM_SMCR_TS_1,
 		External = TIM_SMCR_TS_2 | TIM_SMCR_TS_1 | TIM_SMCR_TS_0,
 	};
-	
+
 	enum class SlaveMode : uint32_t
 	{
 		/// Slave mode disabled - if CEN = '1' then the prescaler is clocked directly by the internal clock.
@@ -154,7 +155,9 @@ public:
 	static void
 	enableOutput();
 };
-}
-}
+
+}	// namespace stm32
+
+}	// namespace xpcc
 
 #endif // XPCC_STM32_TIMER_ADVANCED_BASE_HPP

@@ -32,6 +32,9 @@
 	#error	"Don't include this file directly, use 's_curve_controller.hpp' instead!"
 #endif
 
+
+#include <xpcc/math/utils.hpp>
+
 // ----------------------------------------------------------------------------
 template<typename T>
 xpcc::SCurveController<T>::Parameter::Parameter(
@@ -120,9 +123,9 @@ xpcc::SCurveController<T>::update(T error, const T& speed)
 			parameter.decreaseFactor * 2) + parameter.speedTarget;
 	}
 	
-	output = std::min(outputIncrement, outputDecrement);
+	output = xpcc::min(outputIncrement, outputDecrement);
 	// TODO smooth breaking if the speedMaximum has changed to a lower value
-	output = std::min(output, parameter.speedMaximum);
+	output = xpcc::min(output, parameter.speedMaximum);
 	
 	if (output < parameter.speedMinimum) {
 		output = parameter.speedMinimum;

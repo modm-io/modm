@@ -3,6 +3,6 @@
 <rca version="1.0">
 	<driver type="gpio" name="lpc">
 		<template>gpio.hpp.in</template>
-		<template out="gpio_enable.h">gpio.hpp.in</template>
+		<static>gpio_enable.cpp</static>
 	</driver>
 </rca>

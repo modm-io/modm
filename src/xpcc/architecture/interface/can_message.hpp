@@ -34,6 +34,12 @@ struct Message
 	{
 		return identifier;
 	}
+	
+	inline void
+	setIdentifier(uint32_t id)
+	{
+		identifier = id;
+	}
 
 	inline void
 	setExtended(bool extended = true)
@@ -63,6 +69,12 @@ struct Message
 	getLength() const
 	{
 		return length;
+	}
+	
+	inline void
+	setLength(uint8_t len)
+	{
+		length = len;
 	}
 
 public:

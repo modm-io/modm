@@ -203,36 +203,24 @@ xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::getDotCorrection(uint16_t chann
 }
 
 template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typename Xerr>
-bool
+void
 xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::writeChannels(bool flush)
 {
-	if (flush)
-	{
-		if (!Spi::transfer(gs, status, CHANNELS*3/2))
-			return false;
+	Spi::transferBlocking(gs, status, CHANNELS*3/2);
 
-		latch();
-		return true;
-	}
-
-	return Spi::transfer(gs, status, CHANNELS*3/2);
+	if (flush) latch();
 }
 
 template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typename Xerr>
-bool
+void
 xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::writeDotCorrection()
 {
 	Vprog::set();
 
 	// transfer
-	if (!Spi::transfer(dc, 0, CHANNELS*3/4))
-	{
-		Vprog::reset();
-		return false;
-	}
+	Spi::transferBlocking(dc, 0, CHANNELS*3/4);
 
 	latch();
 
 	Vprog::reset();
-	return true;
 }

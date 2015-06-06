@@ -24,14 +24,16 @@
 
 namespace xpcc
 {
+
 namespace stm32
 {
+
 /**
  * Universal asynchronous receiver transmitter ({{ uart | upper ~ id }})
  *
  * @author		Kevin Laeufer
  * @author		Niklas Hauser
- * @ingroup		stm32
+ * @ingroup		{{target.string}}_uart
  */
 class {{ uart ~ id }} : public UartBase, public ::xpcc::Uart
 {
@@ -104,8 +106,8 @@ template< 	class clockSource, uint32_t baudrate,
 	discardReceiveBuffer();
 };
 
-}	// stm32 namespace
+}	// namespace stm32
 
-}	// xpcc namespace
+}	// namespace xpcc
 
 #endif // XPCC_STM32_{{ uart | upper }}_{{ id }}_HPP

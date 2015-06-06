@@ -19,14 +19,14 @@ namespace led
 // define the pins used by the LCD
 namespace lcd
 {
-	typedef GpioOutputB7 Scl;
+	typedef GpioOutputB7 Sck;
 	typedef GpioOutputB5 Mosi;
 
 	typedef GpioOutputD2 Cs;
 	typedef GpioOutputD3 A0;
 	typedef GpioOutputD4 Reset;
 
-	typedef xpcc::SoftwareSpiMaster< Scl, Mosi, xpcc::GpioUnused, 10000000UL > SPI;
+	typedef xpcc::SoftwareSpiMaster< Sck, Mosi > SPI;
 }
 
 xpcc::DogM128< lcd::SPI, lcd::Cs, lcd::A0, lcd::Reset, true > display;
@@ -147,11 +147,11 @@ MAIN_FUNCTION
 
 	display.setFont(xpcc::font::FixedWidth5x8);
 
-	xpcc::PeriodicTimer<> timer(1000);
+	xpcc::ShortPeriodicTimer timer(1000);
 	while (1)
 	{
 		uint8_t iter = 0;
-		while (!timer.isExpired())
+		while (!timer.execute())
 		{
 			// rectangle in left side of screen
 			display.setColor(Color::black());

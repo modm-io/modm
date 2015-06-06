@@ -11,9 +11,9 @@
 #define XPCC_BMP085_HPP
 
 #include <xpcc/processing/protothread.hpp>
-#include <xpcc/processing/coroutine.hpp>
+#include <xpcc/processing/resumable.hpp>
 #include <xpcc/architecture/interface/i2c_device.hpp>
-#include <xpcc/processing/timeout.hpp>
+#include <xpcc/processing/timer.hpp>
 
 namespace xpcc
 {
@@ -24,6 +24,7 @@ class Bmp085;
 struct bmp085
 {
 protected:
+	/// @cond
 	/// The addresses of the Configuration and Data Registers
 	enum class
 	Register : uint8_t
@@ -60,6 +61,7 @@ protected:
 		Temperature = 0x2E,
 		Pressure = 0x34,
 	};
+	/// @endcond
 
 public:
 	enum class
@@ -73,7 +75,7 @@ public:
 	};
 
 	/**
-	 * Hold the calibration data from the sensor.
+	 * Holds the calibration data from the sensor.
 	 * Values are used for calculation of calibrated
 	 * sensor values from raw sensor data
 	 */
@@ -215,8 +217,7 @@ protected:
  * @tparam I2cMaster I2C interface
  */
 template < typename I2cMaster >
-class Bmp085 : public bmp085, public xpcc::I2cDevice<I2cMaster>,
-			   protected xpcc::co::NestedCoroutine<>
+class Bmp085 : public bmp085, public xpcc::I2cDevice<I2cMaster, 1>
 {
 public:
 	/**
@@ -226,16 +227,12 @@ public:
 	Bmp085(Data &data, uint8_t address=0x77);
 
 	// MARK: - TASKS
-	/// Pings the sensor
-	xpcc::co::Result<bool>
-	ping();
-
 	/// Reads out and stores the calibration bytes
-	xpcc::co::Result<bool>
-	configure(Mode mode = Mode::Standard);
+	xpcc::ResumableResult<bool>
+	initialize(Mode mode = Mode::Standard);
 
 	/// Do a readout sequence to convert and read temperature and then pressure from sensor
-	xpcc::co::Result<bool>
+	xpcc::ResumableResult<bool>
 	readout();
 
 	/// Configures the sensor
@@ -247,29 +244,14 @@ public:
 	}
 
 public:
-	/// the data object for this sensor.
-	Data &data;
+	/// Get the data object for this sensor.
+	inline Data&
+	getData()
+	{ return data; }
 
 private:
-	enum
-	I2cTask : uint8_t
-	{
-		Idle = 0,
-		Ping,
-		Configure,
-		ReadCalibration,
-		ConvertTemperature,
-		ReadTemperature,
-		ConvertPressure,
-		ReadPressure,
-	};
-
-	volatile uint8_t i2cTask;
-	volatile uint8_t i2cSuccess;
-
-	xpcc::I2cTagAdapter< xpcc::I2cWriteReadAdapter > adapter;
-
-	xpcc::Timeout<> timeout;
+	Data &data;
+	xpcc::ShortTimeout timeout;
 
 	/**
 	 * Maximum conversion time for pressure from datasheet for

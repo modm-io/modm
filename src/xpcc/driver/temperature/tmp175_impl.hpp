@@ -13,109 +13,122 @@
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
-xpcc::Tmp175<I2cMaster>::Tmp175(uint8_t* data, uint8_t address)
-:	I2cWriteReadAdapter(address), running(Running::Nothing), config(0), data(data)
+xpcc::Tmp175<I2cMaster>::Tmp175(Data &data, uint8_t address)
+:	Lm75<I2cMaster>(reinterpret_cast<lm75::Data&>(data), address),
+	periodTimeout(250), conversionTimeout(250), updateTime(250), conversionTime(232)
 {
-	configureWriteRead(buffer, 0, data, 0);
+	this->stop();
 }
 
 template < typename I2cMaster >
 bool
-xpcc::Tmp175<I2cMaster>::configure(tmp175::Config1 msb)
+xpcc::Tmp175<I2cMaster>::run()
 {
-	config = msb;
-	buffer[0] = tmp175::REGISTER_CONFIGURATION;
-	buffer[1] = msb;
-	configureWriteRead(buffer, 2, data, 0);
+	PT_BEGIN();
 
-	return I2cMaster::startBlocking(this);
-}
+	while(true)
+	{
+		PT_WAIT_UNTIL(periodTimeout.isExpired());
+		periodTimeout.restart(updateTime);
 
-template < typename I2cMaster >
-void
-xpcc::Tmp175<I2cMaster>::startConversion()
-{
-	status.startConversionPending = true;
-}
+		PT_CALL(startConversion());
 
-template < typename I2cMaster >
-void
-xpcc::Tmp175<I2cMaster>::readTemperature()
-{
-	status.readTemperaturePending = true;
-}
+		conversionTimeout.restart(conversionTime);
+		PT_WAIT_UNTIL(conversionTimeout.isExpired());
 
-template < typename I2cMaster >
-float
-xpcc::Tmp175<I2cMaster>::getTemperature()
-{
-	int16_t temp = static_cast<int16_t>((data[0]<<8)|data[1]);
-	if (data[1] & tmp175::TEMPERATURE_EXTENDED_MODE) {
-		return (temp>>3)/16.f;
+		PT_CALL(this->readTemperature());
 	}
-	else {
-		return (temp>>4)/16.f;
-	}
+
+	PT_END();
 }
 
 template < typename I2cMaster >
-bool
-xpcc::Tmp175<I2cMaster>::isNewDataAvailable()
-{
-	return status.newTemperatureData;
-}
-
-template < typename I2cMaster >
-uint8_t*
+xpcc::tmp175::Data&
 xpcc::Tmp175<I2cMaster>::getData()
 {
-	status.newTemperatureData = false;
-	return data;
+	return reinterpret_cast<Data&>(this->data);
+}
+
+// MARK: - tasks
+template < typename I2cMaster >
+void
+xpcc::Tmp175<I2cMaster>::setUpdateRate(uint8_t rate)
+{
+	// clamp conversion rate to max 33Hz (=~30ms)
+	if (rate == 0) rate = 1;
+	if (rate > 33) rate = 33;
+
+	updateTime = (1000/rate - 29);
+	periodTimeout.restart(updateTime);
+
+	this->restart();
 }
 
 template < typename I2cMaster >
-void
-xpcc::Tmp175<I2cMaster>::update()
+xpcc::ResumableResult<bool>
+xpcc::Tmp175<I2cMaster>::setResolution(Resolution resolution)
 {
-	if (running != Running::Nothing)
-	{
-		switch (getAdapterState())
-		{
-			case xpcc::I2c::AdapterState::Idle:
-				if (running == Running::ReadTemperature) {
-					status.newTemperatureData = true;
-				}
+	RF_BEGIN();
 
-			case xpcc::I2c::AdapterState::Error:
-				running = Running::Nothing;
+	Resolution_t::set(reinterpret_cast<Config1_t&>(this->config_msb), resolution);
 
-			default:
-				break;
-		}
-	}
-	else  {
-		if (status.startConversionPending)
-		{
-			buffer[0] = tmp175::REGISTER_CONFIGURATION;
-			buffer[1] = config & tmp175::CONFIGURATION_ONE_SHOT;
-			configureWriteRead(buffer, 2, data, 0);
+	conversionTime = (uint8_t(resolution) + 1) * 29;
 
-			if (I2cMaster::start(this)) {
-				status.startConversionPending = false;
-				running = Running::StartConversion;
-			}
-		}
-		else if (status.readTemperaturePending)
-		{
-			buffer[0] = tmp175::REGISTER_TEMPERATURE;
-			configureWriteRead(buffer, 1, data, 2);
-
-			if (I2cMaster::start(this)) {
-				status.readTemperaturePending = false;
-				running = Running::ReadTemperature;
-			}
-		}
-	}
+	RF_END_RETURN_CALL( writeConfiguration() );
 }
 
+// MARK: conversion
+template < typename I2cMaster >
+xpcc::ResumableResult<bool>
+xpcc::Tmp175<I2cMaster>::startConversion()
+{
+	RF_BEGIN();
+
+	reinterpret_cast<Config1_t&>(this->config_msb).set(Config1::OneShot);
+
+	if ( RF_CALL(writeConfiguration()) )
+	{
+		reinterpret_cast<Config1_t&>(this->config_msb).reset(Config1::OneShot);
+		RF_RETURN(true);
+	}
+
+	RF_END_RETURN(false);
+}
+
+// MARK: configuration
+template < typename I2cMaster >
+xpcc::ResumableResult<bool>
+xpcc::Tmp175<I2cMaster>::writeConfiguration()
+{
+	RF_BEGIN();
+
+	this->buffer[0] = uint8_t(Register::Configuration);
+	this->buffer[1] = reinterpret_cast<Config1_t&>(this->config_msb).value;
+
+	this->transaction.configureWrite(this->buffer, 2);
+
+	RF_END_RETURN_CALL( this->runTransaction() );
+}
+
+template < typename I2cMaster >
+xpcc::ResumableResult<bool>
+xpcc::Tmp175<I2cMaster>::setLimitRegister(Register reg, float temperature)
+{
+	RF_BEGIN();
+
+	{
+		uint8_t res = uint8_t(Resolution_t::get(reinterpret_cast<Config1_t&>(this->config_msb)));
+
+		int16_t temp = temperature * (2 << res);
+		temp <<= 4 + res;
+
+		this->buffer[0] = uint8_t(reg);
+		this->buffer[1] = (temp >> 8);
+		this->buffer[2] = temp;
+	}
+
+	this->transaction.configureWrite(this->buffer, 3);
+
+	RF_END_RETURN_CALL( this->runTransaction() );
+}
 
