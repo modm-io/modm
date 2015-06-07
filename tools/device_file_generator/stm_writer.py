@@ -53,7 +53,7 @@ class STMDeviceWriter(XMLDeviceWriter):
 		# DMA
 		self.addModuleAttributesToNode(self.root, 'DMA', 'dma')
 		# FSMC
-		self.addModuleAttributesToNode(self.root, 'FSMC_NOR_MUX', 'fsmc')
+		self.addModuleAttributesToNode(self.root, 'FSMC', 'fsmc')
 		# I2C
 		self.addModuleAttributesToNode(self.root, 'I2C', 'i2c')
 		# SPI
