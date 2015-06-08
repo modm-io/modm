@@ -51,11 +51,11 @@ xpcc::stm32::Adc{{ id }}::initialize()
 	constexpr uint32_t baud_middle = (baud_upper + baud_lower) / 2;
 	// decide which divisor is closer to a possible baudrate
 	// lower baudrate means higher divisor!
-	constexpr uint8_t nearest = (baudrate < baud_middle) ? div_ceil : div_floor;
+	constexpr uint8_t pre = (frequency < baud_middle) ? pre_ceil : pre_floor;
 
 	// check if within baudrate tolerance
 	assertBaudrateInTolerance<
-			SystemClock::Adc / nearest,
+			SystemClock::Adc / pre,
 			frequency,
 			tolerance >();
 
