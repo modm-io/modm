@@ -53,8 +53,8 @@ class Led
 public:
 	Led();
 
-	/// Requires a callback function pointer for value updates.
-	Led(Animation<uint8_t>::Callback_t callback);
+	/// Requires a handler function pointer for value updates.
+	Led(Animation<uint8_t>::Handler handler);
 
 	/// @param	brightness
 	///		between 0 and length of lookup-table (usually 255)

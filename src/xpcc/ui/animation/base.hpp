@@ -40,21 +40,19 @@ class Animation
 {
 public:
 	typedef typename FastRamp<T>::StepType TimeType;
-	using Callback_t = void(*)(T);
+	using Handler = void(*)(T);
 
 public:
 	/// @param	value	a reference to the value to be animated
 	Animation(T &value);
 
 	/// @param	value		a reference to the value to be animated
-	/// @param	callback	this function will be called whenever the
-	///						value has been changed
-	Animation(T &value, Callback_t callback);
+	/// @param	handler		this function will be called whenever the value has been changed
+	Animation(T &value, Handler handler);
 
-	/// @param	callback	this function will be called whenever the
-	///						value has been changed
+	/// @param	handler		this function will be called whenever the value has been changed
 	void
-	attachCallback(Callback_t callback);
+	attachCallback(Handler handler);
 
 	/// stop any running animation and set a value.
 	void
@@ -87,7 +85,7 @@ public:
 	update();
 
 private:
-	Callback_t callback;
+	Handler handler;
 	T &currentValue;
 	T endValue;
 	TimeType animationTime;

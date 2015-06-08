@@ -19,17 +19,17 @@ xpcc::ui::Animation<T>::Animation(T &value)
 }
 
 template< typename T >
-xpcc::ui::Animation<T>::Animation(T &value, Callback_t callback)
-:	callback(callback), currentValue(value), endValue(0),
+xpcc::ui::Animation<T>::Animation(T &value, Handler handler)
+:	handler(handler), currentValue(value), endValue(0),
 	 animationTime(0), previous(0)
 {
 }
 
 template< typename T >
 void inline
-xpcc::ui::Animation<T>::attachCallback(Callback_t callback)
+xpcc::ui::Animation<T>::attachCallback(Handler handler)
 {
-	this->callback = callback;
+	this->handler = handler;
 }
 
 template< typename T >
@@ -39,7 +39,7 @@ xpcc::ui::Animation<T>::setValue(T value)
 	animationTime = 0;
 	currentValue = value;
 	interpolation.stop();
-	if (callback) callback(currentValue);
+	if (handler) handler(currentValue);
 }
 
 template< typename T >
@@ -130,8 +130,8 @@ xpcc::ui::Animation<T>::update()
 			if (currentValue != newValue)
 			{
 				currentValue = newValue;
-				// invoke the callback with this value
-				if (callback) callback(currentValue);
+				// invoke the handler with this value
+				if (handler) handler(currentValue);
 				return true;
 			}
 		}
