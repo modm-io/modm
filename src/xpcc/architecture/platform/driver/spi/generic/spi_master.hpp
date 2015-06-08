@@ -43,7 +43,7 @@ public:
 public:
 	// start documentation inherited
 	/// Baudrate is limited to 500kbps.
-	template< class clockSource, uint32_t baudrate,
+	template< class SystemClock, uint32_t baudrate,
 			uint16_t tolerance = Tolerance::FivePercent >
 	static void
 	initialize();

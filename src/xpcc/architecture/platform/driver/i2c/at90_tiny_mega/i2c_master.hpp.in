@@ -36,7 +36,7 @@ public:
 	static const TypeId::I2cMasterSda Sda;
 	static const TypeId::I2cMasterScl Scl;
 
-	template< class clockSource, uint32_t baudrate=Baudrate::Standard,
+	template< class SystemClock, uint32_t baudrate=Baudrate::Standard,
 			uint16_t tolerance = xpcc::Tolerance::FivePercent >
 	static ALWAYS_INLINE void
 	initialize()
@@ -45,35 +45,34 @@ public:
 		// SCL freq = CPU / (16 + 2 * TWBR * Pre)
 
 		constexpr uint32_t pre = (
-				(baudrate * 64ul * 255ul < clockSource::I2c) ? 64 : (
-				(baudrate * 16ul * 255ul < clockSource::I2c) ? 16 : (
-				(baudrate *  4ul * 255ul < clockSource::I2c) ?  4 :
+				(baudrate * 64ul * 255ul < SystemClock::I2c) ? 64 : (
+				(baudrate * 16ul * 255ul < SystemClock::I2c) ? 16 : (
+				(baudrate *  4ul * 255ul < SystemClock::I2c) ?  4 :
 																1
 				)));
 
 		// calculate the fractional prescaler value
-		constexpr float pre_part_raw = static_cast<float>(clockSource::I2c) / ( 2 * baudrate );
+		constexpr float pre_part_raw = float(SystemClock::I2c) / ( 2 * baudrate );
 		constexpr float pre_raw = std::floor(pre_part_raw) < 8 ? 0 : (pre_part_raw - 8) / pre;
 		// respect the prescaler range of 0 to 255
 		constexpr uint32_t pre_ceil = std::ceil(pre_raw) > 255 ? 255 : std::ceil(pre_raw);
 		constexpr uint32_t pre_floor = std::floor(pre_raw);
 
 		// calculate the possible baudrates above and below the requested baudrate
-		constexpr uint32_t baud_lower = clockSource::I2c / ( 16 + 2 * pre_ceil  * pre );
-		constexpr uint32_t baud_upper = clockSource::I2c / ( 16 + 2 * pre_floor * pre );
+		constexpr uint32_t baud_lower = SystemClock::I2c / ( 16 + 2 * pre_ceil  * pre );
+		constexpr uint32_t baud_upper = SystemClock::I2c / ( 16 + 2 * pre_floor * pre );
 
 		// calculate the fractional prescaler value corresponding to the baudrate exactly
 		// between the upper and lower baudrate
-		constexpr float pre_middle = (static_cast<float>(clockSource::I2c) /
-				( 2 * ((baud_upper - baud_lower) / 2.f + baud_lower) ) - 8) / pre;
+		constexpr uint32_t baud_middle = (baud_upper + baud_lower) / 2;
 		// decide which prescaler value is closer to a possible baudrate
-		constexpr uint32_t twbr = (pre_raw >= pre_middle) ? pre_ceil : pre_floor;
+		constexpr uint32_t twbr = (baudrate < baud_middle) ? pre_ceil : pre_floor;
 
 		// check if within baudrate tolerance
-		constexpr uint32_t generated_baudrate = clockSource::I2c / ( 16 + 2 * twbr * pre );
+		constexpr uint32_t generated_baudrate = SystemClock::I2c / ( 16 + 2 * twbr * pre );
 		assertBaudrateInTolerance<
-				/* clostest available baudrate */ generated_baudrate,
-				/* desired baudrate */ baudrate,
+				generated_baudrate,	// closest available baudrate
+				baudrate,			// desired baudrate
 				tolerance >();
 
 		// translate the prescaler into the bitmapping

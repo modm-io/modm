@@ -70,30 +70,29 @@ public:
 
 public:
 	// start documentation inherited
-	template< class clockSource, uint32_t baudrate,
+	template< class SystemClock, uint32_t baudrate,
 			uint16_t tolerance = xpcc::Tolerance::FivePercent >
 	static inline void
 	initialize()
 	{
 		// calculate the fractional prescaler value
-		constexpr float pre_raw = static_cast<float>(clockSource::UsartSpi) / ( 2 * baudrate );
+		constexpr float pre_raw = static_cast<float>(SystemClock::UsartSpi) / ( 2 * baudrate );
 		// respect the prescaler range of 1 to 4096
 		constexpr uint32_t pre_ceil = std::ceil(pre_raw) > 4096 ? 4096 : std::ceil(pre_raw);
 		constexpr uint32_t pre_floor = std::floor(pre_raw) < 1 ? 1 : std::floor(pre_raw);
 
 		// calculate the possible baudrates above and below the requested baudrate
-		constexpr uint32_t baud_lower = clockSource::UsartSpi / ( 2 * pre_ceil );
-		constexpr uint32_t baud_upper = clockSource::UsartSpi / ( 2 * pre_floor );
+		constexpr uint32_t baud_lower = SystemClock::UsartSpi / ( 2 * pre_ceil );
+		constexpr uint32_t baud_upper = SystemClock::UsartSpi / ( 2 * pre_floor );
 
 		// calculate the fractional prescaler value corresponding to the baudrate exactly
 		// between the upper and lower baudrate
-		constexpr float pre_middle = static_cast<float>(clockSource::UsartSpi) /
-				( 2 * ((baud_upper - baud_lower) / 2.f + baud_lower) );
+		constexpr uint32_t baud_middle = (baud_upper + baud_lower) / 2;
 		// decide which prescaler value is closer to a possible baudrate
-		constexpr uint16_t prescaler = (pre_raw >= pre_middle) ? pre_ceil : pre_floor;
+		constexpr uint32_t prescaler = (baudrate < baud_middle) ? pre_ceil : pre_floor;
 
 		// check if within baudrate tolerance
-		constexpr uint32_t generated_baudrate = clockSource::UsartSpi / (2 * prescaler);
+		constexpr uint32_t generated_baudrate = SystemClock::UsartSpi / (2 * prescaler);
 		assertBaudrateInTolerance<
 			/* clostest available baudrate */ generated_baudrate,
 			/* desired baudrate */ baudrate,

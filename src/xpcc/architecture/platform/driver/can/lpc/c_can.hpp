@@ -48,7 +48,7 @@ class Can : public ::xpcc::Can
 {
 public:
 
-	template< class clockSource, uint32_t bitrate = Bitrate::kBps125,
+	template< class SystemClock, uint32_t bitrate = Bitrate::kBps125,
 			uint16_t tolerance = Tolerance::OnePercent >
 	static inline void
 	initialize()
@@ -66,7 +66,7 @@ public:
 		 *
 		 */
 
-		static_assert(clockSource::Can == xpcc::clock::Frequency::MHz48,
+		static_assert(SystemClock::Can == xpcc::clock::Frequency::MHz48,
 				"Other main clocks than 48 MHz are not yet supported.");
 
 		uint16_t prescaler;

@@ -87,7 +87,7 @@ private:
 	/// Private Initializer with computed prescaler and timing constants
 	static void
 	initializeWithPrescaler(uint16_t prescaler, uint8_t bs1, uint8_t bs2,
-	uint32_t interruptPriority, Mode startupMode, bool overwriteOnOverrun);
+			uint32_t interruptPriority, Mode startupMode, bool overwriteOnOverrun);
 public:
 	/**
 	 * Enables the clock for the CAN controller and resets all settings
@@ -104,7 +104,7 @@ public:
 	 * \warning	Has to called after connect(), but before any
 	 * 			other function from this class!
 	 */
-	template< class clockSource, uint32_t bitrate = Bitrate::kBps125,
+	template< class SystemClock, uint32_t bitrate = Bitrate::kBps125,
 			uint16_t tolerance = Tolerance::OnePercent >
 	static inline void
 	initialize(	uint32_t interruptPriority, Mode startupMode = Mode::Normal,
@@ -125,20 +125,19 @@ public:
 		 * STM32F20x   tPCLK = 1 / 30 MHz
 		 * STM32F40x   tPCLK = 1 / 42 MHz
 		 */
-		constexpr uint8_t bs1 = (clockSource::Can{{ id }} == MHz30)? 10 :
-								(clockSource::Can{{ id }} == MHz36)? 12 :
-								(clockSource::Can{{ id }} == MHz42)? 14 : 0;
-		constexpr uint8_t bs2 = (clockSource::Can{{ id }} == MHz30)?  4 :
-								(clockSource::Can{{ id }} == MHz36)?  5 :
-								(clockSource::Can{{ id }} == MHz42)?  6 : 0;
-		constexpr uint16_t prescaler = 	clockSource::Can{{ id }} /
+		constexpr uint8_t bs1 = (SystemClock::Can{{ id }} == MHz30)? 10 :
+								(SystemClock::Can{{ id }} == MHz36)? 12 :
+								(SystemClock::Can{{ id }} == MHz42)? 14 : 0;
+		constexpr uint8_t bs2 = (SystemClock::Can{{ id }} == MHz30)?  4 :
+								(SystemClock::Can{{ id }} == MHz36)?  5 :
+								(SystemClock::Can{{ id }} == MHz42)?  6 : 0;
+		constexpr uint16_t prescaler = 	SystemClock::Can{{ id }} /
 								(bitrate * (1 + bs1 + bs2));
 		static_assert(prescaler > 0,
 				"Unsupported frequency for Can peripheral. "
 				"Only 30 Mhz, 36 MHz and 42 MHz are supported at the moment.");
 
-		return initializeWithPrescaler(prescaler, bs1, bs2,
-		interruptPriority, startupMode, overwriteOnOverrun);
+		return initializeWithPrescaler(prescaler, bs1, bs2, interruptPriority, startupMode, overwriteOnOverrun);
 	}
 
 	/**

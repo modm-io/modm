@@ -57,7 +57,7 @@ public:
 	static const TypeId::Uart1Tx Tx;
 
 public:
-	template< class clockSource, uint32_t baudrate,
+	template< class SystemClock, uint32_t baudrate,
 			uint16_t tolerance = xpcc::Tolerance::OnePercent >
 	static void ALWAYS_INLINE
 	initialize()

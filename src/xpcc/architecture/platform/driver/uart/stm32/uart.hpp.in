@@ -52,7 +52,7 @@ private:
 %% endif
 
 public:
-template< 	class clockSource, uint32_t baudrate,
+template< 	class SystemClock, uint32_t baudrate,
 		uint16_t tolerance = xpcc::Tolerance::OnePercent >
 	static void ALWAYS_INLINE
 %% if parameters.buffered
@@ -62,10 +62,10 @@ template< 	class clockSource, uint32_t baudrate,
 %% endif
 	{
 		constexpr UartBase::OversamplingMode oversample =
-				UartBaudrate::getOversamplingMode(clockSource::{{ uart ~ id }}, baudrate);
+				UartBaudrate::getOversamplingMode(SystemClock::{{ uart ~ id }}, baudrate);
 
 		{{ hal }}::initializeWithBrr(
-				UartBaudrate::getBrr<clockSource::{{ uart ~ id }}, baudrate, tolerance>(),
+				UartBaudrate::getBrr<SystemClock::{{ uart ~ id }}, baudrate, tolerance>(),
 				parity,
 				oversample);
 %% if parameters.buffered

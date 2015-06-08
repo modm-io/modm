@@ -23,42 +23,40 @@
 #	error 	"Don't include this file directly, use 'adc_{{ id }}.hpp' instead!"
 #endif
 
-template< class clockSource, uint32_t frequency, uint16_t tolerance >
+template< class SystemClock, uint32_t frequency, uint16_t tolerance >
 void
 xpcc::stm32::Adc{{ id }}::initialize()
 {
-	constexpr float pre_raw = (static_cast<float>(clockSource::Adc) / (frequency > {{ max_frequency }} ? {{ max_frequency }} : frequency));
+	constexpr float desired = float(SystemClock::Adc) / (frequency > {{ max_frequency }} ? {{ max_frequency }} : frequency);
 
 	// respect the prescaler range of 2, 4, 6, 8
-	constexpr uint32_t pre_ceil = (
-			std::ceil(pre_raw) > 6 ? 8 : (
-			std::ceil(pre_raw) > 4 ? 6 : (
-			std::ceil(pre_raw) > 2 ? 4 :
+	constexpr uint8_t pre_ceil = (
+			std::ceil(desired) > 6 ? 8 : (
+			std::ceil(desired) > 4 ? 6 : (
+			std::ceil(desired) > 2 ? 4 :
 									 2
 			)));
-	constexpr uint32_t pre_floor = (
-			std::floor(pre_raw) < 4 ? 2 : (
-			std::floor(pre_raw) < 6 ? 4 : (
-			std::floor(pre_raw) < 8 ? 6 :
+	constexpr uint8_t pre_floor = (
+			std::floor(desired) < 4 ? 2 : (
+			std::floor(desired) < 6 ? 4 : (
+			std::floor(desired) < 8 ? 6 :
 									  8
 			)));
 
 	// calculate the possible baudrates above and below the requested baudrate
-	constexpr uint32_t baud_lower = clockSource::Adc / ( pre_ceil );
-	constexpr uint32_t baud_upper = clockSource::Adc / ( pre_floor );
+	constexpr uint32_t baud_lower = SystemClock::Adc / pre_ceil;
+	constexpr uint32_t baud_upper = SystemClock::Adc / pre_floor;
 
-	// calculate the fractional prescaler value corresponding to the baudrate exactly
-	// between the upper and lower baudrate
-	constexpr float pre_middle = static_cast<float>(clockSource::Adc) /
-			( ((baud_upper - baud_lower) / 2.f + baud_lower) );
-	// decide which prescaler value is closer to a possible baudrate
-	constexpr uint8_t pre = (pre_raw >= pre_middle) ? pre_ceil : pre_floor;
+	// calculate the half-point between the upper and lower baudrate
+	constexpr uint32_t baud_middle = (baud_upper + baud_lower) / 2;
+	// decide which divisor is closer to a possible baudrate
+	// lower baudrate means higher divisor!
+	constexpr uint8_t nearest = (baudrate < baud_middle) ? div_ceil : div_floor;
 
 	// check if within baudrate tolerance
-	constexpr uint32_t generated_frequency = clockSource::Adc / ( pre );
 	assertBaudrateInTolerance<
-			/* nearest possible value */ generated_frequency,
-			/* desired = */ frequency,
+			SystemClock::Adc / nearest,
+			frequency,
 			tolerance >();
 
 	// translate the prescaler into the bitmapping
