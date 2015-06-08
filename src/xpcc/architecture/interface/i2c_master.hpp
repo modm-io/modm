@@ -64,14 +64,14 @@ public:
 	 * after a master reset.
 	 * This is usually done in the Gpio Scl connect method.
 	 *
-	 * @tparam	clockSource
+	 * @tparam	SystemClock
 	 * 		the currently active system clock
 	 * @tparam	baudrate
 	 * 		the desired baudrate in Hz
 	 * @tparam	tolerance
 	 * 		the allowed absolute tolerance for the resulting baudrate
 	 */
-	template< class clockSource, uint32_t baudrate=Baudrate::Standard,
+	template< class SystemClock, uint32_t baudrate=Baudrate::Standard,
 			uint16_t tolerance = Tolerance::FivePercent >
 	static void
 	initialize();

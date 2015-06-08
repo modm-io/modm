@@ -65,14 +65,14 @@ public:
 	/**
 	 * Initializes the hardware and sets the datarate.
 	 *
-	 * @tparam	clockSource
+	 * @tparam	SystemClock
 	 * 		the currently active system clock
 	 * @tparam	frequency
 	 * 		the desired clock frequency in Hz
 	 * @tparam	tolerance
-	 * 		the allowed absolute tolerance for the resulting clock frequency
+	 * 		the allowed relative tolerance for the resulting clock frequency
 	 */
-	template< class clockSource, uint32_t frequency=200000,
+	template< class SystemClock, uint32_t frequency=200000,
 			uint16_t tolerance = Tolerance::TenPercent >
 	static void
 	initialize();
