@@ -83,7 +83,7 @@ class CppTaskCallerBuilder(builder_base.Builder):
 			'namespace': namespace
 		}
 
-		file = os.path.join(self.options.outpath, 'xpcc_task_caller.hpp')
+		file = os.path.join(self.options.outpath, 'caller.hpp')
 		self.write(file, template.render(substitutions))
 
 # -----------------------------------------------------------------------------
