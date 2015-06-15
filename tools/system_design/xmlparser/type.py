@@ -9,9 +9,9 @@ import utils
 import xml_utils
 
 VALID_UNDERLYING_TYPES_FOR_ENUMS = [
-	'int8_t', 'uint8_t' ]
+	'int8_t', 'uint8_t', 'int16_t', 'uint16_t', 'int32_t', 'uint32_t', 'int64_t', 'uint64_t' ]
 
-# Not allowed are 'int16_t', 'int32_t', 'uint16_t', 'uint32_t' 'char'
+# Not allowed are 'float' and 'char'
 
 class BaseType(object):
 	""" Abstract base class for all types
@@ -170,7 +170,16 @@ class Enum(BaseType):
 
 		# an enum does not depend on other types
 		self.level = 0
-		self.size = 1		# FIXME calculate actual size depending on the value for the enum elements
+		self.size = 1
+		# FIXME calculate actual size depending on the value for the enum elements
+		if '8' in self.underlyingType:
+			self.size = 1
+		elif '16' in self.underlyingType:
+			self.size = 2
+		elif '32' in self.underlyingType:
+			self.size = 4
+		elif '64' in self.underlyingType:
+			self.size = 8
 
 		self.numberOfElements = None
 
