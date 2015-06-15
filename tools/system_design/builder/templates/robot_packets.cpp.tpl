@@ -30,7 +30,7 @@
 xpcc::IOStream&
 {{ namespace }}::packet::operator << (xpcc::IOStream& s, const {{ packet.name | typeName }} e)
 {
-	s << enumToString(e);
+	s << "{{ (packet.name | typeName) ~ "::" }}" << enumToString(e);
 	return s;
 }
 	{% elif packet.flattened().isStruct %}
