@@ -106,3 +106,28 @@ stm32f1_remaps = \
 	'tim2itr1':		{'mask': 1, 'position': 29, 'mapping': [0, 1]},
 	'ptp':			{'mask': 1, 'position': 30, 'mapping': [0, 1]}
 }
+
+stm32_memory = \
+{
+	'f4': {
+		'start': {
+			'flash': 0x08000000,
+			'ccm': 0x10000000,
+			'sram': 0x20000000
+		},
+		'model': [
+			{
+				'names' : ['401', '411'],
+				'memories' : {'flash': -1, 'sram1' : -1}
+			},
+			{
+				'names': ['405', '407', '415', '417'],
+				'memories': {'flash': -1, 'ccm': 64, 'sram1': -1, 'sram2': 16}
+			},
+			{
+				'names': ['427', '429', '437', '439'],
+				'memories': {'flash': -1, 'ccm': 64, 'sram1': -1, 'sram2': 16, 'sram3': 64}
+			}
+		]
+	}
+}

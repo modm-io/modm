@@ -20,6 +20,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'device_files'))
 from device_identifier import DeviceIdentifier
 from stm import stm32_defines
 from stm import stm32f1_remaps
+from stm import stm32_memory
 
 class STMDeviceReader(XMLDeviceReader):
 	""" STMDeviceReader
@@ -77,10 +78,55 @@ class STMDeviceReader(XMLDeviceReader):
 		if len(rams) <= sizeIndex:
 			sizeIndex = 0
 
-		ram = int(rams[sizeIndex].text) * 1024
-		flash = int(self.query("//Flash")[sizeIndex].text) * 1024
+		ram = int(rams[sizeIndex].text)
+		flash = int(self.query("//Flash")[sizeIndex].text)
 		self.addProperty('ram', ram)
 		self.addProperty('flash', flash)
+
+		mem_fam = stm32_memory[self.id.family]
+		mem_model = None
+		for model in mem_fam['model']:
+			if self.id.name in model['names']:
+				mem_model = model
+				break
+		if mem_model == None:
+			self.log.error("STMDeviceReader: Memory model not found for device '{}'".format(self.id.string))
+
+		memories = []
+		# first get the real SRAM1 size
+		for mem, val in mem_model['memories'].items():
+			if '2' in mem or '3' in mem or 'ccm' in mem:
+				ram -= val
+
+		# add all memories
+		for mem, val in mem_model['memories'].items():
+			if '1' in mem:
+				memories.append({'name': 'sram1',
+								 'access' : 'rwx',
+								 'start': "0x{:02X}".format(mem_fam['start']['sram']),
+								 'size': str(ram)})
+			elif '2' in mem:
+				memories.append({'name': 'sram2',
+								 'access' : 'rwx',
+								 'start': "0x{:02X}".format(mem_fam['start']['sram'] + ram*1024),
+								 'size': str(val)})
+			elif '3' in mem:
+				memories.append({'name': 'sram3',
+								 'access': 'rwx',
+								 'start': "0x{:02X}".format(mem_fam['start']['sram'] + ram * 1024 + mem_model['memories']['sram2'] * 1024),
+								 'size': str(val)})
+			elif 'flash' in mem:
+				memories.append({'name': 'flash',
+								 'access': 'rx',
+								 'start': "0x{:02X}".format(mem_fam['start']['flash']),
+								 'size': str(flash)})
+			else:
+				memories.append({'name': mem,
+								 'access': 'rwx',
+								 'start': "0x{:02X}".format(mem_fam['start'][mem]),
+								 'size': str(val)})
+
+		self.addProperty('memories', memories)
 
 		# packaging
 		package = self.query("//@Package")[0]
@@ -100,12 +146,6 @@ class STMDeviceReader(XMLDeviceReader):
 		if self.id.family == 'f4':
 			# required for our FreeRTOS
 			self.addProperty('define', 'STM32F4XX')
-
-		# if self.id.family == 'f3':
-		# 	linkerscript = "%s_%s.ld" % ('stm32f3xx', dev.size_id)
-		# else:
-		# 	linkerscript = "%s_%s.ld" % ('stm32' + dev.family + 'xx', dev.size_id)
-		# self.addProperty('linkerscript', linkerscript)
 
 		gpios = []
 		self.addProperty('gpios', gpios)

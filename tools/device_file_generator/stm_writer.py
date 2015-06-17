@@ -41,6 +41,9 @@ class STMDeviceWriter(XMLDeviceWriter):
 			param_core_child.setAttributes({'name': param_name})
 			param_core_child.setValue(param_name_value[param_name])
 
+		# Memories
+		self.addMemoryToNode(core_child)
+
 		# ADC
 		self.addModuleAttributesToNode(self.root, 'ADC', 'adc', 'stm32f3' if self.device.id.family == 'f3' else 'stm32')
 		# CAN
@@ -117,6 +120,23 @@ class STMDeviceWriter(XMLDeviceWriter):
 				if len(instances) > 0:
 					driver.setAttribute('instances', ",".join(instances))
 
+	def addMemoryToNode(self, node):
+		memories = self.device.getProperty('memories')
+
+		memory = node.addChild('memory')
+		memory.setAttributes({'script': 'stm32' + self.device.id.family})
+
+		for mem in memories.values:
+			sections = mem.value
+
+			for id in mem.ids.differenceFromIds(self.device.ids):
+				attr = self._getAttributeDictionaryFromId(id)
+				for section in sections:
+					memory_section = memory.addChild('section')
+					memory_section.setAttributes(attr)
+					memory_section.setAttributes(section)
+		# sort the node children by start address
+		memory.sort(key=lambda k: (int(k.get('start'), 16)))
 
 	def addGpioToNode(self, node):
 		props = self.device.getProperty('gpios')
