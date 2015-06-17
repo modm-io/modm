@@ -25,6 +25,19 @@ namespace TypeId
 	typedef struct{} FsmcNe1;
 	typedef struct{} FsmcNwait;
 	typedef struct{} FsmcClk;
+
+	typedef struct{} FsmcNreg;
+	typedef struct{} FsmcNiord;
+	typedef struct{} FsmcNiowr;
+	typedef struct{} FsmcCd;
+	typedef struct{} FsmcCle;
+	typedef struct{} FsmcAle;
+	typedef struct{} FsmcIntr;
+	typedef struct{} FsmcInt2;
+	typedef struct{} FsmcInt3;
+	typedef struct{} FsmcNce2;
+	typedef struct{} FsmcNce3;
+	typedef struct{} FsmcNce4;
 %% for ii in range(0, 16)
 	typedef struct{} FsmcD{{ ii }};
 %% endfor
