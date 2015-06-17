@@ -141,15 +141,19 @@ class STMDeviceReader(XMLDeviceReader):
 		self.addProperty('header', 'stm32' + self.id.family + 'xx.h')
 
 		# device defines
-		define = self._getDeviceDefine()
-		if define is None:
-			logger.warn("STMDeviceReader: Define not found for device '{}'".format(self.id.string))
-		else:
-			self.addProperty('define', define)
-
+		defines = []
 		if self.id.family == 'f4':
 			# required for our FreeRTOS
-			self.addProperty('define', 'STM32F4XX')
+			defines.append('STM32F4XX')
+
+		dev_def = self._getDeviceDefine()
+		if dev_def is None:
+			logger.warn("STMDeviceReader: Define not found for device '{}'".format(self.id.string))
+		else:
+			defines.append(dev_def)
+
+		self.addProperty('define', defines)
+
 
 		gpios = []
 		self.addProperty('gpios', gpios)
@@ -165,8 +169,17 @@ class STMDeviceReader(XMLDeviceReader):
 		self.log.debug("Available Modules are:\n" + self._modulesToString())
 
 		for m in self.modules:
-			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'DAC', 'CAN', 'SPI', 'I2C', 'OTG', 'DMA', 'USB', 'FSMC']):
+			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'DAC', 'CAN', 'SPI', 'I2C', 'USB', 'FSMC', 'RNG']):
 				modules.append(m)
+
+		self.dmaFile = None
+		if 'DMA' in self.modules:
+			# lets load additional information about the DMA
+			dma_file = self.query("//IP[@Name='DMA']")[0].get('Version')
+			dma_file = os.path.join(self.rootpath, 'IP', 'DMA-' + dma_file + '_Modes.xml')
+			self.dmaFile = XMLDeviceReader(dma_file, logger)
+			dmas = [d.get('Name') for d in self.dmaFile.query("//IP/ModeLogicOperator/Mode[starts-with(@Name,'DMA')]")]
+			modules.extend(dmas)
 
 		invertMode = {'out': 'in', 'in': 'out', 'io': 'io'}
 		nameToMode = {'rx': 'in', 'tx': 'out', 'cts': 'in', 'rts': 'out', 'ck': 'out',	# Uart
@@ -276,6 +289,14 @@ class STMDeviceReader(XMLDeviceReader):
 						af.update({'id': af_id})
 					afs.append(af)
 
+				if signal.startswith('RCC'):
+					if 'MCO' in signal:
+						af = {'peripheral': 'MCO' + raw_names[2]}
+						af.update({'type': 'out'})
+						if af_id:
+							af.update({'id': af_id})
+						afs.append(af)
+
 				if signal.startswith('I2C'):
 					if name in ['scl', 'sda']:
 						af = {'peripheral' : 'I2cMaster' + instance,
@@ -318,23 +339,23 @@ class STMDeviceReader(XMLDeviceReader):
 							  'id': '0'}
 						afs.append(af)
 
-				if signal.startswith('OTG_FS') and raw_names[2] in ['DM', 'DP']:
+				if signal.startswith('USB_OTG_FS') and raw_names[3] in ['DM', 'DP']:
 					af = {'peripheral' : 'Usb',
-						  'name': raw_names[2].capitalize()}
+						  'name': raw_names[3].capitalize()}
 					if af_id:
 						af.update({'id': af_id})
 					else:
 						af.update({'id': '10'})
 					afs.append(af)
 
-				# if signal.startswith('USB'):
-				# 	af = {'peripheral' : 'Usb',
-				# 		  'name': name.capitalize()}
-				# 	if mode:
-				# 		af.update({'type': mode})
-				# 	if af_id:
-				# 		af.update({'id': af_id})
-				# 	afs.append(af)
+				if signal.startswith('USB_') and raw_names[1] in ['DM', 'DP']:
+					af = {'peripheral': 'Usb',
+						  'name': raw_names[1].capitalize()}
+					if af_id:
+						af.update({'id': af_id})
+					else:
+						af.update({'id': '10'})
+					afs.append(af)
 
 				if signal.startswith('FSMC_'):
 					if not raw_names[1].startswith('DA'):

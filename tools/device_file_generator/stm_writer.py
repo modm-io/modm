@@ -59,6 +59,8 @@ class STMDeviceWriter(XMLDeviceWriter):
 		self.addModuleAttributesToNode(self.root, 'FSMC', 'fsmc')
 		# I2C
 		self.addModuleAttributesToNode(self.root, 'I2C', 'i2c')
+		# Random
+		self.addModuleAttributesToNode(self.root, 'RNG', 'random')
 		# SPI
 		self.addModuleAttributesToNode(self.root, 'SPI', 'spi')
 		self.addModuleAttributesToNode(self.root, ['UART', 'USART'], 'spi', 'stm32_uart')
@@ -83,7 +85,10 @@ class STMDeviceWriter(XMLDeviceWriter):
 				attr = self._getAttributeDictionaryFromId(id)
 				child = node.addChild(name)
 				child.setAttributes(attr)
-				child.setValue(prop.value)
+				if isinstance(prop.value, list):
+					child.setValue(prop.value[0])
+				else:
+					child.setValue(prop.value)
 
 	def addModuleAttributesToNode(self, node, peripheral, name, family=None):
 		if family == None:
