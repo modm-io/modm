@@ -86,9 +86,13 @@ class STMDeviceReader(XMLDeviceReader):
 		mem_fam = stm32_memory[self.id.family]
 		mem_model = None
 		for model in mem_fam['model']:
-			if self.id.name in model['names']:
-				mem_model = model
-				break
+			if any(name.startswith(self.id.name) for name in model['names']):
+				if self.id.name in model['names']:
+					mem_model = model
+					break
+				elif "{}x{}".format(self.id.name, self.id.size_id) in model['names']:
+					mem_model = model
+					break
 		if mem_model == None:
 			self.log.error("STMDeviceReader: Memory model not found for device '{}'".format(self.id.string))
 
