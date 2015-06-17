@@ -19,6 +19,7 @@ from logger import Logger
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'device_files'))
 from device_identifier import DeviceIdentifier
 from stm import stm32_defines
+from stm import stm32f1_remaps
 
 class STMDeviceReader(XMLDeviceReader):
 	""" STMDeviceReader
@@ -138,8 +139,29 @@ class STMDeviceReader(XMLDeviceReader):
 
 		for pin in pins:
 			name = pin.get('Name')
-			pinSignals = self.gpioFile.compactQuery("//GPIO_Pin[@Name='%s']/PinSignal/SpecificParameter[@Name='GPIO_AF']/.." % name)
-			altFunctions = { a.get('Name') : a[0][0].text.replace('GPIO_AF', '')[:2].replace('_','') for a in pinSignals }
+			# F1 does not have pin 'alternate functions' only pin 'remaps' which switch groups of pins
+			if self.id.family == 'f1':
+				pinSignals = self.gpioFile.compactQuery("//GPIO_Pin[@Name='{}']/PinSignal/RemapBlock/..".format(name))
+				rawAltFunctions = {a.get('Name'): a[0].get('Name')[-1:] for a in pinSignals}
+				altFunctions = {}
+				for alt_name in rawAltFunctions:
+					key = alt_name.split('_')[0].lower()
+					if key not in stm32f1_remaps:
+						key += alt_name.split('_')[1].lower()
+					if key in stm32f1_remaps:
+						mask = stm32f1_remaps[key]['mask']
+						pos = stm32f1_remaps[key]['position']
+						value = stm32f1_remaps[key]['mapping'][int(rawAltFunctions[alt_name])]
+						altFunctions[alt_name] = '{},{},{}'.format(pos, mask, value)
+					else:
+						altFunctions[alt_name] = '-1'
+
+
+
+			else:	# F0, F3 and F4
+				pinSignals = self.gpioFile.compactQuery("//GPIO_Pin[@Name='%s']/PinSignal/SpecificParameter[@Name='GPIO_AF']/.." % name)
+				altFunctions = { a.get('Name') : a[0][0].text.replace('GPIO_AF', '')[:2].replace('_','') for a in pinSignals }
+
 			# the analog channels are only available in the Mcu file, not the GPIO file
 			analogSignals = self.compactQuery("//Pin[@Name='{}']/Signal[starts-with(@Name,'ADC')]".format(name))
 			pinSignals.extend(analogSignals)
@@ -156,6 +178,9 @@ class STMDeviceReader(XMLDeviceReader):
 				if len(raw_names) < 2:
 					continue
 				instance = raw_names[0][-1]
+				if not instance.isdigit():
+					instance = ""
+
 				name = raw_names[1].lower()
 				mode = None
 				if name in nameToMode and nameToMode[name] != 'io':
@@ -279,14 +304,13 @@ class STMDeviceReader(XMLDeviceReader):
 			# this sorting only affect the way the debug information is displayed
 			# in stm_writer the AFs are sorted again anyway
 			sorted_afs = [a for a in afs if 'id' in a]
-			sorted_afs.sort(key=lambda k: (int(k['id']), k['peripheral']))
+			sorted_afs.sort(key=lambda k: (int(k['id'].split(',')[0]), k['peripheral']))
 			sorted_afs.extend([a for a in afs if 'id' not in a])
 
 			for af in sorted_afs:
 				af['gpio_port'] = gpio['port']
 				af['gpio_id'] = gpio['id']
 				gpio_afs.append(af)
-
 
 	def _modulesToString(self):
 		string = ""

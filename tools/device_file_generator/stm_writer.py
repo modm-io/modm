@@ -148,7 +148,7 @@ class STMDeviceWriter(XMLDeviceWriter):
 							for key in ['id', 'peripheral', 'name', 'type']	:
 								if key in af_dict['af']:
 									af_child.setAttribute(key, af_dict['af'][key])
-					gpio_child.sort(key=lambda k : (int(k.get('id') or 1e6), k.get('peripheral')))
+					gpio_child.sort(key=lambda k : (int(1e6 if (k.get('id') == None) else k.get('id').split(',')[0]), k.get('peripheral')))
 		# sort the node children by port and id
 		driver.sort(key=lambda k : (k.get('port'), int(k.get('id'))) )
 

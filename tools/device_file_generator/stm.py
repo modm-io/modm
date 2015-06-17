@@ -78,3 +78,31 @@ stm32_defines = \
 		'STM32F411xE',	#STM32F411CD, STM32F411RD, STM32F411VD, STM32F411CE, STM32F411RE and STM32F411VE Devices
 	]
 }
+
+stm32f1_remaps = \
+{
+	'spi1':			{'mask': 1, 'position':  0, 'mapping': [0, 1]},
+	'i2c1':			{'mask': 1, 'position':  1, 'mapping': [0, 1]},
+	'usart1':		{'mask': 1, 'position':  2, 'mapping': [0, 1]},
+	'usart2':		{'mask': 1, 'position':  3, 'mapping': [0, 1]},
+	'usart3':		{'mask': 3, 'position':  4, 'mapping': [0, 1,    3]},
+	'tim1':			{'mask': 3, 'position':  6, 'mapping': [0, 1,    3]},
+	'tim2':			{'mask': 3, 'position':  8, 'mapping': [0, 1, 2, 3]},
+	'tim3':			{'mask': 3, 'position': 10, 'mapping': [0,    2, 3]},
+	'tim4':			{'mask': 1, 'position': 12, 'mapping': [0, 1]},
+	'can':			{'mask': 3, 'position': 13, 'mapping': [0,    2, 3]},
+	'can1': 		{'mask': 3, 'position': 13, 'mapping': [0, 2, 3]},
+	'clock':		{'mask': 1, 'position': 15, 'mapping': [0, 1]},
+	'tim5ch4':		{'mask': 1, 'position': 16, 'mapping': [0, 1]},
+	'adc1etrginj':	{'mask': 1, 'position': 17, 'mapping': [0, 1]},
+	'adc1etrgreg':	{'mask': 1, 'position': 18, 'mapping': [0, 1]},
+	'adc2etrginj':	{'mask': 1, 'position': 19, 'mapping': [0, 1]},
+	'adc2etrgreg':	{'mask': 1, 'position': 20, 'mapping': [0, 1]},
+	'eth':			{'mask': 1, 'position': 21, 'mapping': [0, 1]},
+	'can2':			{'mask': 1, 'position': 22, 'mapping': [0, 1]},
+	'mii':			{'mask': 1, 'position': 23, 'mapping': [0, 1]},
+	'swj':			{'mask': 7, 'position': 24, 'mapping': [0, 1, 2,    4]},
+	'spi3':			{'mask': 1, 'position': 28, 'mapping': [0, 1]},
+	'tim2itr1':		{'mask': 1, 'position': 29, 'mapping': [0, 1]},
+	'ptp':			{'mask': 1, 'position': 30, 'mapping': [0, 1]}
+}
