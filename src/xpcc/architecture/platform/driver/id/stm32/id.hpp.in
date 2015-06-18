@@ -1,0 +1,52 @@
+// coding: utf-8
+/* Copyright (c) 2011-2013, Roboterclub Aachen e.V.
+* All Rights Reserved.
+*
+* The file is part of the xpcc library and is released under the 3-clause BSD
+* license. See the file `LICENSE` for the full license governing this code.
+*/
+// ----------------------------------------------------------------------------
+
+#ifndef XPCC_CORTEX_CORE_HPP
+#define XPCC_CORTEX_CORE_HPP
+
+#include <stdint.h>
+
+namespace xpcc
+{
+
+namespace cortex
+{
+
+typedef void (*InterruptHandler)(void);
+
+/// @ingroup	{{target.string}}_core
+class Core
+{
+public:
+	/**
+	 * Get unique device id (96-bits)
+	 *
+	 * @param offset	0..2
+	 * @return	32-bit of the unique id
+	 */
+	uint32_t
+	getUniqueId(uint8_t offset)
+	{
+		if (offset > 2) return 0;
+%% if target is stm32f2 or target is stm32f3 or target is stm32f4
+		uint32_t *baseaddress = (uint32_t*) 0x1FFF7A10;
+%% elif target is stm32f1
+		uint32_t *baseaddress = (uint32_t*) 0x1FFFF7E8;
+%% else
+# error "Core only supported on STM32F1, F2, F3 and F4. Please port to your target."
+%% endif
+		return *(baseaddress + offset);
+	}
+};
+
+}
+
+}
+
+#endif	// XPCC_CORTEX_CORE_HPP
