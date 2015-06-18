@@ -158,25 +158,6 @@ def platform_tools_generate(env, architecture_path):
 	defines = prop['defines']
 	device_headers = prop['headers']
 
-	if device not in ['darwin', 'linux', 'windows']:
-		# Set Size
-		env['DEVICE_SIZE'] = { "flash": prop['flash'], "ram": prop['ram'], "eeprom": prop['eeprom'] }
-		if (prop['linkerscript'] != ""):
-			# Find Linkerscript:
-			linkerfile = os.path.join(env['XPCC_PLATFORM_PATH'], 'linker', prop['linkerscript'])
-			if not os.path.isfile(linkerfile):
-				linkerfile = os.path.join(env['XPCC_PLATFORM_PATH'], 'linker', prop['target']['platform'], prop['linkerscript'])
-				if not os.path.isfile(linkerfile):
-					env.Error("Linkerscript for %s (%s) could not be found." % (device, linkerfile))
-					Exit(1)
-			linkdir, linkfile = os.path.split(linkerfile)
-			linkdir = linkdir.replace(env['XPCC_ROOTPATH'], "${XPCC_ROOTPATH}")
-			env['LINKPATH'] = str(linkdir)
-			env['LINKFILE'] = str(linkfile)
-		else:
-			env['LINKPATH'] = ""
-			env['LINKFILE'] = ""
-
 	# Loop through Drivers
 	driver_list = []
 	type_id_headers = []
@@ -195,6 +176,9 @@ def platform_tools_generate(env, architecture_path):
 				res = env.Jinja2Template(target = tar, source = src, substitutions = f[2])
 			else:
 				res = env.Command(tar, src, Copy("$TARGET", "$SOURCE"))
+			if 'linker' in src:
+				print src, "=>", tar, ": ", f[2], res
+
 			# check if target is header file
 			if os.path.splitext(tar)[1] in Scanner.HEADER:
 				if not f[1].endswith("_impl.hpp"):
@@ -206,6 +190,25 @@ def platform_tools_generate(env, architecture_path):
 			if os.path.basename(tar) == "type_ids.hpp":
 				type_id_headers.append(f[1]) # append path relative to platform dir
 		driver_list.append(ddic)
+
+	if device not in ['darwin', 'linux', 'windows']:
+		# Set Size
+		env['DEVICE_SIZE'] = { "flash": prop['flash'], "ram": prop['ram'], "eeprom": prop['eeprom'] }
+		if (prop['core'].startswith('cortex')):
+			# Find Linkerscript:
+			linkerfile = os.path.join(env['XPCC_PLATFORM_PATH'], 'linker', prop['linkerscript'])
+			if not os.path.isfile(linkerfile):
+				linkerfile = os.path.join(generated_path, 'driver', 'core', 'cortex', 'linker.ld')
+				if not os.path.isfile(linkerfile):
+					env.Error("Linkerscript for %s (%s) could not be found." % (device, linkerfile))
+			linkdir, linkfile = os.path.split(linkerfile)
+			# linkdir = linkdir.replace(env['XPCC_ROOTPATH'], "${XPCC_ROOTPATH}")
+			print linkerfile, linkdir, linkfile
+			env['LINKPATH'] = str(linkdir)
+			env['LINKFILE'] = str(linkfile)
+		else:
+			env['LINKPATH'] = ""
+			env['LINKFILE'] = ""
 
 	####### Generate Header Templates #########################################
 	# Show SCons how to build the architecture/platform.hpp file:
