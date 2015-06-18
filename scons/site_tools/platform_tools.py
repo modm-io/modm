@@ -135,9 +135,6 @@ def platform_tools_find_device_file(env):
 # env['XPCC_PLATFORM_PATH'] is used for absolute paths
 # architecture_path for relative build paths
 def platform_tools_generate(env, architecture_path):
-# 	# Set some paths used by this file
-	env['XPCC_PLATFORM_GENERATED_PATH_OLD'] = \
-		os.path.join(env['XPCC_LIBRARY_PATH'], 'xpcc', 'architecture', 'generated_platform_' + env['XPCC_DEVICE'])
 
 	env['XPCC_PLATFORM_GENERATED_PATH'] = \
 		os.path.join(env['XPCC_BUILDPATH'], 'generated_platform')
@@ -150,13 +147,8 @@ def platform_tools_generate(env, architecture_path):
 	defines = {}
 	# make paths
 	platform_path = os.path.join(architecture_path, 'platform')
-	old_generated_path = env['XPCC_PLATFORM_GENERATED_PATH_OLD']
 	generated_path = env['XPCC_PLATFORM_GENERATED_PATH']
 
-	#remove the old platform. Delete these lines in a fiew days.
-	#remove also the XPCC_PLATFORM_GENERATED_PATH_OLD
-	if os.path.exists(old_generated_path):
-		Execute(Delete(old_generated_path))
 
 	dev = env['XPCC_DEVICE_FILE']
 
@@ -220,16 +212,11 @@ def platform_tools_generate(env, architecture_path):
 	# each platform will get it's own platform.hpp in 'generated_platform_xxx/include_platform_hack'
 	# Choosing this folder and appending to CPPPATH ensures the usage: #include <xpcc/architecture/platform.hpp>
 
-	#remove the old platform.hpp. Delete these lines in a fiew days.
-	oldTarget = os.path.join(architecture_path, 'platform.hpp')
-	if os.path.exists(oldTarget):
-		Execute(Delete(oldTarget))
-	
 	src = os.path.join(platform_path, 'platform.hpp.in')
 	tar = env.Buildpath(os.path.join(architecture_path, 'platform.hpp'))
 	sub = {'include_path': '../../../generated_platform/drivers.hpp'}
 	env.Template(target = tar, source = src, substitutions = sub)
-	
+
 	#append and return additional CPPPATH
 	cppIncludes = [env.Buildpath('.')]
 	env.AppendUnique(CPPPATH = cppIncludes)
@@ -251,7 +238,7 @@ def platform_tools_generate(env, architecture_path):
 	tar = os.path.join(generated_path, 'type_ids.hpp')
 	sub = {'headers': type_id_headers}
 	env.Jinja2Template(target = tar, source = src, substitutions = sub)
-	
+
 	return sources, defines, cppIncludes
 
 ############## Template Tests #################################################
