@@ -41,8 +41,6 @@
     <driver type="adc" name="stm32f3" instances="1,2,3,4"/>
     <driver type="can" name="stm32" instances="1"/>
     <driver type="clock" name="stm32"/>
-    <driver device-size-id="b|c" device-pin-id="c|r|v" type="dac" name="stm32"/>
-    <driver device-size-id="d|e" device-pin-id="r|v|z" type="dac" name="stm32" instances="1"/>
     <driver type="dma" name="stm32" instances="1,2"/>
     <driver type="i2c" name="stm32" instances="1,2"/>
     <driver device-size-id="d|e" device-pin-id="r|v|z" type="i2c" name="stm32" instances="3"/>

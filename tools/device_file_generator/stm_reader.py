@@ -169,7 +169,7 @@ class STMDeviceReader(XMLDeviceReader):
 		self.log.debug("Available Modules are:\n" + self._modulesToString())
 
 		for m in self.modules:
-			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'DAC', 'CAN', 'SPI', 'I2C', 'USB', 'FSMC', 'RNG']):
+			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'CAN', 'SPI', 'I2C', 'USB', 'FSMC', 'RNG']):
 				modules.append(m)
 
 		if 'CAN' in modules:
