@@ -5,4 +5,4 @@ MEMORY
 	RAM (rwx) : ORIGIN = 0x20000000, LENGTH = 64k
 }
 
-INCLUDE ../../common/memory_sections.ld
+INCLUDE stm32f2xx.ld
