@@ -127,9 +127,7 @@ class STMDeviceWriter(XMLDeviceWriter):
 
 	def addMemoryToNode(self, node):
 		memories = self.device.getProperty('memories')
-
 		memory = node.addChild('memory')
-		memory.setAttributes({'script': 'stm32' + self.device.id.family})
 
 		for mem in memories.values:
 			sections = mem.value
