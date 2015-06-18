@@ -24,7 +24,7 @@
     <define>STM32F4XX</define>
     <driver type="core" name="cortex">
       <parameter name="allocator">newlib</parameter>
-      <memory script="stm32f4">
+      <memory>
         <section device-size-id="g" access="rx" start="0x8000000" name="flash" size="1024"/>
         <section device-size-id="e" access="rx" start="0x8000000" name="flash" size="512"/>
         <section access="rwx" start="0x10000000" name="ccm" size="64"/>
@@ -39,6 +39,7 @@
     <driver type="dma" name="stm32" instances="1,2"/>
     <driver device-pin-id="i|o|v|z" type="fsmc" name="stm32"/>
     <driver type="i2c" name="stm32" instances="1,2,3"/>
+    <driver type="id" name="stm32"/>
     <driver type="random" name="stm32"/>
     <driver type="spi" name="stm32" instances="1,2,3"/>
     <driver type="spi" name="stm32_uart" instances="1,2,3,4,5,6"/>

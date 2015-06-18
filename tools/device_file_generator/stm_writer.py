@@ -22,7 +22,6 @@ class STMDeviceWriter(XMLDeviceWriter):
 
 		self.addDeviceAttributesToNode(self.root, 'flash')
 		self.addDeviceAttributesToNode(self.root, 'ram')
-		self.addDeviceAttributesToNode(self.root, 'linkerscript')
 		self.addDeviceAttributesToNode(self.root, 'core')
 
 		self.addDeviceAttributesToNode(self.root, 'pin-count')
@@ -59,6 +58,8 @@ class STMDeviceWriter(XMLDeviceWriter):
 		self.addModuleAttributesToNode(self.root, 'FSMC', 'fsmc')
 		# I2C
 		self.addModuleAttributesToNode(self.root, 'I2C', 'i2c')
+		# ID
+		self.addModuleAttributesToNode(self.root, 'ID', 'id')
 		# Random
 		self.addModuleAttributesToNode(self.root, 'RNG', 'random')
 		# SPI

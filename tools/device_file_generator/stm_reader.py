@@ -172,6 +172,9 @@ class STMDeviceReader(XMLDeviceReader):
 			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'DAC', 'CAN', 'SPI', 'I2C', 'USB', 'FSMC', 'RNG']):
 				modules.append(m)
 
+		if self.id.family in ['f2', 'f3', 'f4']:
+			modules.append('ID')
+
 		self.dmaFile = None
 		if 'DMA' in self.modules:
 			# lets load additional information about the DMA
