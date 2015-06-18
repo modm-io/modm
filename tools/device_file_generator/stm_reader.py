@@ -172,6 +172,10 @@ class STMDeviceReader(XMLDeviceReader):
 			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'DAC', 'CAN', 'SPI', 'I2C', 'USB', 'FSMC', 'RNG']):
 				modules.append(m)
 
+		if 'CAN' in modules:
+			modules.append('CAN1')
+			modules.remove('CAN')
+
 		if self.id.family in ['f2', 'f3', 'f4']:
 			modules.append('ID')
 
@@ -284,6 +288,8 @@ class STMDeviceReader(XMLDeviceReader):
 					afs.append(af)
 
 				if signal.startswith('CAN'):
+					if instance == '':
+						instance = '1'
 					af = {'peripheral' : 'Can' + instance,
 						  'name': name.capitalize()}
 					if mode:
