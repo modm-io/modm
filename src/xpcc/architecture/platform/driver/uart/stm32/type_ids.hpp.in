@@ -23,6 +23,7 @@ namespace TypeId
 	typedef struct{} Uart{{ id }}Ck;
 	typedef struct{} Uart{{ id }}Rts;
 	typedef struct{} Uart{{ id }}Cts;
+	typedef struct{} Uart{{ id }}De;
 %% endfor
 }
 

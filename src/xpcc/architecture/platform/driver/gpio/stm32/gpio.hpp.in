@@ -231,7 +231,11 @@ public:
 		setOutput();
 	}
 	ALWAYS_INLINE static void set() {
+			%% if target is stm32f3
+		{{reg}}->BSRRL = mask;
+			%% else
 		{{reg}}->BSRR = mask;
+			%% endif
 	}
 	ALWAYS_INLINE static void set(bool status) {
 		if (status) {
@@ -241,7 +245,11 @@ public:
 		}
 	}
 	ALWAYS_INLINE static void reset() {
+			%% if target is stm32f3
+		{{reg}}->BSRRH = mask;
+			%% else
 		{{reg}}->BSRR = (uint32_t(mask) << 16);
+			%% endif
 	}
 	ALWAYS_INLINE static void toggle() {
 		if (isSet()) {

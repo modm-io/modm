@@ -294,7 +294,8 @@ class STMDeviceReader(XMLDeviceReader):
 
 				if signal.startswith('RCC'):
 					if 'MCO' in signal:
-						af = {'peripheral': 'MCO' + raw_names[2]}
+						id = "" if len(raw_names) < 3 else raw_names[2]
+						af = {'peripheral': 'MCO' + id}
 						af.update({'type': 'out'})
 						if af_id:
 							af.update({'id': af_id})
