@@ -26,17 +26,16 @@
         <section access="rwx" start="0x20000000" name="sram1" size="64"/>
       </memory>
     </driver>
-    <driver type="adc" name="stm32" instances="1,2"/>
+    <driver type="adc" name="stm32f1" instances="1,2"/>
     <driver type="can" name="stm32" instances="1,2"/>
     <driver type="clock" name="stm32"/>
-    <driver type="dma" name="stm32" instances="1,2"/>
     <driver type="i2c" name="stm32" instances="1"/>
     <driver device-name="105" type="i2c" name="stm32" instances="2"/>
     <driver type="spi" name="stm32" instances="1,2,3"/>
     <driver type="spi" name="stm32_uart" instances="1,2,3,4,5"/>
     <driver type="timer" name="stm32" instances="1,2,3,4,5,6,7"/>
     <driver type="uart" name="stm32" instances="1,2,3,4,5"/>
-    <driver type="gpio" name="stm32">
+    <driver type="gpio" name="stm32f1">
       <gpio port="A" id="0">
         <af id="3,1,0" peripheral="Uart2" name="Cts" type="in"/>
         <af id="8,3,0" peripheral="Timer2" name="Channel1"/>

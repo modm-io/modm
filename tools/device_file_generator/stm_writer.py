@@ -43,17 +43,23 @@ class STMDeviceWriter(XMLDeviceWriter):
 		# Memories
 		self.addMemoryToNode(core_child)
 
+		adc_map = {'f0': 'stm32f0',
+				   'f1': 'stm32f1',
+				   'f2': 'stm32f2',
+				   'f3': 'stm32f3',
+				   'f4': 'stm32'}
 		# ADC
-		self.addModuleAttributesToNode(self.root, 'ADC', 'adc', 'stm32f3' if self.device.id.family == 'f3' else 'stm32')
+		self.addModuleAttributesToNode(self.root, 'ADC', 'adc', adc_map[self.device.id.family])
 		# CAN
 		self.addModuleAttributesToNode(self.root, 'CAN', 'can')
 		# Clock
 		clock_child = self.root.addChild('driver')
 		clock_child.setAttributes({'type': 'clock', 'name': 'stm32'})
 		# DAC
-		self.addModuleAttributesToNode(self.root, 'DAC', 'dac')
-		# DMA
-		self.addModuleAttributesToNode(self.root, 'DMA', 'dma')
+		# self.addModuleAttributesToNode(self.root, 'DAC', 'dac')
+		if (self.device.id.family in ['f3', 'f4']):
+			# DMA
+			self.addModuleAttributesToNode(self.root, 'DMA', 'dma')
 		# FSMC
 		self.addModuleAttributesToNode(self.root, 'FSMC', 'fsmc')
 		# I2C
@@ -146,7 +152,7 @@ class STMDeviceWriter(XMLDeviceWriter):
 		props = self.device.getProperty('gpios')
 
 		driver = node.addChild('driver')
-		driver.setAttributes({'type': 'gpio', 'name': 'stm32'})
+		driver.setAttributes({'type': 'gpio', 'name': 'stm32f1' if self.device.id.family == 'f1' else 'stm32'})
 
 		for prop in props.values:
 			gpios = prop.value
