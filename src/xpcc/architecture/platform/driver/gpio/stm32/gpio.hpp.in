@@ -524,20 +524,20 @@ public:
 			GPIO{{port.name}}->OTYPER &= ~portMask;
 		}
 		GPIO{{port.name}}->OSPEEDR &= ~portMask2;
-		if (i(speed) == 0x01) {
+		if (i(speed) == 0b01) {
 			GPIO{{port.name}}->OSPEEDR |= port01;
-		} else if (i(speed) == 0x10) {
+		} else if (i(speed) == 0b10) {
 			GPIO{{port.name}}->OSPEEDR |= port10;
-		} else if (i(speed) == 0x11) {
+		} else if (i(speed) == 0b11) {
 			GPIO{{port.name}}->OSPEEDR |= portMask2;
 		}
 	}
 	ALWAYS_INLINE static void configure(InputType type)
 	{
 		GPIO{{port.name}}->PUPDR &= ~portMask2;
-		if (i(type) == 0x01) {
+		if (i(type) == 0b01) {
 			GPIO{{port.name}}->PUPDR |= port01;
-		} else if (i(type) == 0x10) {
+		} else if (i(type) == 0b10) {
 			GPIO{{port.name}}->PUPDR |= port10;
 		}
 	}
