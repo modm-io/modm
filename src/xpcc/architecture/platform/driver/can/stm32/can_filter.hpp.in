@@ -361,7 +361,7 @@ public:
 	static void
 	disableFilter(uint8_t bank);
 
-%% if target is stm32f1 or target is stm32f4
+%% if target is stm32f1 or target is stm32f2 or target is stm32f4
 	/**
 	 * Set the first filter bank for CAN2.
 	 *
