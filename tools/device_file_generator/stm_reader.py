@@ -169,7 +169,7 @@ class STMDeviceReader(XMLDeviceReader):
 		self.log.debug("Available Modules are:\n" + self._modulesToString())
 
 		for m in self.modules:
-			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'CAN', 'SPI', 'I2C', 'USB', 'FSMC', 'RNG']):
+			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'CAN', 'SPI', 'I2C', 'FSMC', 'RNG']):
 				modules.append(m)
 
 		if 'CAN' in modules:
@@ -280,12 +280,12 @@ class STMDeviceReader(XMLDeviceReader):
 					if af_id:
 						af.update({'id': af_id})
 					afs.append(dict(af))
-					invertName = {'miso': 'somi', 'mosi': 'simo', 'nss': 'nss', 'sck': 'sck'}
-					af.update({	'peripheral' : 'SpiSlave' + instance,
-								'name': invertName[name].capitalize()})
-					if mode:
-						af.update({'type': invertMode[nameToMode[name]]})
-					afs.append(af)
+					# invertName = {'miso': 'somi', 'mosi': 'simo', 'nss': 'nss', 'sck': 'sck'}
+					# af.update({	'peripheral' : 'SpiSlave' + instance,
+					# 			'name': invertName[name].capitalize()})
+					# if mode:
+					# 	af.update({'type': invertMode[nameToMode[name]]})
+					# afs.append(af)
 
 				if signal.startswith('CAN'):
 					if instance == '':
@@ -349,23 +349,23 @@ class STMDeviceReader(XMLDeviceReader):
 							  'id': '0'}
 						afs.append(af)
 
-				if signal.startswith('USB_OTG_FS') and raw_names[3] in ['DM', 'DP']:
-					af = {'peripheral' : 'Usb',
-						  'name': raw_names[3].capitalize()}
-					if af_id:
-						af.update({'id': af_id})
-					else:
-						af.update({'id': '10'})
-					afs.append(af)
-
-				if signal.startswith('USB_') and raw_names[1] in ['DM', 'DP']:
-					af = {'peripheral': 'Usb',
-						  'name': raw_names[1].capitalize()}
-					if af_id:
-						af.update({'id': af_id})
-					else:
-						af.update({'id': '10'})
-					afs.append(af)
+				# if signal.startswith('USB_OTG_FS') and raw_names[3] in ['DM', 'DP']:
+				# 	af = {'peripheral' : 'Usb',
+				# 		  'name': raw_names[3].capitalize()}
+				# 	if af_id:
+				# 		af.update({'id': af_id})
+				# 	else:
+				# 		af.update({'id': '10'})
+				# 	afs.append(af)
+				#
+				# if signal.startswith('USB_') and raw_names[1] in ['DM', 'DP']:
+				# 	af = {'peripheral': 'Usb',
+				# 		  'name': raw_names[1].capitalize()}
+				# 	if af_id:
+				# 		af.update({'id': af_id})
+				# 	else:
+				# 		af.update({'id': '10'})
+				# 	afs.append(af)
 
 				if signal.startswith('FSMC_'):
 					if not raw_names[1].startswith('DA'):

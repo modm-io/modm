@@ -29,7 +29,6 @@
     <driver type="adc" name="stm32" instances="1,2"/>
     <driver type="can" name="stm32" instances="1,2"/>
     <driver type="clock" name="stm32"/>
-    <driver type="dac" name="stm32"/>
     <driver type="dma" name="stm32" instances="1,2"/>
     <driver type="i2c" name="stm32" instances="1"/>
     <driver device-name="105" type="i2c" name="stm32" instances="2"/>
@@ -37,7 +36,6 @@
     <driver type="spi" name="stm32_uart" instances="1,2,3,4,5"/>
     <driver type="timer" name="stm32" instances="1,2,3,4,5,6,7"/>
     <driver type="uart" name="stm32" instances="1,2,3,4,5"/>
-    <driver type="usb" name="stm32_fs"/>
     <driver type="gpio" name="stm32">
       <gpio port="A" id="0">
         <af id="3,1,0" peripheral="Uart2" name="Cts" type="in"/>
@@ -68,23 +66,19 @@
       </gpio>
       <gpio port="A" id="4">
         <af id="0,1,0" peripheral="SpiMaster1" name="Nss"/>
-        <af id="0,1,0" peripheral="SpiSlave1" name="Nss"/>
         <af id="3,1,0" peripheral="Uart2" name="Ck" type="out"/>
         <af id="3,1,0" peripheral="UartSpiMaster2" name="Sck" type="out"/>
         <af id="28,1,1" peripheral="SpiMaster3" name="Nss"/>
-        <af id="28,1,1" peripheral="SpiSlave3" name="Nss"/>
         <af peripheral="Adc1" name="Channel4" type="analog"/>
         <af peripheral="Adc2" name="Channel4" type="analog"/>
       </gpio>
       <gpio port="A" id="5">
         <af id="0,1,0" peripheral="SpiMaster1" name="Sck" type="out"/>
-        <af id="0,1,0" peripheral="SpiSlave1" name="Sck" type="in"/>
         <af peripheral="Adc1" name="Channel5" type="analog"/>
         <af peripheral="Adc2" name="Channel5" type="analog"/>
       </gpio>
       <gpio port="A" id="6">
         <af id="0,1,0" peripheral="SpiMaster1" name="Miso" type="in"/>
-        <af id="0,1,0" peripheral="SpiSlave1" name="Somi" type="out"/>
         <af id="6,3,1" peripheral="Timer1" name="BreakIn" type="in"/>
         <af id="10,3,0" peripheral="Timer3" name="Channel1"/>
         <af peripheral="Adc1" name="Channel6" type="analog"/>
@@ -92,7 +86,6 @@
       </gpio>
       <gpio port="A" id="7">
         <af id="0,1,0" peripheral="SpiMaster1" name="Mosi" type="out"/>
-        <af id="0,1,0" peripheral="SpiSlave1" name="Simo" type="in"/>
         <af id="6,3,1" peripheral="Timer1" name="Channel1N"/>
         <af id="10,3,0" peripheral="Timer3" name="Channel2"/>
         <af peripheral="Adc1" name="Channel7" type="analog"/>
@@ -123,11 +116,9 @@
       <gpio port="A" id="14"/>
       <gpio port="A" id="15">
         <af id="0,1,1" peripheral="SpiMaster1" name="Nss"/>
-        <af id="0,1,1" peripheral="SpiSlave1" name="Nss"/>
         <af id="8,3,3" peripheral="Timer2" name="Channel1"/>
         <af id="8,3,1" peripheral="Timer2" name="ExternalTrigger" type="in"/>
         <af id="28,1,0" peripheral="SpiMaster3" name="Nss"/>
-        <af id="28,1,0" peripheral="SpiSlave3" name="Nss"/>
       </gpio>
       <gpio port="B" id="0">
         <af id="6,3,1" peripheral="Timer1" name="Channel2N"/>
@@ -144,25 +135,19 @@
       <gpio port="B" id="2"/>
       <gpio port="B" id="3">
         <af id="0,1,1" peripheral="SpiMaster1" name="Sck" type="out"/>
-        <af id="0,1,1" peripheral="SpiSlave1" name="Sck" type="in"/>
         <af id="8,3,1" peripheral="Timer2" name="Channel2"/>
         <af id="28,1,0" peripheral="SpiMaster3" name="Sck" type="out"/>
-        <af id="28,1,0" peripheral="SpiSlave3" name="Sck" type="in"/>
       </gpio>
       <gpio port="B" id="4">
         <af id="0,1,1" peripheral="SpiMaster1" name="Miso" type="in"/>
-        <af id="0,1,1" peripheral="SpiSlave1" name="Somi" type="out"/>
         <af id="10,3,2" peripheral="Timer3" name="Channel1"/>
         <af id="28,1,0" peripheral="SpiMaster3" name="Miso" type="in"/>
-        <af id="28,1,0" peripheral="SpiSlave3" name="Somi" type="out"/>
       </gpio>
       <gpio port="B" id="5">
         <af id="0,1,1" peripheral="SpiMaster1" name="Mosi" type="out"/>
-        <af id="0,1,1" peripheral="SpiSlave1" name="Simo" type="in"/>
         <af id="10,3,2" peripheral="Timer3" name="Channel2"/>
         <af id="22,1,1" peripheral="Can2" name="Rx" type="in"/>
         <af id="28,1,0" peripheral="SpiMaster3" name="Mosi" type="out"/>
-        <af id="28,1,0" peripheral="SpiSlave3" name="Simo" type="in"/>
       </gpio>
       <gpio port="B" id="6">
         <af id="1,1,0" peripheral="I2cMaster1" name="Scl" type="out"/>
@@ -255,19 +240,16 @@
         <af id="4,3,1" peripheral="Uart3" name="Tx" type="out"/>
         <af id="4,3,1" peripheral="UartSpiMaster3" name="Mosi" type="out"/>
         <af id="28,1,1" peripheral="SpiMaster3" name="Sck" type="out"/>
-        <af id="28,1,1" peripheral="SpiSlave3" name="Sck" type="in"/>
       </gpio>
       <gpio port="C" id="11">
         <af id="4,3,1" peripheral="Uart3" name="Rx" type="in"/>
         <af id="4,3,1" peripheral="UartSpiMaster3" name="Miso" type="in"/>
         <af id="28,1,1" peripheral="SpiMaster3" name="Miso" type="in"/>
-        <af id="28,1,1" peripheral="SpiSlave3" name="Somi" type="out"/>
       </gpio>
       <gpio port="C" id="12">
         <af id="4,3,1" peripheral="Uart3" name="Ck" type="out"/>
         <af id="4,3,1" peripheral="UartSpiMaster3" name="Sck" type="out"/>
         <af id="28,1,1" peripheral="SpiMaster3" name="Mosi" type="out"/>
-        <af id="28,1,1" peripheral="SpiSlave3" name="Simo" type="in"/>
       </gpio>
       <gpio port="C" id="13"/>
       <gpio port="C" id="14"/>
