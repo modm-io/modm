@@ -58,13 +58,18 @@ public:
 	static void
 	initialize()
 	{
+%% if target is not stm32f1
 		constexpr UartBase::OversamplingMode oversample =
 				UartBaudrate::getOversamplingMode(clockSource::Usart{{ id }}, baudrate);
-
+%% endif
 		UsartHal{{ id }}::initializeWithBrr(
 				UartBaudrate::getBrr<clockSource::Usart{{ id }}, baudrate, tolerance>(),
+%% if target is stm32f1
+				UsartHal{{ id }}::Parity::Disabled);
+%% else
 				UsartHal{{ id }}::Parity::Disabled,
 				oversample);
+%% endif
 
 		UsartHal{{ id }}::setLastBitClockPulse(UsartHal{{ id }}::LastBitClockPulse::Output);
 		UsartHal{{ id }}::setSpiClock(UsartHal{{ id }}::SpiClock::Enabled);

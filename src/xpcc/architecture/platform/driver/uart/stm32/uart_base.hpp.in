@@ -65,7 +65,7 @@ public:
 %%	set reg = "ISR"
 		/// Set if match character is received.
 		CharacterMatch	= USART_{{reg}}_CMF,
-%% elif target is stm32f2 or target is stm32f4
+%% else
 %%	set reg = "SR"
 %% endif
 		/// Set if the transmit data register is empty.
@@ -100,13 +100,14 @@ public:
 		///< clock inverted, sample on rising edge
 	};
 
+%% if target is not stm32f1
 	enum class
 	OversamplingMode : uint32_t
 	{
 		By16 = 0b0,
 		By8  = USART_CR1_OVER8,
 	};
-
+%% endif
 	enum class
 	LastBitClockPulse : uint32_t
 	{

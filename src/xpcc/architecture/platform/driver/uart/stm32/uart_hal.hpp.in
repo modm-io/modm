@@ -76,6 +76,7 @@ public:
 	static void
 	initialize(	Parity parity = Parity::Disabled);
 
+%% if target is not stm32f1
 	/**
 	 * Initialize Uart HAL Peripheral
 	 *
@@ -86,6 +87,7 @@ public:
 				OversamplingMode oversample = OversamplingMode::By16 >
 	static void
 	initialize(	Parity parity = Parity::Disabled);
+%% endif
 
 
 	/**
@@ -96,12 +98,16 @@ public:
 	*/
 	static void
 	initializeWithBrr(uint16_t brr,
+%% if target is stm32f1
+			Parity parity);
+%% else
 			Parity parity,
 			OversamplingMode oversample);
 
 	/// Choose if you want to oversample by 16 (_default_) or by 8
 	static inline void
 	setOversamplingMode(OversamplingMode mode);
+%% endif
 %% if id in [1, 2, 3, 6]
 	// Methods needed to use this Usart Peripheral for SPI
 	static inline void

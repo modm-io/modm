@@ -61,13 +61,19 @@ template< 	class clockSource, uint32_t baudrate,
 	initialize(Parity parity = Parity::Disabled)
 %% endif
 	{
+%% if target is not stm32f1
 		constexpr UartBase::OversamplingMode oversample =
 				UartBaudrate::getOversamplingMode(clockSource::{{ uart ~ id }}, baudrate);
+%% endif
 
 		{{ hal }}::initializeWithBrr(
 				UartBaudrate::getBrr<clockSource::{{ uart ~ id }}, baudrate, tolerance>(),
+%% if target is stm32f1
+				parity);
+%% else
 				parity,
 				oversample);
+%% endif
 %% if parameters.buffered
 		initializeBuffered(interruptPriority);
 %% endif
