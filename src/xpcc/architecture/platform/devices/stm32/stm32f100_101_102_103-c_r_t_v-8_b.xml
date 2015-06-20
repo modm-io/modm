@@ -11,7 +11,7 @@
     <ram device-name="101|102" device-size-id="8">10240</ram>
     <ram device-name="101|102" device-size-id="b">16384</ram>
     <ram device-name="103">20480</ram>
-    <linkerscript device-name="100" device-size-id="8">stm32f100_b.ld</linkerscript>
+    <linkerscript device-name="100" device-size-id="b">stm32f100_b.ld</linkerscript>
     <linkerscript device-name="101" device-size-id="8">stm32f101_8.ld</linkerscript>
     <core>cortex-m3</core>
     <pin-count device-pin-id="v">100</pin-count>
