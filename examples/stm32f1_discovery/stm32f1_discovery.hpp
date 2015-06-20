@@ -17,6 +17,7 @@
 #define XPCC_STM32_F1_DISCOVERY_HPP
 
 using namespace xpcc::stm32;
+using namespace xpcc::cortex;
 
 typedef GpioOutputC9  LedLeft;
 typedef GpioOutputC8  LedRight;

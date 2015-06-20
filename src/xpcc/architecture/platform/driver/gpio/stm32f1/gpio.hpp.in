@@ -320,7 +320,7 @@ public:
 					%% if af.type == "analog"
 		setAnalogInput();
 					%% else
-						%% if af.type|string == 'out'
+						%% if af.type == 'out'
 		configure(OutputType(i(OutputType::PushPull) | 0x8), OutputSpeed::MHz50);
 						%% else
 		configure(InputType::Floating);
@@ -366,8 +366,8 @@ public:
 	/// Connect to `{{peripheral}}`.
 	ALWAYS_INLINE static void
 	connect(::xpcc::TypeId::{{ peripheral }}) {
-		configure(OutputType::PushPull);
 		set();
+		configure(OutputType::PushPull);
 	}
 			%% endfor
 		%% endif
@@ -381,7 +381,7 @@ public:
 		I2c::resetDevices< {{name}} >();
 				%% endif
 		set();
-		setOutput(OutputType::OpenDrain);
+		configure(OutputType::OpenDrain);
 	}
 			%% endfor
 		%% endif
