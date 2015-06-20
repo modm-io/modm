@@ -181,8 +181,10 @@ private:
 	static constexpr int64_t Mmin =   2;	///< Multiplier Max
 	static constexpr int64_t Mmax =  16;	///< Multiplier Min
 	// Max/Min Pll Output Frequency
-	static constexpr int64_t PllOutputMin = MHz16;
+	static constexpr int64_t PllOutputMin = MHz8;
 	static constexpr int64_t PllOutputMax = MHz72;
+
+	static constexpr int64_t Input = FixedDivideBy2 ? InputFrequency / 2 : InputFrequency;
 
 //------------------------------- PllP(redivider) ------------------------------
 	static constexpr int64_t
@@ -204,14 +206,14 @@ private:
 	pllM(int64_t p)
 	{
 		// SystemFrequency = m * InputFrequency / p
-		return SystemFrequency * p / InputFrequency;
+		return SystemFrequency * p / Input;
 	}
 
 	static constexpr int64_t
 	checkM(int64_t p, int64_t m)
 	{
 		// SystemFrequency = m * InputFrequency / divisor
-		return ((m >= Mmin && m <= Mmax) and (InputFrequency * m / p) == SystemFrequency);
+		return ((m >= Mmin && m <= Mmax) and (Input * m / p) == SystemFrequency);
 	}
 
 	static constexpr int64_t
@@ -225,7 +227,7 @@ private:
 	calculateDivisor(int64_t m)
 	{
 		// SystemFrequency = m * InputFrequency / divisor
-		return SystemFrequency / m / InputFrequency;
+		return SystemFrequency / m / Input;
 	}
 
 	/// Internal Pll Constants Representation
@@ -237,7 +239,7 @@ public:
 	static constexpr uint8_t PllPrediv = (_PllP > 0)? static_cast<uint8_t>(_PllP)  : 0xff;
 	static constexpr uint8_t PllPrediv2 = 1;
 	/// Resulting Frequencies
-	static constexpr int64_t SystemClock = _PllM * InputFrequency / _PllP;
+	static constexpr int64_t SystemClock = _PllM * Input / _PllP;
 	/// USB needs 48 MHz clock input.
 	static constexpr bool CanUseUSB =
 			((SystemFrequency == MHz48) || (SystemFrequency == MHz72));
@@ -246,13 +248,13 @@ public:
 private:
 	// Static Asserts
 	// Check SystemFrequency range (see STM32F302xx Reference Manual p. 101)
-	static_assert(SystemFrequency >= PllOutputMin && SystemFrequency <= PllOutputMax,
+	static_assert(SystemFrequency >= PllOutputMin and SystemFrequency <= PllOutputMax,
 		"Pll Output Freqeuncy needs to be between 16MHz and 72MHz."
 		"Please consult your STM32's Reference Manual page.");
 	// Check Ranges
-	static_assert(PllPrediv >= Pmin && PllPrediv <= Pmax,
+	static_assert(PllPrediv >= Pmin and PllPrediv <= Pmax,
 		"PllPREDIV is out of range!");
-	static_assert(PllMul >= Mmin && PllMul <= Mmax,
+	static_assert(PllMul >= Mmin and PllMul <= Mmax,
 		"PllM is out of range!");
 	// Check if desired clock frequency is met
 	static_assert(SystemClock == SystemFrequency,

@@ -123,10 +123,13 @@ xpcc::stm32::ClockTree::enablePll(PllSource source,
 bool
 xpcc::stm32::ClockTree::switchSystemClockTo(SystemClockSource src, uint32_t waitCycles)
 {
-	uint32_t t = waitCycles;
-	while (!(RCC->CR & RCC_CR_PLLRDY)) {
-		if (!(--t)) {
-			return false;
+	if (src == SystemClockSource::Pll)
+	{
+		uint32_t t = waitCycles;
+		while (not (RCC->CR & RCC_CR_PLLRDY))
+		{
+			if (not t--)
+				return false;
 		}
 	}
 
@@ -136,25 +139,29 @@ xpcc::stm32::ClockTree::switchSystemClockTo(SystemClockSource src, uint32_t wait
 	// APB2 60MHz, APB1 30MHz, AHB 120MHz, select PLL as source
 %% endif
 
-	RCC->CFGR =
-			(RCC->CFGR & ~0x0000ffff) | // Try to generate a halfword write
-			((
+	uint32_t tmp = RCC->CFGR;
+	tmp &= ~0x00003fff;
 %% if target is stm32f2 or target is stm32f4
-			RCC_CFGR_PPRE1_DIV4 |
-			RCC_CFGR_PPRE2_DIV2 |
+	tmp |= RCC_CFGR_PPRE1_DIV4;
+	tmp |= RCC_CFGR_PPRE2_DIV2;
 %% elif target is stm32f1 and target.name == '100'
-			RCC_CFGR_PPRE1_DIV1 | /* APB1   = 24 / 1 = 24 MHz */
-			RCC_CFGR_PPRE2_DIV1 | /* APB2   = 24 / 1 = 24 MHz */
+	tmp |= RCC_CFGR_PPRE1_DIV1;	// APB1   = 24 / 1 = 24 MHz
+	tmp |= RCC_CFGR_PPRE2_DIV1; // APB2   = 24 / 1 = 24 MHz
 %% elif target is stm32f1 or target is stm32f3
-			RCC_CFGR_PPRE1_DIV2 | /* APB1   = 72 / 2 = 36 MHz */
-			RCC_CFGR_PPRE2_DIV1 | /* APB2   = 72 / 1 = 72 MHz */
+	tmp |= RCC_CFGR_PPRE1_DIV2;	// APB1   = 72 / 2 = 36 MHz
+	tmp |= RCC_CFGR_PPRE2_DIV1; // APB2   = 72 / 1 = 72 MHz
 %% endif
-			RCC_CFGR_HPRE_DIV1  |
-			static_cast<uint32_t>(src)
-			) & 0x0000ffff);
+
+	tmp |= RCC_CFGR_HPRE_DIV1; //
+	tmp |= uint32_t(src);
+	RCC->CFGR = tmp;
 
 	// Wait till the main PLL is used as system clock source
-	while ((RCC->CFGR & (uint32_t) RCC_CFGR_SWS) != (static_cast<uint32_t>(src) << 2));
+	while ((RCC->CFGR & (uint32_t) RCC_CFGR_SWS) != (static_cast<uint32_t>(src) << 2))
+	{
+		if (not --waitCycles)
+			return false;
+	}
 
 	return true;
 }
