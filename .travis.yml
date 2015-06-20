@@ -26,6 +26,7 @@ env:
  - TEST_SUITE="check=examples examples=linux"
  - TEST_SUITE="check=examples examples=lpcxpresso"
  - TEST_SUITE="check=examples examples=stm32"
+ - TEST_SUITE="check=examples examples=stm32f1_discovery"
  - TEST_SUITE="check=examples examples=stm32f3_discovery"
  - TEST_SUITE="check=examples examples=stm32f4_discovery"
  - TEST_SUITE="check=examples examples=stm32f4_loa_v2b"
