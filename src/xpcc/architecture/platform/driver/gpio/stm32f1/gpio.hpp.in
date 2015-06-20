@@ -122,11 +122,19 @@ public:
 	/// Bitmask for registers that contain a 1bit value for every pin.
 	static constexpr uint16_t mask  = 0x1 << pin;
 private:
-	static constexpr uint8_t cr_pin = {{pin % 8}};
+	static constexpr uint8_t cr_pin = {{ pin }} % 8;
 	/// Bitmask for the configuration register with a 4bit mask.
 	static constexpr uint32_t mask4 = 0xf << (cr_pin * 4);
 	/// Port Number.
 	static constexpr uint8_t port_nr = static_cast<uint8_t>(port);
+
+%% if pin|int in range(0,5)
+	static constexpr IRQn_Type ExternalInterruptIRQ = EXTI{{pin}}_IRQn;
+%% elif pin|int in range(5,10)
+	static constexpr IRQn_Type ExternalInterruptIRQ = EXTI9_5_IRQn;
+%% elif pin|int in range(10,16)
+	static constexpr IRQn_Type ExternalInterruptIRQ = EXTI15_10_IRQn;
+%% endif
 
 	/// Enable Analog Mode which is needed to use this pin as an ADC input.
 	ALWAYS_INLINE static void
@@ -142,14 +150,14 @@ public:
 	}
 	ALWAYS_INLINE static void configure(InputType type) {
 		{{reg}}->{{cr}}  = ({{reg}}->{{cr}}  & ~mask4)  | ((i(type) & 0xc0) << (cr_pin * 4));
-		if (type == InputType::PullUp) set();
-		else reset();
+		if (type == InputType::PullUp) {{reg}}->BSRR = mask;
+		else {{reg}}->BRR = mask;
 	}
 		%% for af in gpio.afs
 			%% if af.type == "analog"
 	/// {{name}} connects to {{af.name}} of {{af.peripheral}}
-	static const ::xpcc::stm32::{{af.peripheral}}::Channel
-	{{af.peripheral}}Channel = ::xpcc::stm32::{{af.peripheral}}::Channel::{{ af.name }};
+	//static const ::xpcc::stm32::{{af.peripheral}}::Channel
+	//{{af.peripheral}}Channel = ::xpcc::stm32::{{af.peripheral}}::Channel::{{ af.name }};
 			%% endif
 		%% endfor
 		%% if type in ["" , "Output"]
@@ -278,7 +286,7 @@ public:
 	// start documentation inherited
 	ALWAYS_INLINE static Direction getDirection() {
 		uint32_t mode = ({{reg}}->{{cr}} & mask4);
-		if ((mode == 0) or (mode > (0b1001 << (cr_pin * 4))))
+		if ((mode == 0) or (mode > (uint32_t(0b1001) << (cr_pin * 4))))
 			return Direction::Special;
 		if (mode > 0)
 			return Direction::Out;
@@ -291,8 +299,16 @@ public:
 	}
 	// connect: Hardware Gpio
 		%% for af in gpio.afs
-			%% set afpos, afmask, afval = af.id.split(',')
-			%% set enableAlternatFunction = "AFIO->MAPR = (AFIO->MAPR & ~(" ~ afmask ~ " << " ~ afpos ~ ") | (" ~ afval ~ " << " ~ afpos ~ ");"
+			%% if af.id == "-1" or af.type == "analog":
+				%% set enableAlternateFunction = ""
+			%% else
+				%% set af_all = ("" ~ af.id) | split(',')
+				%% set afpos = af_all[0]
+				%% set afmask = af_all[1]
+				%% set afval = af_all[2]
+				%% set enableAlternateFunction = "AFIO->MAPR = (AFIO->MAPR & ~(" ~ afmask ~ " << " ~ afpos ~ ")) | (" ~ afval ~ " << " ~ afpos ~ ");"
+			%% endif
+
 			%% set use = not (	(af.type == "in"     and type == "Output") or
 								(af.type == "analog" and type == "Output") or
 								(af.type == "out"    and type == "Input" ))
@@ -304,6 +320,11 @@ public:
 					%% if af.type == "analog"
 		setAnalogInput();
 					%% else
+						%% if af.type|string == 'out'
+		configure(OutputType(i(OutputType::PushPull) | 0x8), OutputSpeed::MHz50);
+						%% else
+		configure(InputType::Floating);
+						%% endif
 		{{ enableAlternateFunction }}
 					%% endif
 	}

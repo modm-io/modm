@@ -13,39 +13,32 @@ extern "C"
 void
 xpcc_gpio_enable(void)
 {
-	// FIXME: add possibility to switch individual clocks on and off
-%% if target is stm32f2 or target is stm32f4
-%%	set clock_tree = 'AHB1'
-%% elif target is stm32f0 or target is stm32f3
-%%	set clock_tree = 'AHB'
-%% endif
-
 	// Enable GPIO clock
-	RCC->{{ clock_tree }}ENR  |=
+	RCC->APB2ENR  |=
 %% for port in gpios|xpcc.values('port')|sort
 %%	if not loop.last
-		RCC_{{ clock_tree }}ENR_GPIO{{ port }}EN |
+		RCC_APB2ENR_IOP{{ port }}EN |
 %%	else
-		RCC_{{ clock_tree }}ENR_GPIO{{ port }}EN;
+		RCC_APB2ENR_IOP{{ port }}EN;
 %%	endif
 %% endfor
 
 	// Reset GPIO peripheral
-	RCC->{{ clock_tree }}RSTR |=
+	RCC->APB2RSTR |=
 %% for port in gpios|xpcc.values('port')|sort
 %%	if not loop.last
-		RCC_{{ clock_tree }}RSTR_GPIO{{ port }}RST |
+		RCC_APB2RSTR_IOP{{ port }}RST |
 %%	else
-		RCC_{{ clock_tree }}RSTR_GPIO{{ port }}RST;
+		RCC_APB2RSTR_IOP{{ port }}RST;
 %%	endif
 %% endfor
 
-	RCC->{{ clock_tree }}RSTR &= ~(
+	RCC->APB2RSTR &= ~(
 %% for port in gpios|xpcc.values('port')|sort
 %%	if not loop.last
-		RCC_{{ clock_tree }}RSTR_GPIO{{ port }}RST |
+		RCC_APB2RSTR_IOP{{ port }}RST |
 %%	else
-		RCC_{{ clock_tree }}RSTR_GPIO{{ port }}RST);
+		RCC_APB2RSTR_IOP{{ port }}RST);
 %%	endif
 %% endfor
 }
