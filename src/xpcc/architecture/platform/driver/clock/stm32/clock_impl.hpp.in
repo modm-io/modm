@@ -33,10 +33,8 @@
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::stm32::ClockTree::enableSource(ClockSource src, uint32_t kHz, uint32_t waitCycles)
+xpcc::stm32::ClockTree::enableSource(ClockSource src, uint32_t /*kHz*/, uint32_t waitCycles)
 {
-	(void)(kHz);
-
 	if (src == ClockSource::InternalClock)
 		return true;	// InternalClock is always on
 	if (src == ClockSource::ExternalClock) {
@@ -95,32 +93,48 @@ xpcc::stm32::ClockTree::enablePll(PllSource source, uint8_t pllM,
 	// enable pll
 	RCC->CR |= RCC_CR_PLLON;
 }
-%% elif target is stm32f3
+%% else
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::ClockTree::enablePll(PllSource source, UsbPrescaler usb,
+xpcc::stm32::ClockTree::enablePll(PllSource source,
+%% if usbprescaler is defined
+			UsbPrescaler usb,
+%% endif
+%% if pllprediv2 is defined
+			uint8_t pllMul, uint8_t pllPrediv, uint8_t pllPrediv2)
+%% elif pllprediv is defined
 			uint8_t pllMul, uint8_t pllPrediv)
+%% else
+			uint8_t pllMul)
+%% endif
 {
-	uint32_t tmp = 0;
-
+%% set pullmul = 'RCC_CFGR_PLLMULL' if target is stm32f1 else 'RCC_CFGR_PLLMUL'
 	// Read reserved values and clear all other values
-	tmp = RCC->CFGR & ~(RCC_CFGR_USBPRE | RCC_CFGR_PLLMUL | RCC_CFGR_PLLSRC);
+%% if usbprescaler is defined
+	uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_USBPRE | {{pullmul}} | RCC_CFGR_PLLSRC);
+
+	// Divide Output for USB Clock by 1.5?
+	tmp |= static_cast<uint32_t>(usb);
+%% else
+	uint32_t tmp = RCC->CFGR & ~({{pullmul}} | RCC_CFGR_PLLSRC);
+%% endif
 
 	// PLLSRC source for pll
 	tmp |= static_cast<uint32_t>(source);
 
-	// Divide Output for USB Clock by 1.5?
-	tmp |= static_cast<uint32_t>(usb);
-
 	// Pll multiplication factor
-	tmp |= (static_cast<uint32_t>(pllMul - 2) << 18) & RCC_CFGR_PLLMUL;
+	tmp |= (static_cast<uint32_t>(pllMul - 2) << 18) & {{pullmul}};
 
 	RCC->CFGR = tmp;
 
+%% if pllprediv is defined
+	%% set mask = 'RCC_CFGR2_PREDIV1' if target is stm32f1 else 'RCC_CFGR2_PREDIV'
 	// HSE PREDIV division factor
-	RCC->CFGR2 = (RCC->CFGR2 & ~(RCC_CFGR2_PREDIV)) |
-					(static_cast<uint32_t>(pllPrediv - 1) & RCC_CFGR2_PREDIV);
-
+	RCC->CFGR2 = (RCC->CFGR2 & ~({{mask}})) | (uint32_t(pllPrediv - 1) & {{mask}});
+%% endif
+%% if pllprediv2 is defined
+	RCC->CFGR2 = (RCC->CFGR2 & ~(RCC_CFGR2_PREDIV2)) | ((uint32_t(pllPrediv2 - 1) << 4) & RCC_CFGR2_PREDIV2);
+%% endif
 	// enable pll
 	RCC->CR |= RCC_CR_PLLON;
 }
@@ -144,12 +158,12 @@ xpcc::stm32::ClockTree::switchSystemClockTo(SystemClockSource src, uint32_t wait
 %% endif
 
 	RCC->CFGR =
-			(RCC->CFGR & 0xffff0000) | // Try to generate a halfword write
+			(RCC->CFGR & ~0x0000ffff) | // Try to generate a halfword write
 			((
 %% if target is stm32f2 or target is stm32f4
 			RCC_CFGR_PPRE1_DIV4 |
 			RCC_CFGR_PPRE2_DIV2 |
-%% elif target is stm32f3
+%% elif target is stm32f1 or target is stm32f3
 			RCC_CFGR_PPRE1_DIV2 | /* APB1   = 72 / 2 = 36 MHz */
 			RCC_CFGR_PPRE2_DIV1 | /* APB2   = 72 / 1 = 72 MHz */
 %% endif

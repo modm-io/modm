@@ -7,5 +7,9 @@
 		<template>clock.hpp.in</template>
 		<static>pll_calculator.hpp</static>
 		<static>type_ids.hpp</static>
+
+		<usbprescaler device-name="042|048|070|072|078|102|103|302|303|373">True</usbprescaler>
+		<pllprediv device-family="f0|f3">True</pllprediv>
+		<pllprediv device-name="100|105|107">True</pllprediv>
 	</driver>
 </rca>

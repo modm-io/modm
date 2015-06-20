@@ -216,8 +216,7 @@ namespace xpcc
 			static constexpr int64_t
 			calculatePllP(int64_t p = Pmin)
 			{
-				return (FixedDivideBy2)? (checkP(p)? p : -1) :
-						(checkP(p)? p : ((p < Pmax)? calculatePllP(p + 1) : -1));
+				return (FixedDivideBy2) ? (checkP(p)? p : -1) : (checkP(p)? p : ((p < Pmax)? calculatePllP(p + 1) : -1));
 			}
 
 //------------------------------- PllM -----------------------------------------
@@ -232,8 +231,7 @@ namespace xpcc
 			checkM(int64_t p, int64_t m)
 			{
 				// SystemFrequency = m * InputFrequency / divisor
-				return ((m >= Mmin && m <= Mmax) &&
-						(InputFrequency * m / p) == SystemFrequency);
+				return ((m >= Mmin && m <= Mmax) and (InputFrequency * m / p) == SystemFrequency);
 			}
 
 			static constexpr int64_t
@@ -257,9 +255,9 @@ namespace xpcc
 			/// Pll Constants casted to the correct datatype
 			static constexpr uint8_t PllMul = (_PllM > 0)? static_cast<uint8_t>(_PllM)  : 0xff;
 			static constexpr uint8_t PllPrediv = (_PllP > 0)? static_cast<uint8_t>(_PllP)  : 0xff;
+			static constexpr uint8_t PllPrediv2 = 1;
 			/// Resulting Frequencies
-			static constexpr int64_t SystemClock =
-											_PllM * InputFrequency / _PllP;
+			static constexpr int64_t SystemClock = _PllM * InputFrequency / _PllP;
 			/// USB needs 48 MHz clock input.
 			static constexpr bool CanUseUSB =
 					((SystemFrequency == MHz48) || (SystemFrequency == MHz72));

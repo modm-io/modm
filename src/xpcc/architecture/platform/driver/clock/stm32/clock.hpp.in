@@ -97,7 +97,13 @@ namespace xpcc
 				Hsi = RCC_CFGR_PLLSRC_HSI_DIV2,
 				/// High speed external clock (see HseConfig)
 				Hse = RCC_CFGR_PLLSRC_HSE_PREDIV,
+%% elif target is stm32f1
+				/// High speed internal clock (8 MHz)
+				Hsi = 0,
+				/// High speed external clock (see HseConfig)
+				Hse = RCC_CFGR_PLLSRC,
 %% endif
+
 				InternalClock = Hsi,
 				ExternalClock = Hse,
 				ExternalCrystal = Hse,
@@ -128,18 +134,21 @@ namespace xpcc
 				ExternalCrystal = RCC_CFGR_MCO1_1,
 				Pll = RCC_CFGR_MCO1_1 | RCC_CFGR_MCO1_0,
 			};
-%% endif
-
-%% if target is stm32f3
+%% elif target is stm32f1 or target is stm32f3
 			enum class MCOSource : uint32_t
 			{
 				SystemClock   = RCC_CFGR_MCO_SYSCLK,
 				InternalClock = RCC_CFGR_MCO_HSI,
 				ExternalClock = RCC_CFGR_MCO_HSE,
 				ExternalCrystal = RCC_CFGR_MCO_HSE,
+	%% if target is stm32f1
+				Pll = RCC_CFGR_MCO_PLLCLK_DIV2,	///< divided by 2
+	%% else
 				Pll = RCC_CFGR_MCO_PLL,	///< divided by 2
+	%% endif
 			};
-
+%% endif
+%% if usbprescaler is defined
 			enum class UsbPrescaler : uint32_t
 			{
 				DivideBy1Point5 = 0,
@@ -187,10 +196,18 @@ namespace xpcc
 			static inline void
 			enablePll(PllSource source, uint8_t pllM,
 							uint16_t pllN, uint8_t pllP, uint8_t pllQ);
-%% elif target is stm32f3
-			static inline void
-			enablePll(PllSource source, UsbPrescaler usb,
-						uint8_t pllMul, uint8_t pllPrediv);
+%% else
+			void
+			enablePll(PllSource source,
+	%% if usbprescaler is defined
+							UsbPrescaler usb,
+	%% endif
+	%% if pllprediv is defined
+							uint8_t pllMul, uint8_t pllPrediv);
+	%% else
+							uint8_t pllMul);
+	%% endif
+
 %% endif
 
 			static inline bool
@@ -226,7 +243,7 @@ namespace xpcc
 				if (div > 1) tmp |= (div + 2) << 27;
 				RCC->CFGR = tmp;
 			}
-%% elif target is stm32f3
+%% else
 			static inline void
 			connectToMCO(MCOSource src)
 			{
@@ -235,9 +252,8 @@ namespace xpcc
 			}
 
 			static inline void
-			setMCODivision(int div)
+			setMCODivision(int /*div*/)
 			{
-				(void)div; // avoid compiler warning
 				// Division can not be changed. This is only a placeholder.
 			}
 %% endif

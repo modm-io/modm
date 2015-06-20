@@ -69,7 +69,7 @@ namespace xpcc
 				return StartupError::None;
 			}
 		};
-%% elif target is stm32f3
+%% elif target is stm32f1 or target is stm32f3
 		/*
 		 * Used to setup pll with constants
 		 */
@@ -84,11 +84,24 @@ namespace xpcc
 			static StartupError
 			enable()
 			{
+	%% if usbprescaler is defined
 				constexpr ClockTree::UsbPrescaler usb =
 							(p::CanUseUSB && (OutputFrequency == MHz72))?
 							ClockTree::UsbPrescaler::DivideBy1Point5 :
 							ClockTree::UsbPrescaler::DoNotDivide;
-				ClockTree::enablePll(Source, usb, p::PllMul, p::PllPrediv);
+	%% endif
+				ClockTree::enablePll(Source,
+	%% if usbprescaler is defined
+						usb,
+	%% endif
+	%% if pllprediv2 is defined
+			p::PllMul, p::PllPrediv, p::PllPrediv2);
+	%% elif pllprediv is defined
+				p::PllMul, p::PllPrediv);
+	%% else
+				p::PllMul);
+	%% endif
+
 				return StartupError::None;
 			}
 		};
@@ -151,7 +164,7 @@ namespace xpcc
 							 'sources': [systemClock, externallClock,
 										 externalCrystal, pll] }
 							%# TODO: Add more sources
-%% elif target is stm32f3
+%% elif target is stm32f1 or target is stm32f3
 	%% set sys_timer = 	{'name': "SystemTimer",
 					 'prescaler': "1/8" }
 	%% set apb1_timers = 	{'name': "APB1Timers",
