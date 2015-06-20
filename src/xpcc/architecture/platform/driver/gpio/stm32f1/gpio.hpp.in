@@ -104,7 +104,7 @@ protected:
 	%% set port = gpio.port | upper
 	%% set reg  = "GPIO" ~ port
 	%% set pin  = gpio.id
-	%% set cr = 'CRH' if pin > 8 else 'CRL'
+	%% set cr = 'CRL' if pin|int < 8 else 'CRH'
 
 	%% for type in ["Output", "Input", ""]
 		%% set name = "Gpio" ~ type ~ port ~ gpio.id

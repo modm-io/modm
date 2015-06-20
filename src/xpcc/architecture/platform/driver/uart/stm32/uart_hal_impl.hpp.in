@@ -79,7 +79,7 @@ template<class clockSource, uint32_t baudrate,
 void ALWAYS_INLINE
 xpcc::stm32::{{ name }}::initialize(Parity parity)
 {
-	initializeWithBrr(UartBaudrate::getBrr<clockSource::{{ name }}, baudrate>(),
+	initializeWithBrr(UartBaudrate::getBrr<clockSource::{{ uart ~ id }}, baudrate>(),
 			parity,
 			oversample);
 }
@@ -90,10 +90,10 @@ void ALWAYS_INLINE
 xpcc::stm32::{{ name }}::initialize(Parity parity)
 {
 %% if target is stm32f1
-	initializeWithBrr(UartBaudrate::getBrr<clockSource::{{ name }}, baudrate>(), parity);
+	initializeWithBrr(UartBaudrate::getBrr<clockSource::{{ uart ~ id }}, baudrate>(), parity);
 %% else
-	initializeWithBrr(UartBaudrate::getBrr<clockSource::{{ name }}, baudrate>(), parity,
-					  UartBaudrate::getOversamplingMode(clockSource::{{ name }}, baudrate));
+	initializeWithBrr(UartBaudrate::getBrr<clockSource::{{ uart ~ id }}, baudrate>(), parity,
+					  UartBaudrate::getOversamplingMode(clockSource::{{ uart ~ id }}, baudrate));
 %% endif
 }
 
