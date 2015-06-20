@@ -95,11 +95,11 @@ namespace xpcc
 						usb,
 	%% endif
 	%% if pllprediv2 is defined
-			p::PllMul, p::PllPrediv, p::PllPrediv2);
+						p::PllMul, p::PllPrediv, p::PllPrediv2);
 	%% elif pllprediv is defined
-				p::PllMul, p::PllPrediv);
+						p::PllMul, p::PllPrediv);
 	%% else
-				p::PllMul);
+						p::PllMul);
 	%% endif
 
 				return StartupError::None;

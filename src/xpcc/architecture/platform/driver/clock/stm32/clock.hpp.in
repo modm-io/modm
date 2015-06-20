@@ -178,17 +178,18 @@ public:
 	enablePll(PllSource source, uint8_t pllM,
 					uint16_t pllN, uint8_t pllP, uint8_t pllQ);
 %% else
-	void
+	static inline void
 	enablePll(PllSource source,
 %% if usbprescaler is defined
 					UsbPrescaler usb,
 %% endif
-	%% if pllprediv is defined
-					uint8_t pllMul, uint8_t pllPrediv);
+	%% if pllprediv2 is defined
+				uint8_t pllMul, uint8_t pllPrediv, uint8_t pllPrediv2);
+	%% elif pllprediv is defined
+				uint8_t pllMul, uint8_t pllPrediv);
 	%% else
-					uint8_t pllMul);
+				uint8_t pllMul);
 	%% endif
-
 %% endif
 
 	static inline bool
