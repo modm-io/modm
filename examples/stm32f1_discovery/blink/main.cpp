@@ -3,7 +3,7 @@
 
 MAIN_FUNCTION
 {
-//	defaultSystemClock::enable();
+	defaultSystemClock::enable();
 
 	LedLeft::setOutput(xpcc::Gpio::Low);
 	LedRight::setOutput(xpcc::Gpio::High);

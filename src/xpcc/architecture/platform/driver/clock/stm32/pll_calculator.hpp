@@ -260,6 +260,93 @@ private:
 		"Please consult your STM32's Reference Manual page.");
 };
 
+template<int64_t InputFrequency, int64_t SystemFrequency,
+		 bool FixedDivideBy2>
+class
+Stm32F100PllSettings
+{
+private:
+	// Pll Constant Range
+	static constexpr int64_t Pmin =   1;	///< PreDivider Max
+	static constexpr int64_t Pmax =  16;	///< PreDivider Min
+	static constexpr int64_t Mmin =   2;	///< Multiplier Max
+	static constexpr int64_t Mmax =  16;	///< Multiplier Min
+	// Max/Min Pll Output Frequency
+	static constexpr int64_t PllOutputMin = MHz8;
+	static constexpr int64_t PllOutputMax = MHz24;
+
+	static constexpr int64_t Input = FixedDivideBy2 ? InputFrequency / 2 : InputFrequency;
+
+//------------------------------- PllP(redivider) ------------------------------
+	static constexpr int64_t
+	checkP(int64_t p)
+	{
+		return (/* (InputFrequency / p) <= VCOInputMax && */ // TODO:
+				/* (InputFrequency / p) >= VCOInputMin && */ // are there any constraints?
+				(calculatePllM(p) >= 0));
+	}
+
+	static constexpr int64_t
+	calculatePllP(int64_t p = Pmin)
+	{
+		return (FixedDivideBy2) ? (checkP(p)? p : -1) : (checkP(p)? p : ((p < Pmax)? calculatePllP(p + 1) : -1));
+	}
+
+//------------------------------- PllM -----------------------------------------
+	static constexpr int64_t
+	pllM(int64_t p)
+	{
+		// SystemFrequency = m * InputFrequency / p
+		return SystemFrequency * p / Input;
+	}
+
+	static constexpr int64_t
+	checkM(int64_t p, int64_t m)
+	{
+		// SystemFrequency = m * InputFrequency / divisor
+		return ((m >= Mmin and m <= Mmax) and (Input * m / p) == SystemFrequency);
+	}
+
+	static constexpr int64_t
+	calculatePllM(int64_t p)
+	{
+		return checkM(p, pllM(p))? pllM(p) : -1;
+	}
+
+//------------------------------- Divisor --------------------------------------
+	static constexpr int64_t
+	calculateDivisor(int64_t m)
+	{
+		// SystemFrequency = m * InputFrequency / divisor
+		return SystemFrequency / m / Input;
+	}
+
+	/// Internal Pll Constants Representation
+	static constexpr int64_t _PllP = calculatePllP(Pmin);
+	static constexpr int64_t _PllM = calculatePllM(_PllP);
+public:
+	/// Pll Constants casted to the correct datatype
+	static constexpr uint8_t PllMul = (_PllM > 0)? static_cast<uint8_t>(_PllM)  : 0xff;
+	static constexpr uint8_t PllPrediv = (_PllP > 0)? static_cast<uint8_t>(_PllP)  : 0xff;
+	/// Resulting Frequencies
+	static constexpr int64_t SystemClock = _PllM * Input / _PllP;
+private:
+	// Static Asserts
+	// Check SystemFrequency range (see STM32F100xx Reference Manual p. 101)
+	static_assert(SystemFrequency >= PllOutputMin and SystemFrequency <= PllOutputMax,
+		"Pll Output Freqeuncy needs to be between 8MHz and 24MHz."
+		"Please consult your STM32's Reference Manual page.");
+	// Check Ranges
+	static_assert(PllPrediv >= Pmin and PllPrediv <= Pmax,
+		"PllPREDIV is out of range!");
+	static_assert(PllMul >= Mmin and PllMul <= Mmax,
+		"PllM is out of range!");
+	// Check if desired clock frequency is met
+	static_assert(SystemClock == SystemFrequency,
+		"Desired Output Frequency could not be met."
+		"Please consult your STM32's Reference Manual page.");
+};
+
 }   // namespace stm32
 
 }   // namespace xpcc

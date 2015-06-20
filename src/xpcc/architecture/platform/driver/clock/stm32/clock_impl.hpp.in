@@ -19,13 +19,13 @@ xpcc::stm32::ClockTree::enableSource(ClockSource src, uint32_t /*kHz*/, uint32_t
 	if (src == ClockSource::ExternalClock) {
 		RCC->CR |= RCC_CR_HSEBYP | RCC_CR_HSEON;
 		// return if already running
-		if(RCC->CR & (RCC_CR_HSEBYP | RCC_CR_HSEON) && (RCC->CR & RCC_CR_HSERDY))
+		if(RCC->CR & (RCC_CR_HSEBYP | RCC_CR_HSEON) and (RCC->CR & RCC_CR_HSERDY))
 			return true;
 	}
 	else if(src == ClockSource::ExternalCrystal) {
 		RCC->CR |= RCC_CR_HSEON;
 		// return if already running
-		if(RCC->CR & (RCC_CR_HSEON) && (RCC->CR & RCC_CR_HSERDY))
+		if(RCC->CR & (RCC_CR_HSEON) and (RCC->CR & RCC_CR_HSERDY))
 			return true;
 	}
 	else {

@@ -22,8 +22,8 @@ typedef GpioOutputC9  LedLeft;
 typedef GpioOutputC8  LedRight;
 typedef GpioInputA0   Button;
 
-/// STM32F1 running at 72MHz generated from the external 8MHz clock
+/// STM32F100 running at 24MHz generated from the external 8MHz crystal
 /// supplied by the on-board st-link
-typedef SystemClock<Pll<ExternalClock<MHz8>, MHz72> > defaultSystemClock;
+typedef SystemClock<Pll<ExternalCrystal<MHz8>, MHz24> > defaultSystemClock;
 
 #endif	// XPCC_STM32_F1_DISCOVERY_HPP
