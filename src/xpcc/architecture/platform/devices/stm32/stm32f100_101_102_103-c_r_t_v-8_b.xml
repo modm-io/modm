@@ -5,12 +5,12 @@
  		Please modify the xpcc/tools/device_file_generator code instead and rebuild this file.
  		Be aware, that regenerated files might have a different composition due to technical reasons. -->
   <device platform="stm32" family="f1" name="100|101|102|103" pin_id="c|r|t|v" size_id="8|b">
-    <flash device-size-id="8">64</flash>
-    <flash device-size-id="b">128</flash>
-    <ram device-name="100">8</ram>
-    <ram device-name="101|102" device-size-id="8">10</ram>
-    <ram device-name="101|102" device-size-id="b">16</ram>
-    <ram device-name="103">20</ram>
+    <flash device-size-id="8">65536</flash>
+    <flash device-size-id="b">131072</flash>
+    <ram device-name="100">8192</ram>
+    <ram device-name="101|102" device-size-id="8">10240</ram>
+    <ram device-name="101|102" device-size-id="b">16384</ram>
+    <ram device-name="103">20480</ram>
     <linkerscript device-name="100" device-size-id="8">stm32f100_b.ld</linkerscript>
     <linkerscript device-name="101" device-size-id="8">stm32f101_8.ld</linkerscript>
     <core>cortex-m3</core>

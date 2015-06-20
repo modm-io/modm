@@ -80,8 +80,8 @@ class STMDeviceReader(XMLDeviceReader):
 
 		ram = int(rams[sizeIndex].text)
 		flash = int(self.query("//Flash")[sizeIndex].text)
-		self.addProperty('ram', ram)
-		self.addProperty('flash', flash)
+		self.addProperty('ram', ram * 1024)
+		self.addProperty('flash', flash * 1024)
 
 		mem_fam = stm32_memory[self.id.family]
 		mem_model = None
