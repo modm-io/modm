@@ -503,7 +503,8 @@
         <af id="8" peripheral="UartSpiMaster6" name="Sck" type="out"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n|z" port="G" id="8">
-        <af id="5" peripheral="SpiMaster6" name="Nss"/>
+        <af device-name="427|437|439" device-size-id="g|i" id="5" peripheral="SpiMaster6" name="Nss"/>
+        <af device-name="429" device-pin-id="b|i|n|z" id="5" peripheral="SpiMaster6" name="Nss"/>
         <af id="8" peripheral="Uart6" name="Rts" type="out"/>
       </gpio>
       <gpio device-pin-id="b|i|n|z" port="G" id="9">
@@ -513,7 +514,8 @@
       <gpio device-pin-id="a|b|i|n|z" port="G" id="10"/>
       <gpio device-pin-id="a|b|i|n|z" port="G" id="11"/>
       <gpio device-pin-id="a|b|i|n|z" port="G" id="12">
-        <af id="5" peripheral="SpiMaster6" name="Miso" type="in"/>
+        <af device-name="427|437|439" device-size-id="g|i" id="5" peripheral="SpiMaster6" name="Miso" type="in"/>
+        <af device-name="429" device-pin-id="b|i|n|z" id="5" peripheral="SpiMaster6" name="Miso" type="in"/>
         <af id="8" peripheral="Uart6" name="Rts" type="out"/>
       </gpio>
       <gpio device-pin-id="b|i|n|z" port="G" id="13">

@@ -169,12 +169,11 @@ class STMDeviceReader(XMLDeviceReader):
 		self.log.debug("Available Modules are:\n" + self._modulesToString())
 
 		for m in self.modules:
-			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'CAN', 'SPI', 'I2C', 'FSMC', 'RNG']):
+			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'CAN', 'SPI', 'I2C', 'FSMC', 'RNG', 'RCC']):
 				modules.append(m)
 
 		if 'CAN' in modules:
 			modules.append('CAN1')
-			modules.remove('CAN')
 
 		if self.id.family in ['f2', 'f3', 'f4']:
 			modules.append('ID')
@@ -217,18 +216,19 @@ class STMDeviceReader(XMLDeviceReader):
 						pos = stm32f1_remaps[key]['position']
 						value = stm32f1_remaps[key]['mapping'][int(rawAltFunctions[alt_name])]
 						altFunctions[alt_name] = '{},{},{}'.format(pos, mask, value)
-					else:
-						altFunctions[alt_name] = '-1'
-
-
+				# Add the rest of the pins
+				allSignals = self.compactQuery("//Pin[@Name='{}']/Signal".format(name))
+				for sig in allSignals:
+					if not any(sig.get('Name') in name.get('Name') for name in pinSignals):
+						pinSignals.append(sig)
 
 			else:	# F0, F3 and F4
 				pinSignals = self.gpioFile.compactQuery("//GPIO_Pin[@Name='%s']/PinSignal/SpecificParameter[@Name='GPIO_AF']/.." % name)
 				altFunctions = { a.get('Name') : a[0][0].text.replace('GPIO_AF', '')[:2].replace('_','') for a in pinSignals }
 
-			# the analog channels are only available in the Mcu file, not the GPIO file
-			analogSignals = self.compactQuery("//Pin[@Name='{}']/Signal[starts-with(@Name,'ADC')]".format(name))
-			pinSignals.extend(analogSignals)
+				# the analog channels are only available in the Mcu file, not the GPIO file
+				analogSignals = self.compactQuery("//Pin[@Name='{}']/Signal[starts-with(@Name,'ADC')]".format(name))
+				pinSignals.extend(analogSignals)
 
 			name = name[:4].split('-')[0].split('/')[0].strip()
 
@@ -241,6 +241,10 @@ class STMDeviceReader(XMLDeviceReader):
 				raw_names = signal.split('_')
 				if len(raw_names) < 2:
 					continue
+
+				if raw_names[0] not in modules:
+					continue
+
 				instance = raw_names[0][-1]
 				if not instance.isdigit():
 					instance = ""
@@ -386,6 +390,9 @@ class STMDeviceReader(XMLDeviceReader):
 				af['gpio_port'] = gpio['port']
 				af['gpio_id'] = gpio['id']
 				gpio_afs.append(af)
+
+		if 'CAN' in modules:
+			modules.remove('CAN')
 
 	def _modulesToString(self):
 		string = ""

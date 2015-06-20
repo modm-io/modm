@@ -299,7 +299,7 @@ public:
 	}
 	// connect: Hardware Gpio
 		%% for af in gpio.afs
-			%% if af.id == "-1" or af.type == "analog":
+			%% if af.id is not defined
 				%% set enableAlternateFunction = ""
 			%% else
 				%% set af_all = ("" ~ af.id) | split(',')
