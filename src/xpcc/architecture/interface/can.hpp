@@ -77,14 +77,14 @@ public:
 	/**
 	 * Initializes the hardware and sets the baudrate.
 	 *
-	 * @tparam clockSource
-	 *		the targets system clock
+	 * @tparam SystemClock
+	 * 		the currently active system clock
 	 * @tparam bitrate
 	 * 		the desired bitrate in Hz
 	 * @tparam	tolerance
 	 * 		the allowed relative tolerance for the resulting baudrate
 	 */
-	template< class clockSource, uint32_t bitrate = Bitrate::kBps125,
+	template< class SystemClock, uint32_t bitrate = Bitrate::kBps125,
 			uint16_t tolerance = Tolerance::OnePercent >
 	static void
 	initialize(Mode startupMode);

@@ -44,19 +44,19 @@ public:
 	static constexpr int64_t
 	absoluteError(uint32_t reference, uint32_t actual)
 	{
-		return (static_cast<int64_t>(reference) - actual);
+		return (int64_t(reference) - actual);
 	}
 
 	static constexpr float
 	relativeError(uint32_t reference, uint32_t actual)
 	{
-		return static_cast<float>(absoluteError(reference, actual)) / reference;
+		return (1.f - float(actual) / reference);
 	}
 
 	static constexpr bool
 	isErrorInTolerance(float error, uint16_t tolerance)
 	{
-		return (error == 0) || (((error > 0) ? error : -error) * 1000 <= tolerance);
+		return (error == 0) or (((error > 0) ? error : -error) * 1000 <= tolerance);
 	}
 
 	static constexpr bool

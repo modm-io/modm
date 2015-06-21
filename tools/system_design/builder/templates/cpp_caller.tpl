@@ -14,7 +14,10 @@
 #include <xpcc/processing/protothread.hpp>
 #include <xpcc/processing/resumable.hpp>
 
-namespace robot_call_tasks
+namespace {{ namespace }}
+{
+
+namespace caller
 {
 
 {%- for component in components.iter() %}
@@ -202,6 +205,8 @@ public:
 }; // class {{ component.name | CamelCase }}
 {%- endfor %}
 
-} // namespace robot_call_tasks
+} // namespace caller
+
+} // namespace {{ namespace }}
 
 #endif // {{ namespace | upper }}_CPP_COMMUNICATION_XPCC_TASK_CALLER_HPP

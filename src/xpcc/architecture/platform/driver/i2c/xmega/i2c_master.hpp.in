@@ -42,7 +42,7 @@ public:
 	 * @param	baudrate
 	 *		`Standard` or `Fast`, `High` datarate is not supported by the Xmega
 	 */
-	template<class clockSource, uint32_t baudrate=DataRate::Standard
+	template<class SystemClock, uint32_t baudrate=DataRate::Standard
 			uint16_t tolerance = xpcc::Tolerance::FivePercent >
 	static ALWAYS_INLINE void
 	initialize()

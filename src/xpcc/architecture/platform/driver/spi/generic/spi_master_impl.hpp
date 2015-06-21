@@ -33,7 +33,7 @@ xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::configuration(nullptr);
 // ----------------------------------------------------------------------------
 
 template <typename SCK, typename MOSI, typename MISO>
-template< class clockSource, uint32_t baudrate, uint16_t tolerance >
+template< class SystemClock, uint32_t baudrate, uint16_t tolerance >
 void
 xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::initialize()
 {

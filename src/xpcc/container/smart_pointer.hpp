@@ -33,6 +33,7 @@
 
 #include <cstring>		// for std::memcpy
 #include <stdint.h>
+#include <xpcc/architecture/utils.hpp>
 
 #include <xpcc/io/iostream.hpp>
 
@@ -144,7 +145,7 @@ namespace xpcc
 	protected:
 		friend IOStream&
 		operator <<( IOStream&, const SmartPointer&);
-	};
+	} ATTRIBUTE_PACKED;
 
 	/**
 	 * \ingroup container

@@ -102,11 +102,13 @@
  * @hideinitializer
  */
 #define RF_WAIT_WHILE(condition) \
+		do { \
 			RF_INTERNAL_SET_CASE(__COUNTER__); \
 			if (condition) { \
 				this->popRf(); \
 				return {xpcc::rf::Running}; \
 			} \
+		} while(0)
 
 /**
  * Cause resumable function to wait **until** given `condition` is true.
@@ -156,7 +158,7 @@
 * @hideinitializer
 */
 #define RF_RETURN_CALL(resumable) \
-		{ \
+		do { \
 			RF_INTERNAL_SET_CASE(__COUNTER__); \
 			{ \
 				auto rfResult = resumable; \
@@ -166,7 +168,7 @@
 				} \
 				RF_RETURN(rfResult.getResult()); \
 			} \
-		}
+		} while(0)
 
 #ifdef __DOXYGEN__
 /**
@@ -202,18 +204,18 @@
 		case ((counter % 255) + 1): ;
 
 #define RF_RETURN_1() \
-	{ \
+	do { \
 			this->stopRf(rfIndex); \
 			this->popRf(); \
 			return {xpcc::rf::Stop}; \
-	}
+	} while(0)
 
 #define RF_RETURN_0(result) \
-	{ \
+	do { \
 			this->stopRf(rfIndex); \
 			this->popRf(); \
 			return {xpcc::rf::Stop, (result)}; \
-	}
+	} while(0)
 
 /// Beginner structure for nested resumable functions
 #define RF_BEGIN_1() \

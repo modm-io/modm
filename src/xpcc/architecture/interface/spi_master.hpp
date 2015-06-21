@@ -30,14 +30,14 @@ public:
 	/**
 	 * Initializes the hardware and sets the baudrate.
 	 *
-	 * @tparam	clockSource
+	 * @tparam	SystemClock
 	 * 		the currently active system clock
 	 * @tparam	baudrate
 	 * 		the desired baudrate in Hz
 	 * @tparam	tolerance
-	 * 		the allowed absolute tolerance for the resulting baudrate
+	 * 		the allowed relative tolerance for the resulting baudrate
 	 */
-	template< class clockSource, uint32_t baudrate,
+	template< class SystemClock, uint32_t baudrate,
 			uint16_t tolerance = Tolerance::FivePercent >
 	static void
 	initialize();

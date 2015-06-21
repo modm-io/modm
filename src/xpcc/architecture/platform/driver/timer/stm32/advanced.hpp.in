@@ -149,13 +149,13 @@ public:
 		TIM{{ id }}->ARR = overflow;
 	}
 
-	template<class clockSource>
+	template<class SystemClock>
 	static uint16_t
 	setPeriod(uint32_t microseconds, bool autoApply = true)
 	{
 		// This will be inaccurate for non-smooth frequencies (last six digits
 		// unequal to zero)
-		uint32_t cycles = microseconds * (clockSource::Timer{{ id }} / 1000000UL);
+		uint32_t cycles = microseconds * (SystemClock::Timer{{ id }} / 1000000UL);
 		uint16_t prescaler = (cycles + 65535) / 65536;	// always round up
 		uint16_t overflow = cycles / prescaler;
 

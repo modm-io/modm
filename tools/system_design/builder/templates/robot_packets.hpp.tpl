@@ -61,11 +61,11 @@ namespace {{ namespace }}
 			{%- if element.string %}
 				case {{ prefix ~ enumName }}: return "{{ element.string }}";
 			{%- else %}
-				case {{ prefix ~ enumName }}: return "{{ prefix ~ enumName }}";
+				case {{ prefix ~ enumName }}: return "{{ enumName }}";
 			{%- endif %}
 		{%- endfor %}
 		{%- if packet.isStronglyTyped %}
-				default: return "{{ packet.name | typeName }}::Unknown";
+				default: return "Unknown";
 		{%- else %}
 				default: return "__UNKNOWN_ENUM__";
 		{%- endif %}

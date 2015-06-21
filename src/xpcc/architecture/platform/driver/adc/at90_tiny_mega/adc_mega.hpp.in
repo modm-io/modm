@@ -128,38 +128,38 @@ private:
 
 public:
 	// start inherited documentation
-	template< class clockSource, uint32_t frequency=100000,
+	template< class SystemClock, uint32_t frequency=100000,
 			uint16_t tolerance = xpcc::Tolerance::TenPercent >
 	static void
 	initialize()
 	{
 		// calculate the nearest prescaler from the frequency
-		constexpr float pre_raw = (static_cast<float>(clockSource::Adc) / frequency);
-		constexpr uint16_t pre = (
-				(pre_raw >= ( 64 * 4.f/3)) ? 128 : (
-				(pre_raw >= ( 32 * 4.f/3)) ?  64 : (
-				(pre_raw >= ( 16 * 4.f/3)) ?  32 : (
-				(pre_raw >= (  8 * 4.f/3)) ?  16 : (
-				(pre_raw >= (  4 * 4.f/3)) ?   8 : (
-				(pre_raw >= (  2 * 4.f/3)) ?   4 :
+		constexpr float desired = float(SystemClock::Adc) / frequency;
+		constexpr uint16_t nearest = (
+				(desired >= ( 64 * 4.f/3)) ? 128 : (
+				(desired >= ( 32 * 4.f/3)) ?  64 : (
+				(desired >= ( 16 * 4.f/3)) ?  32 : (
+				(desired >= (  8 * 4.f/3)) ?  16 : (
+				(desired >= (  4 * 4.f/3)) ?   8 : (
+				(desired >= (  2 * 4.f/3)) ?   4 :
 											   2
 				))))));
 
 		// check if we found a prescaler which generates a frequency within the tolerance
 		assertBaudrateInTolerance<
-				clockSource::Adc / pre,
+				SystemClock::Adc / nearest,
 				frequency,
 				tolerance >();
 
 		// translate the prescaler into the bitmapping
 		constexpr Prescaler prescaler = (
-				(pre >= 128) ? Prescaler::Div128 : (
-				(pre >=  64) ? Prescaler::Div64  : (
-				(pre >=  32) ? Prescaler::Div32  : (
-				(pre >=  16) ? Prescaler::Div16  : (
-				(pre >=   8) ? Prescaler::Div8   : (
-				(pre >=   4) ? Prescaler::Div4   :
-							   Prescaler::Div2
+				(nearest >= 128) ? Prescaler::Div128 : (
+				(nearest >=  64) ? Prescaler::Div64  : (
+				(nearest >=  32) ? Prescaler::Div32  : (
+				(nearest >=  16) ? Prescaler::Div16  : (
+				(nearest >=   8) ? Prescaler::Div8   : (
+				(nearest >=   4) ? Prescaler::Div4   :
+								   Prescaler::Div2
 				))))));
 
 		disable();

@@ -128,8 +128,7 @@ def xpcc_task_caller_emitter(target, source, env):
 	except KeyError:
 		path = '.'
 	
-	target = [os.path.join(path, "xpcc_task_caller.hpp")]
-	
+	target = [os.path.join(path, "caller.hpp")]
 	return (target, source)
 
 # -----------------------------------------------------------------------------

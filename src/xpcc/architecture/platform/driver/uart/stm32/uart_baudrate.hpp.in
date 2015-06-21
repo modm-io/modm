@@ -79,12 +79,10 @@ public:
 		constexpr uint32_t baud_lower = clockrate / ( pre_ceil );
 		constexpr uint32_t baud_upper = clockrate / ( pre_floor );
 
-		// calculate the fractional prescaler value corresponding to the baudrate exactly
-		// between the upper and lower baudrate
-		constexpr float pre_middle = static_cast<float>(clockrate) /
-				( ((baud_upper - baud_lower) / 2.f + baud_lower) );
+		// calculate the half-point between the upper and lower baudrate
+		constexpr uint32_t baud_middle = (baud_upper + baud_lower) / 2;
 		// decide which prescaler value is closer to a possible baudrate
-		constexpr uint32_t prescaler = (pre_raw >= pre_middle) ? pre_ceil : pre_floor;
+		constexpr uint32_t prescaler = (baudrate < baud_middle) ? pre_ceil : pre_floor;
 
 		// brr needs to be formatted right for scalar == 8
 		constexpr uint16_t brr = (scalar == 16) ? prescaler :

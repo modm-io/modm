@@ -38,7 +38,7 @@ public:
 
 public:
 	/// Initializes the hardware, with the baudrate limited to about 250kbps.
-	template< class clockSource, uint32_t baudrate=Baudrate::Standard,
+	template< class SystemClock, uint32_t baudrate=Baudrate::Standard,
 			uint16_t tolerance = xpcc::Tolerance::FivePercent >
 	static void
 	initialize()
