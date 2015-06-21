@@ -63,11 +63,11 @@ template< 	class SystemClock, uint32_t baudrate,
 	{
 %% if target is not stm32f1
 		constexpr UartBase::OversamplingMode oversample =
-				UartBaudrate::getOversamplingMode(clockSource::{{ uart ~ id }}, baudrate);
+				UartBaudrate::getOversamplingMode(SystemClock::{{ uart ~ id }}, baudrate);
 %% endif
 
 		{{ hal }}::initializeWithBrr(
-				UartBaudrate::getBrr<clockSource::{{ uart ~ id }}, baudrate, tolerance>(),
+				UartBaudrate::getBrr<SystemClock::{{ uart ~ id }}, baudrate, tolerance>(),
 %% if target is stm32f1
 				parity);
 %% else

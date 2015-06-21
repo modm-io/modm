@@ -60,10 +60,10 @@ public:
 	{
 %% if target is not stm32f1
 		constexpr UartBase::OversamplingMode oversample =
-				UartBaudrate::getOversamplingMode(clockSource::Usart{{ id }}, baudrate);
+				UartBaudrate::getOversamplingMode(SystemClock::Usart{{ id }}, baudrate);
 %% endif
 		UsartHal{{ id }}::initializeWithBrr(
-				UartBaudrate::getBrr<clockSource::Usart{{ id }}, baudrate, tolerance>(),
+				UartBaudrate::getBrr<SystemClock::Usart{{ id }}, baudrate, tolerance>(),
 %% if target is stm32f1
 				UsartHal{{ id }}::Parity::Disabled);
 %% else
