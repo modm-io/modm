@@ -51,7 +51,7 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 			{%- set pointer = "" %}
 		{%- endif %}
 		{%- if action.returnType != None %}
-			{%- set returns = ("" if action.returnType.isBuiltIn else namespace ~ "::packet::") ~ action.returnType.name %}
+			{%- set returns = ("" if action.returnType.isBuiltIn else namespace ~ "::packet::") ~ action.returnType.name | CamelCase %}
 		{%- else %}
 			{%- set returns = "void" %}
 		{%- endif %}
@@ -198,7 +198,7 @@ uint8_t
 				{%- set payload = "" %}
 			{%- endif %}
 			{%- if action.returnType != None %}
-				{%- set returns = ("" if action.returnType.isBuiltIn else namespace ~ "::packet::") ~ action.returnType.name %}
+				{%- set returns = ("" if action.returnType.isBuiltIn else namespace ~ "::packet::") ~ action.returnType.name | CamelCase %}
 			{%- else %}
 				{%- set returns = "void" %}
 			{%- endif %}
