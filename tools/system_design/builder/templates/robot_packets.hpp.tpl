@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <cstdlib>
 #include <xpcc/io/iostream.hpp>
+#include <xpcc/container/smart_pointer.hpp>
 
 namespace {{ namespace }}
 {
@@ -95,7 +96,11 @@ namespace {{ namespace }}
 		operator << (xpcc::IOStream& s, const {{ packet.name | typeName }} e);
 
 	{% elif packet.isTypedef %}
+		{%- if packet.subtype.type.isBuiltIn %}
+		typedef {{ packet.subtype.name }} {{ packet.name | typeName }};
+		{%- else %}
 		typedef {{ packet.subtype.name | typeName }} {{ packet.name | typeName }};
+		{%- endif %}
 	{% endif %}
 {%- endfor -%}
 	} // namespace packet
