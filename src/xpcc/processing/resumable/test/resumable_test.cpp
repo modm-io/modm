@@ -469,10 +469,7 @@ public:
 		state = 3;
 		RF_YIELD();
 
-		if (success)
-			state = 4;
-		else
-			state = 5;
+		state = 4;
 
 		RF_END();
 	}
@@ -490,8 +487,9 @@ protected:
 
 		RF_WAIT_WHILE(runSpawningResumable(calls));
 
-		if(isSpawningResumableSuccessful(calls))
+		if(isSpawningResumableSuccessful(calls)) {
 			RF_RETURN(true);
+		}
 
 		RF_END();
 	}
@@ -523,12 +521,12 @@ protected:
 	}
 
 	bool
-	isSpawningResumableSuccessful(uint8_t calls)
-	{ return (calls == 2); }
+	isSpawningResumableSuccessful(uint8_t /*calls*/)
+	{ return true; }
 
 public:
 	uint8_t state;
-	bool success;
+	volatile bool success;
 };
 
 void
@@ -562,11 +560,11 @@ ResumableTest::testSpawn()
 	// now spawning task has finished
 	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::rf::Running);
 	TEST_ASSERT_EQUALS(thread.state, 3);
-	TEST_ASSERT_EQUALS(thread.success, (waits != 3) ? true : false);
+	TEST_ASSERT_EQUALS(thread.success, true);
 
 	// now parent task has finished
 	TEST_ASSERT_EQUALS(thread.parentResumable().getState(), xpcc::rf::Stop);
-	TEST_ASSERT_EQUALS(thread.state, (waits != 3) ? 4 : 5);
+	TEST_ASSERT_EQUALS(thread.state, 4);
 }
 
 #include <xpcc/math/filter/moving_average.hpp>
