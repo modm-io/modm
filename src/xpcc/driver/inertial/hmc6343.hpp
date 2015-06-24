@@ -367,7 +367,7 @@ private:
 
 private:
 	Data &data;
-	uint8_t buffer[3];
+	uint8_t buffer[4];
 	xpcc::ShortTimeout timeout;
 };
 
