@@ -22,7 +22,6 @@ class STMDeviceWriter(XMLDeviceWriter):
 
 		self.addDeviceAttributesToNode(self.root, 'flash')
 		self.addDeviceAttributesToNode(self.root, 'ram')
-		self.addDeviceAttributesToNode(self.root, 'linkerscript')
 		self.addDeviceAttributesToNode(self.root, 'core')
 
 		self.addDeviceAttributesToNode(self.root, 'pin-count')
@@ -41,21 +40,34 @@ class STMDeviceWriter(XMLDeviceWriter):
 			param_core_child.setAttributes({'name': param_name})
 			param_core_child.setValue(param_name_value[param_name])
 
+		# Memories
+		self.addMemoryToNode(core_child)
+
+		adc_map = {'f0': 'stm32f0',
+				   'f1': 'stm32f1',
+				   'f2': 'stm32f2',
+				   'f3': 'stm32f3',
+				   'f4': 'stm32'}
 		# ADC
-		self.addModuleAttributesToNode(self.root, 'ADC', 'adc', 'stm32f3' if self.device.id.family == 'f3' else 'stm32')
+		self.addModuleAttributesToNode(self.root, 'ADC', 'adc', adc_map[self.device.id.family])
 		# CAN
 		self.addModuleAttributesToNode(self.root, 'CAN', 'can')
 		# Clock
 		clock_child = self.root.addChild('driver')
 		clock_child.setAttributes({'type': 'clock', 'name': 'stm32'})
 		# DAC
-		self.addModuleAttributesToNode(self.root, 'DAC', 'dac')
-		# DMA
-		self.addModuleAttributesToNode(self.root, 'DMA', 'dma')
+		# self.addModuleAttributesToNode(self.root, 'DAC', 'dac')
+		if (self.device.id.family in ['f3', 'f4']):
+			# DMA
+			self.addModuleAttributesToNode(self.root, 'DMA', 'dma')
 		# FSMC
-		self.addModuleAttributesToNode(self.root, 'FSMC_NOR_MUX', 'fsmc')
+		self.addModuleAttributesToNode(self.root, 'FSMC', 'fsmc')
 		# I2C
 		self.addModuleAttributesToNode(self.root, 'I2C', 'i2c')
+		# ID
+		self.addModuleAttributesToNode(self.root, 'ID', 'id')
+		# Random
+		self.addModuleAttributesToNode(self.root, 'RNG', 'random')
 		# SPI
 		self.addModuleAttributesToNode(self.root, 'SPI', 'spi')
 		self.addModuleAttributesToNode(self.root, ['UART', 'USART'], 'spi', 'stm32_uart')
@@ -80,7 +92,10 @@ class STMDeviceWriter(XMLDeviceWriter):
 				attr = self._getAttributeDictionaryFromId(id)
 				child = node.addChild(name)
 				child.setAttributes(attr)
-				child.setValue(prop.value)
+				if isinstance(prop.value, list):
+					child.setValue(prop.value[0])
+				else:
+					child.setValue(prop.value)
 
 	def addModuleAttributesToNode(self, node, peripheral, name, family=None):
 		if family == None:
@@ -117,12 +132,27 @@ class STMDeviceWriter(XMLDeviceWriter):
 				if len(instances) > 0:
 					driver.setAttribute('instances', ",".join(instances))
 
+	def addMemoryToNode(self, node):
+		memories = self.device.getProperty('memories')
+		memory = node.addChild('memory')
+
+		for mem in memories.values:
+			sections = mem.value
+
+			for id in mem.ids.differenceFromIds(self.device.ids):
+				attr = self._getAttributeDictionaryFromId(id)
+				for section in sections:
+					memory_section = memory.addChild('section')
+					memory_section.setAttributes(attr)
+					memory_section.setAttributes(section)
+		# sort the node children by start address
+		memory.sort(key=lambda k: (int(k.get('start'), 16)))
 
 	def addGpioToNode(self, node):
 		props = self.device.getProperty('gpios')
 
 		driver = node.addChild('driver')
-		driver.setAttributes({'type': 'gpio', 'name': 'stm32'})
+		driver.setAttributes({'type': 'gpio', 'name': 'stm32f1' if self.device.id.family == 'f1' else 'stm32'})
 
 		for prop in props.values:
 			gpios = prop.value
@@ -148,7 +178,7 @@ class STMDeviceWriter(XMLDeviceWriter):
 							for key in ['id', 'peripheral', 'name', 'type']	:
 								if key in af_dict['af']:
 									af_child.setAttribute(key, af_dict['af'][key])
-					gpio_child.sort(key=lambda k : (int(k.get('id') or 1e6), k.get('peripheral')))
+					gpio_child.sort(key=lambda k : (int(1e6 if (k.get('id') == None) else k.get('id').split(',')[0]), k.get('peripheral')))
 		# sort the node children by port and id
 		driver.sort(key=lambda k : (k.get('port'), int(k.get('id'))) )
 

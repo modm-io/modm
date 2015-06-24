@@ -1,35 +1,14 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
 /* Copyright (c) 2011, Roboterclub Aachen e.V.
- * All rights reserved.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32__CLOCK_HPP
-#define XPCC_STM32__CLOCK_HPP
+#ifndef XPCC_STM32_CLOCK_HPP
+#define XPCC_STM32_CLOCK_HPP
 
 #include <stdint.h>
 #include "../generic/common_clock.hpp"
@@ -39,212 +18,233 @@ using namespace xpcc::clock;
 
 namespace xpcc
 {
-	namespace stm32
+
+namespace stm32
+{
+
+/**
+ * Clock management.
+ *
+ * For using the internal clock (which is 16MHz) use:
+ * \code
+ * typedef xpcc::stm32::Clock C;
+ * enablePll(C::PllSource::PLL_HSI, 8, 120);	// for STM32F2xx
+ * enablePll(C::PllSource::PLL_HSI, 8, 168);	// for STM32F4xx
+ * switchToPll();
+ * \endcode
+ *
+ * For using an external crystal with 8 MHz use:
+ * \code
+ * typedef xpcc::stm32::Clock C;
+ * if (enableHse(C::HseConfig::HSE_CRYSTAL))
+ * {
+ *     enablePll(C::PllSource::PLL_HSE, 4, 120);	// for STM32F2xx
+ *     enablePll(C::PllSource::PLL_HSE, 4, 168);	// for STM32F4xx
+ *     switchToPll();
+ * }
+ * \endcode
+ *
+ * For using an external oscillator with 25 MHz use:
+ * \code
+ * if (enableHse(HSE_BYPASS))
+ * {
+ *     enablePll(PLL_HSE, 25, 240);	// for STM32F2xx
+ *     enablePll(PLL_HSE, 25, 336);	// for STM32F4xx
+ *     switchToPll();
+ * }
+ * \endcode
+ *
+ * \ingroup	stm32f2_4
+ */
+class ClockTree
+{
+public:
+	enum class ClockSource
 	{
-		/**
-		 * Clock management.
-		 *
-		 * For using the internal clock (which is 16MHz) use:
-		 * \code
-		 * typedef xpcc::stm32::Clock C;
-		 * enablePll(C::PllSource::PLL_HSI, 8, 120);	// for STM32F2xx
-		 * enablePll(C::PllSource::PLL_HSI, 8, 168);	// for STM32F4xx
-		 * switchToPll();
-		 * \endcode
-		 *
-		 * For using an external crystal with 8 MHz use:
-		 * \code
-		 * typedef xpcc::stm32::Clock C;
-		 * if (enableHse(C::HseConfig::HSE_CRYSTAL))
-		 * {
-		 *     enablePll(C::PllSource::PLL_HSE, 4, 120);	// for STM32F2xx
-		 *     enablePll(C::PllSource::PLL_HSE, 4, 168);	// for STM32F4xx
-		 *     switchToPll();
-		 * }
-		 * \endcode
-		 *
-		 * For using an external oscillator with 25 MHz use:
-		 * \code
-		 * if (enableHse(HSE_BYPASS))
-		 * {
-		 *     enablePll(PLL_HSE, 25, 240);	// for STM32F2xx
-		 *     enablePll(PLL_HSE, 25, 336);	// for STM32F4xx
-		 *     switchToPll();
-		 * }
-		 * \endcode
-		 *
-		 * \ingroup	stm32f2_4
-		 */
-		class ClockTree
-		{
-		public:
-			enum class ClockSource
-			{
-				InternalClock,
-				ExternalClock,
-				ExternalCrystal,
-			};
+		InternalClock,
+		ExternalClock,
+		ExternalCrystal,
+	};
 
-			enum class PllSource
-			{
+	enum class PllSource
+	{
 %% if target is stm32f2 or target is stm32f4
-				/// High speed internal clock (16 MHz)
-				Hsi = RCC_PLLCFGR_PLLSRC_HSI,
-				/// High speed external clock (see HseConfig)
-				Hse = RCC_PLLCFGR_PLLSRC_HSE,
+		/// High speed internal clock (16 MHz)
+		Hsi = RCC_PLLCFGR_PLLSRC_HSI,
+		/// High speed external clock (see HseConfig)
+		Hse = RCC_PLLCFGR_PLLSRC_HSE,
 %% elif target is stm32f3
-				/// High speed internal clock (16 MHz)
-				Hsi = RCC_CFGR_PLLSRC_HSI_DIV2,
-				/// High speed external clock (see HseConfig)
-				Hse = RCC_CFGR_PLLSRC_HSE_PREDIV,
+		/// High speed internal clock (16 MHz)
+		Hsi = RCC_CFGR_PLLSRC_HSI_DIV2,
+		/// High speed external clock (see HseConfig)
+		Hse = RCC_CFGR_PLLSRC_HSE_PREDIV,
+%% elif target is stm32f1
+		/// High speed internal clock (8 MHz)
+		Hsi = 0,
+		/// High speed external clock (see HseConfig)
+		Hse = RCC_CFGR_PLLSRC,
 %% endif
-				InternalClock = Hsi,
-				ExternalClock = Hse,
-				ExternalCrystal = Hse,
-			};
 
-			enum class SystemClockSource : uint32_t
-			{
-				Hsi = RCC_CFGR_SW_HSI,
-				Hse = RCC_CFGR_SW_HSE,
-				Pll = RCC_CFGR_SW_PLL,
-				InternalClock = Hsi,
-				ExternalClock = Hse,
-				ExternalCrystal = Hse,
-			};
+		InternalClock = Hsi,
+		ExternalClock = Hse,
+		ExternalCrystal = Hse,
+	};
+
+	enum class SystemClockSource : uint32_t
+	{
+		Hsi = RCC_CFGR_SW_HSI,
+		Hse = RCC_CFGR_SW_HSE,
+		Pll = RCC_CFGR_SW_PLL,
+		InternalClock = Hsi,
+		ExternalClock = Hse,
+		ExternalCrystal = Hse,
+	};
 %% if target is stm32f2 or target is stm32f4
-			enum class MCO1Source : uint32_t
-			{
-				InternalClock = 0,
-				ExternalClock = RCC_CFGR_MCO1_1,
-				ExternalCrystal = RCC_CFGR_MCO1_1,
-				Pll = RCC_CFGR_MCO1_1 | RCC_CFGR_MCO1_0,
-			};
+	enum class MCO1Source : uint32_t
+	{
+		InternalClock = 0,
+		ExternalClock = RCC_CFGR_MCO1_1,
+		ExternalCrystal = RCC_CFGR_MCO1_1,
+		Pll = RCC_CFGR_MCO1_1 | RCC_CFGR_MCO1_0,
+	};
 
-			enum class MCO2Source : uint32_t
-			{
-				SystemClock = 0,
-				ExternalClock = RCC_CFGR_MCO1_1,
-				ExternalCrystal = RCC_CFGR_MCO1_1,
-				Pll = RCC_CFGR_MCO1_1 | RCC_CFGR_MCO1_0,
-			};
+	enum class MCO2Source : uint32_t
+	{
+		SystemClock = 0,
+		ExternalClock = RCC_CFGR_MCO1_1,
+		ExternalCrystal = RCC_CFGR_MCO1_1,
+		Pll = RCC_CFGR_MCO1_1 | RCC_CFGR_MCO1_0,
+	};
+%% elif target is stm32f1 or target is stm32f3
+	enum class MCOSource : uint32_t
+	{
+		SystemClock   = RCC_CFGR_MCO_SYSCLK,
+		InternalClock = RCC_CFGR_MCO_HSI,
+		ExternalClock = RCC_CFGR_MCO_HSE,
+		ExternalCrystal = RCC_CFGR_MCO_HSE,
+	%% if target is stm32f1
+		Pll = RCC_CFGR_MCO_PLLCLK_DIV2,	///< divided by 2
+	%% else
+		Pll = RCC_CFGR_MCO_PLL,	///< divided by 2
+	%% endif
+	};
 %% endif
-
-%% if target is stm32f3
-			enum class MCOSource : uint32_t
-			{
-				SystemClock   = RCC_CFGR_MCO_SYSCLK,
-				InternalClock = RCC_CFGR_MCO_HSI,
-				ExternalClock = RCC_CFGR_MCO_HSE,
-				ExternalCrystal = RCC_CFGR_MCO_HSE,
-				Pll = RCC_CFGR_MCO_PLL,	///< divided by 2
-			};
-
-			enum class UsbPrescaler : uint32_t
-			{
-				DivideBy1Point5 = 0,
-				DoNotDivide     = RCC_CFGR_USBPRE,
-			};
+%% if usbprescaler is defined
+	enum class UsbPrescaler : uint32_t
+	{
+		DivideBy1Point5 = 0,
+		DoNotDivide     = RCC_CFGR_USBPRE,
+	};
 %% endif
-		public:
-			/*
-			 * XPCC Static Clock Standard Interface
-			 * requires source frequency in **kHz**
-			 */
-			static inline bool
-			enableSource(ClockSource src, uint32_t kHz, uint32_t waitCycles = 1500);
-
-%% if target is stm32f2 or target is stm32f4
-			/**
-			 * Enable PLL.
-			 *
-			 * \code
-			 * VCO input frequency = PLL input clock frequency / PLLM [with 2 ≤ PLLM ≤ 63]
-			 * VCO output frequency = VCO input frequency × PLLN [with 64 ≤ PLLN ≤ 432]
-			 * \endcode
-			 *
-			 * \param	source
-			 * 		Source select for PLL and for plli2s. If you are using
-			 * 		HSE you must enable it first (see enableHse()).
-			 *
-			 * \param	pllM
-			 * 		Division factor for the main PLL (PLL) and
-			 * 		audio PLL (PLLI2S) input clock (with 2 ≤ pllM ≤ 63).
-			 *		The software has to set these bits correctly to ensure
-			 *		that frequency of selected source divided by pllM
-			 *		is in ranges from 1 to 2 MHz.
-			 *
-			 * \param	pllN
-			 * 		Main PLL (PLL) multiplication factor for VCO (with 64 ≤ pllN ≤ 432).
-			 * 		The software has to set these bits correctly to ensure
-			 * 		that the VCO output frequency is
-			 * 		 - 336 MHz for ST32F4. Core will run at 168 MHz.
-			 *		 - 240 MHz for ST32F2. Core will run at 120 MHz.
-			 *
-			 * Example:
-			 *
-			 */
-			static inline void
-			enablePll(PllSource source, uint8_t pllM,
-							uint16_t pllN, uint8_t pllP, uint8_t pllQ);
-%% elif target is stm32f3
-			static inline void
-			enablePll(PllSource source, UsbPrescaler usb,
-						uint8_t pllMul, uint8_t pllPrediv);
-%% endif
-
-			static inline bool
-			switchSystemClockTo(SystemClockSource src, uint32_t waitCycles = 1500);
+public:
+	/*
+	 * XPCC Static Clock Standard Interface
+	 * requires source frequency in **kHz**
+	 */
+	static inline bool
+	enableSource(ClockSource src, uint32_t kHz, uint32_t waitCycles = 1500);
 
 %% if target is stm32f2 or target is stm32f4
-			static inline void
-			connectToMCO1(MCO1Source src)
-			{
-				uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO1);
-				RCC->CFGR = tmp | static_cast<uint32_t>(src);
-			}
-
-			static inline void
-			setMCO1Division(int div)
-			{
-				uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO1PRE);
-				if (div > 1) tmp |= (div + 2) << 24;
-				RCC->CFGR = tmp;
-			}
-
-			static inline void
-			connectToMCO2(MCO2Source src)
-			{
-				uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO2);
-				RCC->CFGR = tmp | static_cast<uint32_t>(src);
-			}
-
-			static inline void
-			setMCO2Division(int div)
-			{
-				uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO2PRE);
-				if (div > 1) tmp |= (div + 2) << 27;
-				RCC->CFGR = tmp;
-			}
-%% elif target is stm32f3
-			static inline void
-			connectToMCO(MCOSource src)
-			{
-				uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO);
-				RCC->CFGR = tmp | static_cast<uint32_t>(src);
-			}
-
-			static inline void
-			setMCODivision(int div)
-			{
-				(void)div; // avoid compiler warning
-				// Division can not be changed. This is only a placeholder.
-			}
+	/**
+	 * Enable PLL.
+	 *
+	 * \code
+	 * VCO input frequency = PLL input clock frequency / PLLM [with 2 ≤ PLLM ≤ 63]
+	 * VCO output frequency = VCO input frequency × PLLN [with 64 ≤ PLLN ≤ 432]
+	 * \endcode
+	 *
+	 * \param	source
+	 * 		Source select for PLL and for plli2s. If you are using
+	 * 		HSE you must enable it first (see enableHse()).
+	 *
+	 * \param	pllM
+	 * 		Division factor for the main PLL (PLL) and
+	 * 		audio PLL (PLLI2S) input clock (with 2 ≤ pllM ≤ 63).
+	 *		The software has to set these bits correctly to ensure
+	 *		that frequency of selected source divided by pllM
+	 *		is in ranges from 1 to 2 MHz.
+	 *
+	 * \param	pllN
+	 * 		Main PLL (PLL) multiplication factor for VCO (with 64 ≤ pllN ≤ 432).
+	 * 		The software has to set these bits correctly to ensure
+	 * 		that the VCO output frequency is
+	 * 		 - 336 MHz for ST32F4. Core will run at 168 MHz.
+	 *		 - 240 MHz for ST32F2. Core will run at 120 MHz.
+	 *
+	 * Example:
+	 *
+	 */
+	static inline void
+	enablePll(PllSource source, uint8_t pllM,
+					uint16_t pllN, uint8_t pllP, uint8_t pllQ);
+%% else
+	static inline void
+	enablePll(PllSource source,
+%% if usbprescaler is defined
+					UsbPrescaler usb,
 %% endif
-		};
+	%% if pllprediv2 is defined
+				uint8_t pllMul, uint8_t pllPrediv, uint8_t pllPrediv2);
+	%% elif pllprediv is defined
+				uint8_t pllMul, uint8_t pllPrediv);
+	%% else
+				uint8_t pllMul);
+	%% endif
+%% endif
+
+	static inline bool
+	switchSystemClockTo(SystemClockSource src, uint32_t waitCycles = 1500);
+
+%% if target is stm32f2 or target is stm32f4
+	static inline void
+	connectToMCO1(MCO1Source src)
+	{
+		uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO1);
+		RCC->CFGR = tmp | static_cast<uint32_t>(src);
 	}
-}
+
+	static inline void
+	setMCO1Division(int div)
+	{
+		uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO1PRE);
+		if (div > 1) tmp |= (div + 2) << 24;
+		RCC->CFGR = tmp;
+	}
+
+	static inline void
+	connectToMCO2(MCO2Source src)
+	{
+		uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO2);
+		RCC->CFGR = tmp | static_cast<uint32_t>(src);
+	}
+
+	static inline void
+	setMCO2Division(int div)
+	{
+		uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO2PRE);
+		if (div > 1) tmp |= (div + 2) << 27;
+		RCC->CFGR = tmp;
+	}
+%% else
+	static inline void
+	connectToMCO(MCOSource src)
+	{
+		uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO);
+		RCC->CFGR = tmp | static_cast<uint32_t>(src);
+	}
+
+	static inline void
+	setMCODivision(int /*div*/)
+	{
+		// Division can not be changed. This is only a placeholder.
+	}
+%% endif
+};
+
+}   // namespace stm32
+
+}   // namespace xpcc
 
 #include "clock_impl.hpp"
 
-#endif	//  XPCC_STM32__CLOCK_HPP
+#endif	//  XPCC_STM32_CLOCK_HPP

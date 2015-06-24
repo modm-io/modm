@@ -5,7 +5,7 @@
 %#*
 %#* Redistribution and use in source and binary forms, with or without
 %#* modification, are permitted provided that the following conditions are met:
-%#* 
+%#*
 %#*     * Redistributions of source code must retain the above copyright
 %#*       notice, this list of conditions and the following disclaimer.
 %#*     * Redistributions in binary form must reproduce the above copyright
@@ -64,7 +64,7 @@
 %% do i.update({ 8: ["EXTI2_IRQHandler", "EXTI Line 2"]})
 %% do i.update({ 9: ["EXTI3_IRQHandler", "EXTI Line 3"]})
 %% do i.update({10: ["EXTI4_IRQHandler", "EXTI Line 4"]})
-%% if target is stm32f3
+%% if target is stm32f1 or target is stm32f3
 %% do i.update({11: ["DMA1_Channel1_IRQHandler", "DMA1 Channel 1"]})
 %% do i.update({12: ["DMA1_Channel2_IRQHandler", "DMA1 Channel 2"]})
 %% do i.update({13: ["DMA1_Channel3_IRQHandler", "DMA1 Channel 3"]})
@@ -95,7 +95,7 @@
 %%  do i.update({22: ["CAN1_SCE_IRQHandler", "CAN1 SCE"]})
 %% endif
 %% do i.update({23: ["EXTI9_5_IRQHandler", "EXTI Line 9..5"]})
-%% if target is stm32f3
+%% if target is stm32f1 or target is stm32f3
 %% 	do i.update({24: ["TIM1_BRK_TIM15_IRQHandler", "TIM1 Break"]})
 %% 	do i.update({25: ["TIM1_UP_TIM16_IRQHandler", "TIM1 Update"]})
 %% 	do i.update({26: ["TIM1_TRG_COM_TIM17_IRQHandler", "TIM1 Trigger and Commutation"]})
@@ -108,14 +108,8 @@
 %% do i.update({28: ["TIM2_IRQHandler", "TIM2"]})
 %% do i.update({29: ["TIM3_IRQHandler", "TIM3"]})
 %% do i.update({30: ["TIM4_IRQHandler", "TIM4"]})
-%% if target is stm32f3
-%# TODO: is this distinction needed?? In stm32f30x.h the handler is called I2C1_EV_IRQHandler
-%% 	do i.update({31: ["I2C1_EV_EXTI23_IRQHandler", "I2C1 Event and EXTI Line23"]})
-%% 	do i.update({33: ["I2C2_EV_EXTI24_IRQHandler", "I2C2 Event and EXTI Line24"]})
-%% elif target is stm32f2 or target is stm32f4
-%% 	do i.update({31: ["I2C1_EV_IRQHandler", "I2C1 Event"]})
-%% 	do i.update({33: ["I2C2_EV_IRQHandler", "I2C2 Event"]})
-%% endif
+%% do i.update({31: ["I2C1_EV_IRQHandler", "I2C1 Event"]})
+%% do i.update({33: ["I2C2_EV_IRQHandler", "I2C2 Event"]})
 %% do i.update({32: ["I2C1_ER_IRQHandler", "I2C1 Error"]})
 %% do i.update({34: ["I2C2_ER_IRQHandler", "I2C2 Error"]})
 %% do i.update({35: ["SPI1_IRQHandler", "SPI1"]})

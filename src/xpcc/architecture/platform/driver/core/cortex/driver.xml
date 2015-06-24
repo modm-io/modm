@@ -11,6 +11,7 @@
 		<template>startup.c.in</template>
 		<template>delay.sx.in</template>
 		<template>syscalls.cpp.in</template>
+		<template out="linker.ld">linker/stm32.ld.in</template>
 		<static>cxxabi.cpp</static>
 		<static>default_handler.sx</static>
 		<!-- Systick Timer -->

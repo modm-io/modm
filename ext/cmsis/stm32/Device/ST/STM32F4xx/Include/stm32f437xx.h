@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    stm32f437xx.h
   * @author  MCD Application Team
-  * @version V2.0.0
-  * @date    18-February-2014
+  * @version V2.2.0
+  * @date    15-December-2014
   * @brief   CMSIS STM32F437xx Device Peripheral Access Layer Header File.
   *
   *          This file contains:
@@ -597,8 +597,7 @@ typedef struct
   __IO uint32_t PUPDR;    /*!< GPIO port pull-up/pull-down register,  Address offset: 0x0C      */
   __IO uint32_t IDR;      /*!< GPIO port input data register,         Address offset: 0x10      */
   __IO uint32_t ODR;      /*!< GPIO port output data register,        Address offset: 0x14      */
-  __IO uint16_t BSRRL;    /*!< GPIO port bit set/reset low register,  Address offset: 0x18      */
-  __IO uint16_t BSRRH;    /*!< GPIO port bit set/reset high register, Address offset: 0x1A      */
+  __IO uint32_t BSRR;     /*!< GPIO port bit set/reset register,      Address offset: 0x18      */
   __IO uint32_t LCKR;     /*!< GPIO port configuration lock register, Address offset: 0x1C      */
   __IO uint32_t AFR[2];   /*!< GPIO alternate function registers,     Address offset: 0x20-0x24 */
 } GPIO_TypeDef;
@@ -1073,7 +1072,7 @@ USB_OTG_HostChannelTypeDef;
 /** @addtogroup Peripheral_memory_map
   * @{
   */
-#define FLASH_BASE            ((uint32_t)0x08000000) /*!< FLASH(up to 1 MB) base address in the alias region                         */
+#define FLASH_BASE            ((uint32_t)0x08000000) /*!< FLASH(up to 2 MB) base address in the alias region                         */
 #define CCMDATARAM_BASE       ((uint32_t)0x10000000) /*!< CCM(core coupled memory) data RAM(64 KB) base address in the alias region  */
 #define SRAM1_BASE            ((uint32_t)0x20000000) /*!< SRAM1(112 KB) base address in the alias region                             */
 #define SRAM2_BASE            ((uint32_t)0x2001C000) /*!< SRAM2(16 KB) base address in the alias region                              */
@@ -1087,6 +1086,8 @@ USB_OTG_HostChannelTypeDef;
 #define SRAM3_BB_BASE         ((uint32_t)0x22020000) /*!< SRAM3(64 KB) base address in the bit-band region                              */
 #define PERIPH_BB_BASE        ((uint32_t)0x42000000) /*!< Peripheral base address in the bit-band region                                */
 #define BKPSRAM_BB_BASE       ((uint32_t)0x42024000) /*!< Backup SRAM(4 KB) base address in the bit-band region                         */
+#define FLASH_END             ((uint32_t)0x081FFFFF) /*!< FLASH end address */
+#define CCMDATARAM_END        ((uint32_t)0x1000FFFF) /*!< CCM data RAM end address */
 
 /* Legacy defines */
 #define SRAM_BASE             SRAM1_BASE
@@ -1958,72 +1959,128 @@ USB_OTG_HostChannelTypeDef;
 #define  CAN_FMR_CAN2SB                      ((uint32_t)0x00003F00)        /*!<CAN2 start bank */
 
 /*******************  Bit definition for CAN_FM1R register  *******************/
-#define  CAN_FM1R_FBM                        ((uint32_t)0x3FFF)            /*!<Filter Mode */
-#define  CAN_FM1R_FBM0                       ((uint32_t)0x0001)            /*!<Filter Init Mode bit 0 */
-#define  CAN_FM1R_FBM1                       ((uint32_t)0x0002)            /*!<Filter Init Mode bit 1 */
-#define  CAN_FM1R_FBM2                       ((uint32_t)0x0004)            /*!<Filter Init Mode bit 2 */
-#define  CAN_FM1R_FBM3                       ((uint32_t)0x0008)            /*!<Filter Init Mode bit 3 */
-#define  CAN_FM1R_FBM4                       ((uint32_t)0x0010)            /*!<Filter Init Mode bit 4 */
-#define  CAN_FM1R_FBM5                       ((uint32_t)0x0020)            /*!<Filter Init Mode bit 5 */
-#define  CAN_FM1R_FBM6                       ((uint32_t)0x0040)            /*!<Filter Init Mode bit 6 */
-#define  CAN_FM1R_FBM7                       ((uint32_t)0x0080)            /*!<Filter Init Mode bit 7 */
-#define  CAN_FM1R_FBM8                       ((uint32_t)0x0100)            /*!<Filter Init Mode bit 8 */
-#define  CAN_FM1R_FBM9                       ((uint32_t)0x0200)            /*!<Filter Init Mode bit 9 */
-#define  CAN_FM1R_FBM10                      ((uint32_t)0x0400)            /*!<Filter Init Mode bit 10 */
-#define  CAN_FM1R_FBM11                      ((uint32_t)0x0800)            /*!<Filter Init Mode bit 11 */
-#define  CAN_FM1R_FBM12                      ((uint32_t)0x1000)            /*!<Filter Init Mode bit 12 */
-#define  CAN_FM1R_FBM13                      ((uint32_t)0x2000)            /*!<Filter Init Mode bit 13 */
+#define  CAN_FM1R_FBM                        ((uint32_t)0x0FFFFFFF)        /*!<Filter Mode */
+#define  CAN_FM1R_FBM0                       ((uint32_t)0x00000001)        /*!<Filter Init Mode bit 0 */
+#define  CAN_FM1R_FBM1                       ((uint32_t)0x00000002)        /*!<Filter Init Mode bit 1 */
+#define  CAN_FM1R_FBM2                       ((uint32_t)0x00000004)        /*!<Filter Init Mode bit 2 */
+#define  CAN_FM1R_FBM3                       ((uint32_t)0x00000008)        /*!<Filter Init Mode bit 3 */
+#define  CAN_FM1R_FBM4                       ((uint32_t)0x00000010)        /*!<Filter Init Mode bit 4 */
+#define  CAN_FM1R_FBM5                       ((uint32_t)0x00000020)        /*!<Filter Init Mode bit 5 */
+#define  CAN_FM1R_FBM6                       ((uint32_t)0x00000040)        /*!<Filter Init Mode bit 6 */
+#define  CAN_FM1R_FBM7                       ((uint32_t)0x00000080)        /*!<Filter Init Mode bit 7 */
+#define  CAN_FM1R_FBM8                       ((uint32_t)0x00000100)        /*!<Filter Init Mode bit 8 */
+#define  CAN_FM1R_FBM9                       ((uint32_t)0x00000200)        /*!<Filter Init Mode bit 9 */
+#define  CAN_FM1R_FBM10                      ((uint32_t)0x00000400)        /*!<Filter Init Mode bit 10 */
+#define  CAN_FM1R_FBM11                      ((uint32_t)0x00000800)        /*!<Filter Init Mode bit 11 */
+#define  CAN_FM1R_FBM12                      ((uint32_t)0x00001000)        /*!<Filter Init Mode bit 12 */
+#define  CAN_FM1R_FBM13                      ((uint32_t)0x00002000)        /*!<Filter Init Mode bit 13 */
+#define  CAN_FM1R_FBM14                      ((uint32_t)0x00004000)        /*!<Filter Init Mode bit 14 */
+#define  CAN_FM1R_FBM15                      ((uint32_t)0x00008000)        /*!<Filter Init Mode bit 15 */
+#define  CAN_FM1R_FBM16                      ((uint32_t)0x00010000)        /*!<Filter Init Mode bit 16 */
+#define  CAN_FM1R_FBM17                      ((uint32_t)0x00020000)        /*!<Filter Init Mode bit 17 */
+#define  CAN_FM1R_FBM18                      ((uint32_t)0x00040000)        /*!<Filter Init Mode bit 18 */
+#define  CAN_FM1R_FBM19                      ((uint32_t)0x00080000)        /*!<Filter Init Mode bit 19 */
+#define  CAN_FM1R_FBM20                      ((uint32_t)0x00100000)        /*!<Filter Init Mode bit 20 */
+#define  CAN_FM1R_FBM21                      ((uint32_t)0x00200000)        /*!<Filter Init Mode bit 21 */
+#define  CAN_FM1R_FBM22                      ((uint32_t)0x00400000)        /*!<Filter Init Mode bit 22 */
+#define  CAN_FM1R_FBM23                      ((uint32_t)0x00800000)        /*!<Filter Init Mode bit 23 */
+#define  CAN_FM1R_FBM24                      ((uint32_t)0x01000000)        /*!<Filter Init Mode bit 24 */
+#define  CAN_FM1R_FBM25                      ((uint32_t)0x02000000)        /*!<Filter Init Mode bit 25 */
+#define  CAN_FM1R_FBM26                      ((uint32_t)0x04000000)        /*!<Filter Init Mode bit 26 */
+#define  CAN_FM1R_FBM27                      ((uint32_t)0x08000000)        /*!<Filter Init Mode bit 27 */
 
 /*******************  Bit definition for CAN_FS1R register  *******************/
-#define  CAN_FS1R_FSC                        ((uint32_t)0x3FFF)            /*!<Filter Scale Configuration */
-#define  CAN_FS1R_FSC0                       ((uint32_t)0x0001)            /*!<Filter Scale Configuration bit 0 */
-#define  CAN_FS1R_FSC1                       ((uint32_t)0x0002)            /*!<Filter Scale Configuration bit 1 */
-#define  CAN_FS1R_FSC2                       ((uint32_t)0x0004)            /*!<Filter Scale Configuration bit 2 */
-#define  CAN_FS1R_FSC3                       ((uint32_t)0x0008)            /*!<Filter Scale Configuration bit 3 */
-#define  CAN_FS1R_FSC4                       ((uint32_t)0x0010)            /*!<Filter Scale Configuration bit 4 */
-#define  CAN_FS1R_FSC5                       ((uint32_t)0x0020)            /*!<Filter Scale Configuration bit 5 */
-#define  CAN_FS1R_FSC6                       ((uint32_t)0x0040)            /*!<Filter Scale Configuration bit 6 */
-#define  CAN_FS1R_FSC7                       ((uint32_t)0x0080)            /*!<Filter Scale Configuration bit 7 */
-#define  CAN_FS1R_FSC8                       ((uint32_t)0x0100)            /*!<Filter Scale Configuration bit 8 */
-#define  CAN_FS1R_FSC9                       ((uint32_t)0x0200)            /*!<Filter Scale Configuration bit 9 */
-#define  CAN_FS1R_FSC10                      ((uint32_t)0x0400)            /*!<Filter Scale Configuration bit 10 */
-#define  CAN_FS1R_FSC11                      ((uint32_t)0x0800)            /*!<Filter Scale Configuration bit 11 */
-#define  CAN_FS1R_FSC12                      ((uint32_t)0x1000)            /*!<Filter Scale Configuration bit 12 */
-#define  CAN_FS1R_FSC13                      ((uint32_t)0x2000)            /*!<Filter Scale Configuration bit 13 */
+#define  CAN_FS1R_FSC                        ((uint32_t)0x0FFFFFFF)        /*!<Filter Scale Configuration */
+#define  CAN_FS1R_FSC0                       ((uint32_t)0x00000001)        /*!<Filter Scale Configuration bit 0 */
+#define  CAN_FS1R_FSC1                       ((uint32_t)0x00000002)        /*!<Filter Scale Configuration bit 1 */
+#define  CAN_FS1R_FSC2                       ((uint32_t)0x00000004)        /*!<Filter Scale Configuration bit 2 */
+#define  CAN_FS1R_FSC3                       ((uint32_t)0x00000008)        /*!<Filter Scale Configuration bit 3 */
+#define  CAN_FS1R_FSC4                       ((uint32_t)0x00000010)        /*!<Filter Scale Configuration bit 4 */
+#define  CAN_FS1R_FSC5                       ((uint32_t)0x00000020)        /*!<Filter Scale Configuration bit 5 */
+#define  CAN_FS1R_FSC6                       ((uint32_t)0x00000040)        /*!<Filter Scale Configuration bit 6 */
+#define  CAN_FS1R_FSC7                       ((uint32_t)0x00000080)        /*!<Filter Scale Configuration bit 7 */
+#define  CAN_FS1R_FSC8                       ((uint32_t)0x00000100)        /*!<Filter Scale Configuration bit 8 */
+#define  CAN_FS1R_FSC9                       ((uint32_t)0x00000200)        /*!<Filter Scale Configuration bit 9 */
+#define  CAN_FS1R_FSC10                      ((uint32_t)0x00000400)        /*!<Filter Scale Configuration bit 10 */
+#define  CAN_FS1R_FSC11                      ((uint32_t)0x00000800)        /*!<Filter Scale Configuration bit 11 */
+#define  CAN_FS1R_FSC12                      ((uint32_t)0x00001000)        /*!<Filter Scale Configuration bit 12 */
+#define  CAN_FS1R_FSC13                      ((uint32_t)0x00002000)        /*!<Filter Scale Configuration bit 13 */
+#define  CAN_FS1R_FSC14                      ((uint32_t)0x00004000)        /*!<Filter Scale Configuration bit 14 */
+#define  CAN_FS1R_FSC15                      ((uint32_t)0x00008000)        /*!<Filter Scale Configuration bit 15 */
+#define  CAN_FS1R_FSC16                      ((uint32_t)0x00010000)        /*!<Filter Scale Configuration bit 16 */
+#define  CAN_FS1R_FSC17                      ((uint32_t)0x00020000)        /*!<Filter Scale Configuration bit 17 */
+#define  CAN_FS1R_FSC18                      ((uint32_t)0x00040000)        /*!<Filter Scale Configuration bit 18 */
+#define  CAN_FS1R_FSC19                      ((uint32_t)0x00080000)        /*!<Filter Scale Configuration bit 19 */
+#define  CAN_FS1R_FSC20                      ((uint32_t)0x00100000)        /*!<Filter Scale Configuration bit 20 */
+#define  CAN_FS1R_FSC21                      ((uint32_t)0x00200000)        /*!<Filter Scale Configuration bit 21 */
+#define  CAN_FS1R_FSC22                      ((uint32_t)0x00400000)        /*!<Filter Scale Configuration bit 22 */
+#define  CAN_FS1R_FSC23                      ((uint32_t)0x00800000)        /*!<Filter Scale Configuration bit 23 */
+#define  CAN_FS1R_FSC24                      ((uint32_t)0x01000000)        /*!<Filter Scale Configuration bit 24 */
+#define  CAN_FS1R_FSC25                      ((uint32_t)0x02000000)        /*!<Filter Scale Configuration bit 25 */
+#define  CAN_FS1R_FSC26                      ((uint32_t)0x04000000)        /*!<Filter Scale Configuration bit 26 */
+#define  CAN_FS1R_FSC27                      ((uint32_t)0x08000000)        /*!<Filter Scale Configuration bit 27 */
 
 /******************  Bit definition for CAN_FFA1R register  *******************/
-#define  CAN_FFA1R_FFA                       ((uint32_t)0x3FFF)            /*!<Filter FIFO Assignment */
-#define  CAN_FFA1R_FFA0                      ((uint32_t)0x0001)            /*!<Filter FIFO Assignment for Filter 0 */
-#define  CAN_FFA1R_FFA1                      ((uint32_t)0x0002)            /*!<Filter FIFO Assignment for Filter 1 */
-#define  CAN_FFA1R_FFA2                      ((uint32_t)0x0004)            /*!<Filter FIFO Assignment for Filter 2 */
-#define  CAN_FFA1R_FFA3                      ((uint32_t)0x0008)            /*!<Filter FIFO Assignment for Filter 3 */
-#define  CAN_FFA1R_FFA4                      ((uint32_t)0x0010)            /*!<Filter FIFO Assignment for Filter 4 */
-#define  CAN_FFA1R_FFA5                      ((uint32_t)0x0020)            /*!<Filter FIFO Assignment for Filter 5 */
-#define  CAN_FFA1R_FFA6                      ((uint32_t)0x0040)            /*!<Filter FIFO Assignment for Filter 6 */
-#define  CAN_FFA1R_FFA7                      ((uint32_t)0x0080)            /*!<Filter FIFO Assignment for Filter 7 */
-#define  CAN_FFA1R_FFA8                      ((uint32_t)0x0100)            /*!<Filter FIFO Assignment for Filter 8 */
-#define  CAN_FFA1R_FFA9                      ((uint32_t)0x0200)            /*!<Filter FIFO Assignment for Filter 9 */
-#define  CAN_FFA1R_FFA10                     ((uint32_t)0x0400)            /*!<Filter FIFO Assignment for Filter 10 */
-#define  CAN_FFA1R_FFA11                     ((uint32_t)0x0800)            /*!<Filter FIFO Assignment for Filter 11 */
-#define  CAN_FFA1R_FFA12                     ((uint32_t)0x1000)            /*!<Filter FIFO Assignment for Filter 12 */
-#define  CAN_FFA1R_FFA13                     ((uint32_t)0x2000)            /*!<Filter FIFO Assignment for Filter 13 */
+#define  CAN_FFA1R_FFA                        ((uint32_t)0x0FFFFFFF)        /*!<Filter FIFO Assignment */
+#define  CAN_FFA1R_FFA0                       ((uint32_t)0x00000001)        /*!<Filter FIFO Assignment bit 0 */
+#define  CAN_FFA1R_FFA1                       ((uint32_t)0x00000002)        /*!<Filter FIFO Assignment bit 1 */
+#define  CAN_FFA1R_FFA2                       ((uint32_t)0x00000004)        /*!<Filter FIFO Assignment bit 2 */
+#define  CAN_FFA1R_FFA3                       ((uint32_t)0x00000008)        /*!<Filter FIFO Assignment bit 3 */
+#define  CAN_FFA1R_FFA4                       ((uint32_t)0x00000010)        /*!<Filter FIFO Assignment bit 4 */
+#define  CAN_FFA1R_FFA5                       ((uint32_t)0x00000020)        /*!<Filter FIFO Assignment bit 5 */
+#define  CAN_FFA1R_FFA6                       ((uint32_t)0x00000040)        /*!<Filter FIFO Assignment bit 6 */
+#define  CAN_FFA1R_FFA7                       ((uint32_t)0x00000080)        /*!<Filter FIFO Assignment bit 7 */
+#define  CAN_FFA1R_FFA8                       ((uint32_t)0x00000100)        /*!<Filter FIFO Assignment bit 8 */
+#define  CAN_FFA1R_FFA9                       ((uint32_t)0x00000200)        /*!<Filter FIFO Assignment bit 9 */
+#define  CAN_FFA1R_FFA10                      ((uint32_t)0x00000400)        /*!<Filter FIFO Assignment bit 10 */
+#define  CAN_FFA1R_FFA11                      ((uint32_t)0x00000800)        /*!<Filter FIFO Assignment bit 11 */
+#define  CAN_FFA1R_FFA12                      ((uint32_t)0x00001000)        /*!<Filter FIFO Assignment bit 12 */
+#define  CAN_FFA1R_FFA13                      ((uint32_t)0x00002000)        /*!<Filter FIFO Assignment bit 13 */
+#define  CAN_FFA1R_FFA14                      ((uint32_t)0x00004000)        /*!<Filter FIFO Assignment bit 14 */
+#define  CAN_FFA1R_FFA15                      ((uint32_t)0x00008000)        /*!<Filter FIFO Assignment bit 15 */
+#define  CAN_FFA1R_FFA16                      ((uint32_t)0x00010000)        /*!<Filter FIFO Assignment bit 16 */
+#define  CAN_FFA1R_FFA17                      ((uint32_t)0x00020000)        /*!<Filter FIFO Assignment bit 17 */
+#define  CAN_FFA1R_FFA18                      ((uint32_t)0x00040000)        /*!<Filter FIFO Assignment bit 18 */
+#define  CAN_FFA1R_FFA19                      ((uint32_t)0x00080000)        /*!<Filter FIFO Assignment bit 19 */
+#define  CAN_FFA1R_FFA20                      ((uint32_t)0x00100000)        /*!<Filter FIFO Assignment bit 20 */
+#define  CAN_FFA1R_FFA21                      ((uint32_t)0x00200000)        /*!<Filter FIFO Assignment bit 21 */
+#define  CAN_FFA1R_FFA22                      ((uint32_t)0x00400000)        /*!<Filter FIFO Assignment bit 22 */
+#define  CAN_FFA1R_FFA23                      ((uint32_t)0x00800000)        /*!<Filter FIFO Assignment bit 23 */
+#define  CAN_FFA1R_FFA24                      ((uint32_t)0x01000000)        /*!<Filter FIFO Assignment bit 24 */
+#define  CAN_FFA1R_FFA25                      ((uint32_t)0x02000000)        /*!<Filter FIFO Assignment bit 25 */
+#define  CAN_FFA1R_FFA26                      ((uint32_t)0x04000000)        /*!<Filter FIFO Assignment bit 26 */
+#define  CAN_FFA1R_FFA27                      ((uint32_t)0x08000000)        /*!<Filter FIFO Assignment bit 27 */
 
 /*******************  Bit definition for CAN_FA1R register  *******************/
-#define  CAN_FA1R_FACT                       ((uint32_t)0x3FFF)            /*!<Filter Active */
-#define  CAN_FA1R_FACT0                      ((uint32_t)0x0001)            /*!<Filter 0 Active */
-#define  CAN_FA1R_FACT1                      ((uint32_t)0x0002)            /*!<Filter 1 Active */
-#define  CAN_FA1R_FACT2                      ((uint32_t)0x0004)            /*!<Filter 2 Active */
-#define  CAN_FA1R_FACT3                      ((uint32_t)0x0008)            /*!<Filter 3 Active */
-#define  CAN_FA1R_FACT4                      ((uint32_t)0x0010)            /*!<Filter 4 Active */
-#define  CAN_FA1R_FACT5                      ((uint32_t)0x0020)            /*!<Filter 5 Active */
-#define  CAN_FA1R_FACT6                      ((uint32_t)0x0040)            /*!<Filter 6 Active */
-#define  CAN_FA1R_FACT7                      ((uint32_t)0x0080)            /*!<Filter 7 Active */
-#define  CAN_FA1R_FACT8                      ((uint32_t)0x0100)            /*!<Filter 8 Active */
-#define  CAN_FA1R_FACT9                      ((uint32_t)0x0200)            /*!<Filter 9 Active */
-#define  CAN_FA1R_FACT10                     ((uint32_t)0x0400)            /*!<Filter 10 Active */
-#define  CAN_FA1R_FACT11                     ((uint32_t)0x0800)            /*!<Filter 11 Active */
-#define  CAN_FA1R_FACT12                     ((uint32_t)0x1000)            /*!<Filter 12 Active */
-#define  CAN_FA1R_FACT13                     ((uint32_t)0x2000)            /*!<Filter 13 Active */
+#define  CAN_FA1R_FACT                        ((uint32_t)0x0FFFFFFF)        /*!<Filter Active */
+#define  CAN_FA1R_FACT0                       ((uint32_t)0x00000001)        /*!<Filter Active bit 0 */
+#define  CAN_FA1R_FACT1                       ((uint32_t)0x00000002)        /*!<Filter Active bit 1 */
+#define  CAN_FA1R_FACT2                       ((uint32_t)0x00000004)        /*!<Filter Active bit 2 */
+#define  CAN_FA1R_FACT3                       ((uint32_t)0x00000008)        /*!<Filter Active bit 3 */
+#define  CAN_FA1R_FACT4                       ((uint32_t)0x00000010)        /*!<Filter Active bit 4 */
+#define  CAN_FA1R_FACT5                       ((uint32_t)0x00000020)        /*!<Filter Active bit 5 */
+#define  CAN_FA1R_FACT6                       ((uint32_t)0x00000040)        /*!<Filter Active bit 6 */
+#define  CAN_FA1R_FACT7                       ((uint32_t)0x00000080)        /*!<Filter Active bit 7 */
+#define  CAN_FA1R_FACT8                       ((uint32_t)0x00000100)        /*!<Filter Active bit 8 */
+#define  CAN_FA1R_FACT9                       ((uint32_t)0x00000200)        /*!<Filter Active bit 9 */
+#define  CAN_FA1R_FACT10                      ((uint32_t)0x00000400)        /*!<Filter Active bit 10 */
+#define  CAN_FA1R_FACT11                      ((uint32_t)0x00000800)        /*!<Filter Active bit 11 */
+#define  CAN_FA1R_FACT12                      ((uint32_t)0x00001000)        /*!<Filter Active bit 12 */
+#define  CAN_FA1R_FACT13                      ((uint32_t)0x00002000)        /*!<Filter Active bit 13 */
+#define  CAN_FA1R_FACT14                      ((uint32_t)0x00004000)        /*!<Filter Active bit 14 */
+#define  CAN_FA1R_FACT15                      ((uint32_t)0x00008000)        /*!<Filter Active bit 15 */
+#define  CAN_FA1R_FACT16                      ((uint32_t)0x00010000)        /*!<Filter Active bit 16 */
+#define  CAN_FA1R_FACT17                      ((uint32_t)0x00020000)        /*!<Filter Active bit 17 */
+#define  CAN_FA1R_FACT18                      ((uint32_t)0x00040000)        /*!<Filter Active bit 18 */
+#define  CAN_FA1R_FACT19                      ((uint32_t)0x00080000)        /*!<Filter Active bit 19 */
+#define  CAN_FA1R_FACT20                      ((uint32_t)0x00100000)        /*!<Filter Active bit 20 */
+#define  CAN_FA1R_FACT21                      ((uint32_t)0x00200000)        /*!<Filter Active bit 21 */
+#define  CAN_FA1R_FACT22                      ((uint32_t)0x00400000)        /*!<Filter Active bit 22 */
+#define  CAN_FA1R_FACT23                      ((uint32_t)0x00800000)        /*!<Filter Active bit 23 */
+#define  CAN_FA1R_FACT24                      ((uint32_t)0x01000000)        /*!<Filter Active bit 24 */
+#define  CAN_FA1R_FACT25                      ((uint32_t)0x02000000)        /*!<Filter Active bit 25 */
+#define  CAN_FA1R_FACT26                      ((uint32_t)0x04000000)        /*!<Filter Active bit 26 */
+#define  CAN_FA1R_FACT27                      ((uint32_t)0x08000000)        /*!<Filter Active bit 27 */
 
 /*******************  Bit definition for CAN_F0R1 register  *******************/
 #define  CAN_F0R1_FB0                        ((uint32_t)0x00000001)        /*!<Filter bit 0 */
@@ -4056,6 +4113,12 @@ USB_OTG_HostChannelTypeDef;
 #define  FMC_BWTR1_DATAST_6                 ((uint32_t)0x00004000)        /*!<Bit 6 */
 #define  FMC_BWTR1_DATAST_7                 ((uint32_t)0x00008000)        /*!<Bit 7 */
 
+#define  FMC_BWTR1_BUSTURN                  ((uint32_t)0x000F0000)        /*!<BUSTURN[3:0] bits (Bus turnaround duration) */
+#define  FMC_BWTR1_BUSTURN_0                ((uint32_t)0x00010000)        /*!<Bit 0 */
+#define  FMC_BWTR1_BUSTURN_1                ((uint32_t)0x00020000)        /*!<Bit 1 */
+#define  FMC_BWTR1_BUSTURN_2                ((uint32_t)0x00040000)        /*!<Bit 2 */
+#define  FMC_BWTR1_BUSTURN_3                ((uint32_t)0x00080000)        /*!<Bit 3 */
+
 #define  FMC_BWTR1_CLKDIV                   ((uint32_t)0x00F00000)        /*!<CLKDIV[3:0] bits (Clock divide ratio) */
 #define  FMC_BWTR1_CLKDIV_0                 ((uint32_t)0x00100000)        /*!<Bit 0 */
 #define  FMC_BWTR1_CLKDIV_1                 ((uint32_t)0x00200000)        /*!<Bit 1 */
@@ -4094,6 +4157,12 @@ USB_OTG_HostChannelTypeDef;
 #define  FMC_BWTR2_DATAST_5                 ((uint32_t)0x00002000)        /*!<Bit 5 */
 #define  FMC_BWTR2_DATAST_6                 ((uint32_t)0x00004000)        /*!<Bit 6 */
 #define  FMC_BWTR2_DATAST_7                 ((uint32_t)0x00008000)        /*!<Bit 7 */
+
+#define  FMC_BWTR2_BUSTURN                  ((uint32_t)0x000F0000)        /*!<BUSTURN[3:0] bits (Bus turnaround duration) */
+#define  FMC_BWTR2_BUSTURN_0                ((uint32_t)0x00010000)        /*!<Bit 0 */
+#define  FMC_BWTR2_BUSTURN_1                ((uint32_t)0x00020000)        /*!<Bit 1 */
+#define  FMC_BWTR2_BUSTURN_2                ((uint32_t)0x00040000)        /*!<Bit 2 */
+#define  FMC_BWTR2_BUSTURN_3                ((uint32_t)0x00080000)        /*!<Bit 3 */
 
 #define  FMC_BWTR2_CLKDIV                   ((uint32_t)0x00F00000)        /*!<CLKDIV[3:0] bits (Clock divide ratio) */
 #define  FMC_BWTR2_CLKDIV_0                 ((uint32_t)0x00100000)        /*!<Bit 0 */
@@ -4134,6 +4203,12 @@ USB_OTG_HostChannelTypeDef;
 #define  FMC_BWTR3_DATAST_6                 ((uint32_t)0x00004000)        /*!<Bit 6 */
 #define  FMC_BWTR3_DATAST_7                 ((uint32_t)0x00008000)        /*!<Bit 7 */
 
+#define  FMC_BWTR3_BUSTURN                  ((uint32_t)0x000F0000)        /*!<BUSTURN[3:0] bits (Bus turnaround duration) */
+#define  FMC_BWTR3_BUSTURN_0                ((uint32_t)0x00010000)        /*!<Bit 0 */
+#define  FMC_BWTR3_BUSTURN_1                ((uint32_t)0x00020000)        /*!<Bit 1 */
+#define  FMC_BWTR3_BUSTURN_2                ((uint32_t)0x00040000)        /*!<Bit 2 */
+#define  FMC_BWTR3_BUSTURN_3                ((uint32_t)0x00080000)        /*!<Bit 3 */
+
 #define  FMC_BWTR3_CLKDIV                   ((uint32_t)0x00F00000)        /*!<CLKDIV[3:0] bits (Clock divide ratio) */
 #define  FMC_BWTR3_CLKDIV_0                 ((uint32_t)0x00100000)        /*!<Bit 0 */
 #define  FMC_BWTR3_CLKDIV_1                 ((uint32_t)0x00200000)        /*!<Bit 1 */
@@ -4172,6 +4247,12 @@ USB_OTG_HostChannelTypeDef;
 #define  FMC_BWTR4_DATAST_5                 ((uint32_t)0x00002000)        /*!<Bit 5 */
 #define  FMC_BWTR4_DATAST_6                 ((uint32_t)0x00004000)        /*!<Bit 6 */
 #define  FMC_BWTR4_DATAST_7                 ((uint32_t)0x00008000)        /*!<Bit 7 */
+
+#define  FMC_BWTR4_BUSTURN                  ((uint32_t)0x000F0000)        /*!<BUSTURN[3:0] bits (Bus turnaround duration) */
+#define  FMC_BWTR4_BUSTURN_0                ((uint32_t)0x00010000)        /*!<Bit 0 */
+#define  FMC_BWTR4_BUSTURN_1                ((uint32_t)0x00020000)        /*!<Bit 1 */
+#define  FMC_BWTR4_BUSTURN_2                ((uint32_t)0x00040000)        /*!<Bit 2 */
+#define  FMC_BWTR4_BUSTURN_3                ((uint32_t)0x00080000)        /*!<Bit 3 */
 
 #define  FMC_BWTR4_CLKDIV                   ((uint32_t)0x00F00000)        /*!<CLKDIV[3:0] bits (Clock divide ratio) */
 #define  FMC_BWTR4_CLKDIV_0                 ((uint32_t)0x00100000)        /*!<Bit 0 */
@@ -5094,6 +5175,25 @@ USB_OTG_HostChannelTypeDef;
 #define GPIO_BSRR_BR_14                      ((uint32_t)0x40000000)
 #define GPIO_BSRR_BR_15                      ((uint32_t)0x80000000)
 
+/****************** Bit definition for GPIO_LCKR register *********************/
+#define GPIO_LCKR_LCK0                       ((uint32_t)0x00000001)
+#define GPIO_LCKR_LCK1                       ((uint32_t)0x00000002)
+#define GPIO_LCKR_LCK2                       ((uint32_t)0x00000004)
+#define GPIO_LCKR_LCK3                       ((uint32_t)0x00000008)
+#define GPIO_LCKR_LCK4                       ((uint32_t)0x00000010)
+#define GPIO_LCKR_LCK5                       ((uint32_t)0x00000020)
+#define GPIO_LCKR_LCK6                       ((uint32_t)0x00000040)
+#define GPIO_LCKR_LCK7                       ((uint32_t)0x00000080)
+#define GPIO_LCKR_LCK8                       ((uint32_t)0x00000100)
+#define GPIO_LCKR_LCK9                       ((uint32_t)0x00000200)
+#define GPIO_LCKR_LCK10                      ((uint32_t)0x00000400)
+#define GPIO_LCKR_LCK11                      ((uint32_t)0x00000800)
+#define GPIO_LCKR_LCK12                      ((uint32_t)0x00001000)
+#define GPIO_LCKR_LCK13                      ((uint32_t)0x00002000)
+#define GPIO_LCKR_LCK14                      ((uint32_t)0x00004000)
+#define GPIO_LCKR_LCK15                      ((uint32_t)0x00008000)
+#define GPIO_LCKR_LCKK                       ((uint32_t)0x00010000)
+
 /******************************************************************************/
 /*                                                                            */
 /*                                    HASH                                    */
@@ -5298,6 +5398,8 @@ USB_OTG_HostChannelTypeDef;
 
 /* Legacy define */
 #define  PWR_CR_PMODE                        PWR_CR_VOS
+#define  PWR_CR_LPUDS                        PWR_CR_LPLVDS     /*!< Low-Power Regulator in deepsleep under-drive mode          */
+#define  PWR_CR_MRUDS                        PWR_CR_MRLVDS     /*!< Main regulator in deepsleep under-drive mode               */
 
 /*******************  Bit definition for PWR_CSR register  ********************/
 #define  PWR_CSR_WUF                         ((uint32_t)0x00000001)     /*!< Wakeup Flag                                      */
@@ -8539,14 +8641,14 @@ USB_OTG_HostChannelTypeDef;
                                        ((INSTANCE) == I2C3))
 
 /******************************** I2S Instances *******************************/
-#define IS_I2S_INSTANCE(INSTANCE)  (((INSTANCE) == SPI2) || \
-                                    ((INSTANCE) == SPI3))
+#define IS_I2S_ALL_INSTANCE(INSTANCE)  (((INSTANCE) == SPI2) || \
+                                        ((INSTANCE) == SPI3))
 
 /*************************** I2S Extended Instances ***************************/
-#define IS_I2S_INSTANCE_EXT(PERIPH)  (((INSTANCE) == SPI2)    || \
-                                      ((INSTANCE) == SPI3)    || \
-                                      ((INSTANCE) == I2S2ext) || \
-                                      ((INSTANCE) == I2S3ext))
+#define IS_I2S_ALL_INSTANCE_EXT(PERIPH)  (((INSTANCE) == SPI2)    || \
+                                          ((INSTANCE) == SPI3)    || \
+                                          ((INSTANCE) == I2S2ext) || \
+                                          ((INSTANCE) == I2S3ext))
 
 /******************************* RNG Instances ********************************/
 #define IS_RNG_ALL_INSTANCE(INSTANCE)  ((INSTANCE) == RNG)
@@ -8830,6 +8932,34 @@ USB_OTG_HostChannelTypeDef;
 
 /****************************** WWDG Instances ********************************/
 #define IS_WWDG_ALL_INSTANCE(INSTANCE)  ((INSTANCE) == WWDG)
+
+/****************************** SDIO Instances ********************************/
+#define IS_SDIO_ALL_INSTANCE(INSTANCE) ((INSTANCE) == SDIO)
+
+/****************************** USB Exported Constants ************************/
+#define USB_OTG_FS_HOST_MAX_CHANNEL_NBR                8
+#define USB_OTG_FS_MAX_IN_ENDPOINTS                    4    /* Including EP0 */
+#define USB_OTG_FS_MAX_OUT_ENDPOINTS                   4    /* Including EP0 */
+#define USB_OTG_FS_TOTAL_FIFO_SIZE                     1280 /* in Bytes */
+
+#define USB_OTG_HS_HOST_MAX_CHANNEL_NBR                12
+#define USB_OTG_HS_MAX_IN_ENDPOINTS                    6    /* Including EP0 */
+#define USB_OTG_HS_MAX_IN_ENDPOINTS                    6    /* Including EP0 */
+#define USB_OTG_HS_TOTAL_FIFO_SIZE                     4096 /* in Bytes */
+
+/******************************************************************************/
+/*  For a painless codes migration between the STM32F4xx device product       */
+/*  lines, the aliases defined below are put in place to overcome the         */
+/*  differences in the interrupt handlers and IRQn definitions.               */
+/*  No need to update developed interrupt code when moving across             */
+/*  product lines within the same STM32F4 Family                              */
+/******************************************************************************/
+
+/* Aliases for __IRQn */
+#define FSMC_IRQn              FMC_IRQn
+
+/* Aliases for __IRQHandler */
+#define FSMC_IRQHandler        FMC_IRQHandler
 
 /**
   * @}

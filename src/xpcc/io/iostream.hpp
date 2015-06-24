@@ -161,7 +161,7 @@ public :
 		}
 		else {
 			this->writeHex(static_cast<uint8_t>(v >> 8));
-			this->writeHex(static_cast<uint8_t>(v & 0xff));
+			this->writeHex(static_cast<uint8_t>(v));
 		}
 		return *this;
 	}
@@ -174,11 +174,11 @@ public :
 		}
 		else if (this->mode == Mode::Binary) {
 			this->writeBin(static_cast<uint8_t>(v >> 8));
-			this->writeBin(static_cast<uint8_t>(v & 0xff));
+			this->writeBin(static_cast<uint8_t>(v));
 		}
 		else {
 			this->writeHex(static_cast<uint8_t>(v >> 8));
-			this->writeHex(static_cast<uint8_t>(v & 0xff));
+			this->writeHex(static_cast<uint8_t>(v));
 		}
 		return *this;
 	}
@@ -193,13 +193,13 @@ public :
 			this->writeBin(static_cast<uint8_t>(v >> 24));
 			this->writeBin(static_cast<uint8_t>(v >> 16));
 			this->writeBin(static_cast<uint8_t>(v >> 8));
-			this->writeBin(static_cast<uint8_t>(v & 0xff));
+			this->writeBin(static_cast<uint8_t>(v));
 		}
 		else {
 			this->writeHex(static_cast<uint8_t>(v >> 24));
 			this->writeHex(static_cast<uint8_t>(v >> 16));
 			this->writeHex(static_cast<uint8_t>(v >> 8));
-			this->writeHex(static_cast<uint8_t>(v & 0xff));
+			this->writeHex(static_cast<uint8_t>(v));
 		}
 		return *this;
 	}
@@ -214,13 +214,13 @@ public :
 			this->writeBin(static_cast<uint8_t>(v >> 24));
 			this->writeBin(static_cast<uint8_t>(v >> 16));
 			this->writeBin(static_cast<uint8_t>(v >> 8));
-			this->writeBin(static_cast<uint8_t>(v & 0xff));
+			this->writeBin(static_cast<uint8_t>(v));
 		}
 		else {
 			this->writeHex(static_cast<uint8_t>(v >> 24));
 			this->writeHex(static_cast<uint8_t>(v >> 16));
 			this->writeHex(static_cast<uint8_t>(v >> 8));
-			this->writeHex(static_cast<uint8_t>(v & 0xff));
+			this->writeHex(static_cast<uint8_t>(v));
 		}
 		return *this;
 	}

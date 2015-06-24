@@ -53,8 +53,10 @@ public:
 		ModeFaultError		= SPI_SR_MODF,
 		OverrunError		= SPI_SR_OVR,
 		Busy				= SPI_SR_BSY,
-%% if target is stm32f0 or target is stm32f3
+%% if target is not stm32f1
 		FrameFormatError	= SPI_SR_FRE,
+%% endif
+%% if target is stm32f0 or target is stm32f3
 		FifoRxLevel			= SPI_SR_FRLVL,
 		FifoTxLevel			= SPI_SR_FTLVL,
 %% endif
@@ -105,7 +107,7 @@ public:
 		Bit15 = SPI_CR2_DS_3 | SPI_CR2_DS_2 | SPI_CR2_DS_1,	///< 0b1110
 		Bit16 = SPI_CR2_DS_3 | SPI_CR2_DS_2 | SPI_CR2_DS_1 | SPI_CR2_DS_0,///< 0b1111
 		All   = Bit16,
-%% elif target is stm32f1 or target is stm32f2 or target is stm32f4
+%% else
 		Bit8  = 0,
 		Bit16 = SPI_CR1_DFF,
 		All   = Bit16,

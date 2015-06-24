@@ -62,19 +62,19 @@ namespace xpcc
 		 * \brief	Allocates memory from the given size
 		 *
 		 * \param	size	the amount of memory to be allocated, has to be
-		 * 					smaller than 252
+		 * 					smaller than 65530
 		 */
-		SmartPointer(uint8_t size);
+		SmartPointer(uint16_t size);
 
 		// Must use a pointer to T here, otherwise the compiler can't distinguish
 		// between constructor and copy constructor!
 		template<typename T>
 		explicit SmartPointer(const T *data)
-		: ptr(new uint8_t[sizeof(T) + 2])
+		: ptr(new uint8_t[sizeof(T) + 3])
 		{
 			ptr[0] = 1;
-			ptr[1] = sizeof(T);
-			std::memcpy(ptr + 2, data, sizeof(T));
+			*reinterpret_cast<uint16_t*>(ptr + 1) = sizeof(T);
+			std::memcpy(ptr + 3, data, sizeof(T));
 		}
 
 		SmartPointer(const SmartPointer& other);
@@ -84,19 +84,19 @@ namespace xpcc
 		inline const uint8_t *
 		getPointer() const
 		{
-			return &ptr[2];
+			return ptr + 3;
 		}
 
 		inline uint8_t *
 		getPointer()
 		{
-			return &ptr[2];
+			return ptr + 3;
 		}
 
-		inline uint8_t
+		inline uint16_t
 		getSize() const
 		{
-			return ptr[1];
+			return *reinterpret_cast<uint16_t*>(ptr + 1);
 		}
 
 	public:
@@ -110,7 +110,7 @@ namespace xpcc
 		inline const T&
 		get() const
 		{
-			return *((T*) &ptr[2]);
+			return *reinterpret_cast<T*>(ptr + 3);
 		}
 
 		/**
@@ -123,9 +123,9 @@ namespace xpcc
 		bool
 		get(T& value) const
 		{
-			if (sizeof(T) == ptr[1])
+			if (sizeof(T) == getSize())
 			{
-				value = *((T *) &ptr[2]);
+				value = *reinterpret_cast<T*>(ptr + 3);
 				return true;
 			}
 			else {

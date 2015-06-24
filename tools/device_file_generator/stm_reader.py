@@ -18,92 +18,142 @@ from logger import Logger
 # add python module device files to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'device_files'))
 from device_identifier import DeviceIdentifier
+from stm import stm32_defines
+from stm import stm32f1_remaps
+from stm import stm32_memory
 
 class STMDeviceReader(XMLDeviceReader):
 	""" STMDeviceReader
 	This STM specific part description file reader knows the structure and
 	translates the data into a platform independent format.
 	"""
+	familyFile = None
+	rootpath = None
 
-	def __init__(self, file, logger=None):
-		# we need to combine several xml files
+	@staticmethod
+	def getDevicesFromFamily(family, logger=None, rootpath=None):
+		if rootpath is None:
+			rootpath = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'STM_devices')
+		STMDeviceReader.rootpath = rootpath
 
-		# The memory files are actually the best starting point, since they
-		# are named most specifically after the device
-		memoryFile = XMLDeviceReader(file, logger)
-		memory = memoryFile.query("//Root")[0]
-		# this name string contains all relevant information
-		name = memory.get('name')
-		# the device identifier parses it
-		dev = DeviceIdentifier(name.lower())
+		STMDeviceReader.familyFile = XMLDeviceReader(os.path.join(rootpath, 'families.xml'), logger)
+		families = STMDeviceReader.familyFile.query("//Family[@Name='{}']/SubFamily/Mcu/@RefName".format(family))
+		logger.debug("STMDeviceReader: Found devices of family '{}': {}".format(family, ", ".join(families)))
+		return families
+
+
+	def __init__(self, deviceName, logger=None):
+		deviceNames = self.familyFile.query("//Family/SubFamily/Mcu[@RefName='{}']".format(deviceName))[0]
+		comboDeviceName = deviceNames.get('Name')
+		deviceFile = os.path.join(self.rootpath, comboDeviceName + '.xml')
+
+		XMLDeviceReader.__init__(self, deviceFile, logger)
+		self.name = deviceName
+		self.id = DeviceIdentifier(self.name.lower())
 
 		if logger:
-			logger.info("Parsing STM32 PDF: %s" % dev.string)
+			logger.info("STMDeviceReader: Parsing '{}'".format(self.id.string))
 
-		# now we have to search the correct peripheral configuration files
-		# they use the same file for several size_ids, therefore we have to
-		# filter them manually
-		device = None
-		files = glob.glob(os.path.join(os.path.dirname(file), '..', name[:-1] + '*'))
-		for deviceFile in files:
-			fileName = os.path.basename(deviceFile).replace(name[:-1], '').replace('.xml', '')
-			# Tx -> LQFP, Ux -> VFQFPN, Hx -> LFBGA, Yx -> WLCSP
-			# we only take the QFP as reference
-			if fileName[-2:] in ['Tx', 'Ux', 'Hx', 'Px', 'T6', 'P6']:
-				if fileName[0] != '(':
-					if fileName[0] in [name[-1:], 'x']:
-						device = deviceFile
-						break
-				else:
-					# (S-I-Z-E)Tx
-					sizes = fileName[1:-3].split('-')
-					if name[-1:] in sizes:
-						device = deviceFile
-						break
-
-		if device == None and logger:
-			logger.error("STMDeviceReader: Could not find device file for device '%s'" % dev.string)
-			logger.error("STMDeviceReader: Possible files are: " + str([os.path.basename(f) for f in files]))
-			exit()
-
-		# this peripheral file is the actual, important file to work with
-		XMLDeviceReader.__init__(self, device, logger)
-		self.name = name
-		self.id = dev
-
-		# lets load additional information about the GPIO IP
-		ip_file = self.query("//IP[@Name='GPIO']")[0].get('Version')
-		ip_file = os.path.join(os.path.dirname(device), 'IP', 'GPIO-'+ip_file+'_Modes.xml')
-		gpioFile = XMLDeviceReader(ip_file, logger)
-
-		# Some information about core and architecture can be found in the
-		# propertyGroup.xml file
-		propertyGroup = XMLDeviceReader(os.path.join(os.path.dirname(file), 'propertyGroups.xml'), self.log)
-		architecture = propertyGroup.query("//groupEntry[@name='%s']/property[@name='arm_architecture']" % name)[0].get('value').lower()
-		core = propertyGroup.query("//groupEntry[@name='%s']/property[@name='arm_core_type']" % name)[0].get('value').lower()
-		if len(propertyGroup.query("//groupEntry[@name='%s']/property[@name='arm_fpu_type']" % name)) > 0:
+		# information about the core and architecture
+		coreLut = {'m0': 'v6m', 'm3': 'v7m', 'm4': 'v7em'}
+		core = self.query('//Core')[0].text.replace('ARM ', '').lower()
+		self.addProperty('architecture', coreLut[core.replace('cortex-', '')])
+		if core.endswith('m4'):
 			core += 'f'
-
 		self.addProperty('core', core)
-		self.addProperty('architecture', architecture)
 
-		self.addProperty('header', 'stm32' + dev.family + 'xx.h')
-		self.addProperty('define', 'STM32F' + dev.name + 'xx')
-		if self.id.family == 'f3':
-			linkerscript = "%s_%s.ld" % ('stm32f3xx', dev.size_id)
-		else:
-			linkerscript = "%s_%s.ld" % ('stm32' + dev.family + 'xx', dev.size_id)
-		self.addProperty('linkerscript', linkerscript)
+		# flash and ram sizes
+		# The <ram> and <flash> can occur multiple times.
+		# they are "ordered" in the same way as the `(S-I-Z-E)` ids in the device combo name
+		# we must first find out which index the current self.id.size_id has inside `(S-I-Z-E)`
+		sizeIndex = 0
 
-		flash = memoryFile.query("//MemorySegment[@name='FLASH']")[0].get('size')
-		ram = memoryFile.query("//MemorySegment[@name='RAM']")[0].get('size')
-		# only the STM32F4 has Core Coupled Memory
-		if dev.family == 'f4' and dev.name != '401':
-			data_sram = memoryFile.query("//MemorySegment[@name='DATA_SRAM']")[0].get('size')
+		matchString = "\(.(-.)*\)"
+		match = re.search(matchString, comboDeviceName)
+		if match:
+			sizeArray = match.group(0)[1:-1].lower().split("-")
+			sizeIndex = sizeArray.index(self.id.size_id)
+
+		rams = self.query("//Ram")
+		if len(rams) <= sizeIndex:
+			sizeIndex = 0
+
+		ram = int(rams[sizeIndex].text)
+		flash = int(self.query("//Flash")[sizeIndex].text)
+		self.addProperty('ram', ram * 1024)
+		self.addProperty('flash', flash * 1024)
+
+		mem_fam = stm32_memory[self.id.family]
+		mem_model = None
+		for model in mem_fam['model']:
+			if any(name.startswith(self.id.name) for name in model['names']):
+				if self.id.name in model['names']:
+					mem_model = model
+					break
+				elif "{}x{}".format(self.id.name, self.id.size_id) in model['names']:
+					mem_model = model
+					break
+		if mem_model == None:
+			self.log.error("STMDeviceReader: Memory model not found for device '{}'".format(self.id.string))
+
+		memories = []
+		# first get the real SRAM1 size
+		for mem, val in mem_model['memories'].items():
+			if '2' in mem or '3' in mem or 'ccm' in mem:
+				ram -= val
+
+		# add all memories
+		for mem, val in mem_model['memories'].items():
+			if '1' in mem:
+				memories.append({'name': 'sram1',
+								 'access' : 'rwx',
+								 'start': "0x{:02X}".format(mem_fam['start']['sram']),
+								 'size': str(ram)})
+			elif '2' in mem:
+				memories.append({'name': 'sram2',
+								 'access' : 'rwx',
+								 'start': "0x{:02X}".format(mem_fam['start']['sram'] + ram*1024),
+								 'size': str(val)})
+			elif '3' in mem:
+				memories.append({'name': 'sram3',
+								 'access': 'rwx',
+								 'start': "0x{:02X}".format(mem_fam['start']['sram'] + ram * 1024 + mem_model['memories']['sram2'] * 1024),
+								 'size': str(val)})
+			elif 'flash' in mem:
+				memories.append({'name': 'flash',
+								 'access': 'rx',
+								 'start': "0x{:02X}".format(mem_fam['start']['flash']),
+								 'size': str(flash)})
+			else:
+				memories.append({'name': mem,
+								 'access': 'rwx',
+								 'start': "0x{:02X}".format(mem_fam['start'][mem]),
+								 'size': str(val)})
+
+		self.addProperty('memories', memories)
+
+		# packaging
+		package = self.query("//@Package")[0]
+		self.addProperty('pin-count', re.findall('[0-9]+', package)[0])
+		self.addProperty('package', re.findall('[A-Za-z\.]+', package)[0])
+
+		# device header
+		self.addProperty('header', 'stm32' + self.id.family + 'xx.h')
+
+		# device defines
+		defines = []
+		if self.id.family == 'f4':
+			# required for our FreeRTOS
+			defines.append('STM32F4XX')
+
+		dev_def = self._getDeviceDefine()
+		if dev_def is None:
+			logger.warn("STMDeviceReader: Define not found for device '{}'".format(self.id.string))
 		else:
-			data_sram = '0'
-		self.addProperty('flash', int(flash, 16))
-		self.addProperty('ram', int(ram, 16) + int(data_sram, 16))
+			defines.append(dev_def)
+
+		self.addProperty('define', defines)
+
 
 		gpios = []
 		self.addProperty('gpios', gpios)
@@ -114,67 +164,91 @@ class STMDeviceReader(XMLDeviceReader):
 		modules = []
 		self.addProperty('modules', modules)
 
-		self.modules = memoryFile.query("//RegisterGroup/@name")
-		self.modules.extend(self.query("//IP/@InstanceName"))
-		self.modules = list(set(self.modules))
+		self.modules = self.query("//IP/@InstanceName")
+		self.modules = sorted(list(set(self.modules)))
 		self.log.debug("Available Modules are:\n" + self._modulesToString())
-		package = self.query("/Mcu/@Package")[0]
-		self.addProperty('pin-count', re.findall('[0-9]+', package)[0])
-		self.addProperty('package', re.findall('[A-Za-z\.]+', package)[0])
 
 		for m in self.modules:
-			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'DAC', 'CAN', 'SPI', 'I2C', 'OTG', 'DMA', 'USB', 'FSMC']):
-				if m.startswith('ADC') and '_' in m:
-					for a in m.replace('ADC','').split('_'):
-						modules.append('ADC'+a)
-				else:
-					modules.append(m)
+			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'CAN', 'SPI', 'I2C', 'FSMC', 'RNG', 'RCC']):
+				modules.append(m)
+
+		if 'CAN' in modules:
+			modules.append('CAN1')
+
+		if self.id.family in ['f2', 'f3', 'f4']:
+			modules.append('ID')
+
+		self.dmaFile = None
+		if 'DMA' in self.modules:
+			# lets load additional information about the DMA
+			dma_file = self.query("//IP[@Name='DMA']")[0].get('Version')
+			dma_file = os.path.join(self.rootpath, 'IP', 'DMA-' + dma_file + '_Modes.xml')
+			self.dmaFile = XMLDeviceReader(dma_file, logger)
+			dmas = [d.get('Name') for d in self.dmaFile.query("//IP/ModeLogicOperator/Mode[starts-with(@Name,'DMA')]")]
+			modules.extend(dmas)
 
 		invertMode = {'out': 'in', 'in': 'out', 'io': 'io'}
 		nameToMode = {'rx': 'in', 'tx': 'out', 'cts': 'in', 'rts': 'out', 'ck': 'out',	# Uart
 					 'miso': 'in', 'mosi': 'out', 'nss': 'io', 'sck': 'out',	# Spi
 					 'scl': 'out', 'sda': 'io'}	# I2c
-		# this look up table is only used for chips using the STM32Fxx7 GPIO IP
-		nameToAf = {'RTC_50Hz': '0', 'MCO': '0', 'TAMPER': '0', 'SWJ': '0', 'TRACE': '0',
-					'TIM1': '1', 'TIM2': '1',
-					'TIM3': '2', 'TIM4': '2', 'TIM5': '2',
-					'TIM8': '3', 'TIM9': '3', 'TIM10': '3', 'TIM11': '3',
-					'I2C1': '4', 'I2C2': '4', 'I2C3': '4',
-					'SPI1': '5', 'SPI2': '5', 'SPI4': '5', 'SPI5': '5', 'SPI6': '5',
-					'SPI3': '6', 'SAI1': '6',
-					'USART1': '7', 'USART2': '7', 'USART3': '7', 'I2S3ext': '7',
-					'UART4': '8', 'UART5': '8', 'USART6': '8', 'UART7': '8', 'UART8': '8',
-					'CAN1': '9', 'CAN2': '9', 'TIM12': '9', 'TIM13': '9', 'TIM14': '9',
-					'OTG_FS': '10', 'OTG_HS': '10',
-					'ETH': '11',
-					'FSMC': '12', 'SDIO': '12', 'OTG_HS_FS': '12',
-					'DCMI': '13',
-					'LCD': '14',
-					'EVENTOUT': '15' }
 
-		for pin in self.query("//Pin[@Type='I/O']"):
+		# lets load additional information about the GPIO IP
+		ip_file = self.query("//IP[@Name='GPIO']")[0].get('Version')
+		ip_file = os.path.join(self.rootpath, 'IP', 'GPIO-' + ip_file + '_Modes.xml')
+		self.gpioFile = XMLDeviceReader(ip_file, logger)
+
+		pins = self.query("//Pin[@Type='I/O'][starts-with(@Name,'P')]")
+		pins = sorted(pins, key=lambda p: [p.get('Name')[1:2], int(p.get('Name')[:4].split('-')[0].split('/')[0][2:])])
+
+		for pin in pins:
 			name = pin.get('Name')
-			if not name.startswith('P'):
-				continue
-			altFunctions = gpioFile.compactQuery("//GPIO_Pin[@Name='%s']/PinSignal/SpecificParameter[@Name='GPIO_AF']/.." % name)
-			altFunctions = { a.get('Name') : a[0][0].text.replace('GPIO_AF_', '') for a in altFunctions }
-			# for some reason, the 417 and 427 series GPIO has no direct AF number mapping
-			if any(name in ip_file for name in ['217', '401', '407', '417', '427']):
-				altFunctions = { a : nameToAf[altFunctions[a]] for a in altFunctions }
+			# F1 does not have pin 'alternate functions' only pin 'remaps' which switch groups of pins
+			if self.id.family == 'f1':
+				pinSignals = self.gpioFile.compactQuery("//GPIO_Pin[@Name='{}']/PinSignal/RemapBlock/..".format(name))
+				rawAltFunctions = {a.get('Name'): a[0].get('Name')[-1:] for a in pinSignals}
+				altFunctions = {}
+				for alt_name in rawAltFunctions:
+					key = alt_name.split('_')[0].lower()
+					if key not in stm32f1_remaps:
+						key += alt_name.split('_')[1].lower()
+					if key in stm32f1_remaps:
+						mask = stm32f1_remaps[key]['mask']
+						pos = stm32f1_remaps[key]['position']
+						value = stm32f1_remaps[key]['mapping'][int(rawAltFunctions[alt_name])]
+						altFunctions[alt_name] = '{},{},{}'.format(pos, mask, value)
+				# Add the rest of the pins
+				allSignals = self.compactQuery("//Pin[@Name='{}']/Signal".format(name))
+				for sig in allSignals:
+					if not any(sig.get('Name') in name.get('Name') for name in pinSignals):
+						pinSignals.append(sig)
 
-			if '-' in name:
-				name = name.split('-')[0]
-			elif '/' in name:
-				name = name.split('/')[0]
+			else:	# F0, F3 and F4
+				pinSignals = self.gpioFile.compactQuery("//GPIO_Pin[@Name='%s']/PinSignal/SpecificParameter[@Name='GPIO_AF']/.." % name)
+				altFunctions = { a.get('Name') : a[0][0].text.replace('GPIO_AF', '')[:2].replace('_','') for a in pinSignals }
+
+				# the analog channels are only available in the Mcu file, not the GPIO file
+				analogSignals = self.compactQuery("//Pin[@Name='{}']/Signal[starts-with(@Name,'ADC')]".format(name))
+				pinSignals.extend(analogSignals)
+
+			name = name[:4].split('-')[0].split('/')[0].strip()
 
 			gpio = {'port': name[1:2], 'id': name[2:]}
 			gpios.append(gpio)
 
 			afs = []
 
-			for signal in [s.get('Name') for s in pin if s.get('Name') != 'GPIO']:
+			for signal in [s.get('Name') for s in pinSignals]:
 				raw_names = signal.split('_')
+				if len(raw_names) < 2:
+					continue
+
+				if raw_names[0] not in modules:
+					continue
+
 				instance = raw_names[0][-1]
+				if not instance.isdigit():
+					instance = ""
+
 				name = raw_names[1].lower()
 				mode = None
 				if name in nameToMode and nameToMode[name] != 'io':
@@ -210,14 +284,16 @@ class STMDeviceReader(XMLDeviceReader):
 					if af_id:
 						af.update({'id': af_id})
 					afs.append(dict(af))
-					invertName = {'miso': 'somi', 'mosi': 'simo', 'nss': 'nss', 'sck': 'sck'}
-					af.update({	'peripheral' : 'SpiSlave' + instance,
-								'name': invertName[name].capitalize()})
-					if mode:
-						af.update({'type': invertMode[nameToMode[name]]})
-					afs.append(af)
+					# invertName = {'miso': 'somi', 'mosi': 'simo', 'nss': 'nss', 'sck': 'sck'}
+					# af.update({	'peripheral' : 'SpiSlave' + instance,
+					# 			'name': invertName[name].capitalize()})
+					# if mode:
+					# 	af.update({'type': invertMode[nameToMode[name]]})
+					# afs.append(af)
 
 				if signal.startswith('CAN'):
+					if instance == '':
+						instance = '1'
 					af = {'peripheral' : 'Can' + instance,
 						  'name': name.capitalize()}
 					if mode:
@@ -225,6 +301,15 @@ class STMDeviceReader(XMLDeviceReader):
 					if af_id:
 						af.update({'id': af_id})
 					afs.append(af)
+
+				if signal.startswith('RCC'):
+					if 'MCO' in signal:
+						id = "" if len(raw_names) < 3 else raw_names[2]
+						af = {'peripheral': 'MCO' + id}
+						af.update({'type': 'out'})
+						if af_id:
+							af.update({'id': af_id})
+						afs.append(af)
 
 				if signal.startswith('I2C'):
 					if name in ['scl', 'sda']:
@@ -268,42 +353,46 @@ class STMDeviceReader(XMLDeviceReader):
 							  'id': '0'}
 						afs.append(af)
 
-				if signal.startswith('OTG_FS') and raw_names[2] in ['DM', 'DP']:
-					af = {'peripheral' : 'Usb',
-						  'name': raw_names[2].capitalize()}
-					if af_id:
-						af.update({'id': af_id})
-					else:
-						af.update({'id': '10'})
-					afs.append(af)
+				# if signal.startswith('USB_OTG_FS') and raw_names[3] in ['DM', 'DP']:
+				# 	af = {'peripheral' : 'Usb',
+				# 		  'name': raw_names[3].capitalize()}
+				# 	if af_id:
+				# 		af.update({'id': af_id})
+				# 	else:
+				# 		af.update({'id': '10'})
+				# 	afs.append(af)
+				#
+				# if signal.startswith('USB_') and raw_names[1] in ['DM', 'DP']:
+				# 	af = {'peripheral': 'Usb',
+				# 		  'name': raw_names[1].capitalize()}
+				# 	if af_id:
+				# 		af.update({'id': af_id})
+				# 	else:
+				# 		af.update({'id': '10'})
+				# 	afs.append(af)
 
-				if signal.startswith('USB'):
-					af = {'peripheral' : 'Usb',
-						  'name': name.capitalize()}
-					if mode:
-						af.update({'type': mode})
-					if af_id:
-						af.update({'id': af_id})
-					afs.append(af)
-
-				if signal.startswith('FSMC_NOR_MUX_'):
-					af = {'peripheral' : 'Fsmc',
-						  'name': raw_names[3].capitalize().replace('Da','D')}
-					if af_id:
-						af.update({'id': af_id})
-					afs.append(af)
+				if signal.startswith('FSMC_'):
+					if not raw_names[1].startswith('DA'):
+						af = {'peripheral' : 'Fsmc',
+							  'name': raw_names[1].capitalize()}
+						if af_id:
+							af.update({'id': af_id})
+						afs.append(af)
 
 			# sort after key id and then add all without ids
 			# this sorting only affect the way the debug information is displayed
 			# in stm_writer the AFs are sorted again anyway
 			sorted_afs = [a for a in afs if 'id' in a]
-			sorted_afs.sort(key=lambda k: (int(k['id']), k['peripheral']))
+			sorted_afs.sort(key=lambda k: (int(k['id'].split(',')[0]), k['peripheral']))
 			sorted_afs.extend([a for a in afs if 'id' not in a])
 
 			for af in sorted_afs:
 				af['gpio_port'] = gpio['port']
 				af['gpio_id'] = gpio['id']
 				gpio_afs.append(af)
+
+		if 'CAN' in modules:
+			modules.remove('CAN')
 
 	def _modulesToString(self):
 		string = ""
@@ -315,8 +404,28 @@ class STMDeviceReader(XMLDeviceReader):
 			char = module[0][0:1]
 		return string
 
+	def _getDeviceDefine(self):
+		if self.id.family not in stm32_defines:
+			return None
+		# get the defines for this device family
+		familyDefines = stm32_defines[self.id.family]
+		# get all defines for this device name
+		devName = 'STM32F{}'.format(self.id.name)
+		deviceDefines = sorted([define for define in familyDefines if define.startswith(devName)])
+		# if there is only one define thats the one
+		if len(deviceDefines) == 1:
+			return deviceDefines[0]
+
+		# now we match for the size-id.
+		devName += 'x{}'.format(self.id.size_id.upper())
+		for define in deviceDefines:
+			if devName <= define:
+				return define
+
+		return None
+
 	def __repr__(self):
 		return self.__str__()
 
 	def __str__(self):
-		return "STMDeviceReader(" + self.name + ")"
+		return "STMDeviceReader({}, [\n{}])".format(os.path.basename(self.name), ",\n".join(map(str, self.properties)))

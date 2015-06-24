@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2013, Roboterclub Aachen e.V.
 # All rights reserved.
-# 
+#
 # The file is part of the xpcc library and is released under the 3-clause BSD
 # license. See the file `LICENSE` for the full license governing this code.
 # -----------------------------------------------------------------------------
@@ -17,7 +17,7 @@ class DeviceMerger:
 	Since most Devices have the same peripherals, but differ in other
 	parameters, like Flash/RAM/EEPROM sizes, packaging or other minor
 	differences, it makes sense to group them accordingly.
-	
+
 	Please not that this class only makes the resulting XML files more user
 	friendly to manually edit, since the user does not have to apply the
 	changes to multiple files. Ideally - reality might differ :(.
@@ -44,11 +44,11 @@ class DeviceMerger:
 
 	def mergedByName(self):
 		self.mergedDevices = self._mergeDevicesByName(self.mergedDevices)
-	
+
 	def mergedBySize(self):
 		self.mergedDevices = self._mergeDevicesBySize(self.mergedDevices)
 
-	
+
 	def _mergeDevicesByName(self, devices):
 		"""
 		This is a simple helper method to merge devices based on name.
@@ -115,27 +115,33 @@ class DeviceMerger:
 			merged.append(current)
 
 		return merged
-	
+
 	def _getCategoryNameSTM32(self, device):
 		names = device.ids.getAttribute('name')
 		family = device.id.family
-		
+
 		if family == 'f0':
-			categories = [	['050', '051'],
-							['030']  ]
+			categories = [	['030', '050', '070'],
+			                ['031', '051', '071', '091'],
+			                ['042', '072'],
+			                ['038', '048', '058', '078', '098']]
 		elif family == 'f1':
 			categories = [	['100', '102', '101', '103'],
 							['105', '107']  ]
 		elif family == 'f2':
 			categories = [	['205', '207', '215', '217']  ]
 		elif family == 'f3':
-			categories = [	['302', '303'],
-							['372', '373']  ]
+			categories = [	['301'],
+							['302'],
+							['303'],
+			                ['334'],
+			                ['318', '328', '358', '378'],
+							['373']  ]
 		elif family == 'f4':
 			categories = [	['401'],
 							['405', '415', '407', '417'],
 							['427', '437', '429', '439']  ]
-			
+
 		# make sure that only one category is used!
 		for cat in categories:
 			if names[0] in cat:
@@ -230,7 +236,7 @@ class DeviceMerger:
 								matches.append(dev)
 
 			# The following code is Atmel's fault with their stupid naming schemes.
-			# the AT90's, ATmega's and ATtiny's have special merging rules 
+			# the AT90's, ATmega's and ATtiny's have special merging rules
 			if current.id.family == "at90":
 				name = current.id.name
 
@@ -364,7 +370,7 @@ class DeviceMerger:
 			merged.append(current)
 
 		return merged
-	
+
 	def _getCategorySizeSTM32(self, device):
 		size_ids = device.ids.getAttribute('size_id')
 		family = device.id.family
@@ -372,21 +378,31 @@ class DeviceMerger:
 		# these categories are dependent on name
 		# these are the categories of mergeable size-ids
 		if family == 'f0':
-			categories = [	['4', '6', '8']  ]	# low and medium density
+			categories = [	['4', '6'],
+			                  ['8'],
+			                  ['b', 'c']  ]
+			if name in ['072', '042']:
+				categories = [['4', '6'], ['8', 'b']]
 		elif family == 'f1':
 			categories = [	['4', '6'],			# low density
 							['8', 'b'],			# medium density
 							['c', 'd', 'e'],	# high density
 							['f', 'g']  ]		# super high density
 			if name in ['105', '107']:
-				categories = [	['8', 'b', 'c']  ]	# medium and high density
+				categories = [	['8', 'b', 'c'] ]	# medium and high density
 		elif family == 'f2':
 			categories = [	['b', 'c', 'd', 'e', 'f', 'g'] ]	# high density
 		elif family == 'f3':
-			categories = [	['8', 'b', 'c']  ]
+			categories = [ ['4', '6', '8'], ['b', 'c', 'd', 'e'] ]
+			if name in ['373']:
+				categories = [['8', 'b', 'c']]
 		elif family == 'f4':
-			categories = [	['c'],
+			categories = [	['b', 'c', 'd'],
 							['e', 'g', 'i']  ]
+			if name in ['401']:
+				categories = [	['b', 'c', 'd', 'e'] ]
+			if name in ['411']:
+					categories = [['c', 'e']]
 		# make sure that only one category is used!
 		for cat in categories:
 			if size_ids[0] in cat:
@@ -432,7 +448,7 @@ class DeviceMerger:
 			matches = []
 			suffix = self._getCategoryTypeAVR(current)
 
-			self.log.info("ByType: Searching for device ending in " + str(suffix)) 
+			self.log.info("ByType: Searching for device ending in " + str(suffix))
 
 			for dev in devs:
 				if dev.id.name == props.name and dev.id.type in suffix:

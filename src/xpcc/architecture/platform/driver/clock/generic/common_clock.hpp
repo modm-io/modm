@@ -77,14 +77,15 @@ Hz(int f)  { return (f == HzDontCare)? HzDontCare : (f / Hz1); }
 /**
  * Errors that might prevent using a certain clock configuration
  */
-enum class StartupError
+enum class
+StartupError : uint8_t
 {
-	None,				// all went well
-	InternalClock,		// was not able to start the internal clock
-	ExternalClock,		// was not able to start the external clock
-	ExternalCrystal,	// was not able to start the external oscillator
-	Pll,				// was not able to start the PLL
-	SystemClock,		// was not able to switch system clock input
+	None = 0,				// all went well
+	InternalClock = 1,		// was not able to start the internal clock
+	ExternalClock = 2,		// was not able to start the external clock
+	ExternalCrystal = 3,	// was not able to start the external oscillator
+	Pll = 4,				// was not able to start the PLL
+	SystemClock = 5,		// was not able to switch system clock input
 };
 
 }	// namespace clock

@@ -10,7 +10,7 @@
 #ifndef XPCC_HMC6343_HPP
 #	error  "Don't include this file directly, use 'hmc6343.hpp' instead!"
 #endif
-#include <xpcc/math/utils/operator.hpp>
+#include <xpcc/math/utils/endianness.hpp>
 
 // ----------------------------------------------------------------------------
 template < class I2cMaster >
@@ -63,11 +63,16 @@ xpcc::Hmc6343<I2cMaster>::writeRegister(Register16 reg, uint16_t value)
 {
 	RF_BEGIN();
 
+	// for little endian machines this endianness "conversion" does nothing
+	*reinterpret_cast<uint16_t*>(buffer+2) = xpcc::toLittleEndian(value);
+	// for big endian machines, the bytes are swapped, so that the following is always true!
+	// buffer[2] has LSB, buffer[3] has MSB
+
 	// LSB
-	if ( RF_CALL( writeRegister(static_cast<Register>(reg), value) ) )
+	if ( RF_CALL( writeRegister(static_cast<Register>(reg), buffer[2]) ) )
 	{
 		// MSB
-		RF_RETURN_CALL( writeRegister(static_cast<Register>(i(reg)+1), (value >> 8)) );
+		RF_RETURN_CALL( writeRegister(static_cast<Register>(i(reg)+1), buffer[3]) );
 	}
 
 	RF_END_RETURN(false);
@@ -110,12 +115,11 @@ xpcc::Hmc6343<I2cMaster>::readRegister(Register16 reg, uint16_t &value)
 	if ( RF_CALL( readRegister(static_cast<Register>(reg), buffer[2]) ) )
 	{
 		// MSB
-		value = buffer[2];
-		if ( RF_CALL( readRegister(static_cast<Register>(i(reg)+1), buffer[2]) ) )
+		if ( RF_CALL( readRegister(static_cast<Register>(i(reg)+1), buffer[3]) ) )
 		{
-			// an optimization would be to take the uint8_t address of the MSB value
-			// but then we would have to deal with endianess, and that headache is annoying.
-			value |= (buffer[2] << 8);
+			// buffer[2] has LSB, buffer[3] has MSB
+			// bytes get swapped on big endian machines
+			value = xpcc::fromLittleEndian(*reinterpret_cast<uint16_t*>(buffer+2));
 			RF_RETURN(true);
 		}
 	}

@@ -73,28 +73,37 @@ xpcc::stm32::{{ name }}::disable()
 	RCC->APB1ENR &= ~RCC_APB1ENR_{{ peripheral }}EN;
 %% endif
 }
-
+%% if target is not stm32f1
 template<class SystemClock, uint32_t baudrate,
 		xpcc::stm32::{{ name }}::OversamplingMode oversample>
 void ALWAYS_INLINE
 xpcc::stm32::{{ name }}::initialize(Parity parity)
 {
-	initializeWithBrr(UartBaudrate::getBrr<SystemClock::{{ name }}, baudrate>(),
+	initializeWithBrr(UartBaudrate::getBrr<SystemClock::{{ uart ~ id }}, baudrate>(),
 			parity,
 			oversample);
 }
+%% endif
 
 template<class SystemClock, uint32_t baudrate>
 void ALWAYS_INLINE
 xpcc::stm32::{{ name }}::initialize(Parity parity)
 {
-	initialize<SystemClock, baudrate,
-			UartBaudrate::getOversamplingMode(SystemClock::{{ name }}, baudrate)>(parity);
+%% if target is stm32f1
+	initializeWithBrr(UartBaudrate::getBrr<SystemClock::{{ uart ~ id }}, baudrate>(), parity);
+%% else
+	initializeWithBrr(UartBaudrate::getBrr<SystemClock::{{ uart ~ id }}, baudrate>(), parity,
+					  UartBaudrate::getOversamplingMode(SystemClock::{{ uart ~ id }}, baudrate));
+%% endif
 }
 
 
 void inline
+%% if target is not stm32f1
 xpcc::stm32::{{ name }}::initializeWithBrr(uint16_t brr, Parity parity, OversamplingMode oversample)
+%% else
+xpcc::stm32::{{ name }}::initializeWithBrr(uint16_t brr, Parity parity)
+%% endif
 {
 	enable();
 	// DIRTY HACK: disable and reenable uart to be able to set
@@ -103,11 +112,13 @@ xpcc::stm32::{{ name }}::initializeWithBrr(uint16_t brr, Parity parity, Oversamp
 	// set baudrate
 	{{ peripheral }}->BRR = brr;
 	setParity(parity);
+%% if target is not stm32f1
 	setOversamplingMode(oversample);
+%% endif
 	{{ peripheral }}->CR1 |=  USART_CR1_UE;	// Uart Reenable
 }
 
-
+%% if target is not stm32f1
 void
 xpcc::stm32::{{ name }}::setOversamplingMode(OversamplingMode mode)
 {
@@ -117,6 +128,7 @@ xpcc::stm32::{{ name }}::setOversamplingMode(OversamplingMode mode)
 		{{ peripheral }}->CR1 |=  static_cast<uint32_t>(OversamplingMode::By8);
 	}
 }
+%% endif
 %% if id in [1, 2, 3, 6]
 
 void
@@ -153,7 +165,7 @@ xpcc::stm32::{{ name }}::write(uint8_t data)
 {
 %% if target is stm32f0 or target is stm32f3
 	{{ peripheral }}->TDR = data;
-%% elif target is stm32f2 or target is stm32f4
+%% else
 	{{ peripheral }}->DR = data;
 %% endif
 }
@@ -163,7 +175,7 @@ xpcc::stm32::{{ name }}::read(uint8_t &data)
 {
 %% if target is stm32f0 or target is stm32f3
 	data = {{ peripheral }}->RDR;
-%% elif target is stm32f2 or target is stm32f4
+%% else
 	data = {{ peripheral }}->DR;
 %% endif
 }
@@ -193,7 +205,7 @@ xpcc::stm32::{{ name }}::isReceiveRegisterNotEmpty()
 {
 %% if target is stm32f0 or target is stm32f3
 	return {{ peripheral }}->ISR & USART_ISR_RXNE;
-%% elif target is stm32f2 or target is stm32f4
+%% else
 	return {{ peripheral }}->SR & USART_SR_RXNE;
 %% endif
 }
@@ -203,7 +215,7 @@ xpcc::stm32::{{ name }}::isTransmitRegisterEmpty()
 {
 %% if target is stm32f0 or target is stm32f3
 	return {{ peripheral }}->ISR & USART_ISR_TXE;
-%% elif target is stm32f2 or target is stm32f4
+%% else
 	return {{ peripheral }}->SR & USART_SR_TXE;
 %% endif
 }
@@ -240,7 +252,7 @@ xpcc::stm32::{{ name }}::getInterruptFlags()
 {
 %% if target is stm32f0 or target is stm32f3
 	return static_cast<InterruptFlag>( {{ peripheral }}->ISR );
-%% elif target is stm32f2 or target is stm32f4
+%% else
 	return static_cast<InterruptFlag>( {{ peripheral }}->SR );
 %% endif
 }
@@ -258,7 +270,7 @@ xpcc::stm32::{{ name }}::acknowledgeInterruptFlags(InterruptFlag flags)
 	// Flags are cleared by writing a one to the flag position.
 	// Writing a zero is (hopefully) ignored.
 	{{ peripheral }}->ICR = (flags & mask);
-%% elif target is stm32f2 or target is stm32f4
+%% else
 	/* Interrupts must be cleared manually by accessing SR and DR.
 	 * Overrun Interrupt, Noise flag detected, Framing Error, Parity Error
 	 * p779: "It is cleared by a software sequence (an read to the

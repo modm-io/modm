@@ -74,7 +74,7 @@ xpcc::stm32::CanFilter::disableFilter(uint8_t id)
 }
 
 // ----------------------------------------------------------------------------
-%% if target is stm32f1 or target is stm32f4
+%% if target is stm32f1 or target is stm32f2 or target is stm32f4
 void
 xpcc::stm32::CanFilter::setStartFilterBankForCan2(uint8_t startBank)
 {

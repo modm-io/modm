@@ -33,12 +33,13 @@ public:
 	uint32_t
 	getUniqueId(uint8_t offset)
 	{
-%% if target is stm32f2 or target is stm32f4
+		if (offset > 2) return 0;
+%% if target is stm32f2 or target is stm32f3 or target is stm32f4
 		uint32_t *baseaddress = (uint32_t*) 0x1FFF7A10;
 %% elif target is stm32f1
 		uint32_t *baseaddress = (uint32_t*) 0x1FFFF7E8;
 %% else
-# error "Core only supported on STM32F2,F1 and F4. Please port to your target."
+# error "Core only supported on STM32F1, F2, F3 and F4. Please port to your target."
 %% endif
 		return *(baseaddress + offset);
 	}
