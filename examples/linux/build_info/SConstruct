@@ -15,6 +15,10 @@ program = env.Program(target = env['XPCC_CONFIG']['general']['name'], source = f
 # build the xpcc library
 env.XpccLibrary()
 
+# build xpcc_git_info.hpp and xpcc_build_info.hpp file
+env.GitInfoHeader()
+env.BuildInfoHeader()
+
 # build xpcc_build_info.hpp file
 env.BuildInfoHeader()
 
