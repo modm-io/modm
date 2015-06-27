@@ -53,6 +53,7 @@
     <driver device-size-id="d|e" device-pin-id="r|v|z" type="timer" name="stm32" instances="20"/>
     <driver type="uart" name="stm32" instances="1,2,3"/>
     <driver device-pin-id="r|v|z" type="uart" name="stm32" instances="4,5"/>
+    <driver type="usb" name="stm32_fs"/>
     <driver type="gpio" name="stm32">
       <gpio port="A" id="0">
         <af id="1" peripheral="Timer2" name="Channel1"/>
@@ -147,6 +148,7 @@
         <af id="10" peripheral="Timer4" name="Channel1"/>
         <af id="11" peripheral="Timer1" name="Channel4"/>
         <af id="12" peripheral="Timer1" name="BreakIn" type="in"/>
+        <af device-size-id="b|c" device-pin-id="c|r|v" id="14" peripheral="Usb" name="Dm"/>
       </gpio>
       <gpio port="A" id="12">
         <af id="1" peripheral="Timer16" name="Channel1"/>
@@ -156,6 +158,7 @@
         <af id="9" peripheral="Can1" name="Tx" type="out"/>
         <af id="10" peripheral="Timer4" name="Channel2"/>
         <af id="11" peripheral="Timer1" name="ExternalTrigger" type="in"/>
+        <af device-size-id="b|c" device-pin-id="c|r|v" id="14" peripheral="Usb" name="Dp"/>
       </gpio>
       <gpio port="A" id="13">
         <af id="1" peripheral="Timer16" name="Channel1N"/>

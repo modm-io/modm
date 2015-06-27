@@ -41,6 +41,7 @@
     <driver type="spi" name="stm32_uart" instances="1,2,6"/>
     <driver type="timer" name="stm32" instances="1,2,3,4,5,9,10,11"/>
     <driver type="uart" name="stm32" instances="1,2,6"/>
+    <driver type="usb" name="stm32_fs"/>
     <driver type="gpio" name="stm32">
       <gpio port="A" id="0">
         <af id="1" peripheral="Timer2" name="Channel1"/>
@@ -118,12 +119,14 @@
         <af id="7" peripheral="Uart1" name="Cts" type="in"/>
         <af id="8" peripheral="Uart6" name="Tx" type="out"/>
         <af id="8" peripheral="UartSpiMaster6" name="Mosi" type="out"/>
+        <af id="10" peripheral="Usb" name="Dm"/>
       </gpio>
       <gpio port="A" id="12">
         <af id="1" peripheral="Timer1" name="ExternalTrigger" type="in"/>
         <af id="7" peripheral="Uart1" name="Rts" type="out"/>
         <af id="8" peripheral="Uart6" name="Rx" type="in"/>
         <af id="8" peripheral="UartSpiMaster6" name="Miso" type="in"/>
+        <af id="10" peripheral="Usb" name="Dp"/>
       </gpio>
       <gpio port="A" id="13"/>
       <gpio port="A" id="14"/>

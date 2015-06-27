@@ -169,7 +169,7 @@ class STMDeviceReader(XMLDeviceReader):
 		self.log.debug("Available Modules are:\n" + self._modulesToString())
 
 		for m in self.modules:
-			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'CAN', 'SPI', 'I2C', 'FSMC', 'RNG', 'RCC']):
+			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'CAN', 'SPI', 'I2C', 'FSMC', 'RNG', 'RCC', 'USB']):
 				modules.append(m)
 
 		if 'CAN' in modules:
@@ -242,7 +242,7 @@ class STMDeviceReader(XMLDeviceReader):
 				if len(raw_names) < 2:
 					continue
 
-				if raw_names[0] not in modules:
+				if not any(m.startswith(raw_names[0]) for m in modules):
 					continue
 
 				instance = raw_names[0][-1]
@@ -353,23 +353,23 @@ class STMDeviceReader(XMLDeviceReader):
 							  'id': '0'}
 						afs.append(af)
 
-				# if signal.startswith('USB_OTG_FS') and raw_names[3] in ['DM', 'DP']:
-				# 	af = {'peripheral' : 'Usb',
-				# 		  'name': raw_names[3].capitalize()}
-				# 	if af_id:
-				# 		af.update({'id': af_id})
-				# 	else:
-				# 		af.update({'id': '10'})
-				# 	afs.append(af)
-				#
-				# if signal.startswith('USB_') and raw_names[1] in ['DM', 'DP']:
-				# 	af = {'peripheral': 'Usb',
-				# 		  'name': raw_names[1].capitalize()}
-				# 	if af_id:
-				# 		af.update({'id': af_id})
-				# 	else:
-				# 		af.update({'id': '10'})
-				# 	afs.append(af)
+				if signal.startswith('USB_OTG_FS') and raw_names[3] in ['DM', 'DP']:
+					af = {'peripheral' : 'Usb',
+						  'name': raw_names[3].capitalize()}
+					if af_id:
+						af.update({'id': af_id})
+					else:
+						af.update({'id': '10'})
+					afs.append(af)
+
+				if signal.startswith('USB_') and raw_names[1] in ['DM', 'DP']:
+					af = {'peripheral': 'Usb',
+						  'name': raw_names[1].capitalize()}
+					if af_id:
+						af.update({'id': af_id})
+					else:
+						af.update({'id': '10'})
+					afs.append(af)
 
 				if signal.startswith('FSMC_'):
 					if not raw_names[1].startswith('DA'):
