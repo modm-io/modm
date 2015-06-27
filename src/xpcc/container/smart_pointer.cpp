@@ -50,7 +50,7 @@ xpcc::SmartPointer::SmartPointer(const SmartPointer& other) :
 // must allocate at least four bytes, so getPointer() does return
 // a valid address
 xpcc::SmartPointer::SmartPointer(uint16_t size) :
-	ptr(new uint8_t[size + 4])
+	ptr(new uint8_t[size ? size + 3 : 4])
 {
 	ptr[0] = 1;
 	*reinterpret_cast<uint16_t*>(ptr + 1) = size;
