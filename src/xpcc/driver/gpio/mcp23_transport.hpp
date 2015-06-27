@@ -110,7 +110,7 @@ private:
 	uint8_t address;
 
 	// write read bit on the address
-	static constexpr uint8_t Read = 0x80;
+	static constexpr uint8_t Read = 0x01;
 	static constexpr uint8_t Write = 0x00;
 };
 
