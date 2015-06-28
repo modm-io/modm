@@ -12,8 +12,7 @@ MAIN_FUNCTION
 	// New Static Clock Setup ( => Static)
 	typedef Pll<ExternalCrystal<MHz12>, MHz48> clockSource;
 	// typedef ExternalOscillator<MHz12> clockSource;
-	StartupError err =
-		SystemClock<clockSource>::enable();
+	SystemClock<clockSource>::enable();
 
 	ClockTree::connectToClockOut(ClockTree::ClockOutSource::SystemClock);
 	ClockTree::setClockOutDivision(100);
