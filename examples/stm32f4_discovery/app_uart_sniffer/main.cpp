@@ -46,6 +46,9 @@ setDirection(Direction dir)
 
 		switch (direction)
 		{
+		case Direction::Init:
+			// Error
+			break;
 		case Direction::Host2Node:
 			XPCC_LOG_INFO.printf("\e[91m");
 			break;
