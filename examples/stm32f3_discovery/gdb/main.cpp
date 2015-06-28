@@ -84,6 +84,7 @@ void rec_itr()
 	i = fib_itr(10);
 	i = fib_rec(10);
 	i = pow(2, 30);	// = (1<<30)
+	(void)i;
 }
 
 MAIN_FUNCTION
@@ -100,7 +101,8 @@ MAIN_FUNCTION
 	LedNorthWest::setOutput(xpcc::Gpio::High);
 
 	int a = 30;
-	
+	(void)a;
+
 	while (1)
 	{
 		rec_itr();
