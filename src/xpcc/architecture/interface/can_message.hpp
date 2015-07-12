@@ -12,6 +12,7 @@
 #define XPCC_CAN__MESSAGE_HPP
 
 #include <stdint.h>
+#include <xpcc/io/iostream.hpp>
 #include <xpcc/architecture/utils.hpp>
 
 namespace xpcc
@@ -92,6 +93,9 @@ public:
 	} flags;
 	uint8_t length;
 };
+
+xpcc::IOStream&
+operator << (xpcc::IOStream& s, const xpcc::can::Message m);
 
 }	// namespace can
 
