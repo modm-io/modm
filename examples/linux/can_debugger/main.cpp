@@ -24,37 +24,6 @@ static constexpr uint32_t canBusBaudRate = 125000;
 
 xpcc::hosted::CanUsb canUsb;
 
-namespace xpcc {
-
-	IOStream&
-	operator << (IOStream& s, const can::Message &m)
-	{
-		s.printf("Id: %04x, ", m.getIdentifier());
-		
-		if (m.isExtended()) {
-			s.printf("E, ");
-		} else {
-			s.printf("   ");
-		}
-
-		if (m.isRemoteTransmitRequest()) {
-			s.printf("R, ");
-		} else {
-			s.printf("   ");
-		}
-		
-		
-		s.printf("L: %1d, ", m.getLength());
-		
-		for (std::size_t ii = 0; ii < m.getLength(); ++ii) {
-			s.printf("%02x ", m.data[ii]);
-		}
-
-		return s;
-	}
-
-} // xpcc namespace
-
 int
 main()
 {
