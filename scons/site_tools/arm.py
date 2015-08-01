@@ -144,7 +144,7 @@ def generate(env, **kw):
 #		"-Wshadow",			# TODO enable this
 		"-Wpointer-arith",
 		"-Wunused",
-		"-Wa,-adhlns=${TARGET.base}.lst",
+#		"-Wa,-adhlns=${TARGET.base}.lst",
 		"-DBASENAME=${SOURCE.file}",
 		"-fdiagnostics-color=auto",
 	]
