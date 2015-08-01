@@ -115,6 +115,8 @@ namespace xpcc
 %#------------ Inputs ---------------------------------------------------------
 %% set internalClock =		{'name': "InternalClock",
 							 'fixedFrequency': "MHz8" }
+%% set internalClock =		{'name': "InternalClock",
+							 'fixedFrequency': "MHz16" }
 %% set externalClock =		{'name': "ExternalClock",
 							 'minFrequency': "MHz4",
 							 'maxFrequency': "MHz32" }
