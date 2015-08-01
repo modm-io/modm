@@ -37,8 +37,11 @@
 
 #define	FLASH_STORAGE(var)				extern const var PROGMEM; const var
 #define	EXTERN_FLASH_STORAGE(var)		extern const var PROGMEM
+
 #define	FLASH_STORAGE_STRING(s)			extern const char s[] PROGMEM; const char s[]
 #define	EXTERN_FLASH_STORAGE_STRING(s)	extern const char s[] PROGMEM
+
+#define	INLINE_FLASH_STORAGE_STRING(s)	((const PROGMEM char *)(s))
 
 namespace xpcc
 {

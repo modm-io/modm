@@ -74,6 +74,8 @@
 		#define	FLASH_STORAGE_STRING(s)			extern const char s[]; const char s[]
 		#define	EXTERN_FLASH_STORAGE_STRING(s)	extern const char s[]
 
+		#define	INLINE_FLASH_STORAGE_STRING(s)	((const char *)(s))
+
 		namespace xpcc
 		{
 			template<typename T, std::size_t size>
