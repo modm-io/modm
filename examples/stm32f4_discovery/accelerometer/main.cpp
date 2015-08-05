@@ -29,10 +29,6 @@ typedef GpioA5 Scl;
 typedef GpioA7 Sda;
 typedef xpcc::SoftwareI2cMaster<Scl, Sda> I2cMaster;
 
-// Interrupt lines
-typedef GpioInputE0 Int1;
-typedef GpioInputE1 Int2;
-
 #if USE_I2C
 typedef xpcc::Lis3TransportI2c< I2cMaster > Transport;
 #else
