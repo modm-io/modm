@@ -447,8 +447,10 @@ def generate(env, **kw):
 	elif env['ARCHITECTURE'].startswith('hosted'):
 		env['HOSTED_DEVICE'] = device
 		env.Tool('hosted')
-	elif env['ARCHITECTURE'] in ['cortex-m0', 'cortex-m3', 'cortex-m4', 'cortex-m4f']:
-		if env['ARCHITECTURE'] == 'cortex-m4f':
+	elif env['ARCHITECTURE'] in ['cortex-m0', 'cortex-m3', 'cortex-m4', 'cortex-m4f', 'cortex-m7', 'cortex-m7f']:
+		if env['ARCHITECTURE'] == 'cortex-m7f':
+			env['ARM_ARCH'] = 'cortex-m7'
+		elif env['ARCHITECTURE'] == 'cortex-m4f':
 			env['ARM_ARCH'] = 'cortex-m4'
 		else:
 			env['ARM_ARCH'] = env['ARCHITECTURE']

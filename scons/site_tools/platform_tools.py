@@ -346,9 +346,15 @@ def generate(env, **kw):
 	def test_cortex_m4(target):
 		return test_core(target, 'cortex-m4', True)
 	env.AddTemplateJinja2Test('cortex_m4', test_cortex_m4)
+	def test_cortex_m7(target):
+		return test_core(target, 'cortex-m7', True)
+	env.AddTemplateJinja2Test('cortex_m7', test_cortex_m7)
 	def test_cortex_m4f(target):
 		return test_core(target, 'cortex-m4f')
 	env.AddTemplateJinja2Test('cortex_m4f', test_cortex_m4f)
+	def test_cortex_m7f(target):
+		return test_core(target, 'cortex-m7f')
+	env.AddTemplateJinja2Test('cortex_m7f', test_cortex_m7f)
 
 	# Platform Tests
 	def test_is_stm32(target):
@@ -377,6 +383,9 @@ def generate(env, **kw):
 	def test_is_stm32f4(target):
 		return test_platform(target, 'stm32') and test_family(target, 'f4')
 	env.AddTemplateJinja2Test('stm32f4', test_is_stm32f4)
+	def test_is_stm32f7(target):
+		return test_platform(target, 'stm32') and test_family(target, 'f7')
+	env.AddTemplateJinja2Test('stm32f7', test_is_stm32f7)
 
 # -----------------------------------------------------------------------------
 def exists(env):
