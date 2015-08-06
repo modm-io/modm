@@ -50,7 +50,9 @@
 %% macro appendInterrupts()
 %#
 %% if target is stm32f0
-%%	include 'stm32f0_ivectors.macros' with context
+%%    include 'stm32f0_ivectors.macros' with context
+%% elif target is stm32f7
+%%    include 'stm32f7_ivectors.macros' with context
 %% else
 %#
 %% do i.update({ 0: ["WWDG_IRQHandler", "Window Watchdog"]})
@@ -65,44 +67,44 @@
 %% do i.update({ 9: ["EXTI3_IRQHandler", "EXTI Line 3"]})
 %% do i.update({10: ["EXTI4_IRQHandler", "EXTI Line 4"]})
 %% if target is stm32f1 or target is stm32f3
-%% do i.update({11: ["DMA1_Channel1_IRQHandler", "DMA1 Channel 1"]})
-%% do i.update({12: ["DMA1_Channel2_IRQHandler", "DMA1 Channel 2"]})
-%% do i.update({13: ["DMA1_Channel3_IRQHandler", "DMA1 Channel 3"]})
-%% do i.update({14: ["DMA1_Channel4_IRQHandler", "DMA1 Channel 4"]})
-%% do i.update({15: ["DMA1_Channel5_IRQHandler", "DMA1 Channel 5"]})
-%% do i.update({16: ["DMA1_Channel6_IRQHandler", "DMA1 Channel 6"]})
-%% do i.update({17: ["DMA1_Channel7_IRQHandler", "DMA1 Channel 7"]})
-%% 	do i.update({18: ["ADC_IRQHandler", "ADC1 and ADC2"]})
+%%    do i.update({11: ["DMA1_Channel1_IRQHandler", "DMA1 Channel 1"]})
+%%    do i.update({12: ["DMA1_Channel2_IRQHandler", "DMA1 Channel 2"]})
+%%    do i.update({13: ["DMA1_Channel3_IRQHandler", "DMA1 Channel 3"]})
+%%    do i.update({14: ["DMA1_Channel4_IRQHandler", "DMA1 Channel 4"]})
+%%    do i.update({15: ["DMA1_Channel5_IRQHandler", "DMA1 Channel 5"]})
+%%    do i.update({16: ["DMA1_Channel6_IRQHandler", "DMA1 Channel 6"]})
+%%    do i.update({17: ["DMA1_Channel7_IRQHandler", "DMA1 Channel 7"]})
+%%    do i.update({18: ["ADC_IRQHandler", "ADC1 and ADC2"]})
 %% elif target is stm32f2 or target is stm32f4
-%% do i.update({11: ["DMA1_Stream0_IRQHandler", "DMA1 Stream 0"]})
-%% do i.update({12: ["DMA1_Stream1_IRQHandler", "DMA1 Stream 1"]})
-%% do i.update({13: ["DMA1_Stream2_IRQHandler", "DMA1 Stream 2"]})
-%% do i.update({14: ["DMA1_Stream3_IRQHandler", "DMA1 Stream 3"]})
-%% do i.update({15: ["DMA1_Stream4_IRQHandler", "DMA1 Stream 4"]})
-%% do i.update({16: ["DMA1_Stream5_IRQHandler", "DMA1 Stream 5"]})
-%% do i.update({17: ["DMA1_Stream6_IRQHandler", "DMA1 Stream 6"]})
-%% 	do i.update({18: ["ADC_IRQHandler", "ADC1, ADC2 and ADC3s"]})
+%%    do i.update({11: ["DMA1_Stream0_IRQHandler", "DMA1 Stream 0"]})
+%%    do i.update({12: ["DMA1_Stream1_IRQHandler", "DMA1 Stream 1"]})
+%%    do i.update({13: ["DMA1_Stream2_IRQHandler", "DMA1 Stream 2"]})
+%%    do i.update({14: ["DMA1_Stream3_IRQHandler", "DMA1 Stream 3"]})
+%%    do i.update({15: ["DMA1_Stream4_IRQHandler", "DMA1 Stream 4"]})
+%%    do i.update({16: ["DMA1_Stream5_IRQHandler", "DMA1 Stream 5"]})
+%%    do i.update({17: ["DMA1_Stream6_IRQHandler", "DMA1 Stream 6"]})
+%%    do i.update({18: ["ADC_IRQHandler", "ADC1, ADC2 and ADC3s"]})
 %% endif
 %% if target is stm32f3
-%%  do i.update({19: ["USB_HP_CAN_TX_IRQHandler", "USB HP CAN TX"]} )
-%%  do i.update({20: ["USB_LP_CAN_RX0_IRQHandler", "USB LP CAN RX0"]})
-%%  do i.update({21: ["CAN_RX1_IRQHandler", "CAN RX1"]})
-%%  do i.update({22: ["CAN_SCE_IRQHandler", "CAN SCE"]})
+%%    do i.update({19: ["USB_HP_CAN_TX_IRQHandler", "USB HP CAN TX"]} )
+%%    do i.update({20: ["USB_LP_CAN_RX0_IRQHandler", "USB LP CAN RX0"]})
+%%    do i.update({21: ["CAN_RX1_IRQHandler", "CAN RX1"]})
+%%    do i.update({22: ["CAN_SCE_IRQHandler", "CAN SCE"]})
 %% elif target is stm32f2 or target is stm32f4
-%%  do i.update({19: ["CAN1_TX_IRQHandler", "CAN1 TX"]} )
-%%  do i.update({20: ["CAN1_RX0_IRQHandler", "CAN1 RX0"]})
-%%  do i.update({21: ["CAN1_RX1_IRQHandler", "CAN1 RX1"]})
-%%  do i.update({22: ["CAN1_SCE_IRQHandler", "CAN1 SCE"]})
+%%    do i.update({19: ["CAN1_TX_IRQHandler", "CAN1 TX"]} )
+%%    do i.update({20: ["CAN1_RX0_IRQHandler", "CAN1 RX0"]})
+%%    do i.update({21: ["CAN1_RX1_IRQHandler", "CAN1 RX1"]})
+%%    do i.update({22: ["CAN1_SCE_IRQHandler", "CAN1 SCE"]})
 %% endif
 %% do i.update({23: ["EXTI9_5_IRQHandler", "EXTI Line 9..5"]})
 %% if target is stm32f1 or target is stm32f3
-%% 	do i.update({24: ["TIM1_BRK_TIM15_IRQHandler", "TIM1 Break"]})
-%% 	do i.update({25: ["TIM1_UP_TIM16_IRQHandler", "TIM1 Update"]})
-%% 	do i.update({26: ["TIM1_TRG_COM_TIM17_IRQHandler", "TIM1 Trigger and Commutation"]})
+%%    do i.update({24: ["TIM1_BRK_TIM15_IRQHandler", "TIM1 Break"]})
+%%    do i.update({25: ["TIM1_UP_TIM16_IRQHandler", "TIM1 Update"]})
+%%    do i.update({26: ["TIM1_TRG_COM_TIM17_IRQHandler", "TIM1 Trigger and Commutation"]})
 %% elif target is stm32f2 or target is stm32f4
-%% 	do i.update({24: ["TIM1_BRK_TIM9_IRQHandler", "TIM1 Break"]})
-%% 	do i.update({25: ["TIM1_UP_TIM10_IRQHandler", "TIM1 Update"]})
-%% 	do i.update({26: ["TIM1_TRG_COM_TIM11_IRQHandler", "TIM1 Trigger and Commutation"]})
+%%    do i.update({24: ["TIM1_BRK_TIM9_IRQHandler", "TIM1 Break"]})
+%%    do i.update({25: ["TIM1_UP_TIM10_IRQHandler", "TIM1 Update"]})
+%%    do i.update({26: ["TIM1_TRG_COM_TIM11_IRQHandler", "TIM1 Trigger and Commutation"]})
 %% endif
 %% do i.update({27: ["TIM1_CC_IRQHandler", "TIM1 Capture Compare"]})
 %% do i.update({28: ["TIM2_IRQHandler", "TIM2"]})
@@ -120,22 +122,22 @@
 %% do i.update({40: ["EXTI15_10_IRQHandler", "External Line[15:10]s"]})
 %% do i.update({41: ["RTCAlarm_IRQHandler", "RTC Alarm (A and B) through EXTI Line"]})
 %% if target is stm32f3
-%% 	do i.update({42: ["USB_WKUP_IRQHandler", "USB Wakeup through EXTI line"]})
-%% 	do i.update({43: ["TIM8_BRK_IRQHandler", "TIM8 Break"]})
-%% 	do i.update({44: ["TIM8_UP_IRQHandler", "TIM8 Update"]})
-%% 	do i.update({45: ["TIM8_TRG_COM_IRQHandler", "TIM8 Trigger and Commutation"]})
-%% 	do i.update({46: ["TIM8_CC_IRQHandler", "TIM8 Capture compare"]})
-%% 	do i.update({47: ["ADC3_IRQHandler", "ADC3"]})
+%%    do i.update({42: ["USB_WKUP_IRQHandler", "USB Wakeup through EXTI line"]})
+%%    do i.update({43: ["TIM8_BRK_IRQHandler", "TIM8 Break"]})
+%%    do i.update({44: ["TIM8_UP_IRQHandler", "TIM8 Update"]})
+%%    do i.update({45: ["TIM8_TRG_COM_IRQHandler", "TIM8 Trigger and Commutation"]})
+%%    do i.update({46: ["TIM8_CC_IRQHandler", "TIM8 Capture compare"]})
+%%    do i.update({47: ["ADC3_IRQHandler", "ADC3"]})
 %% elif target is stm32f2 or target is stm32f4
-%% 	do i.update({42: ["OTG_FS_WKUP_IRQHandler", "USB OTG FS Wakeup through EXTI line"]})
-%% 	do i.update({43: ["TIM8_BRK_TIM12_IRQHandler", "TIM8 Break and TIM12"]})
-%% 	do i.update({44: ["TIM8_UP_TIM13_IRQHandler", "TIM8 Update and TIM13"]})
-%% 	do i.update({45: ["TIM8_TRG_COM_TIM14_IRQHandler", "TIM8 Trigger and Commutation and TIM14"]})
-%% 	do i.update({46: ["TIM8_CC_IRQHandler", ""]})
-%% 	do i.update({47: ["DMA1_Stream7_IRQHandler", ""]})
-%% 	do i.update({48: ["FSMC_IRQHandler", ""]})
-%% 	do i.update({49: ["SDIO_IRQHandler", ""]})
-%% 	do i.update({50: ["TIM5_IRQHandler", ""]})
+%%    do i.update({42: ["OTG_FS_WKUP_IRQHandler", "USB OTG FS Wakeup through EXTI line"]})
+%%    do i.update({43: ["TIM8_BRK_TIM12_IRQHandler", "TIM8 Break and TIM12"]})
+%%    do i.update({44: ["TIM8_UP_TIM13_IRQHandler", "TIM8 Update and TIM13"]})
+%%    do i.update({45: ["TIM8_TRG_COM_TIM14_IRQHandler", "TIM8 Trigger and Commutation and TIM14"]})
+%%    do i.update({46: ["TIM8_CC_IRQHandler", ""]})
+%%    do i.update({47: ["DMA1_Stream7_IRQHandler", ""]})
+%%    do i.update({48: ["FSMC_IRQHandler", ""]})
+%%    do i.update({49: ["SDIO_IRQHandler", ""]})
+%%    do i.update({50: ["TIM5_IRQHandler", ""]})
 %% endif
 %% do i.update({51: ["SPI3_IRQHandler", ""]})
 %% do i.update({52: ["UART4_IRQHandler", ""]})
@@ -143,44 +145,44 @@
 %% do i.update({54: ["TIM6_DAC_IRQHandler", "TIM6 and DAC1&2 under-run errors"]})
 %% do i.update({55: ["TIM7_IRQHandler", ""]})
 %% if target is stm32f3
-%% do i.update({56: ["DMA2_Channel1_IRQHandler", "DMA2 Channel 1"]})
-%% do i.update({57: ["DMA2_Channel2_IRQHandler", "DMA2 Channel 2"]})
-%% do i.update({58: ["DMA2_Channel3_IRQHandler", "DMA2 Channel 3"]})
-%% do i.update({59: ["DMA2_Channel4_IRQHandler", "DMA2 Channel 4"]})
-%% do i.update({60: ["DMA2_Channel5_IRQHandler", "DMA2 Channel 5"]})
-%% 	do i.update({61: ["ADC4_IRQHandler", "ADC4"]})
-%% 	do i.update({62: ["COMP123_IRQHandler", ""]})
-%% 	do i.update({63: ["COMP456_IRQHandler", ""]})
-%% 	do i.update({64: ["COMP7_IRQHandler", ""]})
-%% 	do i.update({74: ["USB_HP_IRQHandler", "USB High priority"]})
-%% 	do i.update({75: ["USB_LP_IRQHandler", "USB Low prioroty"]})
-%% 	do i.update({76: ["USB_WKUP_IRQHandler", "USB Wakeup through EXTI"]})
+%%    do i.update({56: ["DMA2_Channel1_IRQHandler", "DMA2 Channel 1"]})
+%%    do i.update({57: ["DMA2_Channel2_IRQHandler", "DMA2 Channel 2"]})
+%%    do i.update({58: ["DMA2_Channel3_IRQHandler", "DMA2 Channel 3"]})
+%%    do i.update({59: ["DMA2_Channel4_IRQHandler", "DMA2 Channel 4"]})
+%%    do i.update({60: ["DMA2_Channel5_IRQHandler", "DMA2 Channel 5"]})
+%%    do i.update({61: ["ADC4_IRQHandler", "ADC4"]})
+%%    do i.update({62: ["COMP123_IRQHandler", ""]})
+%%    do i.update({63: ["COMP456_IRQHandler", ""]})
+%%    do i.update({64: ["COMP7_IRQHandler", ""]})
+%%    do i.update({74: ["USB_HP_IRQHandler", "USB High priority"]})
+%%    do i.update({75: ["USB_LP_IRQHandler", "USB Low prioroty"]})
+%%    do i.update({76: ["USB_WKUP_IRQHandler", "USB Wakeup through EXTI"]})
 %% elif target is stm32f2 or target is stm32f4
-%% do i.update({56: ["DMA2_Stream0_IRQHandler", "DMA1 Stream 0"]})
-%% do i.update({57: ["DMA2_Stream1_IRQHandler", "DMA1 Stream 1"]})
-%% do i.update({58: ["DMA2_Stream2_IRQHandler", "DMA1 Stream 2"]})
-%% do i.update({59: ["DMA2_Stream3_IRQHandler", "DMA1 Stream 3"]})
-%% do i.update({60: ["DMA2_Stream4_IRQHandler", "DMA1 Stream 4"]})
-%% 	do i.update({61: ["ETH_IRQHandler", ""]})
-%% 	do i.update({62: ["ETH_WKUP_IRQHandler", "Ethernet Wakeup through EXTI line"]})
-%% 	do i.update({63: ["CAN2_TX_IRQHandler", ""]})
-%% 	do i.update({64: ["CAN2_RX0_IRQHandler", ""]})
-%% 	do i.update({65: ["CAN2_RX1_IRQHandler", ""]})
-%% 	do i.update({66: ["CAN2_SCE_IRQHandler", ""]})
-%% 	do i.update({67: ["OTG_FS_IRQHandler", ""]})
-%% 	do i.update({68: ["DMA2_Stream5_IRQHandler", "DMA2 Stream 5"]})
-%% 	do i.update({69: ["DMA2_Stream6_IRQHandler", "DMA2 Stream 6"]})
-%% 	do i.update({70: ["DMA2_Stream7_IRQHandler", "DMA2 Stream 7"]})
-%% 	do i.update({71: ["USART6_IRQHandler", "USART6"]})
-%% 	do i.update({72: ["I2C3_EV_IRQHandler", "I2C3 event"]})
-%% 	do i.update({73: ["I2C3_ER_IRQHandler", "I2C3 error"]})
-%% 	do i.update({74: ["OTG_HS_EP1_OUT_IRQHandler", "USB OTG HS End Point 1 Out"]})
-%% 	do i.update({75: ["OTG_HS_EP1_IN_IRQHandler", "USB OTG HS End Point 1 In"]})
-%% 	do i.update({76: ["OTG_HS_WKUP_IRQHandler", "USB OTG HS Wakeup through EXTI"]})
-%% 	do i.update({77: ["OTG_HS_IRQHandler", "USB OTG HS"]})
-%% 	do i.update({78: ["DCMI_IRQHandler", "DCMI"]})
-%% 	do i.update({79: ["CRYP_IRQHandler", "CRYP Crypto"]})
-%% 	do i.update({80: ["HASH_RNG_IRQHandler", "Hash and Random Number Generator"]})
+%%    do i.update({56: ["DMA2_Stream0_IRQHandler", "DMA1 Stream 0"]})
+%%    do i.update({57: ["DMA2_Stream1_IRQHandler", "DMA1 Stream 1"]})
+%%    do i.update({58: ["DMA2_Stream2_IRQHandler", "DMA1 Stream 2"]})
+%%    do i.update({59: ["DMA2_Stream3_IRQHandler", "DMA1 Stream 3"]})
+%%    do i.update({60: ["DMA2_Stream4_IRQHandler", "DMA1 Stream 4"]})
+%%    do i.update({61: ["ETH_IRQHandler", ""]})
+%%    do i.update({62: ["ETH_WKUP_IRQHandler", "Ethernet Wakeup through EXTI line"]})
+%%    do i.update({63: ["CAN2_TX_IRQHandler", ""]})
+%%    do i.update({64: ["CAN2_RX0_IRQHandler", ""]})
+%%    do i.update({65: ["CAN2_RX1_IRQHandler", ""]})
+%%    do i.update({66: ["CAN2_SCE_IRQHandler", ""]})
+%%    do i.update({67: ["OTG_FS_IRQHandler", ""]})
+%%    do i.update({68: ["DMA2_Stream5_IRQHandler", "DMA2 Stream 5"]})
+%%    do i.update({69: ["DMA2_Stream6_IRQHandler", "DMA2 Stream 6"]})
+%%    do i.update({70: ["DMA2_Stream7_IRQHandler", "DMA2 Stream 7"]})
+%%    do i.update({71: ["USART6_IRQHandler", "USART6"]})
+%%    do i.update({72: ["I2C3_EV_IRQHandler", "I2C3 event"]})
+%%    do i.update({73: ["I2C3_ER_IRQHandler", "I2C3 error"]})
+%%    do i.update({74: ["OTG_HS_EP1_OUT_IRQHandler", "USB OTG HS End Point 1 Out"]})
+%%    do i.update({75: ["OTG_HS_EP1_IN_IRQHandler", "USB OTG HS End Point 1 In"]})
+%%    do i.update({76: ["OTG_HS_WKUP_IRQHandler", "USB OTG HS Wakeup through EXTI"]})
+%%    do i.update({77: ["OTG_HS_IRQHandler", "USB OTG HS"]})
+%%    do i.update({78: ["DCMI_IRQHandler", "DCMI"]})
+%%    do i.update({79: ["CRYP_IRQHandler", "CRYP Crypto"]})
+%%    do i.update({80: ["HASH_RNG_IRQHandler", "Hash and Random Number Generator"]})
 %% endif
 %% do i.update({81: ["FPU_IRQHandler", "FPU"]})
 %#
@@ -209,6 +211,9 @@
 %% elif target is stm32f4
 	// prepare flash latency for working at 168MHz and supply voltage > 2.7
 	FLASH->ACR = (FLASH->ACR & ~FLASH_ACR_LATENCY) | FLASH_WAIT_STATE_5;
+%% elif target is stm32f7
+	// prepare flash latency for working at 200MHz and supply voltage > 2.7
+	FLASH->ACR = (FLASH->ACR & ~FLASH_ACR_LATENCY) | FLASH_WAIT_STATE_6;
 %% endif
 
 %% if target is stm32f2 or target is stm32f4
@@ -217,11 +222,17 @@
 %% elif target is stm32f3
 	// enable flash prefetch
 	FLASH->ACR |= FLASH_ACR_PRFTBE;
+%% elif target is stm32f7
+	// enable flash prefetch
+	FLASH->ACR |= FLASH_ACR_PRFTEN | FLASH_ACR_ARTEN;
 %% endif
 
 %% if target is stm32f4
 	// Enable Core Coupled Memory (CCM)
 	RCC->AHB1ENR |= RCC_AHB1ENR_CCMDATARAMEN;
+%% elif target is stm32f7
+	// Enable Data Tighly Coupled Memory (DTCM)
+	RCC->AHB1ENR |= RCC_AHB1ENR_DTCMRAMEN;
 %% endif
 %#
 %% endmacro
