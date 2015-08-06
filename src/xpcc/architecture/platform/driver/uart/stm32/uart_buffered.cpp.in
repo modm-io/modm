@@ -54,7 +54,7 @@ namespace
 {{ template.configurePins('Buffered'+className, id) }}
 
 // ----------------------------------------------------------------------------
-#if defined(STM32F3XX)
+#if defined(STM32F3XX) || defined(STM32F7XX)
 	#define USART_SR_RXNE USART_ISR_RXNE
 	#define USART_SR_TXE  USART_ISR_TXE
 

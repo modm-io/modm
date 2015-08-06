@@ -26,6 +26,9 @@ namespace TypeId
 
 	typedef struct{} I2cMaster3Sda;
 	typedef struct{} I2cMaster3Scl;
+
+	typedef struct{} I2cMaster4Sda;
+	typedef struct{} I2cMaster4Scl;
 }
 
 } // namespace xmega

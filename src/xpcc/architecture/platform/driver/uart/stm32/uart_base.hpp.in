@@ -45,7 +45,7 @@ class UartBase
 public:
 	enum class Interrupt : uint32_t
 	{
-%% if target is stm32f0 or target is stm32f3
+%% if target is stm32f0 or target is stm32f3 or target is stm32f7
 		/// A USART interrupt is generated when match character is received.
 		CharacterMatch = USART_CR1_CMIE,
 %% endif
@@ -61,7 +61,7 @@ public:
 
 	enum class InterruptFlag : uint32_t
 	{
-%% if target is stm32f0 or target is stm32f3
+%% if target is stm32f0 or target is stm32f3 or target is stm32f7
 %%	set reg = "ISR"
 		/// Set if match character is received.
 		CharacterMatch	= USART_{{reg}}_CMF,

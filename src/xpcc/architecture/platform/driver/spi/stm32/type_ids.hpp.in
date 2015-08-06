@@ -17,7 +17,7 @@ namespace stm32
 
 namespace TypeId
 {
-%% for id in [1,2,3]
+%% for id in [1,2,3,4,5,6]
 	%% for name in ['Nss', 'Sck', 'Miso', 'Mosi']
 	typedef struct{} SpiMaster{{ id ~ name}};
 	%% endfor
@@ -25,7 +25,7 @@ namespace TypeId
 	%% for name in ['Nss', 'Sck', 'Somi', 'Simo']
 	typedef struct{} SpiSlave{{ id ~ name}};
 	%% endfor
-	
+
 %% endfor
 }
 

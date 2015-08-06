@@ -7,13 +7,13 @@
  */
 // ----------------------------------------------------------------------------
 %#
-%% if target is stm32f2 or target is stm32f4 or (target is stm32f1 and id == 1)
+%% if target is stm32f2 or target is stm32f4 or target is stm32f7 or (target is stm32f1 and id == 1)
 	%% set temperature_available = true
 %% else
 	%% set temperature_available = false
 %% endif
 
-%% if target is stm32f4
+%% if target is stm32f4 or target is stm32f7
 	%% set max_frequency = 36000000
 %% else
 	%% set max_frequency = 14000000
@@ -76,7 +76,7 @@ xpcc::stm32::Adc{{ id }}::initialize()
 void
 xpcc::stm32::Adc{{ id }}::setPrescaler(const Prescaler prescaler)
 {
-%% if target is stm32f2 or target is stm32f4
+%% if target is stm32f2 or target is stm32f4 or target is stm32f7
 	ADC->CCR = (ADC->CCR & ~(0b11 << 17)) | (uint32_t(prescaler) << 17);
 %% elif target is stm32f1
 	RCC->CFGR = (RCC->CFGR & ~(0b11 << 14)) | (uint32_t(prescaler) << 14);
@@ -87,7 +87,7 @@ xpcc::stm32::Adc{{ id }}::setPrescaler(const Prescaler prescaler)
 void
 xpcc::stm32::Adc{{ id }}::enableTemperatureRefVMeasurement()
 {
-	%% if target is stm32f2 or target is stm32f4
+	%% if target is stm32f2 or target is stm32f4 or target is stm32f7
 	ADC->CCR |= ADC_CCR_TSVREFE;
 	%% elif target is stm32f1
 	ADC{{ id }}->CR2 |= ADC_CR2_TSVREFE;
@@ -97,7 +97,7 @@ xpcc::stm32::Adc{{ id }}::enableTemperatureRefVMeasurement()
 void
 xpcc::stm32::Adc{{ id }}::disableTemperatureRefVMeasurement()
 {
-	%% if target is stm32f2 or target is stm32f4
+	%% if target is stm32f2 or target is stm32f4 or target is stm32f7
 	ADC->CCR &= ~ADC_CCR_TSVREFE;
 	%% elif target is stm32f1
 	ADC{{ id }}->CR2 &= ~ADC_CR2_TSVREFE;
@@ -263,7 +263,7 @@ void
 xpcc::stm32::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
 												const bool enable)
 {
-%% if target is stm32f2 or target is stm32f4
+%% if target is stm32f2 or target is stm32f4 or target is stm32f7
 	const IRQn_Type InterruptVector = ADC_IRQn;
 %% elif target is stm32f1
 	%% if id < 3

@@ -54,7 +54,7 @@ struct Gpio
 	OutputSpeed
 	{
 		MHz2 = 0,		///< Low speed
-		%% if target is stm32f2 or target is stm32f4
+		%% if target is stm32f2 or target is stm32f4 or target is stm32f7
 		MHz25 = 0x1,	///< Medium speed
 		MHz50 = 0x2,	///< Fast speed
 		MHz100 = 0x3,	///< High speed on 30 pF (80 MHz Output max speed on 15 pF)
@@ -305,7 +305,7 @@ public:
 		// Enable AFIO
 		RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
 		AFIO->EXTICR[index] = (AFIO->EXTICR[index] & ~syscfg_mask) | syscfg_value;
-%% elif target is stm32f2 or target is stm32f3 or target is stm32f4
+%% elif target is stm32f2 or target is stm32f3 or target is stm32f4 or target is stm32f7
 		// Enable SYSCFG
 		RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
 		SYSCFG->EXTICR[index] = (SYSCFG->EXTICR[index] & ~syscfg_mask) | syscfg_value;

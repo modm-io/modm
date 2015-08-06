@@ -101,7 +101,7 @@ public:
 			SlaveMode slaveMode = SlaveMode::Disabled,
 			SlaveModeTrigger slaveModeTrigger = SlaveModeTrigger::Internal0,
 			MasterMode masterMode = MasterMode::Reset
-%% if target is stm32f3
+%% if target is stm32f3 or target is stm32f7
 			, MasterMode2 masterMode2 = MasterMode2::Reset
 %% endif
 			);
@@ -354,7 +354,7 @@ public:
 	static inline void
 	setCompareValue(uint32_t channel, uint16_t value)
 	{
-%% if target is stm32f2 or target is stm32f3 or target is stm32f4
+%% if target is stm32f2 or target is stm32f3 or target is stm32f4 or target is stm32f7
 		*(&TIM{{ id }}->CCR1 + (channel - 1)) = value;
 %% else
 		*(&TIM{{ id }}->CCR1 + ((channel - 1) * 2)) = value;
@@ -364,7 +364,7 @@ public:
 	static inline uint16_t
 	getCompareValue(uint32_t channel)
 	{
-%% if target is stm32f2 or target is stm32f3 or target is stm32f4
+%% if target is stm32f2 or target is stm32f3 or target is stm32f4 or target is stm32f7
 		return *(&TIM{{ id }}->CCR1 + (channel - 1));
 %% else
 		return *(&TIM{{ id }}->CCR1 + ((channel - 1) * 2));

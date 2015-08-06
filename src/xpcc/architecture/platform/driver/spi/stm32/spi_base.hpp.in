@@ -56,7 +56,7 @@ public:
 %% if target is not stm32f1
 		FrameFormatError	= SPI_SR_FRE,
 %% endif
-%% if target is stm32f0 or target is stm32f3
+%% if target is stm32f0 or target is stm32f3 or target is stm32f7
 		FifoRxLevel			= SPI_SR_FRLVL,
 		FifoTxLevel			= SPI_SR_FTLVL,
 %% endif
@@ -92,7 +92,7 @@ public:
 	enum class
 	DataSize : uint32_t
 	{
-%% if target is stm32f0 or target is stm32f3
+%% if target is stm32f0 or target is stm32f3 or target is stm32f7
 		Bit4  = SPI_CR2_DS_1 | SPI_CR2_DS_0,				///< 0b0011
 		Bit5  = SPI_CR2_DS_2,								///< 0b0100
 		Bit6  = SPI_CR2_DS_2 | SPI_CR2_DS_0,				///< 0b0101
