@@ -33,7 +33,7 @@ class STMDeviceReader(XMLDeviceReader):
 	@staticmethod
 	def getDevicesFromFamily(family, logger=None, rootpath=None):
 		if rootpath is None:
-			rootpath = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'STM_devices')
+			rootpath = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'STM_devices', 'mcu')
 		STMDeviceReader.rootpath = rootpath
 
 		STMDeviceReader.familyFile = XMLDeviceReader(os.path.join(rootpath, 'families.xml'), logger)
@@ -55,7 +55,7 @@ class STMDeviceReader(XMLDeviceReader):
 			logger.info("STMDeviceReader: Parsing '{}'".format(self.id.string))
 
 		# information about the core and architecture
-		coreLut = {'m0': 'v6m', 'm3': 'v7m', 'm4': 'v7em'}
+		coreLut = {'m0': 'v6m', 'm3': 'v7m', 'm4': 'v7em', 'm7': 'v7em'}
 		core = self.query('//Core')[0].text.replace('ARM ', '').lower()
 		self.addProperty('architecture', coreLut[core.replace('cortex-', '')])
 		if core.endswith('m4'):
@@ -99,7 +99,7 @@ class STMDeviceReader(XMLDeviceReader):
 		memories = []
 		# first get the real SRAM1 size
 		for mem, val in mem_model['memories'].items():
-			if '2' in mem or '3' in mem or 'ccm' in mem:
+			if any(s in mem for s in ['2', '3', 'ccm', 'dtcm']):
 				ram -= val
 
 		# add all memories
@@ -142,7 +142,7 @@ class STMDeviceReader(XMLDeviceReader):
 
 		# device defines
 		defines = []
-		if self.id.family == 'f4':
+		if self.id.family in ['f4', 'f7']:
 			# required for our FreeRTOS
 			defines.append('STM32F4XX')
 
@@ -175,7 +175,7 @@ class STMDeviceReader(XMLDeviceReader):
 		if 'CAN' in modules:
 			modules.append('CAN1')
 
-		if self.id.family in ['f2', 'f3', 'f4']:
+		if self.id.family in ['f2', 'f3', 'f4', 'f7']:
 			modules.append('ID')
 
 		self.dmaFile = None
@@ -222,7 +222,7 @@ class STMDeviceReader(XMLDeviceReader):
 					if not any(sig.get('Name') in name.get('Name') for name in pinSignals):
 						pinSignals.append(sig)
 
-			else:	# F0, F3 and F4
+			else:	# F0, F3, F4 and F7
 				pinSignals = self.gpioFile.compactQuery("//GPIO_Pin[@Name='%s']/PinSignal/SpecificParameter[@Name='GPIO_AF']/.." % name)
 				altFunctions = { a.get('Name') : a[0][0].text.replace('GPIO_AF', '')[:2].replace('_','') for a in pinSignals }
 

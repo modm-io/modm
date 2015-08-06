@@ -47,7 +47,8 @@ class STMDeviceWriter(XMLDeviceWriter):
 				   'f1': 'stm32f1',
 				   'f2': 'stm32f2',
 				   'f3': 'stm32f3',
-				   'f4': 'stm32'}
+				   'f4': 'stm32',
+				   'f7': 'stm32'}
 		# ADC
 		self.addModuleAttributesToNode(self.root, 'ADC', 'adc', adc_map[self.device.id.family])
 		# CAN

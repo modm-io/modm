@@ -24,7 +24,7 @@ if __name__ == "__main__":
 	level = 'info'
 	logger = Logger(level)
 	devices = []
-	supported_families = ['STM32F0', 'STM32F1', 'STM32F2', 'STM32F3', 'STM32F4']
+	supported_families = ['STM32F0', 'STM32F1', 'STM32F2', 'STM32F3', 'STM32F4', 'STM32F7']
 	family = None
 
 	for arg in sys.argv[1:]:

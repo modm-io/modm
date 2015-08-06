@@ -76,6 +76,11 @@ stm32_defines = \
 		'STM32F401xC',	# STM32F401CB, STM32F401CC, STM32F401RB, STM32F401RC, STM32F401VB and STM32F401VC Devices
 		'STM32F401xE',	# STM32F401CD, STM32F401RD, STM32F401VD, STM32F401CE, STM32F401RE and STM32F401VE Devices
 		'STM32F411xE',	#STM32F411CD, STM32F411RD, STM32F411VD, STM32F411CE, STM32F411RE and STM32F411VE Devices
+	],
+	'f7': [
+		'STM32F756xx',	# STM32F756VG, STM32F756ZG, STM32F756ZG, STM32F756IG, STM32F756BG and STM32F756NG Devices
+		'STM32F746xx',	# STM32F746VE, STM32F746VG, STM32F746ZE, STM32F746ZG, STM32F746IE, STM32F746IG, STM32F746BE, STM32F746BG, STM32F746NE and STM32F746NG Devices
+		'STM32F745xx',	# STM32F745VE, STM32F745VG, STM32F745ZG, STM32F745ZE, STM32F745IE and STM32F745IG Devices
 	]
 }
 
@@ -188,6 +193,20 @@ stm32_memory = \
 			{
 				'names': ['427', '429', '437', '439'],
 				'memories': {'flash': -1, 'ccm': 64, 'sram1': -1, 'sram2': 16, 'sram3': 64}
+			}
+		]
+	},
+	'f7': {
+		'start': {
+			'flash': 0x08000000,
+			'dtcm': 0x20000000,
+			'itcm': 0x00200000,
+			'sram': 0x20010000
+		},
+		'model': [
+			{
+				'names': ['745', '746', '756'],
+				'memories': {'flash': -1, 'itcm': 16, 'dtcm': 64, 'sram1': -1, 'sram2': 16}
 			}
 		]
 	}
