@@ -64,6 +64,11 @@ if env['XPCC_DEVICE'].startswith('stm32f4'):
 		'cmsis/stm32/Include',
 		'cmsis/stm32/Device/ST/STM32F4xx/Include']
 
+if env['XPCC_DEVICE'].startswith('stm32f7'):
+	globalIncludes += [
+		'cmsis/stm32/Include',
+		'cmsis/stm32/Device/ST/STM32F7xx/Include']
+
 if 'stm32f' in env['XPCC_DEVICE'] and not env['XPCC_DEVICE'].startswith('stm32f0'):
 	sourcePath += ['freertos']		# FreeRTOS for STM32
 	sourcePath += ['fatfs']			# FatFS
