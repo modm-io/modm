@@ -133,7 +133,7 @@
     </driver>
     <driver type="adc" name="stm32" instances="1,2,3"/>
     <driver type="can" name="stm32" instances="1,2"/>
-    <driver type="clock" name="stm32"/>
+    <!--<driver type="clock" name="stm32"/>-->
     <driver type="i2c" name="stm32" instances="1,2,3,4"/>
     <driver type="id" name="stm32"/>
     <driver type="random" name="stm32"/>
