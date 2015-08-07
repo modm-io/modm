@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    stm32f102x6.h
   * @author  MCD Application Team
-  * @version V4.0.0
-  * @date    16-December-2014
+  * @version V4.0.1
+  * @date    31-July-2015
   * @brief   CMSIS Cortex-M3 Device Peripheral Access Layer Header File. 
   *          This file contains all the peripheral register's definitions, bits 
   *          definitions and memory mapping for STM32F1xx devices.            
@@ -16,7 +16,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2014 STMicroelectronics</center></h2>
+  * <h2><center>&copy; COPYRIGHT(c) 2015 STMicroelectronics</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -202,7 +202,9 @@ typedef struct
 typedef struct
 {
   __IO uint32_t DR;           /*!< CRC Data register,                           Address offset: 0x00 */
-  __IO uint32_t IDR;          /*!< CRC Independent data register,               Address offset: 0x04 */
+  __IO uint8_t  IDR;          /*!< CRC Independent data register,               Address offset: 0x04 */
+  uint8_t       RESERVED0;    /*!< Reserved,                                    Address offset: 0x05 */
+  uint16_t      RESERVED1;    /*!< Reserved,                                    Address offset: 0x06 */  
   __IO uint32_t CR;           /*!< CRC Control register,                        Address offset: 0x08 */ 
 } CRC_TypeDef;
 
@@ -658,7 +660,7 @@ typedef struct
 #define  CRC_DR_DR                           ((uint32_t)0xFFFFFFFF)        /*!< Data register bits */
 
 /*******************  Bit definition for CRC_IDR register  ********************/
-#define  CRC_IDR_IDR                         ((uint32_t)0x000000FF)        /*!< General-purpose 8-bit data register bits */
+#define  CRC_IDR_IDR                         ((uint32_t)0xFF)              /*!< General-purpose 8-bit data register bits */
 
 /********************  Bit definition for CRC_CR register  ********************/
 #define  CRC_CR_RESET                        ((uint32_t)0x00000001)        /*!< RESET bit */
@@ -4130,18 +4132,6 @@ typedef struct
 #define  FLASH_WRP0_WRP0                     ((uint32_t)0x000000FF)        /*!< Flash memory write protection option bytes */
 #define  FLASH_WRP0_nWRP0                    ((uint32_t)0x0000FF00)        /*!< Flash memory write protection complemented option bytes */
 
-/******************  Bit definition for FLASH_WRP1 register  ******************/
-#define  FLASH_WRP1_WRP1                     ((uint32_t)0x00FF0000)        /*!< Flash memory write protection option bytes */
-#define  FLASH_WRP1_nWRP1                    ((uint32_t)0xFF000000)        /*!< Flash memory write protection complemented option bytes */
-
-/******************  Bit definition for FLASH_WRP2 register  ******************/
-#define  FLASH_WRP2_WRP2                     ((uint32_t)0x000000FF)        /*!< Flash memory write protection option bytes */
-#define  FLASH_WRP2_nWRP2                    ((uint32_t)0x0000FF00)        /*!< Flash memory write protection complemented option bytes */
-
-/******************  Bit definition for FLASH_WRP3 register  ******************/
-#define  FLASH_WRP3_WRP3                     ((uint32_t)0x00FF0000)        /*!< Flash memory write protection option bytes */
-#define  FLASH_WRP3_nWRP3                    ((uint32_t)0xFF000000)        /*!< Flash memory write protection complemented option bytes */
-
 
 
 /**
@@ -4358,39 +4348,23 @@ typedef struct
 /******************************************************************************/
 
 /* Aliases for __IRQn */
-#define ADC1_2_IRQn               ADC1_IRQn
-
-
-#define CAN1_TX_IRQn              USB_HP_IRQn
-#define USB_HP_CAN1_TX_IRQn       USB_HP_IRQn
-
-#define USB_LP_CAN1_RX0_IRQn      USB_LP_IRQn
-#define CAN1_RX0_IRQn             USB_LP_IRQn
-
-
-
-#define OTG_FS_WKUP_IRQn          USBWakeUp_IRQn
-#define CEC_IRQn                  USBWakeUp_IRQn  
-
-
+#define ADC1_2_IRQn          ADC1_IRQn
+#define CEC_IRQn             USBWakeUp_IRQn
+#define OTG_FS_WKUP_IRQn     USBWakeUp_IRQn
+#define USB_HP_CAN1_TX_IRQn  USB_HP_IRQn
+#define CAN1_TX_IRQn         USB_HP_IRQn
+#define USB_LP_CAN1_RX0_IRQn USB_LP_IRQn
+#define CAN1_RX0_IRQn        USB_LP_IRQn
 
 
 /* Aliases for __IRQHandler */
-#define ADC1_2_IRQHandler               ADC1_IRQHandler
-
-
-#define CAN1_TX_IRQHandler              USB_HP_IRQHandler
-#define USB_HP_CAN1_TX_IRQHandler       USB_HP_IRQHandler
-
-#define USB_LP_CAN1_RX0_IRQHandler      USB_LP_IRQHandler
-#define CAN1_RX0_IRQHandler             USB_LP_IRQHandler
-
-
-
-#define OTG_FS_WKUP_IRQHandler          USBWakeUp_IRQHandler
-#define CEC_IRQHandler                  USBWakeUp_IRQHandler  
-
-
+#define ADC1_2_IRQHandler          ADC1_IRQHandler
+#define CEC_IRQHandler             USBWakeUp_IRQHandler
+#define OTG_FS_WKUP_IRQHandler     USBWakeUp_IRQHandler
+#define USB_HP_CAN1_TX_IRQHandler  USB_HP_IRQHandler
+#define CAN1_TX_IRQHandler         USB_HP_IRQHandler
+#define USB_LP_CAN1_RX0_IRQHandler USB_LP_IRQHandler
+#define CAN1_RX0_IRQHandler        USB_LP_IRQHandler
 
 
 /**

@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    stm32f103xg.h
   * @author  MCD Application Team
-  * @version V4.0.0
-  * @date    16-December-2014
+  * @version V4.0.1
+  * @date    31-July-2015
   * @brief   CMSIS Cortex-M3 Device Peripheral Access Layer Header File. 
   *          This file contains all the peripheral register's definitions, bits 
   *          definitions and memory mapping for STM32F1xx devices.            
@@ -16,7 +16,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2014 STMicroelectronics</center></h2>
+  * <h2><center>&copy; COPYRIGHT(c) 2015 STMicroelectronics</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -326,7 +326,9 @@ typedef struct
 typedef struct
 {
   __IO uint32_t DR;           /*!< CRC Data register,                           Address offset: 0x00 */
-  __IO uint32_t IDR;          /*!< CRC Independent data register,               Address offset: 0x04 */
+  __IO uint8_t  IDR;          /*!< CRC Independent data register,               Address offset: 0x04 */
+  uint8_t       RESERVED0;    /*!< Reserved,                                    Address offset: 0x05 */
+  uint16_t      RESERVED1;    /*!< Reserved,                                    Address offset: 0x06 */  
   __IO uint32_t CR;           /*!< CRC Control register,                        Address offset: 0x08 */ 
 } CRC_TypeDef;
 
@@ -945,7 +947,7 @@ typedef struct
 #define  CRC_DR_DR                           ((uint32_t)0xFFFFFFFF)        /*!< Data register bits */
 
 /*******************  Bit definition for CRC_IDR register  ********************/
-#define  CRC_IDR_IDR                         ((uint32_t)0x000000FF)        /*!< General-purpose 8-bit data register bits */
+#define  CRC_IDR_IDR                         ((uint32_t)0xFF)              /*!< General-purpose 8-bit data register bits */
 
 /********************  Bit definition for CRC_CR register  ********************/
 #define  CRC_CR_RESET                        ((uint32_t)0x00000001)        /*!< RESET bit */
@@ -6720,96 +6722,58 @@ typedef struct
 /******************************************************************************/
 
 /* Aliases for __IRQn */
-#define ADC1_IRQn                 ADC1_2_IRQn
+#define ADC1_IRQn               ADC1_2_IRQn
+#define DMA2_Channel4_IRQn      DMA2_Channel4_5_IRQn
+#define TIM1_BRK_TIM15_IRQn     TIM1_BRK_TIM9_IRQn
+#define TIM1_BRK_IRQn           TIM1_BRK_TIM9_IRQn
+#define TIM9_IRQn               TIM1_BRK_TIM9_IRQn
+#define TIM1_TRG_COM_TIM17_IRQn TIM1_TRG_COM_TIM11_IRQn
+#define TIM1_TRG_COM_IRQn       TIM1_TRG_COM_TIM11_IRQn
+#define TIM11_IRQn              TIM1_TRG_COM_TIM11_IRQn
+#define TIM10_IRQn              TIM1_UP_TIM10_IRQn
+#define TIM1_UP_TIM16_IRQn      TIM1_UP_TIM10_IRQn
+#define TIM1_UP_IRQn            TIM1_UP_TIM10_IRQn
+#define TIM6_DAC_IRQn           TIM6_IRQn
+#define TIM12_IRQn              TIM8_BRK_TIM12_IRQn
+#define TIM8_BRK_IRQn           TIM8_BRK_TIM12_IRQn
+#define TIM14_IRQn              TIM8_TRG_COM_TIM14_IRQn
+#define TIM8_TRG_COM_IRQn       TIM8_TRG_COM_TIM14_IRQn
+#define TIM8_UP_IRQn            TIM8_UP_TIM13_IRQn
+#define TIM13_IRQn              TIM8_UP_TIM13_IRQn
+#define CEC_IRQn                USBWakeUp_IRQn
+#define OTG_FS_WKUP_IRQn        USBWakeUp_IRQn
+#define CAN1_TX_IRQn            USB_HP_CAN1_TX_IRQn
+#define USB_HP_IRQn             USB_HP_CAN1_TX_IRQn
+#define USB_LP_IRQn             USB_LP_CAN1_RX0_IRQn
+#define CAN1_RX0_IRQn           USB_LP_CAN1_RX0_IRQn
 
-
-
-#define CAN1_TX_IRQn              USB_HP_CAN1_TX_IRQn
-#define USB_HP_IRQn               USB_HP_CAN1_TX_IRQn
-
-#define USB_LP_IRQn               USB_LP_CAN1_RX0_IRQn
-#define CAN1_RX0_IRQn             USB_LP_CAN1_RX0_IRQn
-
-
-  
-#define TIM1_BRK_TIM15_IRQn       TIM1_BRK_TIM9_IRQn
-#define TIM9_IRQn                 TIM1_BRK_TIM9_IRQn
-#define TIM1_BRK_IRQn             TIM1_BRK_TIM9_IRQn
-
-#define TIM1_UP_TIM16_IRQn        TIM1_UP_TIM10_IRQn
-#define TIM10_IRQn                TIM1_UP_TIM10_IRQn
-#define TIM1_UP_IRQn              TIM1_UP_TIM10_IRQn
-
-#define TIM1_TRG_COM_TIM17_IRQn   TIM1_TRG_COM_TIM11_IRQn
-#define TIM11_IRQn                TIM1_TRG_COM_TIM11_IRQn
-#define TIM1_TRG_COM_IRQn         TIM1_TRG_COM_TIM11_IRQn
-
-
-#define OTG_FS_WKUP_IRQn          USBWakeUp_IRQn
-#define CEC_IRQn                  USBWakeUp_IRQn  
-
-  
-
-#define TIM12_IRQn                TIM8_BRK_TIM12_IRQn
-#define TIM8_BRK_IRQn             TIM8_BRK_TIM12_IRQn
-
-#define TIM13_IRQn                TIM8_UP_TIM13_IRQn
-#define TIM8_UP_IRQn              TIM8_UP_TIM13_IRQn
-
-
-#define TIM14_IRQn                TIM8_TRG_COM_TIM14_IRQn
-#define TIM8_TRG_COM_IRQn         TIM8_TRG_COM_TIM14_IRQn
-  
-
-#define TIM6_DAC_IRQn             TIM6_IRQn
-
-#define DMA2_Channel4_IRQn        DMA2_Channel4_5_IRQn
 
 /* Aliases for __IRQHandler */
-#define ADC1_IRQHandler                 ADC1_2_IRQHandler
+#define ADC1_IRQHandler               ADC1_2_IRQHandler
+#define DMA2_Channel4_IRQHandler      DMA2_Channel4_5_IRQHandler
+#define TIM1_BRK_TIM15_IRQHandler     TIM1_BRK_TIM9_IRQHandler
+#define TIM1_BRK_IRQHandler           TIM1_BRK_TIM9_IRQHandler
+#define TIM9_IRQHandler               TIM1_BRK_TIM9_IRQHandler
+#define TIM1_TRG_COM_TIM17_IRQHandler TIM1_TRG_COM_TIM11_IRQHandler
+#define TIM1_TRG_COM_IRQHandler       TIM1_TRG_COM_TIM11_IRQHandler
+#define TIM11_IRQHandler              TIM1_TRG_COM_TIM11_IRQHandler
+#define TIM10_IRQHandler              TIM1_UP_TIM10_IRQHandler
+#define TIM1_UP_TIM16_IRQHandler      TIM1_UP_TIM10_IRQHandler
+#define TIM1_UP_IRQHandler            TIM1_UP_TIM10_IRQHandler
+#define TIM6_DAC_IRQHandler           TIM6_IRQHandler
+#define TIM12_IRQHandler              TIM8_BRK_TIM12_IRQHandler
+#define TIM8_BRK_IRQHandler           TIM8_BRK_TIM12_IRQHandler
+#define TIM14_IRQHandler              TIM8_TRG_COM_TIM14_IRQHandler
+#define TIM8_TRG_COM_IRQHandler       TIM8_TRG_COM_TIM14_IRQHandler
+#define TIM8_UP_IRQHandler            TIM8_UP_TIM13_IRQHandler
+#define TIM13_IRQHandler              TIM8_UP_TIM13_IRQHandler
+#define CEC_IRQHandler                USBWakeUp_IRQHandler
+#define OTG_FS_WKUP_IRQHandler        USBWakeUp_IRQHandler
+#define CAN1_TX_IRQHandler            USB_HP_CAN1_TX_IRQHandler
+#define USB_HP_IRQHandler             USB_HP_CAN1_TX_IRQHandler
+#define USB_LP_IRQHandler             USB_LP_CAN1_RX0_IRQHandler
+#define CAN1_RX0_IRQHandler           USB_LP_CAN1_RX0_IRQHandler
 
-
-
-#define CAN1_TX_IRQHandler              USB_HP_CAN1_TX_IRQHandler
-#define USB_HP_IRQHandler               USB_HP_CAN1_TX_IRQHandler
-
-#define USB_LP_IRQHandler               USB_LP_CAN1_RX0_IRQHandler
-#define CAN1_RX0_IRQHandler             USB_LP_CAN1_RX0_IRQHandler
-
-
-  
-#define TIM1_BRK_TIM15_IRQHandler       TIM1_BRK_TIM9_IRQHandler
-#define TIM9_IRQHandler                 TIM1_BRK_TIM9_IRQHandler
-#define TIM1_BRK_IRQHandler             TIM1_BRK_TIM9_IRQHandler
-
-#define TIM1_UP_TIM16_IRQHandler        TIM1_UP_TIM10_IRQHandler
-#define TIM10_IRQHandler                TIM1_UP_TIM10_IRQHandler
-#define TIM1_UP_IRQHandler              TIM1_UP_TIM10_IRQHandler
-
-#define TIM1_TRG_COM_TIM17_IRQHandler   TIM1_TRG_COM_TIM11_IRQHandler
-#define TIM11_IRQHandler                TIM1_TRG_COM_TIM11_IRQHandler
-#define TIM1_TRG_COM_IRQHandler         TIM1_TRG_COM_TIM11_IRQHandler
-
-
-#define OTG_FS_WKUP_IRQHandler          USBWakeUp_IRQHandler
-#define CEC_IRQHandler                  USBWakeUp_IRQHandler  
-
-  
-
-#define TIM12_IRQHandler                TIM8_BRK_TIM12_IRQHandler
-#define TIM8_BRK_IRQHandler             TIM8_BRK_TIM12_IRQHandler
-
-#define TIM13_IRQHandler                TIM8_UP_TIM13_IRQHandler
-#define TIM8_UP_IRQHandler              TIM8_UP_TIM13_IRQHandler
-
-
-#define TIM14_IRQHandler                TIM8_TRG_COM_TIM14_IRQHandler
-#define TIM8_TRG_COM_IRQHandler         TIM8_TRG_COM_TIM14_IRQHandler
-  
-
-#define TIM6_DAC_IRQHandler             TIM6_IRQHandler
-
-#define DMA2_Channel4_IRQHandler        DMA2_Channel4_5_IRQHandler
 
 /**
   * @}
