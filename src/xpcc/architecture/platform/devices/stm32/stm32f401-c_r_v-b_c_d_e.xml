@@ -30,6 +30,64 @@
         <section device-size-id="b|c" access="rwx" start="0x20000000" name="sram1" size="64"/>
         <section device-size-id="d|e" access="rwx" start="0x20000000" name="sram1" size="96"/>
       </memory>
+      <vectors>
+        <vector position="0" name="WWDG_IRQHandler"/>
+        <vector position="1" name="PVD_IRQHandler"/>
+        <vector position="2" name="TAMP_STAMP_IRQHandler"/>
+        <vector position="3" name="RTC_WKUP_IRQHandler"/>
+        <vector position="4" name="FLASH_IRQHandler"/>
+        <vector position="5" name="RCC_IRQHandler"/>
+        <vector position="6" name="EXTI0_IRQHandler"/>
+        <vector position="7" name="EXTI1_IRQHandler"/>
+        <vector position="8" name="EXTI2_IRQHandler"/>
+        <vector position="9" name="EXTI3_IRQHandler"/>
+        <vector position="10" name="EXTI4_IRQHandler"/>
+        <vector position="11" name="DMA1_Stream0_IRQHandler"/>
+        <vector position="12" name="DMA1_Stream1_IRQHandler"/>
+        <vector position="13" name="DMA1_Stream2_IRQHandler"/>
+        <vector position="14" name="DMA1_Stream3_IRQHandler"/>
+        <vector position="15" name="DMA1_Stream4_IRQHandler"/>
+        <vector position="16" name="DMA1_Stream5_IRQHandler"/>
+        <vector position="17" name="DMA1_Stream6_IRQHandler"/>
+        <vector position="18" name="ADC_IRQHandler"/>
+        <vector position="19" name="EXTI9_5_IRQHandler"/>
+        <vector position="20" name="TIM1_BRK_TIM9_IRQHandler"/>
+        <vector position="21" name="TIM1_UP_TIM10_IRQHandler"/>
+        <vector position="22" name="TIM1_TRG_COM_TIM11_IRQHandler"/>
+        <vector position="23" name="TIM1_CC_IRQHandler"/>
+        <vector position="24" name="TIM2_IRQHandler"/>
+        <vector position="25" name="TIM3_IRQHandler"/>
+        <vector position="26" name="TIM4_IRQHandler"/>
+        <vector position="27" name="I2C1_EV_IRQHandler"/>
+        <vector position="28" name="I2C1_ER_IRQHandler"/>
+        <vector position="29" name="I2C2_EV_IRQHandler"/>
+        <vector position="30" name="I2C2_ER_IRQHandler"/>
+        <vector position="31" name="SPI1_IRQHandler"/>
+        <vector position="32" name="SPI2_IRQHandler"/>
+        <vector position="33" name="USART1_IRQHandler"/>
+        <vector position="34" name="USART2_IRQHandler"/>
+        <vector position="35" name="EXTI15_10_IRQHandler"/>
+        <vector position="36" name="RTC_Alarm_IRQHandler"/>
+        <vector position="37" name="OTG_FS_WKUP_IRQHandler"/>
+        <vector position="38" name="DMA1_Stream7_IRQHandler"/>
+        <vector position="39" name="SDIO_IRQHandler"/>
+        <vector position="40" name="TIM5_IRQHandler"/>
+        <vector position="41" name="SPI3_IRQHandler"/>
+        <vector position="42" name="DMA2_Stream0_IRQHandler"/>
+        <vector position="43" name="DMA2_Stream1_IRQHandler"/>
+        <vector position="44" name="DMA2_Stream2_IRQHandler"/>
+        <vector position="45" name="DMA2_Stream3_IRQHandler"/>
+        <vector position="46" name="DMA2_Stream4_IRQHandler"/>
+        <vector position="47" name="OTG_FS_IRQHandler"/>
+        <vector position="48" name="DMA2_Stream5_IRQHandler"/>
+        <vector position="49" name="DMA2_Stream6_IRQHandler"/>
+        <vector position="50" name="DMA2_Stream7_IRQHandler"/>
+        <vector position="51" name="USART6_IRQHandler"/>
+        <vector position="52" name="I2C3_EV_IRQHandler"/>
+        <vector position="53" name="I2C3_ER_IRQHandler"/>
+        <vector position="54" name="FPU_IRQHandler"/>
+        <vector position="55" name="SPI4_IRQHandler"/>
+      </vectors>
     </driver>
     <driver type="adc" name="stm32" instances="1"/>
     <driver type="clock" name="stm32"/>
