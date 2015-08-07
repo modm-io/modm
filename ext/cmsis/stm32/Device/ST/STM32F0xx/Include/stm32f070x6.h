@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    stm32f070x6.h
   * @author  MCD Application Team
-  * @version V2.2.0
-  * @date    05-December-2014
+  * @version V2.2.2
+  * @date    26-June-2015
   * @brief   CMSIS STM32F070x6 Devices Peripheral Access Layer Header File.
   *
   *          This file contains:
@@ -14,7 +14,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2014 STMicroelectronics</center></h2>
+  * <h2><center>&copy; COPYRIGHT(c) 2015 STMicroelectronics</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -59,7 +59,6 @@
 /** @addtogroup Configuration_section_for_CMSIS
   * @{
   */
-
 /**
  * @brief Configuration of the Cortex-M0 Processor and Core Peripherals
  */
@@ -233,14 +232,12 @@ typedef struct
   */
 typedef struct
 {
-  __IO uint16_t RDP;          /*!< FLASH option byte Read protection,             Address offset: 0x00 */
-  __IO uint16_t USER;         /*!< FLASH option byte user options,                Address offset: 0x02 */
-  __IO uint16_t DATA0;        /*!< User data byte 0 (stored in FLASH_OBR[23:16]), Address offset: 0x04 */
-  __IO uint16_t DATA1;        /*!< User data byte 1 (stored in FLASH_OBR[31:24]), Address offset: 0x06 */
-  __IO uint16_t WRP0;         /*!< FLASH option byte write protection 0,          Address offset: 0x08 */
-  __IO uint16_t WRP1;         /*!< FLASH option byte write protection 1,          Address offset: 0x0A */
-  __IO uint16_t WRP2;         /*!< FLASH option byte write protection 2,          Address offset: 0x0C */
-  __IO uint16_t WRP3;         /*!< FLASH option byte write protection 3,          Address offset: 0x0E */
+  __IO uint16_t RDP;          /*!< FLASH option byte Read protection,                        Address offset: 0x00 */
+  __IO uint16_t USER;         /*!< FLASH option byte user options,                           Address offset: 0x02 */
+  __IO uint16_t DATA0;        /*!< User data byte 0 (stored in FLASH_OBR[23:16]),            Address offset: 0x04 */
+  __IO uint16_t DATA1;        /*!< User data byte 1 (stored in FLASH_OBR[31:24]),            Address offset: 0x06 */
+  __IO uint16_t WRP0;         /*!< FLASH option byte write protection 0,                     Address offset: 0x08 */
+  __IO uint16_t WRP1;         /*!< FLASH option byte write protection 1,                     Address offset: 0x0A */
 }OB_TypeDef;
 
 /**
@@ -318,6 +315,7 @@ typedef struct
 /**
   * @brief Reset and Clock Control
   */
+
 typedef struct
 {
   __IO uint32_t CR;         /*!< RCC clock control register,                                  Address offset: 0x00 */
@@ -339,7 +337,6 @@ typedef struct
 /** 
   * @brief Real-Time Clock
   */
-
 typedef struct
 {
   __IO uint32_t TR;         /*!< RTC time register,                                        Address offset: 0x00 */
@@ -406,7 +403,6 @@ typedef struct
   __IO uint32_t DMAR;            /*!< TIM DMA address for full transfer register,  Address offset: 0x4C */
   __IO uint32_t OR;              /*!< TIM option register,                         Address offset: 0x50 */
 }TIM_TypeDef;
-
 
 /**
   * @brief Universal Synchronous Asynchronous Receiver Transmitter
@@ -486,6 +482,7 @@ typedef struct
   */
 
 #define FLASH_BASE            ((uint32_t)0x08000000) /*!< FLASH base address in the alias region */
+#define FLASH_BANK1_END       ((uint32_t)0x08007FFF) /*!< FLASH END address of bank1 */ 
 #define SRAM_BASE             ((uint32_t)0x20000000) /*!< SRAM base address in the alias region */
 #define PERIPH_BASE           ((uint32_t)0x40000000) /*!< Peripheral base address in the alias region */
 
@@ -708,7 +705,6 @@ typedef struct
 #define  ADC_DR_DATA                         ((uint32_t)0x0000FFFF)        /*!< Regular data */
 
 /*******************  Bit definition for ADC_CCR register  ********************/
-#define  ADC_CCR_VBATEN                       ((uint32_t)0x01000000)       /*!< Voltage battery enable */
 #define  ADC_CCR_TSEN                         ((uint32_t)0x00800000)       /*!< Tempurature sensore enable */
 #define  ADC_CCR_VREFEN                       ((uint32_t)0x00400000)       /*!< Vrefint enable */
 
@@ -1023,8 +1019,8 @@ typedef struct
 #define  FLASH_OPTKEYR_OPTKEYR               ((uint32_t)0xFFFFFFFF)        /*!< Option Byte Key */
 
 /******************  FLASH Keys  **********************************************/
-#define FLASH_FKEY1                          ((uint32_t)0x45670123)        /*!< Flash program erase key1 */
-#define FLASH_FKEY2                          ((uint32_t)0xCDEF89AB)        /*!< Flash program erase key2: used with FLASH_PEKEY1
+#define FLASH_KEY1                           ((uint32_t)0x45670123)        /*!< Flash program erase key1 */
+#define FLASH_KEY2                           ((uint32_t)0xCDEF89AB)        /*!< Flash program erase key2: used with FLASH_PEKEY1
                                                                                 to unlock the write access to the FPEC. */
                                                                
 #define FLASH_OPTKEY1                        ((uint32_t)0x45670123)        /*!< Flash option key1 */
@@ -1059,12 +1055,13 @@ typedef struct
 #define  FLASH_OBR_RDPRT1                    ((uint32_t)0x00000002)        /*!< Read protection Level 1 */
 #define  FLASH_OBR_RDPRT2                    ((uint32_t)0x00000004)        /*!< Read protection Level 2 */
 
-#define  FLASH_OBR_USER                      ((uint32_t)0x00003700)        /*!< User Option Bytes */
+#define  FLASH_OBR_USER                      ((uint32_t)0x00007700)        /*!< User Option Bytes */
 #define  FLASH_OBR_IWDG_SW                   ((uint32_t)0x00000100)        /*!< IWDG SW */
 #define  FLASH_OBR_nRST_STOP                 ((uint32_t)0x00000200)        /*!< nRST_STOP */
 #define  FLASH_OBR_nRST_STDBY                ((uint32_t)0x00000400)        /*!< nRST_STDBY */
 #define  FLASH_OBR_nBOOT1                    ((uint32_t)0x00001000)        /*!< nBOOT1 */
 #define  FLASH_OBR_VDDA_MONITOR              ((uint32_t)0x00002000)        /*!< VDDA power supply supervisor */
+#define  FLASH_OBR_RAM_PARITY_CHECK          ((uint32_t)0x00004000)        /*!< RAM parity check */
 
 /* Old BOOT1 bit definition, maintained for legacy purpose */
 #define FLASH_OBR_BOOT1                      FLASH_OBR_nBOOT1
@@ -1088,18 +1085,6 @@ typedef struct
 /******************  Bit definition for OB_WRP0 register  *********************/
 #define  OB_WRP0_WRP0                        ((uint32_t)0x000000FF)        /*!< Flash memory write protection option bytes */
 #define  OB_WRP0_nWRP0                       ((uint32_t)0x0000FF00)        /*!< Flash memory write protection complemented option bytes */
-
-/******************  Bit definition for OB_WRP1 register  *********************/
-#define  OB_WRP1_WRP1                        ((uint32_t)0x00FF0000)        /*!< Flash memory write protection option bytes */
-#define  OB_WRP1_nWRP1                       ((uint32_t)0xFF000000)        /*!< Flash memory write protection complemented option bytes */
-
-/******************  Bit definition for OB_WRP2 register  *********************/
-#define  OB_WRP2_WRP2                        ((uint32_t)0x000000FF)        /*!< Flash memory write protection option bytes */
-#define  OB_WRP2_nWRP2                       ((uint32_t)0x0000FF00)        /*!< Flash memory write protection complemented option bytes */
-
-/******************  Bit definition for OB_WRP3 register  *********************/
-#define  OB_WRP3_WRP3                        ((uint32_t)0x00FF0000)        /*!< Flash memory write protection option bytes */
-#define  OB_WRP3_nWRP3                       ((uint32_t)0xFF000000)        /*!< Flash memory write protection complemented option bytes */
 
 /******************************************************************************/
 /*                                                                            */
@@ -2277,172 +2262,172 @@ typedef struct
 #define SYSCFG_CFGR1_I2C_FMP_PA10           ((uint32_t)0x00800000) /*!< I2C PA10 Fast mode plus */
 
 /*****************  Bit definition for SYSCFG_EXTICR1 register  **************/
-#define SYSCFG_EXTICR1_EXTI0            ((uint16_t)0x000F) /*!< EXTI 0 configuration */
-#define SYSCFG_EXTICR1_EXTI1            ((uint16_t)0x00F0) /*!< EXTI 1 configuration */
-#define SYSCFG_EXTICR1_EXTI2            ((uint16_t)0x0F00) /*!< EXTI 2 configuration */
-#define SYSCFG_EXTICR1_EXTI3            ((uint16_t)0xF000) /*!< EXTI 3 configuration */
+#define SYSCFG_EXTICR1_EXTI0                 ((uint32_t)0x0000000F) /*!< EXTI 0 configuration */
+#define SYSCFG_EXTICR1_EXTI1                 ((uint32_t)0x000000F0) /*!< EXTI 1 configuration */
+#define SYSCFG_EXTICR1_EXTI2                 ((uint32_t)0x00000F00) /*!< EXTI 2 configuration */
+#define SYSCFG_EXTICR1_EXTI3                 ((uint32_t)0x0000F000) /*!< EXTI 3 configuration */
 
 /** 
   * @brief  EXTI0 configuration
   */
-#define SYSCFG_EXTICR1_EXTI0_PA         ((uint16_t)0x0000) /*!< PA[0] pin */
-#define SYSCFG_EXTICR1_EXTI0_PB         ((uint16_t)0x0001) /*!< PB[0] pin */
-#define SYSCFG_EXTICR1_EXTI0_PC         ((uint16_t)0x0002) /*!< PC[0] pin */
-#define SYSCFG_EXTICR1_EXTI0_PD         ((uint16_t)0x0003) /*!< PD[0] pin */
-#define SYSCFG_EXTICR1_EXTI0_PF         ((uint16_t)0x0005) /*!< PF[0] pin */
+#define SYSCFG_EXTICR1_EXTI0_PA              ((uint32_t)0x00000000) /*!< PA[0] pin */
+#define SYSCFG_EXTICR1_EXTI0_PB              ((uint32_t)0x00000001) /*!< PB[0] pin */
+#define SYSCFG_EXTICR1_EXTI0_PC              ((uint32_t)0x00000002) /*!< PC[0] pin */
+#define SYSCFG_EXTICR1_EXTI0_PD              ((uint32_t)0x00000003) /*!< PD[0] pin */
+#define SYSCFG_EXTICR1_EXTI0_PF              ((uint32_t)0x00000005) /*!< PF[0] pin */
 
 /** 
   * @brief  EXTI1 configuration  
   */ 
-#define SYSCFG_EXTICR1_EXTI1_PA         ((uint16_t)0x0000) /*!< PA[1] pin */
-#define SYSCFG_EXTICR1_EXTI1_PB         ((uint16_t)0x0010) /*!< PB[1] pin */
-#define SYSCFG_EXTICR1_EXTI1_PC         ((uint16_t)0x0020) /*!< PC[1] pin */
-#define SYSCFG_EXTICR1_EXTI1_PD         ((uint16_t)0x0030) /*!< PD[1] pin */
-#define SYSCFG_EXTICR1_EXTI1_PF         ((uint16_t)0x0050) /*!< PF[1] pin */
+#define SYSCFG_EXTICR1_EXTI1_PA              ((uint32_t)0x00000000) /*!< PA[1] pin */
+#define SYSCFG_EXTICR1_EXTI1_PB              ((uint32_t)0x00000010) /*!< PB[1] pin */
+#define SYSCFG_EXTICR1_EXTI1_PC              ((uint32_t)0x00000020) /*!< PC[1] pin */
+#define SYSCFG_EXTICR1_EXTI1_PD              ((uint32_t)0x00000030) /*!< PD[1] pin */
+#define SYSCFG_EXTICR1_EXTI1_PF              ((uint32_t)0x00000050) /*!< PF[1] pin */
 
 /** 
   * @brief  EXTI2 configuration  
   */
-#define SYSCFG_EXTICR1_EXTI2_PA         ((uint16_t)0x0000) /*!< PA[2] pin */
-#define SYSCFG_EXTICR1_EXTI2_PB         ((uint16_t)0x0100) /*!< PB[2] pin */
-#define SYSCFG_EXTICR1_EXTI2_PC         ((uint16_t)0x0200) /*!< PC[2] pin */
-#define SYSCFG_EXTICR1_EXTI2_PD         ((uint16_t)0x0300) /*!< PD[2] pin */
-#define SYSCFG_EXTICR1_EXTI2_PF         ((uint16_t)0x0500) /*!< PF[2] pin */
+#define SYSCFG_EXTICR1_EXTI2_PA              ((uint32_t)0x00000000) /*!< PA[2] pin */
+#define SYSCFG_EXTICR1_EXTI2_PB              ((uint32_t)0x00000100) /*!< PB[2] pin */
+#define SYSCFG_EXTICR1_EXTI2_PC              ((uint32_t)0x00000200) /*!< PC[2] pin */
+#define SYSCFG_EXTICR1_EXTI2_PD              ((uint32_t)0x00000300) /*!< PD[2] pin */
+#define SYSCFG_EXTICR1_EXTI2_PF              ((uint32_t)0x00000500) /*!< PF[2] pin */
 
 /** 
   * @brief  EXTI3 configuration  
   */
-#define SYSCFG_EXTICR1_EXTI3_PA         ((uint16_t)0x0000) /*!< PA[3] pin */
-#define SYSCFG_EXTICR1_EXTI3_PB         ((uint16_t)0x1000) /*!< PB[3] pin */
-#define SYSCFG_EXTICR1_EXTI3_PC         ((uint16_t)0x2000) /*!< PC[3] pin */
-#define SYSCFG_EXTICR1_EXTI3_PD         ((uint16_t)0x3000) /*!< PD[3] pin */
-#define SYSCFG_EXTICR1_EXTI3_PF         ((uint16_t)0x5000) /*!< PF[3] pin */
+#define SYSCFG_EXTICR1_EXTI3_PA              ((uint32_t)0x00000000) /*!< PA[3] pin */
+#define SYSCFG_EXTICR1_EXTI3_PB              ((uint32_t)0x00001000) /*!< PB[3] pin */
+#define SYSCFG_EXTICR1_EXTI3_PC              ((uint32_t)0x00002000) /*!< PC[3] pin */
+#define SYSCFG_EXTICR1_EXTI3_PD              ((uint32_t)0x00003000) /*!< PD[3] pin */
+#define SYSCFG_EXTICR1_EXTI3_PF              ((uint32_t)0x00005000) /*!< PF[3] pin */
 
 /*****************  Bit definition for SYSCFG_EXTICR2 register  **************/
-#define SYSCFG_EXTICR2_EXTI4            ((uint16_t)0x000F) /*!< EXTI 4 configuration */
-#define SYSCFG_EXTICR2_EXTI5            ((uint16_t)0x00F0) /*!< EXTI 5 configuration */
-#define SYSCFG_EXTICR2_EXTI6            ((uint16_t)0x0F00) /*!< EXTI 6 configuration */
-#define SYSCFG_EXTICR2_EXTI7            ((uint16_t)0xF000) /*!< EXTI 7 configuration */
+#define SYSCFG_EXTICR2_EXTI4                 ((uint32_t)0x0000000F) /*!< EXTI 4 configuration */
+#define SYSCFG_EXTICR2_EXTI5                 ((uint32_t)0x000000F0) /*!< EXTI 5 configuration */
+#define SYSCFG_EXTICR2_EXTI6                 ((uint32_t)0x00000F00) /*!< EXTI 6 configuration */
+#define SYSCFG_EXTICR2_EXTI7                 ((uint32_t)0x0000F000) /*!< EXTI 7 configuration */
 
 /** 
   * @brief  EXTI4 configuration  
   */
-#define SYSCFG_EXTICR2_EXTI4_PA         ((uint16_t)0x0000) /*!< PA[4] pin */
-#define SYSCFG_EXTICR2_EXTI4_PB         ((uint16_t)0x0001) /*!< PB[4] pin */
-#define SYSCFG_EXTICR2_EXTI4_PC         ((uint16_t)0x0002) /*!< PC[4] pin */
-#define SYSCFG_EXTICR2_EXTI4_PD         ((uint16_t)0x0003) /*!< PD[4] pin */
-#define SYSCFG_EXTICR2_EXTI4_PF         ((uint16_t)0x0005) /*!< PF[4] pin */
+#define SYSCFG_EXTICR2_EXTI4_PA              ((uint32_t)0x00000000) /*!< PA[4] pin */
+#define SYSCFG_EXTICR2_EXTI4_PB              ((uint32_t)0x00000001) /*!< PB[4] pin */
+#define SYSCFG_EXTICR2_EXTI4_PC              ((uint32_t)0x00000002) /*!< PC[4] pin */
+#define SYSCFG_EXTICR2_EXTI4_PD              ((uint32_t)0x00000003) /*!< PD[4] pin */
+#define SYSCFG_EXTICR2_EXTI4_PF              ((uint32_t)0x00000005) /*!< PF[4] pin */
 
 /** 
   * @brief  EXTI5 configuration  
   */
-#define SYSCFG_EXTICR2_EXTI5_PA         ((uint16_t)0x0000) /*!< PA[5] pin */
-#define SYSCFG_EXTICR2_EXTI5_PB         ((uint16_t)0x0010) /*!< PB[5] pin */
-#define SYSCFG_EXTICR2_EXTI5_PC         ((uint16_t)0x0020) /*!< PC[5] pin */
-#define SYSCFG_EXTICR2_EXTI5_PD         ((uint16_t)0x0030) /*!< PD[5] pin */
-#define SYSCFG_EXTICR2_EXTI5_PF         ((uint16_t)0x0050) /*!< PF[5] pin */
+#define SYSCFG_EXTICR2_EXTI5_PA              ((uint32_t)0x00000000) /*!< PA[5] pin */
+#define SYSCFG_EXTICR2_EXTI5_PB              ((uint32_t)0x00000010) /*!< PB[5] pin */
+#define SYSCFG_EXTICR2_EXTI5_PC              ((uint32_t)0x00000020) /*!< PC[5] pin */
+#define SYSCFG_EXTICR2_EXTI5_PD              ((uint32_t)0x00000030) /*!< PD[5] pin */
+#define SYSCFG_EXTICR2_EXTI5_PF              ((uint32_t)0x00000050) /*!< PF[5] pin */
 
 /** 
   * @brief  EXTI6 configuration  
   */
-#define SYSCFG_EXTICR2_EXTI6_PA         ((uint16_t)0x0000) /*!< PA[6] pin */
-#define SYSCFG_EXTICR2_EXTI6_PB         ((uint16_t)0x0100) /*!< PB[6] pin */
-#define SYSCFG_EXTICR2_EXTI6_PC         ((uint16_t)0x0200) /*!< PC[6] pin */
-#define SYSCFG_EXTICR2_EXTI6_PD         ((uint16_t)0x0300) /*!< PD[6] pin */
-#define SYSCFG_EXTICR2_EXTI6_PF         ((uint16_t)0x0500) /*!< PF[6] pin */
+#define SYSCFG_EXTICR2_EXTI6_PA              ((uint32_t)0x00000000) /*!< PA[6] pin */
+#define SYSCFG_EXTICR2_EXTI6_PB              ((uint32_t)0x00000100) /*!< PB[6] pin */
+#define SYSCFG_EXTICR2_EXTI6_PC              ((uint32_t)0x00000200) /*!< PC[6] pin */
+#define SYSCFG_EXTICR2_EXTI6_PD              ((uint32_t)0x00000300) /*!< PD[6] pin */
+#define SYSCFG_EXTICR2_EXTI6_PF              ((uint32_t)0x00000500) /*!< PF[6] pin */
 
 /** 
   * @brief  EXTI7 configuration  
   */
-#define SYSCFG_EXTICR2_EXTI7_PA         ((uint16_t)0x0000) /*!< PA[7] pin */
-#define SYSCFG_EXTICR2_EXTI7_PB         ((uint16_t)0x1000) /*!< PB[7] pin */
-#define SYSCFG_EXTICR2_EXTI7_PC         ((uint16_t)0x2000) /*!< PC[7] pin */
-#define SYSCFG_EXTICR2_EXTI7_PD         ((uint16_t)0x3000) /*!< PD[7] pin */
-#define SYSCFG_EXTICR2_EXTI7_PF         ((uint16_t)0x5000) /*!< PF[7] pin */
+#define SYSCFG_EXTICR2_EXTI7_PA              ((uint32_t)0x00000000) /*!< PA[7] pin */
+#define SYSCFG_EXTICR2_EXTI7_PB              ((uint32_t)0x00001000) /*!< PB[7] pin */
+#define SYSCFG_EXTICR2_EXTI7_PC              ((uint32_t)0x00002000) /*!< PC[7] pin */
+#define SYSCFG_EXTICR2_EXTI7_PD              ((uint32_t)0x00003000) /*!< PD[7] pin */
+#define SYSCFG_EXTICR2_EXTI7_PF              ((uint32_t)0x00005000) /*!< PF[7] pin */
 
 /*****************  Bit definition for SYSCFG_EXTICR3 register  **************/
-#define SYSCFG_EXTICR3_EXTI8            ((uint16_t)0x000F) /*!< EXTI 8 configuration */
-#define SYSCFG_EXTICR3_EXTI9            ((uint16_t)0x00F0) /*!< EXTI 9 configuration */
-#define SYSCFG_EXTICR3_EXTI10           ((uint16_t)0x0F00) /*!< EXTI 10 configuration */
-#define SYSCFG_EXTICR3_EXTI11           ((uint16_t)0xF000) /*!< EXTI 11 configuration */
+#define SYSCFG_EXTICR3_EXTI8                 ((uint32_t)0x0000000F) /*!< EXTI 8 configuration */
+#define SYSCFG_EXTICR3_EXTI9                 ((uint32_t)0x000000F0) /*!< EXTI 9 configuration */
+#define SYSCFG_EXTICR3_EXTI10                ((uint32_t)0x00000F00) /*!< EXTI 10 configuration */
+#define SYSCFG_EXTICR3_EXTI11                ((uint32_t)0x0000F000) /*!< EXTI 11 configuration */
 
 /** 
   * @brief  EXTI8 configuration  
   */
-#define SYSCFG_EXTICR3_EXTI8_PA         ((uint16_t)0x0000) /*!< PA[8] pin */
-#define SYSCFG_EXTICR3_EXTI8_PB         ((uint16_t)0x0001) /*!< PB[8] pin */
-#define SYSCFG_EXTICR3_EXTI8_PC         ((uint16_t)0x0002) /*!< PC[8] pin */
-#define SYSCFG_EXTICR3_EXTI8_PD         ((uint16_t)0x0003) /*!< PD[8] pin */
-#define SYSCFG_EXTICR3_EXTI8_PF         ((uint16_t)0x0005) /*!< PF[8] pin */
+#define SYSCFG_EXTICR3_EXTI8_PA              ((uint32_t)0x00000000) /*!< PA[8] pin */
+#define SYSCFG_EXTICR3_EXTI8_PB              ((uint32_t)0x00000001) /*!< PB[8] pin */
+#define SYSCFG_EXTICR3_EXTI8_PC              ((uint32_t)0x00000002) /*!< PC[8] pin */
+#define SYSCFG_EXTICR3_EXTI8_PD              ((uint32_t)0x00000003) /*!< PD[8] pin */
+#define SYSCFG_EXTICR3_EXTI8_PF              ((uint32_t)0x00000005) /*!< PF[8] pin */
 
 /** 
   * @brief  EXTI9 configuration  
   */
-#define SYSCFG_EXTICR3_EXTI9_PA         ((uint16_t)0x0000) /*!< PA[9] pin */
-#define SYSCFG_EXTICR3_EXTI9_PB         ((uint16_t)0x0010) /*!< PB[9] pin */
-#define SYSCFG_EXTICR3_EXTI9_PC         ((uint16_t)0x0020) /*!< PC[9] pin */
-#define SYSCFG_EXTICR3_EXTI9_PD         ((uint16_t)0x0030) /*!< PD[9] pin */
-#define SYSCFG_EXTICR3_EXTI9_PF         ((uint16_t)0x0050) /*!< PF[9] pin */
+#define SYSCFG_EXTICR3_EXTI9_PA              ((uint32_t)0x00000000) /*!< PA[9] pin */
+#define SYSCFG_EXTICR3_EXTI9_PB              ((uint32_t)0x00000010) /*!< PB[9] pin */
+#define SYSCFG_EXTICR3_EXTI9_PC              ((uint32_t)0x00000020) /*!< PC[9] pin */
+#define SYSCFG_EXTICR3_EXTI9_PD              ((uint32_t)0x00000030) /*!< PD[9] pin */
+#define SYSCFG_EXTICR3_EXTI9_PF              ((uint32_t)0x00000050) /*!< PF[9] pin */
 
 /** 
   * @brief  EXTI10 configuration  
   */
-#define SYSCFG_EXTICR3_EXTI10_PA        ((uint16_t)0x0000) /*!< PA[10] pin */
-#define SYSCFG_EXTICR3_EXTI10_PB        ((uint16_t)0x0100) /*!< PB[10] pin */
-#define SYSCFG_EXTICR3_EXTI10_PC        ((uint16_t)0x0200) /*!< PC[10] pin */
-#define SYSCFG_EXTICR3_EXTI10_PD        ((uint16_t)0x0300) /*!< PD[10] pin */
-#define SYSCFG_EXTICR3_EXTI10_PF        ((uint16_t)0x0500) /*!< PF[10] pin */
+#define SYSCFG_EXTICR3_EXTI10_PA             ((uint32_t)0x00000000) /*!< PA[10] pin */
+#define SYSCFG_EXTICR3_EXTI10_PB             ((uint32_t)0x00000100) /*!< PB[10] pin */
+#define SYSCFG_EXTICR3_EXTI10_PC             ((uint32_t)0x00000200) /*!< PC[10] pin */
+#define SYSCFG_EXTICR3_EXTI10_PD             ((uint32_t)0x00000300) /*!< PD[10] pin */
+#define SYSCFG_EXTICR3_EXTI10_PF             ((uint32_t)0x00000500) /*!< PF[10] pin */
 
 /** 
   * @brief  EXTI11 configuration  
   */
-#define SYSCFG_EXTICR3_EXTI11_PA        ((uint16_t)0x0000) /*!< PA[11] pin */
-#define SYSCFG_EXTICR3_EXTI11_PB        ((uint16_t)0x1000) /*!< PB[11] pin */
-#define SYSCFG_EXTICR3_EXTI11_PC        ((uint16_t)0x2000) /*!< PC[11] pin */
-#define SYSCFG_EXTICR3_EXTI11_PD        ((uint16_t)0x3000) /*!< PD[11] pin */
-#define SYSCFG_EXTICR3_EXTI11_PF        ((uint16_t)0x5000) /*!< PF[11] pin */
+#define SYSCFG_EXTICR3_EXTI11_PA             ((uint32_t)0x00000000) /*!< PA[11] pin */
+#define SYSCFG_EXTICR3_EXTI11_PB             ((uint32_t)0x00001000) /*!< PB[11] pin */
+#define SYSCFG_EXTICR3_EXTI11_PC             ((uint32_t)0x00002000) /*!< PC[11] pin */
+#define SYSCFG_EXTICR3_EXTI11_PD             ((uint32_t)0x00003000) /*!< PD[11] pin */
+#define SYSCFG_EXTICR3_EXTI11_PF             ((uint32_t)0x00005000) /*!< PF[11] pin */
 
 /*****************  Bit definition for SYSCFG_EXTICR4 register  **************/
-#define SYSCFG_EXTICR4_EXTI12           ((uint16_t)0x000F) /*!< EXTI 12 configuration */
-#define SYSCFG_EXTICR4_EXTI13           ((uint16_t)0x00F0) /*!< EXTI 13 configuration */
-#define SYSCFG_EXTICR4_EXTI14           ((uint16_t)0x0F00) /*!< EXTI 14 configuration */
-#define SYSCFG_EXTICR4_EXTI15           ((uint16_t)0xF000) /*!< EXTI 15 configuration */
+#define SYSCFG_EXTICR4_EXTI12                ((uint32_t)0x0000000F) /*!< EXTI 12 configuration */
+#define SYSCFG_EXTICR4_EXTI13                ((uint32_t)0x000000F0) /*!< EXTI 13 configuration */
+#define SYSCFG_EXTICR4_EXTI14                ((uint32_t)0x00000F00) /*!< EXTI 14 configuration */
+#define SYSCFG_EXTICR4_EXTI15                ((uint32_t)0x0000F000) /*!< EXTI 15 configuration */
 
 /** 
   * @brief  EXTI12 configuration  
   */
-#define SYSCFG_EXTICR4_EXTI12_PA        ((uint16_t)0x0000) /*!< PA[12] pin */
-#define SYSCFG_EXTICR4_EXTI12_PB        ((uint16_t)0x0001) /*!< PB[12] pin */
-#define SYSCFG_EXTICR4_EXTI12_PC        ((uint16_t)0x0002) /*!< PC[12] pin */
-#define SYSCFG_EXTICR4_EXTI12_PD        ((uint16_t)0x0003) /*!< PD[12] pin */
-#define SYSCFG_EXTICR4_EXTI12_PF        ((uint16_t)0x0005) /*!< PF[12] pin */
+#define SYSCFG_EXTICR4_EXTI12_PA             ((uint32_t)0x00000000) /*!< PA[12] pin */
+#define SYSCFG_EXTICR4_EXTI12_PB             ((uint32_t)0x00000001) /*!< PB[12] pin */
+#define SYSCFG_EXTICR4_EXTI12_PC             ((uint32_t)0x00000002) /*!< PC[12] pin */
+#define SYSCFG_EXTICR4_EXTI12_PD             ((uint32_t)0x00000003) /*!< PD[12] pin */
+#define SYSCFG_EXTICR4_EXTI12_PF             ((uint32_t)0x00000005) /*!< PF[12] pin */
 
 /** 
   * @brief  EXTI13 configuration  
   */
-#define SYSCFG_EXTICR4_EXTI13_PA        ((uint16_t)0x0000) /*!< PA[13] pin */
-#define SYSCFG_EXTICR4_EXTI13_PB        ((uint16_t)0x0010) /*!< PB[13] pin */
-#define SYSCFG_EXTICR4_EXTI13_PC        ((uint16_t)0x0020) /*!< PC[13] pin */
-#define SYSCFG_EXTICR4_EXTI13_PD        ((uint16_t)0x0030) /*!< PD[13] pin */
-#define SYSCFG_EXTICR4_EXTI13_PF        ((uint16_t)0x0050) /*!< PF[13] pin */
+#define SYSCFG_EXTICR4_EXTI13_PA             ((uint32_t)0x00000000) /*!< PA[13] pin */
+#define SYSCFG_EXTICR4_EXTI13_PB             ((uint32_t)0x00000010) /*!< PB[13] pin */
+#define SYSCFG_EXTICR4_EXTI13_PC             ((uint32_t)0x00000020) /*!< PC[13] pin */
+#define SYSCFG_EXTICR4_EXTI13_PD             ((uint32_t)0x00000030) /*!< PD[13] pin */
+#define SYSCFG_EXTICR4_EXTI13_PF             ((uint32_t)0x00000050) /*!< PF[13] pin */
 
 /** 
   * @brief  EXTI14 configuration  
   */
-#define SYSCFG_EXTICR4_EXTI14_PA        ((uint16_t)0x0000) /*!< PA[14] pin */
-#define SYSCFG_EXTICR4_EXTI14_PB        ((uint16_t)0x0100) /*!< PB[14] pin */
-#define SYSCFG_EXTICR4_EXTI14_PC        ((uint16_t)0x0200) /*!< PC[14] pin */
-#define SYSCFG_EXTICR4_EXTI14_PD        ((uint16_t)0x0300) /*!< PD[14] pin */
-#define SYSCFG_EXTICR4_EXTI14_PF        ((uint16_t)0x0500) /*!< PF[14] pin */
+#define SYSCFG_EXTICR4_EXTI14_PA             ((uint32_t)0x00000000) /*!< PA[14] pin */
+#define SYSCFG_EXTICR4_EXTI14_PB             ((uint32_t)0x00000100) /*!< PB[14] pin */
+#define SYSCFG_EXTICR4_EXTI14_PC             ((uint32_t)0x00000200) /*!< PC[14] pin */
+#define SYSCFG_EXTICR4_EXTI14_PD             ((uint32_t)0x00000300) /*!< PD[14] pin */
+#define SYSCFG_EXTICR4_EXTI14_PF             ((uint32_t)0x00000500) /*!< PF[14] pin */
 
 /** 
   * @brief  EXTI15 configuration  
   */
-#define SYSCFG_EXTICR4_EXTI15_PA        ((uint16_t)0x0000) /*!< PA[15] pin */
-#define SYSCFG_EXTICR4_EXTI15_PB        ((uint16_t)0x1000) /*!< PB[15] pin */
-#define SYSCFG_EXTICR4_EXTI15_PC        ((uint16_t)0x2000) /*!< PC[15] pin */
-#define SYSCFG_EXTICR4_EXTI15_PD        ((uint16_t)0x3000) /*!< PD[15] pin */
-#define SYSCFG_EXTICR4_EXTI15_PF        ((uint16_t)0x5000) /*!< PF[15] pin */
+#define SYSCFG_EXTICR4_EXTI15_PA             ((uint32_t)0x00000000) /*!< PA[15] pin */
+#define SYSCFG_EXTICR4_EXTI15_PB             ((uint32_t)0x00001000) /*!< PB[15] pin */
+#define SYSCFG_EXTICR4_EXTI15_PC             ((uint32_t)0x00002000) /*!< PC[15] pin */
+#define SYSCFG_EXTICR4_EXTI15_PD             ((uint32_t)0x00003000) /*!< PD[15] pin */
+#define SYSCFG_EXTICR4_EXTI15_PF             ((uint32_t)0x00005000) /*!< PF[15] pin */
 
 /*****************  Bit definition for SYSCFG_CFGR2 register  ****************/
 #define SYSCFG_CFGR2_LOCKUP_LOCK               ((uint32_t)0x00000001) /*!< Enables and locks the LOCKUP (Hardfault) output of CortexM0 with Break Input of TIMER1 */
@@ -3092,6 +3077,7 @@ typedef struct
 /****************************** I2C Instances *********************************/
 #define IS_I2C_ALL_INSTANCE(INSTANCE) ((INSTANCE) == I2C1)
 
+
 /****************************** IWDG Instances ********************************/
 #define IS_IWDG_ALL_INSTANCE(INSTANCE)  ((INSTANCE) == IWDG)
 
@@ -3291,6 +3277,8 @@ typedef struct
 #define IS_UART_AUTOBAUDRATE_DETECTION_INSTANCE(INSTANCE) (((INSTANCE) == USART1) || \
                                                            ((INSTANCE) == USART2))
 
+#define IS_UART_DRIVER_ENABLE_INSTANCE(INSTANCE) (((INSTANCE) == USART1) || \
+                                                  ((INSTANCE) == USART2))
 /****************************** USB Instances ********************************/
 #define IS_USB_ALL_INSTANCE(INSTANCE)  ((INSTANCE) == USB)
 
