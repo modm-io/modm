@@ -46,6 +46,12 @@
 %#
 %% endmacro
 
+%% macro appendInterrupts()
+%# Include Target Specific Interrupt Table
+%% for vector in vectorss[0]['vectors']
+%%  do i.update({(vector.position | int) : [vector.name, ""]})
+%% endfor
+%% endmacro
 
 %% macro startupCode()
 %#

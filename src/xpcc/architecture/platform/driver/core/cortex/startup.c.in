@@ -46,10 +46,8 @@
 %% elif target is lpc
 %%	import 'lpc/lpc.macros' as platform with context
 %% endif
-%# Include Target Specific Interrupt Table
-%% for vector in vectorss[0]['vectors']
-%%  do i.update({(vector.position | int) : [vector.name, ""]})
-%% endfor
+%# Set peripheralInterrupts variable that contains device specific interrupts
+{{ platform.appendInterrupts() }}
 %# Count Interrupts
 %% set number_of_interrupts = i.keys()|sort|last
 
