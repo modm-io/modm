@@ -37,9 +37,18 @@ class STMDeviceReader(XMLDeviceReader):
 		STMDeviceReader.rootpath = rootpath
 
 		STMDeviceReader.familyFile = XMLDeviceReader(os.path.join(rootpath, 'families.xml'), logger)
-		families = STMDeviceReader.familyFile.query("//Family[@Name='{}']/SubFamily/Mcu/@RefName".format(family))
-		logger.debug("STMDeviceReader: Found devices of family '{}': {}".format(family, ", ".join(families)))
-		return families
+		rawDevices = STMDeviceReader.familyFile.query("//Family[@Name='{}']/SubFamily/Mcu/@RefName".format(family))
+
+		# devices can contain duplicates due to Hx, Tx, Yx, Ix suffix!
+		# we treat them as single devices, since we don't care about the MCUs package
+		devices = []
+		for i, dev in enumerate(rawDevices):
+			shortDev = dev[:-2] if dev.endswith('x') else dev
+			if all(not d.startswith(shortDev) for d in devices):
+				devices.append(dev)
+
+		logger.debug("STMDeviceReader: Found devices of family '{}': {}".format(family, ", ".join(devices)))
+		return devices
 
 
 	def __init__(self, deviceName, logger=None):
