@@ -15,7 +15,6 @@
     <core>cortex-m4f</core>
     <pin-count device-pin-id="v">100</pin-count>
     <pin-count device-pin-id="c">48</pin-count>
-    <pin-count device-pin-id="c">49</pin-count>
     <pin-count device-pin-id="r">64</pin-count>
     <header>stm32f4xx.h</header>
     <define device-size-id="b|c">STM32F401xC</define>
@@ -290,7 +289,6 @@
         <af id="7" peripheral="Uart2" name="Ck" type="out"/>
         <af id="7" peripheral="UartSpiMaster2" name="Sck" type="out"/>
       </gpio>
-      <gpio device-pin-id="v" port="D" id="8"/>
       <gpio device-pin-id="v" port="D" id="9"/>
       <gpio device-pin-id="v" port="D" id="10"/>
       <gpio device-pin-id="v" port="D" id="11"/>

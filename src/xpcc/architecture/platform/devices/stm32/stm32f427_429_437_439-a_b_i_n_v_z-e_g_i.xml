@@ -8,10 +8,9 @@
     <flash device-name="429" device-size-id="e" device-pin-id="b|i|n|v|z">524288</flash>
     <flash device-size-id="g">1048576</flash>
     <flash device-size-id="i">2097152</flash>
-    <ram>262144</ram>
+    <ram>196608</ram>
     <core>cortex-m4f</core>
     <pin-count device-pin-id="v">100</pin-count>
-    <pin-count device-name="429|439" device-size-id="i" device-pin-id="z">143</pin-count>
     <pin-count device-pin-id="z">144</pin-count>
     <pin-count device-pin-id="a">169</pin-count>
     <pin-count device-pin-id="i">176</pin-count>
@@ -44,8 +43,7 @@
     <driver type="random" name="stm32"/>
     <driver type="spi" name="stm32" instances="1,2,3,4"/>
     <driver device-pin-id="a|b|i|n|z" type="spi" name="stm32" instances="5"/>
-    <driver device-name="427|437|439" device-size-id="g|i" device-pin-id="a|b|i|n|z" type="spi" name="stm32" instances="6"/>
-    <driver device-name="429" device-pin-id="b|i|n|z" type="spi" name="stm32" instances="6"/>
+    <driver device-pin-id="b|i|n|z" type="spi" name="stm32" instances="6"/>
     <driver type="spi" name="stm32_uart" instances="1,2,3,4,5,6,7,8"/>
     <driver type="timer" name="stm32" instances="1,2,3,4,5,6,7,8,9,10,11,12,13,14"/>
     <driver type="uart" name="stm32" instances="1,2,3,4,5,6,7,8"/>
@@ -506,8 +504,7 @@
         <af id="8" peripheral="UartSpiMaster6" name="Sck" type="out"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n|z" port="G" id="8">
-        <af device-name="427|437|439" device-size-id="g|i" id="5" peripheral="SpiMaster6" name="Nss"/>
-        <af device-name="429" device-pin-id="b|i|n|z" id="5" peripheral="SpiMaster6" name="Nss"/>
+        <af device-pin-id="b|i|n|z" id="5" peripheral="SpiMaster6" name="Nss"/>
         <af id="8" peripheral="Uart6" name="Rts" type="out"/>
       </gpio>
       <gpio device-pin-id="b|i|n|z" port="G" id="9">
@@ -517,8 +514,7 @@
       <gpio device-pin-id="a|b|i|n|z" port="G" id="10"/>
       <gpio device-pin-id="a|b|i|n|z" port="G" id="11"/>
       <gpio device-pin-id="a|b|i|n|z" port="G" id="12">
-        <af device-name="427|437|439" device-size-id="g|i" id="5" peripheral="SpiMaster6" name="Miso" type="in"/>
-        <af device-name="429" device-pin-id="b|i|n|z" id="5" peripheral="SpiMaster6" name="Miso" type="in"/>
+        <af device-pin-id="b|i|n|z" id="5" peripheral="SpiMaster6" name="Miso" type="in"/>
         <af id="8" peripheral="Uart6" name="Rts" type="out"/>
       </gpio>
       <gpio device-pin-id="b|i|n|z" port="G" id="13">

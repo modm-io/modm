@@ -8,10 +8,9 @@
     <flash device-size-id="e">524288</flash>
     <flash device-size-id="g">1048576</flash>
     <ram>327680</ram>
-    <core>cortex-m7</core>
+    <core>cortex-m7f</core>
     <linkerscript device-size-id="g">stm32f7xx_g.ld</linkerscript>
     <pin-count device-pin-id="v">100</pin-count>
-    <pin-count device-name="746|756" device-pin-id="z">143</pin-count>
     <pin-count device-pin-id="z">144</pin-count>
     <pin-count device-pin-id="i">176</pin-count>
     <pin-count device-pin-id="b">208</pin-count>
