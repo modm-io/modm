@@ -110,8 +110,9 @@
         <vector position="76" name="OTG_HS_WKUP_IRQHandler"/>
         <vector position="77" name="OTG_HS_IRQHandler"/>
         <vector position="78" name="DCMI_IRQHandler"/>
-        <vector position="79" name="CRYP_IRQHandler"/>
-        <vector position="80" name="HASH_RNG_IRQHandler"/>
+        <vector device-name="756" device-size-id="g" position="79" name="CRYP_IRQHandler"/>
+        <vector device-name="756" device-size-id="g" position="80" name="HASH_RNG_IRQHandler"/>
+        <vector device-name="745|746" position="80" name="RNG_IRQHandler"/>
         <vector position="81" name="FPU_IRQHandler"/>
         <vector position="82" name="UART7_IRQHandler"/>
         <vector position="83" name="UART8_IRQHandler"/>
@@ -119,8 +120,8 @@
         <vector position="85" name="SPI5_IRQHandler"/>
         <vector position="86" name="SPI6_IRQHandler"/>
         <vector position="87" name="SAI1_IRQHandler"/>
-        <vector position="88" name="LTDC_IRQHandler"/>
-        <vector position="89" name="LTDC_ER_IRQHandler"/>
+        <vector device-name="746|756" position="88" name="LTDC_IRQHandler"/>
+        <vector device-name="746|756" position="89" name="LTDC_ER_IRQHandler"/>
         <vector position="90" name="DMA2D_IRQHandler"/>
         <vector position="91" name="SAI2_IRQHandler"/>
         <vector position="92" name="QUADSPI_IRQHandler"/>

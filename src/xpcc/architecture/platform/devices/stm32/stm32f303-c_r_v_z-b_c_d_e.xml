@@ -85,39 +85,31 @@
         <vector position="46" name="TIM8_CC_IRQHandler"/>
         <vector position="47" name="ADC3_IRQHandler"/>
         <vector device-size-id="d|e" device-pin-id="r|v|z" position="48" name="FMC_IRQHandler"/>
-        <vector device-size-id="b|c" device-pin-id="c|r|v" position="48" name="TIM5_IRQHandler"/>
-        <vector position="49" name="SPI3_IRQHandler"/>
-        <vector position="50" name="UART4_IRQHandler"/>
-        <vector position="51" name="UART5_IRQHandler"/>
-        <vector position="52" name="TIM6_DAC_IRQHandler"/>
-        <vector position="53" name="TIM7_IRQHandler"/>
-        <vector position="54" name="DMA2_Channel1_IRQHandler"/>
-        <vector position="55" name="DMA2_Channel2_IRQHandler"/>
-        <vector position="56" name="DMA2_Channel3_IRQHandler"/>
-        <vector position="57" name="DMA2_Channel4_IRQHandler"/>
-        <vector position="58" name="DMA2_Channel5_IRQHandler"/>
-        <vector position="59" name="ADC4_IRQHandler"/>
-        <vector position="60" name="COMP1_2_3_IRQHandler"/>
-        <vector position="61" name="COMP1_2_IRQHandler"/>
-        <vector position="62" name="COMP4_5_6_IRQHandler"/>
-        <vector position="63" name="COMP4_6_IRQHandler"/>
-        <vector position="64" name="COMP7_IRQHandler"/>
-        <vector device-size-id="d|e" device-pin-id="r|v|z" position="65" name="I2C3_EV_IRQHandler"/>
-        <vector device-size-id="b|c" device-pin-id="c|r|v" position="65" name="USB_HP_IRQHandler"/>
-        <vector device-size-id="d|e" device-pin-id="r|v|z" position="66" name="I2C3_ER_IRQHandler"/>
-        <vector device-size-id="b|c" device-pin-id="c|r|v" position="66" name="USB_LP_IRQHandler"/>
-        <vector device-size-id="d|e" device-pin-id="r|v|z" position="67" name="USB_HP_IRQHandler"/>
-        <vector device-size-id="b|c" device-pin-id="c|r|v" position="67" name="USBWakeUp_RMP_IRQHandler"/>
-        <vector device-size-id="d|e" device-pin-id="r|v|z" position="68" name="USB_LP_IRQHandler"/>
-        <vector device-size-id="b|c" device-pin-id="c|r|v" position="68" name="TIM19_IRQHandler"/>
-        <vector device-size-id="d|e" device-pin-id="r|v|z" position="69" name="USBWakeUp_RMP_IRQHandler"/>
-        <vector device-size-id="b|c" device-pin-id="c|r|v" position="69" name="FPU_IRQHandler"/>
-        <vector device-size-id="d|e" device-pin-id="r|v|z" position="70" name="TIM20_BRK_IRQHandler"/>
-        <vector device-size-id="d|e" device-pin-id="r|v|z" position="71" name="TIM20_UP_IRQHandler"/>
-        <vector device-size-id="d|e" device-pin-id="r|v|z" position="72" name="TIM20_TRG_COM_IRQHandler"/>
-        <vector device-size-id="d|e" device-pin-id="r|v|z" position="73" name="TIM20_CC_IRQHandler"/>
-        <vector device-size-id="d|e" device-pin-id="r|v|z" position="74" name="FPU_IRQHandler"/>
-        <vector device-size-id="d|e" device-pin-id="r|v|z" position="75" name="SPI4_IRQHandler"/>
+        <vector position="51" name="SPI3_IRQHandler"/>
+        <vector position="52" name="UART4_IRQHandler"/>
+        <vector position="53" name="UART5_IRQHandler"/>
+        <vector position="54" name="TIM6_DAC_IRQHandler"/>
+        <vector position="55" name="TIM7_IRQHandler"/>
+        <vector position="56" name="DMA2_Channel1_IRQHandler"/>
+        <vector position="57" name="DMA2_Channel2_IRQHandler"/>
+        <vector position="58" name="DMA2_Channel3_IRQHandler"/>
+        <vector position="59" name="DMA2_Channel4_IRQHandler"/>
+        <vector position="60" name="DMA2_Channel5_IRQHandler"/>
+        <vector position="61" name="ADC4_IRQHandler"/>
+        <vector position="64" name="COMP1_2_3_IRQHandler"/>
+        <vector position="65" name="COMP4_5_6_IRQHandler"/>
+        <vector position="66" name="COMP7_IRQHandler"/>
+        <vector device-size-id="d|e" device-pin-id="r|v|z" position="72" name="I2C3_EV_IRQHandler"/>
+        <vector device-size-id="d|e" device-pin-id="r|v|z" position="73" name="I2C3_ER_IRQHandler"/>
+        <vector position="74" name="USB_HP_IRQHandler"/>
+        <vector position="75" name="USB_LP_IRQHandler"/>
+        <vector position="76" name="USBWakeUp_RMP_IRQHandler"/>
+        <vector device-size-id="d|e" device-pin-id="r|v|z" position="77" name="TIM20_BRK_IRQHandler"/>
+        <vector device-size-id="d|e" device-pin-id="r|v|z" position="78" name="TIM20_UP_IRQHandler"/>
+        <vector device-size-id="d|e" device-pin-id="r|v|z" position="79" name="TIM20_TRG_COM_IRQHandler"/>
+        <vector device-size-id="d|e" device-pin-id="r|v|z" position="80" name="TIM20_CC_IRQHandler"/>
+        <vector position="81" name="FPU_IRQHandler"/>
+        <vector device-size-id="d|e" device-pin-id="r|v|z" position="84" name="SPI4_IRQHandler"/>
       </vectors>
     </driver>
     <driver type="adc" name="stm32f3" instances="1,2,3,4"/>
