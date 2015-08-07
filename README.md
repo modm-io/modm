@@ -46,9 +46,14 @@ Here is a list of supported **and tested** microcontrollers:
 - ATmega644 family
 - ATmega328p family (Arduino Uno)
 - ATmega1280 family (Arduino Mega)
-- STM32F407 family (STM32F4 Discovery Board)
+- STM32F101 family
+- STM32F100 family (STM32F1 Discovery Board)
 - STM32F303 family (STM32F3 Discovery Board)
+- STM32F407 family (STM32F4 Discovery Board)
+- STM32F411 family (STM32F411 Nucleo Board)
+- STM32F746 family (STM32F7 Discovery Board)
 - LPC11C24 (LPCxpresso Board)
+- LPC1115 (LPCxpresso Board)
 
 Please see [our examples](https://github.com/roboterclubaachen/xpcc/tree/develop/examples) 
 for a complete list of tested projects.
@@ -61,7 +66,7 @@ The following microcontrollers should be able to compile, but *have not been tes
 - All ATtiny's
 - All ATmega's
 
-There are more platforms which we have prepared, but currently not finished support for (Xmega, STM32F{0,1,2}).
+There are more platforms which we have prepared, but currently not finished support for (Xmega, STM32F{0,2}).
 A complete support list of tested and/or compilable and/or potentially portable microcontrollers is available in our
 [device file section](https://github.com/roboterclubaachen/xpcc/tree/develop/src/xpcc/architecture/platform/devices).
 
