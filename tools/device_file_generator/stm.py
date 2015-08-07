@@ -123,7 +123,7 @@ stm32_memory = \
 		'model': [
 			{
 				'names': ['030', '031', '038', '042', '048', '051', '058', '070', '071', '072', '078', '091', '098'],
-				'memories': {'flash': -1, 'sram1': -1}
+				'memories': {'flash': 0, 'sram1': 0}
 			}
 		]
 	},
@@ -135,7 +135,7 @@ stm32_memory = \
 		'model': [
 			{
 				'names': ['100', '101', '102', '103', '105', '107'],
-				'memories': {'flash': -1, 'sram1': -1}
+				'memories': {'flash': 0, 'sram1': 0}
 			}
 		]
 	},
@@ -147,7 +147,7 @@ stm32_memory = \
 		'model': [
 			{
 				'names': ['205', '207', '215', '217'],
-				'memories': {'flash': -1, 'sram1': -1, 'sram2': 16}
+				'memories': {'flash': 0, 'sram1': 0, 'sram2': 16}
 			}
 		]
 	},
@@ -160,19 +160,19 @@ stm32_memory = \
 		'model': [
 			{
 				'names' : ['301', '302', '318', '378', '373'],
-				'memories' : {'flash': -1, 'sram1' : -1}
+				'memories' : {'flash': 0, 'sram1' : 0}
 			},
 			{
 				'names': ['303x6', '303x8', '328', '334', '373'],
-				'memories': {'flash': -1, 'ccm': 4, 'sram1': -1}
+				'memories': {'flash': 0, 'ccm': 4, 'sram1': 0}
 			},
 			{
 				'names': ['303xb', '303xc', '358'],
-				'memories': {'flash': -1, 'ccm': 8, 'sram1': -1}
+				'memories': {'flash': 0, 'ccm': 8, 'sram1': 0}
 			},
 			{
 				'names': ['303xd', '303xe', '398'],
-				'memories': {'flash': -1, 'ccm': 16, 'sram1': -1}
+				'memories': {'flash': 0, 'ccm': 16, 'sram1': 0}
 			}
 		]
 	},
@@ -185,15 +185,15 @@ stm32_memory = \
 		'model': [
 			{
 				'names' : ['401', '411', '446'],
-				'memories' : {'flash': -1, 'sram1' : -1}
+				'memories' : {'flash': 0, 'sram1' : 0}
 			},
 			{
 				'names': ['405', '407', '415', '417'],
-				'memories': {'flash': -1, 'ccm': 64, 'sram1': -1, 'sram2': 16}
+				'memories': {'flash': 0, 'ccm': 64, 'sram1': 0, 'sram2': 16}
 			},
 			{
 				'names': ['427', '429', '437', '439'],
-				'memories': {'flash': -1, 'ccm': 64, 'sram1': -1, 'sram2': 16, 'sram3': 64}
+				'memories': {'flash': 0, 'ccm': 64, 'sram1': 0, 'sram2': 16, 'sram3': 64}
 			}
 		]
 	},
@@ -207,7 +207,7 @@ stm32_memory = \
 		'model': [
 			{
 				'names': ['745', '746', '756'],
-				'memories': {'flash': -1, 'itcm': 16, 'dtcm': 64, 'sram1': -1, 'sram2': 16}
+				'memories': {'flash': 0, 'itcm': 16, 'dtcm': 64, 'sram1': 0, 'sram2': 16}
 			}
 		]
 	}

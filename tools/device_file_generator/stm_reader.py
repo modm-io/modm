@@ -105,11 +105,6 @@ class STMDeviceReader(XMLDeviceReader):
 		if len(rams) <= sizeIndex:
 			sizeIndex = 0
 
-		ram = int(rams[sizeIndex].text)
-		flash = int(self.query("//Flash")[sizeIndex].text)
-		self.addProperty('ram', ram * 1024)
-		self.addProperty('flash', flash * 1024)
-
 		mem_fam = stm32_memory[self.id.family]
 		mem_model = None
 		for model in mem_fam['model']:
@@ -123,10 +118,15 @@ class STMDeviceReader(XMLDeviceReader):
 		if mem_model == None:
 			self.log.error("STMDeviceReader: Memory model not found for device '{}'".format(self.id.string))
 
+		ram = int(rams[sizeIndex].text) + mem_model['memories']['sram1']
+		flash = int(self.query("//Flash")[sizeIndex].text) + mem_model['memories']['flash']
+		self.addProperty('ram', ram * 1024)
+		self.addProperty('flash', flash * 1024)
+
 		memories = []
 		# first get the real SRAM1 size
 		for mem, val in mem_model['memories'].items():
-			if any(s in mem for s in ['2', '3', 'ccm', 'dtcm']):
+			if any(s in mem for s in ['2', '3', 'dtcm']):
 				ram -= val
 
 		# add all memories
