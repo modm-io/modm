@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    stm32f439xx.h
   * @author  MCD Application Team
-  * @version V2.2.0
-  * @date    15-December-2014
+  * @version V2.3.2
+  * @date    26-June-2015
   * @brief   CMSIS STM32F439xx Device Peripheral Access Layer Header File.
   *
   *          This file contains:
@@ -14,7 +14,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2014 STMicroelectronics</center></h2>
+  * <h2><center>&copy; COPYRIGHT(c) 2015 STMicroelectronics</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -1129,12 +1129,11 @@ USB_OTG_HostChannelTypeDef;
 #define PERIPH_BASE           ((uint32_t)0x40000000) /*!< Peripheral base address in the alias region                                */
 #define BKPSRAM_BASE          ((uint32_t)0x40024000) /*!< Backup SRAM(4 KB) base address in the alias region                         */
 #define FMC_R_BASE            ((uint32_t)0xA0000000) /*!< FMC registers base address                                                 */
-#define CCMDATARAM_BB_BASE    ((uint32_t)0x12000000) /*!< CCM(core coupled memory) data RAM(64 KB) base address in the bit-band region  */
 #define SRAM1_BB_BASE         ((uint32_t)0x22000000) /*!< SRAM1(112 KB) base address in the bit-band region                             */
-#define SRAM2_BB_BASE         ((uint32_t)0x2201C000) /*!< SRAM2(16 KB) base address in the bit-band region                              */
-#define SRAM3_BB_BASE         ((uint32_t)0x22020000) /*!< SRAM3(64 KB) base address in the bit-band region                              */
+#define SRAM2_BB_BASE         ((uint32_t)0x22380000) /*!< SRAM2(16 KB) base address in the bit-band region                              */
+#define SRAM3_BB_BASE         ((uint32_t)0x22400000) /*!< SRAM3(64 KB) base address in the bit-band region                              */
 #define PERIPH_BB_BASE        ((uint32_t)0x42000000) /*!< Peripheral base address in the bit-band region                                */
-#define BKPSRAM_BB_BASE       ((uint32_t)0x42024000) /*!< Backup SRAM(4 KB) base address in the bit-band region                         */
+#define BKPSRAM_BB_BASE       ((uint32_t)0x42480000) /*!< Backup SRAM(4 KB) base address in the bit-band region                         */
 #define FLASH_END             ((uint32_t)0x081FFFFF) /*!< FLASH end address */
 #define CCMDATARAM_END        ((uint32_t)0x1000FFFF) /*!< CCM data RAM end address */
 
@@ -3647,6 +3646,9 @@ USB_OTG_HostChannelTypeDef;
 #define  EXTI_IMR_MR17                       ((uint32_t)0x00020000)        /*!< Interrupt Mask on line 17 */
 #define  EXTI_IMR_MR18                       ((uint32_t)0x00040000)        /*!< Interrupt Mask on line 18 */
 #define  EXTI_IMR_MR19                       ((uint32_t)0x00080000)        /*!< Interrupt Mask on line 19 */
+#define  EXTI_IMR_MR20                       ((uint32_t)0x00100000)        /*!< Interrupt Mask on line 20 */
+#define  EXTI_IMR_MR21                       ((uint32_t)0x00200000)        /*!< Interrupt Mask on line 21 */
+#define  EXTI_IMR_MR22                       ((uint32_t)0x00400000)        /*!< Interrupt Mask on line 22 */
 
 /*******************  Bit definition for EXTI_EMR register  *******************/
 #define  EXTI_EMR_MR0                        ((uint32_t)0x00000001)        /*!< Event Mask on line 0 */
@@ -3669,6 +3671,9 @@ USB_OTG_HostChannelTypeDef;
 #define  EXTI_EMR_MR17                       ((uint32_t)0x00020000)        /*!< Event Mask on line 17 */
 #define  EXTI_EMR_MR18                       ((uint32_t)0x00040000)        /*!< Event Mask on line 18 */
 #define  EXTI_EMR_MR19                       ((uint32_t)0x00080000)        /*!< Event Mask on line 19 */
+#define  EXTI_EMR_MR20                       ((uint32_t)0x00100000)        /*!< Event Mask on line 20 */
+#define  EXTI_EMR_MR21                       ((uint32_t)0x00200000)        /*!< Event Mask on line 21 */
+#define  EXTI_EMR_MR22                       ((uint32_t)0x00400000)        /*!< Event Mask on line 22 */
 
 /******************  Bit definition for EXTI_RTSR register  *******************/
 #define  EXTI_RTSR_TR0                       ((uint32_t)0x00000001)        /*!< Rising trigger event configuration bit of line 0 */
@@ -3691,6 +3696,9 @@ USB_OTG_HostChannelTypeDef;
 #define  EXTI_RTSR_TR17                      ((uint32_t)0x00020000)        /*!< Rising trigger event configuration bit of line 17 */
 #define  EXTI_RTSR_TR18                      ((uint32_t)0x00040000)        /*!< Rising trigger event configuration bit of line 18 */
 #define  EXTI_RTSR_TR19                      ((uint32_t)0x00080000)        /*!< Rising trigger event configuration bit of line 19 */
+#define  EXTI_RTSR_TR20                      ((uint32_t)0x00100000)        /*!< Rising trigger event configuration bit of line 20 */
+#define  EXTI_RTSR_TR21                      ((uint32_t)0x00200000)        /*!< Rising trigger event configuration bit of line 21 */
+#define  EXTI_RTSR_TR22                      ((uint32_t)0x00400000)        /*!< Rising trigger event configuration bit of line 22 */
 
 /******************  Bit definition for EXTI_FTSR register  *******************/
 #define  EXTI_FTSR_TR0                       ((uint32_t)0x00000001)        /*!< Falling trigger event configuration bit of line 0 */
@@ -3713,6 +3721,9 @@ USB_OTG_HostChannelTypeDef;
 #define  EXTI_FTSR_TR17                      ((uint32_t)0x00020000)        /*!< Falling trigger event configuration bit of line 17 */
 #define  EXTI_FTSR_TR18                      ((uint32_t)0x00040000)        /*!< Falling trigger event configuration bit of line 18 */
 #define  EXTI_FTSR_TR19                      ((uint32_t)0x00080000)        /*!< Falling trigger event configuration bit of line 19 */
+#define  EXTI_FTSR_TR20                      ((uint32_t)0x00100000)        /*!< Falling trigger event configuration bit of line 20 */
+#define  EXTI_FTSR_TR21                      ((uint32_t)0x00200000)        /*!< Falling trigger event configuration bit of line 21 */
+#define  EXTI_FTSR_TR22                      ((uint32_t)0x00400000)        /*!< Falling trigger event configuration bit of line 22 */
 
 /******************  Bit definition for EXTI_SWIER register  ******************/
 #define  EXTI_SWIER_SWIER0                   ((uint32_t)0x00000001)        /*!< Software Interrupt on line 0 */
@@ -3735,6 +3746,9 @@ USB_OTG_HostChannelTypeDef;
 #define  EXTI_SWIER_SWIER17                  ((uint32_t)0x00020000)        /*!< Software Interrupt on line 17 */
 #define  EXTI_SWIER_SWIER18                  ((uint32_t)0x00040000)        /*!< Software Interrupt on line 18 */
 #define  EXTI_SWIER_SWIER19                  ((uint32_t)0x00080000)        /*!< Software Interrupt on line 19 */
+#define  EXTI_SWIER_SWIER20                  ((uint32_t)0x00100000)        /*!< Software Interrupt on line 20 */
+#define  EXTI_SWIER_SWIER21                  ((uint32_t)0x00200000)        /*!< Software Interrupt on line 21 */
+#define  EXTI_SWIER_SWIER22                  ((uint32_t)0x00400000)        /*!< Software Interrupt on line 22 */
 
 /*******************  Bit definition for EXTI_PR register  ********************/
 #define  EXTI_PR_PR0                         ((uint32_t)0x00000001)        /*!< Pending bit for line 0 */
@@ -3757,6 +3771,9 @@ USB_OTG_HostChannelTypeDef;
 #define  EXTI_PR_PR17                        ((uint32_t)0x00020000)        /*!< Pending bit for line 17 */
 #define  EXTI_PR_PR18                        ((uint32_t)0x00040000)        /*!< Pending bit for line 18 */
 #define  EXTI_PR_PR19                        ((uint32_t)0x00080000)        /*!< Pending bit for line 19 */
+#define  EXTI_PR_PR20                        ((uint32_t)0x00100000)        /*!< Pending bit for line 20 */
+#define  EXTI_PR_PR21                        ((uint32_t)0x00200000)        /*!< Pending bit for line 21 */
+#define  EXTI_PR_PR22                        ((uint32_t)0x00400000)        /*!< Pending bit for line 22 */
 
 /******************************************************************************/
 /*                                                                            */
@@ -4873,7 +4890,7 @@ USB_OTG_HostChannelTypeDef;
 #define  FMC_SDCMR_MODE                     ((uint32_t)0x00000007)        /*!<MODE[2:0] bits (Command mode) */
 #define  FMC_SDCMR_MODE_0                   ((uint32_t)0x00000001)        /*!<Bit 0 */
 #define  FMC_SDCMR_MODE_1                   ((uint32_t)0x00000002)        /*!<Bit 1 */
-#define  FMC_SDCMR_MODE_2                   ((uint32_t)0x00000003)        /*!<Bit 2 */
+#define  FMC_SDCMR_MODE_2                   ((uint32_t)0x00000004)        /*!<Bit 2 */
                                             
 #define  FMC_SDCMR_CTB2                     ((uint32_t)0x00000008)        /*!<Command target 2 */
 
@@ -5274,17 +5291,27 @@ USB_OTG_HostChannelTypeDef;
 #define HASH_CR_LKEY                         ((uint32_t)0x00010000)
 
 /******************  Bits definition for HASH_STR register  *******************/
-#define HASH_STR_NBW                         ((uint32_t)0x0000001F)
-#define HASH_STR_NBW_0                       ((uint32_t)0x00000001)
-#define HASH_STR_NBW_1                       ((uint32_t)0x00000002)
-#define HASH_STR_NBW_2                       ((uint32_t)0x00000004)
-#define HASH_STR_NBW_3                       ((uint32_t)0x00000008)
-#define HASH_STR_NBW_4                       ((uint32_t)0x00000010)
+#define HASH_STR_NBLW                        ((uint32_t)0x0000001F)
+#define HASH_STR_NBLW_0                      ((uint32_t)0x00000001)
+#define HASH_STR_NBLW_1                      ((uint32_t)0x00000002)
+#define HASH_STR_NBLW_2                      ((uint32_t)0x00000004)
+#define HASH_STR_NBLW_3                      ((uint32_t)0x00000008)
+#define HASH_STR_NBLW_4                      ((uint32_t)0x00000010)
 #define HASH_STR_DCAL                        ((uint32_t)0x00000100)
+/* Aliases for HASH_STR register */
+#define HASH_STR_NBW                         HASH_STR_NBLW
+#define HASH_STR_NBW_0                       HASH_STR_NBLW_0
+#define HASH_STR_NBW_1                       HASH_STR_NBLW_1
+#define HASH_STR_NBW_2                       HASH_STR_NBLW_2
+#define HASH_STR_NBW_3                       HASH_STR_NBLW_3
+#define HASH_STR_NBW_4                       HASH_STR_NBLW_4
 
 /******************  Bits definition for HASH_IMR register  *******************/
-#define HASH_IMR_DINIM                       ((uint32_t)0x00000001)
-#define HASH_IMR_DCIM                        ((uint32_t)0x00000002)
+#define HASH_IMR_DINIE                       ((uint32_t)0x00000001)
+#define HASH_IMR_DCIE                        ((uint32_t)0x00000002)
+/* Aliases for HASH_IMR register */
+#define HASH_IMR_DINIM                       HASH_IMR_DINIE
+#define HASH_IMR_DCIM                        HASH_IMR_DCIE
 
 /******************  Bits definition for HASH_SR register  ********************/
 #define HASH_SR_DINIS                        ((uint32_t)0x00000001)
@@ -5823,7 +5850,7 @@ USB_OTG_HostChannelTypeDef;
 #define  RCC_AHB1RSTR_DMA2RST                ((uint32_t)0x00400000)
 #define  RCC_AHB1RSTR_DMA2DRST               ((uint32_t)0x00800000)
 #define  RCC_AHB1RSTR_ETHMACRST              ((uint32_t)0x02000000)
-#define  RCC_AHB1RSTR_OTGHRST                ((uint32_t)0x10000000)
+#define  RCC_AHB1RSTR_OTGHRST                ((uint32_t)0x20000000)
 
 /********************  Bit definition for RCC_AHB2RSTR register  **************/
 #define  RCC_AHB2RSTR_DCMIRST                ((uint32_t)0x00000001)
@@ -6138,7 +6165,11 @@ USB_OTG_HostChannelTypeDef;
 #define  RCC_DCKCFGR_PLLSAIDIVQ              ((uint32_t)0x00001F00)
 #define  RCC_DCKCFGR_PLLSAIDIVR              ((uint32_t)0x00030000)
 #define  RCC_DCKCFGR_SAI1ASRC                ((uint32_t)0x00300000)
+#define  RCC_DCKCFGR_SAI1ASRC_0              ((uint32_t)0x00100000)
+#define  RCC_DCKCFGR_SAI1ASRC_1              ((uint32_t)0x00200000)
 #define  RCC_DCKCFGR_SAI1BSRC                ((uint32_t)0x00C00000)
+#define  RCC_DCKCFGR_SAI1BSRC_0              ((uint32_t)0x00400000)
+#define  RCC_DCKCFGR_SAI1BSRC_1              ((uint32_t)0x00800000)
 #define  RCC_DCKCFGR_TIMPRE                  ((uint32_t)0x01000000)
 
 
@@ -6270,7 +6301,7 @@ USB_OTG_HostChannelTypeDef;
 
 /********************  Bits definition for RTC_PRER register  *****************/
 #define RTC_PRER_PREDIV_A                    ((uint32_t)0x007F0000)
-#define RTC_PRER_PREDIV_S                    ((uint32_t)0x00001FFF)
+#define RTC_PRER_PREDIV_S                    ((uint32_t)0x00007FFF)
 
 /********************  Bits definition for RTC_WUTR register  *****************/
 #define RTC_WUTR_WUT                         ((uint32_t)0x0000FFFF)
@@ -6579,16 +6610,17 @@ USB_OTG_HostChannelTypeDef;
 #define  SAI_xCR1_DMAEN                   ((uint32_t)0x00020000)        /*!<DMA enable                 */
 #define  SAI_xCR1_NODIV                   ((uint32_t)0x00080000)        /*!<No Divider Configuration   */
 
-#define  SAI_xCR1_MCKDIV                  ((uint32_t)0x00780000)        /*!<MCKDIV[3:0] (Master ClocK Divider)  */
-#define  SAI_xCR1_MCKDIV_0                ((uint32_t)0x00080000)        /*!<Bit 0  */
-#define  SAI_xCR1_MCKDIV_1                ((uint32_t)0x00100000)        /*!<Bit 1  */
-#define  SAI_xCR1_MCKDIV_2                ((uint32_t)0x00200000)        /*!<Bit 2  */
-#define  SAI_xCR1_MCKDIV_3                ((uint32_t)0x00400000)        /*!<Bit 3  */
+#define  SAI_xCR1_MCKDIV                  ((uint32_t)0x00F00000)        /*!<MCKDIV[3:0] (Master ClocK Divider)  */
+#define  SAI_xCR1_MCKDIV_0                ((uint32_t)0x00100000)        /*!<Bit 0  */
+#define  SAI_xCR1_MCKDIV_1                ((uint32_t)0x00200000)        /*!<Bit 1  */
+#define  SAI_xCR1_MCKDIV_2                ((uint32_t)0x00400000)        /*!<Bit 2  */
+#define  SAI_xCR1_MCKDIV_3                ((uint32_t)0x00800000)        /*!<Bit 3  */
 
 /*******************  Bit definition for SAI_xCR2 register  *******************/
-#define  SAI_xCR2_FTH                     ((uint32_t)0x00000003)        /*!<FTH[1:0](Fifo THreshold)  */
+#define  SAI_xCR2_FTH                     ((uint32_t)0x00000007)        /*!<FTH[2:0](Fifo THreshold)  */
 #define  SAI_xCR2_FTH_0                   ((uint32_t)0x00000001)        /*!<Bit 0 */
 #define  SAI_xCR2_FTH_1                   ((uint32_t)0x00000002)        /*!<Bit 1 */
+#define  SAI_xCR2_FTH_2                   ((uint32_t)0x00000004)        /*!<Bit 2 */
 
 #define  SAI_xCR2_FFLUSH                  ((uint32_t)0x00000008)        /*!<Fifo FLUSH                       */
 #define  SAI_xCR2_TRIS                    ((uint32_t)0x00000010)        /*!<TRIState Management on data line */
@@ -6674,7 +6706,7 @@ USB_OTG_HostChannelTypeDef;
 #define  SAI_xSR_FLVL                     ((uint32_t)0x00070000)         /*!<FLVL[2:0] (FIFO Level Threshold)               */
 #define  SAI_xSR_FLVL_0                   ((uint32_t)0x00010000)         /*!<Bit 0 */
 #define  SAI_xSR_FLVL_1                   ((uint32_t)0x00020000)         /*!<Bit 1 */
-#define  SAI_xSR_FLVL_2                   ((uint32_t)0x00030000)         /*!<Bit 2 */
+#define  SAI_xSR_FLVL_2                   ((uint32_t)0x00040000)         /*!<Bit 2 */
 
 /******************  Bit definition for SAI_xCLRFR register  ******************/
 #define  SAI_xCLRFR_COVRUDR               ((uint32_t)0x00000001)        /*!<Clear Overrun underrun                               */
