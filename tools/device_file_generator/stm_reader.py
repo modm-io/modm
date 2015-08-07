@@ -71,24 +71,6 @@ class STMDeviceReader(XMLDeviceReader):
 			core += 'f'
 		self.addProperty('core', core)
 
-		# add entire interrupt vectore table here:
-		nvic_file = self.query("//IP[@Name='NVIC']")[0].get('Version')
-		nvic_file = os.path.join(self.rootpath, 'IP', 'NVIC-' + nvic_file + '_Modes.xml')
-		self.nvicFile = XMLDeviceReader(nvic_file, logger)
-		iNode = self.nvicFile.query("//IP/RefParameter[@Name='IRQn']/PossibleValue")
-		ivectors = []
-		ignore = True
-		pos = 0
-		for node in iNode:
-			if ignore:
-				if 'SysTick_IRQn' in node.get('Value'):
-					ignore = False
-				continue
-			ivectors.append({'position': pos, 'name': node.get('Value').split(":")[0][:-1] + "Handler"}) #, 'description': node.get('Comment')})
-			pos += 1
-
-		self.addProperty('interrupts', ivectors)
-
 		# flash and ram sizes
 		# The <ram> and <flash> can occur multiple times.
 		# they are "ordered" in the same way as the `(S-I-Z-E)` ids in the device combo name
@@ -175,7 +157,7 @@ class STMDeviceReader(XMLDeviceReader):
 
 		dev_def = self._getDeviceDefine()
 		if dev_def is None:
-			logger.warn("STMDeviceReader: Define not found for device '{}'".format(self.id.string))
+			logger.error("STMDeviceReader: Define not found for device '{}'".format(self.id.string))
 		else:
 			defines.append(dev_def)
 
@@ -193,7 +175,33 @@ class STMDeviceReader(XMLDeviceReader):
 
 		self.modules = self.query("//IP/@InstanceName")
 		self.modules = sorted(list(set(self.modules)))
-		self.log.debug("Available Modules are:\n" + self._modulesToString())
+		self.log.debug("STMDeviceReader: Available Modules are:\n" + self._modulesToString())
+
+		# add entire interrupt vectore table here.
+		# I have not found a way to extract the correct vector _position_ from the ST device files
+		# so we have to swallow our pride and just parse the header file
+		# ext/cmsis/stm32/Device/ST/STM32F4xx/Include/
+		headerFilePath = os.path.join('..', '..', 'ext', 'cmsis', 'stm32', 'Device', 'ST', 'STM32{}xx'.format(self.id.family.upper()), 'Include', '{}.h'.format(dev_def.lower()))
+		headerFile = open(headerFilePath, 'r').read()
+		match = re.search("typedef enum.*?/\*\*.*?/\*\*.*?\*/(?P<table>.*?)} IRQn_Type;", headerFile, re.DOTALL)
+		if not match:
+			logger.error("STMDeviceReader: Interrupt vector table not found for device '{}'".format(self.id.string))
+			exit(1)
+
+		# print dev_def.lower(), match.group('table')
+
+		ivectors = []
+		for i, line in enumerate(match.group('table').split('\n')[1:-1]):
+			if '=' not in line: # avoid multiline comment
+				continue
+
+			name, pos = line.split('/*!<')[0].split('=')
+			pos = int(pos.strip(' ,'))
+			name = name.strip()[:-1] + 'Handler'
+			ivectors.append({'position': pos, 'name': name})
+
+		self.log.debug("STMDeviceReader: Found interrupt vectors:\n" + "\n".join(["{}: {}".format(v['position'], v['name']) for v in ivectors]))
+		self.addProperty('interrupts', ivectors)
 
 		for m in self.modules:
 			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'CAN', 'SPI', 'I2C', 'FSMC', 'RNG', 'RCC', 'USB']):
