@@ -42,6 +42,7 @@ class STMDeviceWriter(XMLDeviceWriter):
 
 		# Memories
 		self.addMemoryToNode(core_child)
+		self.addInterruptTableToNode(core_child)
 
 		adc_map = {'f0': 'stm32f0',
 				   'f1': 'stm32f1',
@@ -148,6 +149,22 @@ class STMDeviceWriter(XMLDeviceWriter):
 					memory_section.setAttributes(section)
 		# sort the node children by start address
 		memory.sort(key=lambda k: (int(k.get('start'), 16)))
+
+	def addInterruptTableToNode(self, node):
+		interrupts = self.device.getProperty('interrupts')
+		ivector = node.addChild('vectors')
+
+		for interrupt in interrupts.values:
+			vectors = interrupt.value
+
+			for id in interrupt.ids.differenceFromIds(self.device.ids):
+				attr = self._getAttributeDictionaryFromId(id)
+				for vec in vectors:
+					vector_section = ivector.addChild('vector')
+					vector_section.setAttributes(attr)
+					vector_section.setAttributes(vec)
+		# sort the node children by start address
+		ivector.sort(key=lambda k: (int(k.get('position'), 16)))
 
 	def addGpioToNode(self, node):
 		props = self.device.getProperty('gpios')

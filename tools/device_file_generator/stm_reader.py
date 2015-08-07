@@ -58,9 +58,27 @@ class STMDeviceReader(XMLDeviceReader):
 		coreLut = {'m0': 'v6m', 'm3': 'v7m', 'm4': 'v7em', 'm7': 'v7em'}
 		core = self.query('//Core')[0].text.replace('ARM ', '').lower()
 		self.addProperty('architecture', coreLut[core.replace('cortex-', '')])
-		if core.endswith('m4'):
+		if core.endswith('m4') or core.endswith('m7'):
 			core += 'f'
 		self.addProperty('core', core)
+
+		# add entire interrupt vectore table here:
+		nvic_file = self.query("//IP[@Name='NVIC']")[0].get('Version')
+		nvic_file = os.path.join(self.rootpath, 'IP', 'NVIC-' + nvic_file + '_Modes.xml')
+		self.nvicFile = XMLDeviceReader(nvic_file, logger)
+		iNode = self.nvicFile.query("//IP/RefParameter[@Name='IRQn']/PossibleValue")
+		ivectors = []
+		ignore = True
+		pos = 0
+		for node in iNode:
+			if ignore:
+				if 'SysTick_IRQn' in node.get('Value'):
+					ignore = False
+				continue
+			ivectors.append({'position': pos, 'name': node.get('Value').split(":")[0][:-1] + "Handler"}) #, 'description': node.get('Comment')})
+			pos += 1
+
+		self.addProperty('interrupts', ivectors)
 
 		# flash and ram sizes
 		# The <ram> and <flash> can occur multiple times.
