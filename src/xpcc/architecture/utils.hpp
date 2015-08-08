@@ -113,6 +113,8 @@
 	#	define ATTRIBUTE_WEAK		__attribute__ ((weak))
 	#	define ATTRIBUTE_ALIGNED(n)	__attribute__((aligned(n)))
 	#	define ATTRIBUTE_PACKED		__attribute__((packed))
+	#	define ATTRIBUTE_FASTCODE	__attribute__((section(".fastcode")))
+	#	define ATTRIBUTE_FASTDATA	__attribute__((section(".fastdata")))
 
 	// see http://dbp-consulting.com/tutorials/StrictAliasing.html
 	#	define ATTRIBUTE_MAY_ALIAS	__attribute__((__may_alias__))
@@ -122,6 +124,8 @@
 	#	define ATTRIBUTE_WEAK
 	#	define ATTRIBUTE_ALIGNED(n)
 	#	define ATTRIBUTE_PACKED
+	#	define ATTRIBUTE_FASTCODE
+	#	define ATTRIBUTE_FASTDATA
 	#	define ATTRIBUTE_MAY_ALIAS
 	#endif
 

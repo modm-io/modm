@@ -1,7 +1,7 @@
 #include <xpcc/architecture/platform.hpp>
 #include "../stm32f4_discovery.hpp"
 
-uint16_t buffer[] __attribute__((section(".fastdata"))) = {100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 900, 800, 700, 600, 500, 400, 300, 200};
+uint16_t buffer[] ATTRIBUTE_FASTDATA = {100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 900, 800, 700, 600, 500, 400, 300, 200};
 
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
