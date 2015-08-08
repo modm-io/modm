@@ -1,7 +1,7 @@
 #include <xpcc/architecture/platform.hpp>
 #include "../stm32f4_discovery.hpp"
 
-uint32_t buffer[100] __attribute__((section(".ccm"))) = {100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1400, 1300, 1200, 1100, 1000, 900, 800, 700, 600, 500, 400, 300, 200, 100};
+uint16_t buffer[] __attribute__((section(".fastdata"))) = {100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 900, 800, 700, 600, 500, 400, 300, 200};
 
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
@@ -21,7 +21,7 @@ MAIN_FUNCTION
 		LedGreen::toggle();
 		xpcc::delayMilliseconds(buffer[counter]);
 		counter++;
-		counter %= 29;
+		counter %= XPCC__ARRAY_SIZE(buffer);
 	}
 
 	return 0;
