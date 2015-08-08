@@ -21,6 +21,12 @@
  *                |       (grows downwards)         |
  *                |               |                 |
  *                |               v                 |
+ *                |---------------------------------| <------- __thread_stack_top
+ *                |                                 |
+ *                |    Thread/Process Stack (psp)   |
+ *                |       (grows downwards)         |
+ *                |               |                 |
+ *                |               v                 |
  *                |                                 | <------- __stack_start
  *                |---------------------------------|
  *                |           Unused RAM            |
@@ -132,7 +138,7 @@ PROVIDE(__heap_end  = ORIGIN(RAM) + LENGTH(RAM));
 
 /* Used for interrupt handlers */
 HANDLER_STACK_SIZE = DEFINED(__handler_stack_size) ? __handler_stack_size : 1024;
-PROCESS_STACK_SIZE = DEFINED(__process_stack_size) ? __process_stack_size : 1024;
+THREAD_STACK_SIZE  = DEFINED(__thread_stack_size)  ? __thread_stack_size  : 1024;
 
 SECTIONS
 {
@@ -345,9 +351,13 @@ SECTIONS
 
 	.stack (NOLOAD) :
 	{
-		. = ORIGIN(RAM) + LENGTH(RAM) - HANDLER_STACK_SIZE;
+		. = ORIGIN(RAM) + LENGTH(RAM) - HANDLER_STACK_SIZE - THREAD_STACK_SIZE;
 		. = ALIGN(4);
 		__stack_start = . ;
+
+		. += THREAD_STACK_SIZE;
+		. = ALIGN (4);
+		__thread_stack_top = . ;
 
 		. += HANDLER_STACK_SIZE;
 		. = ALIGN (4);
