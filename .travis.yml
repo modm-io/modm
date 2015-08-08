@@ -29,6 +29,7 @@ env:
  - TEST_SUITE="check=examples examples=stm32f1_discovery"
  - TEST_SUITE="check=examples examples=stm32f3_discovery"
  - TEST_SUITE="check=examples examples=stm32f4_discovery"
+ - TEST_SUITE="check=examples examples=stm32f429_discovery"
  - TEST_SUITE="check=examples examples=stm32f7_discovery"
  - TEST_SUITE="check=examples examples=stm32f4_loa_v2b"
  - TEST_SUITE="check=examples examples=unittest"
