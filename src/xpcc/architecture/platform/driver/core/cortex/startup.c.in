@@ -124,9 +124,12 @@ extern uint32_t __fastcode_load;
 extern uint32_t __fastcode_start;
 extern uint32_t __fastcode_end;
 
-extern uint32_t __ccm_load;
-extern uint32_t __ccm_start;
-extern uint32_t __ccm_end;
+extern uint32_t __vector_table_ram;
+extern uint32_t __vector_table_rom;
+
+extern uint32_t __fastdata_load;
+extern uint32_t __fastdata_start;
+extern uint32_t __fastdata_end;
 
 extern uint32_t __data_load;
 extern uint32_t __data_start;
@@ -177,9 +180,9 @@ Reset_Handler(void)
 		*(dest++) = *(src++);
 	}
 
-	src = &__ccm_load;
-	dest = &__ccm_start;
-	while (dest < &__ccm_end)
+	src = &__fastdata_load;
+	dest = &__fastdata_start;
+	while (dest < &__fastdata_end)
 	{
 		*(dest++) = *(src++);
 	}
@@ -210,8 +213,11 @@ Reset_Handler(void)
 %% if target is cortex_m3 or target is cortex_m4 or target is cortex_m7
 	// Setup NVIC
 	// Set vector table
-	const uint32_t offset = 0;
-	SCB->VTOR = 0x08000000 | (offset & 0x1FFFFF80);
+	%% if parameters.vector_table_in_ram
+	SCB->VTOR = (uint32_t)(&__vector_table_ram);
+	%% else
+	SCB->VTOR = (uint32_t)(&__vector_table_rom);
+	%% endif
 
 	// Lower priority level for all peripheral interrupts to lowest possible
 	for (uint32_t i = 0; i < NR_INTERRUPTS; i++) {

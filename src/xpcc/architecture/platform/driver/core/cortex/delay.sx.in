@@ -79,8 +79,13 @@ _delay_us:
 2:
 	bx		lr
 %% elif target is cortex_m3 or target is cortex_m4
+	%% if target is stm32f3
+	// function resides in Core-Coupled memory, which is twice as fast as SRAM
+	mov		r1, #(F_CPU / 1000000 / 6)
+	%% else
 	// 72 / 6 cycles per loop = 12
 	mov		r1, #(F_CPU / 1000000 / 12)
+	%% endif
 	muls	r1, r0, r1
 1:
 	itt		ne
@@ -120,7 +125,12 @@ _delay_ms:
 	bne		1b
 2:	bx		lr
 %% elif target is cortex_m3 or target is cortex_m4
+	%% if target is stm32f3
+	// function resides in Core-Coupled memory, which is twice as fast as SRAM
+	ldr		r1, =(F_CPU / 1000 / 4)
+	%% else
 	ldr		r1, =(F_CPU / 1000 / 8)
+	%% endif
 	muls	r1, r0, r1
 1:
 	itt		ne

@@ -2,10 +2,10 @@
 MEMORY
 {
 	ROM (rx)      : ORIGIN = 0x08000000, LENGTH = 128k
-	RAM (rwx)     : ORIGIN = 0x20000000, LENGTH = 40k	/* Main internal SRAM */
-	
-	/* Core Coupled Memory, can only be accessed by the CPU */
+	RAM (rwx)     : ORIGIN = 0x20000000, LENGTH = 40k
+
+	SRAM1 (rwx)   : ORIGIN = 0x20000000, LENGTH = 40k
 	CCM (rwx)     : ORIGIN = 0x10000000, LENGTH = 8k
 }
 
-INCLUDE stm32f4xx.ld
+INCLUDE stm32_iccm.ld
