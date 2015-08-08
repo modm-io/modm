@@ -23,7 +23,6 @@
     <define device-name="439">STM32F439xx</define>
     <define>STM32F4XX</define>
     <driver type="core" name="cortex">
-      <parameter name="allocator">newlib</parameter>
       <memory>
         <section device-size-id="g" access="rx" start="0x8000000" name="flash" size="1024"/>
         <section device-size-id="i" access="rx" start="0x8000000" name="flash" size="2048"/>

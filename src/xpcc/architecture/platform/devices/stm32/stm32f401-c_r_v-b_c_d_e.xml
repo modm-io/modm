@@ -21,7 +21,6 @@
     <define device-size-id="d|e">STM32F401xE</define>
     <define>STM32F4XX</define>
     <driver type="core" name="cortex">
-      <parameter name="allocator">newlib</parameter>
       <memory>
         <section device-size-id="b" access="rx" start="0x8000000" name="flash" size="128"/>
         <section device-size-id="c" access="rx" start="0x8000000" name="flash" size="256"/>
