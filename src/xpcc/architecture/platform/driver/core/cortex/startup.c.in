@@ -90,8 +90,7 @@ extern uint32_t __stack_end;
 
 %% if parameters.vector_table_in_ram
 // Define the vector table
-FunctionPointer flashVectors[4]
-__attribute__ ((section(".reset"))) =
+FunctionPointer flashVectors[4] __attribute__ ((section(".reset"))) =
 {
 	(FunctionPointer) &__stack_end,	// stack pointer
 	Reset_Handler,				// code entry point
@@ -124,6 +123,10 @@ FunctionPointer flashVectors[] __attribute__ ((section(".reset"))) =
 extern uint32_t __fastcode_load;
 extern uint32_t __fastcode_start;
 extern uint32_t __fastcode_end;
+
+extern uint32_t __ccm_load;
+extern uint32_t __ccm_start;
+extern uint32_t __ccm_end;
 
 extern uint32_t __data_load;
 extern uint32_t __data_start;
@@ -170,6 +173,13 @@ Reset_Handler(void)
 	uint32_t* src = &__fastcode_load;
 	uint32_t* dest = &__fastcode_start;
 	while (dest < &__fastcode_end)
+	{
+		*(dest++) = *(src++);
+	}
+
+	src = &__ccm_load;
+	dest = &__ccm_start;
+	while (dest < &__ccm_end)
 	{
 		*(dest++) = *(src++);
 	}
