@@ -23,7 +23,7 @@
     <define device-size-id="b|c" device-pin-id="c|r|v">STM32F303xC</define>
     <define device-size-id="d|e" device-pin-id="r|v|z">STM32F303xE</define>
     <driver type="core" name="cortex">
-      <parameter name="allocator">newlib</parameter>
+      <parameter name="vector_table_in_ram">true</parameter>
       <memory>
         <section device-size-id="b" access="rx" start="0x8000000" name="flash" size="128"/>
         <section device-size-id="c" access="rx" start="0x8000000" name="flash" size="256"/>

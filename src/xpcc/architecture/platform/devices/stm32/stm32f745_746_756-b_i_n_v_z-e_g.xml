@@ -21,7 +21,6 @@
     <define device-name="746">STM32F746xx</define>
     <define device-name="756" device-size-id="g">STM32F756xx</define>
     <driver type="core" name="cortex">
-      <parameter name="allocator">newlib</parameter>
       <memory>
         <section access="rwx" start="0x200000" name="itcm" size="16"/>
         <section device-size-id="g" access="rx" start="0x8000000" name="flash" size="1024"/>

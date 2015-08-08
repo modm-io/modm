@@ -34,7 +34,12 @@ class STMDeviceWriter(XMLDeviceWriter):
 		param_name_value = {
 #							'enable_hardfault_handler': 'false',
 #							'vector_table_in_ram': 'false',
-							'allocator': 'newlib'}
+#							'allocator': 'newlib'
+		}
+		# The STM32F3 has Core-Coupled Memory on the I-Bus, so we remap by default
+		if self.device.id.family == 'f3' and self._hasCoreCoupledMemory():
+			param_name_value['vector_table_in_ram'] = 'true'
+
 		for param_name in param_name_value:
 			param_core_child = core_child.addChild('parameter')
 			param_core_child.setAttributes({'name': param_name})
@@ -199,6 +204,12 @@ class STMDeviceWriter(XMLDeviceWriter):
 					gpio_child.sort(key=lambda k : (int(1e6 if (k.get('id') == None) else k.get('id').split(',')[0]), k.get('peripheral')))
 		# sort the node children by port and id
 		driver.sort(key=lambda k : (k.get('port'), int(k.get('id'))) )
+
+	def _hasCoreCoupledMemory(self):
+		for memory in [memory.value for memory in self.device.getProperty('memories').values]:
+			if any(mem['name'] == 'ccm' for mem in memory):
+				return True
+		return False
 
 	def _getAttributeDictionaryFromId(self, id):
 		target = id.properties

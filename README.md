@@ -50,8 +50,8 @@ Here is a list of supported **and tested** microcontrollers:
 - STM32F100 family (STM32F1 Discovery Board)
 - STM32F303 family (STM32F3 Discovery Board)
 - STM32F407 family (STM32F4 Discovery Board)
+- STM32F429 family (STM32F429 Discovery Board)
 - STM32F411 family (STM32F411 Nucleo Board)
-- STM32F746 family (STM32F7 Discovery Board)
 - LPC11C24 (LPCxpresso Board)
 - LPC1115 (LPCxpresso Board)
 

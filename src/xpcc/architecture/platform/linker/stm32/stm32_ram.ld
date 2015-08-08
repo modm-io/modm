@@ -8,34 +8,17 @@
  * Any symbols defined in the Linker Script are automatically global and
  * available to the rest of the program.
  *
- * Example for STM32F746:
+ * Example for STM32F401:
  *
  *                          MEMORY MAP (RAM)
  *
- * Auxiliary internal SRAM2 (16 kB):
- *                |                                 | 0x2005 0000
- *                |---------------------------------| 0x2004 FFFF
- *                |                                 |
- *                |                                 |
- *                |                                 |
- *                |---------------------------------| 0x2004 C000
- *
- * Main internal SRAM1 (240 kB):
- *                |                                 | 0x2004 C000 <---- __ram_end, __head_end
- *                |---------------------------------| 0x2004 BFFF
- *                |                                 |
- *                |               ^                 |
- *                |               |                 |
- *                |            Heap Area            |
- *                |         (grows upwards)         |
- *                |                                 | <------- __head_start
- *                |---------------------------------| <------- __handler_stack_top, __stack_end
+ *                |                                 | 0x2001 0000 <--- __handler_stack_top, __stack_end
+ *                |---------------------------------| 0x2000 FFFF
  *                |                                 |
  *                |    Handler/Main Stack (msp)     |
  *                |       (grows downwards)         |
  *                |               |                 |
  *                |               v                 |
- *                |                                 |
  *                |---------------------------------| <------- __thread_stack_top
  *                |                                 |
  *                |    Thread/Process Stack (psp)   |
@@ -43,6 +26,16 @@
  *                |               |                 |
  *                |               v                 |
  *                |                                 | <------- __stack_start
+ *                |---------------------------------|
+ *                |           Unused RAM            |
+ *                | (overwritten by heap or stack!) |
+ *                |---------------------------------|
+ *                |                                 |
+ *                |               ^                 |
+ *                |               |                 |
+ *                |            Heap Area            |
+ *                |         (grows upwards)         |
+ *                |                                 | <------- __heap_start
  *      +-------> |---------------------------------| <------- __noinit_end
  *      |         |                                 |
  *   .noinit      |     Global data not cleared     |
@@ -57,24 +50,21 @@
  *    .data       |     initialized variables       |
  *      |         |                                 |
  *      |         |                                 | <------- __data_start
+ *      +-------> |---------------------------------| <------- __fastdata_end
+ *      |         |                                 |
+ *  .fastdata     |     initialized variables       |
+ *      |         |                                 | <------- __fastdata_start
  *      +-------> |---------------------------------| <------- __fastcode_end
  *      |         |     C/C++-Functions in RAM      |
  *      |         |    (e.g. Interrupt Handler)     |
  *  .fastcode     | ------------------------------- |
  *      |         |   Interrupt Vectors (.vectors)  |
- *      |         |        (if re-mapped)           |
- *      +-------> |---------------------------------| 0x2001 0000 <--- __ram_start, __fastcode_start
- *
- * DTCM (Data Tightly Coupled Memory) (64 kB):
- *                |                                 | 0x2001 0000
- *                |---------------------------------| 0x2000 FFFF
- *                |                                 |
- *                |                                 |
- *                |                                 |
- *                |---------------------------------| 0x2000 0000
+ *      |         |        (if re-mapped)           | <------- __fastcode_start
+ *      +-------> |---------------------------------| 0x2000 0000 <--- __ram_start
  *
  *
- *                         MEMORY MAP (Flash)
+ *                          MEMORY MAP (Flash)
+ *
  *                |                                 |
  *                |---------------------------------| 0x0802 0000
  *                |                                 | 0x0801 FFFF
@@ -84,31 +74,35 @@
  *                |                                 |
  *                |                                 |
  *                |                                 |
- *     +--------> |---------------------------------|
- *     |          |                                 |
- *     |          |                                 |
- *     |          |                                 |
- *   .data        |      copy of .data area         |
- *     |          |                                 |
- *     |          |                                 |
- *     |          |                                 | <------- __data_load
- *     +--------> |---------------------------------|
- *     |          |    Static Constructors (C++)    |
- *     |          | ------------------------------- |
- *     |          |                                 |
- *   .text        |                                 |
- *     |          |          C/C++ code             |
- *     |          |                                 |
- *     |          |                                 |
- *     +--------> |---------------------------------|
- *     |          |                                 |
- * .fastcode      |     C-Functions to be loaded    |
- *     |          |           into RAM              | <------- __fastcode_load
- *     +--------> |---------------------------------|
- *     |          |                                 |
- *  .reset        |        Interrupt Vectors        |
- *     |          |                                 |
- *     +--------> |---------------------------------| 0x0800 0000
+ *      +-------> |---------------------------------|
+ *      |         |                                 |
+ *      |         |                                 |
+ *      |         |                                 |
+ *    .data       |      copy of .data area         |
+ *      |         |                                 |
+ *      |         |                                 |
+ *      |         |                                 | <------- __data_load
+ *      +-------> |---------------------------------|
+ *      |         |    Static Constructors (C++)    |
+ *      |         | ------------------------------- |
+ *      |         |                                 |
+ *    .text       |                                 |
+ *      |         |          C/C++ code             |
+ *      |         |                                 |
+ *      |         |                                 |
+ *      +-------> |---------------------------------|
+ *      |         |                                 |
+ *  .fastdata     |     Variables to be loaded      |
+ *      |         |           into RAM              | <------- __fastdata_load
+ *      +-------> |---------------------------------|
+ *      |         |                                 |
+ *  .fastcode     |     C-Functions to be loaded    |
+ *      |         |           into RAM              | <------- __fastcode_load
+ *      +-------> |---------------------------------|
+ *      |         |                                 |
+ *   .reset       |        Interrupt Vectors        |
+ *      |         |                                 |
+ *      +-------> |---------------------------------| 0x0800 0000
  *
  * The first two words (32-bit) in the Flash defines the initial stack pointer
  * location and the reset handler location.
@@ -133,15 +127,14 @@ PROVIDE(__ram_end   = ORIGIN(RAM) + LENGTH(RAM));
 PROVIDE(__heap_end  = ORIGIN(RAM) + LENGTH(RAM));
 
 /* Used for interrupt handlers */
-HANDLER_STACK_SIZE = 1024;
-
-/* Used during normal program execution */
-THREAD_STACK_SIZE = 1024;
+HANDLER_STACK_SIZE = DEFINED(__handler_stack_size) ? __handler_stack_size : 1024;
+THREAD_STACK_SIZE  = DEFINED(__thread_stack_size)  ? __thread_stack_size  : 1024;
 
 SECTIONS
 {
 	.reset :
 	{
+		__vector_table_rom = .;					    /* address in ROM */
 		/* Initial stack address, Reset and NMI handler */
 		KEEP(*(.reset))
 		. = ALIGN(4);
@@ -151,17 +144,33 @@ SECTIONS
 	{
 		__fastcode_load = LOADADDR (.fastcode);		/* address in ROM */
 		__fastcode_start = .;						/* address in RAM */
+		__vector_table_ram = .;						/* address in RAM */
 
 		/* used for vectors remapped to RAM */
-		KEEP(*(.vectors))
+        KEEP(*(.vectors))
 		KEEP(*(.fastcode))
 
-		*(.glue_7t)		/* TODO: are these useful here or better only in .text? */
+		/* These sections glue together ARM and Thumb code.
+		 * .glue_7 is used for ARM code calling Thumb code, and .glue_7t is
+		 * used for Thumb code calling ARM code.
+		 */
+		*(.glue_7t)
 		*(.glue_7)
 
 		. = ALIGN (4);
 		__fastcode_end = .;
 	} >RAM AT>ROM
+
+	.fastdata :
+    {
+        __fastdata_load = LOADADDR (.fastdata);		/* address in ROM */
+		__fastdata_start = .;						/* address in RAM */
+
+		KEEP(*(.fastdata))
+
+        . = ALIGN(4);
+		__fastdata_end = .;
+    } >RAM AT>ROM
 
 	.text :
 	{
@@ -303,7 +312,7 @@ SECTIONS
 	} >RAM AT>ROM
 
 	/* uninitialized variables */
-	.bss :
+	.bss (NOLOAD) :
 	{
 		. = ALIGN(4);
 		__bss_start = . ;
@@ -317,7 +326,7 @@ SECTIONS
 	} >RAM
 
 	/* Global data not cleared after reset.  */
-	.noinit :
+	.noinit (NOLOAD) :
 	{
 		. = ALIGN (4);
 		PROVIDE (__noinit_start = .);
@@ -326,10 +335,13 @@ SECTIONS
 
 		. = ALIGN (4);
 		PROVIDE (__noinit_end = .);
+		. = ALIGN (4);
+		PROVIDE (__heap_start = .);
 	} >RAM
 
-	.stack :
+	.stack (NOLOAD) :
 	{
+		. = ORIGIN(RAM) + LENGTH(RAM) - HANDLER_STACK_SIZE - THREAD_STACK_SIZE;
 		. = ALIGN(4);
 		__stack_start = . ;
 
@@ -344,7 +356,6 @@ SECTIONS
 		__stack_end = .;
 
 		. = ALIGN (4);
-		PROVIDE (__heap_start = .);
 	} >RAM
 
 	. = ALIGN(4);

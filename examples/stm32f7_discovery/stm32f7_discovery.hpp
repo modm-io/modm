@@ -18,7 +18,9 @@
 
 using namespace xpcc::stm32;
 
+typedef GpioOutputI1 Led;		// User LED 1 (Arduino D13)
 
+typedef GpioInputI11 Button;	// User Button
 
 /// STM32F7 running at 200MHz generated from the external on-board 25MHz clock
 //typedef SystemClock<Pll<ExternalClock<MHz25>, MHz200> > defaultSystemClock;

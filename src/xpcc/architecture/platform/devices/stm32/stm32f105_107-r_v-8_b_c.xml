@@ -17,7 +17,6 @@
     <define device-name="105">STM32F105xC</define>
     <define device-name="107">STM32F107xC</define>
     <driver type="core" name="cortex">
-      <parameter name="allocator">newlib</parameter>
       <memory>
         <section device-name="107" access="rx" start="0x8000000" name="flash" size="128"/>
         <section device-name="105" access="rx" start="0x8000000" name="flash" size="64"/>
