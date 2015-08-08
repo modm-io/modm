@@ -163,7 +163,7 @@ stm32_memory = \
 				'memories' : {'flash': 0, 'sram1' : 0}
 			},
 			{
-				'names': ['303x6', '303x8', '328', '334', '373'],
+				'names': ['303x6', '303x8', '328', '334'],
 				'memories': {'flash': 0, 'ccm': 4, 'sram1': 0}
 			},
 			{
