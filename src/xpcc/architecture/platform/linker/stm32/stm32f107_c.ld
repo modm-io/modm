@@ -1,8 +1,0 @@
-
-MEMORY
-{
-	ROM (rx)  : ORIGIN = 0x08000000, LENGTH = 256k
-	RAM (rwx) : ORIGIN = 0x20000000, LENGTH = 64k
-}
-
-INCLUDE stm32f2xx.ld
