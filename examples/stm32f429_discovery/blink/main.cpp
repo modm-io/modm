@@ -1,18 +1,15 @@
-#include <xpcc/architecture/platform.hpp>
 #include "../stm32f429_discovery.hpp"
+
+using namespace Board;
 
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	defaultSystemClock::enable();
+	Board::initialize();
 
-	LedRed::setOutput(xpcc::Gpio::High);
-	LedGreen::setOutput(xpcc::Gpio::Low);
-
-	VBusPresent::setOutput(xpcc::Gpio::Low);
-	VBusOvercurrent::setOutput(xpcc::Gpio::Low);
-
-	Button::setInput();
+	LedRed::set();
+	usb::VBus::setOutput(xpcc::Gpio::Low);
+	usb::Overcurrent::setOutput(xpcc::Gpio::Low);
 
 	while (1)
 	{
@@ -21,8 +18,8 @@ MAIN_FUNCTION
 
 		xpcc::delayMilliseconds(Button::read() ? 125 : 500);
 
-		VBusPresent::toggle();
-		VBusOvercurrent::toggle();
+		usb::VBus::toggle();
+		usb::Overcurrent::toggle();
 
 		xpcc::delayMilliseconds(Button::read() ? 125 : 500);
 	}
