@@ -1,4 +1,3 @@
-#include <xpcc/architecture/platform.hpp>
 #include "../../stm32f4_discovery.hpp"
 #include <xpcc/driver/radio/nrf24/nrf24_phy.hpp>
 #include <xpcc/debug/logger.hpp>
@@ -79,36 +78,31 @@ configureBoth(Register_t reg, uint8_t value)
 
 MAIN_FUNCTION
 {
-	defaultSystemClock::enable();
-	xpcc::cortex::SysTickTimer::enable();
+	Board::initialize();
 
 	Csn1::setOutput(xpcc::Gpio::High);
 	Csn2::setOutput(xpcc::Gpio::High);
 	Ce1::setOutput(xpcc::Gpio::Low);
 	Ce2::setOutput(xpcc::Gpio::Low);
 
-	LedGreen::setOutput(xpcc::Gpio::Low);
-	LedOrange::setOutput(xpcc::Gpio::Low);
-	LedBlue::setOutput(xpcc::Gpio::Low);
-
 
 	// Enable SPI 1
 	GpioOutputB5::connect(SpiMaster1::Mosi);
 	GpioInputB4::connect(SpiMaster1::Miso);
 	GpioOutputB3::connect(SpiMaster1::Sck);
-	SpiMaster1::initialize<defaultSystemClock, 10500000, xpcc::Tolerance::Exact>();
+	SpiMaster1::initialize<Board::systemClock, 10500000, xpcc::Tolerance::Exact>();
 
 	// Enable SPI 2
 	GpioOutputB15::connect(SpiMaster2::Mosi);
 	GpioInputB14::connect(SpiMaster2::Miso);
 	GpioOutputB13::connect(SpiMaster2::Sck);
-	SpiMaster2::initialize<defaultSystemClock, 10500000, xpcc::Tolerance::Exact>();
+	SpiMaster2::initialize<Board::systemClock, 10500000, xpcc::Tolerance::Exact>();
 
 
 	// Enable UART 2
 	GpioOutputA2::connect(Usart2::Tx);
 	GpioInputA3::connect(Usart2::Rx, Gpio::InputType::PullUp);
-	Usart2::initialize<defaultSystemClock, 115200>(12);
+	Usart2::initialize<Board::systemClock, 115200>(12);
 
 
 
@@ -189,7 +183,7 @@ MAIN_FUNCTION
 
 			payload[0]++;
 
-			LedOrange::toggle();
+			Board::LedOrange::toggle();
 		}
 
 		/* Check if packet was sent successfully  */
@@ -207,7 +201,7 @@ MAIN_FUNCTION
 				nrf24ptx::setBits(Register::STATUS, Status::TX_DS);
 			}
 
-			LedBlue::toggle();
+			Board::LedBlue::toggle();
 		}
 
 
@@ -226,7 +220,7 @@ MAIN_FUNCTION
 
 			XPCC_LOG_INFO.printf("Received packet, pl=%d, data: %x %x %x %x\n", pl, received_data[3], received_data[2], received_data[1], received_data[0]);
 
-			LedGreen::toggle();
+		Board::LedGreen::toggle();
 		}
 	}
 

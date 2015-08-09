@@ -1,4 +1,3 @@
-#include <xpcc/architecture/platform.hpp>
 #include "../stm32f4_discovery.hpp"
 
 #include <xpcc/processing.hpp>
@@ -111,24 +110,15 @@ ThreadOne one;
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	defaultSystemClock::enable();
-	xpcc::cortex::SysTickTimer::enable();
-
-	LedOrange::setOutput(xpcc::Gpio::High);
-	LedGreen::setOutput(xpcc::Gpio::Low);
-	LedRed::setOutput(xpcc::Gpio::High);
-	LedBlue::setOutput(xpcc::Gpio::High);
+	Board::initialize();
 
 	GpioOutputA2::connect(Usart2::Tx);
-	Usart2::initialize<defaultSystemClock, xpcc::Uart::B115200>(10);
-
-	GpioB10::setOutput(Gpio::OutputType::OpenDrain);
-	GpioB11::setOutput(Gpio::OutputType::OpenDrain);
+	Usart2::initialize<Board::systemClock, xpcc::Uart::B115200>(10);
 
 	GpioB11::connect(I2cMaster2::Sda);
 	GpioB10::connect(I2cMaster2::Scl);
 
-	MyI2cMaster::initialize<defaultSystemClock, 100000>();
+	MyI2cMaster::initialize<Board::systemClock, 100000>();
 
 	stream << "\n\nWelcome to TCS3414 demo!\n\n";
 
@@ -138,7 +128,7 @@ MAIN_FUNCTION
 	{
 		one.update();
 		if (tmr.execute()) {
-			LedOrange::toggle();
+			Board::LedOrange::toggle();
 		}
 	}
 

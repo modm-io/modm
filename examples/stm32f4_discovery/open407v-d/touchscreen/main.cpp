@@ -1,5 +1,4 @@
-
-#include <xpcc/architecture.hpp>
+#include "../../stm32f4_discovery.hpp"
 
 #include <xpcc/driver/display/parallel_tft.hpp>
 #include <xpcc/driver/bus/tft_memory_bus.hpp>
@@ -7,8 +6,6 @@
 #include <xpcc/driver/touch/ads7843.hpp>
 
 #include "touchscreen_calibrator.hpp"
-
-#include "../../stm32f4_discovery.hpp"
 
 
 // ----------------------------------------------------------------------------
@@ -115,7 +112,7 @@ initTouchscreen()
 	GpioInputB14::connect(SpiMaster2::Miso);
 	GpioOutputB15::connect(SpiMaster2::Mosi);
 
-	SpiMaster2::initialize<defaultSystemClock, 1312500ul>();
+	SpiMaster2::initialize<Board::systemClock, 1312500ul>();
 	SpiMaster2::setDataMode(SpiMaster2::DataMode::Mode0);
 
 }
@@ -187,12 +184,9 @@ drawPoint(xpcc::GraphicDisplay& display, xpcc::glcd::Point point)
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	defaultSystemClock::enable();
+	Board::initialize();
 
-	LedOrange::setOutput(xpcc::Gpio::High);
-	LedGreen::setOutput(xpcc::Gpio::Low);
-
-	Button::setInput();
+	Board::LedOrange::set();
 
 	initDisplay();
 	initTouchscreen();
@@ -204,20 +198,21 @@ MAIN_FUNCTION
 	while (1)
 	{
 		xpcc::glcd::Point raw;
-		if (ads7843.read(&raw)) {
+		if (ads7843.read(&raw))
+		{
 			xpcc::glcd::Point point;
 
 			touchscreen.translate(&raw, &point);
 			drawPoint(tft, point);
 
-			LedGreen::set();
+			Board::LedGreen::set();
 		}
 		else {
-			LedGreen::reset();
+			Board::LedGreen::reset();
 		}
 
 		// clear screen if the user button is pressed
-		if (Button::read()) {
+		if (Board::Button::read()) {
 			tft.clear();
 		}
 	}

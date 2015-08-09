@@ -4,19 +4,14 @@
 
 MAIN_FUNCTION
 {
-	defaultSystemClock::enable();
-
-	LedOrange::setOutput(xpcc::Gpio::High);
-	LedGreen::setOutput(xpcc::Gpio::Low);
-	LedRed::setOutput(xpcc::Gpio::High);
-	LedBlue::setOutput(xpcc::Gpio::High);
+	Board::initialize();
 
 	// Enable SPI 2
 	GpioOutputB12::connect(SpiMaster2::Nss);
 	GpioOutputB15::connect(SpiMaster2::Mosi);
 	GpioInputB14::connect(SpiMaster2::Miso);
 	GpioOutputB13::connect(SpiMaster2::Sck);
-	SpiMaster2::initialize<defaultSystemClock, MHz20>();
+	SpiMaster2::initialize<Board::systemClock, MHz20>();
 
 	while (1)
 	{

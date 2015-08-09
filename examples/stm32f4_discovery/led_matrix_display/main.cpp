@@ -1,8 +1,5 @@
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/architecture.hpp>
-#include <xpcc/processing.hpp>
 #include "../stm32f4_discovery.hpp"
-
+#include <xpcc/processing.hpp>
 #include <xpcc/driver/display/max7219matrix.hpp>
 
 /**
@@ -26,9 +23,9 @@
  */
 
 // Software SPI is simple and fast
-typedef xpcc::stm32::GpioOutputE1 Data;
-typedef xpcc::stm32::GpioOutputE3 Cs;
-typedef xpcc::stm32::GpioOutputE5 Clk;
+typedef GpioOutputE1 Data;
+typedef GpioOutputE3 Cs;
+typedef GpioOutputE5 Clk;
 
 typedef xpcc::SoftwareSpiMaster< Clk, Data > Spi;
 
@@ -38,15 +35,15 @@ xpcc::Max7219matrix<Spi, Cs, 3, 1> ledMatrixDisplay;
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	defaultSystemClock::enable();
+	Board::initialize();
 
-	LedOrange::setOutput(xpcc::Gpio::High);
+	Board::LedOrange::setOutput(xpcc::Gpio::High);
 
     Data::setOutput();
     Cs::setOutput();
     Clk::setOutput();
 
-    Spi::initialize< defaultSystemClock, 10000000 >();
+    Spi::initialize< Board::systemClock, 10000000 >();
 
     ledMatrixDisplay.initialize();
 
@@ -66,7 +63,7 @@ MAIN_FUNCTION
 				ledMatrixDisplay.printf("%04d", sec);
 				ledMatrixDisplay.update();
 
-				LedOrange::toggle();
+				Board::LedOrange::toggle();
 			}
 		}
     }

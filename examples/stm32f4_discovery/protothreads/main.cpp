@@ -1,4 +1,3 @@
-#include <xpcc/architecture/platform.hpp>
 #include "../stm32f4_discovery.hpp"
 
 #include <xpcc/processing/timer.hpp>
@@ -75,7 +74,7 @@ public:
 			}
 			this->timeout.restart(200);
 			PT_WAIT_UNTIL(this->timeout.isExpired());
-			LedRed::toggle();
+			Board::LedRed::toggle();
 		}
 
 		PT_END();
@@ -93,29 +92,21 @@ ThreadOne one;
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	defaultSystemClock::enable();
-	xpcc::cortex::SysTickTimer::enable();
-
-	LedOrange::setOutput(xpcc::Gpio::High);
-	LedGreen::setOutput(xpcc::Gpio::Low);
-	LedRed::setOutput(xpcc::Gpio::High);
-	LedBlue::setOutput(xpcc::Gpio::High);
+	Board::initialize();
 
 	GpioOutputA2::connect(Usart2::Tx);
-	Usart2::initialize<defaultSystemClock, xpcc::Uart::B38400>(10);
+	Usart2::initialize<Board::systemClock, xpcc::Uart::B38400>(10);
 
-	GpioB7::connect(MyI2cMaster::Sda);
-	GpioB8::connect(MyI2cMaster::Scl);
-	GpioB7::configure(Gpio::InputType::PullUp);
-	GpioB8::configure(Gpio::InputType::PullUp);
-	MyI2cMaster::initialize<defaultSystemClock, 100000>();
+	GpioB7::connect(MyI2cMaster::Sda, Gpio::InputType::PullUp);
+	GpioB8::connect(MyI2cMaster::Scl, Gpio::InputType::PullUp);
+	MyI2cMaster::initialize<Board::systemClock, 100000>();
 
 	stream << "\n\nRESTART\n\n";
 
 	while (1)
 	{
 		one.update();
-		LedOrange::toggle();
+		Board::LedOrange::toggle();
 	}
 
 	return 0;

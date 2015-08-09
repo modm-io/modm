@@ -42,14 +42,12 @@ displayMessage(const xpcc::can::Message& message)
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	defaultSystemClock::enable();
-
-	LedOrange::setOutput(xpcc::Gpio::High);
+	Board::initialize();
 
 	// Initialize Usart
 	GpioOutputA2::connect(Usart2::Tx);
 	GpioInputA3::connect(Usart2::Rx, Gpio::InputType::PullUp);
-	Usart2::initialize<defaultSystemClock, 115200>(10);
+	Usart2::initialize<Board::systemClock, 115200>(10);
 
 	XPCC_LOG_INFO << "CAN Test Program" << xpcc::endl;
 
@@ -60,7 +58,7 @@ MAIN_FUNCTION
 	// Initialize Can1
 	GpioInputB8::connect(Can1::Rx, Gpio::InputType::PullUp);
 	GpioOutputB9::connect(Can1::Tx, Gpio::OutputType::PushPull);
-	Can1::initialize<defaultSystemClock, Can1::Bitrate::kBps125>(9);
+	Can1::initialize<Board::systemClock, Can1::Bitrate::kBps125>(9);
 
 	XPCC_LOG_INFO << "Setting up Filter for Can1..." << xpcc::endl;
 	// Receive every message
@@ -72,7 +70,7 @@ MAIN_FUNCTION
 	// Initialize Can2
 	GpioInputB5::connect(Can2::Rx, Gpio::InputType::PullUp);
 	GpioOutputB6::connect(Can2::Tx, Gpio::OutputType::PushPull);
-	Can2::initialize<defaultSystemClock, Can2::Bitrate::kBps125>(12);
+	Can2::initialize<Board::systemClock, Can2::Bitrate::kBps125>(12);
 
 	XPCC_LOG_INFO << "Setting up Filter for Can2..." << xpcc::endl;
 	// Receive every message

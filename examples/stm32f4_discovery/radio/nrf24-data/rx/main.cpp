@@ -1,4 +1,3 @@
-#include <xpcc/architecture/platform.hpp>
 #include "../../../stm32f4_discovery.hpp"
 #include <xpcc/debug/logger.hpp>
 #include <xpcc/processing.hpp>
@@ -54,8 +53,7 @@ typedef xpcc::Nrf24Data<nrf24phy> nrf24data;
 
 MAIN_FUNCTION
 {
-	defaultSystemClock::enable();
-	xpcc::cortex::SysTickTimer::enable();
+	Board::initialize();
 
 	// Setup GPIOs
 	Csn::setOutput(xpcc::Gpio::High);
@@ -65,12 +63,12 @@ MAIN_FUNCTION
 	GpioOutputB15::connect(Spi::Mosi);
 	GpioInputB14::connect(Spi::Miso);
 	GpioOutputB13::connect(Spi::Sck);
-	Spi::initialize<defaultSystemClock, MHz10>();
+	Spi::initialize<Board::systemClock, MHz10>();
 
 	// Enable UART 2
 	GpioOutputA2::connect(Usart2::Tx);
 	GpioInputA3::connect(Usart2::Rx, Gpio::InputType::PullUp);
-	Usart2::initialize<defaultSystemClock, 115200>(12);
+	Usart2::initialize<Board::systemClock, 115200>(12);
 
 	XPCC_LOG_INFO << "Hello from nrf24-data-rx example" << xpcc::endl;
 

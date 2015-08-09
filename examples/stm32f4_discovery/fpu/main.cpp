@@ -1,17 +1,11 @@
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/math.hpp>
 #include "../stm32f4_discovery.hpp"
+#include <xpcc/math.hpp>
 
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	defaultSystemClock::enable();
+	Board::initialize();
 
-	LedOrange::setOutput(xpcc::Gpio::High);
-	LedGreen::setOutput(xpcc::Gpio::Low);
-	LedRed::setOutput(xpcc::Gpio::High);
-	LedBlue::setOutput(xpcc::Gpio::High);
-	
 	while (1)
 	{
 		xpcc::Vector<float, 2> v(1.0f, 2.0f);

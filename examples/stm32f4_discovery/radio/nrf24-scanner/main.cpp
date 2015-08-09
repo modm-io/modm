@@ -1,4 +1,3 @@
-#include <xpcc/architecture/platform.hpp>
 #include "../../stm32f4_discovery.hpp"
 #include <xpcc/driver/radio/nrf24/nrf24_phy.hpp>
 #include <xpcc/debug/logger.hpp>
@@ -45,24 +44,23 @@ typedef xpcc::Nrf24Phy<SpiMaster2, Csn, Ce> nrf24hal;
 
 MAIN_FUNCTION
 {
-	defaultSystemClock::enable();
-	xpcc::cortex::SysTickTimer::enable();
+	Board::initialize();
 
 	Csn::setOutput(xpcc::Gpio::High);
 	Ce::setOutput(xpcc::Gpio::Low);
 
-	LedOrange::setOutput(xpcc::Gpio::Low);
+	Board::LedOrange::setOutput(xpcc::Gpio::Low);
 
 	// Enable SPI 2
 	GpioOutputB15::connect(SpiMaster2::Mosi);
 	GpioInputB14::connect(SpiMaster2::Miso);
 	GpioOutputB13::connect(SpiMaster2::Sck);
-	SpiMaster2::initialize<defaultSystemClock, MHz10>();
+	SpiMaster2::initialize<Board::systemClock, MHz10>();
 
 	// Enable UART 2
 	GpioOutputA2::connect(Usart2::Tx);
 	GpioInputA3::connect(Usart2::Rx, Gpio::InputType::PullUp);
-	Usart2::initialize<defaultSystemClock, 115200>(12);
+	Usart2::initialize<Board::systemClock, 115200>(12);
 
 
 	// Initialize nRF24-HAL
@@ -132,7 +130,7 @@ MAIN_FUNCTION
 				max = channel_info[i];
 
 			if(channel_info[i])
-				LedOrange::toggle();
+				Board::LedOrange::toggle();
 
 			if(divide_now)
 				channel_info[i] /= divider;

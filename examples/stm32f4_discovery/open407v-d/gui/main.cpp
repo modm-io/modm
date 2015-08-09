@@ -1,5 +1,4 @@
-
-#include <xpcc/architecture.hpp>
+#include "../../stm32f4_discovery.hpp"
 #include <xpcc/debug/logger.hpp>
 #include <xpcc/driver/display/parallel_tft.hpp>
 #include <xpcc/driver/bus//tft_memory_bus.hpp>
@@ -13,7 +12,6 @@
 
 #include "touchscreen_calibrator.hpp"
 
-#include "../../stm32f4_discovery.hpp"
 #include "images/bluetooth_12x16.hpp"
 
 // ----------------------------------------------------------------------------
@@ -40,7 +38,7 @@ initLogger()
 {
 	GpioOutputA2::connect(Usart2::Tx);
 	GpioInputA3::connect(Usart2::Rx);
-	Usart2::initialize<defaultSystemClock, 115200>(12);
+	Usart2::initialize<Board::systemClock, 115200>(12);
 }
 
 // ----------------------------------------------------------------------------
@@ -157,7 +155,7 @@ initTouchscreen()
 	GpioInputB14::connect(SpiMaster2::Miso);
 	GpioOutputB15::connect(SpiMaster2::Mosi);
 
-	SpiMaster2::initialize<defaultSystemClock, 656250ul>();
+	SpiMaster2::initialize<Board::systemClock, 656250ul>();
 	SpiMaster2::setDataMode(SpiMaster2::DataMode::Mode0);
 
 }
@@ -381,7 +379,7 @@ test_callback(const xpcc::gui::InputEvent& ev, xpcc::gui::Widget* w, void* data)
 	(void) w;
 	(void) data;
 
-	LedGreen::toggle();
+	Board::LedGreen::toggle();
 }
 
 
@@ -408,17 +406,7 @@ xpcc::glcd::Point calibration[] = {{3339, 3046},{931, 2428},{2740, 982}};
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	defaultSystemClock::enable();
-
-	// needed for AsyncEvent (using xpcc::Timeout)
-	xpcc::cortex::SysTickTimer::enable();
-
-
-	LedOrange::setOutput(xpcc::Gpio::Low);
-	LedGreen::setOutput(xpcc::Gpio::Low);
-	LedBlue::setOutput(xpcc::Gpio::Low);
-
-	Button::setInput();
+	Board::initialize();
 
 	initLogger();
 

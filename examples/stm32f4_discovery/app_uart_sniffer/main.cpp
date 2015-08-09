@@ -1,6 +1,6 @@
-#include <xpcc/architecture.hpp>
 #include "../stm32f4_discovery.hpp"
 #include <xpcc/debug/logger.hpp>
+#include <xpcc/processing.hpp>
 
 Usart2 uart;
 xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > loggerDevice(uart);
@@ -68,26 +68,20 @@ setDirection(Direction dir)
  */
 MAIN_FUNCTION
 {
-	defaultSystemClock::enable();
-	xpcc::cortex::SysTickTimer::enable();
-
-	LedOrange::setOutput(xpcc::Gpio::High);
-	LedGreen::setOutput(xpcc::Gpio::Low);
-	LedRed::setOutput(xpcc::Gpio::High);
-	LedBlue::setOutput(xpcc::Gpio::High);
+	Board::initialize();
 
 	// Enable USART 2: To / from PC
 	GpioOutputA2::connect(Usart2::Tx);
 	GpioInputA3::connect(Usart2::Rx, Gpio::InputType::PullUp);
-	Usart2::initialize<defaultSystemClock, 115200>(12);
+	Usart2::initialize<Board::systemClock, 115200>(12);
 
 	// Enable USART 1 Host To Node
 	GpioInputA10::connect(Usart1::Rx, Gpio::InputType::PullUp);
-	Usart1::initialize<defaultSystemClock, 115200>(12);
+	Usart1::initialize<Board::systemClock, 115200>(12);
 
 	// Enable USART 3 Node to Host
 	GpioInputD9::connect(Usart3::Rx, Gpio::InputType::PullUp);
-	Usart3::initialize<defaultSystemClock, 115200>(12);
+	Usart3::initialize<Board::systemClock, 115200>(12);
 
 	XPCC_LOG_INFO.printf("\e[H\e[J\e[39m");
 	XPCC_LOG_INFO.printf("Welcome to XPCC Bidirectional UART Sniffer.\n\n");
@@ -101,12 +95,12 @@ MAIN_FUNCTION
 		while (Usart3::read(c)) {
 			setDirection(Direction::Node2Host);
 			XPCC_LOG_INFO.printf("%02x ", c);
-			LedRed::toggle();
+			Board::LedRed::toggle();
 		}
 		while (Usart1::read(c)) {
 			setDirection(Direction::Host2Node);
 			XPCC_LOG_INFO.printf("%02x ", c);
-			LedGreen::toggle();
+			Board::LedGreen::toggle();
 		}
 
 		xpcc::delayMicroseconds(100);

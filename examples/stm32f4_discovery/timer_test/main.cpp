@@ -1,17 +1,16 @@
-#include <xpcc/architecture/platform.hpp>
 #include "../stm32f4_discovery.hpp"
 
 /**
  * This is some testing of Timers 1 to 14 on a STM32 F4 Discovery Board.
  *
- * The blue LED is blinked in the main loop with busy waiting. 
+ * The blue LED is blinked in the main loop with busy waiting.
  *
- * Red and green LEDs are blinked by interrupts from timers. 
+ * Red and green LEDs are blinked by interrupts from timers.
  * The red LED should blink three times, driven by Timer 1,
  * then the green one blinks three times driven by Timer 2,
  * and then the red one again by Timer 3, et cetera.
  *
- * After 14 * 3 blinks each timer TIM1 to TIM14 blinked an LED 
+ * After 14 * 3 blinks each timer TIM1 to TIM14 blinked an LED
  * from an interrupt.
  *
  * When the blue LED stops blinking, probably the processor was
@@ -27,7 +26,7 @@ testTimerAdvancedStart()
     TIMER::enable();
     TIMER::setMode(TIMER::Mode::UpCounter);
 
-	TIMER::template setPeriod<defaultSystemClock>(250000);
+	TIMER::template setPeriod<Board::systemClock>(250000);
     TIMER::enableInterruptVector(TIMER::Interrupt::Update, true, 10);
     TIMER::enableInterrupt(TIMER::Interrupt::Update);
 
@@ -42,7 +41,7 @@ testTimerStart()
     TIMER::enable();
     TIMER::setMode(TIMER::Mode::UpCounter);
 
-	TIMER::template setPeriod<defaultSystemClock>(250000);
+	TIMER::template setPeriod<Board::systemClock>(250000);
     TIMER::enableInterruptVector(true, 10);
     TIMER::enableInterrupt(TIMER::Interrupt::Update);
 
@@ -70,15 +69,12 @@ testTimerStop()
     TIMER::disable();
 }
 
+using namespace Board;
+
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-    defaultSystemClock::enable();
-
-    LedOrange::setOutput(xpcc::Gpio::Low);
-    LedGreen::setOutput(xpcc::Gpio::Low);
-    LedRed::setOutput(xpcc::Gpio::Low);
-    LedBlue::setOutput(xpcc::Gpio::Low);
+    Board::initialize();
 
     uint16_t state = 0;
 	bool restart = false;
@@ -91,7 +87,7 @@ MAIN_FUNCTION
         xpcc::delayMilliseconds(150);
 
 		if (restart) {
-			restart = false; 
+			restart = false;
 			state = 0;
 		}
 
@@ -221,7 +217,7 @@ MAIN_FUNCTION
         case 166:
             testTimerStop<Timer14>();
             break;
-			
+
 		case 180:
 			restart = true;
 			break;

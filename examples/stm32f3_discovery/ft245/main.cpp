@@ -1,6 +1,5 @@
-#include <xpcc/architecture.hpp>
-#include <xpcc/driver/usb/ft245.hpp>
 #include "../stm32f3_discovery.hpp"
+#include <xpcc/driver/usb/ft245.hpp>
 
 /**
  * Example of FT245 usage.
@@ -15,9 +14,7 @@
  */
 MAIN_FUNCTION
 {
-	defaultSystemClock::enable();
-
-	LedNorth::setOutput(xpcc::Gpio::Low);
+	Board::initialize();
 
 	typedef xpcc::stm32::GpioPort<xpcc::stm32::GpioD0, 8> myPort;
 	typedef xpcc::stm32::GpioInputC11  Rxf;
@@ -35,7 +32,7 @@ MAIN_FUNCTION
 		uint8_t c;
 		if (myFt::read(c)) {
 			myFt::write(c + 1);
-			LedNorth::toggle();
+			Board::LedNorth::toggle();
 		}
 	}
 
