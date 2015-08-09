@@ -48,10 +48,10 @@ namespace l3g
 typedef GpioInputE0		Int1;	// MEMS_INT1 [L3GD20_INT1]: GPXTI0
 typedef GpioInputE1		Int2;	// MEMS_INT2 [L3GD20_DRDY/INT2]: GPXTI1
 
-typedef GpioOutputE3	Cs;		// CS_I2C/SPI [L3GD20_CS_I2C/SPI]: GPIO_Output
-typedef GpioInputA6		Miso;	// SPI1_MISO [L3GD20_SA0/SDO]: SPI1_MISO
-typedef GpioOutputA5	Sck;	// SPI1_SCK [L3GD20_SCL/SPC]: SPI1_SCK
-typedef GpioOutputA7	Mosi;	// SPI1_MISO [L3GD20_SDA/SDI/SDO]: SPI1_MOSI
+typedef GpioOutputE3	Cs;		// CS_I2C/SPI [L3GD20_CS_I2C/SPI]
+typedef GpioOutputA5	Sck;	// SPI1_SCK [L3GD20_SCL/SPC]
+typedef GpioOutputA7	Mosi;	// SPI1_MISO [L3GD20_SDA/SDI/SDO]
+typedef GpioInputA6		Miso;	// SPI1_MISO [L3GD20_SA0/SDO]
 
 typedef SpiMaster1 SpiMaster;
 }
@@ -101,6 +101,7 @@ initialize()
 //	Button::enableExternalInterruptVector(12);
 }
 
+
 inline void
 initializeL3g()
 {
@@ -123,6 +124,7 @@ initializeL3g()
 	l3g::SpiMaster::initialize<systemClock, 9000000>();
 	l3g::SpiMaster::setDataMode(l3g::SpiMaster::DataMode::Mode3);
 }
+
 
 inline void
 initializeLsm3()

@@ -81,13 +81,13 @@ typedef GpioInputC3		Dout;	// PDM_OUT: I2S2_SD
 
 namespace usb
 {
-typedef GpioA11	Dm;	// OTG_FS_DM: USB_OTG_FS_DM
-typedef GpioA12	Dp;	// OTG_FS_DP: USB_OTG_FS_DP
-typedef GpioA10	Id;	// OTG_FS_ID: USB_OTG_FS_ID
+typedef GpioA11	Dm;		// OTG_FS_DM: USB_OTG_FS_DM
+typedef GpioA12	Dp;		// OTG_FS_DP: USB_OTG_FS_DP
+typedef GpioA10	Id;		// OTG_FS_ID: USB_OTG_FS_ID
 
-typedef GpioOutputC0	Power;		// OTG_FS_PowerSwitchOn
-typedef GpioInputD5		Overcurrent;	// OTG_FS_OverCurrent
-typedef GpioInputA9		Vbus;		// OTG_FS_VBUS
+typedef GpioD5			Overcurrent;	// OTG_FS_OverCurrent
+typedef GpioOutputC0	Power;			// OTG_FS_PowerSwitchOn
+typedef GpioInputA9		VBus;			// VBUS_FS: USB_OTG_HS_VBUS
 //typedef UsbFs Device;
 }
 
