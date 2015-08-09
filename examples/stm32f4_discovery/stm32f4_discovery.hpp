@@ -44,6 +44,7 @@ typedef GpioOutputD15 LedBlue;		// User LED 6
 namespace lis3
 {
 typedef GpioInputE1		Int;	// LIS302DL_INT2
+
 typedef GpioOutputE3	Cs;		// LIS302DL_CS_I2C/SPI
 typedef GpioOutputA5	Sck;	// SPI1_SCK
 typedef GpioOutputA7	Mosi;	// SPI1_MOSI
@@ -62,8 +63,8 @@ typedef GpioOutputC10	Sclk;	// I2S3_SCK
 typedef GpioOutputC12	Sdin;	// I2S3_SD
 
 typedef GpioOutputD4	Reset;	// Audio_RST
-typedef GpioOutputB6	Scl;	// Audio_SCL
-typedef GpioOutputB9	Sda;	// Audio_SDA
+typedef GpioB6			Scl;	// Audio_SCL
+typedef GpioB9			Sda;	// Audio_SDA
 
 typedef I2cMaster1 I2cMaster;
 //typedef I2sMaster3 I2sMaster;
@@ -73,16 +74,16 @@ typedef I2cMaster1 I2cMaster;
 namespace mp45
 {
 typedef GpioOutputB10	Clk;	// CLK_IN: I2S2_CK
-typedef GpioOutputC3	Dout;	// PDM_OUT: I2S2_SD
+typedef GpioInputC3		Dout;	// PDM_OUT: I2S2_SD
 //typedef I2sMaster2 I2sMaster;
 }
 
 
 namespace usb
 {
-typedef GpioOutputA11	Dm;	// OTG_FS_DM: USB_OTG_FS_DM
-typedef GpioOutputA12	Dp;	// OTG_FS_DP: USB_OTG_FS_DP
-typedef GpioOutputA10	Id;	// OTG_FS_ID: USB_OTG_FS_ID
+typedef GpioA11	Dm;	// OTG_FS_DM: USB_OTG_FS_DM
+typedef GpioA12	Dp;	// OTG_FS_DP: USB_OTG_FS_DP
+typedef GpioA10	Id;	// OTG_FS_ID: USB_OTG_FS_ID
 
 typedef GpioOutputC0	Power;		// OTG_FS_PowerSwitchOn
 typedef GpioInputD5		Overcurrent;	// OTG_FS_OverCurrent
@@ -111,12 +112,12 @@ initialize()
 inline void
 initializeLis3()
 {
-	lis3::Cs::setOutput(xpcc::Gpio::High);
-
 	lis3::Int::setInput();
 	lis3::Int::setInputTrigger(Gpio::InputTrigger::RisingEdge);
 	lis3::Int::enableExternalInterrupt();
 //	lis3::Int::enableExternalInterruptVector(12);
+
+	lis3::Cs::setOutput(xpcc::Gpio::High);
 
 	lis3::Sck::connect(lis3::SpiMaster::Sck);
 	lis3::Mosi::connect(lis3::SpiMaster::Mosi);
@@ -135,11 +136,11 @@ initializeCs43()
 //	cs43::Sclk::connect(cs43::I2sMaster::Ck);
 //	cs43::Sdin::connect(cs43::I2sMaster::Sd);
 
-//	cs43::Reset::setOutput(xpcc::Gpio::High);
+	cs43::Reset::setOutput(xpcc::Gpio::High);
 
-//	cs43::Scl::connect(cs43::I2cMaster::Scl);
-//	cs43::Sda::connect(cs43::I2cMaster::Sda);
-//	cs43::I2cMaster::initialize<systemClock, cs43::I2cMaster::Baudrate::Standard>();
+	cs43::Scl::connect(cs43::I2cMaster::Scl);
+	cs43::Sda::connect(cs43::I2cMaster::Sda);
+	cs43::I2cMaster::initialize<systemClock, cs43::I2cMaster::Baudrate::Standard>();
 }
 
 /// not supported yet, due to missing I2S driver
@@ -158,9 +159,10 @@ initializeUsb()
 //	usb::Dp::connect(usb::Device::Dp);
 //	usb::Id::connect(usb::Device::Id);
 
-//	usb::Overcurrent::setInput(Gpio::InputType::Floating);
-//	usb::Power::setOutput(Gpio::OutputType::PushPull, Gpio::OutputSpeed::MHz2);
-//	usb::Vbus::setInput(Gpio::InputType::Floating);
+	usb::Power::setOutput(Gpio::OutputType::PushPull, Gpio::OutputSpeed::MHz2);
+
+	usb::Overcurrent::setInput(Gpio::InputType::Floating);
+	usb::Vbus::setInput(Gpio::InputType::Floating);
 }
 
 }
