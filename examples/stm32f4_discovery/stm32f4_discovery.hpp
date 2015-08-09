@@ -92,7 +92,7 @@ typedef GpioInputA9		Vbus;		// OTG_FS_VBUS
 
 
 inline void
-initializeClock()
+initialize()
 {
 	systemClock::enable();
 	xpcc::cortex::SysTickTimer::enable();

@@ -1,4 +1,4 @@
-#include <xpcc/architecture.hpp>
+#include "../../stm32f4_discovery.hpp"
 #include <xpcc/debug/logger.hpp>
 #include <xpcc/processing.hpp>
 
@@ -6,8 +6,6 @@
 // Set the log level
 #undef	XPCC_LOG_LEVEL
 #define	XPCC_LOG_LEVEL xpcc::log::INFO
-
-#include "../../stm32f4_discovery.hpp"
 
 typedef GpioInputA7 AdcIn0;
 typedef GpioInputA4 AdcIn1;
@@ -32,15 +30,15 @@ xpcc::ShortTimeout timeout(100);
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	defaultSystemClock::enable();
+	Board::initialize();
 
 	// initialize Uart2 for XPCC_LOG_INFO
 	GpioOutputA2::connect(Usart2::Tx);
 	GpioInputA3::connect(Usart2::Rx, Gpio::InputType::PullUp);
-	Usart2::initialize<defaultSystemClock, 115200>(12);
+	Usart2::initialize<Board::systemClock, 115200>(12);
 
 	// initialize Adc3
-	Adc3::initialize<defaultSystemClock>();
+	Adc3::initialize<Board::systemClock>();
 	AdcIn0::connect(Adc2::Channel7);
 	AdcIn1::connect(Adc2::Channel4);
 	AdcIn2::connect(Adc2::Channel2);

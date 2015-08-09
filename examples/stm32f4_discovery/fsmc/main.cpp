@@ -10,7 +10,7 @@
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	defaultSystemClock::enable();
+	Board::initialize();
 
 	// Initialize FSMC
 	Fsmc::initialize();
@@ -54,10 +54,10 @@ MAIN_FUNCTION
 
 	volatile uint16_t * const out = fsmc::NorSram::getRegionPointer<uint16_t>(fsmc::NorSram::CHIP_SELECT_1);
 
-	LedOrange::setOutput(xpcc::Gpio::High);
-	LedGreen::setOutput(xpcc::Gpio::Low);
+	Board::LedOrange::setOutput(xpcc::Gpio::High);
+	Board::LedGreen::setOutput(xpcc::Gpio::Low);
 
-	while(!Button::read());
+	while(!Board::Button::read());
 
 	uint16_t data[0xff];
 
@@ -71,8 +71,8 @@ MAIN_FUNCTION
 	{
 		static uint8_t ii = 0;
 		++ii;
-		LedOrange::toggle();
-		LedGreen::toggle();
+		Board::LedOrange::toggle();
+		Board::LedGreen::toggle();
 		xpcc::delayMilliseconds(data[ii]);
 	}
 

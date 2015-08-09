@@ -3,8 +3,6 @@
 #include <xpcc/processing.hpp>
 #include <xpcc/math.hpp>
 
-using namespace Board;
-
 
 // ST changed the accelerometer in the C revision (MB997C)
 // change this to `false`, if you have MB997A or MB997B!
@@ -25,7 +23,7 @@ typedef xpcc::SoftwareI2cMaster<Scl, Sda> I2cMaster;
 
 typedef xpcc::Lis3TransportI2c< I2cMaster > Transport;
 #else
-typedef lis3::Transport Transport;
+typedef Board::lis3::Transport Transport;
 #endif
 
 } // namespace lis3
@@ -56,9 +54,9 @@ public:
 				break;
 			// otherwise, try again in 100ms
 			this->timeout.restart(100);
-			LedOrange::set();
+			Board::LedOrange::set();
 			PT_WAIT_UNTIL(this->timeout.isExpired());
-			LedOrange::reset();
+			Board::LedOrange::reset();
 		}
 
 		// initialize with limited range of ~2.3G
@@ -76,10 +74,10 @@ public:
 			averageY.update(accel.getData().getY());
 #endif
 
-			LedOrange::set(averageX.getValue() < -0.2);
-			LedBlue::set(averageX.getValue() > 0.2);
-			LedGreen::set(averageY.getValue() < -0.2);
-			LedRed::set(averageY.getValue() > 0.2);
+			Board::LedOrange::set(averageX.getValue() < -0.2);
+			Board::LedBlue::set(averageX.getValue() > 0.2);
+			Board::LedGreen::set(averageY.getValue() < -0.2);
+			Board::LedRed::set(averageY.getValue() > 0.2);
 
 			this->timeout.restart(5);
 			PT_WAIT_UNTIL(this->timeout.isExpired());
@@ -98,18 +96,18 @@ ReaderThread reader;
 
 MAIN_FUNCTION
 {
-	initializeClock();
+	Board::initialize();
 
 #if USE_I2C
-	lis3::Cs::setOutput(xpcc::Gpio::High);
-	lis3::Mosi::setOutput(xpcc::Gpio::High);
+	Board::lis3::Cs::setOutput(xpcc::Gpio::High);
+	Board::lis3::Mosi::setOutput(xpcc::Gpio::High);
 
 	lis::Scl::connect(lis::I2cMaster::Scl, Gpio::InputType::PullUp);
 	lis::Sda::connect(lis::I2cMaster::Sda, Gpio::InputType::PullUp);
 
 	lis::I2cMaster::initialize<systemClock, 400000>();
 #else
-	initializeLis3();
+	Board::initializeLis3();
 #endif
 
 	while (1)

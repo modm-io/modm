@@ -1,4 +1,3 @@
-#include <xpcc/architecture/platform.hpp>
 #include "../stm32f4_discovery.hpp"
 
 #include <xpcc/processing.hpp>
@@ -84,15 +83,15 @@ public:
 				{
 					uint8_t mm = distance.getData().getDistance();
 					XPCC_LOG_DEBUG << "mm: " << mm;
-					LedGreen::set(mm > 160);
-					LedBlue::set(mm > 110);
-					LedRed::set(mm > 25);
+					Board::LedGreen::set(mm > 160);
+					Board::LedBlue::set(mm > 110);
+					Board::LedRed::set(mm > 25);
 				}
 				else {
 					XPCC_LOG_DEBUG << "Error: " << (uint8_t(error) >> 4);
-					LedGreen::set();
-					LedBlue::set();
-					LedRed::set();
+					Board::LedGreen::set();
+					Board::LedBlue::set();
+					Board::LedRed::set();
 				}
 			}
 
@@ -131,24 +130,15 @@ ThreadOne one;
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	defaultSystemClock::enable();
-	xpcc::cortex::SysTickTimer::enable();
-
-	LedOrange::setOutput(xpcc::Gpio::Low);
-	LedGreen::setOutput(xpcc::Gpio::Low);
-	LedRed::setOutput(xpcc::Gpio::Low);
-	LedBlue::setOutput(xpcc::Gpio::Low);
+	Board::initialize();
 
 	GpioOutputA2::connect(Usart2::Tx);
-	Usart2::initialize<defaultSystemClock, xpcc::Uart::B115200>(10);
-
-	GpioB10::setOutput(Gpio::OutputType::OpenDrain);
-	GpioB11::setOutput(Gpio::OutputType::OpenDrain);
+	Usart2::initialize<Board::systemClock, xpcc::Uart::B115200>(10);
 
 	GpioB11::connect(I2cMaster2::Sda);
 	GpioB10::connect(I2cMaster2::Scl);
 
-	MyI2cMaster::initialize<defaultSystemClock, 400000>();
+	MyI2cMaster::initialize<Board::systemClock, 400000>();
 
 	XPCC_LOG_INFO << "\n\nWelcome to VL6180X demo!\n\n";
 
@@ -158,7 +148,7 @@ MAIN_FUNCTION
 	{
 		one.update();
 		if (tmr.execute()) {
-			LedOrange::toggle();
+			Board::LedOrange::toggle();
 		}
 	}
 

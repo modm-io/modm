@@ -1,13 +1,8 @@
-#include <xpcc/architecture/platform.hpp>
 #include "../stm32f4_discovery.hpp"
-
 #include <xpcc/processing.hpp>
-#include <xpcc/processing/protothread.hpp>
-#include <xpcc/driver/pressure/bmp085.hpp>
-
 #include <xpcc/io/iostream.hpp>
-
 #include <xpcc/architecture/interface/gpio.hpp>
+#include <xpcc/driver/pressure/bmp085.hpp>
 
 xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > device;
 xpcc::IOStream stream(device);
@@ -115,27 +110,21 @@ ThreadOne one;
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	defaultSystemClock::enable();
-	xpcc::cortex::SysTickTimer::enable();
-
-	LedOrange::setOutput(xpcc::Gpio::High);
-	LedGreen::setOutput(xpcc::Gpio::Low);
-	LedRed::setOutput(xpcc::Gpio::High);
-	LedBlue::setOutput(xpcc::Gpio::High);
+	Board::initialize();
 
 	GpioOutputA2::connect(Usart2::Tx);
-	Usart2::initialize<defaultSystemClock, xpcc::Uart::B115200>(10);
+	Usart2::initialize<Board::systemClock, xpcc::Uart::B115200>(10);
 
 	GpioB9::connect(MyI2cMaster::Sda);
 	GpioB8::connect(MyI2cMaster::Scl);
-    MyI2cMaster::initialize<defaultSystemClock, MyI2cMaster::Baudrate::Standard>();
+    MyI2cMaster::initialize<Board::systemClock, MyI2cMaster::Baudrate::Standard>();
 
 	stream << "\n\nWelcome to BMP085 demo!\n\n";
 
 	while (1)
 	{
 		one.update();
-		LedOrange::toggle();
+		Board::LedOrange::toggle();
 	}
 
 	return 0;

@@ -1,20 +1,18 @@
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/processing.hpp>
 #include "../stm32f4_discovery.hpp"
+#include <xpcc/processing.hpp>
 #include "leds.hpp"
 #include "animations.hpp"
 
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	defaultSystemClock::enable();
-	xpcc::cortex::SysTickTimer::enable();
+	Board::initialize();
 
 	// connect the Timer Channels to the LEDs
-	LedGreen::connect(Timer4::Channel1);
-	LedOrange::connect(Timer4::Channel2);
-	LedRed::connect(Timer4::Channel3);
-	LedBlue::connect(Timer4::Channel4);
+	Board::LedGreen::connect(Timer4::Channel1);
+	Board::LedOrange::connect(Timer4::Channel2);
+	Board::LedRed::connect(Timer4::Channel3);
+	Board::LedBlue::connect(Timer4::Channel4);
 
 	// set up the timer for 16bit PWM
 	Timer4::enable();
@@ -38,7 +36,7 @@ MAIN_FUNCTION
 	pulsePeriod.setPeriod(10000);
 	// pulse between 0.5s and 5s.
 	pulsePeriod.setRange(500, 5000);
-	indicator.setRange(0,100);
+	indicator.setRange(0, 100);
 
 	// start all animations indefinitely
 	pulse.start();

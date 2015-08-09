@@ -1,6 +1,4 @@
-#include <xpcc/architecture/platform.hpp>
 #include "../stm32f4_discovery.hpp"
-
 #include <xpcc/driver/display/ssd1306.hpp>
 
 /**
@@ -20,12 +18,11 @@ xpcc::Ssd1306<MyI2cMaster> display;
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	defaultSystemClock::enable();
-	xpcc::cortex::SysTickTimer::enable();
+	Board::initialize();
 
 	Sda::connect(MyI2cMaster::Sda);
 	Scl::connect(MyI2cMaster::Scl);
-	MyI2cMaster::initialize<defaultSystemClock, 420000>();
+	MyI2cMaster::initialize<Board::systemClock, 420000>();
 
 	display.initializeBlocking();
 	display.setFont(xpcc::font::Assertion);

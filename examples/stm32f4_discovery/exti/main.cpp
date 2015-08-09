@@ -7,8 +7,9 @@
  *
  */
 
-#include <xpcc/architecture.hpp>
 #include "../stm32f4_discovery.hpp"
+
+using namespace Board;
 
 typedef GpioInputE11 Irq;
 
@@ -45,7 +46,7 @@ EXTI15_10_IRQHandler(void)
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	defaultSystemClock::enable();
+	Board::initialize();
 
 	// will be used to indicate external interrupts
 	LedOrange::setOutput(xpcc::Gpio::Low);
