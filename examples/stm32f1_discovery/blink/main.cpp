@@ -1,19 +1,20 @@
-#include <xpcc/architecture.hpp>
 #include "../stm32f1_discovery.hpp"
+
+using namespace Board;
 
 MAIN_FUNCTION
 {
-	defaultSystemClock::enable();
+	Board::initialize();
 
-	LedLeft::setOutput(xpcc::Gpio::Low);
-	LedRight::setOutput(xpcc::Gpio::High);
+	LedBlue::set();
 
 	while (1)
 	{
-		LedLeft::toggle();
-		xpcc::delayMilliseconds(100);
-		LedRight::toggle();
-		xpcc::delayMilliseconds(100);
+		LedGreen::toggle();
+		xpcc::delayMilliseconds(Button::read() ? 100 : 300);
+
+		LedBlue::toggle();
+		xpcc::delayMilliseconds(Button::read() ? 100 : 300);
 	}
 
 	return 0;

@@ -10,21 +10,47 @@
 //
 // STM32F1DISCOVERY
 // Discovery kit for STM32 F1 series
-// www.st.com/stm32-discovery
+// http://www.st.com/web/en/catalog/tools/FM116/SC959/SS1532/PF250863
 //
 
 #ifndef XPCC_STM32_F1_DISCOVERY_HPP
 #define XPCC_STM32_F1_DISCOVERY_HPP
 
-using namespace xpcc::stm32;
-using namespace xpcc::cortex;
+#include <xpcc/architecture/platform.hpp>
 
-typedef GpioOutputC9  LedLeft;
-typedef GpioOutputC8  LedRight;
-typedef GpioInputA0   Button;
+using namespace xpcc::stm32;
+
+
+namespace Board
+{
 
 /// STM32F100 running at 24MHz generated from the external 8MHz crystal
 /// supplied by the on-board st-link
-typedef SystemClock<Pll<ExternalCrystal<MHz8>, MHz24> > defaultSystemClock;
+typedef SystemClock<Pll<ExternalCrystal<MHz8>, MHz24> > systemClock;
+
+
+typedef GpioInputA0   Button;	// Blue PushButton
+
+
+typedef GpioOutputC9  LedGreen;		// User LED 3
+typedef GpioOutputC8  LedBlue;		// User LED 4
+
+
+inline void
+initialize()
+{
+	systemClock::enable();
+	xpcc::cortex::SysTickTimer::enable();
+
+	LedGreen::setOutput(xpcc::Gpio::Low);
+	LedBlue::setOutput(xpcc::Gpio::Low);
+
+	Button::setInput();
+	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
+	Button::enableExternalInterrupt();
+//	Button::enableExternalInterruptVector(12);
+}
+
+}
 
 #endif	// XPCC_STM32_F1_DISCOVERY_HPP
