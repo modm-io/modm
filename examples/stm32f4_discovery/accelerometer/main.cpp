@@ -1,5 +1,10 @@
-#include <xpcc/architecture/platform.hpp>
 #include "../stm32f4_discovery.hpp"
+#include <xpcc/driver/inertial/lis302dl.hpp>
+#include <xpcc/processing.hpp>
+#include <xpcc/math.hpp>
+
+using namespace Board;
+
 
 // ST changed the accelerometer in the C revision (MB997C)
 // change this to `false`, if you have MB997A or MB997B!
@@ -8,34 +13,22 @@
 // if you want to use Software I2c change this to `true`
 #define USE_I2C false
 
-#if REVISION_C
-#	include <xpcc/driver/inertial/lis3dsh.hpp>
-#else
-#	include <xpcc/driver/inertial/lis302dl.hpp>
-#endif
 
 namespace lis
 {
 
-// Spi Transport Layer
-typedef GpioOutputA5 Sck;
-typedef GpioInputA6 Miso;
-typedef GpioOutputA7 Mosi;
-typedef GpioOutputE3 Cs;
-typedef SpiMaster1 SpiMaster;
-
+#if USE_I2C
 // I2c Transport Layer
 typedef GpioA5 Scl;
 typedef GpioA7 Sda;
 typedef xpcc::SoftwareI2cMaster<Scl, Sda> I2cMaster;
 
-#if USE_I2C
 typedef xpcc::Lis3TransportI2c< I2cMaster > Transport;
 #else
-typedef xpcc::Lis3TransportSpi< SpiMaster, Cs > Transport;
+typedef lis3::Transport Transport;
 #endif
 
-} // namespace lis
+} // namespace lis3
 
 // Data and Driver object
 #if REVISION_C
@@ -46,8 +39,6 @@ xpcc::lis302dl::Data data;
 xpcc::Lis302dl< lis::Transport > accel(data);
 #endif
 
-#include <xpcc/processing.hpp>
-#include <xpcc/math.hpp>
 
 class ReaderThread : public xpcc::pt::Protothread
 {
@@ -107,31 +98,18 @@ ReaderThread reader;
 
 MAIN_FUNCTION
 {
-	defaultSystemClock::enable();
-	xpcc::cortex::SysTickTimer::enable();
-
-	LedOrange::setOutput(xpcc::Gpio::Low);
-	LedGreen::setOutput(xpcc::Gpio::Low);
-	LedRed::setOutput(xpcc::Gpio::Low);
-	LedBlue::setOutput(xpcc::Gpio::Low);
+	initializeClock();
 
 #if USE_I2C
-	lis::Cs::setOutput(xpcc::Gpio::High);
-	lis::Mosi::setOutput(xpcc::Gpio::High);
+	lis3::Cs::setOutput(xpcc::Gpio::High);
+	lis3::Mosi::setOutput(xpcc::Gpio::High);
 
-	lis::Scl::connect(lis::I2cMaster::Scl);
-	lis::Sda::connect(lis::I2cMaster::Sda);
-	lis::Scl::configure(Gpio::InputType::PullUp);
-	lis::Sda::configure(Gpio::InputType::PullUp);
+	lis::Scl::connect(lis::I2cMaster::Scl, Gpio::InputType::PullUp);
+	lis::Sda::connect(lis::I2cMaster::Sda, Gpio::InputType::PullUp);
 
-	lis::I2cMaster::initialize<defaultSystemClock, 400000>();
+	lis::I2cMaster::initialize<systemClock, 400000>();
 #else
-	lis::Sck::connect(lis::SpiMaster::Sck);
-	lis::Miso::connect(lis::SpiMaster::Miso);
-	lis::Mosi::connect(lis::SpiMaster::Mosi);
-
-	lis::SpiMaster::initialize<defaultSystemClock, MHz10>();
-	lis::SpiMaster::setDataMode(lis::SpiMaster::DataMode::Mode3);
+	initializeLis3();
 #endif
 
 	while (1)
