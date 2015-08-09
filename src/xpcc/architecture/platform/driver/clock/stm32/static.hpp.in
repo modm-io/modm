@@ -137,15 +137,15 @@ namespace xpcc
 					 'prescaler': "1/4",
 					 'sinks': [ apb1_timers, "Dac", "Can1", "Can2",
 								"I2c1", "I2c2", "I2c3", "Spi2", "Spi3",
-								"Usart2", "Usart3", "Uart4", "Uart5" ] }
+								"Usart2", "Usart3", "Uart4", "Uart5", "Uart7", "Uart8" ] }
 	%% set apb2_timers = 	{'name': "APB2Timers",
 							 'prescaler': 2,
 							 'sinks': [ "Timer1",  "Timer8",  "Timer9",
 										"Timer10", "Timer11" ] }
 	%% set apb2 = 	{'name': "APB2",
 					 'prescaler': "1/2",
-					 'sinks': [ apb2_timers, "Spi1", "Sdio", "Adc",
-								"Usart1", "Usart6" ] }
+					 'sinks': [ apb2_timers, "Spi1", "Spi4", "Spi5", "Spi6",
+								"Sdio", "Adc", "Usart1", "Usart6" ] }
 	%% set ahb1 = 	{'name': "AHB",
 					 'prescaler': "1",
 					 'sinks': [ sys_timer, apb1, apb2, "Dma", "Gpio" ] }
