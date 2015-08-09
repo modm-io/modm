@@ -149,7 +149,7 @@ public:
 		{{reg}}->{{cr}}  = ({{reg}}->{{cr}}  & ~mask4)  | ((i(type) | i(speed)) << (cr_pin * 4));
 	}
 	ALWAYS_INLINE static void configure(InputType type) {
-		{{reg}}->{{cr}}  = ({{reg}}->{{cr}}  & ~mask4)  | ((i(type) & 0xc0) << (cr_pin * 4));
+		{{reg}}->{{cr}}  = ({{reg}}->{{cr}}  & ~mask4)  | ((i(type) & 0xc) << (cr_pin * 4));
 		if (type == InputType::PullUp) {{reg}}->BSRR = mask;
 		else {{reg}}->BRR = mask;
 	}
