@@ -1,4 +1,3 @@
-#include <xpcc/architecture.hpp>
 #include "../stm32f3_discovery.hpp"
 
 int global_a = 1;
@@ -89,16 +88,7 @@ void rec_itr()
 
 MAIN_FUNCTION
 {
-	defaultSystemClock::enable();
-
-	LedNorth::setOutput(xpcc::Gpio::Low);
-	LedNorthEast::setOutput(xpcc::Gpio::High);
-	LedEast::setOutput(xpcc::Gpio::High);
-	LedSouthEast::setOutput(xpcc::Gpio::High);
-	LedSouth::setOutput(xpcc::Gpio::High);
-	LedSouthWest::setOutput(xpcc::Gpio::High);
-	LedWest::setOutput(xpcc::Gpio::High);
-	LedNorthWest::setOutput(xpcc::Gpio::High);
+	Board::initialize();
 
 	int a = 30;
 	(void)a;

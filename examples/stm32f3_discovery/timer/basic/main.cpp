@@ -1,12 +1,9 @@
-#include <xpcc/architecture.hpp>
 #include "../../stm32f3_discovery.hpp"
 
 MAIN_FUNCTION
 {
-	defaultSystemClock::enable();
-
-	LedNorth::setOutput(xpcc::Gpio::High);
-	LedNorthWest::setOutput(xpcc::Gpio::Low);
+	Board::initialize();
+	Board::LedNorth::set();
 
 
 	Timer1::enable();
@@ -17,8 +14,8 @@ MAIN_FUNCTION
 	Timer1::applyAndReset();
 	Timer1::start();
 
-	LedNorth::connect(Timer1::Channel1);
-	LedNorthWest::connect(Timer1::Channel1N);
+	Board::LedNorth::connect(Timer1::Channel1);
+	Board::LedNorthWest::connect(Timer1::Channel1N);
 	Timer1::setCompareValue(1, 0);
 	Timer1::configureOutputChannel(1,
 			static_cast<uint32_t>(Timer1::OutputCompareMode::Pwm) | 0b0101);

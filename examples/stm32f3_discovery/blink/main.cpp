@@ -1,36 +1,30 @@
-#include <xpcc/architecture.hpp>
 #include "../stm32f3_discovery.hpp"
+
+using namespace Board;
 
 MAIN_FUNCTION
 {
-	defaultSystemClock::enable();
+	Board::initialize();
 
-	LedNorth::setOutput(xpcc::Gpio::Low);
-	LedNorthEast::setOutput(xpcc::Gpio::High);
-	LedEast::setOutput(xpcc::Gpio::High);
-	LedSouthEast::setOutput(xpcc::Gpio::High);
-	LedSouth::setOutput(xpcc::Gpio::High);
-	LedSouthWest::setOutput(xpcc::Gpio::High);
-	LedWest::setOutput(xpcc::Gpio::High);
-	LedNorthWest::setOutput(xpcc::Gpio::High);
+	Board::LedNorth::set();
 
 	while (1)
 	{
-		LedNorth::toggle();
+		Board::LedNorth::toggle();
 		xpcc::delayMilliseconds(100);
-		LedNorthEast::toggle();
+		Board::LedNorthEast::toggle();
 		xpcc::delayMilliseconds(100);
-		LedEast::toggle();
+		Board::LedEast::toggle();
 		xpcc::delayMilliseconds(100);
-		LedSouthEast::toggle();
+		Board::LedSouthEast::toggle();
 		xpcc::delayMilliseconds(100);
-		LedSouth::toggle();
+		Board::LedSouth::toggle();
 		xpcc::delayMilliseconds(100);
-		LedSouthWest::toggle();
+		Board::LedSouthWest::toggle();
 		xpcc::delayMilliseconds(100);
-		LedWest::toggle();
+		Board::LedWest::toggle();
 		xpcc::delayMilliseconds(100);
-		LedNorthWest::toggle();
+		Board::LedNorthWest::toggle();
 		xpcc::delayMilliseconds(100);
 	}
 
