@@ -162,7 +162,7 @@ initializeUsb()
 	usb::Power::setOutput(Gpio::OutputType::PushPull, Gpio::OutputSpeed::MHz2);
 
 	usb::Overcurrent::setInput(Gpio::InputType::Floating);
-	usb::Vbus::setInput(Gpio::InputType::Floating);
+	usb::VBus::setInput(Gpio::InputType::Floating);
 }
 
 }
