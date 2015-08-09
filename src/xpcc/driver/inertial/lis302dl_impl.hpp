@@ -41,7 +41,7 @@ xpcc::Lis302dl<Transport>::updateControlRegister(uint8_t index, Control_t setMas
 
 template < class Transport >
 xpcc::ResumableResult<bool>
-xpcc::Lis302dl<Transport>::writeClickThreshold(Axis axis, uint8_t threshold)
+xpcc::Lis302dl<Transport>::setClickThreshold(Axis axis, uint8_t threshold)
 {
 	switch(axis)
 	{
