@@ -17,6 +17,7 @@
 #define XPCC_STM32_F3_DISCOVERY_HPP
 
 #include <xpcc/architecture/platform.hpp>
+#include <xpcc/driver/inertial/l3gd20.hpp>
 
 using namespace xpcc::stm32;
 
@@ -54,6 +55,8 @@ typedef GpioOutputA7	Mosi;	// SPI1_MISO [L3GD20_SDA/SDI/SDO]
 typedef GpioInputA6		Miso;	// SPI1_MISO [L3GD20_SA0/SDO]
 
 typedef SpiMaster1 SpiMaster;
+typedef xpcc::Lis3TransportSpi< SpiMaster, Cs > Transport;
+typedef xpcc::L3gd20< Transport > Sensor;
 }
 
 
