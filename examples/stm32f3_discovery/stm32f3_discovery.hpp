@@ -18,6 +18,7 @@
 
 #include <xpcc/architecture/platform.hpp>
 #include <xpcc/driver/inertial/l3gd20.hpp>
+#include <xpcc/driver/inertial/lsm303a.hpp>
 
 using namespace xpcc::stm32;
 
@@ -72,6 +73,7 @@ typedef GpioB7		Sda;	// I2C1_SDA [LSM303DLHC_SDA]: I2C1_SDA
 // Hardware I2C not yet implemented for F3!
 //typedef I2cMaster1 I2cMaster;
 typedef xpcc::SoftwareI2cMaster<GpioB6, GpioB7> I2cMaster;
+typedef xpcc::Lsm303a< I2cMaster > Accelerometer;
 }
 
 
@@ -142,10 +144,10 @@ initializeLsm3()
 	lsm3::Int2::enableExternalInterrupt();
 //	lsm3::Int2::enableExternalInterruptVector(12);
 
-	lsm3::Int2::setInput();
-	lsm3::Int2::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	lsm3::Int2::enableExternalInterrupt();
-//	lsm3::Int2::enableExternalInterruptVector(12);
+	lsm3::Drdy::setInput();
+	lsm3::Drdy::setInputTrigger(Gpio::InputTrigger::RisingEdge);
+	lsm3::Drdy::enableExternalInterrupt();
+//	lsm3::Drdy::enableExternalInterruptVector(12);
 
 	lsm3::Scl::connect(lsm3::I2cMaster::Scl);
 	lsm3::Sda::connect(lsm3::I2cMaster::Sda);
