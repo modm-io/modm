@@ -35,7 +35,7 @@ xpcc::Itg3200<I2cMaster>::configure(LowPassFilter filter, uint8_t divider)
 
 template < typename I2cMaster >
 xpcc::ResumableResult<bool>
-xpcc::Itg3200<I2cMaster>::readRotationRate()
+xpcc::Itg3200<I2cMaster>::readRotation()
 {
 	RF_BEGIN();
 

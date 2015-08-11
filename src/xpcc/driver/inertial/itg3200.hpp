@@ -146,13 +146,13 @@ public:
 		/// returns the rotation rate in degrees per second
 		///@{
 		inline float
-		getRotationRateX() { return getRate(1); }
+		getX() { return getRate(1); }
 
 		inline float
-		getRotationRateY() { return getRate(2); }
+		getY() { return getRate(2); }
 
 		inline float
-		getRotationRateZ() { return getRate(3); }
+		getZ() { return getRate(3); }
 		///@}
 
 		/// returns the temperature in degrees Celcius
@@ -177,7 +177,7 @@ public:
 		{
 			int16_t* rawData = reinterpret_cast<int16_t*>(data);
 			int16_t rateValue = xpcc::fromBigEndian(rawData[index]);
-			return rateValue / 14.375f;
+			return rateValue * (1.f / 14.375f);
 		}
 	};
 }; // struct itg3200
@@ -205,7 +205,7 @@ public:
 
 	/// reads the temperature and gyro registers and buffer the results
 	xpcc::ResumableResult<bool>
-	readRotationRate();
+	readRotation();
 
 
 	xpcc::ResumableResult<bool> inline
