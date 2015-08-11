@@ -442,19 +442,19 @@ public:
 		friend class Lis3dsh;
 
 		Data()
-		:	data{0,0,0}, meta(2)
+		:	data{0,0,0,0,0,0}, scale(2)
 		{}
 		// DATA ACCESS
 		///@{
 		/// returns the acceleration in g
 		float inline
-		getX() { return getData(0) * float(meta)/0x7FFF; }
+		getX() { return getData(0) * float(scale)/0x7FFF; }
 
 		float inline
-		getY() { return getData(1) * float(meta)/0x7FFF; }
+		getY() { return getData(1) * float(scale)/0x7FFF; }
 
 		float inline
-		getZ() { return getData(2) * float(meta)/0x7FFF; }
+		getZ() { return getData(2) * float(scale)/0x7FFF; }
 		///@}
 
 		inline int16_t
@@ -476,7 +476,7 @@ public:
 		// data 0-5 = xl,xh,yl,yh,zl,zh
 		uint8_t data[6];
 		// contains scale in g (5bit LSB)
-		uint8_t meta;
+		uint8_t scale;
 	};
 
 protected:

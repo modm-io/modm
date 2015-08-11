@@ -34,7 +34,7 @@ xpcc::Lis3dsh<Transport>::configure(Scale scale, MeasurementRate rate)
 	{
 		// see updateControlRegister
 		uint8_t s = rawBuffer[4] >> 2;
-		data.meta = (s == 8) ? s + 8 : s + 2;
+		data.scale = (s == 8) ? s + 8 : s + 2;
 	}
 
 	rawBuffer[5] = uint8_t(Control6::ADD_INC);
@@ -63,7 +63,7 @@ xpcc::Lis3dsh<Transport>::updateControlRegister(uint8_t index, Control_t setMask
 		uint8_t scale = (Control5_t(rawBuffer[4]) & Control5::FSCALE_Mask).value >> 2;
 		// for G2, G6, G8 we can simply add 2 to the result.
 		// this does not work for G16, where we have to add 8
-		data.meta = (scale == 8) ? scale + 8 : scale + 2;
+		data.scale = (scale == 8) ? scale + 8 : scale + 2;
 	}
 
 	RF_END_RETURN_CALL(this->write(0x20 + index, rawBuffer[index]));

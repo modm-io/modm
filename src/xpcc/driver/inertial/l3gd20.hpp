@@ -18,7 +18,7 @@
 namespace xpcc
 {
 
-// forward declaration for friending with lis3dsh::Data
+// forward declaration for friending with l3gd20::Data
 template < class Transport >
 class L3gd20;
 
@@ -243,17 +243,9 @@ public:
 	enum class
 	Scale : uint8_t
 	{
-		Dps200 = 0,
+		Dps250 = 0,
 		Dps500 = Control4::FS0,
 		Dps2000 = int(Control4::FS1) | int(Control4::FS0),
-	};
-
-	enum class
-	Axis : uint8_t
-	{
-		X = 2,
-		Y = 1,
-		Z = 0,
 	};
 
 public:
@@ -342,9 +334,9 @@ template < class Transport >
 class L3gd20 : public l3gd20, public Transport
 {
 public:
-	/// Constructor, requires a lis3dsh::Data object.
-	/// For I2c this also sets the address to 0x1D (alternative: 0x1C).
-	L3gd20(Data &data, uint8_t address=0x1D);
+	/// Constructor, requires a l3gd20::Data object.
+	/// For I2c this also sets the address to 0b110101 (alternative: 0x1C).
+	L3gd20(Data &data, uint8_t address=0x35);
 
 	bool inline
 	configureBlocking(Scale scale, MeasurementRate rate = MeasurementRate::Hz380)

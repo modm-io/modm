@@ -36,10 +36,7 @@ xpcc::L3gd20<Transport>::configure(Scale scale, MeasurementRate rate)
 
 	if (RF_CALL(this->write(i(Register::CTRL_REG1), rawBuffer[0])))
 	{
-		if (RF_CALL(this->write(i(Register::CTRL_REG4), rawBuffer[3])))
-		{
-			RF_RETURN(true);
-		}
+		RF_RETURN_CALL(this->write(i(Register::CTRL_REG4), rawBuffer[3]));
 	}
 	RF_END_RETURN(false);
 }
@@ -51,7 +48,7 @@ xpcc::L3gd20<Transport>::updateControlRegister(uint8_t index, Control_t setMask,
 	RF_BEGIN();
 
 	rawBuffer[index] = (rawBuffer[index] & ~clearMask.value) | setMask.value;
-	// update the scale in the data object, if we update CTRL_REG5 (index 4)
+	// update the scale in the data object, if we update CTRL_REG4 (index 3)
 	if (index == 3)
 	{
 		data.scale = ((Control4_t(rawBuffer[3]) & (Control4::FS1 | Control4::FS0)).value >> 4) + 1;

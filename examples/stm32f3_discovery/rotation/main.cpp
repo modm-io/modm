@@ -22,9 +22,9 @@ using LedRingRight = xpcc::SoftwareGpioPort<
 	>;
 
 // create the data object
-Board::l3g::Sensor::Data data;
+Board::l3g::Gyroscope::Data data;
 // and hand it to the sensor driver
-Board::l3g::Sensor gyro(data);
+Board::l3g::Gyroscope gyro(data);
 
 
 class ReaderThread : public xpcc::pt::Protothread
@@ -35,8 +35,8 @@ public:
 	{
 		PT_BEGIN();
 
-		// initialize with limited range of 200 degrees per second
-		PT_CALL(gyro.configure(gyro.Scale::Dps200));
+		// initialize with limited range of 250 degrees per second
+		PT_CALL(gyro.configure(gyro.Scale::Dps250));
 
 		while (true)
 		{

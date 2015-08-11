@@ -56,7 +56,7 @@ typedef GpioInputA6		Miso;	// SPI1_MISO [L3GD20_SA0/SDO]
 
 typedef SpiMaster1 SpiMaster;
 typedef xpcc::Lis3TransportSpi< SpiMaster, Cs > Transport;
-typedef xpcc::L3gd20< Transport > Sensor;
+typedef xpcc::L3gd20< Transport > Gyroscope;
 }
 
 
