@@ -228,7 +228,7 @@ Reset_Handler(void)
 	%% endif
 
 	// Lower priority level for all peripheral interrupts to lowest possible
-	for (uint32_t i = 0; i < NR_INTERRUPTS; i++) {
+	for (uint32_t i = 0; i < {{ number_of_interrupts }}; i++) {
 		const uint32_t priority = 0xF;
 		NVIC->IP[i] = (priority & 0xF) << 4;
 	}

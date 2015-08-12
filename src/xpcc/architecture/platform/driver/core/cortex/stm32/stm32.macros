@@ -42,7 +42,6 @@
 #define FLASH_WAIT_STATE_6		0x6
 #define FLASH_WAIT_STATE_7		0x7
 
-#define NR_INTERRUPTS 82
 %#
 %% endmacro
 
