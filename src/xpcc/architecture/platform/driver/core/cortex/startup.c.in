@@ -77,9 +77,13 @@ void HardFault_Handler(void)			__attribute__ ((weak, alias("defaultHandler")));
 %% set declarations = []
 %% for addr, interrupt in i.iteritems()
 %% 	if interrupt[0] not in declarations
-%%	do declarations.append(interrupt[0])
-{{ ("void " + interrupt[0] + "(void)") | xpcc.pad(36)}}__attribute__ ((weak, alias("defaultHandler")));
-%% endif
+%%		do declarations.append(interrupt[0])
+%%		set suffix = "_IRQHandler"
+%%		if addr < 0
+%%			set suffix = ""
+%%		endif
+{{ ("void " + interrupt[0] + suffix + "(void)") | xpcc.pad(36)}}__attribute__ ((weak, alias("defaultHandler")));
+%%	endif
 %% endfor
 // ----------------------------------------------------------------------------
 // Interrupt vectors
@@ -109,7 +113,11 @@ FunctionPointer flashVectors[] __attribute__ ((section(".reset"))) =
 	HardFault_Handler,					// -13: hard fault handler
 %% for addr in range(4 - 16, number_of_interrupts + 1)
 %% 	if addr in i
-	{{ (i[addr][0] + ",") | xpcc.pad(32) }}// {{addr}}: {{i[addr][1]}}
+%%		set suffix = "_IRQHandler"
+%%		if addr < 0
+%%			set suffix = ""
+%%		endif
+	{{ (i[addr][0] + suffix + ",") | xpcc.pad(32) }}// {{addr}}: {{i[addr][1]}}
 %% 	else
 	0,									// {{addr}}
 %% 	endif
