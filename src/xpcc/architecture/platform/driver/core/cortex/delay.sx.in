@@ -81,7 +81,7 @@ _delay_us:
 %% elif target is cortex_m3 or target is cortex_m4
 	%% if target is stm32f3
 	// function resides in Core-Coupled memory, which is twice as fast as SRAM
-	mov		r1, #(F_CPU / 1000000 / 6)
+	mov		r1, #(F_CPU / 1000000 / 5)
 	%% else
 	// 72 / 6 cycles per loop = 12
 	mov		r1, #(F_CPU / 1000000 / 12)
