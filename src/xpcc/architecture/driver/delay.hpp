@@ -155,33 +155,44 @@ namespace xpcc
 
 #elif defined(XPCC__CPU_ARM)
 
-	extern "C" void _delay_ns(uint32_t ns); // ~15 cycles slower, since not inlined
+	extern "C" void _delay_ns(uint32_t ns); // ~10-15 cycles slower, since not inlined
 	extern "C" void _delay_us(uint32_t us);
 	extern "C" void _delay_ms(uint32_t ms);
 
 	namespace xpcc
 	{
-		namespace clock { extern uint16_t ATTRIBUTE_FASTDATA ns_cycle_pre; }
+//		namespace clock { extern uint16_t ATTRIBUTE_FASTDATA ns_cycle_pre; }
 
 		ALWAYS_INLINE void
 		delayNanoseconds(uint16_t ns)
 		{
-			asm volatile (
-				"muls.n	%2, %2, %1"         "\n\t"
-				"movs.n r0, %0"             "\n\t"
-			"1:"                            "\n\t"
-				"cmp.n	r0, %2"             "\n\t"
-				"ble.n	2f"                 "\n\t"
-				"subs.n	r0, r0, %1"         "\n\t"
-				"b.n	1b"                 "\n\t"
-			"2:"                            "\n\t"
-				: /* no output register */
-				: "r" (ns), "r" (clock::ns_cycle_pre), "r" (3)
-				: "r0"
-			);
+			::_delay_ns(ns);
+//#if defined (XPCC__CPU_CORTEX_M4)
+//			asm volatile (
+//				"muls.n	%2, %2, %1"     "\n\t"
+//				"subs.n	r0, %0, %2"     "\n\t"
+//			"1:"
+//				"subs.n	r0, r0, %1"     "\n\t"
+//				"bpl.n	1b"             "\n\t"
+//				: /* no output register */
+//				: "r" (ns), "r" (clock::ns_cycle_pre), "r" (5)
+//				: "r0"
+//			);
+//#elif defined(XPCC__CPU_CORTEX_M3)
+//			asm volatile (
+//				"lsls.n	r1, %1, #1"     "\n\t"
+//				"subs.n	r0, %0, r1"     "\n\t"
+//			"1:"
+//				"subs.n	r0, r0, %1"     "\n\t"
+//				"bpl.n	1b"             "\n\t"
+//				: /* no output register */
+//				: "r" (ns), "r" (clock::ns_cycle_pre)
+//				: "r0", "r1"
+//			);
+//#endif
 		}
 
-		ALWAYS_INLINE  void
+		ALWAYS_INLINE void
 		delayMicroseconds(uint16_t us)
 		{
 			::_delay_us(us);

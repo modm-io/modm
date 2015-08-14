@@ -28,7 +28,21 @@
  */
 // ----------------------------------------------------------------------------
 
+%% if target is stm32f4
+	%% set loop = 3
+	%% set overhead = 29
+	// the ART Accelerator in the STM32 executes the short loop in the
+	// _delay_ns function twice as fast as when executing from RAM!
+	// Apparently this is due to the use of the "dedicated I-Bus and prefetch buffers",
+	// whereas when executing from RAM "the instruction hast to be fetched using the
+	// system bus, which incurs an extra wait state".
+	// So for STM32's without I-CCM, we execute from Flash.
+	.section .text, "x"
+%% elif target is stm32f3
+	%% set loop = 3
+	%% set overhead = 31
 	.section .fastcode, "x"
+%% endif
 	.syntax	unified
 	.align	4
 	.thumb
@@ -44,9 +58,7 @@
 	 * cycles, and its timing is not accurate when interrupted by an exception.
 	 *
 	 * This code also exists as inline assembly, which reduces setup costs to
-	 * 18-20 cycles, since no jump has to take place.
-	 * However, for the code to be inlined it must reside in Flash memory, which
-	 * might not always be the best option.
+	 * 16-20 cycles, since no jump has to take place.
 	 *
 	 * @author  Niklas Hauser
 	 */
@@ -56,43 +68,43 @@
 	.func	_delay_ns
 _delay_ns:
 	ldr		r1, =ns_per_cycle	// 2 cycles
-	movs.n	r2, #(35 / 5)		// 1 cycles
+	// setup overhead is {{ overhead }} cycles
+	movs.n	r2, #({{ (overhead / loop) | int}})		// 1 cycle
 	ldrh.n	r1, [r1, #0]		// 2 cycles
 	muls.n	r2, r2, r1			// 2 cycles
-1:			// setup cycles is around 27 - 37, therefore multiply by 7 (5*7 => 35)
-	cmp.n	r0, r2				// 1 cycle
-	ble.n	2f					// 1 cycle (when not taken)
-	subs.n	r0, r0, r1			// 1 cycle
-	b.n		1b					// 2 cycles (when taken)
-2:			//  5 cycles for loop!
+	subs.n	r0, r0, r2			// 1 cycle
+1:	subs.n	r0, r0, r1			// 1 cycle
+	bpl.n	1b					// 2 cycles (when taken)
+	//  {{ loop }} cycles for loop!
 	bx.n		lr
 	.size	_delay_ns, . - _delay_ns
 	.endfunc
 
+%% if target is cortex_m0
 	// ------------------------------------------------------------------------
 	/**
 	 * @brief	Simple delay loop (in microseconds resolution)
-	 * 
+	 *
 	 * Use Timer-Interrupts etc. for delays whenever possible. This delay-loop
 	 * is very inaccurate when interrupts or DMA transfers occur at the same
 	 * time. This is because only the number of cycles inside this loop are
 	 * counted. External interruptions go unnoticed and will prolong the delay
 	 * time.
-	 * 
+	 *
 	 * C equivalent:
 	 * @code
 	 * extern "C" void _delay_us(uint32_t us);
 	 * @endcode
-	 * 
+	 *
 	 * The function is put into the .fastcode section which resides in RAM to
 	 * be sure that it is executed without any waitstates etc. Otherwise
 	 * the delay variables had to be adapted every ARM type.
-	 * 
+	 *
 	 * An example are the AT91SAM types, which aren't able to run ARM code from
 	 * Flash at above 20-30 Mhz without wait-states. Of course this changes
 	 * the executing timing which we would like to avoid here to get
-	 * at least an reasonably accurate delay. 
-	 * 
+	 * at least an reasonably accurate delay.
+	 *
 	 * @see		_delay_ms
 	 * @author	Fabian Greif
 	 */
@@ -103,8 +115,6 @@ _delay_ns:
 _delay_us:
 	// Example:
 	// F_CPU / 1000000 = cycles per us => 72,000,000 / 1,000,000 = 72
-%# Different _delay_us implementations depending on core architecture
-%% if target is cortex_m0
 	// 72 / 4 cycles per loop = 18
 	movs	r1, #(F_CPU / 1000000 / 4)
 	muls	r1, r0, r1
@@ -114,34 +124,18 @@ _delay_us:
 	bne		1b
 2:
 	bx		lr
-%% elif target is cortex_m3 or target is cortex_m4
-	%% if target is stm32f3
-	// function resides in Core-Coupled memory, which is twice as fast as SRAM
-	mov		r1, #(F_CPU / 1000000 / 5)
-	%% else
-	// 72 / 6 cycles per loop = 12
-	mov		r1, #(F_CPU / 1000000 / 12)
-	%% endif
-	muls	r1, r0, r1
-1:
-	itt		ne
-	subsne	r1, r1, #1
-	nop
-	bne		1b
-	bx		lr
-%% endif
 	.size	_delay_us, . - _delay_us
 	.endfunc
-	
+
 	// ------------------------------------------------------------------------
 	/**
 	 * @brief	Simple delay loop (in milliseconds resolution)
-	 * 
+	 *
 	 * C equivalent:
 	 * @code
 	 * extern "C" void _delay_ms(uint32_t ms);
 	 * @endcode
-	 * 
+	 *
 	 * @see		_delay_us
 	 * @author	Fabian Greif
 	 */
@@ -151,8 +145,6 @@ _delay_us:
 	.func	_delay_ms
 _delay_ms:
 	// see _delay_us
-%# Different _delay_us implementations depending on core architecture
-%% if target is cortex_m0
 	ldr		r1, =(F_CPU / 1000 / 4)
 	muls	r1, r0, r1
 	beq		2f
@@ -160,21 +152,8 @@ _delay_ms:
 	subs	r1, r1, #1
 	bne		1b
 2:	bx		lr
-%% elif target is cortex_m3 or target is cortex_m4
-	%% if target is stm32f3
-	// function resides in Core-Coupled memory, which is twice as fast as SRAM
-	ldr		r1, =(F_CPU / 1000 / 4)
-	%% else
-	ldr		r1, =(F_CPU / 1000 / 8)
-	%% endif
-	muls	r1, r0, r1
-1:
-	itt		ne
-	subsne	r1, r1, #1
-	bne		1b
-	bx		lr
-%% endif
 	.size	_delay_ms, . - _delay_ms
 	.endfunc
+%% endif
 
 	.end
