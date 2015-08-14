@@ -192,12 +192,10 @@ namespace xpcc
 	{
 		// disable interrupts -> PRIMASK=1
 		// enable interrupts -> PRIMASK=0
-		uint32_t mask = 1;
 		asm volatile (
 				"mrs %0, PRIMASK"	"\n\t"
-				"msr PRIMASK, %1"
-				: "=&r" (cpsr)
-				: "r" (mask));
+				"cpsid i"
+				: "=&r" (cpsr));
 	}
 
 	xpcc::atomic::Lock::~Lock()
@@ -209,12 +207,10 @@ namespace xpcc
 	{
 		// disable interrupts -> PRIMASK=1
 		// enable interrupts -> PRIMASK=0
-		uint32_t mask = 0;
 		asm volatile (
 				"mrs %0, PRIMASK"	"\n\t"
-				"msr PRIMASK, %1"
-				: "=&r" (cpsr)
-				: "r" (mask));
+				"cpsie i"
+				: "=&r" (cpsr));
 	}
 
 	xpcc::atomic::Unlock::~Unlock()
