@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -38,18 +38,25 @@
 namespace xpcc
 {
 	/**
+	 * \brief	Delay ns nanoseconds
+	 * \ingroup	architecture
+	 */
+	void
+	delayNanoseconds(uint16_t ns);
+
+	/**
 	 * \brief	Delay us microseconds
 	 * \ingroup	architecture
 	 */
 	void
-	delayMicroseconds(uint32_t us);
-	
+	delayMicroseconds(uint16_t us);
+
 	/**
 	 * \brief	Delay ms milliseconds
 	 * \ingroup	architecture
 	 */
 	void
-	delayMilliseconds(uint32_t ms);
+	delayMilliseconds(uint16_t ms);
 }
 
 #else // !__DOXYGEN__
@@ -58,17 +65,23 @@ namespace xpcc
 #include <xpcc/architecture/utils.hpp>
 
 #if defined(XPCC__CPU_AVR)
-	
+
 	#include <util/delay.h>
-	
+
 	namespace xpcc
 	{
+		void ALWAYS_INLINE
+		delayNanoseconds(uint16_t /*ns*/)
+		{
+			_delay_us(1);
+		}
+
 		ALWAYS_INLINE void
 		delayMicroseconds(uint16_t us)
 		{
 			while(us--) _delay_us(1);
 		}
-		
+
 		ALWAYS_INLINE void
 		delayMilliseconds(uint16_t ms)
 		{
@@ -79,24 +92,30 @@ namespace xpcc
 #elif defined(XPCC__OS_UNIX) || defined(XPCC__OS_OSX)
 
 	#include <unistd.h>
-	
+
 	namespace xpcc
 	{
+		void ALWAYS_INLINE
+		delayNanoseconds(uint16_t /*ns*/)
+		{
+			usleep(1);
+		}
+
 		ALWAYS_INLINE void
-		delayMicroseconds(uint32_t us)
+		delayMicroseconds(uint16_t us)
 		{
 			usleep(us);
 		}
-		
+
 		ALWAYS_INLINE void
-		delayMilliseconds(uint32_t ms)
+		delayMilliseconds(uint16_t ms)
 		{
-			usleep(ms*1000);
+			usleep(uint32_t(ms)*1000);
 		}
 	}
-	
+
 #elif defined(XPCC__OS_WIN32)
-	
+
 	namespace xpcc
 	{
 		/*inline void
@@ -108,41 +127,68 @@ namespace xpcc
 			}
 			Sleep(ms);
 		}
-		
+
 		inline void
 		delay_ms(int ms)
 		{
 			Sleep(ms);
 		}*/
-		
+
+		inline void
+		delayNanoseconds(int)
+		{
+			// TODO
+		}
+
 		inline void
 		delayMicroseconds(int)
 		{
 			// TODO
 		}
-		
+
 		inline void
 		delayMilliseconds(int)
 		{
 			// TODO
 		}
 	}
-	
+
 #elif defined(XPCC__CPU_ARM)
-	
+
+	extern "C" void _delay_ns(uint32_t ns); // ~15 cycles slower, since not inlined
 	extern "C" void _delay_us(uint32_t us);
 	extern "C" void _delay_ms(uint32_t ms);
-	
+
 	namespace xpcc
 	{
-		static inline void
-		delayMicroseconds(uint32_t us)
+		namespace clock { extern uint16_t ATTRIBUTE_FASTDATA ns_cycle_pre; }
+
+		ALWAYS_INLINE void
+		delayNanoseconds(uint16_t ns)
+		{
+			asm volatile (
+				"muls.n	%2, %2, %1"         "\n\t"
+				"movs.n r0, %0"             "\n\t"
+			"1:"                            "\n\t"
+				"cmp.n	r0, %2"             "\n\t"
+				"ble.n	2f"                 "\n\t"
+				"subs.n	r0, r0, %1"         "\n\t"
+				"b.n	1b"                 "\n\t"
+			"2:"                            "\n\t"
+				: /* no output register */
+				: "r" (ns), "r" (clock::ns_cycle_pre), "r" (3)
+				: "r0"
+			);
+		}
+
+		ALWAYS_INLINE  void
+		delayMicroseconds(uint16_t us)
 		{
 			::_delay_us(us);
 		}
-		
-		static inline void
-		delayMilliseconds(uint32_t ms)
+
+		ALWAYS_INLINE void
+		delayMilliseconds(uint16_t ms)
 		{
 			::_delay_ms(ms);
 		}
