@@ -43,7 +43,7 @@ public:
 	static void
 	initialize()
 	{
-		delayTime = 250000 / baudrate;
+		delayTime = uint32_t(250000000) / baudrate;
 		if (delayTime == 0) delayTime = 1;
 
 		SCL::set();
@@ -112,13 +112,13 @@ private:
 	/// busy waits a **half** clock cycle
 	static ALWAYS_INLINE void
 	delay2()
-	{ xpcc::delayMicroseconds(delayTime*2); }
+	{ xpcc::delayNanoseconds(delayTime*2); }
 
 	// timings
 	/// busy waits **quarter** clock cycle
 	static ALWAYS_INLINE void
 	delay4()
-	{ xpcc::delayMicroseconds(delayTime); }
+	{ xpcc::delayNanoseconds(delayTime); }
 
 	enum
 	{

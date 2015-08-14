@@ -37,7 +37,7 @@ template< class SystemClock, uint32_t baudrate, uint16_t tolerance >
 void
 xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::initialize()
 {
-	delayTime = 500000 / baudrate;
+	delayTime = 500000000 / baudrate;
 	if (delayTime == 0) delayTime = 1;
 
 	SCK::reset();
@@ -189,5 +189,5 @@ template <typename SCK, typename MOSI, typename MISO>
 void ALWAYS_INLINE
 xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::delay()
 {
-	xpcc::delayMicroseconds(delayTime);
+	xpcc::delayNanoseconds(delayTime);
 }
