@@ -66,6 +66,11 @@ namespace xpcc
 			enable()
 			{
 				ClockTree::enablePll(Source, p::PllM, p::PllN, p::PllP, p::PllQ);
+				ClockTree::fcpu     = OutputFrequency;
+				ClockTree::fcpu_kHz = OutputFrequency / 1000;
+				ClockTree::fcpu_MHz = OutputFrequency / 1000000;
+				ClockTree::ns_cycle = std::round(1000000000.f / OutputFrequency);
+				ClockTree::ns_cycle_pre = std::round(1000000000.f / OutputFrequency * 5);
 				return StartupError::None;
 			}
 		};
@@ -107,6 +112,11 @@ namespace xpcc
 						p::PllMul);
 	%% endif
 
+				ClockTree::fcpu     = OutputFrequency;
+				ClockTree::fcpu_kHz = OutputFrequency / 1000;
+				ClockTree::fcpu_MHz = OutputFrequency / 1000000;
+				ClockTree::ns_cycle = std::round(1000000000.f / OutputFrequency);
+				ClockTree::ns_cycle_pre = std::round(1000000000.f / OutputFrequency * 5);
 				return StartupError::None;
 			}
 		};

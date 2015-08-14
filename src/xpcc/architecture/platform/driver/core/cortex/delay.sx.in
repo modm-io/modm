@@ -32,7 +32,38 @@
 	.syntax	unified
 	.align	4
 	.thumb
-	
+
+	/**
+	 * @brief	Dynamic delay loop (in nanoseconds resolution)
+	 *
+	 * The functions adapts its minimum delay for current clock rate,
+	 * deprecating reliance on the F_CPU macro and enabling clock switching
+	 * at runtime.
+	 *
+	 * Unfortunately, the setup cost varies anywhere from 19 cycles to 37
+	 * cycles, and its timing is not accurate when interrupted by an exception.
+	 *
+	 * @author  Niklas Hauser
+	 */
+	.global	_delay_ns
+	.type	_delay_ns, %function
+	.thumb_func
+	.func	_delay_ns
+_delay_ns:
+	ldr.n	r1, =ns_per_cycle	// 2 cycles
+	ldrh.n	r1, [r1, #0]		// 2 cycles
+	movs.n	r2, #6				// 1 cycles
+	muls.n	r2, r2, r1			// 1 cycles
+1:			// setup cycles is around 27 - 37, therefore multiply by 6 (5*6 => 30)
+	cmp.n	r0, r2				// 1 cycle
+	ble.n	2f					// 1 cycle (when not taken)
+	subs.n	r0, r0, r1			// 1 cycle
+	b.n		1b					// 2 cycles (when taken)
+2:			//  5 cycles for loop!
+	bx		lr
+	.size	_delay_ns, . - _delay_ns
+	.endfunc
+
 	// ------------------------------------------------------------------------
 	/**
 	 * @brief	Simple delay loop (in microseconds resolution)
