@@ -141,7 +141,7 @@ public:
 	 * XPCC Static Clock Standard Interface
 	 * requires source frequency in **kHz**
 	 */
-	static inline bool
+	static bool
 	enableSource(ClockSource src, uint32_t kHz, uint32_t waitCycles = 1500);
 
 %% if target is stm32f2 or target is stm32f4
@@ -174,11 +174,11 @@ public:
 	 * Example:
 	 *
 	 */
-	static inline void
+	static void
 	enablePll(PllSource source, uint8_t pllM,
 					uint16_t pllN, uint8_t pllP, uint8_t pllQ);
 %% else
-	static inline void
+	static void
 	enablePll(PllSource source,
 %% if usbprescaler is defined
 					UsbPrescaler usb,
@@ -192,7 +192,7 @@ public:
 	%% endif
 %% endif
 
-	static inline bool
+	static bool
 	switchSystemClockTo(SystemClockSource src, uint32_t waitCycles = 1500);
 
 %% if target is stm32f2 or target is stm32f4
@@ -244,7 +244,5 @@ public:
 }   // namespace stm32
 
 }   // namespace xpcc
-
-#include "clock_impl.hpp"
 
 #endif	//  XPCC_STM32_CLOCK_HPP
