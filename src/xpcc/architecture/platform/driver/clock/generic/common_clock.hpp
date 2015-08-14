@@ -11,6 +11,7 @@
 #define XPCC_COMMON_CLOCK_HPP
 
 #include <stdint.h>
+#include <xpcc/architecture/utils.hpp>
 
 namespace xpcc
 {
@@ -87,6 +88,11 @@ StartupError : uint8_t
 	Pll = 4,				// was not able to start the PLL
 	SystemClock = 5,		// was not able to switch system clock input
 };
+
+extern uint32_t ATTRIBUTE_FASTDATA fcpu;
+extern uint32_t ATTRIBUTE_FASTDATA fcpu_kHz;
+extern uint16_t ATTRIBUTE_FASTDATA fcpu_MHz;
+extern uint16_t ATTRIBUTE_FASTDATA ns_cycle_pre asm("ns_per_cycle");
 
 }	// namespace clock
 

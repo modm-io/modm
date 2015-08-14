@@ -10,13 +10,6 @@
 #include "../../../device.hpp"
 #include "clock.hpp"
 
-// TODO: Adapt this for internal clocks with MHz16
-uint32_t xpcc::stm32::ClockTree::fcpu(MHz8);
-uint32_t xpcc::stm32::ClockTree::fcpu_kHz(8000);
-uint16_t xpcc::stm32::ClockTree::fcpu_MHz(8);
-uint16_t xpcc::stm32::ClockTree::ns_cycle(125);
-uint16_t xpcc::stm32::ClockTree::ns_cycle_pre(125 * 8);
-
 // ----------------------------------------------------------------------------
 bool
 xpcc::stm32::ClockTree::enableSource(ClockSource src, uint32_t /*kHz*/, uint32_t waitCycles)

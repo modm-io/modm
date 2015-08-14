@@ -243,47 +243,20 @@ public:
 	static inline uint32_t
 	getCpuFrequency()
 	{
-		return fcpu;
+		return xpcc::clock::fcpu;
 	}
 
 	static inline uint32_t
 	getCpuFrequencykHz()
 	{
-		return fcpu_kHz;
+		return xpcc::clock::fcpu_kHz;
 	}
 
 	static inline uint32_t
 	getCpuFrequencyMHz()
 	{
-		return fcpu_MHz;
+		return xpcc::clock::fcpu_MHz;
 	}
-
-	static inline uint32_t
-	getNanosecondsPerCpuCycle()
-	{
-		return ns_cycle;
-	}
-
-	static inline uint32_t
-	getPrecomputedNanosecondsPerCpuCycle()
-	{
-		return ns_cycle_pre;
-	}
-
-private:
-	static uint32_t ATTRIBUTE_FASTDATA fcpu;
-	static uint32_t ATTRIBUTE_FASTDATA fcpu_kHz;
-	static uint16_t ATTRIBUTE_FASTDATA fcpu_MHz;
-	static uint16_t ATTRIBUTE_FASTDATA ns_cycle;
-	static uint16_t ATTRIBUTE_FASTDATA ns_cycle_pre    asm("ns_per_cycle");
-
-%% if target is stm32f2 or target is stm32f4
-	template<int InputFrequency, int OutputFrequency, int UsbFrequency, ClockTree::PllSource Source>
-	friend class PllSetup;
-%% elif target is stm32f1 or target is stm32f3
-	template<int InputFrequency, int OutputFrequency, ClockTree::PllSource Source>
-	friend class PllSetup;
-%% endif
 };
 
 }   // namespace stm32
