@@ -132,8 +132,11 @@ extern uint32_t __fastcode_load;
 extern uint32_t __fastcode_start;
 extern uint32_t __fastcode_end;
 
-extern uint32_t __vector_table_ram;
-extern uint32_t __vector_table_rom;
+extern uint32_t __vector_table_ram_load;
+extern uint32_t __vector_table_ram_start;
+extern uint32_t __vector_table_ram_end;
+
+extern uint32_t __vector_table_rom_start;
 
 extern uint32_t __fastdata_load;
 extern uint32_t __fastdata_start;
@@ -180,9 +183,22 @@ Reset_Handler(void)
 	{
 	}
 
+	uint32_t* src;
+	uint32_t* dest;
+
+%% if parameters.vector_table_in_ram
+	// copy vector table to RAM (.vectors)
+	src = &__vector_table_ram_load;
+	dest = &__vector_table_ram_start;
+	while (dest < &__vector_table_ram_end)
+	{
+		*(dest++) = *(src++);
+	}
+%% endif
+
 	// Copy functions to RAM (.fastcode)
-	uint32_t* src = &__fastcode_load;
-	uint32_t* dest = &__fastcode_start;
+	src = &__fastcode_load;
+	dest = &__fastcode_start;
 	while (dest < &__fastcode_end)
 	{
 		*(dest++) = *(src++);
@@ -222,9 +238,9 @@ Reset_Handler(void)
 	// Setup NVIC
 	// Set vector table
 	%% if parameters.vector_table_in_ram
-	SCB->VTOR = (uint32_t)(&__vector_table_ram);
+	SCB->VTOR = (uint32_t)(&__vector_table_ram_start);
 	%% else
-	SCB->VTOR = (uint32_t)(&__vector_table_rom);
+	SCB->VTOR = (uint32_t)(&__vector_table_rom_start);
 	%% endif
 
 	// Lower priority level for all peripheral interrupts to lowest possible
