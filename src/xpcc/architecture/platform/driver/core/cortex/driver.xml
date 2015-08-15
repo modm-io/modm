@@ -9,7 +9,7 @@
 		<parameter name="vector_table_in_ram" type="bool">false</parameter>
 		<parameter name="enable_hardfault_handler_log" type="bool">false</parameter>
 		<template>startup.c.in</template>
-		<static device-family="f1|f2|f3|f4|f7">delay_cycle.cpp</static>
+		<template device-family="f1|f2|f3|f4|f7">delay_cycle.cpp.in</template>
 		<template>delay.sx.in</template>
 		<template>syscalls.cpp.in</template>
 		<static>cxxabi.cpp</static>

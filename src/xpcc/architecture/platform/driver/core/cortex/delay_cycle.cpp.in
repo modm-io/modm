@@ -15,12 +15,18 @@ extern "C"
 
 #define DWT_CYCCNT      (*((__IO uint32_t *)0xE0001004))
 
+%% if target is stm32f1
+	%% set overhead = 20
+%% else
+	%% set overhead = 35
+%% endif
+
 void ATTRIBUTE_FASTCODE
 _delay_us(uint16_t us)
 {
 	uint32_t start = DWT_CYCCNT;
 	// prefer this for cores with fast hardware multiplication
-	int32_t delay = int32_t(xpcc::clock::fcpu_MHz) * us - 35;
+	int32_t delay = int32_t(xpcc::clock::fcpu_MHz) * us - {{ overhead }};
 
 	while (int32_t(DWT_CYCCNT - start) < delay)
 		;
@@ -32,7 +38,7 @@ _delay_ms(uint16_t ms)
 	if (!ms) return;
 
 	uint32_t start = DWT_CYCCNT;
-	int32_t delay = int32_t(xpcc::clock::fcpu_kHz) * ms - 35;
+	int32_t delay = int32_t(xpcc::clock::fcpu_kHz) * ms - {{ overhead }};
 
 	while (int32_t(DWT_CYCCNT - start) < delay)
 		;
