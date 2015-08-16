@@ -41,14 +41,6 @@
 #define FLASH_WAIT_STATE_5		0x5
 #define FLASH_WAIT_STATE_6		0x6
 #define FLASH_WAIT_STATE_7		0x7
-
-%%  if not target is stm32f0
-#define DEMCR_TRCENA    0x01000000
-#define DEMCR           (*((__IO uint32_t *)0xE000EDFC))
-#define DWT_CTRL        (*(__IO uint32_t *)0xe0001000)
-#define CYCCNTENA       (1<<0)
-#define DWT_CYCCNT      (*((__IO uint32_t *)0xE0001004))
-%% endif
 %#
 %% endmacro
 
@@ -68,15 +60,7 @@
 	SYSCFG->CFGR1 |= SYSCFG_CFGR1_USB_IT_RMP;
 %% endif
 
-%% if not target is stm32f0
-	// Enable DWT
-	DEMCR |= DEMCR_TRCENA;
-	DWT_CYCCNT = 0;
-	// Enable CPU cycle counter
-	DWT_CTRL |= CYCCNTENA;
-%% endif
-
-// TODO: check F_CPU to determine flash latency
+// TODO: Move this into SystemClock implementation
 %% if target is stm32f2
 	// prepare flash latency for working at 120MHz and supply voltage > 2.7
 	FLASH->ACR = (FLASH->ACR & ~FLASH_ACR_LATENCY) | FLASH_WAIT_STATE_3;
