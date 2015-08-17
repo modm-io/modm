@@ -52,11 +52,11 @@ import subprocess
 filter = re.compile('^(?P<section>[.]\w+)\s*(?P<size>\d+)\s*(?P<addr>\d+)$')
 
 # Sections which will remain in the Flash
-flashSectionNames = ['.reset', '.fastcode', '.text', '.rodata', '.data']
+flashSectionNames = ['.reset', '.fastcode', '.fastdata', '.text', '.rodata', '.data']
 
 # Sections which will be created in RAM or are copied from the Flash. In that
 # case the section will appear also in `flashSectionNames`.
-ramSectionNames = ['.vectors', '.fastcode', '.data', '.bss', '.noinit']
+ramSectionNames = ['.vectors', '.fastcode', '.fastdata', '.data', '.bss', '.noinit']
 
 def size_action(target, source, env):
 	cmd = [env['SIZE'], '-A', str(source[0])]

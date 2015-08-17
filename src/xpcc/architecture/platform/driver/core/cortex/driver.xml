@@ -9,7 +9,7 @@
 		<parameter name="vector_table_in_ram" type="bool">false</parameter>
 		<parameter name="enable_hardfault_handler_log" type="bool">false</parameter>
 		<template>startup.c.in</template>
-		<template>delay.sx.in</template>
+		<template>delay.cpp.in</template>
 		<template>syscalls.cpp.in</template>
 		<static>cxxabi.cpp</static>
 		<static>default_handler.sx</static>
@@ -18,5 +18,7 @@
 		<static>systick/systick_timer.cpp</static>
 		<template core="cortex-m3|cortex-m4|cortex-m4f|cortex-m7|cortex-m7f">hard_fault_handler.cpp.in</template>
 		<static core="cortex-m3|cortex-m4|cortex-m4f|cortex-m7|cortex-m7f">hard_fault.sx</static>
+
+		<noiccm device-family="f3" device-name="301|302|318|378|373">True</noiccm>
 	</driver>
 </rca>

@@ -65,11 +65,13 @@
  *  .fastdata     |     initialized variables       |
  *      |         |                                 | <------- __fastdata_start
  *      +-------> |---------------------------------| <------- __fastcode_end
- *      |         |     C/C++-Functions in RAM      |
- *      |         |    (e.g. Interrupt Handler)     |
- *  .fastcode     | ------------------------------- |
- *      |         |   Interrupt Vectors (.vectors)  |
- *      |         |        (if re-mapped)           | <------- __fastcode_start
+ *      |         |                                 |
+ *  .fastcode     |     C/C++-Functions in RAM      |
+ *      |         |                                 | <------- __fastcode_start
+ *      +-------> |---------------------------------| <------- __vector_table_ram_end
+ *      |         |                                 |
+ *  .vectors      |    Interrupt Vectors (in RAM)   |
+ *      |         |        (if re-mapped)           | <------- __vector_table_ram_start
  *      +-------> |---------------------------------| 0x1000 0000
  *
  *
@@ -110,16 +112,12 @@
  *      |         |         into CCM RAM            | <------- __fastcode_load
  *      +-------> |---------------------------------|
  *      |         |                                 |
- *   .reset       |        Interrupt Vectors        |
- *      |         |                                 |
+ *   .reset       |    Interrupt Vectors (in ROM)   | <------- __vector_table_ram_load
+ *      |         |       (copy of .vectors)        | <------- __vector_table_rom_start
  *      +-------> |---------------------------------| 0x0800 0000
  *
  * The first two words (32-bit) in the Flash defines the initial stack pointer
  * location and the reset handler location.
- *
- * Usage:
- *   Use __attribute__ ((long_call, section (".fastcode"))) to move functions
- *   into the RAM.
  */
 
 OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
@@ -144,28 +142,30 @@ SECTIONS
 {
 	.reset :
 	{
-		__vector_table_rom = .;					    /* address in ROM */
+		__vector_table_rom_start = .;					/* address in ROM */
 		/* Initial stack address, Reset and NMI handler */
 		KEEP(*(.reset))
 		. = ALIGN(4);
 	} >ROM
 
+	.vectors :  /* Vector table in RAM, only if remapped */
+	{
+		__vector_table_ram_load = LOADADDR (.vectors);		/* address in ROM */
+		__vector_table_ram_start = .;						/* address in RAM */
+
+		/* used for vectors remapped to RAM */
+        KEEP(*(.vectors))
+
+        . = ALIGN (4);
+        __vector_table_ram_end = .;
+	} >CCM AT>ROM
+
 	.fastcode :
 	{
 		__fastcode_load = LOADADDR (.fastcode);		/* address in ROM */
 		__fastcode_start = .;						/* address in RAM */
-		__vector_table_ram = .;					    /* address in RAM */
 
-		/* used for vectors remapped to RAM */
-        KEEP(*(.vectors))
 		KEEP(*(.fastcode))
-
-		/* These sections glue together ARM and Thumb code.
-		 * .glue_7 is used for ARM code calling Thumb code, and .glue_7t is
-		 * used for Thumb code calling ARM code.
-		 */
-		*(.glue_7t)
-		*(.glue_7)
 
 		. = ALIGN (4);
 		__fastcode_end = .;
@@ -220,13 +220,6 @@ SECTIONS
 		 */
 		*(.plt)
 		. = ALIGN(4);
-
-		/* These sections glue together ARM and Thumb code.
-		 * .glue_7 is used for ARM code calling Thumb code, and .glue_7t is
-		 * used for Thumb code calling ARM code.
-		 */
-		*(.glue_7t)
-		*(.glue_7)
 
 		/* .ARM.extab names a section that contains exception unwinding information */
 		*(.ARM.extab* .gnu.linkonce.armextab.*)

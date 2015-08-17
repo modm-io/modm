@@ -11,6 +11,7 @@
 #define XPCC_COMMON_CLOCK_HPP
 
 #include <stdint.h>
+#include <xpcc/architecture/utils.hpp>
 
 namespace xpcc
 {
@@ -59,7 +60,10 @@ enum Frequency
 	MHz100      =  100 * MHz1,
 	MHz120      =  120 * MHz1,
 	MHz168      =  168 * MHz1,
+	MHz180      =  180 * MHz1,
 	MHz192      =  192 * MHz1,
+	MHz200      =  200 * MHz1,
+	MHz216      =  216 * MHz1,
 	MHz432      =  432 * MHz1,
 };
 
@@ -87,6 +91,11 @@ StartupError : uint8_t
 	Pll = 4,				// was not able to start the PLL
 	SystemClock = 5,		// was not able to switch system clock input
 };
+
+extern uint32_t ATTRIBUTE_FASTDATA fcpu;
+extern uint32_t ATTRIBUTE_FASTDATA fcpu_kHz;
+extern uint16_t ATTRIBUTE_FASTDATA fcpu_MHz;
+extern uint16_t ATTRIBUTE_FASTDATA ns_per_loop asm("ns_per_loop");
 
 }	// namespace clock
 

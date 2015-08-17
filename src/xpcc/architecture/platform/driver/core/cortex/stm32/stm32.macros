@@ -41,7 +41,6 @@
 #define FLASH_WAIT_STATE_5		0x5
 #define FLASH_WAIT_STATE_6		0x6
 #define FLASH_WAIT_STATE_7		0x7
-
 %#
 %% endmacro
 
@@ -61,7 +60,7 @@
 	SYSCFG->CFGR1 |= SYSCFG_CFGR1_USB_IT_RMP;
 %% endif
 
-// TODO: check F_CPU to determine flash latency
+// TODO: Move this into SystemClock implementation
 %% if target is stm32f2
 	// prepare flash latency for working at 120MHz and supply voltage > 2.7
 	FLASH->ACR = (FLASH->ACR & ~FLASH_ACR_LATENCY) | FLASH_WAIT_STATE_3;

@@ -159,71 +159,52 @@ namespace xpcc
 		__asm__ volatile ("" ::: "memory");
 	}
 
-#elif defined(XPCC__CPU_ARM7TDMI)
-	
-	// These functions are defined in "interrupt.S"
-	extern "C" uint32_t _disable_interrupt(void);
-	extern "C" uint32_t _enable_interrupt(void);
-	extern "C" void _restore_interrupt(uint32_t cpsr);
-	
-	xpcc::atomic::Lock::Lock() :
-		cpsr(_disable_interrupt())
-	{
-	}
-	
-	xpcc::atomic::Lock::~Lock()
-	{
-		_restore_interrupt(cpsr);
-	}
-	
-	xpcc::atomic::Unlock::Unlock() :
-		cpsr(_enable_interrupt())
-	{
-	}
-	
-	xpcc::atomic::Unlock::~Unlock()
-	{
-		_restore_interrupt(cpsr);
-	}
-	
-#elif defined(XPCC__CPU_CORTEX_M0) || defined(XPCC__CPU_CORTEX_M3) || defined(XPCC__CPU_CORTEX_M4)
+#elif defined(XPCC__CPU_CORTEX_M0) || defined(XPCC__CPU_CORTEX_M3) || defined(XPCC__CPU_CORTEX_M4) || defined(XPCC__CPU_CORTEX_M7)
 
+	ALWAYS_INLINE
 	xpcc::atomic::Lock::Lock()
 	{
+		// cpsr = __get_PRIMASK();
+		// __disable_irq();
 		// disable interrupts -> PRIMASK=1
 		// enable interrupts -> PRIMASK=0
-		uint32_t mask = 1;
 		asm volatile (
 				"mrs %0, PRIMASK"	"\n\t"
-				"msr PRIMASK, %1"
+				"cpsid i"
 				: "=&r" (cpsr)
-				: "r" (mask));
+				:: "memory");
 	}
 
+	ALWAYS_INLINE
 	xpcc::atomic::Lock::~Lock()
 	{
-		asm volatile ("msr PRIMASK, %0" : : "r" (cpsr) );
-	}
-	
-	xpcc::atomic::Unlock::Unlock()
-	{
-		// disable interrupts -> PRIMASK=1
-		// enable interrupts -> PRIMASK=0
-		uint32_t mask = 0;
-		asm volatile (
-				"mrs %0, PRIMASK"	"\n\t"
-				"msr PRIMASK, %1"
-				: "=&r" (cpsr)
-				: "r" (mask));
+		// __set_PRIMASK(cpsr);
+		asm volatile ("msr PRIMASK, %0" : : "r" (cpsr) : "memory" );
 	}
 
+	ALWAYS_INLINE
+	xpcc::atomic::Unlock::Unlock()
+	{
+		// cpsr = __get_PRIMASK();
+		// __disable_irq();
+		// disable interrupts -> PRIMASK=1
+		// enable interrupts -> PRIMASK=0
+		asm volatile (
+				"mrs %0, PRIMASK"	"\n\t"
+				"cpsie i"
+				: "=&r" (cpsr)
+				:: "memory");
+	}
+
+	ALWAYS_INLINE
 	xpcc::atomic::Unlock::~Unlock()
 	{
-		asm volatile ("msr PRIMASK, %0" : : "r" (cpsr) );
+		// __set_PRIMASK(cpsr);
+		asm volatile ("msr PRIMASK, %0" : : "r" (cpsr) : "memory" );
 	}
 
 #elif defined(XPCC__OS_HOSTED)
-	
+
 	xpcc::atomic::Lock::Lock()
 	{
 	}
@@ -239,29 +220,6 @@ namespace xpcc
 	xpcc::atomic::Unlock::~Unlock()
 	{
 	}
-	
-#elif defined(XPCC__CPU_AVR32)
-	xpcc::atomic::Lock::Lock()
-	{
-#warning Implement xpcc::atomic::Lock::Lock()
-	}
-
-	xpcc::atomic::Lock::~Lock()
-	{
-#warning Implement xpcc::atomic::Lock::~Lock()
-	}
-
-	xpcc::atomic::Unlock::Unlock()
-	{
-#warning Implement xpcc::atomic::Unlock::Unlock()
-	}
-
-	xpcc::atomic::Unlock::~Unlock()
-	{
-#warning Implement xpcc::atomic::Unlock::~Unlock()
-	}
-
-
 #else
 #	error	"Please provide an atomic lock implementation for this target!"
 #endif

@@ -131,6 +131,23 @@ namespace xpcc
 				LPC_SYSCON->CLKOUTDIV = 0xff & static_cast<uint8_t>(div);
 			}
 
+			static inline uint32_t
+			getCpuFrequency()
+			{
+				return xpcc::clock::fcpu;
+			}
+
+			static inline uint32_t
+			getCpuFrequencykHz()
+			{
+				return xpcc::clock::fcpu_kHz;
+			}
+
+			static inline uint32_t
+			getCpuFrequencyMHz()
+			{
+				return xpcc::clock::fcpu_MHz;
+			}
 		};
 	}
 }
