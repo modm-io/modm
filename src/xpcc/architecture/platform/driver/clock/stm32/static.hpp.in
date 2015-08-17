@@ -71,7 +71,7 @@ namespace xpcc
 				xpcc::clock::fcpu     = OutputFrequency;
 				xpcc::clock::fcpu_kHz = OutputFrequency / 1000;
 				xpcc::clock::fcpu_MHz = OutputFrequency / 1000000;
-				xpcc::clock::ns_cycle_pre = std::round(1000000000.f / OutputFrequency * 3.f);
+				xpcc::clock::ns_per_loop = std::round(1000000000.f / OutputFrequency * 3.f);
 				return StartupError::None;
 			}
 		};
@@ -116,7 +116,7 @@ namespace xpcc
 				xpcc::clock::fcpu     = OutputFrequency;
 				xpcc::clock::fcpu_kHz = OutputFrequency / 1000;
 				xpcc::clock::fcpu_MHz = OutputFrequency / 1000000;
-				xpcc::clock::ns_cycle_pre = std::round(1000000000.f / OutputFrequency * 3.f);
+				xpcc::clock::ns_per_loop = std::round(1000000000.f / OutputFrequency * 3.f);
 				return StartupError::None;
 			}
 		};
