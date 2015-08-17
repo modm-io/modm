@@ -16,9 +16,9 @@
 	%% set overhead = 29
 %% else
 	%% if target is stm32f4
-		%% set overhead = 29
+		%% set overhead = 25
 	%% elif target is stm32f1
-		%% set overhead = 18
+		%% set overhead = 12
 	%% else
 		%% set overhead = 30
 	%% endif
@@ -33,6 +33,7 @@ _delay_ns(uint16_t ns)
 {
 	// ns_per_loop = nanoseconds per cycle times cycles per loop ({{loop}} cycles)
 	asm volatile (
+		".syntax unified"       "\n\t"
 		"muls.n	%2, %2, %1"     "\n\t"  // multiply the overhead cycles with the ns per cycle:  1-2 cycles on cm3, up to 32 cycles on cm0
 		"subs.n	%0, %0, %2"     "\n\t"  // subtract the overhead in ns from the input:          1 cycle
 	"1:  subs.n	%0, %0, %1"     "\n\t"  // subtract the ns per loop from the input:             1 cycle
@@ -49,6 +50,7 @@ _delay_us(uint16_t us)
 
 %% if target is cortex_m0
 	asm volatile (
+		".syntax unified"       "\n\t"
 		"muls.n	%0, %0, %1"     "\n\t"  // get number of cycles by us * fcpu_MHz:               1-2 cycles on cm3, up to 32 cycles on cm0
 	"1:  subs.n	%0, %0, #{{loop}}"     "\n\t"  // subtract the loop cycles from the input:             1 cycle
 		"bpl.n	1b"             "\n\t"  // keep doing that while result is still positive:      2 cycles (when taken)
@@ -71,6 +73,7 @@ _delay_ms(uint16_t ms)
 
 %% if target is cortex_m0
 	asm volatile (
+		".syntax unified"       "\n\t"
 		"muls.n	%0, %0, %1"     "\n\t"  // get number of cycles by ms * fcpu_kHz:               1-2 cycles on cm3, up to 32 cycles on cm0
 	"1:  subs.n	%0, %0, #{{loop}}"     "\n\t"  // subtract the loop cycles from the input:             1 cycle
 		"bpl.n	1b"             "\n\t"  // keep doing that while result is still positive:      2 cycles (when taken)

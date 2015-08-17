@@ -161,6 +161,7 @@ namespace xpcc
 
 	namespace xpcc
 	{
+		/// @warning    There is little to no timing guarantee with this method!
 		ALWAYS_INLINE void
 		delayNanoseconds(uint16_t ns)
 		{
