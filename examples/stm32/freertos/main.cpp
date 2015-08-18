@@ -143,6 +143,7 @@ main(void)
 	// Switch to the external clock and enable the PLL to let
 	// the STM32 run at 168 MHz.
 	defaultSystemClock::enable();
+	xpcc::cortex::SysTickTimer::initialize<defaultSystemClock>();
 
 	LedStat::setOutput(xpcc::Gpio::High);
 	Led1::setOutput(xpcc::Gpio::Low);
