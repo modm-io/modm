@@ -50,6 +50,8 @@ public:
 	initialize()
 	{
 %% if parameters.free_rtos_support
+		static_assert({{ parameters.free_rtos_frequency }} % 1000 == 0,
+				"FreeRTOS switching frequency must be a multiple of 1000Hz!");
 		constexpr float desired = float(SystemClock::Frequency) / {{ parameters.free_rtos_frequency }};
 %% else
 		constexpr float desired = float(SystemClock::Frequency) / 1000;
