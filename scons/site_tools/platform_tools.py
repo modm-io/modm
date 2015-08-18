@@ -257,8 +257,8 @@ def test_item(dic, item_key, item_value, starts_with=False):
 def filter_get_ports(gpios):
 	"""
 	This filter accepts a list of gpios as e.g. used by the stm32af driver
-	and tried to extract information about port which is returned as a list
-	of dictionaries with the following strcture:
+	and tries to extract information about port which is returned as a list
+	of dictionaries with the following structure:
 	{'name': "C", 'startPin': 0, 'width': 16}
 	"""
 	# collect information on available gpios
@@ -282,6 +282,26 @@ def filter_get_ports(gpios):
 			port['width'] = ii - port['startPin']
 			ports.append(port)
 	return ports
+
+# -----------------------------------------------------------------------------
+def filter_get_adcs(gpios):
+	"""
+	This filter accepts a list of gpios as e.g. used by the stm32af driver
+	and tries to extract information about what ADC modules are references
+	which is returned as a list of instances
+	['0', '1']
+	"""
+	# collect information on available gpios
+	adcs = []
+	for gpio in gpios:
+		if 'afs' in gpio:
+			for af in gpio['afs']:
+				if 'type' in af and af['type'] == "analog" and af['peripheral'] not in adcs:
+					adcs.append(af['peripheral'])
+
+	adcs = [i[3] for i in adcs]
+
+	return adcs
 
 # -----------------------------------------------------------------------------
 def filter_letter_to_num(letter):
@@ -308,6 +328,7 @@ def generate(env, **kw):
 	# Add Filter for Gpio Drivers to Template Engine
 	env.AddTemplateJinja2Filter('getPorts',    filter_get_ports)
 	env.AddTemplateJinja2Filter('letterToNum', filter_letter_to_num)
+	env.AddTemplateJinja2Filter('getAdcs', filter_get_adcs)
 
 	########## Add Template Tests #############################################
 	# Generaic Tests (they accept a string)

@@ -14,6 +14,16 @@
 #include <xpcc/architecture/interface/gpio.hpp>
 #include <xpcc/architecture/interface/i2c.hpp>
 
+%% for instance in gpios | getAdcs
+	%% if target is stm32f1
+#include "../../adc/stm32f1/adc_{{instance}}.hpp"
+	%% elif target is stm32f3
+#include "../../adc/stm32f3/adc_{{instance}}.hpp"
+	%% else
+#include "../../adc/stm32/adc_{{instance}}.hpp"
+	%% endif
+%% endfor
+
 extern void xpcc_gpio_enable(void);
 
 /**
