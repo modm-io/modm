@@ -29,10 +29,7 @@ class SysTickTimer
 {
 public:
 	/**
-	 * Enables the SysTick Timer to generate periodic events.
-	 *
-	 * @param	reload
-	 * 		Reload value to generate a 1000 Hz interrupt rate.
+	 * Initializes the SysTick Timer to generate periodic events.
 	 *
 	 *
 	 * @warning	The SysTick Timer is used by default to increment
@@ -40,13 +37,24 @@ public:
 	 * 			similar processing classes.
 	 * 			You must not increment the xpcc::Clock
 	 * 			additionally somewhere else.
+	 *
+	 * @tparam	SystemClock
+	 * 		the currently active system clock
+	 * @tparam	rate
+	 * 		the desired update rate of the xpcc::Clock
+	 * @tparam	tolerance
+	 * 		the allowed absolute tolerance for the resulting clock rate
 	 */
 	template< class SystemClock, uint16_t rate = 1000,
 			uint16_t tolerance = xpcc::Tolerance::ZeroPercent >
 	static void
 	initialize()
 	{
+%% if parameters.free_rtos_support
+		constexpr float desired = float(SystemClock::Frequency) / {{ parameters.free_rtos_frequency }};
+%% else
 		constexpr float desired = float(SystemClock::Frequency) / rate;
+%% endif
 
 		// calculate the possible rates above and below the requested rate
 		constexpr uint32_t rate_lower = SystemClock::Frequency / std::ceil(desired);
@@ -61,10 +69,17 @@ public:
 		constexpr uint32_t generated_rate = SystemClock::Frequency / reload;
 		Peripheral::assertBaudrateInTolerance<
 				/* nearest possible value */ generated_rate,
+%% if parameters.free_rtos_support
+				/* desired = */ {{ parameters.free_rtos_frequency }},
+%% else
 				/* desired = */ rate,
+%% endif
 				tolerance >();
-
+%% if parameters.free_rtos_support
+		enable(reload - 1, rate);
+%% else
 		enable(reload - 1);
+%% endif
 	}
 
 	/**
@@ -93,7 +108,11 @@ public:
 
 private:
 	static void
+%% if parameters.free_rtos_support
+	enable(uint32_t reload, uint16_t rate);
+%% else
 	enable(uint32_t reload);
+%% endif
 };
 
 }

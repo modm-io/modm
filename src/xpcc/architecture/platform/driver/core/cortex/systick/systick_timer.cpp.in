@@ -15,18 +15,39 @@
 #include "systick_timer.hpp"
 
 static xpcc::cortex::InterruptHandler sysTickHandler(nullptr);
+%% if parameters.free_rtos_support
+static uint16_t counter(1);
+static uint16_t counterReload(1);
+%% endif
 
 extern "C" void
 SysTick_Handler(void)
 {
+%% if parameters.free_rtos_support
+	if (--counter == 0)
+	{
+		xpcc::Clock::increment();
+		counter = counterReload;
+	}
+%% else
 	xpcc::Clock::increment();
+%% endif
 	if (sysTickHandler) sysTickHandler();
 }
 
 // ----------------------------------------------------------------------------
 void
+%% if parameters.free_rtos_support
+xpcc::cortex::SysTickTimer::enable(uint32_t reload, uint16_t rate)
+%% else
 xpcc::cortex::SysTickTimer::enable(uint32_t reload)
+%% endif
 {
+%% if parameters.free_rtos_support
+	counterReload = {{ parameters.free_rtos_frequency }} / rate;
+	counter = counterReload;
+%% endif
+
 	SysTick->LOAD = reload;
 	// Lower systick interrupt priority to lowest level
 	NVIC_SetPriority(SysTick_IRQn, 0xf);
