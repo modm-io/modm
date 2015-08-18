@@ -16,7 +16,7 @@ int
 main(void)
 {
 	defaultSystemClock::enable();
-	SysTickTimer::enable();		// will generate one interrupt every millisecond
+	SysTickTimer::initialize<defaultSystemClock>();
 
 	// Set LED port pin to output
 	Led::setOutput();

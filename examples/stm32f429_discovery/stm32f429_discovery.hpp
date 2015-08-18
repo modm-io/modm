@@ -154,7 +154,7 @@ inline void
 initialize()
 {
 	systemClock::enable();
-	xpcc::cortex::SysTickTimer::enable();
+	xpcc::cortex::SysTickTimer::initialize<systemClock>();
 
 	LedGreen::setOutput(xpcc::Gpio::Low);
 	LedRed::setOutput(xpcc::Gpio::Low);
