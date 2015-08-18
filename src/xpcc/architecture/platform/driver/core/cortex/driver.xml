@@ -10,7 +10,7 @@
 		<parameter name="enable_hardfault_handler_log" type="bool">false</parameter>
 
 		<parameter name="free_rtos_support" type="bool">false</parameter>
-		<parameter name="free_rtos_frequency" type="int">1000</parameter>
+		<parameter name="free_rtos_frequency" type="int" min="1000" max="10000">1000</parameter>
 
 		<template>startup.c.in</template>
 		<template>delay.cpp.in</template>

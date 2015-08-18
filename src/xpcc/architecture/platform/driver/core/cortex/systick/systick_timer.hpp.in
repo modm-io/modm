@@ -45,15 +45,14 @@ public:
 	 * @tparam	tolerance
 	 * 		the allowed absolute tolerance for the resulting clock rate
 	 */
-	template< class SystemClock, uint16_t rate = 1000,
-			uint16_t tolerance = xpcc::Tolerance::ZeroPercent >
+	template< class SystemClock, uint16_t tolerance = xpcc::Tolerance::ZeroPercent >
 	static void
 	initialize()
 	{
 %% if parameters.free_rtos_support
 		constexpr float desired = float(SystemClock::Frequency) / {{ parameters.free_rtos_frequency }};
 %% else
-		constexpr float desired = float(SystemClock::Frequency) / rate;
+		constexpr float desired = float(SystemClock::Frequency) / 1000;
 %% endif
 
 		// calculate the possible rates above and below the requested rate
@@ -63,7 +62,7 @@ public:
 		// calculate the half-point between the upper and lower rate
 		constexpr uint32_t rate_middle = (rate_upper + rate_lower) / 2;
 		// decide which reload value is closer to a possible rate
-		constexpr uint32_t reload = (rate < rate_middle) ? std::ceil(desired) : std::floor(desired);
+		constexpr uint32_t reload = (1000 < rate_middle) ? std::ceil(desired) : std::floor(desired);
 
 		// check if within rate tolerance
 		constexpr uint32_t generated_rate = SystemClock::Frequency / reload;
@@ -72,14 +71,11 @@ public:
 %% if parameters.free_rtos_support
 				/* desired = */ {{ parameters.free_rtos_frequency }},
 %% else
-				/* desired = */ rate,
+				/* desired = */ 1000,
 %% endif
 				tolerance >();
-%% if parameters.free_rtos_support
-		enable(reload - 1, rate);
-%% else
+
 		enable(reload - 1);
-%% endif
 	}
 
 	/**
@@ -108,11 +104,7 @@ public:
 
 private:
 	static void
-%% if parameters.free_rtos_support
-	enable(uint32_t reload, uint16_t rate);
-%% else
 	enable(uint32_t reload);
-%% endif
 };
 
 }

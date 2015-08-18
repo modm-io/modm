@@ -1,5 +1,5 @@
 // coding: utf-8
-/* Copyright (c) 2011-2013, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
 * All Rights Reserved.
 *
 * The file is part of the xpcc library and is released under the 3-clause BSD
@@ -37,14 +37,10 @@ SysTick_Handler(void)
 
 // ----------------------------------------------------------------------------
 void
-%% if parameters.free_rtos_support
-xpcc::cortex::SysTickTimer::enable(uint32_t reload, uint16_t rate)
-%% else
 xpcc::cortex::SysTickTimer::enable(uint32_t reload)
-%% endif
 {
 %% if parameters.free_rtos_support
-	counterReload = {{ parameters.free_rtos_frequency }} / rate;
+	counterReload = {{ parameters.free_rtos_frequency }} / 1000;
 	counter = counterReload;
 %% endif
 
