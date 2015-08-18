@@ -89,7 +89,7 @@ inline void
 initialize()
 {
 	systemClock::enable();
-	xpcc::cortex::SysTickTimer::enable();
+	xpcc::cortex::SysTickTimer::initialize<systemClock>();
 
 	LedNorth::setOutput(xpcc::Gpio::Low);
 	LedNorthEast::setOutput(xpcc::Gpio::Low);

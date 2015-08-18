@@ -8,6 +8,7 @@
 		<parameter name="enable_gpio" type="bool">true</parameter>
 		<parameter name="vector_table_in_ram" type="bool">false</parameter>
 
+
 		<parameter name="enable_hardfault_handler_log" type="bool">false</parameter>
 		<parameter name="hardfault_handler_uart" type="int" min="1" max="8">1</parameter>
 
@@ -15,14 +16,21 @@
 		<parameter name="hardfault_handler_led_port" type="enum" values="A;B;C;D;E;F;G;H;I;J;K">A</parameter>
 		<parameter name="hardfault_handler_led_pin" type="int" min="0" max="15">0</parameter>
 
+
+		<parameter name="free_rtos_support" type="bool">false</parameter>
+		<parameter name="free_rtos_frequency" type="int" min="1000" max="10000">1000</parameter>
+
+
 		<template>startup.c.in</template>
 		<template>delay.cpp.in</template>
 		<template>syscalls.cpp.in</template>
 		<static>cxxabi.cpp</static>
 		<static>default_handler.sx</static>
+
 		<!-- Systick Timer -->
-		<static>systick/systick_timer.hpp</static>
-		<static>systick/systick_timer.cpp</static>
+		<template>systick/systick_timer.hpp.in</template>
+		<template>systick/systick_timer.cpp.in</template>
+		<!-- Systick Timer -->
 		<template core="cortex-m3|cortex-m4|cortex-m4f|cortex-m7|cortex-m7f">hard_fault_handler.cpp.in</template>
 		<static core="cortex-m3|cortex-m4|cortex-m4f|cortex-m7|cortex-m7f">hard_fault.sx</static>
 
