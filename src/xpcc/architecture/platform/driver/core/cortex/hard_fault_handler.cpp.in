@@ -33,6 +33,38 @@
 #include "../../../device.hpp"
 #include <xpcc/debug/logger.hpp>
 #include <xpcc_config.hpp>
+#include "../../clock/generic/common_clock.hpp"
+#include "../../gpio/stm32/gpio.hpp"
+
+
+%% if parameters.enable_hardfault_handler_log
+	%% set id = parameters.hardfault_handler_uart
+
+	%% if id in [1, 2, 3, 6]
+		%%	set uart = "Usart"
+	%% elif id in [4, 5, 7, 8]
+		%%	set uart = "Uart"
+	%% endif
+
+#include "../../uart/stm32/{{ uart | lower }}_{{ id }}.hpp"
+#include "../../uart/stm32/{{ uart | lower }}_hal_{{ id }}.hpp"
+
+extern "C" void {{ uart | upper ~ id }}_IRQHandler(void);
+
+// since the hard fault handler cannot be preempted by any other handler or IRQ
+// we have to manually call it here. Not pretty, but it works.
+extern "C"
+void flushUart()
+{
+	while(not xpcc::stm32::{{ uart ~ id }}::isWriteFinished())
+	{
+		if (xpcc::stm32::{{ uart }}Hal{{ id }}::isTransmitRegisterEmpty())
+		{
+			{{ uart | upper ~ id }}_IRQHandler();
+		}
+	}
+}
+%% endif
 
 // ----------------------------------------------------------------------------
 extern "C"
@@ -59,25 +91,39 @@ _hardFaultHandler(const uint32_t * ctx)
 	uint32_t dfsr = (*((volatile uint32_t *)(0xE000ED30)));
 	uint32_t afsr = (*((volatile uint32_t *)(0xE000ED3C)));
 
-	XPCC_LOG_ERROR.printf("\n\nHard fault Exception:\n");
-	XPCC_LOG_ERROR.printf("r0 : 0x%08lx   r12 : 0x%08lx\n", stacked_r0, stacked_r12);
-	XPCC_LOG_ERROR.printf("r1 : 0x%08lx   lr  : 0x%08lx\n", stacked_r1, stacked_lr);
-	XPCC_LOG_ERROR.printf("r2 : 0x%08lx   pc  : 0x%08lx\n", stacked_r2, stacked_pc);
-	XPCC_LOG_ERROR.printf("r3 : 0x%08lx   psr : 0x%08lx\n", stacked_r3, stacked_psr);
-	XPCC_LOG_ERROR.printf("BFAR  : 0x%08lx\n", bfar);
-	XPCC_LOG_ERROR.printf("CFSR  : 0x%08lx\n", cfsr);
-	XPCC_LOG_ERROR.printf("HFSR  : 0x%08lx\n", hfsr);
-	XPCC_LOG_ERROR.printf("DFSR  : 0x%08lx\n", dfsr);
-	XPCC_LOG_ERROR.printf("AFSR  : 0x%08lx\n", afsr);
-	XPCC_LOG_ERROR.printf("SHCSR : 0x%08lx\n", SCB->SHCSR);
+	xpcc::stm32::{{ uart ~ id }}::discardTransmitBuffer();
+
+	XPCC_LOG_ERROR.printf("\n\nHard fault Exception:\n"); flushUart();
+	XPCC_LOG_ERROR.printf("r0 : 0x%08lx   r12 : 0x%08lx\n", stacked_r0, stacked_r12); flushUart();
+	XPCC_LOG_ERROR.printf("r1 : 0x%08lx   lr  : 0x%08lx\n", stacked_r1, stacked_lr); flushUart();
+	XPCC_LOG_ERROR.printf("r2 : 0x%08lx   pc  : 0x%08lx\n", stacked_r2, stacked_pc); flushUart();
+	XPCC_LOG_ERROR.printf("r3 : 0x%08lx   psr : 0x%08lx\n", stacked_r3, stacked_psr); flushUart();
+	XPCC_LOG_ERROR.printf("BFAR  : 0x%08lx\n", bfar); flushUart();
+	XPCC_LOG_ERROR.printf("CFSR  : 0x%08lx\n", cfsr); flushUart();
+	XPCC_LOG_ERROR.printf("HFSR  : 0x%08lx\n", hfsr); flushUart();
+	XPCC_LOG_ERROR.printf("DFSR  : 0x%08lx\n", dfsr); flushUart();
+	XPCC_LOG_ERROR.printf("AFSR  : 0x%08lx\n", afsr); flushUart();
+	XPCC_LOG_ERROR.printf("SHCSR : 0x%08lx\n", SCB->SHCSR); flushUart();
 
 %% else
 	(void) ctx;	// avoid warning
 %% endif
 
 	// Infinite loop
+%% if parameters.enable_hardfault_handler_led
+	uint32_t counter = 1;
+	xpcc::stm32::Gpio{{ parameters.hardfault_handler_led_port }}{{ parameters.hardfault_handler_led_pin }}::setOutput();
+	while(1)
+	{
+		while(--counter) ;
+		counter = xpcc::clock::fcpu / 10;
+
+		xpcc::stm32::Gpio{{ parameters.hardfault_handler_led_port }}{{ parameters.hardfault_handler_led_pin }}::toggle();
+	}
+%% else
 	while (1)
 	{
 	}
+%% endif
 }
 

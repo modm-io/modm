@@ -7,7 +7,14 @@
 		</parameter>
 		<parameter name="enable_gpio" type="bool">true</parameter>
 		<parameter name="vector_table_in_ram" type="bool">false</parameter>
+
 		<parameter name="enable_hardfault_handler_log" type="bool">false</parameter>
+		<parameter name="hardfault_handler_uart" type="int" min="1" max="8">1</parameter>
+
+		<parameter name="enable_hardfault_handler_led" type="bool">false</parameter>
+		<parameter name="hardfault_handler_led_port" type="enum" values="A;B;C;D;E;F;G;H;I;J;K">A</parameter>
+		<parameter name="hardfault_handler_led_pin" type="int" min="0" max="15">0</parameter>
+
 		<template>startup.c.in</template>
 		<template>delay.cpp.in</template>
 		<template>syscalls.cpp.in</template>
