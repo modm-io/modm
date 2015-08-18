@@ -34,8 +34,12 @@
 #include <xpcc/debug/logger.hpp>
 #include <xpcc_config.hpp>
 #include "../../clock/generic/common_clock.hpp"
-#include "../../gpio/stm32/gpio.hpp"
 
+%% if target is stm32f1
+#include "../../gpio/stm32f1/gpio.hpp"
+%% else
+#include "../../gpio/stm32/gpio.hpp"
+%% endif
 
 %% if parameters.enable_hardfault_handler_log
 	%% set id = parameters.hardfault_handler_uart
