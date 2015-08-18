@@ -159,8 +159,8 @@ private:
 {{ assertFrequency(s.name, "OutputFrequency", "min", s.minFrequency) }}
 {{ assertFrequency(s.name, "OutputFrequency", "max", s.maxFrequency) }}
 %#		FIXME: make optional in order for sink to be more generic
-	static_assert(OutputFrequency == F_CPU,
-	"OutputFrequency needs to match F_CPU value from project.cfg");
+	// static_assert(OutputFrequency == F_CPU,
+	// "OutputFrequency needs to match F_CPU value from project.cfg");
 public:
 	/// TypeId to connect an Output to {{ s.name }}
 	static const ::{{type_id_namespace}}::TypeId::{{ s.name }} Id;
