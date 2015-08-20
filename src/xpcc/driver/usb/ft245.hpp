@@ -64,7 +64,7 @@ namespace xpcc
 	public:
 		/// Write a single byte to the FIFO
 		/// \param	data	Single byte to write
-		static void
+		static bool
 		write(uint8_t data);
 
 		/**

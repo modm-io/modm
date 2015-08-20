@@ -77,7 +77,7 @@ xpcc::Ft245<PORT, RD, WR, RXF, TXE>::read(uint8_t *buffer, uint8_t n)
 
 // ----------------------------------------------------------------------------
 template <typename PORT, typename RD, typename WR, typename RXF, typename TXE>
-void
+bool
 xpcc::Ft245<PORT, RD, WR, RXF, TXE>::write(uint8_t c)
 {
 	// When TXE is high do not write data into the FIFO
@@ -89,6 +89,8 @@ xpcc::Ft245<PORT, RD, WR, RXF, TXE>::write(uint8_t c)
 	port.write(c);
 	wr.reset();
 	port.setInput();
+
+	return true;
 }
 
 // ----------------------------------------------------------------------------
