@@ -22,6 +22,7 @@
 
 #include <xpcc/architecture/platform.hpp>
 #include <xpcc/driver/usb/ft245.hpp>
+#include <xpcc/debug/logger.hpp>
 
 using namespace xpcc::at90;
 
@@ -54,7 +55,20 @@ typedef GpioOutputG0  WrInverted;
 typedef xpcc::GpioInverted<WrInverted> Wr;
 
 
-typedef xpcc::Ft245<myPort, Rd, Wr, Rxf, Txe> myFt;
+typedef xpcc::Ft245<myPort, Rd, Wr, Rxf, Txe> MyFt;
+MyFt myFt;
+
+xpcc::IODeviceWrapper< MyFt, xpcc::IOBuffer::BlockIfFull > loggerDevice(myFt);
+
+// Set all four logger streams to use the UART
+xpcc::log::Logger xpcc::log::debug(loggerDevice);
+xpcc::log::Logger xpcc::log::info(loggerDevice);
+xpcc::log::Logger xpcc::log::warning(loggerDevice);
+xpcc::log::Logger xpcc::log::error(loggerDevice);
+
+// Set the log level
+#undef	XPCC_LOG_LEVEL
+#define	XPCC_LOG_LEVEL xpcc::log::DEBUG
 
 
 MAIN_FUNCTION
@@ -83,6 +97,12 @@ MAIN_FUNCTION
 	Rd::setOutput(xpcc::Gpio::High);
 	WrInverted::setOutput(xpcc::Gpio::Low);
 
+	XPCC_LOG_DEBUG   << "debug"   << xpcc::endl;
+	XPCC_LOG_INFO    << "info"    << xpcc::endl;
+	XPCC_LOG_WARNING << "warning" << xpcc::endl;
+	XPCC_LOG_ERROR   << "error"   << xpcc::endl;
+
+	uint16_t counter = 0;
 
 	while (1)
 	{
@@ -95,12 +115,13 @@ MAIN_FUNCTION
 		Led4Low::toggle();
 		Led4High::toggle();
 
+		XPCC_LOG_DEBUG << "This is debugging " << counter++ << xpcc::endl;
+
 		uint8_t c;
-		if (myFt::read(c)) {
+		if (MyFt::read(c)) {
 			Led5Low::toggle();
 			Led5High::toggle();
-			myFt::write(c);
+			XPCC_LOG_DEBUG << "Received '" << c << "'" << xpcc::endl;
 		}
-
 	}
 }
