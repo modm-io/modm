@@ -21,8 +21,9 @@ namespace can
 xpcc::IOStream&
 operator << (xpcc::IOStream& s, const xpcc::can::Message m)
 {
-    s.printf("id = %04x, len = %2d, flags = %c%c, data = ",
-             m.identifier, m.length,
+    s.printf("id = %04x, len = ", m.identifier);
+    s << m.length;
+    s.printf(", flags = %c%c, data = ",
              m.flags.rtr ? 'R' : 'r',
              m.flags.extended ? 'E' : 'e');
     for (uint_fast8_t ii = 0; ii < m.length; ++ii) {
