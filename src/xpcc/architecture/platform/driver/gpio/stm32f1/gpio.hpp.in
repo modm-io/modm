@@ -441,6 +441,7 @@ class GpioPortBase<Gpio::Port::{{port.name}}, StartPin, Width> : public Gpio
 	static constexpr uint32_t port0010L = 0x22222222 & configMaskL;
 	static constexpr uint32_t port0100L = 0x44444444 & configMaskL;
 	static constexpr uint32_t port1000L = 0x88888888 & configMaskL;
+
 	static constexpr uint32_t port0001H = 0x11111111 & configMaskH;
 	static constexpr uint32_t port0010H = 0x22222222 & configMaskH;
 	static constexpr uint32_t port0100H = 0x44444444 & configMaskH;
@@ -452,7 +453,7 @@ public:
 public:
 	ALWAYS_INLINE static void setOutput() {
 		GPIO{{port.name}}->CRH = (GPIO{{port.name}}->CRH & ~configMaskH) | port0001H | port0010H;
-		GPIO{{port.name}}->CRL = (GPIO{{port.name}}->CRL & ~configMaskL) | port0001L | port0010H;
+		GPIO{{port.name}}->CRL = (GPIO{{port.name}}->CRL & ~configMaskL) | port0001L | port0010L;
 	}
 	ALWAYS_INLINE static void setInput() {
 		GPIO{{port.name}}->CRH = (GPIO{{port.name}}->CRH & ~configMaskH) | port0100H;
