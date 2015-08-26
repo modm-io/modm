@@ -132,12 +132,16 @@
  */
 
 /* To debug the internal state of the driver, you can instantiate a
- * xpcc::IOStream, which will then be used to dump state data of the operations
- * via the serial port.
+ * xpcc::IOStream in your main souce file, which will then be used to dump
+ * state data of the operations via the serial port, e.g.
+ *   #include <xpcc/io/iostream.hpp>
+ *   xpcc::IODeviceWrapper< Uart5, * xpcc::IOBuffer::BlockIfFull > device;
+ *   xpcc::IOStream stream(device);
+
  * Be advised, that a typical I2C read/write operation can take 10 to 100 longer
  * because the strings have to be copied during the interrupt!
  *
- * You can enable serial debugging with this define.
+ * You can enable serial debugging with this define by changing 0 to 1.
  */
 #define SERIAL_DEBUGGING 0
 
@@ -146,7 +150,7 @@
 	typedef xpcc::stm32::Uart5 DebugUart;
 #	include <xpcc/io/iostream.hpp>
 	extern xpcc::IOStream stream;
-#	define DEBUG_STREAM(x) //stream << x << "\n"
+#	define DEBUG_STREAM(x) stream << x << "\n"
 #	define DEBUG(x) xpcc::stm32::Uart5::write(x)
 #else
 #	define DEBUG_STREAM(x)
