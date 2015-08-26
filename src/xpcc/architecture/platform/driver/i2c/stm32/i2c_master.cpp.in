@@ -142,7 +142,7 @@
 #define SERIAL_DEBUGGING 0
 
 #if SERIAL_DEBUGGING
-#	include "../uart/uart_5.hpp"
+#	include "../../uart/stm32/uart_5.hpp"
 	typedef xpcc::stm32::Uart5 DebugUart;
 #	include <xpcc/io/iostream.hpp>
 	extern xpcc::IOStream stream;
