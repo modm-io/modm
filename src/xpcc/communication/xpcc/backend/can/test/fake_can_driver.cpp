@@ -38,7 +38,7 @@ FakeCanDriver::FakeCanDriver() :
 bool
 FakeCanDriver::isMessageAvailable()
 {
-	return !receiveList.isEmpty();
+	return (not receiveList.isEmpty());
 }
 
 bool
