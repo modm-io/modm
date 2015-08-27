@@ -122,6 +122,9 @@ public:
 	static inline bool
 	isBusy();
 
+	static inline bool
+	writeCGRAM(uint8_t character, uint8_t *cg);
+
 protected:
 	/// unconditionally write data to the controller
 	static ALWAYS_INLINE void

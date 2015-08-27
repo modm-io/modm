@@ -163,6 +163,19 @@ xpcc::Hd44780Base<DATA, RW, RS, E>::isBusy()
 	return false;
 }
 
+template <typename DATA, typename RW, typename RS, typename E>
+bool
+xpcc::Hd44780Base<DATA, RW, RS, E>::writeCGRAM(uint8_t character, uint8_t *cg)
+{
+	while(not writeCommand(SetCGRAM_Address | (character << 3)))
+		;
+	for (std::size_t ii = 0; ii < 8; ++ii) {
+		writeRAM(cg[ii]);
+	}
+	return true;
+}
+
+
 // MARK: bus specialisation of 4bit port
 template <typename DATA, typename RW, typename RS, typename E>
 template <typename Data, typename Enable>

@@ -66,6 +66,15 @@ public:
 
 protected:
 	typedef Hd44780Base<DATA, RW, RS, E> driver;
+
+public:
+	/**
+	 * Write bitmap to display for use as user defined character.
+	 * cg must be uint8_t[8].
+	 */
+	void
+	writeCGRAM(uint8_t character, uint8_t *cg);
+
 };
 
 /**

@@ -60,6 +60,18 @@ xpcc::Hd44780<DATA, RW, RS, E>::execute(Command command)
 
 template <typename DATA, typename RW, typename RS, typename E>
 void
+xpcc::Hd44780<DATA, RW, RS, E>::writeCGRAM(uint8_t character, uint8_t *cg)
+{
+	// There are only 8 characters in CGRAM
+	if (character > 8) {
+		return;
+	}
+	while(not driver::writeCGRAM(character, cg))
+			;
+}
+
+template <typename DATA, typename RW, typename RS, typename E>
+void
 xpcc::Hd44780<DATA, RW, RS, E>::clear()
 {
 	while(!driver::clear())
