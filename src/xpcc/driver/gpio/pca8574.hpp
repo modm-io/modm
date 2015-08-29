@@ -37,6 +37,10 @@ public:
 private:
 	// Internal write buffer
 	uint8_t i2cBuffer;
+	uint8_t pins;
+
+	template < typename gpioExpanderType, gpioExpanderType & gpioExpander, uint8_t Pin >
+	friend class Pca8574Gpio;
 };
 
 } // namespace xpcc

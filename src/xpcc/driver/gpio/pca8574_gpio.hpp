@@ -17,18 +17,6 @@ namespace xpcc
 {
 
 /**
- * Storage of pin state for a port expander.
- *
- * For pin operations like set() / reset() the state of all other
- * pins at the port expander must be known because all eight bits
- * are written at once in a single I2C transaction.
- * All pins on the same gpioExpander must share the same storage.
- */
-struct pca8574GpioStore {
-	uint8_t pinState;
-};
-
-/**
  * Create an xpcc GPIO compatible interface from a PCA8574 port expander.
  *
  * @code
@@ -52,7 +40,6 @@ struct pca8574GpioStore {
  * @author: strongly-typed
  */
 template <
-	pca8574GpioStore & store,
 	typename gpioExpanderType,
 	gpioExpanderType & gpioExpander,
 	uint8_t Pin
@@ -72,35 +59,35 @@ public:
 
 	static void
 	set() {
-		store.pinState |= (1 << Pin);
-		RF_CALL_BLOCKING(gpioExpander.write(store.pinState));
+		gpioExpander.pins |= (1 << Pin);
+		RF_CALL_BLOCKING(gpioExpander.write(gpioExpander.pins));
 	}
 
 	static void
 	set(bool value) {
 		if (value) {
-			store.pinState |= (1 << Pin);
+			gpioExpander.pins |= (1 << Pin);
 		} else {
-			store.pinState &= ~(1 << Pin);
+			gpioExpander.pins &= ~(1 << Pin);
 		}
-		RF_CALL_BLOCKING(gpioExpander.write(store.pinState));
+		RF_CALL_BLOCKING(gpioExpander.write(gpioExpander.pins));
 	}
 
 	static void
 	reset() {
-		store.pinState &= ~(1 << Pin);
-		RF_CALL_BLOCKING(gpioExpander.write(store.pinState));
+		gpioExpander.pins &= ~(1 << Pin);
+		RF_CALL_BLOCKING(gpioExpander.write(gpioExpander.pins));
 	}
 
 	static void
 	toggle() {
-		store.pinState ^= (1 << Pin);
-		RF_CALL_BLOCKING(gpioExpander.write(store.pinState));
+		gpioExpander.pins ^= (1 << Pin);
+		RF_CALL_BLOCKING(gpioExpander.write(gpioExpander.pins));
 	}
 
 	static bool
 	isSet() {
-		return (store.pinState & (1 << Pin));
+		return (gpioExpander.pins & (1 << Pin));
 	}
 
 	static void

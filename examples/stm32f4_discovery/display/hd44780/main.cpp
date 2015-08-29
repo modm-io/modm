@@ -57,18 +57,15 @@ GpioExpander gpioExpander;
 
 namespace expander
 {
-	// Storage for the pin state of this GPIO expander
-	xpcc::pca8574GpioStore store;
-
 	// Instances for each pin
-	typedef xpcc::Pca8574Gpio<store, GpioExpander, gpioExpander, 0 > Rs;
-	typedef xpcc::Pca8574Gpio<store, GpioExpander, gpioExpander, 1 > Rw;
-	typedef xpcc::Pca8574Gpio<store, GpioExpander, gpioExpander, 2 > E;
-	typedef xpcc::Pca8574Gpio<store, GpioExpander, gpioExpander, 3 > Backlight;
-	typedef xpcc::Pca8574Gpio<store, GpioExpander, gpioExpander, 4 > Pin4;
-	typedef xpcc::Pca8574Gpio<store, GpioExpander, gpioExpander, 5 > Pin5;
-	typedef xpcc::Pca8574Gpio<store, GpioExpander, gpioExpander, 6 > Pin6;
-	typedef xpcc::Pca8574Gpio<store, GpioExpander, gpioExpander, 7 > Pin7;
+	typedef xpcc::Pca8574Gpio<GpioExpander, gpioExpander, 0 > Rs;
+	typedef xpcc::Pca8574Gpio<GpioExpander, gpioExpander, 1 > Rw;
+	typedef xpcc::Pca8574Gpio<GpioExpander, gpioExpander, 2 > E;
+	typedef xpcc::Pca8574Gpio<GpioExpander, gpioExpander, 3 > Backlight;
+	typedef xpcc::Pca8574Gpio<GpioExpander, gpioExpander, 4 > Pin4;
+	typedef xpcc::Pca8574Gpio<GpioExpander, gpioExpander, 5 > Pin5;
+	typedef xpcc::Pca8574Gpio<GpioExpander, gpioExpander, 6 > Pin6;
+	typedef xpcc::Pca8574Gpio<GpioExpander, gpioExpander, 7 > Pin7;
 
 	// Form a GpioPort out of four single pins.
 	// This can be optimised by a special implementation of Pca8574Gpio which

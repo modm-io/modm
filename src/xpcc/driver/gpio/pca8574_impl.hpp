@@ -13,7 +13,7 @@
 
 template < class I2cMaster >
 xpcc::Pca8574<I2cMaster>::Pca8574(uint8_t address)
-: I2cDevice<I2cMaster, 1>(address)
+: I2cDevice<I2cMaster, 1>(address), pins(0)
 {
 }
 
