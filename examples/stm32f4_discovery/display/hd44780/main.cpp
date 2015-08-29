@@ -58,14 +58,14 @@ GpioExpander gpioExpander;
 namespace expander
 {
 	// Instances for each pin
-	typedef xpcc::Pca8574Gpio<GpioExpander, gpioExpander, 0 > Rs;
-	typedef xpcc::Pca8574Gpio<GpioExpander, gpioExpander, 1 > Rw;
-	typedef xpcc::Pca8574Gpio<GpioExpander, gpioExpander, 2 > E;
-	typedef xpcc::Pca8574Gpio<GpioExpander, gpioExpander, 3 > Backlight;
-	typedef xpcc::Pca8574Gpio<GpioExpander, gpioExpander, 4 > Pin4;
-	typedef xpcc::Pca8574Gpio<GpioExpander, gpioExpander, 5 > Pin5;
-	typedef xpcc::Pca8574Gpio<GpioExpander, gpioExpander, 6 > Pin6;
-	typedef xpcc::Pca8574Gpio<GpioExpander, gpioExpander, 7 > Pin7;
+	typedef GpioExpander::Gpio< gpioExpander, 0 > Rs;
+	typedef GpioExpander::Gpio< gpioExpander, 1 > Rw;
+	typedef GpioExpander::Gpio< gpioExpander, 2 > E;
+	typedef GpioExpander::Gpio< gpioExpander, 3 > Backlight;
+	typedef GpioExpander::Gpio< gpioExpander, 4 > Pin4;
+	typedef GpioExpander::Gpio< gpioExpander, 5 > Pin5;
+	typedef GpioExpander::Gpio< gpioExpander, 6 > Pin6;
+	typedef GpioExpander::Gpio< gpioExpander, 7 > Pin7;
 
 	// Form a GpioPort out of four single pins.
 	// This can be optimised by a special implementation of Pca8574Gpio which

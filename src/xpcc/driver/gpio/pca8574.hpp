@@ -12,6 +12,7 @@
 
 #include <xpcc/architecture/interface/i2c_device.hpp>
 #include <xpcc/processing/protothread.hpp>
+#include "pca8574_gpio.hpp"
 
 namespace xpcc
 {
@@ -24,6 +25,10 @@ namespace xpcc
 template < class I2cMaster >
 class Pca8574 : public xpcc::I2cDevice< I2cMaster, 1 >
 {
+public:
+	template < Pca8574<I2cMaster> &object, uint8_t Pin >
+	using Gpio = Pca8574Gpio< Pca8574<I2cMaster>, object, Pin >;
+
 public:
 	Pca8574(uint8_t address=0x27);
 
