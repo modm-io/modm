@@ -31,6 +31,9 @@ xpcc::log::Logger xpcc::log::error(device);
 typedef I2cMaster2 MyI2cMaster;
 // typedef xpcc::SoftwareI2cMaster<GpioB10, GpioB11> MyI2cMaster;
 
+xpcc::vl6180::Data data;
+xpcc::Vl6180<MyI2cMaster> distance(data);
+
 class ThreadOne : public xpcc::pt::Protothread
 {
 public:
@@ -116,9 +119,6 @@ public:
 
 		PT_END();
 	}
-private:
-	xpcc::vl6180::Data data;
-	xpcc::Vl6180<MyI2cMaster> distance(data);
 
 private:
 	xpcc::Timeout timeout;
