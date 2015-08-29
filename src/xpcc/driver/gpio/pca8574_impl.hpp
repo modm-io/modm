@@ -12,31 +12,35 @@
 #endif
 
 template < class I2cMaster >
-xpcc::Pca8574<I2cMaster>::Pca8574(/* Data &data, */ uint8_t address)
-: I2cDevice<I2cMaster, 2>(address) /* , data(data) */
+xpcc::Pca8574<I2cMaster>::Pca8574(uint8_t address)
+: I2cDevice<I2cMaster, 1>(address)
 {
 }
 
 template < class I2cMaster >
-xpcc::ResumableResult<bool> ALWAYS_INLINE
+xpcc::ResumableResult<bool>
 xpcc::Pca8574<I2cMaster>::write(uint8_t value)
 {
 	RF_BEGIN();
 
-	i2cBuffer[0] = value;
-	this->transaction.configureWrite(i2cBuffer, /* length */ 1);
+	i2cBuffer = value;
+	this->transaction.configureWrite(&i2cBuffer, 1);
 
-	RF_END_RETURN_CALL( this->runTransaction() )
+	RF_END_RETURN_CALL( this->runTransaction() );
 };
 
 template < class I2cMaster >
-xpcc::ResumableResult<bool> ALWAYS_INLINE
+xpcc::ResumableResult<bool>
 xpcc::Pca8574<I2cMaster>::read(uint8_t &value)
 {
 	RF_BEGIN();
 
-	this->transaction.configureRead(i2cBuffer, 1);
-	value = i2cBuffer[0];
+	this->transaction.configureRead(&i2cBuffer, 1);
+	if (RF_CALL(this->runTransaction()))
+	{
+		value = i2cBuffer;
+		RF_RETURN( true );
+	}
 
-	RF_END_RETURN_CALL( this->runTransaction() )
+	RF_END_RETURN( false );
 };

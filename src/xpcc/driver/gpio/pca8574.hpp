@@ -22,21 +22,21 @@ namespace xpcc
  * @author  strongly-typed
  */
 template < class I2cMaster >
-class Pca8574 : public xpcc::I2cDevice< I2cMaster, 2 >
+class Pca8574 : public xpcc::I2cDevice< I2cMaster, 1 >
 {
 public:
 	Pca8574(uint8_t address=0x27);
 
 public:
-	xpcc::ResumableResult<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool>
 	write(uint8_t value);
 
-	xpcc::ResumableResult<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool>
 	read(uint8_t &value);
 
 private:
 	// Internal write buffer
-	uint8_t i2cBuffer[1];
+	uint8_t i2cBuffer;
 };
 
 } // namespace xpcc
