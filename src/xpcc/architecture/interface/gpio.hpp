@@ -260,8 +260,9 @@ class GpioPort
 {
 #ifdef __DOXYGEN__
 public:
-	/// this can be used in drivers to assert the correct requirements
-	static constexpr uint16_t width;
+	/// This holds the width of the port as number of bits
+	/// and can be used in drivers to assert the correct requirements
+	static constexpr uint8_t width;
 
 public:
 	static void
