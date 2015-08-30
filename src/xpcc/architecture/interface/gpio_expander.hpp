@@ -11,10 +11,136 @@
 #define XPCC_GPIO_EXPANDER_HPP
 
 #include <xpcc/architecture/interface/gpio.hpp>
+#include <xpcc/architecture/interface/register.hpp>
 #include <xpcc/processing/resumable.hpp>
 
 namespace xpcc
 {
+
+/**
+ * Interface of an IO expander driver.
+ *
+ * All IO expander driver should implement this interface, so that they can be wrapped
+ * into `xpcc::GpioExpanderPin` and `xpcc::GpioExpanderPort`.
+ *
+ * The interface is almost identical to an GPIO pin, except multiple pins can be set at once.
+ *
+ * @note The driver must buffer the expanders IO registers. This means at least the direction,
+ *       output and input values should be buffered so that a read-modify-write can be performed
+ *       on SRAM and then only one write is performed on the bus instead of a read and write!
+ *
+ * @warning The `read()` function does not perform a read bus access, but operates on the
+ *          buffered result of `readInput()`. This allows a capture-and-evaluate approach, which
+ *          is especially useful for reducing bus traffic and necessary for sampling all pins at
+ *          the same time for `xpcc::GpioExpanderPort`.
+ *
+ * @see xpcc::GpioExpanderPin
+ * @see xpcc::GpioExpanderPort
+ * @see xpcc::GpioIO
+ *
+ * @author  Niklas Hauser
+ * @ingroup gpio
+ */
+class GpioExpander
+{
+#ifdef __DOXYGEN__
+public:
+	/// This holds the width of the port as number of bits
+	/// and can be used in drivers to assert the correct requirements
+	static constexpr uint8_t width;
+
+public:
+	/// A type containing a unique identifier for each pin.
+	/// This is mostly a bit mask, however, since this is implementation
+	/// defined it can also be an index.
+	/// The underlying type depends on the width of the expander!
+	enum class
+	Pin : uint16_t
+	{
+		P0,
+		P1,
+		P2,
+		P3,
+		P4,
+		P5,
+		P6,
+		P7
+	};
+	/// Use type-safe flags container for the pins
+	typedef xpcc::Flags8<Pin> Pins;
+
+public:
+	/// Sets one or more pins to output
+	xpcc::ResumableResult<bool>
+	setOutput(Pins pins);
+
+	/// Sets one or more pins to logic high
+	/// @warning only modifies pins that have previously been set to output!
+	xpcc::ResumableResult<bool>
+	set(Pins pins);
+
+	/// Resets one or more pins to logic low
+	/// @warning only modifies pins that have previously been set to output!
+	xpcc::ResumableResult<bool>
+	reset(Pins pins);
+
+	/// Toggles one or more pins
+	/// @warning only modifies pins that have previously been set to output!
+	xpcc::ResumableResult<bool>
+	toggle(Pins pins);
+
+	/// sets one or more pins to high or low level
+	/// @warning only modifies pins that have previously been set to output!
+	xpcc::ResumableResult<bool>
+	set(Pins pins, bool value);
+
+	/// Returns the set logical output state of the pin.
+	bool
+	isSet(Pin pin) const;
+
+	/// returns direction of one pin at run-time
+	xpcc::Gpio::Direction
+	getDirection(Pin pin) const;
+
+public:
+	/// Sets one or more pins to input
+	xpcc::ResumableResult<bool>
+	setInput(Pins pins);
+
+	/// Returns true if **all** pins have a high level
+	/// @warning This function operates on the buffered input read.
+	///          You have to call `readInput()` to update the result.
+	bool
+	read(Pins pins) const;
+
+	/// Reads the inputs and buffers them
+	xpcc::ResumableResult<bool>
+	readInput();
+
+public:
+	/// Writes data to the entire port
+	/// @warning only modifies pins that have previously been set to output!
+	xpcc::ResumableResult<bool>
+	writePort(uint16_t data);
+
+	/// Reads the entire port, buffers them and outputs the result to data.
+	xpcc::ResumableResult<bool>
+	readPort(uint16_t &data);
+
+public:
+	/// Returns the direction bits: 0 for Input, 1 for Output
+	Pins
+	getDirections() const;
+
+	/// Returns the output bits: 0 for low, 1 for high
+	Pins
+	getOutputs() const;
+
+	/// Returns the input bits: 0 for low, 1 for high
+	Pins
+	getInputs() const;
+#endif
+};
 
 /**
  * Create an xpcc GPIO compatible interface from any IO-expander
