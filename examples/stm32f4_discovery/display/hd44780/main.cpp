@@ -17,7 +17,6 @@
 #include <xpcc/io/iostream.hpp>
 #include <xpcc/debug/logger.hpp>
 #include <xpcc/driver/gpio/pca8574.hpp>
-#include <xpcc/driver/gpio/pca8574_gpio.hpp>
 
 #include "../../stm32f4_discovery.hpp"
 
@@ -58,14 +57,16 @@ GpioExpander gpioExpander;
 namespace expander
 {
 	// Instances for each pin
-	typedef GpioExpander::Gpio< gpioExpander, 0 > Rs;
-	typedef GpioExpander::Gpio< gpioExpander, 1 > Rw;
-	typedef GpioExpander::Gpio< gpioExpander, 2 > E;
-	typedef GpioExpander::Gpio< gpioExpander, 3 > Backlight;
-	typedef GpioExpander::Gpio< gpioExpander, 4 > Pin4;
-	typedef GpioExpander::Gpio< gpioExpander, 5 > Pin5;
-	typedef GpioExpander::Gpio< gpioExpander, 6 > Pin6;
-	typedef GpioExpander::Gpio< gpioExpander, 7 > Pin7;
+	typedef GpioExpander::P0< gpioExpander > Rs;
+	typedef GpioExpander::P1< gpioExpander > Rw;
+	typedef GpioExpander::P2< gpioExpander > E;
+	typedef GpioExpander::P3< gpioExpander > Backlight;
+	typedef GpioExpander::P4< gpioExpander > Pin4;
+	typedef GpioExpander::P5< gpioExpander > Pin5;
+	typedef GpioExpander::P6< gpioExpander > Pin6;
+	// you can also declare the pin like this, however it is too verbose
+	typedef xpcc::GpioExpanderPin< GpioExpander, gpioExpander, GpioExpander::Pin::P7 > Pin7;
+//	typedef GpioExpander::P7< gpioExpander > Pin7;
 
 	// Form a GpioPort out of four single pins.
 	// This can be optimised by a special implementation of Pca8574Gpio which
