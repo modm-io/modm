@@ -69,7 +69,7 @@ xpcc::Pca9535<I2cMaster>::toggle(Pins pins)
 
 template < typename I2cMaster >
 xpcc::ResumableResult<bool>
-xpcc::Pca9535<I2cMaster>::update(Pins pins, bool value)
+xpcc::Pca9535<I2cMaster>::set(Pins pins, bool value)
 {
 	RF_BEGIN();
 
@@ -113,6 +113,34 @@ xpcc::Pca9535<I2cMaster>::resetInvertInput(Pins pins)
 	memory.polarity.reset(pins);
 
 	RF_END_RETURN_CALL( writeMemory(Index::Polarity) );
+}
+
+template < typename I2cMaster >
+xpcc::ResumableResult<bool>
+xpcc::Pca9535<I2cMaster>::writePort(uint16_t data)
+{
+	RF_BEGIN();
+
+	// high is 1, low is 0
+	memory.output.value = data;
+
+	RF_END_RETURN_CALL( writeMemory(Index::Output) );
+}
+
+template < typename I2cMaster >
+xpcc::ResumableResult<bool>
+xpcc::Pca9535<I2cMaster>::readPort(uint16_t &data)
+{
+	RF_BEGIN();
+
+	if ( RF_CALL(readInput()) )
+	{
+		// high is 1, low is 0
+		data = memory.input.value;
+		RF_RETURN( true );
+	}
+
+	RF_END_RETURN( false );
 }
 
 // MARK: write multilength register

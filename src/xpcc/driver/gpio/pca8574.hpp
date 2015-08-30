@@ -41,35 +41,18 @@ public:
  *
  * This IO-Expander only has open-drain outputs with weak internal pull-ups.
  *
+ * @ingroup driver_gpio
+ *
  * @author  strongly-typed
  * @author: Niklas Hauser
  */
 template < class I2cMaster >
-class Pca8574 : public pca8574, public xpcc::I2cDevice< I2cMaster, 2 >
+class Pca8574 : public pca8574, public xpcc::I2cDevice< I2cMaster, 2 >, public xpcc::GpioExpander
 {
 public:
-	/// Alias-templates for simpler use of the Pin
-	/// @see xpcc::GpioExpanderPin
-	/// @{
-	template < Pca8574<I2cMaster> &object >
-	using P0 = GpioExpanderPin< Pca8574<I2cMaster>, object, Pin::P0 >;
-	template < Pca8574<I2cMaster> &object >
-	using P1 = GpioExpanderPin< Pca8574<I2cMaster>, object, Pin::P1 >;
-	template < Pca8574<I2cMaster> &object >
-	using P2 = GpioExpanderPin< Pca8574<I2cMaster>, object, Pin::P2 >;
-	template < Pca8574<I2cMaster> &object >
-	using P3 = GpioExpanderPin< Pca8574<I2cMaster>, object, Pin::P3 >;
-	template < Pca8574<I2cMaster> &object >
-	using P4 = GpioExpanderPin< Pca8574<I2cMaster>, object, Pin::P4 >;
-	template < Pca8574<I2cMaster> &object >
-	using P5 = GpioExpanderPin< Pca8574<I2cMaster>, object, Pin::P5 >;
-	template < Pca8574<I2cMaster> &object >
-	using P6 = GpioExpanderPin< Pca8574<I2cMaster>, object, Pin::P6 >;
-	template < Pca8574<I2cMaster> &object >
-	using P7 = GpioExpanderPin< Pca8574<I2cMaster>, object, Pin::P7 >;
-	/// @}
+	static constexpr uint8_t width = 8;
 
-public:
+	/// Constructor, sets address to default of 0x27
 	Pca8574(uint8_t address=0x27);
 
 public:
@@ -78,7 +61,7 @@ public:
 	{
 		// nothing needs to be changed for switching to output
 		direction.set(pins);
-		return {xpcc::rf::ResultState::Stop, true};
+		return {xpcc::rf::Stopped, true};
 	}
 
 	xpcc::ResumableResult<bool>
@@ -143,6 +126,28 @@ public:
 	Pins inline
 	getDirections()
 	{ return direction; }
+
+public:
+	/// Alias-templates for simpler use of the Pin
+	/// @see xpcc::GpioExpanderPin
+	/// @{
+	template < Pca8574<I2cMaster> &object >
+	using P0 = GpioExpanderPin< Pca8574<I2cMaster>, object, Pin::P0 >;
+	template < Pca8574<I2cMaster> &object >
+	using P1 = GpioExpanderPin< Pca8574<I2cMaster>, object, Pin::P1 >;
+	template < Pca8574<I2cMaster> &object >
+	using P2 = GpioExpanderPin< Pca8574<I2cMaster>, object, Pin::P2 >;
+	template < Pca8574<I2cMaster> &object >
+	using P3 = GpioExpanderPin< Pca8574<I2cMaster>, object, Pin::P3 >;
+	template < Pca8574<I2cMaster> &object >
+	using P4 = GpioExpanderPin< Pca8574<I2cMaster>, object, Pin::P4 >;
+	template < Pca8574<I2cMaster> &object >
+	using P5 = GpioExpanderPin< Pca8574<I2cMaster>, object, Pin::P5 >;
+	template < Pca8574<I2cMaster> &object >
+	using P6 = GpioExpanderPin< Pca8574<I2cMaster>, object, Pin::P6 >;
+	template < Pca8574<I2cMaster> &object >
+	using P7 = GpioExpanderPin< Pca8574<I2cMaster>, object, Pin::P7 >;
+	/// @}
 
 private:
 	// buffer the io states

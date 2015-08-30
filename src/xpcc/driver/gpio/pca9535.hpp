@@ -16,7 +16,7 @@
 namespace xpcc
 {
 
-struct pca9535 : public Gpio
+struct pca9535
 {
 protected:
 	/// @cond
@@ -105,6 +105,8 @@ class Pca9535 : public pca9535, public xpcc::I2cDevice< I2cMaster, 2 >
 		Polarity = 6,
 		Configuration = 9
 	};
+public:
+	static constexpr uint8_t width = 16;
 
 public:
 	/// Constructor, sets address to default of 0x20 (range 0x20 - 0x27)
@@ -124,20 +126,20 @@ public:
 	toggle(Pins pins);
 
 	xpcc::ResumableResult<bool>
-	update(Pins pins, bool value);
+	set(Pins pins, bool value);
 
-	bool
-	isSet(Pin pin)
+	bool inline
+	isSet(Pin pin) const
 	{
 		// high is 1, low is 0
 		return memory.output.any(pin);
 	}
 
-	Direction
-	getDirection(Pin pin)
+	xpcc::Gpio::Direction inline
+	getDirection(Pin pin) const
 	{
 		// output is 0, input is 1
-		return memory.configuration.any(pin) ? Direction::In : Direction::Out;
+		return memory.configuration.any(pin) ? xpcc::Gpio::Direction::In : xpcc::Gpio::Direction::Out;
 	}
 
 public:
@@ -150,35 +152,80 @@ public:
 	xpcc::ResumableResult<bool>
 	resetInvertInput(Pins pins);
 
-	bool
-	read(Pin pin)
+	bool inline
+	read(Pins pins) const
 	{
 		// high is 1, low is 0
-		return memory.input.any(pin);
+		return memory.input.all(pins);
 	}
 
-public:
 	xpcc::ResumableResult<bool> inline
 	readInput()
 	{ return readMemory(Index::Input); }
 
 public:
-	Pins inline
-	getOutputs()
-	{ return memory.output; }
+	xpcc::ResumableResult<bool>
+	writePort(uint16_t data);
 
-	Pins inline
-	getInputs()
-	{ return memory.input; }
+	xpcc::ResumableResult<bool>
+	readPort(uint16_t &data);
 
-	/// 0 is input, 1 is output
+
+public:
 	Pins inline
-	getDirections()
+	getDirections() const
 	{ return ~memory.configuration; }
 
 	Pins inline
-	getPolarities()
+	getOutputs() const
+	{ return memory.output; }
+
+	Pins inline
+	getInputs() const
+	{ return memory.input; }
+
+	Pins inline
+	getPolarities() const
 	{ return memory.polarity; }
+
+public:
+	/// Alias-templates for simpler use of the Pin
+	/// @see xpcc::GpioExpanderPin
+	/// @{
+	template < Pca9535<I2cMaster> &object >
+	using P0_0 = GpioExpanderPin< Pca9535<I2cMaster>, object, Pin::P0_0 >;
+	template < Pca9535<I2cMaster> &object >
+	using P0_1 = GpioExpanderPin< Pca9535<I2cMaster>, object, Pin::P0_1 >;
+	template < Pca9535<I2cMaster> &object >
+	using P0_2 = GpioExpanderPin< Pca9535<I2cMaster>, object, Pin::P0_2 >;
+	template < Pca9535<I2cMaster> &object >
+	using P0_3 = GpioExpanderPin< Pca9535<I2cMaster>, object, Pin::P0_3 >;
+	template < Pca9535<I2cMaster> &object >
+	using P0_4 = GpioExpanderPin< Pca9535<I2cMaster>, object, Pin::P0_4 >;
+	template < Pca9535<I2cMaster> &object >
+	using P0_5 = GpioExpanderPin< Pca9535<I2cMaster>, object, Pin::P0_5 >;
+	template < Pca9535<I2cMaster> &object >
+	using P0_6 = GpioExpanderPin< Pca9535<I2cMaster>, object, Pin::P0_6 >;
+	template < Pca9535<I2cMaster> &object >
+	using P0_7 = GpioExpanderPin< Pca9535<I2cMaster>, object, Pin::P0_7 >;
+
+	template < Pca9535<I2cMaster> &object >
+	using P1_0 = GpioExpanderPin< Pca9535<I2cMaster>, object, Pin::P1_0 >;
+	template < Pca9535<I2cMaster> &object >
+	using P1_1 = GpioExpanderPin< Pca9535<I2cMaster>, object, Pin::P1_1 >;
+	template < Pca9535<I2cMaster> &object >
+	using P1_2 = GpioExpanderPin< Pca9535<I2cMaster>, object, Pin::P1_2 >;
+	template < Pca9535<I2cMaster> &object >
+	using P1_3 = GpioExpanderPin< Pca9535<I2cMaster>, object, Pin::P1_3 >;
+	template < Pca9535<I2cMaster> &object >
+	using P1_4 = GpioExpanderPin< Pca9535<I2cMaster>, object, Pin::P1_4 >;
+	template < Pca9535<I2cMaster> &object >
+	using P1_5 = GpioExpanderPin< Pca9535<I2cMaster>, object, Pin::P1_5 >;
+	template < Pca9535<I2cMaster> &object >
+	using P1_6 = GpioExpanderPin< Pca9535<I2cMaster>, object, Pin::P1_6 >;
+	template < Pca9535<I2cMaster> &object >
+	using P1_7 = GpioExpanderPin< Pca9535<I2cMaster>, object, Pin::P1_7 >;
+	/// @}
 
 private:
 	xpcc::ResumableResult<bool>
