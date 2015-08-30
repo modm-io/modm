@@ -18,10 +18,12 @@ namespace xpcc
 
 /**
  * Create an xpcc GPIO compatible interface from any IO-expander
- * conforming to the xpcc::GpioExpander interface
+ * conforming to the xpcc::GpioExpander interface.
  *
- * @warning Access to the IO-expander is **blocking and can silently fail**!
- *          If this is undesirable for you application, you need to write your own wrapper!
+ * This allows the transparent usage of IO Expander pins in classes that require
+ * Gpios as template arguments.
+ * @note For every pin access a blocking bus transfer is performed, therefore
+ *       do not expect these gpios to be fast!
  *
  * Usage:
  * @code
@@ -43,16 +45,21 @@ namespace xpcc
  * typedef Expander::P1< expander > Rw;
  * typedef Expander::P2< expander > E;
  * typedef Expander::P3< expander > Backlight;
- * typedef Expander::P4< expander > Pin4;
- * typedef Expander::P5< expander > Pin5;
- * typedef Expander::P6< expander > Pin6;
- * typedef Expander::P7< expander > Pin7;
- *
- * typedef xpcc::SoftwareGpioPort<Pin7, Pin6, Pin5, Pin4> Data4BitGpio;
  *
  * Backlight::set();
  * @endcode
  *
+ * @warning Access to the IO-expander is **blocking and can silently fail**!
+ *          If this is undesirable for you application, you need to write your own wrapper!
+ *
+ * @see xpcc::GpioExpander
+ * @see xpcc::GpioIO
+ *
+ * @tparam  GpioExpander    Type of class conforming to xpcc::GpioExpander interface
+ * @tparam  expander        instance of the expander with the selected pin
+ * @tparam  pin             pin identifier on expander
+ *
+ * @ingroup gpio
  * @author: strongly-typed
  * @author: Niklas Hauser
  */
@@ -64,13 +71,16 @@ template <
 class GpioExpanderPin : public xpcc::GpioIO
 {
 public:
+	static constexpr Direction direction = Direction::InOut;
+
+public:
 	static void
 	setOutput()
 	{
 		RF_CALL_BLOCKING(expander.setOutput(pin));
 	}
 
-	static void
+	static void inline
 	setOutput(bool value)
 	{
 		set(value);
@@ -120,6 +130,11 @@ public:
 		return expander.read(pin);
 	}
 
+	static Direction
+	getDirection()
+	{
+		return expander.getDirection(pin);
+	}
 };
 
 } // xpcc namespace
