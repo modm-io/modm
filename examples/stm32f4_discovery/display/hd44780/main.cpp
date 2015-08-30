@@ -171,8 +171,8 @@ main()
 
 	XPCC_LOG_INFO << "\n\nWelcome to HD44780 I2C demo!\n\n";
 
-	GpioB11::connect(I2cMaster2::Sda, Gpio::InputType::PullUp);
-	GpioB10::connect(I2cMaster2::Scl, Gpio::InputType::PullUp);
+	GpioB11::connect(MyI2cMaster::Sda, Gpio::InputType::PullUp);
+	GpioB10::connect(MyI2cMaster::Scl, Gpio::InputType::PullUp);
 
 	MyI2cMaster::initialize<Board::systemClock, 100000>();
 
