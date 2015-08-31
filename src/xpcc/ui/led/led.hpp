@@ -30,18 +30,15 @@ namespace ui
  * Here is an example for the STM32F4:
  * @code
  * #include <xpcc/ui/led.hpp>
- * // use a 16bits lookup table with 256 values.
- * xpcc::accessor::Flash<uint16_t> table(xpcc::ui::table16_256);
- * void
- * setOrange(uint8_t brightness)
+ * // use a lambda function without a closure, this is equivalent to a normal function pointer
+ * xpcc::ui::Led orange([](uint8_t brightness)
  * {
- *     Timer4::setCompareValue(1, table[brightness]);
- * }
- * xpcc::ui::Led orange(setOrange);
+ *     Timer4::setCompareValue(2, xpcc::ui::table22_16_256[brightness]);
+ * });
  * // setup Timer4 etc...
  * @endcode
  *
- * This is just a very thin wrapper around xpcc::ui::Animation<uint8_t>.
+ * This is just a very, very thin wrapper around xpcc::ui::Animation<uint8_t>.
  * If you need more advanced features, have a look there.
  *
  * @see Animation
@@ -51,30 +48,35 @@ namespace ui
 class Led
 {
 public:
-	Led();
+	ALWAYS_INLINE Led(): Led(nullptr) {}
 
 	/// Requires a handler function pointer for value updates.
-	Led(Animation<uint8_t>::Handler handler);
+	ALWAYS_INLINE Led(Animation<uint8_t>::Handler handler):
+		animation(brightness, handler), brightness(0) {}
 
 	/// @param	brightness
 	///		between 0 and length of lookup-table (usually 255)
-	void
-	setBrightness(uint8_t brightness);
+	ALWAYS_INLINE void
+	setBrightness(uint8_t brightness)
+	{ animation.setValue(brightness); }
 
 	/// @return brightness of the LED
-	uint8_t
-	getBrightness() const;
+	ALWAYS_INLINE uint8_t
+	getBrightness() const
+	{ return animation.getValue(); }
 
 	/// @return `true` if LED is currently fading to another brightness,
 	///			`false` if otherwise
-	bool
-	isFading() const;
+	ALWAYS_INLINE bool
+	isFading() const
+	{ return animation.isAnimating(); }
 
 	/// Fade from the current brightness to a new brightness in the specified ms.
 	/// Fading times of more than ~32s are not possible. You must control
 	/// fading externally in that case.
-	void
-	fadeTo(uint8_t brightness, uint16_t time);
+	ALWAYS_INLINE void
+	fadeTo(uint8_t brightness, uint16_t time)
+	{ animation.animateTo(brightness, time); }
 
 	/**
 	 * Mimmics the behaviour of normal lamps, which take a small amount
@@ -82,8 +84,9 @@ public:
 	 * @param	time
 	 * 		specify the fade up time in ms, `0` to turn the LED on instantly
 	 */
-	void
-	on(uint16_t time=75);
+	ALWAYS_INLINE void
+	on(uint16_t time=75)
+	{ fadeTo(255, time); }
 
 	/**
 	 * Mimmics the behaviour of normal lamps, which take a small amount
@@ -91,14 +94,16 @@ public:
 	 * @param	time
 	 * 		specify the fade up time in ms, `0` to turn the LED off instantly
 	 */
-	void
-	off(uint16_t time=120);
+	ALWAYS_INLINE void
+	off(uint16_t time=120)
+	{ fadeTo(0, time); }
 
 	/// Can be called at a interval of 1ms or less.
 	/// If you do not need 1ms response time (e.g. for on(), off()),
 	/// you may call this at intervals < 255ms.
-	void
-	update();
+	ALWAYS_INLINE void
+	update()
+	{ animation.update(); }
 
 public:
 	Animation<uint8_t> animation;
@@ -110,7 +115,5 @@ private:
 }	// namespace ui
 
 }	// namespace xpcc
-
-#include "led_impl.hpp"
 
 #endif	// XPCC_UI_LED_HPP
