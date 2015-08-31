@@ -258,8 +258,14 @@ public:
  */
 class GpioPort
 {
-#ifdef __DOXYGEN__
 public:
+	enum class
+	DataOrder : bool
+	{
+		Normal = false,
+		Reversed = true
+	};
+#ifdef __DOXYGEN__
 	/// This holds the width of the port as number of bits
 	/// and can be used in drivers to assert the correct requirements
 	static constexpr uint8_t width;

@@ -266,7 +266,8 @@ template <
 	typename GpioExpander,
 	GpioExpander &expander,
 	typename GpioExpander::Pin StartPin,
-	uint8_t Width >
+	uint8_t Width,
+	GpioPort::DataOrder DataOrder = GpioPort::DataOrder::Normal >
 class GpioExpanderPort : public xpcc::GpioPort
 {
 	static constexpr uint8_t StartIndex = GpioExpander::indexFromPin(StartPin);
@@ -319,6 +320,68 @@ public:
 		RF_CALL_BLOCKING( expander.toggle(Pins(portMask)) );
 	}
 };
+
+/// @cond
+template <
+	typename GpioExpander,
+	GpioExpander &expander,
+	typename GpioExpander::Pin StartPin,
+	uint8_t Width >
+class GpioExpanderPort<GpioExpander, expander, StartPin, Width, GpioPort::DataOrder::Reversed> : public xpcc::GpioPort
+{
+	using Pins = typename GpioExpander::Pins;
+	using PortType = typename GpioExpander::PortType;
+
+	static constexpr uint8_t StartIndex = GpioExpander::indexFromPin(StartPin);
+	static constexpr uint8_t StartIndexReversed = (sizeof(PortType) * 4 - StartIndex - Width) + sizeof(PortType) * 4;
+
+	static_assert(Width <= GpioExpander::width, "Width too large.");
+	static_assert(Width > 0, "Width should be at least 1.");
+	static_assert(StartIndex + Width <= GpioExpander::width, "StartPin + Width too large.");
+
+	static constexpr PortType dataMask = (1 << Width) - 1;
+	static constexpr PortType portMask = dataMask << StartIndex;
+	static constexpr PortType portMaskReversed = dataMask << StartIndexReversed;
+
+public:
+	static constexpr uint8_t width = Width;
+
+public:
+	static void
+	setOutput()
+	{
+		RF_CALL_BLOCKING(expander.setOutput(Pins(portMask)));
+	}
+
+	static void
+	setInput()
+	{
+		RF_CALL_BLOCKING(expander.setInput(Pins(portMask)));
+	}
+
+	static PortType
+	read()
+	{
+		RF_CALL_BLOCKING(expander.readInput());
+
+		return (xpcc::bitReverse(PortType(expander.getInputs().value & portMask))) >> StartIndexReversed;
+	}
+
+	static void
+	write(PortType data)
+	{
+		data = xpcc::bitReverse(PortType((data & dataMask) << StartIndexReversed));
+		data = (expander.getOutputs().value & ~portMask) | data;
+		RF_CALL_BLOCKING( expander.writePort(data) );
+	}
+
+	static void
+	toggle()
+	{
+		RF_CALL_BLOCKING( expander.toggle(Pins(portMask)) );
+	}
+};
+/// @endcond
 
 } // xpcc namespace
 
