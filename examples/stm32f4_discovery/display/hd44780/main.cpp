@@ -71,7 +71,8 @@ namespace expander
 	// Form a GpioPort out of four single pins.
 	// This can be optimised by a special implementation of Pca8574Gpio which
 	// should provide an interface to a GpioPort, too.
-	typedef xpcc::SoftwareGpioPort<Pin7, Pin6, Pin5, Pin4> Data4BitGpio;
+	typedef xpcc::GpioExpanderPort< GpioExpander, gpioExpander, GpioExpander::Pin::P4, 4 > Data4BitGpio;
+//	typedef xpcc::SoftwareGpioPort<Pin7, Pin6, Pin5, Pin4> Data4BitGpio;
 }
 
 // You can choose either port width simply by using it.
