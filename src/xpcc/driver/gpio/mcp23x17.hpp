@@ -240,7 +240,6 @@ public:
 	/// @}
 
 private:
-	/// @cond
 	struct ATTRIBUTE_PACKED
 	Memory
 	{
