@@ -249,6 +249,10 @@ public:
 	using B7 = GpioExpanderPin< Mcp23x17<Transport>, object, Pin::B7 >;
 	/// @}
 
+	/// Alias-templates for simpler use of the Port
+	template < Mcp23x17<Transport> &object, Pin StartPin, uint8_t Width >
+	using Port = GpioExpanderPort< Mcp23x17<Transport>, object, StartPin, Width >;
+
 private:
 	struct ATTRIBUTE_PACKED
 	Memory

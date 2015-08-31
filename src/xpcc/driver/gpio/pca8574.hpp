@@ -157,6 +157,10 @@ public:
 	using P7 = GpioExpanderPin< Pca8574<I2cMaster>, object, Pin::P7 >;
 	/// @}
 
+	/// Alias-templates for simpler use of the Port
+	template < Pca8574<I2cMaster> &object, Pin StartPin, uint8_t Width >
+	using Port = GpioExpanderPort< Pca8574<I2cMaster>, object, StartPin, Width >;
+
 private:
 	// buffer the io states
 	Pins direction; // output = 1, input = 0

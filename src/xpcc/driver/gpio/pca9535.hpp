@@ -238,6 +238,10 @@ public:
 	using P1_7 = GpioExpanderPin< Pca9535<I2cMaster>, object, Pin::P1_7 >;
 	/// @}
 
+	/// Alias-templates for simpler use of the Port
+	template < Pca9535<I2cMaster> &object, Pin StartPin, uint8_t Width >
+	using Port = GpioExpanderPort< Pca9535<I2cMaster>, object, StartPin, Width >;
+
 private:
 	xpcc::ResumableResult<bool>
 	writeMemory(Index index);
