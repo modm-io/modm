@@ -52,6 +52,15 @@ class Pca8574 : public pca8574, public xpcc::I2cDevice< I2cMaster, 2 >, public x
 public:
 	static constexpr uint8_t width = 8;
 
+	using PortType = uint8_t;
+
+	static constexpr uint8_t
+	indexFromPin(Pin pin)
+	{
+		return xpcc::leftmostBit(PortType(pin));
+	}
+
+public:
 	/// Constructor, sets address to default of 0x27
 	Pca8574(uint8_t address=0x27);
 
@@ -108,10 +117,10 @@ public:
 
 public:
 	xpcc::ResumableResult<bool>
-	writePort(uint8_t value);
+	writePort(PortType value);
 
 	xpcc::ResumableResult<bool>
-	readPort(uint8_t &value);
+	readPort(PortType &value);
 
 public:
 	Pins inline

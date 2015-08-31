@@ -106,8 +106,17 @@ class Pca9535 : public pca9535, public xpcc::I2cDevice< I2cMaster, 2 >, public x
 		Polarity = 6,
 		Configuration = 9
 	};
+
 public:
 	static constexpr uint8_t width = 16;
+
+	using PortType = uint16_t;
+
+	static constexpr uint8_t
+	indexFromPin(Pin pin)
+	{
+		return xpcc::leftmostBit(PortType(pin));
+	}
 
 public:
 	/// Constructor, sets address to default of 0x20 (range 0x20 - 0x27)
@@ -168,10 +177,10 @@ public:
 
 public:
 	xpcc::ResumableResult<bool>
-	writePort(uint16_t data);
+	writePort(PortType data);
 
 	xpcc::ResumableResult<bool>
-	readPort(uint16_t &data);
+	readPort(PortType &data);
 
 
 public:
