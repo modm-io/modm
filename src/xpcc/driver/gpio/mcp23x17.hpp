@@ -18,7 +18,7 @@
 namespace xpcc
 {
 
-struct mcp23x17 : public Gpio
+struct mcp23x17
 {
 protected:
 	/// @cond
@@ -83,7 +83,7 @@ public:
 }; // struct mcp23x17
 
 /**
- * MCP23X15 16-Bit I/O Expander with Serial Interface
+ * MCP23X15 16-Bit I/O Expander with Serial Interface.
  *
  * GPB is the high byte, GPA the low byte.
  * The lower three address bits can be configured: 0100abc.
@@ -96,15 +96,15 @@ public:
  * If you want to operate on all 16bit, use the `get(Inputs|Outputs|Directions|Polarities)()`
  * getters.
  *
- * @tparam	Transport	Either the I2C or SPI Transport Layer.
- *
  * @see Mcp23TransportI2c
  * @see Mcp23TransportSpi
  *
- * @ingroup driver_gpio
+ * @tparam	Transport	Either the I2C or SPI Transport Layer.
  *
  * @author	Fabian Greif
  * @author	Niklas Hauser
+ *
+ * @ingroup driver_gpio
  */
 template <class Transport>
 class Mcp23x17 : public mcp23x17, public Transport, public xpcc::GpioExpander
@@ -138,11 +138,13 @@ public:
 		return memory.outputLatch.any(pin);
 	}
 
-	Direction
+	xpcc::Gpio::Direction
 	getDirection(Pin pin)
 	{
 		// output is 0, input is 1
-		return memory.direction.any(pin) ? Direction::In : Direction::Out;
+		return memory.direction.any(pin) ?
+				xpcc::Gpio::Direction::In :
+				xpcc::Gpio::Direction::Out;
 	}
 
 public:
@@ -202,7 +204,6 @@ public:
 
 public:
 	/// Alias-templates for simpler use of the Pin
-	/// @see xpcc::GpioExpanderPin
 	/// @{
 	template < Mcp23x17<Transport> &object >
 	using A0 = GpioExpanderPin< Mcp23x17<Transport>, object, Pin::A0 >;

@@ -11,6 +11,7 @@
 #define XPCC_PCA9535_HPP
 
 #include <xpcc/architecture/interface/i2c_device.hpp>
+#include <xpcc/architecture/interface/gpio_expander.hpp>
 #include <xpcc/math/geometry/angle.hpp>
 
 namespace xpcc
@@ -95,7 +96,7 @@ public:
  * @ingroup driver_gpio
  */
 template < typename I2cMaster >
-class Pca9535 : public pca9535, public xpcc::I2cDevice< I2cMaster, 2 >
+class Pca9535 : public pca9535, public xpcc::I2cDevice< I2cMaster, 2 >, public xpcc::GpioExpander
 {
 	enum class
 	Index : uint8_t
@@ -139,7 +140,9 @@ public:
 	getDirection(Pin pin) const
 	{
 		// output is 0, input is 1
-		return memory.configuration.any(pin) ? xpcc::Gpio::Direction::In : xpcc::Gpio::Direction::Out;
+		return memory.configuration.any(pin) ?
+				xpcc::Gpio::Direction::In :
+				xpcc::Gpio::Direction::Out;
 	}
 
 public:
@@ -190,7 +193,6 @@ public:
 
 public:
 	/// Alias-templates for simpler use of the Pin
-	/// @see xpcc::GpioExpanderPin
 	/// @{
 	template < Pca9535<I2cMaster> &object >
 	using P0_0 = GpioExpanderPin< Pca9535<I2cMaster>, object, Pin::P0_0 >;

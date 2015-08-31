@@ -44,7 +44,7 @@ public:
  * @ingroup driver_gpio
  *
  * @author  strongly-typed
- * @author: Niklas Hauser
+ * @author  Niklas Hauser
  */
 template < class I2cMaster >
 class Pca8574 : public pca8574, public xpcc::I2cDevice< I2cMaster, 2 >, public xpcc::GpioExpander
@@ -129,7 +129,6 @@ public:
 
 public:
 	/// Alias-templates for simpler use of the Pin
-	/// @see xpcc::GpioExpanderPin
 	/// @{
 	template < Pca8574<I2cMaster> &object >
 	using P0 = GpioExpanderPin< Pca8574<I2cMaster>, object, Pin::P0 >;
