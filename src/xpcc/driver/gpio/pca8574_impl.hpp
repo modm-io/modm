@@ -14,7 +14,7 @@
 template < class I2cMaster >
 xpcc::Pca8574<I2cMaster>::Pca8574(uint8_t address):
 	I2cDevice<I2cMaster, 2>(address),
-	direction(Pins(0)), output(Pins(0xff)), input(Pins(0xff))
+	direction(Pins(0xff)), output(Pins(0xff)), input(Pins(0xff))
 {
 }
 
