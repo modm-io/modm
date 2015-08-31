@@ -117,6 +117,16 @@ public:
 
 		XPCC_LOG_DEBUG << "Device responded" << xpcc::endl;
 
+		// Actually, this is not needed because of hardware defaults, but this is better style.
+		expander::Backlight::setOutput();
+		expander::Data4BitGpio::setOutput();
+
+		// Actually, this is not needed because of initialze of display driver.
+		expander::Rs::setOutput();
+		expander::Rw::setOutput();
+		expander::E::setOutput();
+
+		// Actually, this is not needed because of hardware defaults.
 		expander::Backlight::set();
 
 		// Initialize twice as some display are not initialised after first try.
