@@ -13,6 +13,7 @@
 #include <xpcc/architecture/interface/gpio.hpp>
 #include <xpcc/architecture/interface/register.hpp>
 #include <xpcc/processing/resumable.hpp>
+#include <xpcc/math/utils/bit_operation.hpp>
 
 namespace xpcc
 {
@@ -49,15 +50,24 @@ public:
 	/// and can be used in drivers to assert the correct requirements
 	static constexpr uint8_t width;
 
+	/// This contains the underlying type that can hold the bits of the entire port.
+	/// This value is implementation defined, it may also be `uint16_t`.
+	using PortType = uint8_t;
+
 public:
 	/// A type containing a unique identifier for each pin.
 	/// This is mostly a bit mask, however, since this is implementation
 	/// defined it can also be an index.
-	/// The underlying type depends on the width of the expander!
 	enum class
-	Pin : uint16_t;
+	Pin : PortType;
 	/// Use type-safe flags container for the pins
-	typedef xpcc::Flags8<Pin> Pins;
+	typedef xpcc::Flags<Pin, PortType> Pins;
+
+	/// Returns the *index* of the pin as a constexpr function.
+	/// The mapping is implementation defined, however, as an implementation hint
+	/// when using a bit mask, you should use `xpcc::leftmostBit()`
+	static constexpr uint8_t
+	indexFromPin(Pin pin);
 
 public:
 	/// Sets one or more pins to output
@@ -111,11 +121,11 @@ public:
 	/// Writes data to the entire port
 	/// @warning only modifies pins that have previously been set to output!
 	xpcc::ResumableResult<bool>
-	writePort(uint16_t data);
+	writePort(PortType data);
 
 	/// Reads the entire port, buffers them and outputs the result to data.
 	xpcc::ResumableResult<bool>
-	readPort(uint16_t &data);
+	readPort(PortType &data);
 
 public:
 	/// Returns the direction bits: 0 for Input, 1 for Output
@@ -182,8 +192,7 @@ public:
 template <
 	typename GpioExpander,
 	GpioExpander &expander,
-	typename GpioExpander::Pin pin
-	>
+	typename GpioExpander::Pin pin >
 class GpioExpanderPin : public xpcc::GpioIO
 {
 public:
@@ -250,6 +259,64 @@ public:
 	getDirection()
 	{
 		return expander.getDirection(pin);
+	}
+};
+
+template <
+	typename GpioExpander,
+	GpioExpander &expander,
+	typename GpioExpander::Pin StartPin,
+	uint8_t Width >
+class GpioExpanderPort : public xpcc::GpioPort
+{
+	static constexpr uint8_t StartIndex = GpioExpander::indexFromPin(StartPin);
+
+	static_assert(Width <= GpioExpander::width, "Width too large.");
+	static_assert(Width > 0, "Width should be at least 1.");
+	static_assert(StartIndex + Width <= GpioExpander::width, "StartPin + Width too large.");
+
+	using Pins = typename GpioExpander::Pins;
+	using PortType = typename GpioExpander::PortType;
+
+	static constexpr PortType dataMask = (1 << Width) - 1;
+	static constexpr PortType portMask = dataMask << StartIndex;
+
+public:
+	static constexpr uint8_t width = Width;
+
+public:
+	static void
+	setOutput()
+	{
+		RF_CALL_BLOCKING(expander.setOutput(Pins(portMask)));
+	}
+
+	static void
+	setInput()
+	{
+		RF_CALL_BLOCKING(expander.setInput(Pins(portMask)));
+	}
+
+	static PortType
+	read()
+	{
+		RF_CALL_BLOCKING(expander.readInput());
+
+		return (expander.getInputs().value & portMask) >> StartIndex;
+	}
+
+	static void
+	write(PortType data)
+	{
+		data = (data & dataMask) << StartIndex;
+		data = (expander.getOutputs().value & ~portMask) | data;
+		RF_CALL_BLOCKING( expander.writePort(data) );
+	}
+
+	static void
+	toggle()
+	{
+		RF_CALL_BLOCKING( expander.toggle(Pins(portMask)) );
 	}
 };
 
