@@ -55,17 +55,7 @@ public:
 	/// defined it can also be an index.
 	/// The underlying type depends on the width of the expander!
 	enum class
-	Pin : uint16_t
-	{
-		P0,
-		P1,
-		P2,
-		P3,
-		P4,
-		P5,
-		P6,
-		P7
-	};
+	Pin : uint16_t;
 	/// Use type-safe flags container for the pins
 	typedef xpcc::Flags8<Pin> Pins;
 
@@ -186,8 +176,8 @@ public:
  * @tparam  pin             pin identifier on expander
  *
  * @ingroup gpio
- * @author: strongly-typed
- * @author: Niklas Hauser
+ * @author  strongly-typed
+ * @author  Niklas Hauser
  */
 template <
 	typename GpioExpander,
