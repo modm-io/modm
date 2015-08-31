@@ -239,8 +239,8 @@ public:
 	/// @}
 
 	/// Alias-templates for simpler use of the Port
-	template < Pca9535<I2cMaster> &object, Pin StartPin, uint8_t Width >
-	using Port = GpioExpanderPort< Pca9535<I2cMaster>, object, StartPin, Width >;
+	template < Pca9535<I2cMaster> &object, Pin StartPin, uint8_t Width, GpioPort::DataOrder DataOrder = GpioPort::DataOrder::Normal  >
+	using Port = GpioExpanderPort< Pca9535<I2cMaster>, object, StartPin, Width, DataOrder >;
 
 private:
 	xpcc::ResumableResult<bool>

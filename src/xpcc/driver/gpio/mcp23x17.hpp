@@ -250,8 +250,8 @@ public:
 	/// @}
 
 	/// Alias-templates for simpler use of the Port
-	template < Mcp23x17<Transport> &object, Pin StartPin, uint8_t Width >
-	using Port = GpioExpanderPort< Mcp23x17<Transport>, object, StartPin, Width >;
+	template < Mcp23x17<Transport> &object, Pin StartPin, uint8_t Width, GpioPort::DataOrder DataOrder = GpioPort::DataOrder::Normal  >
+	using Port = GpioExpanderPort< Mcp23x17<Transport>, object, StartPin, Width, DataOrder >;
 
 private:
 	struct ATTRIBUTE_PACKED
