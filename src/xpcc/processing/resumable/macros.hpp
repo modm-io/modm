@@ -44,7 +44,7 @@
 			this->popRf(); \
 			return {xpcc::rf::WrongState}; \
 	} \
-	static_assert(uint16_t(__COUNTER__) - rfCounter < 256, "You have too many states in this resumable function!");
+	static_assert(uint16_t(__COUNTER__) - rfCounter < 256, "You have too many states in this resumable function!")
 
 /**
  * End the resumable function. You can use this to return `void`, or if the result does not matter.
@@ -61,7 +61,7 @@
 			this->popRf(); \
 			return {xpcc::rf::WrongState}; \
 	} \
-	static_assert(uint16_t(__COUNTER__) - rfCounter < 256, "You have too many states in this resumable function!");
+	static_assert(uint16_t(__COUNTER__) - rfCounter < 256, "You have too many states in this resumable function!")
 
 /**
  * End the resumable function by calling another resumable function and returning its result.
@@ -76,7 +76,7 @@
 			this->popRf(); \
 			return {xpcc::rf::WrongState}; \
 	} \
-	static_assert(uint16_t(__COUNTER__) - rfCounter < 256, "You have too many states in this resumable function!");
+	static_assert(uint16_t(__COUNTER__) - rfCounter < 256, "You have too many states in this resumable function!")
 
 /**
  * Yield resumable function until next invocation.
