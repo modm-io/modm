@@ -40,7 +40,7 @@ ResultState
 /// Used to store a resumable function's position (what Dunkels calls a
 /// "local continuation").
 typedef uint8_t State;
-/// We use 0 instead of -1 since it might be fast to check
+/// We use 0 instead of -1 since it might be faster to check
 static constexpr State Stopped = State(0);
 /// @endcond
 
@@ -48,6 +48,7 @@ static constexpr State Stopped = State(0);
 
 /// All resumable functions return an encapsulated result type.
 /// @warning The result type **must** have a default constructor!
+/// @ingroup	resumable
 template < typename T >
 struct ResumableResult
 {

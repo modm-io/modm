@@ -72,6 +72,7 @@
  *         if (RF_CALL(setTimer(100)))
  *         {
  *             RF_WAIT_UNTIL(timeout.isExpired());
+ *             RF_RETURN(true);
  *         }
  *
  *         RF_END_RETURN(false);
