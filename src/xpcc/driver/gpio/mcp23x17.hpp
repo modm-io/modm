@@ -11,13 +11,14 @@
 #define XPCC_MCP23X17_HPP
 
 #include <xpcc/architecture/interface/gpio.hpp>
+#include <xpcc/architecture/interface/gpio_expander.hpp>
 #include <xpcc/architecture/interface/register.hpp>
 #include "mcp23_transport.hpp"
 
 namespace xpcc
 {
 
-struct mcp23x17 : public Gpio
+struct mcp23x17
 {
 protected:
 	/// @cond
@@ -82,7 +83,7 @@ public:
 }; // struct mcp23x17
 
 /**
- * MCP23X15 16-Bit I/O Expander with Serial Interface
+ * MCP23X15 16-Bit I/O Expander with Serial Interface.
  *
  * GPB is the high byte, GPA the low byte.
  * The lower three address bits can be configured: 0100abc.
@@ -95,19 +96,30 @@ public:
  * If you want to operate on all 16bit, use the `get(Inputs|Outputs|Directions|Polarities)()`
  * getters.
  *
- * @tparam	Transport	Either the I2C or SPI Transport Layer.
- *
  * @see Mcp23TransportI2c
  * @see Mcp23TransportSpi
  *
- * @ingroup driver_gpio
+ * @tparam	Transport	Either the I2C or SPI Transport Layer.
  *
  * @author	Fabian Greif
  * @author	Niklas Hauser
+ *
+ * @ingroup driver_gpio
  */
 template <class Transport>
-class Mcp23x17 : public mcp23x17, public Transport
+class Mcp23x17 : public mcp23x17, public Transport, public xpcc::GpioExpander
 {
+public:
+	static constexpr uint8_t width = 16;
+
+	using PortType = uint16_t;
+
+	static constexpr uint8_t
+	indexFromPin(Pin pin)
+	{
+		return xpcc::leftmostBit(PortType(pin));
+	}
+
 public:
 	/// Constructor, sets address to default of 0x20 (range 0x20 - 0x27)
 	Mcp23x17(uint8_t address=0x20);
@@ -126,7 +138,7 @@ public:
 	toggle(Pins pins);
 
 	xpcc::ResumableResult<bool>
-	update(Pins pins, bool value);
+	set(Pins pins, bool value);
 
 	bool
 	isSet(Pin pin)
@@ -135,11 +147,13 @@ public:
 		return memory.outputLatch.any(pin);
 	}
 
-	Direction
+	xpcc::Gpio::Direction
 	getDirection(Pin pin)
 	{
 		// output is 0, input is 1
-		return memory.direction.any(pin) ? Direction::In : Direction::Out;
+		return memory.direction.any(pin) ?
+				xpcc::Gpio::Direction::In :
+				xpcc::Gpio::Direction::Out;
 	}
 
 public:
@@ -165,12 +179,26 @@ public:
 		return memory.gpio.any(pin);
 	}
 
-public:
 	xpcc::ResumableResult<bool> inline
 	readInput()
+	{ return Transport::read(i(Register::GPIO), buffer + 18, 2); }
+
+	xpcc::ResumableResult<bool> inline
+	readAllInput()
 	{ return Transport::read(i(Register::INTF), buffer + 14, 8); }
 
 public:
+	xpcc::ResumableResult<bool>
+	writePort(PortType data);
+
+	xpcc::ResumableResult<bool>
+	readPort(PortType &data);
+
+public:
+	Pins inline
+	getDirections()
+	{ return ~memory.direction; }
+
 	Pins inline
 	getOutputs()
 	{ return memory.outputLatch; }
@@ -179,17 +207,53 @@ public:
 	getInputs()
 	{ return memory.gpio; }
 
-	/// 0 is input, 1 is output
-	Pins inline
-	getDirections()
-	{ return ~memory.direction; }
-
 	Pins inline
 	getPolarities()
 	{ return memory.polarity; }
 
+public:
+	/// Alias-templates for simpler use of the Pin
+	/// @{
+	template < Mcp23x17<Transport> &object >
+	using A0 = GpioExpanderPin< Mcp23x17<Transport>, object, Pin::A0 >;
+	template < Mcp23x17<Transport> &object >
+	using A1 = GpioExpanderPin< Mcp23x17<Transport>, object, Pin::A1 >;
+	template < Mcp23x17<Transport> &object >
+	using A2 = GpioExpanderPin< Mcp23x17<Transport>, object, Pin::A2 >;
+	template < Mcp23x17<Transport> &object >
+	using A3 = GpioExpanderPin< Mcp23x17<Transport>, object, Pin::A3 >;
+	template < Mcp23x17<Transport> &object >
+	using A4 = GpioExpanderPin< Mcp23x17<Transport>, object, Pin::A4 >;
+	template < Mcp23x17<Transport> &object >
+	using A5 = GpioExpanderPin< Mcp23x17<Transport>, object, Pin::A5 >;
+	template < Mcp23x17<Transport> &object >
+	using A6 = GpioExpanderPin< Mcp23x17<Transport>, object, Pin::A6 >;
+	template < Mcp23x17<Transport> &object >
+	using A7 = GpioExpanderPin< Mcp23x17<Transport>, object, Pin::A7 >;
+
+	template < Mcp23x17<Transport> &object >
+	using B0 = GpioExpanderPin< Mcp23x17<Transport>, object, Pin::B0 >;
+	template < Mcp23x17<Transport> &object >
+	using B1 = GpioExpanderPin< Mcp23x17<Transport>, object, Pin::B1 >;
+	template < Mcp23x17<Transport> &object >
+	using B2 = GpioExpanderPin< Mcp23x17<Transport>, object, Pin::B2 >;
+	template < Mcp23x17<Transport> &object >
+	using B3 = GpioExpanderPin< Mcp23x17<Transport>, object, Pin::B3 >;
+	template < Mcp23x17<Transport> &object >
+	using B4 = GpioExpanderPin< Mcp23x17<Transport>, object, Pin::B4 >;
+	template < Mcp23x17<Transport> &object >
+	using B5 = GpioExpanderPin< Mcp23x17<Transport>, object, Pin::B5 >;
+	template < Mcp23x17<Transport> &object >
+	using B6 = GpioExpanderPin< Mcp23x17<Transport>, object, Pin::B6 >;
+	template < Mcp23x17<Transport> &object >
+	using B7 = GpioExpanderPin< Mcp23x17<Transport>, object, Pin::B7 >;
+	/// @}
+
+	/// Alias-templates for simpler use of the Port
+	template < Mcp23x17<Transport> &object, Pin StartPin, uint8_t Width, GpioPort::DataOrder DataOrder = GpioPort::DataOrder::Normal  >
+	using Port = GpioExpanderPort< Mcp23x17<Transport>, object, StartPin, Width, DataOrder >;
+
 private:
-	/// @cond
 	struct ATTRIBUTE_PACKED
 	Memory
 	{

@@ -16,6 +16,7 @@
 #include "gpio_define.h"
 #include <xpcc/architecture/interface/gpio.hpp>
 #include <xpcc/architecture/interface/i2c.hpp>
+#include <xpcc/math/utils/bit_operation.hpp>
 
 /**
  * @ingroup 	platform
@@ -279,12 +280,25 @@ public:
 		return (DDR{{port}} & mask) ? Direction::Out : Direction::In;
 	}
 		%% endif
+	ALWAYS_INLINE static void
+	disconnect() {
+		%% if type == "Output"
+		DDR{{port}} &= ~mask;   // manual call to setInput()
+			%% if pue is defined
+		PUE{{port}} &= ~mask;
+			%% else
+		PORT{{port}} &= ~mask;
+			%% endif
+		%% else
+		setInput(InputType::Floating);
+		%% endif
+	}
 		%% for af in gpio.afs
 			%% if (	(af.type == 'in' and type == 'Input') or
 					(af.type == 'out' and type == 'Output') or
 					(af.type == 'io' or type == 'IO')	)
 	/// Connect `{{port~pin}}` as `{{af.name}}` to `{{af.peripheral}}`.
-	ALWAYS_INLINE static void
+	inline static void
 	connect(TypeId::{{ af.peripheral }}{{ af.name }}) {
 				%% if af.name == "Scl" and type == 'IO'
 		xpcc::I2c::resetDevices< {{name}} >();
@@ -326,7 +340,8 @@ public:
 
 %# Ports
 /// @cond
-template< Gpio::Port Port, uint8_t StartPin, uint8_t Width>
+// forward declaration for GpioPort
+template< Gpio::Port Port, uint8_t StartPin, uint8_t Width, GpioPort::DataOrder PortOrder >
 class GpioPortBase;
 /// @endcond
 
@@ -337,14 +352,40 @@ class GpioPortBase;
  * @tparam	Width		required width of the port (up to 8)
  * @ingroup {{target.string}}_gpio
  */
-template< class StartPin, uint8_t Width >
-class GpioPort : public ::xpcc::GpioPort, /** @cond */ public GpioPortBase< StartPin::port, StartPin::pin, Width> /** @endcond */
-{};
+template< class StartPin, uint8_t Width, ::xpcc::GpioPort::DataOrder PortOrder = GpioPort::DataOrder::Normal >
+class GpioPort : public ::xpcc::GpioPort, /** @cond */ public GpioPortBase< StartPin::port, StartPin::pin, Width, PortOrder > /** @endcond */
+{
+public:
+	static constexpr uint8_t width = Width;
+
+	static constexpr DataOrder
+	getDataOrder()
+	{ return PortOrder; }
+
+	using PortType = uint8_t;
+
+#ifdef __DOXYGEN__
+	static void
+	setOutput();
+
+	static void
+	setInput();
+
+	static PortType
+	read();
+
+	static void
+	write(PortType data);
+
+	static void
+	toggle();
+#endif
+};
 
 /// @cond
 %% for port in gpios | getPorts
-template< uint8_t StartPin, uint8_t Width >
-class GpioPortBase<Gpio::Port::{{port.name}}, StartPin, Width> : public Gpio
+template< uint8_t StartPin, uint8_t Width, ::xpcc::GpioPort::DataOrder PortOrder >
+class GpioPortBase<Gpio::Port::{{port.name}}, StartPin, Width, PortOrder> : public Gpio
 {
 	static_assert(StartPin < {{port.startPin + port.width}},
 			"StartPin too large, maximum {{port.startPin + port.width - 1}}.");
@@ -359,20 +400,17 @@ class GpioPortBase<Gpio::Port::{{port.name}}, StartPin, Width> : public Gpio
 	static constexpr uint8_t portMask = dataMask << StartPin;
 
 public:
-	static constexpr uint8_t width = Width;
-
-public:
 	ALWAYS_INLINE static void setOutput() {
 		DDR{{port.name}} |= portMask;
 	}
 	ALWAYS_INLINE static void setInput() {
 		DDR{{port.name}} &= ~portMask;
 	}
-	ALWAYS_INLINE static uint8_t read() {
+	inline static uint8_t read() {
 		uint8_t data = PIN{{port.name}} & portMask;
 		return (data >> StartPin);
 	}
-	ALWAYS_INLINE static void write(uint8_t data) {
+	inline static void write(uint8_t data) {
 		data <<= StartPin;
 		PORT{{port.name}} = (PORT{{port.name}} & ~portMask) | (data & portMask);
 	}
@@ -384,9 +422,49 @@ public:
 	%% endif
 	}
 };
+// another specialization for DataOrder::Reversed
+template< uint8_t StartPin, uint8_t Width >
+class GpioPortBase<Gpio::Port::{{port.name}}, StartPin, Width, ::xpcc::GpioPort::DataOrder::Reversed> : public Gpio
+{
+	static_assert(StartPin < {{port.startPin + port.width}},
+			"StartPin too large, maximum {{port.startPin + port.width - 1}}.");
+	static_assert(Width <= {{port.width}},
+			"Width too large, maximum {{port.width}}.");
+	static_assert(Width > 0,
+			"Width should be at least 1.");
+	static_assert(StartPin + Width <= {{port.startPin + port.width}},
+			"StartPin + Width too large, maximum {{port.startPin + port.width}}.");
+
+	static constexpr uint8_t StartPinReversed = (4 - StartPin - Width) + 4;
+	static constexpr uint8_t dataMask = (1 << Width) - 1;
+	static constexpr uint8_t portMask = dataMask << StartPin;
+
+public:
+	ALWAYS_INLINE static void setOutput() {
+		DDR{{port.name}} |= portMask;
+	}
+	ALWAYS_INLINE static void setInput() {
+		DDR{{port.name}} &= ~portMask;
+	}
+	inline static uint8_t read() {
+		uint8_t data = xpcc::bitReverse(uint8_t(PIN{{port.name}} & portMask));
+		return (data >> StartPinReversed);
+	}
+	inline static void write(uint8_t data) {
+		data = xpcc::bitReverse(uint8_t(data << StartPinReversed));
+		PORT{{port.name}} = (PORT{{port.name}} & ~portMask) | (data & portMask);
+	}
+	ALWAYS_INLINE static void toggle() {
+	%% if notoggle is defined
+		PORT{{port.name}} ^= portMask;
+	%% else
+		PIN{{port.name}} = portMask;
+	%% endif
+	}
+};
 	%% if port.startPin == 0 and port.width == 8
-template<>
-class GpioPortBase<Gpio::Port::{{port.name}}, 0, 8 > : public Gpio
+template< ::xpcc::GpioPort::DataOrder DataOrder >
+class GpioPortBase<Gpio::Port::{{port.name}}, 0, 8, DataOrder > : public Gpio
 {
 public:
 	static constexpr uint8_t width = 8;
@@ -403,6 +481,34 @@ public:
 	}
 	ALWAYS_INLINE static void write(uint8_t data) {
 		PORT{{port.name}} = data;
+	}
+	ALWAYS_INLINE static void toggle() {
+		%% if notoggle is defined
+		PORT{{port.name}} ^= 0xff;
+		%% else
+		PIN{{port.name}} = 0xff;
+		%% endif
+	}
+};
+// another specialization for DataOrder::Reversed
+template<>
+class GpioPortBase<Gpio::Port::{{port.name}}, 0, 8, ::xpcc::GpioPort::DataOrder::Reversed > : public Gpio
+{
+public:
+	static constexpr uint8_t width = 8;
+
+public:
+	ALWAYS_INLINE static void setOutput() {
+		DDR{{port.name}} = 0xff;
+	}
+	ALWAYS_INLINE static void setInput() {
+		DDR{{port.name}} = 0;
+	}
+	ALWAYS_INLINE static uint8_t read() {
+		return xpcc::bitReverse(uint8_t(PIN{{port.name}}));
+	}
+	ALWAYS_INLINE static void write(uint8_t data) {
+		PORT{{port.name}} = xpcc::bitReverse(data);
 	}
 	ALWAYS_INLINE static void toggle() {
 		%% if notoggle is defined

@@ -24,8 +24,8 @@ namespace xpcc
  *
  * The I2C interface is compliant with Fast Mode (up to 400kHz).
  *
- * @see Mcp23x08
- * @see Mcp23x17
+ * @see xpcc::Mcp23x08
+ * @see xpcc::Mcp23x17
  *
  * @ingroup driver_gpio
  * @author	Niklas Hauser

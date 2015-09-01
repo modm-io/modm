@@ -17,7 +17,6 @@
 #include <xpcc/io/iostream.hpp>
 #include <xpcc/debug/logger.hpp>
 #include <xpcc/driver/gpio/pca8574.hpp>
-#include <xpcc/driver/gpio/pca8574_gpio.hpp>
 
 #include "../../stm32f4_discovery.hpp"
 
@@ -57,23 +56,24 @@ GpioExpander gpioExpander;
 
 namespace expander
 {
-	// Storage for the pin state of this GPIO expander
-	xpcc::pca8574GpioStore store;
-
 	// Instances for each pin
-	typedef xpcc::Pca8574Gpio<store, GpioExpander, gpioExpander, 0 > Rs;
-	typedef xpcc::Pca8574Gpio<store, GpioExpander, gpioExpander, 1 > Rw;
-	typedef xpcc::Pca8574Gpio<store, GpioExpander, gpioExpander, 2 > E;
-	typedef xpcc::Pca8574Gpio<store, GpioExpander, gpioExpander, 3 > Backlight;
-	typedef xpcc::Pca8574Gpio<store, GpioExpander, gpioExpander, 4 > Pin4;
-	typedef xpcc::Pca8574Gpio<store, GpioExpander, gpioExpander, 5 > Pin5;
-	typedef xpcc::Pca8574Gpio<store, GpioExpander, gpioExpander, 6 > Pin6;
-	typedef xpcc::Pca8574Gpio<store, GpioExpander, gpioExpander, 7 > Pin7;
+	typedef GpioExpander::P0< gpioExpander > Rs;
+	typedef GpioExpander::P1< gpioExpander > Rw;
+	typedef GpioExpander::P2< gpioExpander > E;
+	typedef GpioExpander::P3< gpioExpander > Backlight;
+	typedef GpioExpander::P4< gpioExpander > Pin4;
+	typedef GpioExpander::P5< gpioExpander > Pin5;
+	typedef GpioExpander::P6< gpioExpander > Pin6;
+	// you can also declare the pin like this, however it is too verbose
+	typedef xpcc::GpioExpanderPin< GpioExpander, gpioExpander, GpioExpander::Pin::P7 > Pin7;
+//	typedef GpioExpander::P7< gpioExpander > Pin7;
 
 	// Form a GpioPort out of four single pins.
-	// This can be optimised by a special implementation of Pca8574Gpio which
-	// should provide an interface to a GpioPort, too.
-	typedef xpcc::SoftwareGpioPort<Pin7, Pin6, Pin5, Pin4> Data4BitGpio;
+	typedef GpioExpander::Port< gpioExpander,
+			GpioExpander::Pin::P4, 4 > Data4BitGpio;
+	// You can also use SoftwareGpioPort, note however, that every pin is set separately,
+	// so this requires four times as many bus accesses as the optimized version above.
+//	typedef xpcc::SoftwareGpioPort<Pin7, Pin6, Pin5, Pin4> Data4BitGpio;
 }
 
 // You can choose either port width simply by using it.
@@ -117,6 +117,16 @@ public:
 
 		XPCC_LOG_DEBUG << "Device responded" << xpcc::endl;
 
+		// Actually, this is not needed because of hardware defaults, but this is better style.
+		expander::Backlight::setOutput();
+		expander::Data4BitGpio::setOutput();
+
+		// Actually, this is not needed because of initialze of display driver.
+		expander::Rs::setOutput();
+		expander::Rw::setOutput();
+		expander::E::setOutput();
+
+		// Actually, this is not needed because of hardware defaults.
 		expander::Backlight::set();
 
 		// Initialize twice as some display are not initialised after first try.
@@ -174,8 +184,8 @@ main()
 
 	XPCC_LOG_INFO << "\n\nWelcome to HD44780 I2C demo!\n\n";
 
-	GpioB11::connect(I2cMaster2::Sda, Gpio::InputType::PullUp);
-	GpioB10::connect(I2cMaster2::Scl, Gpio::InputType::PullUp);
+	GpioB11::connect(MyI2cMaster::Sda, Gpio::InputType::PullUp);
+	GpioB10::connect(MyI2cMaster::Scl, Gpio::InputType::PullUp);
 
 	MyI2cMaster::initialize<Board::systemClock, 100000>();
 

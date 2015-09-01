@@ -72,7 +72,7 @@ xpcc::Mcp23x17<Transport>::toggle(Pins pins)
 
 template < class Transport >
 xpcc::ResumableResult<bool>
-xpcc::Mcp23x17<Transport>::update(Pins pins, bool value)
+xpcc::Mcp23x17<Transport>::set(Pins pins, bool value)
 {
 	RF_BEGIN();
 
@@ -142,4 +142,36 @@ xpcc::Mcp23x17<Transport>::resetInvertInput(Pins pins)
 	memory.polarity.reset(pins);
 
 	RF_END_RETURN_CALL( this->write16(i(Register::IPOL), memory.polarity.value) );
+}
+
+template < class Transport >
+xpcc::ResumableResult<bool>
+xpcc::Mcp23x17<Transport>::writePort(uint16_t data)
+{
+	RF_BEGIN();
+
+	// high is 1, low is 0
+	// output is 0, input is 1
+	// set output latches locally, but only those that are output
+	// clear all outputs
+	memory.outputLatch.clear(~memory.direction);
+	// set masked output values
+	memory.outputLatch.set(Pins(data) & ~memory.direction);
+
+	RF_END_RETURN_CALL( this->write16(i(Register::GPIO), memory.outputLatch.value) );
+}
+
+template < class Transport >
+xpcc::ResumableResult<bool>
+xpcc::Mcp23x17<Transport>::readPort(uint16_t &data)
+{
+	RF_BEGIN();
+
+	if (RF_CALL( readInput() ))
+	{
+		data = memory.gpio.value;
+		RF_RETURN( true );
+	}
+
+	RF_END_RETURN( false );
 }

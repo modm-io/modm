@@ -234,6 +234,24 @@ namespace xpcc
 #endif
 	}
 
+	/// @cond
+	constexpr int8_t
+	leftmostBitHelper(uint32_t value)
+	{
+		return (value == 0)?  0  :  (1 + leftmostBitHelper(value >> 1));
+	}
+	/// @endcond
+
+	/// Returns position of leftmost bit at compile time.
+	/// @retval -1  if no bit set in value
+	/// @retval n   position of leftmost bit
+	/// @ingroup math
+	constexpr int8_t
+	leftmostBit(uint32_t value)
+	{
+		return leftmostBitHelper(value) - 1;
+	}
+
 	// --------------------------------------------------------------------
 	/**
 	 * \brief	Count the number of bits set
