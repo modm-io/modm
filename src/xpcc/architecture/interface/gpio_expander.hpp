@@ -457,8 +457,8 @@ public:
 	static void
 	write(PortType data)
 	{
-		data = xpcc::bitReverse(PortType((data & dataMask) << StartIndexReversed));
-		data = (expander.getOutputs().value & ~portMask) | data;
+		data = xpcc::bitReverse(PortType(data << StartIndexReversed));
+		data = (expander.getOutputs().value & ~portMask) | (data & portMask);
 		RF_CALL_BLOCKING( expander.writePort(data) );
 	}
 
