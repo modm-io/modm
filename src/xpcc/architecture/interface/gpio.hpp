@@ -251,24 +251,39 @@ public:
  * This class provides the interface for up to 16 parallel IOs.
  * Be aware that the interface is the same regardless of the actual
  * mapping of the IOs.
- * For example, when a high octet (0xf400) is physically configured, the
- * data will still be written and read as a low octet (0x00f4).
+ * For example, when a high octet `0xf400` is physically configured, the
+ * data will still be written and read as a low octet `0x00f4`.
  *
+ * @note `DataOrder` is used to specify the bit order of the write and read data.
+ *       When set to Reversed the bit order of `data` is reversed whenever a write
+ *       or read to/from the port occurs. So a physical configuration of `0b11100100`
+ *       returns `0b00100111` when read, or data `0xe4` is written as a high octet
+ *       `0x2700`.
+ *
+ * @note `DataOrder` is a template Parameter
  * @ingroup	gpio
  */
 class GpioPort
 {
 public:
+	/// This enum can be used to reverse the bit order of the Data.
 	enum class
 	DataOrder : bool
 	{
-		Normal = false,
-		Reversed = true
+		Normal = false, ///< bit order of data is the same as bit order of port
+		Reversed = true ///< bit order of data is the reverse bit order of port
 	};
 #ifdef __DOXYGEN__
 	/// This holds the width of the port as number of bits
 	/// and can be used in drivers to assert the correct requirements
 	static constexpr uint8_t width;
+
+	/// may also be uint8_t, depending on port width
+	using PortType = uint16_t;
+
+	/// returns the chosen data order
+	static constexpr DataOrder
+	getDataOrder();
 
 public:
 	static void
@@ -278,12 +293,12 @@ public:
 	setInput();
 
 	/// The read data is always right-aligned regardless of physical mapping.
-	static uint16_t
+	static PortType
 	read();
 
 	/// The write data is always right-aligned regardless of physical mapping.
 	static void
-	write(uint16_t data);
+	write(PortType data);
 
 	/// Toggle the output states of all pins
 	static void
