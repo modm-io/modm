@@ -78,6 +78,20 @@
 #	define USART0_TX_vect		USART_TX_vect
 #endif
 
+// ATMega162 is crazy about USART0/1 RX and TX which have an extra 'C' for 'complete'
+#if defined(USART0_RXC_vect) and not defined(USART0_RX_vect)
+#	define USART0_RX_vect		USART0_RXC_vect
+#endif
+#if defined(USART1_RXC_vect) and not defined(USART1_RX_vect)
+#	define USART1_RX_vect		USART1_RXC_vect
+#endif
+#if defined(USART0_TXC_vect) and not defined(USART0_TX_vect)
+#	define USART0_TX_vect		USART0_TXC_vect
+#endif
+#if defined(USART1_TXC_vect) and not defined(USART1_TX_vect)
+#	define USART1_TX_vect		USART1_TXC_vect
+#endif
+
 #if defined(USARTRXC_vect) and not defined(USART0_RX_vect)
 #	define USART0_RX_vect		USARTRXC_vect
 #endif
