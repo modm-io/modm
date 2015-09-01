@@ -13,6 +13,7 @@
 #include "../../../type_ids.hpp"
 #include <xpcc/architecture/interface/gpio.hpp>
 #include <xpcc/architecture/interface/i2c.hpp>
+#include <xpcc/math/utils/bit_operation.hpp>
 
 %% for instance in gpios | getAdcs
 	%% if target is stm32f1
@@ -479,7 +480,7 @@ public:
 
 %# Ports
 /// @cond
-template< Gpio::Port Port, uint8_t StartPin, uint8_t Width>
+template< Gpio::Port Port, uint8_t StartPin, uint8_t Width, GpioPort::DataOrder PortOrder>
 class GpioPortBase;
 /// @endcond
 
@@ -490,32 +491,58 @@ class GpioPortBase;
  * @tparam	Width		required width of the port (up to 16)
  * @ingroup {{target.string}}_gpio
  */
-template< typename StartPin, uint8_t Width >
-class GpioPort : public ::xpcc::GpioPort, public GpioPortBase< StartPin::port, StartPin::pin, Width>
-{};
+template< typename StartPin, uint8_t Width, ::xpcc::GpioPort::DataOrder PortOrder = GpioPort::DataOrder::Normal >
+class GpioPort : public ::xpcc::GpioPort, /** @cond */ public GpioPortBase< StartPin::port, StartPin::pin, Width, PortOrder > /** @endcond */
+{
+public:
+	static constexpr uint8_t width = Width;
+
+	static constexpr DataOrder
+	getDataOrder()
+	{ return PortOrder; }
+
+	using PortType = uint16_t;
+
+#ifdef __DOXYGEN__
+	static void
+	setOutput();
+
+	static void
+	setInput();
+
+	static PortType
+	read();
+
+	static void
+	write(PortType data);
+
+	static void
+	toggle();
+#endif
+};
 
 /// @cond
+// there is no extra optimized specialization for Width=16 or DataOrder::Reversed, since using
+// a 16bit port is relatively rare and the optimizer will optimize the heck out of it anyway.
 %% for port in gpios | getPorts
-template< uint8_t StartPin, uint8_t Width >
-class GpioPortBase<Gpio::Port::{{port.name}}, StartPin, Width> : public Gpio
+template< uint8_t StartPin, uint8_t Width, ::xpcc::GpioPort::DataOrder PortOrder >
+class GpioPortBase<Gpio::Port::{{port.name}}, StartPin, Width, PortOrder> : public Gpio
 {
 	static_assert(StartPin < {{port.startPin + port.width}},
-			"StartPin too large, maximum {{port.startPin + port.width}}.");
+			"Port StartPin too large, maximum {{port.startPin + port.width}}.");
 	static_assert(Width <= {{port.width}},
-			"Width too large, maximum {{port.width}}.");
+			"Port Width too large, maximum {{port.width}}.");
 	static_assert(Width > 0,
-			"Width should be at least 1.");
+			"Port Width should be at least 1.");
 	static_assert(StartPin + Width <= {{port.startPin + port.width}},
-			"StartPin + Width too large, maximum {{port.startPin + port.width}}.");
+			"Port StartPin + Width too large, maximum {{port.startPin + port.width}}.");
 
+	static constexpr uint8_t StartPinReversed = (8 - StartPin - Width) + 8;
 	static constexpr uint16_t dataMask = (1 << Width) - 1;
 	static constexpr uint16_t portMask = dataMask << StartPin;
 	static constexpr uint32_t portMask2 = portMask | (portMask << Width);
 	static constexpr uint32_t port01 = 0x55555555 & portMask2;
 	static constexpr uint32_t port10 = 0xAAAAAAAA & portMask2;
-
-public:
-	static constexpr uint8_t width = Width;
 
 public:
 	ALWAYS_INLINE static void setOutput() {
@@ -551,13 +578,23 @@ public:
 			GPIO{{port.name}}->PUPDR |= port10;
 		}
 	}
-	ALWAYS_INLINE static uint16_t read() {
-		uint16_t data = GPIO{{port.name}}->IDR & portMask;
-		return (data >> StartPin);
+	inline static uint16_t read() {
+		if (PortOrder == ::xpcc::GpioPort::DataOrder::Normal) {   // this branch is optimized away
+			uint16_t data = GPIO{{port.name}}->IDR & portMask;
+			return (data >> StartPin);
+		} else {
+			uint16_t data = xpcc::bitReverse(uint16_t(GPIO{{port.name}}->IDR & portMask));
+			return (data >> StartPinReversed);
+		}
 	}
-	ALWAYS_INLINE static void write(uint16_t data) {
-		data <<= StartPin;
-		GPIO{{port.name}}->ODR = (GPIO{{port.name}}->ODR & ~portMask) | data;
+	inline static void write(uint16_t data) {
+		if (PortOrder == ::xpcc::GpioPort::DataOrder::Normal) {   // this branch is optimized away
+			data <<= StartPin;
+			GPIO{{port.name}}->ODR = (GPIO{{port.name}}->ODR & ~portMask) | (data & portMask);
+		} else {
+			data = xpcc::bitReverse(uint16_t(data << StartPinReversed));
+			GPIO{{port.name}}->ODR = (GPIO{{port.name}}->ODR & ~portMask) | (data & portMask);
+		}
 	}
 };
 
