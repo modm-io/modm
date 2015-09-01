@@ -39,7 +39,7 @@ namespace xpcc
  *     typedef GpioOutputD5 Mosi;
  * }
  *
- * SoftwareSimpleSpi< pin::Clk, pin::Mosi, xpcc::GpioUnused > Spi;
+ * xpcc::SoftwareSpiMaster< pin::Clk, pin::Mosi, xpcc::GpioUnused > Spi;
  *
  * ...
  * Spi::write(0xaa);
@@ -172,6 +172,10 @@ public:
  * Supplying up to 8 Gpios will use `uint8_t`, up to 16 Gpios will use
  * `uint16_t`.
  *
+ * @note Since the bit order is explicitly given by the order of template arguments,
+ *       this class only supports `DataOrder::Normal`.
+ *       If you need reverse bit order, reverse the order of `Gpios`!
+ *
  * @tparam Gpios	Up to 16 GpioIO classes, ordered MSB to LSB
  *
  * @author	Niklas Hauser
@@ -179,7 +183,30 @@ public:
  */
 template<typename... Gpios>
 class SoftwareGpioPort : public GpioPort
-{};
+{
+#ifdef __DOXYGEN__
+public:
+	static constexpr uint8_t width = sizeof(Gpios);
+	static constexpr DataOrder getDataOrder();
+
+	using PortType = uint16_t;
+
+	static void
+	setOutput();
+
+	static void
+	setInput();
+
+	static PortType
+	read();
+
+	static void
+	write(PortType data);
+
+	static void
+	toggle();
+#endif
+};
 
 /// @cond
 template<typename Gpio, typename... Gpios>
@@ -187,11 +214,14 @@ class SoftwareGpioPort<Gpio, Gpios...> : private SoftwareGpioPort<Gpios...>
 {
 public:
 	static constexpr uint8_t width = 1 + SoftwareGpioPort<Gpios...>::width;
+
+	static constexpr GpioPort::DataOrder
+	getDataOrder()
+	{ return GpioPort::DataOrder::Normal; }
 private:
 	typedef typename xpcc::tmp::Select< (width > 8),
 										uint16_t,
-										uint8_t >::Result Index;
-	typedef Index Size;
+										uint8_t >::Result PortType;
 
 public:
 	static void
@@ -208,10 +238,10 @@ public:
 		SoftwareGpioPort<Gpios...>::setInput();
 	}
 
-	static Size
+	static PortType
 	read()
 	{
-		Size data = SoftwareGpioPort<Gpios...>::read();
+		PortType data = SoftwareGpioPort<Gpios...>::read();
 		if (Gpio::read()) {
 			data |= (1 << (width-1));
 		}
@@ -219,7 +249,7 @@ public:
 	}
 
 	static void
-	write(Size data)
+	write(PortType data)
 	{
 		Gpio::set(data & (1 << (width-1)));
 		SoftwareGpioPort<Gpios...>::write(data);
