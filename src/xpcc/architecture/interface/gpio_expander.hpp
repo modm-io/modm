@@ -143,11 +143,12 @@ public:
 };
 
 /**
- * Create an xpcc GPIO compatible interface from any IO-expander
- * conforming to the xpcc::GpioExpander interface.
+ * Create an `xpcc::GpioIO` compatible interface from any IO-expander
+ * conforming to the `xpcc::GpioExpander` interface.
  *
  * This allows the transparent usage of IO Expander pins in classes that require
  * Gpios as template arguments.
+ *
  * @note For every pin access a blocking bus transfer is performed, therefore
  *       do not expect these gpios to be fast!
  *
@@ -178,12 +179,14 @@ public:
  * @warning Access to the IO-expander is **blocking and can silently fail**!
  *          If this is undesirable for you application, you need to write your own wrapper!
  *
+ * @pre     The IO-expander needs to be initialized externally, if required.
+ *
  * @see xpcc::GpioExpander
  * @see xpcc::GpioIO
  *
- * @tparam  GpioExpander    Type of class conforming to xpcc::GpioExpander interface
- * @tparam  expander        instance of the expander with the selected pin
- * @tparam  pin             pin identifier on expander
+ * @tparam  GpioExpander    Type of class conforming to the `xpcc::GpioExpander` interface
+ * @tparam  expander        instance of the expander
+ * @tparam  pin             pin identifier of desired expander pin
  *
  * @ingroup gpio
  * @author  strongly-typed
@@ -197,6 +200,7 @@ class GpioExpanderPin : public xpcc::GpioIO
 {
 public:
 	static constexpr Direction direction = Direction::InOut;
+	static constexpr GpioExpander &ioExpander = expander;
 
 public:
 	static void
@@ -262,6 +266,76 @@ public:
 	}
 };
 
+
+/**
+ * Create an `xpcc::GpioPort` compatible interface from any IO-expander
+ * conforming to the `xpcc::GpioExpander` interface.
+ *
+ * This allows the transparent usage of IO Expander ports in classes that require
+ * Ports as template arguments.
+ * The port access is optimized so that only one write or one read needs to be performed
+ * to update the port values.
+ * Any port position and width is supported and operates independently from the other
+ * IOs on the expander.
+ *
+ * @note For every port access a blocking bus transfer is performed, therefore
+ *       do not expect these ports to be fast!
+ *
+ * @warning You can also use `xpcc::SoftwareGpioPort` to create a port out of individual
+ *          `GpioExpanderPin` classes, however, since each pin is individually accessed,
+ *          this means more bus traffic and a non-atomic write and read of port data!
+ *          It is strongly recommended to use this optimized class instead!
+ *
+ * Usage:
+ * @code
+ * typedef xpcc::Pca8574<MyI2cMaster> Expander;
+ * Expander expander;
+ *
+ * typedef xpcc::GpioExpanderPort< Expander, expander, Expander::Pin::P4, 4 > Data;
+ * @endcode
+ *
+ * However, instead of using this class like that, prefer using the alias-template
+ * types provided by the IO-expander of your choice for better readability:
+ *
+ * @code
+ * typedef xpcc::Pca8574<MyI2cMaster> Expander;
+ * Expander expander;
+ *
+ * // a 4bit wide port in the upper nibble
+ * typedef Expander::Port< expander, Expander::Pin::P4, 4 > Data;
+ *
+ * // writes 0x50 on the port
+ * Data::write(0x5);
+ * @endcode
+ *
+ * You can reverse the ports bit order in software at runtime, so that data is written
+ * or read in reverse bit order when accessing the port:
+ *
+ * @code
+ * // a 4bit wide port in the upper nibble with reversed bit order
+ * typedef Expander::Port< expander, Expander::Pin::P4, 4, xpcc::GpioPort::DataOrder::Reversed > Data;
+ *
+ * // writes 0xa0 on the port
+ * Data::write(0x5);
+ * @endcode
+ *
+ * @warning Access to the IO-expander is **blocking and can silently fail**!
+ *          If this is undesirable for you application, you need to write your own wrapper!
+ *
+ * @pre     The IO-expander needs to be initialized externally, if required.
+ *
+ * @see xpcc::GpioExpander
+ * @see xpcc::GpioIO
+ *
+ * @tparam  GpioExpander    Type of class conforming to the `xpcc::GpioExpander` interface
+ * @tparam  expander        instance of the expander with the selected pin
+ * @tparam  StartPin        starting pin of the port, physically LSB
+ * @tparam  Width           width of the entire port in bits
+ * @tparam  DataOrder       the bit order mapping of data
+ *
+ * @ingroup gpio
+ * @author  Niklas Hauser
+ */
 template <
 	typename GpioExpander,
 	GpioExpander &expander,
@@ -272,9 +346,9 @@ class GpioExpanderPort : public xpcc::GpioPort
 {
 	static constexpr uint8_t StartIndex = GpioExpander::indexFromPin(StartPin);
 
-	static_assert(Width <= GpioExpander::width, "Width too large.");
-	static_assert(Width > 0, "Width should be at least 1.");
-	static_assert(StartIndex + Width <= GpioExpander::width, "StartPin + Width too large.");
+	static_assert(Width <= GpioExpander::width, "Port Width too large for IO expander.");
+	static_assert(Width > 0, "Port Width should be at least 1.");
+	static_assert(StartIndex + Width <= GpioExpander::width, "Port StartPin + Width too large for IO expander.");
 
 	using Pins = typename GpioExpander::Pins;
 	using PortType = typename GpioExpander::PortType;
@@ -284,6 +358,11 @@ class GpioExpanderPort : public xpcc::GpioPort
 
 public:
 	static constexpr uint8_t width = Width;
+
+	static constexpr DataOrder
+	getDataOrder() { return DataOrder::Normal; }
+
+	static constexpr GpioExpander &ioExpander = expander;
 
 public:
 	static void
@@ -322,6 +401,7 @@ public:
 };
 
 /// @cond
+// we are not going to document the specialization again
 template <
 	typename GpioExpander,
 	GpioExpander &expander,
@@ -333,11 +413,13 @@ class GpioExpanderPort<GpioExpander, expander, StartPin, Width, GpioPort::DataOr
 	using PortType = typename GpioExpander::PortType;
 
 	static constexpr uint8_t StartIndex = GpioExpander::indexFromPin(StartPin);
+	// we can find the required "reverse" shifting index using
+	// (T/2 - P - W) + T/2, with T = bitwidth of expander port, P = start position, W = port width
 	static constexpr uint8_t StartIndexReversed = (sizeof(PortType) * 4 - StartIndex - Width) + sizeof(PortType) * 4;
 
-	static_assert(Width <= GpioExpander::width, "Width too large.");
-	static_assert(Width > 0, "Width should be at least 1.");
-	static_assert(StartIndex + Width <= GpioExpander::width, "StartPin + Width too large.");
+	static_assert(Width <= GpioExpander::width, "Port Width too large for IO expander.");
+	static_assert(Width > 0, "Port Width should be at least 1.");
+	static_assert(StartIndex + Width <= GpioExpander::width, "Port StartPin + Width too large for IO expander.");
 
 	static constexpr PortType dataMask = (1 << Width) - 1;
 	static constexpr PortType portMask = dataMask << StartIndex;
@@ -345,6 +427,11 @@ class GpioExpanderPort<GpioExpander, expander, StartPin, Width, GpioPort::DataOr
 
 public:
 	static constexpr uint8_t width = Width;
+
+	static constexpr DataOrder
+	getDataOrder() { return DataOrder::Reversed; }
+
+	static constexpr GpioExpander &ioExpander = expander;
 
 public:
 	static void
