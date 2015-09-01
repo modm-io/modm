@@ -328,7 +328,7 @@ public:
 %# Ports
 /// @cond
 // forward declaration for GpioPort
-template< Gpio::Port Port, uint8_t StartPin, uint8_t Width, GpioPort::DataOrder DataOrder>
+template< Gpio::Port Port, uint8_t StartPin, uint8_t Width, GpioPort::DataOrder PortOrder >
 class GpioPortBase;
 /// @endcond
 
@@ -339,16 +339,19 @@ class GpioPortBase;
  * @tparam	Width		required width of the port (up to 8)
  * @ingroup {{target.string}}_gpio
  */
-template< class StartPin, uint8_t Width, ::xpcc::GpioPort::DataOrder DataOrder = GpioPort::DataOrder::Normal >
-class GpioPort : public ::xpcc::GpioPort, /** @cond */ public GpioPortBase< StartPin::port, StartPin::pin, Width, DataOrder> /** @endcond */
+template< class StartPin, uint8_t Width, ::xpcc::GpioPort::DataOrder PortOrder = GpioPort::DataOrder::Normal >
+class GpioPort : public ::xpcc::GpioPort, /** @cond */ public GpioPortBase< StartPin::port, StartPin::pin, Width, PortOrder > /** @endcond */
 {
-#ifdef __DOXYGEN__
 public:
-	static constexpr uint8_t width = sizeof(Gpios);
-	static constexpr DataOrder getDataOrder();
+	static constexpr uint8_t width = Width;
 
-	using PortType = uint16_t;
+	static constexpr DataOrder
+	getDataOrder()
+	{ return PortOrder; }
 
+	using PortType = uint8_t;
+
+#ifdef __DOXYGEN__
 	static void
 	setOutput();
 
@@ -368,8 +371,8 @@ public:
 
 /// @cond
 %% for port in gpios | getPorts
-template< uint8_t StartPin, uint8_t Width, ::xpcc::GpioPort::DataOrder DataOrder >
-class GpioPortBase<Gpio::Port::{{port.name}}, StartPin, Width, DataOrder> : public Gpio
+template< uint8_t StartPin, uint8_t Width, ::xpcc::GpioPort::DataOrder PortOrder >
+class GpioPortBase<Gpio::Port::{{port.name}}, StartPin, Width, PortOrder> : public Gpio
 {
 	static_assert(StartPin < {{port.startPin + port.width}},
 			"StartPin too large, maximum {{port.startPin + port.width - 1}}.");
@@ -382,9 +385,6 @@ class GpioPortBase<Gpio::Port::{{port.name}}, StartPin, Width, DataOrder> : publ
 
 	static constexpr uint8_t dataMask = (1 << Width) - 1;
 	static constexpr uint8_t portMask = dataMask << StartPin;
-
-public:
-	static constexpr uint8_t width = Width;
 
 public:
 	ALWAYS_INLINE static void setOutput() {
@@ -425,9 +425,6 @@ class GpioPortBase<Gpio::Port::{{port.name}}, StartPin, Width, ::xpcc::GpioPort:
 	static constexpr uint8_t StartPinReversed = (4 - StartPin - Width) + 4;
 	static constexpr uint8_t dataMask = (1 << Width) - 1;
 	static constexpr uint8_t portMask = dataMask << StartPin;
-
-public:
-	static constexpr uint8_t width = Width;
 
 public:
 	ALWAYS_INLINE static void setOutput() {
