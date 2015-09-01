@@ -283,7 +283,7 @@ public:
 		%% if type in ["", "Input"]
 	// GpioInput
 	// start documentation inherited
-	ALWAYS_INLINE static void
+	inline static void
 	setInput() {
 		{{reg}}->MODER   &= ~mask2;
 		// reset output type and speed
@@ -312,15 +312,9 @@ public:
 		constexpr uint8_t bit_pos = (pin & 0x03) << 2;
 		constexpr uint16_t syscfg_mask = (0x0f) << bit_pos;
 		constexpr uint16_t syscfg_value = (port_nr & (0x0f)) << bit_pos;
-%% if target is stm32f1
-		// Enable AFIO
-		RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
-		AFIO->EXTICR[index] = (AFIO->EXTICR[index] & ~syscfg_mask) | syscfg_value;
-%% elif target is stm32f2 or target is stm32f3 or target is stm32f4 or target is stm32f7
 		// Enable SYSCFG
 		RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
 		SYSCFG->EXTICR[index] = (SYSCFG->EXTICR[index] & ~syscfg_mask) | syscfg_value;
-%% endif
 		EXTI->IMR |= mask;
 	}
 	ALWAYS_INLINE static void
@@ -339,7 +333,7 @@ public:
 	{
 		NVIC_DisableIRQ(ExternalInterruptIRQ);
 	}
-	ALWAYS_INLINE static void
+	inline static void
 	setInputTrigger(const InputTrigger trigger)
 	{
 		switch (trigger)
@@ -373,7 +367,7 @@ public:
 		%% endif
 	// GpioIO
 	// start documentation inherited
-	ALWAYS_INLINE static Direction getDirection() {
+	inline static Direction getDirection() {
 		uint32_t mode = ({{reg}}->MODER & mask2);
 		if (mode == (i(Mode::Input) << pin * 2))
 			return Direction::In;
@@ -422,7 +416,7 @@ public:
 				%% endif
 				%% if type == '' and af.name in ['Scl', 'Sda']
 	/// Connect {{name}} as {{af.name}} to {{af.peripheral}}.
-	ALWAYS_INLINE static void
+	inline static void
 	connect(TypeId::{{ af.peripheral }}{{ af.name }} /* t */, InputType type=InputType::Floating) {
 		configure(type);
 					%% if af.name in ['Scl']
@@ -447,7 +441,7 @@ public:
 			%% for peripheral in   ['SoftwareSpiMasterMosi',
 									'SoftwareSpiMasterSck']
 	/// Connect to `{{peripheral}}`.
-	ALWAYS_INLINE static void
+	inline static void
 	connect(::xpcc::TypeId::{{ peripheral }}) {
 		configure(OutputType::PushPull);
 		setOutput();
@@ -459,7 +453,7 @@ public:
 			%% for peripheral in   ['SoftwareI2cMasterSda',
 									'SoftwareI2cMasterScl']
 	/// Connect to `{{peripheral}}`.
-	ALWAYS_INLINE static void
+	inline static void
 	connect(::xpcc::TypeId::{{ peripheral }}, InputType type=InputType::Floating) {
 		configure(type);
 				%% if peripheral in ['SoftwareI2cMasterScl']
@@ -558,7 +552,7 @@ public:
 	ALWAYS_INLINE static void setInput() {
 		GPIO{{port.name}}->MODER &= ~portMask2;
 	}
-	ALWAYS_INLINE static void
+	inline static void
 	configure(OutputType type,
 			  OutputSpeed speed = OutputSpeed::MHz50)
 	{
@@ -576,7 +570,7 @@ public:
 			GPIO{{port.name}}->OSPEEDR |= portMask2;
 		}
 	}
-	ALWAYS_INLINE static void configure(InputType type)
+	inline static void configure(InputType type)
 	{
 		GPIO{{port.name}}->PUPDR &= ~portMask2;
 		if (i(type) == 0b01) {

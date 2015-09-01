@@ -251,7 +251,7 @@ public:
 	{
 		NVIC_DisableIRQ(ExternalInterruptIRQ);
 	}
-	ALWAYS_INLINE static void
+	inline static void
 	setInputTrigger(const InputTrigger trigger)
 	{
 		switch (trigger)
@@ -271,8 +271,7 @@ public:
 		}
 	}
 	ALWAYS_INLINE static bool
-	getExternalInterruptFlag()
-	{
+	getExternalInterruptFlag() {
 		return (EXTI->PR & mask);
 	}
 	/**	\brief	Reset the interrupt flag in the interrupt routine. */
@@ -285,7 +284,7 @@ public:
 		%% endif
 	// GpioIO
 	// start documentation inherited
-	ALWAYS_INLINE static Direction getDirection() {
+	inline static Direction getDirection() {
 		uint32_t mode = ({{reg}}->{{cr}} & mask4);
 		if ((mode == 0) or (mode > (uint32_t(0b1001) << (cr_pin * 4))))
 			return Direction::Special;
@@ -342,7 +341,7 @@ public:
 				%% endif
 				%% if type == '' and af.name in ['Scl', 'Sda']
 	/// Connect {{name}} as {{af.name}} to {{af.peripheral}}.
-	ALWAYS_INLINE static void
+	inline static void
 	connect(TypeId::{{ af.peripheral }}{{ af.name }} /* t */) {
 					%% if af.name in ['Scl']
 		I2c::resetDevices< {{name}} >();
@@ -377,7 +376,7 @@ public:
 			%% for peripheral in   ['SoftwareI2cMasterSda',
 									'SoftwareI2cMasterScl']
 	/// Connect to `{{peripheral}}`.
-	ALWAYS_INLINE static void
+	inline static void
 	connect(::xpcc::TypeId::{{ peripheral }}) {
 				%% if peripheral in ['SoftwareI2cMasterScl']
 		I2c::resetDevices< {{name}} >();
@@ -477,15 +476,15 @@ class GpioPortBase<Gpio::Port::{{port.name}}, StartPin, Width, PortOrder> : publ
 	static constexpr uint32_t port1000H = 0x88888888 & configMaskH;
 
 public:
-	ALWAYS_INLINE static void setOutput() {
+	inline static void setOutput() {
 		GPIO{{port.name}}->CRH = (GPIO{{port.name}}->CRH & ~configMaskH) | port0001H | port0010H;
 		GPIO{{port.name}}->CRL = (GPIO{{port.name}}->CRL & ~configMaskL) | port0001L | port0010L;
 	}
-	ALWAYS_INLINE static void setInput() {
+	inline static void setInput() {
 		GPIO{{port.name}}->CRH = (GPIO{{port.name}}->CRH & ~configMaskH) | port0100H;
 		GPIO{{port.name}}->CRL = (GPIO{{port.name}}->CRL & ~configMaskL) | port0100L;
 	}
-	ALWAYS_INLINE static void
+	inline static void
 	configure(OutputType type,
 			  OutputSpeed speed = OutputSpeed::MHz50)
 	{
@@ -507,7 +506,7 @@ public:
 		GPIO{{port.name}}->CRH = (GPIO{{port.name}}->CRH & ~configMaskH) | crh;
 		GPIO{{port.name}}->CRL = (GPIO{{port.name}}->CRL & ~configMaskL) | crl;
 	}
-	ALWAYS_INLINE static void configure(InputType type)
+	inline static void configure(InputType type)
 	{
 		if (type == InputType::Floating) {
 			GPIO{{port.name}}->CRH = (GPIO{{port.name}}->CRH & ~configMaskH) | port0100H;

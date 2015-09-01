@@ -298,7 +298,7 @@ public:
 					(af.type == 'out' and type == 'Output') or
 					(af.type == 'io' or type == 'IO')	)
 	/// Connect `{{port~pin}}` as `{{af.name}}` to `{{af.peripheral}}`.
-	ALWAYS_INLINE static void
+	inline static void
 	connect(TypeId::{{ af.peripheral }}{{ af.name }}) {
 				%% if af.name == "Scl" and type == 'IO'
 		xpcc::I2c::resetDevices< {{name}} >();
@@ -406,11 +406,11 @@ public:
 	ALWAYS_INLINE static void setInput() {
 		DDR{{port.name}} &= ~portMask;
 	}
-	ALWAYS_INLINE static uint8_t read() {
+	inline static uint8_t read() {
 		uint8_t data = PIN{{port.name}} & portMask;
 		return (data >> StartPin);
 	}
-	ALWAYS_INLINE static void write(uint8_t data) {
+	inline static void write(uint8_t data) {
 		data <<= StartPin;
 		PORT{{port.name}} = (PORT{{port.name}} & ~portMask) | (data & portMask);
 	}
@@ -446,11 +446,11 @@ public:
 	ALWAYS_INLINE static void setInput() {
 		DDR{{port.name}} &= ~portMask;
 	}
-	ALWAYS_INLINE static uint8_t read() {
+	inline static uint8_t read() {
 		uint8_t data = xpcc::bitReverse(uint8_t(PIN{{port.name}} & portMask));
 		return (data >> StartPinReversed);
 	}
-	ALWAYS_INLINE static void write(uint8_t data) {
+	inline static void write(uint8_t data) {
 		data = xpcc::bitReverse(uint8_t(data << StartPinReversed));
 		PORT{{port.name}} = (PORT{{port.name}} & ~portMask) | (data & portMask);
 	}
