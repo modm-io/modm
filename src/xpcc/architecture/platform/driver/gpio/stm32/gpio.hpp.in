@@ -384,7 +384,14 @@ public:
 	// end documentation inherited
 	ALWAYS_INLINE static void
 	disconnect() {
-		{{reg}}->MODER = ({{reg}}->MODER   & ~mask2) | (i(Mode::Input) << (pin * 2));
+		%% if type == "Output"
+		{{reg}}->MODER &= ~mask2;
+		{{reg}}->OTYPER  &= ~mask;
+		{{reg}}->OSPEEDR &= ~mask2;
+		{{reg}}->PUPDR &= ~mask2;
+		%% else
+		setInput(InputType::Floating);
+		%% endif
 		{{reg}}->AFR[af_id] = ({{reg}}->AFR[af_id] & ~af_mask);
 	}
 	// connect: Hardware Gpio

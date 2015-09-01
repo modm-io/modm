@@ -280,6 +280,19 @@ public:
 		return (DDR{{port}} & mask) ? Direction::Out : Direction::In;
 	}
 		%% endif
+	ALWAYS_INLINE static void
+	disconnect() {
+		%% if type == "Output"
+		DDR{{port}} &= ~mask;   // manual call to setInput()
+			%% if pue is defined
+		PUE{{port}} &= ~mask;
+			%% else
+		PORT{{port}} &= ~mask;
+			%% endif
+		%% else
+		setInput(InputType::Floating);
+		%% endif
+	}
 		%% for af in gpio.afs
 			%% if (	(af.type == 'in' and type == 'Input') or
 					(af.type == 'out' and type == 'Output') or
