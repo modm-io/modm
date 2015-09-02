@@ -100,6 +100,26 @@ max(const T& a, const T& b)
  * @ingroup sorting_algorithms
  * @param  a  A thing of arbitrary type.
  * @param  b  Another thing of arbitrary type.
+ * @param  c  Something else of arbitrary type.
+ * @return   The greater of the three parameters.
+ *
+ * This is the simple classic generic implementation.  It will work on
+ * temporary expressions, since they are only evaluated once, unlike a
+ * preprocessor macro.
+ */
+template<typename T>
+constexpr T
+max(const T a, const T b, const T c)
+{
+	return ( ( (b > c) ? b : c ) > a ) ?
+	         ( (b > c) ? b : c) : a;
+}
+
+/**
+ * @brief This does what you think it does.
+ * @ingroup sorting_algorithms
+ * @param  a  A thing of arbitrary type.
+ * @param  b  Another thing of arbitrary type.
  * @param  compare  A comparison functor.
  * @return   The lesser of the parameters.
  *
@@ -123,7 +143,7 @@ min(const T& a, const T& b, Compare compare)
  * @param  b  Another thing of arbitrary type.
  * @param  compare  A comparison functor.
  * @return   The greater of the parameters.
- * 
+ *
  * This will work on temporary expressions, since they are only evaluated
  * once, unlike a preprocessor macro.
  */
