@@ -141,7 +141,6 @@ class STMDeviceWriter(XMLDeviceWriter):
 
 	def addMemoryToNode(self, node):
 		memories = self.device.getProperty('memories')
-		memory = node.addChild('memory')
 
 		for mem in memories.values:
 			sections = mem.value
@@ -149,15 +148,20 @@ class STMDeviceWriter(XMLDeviceWriter):
 			for id in mem.ids.differenceFromIds(self.device.ids):
 				attr = self._getAttributeDictionaryFromId(id)
 				for section in sections:
-					memory_section = memory.addChild('section')
+					memory_section = node.addChild('memory')
 					memory_section.setAttributes(attr)
 					memory_section.setAttributes(section)
 		# sort the node children by start address
-		memory.sort(key=lambda k: (int(k.get('start'), 16)))
+		# node.sort(key=lambda k: (int(k.get('start'), 16)))
+
+	@staticmethod
+	def sortNode(k):
+		if k.tag not in ['vector', 'memory']:
+			return -1
+		return (k.tag, int(k.get('position')) if k.get('position') else (k.tag, int(k.get('start'), 16), int(k.get('size'))))
 
 	def addInterruptTableToNode(self, node):
 		interrupts = self.device.getProperty('interrupts')
-		ivector = node.addChild('vectors')
 
 		for interrupt in interrupts.values:
 			vectors = interrupt.value
@@ -165,11 +169,11 @@ class STMDeviceWriter(XMLDeviceWriter):
 			for id in interrupt.ids.differenceFromIds(self.device.ids):
 				attr = self._getAttributeDictionaryFromId(id)
 				for vec in vectors:
-					vector_section = ivector.addChild('vector')
+					vector_section = node.addChild('vector')
 					vector_section.setAttributes(attr)
 					vector_section.setAttributes(vec)
-		# sort the node children by start address
-		ivector.sort(key=lambda k: (int(k.get('position'), 16)))
+		# sort the node children by vector number
+		node.sort(key=STMDeviceWriter.sortNode)
 
 	def addGpioToNode(self, node):
 		props = self.device.getProperty('gpios')

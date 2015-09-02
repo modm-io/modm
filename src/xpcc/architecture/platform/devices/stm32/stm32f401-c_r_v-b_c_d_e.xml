@@ -21,72 +21,68 @@
     <define device-size-id="d|e">STM32F401xE</define>
     <define>STM32F4XX</define>
     <driver type="core" name="cortex">
-      <memory>
-        <section device-size-id="b" access="rx" start="0x8000000" name="flash" size="128"/>
-        <section device-size-id="c" access="rx" start="0x8000000" name="flash" size="256"/>
-        <section device-size-id="d" access="rx" start="0x8000000" name="flash" size="384"/>
-        <section device-size-id="e" access="rx" start="0x8000000" name="flash" size="512"/>
-        <section device-size-id="b|c" access="rwx" start="0x20000000" name="sram1" size="64"/>
-        <section device-size-id="d|e" access="rwx" start="0x20000000" name="sram1" size="96"/>
-      </memory>
-      <vectors>
-        <vector position="0" name="WWDG"/>
-        <vector position="1" name="PVD"/>
-        <vector position="2" name="TAMP_STAMP"/>
-        <vector position="3" name="RTC_WKUP"/>
-        <vector position="4" name="FLASH"/>
-        <vector position="5" name="RCC"/>
-        <vector position="6" name="EXTI0"/>
-        <vector position="7" name="EXTI1"/>
-        <vector position="8" name="EXTI2"/>
-        <vector position="9" name="EXTI3"/>
-        <vector position="10" name="EXTI4"/>
-        <vector position="11" name="DMA1_Stream0"/>
-        <vector position="12" name="DMA1_Stream1"/>
-        <vector position="13" name="DMA1_Stream2"/>
-        <vector position="14" name="DMA1_Stream3"/>
-        <vector position="15" name="DMA1_Stream4"/>
-        <vector position="16" name="DMA1_Stream5"/>
-        <vector position="17" name="DMA1_Stream6"/>
-        <vector position="18" name="ADC"/>
-        <vector position="23" name="EXTI9_5"/>
-        <vector position="24" name="TIM1_BRK_TIM9"/>
-        <vector position="25" name="TIM1_UP_TIM10"/>
-        <vector position="26" name="TIM1_TRG_COM_TIM11"/>
-        <vector position="27" name="TIM1_CC"/>
-        <vector position="28" name="TIM2"/>
-        <vector position="29" name="TIM3"/>
-        <vector position="30" name="TIM4"/>
-        <vector position="31" name="I2C1_EV"/>
-        <vector position="32" name="I2C1_ER"/>
-        <vector position="33" name="I2C2_EV"/>
-        <vector position="34" name="I2C2_ER"/>
-        <vector position="35" name="SPI1"/>
-        <vector position="36" name="SPI2"/>
-        <vector position="37" name="USART1"/>
-        <vector position="38" name="USART2"/>
-        <vector position="40" name="EXTI15_10"/>
-        <vector position="41" name="RTC_Alarm"/>
-        <vector position="42" name="OTG_FS_WKUP"/>
-        <vector position="47" name="DMA1_Stream7"/>
-        <vector position="49" name="SDIO"/>
-        <vector position="50" name="TIM5"/>
-        <vector position="51" name="SPI3"/>
-        <vector position="56" name="DMA2_Stream0"/>
-        <vector position="57" name="DMA2_Stream1"/>
-        <vector position="58" name="DMA2_Stream2"/>
-        <vector position="59" name="DMA2_Stream3"/>
-        <vector position="60" name="DMA2_Stream4"/>
-        <vector position="67" name="OTG_FS"/>
-        <vector position="68" name="DMA2_Stream5"/>
-        <vector position="69" name="DMA2_Stream6"/>
-        <vector position="70" name="DMA2_Stream7"/>
-        <vector position="71" name="USART6"/>
-        <vector position="72" name="I2C3_EV"/>
-        <vector position="73" name="I2C3_ER"/>
-        <vector position="81" name="FPU"/>
-        <vector position="84" name="SPI4"/>
-      </vectors>
+      <memory device-size-id="b" access="rx" start="0x8000000" name="flash" size="128"/>
+      <memory device-size-id="c" access="rx" start="0x8000000" name="flash" size="256"/>
+      <memory device-size-id="d" access="rx" start="0x8000000" name="flash" size="384"/>
+      <memory device-size-id="e" access="rx" start="0x8000000" name="flash" size="512"/>
+      <memory device-size-id="b|c" access="rwx" start="0x20000000" name="sram1" size="64"/>
+      <memory device-size-id="d|e" access="rwx" start="0x20000000" name="sram1" size="96"/>
+      <vector position="0" name="WWDG"/>
+      <vector position="1" name="PVD"/>
+      <vector position="2" name="TAMP_STAMP"/>
+      <vector position="3" name="RTC_WKUP"/>
+      <vector position="4" name="FLASH"/>
+      <vector position="5" name="RCC"/>
+      <vector position="6" name="EXTI0"/>
+      <vector position="7" name="EXTI1"/>
+      <vector position="8" name="EXTI2"/>
+      <vector position="9" name="EXTI3"/>
+      <vector position="10" name="EXTI4"/>
+      <vector position="11" name="DMA1_Stream0"/>
+      <vector position="12" name="DMA1_Stream1"/>
+      <vector position="13" name="DMA1_Stream2"/>
+      <vector position="14" name="DMA1_Stream3"/>
+      <vector position="15" name="DMA1_Stream4"/>
+      <vector position="16" name="DMA1_Stream5"/>
+      <vector position="17" name="DMA1_Stream6"/>
+      <vector position="18" name="ADC"/>
+      <vector position="23" name="EXTI9_5"/>
+      <vector position="24" name="TIM1_BRK_TIM9"/>
+      <vector position="25" name="TIM1_UP_TIM10"/>
+      <vector position="26" name="TIM1_TRG_COM_TIM11"/>
+      <vector position="27" name="TIM1_CC"/>
+      <vector position="28" name="TIM2"/>
+      <vector position="29" name="TIM3"/>
+      <vector position="30" name="TIM4"/>
+      <vector position="31" name="I2C1_EV"/>
+      <vector position="32" name="I2C1_ER"/>
+      <vector position="33" name="I2C2_EV"/>
+      <vector position="34" name="I2C2_ER"/>
+      <vector position="35" name="SPI1"/>
+      <vector position="36" name="SPI2"/>
+      <vector position="37" name="USART1"/>
+      <vector position="38" name="USART2"/>
+      <vector position="40" name="EXTI15_10"/>
+      <vector position="41" name="RTC_Alarm"/>
+      <vector position="42" name="OTG_FS_WKUP"/>
+      <vector position="47" name="DMA1_Stream7"/>
+      <vector position="49" name="SDIO"/>
+      <vector position="50" name="TIM5"/>
+      <vector position="51" name="SPI3"/>
+      <vector position="56" name="DMA2_Stream0"/>
+      <vector position="57" name="DMA2_Stream1"/>
+      <vector position="58" name="DMA2_Stream2"/>
+      <vector position="59" name="DMA2_Stream3"/>
+      <vector position="60" name="DMA2_Stream4"/>
+      <vector position="67" name="OTG_FS"/>
+      <vector position="68" name="DMA2_Stream5"/>
+      <vector position="69" name="DMA2_Stream6"/>
+      <vector position="70" name="DMA2_Stream7"/>
+      <vector position="71" name="USART6"/>
+      <vector position="72" name="I2C3_EV"/>
+      <vector position="73" name="I2C3_ER"/>
+      <vector position="81" name="FPU"/>
+      <vector position="84" name="SPI4"/>
     </driver>
     <driver type="adc" name="stm32" instances="1"/>
     <driver type="clock" name="stm32"/>

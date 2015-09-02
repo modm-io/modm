@@ -135,7 +135,7 @@ class STMDeviceReader(XMLDeviceReader):
 								 'size': str(flash)})
 			else:
 				memories.append({'name': mem,
-								 'access': 'rwx',
+				                 'access': 'rw' if self.id.family == 'f4' and mem == 'ccm' else 'rwx',
 								 'start': "0x{:02X}".format(mem_fam['start'][mem]),
 								 'size': str(val)})
 
