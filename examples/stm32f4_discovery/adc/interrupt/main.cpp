@@ -14,12 +14,12 @@ xpcc::log::Logger xpcc::log::info(loggerDevice);
 static void
 printAdc()
 {
-	Adc3::acknowledgeInterruptFlags(Adc3::InterruptFlag::All);
+	Adc2::acknowledgeInterruptFlags(Adc2::InterruptFlag::All);
 
 	const float maxVoltage = 3.3;
 	float voltage = 0.0;
 	int adcValue = 0;
-	adcValue = Adc3::getValue();
+	adcValue = Adc2::getValue();
 	XPCC_LOG_INFO << "adcValue=" << adcValue;
 	voltage = adcValue * maxVoltage / 0xfff;
 	XPCC_LOG_INFO << " voltage=" << voltage << xpcc::endl;
@@ -35,18 +35,18 @@ MAIN_FUNCTION
 	GpioInputA3::connect(Usart2::Rx, Gpio::InputType::PullUp);
 	Usart2::initialize<Board::systemClock, 115200>(12);
 
-	// initialize Adc3
-	Adc3::initialize<Board::systemClock>();
+	// initialize Adc2
+	Adc2::initialize<Board::systemClock>();
 	AdcIn::connect(Adc2::Channel7);
 	Adc2::setChannel(AdcIn::Adc2Channel);
 
-	Adc3::enableInterruptVector(5);
-	Adc3::enableInterrupt(Adc3::Interrupt::EndOfRegularConversion);
-	AdcInterrupt3::attachInterruptHandler(printAdc);
+	Adc2::enableInterruptVector(5);
+	Adc2::enableInterrupt(Adc2::Interrupt::EndOfRegularConversion);
+	AdcInterrupt2::attachInterruptHandler(printAdc);
 
 	while (1)
 	{
-		Adc3::startConversion();
+		Adc2::startConversion();
 
 		xpcc::delayMilliseconds(500);
 	}
