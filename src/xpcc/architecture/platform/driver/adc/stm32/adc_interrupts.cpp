@@ -7,6 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
+#include "../../../device.hpp"
+
 // this should be able to be generated instead of using Macros for this.
 #ifdef ADC1
 #	include "adc_interrupt_1.hpp"
