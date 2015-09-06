@@ -10,6 +10,8 @@
 #ifndef XPCC_IOSTREAM_HPP
 #define XPCC_IOSTREAM_HPP
 
+#include <cstddef>
+
 #include <xpcc/architecture/detect.hpp>
 #include <xpcc/architecture/utils.hpp>
 
@@ -58,6 +60,37 @@ public :
 		}
 		return *this;
 	}
+
+	/// reads characters into NULL delimited c string
+	/// in contrast to the standard implementation, this does not care about
+	/// newline characters in the input
+	inline IOStream&
+	get(char* s, size_t n)
+	{
+		if(n < 1) {
+			return *this;
+		}
+		char cc;
+		size_t ii;
+		for(ii = 0; ii < (n-1); ++ii) {
+			if(this->device->read(cc)) {
+				s[ii] = cc;
+			} else {
+				break;
+			}
+		}
+		s[ii] = '\0';
+		return *this;
+	}
+
+	template<size_t N>
+	inline IOStream&
+	get(char (&s)[N])
+	{
+		return this->get(s, N);
+	}
+
+
 
 	inline IOStream&
 	flush()
