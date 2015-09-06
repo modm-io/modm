@@ -175,6 +175,15 @@ namespace unittest
 		}
 	}
 
+	// ------------------------------------------------------------------------
+	inline void
+	printString(xpcc::IOStream& stream, const char* a, const char* b, size_t pos)
+	{
+		stream << xpcc::endl << a << xpcc::endl << b << xpcc::endl;
+		for(size_t ii = 0; ii < pos; ++ii) { stream << " "; }
+		stream << "^" << xpcc::endl;
+	}
+
 	inline bool
 	checkString(const char* a, const char* b, unsigned int line)
 	{
@@ -182,12 +191,16 @@ namespace unittest
 		while(a[ii] != '\0' && b[ii] != '\0') {
 			if (a[ii] != b[ii]) {
 				xpcc::IOStream& stream = TEST_REPORTER__.reportFailure(line);
-				stream << xpcc::endl << a << xpcc::endl << b << xpcc::endl;
-				for(size_t jj = 0; jj < ii; ++jj) { stream << " "; }
-				stream << "^" << xpcc::endl;
+				printString(stream, a, b, ii);
 				return false;
 			}
 			++ii;
+		}
+		// strings are not of equal length
+		if(a[ii] != '\0' || b[ii] != '\0') {
+			xpcc::IOStream& stream = TEST_REPORTER__.reportFailure(line);
+			printString(stream, a, b, ii);
+			return false;
 		}
 		TEST_REPORTER__.reportPass();
 		return true;
