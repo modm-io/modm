@@ -39,13 +39,13 @@ public:
 
 private:
 	static inline uint8_t
-	hexToByte(const char *s)
+	hexToByte(const char *s, bool& error)
 	{
-		return (charToByte(s) << 4) | charToByte(s + 1);
+		return (charToByte(s[0], error) << 4) | charToByte(s[1], error);
 	}
 
 	static uint8_t
-	charToByte(const char *s);
+	charToByte(const char cc, bool& error);
 
 	static char
 	byteToHex(uint8_t num);
