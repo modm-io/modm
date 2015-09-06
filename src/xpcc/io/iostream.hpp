@@ -51,7 +51,7 @@ public :
 
 	/// Reads one character and returns it if available. Otherwise, returns IOStream::eof.
 	inline IOStream&
-	get(char c)
+	get(char& c)
 	{
 		if(!this->device->read(c)) {
 			c = IOStream::eof;
