@@ -75,7 +75,7 @@ unittest::Reporter::reportFailure(unsigned int lineNumber)
 	return outputStream;
 }
 
-void
+uint8_t
 unittest::Reporter::printSummary()
 {
 	if (testsFailed == 0) {
@@ -84,6 +84,7 @@ unittest::Reporter::printSummary()
 					 << xpcc::accessor::asFlash(reportTests)
 					 << xpcc::accessor::asFlash(reportOk)
 					 << xpcc::endl;
+		return 0;
 	}
 	else {
 		outputStream << xpcc::accessor::asFlash(reportFailed)
@@ -93,5 +94,6 @@ unittest::Reporter::printSummary()
 					 << xpcc::accessor::asFlash(reportTests)
 					 << xpcc::accessor::asFlash(reportFail)
 					 << xpcc::endl;
+		return 1;
 	}
 }
