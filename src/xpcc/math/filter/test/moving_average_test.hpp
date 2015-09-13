@@ -41,4 +41,7 @@ public:
 	
 	void
 	testAverage();
+
+    void
+    testFloatAverage();
 };

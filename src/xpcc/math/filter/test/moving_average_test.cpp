@@ -34,13 +34,21 @@
 
 namespace
 {
-	struct TestData
+    struct TestData
 	{
 		typedef int16_t Type;
 		
 		Type input;
 		Type output;
 	};
+
+    struct TestDataFloat
+    {
+        typedef double Type;
+
+        Type input;
+        Type output;
+    };
 	
 	static const TestData data[] =
 	{
@@ -61,12 +69,32 @@ namespace
 		{ 200,	175 },
 		{ 200,	200 },
 	};
+
+    static const TestDataFloat dataF[] =
+    {
+        { 10.0,	2.5 },
+        { 10.0,	5.0 },
+        { 10.0,	7.5 },
+        { 10.0,	10.0 },
+        { -10.0,	5.0 },
+        { -10.0,	0.0 },
+        { 5,	-1.25 },
+        { 5,	-2.5 },
+        { 5,	1.25 },
+        { 5,	5.0 },
+        { 100,	28.75 },
+        { 100,	52.5 },
+        { 200,	101.25 },
+        { 200,	150.0 },
+        { 200,	175.0 },
+        { 200,	200.0 },
+    };
 }
 
 void
 MovingAverageTest::testDefaultConstructor()
 {
-	xpcc::MovingAverage<int16_t, 4> filter;
+    xpcc::filter::MovingAverage<int16_t, 4> filter;
 	
 	TEST_ASSERT_EQUALS(filter.getValue(), 0);
 }
@@ -74,7 +102,7 @@ MovingAverageTest::testDefaultConstructor()
 void
 MovingAverageTest::testConstructor()
 {
-	xpcc::MovingAverage<int16_t, 4> filter(20);
+    xpcc::filter::MovingAverage<int16_t, 4> filter(20);
 	
 	TEST_ASSERT_EQUALS(filter.getValue(), 20);
 }
@@ -82,11 +110,23 @@ MovingAverageTest::testConstructor()
 void
 MovingAverageTest::testAverage()
 {
-	xpcc::MovingAverage<TestData::Type, 4> filter;
+    xpcc::filter::MovingAverage<TestData::Type, 4> filter;
 	
 	for (uint_fast8_t i = 0; i < (sizeof(data) / sizeof(TestData)); ++i)
 	{
 		filter.update(data[i].input);
 		TEST_ASSERT_EQUALS(filter.getValue(), data[i].output);
 	}
+}
+
+void
+MovingAverageTest::testFloatAverage()
+{
+    xpcc::filter::MovingAverage<TestDataFloat::Type, 4> filter;
+    for (uint_fast8_t i = 0; i < (sizeof(data) / sizeof(TestDataFloat)); ++i)
+    {
+        filter.update(dataF[i].input);
+        TEST_ASSERT_TRUE(abs(filter.getValue()-dataF[i].output) < 1e-4);
+    }
+
 }
