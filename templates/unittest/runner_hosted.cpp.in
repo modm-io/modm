@@ -39,7 +39,5 @@ main(void)
 	// run tests
 ${tests}
 
-	unittest::Controller::instance().getReporter().printSummary();
-
-	return 0;
+	return unittest::Controller::instance().getReporter().printSummary();
 }

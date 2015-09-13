@@ -128,7 +128,7 @@ namespace unittest
 	
 	// ------------------------------------------------------------------------
 	template <typename A, typename B>
-	bool
+	inline bool
 	checkEqual(const A& a, const B& b, unsigned int line)
 	{
 		if (a == b) {
@@ -174,7 +174,38 @@ namespace unittest
 			return false;
 		}
 	}
-	
+
+	// ------------------------------------------------------------------------
+	inline void
+	printString(xpcc::IOStream& stream, const char* a, const char* b, size_t pos)
+	{
+		stream << xpcc::endl << a << xpcc::endl << b << xpcc::endl;
+		for(size_t ii = 0; ii < pos; ++ii) { stream << " "; }
+		stream << "^" << xpcc::endl;
+	}
+
+	inline bool
+	checkString(const char* a, const char* b, unsigned int line)
+	{
+		size_t ii = 0;
+		while(a[ii] != '\0' && b[ii] != '\0') {
+			if (a[ii] != b[ii]) {
+				xpcc::IOStream& stream = TEST_REPORTER__.reportFailure(line);
+				printString(stream, a, b, ii);
+				return false;
+			}
+			++ii;
+		}
+		// strings are not of equal length
+		if(a[ii] != '\0' || b[ii] != '\0') {
+			xpcc::IOStream& stream = TEST_REPORTER__.reportFailure(line);
+			printString(stream, a, b, ii);
+			return false;
+		}
+		TEST_REPORTER__.reportPass();
+		return true;
+	}
+
 	// ------------------------------------------------------------------------
 	template <typename T>
 	inline void
@@ -230,6 +261,9 @@ namespace unittest
 
 #define	TEST_ASSERT_EQUALS_RANGE(value, lower, upper) \
 	TEST_RETURN__(::unittest::checkRange((value), (lower), (upper), __LINE__))
+
+#define	TEST_ASSERT_EQUALS_STRING(x, y) \
+	TEST_RETURN__(::unittest::checkString((x), (y), __LINE__))
 
 #define	TEST_ASSERT_EQUALS_ARRAY(x, y, ...) \
 	TEST_RETURN__(::unittest::checkArray((x), (y), __LINE__, __VA_ARGS__))

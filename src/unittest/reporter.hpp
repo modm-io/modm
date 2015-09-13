@@ -87,8 +87,9 @@ namespace unittest
 		 * 
 		 * Basically the total number of failed and passed tests and then 
 		 * 'OK' if there was no failure or 'FAIL' otherwise.
+		 * @return 0 if all tests passed
 		 */
-		void
+		uint8_t
 		printSummary();
 		
 	private:

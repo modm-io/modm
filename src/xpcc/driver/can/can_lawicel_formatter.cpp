@@ -16,6 +16,7 @@
 bool
 xpcc::CanLawicelFormatter::convertToCanMessage(const char* in, can::Message& out)
 {
+	bool error = false;
 	uint8_t dlc_pos;
 
 	if (in[0] == 'R' || in[0] == 'T') {
@@ -52,21 +53,29 @@ xpcc::CanLawicelFormatter::convertToCanMessage(const char* in, can::Message& out
 		uint16_t id;
 		uint16_t id2;
 
-		id  = hexToByte(&in[1]) << 8;
-		id |= hexToByte(&in[3]);
+		id  = hexToByte(&in[1], error) << 8;
+		id |= hexToByte(&in[3], error);
 
-		id2  = hexToByte(&in[5]) << 8;
-		id2 |= hexToByte(&in[7]);
+		id2  = hexToByte(&in[5], error) << 8;
+		id2 |= hexToByte(&in[7], error);
 
 		out.identifier = (uint32_t) id << 16 | id2;
+
+		// check that id does not exceed 29 bits (0x1fffffff)
+		if(out.identifier > 0x1fffffff)
+			return false;
 	}
 	else {
 		uint16_t id;
 
-		id  = charToByte(&in[1]) << 8;
-		id |= hexToByte(&in[2]);
+		id  = charToByte(in[1], error) << 8;
+		id |= hexToByte(&in[2], error);
 
 		out.identifier = id;
+
+		// check that id does not exceed 11 bits (0x7ff)
+		if(out.identifier > 0x7ff)
+			return false;
 	}
 
 	// read data if the message is no rtr-frame
@@ -77,11 +86,11 @@ xpcc::CanLawicelFormatter::convertToCanMessage(const char* in, can::Message& out
 
 		for (i=0; i < out.length; i++)
 		{
-			out.data[i] = hexToByte(buf);
+			out.data[i] = hexToByte(buf, error);
 			buf += 2;
 		}
 	}
-	return true;
+	return !error;
 }
 
 
@@ -145,16 +154,18 @@ xpcc::CanLawicelFormatter::convertToString(const can::Message& in, char* out)
 
 
 uint8_t
-xpcc::CanLawicelFormatter::charToByte(const char *s)
+xpcc::CanLawicelFormatter::charToByte(const char cc, bool& error)
 {
-	uint8_t t = *s;
-	if (t >= 'a')
-		t = t - 'a' + 10;
-	else if (t >= 'A')
-		t = t - 'A' + 10;
-	else
-		t = t - '0';
-	return t;
+	if(cc >= '0' && cc <= '9') {
+		return cc - '0';
+	} else if(cc >= 'A' && cc <= 'F') {
+		return cc - 'A' + 10;
+	} else if(cc >= 'a' && cc <= 'f') {
+		return cc - 'a' + 10;
+	} else {
+		error = true;
+		return 0;
+	}
 }
 
 char

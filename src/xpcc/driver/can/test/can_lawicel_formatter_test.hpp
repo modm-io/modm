@@ -63,4 +63,8 @@ public:
 	 */
 	void
 	testRoudtripString();
+
+	// check if invalid input is rejected as expected
+	void
+	testInvalidInput();
 };

@@ -188,6 +188,18 @@ CanLawicelFormatterTest::testRoudtripString()
 	TEST_ASSERT_EQUALS_ARRAY(msg.data, myMsg.data, 4U);
 }
 
+void
+CanLawicelFormatterTest::testInvalidInput()
+{
+	const auto& toCanMessage = xpcc::CanLawicelFormatter::convertToCanMessage;
+	xpcc::can::Message message;
 
-
-
+	// id too high only 11 bits supported
+	TEST_ASSERT_FALSE(toCanMessage("tfff0", message));
+	// one octet missing
+	TEST_ASSERT_FALSE(toCanMessage("t0ff300ff4", message));
+	// invalid character in payload
+	TEST_ASSERT_FALSE(toCanMessage("t0ff30RMf4.", message));
+	// invalid character in id
+	TEST_ASSERT_FALSE(toCanMessage("t0f.3000000", message));
+}
