@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -29,72 +29,43 @@
 // ----------------------------------------------------------------------------
 
 #ifndef XPCC__MOVING_AVERAGE_HPP
-#define XPCC__MOVING_AVERAGE_HPP
-
-#include <cstddef>
-#include <stdint.h>
-#include <xpcc/utils/template_metaprogramming.hpp>
+	#error	"Don't include this file directly, use 'moving_average.hpp' instead!"
+#endif
 
 namespace xpcc
 {
-	/**
-	 * \brief	Moving average filter
-	 * 
-	 * Calculates the average of N newest values, i.a. the sum of the last N
-	 * values have been passed to update(...), divided by N. If less than N
-	 * values have been passed to the filter, the division factor is still N,
-	 * so missing values are assumed to be zero.
-	 *
-     * For integer types this implementation stores the current sum of all values in the buffer
-	 * and updates this value with every call of update() by subtracting
-	 * the overwritten buffer index and adding the new one.
-     *
-     * Due to numerical instabillities for floating value types, inside the update function
-     * the sum has to be recalculated making it less efficient.
-     *
-     * The internal sum is always up to date and the getValue()
-	 * method consists of only one division.
-	 * 
-	 * \warning	Input range is limited by the following equation
-	 * 			\code N * input::maxValue < T::maxValue \endcode
-	 * 			The sum off the last N input values must not be greater than
-	 * 			the maximum value of T, otherwise an overflow will occur.
-	 * 
-	 * \tparam	T	Input type
-	 * \tparam	N	Number of samples (maximum is 65356 or 2**16)
-	 * 
-	 * \ingroup	filter
-	 */
-	template<typename T, std::size_t N>
-	class MovingAverage
+	template<std::size_t N>
+	class MovingAverage<double, N >
 	{
 	private:
 		typedef typename ::xpcc::tmp::Select<
 			(N >= 256),
 			uint_fast16_t,
 			uint_fast8_t >::Result Index;
-		
+
 	public:
-		MovingAverage(const T& initialValue = 0);
-		
+
+		MovingAverage(const double& initialValue = 0);
+
 		/// Append new value
 		void
-		update(const T& input);
-		
+		update(const double& input);
+
 		/// Get filtered value
-		const T
+		double
 		getValue() const;
-	
+
 	private:
 		Index index;
-		T buffer[N];
-		T sum;
+		double buffer[N];
+		double sum;
 	};
 }
 
-// ----------------------------------------------------------------------------
-template<typename T, std::size_t N>
-xpcc::MovingAverage<T, N>::MovingAverage(const T& initialValue) :
+//---------------------------------------------------------------------------------
+
+template<std::size_t N>
+xpcc::MovingAverage<double, N>::MovingAverage(const double& initialValue) :
 	index(0), sum(N * initialValue)
 {
 	for (Index i = 0; i < N; ++i) {
@@ -102,33 +73,29 @@ xpcc::MovingAverage<T, N>::MovingAverage(const T& initialValue) :
 	}
 }
 
-// ----------------------------------------------------------------------------
-// TODO implementierung für float anpassen
-template<typename T, std::size_t N>
+
+//---------------------------------------------------------------------------------
+template<std::size_t N>
 void
-xpcc::MovingAverage<T, N>::update(const T& input)
-{
-	sum -= buffer[index];
-	sum += input;
-	
+xpcc::MovingAverage<double, N>::update(const double& input){
 	buffer[index] = input;
-	
+
 	index++;
 	if (index >= N) {
 		index = 0;
 	}
+
+	sum = 0;
+	for (Index i = 0; i < N; ++i) {
+		sum+= buffer[i];
+	}
+
 }
 
-// -----------------------------------------------------------------------------
-
-
-template<typename T, std::size_t N>
-const T
-xpcc::MovingAverage<T, N>::getValue() const
+// ------------------------------------------------------------------------------
+template<std::size_t N>
+double
+xpcc::MovingAverage<double, N>::getValue() const
 {
 	return (sum / N);
 }
-
-
-#include "moving_average_float_impl.hpp"
-#endif // XPCC__MOVING_AVERAGE_HPP
