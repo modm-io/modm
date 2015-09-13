@@ -34,38 +34,40 @@
 
 namespace xpcc
 {
-	template<std::size_t N>
-	class MovingAverage<double, N >
-	{
-	private:
-		typedef typename ::xpcc::tmp::Select<
-			(N >= 256),
-			uint_fast16_t,
-			uint_fast8_t >::Result Index;
+	namespace filter{
+		template<std::size_t N>
+		class MovingAverage<double, N >
+		{
+		private:
+			typedef typename ::xpcc::tmp::Select<
+				(N >= 256),
+				uint_fast16_t,
+				uint_fast8_t >::Result Index;
 
-	public:
+		public:
 
-		MovingAverage(const double& initialValue = 0);
+			MovingAverage(const double& initialValue = 0);
 
-		/// Append new value
-		void
-		update(const double& input);
+			/// Append new value
+			void
+			update(const double& input);
 
-		/// Get filtered value
-		double
-		getValue() const;
+			/// Get filtered value
+			double
+			getValue() const;
 
-	private:
-		Index index;
-		double buffer[N];
-		double sum;
-	};
+		private:
+			Index index;
+			double buffer[N];
+			double sum;
+		};
+	}
 }
 
 //---------------------------------------------------------------------------------
 
 template<std::size_t N>
-xpcc::MovingAverage<double, N>::MovingAverage(const double& initialValue) :
+xpcc::filter::MovingAverage<double, N>::MovingAverage(const double& initialValue) :
 	index(0), sum(N * initialValue)
 {
 	for (Index i = 0; i < N; ++i) {
@@ -77,7 +79,7 @@ xpcc::MovingAverage<double, N>::MovingAverage(const double& initialValue) :
 //---------------------------------------------------------------------------------
 template<std::size_t N>
 void
-xpcc::MovingAverage<double, N>::update(const double& input){
+xpcc::filter::MovingAverage<double, N>::update(const double& input){
 	buffer[index] = input;
 
 	index++;
@@ -95,7 +97,7 @@ xpcc::MovingAverage<double, N>::update(const double& input){
 // ------------------------------------------------------------------------------
 template<std::size_t N>
 double
-xpcc::MovingAverage<double, N>::getValue() const
+xpcc::filter::MovingAverage<double, N>::getValue() const
 {
 	return (sum / N);
 }
