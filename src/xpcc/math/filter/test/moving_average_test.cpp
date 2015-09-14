@@ -42,14 +42,14 @@ namespace
 		Type output;
 	};
 
-    struct TestDataFloat
-    {
-        typedef double Type;
+	struct TestDataFloat
+	{
+		typedef double Type;
 
-        Type input;
-        Type output;
-    };
-	
+		Type input;
+		Type output;
+	};
+
 	static const TestData data[] =
 	{
 		{ 10,	2 },
@@ -70,48 +70,48 @@ namespace
 		{ 200,	200 },
 	};
 
-    static const TestDataFloat dataF[] =
-    {
-        { 10.0,	2.5 },
-        { 10.0,	5.0 },
-        { 10.0,	7.5 },
-        { 10.0,	10.0 },
-        { -10.0,	5.0 },
-        { -10.0,	0.0 },
-        { 5,	-1.25 },
-        { 5,	-2.5 },
-        { 5,	1.25 },
-        { 5,	5.0 },
-        { 100,	28.75 },
-        { 100,	52.5 },
-        { 200,	101.25 },
-        { 200,	150.0 },
-        { 200,	175.0 },
-        { 200,	200.0 },
-    };
+	static const TestDataFloat dataF[] =
+	{
+		{ 10.0,	2.5 },
+		{ 10.0,	5.0 },
+		{ 10.0,	7.5 },
+		{ 10.0,	10.0 },
+		{ -10.0,	5.0 },
+		{ -10.0,	0.0 },
+		{ 5,	-1.25 },
+		{ 5,	-2.5 },
+		{ 5,	1.25 },
+		{ 5,	5.0 },
+		{ 100,	28.75 },
+		{ 100,	52.5 },
+		{ 200,	101.25 },
+		{ 200,	150.0 },
+		{ 200,	175.0 },
+		{ 200,	200.0 },
+	};
 }
 
 void
 MovingAverageTest::testDefaultConstructor()
 {
-    xpcc::filter::MovingAverage<int16_t, 4> filter;
-	
+	xpcc::filter::MovingAverage<int16_t, 4> filter;
+
 	TEST_ASSERT_EQUALS(filter.getValue(), 0);
 }
 
 void
 MovingAverageTest::testConstructor()
 {
-    xpcc::filter::MovingAverage<int16_t, 4> filter(20);
-	
+	xpcc::filter::MovingAverage<int16_t, 4> filter(20);
+
 	TEST_ASSERT_EQUALS(filter.getValue(), 20);
 }
 
 void
 MovingAverageTest::testAverage()
 {
-    xpcc::filter::MovingAverage<TestData::Type, 4> filter;
-	
+	xpcc::filter::MovingAverage<TestData::Type, 4> filter;
+
 	for (uint_fast8_t i = 0; i < (sizeof(data) / sizeof(TestData)); ++i)
 	{
 		filter.update(data[i].input);
@@ -122,11 +122,10 @@ MovingAverageTest::testAverage()
 void
 MovingAverageTest::testFloatAverage()
 {
-    xpcc::filter::MovingAverage<TestDataFloat::Type, 4> filter;
-    for (uint_fast8_t i = 0; i < (sizeof(data) / sizeof(TestDataFloat)); ++i)
-    {
-        filter.update(dataF[i].input);
-        TEST_ASSERT_TRUE(abs(filter.getValue()-dataF[i].output) < 1e-4);
-    }
-
+	xpcc::filter::MovingAverage<TestDataFloat::Type, 4> filter;
+	for (uint_fast8_t i = 0; i < (sizeof(data) / sizeof(TestDataFloat)); ++i)
+	{
+		filter.update(dataF[i].input);
+		TEST_ASSERT_TRUE(abs(filter.getValue()-dataF[i].output) < 1e-4);
+	}
 }
