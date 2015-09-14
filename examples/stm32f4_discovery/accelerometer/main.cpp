@@ -88,8 +88,8 @@ public:
 
 private:
 	xpcc::ShortTimeout timeout;
-	xpcc::MovingAverage<float, 25> averageX;
-	xpcc::MovingAverage<float, 25> averageY;
+	xpcc::filter::MovingAverage<float, 25> averageX;
+	xpcc::filter::MovingAverage<float, 25> averageY;
 };
 
 ReaderThread reader;

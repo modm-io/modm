@@ -73,7 +73,7 @@ public:
 
 private:
 	xpcc::ShortTimeout timeout;
-	xpcc::MovingAverage<float, 25> averageZ;
+	xpcc::filter::MovingAverage<float, 25> averageZ;
 };
 
 ReaderThread reader;
