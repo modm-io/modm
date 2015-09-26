@@ -105,10 +105,12 @@ public:
 	update()
 	{ animation.update(); }
 
-public:
-	Animation<uint8_t> animation;
+	/// This object can be cast to the underlying Animation object
+	operator Animation<uint8_t>& ()
+	{ return animation; }
 
 private:
+	Animation<uint8_t> animation;
 	uint8_t brightness;
 };
 
