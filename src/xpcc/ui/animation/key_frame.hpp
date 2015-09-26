@@ -89,7 +89,10 @@ class KeyFrameAnimationBase
 public:
 	KeyFrameAnimationBase(Animation<Args>&... animator);
 
-	KeyFrameAnimationBase(KeyFrame<T, size> *frames, uint16_t length, Animation<Args>&... animator);
+	template< uint16_t N >
+	KeyFrameAnimationBase(const KeyFrame<T, size> (&frames)[N], Animation<Args>&... animator);
+
+	KeyFrameAnimationBase(const KeyFrame<T, size> *frames, uint16_t length, Animation<Args>&... animator);
 
 	bool
 	start(uint8_t repeat=0);
@@ -126,7 +129,7 @@ private:
 	checkRepeat();
 
 	Animation<T> *animator[size];
-	KeyFrame<T, size> *frames;
+	const KeyFrame<T, size> *frames;
 	uint16_t length;
 	uint16_t currentFrame;
 	uint8_t repeat;

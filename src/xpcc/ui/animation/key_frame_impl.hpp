@@ -19,8 +19,15 @@ xpcc::ui::KeyFrameAnimationBase<T, Args...>::KeyFrameAnimationBase(Animation<Arg
 }
 
 template< typename T, class... Args >
+template< uint16_t N >
+xpcc::ui::KeyFrameAnimationBase<T, Args...>::KeyFrameAnimationBase(const KeyFrame<T, size> (&frames)[N], Animation<Args>&... animator)
+:	KeyFrameAnimationBase(frames, N, animator...)
+{
+}
+
+template< typename T, class... Args >
 xpcc::ui::KeyFrameAnimationBase<T, Args...>::KeyFrameAnimationBase(
-		KeyFrame<T, size> *frames, uint16_t length,
+		const KeyFrame<T, size> *frames, uint16_t length,
 		Animation<Args>&... animator)
 :	animator{(&animator)...}, frames(frames), length(length),
 	currentFrame(0), repeat(0), mode(modeCycleMask)
