@@ -1,0 +1,11 @@
+unittest:
+  script:
+    - scons unittest
+
+check:
+  script:
+    - scons check
+
+documentation:
+  script:
+    - scons doc
