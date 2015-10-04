@@ -97,6 +97,8 @@ class Parser(object):
 		another type/component with is not parsed at the moment. This
 		way is ensured that at least the shell of the objects exists.
 		
+		After all a checking and optimizing step is performed
+		
 		Keyword arguments:
 		filename	-- xml file to load
 		"""
@@ -113,9 +115,13 @@ class Parser(object):
 		#all xml file content is stored as documents here in the included-first order
 		self.xml_documents = []
 		
+		
 		self._read_and_validate_files(filename)
+		
 		for d in self.xml_documents:
 			self._parse_document(d)
+		
+		self._check_everything()
 		
 	def _read_and_validate_files(self, filename):
 		"""
@@ -184,6 +190,7 @@ class Parser(object):
 			e.args = ("'%s': %s" % (xmldocument.docinfo.URL, e.message),) + e.args[1:0]
 			raise
 		
+	def _check_everything(self):
 		# create expanded versions for all types and components
 		for t in self.tree.types:
 			t.flattened()
