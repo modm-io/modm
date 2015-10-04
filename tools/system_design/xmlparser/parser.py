@@ -175,6 +175,7 @@ class Parser(object):
 			self._create_type_hierarchy()
 
 			self._parse_events(xmltree)
+			self._evaluate_events()
 			self._check_events()
 
 			self._parse_components(xmltree)
@@ -249,8 +250,12 @@ class Parser(object):
 	
 	def _parse_events(self, xmltree):
 		for node in xmltree.findall('event'):
-			element = event.Event(node, self.tree)
+			element = event.Event(node)
 			self.tree.events[element.name] = element
+	
+	def _evaluate_events(self):
+		for e in self.tree.events:
+			e.evaluate(self.tree)
 	
 	def _parse_components(self, xmltree):
 		self.__parse_body(xmltree, 'component', component.Component, self.tree.components)
