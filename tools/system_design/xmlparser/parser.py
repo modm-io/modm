@@ -82,8 +82,9 @@ class Parser(object):
 		"""
 		Parse a XML-file
 		
-		Parsing is done in multiple steps:
+		At first all files chained by the include-tag are read in recursively.
 		
+		Parsing is done then in multiple steps:
 		 1. Parse all available types without evaluating
 		 2. Evaluate the types
 		 3. Parse all events
@@ -95,8 +96,6 @@ class Parser(object):
 		Step 1 and 4 are necessary because a type/component may reference to
 		another type/component with is not parsed at the moment. This
 		way is ensured that at least the shell of the objects exists.
-		
-		This function will be called recursively if an include-tag is found.
 		
 		Keyword arguments:
 		filename	-- xml file to load
@@ -110,12 +109,24 @@ class Parser(object):
 		# used to make sure files are only included once, this has basically
 		# the same effect that "#include guards" in C++ have
 		self.included_files = []
-		self._parse_file(filename)
 		
-	def _parse_file(self, filename):
+		#all xml file content is stored as documents here in the included-first order
+		self.xml_documents = []
+		
+		self._read_and_validate_files(filename)
+		for d in self.xml_documents:
+			self._parse_document(d)
+		
+	def _read_and_validate_files(self, filename):
 		"""
+		Read all xml files that are reacheble by the include chain
+		add their paths to self.included_files for not including files twice
+		append them to self.xml_documents in included first order to xml_documents
 		"""
 		logging.debug("Parse %s" % filename)
+		
+		self.included_files.append(filename)
+		
 		try:
 			# read the time of the last change
 			self.modify_time = max(self.modify_time, os.stat(filename).st_mtime)
@@ -126,7 +137,7 @@ class Parser(object):
 			parser.resolvers.add( DTDResolver(dtdPath = self.dtdPath) )
 			
 			# parse the xml-file
-			xmltree = etree.parse(filename, parser).getroot()
+			document = etree.parse(filename, parser)
 		except OSError as e:
 			raise ParserException(e)
 		except Exception as e:
@@ -136,14 +147,22 @@ class Parser(object):
 		
 		# search for include and reference nodes and parse
 		# the specified files first
+		xmltree = document.getroot()
 		for node in xmltree.findall('include'):
 			include_file = Parser.find_include_file(node.text, filename, self.include_paths)
 			if include_file not in self.included_files:
-				self.included_files.append(include_file)
-				self._parse_file(include_file)
+				self._read_and_validate_files(include_file)
 			else:
 				logging.debug("'%s' already included." % include_file)
 
+		self.xml_documents.append(document)
+		
+		
+	def _parse_document(self, xmldocument):
+		"""
+		"""
+		
+		xmltree = xmldocument.getroot()
 		try:
 			self._parse_types(xmltree)
 			self._evaluate_types(xmltree)
@@ -162,7 +181,7 @@ class Parser(object):
 			# Add file information that is not available in the lower classes
 			# to exception. See:
 			# http://www.ianbicking.org/blog/2007/09/re-raising-exceptions.html
-			e.args = ("'%s': %s" % (filename, e.message),) + e.args[1:0]
+			e.args = ("'%s': %s" % (xmldocument.docinfo.URL, e.message),) + e.args[1:0]
 			raise
 		
 		# create expanded versions for all types and components
