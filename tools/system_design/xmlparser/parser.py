@@ -88,7 +88,7 @@ class Parser(object):
 		 1. Parse all available types without evaluating
 		 2. Evaluate the types
 		 3. Parse all events
-		 4. Parse all components without evaluating
+		 4. Parse all components without evaluating (an empty named component will be placed into the tree)
 		 5. Evaluate all components
 		 6. Parse all container
 		 7. Parse all domains
@@ -171,14 +171,14 @@ class Parser(object):
 		xmltree = xmldocument.getroot()
 		try:
 			self._parse_types(xmltree)
-			self._evaluate_types(xmltree)
+			self._evaluate_types()
 			self._create_type_hierarchy()
 
 			self._parse_events(xmltree)
 			self._check_events()
 
 			self._parse_components(xmltree)
-			self._evaluate_components(xmltree)
+			self._evaluate_components()
 
 			self._parse_container(xmltree)
 
@@ -239,7 +239,7 @@ class Parser(object):
 			element = object(node)
 			list[element.name] = element
 	
-	def _evaluate_types(self, xmltree):
+	def _evaluate_types(self):
 		for type in self.tree.types:
 			type.evaluate(self.tree)
 	
@@ -255,7 +255,7 @@ class Parser(object):
 	def _parse_components(self, xmltree):
 		self.__parse_body(xmltree, 'component', component.Component, self.tree.components)
 	
-	def _evaluate_components(self, xmltree):
+	def _evaluate_components(self):
 		for component in self.tree.components:
 			component.evaluate(self.tree)
 	
