@@ -85,13 +85,14 @@ class Parser(object):
 		At first all files chained by the include-tag are read in recursively.
 		
 		Parsing is done then in multiple steps:
-		 1. Parse all available types without evaluating
-		 2. Evaluate the types
-		 3. Parse all events
-		 4. Parse all components without evaluating (an empty named component will be placed into the tree)
-		 5. Evaluate all components
-		 6. Parse all container
-		 7. Parse all domains
+		 1. Creating the elements and add them to the tree parsing the names only. This should be an independent task
+		  types, events, components
+		 2. Evaluate the elements parsing the remaining xml elements. Since all elements are in tree already, these may be also independent tasks.
+		  1. Evaluate types, create dependency hierarchy
+		  2. Evaluate events, link with types 
+		  3. Evaluate components, link with types and events
+		 3. Parse all container
+		 4. Parse all domains
 		
 		Step 1 and 4 are necessary because a type/component may reference to
 		another type/component with is not parsed at the moment. This
@@ -171,14 +172,15 @@ class Parser(object):
 		xmltree = xmldocument.getroot()
 		try:
 			self._parse_types(xmltree)
+			self._parse_events(xmltree)
+			self._parse_components(xmltree)
+			
 			self._evaluate_types()
 			self._create_type_hierarchy()
 
-			self._parse_events(xmltree)
 			self._evaluate_events()
 			self._check_events()
 
-			self._parse_components(xmltree)
 			self._evaluate_components()
 
 			self._parse_container(xmltree)
@@ -293,7 +295,7 @@ if __name__ == "__main__":
 	
 	tree = parser.tree
 	
-	print tree.dump()
+	#print tree.dump()
 	#print tree.types["Track Segment Line"].flattened().dump()
 	#print tree.components["driver"].dump()
 	#print tree.components["driver"].flattened().dump()
