@@ -117,6 +117,7 @@ class Parser(object):
 		for d in self.xml_documents:
 			self._parse_document(d)
 		
+		self._evaluate_tree()
 		self._check_everything()
 		
 	def _read_and_validate_files(self, filename):
@@ -172,22 +173,22 @@ class Parser(object):
 			self._parse_container(xmltree)
 			self._parse_domains(xmltree)
 			
-			self._evaluate_types()
-			self._create_type_hierarchy()
-
-			self._evaluate_events()
-			self._check_events()
-
-			self._evaluate_components()
-			self._evaluate_container()
-
-
 		except ParserException as e:
 			# Add file information that is not available in the lower classes
 			# to exception. See:
 			# http://www.ianbicking.org/blog/2007/09/re-raising-exceptions.html
 			e.args = ("'%s': %s" % (xmldocument.docinfo.URL, e.message),) + e.args[1:0]
 			raise
+		
+	def _evaluate_tree(self):
+		self._evaluate_types()
+		self._create_type_hierarchy()
+
+		self._evaluate_events()
+		self._check_events()
+
+		self._evaluate_components()
+		self._evaluate_container()
 		
 	def _check_everything(self):
 		# create expanded versions for all types and components
