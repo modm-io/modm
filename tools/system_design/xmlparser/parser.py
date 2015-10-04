@@ -120,26 +120,19 @@ class Parser(object):
 			# read the time of the last change
 			self.modify_time = max(self.modify_time, os.stat(filename).st_mtime)
 			
-			# parse the xml-file
-			xmltree = etree.parse(filename).getroot()
-		except OSError as e:
-			raise ParserException(e)
-		except Exception as e:
-			raise ParserException("while parsing xml-file '%s': %s" % (filename, e))
-		
-		# validate against the embedded DTD file
-		try:
 			parser = etree.XMLParser(dtd_validation=True, load_dtd=True)
 			
 			# Dynamically resolve DTD paths
 			parser.resolvers.add( DTDResolver(dtdPath = self.dtdPath) )
 			
-			dummy = etree.parse(filename, parser)
-			
-		except etree.XMLSyntaxError as e:
-			raise ParserException("Validation error in '%s': %s" % (filename, e))
+			# parse the xml-file
+			xmltree = etree.parse(filename, parser).getroot()
+		except OSError as e:
+			raise ParserException(e)
+		except Exception as e:
+			raise ParserException("Error while parsing xml-file '%s': %s" % (filename, e))
 		else:
-			logging.debug("Validation OK!")
+			logging.debug("Parsing and Validation OK!")
 		
 		# search for include and reference nodes and parse
 		# the specified files first
