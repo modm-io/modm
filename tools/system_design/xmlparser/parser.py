@@ -84,19 +84,14 @@ class Parser(object):
 		
 		At first all files chained by the include-tag are read in recursively.
 		
-		Parsing is done then in multiple steps:
+		Parsing is done in two steps: Creating the empty elements first, fill and link them then.
 		 1. Creating the elements and add them to the tree parsing the names only. This should be an independent task
-		  types, events, components
+		  types, events, components, doains
 		 2. Evaluate the elements parsing the remaining xml elements. Since all elements are in tree already, these may be also independent tasks.
 		  1. Evaluate types, create dependency hierarchy
 		  2. Evaluate events, link with types 
 		  3. Evaluate components, link with types and events
 		 3. Parse all container
-		 4. Parse all domains
-		
-		Step 1 and 4 are necessary because a type/component may reference to
-		another type/component with is not parsed at the moment. This
-		way is ensured that at least the shell of the objects exists.
 		
 		After all a checking and optimizing step is performed
 		
@@ -175,6 +170,8 @@ class Parser(object):
 			self._parse_events(xmltree)
 			self._parse_components(xmltree)
 			
+			self._parse_domains(xmltree)
+			
 			self._evaluate_types()
 			self._create_type_hierarchy()
 
@@ -185,7 +182,6 @@ class Parser(object):
 
 			self._parse_container(xmltree)
 
-			self._parse_domains(xmltree)
 		except ParserException as e:
 			# Add file information that is not available in the lower classes
 			# to exception. See:
@@ -273,7 +269,7 @@ class Parser(object):
 			
 	def _parse_domains(self, xmltree):
 		for node in xmltree.findall('domain'):
-			element = domain.Domain(node, self.tree)
+			element = domain.Domain(node)
 			self.tree.domains[element.name] = element
 	
 	def _check_events(self):

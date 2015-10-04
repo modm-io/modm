@@ -14,13 +14,11 @@ class Domain:
 	description		--	Description string
 	id				--	ID of the domains
 	"""
-	def __init__(self, node, tree):
+	def __init__(self, node):
 		""" Constructor
 		
 		Keyword arguments:
 		node	--	XML node defining this event
-		tree	--	currently evaluted communication structure tree
-		
 		"""
 		self.name = node.get('name')
 		utils.check_name(self.name)
