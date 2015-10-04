@@ -131,10 +131,6 @@ class Enum(BaseType):
 			else:
 				utils.check_name(self.name)
 
-			self.string = node.get('string')
-			if self.string is None:
-				self.string = self.name
-
 			self.description = xml_utils.get_description(node)
 			self.string = xml_utils.get_string(node)
 
