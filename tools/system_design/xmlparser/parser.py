@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import xml.etree.ElementTree as et
-import xml.parsers.expat
 from lxml import etree
 import os
 import sys
@@ -123,30 +121,25 @@ class Parser(object):
 			self.modify_time = max(self.modify_time, os.stat(filename).st_mtime)
 			
 			# parse the xml-file
-			xmltree = et.parse(filename).getroot()
+			xmltree = etree.parse(filename).getroot()
 		except OSError as e:
 			raise ParserException(e)
-		except (xml.parsers.expat.ExpatError, xml.etree.ElementTree.ParseError) as e:
+		except Exception as e:
 			raise ParserException("while parsing xml-file '%s': %s" % (filename, e))
 		
+		# validate against the embedded DTD file
 		try:
-			import lxml.etree		# for validating
+			parser = etree.XMLParser(dtd_validation=True, load_dtd=True)
 			
-			# validate against the embedded DTD file
-			try:
-				parser = lxml.etree.XMLParser(dtd_validation=True, load_dtd=True)
-				
-				# Dynamically resolve DTD paths
-				parser.resolvers.add( DTDResolver(dtdPath = self.dtdPath) )
-				
-				dummy = lxml.etree.parse(filename, parser)
-				
-			except lxml.etree.XMLSyntaxError as e:
-				raise ParserException("Validation error in '%s': %s" % (filename, e))
-			else:
-				logging.debug("Validation OK!")
-		except ImportError as e:
-			logging.warning("Warning: couldn't load 'lxml' module. No validation done!")
+			# Dynamically resolve DTD paths
+			parser.resolvers.add( DTDResolver(dtdPath = self.dtdPath) )
+			
+			dummy = etree.parse(filename, parser)
+			
+		except etree.XMLSyntaxError as e:
+			raise ParserException("Validation error in '%s': %s" % (filename, e))
+		else:
+			logging.debug("Validation OK!")
 		
 		# search for include and reference nodes and parse
 		# the specified files first
