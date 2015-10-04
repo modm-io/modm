@@ -192,20 +192,23 @@ class Parser(object):
 	@staticmethod
 	def find_include_file(filename, include_file, include_paths, line_count=""):
 		""" Tries to find the include file and return it's absolute path """
-		relative_to_file = os.path.join(os.path.dirname(include_file), filename)
+		
 		# 1.) include file name can be absolut
 		if os.path.isabs(filename):
 			return filename
+		
 		# 2.) it could be a path relative to the files path
 		#     this works just like #include "{filename}" in C/C++
-		elif os.path.isfile(relative_to_file):
+		relative_to_file = os.path.abspath(os.path.join(os.path.dirname(include_file), filename))
+		if os.path.isfile(relative_to_file):
 			return relative_to_file
+		
 		# 3.) it could be a path relative to the include path
-		else:
-			for path in include_paths:
-				relative_to_include_path = os.path.join(path, filename)
-				if os.path.isfile(relative_to_include_path):
-					return relative_to_include_path
+		for path in include_paths:
+			relative_to_include_path = os.path.abspath(os.path.join(path, filename))
+			if os.path.isfile(relative_to_include_path):
+				return relative_to_include_path
+			
 		# 4.) Error!
 		raise ParserException("Could not find include file '%s' in '%s:%s'" % (filename, include_file, line_count))
 
