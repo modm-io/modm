@@ -402,3 +402,35 @@ LinkedListTest::testRemove()
 	TEST_ASSERT_EQUALS(list.getFront(), 2);
 	TEST_ASSERT_EQUALS(list.getBack(), 2);
 }
+
+void
+LinkedListTest::testInsert()
+{
+	xpcc::LinkedList<int16_t> list;
+	xpcc::LinkedList<int16_t>::iterator it = list.begin();
+	list.insert(it, 0);
+	TEST_ASSERT_FALSE(list.isEmpty());
+	list.insert(it, 2);
+	list.insert(it, 4);
+
+	TEST_ASSERT_EQUALS(list.getSize(), 3u);
+
+	int16_t ii = 0;
+	for(const auto value : list) {
+		TEST_ASSERT_EQUALS(value, ii);
+		ii += 2;
+	}
+
+	it = list.begin();
+	list.insert(it, 1);
+	++it; ++it;
+	list.insert(it, 3);
+	++it; ++it;
+	list.insert(it, 5);
+
+	ii = 0;
+	for(const auto value : list) {
+		TEST_ASSERT_EQUALS(value, ii);
+		ii += 1;
+	}
+}

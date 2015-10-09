@@ -77,4 +77,7 @@ public:
 	
 	void
 	testRemove();
+
+	void
+	testInsert();
 };

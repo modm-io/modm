@@ -80,7 +80,7 @@ namespace xpcc
 		/// Insert at the end of the list
 		bool
 		append(const T& value);
-		
+
 		/// Remove the first entry
 		void
 		removeFront();
@@ -186,9 +186,11 @@ namespace xpcc
 			const T* operator -> () const;
 		
 		private:
-			const_iterator(const Node* node);
-			
-			const Node* node;
+			const_iterator(Node* node);
+			// TODO: this should acutally be a node that points to a const
+			// value, but since all access is const, this does not really make
+			// a difference
+			Node* node;
 		};
 
 		/**
@@ -231,10 +233,13 @@ namespace xpcc
 		 */
 		iterator
 		remove(const iterator& position);
-		
+
+		bool
+		insert(const_iterator pos, const T& value);
+
 	private:
 		friend class const_iterator;
-		friend class iterator;		
+		friend class iterator;
 		
 		LinkedList(const LinkedList& other);
 		
