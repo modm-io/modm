@@ -32,6 +32,7 @@
 #define	XPCC__DISPATCHER_HPP
 
 #include <xpcc/processing/timer.hpp>
+#include <xpcc/container/linked_list.hpp>
 
 #include "backend/backend_interface.hpp"
 #include "postman/postman.hpp"
@@ -76,21 +77,18 @@ namespace xpcc
 		class Entry
 		{
 		public:
-			enum Type
+			enum class Type
 			{
-				DEFAULT,
-				CALLBACK,
+				Default,
+				Callback,
 			};
 
-			/**
-			 * \brief 	Communication info, state of sending and
-			 * 			retrieving messages and acks.
-			 */
+			/// Communication info, state of sending and retrieving messages and acks.
 			enum State
 			{
-				TRANSMISSION_PENDING,
-				WAIT_FOR_ACK,
-				WAIT_FOR_RESPONSE,
+				TransmissionPending,
+				WaitForACK,
+				WaitForResponse,
 			};
 
 		public:
@@ -104,23 +102,26 @@ namespace xpcc
 			 * information needed by handling of messages.
 			 */
 			Entry(Type type, const Header& inHeader, SmartPointer& inPayload) :
-				type(type), next(0),
-				header(inHeader), payload(inPayload),
-				time(), tries(0)
+				type(type),
+				header(inHeader), payload(inPayload)
 			{
 			}
 
 			Entry(const Header& inHeader, SmartPointer& inPayload) :
-				type(DEFAULT), next(0),
-				header(inHeader), payload(inPayload),
-				time(), tries(0)
+				header(inHeader), payload(inPayload)
 			{
 			}
 
 			Entry(const Header& inHeader) :
-				type(DEFAULT), next(0),
-				header(inHeader), payload(),
-				time(), tries(0)
+				header(inHeader)
+			{
+			}
+
+			Entry(const Header& inHeader,
+					SmartPointer& inPayload, ResponseCallback& callback_) :
+				type(Type::Callback),
+				header(inHeader), payload(inPayload),
+				callback(callback_)
 			{
 			}
 
@@ -131,34 +132,19 @@ namespace xpcc
 			bool
 			headerFits(const Header& header) const;
 
-			/**
-			 * \brief 	List-handling, return pointer to the next entry.
-			 */
-			inline const Entry *
-			getNext() const
+			inline void
+			callbackResponse(const Header& header, const SmartPointer &payload) const
 			{
-				return next;
+				this->callback.call(header, payload);
 			}
 
-			const Type type;
-			Entry *next;			///< List-handling, holds pointer to the next entry.
+			const Type type = Type::Default;
 			const Header header;
 			const SmartPointer payload;
-			State state;
+			State state = State::TransmissionPending;
 			ShortTimeout time;
-			uint8_t tries;
-		};
-
-		class CallbackEntry : public Entry
-		{
-		public:
-			CallbackEntry(const Header& header,
-					SmartPointer& payload, ResponseCallback& callback_) :
-				Entry(CALLBACK, header, payload),
-				callback(callback_)
-			{
-			}
-
+			uint8_t tries = 0;
+		private:
 			ResponseCallback callback;
 		};
 
@@ -172,55 +158,22 @@ namespace xpcc
 		void
 		addResponse(const Header& header, SmartPointer& smartPayload);
 
-
-		/**
-		 * \brief 		Appends one ore more entries to this->last. this->last is updated to the tail of next.
-		 *
-		 */
-		void
-		append(Entry *next);
-
-		/**
-		 * \brief 		fix->next will be set to next. the old entry of fix->next will be set
-		 *				to the tail of next. this->last will be updated to tail of next if
-		 *				fix->next==Null, which is equivalent to fix==last.
-		 *
-		 * \param fix has to be one element already appended to the list.
-		 * \param next must not be contained by any list. Any element of the next->next chain must not be contained by any list.
-		 */
-		inline void
-		insertAfter(Entry *fix, Entry *next);
-
-		/**
-		 * \brief 		if (entry->next) then entry->next will be set to entry->next->next. this->last
-		 *				will be set to entry if entry->next was the last element.
-		 *				The removed element is returned
-		 *				if entry was the last element nothing is done and Null is returned.
-		 *				For safety the member next of the returned element is set to Null.
-		 *
-		 * \param entry has to be one element already appended to the list.
-		 */
-		Entry *
-		removeNextEntryFromList(Entry *entry);
-
-		Entry *
-		deleteEntry(Entry *entry, Entry *prev);
-
 		inline void
 		handleActionCall(const Header& header, const SmartPointer& payload);
 
 		void
 		sendAcknowledge(const Header& header);
 
-		inline Entry *
-		sendMessageToInnerComponent(Entry *entry, Entry *prev);
+		using EntryList = LinkedList<Entry>;
+		using EntryIterator = EntryList::iterator;
+
+		EntryIterator
+		sendMessageToInnerComponent(EntryIterator entry);
 
 		BackendInterface * const backend;
 		Postman * const postman;
 
-		Entry dummyFirst;
-		Entry *first;
-		Entry *last;
+		EntryList entries;
 
 	private:
 		friend class Communicator;
