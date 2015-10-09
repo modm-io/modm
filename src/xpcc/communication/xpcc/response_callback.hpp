@@ -52,6 +52,8 @@ namespace xpcc
 		typedef void (Communicatable::*Function)(const Header& header, const uint8_t *type);
 
 	public:
+		ResponseCallback() : component(nullptr), function(nullptr) {}
+
 		/**
 		 * Set the method that will be called when a response is received.
 		 *
@@ -83,11 +85,19 @@ namespace xpcc
 		{
 		}
 
+		inline bool
+		isCallable() const
+		{
+			return component != nullptr and function != nullptr;
+		}
+
 		/// \todo check packet size?
 		inline void
 		call(const Header& header, const SmartPointer &payload) const
 		{
-			(component->*function)(header, payload.getPointer());
+			if(isCallable()) {
+				(component->*function)(header, payload.getPointer());
+			}
 			// TODO spezieller Aufruf für packetgröße = 0, funktioniert zwar
 			// auch ohne ist aber extrem unschön!
 		}
