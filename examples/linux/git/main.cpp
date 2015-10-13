@@ -11,6 +11,9 @@ int
 main()
 {
 	// Let's print some information that is provided in the xpcc_git_info.hpp
+	XPCC_LOG_INFO << "Local Git User:" << xpcc::endl;
+	XPCC_LOG_INFO << "Name:  " << XPCC_GIT_CONFIG_USER_NAME      << xpcc::endl;
+	XPCC_LOG_INFO << "Email: " << XPCC_GIT_CONFIG_USER_EMAIL     << xpcc::endl;
 	XPCC_LOG_INFO << "Last Commit:" << xpcc::endl;
 	XPCC_LOG_INFO << "SHA:             " << XPCC_GIT_SHA      << xpcc::endl;
 	XPCC_LOG_INFO << "Abbreviated SHA: " << XPCC_GIT_SHA_ABBR << xpcc::endl;
