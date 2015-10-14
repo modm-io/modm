@@ -37,6 +37,11 @@ def git_info_header(env):
 		defines['XPCC_GIT_COMMITTER_DATE']  = env.CStringLiteral(git_show('%cd'))
 		defines['XPCC_GIT_COMMITTER_DATE_TIMESTAMP'] = git_show('%ct')
 		defines['XPCC_GIT_SUBJECT']         = env.CStringLiteral(git_show('%s'))
+		# Git Config
+		name  = subprocess.check_output(['git', 'config', 'user.name']).split('\n', 1)[0]
+		email = subprocess.check_output(['git', 'config', 'user.email']).split('\n', 1)[0]
+		defines['XPCC_GIT_CONFIG_USER_NAME']  = env.CStringLiteral(name)
+		defines['XPCC_GIT_CONFIG_USER_EMAIL'] = env.CStringLiteral(email)
 		# Status
 		s = subprocess.check_output(['git', '--no-pager', 'status', '--porcelain']).split('\n')
 		f = { 'M': 0, 'A': 0, 'D': 0, 'R': 0, 'C': 0, 'U': 0, '?': 0}

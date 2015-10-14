@@ -114,6 +114,29 @@ xpcc::LinkedList<T, Allocator>::append(const T& value)
 	return true;
 }
 
+template <typename T, typename Allocator>
+bool
+xpcc::LinkedList<T, Allocator>::insert(const_iterator pos, const T& value)
+{
+	// if pos is the `end` iterator
+	if(pos.node == nullptr) {
+		return this->append(value);
+	}
+
+	// allocate memory for the new node and copy the value into it
+	Node *node = this->nodeAllocator.allocate(1);
+	Allocator::construct(&node->value, value);
+
+	// hook the node into the list
+	node->next = pos.node->next;
+	pos.node->next = node;
+	if(this->back == pos.node) {
+		this->back = node;
+	}
+
+	return true;
+}
+
 // ----------------------------------------------------------------------------
 template <typename T, typename Allocator>
 void

@@ -24,7 +24,7 @@
 <language id="in" _name="XPCC C++ Template" version="2.0" _section="Sources">
 	<metadata>
 		<!-- <property name="mimetypes">text/x-c++;text/x-cpp;text/x-c++src</property>-->
-		<property name="globs">*.in.cpp;*.in.hpp</property>
+		<property name="globs">*.cpp.in;*.hpp.in</property>
 		<property name="line-comment-start">//</property>
 		<property name="block-comment-start">/*</property>
 		<property name="block-comment-end">*/</property>

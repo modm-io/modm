@@ -1,0 +1,14 @@
+unittest:
+  script:
+    - env
+    - scons unittest
+
+check:
+  script:
+    - env
+    - scons check
+
+documentation:
+  script:
+    - env
+    - scons doc

@@ -45,7 +45,7 @@ xpcc::LinkedList<T, Allocator>::const_iterator::const_iterator() :
 
 template <typename T, typename Allocator>
 xpcc::LinkedList<T, Allocator>::const_iterator::const_iterator(
-		const Node* node) :
+		Node* node) :
 	node(node)
 {
 }
