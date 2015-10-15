@@ -22,6 +22,16 @@ def git_show(format, ref='HEAD'):
 	# results for older git versions
 	return r.split('\n', 1)[0][1:-1]
 
+def git_config(key):
+	""" git_show
+		returns a string containing the output from git config
+		returns an empty string if the command fails
+	"""
+	try:
+		return subprocess.check_output(['git', 'config', key]).split('\n', 1)[0]
+	except subprocess.CalledProcessError:
+		return ""
+
 def git_info_header(env):
 	defines = {}
 	try:
@@ -38,10 +48,8 @@ def git_info_header(env):
 		defines['XPCC_GIT_COMMITTER_DATE_TIMESTAMP'] = git_show('%ct')
 		defines['XPCC_GIT_SUBJECT']         = env.CStringLiteral(git_show('%s'))
 		# Git Config
-		name  = subprocess.check_output(['git', 'config', 'user.name']).split('\n', 1)[0]
-		email = subprocess.check_output(['git', 'config', 'user.email']).split('\n', 1)[0]
-		defines['XPCC_GIT_CONFIG_USER_NAME']  = env.CStringLiteral(name)
-		defines['XPCC_GIT_CONFIG_USER_EMAIL'] = env.CStringLiteral(email)
+		defines['XPCC_GIT_CONFIG_USER_NAME']  = env.CStringLiteral(git_config('user.name'))
+		defines['XPCC_GIT_CONFIG_USER_EMAIL'] = env.CStringLiteral(git_config('user.email'))
 		# Status
 		s = subprocess.check_output(['git', '--no-pager', 'status', '--porcelain']).split('\n')
 		f = { 'M': 0, 'A': 0, 'D': 0, 'R': 0, 'C': 0, 'U': 0, '?': 0}
