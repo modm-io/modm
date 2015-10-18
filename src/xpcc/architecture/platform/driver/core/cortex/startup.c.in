@@ -90,13 +90,14 @@ void HardFault_Handler(void)			__attribute__ ((weak, alias("defaultHandler")));
 typedef void (* const FunctionPointer)(void);
 
 // defined in the linkerscript
-extern uint32_t __stack_end;
+extern uint32_t __main_stack_top;
+extern uint32_t __process_stack_top;
 
 %% if parameters.vector_table_in_ram
 // Define the vector table
 FunctionPointer flashVectors[4] __attribute__ ((section(".reset"))) =
 {
-	(FunctionPointer) &__stack_end,	// stack pointer
+	(FunctionPointer) &__main_stack_top,	// stack pointer
 	Reset_Handler,				// code entry point
 	NMI_Handler,				// NMI handler
 	HardFault_Handler,			// hard fault handler
@@ -107,19 +108,19 @@ FunctionPointer ramVectors[] __attribute__ ((section(".vectors"))) =
 FunctionPointer flashVectors[] __attribute__ ((section(".reset"))) =
 %% endif
 {
-	(FunctionPointer) &__stack_end,		// -16: stack pointer
-	Reset_Handler,						// -15: code entry point
-	NMI_Handler,						// -14: Non Maskable Interrupt handler
-	HardFault_Handler,					// -13: hard fault handler
+	(FunctionPointer) &__main_stack_top,	// -16: stack pointer
+	Reset_Handler,							// -15: code entry point
+	NMI_Handler,							// -14: Non Maskable Interrupt handler
+	HardFault_Handler,						// -13: hard fault handler
 %% for addr in range(4 - 16, number_of_interrupts + 1)
 %% 	if addr in i
 %%		set suffix = "_IRQHandler"
 %%		if addr < 0
 %%			set suffix = ""
 %%		endif
-	{{ (i[addr][0] + suffix + ",") | xpcc.pad(32) }}// {{addr}}: {{i[addr][1]}}
+	{{ (i[addr][0] + suffix + ",") | xpcc.pad(36) }}// {{addr}}
 %% 	else
-	0,									// {{addr}}
+	0,										// {{addr}}
 %% 	endif
 %% endfor
 };
@@ -179,9 +180,12 @@ void
 Reset_Handler(void)
 {
 	// startup delay
-	for (volatile unsigned long i = 0; i < 500000; i++)
+	for (unsigned long i = 0; i < 500000; i++)
 	{
 	}
+
+	// set the process stack pointer
+	asm volatile ("msr PSP, %0" :: "r" (__process_stack_top) : "memory" );
 
 	uint32_t* src;
 	uint32_t* dest;
@@ -253,8 +257,7 @@ Reset_Handler(void)
 
 	// Lower priority level for all peripheral interrupts to lowest possible
 	for (uint32_t i = 0; i < {{ number_of_interrupts }}; i++) {
-		const uint32_t priority = 0xF;
-		NVIC->IP[i] = (priority & 0xF) << 4;
+		NVIC->IP[i] = 0xff;
 	}
 
 	// Set the PRIGROUP[10:8] bits to

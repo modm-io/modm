@@ -6,7 +6,6 @@ MEMORY
 	RAM (rwx) : ORIGIN = 0x10000100, LENGTH = 8k
 }
 
-PROVIDE(__handler_stack_size = 124 + 4);
-PROVIDE(__thread_stack_size  = 508 + 4);
+PROVIDE(__main_stack_size = 1k);
 
 INCLUDE "../stm32/stm32_ram.ld"

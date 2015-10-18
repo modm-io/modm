@@ -12,30 +12,15 @@
  *
  *                          MEMORY MAP (RAM)
  *
- *                |                                 | 0x2001 0000 <--- __handler_stack_top, __stack_end
+ *                |                                 | 0x2001 0000
  *                |---------------------------------| 0x2000 FFFF
- *                |                                 |
- *                |    Handler/Main Stack (msp)     |
- *                |       (grows downwards)         |
- *                |               |                 |
- *                |               v                 |
- *                |---------------------------------| <------- __thread_stack_top
- *                |                                 |
- *                |    Thread/Process Stack (psp)   |
- *                |       (grows downwards)         |
- *                |               |                 |
- *                |               v                 |
- *                |                                 | <------- __stack_start
- *                |---------------------------------|
  *                |           Unused RAM            |
- *                | (overwritten by heap or stack!) |
+ *                |     (overwritten by heap!)      |
  *                |---------------------------------|
- *                |                                 |
  *                |               ^                 |
  *                |               |                 |
  *                |            Heap Area            |
- *                |         (grows upwards)         |
- *                |                                 | <------- __heap_start
+ *                |         (grows upwards)         | <------- __heap_start
  *      +-------> |---------------------------------| <------- __noinit_end
  *      |         |                                 |
  *   .noinit      |     Global data not cleared     |
@@ -53,15 +38,28 @@
  *      +-------> |---------------------------------| <------- __vector_table_ram_end
  *      |         |                                 |
  *  .vectors      |    Interrupt Vectors (in RAM)   |
- *      |         |        (if re-mapped)           |
- *      +-------> |---------------------------------| 0x2000 0000 <--- __ram_start
+ *      |         |        (if re-mapped)           | <------- __vector_table_ram_start
+ *      +-------> |---------------------------------| <------- __process_stack_top, __stack_end
+ *                |       Process Stack (psp)       |
+ *                |       (grows downwards)         |
+ *                |               |                 |
+ *                |               v                 |
+ *                |---------------------------------| <------- __main_stack_top
+ *                |        Main Stack (msp)         |
+ *                |       (grows downwards)         |
+ *                |               |                 |
+ *                |               v                 | <------- __stack_start
+ *                |---------------------------------|
+ *                |  Alignment buffer for .vectors  |
+ *                |     (overwritten by stack!)     |
+ *                |---------------------------------| 0x2000 0000 <--- __ram_start
  *
  *
  *                          MEMORY MAP (Flash)
  *
+ *                |                                 | 0x0802 0000
+ *                |---------------------------------| 0x0801 FFFF
  *                |                                 |
- *                |---------------------------------| 0x0802 0000
- *                |                                 | 0x0801 FFFF
  *                |                                 |
  *                |                                 |
  *                |          Unused flash           |
@@ -108,9 +106,27 @@ PROVIDE(__ram_start = ORIGIN(RAM));
 PROVIDE(__ram_end   = ORIGIN(RAM) + LENGTH(RAM));
 PROVIDE(__heap_end  = ORIGIN(RAM) + LENGTH(RAM));
 
-/* Used for interrupt handlers */
-HANDLER_STACK_SIZE = DEFINED(__handler_stack_size) ? __handler_stack_size : 1024;
-THREAD_STACK_SIZE  = DEFINED(__thread_stack_size)  ? __thread_stack_size  : 1024;
+/* the thread stack is used only for reporting hard fault conditions! It may therefore be small. */
+PROCESS_STACK_SIZE  = DEFINED(__process_stack_size) ? (__process_stack_size & ~0x7) : 256;
+/* the handler stack is used for main program as well as interrupts */
+MAIN_STACK_SIZE     = DEFINED(__main_stack_size)    ? (__main_stack_size & ~0x7)    : 2k;
+/* combined stack size */
+TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
+
+/* If the vector table is relocated into RAM, then it must be aligned to a power of two! */
+VECTOR_TABLE_ENTRIES = DEFINED(__vector_table_entries) ? __vector_table_entries : 128;
+/* Round up the number of vector table entries to the nearest power-of-two and multiply by 8. */
+VECTOR_TABLE_ALIGNMENT = (
+		(VECTOR_TABLE_ENTRIES <=  16) ?  16 : (
+		(VECTOR_TABLE_ENTRIES <=  32) ?  32 : (
+		(VECTOR_TABLE_ENTRIES <=  64) ?  64 : (
+		(VECTOR_TABLE_ENTRIES <= 128) ? 128 :
+										256
+		)))) * 8;
+/* compute the vector table offset from start of RAM */
+VECTOR_TABLE_OFFSET = ( (!DEFINED(.vectors) || ((TOTAL_STACK_SIZE % VECTOR_TABLE_ALIGNMENT) == 0) ) ?
+		TOTAL_STACK_SIZE :
+		(TOTAL_STACK_SIZE / VECTOR_TABLE_ALIGNMENT + 1) * VECTOR_TABLE_ALIGNMENT);
 
 SECTIONS
 {
@@ -122,16 +138,34 @@ SECTIONS
 		. = ALIGN(4);
 	} >ROM
 
+	.stack (NOLOAD) :
+	{
+		. = VECTOR_TABLE_OFFSET - TOTAL_STACK_SIZE;
+		__stack_start = .;
+
+		. += MAIN_STACK_SIZE;	/* first the handler stack */
+		. = ALIGN (8);
+		__main_stack_top = .;
+
+		. += PROCESS_STACK_SIZE;		/* then the (smaller) thread stack */
+		. = ALIGN (8);
+		__process_stack_top = .;
+
+		__stack_end = .;
+
+		. = ALIGN (4);
+	} >RAM
+
 	.vectors :  /* Vector table in RAM, only if remapped */
 	{
 		__vector_table_ram_load = LOADADDR (.vectors);		/* address in ROM */
-		__vector_table_ram_start = .;						/* address in RAM */
+		__vector_table_ram_start = .;
 
 		/* used for vectors remapped to RAM */
-        KEEP(*(.vectors))
+		KEEP(*(.vectors))
 
-        . = ALIGN (4);
-        __vector_table_ram_end = .;
+		. = ALIGN (4);
+		__vector_table_ram_end = .;
 	} >RAM AT>ROM
 
 	.text :
@@ -323,25 +357,6 @@ SECTIONS
 		PROVIDE (__noinit_end = .);
 		. = ALIGN (4);
 		PROVIDE (__heap_start = .);
-	} >RAM
-
-	.stack (NOLOAD) :
-	{
-		. = ORIGIN(RAM) + LENGTH(RAM) - HANDLER_STACK_SIZE - THREAD_STACK_SIZE;
-		. = ALIGN(4);
-		__stack_start = . ;
-
-		. += THREAD_STACK_SIZE;
-		. = ALIGN (4);
-		__thread_stack_top = . ;
-
-		. += HANDLER_STACK_SIZE;
-		. = ALIGN (4);
-		__handler_stack_top = . ;
-
-		__stack_end = .;
-
-		. = ALIGN (4);
 	} >RAM
 
 	. = ALIGN(4);
