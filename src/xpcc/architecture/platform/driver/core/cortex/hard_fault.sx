@@ -27,16 +27,16 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
-	
+
 	.text
 	.syntax	unified
 	.align	4
 	.thumb
-	
+
 	// ------------------------------------------------------------------------
 	/**
 	 * @brief	Hard fault handler
-	 * 
+	 *
 	 * Prepares data for the C output handler
 	 */
 	.global	HardFault_Handler
@@ -44,13 +44,57 @@
 	.thumb_func
 	.func	HardFault_Handler
 HardFault_Handler:
-	tst		lr, #4
-	ite		eq
-	mrseq	r0, msp
-	mrsne	r0, psp
-	b		_hardFaultHandler
-	
+
+	/* We want to preserve the entire stack frame, since in case of a stack overflow, the exception entry
+	 * is not able to push an exception frame onto the main stack!
+	 * So we need to push all registers onto the process stack, since it definitely has space.
+	 *
+	 * To do this, we need to:
+	 *	- buffer the main stack pointer value
+	 *	- write the main stack pointer value to __process_stack_top (a constant)
+	 *	- push the registers r4 through r11 onto the process stack
+	 *  - push the remaining registers as a formatted stack frame onto the process stack (r0-r3,r12,lr,pc,psr)
+	 *
+	 * Unfortunately the original LR, PC and PSR are (obviously) invalidated upon exception entry,
+	 * therefore we do not push these registers onto the stack, but only reserve space for them.
+	 * We opportunistically attempt to recover these register from the main stack frame that might have been
+	 * preserved during hard fault exception entry, however, a more thorough interpretation of the hard fault
+	 * reason and validation of plausibility of these recovered values is done in C code.
+	 */
+	msr psp, r0							// save register 0 into the process stack pointer (PSP)
+	mov lr, sp							// save the main stack pointer into the link register
+	ldr r0, =__process_stack_top		// load the PSP value into register 0
+	mov sp, r0							// write the current stack pointer to the new PSP value
+	mrs r0, psp							// restore register 0 from the PSP
+	push {r4-r11}				// +8	// push registers r4 through r11 onto the stack
+	push {r0-r2}				// +3	// reserve space for lr, pc and psr on the stack
+	push {r0-r3,r12}			// +5	// push remaining registers (without the LR or PC or xPSR) onto the stack
+	mov r9, sp							// buffer the current PSP for later
+
+	// we now push all valuable information about the bus fault onto the stack
+	// this means loading a range or registers from SCB and preserving them
+	ldr r0, =0xE000ED24					// load address of SCB->SHCRS register
+	ldm r0, {r1,r2,r3,r4,r5,r6,r7}		// load SHCRS, CFSR, HFSR, DFSR, MMAR, BFAR, AFSR registers
+	push {r1-r7}				// +7	// push them onto the stack
+
+	// prepare the four arguments for the C hard fault handler function
+	mov r0, sp							// load the PSP (the exception stack frame)
+	mov r1, lr							// load the MSP from the link register
+
+	// opportunistically copy LR, PC and PSR from main stack over to the process stack
+	// this doesn't cause a bus fault (which would result in core lockup) since we disabled that behavior.
+	ldr r2, [r1, #20]					// load  LR
+	str r2, [r9, #20]					// store LR
+	ldr r2, [r1, #24]					// load  PC
+	str r2, [r9, #24]					// store PC
+	ldr r2, [r1, #28]					// load  PSR
+	str r2, [r9, #28]					// store PSR
+
+	// 23 registers have been pushed onto the stack, => 92 bytes of the process stack have already been used!
+	// call the C code handler
+	b _hardFaultHandler
+
 	.size	HardFault_Handler, . - HardFault_Handler
 	.endfunc
-	
+
 	.end

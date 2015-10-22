@@ -256,6 +256,11 @@ Reset_Handler(void)
 	%% else
 	SCB->VTOR = (uint32_t)(&__vector_table_rom_start);
 	%% endif
+	// Enables handlers with priority -1 or -2 to ignore data BusFaults caused by load and store instructions.
+	// This applies to the hard fault, NMI, and FAULTMASK escalated handlers.
+	// We use this to opportunistically restore LR, PC and xPSR in the hard fault handler.
+	// Also enables trapping of divide by zero. Otherwise it would just be ignored.
+	SCB->CCR |= SCB_CCR_BFHFNMIGN_Msk | SCB_CCR_DIV_0_TRP_Msk;
 
 	// Lower priority level for all peripheral interrupts to lowest possible
 	for (uint32_t i = 0; i < {{ number_of_interrupts }}; i++) {
