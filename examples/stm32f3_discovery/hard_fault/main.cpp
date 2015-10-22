@@ -27,10 +27,17 @@ MAIN_FUNCTION
 	XPCC_LOG_INFO << "Causing a Hardfault now!" << xpcc::endl;
 
 	// simply insert an undefined instruction
-	asm volatile (".short 0xde00");
+	// asm volatile (".short 0xde00");
+
+	while(1) {
+		// create a stack overflow by just pushing 13 registers onto the stack all the time
+		asm volatile ("push {r0-r12}");
+	}
 
 	while (1)
 	{
+		xpcc::delayMilliseconds(250);
+		Board::LedSouth::toggle();
 	}
 
 	return 0;
