@@ -131,9 +131,9 @@ PROVIDE(__heap_end  = ORIGIN(RAM) + LENGTH(RAM));
 
 /* Used for interrupt handlers */
 /* the thread stack is used only for reporting hard fault conditions! It may therefore be small. */
-PROCESS_STACK_SIZE  = DEFINED(__process_stack_size) ? (__process_stack_size & ~0x7) : 256;
+PROCESS_STACK_SIZE  = DEFINED(__process_stack_size) ? (__process_stack_size & ~0x7) : 360;
 /* the handler stack is used for main program as well as interrupts */
-MAIN_STACK_SIZE     = DEFINED(__main_stack_size)    ? (__main_stack_size & ~0x7)    : (3k - 256);
+MAIN_STACK_SIZE     = DEFINED(__main_stack_size)    ? (__main_stack_size & ~0x7)    : 3k;
 /* combined stack size */
 TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 

@@ -32,7 +32,7 @@
 
 #include "../../../device.hpp"
 
-%% if parameters.enable_hardfault_handler_led or parameters.enable_hardfault_handler_log
+%% if parameters.enable_hardfault_handler_led or (parameters.enable_hardfault_handler_log != "false")
 #include "../../clock/generic/common_clock.hpp"
 %% endif
 
@@ -44,7 +44,7 @@
 	%% endif
 %% endif
 
-%% if parameters.enable_hardfault_handler_log
+%% if parameters.enable_hardfault_handler_log != "false"
 #include <xpcc/debug/logger.hpp>
 	%% set id = parameters.hardfault_handler_uart
 
@@ -74,12 +74,51 @@ void flushUart()
 }
 %% endif
 
+%% if parameters.enable_hardfault_handler_log == "true"
+const char *mem_fault_bits[] = {
+	"MMARVALID",
+	"MLSPERR",
+	"MSTKERR",
+	"MUNSTKERR",
+	"DACCVIOL",
+	"IACCVIOL"
+};
+const char *bus_fault_bits[] = {
+	"BFARVALID",
+	"LSPERR",
+	"STKERR",
+	"UNSTKERR",
+	"IMPRECISERR",
+	"PRECISERR",
+	"IBUSERR"
+};
+const char *usage_fault_bits[] = {
+	"DIVBYZERO",
+	"UNALIGNED",
+	"NOCP",
+	"INVPC",
+	"INVSTATE",
+	"UNDEFINSTR"
+};
+%% endif
+const char *valid   = "";
+const char *invalid = " [INVALID]";
+
+extern const uint32_t __stack_start;
+extern const uint32_t __stack_end;
+extern const uint32_t __main_stack_top;
+extern const uint32_t __process_stack_top;
+
+constexpr uint16_t usage_fault_mask = 0x30f;
+constexpr uint8_t    bus_fault_mask = 0xbf;
+constexpr uint8_t    mem_fault_mask = 0xbb;
+
 // ----------------------------------------------------------------------------
 extern "C"
 void
 _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 {
-%% if parameters.enable_hardfault_handler_log
+%% if parameters.enable_hardfault_handler_log != "false"
 #undef XPCC_LOG_LEVEL
 #define XPCC_LOG_LEVEL	xpcc::log::ERROR
 	// all fault registers
@@ -122,7 +161,7 @@ _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 	xpcc::stm32::Gpio{{ parameters.hardfault_handler_led_port }}{{ parameters.hardfault_handler_led_pin }}::setOutput();
 %% endif
 
-%% if parameters.enable_hardfault_handler_log
+%% if parameters.enable_hardfault_handler_log != "false"
 	uint32_t logCounter = 1;
 %% endif
 
@@ -131,43 +170,115 @@ _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 %% if parameters.enable_hardfault_handler_led
 		if (--ledCounter == 0)
 		{
-			ledCounter = xpcc::clock::fcpu / 10;
+			ledCounter = xpcc::clock::fcpu / 20;
 
 			xpcc::stm32::Gpio{{ parameters.hardfault_handler_led_port }}{{ parameters.hardfault_handler_led_pin }}::toggle();
 		}
 %% endif
 
-%% if parameters.enable_hardfault_handler_log
+%% if parameters.enable_hardfault_handler_log != "false"
 		if (--logCounter == 0)
 		{
 			logCounter = xpcc::clock::fcpu;
 
 			XPCC_LOG_ERROR.printf("\n\n\n####  Hard Fault Exception  ####\n\n"); flushUart();
 
-			constexpr uint8_t stack_dump_size = 32;
-			for (uint32_t ii=1; ii <= stack_dump_size; ii++)
+			constexpr int stack_dump_size = {{ parameters.hardfault_handler_stack_dump_length }};
+			for (int ii = stack_dump_size-1; ii >= 0; ii--)
 			{
-				XPCC_LOG_ERROR.printf("msp[0x%08lx] : 0x%08lx\n", msp + stack_dump_size - ii, msp[stack_dump_size - ii]); flushUart();
+				if (&msp[ii] > &__process_stack_top) continue;
+
+				XPCC_LOG_ERROR.printf("msp[0x%08lx] : 0x%08lx", msp + ii, msp[ii]); flushUart();
+
+				if (&msp[ii] == &__process_stack_top)   { XPCC_LOG_ERROR << " <-- __process_stack_top\n"; }
+				else if (&msp[ii] == &__main_stack_top) { XPCC_LOG_ERROR << " <-- __main_stack_top\n"; }
+				else { XPCC_LOG_ERROR << '\n'; }
 			}
 
-			XPCC_LOG_ERROR << '\n';
-			XPCC_LOG_ERROR.printf("r0 : 0x%08lx   r8  : 0x%08lx\n", stacked_r0, stacked_r8);  flushUart();
-			XPCC_LOG_ERROR.printf("r1 : 0x%08lx   r9  : 0x%08lx\n", stacked_r1, stacked_r9);  flushUart();
-			XPCC_LOG_ERROR.printf("r2 : 0x%08lx   r10 : 0x%08lx\n", stacked_r2, stacked_r10); flushUart();
-			XPCC_LOG_ERROR.printf("r3 : 0x%08lx   r11 : 0x%08lx\n", stacked_r3, stacked_r11); flushUart();
-			XPCC_LOG_ERROR.printf("r4 : 0x%08lx   r12 : 0x%08lx\n", stacked_r4, stacked_r12); flushUart();
-			XPCC_LOG_ERROR.printf("r5 : 0x%08lx   lr  : 0x%08lx\n", stacked_r5, stacked_lr);  flushUart();
-			XPCC_LOG_ERROR.printf("r6 : 0x%08lx   pc  : 0x%08lx\n", stacked_r6, stacked_pc);  flushUart();
-			XPCC_LOG_ERROR.printf("r7 : 0x%08lx   psr : 0x%08lx\n", stacked_r7, stacked_psr); flushUart();
+			uint16_t usage_fault = ((cfsr & SCB_CFSR_USGFAULTSR_Msk) >> SCB_CFSR_USGFAULTSR_Pos) & usage_fault_mask;
+			uint8_t    bus_fault = ((cfsr & SCB_CFSR_BUSFAULTSR_Msk) >> SCB_CFSR_BUSFAULTSR_Pos) &   bus_fault_mask;
+			uint8_t    mem_fault = ((cfsr & SCB_CFSR_MEMFAULTSR_Msk) >> SCB_CFSR_MEMFAULTSR_Pos) &   mem_fault_mask;
+
+			bool is_mmar_valid = (cfsr & (1 <<  7));
+			bool is_bfar_valid = (cfsr & (1 << 15));
+
+			bool is_stack_overflow = (bus_fault and not usage_fault and not mem_fault) and
+									 (is_bfar_valid and not is_mmar_valid) and
+									 (bfar < __stack_start) and (msp < &__main_stack_top);
+
+			bool is_stack_underflow = (bus_fault and not usage_fault and not mem_fault) and
+									  (is_bfar_valid and not is_mmar_valid) and
+									  (bfar > __main_stack_top);
 
 			XPCC_LOG_ERROR << '\n';
-			XPCC_LOG_ERROR.printf("SHCSR : 0x%08lx\n", shcrs); flushUart();
-			XPCC_LOG_ERROR.printf("CFSR  : 0x%08lx\n", cfsr);  flushUart();
-			XPCC_LOG_ERROR.printf("HFSR  : 0x%08lx\n", hfsr);  flushUart();
-			XPCC_LOG_ERROR.printf("DFSR  : 0x%08lx\n", dfsr);  flushUart();
-			XPCC_LOG_ERROR.printf("MMAR  : 0x%08lx\n", mmar);  flushUart();
-			XPCC_LOG_ERROR.printf("BFAR  : 0x%08lx\n", bfar);  flushUart();
-			XPCC_LOG_ERROR.printf("AFSR  : 0x%08lx\n", afsr);  flushUart();
+			XPCC_LOG_ERROR.printf("r0 : 0x%08lx   r8  : 0x%08lx\n",   stacked_r0, stacked_r8);  flushUart();
+			XPCC_LOG_ERROR.printf("r1 : 0x%08lx   r9  : 0x%08lx\n",   stacked_r1, stacked_r9);  flushUart();
+			XPCC_LOG_ERROR.printf("r2 : 0x%08lx   r10 : 0x%08lx\n",   stacked_r2, stacked_r10); flushUart();
+			XPCC_LOG_ERROR.printf("r3 : 0x%08lx   r11 : 0x%08lx\n",   stacked_r3, stacked_r11); flushUart();
+			XPCC_LOG_ERROR.printf("r4 : 0x%08lx   r12 : 0x%08lx\n",   stacked_r4, stacked_r12); flushUart();
+			XPCC_LOG_ERROR.printf("r5 : 0x%08lx   lr  : 0x%08lx%s\n", stacked_r5, stacked_lr,  (is_stack_overflow or is_stack_underflow) ? invalid : valid); flushUart();
+			XPCC_LOG_ERROR.printf("r6 : 0x%08lx   pc  : 0x%08lx%s\n", stacked_r6, stacked_pc,  (is_stack_overflow or is_stack_underflow) ? invalid : valid); flushUart();
+			XPCC_LOG_ERROR.printf("r7 : 0x%08lx   psr : 0x%08lx%s\n", stacked_r7, stacked_psr, (is_stack_overflow or is_stack_underflow) ? invalid : valid); flushUart();
+
+			XPCC_LOG_ERROR << '\n';
+			XPCC_LOG_ERROR.printf("SHCSR : 0x%08lx\n",   shcrs); flushUart();
+			XPCC_LOG_ERROR.printf("CFSR  : 0x%08lx\n",   cfsr);  flushUart();
+			XPCC_LOG_ERROR.printf("HFSR  : 0x%08lx\n",   hfsr);  flushUart();
+			XPCC_LOG_ERROR.printf("DFSR  : 0x%08lx\n",   dfsr);  flushUart();
+			XPCC_LOG_ERROR.printf("MMAR  : 0x%08lx%s\n", mmar, is_mmar_valid ? valid : invalid); flushUart();
+			XPCC_LOG_ERROR.printf("BFAR  : 0x%08lx%s\n", bfar, is_bfar_valid ? valid : invalid); flushUart();
+			XPCC_LOG_ERROR.printf("AFSR  : 0x%08lx\n",   afsr);  flushUart();
+
+	%% if parameters.enable_hardfault_handler_log != "basic"
+			XPCC_LOG_ERROR << '\n';
+			if (mem_fault)
+			{
+				XPCC_LOG_ERROR.printf("Memory Manage Faults:"); flushUart();
+				for(uint8_t index = 0, mask = 0x80; mask; mask >>= 1)
+				{
+					if (mem_fault_mask & mask)
+					{
+						if (mem_fault & mask) {
+							XPCC_LOG_ERROR << ' ' << mem_fault_bits[index]; flushUart();
+						}
+						index++;
+					}
+				};
+				XPCC_LOG_ERROR << '\n';
+			}
+			if (bus_fault)
+			{
+				XPCC_LOG_ERROR.printf("Bus Faults:"); flushUart();
+				for(uint8_t index = 0, mask = 0x80; mask; mask >>= 1)
+				{
+					if (bus_fault_mask & mask)
+					{
+						if (bus_fault & mask) {
+							XPCC_LOG_ERROR << ' ' << bus_fault_bits[index]; flushUart();
+						}
+						index++;
+					}
+				};
+				XPCC_LOG_ERROR << '\n';
+			}
+			if (usage_fault)
+			{
+				XPCC_LOG_ERROR.printf("Usage Faults:"); flushUart();
+				for(uint16_t index = 0, mask = 0x8000; mask; mask >>= 1)
+				{
+					if (usage_fault_mask & mask)
+					{
+						if (usage_fault & mask) {
+							XPCC_LOG_ERROR << ' ' << usage_fault_bits[index]; flushUart();
+						}
+						index++;
+					}
+				};
+				XPCC_LOG_ERROR << '\n';
+			}
+	%% endif
+			if (is_stack_overflow)  { XPCC_LOG_ERROR << "  ### STACK OVERFLOW ###\n"; flushUart(); }
+			if (is_stack_underflow) { XPCC_LOG_ERROR << "  ### STACK UNDERFLOW ###\n"; flushUart(); }
 		}
 %% endif
 	}
