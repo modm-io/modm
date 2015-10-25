@@ -116,6 +116,10 @@ constexpr uint8_t    mem_fault_mask = 0xbb;
 // ----------------------------------------------------------------------------
 extern "C"
 void
+_hardFaultHandler(const uint32_t *ctx, const uint32_t *msp) __attribute__((naked, noreturn));
+
+extern "C"
+void
 _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 {
 %% if parameters.enable_hardfault_handler_log != "false"
