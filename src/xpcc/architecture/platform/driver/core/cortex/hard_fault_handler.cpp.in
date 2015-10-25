@@ -126,33 +126,33 @@ _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 #undef XPCC_LOG_LEVEL
 #define XPCC_LOG_LEVEL	xpcc::log::ERROR
 	// all fault registers
-	const uint32_t shcrs = ctx[ 0];
-	const uint32_t cfsr  = ctx[ 1];
-	const uint32_t hfsr  = ctx[ 2];
-	const uint32_t dfsr  = ctx[ 3];
-	const uint32_t mmar  = ctx[ 4];
-	const uint32_t bfar  = ctx[ 5];
-	const uint32_t afsr  = ctx[ 6];
+	const uint32_t& shcrs = ctx[ 0];
+	const uint32_t& cfsr  = ctx[ 1];
+	const uint32_t& hfsr  = ctx[ 2];
+	const uint32_t& dfsr  = ctx[ 3];
+	const uint32_t& mmar  = ctx[ 4];
+	const uint32_t& bfar  = ctx[ 5];
+	const uint32_t& afsr  = ctx[ 6];
 
 	// original exception stack frame
-	const uint32_t stacked_r0  = ctx[ 7];
-	const uint32_t stacked_r1  = ctx[ 8];
-	const uint32_t stacked_r2  = ctx[ 9];
-	const uint32_t stacked_r3  = ctx[10];
-	const uint32_t stacked_r12 = ctx[11];
-	const uint32_t stacked_lr  = ctx[12]; // possibly invalid!
-	const uint32_t stacked_pc  = ctx[13]; // possibly invalid!
-	const uint32_t stacked_psr = ctx[14]; // possibly invalid!
+	const uint32_t& stacked_r0  = ctx[ 7];
+	const uint32_t& stacked_r1  = ctx[ 8];
+	const uint32_t& stacked_r2  = ctx[ 9];
+	const uint32_t& stacked_r3  = ctx[10];
+	const uint32_t& stacked_r12 = ctx[11];
+	const uint32_t& stacked_lr  = ctx[12]; // possibly invalid!
+	const uint32_t& stacked_pc  = ctx[13]; // possibly invalid!
+	const uint32_t& stacked_psr = ctx[14]; // possibly invalid!
 
 	// all other registers
-	const uint32_t stacked_r4  = ctx[15];
-	const uint32_t stacked_r5  = ctx[16];
-	const uint32_t stacked_r6  = ctx[17];
-	const uint32_t stacked_r7  = ctx[18];
-	const uint32_t stacked_r8  = ctx[19];
-	const uint32_t stacked_r9  = ctx[20];
-	const uint32_t stacked_r10 = ctx[21];
-	const uint32_t stacked_r11 = ctx[22];
+	const uint32_t& stacked_r4  = ctx[15];
+	const uint32_t& stacked_r5  = ctx[16];
+	const uint32_t& stacked_r6  = ctx[17];
+	const uint32_t& stacked_r7  = ctx[18];
+	const uint32_t& stacked_r8  = ctx[19];
+	const uint32_t& stacked_r9  = ctx[20];
+	const uint32_t& stacked_r10 = ctx[21];
+	const uint32_t& stacked_r11 = ctx[22];
 
 	xpcc::stm32::{{ uart ~ id }}::discardTransmitBuffer();
 %% else
