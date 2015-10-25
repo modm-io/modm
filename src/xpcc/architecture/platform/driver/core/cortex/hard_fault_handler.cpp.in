@@ -101,6 +101,37 @@ const char *usage_fault_bits[] = {
 	"UNDEFINSTR"
 };
 %% endif
+%% if parameters.enable_hardfault_handler_log != "false"
+const char *stack_frame_names[] = {
+	"R0",
+	"R1",
+	"R2",
+	"R3",
+	"R12",
+	"LR",
+	"PC",
+	"xPSR",
+	"S0",
+	"S1",
+	"S2",
+	"S3",
+	"S4",
+	"S5",
+	"S6",
+	"S7",
+	"S8",
+	"S9",
+	"S10",
+	"S11",
+	"S12",
+	"S13",
+	"S14",
+	"S15",
+	"FPSCR",
+	""
+};
+const char *exception_stack_frame = " ^-- exception stack frame\n";
+%% endif
 const char *valid   = "";
 const char *invalid = " [INVALID]";
 
@@ -185,20 +216,7 @@ _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 		{
 			logCounter = xpcc::clock::fcpu;
 
-			XPCC_LOG_ERROR.printf("\n\n\n####  Hard Fault Exception  ####\n\n"); flushUart();
-
-			constexpr int stack_dump_size = {{ parameters.hardfault_handler_stack_dump_length }};
-			for (int ii = stack_dump_size-1; ii >= 0; ii--)
-			{
-				if (&msp[ii] > &__process_stack_top) continue;
-
-				XPCC_LOG_ERROR.printf("msp[0x%08lx] : 0x%08lx", msp + ii, msp[ii]); flushUart();
-
-				if (&msp[ii] == &__process_stack_top)   { XPCC_LOG_ERROR << " <-- __process_stack_top\n"; }
-				else if (&msp[ii] == &__main_stack_top) { XPCC_LOG_ERROR << " <-- __main_stack_top\n"; }
-				else { XPCC_LOG_ERROR << '\n'; }
-			}
-
+			// isolate the fault registers
 			uint16_t usage_fault = ((cfsr & SCB_CFSR_USGFAULTSR_Msk) >> SCB_CFSR_USGFAULTSR_Pos) & usage_fault_mask;
 			uint8_t    bus_fault = ((cfsr & SCB_CFSR_BUSFAULTSR_Msk) >> SCB_CFSR_BUSFAULTSR_Pos) &   bus_fault_mask;
 			uint8_t    mem_fault = ((cfsr & SCB_CFSR_MEMFAULTSR_Msk) >> SCB_CFSR_MEMFAULTSR_Pos) &   mem_fault_mask;
@@ -213,6 +231,31 @@ _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 			bool is_stack_underflow = (bus_fault and not usage_fault and not mem_fault) and
 									  (is_bfar_valid and not is_mmar_valid) and
 									  (bfar > __main_stack_top);
+
+			bool is_floating_point_active = FPU->FPCCR & 1;
+
+			XPCC_LOG_ERROR.printf("\n\n\n####  Hard Fault Exception  ####\n\n"); flushUart();
+
+			// search for the highest watermark level on the stack
+			uint32_t *ii = (uint32_t*)&__stack_start;
+			while((ii <= &__main_stack_top) and (*ii == 0xAAAA5555)) ii++;
+			const uint32_t *main_stack_end = ii;
+
+			// print the entire main stack content and annotate it
+			uint32_t *sp = (uint32_t*)&__main_stack_top;
+			for (; sp >= main_stack_end; sp--)
+			{
+				XPCC_LOG_ERROR.printf("sp[0x%08lx] : 0x%08lx", sp, *sp); flushUart();
+
+				// annotate the stack
+				if (sp == &__main_stack_top) { XPCC_LOG_ERROR << " <-- __main_stack_top\n"; }
+				else if (sp == (msp + (is_floating_point_active ? 26 : 8))) { XPCC_LOG_ERROR << " <-- main stack pointer\n"; }
+				else if (sp < (msp + (is_floating_point_active ? 26 : 8)) and sp >= msp) { XPCC_LOG_ERROR.printf(" | %s\n", stack_frame_names[sp - msp]); }
+				else if (sp == msp - 1) { XPCC_LOG_ERROR << exception_stack_frame; }
+				else { XPCC_LOG_ERROR << '\n'; }
+			}
+			if (sp == msp - 1) { XPCC_LOG_ERROR << "                           "; XPCC_LOG_ERROR << exception_stack_frame; }
+			XPCC_LOG_ERROR.printf("\nMaximum Stack Usage: %u Bytes\n", (&__main_stack_top - main_stack_end)*4); flushUart();
 
 			XPCC_LOG_ERROR << '\n';
 			XPCC_LOG_ERROR.printf("r0 : 0x%08lx   r8  : 0x%08lx\n",   stacked_r0, stacked_r8);  flushUart();

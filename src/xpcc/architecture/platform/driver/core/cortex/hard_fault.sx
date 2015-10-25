@@ -91,6 +91,7 @@ HardFault_Handler:
 	str r2, [r9, #28]					// store PSR
 
 	// 23 registers have been pushed onto the stack, => 92 bytes of the process stack have already been used!
+	dsb
 	// call the C code handler
 	b _hardFaultHandler
 
