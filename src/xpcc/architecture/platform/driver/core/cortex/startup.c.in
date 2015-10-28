@@ -182,15 +182,20 @@ extern void xpcc_gpio_enable(void);
 void
 Reset_Handler(void)
 {
+	// fill the stack with 0xAAAA5555 for watermarking
+	asm volatile (
+		".syntax unified"         "\n\t"
+		"ldr  r0, =__stack_start" "\n\t"
+		"ldr  r1, =__stack_end-4" "\n\t"
+		"ldr  r2, =0xAAAA5555"    "\n\t"
+	"1:  str  r2, [r0]"           "\n\t" // store the value into ram
+		"adds r0, #4"             "\n\t" // add sizeof(uint32_t) to the pointer
+		"cmp  r0, r1"             "\n\t" // compare pointer with end of stack address
+		"bne  1b"                 "\n\t" // continue loop if not equal
+	);
+
 	uint32_t* src;
 	uint32_t* dest;
-
-	// Fill both main and process stacks with 0xAA55 for watermarking
-	dest = &__stack_start;
-	while (dest < &__stack_end)
-	{
-		*(dest++) = 0xAAAA5555;
-	}
 
 %% if parameters.vector_table_in_ram
 	// copy vector table to RAM (.vectors)
