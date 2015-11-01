@@ -34,6 +34,9 @@ MAIN_FUNCTION
 	asm volatile ("pop {r0-r12}");
 	asm volatile ("pop {r0-r12}");
 
+	// execute unused stack
+	asm volatile ("ldr pc, =0x20000247");
+
 	// divide by zero
 	volatile uint8_t number = 42;
 	volatile uint8_t divisor = 0;
