@@ -187,7 +187,7 @@ _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 
 	xpcc::stm32::{{ uart ~ id }}::discardTransmitBuffer();
 %% else
-	(void) ctx;	// avoid warning
+	(void) ctx; (void) msp;	// avoid warnings
 %% endif
 
 	// Infinite loop
@@ -232,13 +232,22 @@ _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 									  (is_bfar_valid and not is_mmar_valid) and
 									  (bfar > __main_stack_top);
 
+			bool is_stack_execution = (cfsr == 0x00010000) and
+									  (stacked_pc == (uint32_t)&__stack_start);
+
 			bool is_floating_point_active = FPU->FPCCR & 1;
 
 			XPCC_LOG_ERROR.printf("\n\n\n####  Hard Fault Exception  ####\n\n"); flushUart();
 
 			// search for the highest watermark level on the stack
-			uint32_t *ii = (uint32_t*)&__stack_start;
-			while((ii <= &__main_stack_top) and (*ii == 0xAAAA5555)) ii++;
+			uint32_t *ii = ((uint32_t*)&__stack_start) + 1;
+			uint32_t value = 0xE7FBE7FC;
+			while((ii <= &__main_stack_top) and (*ii == value))
+			{
+				ii++;
+				if (value > 0xE401E402) value -= 0x20002;
+				else value = 0xE401E401;
+			}
 			const uint32_t *main_stack_end = ii;
 
 			// print the entire main stack content and annotate it
@@ -324,7 +333,8 @@ _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 				XPCC_LOG_ERROR << '\n';
 			}
 	%% endif
-			if (is_stack_overflow)  { XPCC_LOG_ERROR << "  ### STACK OVERFLOW ###\n"; flushUart(); }
+			if (is_stack_execution) { XPCC_LOG_ERROR << "  ### STACK EXECUTION ###\n"; flushUart(); }
+			if (is_stack_overflow)  { XPCC_LOG_ERROR << "  ### STACK OVERFLOW  ###\n"; flushUart(); }
 			if (is_stack_underflow) { XPCC_LOG_ERROR << "  ### STACK UNDERFLOW ###\n"; flushUart(); }
 		}
 %% endif
