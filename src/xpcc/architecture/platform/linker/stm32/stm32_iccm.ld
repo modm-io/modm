@@ -153,10 +153,10 @@ SECTIONS
 		__vector_table_ram_start = .;						/* address in RAM */
 
 		/* used for vectors remapped to RAM */
-        KEEP(*(.vectors))
+		KEEP(*(.vectors))
 
-        . = ALIGN (4);
-        __vector_table_ram_end = .;
+		. = ALIGN (4);
+		__vector_table_ram_end = .;
 	} >CCM AT>ROM
 
 	.fastcode :
@@ -171,15 +171,15 @@ SECTIONS
 	} >CCM AT>ROM
 
 	.fastdata :
-    {
-        __fastdata_load = LOADADDR (.fastdata);		/* address in ROM */
+	{
+		__fastdata_load = LOADADDR (.fastdata);		/* address in ROM */
 		__fastdata_start = .;						/* address in RAM */
 
 		KEEP(*(.fastdata))
 
-        . = ALIGN(4);
+		. = ALIGN(4);
 		__fastdata_end = .;
-    } >CCM AT>ROM
+	} >CCM AT>ROM
 
 	.text :
 	{
