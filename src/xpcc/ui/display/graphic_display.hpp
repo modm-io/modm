@@ -63,7 +63,7 @@ namespace xpcc
 			static ALWAYS_INLINE Color blue()    { return Color(0x001F); };
 			static ALWAYS_INLINE Color navy()    { return Color(0x0010); };
 			static ALWAYS_INLINE Color black()   { return Color(0x0000); };
-			static ALWAYS_INLINE Color signalViolet()   { return Color(0x84D0); };
+			static ALWAYS_INLINE Color signalViolet()   { return Color(0x8010); }; //0x84D0
 			static ALWAYS_INLINE Color emeraldGreen()   { return Color(0x5DCC); };
 
 			/**
