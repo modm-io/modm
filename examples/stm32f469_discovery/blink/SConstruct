@@ -5,10 +5,10 @@ rootpath = '../../..'
 env = Environment(tools = ['xpcc'], toolpath = [rootpath + '/scons/site_tools'])
 
 # find all source files
-files = env.FindFiles('.')
+sources = env.FindFiles('.').sources + ['../stm32f469_discovery.cpp']
 
 # build the program
-program = env.Program(target = env['XPCC_CONFIG']['general']['name'], source = files.sources)
+program = env.Program(target = env['XPCC_CONFIG']['general']['name'], source = sources)
 
 # build the xpcc library
 env.XpccLibrary()

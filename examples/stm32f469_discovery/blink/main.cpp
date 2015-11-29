@@ -1,20 +1,6 @@
 #include "../stm32f469_discovery.hpp"
-#include <xpcc/debug/logger.hpp>
 
 using namespace Board;
-
-// Set the log level
-#undef	XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::INFO
-
-// Create an IODeviceWrapper around the Uart Peripheral we want to use
-xpcc::IODeviceWrapper< Usart3, xpcc::IOBuffer::BlockIfFull > loggerDevice;
-
-// Set all four logger streams to use the UART
-xpcc::log::Logger xpcc::log::debug(loggerDevice);
-xpcc::log::Logger xpcc::log::info(loggerDevice);
-xpcc::log::Logger xpcc::log::warning(loggerDevice);
-xpcc::log::Logger xpcc::log::error(loggerDevice);
 
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION

@@ -17,6 +17,7 @@
 #define XPCC_STM32_F469_DISCOVERY_HPP
 
 #include <xpcc/architecture/platform.hpp>
+#include <xpcc/debug/logger.hpp>
 
 using namespace xpcc::stm32;
 
