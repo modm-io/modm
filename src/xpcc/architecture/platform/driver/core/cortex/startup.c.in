@@ -250,7 +250,7 @@ Reset_Handler(void)
 %# Perform Platform Specific Setup
 {{ platform.startupCode() }}
 
-%% if not target is cortex_m0
+%% if not (target is cortex_m0 or target is cortex_m7)
 	// Enable Tracing Debug Unit
 	CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
 	DWT->CYCCNT = 0;
