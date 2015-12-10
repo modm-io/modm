@@ -115,9 +115,9 @@
 	#	define ATTRIBUTE_PACKED		__attribute__((packed))
 	#	define ATTRIBUTE_FASTCODE	__attribute__((section(".fastcode")))
 	#	define ATTRIBUTE_FASTDATA	__attribute__((section(".fastdata")))
-
-	// see http://dbp-consulting.com/tutorials/StrictAliasing.html
-	#	define ATTRIBUTE_MAY_ALIAS	__attribute__((__may_alias__))
+	#	define ATTRIBUTE_MAY_ALIAS	__attribute__((__may_alias__))	// see http://dbp-consulting.com/tutorials/StrictAliasing.html
+	#	define likely(x)			__builtin_expect(!!(x), 1)
+	#	define unlikely(x)			__builtin_expect(!!(x), 0)
 	#else
 	#	define ALWAYS_INLINE  		inline
 	#	define ATTRIBUTE_UNUSED
@@ -127,6 +127,8 @@
 	#	define ATTRIBUTE_FASTCODE
 	#	define ATTRIBUTE_FASTDATA
 	#	define ATTRIBUTE_MAY_ALIAS
+	#	define likely(x)			(x)
+	#	define unlikely(x)			(x)
 	#endif
 
 	#ifdef XPCC__CPU_AVR
