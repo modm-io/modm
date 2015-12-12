@@ -40,19 +40,21 @@ cache:
  directories:
   - $HOME/cache
 
+# these are ordered by longest running time, so that all instances complete
+# within the longest running instances, which is the first.
 env:
+ - TEST_SUITE="check=examples examples=stm32f4_discovery"
+ - TEST_SUITE="check=examples examples=stm32f3_discovery"
  - TEST_SUITE="unittest"
- - TEST_SUITE="check=devices"
- - TEST_SUITE="check=examples examples=arduino_uno"
  - TEST_SUITE="check=examples examples=avr"
+ - TEST_SUITE="check=devices"
  - TEST_SUITE="check=examples examples=linux"
+ - TEST_SUITE="check=examples examples=stm32f429_discovery"
+ - TEST_SUITE="check=examples examples=stm32f1_discovery"
+# - TEST_SUITE="check=examples examples=stm32f7_discovery"
  - TEST_SUITE="check=examples examples=lpcxpresso"
  - TEST_SUITE="check=examples examples=stm32"
- - TEST_SUITE="check=examples examples=stm32f1_discovery"
- - TEST_SUITE="check=examples examples=stm32f3_discovery"
- - TEST_SUITE="check=examples examples=stm32f4_discovery"
- - TEST_SUITE="check=examples examples=stm32f429_discovery"
-# - TEST_SUITE="check=examples examples=stm32f7_discovery"
+ - TEST_SUITE="check=examples examples=arduino_uno"
  - TEST_SUITE="check=examples examples=stm32f4_loa_v2b"
  - TEST_SUITE="check=examples examples=unittest"
 
