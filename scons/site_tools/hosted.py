@@ -101,5 +101,12 @@ def generate(env, **kw):
 		"-Woverloaded-virtual",
 	]
 
+	if 'CXXFLAGS' in os.environ:
+		flags = "".join(os.environ['CXXFLAGS'])
+		env['CXXFLAGS'].append(flags)
+	if 'LDFLAGS' in os.environ:
+		flags = "".join(os.environ['LDFLAGS'])
+		env['LINKFLAGS'] = flags
+
 def exists(env):
 	return env.Detect('g++')
