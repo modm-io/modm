@@ -191,6 +191,7 @@ def generate(env, **kw):
 		"-nostartfiles",
 		"-L$LINKPATH",
 		"-T$LINKFILE",
+		"-Wl,--fatal-warnings",
 		"-Wl,-Map=${TARGET.base}.map,--cref",
 	]
 	
