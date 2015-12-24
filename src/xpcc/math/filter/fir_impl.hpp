@@ -31,7 +31,7 @@
 #ifndef XPCC__FIR_IMPL_HPP
 #define XPCC__FIR_IMPL_HPP
 
-#define likely(x) __builtin_expect((x),1)
+#include <xpcc/architecture/utils.hpp>
 
 //#define FIR_DEBUG
 

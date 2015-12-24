@@ -17,6 +17,8 @@ xpcc::glcd::Color defaultColors[] = {
 	xpcc::glcd::Color::green(),		// GREEN
 	xpcc::glcd::Color::blue(),		// BLUE
 	xpcc::glcd::Color::yellow(),	// YELLOW
+	xpcc::glcd::Color::signalViolet(), //SIGNALVIOLET
+	xpcc::glcd::Color::emeraldGreen(), //EMERALDGREEN
 	xpcc::glcd::Color::blue(),		// BORDER
 	xpcc::glcd::Color::yellow(),	// TEXT
 	xpcc::glcd::Color::black(),		// BACKGROUND
