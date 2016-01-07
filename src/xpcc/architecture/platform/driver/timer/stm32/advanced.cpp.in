@@ -267,6 +267,12 @@ xpcc::stm32::Timer{{ id }}::enableInterruptVector(Interrupt interrupt, bool enab
 {
 	if (enable)
 	{
+%% if target is stm32f0
+		if(interrupt & (Interrupt::Update | Interrupt::Break | Interrupt::COM | Interrupt::Trigger)) {
+			NVIC_SetPriority(TIM{{ id }}_BRK_UP_TRG_COM_IRQn, priority);
+			nvicEnableInterrupt(TIM{{ id }}_BRK_UP_TRG_COM_IRQn);
+		}
+%% else
 		if (interrupt & Interrupt::Update) {
 			NVIC_SetPriority(TIM{{ id }}_UP_IRQn, priority);
 			nvicEnableInterrupt(TIM{{ id }}_UP_IRQn);
@@ -281,7 +287,7 @@ xpcc::stm32::Timer{{ id }}::enableInterruptVector(Interrupt interrupt, bool enab
 			NVIC_SetPriority(TIM{{ id }}_TRG_COM_IRQn, priority);
 			nvicEnableInterrupt(TIM{{ id }}_TRG_COM_IRQn);
 		}	
-		
+%% endif
 		if (interrupt & 
 				(Interrupt::CaptureCompare1 | Interrupt::CaptureCompare2 |
 				 Interrupt::CaptureCompare3 | Interrupt::CaptureCompare4)) {
@@ -291,6 +297,11 @@ xpcc::stm32::Timer{{ id }}::enableInterruptVector(Interrupt interrupt, bool enab
 	}
 	else
 	{
+%% if target is stm32f0
+		if(interrupt & (Interrupt::Update | Interrupt::Break | Interrupt::COM | Interrupt::Trigger)) {
+			nvicDisableInterrupt(TIM{{ id }}_BRK_UP_TRG_COM_IRQn);
+		}
+%% else
 		if (interrupt & Interrupt::Update) {
 			nvicDisableInterrupt(TIM{{ id }}_UP_IRQn);
 		}
@@ -302,7 +313,7 @@ xpcc::stm32::Timer{{ id }}::enableInterruptVector(Interrupt interrupt, bool enab
 		if (interrupt & (Interrupt::COM | Interrupt::Trigger)) {
 			nvicDisableInterrupt(TIM{{ id }}_TRG_COM_IRQn);
 		}
-		
+%% endif
 		if (interrupt & 
 				(Interrupt::CaptureCompare1 | Interrupt::CaptureCompare2 |
 				 Interrupt::CaptureCompare3 | Interrupt::CaptureCompare4)) {
