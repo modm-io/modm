@@ -15,6 +15,8 @@
 #include <xpcc/architecture/detect.hpp>
 #include <xpcc/architecture/utils.hpp>
 
+#include <stdarg.h>	// va_list
+
 #include "iodevice.hpp"
 #include "iodevice_wrapper.hpp"
 
@@ -438,6 +440,9 @@ public :
 	 */
 	IOStream&
 	printf(const char* fmt, ...);
+
+	IOStream&
+	vprintf(const char *fmt, va_list vlist);
 
 protected :
 	void
