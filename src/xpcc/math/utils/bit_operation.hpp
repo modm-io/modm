@@ -166,7 +166,7 @@ namespace xpcc
 	inline uint8_t
 	bitReverse(uint8_t n)
 	{
-#ifdef XPCC__CPU_ARM
+#if defined(XPCC__CPU_ARM) && !defined(XPCC__CPU_CORTEX_M0)
 		asm volatile(
 			"rbit %0,%0"	"\n\t"
 			"rev %0,%0"		"\n\t"
@@ -190,7 +190,7 @@ namespace xpcc
 	inline uint16_t
 	bitReverse(uint16_t n)
 	{
-#ifdef XPCC__CPU_ARM
+#if defined(XPCC__CPU_ARM) && !defined(XPCC__CPU_CORTEX_M0)
 		asm volatile(
 			"rbit %0,%0"	"\n\t"
 			"rev16 %0,%0"	"\n\t"
@@ -216,7 +216,7 @@ namespace xpcc
 	inline uint32_t
 	bitReverse(uint32_t n)
 	{
-#ifdef XPCC__CPU_ARM
+#if defined(XPCC__CPU_ARM) && !defined(XPCC__CPU_CORTEX_M0)
 		asm volatile(
 			"rbit %0,%0"	"\n\t"
 			 : "=r" (n)
