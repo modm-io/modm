@@ -16,8 +16,8 @@
 %% set hal = uart ~ "Hal" ~ id
 
 #include "../../../device.hpp"
-#include "{{ uart | lower }}_hal_{{ id }}.hpp"
-#include "{{ uart | lower }}_{{ id }}.hpp"
+#include "uart_hal_{{ id }}.hpp"
+#include "uart_{{ id }}.hpp"
 
 %% if parameters.buffered
 #include <xpcc/architecture/driver/atomic.hpp>
