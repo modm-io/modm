@@ -6,7 +6,7 @@
  * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
-%% if id in [1, 2, 3, 6]
+%% if id in [1, 2, 3, 6] or target is stm32f0
 %%	set uart = "Usart"
 %% elif id in [4, 5, 7, 8]
 %%	set uart = "Uart"
