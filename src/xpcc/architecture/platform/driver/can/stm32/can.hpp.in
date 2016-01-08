@@ -126,7 +126,7 @@ public:
 								(SystemClock::Can{{ id }} == MHz42)?  6 : 0;
 		constexpr uint16_t prescaler = 	SystemClock::Can{{ id }} /
 								(bitrate * (1 + bs1 + bs2));
-		static_assert(prescaler > 0,
+		static_assert(bs1 > 0 and bs2 > 0,
 				"Unsupported frequency for Can peripheral. "
 				"Only 30 Mhz, 36 MHz and 42 MHz are supported at the moment.");
 
