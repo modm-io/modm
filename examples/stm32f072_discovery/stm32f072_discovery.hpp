@@ -32,6 +32,7 @@ namespace Board
 struct DummyClock {
 	static constexpr int Frequency = 8 * 1000 * 1000;
 	static constexpr int Usart1 = Frequency;
+	static constexpr int Can1 = Frequency;
 	static constexpr int Spi2 = Frequency;
 };
 
