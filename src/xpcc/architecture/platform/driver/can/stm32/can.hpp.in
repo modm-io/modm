@@ -118,10 +118,12 @@ public:
 		 * STM32F20x   tPCLK = 1 / 30 MHz
 		 * STM32F40x   tPCLK = 1 / 42 MHz
 		 */
-		constexpr uint8_t bs1 = (SystemClock::Can{{ id }} == MHz30)? 10 :
+		constexpr uint8_t bs1 = (SystemClock::Can{{ id }} ==  MHz8)? 11 :
+								(SystemClock::Can{{ id }} == MHz30)? 10 :
 								(SystemClock::Can{{ id }} == MHz36)? 12 :
 								(SystemClock::Can{{ id }} == MHz42)? 14 : 0;
-		constexpr uint8_t bs2 = (SystemClock::Can{{ id }} == MHz30)?  4 :
+		constexpr uint8_t bs2 = (SystemClock::Can{{ id }} ==  MHz8)?  4 :
+								(SystemClock::Can{{ id }} == MHz30)?  4 :
 								(SystemClock::Can{{ id }} == MHz36)?  5 :
 								(SystemClock::Can{{ id }} == MHz42)?  6 : 0;
 		constexpr uint16_t prescaler = 	SystemClock::Can{{ id }} /
@@ -129,6 +131,7 @@ public:
 		static_assert(bs1 > 0 and bs2 > 0,
 				"Unsupported frequency for Can peripheral. "
 				"Only 30 Mhz, 36 MHz and 42 MHz are supported at the moment.");
+		static_assert(prescaler > 0, "CAN bitrate is too high for standard bit timings!");
 
 		return initializeWithPrescaler(prescaler, bs1, bs2, interruptPriority, startupMode, overwriteOnOverrun);
 	}
