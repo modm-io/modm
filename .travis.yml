@@ -51,6 +51,7 @@ env:
  - TEST_SUITE="check=examples examples=linux"
  - TEST_SUITE="check=examples examples=stm32f429_discovery"
  - TEST_SUITE="check=examples examples=stm32f1_discovery"
+ - TEST_SUITE="check=examples examples=stm32f072_discovery"
 # - TEST_SUITE="check=examples examples=stm32f7_discovery"
  - TEST_SUITE="check=examples examples=lpcxpresso"
  - TEST_SUITE="check=examples examples=stm32"
