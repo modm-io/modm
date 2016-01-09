@@ -23,7 +23,7 @@
 %% set irq_name = "8_BRK_TIM12"
 %% elif id == 13
 %% set irq_name = "8_UP_TIM13"
-%% elif id == 14
+%% elif id == 14 and not target is stm32f0
 %% set irq_name = "8_TRG_COM_TIM14"
 %% else
 %% set irq_name = id

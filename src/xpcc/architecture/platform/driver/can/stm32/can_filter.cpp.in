@@ -9,7 +9,7 @@
 
 #include "can_filter.hpp"
 
-%% if target is stm32f3
+%% if target is stm32f3 or target is stm32f0
 	%% set reg = 'CAN'
 %% else
 	%% set reg = 'CAN1'
