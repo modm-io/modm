@@ -70,7 +70,7 @@ MAIN_FUNCTION
 	// Initialize Can
 	GpioInputB8::connect(Can1::Rx, Gpio::InputType::PullUp);
 	GpioOutputB9::connect(Can1::Tx, Gpio::OutputType::PushPull);
-	Can1::initialize<Board::DefaultSystemClock, Can1::Bitrate::kBps500>(9);
+	Can1::initialize<Board::DefaultSystemClock, Can1::Bitrate::kBps125>(9);
 
 	XPCC_LOG_INFO << "Setting up Filter for Can ..." << xpcc::endl;
 	// Receive every message

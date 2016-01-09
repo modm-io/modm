@@ -29,14 +29,15 @@ namespace Board
 // TODO: enable once clock driver is implemented
 //using DefaultSystemClock = SystemClock<InternalClock<MHz48>, MHz48>;
 
+template<int F = 8 * 1000 * 1000>
 struct DummyClock {
-	static constexpr int Frequency = 8 * 1000 * 1000;
+	static constexpr int Frequency = F;
 	static constexpr int Usart1 = Frequency;
 	static constexpr int Can1 = Frequency;
 	static constexpr int Spi2 = Frequency;
 };
 
-using DefaultSystemClock = DummyClock;
+using DefaultSystemClock = DummyClock<48 * 1000 * 1000>;
 
 using LedUp    = GpioOutputC6;
 using LedDown  = GpioOutputC7;
@@ -60,11 +61,44 @@ using Transport = xpcc::Lis3TransportSpi< SpiMaster, Cs >;
 using Gyroscope = xpcc::L3gd20< Transport >;
 }
 
+
+inline bool
+enableHSI48()
+{
+	RCC->CR2 |= RCC_CR2_HSI48ON;
+	uint32_t t = 1500;
+	while (!(RCC->CR2 & RCC_CR2_HSI48RDY) and --t) {
+	}
+	return static_cast<bool>(RCC->CR2 & RCC_CR2_HSI48RDY);
+}
+
+inline bool
+switchSystemClockToHSI48()
+{
+	// use HSI48, all prescalers set to 1
+	RCC->CFGR = RCC_CFGR_SW_HSI48;
+	uint32_t t = 1500;
+	// Wait till the main PLL is used as system clock source
+	while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_HSI48 and --t) {
+	}
+
+	const bool success = ((RCC->CFGR & RCC_CFGR_SWS) == RCC_CFGR_SWS_HSI48);
+
+	if(success) {
+		xpcc::clock::fcpu_MHz = 48;
+		xpcc::clock::fcpu_kHz = 48 * 1000;
+	}
+
+	return success;
+}
+
 inline void
 initialize()
 {
 	// TODO: enable once clock driver is implemented
 	// DefaultSystemClock::enable();
+	enableHSI48();
+	switchSystemClockToHSI48();
 	xpcc::cortex::SysTickTimer::initialize<DefaultSystemClock>();
 
 	LedUp::setOutput(xpcc::Gpio::Low);
@@ -98,7 +132,7 @@ initializeL3g()
 	l3g::Mosi::connect(l3g::SpiMaster::Mosi);
 	l3g::Miso::connect(l3g::SpiMaster::Miso);
 
-	l3g::SpiMaster::initialize<DefaultSystemClock, 4000000>();
+	l3g::SpiMaster::initialize<DefaultSystemClock, 3000000>();
 	l3g::SpiMaster::setDataMode(l3g::SpiMaster::DataMode::Mode3);
 }
 
