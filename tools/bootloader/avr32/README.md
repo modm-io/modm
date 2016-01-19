@@ -38,7 +38,7 @@ Usage:
 3) Create the configuration using this tool.
    Select the GPIO number (e.g. 19) and the active level (--low or --high) of your GPIO.
    If your button connects to GND the active level is --low.
-   $ python avr32_dfu_config.py --low 19
+   $ python2 avr32_dfu_config.py --low 19
 
 4) Write the user page to the device
    $ dfu-programmer at32uc3b0256 erase

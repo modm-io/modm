@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # 
 # Copyright (c) 2011, Roboterclub Aachen e.V.
 # All rights reserved.
@@ -36,8 +36,8 @@ command = os.path.join(script_path, "../../tools/font_creator/font_export.py")
 def font_action(target, source, env):
 	infile  = str(source[0])
 	outfile = os.path.splitext(str(target[0]))[0]
-	
-	os.system('python "%s" "%s" "%s"' % (command, infile, outfile))
+
+	os.system('python2 "%s" "%s" "%s"' % (command, infile, outfile))
 
 def font_string(target, source, env):
 	return "Create Font: '%s'" % (str(source[0]))

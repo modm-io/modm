@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 """ Bootloader for AVR-Boards connected via CAN bus
 

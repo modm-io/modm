@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 
 """Configuration Utility for pre-programmed DFU USB bootloader in Atmel AVR32 UC3 devices.
 

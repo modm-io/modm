@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # 
 # Copyright (c) 2009, Roboterclub Aachen e.V.
 # All rights reserved.
@@ -140,7 +140,7 @@ def generate(env, **kw):
 	env['BUILDERS']['SystemCppPackets'] = \
 		SCons.Script.Builder(
 			action = SCons.Action.Action(
-				'python "${XPCC_SYSTEM_BUILDER}/cpp_packets.py" ' \
+				'python2 "${XPCC_SYSTEM_BUILDER}/cpp_packets.py" ' \
 					'--source_path ${TARGETS[0].dir} ' \
 					'--header_path ${TARGETS[1].dir} ' \
 					'--dtdpath "${dtdPath}" ' \
@@ -156,7 +156,7 @@ def generate(env, **kw):
 	env['BUILDERS']['SystemCppIdentifier'] = \
 		SCons.Script.Builder(
 			action = SCons.Action.Action(
-				'python "${XPCC_SYSTEM_BUILDER}/cpp_identifier.py" ' \
+				'python2 "${XPCC_SYSTEM_BUILDER}/cpp_identifier.py" ' \
 					'--outpath ${TARGET.dir} ' \
 					'--dtdpath "${dtdPath}" ' \
 					'--namespace "${namespace}" ' \
@@ -171,7 +171,7 @@ def generate(env, **kw):
 	env['BUILDERS']['SystemCppPostman'] = \
 		SCons.Script.Builder(
 			action = SCons.Action.Action(
-				'python "${XPCC_SYSTEM_BUILDER}/cpp_postman.py" ' \
+				'python2 "${XPCC_SYSTEM_BUILDER}/cpp_postman.py" ' \
 					'--container "${container}" ' \
 					'--outpath ${TARGET.dir} ' \
 					'--dtdpath "${dtdPath}" ' \
@@ -187,7 +187,7 @@ def generate(env, **kw):
 	env['BUILDERS']['SystemCppCommunication'] = \
 		SCons.Script.Builder(
 			action = SCons.Action.Action(
-				'python "${XPCC_SYSTEM_BUILDER}/cpp_communication.py" ' \
+				'python2 "${XPCC_SYSTEM_BUILDER}/cpp_communication.py" ' \
 					'--outpath ${TARGET.dir} ' \
 					'--dtdpath "${dtdPath}" ' \
 					'--namespace "${namespace}" ' \
@@ -202,7 +202,7 @@ def generate(env, **kw):
 	env['BUILDERS']['SystemCppXpccTaskCaller'] = \
 		SCons.Script.Builder(
 			action = SCons.Action.Action(
-				'python "${XPCC_SYSTEM_BUILDER}/cpp_xpcc_task_caller.py" ' \
+				'python2 "${XPCC_SYSTEM_BUILDER}/cpp_xpcc_task_caller.py" ' \
 					'--outpath ${TARGET.dir} ' \
 					'--dtdpath "${dtdPath}" ' \
 					'--namespace "${namespace}" ' \

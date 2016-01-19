@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 # 
 # Copyright (c) 2009, Roboterclub Aachen e.V.
@@ -38,7 +38,7 @@ class JavaPacketsJaxbIndexBuilder(builder_base.Builder):
 	Generate jaxb.index file, which allows to marchal and unmarshal a packet with jaxb to and from a xml string.
 	
 	A common call would be like:
-	$python java_packets.py  --outpath source/rca/robot --package rca.robot robot.xml;
+	$python2 java_packets.py  --outpath source/rca/robot --package rca.robot robot.xml;
 	"""
 	
 	

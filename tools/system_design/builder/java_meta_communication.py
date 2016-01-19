@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 # 
 # Copyright (c) 2009, Roboterclub Aachen e.V.
@@ -44,7 +44,7 @@ class JavaCommunicationBuilder(builder_base.Builder):
 	This is intended to be used in a generic user interface.
 	
 	A common call would be like:
-	$python java_meta_communication.py  --outpath source/rca/robot --package rca.robot robot.xml;
+	$python2 java_meta_communication.py  --outpath source/rca/robot --package rca.robot robot.xml;
 	"""
 	
 	
