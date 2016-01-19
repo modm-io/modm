@@ -7,7 +7,7 @@
 #define CONFIG_ENABLE_DRIVER_ROMUSB   0
 #define CONFIG_ENABLE_DRIVER_ROMPOWER 0
 
-#include <lpc11xx/driver/rom_drivers.h>
+#include <nxp/lpc11xx/driver/rom_drivers.h>
 
 #include "../../clock/generic/common_clock.hpp"
 

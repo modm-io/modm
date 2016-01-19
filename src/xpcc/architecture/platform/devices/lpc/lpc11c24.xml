@@ -12,9 +12,7 @@
 		<!-- Number of pins -->
 		<pin-count device-name="c24">48</pin-count>
 		<!-- Headers to be included with the {{ include_device_headers }} substitution-->
-		<header>lpc11xx/cmsis/LPC11xx.h</header>
-		<header>lpc11xx/cmsis/core_cm0.h</header>
-		<header>lpc11xx/cmsis/system_LPC11xx.h</header>
+		<header>LPC11xx.h</header>
 		<!-- Cpp Defines -->
 		<define>CORTEX_VECTORS_RAM = 0</define>
 		<!-- set to a value > 0 to enable software buffering of CAN messages -->
