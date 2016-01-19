@@ -42,47 +42,41 @@ buildIncludes = []
 # global environment
 globalIncludes = []
 
+if env['ARCHITECTURE'].startswith('cortex-m'):
+	globalIncludes += ['cmsis/Include']
+
 # -----------------------------------------------------------------------------
-# Add the STM32 Standard Peripheral Library
+# Add the STM32 device header files
 if env['XPCC_DEVICE'].startswith('stm32f0'):
-	globalIncludes += [
-		'cmsis/stm32/Include',
-		'cmsis/stm32/Device/ST/STM32F0xx/Include',
-		]
+	globalIncludes += ['st/stm32f0xx/Include']
+
 if env['XPCC_DEVICE'].startswith('stm32f1'):
-	globalIncludes += [
-		'cmsis/stm32/Include',
-		'cmsis/stm32/Device/ST/STM32F1xx/Include']
+	globalIncludes += ['st/stm32f1xx/Include']
+
+# if env['XPCC_DEVICE'].startswith('stm32f2'):
+# 	globalIncludes += [
+# 		'st/stm32f2xx/Include']
 
 if env['XPCC_DEVICE'].startswith('stm32f3'):
-	globalIncludes += [
-		'cmsis/stm32/Include',
-		'cmsis/stm32/Device/ST/STM32F3xx/Include']
+	globalIncludes += ['st/stm32f3xx/Include']
 
 if env['XPCC_DEVICE'].startswith('stm32f4'):
-	globalIncludes += [
-		'cmsis/stm32/Include',
-		'cmsis/stm32/Device/ST/STM32F4xx/Include']
+	globalIncludes += ['st/stm32f4xx/Include']
 
 if env['XPCC_DEVICE'].startswith('stm32f7'):
-	globalIncludes += [
-		'cmsis/stm32/Include',
-		'cmsis/stm32/Device/ST/STM32F7xx/Include']
+	globalIncludes += ['st/stm32f7xx/Include']
 
+# -----------------------------------------------------------------------------
+# Add the LPC device header files
+if env['XPCC_DEVICE'].startswith('lpc11'):
+	globalIncludes += ['nxp/lpc11xx/Include']
+
+# -----------------------------------------------------------------------------
 if 'stm32f' in env['XPCC_DEVICE'] and not env['XPCC_DEVICE'].startswith('stm32f0'):
 	sourcePath += ['freertos']		# FreeRTOS for STM32
 	sourcePath += ['fatfs']			# FatFS
 
-if env['XPCC_DEVICE'].startswith('lpc11'):
-	#sourcePath += ['lpc11xx/cmsis', 'lpc11xx/driver']
-	globalIncludes += [
-		'lpc11xx/cmsis']
 
-if env['XPCC_DEVICE'].startswith('lpc17'):
-	sourcePath += ['lpc17xx/cmsis']
-	globalIncludes += []
-
-# -----------------------------------------------------------------------------
 includes = buildIncludes + globalIncludes
 for path in includes:
 	env.AppendUnique(CPPPATH = os.path.join(env['XPCC_ROOTPATH'], 'ext', path))
