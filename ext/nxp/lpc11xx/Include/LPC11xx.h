@@ -1,22 +1,30 @@
 /****************************************************************************
- *   $Id::                                                                  $
+ *   $Id:: LPC11xx.h 9198 2012-05-29 usb00175                     $
  *   Project: NXP LPC11xx software example  
  *
  *   Description:
  *     CMSIS Cortex-M0 Core Peripheral Access Layer Header File for 
  *     NXP LPC11xx Device Series 
- *
+ 
  ****************************************************************************
  * Software that is described herein is for illustrative purposes only
- * which provides customers with programming information regarding the
- * products. This software is supplied "AS IS" without any warranties.
- * NXP Semiconductors assumes no responsibility or liability for the
- * use of the software, conveys no license or title under any patent,
- * copyright, or mask work right to the product. NXP Semiconductors
- * reserves the right to make changes in the software without
- * notification. NXP Semiconductors also make no representation or
- * warranty that such application will be suitable for the specified
- * use without further testing or modification.
+* which provides customers with programming information regarding the
+* products. This software is supplied "AS IS" without any warranties.
+* NXP Semiconductors assumes no responsibility or liability for the
+* use of the software, conveys no license or title under any patent,
+* copyright, or mask work right to the product. NXP Semiconductors
+* reserves the right to make changes in the software without
+* notification. NXP Semiconductors also make no representation or
+* warranty that such application will be suitable for the specified
+* use without further testing or modification.
+
+* Permission to use, copy, modify, and distribute this software and its 
+* documentation is hereby granted, under NXP Semiconductors' 
+* relevant copyright in the software, without fee, provided that it 
+* is used in conjunction with NXP Semiconductors microcontrollers.  This 
+* copyright, permission, and disclaimer notice must appear in all copies of 
+* this code.
+
 ****************************************************************************/
 #ifndef __LPC11xx_H__
 #define __LPC11xx_H__
@@ -98,7 +106,7 @@ typedef enum IRQn
  * ==========================================================================
  */
 
-/* Configuration of the Cortex-M3 Processor and Core Peripherals */
+/* Configuration of the Cortex-M0 Processor and Core Peripherals */
 #define __MPU_PRESENT             0         /*!< MPU present or not                               */
 #define __NVIC_PRIO_BITS          2         /*!< Number of Bits used for Priority Levels          */
 #define __Vendor_SysTickConfig    0         /*!< Set to 1 if different SysTick Config is used     */
@@ -127,7 +135,7 @@ typedef struct
   __IO uint32_t SYSMEMREMAP;            /*!< Offset: 0x000 System memory remap (R/W) */
   __IO uint32_t PRESETCTRL;             /*!< Offset: 0x004 Peripheral reset control (R/W) */
   __IO uint32_t SYSPLLCTRL;             /*!< Offset: 0x008 System PLL control (R/W) */
-  __IO uint32_t SYSPLLSTAT;             /*!< Offset: 0x00C System PLL status (R/W ) */
+  __I uint32_t SYSPLLSTAT;             /*!< Offset: 0x00C System PLL status (R/ ) */
        uint32_t RESERVED0[4];
 
   __IO uint32_t SYSOSCCTRL;             /*!< Offset: 0x020 System oscillator control (R/W) */
@@ -150,10 +158,7 @@ typedef struct
   __IO uint32_t SSP0CLKDIV;             /*!< Offset: 0x094 SSP0 clock divider (R/W) */          
   __IO uint32_t UARTCLKDIV;             /*!< Offset: 0x098 UART clock divider (R/W) */
   __IO uint32_t SSP1CLKDIV;             /*!< Offset: 0x09C SSP1 clock divider (R/W) */          
-       uint32_t RESERVED6[4];
-
-  __IO uint32_t SYSTICKCLKDIV;          /*!< Offset: 0x0B0 SYSTICK clock divider (R/W) */          
-       uint32_t RESERVED7[7];
+       uint32_t RESERVED6[12];
 
   __IO uint32_t WDTCLKSEL;              /*!< Offset: 0x0D0 WDT clock source select (R/W) */
   __IO uint32_t WDTCLKUEN;              /*!< Offset: 0x0D4 WDT clock source update enable (R/W) */
@@ -169,15 +174,15 @@ typedef struct
        uint32_t RESERVED10[18];
   __IO uint32_t BODCTRL;                /*!< Offset: 0x150 BOD control (R/W) */
   __IO uint32_t SYSTCKCAL;              /*!< Offset: 0x154 System tick counter calibration (R/W) */
-       uint32_t RESERVED12[2];
-  __IO uint32_t MAINREGVOUT0CFG;        /*!< Offset: 0x160 Main Regulator Voltage 0 Configuration */ 
-  __IO uint32_t MAINREGVOUT1CFG;        /*!< Offset: 0x164 Main Regulator Voltage 1 Configuration */
-       uint32_t RESERVED13[38];
-
+       
+       uint32_t RESERVED13[7];
+  __IO uint32_t NMISRC;                 /*!< Offset: 0x174 NMI source selection register (R/W) */
+       uint32_t RESERVED14[34];
+       
   __IO uint32_t STARTAPRP0;             /*!< Offset: 0x200 Start logic edge control Register 0 (R/W) */     
   __IO uint32_t STARTERP0;              /*!< Offset: 0x204 Start logic signal enable Register 0 (R/W) */      
   __O  uint32_t STARTRSRP0CLR;          /*!< Offset: 0x208 Start logic reset Register 0  ( /W) */
-  __IO uint32_t STARTSRP0;              /*!< Offset: 0x20C Start logic status Register 0 (R/W) */
+  __I uint32_t STARTSRP0;              /*!< Offset: 0x20C Start logic status Register 0 (R/) */
   __IO uint32_t STARTAPRP1;             /*!< Offset: 0x210 Start logic edge control Register 0 (R/W). (LPC11UXX only) */     
   __IO uint32_t STARTERP1;              /*!< Offset: 0x214 Start logic signal enable Register 0 (R/W). (LPC11UXX only) */      
   __O  uint32_t STARTRSRP1CLR;          /*!< Offset: 0x218 Start logic reset Register 0  ( /W). (LPC11UXX only) */
@@ -187,9 +192,7 @@ typedef struct
   __IO uint32_t PDSLEEPCFG;             /*!< Offset: 0x230 Power-down states in Deep-sleep mode (R/W) */
   __IO uint32_t PDAWAKECFG;             /*!< Offset: 0x234 Power-down states after wake-up (R/W) */        
   __IO uint32_t PDRUNCFG;               /*!< Offset: 0x238 Power-down configuration Register (R/W) */
-       uint32_t RESERVED15[101];
-  __O  uint32_t VOUTCFGPROT;            /*!< Offset: 0x3D0 Voltage Output Configuration Protection Register (W) */
-       uint32_t RESERVED16[8];
+       uint32_t RESERVED15[110];
   __I  uint32_t DEVICE_ID;              /*!< Offset: 0x3F4 Device ID (R/ ) */
 } LPC_SYSCON_TypeDef;
 /*@}*/ /* end of group LPC11xx_SYSCON */
@@ -207,7 +210,7 @@ typedef struct
   __IO uint32_t RESET_PIO0_0;           /*!< Offset: 0x00C I/O configuration for pin RESET/PIO0_0  (R/W) */
   __IO uint32_t PIO0_1;                 /*!< Offset: 0x010 I/O configuration for pin PIO0_1/CLKOUT/CT32B0_MAT2 (R/W) */
   __IO uint32_t PIO1_8;                 /*!< Offset: 0x014 I/O configuration for pin PIO1_8/CT16B1_CAP0 (R/W) */
-       uint32_t RESERVED1[1];
+  __IO uint32_t SSEL1_LOC;              /*!< Offset: 0x018 IOCON SSEL1 location register (IOCON_SSEL1_LOC, address 0x4004 4018) */
   __IO uint32_t PIO0_2;                 /*!< Offset: 0x01C I/O configuration for pin PIO0_2/SSEL0/CT16B0_CAP0 (R/W) */
 
   __IO uint32_t PIO2_7;                 /*!< Offset: 0x020 I/O configuration for pin PIO2_7 (R/W) */
@@ -254,6 +257,13 @@ typedef struct
   __IO uint32_t DSR_LOC;                /*!< Offset: 0x0B4 DSR pin location select Register (R/W) */
   __IO uint32_t DCD_LOC;                /*!< Offset: 0x0B8 DCD pin location select Register (R/W) */
   __IO uint32_t RI_LOC;                 /*!< Offset: 0x0BC RI pin location Register (R/W) */
+
+  __IO uint32_t CT16B0_CAP0_LOC;        /*!< Offset: 0x0C0 IOCON CT16B0_CAP0 location register (IOCON_CT16B0_CAP0_LOC, address 0x4004 40C0) */
+  __IO uint32_t SCK1_LOC;               /*!< Offset: 0x0C4 IOCON SCK1 location register (IOCON_SCK1_LOC, address 0x4004 40C4) */
+  __IO uint32_t MISO1_LOC;              /*!< Offset: 0x0C8 IOCON MISO1 location register (IOCON_MISO1_LOC, address 0x4004 40C8) */
+  __IO uint32_t MOSI1_LOC;              /*!< Offset: 0x0CC IOCON MOSI1 location register (IOCON_MOSI1_LOC, address 0x4004 40CC) */
+  __IO uint32_t CT32B0_CAP0_LOC;        /*!< Offset: 0x0D0 IOCON CT32B0_CAP0 location register (IOCON_CT32B0_CAP0_LOC, address 0x4004 40D0) */
+  __IO uint32_t RXD_LOC;                /*!< Offset: 0x0D4 IOCON RXD location register (IOCON_RXD_LOC, address 0x4004 40D4) */
 } LPC_IOCON_TypeDef;
 /*@}*/ /* end of group LPC11xx_IOCON */
 
@@ -272,6 +282,30 @@ typedef struct
   __IO uint32_t GPREG4;                 /*!< Offset: 0x014 General purpose Register 4 (R/W) */
 } LPC_PMU_TypeDef;
 /*@}*/ /* end of group LPC11xx_PMU */
+
+
+
+// ------------------------------------------------------------------------------------------------
+// -----                                       FLASHCTRL                                      -----
+// ------------------------------------------------------------------------------------------------
+
+typedef struct {                            /*!< (@ 0x4003C000) FLASHCTRL Structure    */
+  __I  uint32_t RESERVED0[4];
+  __IO uint32_t FLASHCFG;                   /*!< (@ 0x4003C010) Flash memory access time configuration register */
+  __I  uint32_t RESERVED1[3];
+  __IO uint32_t FMSSTART;                   /*!< (@ 0x4003C020) Signature start address register */
+  __IO uint32_t FMSSTOP;                    /*!< (@ 0x4003C024) Signature stop-address register */
+  __I  uint32_t RESERVED2[1];
+  __I  uint32_t FMSW0;                      /*!< (@ 0x4003C02C) Word 0 [31:0]          */
+  __I  uint32_t FMSW1;                      /*!< (@ 0x4003C030) Word 1 [63:32]         */
+  __I  uint32_t FMSW2;                      /*!< (@ 0x4003C034) Word 2 [95:64]         */
+  __I  uint32_t FMSW3;                      /*!< (@ 0x4003C038) Word 3 [127:96]        */
+  __I  uint32_t RESERVED3[1001];
+  __I  uint32_t FMSTAT;                     /*!< (@ 0x4003CFE0) Signature generation status register */
+  __I  uint32_t RESERVED4[1];
+  __IO uint32_t FMSTATCLR;                  /*!< (@ 0x4003CFE8) Signature generation status clear register */
+} LPC_FLASHCTRL_Type;
+
 
 /*------------- General Purpose Input/Output (GPIO) --------------------------*/
 /** @addtogroup LPC11xx_GPIO LPC11xx General Purpose Input/Output 
@@ -292,9 +326,9 @@ typedef struct
   __IO uint32_t IBE;                    /*!< Offset: 0x8008 Interrupt both edges Register (R/W) */
   __IO uint32_t IEV;                    /*!< Offset: 0x800C Interrupt event Register  (R/W) */
   __IO uint32_t IE;                     /*!< Offset: 0x8010 Interrupt mask Register (R/W) */
-  __IO uint32_t RIS;                    /*!< Offset: 0x8014 Raw interrupt status Register (R/ ) */
-  __IO uint32_t MIS;                    /*!< Offset: 0x8018 Masked interrupt status Register (R/ ) */
-  __IO uint32_t IC;                     /*!< Offset: 0x801C Interrupt clear Register (R/W) */
+  __I uint32_t RIS;                    /*!< Offset: 0x8014 Raw interrupt status Register (R/ ) */
+  __I uint32_t MIS;                    /*!< Offset: 0x8018 Masked interrupt status Register (R/ ) */
+  __O uint32_t IC;                     /*!< Offset: 0x801C Interrupt clear Register (/W) */
 } LPC_GPIO_TypeDef;
 /*@}*/ /* end of group LPC11xx_GPIO */
 
@@ -316,7 +350,8 @@ typedef struct
   __IO uint32_t MR3;                    /*!< Offset: 0x024 Match Register 3 (R/W) */
   __IO uint32_t CCR;                    /*!< Offset: 0x028 Capture Control Register (R/W) */
   __I  uint32_t CR0;                    /*!< Offset: 0x02C Capture Register 0 (R/ ) */
-       uint32_t RESERVED1[3];
+  __I  uint32_t CR1;                    /*!< Offset: 0x030 Capture Register 1 (R/ ) */
+       uint32_t RESERVED1[2];
   __IO uint32_t EMR;                    /*!< Offset: 0x03C External Match Register (R/W) */
        uint32_t RESERVED2[12];
   __IO uint32_t CTCR;                   /*!< Offset: 0x070 Count Control Register (R/W) */
@@ -375,9 +410,9 @@ typedef struct
   __I  uint32_t SR;                     /*!< Offset: 0x00C Status Registe (R/ ) */
   __IO uint32_t CPSR;                   /*!< Offset: 0x010 Clock Prescale Register (R/W) */
   __IO uint32_t IMSC;                   /*!< Offset: 0x014 Interrupt Mask Set and Clear Register (R/W) */
-  __IO uint32_t RIS;                    /*!< Offset: 0x018 Raw Interrupt Status Register (R/W) */
-  __IO uint32_t MIS;                    /*!< Offset: 0x01C Masked Interrupt Status Register (R/W) */
-  __IO uint32_t ICR;                    /*!< Offset: 0x020 SSPICR Interrupt Clear Register (R/W) */
+  __I uint32_t RIS;                    /*!< Offset: 0x018 Raw Interrupt Status Register (R/) */
+  __I uint32_t MIS;                    /*!< Offset: 0x01C Masked Interrupt Status Register (R/) */
+  __O uint32_t ICR;                    /*!< Offset: 0x020 SSPICR Interrupt Clear Register (/W) */
 } LPC_SSP_TypeDef;
 /*@}*/ /* end of group LPC11xx_SSP */
 
@@ -518,6 +553,7 @@ typedef struct
 #define LPC_CT32B1_BASE       (LPC_APB0_BASE + 0x18000)
 #define LPC_ADC_BASE          (LPC_APB0_BASE + 0x1C000)
 #define LPC_PMU_BASE          (LPC_APB0_BASE + 0x38000)
+#define LPC_FLASHCTRL_BASE    (LPC_APB0_BASE + 0x3C000)
 #define LPC_SSP0_BASE         (LPC_APB0_BASE + 0x40000)
 #define LPC_IOCON_BASE        (LPC_APB0_BASE + 0x44000)
 #define LPC_SYSCON_BASE       (LPC_APB0_BASE + 0x48000)
@@ -543,6 +579,7 @@ typedef struct
 #define LPC_TMR32B1           ((LPC_TMR_TypeDef    *) LPC_CT32B1_BASE)
 #define LPC_ADC               ((LPC_ADC_TypeDef    *) LPC_ADC_BASE   )
 #define LPC_PMU               ((LPC_PMU_TypeDef    *) LPC_PMU_BASE   )
+#define LPC_FLASHCTRL         ((LPC_FLASHCTRL_Type *) LPC_FLASHCTRL_BASE)
 #define LPC_SSP0              ((LPC_SSP_TypeDef    *) LPC_SSP0_BASE  )
 #define LPC_SSP1              ((LPC_SSP_TypeDef    *) LPC_SSP1_BASE  )
 #define LPC_CAN               ((LPC_CAN_TypeDef    *) LPC_CAN_BASE   )
