@@ -87,6 +87,7 @@ switchSystemClockToHSI48()
 	if(success) {
 		xpcc::clock::fcpu_MHz = 48;
 		xpcc::clock::fcpu_kHz = 48 * 1000;
+		xpcc::clock::ns_per_loop = 4000 / 48;	// ~83ns per delay loop
 	}
 
 	return success;
