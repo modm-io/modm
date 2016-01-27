@@ -1,12 +1,21 @@
 External Libraries
 ==================
 This folder is used to store external libraries, that we have adapted to our needs.
-Even though we should use git submodules for this, they do not work when using svn to 
-checkout the repository.
-We therefore just store a copy of the repositories here.
+We often only require a small subset of external libraries, therefore these files are copied, instead of including the entire library using a git submodule.
 
-Choosing the external library
------------------------------
+Libraries
+---------
+
+- `cmsis`: include headers, [unmodified v4.5](https://github.com/ARM-software/CMSIS/)
+- `fatfs`: [own fork of v0.9](https://github.com/roboterclubaachen/fatfs)
+- `freertos`: modified v7.0.1 without own fork (sadly)
+- `nxp`: LPC CMSIS device headers + drivers (search on lpcware.com/downloads)
+- `st`: STM32 CMSIS device headers extracted from Cube libraries
+
+See the Readme inside each library folder for additional information including license.
+
+Maintaining External Libraries
+------------------------------
 If the external library already exists on GitHub, fork it and apply
 your modifications before adding the necessary files.
 Basic instructions on forking can be found [here](http://help.github.com/fork-a-repo/).
@@ -20,7 +29,7 @@ Create new folder with the name of the git repository:
     user:dev $ mkdir repo
     user:dev $ cd repo
     user:repo $ git init
-    
+
 Copy the source into it, add the files and push your first commit.
 
     user:repo $ git add .
