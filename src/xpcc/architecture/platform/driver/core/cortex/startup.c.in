@@ -67,10 +67,9 @@
  */
 void Reset_Handler(void)				__attribute__((naked, noreturn));
 void NMI_Handler(void)					__attribute__ ((weak, alias("defaultHandler")));
-%% if target is cortex_m3 or target is cortex_m4 or target is cortex_m7
+%% if target is stm32
 void HardFault_Handler(void);
-%% elif target is cortex_m0
-%# for cortex m0 no hard fault handler is implemented
+%% else
 void HardFault_Handler(void)			__attribute__ ((weak, alias("defaultHandler")));
 %% endif
 %# Remember declarations to avoid redeclarations

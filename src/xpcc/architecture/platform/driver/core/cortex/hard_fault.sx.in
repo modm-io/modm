@@ -52,7 +52,7 @@ HardFault_Handler:
 	 * To do this, we need to:
 	 *	- buffer the main stack pointer value
 	 *	- write the main stack pointer value to __process_stack_top (a constant)
-	 *	- push the registers r4 through r11 onto the process stack
+	 *	- push the registers r4 through r11 onto the process stack (only r4 -> r7 on CM0)
 	 *  - push the remaining registers as a formatted stack frame onto the process stack (r0-r3,r12,lr,pc,psr)
 	 *
 	 * Unfortunately the original LR, PC and PSR are (obviously) invalidated upon exception entry,
@@ -66,31 +66,52 @@ HardFault_Handler:
 	ldr r0, =__process_stack_top		// load the PSP value into register 0
 	mov sp, r0							// write the current stack pointer to the new PSP value
 	mrs r0, psp							// restore register 0 from the PSP
+%% if target is cortex_m0
+	push {r4-r7}				// +4	// push registers r4 through r7 onto the stack, CM0 cannot push r8-r12
+	push {r4-r7}				// +4	// reserve space for r12, lr, pc and psr on the stack
+	push {r0-r3}				// +4	// push remaining registers (without the R12 or LR or PC or xPSR) onto the stack
+%% else
 	push {r4-r11}				// +8	// push registers r4 through r11 onto the stack
 	push {r0-r2}				// +3	// reserve space for lr, pc and psr on the stack
 	push {r0-r3,r12}			// +5	// push remaining registers (without the LR or PC or xPSR) onto the stack
 	mov r9, sp							// buffer the current PSP for later
-
 	// we now push all valuable information about the bus fault onto the stack
 	// this means loading a range or registers from SCB and preserving them
 	ldr r0, =0xE000ED24					// load address of SCB->SHCRS register
 	ldm r0, {r1,r2,r3,r4,r5,r6,r7}		// load SHCRS, CFSR, HFSR, DFSR, MMAR, BFAR, AFSR registers
 	push {r1-r7}				// +7	// push them onto the stack
-
+%% endif
 	// prepare the four arguments for the C hard fault handler function
 	mov r0, sp							// load the PSP (the exception stack frame)
 	mov r1, lr							// load the MSP from the link register
 
 	// opportunistically copy LR, PC and PSR from main stack over to the process stack
 	// this doesn't cause a bus fault (which would result in core lockup) since we disabled that behavior.
+%% if target is cortex_m0
+	ldr r2, [r1, #16]					// load  R12
+	str r2, [r0, #16]					// store R12
+	ldr r2, [r1, #16]					// load  R12
+	str r2, [r0, #16]					// store R12
+	ldr r2, [r1, #20]					// load  LR
+	str r2, [r0, #20]					// store LR
+	ldr r2, [r1, #24]					// load  PC
+	str r2, [r0, #24]					// store PC
+	ldr r2, [r1, #28]					// load  PSR
+	str r2, [r0, #28]					// store PSR
+%% else
 	ldr r2, [r1, #20]					// load  LR
 	str r2, [r9, #20]					// store LR
 	ldr r2, [r1, #24]					// load  PC
 	str r2, [r9, #24]					// store PC
 	ldr r2, [r1, #28]					// load  PSR
 	str r2, [r9, #28]					// store PSR
+%% endif
 
+%% if target is cortex_m0
+	// 12 registers have been pushed onto the stack, => 48 bytes of the process stack have already been used!
+%% else
 	// 23 registers have been pushed onto the stack, => 92 bytes of the process stack have already been used!
+%% endif
 	dsb
 	// call the C code handler
 	b _hardFaultHandler

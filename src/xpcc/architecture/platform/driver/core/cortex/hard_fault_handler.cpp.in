@@ -73,7 +73,7 @@ void flushUart()
 }
 %% endif
 
-%% if parameters.enable_hardfault_handler_log == "true"
+%% if parameters.enable_hardfault_handler_log == "true" and target is not cortex_m0
 const char *mem_fault_bits[] = {
 	"MMARVALID",
 	"MLSPERR",
@@ -110,6 +110,7 @@ const char *stack_frame_names[] = {
 	"LR",
 	"PC",
 	"xPSR",
+	%% if target is not cortex_m0
 	"S0",
 	"S1",
 	"S2",
@@ -127,6 +128,7 @@ const char *stack_frame_names[] = {
 	"S14",
 	"S15",
 	"FPSCR",
+	%% endif
 	""
 };
 const char *exception_stack_frame = " ^-- exception stack frame\n";
@@ -155,6 +157,23 @@ _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 %% if parameters.enable_hardfault_handler_log != "false"
 #undef XPCC_LOG_LEVEL
 #define XPCC_LOG_LEVEL	xpcc::log::ERROR
+%% if target is cortex_m0
+	// original exception stack frame
+	const uint32_t& stacked_r0  = ctx[ 0];
+	const uint32_t& stacked_r1  = ctx[ 1];
+	const uint32_t& stacked_r2  = ctx[ 2];
+	const uint32_t& stacked_r3  = ctx[ 3];
+	const uint32_t& stacked_r12 = ctx[ 4];
+	const uint32_t& stacked_lr  = ctx[ 5]; // possibly invalid!
+	const uint32_t& stacked_pc  = ctx[ 6]; // possibly invalid!
+	const uint32_t& stacked_psr = ctx[ 7]; // possibly invalid!
+
+	// all other registers
+	const uint32_t& stacked_r4  = ctx[ 8];
+	const uint32_t& stacked_r5  = ctx[ 9];
+	const uint32_t& stacked_r6  = ctx[10];
+	const uint32_t& stacked_r7  = ctx[11];
+%% else
 	// all fault registers
 	const uint32_t& shcrs = ctx[ 0];
 	const uint32_t& cfsr  = ctx[ 1];
@@ -183,6 +202,7 @@ _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 	const uint32_t& stacked_r9  = ctx[20];
 	const uint32_t& stacked_r10 = ctx[21];
 	const uint32_t& stacked_r11 = ctx[22];
+%% endif
 
 	xpcc::stm32::{{ uart ~ id }}::discardTransmitBuffer();
 %% else
@@ -215,6 +235,7 @@ _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 		{
 			logCounter = xpcc::clock::fcpu;
 
+	%% if target is not cortex_m0
 			// isolate the fault registers
 			uint16_t usage_fault = ((cfsr & SCB_CFSR_USGFAULTSR_Msk) >> SCB_CFSR_USGFAULTSR_Pos) & usage_fault_mask;
 			uint8_t    bus_fault = ((cfsr & SCB_CFSR_BUSFAULTSR_Msk) >> SCB_CFSR_BUSFAULTSR_Pos) &   bus_fault_mask;
@@ -235,7 +256,10 @@ _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 									  (stacked_pc == (uint32_t)&__stack_start);
 
 			bool is_floating_point_active = FPU->FPCCR & 1;
-
+	%% else
+			bool is_stack_execution = (stacked_pc == (uint32_t)&__stack_start);
+			constexpr bool is_floating_point_active = false;
+	%% endif
 			XPCC_LOG_ERROR.printf("\n\n\n####  Hard Fault Exception  ####\n\n"); flushUart();
 
 			// search for the highest watermark level on the stack
@@ -265,6 +289,21 @@ _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 			if (sp == msp - 1) { XPCC_LOG_ERROR << "                           "; XPCC_LOG_ERROR << exception_stack_frame; }
 			XPCC_LOG_ERROR.printf("\nMaximum Stack Usage: %u Bytes\n", (&__main_stack_top - main_stack_end)*4); flushUart();
 
+	%% if target is cortex_m0
+			XPCC_LOG_ERROR << '\n';
+			XPCC_LOG_ERROR.printf("r0 : 0x%08lx\n", stacked_r0 ); flushUart();
+			XPCC_LOG_ERROR.printf("r1 : 0x%08lx\n", stacked_r1 ); flushUart();
+			XPCC_LOG_ERROR.printf("r2 : 0x%08lx\n", stacked_r2 ); flushUart();
+			XPCC_LOG_ERROR.printf("r3 : 0x%08lx\n", stacked_r3 ); flushUart();
+			XPCC_LOG_ERROR.printf("r4 : 0x%08lx\n", stacked_r4 ); flushUart();
+			XPCC_LOG_ERROR.printf("r5 : 0x%08lx\n", stacked_r5 ); flushUart();
+			XPCC_LOG_ERROR.printf("r6 : 0x%08lx\n", stacked_r6 ); flushUart();
+			XPCC_LOG_ERROR.printf("r7 : 0x%08lx\n", stacked_r7 ); flushUart();
+			XPCC_LOG_ERROR.printf("r12: 0x%08lx\n", stacked_r12); flushUart();
+			XPCC_LOG_ERROR.printf("lr : 0x%08lx\n", stacked_lr ); flushUart();
+			XPCC_LOG_ERROR.printf("pc : 0x%08lx\n", stacked_pc ); flushUart();
+			XPCC_LOG_ERROR.printf("psr: 0x%08lx\n", stacked_psr); flushUart();
+	%% else
 			XPCC_LOG_ERROR << '\n';
 			XPCC_LOG_ERROR.printf("r0 : 0x%08lx   r8  : 0x%08lx\n",   stacked_r0, stacked_r8);  flushUart();
 			XPCC_LOG_ERROR.printf("r1 : 0x%08lx   r9  : 0x%08lx\n",   stacked_r1, stacked_r9);  flushUart();
@@ -283,8 +322,8 @@ _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 			XPCC_LOG_ERROR.printf("MMAR  : 0x%08lx%s\n", mmar, is_mmar_valid ? valid : invalid); flushUart();
 			XPCC_LOG_ERROR.printf("BFAR  : 0x%08lx%s\n", bfar, is_bfar_valid ? valid : invalid); flushUart();
 			XPCC_LOG_ERROR.printf("AFSR  : 0x%08lx\n",   afsr);  flushUart();
-
-	%% if parameters.enable_hardfault_handler_log != "basic"
+	%% endif
+	%% if parameters.enable_hardfault_handler_log != "basic" and target is not cortex_m0
 			XPCC_LOG_ERROR << '\n';
 			if (mem_fault)
 			{
@@ -333,8 +372,10 @@ _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 			}
 	%% endif
 			if (is_stack_execution) { XPCC_LOG_ERROR << "  ### STACK EXECUTION ###\n"; flushUart(); }
+	%% if target is not cortex_m0
 			if (is_stack_overflow)  { XPCC_LOG_ERROR << "  ### STACK OVERFLOW  ###\n"; flushUart(); }
 			if (is_stack_underflow) { XPCC_LOG_ERROR << "  ### STACK UNDERFLOW ###\n"; flushUart(); }
+	%% endif
 		}
 %% endif
 	}
