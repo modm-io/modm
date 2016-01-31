@@ -14,7 +14,7 @@
 #include "can_{{ id }}.hpp"
 #include <xpcc_config.hpp>
 
-%% if target is stm32f3
+%% if target is stm32f3 or target is stm32f0
 	%% set reg = 'CAN'
 %% else
 	%% set reg = 'CAN' ~ id
@@ -26,7 +26,7 @@
 #define CAN_BTR_TS2_POS		20
 #define CAN_BTR_TS1_POS		16
 
-%% if target is stm32f0 or target is stm32f3
+%% if target is stm32f3
 #	define	CAN1_TX_IRQHandler		USB_HP_CAN1_TX_IRQHandler
 #	define	CAN1_RX0_IRQHandler		USB_LP_CAN1_RX0_IRQHandler
 #	define	CAN1_TX_IRQn			USB_HP_CAN1_TX_IRQn
@@ -98,6 +98,17 @@ xpcc::stm32::Can{{ id }}::initializeWithPrescaler(
 	// FIFO1 Overrun, FIFO0 Overrun
 	{{ reg }}->IER = CAN_IER_FOVIE1 | CAN_IER_FOVIE0;
 
+%% if parameters.tx_buffer > 0
+	{{ reg }}->IER |= CAN_IER_TMEIE;
+%% endif
+
+%% if target is stm32f0
+	// Set vector priority
+	NVIC_SetPriority(CEC_CAN_IRQn, interruptPriority);
+
+	// Register Interrupts at the NVIC
+	nvicEnableInterrupt(CEC_CAN_IRQn);
+%% else
 	// Set vector priority
 	NVIC_SetPriority({{ reg }}_RX0_IRQn, interruptPriority);
 	NVIC_SetPriority({{ reg }}_RX1_IRQn, interruptPriority);
@@ -106,11 +117,13 @@ xpcc::stm32::Can{{ id }}::initializeWithPrescaler(
 	nvicEnableInterrupt({{ reg }}_RX0_IRQn);
 	nvicEnableInterrupt({{ reg }}_RX1_IRQn);
 
-%% if parameters.tx_buffer > 0
-	{{ reg }}->IER |= CAN_IER_TMEIE;
+	%% if parameters.tx_buffer > 0
 	nvicEnableInterrupt({{ reg }}_TX_IRQn);
 	NVIC_SetPriority({{ reg }}_TX_IRQn, interruptPriority);
+	%% endif
 %% endif
+
+
 
 %% if parameters.rx_buffer > 0
 	{{ reg }}->IER |= CAN_IER_FMPIE1 | CAN_IER_FMPIE0;
@@ -279,6 +292,31 @@ extern "C" void
 %% endif
 }
 
+%% if target is stm32f0
+// On stm32f0, ST has decided to use only one interrupt vector for all
+// CAN interrupts. In order to avoide duplicate code, we try to determine
+// the interrupt source and call the correct interrupts function defined above.
+// Sources for the different interrupts are specified in the Reference Manual
+// in the "bxCAN interrupts" section.
+extern "C" void
+CEC_CAN_IRQHandler()
+{
+	if({{ reg }}->TSR & (CAN_TSR_RQCP0 | CAN_TSR_RQCP1 | CAN_TSR_RQCP2)) {
+		{{ reg }}_TX_IRQHandler();
+	}
+
+	if({{ reg }}->RF0R & (CAN_RF0R_FMP0 | CAN_RF0R_FULL0 | CAN_RF0R_FOVR0)) {
+		{{ reg }}_RX0_IRQHandler();
+	}
+
+	if({{ reg }}->RF1R & (CAN_RF1R_FMP1 | CAN_RF1R_FULL1 | CAN_RF1R_FOVR1)) {
+		{{ reg }}_RX1_IRQHandler();
+	}
+
+	// TODO: we do not handle status changes at the moment.
+}
+%% endif
+
 // ----------------------------------------------------------------------------
 void
 xpcc::stm32::Can{{ id }}::setMode(Mode mode)
@@ -423,8 +461,10 @@ xpcc::stm32::Can{{ id }}::enableStatusChangeInterrupt(
 		uint32_t interruptEnable,
 		uint32_t interruptPriority)
 {
+%% if not target is stm32f0
 	NVIC_SetPriority({{ reg }}_SCE_IRQn, interruptPriority);
 	nvicEnableInterrupt({{ reg }}_SCE_IRQn);
-	
+
+%% endif
 	{{ reg }}->IER = interruptEnable | ({{ reg }}->IER & 0x000000ff);
 }

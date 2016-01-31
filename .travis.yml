@@ -1,37 +1,63 @@
 language: cpp
 compiler: gcc
+sudo: false
+
+addons:
+ apt:
+  sources:
+   - ubuntu-toolchain-r-test
+  packages:
+   - scons
+   - python
+   - python-jinja2
+   - python-lxml
+   - libsdl1.2-dev
+   - libsdl-image1.2-dev
+   - libgtkmm-2.4-dev
+   - g++-4.8
+   - lib32z1
+   - lib32ncurses5
+   - lib32bz2-1.0
 
 before_install:
- - sudo apt-get update -qq
- - sudo apt-get install -y software-properties-common
- - sudo add-apt-repository -y ppa:terry.guo/gcc-arm-embedded
- - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
- - sudo add-apt-repository -y ppa:mapnik/boost
- - sudo apt-get update -qq
- - sudo apt-get install -y scons python python-jinja2 python-lxml
- - sudo apt-get install -y libsdl1.2-dev libsdl-image1.2-dev libgtkmm-2.4-dev
- - sudo apt-get install -y gcc-arm-none-eabi g++-4.8
- - sudo apt-get install -y libboost1.49-dev libboost-system1.49-dev libboost-thread1.49-dev
  - export CC=gcc-4.8
  - export CXX=g++-4.8
- - wget http://www.atmel.com/images/avr8-gnu-toolchain-3.4.5.1522-linux.any.x86.tar.gz -O avr8.tar.gz
- - tar -zxf avr8.tar.gz
- - export PATH="$PATH:$TRAVIS_BUILD_DIR/avr8-gnu-toolchain-linux_x86/bin"
+ - bash .travis.dep.sh
+ - export LD_LIBRARY_PATH="$HOME/cache/boost/lib:$LD_LIBRARY_PATH"
+ - export CXXFLAGS="-isystem$HOME/cache/boost/include"
+ - export LDFLAGS="-L$HOME/cache/boost/lib"
+ - export PATH="$HOME/cache/avr8-gnu-toolchain-linux_x86/bin:$HOME/cache/gcc-arm-none-eabi-4_9-2015q3/bin:$PATH"
+ - echo $PATH
+ - ls -l $HOME/cache/avr8-gnu-toolchain-linux_x86/bin
+ - ls -l $HOME/cache/gcc-arm-none-eabi-4_9-2015q3/bin
+ - ls -l $HOME/cache/boost
+ - which avr-g++
+ - avr-g++ --version
+ - which arm-none-eabi-g++
+ - arm-none-eabi-g++ --version
 
+cache:
+ directories:
+  - $HOME/cache
+
+# these are ordered by longest running time, so that all instances complete
+# within the longest running instances, which is the first.
 env:
+ - TEST_SUITE="check=examples examples=stm32f4_discovery"
+ - TEST_SUITE="check=examples examples=stm32f3_discovery"
  - TEST_SUITE="unittest"
- - TEST_SUITE="check=devices"
- - TEST_SUITE="check=examples examples=arduino_uno"
  - TEST_SUITE="check=examples examples=avr"
+ - TEST_SUITE="check=devices"
  - TEST_SUITE="check=examples examples=linux"
+ - TEST_SUITE="check=examples examples=stm32f429_discovery"
+ - TEST_SUITE="check=examples examples=stm32f1_discovery"
+ - TEST_SUITE="check=examples examples=stm32f072_discovery"
+# - TEST_SUITE="check=examples examples=stm32f7_discovery"
  - TEST_SUITE="check=examples examples=lpcxpresso"
  - TEST_SUITE="check=examples examples=stm32"
- - TEST_SUITE="check=examples examples=stm32f1_discovery"
- - TEST_SUITE="check=examples examples=stm32f3_discovery"
- - TEST_SUITE="check=examples examples=stm32f4_discovery"
- - TEST_SUITE="check=examples examples=stm32f429_discovery"
-# - TEST_SUITE="check=examples examples=stm32f7_discovery"
+ - TEST_SUITE="check=examples examples=arduino_uno"
  - TEST_SUITE="check=examples examples=stm32f4_loa_v2b"
+ - TEST_SUITE="check=examples examples=stm32f469_discovery"
  - TEST_SUITE="check=examples examples=unittest"
 
 script: "scons $TEST_SUITE"

@@ -7,7 +7,7 @@
  */
 // ----------------------------------------------------------------------------
 %#
-%% if id in [1, 2, 3, 6]
+%% if id in [1, 2, 3, 6] or target is stm32f0
 %%	set uart = "Usart"
 %% elif id in [4, 5, 7, 8]
 %%	set uart = "Uart"
@@ -16,7 +16,7 @@
 %% set name = uart ~ "Hal" ~ id
 %% set peripheral = uart | upper ~ id
 
-#ifndef XPCC_STM32_{{ uart | upper }}HAL_{{ id }}_HPP
+#ifndef XPCC_STM32_UARTHAL_{{ id }}_HPP
 #	error 	"Don't include this file directly, use" \
 #			"'{{ uart | lower }}_hal_{{ id }}.hpp' instead!"
 #endif
@@ -223,15 +223,20 @@ xpcc::stm32::{{ name }}::isTransmitRegisterEmpty()
 void
 xpcc::stm32::{{ name }}::enableInterruptVector(bool enable, uint32_t priority)
 {
+%% if target is stm32f0 and id in [3,4]
+	%%set irq = "USART3_4"
+%% else
+	%% set irq = peripheral
+%% endif
 	if (enable) {
 		// Set priority for the interrupt vector
-		NVIC_SetPriority({{ peripheral }}_IRQn, priority);
+		NVIC_SetPriority({{ irq }}_IRQn, priority);
 
 		// register IRQ at the NVIC
-		NVIC_EnableIRQ({{ peripheral }}_IRQn);
+		NVIC_EnableIRQ({{ irq }}_IRQn);
 	}
 	else {
-		NVIC_DisableIRQ({{ peripheral }}_IRQn);
+		NVIC_DisableIRQ({{ irq }}_IRQn);
 	}
 }
 

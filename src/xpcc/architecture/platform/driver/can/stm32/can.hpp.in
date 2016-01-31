@@ -15,10 +15,11 @@
 #include "../../../type_ids.hpp"
 
 #include "../../clock/generic/common_clock.hpp"
+#include "../generic/can_bit_timings.hpp"
 #include "error_code.hpp"
 #include "can_filter.hpp"
 
-%% if target is stm32f3
+%% if target is stm32f3 or target is stm32f0
 	%% set reg = 'CAN'
 %% else
 	%% set reg = 'CAN' ~ id
@@ -103,34 +104,15 @@ public:
 	initialize(	uint32_t interruptPriority, Mode startupMode = Mode::Normal,
 				bool overwriteOnOverrun = true)
 	{
-		/* Example for CAN bit timing:
-		 *   CLK on APB1 = 36 MHz
-		 *   BaudRate = 125 kBPs = 1 / NominalBitTime
-		 *   NominalBitTime = 8uS = tq + tBS1 + tBS2
-		 * with:
-		 *   tBS1 = tq * (TS1[3:0] + 1) = 12 * tq
-		 *   tBS2 = tq * (TS2[2:0] + 1) = 5 * tq
-		 *   tq = (BRP[9:0] + 1) * tPCLK
-		 * where tq refers to the Time quantum
-		 *   tPCLK = time period of the APB clock = 1 / 36 MHz
-		 *
-		 * STM32F1xx   tPCLK = 1 / 36 MHz
-		 * STM32F20x   tPCLK = 1 / 30 MHz
-		 * STM32F40x   tPCLK = 1 / 42 MHz
-		 */
-		constexpr uint8_t bs1 = (SystemClock::Can{{ id }} == MHz30)? 10 :
-								(SystemClock::Can{{ id }} == MHz36)? 12 :
-								(SystemClock::Can{{ id }} == MHz42)? 14 : 0;
-		constexpr uint8_t bs2 = (SystemClock::Can{{ id }} == MHz30)?  4 :
-								(SystemClock::Can{{ id }} == MHz36)?  5 :
-								(SystemClock::Can{{ id }} == MHz42)?  6 : 0;
-		constexpr uint16_t prescaler = 	SystemClock::Can{{ id }} /
-								(bitrate * (1 + bs1 + bs2));
-		static_assert(prescaler > 0,
-				"Unsupported frequency for Can peripheral. "
-				"Only 30 Mhz, 36 MHz and 42 MHz are supported at the moment.");
+		using Timings = CanBitTiming<SystemClock::Can{{ id }}, bitrate>;
 
-		return initializeWithPrescaler(prescaler, bs1, bs2, interruptPriority, startupMode, overwriteOnOverrun);
+		return initializeWithPrescaler(
+			Timings::getPrescaler(),
+			Timings::getBS1(),
+			Timings::getBS2(),
+			interruptPriority,
+			startupMode,
+			overwriteOnOverrun);
 	}
 
 	/**

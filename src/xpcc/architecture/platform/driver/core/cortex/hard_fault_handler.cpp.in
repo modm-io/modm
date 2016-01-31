@@ -54,8 +54,7 @@
 		%%	set uart = "Uart"
 	%% endif
 
-#include "../../uart/stm32/{{ uart | lower }}_{{ id }}.hpp"
-#include "../../uart/stm32/{{ uart | lower }}_hal_{{ id }}.hpp"
+#include "../../uart/stm32/uart_{{ id }}.hpp"
 
 extern "C" void {{ uart | upper ~ id }}_IRQHandler(void);
 

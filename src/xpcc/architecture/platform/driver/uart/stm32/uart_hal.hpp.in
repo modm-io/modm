@@ -6,14 +6,14 @@
  * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
-%% if id in [1, 2, 3, 6]
+%% if id in [1, 2, 3, 6] or target is stm32f0
 %%	set uart = "Usart"
 %% elif id in [4, 5, 7, 8]
 %%	set uart = "Uart"
 %% endif
 
-#ifndef XPCC_STM32_{{ uart | upper }}HAL_{{ id }}_HPP
-#define XPCC_STM32_{{ uart | upper }}HAL_{{ id }}_HPP
+#ifndef XPCC_STM32_UARTHAL_{{ id }}_HPP
+#define XPCC_STM32_UARTHAL_{{ id }}_HPP
 
 #include <stdint.h>
 #include "../../../type_ids.hpp"
@@ -180,6 +180,6 @@ public:
 
 }	// namespace xpcc
 
-#include "{{ uart | lower }}_hal_{{ id }}_impl.hpp"
+#include "uart_hal_{{ id }}_impl.hpp"
 
-#endif // XPCC_STM32_{{ uart | upper }}HAL_{{ id }}_HPP
+#endif // XPCC_STM32_UARTHAL_{{ id }}_HPP

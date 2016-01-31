@@ -51,7 +51,7 @@ Here is a list of supported **and tested** microcontrollers:
 - STM32F303 family (STM32F3 Discovery Board)
 - STM32F407 family (STM32F4 Discovery Board)
 - STM32F429 family (STM32F429 Discovery Board)
-- STM32F401 family (STM32F401 Nucleo Board)
+- STM32F469 family (STM32F469 Discovery Board)
 - LPC11C24 (LPCxpresso Board)
 - LPC1115 (LPCxpresso Board)
 
@@ -66,7 +66,7 @@ The following microcontrollers should be able to compile, but *have not been tes
 - All ATtiny's
 - All ATmega's
 
-There are more platforms which we have prepared, but currently not finished support for (Xmega, STM32F{0,2}).
+There are more platforms which we have prepared, but currently not finished support for (Xmega, STM32F{0,1,2,7}).
 A complete support list of tested and/or compilable and/or potentially portable microcontrollers is available in our
 [device file section](https://github.com/roboterclubaachen/xpcc/tree/develop/src/xpcc/architecture/platform/devices).
 

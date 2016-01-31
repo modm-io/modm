@@ -452,9 +452,15 @@ class STMDeviceReader(XMLDeviceReader):
 			return deviceDefines[0]
 
 		# now we match for the size-id.
-		devName += 'x{}'.format(self.id.size_id.upper())
+		devNameMatch = devName + 'x{}'.format(self.id.size_id.upper())
 		for define in deviceDefines:
-			if devName <= define:
+			if devNameMatch <= define:
+				return define
+
+		# now we match for the pin-id.
+		devNameMatch = devName + '{}x'.format(self.id.pin_id.upper())
+		for define in deviceDefines:
+			if devNameMatch <= define:
 				return define
 
 		return None

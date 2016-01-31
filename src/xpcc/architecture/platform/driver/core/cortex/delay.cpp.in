@@ -10,7 +10,11 @@
 #include "../../../device.hpp"
 #include "../../clock/generic/common_clock.hpp"
 
-%% set loop = 3
+%% if target is cortex_m0
+	%% set loop = 4
+%% else
+	%% set loop = 3
+%% endif
 
 %% if target is stm32f3 and not noiccm is defined
 	%% set overhead = 29
