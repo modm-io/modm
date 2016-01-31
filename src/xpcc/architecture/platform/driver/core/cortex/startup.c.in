@@ -185,7 +185,6 @@ Reset_Handler(void)
 	// fill the stack with relative branches to __stack_start
 	// where the undefined instruction is waiting to trigger the hard fault
 	asm volatile (
-		".syntax unified"               "\n\t"
 		"ldr   r0, =__stack_start"      "\n\t"
 
 		"ldr   r1, =0xE7FDDE00"         "\n\t" // b __stack_start, undef. instruction
@@ -199,10 +198,10 @@ Reset_Handler(void)
 		"add   r0, #2"                  "\n\t" // add sizeof(uint16_t) to the pointer
 
 		"cmp   r2, r3"                  "\n\t" // compare value with 0xE401
-		"it    ne"                      "\n\t" // IT block
-		"subne r2, #1"                  "\n\t" // subtract only if not equal
+		"beq   2f"                      "\n\t" // branch forward if equal
+		"sub   r2, #1"                  "\n\t" // subtract only if not equal
 
-		"cmp   r0, r1"                  "\n\t" // compare pointer with end of stack address
+	"2:  cmp   r0, r1"                  "\n\t" // compare pointer with end of stack address
 		"bne   1b"                      "\n\t" // continue loop if not equal
 	);
 
