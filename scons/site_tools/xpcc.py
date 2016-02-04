@@ -380,6 +380,7 @@ def generate(env, **kw):
 	env.Tool('platform_tools')
 
 	env.Tool('git')
+	env.Tool('qtcreator')
 
 	env.FindDeviceFile()
 
