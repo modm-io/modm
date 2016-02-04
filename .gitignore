@@ -13,3 +13,11 @@ build/
 # xpcc_config.hpp is generated from a template file
 src/xpcc_config.hpp
 src/libxpcc.a
+
+# qt creator
+*.creator
+*.creator.user
+*.creator.shared
+*.config
+*.includes
+*.files
