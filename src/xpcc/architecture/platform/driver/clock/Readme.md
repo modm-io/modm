@@ -12,7 +12,7 @@ implement two standardized interfaces:
 Both, the dynamic as well as the static interface, build on the same design:
 The goal is to represent different parts of a clock tree as separate classes
 that can be connected to each other.
-In addiditon to that the user needs to be able to diable as well as enable
+In addition to that the user needs to be able to disable as well as enable
 these building blocks where possible.
 
 ### Clock Sources
@@ -27,14 +27,14 @@ sources:
 
 Please note that for example on the STM32 platform the _ExternalClock_ and the
 _ExternalCrystal_ both use the same hardware. Nonetheless the two separate
-classes need to implemented in orde to provide a common interface.
+classes need to implemented in order to provide a common interface.
 
 ### PLL
 
 An important part of every clock tree is a Pll. These are used to multiply
 an input frequency. Thus the need to be connected to a Clock Source and to
 be enabled with a target frequency as an argument. If there is more than one
-Pll on yout system, they should be called: Pll, Pll2, Pll3 etc.
+Pll on your system, they should be called: Pll, Pll2, Pll3 etc.
 
 ### The System Clock
 
