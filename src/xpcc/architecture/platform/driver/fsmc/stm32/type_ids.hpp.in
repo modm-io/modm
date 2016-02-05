@@ -22,7 +22,9 @@ namespace TypeId
 	typedef struct{} FsmcNl;
 	typedef struct{} FsmcNbl0;
 	typedef struct{} FsmcNbl1;
-	typedef struct{} FsmcNe1;
+	%% for ii in range(1, 5)
+		typedef struct{} FsmcNe{{ ii }};
+	%% endfor
 	typedef struct{} FsmcNwait;
 	typedef struct{} FsmcClk;
 
@@ -38,10 +40,13 @@ namespace TypeId
 	typedef struct{} FsmcNce2;
 	typedef struct{} FsmcNce3;
 	typedef struct{} FsmcNce4;
+
+	typedef struct{} FsmcNios16;
+
 %% for ii in range(0, 16)
 	typedef struct{} FsmcD{{ ii }};
 %% endfor
-%% for ii in range(16, 24)
+%% for ii in range(0, 26)
 	typedef struct{} FsmcA{{ ii }};
 %% endfor
 }
