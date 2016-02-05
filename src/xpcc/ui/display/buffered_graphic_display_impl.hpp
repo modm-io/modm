@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -42,7 +42,7 @@ xpcc::BufferedGraphicDisplay<Width, Height>::clear()
 			this->buffer[x][y] = 0;
 		}
 	}
-	
+
 	// reset the cursor
 	this->cursor = glcd::Point(0, 0);
 }
@@ -55,11 +55,11 @@ xpcc::BufferedGraphicDisplay<Width, Height>::drawHorizontalLine(
 		uint16_t length)
 {
 	const uint16_t y = start.getY() / 8;
-	
+
 	if (this->foregroundColor == glcd::Color::black())
 	{
 		const uint8_t mask = 1 << (start.getY() & 0x07);
-		for (uint_fast16_t x = start.getX(); x < static_cast<uint16_t>(start.getX() + length); ++x) {
+		for (uint_fast16_t x = start.getX(); x <= static_cast<uint16_t>(start.getX() + length); ++x) {
 			if( x < Width && y < Height ) {
 				this->buffer[x][y] |= mask;
 			}
@@ -67,7 +67,7 @@ xpcc::BufferedGraphicDisplay<Width, Height>::drawHorizontalLine(
 	}
 	else {
 		const uint8_t mask = ~(1 << (start.getY() & 0x07));
-		for (uint_fast16_t x = start.getX(); x < static_cast<uint16_t>(start.getX() + length); ++x) {
+		for (uint_fast16_t x = start.getX(); x <= static_cast<uint16_t>(start.getX() + length); ++x) {
 			if( x < Width && y < Height ) {
 				this->buffer[x][y] &= mask;
 			}
@@ -86,7 +86,7 @@ xpcc::BufferedGraphicDisplay<Width, Height>::drawImageRaw(glcd::Point upperLeft,
 	{
 		uint16_t row = upperLeft.getY() / 8;
 		uint16_t rowCount = (height + 7) / 8;	// always round up
-		
+
 		if ((height & 0x07) == 0)
 		{
 			for (uint_fast16_t i = 0; i < width; i++)
@@ -104,7 +104,7 @@ xpcc::BufferedGraphicDisplay<Width, Height>::drawImageRaw(glcd::Point upperLeft,
 			return;
 		}
 	}
-	
+
 	GraphicDisplay::drawImageRaw(upperLeft, width, height, data);
 }
 
