@@ -461,9 +461,9 @@ class GpioPortBase<Gpio::Port::{{port.name}}, StartPin, Width, PortOrder> : publ
 	static constexpr uint16_t dataMask = (1 << Width) - 1;
 	static constexpr uint16_t portMask = dataMask << StartPin;
 
-	static constexpr uint64_t configMask = (1 << (Width * 4)) - 1;
-	static constexpr uint32_t configMaskL = configMask << (StartPin * 4);
-	static constexpr uint32_t configMaskH = configMask << ((StartPin * 4) - 32);
+	static constexpr uint64_t configMask = ((1ULL << (Width * 4)) - 1) << (StartPin * 4);
+	static constexpr uint32_t configMaskL = static_cast<uint32_t>(configMask);
+	static constexpr uint32_t configMaskH = static_cast<uint32_t>(configMask >> 32);
 
 	static constexpr uint32_t port0001L = 0x11111111 & configMaskL;
 	static constexpr uint32_t port0010L = 0x22222222 & configMaskL;
