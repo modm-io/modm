@@ -130,7 +130,7 @@ public:
 		writing() override;
 
 		virtual void
-		detaching(xpcc::I2c::DetachCause cause);
+		detaching(xpcc::I2c::DetachCause cause) override;
 
 	private:
 		uint8_t *commands;
