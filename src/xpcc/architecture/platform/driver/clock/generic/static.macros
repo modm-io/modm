@@ -63,7 +63,15 @@ public:
 	static StartupError
 	enable(const uint32_t waitCycles = 1500)
 	{
-		if (!ClockTree::enableSource(ClockTree::ClockSource::{{ s.name }}, kHz(outputFrequency), waitCycles))
+%% if target is lpc
+	%%	if s.fixedFrequency|length > 0
+		if (!ClockControl::enable{{ s.name }}({{ s.fixedFrequency }}/1000, waitCycles))
+	%% else
+		if (!ClockControl::enable{{ s.name }}(InputFrequency/1000, waitCycles))
+	%% endif
+%% else
+		if (!ClockControl::enable{{ s.name }}(waitCycles))
+%% endif
 			return StartupError::{{ s.name }};
 		return StartupError::None;
 	}
@@ -105,7 +113,7 @@ public:
 		if (err != StartupError::None) return err;
 		return PllSetup<InputFrequency,
 				OutputFrequency{{ template }},
-				ClockTree::PllSource::{{ src.name }}>::enable();
+				ClockControl::PllSource::{{ src.name }}>::enable();
 	}
 	static constexpr int
 	outputFrequency = OutputFrequency;
@@ -176,8 +184,8 @@ public:
 	{
 		StartupError err =  {{ src.name }}<{{ template }}>::enable(waitCycles);
 		if (err != StartupError::None) return err;
-		if(ClockTree::switch{{ s.name }}To(
-				ClockTree::{{ s.name }}Source::{{ src.name }}, waitCycles))
+		if(ClockControl::enable{{ s.name }}(
+				ClockControl::{{ s.name }}Source::{{ src.name }}, waitCycles))
 			return StartupError::None;
 		return StartupError::{{ src.name }};
 	}
@@ -200,18 +208,25 @@ public:
 	};
 
 	static ALWAYS_INLINE void
-	setDivision(Division d)
+	setDivision(Division)
 	{
-		ClockTree::set{{ o.name }}Division(static_cast<int>(d));
+		//ClockControl::enable{{ o.name }}(static_cast<int>(d));
 	}
 %% endif
 	// Connect Functions
 %% for src in o.sources
 	static ALWAYS_INLINE void
+%% if target is stm32f2 or target is stm32f4
+	connect(::{{type_id_namespace}}::TypeId::{{ src.name }} /* t */, uint8_t div = 1)
+	{
+		ClockControl::enable{{ o.name }}(ClockControl::{{ o.name }}Source::{{ src.name }}, div);
+	}
+%% else
 	connect(::{{type_id_namespace}}::TypeId::{{ src.name }} /* t */)
 	{
-		ClockTree::connectTo{{ o.name }}(ClockTree::{{ o.name }}Source::{{ src.name }});
+		ClockControl::enable{{ o.name }}(ClockControl::{{ o.name }}Source::{{ src.name }});
 	}
+%% endif
 %% endfor
 };
 %% endmacro

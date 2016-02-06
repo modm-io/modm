@@ -11,6 +11,7 @@
 #define XPCC_STM32_CLOCK_HPP
 
 #include <stdint.h>
+#include "../../../device.hpp"
 #include "../generic/common_clock.hpp"
 // #include "static.hpp"
 
@@ -22,51 +23,11 @@ namespace xpcc
 namespace stm32
 {
 
-/**
- * Clock management.
- *
- * For using the internal clock (which is 16MHz) use:
- * \code
- * typedef xpcc::stm32::Clock C;
- * enablePll(C::PllSource::PLL_HSI, 8, 120);	// for STM32F2xx
- * enablePll(C::PllSource::PLL_HSI, 8, 168);	// for STM32F4xx
- * switchToPll();
- * \endcode
- *
- * For using an external crystal with 8 MHz use:
- * \code
- * typedef xpcc::stm32::Clock C;
- * if (enableHse(C::HseConfig::HSE_CRYSTAL))
- * {
- *     enablePll(C::PllSource::PLL_HSE, 4, 120);	// for STM32F2xx
- *     enablePll(C::PllSource::PLL_HSE, 4, 168);	// for STM32F4xx
- *     switchToPll();
- * }
- * \endcode
- *
- * For using an external oscillator with 25 MHz use:
- * \code
- * if (enableHse(HSE_BYPASS))
- * {
- *     enablePll(PLL_HSE, 25, 240);	// for STM32F2xx
- *     enablePll(PLL_HSE, 25, 336);	// for STM32F4xx
- *     switchToPll();
- * }
- * \endcode
- *
- * \ingroup	stm32f2_4
- */
-class ClockTree
+class ClockControl
 {
 public:
-	enum class ClockSource
-	{
-		InternalClock,
-		ExternalClock,
-		ExternalCrystal,
-	};
-
-	enum class PllSource
+	enum class
+	PllSource : uint32_t
 	{
 %% if target is stm32f2 or target is stm32f4
 		/// High speed internal clock (16 MHz)
@@ -90,17 +51,75 @@ public:
 		ExternalCrystal = Hse,
 	};
 
-	enum class SystemClockSource : uint32_t
+	enum class
+	SystemClockSource : uint32_t
 	{
 		Hsi = RCC_CFGR_SW_HSI,
 		Hse = RCC_CFGR_SW_HSE,
+
 		Pll = RCC_CFGR_SW_PLL,
 		InternalClock = Hsi,
 		ExternalClock = Hse,
 		ExternalCrystal = Hse,
 	};
+
+	enum class
+	RealTimeClockSource : uint32_t
+	{
+		Lsi = RCC_BDCR_RTCSEL_1,
+		Lse = RCC_BDCR_RTCSEL_0,
+		Hse = RCC_BDCR_RTCSEL_0 | RCC_BDCR_RTCSEL_1,
+
+		ExternalClock = Hse,
+		ExternalCrystal = Hse,
+		LowSpeedInternalClock = Lsi,
+		LowSpeedExternalClock = Lse,
+		LowSpeedExternalCrystal = Lse
+	};
+
+	enum class
+	WatchdogClockSource : uint32_t
+	{
+		LowSpeedInternalClock = 0
+	};
+
+	enum class
+	AhbPrescaler : uint32_t
+	{
+		Div1   = RCC_CFGR_HPRE_DIV1,
+		Div2   = RCC_CFGR_HPRE_DIV2,
+		Div4   = RCC_CFGR_HPRE_DIV4,
+		Div8   = RCC_CFGR_HPRE_DIV8,
+		Div16  = RCC_CFGR_HPRE_DIV16,
+		Div64  = RCC_CFGR_HPRE_DIV64,
+		Div128 = RCC_CFGR_HPRE_DIV128,
+		Div256 = RCC_CFGR_HPRE_DIV256,
+		Div512 = RCC_CFGR_HPRE_DIV512
+	};
+
+	enum class
+	Apb1Prescaler : uint32_t
+	{
+		Div1   = RCC_CFGR_PPRE1_DIV1,
+		Div2   = RCC_CFGR_PPRE1_DIV2,
+		Div4   = RCC_CFGR_PPRE1_DIV4,
+		Div8   = RCC_CFGR_PPRE1_DIV8,
+		Div16  = RCC_CFGR_PPRE1_DIV16
+	};
+
+	enum class
+	Apb2Prescaler : uint32_t
+	{
+		Div1   = RCC_CFGR_PPRE2_DIV1,
+		Div2   = RCC_CFGR_PPRE2_DIV2,
+		Div4   = RCC_CFGR_PPRE2_DIV4,
+		Div8   = RCC_CFGR_PPRE2_DIV8,
+		Div16  = RCC_CFGR_PPRE2_DIV16
+	};
+
 %% if target is stm32f2 or target is stm32f4
-	enum class MCO1Source : uint32_t
+	enum class
+	ClockOutput1Source : uint32_t
 	{
 		InternalClock = 0,
 		ExternalClock = RCC_CFGR_MCO1_1,
@@ -108,7 +127,8 @@ public:
 		Pll = RCC_CFGR_MCO1_1 | RCC_CFGR_MCO1_0,
 	};
 
-	enum class MCO2Source : uint32_t
+	enum class
+	ClockOutput2Source : uint32_t
 	{
 		SystemClock = 0,
 		ExternalClock = RCC_CFGR_MCO1_1,
@@ -116,7 +136,8 @@ public:
 		Pll = RCC_CFGR_MCO1_1 | RCC_CFGR_MCO1_0,
 	};
 %% elif target is stm32f1 or target is stm32f3
-	enum class MCOSource : uint32_t
+	enum class
+	ClockOutputSource : uint32_t
 	{
 		SystemClock   = RCC_CFGR_MCO_SYSCLK,
 		InternalClock = RCC_CFGR_MCO_HSI,
@@ -130,20 +151,34 @@ public:
 	};
 %% endif
 %% if usbprescaler is defined
-	enum class UsbPrescaler : uint32_t
+	enum class
+	UsbPrescaler : uint32_t
 	{
-		DivideBy1Point5 = 0,
-		DoNotDivide     = RCC_CFGR_USBPRE,
+		Div1 = RCC_CFGR_USBPRE,	///< do not divide
+		Div1_5 = 0,	///< divide by 1.5
 	};
 %% endif
 public:
-	/*
-	 * XPCC Static Clock Standard Interface
-	 * requires source frequency in **kHz**
-	 */
+	// sources
 	static bool
-	enableSource(ClockSource src, uint32_t kHz, uint32_t waitCycles = 1500);
+	enableInternalClock(uint32_t waitCycles = 2048);
 
+	static bool
+	enableExternalClock(uint32_t waitCycles = 2048);
+
+	static bool
+	enableExternalCrystal(uint32_t waitCycles = 2048);
+
+	static bool
+	enableLowSpeedInternalClock(uint32_t waitCycles = 2048);
+
+	static bool
+	enableLowSpeedExternalClock(uint32_t waitCycles = 2048);
+
+	static bool
+	enableLowSpeedExternalCrystal(uint32_t waitCycles = 2048);
+
+	// plls
 %% if target is stm32f2 or target is stm32f4
 	/**
 	 * Enable PLL.
@@ -174,72 +209,89 @@ public:
 	 * Example:
 	 *
 	 */
-	static void
+	static bool
 	enablePll(PllSource source, uint8_t pllM,
-					uint16_t pllN, uint8_t pllP, uint8_t pllQ);
+					uint16_t pllN, uint8_t pllP, uint8_t pllQ, uint32_t waitCycles = 2048);
 %% else
-	static void
+	static bool
 	enablePll(PllSource source,
 %% if usbprescaler is defined
-					UsbPrescaler usb,
+				UsbPrescaler usb,
 %% endif
 	%% if pllprediv2 is defined
-				uint8_t pllMul, uint8_t pllPrediv, uint8_t pllPrediv2);
+				uint8_t pllMul, uint8_t pllPrediv, uint8_t pllPrediv2, uint32_t waitCycles = 2048);
 	%% elif pllprediv is defined
-				uint8_t pllMul, uint8_t pllPrediv);
+				uint8_t pllMul, uint8_t pllPrediv, uint32_t waitCycles = 2048);
 	%% else
-				uint8_t pllMul);
+				uint8_t pllMul, uint32_t waitCycles = 2048);
 	%% endif
 %% endif
 
+	// sinks
 	static bool
-	switchSystemClockTo(SystemClockSource src, uint32_t waitCycles = 1500);
+	enableSystemClock(SystemClockSource src, uint32_t waitCycles = 2048);
+
+	static inline bool
+	enableRealTimeClock(RealTimeClockSource src)
+	{
+		RCC->BDCR = (RCC->BDCR & ~RCC_BDCR_RTCSEL) | RCC_BDCR_RTCEN | uint32_t(src);
+		return true;
+	}
+
+	static inline bool
+	enableWatchdogClock(WatchdogClockSource /*src*/)
+	{ return true; }
 
 %% if target is stm32f2 or target is stm32f4
-	static inline void
-	connectToMCO1(MCO1Source src)
+	static inline bool
+	enableClockOutput1(ClockOutput1Source src, uint8_t div)
 	{
-		uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO1);
-		RCC->CFGR = tmp | static_cast<uint32_t>(src);
-	}
-
-	static inline void
-	setMCO1Division(int div)
-	{
-		uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO1PRE);
+		uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO1 | RCC_CFGR_MCO1PRE);
 		if (div > 1) tmp |= (div + 2) << 24;
-		RCC->CFGR = tmp;
+		RCC->CFGR = tmp | uint32_t(src);
+		return true;
 	}
 
-	static inline void
-	connectToMCO2(MCO2Source src)
+	static inline bool
+	enableClockOutput2(ClockOutput2Source src, uint8_t div)
 	{
-		uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO2);
-		RCC->CFGR = tmp | static_cast<uint32_t>(src);
-	}
-
-	static inline void
-	setMCO2Division(int div)
-	{
-		uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO2PRE);
+		uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO2 | RCC_CFGR_MCO2PRE);
 		if (div > 1) tmp |= (div + 2) << 27;
-		RCC->CFGR = tmp;
+		RCC->CFGR = tmp | uint32_t(src);
+		return true;
 	}
 %% else
-	static inline void
-	connectToMCO(MCOSource src)
+	static inline bool
+	enableClockOutput(ClockOutputSource src)
 	{
-		uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO);
-		RCC->CFGR = tmp | static_cast<uint32_t>(src);
-	}
-
-	static inline void
-	setMCODivision(int /*div*/)
-	{
-		// Division can not be changed. This is only a placeholder.
+		RCC->CFGR = (RCC->CFGR & ~(RCC_CFGR_MCO))| uint32_t(src);
+		return true;
 	}
 %% endif
 
+public:
+	static inline bool
+	setAhbPrescaler(AhbPrescaler prescaler)
+	{
+		RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_HPRE) | uint32_t(prescaler);
+		return true;
+	}
+
+	static inline bool
+	setApb1Prescaler(Apb1Prescaler prescaler)
+	{
+		RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_PPRE1) | uint32_t(prescaler);
+		return true;
+	}
+
+	static inline bool
+	setApb2Prescaler(Apb2Prescaler prescaler)
+	{
+		RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_PPRE2) | uint32_t(prescaler);
+		return true;
+	}
+
+public:
 	static inline uint32_t
 	getCpuFrequency()
 	{
