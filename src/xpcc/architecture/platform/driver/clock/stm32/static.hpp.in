@@ -173,12 +173,12 @@ namespace xpcc
 							 'sources': [ internalClock, externalClock,
 										  externalCrystal, pll ],
 							 'sinks': [ ahb1, ahb3 ] }
-	%% set mco1 =			{'name': "MCO1",
+	%% set mco1 =			{'name': "ClockOutput1",
 							 'divisions': [1, 2, 3, 4, 5],
 							 'sources': [internalClock, externalClock,
 										 externalCrystal, pll] }
 							%# TODO: Add more sources
-	%% set mco2 =			{'name': "MCO2",
+	%% set mco2 =			{'name': "ClockOutput2",
 							 'divisions': [1, 2, 3, 4, 5],
 							 'sources': [systemClock, externalClock,
 										 externalCrystal, pll] }
@@ -213,7 +213,7 @@ namespace xpcc
 							 'sources': [ internalClock, externalClock,
 										  externalCrystal, pll ],
 							 'sinks': [ ahb ] }
-	%% set mco1 =			{'name': "MCO",
+	%% set mco1 =			{'name': "ClockOutput",
 							 'divisions': [1],
 							 'sources': [internalClock, externalClock,
 										 externalCrystal, pll, systemClock] }
@@ -247,7 +247,7 @@ namespace xpcc
 							 'sources': [ internalClock, externalClock,
 										  externalCrystal, pll ],
 							 'sinks': [ ahb ] }
-	%% set mco1 =			{'name': "MCO",
+	%% set mco1 =			{'name': "ClockOutput",
 							 'divisions': [1],
 							 'sources': [internalClock, externalClock,
 										 externalCrystal, pll, systemClock] }

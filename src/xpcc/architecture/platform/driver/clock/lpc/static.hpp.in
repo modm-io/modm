@@ -86,7 +86,7 @@ namespace xpcc
 							 'sources': [ internalClock, externallClock,
 										  externalCrystal, pll ],
 							 'sinks': ["Can"] }
-%% set clockOut =			{'name': "ClockOut",
+%% set clockOut =			{'name': "ClockOutput",
 							 'divisions': range(1,255),
 							 'sources': [externallClock,
 										 externalCrystal, systemClock] }

@@ -23,9 +23,9 @@ namespace TypeId
 	typedef struct{} ExternalCrystal;
 	typedef struct{} Pll;
 	typedef struct{} SystemClock;
-	typedef struct{} MCO;
-	typedef struct{} MCO1;
-	typedef struct{} MCO2;
+	typedef struct{} ClockOutput;
+	typedef struct{} ClockOutput1;
+	typedef struct{} ClockOutput2;
 }
 
 }   // namespace stm32

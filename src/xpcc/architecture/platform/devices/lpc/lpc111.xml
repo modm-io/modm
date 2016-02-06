@@ -27,7 +27,7 @@
 		<driver type="uart" name="lpc" instances="1"/>
 		<driver type="gpio" name="lpc">
 			<!--<gpio port="0" id="0" func="Reset,Gpio" bits="mode,hys,od"/>-->
-			<gpio port="0" id="1"  func="Gpio,ClockOut,Timer32_0" bits="mode,hys,od"/>
+			<gpio port="0" id="1"  func="Gpio,ClockOutput,Timer32_0" bits="mode,hys,od"/>
 			<gpio port="0" id="2"  func="Gpio,Spi0,Timer16_0"     bits="mode,hys,od"/>
 			<gpio port="0" id="3"  func="Gpio"                    bits="mode,hys,od"/>
 			<gpio port="0" id="4"  func="Gpio,I2c"                bits="i2c_mode"/>
