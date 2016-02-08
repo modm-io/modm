@@ -52,21 +52,20 @@ namespace xpcc
 		/*
 		 * Used to setup pll with constants
 		 */
-		template<int InputFrequency, int OutputFrequency, int UsbFrequency,
-		ClockTree::PllSource Source>
+		template<int InputFrequency, int OutputFrequency, int UsbFrequency, ClockControl::PllSource Source>
 		class PllSetup
 		{
 		private:
 %% if target is stm32f2
 			typedef Stm32F2F4PllSettings<MHz64,  InputFrequency, OutputFrequency, UsbFrequency> p;
-%% elif target is stm32f4
+%% else
 			typedef Stm32F2F4PllSettings<MHz192, InputFrequency, OutputFrequency, UsbFrequency> p;
 %% endif
 		public:
 			static StartupError
 			enable()
 			{
-				ClockTree::enablePll(Source, p::PllM, p::PllN, p::PllP, p::PllQ);
+				ClockControl::enablePll(Source, p::PllM, p::PllN, p::PllP, p::PllQ);
 
 				xpcc::clock::fcpu     = OutputFrequency;
 				xpcc::clock::fcpu_kHz = OutputFrequency / 1000;
@@ -79,29 +78,28 @@ namespace xpcc
 		/*
 		 * Used to setup pll with constants
 		 */
-		template<int InputFrequency, int OutputFrequency,
-		ClockTree::PllSource Source>
+		template<int InputFrequency, int OutputFrequency, ClockControl::PllSource Source>
 		class PllSetup
 		{
 		private:
 	%% if target is stm32f1 and target.name == '100'
 			typedef Stm32F100PllSettings<InputFrequency, OutputFrequency,
-									(Source == ClockTree::PllSource::Hsi)> p;
+									(Source == ClockControl::PllSource::Hsi)> p;
 	%% else
 			typedef Stm32F3PllSettings<InputFrequency, OutputFrequency,
-									(Source == ClockTree::PllSource::Hsi)> p;
+									(Source == ClockControl::PllSource::Hsi)> p;
 	%% endif
 		public:
 			static StartupError
 			enable()
 			{
 	%% if usbprescaler is defined
-				constexpr ClockTree::UsbPrescaler usb =
+				constexpr ClockControl::UsbPrescaler usb =
 							(p::CanUseUSB && (OutputFrequency == MHz72))?
-							ClockTree::UsbPrescaler::DivideBy1Point5 :
-							ClockTree::UsbPrescaler::DoNotDivide;
+							ClockControl::UsbPrescaler::Div1_5 :
+							ClockControl::UsbPrescaler::Div1;
 	%% endif
-				ClockTree::enablePll(Source,
+				ClockControl::enablePll(Source,
 	%% if usbprescaler is defined
 						usb,
 	%% endif
@@ -173,12 +171,12 @@ namespace xpcc
 							 'sources': [ internalClock, externalClock,
 										  externalCrystal, pll ],
 							 'sinks': [ ahb1, ahb3 ] }
-	%% set mco1 =			{'name': "MCO1",
+	%% set mco1 =			{'name': "ClockOutput1",
 							 'divisions': [1, 2, 3, 4, 5],
 							 'sources': [internalClock, externalClock,
 										 externalCrystal, pll] }
 							%# TODO: Add more sources
-	%% set mco2 =			{'name': "MCO2",
+	%% set mco2 =			{'name': "ClockOutput2",
 							 'divisions': [1, 2, 3, 4, 5],
 							 'sources': [systemClock, externalClock,
 										 externalCrystal, pll] }
@@ -213,7 +211,7 @@ namespace xpcc
 							 'sources': [ internalClock, externalClock,
 										  externalCrystal, pll ],
 							 'sinks': [ ahb ] }
-	%% set mco1 =			{'name': "MCO",
+	%% set mco1 =			{'name': "ClockOutput",
 							 'divisions': [1],
 							 'sources': [internalClock, externalClock,
 										 externalCrystal, pll, systemClock] }
@@ -247,7 +245,7 @@ namespace xpcc
 							 'sources': [ internalClock, externalClock,
 										  externalCrystal, pll ],
 							 'sinks': [ ahb ] }
-	%% set mco1 =			{'name': "MCO",
+	%% set mco1 =			{'name': "ClockOutput",
 							 'divisions': [1],
 							 'sources': [internalClock, externalClock,
 										 externalCrystal, pll, systemClock] }

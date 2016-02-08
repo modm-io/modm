@@ -47,17 +47,11 @@ namespace xpcc
 		 *
 		 * \ingroup
 		 */
-		class ClockTree
+		class ClockControl
 		{
 		public:
-			enum class ClockSource
-			{
-				InternalClock,		/* IRC Oscillator (12MHz) */
-				ExternalClock,		/* System Oscillator */
-				ExternalCrystal,
-			};
-
-			enum class PllSource
+			enum class
+			PllSource
 			{
 				IRC = 0,
 				SystemOscillator = 1,
@@ -66,7 +60,8 @@ namespace xpcc
 				ExternalCrystal = SystemOscillator,
 			};
 
-			enum class SystemClockSource : uint32_t
+			enum class
+			SystemClockSource : uint32_t
 			{
 				IRC = 0x0,
 				SystemPllInput = 0x1,
@@ -78,7 +73,8 @@ namespace xpcc
 				Pll = SystemPllOutput,
 			};
 
-			enum class ClockOutSource : uint32_t
+			enum class
+			ClockOutputSource : uint32_t
 			{
 				IRC = 0x0,
 				SystemOscillator = 0x1,
@@ -92,7 +88,13 @@ namespace xpcc
 
 		public:
 			static bool
-			enableSource(ClockSource src, uint32_t kHz, uint32_t waitCycles = 1500);
+			enableInternalClock(uint32_t kHz, uint32_t waitCycles = 2048);
+
+			static bool
+			enableExternalClock(uint32_t kHz, uint32_t waitCycles = 2048);
+
+			static bool
+			enableExternalCrystal(uint32_t kHz, uint32_t waitCycles = 2048);
 
 			/**
 			 * Enable PLL.
@@ -109,26 +111,26 @@ namespace xpcc
 			 * Example:
 			 *
 			 */
-			static void
+			static bool
 			enablePll(PllSource source, uint8_t pllM, uint8_t pllP);
 
 			static bool
-			switchSystemClockTo(SystemClockSource src, uint32_t waitCycles = 1500);
+			enableSystemClock(SystemClockSource src, uint32_t waitCycles = 2048);
 
-			static void
-			connectToClockOut(ClockOutSource src)
+			static bool
+			enableClockOutput(ClockOutputSource src, uint8_t div = 1, uint32_t waitCycles = 2048)
 			{
+				bool retval;
 				LPC_SYSCON->CLKOUTCLKSEL = 0x3 & static_cast<uint32_t>(src);
 				LPC_SYSCON->CLKOUTUEN = 0x01;	// toggle update enable register
 				LPC_SYSCON->CLKOUTUEN = 0x00;
 				LPC_SYSCON->CLKOUTUEN = 0x01;
-				while (!(LPC_SYSCON->CLKOUTUEN & 0x01));
-			}
-
-			static void
-			setClockOutDivision(int div)
-			{
 				LPC_SYSCON->CLKOUTDIV = 0xff & static_cast<uint8_t>(div);
+
+				while (not (retval = LPC_SYSCON->CLKOUTUEN & 0x01) and --waitCycles)
+					;
+
+				return retval;
 			}
 
 			static inline uint32_t

@@ -153,7 +153,7 @@
       </gpio>
       <gpio port="A" id="8">
         <af id="6,3,0" peripheral="Timer1" name="Channel1"/>
-        <af peripheral="MCO" type="out"/>
+        <af peripheral="ClockOutput" type="out"/>
         <af peripheral="Uart1" name="Ck" type="out"/>
         <af peripheral="UartSpiMaster1" name="Sck" type="out"/>
       </gpio>

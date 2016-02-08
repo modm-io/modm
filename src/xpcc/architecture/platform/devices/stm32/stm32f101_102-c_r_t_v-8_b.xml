@@ -118,7 +118,7 @@
         <af peripheral="Adc1" name="Channel7" type="analog"/>
       </gpio>
       <gpio port="A" id="8">
-        <af peripheral="MCO" type="out"/>
+        <af peripheral="ClockOutput" type="out"/>
         <af peripheral="Uart1" name="Ck" type="out"/>
         <af peripheral="UartSpiMaster1" name="Sck" type="out"/>
       </gpio>

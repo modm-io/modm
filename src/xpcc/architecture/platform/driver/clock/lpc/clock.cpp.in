@@ -59,40 +59,37 @@
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::lpc::ClockTree::enableSource(ClockSource src, uint32_t f_kHz, uint32_t /*waitCycles*/)
+xpcc::lpc::ClockControl::enableInternalClock(uint32_t, uint32_t)
 {
-	if (src == ClockSource::InternalClock) {
-		return true;	// InternalClock is on by default (PDRUNCFG: IRC_PD)
-	}
-	else if (src == ClockSource::ExternalClock) {
-		LPC_SYSCON->PDRUNCFG &= ~PDRUNCFG_SYSOSC_PD;	// powerup
-		LPC_SYSCON->SYSOSCCTRL |= SYSOSCCTRL_BYPASS;	// enable bypass
-	}
-	else if(src == ClockSource::ExternalCrystal) {
-		LPC_SYSCON->PDRUNCFG &= ~PDRUNCFG_SYSOSC_PD;	// powerup
-		LPC_SYSCON->SYSOSCCTRL &= ~SYSOSCCTRL_BYPASS;	// do not bypass
-		if(f_kHz >= u32kHz(MHz1) && f_kHz <= u32kHz(MHz17)) {
-			LPC_SYSCON->SYSOSCCTRL &= ~SYSOSCCTRL_FREQRANGE; // 1-20MHz
-		}
-		else if (f_kHz >= u32kHz(MHz17) && f_kHz <= u32kHz(MHz25)) {
-			LPC_SYSCON->SYSOSCCTRL |= SYSOSCCTRL_FREQRANGE; // 15-25MHz
-		}
-		else {
-			return false;	// should not get here
-		}
-	}
-	else {
-		return false;	// should not get here
-	}
+	return true;
+}
 
-	// TODO: maybe add wait loop (especially for for oscillator??)
+bool
+xpcc::lpc::ClockControl::enableExternalClock(uint32_t, uint32_t)
+{
+	LPC_SYSCON->PDRUNCFG &= ~PDRUNCFG_SYSOSC_PD;	// powerup
+	LPC_SYSCON->SYSOSCCTRL |= SYSOSCCTRL_BYPASS;	// enable bypass
+	return true;
+}
 
+bool
+xpcc::lpc::ClockControl::enableExternalCrystal(uint32_t f_kHz, uint32_t)
+{
+	LPC_SYSCON->PDRUNCFG &= ~PDRUNCFG_SYSOSC_PD;	// powerup
+	LPC_SYSCON->SYSOSCCTRL &= ~SYSOSCCTRL_BYPASS;	// do not bypass
+	if(f_kHz >= u32kHz(MHz1) && f_kHz <= u32kHz(MHz17)) {
+		LPC_SYSCON->SYSOSCCTRL &= ~SYSOSCCTRL_FREQRANGE; // 1-20MHz
+	}
+	else if (f_kHz >= u32kHz(MHz17) && f_kHz <= u32kHz(MHz25)) {
+		LPC_SYSCON->SYSOSCCTRL |= SYSOSCCTRL_FREQRANGE; // 15-25MHz
+	}
+	else return false;	// should not get here
 	return true;
 }
 
 // ----------------------------------------------------------------------------
-void
-xpcc::lpc::ClockTree::enablePll(PllSource source, uint8_t pllM, uint8_t pllP)
+bool
+xpcc::lpc::ClockControl::enablePll(PllSource source, uint8_t pllM, uint8_t pllP)
 {
 	// SYSPLLCLKSEL
 	LPC_SYSCON->SYSPLLCLKSEL = (LPC_SYSCON->SYSPLLCLKSEL & 0b11)
@@ -104,11 +101,12 @@ xpcc::lpc::ClockTree::enablePll(PllSource source, uint8_t pllM, uint8_t pllP)
 	LPC_SYSCON->SYSPLLCTRL = (0x1f & (pllM-1)) | (0x60 & pllP);
 	LPC_SYSCON->PDRUNCFG &= ~PDRUNCFG_SYSPLL_PD;	// power up pll
 	while (!(LPC_SYSCON->SYSPLLSTAT & SYSPLLSTAT_LOCK));// wait for pll to be locked
+	return true;
 }
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::lpc::ClockTree::switchSystemClockTo(SystemClockSource src, uint32_t /*waitCycles*/)
+xpcc::lpc::ClockControl::enableSystemClock(SystemClockSource src, uint32_t /*waitCycles*/)
 {
 	LPC_SYSCON->MAINCLKSEL = static_cast<uint32_t>(src);
 	LPC_SYSCON->MAINCLKUEN = 0x01;	// toggle update enable register

@@ -12,38 +12,70 @@
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::stm32::ClockTree::enableSource(ClockSource src, uint32_t /*kHz*/, uint32_t waitCycles)
+xpcc::stm32::ClockControl::enableInternalClock(uint32_t waitCycles)
 {
-	if (src == ClockSource::InternalClock)
-		return true;	// InternalClock is always on
-	if (src == ClockSource::ExternalClock) {
-		RCC->CR |= RCC_CR_HSEBYP | RCC_CR_HSEON;
-		// return if already running
-		if(RCC->CR & (RCC_CR_HSEBYP | RCC_CR_HSEON) and (RCC->CR & RCC_CR_HSERDY))
-			return true;
-	}
-	else if(src == ClockSource::ExternalCrystal) {
-		RCC->CR |= RCC_CR_HSEON;
-		// return if already running
-		if(RCC->CR & (RCC_CR_HSEON) and (RCC->CR & RCC_CR_HSERDY))
-			return true;
-	}
-	else {
-		return false;	// should not get here
-	}
+	bool retval;
+	RCC->CR |= RCC_CR_HSION;
+	while (not (retval = (RCC->CR & RCC_CR_HSIRDY)) and --waitCycles)
+		;
+	return retval;
+}
 
-	uint32_t t = waitCycles;
-	while (!(RCC->CR & RCC_CR_HSERDY) && --t) {
-	}
+bool
+xpcc::stm32::ClockControl::enableExternalClock(uint32_t waitCycles)
+{
+	bool retval;
+	RCC->CR |= RCC_CR_HSEBYP | RCC_CR_HSEON;
+	while (not (retval = (RCC->CR & RCC_CR_HSERDY)) and --waitCycles)
+		;
+	return retval;
+}
 
-	return (RCC->CR & RCC_CR_HSERDY);
+bool
+xpcc::stm32::ClockControl::enableExternalCrystal(uint32_t waitCycles)
+{
+	bool retval;
+	RCC->CR = (RCC->CR & ~RCC_CR_HSEBYP) | RCC_CR_HSEON;
+	while (not (retval = (RCC->CR & RCC_CR_HSERDY)) and --waitCycles)
+		;
+	return retval;
+}
+
+bool
+xpcc::stm32::ClockControl::enableLowSpeedInternalClock(uint32_t waitCycles)
+{
+	bool retval;
+	RCC->CSR |= RCC_CSR_LSION;
+	while (not (retval = (RCC->CSR & RCC_CSR_LSIRDY)) and --waitCycles)
+		;
+	return retval;
+}
+
+bool
+xpcc::stm32::ClockControl::enableLowSpeedExternalClock(uint32_t waitCycles)
+{
+	bool retval;
+	RCC->BDCR |= RCC_BDCR_LSEBYP | RCC_BDCR_LSEON;
+	while (not (retval = (RCC->BDCR & RCC_BDCR_LSERDY)) and --waitCycles)
+		;
+	return retval;
+}
+
+bool
+xpcc::stm32::ClockControl::enableLowSpeedExternalCrystal(uint32_t waitCycles)
+{
+	bool retval;
+	RCC->BDCR = (RCC->BDCR & ~RCC_BDCR_LSEBYP) | RCC_BDCR_LSEON;
+	while (not (retval = (RCC->BDCR & RCC_BDCR_LSERDY)) and --waitCycles)
+		;
+	return retval;
 }
 
 %% if target is stm32f2 or target is stm32f4
 // ----------------------------------------------------------------------------
-void
-xpcc::stm32::ClockTree::enablePll(PllSource source, uint8_t pllM,
-	uint16_t pllN, uint8_t pllP, uint8_t pllQ)
+bool
+xpcc::stm32::ClockControl::enablePll(PllSource source, uint8_t pllM,
+	uint16_t pllN, uint8_t pllP, uint8_t pllQ, uint32_t waitCycles)
 {
 	uint32_t tmp = 0;
 
@@ -71,31 +103,36 @@ xpcc::stm32::ClockTree::enablePll(PllSource source, uint8_t pllM,
 
 	// enable pll
 	RCC->CR |= RCC_CR_PLLON;
+
+	while (not (tmp = (RCC->CR & RCC_CR_PLLRDY)) and --waitCycles)
+		;
+
+	return tmp;
 }
 %% else
 // ----------------------------------------------------------------------------
-void
-xpcc::stm32::ClockTree::enablePll(PllSource source,
+bool
+xpcc::stm32::ClockControl::enablePll(PllSource source,
 %% if usbprescaler is defined
 			UsbPrescaler usb,
 %% endif
 %% if pllprediv2 is defined
-			uint8_t pllMul, uint8_t pllPrediv, uint8_t pllPrediv2)
+			uint8_t pllMul, uint8_t pllPrediv, uint8_t pllPrediv2, uint32_t waitCycles)
 %% elif pllprediv is defined
-			uint8_t pllMul, uint8_t pllPrediv)
+			uint8_t pllMul, uint8_t pllPrediv, uint32_t waitCycles)
 %% else
-			uint8_t pllMul)
+			uint8_t pllMul, uint32_t waitCycles)
 %% endif
 {
 %% set pullmul = 'RCC_CFGR_PLLMULL' if target is stm32f1 else 'RCC_CFGR_PLLMUL'
 	// Read reserved values and clear all other values
 %% if usbprescaler is defined
-	uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_USBPRE | {{pullmul}} | RCC_CFGR_PLLSRC);
+	uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_USBPRE | {{pullmul}} | RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE);
 
 	// Divide Output for USB Clock by 1.5?
 	tmp |= static_cast<uint32_t>(usb);
 %% else
-	uint32_t tmp = RCC->CFGR & ~({{pullmul}} | RCC_CFGR_PLLSRC);
+	uint32_t tmp = RCC->CFGR & ~({{pullmul}} | RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE);
 %% endif
 
 	// PLLSRC source for pll
@@ -104,60 +141,38 @@ xpcc::stm32::ClockTree::enablePll(PllSource source,
 	// Pll multiplication factor
 	tmp |= (static_cast<uint32_t>(pllMul - 2) << 18) & {{pullmul}};
 
-	RCC->CFGR = tmp;
-
 %% if pllprediv is defined
 	%% set mask = 'RCC_CFGR2_PREDIV1' if target is stm32f1 else 'RCC_CFGR2_PREDIV'
+#ifdef {{mask}}
 	// HSE PREDIV division factor
 	RCC->CFGR2 = (RCC->CFGR2 & ~({{mask}})) | (uint32_t(pllPrediv - 1) & {{mask}});
+#else
+	if (uint32_t(pllPrediv - 1) & 0x1) tmp |= RCC_CFGR_PLLXTPRE;
+#endif
 %% endif
+	RCC->CFGR = tmp;
 %% if pllprediv2 is defined
 	RCC->CFGR2 = (RCC->CFGR2 & ~(RCC_CFGR2_PREDIV2)) | ((uint32_t(pllPrediv2 - 1) << 4) & RCC_CFGR2_PREDIV2);
 %% endif
 	// enable pll
 	RCC->CR |= RCC_CR_PLLON;
+
+	while (not (tmp = (RCC->CR & RCC_CR_PLLRDY)) and --waitCycles)
+		;
+
+	return tmp;
 }
 %%endif
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::stm32::ClockTree::switchSystemClockTo(SystemClockSource src, uint32_t waitCycles)
+xpcc::stm32::ClockControl::enableSystemClock(SystemClockSource src, uint32_t waitCycles)
 {
-	if (src == SystemClockSource::Pll)
-	{
-		uint32_t t = waitCycles;
-		while (not (RCC->CR & RCC_CR_PLLRDY))
-		{
-			if (not t--)
-				return false;
-		}
-	}
-
-%% if target is stm32f4
-	// APB2 84MHz, APB1 42MHz, AHB 168MHz, select PLL as source
-%% elif target is stm32f2
-	// APB2 60MHz, APB1 30MHz, AHB 120MHz, select PLL as source
-%% endif
-
-	uint32_t tmp = RCC->CFGR;
-	tmp &= ~0x00003fff;
-%% if target is stm32f2 or target is stm32f4
-	tmp |= RCC_CFGR_PPRE1_DIV4;
-	tmp |= RCC_CFGR_PPRE2_DIV2;
-%% elif target is stm32f1 and target.name == '100'
-	tmp |= RCC_CFGR_PPRE1_DIV1;	// APB1   = 24 / 1 = 24 MHz
-	tmp |= RCC_CFGR_PPRE2_DIV1; // APB2   = 24 / 1 = 24 MHz
-%% elif target is stm32f1 or target is stm32f3
-	tmp |= RCC_CFGR_PPRE1_DIV2;	// APB1   = 72 / 2 = 36 MHz
-	tmp |= RCC_CFGR_PPRE2_DIV1; // APB2   = 72 / 1 = 72 MHz
-%% endif
-
-	tmp |= RCC_CFGR_HPRE_DIV1; //
-	tmp |= uint32_t(src);
-	RCC->CFGR = tmp;
+	RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_SW) | uint32_t(src);
 
 	// Wait till the main PLL is used as system clock source
-	while ((RCC->CFGR & (uint32_t) RCC_CFGR_SWS) != (static_cast<uint32_t>(src) << 2))
+	src = SystemClockSource(uint32_t(src) << 2);
+	while ((RCC->CFGR & RCC_CFGR_SWS) != uint32_t(src))
 	{
 		if (not --waitCycles)
 			return false;

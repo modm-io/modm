@@ -84,12 +84,18 @@ Hz(int f)  { return (f == HzDontCare)? HzDontCare : (f / Hz1); }
 enum class
 StartupError : uint8_t
 {
-	None = 0,				// all went well
-	InternalClock = 1,		// was not able to start the internal clock
-	ExternalClock = 2,		// was not able to start the external clock
-	ExternalCrystal = 3,	// was not able to start the external oscillator
-	Pll = 4,				// was not able to start the PLL
-	SystemClock = 5,		// was not able to switch system clock input
+	None = 0,
+	InternalClock,
+	ExternalClock,
+	ExternalCrystal,
+	LowSpeedInternalClock,
+	LowSpeedExternalClock,
+	LowSpeedExternalCrystal,
+	Pll,
+	SystemClock,
+	ClockOutput,
+	RealTimeClock,
+	WatchdogClock
 };
 
 extern uint32_t ATTRIBUTE_FASTDATA fcpu;
