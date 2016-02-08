@@ -63,28 +63,25 @@
  *
  * CCM (Core Coupled memory) (64 kB):
  *   only accessible by the CPU (no DMA) via D-Bus, not I-Bus!
- *                |                                 | 0x1001 0000 <--- __handler_stack_top, __stack_end
+ *                |                                 | 0x1001 0000
  *                |---------------------------------| 0x1000 FFFF
- *                |                                 |
- *                |    Handler/Main Stack (msp)     |
- *                |       (grows downwards)         |
- *                |               |                 |
- *                |               v                 |
- *                |---------------------------------| <------- __thread_stack_top
- *                |                                 |
- *                |    Thread/Process Stack (psp)   |
- *                |       (grows downwards)         |
- *                |               |                 |
- *                |               v                 |
- *                |                                 | <------- __stack_start
- *                |---------------------------------|
  *                |           Unused RAM            |
- *                |     (overwritten by stack!)     |
+ *                |    (perhaps usable for heap?)   |
  *      +-------> |---------------------------------| <------- __fastdata_end
  *      |         |                                 |
  *  .fastdata     |     initialized variables       |
  *      |         |                                 | <------- __fastdata_start
- *      +-------> |---------------------------------| 0x1000 0000
+ *      +-------> |---------------------------------| <------- __process_stack_top, __stack_end
+ *                |       Process Stack (psp)       |
+ *                |       (grows downwards)         |
+ *                |               |                 |
+ *                |               v                 |
+ *                |---------------------------------| <------- __main_stack_top
+ *                |        Main Stack (msp)         |
+ *                |       (grows downwards)         |
+ *                |               |                 |
+ *                |               v                 | <------- __stack_start
+ *                |---------------------------------| 0x1000 0000
  *
  *
  *                          MEMORY MAP (Flash)
@@ -142,9 +139,12 @@ PROVIDE(__ram_start = ORIGIN(RAM));
 PROVIDE(__ram_end   = ORIGIN(RAM) + LENGTH(RAM));
 PROVIDE(__heap_end  = ORIGIN(RAM) + LENGTH(RAM));
 
-/* Used for interrupt handlers */
-HANDLER_STACK_SIZE = DEFINED(__handler_stack_size) ? __handler_stack_size : 1024;
-THREAD_STACK_SIZE  = DEFINED(__thread_stack_size)  ? __thread_stack_size  : 1024;
+/* the thread stack is used only for reporting hard fault conditions! It may therefore be small. */
+PROCESS_STACK_SIZE  = DEFINED(__process_stack_size) ? (__process_stack_size & ~0x7) : 256;
+/* the handler stack is used for main program as well as interrupts */
+MAIN_STACK_SIZE     = DEFINED(__main_stack_size)    ? (__main_stack_size & ~0x7)    : 3k;
+/* combined stack size */
+TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 
 SECTIONS
 {
@@ -162,41 +162,37 @@ SECTIONS
 		__vector_table_ram_start = .;						/* address in RAM */
 
 		/* used for vectors remapped to RAM */
-        KEEP(*(.vectors))
+		KEEP(*(.vectors))
 
-        . = ALIGN (4);
-        __vector_table_ram_end = .;
+		. = ALIGN (4);
+		__vector_table_ram_end = .;
 	} >RAM AT>ROM
 
+	.stack (NOLOAD) :
+	{
+		__stack_start = . ;
+
+		. += MAIN_STACK_SIZE;
+		. = ALIGN (8);
+		__main_stack_top = . ;
+
+		. += PROCESS_STACK_SIZE;
+		. = ALIGN (8);
+		__process_stack_top = . ;
+
+		__stack_end = .;
+	} >CCM
+
 	.fastdata :
-    {
-        __fastdata_load = LOADADDR (.fastdata);		/* address in ROM */
+	{
+		__fastdata_load = LOADADDR (.fastdata);		/* address in ROM */
 		__fastdata_start = .;						/* address in RAM */
 
 		KEEP(*(.fastdata))
 
-        . = ALIGN(4);
-		__fastdata_end = .;
-    } >CCM AT>ROM
-
-	.stack (NOLOAD) :
-	{
-		. = ORIGIN(CCM) + LENGTH(CCM) - HANDLER_STACK_SIZE - THREAD_STACK_SIZE;
 		. = ALIGN(4);
-		__stack_start = . ;
-
-		. += THREAD_STACK_SIZE;
-		. = ALIGN (4);
-		__thread_stack_top = . ;
-
-		. += HANDLER_STACK_SIZE;
-		. = ALIGN (4);
-		__handler_stack_top = . ;
-
-		__stack_end = .;
-
-		. = ALIGN (4);
-	} >CCM
+		__fastdata_end = .;
+	} >CCM AT>ROM
 
 	.text :
 	{

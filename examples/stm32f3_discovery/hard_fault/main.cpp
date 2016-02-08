@@ -26,11 +26,32 @@ MAIN_FUNCTION
 
 	XPCC_LOG_INFO << "Causing a Hardfault now!" << xpcc::endl;
 
-	// simply insert an undefined instruction
+	// simulate some stack usage
+	asm volatile ("push {r0-r12}");
+	asm volatile ("push {r0-r12}");
+	asm volatile ("push {r0-r12}");
+	asm volatile ("pop {r0-r12}");
+	asm volatile ("pop {r0-r12}");
+	asm volatile ("pop {r0-r12}");
+
+	// execute unused stack
+	asm volatile ("ldr pc, =0x20000247");
+
+	// divide by zero
+	volatile uint8_t number = 42;
+	volatile uint8_t divisor = 0;
+	number /= divisor;
+
+	// undefined instruction
 	asm volatile (".short 0xde00");
+
+	// stack overflow
+	while(1) asm volatile ("push {r0-r12}");
 
 	while (1)
 	{
+		xpcc::delayMilliseconds(250);
+		Board::LedSouth::toggle();
 	}
 
 	return 0;

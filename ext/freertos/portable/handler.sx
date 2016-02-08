@@ -91,10 +91,10 @@ vPortStartFirstTask:
 @	ldr		r0, [r0]
 @	ldr		r0, [r0]
 @	msr		msp, r0				/* Set the msp back to the start of the stack. */
-	ldr		r0, =__handler_stack_top
-	msr		msp, r0
-	ldr		r0, =__thread_stack_top
-	msr		psp, r0
+	ldr		r0, =__process_stack_top	/* the inversion of msp/psp here is not a mistake */
+	msr		msp, r0						/* the psp is very small in the xpcc linkerscripts and not used */
+	ldr		r0, =__main_stack_top		/* to de-priviledge the software currently executing */
+	msr		psp, r0						/* FreeRTOS uses the psp as the "main" stack, so we switch here */
 	mov		r0, #2				/* enable process stack pointer */
 	msr		control, r0
 	cpsie	i					/* Globally enable interrupts. */

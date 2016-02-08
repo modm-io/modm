@@ -16,28 +16,13 @@
  * Main internal SRAM1 (up to 40 kB):
  *                |                                 | 0x2001 C000 <--- __handler_stack_top, __stack_end
  *                |---------------------------------| 0x2001 BFFF
- *                |                                 |
- *                |    Handler/Main Stack (msp)     |
- *                |       (grows downwards)         |
- *                |               |                 |
- *                |               v                 |
- *                |---------------------------------| <------- __thread_stack_top
- *                |                                 |
- *                |    Thread/Process Stack (psp)   |
- *                |       (grows downwards)         |
- *                |               |                 |
- *                |               v                 |
- *                |                                 | <------- __stack_start
- *                |---------------------------------|
  *                |           Unused RAM            |
- *                | (overwritten by heap or stack!) |
+ *                |     (overwritten by heap!)      |
  *                |---------------------------------|
- *                |                                 |
  *                |               ^                 |
  *                |               |                 |
  *                |            Heap Area            |
- *                |         (grows upwards)         |
- *                |                                 | <------- __heap_start
+ *                |         (grows upwards)         | <------- __heap_start
  *      +-------> |---------------------------------| <------- __noinit_end
  *      |         |                                 |
  *   .noinit      |     Global data not cleared     |
@@ -52,7 +37,17 @@
  *    .data       |     initialized variables       |
  *      |         |                                 |
  *      |         |                                 |
- *      +-------> |---------------------------------| 0x2000 0000 <--- __ram_start, __data_start
+ *      +-------> |---------------------------------| <------- __process_stack_top, __stack_end, __data_start
+ *                |       Process Stack (psp)       |
+ *                |       (grows downwards)         |
+ *                |               |                 |
+ *                |               v                 |
+ *                |---------------------------------| <------- __main_stack_top
+ *                |        Main Stack (msp)         |
+ *                |       (grows downwards)         |
+ *                |               |                 |
+ *                |               v                 | <------- __stack_start
+ *                |---------------------------------| 0x2000 0000 <--- __ram_start
  *
  *
  * CCM (Core Coupled memory) (up to 16 kB):
@@ -135,8 +130,12 @@ PROVIDE(__ram_end   = ORIGIN(RAM) + LENGTH(RAM));
 PROVIDE(__heap_end  = ORIGIN(RAM) + LENGTH(RAM));
 
 /* Used for interrupt handlers */
-HANDLER_STACK_SIZE = DEFINED(__handler_stack_size) ? __handler_stack_size : 1024;
-THREAD_STACK_SIZE  = DEFINED(__thread_stack_size)  ? __thread_stack_size  : 1024;
+/* the thread stack is used only for reporting hard fault conditions! It may therefore be small. */
+PROCESS_STACK_SIZE  = DEFINED(__process_stack_size) ? (__process_stack_size & ~0x7) : 192;
+/* the handler stack is used for main program as well as interrupts, **main stack size must be a multiple of 32!** */
+MAIN_STACK_SIZE     = DEFINED(__main_stack_size)    ? (__main_stack_size & ~0x1f)    : 2k;
+/* combined stack size */
+TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 
 SECTIONS
 {
@@ -154,10 +153,10 @@ SECTIONS
 		__vector_table_ram_start = .;						/* address in RAM */
 
 		/* used for vectors remapped to RAM */
-        KEEP(*(.vectors))
+		KEEP(*(.vectors))
 
-        . = ALIGN (4);
-        __vector_table_ram_end = .;
+		. = ALIGN (4);
+		__vector_table_ram_end = .;
 	} >CCM AT>ROM
 
 	.fastcode :
@@ -172,15 +171,15 @@ SECTIONS
 	} >CCM AT>ROM
 
 	.fastdata :
-    {
-        __fastdata_load = LOADADDR (.fastdata);		/* address in ROM */
+	{
+		__fastdata_load = LOADADDR (.fastdata);		/* address in ROM */
 		__fastdata_start = .;						/* address in RAM */
 
 		KEEP(*(.fastdata))
 
-        . = ALIGN(4);
+		. = ALIGN(4);
 		__fastdata_end = .;
-    } >CCM AT>ROM
+	} >CCM AT>ROM
 
 	.text :
 	{
@@ -298,6 +297,21 @@ SECTIONS
 	} >ROM
 	_etext = .;
 
+	.stack (NOLOAD) :
+	{
+		__stack_start = . ;
+
+		. += MAIN_STACK_SIZE;
+		. = ALIGN (8);
+		__main_stack_top = . ;
+
+		. += PROCESS_STACK_SIZE;
+		. = ALIGN (8);
+		__process_stack_top = . ;
+
+		__stack_end = .;
+	} >RAM
+
 	/* initialized variables */
 	.data : ALIGN (8)
 	{
@@ -340,25 +354,6 @@ SECTIONS
 		PROVIDE (__noinit_end = .);
 		. = ALIGN (4);
 		PROVIDE (__heap_start = .);
-	} >RAM
-
-	.stack (NOLOAD) :
-	{
-		. = ORIGIN(RAM) + LENGTH(RAM) - HANDLER_STACK_SIZE - THREAD_STACK_SIZE;
-		. = ALIGN(4);
-		__stack_start = . ;
-
-		. += THREAD_STACK_SIZE;
-		. = ALIGN (4);
-		__thread_stack_top = . ;
-
-		. += HANDLER_STACK_SIZE;
-		. = ALIGN (4);
-		__handler_stack_top = . ;
-
-		__stack_end = .;
-
-		. = ALIGN (4);
 	} >RAM
 
 	. = ALIGN(4);
