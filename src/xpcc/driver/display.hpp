@@ -38,6 +38,7 @@
 #include "display/hd44780.hpp"
 #include "display/ks0108.hpp"
 #include "display/max7219matrix.hpp"
+#include "display/nokia5110.hpp"
 #include "display/nokia6610.hpp"
 #include "display/parallel_tft.hpp"
 #include "display/seven_segment.hpp"
