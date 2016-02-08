@@ -10,7 +10,7 @@
 #ifndef XPCC_HD44780_HPP
 #define XPCC_HD44780_HPP
 
-#include <xpcc/architecture/driver.hpp>
+#include <xpcc/architecture/interface/gpio.hpp>
 #include <xpcc/ui/display/character_display.hpp>
 #include "hd44780_base.hpp"
 
