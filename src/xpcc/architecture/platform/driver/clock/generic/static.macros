@@ -73,6 +73,19 @@ public:
 		if (!ClockControl::enable{{ s.name }}(waitCycles))
 %% endif
 			return StartupError::{{ s.name }};
+
+
+%% if target is stm32f2 or target is stm32f4
+			ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div4);
+			ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div2);
+%% elif target is stm32f1 and target.name == '100'
+			ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div1);
+			ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div1);
+%% elif target is stm32f1 or target is stm32f3
+			ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div2);
+			ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div1);
+%% endif
+
 		return StartupError::None;
 	}
 
