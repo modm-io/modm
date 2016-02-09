@@ -187,9 +187,8 @@ class Scanner:
 
 						self.sources.extend(files)
 
-					if self.unittest is True:
-						for header in self.HEADER:
-							self.header.extend(self.env.Glob(p + header))
+					for header in self.HEADER:
+						self.header.extend(self.env.Glob(p + header))
 
 	def __iadd__(self, item):
 		self.append(item)
