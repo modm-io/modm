@@ -62,8 +62,13 @@ CanBitTimingsTest::testPrecalculatedValues()
 
 	TEST_TIMING(MHz42, kBps125, 14, 6, 16);
 	TEST_TIMING(MHz42, kBps250, 14, 6,  8);
-	TEST_TIMING(MHz42, kBps500, 14, 6, 4 );
+	TEST_TIMING(MHz42, kBps500, 14, 6,  4);
 	TEST_TIMING(MHz42,   MBps1, 14, 6,  2);
+
+	TEST_TIMING(MHz32, kBps125, 11, 4, 16);
+	TEST_TIMING(MHz32, kBps250, 11, 4,  8);
+	TEST_TIMING(MHz32, kBps500, 11, 4,  4);
+	TEST_TIMING(MHz32,   MBps1, 11, 4,  2);
 
 }
 

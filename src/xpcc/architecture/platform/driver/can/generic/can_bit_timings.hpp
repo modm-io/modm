@@ -59,7 +59,8 @@ private:
 		       (Clk == xpcc::clock::MHz48)? 11 :
 		       (Clk == xpcc::clock::MHz30)? 10 :
 		       (Clk == xpcc::clock::MHz36)? 12 :
-		       (Clk == xpcc::clock::MHz42)? 14 : 0;
+		       (Clk == xpcc::clock::MHz42)? 14 :
+		       (Clk == xpcc::clock::MHz32)? 11 : 0;
 	}
 
 	static constexpr uint8_t calcBS2() {
@@ -67,7 +68,8 @@ private:
 		       (Clk == xpcc::clock::MHz48)?  4 :
 		       (Clk == xpcc::clock::MHz30)?  4 :
 		       (Clk == xpcc::clock::MHz36)?  5 :
-		       (Clk == xpcc::clock::MHz42)?  6 : 0;
+		       (Clk == xpcc::clock::MHz42)?  6 :
+		       (Clk == xpcc::clock::MHz32)?  4 : 0;
 	}
 
 	static constexpr CanBitTimingConfguration calculateBestConfig() {
