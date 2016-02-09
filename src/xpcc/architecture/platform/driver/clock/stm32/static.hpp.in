@@ -122,11 +122,7 @@ namespace xpcc
 
 %#------------ Inputs ---------------------------------------------------------
 %% set internalClock =		{'name': "InternalClock",
-							 'fixedFrequency': "MHz8" }
-%% if target is stm32f4 and target.name == '401'
-	%% set internalClock =		{'name': "InternalClock",
-							 	 'fixedFrequency': "MHz16" }
-%% endif
+							 'fixedFrequency': "MHz16" }
 %% set externalClock =		{'name': "ExternalClock",
 							 'minFrequency': "MHz4",
 							 'maxFrequency': "MHz32" }
@@ -182,6 +178,8 @@ namespace xpcc
 										 externalCrystal, pll] }
 							%# TODO: Add more sources
 %% elif target is stm32f1 and target.name == '100'
+	%% set internalClock =	{'name': "InternalClock",
+							 'fixedFrequency': "MHz8" }
 	%% set sys_timer = 	{'name': "SystemTimer",
 					 'prescaler': "1/8" }
 	%% set apb1_timers = 	{'name': "APB1Timers",
@@ -216,6 +214,8 @@ namespace xpcc
 							 'sources': [internalClock, externalClock,
 										 externalCrystal, pll, systemClock] }
 %% elif target is stm32f1 or target is stm32f3
+	%% set internalClock =	{'name': "InternalClock",
+							 'fixedFrequency': "MHz16" }
 	%% set sys_timer = 	{'name': "SystemTimer",
 					 'prescaler': "1/8" }
 	%% set apb1_timers = 	{'name': "APB1Timers",
