@@ -45,14 +45,16 @@ def collect_defines(defines, source):
 def qt_creator_project_method(env, file_scanner):
 	# collect values
 	project_name = env['XPCC_PROJECT_NAME']
+	project_path = env['XPCC_BASEPATH']
 	defines = {}
 	collect_defines(defines, env['CPPDEFINES'])
 	collect_defines(defines, file_scanner.defines)
-	files = [str(ff) for ff in file_scanner.header + file_scanner.sources]
+	files = [os.path.relpath(str(ff), project_path)
+	         for ff in file_scanner.header + file_scanner.sources]
 	includes = env['CPPPATH']
 
 	# generate project files
-	proj_path = os.path.join(env['XPCC_BASEPATH'], project_name)
+	proj_path = os.path.join(project_path, project_name)
 	temp_path = os.path.join(env['XPCC_ROOTPATH'], 'templates', 'qtcreator', 'project')
 	return [
 		env.Jinja2Template(
