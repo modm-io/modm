@@ -181,7 +181,7 @@ class STMDeviceReader(XMLDeviceReader):
 		# I have not found a way to extract the correct vector _position_ from the ST device files
 		# so we have to swallow our pride and just parse the header file
 		# ext/cmsis/stm32/Device/ST/STM32F4xx/Include/
-		headerFilePath = os.path.join('..', '..', 'ext', 'cmsis', 'stm32', 'Device', 'ST', 'STM32{}xx'.format(self.id.family.upper()), 'Include', '{}.h'.format(dev_def.lower()))
+		headerFilePath = os.path.join('..', '..', 'ext', 'st', 'stm32{}xx'.format(self.id.family), 'Include', '{}.h'.format(dev_def.lower()))
 		headerFile = open(headerFilePath, 'r').read()
 		match = re.search("typedef enum.*?/\*\*.*?/\*\*.*?\*/(?P<table>.*?)} IRQn_Type;", headerFile, re.DOTALL)
 		if not match:
