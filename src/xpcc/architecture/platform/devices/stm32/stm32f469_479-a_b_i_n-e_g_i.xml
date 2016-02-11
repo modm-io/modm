@@ -5,8 +5,9 @@
  		Please modify the xpcc/tools/device_file_generator code instead and rebuild this file.
  		Be aware, that regenerated files might have a different composition due to technical reasons. -->
   <device platform="stm32" family="f4" name="469|479" pin_id="a|b|i|n" size_id="e|g|i">
-    <flash device-name="469">524288</flash>
-    <flash device-name="479">1048576</flash>
+    <flash device-size-id="e">524288</flash>
+    <flash device-size-id="g">1048576</flash>
+    <flash device-size-id="i">2097152</flash>
     <ram>327680</ram>
     <core>cortex-m4f</core>
 	<linkerscript device-size-id="i">stm32f46x_i.ld</linkerscript>
@@ -19,8 +20,9 @@
     <define device-name="479">STM32F479xx</define>
     <define>STM32F4XX</define>
     <driver type="core" name="cortex">
-      <memory device-name="469" access="rx" start="0x8000000" name="flash" size="512"/>
-      <memory device-name="479" access="rx" start="0x8000000" name="flash" size="1024"/>
+      <memory device-size-id="e" access="rx" start="0x8000000" name="flash" size="512"/>
+      <memory device-size-id="g" access="rx" start="0x8000000" name="flash" size="1024"/>
+      <memory device-size-id="i" access="rx" start="0x8000000" name="flash" size="2048"/>
       <memory access="rw" start="0x10000000" name="ccm" size="64"/>
       <memory access="rwx" start="0x20000000" name="sram1" size="160"/>
       <memory access="rwx" start="0x20028000" name="sram2" size="32"/>

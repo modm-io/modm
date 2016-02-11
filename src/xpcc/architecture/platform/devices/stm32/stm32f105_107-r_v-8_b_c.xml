@@ -5,8 +5,9 @@
  		Please modify the xpcc/tools/device_file_generator code instead and rebuild this file.
  		Be aware, that regenerated files might have a different composition due to technical reasons. -->
   <device platform="stm32" family="f1" name="105|107" pin_id="r|v" size_id="8|b|c">
-    <flash device-name="105">65536</flash>
-    <flash device-name="107">131072</flash>
+    <flash device-size-id="8">65536</flash>
+    <flash device-size-id="b">131072</flash>
+    <flash device-size-id="c">262144</flash>
     <ram>65536</ram>
     <linkerscript device-size-id="b">stm32f107_b.ld</linkerscript>
     <linkerscript device-size-id="c">stm32f107_c.ld</linkerscript>
@@ -17,8 +18,9 @@
     <define device-name="105">STM32F105xC</define>
     <define device-name="107">STM32F107xC</define>
     <driver type="core" name="cortex">
-      <memory device-name="105" access="rx" start="0x8000000" name="flash" size="64"/>
-      <memory device-name="107" access="rx" start="0x8000000" name="flash" size="128"/>
+      <memory device-size-id="8" access="rx" start="0x8000000" name="flash" size="64"/>
+      <memory device-size-id="b" access="rx" start="0x8000000" name="flash" size="128"/>
+      <memory device-size-id="c" access="rx" start="0x8000000" name="flash" size="256"/>
       <memory access="rwx" start="0x20000000" name="sram1" size="64"/>
       <vector position="0" name="WWDG"/>
       <vector position="1" name="PVD"/>

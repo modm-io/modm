@@ -5,7 +5,8 @@
  		Please modify the xpcc/tools/device_file_generator code instead and rebuild this file.
  		Be aware, that regenerated files might have a different composition due to technical reasons. -->
   <device platform="stm32" family="f1" name="100" pin_id="c|r|v" size_id="8|b">
-    <flash>65536</flash>
+    <flash device-size-id="8">65536</flash>
+    <flash device-size-id="b">131072</flash>
     <ram>8192</ram>
     <core>cortex-m3</core>
     <linkerscript>stm32f100_b.ld</linkerscript>
@@ -15,7 +16,8 @@
     <header>stm32f1xx.h</header>
     <define>STM32F100xB</define>
     <driver type="core" name="cortex">
-      <memory access="rx" start="0x8000000" name="flash" size="64"/>
+      <memory device-size-id="8" access="rx" start="0x8000000" name="flash" size="64"/>
+      <memory device-size-id="b" access="rx" start="0x8000000" name="flash" size="128"/>
       <memory access="rwx" start="0x20000000" name="sram1" size="8"/>
       <vector position="0" name="WWDG"/>
       <vector position="1" name="PVD"/>
