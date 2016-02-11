@@ -25,26 +25,28 @@ if __name__ == "__main__":
 	logger = Logger(level)
 	devices = []
 	supported_families = ['STM32F0', 'STM32F1', 'STM32F2', 'STM32F3', 'STM32F4', 'STM32F7']
-	family = None
+	filtered_family = None
+	filtered_device = None
 
 	for arg in sys.argv[1:]:
 		if arg in ['error', 'warn', 'info', 'debug', 'disabled']:
 			level = arg
 			logger.setLogLevel(level)
 			continue
-		if arg in supported_families:
-			family = arg
+		if any (arg.startswith(f) for f in supported_families):
+			filtered_device = arg
+			filtered_family = arg[:7]
 		else:
 			logger.error("Invalid family! Valid input is '{}', found '{}'".format(", ".join(supported_families), arg))
 			exit(1)
 
-	if family is None:
+	if filtered_device is None:
 		logger.error("Please provide a device family: '{}'".format(", ".join(supported_families)))
 		exit(1)
 
-	devicesFromFamily = STMDeviceReader.getDevicesFromFamily(family, logger)
+	devicesFromFamily = STMDeviceReader.getDevicesFromFamily(filtered_family, logger)
 
-	for deviceName in devicesFromFamily:
+	for deviceName in [d for d in devicesFromFamily if d.startswith(filtered_device)]:
 		device = STMDeviceReader(deviceName, logger)
 		devices.append(Device(device, logger))
 
@@ -56,4 +58,3 @@ if __name__ == "__main__":
 	for dev in merger.mergedDevices:
 		writer = STMDeviceWriter(dev, logger)
 		writer.write(folder)
-
