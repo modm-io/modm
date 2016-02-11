@@ -75,17 +75,23 @@ class STMDeviceReader(XMLDeviceReader):
 		# The <ram> and <flash> can occur multiple times.
 		# they are "ordered" in the same way as the `(S-I-Z-E)` ids in the device combo name
 		# we must first find out which index the current self.id.size_id has inside `(S-I-Z-E)`
-		sizeIndex = 0
+		sizeIndexFlash = 0
+		sizeIndexRam = 0
 
 		matchString = "\(.(-.)*\)"
 		match = re.search(matchString, comboDeviceName)
 		if match:
 			sizeArray = match.group(0)[1:-1].lower().split("-")
-			sizeIndex = sizeArray.index(self.id.size_id)
+			sizeIndexFlash = sizeArray.index(self.id.size_id)
+			sizeIndexRam = sizeIndexFlash
 
 		rams = self.query("//Ram")
-		if len(rams) <= sizeIndex:
-			sizeIndex = 0
+		if len(rams) <= sizeIndexRam:
+			sizeIndexRam = 0
+
+		flashs = self.query("//Flash")
+		if len(flashs) <= sizeIndexFlash:
+			sizeIndexFlash = 0
 
 		mem_fam = stm32_memory[self.id.family]
 		mem_model = None
@@ -100,8 +106,8 @@ class STMDeviceReader(XMLDeviceReader):
 		if mem_model == None:
 			self.log.error("STMDeviceReader: Memory model not found for device '{}'".format(self.id.string))
 
-		ram = int(rams[sizeIndex].text) + mem_model['memories']['sram1']
-		flash = int(self.query("//Flash")[sizeIndex].text) + mem_model['memories']['flash']
+		ram = int(rams[sizeIndexRam].text) + mem_model['memories']['sram1']
+		flash = int(flashs[sizeIndexFlash].text) + mem_model['memories']['flash']
 		self.addProperty('ram', ram * 1024)
 		self.addProperty('flash', flash * 1024)
 
