@@ -22,7 +22,7 @@ MAIN_FUNCTION
 
 	// initialize Uart for XPCC_LOG
 	GpioOutputA9::connect(Usart1::Tx);
-	Usart1::initialize<Board::DefaultSystemClock, 115200>(12);
+	Usart1::initialize<Board::systemClock, 115200>(12);
 
 	XPCC_LOG_INFO << "Causing a Hardfault now!" << xpcc::endl;
 

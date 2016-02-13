@@ -15,7 +15,7 @@ MAIN_FUNCTION
 	// Enable USART 1
 	GpioOutputA9::connect(Usart1::Tx);
 	GpioInputA10::connect(Usart1::Rx, Gpio::InputType::PullUp);
-	Usart1::initialize<Board::DefaultSystemClock, 9600>(12);
+	Usart1::initialize<Board::systemClock, 9600>(12);
 
 	while (1)
 	{

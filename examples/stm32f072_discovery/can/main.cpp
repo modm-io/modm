@@ -62,7 +62,7 @@ MAIN_FUNCTION
 	// Initialize Usart
 	GpioOutputA9::connect(Usart1::Tx);
 	GpioInputA10::connect(Usart1::Rx, Gpio::InputType::PullUp);
-	Usart1::initialize<Board::DefaultSystemClock, 115200>(12);
+	Usart1::initialize<Board::systemClock, 115200>(12);
 
 	XPCC_LOG_INFO << "CAN Test Program" << xpcc::endl;
 
@@ -70,7 +70,7 @@ MAIN_FUNCTION
 	// Initialize Can
 	GpioInputB8::connect(Can1::Rx, Gpio::InputType::PullUp);
 	GpioOutputB9::connect(Can1::Tx, Gpio::OutputType::PushPull);
-	Can1::initialize<Board::DefaultSystemClock, Can1::Bitrate::kBps125>(9);
+	Can1::initialize<Board::systemClock, Can1::Bitrate::kBps125>(9);
 
 	XPCC_LOG_INFO << "Setting up Filter for Can ..." << xpcc::endl;
 	// Receive every message

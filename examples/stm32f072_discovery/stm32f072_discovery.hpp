@@ -27,7 +27,7 @@ namespace Board
 
 /// STM32F072 running at 48MHz generated from the internal 48MHz clock
 // TODO: enable once clock driver is implemented
-//using DefaultSystemClock = SystemClock<InternalClock<MHz48>, MHz48>;
+//using systemClock = SystemClock<InternalClock<MHz48>, MHz48>;
 
 template<int F = 8 * 1000 * 1000>
 struct DummyClock {
@@ -37,7 +37,7 @@ struct DummyClock {
 	static constexpr int Spi2 = Frequency;
 };
 
-using DefaultSystemClock = DummyClock<48 * 1000 * 1000>;
+using systemClock = DummyClock<48 * 1000 * 1000>;
 
 using LedUp    = GpioOutputC6;
 using LedDown  = GpioOutputC7;
@@ -62,45 +62,22 @@ using Gyroscope = xpcc::L3gd20< Transport >;
 }
 
 
-inline bool
-enableHSI48()
-{
-	RCC->CR2 |= RCC_CR2_HSI48ON;
-	uint32_t t = 1500;
-	while (!(RCC->CR2 & RCC_CR2_HSI48RDY) and --t) {
-	}
-	return static_cast<bool>(RCC->CR2 & RCC_CR2_HSI48RDY);
-}
-
-inline bool
-switchSystemClockToHSI48()
-{
-	// use HSI48, all prescalers set to 1
-	RCC->CFGR = RCC_CFGR_SW_HSI48;
-	uint32_t t = 1500;
-	// Wait till the main PLL is used as system clock source
-	while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_HSI48 and --t) {
-	}
-
-	const bool success = ((RCC->CFGR & RCC_CFGR_SWS) == RCC_CFGR_SWS_HSI48);
-
-	if(success) {
-		xpcc::clock::fcpu_MHz = 48;
-		xpcc::clock::fcpu_kHz = 48 * 1000;
-		xpcc::clock::ns_per_loop = 4000 / 48;	// ~83ns per delay loop
-	}
-
-	return success;
-}
-
 inline void
 initialize()
 {
-	// TODO: enable once clock driver is implemented
-	// DefaultSystemClock::enable();
-	enableHSI48();
-	switchSystemClockToHSI48();
-	xpcc::cortex::SysTickTimer::initialize<DefaultSystemClock>();
+	// Enable the interal 48MHz clock
+	ClockControl::enableInternalClockMHz48();
+	// set flash latency to 1 otherwise the controller crashes
+	FLASH->ACR |= FLASH_ACR_PRFTBE | 1;
+	// Switch to the 48MHz clock
+	ClockControl::enableSystemClock(ClockControl::SystemClockSource::InternalClockMHz48);
+	// update frequencies for busy-wait delay functions
+	xpcc::clock::fcpu        = MHz48;
+	xpcc::clock::fcpu_kHz    = 48000;
+	xpcc::clock::fcpu_MHz    = 48;
+	xpcc::clock::ns_per_loop = 4000 / 48;	// ~83ns per delay loop
+
+	xpcc::cortex::SysTickTimer::initialize<systemClock>();
 
 	LedUp::setOutput(xpcc::Gpio::Low);
 	LedDown::setOutput(xpcc::Gpio::Low);
@@ -133,7 +110,7 @@ initializeL3g()
 	l3g::Mosi::connect(l3g::SpiMaster::Mosi);
 	l3g::Miso::connect(l3g::SpiMaster::Miso);
 
-	l3g::SpiMaster::initialize<DefaultSystemClock, 3000000>();
+	l3g::SpiMaster::initialize<systemClock, 3000000>();
 	l3g::SpiMaster::setDataMode(l3g::SpiMaster::DataMode::Mode3);
 }
 
