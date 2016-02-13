@@ -11,5 +11,10 @@
 		<usbprescaler device-name="042|048|070|072|078|102|103|302|303|373">True</usbprescaler>
 		<pllprediv device-family="f0|f3">True</pllprediv>
 		<pllprediv device-name="100|105|107">True</pllprediv>
+
+		<hsi_frequency device-family="f0|f1|f3">8</hsi_frequency>
+		<hsi_frequency device-family="f2|f4">16</hsi_frequency>
+		<lsi_frequency device-family="f0|f1|f3">40</lsi_frequency>
+		<lsi_frequency device-family="f2|f4">32</lsi_frequency>
 	</driver>
 </rca>
