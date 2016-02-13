@@ -30,6 +30,8 @@ enum Frequency
 	kHz1        = 1000 *  Hz1,
 	kHz10       =   10 * kHz1,
 	kHz20       =   20 * kHz1,
+	kHz32       =   32 * kHz1,
+	kHz40       =   40 * kHz1,
 	kHz50       =   50 * kHz1,
 	kHz100      =  100 * kHz1,
 	kHz125      =  125 * kHz1,

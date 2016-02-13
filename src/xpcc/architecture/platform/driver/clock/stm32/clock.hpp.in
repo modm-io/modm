@@ -35,7 +35,7 @@ public:
 		/// High speed external clock (see HseConfig)
 		Hse = RCC_PLLCFGR_PLLSRC_HSE,
 %% elif target is stm32f3
-		/// High speed internal clock (16 MHz)
+		/// High speed internal clock (8 MHz)
 		Hsi = RCC_CFGR_PLLSRC_HSI_DIV2,
 		/// High speed external clock (see HseConfig)
 		Hse = RCC_CFGR_PLLSRC_HSE_PREDIV,
@@ -57,10 +57,10 @@ public:
 		Hsi = RCC_CFGR_SW_HSI,
 		Hse = RCC_CFGR_SW_HSE,
 
-		Pll = RCC_CFGR_SW_PLL,
 		InternalClock = Hsi,
 		ExternalClock = Hse,
 		ExternalCrystal = Hse,
+		Pll = RCC_CFGR_SW_PLL,
 	};
 
 	enum class
