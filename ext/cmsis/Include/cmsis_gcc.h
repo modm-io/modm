@@ -216,7 +216,7 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE void __set_PRIMASK(uint32_t p
 }
 
 
-#if       (__CORTEX_M >= 0x03U)
+#if defined(__CORTEX_M) && (__CORTEX_M >= 0x03U)
 
 /**
   \brief   Enable FIQ
@@ -301,10 +301,10 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE void __set_FAULTMASK(uint32_t
   __ASM volatile ("MSR faultmask, %0" : : "r" (faultMask) : "memory");
 }
 
-#endif /* (__CORTEX_M >= 0x03U) */
+#endif /* defined(__CORTEX_M) && (__CORTEX_M >= 0x03U) */
 
 
-#if       (__CORTEX_M == 0x04U) || (__CORTEX_M == 0x07U)
+#if defined(__CORTEX_M) && ((__CORTEX_M == 0x04U) || (__CORTEX_M == 0x07U))
 
 /**
   \brief   Get FPSCR
@@ -342,7 +342,7 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE void __set_FPSCR(uint32_t fps
 #endif
 }
 
-#endif /* (__CORTEX_M == 0x04U) || (__CORTEX_M == 0x07U) */
+#endif /* defined(__CORTEX_M) && ((__CORTEX_M == 0x04U) || (__CORTEX_M == 0x07U)) */
 
 
 
@@ -527,7 +527,7 @@ __attribute__((always_inline)) __STATIC_INLINE uint32_t __RBIT(uint32_t value)
 {
   uint32_t result;
 
-#if       (__CORTEX_M >= 0x03U) || (__CORTEX_SC >= 300U)
+#if (defined(__CORTEX_M) && (__CORTEX_M >= 0x03U)) || (defined(__CORTEX_SC) && (__CORTEX_SC >= 300U))
    __ASM volatile ("rbit %0, %1" : "=r" (result) : "r" (value) );
 #else
   int32_t s = 4 /*sizeof(v)*/ * 8 - 1; /* extra shift needed at end */
@@ -554,7 +554,7 @@ __attribute__((always_inline)) __STATIC_INLINE uint32_t __RBIT(uint32_t value)
 #define __CLZ             __builtin_clz
 
 
-#if       (__CORTEX_M >= 0x03U) || (__CORTEX_SC >= 300U)
+#if (defined(__CORTEX_M) && (__CORTEX_M >= 0x03U)) || (defined(__CORTEX_SC) && (__CORTEX_SC >= 300U))
 
 /**
   \brief   LDR Exclusive (8 bit)
@@ -816,7 +816,7 @@ __attribute__((always_inline)) __STATIC_INLINE void __STRT(uint32_t value, volat
    __ASM volatile ("strt %1, %0" : "=Q" (*addr) : "r" (value) );
 }
 
-#endif /* (__CORTEX_M >= 0x03U) || (__CORTEX_SC >= 300U) */
+#endif /* (defined(__CORTEX_M) && (__CORTEX_M >= 0x03U)) || (defined(__CORTEX_SC) && (__CORTEX_SC >= 300U)) */
 
 /*@}*/ /* end of group CMSIS_Core_InstructionInterface */
 
@@ -827,7 +827,7 @@ __attribute__((always_inline)) __STATIC_INLINE void __STRT(uint32_t value, volat
   @{
 */
 
-#if (__CORTEX_M >= 0x04U)  /* only for Cortex-M4 and above */
+#if defined(__CORTEX_M) && (__CORTEX_M >= 0x04U)  /* only for Cortex-M4 and above */
 
 __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __SADD8(uint32_t op1, uint32_t op2)
 {
@@ -1362,7 +1362,7 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __SMMLA (int32_t op1
  return(result);
 }
 
-#endif /* (__CORTEX_M >= 0x04) */
+#endif /* defined(__CORTEX_M) && (__CORTEX_M >= 0x04U) */
 /*@} end of group CMSIS_SIMD_intrinsics */
 
 
