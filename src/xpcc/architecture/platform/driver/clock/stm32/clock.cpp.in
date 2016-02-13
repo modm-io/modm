@@ -10,6 +10,23 @@
 #include "../../../device.hpp"
 #include "clock.hpp"
 
+namespace xpcc
+{
+namespace clock
+{
+
+uint32_t ATTRIBUTE_FASTDATA fcpu({{ hsi_frequency|int * 1000000 }});
+uint32_t ATTRIBUTE_FASTDATA fcpu_kHz({{ hsi_frequency|int * 1000 }});
+uint16_t ATTRIBUTE_FASTDATA fcpu_MHz({{ hsi_frequency }});
+%% if target is cortex_m0
+uint16_t ATTRIBUTE_FASTDATA ns_per_loop asm("ns_per_loop") ({{4000.0 / hsi_frequency|int}});
+%% else
+uint16_t ATTRIBUTE_FASTDATA ns_per_loop asm("ns_per_loop") ({{3000.0 / hsi_frequency|int}});
+%% endif
+
+}
+}
+
 // ----------------------------------------------------------------------------
 bool
 xpcc::stm32::ClockControl::enableInternalClock(uint32_t waitCycles)
