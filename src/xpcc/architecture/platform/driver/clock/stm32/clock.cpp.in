@@ -28,6 +28,30 @@ uint16_t ATTRIBUTE_FASTDATA ns_per_loop asm("ns_per_loop") ({{3000.0 / hsi_frequ
 }
 
 // ----------------------------------------------------------------------------
+%% if target is stm32f0
+bool
+xpcc::stm32::ClockControl::enableInternalClockMHz14(uint32_t waitCycles)
+{
+	bool retval;
+	RCC->CR2 |= RCC_CR2_HSI14ON;
+	while (not (retval = (RCC->CR2 & RCC_CR2_HSI14RDY)) and --waitCycles)
+		;
+	return retval;
+}
+%% endif
+
+%% if hsi48 is defined
+bool
+xpcc::stm32::ClockControl::enableInternalClockMHz48(uint32_t waitCycles)
+{
+	bool retval;
+	RCC->CR2 |= RCC_CR2_HSI48ON;
+	while (not (retval = (RCC->CR2 & RCC_CR2_HSI48RDY)) and --waitCycles)
+		;
+	return retval;
+}
+%% endif
+
 bool
 xpcc::stm32::ClockControl::enableInternalClock(uint32_t waitCycles)
 {

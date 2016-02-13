@@ -34,7 +34,7 @@ public:
 		Hsi = RCC_PLLCFGR_PLLSRC_HSI,
 		/// High speed external clock (see HseConfig)
 		Hse = RCC_PLLCFGR_PLLSRC_HSE,
-%% elif target is stm32f3
+%% elif target is stm32f0 or target is stm32f3
 		/// High speed internal clock (8 MHz)
 		Hsi = RCC_CFGR_PLLSRC_HSI_DIV2,
 		/// High speed external clock (see HseConfig)
@@ -44,6 +44,11 @@ public:
 		Hsi = 0,
 		/// High speed external clock (see HseConfig)
 		Hse = RCC_CFGR_PLLSRC,
+%% endif
+%% if hsi48 is defined
+		/// High speed internal clock (48 MHz)
+		Hsi48 = RCC_CFGR_PLLSRC_HSI48_PREDIV,
+		InternalClockMHz48 = Hsi48,
 %% endif
 
 		InternalClock = Hsi,
@@ -56,6 +61,10 @@ public:
 	{
 		Hsi = RCC_CFGR_SW_HSI,
 		Hse = RCC_CFGR_SW_HSE,
+%% if hsi48 is defined
+		Hsi48 = RCC_CFGR_SW_HSI48,
+		InternalClockMHz48 = Hsi48,
+%% endif
 
 		InternalClock = Hsi,
 		ExternalClock = Hse,
@@ -97,6 +106,17 @@ public:
 		Div512 = RCC_CFGR_HPRE_DIV512
 	};
 
+%% if target is stm32f0
+	enum class
+	ApbPrescaler : uint32_t
+	{
+		Div1   = RCC_CFGR_PPRE_DIV1,
+		Div2   = RCC_CFGR_PPRE_DIV2,
+		Div4   = RCC_CFGR_PPRE_DIV4,
+		Div8   = RCC_CFGR_PPRE_DIV8,
+		Div16  = RCC_CFGR_PPRE_DIV16
+	};
+%% else
 	enum class
 	Apb1Prescaler : uint32_t
 	{
@@ -116,6 +136,7 @@ public:
 		Div8   = RCC_CFGR_PPRE2_DIV8,
 		Div16  = RCC_CFGR_PPRE2_DIV16
 	};
+%% endif
 
 %% if target is stm32f2 or target is stm32f4
 	enum class
@@ -135,7 +156,7 @@ public:
 		ExternalCrystal = RCC_CFGR_MCO1_1,
 		Pll = RCC_CFGR_MCO1_1 | RCC_CFGR_MCO1_0,
 	};
-%% elif target is stm32f1 or target is stm32f3
+%% else
 	enum class
 	ClockOutputSource : uint32_t
 	{
@@ -143,6 +164,12 @@ public:
 		InternalClock = RCC_CFGR_MCO_HSI,
 		ExternalClock = RCC_CFGR_MCO_HSE,
 		ExternalCrystal = RCC_CFGR_MCO_HSE,
+	%% if target is stm32f0
+		InternalClockMHz14 = RCC_CFGR_MCO_HSI14,
+	%% endif
+	%% if hsi48 is defined
+		InternalClockMHz48 = RCC_CFGR_MCO_HSI48,
+	%% endif
 	%% if target is stm32f1
 		Pll = RCC_CFGR_MCO_PLLCLK_DIV2,	///< divided by 2
 	%% else
@@ -162,6 +189,16 @@ public:
 	// sources
 	static bool
 	enableInternalClock(uint32_t waitCycles = 2048);
+
+%% if target is stm32f0
+	static bool
+	enableInternalClockMHz14(uint32_t waitCycles = 2048);
+%% endif
+
+%% if hsi48 is defined
+	static bool
+	enableInternalClockMHz48(uint32_t waitCycles = 2048);
+%% endif
 
 	static bool
 	enableExternalClock(uint32_t waitCycles = 2048);
@@ -277,6 +314,14 @@ public:
 		return true;
 	}
 
+%% if target is stm32f0
+	static inline bool
+	setApbPrescaler(ApbPrescaler prescaler)
+	{
+		RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_PPRE) | uint32_t(prescaler);
+		return true;
+	}
+%% else
 	static inline bool
 	setApb1Prescaler(Apb1Prescaler prescaler)
 	{
@@ -290,6 +335,7 @@ public:
 		RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_PPRE2) | uint32_t(prescaler);
 		return true;
 	}
+%% endif
 
 public:
 	static inline uint32_t
