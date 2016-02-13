@@ -26,7 +26,7 @@ namespace Board
 /// STM32F103RB running at 64MHz generated from the internal 8MHz crystal
 // Dummy clock for devices
 struct systemClock {
-	static constexpr uint32_t Frequency = 64000000;
+	static constexpr uint32_t Frequency = MHz64;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 2;
 	static constexpr uint32_t Apb2 = Frequency;
@@ -109,10 +109,10 @@ initialize()
 	ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div2);
 	ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div1);
 	// update frequencies for busy-wait delay functions
-	xpcc::clock::fcpu        = systemClock::Frequency;
-	xpcc::clock::fcpu_kHz    = systemClock::Frequency / 1000;
-	xpcc::clock::fcpu_MHz    = systemClock::Frequency / 1000000;
-	xpcc::clock::ns_per_loop = std::round(1000000000.f / systemClock::Frequency * 3.f);
+	xpcc::clock::fcpu        = MHz64;
+	xpcc::clock::fcpu_kHz    = 64000;
+	xpcc::clock::fcpu_MHz    = 64;
+	xpcc::clock::ns_per_loop = 47; // 3000 / 64 = 46.875 = ~47ns per delay loop
 
 	xpcc::cortex::SysTickTimer::initialize<systemClock>();
 
