@@ -662,6 +662,9 @@ WARN_LOGFILE           =
 # with spaces.
 
 INPUT                  = ../src/ \
+                         ../build/gpio_basic/libxpcc/generated_platform/ \
+                         ../build/gpio_blinking/libxpcc/generated_platform/ \
+                         ../build/stm32f4_discovery/blink/libxpcc/generated_platform/ \
                          .
 
 # This tag can be used to specify the character encoding of the source files
