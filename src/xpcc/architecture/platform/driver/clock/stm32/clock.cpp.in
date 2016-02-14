@@ -18,10 +18,13 @@ uint32_t ATTRIBUTE_FASTDATA fcpu({{ hsi_frequency|int * 1000000 }});
 uint32_t ATTRIBUTE_FASTDATA fcpu_kHz({{ hsi_frequency|int * 1000 }});
 uint16_t ATTRIBUTE_FASTDATA fcpu_MHz({{ hsi_frequency }});
 %% if target is cortex_m0
-uint16_t ATTRIBUTE_FASTDATA ns_per_loop asm("ns_per_loop") ({{4000.0 / hsi_frequency|int}});
+	%% set loops = 4000.0
+%% elif target is cortex_m7
+	%% set loops = 1000.0
 %% else
-uint16_t ATTRIBUTE_FASTDATA ns_per_loop asm("ns_per_loop") ({{3000.0 / hsi_frequency|int}});
+	%% set loops = 3000.0
 %% endif
+uint16_t ATTRIBUTE_FASTDATA ns_per_loop asm("ns_per_loop") ({{ loops / hsi_frequency|int}});
 
 }
 }
@@ -111,7 +114,7 @@ xpcc::stm32::ClockControl::enableLowSpeedExternalCrystal(uint32_t waitCycles)
 	return retval;
 }
 
-%% if target is stm32f2 or target is stm32f4
+%% if target is stm32f2 or target is stm32f4 or target is stm32f7
 // ----------------------------------------------------------------------------
 bool
 xpcc::stm32::ClockControl::enablePll(PllSource source, uint8_t pllM,

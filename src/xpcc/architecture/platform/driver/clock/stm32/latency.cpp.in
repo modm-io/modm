@@ -224,7 +224,7 @@ voltage range, the maximum frequency should be adapted accordingly:
 %% elif target is stm32f7
 /*
 For the stm32f7xx devices, the maximum frequency of the SYSCLK and HCLK is 216 MHz,
-PCLK2 108 MHz and PCLK1 54 MHz. Depending on the device
+PCLK2 90 MHz and PCLK1 45 MHz. Depending on the device
 voltage range, the maximum frequency should be adapted accordingly:
 +---------------+---------------------------------------------------------------------+
 | Latency       |                HCLK clock frequency (MHz)                           |

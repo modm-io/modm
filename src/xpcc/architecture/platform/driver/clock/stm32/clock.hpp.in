@@ -44,7 +44,7 @@ public:
 	enum class
 	PllSource : uint32_t
 	{
-%% if target is stm32f2 or target is stm32f4
+%% if target is stm32f2 or target is stm32f4 or target is stm32f7
 		/// High speed internal clock (16 MHz)
 		Hsi = RCC_PLLCFGR_PLLSRC_HSI,
 		/// High speed external clock (see HseConfig)
@@ -153,7 +153,7 @@ public:
 	};
 %% endif
 
-%% if target is stm32f2 or target is stm32f4
+%% if target is stm32f2 or target is stm32f4 or target is stm32f7
 	enum class
 	ClockOutput1Source : uint32_t
 	{
@@ -231,7 +231,7 @@ public:
 	enableLowSpeedExternalCrystal(uint32_t waitCycles = 2048);
 
 	// plls
-%% if target is stm32f2 or target is stm32f4
+%% if target is stm32f2 or target is stm32f4 or target is stm32f7
 	/**
 	 * Enable PLL.
 	 *
@@ -294,7 +294,7 @@ public:
 	enableWatchdogClock(WatchdogClockSource /*src*/)
 	{ return true; }
 
-%% if target is stm32f2 or target is stm32f4
+%% if target is stm32f2 or target is stm32f4 or target is stm32f7
 	static inline bool
 	enableClockOutput1(ClockOutput1Source src, uint8_t div)
 	{
