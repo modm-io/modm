@@ -167,9 +167,9 @@ public:
 	ClockOutput2Source : uint32_t
 	{
 		SystemClock = 0,
-		ExternalClock = RCC_CFGR_MCO1_1,
-		ExternalCrystal = RCC_CFGR_MCO1_1,
-		Pll = RCC_CFGR_MCO1_1 | RCC_CFGR_MCO1_0,
+		ExternalClock = RCC_CFGR_MCO2_1,
+		ExternalCrystal = RCC_CFGR_MCO2_1,
+		Pll = RCC_CFGR_MCO2_1 | RCC_CFGR_MCO2_0,
 	};
 %% else
 	enum class
