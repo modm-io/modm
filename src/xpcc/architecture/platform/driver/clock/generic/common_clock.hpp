@@ -53,6 +53,7 @@ enum Frequency
 	MHz30       =   30 * MHz1,
 	MHz32       =   32 * MHz1,
 	MHz36       =   36 * MHz1,
+	MHz40       =   40 * MHz1,
 	MHz42       =   42 * MHz1,
 	MHz48       =   48 * MHz1,
 	MHz50       =   50 * MHz1,
