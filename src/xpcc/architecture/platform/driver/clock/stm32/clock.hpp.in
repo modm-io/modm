@@ -1,5 +1,5 @@
 // coding: utf-8
-/* Copyright (c) 2011, Roboterclub Aachen e.V.
+/* Copyright (c) 2011-2016, Roboterclub Aachen e.V.
  * All Rights Reserved.
  *
  * The file is part of the xpcc library and is released under the 3-clause BSD
@@ -10,10 +10,14 @@
 #ifndef XPCC_STM32_CLOCK_HPP
 #define XPCC_STM32_CLOCK_HPP
 
+/**
+ * @ingroup 	{{target.string}}
+ * @defgroup	{{target.string}}_clock System Clock
+ */
+
 #include <stdint.h>
 #include "../../../device.hpp"
 #include "../generic/common_clock.hpp"
-// #include "static.hpp"
 
 using namespace xpcc::clock;
 
@@ -23,6 +27,17 @@ namespace xpcc
 namespace stm32
 {
 
+/**
+ * Clock Control for STM32 devices.
+ *
+ * This class abstracts access to clock settings on the STM32.
+ * You need to use this class to enable internal and external clock
+ * sources & outputs, set PLL parameters and AHB & APB prescalers.
+ * Don't forget to set the flash latencies.
+ *
+ * @author		Niklas Hauser
+ * @ingroup		{{target.string}}_clock
+ */
 class ClockControl
 {
 public:
