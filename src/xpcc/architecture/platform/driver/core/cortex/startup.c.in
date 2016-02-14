@@ -93,19 +93,13 @@ extern uint32_t __main_stack_top;
 extern uint32_t __process_stack_top;
 
 %% if parameters.vector_table_in_ram
-// Define the vector table
-FunctionPointer flashVectors[4] __attribute__ ((section(".reset"))) =
-{
-	(FunctionPointer) &__main_stack_top,	// stack pointer
-	Reset_Handler,				// code entry point
-	NMI_Handler,				// NMI handler
-	HardFault_Handler,			// hard fault handler
-};
-
-FunctionPointer ramVectors[] __attribute__ ((section(".vectors"))) =
-%% else
-FunctionPointer flashVectors[] __attribute__ ((section(".reset"))) =
+// reserve space for the remapped vector table in RAM
+__attribute__(( section(".vectors") ))
+FunctionPointer ramVectors[{{number_of_interrupts + 16}}];
 %% endif
+// Define the vector table
+__attribute__(( section(".reset") ))
+FunctionPointer flashVectors[] =
 {
 	(FunctionPointer) &__main_stack_top,	// -16: stack pointer
 	Reset_Handler,							// -15: code entry point
@@ -117,9 +111,9 @@ FunctionPointer flashVectors[] __attribute__ ((section(".reset"))) =
 %%		if addr < 0
 %%			set suffix = ""
 %%		endif
-	{{ (i[addr][0] + suffix + ",") | xpcc.pad(36) }}// {{addr}}
+	{{ (i[addr][0] + suffix + ",") | xpcc.pad(36) }}// {{ (addr|string).rjust(3) }}
 %% 	else
-	0,										// {{addr}}
+	0,										// {{ (addr|string).rjust(3) }}
 %% 	endif
 %% endfor
 };

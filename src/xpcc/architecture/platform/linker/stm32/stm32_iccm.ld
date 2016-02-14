@@ -142,6 +142,7 @@ SECTIONS
 	.reset :
 	{
 		__vector_table_rom_start = .;					/* address in ROM */
+		__vector_table_ram_load = .;
 		/* Initial stack address, Reset and NMI handler */
 		KEEP(*(.reset))
 		. = ALIGN(4);
@@ -149,7 +150,6 @@ SECTIONS
 
 	.vectors :  /* Vector table in RAM, only if remapped */
 	{
-		__vector_table_ram_load = LOADADDR (.vectors);		/* address in ROM */
 		__vector_table_ram_start = .;						/* address in RAM */
 
 		/* used for vectors remapped to RAM */
@@ -157,7 +157,7 @@ SECTIONS
 
 		. = ALIGN (4);
 		__vector_table_ram_end = .;
-	} >CCM AT>ROM
+	} >CCM
 
 	.fastcode :
 	{
