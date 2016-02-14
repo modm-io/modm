@@ -197,6 +197,7 @@ public:
 	{
 		StartupError err =  {{ src.name }}<{{ template }}>::enable(waitCycles);
 		if (err != StartupError::None) return err;
+		ClockControl::setFlashLatency(OutputFrequency);
 		if(ClockControl::enable{{ s.name }}(
 				ClockControl::{{ s.name }}Source::{{ src.name }}, waitCycles))
 			return StartupError::None;
