@@ -68,6 +68,7 @@ Here is a list of supported **and tested** microcontrollers (with development bo
 - STM32F407 (STM32F4 Discovery Board)
 - STM32F429 (STM32F429 Discovery Board)
 - STM32F469 (STM32F469 Discovery Board)
+- STM32F746 (STM32F7 Discovery Board)
 - LPC11C24 (LPCxpresso Board)
 - LPC1115 (LPCxpresso Board)
 
