@@ -236,47 +236,52 @@ flash_latency_{{ mV }}[] =
 uint32_t
 xpcc::stm32::ClockControl::setFlashLatency(const uint32_t CPU_Frequency, const uint16_t mV)
 {
+%% if target.name != "100"
 	const uint32_t *lut(flash_latency_3600);
 	uint8_t lut_size(sizeof(flash_latency_3600) / sizeof(uint32_t));
-%% if table|length > 1
+	%% if table|length > 1
 	// find the right table for the voltage
-	%% for mV in (table|sort)[:-1]
+		%% for mV in (table|sort)[:-1]
 	{% if not loop.first %}else {% endif %}if (mV < {{ mV }}) {
 		lut = flash_latency_{{ mV }};
 		lut_size = sizeof(flash_latency_{{ mV }}) / sizeof(uint32_t);
 	}
-	%% endfor
-%% else
+		%% endfor
+	%% else
 	(void) mV;
-%% endif
+	%% endif
 	// find the next highest frequency in the table
 	uint8_t latency(0);
 	uint32_t max_freq(0);
 	while (latency < lut_size)
 	{
 		if (CPU_Frequency <= (max_freq = lut[latency]))
-			goto set_latency;	// horrible, but effective
+			break;
 		latency++;
 	}
 
-	return 0;
-
-set_latency:
-%% if target.name != "100"
-	uint32_t acr = FLASH->ACR & ~FLASH_ACR_LATENCY;
-	// set flash latency
-	acr |= latency;
-%% if target is stm32f2 or target is stm32f4
-	// enable flash prefetch and data and instruction cache
-	acr |= FLASH_ACR_PRFTEN | FLASH_ACR_DCEN | FLASH_ACR_ICEN;
-%% elif target is stm32f7
-	// enable flash prefetch and flash accelerator
-	acr |= FLASH_ACR_PRFTEN | FLASH_ACR_ARTEN;
+	if (CPU_Frequency <= max_freq)
+	{
+		uint32_t acr = FLASH->ACR & ~FLASH_ACR_LATENCY;
+		// set flash latency
+		acr |= latency;
+	%% if target is stm32f2 or target is stm32f4
+		// enable flash prefetch and data and instruction cache
+		acr |= FLASH_ACR_PRFTEN | FLASH_ACR_DCEN | FLASH_ACR_ICEN;
+	%% elif target is stm32f7
+		// enable flash prefetch and flash accelerator
+		acr |= FLASH_ACR_PRFTEN | FLASH_ACR_ARTEN;
+	%% else
+		// enable flash prefetch
+		acr |= FLASH_ACR_PRFTBE;
+	%% endif
+		FLASH->ACR = acr;
+	}
 %% else
-	// enable flash prefetch
-	acr |= FLASH_ACR_PRFTBE;
+	(void) CPU_Frequency;
+	(void) mV;
+	uint32_t max_freq(MHz24);
 %% endif
-	FLASH->ACR = acr;
-%% endif
+
 	return max_freq;
 }

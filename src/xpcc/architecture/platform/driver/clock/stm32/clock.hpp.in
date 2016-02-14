@@ -357,7 +357,9 @@ public:
 	 * Does nothing if CPU frequency is too high for the available
 	 * voltage.
 	 *
-	 * @returns maximum CPU frequency for voltage or `0` if CPU frequency is too high for voltage
+	 * @returns maximum CPU frequency for voltage.
+	 * @retval	<=CPU_Frequency flash latency has been set correctly.
+	 * @retval	>CPU_Frequency requested frequency too high for voltage.
 	 */
 	static uint32_t
 	setFlashLatency(const uint32_t CPU_Frequency, const uint16_t mV = 3300);
