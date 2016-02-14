@@ -38,8 +38,8 @@ typedef GpioOutputD3 LedD13;							// LED7 [Green]
 
 namespace stlink
 {
-typedef GpioB10	Rx;		// STLK_RX [STLINK V2-1_U2_RX]: USART3_TX
-typedef GpioB11	Tx;		// STLK_TX [STLINK V2-1_U2_TX]: USART3_RX
+typedef GpioOutputB10	Tx;		// STLK_RX [STLINK V2-1_U2_RX]: USART3_TX
+typedef GpioInputB11	Rx;		// STLK_TX [STLINK V2-1_U2_TX]: USART3_RX
 typedef Usart3 Uart;
 }
 
@@ -114,8 +114,8 @@ initialize()
 	systemClock::enable();
 	xpcc::cortex::SysTickTimer::initialize<systemClock>();
 
-	stlink::Rx::connect(stlink::Uart::Tx);
-	stlink::Tx::connect(stlink::Uart::Rx, Gpio::InputType::PullUp);
+	stlink::Tx::connect(stlink::Uart::Tx);
+	stlink::Rx::connect(stlink::Uart::Rx, Gpio::InputType::PullUp);
 	stlink::Uart::initialize<systemClock, 115200>(12);
 
 	LedGreen::setOutput(xpcc::Gpio::Low);

@@ -29,15 +29,31 @@ namespace Board
 // TODO: enable once clock driver is implemented
 //using systemClock = SystemClock<InternalClock<MHz48>, MHz48>;
 
-template<int F = 8 * 1000 * 1000>
-struct DummyClock {
-	static constexpr int Frequency = F;
+struct systemClock
+{
+	static constexpr int Frequency = MHz48;
 	static constexpr int Usart1 = Frequency;
 	static constexpr int Can1 = Frequency;
 	static constexpr int Spi2 = Frequency;
-};
 
-using systemClock = DummyClock<48 * 1000 * 1000>;
+	static bool inline
+	enable()
+	{
+		// Enable the interal 48MHz clock
+		ClockControl::enableInternalClockMHz48();
+		// set flash latency for 48MHz
+		ClockControl::setFlashLatency(Frequency);
+		// Switch to the 48MHz clock
+		ClockControl::enableSystemClock(ClockControl::SystemClockSource::InternalClockMHz48);
+		// update frequencies for busy-wait delay functions
+		xpcc::clock::fcpu     = Frequency;
+		xpcc::clock::fcpu_kHz = Frequency / 1000;
+		xpcc::clock::fcpu_MHz = Frequency / 1000000;
+		xpcc::clock::ns_per_loop = std::round(4000 / (Frequency / 1000000));
+
+		return true;
+	}
+};
 
 using LedUp    = GpioOutputC6;
 using LedDown  = GpioOutputC7;
@@ -65,18 +81,7 @@ using Gyroscope = xpcc::L3gd20< Transport >;
 inline void
 initialize()
 {
-	// Enable the interal 48MHz clock
-	ClockControl::enableInternalClockMHz48();
-	// set flash latency for 48MHz
-	ClockControl::setFlashLatency(MHz48);
-	// Switch to the 48MHz clock
-	ClockControl::enableSystemClock(ClockControl::SystemClockSource::InternalClockMHz48);
-	// update frequencies for busy-wait delay functions
-	xpcc::clock::fcpu        = MHz48;
-	xpcc::clock::fcpu_kHz    = 48000;
-	xpcc::clock::fcpu_MHz    = 48;
-	xpcc::clock::ns_per_loop = 4000 / 48;	// ~83ns per delay loop
-
+	systemClock::enable();
 	xpcc::cortex::SysTickTimer::initialize<systemClock>();
 
 	LedUp::setOutput(xpcc::Gpio::Low);

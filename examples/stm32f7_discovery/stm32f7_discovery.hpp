@@ -73,7 +73,7 @@ struct systemClock
 	static constexpr uint32_t Timer13 = Apb1Timer;
 	static constexpr uint32_t Timer14 = Apb1Timer;
 
-	static void inline
+	static bool inline
 	enable()
 	{
 		ClockControl::enableExternalClock(); // 25 MHz
@@ -94,7 +94,9 @@ struct systemClock
 		xpcc::clock::fcpu     = Frequency;
 		xpcc::clock::fcpu_kHz = Frequency / 1000;
 		xpcc::clock::fcpu_MHz = Frequency / 1000000;
-		xpcc::clock::ns_per_loop = std::round(1000/(Frequency / 1000000));
+		xpcc::clock::ns_per_loop = std::round(1000 / (Frequency / 1000000));
+
+		return true;
 	}
 };
 
