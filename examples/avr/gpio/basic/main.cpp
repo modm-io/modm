@@ -9,7 +9,7 @@
 
 #include <xpcc/architecture/platform.hpp>
 
-using namespace xpcc::atmega;
+using namespace xpcc::attiny;
 
 typedef GpioOutputB0 Led;
 // create a wrapper for a output pin
