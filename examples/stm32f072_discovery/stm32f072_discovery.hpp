@@ -67,8 +67,8 @@ initialize()
 {
 	// Enable the interal 48MHz clock
 	ClockControl::enableInternalClockMHz48();
-	// set flash latency to 1 otherwise the controller crashes
-	FLASH->ACR |= FLASH_ACR_PRFTBE | 1;
+	// set flash latency for 48MHz
+	ClockControl::setFlashLatency(MHz48);
 	// Switch to the 48MHz clock
 	ClockControl::enableSystemClock(ClockControl::SystemClockSource::InternalClockMHz48);
 	// update frequencies for busy-wait delay functions

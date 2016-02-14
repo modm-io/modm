@@ -100,8 +100,8 @@ initialize()
 	ClockControl::enableInternalClock();	// 8MHz
 	// internal clock / 2 * 16 = 64MHz, => 64/1.5 = 42.6 => bad for USB
 	ClockControl::enablePll(ClockControl::PllSource::InternalClock, ClockControl::UsbPrescaler::Div1_5, 16);
-	// set flash latency to 2 otherwise the controller crashes
-	FLASH->ACR |= FLASH_ACR_PRFTBE | 2;
+	// set flash latency for 64MHz
+	ClockControl::setFlashLatency(MHz64);
 	// switch system clock to PLL output
 	ClockControl::enableSystemClock(ClockControl::SystemClockSource::Pll);
 	ClockControl::setAhbPrescaler(ClockControl::AhbPrescaler::Div1);
