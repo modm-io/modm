@@ -23,7 +23,7 @@ or [have a look at the archive](http://blog.gmane.org/gmane.comp.hardware.arm.co
 - You want to contribute? [Read the contribution guidelines](CONTRIBUTING.md) and [open a pull request so we can merge it](https://github.com/roboterclubaachen/xpcc/pulls).
 
 The source code is freely available, so adapt it to your needs.
-The only thing we ask of is to contribute your changes back.
+The only thing we ask of you is to contribute your changes back.
 That way everyone can profit from it.
 
 Have fun!
@@ -63,6 +63,7 @@ Here is a list of supported **and tested** microcontrollers (with development bo
 - ATmega1280 (Arduino Mega)
 - STM32F072 (STM32F072 Discovery Board)
 - STM32F100 (STM32F1 Discovery Board)
+- STM32F103 (STM32F103 Nucleo Board)
 - STM32F303 (STM32F3 Discovery Board)
 - STM32F407 (STM32F4 Discovery Board)
 - STM32F429 (STM32F429 Discovery Board)
