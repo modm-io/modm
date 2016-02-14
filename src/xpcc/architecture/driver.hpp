@@ -28,6 +28,11 @@
  */
 // ----------------------------------------------------------------------------
 
+/**
+ * @ingroup 	architecture
+ * @defgroup	platform	Supported Platforms
+ */
+
 #include "driver/atomic.hpp"
 #include "driver/accessor.hpp"
 #include "driver/delay.hpp"

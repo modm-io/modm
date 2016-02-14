@@ -10,12 +10,6 @@
 #ifndef XPCC__PLATFORM_HPP
 #define XPCC__PLATFORM_HPP
 
-/**
- * \ingroup 	architecture
- * \defgroup	platform	Supported Platforms
- *
- */
-
 #include <stdint.h>
 
 #include <xpcc/architecture/detect.hpp>		// sets XPCC__CPU_xx etc. macros
