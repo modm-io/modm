@@ -1,0 +1,282 @@
+/* Copyright (c) 2016, Roboterclub Aachen e.V.
+* All Rights Reserved.
+*
+* The file is part of the xpcc library and is released under the 3-clause BSD
+* license. See the file `LICENSE` for the full license governing this code.
+* ------------------------------------------------------------------------ */
+
+#include "clock.hpp"
+
+%% if target is stm32f0
+/*
+For the stm32f0xx devices, the maximum frequency of the SYSCLK and HCLK is 48 MHz,
+PCLK2 48 MHz and PCLK1 48 MHz. The maximum frequency should be adapted accordingly:
++---------------+----------------+
+| Latency       | HCLK clock     |
+|               | frequency (MHz)|
+|---------------|----------------|
+|0WS(1CPU cycle)| 0 < HCLK <=  24|
+|---------------|----------------|
+|1WS(2CPU cycle)|24 < HCLK <=  48|
+|---------------|----------------|
+|2WS(3CPU cycle)|48 < HCLK <=  72|
++---------------+----------------+
+*/
+	%% set table = {3600: [24, 48]}
+%% elif target is stm32f1 or target is stm32f3
+	%% if target.name in ["100"]
+/*
+For the stm32f100 devices, the maximum frequency of the SYSCLK and HCLK is 24 MHz,
+PCLK2 24 MHz and PCLK1 24 MHz.
++---------------+----------------+
+| Latency       | HCLK clock     |
+|               | frequency (MHz)|
+|---------------|----------------|
+|0WS(1CPU cycle)| 0 < HCLK <=  24|
++---------------+----------------+
+*/
+		%% set table = {3600: [24]}
+	%% else
+/*
+For the f1xx & f3xx devices, the maximum frequency of the SYSCLK and HCLK is 72 MHz,
+PCLK2 72 MHz and PCLK1 36 MHz. The maximum frequency should be adapted accordingly:
++---------------+----------------+
+| Latency       | HCLK clock     |
+|               | frequency (MHz)|
+|---------------|----------------|
+|0WS(1CPU cycle)| 0 < HCLK <=  24|
+|---------------|----------------|
+|1WS(2CPU cycle)|24 < HCLK <=  48|
+|---------------|----------------|
+|2WS(3CPU cycle)|48 < HCLK <=  72|
++---------------+----------------+
+*/
+		%% set table = {3600: [24, 48, 72]}
+	%% endif
+%% elif target is stm32f2
+/*
+For the stm32f2xx devices, the maximum frequency of the SYSCLK and HCLK is 120 MHz,
+PCLK2 60 MHz and PCLK1 30 MHz. Depending on the device voltage range, the maximum
+frequency should be adapted accordingly:
++---------------+---------------------------------------------------------------------+
+| Latency       |                HCLK clock frequency (MHz)                           |
+|               |---------------------------------------------------------------------|
+|               | voltage range  | voltage range  |  voltage range  |  voltage range  |
+|               | 2.7 V - 3.6 V  | 2.4 V - 2.7 V  |  2.1 V - 2.4 V  |  1.8 V - 2.1 V  |
+|---------------|----------------|----------------|-----------------|-----------------|
+|0WS(1CPU cycle)| 0 < HCLK <=  30| 0 < HCLK <=  24|  0 < HCLK <=  18|  0 < HCLK <=  16|
+|---------------|----------------|----------------|-----------------|-----------------|
+|1WS(2CPU cycle)|30 < HCLK <=  60|24 < HCLK <=  48| 18 < HCLK <=  36| 16 < HCLK <=  32|
+|---------------|----------------|----------------|-----------------|-----------------|
+|2WS(3CPU cycle)|60 < HCLK <=  90|48 < HCLK <=  72| 36 < HCLK <=  54| 32 < HCLK <=  48|
+|---------------|----------------|----------------|-----------------|-----------------|
+|3WS(4CPU cycle)|90 < HCLK <= 120|72 < HCLK <=  96| 54 < HCLK <=  72| 48 < HCLK <=  64|
+|---------------|----------------|----------------|-----------------|-----------------|
+|4WS(5CPU cycle)|      NA        |96 < HCLK <= 120| 72 < HCLK <=  90| 64 < HCLK <=  80|
+|---------------|----------------|----------------|-----------------|-----------------|
+|5WS(6CPU cycle)|      NA        |      NA        | 90 < HCLK <= 108| 80 < HCLK <=  96|
+|---------------|----------------|----------------|-----------------|-----------------|
+|6WS(7CPU cycle)|      NA        |      NA        |108 < HCLK <= 120| 96 < HCLK <= 112|
+|---------------|----------------|----------------|-----------------|-----------------|
+|7WS(8CPU cycle)|      NA        |      NA        |       NA        |112 < HCLK <= 120|
++---------------+----------------+----------------+-----------------+-----------------+
+*/
+	{% set table = {
+		3600: [30, 60, 90, 120],
+		2700: [24, 48, 72, 96, 120],
+		2400: [18, 36, 54, 72, 90, 108, 120],
+		2100: [16, 32, 48, 64, 80, 96, 112, 120] }
+	%}
+%% elif target is stm32f4
+	%% if target.name in ["410", "411"]
+/*
+For the 410 & 411 devices, the maximum frequency of the SYSCLK and HCLK is 100 MHz,
+PCLK2 100 MHz and PCLK1 50 MHz. Depending on the device voltage range, the maximum
+frequency should be adapted accordingly:
++---------------+---------------------------------------------------------------------+
+| Latency       |                HCLK clock frequency (MHz)                           |
+|               |---------------------------------------------------------------------|
+|               | voltage range  | voltage range  |  voltage range  |  voltage range  |
+|               | 2.7 V - 3.6 V  | 2.4 V - 2.7 V  |  2.1 V - 2.4 V  |  1.71V - 2.1 V  |
+|---------------|----------------|----------------|-----------------|-----------------|
+|0WS(1CPU cycle)| 0 < HCLK <=  30| 0 < HCLK <=  24|  0 < HCLK <=  18|  0 < HCLK <=  16|
+|---------------|----------------|----------------|-----------------|-----------------|
+|1WS(2CPU cycle)|30 < HCLK <=  60|24 < HCLK <=  48| 18 < HCLK <=  36| 16 < HCLK <=  32|
+|---------------|----------------|----------------|-----------------|-----------------|
+|2WS(3CPU cycle)|60 < HCLK <=  90|48 < HCLK <=  72| 36 < HCLK <=  54| 32 < HCLK <=  48|
+|---------------|----------------|----------------|-----------------|-----------------|
+|3WS(4CPU cycle)|90 < HCLK <= 100|72 < HCLK <=  96| 54 < HCLK <=  72| 48 < HCLK <=  64|
+|---------------|----------------|----------------|-----------------|-----------------|
+|4WS(5CPU cycle)|      NA        |96 < HCLK <= 100| 72 < HCLK <=  90| 64 < HCLK <=  80|
+|---------------|----------------|----------------|-----------------|-----------------|
+|5WS(6CPU cycle)|      NA        |      NA        | 90 < HCLK <= 100| 80 < HCLK <=  96|
+|---------------|----------------|----------------|-----------------|-----------------|
+|6WS(7CPU cycle)|      NA        |      NA        |       NA        | 96 < HCLK <= 100|
++---------------+----------------+----------------+-----------------+-----------------+
+*/
+		{% set table = {
+			3600: [30, 60, 90, 100],
+			2700: [24, 48, 72, 96, 100],
+			2400: [18, 36, 54, 72, 90, 100],
+			2100: [16, 32, 48, 64, 80, 96, 100] }
+		%}
+	%% elif target.name in ["401"]
+/*
+For the 401 devices, the maximum frequency of the SYSCLK and HCLK is 84 MHz,
+PCLK2 84 MHz and PCLK1 42 MHz. Depending on the device voltage range, the maximum
+frequency should be adapted accordingly:
++---------------+---------------------------------------------------------------------+
+| Latency       |                HCLK clock frequency (MHz)                           |
+|               |---------------------------------------------------------------------|
+|               | voltage range  | voltage range  |  voltage range  |  voltage range  |
+|               | 2.7 V - 3.6 V  | 2.4 V - 2.7 V  |  2.1 V - 2.4 V  |  1.71V - 2.1 V  |
+|---------------|----------------|----------------|-----------------|-----------------|
+|0WS(1CPU cycle)| 0 < HCLK <=  30| 0 < HCLK <=  24|  0 < HCLK <=  18|  0 < HCLK <=  16|
+|---------------|----------------|----------------|-----------------|-----------------|
+|1WS(2CPU cycle)|30 < HCLK <=  60|24 < HCLK <=  48| 18 < HCLK <=  36| 16 < HCLK <=  32|
+|---------------|----------------|----------------|-----------------|-----------------|
+|2WS(3CPU cycle)|60 < HCLK <=  84|48 < HCLK <=  72| 36 < HCLK <=  54| 32 < HCLK <=  48|
+|---------------|----------------|----------------|-----------------|-----------------|
+|3WS(4CPU cycle)|      NA        |72 < HCLK <=  84| 54 < HCLK <=  72| 48 < HCLK <=  64|
+|---------------|----------------|----------------|-----------------|-----------------|
+|4WS(5CPU cycle)|      NA        |      NA        | 72 < HCLK <=  84| 64 < HCLK <=  80|
+|---------------|----------------|----------------|-----------------|-----------------|
+|5WS(6CPU cycle)|      NA        |      NA        |       NA        | 80 < HCLK <=  84|
++---------------+----------------+----------------+-----------------+-----------------+
+*/
+		{% set table = {
+			3600: [30, 60, 84],
+			2700: [24, 48, 72, 84],
+			2400: [18, 36, 54, 72, 84],
+			2100: [16, 32, 48, 64, 80, 84] }
+		%}
+	%% elif target.name in ["405", "407", "415", "417"]
+/*
+For the 405, 407, 415, 417 devices, the maximum frequency of the SYSCLK and HCLK is
+168 MHz, PCLK2 84 MHz and PCLK1 42 MHz. Depending on the device voltage range, the
+maximum frequency should be adapted accordingly:
++---------------+---------------------------------------------------------------------+
+| Latency       |                HCLK clock frequency (MHz)                           |
+|               |---------------------------------------------------------------------|
+|               | voltage range  | voltage range  |  voltage range  |  voltage range  |
+|               | 2.7 V - 3.6 V  | 2.4 V - 2.7 V  |  2.1 V - 2.4 V  |  1.8 V - 2.1 V  |
+|---------------|----------------|----------------|-----------------|-----------------|
+|0WS(1CPU cycle)|  0< HCLK <=  30|  0< HCLK <=  24|  0 < HCLK <=  22|  0 < HCLK <=  20|
+|---------------|----------------|----------------|-----------------|-----------------|
+|1WS(2CPU cycle)| 30< HCLK <=  60| 24< HCLK <=  48| 22 < HCLK <=  44| 20 < HCLK <=  40|
+|---------------|----------------|----------------|-----------------|-----------------|
+|2WS(3CPU cycle)| 60< HCLK <=  90| 48< HCLK <=  72| 44 < HCLK <=  66| 40 < HCLK <=  60|
+|---------------|----------------|----------------|-----------------|-----------------|
+|3WS(4CPU cycle)| 90< HCLK <= 120| 72< HCLK <=  96| 66 < HCLK <=  88| 60 < HCLK <=  80|
+|---------------|----------------|----------------|-----------------|-----------------|
+|4WS(5CPU cycle)|120< HCLK <= 150| 96< HCLK <= 120| 88 < HCLK <= 110| 80 < HCLK <= 100|
+|---------------|----------------|----------------|-----------------|-----------------|
+|5WS(6CPU cycle)|150< HCLK <= 168|120< HCLK <= 144|110 < HCLK <= 132|100 < HCLK <= 120|
+|---------------|----------------|----------------|-----------------|-----------------|
+|6WS(7CPU cycle)|      NA        |144< HCLK <= 168|132 < HCLK <= 154|120 < HCLK <= 140|
+|---------------|----------------|----------------|-----------------|-----------------|
+|7WS(8CPU cycle)|      NA        |      NA        |154 < HCLK <= 168|140 < HCLK <= 160|
++---------------+----------------+----------------+-----------------+-----------------+
+*/
+		{% set table = {
+			3600: [30, 60, 90, 120, 150, 168],
+			2700: [24, 48, 72, 96, 120, 144, 168],
+			2400: [22, 44, 66, 88, 110, 132, 154, 168],
+			2100: [20, 40, 60, 80, 100, 120, 140, 160] }
+		%}
+	%% elif target.name in ["427", "429", "437", "439", "446", "469", "479"]
+/*
+For the 427, 429, 437, 439, 446, 469, 479 devices, the maximum frequency of the
+SYSCLK and HCLK is 180 MHz, PCLK2 90 MHz and PCLK1 45 MHz. Depending on the device
+voltage range, the maximum frequency should be adapted accordingly:
++---------------+---------------------------------------------------------------------+
+| Latency       |                HCLK clock frequency (MHz)                           |
+|               |---------------------------------------------------------------------|
+|               | voltage range  | voltage range  |  voltage range  |  voltage range  |
+|               | 2.7 V - 3.6 V  | 2.4 V - 2.7 V  |  2.1 V - 2.4 V  |  1.8 V - 2.1 V  |
+|---------------|----------------|----------------|-----------------|-----------------|
+|0WS(1CPU cycle)|  0< HCLK <=  30|  0< HCLK <=  24|  0 < HCLK <=  22|  0 < HCLK <=  20|
+|---------------|----------------|----------------|-----------------|-----------------|
+|1WS(2CPU cycle)| 30< HCLK <=  60| 24< HCLK <=  48| 22 < HCLK <=  44| 20 < HCLK <=  40|
+|---------------|----------------|----------------|-----------------|-----------------|
+|2WS(3CPU cycle)| 60< HCLK <=  90| 48< HCLK <=  72| 44 < HCLK <=  66| 40 < HCLK <=  60|
+|---------------|----------------|----------------|-----------------|-----------------|
+|3WS(4CPU cycle)| 90< HCLK <= 120| 72< HCLK <=  96| 66 < HCLK <=  88| 60 < HCLK <=  80|
+|---------------|----------------|----------------|-----------------|-----------------|
+|4WS(5CPU cycle)|120< HCLK <= 150| 96< HCLK <= 120| 88 < HCLK <= 110| 80 < HCLK <= 100|
+|---------------|----------------|----------------|-----------------|-----------------|
+|5WS(6CPU cycle)|150< HCLK <= 180|120< HCLK <= 144|110 < HCLK <= 132|100 < HCLK <= 120|
+|---------------|----------------|----------------|-----------------|-----------------|
+|6WS(7CPU cycle)|      NA        |144< HCLK <= 168|132 < HCLK <= 154|120 < HCLK <= 140|
+|---------------|----------------|----------------|-----------------|-----------------|
+|7WS(8CPU cycle)|      NA        |168< HCLK <= 180|154 < HCLK <= 176|140 < HCLK <= 160|
+|---------------|----------------|----------------|-----------------|-----------------|
+|8WS(9CPU cycle)|      NA        |      NA        |176 < HCLK <= 180|160 < HCLK <= 168|
++---------------+----------------+----------------+-----------------+-----------------+
+*/
+		{% set table = {
+			3600: [30, 60, 90, 120, 150, 180],
+			2700: [24, 48, 72, 96, 120, 144, 168, 180],
+			2400: [22, 44, 66, 88, 110, 132, 154, 176, 180],
+			2100: [20, 40, 60, 80, 100, 120, 140, 160, 168] }
+		%}
+	%% endif
+%% endif
+
+%% for mV, table_MHz in table.items()|sort
+static const uint32_t
+flash_latency_{{ mV }}[] =
+{
+	%% for mhz in table_MHz
+	{{ mhz * 1000000 }},
+	%% endfor
+};
+%% endfor
+
+uint32_t
+xpcc::stm32::ClockControl::setFlashLatency(const uint32_t CPU_Frequency, const uint16_t mV)
+{
+	const uint32_t *lut(flash_latency_3600);
+	uint8_t lut_size(sizeof(flash_latency_3600) / sizeof(uint32_t));
+%% if table|length > 1
+	// find the right table for the voltage
+	%% for mV in (table|sort)[:-1]
+	{% if not loop.first %}else {% endif %}if (mV < {{ mV }}) {
+		lut = flash_latency_{{ mV }};
+		lut_size = sizeof(flash_latency_{{ mV }}) / sizeof(uint32_t);
+	}
+	%% endfor
+%% else
+	(void) mV;
+%% endif
+	// find the next highest frequency in the table
+	uint8_t latency(0);
+	uint32_t max_freq(0);
+	while (latency < lut_size)
+	{
+		if (CPU_Frequency <= (max_freq = lut[latency]))
+			goto set_latency;	// horrible, but effective
+		latency++;
+	}
+
+	return 0;
+
+set_latency:
+%% if target.name != "100"
+	uint32_t acr = FLASH->ACR & ~FLASH_ACR_LATENCY;
+	// set flash latency
+	acr |= latency;
+%% if target is stm32f2 or target is stm32f4
+	// enable flash prefetch and data and instruction cache
+	acr |= FLASH_ACR_PRFTEN | FLASH_ACR_DCEN | FLASH_ACR_ICEN;
+%% elif target is stm32f7
+	// enable flash prefetch and flash accelerator
+	acr |= FLASH_ACR_PRFTEN | FLASH_ACR_ARTEN;
+%% else
+	// enable flash prefetch
+	acr |= FLASH_ACR_PRFTBE;
+%% endif
+	FLASH->ACR = acr;
+%% endif
+	return max_freq;
+}

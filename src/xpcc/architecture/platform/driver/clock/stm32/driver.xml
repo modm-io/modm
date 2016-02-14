@@ -2,11 +2,13 @@
 <!DOCTYPE rca SYSTEM "../../xml/driver.dtd">
 <rca version="1.0">
 	<driver type="clock" name="stm32">
-		<template device-family="f1|f3|f4">static.hpp.in</template>
+		<template>latency.cpp.in</template>
 		<template>clock.cpp.in</template>
 		<template>clock.hpp.in</template>
-		<static device-family="f1|f3|f4">pll_calculator.hpp</static>
 		<static>type_ids.hpp</static>
+
+		<template device-family="f1|f3|f4">static.hpp.in</template>
+		<static device-family="f1|f3|f4">pll_calculator.hpp</static>
 
 		<usbprescaler device-name="042|048|070|072|078|102|103|302|303|373">True</usbprescaler>
 		<pllprediv device-family="f0|f3">True</pllprediv>

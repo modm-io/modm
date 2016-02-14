@@ -338,6 +338,16 @@ public:
 %% endif
 
 public:
+	/** Set flash latency for CPU frequency and voltage.
+	 * Does nothing if CPU frequency is too high for the available
+	 * voltage.
+	 *
+	 * @returns maximum CPU frequency for voltage or `0` if CPU frequency is too high for voltage
+	 */
+	static uint32_t
+	setFlashLatency(const uint32_t CPU_Frequency, const uint16_t mV = 3300);
+
+public:
 	static inline uint32_t
 	getCpuFrequency()
 	{
