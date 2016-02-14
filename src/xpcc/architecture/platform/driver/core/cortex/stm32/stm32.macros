@@ -32,16 +32,6 @@
 
 
 %% macro defines()
-%#
-#define FLASH_WAIT_STATE_0		0x0
-#define FLASH_WAIT_STATE_1		0x1
-#define FLASH_WAIT_STATE_2		0x2
-#define FLASH_WAIT_STATE_3		0x3
-#define FLASH_WAIT_STATE_4		0x4
-#define FLASH_WAIT_STATE_5		0x5
-#define FLASH_WAIT_STATE_6		0x6
-#define FLASH_WAIT_STATE_7		0x7
-%#
 %% endmacro
 
 %% macro appendInterrupts()
@@ -58,32 +48,6 @@
 	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
 	// Remap USB Interrupts
 	SYSCFG->CFGR1 |= SYSCFG_CFGR1_USB_IT_RMP;
-%% endif
-
-// TODO: Move this into SystemClock implementation
-%% if target is stm32f2
-	// prepare flash latency for working at 120MHz and supply voltage > 2.7
-	FLASH->ACR = (FLASH->ACR & ~FLASH_ACR_LATENCY) | FLASH_WAIT_STATE_3;
-%% elif target is stm32f3
-	// prepare flash latency for working at 72MHz and supply voltage > 2.7
-	FLASH->ACR = (FLASH->ACR & ~FLASH_ACR_LATENCY) | FLASH_ACR_LATENCY_1;
-%% elif target is stm32f4
-	// prepare flash latency for working at 168MHz and supply voltage > 2.7
-	FLASH->ACR = (FLASH->ACR & ~FLASH_ACR_LATENCY) | FLASH_WAIT_STATE_5;
-%% elif target is stm32f7
-	// prepare flash latency for working at 200MHz and supply voltage > 2.7
-	FLASH->ACR = (FLASH->ACR & ~FLASH_ACR_LATENCY) | FLASH_WAIT_STATE_6;
-%% endif
-
-%% if target is stm32f2 or target is stm32f4
-	// enable flash prefetch
-	FLASH->ACR |= FLASH_ACR_PRFTEN | FLASH_ACR_DCEN | FLASH_ACR_ICEN;
-%% elif target is stm32f3
-	// enable flash prefetch
-	FLASH->ACR |= FLASH_ACR_PRFTBE;
-%% elif target is stm32f7
-	// enable flash prefetch
-	FLASH->ACR |= FLASH_ACR_PRFTEN | FLASH_ACR_ARTEN;
 %% endif
 
 %% if target is stm32f4
