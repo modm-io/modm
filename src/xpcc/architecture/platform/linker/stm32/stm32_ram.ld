@@ -12,15 +12,13 @@
  *
  *                          MEMORY MAP (RAM)
  *
- *                |                                 | 0x2001 0000
- *                |---------------------------------| 0x2000 FFFF
- *                |           Unused RAM            |
- *                |     (overwritten by heap!)      |
- *                |---------------------------------|
- *                |               ^                 |
- *                |               |                 |
- *                |            Heap Area            |
- *                |         (grows upwards)         | <------- __heap_start
+ *                |                                 | 0x2001 0000 <---- __ram_end, __heap1_end, __heap_end
+ *      +-------> |---------------------------------| 0x2000 FFFF
+ *      |         |                                 |
+ *      |         |               ^                 |
+ *   .heap1       |               |                 |
+ *      |         |            Heap Area            |
+ *      |         |         (grows upwards)         | <------- __heap1_start, __heap_start
  *      +-------> |---------------------------------| <------- __noinit_end
  *      |         |                                 |
  *   .noinit      |     Global data not cleared     |
@@ -40,24 +38,24 @@
  *  .vectors      |    Interrupt Vectors (in RAM)   |
  *      |         |        (if re-mapped)           | <------- __vector_table_ram_start
  *      +-------> |---------------------------------| <------- __process_stack_top, __stack_end
- *                |       Process Stack (psp)       |
- *                |       (grows downwards)         |
- *                |               |                 |
- *                |               v                 |
- *                |---------------------------------| <------- __main_stack_top
- *                |        Main Stack (msp)         |
- *                |       (grows downwards)         |
- *                |               |                 |
- *                |               v                 | <------- __stack_start
- *                |---------------------------------|
- *                |  Alignment buffer for .vectors  |
- *                |     (overwritten by stack!)     |
- *                |---------------------------------| 0x2000 0000 <--- __ram_start
+ *      |         |       Process Stack (psp)       |
+ *      |         |       (grows downwards)         |
+ *      |         |               |                 |
+ *      |         |               v                 |
+ *      |         |---------------------------------| <------- __main_stack_top
+ *      |         |        Main Stack (msp)         |
+ *   .stack       |       (grows downwards)         |
+ *      |         |               |                 |
+ *      |         |               v                 |
+ *      |         |---------------------------------|
+ *      |         |  Alignment buffer for .vectors  |
+ *      |         |   (overwritten by main stack!)  | <------- __stack_start
+ *      +-------> |---------------------------------| 0x2000 0000 <--- __ram_start
  *
  *
  *                          MEMORY MAP (Flash)
  *
- *                |                                 | 0x0802 0000
+ *                |                                 | 0x0802 0000 <--- __rom_end
  *                |---------------------------------| 0x0801 FFFF
  *                |                                 |
  *                |                                 |
@@ -84,9 +82,9 @@
  *      |         |                                 | <------- __fastcode_load, __fastcode_start, __fastcode_end
  *      +-------> |---------------------------------|
  *      |         |                                 |
- *   .reset       |    Interrupt Vectors (in ROM)   | <------- __vector_table_ram_load
- *      |         |       (copy of .vectors)        | <------- __vector_table_rom_start
- *      +-------> |---------------------------------| 0x0800 0000
+ *   .reset       |    Interrupt Vectors (in ROM)   |
+ *      |         |       (copy of .vectors)        | <------- __vector_table_rom_start, __vector_table_ram_load
+ *      +-------> |---------------------------------| 0x0800 0000 <--- __rom_start
  *
  * The first two words (32-bit) in the Flash defines the initial stack pointer
  * location and the reset handler location.
@@ -104,7 +102,8 @@ EXTERN(_init)
 
 PROVIDE(__ram_start = ORIGIN(RAM));
 PROVIDE(__ram_end   = ORIGIN(RAM) + LENGTH(RAM));
-PROVIDE(__heap_end  = ORIGIN(RAM) + LENGTH(RAM));
+PROVIDE(__rom_start = ORIGIN(ROM));
+PROVIDE(__rom_end   = ORIGIN(ROM) + LENGTH(ROM));
 
 /* the thread stack is used only for reporting hard fault conditions! It may therefore be small. */
 PROCESS_STACK_SIZE  = DEFINED(__process_stack_size) ? (__process_stack_size & ~0x7) : 192;
@@ -355,8 +354,17 @@ SECTIONS
 
 		. = ALIGN (4);
 		PROVIDE (__noinit_end = .);
-		. = ALIGN (4);
+	} >RAM
+
+	.heap1 (NOLOAD) :
+	{
+		. = ALIGN(4);
 		PROVIDE (__heap_start = .);
+		__heap1_start = .;
+
+		. = ORIGIN(RAM) + LENGTH(RAM);
+		__heap1_end = .;
+		PROVIDE (__heap_end = .);
 	} >RAM
 
 	. = ALIGN(4);

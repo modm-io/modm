@@ -8,38 +8,37 @@
  * Any symbols defined in the Linker Script are automatically global and
  * available to the rest of the program.
  *
- * Example for STM32F427: (SRAM3 not available on F40* / F41* devices!
+ * Example for STM32F427:
  *
  *                          MEMORY MAP (RAM)
  *
  * Auxiliary internal SRAM3 (64 kB):
  *   only accessible by CPU via S-Bus (less efficient than I-Bus), otherwise fully DMA capable
- *                |                                 | 0x2003 0000 <---- __ram_end, __heap_end
- *                |---------------------------------| 0x2002 FFFF
- *                |                                 |
- *                |                                 |
- *                |                                 |
- *                |---------------------------------| 0x2002 0000
+ *                |                                 | 0x2003 0000 <---- __ram_end, __heap3_end, __heap_end
+ *      +-------> |---------------------------------| 0x2002 FFFF
+ *      |         |                                 |
+ *   .heap3       |         not available on        |
+ *      |         |        F40./F41. devices!       |
+ *      +-------> |---------------------------------| 0x2002 0000 <--- __heap3_start
  *
  * Auxiliary internal SRAM2 (16 kB):
  *   only accessible by CPU via S-Bus (less efficient than I-Bus), otherwise fully DMA capable
- *                |                                 | 0x2002 0000 <---- __ram_end, __heap_end
- *                |---------------------------------| 0x2001 FFFF       (F40* / F41* devices)
- *                |                                 |
- *                |                                 |
- *                |                                 |
- *                |---------------------------------| 0x2001 C000
+ *                |                                 | 0x2002 0000 <---- (__ram_end, __heap_end), __heap2_end
+ *      +-------> |---------------------------------| 0x2001 FFFF
+ *      |         |                                 |
+ *   .heap2       |                                 |
+ *      |         |                                 |
+ *      +-------> |---------------------------------| 0x2001 C000 <--- __heap2_start
  *
  *
  * Main internal SRAM1 (112 kB):
- *                |                                 | 0x2001 C000
- *                |---------------------------------| 0x2001 BFFF
- *                |                                 |
- *                |               ^                 |
- *                |               |                 |
- *                |            Heap Area            |
- *                |         (grows upwards)         |
- *                |                                 | <------- __heap_start
+ *                |                                 | 0x2001 C000 <---- __heap1_end
+ *      +-------> |---------------------------------| 0x2001 BFFF
+ *      |         |                                 |
+ *      |         |               ^                 |
+ *   .heap1       |               |                 |
+ *      |         |            Heap Area            |
+ *      |         |         (grows upwards)         | <------- __heap1_start, __heap_start
  *      +-------> |---------------------------------| <------- __noinit_end
  *      |         |                                 |
  *   .noinit      |     Global data not cleared     |
@@ -63,32 +62,33 @@
  *
  * CCM (Core Coupled memory) (64 kB):
  *   only accessible by the CPU (no DMA) via D-Bus, not I-Bus!
- *                |                                 | 0x1001 0000
- *                |---------------------------------| 0x1000 FFFF
- *                |           Unused RAM            |
- *                |    (perhaps usable for heap?)   |
+ *                |                                 | 0x1001 0000 <---- __heap0_end
+ *      +-------> |---------------------------------| 0x1000 FFFF
+ *      |         |                                 |
+ *   .heap0       |           Unused RAM            |
+ *      |         |                                 | <------- __heap0_start
  *      +-------> |---------------------------------| <------- __fastdata_end
  *      |         |                                 |
  *  .fastdata     |     initialized variables       |
  *      |         |                                 | <------- __fastdata_start
  *      +-------> |---------------------------------| <------- __process_stack_top, __stack_end
- *                |       Process Stack (psp)       |
- *                |       (grows downwards)         |
- *                |               |                 |
- *                |               v                 |
- *                |---------------------------------| <------- __main_stack_top
- *                |        Main Stack (msp)         |
- *                |       (grows downwards)         |
- *                |               |                 |
- *                |               v                 | <------- __stack_start
- *                |---------------------------------| 0x1000 0000
+ *      |         |       Process Stack (psp)       |
+ *      |         |       (grows downwards)         |
+ *      |         |               |                 |
+ *      |         |               v                 |
+ *   .stack       |---------------------------------| <------- __main_stack_top
+ *      |         |        Main Stack (msp)         |
+ *      |         |       (grows downwards)         |
+ *      |         |               |                 |
+ *      |         |               v                 | <------- __stack_start
+ *      +-------> |---------------------------------| 0x1000 0000
  *
  *
  *                          MEMORY MAP (Flash)
  *
+ *                |                                 | 0x0802 0000 <--- __rom_end
+ *                |---------------------------------| 0x0801 FFFF
  *                |                                 |
- *                |---------------------------------| 0x0802 0000
- *                |                                 | 0x0801 FFFF
  *                |                                 |
  *                |                                 |
  *                |          Unused flash           |
@@ -117,9 +117,9 @@
  *      |         |         into CCM RAM            | <------- __fastdata_load
  *      +-------> |---------------------------------|
  *      |         |                                 |
- *   .reset       |    Interrupt Vectors (in ROM)   | <------- __vector_table_ram_load
- *      |         |       (copy of .vectors)        | <------- __vector_table_rom_start
- *      +-------> |---------------------------------| 0x0800 0000
+ *   .reset       |    Interrupt Vectors (in ROM)   |
+ *      |         |       (copy of .vectors)        | <------- __vector_table_rom_start, __vector_table_ram_load
+ *      +-------> |---------------------------------| 0x0800 0000 <--- __rom_start
  *
  * The first two words (32-bit) in the Flash defines the initial stack pointer
  * location and the reset handler location.
@@ -137,7 +137,8 @@ EXTERN(_init)
 
 PROVIDE(__ram_start = ORIGIN(RAM));
 PROVIDE(__ram_end   = ORIGIN(RAM) + LENGTH(RAM));
-PROVIDE(__heap_end  = ORIGIN(RAM) + LENGTH(RAM));
+PROVIDE(__rom_start = ORIGIN(ROM));
+PROVIDE(__rom_end   = ORIGIN(ROM) + LENGTH(ROM));
 
 /* the thread stack is used only for reporting hard fault conditions! It may therefore be small. */
 PROCESS_STACK_SIZE  = DEFINED(__process_stack_size) ? (__process_stack_size & ~0x7) : 256;
@@ -193,6 +194,17 @@ SECTIONS
 		. = ALIGN(4);
 		__fastdata_end = .;
 	} >CCM AT>ROM
+
+	/* This is currently not used by the heap allocator!
+	.heap0 (NOLOAD) :
+	{
+		. = ALIGN(4);
+		__heap0_start = .;
+
+		. = ORIGIN(CCM) + LENGTH(CCM);
+		__heap0_end = .;
+	} >CCM
+	*/
 
 	.text :
 	{
@@ -376,8 +388,37 @@ SECTIONS
 
 		. = ALIGN (4);
 		PROVIDE (__noinit_end = .);
-		. = ALIGN (4);
+	} >RAM
+
+	.heap1 (NOLOAD) :
+	{
+		. = ALIGN(4);
 		PROVIDE (__heap_start = .);
+		__heap1_start = .;
+
+		. = ORIGIN(SRAM1) + LENGTH(SRAM1);
+		__heap1_end = .;
+	} >RAM
+
+	.heap2 (NOLOAD) :
+	{
+		. = ORIGIN(SRAM2);
+		__heap2_start = .;
+
+		. = ORIGIN(SRAM2) + LENGTH(SRAM2);
+		__heap2_end = .;
+	} >RAM
+
+	/* The section length is zero if SRAM3 is not available
+	 * on this device. Ideally, the section would not exist.
+	 */
+	.heap3 (NOLOAD) :
+	{
+		__heap3_start = .;
+
+		. = ORIGIN(RAM) + LENGTH(RAM);
+		__heap3_end = .;
+		PROVIDE (__heap_end = .);
 	} >RAM
 
 	. = ALIGN(4);

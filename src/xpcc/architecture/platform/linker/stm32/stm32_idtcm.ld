@@ -14,23 +14,22 @@
  *
  * Auxiliary internal SRAM2 (16 kB):
  *   only accessible by CPU via S-Bus (less efficient than I-Bus), otherwise fully DMA capable
- *                |                                 | 0x2005 0000 <---- __ram_end, __heap_ends
- *                |---------------------------------| 0x2004 FFFF
- *                |                                 |
- *                |                                 |
- *                |                                 |
- *                |---------------------------------| 0x2004 C000
+ *                |                                 | 0x2005 0000 <---- __ram_end, __heap2_end, __heap_end
+ *      +-------> |---------------------------------| 0x2004 FFFF
+ *      |         |                                 |
+ *    heap2       |                                 |
+ *      |         |                                 |
+ *      +-------> |---------------------------------| 0x2004 C000 <--- __heap2_start
  *
  *
  * Main internal SRAM1 (240 kB):
  *                |                                 | 0x2004 C000
- *                |---------------------------------| 0x2004 BFFF
- *                |                                 |
- *                |               ^                 |
- *                |               |                 |
- *                |            Heap Area            |
- *                |         (grows upwards)         |
- *                |                                 | <------- __heap_start
+ *      +-------> |---------------------------------| 0x2004 BFFF
+ *      |         |                                 |
+ *      |         |               ^                 |
+ *   .heap1       |               |                 |
+ *      |         |            Heap Area            |
+ *      |         |         (grows upwards)         | <------- __heap1_start, __heap_start
  *      +-------> |---------------------------------| <------- __noinit_end
  *      |         |                                 |
  *   .noinit      |     Global data not cleared     |
@@ -50,32 +49,33 @@
  *
  * DTCM (Data Tightly Coupled memory) (64 kB):
  *   accessible by DMA and the CPU via D-Bus, not I-Bus!
- *                |                                 | 0x2001 0000
- *                |---------------------------------| 0x2000 FFFF
- *                |           Unused RAM            |
- *                |    (perhaps usable for heap?)   |
+ *                |                                 | 0x2001 0000 <---- __heap0_end
+ *      +-------> |---------------------------------| 0x2000 FFFF
+ *      |         |                                 |
+ *   .heap0       |           Unused RAM            |
+ *      |         |                                 | <------- __heap0_start
  *      +-------> |---------------------------------| <------- __fastdata_end
  *      |         |                                 |
  *  .fastdata     |     initialized variables       |
  *      |         |                                 | <------- __fastdata_start
  *      +-------> |---------------------------------| <------- __process_stack_top, __stack_end
- *                |       Process Stack (psp)       |
- *                |       (grows downwards)         |
- *                |               |                 |
- *                |               v                 |
- *                |---------------------------------| <------- __main_stack_top
- *                |        Main Stack (msp)         |
- *                |       (grows downwards)         |
- *                |               |                 |
- *                |               v                 | <------- __stack_start
- *                |---------------------------------| 0x2000 0000
+ *      |         |       Process Stack (psp)       |
+ *      |         |       (grows downwards)         |
+ *      |         |               |                 |
+ *      |         |               v                 |
+ *   .stack       |---------------------------------| <------- __main_stack_top
+ *      |         |        Main Stack (msp)         |
+ *      |         |       (grows downwards)         |
+ *      |         |               |                 |
+ *      |         |               v                 | <------- __stack_start
+ *      +-------> |---------------------------------| 0x2000 0000
  *
  *
  *                          MEMORY MAP (Flash)
  *
+ *                |                                 | 0x0802 0000 <--- __rom_end
+ *                |---------------------------------| 0x0801 FFFF
  *                |                                 |
- *                |---------------------------------| 0x0802 0000
- *                |                                 | 0x0801 FFFF
  *                |                                 |
  *                |                                 |
  *                |          Unused flash           |
@@ -108,15 +108,17 @@
  *      |         |         into ITCM RAM           | <------- __fastcode_load
  *      +-------> |---------------------------------|
  *      |         |                                 |
- *   .reset       |    Interrupt Vectors (in ROM)   | <------- __vector_table_ram_load
- *      |         |       (copy of .vectors)        | <------- __vector_table_rom_start
- *      +-------> |---------------------------------| 0x0800 0000
+ *   .reset       |    Interrupt Vectors (in ROM)   |
+ *      |         |       (copy of .vectors)        | <------- __vector_table_rom_start, __vector_table_ram_load
+ *      +-------> |---------------------------------| 0x0800 0000 <--- __rom_start
  *
  * ITCM (Instruction Tightly Coupled Memory) (16 kB):
  *   only accessible by the CPU (no DMA etc.) via I-Bus!
- *                |                                 | 0x0000 4000
- *                |---------------------------------| 0x0000 3FFF
- *                |           Unused RAM            |
+ *                |                                 | 0x0000 4000 <---- __heap4_end
+ *      +-------> |---------------------------------| 0x0000 3FFF
+ *      |         |                                 |
+ *   .heap4       |           Unused RAM            |
+ *      |         |                                 | <------- __heap4_start
  *      +-------> |---------------------------------| <------- __fastcode_end
  *      |         |                                 |
  *  .fastcode     |     C/C++-Functions in RAM      |
@@ -143,7 +145,8 @@ EXTERN(_init)
 
 PROVIDE(__ram_start = ORIGIN(RAM));
 PROVIDE(__ram_end   = ORIGIN(RAM) + LENGTH(RAM));
-PROVIDE(__heap_end  = ORIGIN(RAM) + LENGTH(RAM));
+PROVIDE(__rom_start = ORIGIN(ROM));
+PROVIDE(__rom_end   = ORIGIN(ROM) + LENGTH(ROM));
 
 /* the thread stack is used only for reporting hard fault conditions! It may therefore be small. */
 PROCESS_STACK_SIZE  = DEFINED(__process_stack_size) ? (__process_stack_size & ~0x7) : 256;
@@ -185,6 +188,17 @@ SECTIONS
 		__fastcode_end = .;
 	} >ITCM AT>ROM
 
+	/* This is currently not used by the heap allocator!
+	.heap4 (NOLOAD) :
+	{
+		. = ALIGN(4);
+		__heap4_start = .;
+
+		. = ORIGIN(ITCM) + LENGTH(ITCM);
+		__heap4_end = .;
+	} >ITCM
+	*/
+
 	.stack (NOLOAD) :
 	{
 		__stack_start = . ;
@@ -210,6 +224,17 @@ SECTIONS
 		. = ALIGN(4);
 		__fastdata_end = .;
 	} >DTCM AT>ROM
+
+	/* This is currently not used by the heap allocator!
+	.heap0 (NOLOAD) :
+	{
+		. = ALIGN(4);
+		__heap0_start = .;
+
+		. = ORIGIN(DTCM) + LENGTH(DTCM);
+		__heap0_end = .;
+	} >DTCM
+	*/
 
 	.text :
 	{
@@ -367,8 +392,26 @@ SECTIONS
 
 		. = ALIGN (4);
 		PROVIDE (__noinit_end = .);
-		. = ALIGN (4);
+	} >RAM
+
+	.heap1 (NOLOAD) :
+	{
+		. = ALIGN(4);
 		PROVIDE (__heap_start = .);
+		__heap1_start = .;
+
+		. = ORIGIN(SRAM1) + LENGTH(SRAM1);
+		__heap1_end = .;
+	} >RAM
+
+	.heap2 (NOLOAD) :
+	{
+		. = ORIGIN(SRAM2);
+		__heap2_start = .;
+
+		. = ORIGIN(SRAM2) + LENGTH(SRAM2);
+		__heap2_end = .;
+		PROVIDE (__heap_end = .);
 	} >RAM
 
 	. = ALIGN(4);

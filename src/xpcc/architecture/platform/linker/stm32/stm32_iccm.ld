@@ -14,15 +14,13 @@
  *
  *
  * Main internal SRAM1 (up to 40 kB):
- *                |                                 | 0x2001 C000 <--- __handler_stack_top, __stack_end
- *                |---------------------------------| 0x2001 BFFF
- *                |           Unused RAM            |
- *                |     (overwritten by heap!)      |
- *                |---------------------------------|
- *                |               ^                 |
- *                |               |                 |
- *                |            Heap Area            |
- *                |         (grows upwards)         | <------- __heap_start
+ *                |                                 | 0x2001 C000 <---- __ram_end, __heap1_end, __heap_end
+ *      +-------> |---------------------------------| 0x2001 BFFF
+ *      |         |                                 |
+ *      |         |               ^                 |
+ *   .heap1       |               |                 |
+ *      |         |            Heap Area            |
+ *      |         |         (grows upwards)         | <------- __heap1_start, __heap_start
  *      +-------> |---------------------------------| <------- __noinit_end
  *      |         |                                 |
  *   .noinit      |     Global data not cleared     |
@@ -38,23 +36,25 @@
  *      |         |                                 |
  *      |         |                                 |
  *      +-------> |---------------------------------| <------- __process_stack_top, __stack_end, __data_start
- *                |       Process Stack (psp)       |
- *                |       (grows downwards)         |
- *                |               |                 |
- *                |               v                 |
- *                |---------------------------------| <------- __main_stack_top
- *                |        Main Stack (msp)         |
- *                |       (grows downwards)         |
- *                |               |                 |
- *                |               v                 | <------- __stack_start
- *                |---------------------------------| 0x2000 0000 <--- __ram_start
+ *      |         |       Process Stack (psp)       |
+ *      |         |       (grows downwards)         |
+ *      |         |               |                 |
+ *      |         |               v                 |
+ *   .stack       |---------------------------------| <------- __main_stack_top
+ *      |         |        Main Stack (msp)         |
+ *      |         |       (grows downwards)         |
+ *      |         |               |                 |
+ *      |         |               v                 | <------- __stack_start
+ *      +-------> |---------------------------------| 0x2000 0000 <--- __ram_start
  *
  *
  * CCM (Core Coupled memory) (up to 16 kB):
  *   only accessible by the CPU (no DMA etc.) via D-Bus _and_ I-Bus!
- *                |                                 | 0x1000 4000
- *                |---------------------------------| 0x1000 3FFF
- *                |           Unused RAM            |
+ *                |                                 | 0x1000 4000 <---- __heap4_end
+ *      +-------> |---------------------------------| 0x1000 3FFF
+ *      |         |                                 |
+ *   .heap4       |           Unused RAM            |
+ *      |         |                                 | <------- __heap4_start
  *      +-------> |---------------------------------| <------- __fastdata_end
  *      |         |                                 |
  *  .fastdata     |     initialized variables       |
@@ -72,9 +72,9 @@
  *
  *                         MEMORY MAP (Flash)
  *
+ *                |                                 | 0x0802 0000 <--- __rom_end
+ *                |---------------------------------| 0x0801 FFFF
  *                |                                 |
- *                |---------------------------------| 0x0802 0000
- *                |                                 | 0x0801 FFFF
  *                |                                 |
  *                |                                 |
  *                |          Unused flash           |
@@ -107,9 +107,9 @@
  *      |         |         into CCM RAM            | <------- __fastcode_load
  *      +-------> |---------------------------------|
  *      |         |                                 |
- *   .reset       |    Interrupt Vectors (in ROM)   | <------- __vector_table_ram_load
- *      |         |       (copy of .vectors)        | <------- __vector_table_rom_start
- *      +-------> |---------------------------------| 0x0800 0000
+ *   .reset       |    Interrupt Vectors (in ROM)   |
+ *      |         |       (copy of .vectors)        | <------- __vector_table_rom_start, __vector_table_ram_load
+ *      +-------> |---------------------------------| 0x0800 0000 <--- __rom_start
  *
  * The first two words (32-bit) in the Flash defines the initial stack pointer
  * location and the reset handler location.
@@ -127,7 +127,8 @@ EXTERN(_init)
 
 PROVIDE(__ram_start = ORIGIN(RAM));
 PROVIDE(__ram_end   = ORIGIN(RAM) + LENGTH(RAM));
-PROVIDE(__heap_end  = ORIGIN(RAM) + LENGTH(RAM));
+PROVIDE(__rom_start = ORIGIN(ROM));
+PROVIDE(__rom_end   = ORIGIN(ROM) + LENGTH(ROM));
 
 /* Used for interrupt handlers */
 /* the thread stack is used only for reporting hard fault conditions! It may therefore be small. */
@@ -180,6 +181,17 @@ SECTIONS
 		. = ALIGN(4);
 		__fastdata_end = .;
 	} >CCM AT>ROM
+
+	/* This is currently not used by the heap allocator!
+	.heap4 (NOLOAD) :
+	{
+		. = ALIGN(4);
+		__heap4_start = .;
+
+		. = ORIGIN(CCM) + LENGTH(CCM);
+		__heap4_end = .;
+	} >CCM
+	*/
 
 	.text :
 	{
@@ -352,8 +364,17 @@ SECTIONS
 
 		. = ALIGN (4);
 		PROVIDE (__noinit_end = .);
-		. = ALIGN (4);
+	} >RAM
+
+	.heap1 (NOLOAD) :
+	{
+		. = ALIGN(4);
 		PROVIDE (__heap_start = .);
+		__heap1_start = .;
+
+		. = ORIGIN(RAM) + LENGTH(RAM);
+		__heap1_end = .;
+		PROVIDE (__heap_end = .);
 	} >RAM
 
 	. = ALIGN(4);
