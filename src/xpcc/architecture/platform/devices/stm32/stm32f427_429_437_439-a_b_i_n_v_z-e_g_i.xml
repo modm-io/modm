@@ -8,7 +8,7 @@
     <flash device-size-id="e">524288</flash>
     <flash device-size-id="g">1048576</flash>
     <flash device-size-id="i">2097152</flash>
-    <ram>196608</ram>
+    <ram>262144</ram>
     <core>cortex-m4f</core>
     <linkerscript device-size-id="i">stm32f4xx_i.ld</linkerscript>
     <pin-count device-pin-id="v">100</pin-count>

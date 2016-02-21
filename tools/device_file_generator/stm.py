@@ -210,7 +210,7 @@ stm32_memory = \
 		'start': {
 			'flash': 0x08000000,
 			'dtcm': 0x20000000,
-			'itcm': 0x00200000,
+			'itcm': 0x00000000,
 			'sram': 0x20010000
 		},
 		'model': [

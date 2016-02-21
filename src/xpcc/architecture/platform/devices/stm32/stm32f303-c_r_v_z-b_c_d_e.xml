@@ -9,9 +9,9 @@
     <flash device-size-id="c">262144</flash>
     <flash device-size-id="d">393216</flash>
     <flash device-size-id="e">524288</flash>
-    <ram device-size-id="b">32768</ram>
-    <ram device-size-id="c">40960</ram>
-    <ram device-size-id="d|e" device-pin-id="r|v|z">65536</ram>
+    <ram device-size-id="b">40960</ram>
+    <ram device-size-id="c">49152</ram>
+    <ram device-size-id="d|e">81920</ram>
     <linkerscript device-size-id="b">stm32f3xx_b.ld</linkerscript>
     <linkerscript device-size-id="c">stm32f3xx_c.ld</linkerscript>
     <core>cortex-m4f</core>

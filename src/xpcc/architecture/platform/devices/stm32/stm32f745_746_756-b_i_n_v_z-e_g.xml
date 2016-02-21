@@ -7,7 +7,7 @@
   <device platform="stm32" family="f7" name="745|746|756" pin_id="b|i|n|v|z" size_id="e|g">
     <flash device-size-id="e">524288</flash>
     <flash device-size-id="g">1048576</flash>
-    <ram>327680</ram>
+    <ram>409600</ram>
     <core>cortex-m7f</core>
     <linkerscript device-size-id="g">stm32f7xx_g.ld</linkerscript>
     <pin-count device-pin-id="v">100</pin-count>
@@ -21,12 +21,12 @@
     <define device-name="746">STM32F746xx</define>
     <define device-name="756" device-size-id="g">STM32F756xx</define>
     <driver type="core" name="cortex">
-      <section access="rwx" start="0x200000" name="itcm" size="16"/>
-      <section device-size-id="g" access="rx" start="0x8000000" name="flash" size="1024"/>
-      <section device-size-id="e" access="rx" start="0x8000000" name="flash" size="512"/>
-      <section access="rwx" start="0x20000000" name="dtcm" size="64"/>
-      <section access="rwx" start="0x20010000" name="sram1" size="240"/>
-      <section access="rwx" start="0x2004C000" name="sram2" size="16"/>
+      <memory access="rwx" start="0x00" name="itcm" size="16"/>
+      <memory device-size-id="e" access="rx" start="0x8000000" name="flash" size="512"/>
+      <memory device-size-id="g" access="rx" start="0x8000000" name="flash" size="1024"/>
+      <memory access="rwx" start="0x20000000" name="dtcm" size="64"/>
+      <memory access="rwx" start="0x20010000" name="sram1" size="240"/>
+      <memory access="rwx" start="0x2004C000" name="sram2" size="16"/>
       <vector position="0" name="WWDG"/>
       <vector position="1" name="PVD"/>
       <vector position="2" name="TAMP_STAMP"/>

@@ -106,9 +106,14 @@ class STMDeviceReader(XMLDeviceReader):
 		if mem_model == None:
 			self.log.error("STMDeviceReader: Memory model not found for device '{}'".format(self.id.string))
 
-		ram = int(rams[sizeIndexRam].text) + mem_model['memories']['sram1']
+		total_ram = ram = int(rams[sizeIndexRam].text) + mem_model['memories']['sram1']
 		flash = int(flashs[sizeIndexFlash].text) + mem_model['memories']['flash']
-		self.addProperty('ram', ram * 1024)
+		if 'ccm' in mem_model['memories']:
+			total_ram += mem_model['memories']['ccm']
+		if 'itcm' in mem_model['memories']:
+			total_ram += mem_model['memories']['itcm']
+			total_ram += mem_model['memories']['dtcm']
+		self.addProperty('ram', total_ram * 1024)
 		self.addProperty('flash', flash * 1024)
 
 		memories = []

@@ -7,7 +7,7 @@
   <device platform="stm32" family="f4" name="405|407|415|417" pin_id="i|o|r|v|z" size_id="e|g">
     <flash device-size-id="e">524288</flash>
     <flash device-size-id="g">1048576</flash>
-    <ram>131072</ram>
+    <ram>196608</ram>
     <core>cortex-m4f</core>
     <linkerscript device-size-id="e">stm32f4xx_e.ld</linkerscript>
     <linkerscript device-size-id="g">stm32f4xx_g.ld</linkerscript>
