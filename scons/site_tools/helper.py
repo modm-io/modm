@@ -52,11 +52,11 @@ import subprocess
 filter = re.compile('^(?P<section>[.]\w+)\s*(?P<size>\d+)\s*(?P<addr>\d+)$')
 
 # Sections which will remain in the Flash
-flashSectionNames = ['.reset', '.vectors', '.fastcode', '.fastdata', '.text', '.rodata', '.data']
+flashSectionNames = ['.reset', '.fastcode', '.fastdata', '.text', '.rodata', '.data']
 
 # Sections which will be created in RAM or are copied from the Flash. In that
 # case the section will appear also in `flashSectionNames`.
-ramSectionNames = ['.vectors', '.fastcode', '.fastdata', '.data', '.bss', '.noinit', '.stack']
+ramSectionNames = ['.vectors', '.fastcode', '.fastdata', '.data', '.bss', '.noinit']
 
 def size_action(target, source, env):
 	cmd = [env['SIZE'], '-A', str(source[0])]
@@ -71,8 +71,13 @@ def size_action(target, source, env):
 
 	flashSize = 0
 	ramSize = 0
+	stackSize = 0
+	heapSize = 0
 	flashSections = {}
 	ramSections = {}
+	stackSections = {}
+	heapSections = {}
+
 	for line in stdout.splitlines():
 		match = filter.match(line)
 		if match:
@@ -83,15 +88,25 @@ def size_action(target, source, env):
 			if section in ramSectionNames:
 				ramSize += int(match.group('size'))
 				ramSections[section] = 1
+			if section.startswith('.stack'):
+				stackSize += int(match.group('size'))
+				stackSections[section] = 1
+			if section.startswith('.heap'):
+				heapSize += int(match.group('size'))
+				heapSections[section] = 1
 
 	# create lists of the used sections for Flash and RAM
 	flashSections = flashSections.keys()
 	flashSections.sort()
-	ramSections = ramSections.keys()
+	ramSections = ramSections.keys() + stackSections.keys()
 	ramSections.sort()
+	heapSections = heapSections.keys()
+	heapSections.sort()
 
 	flashPercentage = flashSize / float(env['DEVICE_SIZE']['flash']) * 100.0
 	ramPercentage = ramSize / float(env['DEVICE_SIZE']['ram']) * 100.0
+	stackPercentage = stackSize / float(env['DEVICE_SIZE']['ram']) * 100.0
+	heapPercentage = heapSize / float(env['DEVICE_SIZE']['ram']) * 100.0
 
 	device = env['ARM_DEVICE']
 
@@ -99,13 +114,17 @@ def size_action(target, source, env):
 ------------
 Device: %s
 
-Program: %7d bytes (%2.1f%% Full)
+Program: %7d bytes (%2.1f%% used)
 (%s)
 
-Data:    %7d bytes (%2.1f%% Full)
+Data:    %7d bytes (%2.1f%% used) = %d bytes static (%2.1f%%) + %d bytes stack (%2.1f%%)
 (%s)
-""" % (device, flashSize, flashPercentage, ' + '.join(flashSections), \
-	ramSize, ramPercentage, ' + '.join(ramSections))
+
+Heap:    %7d bytes (%2.1f%% available)
+(%s)
+""" % (device, flashSize, flashPercentage, ' + '.join(flashSections),
+	   ramSize + stackSize, ramPercentage + stackPercentage, ramSize, ramPercentage, stackSize, stackPercentage, ' + '.join(ramSections),
+	   heapSize, heapPercentage, ' + '.join(heapSections))
 
 # -----------------------------------------------------------------------------
 def show_size(env, source, alias='__size'):
