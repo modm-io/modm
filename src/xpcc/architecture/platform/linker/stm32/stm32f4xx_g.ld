@@ -1,7 +1,7 @@
 
 MEMORY
 {
-	ROM (rx)      : ORIGIN = 0x08000000, LENGTH = 1m
+	ROM (rx)    : ORIGIN = 0x08000000, LENGTH = 1m
 	RAM (rwx)   : ORIGIN = 0x20000000, LENGTH = 112k + 16k	/* Entire continuous RAM section */
 
 	SRAM1 (rwx) : ORIGIN = 0x20000000, LENGTH = 112k		/* Main internal SRAM1 */
