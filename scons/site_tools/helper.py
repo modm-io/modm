@@ -1,11 +1,11 @@
 #!/usr/bin/env python2
-# 
+#
 # Copyright (c) 2009, Roboterclub Aachen e.V.
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
+#
 #     * Redistributions of source code must retain the above copyright
 #       notice, this list of conditions and the following disclaimer.
 #     * Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
 #     * Neither the name of the Roboterclub Aachen e.V. nor the
 #       names of its contributors may be used to endorse or promote products
 #       derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
 # EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -46,7 +46,7 @@ import subprocess
 # .debug_aranges      3360           0
 # (...)
 # Total             285915
-# 
+#
 # Try to match the lines (name, size, address) to get the size of the
 # individual regions
 filter = re.compile('^(?P<section>[.]\w+)\s*(?P<size>\d+)\s*(?P<addr>\d+)$')
@@ -60,15 +60,15 @@ ramSectionNames = ['.vectors', '.fastcode', '.fastdata', '.data', '.bss', '.noin
 
 def size_action(target, source, env):
 	cmd = [env['SIZE'], '-A', str(source[0])]
-	
+
 	# Run the default nm command (`arm-none-eabi-nm` in this case)
 	p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
 	stdout, stderr = p.communicate()
-	
+
 	if stderr is not None:
 		env.Error("Error while running %s" % ' '.join(cmd))
 		Exit(1)
-	
+
 	flashSize = 0
 	ramSize = 0
 	flashSections = {}
@@ -83,18 +83,18 @@ def size_action(target, source, env):
 			if section in ramSectionNames:
 				ramSize += int(match.group('size'))
 				ramSections[section] = 1
-	
+
 	# create lists of the used sections for Flash and RAM
 	flashSections = flashSections.keys()
 	flashSections.sort()
 	ramSections = ramSections.keys()
 	ramSections.sort()
-	
+
 	flashPercentage = flashSize / float(env['DEVICE_SIZE']['flash']) * 100.0
 	ramPercentage = ramSize / float(env['DEVICE_SIZE']['ram']) * 100.0
-	
+
 	device = env['ARM_DEVICE']
-	
+
 	print """Memory Usage
 ------------
 Device: %s
@@ -111,7 +111,7 @@ Data:    %7d bytes (%2.1f%% Full)
 def show_size(env, source, alias='__size'):
 	if env['ARCHITECTURE'] == 'avr8':
 		# use the raw output of the size tool
-		action = Action("$SIZE %s" % source[0].path, 
+		action = Action("$SIZE %s" % source[0].path,
 					cmdstr="$SIZECOMSTR")
 	else:
 		action = Action(size_action, cmdstr="$SIZECOMSTR")
@@ -119,7 +119,7 @@ def show_size(env, source, alias='__size'):
 	return env.AlwaysBuild(env.Alias(alias, source, action))
 
 def list_symbols(env, source, alias='__symbols'):
-	action = Action("$NM %s -S -C --size-sort -td" % source[0].path, 
+	action = Action("$NM %s -S -C --size-sort -td" % source[0].path,
 					cmdstr="$SYMBOLSCOMSTR")
 	return env.AlwaysBuild(env.Alias(alias, source, action))
 
@@ -135,10 +135,10 @@ def generate(env, **kw):
 	if ARGUMENTS.get('verbose') != '1':
 		env['SIZECOMSTR'] = "Size after:"
 		env['SYMBOLSCOMSTR'] = "Show symbols for '$SOURCE':"
-	
+
 	env.AddMethod(show_size, 'Size')
 	env.AddMethod(list_symbols, 'Symbols')
-	
+
 	env.AddMethod(run_program, 'Run')
 	env.AddMethod(phony_target, 'Phony')
 
