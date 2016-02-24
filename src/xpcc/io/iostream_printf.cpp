@@ -33,9 +33,9 @@ xpcc::IOStream::vprintf(const char *fmt, va_list ap)
 	// for all chars in format (fmt)
 	while ((c = *fmt++) != 0)
 	{
-		bool isSigned = 0;
-		bool isLong = 0;
-		bool isLongLong = 0;
+		bool isSigned = false;
+		bool isLong = false;
+		bool isLongLong = false;
 
 		if (c != '%')
 		{
