@@ -487,6 +487,10 @@ protected :
 #endif
 
 private :
+	void
+	writeUnsignedInteger(unsigned long unsignedValue, uint_fast8_t base, size_t width, char fill);
+
+private:
 	enum class
 	Mode
 	{

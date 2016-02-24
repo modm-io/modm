@@ -137,40 +137,46 @@ xpcc::IOStream::vprintf(const char *fmt, va_list ap)
 				unsignedValue = (unsigned long) signedValue;
 			}
 
-			{
-				char scratch[26];
-
-				ptr = scratch + sizeof(scratch);
-				*--ptr = 0;
-				do
-				{
-					char ch = (unsignedValue % base) + '0';
-
-					if (ch > '9') {
-						ch += 'A' - '9' - 1;
-					}
-
-					*--ptr = ch;
-					unsignedValue /= base;
-
-					if (width) {
-						--width;
-					}
-				} while (unsignedValue);
-
-				// insert padding chars
-				while (width--) {
-					*--ptr = fill;
-				}
-
-				// output result
-				while ((c = *ptr++)) {
-					this->device->write(c);
-				}
-			}
+			writeUnsignedInteger(unsignedValue, base, width, fill);
 		}
 	}
 
 	return *this;
 }
 
+void
+xpcc::IOStream::writeUnsignedInteger(
+	unsigned long unsignedValue, uint_fast8_t base,
+	size_t width, char fill)
+{
+	char scratch[26];
+
+	char *ptr = scratch + sizeof(scratch);
+	*--ptr = 0;
+	do
+	{
+		char ch = (unsignedValue % base) + '0';
+
+		if (ch > '9') {
+			ch += 'A' - '9' - 1;
+		}
+
+		*--ptr = ch;
+		unsignedValue /= base;
+
+		if (width) {
+			--width;
+		}
+	} while (unsignedValue);
+
+	// insert padding chars
+	while (width--) {
+		*--ptr = fill;
+	}
+
+	// output result
+	char ch;
+	while ((ch = *ptr++)) {
+		this->device->write(ch);
+	}
+}
