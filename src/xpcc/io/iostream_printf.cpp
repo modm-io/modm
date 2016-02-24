@@ -10,6 +10,7 @@
 #include <stdarg.h>
 #include <stdio.h>		// snprintf()
 #include <stdlib.h>
+#include <xpcc/math/utils/misc.hpp>        // xpcc::pow
 
 #include "iostream.hpp"
 
@@ -36,6 +37,7 @@ xpcc::IOStream::vprintf(const char *fmt, va_list ap)
 		bool isSigned = false;
 		bool isLong = false;
 		bool isLongLong = false;
+		bool isFloat = false;
 		bool isNegative = false;
 
 		if (c != '%')
@@ -46,6 +48,7 @@ xpcc::IOStream::vprintf(const char *fmt, va_list ap)
 		c = *fmt++;
 
 		size_t width = 0;
+		size_t width_frac = 0;
 		char fill = ' ';
 		if (c == '0')
 		{
@@ -55,6 +58,15 @@ xpcc::IOStream::vprintf(const char *fmt, va_list ap)
 		if (c >= '0' && c <= '9')
 		{
 			width = c - '0';
+			c = *fmt++;
+		}
+
+		if (c == '.') {
+			c = *fmt++;
+
+			if (c >= '0' && c <= '9') {
+				width_frac = c - '0';
+			}
 			c = *fmt++;
 		}
 
@@ -89,6 +101,10 @@ xpcc::IOStream::vprintf(const char *fmt, va_list ap)
 				}
 				continue;
 
+			case 'f':
+				isFloat = true;
+				break;
+
 			case 'd':
 				isSigned = true;
 				/* no break */
@@ -108,6 +124,44 @@ xpcc::IOStream::vprintf(const char *fmt, va_list ap)
 
 
 		// Number output
+		if (isFloat)
+		{
+			// va_arg(ap, float) not allowed
+			float float_value = va_arg(ap, double);
+
+			if (float_value < 0)
+			{
+				float_value = -float_value; // make it positive
+				isNegative = true;
+			}
+
+			// 1) Print integer part
+			int width_integer = width - width_frac - 1;
+			if (width_integer < 0) {
+				width_integer = 0;
+			}
+
+			writeUnsignedInteger((unsigned int)float_value, base, width_integer, fill, isNegative);
+
+			// 2) Decimal dot
+			this->device->write('.');
+
+			// 3) Fractional part
+			float_value = float_value - ((int) float_value);
+			float_value *= xpcc::pow(10, width_frac);
+
+			// Alternative: Smaller code size but probably less precise
+			// for (uint_fast8_t ii = 0; ii < width_frac; ++ii) {
+			//     float_value = float_value * (10.0);
+			// }
+
+			// Add 1/2 for roundig of last digit
+			float_value += 0.5;
+
+			// Print fractional part
+			writeUnsignedInteger((unsigned int)float_value, base, width_frac, '0', false);
+		}
+		else
 		{
 			unsigned long unsignedValue;
 
