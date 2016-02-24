@@ -36,6 +36,7 @@ xpcc::IOStream::vprintf(const char *fmt, va_list ap)
 		bool isSigned = false;
 		bool isLong = false;
 		bool isLongLong = false;
+		bool isNegative = false;
 
 		if (c != '%')
 		{
@@ -127,17 +128,14 @@ xpcc::IOStream::vprintf(const char *fmt, va_list ap)
 				{
 					if (signedValue < 0)
 					{
+						isNegative = true;
 						signedValue = -signedValue; // make it positive
-						this->device->write('-');
-						if (width) {
-							--width;
-						}
 					}
 				}
 				unsignedValue = (unsigned long) signedValue;
 			}
 
-			writeUnsignedInteger(unsignedValue, base, width, fill);
+			writeUnsignedInteger(unsignedValue, base, width, fill, isNegative);
 		}
 	}
 
@@ -147,7 +145,7 @@ xpcc::IOStream::vprintf(const char *fmt, va_list ap)
 void
 xpcc::IOStream::writeUnsignedInteger(
 	unsigned long unsignedValue, uint_fast8_t base,
-	size_t width, char fill)
+	size_t width, char fill, bool isNegative)
 {
 	char scratch[26];
 
@@ -168,6 +166,15 @@ xpcc::IOStream::writeUnsignedInteger(
 			--width;
 		}
 	} while (unsignedValue);
+
+	// Insert minus sign if needed
+	if (isNegative)
+	{
+		*--ptr = '-';
+		if (width) {
+			--width;
+		}
+	}
 
 	// insert padding chars
 	while (width--) {

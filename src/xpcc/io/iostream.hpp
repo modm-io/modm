@@ -487,7 +487,7 @@ protected:
 #endif
 
 	void
-	writeUnsignedInteger(unsigned long unsignedValue, uint_fast8_t base, size_t width, char fill);
+	writeUnsignedInteger(unsigned long unsignedValue, uint_fast8_t base, size_t width, char fill, bool isNegative);
 
 private:
 	enum class
