@@ -31,5 +31,29 @@ main()
 	XPCC_LOG_INFO.printf("glibc %s", buf);
 	XPCC_LOG_INFO << xpcc::endl;
 
+	float ff_testvector[] = {123.556789, -123.4};
+
+	for (size_t ii = 0; ii < XPCC__ARRAY_SIZE(ff_testvector); ++ii) {
+		float ff = ff_testvector[ii];
+
+		for (uint_fast8_t width = 1; width < 10; ++width)
+		{
+			for (uint_fast8_t width_frac = 1; width_frac < 10; ++width_frac)
+			{
+				char fmt_str[10];
+				sprintf(fmt_str, ">>%%%d.%df<<", width, width_frac);
+				XPCC_LOG_INFO << "xpcc  ";
+				XPCC_LOG_INFO.printf(fmt_str, ff);
+				XPCC_LOG_INFO << xpcc::endl;
+
+				char buf[23];
+				sprintf(buf, fmt_str, ff);
+				XPCC_LOG_INFO.printf("glibc %s", buf);
+
+				XPCC_LOG_INFO << xpcc::endl << xpcc::endl;
+			}
+		}
+	}
+
 	return 0;
 }
