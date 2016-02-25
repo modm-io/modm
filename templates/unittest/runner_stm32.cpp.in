@@ -4,6 +4,9 @@
 
 #include <xpcc/architecture/platform.hpp>
 
+// This unittest is made for the STM32 F4 Discovery Board
+#include "../../examples/stm32f4_discovery/stm32f4_discovery.hpp"
+
 #include <unittest/reporter.hpp>
 #include <unittest/controller.hpp>
 
@@ -11,55 +14,32 @@ ${includes}
 
 ${names}
 
-GPIO__OUTPUT(LedOrange, D, 13);		// User LED 3
-GPIO__OUTPUT(LedGreen, D, 12);		// User LED 4
-GPIO__OUTPUT(LedRed, D, 14);		// User LED 5
-GPIO__OUTPUT(LedBlue, D, 15);		// User LED 6
-
-GPIO__OUTPUT(VBusPresent, A, 9);		// green LED (LD7)
-GPIO__OUTPUT(VBusOvercurrent, D, 5);	// red LED   (LD8)
-
-GPIO__INPUT(Button, A, 0);
-
 using namespace xpcc::stm32;
 
-static bool
-initClock()
-{
-	// use external 8MHz crystal
-	if (!Clock::enableHse(Clock::HSE_CRYSTAL)) {
-		return false;
-	}
-	
-	Clock::enablePll(Clock::PLL_HSE, 4, 168);
-	return Clock::switchToPll();
-}
+// Create an IODeviceWrapper around the Uart Peripheral we want to use
+xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > loggerDevice;
 
 int
 main()
 {
-	initClock();
+	Board::initialize();
 
-	LedOrange::setOutput(xpcc::Gpio::High);
-	LedGreen::setOutput(xpcc::Gpio::Low);
-	LedRed::setOutput(xpcc::Gpio::High);
-	LedBlue::setOutput(xpcc::Gpio::High);
-	
-	// initialize output device
-	xpcc::stm32::Usart1 uart(115200);
-	xpcc::IODeviceWrapper<xpcc::stm32::Usart1> device(uart);
-	
-	device.write("Unittests (" __DATE__ ", " __TIME__")\n");
-	
-	unittest::Reporter reporter(device);
+	// initialize output device, enable USART 2
+	GpioOutputA2::connect(Usart2::Tx);
+	GpioInputA3::connect(Usart2::Rx, Gpio::InputType::PullUp);
+	Usart2::initialize<Board::systemClock, 115200>(12);
+
+	loggerDevice.write("Unittests (" __DATE__ ", " __TIME__")\n");
+
+	unittest::Reporter reporter(loggerDevice);
 	unittest::Controller::instance().setReporter(reporter);
-	
+
 	// run tests
 ${tests}
-	
+
 	unittest::Controller::instance().getReporter().printSummary();
-	
-	while (1)
+
+	while (true)
 	{
 	}
 }

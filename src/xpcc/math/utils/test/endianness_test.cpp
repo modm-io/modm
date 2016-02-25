@@ -16,7 +16,7 @@ EndiannessTest::testToBigEndian()
 		uint32_t val = 0xdeadbeef;
 		TEST_ASSERT_EQUALS(xpcc::toBigEndian(val), 0xefbeadde);
 
-		TEST_ASSERT_EQUALS(xpcc::toBigEndian(0xdeadbeef), 0xefbeadde);
+		TEST_ASSERT_EQUALS(xpcc::toBigEndian(0xdeadbeeful), 0xefbeadde);
 
 		// Constants are promoted to 32 bits by the compiler.
 		// Without static cast, this does not yield to the expected result

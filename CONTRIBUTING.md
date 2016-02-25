@@ -16,6 +16,8 @@ Remember that you can continue to push to your `feature/*` or `fix/*` branches t
 
 Please note that your pull request will have to pass the CI tests in order to be merged.
 
+Including unit tests is very welcomed and highly recommended. xpcc has its own simple and easy to use unit test framework. Unit tests are placed in the `test` subdirectory of every component (e.g. `xpcc/src/xpcc/math/filter/test`) and are run with `scons unittest`. [See here for more information about testing strategies in xpcc.](TESTING.md)
+
 ## When in doubt, ask
 
 If you want to add a new platform, or other significant functionality, we [ask you to discuss that on the mailing list first](http://mailman.rwth-aachen.de/mailman/listinfo/xpcc-dev). We are very open to new suggestions, however, we might have different plans for a particular feature.

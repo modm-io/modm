@@ -16,6 +16,7 @@ culmination of many years worth of effort, experience and improvements.
 - [Feast your eyes on lots of working examples][examples].
 - [API reference is available here][reference].
 - [We have continuous integration as well][travis_ci].
+- [And we care a lot about testing](TESTING.md).
 
 This project also has [guide for developers][guide] as well as a [technical blog][blog] to document larger design concepts.
 
