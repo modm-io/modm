@@ -36,6 +36,7 @@ main(void)
 	defined(__AVR_ATmega645__)  || \
 	defined(__AVR_ATmega6490__) || \
 	defined(__AVR_ATmega128__)  || \
+	defined(__AVR_ATmega2560__) || \
 	defined(__AVR_AT90CAN128__) || \
 	defined(__AVR_AT90CAN64__)  || \
 	defined(__AVR_AT90CAN32__)
@@ -44,7 +45,8 @@ main(void)
 	GpioInputE0::connect(Uart0::Rx);
 #elif defined(__AVR_ATmega640__) || \
 	defined(__AVR_ATmega1280__)  || \
-	defined(__AVR_ATmega1281__)
+	defined(__AVR_ATmega1281__)  || \
+	defined(__AVR_ATmega2561__)
 	typedef Uart1 uart;
 	GpioOutputD3::connect(Uart1::Tx);
 	GpioInputD2::connect(Uart1::Rx);
