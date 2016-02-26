@@ -45,6 +45,54 @@
 	.func	HardFault_Handler
 HardFault_Handler:
 
+%% if target is stm32
+	/* When a hard fault occurs, this handler will move the stack pointer around.
+ 	 * This makes it harder to debug a hard fault with a real debugger, so if one is connected we would
+	 * like to trigger a software breakpoint before moving the stack pointer.
+	 * The decision to trigger the breakpoint needs to happen at runtime and not at compile time,
+	 * since when a hard fault has been triggered, you want to debug the binary on the device and not
+	 * compile a new binary with the breakpoint in it, which might then prevent the fault from occurring.
+	 *
+	 * The Cortex-M3 Core Debug module contains the "Debug Halting Control and Status Register" (DHCSR),
+	 * which contains the `C_DEBUGEN` bit, which is set by the debugger to enable halting debug.
+	 * "If halting debug is enabled [...], captured events will halt the processor in Debug state."
+	 * You can test if halting debug is enabled using `(CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk)`.
+	 *
+	 * !!!WARNING:
+	 *    "If DHCSR.C_DEBUGEN is clear and a breakpoint occurs in an NMI or HardFault exception handler,
+	 *     the system locks up with an unrecoverable error."
+	 *
+	 * Since we are using a breakpoint inside the HardFault exception handler, we must therefore always
+	 * check this flag, before executing the breakpoint.
+	 *
+	 * !!!WARNING:
+	 *     On ARMv6-M "access to the DHCSR from software running on the processor is IMPLEMENTATION DEFINED."
+	 *     This means, that on Cortex-M0, it might not be possible to read the DHCSR from software!
+	 *
+	 * STM32F0 implements this access, but LPC11 does not!
+	 *
+	 * !!!WARNING:
+	 *     OpenOcd does not reset the `C_DEBUGEN` bit on the `shutdown` command. This might be a bug.
+	 *     A workaround is to issue `reset halt`, then manually reset the bits using `mww 0xE000EDF0 0xA05F0000`.
+	 *     This will also clear the `C_HALT` bit and therefore this is equivalent to `reset run`.
+	 *
+	 * !!!WARNING:
+	 *    `C_DEBUGEN` is sticky! It survives all resets but a power-on reset. This means that after debugging
+	 *    either power cycle the target or manually clear `C_DEBUGEN` using `mww 0xE000EDF0 0xA05F0000`.
+	 */
+	msr psp, r0							// save register 0 into the process stack pointer (PSP)
+	ldr r0, =0xE000EDF0					// Load the address of the Debug Halting Control and Status Register (DHCSR)
+	ldr r0, [r0, #0]					// load the content of DHCSR, we need to check if bit 0 is set
+	lsls r0, #31						// test bit 0 by shifting it left 31 times, becoming sign bit
+	mrs r0, psp							// restore r0 before triggering the breakpoint
+	bpl no_debugger						// branch over breakpoint if lsls resulted in positive integer (MSB not set)
+	bkpt #42							// trigger a break point, only if a debugger is connected
+no_debugger:
+%% endif
+
+%% if (not parameters.enable_hardfault_handler_led) and (parameters.enable_hardfault_handler_log == "false")
+	b HardFault_Handler					// busy wait in a loop forever
+%% else
 	/* We want to preserve the entire stack frame, since in case of a stack overflow, the exception entry
 	 * is not able to push an exception frame onto the main stack!
 	 * So we need to push all registers onto the process stack, since it definitely has space.
@@ -116,6 +164,7 @@ HardFault_Handler:
 	// call the C code handler
 	b _hardFaultHandler
 
+%% endif
 	.size	HardFault_Handler, . - HardFault_Handler
 	.endfunc
 
