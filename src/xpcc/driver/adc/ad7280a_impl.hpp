@@ -428,10 +428,10 @@ bool
 xpcc::Ad7280a<Spi, Cs, Cnvst, N>::read(uint32_t *value)
 {
 	Cs::reset();
-	*value  = Spi::write(0xF8) << 24;
-	*value |= Spi::write(0x00) << 16;
-	*value |= Spi::write(0x03) << 8;
-	*value |= Spi::write(0x0A);
+	*value  = static_cast<uint32_t>(Spi::write(0xF8)) << 24;
+	*value |= static_cast<uint32_t>(Spi::write(0x00)) << 16;
+	*value |= static_cast<uint32_t>(Spi::write(0x03)) << 8;
+	*value |= static_cast<uint32_t>(Spi::write(0x0A));
 	Cs::set();
 	
 	//XPCC_LOG_DEBUG << "read = " << xpcc::hex << *value << xpcc::ascii << xpcc::endl;

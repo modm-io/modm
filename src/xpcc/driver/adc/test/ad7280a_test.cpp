@@ -215,7 +215,7 @@ Ad7280aTest::testChannelRead()
 	uint16_t value;
 	TEST_ASSERT_TRUE(Ad7280a::readChannel(0, xpcc::ad7280a::CELL_VOLTAGE_4, &value));
 
-	TEST_ASSERT_EQUALS(value, 549);
+	TEST_ASSERT_EQUALS(value, 549u);
 
 	device.finish();
 }
@@ -265,12 +265,12 @@ Ad7280aTest::testAllChannelRead()
 	uint16_t values[6];
 	TEST_ASSERT_TRUE(Ad7280a::readAllChannels(values));
 
-	TEST_ASSERT_EQUALS(values[0], 100);
-	TEST_ASSERT_EQUALS(values[1], 200);
-	TEST_ASSERT_EQUALS(values[2], 300);
-	TEST_ASSERT_EQUALS(values[3], 400);
-	TEST_ASSERT_EQUALS(values[4], 500);
-	TEST_ASSERT_EQUALS(values[5], 600);
+	TEST_ASSERT_EQUALS(values[0], 100u);
+	TEST_ASSERT_EQUALS(values[1], 200u);
+	TEST_ASSERT_EQUALS(values[2], 300u);
+	TEST_ASSERT_EQUALS(values[3], 400u);
+	TEST_ASSERT_EQUALS(values[4], 500u);
+	TEST_ASSERT_EQUALS(values[5], 600u);
 
 	device.finish();
 }
