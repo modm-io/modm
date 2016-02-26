@@ -27,9 +27,9 @@ main()
 	LedRed::set();
 
 	// initialize output device
-	GpioOutputD1::connect(Uart0::Tx);
-    GpioInputD0::connect(Uart0::Rx);
-    Uart0::initialize< clock, 115200, xpcc::Tolerance::TenPercent >();
+	GpioOutputE1::connect(Uart0::Tx);
+	GpioInputE0::connect(Uart0::Rx);
+	Uart0::initialize< clock, 115200, xpcc::Tolerance::TenPercent >();
 
 	Uart0 uart;
 	xpcc::IODeviceWrapper< Uart0, xpcc::IOBuffer::BlockIfFull > loggerDevice(uart);
