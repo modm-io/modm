@@ -88,8 +88,12 @@
       </gpio>
       <gpio port="D" id="6"/>
       <gpio port="D" id="7"/>
-      <gpio port="E" id="0" pcint="8"/>
-      <gpio port="E" id="1"/>
+      <gpio port="E" id="0" pcint="8">
+        <af peripheral="Uart0" type="in" name="Rxd"/>
+      </gpio>
+      <gpio port="E" id="1">
+        <af peripheral="Uart0" type="out" name="Txd"/>
+      </gpio>
       <gpio port="E" id="2"/>
       <gpio port="E" id="3"/>
       <gpio port="E" id="4" extint="4"/>

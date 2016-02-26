@@ -1010,6 +1010,12 @@ pins = \
 			{ "port": "B", "id": "1", "name": "sck", "dir": "out" },
 			{ "port": "B", "id": "0", "name": "ss", "dir": "out" }
 		],
+		"uart0":
+		[
+			{ "port": "E", "id": "0", "name": "rxd", "dir": "in" },
+			{ "port": "E", "id": "1", "name": "txd", "dir": "out" },
+			{ "port": "E", "id": "2", "name": "xck", "dir": "out" }
+		],
 		"uart1":
 		[
 			{ "port": "D", "id": "2", "name": "rxd", "dir": "in" },
