@@ -43,7 +43,7 @@
 %% if target.name in ['8', '128'] and target.type in ['a', None]
 	%% set adfr = 1
 %% endif
-%% if (target.name in ['16', '32'] and target.type in ['u4']) or (target.name in ['640', '1280', '1281', '2560', '2561'] and target.type in [None]) or (target.name in ['64', '128', '256', '644', '1284', '2564'] and target.type in ['rfa1', 'rfr2'])
+%% if (target.name in ['16', '32'] and target.type in ['u4']) or (target.name in ['640', '1280', '2560'] and target.type in [None]) or (target.name in ['64', '128', '256', '644', '1284', '2564'] and target.type in ['rfa1', 'rfr2'])
 	%% set mux5 = 1
 %% endif
 %% if target.name in ['8', '48', '88', '168', '328'] and target.type in ['a', None, 'p', 'pa']
