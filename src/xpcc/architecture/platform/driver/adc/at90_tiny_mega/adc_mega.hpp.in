@@ -52,6 +52,10 @@
 %% if target.name in ['16', '32', '8535'] and target.type in ['a', None]
 	%% set sfior = 1
 %% endif
+{#- ADC High Speed Mode has been removed from some chips #}
+%% if target.name in ['8', '16', '32', '64'] and target.type in ['m1', 'u4', 'c1', 'u6', 'a']
+	%% set adhsm = 1
+%% endif
 
 %% set resolution = 10
 
@@ -389,7 +393,7 @@ public:
 %% endif
 
 	// MARK: special operation modes
-%% if mux5 or (acdsrb and adcsrb == 'AREFEN')
+%% if adhsm
 	/**
 	 * Enable the ADC High Speed mode
 	 *
