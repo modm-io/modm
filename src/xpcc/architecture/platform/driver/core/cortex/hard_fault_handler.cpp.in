@@ -211,7 +211,7 @@ _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 
 	// Infinite loop
 %% if parameters.enable_hardfault_handler_led
-	uint32_t ledCounter = 1;
+	volatile uint32_t ledCounter = 1;
 	xpcc::stm32::Gpio{{ parameters.hardfault_handler_led_port }}{{ parameters.hardfault_handler_led_pin }}::setOutput();
 %% endif
 
