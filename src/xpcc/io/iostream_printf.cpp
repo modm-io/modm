@@ -135,6 +135,9 @@ xpcc::IOStream::vprintf(const char *fmt, va_list ap)
 				isNegative = true;
 			}
 
+			// Rounding
+			float_value += 0.5 / xpcc::pow(10, width_frac);
+
 			// 1) Print integer part
 			int width_integer = width - width_frac - 1;
 			if (width_integer < 0) {
@@ -154,9 +157,6 @@ xpcc::IOStream::vprintf(const char *fmt, va_list ap)
 			// for (uint_fast8_t ii = 0; ii < width_frac; ++ii) {
 			//     float_value = float_value * (10.0);
 			// }
-
-			// Add 1/2 for roundig of last digit
-			float_value += 0.5;
 
 			// Print fractional part
 			writeUnsignedInteger((unsigned int)float_value, base, width_frac, '0', false);
