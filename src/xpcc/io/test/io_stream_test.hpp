@@ -121,6 +121,12 @@ public:
 	void
 	testBin5();
 
+	void
+	testPrintf1();
+
+	void
+	testPrintf2();
+
 private:
 	xpcc::IOStream *stream;
 };

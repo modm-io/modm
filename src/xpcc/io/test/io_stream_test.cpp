@@ -463,3 +463,56 @@ IoStreamTest::testBin5()
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 16);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 16);
 }
+
+void
+IoStreamTest::testPrintf1()
+{
+	// Test unformatted printing
+	(*stream).printf("Lala");
+
+	TEST_ASSERT_EQUALS_ARRAY("Lala", device.buffer, 4);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 4);
+}
+
+void
+IoStreamTest::testPrintf2()
+{
+	// Compare xpcc's formatter with glibc's formatter
+
+	float ff_testvector[] = {
+		123.456789
+		-42.9994,
+		-42.9995,
+		-42.9996,
+		-42.9997,
+		-42.9998,
+		-42.9999,
+		-42.99999,
+		-0.002345,
+		+0.0067890
+	};
+
+	for (std::size_t ii = 0; ii < XPCC__ARRAY_SIZE(ff_testvector); ++ii)
+	{
+		float ff = ff_testvector[ii];
+
+		for (uint_fast8_t width = 1; width < 9; ++width)
+		{
+			for (uint_fast8_t width_frac = 1; width_frac < 5; ++width_frac)
+			{
+				char fmt_str[10];
+				sprintf(fmt_str, "%%%d.%df", width, width_frac);
+
+				char glibc[device.buffer_length];
+
+				int len = snprintf(glibc, device.buffer_length, fmt_str, ff);
+
+				(*stream).printf(fmt_str, ff);
+
+				TEST_ASSERT_EQUALS_ARRAY(glibc, device.buffer, len);
+				TEST_ASSERT_EQUALS(device.bytesWritten, len);
+				(*stream).flush();
+			}
+		}
+	}
+}
