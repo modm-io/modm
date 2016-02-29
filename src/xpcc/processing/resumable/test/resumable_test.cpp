@@ -751,7 +751,7 @@ ResumableTest::testComplexSpawn()
 
 	auto result = thread.parentResumable();
 	TEST_ASSERT_EQUALS(result.getState(), xpcc::rf::Stop);
-	TEST_ASSERT_EQUALS(result.getResult(), 42+42);
+	TEST_ASSERT_EQUALS(result.getResult(), 42u+42u);
 }
 
 
