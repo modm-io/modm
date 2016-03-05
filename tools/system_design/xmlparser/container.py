@@ -24,7 +24,7 @@ class Container:
 	The events and subscriptions lists are empty until createEventLists() is
 	called. This must be done only after all components are expanded.
 	"""
-	def __init__(self, node, tree):
+	def __init__(self, node):
 		""" Constructor
 		
 		Keyword arguments:
@@ -33,6 +33,7 @@ class Container:
 		
 		Resets the 'abstract' flag for every component beeing contained here.
 		"""
+		self.node = node
 		self.name = node.get('name')
 		utils.check_name(self.name)
 		
@@ -43,12 +44,20 @@ class Container:
 		
 		self.description = xml_utils.get_description(node)
 		
-		self.components = utils.SingleAssignDictionary("component")
+		self.components = None
 		self.events = EventContainer()
-		self.subscriptions = {}
+		self.subscriptions = None
 		self.indexReady = False
-		
-		for node in node.findall('component'):
+
+
+	def evaluate(self, tree):
+		if self.node is None:
+			return
+
+		self.components = utils.SingleAssignDictionary("component")
+		self.subscriptions = {}
+
+		for node in self.node.findall('component'):
 			component_name = node.get('name')
 			try:
 				component = tree.components[component_name]
@@ -57,7 +66,9 @@ class Container:
 				self.components[component_name] = component
 			except KeyError:
 				raise ParserException("Unknown component '%s' in container '%s'." % (component_name, self.name))
-	
+
+		self.node = None
+
 	def updateIndex(self):
 		"""
 		Create the lists of all events use by the components in this

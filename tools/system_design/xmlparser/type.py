@@ -131,10 +131,6 @@ class Enum(BaseType):
 			else:
 				utils.check_name(self.name)
 
-			self.string = node.get('string')
-			if self.string is None:
-				self.string = self.name
-
 			self.description = xml_utils.get_description(node)
 			self.string = xml_utils.get_string(node)
 
@@ -149,39 +145,14 @@ class Enum(BaseType):
 
 		self._last_value = 0
 		self.elements = []
+		self.isStronglyTyped = None
+		self.numberOfElements = None
 
 		self.isEnum = True
-		self.isStronglyTyped = False
-
-		typed = node.get('typed')
-		if typed is not None:
-			if typed in ["strong", "weak"]:
-				self.isStronglyTyped = (typed == "strong")
-			else:
-				raise ParserException("Attribute typed of element in enum has to be either `strong` or `weak` (found: '%s')" % (self.typed))
-
-		self.underlyingType = node.get('underlyingType')
-		
-		if self.underlyingType is None:
-			self.underlyingType = "uint8_t"
-		
-		if self.underlyingType is not None and self.underlyingType not in VALID_UNDERLYING_TYPES_FOR_ENUMS:
-			raise ParserException("Attribute underlyingType of element in enum has to be a built in value (found: '%s')" % (self.underlyingType))
 
 		# an enum does not depend on other types
 		self.level = 0
 		self.size = 1
-		# FIXME calculate actual size depending on the value for the enum elements
-		if '8' in self.underlyingType:
-			self.size = 1
-		elif '16' in self.underlyingType:
-			self.size = 2
-		elif '32' in self.underlyingType:
-			self.size = 4
-		elif '64' in self.underlyingType:
-			self.size = 8
-
-		self.numberOfElements = None
 
 	def iter(self):
 		""" Iterate over all sub-elements of the enum """
@@ -194,11 +165,36 @@ class Enum(BaseType):
 
 		self.description = xml_utils.get_description(self.node)
 		self.string = xml_utils.get_string(self.node)
+
+		self.isStronglyTyped = False
+		typed = self.node.get('typed')
+		if typed is not None:
+			if typed in ["strong", "weak"]:
+				self.isStronglyTyped = (typed == "strong")
+			else:
+				raise ParserException("Attribute typed of element in enum has to be either `strong` or `weak` (found: '%s')" % (self.typed))
+
+		self.underlyingType = self.node.get('underlyingType')
+		if self.underlyingType is None:
+			self.underlyingType = "uint8_t"
+		if self.underlyingType is not None and self.underlyingType not in VALID_UNDERLYING_TYPES_FOR_ENUMS:
+			raise ParserException("Attribute underlyingType of element in enum has to be a built in value (found: '%s')" % (self.underlyingType))
+
+		# FIXME calculate actual size depending on the value for the enum elements
+		if '8' in self.underlyingType:
+			self.size = 1
+		elif '16' in self.underlyingType:
+			self.size = 2
+		elif '32' in self.underlyingType:
+			self.size = 4
+		elif '64' in self.underlyingType:
+			self.size = 8
+
 		for node in self.node.findall('element'):
 			self.__add(self.Element(node, self.isStronglyTyped))
+		self.numberOfElements = len(self.elements)
 
 		self.node = None
-		self.numberOfElements = len(self.elements)
 
 	def __add(self, element):
 		""" Add an element to the enum.
