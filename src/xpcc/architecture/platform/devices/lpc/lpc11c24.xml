@@ -13,8 +13,6 @@
 		<pin-count device-name="c24">48</pin-count>
 		<!-- Headers to be included with the {{ include_device_headers }} substitution-->
 		<header>LPC11xx.h</header>
-		<!-- Cpp Defines -->
-		<define>CORTEX_VECTORS_RAM = 0</define>
 		<!-- set to a value > 0 to enable software buffering of CAN messages -->
 		<define>LPC11C_CAN_TX_BUFFER_SIZE = 16</define>
 		<define>LPC11C_CAN_RX_BUFFER_SIZE = 16</define>

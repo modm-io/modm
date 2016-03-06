@@ -15,8 +15,6 @@
 		<header>lpc11xx/cmsis/LPC11xx.h</header>
 		<header>lpc11xx/cmsis/core_cm0.h</header>
 		<header>lpc11xx/cmsis/system_LPC11xx.h</header>
-		<!-- Cpp Defines -->
-		<define>CORTEX_VECTORS_RAM = 0</define>
 		<!-- Core Driver -->
 		<driver type="core" name="cortex">
 			<parameter name="allocator">block_allocator</parameter>
