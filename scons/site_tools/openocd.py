@@ -48,6 +48,10 @@ def openocd_run(env, source, alias='openocd_run'):
 		cmdstr="$OPENOCD_COMSTR")
 	return env.AlwaysBuild(env.Alias(alias, source, action))
 
+def openocd_debug(env, source, alias='openocd_debug'):
+	env['OPENOCD_COMMANDS'] = "init\nhalt"
+	return openocd_run(env, source, alias)
+	
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
 	# build messages
@@ -57,6 +61,7 @@ def generate(env, **kw):
 	env['OPENOCD'] = 'openocd'
 	
 	env.AddMethod(openocd_run, 'OpenOcd')
+	env.AddMethod(openocd_debug, 'OpenOcdDebug')
 
 def exists(env):
 	return env.Detect('openocd')
