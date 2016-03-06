@@ -31,23 +31,27 @@ from SCons.Script import *
 
 # -----------------------------------------------------------------------------
 def openocd_run(env, source, alias='openocd_run'):
+	# The commands are wrapped into '-c "command1" -c "command2" ...'
+	if env['OPENOCD_COMMANDS'] == 'default':
+		env['OPENOCD_COMMANDS'] = """
+			init
+			reset init
+			flash write_image erase $SOURCE
+			reset run
+			shutdown"""
+
 	if platform.system() == "Windows":
-
-		# The commands are wrapped into '-c "command1" -c "command2" ...'
 		env['OPENOCD_COMMANDS'] = env['OPENOCD_COMMANDS'].replace("$SOURCE", str(source[0]).replace("\\","/"))
-		commands = [c for c in env['OPENOCD_COMMANDS'].split('\n') if c != '']
-#		commands[0] = commands[0].replace("\\", "/")
-		action = Action("$OPENOCD -f $OPENOCD_CONFIGFILE %s" % ' '.join(['-c "%s"' % c for c in commands]), 
-			cmdstr="$OPENOCD_COMSTR")
-		return env.AlwaysBuild(env.Alias(alias, source, action))
-	else:
-	
-		# The commands are wrapped into '-c "command1" -c "command2" ...'
-		commands = [c for c in env['OPENOCD_COMMANDS'].split('\n') if c != '']
-		action = Action("$OPENOCD -f $OPENOCD_CONFIGFILE %s" % ' '.join(['-c "%s"' % c for c in commands]), 
-			cmdstr="$OPENOCD_COMSTR")
-		return env.AlwaysBuild(env.Alias(alias, source, action))
 
+	commands = [c for c in env['OPENOCD_COMMANDS'].split('\n') if c != '']
+	action = Action("$OPENOCD -f $OPENOCD_CONFIGFILE %s" % ' '.join(['-c "%s"' % c for c in commands]),
+		cmdstr="$OPENOCD_COMSTR")
+	return env.AlwaysBuild(env.Alias(alias, source, action))
+
+def openocd_debug(env, source, alias='openocd_debug'):
+	env['OPENOCD_COMMANDS'] = "init\nhalt"
+	return openocd_run(env, source, alias)
+	
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
 	# build messages
@@ -57,6 +61,7 @@ def generate(env, **kw):
 	env['OPENOCD'] = 'openocd'
 	
 	env.AddMethod(openocd_run, 'OpenOcd')
+	env.AddMethod(openocd_debug, 'OpenOcdDebug')
 
 def exists(env):
 	return env.Detect('openocd')

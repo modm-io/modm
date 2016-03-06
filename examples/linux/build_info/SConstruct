@@ -1,36 +1,7 @@
-# WARNING: This file is generated automatically from templates/SConstruct.in
-# do not edit!
-
 # path to the xpcc root directory
-rootpath = '../../..'
-
-env = Environment(tools = ['xpcc'], toolpath = [rootpath + '/scons/site_tools'])
-
-# find all source files
-files = env.FindFiles('.')
-
-# build the program
-program = env.Program(target = env['XPCC_CONFIG']['general']['name'], source = files.sources)
-
-# build the xpcc library
-env.XpccLibrary()
-
-# build xpcc_git_info.hpp and xpcc_build_info.hpp file
-env.GitInfoHeader()
-env.BuildInfoHeader()
+xpccpath = '../../..'
+# execute the common SConstruct file
+execfile(xpccpath + '/scons/SConstruct')
 
 # build xpcc_build_info.hpp file
 env.BuildInfoHeader()
-
-# create a file called 'defines.hpp' with all preprocessor defines if necessary
-env.Defines()
-
-env.Alias('size', env.Size(program))
-env.Alias('symbols', env.Symbols(program))
-env.Alias('defines', env.ShowDefines())
-
-env.Alias('build', program)
-env.Alias('run', env.Run(program))
-env.Alias('all', ['build', 'run'])
-
-env.Default('all')

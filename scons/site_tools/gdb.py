@@ -44,7 +44,7 @@ def generate(env, **kw):
 	if not ARGUMENTS.get('verbose'):
 		env['GDB_COMSTR'] = "GDB: debugging $SOURCE"
 	
-	env['GDB'] = "arm-none-eabi-gdb"
+	env['GDB'] = "arm-none-eabi-gdb -tui"
 	env['GDB_PORT'] = '3333'
 	
 	env.AddMethod(gdb_debug, 'GdbDebug')

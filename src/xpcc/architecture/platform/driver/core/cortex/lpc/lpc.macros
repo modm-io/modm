@@ -76,12 +76,6 @@
 	// Enable AHB clock to the GPIO domain.
 	LPC_SYSCON->SYSAHBCLKCTRL |= (1 << 6); // FIXME: Move to Gpio Driver
 
-	#if CORTEX_VECTORS_RAM
-	LPC_SYSCON->SYSMEMREMAP = ((LPC_SYSCON->SYSMEMREMAP)& ~3) | 1;
-	#else
-	//	LPC_SYSCON->SYSMEMREMAP |= 3; // Map to flash
-	#endif
-
 	//#if (MEMMAP_SETUP || MEMMAP_INIT) // Memory Mapping Setup
 	//LPC_SYSCON->SYSMEMREMAP = SYSMEMREMAP_Val;
 	//#endif

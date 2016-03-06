@@ -1,5 +1,6 @@
 
-#include <xpcc/architecture/general/accessor/flash.hpp>
+#include <xpcc/architecture/platform.hpp>
+#include <xpcc/architecture/driver/accessor/flash.hpp>
 
 //extern const int a PROGMEM;
 //const int a = 12;
@@ -25,16 +26,16 @@ int
 main(void)
 {
 	xpcc::accessor::Flash<int> bar(&foo);
-	
+
 	out = *bar;
-	
-	function(xpcc::modifier::asFlash(string));
-	
+
+	function(xpcc::accessor::asFlash(string));
+
 	xpcc::accessor::Flash<int32_t> blub(bla);
-	
+
 	out = blub[2];
-	
+
 	while (1) {
-		
+
 	}
 }

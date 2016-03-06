@@ -1,0 +1,86 @@
+"""
+WARNING: THIS IS A GENERIC SCONSTRUCT FILE FOR ALL XPCC PROJECTS!
+         YOU NEED TO EXECUTE THIS FILE INSIDE YOUR PROJECTS SCONSTRUCT FILE:
+
+# path to the xpcc root directory (modify as required!)
+xpccpath = '../xpcc'
+# execute the xpcc basic
+execfile(xpccpath + '/scons/SConstruct')
+"""
+
+# This variable MUST be defined externally
+# xpccpath = '../../..'
+
+# Create the SConstruct environment
+env = Environment(tools = ['xpcc', 'bitmap'], toolpath = [xpccpath + '/scons/site_tools'])
+
+# build the xpcc library
+env.XpccLibrary()
+# create a file called 'defines.hpp' with all preprocessor defines if necessary
+env.Defines()
+# build xpcc_git_info.hpp file
+# env.GitInfoHeader()   # disabled for privacy
+# build xpcc_build_info.hpp file
+# env.BuildInfoHeader() # disabled for privacy
+# you may append these methods manually to your local SConstruct file!
+
+# find all source files
+env.Append(CPPPATH = ['.'])
+files = env.FindFiles('.')
+
+# add manually specified sources as well
+if 'extrasources' in env['XPCC_CONFIG']['build']:
+    files.sources = files.sources + eval(env['XPCC_CONFIG']['build']['extrasources'])
+
+# add sources for XPCC communication
+if 'communication' in env['XPCC_CONFIG']:
+    if 'source' in env['XPCC_CONFIG']['communication']:
+        source_path = env['XPCC_CONFIG']['communication']['source']
+    else: source_path = 'communication.xml'
+    if 'generate' in env['XPCC_CONFIG']['communication']:
+        generate_path = env['XPCC_CONFIG']['communication']['generate']
+    else: generate_path = 'communication'
+
+    files.sources += env.XpccCommunication(source_path, path=generate_path)
+
+if 'images' in env['XPCC_CONFIG']:
+    # create c-files from the bitmaps
+    for image in Glob(env['XPCC_CONFIG']['images']['source'] + '/*.pbm'):
+        files += env.Bitmap(image)
+
+# build the program
+program = env.Program(target = env['XPCC_CONFIG']['general']['name'], source = files.sources)
+
+env.Alias('size', env.Size(program))
+env.Alias('symbols', env.Symbols(program))
+env.Alias('defines', env.ShowDefines())
+
+if env.CheckArchitecture('hosted'):
+    env.Alias('build', program)
+    env.Alias('run', env.Run(program))
+    env.Alias('all', ['build', 'run'])
+else:
+    hexfile = env.Hex(program)
+
+    if 'avrdude' in env['XPCC_CONFIG']:
+        env.Alias('program', env.Avrdude(hexfile))
+        env.Alias('fuse', env.AvrdudeFuses())
+    elif 'openocd' in env['XPCC_CONFIG']:
+        env.Alias('program', env.OpenOcd(program))
+        env.Alias('openocd-debug', env.OpenOcdDebug(program))
+    elif 'lpclink' in env['XPCC_CONFIG']:
+        env.Alias('init', env.LpcLinkInit(program))
+        env.Alias('program', env.LpcLinkFlash(program))
+        env.Alias('lpclink-debug', env.LpcLinkDebug(program))
+    # ST Link only reasonable on Windows, please use OpenOCD instead
+    if env.CheckArchitecture('avr'):
+        env.Alias('eeprom', env.Eeprom(program))
+    else:
+        env.Alias('debug', env.GdbDebug(program))
+        env.Alias('bin', env.Bin(program))
+
+    env.Alias('listing', env.Listing(program))
+    env.Alias('build', hexfile)
+    env.Alias('all', ['build', 'size'])
+
+env.Default('all')
