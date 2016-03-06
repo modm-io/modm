@@ -1,31 +1,4 @@
-
 # path to the xpcc root directory
-rootpath = '../../..'
-
-env = Environment(tools = ['xpcc'], toolpath = [rootpath + '/scons/site_tools'])
-
-# find all source files
-sources = env.FindFiles('.').sources + ['../stm32f469_discovery.cpp']
-
-# build the program
-program = env.Program(target = env['XPCC_CONFIG']['general']['name'], source = sources)
-
-# build the xpcc library
-env.XpccLibrary()
-
-# create a file called 'defines.hpp' with all preprocessor defines if necessary
-env.Defines()
-
-env.Alias('size', env.Size(program))
-env.Alias('symbols', env.Symbols(program))
-env.Alias('defines', env.ShowDefines())
-
-hexfile = env.Hex(program)
-binfile = env.Bin(program)
-
-env.Alias('program', env.OpenOcd(program))
-env.Alias('remote', env.OpenOcdRemote(hexfile))
-env.Alias('build', [hexfile, binfile, env.Listing(program)])
-env.Alias('all', ['build', 'size'])
-
-env.Default('all')
+xpccpath = '../../..'
+# execute the common SConstruct file
+execfile(xpccpath + '/scons/SConstruct')
