@@ -462,25 +462,32 @@ def generate(env, **kw):
 		env.Tool('dfu_stm32_programmer')
 
 		# load openocd tool if required
+		program_type = None
 		if parser.has_section('program'):
-			try:
-				if parser.get('program', 'tool') == 'openocd':
-					env.Tool('openocd')
-					env.Tool('openocd_remote')
-					env['OPENOCD_CONFIGFILE'] = parser.get('openocd', 'configfile')
-					env['OPENOCD_COMMANDS'] = parser.get('openocd', 'commands')
-					env['OPENOCD_REMOTE_HOST'] = parser.get('openocd', 'remote_host', 'localhost')
-					env['OPENOCD_REMOTE_USER'] = parser.get('openocd', 'remote_user', 'pi')
-				if parser.get('program', 'tool') == 'stlink':
-					env.Tool('stlink')
-				if parser.get('program', 'tool') == 'lpclink':
-					env['GDB_PORT'] = parser.get('debug', 'gdbport')
-					env.Tool('lpclink')
-					#env['OPENOCD_CONFIGFILE'] = parser.get('openocd', 'configfile')
-					#env['OPENOCD_COMMANDS'] = parser.get('openocd', 'commands')
-			except configparser.ParserException as e:
-				env.Error("Error in Configuration: %s" % e)
-				Exit(1)
+			program_type = parser.get('program', 'tool')
+		else:
+			for ptype in ['openocd', 'stlink', 'lpclink']:
+				if parser.has_section(ptype):
+					program_type = ptype
+					break
+		try:
+			if program_type == 'openocd':
+				env.Tool('openocd')
+				env.Tool('openocd_remote')
+				env['OPENOCD_CONFIGFILE'] = parser.get('openocd', 'configfile', 'openocd.cfg')
+				env['OPENOCD_COMMANDS'] = parser.get('openocd', 'commands', 'default')
+				env['OPENOCD_REMOTE_HOST'] = parser.get('openocd', 'remote_host', 'localhost')
+				env['OPENOCD_REMOTE_USER'] = parser.get('openocd', 'remote_user', 'pi')
+			elif program_type == 'stlink':
+				env.Tool('stlink')
+			elif program_type == 'lpclink':
+				env.Tool('lpclink')
+				#env['OPENOCD_CONFIGFILE'] = parser.get('openocd', 'configfile')
+				#env['OPENOCD_COMMANDS'] = parser.get('openocd', 'commands')
+		except configparser.ParserException as e:
+			env.Error("Error in Configuration: %s" % e)
+			Exit(1)
+
 		if parser.has_section('debug'):
 			try:
 				if parser.get('debug', 'tool') == 'gdb':
