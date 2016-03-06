@@ -13,26 +13,9 @@ the **Start Debugging** section.
 To compile code that is easily debugged, you need to specify some flags
 in your local _SConstruct_ file:
 
-
 	env['CXXFLAGS'].append("-O0")	# no optimizations
 	env['CXXFLAGS'].append("-g")	# include debug symbols
 
-
-### OpenOCD debug config
-
-Your debug config for OpenOCD should look like this:
-
-
-	# programmer
-	source [find interface/stlink-v2.cfg]
-	# target
-	source [find target/stm32f3x_stlink.cfg]
-	reset_config srst_only
-	# gdb port
-	gdb_port 1324
-	init
-	# halt device when openocd is started
-	halt
 
 ## Start Debugging
 
@@ -43,31 +26,21 @@ or you can use gdb (how? _TBD....sorry_).
 
 ### Start OpenOCD as GDB server
 
-using your openocd-debug.cfg:
-
-
-	openocd -f openocd-debug.cfg
+	scons openocd-debug
 
 
 ### Start GDB
 
 In a different terminal run gdb with the path to your _.elf_ file.
-For the _gdb_ example project you can use "start-gdb.sh".
 
+	scons debug
 
-	export PATH_TO_YOUR_ELF = "../../../build/stm32f3_discovery/gdb/gdb.elf" # e.g.
-	arm-none-eabi-gdb $PATH_TO_YOUR_ELF
-
-
-Now you need to connect GDB to you OpenOCD server:
-
-	target extended-remote :1324
 
 ### Use GDB
 
 Now you can set breakpoints:
 
-	b main.cpp:133
+	b main.cpp:93
 
 Continue to them
 
@@ -93,16 +66,17 @@ Go to next assembly instruction
 
 	ni
 
-And much more. See the _Usefull GDB Commands_ section.
+And much more. See the _Useful GDB Commands_ section.
 
-### Usefull GDB Commands
+
+### Useful GDB Commands
 
 * **info break** (_i b_): list all breakpoints
 * **break** (_b_): set breakpoint; e.g. "b main.cpp:120"
 * **continue** (_c_): continue to next breakpoint
 * **layout split**: display C/C++ code as well as assembler instructions in window
 * **layout regs**:  display registers in window
-* **list** (_l_): show 
+* **list** (_l_): show
 * **next** (_n_): next line; do not step into
 * **step** (_s_): steps into function
 * **nexti** (_ni_): go to next machine instruction
