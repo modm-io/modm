@@ -31,6 +31,14 @@ from SCons.Script import *
 
 # -----------------------------------------------------------------------------
 def openocd_run(env, source, alias='openocd_run'):
+	# The commands are wrapped into '-c "command1" -c "command2" ...'
+	if env['OPENOCD_COMMANDS'] == 'default':
+		env['OPENOCD_COMMANDS'] = """
+			init
+			reset init
+			flash write_image erase $SOURCE
+			reset run
+			shutdown"""
 
 	if platform.system() == "Windows":
 		env['OPENOCD_COMMANDS'] = env['OPENOCD_COMMANDS'].replace("$SOURCE", str(source[0]).replace("\\","/"))
