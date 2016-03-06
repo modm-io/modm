@@ -34,35 +34,6 @@
 #include "detect.hpp"
 
 #ifdef __DOXYGEN__
-
-	/**
-	 * \brief	Main function definition for microcontroller projects
-	 *
-	 * Inhibits some stack operations at the beginning of main for avr-gcc. May
-	 * save up a few bytes of stack memory.
-	 *
-	 * Typical structure of an microcontroller program:
-	 * \code
-	 * #include <xpcc/architecture/platform.hpp>
-	 *
-	 * MAIN_FUNCTION
-	 * {
-	 *    ...
-	 *
-	 *    while (1)
-	 *    {
-	 *        ...
-	 *    }
-	 * }
-	 * \endcode
-	 *
-	 * \ingroup	platform
-	 */
-	#define	MAIN_FUNCTION
-
-	/** Same as MAIN_FUNCTION but avoids warning about unused parameters */
-	#define	MAIN_FUNCTION_NAKED
-
 	/**
 	 * \brief	Force inlining
 	 *
