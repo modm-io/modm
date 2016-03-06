@@ -481,6 +481,7 @@ def generate(env, **kw):
 			elif program_type == 'stlink':
 				env.Tool('stlink')
 			elif program_type == 'lpclink':
+				env['LPCLINK_PATH'] = parser.get('lpclink', 'basepath', 'default')
 				env.Tool('lpclink')
 				#env['OPENOCD_CONFIGFILE'] = parser.get('openocd', 'configfile')
 				#env['OPENOCD_COMMANDS'] = parser.get('openocd', 'commands')
