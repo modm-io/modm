@@ -42,7 +42,8 @@ typedef GpioOutputE12 Csn;
 typedef xpcc::Nrf24Phy<SpiMaster2, Csn, Ce> nrf24hal;
 
 
-MAIN_FUNCTION
+int
+main()
 {
 	Board::initialize();
 

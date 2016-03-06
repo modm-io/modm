@@ -2,7 +2,8 @@
 #include "../stm32f4_discovery.hpp"
 
 
-MAIN_FUNCTION
+int
+main()
 {
 	Board::initialize();
 

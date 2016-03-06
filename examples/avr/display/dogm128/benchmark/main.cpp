@@ -139,7 +139,8 @@ drawSpinner(Point center, uint8_t pos)
 }
 
 
-MAIN_FUNCTION
+int 
+main()
 {
 	setup();
 

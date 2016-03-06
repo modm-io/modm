@@ -15,7 +15,8 @@
 xpcc::IODeviceWrapper< Uart0, xpcc::IOBuffer::BlockIfFull > serialDevice;
 xpcc::IOStream serialStream(serialDevice);
 
-MAIN_FUNCTION
+int 
+main()
 {
 	// initialize the serial communication module
 	DigitalInput0::connect(Uart0::Rx);

@@ -33,7 +33,8 @@
 using namespace xpcc::atmega;
 typedef xpcc::avr::SystemClock systemClock;
 
-int main()
+int 
+main()
 {
 	// Set-up the I2C device as master and configure it to a baudrate of 100.000
 	I2cMaster::initialize<systemClock, 100000>();

@@ -90,7 +90,8 @@ private:
 ThreadOne one;
 
 // ----------------------------------------------------------------------------
-MAIN_FUNCTION
+int
+main()
 {
 	Board::initialize();
 

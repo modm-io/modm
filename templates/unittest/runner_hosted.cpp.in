@@ -31,7 +31,7 @@ ${includes}
 ${names}
 
 int
-main(void)
+main()
 {
 	unittest::Reporter reporter(outputDevice);
 	unittest::Controller::instance().setReporter(reporter);

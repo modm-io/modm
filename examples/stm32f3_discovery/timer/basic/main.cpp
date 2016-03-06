@@ -1,6 +1,7 @@
 #include "../../stm32f3_discovery.hpp"
 
-MAIN_FUNCTION
+int
+main()
 {
 	Board::initialize();
 	Board::LedNorth::set();

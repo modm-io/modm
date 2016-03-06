@@ -4,7 +4,8 @@
 
 using namespace xpcc::atmega;
 
-MAIN_FUNCTION
+int 
+main()
 {
 	xpcc::sab::Interface< Uart0 > interface;
 	

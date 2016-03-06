@@ -246,7 +246,7 @@ release(void *p)
 }
 
 int
-main(void)
+main()
 {
 	void *handles[32];
 	size_t sizes[32];

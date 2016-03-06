@@ -1,7 +1,8 @@
 #include <xpcc/architecture.hpp>
 #include "../stm32f4_loa_v2b.hpp"
 
-MAIN_FUNCTION
+int
+main()
 {
 	defaultSystemClock::enable();
 

@@ -30,7 +30,8 @@ typedef xpcc::SoftwareSpiMaster< lcd::Scl, lcd::Mosi, lcd::Miso > SPI;
 
 xpcc::DogM128< SPI, lcd::Cs, lcd::A0, lcd::Reset, true > display;
 
-MAIN_FUNCTION
+int 
+main()
 {
 	// Enable a yellow backlight
 	led::R::set();

@@ -4,7 +4,8 @@
 #include "animations.hpp"
 
 // ----------------------------------------------------------------------------
-MAIN_FUNCTION
+int
+main()
 {
 	Board::initialize();
 

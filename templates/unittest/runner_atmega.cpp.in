@@ -15,7 +15,7 @@ GPIO__OUTPUT(LedGreen, B, 0);
 GPIO__OUTPUT(LedRed, B, 1);
 
 int
-main(void)
+main()
 {
 	LedGreen::setOutput();
 	LedRed::setOutput();

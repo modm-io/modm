@@ -239,11 +239,9 @@ test_callback(const xpcc::gui::InputEvent& ev, xpcc::gui::Widget* w, void* data)
 
 
 // ----------------------------------------------------------------------------
-MAIN_FUNCTION
+int
+main(int, char**)
 {
-	(void) argc;
-	(void) argv;
-
 	XPCC_LOG_DEBUG << "Hello from xpcc gui example!" << xpcc::endl;
 
 	initSDL();

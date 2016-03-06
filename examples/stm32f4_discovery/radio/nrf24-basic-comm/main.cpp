@@ -76,7 +76,8 @@ configureBoth(Register_t reg, uint8_t value)
 	nrf24prx::writeRegister(reg, value);
 }
 
-MAIN_FUNCTION
+int
+main()
 {
 	Board::initialize();
 

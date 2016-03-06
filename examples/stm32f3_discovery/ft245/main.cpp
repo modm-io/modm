@@ -12,7 +12,8 @@
  * For every character received the red LED toggles once.
  *
  */
-MAIN_FUNCTION
+int
+main()
 {
 	Board::initialize();
 

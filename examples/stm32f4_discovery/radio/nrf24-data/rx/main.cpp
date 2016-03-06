@@ -51,7 +51,8 @@ typedef xpcc::Nrf24Phy<Spi, Csn, Ce> nrf24phy;
 typedef xpcc::Nrf24Config<nrf24phy> nrf24config;
 typedef xpcc::Nrf24Data<nrf24phy> nrf24data;
 
-MAIN_FUNCTION
+int
+main()
 {
 	Board::initialize();
 

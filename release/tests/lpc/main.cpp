@@ -6,7 +6,7 @@ GPIO__INPUT(In, 0, 1);
 GPIO__IO(Io, 0, 2);
 
 int
-main(void)
+main()
 {
 	Out::setOutput();
 	Out::setOutput(true);

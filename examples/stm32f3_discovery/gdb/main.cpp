@@ -86,7 +86,8 @@ void rec_itr()
 	(void)i;
 }
 
-MAIN_FUNCTION
+int
+main()
 {
 	Board::initialize();
 

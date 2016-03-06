@@ -16,7 +16,8 @@ typedef xpcc::SiemensS65Portrait<SPI, Cs, Rs, Reset> Display;
 
 typedef GpioOutputA5 Backlight;
 
-MAIN_FUNCTION
+int 
+main()
 {
 	Display display;
 

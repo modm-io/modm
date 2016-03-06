@@ -37,7 +37,7 @@ void
 testXpccLogger(void);
 
 int
-main(void)
+main()
 {
 	systemClock::enable();
 

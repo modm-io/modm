@@ -21,7 +21,8 @@ typedef xpcc::SoftwareSpiMaster< lcd::Scl, lcd::Mosi, lcd::Miso > SPI;
 
 xpcc::DogM163< SPI, lcd::Cs, lcd::Rs > display;
 
-MAIN_FUNCTION
+int 
+main()
 {
     SPI::initialize<clock, 1000000>();
     lcd::Cs::setOutput();

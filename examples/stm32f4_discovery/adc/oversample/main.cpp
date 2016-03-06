@@ -28,7 +28,8 @@ typedef xpcc::AdcSampler< AdcInterrupt2, 3, 100 > sensors;
 xpcc::ShortTimeout timeout(100);
 
 // ----------------------------------------------------------------------------
-MAIN_FUNCTION
+int
+main()
 {
 	Board::initialize();
 

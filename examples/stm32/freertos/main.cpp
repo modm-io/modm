@@ -138,7 +138,7 @@ DisplayThread thread3;
 
 // ----------------------------------------------------------------------------
 int
-main(void)
+main()
 {
 	// Switch to the external clock and enable the PLL to let
 	// the STM32 run at 168 MHz.

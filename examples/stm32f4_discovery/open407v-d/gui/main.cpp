@@ -404,7 +404,8 @@ test_callback(const xpcc::gui::InputEvent& ev, xpcc::gui::Widget* w, void* data)
 xpcc::glcd::Point calibration[] = {{3339, 3046},{931, 2428},{2740, 982}};
 
 // ----------------------------------------------------------------------------
-MAIN_FUNCTION
+int
+main()
 {
 	Board::initialize();
 

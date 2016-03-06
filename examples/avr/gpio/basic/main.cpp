@@ -15,7 +15,8 @@ typedef GpioOutputB0 Led;
 // create a wrapper for a output pin
 typedef xpcc::GpioInverted< GpioOutputB1 > LedInverted;
 
-MAIN_FUNCTION
+int
+main()
 {
 	Led::setOutput();
 	Led::set();

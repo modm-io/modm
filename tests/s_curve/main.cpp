@@ -6,7 +6,7 @@
 #include <xpcc/math/geometry/angle.hpp>
 
 int
-main(void)
+main()
 {
 	/*xpcc::SCurveController<float>::Parameter parameter(
 			5,		// target area

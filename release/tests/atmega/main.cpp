@@ -16,7 +16,7 @@ typedef GpioInputB1  In;
 typedef GpioB2       Io;
 
 int
-main(void)
+main()
 {
 	Out::setOutput();
 	Out::setOutput(true);

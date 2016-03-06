@@ -18,7 +18,8 @@ xpcc::IOStream serialStream(serialDevice);
 // name pin2
 typedef DigitalInput2 PushButton;
 
-MAIN_FUNCTION
+int
+main()
 {
 	// initialize the serial communication module
 	DigitalInput0::connect(Uart0::Rx);

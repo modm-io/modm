@@ -27,7 +27,7 @@ typedef xpcc::stm32::GpioInputA1  In;
 typedef xpcc::stm32::GpioA2       Io;
 
 int
-main(void)
+main()
 {
 	Out::setOutput();
 	Out::setOutput(true);

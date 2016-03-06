@@ -72,7 +72,8 @@ testTimerStop()
 using namespace Board;
 
 // ----------------------------------------------------------------------------
-MAIN_FUNCTION
+int
+main()
 {
     Board::initialize();
 

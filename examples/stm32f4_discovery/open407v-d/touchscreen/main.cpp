@@ -182,7 +182,8 @@ drawPoint(xpcc::GraphicDisplay& display, xpcc::glcd::Point point)
 }
 
 // ----------------------------------------------------------------------------
-MAIN_FUNCTION
+int
+main()
 {
 	Board::initialize();
 

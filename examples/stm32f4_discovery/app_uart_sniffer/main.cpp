@@ -66,7 +66,8 @@ setDirection(Direction dir)
 /**
  *
  */
-MAIN_FUNCTION
+int
+main()
 {
 	Board::initialize();
 

@@ -71,7 +71,8 @@ xpcc::log::Logger xpcc::log::error(loggerDevice);
 #define	XPCC_LOG_LEVEL xpcc::log::DEBUG
 
 
-MAIN_FUNCTION
+int 
+main()
 {
 	LedStatus::setOutput();
 	LedStatus::set();

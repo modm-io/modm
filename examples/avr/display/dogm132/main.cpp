@@ -19,7 +19,8 @@ typedef xpcc::DogM132<SPI, Cs, A0, Reset> Display;
 
 typedef GpioOutputD7 Backlight;
 
-MAIN_FUNCTION
+int 
+main()
 {
 	Display display;
 

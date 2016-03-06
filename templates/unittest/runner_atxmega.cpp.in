@@ -12,7 +12,7 @@ ${includes}
 ${names}
 
 int
-main(void)
+main()
 {
 	// initialize output device
 	xpcc::atxmega::BufferedUartE0 uart(115200);

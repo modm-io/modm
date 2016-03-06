@@ -41,7 +41,8 @@ typedef GpioOutputA1  Ce;
 
 typedef xpcc::Nrf24Phy<SpiMaster2, Csn, Ce> nrf24phy;
 
-MAIN_FUNCTION
+int
+main()
 {
 	Board::initialize();
 

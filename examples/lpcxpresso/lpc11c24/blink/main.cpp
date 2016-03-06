@@ -7,7 +7,8 @@ using namespace xpcc::lpc;
 typedef GpioOutput0_7 Led;
 
 // ----------------------------------------------------------------------------
-MAIN_FUNCTION
+int 
+main()
 {
 	// New Static Clock Setup ( => Static)
 	typedef Pll<ExternalCrystal<MHz12>, MHz48> clockSource;

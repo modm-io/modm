@@ -94,7 +94,8 @@ private:
 
 ReaderThread reader;
 
-MAIN_FUNCTION
+int
+main()
 {
 	Board::initialize();
 

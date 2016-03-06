@@ -12,7 +12,8 @@ using namespace xpcc::atmega;
 
 typedef GpioOutputB0 Led;
 
-MAIN_FUNCTION
+int 
+main()
 {
 	Led::setOutput();
 

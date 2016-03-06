@@ -30,7 +30,7 @@ namespace component
 }
 
 int
-main(void)
+main()
 {
 	connector.addReceiverId(robot::component::SENDER);
 	connector.addReceiverId(robot::component::RECEIVER);

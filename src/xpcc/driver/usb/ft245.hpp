@@ -35,10 +35,11 @@ namespace xpcc
 	 * typedef xpcc::stm32::GpioInputC10  Txe;
 	 * typedef xpcc::stm32::GpioOutputA15 Rd;
 	 * typedef xpcc::stm32::GpioOutputA9  Wr;
-     *
+	 *
 	 * typedef xpcc::Ft245<myPort, Rd, Wr, Rxf, Txe> myFt;
-     *
-	 * MAIN_FUNCTION
+	 *
+	 * int
+	 * main()
 	 * {
 	 *   Rd::setOutput(xpcc::Gpio::High);
 	 *   Wr::setOutput(xpcc::Gpio::Low);
@@ -49,7 +50,7 @@ namespace xpcc
 	 *     if (myFt::read(c)) {
 	 *     myFt::write(c + 1);
 	 *   }
-     * }
+	 * }
 	 * \endcode
 	 *
 	 * \ingroup	driver_other

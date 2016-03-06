@@ -3,7 +3,8 @@
 using namespace Board;
 
 // ----------------------------------------------------------------------------
-MAIN_FUNCTION
+int
+main()
 {
 	Board::initialize();
 	LedD13::setOutput(xpcc::Gpio::Low);

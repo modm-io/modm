@@ -11,7 +11,8 @@
 
 #include "../../arduino_uno.hpp"
 
-MAIN_FUNCTION
+int
+main()
 {
 	DigitalOutput13::setOutput();
 

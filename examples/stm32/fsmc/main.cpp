@@ -98,7 +98,8 @@ lcd::Display display(parallelBus);
 typedef SystemClock<Pll<ExternalCrystal<MHz25>, MHz168, MHz48> > defaultSystemClock;
 
 // ----------------------------------------------------------------------------
-MAIN_FUNCTION
+int
+main()
 {
 	// Switch STM32F4 to 168 MHz (HSE clocked by an 25 MHz external clock)
     defaultSystemClock::enable();

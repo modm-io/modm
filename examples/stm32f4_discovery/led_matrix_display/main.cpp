@@ -33,7 +33,8 @@ typedef xpcc::SoftwareSpiMaster< Clk, Data > Spi;
 xpcc::Max7219matrix<Spi, Cs, 3, 1> ledMatrixDisplay;
 
 // ----------------------------------------------------------------------------
-MAIN_FUNCTION
+int
+main()
 {
 	Board::initialize();
 
