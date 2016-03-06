@@ -483,20 +483,20 @@ def generate(env, **kw):
 			elif program_type == 'lpclink':
 				env['LPCLINK_PATH'] = parser.get('lpclink', 'basepath', 'default')
 				env.Tool('lpclink')
-				#env['OPENOCD_CONFIGFILE'] = parser.get('openocd', 'configfile')
-				#env['OPENOCD_COMMANDS'] = parser.get('openocd', 'commands')
 		except configparser.ParserException as e:
 			env.Error("Error in Configuration: %s" % e)
 			Exit(1)
 
 		if parser.has_section('debug'):
-			try:
-				if parser.get('debug', 'tool') == 'gdb':
-					env['GDB_PORT'] = parser.get('debug', 'gdbport')
-					env.Tool('gdb')
-			except configparser.ParserException as e:
-				env.Error("Error in Configuration: %s" % e)
-				Exit(1)
+			if parser.get('debug', 'tool') == 'gdb':
+				env['GDB_PORT'] = parser.get('debug', 'gdbport')
+		else:
+			env['GDB_PORT'] = parser.get('gdb', 'port', '3333')
+		try:
+			env.Tool('gdb')
+		except configparser.ParserException as e:
+			env.Error("Error in Configuration: %s" % e)
+
 	else:
 		env.Error("xpcc Error: Unknown architecture '%s'!" % env['ARCHITECTURE'])
 		Exit(1)
