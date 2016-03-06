@@ -35,9 +35,10 @@ def openocd_run(env, source, alias='openocd_run'):
 	if env['OPENOCD_COMMANDS'] == 'default':
 		env['OPENOCD_COMMANDS'] = """
 			init
-			reset init
+			reset halt
 			flash write_image erase $SOURCE
-			reset run
+			reset halt
+			mww 0xE000EDF0 0xA05F0000
 			shutdown"""
 
 	if platform.system() == "Windows":

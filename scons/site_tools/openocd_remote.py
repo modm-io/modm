@@ -23,7 +23,7 @@ def openocd_remote_run(env, source, alias='openocd_remote_run'):
 		action = fail
 		return env.AlwaysBuild(env.Alias(alias, source, action))
 	else:
-		commands = ["init", "reset halt", "flash write_image erase /tmp/openocd.hex", "reset run"]
+		commands = ["init", "reset halt", "flash write_image erase /tmp/openocd.hex", "reset halt", "mww 0xE000EDF0 0xA05F0000"]
 		action = Action("scp $SOURCE $OPENOCD_REMOTE_USER@$OPENOCD_REMOTE_HOST:/tmp/openocd.hex; echo %s | nc $OPENOCD_REMOTE_HOST 4444" % ' '.join(['"%s;"' % c for c in commands]),
 			cmdstr="$OPENOCD_COMSTR")
 		return env.AlwaysBuild(env.Alias(alias, source, action))
