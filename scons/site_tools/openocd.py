@@ -31,22 +31,14 @@ from SCons.Script import *
 
 # -----------------------------------------------------------------------------
 def openocd_run(env, source, alias='openocd_run'):
-	if platform.system() == "Windows":
 
-		# The commands are wrapped into '-c "command1" -c "command2" ...'
+	if platform.system() == "Windows":
 		env['OPENOCD_COMMANDS'] = env['OPENOCD_COMMANDS'].replace("$SOURCE", str(source[0]).replace("\\","/"))
-		commands = [c for c in env['OPENOCD_COMMANDS'].split('\n') if c != '']
-#		commands[0] = commands[0].replace("\\", "/")
-		action = Action("$OPENOCD -f $OPENOCD_CONFIGFILE %s" % ' '.join(['-c "%s"' % c for c in commands]), 
-			cmdstr="$OPENOCD_COMSTR")
-		return env.AlwaysBuild(env.Alias(alias, source, action))
-	else:
-	
-		# The commands are wrapped into '-c "command1" -c "command2" ...'
-		commands = [c for c in env['OPENOCD_COMMANDS'].split('\n') if c != '']
-		action = Action("$OPENOCD -f $OPENOCD_CONFIGFILE %s" % ' '.join(['-c "%s"' % c for c in commands]), 
-			cmdstr="$OPENOCD_COMSTR")
-		return env.AlwaysBuild(env.Alias(alias, source, action))
+
+	commands = [c for c in env['OPENOCD_COMMANDS'].split('\n') if c != '']
+	action = Action("$OPENOCD -f $OPENOCD_CONFIGFILE %s" % ' '.join(['-c "%s"' % c for c in commands]),
+		cmdstr="$OPENOCD_COMSTR")
+	return env.AlwaysBuild(env.Alias(alias, source, action))
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
