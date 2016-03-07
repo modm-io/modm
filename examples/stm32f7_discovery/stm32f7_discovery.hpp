@@ -94,7 +94,7 @@ struct systemClock
 		xpcc::clock::fcpu     = Frequency;
 		xpcc::clock::fcpu_kHz = Frequency / 1000;
 		xpcc::clock::fcpu_MHz = Frequency / 1000000;
-		xpcc::clock::ns_per_loop = std::round(1000 / (Frequency / 1000000));
+		xpcc::clock::ns_per_loop = ::round(1000 / (Frequency / 1000000));
 
 		return true;
 	}
