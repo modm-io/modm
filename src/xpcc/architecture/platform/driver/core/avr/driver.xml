@@ -5,6 +5,7 @@
 		<static>cxxabi.cpp</static>
 		<static>newdelete.cpp</static>
 		<static>ram.hpp</static>
+		<static>main.hpp</static>
 		<static device-family="xmega">utils.hpp</static>
 		<static device-family="xmega">utils.cpp</static>
 		<template>ram.cpp.in</template>
