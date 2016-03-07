@@ -11,6 +11,7 @@
 #include <xpcc_config.hpp>
 
 #include "../../../device.hpp"
+#include "../../clock/lpc/clock.hpp"
 
 #include "uart_1.hpp"
 #include "lpc11_uart_registers.hpp"
@@ -56,7 +57,7 @@ xpcc::lpc::Uart1::initialize(uint32_t baudrate)
 
 	LPC_UART->LCR = LCR_DLAB;
 	uint32_t regVal = LPC_SYSCON->UARTCLKDIV;
-	uint32_t   Fdiv = (((F_CPU * LPC_SYSCON->SYSAHBCLKDIV)/regVal)/16)/baudrate ; //390;
+	uint32_t   Fdiv = (((xpcc::lpc::ClockControl::getCpuFrequency() * LPC_SYSCON->SYSAHBCLKDIV)/regVal)/16)/baudrate ; //390;
 	LPC_UART->DLM = Fdiv >>    8;
 	LPC_UART->DLL = Fdiv  & 0xff;
 	//LPC_UART->DLM = 0;
