@@ -457,6 +457,8 @@ def generate(env, **kw):
 			env['ARM_ARCH'] = env['ARCHITECTURE']
 		env['ARM_DEVICE'] = device
 		env['ARM_CLOCK'] = clock
+		if clock != "NaN" and not 'freertos' in env['XPCC_ACTIVE_MODULES']:
+			env.Warn("Specifying clock for ARM devices is deprecated.")
 
 		env.Tool('arm')
 		env.Tool('dfu_stm32_programmer')
