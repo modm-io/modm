@@ -31,14 +31,14 @@
 #include "smart_pointer.hpp"
 
 // ----------------------------------------------------------------------------
-// must allocate at least four bytes, so getPointer() does return
+// must allocate at least five bytes, so getPointer() does return
 // a valid address
 xpcc::SmartPointer::SmartPointer() :
-	ptr(new uint8_t[4])
+	ptr(new uint8_t[5])
 {
 	ptr[0] = 1;
-	ptr[1] = 0;
 	ptr[2] = 0;
+	ptr[3] = 0;
 }
 
 xpcc::SmartPointer::SmartPointer(const SmartPointer& other) :
@@ -47,13 +47,13 @@ xpcc::SmartPointer::SmartPointer(const SmartPointer& other) :
 	ptr[0]++;
 }
 
-// must allocate at least four bytes, so getPointer() does return
+// must allocate at least five bytes, so getPointer() does return
 // a valid address
 xpcc::SmartPointer::SmartPointer(uint16_t size) :
-	ptr(new uint8_t[size ? size + 3 : 4])
+	ptr(new uint8_t[size ? size + 4 : 5])
 {
 	ptr[0] = 1;
-	*reinterpret_cast<uint16_t*>(ptr + 1) = size;
+	*reinterpret_cast<uint16_t*>(ptr + 2) = size;
 }
 
 xpcc::SmartPointer::~SmartPointer()
@@ -88,7 +88,7 @@ xpcc::IOStream&
 xpcc::operator << (xpcc::IOStream& s, const xpcc::SmartPointer& v)
 {
 	s << "0x" << xpcc::hex;
-	for (uint8_t i = 3; i < v.getSize() + 3; i++)
+	for (uint8_t i = 4; i < v.getSize() + 4; i++)
 	{
 		s << v.ptr[i];
 	}

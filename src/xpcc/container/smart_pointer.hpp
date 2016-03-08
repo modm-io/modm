@@ -70,11 +70,11 @@ namespace xpcc
 		// between constructor and copy constructor!
 		template<typename T>
 		explicit SmartPointer(const T *data)
-		: ptr(new uint8_t[sizeof(T) + 3])
+		: ptr(new uint8_t[sizeof(T) + 4])
 		{
 			ptr[0] = 1;
-			*reinterpret_cast<uint16_t*>(ptr + 1) = sizeof(T);
-			std::memcpy(ptr + 3, data, sizeof(T));
+			*reinterpret_cast<uint16_t*>(ptr + 2) = sizeof(T);
+			std::memcpy(ptr + 4, data, sizeof(T));
 		}
 
 		SmartPointer(const SmartPointer& other);
@@ -84,19 +84,19 @@ namespace xpcc
 		inline const uint8_t *
 		getPointer() const
 		{
-			return ptr + 3;
+			return ptr + 4;
 		}
 
 		inline uint8_t *
 		getPointer()
 		{
-			return ptr + 3;
+			return ptr + 4;
 		}
 
 		inline uint16_t
 		getSize() const
 		{
-			return *reinterpret_cast<uint16_t*>(ptr + 1);
+			return *reinterpret_cast<uint16_t*>(ptr + 2);
 		}
 
 	public:
@@ -110,7 +110,7 @@ namespace xpcc
 		inline const T&
 		get() const
 		{
-			return *reinterpret_cast<T*>(ptr + 3);
+			return *reinterpret_cast<T*>(ptr + 4);
 		}
 
 		/**
@@ -125,7 +125,7 @@ namespace xpcc
 		{
 			if (sizeof(T) == getSize())
 			{
-				value = *reinterpret_cast<T*>(ptr + 3);
+				value = *reinterpret_cast<T*>(ptr + 4);
 				return true;
 			}
 			else {
