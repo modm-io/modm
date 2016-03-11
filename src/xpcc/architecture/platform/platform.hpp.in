@@ -16,6 +16,6 @@
 #include <xpcc/architecture/utils.hpp>
 
 // Include generated Platform sources:
-#include "${include_path}"
+#include "{{include_path}}"
 
 #endif	// XPCC__PLATFORM_HPP
