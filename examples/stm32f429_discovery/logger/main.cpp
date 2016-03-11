@@ -1,4 +1,4 @@
-#include "../stm32f429_discovery.hpp"
+#include <xpcc/architecture/platform.hpp>
 #include <xpcc/debug/logger.hpp>
 
 // ----------------------------------------------------------------------------
