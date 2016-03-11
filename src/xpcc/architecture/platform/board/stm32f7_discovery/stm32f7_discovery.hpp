@@ -1,0 +1,133 @@
+// coding: utf-8
+/* Copyright (c) 2015, Roboterclub Aachen e.V.
+* All Rights Reserved.
+*
+* The file is part of the xpcc library and is released under the 3-clause BSD
+* license. See the file `LICENSE` for the full license governing this code.
+*/
+// ----------------------------------------------------------------------------
+
+//
+// STM32F7DISCOVERY
+// Discovery kit for STM32F746 line
+// http://www.st.com/web/en/catalog/tools/FM116/SC959/SS1532/PF252419
+//
+
+#ifndef XPCC_STM32_F7_DISCOVERY_HPP
+#define XPCC_STM32_F7_DISCOVERY_HPP
+
+#include <xpcc/architecture/platform.hpp>
+#include <xpcc/debug/logger.hpp>
+
+using namespace xpcc::stm32;
+
+namespace Board
+{
+
+/// STM32F7 running at 216MHz from the external 25MHz clock
+struct systemClock
+{
+	static constexpr uint32_t Frequency = MHz216;
+	static constexpr uint32_t Apb1 = Frequency / 8;
+	static constexpr uint32_t Apb2 = Frequency / 4;
+
+	static constexpr uint32_t Adc1 = Apb2;
+	static constexpr uint32_t Adc2 = Apb2;
+	static constexpr uint32_t Adc3 = Apb2;
+
+	static constexpr uint32_t Spi1 = Apb2;
+	static constexpr uint32_t Spi2 = Apb1;
+	static constexpr uint32_t Spi3 = Apb1;
+	static constexpr uint32_t Spi4 = Apb2;
+
+	static constexpr uint32_t Usart1 = Apb2;
+	static constexpr uint32_t Usart2 = Apb1;
+	static constexpr uint32_t Usart3 = Apb1;
+	static constexpr uint32_t Uart4  = Apb1;
+	static constexpr uint32_t Uart5  = Apb1;
+	static constexpr uint32_t Usart6 = Apb2;
+	static constexpr uint32_t Uart7  = Apb1;
+	static constexpr uint32_t Uart8  = Apb1;
+
+	static constexpr uint32_t Can1 = Apb1;
+	static constexpr uint32_t Can2 = Apb1;
+
+	static constexpr uint32_t I2c1 = Apb1;
+	static constexpr uint32_t I2c2 = Apb1;
+	static constexpr uint32_t I2c3 = Apb1;
+	static constexpr uint32_t I2c4 = Apb1;
+
+	static constexpr uint32_t Apb1Timer = Apb1 * 2;
+	static constexpr uint32_t Apb2Timer = Apb2 * 2;
+	static constexpr uint32_t Timer1  = Apb2Timer;
+	static constexpr uint32_t Timer2  = Apb1Timer;
+	static constexpr uint32_t Timer3  = Apb1Timer;
+	static constexpr uint32_t Timer4  = Apb1Timer;
+	static constexpr uint32_t Timer5  = Apb1Timer;
+	static constexpr uint32_t Timer6  = Apb1Timer;
+	static constexpr uint32_t Timer7  = Apb1Timer;
+	static constexpr uint32_t Timer8  = Apb2Timer;
+	static constexpr uint32_t Timer10 = Apb2Timer;
+	static constexpr uint32_t Timer11 = Apb2Timer;
+	static constexpr uint32_t Timer12 = Apb1Timer;
+	static constexpr uint32_t Timer13 = Apb1Timer;
+	static constexpr uint32_t Timer14 = Apb1Timer;
+
+	static bool inline
+	enable()
+	{
+		ClockControl::enableExternalClock(); // 25 MHz
+		ClockControl::enablePll(
+			ClockControl::PllSource::ExternalClock,
+			25,		// 25MHz / N=25 -> 1MHz
+			432,	// 1MHz * M=432 -> 432MHz
+			2,		// 432MHz / P=2 -> 216MHz = F_cpu
+			9		// 432MHz / Q=9 -> 48MHz = F_usb
+		);
+		ClockControl::setFlashLatency(Frequency);
+		ClockControl::enableSystemClock(ClockControl::SystemClockSource::Pll);
+		// APB1 is running only at 27MHz, since AHB / 4 = 54MHz > 45MHz limit!
+		ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div8);
+		// APB2 is running only at 54MHz, since AHB / 2 = 108MHz > 90MHz limit!
+		ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div4);
+		// update clock frequencies
+		xpcc::clock::fcpu     = Frequency;
+		xpcc::clock::fcpu_kHz = Frequency / 1000;
+		xpcc::clock::fcpu_MHz = Frequency / 1000000;
+		xpcc::clock::ns_per_loop = ::round(1000 / (Frequency / 1000000));
+
+		return true;
+	}
+};
+
+
+using Button = GpioInputI11;	// User Button
+using LedD13 = GpioOutputI1;	// User LED 1 (Arduino D13)
+
+
+namespace stlink
+{
+using Tx = GpioOutputA9;
+using Rx = GpioInputB7;
+using Uart = Usart1;
+}
+
+inline void
+initialize()
+{
+	systemClock::enable();
+	xpcc::cortex::SysTickTimer::initialize<systemClock>();
+
+	stlink::Tx::connect(stlink::Uart::Tx);
+	stlink::Rx::connect(stlink::Uart::Rx, Gpio::InputType::PullUp);
+	stlink::Uart::initialize<systemClock, 115200>(12);
+
+	Button::setInput();
+	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
+	Button::enableExternalInterrupt();
+//	Button::enableExternalInterruptVector(12);
+}
+
+}
+
+#endif	// XPCC_STM32_F7_DISCOVERY_HPP
