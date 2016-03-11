@@ -28,60 +28,60 @@ namespace Board
 
 /// STM32F3 running at 72MHz generated from the external 8MHz clock
 /// supplied by the on-board st-link
-typedef SystemClock<Pll<ExternalClock<MHz8>, MHz72> > systemClock;
+using systemClock = SystemClock<Pll<ExternalClock<MHz8>, MHz72> >;
 
 
-typedef GpioInputA0   Button;
-typedef GpioOutputA8  ClockOut;
+using Button = GpioInputA0;
+using ClockOut = GpioOutputA8;
 
+using LedNorth     = GpioOutputE9;		// User LED 3: Red
+using LedNorthEast = GpioOutputE10;		// User LED 5: Orange
+using LedEast      = GpioOutputE11;		// User LED 7: Green
+using LedSouthEast = GpioOutputE12;		// User LED 9: Blue
+using LedSouth     = GpioOutputE13 ;	// User LED 10: Red
+using LedSouthWest = GpioOutputE14;		// User LED 8: Orange
+using LedWest      = GpioOutputE15;		// User LED 6: Green
+using LedNorthWest = GpioOutputE8;		// User LED 4: Blue
 
-typedef GpioOutputE9  LedNorth;			// User LED 3: Red
-typedef GpioOutputE10 LedNorthEast;		// User LED 5: Orange
-typedef GpioOutputE11 LedEast;			// User LED 7: Green
-typedef GpioOutputE12 LedSouthEast;		// User LED 9: Blue
-typedef GpioOutputE13 LedSouth;			// User LED 10: Red
-typedef GpioOutputE14 LedSouthWest;		// User LED 8: Orange
-typedef GpioOutputE15 LedWest;			// User LED 6: Green
-typedef GpioOutputE8  LedNorthWest;		// User LED 4: Blue
 
 
 namespace l3g
 {
-typedef GpioInputE0		Int1;	// MEMS_INT1 [L3GD20_INT1]: GPXTI0
-typedef GpioInputE1		Int2;	// MEMS_INT2 [L3GD20_DRDY/INT2]: GPXTI1
+using Int1 = GpioInputE0;	// MEMS_INT1 [L3GD20_INT1]: GPXTI0
+using Int2 = GpioInputE1;	// MEMS_INT2 [L3GD20_DRDY/INT2]: GPXTI1
 
-typedef GpioOutputE3	Cs;		// CS_I2C/SPI [L3GD20_CS_I2C/SPI]
-typedef GpioOutputA5	Sck;	// SPI1_SCK [L3GD20_SCL/SPC]
-typedef GpioOutputA7	Mosi;	// SPI1_MISO [L3GD20_SDA/SDI/SDO]
-typedef GpioInputA6		Miso;	// SPI1_MISO [L3GD20_SA0/SDO]
+using Cs   = GpioOutputE3;	// CS_I2C/SPI [L3GD20_CS_I2C/SPI]
+using Sck  = GpioOutputA5;	// SPI1_SCK [L3GD20_SCL/SPC]
+using Mosi = GpioOutputA7;	// SPI1_MISO [L3GD20_SDA/SDI/SDO]
+using Miso = GpioInputA6;	// SPI1_MISO [L3GD20_SA0/SDO]
 
-typedef SpiMaster1 SpiMaster;
-typedef xpcc::Lis3TransportSpi< SpiMaster, Cs > Transport;
-typedef xpcc::L3gd20< Transport > Gyroscope;
+using SpiMaster = SpiMaster1;
+using Transport = xpcc::Lis3TransportSpi< SpiMaster, Cs >;
+using Gyroscope = xpcc::L3gd20< Transport >;
 }
 
 
 namespace lsm3
 {
-typedef GpioInputE2	Drdy;	// DRDY [LSM303DLHC_DRDY]: GPXTI2
-typedef GpioInputE4	Int1;	// MEMS_INT3 [LSM303DLHC_INT1]: GPXTI4
-typedef GpioInputE5	Int2;	// MEMS_INT4 [LSM303DLHC_INT2]: GPXTI5
+using Drdy = GpioInputE2;	// DRDY [LSM303DLHC_DRDY]: GPXTI2
+using Int1 = GpioInputE4;	// MEMS_INT3 [LSM303DLHC_INT1]: GPXTI4
+using Int2 = GpioInputE5;	// MEMS_INT4 [LSM303DLHC_INT2]: GPXTI5
 
-typedef GpioB6		Scl;	// I2C1_SCL [LSM303DLHC_SCL]: I2C1_SCL
-typedef GpioB7		Sda;	// I2C1_SDA [LSM303DLHC_SDA]: I2C1_SDA
+using Scl = GpioB6;	// I2C1_SCL [LSM303DLHC_SCL]: I2C1_SCL
+using Sda = GpioB7;	// I2C1_SDA [LSM303DLHC_SDA]: I2C1_SDA
 
 // Hardware I2C not yet implemented for F3!
-//typedef I2cMaster1 I2cMaster;
-typedef xpcc::SoftwareI2cMaster<GpioB6, GpioB7> I2cMaster;
-typedef xpcc::Lsm303a< I2cMaster > Accelerometer;
+//using I2cMaster = I2cMaster1;
+using I2cMaster = xpcc::SoftwareI2cMaster<GpioB6, GpioB7>;
+using Accelerometer = xpcc::Lsm303a< I2cMaster >;
 }
 
 
 namespace usb
 {
-typedef GpioA11	Dm;		// DM: USB_DM
-typedef GpioA12	Dp;		// DP: USB_DP
-//typedef UsbFs Device;
+using Dm = GpioA11;		// DM: USB_DM
+using Dp = GpioA12;		// DP: USB_DP
+//using Device = UsbFs;
 }
 
 
