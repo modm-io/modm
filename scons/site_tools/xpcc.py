@@ -141,7 +141,7 @@ def xpcc_library(env, buildpath=None):
 
 	substitutions = {
 		'defines': '\n'.join(define_list),
-		'name': env['XPCC_CONFIG']['general']['name']
+		'name': env['XPCC_PROJECT_NAME']
 	}
 
 	file = env.Template(
@@ -309,7 +309,7 @@ def generate(env, **kw):
 	rootpath = os.path.abspath(rootpath)
 
 	# load the configuration file
-	configfile = ARGUMENTS.get('config', env.get('configfile', 'project.cfg'))
+	configfile = os.path.abspath(ARGUMENTS.get('config', env.get('configfile', 'project.cfg')))
 	try:
 		parser = configparser.Parser()
 		parser.read(configfile)
@@ -327,9 +327,14 @@ def generate(env, **kw):
 
 		architecture_deprecated = parser.get('build', 'architecture', 'deprecated')
 		if architecture_deprecated != "deprecated":
-			env.Warn("Specifying architecture is deprecated and replaced by only the Device ID ('device=...'.")
+			env.Warn("Specifying architecture is deprecated and replaced by only 'build.device'.")
 
-		env['XPCC_PROJECT_NAME'] = parser.get('general', 'name')
+		project_name = parser.get('general', 'name', 'deprecated')
+		if project_name == 'deprecated':
+			project_name = parser.get('build', 'name', os.path.basename(os.path.dirname(configfile)))
+		else:
+			env.Warn("Specifying 'general.name' is deprecated and replaced by 'build.name'!")
+		env['XPCC_PROJECT_NAME'] = project_name
 
 		buildpath = env.get('buildpath')
 		# put together build path
