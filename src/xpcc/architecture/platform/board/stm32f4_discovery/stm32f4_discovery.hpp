@@ -27,68 +27,68 @@ namespace Board
 
 /// STM32F4 running at 168MHz (USB Clock qt 48MHz) generated from the
 /// external on-board 8MHz crystal
-typedef SystemClock<Pll<ExternalCrystal<MHz8>, MHz168, MHz48> > systemClock;
+using systemClock = SystemClock<Pll<ExternalCrystal<MHz8>, MHz168, MHz48> >;
 
 
-typedef GpioInputA0  Button;	// Blue PushButton
-typedef GpioOutputA8 ClockOut;
-typedef GpioOutputC9 SystemClockOut;
+using Button = GpioInputA0;
+using ClockOut = GpioOutputA8;
+using SystemClockOut = GpioOutputC9;
 
+using LedOrange = GpioOutputD13;	// User LED 3
+using LedGreen  = GpioOutputD12;	// User LED 4
+using LedRed    = GpioOutputD14;	// User LED 5
+using LedBlue   = GpioOutputD15;	// User LED 6
 
-typedef GpioOutputD13 LedOrange;	// User LED 3
-typedef GpioOutputD12 LedGreen;		// User LED 4
-typedef GpioOutputD14 LedRed;		// User LED 5
-typedef GpioOutputD15 LedBlue;		// User LED 6
 
 
 namespace lis3
 {
-typedef GpioInputE1		Int;	// LIS302DL_INT2
+using Int = GpioInputE1;	// LIS302DL_INT2
 
-typedef GpioOutputE3	Cs;		// LIS302DL_CS_I2C/SPI
-typedef GpioOutputA5	Sck;	// SPI1_SCK
-typedef GpioOutputA7	Mosi;	// SPI1_MOSI
-typedef GpioInputA6		Miso;	// SPI1_MISO
+using Cs   = GpioOutputE3;	// LIS302DL_CS_I2C/SPI
+using Sck  = GpioOutputA5;	// SPI1_SCK
+using Mosi = GpioOutputA7;	// SPI1_MOSI
+using Miso = GpioInputA6;	// SPI1_MISO
 
-typedef SpiMaster1 SpiMaster;
-typedef xpcc::Lis3TransportSpi< SpiMaster, Cs > Transport;
+using SpiMaster = SpiMaster1;
+using Transport = xpcc::Lis3TransportSpi< SpiMaster, Cs >;
 }
 
 
 namespace cs43
 {
-typedef GpioOutputA4	Lrck;	// I2S3_WS
-typedef GpioOutputC7	Mclk;	// I2S3_MCK
-typedef GpioOutputC10	Sclk;	// I2S3_SCK
-typedef GpioOutputC12	Sdin;	// I2S3_SD
+using Lrck = GpioOutputA4;	// I2S3_WS
+using Mclk = GpioOutputC7;	// I2S3_MCK
+using Sclk = GpioOutputC10;	// I2S3_SCK
+using Sdin = GpioOutputC12;	// I2S3_SD
 
-typedef GpioOutputD4	Reset;	// Audio_RST
-typedef GpioB6			Scl;	// Audio_SCL
-typedef GpioB9			Sda;	// Audio_SDA
+using Reset = GpioOutputD4;	// Audio_RST
+using Scl = GpioB6;			// Audio_SCL
+using Sda = GpioB9;			// Audio_SDA
 
-typedef I2cMaster1 I2cMaster;
-//typedef I2sMaster3 I2sMaster;
+using I2cMaster = I2cMaster1;
+//using I2sMaster = I2sMaster3;
 }
 
 
 namespace mp45
 {
-typedef GpioOutputB10	Clk;	// CLK_IN: I2S2_CK
-typedef GpioInputC3		Dout;	// PDM_OUT: I2S2_SD
-//typedef I2sMaster2 I2sMaster;
+using Clk = GpioOutputB10;	// CLK_IN: I2S2_CK
+using Dout = GpioInputC3;	// PDM_OUT: I2S2_SD
+//using  = I2sMaster2 I2sMaster;
 }
 
 
 namespace usb
 {
-typedef GpioA11	Dm;		// OTG_FS_DM: USB_OTG_FS_DM
-typedef GpioA12	Dp;		// OTG_FS_DP: USB_OTG_FS_DP
-typedef GpioA10	Id;		// OTG_FS_ID: USB_OTG_FS_ID
+using Dm = GpioA11;			// OTG_FS_DM: USB_OTG_FS_DM
+using Dp = GpioA12;			// OTG_FS_DP: USB_OTG_FS_DP
+using Id = GpioA10;			// OTG_FS_ID: USB_OTG_FS_ID
 
-typedef GpioD5			Overcurrent;	// OTG_FS_OverCurrent
-typedef GpioOutputC0	Power;			// OTG_FS_PowerSwitchOn
-typedef GpioInputA9		VBus;			// VBUS_FS: USB_OTG_HS_VBUS
-//typedef UsbFs Device;
+using Overcurrent = GpioD5;	// OTG_FS_OverCurrent
+using Power = GpioOutputC0;	// OTG_FS_PowerSwitchOn
+using VBus = GpioInputA9;	// VBUS_FS: USB_OTG_HS_VBUS
+//using Device = UsbFs;
 }
 
 

@@ -1,4 +1,4 @@
-#include "../stm32f4_discovery.hpp"
+#include <xpcc/architecture/platform.hpp>
 
 #include <xpcc/processing/timer.hpp>
 #include <xpcc/processing/protothread.hpp>
