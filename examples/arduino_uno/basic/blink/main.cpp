@@ -9,18 +9,19 @@
 
 // Inspired by: http://arduino.cc/en/Tutorial/Blink
 
-#include "../../arduino_uno.hpp"
+#include <xpcc/architecture/platform.hpp>
 
 int
 main()
 {
-	DigitalOutput13::setOutput();
+	Board::initialize();
+	LedD13::setOutput();
 
 	while (1)
 	{
-		DigitalOutput13::set();
+		LedD13::set();
 		xpcc::delayMilliseconds(1000);
-		DigitalOutput13::reset();
+		LedD13::reset();
 		xpcc::delayMilliseconds(1000);
 	}
 }

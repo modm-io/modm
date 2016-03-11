@@ -9,24 +9,17 @@
 
 // Inspired by: http://arduino.cc/en/Tutorial/ReadAnalogVoltage
 
-#include "../../arduino_uno.hpp"
+#include <xpcc/architecture/platform.hpp>
 
-// create a device wrapper and a stream in oder to be able to send strings
-xpcc::IODeviceWrapper< Uart0, xpcc::IOBuffer::BlockIfFull > serialDevice;
-xpcc::IOStream serialStream(serialDevice);
-
-int 
+int
 main()
 {
-	// initialize the serial communication module
-	DigitalInput0::connect(Uart0::Rx);
-	DigitalOutput1::connect(Uart0::Tx);
-	Uart0::initialize<clock, 9600>();
+	Board::initialize();
 
 	// Initialize the analog to digital converter
 	// With the AVR running at 16Mhz and a prescaler of 128 the
 	// ADC is running at 125kHz.
-	Adc::initialize<clock, 125000>();
+	Adc::initialize<Board::systemClock, 125000>();
 	Adc::setReference(Adc::Reference::InternalVcc);
 
 	while (1)
