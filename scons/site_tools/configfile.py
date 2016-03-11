@@ -137,6 +137,9 @@ class Scanner:
 			ignoreList = listify(ignore)
 		pathlist = listify(path)
 
+		if 'XPCC_BOARD_PATH' in self.env:
+			pathlist.append(self.env['XPCC_BOARD_PATH'])
+
 		self.sources = FileList()
 		self.header = FileList()
 		self.defines = {}

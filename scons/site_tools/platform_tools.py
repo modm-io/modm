@@ -215,6 +215,8 @@ def platform_tools_generate(env, architecture_path):
 	src = os.path.join(platform_path, 'platform.hpp.in')
 	tar = env.Buildpath(os.path.join(architecture_path, 'platform.hpp'))
 	sub = {'include_path': '../../../generated_platform/drivers.hpp'}
+	if 'XPCC_BOARD' in env:
+		sub['board'] = env['XPCC_BOARD']
 	env.Jinja2Template(target = tar, source = src, substitutions = sub)
 
 	#append and return additional CPPPATH

@@ -34,6 +34,7 @@ import platform
 import configfile as configparser
 import textwrap
 import getpass, subprocess
+import glob
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'tools', 'device_files'))
 from device_identifier import DeviceIdentifier
@@ -313,6 +314,18 @@ def generate(env, **kw):
 	try:
 		parser = configparser.Parser()
 		parser.read(configfile)
+
+		board = parser.get('build', 'board', 'undeclared')
+		if board != 'undeclared':
+			boardpath = os.path.join(rootpath, 'src', 'xpcc', 'architecture', 'platform', 'board', board)
+			if not os.path.exists(boardpath):
+				available = map(os.path.basename, glob.glob(os.path.dirname(boardpath) + '/*'))
+				available.remove('build.cfg')
+				env.Error("Board '{}' not found! Available boards are:\n\t- {}".format(board, "\n\t- ".join(available)))
+				env.Exit(1)
+			parser.read([os.path.join(boardpath, 'board.cfg'), configfile])
+			env['XPCC_BOARD'] = board
+			env['XPCC_BOARD_PATH'] = boardpath
 
 		device = parser.get('build', 'device')
 
