@@ -37,6 +37,8 @@ using LedRed    = xpcc::GpioInverted<GpioOutputD5>;		// LED3 [Red]
 using LedBlue   = xpcc::GpioInverted<GpioOutputK3>;		// LED4 [Blue]
 using LedD13    = GpioOutputD3;							// LED7 [Green]
 
+using Leds = xpcc::SoftwareGpioPort< LedBlue, LedRed, LedOrange, LedGreen >;
+
 
 namespace stlink
 {

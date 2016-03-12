@@ -39,6 +39,7 @@ using LedGreen  = GpioOutputD12;	// User LED 4
 using LedRed    = GpioOutputD14;	// User LED 5
 using LedBlue   = GpioOutputD15;	// User LED 6
 
+using Leds = xpcc::SoftwareGpioPort< LedGreen, LedBlue, LedRed, LedOrange >;
 
 
 namespace lis3

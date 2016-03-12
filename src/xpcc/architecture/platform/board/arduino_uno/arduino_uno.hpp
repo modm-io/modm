@@ -50,6 +50,8 @@ using D13 = GpioB5;
 using Button = xpcc::GpioUnused;
 using LedD13 = D13;
 
+using Leds = xpcc::SoftwareGpioPort< LedD13 >;
+
 
 inline void
 initialize()

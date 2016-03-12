@@ -63,6 +63,8 @@ using LedDown  = GpioOutputC7;
 using LedLeft  = GpioOutputC8;
 using LedRight = GpioOutputC9;
 
+using Leds = xpcc::SoftwareGpioPort< LedLeft, LedDown, LedRight, LedUp >;
+
 
 namespace l3g
 {

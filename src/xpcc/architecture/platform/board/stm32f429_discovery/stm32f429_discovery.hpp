@@ -33,6 +33,7 @@ using Button = GpioInputA0;
 using LedGreen = GpioOutputG13;	// User LED (LD3)
 using LedRed   = GpioOutputG14;	// User LED (LD4)
 
+using Leds = xpcc::SoftwareGpioPort< LedRed, LedGreen >;
 
 namespace l3g
 {

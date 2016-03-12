@@ -34,6 +34,7 @@ using Button = GpioInputA0;	// Blue PushButton
 using LedGreen = GpioOutputC9;		// User LED 3
 using LedBlue  = GpioOutputC8;		// User LED 4
 
+using Leds = xpcc::SoftwareGpioPort< LedBlue, LedGreen >;
 
 
 inline void

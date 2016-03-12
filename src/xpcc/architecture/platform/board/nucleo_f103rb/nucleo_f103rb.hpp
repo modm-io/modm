@@ -113,6 +113,8 @@ using D15 = GpioB8;
 using Button = xpcc::GpioInverted<GpioInputC13>;
 using LedD13 = D13;
 
+using Leds = xpcc::SoftwareGpioPort< LedD13 >;
+
 
 namespace stlink
 {
