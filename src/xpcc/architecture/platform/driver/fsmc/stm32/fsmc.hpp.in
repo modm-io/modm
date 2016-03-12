@@ -27,6 +27,11 @@
 %%  set BTRx = "BTRx"
 %% endif
 
+%% if target is stm32f4 and (target.name not in ["405", "407", "415", "417"])
+%%   set FMC = "FMC"
+%% else
+%%   set FMC = "FSMC"
+%% endif
 
 namespace xpcc
 {
@@ -124,30 +129,30 @@ namespace xpcc
 				enum BusType
 				{
 					NO_MULTIPLEX_8BIT = 0,
-					NO_MULTIPLEX_16BIT = FSMC_{{ BCRx }}_MWID_0,
-					ADDRESS_DATA_MULIPLEX_8BIT = FSMC_{{ BCRx }}_MUXEN,
-					ADDRESS_DATA_MULIPLEX_16BIT = FSMC_{{ BCRx }}_MUXEN | FSMC_{{ BCRx }}_MWID_0,
+					NO_MULTIPLEX_16BIT = {{ FMC }}_{{ BCRx }}_MWID_0,
+					ADDRESS_DATA_MULIPLEX_8BIT = {{ FMC }}_{{ BCRx }}_MUXEN,
+					ADDRESS_DATA_MULIPLEX_16BIT = {{ FMC }}_{{ BCRx }}_MUXEN | {{ FMC }}_{{ BCRx }}_MWID_0,
 				};
 
 				enum MemoryType
 				{
 					SRAM_ROM = 0,
-					PSRAM = FSMC_{{ BCRx }}_MTYP_0, ///< PSRAM (CRAM)
-					NOR = FSMC_{{ BCRx }}_MTYP_1, ///< NOR Flash/OneNAND Flash
+					PSRAM = {{ FMC }}_{{ BCRx }}_MTYP_0, ///< PSRAM (CRAM)
+					NOR = {{ FMC }}_{{ BCRx }}_MTYP_1, ///< NOR Flash/OneNAND Flash
 				};
 
 				enum AccessMode
 				{
 					MODE_A = 0,	///< access mode A
-					MODE_B = FSMC_{{ BTRx }}_ACCMOD_0, ///< access mode B
-					MODE_C = FSMC_{{ BTRx }}_ACCMOD_1, ///< access mode C
-					MODE_D = FSMC_{{ BTRx }}_ACCMOD_0 | FSMC_{{ BTRx }}_ACCMOD_1 ///< access mode D
+					MODE_B = {{ FMC }}_{{ BTRx }}_ACCMOD_0, ///< access mode B
+					MODE_C = {{ FMC }}_{{ BTRx }}_ACCMOD_1, ///< access mode C
+					MODE_D = {{ FMC }}_{{ BTRx }}_ACCMOD_0 | {{ FMC }}_{{ BTRx }}_ACCMOD_1 ///< access mode D
 				};
 
 				enum class ExtendedMode : uint32_t
 				{
 					Disable = 0,
-					Enable  = FSMC_{{ BCRx }}_EXTMOD,
+					Enable  = {{ FMC }}_{{ BCRx }}_EXTMOD,
 				};
 
 				/**
@@ -197,10 +202,10 @@ namespace xpcc
 				enableRegion(Region region, bool enable = true)
 				{
 					if (enable) {
-						FSMC_Bank1->BTCR[region] |= FSMC_{{ BCRx }}_MBKEN;
+						{{ FMC }}_Bank1->BTCR[region] |= {{ FMC }}_{{ BCRx }}_MBKEN;
 					}
 					else {
-						FSMC_Bank1->BTCR[region] &= ~FSMC_{{ BCRx }}_MBKEN;
+						{{ FMC }}_Bank1->BTCR[region] &= ~{{ FMC }}_{{ BCRx }}_MBKEN;
 					}
 
 				}
@@ -229,11 +234,12 @@ namespace xpcc
 				enableAsynchronousWait(Region region,
 						WaitPolarity polarity = WAIT_LOW_ACTIVE)
 				{
-					uint32_t btcr = FSMC_{{ BCRx }}_ASYNCWAIT;
-					if (polarity != WAIT_LOW_ACTIVE) {
-						btcr |= FSMC_{{ BCRx }}_WAITPOL;
+					uint32_t btcr = {{ FMC }}_{{ BCRx }}_ASYNCWAIT;
+					if (polarity != WAIT_LOW_ACTIVE)
+					{
+						btcr |= {{ FMC }}_{{ BCRx }}_WAITPOL;
 					}
-					FSMC_Bank1->BTCR[region] = btcr;
+					{{ FMC }}_Bank1->BTCR[region] = btcr;
 				}
 
 				/**
@@ -243,7 +249,8 @@ namespace xpcc
 				 */
 				template<typename T>
 				static constexpr inline T*
-				getRegionPointer(Region region) {
+				getRegionPointer(Region region)
+				{
 					return 	(region == CHIP_SELECT_1)? (T *)(0x60000000) :
 							(region == CHIP_SELECT_2)? (T *)(0x64000000) :
 							(region == CHIP_SELECT_3)? (T *)(0x68000000) :
@@ -321,7 +328,7 @@ namespace xpcc
 			enable()
 			{
 %% if target is stm32f2 or target is stm32f4
-				RCC->AHB3ENR |= RCC_AHB3ENR_FSMCEN;
+				RCC->AHB3ENR |= RCC_AHB3ENR_{{ FMC }}EN;
 %% else
 				RCC->AHBENR |= RCC_AHBENR_FSMCEN;
 %% endif
@@ -331,7 +338,7 @@ namespace xpcc
 			disable()
 			{
 %% if target is stm32f2 or target is stm32f4
-				RCC->AHB3ENR &= ~RCC_AHB3ENR_FSMCEN;
+				RCC->AHB3ENR &= ~RCC_AHB3ENR_{{ FMC }}EN;
 %% else
 				RCC->AHBENR &= ~RCC_AHBENR_FSMCEN;
 %% endif

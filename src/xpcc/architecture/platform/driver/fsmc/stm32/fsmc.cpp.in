@@ -1,10 +1,10 @@
 // coding: utf-8
 /* Copyright (c) 2012-2013, Roboterclub Aachen e.V.
-* All Rights Reserved.
-*
-* The file is part of the xpcc library and is released under the 3-clause BSD
-* license. See the file `LICENSE` for the full license governing this code.
-*/
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
 // ----------------------------------------------------------------------------
 
 #include "fsmc.hpp"
@@ -15,6 +15,12 @@
 %% elif target is stm32f1
 %%  set BCRx = "BCRx"
 %%  set BTRx = "BTRx"
+%% endif
+
+%% if target is stm32f4 and (target.name not in ["405", "407", "415", "417"])
+%%   set FMC = "FMC"
+%% else
+%%   set FMC = "FSMC"
 %% endif
 
 // ----------------------------------------------------------------------------
@@ -39,16 +45,16 @@ xpcc::stm32::fsmc::NorSram::resetRegion(Region region)
 	if (region == CHIP_SELECT_1)
 	{
 		// FSMC_Bank1_NORSRAM1
-		FSMC_Bank1->BTCR[region*2] = 0x000030DB;
+		{{ FMC }}_Bank1->BTCR[region*2] = 0x000030DB;
 	}
 	else
 	{
 		// FSMC_Bank1_NORSRAM2,  FSMC_Bank1_NORSRAM3 or FSMC_Bank1_NORSRAM4
-		FSMC_Bank1->BTCR[region*2] = 0x000030D2;
+		{{ FMC }}_Bank1->BTCR[region*2] = 0x000030D2;
 	}
 
-	FSMC_Bank1->BTCR[region*2 + 1] = 0x0FFFFFFF;
-	FSMC_Bank1E->BWTR[region] = 0x0FFFFFFF;
+	{{ FMC }}_Bank1->BTCR[region*2 + 1] = 0x0FFFFFFF;
+	{{ FMC }}_Bank1E->BWTR[region] = 0x0FFFFFFF;
 }
 
 void
@@ -56,18 +62,18 @@ xpcc::stm32::fsmc::NorSram::configureSynchronousRegion(Region region,
 		BusType multiplex, MemoryType memoryType, SynchronousTiming timing)
 {
 	// NOR/PSRAM chip-select control register (BCR)
-	FSMC_Bank1->BTCR[region*2] =
-			FSMC_{{ BCRx }}_CBURSTRW |
-			FSMC_{{ BCRx }}_EXTMOD |	// Enable extended mode, this allows different timings for read and write
-			FSMC_{{ BCRx }}_WREN |	// enable write
-			FSMC_{{ BCRx }}_BURSTEN | // synchronous access
+	{{ FMC }}_Bank1->BTCR[region*2] =
+			{{ FMC }}_{{ BCRx }}_CBURSTRW |
+			{{ FMC }}_{{ BCRx }}_EXTMOD |	// Enable extended mode, this allows different timings for read and write
+			{{ FMC }}_{{ BCRx }}_WREN |	// enable write
+			{{ FMC }}_{{ BCRx }}_BURSTEN | // synchronous access
 			(1 << 7) |			// FWPRLVL (unknown, should be kept at reset level (=1))
 			memoryType |
 			multiplex;
 
 	if (memoryType == NOR) {
 		// Flash access enable
-		FSMC_Bank1->BTCR[region*2] |= FSMC_{{ BCRx }}_FACCEN;
+		{{ FMC }}_Bank1->BTCR[region*2] |= {{ FMC }}_{{ BCRx }}_FACCEN;
 	}
 
 	if (memoryType == PSRAM) {
@@ -89,14 +95,14 @@ xpcc::stm32::fsmc::NorSram::configureSynchronousRegion(Region region,
 	}
 
 	// SRAM/NOR-Flash timing register (BTR) (for read access)
-	FSMC_Bank1->BTCR[region*2 + 1] =
+	{{ FMC }}_Bank1->BTCR[region*2 + 1] =
 			timing.dataLatency << 24 |
 			timing.clockDivideRatio << 20 |
 			timing.busTurnAround << 16;
 
 	// SRAM/NOR-Flash write timing registers (BWTR)
 	// TODO read write timing different?
-	FSMC_Bank1E->BWTR[region] =
+	{{ FMC }}_Bank1E->BWTR[region] =
 			timing.dataLatency << 24 |
 			timing.clockDivideRatio << 20 |
 			timing.busTurnAround << 16;
@@ -112,16 +118,16 @@ xpcc::stm32::fsmc::NorSram::configureAsynchronousRegion(Region region,
 						memoryType == NOR && accessMode == MODE_A)?
 						(1 << 6) : 0;
 	// NOR/PSRAM chip-select control register (BCR)
-	FSMC_Bank1->BTCR[region*2] =
+	{{ FMC }}_Bank1->BTCR[region*2] =
 			static_cast<uint32_t>(extended) |	// Enable extended mode, this allows different timings for read and write
-			FSMC_{{ BCRx }}_WREN |	// enable write
+			{{ FMC }}_{{ BCRx }}_WREN |	// enable write
 			FACCEN |
 			(1 << 7) |			// FWPRLVL (unknown, should be kept at reset level (=1))
 			memoryType |
 			busType;
 
 	// SRAM/NOR-Flash timing register (BTR) (for read access)
-	FSMC_Bank1->BTCR[region*2 + 1] =
+	{{ FMC }}_Bank1->BTCR[region*2 + 1] =
 			accessMode |
 			timing.busTurnAround << 16 |
 			timing.readDataPhase << 8 |
@@ -129,7 +135,7 @@ xpcc::stm32::fsmc::NorSram::configureAsynchronousRegion(Region region,
 			timing.readAddressSetup;
 
 	// SRAM/NOR-Flash write timing registers (BWTR)
-	FSMC_Bank1E->BWTR[region] =
+	{{ FMC }}_Bank1E->BWTR[region] =
 			accessMode |
 			timing.busTurnAround << 16 |
 			timing.writeDataPhase << 8 |
