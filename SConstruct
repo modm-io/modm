@@ -107,5 +107,5 @@ for key, value in ARGUMENTS.items():
 	unittest_str += (" %s=%s" % (key, value))
 env.Phony(unittest=unittest_str)
 
-env.Alias('all', ['doc', 'update', 'templates', 'unittest'])
+env.Alias('all', ['doc', 'unittest'])
 env.Default('all')
