@@ -13,7 +13,7 @@
 %%   set apb = "APB1"
 %% endif
 
-%% if target is stm32f3 and target.name == "373"
+%% if (target is stm32f3 and target.name == "373") or target is stm32f0
 %%   set irq_name = id
 %% else
 %%   if id == 9
@@ -28,6 +28,12 @@
 %%     set irq_name = "8_UP_TIM13"
 %%   elif id == 14 and not target is stm32f0
 %%     set irq_name = "8_TRG_COM_TIM14"
+%%   elif id == 15
+%%     set irq_name = "1_BRK_TIM15"
+%%   elif id == 16
+%%     set irq_name = "1_UP_TIM16"
+%%   elif id == 17
+%%     set irq_name = "1_TRG_COM_TIM17"
 %%   else
 %%     set irq_name = id
 %%   endif
