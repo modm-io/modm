@@ -7,25 +7,15 @@
  */
 // ----------------------------------------------------------------------------
 
-%% if id in range(9,12)
-%% set apb = "APB2"
+%% if id in range(9,12) or id in range(15,20)
+%%   set apb = "APB2"
 %% else
-%% set apb = "APB1"
+%%   set apb = "APB1"
 %% endif
 
 %% if target is stm32f3 and target.name == "373"
-%%   if id in range(9,12) or id in range(15,20)
-%%     set apb = "APB2"
-%%   else
-%%     set apb = "APB1"
-%%   endif
 %%   set irq_name = id
 %% else
-%%   if id in range(9,12)
-%%     set apb = "APB2"
-%%   else
-%%     set apb = "APB1"
-%%   endif
 %%   if id == 9
 %%     set irq_name = "1_BRK_TIM9"
 %%   elif id == 10
