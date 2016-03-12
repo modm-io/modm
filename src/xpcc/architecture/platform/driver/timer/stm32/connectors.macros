@@ -11,7 +11,7 @@
 			["Channel1", "Channel1N", "Channel2", "Channel2N",
 			 "Channel3", "Channel3N", "Channel4", "Channel4N",
 			 "ExternalTrigger", "BreakIn"])
-	%% elif id in [2, 3, 4, 5]
+	%% elif id in [2, 3, 4, 5, 19]
 	%# General Purpose Timer
 		%% do connectors.extend(
 			["Channel1", "Channel2", "Channel3", "Channel4", "ExternalTrigger"])

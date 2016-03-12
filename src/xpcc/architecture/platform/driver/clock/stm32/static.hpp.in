@@ -213,6 +213,42 @@ namespace xpcc
 							 'divisions': [1],
 							 'sources': [internalClock, externalClock,
 										 externalCrystal, pll, systemClock] }
+%% elif target is stm32f3 and target.name == "373"
+	%% set internalClock =	{'name': "InternalClock",
+							 'fixedFrequency': "MHz8" }
+	%% set sys_timer = 	{'name': "SystemTimer",
+					     'prescaler': "1/8" }
+	%% set apb1_timers = 	{'name': "APB1Timers",
+							 'prescaler': "1" ,
+							 'sinks': [ "Timer2",  "Timer3",  "Timer4", "Timer5",
+										"Timer6",  "Timer7", "Timer12", "Timer13", "Timer14" ] }
+	%% set apb1 = 	{'name': "APB1",
+					 'prescaler': "1/2",
+					 'sinks': [ apb1_timers, "Can1", "I2c1", "I2c2",
+								"Usart2", "Usart3", "Uart4", "Uart5",
+								"Spi2", "Spi3" ] }
+	%% set apb2 = 	{'name': "APB2",
+					 'prescaler': "1",
+					 'sinks': [ "Usart1", "Spi1", "Adc",
+								"Timer1", "Timer8", "Timer15", "Timer16", "Timer17" ] }
+	%% set ahb = 	{'name': "AHB",
+					 'prescaler': "1",
+					 'sinks': [ sys_timer, apb1, apb2, "Gpio", "Dma" ] }
+					%#	 Note: Adc has its own prescaler
+	%% set pll =			{'name': "Pll",
+							 'setup': "PllSetup",
+							 'sources': [internalClock,
+										externalClock, externalCrystal] }
+	%% set systemClock =	{'name': "SystemClock",
+							 'minFrequency': "MHz4",
+							 'maxFrequency': "MHz72",
+							 'sources': [ internalClock, externalClock,
+										  externalCrystal, pll ],
+							 'sinks': [ ahb ] }
+	%% set mco1 =			{'name': "ClockOutput",
+							 'divisions': [1],
+							 'sources': [internalClock, externalClock,
+										 externalCrystal, pll, systemClock] }
 %% elif target is stm32f1 or target is stm32f3
 	%% set internalClock =	{'name': "InternalClock",
 							 'fixedFrequency': "MHz16" }

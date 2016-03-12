@@ -78,7 +78,7 @@ xpcc::stm32::Adc{{ id }}::setPrescaler(const Prescaler prescaler)
 {
 %% if target is stm32f2 or target is stm32f4 or target is stm32f7
 	ADC->CCR = (ADC->CCR & ~(0b11 << 17)) | (uint32_t(prescaler) << 17);
-%% elif target is stm32f1
+%% elif target is stm32f1 or target is stm32f3
 	RCC->CFGR = (RCC->CFGR & ~(0b11 << 14)) | (uint32_t(prescaler) << 14);
 %% endif
 }
@@ -265,7 +265,7 @@ xpcc::stm32::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
 {
 %% if target is stm32f2 or target is stm32f4 or target is stm32f7
 	const IRQn_Type InterruptVector = ADC_IRQn;
-%% elif target is stm32f1
+%% elif target is stm32f1 or target is stm32f3
 	%% if id < 3
 	const IRQn_Type InterruptVector = ADC1_2_IRQn;
 	%% elif id == 3

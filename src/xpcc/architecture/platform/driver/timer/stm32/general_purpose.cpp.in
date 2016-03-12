@@ -13,20 +13,34 @@
 %% set apb = "APB1"
 %% endif
 
-%% if id == 9
-%% set irq_name = "1_BRK_TIM9"
-%% elif id == 10
-%% set irq_name = "1_UP_TIM10"
-%% elif id == 11
-%% set irq_name = "1_TRG_COM_TIM11"
-%% elif id == 12
-%% set irq_name = "8_BRK_TIM12"
-%% elif id == 13
-%% set irq_name = "8_UP_TIM13"
-%% elif id == 14 and not target is stm32f0
-%% set irq_name = "8_TRG_COM_TIM14"
+%% if target is stm32f3 and target.name == "373"
+%%   if id in range(9,12) or id in range(15,20)
+%%     set apb = "APB2"
+%%   else
+%%     set apb = "APB1"
+%%   endif
+%%   set irq_name = id
 %% else
-%% set irq_name = id
+%%   if id in range(9,12)
+%%     set apb = "APB2"
+%%   else
+%%     set apb = "APB1"
+%%   endif
+%%   if id == 9
+%%     set irq_name = "1_BRK_TIM9"
+%%   elif id == 10
+%%     set irq_name = "1_UP_TIM10"
+%%   elif id == 11
+%%     set irq_name = "1_TRG_COM_TIM11"
+%%   elif id == 12
+%%     set irq_name = "8_BRK_TIM12"
+%%   elif id == 13
+%%     set irq_name = "8_UP_TIM13"
+%%   elif id == 14 and not target is stm32f0
+%%     set irq_name = "8_TRG_COM_TIM14"
+%%   else
+%%     set irq_name = id
+%%   endif
 %% endif
 
 #include <xpcc_config.hpp>

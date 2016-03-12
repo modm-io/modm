@@ -39,9 +39,11 @@ xpcc::stm32::Timer{{ id }}::setMode(Mode mode)
 }
 
 %% if (id == 6) and (target is stm32f2 or target is stm32f3 or target is stm32f4 or target is stm32f7)
-	%% set interrupt_vector = "TIM6_DAC_IRQn"
+%%   set interrupt_vector = "TIM6_DAC_IRQn"
+%% elif (id == 18) and (target is stm32f3 and target.name == "373")
+%%   set interrupt_vector = "TIM18_DAC2_IRQn"
 %% else
-	%% set interrupt_vector = "TIM" ~ id ~ "_IRQn"
+%%   set interrupt_vector = "TIM" ~ id ~ "_IRQn"
 %% endif
 void
 xpcc::stm32::Timer{{ id }}::enableInterruptVector(bool enable, uint32_t priority)

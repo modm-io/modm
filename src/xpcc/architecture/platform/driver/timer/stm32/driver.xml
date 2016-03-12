@@ -5,10 +5,10 @@
 		<!-- Template: file that needs to be turned into a source file -->
 		<template instances="1,8" out="timer_{{id}}.cpp">advanced.cpp.in</template>
 		<template instances="1,8" out="timer_{{id}}.hpp">advanced.hpp.in</template>
-		<template instances="6,7" out="timer_{{id}}.cpp">basic.cpp.in</template>
-		<template instances="6,7" out="timer_{{id}}.hpp">basic.hpp.in</template>
-		<template instances="2,3,4,5,9,10,11,12,13,14" out="timer_{{id}}.cpp">general_purpose.cpp.in</template>
-		<template instances="2,3,4,5,9,10,11,12,13,14" out="timer_{{id}}.hpp">general_purpose.hpp.in</template>
+		<template instances="6,7,18" out="timer_{{id}}.cpp">basic.cpp.in</template>
+		<template instances="6,7,18" out="timer_{{id}}.hpp">basic.hpp.in</template>
+		<template instances="2,3,4,5,9,10,11,12,13,14,15,16,17,19" out="timer_{{id}}.cpp">general_purpose.cpp.in</template>
+		<template instances="2,3,4,5,9,10,11,12,13,14,15,16,17,19" out="timer_{{id}}.hpp">general_purpose.hpp.in</template>
 		<!-- Static: files that just need to be copied to the generated directory -->
 		<template>type_ids.hpp.in</template>
 		<template>advanced_base.hpp.in</template>

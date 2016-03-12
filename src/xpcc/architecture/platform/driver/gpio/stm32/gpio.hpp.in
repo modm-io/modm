@@ -16,7 +16,7 @@
 #include <xpcc/math/utils/bit_operation.hpp>
 
 %% for instance in gpios | getAdcs
-	%% if target is stm32f3
+	%% if (target is stm32f3 and target.name != "373")
 #include "../../adc/stm32f3/adc_{{instance}}.hpp"
 	%% else
 #include "../../adc/stm32/adc_{{instance}}.hpp"
