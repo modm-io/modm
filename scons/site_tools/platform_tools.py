@@ -158,24 +158,20 @@ def platform_tools_generate(env, architecture_path):
 	defines = prop['defines']
 	device_headers = prop['headers']
 
-	if device not in ['darwin', 'linux', 'windows']:
+	if not env['ARCHITECTURE'].startswith('hosted'):
 		# Set Size
 		env['DEVICE_SIZE'] = { "flash": prop['flash'], "ram": prop['ram'], "eeprom": prop['eeprom'] }
-		if (prop['linkerscript'] != ""):
+
+		if not env['ARCHITECTURE'].startswith('avr'):
 			# Find Linkerscript:
-			linkerfile = os.path.join(env['XPCC_PLATFORM_PATH'], 'linker', prop['linkerscript'])
-			if not os.path.isfile(linkerfile):
-				linkerfile = os.path.join(env['XPCC_PLATFORM_PATH'], 'linker', prop['target']['platform'], prop['linkerscript'])
-				if not os.path.isfile(linkerfile):
-					env.Error("Linkerscript for %s (%s) could not be found." % (device, linkerfile))
-					Exit(1)
+			linkerfile = os.path.join(env['XPCC_PLATFORM_GENERATED_PATH'], 'driver', 'core', 'cortex', 'linkerscript.ld')
+			# make the program depend directly on the linkerscript, so it re-links when something changed!
+			Depends(os.path.join(env['XPCC_BUILDPATH'], "..", env['XPCC_PROJECT_NAME'] + ".elf"), linkerfile)
+
 			linkdir, linkfile = os.path.split(linkerfile)
 			linkdir = linkdir.replace(env['XPCC_ROOTPATH'], "${XPCC_ROOTPATH}")
 			env['LINKPATH'] = str(linkdir)
 			env['LINKFILE'] = str(linkfile)
-		else:
-			env['LINKPATH'] = ""
-			env['LINKFILE'] = ""
 
 	# Loop through Drivers
 	driver_list = []
