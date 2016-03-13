@@ -16,6 +16,7 @@
 
 #include <xpcc/architecture/platform.hpp>
 #include <xpcc/debug/logger.hpp>
+#define XPCC_BOARD_HAS_LOGGER
 
 using namespace xpcc::stm32;
 
@@ -111,7 +112,10 @@ using D14 = GpioB9;
 using D15 = GpioB8;
 
 using Button = xpcc::GpioInverted<GpioInputC13>;
-using Led = D13;
+using LedD13 = D13;
+
+using Leds = xpcc::SoftwareGpioPort< LedD13 >;
+
 
 namespace stlink
 {
@@ -130,8 +134,6 @@ initialize()
 	stlink::Tx::connect(stlink::Uart::Tx);
 	stlink::Rx::connect(stlink::Uart::Rx, Gpio::InputType::PullUp);
 	stlink::Uart::initialize<systemClock, 115200>(12);
-
-	Led::setOutput(xpcc::Gpio::Low);
 
 	Button::setInput();
 	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);

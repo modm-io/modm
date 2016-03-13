@@ -34,6 +34,7 @@ import platform
 import configfile as configparser
 import textwrap
 import getpass, subprocess
+import glob
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'tools', 'device_files'))
 from device_identifier import DeviceIdentifier
@@ -141,7 +142,7 @@ def xpcc_library(env, buildpath=None):
 
 	substitutions = {
 		'defines': '\n'.join(define_list),
-		'name': env['XPCC_CONFIG']['general']['name']
+		'name': env['XPCC_PROJECT_NAME']
 	}
 
 	file = env.Template(
@@ -309,10 +310,22 @@ def generate(env, **kw):
 	rootpath = os.path.abspath(rootpath)
 
 	# load the configuration file
-	configfile = ARGUMENTS.get('config', env.get('configfile', 'project.cfg'))
+	configfile = os.path.abspath(ARGUMENTS.get('config', env.get('configfile', 'project.cfg')))
 	try:
 		parser = configparser.Parser()
 		parser.read(configfile)
+
+		board = parser.get('build', 'board', 'undeclared')
+		if board != 'undeclared':
+			boardpath = os.path.join(rootpath, 'src', 'xpcc', 'architecture', 'platform', 'board', board)
+			if not os.path.exists(boardpath):
+				available = map(os.path.basename, glob.glob(os.path.dirname(boardpath) + '/*'))
+				available.remove('build.cfg')
+				env.Error("Board '{}' not found! Available boards are:\n\t- {}".format(board, "\n\t- ".join(available)))
+				env.Exit(1)
+			parser.read([os.path.join(boardpath, 'board.cfg'), configfile])
+			env['XPCC_BOARD'] = board
+			env['XPCC_BOARD_PATH'] = boardpath
 
 		device = parser.get('build', 'device')
 
@@ -327,9 +340,14 @@ def generate(env, **kw):
 
 		architecture_deprecated = parser.get('build', 'architecture', 'deprecated')
 		if architecture_deprecated != "deprecated":
-			env.Warn("Specifying architecture is deprecated and replaced by only the Device ID ('device=...'.")
+			env.Warn("Specifying architecture is deprecated and replaced by only 'build.device'.")
 
-		env['XPCC_PROJECT_NAME'] = parser.get('general', 'name')
+		project_name = parser.get('general', 'name', 'deprecated')
+		if project_name == 'deprecated':
+			project_name = parser.get('build', 'name', os.path.basename(os.path.dirname(configfile)))
+		else:
+			env.Warn("Specifying 'general.name' is deprecated and replaced by 'build.name'!")
+		env['XPCC_PROJECT_NAME'] = project_name
 
 		buildpath = env.get('buildpath')
 		# put together build path

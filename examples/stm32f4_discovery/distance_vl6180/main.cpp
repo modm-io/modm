@@ -1,4 +1,4 @@
-#include "../stm32f4_discovery.hpp"
+#include <xpcc/architecture/platform.hpp>
 
 #include <xpcc/processing.hpp>
 #include <xpcc/driver/position/vl6180.hpp>

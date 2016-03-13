@@ -18,7 +18,7 @@
 #include <xpcc/driver/display/hd44780.hpp>
 #include <xpcc/driver/gpio/pca8574.hpp>
 
-#include "../../stm32f4_discovery.hpp"
+#include <xpcc/architecture/platform.hpp>
 
 xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > device;
 xpcc::IOStream stream(device);

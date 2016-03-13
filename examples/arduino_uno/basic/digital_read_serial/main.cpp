@@ -9,23 +9,15 @@
 
 // Inspired by: http://arduino.cc/en/Tutorial/DigitalReadSerial
 
-#include "../../arduino_uno.hpp"
-
-// create a device wrapper and a stream in oder to be able to send strings
-xpcc::IODeviceWrapper< Uart0, xpcc::IOBuffer::BlockIfFull > serialDevice;
-xpcc::IOStream serialStream(serialDevice);
+#include <xpcc/architecture/platform.hpp>
 
 // name pin2
-typedef DigitalInput2 PushButton;
+using PushButton = D2;
 
 int
 main()
 {
-	// initialize the serial communication module
-	DigitalInput0::connect(Uart0::Rx);
-	DigitalOutput1::connect(Uart0::Tx);
-	Uart0::initialize<clock, 9600>();
-
+	Board::initialize();
 	PushButton::setInput();
 
 	while (1)

@@ -1,4 +1,4 @@
-#include "../stm32f3_discovery.hpp"
+#include <xpcc/architecture/platform.hpp>
 
 int global_a = 1;
 int global_b = 2;

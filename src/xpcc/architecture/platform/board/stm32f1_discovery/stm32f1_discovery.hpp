@@ -26,14 +26,15 @@ namespace Board
 
 /// STM32F100 running at 24MHz generated from the external 8MHz crystal
 /// supplied by the on-board st-link
-typedef SystemClock<Pll<ExternalCrystal<MHz8>, MHz24> > systemClock;
+using systemClock = SystemClock<Pll<ExternalCrystal<MHz8>, MHz24> >;
 
 
-typedef GpioInputA0   Button;	// Blue PushButton
+using Button = GpioInputA0;	// Blue PushButton
 
+using LedGreen = GpioOutputC9;		// User LED 3
+using LedBlue  = GpioOutputC8;		// User LED 4
 
-typedef GpioOutputC9  LedGreen;		// User LED 3
-typedef GpioOutputC8  LedBlue;		// User LED 4
+using Leds = xpcc::SoftwareGpioPort< LedBlue, LedGreen >;
 
 
 inline void

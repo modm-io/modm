@@ -55,11 +55,15 @@ struct systemClock
 	}
 };
 
+
+using Button   = GpioInputA0;
+
 using LedUp    = GpioOutputC6;
 using LedDown  = GpioOutputC7;
 using LedLeft  = GpioOutputC8;
 using LedRight = GpioOutputC9;
-using Button   = GpioInputA0;
+
+using Leds = xpcc::SoftwareGpioPort< LedLeft, LedDown, LedRight, LedUp >;
 
 
 namespace l3g

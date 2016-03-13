@@ -18,6 +18,7 @@
 
 #include <xpcc/architecture/platform.hpp>
 #include <xpcc/debug/logger.hpp>
+#define XPCC_BOARD_HAS_LOGGER
 
 using namespace xpcc::stm32;
 
@@ -100,9 +101,12 @@ struct systemClock
 	}
 };
 
-typedef GpioInputI11 Button;	// User Button
 
-typedef GpioOutputI1 LedD13;	// User LED 1 (Arduino D13)
+using Button = GpioInputI11;	// User Button
+using LedD13 = GpioOutputI1;	// User LED 1 (Arduino D13)
+
+using Leds = xpcc::SoftwareGpioPort< LedD13 >;
+
 
 namespace stlink
 {

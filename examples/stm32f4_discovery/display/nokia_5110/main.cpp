@@ -13,7 +13,7 @@
 #include <xpcc/processing/protothread.hpp>
 #include <xpcc/driver/display/nokia5110.hpp>
 
-#include "../../stm32f4_discovery.hpp"
+#include <xpcc/architecture/platform.hpp>
 
 xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > device;
 xpcc::IOStream stream(device);

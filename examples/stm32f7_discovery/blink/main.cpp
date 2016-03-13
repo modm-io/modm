@@ -1,5 +1,4 @@
-#include "../stm32f7_discovery.hpp"
-#include <xpcc/processing.hpp>
+#include <xpcc/architecture/platform.hpp>
 
 using namespace Board;
 

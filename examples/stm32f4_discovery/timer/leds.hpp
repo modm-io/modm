@@ -1,7 +1,7 @@
 #ifndef LEDS_HPP
 #define LEDS_HPP
 
-#include "../stm32f4_discovery.hpp"
+#include <xpcc/architecture/platform.hpp>
 #include <xpcc/ui/led.hpp>
 
 // create the leds with these lambda callbacks

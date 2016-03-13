@@ -16,6 +16,10 @@
 #include <xpcc/architecture/utils.hpp>
 
 // Include generated Platform sources:
-#include "${include_path}"
+#include "{{include_path}}"
+
+%% if board is defined
+#include <xpcc/architecture/platform/board/{{board}}/{{board}}.hpp>
+%% endif
 
 #endif	// XPCC__PLATFORM_HPP

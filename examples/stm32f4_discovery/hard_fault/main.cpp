@@ -1,4 +1,4 @@
-#include "../stm32f4_discovery.hpp"
+#include <xpcc/architecture/platform.hpp>
 #include <xpcc/debug/logger.hpp>
 
 /* This example showcases the hard fault handler LED blinking and UART logging.

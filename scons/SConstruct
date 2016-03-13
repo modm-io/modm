@@ -49,7 +49,7 @@ if 'images' in env['XPCC_CONFIG']:
         files += env.Bitmap(image)
 
 # build the program
-program = env.Program(target = env['XPCC_CONFIG']['general']['name'], source = files.sources)
+program = env.Program(target = env['XPCC_PROJECT_NAME'], source = files.sources)
 
 env.Alias('size', env.Size(program))
 env.Alias('symbols', env.Symbols(program))

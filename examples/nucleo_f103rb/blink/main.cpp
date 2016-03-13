@@ -1,4 +1,4 @@
-#include "../nucleo_f103rb.hpp"
+#include <xpcc/architecture/platform.hpp>
 
 using namespace Board;
 
@@ -6,6 +6,7 @@ int
 main()
 {
 	Board::initialize();
+	LedD13::setOutput();
 
 	// Use the logging streams to print some messages.
 	// Change XPCC_LOG_LEVEL above to enable or disable these messages
@@ -18,7 +19,7 @@ main()
 
 	while (1)
 	{
-		Led::toggle();
+		LedD13::toggle();
 		xpcc::delayMilliseconds(Button::read() ? 100 : 500);
 
 		XPCC_LOG_INFO << "loop: " << counter++ << xpcc::endl;

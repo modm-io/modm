@@ -1,4 +1,4 @@
-#include "../stm32f4_discovery.hpp"
+#include <xpcc/architecture/platform.hpp>
 
 /**
  * This is some testing of Timers 1 to 14 on a STM32 F4 Discovery Board.

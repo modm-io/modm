@@ -1,4 +1,4 @@
-#include "../../stm32f4_discovery.hpp"
+#include <xpcc/architecture/platform.hpp>
 
 #include <xpcc/driver/display/parallel_tft.hpp>
 #include <xpcc/driver/bus/tft_memory_bus.hpp>
