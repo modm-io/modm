@@ -16,7 +16,10 @@
 		<define>LPC11C_CAN_RX_BUFFER_SIZE = 16</define>
 		<!-- Core Driver -->
 		<driver type="core" name="cortex">
+			<parameter name="main_stack_size">1024</parameter>
 			<parameter name="allocator">block_allocator</parameter>
+			<memory access="rx" start="0x00000000" name="flash" size="32"/>
+			<memory access="rwx" start="0x10000100" name="sram1" size="8"/>
 		</driver>
 		<!-- Peripheral Drivers -->
 		<driver type="clock" name="lpc" />

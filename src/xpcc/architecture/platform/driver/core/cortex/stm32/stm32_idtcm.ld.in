@@ -2,20 +2,29 @@
  *                           LINKER  SCRIPT
  *
  * The Linker Script defines how the code and data emitted by the GNU C compiler
- * and assembler are  to be loaded into memory (code goes into ROM, variables
+ * and assembler are  to be loaded into memory (code goes into FLASH, variables
  * go into RAM).
  *
  * Any symbols defined in the Linker Script are automatically global and
  * available to the rest of the program.
  *
- * Example for STM32F303:
+ * Example for STM32F746:
  *
  *                          MEMORY MAP (RAM)
  *
+ * Auxiliary internal SRAM2 (16 kB):
+ *   only accessible by CPU via S-Bus (less efficient than I-Bus), otherwise fully DMA capable
+ *                |                                 | 0x2005 0000 <---- __ram_end, __heap2_end, __heap_end
+ *      +-------> |---------------------------------| 0x2004 FFFF
+ *      |         |                                 |
+ *    heap2       |                                 |
+ *      |         |                                 |
+ *      +-------> |---------------------------------| 0x2004 C000 <--- __heap2_start
  *
- * Main internal SRAM1 (up to 40 kB):
- *                |                                 | 0x2001 C000 <---- __ram_end, __heap1_end, __heap_end
- *      +-------> |---------------------------------| 0x2001 BFFF
+ *
+ * Main internal SRAM1 (240 kB):
+ *                |                                 | 0x2004 C000
+ *      +-------> |---------------------------------| 0x2004 BFFF
  *      |         |                                 |
  *      |         |               ^                 |
  *   .heap1       |               |                 |
@@ -34,8 +43,22 @@
  *      |         |                                 |
  *    .data       |     initialized variables       |
  *      |         |                                 |
+ *      |         |                                 | <------- __data_start
+ *      +-------> |---------------------------------| 0x2001 0000 <--- __ram_start
+ *
+ *
+ * DTCM (Data Tightly Coupled memory) (64 kB):
+ *   accessible by DMA and the CPU via D-Bus, not I-Bus!
+ *                |                                 | 0x2001 0000 <---- __heap0_end
+ *      +-------> |---------------------------------| 0x2000 FFFF
  *      |         |                                 |
- *      +-------> |---------------------------------| <------- __process_stack_top, __stack_end, __data_start
+ *   .heap0       |           Unused RAM            |
+ *      |         |                                 | <------- __heap0_start
+ *      +-------> |---------------------------------| <------- __fastdata_end
+ *      |         |                                 |
+ *  .fastdata     |     initialized variables       |
+ *      |         |                                 | <------- __fastdata_start
+ *      +-------> |---------------------------------| <------- __process_stack_top, __stack_end
  *      |         |       Process Stack (psp)       |
  *      |         |       (grows downwards)         |
  *      |         |               |                 |
@@ -45,32 +68,10 @@
  *      |         |       (grows downwards)         |
  *      |         |               |                 |
  *      |         |               v                 | <------- __stack_start
- *      +-------> |---------------------------------| 0x2000 0000 <--- __ram_start
+ *      +-------> |---------------------------------| 0x2000 0000
  *
  *
- * CCM (Core Coupled memory) (up to 16 kB):
- *   only accessible by the CPU (no DMA etc.) via D-Bus _and_ I-Bus!
- *                |                                 | 0x1000 4000 <---- __heap4_end
- *      +-------> |---------------------------------| 0x1000 3FFF
- *      |         |                                 |
- *   .heap4       |           Unused RAM            |
- *      |         |                                 | <------- __heap4_start
- *      +-------> |---------------------------------| <------- __fastdata_end
- *      |         |                                 |
- *  .fastdata     |     initialized variables       |
- *      |         |                                 | <------- __fastdata_start
- *      +-------> |---------------------------------| <------- __fastcode_end
- *      |         |                                 |
- *  .fastcode     |     C/C++-Functions in RAM      |
- *      |         |                                 | <------- __fastcode_start
- *      +-------> |---------------------------------| <------- __vector_table_ram_end
- *      |         |                                 |
- *  .vectors      |    Interrupt Vectors (in RAM)   |
- *      |         |        (if re-mapped)           | <------- __vector_table_ram_start
- *      +-------> |---------------------------------| 0x1000 0000
- *
- *
- *                         MEMORY MAP (Flash)
+ *                          MEMORY MAP (Flash)
  *
  *                |                                 | 0x0802 0000 <--- __rom_end
  *                |---------------------------------| 0x0801 FFFF
@@ -100,20 +101,56 @@
  *      +-------> |---------------------------------|
  *      |         |                                 |
  *  .fastdata     |     Variables to be loaded      |
- *      |         |         into CCM RAM            | <------- __fastdata_load
+ *      |         |         into DTCM RAM           | <------- __fastdata_load
  *      +-------> |---------------------------------|
  *      |         |                                 |
  *  .fastcode     |     C-Functions to be loaded    |
- *      |         |         into CCM RAM            | <------- __fastcode_load
+ *      |         |         into ITCM RAM           | <------- __fastcode_load
  *      +-------> |---------------------------------|
  *      |         |                                 |
- *   .reset       |    Interrupt Vectors (in ROM)   |
+ *   .reset       |   Interrupt Vectors (in FLASH)  |
  *      |         |       (copy of .vectors)        | <------- __vector_table_rom_start, __vector_table_ram_load
  *      +-------> |---------------------------------| 0x0800 0000 <--- __rom_start
+ *
+ * ITCM (Instruction Tightly Coupled Memory) (16 kB):
+ *   only accessible by the CPU (no DMA etc.) via I-Bus!
+ *                |                                 | 0x0000 4000 <---- __heap4_end
+ *      +-------> |---------------------------------| 0x0000 3FFF
+ *      |         |                                 |
+ *   .heap4       |           Unused RAM            |
+ *      |         |                                 | <------- __heap4_start
+ *      +-------> |---------------------------------| <------- __fastcode_end
+ *      |         |                                 |
+ *  .fastcode     |     C/C++-Functions in RAM      |
+ *      |         |                                 | <------- __fastcode_start
+ *      +-------> |---------------------------------| <------- __vector_table_ram_end
+ *      |         |                                 |
+ *  .vectors      |    Interrupt Vectors (in RAM)   |
+ *      |         |        (if re-mapped)           | <------- __vector_table_ram_start
+ *      +-------> |---------------------------------| 0x0000 0000
  *
  * The first two words (32-bit) in the Flash defines the initial stack pointer
  * location and the reset handler location.
  */
+
+%% set regions = []
+%% set ram_sizes = []
+%% set ram_origin = []
+
+MEMORY
+{
+%% for memory in memorys
+	{{ memory.name | upper }} ({{ memory.access }}) : ORIGIN = {{ memory.start }}, LENGTH = {{ memory.size }}k
+	%% do regions.append(memory.name)
+	%% if 'sram1' == memory.name
+		%% do ram_origin.append(memory.start)
+	%% endif
+	%% if 'sram' in memory.name
+		%% do ram_sizes.append(memory.size | int)
+	%% endif
+%% endfor
+	RAM (rwx) : ORIGIN = {{ ram_origin[0] }}, LENGTH = {{ ram_sizes | sum }}k
+}
 
 OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
@@ -127,14 +164,17 @@ EXTERN(_init)
 
 PROVIDE(__ram_start = ORIGIN(RAM));
 PROVIDE(__ram_end   = ORIGIN(RAM) + LENGTH(RAM));
-PROVIDE(__rom_start = ORIGIN(ROM));
-PROVIDE(__rom_end   = ORIGIN(ROM) + LENGTH(ROM));
+PROVIDE(__rom_start = ORIGIN(FLASH));
+PROVIDE(__rom_end   = ORIGIN(FLASH) + LENGTH(FLASH));
 
-/* Used for interrupt handlers */
 /* the thread stack is used only for reporting hard fault conditions! It may therefore be small. */
-PROCESS_STACK_SIZE  = DEFINED(__process_stack_size) ? (__process_stack_size & ~0x7) : 192;
-/* the handler stack is used for main program as well as interrupts, **main stack size must be a multiple of 32!** */
-MAIN_STACK_SIZE     = DEFINED(__main_stack_size)    ? (__main_stack_size & ~0x1f)    : 2k;
+%% if parameters.enable_hardfault_handler_led or (parameters.enable_hardfault_handler_log != "false")
+PROCESS_STACK_SIZE  = 192;
+%% else
+PROCESS_STACK_SIZE  = 0;
+%% endif
+/* the handler stack is used for main program as well as interrupts */
+MAIN_STACK_SIZE     = {{ parameters.main_stack_size }};
 /* combined stack size */
 TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 
@@ -142,12 +182,12 @@ SECTIONS
 {
 	.reset :
 	{
-		__vector_table_rom_start = .;					/* address in ROM */
+		__vector_table_rom_start = .;					/* address in FLASH */
 		__vector_table_ram_load = .;
 		/* Initial stack address, Reset and NMI handler */
 		KEEP(*(.reset))
 		. = ALIGN(4);
-	} >ROM
+	} >FLASH
 
 	.vectors :  /* Vector table in RAM, only if remapped */
 	{
@@ -158,29 +198,18 @@ SECTIONS
 
 		. = ALIGN (4);
 		__vector_table_ram_end = .;
-	} >CCM
+	} >ITCM
 
 	.fastcode :
 	{
-		__fastcode_load = LOADADDR (.fastcode);		/* address in ROM */
+		__fastcode_load = LOADADDR (.fastcode);		/* address in FLASH */
 		__fastcode_start = .;						/* address in RAM */
 
 		KEEP(*(.fastcode))
 
 		. = ALIGN (4);
 		__fastcode_end = .;
-	} >CCM AT>ROM
-
-	.fastdata :
-	{
-		__fastdata_load = LOADADDR (.fastdata);		/* address in ROM */
-		__fastdata_start = .;						/* address in RAM */
-
-		KEEP(*(.fastdata))
-
-		. = ALIGN(4);
-		__fastdata_end = .;
-	} >CCM AT>ROM
+	} >ITCM AT>FLASH
 
 	/* This is currently not used by the heap allocator!
 	.heap4 (NOLOAD) :
@@ -188,9 +217,46 @@ SECTIONS
 		. = ALIGN(4);
 		__heap4_start = .;
 
-		. = ORIGIN(CCM) + LENGTH(CCM);
+		. = ORIGIN(ITCM) + LENGTH(ITCM);
 		__heap4_end = .;
-	} >CCM
+	} >ITCM
+	*/
+
+	.stack (NOLOAD) :
+	{
+		__stack_start = . ;
+
+		. += MAIN_STACK_SIZE;
+		. = ALIGN (8);
+		__main_stack_top = . ;
+
+		. += PROCESS_STACK_SIZE;
+		. = ALIGN (8);
+		__process_stack_top = . ;
+
+		__stack_end = .;
+	} >DTCM
+
+	.fastdata :
+	{
+		__fastdata_load = LOADADDR (.fastdata);		/* address in FLASH */
+		__fastdata_start = .;						/* address in RAM */
+
+		KEEP(*(.fastdata))
+
+		. = ALIGN(4);
+		__fastdata_end = .;
+	} >DTCM AT>FLASH
+
+	/* This is currently not used by the heap allocator!
+	.heap0 (NOLOAD) :
+	{
+		. = ALIGN(4);
+		__heap0_start = .;
+
+		. = ORIGIN(DTCM) + LENGTH(DTCM);
+		__heap0_end = .;
+	} >DTCM
 	*/
 
 	.text :
@@ -221,7 +287,7 @@ SECTIONS
 		 * Might be replaced by ELF section groups in newer versions of ld.
 		 */
 		*(.text .text.* .gnu.linkonce.t.*)
-		. = ALIGN(4);
+		. = ALIGN (4);
 
 		/* Position independent code will call non-static functions via the
 		 * Procedure Linkage Table or PLT. This PLT does not exist in .o files.
@@ -250,7 +316,7 @@ SECTIONS
 		*(.eh_frame)
 
 		*(.gnu.warning)
-	} >ROM
+	} >FLASH
 
 	.rodata : ALIGN (4)
 	{
@@ -296,7 +362,7 @@ SECTIONS
 
 		*(.init .init.*)
 		*(.fini .fini.*)
-	} >ROM
+	} >FLASH
 
 	/* .ARM.exidx names a section that contains index entries for
 	 * section unwinding. It is sorted, so has to go in its own output section.
@@ -306,28 +372,13 @@ SECTIONS
 		__exidx_start = .;
 		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
 		__exidx_end = .;
-	} >ROM
+	} >FLASH
 	_etext = .;
-
-	.stack (NOLOAD) :
-	{
-		__stack_start = . ;
-
-		. += MAIN_STACK_SIZE;
-		. = ALIGN (8);
-		__main_stack_top = . ;
-
-		. += PROCESS_STACK_SIZE;
-		. = ALIGN (8);
-		__process_stack_top = . ;
-
-		__stack_end = .;
-	} >RAM
 
 	/* initialized variables */
 	.data : ALIGN (8)
 	{
-		__data_load = LOADADDR (.data);		/* address in ROM */
+		__data_load = LOADADDR (.data);		/* address in FLASH */
 		__data_start = .;					/* address in RAM */
 
 		KEEP(*(.jcr))
@@ -338,7 +389,7 @@ SECTIONS
 
 		. = ALIGN (4);
 		__data_end = .;
-	} >RAM AT>ROM
+	} >RAM AT>FLASH
 
 	/* uninitialized variables */
 	.bss (NOLOAD) :
@@ -372,8 +423,17 @@ SECTIONS
 		PROVIDE (__heap_start = .);
 		__heap1_start = .;
 
-		. = ORIGIN(RAM) + LENGTH(RAM);
+		. = ORIGIN(SRAM1) + LENGTH(SRAM1);
 		__heap1_end = .;
+	} >RAM
+
+	.heap2 (NOLOAD) :
+	{
+		. = ORIGIN(SRAM2);
+		__heap2_start = .;
+
+		. = ORIGIN(SRAM2) + LENGTH(SRAM2);
+		__heap2_end = .;
 		PROVIDE (__heap_end = .);
 	} >RAM
 
