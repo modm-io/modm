@@ -5,8 +5,6 @@
 		<!-- Flash and RAM sizes -->
 		<flash device-name="15">65536</flash>
 		<ram>8192</ram>
-		<!-- Linker Script -->
-		<linkerscript device-name="15">lpc1115.ld</linkerscript>
 		<!-- Core -->
 		<core>cortex-m0</core>
 		<!-- Number of pins -->

@@ -12,7 +12,6 @@
     <ram device-name="401" device-size-id="b|c">65536</ram>
     <ram device-name="401" device-size-id="d|e">98304</ram>
     <ram device-name="411">131072</ram>
-    <linkerscript device-size-id="e">stm32f4xx_e.ld</linkerscript>
     <core>cortex-m4f</core>
     <pin-count device-pin-id="v">100</pin-count>
     <pin-count device-name="401" device-pin-id="c">48</pin-count>

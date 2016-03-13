@@ -11,7 +11,6 @@
     <ram device-size-id="c">49152</ram>
     <ram device-size-id="d|e">65536</ram>
     <core>cortex-m3</core>
-	<linkerscript device-size-id="c">stm32f103_c.ld</linkerscript>
     <pin-count device-pin-id="v">100</pin-count>
     <pin-count device-pin-id="z">144</pin-count>
     <pin-count device-pin-id="r">64</pin-count>
