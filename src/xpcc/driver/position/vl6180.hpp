@@ -320,7 +320,7 @@ public:
 		inline float
 		getAmbientLight()
 		{
-			uint16_t* rawData = reinterpret_cast<uint16_t*>(data+1);
+			auto* rawData = xpcc::asUnaligned<uint16_t>(data+1);
 			uint16_t value = xpcc::fromBigEndian(*rawData);
 			float lux = (32.f * value);
 			lux /= (vl6180_private::gain[gain & 0x7] * time);
