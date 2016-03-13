@@ -19,6 +19,36 @@
 			<parameter name="allocator">block_allocator</parameter>
 			<memory access="rx" start="0x00000000" name="flash" size="64"/>
 			<memory access="rwx" start="0x10000100" name="sram1" size="8"/>
+			<vector position="0" name="WAKEUP0"/>
+			<vector position="1" name="WAKEUP1"/>
+			<vector position="2" name="WAKEUP2"/>
+			<vector position="3" name="WAKEUP3"/>
+			<vector position="4" name="WAKEUP4"/>
+			<vector position="5" name="WAKEUP5"/>
+			<vector position="6" name="WAKEUP6"/>
+			<vector position="7" name="WAKEUP7"/>
+			<vector position="8" name="WAKEUP8"/>
+			<vector position="9" name="WAKEUP9"/>
+			<vector position="10" name="WAKEUP10"/>
+			<vector position="11" name="WAKEUP11"/>
+			<vector position="12" name="WAKEUP12"/>
+			<vector position="13" name="CAN"/>
+			<vector position="14" name="SSP1"/>
+			<vector position="15" name="I2C"/>
+			<vector position="16" name="TIMER16_0"/>
+			<vector position="17" name="TIMER16_1"/>
+			<vector position="18" name="TIMER32_0"/>
+			<vector position="19" name="TIMER32_1"/>
+			<vector position="20" name="SSP0"/>
+			<vector position="21" name="UART"/>
+			<vector position="24" name="ADC"/>
+			<vector position="25" name="WDT"/>
+			<vector position="26" name="BOD"/>
+			<vector position="27" name="FMC"/>
+			<vector position="28" name="PIOINT3"/>
+			<vector position="29" name="PIOINT2"/>
+			<vector position="30" name="PIOINT1"/>
+			<vector position="31" name="PIOINT0"/>
 		</driver>
 		<!-- Peripheral Drivers -->
 		<driver type="clock" name="lpc" />

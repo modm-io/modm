@@ -36,38 +36,10 @@
 
 
 %% macro appendInterrupts()
-
-%% do i.update({ 0: ["WAKEUP0_IRQHandler",  "PIO0_0  Wakeup"]})
-%% do i.update({ 1: ["WAKEUP1_IRQHandler",  "PIO0_1  Wakeup"]})
-%% do i.update({ 2: ["WAKEUP2_IRQHandler",  "PIO0_2  Wakeup"]})
-%% do i.update({ 3: ["WAKEUP3_IRQHandler",  "PIO0_3  Wakeup"]})
-%% do i.update({ 4: ["WAKEUP4_IRQHandler",  "PIO0_4  Wakeup"]})
-%% do i.update({ 5: ["WAKEUP5_IRQHandler",  "PIO0_5  Wakeup"]})
-%% do i.update({ 6: ["WAKEUP6_IRQHandler",  "PIO0_6  Wakeup"]})
-%% do i.update({ 7: ["WAKEUP7_IRQHandler",  "PIO0_7  Wakeup"]})
-%% do i.update({ 8: ["WAKEUP8_IRQHandler",  "PIO0_8  Wakeup"]})
-%% do i.update({ 9: ["WAKEUP9_IRQHandler",  "PIO0_9  Wakeup"]})
-%% do i.update({10: ["WAKEUP10_IRQHandler", "PIO0_10 Wakeup"]})
-%% do i.update({11: ["WAKEUP11_IRQHandler", "PIO0_11 Wakeup"]})
-%% do i.update({12: ["WAKEUP12_IRQHandler", "PIO1_0  Wakeup"]})
-%% do i.update({13: ["CAN_IRQHandler", "C_CAN Interrupt"]})
-%% do i.update({14: ["SSP1_IRQHandler", "SPI/SSP1 Interrupt"]})
-%% do i.update({15: ["I2C_IRQHandler", "I2C0"]})
-%% do i.update({16: ["TIMER16_0_IRQHandler", "CT16B0 (16-bit Timer 0)"]})
-%% do i.update({17: ["TIMER16_1_IRQHandler", "CT16B1 (16-bit Timer 1)"]})
-%% do i.update({18: ["TIMER32_0_IRQHandler", "CT32B0 (32-bit Timer 0)"]})
-%% do i.update({19: ["TIMER32_1_IRQHandler", "CT32B1 (32-bit Timer 1)"]})
-%% do i.update({20: ["SSP0_IRQHandler", "SPI/SSP0 Interrupt"]})
-%% do i.update({21: ["UART_IRQHandler", "UART0"]})
-%% do i.update({24: ["ADC_IRQHandler", "ADC (A/D Converter)"]})
-%% do i.update({25: ["WDT_IRQHandler", "WDT (Watchdog Timer)"]})
-%% do i.update({26: ["BOD_IRQHandler", "BOD (Brownout Detect)"]})
-%% do i.update({27: ["FMC_IRQHandler", "Flash Memory Controller Interrupt"]})
-%% do i.update({28: ["PIOINT3_IRQHandler", "PIO INT3"]})
-%% do i.update({29: ["PIOINT2_IRQHandler", "PIO INT2"]})
-%% do i.update({30: ["PIOINT1_IRQHandler", "PIO INT1"]})
-%% do i.update({31: ["PIOINT0_IRQHandler", "PIO INT0"]})
-
+%# Include Target Specific Interrupt Table
+%% for vector in vectors
+%%  do i.update({(vector.position | int) : [vector.name, ""]})
+%% endfor
 %% endmacro
 
 
