@@ -65,7 +65,7 @@
  * As they are weak aliases, any function with the same name will override
  * this definition.
  */
-void Reset_Handler(void)				__attribute__((naked, noreturn));
+void Reset_Handler(void)				__attribute__((noreturn));
 void NMI_Handler(void)					__attribute__ ((weak, alias("defaultHandler")));
 %% if target is stm32
 void HardFault_Handler(void);

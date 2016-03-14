@@ -148,7 +148,7 @@ constexpr uint8_t    mem_fault_mask = 0xbb;
 // ----------------------------------------------------------------------------
 extern "C"
 void
-_hardFaultHandler(const uint32_t *ctx, const uint32_t *msp) __attribute__((naked, noreturn));
+_hardFaultHandler(const uint32_t *ctx, const uint32_t *msp) __attribute__((noreturn));
 
 extern "C"
 void
