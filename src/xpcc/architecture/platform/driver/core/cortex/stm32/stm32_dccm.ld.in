@@ -2,7 +2,7 @@
  *                           LINKER  SCRIPT
  *
  * The Linker Script defines how the code and data emitted by the GNU C compiler
- * and assembler are  to be loaded into memory (code goes into ROM, variables
+ * and assembler are  to be loaded into memory (code goes into FLASH, variables
  * go into RAM).
  *
  * Any symbols defined in the Linker Script are automatically global and
@@ -117,13 +117,32 @@
  *      |         |         into CCM RAM            | <------- __fastdata_load
  *      +-------> |---------------------------------|
  *      |         |                                 |
- *   .reset       |    Interrupt Vectors (in ROM)   |
+ *   .reset       |   Interrupt Vectors (in FLASH)  |
  *      |         |       (copy of .vectors)        | <------- __vector_table_rom_start, __vector_table_ram_load
  *      +-------> |---------------------------------| 0x0800 0000 <--- __rom_start
  *
  * The first two words (32-bit) in the Flash defines the initial stack pointer
  * location and the reset handler location.
  */
+
+%% set regions = []
+%% set ram_sizes = []
+%% set ram_origin = []
+
+MEMORY
+{
+%% for memory in memorys
+	{{ memory.name | upper }} ({{ memory.access }}) : ORIGIN = {{ memory.start }}, LENGTH = {{ memory.size }}k
+	%% do regions.append(memory.name)
+	%% if 'sram1' == memory.name
+		%% do ram_origin.append(memory.start)
+	%% endif
+	%% if 'sram' in memory.name
+		%% do ram_sizes.append(memory.size | int)
+	%% endif
+%% endfor
+	RAM (rwx) : ORIGIN = {{ ram_origin[0] }}, LENGTH = {{ ram_sizes | sum }}k
+}
 
 OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
@@ -137,13 +156,17 @@ EXTERN(_init)
 
 PROVIDE(__ram_start = ORIGIN(RAM));
 PROVIDE(__ram_end   = ORIGIN(RAM) + LENGTH(RAM));
-PROVIDE(__rom_start = ORIGIN(ROM));
-PROVIDE(__rom_end   = ORIGIN(ROM) + LENGTH(ROM));
+PROVIDE(__rom_start = ORIGIN(FLASH));
+PROVIDE(__rom_end   = ORIGIN(FLASH) + LENGTH(FLASH));
 
 /* the thread stack is used only for reporting hard fault conditions! It may therefore be small. */
-PROCESS_STACK_SIZE  = DEFINED(__process_stack_size) ? (__process_stack_size & ~0x7) : 256;
+%% if parameters.enable_hardfault_handler_led or (parameters.enable_hardfault_handler_log != "false")
+PROCESS_STACK_SIZE  = 192;
+%% else
+PROCESS_STACK_SIZE  = 0;
+%% endif
 /* the handler stack is used for main program as well as interrupts */
-MAIN_STACK_SIZE     = DEFINED(__main_stack_size)    ? (__main_stack_size & ~0x7)    : 3k;
+MAIN_STACK_SIZE     = {{ parameters.main_stack_size }};
 /* combined stack size */
 TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 
@@ -151,12 +174,12 @@ SECTIONS
 {
 	.reset :
 	{
-		__vector_table_rom_start = .;					/* address in ROM */
+		__vector_table_rom_start = .;					/* address in FLASH */
 		__vector_table_ram_load = .;
 		/* Initial stack address, Reset and NMI handler */
 		KEEP(*(.reset))
 		. = ALIGN(4);
-	} >ROM
+	} >FLASH
 
 	.vectors :  /* Vector table in RAM, only if remapped */
 	{
@@ -186,14 +209,14 @@ SECTIONS
 
 	.fastdata :
 	{
-		__fastdata_load = LOADADDR (.fastdata);		/* address in ROM */
+		__fastdata_load = LOADADDR (.fastdata);		/* address in FLASH */
 		__fastdata_start = .;						/* address in RAM */
 
 		KEEP(*(.fastdata))
 
 		. = ALIGN(4);
 		__fastdata_end = .;
-	} >CCM AT>ROM
+	} >CCM AT>FLASH
 
 	/* This is currently not used by the heap allocator!
 	.heap0 (NOLOAD) :
@@ -289,7 +312,7 @@ SECTIONS
 		*(.eh_frame)
 
 		*(.gnu.warning)
-	} >ROM
+	} >FLASH
 
 	.rodata : ALIGN (4)
 	{
@@ -335,7 +358,7 @@ SECTIONS
 
 		*(.init .init.*)
 		*(.fini .fini.*)
-	} >ROM
+	} >FLASH
 
 	/* .ARM.exidx names a section that contains index entries for
 	 * section unwinding. It is sorted, so has to go in its own output section.
@@ -345,13 +368,13 @@ SECTIONS
 		__exidx_start = .;
 		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
 		__exidx_end = .;
-	} >ROM
+	} >FLASH
 	_etext = .;
 
 	/* initialized variables */
 	.data : ALIGN (8)
 	{
-		__data_load = LOADADDR (.data);		/* address in ROM */
+		__data_load = LOADADDR (.data);		/* address in FLASH */
 		__data_start = .;					/* address in RAM */
 
 		KEEP(*(.jcr))
@@ -362,7 +385,7 @@ SECTIONS
 
 		. = ALIGN (4);
 		__data_end = .;
-	} >RAM AT>ROM
+	} >RAM AT>FLASH
 
 	/* uninitialized variables */
 	.bss (NOLOAD) :
@@ -398,6 +421,7 @@ SECTIONS
 
 		. = ORIGIN(SRAM1) + LENGTH(SRAM1);
 		__heap1_end = .;
+%% if 'sram2' in regions
 	} >RAM
 
 	.heap2 (NOLOAD) :
@@ -407,17 +431,17 @@ SECTIONS
 
 		. = ORIGIN(SRAM2) + LENGTH(SRAM2);
 		__heap2_end = .;
+	%% if 'sram3' in regions
 	} >RAM
 
-	/* The section length is zero if SRAM3 is not available
-	 * on this device. Ideally, the section would not exist.
-	 */
 	.heap3 (NOLOAD) :
 	{
 		__heap3_start = .;
 
-		. = ORIGIN(RAM) + LENGTH(RAM);
+		. = ORIGIN(SRAM3) + LENGTH(SRAM3);
 		__heap3_end = .;
+	%% endif
+%% endif
 		PROVIDE (__heap_end = .);
 	} >RAM
 

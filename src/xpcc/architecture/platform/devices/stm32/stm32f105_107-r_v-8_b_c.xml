@@ -9,8 +9,6 @@
     <flash device-size-id="b">131072</flash>
     <flash device-size-id="c">262144</flash>
     <ram>65536</ram>
-    <linkerscript device-size-id="b">stm32f107_b.ld</linkerscript>
-    <linkerscript device-size-id="c">stm32f107_c.ld</linkerscript>
     <core>cortex-m3</core>
     <pin-count device-pin-id="v">100</pin-count>
     <pin-count device-pin-id="r">64</pin-count>

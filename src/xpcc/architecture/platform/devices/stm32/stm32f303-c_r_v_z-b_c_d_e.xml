@@ -12,8 +12,6 @@
     <ram device-size-id="b">40960</ram>
     <ram device-size-id="c">49152</ram>
     <ram device-size-id="d|e">81920</ram>
-    <linkerscript device-size-id="b">stm32f3xx_b.ld</linkerscript>
-    <linkerscript device-size-id="c">stm32f3xx_c.ld</linkerscript>
     <core>cortex-m4f</core>
     <pin-count device-pin-id="v">100</pin-count>
     <pin-count device-pin-id="z">144</pin-count>

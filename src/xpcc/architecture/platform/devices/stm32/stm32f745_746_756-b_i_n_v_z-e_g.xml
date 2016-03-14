@@ -9,7 +9,6 @@
     <flash device-size-id="g">1048576</flash>
     <ram>409600</ram>
     <core>cortex-m7f</core>
-    <linkerscript device-size-id="g">stm32f7xx_g.ld</linkerscript>
     <pin-count device-pin-id="v">100</pin-count>
     <pin-count device-pin-id="z">144</pin-count>
     <pin-count device-pin-id="i">176</pin-count>

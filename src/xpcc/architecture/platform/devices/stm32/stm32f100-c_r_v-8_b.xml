@@ -9,7 +9,6 @@
     <flash device-size-id="b">131072</flash>
     <ram>8192</ram>
     <core>cortex-m3</core>
-    <linkerscript>stm32f100_b.ld</linkerscript>
     <pin-count device-pin-id="v">100</pin-count>
     <pin-count device-pin-id="c">48</pin-count>
     <pin-count device-pin-id="r">64</pin-count>

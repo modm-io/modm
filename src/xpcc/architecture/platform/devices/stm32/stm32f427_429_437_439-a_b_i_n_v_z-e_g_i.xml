@@ -10,7 +10,6 @@
     <flash device-size-id="i">2097152</flash>
     <ram>262144</ram>
     <core>cortex-m4f</core>
-    <linkerscript device-size-id="i">stm32f4xx_i.ld</linkerscript>
     <pin-count device-pin-id="v">100</pin-count>
     <pin-count device-pin-id="z">144</pin-count>
     <pin-count device-pin-id="a">169</pin-count>
