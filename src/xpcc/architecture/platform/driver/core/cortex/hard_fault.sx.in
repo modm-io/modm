@@ -99,6 +99,18 @@ no_debugger:
 	ldr r0, =__process_stack_top		// load the PSP value into register 0
 	mov sp, r0							// write the current stack pointer to the new PSP value
 	mov r0, lr							// restore register 0 from the LR
+
+%% if parameters.enable_hardfault_handler_log == "false"
+	ldr r0, =_initHardFaultHandlerLed
+	blx r0 								// call Led::setOutput();
+loop:
+	ldr r0, =_ZN4xpcc5clock4fcpuE		// load xpcc::clock::fcpu
+1:	subs r0, r0, #5						// subtract 5 from value
+	bpl	1b								// loop while positive
+	ldr r0, =_toggleHardFaultHandlerLed
+	blx r0								// call Led::toggle();
+	b loop								// loop forever
+%% else
 	/* We want to preserve the entire stack frame, since in case of a stack overflow, the exception entry
 	 * is not able to push an exception frame onto the main stack!
 	 * So we need to push all registers onto the process stack, since it definitely has space.
@@ -165,6 +177,7 @@ no_debugger:
 	// call the C code handler
 	b _hardFaultHandler
 
+%% endif
 %% endif
 	.size	HardFault_Handler, . - HardFault_Handler
 	.endfunc

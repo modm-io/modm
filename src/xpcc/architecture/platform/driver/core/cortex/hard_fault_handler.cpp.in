@@ -42,6 +42,19 @@
 	%% else
 #include "../../gpio/stm32/gpio.hpp"
 	%% endif
+
+extern "C" void _initHardFaultHandlerLed() __attribute__((optimize("Os")));
+extern "C" void _initHardFaultHandlerLed()
+{
+	xpcc::stm32::Gpio{{ parameters.hardfault_handler_led_port }}{{ parameters.hardfault_handler_led_pin }}::setOutput();
+}
+
+extern "C" void _toggleHardFaultHandlerLed() __attribute__((optimize("Os")));
+extern "C" void _toggleHardFaultHandlerLed()
+{
+	xpcc::stm32::Gpio{{ parameters.hardfault_handler_led_port }}{{ parameters.hardfault_handler_led_pin }}::toggle();
+}
+
 %% endif
 
 %% if parameters.enable_hardfault_handler_log != "false"
@@ -146,16 +159,11 @@ const char *stack_frame_names[] = {
 const char *exception_stack_frame = " ^-- exception stack frame\n";
 %% endif
 
-// ----------------------------------------------------------------------------
-extern "C"
-void
-_hardFaultHandler(const uint32_t *ctx, const uint32_t *msp) __attribute__((noreturn));
-
-extern "C"
-void
-_hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
-{
 %% if parameters.enable_hardfault_handler_log != "false"
+// ----------------------------------------------------------------------------
+extern "C" void _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp) __attribute__((noreturn, optimize("Os")));
+extern "C" void _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
+{
 #undef XPCC_LOG_LEVEL
 #define XPCC_LOG_LEVEL	xpcc::log::ERROR
 %% if target is cortex_m0
@@ -206,32 +214,26 @@ _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 %% endif
 
 	xpcc::stm32::{{ uart ~ id }}::discardTransmitBuffer();
-%% else
-	(void) ctx; (void) msp;	// avoid warnings
-%% endif
 
 	// Infinite loop
-%% if parameters.enable_hardfault_handler_led
+	%% if parameters.enable_hardfault_handler_led
 	volatile uint32_t ledCounter = 1;
-	xpcc::stm32::Gpio{{ parameters.hardfault_handler_led_port }}{{ parameters.hardfault_handler_led_pin }}::setOutput();
-%% endif
+	_initHardFaultHandlerLed();
+	%% endif
 
-%% if parameters.enable_hardfault_handler_log != "false"
 	uint32_t logCounter = 1;
-%% endif
 
 	while(1)
 	{
-%% if parameters.enable_hardfault_handler_led
+	%% if parameters.enable_hardfault_handler_led
 		if (--ledCounter == 0)
 		{
 			ledCounter = xpcc::clock::fcpu / 20;
 
-			xpcc::stm32::Gpio{{ parameters.hardfault_handler_led_port }}{{ parameters.hardfault_handler_led_pin }}::toggle();
+			_toggleHardFaultHandlerLed();
 		}
-%% endif
+	%% endif
 
-%% if parameters.enable_hardfault_handler_log != "false"
 		if (--logCounter == 0)
 		{
 			logCounter = xpcc::clock::fcpu;
@@ -378,6 +380,6 @@ _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 			if (is_stack_underflow) { XPCC_LOG_ERROR << "  ### STACK UNDERFLOW ###\n"; flushUart(); }
 	%% endif
 		}
-%% endif
 	}
 }
+%% endif
