@@ -80,11 +80,11 @@ HardFault_Handler:
 	 *    `C_DEBUGEN` is sticky! It survives all resets but a power-on reset. This means that after debugging
 	 *    either power cycle the target or manually clear `C_DEBUGEN` using `mww 0xE000EDF0 0xA05F0000`.
 	 */
-	msr psp, r0							// save register 0 into the process stack pointer (PSP)
+	mov lr, r0							// save register 0 into the link register
 	ldr r0, =0xE000EDF0					// Load the address of the Debug Halting Control and Status Register (DHCSR)
 	ldr r0, [r0, #0]					// load the content of DHCSR, we need to check if bit 0 is set
 	lsls r0, #31						// test bit 0 by shifting it left 31 times, becoming sign bit
-	mrs r0, psp							// restore r0 before triggering the breakpoint
+	mov r0, lr							// restore register 0 before triggering the breakpoint
 	bpl no_debugger						// branch over breakpoint if lsls resulted in positive integer (MSB not set)
 	bkpt #42							// trigger a break point, only if a debugger is connected
 no_debugger:
@@ -93,6 +93,12 @@ no_debugger:
 %% if (not parameters.enable_hardfault_handler_led) and (parameters.enable_hardfault_handler_log == "false")
 	b HardFault_Handler					// busy wait in a loop forever
 %% else
+	mov lr, r0							// save register 0 into the link register
+	mov r0, sp							// move SP into r0
+	msr psp, r0							// save SP into the process stack pointer (PSP)
+	ldr r0, =__process_stack_top		// load the PSP value into register 0
+	mov sp, r0							// write the current stack pointer to the new PSP value
+	mov r0, lr							// restore register 0 from the LR
 	/* We want to preserve the entire stack frame, since in case of a stack overflow, the exception entry
 	 * is not able to push an exception frame onto the main stack!
 	 * So we need to push all registers onto the process stack, since it definitely has space.
@@ -109,11 +115,6 @@ no_debugger:
 	 * preserved during hard fault exception entry, however, a more thorough interpretation of the hard fault
 	 * reason and validation of plausibility of these recovered values is done in C code.
 	 */
-	msr psp, r0							// save register 0 into the process stack pointer (PSP)
-	mov lr, sp							// save the main stack pointer into the link register
-	ldr r0, =__process_stack_top		// load the PSP value into register 0
-	mov sp, r0							// write the current stack pointer to the new PSP value
-	mrs r0, psp							// restore register 0 from the PSP
 %% if target is cortex_m0
 	push {r4-r7}				// +4	// push registers r4 through r7 onto the stack, CM0 cannot push r8-r12
 	push {r4-r7}				// +4	// reserve space for r12, lr, pc and psr on the stack
@@ -131,7 +132,7 @@ no_debugger:
 %% endif
 	// prepare the four arguments for the C hard fault handler function
 	mov r0, sp							// load the PSP (the exception stack frame)
-	mov r1, lr							// load the MSP from the link register
+	mrs r1, psp							// load the MSP from the PSP register
 
 	// opportunistically copy LR, PC and PSR from main stack over to the process stack
 	// this doesn't cause a bus fault (which would result in core lockup) since we disabled that behavior.
