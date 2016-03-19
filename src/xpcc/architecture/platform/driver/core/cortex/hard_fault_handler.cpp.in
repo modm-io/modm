@@ -258,10 +258,10 @@ extern "C" void _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 			bool is_stack_execution = (cfsr == 0x00010000) and
 									  (stacked_pc == (uint32_t)&__stack_start);
 
-			bool is_floating_point_active = FPU->FPCCR & 1;
+			//bool is_floating_point_active = FPU->FPCCR & 1;
 	%% else
 			bool is_stack_execution = (stacked_pc == (uint32_t)&__stack_start);
-			constexpr bool is_floating_point_active = false;
+			//constexpr bool is_floating_point_active = false;
 	%% endif
 			XPCC_LOG_ERROR.printf("\n\n\n####  Hard Fault Exception  ####\n\n"); flushUart();
 
@@ -277,6 +277,7 @@ extern "C" void _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 			const uint32_t *main_stack_end = ii;
 
 			// print the entire main stack content and annotate it
+			/*
 			uint32_t *sp = (uint32_t*)&__main_stack_top;
 			for (; sp >= main_stack_end; sp--)
 			{
@@ -290,7 +291,9 @@ extern "C" void _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 				else { XPCC_LOG_ERROR << '\n'; }
 			}
 			if (sp == msp - 1) { XPCC_LOG_ERROR << "                           "; XPCC_LOG_ERROR << exception_stack_frame; }
-			XPCC_LOG_ERROR.printf("\nMaximum Stack Usage: %u Bytes\n", (&__main_stack_top - main_stack_end)*4); flushUart();
+			*/
+			XPCC_LOG_ERROR.printf("Main Stack Pointer: 0x%08lx\n", msp + 8); flushUart();
+			XPCC_LOG_ERROR.printf("Maximum Stack Usage: %u Bytes\n", (&__main_stack_top - main_stack_end)*4); flushUart();
 
 	%% if target is cortex_m0
 			XPCC_LOG_ERROR << '\n';
