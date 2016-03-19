@@ -71,6 +71,18 @@ void flushUart()
 		}
 	}
 }
+
+const char *valid   = "";
+const char *invalid = " [INVALID]";
+
+extern const uint32_t __stack_start;
+extern const uint32_t __stack_end;
+extern const uint32_t __main_stack_top;
+extern const uint32_t __process_stack_top;
+
+constexpr uint16_t usage_fault_mask = 0x30f;
+constexpr uint8_t    bus_fault_mask = 0xbf;
+constexpr uint8_t    mem_fault_mask = 0xbb;
 %% endif
 
 %% if parameters.enable_hardfault_handler_log == "true" and target is not cortex_m0
@@ -133,17 +145,6 @@ const char *stack_frame_names[] = {
 };
 const char *exception_stack_frame = " ^-- exception stack frame\n";
 %% endif
-const char *valid   = "";
-const char *invalid = " [INVALID]";
-
-extern const uint32_t __stack_start;
-extern const uint32_t __stack_end;
-extern const uint32_t __main_stack_top;
-extern const uint32_t __process_stack_top;
-
-constexpr uint16_t usage_fault_mask = 0x30f;
-constexpr uint8_t    bus_fault_mask = 0xbf;
-constexpr uint8_t    mem_fault_mask = 0xbb;
 
 // ----------------------------------------------------------------------------
 extern "C"
