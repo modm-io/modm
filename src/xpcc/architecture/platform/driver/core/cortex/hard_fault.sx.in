@@ -45,7 +45,7 @@
 	.func	HardFault_Handler
 HardFault_Handler:
 
-%% if target is stm32
+%% if (target is stm32) and (target is not stm32f0)
 	/* When a hard fault occurs, this handler will move the stack pointer around.
  	 * This makes it harder to debug a hard fault with a real debugger, so if one is connected we would
 	 * like to trigger a software breakpoint before moving the stack pointer.
@@ -69,7 +69,7 @@ HardFault_Handler:
 	 *     On ARMv6-M "access to the DHCSR from software running on the processor is IMPLEMENTATION DEFINED."
 	 *     This means, that on Cortex-M0, it might not be possible to read the DHCSR from software!
 	 *
-	 * STM32F0 implements this access, but LPC11 does not!
+	 * Neither STM32F0 nor LPC11 implement this access!
 	 *
 	 * !!!WARNING:
 	 *     OpenOcd does not reset the `C_DEBUGEN` bit on the `shutdown` command. This might be a bug.
