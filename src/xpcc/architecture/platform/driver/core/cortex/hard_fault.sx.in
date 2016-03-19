@@ -127,14 +127,17 @@ loop:
 	 * preserved during hard fault exception entry, however, a more thorough interpretation of the hard fault
 	 * reason and validation of plausibility of these recovered values is done in C code.
 	 */
-%% if target is cortex_m0
-	push {r4-r7}				// +4	// push registers r4 through r7 onto the stack, CM0 cannot push r8-r12
-	push {r4-r7}				// +4	// reserve space for r12, lr, pc and psr on the stack
-	push {r0-r3}				// +4	// push remaining registers (without the R12 or LR or PC or xPSR) onto the stack
-%% else
-	push {r4-r11}				// +8	// push registers r4 through r11 onto the stack
-	push {r0-r2}				// +3	// reserve space for lr, pc and psr on the stack
-	push {r0-r3,r12}			// +5	// push remaining registers (without the LR or PC or xPSR) onto the stack
+	push {r0-r7}				// +8	// push registers r0 through r7 onto the stack
+	mov r0, r8							// copy the higher registers into the lower ones
+	mov r1, r9							// this is required since the Cortex-M0 cannot
+	mov r2, r10							// push the higher registers onto the stack
+	mov r3, r11
+	mov r4, r12
+	mov r5, lr							// INVALID!
+	mov r6, pc							// INVALID!
+	mrs r7, psr
+	push {r0-r7}				// +8	// push registers r8 through r12, lr, pc, xpsr onto the stack
+%% if target is not cortex_m0
 	mov r9, sp							// buffer the current PSP for later
 	// we now push all valuable information about the bus fault onto the stack
 	// this means loading a range or registers from SCB and preserving them
@@ -149,10 +152,6 @@ loop:
 	// opportunistically copy LR, PC and PSR from main stack over to the process stack
 	// this doesn't cause a bus fault (which would result in core lockup) since we disabled that behavior.
 %% if target is cortex_m0
-	ldr r2, [r1, #16]					// load  R12
-	str r2, [r0, #16]					// store R12
-	ldr r2, [r1, #16]					// load  R12
-	str r2, [r0, #16]					// store R12
 	ldr r2, [r1, #20]					// load  LR
 	str r2, [r0, #20]					// store LR
 	ldr r2, [r1, #24]					// load  PC
@@ -169,13 +168,14 @@ loop:
 %% endif
 
 %% if target is cortex_m0
-	// 12 registers have been pushed onto the stack, => 48 bytes of the process stack have already been used!
+	// 16 registers have been pushed onto the stack, => 64 bytes of the process stack have already been used!
 %% else
 	// 23 registers have been pushed onto the stack, => 92 bytes of the process stack have already been used!
 %% endif
 	dsb
 	// call the C code handler
-	b _hardFaultHandler
+	ldr r2, =_hardFaultHandler
+	bx r2
 
 %% endif
 %% endif
