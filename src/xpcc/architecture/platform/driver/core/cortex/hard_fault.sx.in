@@ -86,6 +86,7 @@ HardFault_Handler:
 	lsls r0, #31						// test bit 0 by shifting it left 31 times, becoming sign bit
 	mov r0, lr							// restore register 0 before triggering the breakpoint
 	bpl no_debugger						// branch over breakpoint if lsls resulted in positive integer (MSB not set)
+	ldr lr, =0xfffffff9					// restore link register for GDB
 	bkpt #42							// trigger a break point, only if a debugger is connected
 no_debugger:
 %% endif
@@ -103,12 +104,16 @@ no_debugger:
 %% if parameters.enable_hardfault_handler_log == "false"
 	ldr r0, =_initHardFaultHandlerLed
 	blx r0 								// call Led::setOutput();
+	ldr r0, =0xfffffff9					// ARMv6 cannot load directly into LR
+	mov lr, r0							// restore link register for GDB
 loop:
 	ldr r0, =_ZN4xpcc5clock4fcpuE		// load xpcc::clock::fcpu
 1:	subs r0, r0, #5						// subtract 5 from value
 	bpl	1b								// loop while positive
 	ldr r0, =_toggleHardFaultHandlerLed
 	blx r0								// call Led::toggle();
+	ldr r0, =0xfffffff9					// ARMv6 cannot load directly into LR
+	mov lr, r0							// restore link register for GDB
 	b loop								// loop forever
 %% else
 	/* We want to preserve the entire stack frame, since in case of a stack overflow, the exception entry
@@ -126,6 +131,8 @@ loop:
 	 * We opportunistically attempt to recover these register from the main stack frame that might have been
 	 * preserved during hard fault exception entry, however, a more thorough interpretation of the hard fault
 	 * reason and validation of plausibility of these recovered values is done in C code.
+	 *
+	 * Note: By pushing all these registers to the stack, GDB cannot correctly unwind it anymore!
 	 */
 	push {r0-r7}				// +8	// push registers r0 through r7 onto the stack
 	mov r0, r8							// copy the higher registers into the lower ones
