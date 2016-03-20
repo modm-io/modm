@@ -86,22 +86,50 @@ HardFault_Handler:
 	lsls r0, #31						// test bit 0 by shifting it left 31 times, becoming sign bit
 	mov r0, lr							// restore register 0 before triggering the breakpoint
 	bpl no_debugger						// branch over breakpoint if lsls resulted in positive integer (MSB not set)
+
 	ldr lr, =0xfffffff9					// restore link register for GDB
 	bkpt #42							// trigger a break point, only if a debugger is connected
+
 no_debugger:
 %% endif
 
 %% if (not parameters.enable_hardfault_handler_led) and (parameters.enable_hardfault_handler_log == "false")
 	b HardFault_Handler					// busy wait in a loop forever
 %% else
+	// Save the current main stack pointer into the PSP register.
 	mov lr, r0							// save register 0 into the link register
 	mov r0, sp							// move SP into r0
 	msr psp, r0							// save SP into the process stack pointer (PSP)
+
+%% if parameters.enable_hardfault_handler_log == "false"
+	/* The LED blinking code consumes at most 32B of stack.
+	 * If there is >32B of space on the main stack, we do not switch the
+	 * stack pointer to the reserved hard fault handler stack.
+	 * This way you can connect the GDB debugger and it recognizes the stack
+	 * frames correctly, even while blinking the LED.
+	 */
+	ldr r0, =__stack_start
+	sub sp, #32							// subtract 32B from the stack pointer
+	cmp sp, r0							// compare: SP - R0 => pos. if space left
+	add sp, #32							// undo the subtraction
+	bpl use_main_stack					// do not switch stack, if there is enough space left
+										// otherwise change SP to hard fault handler stack
+%% endif
 	ldr r0, =__process_stack_top		// load the PSP value into register 0
 	mov sp, r0							// write the current stack pointer to the new PSP value
+
+use_main_stack:
 	mov r0, lr							// restore register 0 from the LR
 
 %% if parameters.enable_hardfault_handler_log == "false"
+	/* This sets up and toggles an LED.
+	 * The actual setup and toggle code is delegated to C++ world,
+	 * so that the xpcc GPIO API can be used.
+	 * This consumes very, very little stack, definitely less than 32B.
+	 *
+	 * This code clobbers R0,R1,R2 & R3, hopefully they were saved on exception entry.
+	 * Note: We are restoring LR to enable GDB stack unwinding.
+	 */
 	ldr r0, =_initHardFaultHandlerLed
 	blx r0 								// call Led::setOutput();
 	ldr r0, =0xfffffff9					// ARMv6 cannot load directly into LR
@@ -115,6 +143,7 @@ loop:
 	ldr r0, =0xfffffff9					// ARMv6 cannot load directly into LR
 	mov lr, r0							// restore link register for GDB
 	b loop								// loop forever
+
 %% else
 	/* We want to preserve the entire stack frame, since in case of a stack overflow, the exception entry
 	 * is not able to push an exception frame onto the main stack!
