@@ -7,7 +7,7 @@
 		</parameter>
 		<parameter name="enable_gpio" type="bool">true</parameter>
 		<parameter name="vector_table_in_ram" type="bool">false</parameter>
-		<parameter name="main_stack_size" type="int" min="512" max="8192">1856</parameter>
+		<parameter name="main_stack_size" type="int" min="512" max="8192">3040</parameter>
 
 
 		<parameter name="enable_hardfault_handler_log" type="enum" values="false;basic;true">false</parameter>

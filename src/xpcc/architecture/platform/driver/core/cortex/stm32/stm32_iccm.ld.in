@@ -149,13 +149,16 @@ PROVIDE(__ram_end   = ORIGIN(RAM) + LENGTH(RAM));
 PROVIDE(__rom_start = ORIGIN(FLASH));
 PROVIDE(__rom_end   = ORIGIN(FLASH) + LENGTH(FLASH));
 
-/* Used for interrupt handlers */
 /* the thread stack is used only for reporting hard fault conditions! It may therefore be small. */
-%% if parameters.enable_hardfault_handler_led or (parameters.enable_hardfault_handler_log != "false")
-PROCESS_STACK_SIZE  = 192;
+%% if (not parameters.enable_hardfault_handler_led) and (parameters.enable_hardfault_handler_log == "false")
+	%% set pss = 0
+%% elif parameters.enable_hardfault_handler_log == "false"
+	%% set pss = 32
 %% else
-PROCESS_STACK_SIZE  = 0;
+	%% set pss = 512
 %% endif
+/* the thread stack is used only for reporting hard fault conditions! It may therefore be small. */
+PROCESS_STACK_SIZE  = {{ pss }};
 /* the handler stack is used for main program as well as interrupts */
 MAIN_STACK_SIZE     = {{ parameters.main_stack_size }};
 /* combined stack size */
