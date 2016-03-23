@@ -139,7 +139,10 @@ STRIP_FROM_PATH        =
 # definition is used. Otherwise one should specify the include paths that
 # are normally passed to the compiler using the -I flag.
 
-STRIP_FROM_INC_PATH    = ../src/
+STRIP_FROM_INC_PATH    = ../src/ \
+                         ../build/avr/basic/libxpcc/generated_platform/ \
+                         ../build/avr/blinking/libxpcc/generated_platform/ \
+                         ../build/stm32f4_discovery/blink/libxpcc/generated_platform/
 
 # If the SHORT_NAMES tag is set to YES, doxygen will generate much shorter
 # (but less readable) file names. This can be useful if your file system
@@ -662,8 +665,8 @@ WARN_LOGFILE           =
 # with spaces.
 
 INPUT                  = ../src/ \
-                         ../build/gpio_basic/libxpcc/generated_platform/ \
-                         ../build/gpio_blinking/libxpcc/generated_platform/ \
+                         ../build/avr/basic/libxpcc/generated_platform/ \
+                         ../build/avr/blinking/libxpcc/generated_platform/ \
                          ../build/stm32f4_discovery/blink/libxpcc/generated_platform/ \
                          .
 
