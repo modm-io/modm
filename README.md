@@ -180,12 +180,6 @@ Daniel Krebs ([@daniel-k](https://github.com/daniel-k)),
   Template files for xpcc, Unit-Tests etc.
 </dd>
 
-<dt>tests</dt>
-<dd>
-  Test programs, used during the development of the library. May be
-  out of date or not working at all.
-</dd>
-
 <dt>tools</dt>
 <dd>
   Supporting tools for the usage of the library.
