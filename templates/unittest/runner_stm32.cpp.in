@@ -4,9 +4,6 @@
 
 #include <xpcc/architecture/platform.hpp>
 
-// This unittest is made for the STM32 F4 Discovery Board
-#include "../../examples/stm32f4_discovery/stm32f4_discovery.hpp"
-
 #include <unittest/reporter.hpp>
 #include <unittest/controller.hpp>
 
