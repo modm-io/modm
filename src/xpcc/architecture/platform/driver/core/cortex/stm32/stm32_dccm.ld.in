@@ -221,7 +221,7 @@ SECTIONS
 		__fastdata_end = .;
 	} >CCM AT>FLASH
 
-	/* This is currently not used by the heap allocator!
+%% if parameters.allocator == "tlsf"
 	.heap0 (NOLOAD) :
 	{
 		. = ALIGN(4);
@@ -230,7 +230,7 @@ SECTIONS
 		. = ORIGIN(CCM) + LENGTH(CCM);
 		__heap0_end = .;
 	} >CCM
-	*/
+%% endif
 
 	.text :
 	{

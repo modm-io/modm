@@ -17,7 +17,7 @@
  *                |                                 | 0x2005 0000 <---- __ram_end, __heap2_end, __heap_end
  *      +-------> |---------------------------------| 0x2004 FFFF
  *      |         |                                 |
- *    heap2       |                                 |
+ *   .heap2       |                                 |
  *      |         |                                 |
  *      +-------> |---------------------------------| 0x2004 C000 <--- __heap2_start
  *
@@ -215,7 +215,7 @@ SECTIONS
 		__fastcode_end = .;
 	} >ITCM AT>FLASH
 
-	/* This is currently not used by the heap allocator!
+%% if parameters.allocator == "tlsf"
 	.heap4 (NOLOAD) :
 	{
 		. = ALIGN(4);
@@ -224,7 +224,7 @@ SECTIONS
 		. = ORIGIN(ITCM) + LENGTH(ITCM);
 		__heap4_end = .;
 	} >ITCM
-	*/
+%% endif
 
 	.stack (NOLOAD) :
 	{
@@ -252,7 +252,7 @@ SECTIONS
 		__fastdata_end = .;
 	} >DTCM AT>FLASH
 
-	/* This is currently not used by the heap allocator!
+%% if parameters.allocator == "tlsf"
 	.heap0 (NOLOAD) :
 	{
 		. = ALIGN(4);
@@ -261,7 +261,7 @@ SECTIONS
 		. = ORIGIN(DTCM) + LENGTH(DTCM);
 		__heap0_end = .;
 	} >DTCM
-	*/
+%% endif
 
 	.text :
 	{
