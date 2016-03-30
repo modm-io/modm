@@ -157,7 +157,7 @@ __libc_init_array(void);
 extern void
 exit(int) __attribute__ ((noreturn, weak));
 
-%% if parameters.allocator == "block_allocator"
+%% if parameters.allocator in ["block_allocator", "tlsf"]
 extern void __xpcc_initialize_memory(void);
 %% endif
 
@@ -303,8 +303,8 @@ Reset_Handler(void)
 	xpcc_gpio_enable();
 %% endif
 
-%% if parameters.allocator == "block_allocator"
-	// initialize xpcc block allocator
+%% if parameters.allocator in ["block_allocator", "tlsf"]
+	// initialize xpcc block or TLSF allocator
 	// needs to be done before calling the CTORS of static objects
 	__xpcc_initialize_memory();
 %% endif
