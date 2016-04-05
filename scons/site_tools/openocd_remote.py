@@ -44,6 +44,19 @@ def gdb_remote_program(env, source, alias='gdb_remote_program'):
 	return env.AlwaysBuild(env.Alias(alias, source, action))
 
 # -----------------------------------------------------------------------------
+# Interactively debug via a remote gdb session
+def gdb_remote_debug(env, source, alias='gdb_remote_debug'):
+	gdb = "arm-none-eabi-gdb"
+	cmd = [gdb, '-q',
+	    '--tui',
+		'-ex "target remote $OPENOCD_REMOTE_HOST:3333"',
+		'-ex "monitor halt"',
+		'$SOURCE']
+
+	action = Action(' '.join(cmd))
+	return env.AlwaysBuild(env.Alias(alias, source, action))
+
+# -----------------------------------------------------------------------------
 # Reset processor via remote gdb session
 def gdb_remote_reset(env, alias='gdb_remote_reset'):
 	if platform.system() == "Windows":
@@ -75,6 +88,7 @@ def generate(env, **kw):
 	env.AddMethod(openocd_remote_run,  'OpenOcdRemote')
 	env.AddMethod(gdb_remote_program,  'GdbRemoteProgram')
 	env.AddMethod(gdb_remote_reset,    'GdbRemoteReset')
+	env.AddMethod(gdb_remote_debug,    'GdbRemoteDebug')
 
 def exists(env):
 	return env.Detect('openocd_remote')
