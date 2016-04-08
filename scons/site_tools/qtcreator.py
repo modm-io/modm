@@ -42,7 +42,7 @@ def collect_defines(defines, source):
 		[collect_defines(defines, mm) for mm in source]
 
 
-def qt_creator_project_method(env, file_scanner):
+def qt_creator_project_method(env, file_scanner, additional_sources=[]):
 	# collect values
 	project_name = env['XPCC_PROJECT_NAME']
 	project_path = env['XPCC_BASEPATH']
@@ -50,7 +50,7 @@ def qt_creator_project_method(env, file_scanner):
 	collect_defines(defines, env['CPPDEFINES'])
 	collect_defines(defines, file_scanner.defines)
 	files = [os.path.relpath(str(ff), project_path)
-	         for ff in file_scanner.header + file_scanner.sources]
+	         for ff in file_scanner.header + file_scanner.sources + additional_sources]
 	includes = env['CPPPATH']
 
 	# generate project files
