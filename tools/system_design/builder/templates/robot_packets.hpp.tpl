@@ -79,10 +79,12 @@ namespace {{ namespace }}
 	{% elif packet.isStruct %}
 		struct {{ packet.name | typeName }}
 		{
-			{{ packet.flattened() | generateConstructor }};
+			constexpr {{ packet.flattened() | generateConstructor }}:
+				{{ packet.flattened() | generateInitializationList }} {}
 
 			{% if packet.flattened().size > 0 -%}
-			{{ packet.flattened() | generateConstructor(default=False) }};
+			constexpr {{ packet.flattened() | generateConstructor(default=False) }} :
+				{{ packet.flattened() | generateInitializationList(default=False) }} {}
 			{%- endif %}
 			{% for element in packet.flattened().iter() %}
 			{%- if element.description %}
