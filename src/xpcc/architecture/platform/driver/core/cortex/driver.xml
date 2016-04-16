@@ -2,8 +2,8 @@
 <!DOCTYPE rca SYSTEM "../../xml/driver.dtd">
 <rca version="1.0">
 	<driver type="core" name="cortex">
-		<parameter name="allocator" type="enum" values="newlib;block_allocator">
-			newlib
+		<parameter name="allocator" type="enum" values="newlib;block_allocator;tlsf">
+			tlsf
 		</parameter>
 		<parameter name="enable_gpio" type="bool">true</parameter>
 		<parameter name="vector_table_in_ram" type="bool">false</parameter>
