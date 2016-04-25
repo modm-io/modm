@@ -45,7 +45,7 @@ struct i2cEeprom
  *
  * Compatible with the 24C256 (ST) and 24FC1025 (Microchip) family and other
  * I2C eeprom with an 16-bit address pointer.
- * Base address for most 24xxyyyy eeproms is 0xA0.
+ * Base address for most 24xxyyyy eeproms is 0x50.
  *
  * @ingroup	driver_storage
  * @author	Fabian Greif
@@ -55,7 +55,7 @@ template <typename I2cMaster>
 class I2cEeprom : public xpcc::I2cDevice< I2cMaster, 1, i2cEeprom::DataTransmissionAdapter >
 {
 public:
-	I2cEeprom(uint8_t address = 0xA0);
+	I2cEeprom(uint8_t address = 0x50);
 
 	/**
 	 * Write byte
@@ -97,7 +97,7 @@ public:
 	inline xpcc::ResumableResult<bool>
 	write(uint16_t address, const T& data)
 	{
-		return write(address, static_cast<const uint8_t *>(&data), sizeof(T));
+		return write(address, reinterpret_cast<const uint8_t *>(&data), sizeof(T));
 	}
 
 	/// Read byte
@@ -123,7 +123,7 @@ public:
 	inline xpcc::ResumableResult<bool>
 	read(uint16_t address, T& data)
 	{
-		return read(address, static_cast<uint8_t *>(&data), sizeof(T));
+		return read(address, reinterpret_cast<uint8_t *>(&data), sizeof(T));
 	}
 };
 
