@@ -30,6 +30,10 @@ struct i2cEeprom
 		bool
 		configureRead(uint16_t address, uint8_t *buffer, std::size_t size);
 
+		inline uint8_t getAddress() const {
+			return this->address >> 1;
+		}
+
 	protected:
 		virtual Writing
 		writing() override;
@@ -67,7 +71,7 @@ public:
 	 * 			`false` otherwise
 	 */
 	inline xpcc::ResumableResult<bool>
-	writeByte(uint16_t address, uint8_t data)
+	writeByte(uint32_t address, uint8_t data)
 	{
 		return write(address, &data, 1);
 	}
@@ -83,7 +87,7 @@ public:
 	 * 			`false` otherwise
 	 */
 	xpcc::ResumableResult<bool>
-	write(uint16_t address, const uint8_t *data, std::size_t length);
+	write(uint32_t address, const uint8_t *data, std::size_t length);
 
 	/**
 	 * Convenience function
@@ -95,21 +99,21 @@ public:
 	 */
 	template <typename T>
 	inline xpcc::ResumableResult<bool>
-	write(uint16_t address, const T& data)
+	write(uint32_t address, const T& data)
 	{
 		return write(address, reinterpret_cast<const uint8_t *>(&data), sizeof(T));
 	}
 
 	/// Read byte
 	inline xpcc::ResumableResult<bool>
-	readByte(uint16_t address, uint8_t &data)
+	readByte(uint32_t address, uint8_t &data)
 	{
 		return read(address, &data, 1);
 	}
 
 	/// Read block
 	xpcc::ResumableResult<bool>
-	read(uint16_t address, uint8_t *data, std::size_t length);
+	read(uint32_t address, uint8_t *data, std::size_t length);
 
 	/**
 	 * Convenience function

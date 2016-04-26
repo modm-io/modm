@@ -19,12 +19,14 @@ xpcc::I2cEeprom<I2cMaster>::I2cEeprom(uint8_t address) :
 }
 
 // MARK: - write operations
-
 template <typename I2cMaster>
 xpcc::ResumableResult<bool>
-xpcc::I2cEeprom<I2cMaster>::write(uint16_t address, const uint8_t *data, std::size_t length)
+xpcc::I2cEeprom<I2cMaster>::write(uint32_t address, const uint8_t *data, std::size_t length)
 {
 	RF_BEGIN();
+
+	if (address & 0x10000) this->setAddress(this->transaction.getAddress() | 0b100);
+	else this->setAddress(this->transaction.getAddress() & ~0b100);
 
 	RF_WAIT_UNTIL( this->transaction.configureWrite(address, data, length) and this->startTransaction() );
 
@@ -36,9 +38,12 @@ xpcc::I2cEeprom<I2cMaster>::write(uint16_t address, const uint8_t *data, std::si
 // MARK: - read operations
 template <typename I2cMaster>
 xpcc::ResumableResult<bool>
-xpcc::I2cEeprom<I2cMaster>::read(uint16_t address, uint8_t *data, std::size_t length)
+xpcc::I2cEeprom<I2cMaster>::read(uint32_t address, uint8_t *data, std::size_t length)
 {
 	RF_BEGIN();
+
+	if (address & 0x10000) this->setAddress(this->transaction.getAddress() | 0b100);
+	else this->setAddress(this->transaction.getAddress() & ~0b100);
 
 	RF_WAIT_UNTIL( this->transaction.configureRead(address, data, length) and this->startTransaction() );
 
