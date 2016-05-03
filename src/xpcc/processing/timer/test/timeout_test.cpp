@@ -145,7 +145,7 @@ TimeoutTest::testTimeOverflow()
 	TEST_ASSERT_EQUALS((time / 2 + 100), 32867);
 
 	xpcc::GenericTimeout<xpcc::ClockDummy, xpcc::ShortTimestamp> timeoutShort(time / 2 - 1);	//=> 32867 + 32766 = 97
-	TEST_ASSERT_EQUALS((time / 2 - 1), 32766);
+	TEST_ASSERT_EQUALS(((signed)(time / 2) - 1), 32766);
 
 	TEST_ASSERT_FALSE(timeoutShort.execute());
 

@@ -7,42 +7,49 @@
 
 #include <xpcc/architecture/platform.hpp>
 
+using namespace xpcc::atmega;
+typedef xpcc::avr::SystemClock clock;
+
 ${includes}
 
 ${names}
 
-GPIO__OUTPUT(LedGreen, B, 0);
-GPIO__OUTPUT(LedRed, B, 1);
+using LedGreen = GpioOutputB0;
+using LedRed = GpioB1;
 
 int
 main()
 {
 	LedGreen::setOutput();
 	LedRed::setOutput();
-	
+
 	LedGreen::reset();
 	LedRed::set();
-	
+
 	// initialize output device
-	xpcc::atmega::BufferedUart0 uart(115200);
-	xpcc::IODeviceWrapper<xpcc::atmega::BufferedUart0> device(uart);
-	
+	GpioOutputE1::connect(Uart0::Tx);
+	GpioInputE0::connect(Uart0::Rx);
+	Uart0::initialize< clock, 115200, xpcc::Tolerance::TenPercent >();
+
+	Uart0 uart;
+	xpcc::IODeviceWrapper< Uart0, xpcc::IOBuffer::BlockIfFull > loggerDevice(uart);
+
 	sei();
-	
-	device.write("Unittests (" __DATE__ ", " __TIME__")\n");
-	
-	unittest::Reporter reporter(device);
+
+	loggerDevice.write("Unittests (" __DATE__ ", " __TIME__")\n");
+
+	unittest::Reporter reporter(loggerDevice);
 	unittest::Controller::instance().setReporter(reporter);
-	
+
 	LedGreen::set();
-	
+
 	// run tests
 ${tests}
-	
+
 	unittest::Controller::instance().getReporter().printSummary();
-	
+
 	LedRed::reset();
-	
+
 	while (1)
 	{
 	}

@@ -167,6 +167,10 @@ def platform_tools_generate(env, architecture_path):
 			linkerfile = os.path.join(env['XPCC_PLATFORM_GENERATED_PATH'], 'driver', 'core', 'cortex', 'linkerscript.ld')
 			# make the program depend directly on the linkerscript, so it re-links when something changed!
 			Depends(os.path.join(env['XPCC_BUILDPATH'], "..", env['XPCC_PROJECT_NAME'] + ".elf"), linkerfile)
+			# TODO: This is a hack for unittests on stm32. Their elf file is called "executable" instead of the project name.
+			#       This should be properly solved using a custom env.Program wrapper!
+			#       cc @ekiwi
+			Depends(os.path.join(env['XPCC_BUILDPATH'], "..", "executable.elf"), linkerfile)
 
 			linkdir, linkfile = os.path.split(linkerfile)
 			linkdir = linkdir.replace(env['XPCC_ROOTPATH'], "${XPCC_ROOTPATH}")

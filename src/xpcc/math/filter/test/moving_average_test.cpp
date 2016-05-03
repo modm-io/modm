@@ -128,6 +128,6 @@ MovingAverageTest::testFloatAverage()
 	for (uint_fast8_t i = 0; i < (sizeof(data) / sizeof(TestDataFloat)); ++i)
 	{
 		filter.update(dataF[i].input);
-		TEST_ASSERT_TRUE(std::abs(filter.getValue()-dataF[i].output) < 1e-4);
+		TEST_ASSERT_EQUALS_DELTA(filter.getValue(), dataF[i].output, double(1e-4));
 	}
 }

@@ -13,6 +13,7 @@
 #include <stdint.h>
 #include <xpcc/utils/bit_constants.hpp>
 #include <xpcc/architecture/detect.hpp>
+#include <xpcc/io/iostream.hpp>
 
 /**
  * @ingroup		interface
@@ -232,27 +233,49 @@ struct Register
 	// dealing with complex objects, but with one integral value.
 	// So there is not need for it.
 	/* explicit */
+
 	/// Returns `true` if `value` is non-zero
 	constexpr operator bool() const
-	{ return value != 0; }
+	{ return bool(value); }
+
 	/// Returns `true` if `value` is zero
 	constexpr bool operator!() const
-	{ return value == 0; }
+	{ return not bool(value); }
 	/// @}
 
-	// GCC is broken here, matches overloads for deleted operators
-#if (not (defined XPCC__OS_HOSTED and defined XPCC__COMPILER_GCC)) or defined __DOXYGEN__
-	// do NOT cast to anything else
-	/// all other operators are deleted and must be explicitly implemented
-	template<typename U>
-	constexpr operator U() const = delete;
-#endif
+	/// Printing a register will output its numeric value.
+	friend IOStream&
+	operator << (IOStream& s, const Register<T>& m)
+	{ return (s << m.value); }
 
 protected:
 	/// This class is meant to be subclassed
 	constexpr Register(UnderlyingType value)
 	:	value(value) {}
+
+#ifndef __DOXYGEN__
+public:
+	// do NOT cast to anything else
+	/// all other conversion operators are deleted and must be explicitly implemented
+	constexpr operator      char16_t() const = delete;
+	constexpr operator      char32_t() const = delete;
+	constexpr operator       wchar_t() const = delete;
+	constexpr operator   signed char() const = delete;
+	constexpr operator unsigned char() const = delete;
+	constexpr operator   signed short int() const = delete;
+	constexpr operator unsigned short int() const = delete;
+	constexpr operator   signed int() const = delete;
+	constexpr operator unsigned int() const = delete;
+	constexpr operator   signed long int() const = delete;
+	constexpr operator unsigned long int() const = delete;
+	constexpr operator   signed long long int() const = delete;
+	constexpr operator unsigned long long int() const = delete;
+	constexpr operator       float() const = delete;
+	constexpr operator      double() const = delete;
+	constexpr operator long double() const = delete;
+#endif
 };
+
 /// @ingroup	register
 /// @{
 using Register8  = Register<uint8_t>;	///< Register class with  8-bit wide underlying type
