@@ -377,7 +377,6 @@ SECTIONS
 		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
 		__exidx_end = .;
 	} >FLASH
-	_etext = .;
 
 	/* initialized variables */
 	.data : ALIGN (8)

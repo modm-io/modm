@@ -229,7 +229,7 @@ SECTIONS
 		 *
 		 * Might be replaced by ELF section groups in newer versions of ld.
 		 */
-		*(.fastcode .text .text.* .gnu.linkonce.t.*)
+		*(.text .text.* .gnu.linkonce.t.*)
 		. = ALIGN (4);
 
 		/* From the Cortex-M3 Technical Reference Manual:
@@ -254,9 +254,8 @@ SECTIONS
 		 *
 		 * So for STM32's where the CCM is _not_ connected to the I-Bus, we execute .fastcode from Flash.
 		 */
-		__fastcode_load = .;
-		__fastcode_start = .;
-		__fastcode_end = .;
+		*(.fastcode)
+		. = ALIGN (4);
 
 		/* Position independent code will call non-static functions via the
 		 * Procedure Linkage Table or PLT. This PLT does not exist in .o files.
@@ -342,7 +341,6 @@ SECTIONS
 		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
 		__exidx_end = .;
 	} >FLASH
-	_etext = .;
 
 	/* initialized variables */
 	.data : ALIGN (8)
@@ -358,11 +356,6 @@ SECTIONS
 
 		. = ALIGN (4);
 		__data_end = .;
-
-		/* dummy symbols for start-up script */
-		__fastdata_load = .;
-		__fastdata_start = .;
-		__fastdata_end = .;
 	} >RAM AT>FLASH
 
 	/* uninitialized variables */

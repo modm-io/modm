@@ -333,7 +333,6 @@ SECTIONS
 		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
 		__exidx_end = .;
 	} >FLASH
-	_etext = .;
 
 	.stack (NOLOAD) :
 	{
