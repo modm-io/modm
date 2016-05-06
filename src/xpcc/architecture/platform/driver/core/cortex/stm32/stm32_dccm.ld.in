@@ -219,7 +219,7 @@ SECTIONS
 
 		. = ALIGN(4);
 		__fastdata_end = .;
-	} >CCM AT>FLASH
+	} >CCM AT >FLASH
 
 %% if parameters.allocator == "tlsf"
 	.heap0 (NOLOAD) :
@@ -386,7 +386,7 @@ SECTIONS
 
 		. = ALIGN (4);
 		__data_end = .;
-	} >RAM AT>FLASH
+	} >RAM AT >FLASH
 
 	/* uninitialized variables */
 	.bss (NOLOAD) :

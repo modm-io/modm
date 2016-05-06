@@ -356,7 +356,7 @@ SECTIONS
 
 		. = ALIGN (4);
 		__data_end = .;
-	} >RAM AT>FLASH
+	} >RAM AT >FLASH
 
 	/* uninitialized variables */
 	.bss (NOLOAD) :
