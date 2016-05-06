@@ -89,8 +89,8 @@ void HardFault_Handler(void)			__attribute__ ((weak, alias("defaultHandler")));
 typedef void (* const FunctionPointer)(void);
 
 // defined in the linkerscript
-extern uint32_t __main_stack_top;
-extern uint32_t __process_stack_top;
+extern uint32_t __main_stack_top[];
+extern uint32_t __process_stack_top[];
 
 %% if parameters.vector_table_in_ram
 // reserve space for the remapped vector table in RAM
@@ -101,7 +101,7 @@ FunctionPointer ramVectors[{{number_of_interrupts + 16}}];
 __attribute__(( section(".reset") ))
 FunctionPointer flashVectors[] =
 {
-	(FunctionPointer) &__main_stack_top,	// -16: stack pointer
+	(FunctionPointer)__main_stack_top,		// -16: stack pointer
 	Reset_Handler,							// -15: code entry point
 	NMI_Handler,							// -14: Non Maskable Interrupt handler
 	HardFault_Handler,						// -13: hard fault handler
@@ -120,31 +120,18 @@ FunctionPointer flashVectors[] =
 
 // ----------------------------------------------------------------------------
 // The following are constructs created by the linker, indicating where the
-// the "data" and "bss" segments reside in memory.  The initializers for the
-// for the "data" segment resides immediately following the "text" segment.
-extern uint32_t __stack_start;
-extern uint32_t __stack_end;
+// the "data" and "bss" segments reside in memory.
+extern uint32_t __stack_start[];
+extern uint32_t __stack_end[];
 
-extern uint32_t __fastcode_load;
-extern uint32_t __fastcode_start;
-extern uint32_t __fastcode_end;
+extern uint32_t __table_copy_start[];
+extern uint32_t __table_copy_end[];
 
-extern uint32_t __vector_table_ram_load;
-extern uint32_t __vector_table_ram_start;
-extern uint32_t __vector_table_ram_end;
+extern uint32_t __table_zero_start[];
+extern uint32_t __table_zero_end[];
 
-extern uint32_t __vector_table_rom_start;
-
-extern uint32_t __fastdata_load;
-extern uint32_t __fastdata_start;
-extern uint32_t __fastdata_end;
-
-extern uint32_t __data_load;
-extern uint32_t __data_start;
-extern uint32_t __data_end;
-
-extern uint32_t __bss_start;
-extern uint32_t __bss_end;
+extern uint32_t __vector_table_rom_start[];
+extern uint32_t __vector_table_ram_start[];
 
 // Application's main function
 int
@@ -198,47 +185,32 @@ Reset_Handler(void)
 		"bne   1b"                      "\n\t" // continue loop if not equal
 	);
 
-	uint32_t* src;
-	uint32_t* dest;
-
-%% if parameters.vector_table_in_ram
-	// copy vector table to RAM (.vectors)
-	src = &__vector_table_ram_load;
-	dest = &__vector_table_ram_start;
-	while (dest < &__vector_table_ram_end)
+	// copy all memory declared in linkerscript table
 	{
-		*(dest++) = *(src++);
+		uint32_t **table = (uint32_t**)__table_copy_start;
+		while(table < (uint32_t**)__table_copy_end)
+		{
+			uint32_t *src  = table[0]; // load address
+			uint32_t *dest = table[1]; // destination start
+			while (dest < table[2])    // destination end
+			{
+				*(dest++) = *(src++);
+			}
+			table += 3;
+		}
 	}
-%% endif
-
-	// Copy functions to RAM (.fastcode)
-	src = &__fastcode_load;
-	dest = &__fastcode_start;
-	while (dest < &__fastcode_end)
+	// zero all memory declared in linkerscript table
 	{
-		*(dest++) = *(src++);
-	}
-
-	src = &__fastdata_load;
-	dest = &__fastdata_start;
-	while (dest < &__fastdata_end)
-	{
-		*(dest++) = *(src++);
-	}
-
-	// Copy the data segment initializers from flash to RAM (.data)
-	src = &__data_load;
-	dest = &__data_start;
-	while (dest < &__data_end)
-	{
-		*(dest++) = *(src++);
-	}
-
-	// Fill the bss segment with zero (.bss)
-	dest = &__bss_start;
-	while (dest < &__bss_end)
-	{
-		*(dest++) = 0;
+		uint32_t **table = (uint32_t**)__table_zero_start;
+		while(table < (uint32_t**)__table_zero_end)
+		{
+			uint32_t *dest = table[0]; // destination start
+			while (dest < table[1])    // destination end
+			{
+				*(dest++) = 0;
+			}
+			table += 2;
+		}
 	}
 
 %# Perform Platform Specific Setup
@@ -266,9 +238,9 @@ Reset_Handler(void)
 	// Setup NVIC
 	// Set vector table
 	%% if parameters.vector_table_in_ram
-	SCB->VTOR = (uint32_t)(&__vector_table_ram_start);
+	SCB->VTOR = (uint32_t)(__vector_table_ram_start);
 	%% else
-	SCB->VTOR = (uint32_t)(&__vector_table_rom_start);
+	SCB->VTOR = (uint32_t)(__vector_table_rom_start);
 	%% endif
 	// Enables handlers with priority -1 or -2 to ignore data BusFaults caused by load and store instructions.
 	// This applies to the hard fault, NMI, and FAULTMASK escalated handlers.

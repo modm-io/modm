@@ -413,6 +413,30 @@ SECTIONS
 		PROVIDE (__heap_end = .);
 	} >RAM
 
+	.table.zero :
+	{
+		. = ALIGN(4);
+		__table_zero_start = .;
+		LONG (__bss_start)
+		LONG (__bss_end)
+		__table_zero_end = .;
+	} >FLASH
+
+	.table.copy :
+	{
+		. = ALIGN(4);
+		__table_copy_start = .;
+		LONG (__data_load)
+		LONG (__data_start)
+		LONG (__data_end)
+%% if parameters.vector_table_in_ram
+		LONG (__vector_table_ram_load)
+		LONG (__vector_table_ram_start)
+		LONG (__vector_table_ram_end)
+%% endif
+		__table_copy_end = .;
+	} >FLASH
+
 	. = ALIGN(4);
 	_end = . ;
 	__end = . ;
