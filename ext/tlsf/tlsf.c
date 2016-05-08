@@ -22,6 +22,14 @@
 #	define XPCC_TLFS_FL_INDEX_MAX 19
 #endif
 
+/*
+** This prevents the usage of newlib's `assert` and `printf` functions,
+** which add ~30kB of code and ~2kB of static RAM usage, but are usable,
+** since xpcc does not use newlib's printf.
+*/
+#define tlsf_assert (void)
+#define printf(...) {}
+
 
 #if defined(__cplusplus)
 #define tlsf_decl inline
