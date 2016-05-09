@@ -52,7 +52,7 @@ namespace xpcc
 	class Dispatcher
 	{
 	public:
-		static const uint16_t acknowledgeTimeout = 100;
+		static const uint16_t acknowledgeTimeout = 500;
 		static const uint16_t responseTimeout = 100;
 
 	public:
