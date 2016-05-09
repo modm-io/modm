@@ -416,7 +416,7 @@ DispatcherTest::testActionRetransmissionWithAbort()
 		backend->messagesSend.removeAll();
 		
 		// reset time so that the timeout is expired
-		TestingClock::time += 100;
+		TestingClock::time += 500;
 		
 		dispatcher->update();
 	}
@@ -444,7 +444,7 @@ DispatcherTest::testActionRetransmission()
 		
 		if (i == 0) {
 			// reset time so that the timeout is expired
-			TestingClock::time += 100;
+			TestingClock::time += 500;
 		}
 		
 		dispatcher->update();
@@ -456,7 +456,7 @@ DispatcherTest::testActionRetransmission()
 					xpcc::SmartPointer()));
 	
 	// reset time so that the timeout is expired
-	TestingClock::time += 100;
+	TestingClock::time += 500;
 	
 	dispatcher->update();
 	
@@ -494,7 +494,7 @@ DispatcherTest::testResponseRetransmissionWithAbort()
 		backend->messagesSend.removeFront();
 		
 		// reset time so that the timeout is expired
-		TestingClock::time += 100;
+		TestingClock::time += 500;
 		
 		dispatcher->update();
 	}
@@ -526,7 +526,7 @@ DispatcherTest::testResponseRetransmission()
 		
 		if (i == 0) {
 			// reset time so that the timeout is expired
-			TestingClock::time += 100;
+			TestingClock::time += 500;
 		}
 		
 		dispatcher->update();
