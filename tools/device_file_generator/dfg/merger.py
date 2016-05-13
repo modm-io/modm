@@ -119,9 +119,9 @@ class DeviceMerger:
 
 		if family == 'f0':
 			categories = [	['030', '050', '070'],
-			                ['031', '051', '071', '091'],
-			                ['042', '072'],
-			                ['038', '048', '058', '078', '098']]
+							['031', '051', '071', '091'],
+							['042', '072'],
+							['038', '048', '058', '078', '098']]
 		elif family == 'f1':
 			categories = [	['100'],
 							['101', '102'],
@@ -401,8 +401,8 @@ class DeviceMerger:
 		# these are the categories of mergeable size-ids
 		if family == 'f0':
 			categories = [	['4', '6'],
-			                  ['8'],
-			                  ['b', 'c']  ]
+							['8'],
+							['b', 'c']  ]
 			if name in ['072', '042']:
 				categories = [['4', '6'], ['8', 'b']]
 		elif family == 'f1':
