@@ -61,12 +61,13 @@
  *	- set start bit (RESTART!)
  *	#
  *	- check SB bit
- *	- set ACK low
+ *	- set ACK high
  *	- set POS high (must be used ONLY in two byte transfers, clear it afterwards!)
  *	- write address
  *	#
  *	- check ADDR bit
  *	- clear ADDR bit
+ *	- set ACK low
  *	#
  *	- check BTF bit
  *	- set STOP high
@@ -297,7 +298,7 @@ I2C{{ id }}_EV_IRQHandler(void)
 				reading = transaction->reading();
 				nextOperation = static_cast<xpcc::I2c::Operation>(reading.next);
 
-				if (reading.length <= 2)
+				if (reading.length < 2)
 				{
 					DEBUG_STREAM("NACK");
 					I2C{{ id }}->CR1 &= ~I2C_CR1_ACK;
@@ -376,6 +377,11 @@ I2C{{ id }}_EV_IRQHandler(void)
 			*reading.buffer++ = dr & 0xff;
 			reading.length = 0;
 			checkNextOperation = CHECK_NEXT_OPERATION_YES_NO_STOP_BIT;
+		}
+		else if (reading.length == 2)
+		{
+			DEBUG_STREAM("NACK");
+			I2C{{ id }}->CR1 &= ~I2C_CR1_ACK;
 		}
 	}
 
