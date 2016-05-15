@@ -340,6 +340,7 @@ I2C{{ id }}_EV_IRQHandler(void)
 
 	else if (sr1 & I2C_SR1_ADDR)
 	{
+		xpcc::atomic::Lock lock;
 		starting.address = 0;
 		// EV6: ADDR=1, cleared by reading SR1 register followed by reading SR2.
 		DEBUG_STREAM("address sent");
@@ -441,6 +442,7 @@ I2C{{ id }}_EV_IRQHandler(void)
 
 		if (reading.length == 2)
 		{
+			xpcc::atomic::Lock lock;
 			// EV7_1: RxNE=1, cleared by reading DR register, programming STOP=1
 			DEBUG_STREAM("STOP");
 			I2C{{ id }}->CR1 |= I2C_CR1_STOP;
