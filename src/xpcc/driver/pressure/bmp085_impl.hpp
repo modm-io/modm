@@ -113,7 +113,7 @@ xpcc::bmp085::Data::calculateCalibratedTemperature()
 {
 	int32_t x1, x2;
 	uint16_t ut = (uint16_t(raw[0]) << 8) | raw[1];
-	x1 = xpcc::math::mul(ut - calibration.ac6, calibration.ac5) >> 15;
+	x1 = xpcc::math::mul( int16_t(ut - calibration.ac6), int16_t(calibration.ac5)) >> 15;
 	x2 = (int32_t(calibration.mc) << 11) / (x1 + calibration.md);
 	b5 = x1 + x2;
 	calibratedTemperature = int16_t((b5 + 8) >> 4);
