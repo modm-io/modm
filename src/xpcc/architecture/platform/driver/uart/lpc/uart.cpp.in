@@ -252,11 +252,11 @@ xpcc::lpc::Uart1::read(uint8_t& data)
 		data = rxBuffer.get();
 		rxBuffer.pop();
 		// if the hardware buffer has been used, copy all into rxBuffer
-		while(LPC_UART->LSR & LSR_RDR and not rxBuffer.isFull())
+		while(LPC_UART->LSR & LSR_RDR and rxBuffer.isNotFull())
 		{
 			rxBuffer.push(LPC_UART->RBR);
 		}
-		if (not rxBuffer.isFull())
+		if (rxBuffer.isNotFull())
 		{
 			atomic::Lock lock;
 			LPC_UART->IER |= IER_RBRIE;

@@ -629,7 +629,7 @@ xpcc::stm32::I2cMaster{{ id }}::start(I2cTransaction *transaction, Configuration
 {
 	xpcc::atomic::Lock lock;
 	// if we have a place in the queue and the transaction object is valid
-	if (!queue.isFull() && transaction)
+	if (queue.isNotFull() && transaction)
 	{
 		// if the transaction object wants to attach to the queue
 		if (transaction->attaching())

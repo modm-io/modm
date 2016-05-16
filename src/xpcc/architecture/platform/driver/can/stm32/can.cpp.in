@@ -402,7 +402,7 @@ bool
 xpcc::stm32::Can{{ id }}::isReadyToSend()
 {
 %% if parameters.tx_buffer > 0
-	return !txQueue.isFull();
+	return txQueue.isNotFull();
 %% else
 	return (({{ reg }}->TSR & (CAN_TSR_TME0 | CAN_TSR_TME1 | CAN_TSR_TME2)) != 0);
 %% endif

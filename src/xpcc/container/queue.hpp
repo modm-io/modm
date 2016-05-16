@@ -59,25 +59,31 @@ namespace xpcc
 		
 	public:
 		inline bool
-		isEmpty()
+		isEmpty() const
 		{
 			return c.isEmpty();
 		}
 		
 		inline bool
-		isFull()
+		isFull() const
 		{
 			return c.isFull();
 		}
+
+		inline bool
+		isNotFull() const
+		{
+			return not isFull();
+		}
 		
 		inline Size
-		getSize()
+		getSize() const
 		{
 			return c.getSize();
 		}
 		
 		inline Size
-		getMaxSize()
+		getMaxSize() const
 		{
 			return c.getMaxSize();
 		}

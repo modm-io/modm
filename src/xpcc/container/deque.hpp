@@ -87,6 +87,9 @@ namespace xpcc
 		
 		inline bool
 		isFull() const;
+
+		inline bool
+		isNotFull() const { return not isFull(); };
 		
 		inline Size
 		getSize() const;

@@ -196,7 +196,7 @@ xpcc::lpc::Can::CAN_rx(uint8_t msg_obj_num)
 {
 	// Move received message to queue if possible
 
-	if (!rxQueue.isFull()) {
+	if (rxQueue.isNotFull()) {
 		xpcc::can::Message message;
 		readMessageObject(message, msg_obj_num);
 		if (!rxQueue.push(message)) {
@@ -307,7 +307,7 @@ xpcc::lpc::Can::getMessage(can::Message & message)
 		// Happens if an interrupt was missed or the rxQueue got full
 		// temporarily and messages were stored in the hardware FIFO
 		// See Rx Interrupt for further explanation.
-		while ((!rxQueue.isFull()) && (LPC_CAN->ND1 & 0xffff)) {
+		while ((rxQueue.isNotFull()) && (LPC_CAN->ND1 & 0xffff)) {
 			uint8_t messageObjectId = ffs(LPC_CAN->ND1 & 0xffff) - 1;
 			xpcc::can::Message newMessage;
 			readMessageObject(newMessage, messageObjectId);
@@ -352,7 +352,7 @@ bool
 xpcc::lpc::Can::isReadyToSend()
 {
 #if LPC11C_CAN_TX_BUFFER_SIZE > 0
-	return !txQueue.isFull();
+	return txQueue.isNotFull();
 #else
 	/* Check if at least one Message Object 17 to 32
 	 * is not pending. If not all are pending at least

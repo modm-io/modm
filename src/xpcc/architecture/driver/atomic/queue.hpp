@@ -67,6 +67,9 @@ namespace xpcc
 			ALWAYS_INLINE bool
 			isFull() const;
 			
+			ALWAYS_INLINE bool
+			isNotFull() const { return not isFull(); }
+
 			/**
 			 * \returns	\c false if less than three elements
 			 * 			can be stored in queue.
