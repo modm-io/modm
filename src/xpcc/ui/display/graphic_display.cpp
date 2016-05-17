@@ -80,7 +80,7 @@ xpcc::GraphicDisplay::drawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2)
 		if (y1 > y2) {
 			xpcc::swap(y1, y2);
 		}
-		this->drawVerticalLine(glcd::Point(x1, y1), y2 - y1);
+		this->drawVerticalLine(glcd::Point(x1, y1), y2 - y1 + 1);
 	}
 	else if (y1 == y2)
 	{
@@ -88,7 +88,7 @@ xpcc::GraphicDisplay::drawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2)
 		if (x1 > x2) {
 			xpcc::swap(x1, x2);
 		}
-		this->drawHorizontalLine(glcd::Point(x1, y1), x2 - x1);
+		this->drawHorizontalLine(glcd::Point(x1, y1), x2 - x1 + 1);
 	}
 	else
 	{
@@ -137,7 +137,7 @@ xpcc::GraphicDisplay::drawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2)
 void
 xpcc::GraphicDisplay::drawHorizontalLine(glcd::Point start, uint16_t length)
 {
-	for (int_fast16_t i = start.getX(); i <= static_cast<int16_t>(start.getX() + length); ++i) {
+	for (int_fast16_t i = start.getX(); i < static_cast<int16_t>(start.getX() + length); ++i) {
 		(this->*draw)(i, start.getY());
 	}
 }
@@ -145,7 +145,7 @@ xpcc::GraphicDisplay::drawHorizontalLine(glcd::Point start, uint16_t length)
 void
 xpcc::GraphicDisplay::drawVerticalLine(glcd::Point start, uint16_t length)
 {
-	for (int_fast16_t i = start.getY(); i <= static_cast<int16_t>(start.getY() + length); ++i) {
+	for (int_fast16_t i = start.getY(); i < static_cast<int16_t>(start.getY() + length); ++i) {
 		(this->*draw)(start.getX(), i);
 	}
 }

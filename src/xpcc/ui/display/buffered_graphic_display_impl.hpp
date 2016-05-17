@@ -59,7 +59,7 @@ xpcc::BufferedGraphicDisplay<Width, Height>::drawHorizontalLine(
 	if (this->foregroundColor == glcd::Color::black())
 	{
 		const uint8_t mask = 1 << (start.getY() & 0x07);
-		for (uint_fast16_t x = start.getX(); x <= static_cast<uint16_t>(start.getX() + length); ++x) {
+		for (uint_fast16_t x = start.getX(); x < static_cast<uint16_t>(start.getX() + length); ++x) {
 			if( x < Width && y < Height ) {
 				this->buffer[x][y] |= mask;
 			}
@@ -67,7 +67,7 @@ xpcc::BufferedGraphicDisplay<Width, Height>::drawHorizontalLine(
 	}
 	else {
 		const uint8_t mask = ~(1 << (start.getY() & 0x07));
-		for (uint_fast16_t x = start.getX(); x <= static_cast<uint16_t>(start.getX() + length); ++x) {
+		for (uint_fast16_t x = start.getX(); x < static_cast<uint16_t>(start.getX() + length); ++x) {
 			if( x < Width && y < Height ) {
 				this->buffer[x][y] &= mask;
 			}
