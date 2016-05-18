@@ -64,6 +64,7 @@ Here is a list of supported **and tested** microcontrollers and development boar
 | STM32F103  | [STM32F103 Nucleo][]    | &#9733;&#9733;&#9733;&#9733;        |
 | STM32F303  | [STM32F3 Discovery][]   | &#9733;&#9733;&#9733;&#9733;&#9733; |
 | STM32F407  | [STM32F4 Discovery][]   | &#9733;&#9733;&#9733;&#9733;&#9733; |
+| STM32F411  | [STM32F411 Nucleo][]    | &#9733;&#9733;&#9733;&#9733;        |
 | STM32F429  | [STM32F429 Discovery][] | &#9733;&#9733;&#9733;&#9733;&#9733; |
 | STM32F469  | [STM32F469 Discovery][] | &#9733;&#9733;&#9733;&#9733;        |
 | STM32F746  | [STM32F7 Discovery][]   | &#9733;&#9733;&#9733;&#9733;        |
@@ -218,6 +219,7 @@ Daniel Krebs ([@daniel-k](https://github.com/daniel-k)),
 [STM32F103 Nucleo]: http://www.st.com/web/catalog/tools/FM116/SC959/SS1532/LN1847/PF259875
 [STM32F3 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF254044
 [STM32F4 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF252419
+[STM32F411 Nucleo]: http://www.st.com/web/catalog/tools/FM116/SC959/SS1532/LN1847/PF260320
 [STM32F429 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF259090
 [STM32F469 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF262395
 [STM32F7 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF261641
