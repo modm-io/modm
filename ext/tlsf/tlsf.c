@@ -28,7 +28,8 @@
 ** since xpcc does not use newlib's printf.
 */
 #define tlsf_assert (void)
-#define printf(...) {}
+static void silent_printf(char* fmt, ...) { (void)fmt; }
+#define printf silent_printf
 
 
 #if defined(__cplusplus)
@@ -1271,3 +1272,6 @@ void* tlsf_realloc(tlsf_t tlsf, void* ptr, size_t size)
 
 	return p;
 }
+
+#undef tlsf_assert
+#undef printf
