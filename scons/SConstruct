@@ -54,6 +54,7 @@ program = env.Program(target = env['XPCC_PROJECT_NAME'], source = files.sources)
 env.Alias('size', env.Size(program))
 env.Alias('symbols', env.Symbols(program))
 env.Alias('defines', env.ShowDefines())
+env.Alias('qtcreator', env.QtCreatorProject(files))
 
 if env.CheckArchitecture('hosted'):
     env.Alias('build', program)
