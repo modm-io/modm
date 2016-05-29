@@ -288,7 +288,152 @@ using Register32 = Register<uint32_t>;	///< Register class with 32-bit wide unde
  * Class for operating on a register.
  *
  * This class extends the Register base class by adding constructor
- * and bitwise operation overloading and convenience functions between
+ * and bitwise operation overloading between
+ * a strongly-typed enum and itself.
+ * It is the common base class for Flags, Configurations and Values!
+ *
+ * @tparam	Enum	a strongly-typed enum containing the bit masks
+ * @tparam	T		the underlying integer type to be for internal representation
+ *
+ * @see Flags
+ *
+ * @ingroup	register
+ * @author	Niklas Hauser
+ */
+template < typename Enum, typename T >
+struct FlagsOperators : public ::xpcc::Register<T>
+{
+	/// @cond
+	typedef T UnderlyingType;
+	using Register<T>::value;
+	/// @endcond
+
+	typedef Enum EnumType;	///< The enum type
+
+	// MARK: Constructors and assignments
+
+	/// @{
+
+	/// default constructor initializes `value` to zero
+	constexpr FlagsOperators() {}
+
+	/// constructs itself out of a strongly-typed enum
+	constexpr FlagsOperators(Enum flag) :
+		Register<T>(T(flag)) {}
+
+	/// When explicitly called, this class constructs itself out of the underlying type
+	explicit constexpr FlagsOperators(UnderlyingType flag) :
+		Register<T>(flag) {}
+
+	/// When explicitly called, this class constructs itself out of the superclass
+	explicit constexpr FlagsOperators(Register<T> const &o) :
+		Register<T>(o.value) {}
+
+	constexpr FlagsOperators(FlagsOperators const &o) = default;	///< Copy constructor
+	constexpr FlagsOperators(FlagsOperators &&o) = default;		///< Move constructor
+	/// @}
+
+	/// @{
+	FlagsOperators& operator=(FlagsOperators const &o) = default;	///< Copy assignment
+	FlagsOperators& operator=(FlagsOperators &&o) = default;		///< Move assignment
+	/// @}
+
+	static constexpr FlagsOperators mask()	/// returns the mask of the integer type
+	{ return FlagsOperators(T(-1)); }
+
+	// flags binary operations
+	/// bitwise negation
+	constexpr FlagsOperators operator~() const { return FlagsOperators(~value); }
+
+	/// @{
+
+	/// bitwise **AND** with multiple bits
+	constexpr FlagsOperators operator&(FlagsOperators const &o) const { return FlagsOperators(value & o.value); }
+	/// bitwise **OR** with multiple bits
+	constexpr FlagsOperators operator|(FlagsOperators const &o) const { return FlagsOperators(value | o.value); }
+	/// bitwise **XOR** with multiple bits
+	constexpr FlagsOperators operator^(FlagsOperators const &o) const { return FlagsOperators(value ^ o.value); }
+	/// @}
+
+	/// @{
+
+	/// bitwise **AND** with multiple bits
+	FlagsOperators& operator&=(FlagsOperators const &o) {  return (value &= o.value, *this); }
+	/// bitwise **OR** with multiple bits
+	FlagsOperators& operator|=(FlagsOperators const &o) { return (value |= o.value, *this); }
+	/// bitwise **XOR** with multiple bits
+	FlagsOperators& operator^=(FlagsOperators const &o) { return (value ^= o.value, *this); }
+	/// @}
+
+	/// @{
+
+	/// bitwise **AND** with a single bit
+	FlagsOperators& operator&=(Enum const &flag) { return operator&=(FlagsOperators(flag)); }
+	/// bitwise **OR** with a single bit
+	FlagsOperators& operator|=(Enum const &flag) { return operator|=(FlagsOperators(flag)); }
+	/// bitwise **XOR** with a single bit
+	FlagsOperators& operator^=(Enum const &flag) { return operator^=(FlagsOperators(flag)); }
+	/// @}
+
+	/// @{
+
+	/// bitwise **AND** with a single bit
+	friend constexpr FlagsOperators operator&(Enum const &a, FlagsOperators const &b) { return b & a; }
+	/// bitwise **OR** with a single bit
+	friend constexpr FlagsOperators operator|(Enum const &a, FlagsOperators const &b) { return b | a; }
+	/// bitwise **XOR** with a single bit
+	friend constexpr FlagsOperators operator^(Enum const &a, FlagsOperators const &b) { return b ^ a; }
+	/// @}
+
+#ifndef __DOXYGEN__
+	constexpr FlagsOperators operator&(Enum const &flag) const { return operator&(FlagsOperators(flag)); }
+	constexpr FlagsOperators operator|(Enum const &flag) const { return operator|(FlagsOperators(flag)); }
+	constexpr FlagsOperators operator^(Enum const &flag) const { return operator^(FlagsOperators(flag)); }
+
+	constexpr bool operator==(Enum const &flag) const { return value == T(flag); }
+	constexpr bool operator!=(Enum const &flag) const { return value != T(flag); }
+
+	friend constexpr bool operator==(Enum const &a, FlagsOperators const &b) { return b == a; }
+	friend constexpr bool operator!=(Enum const &a, FlagsOperators const &b) { return b != a; }
+
+	constexpr bool operator==(FlagsOperators const &o) const { return value == o.value; }
+	constexpr bool operator!=(FlagsOperators const &o) const { return value != o.value; }
+#else
+	/// @{
+
+	/// bitwise **AND** with a single bit
+	friend constexpr FlagsOperators operator&(FlagsOperators const &a, Enum const &b);
+	/// bitwise **OR** with a single bit
+	friend constexpr FlagsOperators operator|(FlagsOperators const &a, Enum const &b);
+	/// bitwise **XOR** with a single bit
+	friend constexpr FlagsOperators operator^(FlagsOperators const &a, Enum const &b);
+	/// @}
+
+	/// @{
+
+	/// bitwise **AND** with a single bit
+	friend constexpr FlagsOperators operator&(Enum const &a, Enum const &b);
+	/// bitwise **OR** with a single bit
+	friend constexpr FlagsOperators operator|(Enum const &a, Enum const &b);
+	/// bitwise **XOR** with a single bit
+	friend constexpr FlagsOperators operator^(Enum const &a, Enum const &b);
+	/// @}
+
+	/// Compares if two flags are equal
+	/// @{
+	friend constexpr bool operator==(FlagsOperators const &a, Enum const &b);
+	friend constexpr bool operator!=(FlagsOperators const &a, Enum const &b);
+	friend constexpr bool operator==(Enum const &a, FlagsOperators const &b);
+	friend constexpr bool operator!=(Enum const &a, FlagsOperators const &b);
+	/// @}
+#endif
+} ATTRIBUTE_PACKED;
+
+/**
+ * Class for operating on a register.
+ *
+ * This class extends the FlagsOperators base class by adding constructor
+ * overloading and convenience functions between
  * a strongly-typed enum and itself.
  *
  * This class makes heavy use of `constexpr`, so that as many values
@@ -321,11 +466,11 @@ using Register32 = Register<uint32_t>;	///< Register class with 32-bit wide unde
  * @author	Niklas Hauser
  */
 template < typename Enum, typename T >
-struct Flags : public ::xpcc::Register<T>
+struct Flags : public ::xpcc::FlagsOperators<Enum, T>
 {
 	/// @cond
 	typedef T UnderlyingType;
-	using Register<T>::value;
+	using FlagsOperators<Enum, T>::value;
 	/// @endcond
 
 	typedef Enum EnumType;	///< The enum type
@@ -339,15 +484,18 @@ struct Flags : public ::xpcc::Register<T>
 
 	/// constructs itself out of a strongly-typed enum
 	constexpr Flags(Enum flag) :
-		Register<T>(T(flag)) {}
+		FlagsOperators<Enum, T>(flag) {}
+
+	constexpr Flags(FlagsOperators<Enum, T> const &flag) :
+		FlagsOperators<Enum, T>(flag) {}
 
 	/// When explicitly called, this class constructs itself out of the underlying type
 	explicit constexpr Flags(UnderlyingType flag) :
-		Register<T>(flag) {}
+		FlagsOperators<Enum, T>(flag) {}
 
 	/// When explicitly called, this class constructs itself out of the superclass
 	explicit constexpr Flags(Register<T> const &o) :
-		Register<T>(o.value) {}
+		FlagsOperators<Enum, T>(o) {}
 
 	constexpr Flags(Flags const &o) = default;	///< Copy constructor
 	constexpr Flags(Flags &&o) = default;		///< Move constructor
@@ -357,9 +505,6 @@ struct Flags : public ::xpcc::Register<T>
 	Flags& operator=(Flags const &o) = default;	///< Copy assignment
 	Flags& operator=(Flags &&o) = default;		///< Move assignment
 	/// @}
-
-	static constexpr Flags mask()	/// returns the mask of the integer type
-	{ return Flags(T(-1)); }
 
 	/// @{
 	// MARK: convenience methods
@@ -423,93 +568,6 @@ struct Flags : public ::xpcc::Register<T>
 	constexpr bool none(Flags const &o) const
 	{ return (*this & o).value == 0; }
 	/// @}
-
-	// flags binary operations
-	/// bitwise negation
-	constexpr Flags operator~() const { return Flags(~value); }
-
-	/// @{
-
-	/// bitwise **AND** with multiple bits
-	constexpr Flags operator&(Flags const &o) const { return Flags(value & o.value); }
-	/// bitwise **OR** with multiple bits
-	constexpr Flags operator|(Flags const &o) const { return Flags(value | o.value); }
-	/// bitwise **XOR** with multiple bits
-	constexpr Flags operator^(Flags const &o) const { return Flags(value ^ o.value); }
-	/// @}
-
-	/// @{
-
-	/// bitwise **AND** with multiple bits
-	Flags& operator&=(Flags const &o) {  return (value &= o.value, *this); }
-	/// bitwise **OR** with multiple bits
-	Flags& operator|=(Flags const &o) { return (value |= o.value, *this); }
-	/// bitwise **XOR** with multiple bits
-	Flags& operator^=(Flags const &o) { return (value ^= o.value, *this); }
-	/// @}
-
-	/// @{
-
-	/// bitwise **AND** with a single bit
-	Flags& operator&=(Enum const &flag) { return operator&=(Flags(flag)); }
-	/// bitwise **OR** with a single bit
-	Flags& operator|=(Enum const &flag) { return operator|=(Flags(flag)); }
-	/// bitwise **XOR** with a single bit
-	Flags& operator^=(Enum const &flag) { return operator^=(Flags(flag)); }
-	/// @}
-
-	/// @{
-
-	/// bitwise **AND** with a single bit
-	friend constexpr Flags operator&(Enum const &a, Flags const &b) { return b & a; }
-	/// bitwise **OR** with a single bit
-	friend constexpr Flags operator|(Enum const &a, Flags const &b) { return b | a; }
-	/// bitwise **XOR** with a single bit
-	friend constexpr Flags operator^(Enum const &a, Flags const &b) { return b ^ a; }
-	/// @}
-
-#ifndef __DOXYGEN__
-	constexpr Flags operator&(Enum const &flag) const { return operator&(Flags(flag)); }
-	constexpr Flags operator|(Enum const &flag) const { return operator|(Flags(flag)); }
-	constexpr Flags operator^(Enum const &flag) const { return operator^(Flags(flag)); }
-
-	constexpr bool operator==(Enum const &flag) const { return value == T(flag); }
-	constexpr bool operator!=(Enum const &flag) const { return value != T(flag); }
-
-	friend constexpr bool operator==(Enum const &a, Flags const &b) { return b == a; }
-	friend constexpr bool operator!=(Enum const &a, Flags const &b) { return b != a; }
-
-	constexpr bool operator==(Flags const &o) const { return value == o.value; }
-	constexpr bool operator!=(Flags const &o) const { return value != o.value; }
-#else
-	/// @{
-
-	/// bitwise **AND** with a single bit
-	friend constexpr Flags operator&(Flags const &a, Enum const &b);
-	/// bitwise **OR** with a single bit
-	friend constexpr Flags operator|(Flags const &a, Enum const &b);
-	/// bitwise **XOR** with a single bit
-	friend constexpr Flags operator^(Flags const &a, Enum const &b);
-	/// @}
-
-	/// @{
-
-	/// bitwise **AND** with a single bit
-	friend constexpr Flags operator&(Enum const &a, Enum const &b);
-	/// bitwise **OR** with a single bit
-	friend constexpr Flags operator|(Enum const &a, Enum const &b);
-	/// bitwise **XOR** with a single bit
-	friend constexpr Flags operator^(Enum const &a, Enum const &b);
-	/// @}
-
-	/// Compares if two flags are equal
-	/// @{
-	friend constexpr bool operator==(Flags const &a, Enum const &b);
-	friend constexpr bool operator!=(Flags const &a, Enum const &b);
-	friend constexpr bool operator==(Enum const &a, Flags const &b);
-	friend constexpr bool operator!=(Enum const &a, Flags const &b);
-	/// @}
-#endif
 } ATTRIBUTE_PACKED;
 
 /// @ingroup	register
@@ -680,19 +738,20 @@ struct FlagsGroup<T> : public Register<typename T::UnderlyingType>
  * @author	Niklas Hauser
  */
 template < typename Parent, typename Enum, typename Parent::UnderlyingType Mask, typename Parent::UnderlyingType Position = 0 >
-struct Configuration : public ::xpcc::Register<typename Parent::UnderlyingType>
+struct Configuration : public ::xpcc::FlagsOperators<typename Parent::EnumType, typename Parent::UnderlyingType>
 {
 private:
 	typedef typename Parent::UnderlyingType UnderlyingType;
 	typedef UnderlyingType UType;	// lazy
+	typedef typename Parent::EnumType EType;	// lazy
 
 public:
 	/// explicit constructor for the underlying type
 	explicit constexpr Configuration(UnderlyingType config) :
-		Register<UType>(config << Position) {}
+		FlagsOperators<EType, UType>(config << Position) {}
 	/// explicit constructor for the enum type
 	explicit constexpr Configuration(Enum config) :
-		Register<UType>(UType(config) << Position) {}
+		FlagsOperators<EType, UType>(UType(config) << Position) {}
 
 	/// copy constructor
 	constexpr Configuration(Configuration const &o) = default;
@@ -720,7 +779,7 @@ public:
 
 	/// @cond
 	constexpr operator Parent() const
-	{	return Parent(Register<UType>::value); }
+	{	return Parent(FlagsOperators<EType, UType>::value); }
 	/// @endcond
 } ATTRIBUTE_PACKED;
 
@@ -746,15 +805,18 @@ public:
  * @author	Niklas Hauser
  */
 template < typename Parent, typename Parent::UnderlyingType Width, typename Parent::UnderlyingType Position = 0 >
-struct Value : public ::xpcc::Register<typename Parent::UnderlyingType>
+struct Value : public ::xpcc::FlagsOperators<typename Parent::EnumType, typename Parent::UnderlyingType>
 {
 private:
-	typedef typename Parent::UnderlyingType PType;
-	static constexpr PType Mask = ((1 << Width) - 1) << Position;
+	typedef typename Parent::UnderlyingType UnderlyingType;
+	typedef UnderlyingType UType;	// lazy
+	typedef typename Parent::EnumType EType;	// lazy
+
+	static constexpr UType Mask = ((1 << Width) - 1) << Position;
 public:
 	/// explicit constructor for the underlying type
-	explicit constexpr Value(typename Parent::UnderlyingType config) :
-		Register<PType>((config << Position) & Mask) {}
+	explicit constexpr Value(UnderlyingType config) :
+		FlagsOperators<EType, UType>((config << Position) & Mask) {}
 
 	/// copy constructor
 	constexpr Value(Value const &o) = default;
@@ -764,7 +826,7 @@ public:
 	/// @{
 
 	/// clears and sets a new value in a Flags register
-	static inline void set(Parent &parent, typename Parent::UnderlyingType config)
+	static inline void set(Parent &parent, UnderlyingType config)
 	{	parent.value = (parent.value & ~Mask) | ((config << Position) & Mask); }
 
 	/// clears the value in a Flags register
@@ -772,7 +834,7 @@ public:
 	{	parent.value &= ~Mask; }
 
 	/// returns the value from a Flags register
-	static constexpr PType get(Parent const &parent)
+	static constexpr UType get(Parent const &parent)
 	{	return (parent.value & Mask) >> Position; }
 	/// @}
 
@@ -782,7 +844,7 @@ public:
 
 	/// @cond
 	constexpr operator Parent() const
-	{	return Parent(Register<PType>::value); }
+	{	return Parent(FlagsOperators<EType, UType>::value); }
 	/// @endcond
 } ATTRIBUTE_PACKED;
 
