@@ -268,6 +268,12 @@ RegisterTest::testConfigurations()
 	v1 = Test3::Bit | Config0(Config::Two);
 	TEST_ASSERT_EQUALS(v1.value, (xpcc::Bit4 | 0b10));
 
+	v1 = Config0(Config::Two) | Test3::Bit;
+	TEST_ASSERT_EQUALS(v1.value, (xpcc::Bit4 | 0b10));
+
+	v1 = Config2(Config::Three) | Config0(Config::Two);
+	TEST_ASSERT_EQUALS(v1.value, ((0b11 << 2) | 0b10));
+
 	v1 = Test3::Bit | Config2(Config::Three) | Config0(Config::Two);
 	TEST_ASSERT_EQUALS(v1.value, (xpcc::Bit4 | (0b11 << 2) | 0b10));
 
@@ -295,6 +301,12 @@ void
 RegisterTest::testValue()
 {
 	Test3_t v1 = Test3::Bit | Config0(Config::Two) | Address(6);
+	TEST_ASSERT_EQUALS(v1.value, (xpcc::Bit4 | 0b10 | (6 << 5)));
+
+	v1 = Config0(Config::Two) | Address(6) | Test3::Bit;
+	TEST_ASSERT_EQUALS(v1.value, (xpcc::Bit4 | 0b10 | (6 << 5)));
+
+	v1 = Address(6) | Config0(Config::Two) | Test3::Bit;
 	TEST_ASSERT_EQUALS(v1.value, (xpcc::Bit4 | 0b10 | (6 << 5)));
 
 	Address::reset(v1);
