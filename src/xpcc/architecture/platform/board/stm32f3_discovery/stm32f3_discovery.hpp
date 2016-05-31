@@ -26,9 +26,96 @@ using namespace xpcc::stm32;
 namespace Board
 {
 
-/// STM32F3 running at 72MHz generated from the external 8MHz clock
+/* SystemClock generator is only available for selected STM32F4 devices.
+ * The idea is that it is generated automatically for you like the rest of the
+ * HAL, however, xpcc does not have this capability yet. See PR #36.
+ */
+// using systemClock = SystemClock<Pll<ExternalClock<MHz8>, MHz72> >;
+
+// Instead this manual implementation of the system clock is used:
+/// STM32F303 running at 72MHz generated from the external 8MHz clock
 /// supplied by the on-board st-link
-using systemClock = SystemClock<Pll<ExternalClock<MHz8>, MHz72> >;
+struct systemClock {
+	static constexpr uint32_t Frequency = 72 * MHz1;
+	static constexpr uint32_t Ahb = Frequency;
+	static constexpr uint32_t Apb1 = Frequency / 2;
+	static constexpr uint32_t Apb2 = Frequency;
+
+	static constexpr uint32_t Adc1   = Apb2;
+	static constexpr uint32_t Adc2   = Apb2;
+	static constexpr uint32_t Adc3   = Apb2;
+	static constexpr uint32_t Adc4   = Apb2;
+
+	static constexpr uint32_t Can1   = Apb1;
+	static constexpr uint32_t Can2   = Apb1;
+
+	static constexpr uint32_t Spi1   = Apb2;
+	static constexpr uint32_t Spi2   = Apb1;
+	static constexpr uint32_t Spi3   = Apb1;
+	static constexpr uint32_t Spi4   = Apb2;
+	static constexpr uint32_t Spi5   = Apb2;
+	static constexpr uint32_t Spi6   = Apb2;
+
+	static constexpr uint32_t Usart1 = Apb2;
+	static constexpr uint32_t Usart2 = Apb1;
+	static constexpr uint32_t Usart3 = Apb1;
+	static constexpr uint32_t Uart4  = Apb1;
+	static constexpr uint32_t Uart5  = Apb1;
+	static constexpr uint32_t Usart6 = Apb2;
+	static constexpr uint32_t Uart7  = Apb1;
+	static constexpr uint32_t Uart8  = Apb1;
+
+	static constexpr uint32_t I2c1   = Apb1;
+	static constexpr uint32_t I2c2   = Apb1;
+	static constexpr uint32_t I2c3   = Apb1;
+
+	static constexpr uint32_t Apb1Timer = Apb1 * 2;
+	static constexpr uint32_t Apb2Timer = Apb2 * 1;
+	static constexpr uint32_t Timer1  = Apb2Timer;
+	static constexpr uint32_t Timer2  = Apb1Timer;
+	static constexpr uint32_t Timer3  = Apb1Timer;
+	static constexpr uint32_t Timer4  = Apb1Timer;
+	static constexpr uint32_t Timer5  = Apb1Timer;
+	static constexpr uint32_t Timer6  = Apb1Timer;
+	static constexpr uint32_t Timer7  = Apb1Timer;
+	static constexpr uint32_t Timer8  = Apb2Timer;
+	static constexpr uint32_t Timer9  = Apb2Timer;
+	static constexpr uint32_t Timer10 = Apb2Timer;
+	static constexpr uint32_t Timer11 = Apb2Timer;
+	static constexpr uint32_t Timer12 = Apb1Timer;
+	static constexpr uint32_t Timer13 = Apb1Timer;
+	static constexpr uint32_t Timer14 = Apb1Timer;
+	static constexpr uint32_t Timer15 = Apb2Timer;
+	static constexpr uint32_t Timer16 = Apb2Timer;
+	static constexpr uint32_t Timer17 = Apb2Timer;
+
+	static bool inline
+	enable()
+	{
+		ClockControl::enableExternalClock();	// 8MHz
+		ClockControl::enablePll(
+			ClockControl::PllSource::ExternalClock,
+			ClockControl::UsbPrescaler::Div1_5,
+			9,
+			1
+		);
+		// set flash latency for 72MHz
+		ClockControl::setFlashLatency(Frequency);
+		// switch system clock to PLL output
+		ClockControl::enableSystemClock(ClockControl::SystemClockSource::Pll);
+		ClockControl::setAhbPrescaler(ClockControl::AhbPrescaler::Div1);
+		// APB1 has max. 36MHz
+		ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div2);
+		ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div1);
+		// update frequencies for busy-wait delay functions
+		xpcc::clock::fcpu     = Frequency;
+		xpcc::clock::fcpu_kHz = Frequency / 1000;
+		xpcc::clock::fcpu_MHz = Frequency / 1000000;
+		xpcc::clock::ns_per_loop = ::round(3000 / (Frequency / 1000000));
+
+		return true;
+	}
+};
 
 
 using Button = GpioInputA0;
