@@ -63,6 +63,7 @@ Here is a list of supported **and tested** microcontrollers and development boar
 | STM32F100  | [STM32F1 Discovery][]   | &#9733;&#9733;&#9733;&#9733;        |
 | STM32F103  | [Nucleo F103RB][]       | &#9733;&#9733;&#9733;&#9733;        |
 | STM32F303  | [STM32F3 Discovery][]   | &#9733;&#9733;&#9733;&#9733;&#9733; |
+| STM32F303  | [Nucleo F303K8][]       | &#9733;&#9733;&#9733;&#9733;        |
 | STM32F407  | [STM32F4 Discovery][]   | &#9733;&#9733;&#9733;&#9733;&#9733; |
 | STM32F411  | [Nucleo F411RE][]       | &#9733;&#9733;&#9733;&#9733;        |
 | STM32F429  | [STM32F429 Discovery][] | &#9733;&#9733;&#9733;&#9733;&#9733; |
@@ -219,6 +220,7 @@ Daniel Krebs ([@daniel-k](https://github.com/daniel-k)),
 [STM32F1 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF250863
 [Nucleo F103RB]: http://www.st.com/web/catalog/tools/FM116/SC959/SS1532/LN1847/PF259875
 [STM32F3 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF254044
+[Nucleo F303K8]: http://www.st.com/en/evaluation-tools/nucleo-f303k8.html
 [STM32F4 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF252419
 [Nucleo F411RE]: http://www.st.com/web/catalog/tools/FM116/SC959/SS1532/LN1847/PF260320
 [STM32F429 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF259090
