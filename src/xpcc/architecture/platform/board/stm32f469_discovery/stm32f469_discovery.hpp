@@ -25,10 +25,104 @@ using namespace xpcc::stm32;
 namespace Board
 {
 
-/// STM32F469 running at 168MHz (USB Clock qt 48MHz) generated from the
-/// external on-board 8MHz crystal
-using systemClock = SystemClock<Pll<ExternalCrystal<MHz8>, MHz168, MHz48> >;
+/// STM32F469 running at 180MHz from the external 8MHz crystal
+struct systemClock
+{
+	static constexpr uint32_t Frequency = MHz180;
+	static constexpr uint32_t Apb1 = Frequency / 4;
+	static constexpr uint32_t Apb2 = Frequency / 2;
 
+	static constexpr uint32_t Adc = Apb2;
+
+	static constexpr uint32_t Spi1 = Apb2;
+	static constexpr uint32_t Spi2 = Apb1;
+	static constexpr uint32_t Spi3 = Apb1;
+	static constexpr uint32_t Spi4 = Apb2;
+	static constexpr uint32_t Spi5 = Apb2;
+	static constexpr uint32_t Spi6 = Apb2;
+
+	static constexpr uint32_t Usart1 = Apb2;
+	static constexpr uint32_t Usart2 = Apb1;
+	static constexpr uint32_t Usart3 = Apb1;
+	static constexpr uint32_t Uart4  = Apb1;
+	static constexpr uint32_t Uart5  = Apb1;
+	static constexpr uint32_t Usart6 = Apb2;
+	static constexpr uint32_t Uart7  = Apb1;
+	static constexpr uint32_t Uart8  = Apb1;
+
+	static constexpr uint32_t Can1 = Apb1;
+	static constexpr uint32_t Can2 = Apb1;
+
+	static constexpr uint32_t I2c1 = Apb1;
+	static constexpr uint32_t I2c2 = Apb1;
+	static constexpr uint32_t I2c3 = Apb1;
+	static constexpr uint32_t I2c4 = Apb1;
+
+	static constexpr uint32_t Apb1Timer = Apb1 * 2;
+	static constexpr uint32_t Apb2Timer = Apb2 * 2;
+	static constexpr uint32_t Timer1  = Apb2Timer;
+	static constexpr uint32_t Timer2  = Apb1Timer;
+	static constexpr uint32_t Timer3  = Apb1Timer;
+	static constexpr uint32_t Timer4  = Apb1Timer;
+	static constexpr uint32_t Timer5  = Apb1Timer;
+	static constexpr uint32_t Timer6  = Apb1Timer;
+	static constexpr uint32_t Timer7  = Apb1Timer;
+	static constexpr uint32_t Timer8  = Apb2Timer;
+	static constexpr uint32_t Timer10 = Apb2Timer;
+	static constexpr uint32_t Timer11 = Apb2Timer;
+	static constexpr uint32_t Timer12 = Apb1Timer;
+	static constexpr uint32_t Timer13 = Apb1Timer;
+	static constexpr uint32_t Timer14 = Apb1Timer;
+
+	static bool inline
+	enable()
+	{
+		ClockControl::enableExternalCrystal(); // 8 MHz
+		ClockControl::enablePll(
+		ClockControl::PllSource::ExternalCrystal,
+			4,      // 8MHz / N=4 -> 2MHz
+			180,    // 2MHz * M=180 -> 360MHz
+			2,      // 360MHz / P=2 -> 180MHz = F_cpu
+			7       // 360MHz / Q=7 -> ~51MHz = F_usb => bad for USB
+		);
+		ClockControl::setFlashLatency(Frequency);
+		ClockControl::enableSystemClock(ClockControl::SystemClockSource::Pll);
+		ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div4);
+		ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div2);
+		// update clock frequencies
+		xpcc::clock::fcpu     = Frequency;
+		xpcc::clock::fcpu_kHz = Frequency / 1000;
+		xpcc::clock::fcpu_MHz = Frequency / 1000000;
+		xpcc::clock::ns_per_loop = ::round(3000 / (Frequency / 1000000));
+
+		return true;
+	}
+};
+
+// Arduino Footprint
+using A0 = GpioB1;
+using A1 = GpioC2;
+using A2 = GpioC3;
+using A3 = GpioC4;
+using A4 = GpioC5;
+using A5 = GpioA4;
+
+using D0  = GpioG9;
+using D1  = GpioG14;
+using D2  = GpioG13;
+using D3  = GpioA1;
+using D4  = GpioG12;
+using D5  = GpioA2;
+using D6  = GpioA6;
+using D7  = GpioG11;
+using D8  = GpioG10;
+using D9  = GpioA7;
+using D10 = GpioH6;
+using D11 = GpioB15;
+using D12 = GpioB14;
+using D13 = GpioD3;
+using D14 = GpioB9;
+using D15 = GpioB8;
 
 using Button = GpioInputA0;
 
@@ -36,6 +130,7 @@ using LedGreen  = xpcc::GpioInverted<GpioOutputG6>;		// LED1 [Green]
 using LedOrange = xpcc::GpioInverted<GpioOutputD4>;		// LED2 [Orange]
 using LedRed    = xpcc::GpioInverted<GpioOutputD5>;		// LED3 [Red]
 using LedBlue   = xpcc::GpioInverted<GpioOutputK3>;		// LED4 [Blue]
+using LedUsb    = xpcc::GpioInverted<GpioOutputB7>;		// LED5 [Red] USB Overcurrent
 using LedD13    = GpioOutputD3;							// LED7 [Green]
 
 using Leds = xpcc::SoftwareGpioPort< LedBlue, LedRed, LedOrange, LedGreen >;
