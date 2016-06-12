@@ -62,6 +62,7 @@ env:
  - TEST_SUITE="check=examples examples=stm32f469_discovery"
  - TEST_SUITE="check=examples examples=nucleo_f103rb"
  - TEST_SUITE="check=examples examples=nucleo_f411re"
+ - TEST_SUITE="check=examples examples=nucleo_f429zi"
  - TEST_SUITE="check=examples examples=unittest"
 
 script: "scons $TEST_SUITE"
