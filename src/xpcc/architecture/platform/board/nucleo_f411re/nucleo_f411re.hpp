@@ -31,7 +31,7 @@ struct systemClock {
 	static constexpr uint32_t Apb1 = Frequency / 2;
 	static constexpr uint32_t Apb2 = Frequency;
 
-	static constexpr uint32_t Adc1   = Apb2;
+	static constexpr uint32_t Adc    = Apb2;
 
 	static constexpr uint32_t Spi1   = Apb2;
 	static constexpr uint32_t Spi2   = Apb1;
@@ -144,4 +144,4 @@ initialize()
 
 }
 
-#endif	// XPCC_STM32_NUCLEO_F103RB_HPP
+#endif	// XPCC_STM32_NUCLEO_F411RE_HPP
