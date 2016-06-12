@@ -61,12 +61,12 @@ Here is a list of supported **and tested** microcontrollers and development boar
 | ATmega328p | [Arduino Uno][]         | &#9733;&#9733;&#9733;               |
 | STM32F072  | [STM32F072 Discovery][] | &#9733;&#9733;&#9733;&#9733;        |
 | STM32F100  | [STM32F1 Discovery][]   | &#9733;&#9733;&#9733;&#9733;        |
-| STM32F103  | [STM32F103 Nucleo][]    | &#9733;&#9733;&#9733;&#9733;        |
+| STM32F103  | [Nucleo F103RB][]       | &#9733;&#9733;&#9733;&#9733;        |
 | STM32F303  | [STM32F3 Discovery][]   | &#9733;&#9733;&#9733;&#9733;&#9733; |
 | STM32F407  | [STM32F4 Discovery][]   | &#9733;&#9733;&#9733;&#9733;&#9733; |
-| STM32F411  | [STM32F411 Nucleo][]    | &#9733;&#9733;&#9733;&#9733;        |
+| STM32F411  | [Nucleo F411RE][]       | &#9733;&#9733;&#9733;&#9733;        |
 | STM32F429  | [STM32F429 Discovery][] | &#9733;&#9733;&#9733;&#9733;&#9733; |
-| STM32F429  | [STM32F429 Nucleo][]    | &#9733;&#9733;&#9733;&#9733;        |
+| STM32F429  | [Nucleo F429ZI][]       | &#9733;&#9733;&#9733;&#9733;        |
 | STM32F469  | [STM32F469 Discovery][] | &#9733;&#9733;&#9733;&#9733;        |
 | STM32F746  | [STM32F7 Discovery][]   | &#9733;&#9733;&#9733;&#9733;        |
 | LPC11C24   | [LPCxpresso][]          | &#9733;&#9733;                      |
@@ -217,12 +217,12 @@ Daniel Krebs ([@daniel-k](https://github.com/daniel-k)),
 [Arduino Uno]: https://www.arduino.cc/en/Main/ArduinoBoardUno
 [STM32F072 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF259724
 [STM32F1 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF250863
-[STM32F103 Nucleo]: http://www.st.com/web/catalog/tools/FM116/SC959/SS1532/LN1847/PF259875
+[Nucleo F103RB]: http://www.st.com/web/catalog/tools/FM116/SC959/SS1532/LN1847/PF259875
 [STM32F3 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF254044
 [STM32F4 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF252419
-[STM32F411 Nucleo]: http://www.st.com/web/catalog/tools/FM116/SC959/SS1532/LN1847/PF260320
+[Nucleo F411RE]: http://www.st.com/web/catalog/tools/FM116/SC959/SS1532/LN1847/PF260320
 [STM32F429 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF259090
-[STM32F429 Nucleo]: http://www.st.com/web/en/catalog/tools/PF262637
+[Nucleo F429ZI]: http://www.st.com/web/en/catalog/tools/PF262637
 [STM32F469 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF262395
 [STM32F7 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF261641
 [LPCxpresso]: https://www.lpcware.com/LPCXpressoV1Boards

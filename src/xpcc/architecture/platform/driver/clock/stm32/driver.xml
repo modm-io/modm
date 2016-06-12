@@ -10,7 +10,8 @@
 		<template device-family="f1|f3|f4">static.hpp.in</template>
 		<static device-family="f1|f3|f4">pll_calculator.hpp</static>
 
-		<usbprescaler device-name="042|048|070|072|078|102|103|302|303|373">True</usbprescaler>
+		<usbprescaler device-name="042|048|070|072|078|102|103|302|373">True</usbprescaler>
+		<usbprescaler device-name="303|358|398" device-size-id="b|c|d|e">True</usbprescaler>
 		<pllprediv device-family="f0|f3">True</pllprediv>
 		<pllprediv device-name="100|105|107">True</pllprediv>
 		<hsi48 device-name="042|048|071|072|078|091|098">True</hsi48>

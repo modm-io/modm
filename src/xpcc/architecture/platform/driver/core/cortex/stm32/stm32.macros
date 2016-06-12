@@ -46,7 +46,7 @@
 %% if target is stm32f3
 	// enable clock
 	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
-%%   if target.name != "373"
+%%   if target.name in ["302"] or (target.name in ["303"] and target.size_id in ["c", "e"])
 	// Remap USB Interrupts
 	SYSCFG->CFGR1 |= SYSCFG_CFGR1_USB_IT_RMP;
 %%   endif
