@@ -84,4 +84,26 @@ constexpr MemoryTraits MemoryDefault = MemoryDMA;
 
 } // namespace xpcc
 
+/** Request object memory with defined traits.
+ * @code
+ *    Foo *p = new (xpcc::MemoryFastData) Foo;
+ * @endcode
+ *
+ * @note Memory traits are ignored on AVRs.
+ * @ingroup memory_traits
+ */
+void *
+operator new(size_t size, xpcc::MemoryTraits traits);
+
+/** Request array memory with defined traits.
+ * @code
+ *    uint32_t *p = new (xpcc::MemoryFastData) uint32_t[200];
+ * @endcode
+ *
+ * @note Memory traits are ignored on AVRs.
+ * @ingroup memory_traits
+ */
+void *
+operator new[](size_t size, xpcc::MemoryTraits traits);
+
 #endif // XPCC_MEMORY_HPP
