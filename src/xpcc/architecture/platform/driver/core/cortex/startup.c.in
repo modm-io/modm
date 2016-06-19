@@ -144,6 +144,10 @@ __libc_init_array(void);
 extern void
 exit(int) __attribute__ ((noreturn, weak));
 
+// default implementation is empty and does nothing
+void xpcc_hook_hardware_init(void) __attribute__(( weak ));
+void xpcc_hook_hardware_init(void) {}
+
 %% if parameters.allocator in ["block_allocator", "tlsf"]
 extern void __xpcc_initialize_memory(void);
 %% endif
@@ -274,6 +278,9 @@ Reset_Handler(void)
 	// Enable GPIO Clock
 	xpcc_gpio_enable();
 %% endif
+
+	// Initialize external memories in this hook
+	xpcc_hook_hardware_init();
 
 %% if parameters.allocator in ["block_allocator", "tlsf"]
 	// initialize xpcc block or TLSF allocator
