@@ -132,6 +132,7 @@ MEMORY
 	%% endif
 %% endfor
 	RAM (rwx) : ORIGIN = {{ ram_origin[0] }}, LENGTH = {{ ram_sizes | sum }}k
+	{{ parameters.linkerscript_memory }}
 }
 
 OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
@@ -402,6 +403,7 @@ SECTIONS
 		PROVIDE (__heap_end = .);
 	} >RAM
 
+	{{ parameters.linkerscript_sections }}
 
 	/* TABLES! TABLES! ALL THE TABLES YOU COULD EVER WANT! TABLES! */
 	.table.zero.intern : ALIGN(4)
@@ -435,12 +437,14 @@ SECTIONS
 	.table.zero.extern : ALIGN(4)
 	{
 		__table_zero_extern_start = .;
+		{{ parameters.linkerscript_table_zero_extern }}
 		__table_zero_extern_end = .;
 	} >FLASH
 
 	.table.copy.extern : ALIGN(4)
 	{
 		__table_copy_extern_start = .;
+		{{ parameters.linkerscript_table_copy_extern }}
 		__table_copy_extern_end = .;
 	} >FLASH
 
