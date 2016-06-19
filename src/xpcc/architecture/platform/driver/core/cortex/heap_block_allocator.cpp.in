@@ -35,13 +35,31 @@ void __xpcc_initialize_memory(void)
 	allocator.initialize(&__heap_start, &__heap_end);
 }
 
-void *malloc(size_t size)
+void *__wrap__malloc_r(struct _reent *r, size_t size)
 {
+	(void) r;
 	return allocator.allocate(size);
 }
 
-void free(void *p)
+void *__wrap__calloc_r(struct _reent *r, size_t size)
 {
+	void *p = __wrap__malloc_r(r, size);
+	if (p) memset(p, 0, size);
+	return p;
+}
+
+void *__wrap__realloc_r(struct _reent *r, void *p, size_t size)
+{
+	(void) r;
+	(void) p;
+	(void) size;
+	// NOT IMPLEMENTED!
+	return NULL;
+}
+
+void __wrap__free_r(struct _reent *r, void *p)
+{
+	(void) r;
 	allocator.free(p);
 }
 

@@ -99,8 +99,9 @@ get_tlsf_for_ptr(void *p)
 %% endif
 }
 
-void *malloc(size_t size)
+void *__wrap__malloc_r(struct _reent *r, size_t size)
 {
+	(void) r;
 	void* p = tlsf_malloc(tlsf_heap123, size);
 %% if heap0_available
 	if (p) return p;
@@ -110,15 +111,24 @@ void *malloc(size_t size)
 	return p;
 }
 
-void *realloc(void *p, size_t size)
+void *__wrap__calloc_r(struct _reent *r, size_t size)
 {
+	(void) r;
+	void *p = __wrap__malloc_r(r, size);
+	if (p) memset(p, 0, size);
+	return p;
+}
+
+void *__wrap__realloc_r(struct _reent *r, void *p, size_t size)
+{
+	(void) r;
 	return tlsf_realloc(get_tlsf_for_ptr(p), p, size);
 }
 
-void free(void *p)
+void __wrap__free_r(struct _reent *r, void *p)
 {
+	(void) r;
 	tlsf_free(get_tlsf_for_ptr(p), p);
-	p = NULL;
 }
 
 // _sbrk_r is empty
