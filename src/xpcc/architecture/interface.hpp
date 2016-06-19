@@ -105,5 +105,6 @@ public:
 #include "interface/spi.hpp"
 #include "interface/i2c.hpp"
 #include "interface/register.hpp"
+#include "interface/memory.hpp"
 
 #endif	// XPCC_INTERFACE_HPP
