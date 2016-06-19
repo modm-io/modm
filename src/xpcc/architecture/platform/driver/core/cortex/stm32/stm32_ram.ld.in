@@ -446,6 +446,37 @@ SECTIONS
 		__table_copy_extern_end = .;
 	} >FLASH
 
+%% if parameters.allocator == "tlsf"
+	/* SRAM properties bit mask (16-bit):
+	 *
+	 * - 0x0001: accessible via S-Bus
+	 * - 0x0002: accessible via D-Bus
+	 * - 0x0004: accessible via I-Bus
+	 * - 0x0008: accessible via DMA
+	 * - 0x0010: accessible via DMA2D
+	 *
+	 * - 0x1FE0: reserved
+	 *
+	 * - 0x2000: Fast memory (Core- or Tightly-Coupled)
+	 * - 0x4000: non-volatile (or battery backed) memory
+	 * - 0x8000: external memory
+	 */
+	.table.heap : ALIGN(4)
+	{
+		__table_heap_start = .;
+		LONG (0x000f) /* SRAM1 */
+		LONG (__heap1_start)
+		LONG (__heap1_end)
+%% if 'sram2' in regions
+		LONG (0x000f) /* SRAM2 */
+		LONG (__heap2_start)
+		LONG (__heap2_end)
+%% endif
+		{{ parameters.linkerscript_table_heap_extern }}
+		__table_heap_end = .;
+	} >FLASH
+%% endif
+
 	. = ALIGN(4);
 	_end = . ;
 	__end = . ;

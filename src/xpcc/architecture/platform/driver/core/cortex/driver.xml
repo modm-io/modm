@@ -24,6 +24,7 @@
 		<parameter name="linkerscript_sections" type="string"></parameter>
 		<parameter name="linkerscript_table_zero_extern" type="string"></parameter>
 		<parameter name="linkerscript_table_copy_extern" type="string"></parameter>
+		<parameter name="linkerscript_table_heap_extern" type="string"></parameter>
 
 		<!-- lpc -->
 		<template device-platform="lpc" out="linkerscript.ld">stm32/stm32_ram.ld.in</template>
