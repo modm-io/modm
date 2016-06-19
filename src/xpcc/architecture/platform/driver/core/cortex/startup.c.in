@@ -124,11 +124,17 @@ FunctionPointer flashVectors[] =
 extern uint32_t __stack_start[];
 extern uint32_t __stack_end[];
 
-extern uint32_t __table_copy_start[];
-extern uint32_t __table_copy_end[];
+extern uint32_t __table_copy_intern_start[];
+extern uint32_t __table_copy_intern_end[];
 
-extern uint32_t __table_zero_start[];
-extern uint32_t __table_zero_end[];
+extern uint32_t __table_zero_intern_start[];
+extern uint32_t __table_zero_intern_end[];
+
+extern uint32_t __table_copy_extern_start[];
+extern uint32_t __table_copy_extern_end[];
+
+extern uint32_t __table_zero_extern_start[];
+extern uint32_t __table_zero_extern_end[];
 
 extern uint32_t __vector_table_rom_start[];
 extern uint32_t __vector_table_ram_start[];
@@ -155,6 +161,35 @@ extern void __xpcc_initialize_memory(void);
 %% if parameters.enable_gpio
 extern void xpcc_gpio_enable(void);
 %% endif
+
+static void
+table_copy(uint32_t **table, uint32_t **end)
+{
+	while(table < end)
+	{
+		uint32_t *src  = table[0]; // load address
+		uint32_t *dest = table[1]; // destination start
+		while (dest < table[2])    // destination end
+		{
+			*(dest++) = *(src++);
+		}
+		table += 3;
+	}
+}
+
+static void
+table_zero(uint32_t **table, uint32_t **end)
+{
+	while(table < end)
+	{
+		uint32_t *dest = table[0]; // destination start
+		while (dest < table[1])    // destination end
+		{
+			*(dest++) = 0;
+		}
+		table += 2;
+	}
+}
 
 // ----------------------------------------------------------------------------
 // This is the code that gets called when the processor first starts execution
@@ -189,36 +224,14 @@ Reset_Handler(void)
 		"bne   1b"                      "\n\t" // continue loop if not equal
 	);
 
-	// copy all memory declared in linkerscript table
-	{
-		uint32_t **table = (uint32_t**)__table_copy_start;
-		while(table < (uint32_t**)__table_copy_end)
-		{
-			uint32_t *src  = table[0]; // load address
-			uint32_t *dest = table[1]; // destination start
-			while (dest < table[2])    // destination end
-			{
-				*(dest++) = *(src++);
-			}
-			table += 3;
-		}
-	}
-	// zero all memory declared in linkerscript table
-	{
-		uint32_t **table = (uint32_t**)__table_zero_start;
-		while(table < (uint32_t**)__table_zero_end)
-		{
-			uint32_t *dest = table[0]; // destination start
-			while (dest < table[1])    // destination end
-			{
-				*(dest++) = 0;
-			}
-			table += 2;
-		}
-	}
-
 %# Perform Platform Specific Setup
 {{ platform.startupCode() }}
+
+	// copy all internal memory declared in linkerscript table
+	table_copy(	(uint32_t**)__table_copy_intern_start,
+				(uint32_t**)__table_copy_intern_end);
+	table_zero(	(uint32_t**)__table_zero_intern_start,
+				(uint32_t**)__table_zero_intern_end);
 
 %% if not (target is cortex_m0 or target is cortex_m7)
 	// Enable Tracing Debug Unit
@@ -281,6 +294,12 @@ Reset_Handler(void)
 
 	// Initialize external memories in this hook
 	xpcc_hook_hardware_init();
+
+	// copy all external memory declared in linkerscript table
+	table_copy(	(uint32_t**)__table_copy_extern_start,
+				(uint32_t**)__table_copy_extern_end);
+	table_zero(	(uint32_t**)__table_zero_extern_start,
+				(uint32_t**)__table_zero_extern_end);
 
 %% if parameters.allocator in ["block_allocator", "tlsf"]
 	// initialize xpcc block or TLSF allocator

@@ -446,19 +446,19 @@ SECTIONS
 		PROVIDE (__heap_end = .);
 	} >RAM
 
-	.table.zero :
+
+	/* TABLES! TABLES! ALL THE TABLES YOU COULD EVER WANT! TABLES! */
+	.table.zero.intern : ALIGN(4)
 	{
-		. = ALIGN(4);
-		__table_zero_start = .;
+		__table_zero_intern_start = .;
 		LONG (__bss_start)
 		LONG (__bss_end)
-		__table_zero_end = .;
+		__table_zero_intern_end = .;
 	} >FLASH
 
-	.table.copy :
+	.table.copy.intern : ALIGN(4)
 	{
-		. = ALIGN(4);
-		__table_copy_start = .;
+		__table_copy_intern_start = .;
 		LONG (__data_load)
 		LONG (__data_start)
 		LONG (__data_end)
@@ -470,7 +470,19 @@ SECTIONS
 		LONG (__vector_table_ram_start)
 		LONG (__vector_table_ram_end)
 %% endif
-		__table_copy_end = .;
+		__table_copy_intern_end = .;
+	} >FLASH
+
+	.table.zero.extern : ALIGN(4)
+	{
+		__table_zero_extern_start = .;
+		__table_zero_extern_end = .;
+	} >FLASH
+
+	.table.copy.extern : ALIGN(4)
+	{
+		__table_copy_extern_start = .;
+		__table_copy_extern_end = .;
 	} >FLASH
 
 	. = ALIGN(4);
