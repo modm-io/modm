@@ -7,7 +7,7 @@
   <device platform="stm32" family="f4" name="405|407|415|417" pin_id="i|o|r|v|z" size_id="e|g">
     <flash device-size-id="e">524288</flash>
     <flash device-size-id="g">1048576</flash>
-    <ram>196608</ram>
+    <ram>200704</ram>
     <core>cortex-m4f</core>
     <pin-count device-pin-id="v">100</pin-count>
     <pin-count device-pin-id="z">144</pin-count>
@@ -26,6 +26,7 @@
       <memory access="rw" start="0x10000000" name="ccm" size="64"/>
       <memory access="rwx" start="0x20000000" name="sram1" size="112"/>
       <memory access="rwx" start="0x2001C000" name="sram2" size="16"/>
+      <memory access="rwx" start="0x40024000" name="backup" size="4"/>
       <vector position="0" name="WWDG"/>
       <vector position="1" name="PVD"/>
       <vector position="2" name="TAMP_STAMP"/>

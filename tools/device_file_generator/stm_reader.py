@@ -110,6 +110,8 @@ class STMDeviceReader(XMLDeviceReader):
 		flash = int(flashs[sizeIndexFlash].text) + mem_model['memories']['flash']
 		if 'ccm' in mem_model['memories']:
 			total_ram += mem_model['memories']['ccm']
+		if 'backup' in mem_model['memories']:
+			total_ram += mem_model['memories']['backup']
 		if 'itcm' in mem_model['memories']:
 			total_ram += mem_model['memories']['itcm']
 			total_ram += mem_model['memories']['dtcm']

@@ -10,6 +10,16 @@
  *
  * Example for STM32F746:
  *
+ *                        MEMORY MAP (BACKUP)
+ *
+ * Backup internal SRAM (4 kB):
+ *                |                                 | 0x4002 5000 <---- __backup_end
+ *      +-------> |---------------------------------| 0x4002 4FFF
+ *      |         |                                 |
+ *   .backup      |                                 |
+ *      |         |                                 |
+ *      +-------> |---------------------------------| 0x4002 4000 <--- __backup_start
+ *
  *                          MEMORY MAP (RAM)
  *
  * Auxiliary internal SRAM2 (16 kB):
@@ -260,6 +270,25 @@ SECTIONS
 		__heap0_end = .;
 	} >DTCM
 
+	.backup :
+	{
+		__backup_load = LOADADDR (.backup);			/* address in FLASH */
+		__backup_start = .;							/* address in RAM */
+
+		KEEP(*(.backup))
+
+		. = ALIGN(4);
+		__backup_end = .;
+	} >BACKUP AT >FLASH
+
+	.heap5 (NOLOAD) :
+	{
+		__heap5_start = .;
+
+		. = ORIGIN(BACKUP) + LENGTH(BACKUP);
+		__heap5_end = .;
+	} >BACKUP
+
 	.text :
 	{
 		/* Create a symbol for each input file in the current section, set to
@@ -509,6 +538,9 @@ SECTIONS
 		LONG (0x2005) /* ITCM */
 		LONG (__heap4_start)
 		LONG (__heap4_end)
+		LONG (0x4009) /* BKPSRAM */
+		LONG (__heap5_start)
+		LONG (__heap5_end)
 		{{ parameters.linkerscript_table_heap_extern }}
 		__table_heap_end = .;
 	} >FLASH

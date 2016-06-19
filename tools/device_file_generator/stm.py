@@ -185,7 +185,8 @@ stm32_memory = \
 		'start': {
 			'flash': 0x08000000,
 			'ccm': 0x10000000,
-			'sram': 0x20000000
+			'sram': 0x20000000,
+			'backup': 0x40024000
 		},
 		'model': [
 			{
@@ -194,15 +195,15 @@ stm32_memory = \
 			},
 			{
 				'names': ['405', '407', '415', '417'],
-				'memories': {'flash': 0, 'ccm': 64, 'sram1': 0, 'sram2': 16}
+				'memories': {'flash': 0, 'ccm': 64, 'sram1': 0, 'sram2': 16, 'backup': 4}
 			},
 			{
 				'names': ['427', '429', '437', '439'],
-				'memories': {'flash': 0, 'ccm': 64, 'sram1': 0, 'sram2': 16, 'sram3': 64}
+				'memories': {'flash': 0, 'ccm': 64, 'sram1': 0, 'sram2': 16, 'sram3': 64, 'backup': 4}
 			},
 			{
 				'names': ['469', '479'],
-				'memories': {'flash': 0, 'ccm': 64, 'sram1': 0, 'sram2': 32, 'sram3': 128}
+				'memories': {'flash': 0, 'ccm': 64, 'sram1': 0, 'sram2': 32, 'sram3': 128, 'backup': 4}
 			}
 		]
 	},
@@ -211,12 +212,13 @@ stm32_memory = \
 			'flash': 0x08000000,
 			'dtcm': 0x20000000,
 			'itcm': 0x00000000,
-			'sram': 0x20010000
+			'sram': 0x20010000,
+			'backup': 0x40024000
 		},
 		'model': [
 			{
 				'names': ['745', '746', '756'],
-				'memories': {'flash': 0, 'itcm': 16, 'dtcm': 64, 'sram1': 0, 'sram2': 16}
+				'memories': {'flash': 0, 'itcm': 16, 'dtcm': 64, 'sram1': 0, 'sram2': 16, 'backup': 4}
 			}
 		]
 	}

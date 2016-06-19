@@ -7,7 +7,7 @@
   <device platform="stm32" family="f7" name="745|746|756" pin_id="b|i|n|v|z" size_id="e|g">
     <flash device-size-id="e">524288</flash>
     <flash device-size-id="g">1048576</flash>
-    <ram>409600</ram>
+    <ram>413696</ram>
     <core>cortex-m7f</core>
     <pin-count device-pin-id="v">100</pin-count>
     <pin-count device-pin-id="z">144</pin-count>
@@ -26,6 +26,7 @@
       <memory access="rwx" start="0x20000000" name="dtcm" size="64"/>
       <memory access="rwx" start="0x20010000" name="sram1" size="240"/>
       <memory access="rwx" start="0x2004C000" name="sram2" size="16"/>
+      <memory access="rwx" start="0x40024000" name="backup" size="4"/>
       <vector position="0" name="WWDG"/>
       <vector position="1" name="PVD"/>
       <vector position="2" name="TAMP_STAMP"/>
