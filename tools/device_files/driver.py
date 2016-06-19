@@ -281,7 +281,7 @@ class Parameter:
 	This represents a Parameter that can be specified in a
 	XML Driver File
 	"""
-	TYPES = ['int', 'bool', 'enum']
+	TYPES = ['int', 'bool', 'enum', 'string']
 
 	def __init__(self, node, logger=None):
 		if logger == None:
@@ -326,9 +326,9 @@ class Parameter:
 			sub_dict['parameters'][self.name] = value
 
 	def evaluateValue(self, value):
-		if isinstance(value, basestring):
-			value = value.strip(' \t\n\r')
 		if self.type == 'int':
+			if isinstance(value, basestring):
+				value = value.strip(' \t\n\r')
 			if isinstance(value, basestring) and not value.isdigit():
 				self.log.error("Invalid value '%s' for %s. The value is not a number!"
 					% (value, self.name))
@@ -344,6 +344,8 @@ class Parameter:
 				return None
 			return value
 		elif self.type == 'bool':
+			if isinstance(value, basestring):
+				value = value.strip(' \t\n\r')
 			if isinstance(value, bool):
 				return value
 			if value.lower() == 'true' or value == '1':
@@ -353,12 +355,16 @@ class Parameter:
 			self.log.error("Invalid value '%s' for %s." % (value, self.name))
 			return None
 		elif self.type == 'enum':
+			if isinstance(value, basestring):
+				value = value.strip(' \t\n\r')
 			if value in self.values:
 				return value
 			else:
 				self.log.error("Invalid value '%s' for %s. Valid values are: %s"
 					% (value, self.name, self.values))
 				return None
+		elif self.type == 'string':
+			return value
 		return None
 
 	def _evaluate(self):
@@ -380,6 +386,8 @@ class Parameter:
 				return False
 			else:
 				self.values = self.values.split(';')
+		elif self.type == 'string':
+			pass
 		if self.instances != None:
 			self.instances = self.instances.split('|')
 		if self.default != None:
