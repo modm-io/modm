@@ -12,13 +12,13 @@
  *
  *                          MEMORY MAP (RAM)
  *
- *                |                                 | 0x2001 0000 <---- __ram_end, __heap1_end, __heap_end
+ *                |                                 | 0x2001 0000 <---- __ram_end, __heap1_end
  *      +-------> |---------------------------------| 0x2000 FFFF
  *      |         |                                 |
  *      |         |               ^                 |
  *   .heap1       |               |                 |
  *      |         |            Heap Area            |
- *      |         |         (grows upwards)         | <------- __heap1_start, __heap_start
+ *      |         |         (grows upwards)         | <------- __heap1_start
  *      +-------> |---------------------------------| <------- __noinit_end
  *      |         |                                 |
  *   .noinit      |     Global data not cleared     |
@@ -388,7 +388,6 @@ SECTIONS
 	.heap1 (NOLOAD) :
 	{
 		. = ALIGN(4);
-		PROVIDE (__heap_start = .);
 		__heap1_start = .;
 
 		. = ORIGIN(RAM) + LENGTH(RAM);
@@ -404,7 +403,6 @@ SECTIONS
 		. = ORIGIN(SRAM2) + LENGTH(SRAM2);
 		__heap2_end = .;
 %% endif
-		PROVIDE (__heap_end = .);
 	} >RAM
 
 	{{ parameters.linkerscript_sections }}
@@ -446,7 +444,6 @@ SECTIONS
 		__table_copy_extern_end = .;
 	} >FLASH
 
-%% if parameters.allocator == "tlsf"
 	/* SRAM properties bit mask (16-bit):
 	 *
 	 * - 0x0001: accessible via S-Bus
@@ -475,7 +472,6 @@ SECTIONS
 		{{ parameters.linkerscript_table_heap_extern }}
 		__table_heap_end = .;
 	} >FLASH
-%% endif
 
 	. = ALIGN(4);
 	_end = . ;

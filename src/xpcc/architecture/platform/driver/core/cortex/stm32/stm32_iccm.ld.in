@@ -14,13 +14,13 @@
  *
  *
  * Main internal SRAM1 (up to 40 kB):
- *                |                                 | 0x2001 C000 <---- __ram_end, __heap1_end, __heap_end
+ *                |                                 | 0x2001 C000 <---- __ram_end, __heap1_end
  *      +-------> |---------------------------------| 0x2001 BFFF
  *      |         |                                 |
  *      |         |               ^                 |
  *   .heap1       |               |                 |
  *      |         |            Heap Area            |
- *      |         |         (grows upwards)         | <------- __heap1_start, __heap_start
+ *      |         |         (grows upwards)         | <------- __heap1_start
  *      +-------> |---------------------------------| <------- __noinit_end
  *      |         |                                 |
  *   .noinit      |     Global data not cleared     |
@@ -209,7 +209,6 @@ SECTIONS
 		__fastdata_end = .;
 	} >CCM AT >FLASH
 
-%% if parameters.allocator == "tlsf"
 	.heap4 (NOLOAD) :
 	{
 		. = ALIGN(4);
@@ -218,7 +217,6 @@ SECTIONS
 		. = ORIGIN(CCM) + LENGTH(CCM);
 		__heap4_end = .;
 	} >CCM
-%% endif
 
 	.text :
 	{
@@ -395,12 +393,10 @@ SECTIONS
 	.heap1 (NOLOAD) :
 	{
 		. = ALIGN(4);
-		PROVIDE (__heap_start = .);
 		__heap1_start = .;
 
 		. = ORIGIN(RAM) + LENGTH(RAM);
 		__heap1_end = .;
-		PROVIDE (__heap_end = .);
 	} >RAM
 
 	{{ parameters.linkerscript_sections }}
@@ -448,7 +444,6 @@ SECTIONS
 		__table_copy_extern_end = .;
 	} >FLASH
 
-%% if parameters.allocator == "tlsf"
 	/* SRAM properties bit mask (16-bit):
 	 *
 	 * - 0x0001: accessible via S-Bus
@@ -475,7 +470,6 @@ SECTIONS
 		{{ parameters.linkerscript_table_heap_extern }}
 		__table_heap_end = .;
 	} >FLASH
-%% endif
 
 	. = ALIGN(4);
 	_end = . ;

@@ -47,6 +47,7 @@
 		<template>startup.c.in</template>
 		<static>default_handler.sx</static>
 		<!-- everything to do with dynamic memory -->
+		<static>heap_table.c</static>
 		<template>heap_newlib.c.in</template>
 		<template>heap_tlsf.c.in</template>
 		<template>heap_block_allocator.cpp.in</template>

@@ -14,7 +14,7 @@
  *
  * Auxiliary internal SRAM3 (64 kB):
  *   only accessible by CPU via S-Bus (less efficient than I-Bus), otherwise fully DMA capable
- *                |                                 | 0x2003 0000 <---- __ram_end, __heap3_end, __heap_end
+ *                |                                 | 0x2003 0000 <---- __ram_end, __heap3_end
  *      +-------> |---------------------------------| 0x2002 FFFF
  *      |         |                                 |
  *   .heap3       |         not available on        |
@@ -38,7 +38,7 @@
  *      |         |               ^                 |
  *   .heap1       |               |                 |
  *      |         |            Heap Area            |
- *      |         |         (grows upwards)         | <------- __heap1_start, __heap_start
+ *      |         |         (grows upwards)         | <------- __heap1_start
  *      +-------> |---------------------------------| <------- __noinit_end
  *      |         |                                 |
  *   .noinit      |     Global data not cleared     |
@@ -222,7 +222,6 @@ SECTIONS
 		__fastdata_end = .;
 	} >CCM AT >FLASH
 
-%% if parameters.allocator == "tlsf"
 	.heap0 (NOLOAD) :
 	{
 		. = ALIGN(4);
@@ -231,7 +230,6 @@ SECTIONS
 		. = ORIGIN(CCM) + LENGTH(CCM);
 		__heap0_end = .;
 	} >CCM
-%% endif
 
 	.text :
 	{
@@ -418,7 +416,6 @@ SECTIONS
 	.heap1 (NOLOAD) :
 	{
 		. = ALIGN(4);
-		PROVIDE (__heap_start = .);
 		__heap1_start = .;
 
 		. = ORIGIN(SRAM1) + LENGTH(SRAM1);
@@ -444,7 +441,6 @@ SECTIONS
 		__heap3_end = .;
 	%% endif
 %% endif
-		PROVIDE (__heap_end = .);
 	} >RAM
 
 	{{ parameters.linkerscript_sections }}
@@ -489,7 +485,6 @@ SECTIONS
 		__table_copy_extern_end = .;
 	} >FLASH
 
-%% if parameters.allocator == "tlsf"
 	/* SRAM properties bit mask (16-bit):
 	 *
 	 * - 0x0001: accessible via S-Bus
@@ -526,7 +521,6 @@ SECTIONS
 		{{ parameters.linkerscript_table_heap_extern }}
 		__table_heap_end = .;
 	} >FLASH
-%% endif
 
 	. = ALIGN(4);
 	_end = . ;

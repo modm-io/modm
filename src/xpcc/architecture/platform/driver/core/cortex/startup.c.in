@@ -154,9 +154,7 @@ exit(int) __attribute__ ((noreturn, weak));
 void xpcc_hook_hardware_init(void) __attribute__(( weak ));
 void xpcc_hook_hardware_init(void) {}
 
-%% if parameters.allocator in ["block_allocator", "tlsf"]
 extern void __xpcc_initialize_memory(void);
-%% endif
 
 %% if parameters.enable_gpio
 extern void xpcc_gpio_enable(void);
@@ -301,11 +299,9 @@ Reset_Handler(void)
 	table_zero(	(uint32_t**)__table_zero_extern_start,
 				(uint32_t**)__table_zero_extern_end);
 
-%% if parameters.allocator in ["block_allocator", "tlsf"]
-	// initialize xpcc block or TLSF allocator
+	// initialize heap
 	// needs to be done before calling the CTORS of static objects
 	__xpcc_initialize_memory();
-%% endif
 
 	// Call CTORS of static objects
 	__libc_init_array();

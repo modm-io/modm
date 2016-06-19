@@ -18,21 +18,38 @@
 
 // ----------------------------------------------------------------------------
 %% if parameters.allocator == "block_allocator"
-// __heap_start is set in the linker command file and is the end of
-// statically allocated data (thus start of heap).
-extern uint8_t __heap_start;
-extern uint8_t __heap_end;
-
 // Using the XPCC Block Allocator
 #include <xpcc/architecture/driver/heap/block_allocator.hpp>
-static xpcc::BlockAllocator<uint16_t, 8> allocator;
+
+#ifndef XPCC_MEMORY_BLOCK_ALLOCATOR_TYPE
+#define XPCC_MEMORY_BLOCK_ALLOCATOR_TYPE uint16_t
+#endif
+
+#ifndef XPCC_MEMORY_BLOCK_ALLOCATOR_CHUNK_SIZE
+#define XPCC_MEMORY_BLOCK_ALLOCATOR_CHUNK_SIZE 8
+#endif
+
+static xpcc::BlockAllocator< XPCC_MEMORY_BLOCK_ALLOCATOR_TYPE, XPCC_MEMORY_BLOCK_ALLOCATOR_CHUNK_SIZE >
+	allocator;
+// this allocator has a maximum heap size!
+const size_t max_heap_size = (1 << (sizeof(XPCC_MEMORY_BLOCK_ALLOCATOR_TYPE) * 8)) *
+							  XPCC_MEMORY_BLOCK_ALLOCATOR_CHUNK_SIZE;
 
 extern "C"
 {
+extern void xpcc_heap_table_find_largest(const uint32_t, uint32_t **, uint32_t **);
 
 void __xpcc_initialize_memory(void)
 {
-	allocator.initialize(&__heap_start, &__heap_end);
+	uint32_t *heap_start, *heap_end;
+	// find the largest heap that is DMA-able and S-Bus accessible
+	xpcc_heap_table_find_largest(0x9, &heap_start, &heap_end);
+	// clamp the heap size to the maximum
+	if ((size_t) heap_end - (size_t) heap_start > max_heap_size) {
+		heap_end = (uint32_t *) ((char *) heap_start + max_heap_size);
+	}
+	// initialize the heap
+	allocator.initialize(heap_start, heap_end);
 }
 
 void *__wrap__malloc_r(struct _reent *r, size_t size)
@@ -70,6 +87,13 @@ _sbrk_r(struct _reent *r,  ptrdiff_t size)
 	(void) r;
 	(void) size;
 	return 0;
+}
+
+// memory traits are ignored for newlib allocator
+void *malloc_tr(size_t size, uint32_t traits)
+{
+	(void) traits;
+	return malloc(size);
 }
 
 } // extern "C"

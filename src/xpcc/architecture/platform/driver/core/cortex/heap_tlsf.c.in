@@ -18,97 +18,116 @@
 
 // ----------------------------------------------------------------------------
 %% if parameters.allocator == "tlsf"
-// Using the TLSF Allocator
 #include <tlsf.h>
 
-%% set regions = []
-%% for memory in memorys
-	%% do regions.append(memory.name)
-%% endfor
+#ifndef XPCC_TLSF_MAX_MEM_POOL_COUNT
+#define XPCC_TLSF_MAX_MEM_POOL_COUNT 6
+#endif
 
-%% set heap0_available = ('ccm' in regions and target is not stm32f3) or 'dtcm' in regions
-%% set heap2_available = 'sram2' in regions
-%% set heap3_available = 'sram3' in regions
-%% set heap4_available = ('ccm' in regions and target is stm32f3) or 'itcm' in regions
-
-%% if heap0_available
-tlsf_t tlsf_heap0;
-extern uint32_t __heap0_start;
-extern uint32_t __heap0_end;
-%% endif
-
-tlsf_t tlsf_heap123;
-extern uint32_t __heap1_start;
-extern uint32_t __heap1_end;
-%% if heap2_available
-extern uint32_t __heap2_start;
-extern uint32_t __heap2_end;
-%% endif
-%% if heap3_available
-extern uint32_t __heap3_start;
-extern uint32_t __heap3_end;
-%% endif
-
-%% if heap4_available
-tlsf_t tlsf_heap4;
-extern uint32_t __heap4_start;
-extern uint32_t __heap4_end;
-%% endif
-
-void __xpcc_initialize_memory(void)
+typedef struct
 {
-%% if heap0_available
-	tlsf_heap0 = tlsf_create_with_pool((void*)&__heap0_start, (size_t)&__heap0_end - (size_t)&__heap0_start);
-%% endif
+	uint32_t traits;
+	tlsf_t tlsf;
+	uint32_t * end;
+} mem_pool_t;
 
-	tlsf_heap123 = tlsf_create_with_pool((void*)&__heap1_start, (size_t)&__heap1_end - (size_t)&__heap1_start);
-%% if heap2_available
-	tlsf_add_pool(tlsf_heap123, (void*)&__heap2_start, (size_t)&__heap2_end - (size_t)&__heap2_start);
-%% endif
-%% if heap3_available
-	tlsf_add_pool(tlsf_heap123, (void*)&__heap3_start, (size_t)&__heap3_end - (size_t)&__heap3_start);
-%% endif
+static mem_pool_t mem_pools[XPCC_TLSF_MAX_MEM_POOL_COUNT];
 
-%% if heap4_available
-	tlsf_heap4 = tlsf_create_with_pool((void*)&__heap4_start, (size_t)&__heap4_end - (size_t)&__heap4_start);
-%% endif
+
+extern uint32_t __table_heap_start[];
+extern uint32_t __table_heap_end[];
+
+void
+__xpcc_initialize_memory(void)
+{
+	typedef struct
+	{
+		uint32_t traits;
+		uint32_t * start;
+		uint32_t * end;
+	} __attribute__((packed)) table_pool_t;
+
+	uint32_t current_traits = 0;
+	mem_pool_t *current_pool = mem_pools;
+
+	// iterate over the entire table but not longer than mem_pools
+	for (table_pool_t *table = (table_pool_t *)__table_heap_start;
+		 (table < (table_pool_t *)__table_heap_end) && (current_pool < (mem_pools + XPCC_TLSF_MAX_MEM_POOL_COUNT));
+		 table++)
+	{
+		// if the pool has a new trait than the previous one, or
+		// if the pool has the same trait, but is non-continous
+		if ((table->traits != current_traits) || (table->start != (current_pool - 1)->end))
+		{
+			// create a new allocator in this pool with these new traits.
+			current_traits = table->traits;
+			current_pool->traits = current_traits;
+			current_pool->tlsf = tlsf_create_with_pool(table->start, (size_t) table->end - (size_t) table->start);
+			current_pool->end = table->end;
+
+			current_pool++;
+		}
+		else
+		{
+			// otherwise add this pool to the existing allocator
+			tlsf_add_pool((current_pool - 1)->tlsf, table->start, (size_t) table->end - (size_t) table->start);
+			(current_pool - 1)->end = table->end;
+		}
+	}
 }
 
-static inline tlsf_t
+static tlsf_t
 get_tlsf_for_ptr(void *p)
 {
-	/* Heap order by address space:
-	 * 1. heap4
-	 * 2. heap0
-	 * 3. heap1
-	 * 4. heap2
-	 * 5. heap3
-	 */
-%% if heap0_available or heap4_available
-	if (p >= (void*)&__heap1_start)
-%% endif
-		return tlsf_heap123;
-%% if heap4_available
-	%% if heap0_available
-	else if (p < (void*)&__heap4_end)
-	%% endif
-	return tlsf_heap4;
-%% endif
-%% if heap0_available
-	return tlsf_heap0;
-%% endif
+	for (mem_pool_t *pool = mem_pools;
+		 pool < (mem_pools + XPCC_TLSF_MAX_MEM_POOL_COUNT);
+		 pool++)
+	{
+		if ((pool->tlsf < p) && (p < (void *) pool->end))
+		{
+			// pointer is within this pool
+			return pool->tlsf;
+		}
+	}
+	return NULL;
+}
+
+void * malloc_tr(size_t size, uint32_t traits)
+{
+try_again:
+	for (mem_pool_t *pool = mem_pools;
+		 pool < (mem_pools + XPCC_TLSF_MAX_MEM_POOL_COUNT);
+		 pool++)
+	{
+		if ((pool->traits & traits) == traits)
+		{
+			void *p = tlsf_malloc(pool->tlsf, size);
+			if (p) return p;
+		}
+	}
+
+	// clear the types core coupled and external, but not non-volatile
+	const uint32_t clear_mask = 0x8000 | 0x2000;
+	if (traits & clear_mask) {
+		traits &= ~clear_mask;
+		goto try_again;
+	}
+	// set the SBus and try again
+	const uint32_t set_mask = 0x0001;
+	if (!(traits & set_mask)) {
+		traits |= set_mask;
+		goto try_again;
+	}
+	// there is no memory left even after fallback.
+
+	return NULL;
 }
 
 void *__wrap__malloc_r(struct _reent *r, size_t size)
 {
 	(void) r;
-	void* p = tlsf_malloc(tlsf_heap123, size);
-%% if heap0_available
-	if (p) return p;
-	// fail back to .heap0
-	p = tlsf_malloc(tlsf_heap0, size);
-%% endif
-	return p;
+	// default is accessible by S-Bus and DMA-able
+	return malloc_tr(size, 0x8 | 0x1);
 }
 
 void *__wrap__calloc_r(struct _reent *r, size_t size)

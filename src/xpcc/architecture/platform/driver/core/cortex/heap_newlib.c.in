@@ -18,13 +18,17 @@
 
 // ----------------------------------------------------------------------------
 %% if parameters.allocator == "newlib"
-// __heap_start is set in the linker command file and is the end of
-// statically allocated data (thus start of heap).
-extern uint8_t __heap_start;
-extern uint8_t __heap_end;
+extern void xpcc_heap_table_find_largest(const uint32_t, uint32_t **, uint32_t **);
 
-// Points to current end of the heap
-uint8_t *__brkval = &__heap_start;
+uint8_t *__brkval = 0;
+uint8_t *heap_end = 0;
+
+void __xpcc_initialize_memory(void)
+{
+	// find the largest heap that is DMA-able and S-Bus accessible
+	xpcc_heap_table_find_largest(0x9, (uint32_t **) &__brkval, (uint32_t **) &heap_end);
+	if (__brkval == 0) exit(-1);
+}
 
 /* Support function. Adjusts end of heap to provide more memory to
  * memory allocator. Simple and dumb with no sanity checks.
@@ -47,7 +51,7 @@ _sbrk_r(struct _reent *r,  ptrdiff_t size)
 	uint8_t *heap = __brkval;
 	__brkval += size;
 
-	if (__brkval >= &__heap_end) {
+	if (__brkval >= heap_end) {
 		// ERROR: out of memory!
 		while (1) ;
 	}
@@ -72,5 +76,12 @@ void *__wrap__realloc_r(struct _reent *r, void *p, size_t size) {
 void __real__free_r(struct _reent *r, void *p);
 void __wrap__free_r(struct _reent *r, void *p) {
 	__real__free_r(r, p);
+}
+
+// memory traits are ignored for newlib allocator
+void *malloc_tr(size_t size, uint32_t traits)
+{
+	(void) traits;
+	return malloc(size);
 }
 %% endif
