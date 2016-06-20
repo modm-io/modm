@@ -1,0 +1,132 @@
+// coding: utf-8
+/* Copyright (c) 2016, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+/**
+ * @ingroup 	{{target.string}}
+ * @defgroup	{{target.string}}_core Core
+ */
+
+#include <stdlib.h>
+#include <stdint.h>
+#include <string.h>
+#include <reent.h>
+
+// ----------------------------------------------------------------------------
+%% if parameters.allocator == "tlsf"
+// Using the TLSF Allocator
+#include <tlsf.h>
+
+%% set regions = []
+%% for memory in memorys
+	%% do regions.append(memory.name)
+%% endfor
+
+%% set heap0_available = ('ccm' in regions and target is not stm32f3) or 'dtcm' in regions
+%% set heap2_available = 'sram2' in regions
+%% set heap3_available = 'sram3' in regions
+%% set heap4_available = ('ccm' in regions and target is stm32f3) or 'itcm' in regions
+
+%% if heap0_available
+tlsf_t tlsf_heap0;
+extern uint32_t __heap0_start;
+extern uint32_t __heap0_end;
+%% endif
+
+tlsf_t tlsf_heap123;
+extern uint32_t __heap1_start;
+extern uint32_t __heap1_end;
+%% if heap2_available
+extern uint32_t __heap2_start;
+extern uint32_t __heap2_end;
+%% endif
+%% if heap3_available
+extern uint32_t __heap3_start;
+extern uint32_t __heap3_end;
+%% endif
+
+%% if heap4_available
+tlsf_t tlsf_heap4;
+extern uint32_t __heap4_start;
+extern uint32_t __heap4_end;
+%% endif
+
+void __xpcc_initialize_memory(void)
+{
+%% if heap0_available
+	tlsf_heap0 = tlsf_create_with_pool((void*)&__heap0_start, (size_t)&__heap0_end - (size_t)&__heap0_start);
+%% endif
+
+	tlsf_heap123 = tlsf_create_with_pool((void*)&__heap1_start, (size_t)&__heap1_end - (size_t)&__heap1_start);
+%% if heap2_available
+	tlsf_add_pool(tlsf_heap123, (void*)&__heap2_start, (size_t)&__heap2_end - (size_t)&__heap2_start);
+%% endif
+%% if heap3_available
+	tlsf_add_pool(tlsf_heap123, (void*)&__heap3_start, (size_t)&__heap3_end - (size_t)&__heap3_start);
+%% endif
+
+%% if heap4_available
+	tlsf_heap4 = tlsf_create_with_pool((void*)&__heap4_start, (size_t)&__heap4_end - (size_t)&__heap4_start);
+%% endif
+}
+
+static inline tlsf_t
+get_tlsf_for_ptr(void *p)
+{
+	/* Heap order by address space:
+	 * 1. heap4
+	 * 2. heap0
+	 * 3. heap1
+	 * 4. heap2
+	 * 5. heap3
+	 */
+%% if heap0_available or heap4_available
+	if (p >= (void*)&__heap1_start)
+%% endif
+		return tlsf_heap123;
+%% if heap4_available
+	%% if heap0_available
+	else if (p < (void*)&__heap4_end)
+	%% endif
+	return tlsf_heap4;
+%% endif
+%% if heap0_available
+	return tlsf_heap0;
+%% endif
+}
+
+void *malloc(size_t size)
+{
+	void* p = tlsf_malloc(tlsf_heap123, size);
+%% if heap0_available
+	if (p) return p;
+	// fail back to .heap0
+	p = tlsf_malloc(tlsf_heap0, size);
+%% endif
+	return p;
+}
+
+void *realloc(void *p, size_t size)
+{
+	return tlsf_realloc(get_tlsf_for_ptr(p), p, size);
+}
+
+void free(void *p)
+{
+	tlsf_free(get_tlsf_for_ptr(p), p);
+	p = NULL;
+}
+
+// _sbrk_r is empty
+void *
+_sbrk_r(struct _reent *r,  ptrdiff_t size)
+{
+	(void) r;
+	(void) size;
+	return NULL;
+}
+%% endif

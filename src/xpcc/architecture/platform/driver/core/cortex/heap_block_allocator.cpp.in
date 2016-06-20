@@ -1,0 +1,59 @@
+// coding: utf-8
+/* Copyright (c) 2013-2016, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+/**
+ * @ingroup 	{{target.string}}
+ * @defgroup	{{target.string}}_core Core
+ */
+
+#include <stdlib.h>
+#include <stdint.h>
+#include <string.h>
+#include <reent.h>
+
+// ----------------------------------------------------------------------------
+%% if parameters.allocator == "block_allocator"
+// __heap_start is set in the linker command file and is the end of
+// statically allocated data (thus start of heap).
+extern uint8_t __heap_start;
+extern uint8_t __heap_end;
+
+// Using the XPCC Block Allocator
+#include <xpcc/architecture/driver/heap/block_allocator.hpp>
+static xpcc::BlockAllocator<uint16_t, 8> allocator;
+
+extern "C"
+{
+
+void __xpcc_initialize_memory(void)
+{
+	allocator.initialize(&__heap_start, &__heap_end);
+}
+
+void *malloc(size_t size)
+{
+	return allocator.allocate(size);
+}
+
+void free(void *p)
+{
+	allocator.free(p);
+}
+
+// _sbrk_r is empty
+void *
+_sbrk_r(struct _reent *r,  ptrdiff_t size)
+{
+	(void) r;
+	(void) size;
+	return 0;
+}
+
+} // extern "C"
+
+%% endif

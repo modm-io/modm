@@ -39,11 +39,21 @@
 		<!-- stm32f7 -->
 		<template device-family="f7" out="linkerscript.ld">stm32/stm32_idtcm.ld.in</template>
 
-		<template>startup.c.in</template>
-		<template>delay.cpp.in</template>
-		<template>syscalls.cpp.in</template>
+		<!-- dealing with C++ -->
 		<static>cxxabi.cpp</static>
+		<!-- dealing with newlib -->
+		<static>syscalls.c</static>
+		<!-- startup script -->
+		<template>startup.c.in</template>
 		<static>default_handler.sx</static>
+		<!-- everything to do with dynamic memory -->
+		<template>heap_newlib.c.in</template>
+		<template>heap_tlsf.c.in</template>
+		<template>heap_block_allocator.cpp.in</template>
+
+		<!-- everything to do with accurate busy-waiting -->
+		<noiccm device-family="f3" device-name="301|302|318|378|373">True</noiccm>
+		<template>delay.cpp.in</template>
 		<static core="cortex-m3|cortex-m4|cortex-m4f|cortex-m7|cortex-m7f">cycle_counter.hpp</static>
 
 		<!-- Systick Timer -->
@@ -52,8 +62,5 @@
 		<!-- Hard Fault Handler -->
 		<template device-platform="stm32">hard_fault_handler.cpp.in</template>
 		<template device-platform="stm32">hard_fault.sx.in</template>
-
-		<!-- required for delay.cpp.in -->
-		<noiccm device-family="f3" device-name="301|302|318|378|373">True</noiccm>
 	</driver>
 </rca>
