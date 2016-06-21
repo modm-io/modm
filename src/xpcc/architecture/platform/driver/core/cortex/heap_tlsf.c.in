@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <reent.h>
+#include <errno.h>
 
 // ----------------------------------------------------------------------------
 %% if parameters.allocator == "tlsf"
@@ -120,6 +121,7 @@ try_again:
 	}
 	// there is no memory left even after fallback.
 
+	exit(ENOMEM);
 	return NULL;
 }
 
@@ -141,13 +143,29 @@ void *__wrap__calloc_r(struct _reent *r, size_t size)
 void *__wrap__realloc_r(struct _reent *r, void *p, size_t size)
 {
 	(void) r;
-	return tlsf_realloc(get_tlsf_for_ptr(p), p, size);
+	tlsf_t pool = get_tlsf_for_ptr(p);
+	// if pointer belongs to no pool, exit.
+	if (!pool) {
+		exit(EINVAL);
+		return NULL;
+	}
+
+	void *ptr = tlsf_realloc(pool, p, size);
+
+	if (!ptr) exit(ENOMEM);
+	return ptr;
 }
 
 void __wrap__free_r(struct _reent *r, void *p)
 {
 	(void) r;
-	tlsf_free(get_tlsf_for_ptr(p), p);
+	tlsf_t pool = get_tlsf_for_ptr(p);
+	// if pointer belongs to no pool, exit.
+	if (!pool) {
+		exit(EINVAL);
+		return;
+	}
+	tlsf_free(pool, p);
 }
 
 // _sbrk_r is empty

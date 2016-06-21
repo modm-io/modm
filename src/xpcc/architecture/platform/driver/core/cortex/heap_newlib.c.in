@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <reent.h>
+#include <errno.h>
 
 // ----------------------------------------------------------------------------
 %% if parameters.allocator == "newlib"
@@ -27,7 +28,7 @@ void __xpcc_initialize_memory(void)
 {
 	// find the largest heap that is DMA-able and S-Bus accessible
 	xpcc_heap_table_find_largest(0x9, (uint32_t **) &__brkval, (uint32_t **) &heap_end);
-	if (__brkval == 0) exit(-1);
+	if (!__brkval) exit(ENOMEM);
 }
 
 /* Support function. Adjusts end of heap to provide more memory to
@@ -53,7 +54,7 @@ _sbrk_r(struct _reent *r,  ptrdiff_t size)
 
 	if (__brkval >= heap_end) {
 		// ERROR: out of memory!
-		while (1) ;
+		exit(ENOMEM);
 	}
 
 	//  Return pointer to start of new heap area.

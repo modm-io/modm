@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <reent.h>
+#include <errno.h>
 
 // ----------------------------------------------------------------------------
 %% if parameters.allocator == "block_allocator"
@@ -44,6 +45,7 @@ void __xpcc_initialize_memory(void)
 	uint32_t *heap_start, *heap_end;
 	// find the largest heap that is DMA-able and S-Bus accessible
 	xpcc_heap_table_find_largest(0x9, &heap_start, &heap_end);
+	if (!heap_start) exit(ENOMEM);
 	// clamp the heap size to the maximum
 	if ((size_t) heap_end - (size_t) heap_start > max_heap_size) {
 		heap_end = (uint32_t *) ((char *) heap_start + max_heap_size);
@@ -55,7 +57,9 @@ void __xpcc_initialize_memory(void)
 void *__wrap__malloc_r(struct _reent *r, size_t size)
 {
 	(void) r;
-	return allocator.allocate(size);
+	void *p = allocator.allocate(size);
+	if (!p) exit(ENOMEM);
+	return p;
 }
 
 void *__wrap__calloc_r(struct _reent *r, size_t size)
@@ -71,6 +75,7 @@ void *__wrap__realloc_r(struct _reent *r, void *p, size_t size)
 	(void) p;
 	(void) size;
 	// NOT IMPLEMENTED!
+	exit(ENOSYS);
 	return NULL;
 }
 
