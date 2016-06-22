@@ -8,6 +8,7 @@
 // ----------------------------------------------------------------------------
 
 #include "ram.hpp"
+#include <xpcc/architecture/interface/memory.hpp>
 
 void *
 operator new(size_t size)
@@ -17,6 +18,18 @@ operator new(size_t size)
 
 void *
 operator new[](size_t size)
+{
+	return xpcc::avr::allocateMemory(size);
+}
+
+void *
+operator new(size_t size, xpcc::MemoryTraits)
+{
+	return xpcc::avr::allocateMemory(size);
+}
+
+void *
+operator new[](size_t size, xpcc::MemoryTraits)
 {
 	return xpcc::avr::allocateMemory(size);
 }
@@ -44,4 +57,3 @@ operator delete[](void* ptr, size_t size __attribute__((unused)))
 {
 	xpcc::avr::freeMemory(ptr);
 }
-

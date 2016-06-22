@@ -33,6 +33,7 @@
 // ----------------------------------------------------------------------------
 
 #include <stdlib.h>                   // for prototypes of malloc() and free()
+#include <xpcc/architecture/interface/memory.hpp>
 
 extern "C"
 {
@@ -71,6 +72,8 @@ extern "C"
 	{
 		return 0;
 	}
+
+	extern void * malloc_tr(size_t, uint32_t);
 }
 
 // ----------------------------------------------------------------------------
@@ -84,6 +87,18 @@ void *
 operator new[](size_t size) throw ()
 {
 	return malloc(size);
+}
+
+void *
+operator new(size_t size, xpcc::MemoryTraits traits)
+{
+	return malloc_tr(size, traits.value);
+}
+
+void *
+operator new[](size_t size, xpcc::MemoryTraits traits)
+{
+	return malloc_tr(size, traits.value);
 }
 
 void

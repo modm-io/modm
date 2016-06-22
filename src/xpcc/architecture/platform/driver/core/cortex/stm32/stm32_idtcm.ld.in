@@ -14,7 +14,7 @@
  *
  * Auxiliary internal SRAM2 (16 kB):
  *   only accessible by CPU via S-Bus (less efficient than I-Bus), otherwise fully DMA capable
- *                |                                 | 0x2005 0000 <---- __ram_end, __heap2_end, __heap_end
+ *                |                                 | 0x2005 0000 <---- __ram_end, __heap2_end
  *      +-------> |---------------------------------| 0x2004 FFFF
  *      |         |                                 |
  *   .heap2       |                                 |
@@ -29,7 +29,7 @@
  *      |         |               ^                 |
  *   .heap1       |               |                 |
  *      |         |            Heap Area            |
- *      |         |         (grows upwards)         | <------- __heap1_start, __heap_start
+ *      |         |         (grows upwards)         | <------- __heap1_start
  *      +-------> |---------------------------------| <------- __noinit_end
  *      |         |                                 |
  *   .noinit      |     Global data not cleared     |
@@ -216,7 +216,6 @@ SECTIONS
 		__fastcode_end = .;
 	} >ITCM AT >FLASH
 
-%% if parameters.allocator == "tlsf"
 	.heap4 (NOLOAD) :
 	{
 		. = ALIGN(4);
@@ -225,7 +224,6 @@ SECTIONS
 		. = ORIGIN(ITCM) + LENGTH(ITCM);
 		__heap4_end = .;
 	} >ITCM
-%% endif
 
 	.stack (NOLOAD) :
 	{
@@ -253,7 +251,6 @@ SECTIONS
 		__fastdata_end = .;
 	} >DTCM AT >FLASH
 
-%% if parameters.allocator == "tlsf"
 	.heap0 (NOLOAD) :
 	{
 		. = ALIGN(4);
@@ -262,7 +259,6 @@ SECTIONS
 		. = ORIGIN(DTCM) + LENGTH(DTCM);
 		__heap0_end = .;
 	} >DTCM
-%% endif
 
 	.text :
 	{
@@ -424,7 +420,6 @@ SECTIONS
 	.heap1 (NOLOAD) :
 	{
 		. = ALIGN(4);
-		PROVIDE (__heap_start = .);
 		__heap1_start = .;
 
 		. = ORIGIN(SRAM1) + LENGTH(SRAM1);
@@ -438,7 +433,6 @@ SECTIONS
 
 		. = ORIGIN(SRAM2) + LENGTH(SRAM2);
 		__heap2_end = .;
-		PROVIDE (__heap_end = .);
 	} >RAM
 
 	{{ parameters.linkerscript_sections }}
@@ -484,6 +478,39 @@ SECTIONS
 		__table_copy_extern_start = .;
 		{{ parameters.linkerscript_table_copy_extern }}
 		__table_copy_extern_end = .;
+	} >FLASH
+
+	/* SRAM properties bit mask (16-bit):
+	 *
+	 * - 0x0001: accessible via S-Bus
+	 * - 0x0002: accessible via D-Bus
+	 * - 0x0004: accessible via I-Bus
+	 * - 0x0008: accessible via DMA
+	 * - 0x0010: accessible via DMA2D
+	 *
+	 * - 0x1FE0: reserved
+	 *
+	 * - 0x2000: Fast memory (Core- or Tightly-Coupled)
+	 * - 0x4000: non-volatile (or battery backed) memory
+	 * - 0x8000: external memory
+	 */
+	.table.heap : ALIGN(4)
+	{
+		__table_heap_start = .;
+		LONG (0x001f) /* SRAM1 */
+		LONG (__heap1_start)
+		LONG (__heap1_end)
+		LONG (0x001f) /* SRAM2 */
+		LONG (__heap2_start)
+		LONG (__heap2_end)
+		LONG (0x200f) /* DTCM */
+		LONG (__heap0_start)
+		LONG (__heap0_end)
+		LONG (0x2005) /* ITCM */
+		LONG (__heap4_start)
+		LONG (__heap4_end)
+		{{ parameters.linkerscript_table_heap_extern }}
+		__table_heap_end = .;
 	} >FLASH
 
 	. = ALIGN(4);
