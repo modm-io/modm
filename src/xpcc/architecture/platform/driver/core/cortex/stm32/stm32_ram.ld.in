@@ -144,21 +144,11 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 	%% set i = {}
 	%% for vector in vectors
 		%% do i.update({vector.position | int : ""})
-		%% endfor
-/* If the vector table is relocated into RAM, then it must be aligned to a power of two! */
-VECTOR_TABLE_ENTRIES = {{ i.keys()|sort|last + 16 }};
+	%% endfor
 /* Round up the number of vector table entries to the nearest power-of-two and multiply by 8. */
-VECTOR_TABLE_ALIGNMENT = (
-		(VECTOR_TABLE_ENTRIES <=  16) ?  16 : (
-		(VECTOR_TABLE_ENTRIES <=  32) ?  32 : (
-		(VECTOR_TABLE_ENTRIES <=  64) ?  64 : (
-		(VECTOR_TABLE_ENTRIES <= 128) ? 128 :
-										256
-		)))) * 8;
+VECTOR_TABLE_ALIGNMENT = (1 << LOG2CEIL({{ i.keys()|sort|last + 16 }})) * 8;
 /* compute the vector table offset from start of RAM */
-VECTOR_TABLE_OFFSET = (((TOTAL_STACK_SIZE % VECTOR_TABLE_ALIGNMENT) == 0) ?
-		TOTAL_STACK_SIZE :
-		(TOTAL_STACK_SIZE / VECTOR_TABLE_ALIGNMENT + 1) * VECTOR_TABLE_ALIGNMENT);
+VECTOR_TABLE_OFFSET = ALIGN(TOTAL_STACK_SIZE, VECTOR_TABLE_ALIGNMENT);
 %% else
 VECTOR_TABLE_OFFSET = TOTAL_STACK_SIZE;
 %% endif
