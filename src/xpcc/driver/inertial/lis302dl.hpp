@@ -214,14 +214,14 @@ public:
 	MeasurementRate : uint8_t
 	{
 		Hz100 = 0x00,
-		Hz400 = Control1::DR,
+		Hz400 = int(Control1::DR),
 	};
 
 	enum class
 	Scale : uint8_t
 	{
 		G2 = 0x00,
-		G8 = Control1::FS,
+		G8 = int(Control1::FS),
 	};
 
 	enum class

@@ -57,14 +57,14 @@ public:
 	ThermostatMode : uint8_t
 	{
 		Comparator = 0,
-		Interrupt = Config1::ThermostatMode
+		Interrupt = int(Config1::ThermostatMode)
 	};
 
 	enum class
 	AlertPolarity : uint8_t
 	{
 		ActiveLow = 0,
-		ActiveHigh = Config1::Polarity
+		ActiveHigh = int(Config1::Polarity)
 	};
 
 	enum class

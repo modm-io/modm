@@ -276,8 +276,8 @@ public:
 	FifoMode : uint8_t
 	{
 		Bypass = 0,
-		Fifo = FifoControl::FM0,
-		Stream = FifoControl::FM1,
+		Fifo = int(FifoControl::FM0),
+		Stream = int(FifoControl::FM1),
 		Trigger = int(FifoControl::FM1) | int(FifoControl::FM0)
 	};
 
@@ -285,15 +285,15 @@ public:
 	MeasurementRate : uint8_t
 	{
 		Off = 0,
-		Hz1 = Control1::ODR0,
-		Hz10 = Control1::ODR1,
+		Hz1 = int(Control1::ODR0),
+		Hz10 = int(Control1::ODR1),
 		Hz25 = int(Control1::ODR1) | int(Control1::ODR0),
-		Hz50 = Control1::ODR2,
+		Hz50 = int(Control1::ODR2),
 		Hz100 = int(Control1::ODR2) | int(Control1::ODR0),
 		Hz200 = int(Control1::ODR2) | int(Control1::ODR1),
 		Hz400 = int(Control1::ODR2) | int(Control1::ODR1) | int(Control1::ODR0),
 
-		Hz1620 = Control1::ODR3,
+		Hz1620 = int(Control1::ODR3),
 		Hz5376 = int(Control1::ODR3) | int(Control1::ODR0),
 	};
 
@@ -301,8 +301,8 @@ public:
 	Scale : uint8_t
 	{
 		G2 = 0,
-		G4 = Control4::FS0,
-		G8 = Control4::FS1,
+		G4 = int(Control4::FS0),
+		G8 = int(Control4::FS1),
 		G16 = int(Control4::FS1) | int(Control4::FS0),
 	};
 

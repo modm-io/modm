@@ -121,9 +121,9 @@
  * Prescaler : uint8_t
  * {
  *     Div1 = 0,				///< configuration documentation
- *     Div2 = Control::PRE0,
- *     Div4 = Control::PRE1,
- *     Div8 = Control::PRE1 | Control::PRE0,
+ *     Div2 = int(Control::PRE0),
+ *     Div4 = int(Control::PRE1),
+ *     Div8 = int(Control::PRE1) | int(Control::PRE0),
  * };
  * typedef Configuration< Control_t, Prescaler, (Bit5 | Bit4) >  Prescaler_t;
  * @endcode

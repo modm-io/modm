@@ -22,8 +22,8 @@ struct hmc5883 : public hmc58x3
 	MeasurementAverage : uint8_t
 	{
 		Average8 = int(ConfigA::MA1) | int(ConfigA::MA0),
-		Average4 = ConfigA::MA1,
-		Average2 = ConfigA::MA0,
+		Average4 = int(ConfigA::MA1),
+		Average2 = int(ConfigA::MA0),
 		Average1 = 0
 	};
 
@@ -31,10 +31,10 @@ struct hmc5883 : public hmc58x3
 	Gain : uint8_t
 	{
 		Ga0_88 = 0,
-		Ga1_3 = ConfigB::GN0,
-		Ga1_9 = ConfigB::GN1,
+		Ga1_3 = int(ConfigB::GN0),
+		Ga1_9 = int(ConfigB::GN1),
 		Ga2_5 = int(ConfigB::GN1) | int(ConfigB::GN2),
-		Ga4_0 = ConfigB::GN2,
+		Ga4_0 = int(ConfigB::GN2),
 		Ga4_7 = int(ConfigB::GN2) | int(ConfigB::GN0),
 		Ga5_6 = int(ConfigB::GN2) | int(ConfigB::GN1),
 		Ga8_1 = int(ConfigB::GN2) | int(ConfigB::GN1) | int(ConfigB::GN0),
@@ -44,10 +44,10 @@ struct hmc5883 : public hmc58x3
 	MeasurementRate : uint8_t
 	{
 		Hz0_75 = 0,
-		Hz1_5 = ConfigA::DO0,
+		Hz1_5 = int(ConfigA::DO0),
 		Hz3 = int(ConfigA::DO1),
 		Hz7_5 = int(ConfigA::DO1) | int(ConfigA::DO0),
-		Hz15 = ConfigA::DO2,
+		Hz15 = int(ConfigA::DO2),
 		Hz30 = int(ConfigA::DO2) | int(ConfigA::DO0),
 		Hz75 = int(ConfigA::DO2) | int(ConfigA::DO1),
 	};

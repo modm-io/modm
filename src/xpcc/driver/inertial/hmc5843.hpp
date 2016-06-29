@@ -22,10 +22,10 @@ struct hmc5843 : public hmc58x3
 	Gain : uint8_t
 	{
 		Ga0_7 = 0,
-		Ga1_0 = ConfigB::GN0,
-		Ga1_5 = ConfigB::GN1,
+		Ga1_0 = int(ConfigB::GN0),
+		Ga1_5 = int(ConfigB::GN1),
 		Ga2_0 = int(ConfigB::GN1) | int(ConfigB::GN0),
-		Ga3_2 = ConfigB::GN2,
+		Ga3_2 = int(ConfigB::GN2),
 		Ga3_8 = int(ConfigB::GN2) | int(ConfigB::GN0),
 		Ga4_5 = int(ConfigB::GN2) | int(ConfigB::GN1),
 		Ga6_5 = int(ConfigB::GN2) | int(ConfigB::GN1) | int(ConfigB::GN0),
@@ -35,10 +35,10 @@ struct hmc5843 : public hmc58x3
 	MeasurementRate : uint8_t
 	{
 		Hz0_5 = 0,
-		Hz1 = ConfigA::DO0,
+		Hz1 = int(ConfigA::DO0),
 		Hz2 = int(ConfigA::DO1),
 		Hz5 = int(ConfigA::DO1) | int(ConfigA::DO0),
-		Hz10 = ConfigA::DO2,
+		Hz10 = int(ConfigA::DO2),
 		Hz20 = int(ConfigA::DO2) | int(ConfigA::DO0),
 		Hz50 = int(ConfigA::DO2) | int(ConfigA::DO1),
 	};

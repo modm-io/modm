@@ -69,10 +69,10 @@ public:
 	LowPassFilter : uint8_t
 	{
 		Hz256 = 0,
-		Hz188 = Filter::DLPF_CFG0,
-		Hz98 = Filter::DLPF_CFG1,
+		Hz188 = int(Filter::DLPF_CFG0),
+		Hz98 = int(Filter::DLPF_CFG1),
 		Hz42 = int(Filter::DLPF_CFG1) | int(Filter::DLPF_CFG0),
-		Hz20 = Filter::DLPF_CFG2,
+		Hz20 = int(Filter::DLPF_CFG2),
 		Hz10 = int(Filter::DLPF_CFG2) | int(Filter::DLPF_CFG0),
 		Hz5 = int(Filter::DLPF_CFG2) | int(Filter::DLPF_CFG1),
 	};
@@ -128,10 +128,10 @@ public:
 	ClockSource : uint8_t
 	{
 		Internal = 0,						///< Internal oscillator
-		PllX = Power::CLK_SEL0,				///< PLL with X Gyro reference
-		PllY = Power::CLK_SEL1,				///< PLL with Y Gyro reference
+		PllX = int(Power::CLK_SEL0),		///< PLL with X Gyro reference
+		PllY = int(Power::CLK_SEL1),		///< PLL with Y Gyro reference
 		PllZ = int(Power::CLK_SEL1) | int(Power::CLK_SEL0),		///< PLL with Z Gyro reference
-		PllExternal32kHz = Power::CLK_SEL2,	///< PLL with external 32.768kHz reference
+		PllExternal32kHz = int(Power::CLK_SEL2),	///< PLL with external 32.768kHz reference
 		PllExternal19MHz = int(Power::CLK_SEL2) | int(Power::CLK_SEL0),	///< PLL with external 19.2MHz reference
 	};
 	typedef Configuration< Power_t, ClockSource, (Bit2 | Bit1 | Bit0) > ClockSource_t;

@@ -66,14 +66,14 @@ public:
 	ConversionMode : uint8_t
 	{
 		Continous = 0,
-		OneShot = Config::OneShot
+		OneShot = int(Config::OneShot)
 	};
 
 	enum class
 	AlertPolarity : uint8_t
 	{
 		ActiveLow = 0,
-		ActiveHigh = Config::Polarity
+		ActiveHigh = int(Config::Polarity)
 	};
 
 	enum class

@@ -224,10 +224,10 @@ public:
 	FifoMode : uint8_t
 	{
 		Bypass = 0,
-		Fifo = FifoControl::FM0,
-		Stream = FifoControl::FM1,
+		Fifo = int(FifoControl::FM0),
+		Stream = int(FifoControl::FM1),
 		StreamTriggerFifo = int(FifoControl::FM1) | int(FifoControl::FM0),
-		BypassTriggerStream = FifoControl::FM2,
+		BypassTriggerStream = int(FifoControl::FM2),
 		BypassTriggerFifo = int(FifoControl::FM2) | int(FifoControl::FM1) | int(FifoControl::FM0),
 	};
 
@@ -244,7 +244,7 @@ public:
 	Scale : uint8_t
 	{
 		Dps250 = 0,
-		Dps500 = Control4::FS0,
+		Dps500 = int(Control4::FS0),
 		Dps2000 = int(Control4::FS1) | int(Control4::FS0),
 	};
 

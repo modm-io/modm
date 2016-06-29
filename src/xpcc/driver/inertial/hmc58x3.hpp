@@ -104,8 +104,8 @@ public:
 	OperationMode : uint8_t
 	{
 		ContinousConversion = 0,
-		SingleConversion = Mode::MD0,
-		Idle = Mode::MD1,
+		SingleConversion = int(Mode::MD0),
+		Idle = int(Mode::MD1),
 		Sleep = int(Mode::MD1) | int(Mode::MD0),	///< *HMC5843 only*
 	};
 

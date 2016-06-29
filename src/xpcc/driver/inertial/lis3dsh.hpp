@@ -387,10 +387,10 @@ public:
 	FifoMode : uint8_t
 	{
 		Bypass = 0,
-		Fifo = FifoControl::FMODE0,
-		Stream = FifoControl::FMODE1,
+		Fifo = int(FifoControl::FMODE0),
+		Stream = int(FifoControl::FMODE1),
 		StreamTriggerFifo = int(FifoControl::FMODE1) | int(FifoControl::FMODE0),
-		BypassTriggerStream = FifoControl::FMODE2,
+		BypassTriggerStream = int(FifoControl::FMODE2),
 		BypassTriggerFifo = int(FifoControl::FMODE2) | int(FifoControl::FMODE1) | int(FifoControl::FMODE0),
 	};
 
@@ -398,14 +398,14 @@ public:
 	MeasurementRate : uint8_t
 	{
 		Off = 0,
-		Hz3_125 = Control4::ODR0,
-		Hz6_25 = Control4::ODR1,
+		Hz3_125 = int(Control4::ODR0),
+		Hz6_25 = int(Control4::ODR1),
 		Hz12_5 = int(Control4::ODR1) | int(Control4::ODR0),
-		Hz25 = Control4::ODR2,
+		Hz25 = int(Control4::ODR2),
 		Hz50 = int(Control4::ODR2) | int(Control4::ODR0),
 		Hz100 = int(Control4::ODR2) | int(Control4::ODR1),
 		Hz400 = int(Control4::ODR2) | int(Control4::ODR1) | int(Control4::ODR0),
-		Hz800 = Control4::ODR3,
+		Hz800 = int(Control4::ODR3),
 		Hz1600 = int(Control4::ODR3) | int(Control4::ODR0),
 	};
 
@@ -413,10 +413,10 @@ public:
 	Scale : uint8_t
 	{
 		G2 = 0,
-		G4 = Control5::FSCALE0,
-		G6 = Control5::FSCALE1,
+		G4 = int(Control5::FSCALE0),
+		G6 = int(Control5::FSCALE1),
 		G8 = int(Control5::FSCALE1) | int(Control5::FSCALE0),
-		G16 = Control5::FSCALE2,
+		G16 = int(Control5::FSCALE2),
 	};
 
 	enum class

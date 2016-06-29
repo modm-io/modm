@@ -53,12 +53,12 @@ struct hmc6343
 	enum class
 	Register16 : uint8_t
 	{
-		DeviceSerial = Register::DeviceSerialLsb,		///< Device Serial Number
-		DeviationAngle = Register::DeviationAngleLsb,	///< Deviation Angle (+-1800) in tenth of a degree
-		VariationAngle = Register::VariationAngleLsb,	///< Variation Angle (+-1800) in tenth of a degree
-		X_Offset = Register::X_OffsetLsb,				///< Hard-Iron Calibration Offset for the X-axis
-		Y_Offset = Register::Y_OffsetLsb,				///< Hard-Iron Calibration Offset for the Y-axis
-		Z_Offset = Register::Z_OffsetLsb,				///< Hard-Iron Calibration Offset for the Z-axis
+		DeviceSerial = int(Register::DeviceSerialLsb),		///< Device Serial Number
+		DeviationAngle = int(Register::DeviationAngleLsb),	///< Deviation Angle (+-1800) in tenth of a degree
+		VariationAngle = int(Register::VariationAngleLsb),	///< Variation Angle (+-1800) in tenth of a degree
+		X_Offset = int(Register::X_OffsetLsb),				///< Hard-Iron Calibration Offset for the X-axis
+		Y_Offset = int(Register::Y_OffsetLsb),				///< Hard-Iron Calibration Offset for the Y-axis
+		Z_Offset = int(Register::Z_OffsetLsb),				///< Hard-Iron Calibration Offset for the Z-axis
 	};
 
 protected:
@@ -90,9 +90,9 @@ public:
 	enum class
 	Orientation : uint8_t
 	{
-		Level = Command::LevelOrientation,
-		UprightSideways = Command::UprightSidewaysOrientation,
-		UprightFlatFront = Command::UprightFlatFrontOrientation
+		Level = int(Command::LevelOrientation),
+		UprightSideways = int(Command::UprightSidewaysOrientation),
+		UprightFlatFront = int(Command::UprightFlatFrontOrientation)
 	};
 
 	enum class
