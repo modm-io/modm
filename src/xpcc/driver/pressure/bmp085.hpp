@@ -15,14 +15,19 @@
 #include <xpcc/architecture/interface/i2c_device.hpp>
 #include <xpcc/processing/timer.hpp>
 
+#include "bmp085_data.hpp"
+
 namespace xpcc
 {
 
-template < typename I2cMaster >
-class Bmp085;
-
 struct bmp085
 {
+
+using Calibration = xpcc::bmp085data::Calibration;
+using Data = xpcc::bmp085data::Data;
+using DataBase = xpcc::bmp085data::DataBase;
+using DataDouble = xpcc::bmp085data::DataDouble;
+
 protected:
 	/// @cond
 	/// The addresses of the Configuration and Data Registers
@@ -74,116 +79,6 @@ public:
 		UltraHighResolution = (0x03 << 6),
 	};
 
-	/**
-	 * Holds the calibration data from the sensor.
-	 * Values are used for calculation of calibrated
-	 * sensor values from raw sensor data
-	 */
-	struct ATTRIBUTE_PACKED
-	Calibration
-	{
-		int16_t  ac1;
-		int16_t  ac2;
-		int16_t  ac3;
-		uint16_t ac4;
-		uint16_t ac5;
-		uint16_t ac6;
-
-		int16_t  b1;
-		int16_t  b2;
-
-		int16_t  mb;
-		int16_t  mc;
-		int16_t  md;
-	};
-
-	struct ATTRIBUTE_PACKED
-	Data
-	{
-		template < typename I2cMaster >
-		friend class Bmp085;
-
-		// DATA ACCESS
-		inline Calibration &
-		getCalibration()
-		{
-			return calibration;
-		}
-
-		/**
-		 * Get the calibrated temperature for the device in 0.1 degree Celsius
-		 *
-		 * If recalculation is necessary it is done on the fly.
-		 * No I2C transaction.
-		 */
-		int16_t inline
-		getTemperature()
-		{
-			if (!(meta & TEMPERATURE_CALCULATED)) {
-				calculateCalibratedTemperature();
-			}
-			return calibratedTemperature;
-		}
-
-		/**
-		 * Get the calibrated pressure from the device in Pascal.
-		 *
-		 * If recalculation is necessary it is done on the fly.
-		 * No I2C transaction.
-		 */
-		int32_t inline
-		getPressure()
-		{
-			if (!(meta & PRESSURE_CALCULATED)) {
-				calculateCalibratedPressure();
-			}
-			return calibratedPressure;
-		}
-
-	private:
-		/**
-		 * Use the calibration data read from the sensor to
-		 * calculate the calibrated temperature from the
-		 * raw data.
-		 * The result is stored in this struct for further
-		 * access.
-		 */
-		void inline
-		calculateCalibratedTemperature();
-
-		/**
-		 * See calculateCalibratedTemperature()
-		 */
-		void inline
-		calculateCalibratedPressure();
-
-		// the order of these private variable is optimized for alignment of 4
-		Calibration calibration;
-
-		int16_t calibratedTemperature; // in 0.1 degree Celsius
-		int32_t calibratedPressure;    // in Pa
-
-		int32_t b5; // calculated in calculateCalibratedTemperature, needed for calculateCalibratedPressure
-
-		/// The raw data that was read from the sensor
-		/// 0 .. 1 temperature data
-		/// 2 .. 4 pressure data
-		uint8_t raw[5];
-
-		// bit 7-6: The mode in which the sensor operates
-		// bit 1: temperatureCalculated
-		// bit 0: pressureCalculated
-		uint8_t meta;
-
-		enum
-		{
-			/// Remember if the raw data was already converted to calibrated temperature
-			TEMPERATURE_CALCULATED = Bit1,
-			/// Remember if the raw data was already converted to calibrated pressure
-			PRESSURE_CALCULATED = Bit0,
-		};
-	};
-
 protected:
 	/// @cond
 	static constexpr uint8_t
@@ -224,7 +119,7 @@ public:
 	 * @param	data		pointer to buffer of the internal data of type Data
 	 * @param	address		address defaults to 0x77
 	 */
-	Bmp085(Data &data, uint8_t address=0x77);
+	Bmp085(DataBase &data, uint8_t address=0x77);
 
 	// MARK: - TASKS
 	/// Reads out and stores the calibration bytes
@@ -250,7 +145,7 @@ public:
 	{ return data; }
 
 private:
-	Data &data;
+	DataBase &data;
 	xpcc::ShortTimeout timeout;
 
 	/**
@@ -265,7 +160,7 @@ private:
 	uint8_t bufferedMode;
 };
 
-}	// namespace xpcc
+} // namespace xpcc
 
 #include "bmp085_impl.hpp"
 
