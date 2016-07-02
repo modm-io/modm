@@ -143,16 +143,11 @@ using Rx = GpioInputB11;		// STLK_TX [STLINK V2-1_U2_TX]: USART3_RX
 using Uart = Usart3;
 }
 
-void
-initializeSdram();
-
 inline void
 initialize()
 {
-	// initialized in `xpcc_hook_hardware_init`
+	// initialized in `xpcc_hook_hardware_init()`
 	// systemClock::enable();
-	// initializeSdram();
-
 	xpcc::cortex::SysTickTimer::initialize<systemClock>();
 
 	stlink::Tx::connect(stlink::Uart::Tx);
