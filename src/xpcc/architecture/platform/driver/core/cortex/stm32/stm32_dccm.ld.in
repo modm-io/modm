@@ -241,6 +241,7 @@ SECTIONS
 		__heap0_end = .;
 	} >CCM
 
+%% if 'backup' in regions
 	.backup :
 	{
 		__backup_load = LOADADDR (.backup);			/* address in FLASH */
@@ -259,6 +260,7 @@ SECTIONS
 		. = ORIGIN(BACKUP) + LENGTH(BACKUP);
 		__heap5_end = .;
 	} >BACKUP
+%% endif
 
 	.text :
 	{
@@ -492,9 +494,11 @@ SECTIONS
 		LONG (__fastdata_load)
 		LONG (__fastdata_start)
 		LONG (__fastdata_end)
+%% if 'backup' in regions
 		LONG (__backup_load)
 		LONG (__backup_start)
 		LONG (__backup_end)
+%% endif
 %% if parameters.vector_table_in_ram
 		LONG (__vector_table_ram_load)
 		LONG (__vector_table_ram_start)
@@ -550,9 +554,11 @@ SECTIONS
 		LONG (0x2002) /* CCM */
 		LONG (__heap0_start)
 		LONG (__heap0_end)
+%% if 'backup' in regions
 		LONG (0x4009) /* BKPSRAM */
 		LONG (__heap5_start)
 		LONG (__heap5_end)
+%% endif
 		{{ parameters.linkerscript_table_heap_extern }}
 		__table_heap_end = .;
 	} >FLASH
