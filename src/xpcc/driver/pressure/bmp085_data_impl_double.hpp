@@ -82,18 +82,29 @@ DataDouble::calculateCalibratedTemperature()
 void
 DataDouble::calculateCalibratedPressure()
 {
-	uint8_t oss = ((meta & 0b11000000) >> 6); // ToDo Use Mask again
-	uint32_t up = ( (uint32_t(raw[2]) << 16) | (uint16_t(raw[3]) << 8) | raw[4] ) >> (8 - oss);
+	XPCC_LOG_DEBUG.printf("raw[2:5] = %02x %02x %02x\n", raw[2], raw[3], raw[4]);
 
-	double pu = up;
+	uint32_t up = ( (uint32_t(raw[2]) << 16) | (uint16_t(raw[3]) << 8) | raw[4] );
+	XPCC_LOG_DEBUG.printf("up = %9d\n", up);
+
+	double pu = up / double(256.0);
+	XPCC_LOG_DEBUG.printf("pu = %9.5f\n", pu);
 
 	calculateCalibratedTemperature();
 
 	double s = calibratedTemperatureDouble - double(25.0);
-	double x = (x2 * pow(s,2)) + (x1 * s) + x0;
-	double y = (y2 * pow(s,2)) + (y11 * s) + y00;
+	double x = (x2 * pow(s, 2)) + (x1 * s) + x0;
+	double y = (y2 * pow(s, 2)) + (y11 * s) + y00;
 	double z = (pu - x) / y;
+
+	XPCC_LOG_DEBUG.printf("s = %9.5f\n", s);
+	XPCC_LOG_DEBUG.printf("x = %9.5f\n", x);
+	XPCC_LOG_DEBUG.printf("y = %9.5f\n", y);
+	XPCC_LOG_DEBUG.printf("z = %9.5f\n", z);
+
 	calibratedPressureDouble = (p2 * pow(z,2)) + (p1 * z) + p0;
+
+	XPCC_LOG_DEBUG.printf("calibratedPressureDouble = %9.5f\n", calibratedPressureDouble);
 
 	meta |= PRESSURE_CALCULATED;
 }
