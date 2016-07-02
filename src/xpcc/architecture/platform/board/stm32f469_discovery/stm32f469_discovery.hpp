@@ -17,6 +17,7 @@
 #define XPCC_STM32_F469_DISCOVERY_HPP
 
 #include <xpcc/architecture/platform.hpp>
+#include <xpcc/ui/display/graphic_display.hpp>
 #include <xpcc/debug/logger.hpp>
 #define XPCC_BOARD_HAS_LOGGER
 
@@ -147,6 +148,12 @@ using Tx = GpioOutputB10;		// STLK_RX [STLINK V2-1_U2_RX]: USART3_TX
 using Rx = GpioInputB11;		// STLK_TX [STLINK V2-1_U2_TX]: USART3_RX
 using Uart = Usart3;
 }
+
+void
+initializeDisplay();
+
+xpcc::GraphicDisplay&
+getDisplay();
 
 inline void
 initialize()
