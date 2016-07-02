@@ -34,6 +34,12 @@ board_initialize_sdram();
 void
 xpcc_hook_hardware_init(void)
 {
+	// Reset LCD
+	Board::DisplayReset::setOutput(xpcc::Gpio::Low);
+	xpcc::delayMilliseconds(20);
+	Board::DisplayReset::set();
+	xpcc::delayMilliseconds(10);
+
 	// initialize system clock and external SDRAM before accessing external memories
 	Board::systemClock::enable();
 	board_initialize_sdram();

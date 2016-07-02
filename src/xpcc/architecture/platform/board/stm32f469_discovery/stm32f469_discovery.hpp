@@ -1,5 +1,5 @@
 // coding: utf-8
-/* Copyright (c) 2015, Roboterclub Aachen e.V.
+/* Copyright (c) 2015-2016, Roboterclub Aachen e.V.
 * All Rights Reserved.
 *
 * The file is part of the xpcc library and is released under the 3-clause BSD
@@ -80,11 +80,15 @@ struct systemClock
 		ClockControl::enableExternalCrystal(); // 8 MHz
 		ClockControl::enablePll(
 		ClockControl::PllSource::ExternalCrystal,
-			4,      // 8MHz / N=4 -> 2MHz
-			180,    // 2MHz * M=180 -> 360MHz
+			8,      // 8MHz / N=8 -> 1MHz   !!! Must be 1 MHz for PLLSAI !!!
+			360,    // 1MHz * M=360 -> 360MHz
 			2,      // 360MHz / P=2 -> 180MHz = F_cpu
-			7       // 360MHz / Q=7 -> ~51MHz = F_usb => bad for USB
+			7       // 360MHz / Q=7 -> ~51MHz (value ignored! PLLSAI generates 48MHz for F_usb)
 		);
+		// Enable overdrive mode
+		PWR->CR |= PWR_CR_ODEN;
+		// wait for it
+		while (not (PWR->CSR & PWR_CSR_ODRDY)) ;
 		ClockControl::setFlashLatency(Frequency);
 		ClockControl::enableSystemClock(ClockControl::SystemClockSource::Pll);
 		ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div4);
@@ -135,6 +139,7 @@ using LedD13    = GpioOutputD3;							// LED7 [Green]
 
 using Leds = xpcc::SoftwareGpioPort< LedBlue, LedRed, LedOrange, LedGreen >;
 
+using DisplayReset = GpioOutputH7;
 
 namespace stlink
 {
