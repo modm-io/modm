@@ -18,6 +18,7 @@
 
 #include <xpcc/architecture/platform.hpp>
 #include <xpcc/ui/display/graphic_display.hpp>
+#include <xpcc/driver/touch/ft6x06.hpp>
 #include <xpcc/debug/logger.hpp>
 #define XPCC_BOARD_HAS_LOGGER
 
@@ -142,11 +143,33 @@ using Leds = xpcc::SoftwareGpioPort< LedBlue, LedRed, LedOrange, LedGreen >;
 
 using DisplayReset = GpioOutputH7;
 
+namespace ft6
+{
+using Int = GpioInputJ5;
+using Scl = GpioB8;
+using Sda = GpioB9;
+using I2cMaster = I2cMaster1;
+using Touch = xpcc::Ft6x06< I2cMaster >;
+}
+
 namespace stlink
 {
 using Tx = GpioOutputB10;		// STLK_RX [STLINK V2-1_U2_RX]: USART3_TX
 using Rx = GpioInputB11;		// STLK_TX [STLINK V2-1_U2_TX]: USART3_RX
 using Uart = Usart3;
+}
+
+inline void
+initializeTouchscreen()
+{
+	ft6::Int::setInput();
+	ft6::Int::setInputTrigger(Gpio::InputTrigger::FallingEdge);
+	ft6::Int::enableExternalInterrupt();
+//	ft6::Int::enableExternalInterruptVector(12);
+
+	ft6::Scl::connect(ft6::I2cMaster::Scl);
+	ft6::Sda::connect(ft6::I2cMaster::Sda);
+	ft6::I2cMaster::initialize<systemClock, 360000>();
 }
 
 void
