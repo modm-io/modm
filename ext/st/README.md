@@ -4,13 +4,13 @@ This folder includes the CMSIS device headers for all STM32 devices.
 The files located here are part of the `STM32Cube` libraries and can be found inside the `STM32Cube*/Drivers/CMSIS/Device/ST/STM32F*xx/Include` folder.  
 The files are not modified, only copied.
 
-Here is a list of the current *version of the device headers* (not Cube library version!):
+Here is a list of the current Cube version, (device header version in braces) and publishing date of the device headers:
 
-- [CubeF0: v2.2.2, 26-June-2015](http://www.st.com/web/en/catalog/tools/PF260612)
-- [CubeF1: v4.0.1, 31-July-2015](http://www.st.com/web/catalog/tools/FM147/CL1794/SC961/SS1743/LN1897/PF260820)
-- [CubeF3: v1.1.0, 12-Sept-2014](http://www.st.com/web/en/catalog/tools/PF260613)
-- [CubeF4: v2.4.0, 14-August-2015](http://www.st.com/web/en/catalog/tools/PF259243)
-- [CubeF7: v1.0.1, 25-June-2015](http://www.st.com/web/catalog/tools/FM147/CL1794/SC961/SS1743/LN1897/PF261909)
+- [CubeF0 v1.6.0 (v2.3.0) @ 27-May-2016](http://www.st.com/content/st_com/en/products/embedded-software/mcus-embedded-software/stm32-embedded-software/stm32cube-embedded-software/stm32cubef0.html)
+- [CubeF1 v1.4.0 (v4.1.0) @ 29-April-2016](http://www.st.com/content/st_com/en/products/embedded-software/mcus-embedded-software/stm32-embedded-software/stm32cube-embedded-software/stm32cubef1.html)
+- [CubeF3 v1.5.0 (v2.3.0) @ 29-April-2015](http://www.st.com/content/st_com/en/products/embedded-software/mcus-embedded-software/stm32-embedded-software/stm32cube-embedded-software/stm32cubef3.html)
+- [CubeF4 v1.12.0 (v2.5.0) @ 22-April-2016](http://www.st.com/content/st_com/en/products/embedded-software/mcus-embedded-software/stm32-embedded-software/stm32cube-embedded-software/stm32cubef4.html)
+- [CubeF7 v1.4.0 (v1.1.0) @ 22-April-2016](http://www.st.com/content/st_com/en/products/embedded-software/mcus-embedded-software/stm32-embedded-software/stm32cube-embedded-software/stm32cubef7.html)
 
 The ST header file in this directory are available under the BSD 3-Clause License:
 ```
