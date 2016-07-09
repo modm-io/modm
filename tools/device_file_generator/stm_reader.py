@@ -69,6 +69,8 @@ class STMDeviceReader(XMLDeviceReader):
 		self.addProperty('architecture', coreLut[core.replace('cortex-', '')])
 		if core.endswith('m4') or core.endswith('m7'):
 			core += 'f'
+		if self.id.family in ['f7'] and self.id.name not in ['745', '746', '756']:
+			core += 'd'
 		self.addProperty('core', core)
 
 		# flash and ram sizes
@@ -459,6 +461,11 @@ class STMDeviceReader(XMLDeviceReader):
 		familyDefines = stm32_defines[self.id.family]
 		# get all defines for this device name
 		devName = 'STM32F{}'.format(self.id.name)
+
+		# Map STM32F7x8 -> STM32F7x7
+		if self.id.family == 'f7' and devName[8] == '8':
+			devName = devName[:8] + '7'
+
 		deviceDefines = sorted([define for define in familyDefines if define.startswith(devName)])
 		# if there is only one define thats the one
 		if len(deviceDefines) == 1:

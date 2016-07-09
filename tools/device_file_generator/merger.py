@@ -142,12 +142,14 @@ class DeviceMerger:
 		elif family == 'f4':
 			categories = [	['401', '411'],
 							['410'],
+							['412'],
 							['405', '415', '407', '417'],
 							['427', '437', '429', '439'],
 							['446'],
 							['469', '479']  ]
 		elif family == 'f7':
-			categories = [	['745', '746', '756']  ]
+			categories = [	['745', '746', '756'],
+							['765', '767', '768', '769', '777', '778', '779']  ]
 
 		# make sure that only one category is used!
 		for cat in categories:
@@ -408,10 +410,10 @@ class DeviceMerger:
 							['e', 'g', 'i']  ]
 			if name in ['401']:
 				categories = [	['b', 'c', 'd', 'e'] ]
-			if name in ['411', '446']:
-					categories = [['c', 'e']]
+			if name in ['411', '412', '446']:
+					categories = [['c', 'e', 'g']]
 		elif family == 'f7':
-			categories = [['e', 'g']]
+			categories = [['e', 'g', 'i']]
 
 		# make sure that only one category is used!
 		for cat in categories:
