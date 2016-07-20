@@ -176,7 +176,7 @@ xpcc::Dispatcher::sendMessageToInnerComponent(EntryIterator entry)
 		
 		if (entry->type == Entry::Type::Callback)
 		{
-			// TODO timer for RESPOMSES not handeled yet
+			// TODO timer for RESPONSES not handeled yet
 			entry->state = Entry::State::WaitForResponse;
 			entry->time.restart(responseTimeout);
 			return entry;
