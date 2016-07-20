@@ -38,7 +38,7 @@ void
 xpcc::Communicator::callAction(uint8_t receiver,
 		uint8_t actionIdentifier, const T& data)
 {
-	Header header(Header::REQUEST, false,
+	Header header(Header::Type::REQUEST, false,
 			receiver,
 			this->ownIdentifier,
 			actionIdentifier);
@@ -54,7 +54,7 @@ void
 xpcc::Communicator::callAction(uint8_t receiver, uint8_t actionIdentifier,
 		const T& data, ResponseCallback& responseCallback)
 {
-	Header header(Header::REQUEST, false,
+	Header header(Header::Type::REQUEST, false,
 			receiver,
 			this->ownIdentifier,
 			actionIdentifier);
@@ -69,7 +69,7 @@ template<typename T>
 void
 xpcc::Communicator::publishEvent(uint8_t eventIdentifier, const T& data)
 {
-	Header header(Header::REQUEST, false,
+	Header header(Header::Type::REQUEST, false,
 			0,
 			this->ownIdentifier,
 			eventIdentifier);
@@ -83,7 +83,7 @@ template<typename T>
 void
 xpcc::Communicator::sendResponse(const ResponseHandle& handle, const T& data)
 {
-	Header header(Header::RESPONSE, false,
+	Header header(Header::Type::RESPONSE, false,
 			handle.destination,
 			this->ownIdentifier,
 			handle.packetIdentifier);
@@ -96,7 +96,7 @@ template<typename T>
 void
 xpcc::Communicator::sendNegativeResponse(const ResponseHandle& handle, const T& data)
 {
-	Header header(Header::NEGATIVE_RESPONSE, false,
+	Header header(Header::Type::NEGATIVE_RESPONSE, false,
 			handle.destination,
 			this->ownIdentifier,
 			handle.packetIdentifier);

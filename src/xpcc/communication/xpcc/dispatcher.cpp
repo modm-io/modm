@@ -52,7 +52,7 @@ xpcc::Dispatcher::update()
 		const Header& header = this->backend->getPacketHeader();
 		const SmartPointer& payload = this->backend->getPacketPayload();
 		
-		if (header.type == Header::REQUEST && !header.isAcknowledge)
+		if (header.type == Header::Type::REQUEST && !header.isAcknowledge)
 		{
 			this->handleActionCall(header, payload);
 		}
@@ -133,7 +133,7 @@ xpcc::Dispatcher::handlePacket(const Header& header,
 			{
 				// entry actual has to be marked acknowledged if acknowleded
 				// request
-				if (header.type == Header::REQUEST)
+				if (header.type == Header::Type::REQUEST)
 				{
 					// Must be an acknowledge otherwise there is an error in
 					// communication, cause no requests can be handled here
@@ -169,7 +169,7 @@ xpcc::Dispatcher::sendMessageToInnerComponent(EntryIterator entry)
 	// communication externally
 	backend->sendPacket(entry->header, entry->payload);
 	
-	if (entry->header.type == Header::REQUEST)
+	if (entry->header.type == Header::Type::REQUEST)
 	{
 		postman->deliverPacket(entry->header, entry->payload);
 		// TODO handle postman errors?
@@ -198,7 +198,7 @@ xpcc::Dispatcher::sendMessageToInnerComponent(EntryIterator entry)
 		auto req = entry;
 		for (++req; req != this->entries.end(); ++req)
 		{
-			if (req->header.type == Header::REQUEST and
+			if (req->header.type == Header::Type::REQUEST and
 			    // must be State::WaitForResponse
 			    req->state != Entry::State::TransmissionPending and
 			    req->headerFits(entry->header))

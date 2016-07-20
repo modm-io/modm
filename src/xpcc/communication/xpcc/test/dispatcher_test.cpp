@@ -64,7 +64,7 @@ DispatcherTest::tearDown()
 void
 DispatcherTest::testReceiveRequest()
 {
-	Message message(xpcc::Header(xpcc::Header::REQUEST, false, 1, 10, 0x10),
+	Message message(xpcc::Header(xpcc::Header::Type::REQUEST, false, 1, 10, 0x10),
 			xpcc::SmartPointer());
 	
 	backend->messagesToReceive.append(message);
@@ -79,14 +79,14 @@ DispatcherTest::testReceiveRequest()
 	TEST_ASSERT_EQUALS(backend->messagesSend.getSize(), 1U);
 	TEST_ASSERT_EQUALS(backend->messagesSend.getFront().payload.getSize(), 0U);
 	
-	xpcc::Header ackHeader(xpcc::Header::REQUEST, true, 10, 1, 0x10);
+	xpcc::Header ackHeader(xpcc::Header::Type::REQUEST, true, 10, 1, 0x10);
 	TEST_ASSERT_EQUALS(backend->messagesSend.getFront().header, ackHeader);
 }
 
 void
 DispatcherTest::testReceiveRequestNoComponent()
 {
-	Message message(xpcc::Header(xpcc::Header::REQUEST, false, 11, 10, 0x10),
+	Message message(xpcc::Header(xpcc::Header::Type::REQUEST, false, 11, 10, 0x10),
 			xpcc::SmartPointer());
 	
 	backend->messagesToReceive.append(message);
@@ -104,7 +104,7 @@ DispatcherTest::testReceiveRequestNoComponent()
 void
 DispatcherTest::testReceiveResponse()
 {
-	Message message(xpcc::Header(xpcc::Header::RESPONSE, false, 1, 10, 0x10),
+	Message message(xpcc::Header(xpcc::Header::Type::RESPONSE, false, 1, 10, 0x10),
 			xpcc::SmartPointer());
 	
 	backend->messagesToReceive.append(message);
@@ -117,14 +117,14 @@ DispatcherTest::testReceiveResponse()
 	TEST_ASSERT_EQUALS(backend->messagesSend.getSize(), 1U);
 	TEST_ASSERT_EQUALS(backend->messagesSend.getFront().payload.getSize(), 0U);
 	
-	xpcc::Header ackHeader(xpcc::Header::RESPONSE, true, 10, 1, 0x10);
+	xpcc::Header ackHeader(xpcc::Header::Type::RESPONSE, true, 10, 1, 0x10);
 	TEST_ASSERT_EQUALS(backend->messagesSend.getFront().header, ackHeader);
 }
 
 void
 DispatcherTest::testReceiveResponseNoComponent()
 {
-	Message message(xpcc::Header(xpcc::Header::RESPONSE, false, 11, 10, 0x10),
+	Message message(xpcc::Header(xpcc::Header::Type::RESPONSE, false, 11, 10, 0x10),
 			xpcc::SmartPointer());
 	
 	backend->messagesToReceive.append(message);
@@ -139,7 +139,7 @@ DispatcherTest::testReceiveResponseNoComponent()
 void
 DispatcherTest::testEventReception()
 {
-	Message message(xpcc::Header(xpcc::Header::REQUEST, false, 0, 10, 0x20),
+	Message message(xpcc::Header(xpcc::Header::Type::REQUEST, false, 0, 10, 0x20),
 			xpcc::SmartPointer());
 	
 	backend->messagesToReceive.append(message);
@@ -175,7 +175,7 @@ DispatcherTest::testEventTransmission()
 			backend->messagesSend.getFront().payload.get<uint32_t>(),
 			0x12345678U);
 	
-	xpcc::Header header(xpcc::Header::REQUEST, false, 0, 2, 0x21);
+	xpcc::Header header(xpcc::Header::Type::REQUEST, false, 0, 2, 0x21);
 	TEST_ASSERT_EQUALS(backend->messagesSend.getFront().header, header);
 }
 
@@ -411,7 +411,7 @@ DispatcherTest::testActionRetransmissionWithAbort()
 		TEST_ASSERT_EQUALS(backend->messagesSend.getSize(), 1U);
 		TEST_ASSERT_EQUALS(backend->messagesSend.getFront().payload.getSize(), 0U);
 		TEST_ASSERT_EQUALS(backend->messagesSend.getFront().header,
-				xpcc::Header(xpcc::Header::REQUEST, false, 10, 1, 0xf3));
+				xpcc::Header(xpcc::Header::Type::REQUEST, false, 10, 1, 0xf3));
 		
 		backend->messagesSend.removeAll();
 		
@@ -438,7 +438,7 @@ DispatcherTest::testActionRetransmission()
 		TEST_ASSERT_EQUALS(backend->messagesSend.getSize(), 1U);
 		TEST_ASSERT_EQUALS(backend->messagesSend.getFront().payload.getSize(), 0U);
 		TEST_ASSERT_EQUALS(backend->messagesSend.getFront().header,
-				xpcc::Header(xpcc::Header::REQUEST, false, 10, 1, 0xf3));
+				xpcc::Header(xpcc::Header::Type::REQUEST, false, 10, 1, 0xf3));
 		
 		backend->messagesSend.removeAll();
 		
@@ -452,7 +452,7 @@ DispatcherTest::testActionRetransmission()
 	
 	// send requested ACK
 	backend->messagesToReceive.append(
-			Message(xpcc::Header(xpcc::Header::REQUEST, true, 1, 10, 0xf3),
+			Message(xpcc::Header(xpcc::Header::Type::REQUEST, true, 1, 10, 0xf3),
 					xpcc::SmartPointer()));
 	
 	// reset time so that the timeout is expired
@@ -467,7 +467,7 @@ void
 DispatcherTest::testResponseRetransmissionWithAbort()
 {
 	backend->messagesToReceive.append(
-			Message(xpcc::Header(xpcc::Header::REQUEST, false, 1, 10, 0x12),
+			Message(xpcc::Header(xpcc::Header::Type::REQUEST, false, 1, 10, 0x12),
 					xpcc::SmartPointer()));
 	
 	dispatcher->update();
@@ -480,7 +480,7 @@ DispatcherTest::testResponseRetransmissionWithAbort()
 	
 	// ACK
 	TEST_ASSERT_EQUALS(backend->messagesSend.getFront().header,
-			xpcc::Header(xpcc::Header::REQUEST, true, 10, 1, 0x12));
+			xpcc::Header(xpcc::Header::Type::REQUEST, true, 10, 1, 0x12));
 	TEST_ASSERT_EQUALS(backend->messagesSend.getFront().payload.getSize(), 0U);
 	backend->messagesSend.removeFront();
 	
@@ -489,7 +489,7 @@ DispatcherTest::testResponseRetransmissionWithAbort()
 		TEST_ASSERT_EQUALS(backend->messagesSend.getSize(), 1U);
 		TEST_ASSERT_EQUALS(backend->messagesSend.getFront().payload.getSize(), 0U);
 		TEST_ASSERT_EQUALS(backend->messagesSend.getFront().header,
-				xpcc::Header(xpcc::Header::RESPONSE, false, 10, 1, 0x12));
+				xpcc::Header(xpcc::Header::Type::RESPONSE, false, 10, 1, 0x12));
 		
 		backend->messagesSend.removeFront();
 		
@@ -507,7 +507,7 @@ void
 DispatcherTest::testResponseRetransmission()
 {
 	backend->messagesToReceive.append(
-			Message(xpcc::Header(xpcc::Header::REQUEST, false, 1, 10, 0x12),
+			Message(xpcc::Header(xpcc::Header::Type::REQUEST, false, 1, 10, 0x12),
 					xpcc::SmartPointer()));
 	
 	dispatcher->update();
@@ -520,7 +520,7 @@ DispatcherTest::testResponseRetransmission()
 		TEST_ASSERT_EQUALS(backend->messagesSend.getSize(), 1U);
 		TEST_ASSERT_EQUALS(backend->messagesSend.getFront().payload.getSize(), 0U);
 		TEST_ASSERT_EQUALS(backend->messagesSend.getFront().header,
-				xpcc::Header(xpcc::Header::RESPONSE, false, 10, 1, 0x12));
+				xpcc::Header(xpcc::Header::Type::RESPONSE, false, 10, 1, 0x12));
 		
 		backend->messagesSend.removeFront();
 		
@@ -534,7 +534,7 @@ DispatcherTest::testResponseRetransmission()
 	
 	// send requested ACK
 	backend->messagesToReceive.append(
-			Message(xpcc::Header(xpcc::Header::RESPONSE, true, 1, 10, 0x12),
+			Message(xpcc::Header(xpcc::Header::Type::RESPONSE, true, 1, 10, 0x12),
 					xpcc::SmartPointer()));
 	
 	// reset time so that the timeout is expired if still active

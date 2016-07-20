@@ -47,7 +47,7 @@ namespace xpcc
 	struct Header
 	{
 	public:
-		enum Type
+		enum class Type : uint8_t
 		{
 			REQUEST,
 			RESPONSE,
@@ -56,7 +56,7 @@ namespace xpcc
 		
 	public:
 		Header() :
-			type(REQUEST),
+			type(Type::REQUEST),
 			isAcknowledge(false),
 			destination(0),
 			source(0),

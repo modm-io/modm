@@ -40,21 +40,18 @@ uint32_t
 xpcc::CanConnectorBase::convertToIdentifier(const Header & header,
 		bool fragmentated)
 {
-	uint32_t identifier;
+	uint32_t identifier = 0;
 
 	switch (header.type)
 	{
-		case xpcc::Header::REQUEST:
+		case xpcc::Header::Type::REQUEST:
 			identifier = 0;
 			break;
-		case xpcc::Header::RESPONSE:
+		case xpcc::Header::Type::RESPONSE:
 			identifier = 1;
 			break;
-		case xpcc::Header::NEGATIVE_RESPONSE:
+		case xpcc::Header::Type::NEGATIVE_RESPONSE:
 			identifier = 2;
-			break;
-		default:
-			identifier = 0;
 			break;
 	}
 
@@ -102,18 +99,18 @@ xpcc::CanConnectorBase::convertToHeader(const uint32_t & identifier,
 	switch (flags & 0x18)
 	{
 		case 0x00:
-			header.type = xpcc::Header::REQUEST;
+			header.type = xpcc::Header::Type::REQUEST;
 			break;
 		case 0x08:
-			header.type = xpcc::Header::RESPONSE;
+			header.type = xpcc::Header::Type::RESPONSE;
 			break;
 		case 0x10:
-			header.type = xpcc::Header::NEGATIVE_RESPONSE;
+			header.type = xpcc::Header::Type::NEGATIVE_RESPONSE;
 			break;
 		default:
 			// unknown type
 			//XPCC_LOG_ERROR << "Unknown Type" << xpcc::flush;
-			header.type = xpcc::Header::REQUEST;
+			header.type = xpcc::Header::Type::REQUEST;
 	}
 
 	// check if the message is a fragment

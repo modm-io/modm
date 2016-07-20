@@ -36,7 +36,7 @@ FakePostman::deliverPacket(const xpcc::Header& header,
 {
 	this->messagesToDeliver.append(Message(header, payload));
 	
-	if (header.type != xpcc::Header::REQUEST)
+	if (header.type != xpcc::Header::Type::REQUEST)
 		return ERROR;
 	
 	if (header.destination == 0)

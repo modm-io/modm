@@ -99,7 +99,7 @@ CanConnectorTest::tearDown()
 
 // ----------------------------------------------------------------------------
 CanConnectorTest::CanConnectorTest() :
-	xpccHeader(xpcc::Header::REQUEST, false, 0x12, 0x34, 0x56),
+	xpccHeader(xpcc::Header::Type::REQUEST, false, 0x12, 0x34, 0x56),
 	normalIdentifier(0x00123456),
 	fragmentedIdentifier(0x01123456)
 {
