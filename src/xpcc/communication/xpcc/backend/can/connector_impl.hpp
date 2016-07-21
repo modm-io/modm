@@ -105,7 +105,9 @@ template<typename Driver>
 void
 xpcc::CanConnector<Driver>::update()
 {
-	this->checkAndReceiveMessages();
+	while (this->canDriver->isMessageAvailable()) {
+		this->retrieveMessage();
+	}
 	this->sendWaitingMessages();
 }
 
@@ -291,14 +293,5 @@ xpcc::CanConnector<Driver>::retrieveMessage()
 	}
 	else {
 		return false;
-	}
-}
-
-template<typename Driver>
-void
-xpcc::CanConnector<Driver>::checkAndReceiveMessages()
-{
-	while (this->canDriver->isMessageAvailable()) {
-		this->retrieveMessage();
 	}
 }

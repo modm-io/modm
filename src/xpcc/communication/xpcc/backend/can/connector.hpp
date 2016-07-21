@@ -184,9 +184,6 @@ namespace xpcc
 		bool
 		retrieveMessage();
 
-		void
-		checkAndReceiveMessages();
-
 	protected:
 		class SendListItem
 		{
