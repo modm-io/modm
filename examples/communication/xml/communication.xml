@@ -43,4 +43,9 @@
 	<component name="receiver" />
 </container>
 
+<container name="senderreceiver">
+	<component name="sender" />
+	<component name="receiver" />
+</container>
+
 </rca>
