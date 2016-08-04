@@ -10,11 +10,11 @@
 //
 // STM32F7DISCOVERY
 // Discovery kit for STM32F746 line
-// http://www.st.com/web/en/catalog/tools/FM116/SC959/SS1532/PF252419
+// http://www.st.com/content/st_com/en/products/evaluation-tools/product-evaluation-tools/mcu-eval-tools/stm32-mcu-eval-tools/stm32-mcu-discovery-kits/32f746gdiscovery.html
 //
 
-#ifndef XPCC_STM32_F7_DISCOVERY_HPP
-#define XPCC_STM32_F7_DISCOVERY_HPP
+#ifndef XPCC_STM32_F746G_DISCOVERY_HPP
+#define XPCC_STM32_F746G_DISCOVERY_HPP
 
 #include <xpcc/architecture/platform.hpp>
 #include <xpcc/debug/logger.hpp>
@@ -133,4 +133,4 @@ initialize()
 
 }
 
-#endif	// XPCC_STM32_F7_DISCOVERY_HPP
+#endif	// XPCC_STM32_F746G_DISCOVERY_HPP
