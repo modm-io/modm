@@ -65,7 +65,7 @@ xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::setDataOrder(DataOrder order)
 
 template <typename SCK, typename MOSI, typename MISO>
 uint8_t
-xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::aquire(void *ctx, ConfigurationHandler handler)
+xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::acquire(void *ctx, ConfigurationHandler handler)
 {
 	if (ctx == nullptr)
 	{

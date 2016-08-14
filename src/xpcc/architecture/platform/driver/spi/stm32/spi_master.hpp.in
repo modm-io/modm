@@ -117,7 +117,7 @@ public:
 
 
 	static uint8_t
-	aquire(void *ctx, ConfigurationHandler handler = nullptr);
+	acquire(void *ctx, ConfigurationHandler handler = nullptr);
 
 	static uint8_t
 	release(void *ctx);

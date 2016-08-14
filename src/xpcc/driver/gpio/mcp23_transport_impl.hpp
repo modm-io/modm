@@ -88,7 +88,7 @@ xpcc::Mcp23TransportSpi<SpiMaster, Cs>::write(uint8_t reg, uint8_t value)
 {
 	RF_BEGIN();
 
-	RF_WAIT_UNTIL(this->aquireMaster());
+	RF_WAIT_UNTIL(this->acquireMaster());
 	Cs::reset();
 
 	RF_CALL(SpiMaster::transfer(address | Write));
@@ -107,7 +107,7 @@ xpcc::Mcp23TransportSpi<SpiMaster, Cs>::write16(uint8_t reg, uint16_t value)
 {
 	RF_BEGIN();
 
-	RF_WAIT_UNTIL(this->aquireMaster());
+	RF_WAIT_UNTIL(this->acquireMaster());
 	Cs::reset();
 
 	RF_CALL(SpiMaster::transfer(address | Write));
@@ -128,7 +128,7 @@ xpcc::Mcp23TransportSpi<SpiMaster, Cs>::read(uint8_t reg, uint8_t *buffer, uint8
 {
 	RF_BEGIN();
 
-	RF_WAIT_UNTIL(this->aquireMaster());
+	RF_WAIT_UNTIL(this->acquireMaster());
 	Cs::reset();
 
 	RF_CALL(SpiMaster::transfer(address | Read));

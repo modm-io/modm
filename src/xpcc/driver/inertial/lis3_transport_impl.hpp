@@ -79,7 +79,7 @@ xpcc::Lis3TransportSpi<SpiMaster, Cs>::write(uint8_t reg, uint8_t value)
 {
 	RF_BEGIN();
 
-	RF_WAIT_UNTIL(this->aquireMaster());
+	RF_WAIT_UNTIL(this->acquireMaster());
 	Cs::reset();
 
 	RF_CALL(SpiMaster::transfer(reg | Write));
@@ -98,7 +98,7 @@ xpcc::Lis3TransportSpi<SpiMaster, Cs>::read(uint8_t reg, uint8_t *buffer, uint8_
 {
 	RF_BEGIN();
 
-	RF_WAIT_UNTIL(this->aquireMaster());
+	RF_WAIT_UNTIL(this->acquireMaster());
 	Cs::reset();
 
 	RF_CALL(SpiMaster::transfer(reg | Read));

@@ -52,7 +52,7 @@ public:
 
 	/**
 	 * Request access to the spi master within a context.
-	 * You may aquire the spi master multiple times within the same context.
+	 * You may acquire the spi master multiple times within the same context.
 	 *
 	 * The configuration handler will only be called when aquiring the spi
 	 * master for the first time (if it is not a `nullptr`).
@@ -61,15 +61,15 @@ public:
 	 * @warning		Aquires are persistent even after calling `initialize()`!
 	 *
 	 * @return	`0` if another context is using the spi master, otherwise
-	 * 			`>0` as the number of times this context aquired the master.
+	 * 			`>0` as the number of times this context acquired the master.
 	 */
 	static uint8_t
-	aquire(void *ctx, ConfigurationHandler handler = nullptr);
+	acquire(void *ctx, ConfigurationHandler handler = nullptr);
 
 	/**
 	 * Release access to the spi master within a context.
 	 *
-	 * @warning		Releases must be balanced with aquires of the **same** context!
+	 * @warning		Releases must be balanced with acquires of the **same** context!
 	 * @warning		Releases are persistent even after calling `initialize()`!
 	 *
 	 * @return	`0` if nothing can be released anymore (for any context)
@@ -109,7 +109,7 @@ public:
 	 * using `PT_CALL` or `RF_CALL` respectively.
 	 * @warning	These methods differ from Resumables by lacking context protection!
 	 * 			You must ensure that only one driver is accessing this resumable function
-	 * 			by using `aquire(ctx)` and `release(ctx)`.
+	 * 			by using `acquire(ctx)` and `release(ctx)`.
 	 *
 	 * @param	data
 	 * 		data to be sent
@@ -127,7 +127,7 @@ public:
 	 * using `PT_CALL` or `RF_CALL` respectively.
 	 * @warning	These methods differ from Resumables by lacking context protection!
 	 * 			You must ensure that only one driver is accessing this resumable function
-	 * 			by using `aquire(ctx)` and `release(ctx)`.
+	 * 			by using `acquire(ctx)` and `release(ctx)`.
 	 *
 	 * @param[in]   tx
 	 *      pointer to transmit buffer, set to `nullptr` to send dummy bytes

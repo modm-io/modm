@@ -19,7 +19,7 @@ xpcc::{{target.family}}::UartSpiMaster{{id}}::dataOrder = DataOrder::MsbFirst;
 
 // bit 7 (0x80) is used for transfer 1 byte
 // bit 6 (0x40) is used for transfer multiple byte
-// bit 5-0 (0x3f) are used to store the aquire count
+// bit 5-0 (0x3f) are used to store the acquire count
 uint8_t
 xpcc::{{target.family}}::UartSpiMaster{{id}}::state(0);
 
@@ -50,7 +50,7 @@ xpcc::{{target.family}}::UartSpiMaster{{id}}::initialize(uint16_t prescaler)
 // ----------------------------------------------------------------------------
 
 uint8_t
-xpcc::{{target.family}}::UartSpiMaster{{id}}::aquire(void *ctx, ConfigurationHandler handler)
+xpcc::{{target.family}}::UartSpiMaster{{id}}::acquire(void *ctx, ConfigurationHandler handler)
 {
 	if (context == nullptr)
 	{

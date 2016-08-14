@@ -13,7 +13,7 @@
 
 // bit 7 (0x80) is used for transfer 1 byte
 // bit 6 (0x40) is used for transfer multiple byte
-// bit 5-0 (0x3f) are used to store the aquire count
+// bit 5-0 (0x3f) are used to store the acquire count
 uint8_t
 xpcc::{{target.family}}::SpiMaster::state(0);
 
@@ -36,7 +36,7 @@ xpcc::{{target.family}}::SpiMaster::initialize(Prescaler prescaler)
 // ----------------------------------------------------------------------------
 
 uint8_t
-xpcc::{{target.family}}::SpiMaster::aquire(void *ctx, ConfigurationHandler handler)
+xpcc::{{target.family}}::SpiMaster::acquire(void *ctx, ConfigurationHandler handler)
 {
 	if (context == nullptr)
 	{

@@ -44,9 +44,9 @@ public:
 
 protected:
 	bool inline
-	aquireMaster()
+	acquireMaster()
 	{
-		return (SpiMaster::aquire(this, configuration) != 0);
+		return (SpiMaster::acquire(this, configuration) != 0);
 	}
 
 	bool inline
