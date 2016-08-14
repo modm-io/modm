@@ -73,7 +73,6 @@
       <vector position="39" name="USART3"/>
       <vector position="40" name="EXTI15_10"/>
       <vector position="41" name="RTC_Alarm"/>
-      <vector position="42" name="USBWakeUp"/>
       <vector position="43" name="TIM8_BRK"/>
       <vector position="44" name="TIM8_UP"/>
       <vector position="45" name="TIM8_TRG_COM"/>

@@ -213,6 +213,8 @@ class STMDeviceReader(XMLDeviceReader):
 			name, pos = line.split('/*!<')[0].split('=')
 			pos = int(pos.strip(' ,'))
 			name = name.strip()[:-5]
+			if self.id.family in ['f3'] and pos == 42 and name == 'USBWakeUp':
+				continue
 			ivectors.append({'position': pos, 'name': name})
 
 		self.log.debug("STMDeviceReader: Found interrupt vectors:\n" + "\n".join(["{}: {}".format(v['position'], v['name']) for v in ivectors]))
