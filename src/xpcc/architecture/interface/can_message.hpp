@@ -92,6 +92,10 @@ public:
 		bool extended : 1;
 	} flags;
 	uint8_t length;
+
+public:
+	bool
+	operator == (const xpcc::can::Message& rhs) const;
 };
 
 xpcc::IOStream&

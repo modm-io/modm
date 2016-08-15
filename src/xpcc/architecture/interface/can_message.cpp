@@ -32,5 +32,24 @@ operator << (xpcc::IOStream& s, const xpcc::can::Message m)
     return s;
 }
 
+bool
+xpcc::can::Message::operator == (const xpcc::can::Message& rhs) const
+{
+	if ((this->identifier     == rhs.identifier) and
+		(this->length         == rhs.length)     and
+		(this->flags.rtr      == rhs.flags.rtr)  and
+		(this->flags.extended == rhs.flags.extended))
+	{
+		bool eq = true;
+		for (uint8_t ii = 0; ii < this->length; ++ii)
+		{
+			if (this->data[ii] != rhs.data[ii]) {
+				eq = false;
+			}
+		}
+		return eq;
+	}
+	return false;
 }
-}
+} // can namespace
+} // xpcc namespace
