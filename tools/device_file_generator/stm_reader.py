@@ -376,7 +376,7 @@ class STMDeviceReader(XMLDeviceReader):
 						output_type = 'in'
 						if 'CH' in tname:
 							nice_name = tname.replace('CH', 'Channel')
-							output_type = None
+							output_type = 'out'
 						elif 'BKIN' in tname:
 							nice_name = 'BreakIn'
 						af = {'peripheral' : 'Timer' + tinstance,
