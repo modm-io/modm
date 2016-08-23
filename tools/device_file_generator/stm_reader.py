@@ -166,7 +166,7 @@ class STMDeviceReader(XMLDeviceReader):
 
 		# device defines
 		defines = []
-		if self.id.family in ['f4', 'f7']:
+		if self.id.family in ['f4']:
 			# required for our FreeRTOS
 			defines.append('STM32F4XX')
 
