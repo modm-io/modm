@@ -93,12 +93,22 @@ def generate(env, **kw):
 		# (for example __libc_init_array())
 		env['THUMB_LINKER'] = '-mthumb'
 
+	# Single precision float support
 	if env['ARCHITECTURE'] == 'cortex-m4f':
 		# Options for '-mfloat-abi='
 		# - soft: Full software floating point.
 		# - softfp: Use the FPU, but remain compatible with soft-float code.
 		# - hard: Full hardware floating point. Needs support from libc. 
 		env['FPU'] = '-mfloat-abi=softfp -mfpu=fpv4-sp-d16'
+
+	# Single precision float support
+	# PM0253 4.7: "The Cortex-M7 Floating-Point Unit (FPU) implements the FPv5 floating-point extensions."
+	if env['ARCHITECTURE'] == 'cortex-m7f':
+		env['FPU'] = '-mfloat-abi=softfp -mfpu=fpv5-sp-d16'
+
+	# Double precision float support
+	if env['ARCHITECTURE'] == 'cortex-m7fd':
+		env['FPU'] = '-mfloat-abi=softfp -mfpu=fpv5-d16'
 	
 	# C flags
 	env['CFLAGS'] = [
@@ -126,12 +136,6 @@ def generate(env, **kw):
 		"-fno-tree-loop-optimize",
 		"-fno-unwind-tables",
 		"-finline-limit=10000",
-		# All constants are assumed to be float (32-bit) and not
-		# double (32-bit) by default.
-		"-fsingle-precision-constant",
-		# Warn if a float value is implicit promoted to double. Doubles are
-		# emulated in software while floats can use the FPU.
-		"-Wdouble-promotion",
 		"-mlong-calls",		# when using ".fastcode" without longcall
 		"-Wall",
 		"-Werror=maybe-uninitialized",
@@ -148,7 +152,18 @@ def generate(env, **kw):
 		"-DBASENAME=${SOURCE.file}",
 		"-fdiagnostics-color=auto",
 	]
-	
+
+	# Platforms with single precision float support
+	if env['ARCHITECTURE'] in ['cortex-m4f', 'cortex-m7f']:
+		env['CFLAGS'] += [
+			# All constants are assumed to be float (32-bit) and not
+			# double (64-bit) by default.
+			"-fsingle-precision-constant",
+			# Warn if a float value is implicit promoted to double. Doubles are
+			# emulated in software while floats can use the FPU.
+			"-Wdouble-promotion",
+		]
+
 	# C++ flags
 	env['CXXFLAGS'] = [
 #		"-fverbose-asm",

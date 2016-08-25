@@ -244,7 +244,7 @@ Reset_Handler(void)
 	SCB_EnableICache();
 %% endif
 
-%% if target is cortex_m4f or target is cortex_m7f
+%% if target is cortex_m4f or target is cortex_m7f or target is cortex_m7fd
 	// Enable FPU in privileged and user mode
 	SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  // set CP10 and CP11 Full Access
 %% endif
