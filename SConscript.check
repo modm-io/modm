@@ -105,6 +105,8 @@ devices = [
 	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m4',	'device': 'stm32f303cc',	'clock':  72000000 },
 #	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m4',	'device': 'stm32f405vg',	'clock': 168000000 },
 	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m4',	'device': 'stm32f407vg',	'clock': 168000000 },
+	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m7f',	'device': 'stm32f746ng',	'clock': 216000000 },
+	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m7fd',	'device': 'stm32f769ni',	'clock': 216000000 },
 ]
 
 check = 'all' if 'check' in BUILD_TARGETS else ARGUMENTS.get('check')
