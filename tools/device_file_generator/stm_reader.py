@@ -69,6 +69,8 @@ class STMDeviceReader(XMLDeviceReader):
 		self.addProperty('architecture', coreLut[core.replace('cortex-', '')])
 		if core.endswith('m4') or core.endswith('m7'):
 			core += 'f'
+		if self.id.family in ['f7'] and self.id.name not in ['745', '746', '756']:
+			core += 'd'
 		self.addProperty('core', core)
 
 		# flash and ram sizes
@@ -164,7 +166,7 @@ class STMDeviceReader(XMLDeviceReader):
 
 		# device defines
 		defines = []
-		if self.id.family in ['f4', 'f7']:
+		if self.id.family in ['f4']:
 			# required for our FreeRTOS
 			defines.append('STM32F4XX')
 
@@ -211,6 +213,8 @@ class STMDeviceReader(XMLDeviceReader):
 			name, pos = line.split('/*!<')[0].split('=')
 			pos = int(pos.strip(' ,'))
 			name = name.strip()[:-5]
+			if self.id.family in ['f3'] and pos == 42 and name == 'USBWakeUp':
+				continue
 			ivectors.append({'position': pos, 'name': name})
 
 		self.log.debug("STMDeviceReader: Found interrupt vectors:\n" + "\n".join(["{}: {}".format(v['position'], v['name']) for v in ivectors]))
@@ -459,6 +463,11 @@ class STMDeviceReader(XMLDeviceReader):
 		familyDefines = stm32_defines[self.id.family]
 		# get all defines for this device name
 		devName = 'STM32F{}'.format(self.id.name)
+
+		# Map STM32F7x8 -> STM32F7x7
+		if self.id.family == 'f7' and devName[8] == '8':
+			devName = devName[:8] + '7'
+
 		deviceDefines = sorted([define for define in familyDefines if define.startswith(devName)])
 		# if there is only one define thats the one
 		if len(deviceDefines) == 1:

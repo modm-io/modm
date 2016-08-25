@@ -15,7 +15,6 @@
     <pin-count device-pin-id="b">208</pin-count>
     <pin-count device-pin-id="n">216</pin-count>
     <header>stm32f7xx.h</header>
-    <define>STM32F4XX</define>
     <define device-name="745">STM32F745xx</define>
     <define device-name="746">STM32F746xx</define>
     <define device-name="756" device-size-id="g">STM32F756xx</define>
