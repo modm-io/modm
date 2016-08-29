@@ -40,8 +40,15 @@ if 'communication' in env['XPCC_CONFIG']:
     if 'generate' in env['XPCC_CONFIG']['communication']:
         generate_path = env['XPCC_CONFIG']['communication']['generate']
     else: generate_path = 'communication'
+    if 'namespace' in env['XPCC_CONFIG']['communication']:
+        namespace = env['XPCC_CONFIG']['communication']['namespace']
+    else: namespace = 'robot'
 
-    files.sources += env.XpccCommunication(source_path, path=generate_path)
+    files.sources += env.XpccCommunication(
+        source_path,
+        dtdPath=xpccpath + '/tools/system_design/xml/dtd',
+        path=generate_path,
+        namespace=namespace)
 
 if 'images' in env['XPCC_CONFIG']:
     # create c-files from the bitmaps
