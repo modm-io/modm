@@ -20,7 +20,7 @@ import os, re, sys
 import builder_base
 
 # This is neccessary in order to use a common find_include_file method
-sys.path = [os.path.join(os.path.dirname(__file__), '..')] + sys.path
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from xmlparser.parser import Parser
 from xmlparser.parser_exception import ParserException
 
