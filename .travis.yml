@@ -66,5 +66,6 @@ env:
  - TEST_SUITE="check=examples examples=nucleo_f411re"
  - TEST_SUITE="check=examples examples=nucleo_f429zi"
  - TEST_SUITE="check=examples examples=unittest"
+ - TEST_SUITE="check=examples examples=zmq"
 
 script: "scons $TEST_SUITE"
