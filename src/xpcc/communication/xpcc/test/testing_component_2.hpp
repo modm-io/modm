@@ -38,7 +38,7 @@
 class TestingComponent2 : public xpcc::AbstractComponent
 {
 public:
-	TestingComponent2(xpcc::Dispatcher *communication, Timeline *timeline);
+	TestingComponent2(xpcc::Dispatcher &communication, Timeline *timeline);
 	
 	virtual void
 	update();

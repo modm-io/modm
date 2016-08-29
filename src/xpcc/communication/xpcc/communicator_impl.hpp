@@ -45,7 +45,7 @@ xpcc::Communicator::callAction(uint8_t receiver,
 	
 	SmartPointer payload(&data);
 	
-	this->dispatcher->addMessage(header, payload);
+	this->dispatcher.addMessage(header, payload);
 }
 
 // ----------------------------------------------------------------------------
@@ -61,7 +61,7 @@ xpcc::Communicator::callAction(uint8_t receiver, uint8_t actionIdentifier,
 	
 	SmartPointer payload(&data);
 	
-	this->dispatcher->addMessage(header, payload, responseCallback);
+	this->dispatcher.addMessage(header, payload, responseCallback);
 }
 
 // ----------------------------------------------------------------------------
@@ -75,7 +75,7 @@ xpcc::Communicator::publishEvent(uint8_t eventIdentifier, const T& data)
 			eventIdentifier);
 	
 	SmartPointer payload(&data);	// no metadata is sent with Events
-	this->dispatcher->addMessage(header, payload);
+	this->dispatcher.addMessage(header, payload);
 }
 
 // ----------------------------------------------------------------------------
@@ -89,7 +89,7 @@ xpcc::Communicator::sendResponse(const ResponseHandle& handle, const T& data)
 			handle.packetIdentifier);
 	
 	SmartPointer payload(&data);
-	this->dispatcher->addResponse(header, payload);
+	this->dispatcher.addResponse(header, payload);
 }
 
 template<typename T>
@@ -102,5 +102,5 @@ xpcc::Communicator::sendNegativeResponse(const ResponseHandle& handle, const T& 
 			handle.packetIdentifier);
 	
 	SmartPointer payload(&data);
-	this->dispatcher->addResponse(header, payload);
+	this->dispatcher.addResponse(header, payload);
 }

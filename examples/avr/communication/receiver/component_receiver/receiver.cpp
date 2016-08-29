@@ -37,7 +37,7 @@
 #include "receiver.hpp"
 
 // ----------------------------------------------------------------------------
-component::Receiver::Receiver(uint8_t id, xpcc::Dispatcher *communication) :
+component::Receiver::Receiver(uint8_t id, xpcc::Dispatcher &communication) :
 	xpcc::AbstractComponent(id, communication)
 {
 }

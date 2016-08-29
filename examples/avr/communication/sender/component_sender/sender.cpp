@@ -40,7 +40,7 @@
 #include "sender.hpp"
 
 // ----------------------------------------------------------------------------
-component::Sender::Sender(uint8_t id, xpcc::Dispatcher *communication) :
+component::Sender::Sender(uint8_t id, xpcc::Dispatcher &communication) :
 	xpcc::AbstractComponent(id, communication),
 	positionCallback(this, &Sender::getPositionCallback),
 	timer(2000)

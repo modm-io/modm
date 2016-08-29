@@ -64,7 +64,7 @@ namespace xpcc
 		 * \param	dispatcher		Communication class use to send messages
 		 */
 		Communicator(const uint8_t ownIdentifier,
-				Dispatcher *dispatcher);
+				Dispatcher &dispatcher);
 
 		Communicator(const Communicator&);
 
@@ -117,7 +117,7 @@ namespace xpcc
 
 	private:
 		const uint8_t ownIdentifier;
-		Dispatcher * const dispatcher;
+		Dispatcher & dispatcher;
 	};
 }
 
