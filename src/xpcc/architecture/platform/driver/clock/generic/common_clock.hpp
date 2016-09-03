@@ -104,7 +104,7 @@ StartupError : uint8_t
 extern uint32_t ATTRIBUTE_FASTDATA fcpu;
 extern uint32_t ATTRIBUTE_FASTDATA fcpu_kHz;
 extern uint16_t ATTRIBUTE_FASTDATA fcpu_MHz;
-extern uint16_t ATTRIBUTE_FASTDATA ns_per_loop asm("ns_per_loop");
+extern uint16_t ATTRIBUTE_FASTDATA ns_per_loop;
 
 }	// namespace clock
 

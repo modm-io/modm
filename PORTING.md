@@ -295,7 +295,7 @@ uint16_t ATTRIBUTE_FASTDATA fcpu_MHz(8);
 // Cortex-M0: 4000 loops per MHz
 // Cortex-M7: 1000 loops per MHz
 // otherwise: 3000 loops per MHz
-uint16_t ATTRIBUTE_FASTDATA ns_per_loop asm("ns_per_loop") (3000 / 8);
+uint16_t ATTRIBUTE_FASTDATA ns_per_loop(3000 / 8);
 
 }
 }
