@@ -208,7 +208,7 @@ Daniel Krebs ([@daniel-k](https://github.com/daniel-k)),
 [eurobot]: http://www.eurobot.org/
 [travis_ci]: https://travis-ci.org/roboterclubaachen/xpcc
 [testing]: http://xpcc.io/guide/testing
-[mailing_archive]: http://blog.gmane.org/gmane.comp.hardware.arm.cortex.xpcc.devel
+[mailing_archive]: https://www.mail-archive.com/xpcc-dev@lists.rwth-aachen.de
 [examples]: https://github.com/roboterclubaachen/xpcc/tree/develop/examples
 [mailing_list]: http://mailman.rwth-aachen.de/mailman/listinfo/xpcc-dev
 [guide]: http://xpcc.io/guide/getting-started
