@@ -113,7 +113,7 @@ public:
 		{%- endif %}
 		getResult()
 		{
-			if (responseHeader.type == xpcc::Header::RESPONSE)
+			if (responseHeader.type == xpcc::Header::Type::RESPONSE)
 				{%- if action.returnType %}
 				return &responsePayload;	/* returns positive response with payload */
 				{%- else %}
