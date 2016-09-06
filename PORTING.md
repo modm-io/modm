@@ -133,8 +133,8 @@ Our build system is organically grown, er, I mean, *has* organically grown. Ther
 The [Cortex-M startup script](https://github.com/roboterclubaachen/xpcc/blob/develop/src/xpcc/architecture/platform/driver/core/cortex/startup.c.in?ts=4) is pretty universal. These are the steps it does:
 
 1. Generate the exception table and places it at the beginning of Flash.
-2. Fill the stack with magic values to catch unintentional stack execution.
-3. Call platform specific code (enabling internal memories, **needs porting**).
+2. Call platform specific code to enable internal memories (**needs porting**).
+3. Fill the stack with magic values to catch unintentional stack execution.
 4. Copy and zero internal memories.
 5. Initialize the Cortex-M CPU.
 6. Call `xpcc_gpio_enable()` to enable clock to GPIO (**needs porting**).
@@ -146,15 +146,15 @@ The [Cortex-M startup script](https://github.com/roboterclubaachen/xpcc/blob/dev
 
 We'll write the `xpcc_gpio_enable()` function when we port the GPIO driver.
 
-To provide code for step 3, copy and adapt [the macro file for the STM32 devices](https://github.com/roboterclubaachen/xpcc/blob/develop/src/xpcc/architecture/platform/driver/core/cortex/stm32/stm32.macros?ts=4).
-You can leave the `defines()` and `appendInterrupt()` macros as they are, but you need to implement the `startupCode()` macro with whatever platform specific hardware needs to be initialized. Don't do complicated stuff here, the system is not fully booted yet!
+To provide code for step 2 adapt [the platform macro file](https://github.com/roboterclubaachen/xpcc/blob/develop/src/xpcc/architecture/platform/driver/core/cortex/platform.macros?ts=4).
+Add whatever code is needed to initialize the internal memories. Don't do complicated stuff here, the system is not fully booted yet!
 
-The [simplest linkerscript available is `stm32/stm32_ram.ld.in`](https://github.com/roboterclubaachen/xpcc/blob/develop/src/xpcc/architecture/platform/driver/core/cortex/stm32/stm32_ram.ld.in?ts=4), which fits everything into one SRAM region.
+The [simplest linkerscript available is `linkerscript/stm32_ram.ld.in`](https://github.com/roboterclubaachen/xpcc/blob/develop/src/xpcc/architecture/platform/driver/core/cortex/linkerscript/stm32_ram.ld.in?ts=4), which fits everything into one SRAM region.
 The linkerscipt diagram in the comment gives you an overview of what goes where, check that against the devices memory map. Note that while the diagram shows specific addresses, the section addresses and sizes are taken from the device file!
 
 You need to tell the [core driver which linkerscript to use for you device](https://github.com/roboterclubaachen/xpcc/blob/develop/src/xpcc/architecture/platform/driver/core/cortex/driver.xml?ts=4#L29-L40):
 ```xml
-<template device-platform="sam" out="linkerscript.ld">stm32/stm32_ram.ld.in</template>
+<template device-platform="sam" out="linkerscript.ld">linkerscript/stm32_ram.ld.in</template>
 ```
 
 ### Compile a minimal example
@@ -295,7 +295,7 @@ uint16_t ATTRIBUTE_FASTDATA fcpu_MHz(8);
 // Cortex-M0: 4000 loops per MHz
 // Cortex-M7: 1000 loops per MHz
 // otherwise: 3000 loops per MHz
-uint16_t ATTRIBUTE_FASTDATA ns_per_loop asm("ns_per_loop") (3000 / 8);
+uint16_t ATTRIBUTE_FASTDATA ns_per_loop(3000 / 8);
 
 }
 }

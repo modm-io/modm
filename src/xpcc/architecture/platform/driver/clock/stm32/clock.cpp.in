@@ -24,7 +24,7 @@ uint16_t ATTRIBUTE_FASTDATA fcpu_MHz({{ hsi_frequency }});
 %% else
 	%% set loops = 3000.0
 %% endif
-uint16_t ATTRIBUTE_FASTDATA ns_per_loop asm("ns_per_loop") ({{ loops / hsi_frequency|int}});
+uint16_t ATTRIBUTE_FASTDATA ns_per_loop({{ loops / hsi_frequency|int}});
 
 }
 }

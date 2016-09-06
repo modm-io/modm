@@ -1,0 +1,48 @@
+%# coding: utf-8
+%# Copyright (c) 2011-2016, Roboterclub Aachen e.V.
+%# All Rights Reserved.
+%#
+%# The file is part of the xpcc library and is released under the 3-clause BSD
+%# license. See the file `LICENSE` for the full license governing this code.
+%# ----------------------------------------------------------------------------
+
+%# This File includes platform specific macros for the generic Cortex-M startup
+
+%# WARNING: This code should _only_ enable internal memories and nothing else.
+%#          Since this is the first code executed after a reset, you do not
+%#          have access to _any_ data stored in RAM, since it has not yet been
+%#          initialized.
+%#          In the worst case you won't even have access to the stack, if the
+%#          memory containing the stack is not physically enabled yet.
+%#          In that case, consider using inline assembly to manage stack access
+%#          manually, until the memory is enabled.
+
+%% macro enableInternalMemory()
+
+%% if target is stm32f3
+	// enable clock
+	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+%%   if target.name in ["302"] or (target.name in ["303"] and target.size_id in ["c", "e"])
+	// Remap USB Interrupts
+	SYSCFG->CFGR1 |= SYSCFG_CFGR1_USB_IT_RMP;
+%%   endif
+%% elif target is stm32f4
+// Only the more powerful F4 targets have CCM or Backup SRAM
+#ifdef RCC_AHB1ENR_CCMDATARAMEN
+	// Enable power to backup domain
+	RCC->APB1ENR |= RCC_APB1ENR_PWREN;
+	// Enable write access to backup SRAM
+	PWR->CR |= PWR_CR_DBP;
+	// Enable Core Coupled Memory (CCM) and backup SRAM (BKPSRAM)
+	RCC->AHB1ENR |= RCC_AHB1ENR_CCMDATARAMEN | RCC_AHB1ENR_BKPSRAMEN;
+#endif
+%% elif target is stm32f7
+	// Enable power to backup domain
+	RCC->APB1ENR |= RCC_APB1ENR_PWREN;
+	// Enable write access to backup SRAM
+	PWR->CR1 |= PWR_CR1_DBP;
+	// Enable Data Tighly Coupled Memory (DTCM) and backup SRAM (BKPSRAM)
+	RCC->AHB1ENR |= RCC_AHB1ENR_DTCMRAMEN | RCC_AHB1ENR_BKPSRAMEN;
+%% endif
+
+%% endmacro
