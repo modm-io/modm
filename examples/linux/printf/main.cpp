@@ -33,7 +33,7 @@ main()
 
 	float ff_testvector[] = {123.556789, -123.4};
 
-	for (size_t ii = 0; ii < XPCC__ARRAY_SIZE(ff_testvector); ++ii) {
+	for (size_t ii = 0; ii < XPCC_ARRAY_SIZE(ff_testvector); ++ii) {
 		float ff = ff_testvector[ii];
 
 		for (uint_fast8_t width = 1; width < 10; ++width)

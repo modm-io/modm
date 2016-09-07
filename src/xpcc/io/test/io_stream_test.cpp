@@ -9,7 +9,7 @@
 
 #include "io_stream_test.hpp"
 
-#include <xpcc/architecture/utils.hpp> // XPCC__ARRAY_SIZE
+#include <xpcc/architecture/utils.hpp> // XPCC_ARRAY_SIZE
 #include <stdio.h>	// snprintf
 #include <string.h>	// memset
 
@@ -492,7 +492,7 @@ IoStreamTest::testPrintf2()
 		+0.0067890
 	};
 
-	for (std::size_t ii = 0; ii < XPCC__ARRAY_SIZE(ff_testvector); ++ii)
+	for (std::size_t ii = 0; ii < XPCC_ARRAY_SIZE(ff_testvector); ++ii)
 	{
 		float ff = ff_testvector[ii];
 
