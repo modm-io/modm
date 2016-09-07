@@ -14,9 +14,9 @@ namespace xpcc
 namespace clock
 {
 
-uint32_t ATTRIBUTE_FASTDATA fcpu({{ hsi_frequency|int * 1000000 }});
-uint32_t ATTRIBUTE_FASTDATA fcpu_kHz({{ hsi_frequency|int * 1000 }});
-uint16_t ATTRIBUTE_FASTDATA fcpu_MHz({{ hsi_frequency }});
+uint32_t xpcc_fastdata fcpu({{ hsi_frequency|int * 1000000 }});
+uint32_t xpcc_fastdata fcpu_kHz({{ hsi_frequency|int * 1000 }});
+uint16_t xpcc_fastdata fcpu_MHz({{ hsi_frequency }});
 %% if target is cortex_m0
 	%% set loops = 4000.0
 %% elif target is cortex_m7
@@ -24,7 +24,7 @@ uint16_t ATTRIBUTE_FASTDATA fcpu_MHz({{ hsi_frequency }});
 %% else
 	%% set loops = 3000.0
 %% endif
-uint16_t ATTRIBUTE_FASTDATA ns_per_loop({{ loops / hsi_frequency|int}});
+uint16_t xpcc_fastdata ns_per_loop({{ loops / hsi_frequency|int}});
 
 }
 }

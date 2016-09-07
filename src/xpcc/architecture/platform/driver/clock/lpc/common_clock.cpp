@@ -17,10 +17,10 @@ namespace xpcc
 namespace clock
 {
 
-uint32_t ATTRIBUTE_FASTDATA fcpu(MHz12);
-uint32_t ATTRIBUTE_FASTDATA fcpu_kHz(12000);
-uint16_t ATTRIBUTE_FASTDATA fcpu_MHz(12);
-uint16_t ATTRIBUTE_FASTDATA ns_per_loop(4000/12);
+uint32_t xpcc_fastdata fcpu(MHz12);
+uint32_t xpcc_fastdata fcpu_kHz(12000);
+uint16_t xpcc_fastdata fcpu_MHz(12);
+uint16_t xpcc_fastdata ns_per_loop(4000/12);
 
 }
 

@@ -101,10 +101,10 @@ StartupError : uint8_t
 	WatchdogClock
 };
 
-extern uint32_t ATTRIBUTE_FASTDATA fcpu;
-extern uint32_t ATTRIBUTE_FASTDATA fcpu_kHz;
-extern uint16_t ATTRIBUTE_FASTDATA fcpu_MHz;
-extern uint16_t ATTRIBUTE_FASTDATA ns_per_loop;
+extern uint32_t xpcc_fastdata fcpu;
+extern uint32_t xpcc_fastdata fcpu_kHz;
+extern uint16_t xpcc_fastdata fcpu_MHz;
+extern uint16_t xpcc_fastdata ns_per_loop;
 
 }	// namespace clock
 

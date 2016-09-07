@@ -289,13 +289,13 @@ namespace xpcc
 namespace clock
 {
 
-uint32_t ATTRIBUTE_FASTDATA fcpu(8000000);
-uint32_t ATTRIBUTE_FASTDATA fcpu_kHz(8000);
-uint16_t ATTRIBUTE_FASTDATA fcpu_MHz(8);
+uint32_t xpcc_fastdata fcpu(8000000);
+uint32_t xpcc_fastdata fcpu_kHz(8000);
+uint16_t xpcc_fastdata fcpu_MHz(8);
 // Cortex-M0: 4000 loops per MHz
 // Cortex-M7: 1000 loops per MHz
 // otherwise: 3000 loops per MHz
-uint16_t ATTRIBUTE_FASTDATA ns_per_loop(3000 / 8);
+uint16_t xpcc_fastdata ns_per_loop(3000 / 8);
 
 }
 }
