@@ -168,7 +168,7 @@ sendMailbox(const xpcc::can::Message& message, uint32_t mailboxId)
 	mailbox->TDTR = message.getLength();
 	
 	// Set up the data field (copy the 8x8-bits into two 32-bit registers)
-	const uint8_t * ATTRIBUTE_MAY_ALIAS data = message.data;
+	const uint8_t * xpcc_may_alias data = message.data;
 	mailbox->TDLR = reinterpret_cast<const uint32_t *>(data)[0];
 	mailbox->TDHR = reinterpret_cast<const uint32_t *>(data)[1];
 	
@@ -197,7 +197,7 @@ readMailbox(xpcc::can::Message& message, uint32_t mailboxId)
 	
 	message.length = mailbox->RDTR & CAN_TDT1R_DLC;
 	
-	uint8_t * ATTRIBUTE_MAY_ALIAS data = message.data;
+	uint8_t * xpcc_may_alias data = message.data;
 	reinterpret_cast<uint32_t *>(data)[0] = mailbox->RDLR;
 	reinterpret_cast<uint32_t *>(data)[1] = mailbox->RDHR;
 }
