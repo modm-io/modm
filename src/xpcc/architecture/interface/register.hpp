@@ -877,8 +877,8 @@ constexpr ::xpcc::Flags<Enum> operator^(Enum const &a, Enum const &b) { return :
  * @hideinitializer
  */
 #define XPCC_FLAGS8(Enum) \
-	typedef ::xpcc::Flags8<Enum> CONCAT(Enum, _t); \
-	XPCC_INT_TYPE_FLAGS(CONCAT(Enum, _t))
+	typedef ::xpcc::Flags8<Enum> XPCC_CONCAT(Enum, _t); \
+	XPCC_INT_TYPE_FLAGS(XPCC_CONCAT(Enum, _t))
 
 /**
  * @details
@@ -895,8 +895,8 @@ constexpr ::xpcc::Flags<Enum> operator^(Enum const &a, Enum const &b) { return :
  * @hideinitializer
  */
 #define XPCC_FLAGS16(Enum) \
-	typedef ::xpcc::Flags16<Enum> CONCAT(Enum, _t); \
-	XPCC_INT_TYPE_FLAGS(CONCAT(Enum, _t))
+	typedef ::xpcc::Flags16<Enum> XPCC_CONCAT(Enum, _t); \
+	XPCC_INT_TYPE_FLAGS(XPCC_CONCAT(Enum, _t))
 
 /**
  * @details
@@ -913,8 +913,8 @@ constexpr ::xpcc::Flags<Enum> operator^(Enum const &a, Enum const &b) { return :
  * @hideinitializer
  */
 #define XPCC_FLAGS32(Enum) \
-	typedef ::xpcc::Flags32<Enum> CONCAT(Enum, _t); \
-	XPCC_INT_TYPE_FLAGS(CONCAT(Enum, _t))
+	typedef ::xpcc::Flags32<Enum> XPCC_CONCAT(Enum, _t); \
+	XPCC_INT_TYPE_FLAGS(XPCC_CONCAT(Enum, _t))
 
 /**
  * @details
