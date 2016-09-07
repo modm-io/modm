@@ -102,7 +102,7 @@ protected:
  * @ingroup	accessor
  */
 template< typename T, typename U>
-ALWAYS_INLINE unaligned_t<T>*
+xpcc_always_inline unaligned_t<T>*
 asUnaligned(U* value)
 {
 	return reinterpret_cast< unaligned_t<T>* >(value);

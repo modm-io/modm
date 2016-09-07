@@ -51,7 +51,7 @@ namespace xpcc
 		 * \ingroup	accessor
 		 */
 		template<typename T>
-		ALWAYS_INLINE volatile T&
+		xpcc_always_inline volatile T&
 		asVolatile(T& value)
 		{
 			return (volatile T&) value;

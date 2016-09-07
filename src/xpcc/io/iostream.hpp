@@ -103,7 +103,7 @@ public:
 	}
 
 	/// set the output mode to binary style for `char` and `char*`
-	ALWAYS_INLINE IOStream&
+	xpcc_always_inline IOStream&
 	bin()
 	{
 		this->mode = Mode::Binary;
@@ -111,7 +111,7 @@ public:
 	}
 
 	/// set the output mode to hexadecimal style for `char` and `char*`
-	ALWAYS_INLINE IOStream&
+	xpcc_always_inline IOStream&
 	hex()
 	{
 		this->mode = Mode::Hexadecimal;
@@ -119,7 +119,7 @@ public:
 	}
 
 	/// set the output mode to ASCII style for `char` and `char*`
-	ALWAYS_INLINE IOStream&
+	xpcc_always_inline IOStream&
 	ascii()
 	{
 		this->mode = Mode::Ascii;
@@ -184,7 +184,7 @@ public:
 		return *this;
 	}
 
-	ALWAYS_INLINE IOStream&
+	xpcc_always_inline IOStream&
 	operator << (const uint16_t& v)
 	{
 		if (this->mode == Mode::Ascii) {
@@ -201,7 +201,7 @@ public:
 		return *this;
 	}
 
-	ALWAYS_INLINE IOStream&
+	xpcc_always_inline IOStream&
 	operator << (const int16_t& v)
 	{
 		if (this->mode == Mode::Ascii) {
@@ -218,7 +218,7 @@ public:
 		return *this;
 	}
 
-	ALWAYS_INLINE IOStream&
+	xpcc_always_inline IOStream&
 	operator << (const uint32_t& v)
 	{
 		if (this->mode == Mode::Ascii) {
@@ -239,7 +239,7 @@ public:
 		return *this;
 	}
 
-	ALWAYS_INLINE IOStream&
+	xpcc_always_inline IOStream&
 	operator << (const int32_t& v)
 	{
 		if (this->mode == Mode::Ascii) {
@@ -264,14 +264,14 @@ public:
 	// For OSX 'int64_t' is of type 'int'. Therefore there is no
 	// function here for the default type 'long int'. As 'long int' has the same
 	// width as 'int64_t' we just use a typedef here.
-	ALWAYS_INLINE IOStream&
+	xpcc_always_inline IOStream&
 	operator << (const long int& v)
 	{
 		this->writeInteger(static_cast<int64_t>(v));
 		return *this;
 	}
 
-	ALWAYS_INLINE IOStream&
+	xpcc_always_inline IOStream&
 	operator << (const long unsigned int& v)
 	{
 		this->writeInteger(static_cast<uint64_t>(v));
@@ -283,14 +283,14 @@ public:
 	// For ARM 'int32_t' is of type 'long'. Therefore there is no
 	// function here for the default type 'int'. As 'int' has the same
 	// width as 'int32_t' we just use a typedef here.
-	ALWAYS_INLINE IOStream&
+	xpcc_always_inline IOStream&
 	operator << (const int& v)
 	{
 		this->writeInteger(static_cast<int32_t>(v));
 		return *this;
 	}
 
-	ALWAYS_INLINE IOStream&
+	xpcc_always_inline IOStream&
 	operator << (const unsigned int& v)
 	{
 		this->writeInteger(static_cast<uint32_t>(v));
@@ -301,14 +301,14 @@ public:
 // The 64-bit types on the AVR are extremely slow and are
 // therefore excluded here
 #if !defined(XPCC__CPU_AVR)
-	ALWAYS_INLINE IOStream&
+	xpcc_always_inline IOStream&
 	operator << (const uint64_t& v)
 	{
 		this->writeInteger(v);
 		return *this;
 	}
 
-	ALWAYS_INLINE IOStream&
+	xpcc_always_inline IOStream&
 	operator << (const int64_t& v)
 	{
 		this->writeInteger(v);
@@ -316,14 +316,14 @@ public:
 	}
 #endif
 
-	ALWAYS_INLINE IOStream&
+	xpcc_always_inline IOStream&
 	operator << (const float& v)
 	{
 		this->writeFloat(v);
 		return *this;
 	}
 
-	ALWAYS_INLINE IOStream&
+	xpcc_always_inline IOStream&
 	operator << (const double& v)
 	{
 #if defined(XPCC__CPU_AVR)
@@ -353,7 +353,7 @@ public:
 	IOStream&
 	operator << (const void* p);
 
-	ALWAYS_INLINE IOStream&
+	xpcc_always_inline IOStream&
 	operator << (IOStream& (*function)(IOStream&))
 	{
 		return function(*this);

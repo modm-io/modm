@@ -49,7 +49,7 @@ namespace xpcc
 	 *
 	 * \ingroup	math
 	 */
-	ALWAYS_INLINE uint8_t
+	xpcc_always_inline uint8_t
 	swap(uint8_t n)
 	{
 #ifdef XPCC__CPU_AVR
@@ -71,7 +71,7 @@ namespace xpcc
 	 *
 	 * \ingroup	math
 	 */
-	ALWAYS_INLINE void
+	xpcc_always_inline void
 	swap(uint8_t& a, uint8_t& b)
 	{
 		uint8_t temp = a;
@@ -88,7 +88,7 @@ namespace xpcc
 	 *
 	 * \ingroup	math
 	 */
-	ALWAYS_INLINE uint16_t
+	xpcc_always_inline uint16_t
 	swap(uint16_t n)
 	{
 #ifdef XPCC__CPU_ARM
@@ -127,7 +127,7 @@ namespace xpcc
 	 *
 	 * \ingroup	math
 	 */
-	ALWAYS_INLINE uint32_t
+	xpcc_always_inline uint32_t
 	swap(uint32_t n)
 	{
 #ifdef XPCC__CPU_ARM
@@ -143,7 +143,7 @@ namespace xpcc
 #endif
 	}
 
-	ALWAYS_INLINE void
+	xpcc_always_inline void
 	swap(int16_t& a, int16_t& b)
 	{
 		int16_t temp = a;

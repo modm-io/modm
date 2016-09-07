@@ -51,43 +51,43 @@ namespace xpcc
 class GpioUnused : GpioIO
 {
 public:
-	ALWAYS_INLINE static void
+	xpcc_always_inline static void
 	setOutput()
 	{
 	}
 
-	ALWAYS_INLINE static void
+	xpcc_always_inline static void
 	setOutput(bool)
 	{
 	}
 
-	ALWAYS_INLINE static void
+	xpcc_always_inline static void
 	setInput()
 	{
 	}
 
-	ALWAYS_INLINE static void
+	xpcc_always_inline static void
 	set()
 	{
 	}
 
-	ALWAYS_INLINE static void
+	xpcc_always_inline static void
 	set(bool)
 	{
 	}
 
-	ALWAYS_INLINE static void
+	xpcc_always_inline static void
 	reset()
 	{
 	}
 
-	ALWAYS_INLINE static void
+	xpcc_always_inline static void
 	toggle()
 	{
 	}
 
 	/// Always returns `false`
-	ALWAYS_INLINE static bool
+	xpcc_always_inline static bool
 	read()
 	{
 		return false;
@@ -118,37 +118,37 @@ template < class Pin >
 class GpioInverted : public Pin
 {
 public:
-	ALWAYS_INLINE static void
+	xpcc_always_inline static void
 	setOutput()
 	{
 		Pin::setOutput();
 	}
 
-	ALWAYS_INLINE static void
+	xpcc_always_inline static void
 	setOutput(bool value)
 	{
 		Pin::setOutput(!value);
 	}
 
-	ALWAYS_INLINE static void
+	xpcc_always_inline static void
 	set()
 	{
 		Pin::reset();
 	}
 
-	ALWAYS_INLINE static void
+	xpcc_always_inline static void
 	set(bool value)
 	{
 		Pin::set(!value);
 	}
 
-	ALWAYS_INLINE static void
+	xpcc_always_inline static void
 	reset()
 	{
 		Pin::set();
 	}
 
-	ALWAYS_INLINE static bool
+	xpcc_always_inline static bool
 	read()
 	{
 		return !Pin::read();

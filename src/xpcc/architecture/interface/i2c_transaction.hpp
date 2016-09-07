@@ -245,7 +245,7 @@ public:
 	{
 	}
 
-	bool ALWAYS_INLINE
+	bool xpcc_always_inline
 	configurePing()
 	{
 		return configureWriteRead(nullptr, 0, nullptr, 0);
@@ -302,7 +302,7 @@ public:
 	 * @return  `true` if adapter was not in use,
 	 *          `false` otherwise
 	 */
-	bool ALWAYS_INLINE
+	bool xpcc_always_inline
 	configureWrite(const uint8_t *buffer, std::size_t size)
 	{
 		return configureWriteRead(buffer, size, nullptr, 0);
@@ -317,7 +317,7 @@ public:
 	 * @return  `true` if adapter was not in use,
 	 *          `false` otherwise
 	 */
-	bool ALWAYS_INLINE
+	bool xpcc_always_inline
 	configureRead(uint8_t *buffer, std::size_t size)
 	{
 		return configureWriteRead(nullptr, 0, buffer, size);
@@ -412,13 +412,13 @@ public:
 	{
 	}
 
-	bool ALWAYS_INLINE
+	bool xpcc_always_inline
 	configurePing()
 	{
 		return configureWrite(nullptr, 0);
 	}
 
-	bool ALWAYS_INLINE
+	bool xpcc_always_inline
 	configureWriteRead(const uint8_t *, std::size_t, uint8_t *, std::size_t)
 	{
 		return false;
@@ -436,7 +436,7 @@ public:
 		return false;
 	}
 
-	bool ALWAYS_INLINE
+	bool xpcc_always_inline
 	configureRead(uint8_t *, std::size_t)
 	{
 		return false;
@@ -487,19 +487,19 @@ public:
 	{
 	}
 
-	bool ALWAYS_INLINE
+	bool xpcc_always_inline
 	configurePing()
 	{
 		return configureRead(nullptr, 0);
 	}
 
-	bool ALWAYS_INLINE
+	bool xpcc_always_inline
 	configureWriteRead(const uint8_t *, std::size_t, uint8_t *, std::size_t)
 	{
 		return false;
 	}
 
-	bool ALWAYS_INLINE
+	bool xpcc_always_inline
 	configureWrite(uint8_t *, std::size_t)
 	{
 		return false;

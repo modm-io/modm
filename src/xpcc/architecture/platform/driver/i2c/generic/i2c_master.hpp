@@ -55,7 +55,7 @@ public:
 	static bool
 	start(I2cTransaction *transaction, ConfigurationHandler handler = nullptr);
 
-	static Error ALWAYS_INLINE
+	static Error xpcc_always_inline
 	getErrorState()
 	{ return errorState; }
 
@@ -110,13 +110,13 @@ private:
 
 	// timings
 	/// busy waits a **half** clock cycle
-	static ALWAYS_INLINE void
+	static xpcc_always_inline void
 	delay2()
 	{ xpcc::delayNanoseconds(delayTime*2); }
 
 	// timings
 	/// busy waits **quarter** clock cycle
-	static ALWAYS_INLINE void
+	static xpcc_always_inline void
 	delay4()
 	{ xpcc::delayNanoseconds(delayTime); }
 

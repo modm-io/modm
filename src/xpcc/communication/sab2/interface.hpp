@@ -96,14 +96,14 @@ namespace xpcc
 			 * \brief	Send a message
 			 */
 			template <typename T>
-			static void ALWAYS_INLINE
+			static void xpcc_always_inline
 			sendMessage(uint8_t address, Flags flags, uint8_t command,
 					const T& payload);
 			
 			/**
 			 * \brief	Send a empty message
 			 */
-			static void ALWAYS_INLINE
+			static void xpcc_always_inline
 			sendMessage(uint8_t address, Flags flags, uint8_t command);
 			
 			/**

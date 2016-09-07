@@ -70,19 +70,19 @@ namespace xpcc
 
 	namespace xpcc
 	{
-		void ALWAYS_INLINE
+		void xpcc_always_inline
 		delayNanoseconds(uint16_t /*ns*/)
 		{
 			_delay_us(1);
 		}
 
-		ALWAYS_INLINE void
+		xpcc_always_inline void
 		delayMicroseconds(uint16_t us)
 		{
 			while(us--) _delay_us(1);
 		}
 
-		ALWAYS_INLINE void
+		xpcc_always_inline void
 		delayMilliseconds(uint16_t ms)
 		{
 			while(ms--) _delay_ms(1);
@@ -95,19 +95,19 @@ namespace xpcc
 
 	namespace xpcc
 	{
-		void ALWAYS_INLINE
+		void xpcc_always_inline
 		delayNanoseconds(uint16_t /*ns*/)
 		{
 			usleep(1);
 		}
 
-		ALWAYS_INLINE void
+		xpcc_always_inline void
 		delayMicroseconds(uint16_t us)
 		{
 			usleep(us);
 		}
 
-		ALWAYS_INLINE void
+		xpcc_always_inline void
 		delayMilliseconds(uint16_t ms)
 		{
 			usleep(uint32_t(ms)*1000);
@@ -162,13 +162,13 @@ namespace xpcc
 	namespace xpcc
 	{
 		/// @warning    There is little to no timing guarantee with this method!
-		ALWAYS_INLINE void
+		xpcc_always_inline void
 		delayNanoseconds(uint16_t ns)
 		{
 			::_delay_ns(ns);
 		}
 
-		ALWAYS_INLINE void
+		xpcc_always_inline void
 		delayMicroseconds(uint16_t us)
 		{
 			::_delay_us(us);
@@ -176,7 +176,7 @@ namespace xpcc
 
 		/// @warning    this method is _not_ guaranteed to work with inputs over 9000ms
 		///             since "It's Over 9000"! (meaning 32bit arithmetics).
-		ALWAYS_INLINE void
+		xpcc_always_inline void
 		delayMilliseconds(uint16_t ms)
 		{
 			::_delay_ms(ms);

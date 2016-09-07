@@ -142,12 +142,12 @@ public:
 	configureAlertMode(ThermostatMode mode, AlertPolarity polarity, FaultQueue faults);
 
 	/// Writes the upper limit of the alarm.
-	xpcc::ResumableResult<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> xpcc_always_inline
 	setUpperLimit(float temperature)
 	{ return setLimitRegister(Register::TemperatureUpperLimit, temperature); }
 
 	/// Writes the lower limit of the alarm.
-	xpcc::ResumableResult<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> xpcc_always_inline
 	setLowerLimit(float temperature)
 	{ return setLimitRegister(Register::TemperatureLowerLimit, temperature); }
 

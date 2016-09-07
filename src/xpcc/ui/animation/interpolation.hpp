@@ -236,28 +236,28 @@ public:
 	 * @param	end		the end of the ramp
 	 * @param	steps	the number of steps for the ramp.
 	 */
-	void ALWAYS_INLINE
+	void xpcc_always_inline
 	initialize(T begin, T end, StepType steps)
 	{
 		computations.initialize(begin, end, steps);
 	}
 
 	/// update the intermediate value for one step
-	void ALWAYS_INLINE
+	void xpcc_always_inline
 	step()
 	{
 		computations.step();
 	}
 
 	/// @return the intermediate value.
-	T ALWAYS_INLINE
+	T xpcc_always_inline
 	getValue()
 	{
 		return computations.get();
 	}
 
 	/// stops the interpolation.
-	void ALWAYS_INLINE
+	void xpcc_always_inline
 	stop()
 	{
 		computations.deltaValue = 0;

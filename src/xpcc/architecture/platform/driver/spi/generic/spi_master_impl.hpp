@@ -186,7 +186,7 @@ xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::transfer(
 // ----------------------------------------------------------------------------
 
 template <typename SCK, typename MOSI, typename MISO>
-void ALWAYS_INLINE
+void xpcc_always_inline
 xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::delay()
 {
 	xpcc::delayNanoseconds(delayTime);

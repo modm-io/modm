@@ -64,10 +64,10 @@ namespace xpcc
 		public:
 			Queue();
 			
-			ALWAYS_INLINE bool
+			xpcc_always_inline bool
 			isFull() const;
 			
-			ALWAYS_INLINE bool
+			xpcc_always_inline bool
 			isNotFull() const { return not isFull(); }
 
 			/**
@@ -79,7 +79,7 @@ namespace xpcc
 			bool
 			isNearlyFull() const;
 
-			ALWAYS_INLINE bool
+			xpcc_always_inline bool
 			isEmpty() const;
 			
 			/**
@@ -94,7 +94,7 @@ namespace xpcc
 			bool
 			isNearlyEmpty() const;
 			
-			ALWAYS_INLINE Size
+			xpcc_always_inline Size
 			getMaxSize() const;
 			
 			const T&

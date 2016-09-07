@@ -64,7 +64,7 @@ namespace xpcc
 		setInvert(bool invert);
 
 	protected:
-		ALWAYS_INLINE void
+		xpcc_always_inline void
 		initialize(xpcc::accessor::Flash<uint8_t> configuration, uint8_t size);
 
 		SPI spi;

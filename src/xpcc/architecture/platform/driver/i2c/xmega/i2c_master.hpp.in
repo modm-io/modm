@@ -44,7 +44,7 @@ public:
 	 */
 	template<class SystemClock, uint32_t baudrate=DataRate::Standard
 			uint16_t tolerance = xpcc::Tolerance::FivePercent >
-	static ALWAYS_INLINE void
+	static xpcc_always_inline void
 	initialize()
 	{
 		static_assert(baudrate <= 400000, "The Xmega does not support I2C baudrates above 400kHz.");

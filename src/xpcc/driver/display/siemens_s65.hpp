@@ -64,19 +64,19 @@ namespace xpcc
 	class SiemensS65Common
 	{
 	protected:
-		ALWAYS_INLINE void
+		xpcc_always_inline void
 		writeCmd(uint8_t reg, uint16_t param);
 
-		ALWAYS_INLINE void
+		xpcc_always_inline void
 		writeReg(uint8_t reg);
 
-		ALWAYS_INLINE void
+		xpcc_always_inline void
 		writeData(uint16_t param);
 
-		ALWAYS_INLINE void
+		xpcc_always_inline void
 		lcdCls(uint16_t colour);
 
-		ALWAYS_INLINE void
+		xpcc_always_inline void
 		lcdSettings(bool landscape);
 
 	};

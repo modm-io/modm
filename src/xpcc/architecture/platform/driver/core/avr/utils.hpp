@@ -33,7 +33,7 @@ namespace xmega
  *
  * @ingroup	xmega
  */
-ALWAYS_INLINE static void
+xpcc_always_inline static void
 changeProtectedRegister(volatile uint8_t *address, uint8_t value)
 {
 #ifdef RAMPZ
@@ -69,7 +69,7 @@ readCalibrationByte(uint8_t index);
  *
  * @ingroup	xmega
  */
-ALWAYS_INLINE static void
+xpcc_always_inline static void
 softwareReset()
 {
 	changeProtectedRegister(&RST_CTRL, RST_SWRST_bm);

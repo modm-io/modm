@@ -235,7 +235,7 @@ protected:
 
 	/// increases nesting level, call this in the switch statement!
 	/// @return current state before increasing nesting level
-	rf::State ALWAYS_INLINE
+	rf::State xpcc_always_inline
 	pushRf(uint_fast8_t index) const
 	{
 		return rfStateArray[index];
@@ -243,13 +243,13 @@ protected:
 
 	/// always call this before returning from the run function!
 	/// decreases nesting level
-	void ALWAYS_INLINE
+	void xpcc_always_inline
 	popRf() const
 	{}
 
 	// invalidates the parent nesting level
 	// @warning	be aware in which nesting level you call this! (before popRf()!)
-	void ALWAYS_INLINE
+	void xpcc_always_inline
 	stopRf(uint_fast8_t index)
 	{
 		rfStateArray[index] = rf::Stopped;
@@ -257,20 +257,20 @@ protected:
 
 	/// sets the state of the parent nesting level
 	/// @warning	be aware in which nesting level you call this! (before popRf()!)
-	void ALWAYS_INLINE
+	void xpcc_always_inline
 	setRf(rf::State state, uint_fast8_t index)
 	{
 		rfStateArray[index] = state;
 	}
 
-	bool ALWAYS_INLINE
+	bool xpcc_always_inline
 	nestingOkRf() const
 	{
 		return true;
 	}
 
 	/// @return	`true` if `stopRf()` has been called before
-	bool ALWAYS_INLINE
+	bool xpcc_always_inline
 	isStoppedRf(uint_fast8_t index) const
 	{
 		return (rfStateArray[index] == rf::Stopped);

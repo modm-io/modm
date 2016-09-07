@@ -48,7 +48,7 @@ namespace xpcc
 	template<typename T, std::size_t size>
 	struct FlashReader
 	{
-		ALWAYS_INLINE
+		xpcc_always_inline
 		static T
 		read(const void* p)
 		{
@@ -61,7 +61,7 @@ namespace xpcc
 	template<typename T>
 	struct FlashReader<T, 1>
 	{
-		ALWAYS_INLINE
+		xpcc_always_inline
 		static T
 		read(const void* p)
 		{
@@ -78,7 +78,7 @@ namespace xpcc
 	template<typename T>
 	struct FlashReader<T, 2>
 	{
-		ALWAYS_INLINE
+		xpcc_always_inline
 		static T
 		read(const void* p)
 		{
@@ -95,7 +95,7 @@ namespace xpcc
 	template<typename T>
 	struct FlashReader<T, 4>
 	{
-		ALWAYS_INLINE
+		xpcc_always_inline
 		static T
 		read(const void* p)
 		{

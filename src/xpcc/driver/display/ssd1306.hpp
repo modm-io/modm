@@ -118,7 +118,7 @@ public:
 	public:
 		DataTransmissionAdapter(uint8_t address);
 
-		void ALWAYS_INLINE
+		void xpcc_always_inline
 		setCommandBuffer(uint8_t *buffer)
 		{ commands = buffer; }
 
@@ -179,7 +179,7 @@ public:
 	/// Use this method to synchronize writing to the displays buffer
 	/// to avoid tearing.
 	/// @return	`true` if the frame buffer is not being copied to the display
-	bool ALWAYS_INLINE
+	bool xpcc_always_inline
 	isWritable()
 	{
 		return this->transaction.writeable;
@@ -195,11 +195,11 @@ public:
 	writeDisplay();
 
 
-	xpcc::ResumableResult<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> xpcc_always_inline
 	setDisplayMode(DisplayMode mode = DisplayMode::Normal)
 	{ return writeCommand(static_cast<Command>(mode)); }
 
-	xpcc::ResumableResult<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> xpcc_always_inline
 	setContrast(uint8_t contrast = 0xCE)
 	{ return writeCommand(Command::SetContrastControl, contrast); }
 
@@ -211,11 +211,11 @@ public:
 	configureScroll(uint8_t origin, uint8_t size,
 			ScrollDirection direction, ScrollStep steps);
 
-	xpcc::ResumableResult<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> xpcc_always_inline
 	enableScroll()
 	{ return writeCommand(Command::SetEnableScroll); }
 
-	xpcc::ResumableResult<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> xpcc_always_inline
 	disableScroll()
 	{ return writeCommand(Command::SetDisableScroll); }
 

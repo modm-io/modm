@@ -47,7 +47,7 @@ protected:
 	write16(uint8_t reg, uint16_t value);
 
 	/// read a 8bit value
-	xpcc::ResumableResult<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> xpcc_always_inline
 	read(uint8_t reg, uint8_t &value)
 	{
 		return read(reg, &value, 1);
@@ -96,7 +96,7 @@ protected:
 	write16(uint8_t reg, uint16_t value);
 
 	/// read a 8bit value
-	xpcc::ResumableResult<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> xpcc_always_inline
 	read(uint8_t reg, uint8_t &value)
 	{
 		return read(reg, &value, 1);

@@ -199,7 +199,7 @@ public:
 	 * @param	input
 	 * 		input signals
 	 */
-	ALWAYS_INLINE void
+	xpcc_always_inline void
 	update(T input);
 
 protected:

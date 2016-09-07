@@ -33,13 +33,13 @@ namespace xpcc
 	class BitbangMemoryInterface
 	{
 	public:
-		ALWAYS_INLINE static void
+		xpcc_always_inline static void
 		initialize();
 
-		ALWAYS_INLINE static void
+		xpcc_always_inline static void
 		writeRegister(const uint8_t reg);
 
-		ALWAYS_INLINE static void
+		xpcc_always_inline static void
 		writeCommand(const uint8_t command, const uint16_t data);
 
 		static void
@@ -49,7 +49,7 @@ namespace xpcc
 		writeRam(uint8_t * addr, const uint16_t size);
 
 	protected:
-		ALWAYS_INLINE static void
+		xpcc_always_inline static void
 		writeData(const uint16_t data);
 
 	protected:

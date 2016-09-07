@@ -178,14 +178,14 @@ xpcc::stm32::Adc{{ id }}::isConversionFinished(void)
 #ifndef XPCC_CUSTOM_NVIC_FUNCTIONS
 #define XPCC_CUSTOM_NVIC_FUNCTIONS
 
-static ALWAYS_INLINE void
+static xpcc_always_inline void
 nvicEnableInterrupt(const IRQn_Type IRQn)
 {
 	NVIC->ISER[(static_cast<uint32_t>(IRQn) >> 5)] =
 								(1 << ((uint32_t)(IRQn) & 0x1F));
 }
 
-static ALWAYS_INLINE void
+static xpcc_always_inline void
 nvicDisableInterrupt(IRQn_Type IRQn)
 {
 	NVIC_DisableIRQ(IRQn);

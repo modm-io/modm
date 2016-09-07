@@ -262,7 +262,7 @@ public:
 protected:
 	/// @cond
 	/// write a 8bit value a register
-	xpcc::ResumableResult<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> xpcc_always_inline
 	write(Register reg, uint8_t &value)
 	{ return write(reg, &value, 1); }
 
@@ -271,7 +271,7 @@ protected:
 	write(Register reg, uint8_t *buffer, uint8_t length, bool copyBuffer=true);
 
 	/// read a 8bit value from a register
-	xpcc::ResumableResult<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> xpcc_always_inline
 	read(Register reg, uint8_t &value)
 	{ return read(reg, &value, 1); }
 

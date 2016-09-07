@@ -96,7 +96,7 @@ namespace xpcc
 			 * \brief	Send a response with an attached payload
 			 */
 			template <typename T>
-			ALWAYS_INLINE void
+			xpcc_always_inline void
 			send(const T& payload);
 			
 		protected:

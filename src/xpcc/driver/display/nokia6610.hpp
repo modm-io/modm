@@ -70,19 +70,19 @@ namespace xpcc
 		setContrast(uint8_t contrast);
 
 	private:
-		ALWAYS_INLINE void
+		xpcc_always_inline void
 		lcdSettings(void);
 
-		ALWAYS_INLINE void
+		xpcc_always_inline void
 		writeSpiCommand(uint16_t data);
 
-		ALWAYS_INLINE void
+		xpcc_always_inline void
 		writeSpiData(uint16_t data);
 
-		ALWAYS_INLINE void
+		xpcc_always_inline void
 		writeSpi9Bit(uint16_t data);
 
-		ALWAYS_INLINE void
+		xpcc_always_inline void
 		writeSpi9BitFlush();
 
 		void

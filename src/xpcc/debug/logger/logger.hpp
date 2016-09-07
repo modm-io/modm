@@ -68,11 +68,11 @@ namespace xpcc
 				/**
 				 * @brief	Output forwarding
 				 * 
-				 * We must use ALWAYS_INLINE here to prevent the generation of
+				 * We must use xpcc_always_inline here to prevent the generation of
 				 * specialized functions for every type. Especially for strings
 				 * this might cause a lot of code size bloat.
 				 * 
-				 * Example without ALWAYS_INLINE or only \c inline:
+				 * Example without xpcc_always_inline or only \c inline:
 				 * \code
 				 * $ scons symbols | grep "Logger"
 				 * ...
@@ -86,10 +86,10 @@ namespace xpcc
 				 * ...
 				 * \endcode
 				 * 
-				 * With ALWAYS_INLINE all these functions are gone.
+				 * With xpcc_always_inline all these functions are gone.
 				 */
 				template<typename T>
-				ALWAYS_INLINE Logger&
+				xpcc_always_inline Logger&
 				operator << (const T& msg)
 				{
 					*(xpcc::IOStream *) this << msg;

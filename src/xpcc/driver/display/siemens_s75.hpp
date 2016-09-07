@@ -113,10 +113,10 @@ namespace xpcc
 		initialize(void);
 
 	protected:
-		ALWAYS_INLINE void
+		xpcc_always_inline void
 		lcdCls(const uint16_t colour);
 
-		ALWAYS_INLINE void
+		xpcc_always_inline void
 		lcdSettings();
 
 	private:

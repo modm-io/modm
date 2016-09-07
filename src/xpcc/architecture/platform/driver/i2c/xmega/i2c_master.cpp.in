@@ -36,28 +36,28 @@ namespace
 	static xpcc::I2cMaster::Error errorState(xpcc::I2cMaster::Error::NoError);
 	
 	// helper functions
-	static ALWAYS_INLINE void
+	static xpcc_always_inline void
 	initializeWrite(xpcc::I2cDelegate::Writing w) {
 		writePointer = w.buffer;
 		writeBytesLeft = w.size;
 		nextOperation = static_cast<xpcc::I2c::Operation>(w.next);
 	}
 	
-	static ALWAYS_INLINE void
+	static xpcc_always_inline void
 	initializeRead(xpcc::I2cDelegate::Reading r) {
 		readPointer = r.buffer;
 		readBytesLeft = r.size;
 		nextOperation = static_cast<xpcc::I2c::Operation>(r.next);
 	}
 	
-	static ALWAYS_INLINE void
+	static xpcc_always_inline void
 	initializeStopAfterAddress() {
 		//writePointer = ..;
 		writeBytesLeft = 0;
 		nextOperation = xpcc::I2c::Operation::Stop;
 	}
 	
-	static ALWAYS_INLINE void
+	static xpcc_always_inline void
 	initializeRestartAfterAddress() {
 		//writePointer = ..;
 		writeBytesLeft = 0;

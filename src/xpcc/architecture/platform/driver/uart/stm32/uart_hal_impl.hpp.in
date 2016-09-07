@@ -76,7 +76,7 @@ xpcc::stm32::{{ name }}::disable()
 %% if target is not stm32f1
 template<class SystemClock, uint32_t baudrate,
 		xpcc::stm32::{{ name }}::OversamplingMode oversample>
-void ALWAYS_INLINE
+void xpcc_always_inline
 xpcc::stm32::{{ name }}::initialize(Parity parity)
 {
 	initializeWithBrr(UartBaudrate::getBrr<SystemClock::{{ uart ~ id }}, baudrate>(),
@@ -86,7 +86,7 @@ xpcc::stm32::{{ name }}::initialize(Parity parity)
 %% endif
 
 template<class SystemClock, uint32_t baudrate>
-void ALWAYS_INLINE
+void xpcc_always_inline
 xpcc::stm32::{{ name }}::initialize(Parity parity)
 {
 %% if target is stm32f1

@@ -85,7 +85,7 @@ namespace xpcc
 		void
 		schedule();
 
-		ALWAYS_INLINE void
+		xpcc_always_inline void
 		scheduleInterupt();
 
 	private:
