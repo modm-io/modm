@@ -62,7 +62,7 @@ public:
 	/// @{
 	/// @ingroup	nrf24
 	/// Data structure that user uses to pass data to the data layer
-	struct ATTRIBUTE_PACKED Packet
+	struct xpcc_packed Packet
 	{
 		Packet() :
 			dest(0), src(0)
@@ -70,7 +70,7 @@ public:
 			payload.length = Nrf24Phy::getMaxPayload();
 		}
 
-		struct ATTRIBUTE_PACKED Payload
+		struct xpcc_packed Payload
 		{
 			uint8_t data[Nrf24Phy::getMaxPayload()];
 			uint8_t length;      // max. 30!
@@ -83,14 +83,14 @@ public:
 
 
 	/// Header of Frame
-	struct ATTRIBUTE_PACKED Header
+	struct xpcc_packed Header
 	{
 		uint8_t     src;
 		uint8_t     dest;
 	};
 
 	/// Data that will be sent over the air
-	struct ATTRIBUTE_PACKED Frame
+	struct xpcc_packed Frame
 	{
 		Header      header;
 		uint8_t     data[30];   // max. possible payload size (32 byte) - 2 byte (src + dest)

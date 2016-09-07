@@ -137,7 +137,7 @@ public:
 	typedef Configuration< Power_t, ClockSource, (Bit2 | Bit1 | Bit0) > ClockSource_t;
 
 public:
-	struct ATTRIBUTE_PACKED
+	struct xpcc_packed
 	Data
 	{
 		template< class I2cMaster >

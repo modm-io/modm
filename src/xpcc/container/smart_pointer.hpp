@@ -145,7 +145,7 @@ namespace xpcc
 	protected:
 		friend IOStream&
 		operator <<( IOStream&, const SmartPointer&);
-	} ATTRIBUTE_PACKED;
+	} xpcc_packed;
 
 	/**
 	 * \ingroup container

@@ -94,7 +94,7 @@ protected:
 #else
 	T data;
 #endif
-} ATTRIBUTE_PACKED;
+} xpcc_packed;
 
 /**
  * Accesses a memory location using a unaligned-safe method.

@@ -1549,7 +1549,7 @@ PREDEFINED             = __DOXYGEN__ \
                          XPCC_TYPE_FLAGS(x)= \
                          XPCC_INT_TYPE_FLAGS(x)= \
                          __attribute__(x)= \
-                         ATTRIBUTE_PACKED=
+                         xpcc_packed=
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then
 # this tag can be used to specify a list of macro names that should be expanded.

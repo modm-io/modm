@@ -81,7 +81,7 @@ protected:
 	/// @endcond
 
 public:
-	struct ATTRIBUTE_PACKED
+	struct xpcc_packed
 	Data
 	{
 		template < class I2cMaster >
