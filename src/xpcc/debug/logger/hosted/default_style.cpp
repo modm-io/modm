@@ -56,15 +56,15 @@ namespace xpcc
 		};
 
 		static Wrapper< char[10], TURQUOISE, NONE > debugWrapper("Debug:   ", device);
-		Logger ATTRIBUTE_WEAK debug(debugWrapper);
+		Logger xpcc_weak debug(debugWrapper);
 
 		static Wrapper< char[10], GREEN, NONE > debugInfo("Info:    ", device);
-		Logger ATTRIBUTE_WEAK info(debugInfo);
+		Logger xpcc_weak info(debugInfo);
 
 		static Wrapper< char[10], YELLOW, NONE > warningInfo("Warning: ", device);
-		Logger ATTRIBUTE_WEAK warning(warningInfo);
+		Logger xpcc_weak warning(warningInfo);
 
 		static Wrapper< char[10], RED, NONE > errorInfo("Error:   ", device);
-		Logger ATTRIBUTE_WEAK error(errorInfo);
+		Logger xpcc_weak error(errorInfo);
 	}
 }
