@@ -142,29 +142,29 @@ public:
 	enableInterruptVector(bool enable, uint32_t priority);
 
 	static inline void
-	enableInterrupt(Interrupt interrupt)
+	enableInterrupt(Interrupt_t interrupt)
 	{
-		TIM{{ id }}->DIER |= static_cast<uint32_t>(interrupt);
+		TIM{{ id }}->DIER |= interrupt.value;
 	}
 
 	static inline void
-	disableInterrupt(Interrupt interrupt)
+	disableInterrupt(Interrupt_t interrupt)
 	{
-		TIM{{ id }}->DIER &= ~static_cast<uint32_t>(interrupt);
+		TIM{{ id }}->DIER &= ~interrupt.value;
 	}
 
-	static inline InterruptFlag
+	static inline InterruptFlag_t
 	getInterruptFlags()
 	{
-		return static_cast<InterruptFlag>(TIM{{ id }}->SR);
+		return InterruptFlag_t(TIM{{ id }}->SR);
 	}
 
 	static void
-	acknowledgeInterruptFlags(InterruptFlag interrupt)
+	acknowledgeInterruptFlags(InterruptFlag_t interrupt)
 	{
 		// Flags are cleared by writing a zero to the flag position.
 		// Writing a one is ignored.
-		TIM{{ id }}->SR = ~static_cast<uint32_t>(interrupt);
+		TIM{{ id }}->SR = ~interrupt.value;
 	}
 };
 

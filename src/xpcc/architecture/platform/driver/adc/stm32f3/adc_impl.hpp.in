@@ -87,8 +87,7 @@ xpcc::stm32::Adc{{ id }}::setPrescaler(const Prescaler pre)
 bool
 xpcc::stm32::Adc{{ id }}::isReady()
 {
-	return (static_cast<uint32_t>(getInterruptFlags()) &
-					static_cast<uint32_t>(InterruptFlag::Ready));
+	return (getInterruptFlags() & InterruptFlag::Ready);
 }
 
 void
@@ -155,9 +154,7 @@ void
 xpcc::stm32::Adc{{ id }}::startConversion(void)
 {
 	// TODO: maybe add more interrupt flags
-	acknowledgeInterruptFlag(static_cast<InterruptFlag>(
-		static_cast<uint32_t>(InterruptFlag::EndOfSampling) |
-		static_cast<uint32_t>(InterruptFlag::Overrun)));
+	acknowledgeInterruptFlag(InterruptFlag::EndOfSampling | InterruptFlag::Overrun);
 	// starts single conversion for the regular group
 	ADC{{ id }}->CR |= ADC_CR_ADSTART;
 }
@@ -165,8 +162,7 @@ xpcc::stm32::Adc{{ id }}::startConversion(void)
 bool
 xpcc::stm32::Adc{{ id }}::isConversionFinished(void)
 {
-	return (static_cast<uint32_t>(getInterruptFlags()) &
-			static_cast<uint32_t>(InterruptFlag::EndOfSampling));
+	return (getInterruptFlags() & InterruptFlag::EndOfSampling);
 }
 
 // ----------------------------------------------------------------------------
@@ -212,27 +208,27 @@ xpcc::stm32::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
 }
 
 void
-xpcc::stm32::Adc{{ id }}::enableInterrupt(const Interrupt interrupt)
+xpcc::stm32::Adc{{ id }}::enableInterrupt(const Interrupt_t interrupt)
 {
-	ADC{{ id }}->IER |= static_cast<uint32_t>(interrupt);
+	ADC{{ id }}->IER |= interrupt.value;
 }
 
 void
-xpcc::stm32::Adc{{ id }}::disableInterrupt(const Interrupt interrupt)
+xpcc::stm32::Adc{{ id }}::disableInterrupt(const Interrupt_t interrupt)
 {
-	ADC{{ id }}->IER &= ~static_cast<uint32_t>(interrupt);
+	ADC{{ id }}->IER &= ~interrupt.value;
 }
 
-xpcc::stm32::Adc{{ id }}::InterruptFlag
+xpcc::stm32::Adc{{ id }}::InterruptFlag_t
 xpcc::stm32::Adc{{ id }}::getInterruptFlags()
 {
-	return static_cast<InterruptFlag>(ADC{{ id }}->ISR);
+	return InterruptFlag_t(ADC{{ id }}->ISR);
 }
 
 void
-xpcc::stm32::Adc{{ id }}::acknowledgeInterruptFlag(const InterruptFlag flags)
+xpcc::stm32::Adc{{ id }}::acknowledgeInterruptFlag(const InterruptFlag_t flags)
 {
 	// Flags are cleared by writing a one to the flag position.
 	// Writing a zero is ignored.
-	ADC{{ id }}->ISR = static_cast<uint32_t>(flags);
+	ADC{{ id }}->ISR = flags.value;
 }

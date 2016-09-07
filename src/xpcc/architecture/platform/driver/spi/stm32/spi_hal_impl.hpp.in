@@ -164,26 +164,26 @@ xpcc::stm32::SpiHal{{ id }}::enableInterruptVector(bool enable, uint32_t priorit
 }
 
 void inline
-xpcc::stm32::SpiHal{{ id }}::enableInterrupt(Interrupt interrupt)
+xpcc::stm32::SpiHal{{ id }}::enableInterrupt(Interrupt_t interrupt)
 {
-	SPI{{ id }}->CR2 |= static_cast<uint32_t>(interrupt);
+	SPI{{ id }}->CR2 |= interrupt.value;
 }
 
 void inline
-xpcc::stm32::SpiHal{{ id }}::disableInterrupt(Interrupt interrupt)
+xpcc::stm32::SpiHal{{ id }}::disableInterrupt(Interrupt_t interrupt)
 {
-	SPI{{ id }}->CR2 &= ~static_cast<uint32_t>(interrupt);
+	SPI{{ id }}->CR2 &= ~interrupt.value;
 }
 
-xpcc::stm32::SpiHal{{ id }}::InterruptFlag inline
+xpcc::stm32::SpiHal{{ id }}::InterruptFlag_t inline
 xpcc::stm32::SpiHal{{ id }}::getInterruptFlags()
 {
-	return static_cast<InterruptFlag>(SPI{{ id }}->SR );
+	return InterruptFlag_t(SPI{{ id }}->SR);
 }
 
 void inline
-xpcc::stm32::SpiHal{{ id }}::acknowledgeInterruptFlag(InterruptFlag /*flags*/)
+xpcc::stm32::SpiHal{{ id }}::acknowledgeInterruptFlag(InterruptFlag_t /*flags*/)
 {
 	// TODO: implement; see STM32F3 reference manual p. 736
-	// SPI{{ id }}->SR =  static_cast<InterruptFlag>(flags);
+	// SPI{{ id }}->SR = flags.value;
 }

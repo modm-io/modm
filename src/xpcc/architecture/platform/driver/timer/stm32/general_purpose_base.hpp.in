@@ -44,6 +44,7 @@ public:
 		Trigger = TIM_DIER_TIE,
 		Break = TIM_DIER_BIE,
 	};
+	XPCC_FLAGS32(Interrupt);
 
 	enum class InterruptFlag : uint32_t
 	{
@@ -60,6 +61,7 @@ public:
 		Overcapture3 = TIM_SR_CC3OF,
 		Overcapture4 = TIM_SR_CC4OF,
 	};
+	XPCC_FLAGS32(InterruptFlag);
 
 	enum class SlaveModeTrigger : uint32_t
 	{
@@ -124,6 +126,7 @@ public:
 		 */
 		Pwm2 = TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_0,
 	};
+	XPCC_FLAGS32(OutputCompareMode);
 
 	enum class OutputComparePreload : uint32_t
 	{
@@ -212,7 +215,7 @@ public:
 	 * 							changed later via setCompareValue())
 	 */
 	static void
-	configureOutputChannel(uint32_t channel, OutputCompareMode mode,
+	configureOutputChannel(uint32_t channel, OutputCompareMode_t mode,
 			uint16_t compareValue);
 
 	/**
@@ -233,10 +236,6 @@ public:
 	static inline uint16_t
 	getCompareValue(uint32_t channel);
 };
-
-ENUM_CLASS_FLAG(GeneralPurposeTimer::Interrupt)
-ENUM_CLASS_FLAG(GeneralPurposeTimer::InterruptFlag)
-ENUM_CLASS_FLAG(GeneralPurposeTimer::OutputCompareMode)
 
 } // namespace stm32
 

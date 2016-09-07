@@ -159,12 +159,12 @@ public:
 	enableInterruptVector(bool enable, uint32_t priority);
 
 	static inline void
-	enableInterrupt(Interrupt interrupt);
+	enableInterrupt(Interrupt_t interrupt);
 
 	static inline void
-	disableInterrupt(Interrupt interrupt);
+	disableInterrupt(Interrupt_t interrupt);
 
-	static inline InterruptFlag
+	static inline InterruptFlag_t
 	getInterruptFlags();
 
 	/**
@@ -173,7 +173,7 @@ public:
 	 * @warning 	Not all InterruptFlags can be cleared this way.
 	 */
 	static inline void
-	acknowledgeInterruptFlags(InterruptFlag flags);
+	acknowledgeInterruptFlags(InterruptFlag_t flags);
 };
 
 }	// namespace stm32
