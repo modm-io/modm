@@ -1167,12 +1167,12 @@ pins = \
 		[
 			{ "port": "B", "id": "2", "int": "0" },
 		],
-		"spi":
-		[
-			{ "port": "B", "id": "0", "name": "miso", "dir": "in" },
-			{ "port": "B", "id": "1", "name": "mosi", "dir": "out" },
-			{ "port": "B", "id": "2", "name": "sck", "dir": "out" }
-		]
+		#"spi":
+		#[
+		#	{ "port": "B", "id": "0", "name": "miso", "dir": "in" },
+		#	{ "port": "B", "id": "1", "name": "mosi", "dir": "out" },
+		#	{ "port": "B", "id": "2", "name": "sck", "dir": "out" }
+		#]
 	},
 	
 	{
@@ -1281,12 +1281,12 @@ pins = \
 		[
 			{ "port": "B", "id": "2", "int": "0" },
 		],
-		"spi":
-		[
-			{ "port": "B", "id": "1", "name": "miso", "dir": "in" },
-			{ "port": "B", "id": "2", "name": "mosi", "dir": "out" },
-			{ "port": "B", "id": "3", "name": "sck", "dir": "out" }
-		],
+		#"spi":
+		#[
+		#	{ "port": "B", "id": "1", "name": "miso", "dir": "in" },
+		#	{ "port": "B", "id": "2", "name": "mosi", "dir": "out" },
+		#	{ "port": "B", "id": "3", "name": "sck", "dir": "out" }
+		#],
 		"usi":
 		[
 			{ "port": "B", "id": "2", "name": "usck", "dir": "out" },
