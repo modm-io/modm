@@ -39,6 +39,7 @@
 		<!-- stm32f7 -->
 		<template device-family="f7" out="linkerscript.ld">linkerscript/stm32_idtcm.ld.in</template>
 
+		<static>assert.cpp</static>
 		<!-- dealing with C++ -->
 		<static>cxxabi.cpp</static>
 		<!-- dealing with newlib -->

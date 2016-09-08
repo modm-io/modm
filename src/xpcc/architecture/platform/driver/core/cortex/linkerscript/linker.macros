@@ -308,6 +308,14 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		KEEP(*(.eh_frame*))
 	} >{{memory}}
 	 */
+
+	/* Assertion handler table */
+	.assertion : ALIGN(4)
+	{
+		__assertion_table_start = .;
+		KEEP(*(.assertion))
+		__assertion_table_end = .;
+	}
 %% endmacro
 
 
