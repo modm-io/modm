@@ -79,8 +79,8 @@ initialize()
 #elif F_CPU > 1000000
 	// Set and enable output compare A
 	OCR0A = F_CPU / (1000ul * 8);
-	// Set prescaler 64 and enable timer
-	TCCR0B = (1 << CS00);
+	// Set prescaler 8 and enable timer
+	TCCR0B = (1 << CS01);
 #endif
 
 	enableInterrupts();
