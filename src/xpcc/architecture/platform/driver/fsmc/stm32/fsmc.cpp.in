@@ -9,7 +9,7 @@
 
 #include "fsmc.hpp"
 
-%% if target is stm32f2 or target is stm32f4
+%% if target is stm32f2 or target is stm32f4 or target is stm32f7
 %%  set BCRx = "BCR1"
 %%  set BTRx = "BTR1"
 %% elif target is stm32f1
@@ -17,7 +17,7 @@
 %%  set BTRx = "BTRx"
 %% endif
 
-%% if target is stm32f4 and (target.name not in ["405", "407", "415", "417"])
+%% if (target is stm32f4 and (target.name not in ["405", "407", "415", "417"])) or target is stm32f7
 %%   set FMC = "FMC"
 %% else
 %%   set FMC = "FSMC"
