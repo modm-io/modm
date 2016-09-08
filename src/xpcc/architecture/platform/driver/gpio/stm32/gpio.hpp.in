@@ -15,6 +15,9 @@
 #include <xpcc/architecture/interface/i2c.hpp>
 #include <xpcc/math/utils/bit_operation.hpp>
 
+%% if target is stm32f0
+// TODO: Include F0 ADC driver here when implemented.
+%% else
 %% for instance in gpios | getAdcs
 	%% if (target is stm32f3 and target.name != "373")
 #include "../../adc/stm32f3/adc_{{instance}}.hpp"
@@ -22,6 +25,7 @@
 #include "../../adc/stm32/adc_{{instance}}.hpp"
 	%% endif
 %% endfor
+%% endif
 
 extern void xpcc_gpio_enable(void);
 
@@ -233,7 +237,7 @@ public:
 		{{reg}}->PUPDR   = ({{reg}}->PUPDR   & ~mask2) | (i(type)  << (pin * 2));
 	}
 		%% for af in gpio.afs
-			%% if af.type == "analog"
+			%% if af.type == "analog" and target is not stm32f0
 	/// {{name}} connects to {{af.name}} of {{af.peripheral}}
 	static const ::xpcc::stm32::{{af.peripheral}}::Channel
 	{{af.peripheral}}Channel = ::xpcc::stm32::{{af.peripheral}}::Channel::{{ af.name }};
