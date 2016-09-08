@@ -172,7 +172,7 @@
         <af peripheral="Adc1" name="Channel7" type="analog"/>
       </gpio>
       <gpio port="A" id="8">
-        <!--<af id="0" peripheral="MCO" type="out"/>-->
+        <af id="0" peripheral="ClockOutput" type="out"/>
         <af id="2" peripheral="Timer5" name="Channel1"/>
         <af id="2" peripheral="Timer5" name="ExternalTrigger" type="in"/>
         <af id="5" peripheral="SpiMaster2" name="Sck" type="out"/>

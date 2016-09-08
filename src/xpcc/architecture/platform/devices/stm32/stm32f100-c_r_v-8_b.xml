@@ -147,7 +147,7 @@
       <gpio port="A" id="14"/>
       <gpio port="A" id="15">
         <af id="0,1,1" peripheral="SpiMaster1" name="Nss"/>
-        <af id="8,3,3" peripheral="Timer2" name="Channel1"/>
+        <af id="8,3,1" peripheral="Timer2" name="Channel1"/>
         <af id="8,3,1" peripheral="Timer2" name="ExternalTrigger" type="in"/>
       </gpio>
       <gpio port="B" id="0">

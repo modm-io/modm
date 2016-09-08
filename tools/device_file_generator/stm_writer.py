@@ -56,7 +56,10 @@ class STMDeviceWriter(XMLDeviceWriter):
 				   'f4': 'stm32',
 				   'f7': 'stm32'}
 		# ADC
-		self.addModuleAttributesToNode(self.root, 'ADC', 'adc', adc_map[self.device.id.family])
+		if self.device.id.family == 'f3' and self.device.id.name == '373':
+			self.addModuleAttributesToNode(self.root, 'ADC', 'adc', 'stm32')
+		else:
+			self.addModuleAttributesToNode(self.root, 'ADC', 'adc', adc_map[self.device.id.family])
 		# CAN
 		self.addModuleAttributesToNode(self.root, 'CAN', 'can')
 		# Clock
@@ -69,6 +72,7 @@ class STMDeviceWriter(XMLDeviceWriter):
 			self.addModuleAttributesToNode(self.root, 'DMA', 'dma')
 		# FSMC
 		self.addModuleAttributesToNode(self.root, 'FSMC', 'fsmc')
+		self.addModuleAttributesToNode(self.root, 'FMC', 'fsmc')
 		# I2C
 		self.addModuleAttributesToNode(self.root, 'I2C', 'i2c')
 		# ID

@@ -5,17 +5,16 @@
  		Please modify the xpcc/tools/device_file_generator code instead and rebuild this file.
  		Be aware, that regenerated files might have a different composition due to technical reasons. -->
   <device platform="stm32" family="f4" name="401|411" pin_id="c|r|v" size_id="b|c|d|e">
-    <flash device-size-id="b">131072</flash>
+    <flash device-name="401" device-size-id="b">131072</flash>
     <flash device-size-id="c">262144</flash>
-    <flash device-size-id="d">393216</flash>
+    <flash device-name="401" device-size-id="d">393216</flash>
     <flash device-size-id="e">524288</flash>
     <ram device-name="401" device-size-id="b|c">65536</ram>
     <ram device-name="401" device-size-id="d|e">98304</ram>
     <ram device-name="411">131072</ram>
     <core>cortex-m4f</core>
     <pin-count device-pin-id="v">100</pin-count>
-    <pin-count device-name="401" device-pin-id="c">48</pin-count>
-    <pin-count device-name="411" device-pin-id="c">49</pin-count>
+    <pin-count device-pin-id="c">48</pin-count>
     <pin-count device-pin-id="r">64</pin-count>
     <header>stm32f4xx.h</header>
     <define device-name="401" device-size-id="b|c">STM32F401xC</define>
