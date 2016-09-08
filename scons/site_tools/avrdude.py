@@ -31,7 +31,7 @@ from SCons.Script import *
 
 # -----------------------------------------------------------------------------
 def avrdude_flash(env, source, eeprom_source='', alias='avrdude_program'):
-	actionString = '$AVRDUDE -p $AVRDUDE_DEVICE -c $AVRDUDE_PROGRAMMER -P $AVRDUDE_PORT $AVRDUDE_OPTIONS -U flash:w:'
+	actionString = '$AVRDUDE -V -p $AVRDUDE_DEVICE -c $AVRDUDE_PROGRAMMER -P $AVRDUDE_PORT $AVRDUDE_OPTIONS -U flash:w:'
 	if platform.system() == "Windows":
 		# avrdude on Windows has problems with absolute path names.
 		# The leading drive letter plus colon backslash (e.g. "c:\path")
