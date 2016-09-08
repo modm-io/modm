@@ -72,12 +72,19 @@ enum Frequency
 
 static constexpr int
 MHz(int f) { return (f == HzDontCare)? HzDontCare : (f / MHz1); }
+
+xpcc_unused
 static constexpr uint32_t
 u32MHz(int f) { return static_cast<uint32_t>(MHz(f)); }
+
 static constexpr int
 kHz(int f) { return (f == HzDontCare)? HzDontCare : (f / kHz1); }
+
+xpcc_unused
 static constexpr uint32_t
 u32kHz(int f) { return static_cast<uint32_t>(kHz(f)); }
+
+xpcc_unused
 static constexpr int
 Hz(int f)  { return (f == HzDontCare)? HzDontCare : (f / Hz1); }
 
