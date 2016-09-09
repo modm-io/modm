@@ -419,8 +419,10 @@ class STMDeviceReader(XMLDeviceReader):
 						  'name': raw_names[1].capitalize()}
 					if af_id:
 						af.update({'id': af_id})
-					else:
-						af.update({'id': '10'})
+					# For the STM32F1 the USB pins aren't enabled like other
+					# alternative functions, but by simply enabling the USB core.
+					#else:
+					#	af.update({'id': '10'})
 					afs.append(af)
 
 				if signal.startswith('FSMC_') or signal.startswith('FMC_'):
