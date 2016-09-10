@@ -71,14 +71,14 @@ namespace xpcc
 		 * 		Needs to point directly above the last available memory
 		 * 		position.
 		 */
-		ALWAYS_INLINE void
+		xpcc_always_inline void
 		initialize(void * heapStart, void * heapEnd);
 		
 		/**
 		 * Allocate memory
 		 * 
 		 */
-		ALWAYS_INLINE void *
+		xpcc_always_inline void *
 		allocate(std::size_t requestedSize);
 		
 		/**
@@ -88,7 +88,7 @@ namespace xpcc
 		 * 		Must be the same pointer previously acquired by
 		 * 		allocate().
 		 */
-		ALWAYS_INLINE void
+		xpcc_always_inline void
 		free(void *ptr);
 		
 	public:
@@ -97,7 +97,7 @@ namespace xpcc
 		
 	private:
 		// Align the pointer to a multiple of XPCC__ALIGNMENT
-		ALWAYS_INLINE T *
+		xpcc_always_inline T *
 		alignPointer(void * ptr) const;
 		
 		//static const int MAX_BLOCK_PARTS = 2048;

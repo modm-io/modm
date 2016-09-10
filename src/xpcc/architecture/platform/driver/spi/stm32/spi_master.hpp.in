@@ -103,13 +103,13 @@ public:
 	}
 
 
-	static ALWAYS_INLINE void
+	static xpcc_always_inline void
 	setDataMode(DataMode mode)
 	{
 		SpiHal{{ id }}::setDataMode(static_cast<SpiHal{{ id }}::DataMode>(mode));
 	}
 
-	static ALWAYS_INLINE void
+	static xpcc_always_inline void
 	setDataOrder(DataOrder order)
 	{
 		SpiHal{{ id }}::setDataOrder(static_cast<SpiHal{{ id }}::DataOrder>(order));

@@ -59,7 +59,7 @@ public:
 public:
 	template< class SystemClock, uint32_t baudrate,
 			uint16_t tolerance = xpcc::Tolerance::OnePercent >
-	static void ALWAYS_INLINE
+	static void xpcc_always_inline
 	initialize()
 	{
 		initialize(baudrate);

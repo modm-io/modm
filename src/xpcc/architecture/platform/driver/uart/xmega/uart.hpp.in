@@ -61,7 +61,7 @@ public:
 	 *		desired baud rate
 	 */
 	template< uint32_t baudrate >
-	static ALWAYS_INLINE void
+	static xpcc_always_inline void
 	initialize()
 	{
 		static_assert(F_CPU/16l >= baudrate, "The CPU frequency must be at least 16x higher than UART baudrate.");

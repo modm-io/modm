@@ -62,7 +62,7 @@ protected:
 	/// @endcond
 public:
 
-	struct ATTRIBUTE_PACKED
+	struct xpcc_packed
 	Data
 	{
 		template < class I2cMaster >
@@ -128,7 +128,7 @@ public:
 	/// sets address to default of 0x48 (alternatives are 0x49, 0x4A and 0x4B).
 	Tmp102(Data &data, uint8_t address=0x48);
 
-	void ALWAYS_INLINE
+	void xpcc_always_inline
 	update()
 	{ run(); }
 
@@ -146,12 +146,12 @@ public:
 	readComparatorMode(bool &result);
 
 	/// Writes the upper limit of the alarm.
-	xpcc::ResumableResult<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> xpcc_always_inline
 	setUpperLimit(float temperature)
 	{ return setLimitRegister(Register::TemperatureUpperLimit, temperature); }
 
 	/// Writes the lower limit of the alarm.
-	xpcc::ResumableResult<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> xpcc_always_inline
 	setLowerLimit(float temperature)
 	{ return setLimitRegister(Register::TemperatureLowerLimit, temperature); }
 

@@ -1542,14 +1542,14 @@ INCLUDE_FILE_PATTERNS  =
 PREDEFINED             = __DOXYGEN__ \
                          __cplusplus \
                          "EXTERN_FLASH_STORAGE(x):=const x" \
-                         ALWAYS_INLINE=inline \
+                         xpcc_always_inline=inline \
                          "XPCC_FLAGS8(x):=typedef xpcc::Flags8< x > x ## _t" \
                          "XPCC_FLAGS16(x):=typedef xpcc::Flags16< x > x ## _t" \
                          "XPCC_FLAGS32(x):=typedef xpcc::Flags32< x > x ## _t" \
                          XPCC_TYPE_FLAGS(x)= \
                          XPCC_INT_TYPE_FLAGS(x)= \
                          __attribute__(x)= \
-                         ATTRIBUTE_PACKED=
+                         xpcc_packed=
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then
 # this tag can be used to specify a list of macro names that should be expanded.

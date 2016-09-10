@@ -58,10 +58,10 @@ namespace xpcc
 		update();
 
 	private:
-		ALWAYS_INLINE void
+		xpcc_always_inline void
 		lcdSettings(void);
 
-		ALWAYS_INLINE void
+		xpcc_always_inline void
 		lcdCls(uint16_t colour);
 	};
 }

@@ -68,7 +68,7 @@ Bmp085Test::testConversion()
 	adc_press_min[2] = 0x4000;
 	adc_press_max[2] = 0xE000;
 
-	for (size_t jj = 0; jj < XPCC__ARRAY_SIZE(dataTable); ++jj)
+	for (size_t jj = 0; jj < XPCC_ARRAY_SIZE(dataTable); ++jj)
 	{
 		xpcc::bmp085::DataDouble* dataDouble;
 

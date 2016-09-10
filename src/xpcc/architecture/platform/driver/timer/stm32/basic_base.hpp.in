@@ -11,6 +11,7 @@
 
 #include <stdint.h>
 #include "../../../device.hpp"
+#include <xpcc/architecture/interface/register.hpp>
 
 /**
  * @ingroup 	{{target.string}}
@@ -37,11 +38,13 @@ public:
 	{
 		Update = TIM_DIER_UIE,
 	};
+	XPCC_FLAGS32(Interrupt);
 
 	enum class InterruptFlag : uint32_t
 	{
 		Update = TIM_SR_UIF,
 	};
+	XPCC_FLAGS32(InterruptFlag);
 
 public:
 	/**
@@ -183,7 +186,7 @@ public:
 	 * \see		enableInterruptVector()
 	 */
 	static void
-	enableInterrupt(Interrupt interrupt);
+	enableInterrupt(Interrupt_t interrupt);
 
 	/**
 	 * Disables interrupts.
@@ -192,7 +195,7 @@ public:
 	 * 				Interrupts to disable
 	 */
 	static void
-	disableInterrupt(Interrupt interrupt);
+	disableInterrupt(Interrupt_t interrupt);
 
 	/**
 	 * Returns a bitmap of the enum StateFlag. Use this method while
@@ -215,7 +218,7 @@ public:
 	 * }
 	 * \endcode
 	 */
-	static InterruptFlag
+	static InterruptFlag_t
 	getInterruptFlags();
 
 	/**
@@ -224,13 +227,8 @@ public:
 	 * \param flags		Bitmap of StateFlag
 	 */
 	static void
-	acknowledgeInterruptFlags(InterruptFlag flags);
+	acknowledgeInterruptFlags(InterruptFlag_t flags);
 };
-
-/// @cond
-ENUM_CLASS_FLAG(BasicTimer::Interrupt)
-ENUM_CLASS_FLAG(BasicTimer::InterruptFlag)
-/// @endcond
 
 } // namespace stm32
 

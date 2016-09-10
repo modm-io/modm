@@ -43,6 +43,7 @@ public:
 		TxBufferEmpty		= SPI_CR2_TXEIE,
 		Error				= SPI_CR2_ERRIE,
 	};
+	XPCC_FLAGS32(Interrupt);
 
 	enum class
 	InterruptFlag : uint32_t
@@ -61,6 +62,7 @@ public:
 		FifoTxLevel			= SPI_SR_FTLVL,
 %% endif
 	};
+	XPCC_FLAGS32(InterruptFlag);
 
 	enum class
 	MasterSelection : uint32_t
@@ -128,11 +130,6 @@ public:
 	};
 
 };
-
-/// @cond
-ENUM_CLASS_FLAG(SpiBase::Interrupt)
-ENUM_CLASS_FLAG(SpiBase::InterruptFlag)
-/// @endcond
 
 } // namespace stm32
 

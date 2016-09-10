@@ -110,7 +110,7 @@ public:
 	///
 	Ds1631(Data &data, uint8_t address=0x90);
 
-	void ALWAYS_INLINE
+	void xpcc_always_inline
 	update()
 	{ run(); }
 
@@ -131,12 +131,12 @@ public:
 	setConversionMode(ConversionMode mode);
 
 	/// Writes the upper limit of the alarm.
-	xpcc::ResumableResult<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> xpcc_always_inline
 	setUpperLimit(float temperature)
 	{ return setLimitRegister(Command::TemperatureUpperLimit, temperature); }
 
 	/// Writes the lower limit of the alarm.
-	xpcc::ResumableResult<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> xpcc_always_inline
 	setLowerLimit(float temperature)
 	{ return setLimitRegister(Command::TemperatureLowerLimit, temperature); }
 
@@ -146,15 +146,15 @@ public:
 	readTemperature();
 
 
-	xpcc::ResumableResult<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> xpcc_always_inline
 	startConversion()
 	{ return writeCommand(Command::StartConvert); }
 
-	xpcc::ResumableResult<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> xpcc_always_inline
 	stopConversion()
 	{ return writeCommand(Command::StopConvert); }
 
-	xpcc::ResumableResult<bool> ALWAYS_INLINE
+	xpcc::ResumableResult<bool> xpcc_always_inline
 	reset()
 	{ return writeCommand(Command::SoftwareReset); }
 

@@ -43,7 +43,7 @@ xpcc::atomic::Queue<T, N>::Queue() :
 }
 
 template<typename T, std::size_t N>
-ALWAYS_INLINE bool
+xpcc_always_inline bool
 xpcc::atomic::Queue<T, N>::isFull() const
 {
 	Index tmphead = xpcc::accessor::asVolatile(this->head) + 1;
@@ -75,7 +75,7 @@ xpcc::atomic::Queue<T, N>::isNearlyFull() const
 }
 
 template<typename T, std::size_t N>
-ALWAYS_INLINE bool
+xpcc_always_inline bool
 xpcc::atomic::Queue<T, N>::isEmpty() const
 {
 	return (xpcc::accessor::asVolatile(this->head) == xpcc::accessor::asVolatile(this->tail));
@@ -103,21 +103,21 @@ xpcc::atomic::Queue<T, N>::isNearlyEmpty() const
 
 
 template<typename T, std::size_t N>
-ALWAYS_INLINE typename xpcc::atomic::Queue<T, N>::Size
+xpcc_always_inline typename xpcc::atomic::Queue<T, N>::Size
 xpcc::atomic::Queue<T, N>::getMaxSize() const
 {
 	return N;
 }
 
 template<typename T, std::size_t N>
-ALWAYS_INLINE const T&
+xpcc_always_inline const T&
 xpcc::atomic::Queue<T, N>::get() const
 {
 	return this->buffer[this->tail];
 }
 
 template<typename T, std::size_t N>
-ALWAYS_INLINE bool
+xpcc_always_inline bool
 xpcc::atomic::Queue<T, N>::push(const T& value)
 {
 	Index tmphead = this->head + 1;
@@ -135,7 +135,7 @@ xpcc::atomic::Queue<T, N>::push(const T& value)
 }
 
 template<typename T, std::size_t N>
-ALWAYS_INLINE void
+xpcc_always_inline void
 xpcc::atomic::Queue<T, N>::pop()
 {
 	Index tmptail = this->tail + 1;

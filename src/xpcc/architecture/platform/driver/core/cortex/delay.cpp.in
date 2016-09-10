@@ -36,7 +36,7 @@ extern "C"
 {
 
 
-void ATTRIBUTE_FASTCODE
+void xpcc_fastcode
 _delay_ns(uint16_t ns)
 {
 	// ns_per_loop = nanoseconds per cycle times cycles per loop ({{loop}} cycles)
@@ -51,7 +51,7 @@ _delay_ns(uint16_t ns)
 }
 
 
-void ATTRIBUTE_FASTCODE
+void xpcc_fastcode
 _delay_us(uint16_t us)
 {
 	if (!us) return;    // 1 cycle, or 2 when taken
@@ -74,7 +74,7 @@ _delay_us(uint16_t us)
 }
 
 
-void ATTRIBUTE_FASTCODE
+void xpcc_fastcode
 _delay_ms(uint16_t ms)
 {
 	if (!ms) return;    // 1 cycle, or 2 when taken

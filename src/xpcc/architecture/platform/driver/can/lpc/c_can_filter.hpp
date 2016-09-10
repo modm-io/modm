@@ -57,7 +57,7 @@ namespace xpcc
 			struct Identifier
 			{
 			protected:
-				ALWAYS_INLINE
+				xpcc_always_inline
 				Identifier(uint32_t identifier) :
 					value(identifier)
 				{
@@ -66,7 +66,7 @@ namespace xpcc
 				uint32_t value;
 
 			public:
-				ALWAYS_INLINE
+				xpcc_always_inline
 				operator uint32_t () const
 				{
 					return value;
@@ -82,7 +82,7 @@ namespace xpcc
 			 */
 			struct ExtendedIdentifier : public Identifier
 			{
-				ALWAYS_INLINE
+				xpcc_always_inline
 				ExtendedIdentifier(uint32_t identifier, RemoteRequestStatus rtr = NO_RTR) :
 					Identifier(identifier | (CAN_IFn_ARB2_MSGVAL << 16) | (CAN_IFn_ARB2_XTD << 16) | ((rtr) ? (CAN_IFn_ARB2_DIR << 16) : 0))
 				{
@@ -91,13 +91,13 @@ namespace xpcc
 
 			struct ExtendedFilterMask
 			{
-				ALWAYS_INLINE
+				xpcc_always_inline
 				ExtendedFilterMask(uint32_t identifier, RemoteRequestFilter rtr = RTR_MATCH) :
 					value(identifier | (CAN_IFn_MSK2_MXTD << 16) | ((rtr) ? (CAN_IFn_MSK2_MDIR << 16) : 0))
 				{
 				}
 
-				ALWAYS_INLINE
+				xpcc_always_inline
 				operator uint32_t () const
 				{
 					return value;

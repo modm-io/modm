@@ -247,7 +247,7 @@ namespace xpcc
 			static bool
 			transfer(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
 			
-			static ALWAYS_INLINE bool
+			static xpcc_always_inline bool
 			transferSync(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
 			
 			static bool

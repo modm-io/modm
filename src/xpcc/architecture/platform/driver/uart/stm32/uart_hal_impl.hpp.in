@@ -76,7 +76,7 @@ xpcc::stm32::{{ name }}::disable()
 %% if target is not stm32f1
 template<class SystemClock, uint32_t baudrate,
 		xpcc::stm32::{{ name }}::OversamplingMode oversample>
-void ALWAYS_INLINE
+void xpcc_always_inline
 xpcc::stm32::{{ name }}::initialize(Parity parity)
 {
 	initializeWithBrr(UartBaudrate::getBrr<SystemClock::{{ uart ~ id }}, baudrate>(),
@@ -86,7 +86,7 @@ xpcc::stm32::{{ name }}::initialize(Parity parity)
 %% endif
 
 template<class SystemClock, uint32_t baudrate>
-void ALWAYS_INLINE
+void xpcc_always_inline
 xpcc::stm32::{{ name }}::initialize(Parity parity)
 {
 %% if target is stm32f1
@@ -241,29 +241,29 @@ xpcc::stm32::{{ name }}::enableInterruptVector(bool enable, uint32_t priority)
 }
 
 void
-xpcc::stm32::{{ name }}::enableInterrupt(Interrupt interrupt)
+xpcc::stm32::{{ name }}::enableInterrupt(Interrupt_t interrupt)
 {
-	{{ peripheral }}->CR1 |= static_cast<uint32_t>(interrupt);
+	{{ peripheral }}->CR1 |= interrupt.value;
 }
 
 void
-xpcc::stm32::{{ name }}::disableInterrupt(Interrupt interrupt)
+xpcc::stm32::{{ name }}::disableInterrupt(Interrupt_t interrupt)
 {
-	{{ peripheral }}->CR1 &= ~static_cast<uint32_t>(interrupt);
+	{{ peripheral }}->CR1 &= ~interrupt.value;
 }
 
-xpcc::stm32::{{ name }}::InterruptFlag
+xpcc::stm32::{{ name }}::InterruptFlag_t
 xpcc::stm32::{{ name }}::getInterruptFlags()
 {
 %% if target is stm32f0 or target is stm32f3 or target is stm32f7
-	return static_cast<InterruptFlag>( {{ peripheral }}->ISR );
+	return InterruptFlag_t( {{ peripheral }}->ISR );
 %% else
-	return static_cast<InterruptFlag>( {{ peripheral }}->SR );
+	return InterruptFlag_t( {{ peripheral }}->SR );
 %% endif
 }
 
 void
-xpcc::stm32::{{ name }}::acknowledgeInterruptFlags(InterruptFlag flags)
+xpcc::stm32::{{ name }}::acknowledgeInterruptFlags(InterruptFlag_t flags)
 {
 %% if target is stm32f0 or target is stm32f3 or target is stm32f7
 	// Not all flags can be cleared by writing to this reg
@@ -274,7 +274,7 @@ xpcc::stm32::{{ name }}::acknowledgeInterruptFlags(InterruptFlag flags)
 		USART_ICR_WUCF;
 	// Flags are cleared by writing a one to the flag position.
 	// Writing a zero is (hopefully) ignored.
-	{{ peripheral }}->ICR = (flags & mask);
+	{{ peripheral }}->ICR = (flags.value & mask);
 %% else
 	/* Interrupts must be cleared manually by accessing SR and DR.
 	 * Overrun Interrupt, Noise flag detected, Framing Error, Parity Error

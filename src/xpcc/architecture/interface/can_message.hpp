@@ -80,7 +80,7 @@ struct Message
 
 public:
 	uint32_t identifier;
-	uint8_t ATTRIBUTE_ALIGNED(4) data[8];
+	uint8_t xpcc_aligned(4) data[8];
 	struct Flags
 	{
 		Flags() :

@@ -432,7 +432,7 @@ namespace xpcc
 		 * only read the X-ZDATA0-1 registers and buffer the results
 		 * sets isNewDataAvailable() to \c true
 		 */
-		ALWAYS_INLINE void
+		xpcc_always_inline void
 		readAccelerometer();
 
 		/* \return pointer to 8bit array containing xyzt temperature and accelerations
@@ -445,7 +445,7 @@ namespace xpcc
 		 * \c false, when the data has been accessed, or data is being
 		 * copied into the buffer.
 		 */
-		ALWAYS_INLINE bool
+		xpcc_always_inline bool
 		isNewDataAvailable();
 
 		void

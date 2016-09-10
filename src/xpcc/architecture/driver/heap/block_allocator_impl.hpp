@@ -74,7 +74,7 @@
  *                             \-- end
  */
 template <typename T, unsigned int BLOCK_SIZE >
-ALWAYS_INLINE void
+xpcc_always_inline void
 xpcc::BlockAllocator<T, BLOCK_SIZE>::initialize(void * heapStart, void * heapEnd)
 {
 	start = alignPointer(heapStart);
@@ -99,7 +99,7 @@ xpcc::BlockAllocator<T, BLOCK_SIZE>::initialize(void * heapStart, void * heapEnd
  * 
  */
 template <typename T, unsigned int BLOCK_SIZE >
-ALWAYS_INLINE void *
+xpcc_always_inline void *
 xpcc::BlockAllocator<T, BLOCK_SIZE>::allocate(std::size_t requestedSize)
 {
 	requestedSize += 4;	// bytes needed for the management
@@ -146,7 +146,7 @@ xpcc::BlockAllocator<T, BLOCK_SIZE>::allocate(std::size_t requestedSize)
 
 // ----------------------------------------------------------------------------
 template <typename T, unsigned int BLOCK_SIZE >
-ALWAYS_INLINE void
+xpcc_always_inline void
 xpcc::BlockAllocator<T, BLOCK_SIZE>::free(void *ptr)
 {
 	if (ptr == 0) {
@@ -199,7 +199,7 @@ xpcc::BlockAllocator<T, BLOCK_SIZE>::free(void *ptr)
 
 // ----------------------------------------------------------------------------
 template <typename T, unsigned int BLOCK_SIZE >
-ALWAYS_INLINE std::size_t
+xpcc_always_inline std::size_t
 xpcc::BlockAllocator<T, BLOCK_SIZE>::getAvailableSize() const
 {
 	T *p = start;
@@ -224,7 +224,7 @@ xpcc::BlockAllocator<T, BLOCK_SIZE>::getAvailableSize() const
 
 // ----------------------------------------------------------------------------
 template<typename T, unsigned int BLOCK_SIZE >
-ALWAYS_INLINE T *
+xpcc_always_inline T *
 xpcc::BlockAllocator<T, BLOCK_SIZE>::alignPointer(void * ptr) const
 {
 	// (XPCC__ALIGNMENT - 1) is used as a bitmask

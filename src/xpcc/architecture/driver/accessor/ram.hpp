@@ -48,34 +48,34 @@ namespace xpcc
 		class Ram
 		{
 		public:
-			ALWAYS_INLINE
+			xpcc_always_inline
 			Ram(const T* addr = 0) :
 				address(addr)
 			{
 			}
 			
 			template <typename U>
-			ALWAYS_INLINE
+			xpcc_always_inline
 			explicit Ram(const Ram<U>& rhs) :
 				address((T*) rhs.address)
 			{
 			}
 			
-			ALWAYS_INLINE
+			xpcc_always_inline
 			const T
 			operator *() const
 			{
 				return *address;
 			}
 			
-			ALWAYS_INLINE
+			xpcc_always_inline
 			const T
 			operator [](std::size_t index) const
 			{
 				return *(address + index);
 			}
 			
-			ALWAYS_INLINE
+			xpcc_always_inline
 			Ram&
 			operator ++ ()
 			{
@@ -83,7 +83,7 @@ namespace xpcc
 				return *this;
 			}
 
-			ALWAYS_INLINE
+			xpcc_always_inline
 			Ram
 			operator ++ (int)
 			{
@@ -92,7 +92,7 @@ namespace xpcc
 				return ret;
 			}
 
-			ALWAYS_INLINE
+			xpcc_always_inline
 			Ram&
 			operator -- ()
 			{
@@ -100,7 +100,7 @@ namespace xpcc
 				return *this;
 			}
 
-			ALWAYS_INLINE
+			xpcc_always_inline
 			Ram&
 			operator -- (int)
 			{
@@ -109,7 +109,7 @@ namespace xpcc
 				return ret;
 			}
 			
-			ALWAYS_INLINE
+			xpcc_always_inline
 			Ram&
 			operator += (std::size_t rhs)
 			{
@@ -117,7 +117,7 @@ namespace xpcc
 				return *this;
 			}
 			
-			ALWAYS_INLINE
+			xpcc_always_inline
 			Ram&
 			operator -= (std::size_t rhs)
 			{
@@ -125,7 +125,7 @@ namespace xpcc
 				return *this;
 			}
 			
-			ALWAYS_INLINE
+			xpcc_always_inline
 			const T*
 			getPointer() const
 			{

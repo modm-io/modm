@@ -81,7 +81,7 @@
 			template<typename T, std::size_t size>
 			struct FlashReader
 			{
-				ALWAYS_INLINE
+				xpcc_always_inline
 				static T
 				read(const T* p)
 				{

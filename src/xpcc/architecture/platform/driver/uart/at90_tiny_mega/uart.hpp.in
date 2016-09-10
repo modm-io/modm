@@ -57,7 +57,7 @@ public:
 	// start documentation inherited
 	template< class SystemClock, uint32_t baudrate,
 			uint16_t tolerance = xpcc::Tolerance::TwoPercent >
-	static ALWAYS_INLINE void
+	static xpcc_always_inline void
 	initialize()
 	{
 		// use double speed when necessary

@@ -14,6 +14,7 @@
 
 #include <stdint.h>
 #include "../../../device.hpp"
+#include <xpcc/architecture/interface/register.hpp>
 
 %% if target is stm32f1 or target is stm32f2 or target is stm32f4
 // STM has some weird ideas about continuity
@@ -58,6 +59,7 @@ public:
 		/// Call interrupt when char received (RXNE) or overrun occurred (ORE)
 		RxNotEmpty	= USART_CR1_RXNEIE,
 	};
+	XPCC_FLAGS32(Interrupt);
 
 	enum class InterruptFlag : uint32_t
 	{
@@ -81,6 +83,7 @@ public:
 		/// Set if a parity error was detected.
 		ParityError		= USART_{{reg}}_PE,
 	};
+	XPCC_FLAGS32(InterruptFlag);
 
 	enum class Parity : uint32_t
 	{
@@ -123,11 +126,6 @@ public:
 	};
 
 };
-
-/// @cond
-ENUM_CLASS_FLAG(UartBase::Interrupt)
-ENUM_CLASS_FLAG(UartBase::InterruptFlag)
-/// @endcond
 
 }	// namespace stm32
 

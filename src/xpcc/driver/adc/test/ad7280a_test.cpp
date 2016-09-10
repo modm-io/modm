@@ -119,10 +119,10 @@ Ad7280aTest::testChainSetup()
 	uint8_t arg4Tx[] = {0x11, 0xC2, 0x65, 0xDC};
 
 	test::Transmission transmissionsInitialize[] = {
-		test::Transmission(XPCC__ARRAY_SIZE(arg1Rx), arg1Rx, arg1Tx),
-		test::Transmission(XPCC__ARRAY_SIZE(arg2Rx), arg2Rx, arg2Tx),
-		test::Transmission(XPCC__ARRAY_SIZE(arg3Rx), arg3Rx, arg3Tx),
-		test::Transmission(XPCC__ARRAY_SIZE(arg4Rx), arg4Rx, arg4Tx),
+		test::Transmission(XPCC_ARRAY_SIZE(arg1Rx), arg1Rx, arg1Tx),
+		test::Transmission(XPCC_ARRAY_SIZE(arg2Rx), arg2Rx, arg2Tx),
+		test::Transmission(XPCC_ARRAY_SIZE(arg3Rx), arg3Rx, arg3Tx),
+		test::Transmission(XPCC_ARRAY_SIZE(arg4Rx), arg4Rx, arg4Tx),
 	};
 
 	device.start(transmissionsInitialize, ARRAY_SIZE(transmissionsInitialize), __LINE__);
@@ -149,12 +149,12 @@ Ad7280aTest::testSelftest()
 	uint8_t arg4Tx[] = {0x00, 0x1E, 0xA5, 0x90};
 
 	test::Transmission transmissionsInitialize[] = {
-		test::Transmission(XPCC__ARRAY_SIZE(arg1Rx), arg1Rx, arg1Tx),
-		test::Transmission(XPCC__ARRAY_SIZE(arg2Rx), arg2Rx, arg2Tx),
-		test::Transmission(XPCC__ARRAY_SIZE(arg3Rx), arg3Rx, arg3Tx),
+		test::Transmission(XPCC_ARRAY_SIZE(arg1Rx), arg1Rx, arg1Tx),
+		test::Transmission(XPCC_ARRAY_SIZE(arg2Rx), arg2Rx, arg2Tx),
+		test::Transmission(XPCC_ARRAY_SIZE(arg3Rx), arg3Rx, arg3Tx),
 
 		// Read the self-test conversion result (value = 980)
-		test::Transmission(XPCC__ARRAY_SIZE(arg4Rx), arg4Rx, arg4Tx),
+		test::Transmission(XPCC_ARRAY_SIZE(arg4Rx), arg4Rx, arg4Tx),
 	};
 
 	device.start(transmissionsInitialize, ARRAY_SIZE(transmissionsInitialize), __LINE__);
@@ -175,8 +175,8 @@ Ad7280aTest::testSoftwareReset()
 	uint8_t arg2Tx[] = {0x00, 0x00, 0x00, 0x00};
 
 	test::Transmission transmissionsInitialize[] = {
-		test::Transmission(XPCC__ARRAY_SIZE(arg1Rx), arg1Rx, arg1Tx),
-		test::Transmission(XPCC__ARRAY_SIZE(arg2Rx), arg2Rx, arg2Tx),
+		test::Transmission(XPCC_ARRAY_SIZE(arg1Rx), arg1Rx, arg1Tx),
+		test::Transmission(XPCC_ARRAY_SIZE(arg2Rx), arg2Rx, arg2Tx),
 	};
 
 	device.start(transmissionsInitialize, ARRAY_SIZE(transmissionsInitialize), __LINE__);
@@ -203,11 +203,11 @@ Ad7280aTest::testChannelRead()
 	uint8_t arg4Tx[] = {0x01, 0x91, 0x2D, 0x88};
 
 	test::Transmission transmissionsInitialize[] = {
-		test::Transmission(XPCC__ARRAY_SIZE(arg1Rx), arg1Rx, arg1Tx),
-		test::Transmission(XPCC__ARRAY_SIZE(arg2Rx), arg2Rx, arg2Tx),
-		test::Transmission(XPCC__ARRAY_SIZE(arg3Rx), arg3Rx, arg3Tx),
+		test::Transmission(XPCC_ARRAY_SIZE(arg1Rx), arg1Rx, arg1Tx),
+		test::Transmission(XPCC_ARRAY_SIZE(arg2Rx), arg2Rx, arg2Tx),
+		test::Transmission(XPCC_ARRAY_SIZE(arg3Rx), arg3Rx, arg3Tx),
 
-		test::Transmission(XPCC__ARRAY_SIZE(arg4Rx), arg4Rx, arg4Tx),
+		test::Transmission(XPCC_ARRAY_SIZE(arg4Rx), arg4Rx, arg4Tx),
 	};
 
 	device.start(transmissionsInitialize, ARRAY_SIZE(transmissionsInitialize), __LINE__);
@@ -249,15 +249,15 @@ Ad7280aTest::testAllChannelRead()
 	uint8_t arg8Tx[] = {0x02, 0x92, 0xC6, 0x74};
 
 	test::Transmission transmissionsInitialize[] = {
-		test::Transmission(XPCC__ARRAY_SIZE(arg1Rx), arg1Rx, arg1Tx),
-		test::Transmission(XPCC__ARRAY_SIZE(arg2Rx), arg2Rx, arg2Tx),
+		test::Transmission(XPCC_ARRAY_SIZE(arg1Rx), arg1Rx, arg1Tx),
+		test::Transmission(XPCC_ARRAY_SIZE(arg2Rx), arg2Rx, arg2Tx),
 
-		test::Transmission(XPCC__ARRAY_SIZE(arg3Rx), arg3Rx, arg3Tx),
-		test::Transmission(XPCC__ARRAY_SIZE(arg4Rx), arg4Rx, arg4Tx),
-		test::Transmission(XPCC__ARRAY_SIZE(arg5Rx), arg5Rx, arg5Tx),
-		test::Transmission(XPCC__ARRAY_SIZE(arg6Rx), arg6Rx, arg6Tx),
-		test::Transmission(XPCC__ARRAY_SIZE(arg7Rx), arg7Rx, arg7Tx),
-		test::Transmission(XPCC__ARRAY_SIZE(arg8Rx), arg8Rx, arg8Tx),
+		test::Transmission(XPCC_ARRAY_SIZE(arg3Rx), arg3Rx, arg3Tx),
+		test::Transmission(XPCC_ARRAY_SIZE(arg4Rx), arg4Rx, arg4Tx),
+		test::Transmission(XPCC_ARRAY_SIZE(arg5Rx), arg5Rx, arg5Tx),
+		test::Transmission(XPCC_ARRAY_SIZE(arg6Rx), arg6Rx, arg6Tx),
+		test::Transmission(XPCC_ARRAY_SIZE(arg7Rx), arg7Rx, arg7Tx),
+		test::Transmission(XPCC_ARRAY_SIZE(arg8Rx), arg8Rx, arg8Tx),
 	};
 
 	device.start(transmissionsInitialize, ARRAY_SIZE(transmissionsInitialize), __LINE__);
@@ -283,7 +283,7 @@ Ad7280aTest::testBalancer()
 	uint8_t arg1Tx[] = {0x00, 0x00, 0x00, 0x00};
 
 	test::Transmission transmissionsInitialize[] = {
-		test::Transmission(XPCC__ARRAY_SIZE(arg1Rx), arg1Rx, arg1Tx),
+		test::Transmission(XPCC_ARRAY_SIZE(arg1Rx), arg1Rx, arg1Tx),
 	};
 
 	device.start(transmissionsInitialize, ARRAY_SIZE(transmissionsInitialize), __LINE__);

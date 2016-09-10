@@ -26,14 +26,14 @@ namespace {{ target.family }}
 {
 
 /// enables global interrupts
-static ALWAYS_INLINE void
+static xpcc_always_inline void
 enableInterrupts()
 {
 	sei();
 }
 
 /// disables global interrupts
-static ALWAYS_INLINE void
+static xpcc_always_inline void
 disableInterrupts()
 {
 	cli();

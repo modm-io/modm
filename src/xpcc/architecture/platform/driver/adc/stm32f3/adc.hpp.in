@@ -33,6 +33,7 @@
 #include <stdint.h>
 #include "../../../type_ids.hpp"
 #include "../../../device.hpp"
+#include <xpcc/architecture/interface/register.hpp>
 
 namespace xpcc
 {
@@ -174,6 +175,7 @@ public:
 		AnalogWatchdog3 					= ADC_IER_AWD3,
 		InjectedContextQueueOverflow 		= ADC_IER_JQOVF,
 	};
+	XPCC_FLAGS32(Interrupt);
 
 	enum class InterruptFlag : uint32_t
 	{
@@ -189,6 +191,7 @@ public:
 		AnalogWatchdog3 					= ADC_ISR_AWD3,
 		InjectedContextQueueOverflow 		= ADC_ISR_JQOVF,
 	};
+	XPCC_FLAGS32(InterruptFlag);
 
 public:
 	/**
@@ -327,19 +330,17 @@ public:
 	enableInterruptVector(const uint32_t priority, const bool enable = true);
 
 	static inline void
-	enableInterrupt(const Interrupt interrupt);
+	enableInterrupt(const Interrupt_t interrupt);
 
 	static inline void
-	disableInterrupt(const Interrupt interrupt);
+	disableInterrupt(const Interrupt_t interrupt);
 
-	static inline InterruptFlag
+	static inline InterruptFlag_t
 	getInterruptFlags();
 
 	static inline void
-	acknowledgeInterruptFlag(const InterruptFlag flags);
+	acknowledgeInterruptFlag(const InterruptFlag_t flags);
 };
-ENUM_CLASS_FLAG(Adc{{ id }}::Interrupt)
-ENUM_CLASS_FLAG(Adc{{ id }}::InterruptFlag)
 
 }
 

@@ -71,7 +71,7 @@ namespace xpcc
 			 * 
 			 * Disables interrupts.
 			 */
-			ALWAYS_INLINE
+			xpcc_always_inline
 			Lock();
 			
 			/**
@@ -79,7 +79,7 @@ namespace xpcc
 			 * 
 			 * Restore the interrupt settings.
 			 */
-			ALWAYS_INLINE
+			xpcc_always_inline
 			~Lock();
 		
 		private:
@@ -108,7 +108,7 @@ namespace xpcc
 			 * 
 			 * Enable interrupts
 			 */
-			ALWAYS_INLINE
+			xpcc_always_inline
 			Unlock();
 			
 			/**
@@ -116,7 +116,7 @@ namespace xpcc
 			 * 
 			 * Restore the interrupt settings.
 			 */
-			ALWAYS_INLINE
+			xpcc_always_inline
 			~Unlock();
 		
 		private:
@@ -161,7 +161,7 @@ namespace xpcc
 
 #elif defined(XPCC__CPU_CORTEX_M0) || defined(XPCC__CPU_CORTEX_M3) || defined(XPCC__CPU_CORTEX_M4) || defined(XPCC__CPU_CORTEX_M7)
 
-	ALWAYS_INLINE
+	xpcc_always_inline
 	xpcc::atomic::Lock::Lock()
 	{
 		// cpsr = __get_PRIMASK();
@@ -175,14 +175,14 @@ namespace xpcc
 				:: "memory");
 	}
 
-	ALWAYS_INLINE
+	xpcc_always_inline
 	xpcc::atomic::Lock::~Lock()
 	{
 		// __set_PRIMASK(cpsr);
 		asm volatile ("msr PRIMASK, %0" : : "r" (cpsr) : "memory" );
 	}
 
-	ALWAYS_INLINE
+	xpcc_always_inline
 	xpcc::atomic::Unlock::Unlock()
 	{
 		// cpsr = __get_PRIMASK();
@@ -196,7 +196,7 @@ namespace xpcc
 				:: "memory");
 	}
 
-	ALWAYS_INLINE
+	xpcc_always_inline
 	xpcc::atomic::Unlock::~Unlock()
 	{
 		// __set_PRIMASK(cpsr);

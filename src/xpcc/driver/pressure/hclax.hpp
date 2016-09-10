@@ -22,7 +22,7 @@ class HclaX;
 
 struct hclax
 {
-	struct ATTRIBUTE_PACKED
+	struct xpcc_packed
 	Data
 	{
 		template < typename I2cMaster >

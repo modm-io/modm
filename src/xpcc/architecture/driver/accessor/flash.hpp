@@ -57,34 +57,34 @@ namespace xpcc
 		class Flash
 		{
 		public:
-			ALWAYS_INLINE
+			xpcc_always_inline
 			explicit Flash(const T* addr = 0) :
 				address(addr)
 			{
 			}
 			
 			template <typename U>
-			ALWAYS_INLINE
+			xpcc_always_inline
 			explicit Flash(const Flash<U>& rhs) :
 				address((T*) rhs.address)
 			{
 			}
 			
-			ALWAYS_INLINE
+			xpcc_always_inline
 			const T
 			operator *() const
 			{
 				return FlashReader<T, sizeof(T)>::read(address);
 			}
 			
-			ALWAYS_INLINE
+			xpcc_always_inline
 			const T
 			operator [](size_t index) const
 			{
 				return FlashReader<T, sizeof(T)>::read(address + index);
 			}
 			
-			ALWAYS_INLINE
+			xpcc_always_inline
 			Flash&
 			operator++()
 			{
@@ -92,7 +92,7 @@ namespace xpcc
 				return *this;
 			}
 
-			ALWAYS_INLINE
+			xpcc_always_inline
 			Flash
 			operator++(int)
 			{
@@ -101,7 +101,7 @@ namespace xpcc
 				return ret;
 			}
 
-			ALWAYS_INLINE
+			xpcc_always_inline
 			Flash&
 			operator--()
 			{
@@ -109,7 +109,7 @@ namespace xpcc
 				return *this;
 			}
 
-			ALWAYS_INLINE
+			xpcc_always_inline
 			Flash&
 			operator--(int)
 			{
@@ -118,7 +118,7 @@ namespace xpcc
 				return ret;
 			}
 			
-			ALWAYS_INLINE
+			xpcc_always_inline
 			Flash&
 			operator+=(size_t rhs)
 			{
@@ -126,7 +126,7 @@ namespace xpcc
 				return *this;
 			}
 			
-			ALWAYS_INLINE
+			xpcc_always_inline
 			Flash&
 			operator-=(size_t rhs)
 			{
@@ -134,14 +134,14 @@ namespace xpcc
 				return *this;
 			}
 			
-			ALWAYS_INLINE
+			xpcc_always_inline
 			bool
 			isValid() const
 			{
 				return (address != 0);
 			}
 			
-			ALWAYS_INLINE
+			xpcc_always_inline
 			const T*
 			getPointer() const
 			{
@@ -163,7 +163,7 @@ namespace xpcc
 		 * \ingroup	accessor
 		 */
 		template<typename T>
-		ALWAYS_INLINE ::xpcc::accessor::Flash<T>
+		xpcc_always_inline ::xpcc::accessor::Flash<T>
 		asFlash(const T* ptr)
 		{
 			return ::xpcc::accessor::Flash<T>(ptr);

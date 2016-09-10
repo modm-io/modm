@@ -26,32 +26,32 @@ public:
 	{
 	}
 
-	ALWAYS_INLINE void
+	xpcc_always_inline void
 	writeIndex(uint16_t index)
 	{
 		*ptrIndex = index;
 	}
 
-	ALWAYS_INLINE void
+	xpcc_always_inline void
 	writeData(uint16_t data)
 	{
 		*ptrData = data;
 	}
 
-	ALWAYS_INLINE uint16_t
+	xpcc_always_inline uint16_t
 	readData()
 	{
 		return *ptrData;
 	}
 
-	ALWAYS_INLINE void
+	xpcc_always_inline void
 	writeRegister(uint16_t reg, uint16_t value)
 	{
 		writeIndex(reg);
 		writeData(value);
 	}
 
-	ALWAYS_INLINE uint16_t
+	xpcc_always_inline uint16_t
 	readRegister(uint16_t reg)
 	{
 		writeIndex(reg);
@@ -74,34 +74,34 @@ public:
 	{
 	}
 
-	ALWAYS_INLINE void
+	xpcc_always_inline void
 	writeIndex(uint8_t index)
 	{
 		*ptrIndex = 0;
 		*ptrIndex = index;
 	}
 
-	ALWAYS_INLINE void
+	xpcc_always_inline void
 	writeData(uint16_t data)
 	{
 		*ptrData = data >> 8;
 		*ptrData = data & 0xff;
 	}
 
-//	ALWAYS_INLINE uint16_t
+//	xpcc_always_inline uint16_t
 //	readData()
 //	{
 //		return *ptrData;
 //	}
 
-	ALWAYS_INLINE void
+	xpcc_always_inline void
 	writeRegister(uint8_t reg, uint16_t value)
 	{
 		writeIndex(reg);
 		writeData(value);
 	}
 
-//	ALWAYS_INLINE uint16_t
+//	xpcc_always_inline uint16_t
 //	readRegister(uint16_t reg)
 //	{
 //		writeIndex(reg);
@@ -128,7 +128,7 @@ template <
 class MemoryBus
 {
 public:
-	static ALWAYS_INLINE void
+	static xpcc_always_inline void
 	initialize()
 	{
 		CS::set();
@@ -137,7 +137,7 @@ public:
 		PORT::setInput();
 	}
 
-	static ALWAYS_INLINE void
+	static xpcc_always_inline void
 	write(const uint8_t data)
 	{
 		CS::reset();
@@ -159,7 +159,7 @@ public:
 		CS::set();
 	}
 
-	static ALWAYS_INLINE uint8_t
+	static xpcc_always_inline uint8_t
 	read()
 	{
 		uint8_t ret;
@@ -193,13 +193,13 @@ class TftMemoryBus8BitGpio
 public:
 	typedef MemoryBus<PORT, CS, RD, WR> BUS;
 
-	static ALWAYS_INLINE void
+	static xpcc_always_inline void
 	initialize()
 	{
 		BUS::initialize();
 	}
 
-	static ALWAYS_INLINE void
+	static xpcc_always_inline void
 	writeIndex(uint8_t index)
 	{
 		// *ptrIndex = 0;
@@ -210,7 +210,7 @@ public:
 		BUS::write(index);
 	}
 
-	static ALWAYS_INLINE void
+	static xpcc_always_inline void
 	writeData(uint16_t data)
 	{
 		// *ptrData = data >> 8;
@@ -221,20 +221,20 @@ public:
 		BUS::write(data & 0xff);
 	}
 
-//	static ALWAYS_INLINE uint16_t
+//	static xpcc_always_inline uint16_t
 //	readData()
 //	{
 //		return *ptrData;
 //	}
 
-	static ALWAYS_INLINE void
+	static xpcc_always_inline void
 	writeRegister(uint8_t reg, uint16_t value)
 	{
 		writeIndex(reg);
 		writeData(value);
 	}
 
-//	static ALWAYS_INLINE uint16_t
+//	static xpcc_always_inline uint16_t
 //	readRegister(uint16_t reg)
 //	{
 //		writeIndex(reg);

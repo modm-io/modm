@@ -39,7 +39,7 @@ struct KeyFrameBase
 	:	length(length), value{values...}
 	{
 	}
-} ATTRIBUTE_PACKED;
+} xpcc_packed;
 
 template<typename T, int remaining, typename... Args>
 struct KeyFrameHelper

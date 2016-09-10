@@ -218,7 +218,7 @@ public:
 %%	endfor
 	};
 
-	static ALWAYS_INLINE void
+	static xpcc_always_inline void
 	setDivision(Division)
 	{
 		//ClockControl::enable{{ o.name }}(static_cast<int>(d));
@@ -226,7 +226,7 @@ public:
 %% endif
 	// Connect Functions
 %% for src in o.sources
-	static ALWAYS_INLINE void
+	static xpcc_always_inline void
 %% if target is stm32f2 or target is stm32f4
 	connect(::{{type_id_namespace}}::TypeId::{{ src.name }} /* t */, uint8_t div = 1)
 	{

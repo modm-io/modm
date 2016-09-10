@@ -48,33 +48,33 @@ namespace ui
 class Led
 {
 public:
-	ALWAYS_INLINE Led(): Led(nullptr) {}
+	xpcc_always_inline Led(): Led(nullptr) {}
 
 	/// Requires a handler function pointer for value updates.
-	ALWAYS_INLINE Led(Animation<uint8_t>::Handler handler):
+	xpcc_always_inline Led(Animation<uint8_t>::Handler handler):
 		animation(brightness, handler), brightness(0) {}
 
 	/// @param	brightness
 	///		between 0 and length of lookup-table (usually 255)
-	ALWAYS_INLINE void
+	xpcc_always_inline void
 	setBrightness(uint8_t brightness)
 	{ animation.setValue(brightness); }
 
 	/// @return brightness of the LED
-	ALWAYS_INLINE uint8_t
+	xpcc_always_inline uint8_t
 	getBrightness() const
 	{ return animation.getValue(); }
 
 	/// @return `true` if LED is currently fading to another brightness,
 	///			`false` if otherwise
-	ALWAYS_INLINE bool
+	xpcc_always_inline bool
 	isFading() const
 	{ return animation.isAnimating(); }
 
 	/// Fade from the current brightness to a new brightness in the specified ms.
 	/// Fading times of more than ~32s are not possible. You must control
 	/// fading externally in that case.
-	ALWAYS_INLINE void
+	xpcc_always_inline void
 	fadeTo(uint8_t brightness, uint16_t time)
 	{ animation.animateTo(brightness, time); }
 
@@ -84,7 +84,7 @@ public:
 	 * @param	time
 	 * 		specify the fade up time in ms, `0` to turn the LED on instantly
 	 */
-	ALWAYS_INLINE void
+	xpcc_always_inline void
 	on(uint16_t time=75)
 	{ fadeTo(255, time); }
 
@@ -94,14 +94,14 @@ public:
 	 * @param	time
 	 * 		specify the fade up time in ms, `0` to turn the LED off instantly
 	 */
-	ALWAYS_INLINE void
+	xpcc_always_inline void
 	off(uint16_t time=120)
 	{ fadeTo(0, time); }
 
 	/// Can be called at a interval of 1ms or less.
 	/// If you do not need 1ms response time (e.g. for on(), off()),
 	/// you may call this at intervals < 255ms.
-	ALWAYS_INLINE void
+	xpcc_always_inline void
 	update()
 	{ animation.update(); }
 

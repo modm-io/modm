@@ -50,21 +50,21 @@ namespace xpcc
 		class Color
 		{
 		public:
-			static ALWAYS_INLINE Color white()   { return Color(0xffff); };
-			static ALWAYS_INLINE Color yellow()  { return Color(0xFFE0); };
-			static ALWAYS_INLINE Color magenta() { return Color(0xF81F); };
-			static ALWAYS_INLINE Color red()     { return Color(0xF800); };
-			static ALWAYS_INLINE Color orange()  { return Color(0xFD20); };
-			static ALWAYS_INLINE Color sliver()  { return Color(0xC618); };
-			static ALWAYS_INLINE Color gray()    { return Color(0x8410); };
-			static ALWAYS_INLINE Color maroon()  { return Color(0x8000); };
-			static ALWAYS_INLINE Color lime()    { return Color(0x07E0); };
-			static ALWAYS_INLINE Color green()   { return Color(0x0400); };
-			static ALWAYS_INLINE Color blue()    { return Color(0x001F); };
-			static ALWAYS_INLINE Color navy()    { return Color(0x0010); };
-			static ALWAYS_INLINE Color black()   { return Color(0x0000); };
-			static ALWAYS_INLINE Color signalViolet()   { return Color(0x8010); }; //0x84D0
-			static ALWAYS_INLINE Color emeraldGreen()   { return Color(0x5DCC); };
+			static xpcc_always_inline Color white()   { return Color(0xffff); };
+			static xpcc_always_inline Color yellow()  { return Color(0xFFE0); };
+			static xpcc_always_inline Color magenta() { return Color(0xF81F); };
+			static xpcc_always_inline Color red()     { return Color(0xF800); };
+			static xpcc_always_inline Color orange()  { return Color(0xFD20); };
+			static xpcc_always_inline Color sliver()  { return Color(0xC618); };
+			static xpcc_always_inline Color gray()    { return Color(0x8410); };
+			static xpcc_always_inline Color maroon()  { return Color(0x8000); };
+			static xpcc_always_inline Color lime()    { return Color(0x07E0); };
+			static xpcc_always_inline Color green()   { return Color(0x0400); };
+			static xpcc_always_inline Color blue()    { return Color(0x001F); };
+			static xpcc_always_inline Color navy()    { return Color(0x0010); };
+			static xpcc_always_inline Color black()   { return Color(0x0000); };
+			static xpcc_always_inline Color signalViolet()   { return Color(0x8010); }; //0x84D0
+			static xpcc_always_inline Color emeraldGreen()   { return Color(0x5DCC); };
 
 			/**
 			 * @param	red

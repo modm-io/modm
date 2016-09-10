@@ -54,7 +54,7 @@ private:
 public:
 template< 	class SystemClock, uint32_t baudrate,
 		uint16_t tolerance = xpcc::Tolerance::OnePercent >
-	static void ALWAYS_INLINE
+	static void xpcc_always_inline
 %% if parameters.buffered
 	initialize(uint32_t interruptPriority, Parity parity = Parity::Disabled)
 %% else

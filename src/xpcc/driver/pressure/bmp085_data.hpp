@@ -35,7 +35,7 @@ namespace bmp085data
  * Values are used for calculation of calibrated
  * sensor values from raw sensor data
  */
-struct ATTRIBUTE_PACKED
+struct xpcc_packed
 Calibration
 {
 	int16_t  ac1;
@@ -53,7 +53,7 @@ Calibration
 	int16_t  md;
 };
 
-class ATTRIBUTE_PACKED
+class xpcc_packed
 DataBase
 {
 	template < typename I2cMaster >
@@ -105,7 +105,7 @@ protected:
 	};
 };
 
-class ATTRIBUTE_PACKED
+class xpcc_packed
 Data : public DataBase
 {
 public:
@@ -165,7 +165,7 @@ private:
 	int32_t b5; // calculated in calculateCalibratedTemperature, needed for calculateCalibratedPressure
 };
 
-class ATTRIBUTE_PACKED
+class xpcc_packed
 DataDouble : public DataBase
 {
 public:

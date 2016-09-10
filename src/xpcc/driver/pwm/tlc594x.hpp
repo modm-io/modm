@@ -120,26 +120,26 @@ public:
 	latch();
 
 	/// @return true if LOD or TEF is detected
-	ALWAYS_INLINE
+	xpcc_always_inline
 	static bool
 	isError()
 	{
 		return !Xerr::read();
 	}
 
-	ALWAYS_INLINE
+	xpcc_always_inline
 	static uint8_t*
 	getGrayscaleData()
 	{
 		return gs;
 	}
-	ALWAYS_INLINE
+	xpcc_always_inline
 	static uint8_t*
 	getDotCorrectionData()
 	{
 		return dc;
 	}
-	ALWAYS_INLINE
+	xpcc_always_inline
 	static uint8_t*
 	getStatusData()
 	{

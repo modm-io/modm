@@ -97,12 +97,12 @@ namespace xpcc
 				{{reg}}->TCR = TCR_CRst;
 			}
 
-			static ALWAYS_INLINE Value
+			static xpcc_always_inline Value
 			getValue() {
 				return {{reg}}->TC;
 			}
 
-			static ALWAYS_INLINE void
+			static xpcc_always_inline void
 			setValue(uint16_t value) {
 				{{reg}}->TC = value;
 			}

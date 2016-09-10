@@ -119,14 +119,14 @@ namespace xpcc
 			 * \brief	Send a message
 			 */
 			template <typename T>
-			static bool ALWAYS_INLINE
+			static bool xpcc_always_inline
 			sendMessage(uint8_t address, Flags flags, uint8_t command,
 					const T& payload);
 			
 			/**
 			 * \brief	Send a empty message
 			 */
-			static bool ALWAYS_INLINE
+			static bool xpcc_always_inline
 			sendMessage(uint8_t address, Flags flags, uint8_t command);
 			
 			/**
@@ -134,38 +134,38 @@ namespace xpcc
 			 * 
 			 * Reset the status with a call of dropMessage().
 			 */
-			static ALWAYS_INLINE bool
+			static xpcc_always_inline bool
 			isMessageAvailable();
 			
-			static ALWAYS_INLINE uint8_t
+			static xpcc_always_inline uint8_t
 			getTransmittedAddress();
 			
-			static ALWAYS_INLINE uint8_t
+			static xpcc_always_inline uint8_t
 			getTransmittedCommand();
 			
-			static ALWAYS_INLINE Flags
+			static xpcc_always_inline Flags
 			getTransmittedFlags();
 			
-			static ALWAYS_INLINE uint8_t
+			static xpcc_always_inline uint8_t
 			getAddress();
 			
-			static ALWAYS_INLINE uint8_t
+			static xpcc_always_inline uint8_t
 			getCommand();
 			
-			static ALWAYS_INLINE bool
+			static xpcc_always_inline bool
 			isResponse();
 			
 			/**
 			 * \brief	Check if the message is an ACK or NACK
 			 * \return	\c true if the message is an ACK, \c false on NACK.
 			 */
-			static ALWAYS_INLINE bool
+			static xpcc_always_inline bool
 			isAcknowledge();
 			
 			/**
 			 * \return	\c true you are allowed to send right now
 			 */
-			static ALWAYS_INLINE bool
+			static xpcc_always_inline bool
 			isBusAvailable();
 			
 			/**
@@ -173,7 +173,7 @@ namespace xpcc
 			 * \return	\c true if the message has been transmitted without
 			 *			collision.
 			 */
-			static ALWAYS_INLINE bool
+			static xpcc_always_inline bool
 			messageTransmitted();
 			
 			/**
@@ -182,14 +182,14 @@ namespace xpcc
 			 * Data access is only valid after isMessageAvailable() returns
 			 * \c true and before any call of dropMessage() or update()
 			 */
-			static ALWAYS_INLINE const uint8_t *
+			static xpcc_always_inline const uint8_t *
 			getPayload();
 			
 			/**
 			 * \return	Size of the received message. Zero if no message
 			 * 			is available at the moment.
 			 */
-			static ALWAYS_INLINE uint8_t
+			static xpcc_always_inline uint8_t
 			getPayloadLength();
 			
 			/**

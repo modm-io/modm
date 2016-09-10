@@ -32,108 +32,121 @@
 #define XPCC__UTILS_HPP
 
 #include "detect.hpp"
+#include "legacy_macros.hpp"
 
 #ifdef __DOXYGEN__
-	/**
-	 * \brief	Force inlining
-	 *
-	 * Macro to force inlining on functions if needed. Compiling with -Os  does not
-	 * always inline them when declared only \c inline.
-	 *
-	 * \ingroup	platform
-	 */
-	#define	ALWAYS_INLINE
+	/// @ingroup	platform
+	/// @{
+
+	/// Convert the argument into a C-String
+	#define	XPCC_STRINGIFY(s)		#s
+
+	/// Concatenate two arguments
+	#define	XPCC_CONCAT(a,b)		a ## b
+
+	/// Concatenate three arguments
+	#define	XPCC_CONCAT3(a,b,c)		a ## b ## c
+
+	/// Concatenate three arguments
+	#define	XPCC_CONCAT4(a,b,c,d)		a ## b ## c ## d
+
+	/// Concatenate three arguments
+	#define	XPCC_CONCAT5(a,b,c,d,e)		a ## b ## c ## d ## e
+
+	/// Compute the size of a static (!) array.
+	#define XPCC_ARRAY_SIZE(x)	(sizeof(x) / sizeof(x[0]))
 
 	/**
-	 * \brief	Convert the argument into a C-String
-	 * \ingroup	platform
+	 * Force inlining on functions if needed. Compiling with -Os  does not
+	 * always inline them when declared only `inline`
 	 */
-	#define	STRINGIFY(s)	#s
+	#define xpcc_always_inline
 
-	/**
-	 * \brief	Concatenate the two arguments
-	 * \ingroup	platform
-	 */
-	#define	CONCAT(a,b)		a ## b
+	/// Attached to a variable or a function this means that it is meant to be possibly unused.
+	#define xpcc_unused
+
+	/// Causes the declaration to be emitted as a weak symbol rather than a global.
+	#define xpcc_weak
+
+	/// Specifies a minimum alignment for the function, measured in bytes.
+	#define xpcc_aligned(n)
+
+	/// Specifies that a variable or structure field should have the smallest possible alignment.
+	#define xpcc_packed
+
+	/// Specifies that a variable (or function) lives in a particular section.
+	#define xpcc_section(s)
+
+	/// Specifies that a function is placed in fastest executable memory.
+	/// @note This is not always SRAM, since Flash accelerators can be faster.
+	#define xpcc_fastcode
+
+	/// Specifies that a variable is placed in fastest accessible memory.
+	#define xpcc_fastdata
+
+	/// This branch is more likely to execute.
+	#define xpcc_likely(x) (x)
+
+	/// This branch is less likely to execute.
+	#define xpcc_unlikely(x) (x)
+
+	/// @}
 
 #else // !__DOXYGEN__
 
-	#define	STRINGIFY(s)	STRINGIFY_(s)
-	#define	STRINGIFY_(s)	STRINGIFY__(s)
-	#define	STRINGIFY__(s)	#s
+	#define	XPCC_STRINGIFY(s)	XPCC_STRINGIFY_(s)
+	#define	XPCC_STRINGIFY_(s)	XPCC_STRINGIFY__(s)
+	#define	XPCC_STRINGIFY__(s)	#s
 
-	#define	CONCAT(a,b)		CONCAT_(a,b)
-	#define	CONCAT_(a,b)	CONCAT__(a,b)
-	#define	CONCAT__(a,b)	a ## b
+	#define	XPCC_CONCAT(a,b)	XPCC_CONCAT_(a,b)
+	#define	XPCC_CONCAT_(a,b)	XPCC_CONCAT__(a,b)
+	#define	XPCC_CONCAT__(a,b)	a ## b
 
-	#define	CONCAT3(a,b,c)		CONCAT3_(a,b,c)
-	#define	CONCAT3_(a,b,c)		CONCAT3__(a,b,c)
-	#define	CONCAT3__(a,b,c)	a ## b ## c
+	#define	XPCC_CONCAT3(a,b,c)		XPCC_CONCAT3_(a,b,c)
+	#define	XPCC_CONCAT3_(a,b,c)	XPCC_CONCAT3__(a,b,c)
+	#define	XPCC_CONCAT3__(a,b,c)	a ## b ## c
 
-	#define	CONCAT4(a,b,c,d)	CONCAT4_(a,b,c,d)
-	#define	CONCAT4_(a,b,c,d)	CONCAT4__(a,b,c,d)
-	#define	CONCAT4__(a,b,c,d)	a ## b ## c ## d
+	#define	XPCC_CONCAT4(a,b,c,d)	XPCC_CONCAT4_(a,b,c,d)
+	#define	XPCC_CONCAT4_(a,b,c,d)	XPCC_CONCAT4__(a,b,c,d)
+	#define	XPCC_CONCAT4__(a,b,c,d)	a ## b ## c ## d
 
-	#define	CONCAT5(a,b,c,d,e)		CONCAT5_(a,b,c,d,e)
-	#define	CONCAT5_(a,b,c,d,e)		CONCAT5__(a,b,c,d,e)
-	#define	CONCAT5__(a,b,c,d,e)	a ## b ## c ## d ## e
+	#define	XPCC_CONCAT5(a,b,c,d,e)		XPCC_CONCAT5_(a,b,c,d,e)
+	#define	XPCC_CONCAT5_(a,b,c,d,e)	XPCC_CONCAT5__(a,b,c,d,e)
+	#define	XPCC_CONCAT5__(a,b,c,d,e)	a ## b ## c ## d ## e
 
-	#ifdef XPCC__COMPILER_GCC
-	#	define ALWAYS_INLINE  		inline __attribute__((always_inline))
-	#	define ATTRIBUTE_UNUSED		__attribute__((unused))
-	#	define ATTRIBUTE_WEAK		__attribute__ ((weak))
-	#	define ATTRIBUTE_ALIGNED(n)	__attribute__((aligned(n)))
-	#	define ATTRIBUTE_PACKED		__attribute__((packed))
-	#	define ATTRIBUTE_FASTCODE	__attribute__((section(".fastcode")))
-	#	define ATTRIBUTE_FASTDATA	__attribute__((section(".fastdata")))
-	#	define ATTRIBUTE_MAY_ALIAS	__attribute__((__may_alias__))	// see http://dbp-consulting.com/tutorials/StrictAliasing.html
-	#	define likely(x)			__builtin_expect(!!(x), 1)
-	#	define unlikely(x)			__builtin_expect(!!(x), 0)
+
+	#if defined(XPCC__COMPILER_GCC) || defined(XPCC__COMPILER_CLANG)
+	#	define xpcc_always_inline	inline __attribute__((always_inline))
+	#	define xpcc_unused			__attribute__((unused))
+	#	define xpcc_weak			__attribute__((weak))
+	#	define xpcc_aligned(n)		__attribute__((aligned(n)))
+	#	define xpcc_packed			__attribute__((packed))
+	#	define xpcc_may_alias		__attribute__((__may_alias__))	// see http://dbp-consulting.com/tutorials/StrictAliasing.html
+	#	define xpcc_deprecated(msg)	__attribute__((deprecated(msg)))
+	#	define xpcc_likely(x)		__builtin_expect(!!(x), 1)
+	#	define xpcc_unlikely(x)		__builtin_expect(!!(x), 0)
+	#	define xpcc_section_(s)		__attribute__((section(s)))
 	#else
-	#	define ALWAYS_INLINE  		inline
-	#	define ATTRIBUTE_UNUSED
-	#	define ATTRIBUTE_WEAK
-	#	define ATTRIBUTE_ALIGNED(n)
-	#	define ATTRIBUTE_PACKED
-	#	define ATTRIBUTE_FASTCODE
-	#	define ATTRIBUTE_FASTDATA
-	#	define ATTRIBUTE_MAY_ALIAS
-	#	define likely(x)			(x)
-	#	define unlikely(x)			(x)
+	#	define xpcc_always_inline	inline
+	#	define xpcc_unused
+	#	define xpcc_weak
+	#	define xpcc_aligned(n)
+	#	define xpcc_packed
+	#	define xpcc_may_alias
+	#	define xpcc_deprecated(msg)
+	#	define xpcc_likely(x)		(x)
+	#	define xpcc_unlikely(x)		(x)
+	#	define xpcc_section_(s)
 	#endif
-
-	#ifdef XPCC__CPU_AVR
-	#	define	MAIN_FUNCTION	int main(void) __attribute__((OS_main)); \
-								int main(void)
-	#	define	MAIN_FUNCTION_NAKED MAIN_FUNCTION
-	#elif defined XPCC__OS_HOSTED
-	#	define 	MAIN_FUNCTION		int main( int argc, char* argv[] )
-	#	define	MAIN_FUNCTION_NAKED	int main( int,      char**       )
+	#ifdef XPCC__OS_HOSTED
+	#	define xpcc_section(s)
 	#else
-	#	define	MAIN_FUNCTION	int main(void)
-	#	define	MAIN_FUNCTION_NAKED MAIN_FUNCTION
+	#	define xpcc_section(s)		xpcc_section_(s)
 	#endif
+	#define xpcc_fastcode		xpcc_section(".fastcode")
+	#define xpcc_fastdata		xpcc_section(".fastdata")
 
-	#define XPCC__ARRAY_SIZE(x)	(sizeof(x) / sizeof(x[0]))
-
-	/**
-	 * Makes it possible to use enum classes as bit flags.
-	 * This disables some typesafety introduced by the enum class feature
-	 * but it should still be more typesafe than using the traditional
-	 * enum type.
-	 * Use (for public enum classes after class definition) like this:
-	 * ENUM_CLASS_FLAG(Adc{{ id }}::InterruptFlag)
-	 */
-	#define ENUM_CLASS_FLAG(name) \
-	inline name operator|(name a, name b) \
-	{return static_cast<name>(static_cast<uint32_t>(a) | static_cast<uint32_t>(b));} \
-	inline uint32_t operator&(name a, name b) \
-	{return (static_cast<uint32_t>(a) & static_cast<uint32_t>(b));} \
-	inline uint32_t operator&(uint32_t a, name b) \
-	{return ((a) & static_cast<uint32_t>(b));} \
-	inline uint32_t operator&(name a, uint32_t b) \
-	{return (static_cast<uint32_t>(a) & (b));}
-
+	#define XPCC_ARRAY_SIZE(x)	(sizeof(x) / sizeof(x[0]))
 
 #endif	// !__DOXYGEN__
 

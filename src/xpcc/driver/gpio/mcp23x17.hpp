@@ -254,7 +254,7 @@ public:
 	using Port = GpioExpanderPort< Mcp23x17<Transport>, object, StartPin, Width, DataOrder >;
 
 private:
-	struct ATTRIBUTE_PACKED
+	struct xpcc_packed
 	Memory
 	{
 		Memory() :

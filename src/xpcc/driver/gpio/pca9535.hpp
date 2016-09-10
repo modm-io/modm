@@ -250,7 +250,7 @@ private:
 	readMemory(Index index);
 
 	/// @cond
-	struct ATTRIBUTE_PACKED
+	struct xpcc_packed
 	Memory
 	{
 		Memory() :
