@@ -115,36 +115,25 @@
 	#define	XPCC_CONCAT5__(a,b,c,d,e)	a ## b ## c ## d ## e
 
 
-	#if defined(XPCC__COMPILER_GCC) || defined(XPCC__COMPILER_CLANG)
-	#	define xpcc_always_inline	inline __attribute__((always_inline))
-	#	define xpcc_unused			__attribute__((unused))
-	#	define xpcc_weak			__attribute__((weak))
-	#	define xpcc_aligned(n)		__attribute__((aligned(n)))
-	#	define xpcc_packed			__attribute__((packed))
-	#	define xpcc_may_alias		__attribute__((__may_alias__))	// see http://dbp-consulting.com/tutorials/StrictAliasing.html
-	#	define xpcc_deprecated(msg)	__attribute__((deprecated(msg)))
-	#	define xpcc_likely(x)		__builtin_expect(!!(x), 1)
-	#	define xpcc_unlikely(x)		__builtin_expect(!!(x), 0)
-	#	define xpcc_section_(s)		__attribute__((section(s)))
-	#else
-	#	define xpcc_always_inline	inline
-	#	define xpcc_unused
-	#	define xpcc_weak
-	#	define xpcc_aligned(n)
-	#	define xpcc_packed
-	#	define xpcc_may_alias
-	#	define xpcc_deprecated(msg)
-	#	define xpcc_likely(x)		(x)
-	#	define xpcc_unlikely(x)		(x)
-	#	define xpcc_section_(s)
-	#endif
+	#define xpcc_always_inline		inline __attribute__((always_inline))
+	#define xpcc_unused				__attribute__((unused))
+	#define xpcc_weak				__attribute__((weak))
+	#define xpcc_aligned(n)			__attribute__((aligned(n)))
+	#define xpcc_packed				__attribute__((packed))
+	// see http://dbp-consulting.com/tutorials/StrictAliasing.html
+	#define xpcc_may_alias			__attribute__((__may_alias__))
+	#define xpcc_deprecated(msg)	__attribute__((deprecated(msg)))
+	#define xpcc_likely(x)			__builtin_expect(!!(x), 1)
+	#define xpcc_unlikely(x)		__builtin_expect(!!(x), 0)
+	#define xpcc_section(s)			__attribute__((section(s)))
+
 	#ifdef XPCC__OS_HOSTED
-	#	define xpcc_section(s)
+	#	define xpcc_fastcode
+	#	define xpcc_fastdata
 	#else
-	#	define xpcc_section(s)		xpcc_section_(s)
+	#	define xpcc_fastcode		xpcc_section(".fastcode")
+	#	define xpcc_fastdata		xpcc_section(".fastdata")
 	#endif
-	#define xpcc_fastcode		xpcc_section(".fastcode")
-	#define xpcc_fastdata		xpcc_section(".fastdata")
 
 	#define XPCC_ARRAY_SIZE(x)	(sizeof(x) / sizeof(x[0]))
 
