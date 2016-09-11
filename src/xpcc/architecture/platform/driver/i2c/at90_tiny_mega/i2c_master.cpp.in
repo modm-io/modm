@@ -37,7 +37,7 @@ namespace
 
 // ----------------------------------------------------------------------------
 /// TWI state machine interrupt handler
-ISR(TWI_vect)
+XPCC_ISR(TWI)
 {
 	switch(TW_STATUS)
 	{

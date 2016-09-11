@@ -14,7 +14,7 @@ typedef GpioOutputB0 Led;
 typedef GpioInputB3 Button;
 
 // Timer interrupt used to query the button status
-ISR(TIMER2_COMPA_vect)
+XPCC_ISR(TIMER2_COMPA)
 {
 	buttons.update(Button::read() ? BUTTON_1 : 0);
 }

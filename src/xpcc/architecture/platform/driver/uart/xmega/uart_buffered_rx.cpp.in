@@ -17,8 +17,8 @@ static xpcc::atomic::Queue<uint8_t, {{parameters.rx_buffer}}> rxBuffer;
 static uint8_t error;
 
 // ----------------------------------------------------------------------------
-ISR(USART{{ id }}_RXC_vect)
-{		
+XPCC_ISR(USART{{ id }}_RXC)
+{
 	// first save the errors
 	error |= USART{{ id }}_STATUS & (USART_FERR_bm | USART_BUFOVF_bm | USART_PERR_bm);
 	// then read the buffer

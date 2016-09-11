@@ -183,8 +183,7 @@ public:
 	 * You need to create you own interrupt handler for this interrupt.
 	 * The interrupt handler has a fixed name:
 	 * \code
-	 * extern "C" void
-	 * CAN{{ id }}_SCE_IRQHandler()
+	 * XPCC_ISR(CAN{{ id }}_SCE)
 	 * {
 	 *     ...
 	 *

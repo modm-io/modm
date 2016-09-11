@@ -192,8 +192,7 @@ xpcc::stm32::{{ name }}::discardReceiveBuffer()
 
 %% if parameters.buffered
 %% set hal = "xpcc::stm32::" ~ hal
-extern "C" void
-{{ uart | upper ~ id }}_IRQHandler()
+XPCC_ISR({{ uart | upper ~ id }})
 {
 	if ({{ hal }}::isReceiveRegisterNotEmpty()) {
 		// TODO: save the errors

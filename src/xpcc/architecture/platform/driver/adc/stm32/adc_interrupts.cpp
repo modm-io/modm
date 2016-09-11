@@ -20,8 +20,8 @@
 #	include "adc_interrupt_3.hpp"
 #endif
 
-extern "C" void
-ADC_IRQHandler(void)
+
+XPCC_ISR(ADC, xpcc_fastcode)
 {
 
 #ifdef ADC1

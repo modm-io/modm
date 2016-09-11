@@ -21,8 +21,7 @@ main()
 }
 
 // Interrupt Handler
-extern "C" void
-USART2_IRQHandler(void)
+XPCC_ISR(USART2)
 {
 	UsartHal2::getInterruptFlags();
 	if(UsartHal2::isTransmitRegisterEmpty()) {

@@ -15,7 +15,7 @@ xpcc::{{ target.family }}::AdcInterrupt::Handler
 xpcc::{{ target.family }}::AdcInterrupt::handler(xpcc::dummy);
 
 // ----------------------------------------------------------------------------
-ISR(ADC_vect, xpcc_weak)
+XPCC_ISR(ADC, xpcc_weak)
 {
 	xpcc::{{ target.family }}::AdcInterrupt::handler();
 }

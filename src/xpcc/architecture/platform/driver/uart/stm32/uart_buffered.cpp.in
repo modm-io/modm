@@ -75,8 +75,7 @@ namespace
 		{{ className | upper }}{{ id }}->DR
 #endif
 
-extern "C" void
-{{ className | upper }}{{ id }}_IRQHandler()
+XPCC_ISR({{ className | upper }}{{ id }})
 {
 
 	uint32_t state = {{ className | upper }}{{ id }}_SR;

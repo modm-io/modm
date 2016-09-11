@@ -163,8 +163,7 @@
 #include <xpcc/architecture/driver/atomic.hpp>
 #include <xpcc/container.hpp>
 
-extern "C" void
-I2C{{ id }}_ER_IRQHandler(void);
+XPCC_ISR_DECL(I2C{{ id }}_ER);
 
 namespace
 {
@@ -227,7 +226,7 @@ namespace
 				// Call error handler manually to detach the transaction object and resolve the deadlock.
 				// Further transactions may not succeed either, but will not lead to a deadlock.
 				error = xpcc::I2cMaster::Error::BusBusy;
-				I2C{{ id }}_ER_IRQHandler();
+				XPCC_ISR_CALL(I2C{{ id }}_ER);
 				return;
 			}
 		}
@@ -276,8 +275,7 @@ namespace
 }
 
 // ----------------------------------------------------------------------------
-extern "C" void
-I2C{{ id }}_EV_IRQHandler(void)
+XPCC_ISR(I2C{{ id }}_EV)
 {
 	DEBUG_STREAM("\n--- interrupt ---");
 
@@ -529,8 +527,7 @@ I2C{{ id }}_EV_IRQHandler(void)
 }
 
 // ----------------------------------------------------------------------------
-extern "C" void
-I2C{{ id }}_ER_IRQHandler(void)
+XPCC_ISR(I2C{{ id }}_ER)
 {
 	DEBUG_STREAM("ERROR!");
 	uint16_t sr1 = I2C{{ id }}->SR1;

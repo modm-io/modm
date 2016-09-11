@@ -308,8 +308,7 @@ xpcc::lpc::Uart1::discardReceiveBuffer()
 }
 
 // ----------------------------------------------------------------------------
-extern "C" void
-UART_IRQHandler()
+XPCC_ISR(UART)
 {
 	// read IIR to clear Interrupt Status and mask
 	uint8_t IIRValue = LPC_UART->IIR & IIR_INTID_MASK;

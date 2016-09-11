@@ -69,7 +69,7 @@ extern "C" void _toggleHardFaultHandlerLed()
 
 #include "../../uart/stm32/uart_{{ id }}.hpp"
 
-extern "C" void {{ uart | upper ~ id }}_IRQHandler(void);
+XPCC_ISR_DECL({{ uart | upper ~ id }});
 
 // since the hard fault handler cannot be preempted by any other handler or IRQ
 // we have to manually call it here. Not pretty, but it works.
@@ -80,7 +80,7 @@ void flushUart()
 	{
 		if (xpcc::stm32::{{ uart }}Hal{{ id }}::isTransmitRegisterEmpty())
 		{
-			{{ uart | upper ~ id }}_IRQHandler();
+			XPCC_ISR_CALL({{ uart | upper ~ id }});
 		}
 	}
 }

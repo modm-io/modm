@@ -12,7 +12,7 @@
 #include "arduino_uno.hpp"
 #include <xpcc/architecture/driver/clock.hpp>
 
-ISR(TIMER0_COMPA_vect)
+XPCC_ISR(TIMER0_COMPA)
 {
 	xpcc::Clock::increment();
 }
