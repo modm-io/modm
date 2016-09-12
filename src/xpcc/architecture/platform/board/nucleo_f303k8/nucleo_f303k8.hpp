@@ -86,6 +86,8 @@ using A2 = GpioA3;
 using A3 = GpioA4;
 using A4 = GpioA5;
 using A5 = GpioA6;
+using A6 = GpioA7;
+using A7 = GpioA2;
 
 using D0  = GpioA10;
 using D1  = GpioA9;
