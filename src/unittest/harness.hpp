@@ -103,6 +103,7 @@
 namespace unittest
 {
 	EXTERN_FLASH_STORAGE_STRING(stringEqual);
+	EXTERN_FLASH_STORAGE_STRING(stringDiffer);
 	EXTERN_FLASH_STORAGE_STRING(stringNotInRange);
 	EXTERN_FLASH_STORAGE_STRING(stringNotTrue);
 	EXTERN_FLASH_STORAGE_STRING(stringNotFalse);
@@ -142,6 +143,22 @@ namespace unittest
 		}
 	}
 	
+	// ------------------------------------------------------------------------
+	template <typename A, typename B>
+	inline bool
+	checkDiffer(const A& a, const B& b, unsigned int line)
+	{
+		if (a != b) {
+			TEST_REPORTER__.reportPass();
+			return true;
+		}
+		else {
+			TEST_REPORTER__.reportFailure(line)
+				<< a << xpcc::accessor::asFlash(unittest::stringDiffer) << b << '\n';
+			return false;
+		}
+	}
+
 	template <typename A, typename B, typename D>
 	bool
 	checkEqualDelta(const A& a, const B& b, const D& delta, unsigned int line)
@@ -252,6 +269,9 @@ namespace unittest
 
 #define	TEST_ASSERT_EQUALS(x, y) \
 	TEST_RETURN__(::unittest::checkEqual((x), (y), __LINE__))
+
+#define TEST_ASSERT_DIFFERS(x, y) \
+	TEST_RETURN__(::unittest::checkDiffer((x), (y), __LINE__))
 
 #define	TEST_ASSERT_EQUALS_FLOAT(x, y) \
 	TEST_RETURN__(::unittest::checkEqual(static_cast<float>(x), static_cast<float>(y), __LINE__))
