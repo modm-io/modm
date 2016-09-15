@@ -127,6 +127,9 @@ public:
 	void
 	testPrintf2();
 
+	void
+	testFp();
+
 private:
 	xpcc::IOStream *stream;
 };

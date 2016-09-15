@@ -516,3 +516,23 @@ IoStreamTest::testPrintf2()
 		}
 	}
 }
+
+int myFunc1(void) { return -1; };
+int myFunc2(void) { return -1; };
+
+void
+IoStreamTest::testFp()
+{
+	int (*myFuncPtr1)(void);
+	int (*myFuncPtr2)(void);
+	int (*myFuncPtr3)(void);
+
+	myFuncPtr1 = &myFunc1;
+	myFuncPtr2 = &myFunc2;
+	myFuncPtr3 = myFuncPtr1;
+
+	TEST_ASSERT_EQUALS(myFuncPtr1, myFuncPtr1);
+	TEST_ASSERT_EQUALS(myFuncPtr1, myFuncPtr3);
+	TEST_ASSERT_DIFFERS(myFuncPtr1, myFuncPtr2);
+
+}
