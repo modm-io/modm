@@ -143,451 +143,63 @@
  * location and the reset handler location.
  */
 
+%% import 'linker.macros' as linker with context
 %% set regions = []
-%% set ram_sizes = []
-%% set ram_origin = []
 
-MEMORY
-{
-%% for memory in memorys
-	{{ memory.name | upper }} ({{ memory.access }}) : ORIGIN = {{ memory.start }}, LENGTH = {{ memory.size }}k
-	%% do regions.append(memory.name)
-	%% if 'sram1' == memory.name
-		%% do ram_origin.append(memory.start)
-	%% endif
-	%% if 'sram' in memory.name
-		%% do ram_sizes.append(memory.size | int)
-	%% endif
-%% endfor
-	RAM (rwx) : ORIGIN = {{ ram_origin[0] }}, LENGTH = {{ ram_sizes | sum }}k
-	{{ parameters.linkerscript_memory }}
-}
+{{ linker.prefix(regions) }}
 
-OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
-OUTPUT_ARCH(arm)
-
-/* First executable instruction in an output file */
-ENTRY(Reset_Handler)
-
-/* force linker to include the syscalls from libxpcc.a */
-EXTERN(_sbrk_r)
-EXTERN(_init)
-
-PROVIDE(__ram_start = ORIGIN(RAM));
-PROVIDE(__ram_end   = ORIGIN(RAM) + LENGTH(RAM));
-PROVIDE(__rom_start = ORIGIN(FLASH));
-PROVIDE(__rom_end   = ORIGIN(FLASH) + LENGTH(FLASH));
-
-/* the thread stack is used only for reporting hard fault conditions! It may therefore be small. */
-%% if (not parameters.enable_hardfault_handler_led) and (parameters.enable_hardfault_handler_log == "false")
-	%% set pss = 0
-%% elif parameters.enable_hardfault_handler_log == "false"
-	%% set pss = 32
-%% else
-	%% set pss = 512
-%% endif
-/* the thread stack is used only for reporting hard fault conditions! It may therefore be small. */
-PROCESS_STACK_SIZE  = {{ pss }};
-/* the handler stack is used for main program as well as interrupts */
-MAIN_STACK_SIZE     = {{ parameters.main_stack_size }};
-/* combined stack size */
-TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 
 SECTIONS
 {
-	.reset :
-	{
-		__vector_table_rom_start = .;					/* address in FLASH */
-		__vector_table_ram_load = .;
-		/* Initial stack address, Reset and NMI handler */
-		KEEP(*(.reset))
-		. = ALIGN(4);
-	} >FLASH
+	{{ linker.section_reset("FLASH") }}
 
-	.vectors :  /* Vector table in RAM, only if remapped */
-	{
-		__vector_table_ram_start = .;						/* address in RAM */
+	{{ linker.section_vectors("ITCM") }}
 
-		/* used for vectors remapped to RAM */
-		KEEP(*(.vectors))
+	{{ linker.section("ITCM AT >FLASH", "fastcode") }}
 
-		. = ALIGN (4);
-		__vector_table_ram_end = .;
-	} >ITCM
+	{{ linker.section_heap("ITCM", "heap4") }}
 
-	.fastcode :
-	{
-		__fastcode_load = LOADADDR (.fastcode);		/* address in FLASH */
-		__fastcode_start = .;						/* address in RAM */
+	{{ linker.section_stack("DTCM", None) }}
 
-		KEEP(*(.fastcode))
+	{{ linker.section("DTCM AT >FLASH", "fastdata") }}
 
-		. = ALIGN (4);
-		__fastcode_end = .;
-	} >ITCM AT >FLASH
+	{{ linker.section_heap("DTCM", "heap0") }}
 
-	.heap4 (NOLOAD) :
-	{
-		. = ALIGN(4);
-		__heap4_start = .;
+	{{ linker.section("BACKUP AT >FLASH", "backup") }}
 
-		. = ORIGIN(ITCM) + LENGTH(ITCM);
-		__heap4_end = .;
-	} >ITCM
+	{{ linker.section_heap("BACKUP", "heap5") }}
 
-	.stack (NOLOAD) :
-	{
-		__stack_start = . ;
+	{{ linker.section_rom("FLASH") }}
 
-		. += MAIN_STACK_SIZE;
-		. = ALIGN (8);
-		__main_stack_top = . ;
+	{{ linker.section_ram("RAM") }}
 
-		. += PROCESS_STACK_SIZE;
-		. = ALIGN (8);
-		__process_stack_top = . ;
+	{{ linker.section_heap("SRAM1", "heap1") }}
 
-		__stack_end = .;
-	} >DTCM
-
-	.fastdata :
-	{
-		__fastdata_load = LOADADDR (.fastdata);		/* address in FLASH */
-		__fastdata_start = .;						/* address in RAM */
-
-		KEEP(*(.fastdata))
-
-		. = ALIGN(4);
-		__fastdata_end = .;
-	} >DTCM AT >FLASH
-
-	.heap0 (NOLOAD) :
-	{
-		. = ALIGN(4);
-		__heap0_start = .;
-
-		. = ORIGIN(DTCM) + LENGTH(DTCM);
-		__heap0_end = .;
-	} >DTCM
-
-	.backup :
-	{
-		__backup_load = LOADADDR (.backup);			/* address in FLASH */
-		__backup_start = .;							/* address in RAM */
-
-		KEEP(*(.backup))
-
-		. = ALIGN(4);
-		__backup_end = .;
-	} >BACKUP AT >FLASH
-
-	.heap5 (NOLOAD) :
-	{
-		__heap5_start = .;
-
-		. = ORIGIN(BACKUP) + LENGTH(BACKUP);
-		__heap5_end = .;
-	} >BACKUP
-
-	.text :
-	{
-		/* Create a symbol for each input file in the current section, set to
-		 * the address of the first byte of data written from that input file.
-		 * */
-		CREATE_OBJECT_SYMBOLS
-
-		/* ABOUT .gnu.linkonce.* sections
-		 *
-		 * Unlike other input section types a section that is prefixed with
-		 * .gnu.linkonce. is treated differently by the linker. If for example
-		 * .gnu.linkonce.t.abc appears in two or more different object files then
-		 * the linker will only keep one and discard the others.
-		 *
-		 * This is done is to support C++ vague linkage.  It is related to
-		 * C++'s ODR (One Definition Rule), and can cause surprises if ODR is
-		 * violated.
-		 *
-		 * For example if you compile with RTTI turned on, you'll see linkonce
-		 * sections for all the RTTI of all the classes in the translation unit
-		 * of that object file.
-		 * Or if you keep generated functions for inline functions
-		 * (-fkeep-inline-functions), you'll see linkonce sections for all the
-		 * emitted kept inline functions.
-		 *
-		 * Might be replaced by ELF section groups in newer versions of ld.
-		 */
-		*(.text .text.* .gnu.linkonce.t.*)
-		. = ALIGN (4);
-
-		/* Position independent code will call non-static functions via the
-		 * Procedure Linkage Table or PLT. This PLT does not exist in .o files.
-		 * In a .o file, use of the PLT is indicated by a special relocation.
-		 * When the program linker processes such a relocation, it will create
-		 * an entry in the PLT
-		 */
-		*(.plt)
-		. = ALIGN(4);
-
-		/* .ARM.extab names a section that contains exception unwinding information */
-		*(.ARM.extab* .gnu.linkonce.armextab.*)
-
-		/* .gcc_except_table is an input section name, which gcc uses
-		 * for information used to unwind the stack when an exception occurs. */
-		*(.gcc_except_table)
-
-		/* When gcc generates code that handles exceptions, it produces tables
-		 * that describe how to unwind the stack. These tables are found in
-		 * the .eh_frame and .eh_frame_hdr section.
-		 *
-		 * See http://www.airs.com/blog/archives/460 or
-		 * http://www.codesourcery.com/public/cxx-abi/exceptions.pdf
-		 */
-		*(.eh_frame_hdr)
-		*(.eh_frame)
-
-		*(.gnu.warning)
-	} >FLASH
-
-	.rodata : ALIGN (4)
-	{
-		*(.rodata .rodata.* .gnu.linkonce.r.*)
-
-		. = ALIGN(4);
-		KEEP(*(.init))
-
-		. = ALIGN(4);
-		PROVIDE_HIDDEN (__preinit_array_start = .);
-		KEEP (*(.preinit_array))
-		PROVIDE_HIDDEN (__preinit_array_end = .);
-
-		. = ALIGN(4);
-		PROVIDE_HIDDEN (__init_array_start = .);
-		KEEP (*(SORT(.init_array.*)))
-		KEEP (*(.init_array))
-		PROVIDE_HIDDEN (__init_array_end = .);
-
-		. = ALIGN(4);
-		KEEP(*(.fini))
-
-		. = ALIGN(4);
-		PROVIDE_HIDDEN (__fini_array_start = .);
-		KEEP (*(.fini_array))
-		KEEP (*(SORT(.fini_array.*)))
-		PROVIDE_HIDDEN (__fini_array_end = .);
-
-		/* These are for static constructors and destructors under ELF */
-		PROVIDE(__ctors_start__ = .);
-		KEEP (*crtbegin.o(.ctors))
-		KEEP (*(EXCLUDE_FILE (*crtend.o) .ctors))
-		KEEP (*(SORT(.ctors.*)))
-		KEEP (*crtend.o(.ctors))
-		PROVIDE(__ctors_end__ = .);
-
-		/*PROVIDE(__dtors_start__ = .);
-		KEEP (*crtbegin.o(.dtors))
-		KEEP (*(EXCLUDE_FILE (*crtend.o) .dtors))
-		KEEP (*(SORT(.dtors.*)))
-		KEEP (*crtend.o(.dtors))
-		PROVIDE(__dtors_end__ = .);*/
-
-		*(.init .init.*)
-		*(.fini .fini.*)
-	} >FLASH
-
-	/* .ARM.exidx names a section that contains index entries for
-	 * section unwinding. It is sorted, so has to go in its own output section.
-	 */
-	.ARM.exidx :
-	{
-		__exidx_start = .;
-		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
-		__exidx_end = .;
-	} >FLASH
-
-	/* initialized variables */
-	.data : ALIGN (8)
-	{
-		__data_load = LOADADDR (.data);		/* address in FLASH */
-		__data_start = .;					/* address in RAM */
-
-		KEEP(*(.jcr))
-		*(.got.plt) *(.got)
-		*(.shdata)
-
-		*(.data .data.* .gnu.linkonce.d.*)
-
-		. = ALIGN (4);
-		__data_end = .;
-	} >RAM AT >FLASH
-
-	/* uninitialized variables */
-	.bss (NOLOAD) :
-	{
-		. = ALIGN(4);
-		__bss_start = . ;
-
-		*(.shbss)
-		*(.bss .bss.* .gnu.linkonce.b.*)
-		*(COMMON)
-
-		. = ALIGN (4);
-		__bss_end = .;
-	} >RAM
-
-	/* Global data not cleared after reset.  */
-	.noinit (NOLOAD) :
-	{
-		. = ALIGN (4);
-		PROVIDE (__noinit_start = .);
-
-		KEEP(*(.noinit*))
-
-		. = ALIGN (4);
-		PROVIDE (__noinit_end = .);
-	} >RAM
-
-	.heap1 (NOLOAD) :
-	{
-		. = ALIGN(4);
-		__heap1_start = .;
-
-		. = ORIGIN(SRAM1) + LENGTH(SRAM1);
-		__heap1_end = .;
-	} >RAM
-
-	.heap2 (NOLOAD) :
-	{
-		. = ORIGIN(SRAM2);
-		__heap2_start = .;
-
-		. = ORIGIN(SRAM2) + LENGTH(SRAM2);
-		__heap2_end = .;
-	} >RAM
+	{{ linker.section_heap("SRAM2", "heap2") }}
 
 	{{ parameters.linkerscript_sections }}
 
 	/* TABLES! TABLES! ALL THE TABLES YOU COULD EVER WANT! TABLES! */
-	.table.zero.intern : ALIGN(4)
-	{
-		__table_zero_intern_start = .;
-		LONG (__bss_start)
-		LONG (__bss_end)
-		__table_zero_intern_end = .;
-	} >FLASH
+	{{ linker.section_table_zero(["bss"]) }}
 
-	.table.copy.intern : ALIGN(4)
-	{
-		__table_copy_intern_start = .;
-		LONG (__data_load)
-		LONG (__data_start)
-		LONG (__data_end)
-		LONG (__fastdata_load)
-		LONG (__fastdata_start)
-		LONG (__fastdata_end)
-		LONG (__fastcode_load)
-		LONG (__fastcode_start)
-		LONG (__fastcode_end)
+%% set copy_table = ["data", "fastdata", "fastcode"]
 %% if parameters.vector_table_in_ram
-		LONG (__vector_table_ram_load)
-		LONG (__vector_table_ram_start)
-		LONG (__vector_table_ram_end)
+	%% do copy_table.append("vector_table_ram")
 %% endif
-		__table_copy_intern_end = .;
-	} >FLASH
+	{{ linker.section_table_copy(copy_table) }}
 
-	.table.zero.extern : ALIGN(4)
-	{
-		__table_zero_extern_start = .;
-		{{ parameters.linkerscript_table_zero_extern }}
-		__table_zero_extern_end = .;
-	} >FLASH
+	{{ linker.section_table_extern() }}
 
-	.table.copy.extern : ALIGN(4)
-	{
-		__table_copy_extern_start = .;
-		{{ parameters.linkerscript_table_copy_extern }}
-		__table_copy_extern_end = .;
-	} >FLASH
+%% set heap_table = [
+		{'name': 'heap1', 'prop': '0x001f'},
+		{'name': 'heap2', 'prop': '0x001f'},
+		{'name': 'heap0', 'prop': '0x200f'},
+		{'name': 'heap4', 'prop': '0x2005'},
+		{'name': 'heap5', 'prop': '0x4009'}
+	]
+	{{ linker.section_table_heap(heap_table) }}
 
-	/* SRAM properties bit mask (16-bit):
-	 *
-	 * - 0x0001: accessible via S-Bus
-	 * - 0x0002: accessible via D-Bus
-	 * - 0x0004: accessible via I-Bus
-	 * - 0x0008: accessible via DMA
-	 * - 0x0010: accessible via DMA2D
-	 *
-	 * - 0x1FE0: reserved
-	 *
-	 * - 0x2000: Fast memory (Core- or Tightly-Coupled)
-	 * - 0x4000: non-volatile (or battery backed) memory
-	 * - 0x8000: external memory
-	 */
-	.table.heap : ALIGN(4)
-	{
-		__table_heap_start = .;
-		LONG (0x001f) /* SRAM1 */
-		LONG (__heap1_start)
-		LONG (__heap1_end)
-		LONG (0x001f) /* SRAM2 */
-		LONG (__heap2_start)
-		LONG (__heap2_end)
-		LONG (0x200f) /* DTCM */
-		LONG (__heap0_start)
-		LONG (__heap0_end)
-		LONG (0x2005) /* ITCM */
-		LONG (__heap4_start)
-		LONG (__heap4_end)
-		LONG (0x4009) /* BKPSRAM */
-		LONG (__heap5_start)
-		LONG (__heap5_end)
-		{{ parameters.linkerscript_table_heap_extern }}
-		__table_heap_end = .;
-	} >FLASH
+	{{ linker.section_end() }}
 
-	. = ALIGN(4);
-	_end = . ;
-	__end = . ;
-	PROVIDE(end = .);
-
-	/* Stabs debugging sections.  */
-	.stab          0 : { *(.stab) }
-	.stabstr       0 : { *(.stabstr) }
-	.stab.excl     0 : { *(.stab.excl) }
-	.stab.exclstr  0 : { *(.stab.exclstr) }
-	.stab.index    0 : { *(.stab.index) }
-	.stab.indexstr 0 : { *(.stab.indexstr) }
-	.comment       0 : { *(.comment) }
-
-	/* DWARF debug sections.
-	 Symbols in the DWARF debugging sections are relative to the beginning
-	 of the section so we begin them at 0.  */
-
-	/* DWARF 1 */
-	.debug          0 : { *(.debug) }
-	.line           0 : { *(.line) }
-	/* GNU DWARF 1 extensions */
-	.debug_srcinfo  0 : { *(.debug_srcinfo) }
-	.debug_sfnames  0 : { *(.debug_sfnames) }
-	/* DWARF 1.1 and DWARF 2 */
-	.debug_aranges  0 : { *(.debug_aranges) }
-	.debug_pubnames 0 : { *(.debug_pubnames) }
-	/* DWARF 2 */
-	.debug_info     0 : { *(.debug_info .gnu.linkonce.wi.*) }
-	.debug_abbrev   0 : { *(.debug_abbrev) }
-	.debug_line     0 : { *(.debug_line) }
-	.debug_frame    0 : { *(.debug_frame) }
-	.debug_str      0 : { *(.debug_str) }
-	.debug_loc      0 : { *(.debug_loc) }
-	.debug_macinfo  0 : { *(.debug_macinfo) }
-	/* SGI/MIPS DWARF 2 extensions */
-	.debug_weaknames 0 : { *(.debug_weaknames) }
-	.debug_funcnames 0 : { *(.debug_funcnames) }
-	.debug_typenames 0 : { *(.debug_typenames) }
-	.debug_varnames  0 : { *(.debug_varnames) }
-	.debug_varnames  0 : { *(.debug_varnames) }
-
-	.note.gnu.arm.ident 0 : { KEEP (*(.note.gnu.arm.ident)) }
-	.ARM.attributes 0 : { KEEP (*(.ARM.attributes)) }
-	/DISCARD/ : { *(.note.GNU-stack)  }
+	{{ linker.section_debug() }}
 }
