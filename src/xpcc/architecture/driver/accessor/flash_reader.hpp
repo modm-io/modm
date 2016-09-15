@@ -75,6 +75,7 @@
 		#define	EXTERN_FLASH_STORAGE_STRING(s)	extern const char s[]
 
 		#define	INLINE_FLASH_STORAGE_STRING(s)	((const char *)(s))
+		#define PSTR(s) ((const char *)(s))
 
 		namespace xpcc
 		{
