@@ -359,6 +359,26 @@ public:
 		return function(*this);
 	}
 
+	typedef void (*myfunc)();
+
+	IOStream&
+	operator << (const myfunc& value);
+
+	/// Write the hex value of a function pointer, catches all kinds of function pointers.
+	template<class Ret, class... Args>
+	IOStream&
+	operator << (Ret(*pointer)(Args...) )
+	{
+		unsigned char *p = (unsigned char *)&pointer;
+
+		for (std::size_t i = 0; i < sizeof(myfunc); i++)
+		{
+			writeHex(p[sizeof(myfunc) - i - 1]);
+		}
+
+    	return *this;
+	}
+
 	/**
 	 * Simple printf() implemenation
 	 *
@@ -394,6 +414,7 @@ public:
 	 * - `d`	signed  decimal
 	 * - `u`	unsigned decimal
 	 * - `x`	hex
+	 * - `f`	float
 	 * - `%`	%
 	 *
 	 * Combined with the length modifiers you get:
