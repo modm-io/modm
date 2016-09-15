@@ -205,6 +205,18 @@ xpcc::IOStream::writeBin(uint8_t value)
 
 // ----------------------------------------------------------------------------
 xpcc::IOStream&
+xpcc::IOStream::operator << (const myfunc& value)
+{
+	unsigned char *p = (unsigned char *)&value;
+
+	for (std::size_t i = 0; i < sizeof(myfunc); i++)
+	{
+		writeHex(p[sizeof(myfunc) - i - 1]);
+	}
+	return *this;
+}
+
+xpcc::IOStream&
 xpcc::IOStream::operator << (const void* p)
 {
 #if XPCC__SIZEOF_POINTER == 2
