@@ -42,8 +42,23 @@ namespace TypeId
 	typedef struct{} FsmcNce4;
 
 	typedef struct{} FsmcNios16;
+	
+%% if (target is stm32f4 and (target.name not in ["405", "407", "415", "417"])) or target is stm32f7
+    typedef struct{} FsmcSdclk;
+    typedef struct{} FsmcNbl2;
+    typedef struct{} FsmcNbl3;
+    typedef struct{} FsmcSdcke0;
+    typedef struct{} FsmcSdcke1;
+    typedef struct{} FsmcSdnwe;
+    typedef struct{} FsmcSdne0;
+    typedef struct{} FsmcSdne1;
+    typedef struct{} FsmcBa0;
+    typedef struct{} FsmcBa1;
+    typedef struct{} FsmcSdncas;
+    typedef struct{} FsmcSdnras;
+%% endif
 
-%% for ii in range(0, 16)
+%% for ii in range(0, 32)
 	typedef struct{} FsmcD{{ ii }};
 %% endfor
 %% for ii in range(0, 26)

@@ -300,10 +300,15 @@ def filter_get_adcs(gpios):
 			for af in gpio['afs']:
 				if 'type' in af and af['type'] == "analog" and af['peripheral'] not in adcs:
 					adcs.append(af['peripheral'])
-
-	adcs = [i[3] for i in adcs]
-
-	return adcs
+	
+	adc_list = []
+	for adc in adcs:
+		# If the ADC has no id (e.g. for STM32F0) use '0' as id. 
+		if len(adc) < 4:
+			adc_list.append('0')
+		else:
+			adc_list.append(adc[3])
+	return adc_list
 
 # -----------------------------------------------------------------------------
 def filter_letter_to_num(letter):

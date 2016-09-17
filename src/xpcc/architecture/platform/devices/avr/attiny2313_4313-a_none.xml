@@ -19,13 +19,15 @@
     <header>avr/interrupt.h</header>
     <driver type="core" name="avr">
       <parameter device-name="2313" name="ram_length">64</parameter>
+      <parameter device-name="2313" name="ram_block_length">4</parameter>
       <parameter device-name="4313" device-type="none" name="ram_length">128</parameter>
-      <parameter name="ram_block_length">4</parameter>
+      <parameter device-name="4313" device-type="none" name="ram_block_length">4</parameter>
     </driver>
     <driver type="clock" name="avr"/>
     <driver type="timer" name="attiny" instances="0,1"/>
     <driver type="uart" name="at90_tiny_mega" instances="0">
-      <parameter name="tx_buffer">16</parameter>
+      <parameter device-name="2313" name="tx_buffer">16</parameter>
+      <parameter device-name="4313" device-type="none" name="tx_buffer">16</parameter>
     </driver>
     <driver type="spi" name="at90_tiny_mega_uart" instances="0"/>
     <driver type="gpio" name="at90_tiny_mega">

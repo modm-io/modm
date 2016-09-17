@@ -34,6 +34,8 @@
 #include "../../../device.hpp"
 #include "xpcc_config.hpp"
 
+{{ platform.defines() }}
+
 // ----------------------------------------------------------------------------
 /*
  * Provide weak aliases for each Exception handler to defaultHandler.

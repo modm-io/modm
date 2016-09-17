@@ -130,18 +130,18 @@
         <af id="2,1,0" peripheral="UartSpiMaster1" name="Miso" type="in"/>
       </gpio>
       <gpio port="A" id="11">
-        <af device-name="102" id="10" peripheral="Usb" name="Dm"/>
         <af peripheral="Uart1" name="Cts" type="in"/>
+        <af device-name="102" peripheral="Usb" name="Dm"/>
       </gpio>
       <gpio port="A" id="12">
-        <af device-name="102" id="10" peripheral="Usb" name="Dp"/>
         <af peripheral="Uart1" name="Rts" type="out"/>
+        <af device-name="102" peripheral="Usb" name="Dp"/>
       </gpio>
       <gpio port="A" id="13"/>
       <gpio port="A" id="14"/>
       <gpio port="A" id="15">
         <af id="0,1,1" peripheral="SpiMaster1" name="Nss"/>
-        <af id="8,3,3" peripheral="Timer2" name="Channel1"/>
+        <af id="8,3,1" peripheral="Timer2" name="Channel1"/>
         <af id="8,3,1" peripheral="Timer2" name="ExternalTrigger" type="in"/>
       </gpio>
       <gpio port="B" id="0">

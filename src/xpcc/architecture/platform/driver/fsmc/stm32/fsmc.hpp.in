@@ -19,7 +19,7 @@
  * @defgroup	{{target.string}}_fsmc FSMC
  */
 
-%% if target is stm32f2 or target is stm32f4
+%% if target is stm32f2 or target is stm32f4 or target is stm32f7
 %%  set BCRx = "BCR1"
 %%  set BTRx = "BTR1"
 %% elif target is stm32f1
@@ -27,7 +27,7 @@
 %%  set BTRx = "BTRx"
 %% endif
 
-%% if target is stm32f4 and (target.name not in ["405", "407", "415", "417"])
+%% if (target is stm32f4 and (target.name not in ["405", "407", "415", "417"])) or target is stm32f7
 %%   set FMC = "FMC"
 %% else
 %%   set FMC = "FSMC"
@@ -299,7 +299,7 @@ namespace xpcc
 		class Fsmc
 		{
 		public:
-		%% for ii in range(0, 16)
+		%% for ii in range(0, 32)
 			/// TypeId used to connect GPIO pins to the FsmcD{{ ii }}.
 			static const TypeId::FsmcD{{ ii }} D{{ ii }};
 		%% endfor
@@ -327,7 +327,7 @@ namespace xpcc
 			static inline void
 			enable()
 			{
-%% if target is stm32f2 or target is stm32f4
+%% if target is stm32f2 or target is stm32f4 or target is stm32f7
 				RCC->AHB3ENR |= RCC_AHB3ENR_{{ FMC }}EN;
 %% else
 				RCC->AHBENR |= RCC_AHBENR_FSMCEN;
@@ -337,7 +337,7 @@ namespace xpcc
 			static inline void
 			disable()
 			{
-%% if target is stm32f2 or target is stm32f4
+%% if target is stm32f2 or target is stm32f4 or target is stm32f7
 				RCC->AHB3ENR &= ~RCC_AHB3ENR_{{ FMC }}EN;
 %% else
 				RCC->AHBENR &= ~RCC_AHBENR_FSMCEN;

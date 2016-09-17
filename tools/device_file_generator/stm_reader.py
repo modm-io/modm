@@ -219,9 +219,9 @@ class STMDeviceReader(XMLDeviceReader):
 
 		self.log.debug("STMDeviceReader: Found interrupt vectors:\n" + "\n".join(["{}: {}".format(v['position'], v['name']) for v in ivectors]))
 		self.addProperty('interrupts', ivectors)
-
+		
 		for m in self.modules:
-			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'CAN', 'SPI', 'I2C', 'FSMC', 'RNG', 'RCC', 'USB']):
+			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'CAN', 'SPI', 'I2C', 'FSMC', 'FMC', 'RNG', 'RCC', 'USB']):
 				modules.append(m)
 
 		if 'CAN' in modules:
@@ -419,11 +419,13 @@ class STMDeviceReader(XMLDeviceReader):
 						  'name': raw_names[1].capitalize()}
 					if af_id:
 						af.update({'id': af_id})
-					else:
-						af.update({'id': '10'})
+					# For the STM32F1 the USB pins aren't enabled like other
+					# alternative functions, but by simply enabling the USB core.
+					#else:
+					#	af.update({'id': '10'})
 					afs.append(af)
 
-				if signal.startswith('FSMC_'):
+				if signal.startswith('FSMC_') or signal.startswith('FMC_'):
 					if not raw_names[1].startswith('DA'):
 						af = {'peripheral' : 'Fsmc',
 							  'name': raw_names[1].capitalize()}

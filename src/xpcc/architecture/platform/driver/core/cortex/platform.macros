@@ -8,6 +8,19 @@
 
 %# This File includes platform specific macros for the generic Cortex-M startup
 
+%% macro defines()
+
+%% if target is stm32f3
+// Remove strange defines from the ST headers (e.g. see stm32f373xc.h at the bottom)
+#undef USBWakeUp_IRQHandler
+#undef CEC_IRQHandler
+%% endif
+
+%% endmacro
+
+
+%% macro enableInternalMemory()
+
 %# WARNING: This code should _only_ enable internal memories and nothing else.
 %#          Since this is the first code executed after a reset, you do not
 %#          have access to _any_ data stored in RAM, since it has not yet been
@@ -16,8 +29,6 @@
 %#          memory containing the stack is not physically enabled yet.
 %#          In that case, consider using inline assembly to manage stack access
 %#          manually, until the memory is enabled.
-
-%% macro enableInternalMemory()
 
 %% if target is stm32f3
 	// enable clock

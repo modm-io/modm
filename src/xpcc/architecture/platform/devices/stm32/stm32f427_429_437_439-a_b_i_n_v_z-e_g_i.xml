@@ -5,7 +5,7 @@
  		Please modify the xpcc/tools/device_file_generator code instead and rebuild this file.
  		Be aware, that regenerated files might have a different composition due to technical reasons. -->
   <device platform="stm32" family="f4" name="427|429|437|439" pin_id="a|b|i|n|v|z" size_id="e|g|i">
-    <flash device-size-id="e">524288</flash>
+    <flash device-name="429" device-size-id="e" device-pin-id="b|i|n|v|z">524288</flash>
     <flash device-size-id="g">1048576</flash>
     <flash device-size-id="i">2097152</flash>
     <ram>266240</ram>
@@ -127,7 +127,7 @@
     <driver type="can" name="stm32" instances="1,2"/>
     <driver type="clock" name="stm32"/>
     <driver type="dma" name="stm32" instances="1,2"/>
-    <driver device-pin-id="v|z|a|i|b|n" type="fsmc" name="stm32"/>
+    <driver type="fsmc" name="stm32"/>
     <driver type="i2c" name="stm32" instances="1,2,3"/>
     <driver type="id" name="stm32"/>
     <driver type="random" name="stm32"/>
@@ -280,6 +280,7 @@
         <af id="5" peripheral="SpiMaster1" name="Mosi" type="out"/>
         <af id="6" peripheral="SpiMaster3" name="Mosi" type="out"/>
         <af id="9" peripheral="Can2" name="Rx" type="in"/>
+        <af id="12" peripheral="Fsmc" name="Sdcke1"/>
       </gpio>
       <gpio port="B" id="6">
         <af id="2" peripheral="Timer4" name="Channel1"/>
@@ -287,13 +288,14 @@
         <af id="7" peripheral="Uart1" name="Tx" type="out"/>
         <af id="7" peripheral="UartSpiMaster1" name="Mosi" type="out"/>
         <af id="9" peripheral="Can2" name="Tx" type="out"/>
+        <af id="12" peripheral="Fsmc" name="Sdne1"/>
       </gpio>
       <gpio port="B" id="7">
         <af id="2" peripheral="Timer4" name="Channel2"/>
         <af id="4" peripheral="I2cMaster1" name="Sda"/>
         <af id="7" peripheral="Uart1" name="Rx" type="in"/>
         <af id="7" peripheral="UartSpiMaster1" name="Miso" type="in"/>
-        <af device-pin-id="i|o|v|z" id="12" peripheral="Fsmc" name="Nl"/>
+        <af id="12" peripheral="Fsmc" name="Nl"/>
       </gpio>
       <gpio port="B" id="8">
         <af id="2" peripheral="Timer4" name="Channel3"/>
@@ -348,6 +350,7 @@
         <af id="9" peripheral="Timer12" name="Channel2"/>
       </gpio>
       <gpio port="C" id="0">
+        <af id="12" peripheral="Fsmc" name="Sdnwe"/>
         <af peripheral="Adc1" name="Channel10" type="analog"/>
         <af peripheral="Adc2" name="Channel10" type="analog"/>
         <af peripheral="Adc3" name="Channel10" type="analog"/>
@@ -359,12 +362,14 @@
       </gpio>
       <gpio port="C" id="2">
         <af id="5" peripheral="SpiMaster2" name="Miso" type="in"/>
+        <af id="12" peripheral="Fsmc" name="Sdne0"/>
         <af peripheral="Adc1" name="Channel12" type="analog"/>
         <af peripheral="Adc2" name="Channel12" type="analog"/>
         <af peripheral="Adc3" name="Channel12" type="analog"/>
       </gpio>
       <gpio port="C" id="3">
         <af id="5" peripheral="SpiMaster2" name="Mosi" type="out"/>
+        <af id="12" peripheral="Fsmc" name="Sdcke0"/>
         <af peripheral="Adc1" name="Channel13" type="analog"/>
         <af peripheral="Adc2" name="Channel13" type="analog"/>
         <af peripheral="Adc3" name="Channel13" type="analog"/>
@@ -512,8 +517,8 @@
         <af id="12" peripheral="Fsmc" name="A23"/>
       </gpio>
       <gpio port="E" id="3">
-		<af id="12" peripheral="Fsmc" name="A19"/>
-	  </gpio>
+        <af id="12" peripheral="Fsmc" name="A19"/>
+      </gpio>
       <gpio port="E" id="4">
         <af id="5" peripheral="SpiMaster4" name="Nss"/>
         <af id="12" peripheral="Fsmc" name="A20"/>
@@ -579,56 +584,57 @@
         <af id="12" peripheral="Fsmc" name="A1"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n|z" port="F" id="2">
-		<af id="12" peripheral="Fsmc" name="A2"/>
-	  </gpio>
+        <af id="12" peripheral="Fsmc" name="A2"/>
+      </gpio>
       <gpio device-pin-id="a|b|i|n|z" port="F" id="3">
-        <af peripheral="Adc3" name="Channel9" type="analog"/>
         <af id="12" peripheral="Fsmc" name="A3"/>
+        <af peripheral="Adc3" name="Channel9" type="analog"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n|z" port="F" id="4">
-        <af peripheral="Adc3" name="Channel14" type="analog"/>
         <af id="12" peripheral="Fsmc" name="A4"/>
+        <af peripheral="Adc3" name="Channel14" type="analog"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n|z" port="F" id="5">
-        <af peripheral="Adc3" name="Channel15" type="analog"/>
         <af id="12" peripheral="Fsmc" name="A5"/>
+        <af peripheral="Adc3" name="Channel15" type="analog"/>
       </gpio>
       <gpio device-pin-id="b|i|n|z" port="F" id="6">
         <af id="3" peripheral="Timer10" name="Channel1"/>
         <af id="5" peripheral="SpiMaster5" name="Nss"/>
         <af id="8" peripheral="Uart7" name="Rx" type="in"/>
-        <af peripheral="Adc3" name="Channel4" type="analog"/>
         <af id="12" peripheral="Fsmc" name="Niord"/>
+        <af peripheral="Adc3" name="Channel4" type="analog"/>
       </gpio>
       <gpio device-pin-id="b|i|n|z" port="F" id="7">
         <af id="3" peripheral="Timer11" name="Channel1"/>
         <af id="5" peripheral="SpiMaster5" name="Sck" type="out"/>
         <af id="8" peripheral="Uart7" name="Tx" type="out"/>
-        <af peripheral="Adc3" name="Channel5" type="analog"/>
         <af id="12" peripheral="Fsmc" name="Nreg"/>
+        <af peripheral="Adc3" name="Channel5" type="analog"/>
       </gpio>
       <gpio device-pin-id="b|i|n|z" port="F" id="8">
         <af id="5" peripheral="SpiMaster5" name="Miso" type="in"/>
         <af id="9" peripheral="Timer13" name="Channel1"/>
-        <af peripheral="Adc3" name="Channel6" type="analog"/>
         <af id="12" peripheral="Fsmc" name="Niowr"/>
+        <af peripheral="Adc3" name="Channel6" type="analog"/>
       </gpio>
       <gpio device-pin-id="b|i|n|z" port="F" id="9">
         <af id="5" peripheral="SpiMaster5" name="Mosi" type="out"/>
         <af id="9" peripheral="Timer14" name="Channel1"/>
-        <af peripheral="Adc3" name="Channel7" type="analog"/>
         <af id="12" peripheral="Fsmc" name="Cd"/>
+        <af peripheral="Adc3" name="Channel7" type="analog"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n|z" port="F" id="10">
-        <af peripheral="Adc3" name="Channel8" type="analog"/>
         <af id="12" peripheral="Fsmc" name="Intr"/>
+        <af peripheral="Adc3" name="Channel8" type="analog"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n|z" port="F" id="11">
         <af id="5" peripheral="SpiMaster5" name="Mosi" type="out"/>
+        <af id="12" peripheral="Fsmc" name="Sdnras"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n|z" port="F" id="12">
-		<af id="12" peripheral="Fsmc" name="A6"/>
-	  </gpio>
+        <af id="12" peripheral="Fsmc" name="A6"/>
+      </gpio>
       <gpio device-pin-id="a|b|i|n|z" port="F" id="13">
         <af id="12" peripheral="Fsmc" name="A7"/>
       </gpio>
@@ -652,9 +658,11 @@
       </gpio>
       <gpio device-pin-id="a|b|i|n|z" port="G" id="4">
         <af id="12" peripheral="Fsmc" name="A14"/>
+        <af id="12" peripheral="Fsmc" name="Ba0"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n|z" port="G" id="5">
         <af id="12" peripheral="Fsmc" name="A15"/>
+        <af id="12" peripheral="Fsmc" name="Ba1"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n|z" port="G" id="6">
         <af id="12" peripheral="Fsmc" name="Int2"/>
@@ -667,6 +675,7 @@
       <gpio device-pin-id="a|b|i|n|z" port="G" id="8">
         <af device-pin-id="b|i|n|z" id="5" peripheral="SpiMaster6" name="Nss"/>
         <af id="8" peripheral="Uart6" name="Rts" type="out"/>
+        <af id="12" peripheral="Fsmc" name="Sdclk"/>
       </gpio>
       <gpio device-pin-id="b|i|n|z" port="G" id="9">
         <af id="8" peripheral="Uart6" name="Rx" type="in"/>
@@ -699,83 +708,110 @@
       </gpio>
       <gpio device-pin-id="a|b|i|n|z" port="G" id="15">
         <af id="8" peripheral="Uart6" name="Cts" type="in"/>
+        <af id="12" peripheral="Fsmc" name="Sdncas"/>
       </gpio>
       <gpio port="H" id="0"/>
       <gpio port="H" id="1"/>
-      <gpio device-pin-id="a|b|i|n" port="H" id="2"/>
-      <gpio device-pin-id="a|b|i|n" port="H" id="3"/>
+      <gpio device-pin-id="a|b|i|n" port="H" id="2">
+        <af id="12" peripheral="Fsmc" name="Sdcke0"/>
+      </gpio>
+      <gpio device-pin-id="a|b|i|n" port="H" id="3">
+        <af id="12" peripheral="Fsmc" name="Sdne0"/>
+      </gpio>
       <gpio device-pin-id="a|b|i|n" port="H" id="4">
         <af id="4" peripheral="I2cMaster2" name="Scl" type="out"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n" port="H" id="5">
         <af id="4" peripheral="I2cMaster2" name="Sda"/>
         <af id="5" peripheral="SpiMaster5" name="Nss"/>
+        <af id="12" peripheral="Fsmc" name="Sdnwe"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n" port="H" id="6">
         <af id="5" peripheral="SpiMaster5" name="Sck" type="out"/>
         <af id="9" peripheral="Timer12" name="Channel1"/>
+        <af id="12" peripheral="Fsmc" name="Sdne1"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n" port="H" id="7">
         <af id="4" peripheral="I2cMaster3" name="Scl" type="out"/>
         <af id="5" peripheral="SpiMaster5" name="Miso" type="in"/>
+        <af id="12" peripheral="Fsmc" name="Sdcke1"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n" port="H" id="8">
         <af id="4" peripheral="I2cMaster3" name="Sda"/>
+        <af id="12" peripheral="Fsmc" name="D16"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n" port="H" id="9">
         <af id="9" peripheral="Timer12" name="Channel2"/>
+        <af id="12" peripheral="Fsmc" name="D17"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n" port="H" id="10">
         <af id="2" peripheral="Timer5" name="Channel1"/>
+        <af id="12" peripheral="Fsmc" name="D18"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n" port="H" id="11">
         <af id="2" peripheral="Timer5" name="Channel2"/>
+        <af id="12" peripheral="Fsmc" name="D19"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n" port="H" id="12">
         <af id="2" peripheral="Timer5" name="Channel3"/>
+        <af id="12" peripheral="Fsmc" name="D20"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n" port="H" id="13">
         <af id="3" peripheral="Timer8" name="Channel1N"/>
         <af id="9" peripheral="Can1" name="Tx" type="out"/>
+        <af id="12" peripheral="Fsmc" name="D21"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n" port="H" id="14">
         <af id="3" peripheral="Timer8" name="Channel2N"/>
+        <af id="12" peripheral="Fsmc" name="D22"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n" port="H" id="15">
         <af id="3" peripheral="Timer8" name="Channel3N"/>
+        <af id="12" peripheral="Fsmc" name="D23"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n" port="I" id="0">
         <af id="2" peripheral="Timer5" name="Channel4"/>
         <af id="5" peripheral="SpiMaster2" name="Nss"/>
+        <af id="12" peripheral="Fsmc" name="D24"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n" port="I" id="1">
         <af id="5" peripheral="SpiMaster2" name="Sck" type="out"/>
+        <af id="12" peripheral="Fsmc" name="D25"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n" port="I" id="2">
         <af id="3" peripheral="Timer8" name="Channel4"/>
         <af id="5" peripheral="SpiMaster2" name="Miso" type="in"/>
+        <af id="12" peripheral="Fsmc" name="D26"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n" port="I" id="3">
         <af id="3" peripheral="Timer8" name="ExternalTrigger" type="in"/>
         <af id="5" peripheral="SpiMaster2" name="Mosi" type="out"/>
+        <af id="12" peripheral="Fsmc" name="D27"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n" port="I" id="4">
         <af id="3" peripheral="Timer8" name="BreakIn" type="in"/>
+        <af id="12" peripheral="Fsmc" name="Nbl2"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n" port="I" id="5">
         <af id="3" peripheral="Timer8" name="Channel1"/>
+        <af id="12" peripheral="Fsmc" name="Nbl3"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n" port="I" id="6">
         <af id="3" peripheral="Timer8" name="Channel2"/>
+        <af id="12" peripheral="Fsmc" name="D28"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n" port="I" id="7">
         <af id="3" peripheral="Timer8" name="Channel3"/>
+        <af id="12" peripheral="Fsmc" name="D29"/>
       </gpio>
       <gpio device-pin-id="b|i|n" port="I" id="8"/>
       <gpio device-pin-id="a|b|i|n" port="I" id="9">
         <af id="9" peripheral="Can1" name="Rx" type="in"/>
+        <af id="12" peripheral="Fsmc" name="D30"/>
       </gpio>
-      <gpio device-pin-id="a|b|i|n" port="I" id="10"/>
+      <gpio device-pin-id="a|b|i|n" port="I" id="10">
+        <af id="12" peripheral="Fsmc" name="D31"/>
+      </gpio>
       <gpio device-pin-id="b|i|n" port="I" id="11"/>
       <gpio device-name="429|439" device-pin-id="b|n" port="I" id="12"/>
       <gpio device-name="429|439" device-pin-id="b|n" port="I" id="13"/>

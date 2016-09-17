@@ -5,7 +5,7 @@
  		Please modify the xpcc/tools/device_file_generator code instead and rebuild this file.
  		Be aware, that regenerated files might have a different composition due to technical reasons. -->
   <device platform="stm32" family="f1" name="105|107" pin_id="r|v" size_id="8|b|c">
-    <flash device-size-id="8">65536</flash>
+    <flash device-name="105" device-size-id="8">65536</flash>
     <flash device-size-id="b">131072</flash>
     <flash device-size-id="c">262144</flash>
     <ram>65536</ram>
@@ -16,7 +16,7 @@
     <define device-name="105">STM32F105xC</define>
     <define device-name="107">STM32F107xC</define>
     <driver type="core" name="cortex">
-      <memory device-size-id="8" access="rx" start="0x8000000" name="flash" size="64"/>
+      <memory device-name="105" device-size-id="8" access="rx" start="0x8000000" name="flash" size="64"/>
       <memory device-size-id="b" access="rx" start="0x8000000" name="flash" size="128"/>
       <memory device-size-id="c" access="rx" start="0x8000000" name="flash" size="256"/>
       <memory access="rwx" start="0x20000000" name="sram1" size="64"/>
@@ -183,7 +183,7 @@
       <gpio port="A" id="14"/>
       <gpio port="A" id="15">
         <af id="0,1,1" peripheral="SpiMaster1" name="Nss"/>
-        <af id="8,3,3" peripheral="Timer2" name="Channel1"/>
+        <af id="8,3,1" peripheral="Timer2" name="Channel1"/>
         <af id="8,3,1" peripheral="Timer2" name="ExternalTrigger" type="in"/>
         <af id="28,1,0" peripheral="SpiMaster3" name="Nss"/>
       </gpio>

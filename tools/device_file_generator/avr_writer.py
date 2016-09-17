@@ -179,7 +179,10 @@ class AVRDeviceWriter(XMLDeviceWriter):
 			self.addModuleAttributesToNode(node, 'SPI', 'spi', family)
 
 	def addAdcToNode(self, node):
-		family = 'at90_tiny_mega' if (self.family in ['at90', 'attiny', 'atmega']) else self.family
+		if self.family == 'at90' and self.types[0] in ['usb', 'can', 'pwm']:
+			family = 'at90'
+		else:
+			family = 'at90_tiny_mega' if (self.family in ['at90', 'attiny', 'atmega']) else self.family
 		if self.family == 'xmega':
 			self.addModuleInstancesAttributesToNode(node, 'ADC', 'adc', family)
 		else:
