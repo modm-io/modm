@@ -6,12 +6,9 @@
 # license. See the file `LICENSE` for the full license governing this code.
 # -----------------------------------------------------------------------------
 
-from writer import XMLDeviceWriter, XMLElement
-
-import os, sys
-# add python module logger to path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
 from logger import Logger
+
+from ..writer import XMLDeviceWriter
 
 class STMDeviceWriter(XMLDeviceWriter):
 	""" STMDeviceWriter
@@ -32,9 +29,9 @@ class STMDeviceWriter(XMLDeviceWriter):
 		core_child = self.root.addChild('driver')
 		core_child.setAttributes({'type': 'core', 'name': 'cortex'})
 		param_name_value = {
-#							'enable_hardfault_handler': 'false',
-#							'vector_table_in_ram': 'false',
-#							'allocator': 'newlib'
+# 							'enable_hardfault_handler': 'false',
+# 							'vector_table_in_ram': 'false',
+# 							'allocator': 'newlib'
 		}
 		# The STM32F3 has Core-Coupled Memory on the I-Bus, so we remap by default
 		if self.device.id.family == 'f3' and self._hasCoreCoupledMemory():
@@ -99,8 +96,8 @@ class STMDeviceWriter(XMLDeviceWriter):
 			return
 
 		for prop in properties.values:
-			for id in prop.ids.differenceFromIds(self.device.ids):
-				attr = self._getAttributeDictionaryFromId(id)
+			for device_id in prop.ids.differenceFromIds(self.device.ids):
+				attr = self._getAttributeDictionaryFromId(device_id)
 				child = node.addChild(name)
 				child.setAttributes(attr)
 				if isinstance(prop.value, list):
@@ -133,8 +130,8 @@ class STMDeviceWriter(XMLDeviceWriter):
 				continue
 			instances.sort(key=int)
 
-			for id in prop.ids.differenceFromIds(self.device.ids):
-				attr = self._getAttributeDictionaryFromId(id)
+			for device_id in prop.ids.differenceFromIds(self.device.ids):
+				attr = self._getAttributeDictionaryFromId(device_id)
 
 				driver = node.addChild('driver')
 				driver.setAttributes(attr)
@@ -149,8 +146,8 @@ class STMDeviceWriter(XMLDeviceWriter):
 		for mem in memories.values:
 			sections = mem.value
 
-			for id in mem.ids.differenceFromIds(self.device.ids):
-				attr = self._getAttributeDictionaryFromId(id)
+			for device_id in mem.ids.differenceFromIds(self.device.ids):
+				attr = self._getAttributeDictionaryFromId(device_id)
 				for section in sections:
 					memory_section = node.addChild('memory')
 					memory_section.setAttributes(attr)
@@ -170,8 +167,8 @@ class STMDeviceWriter(XMLDeviceWriter):
 		for interrupt in interrupts.values:
 			vectors = interrupt.value
 
-			for id in interrupt.ids.differenceFromIds(self.device.ids):
-				attr = self._getAttributeDictionaryFromId(id)
+			for device_id in interrupt.ids.differenceFromIds(self.device.ids):
+				attr = self._getAttributeDictionaryFromId(device_id)
 				for vec in vectors:
 					vector_section = node.addChild('vector')
 					vector_section.setAttributes(attr)
@@ -188,8 +185,8 @@ class STMDeviceWriter(XMLDeviceWriter):
 		for prop in props.values:
 			gpios = prop.value
 
-			for id in prop.ids.differenceFromIds(self.device.ids):
-				attr = self._getAttributeDictionaryFromId(id)
+			for device_id in prop.ids.differenceFromIds(self.device.ids):
+				attr = self._getAttributeDictionaryFromId(device_id)
 				for gpio in gpios:
 					gpio_child = driver.addChild('gpio')
 					gpio_child.setAttributes(attr)
@@ -211,7 +208,7 @@ class STMDeviceWriter(XMLDeviceWriter):
 									af_child.setAttribute(key, af_dict['af'][key])
 					gpio_child.sort(key=lambda k : (int(1e6 if (k.get('id') == None) else k.get('id').split(',')[0]), k.get('peripheral')))
 		# sort the node children by port and id
-		driver.sort(key=lambda k : (k.get('port'), int(k.get('id'))) )
+		driver.sort(key=lambda k : (k.get('port'), int(k.get('id'))))
 
 	def _hasCoreCoupledMemory(self):
 		for memory in [memory.value for memory in self.device.getProperty('memories').values]:
@@ -219,18 +216,18 @@ class STMDeviceWriter(XMLDeviceWriter):
 				return True
 		return False
 
-	def _getAttributeDictionaryFromId(self, id):
-		target = id.properties
-		dict = {}
+	def _getAttributeDictionaryFromId(self, device_id):
+		target = device_id.properties
+		device_dict = {}
 		for attr in target:
 			if target[attr] != None:
 				if attr == 'size_id':
-					dict['device-size-id'] = target[attr]
+					device_dict['device-size-id'] = target[attr]
 				if attr == 'name':
-					dict['device-name'] = target[attr]
+					device_dict['device-name'] = target[attr]
 				if attr == 'pin_id':
-					dict['device-pin-id'] = target[attr]
-		return dict
+					device_dict['device-pin-id'] = target[attr]
+		return device_dict
 
 	def write(self, folder):
 		file_name = 'stm32f' + '_'.join(self.device.ids.getAttribute('name'))

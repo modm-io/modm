@@ -7,15 +7,20 @@
 # license. See the file `LICENSE` for the full license governing this code.
 # -----------------------------------------------------------------------------
 
-import os, sys
-from device import Device
-from avr_reader import AVRDeviceReader
-from avr_writer import AVRDeviceWriter
-from merger import DeviceMerger
+import os
+import sys
 import glob
+
 # add python module logger to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'device_files'))
+
 from logger import Logger
+
+from dfg.device import Device
+from dfg.merger import DeviceMerger
+from dfg.avr.avr_reader import AVRDeviceReader
+from dfg.avr.avr_writer import AVRDeviceWriter
 
 if __name__ == "__main__":
 	"""

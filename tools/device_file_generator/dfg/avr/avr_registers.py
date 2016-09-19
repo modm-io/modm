@@ -7,13 +7,14 @@
 # license. See the file `LICENSE` for the full license governing this code.
 # -----------------------------------------------------------------------------
 
-import os, sys, re
-from device import Device
-from avr_reader import AVRDeviceReader
+import os
+import sys
 import glob
-# add python module logger to path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
+
 from logger import Logger
+
+from ..device import Device
+from .avr_reader import AVRDeviceReader
 
 if __name__ == "__main__":
 	"""
@@ -32,7 +33,7 @@ if __name__ == "__main__":
 			continue
 
 		if "ATtiny" in arg or "ATmega" in arg or 'AT90' in arg:
-			xml_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'AVR_devices', (arg + '*'))
+			xml_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', 'AVR_devices', (arg + '*'))
 			files = glob.glob(xml_path)
 			for file in files:
 				# deal with this here, rather than rewrite half the name merging
@@ -79,7 +80,7 @@ if __name__ == "__main__":
 			registers.remove(match)
 
 		if len(matches) == 0:
-			logger.warn("No match for register: " + current['register'].name + " of " + str([id.string for id in current['ids']]))
+			logger.warn("No match for register: " + current['register'].name + " of " + str([device_id.string for device_id in current['ids']]))
 
 		merged.append(current)
 
@@ -90,13 +91,13 @@ if __name__ == "__main__":
 	for dev in merged:
 		reg = dev['register']
 		dev['ids'].sort(key=lambda k : (int(k.name or 0), k.type))
-		all_names.extend([id.string for id in dev['ids']])
+		all_names.extend([id.string for device_id in dev['ids']])
 		if bitfield_pattern == "":
 			filtered_registers.append(dev['register'].name)
 			s = "Devices:\n"
 			ii = 0
-			for id in dev['ids']:
-				s += id.string.replace("at","") + "  \t"
+			for device_id in dev['ids']:
+				s += device_id.string.replace("at", "") + "  \t"
 				ii += 1
 				if ii > 7:
 					ii = 0
@@ -112,11 +113,11 @@ if __name__ == "__main__":
 	if bitfield_pattern != "":
 		logger.info("Registers containing BitField pattern '" + bitfield_pattern + "':")
 		for dev in filtered_devices:
-			all_filtered_names.extend([id.string for id in dev['ids']])
+			all_filtered_names.extend([device_id.string for device_id in dev['ids']])
 			s = "Devices:\n"
 			ii = 0
-			for id in dev['ids']:
-				s += id.string.replace("at","") + "  \t"
+			for device_id in dev['ids']:
+				s += device_id.string.replace("at", "") + "  \t"
 				ii += 1
 				if ii > 7:
 					ii = 0
@@ -136,8 +137,8 @@ if __name__ == "__main__":
 	all_names.sort()
 	s = "\n"
 	ii = 0
-	for id in all_names:
-		s += id.replace("at","") + "  \t"
+	for device_id in all_names:
+		s += device_id.replace("at", "") + "  \t"
 		ii += 1
 		if ii > 7:
 			ii = 0

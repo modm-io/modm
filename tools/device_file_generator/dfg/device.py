@@ -1,22 +1,16 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2013, Roboterclub Aachen e.V.
 # All rights reserved.
-# 
+#
 # The file is part of the xpcc library and is released under the 3-clause BSD
 # license. See the file `LICENSE` for the full license governing this code.
 # -----------------------------------------------------------------------------
 
-
-from reader import XMLDeviceReader
-from identifiers import Identifiers
-
-import os, sys
-# add python module logger to path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
 from logger import Logger
-# add python module device files to path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'device_files'))
-from device_identifier import DeviceIdentifier
+
+from .reader import XMLDeviceReader
+from .identifiers import Identifiers
+
 
 class Device:
 	""" Device
@@ -28,13 +22,13 @@ class Device:
 			self.log = Logger()
 		else:
 			self.log = logger
-		
+
 		self.ids = None
 		self.properties = []
 		if description_file == None:
 			self.ids = Identifiers(None, self.log)
 			return
-		
+
 		# proper handling of Parsers
 		if isinstance(description_file, XMLDeviceReader):
 			self.properties = list(description_file.properties)
@@ -42,7 +36,7 @@ class Device:
 			self.ids = Identifiers(description_file.id, self.log)
 		else:
 			self.properties = list(description_file)
-		
+
 		if self.ids == None:
 			self.ids = Identifiers(None, self.log)
 
@@ -64,31 +58,31 @@ class Device:
 		"""
 		assert isinstance(other, Device)
 		self.log.info("Merging '%s'  with  '%s'" % (self.ids.string, other.ids.string))
-		
+
 		# update the ids in both
 		self.ids.extend(other.ids)
-		
+
 		# go through all properties and merge each one
 		for self_property in self.properties:
 			for other_property in other.properties:
 				if self_property.name == other_property.name:
 					self_property = self_property.getMergedProperty(other_property)
-		
+
 		self.properties.sort(key=lambda k : k.name)
 
 		return self;
-	
+
 	@property
 	def id(self):
 		return self.ids.intersection
-	
+
 	def getProperty(self, name):
 		for prop in self.properties:
 			if prop.name == name:
 				return prop
 
 		return None
-	
+
 	def __repr__(self):
 		return self.__str__()
 

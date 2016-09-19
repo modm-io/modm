@@ -27,14 +27,14 @@ class DeviceIdentifier:
 	def __init__(self, string=None, logger=None):
 		# quick'n'dirty copy constructor
 		if isinstance(string, DeviceIdentifier):
-			self.log      = string.log
+			self.log = string.log
 			self.platform = string.platform
-			self.family   = string.family
-			self.name	  = string.name
-			self.type	  = string.type
-			self.pin_id   = string.pin_id
-			self.size_id  = string.size_id
-			self.valid    = string.valid
+			self.family = string.family
+			self.name	 = string.name
+			self.type	 = string.type
+			self.pin_id = string.pin_id
+			self.size_id = string.size_id
+			self.valid = string.valid
 			return
 
 		if logger == None:
@@ -44,12 +44,12 @@ class DeviceIdentifier:
 
 		self._string = string
 		# default for properties is None
-		self.platform = None # e.g. stm32, avr
-		self.family   = None # e.g.	   f4, atmega
-		self.name     = None # e.g.   407, 328
-		self.type     = None # e.g.      , p
-		self.pin_id   = None # e.g.	    v,
-		self.size_id  = None # e.g.	    g, 32
+		self.platform = None  # e.g. stm32, avr
+		self.family = None  # e.g.	   f4, atmega
+		self.name = None  # e.g.   407, 328
+		self.type = None  # e.g.      , p
+		self.pin_id = None  # e.g.	    v,
+		self.size_id = None  # e.g.	    g, 32
 		self.valid = False
 
 		if string == None:
@@ -173,14 +173,16 @@ class DeviceIdentifier:
 
 	@property
 	def properties(self):
-		dict = {}
-		dict['platform'] = self.platform
-		dict['family'] = self.family
-		dict['name'] = self.name
-		dict['type'] = self.type
-		dict['pin_id'] = self.pin_id
-		dict['size_id'] = self.size_id
-		return dict
+		device_dict = {}
+
+		device_dict['platform'] = self.platform
+		device_dict['family'] = self.family
+		device_dict['name'] = self.name
+		device_dict['type'] = self.type
+		device_dict['pin_id'] = self.pin_id
+		device_dict['size_id'] = self.size_id
+
+		return device_dict
 
 	def getTargetDict(self):
 		return {'target': self.properties}
@@ -192,14 +194,14 @@ class DeviceIdentifier:
 				return False
 		return True
 
-	def __contains__(self, id):
-		assert isinstance(id, DeviceIdentifier)
+	def __contains__(self, device_id):
+		assert isinstance(device_id, DeviceIdentifier)
 		# simple check uses hash
-		if id == self:
+		if device_id == self:
 			return True
 
 		for attr in self.properties:
-			id_prop = id.properties[attr]
+			id_prop = device_id.properties[attr]
 			self_prop = self.properties[attr]
 			# simple check if they are equal
 			if id_prop == self_prop:
@@ -278,7 +280,7 @@ class DeviceIdentifier:
 
 	def __str__(self):
 		target = self.properties
-		#target = {o:target[o] for o in target if target[o] != None}
+		# target = {o:target[o] for o in target if target[o] != None}
 		t = {}
 		for o in target:
 			if target[o] != None:

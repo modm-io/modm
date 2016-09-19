@@ -1,21 +1,14 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2013, Roboterclub Aachen e.V.
 # All rights reserved.
-# 
+#
 # The file is part of the xpcc library and is released under the 3-clause BSD
 # license. See the file `LICENSE` for the full license governing this code.
 # -----------------------------------------------------------------------------
 
-import os, sys
-
-from identifiers import Identifiers
-
-# add python module logger to path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
 from logger import Logger
-# add python module device files to path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'device_files'))
-from device_identifier import DeviceIdentifier
+
+from .identifiers import Identifiers
 
 class Property:
 	""" Property
@@ -23,15 +16,15 @@ class Property:
 	This manages merging and accessing of properties.
 	"""
 
-	def __init__(self, id, name, value, logger=None):
+	def __init__(self, device_id, name, value, logger=None):
 		if logger == None:
 			self.log = Logger()
 		else:
 			self.log = logger
-		
+
 		self.name = name
-		self.values = [PropertyValue(id, value, self.log)]
-	
+		self.values = [PropertyValue(device_id, value, self.log)]
+
 	def addValue(self, other):
 		if isinstance(other.value, list):
 			for prop in self.values:
@@ -40,7 +33,7 @@ class Property:
 				# what are the differences in both lists?
 				self_diff = [val for val in prop.value if val not in intersection_value]
 				other_diff = [val for val in other.value if val not in intersection_value]
-				
+
 				# if there is an intersection, we can add the other.ids here
 				if len(intersection_value) > 0:
 					# if this value has more items than the intersection
@@ -53,40 +46,40 @@ class Property:
 					prop.ids.extend(other.ids)
 					# continue looking with the differences of other
 					other.value = other_diff
-				
+
 				# order is important
 				prop.value.sort()
 				# no more values to add, we can stop looking now
 				if len(other.value) == 0:
 					return
-			
+
 		else:
 			for prop in self.values:
 				if (prop.value == other.value):
 					prop.ids.extend(other.ids)
 					return
-		
+
 		# apparently this value does not exist yet, so add it
 		self.values.append(other)
-	
+
 	def getMergedProperty(self, other):
 		assert isinstance(other, Property)
 		assert other.name == self.name
-		
+
 		for value in other.values:
 			self.addValue(value)
-		
+
 		self.values.sort(key=lambda k : k.value)
-		
+
 		return self
-	
+
 	def getValues(self):
 		value_list = []
 		for value in self.values:
 			value_list.append(value.value)
-		
+
 		return value_list
-	
+
 	def __repr__(self):
 		return self.__str__()
 
@@ -101,24 +94,24 @@ class PropertyValue:
 	Encapsulates a device property value with ids.
 	"""
 
-	def __init__(self, id, value, logger=None):
+	def __init__(self, device_id, value, logger=None):
 		if logger == None:
 			self.log = Logger()
 		else:
 			self.log = logger
-		
-		if isinstance(id, list):
-			self.ids = list(id)
+
+		if isinstance(device_id, list):
+			self.ids = list(device_id)
 		else:
-			self.ids = Identifiers(id, self.log)
+			self.ids = Identifiers(device_id, self.log)
 		self.value = value
 		if isinstance(self.value, list):
 			self.value.sort()
-	
+
 	@property
 	def id(self):
 		return self.ids.intersection
-	
+
 	def __repr__(self):
 		return self.__str__()
 
