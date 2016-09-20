@@ -63,7 +63,7 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 %% macro section_reset(memory)
 	.reset :
 	{
-		__vector_table_rom_start = .;					/* address in FLASH */
+		__vector_table_rom_start = .;
 		__vector_table_ram_load = .;
 		/* Initial stack address, Reset and NMI handler */
 		KEEP(*(.reset))
@@ -80,14 +80,14 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		/* used for vectors remapped to RAM */
 		KEEP(*(.vectors))
 
-		. = ALIGN (4);
+		. = ALIGN(4);
 		__vector_table_ram_end = .;
 	} >{{memory}}
 %% endmacro
 
 
 %% macro section_fastcode_in_flash()
-	.fastcode :
+	.fastcode : ALIGN(4)
 	{
 		/* From the Cortex-M3 Technical Reference Manual:
 		 *
@@ -112,7 +112,6 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		 * So for STM32's where the CCM is _not_ connected to the I-Bus, we execute .fastcode from Flash.
 		 */
 		*(.fastcode)
-		. = ALIGN (4);
 	} >FLASH
 %% endmacro
 
@@ -126,15 +125,14 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		__stack_start = .;
 
 		. += MAIN_STACK_SIZE;
-		. = ALIGN (8);
+		. = ALIGN(8);
 		__main_stack_top = .;
 
 		. += PROCESS_STACK_SIZE;
-		. = ALIGN (8);
+		. = ALIGN(8);
 		__process_stack_top = .;
 
 		__stack_end = .;
-		. = ALIGN (4);
 	} >{{memory}}
 %% endmacro
 
@@ -144,8 +142,8 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 	{
 		__table_zero_intern_start = .;
 	%% for section in sections
-		LONG (__{{section}}_start)
-		LONG (__{{section}}_end)
+		LONG(__{{section}}_start)
+		LONG(__{{section}}_end)
 	%% endfor
 		__table_zero_intern_end = .;
 	} >FLASH
@@ -157,9 +155,9 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 	{
 		__table_copy_intern_start = .;
 	%% for section in sections
-		LONG (__{{section}}_load)
-		LONG (__{{section}}_start)
-		LONG (__{{section}}_end)
+		LONG(__{{section}}_load)
+		LONG(__{{section}}_start)
+		LONG(__{{section}}_end)
 	%% endfor
 		__table_copy_intern_end = .;
 	} >FLASH
@@ -202,9 +200,9 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 	{
 		__table_heap_start = .;
 	%% for section in sections
-		LONG ({{ section['prop'] }})
-		LONG (__{{ section['name'] }}_start)
-		LONG (__{{ section['name'] }}_end)
+		LONG({{ section['prop'] }})
+		LONG(__{{ section['name'] }}_start)
+		LONG(__{{ section['name'] }}_end)
 	%% endfor
 		{{ parameters.linkerscript_table_heap_extern }}
 		__table_heap_end = .;
@@ -213,10 +211,10 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 
 
 %% macro section(memory, name)
-	.{{name}} :
+	.{{name}} : ALIGN(4)
 	{
-		__{{name}}_load = LOADADDR (.{{name}});		/* address in FLASH */
-		__{{name}}_start = .;						/* address in RAM */
+		__{{name}}_load = LOADADDR(.{{name}});
+		__{{name}}_start = .;
 
 		*(.{{name}})
 
@@ -227,7 +225,7 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 
 
 %% macro section_heap(memory, name)
-	.{{name}} (NOLOAD) : ALIGN(4)
+	.{{name}} (NOLOAD) :
 	{
 		__{{name}}_start = .;
 
@@ -238,66 +236,12 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 
 
 %% macro section_rom(memory)
-	.text :
+	.text : ALIGN(4)
 	{
-		/* Create a symbol for each input file in the current section, set to
-		 * the address of the first byte of data written from that input file.
-		 * */
-		CREATE_OBJECT_SYMBOLS
-
-		/* ABOUT .gnu.linkonce.* sections
-		 *
-		 * Unlike other input section types a section that is prefixed with
-		 * .gnu.linkonce. is treated differently by the linker. If for example
-		 * .gnu.linkonce.t.abc appears in two or more different object files then
-		 * the linker will only keep one and discard the others.
-		 *
-		 * This is done is to support C++ vague linkage.  It is related to
-		 * C++'s ODR (One Definition Rule), and can cause surprises if ODR is
-		 * violated.
-		 *
-		 * For example if you compile with RTTI turned on, you'll see linkonce
-		 * sections for all the RTTI of all the classes in the translation unit
-		 * of that object file.
-		 * Or if you keep generated functions for inline functions
-		 * (-fkeep-inline-functions), you'll see linkonce sections for all the
-		 * emitted kept inline functions.
-		 *
-		 * Might be replaced by ELF section groups in newer versions of ld.
-		 */
 		*(.text .text.* .gnu.linkonce.t.*)
-		. = ALIGN(4);
-
-		/* Position independent code will call non-static functions via the
-		 * Procedure Linkage Table or PLT. This PLT does not exist in .o files.
-		 * In a .o file, use of the PLT is indicated by a special relocation.
-		 * When the program linker processes such a relocation, it will create
-		 * an entry in the PLT
-		 */
-		*(.plt)
-		. = ALIGN(4);
-
-		/* .ARM.extab names a section that contains exception unwinding information */
-		*(.ARM.extab* .gnu.linkonce.armextab.*)
-
-		/* .gcc_except_table is an input section name, which gcc uses
-		 * for information used to unwind the stack when an exception occurs. */
-		*(.gcc_except_table)
-
-		/* When gcc generates code that handles exceptions, it produces tables
-		 * that describe how to unwind the stack. These tables are found in
-		 * the .eh_frame and .eh_frame_hdr section.
-		 *
-		 * See http://www.airs.com/blog/archives/460 or
-		 * http://www.codesourcery.com/public/cxx-abi/exceptions.pdf
-		 */
-		*(.eh_frame_hdr)
-		*(.eh_frame)
-
-		*(.gnu.warning)
 	} >{{memory}}
 
-	.rodata : ALIGN (4)
+	.rodata : ALIGN(4)
 	{
 		*(.rodata .rodata.* .gnu.linkonce.r.*)
 
@@ -305,104 +249,106 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		KEEP(*(.init))
 
 		. = ALIGN(4);
-		PROVIDE_HIDDEN (__preinit_array_start = .);
-		KEEP (*(.preinit_array))
-		PROVIDE_HIDDEN (__preinit_array_end = .);
+		PROVIDE_HIDDEN(__preinit_array_start = .);
+		KEEP(*(.preinit_array))
+		PROVIDE_HIDDEN(__preinit_array_end = .);
 
 		. = ALIGN(4);
-		PROVIDE_HIDDEN (__init_array_start = .);
-		KEEP (*(SORT(.init_array.*)))
-		KEEP (*(.init_array))
-		PROVIDE_HIDDEN (__init_array_end = .);
+		PROVIDE_HIDDEN(__init_array_start = .);
+		KEEP(*(SORT(.init_array.*)))
+		KEEP(*(.init_array))
+		PROVIDE_HIDDEN(__init_array_end = .);
 
 		. = ALIGN(4);
 		KEEP(*(.fini))
 
 		. = ALIGN(4);
-		PROVIDE_HIDDEN (__fini_array_start = .);
-		KEEP (*(.fini_array))
-		KEEP (*(SORT(.fini_array.*)))
-		PROVIDE_HIDDEN (__fini_array_end = .);
+		PROVIDE_HIDDEN(__fini_array_start = .);
+		KEEP(*(.fini_array))
+		KEEP(*(SORT(.fini_array.*)))
+		PROVIDE_HIDDEN(__fini_array_end = .);
 
 		/* These are for static constructors and destructors under ELF */
 		PROVIDE(__ctors_start__ = .);
-		KEEP (*crtbegin.o(.ctors))
-		KEEP (*(EXCLUDE_FILE (*crtend.o) .ctors))
-		KEEP (*(SORT(.ctors.*)))
-		KEEP (*crtend.o(.ctors))
+		KEEP(*crtbegin.o(.ctors))
+		KEEP(*(EXCLUDE_FILE (*crtend.o) .ctors))
+		KEEP(*(SORT(.ctors.*)))
+		KEEP(*crtend.o(.ctors))
 		PROVIDE(__ctors_end__ = .);
 
-		/*PROVIDE(__dtors_start__ = .);
-		KEEP (*crtbegin.o(.dtors))
-		KEEP (*(EXCLUDE_FILE (*crtend.o) .dtors))
-		KEEP (*(SORT(.dtors.*)))
-		KEEP (*crtend.o(.dtors))
-		PROVIDE(__dtors_end__ = .);*/
+		/* We never call static constructors
+		PROVIDE(__dtors_start__ = .);
+		KEEP(*crtbegin.o(.dtors))
+		KEEP(*(EXCLUDE_FILE (*crtend.o) .dtors))
+		KEEP(*(SORT(.dtors.*)))
+		KEEP(*crtend.o(.dtors))
+		PROVIDE(__dtors_end__ = .);
+		*/
 
 		*(.init .init.*)
 		*(.fini .fini.*)
 	} >{{memory}}
 
-	/* .ARM.exidx names a section that contains index entries for
-	 * section unwinding. It is sorted, so has to go in its own output section.
-	 */
-	.ARM.exidx :
+	/* Unwind tables are used to unwind the stack for C++ exceptions.
+	 * On xpcc these are disabled by default, so these sections are empty.
+	.ARM.extab : ALIGN(4)
+	{
+		*(.ARM.extab* .gnu.linkonce.armextab.*)
+	} >{{memory}}
+
+	.ARM.exidx : ALIGN(4)
 	{
 		__exidx_start = .;
 		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
 		__exidx_end = .;
 	} >{{memory}}
+
+	.eh_frame : ALIGN(4)
+	{
+		KEEP(*(.eh_frame*))
+	} >{{memory}}
+	 */
 %% endmacro
 
 
 %% macro section_ram(memory)
 	/* initialized variables */
-	.data : ALIGN (8)
+	.data : ALIGN(4)
 	{
-		__data_load = LOADADDR (.data);		/* address in FLASH */
-		__data_start = .;					/* address in RAM */
-
-		KEEP(*(.jcr))
-		*(.got.plt) *(.got)
-		*(.shdata)
-
+		__data_load = LOADADDR(.data);
+		__data_start = .;
 		*(.data .data.* .gnu.linkonce.d.*)
-
-		. = ALIGN (4);
+		. = ALIGN(4);
 		__data_end = .;
 	} >{{memory}} AT >FLASH
 
 	/* uninitialized variables */
-	.bss (NOLOAD) : ALIGN(4)
+	.bss :
 	{
 		__bss_start = . ;
-
-		*(.shbss)
 		*(.bss .bss.* .gnu.linkonce.b.*)
-		*(COMMON)
-
-		. = ALIGN (4);
+		. = ALIGN(4);
 		__bss_end = .;
 	} >{{memory}}
 
 	/* Global data not cleared after reset.  */
-	.noinit (NOLOAD) : ALIGN(4)
+	.noinit (NOLOAD) :
 	{
 		__noinit_start = .;
-
 		*(.noinit*)
-
-		. = ALIGN (4);
+		. = ALIGN(4);
 		__noinit_end = .;
 	} >{{memory}}
 %% endmacro
 
 
 %% macro section_end()
+/*
 	. = ALIGN(4);
 	_end = . ;
 	__end = . ;
 	PROVIDE(end = .);
+*/
 %% endmacro
 
 
@@ -444,7 +390,7 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 	.debug_varnames  0 : { *(.debug_varnames) }
 	.debug_varnames  0 : { *(.debug_varnames) }
 
-	.note.gnu.arm.ident 0 : { KEEP (*(.note.gnu.arm.ident)) }
-	.ARM.attributes 0 : { KEEP (*(.ARM.attributes)) }
+	.note.gnu.arm.ident 0 : { KEEP(*(.note.gnu.arm.ident)) }
+	.ARM.attributes 0 : { KEEP(*(.ARM.attributes)) }
 	/DISCARD/ : { *(.note.GNU-stack)  }
 %% endmacro
