@@ -50,7 +50,7 @@ public:
 				float value = averageZ.getValue();
 				// normalize rotation and scale by 5 leds
 				uint16_t leds = abs(value / 200 * 5);
-				leds = (1 << abs(leds)) - 1;
+				leds = (1ul << leds) - 1;
 
 				// use left or right half ring depending on sign
 				if (value < 0) {
