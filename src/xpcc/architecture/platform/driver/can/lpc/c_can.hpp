@@ -14,6 +14,8 @@
 // at least one queue, so activate interrupts
 #define LPC11C_USING_CAN_INTERRUPTS ((LPC11C_CAN_TX_BUFFER_SIZE > 0) || (LPC11C_CAN_RX_BUFFER_SIZE > 0))
 
+#define LPC11C_ROM_CAN (*((ROM **)0x1fff1ff8))
+
 namespace xpcc
 {
 namespace lpc
@@ -93,10 +95,10 @@ public:
 	// FIXME: turn into parameter
 	#if LPC11C_USING_CAN_INTERRUPTS
 		/* Interrupts enabled */
-		(*rom)->pCAND->init_can(&ClkInitTable[0], true);
+		LPC11C_ROM_CAN->pCAND->init_can(&ClkInitTable[0], true);
 	#else
 		/* Interrupts disabled */
-		(*rom)->pCAND->init_can(&ClkInitTable[0], false);
+		LPC11C_ROM_CAN->pCAND->init_can(&ClkInitTable[0], false);
 	#endif
 
 		/* Configure the CAN callback functions */
@@ -110,7 +112,7 @@ public:
 		   0,
 		   0,
 		};
-		(*rom)->pCAND->config_calb(&callbacks);
+		LPC11C_ROM_CAN->pCAND->config_calb(&callbacks);
 
 
 		// Use only Message Objects 1 to 16 for reception.
@@ -143,10 +145,6 @@ public:
 
 	static BusState
 	getBusState();
-
-public:
-	static constexpr
-	ROM **rom = (ROM **) 0x1fff1ff8;
 
 protected:
 	/**

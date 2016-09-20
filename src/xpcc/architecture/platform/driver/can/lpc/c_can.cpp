@@ -61,7 +61,7 @@ sendMessageObject(const xpcc::can::Message & message, uint8_t messageObjectId)
 	}
 
 	// Really send the message
-	(*xpcc::lpc::Can::rom)->pCAND->can_transmit(&msg_obj);
+	LPC11C_ROM_CAN->pCAND->can_transmit(&msg_obj);
 }
 
 // ----------------------------------------------------------------------------
@@ -77,7 +77,7 @@ readMessageObject(xpcc::can::Message & message, uint8_t messageObjectId)
 	msg_obj.msgobj = messageObjectId;
 
 	// Read Message Object from CAN controller
-	(*xpcc::lpc::Can::rom)->pCAND->can_receive(&msg_obj);
+	LPC11C_ROM_CAN->pCAND->can_receive(&msg_obj);
 
 	// Is extended Identifier?
 	if (msg_obj.mode_id & CAN_MSGOBJ_EXT) {
@@ -238,7 +238,7 @@ xpcc::lpc::Can::CAN_error(uint32_t /* error_info */)
 	It's function is to call the isr() API located in the ROM */
 extern "C" void
 CAN_IRQHandler(void) {
-	(*xpcc::lpc::Can::rom)->pCAND->isr();
+	LPC11C_ROM_CAN->pCAND->isr();
 }
 
 // ----------------------------------------------------------------------------
