@@ -6,7 +6,7 @@
 # license. See the file `LICENSE` for the full license governing this code.
 # -----------------------------------------------------------------------------
 
-from logger import Logger
+import itertools
 
 from ..writer import XMLDeviceWriter
 
@@ -229,7 +229,30 @@ class STMDeviceWriter(XMLDeviceWriter):
 					device_dict['device-pin-id'] = target[attr]
 		return device_dict
 
+	def _addNamingSchema(self):
+		identifiers = list(itertools.product(("stm32f",),
+											 self.device.ids.getAttribute('name'),
+											 self.device.ids.getAttribute('pin_id'),
+											 self.device.ids.getAttribute('size_id')))
+		devices = [d.string for d in self.device.ids]
+		for identifier_parts in identifiers:
+			identifier = ''.join(identifier_parts)
+
+			if identifier not in devices:
+				child = self.root.prependChild('invalid-device')
+				child.setValue(identifier)
+			else:
+				devices.remove(identifier)
+
+		for device in devices:
+			self.log.error("Found device not matching naming schema: '{}'".format(device))
+
+		child = self.root.prependChild('naming-schema')
+		child.setValue('{{ platform }}f{{ name }}{{ pin_id }}{{ size_id }}')
+
 	def write(self, folder):
+		self._addNamingSchema()
+
 		file_name = 'stm32f' + '_'.join(self.device.ids.getAttribute('name'))
 		file_name += '-' + '_'.join(self.device.ids.getAttribute('pin_id'))
 		file_name += '-' + '_'.join(self.device.ids.getAttribute('size_id'))

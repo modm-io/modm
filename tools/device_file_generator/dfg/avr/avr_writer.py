@@ -6,6 +6,8 @@
 # license. See the file `LICENSE` for the full license governing this code.
 # -----------------------------------------------------------------------------
 
+import itertools
+
 from logger import Logger
 
 from ..writer import XMLDeviceWriter
@@ -285,7 +287,46 @@ class AVRDeviceWriter(XMLDeviceWriter):
 					device_dict['device-pin-id'] = target[attr]
 		return device_dict
 
+	def _addNamingSchema(self):
+		if self.family == 'xmega':
+			naming_schema = 'at{{ family }}{{ name }}{{ type }}{{ pin_id }}'
+			identifiers = list(itertools.product(("at",),
+												 (self.family,),
+												 self.names,
+												 self.types,
+												 self.pin_ids))
+			devices = ['at' + d.string.replace('none', '') for d in self.device.ids]
+		elif self.family == 'at90':
+			naming_schema = '{{ family }}{{ type }}{{ name }}'
+			identifiers = list(itertools.product((self.family,),
+												 self.types,
+												 self.names))
+			devices = [d.string.replace('none', '') for d in self.device.ids]
+		else:
+			naming_schema = '{{ family }}{{ name }}{{ type }}'
+			identifiers = list(itertools.product((self.family,),
+												 self.names,
+												 self.types))
+			devices = [d.string.replace('none', '') for d in self.device.ids]
+
+		for identifier_parts in identifiers:
+			identifier = ''.join(identifier_parts).replace('none', '')
+
+			if identifier not in devices:
+				child = self.root.prependChild('invalid-device')
+				child.setValue(identifier)
+			else:
+				devices.remove(identifier)
+
+		for device in devices:
+			self.log.error("Found device not matching naming schema: '{}'".format(device))
+
+		child = self.root.prependChild('naming-schema')
+		child.setValue(naming_schema)
+
 	def write(self, folder):
+		self._addNamingSchema()
+
 		names = self.names
 		names.sort(key=int)
 		types = self.types

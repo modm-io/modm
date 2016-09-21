@@ -95,6 +95,12 @@ class XMLElement:
 		element.root = etree.SubElement(self.root, name)
 		return element
 
+	def prependChild(self, name):
+		element = XMLElement()
+		element.root = etree.Element(name)
+		self.root.insert(0, element.root)
+		return element
+
 	def addComment(self, comment):
 		self.root.append(etree.Comment(str(comment)))
 
