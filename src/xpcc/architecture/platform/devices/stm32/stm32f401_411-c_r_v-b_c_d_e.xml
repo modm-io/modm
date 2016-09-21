@@ -5,6 +5,13 @@
  		Please modify the xpcc/tools/device_file_generator code instead and rebuild this file.
  		Be aware, that regenerated files might have a different composition due to technical reasons. -->
   <device platform="stm32" family="f4" name="401|411" pin_id="c|r|v" size_id="b|c|d|e">
+    <naming-schema>{{ platform }}f{{ name }}{{ pin_id }}{{ size_id }}</naming-schema>
+    <invalid-device>stm32f411vd</invalid-device>
+    <invalid-device>stm32f411vb</invalid-device>
+    <invalid-device>stm32f411rd</invalid-device>
+    <invalid-device>stm32f411rb</invalid-device>
+    <invalid-device>stm32f411cd</invalid-device>
+    <invalid-device>stm32f411cb</invalid-device>
     <flash device-name="401" device-size-id="b">131072</flash>
     <flash device-size-id="c">262144</flash>
     <flash device-name="401" device-size-id="d">393216</flash>

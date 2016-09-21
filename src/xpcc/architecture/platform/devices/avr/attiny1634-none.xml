@@ -5,6 +5,7 @@
  		Please modify the xpcc/tools/device_file_generator code instead and rebuild this file.
  		Be aware, that regenerated files might have a different composition due to technical reasons. -->
   <device platform="avr" family="attiny" name="1634" size_id="16" type="none">
+    <naming-schema>{{ family }}{{ name }}{{ type }}</naming-schema>
     <flash>16384</flash>
     <ram>1024</ram>
     <eeprom>256</eeprom>

@@ -5,6 +5,16 @@
  		Please modify the xpcc/tools/device_file_generator code instead and rebuild this file.
  		Be aware, that regenerated files might have a different composition due to technical reasons. -->
   <device platform="stm32" family="f7" name="745|746|756" pin_id="b|i|n|v|z" size_id="e|g">
+    <naming-schema>{{ platform }}f{{ name }}{{ pin_id }}{{ size_id }}</naming-schema>
+    <invalid-device>stm32f756ze</invalid-device>
+    <invalid-device>stm32f756ve</invalid-device>
+    <invalid-device>stm32f756ne</invalid-device>
+    <invalid-device>stm32f756ie</invalid-device>
+    <invalid-device>stm32f756be</invalid-device>
+    <invalid-device>stm32f745ng</invalid-device>
+    <invalid-device>stm32f745ne</invalid-device>
+    <invalid-device>stm32f745bg</invalid-device>
+    <invalid-device>stm32f745be</invalid-device>
     <flash device-size-id="e">524288</flash>
     <flash device-size-id="g">1048576</flash>
     <ram>413696</ram>

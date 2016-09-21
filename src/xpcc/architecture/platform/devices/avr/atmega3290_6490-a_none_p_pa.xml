@@ -5,6 +5,8 @@
  		Please modify the xpcc/tools/device_file_generator code instead and rebuild this file.
  		Be aware, that regenerated files might have a different composition due to technical reasons. -->
   <device platform="avr" family="atmega" name="3290|6490" size_id="32|64" type="a|none|p|pa">
+    <naming-schema>{{ family }}{{ name }}{{ type }}</naming-schema>
+    <invalid-device>atmega6490pa</invalid-device>
     <flash device-name="3290">32768</flash>
     <flash device-name="6490">65536</flash>
     <ram device-name="3290">2048</ram>
