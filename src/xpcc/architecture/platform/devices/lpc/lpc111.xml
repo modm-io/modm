@@ -2,6 +2,7 @@
 <!DOCTYPE rca SYSTEM "../devicefile.dtd">
 <rca version="1.0">
 	<device platform="lpc" family="11" name="15">
+		<naming-schema>{{ platform }}{{ family }}{{ name }}</naming-schema>
 		<!-- Flash and RAM sizes -->
 		<flash device-name="15">65536</flash>
 		<ram>8192</ram>
