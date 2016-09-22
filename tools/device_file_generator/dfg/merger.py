@@ -6,9 +6,6 @@
 # license. See the file `LICENSE` for the full license governing this code.
 # -----------------------------------------------------------------------------
 
-import sys, os
-# add python module logger to path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
 from logger import Logger
 
 class DeviceMerger:
@@ -173,18 +170,16 @@ class DeviceMerger:
 			devs.remove(current)
 
 			matches = []
-			type = current.ids.getAttribute('type')[0]
+			device_type = current.ids.getAttribute('type')[0]
 
-			if type != None:
-				pin_id = current.ids.getAttribute('pin_id')[0]
-
-				self.log.info("ByName: Searching for device with type '%s'" % type)
+			if device_type != None:
+				self.log.info("ByName: Searching for device with type '%s'" % device_type)
 
 				for dev in devs:
-					if dev.ids.getAttribute('type')[0] == type:
+					if dev.ids.getAttribute('type')[0] == device_type:
 						# A3 none|b and bu|u are different enough to warrant
 						# a new device file
-						if type == 'a3':
+						if device_type == 'a3':
 							if dev.ids.getAttribute('pin_id')[0] in self._getCategoryPinIdAVR(current):
 								matches.append(dev)
 						else:
@@ -221,13 +216,14 @@ class DeviceMerger:
 
 			if size_id != None:
 				name = current.ids.getAttribute('name')[0]
-				type = current.ids.getAttribute('type')[0]
+				device_type = current.ids.getAttribute('type')[0]
 				family = name[len(size_id):]
 
-				if not (family == "" and type == None):
-					type = self._getCategoryTypeAVR(current)
+				if not (family == "" and device_type == None):
+					device_type = self._getCategoryTypeAVR(current)
 
-					self.log.info("ByName: Searching for device ending in '" + family + "' and '" + str(type) + "'")
+					self.log.info("ByName: Searching for device ending in '"
+								 + family + "' and '" + str(device_type) + "'")
 
 					for dev in devs:
 						dname = dev.ids.getAttribute('name')[0]
@@ -241,7 +237,7 @@ class DeviceMerger:
 							# we should only merge when the family is the same,
 							# and if the type is the same
 
-							if dfamily == family and dev.ids.getAttribute('type')[0] in type:
+							if dfamily == family and dev.ids.getAttribute('type')[0] in device_type:
 								matches.append(dev)
 
 			# The following code is Atmel's fault with their stupid naming schemes.
@@ -359,7 +355,6 @@ class DeviceMerger:
 
 			size_ids = self._getCategorySizeSTM32(current)
 			name = current.ids.getAttribute('name')[0]
-			pin_id = current.ids.getAttribute('pin_id')[0]
 			self.log.info("BySize: Searching for device with size-id '%s'" % size_ids)
 
 			for dev in devs:
@@ -393,14 +388,14 @@ class DeviceMerger:
 			if name in ['072', '042']:
 				categories = [['4', '6'], ['8', 'b']]
 		elif family == 'f1':
-			categories = [	['4', '6'],			# low density
-							['8', 'b'],			# medium density
-							['c', 'd', 'e'],	# high density
-							['f', 'g']  ]		# super high density
+			categories = [	['4', '6'],  # low density
+							['8', 'b'],  # medium density
+							['c', 'd', 'e'],  # high density
+							['f', 'g']  ]  # super high density
 			if name in ['105', '107']:
-				categories = [	['8', 'b', 'c'] ]	# medium and high density
+				categories = [	['8', 'b', 'c'] ]  # medium and high density
 		elif family == 'f2':
-			categories = [	['b', 'c', 'd', 'e', 'f', 'g'] ]	# high density
+			categories = [	['b', 'c', 'd', 'e', 'f', 'g'] ]  # high density
 		elif family == 'f3':
 			categories = [ ['4', '6', '8'], ['b', 'c', 'd', 'e'] ]
 			if name in ['373']:
@@ -479,23 +474,23 @@ class DeviceMerger:
 		return merged
 
 	def _getCategoryPinIdAVR(self, device):
-		type = device.ids.getAttribute('pin_id')[0]
+		device_type = device.ids.getAttribute('pin_id')[0]
 		# these are the categories of mergable types
-		categories = [	# Xmega devices
+		categories = [  # Xmega devices
 						[None, 'none', 'b'],
 						['bu', 'u'],
 						]
 		# make sure that only one category is used!
 		for cat in categories:
-			if type in cat:
+			if device_type in cat:
 				return cat
 
 		return categories[0]
 
 	def _getCategoryTypeAVR(self, device):
-		type = device.ids.getAttribute('type')[0]
+		device_type = device.ids.getAttribute('type')[0]
 		# these are the categories of mergable types
-		categories = [ 	# ATmega devices
+		categories = [  # ATmega devices
 						[None, 'none', 'p', 'a', 'pa'],
 						['rfa1', 'rfa2', 'rfr1', 'rfr2'],
 						['hvb', 'hvbrevb'],
@@ -511,7 +506,7 @@ class DeviceMerger:
 						]
 		# make sure that only one category is used!
 		for cat in categories:
-			if type in cat:
+			if device_type in cat:
 				return cat
 
 		return categories[0]

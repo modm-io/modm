@@ -6,13 +6,12 @@
 # license. See the file `LICENSE` for the full license governing this code.
 # -----------------------------------------------------------------------------
 
-from writer import XMLDeviceWriter, XMLElement
-import avr_io
+import itertools
 
-import os, sys
-# add python module logger to path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
 from logger import Logger
+
+from ..writer import XMLDeviceWriter
+from . import avr_io
 
 class AVRDeviceWriter(XMLDeviceWriter):
 	""" AVRDeviceWriter
@@ -47,7 +46,7 @@ class AVRDeviceWriter(XMLDeviceWriter):
 
 		pin_count_child = self.root.addChild('pin-count')
 		if self.family == 'xmega':
-			# the int in the type is the package id
+			# the int in the type is the package device_id
 			# ie. A1, B1 = 100 pins, A3, C3 = 64 pins, etc...
 			pins = [0, 100, 0, 64, 44, 32]
 			pin_count_child.setValue(pins[int(self.types[0][1:])])
@@ -72,14 +71,14 @@ class AVRDeviceWriter(XMLDeviceWriter):
 				size -= 1024
 			else:
 				size /= 2
-			for id in ram_size.ids.differenceFromIds(self.device.ids):
-				attr = self._getAttributeDictionaryFromId(id)
+			for device_id in ram_size.ids.differenceFromIds(self.device.ids):
+				attr = self._getAttributeDictionaryFromId(device_id)
 				attr['name'] = 'ram_length'
 				ram_size_child = core_child.addChild('parameter')
 				ram_size_child.setAttributes(attr)
 				ram_size_child.setValue(size)
 
-				attr2 = self._getAttributeDictionaryFromId(id)
+				attr2 = self._getAttributeDictionaryFromId(device_id)
 				attr2['name'] = 'ram_block_length'
 				block_size = 4
 				while (size / block_size > 127):
@@ -116,8 +115,8 @@ class AVRDeviceWriter(XMLDeviceWriter):
 			return
 
 		for prop in properties.values:
-			for id in prop.ids.differenceFromIds(self.device.ids):
-				attr = self._getAttributeDictionaryFromId(id)
+			for device_id in prop.ids.differenceFromIds(self.device.ids):
+				attr = self._getAttributeDictionaryFromId(device_id)
 				child = node.addChild(name)
 				child.setAttributes(attr)
 				child.setValue(prop.value)
@@ -129,8 +128,8 @@ class AVRDeviceWriter(XMLDeviceWriter):
 
 		for prop in modules.values:
 			if any(m for m in prop.value if m.startswith(peripheral)):
-				for id in prop.ids.differenceFromIds(self.device.ids):
-					attr = self._getAttributeDictionaryFromId(id)
+				for device_id in prop.ids.differenceFromIds(self.device.ids):
+					attr = self._getAttributeDictionaryFromId(device_id)
 					driver = node.addChild('driver')
 					driver.setAttributes(attr)
 					driver.setAttributes({'type': name, 'name': family})
@@ -149,8 +148,8 @@ class AVRDeviceWriter(XMLDeviceWriter):
 				continue
 			instances.sort()
 
-			for id in prop.ids.differenceFromIds(self.device.ids):
-				attr = self._getAttributeDictionaryFromId(id)
+			for device_id in prop.ids.differenceFromIds(self.device.ids):
+				attr = self._getAttributeDictionaryFromId(device_id)
 
 				driver = node.addChild('driver')
 				driver.setAttributes(attr)
@@ -226,8 +225,8 @@ class AVRDeviceWriter(XMLDeviceWriter):
 				instances = list(set(instances))
 				instances.sort()
 
-				for id in prop.ids.differenceFromIds(self.device.ids):
-					attr = self._getAttributeDictionaryFromId(id)
+				for device_id in prop.ids.differenceFromIds(self.device.ids):
+					attr = self._getAttributeDictionaryFromId(device_id)
 
 					driver = node.addChild('driver')
 					driver.setAttributes(attr)
@@ -245,7 +244,7 @@ class AVRDeviceWriter(XMLDeviceWriter):
 					for ram_size in ram_sizes.values:
 						size = ram_size.value
 						# for small RAM sizes, reserve only 16 bytes for the tx buffer
-						if size < 1024 or size > 1024*4:
+						if size < 1024 or size > 1024 * 4:
 							for ram_id in ram_size.ids.differenceFromIds(self.device.ids):
 								attr = self._getAttributeDictionaryFromId(ram_id)
 								attr['name'] = 'tx_buffer'
@@ -263,11 +262,11 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		for prop in props.values:
 			gpios = prop.value
 			gpios.sort(key=lambda k: (k['port'], k['id']))
-			for id in prop.ids.differenceFromIds(self.device.ids):
-				dict = self._getAttributeDictionaryFromId(id)
+			for device_id in prop.ids.differenceFromIds(self.device.ids):
+				device_dict = self._getAttributeDictionaryFromId(device_id)
 				for gpio in gpios:
 					gpio_child = driver.addChild('gpio')
-					gpio_child.setAttributes(dict)
+					gpio_child.setAttributes(device_dict)
 					for name in ['port', 'id', 'pcint', 'extint']:
 						if name in gpio:
 							gpio_child.setAttribute(name, gpio[name])
@@ -275,20 +274,59 @@ class AVRDeviceWriter(XMLDeviceWriter):
 						af_child = gpio_child.addChild('af')
 						af_child.setAttributes(af)
 
-	def _getAttributeDictionaryFromId(self, id):
-		target = id.properties
-		dict = {}
+	def _getAttributeDictionaryFromId(self, device_id):
+		target = device_id.properties
+		device_dict = {}
 		for attr in target:
 			if target[attr] != None:
 				if attr == 'type':
-					dict['device-type'] = target[attr]
+					device_dict['device-type'] = target[attr]
 				if attr == 'name':
-					dict['device-name'] = target[attr]
+					device_dict['device-name'] = target[attr]
 				if attr == 'pin_id':
-					dict['device-pin-id'] = target[attr]
-		return dict
+					device_dict['device-pin-id'] = target[attr]
+		return device_dict
+
+	def _addNamingSchema(self):
+		if self.family == 'xmega':
+			naming_schema = 'at{{ family }}{{ name }}{{ type }}{{ pin_id }}'
+			identifiers = list(itertools.product(("at",),
+												 (self.family,),
+												 self.names,
+												 self.types,
+												 self.pin_ids))
+			devices = ['at' + d.string.replace('none', '') for d in self.device.ids]
+		elif self.family == 'at90':
+			naming_schema = '{{ family }}{{ type }}{{ name }}'
+			identifiers = list(itertools.product((self.family,),
+												 self.types,
+												 self.names))
+			devices = [d.string.replace('none', '') for d in self.device.ids]
+		else:
+			naming_schema = '{{ family }}{{ name }}{{ type }}'
+			identifiers = list(itertools.product((self.family,),
+												 self.names,
+												 self.types))
+			devices = [d.string.replace('none', '') for d in self.device.ids]
+
+		for identifier_parts in identifiers:
+			identifier = ''.join(identifier_parts).replace('none', '')
+
+			if identifier not in devices:
+				child = self.root.prependChild('invalid-device')
+				child.setValue(identifier)
+			else:
+				devices.remove(identifier)
+
+		for device in devices:
+			self.log.error("Found device not matching naming schema: '{}'".format(device))
+
+		child = self.root.prependChild('naming-schema')
+		child.setValue(naming_schema)
 
 	def write(self, folder):
+		self._addNamingSchema()
+
 		names = self.names
 		names.sort(key=int)
 		types = self.types

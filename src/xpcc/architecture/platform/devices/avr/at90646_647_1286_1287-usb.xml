@@ -4,7 +4,8 @@
   <!-- WARNING: This file is generated automatically, do not edit!
  		Please modify the xpcc/tools/device_file_generator code instead and rebuild this file.
  		Be aware, that regenerated files might have a different composition due to technical reasons. -->
-  <device platform="avr" family="at90" name="646|647|1286|1287" size_id="64|128" type="usb">
+  <device platform="avr" family="at90" name="646|647|1286|1287" type="usb">
+    <naming-schema>{{ family }}{{ type }}{{ name }}</naming-schema>
     <flash>65536</flash>
     <flash>131072</flash>
     <ram>4096</ram>

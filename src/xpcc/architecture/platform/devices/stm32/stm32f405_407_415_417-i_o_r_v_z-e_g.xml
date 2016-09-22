@@ -5,6 +5,26 @@
  		Please modify the xpcc/tools/device_file_generator code instead and rebuild this file.
  		Be aware, that regenerated files might have a different composition due to technical reasons. -->
   <device platform="stm32" family="f4" name="405|407|415|417" pin_id="i|o|r|v|z" size_id="e|g">
+    <naming-schema>{{ platform }}f{{ name }}{{ pin_id }}{{ size_id }}</naming-schema>
+    <invalid-device>stm32f417rg</invalid-device>
+    <invalid-device>stm32f417re</invalid-device>
+    <invalid-device>stm32f417og</invalid-device>
+    <invalid-device>stm32f417oe</invalid-device>
+    <invalid-device>stm32f415ze</invalid-device>
+    <invalid-device>stm32f415ve</invalid-device>
+    <invalid-device>stm32f415re</invalid-device>
+    <invalid-device>stm32f415oe</invalid-device>
+    <invalid-device>stm32f415ig</invalid-device>
+    <invalid-device>stm32f415ie</invalid-device>
+    <invalid-device>stm32f407rg</invalid-device>
+    <invalid-device>stm32f407re</invalid-device>
+    <invalid-device>stm32f407og</invalid-device>
+    <invalid-device>stm32f407oe</invalid-device>
+    <invalid-device>stm32f405ze</invalid-device>
+    <invalid-device>stm32f405ve</invalid-device>
+    <invalid-device>stm32f405re</invalid-device>
+    <invalid-device>stm32f405ig</invalid-device>
+    <invalid-device>stm32f405ie</invalid-device>
     <flash device-size-id="e">524288</flash>
     <flash device-size-id="g">1048576</flash>
     <ram>200704</ram>

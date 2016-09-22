@@ -7,15 +7,19 @@
 # license. See the file `LICENSE` for the full license governing this code.
 # -----------------------------------------------------------------------------
 
-import os, sys
-from device import Device
-from stm_reader import STMDeviceReader
-from stm_writer import STMDeviceWriter
-from merger import DeviceMerger
-import glob
+import os
+import sys
+
 # add python module logger to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'device_files'))
+
 from logger import Logger
+
+from dfg.device import Device
+from dfg.merger import DeviceMerger
+from dfg.stm32.stm_reader import STMDeviceReader
+from dfg.stm32.stm_writer import STMDeviceWriter
 
 if __name__ == "__main__":
 	"""

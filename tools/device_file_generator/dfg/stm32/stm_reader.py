@@ -6,21 +6,20 @@
 # license. See the file `LICENSE` for the full license governing this code.
 # -----------------------------------------------------------------------------
 
-from reader import XMLDeviceReader
-from peripheral import Peripheral
-from register import Register
+import os
+import re
+
 from lxml import etree
 
-import os, sys, math, glob, re
-# add python module logger to path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
 from logger import Logger
-# add python module device files to path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'device_files'))
 from device_identifier import DeviceIdentifier
-from stm import stm32_defines
-from stm import stm32f1_remaps
-from stm import stm32_memory
+
+from ..reader import XMLDeviceReader
+
+from .stm import stm32_defines
+from .stm import stm32f1_remaps
+from .stm import stm32_memory
+
 
 class STMDeviceReader(XMLDeviceReader):
 	""" STMDeviceReader
@@ -33,7 +32,7 @@ class STMDeviceReader(XMLDeviceReader):
 	@staticmethod
 	def getDevicesFromFamily(family, logger=None, rootpath=None):
 		if rootpath is None:
-			rootpath = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'STM_devices', 'mcu')
+			rootpath = os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', '..', 'STM_devices', 'mcu')
 		STMDeviceReader.rootpath = rootpath
 
 		STMDeviceReader.familyFile = XMLDeviceReader(os.path.join(rootpath, 'families.xml'), logger)
@@ -42,7 +41,7 @@ class STMDeviceReader(XMLDeviceReader):
 		# devices can contain duplicates due to Hx, Tx, Yx, Ix suffix!
 		# we treat them as single devices, since we don't care about the MCUs package
 		devices = []
-		for i, dev in enumerate(rawDevices):
+		for dev in rawDevices:
 			shortDev = dev[:-2] if dev.endswith('x') else dev
 			if all(not d.startswith(shortDev) for d in devices):
 				devices.append(dev)
@@ -136,7 +135,7 @@ class STMDeviceReader(XMLDeviceReader):
 			elif '2' in mem:
 				memories.append({'name': 'sram2',
 								 'access' : 'rwx',
-								 'start': "0x{:02X}".format(mem_fam['start']['sram'] + ram*1024),
+								 'start': "0x{:02X}".format(mem_fam['start']['sram'] + ram * 1024),
 								 'size': str(val)})
 			elif '3' in mem:
 				memories.append({'name': 'sram3',
@@ -206,8 +205,8 @@ class STMDeviceReader(XMLDeviceReader):
 		# print dev_def.lower(), match.group('table')
 
 		ivectors = []
-		for i, line in enumerate(match.group('table').split('\n')[1:-1]):
-			if '=' not in line: # avoid multiline comment
+		for line in match.group('table').split('\n')[1:-1]:
+			if '=' not in line:  # avoid multiline comment
 				continue
 
 			name, pos = line.split('/*!<')[0].split('=')
@@ -219,7 +218,7 @@ class STMDeviceReader(XMLDeviceReader):
 
 		self.log.debug("STMDeviceReader: Found interrupt vectors:\n" + "\n".join(["{}: {}".format(v['position'], v['name']) for v in ivectors]))
 		self.addProperty('interrupts', ivectors)
-		
+
 		for m in self.modules:
 			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'CAN', 'SPI', 'I2C', 'FSMC', 'FMC', 'RNG', 'RCC', 'USB']):
 				modules.append(m)
@@ -240,9 +239,9 @@ class STMDeviceReader(XMLDeviceReader):
 			modules.extend(dmas)
 
 		invertMode = {'out': 'in', 'in': 'out', 'io': 'io'}
-		nameToMode = {'rx': 'in', 'tx': 'out', 'cts': 'in', 'rts': 'out', 'ck': 'out',	# Uart
-					 'miso': 'in', 'mosi': 'out', 'nss': 'io', 'sck': 'out',	# Spi
-					 'scl': 'out', 'sda': 'io'}	# I2c
+		nameToMode = {'rx': 'in', 'tx': 'out', 'cts': 'in', 'rts': 'out', 'ck': 'out',  # Uart
+					 'miso': 'in', 'mosi': 'out', 'nss': 'io', 'sck': 'out',  # Spi
+					 'scl': 'out', 'sda': 'io'}  # I2c
 
 		# lets load additional information about the GPIO IP
 		ip_file = self.query("//IP[@Name='GPIO']")[0].get('Version')
@@ -274,9 +273,9 @@ class STMDeviceReader(XMLDeviceReader):
 					if not any(sig.get('Name') in name.get('Name') for name in pinSignals):
 						pinSignals.append(sig)
 
-			else:	# F0, F3, F4 and F7
+			else:  # F0, F3, F4 and F7
 				pinSignals = self.gpioFile.compactQuery("//GPIO_Pin[@Name='%s']/PinSignal/SpecificParameter[@Name='GPIO_AF']/.." % name)
-				altFunctions = { a.get('Name') : a[0][0].text.replace('GPIO_AF', '')[:2].replace('_','') for a in pinSignals }
+				altFunctions = { a.get('Name') : a[0][0].text.replace('GPIO_AF', '')[:2].replace('_', '') for a in pinSignals }
 
 				# the analog channels are only available in the Mcu file, not the GPIO file
 				analogSignals = self.compactQuery("//Pin[@Name='{}']/Signal[starts-with(@Name,'ADC')]".format(name))
@@ -356,8 +355,8 @@ class STMDeviceReader(XMLDeviceReader):
 
 				if signal.startswith('RCC'):
 					if 'MCO' in signal:
-						id = "" if len(raw_names) < 3 else raw_names[2]
-						af = {'peripheral': 'ClockOutput' + id}
+						device_id = "" if len(raw_names) < 3 else raw_names[2]
+						af = {'peripheral': 'ClockOutput' + device_id}
 						af.update({'type': 'out'})
 						if af_id:
 							af.update({'id': af_id})
@@ -421,8 +420,8 @@ class STMDeviceReader(XMLDeviceReader):
 						af.update({'id': af_id})
 					# For the STM32F1 the USB pins aren't enabled like other
 					# alternative functions, but by simply enabling the USB core.
-					#else:
-					#	af.update({'id': '10'})
+					# else:
+					# 	af.update({'id': '10'})
 					afs.append(af)
 
 				if signal.startswith('FSMC_') or signal.startswith('FMC_'):

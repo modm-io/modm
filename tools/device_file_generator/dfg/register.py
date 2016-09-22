@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2013, Roboterclub Aachen e.V.
 # All rights reserved.
-# 
+#
 # The file is part of the xpcc library and is released under the 3-clause BSD
 # license. See the file `LICENSE` for the full license governing this code.
 # -----------------------------------------------------------------------------
 
-import os, sys, re
-# add python module logger to path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
+import re
+
 from logger import Logger
 
 class Register():
@@ -22,7 +21,7 @@ class Register():
 			self.log = Logger()
 		else:
 			self.log = logger
-		
+
 		if fields == None:
 			fields = []
 		self.name = name
@@ -33,20 +32,20 @@ class Register():
 
 	def addField(self, name, index):
 		self.fields.append({'name': name, 'index': index})
-	
+
 	def maskFromRegister(self):
 		mask = 0
 		for field in self.fields:
 			mask |= (1 << field['index'])
 		return mask
-	
+
 	def getFieldsWithPattern(self, pattern):
 		results = []
 		for field in self.fields:
 			match = re.search(pattern, field['name'])
 			if match:
 				results.append(field)
-		
+
 		if len(results) > 0:
 			return results
 		return None
@@ -60,18 +59,18 @@ class Register():
 				return False
 			if len(self.fields) != len(other.fields):
 				return False
-			
+
 			return 	all(item in  self.fields for item in other.fields) and \
 					all(item in other.fields for item in  self.fields)
-			
+
 		return NotImplemented
-	
+
 	def __ne__(self, other):
 		result = self.__eq__(other)
 		if result is NotImplemented:
 			return result
 		return not result
-	
+
 	def __hash__(self):
 		return hash(self.name + str(self.fields))
 
@@ -83,14 +82,14 @@ class Register():
 		bW = 15
 		self.fields.sort(key=lambda k : k['index'], reverse=True)
 		for ii in range(self.size):
-			s += "\n+" + ("-"*(bW-1) + "+")*8
-			values = "\n|" + (" "*(bW-1) + "|")*8
-			
+			s += "\n+" + ("-"*(bW - 1) + "+") * 8
+			values = "\n|" + (" "*(bW - 1) + "|") * 8
+
 			for field in self.fields:
 				index = field['index']
-				if ii*8 <= index < (ii+1)*8:
-					index -= ii*8
-					values = values[:2+bW*(7-index)] + field['name'].center(bW-1) + values[1+bW*((8-index)):]
-			
-			s = s + values + "\n+" + ("-"*(bW-1) + "+")*8
+				if ii * 8 <= index < (ii + 1) * 8:
+					index -= ii * 8
+					values = values[:2 + bW * (7 - index)] + field['name'].center(bW - 1) + values[1 + bW * ((8 - index)):]
+
+			s = s + values + "\n+" + ("-"*(bW - 1) + "+") * 8
 		return s

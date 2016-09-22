@@ -1,17 +1,12 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2013, Roboterclub Aachen e.V.
 # All rights reserved.
-# 
+#
 # The file is part of the xpcc library and is released under the 3-clause BSD
 # license. See the file `LICENSE` for the full license governing this code.
 # -----------------------------------------------------------------------------
 
-import os, sys
-# add python module logger to path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
 from logger import Logger
-
-from register import Register
 
 class Peripheral():
 	""" Peripheral
@@ -24,7 +19,7 @@ class Peripheral():
 			self.log = Logger()
 		else:
 			self.log = logger
-		
+
 		self.name = name
 		if registers == None:
 			registers = []
@@ -38,28 +33,28 @@ class Peripheral():
 
 	def getComparisonPeripheral(self, other):
 		assert isinstance(other, Peripheral)
-		
-		dict = {'common_keys': [], 'different_keys': []}
-		
+
+		comparision_dict = {'common_keys': [], 'different_keys': []}
+
 		common = Peripheral()
 		if self.name == other.name:
-			common.name == self.name
+			common.name = self.name
 		self_delta = Peripheral(self.name)
 		other_delta = Peripheral(other.name)
-		
+
 		# compare registers
 		self_regs = list(self.registers)
 		other_regs = list(other.registers)
-		
+
 		common.registers = list(set(self_regs).intersection(other_regs))
 		self_delta.registers = list(set(self_regs).difference(other_regs))
 		other_delta.registers = list(set(other_regs).difference(self_regs))
-		
-		dict['common'] = common
-		dict['self_delta'] = self_delta
-		dict['other_delta'] = other_delta 
-		
-		return dict
+
+		comparision_dict['common'] = common
+		comparision_dict['self_delta'] = self_delta
+		comparision_dict['other_delta'] = other_delta
+
+		return comparision_dict
 
 	def isEmpty(self):
 		return len(self.registers) == 0
@@ -71,12 +66,12 @@ class Peripheral():
 				return True
 			return False
 		return NotImplemented
-	
+
 	def __hash__(self):
 		return hash(self.name + str(self.registers))
-	
+
 	def __ne__(self, other):
-		result = self.__eq__(o)
+		result = self.__eq__(other)
 		if result is NotImplemented:
 			return result
 		return not result

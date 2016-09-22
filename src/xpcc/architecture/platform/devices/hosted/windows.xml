@@ -2,5 +2,6 @@
 <!DOCTYPE rca SYSTEM "../devicefile.dtd">
 <rca version="1.0">
   <device platform="hosted" family="windows">
+    <naming-schema>{{ platform }}/{{ family }}</naming-schema>
   </device>
 </rca>

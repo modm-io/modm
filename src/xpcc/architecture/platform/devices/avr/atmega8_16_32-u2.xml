@@ -4,7 +4,8 @@
   <!-- WARNING: This file is generated automatically, do not edit!
  		Please modify the xpcc/tools/device_file_generator code instead and rebuild this file.
  		Be aware, that regenerated files might have a different composition due to technical reasons. -->
-  <device platform="avr" family="atmega" name="8|16|32" size_id="8|16|32" type="u2">
+  <device platform="avr" family="atmega" name="8|16|32" type="u2">
+    <naming-schema>{{ family }}{{ name }}{{ type }}</naming-schema>
     <flash device-name="8">8192</flash>
     <flash device-name="16">16384</flash>
     <flash device-name="32">32768</flash>

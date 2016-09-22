@@ -6,19 +6,16 @@
 # license. See the file `LICENSE` for the full license governing this code.
 # -----------------------------------------------------------------------------
 
-from reader import XMLDeviceReader
-from peripheral import Peripheral
-from register import Register
-import avr_io
-import avr_mcu
+import math
 
-import os, sys, math
-# add python module logger to path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
-from logger import Logger
-# add python module device files to path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'device_files'))
 from device_identifier import DeviceIdentifier
+
+from ..reader import XMLDeviceReader
+from ..peripheral import Peripheral
+from ..register import Register
+
+from . import avr_io
+from . import avr_mcu
 
 class AVRDeviceReader(XMLDeviceReader):
 	""" AVRDeviceReader
@@ -31,7 +28,6 @@ class AVRDeviceReader(XMLDeviceReader):
 		device = self.query("//device")[0]
 		self.name = device.get('name')
 		architecture = device.get('architecture')
-		family = device.get('family')
 		self.mcu_devices = [{"device": DeviceIdentifier(d['device']), "mcu": d['mcu']} for d in avr_mcu.mcu]
 
 		self.log.info("Parsing AVR PDF: %s %s" % (architecture, self.name))
@@ -55,7 +51,7 @@ class AVRDeviceReader(XMLDeviceReader):
 				dev_name += dev.pin_id
 			else:
 				dev.pin_id = 'none'
-		else: # atmega
+		else:  # atmega
 			dev_name += dev.name
 			if dev.type:
 				dev_name += dev.type
@@ -224,7 +220,7 @@ class AVRDeviceReader(XMLDeviceReader):
 								gpio['af'].append(af)
 								if 'uartspi' in pin_array:
 									repl = {'txd': 'mosi', 'rxd': 'miso', 'xck': 'sck'}
-									af = {'peripheral' : 'UartSpiMaster'+name[4:],
+									af = {'peripheral' : 'UartSpiMaster' + name[4:],
 										  'name': repl[module['name']].capitalize(),
 										  'type': module['dir']}
 									gpio['af'].append(af)
@@ -233,11 +229,11 @@ class AVRDeviceReader(XMLDeviceReader):
 		d = DeviceIdentifier(device)
 		sub_match = []
 		for dev in self.mcu_devices:
-			id = dev['device']
-			if id in d:
+			device_id = dev['device']
+			if device_id in d:
 				return dev
 
-			if id.family == d.family and id.name == d.name:
+			if device_id.family == d.family and device_id.name == d.name:
 				sub_match.append(dev)
 
 		if len(sub_match) == 1:
@@ -291,8 +287,8 @@ class AVRDeviceReader(XMLDeviceReader):
 
 				if bin(fmask).count("1") > 1:
 					start = flsb
-					for iii in range(8*size):
-						if fmask & 2**(iii):
+					for iii in range(8 * size):
+						if fmask & 2 ** (iii):
 							name = fname + str(start)
 							start += 1
 							register.addField(name, iii)
@@ -308,9 +304,9 @@ class AVRDeviceReader(XMLDeviceReader):
 
 			if bin(fmask).count("1") > 1:
 				start = flsb
-				for iii in range(8*size):
-					if fmask & 2**(iii):
-						register.addField('data'+str(start), iii)
+				for iii in range(8 * size):
+					if fmask & 2 ** (iii):
+						register.addField('data' + str(start), iii)
 						start += 1
 
 		return register
@@ -341,13 +337,13 @@ class AVRDeviceReader(XMLDeviceReader):
 	def _getAttributedPortDictionary(self, port):
 		ports = []
 		mask = port['mask']
-		id = 0
+		pin_id = 0
 
-		while id < 16:
+		while pin_id < 16:
 			if mask & 0x01:
-				ports.append({'port': port['port'], 'id': str(id), 'af': []})
+				ports.append({'port': port['port'], 'id': str(pin_id), 'af': []})
 			mask >>= 1
-			id += 1
+			pin_id += 1
 
 		return ports
 

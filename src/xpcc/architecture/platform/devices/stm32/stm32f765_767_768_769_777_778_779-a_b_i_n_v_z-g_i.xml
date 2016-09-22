@@ -5,6 +5,52 @@
  		Please modify the xpcc/tools/device_file_generator code instead and rebuild this file.
  		Be aware, that regenerated files might have a different composition due to technical reasons. -->
   <device platform="stm32" family="f7" name="765|767|768|769|777|778|779" pin_id="a|b|i|n|v|z" size_id="g|i">
+    <naming-schema>{{ platform }}f{{ name }}{{ pin_id }}{{ size_id }}</naming-schema>
+    <invalid-device>stm32f779zi</invalid-device>
+    <invalid-device>stm32f779zg</invalid-device>
+    <invalid-device>stm32f779vi</invalid-device>
+    <invalid-device>stm32f779vg</invalid-device>
+    <invalid-device>stm32f779ng</invalid-device>
+    <invalid-device>stm32f779ig</invalid-device>
+    <invalid-device>stm32f779bg</invalid-device>
+    <invalid-device>stm32f779ag</invalid-device>
+    <invalid-device>stm32f778zi</invalid-device>
+    <invalid-device>stm32f778zg</invalid-device>
+    <invalid-device>stm32f778vi</invalid-device>
+    <invalid-device>stm32f778vg</invalid-device>
+    <invalid-device>stm32f778ni</invalid-device>
+    <invalid-device>stm32f778ng</invalid-device>
+    <invalid-device>stm32f778ii</invalid-device>
+    <invalid-device>stm32f778ig</invalid-device>
+    <invalid-device>stm32f778bi</invalid-device>
+    <invalid-device>stm32f778bg</invalid-device>
+    <invalid-device>stm32f778ag</invalid-device>
+    <invalid-device>stm32f777zg</invalid-device>
+    <invalid-device>stm32f777vg</invalid-device>
+    <invalid-device>stm32f777ng</invalid-device>
+    <invalid-device>stm32f777ig</invalid-device>
+    <invalid-device>stm32f777bg</invalid-device>
+    <invalid-device>stm32f777ai</invalid-device>
+    <invalid-device>stm32f777ag</invalid-device>
+    <invalid-device>stm32f769zi</invalid-device>
+    <invalid-device>stm32f769zg</invalid-device>
+    <invalid-device>stm32f769vi</invalid-device>
+    <invalid-device>stm32f769vg</invalid-device>
+    <invalid-device>stm32f768zi</invalid-device>
+    <invalid-device>stm32f768zg</invalid-device>
+    <invalid-device>stm32f768vi</invalid-device>
+    <invalid-device>stm32f768vg</invalid-device>
+    <invalid-device>stm32f768ni</invalid-device>
+    <invalid-device>stm32f768ng</invalid-device>
+    <invalid-device>stm32f768ii</invalid-device>
+    <invalid-device>stm32f768ig</invalid-device>
+    <invalid-device>stm32f768bi</invalid-device>
+    <invalid-device>stm32f768bg</invalid-device>
+    <invalid-device>stm32f768ag</invalid-device>
+    <invalid-device>stm32f767ai</invalid-device>
+    <invalid-device>stm32f767ag</invalid-device>
+    <invalid-device>stm32f765ai</invalid-device>
+    <invalid-device>stm32f765ag</invalid-device>
     <flash device-size-id="g">1048576</flash>
     <flash device-size-id="i">2097152</flash>
     <ram>610304</ram>

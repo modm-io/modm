@@ -5,6 +5,7 @@
  		Please modify the xpcc/tools/device_file_generator code instead and rebuild this file.
  		Be aware, that regenerated files might have a different composition due to technical reasons. -->
   <device platform="stm32" family="f4" name="446" pin_id="m|r|v|z" size_id="c|e">
+    <naming-schema>{{ platform }}f{{ name }}{{ pin_id }}{{ size_id }}</naming-schema>
     <flash device-size-id="c">262144</flash>
     <flash device-size-id="e">524288</flash>
     <ram>131072</ram>
