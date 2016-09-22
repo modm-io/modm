@@ -4,7 +4,7 @@
   <!-- WARNING: This file is generated automatically, do not edit!
  		Please modify the xpcc/tools/device_file_generator code instead and rebuild this file.
  		Be aware, that regenerated files might have a different composition due to technical reasons. -->
-  <device platform="avr" family="atmega" name="8535" size_id="8" type="none">
+  <device platform="avr" family="atmega" name="8535" type="none">
     <naming-schema>{{ family }}{{ name }}{{ type }}</naming-schema>
     <flash>8192</flash>
     <ram>512</ram>

@@ -4,7 +4,7 @@
   <!-- WARNING: This file is generated automatically, do not edit!
  		Please modify the xpcc/tools/device_file_generator code instead and rebuild this file.
  		Be aware, that regenerated files might have a different composition due to technical reasons. -->
-  <device platform="avr" family="attiny" name="24|44|84" size_id="2|4|8" type="a|none">
+  <device platform="avr" family="attiny" name="24|44|84" type="a|none">
     <naming-schema>{{ family }}{{ name }}{{ type }}</naming-schema>
     <flash device-name="24">2048</flash>
     <flash device-name="44">4096</flash>

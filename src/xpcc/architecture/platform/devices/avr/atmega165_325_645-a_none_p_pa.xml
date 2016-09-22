@@ -4,7 +4,7 @@
   <!-- WARNING: This file is generated automatically, do not edit!
  		Please modify the xpcc/tools/device_file_generator code instead and rebuild this file.
  		Be aware, that regenerated files might have a different composition due to technical reasons. -->
-  <device platform="avr" family="atmega" name="165|325|645" size_id="16|32|64" type="a|none|p|pa">
+  <device platform="avr" family="atmega" name="165|325|645" type="a|none|p|pa">
     <naming-schema>{{ family }}{{ name }}{{ type }}</naming-schema>
     <invalid-device>atmega645pa</invalid-device>
     <invalid-device>atmega165</invalid-device>

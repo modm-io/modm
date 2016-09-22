@@ -4,7 +4,7 @@
   <!-- WARNING: This file is generated automatically, do not edit!
  		Please modify the xpcc/tools/device_file_generator code instead and rebuild this file.
  		Be aware, that regenerated files might have a different composition due to technical reasons. -->
-  <device platform="avr" family="xmega" name="64|128|192|256" pin_id="b|none" size_id="64|128|192|256" type="a3">
+  <device platform="avr" family="xmega" name="64|128|192|256" pin_id="b|none" type="a3">
     <naming-schema>at{{ family }}{{ name }}{{ type }}{{ pin_id }}</naming-schema>
     <invalid-device>atxmega64a3b</invalid-device>
     <invalid-device>atxmega192a3b</invalid-device>
