@@ -19,6 +19,8 @@ class AVRDeviceWriter(XMLDeviceWriter):
 	"""
 	def __init__(self, device, logger=None):
 		XMLDeviceWriter.__init__(self, device, logger)
+		
+		self.root.removeAttribute('size_id')
 
 		self.log.info(("Generating Device File for '%s'." % self.device.ids.string))
 

@@ -36,7 +36,7 @@ class XMLDeviceWriter:
 		props = {p : props[p] for p in props if props[p] != None}
 		self.root = self.tree.addChild('device')
 		# Force an order onto a dictionary in the most stupid way I could think of
-		for name in ['platform', 'family', 'name', 'pin_id', 'type']:
+		for name in ['platform', 'family', 'name', 'pin_id', 'size_id', 'type']:
 			if name in props:
 				self.root.setAttribute(name, props[name])
 
@@ -89,6 +89,12 @@ class XMLElement:
 
 	def setAttribute(self, key, value):
 		self.root.set(key, str(value))
+	
+	def removeAttribute(self, key):
+		try:
+			del self.root.attrib[key]
+		except KeyError:
+			pass
 
 	def addChild(self, name):
 		element = XMLElement()
