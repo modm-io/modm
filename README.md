@@ -24,6 +24,7 @@ This project also has [guide for developers][guide] as well as a [technical blog
 or [have a look at the archive][mailing_archive].
 - You found a bug? [Open up an issue, we don't bite][issues].
 - You want to contribute? [Read the contribution guidelines][contributing] and [open a pull request so we can merge it][prs].
+- You want to port xpcc? [Read our porting guide][porting].
 
 The source code is freely available under a 3-clause BSD license, so feel
 free to fork this project and adapt it to your needs.
@@ -203,6 +204,7 @@ Daniel Krebs ([@daniel-k](https://github.com/daniel-k)),
 
 [prs]: https://github.com/roboterclubaachen/xpcc/pulls
 [contributing]: https://github.com/roboterclubaachen/xpcc/tree/develop/CONTRIBUTING.md
+[porting]: https://github.com/roboterclubaachen/xpcc/blob/develop/PORTING.md
 [issues]: https://github.com/roboterclubaachen/xpcc/issues
 [rca_ev]: http://www.roboterclub.rwth-aachen.de/
 [eurobot]: http://www.eurobot.org/
