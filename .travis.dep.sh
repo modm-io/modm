@@ -18,8 +18,8 @@ if [ ! -d "$HOME/cache/boost1.54-1.54.0" ]; then
 	tar -xzf libboost1.54-dev-src.tar.gz
 	rm libboost1.54-dev-src.tar.gz
 	cd boost1.54-1.54.0
-	./bootstrap.sh
-	./b2
+	./bootstrap.sh > /dev/null
+	./b2 > /dev/null
 fi
 if [ ! -d "$HOME/cache/boost" ]; then
 	echo "Installing libboost1.54 package..."
