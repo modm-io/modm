@@ -4,6 +4,7 @@
   <device platform="hosted" family="darwin">
     <naming-schema>{{ platform }}/{{ family }}</naming-schema>
     <driver type="can" name="hosted"/>
+    <driver type="can" name="canusb"/>
     <driver type="uart" name="hosted"/>
     <driver type="uart" name="posix"/>
   </device>

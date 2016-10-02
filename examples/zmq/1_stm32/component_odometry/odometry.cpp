@@ -35,7 +35,7 @@ component::Odometry::update()
 	{
 		XPCC_LOG_INFO << XPCC_FILE_INFO << "Odometry update" << xpcc::endl;
 
-		robot::packet::Location location(xpcc::stm32::Timer2::getValue(), 11, 0.5);
+		robot::packet::Location location(xpcc::stm32::Timer1::getValue(), 11, 0.5);
 
 		robot::EventPublisher::robotLocation(getCommunicator(), location);
 	}

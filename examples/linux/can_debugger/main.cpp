@@ -3,7 +3,7 @@
 #include <xpcc/architecture.hpp>
 
 #include <xpcc/architecture/interface/can.hpp>
-#include <xpcc/architecture/platform/driver/can/hosted/canusb.hpp>
+#include <xpcc/architecture/platform/driver/can/canusb/canusb.hpp>
 
 #include <cstdlib>
 

@@ -3,8 +3,8 @@
 #include <xpcc/architecture.hpp>
 
 #include <xpcc/architecture/interface/can.hpp>
-#include <xpcc/architecture/platform/driver/can/hosted/canusb.hpp>
-#include <xpcc/architecture/platform/driver/can/hosted/linux/socketcan.hpp>
+#include <xpcc/architecture/platform/driver/can/canusb/canusb.hpp>
+#include <xpcc/architecture/platform/driver/can/socketcan/socketcan.hpp>
 
 #include <xpcc/communication.hpp>
 #include <xpcc/communication/xpcc/backend/can.hpp>
