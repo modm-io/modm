@@ -486,7 +486,7 @@ def generate(env, **kw):
 		if parser.has_section('program'):
 			program_type = parser.get('program', 'tool')
 		else:
-			for ptype in ['openocd', 'stlink', 'lpclink']:
+			for ptype in ['openocd', 'black_magic_probe', 'stlink', 'lpclink']:
 				if parser.has_section(ptype):
 					program_type = ptype
 					break
@@ -498,6 +498,9 @@ def generate(env, **kw):
 				env['OPENOCD_COMMANDS'] = parser.get('openocd', 'commands', 'default')
 				env['OPENOCD_REMOTE_HOST'] = parser.get('openocd', 'remote_host', 'localhost')
 				env['OPENOCD_REMOTE_USER'] = parser.get('openocd', 'remote_user', 'pi')
+			if program_type == 'black_magic_probe':
+				env.Tool('black_magic_probe')
+				env['BLACK_MAGIC_PROBE_PORT'] = parser.get('black_magic_probe', 'port')
 			elif program_type == 'stlink':
 				env.Tool('stlink')
 			elif program_type == 'lpclink':

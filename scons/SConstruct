@@ -73,6 +73,8 @@ else:
     if 'avrdude' in env['XPCC_CONFIG']:
         env.Alias('program', env.Avrdude(hexfile))
         env.Alias('fuse', env.AvrdudeFuses())
+    elif 'black_magic_probe' in env['XPCC_CONFIG']:
+        env.Alias('program', env.BlackMagicProbe(program))
     elif 'openocd' in env['XPCC_CONFIG']:
         env.Alias('program', env.OpenOcd(program))
         env.Alias('openocd-debug', env.OpenOcdDebug(program))
