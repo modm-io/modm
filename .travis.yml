@@ -1,16 +1,14 @@
 language: cpp
 compiler: gcc
-sudo: false
+sudo: required
+dist: trusty
 
 addons:
  apt:
   sources:
    - ubuntu-toolchain-r-test
   packages:
-   - scons
    - python
-   - python-jinja2
-   - python-lxml
    - libsdl1.2-dev
    - libsdl-image1.2-dev
    - libgtkmm-2.4-dev
@@ -35,6 +33,9 @@ before_install:
  - avr-g++ --version
  - which arm-none-eabi-g++
  - arm-none-eabi-g++ --version
+ - pip install --upgrade pip wheel
+ - pip install jinja2 lxml
+ - pip install --egg SCons
 
 cache:
  directories:
