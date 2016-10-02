@@ -45,7 +45,6 @@ if [ ! -d "$HOME/cache/gcc-arm-none-eabi-4_9-2015q3" ]; then
 fi
 if [ ! -d "$HOME/cache/boost1.54-1.54.0" ]; then
 	echo "Downloading and building libboost1.54 package..."
-	mkdir cd $HOME/cache
 	wget http://box.xpcc.io/libboost1.54-dev-src.tar.gz
 	tar -xzf libboost1.54-dev-src.tar.gz
 	rm libboost1.54-dev-src.tar.gz
