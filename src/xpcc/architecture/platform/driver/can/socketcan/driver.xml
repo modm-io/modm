@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE rca SYSTEM "../../xml/driver.dtd">
+<rca version="1.0">
+	<driver type="can" name="socketcan">
+		<static>socketcan.hpp</static>
+		<static>socketcan.cpp</static>
+	</driver>
+</rca>

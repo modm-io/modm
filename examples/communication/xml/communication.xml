@@ -2,6 +2,7 @@
 <!DOCTYPE rca SYSTEM "communication.dtd">
 <rca version="1.0">
 
+<!-- Basic data types -->
 <builtin name="int8_t" size="1" />
 <builtin name="int16_t" size="2" />
 <builtin name="int32_t" size="4" />
@@ -16,6 +17,7 @@
 		This type is defined to make it possible to send bools from everywhere.</description>
 </typedef>
 
+<!-- Aggregated data types -->
 <struct name="position">
 	<description>Position of the Robot on the Playground.</description>
 	
@@ -23,6 +25,19 @@
 	<element name="y" type="int16_t" unit="mm" />
 </struct>
 
+<struct name="Location">
+	<description>Lage = Position + Orientierung</description>
+	<element name="x"   type="int16_t" unit="mm"  />
+	<element name="y"   type="int16_t" unit="mm"  />
+	<element name="phi" type="float"   unit="rad" />
+</struct>
+
+<!-- Events -->
+<event name="Robot Location" type="Location" id="0x13">
+	<description>The current Location of the Robot. Pivot point of the differential drive.</description>
+</event>
+
+<!-- Components -->
 <component name="sender" id="0x01">
 	
 </component>
@@ -34,7 +49,28 @@
 	</actions>
 </component>
 
+<component name="odometry" id="0x03">
+	<actions>
+		<action name="set led red" id="0x09" parameterType="Bool" />
+	</actions>
+	<events>
+		<publish>
+			<event name="Robot Location" />
+			<!-- <event name="Odometry Speed" /> -->
+			<!-- <event name="Odometry Encoder Integration" /> -->
+		</publish>
+	</events>
+</component>
 
+<component name="gui" id="0x04">
+	<events>
+		<subscribe>
+			<event name="Robot Location" />
+		</subscribe>
+	</events>
+</component>
+
+<!-- Containers -->
 <container name="sender">
 	<component name="sender" />
 </container>
@@ -43,9 +79,17 @@
 	<component name="receiver" />
 </container>
 
+<container name="odometry">
+	<component name="odometry" />
+</container>
+
 <container name="senderreceiver">
 	<component name="sender" />
 	<component name="receiver" />
+</container>
+
+<container name="gui">
+	<component name="gui" />
 </container>
 
 </rca>

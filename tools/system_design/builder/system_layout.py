@@ -37,7 +37,7 @@ import numpy as np
 from pyx import *
 from pyx.connector import arc, curve
 
-sys.path = [os.path.join(os.path.dirname(__file__), '..')] + sys.path
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from xmlparser.utils import SingleAssignDictionary
 
 class SystemLayoutBuilder(builder_base.Builder):

@@ -67,7 +67,7 @@ FLASH_STORAGE(uint8_t canFilter[]) =
 
 namespace component
 {
-	Sender sender(robot::component::SENDER, &dispatcher);
+	Sender sender(robot::component::SENDER, dispatcher);
 }
 
 // ----------------------------------------------------------------------------

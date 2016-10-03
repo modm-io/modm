@@ -2,7 +2,8 @@
 #include <xpcc/architecture.hpp>
 
 #include <xpcc/communication.hpp>
-#include <xpcc/communication/xpcc/backend/tipc.hpp>
+// #include <xpcc/communication/xpcc/backend/tipc.hpp>
+#include <xpcc/communication/xpcc/backend/zeromq.hpp>
 
 #include <xpcc/debug/logger.hpp>
 
@@ -16,7 +17,13 @@
 #include "communication/postman.hpp"
 #include "communication/identifier.hpp"
 
-xpcc::TipcConnector connector;
+// Use TIPC on Linux only
+// xpcc::TipcConnector connector;
+
+// Use ZeroMQ on Linux and Darwin
+const std::string endpointIn  = "tcp://127.0.0.1:8211";
+const std::string endpointOut = "tcp://127.0.0.1:8212";
+static xpcc::ZeroMQConnector connector(endpointIn, endpointOut, xpcc::ZeroMQConnector::Mode::SubPush);
 
 // create an instance of the generated postman
 Postman postman;
@@ -25,19 +32,20 @@ xpcc::Dispatcher dispatcher(&connector, &postman);
 
 namespace component
 {
-	Sender sender(robot::component::SENDER, &dispatcher);
-	Receiver receiver(robot::component::RECEIVER, &dispatcher);
+	Sender sender(robot::component::SENDER, dispatcher);
+	Receiver receiver(robot::component::RECEIVER, dispatcher);
 }
 
 int
 main()
 {
-	connector.addReceiverId(robot::component::SENDER);
-	connector.addReceiverId(robot::component::RECEIVER);
+	// Required for TIPC on Linux only
+	// connector.addReceiverId(robot::component::SENDER);
+	// connector.addReceiverId(robot::component::RECEIVER);
 	
 	XPCC_LOG_INFO << "Welcome to the communication test!" << xpcc::endl; 
 	
-	while (1)
+	while (true)
 	{
 		// deliver received messages
 		dispatcher.update();

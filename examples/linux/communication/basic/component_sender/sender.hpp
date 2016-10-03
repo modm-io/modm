@@ -41,7 +41,7 @@ namespace component
 	class Sender : public xpcc::AbstractComponent
 	{
 	public:
-		Sender(uint8_t id, xpcc::Dispatcher *communication);
+		Sender(uint8_t id, xpcc::Dispatcher &communication);
 		
 		void
 		update();

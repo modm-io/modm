@@ -40,7 +40,7 @@ namespace component
 	class Receiver : public xpcc::AbstractComponent
 	{
 	public:
-		Receiver(uint8_t id, xpcc::Dispatcher *communication);
+		Receiver(uint8_t id, xpcc::Dispatcher &communication);
 		
 		void
 		actionSetPosition(const xpcc::ResponseHandle& handle,

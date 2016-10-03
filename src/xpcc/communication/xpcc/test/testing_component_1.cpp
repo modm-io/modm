@@ -30,7 +30,7 @@
 
 #include "testing_component_1.hpp"
 
-TestingComponent1::TestingComponent1(xpcc::Dispatcher *communication,
+TestingComponent1::TestingComponent1(xpcc::Dispatcher &communication,
 		Timeline *timeline) :
 	xpcc::AbstractComponent(1, communication),
 	timeline(timeline),

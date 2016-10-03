@@ -42,8 +42,8 @@ DispatcherTest::setUp()
 	dispatcher = new xpcc::Dispatcher(backend, postman);
 	timeline = new Timeline();
 	
-	component1 = new TestingComponent1(dispatcher, timeline);
-	component2 = new TestingComponent2(dispatcher, timeline);
+	component1 = new TestingComponent1(*dispatcher, timeline);
+	component2 = new TestingComponent2(*dispatcher, timeline);
 	
 	postman->component1 = component1;
 	postman->component2 = component2;
