@@ -190,15 +190,11 @@ protected:
 /**
  * BME280 digital absolute pressure sensor driver
  *
- * The BME280 is a high precision digital pressure sensor with I2C interface.
- * Unfortunately this sensor is so sensitive, it will give you wrong results
- * when there is traffic on the I2C during either temperature or pressure
- * conversion. So during that time make sure no other sensors on the bus
- * are read out.
+ * The BME280 is a high precision digital temperature, pressure and humidity sensor with I2C interface.
  *
- * For further information, consult the
- * <a href="http://www.bosch-sensortec.com/content/language1/downloads/BST-BMP085-DS000-06.pdf">
- * datasheet</a>.
+ * It is known that many BME280-modules suffer from self-heating (I2C pull-ups?). 
+ * So the reported temperature is about 1 to 3 degree higher than with other sensors.
+ * Forced ventilation can drop the temperature by 2 to 3 degrees.
  *
  * @author  strongly-typed
  * @ingroup driver_pressure
