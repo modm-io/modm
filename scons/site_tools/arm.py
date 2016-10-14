@@ -124,7 +124,7 @@ def generate(env, **kw):
 		"$FPU",
 		"$THUMB",			# use THUMB='-mthumb' to compile as thumb code (default for AT91SAM)
 		"-mthumb-interwork",
-		"-Os",
+		"$OPTIMIZATION",
 		"-gdwarf-2",
 		"-funsigned-char",
 		"-funsigned-bitfields",

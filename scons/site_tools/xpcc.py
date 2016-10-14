@@ -354,6 +354,11 @@ def generate(env, **kw):
 		if buildpath is None:
 			buildpath = parser.get('build', 'buildpath', os.path.join(os.curdir, 'build/'))
 
+		# optimization level can be declared in project.cfg
+		optimization = parser.get('build', 'optimization', 's')
+		# but can be overwritten by command line
+		optimization = ARGUMENTS.get('optimization', optimization)
+
 		# load parameters if available
 		if parser.has_section('parameters'):
 			env['XPCC_USER_PARAMETERS'] = parser.items('parameters')
@@ -387,6 +392,15 @@ def generate(env, **kw):
 	env['XPCC_CONFIG_FILE'] = os.path.abspath(configfile)
 	env['XPCC_SYSTEM_BUILDER'] = os.path.join(rootpath, 'tools', 'system_design', 'builder')
 	env['XPCC_DEVICE'] = device 			# needed by the platform tools
+
+	# compiler optimization
+	optimization_levels = ['0', '1', '2', '3', 's']
+	if optimization in optimization_levels:
+		env['OPTIMIZATION'] = "-O{}".format(optimization)
+	else:
+		env.Error("scons: Unknown compiler optimization level '{}'!".format(optimization))
+		env.Error("Available optimization levels are [{}]".format(', '.join(optimization_levels)))
+		Exit(1)
 
 	# tools which are used independently of the architecture
 	env.Tool('template') # needs to be added before platform_tools

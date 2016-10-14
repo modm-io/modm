@@ -121,7 +121,7 @@ def generate(env, **kw):
 	# flags for C and C++
 	env['CCFLAGS'] = [
 		"-mmcu=$AVR_DEVICE", 
-		"-Os",
+		"$OPTIMIZATION",
 		"-gdwarf-2", 
 		"-funsigned-char",
 		"-funsigned-bitfields", 

@@ -89,6 +89,7 @@ def generate(env, **kw):
 		"-Wundef",
 		"-ggdb",
 		"-DBASENAME=${SOURCE.file}",
+		"$OPTIMIZATION",
 	]
 
 	#if c_compiler == 'clang':
