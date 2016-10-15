@@ -140,6 +140,7 @@ def generate(env, **kw):
 		"-Wa,-adhlns=${TARGET.base}.lst",
 		"-DBASENAME=${SOURCE.file}",
 	]
+	env['CCFLAGS'] += env['XPCC_ADDITIONAL_CCFLAGS']
 	
 	# C++ flags
 	env['CXXFLAGS'] = [

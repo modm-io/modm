@@ -359,6 +359,8 @@ def generate(env, **kw):
 		# but can be overwritten by command line
 		optimization = ARGUMENTS.get('optimization', optimization)
 
+		env['XPCC_ADDITIONAL_CCFLAGS'] = parser.get('build', 'ccflags', '').split()
+
 		# load parameters if available
 		if parser.has_section('parameters'):
 			env['XPCC_USER_PARAMETERS'] = parser.items('parameters')

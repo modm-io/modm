@@ -152,6 +152,7 @@ def generate(env, **kw):
 		"-DBASENAME=${SOURCE.file}",
 		"-fdiagnostics-color=auto",
 	]
+	env['CCFLAGS'] += env['XPCC_ADDITIONAL_CCFLAGS']
 
 	# Platforms with single precision float support
 	if env['ARCHITECTURE'] in ['cortex-m4f', 'cortex-m7f']:
