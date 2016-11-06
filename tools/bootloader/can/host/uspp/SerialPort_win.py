@@ -1,5 +1,4 @@
-# -*- coding: iso-8859-1 -*-
-
+# -*- coding: utf-8 -*-
 ##########################################################################
 # USPP Library (Universal Serial Port Python Library)
 #
@@ -26,12 +25,12 @@
 # Purpose:   Handle low level access to serial port in windows.
 #
 # Author:    Isaac Barona Martinez <ibarona@gmail.com>
-# Copyright: (c) 2001 by Isaac Barona Martínez
+# Copyright: (c) 2001 by Isaac Barona MartÃ­nez
 # Licence:   LGPL
 #
 # Created:   26 June 2001
 # History:
-# 20 January 2002 : Damien Géranton <dgeranton@voila.fr>
+# 20 January 2002 : Damien GÃ©ranton <dgeranton@voila.fr>
 #  Bug fix for Win2000, the file must not be open with
 #  FILE_FLAG_OVERLAPPED
 #

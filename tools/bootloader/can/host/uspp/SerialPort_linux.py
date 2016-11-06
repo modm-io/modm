@@ -1,5 +1,4 @@
-# -*- coding: iso-8859-1 -*-
-
+# -*- coding: utf-8 -*-
 ##########################################################################
 # USPP Library (Universal Serial Port Python Library)
 #
@@ -26,7 +25,7 @@
 # Purpose:   Handle low level access to serial port in linux.
 #
 # Author:    Isaac Barona Martinez <ibarona@gmail.com>
-# Copyright: (c) 2006 by Isaac Barona Martínez
+# Copyright: (c) 2006 by Isaac Barona MartÃ­nez
 # Licence:   LGPL
 #
 # Created:   26 June 2001

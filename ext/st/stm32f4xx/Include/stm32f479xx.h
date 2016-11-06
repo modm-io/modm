@@ -9,7 +9,7 @@
   *          This file contains:
   *           - Data structures and the address mapping for all peripherals
   *           - peripherals registers declarations and bits definition
-  *           - Macros to access peripheral’s registers hardware
+  *           - Macros to access peripheral's registers hardware
   *
   ******************************************************************************
   * @attention
