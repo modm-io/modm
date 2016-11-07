@@ -1,6 +1,6 @@
 avr32_dfu_config.py
 
-Copyright 2012 strongly-typed
+Copyright 2012 Sascha Schade
 
 Configuration Utility for pre-programmed DFU USB Bootloader
 ===========================================================

@@ -1,6 +1,8 @@
 /*
     FreeRTOS V7.0.1 - Copyright (C) 2011 Real Time Engineers Ltd.
-	
+
+    Copyright (c) 2011-2012, Fabian Greif
+    Copyright (c) 2012, 2015, Niklas Hauser
 
     ***************************************************************************
      *                                                                       *

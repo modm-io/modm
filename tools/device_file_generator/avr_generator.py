@@ -1,10 +1,17 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
-# Copyright (c) 2013, Roboterclub Aachen e.V.
-# All rights reserved.
 #
-# The file is part of the xpcc library and is released under the 3-clause BSD
-# license. See the file `LICENSE` for the full license governing this code.
+# Copyright (c) 2010-2011, 2016, Fabian Greif
+# Copyright (c) 2012, David Hebbeker
+# Copyright (c) 2012-2013, 2015, Niklas Hauser
+# Copyright (c) 2012, Sascha Schade
+# Copyright (c) 2016, Daniel Krebs
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
 import os

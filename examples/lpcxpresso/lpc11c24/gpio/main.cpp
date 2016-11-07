@@ -1,3 +1,16 @@
+/*
+ * Copyright (c) 2012, Sascha Schade
+ * Copyright (c) 2014-2015, Kevin Laeufer
+ * Copyright (c) 2015-2016, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
 /**
  * \brief	Minimal example for LPC11C24 on LPCXpresso board.
  *
@@ -5,7 +18,7 @@
  * If the GPIO P3_2 (lower right corner) is tied low
  * the LED2 is switched off.
  *
- * Tested in hardware 2012-08-08 by strongly-typed.
+ * Tested in hardware 2012-08-08 by Sascha Schade.
  * Tested again 2014-08-01.
  */
 

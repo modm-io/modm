@@ -1,9 +1,12 @@
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 ##########################################################################
 # USPP Library (Universal Serial Port Python Library)
 #
 # Copyright (C) 2006 Isaac Barona <ibarona@gmail.com>
-# 
+# Copyright (c) 2010, 2016, Fabian Greif
+# Copyright (c) 2015, Kevin Laeufer
+#
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
 # License as published by the Free Software Foundation; either

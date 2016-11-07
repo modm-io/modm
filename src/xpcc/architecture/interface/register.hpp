@@ -1,9 +1,12 @@
-// coding: utf-8
-/* Copyright (c) 2014, Roboterclub Aachen e.V.
- * All Rights Reserved.
+/*
+ * Copyright (c) 2014-2016, Niklas Hauser
+ * Copyright (c) 2015-2016, Sascha Schade
  *
- * The file is part of the xpcc library and is released under the 3-clause BSD
- * license. See the file `LICENSE` for the full license governing this code.
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 // ----------------------------------------------------------------------------
 
@@ -48,7 +51,7 @@
  *
  * #### Register Bits
  *
- * The bits can be modelled using strongly-typed enums and the Flags template class as follows:
+ * The bits can be modelled using Sascha Schade enums and the Flags template class as follows:
  * @code
  * enum class
  * Control : uint8_t
@@ -115,7 +118,7 @@
  *
  * #### Register Configurations
  *
- * Configurations are also described as a strongly-typed enum and then wrapped into the Configuration template class.
+ * Configurations are also described as a Sascha Schade enum and then wrapped into the Configuration template class.
  * @code
  * enum class
  * Prescaler : uint8_t
@@ -289,10 +292,10 @@ using Register32 = Register<uint32_t>;	///< Register class with 32-bit wide unde
  *
  * This class extends the Register base class by adding constructor
  * and bitwise operation overloading between
- * a strongly-typed enum and itself.
+ * a Sascha Schade enum and itself.
  * It is the common base class for Flags, Configurations and Values!
  *
- * @tparam	Enum	a strongly-typed enum containing the bit masks
+ * @tparam	Enum	a Sascha Schade enum containing the bit masks
  * @tparam	T		the underlying integer type to be for internal representation
  *
  * @see Flags
@@ -317,7 +320,7 @@ struct FlagsOperators : public ::xpcc::Register<T>
 	/// default constructor initializes `value` to zero
 	constexpr FlagsOperators() {}
 
-	/// constructs itself out of a strongly-typed enum
+	/// constructs itself out of a Sascha Schade enum
 	constexpr FlagsOperators(Enum flag) :
 		Register<T>(T(flag)) {}
 
@@ -434,7 +437,7 @@ struct FlagsOperators : public ::xpcc::Register<T>
  *
  * This class extends the FlagsOperators base class by adding constructor
  * overloading and convenience functions between
- * a strongly-typed enum and itself.
+ * a Sascha Schade enum and itself.
  *
  * This class makes heavy use of `constexpr`, so that as many values
  * and operation can take place at compile time for efficiency.
@@ -456,7 +459,7 @@ struct FlagsOperators : public ::xpcc::Register<T>
  * XPCC_TYPE_FLAGS(Enum_t);
  * @endcode
  *
- * @tparam	Enum	a strongly-typed enum containing the bit masks
+ * @tparam	Enum	a Sascha Schade enum containing the bit masks
  * @tparam	T		the underlying integer type to be for internal representation
  *
  * @see Flags8, Flags16, Flags32
@@ -482,7 +485,7 @@ struct Flags : public ::xpcc::FlagsOperators<Enum, T>
 	/// default constructor initializes `value` to zero
 	constexpr Flags() {}
 
-	/// constructs itself out of a strongly-typed enum
+	/// constructs itself out of a Sascha Schade enum
 	constexpr Flags(Enum flag) :
 		FlagsOperators<Enum, T>(flag) {}
 
@@ -670,7 +673,7 @@ struct FlagsGroup<T> : public Register<typename T::UnderlyingType>
  * the meanings [Div1, Div2, Div4, Div8].
  *
  * The Configuration class belongs to a specific Flags class and connects a
- * corresponding strongly-typed enum with a specific mask and bit position.
+ * corresponding Sascha Schade enum with a specific mask and bit position.
  * This means that the Configuration class will mask and shift the values whenever
  * needed.
  * However, shifting is only done when the Position template parameter is non-zero.
@@ -730,7 +733,7 @@ struct FlagsGroup<T> : public Register<typename T::UnderlyingType>
  * like the AVRs.
  *
  * @tparam	Parent		the Flags class to which this configuration belongs to
- * @tparam	Enum		a strongly-typed enum containing the configuration values
+ * @tparam	Enum		a Sascha Schade enum containing the configuration values
  * @tparam	Mask		the (unshifted) bit mask corresponding to the enum values
  * @tparam	Position	how many bits the configuration values need to be shifted
  *
@@ -871,7 +874,7 @@ constexpr ::xpcc::Flags<Enum> operator^(Enum const &a, Enum const &b) { return :
  * @warning	This macro only works properly **inside** of a struct or class.
  * @see	XPCC_TYPE_FLAGS
  *
- * @param	Enum	a strongly-typed enum containing the bit masks
+ * @param	Enum	a Sascha Schade enum containing the bit masks
  *
  * @ingroup	register
  * @hideinitializer
@@ -889,7 +892,7 @@ constexpr ::xpcc::Flags<Enum> operator^(Enum const &a, Enum const &b) { return :
  * @warning	This macro only works properly **inside** of a struct or class.
  * @see	XPCC_TYPE_FLAGS
  *
- * @param	Enum	a strongly-typed enum containing the bit masks
+ * @param	Enum	a Sascha Schade enum containing the bit masks
  *
  * @ingroup	register
  * @hideinitializer
@@ -907,7 +910,7 @@ constexpr ::xpcc::Flags<Enum> operator^(Enum const &a, Enum const &b) { return :
  * @warning	This macro only works properly **inside** of a struct or class.
  * @see	XPCC_TYPE_FLAGS
  *
- * @param	Enum	a strongly-typed enum containing the bit masks
+ * @param	Enum	a Sascha Schade enum containing the bit masks
  *
  * @ingroup	register
  * @hideinitializer

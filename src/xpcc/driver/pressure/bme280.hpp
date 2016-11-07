@@ -1,9 +1,11 @@
-// coding: utf-8
-/* Copyright (c) 2016, Roboterclub Aachen e. V.
- * All Rights Reserved.
+/*
+ * Copyright (c) 2016, Sascha Schade
  *
- * The file is part of the xpcc library and is released under the 3-clause BSD
- * license. See the file `LICENSE` for the full license governing this code.
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 // ----------------------------------------------------------------------------
 
@@ -196,7 +198,7 @@ protected:
  * So the reported temperature is about 1 to 3 degree higher than with other sensors.
  * Forced ventilation can drop the temperature by 2 to 3 degrees.
  *
- * @author  strongly-typed
+ * @author  Sascha Schade
  * @ingroup driver_pressure
  *
  * @tparam I2cMaster I2C interface

@@ -1,3 +1,16 @@
+/*
+ * Copyright (c) 2013, Kevin Laeufer
+ * Copyright (c) 2013-2014, Sascha Schade
+ * Copyright (c) 2013-2016, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
 #include <xpcc/architecture/platform.hpp>
 #include <xpcc/processing.hpp>
 #include <xpcc/debug/logger.hpp>
@@ -7,7 +20,7 @@
  *
  * Connect PB8 / PB9 to a CAN transceiver which is connected to a CAN bus.
  *
- * Tested in hardware on 2013-12-17 by strongly-typed.
+ * Tested in hardware on 2013-12-17 by Sascha Schade.
  */
 
 // Create an IODeviceWrapper around the Uart Peripheral we want to use

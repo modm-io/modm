@@ -1,9 +1,12 @@
-// coding: utf-8
-/* Copyright (c) 2015, Roboterclub Aachen e. V.
- * All Rights Reserved.
+/*
+ * Copyright (c) 2015, Sascha Schade
+ * Copyright (c) 2015, Niklas Hauser
  *
- * The file is part of the xpcc library and is released under the 3-clause BSD
- * license. See the file `LICENSE` for the full license governing this code.
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 // ----------------------------------------------------------------------------
 
@@ -43,7 +46,7 @@ public:
  *
  * @ingroup driver_gpio
  *
- * @author  strongly-typed
+ * @author  Sascha Schade
  * @author  Niklas Hauser
  */
 template < class I2cMaster >

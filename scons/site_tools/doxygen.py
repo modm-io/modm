@@ -3,6 +3,7 @@
 # Astxx, the Asterisk C++ API and Utility Library.
 # Copyright (C) 2005, 2006  Matthew A. Nicholson
 # Copyright (C) 2006  Tim Blechmann
+# Copyright (c) 2009-2012, Fabian Greif
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public

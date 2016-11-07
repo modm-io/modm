@@ -136,7 +136,7 @@ Niklas Hauser ([@salkinium](https://github.com/salkinium)) and
 Kevin Läufer ([@ekiwi](https://github.com/ekiwi)) with significant contributions from
 Fabian Greif ([@dergraaf](https://github.com/dergraaf)),
 Daniel Krebs ([@daniel-k](https://github.com/daniel-k)),
-[@strongly-typed](https://github.com/strongly-typed), [@georgi-g](https://github.com/georgi-g) and
+Sascha Schade [@strongly-typed](https://github.com/strongly-typed), [@georgi-g](https://github.com/georgi-g) and
 [@thundernail](https://github.com/thundernail).
 
 ## Folder structure
