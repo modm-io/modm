@@ -7,7 +7,6 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc_config.hpp>
 #include "timer_{{ id }}.hpp"
 
 void
@@ -38,11 +37,11 @@ xpcc::stm32::Timer{{ id }}::setMode(Mode mode)
 	TIM{{ id }}->CR2 = 0;
 }
 
-%% if (id == 6) and (target is stm32f2 or target is stm32f3 or target is stm32f4 or target is stm32f7)
+%% if (id == 6) and (target.family in ["f2", "f3", "f4", "f7"])
 %%   set interrupt_vector = "TIM6_DAC_IRQn"
 %% elif (id == 7) and ((target.name in ["328", "334"]) or (target.name in ["303"] and target.size_id in ["8"]))
 %%   set interrupt_vector = "TIM7_DAC2_IRQn"
-%% elif (id == 18) and (target is stm32f3 and target.name == "373")
+%% elif (id == 18) and (target.family == "f3" and target.name == "373")
 %%   set interrupt_vector = "TIM18_DAC2_IRQn"
 %% else
 %%   set interrupt_vector = "TIM" ~ id ~ "_IRQn"

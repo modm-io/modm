@@ -1,0 +1,80 @@
+
+def get_properties(env):
+    device = env[":target"]
+    driver = device.get_driver("timer")
+    properties = device.properties
+    properties["target"] = device.identifier
+    properties["partname"] = device.partname
+    properties["driver"] = driver
+    return properties
+
+def get_connectors(instance):
+    if instance in [1, 8]:
+        return ["Channel1", "Channel1N", "Channel2", "Channel2N",
+                "Channel3", "Channel3N", "Channel4", "Channel4N",
+                "ExternalTrigger", "BreakIn"]
+    elif instance in [2, 3, 4, 5, 19]:
+        return ["Channel1", "Channel2", "Channel3", "Channel4", "ExternalTrigger"]
+    elif instance in [9, 12]:
+        return ["Channel1", "Channel2"]
+    elif instance in [10, 11, 13, 14]:
+        return ["Channel1"]
+    elif instance in [15, 16, 17]:
+        return ["Channel1", "Channel1N", "Channel2", "BreakIn"]
+    return []
+
+class Instance(Module):
+    def __init__(self, instance):
+        self.instance = instance
+
+    def init(self, module):
+        module.name = str(self.instance)
+        module.description = "Timer {} instance".format(self.instance)
+
+    def prepare(self, module, options):
+        module.depends(":platform:timer")
+        return True
+
+    def build(self, env):
+        properties = get_properties(env)
+        properties["id"] = int(self.instance)
+
+        properties["connectors"] = get_connectors(self.instance)
+
+        env.substitutions = properties
+        env.outbasepath = "src/modm/platform/timer"
+
+        source_timer = "general_purpose"
+        if self.instance in [1, 8]:
+            source_timer = "advanced"
+        elif self.instance in [6, 7, 18]:
+            source_timer = "basic"
+
+        env.template(source_timer + ".hpp.in", "timer_{}.hpp".format(self.instance))
+        env.template(source_timer + ".cpp.in", "timer_{}.cpp".format(self.instance))
+
+
+def init(module):
+    module.name = "timer"
+    module.parent = "platform"
+
+def prepare(module, options):
+    device = options[":target"]
+    if not device.has_driver("timer:stm32"):
+        return False
+
+    module.depends(":platform:core")
+
+    for instance in listify(device.get_driver("timer")["instance"]):
+        module.add_submodule(Instance(int(instance)))
+
+    return True
+
+def build(env):
+    env.substitutions = get_properties(env)
+    env.outbasepath = "src/modm/platform/timer"
+
+    env.template("type_ids.hpp.in", filters={"getConnectors": get_connectors})
+    env.template("basic_base.hpp.in")
+    env.template("general_purpose_base.hpp.in")
+    env.template("advanced_base.hpp.in")

@@ -18,9 +18,7 @@ namespace stm32
 namespace TypeId
 {
 %% for id in [1,2,3,4,5,8,9,10,11,12,13,14,15,16,17,18,19]
-	%% set connectors = []
-	%% import 'connectors.macros' as cons with context
-	%% for connector in connectors
+	%% for connector in (id | getConnectors)
 	typedef struct{} Timer{{ id ~ connector}};
 	%% endfor
 %% endfor

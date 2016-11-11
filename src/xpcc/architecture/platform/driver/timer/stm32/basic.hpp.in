@@ -10,7 +10,7 @@
 #ifndef XPCC_STM32_TIMER_{{ id }}_HPP
 #define XPCC_STM32_TIMER_{{ id }}_HPP
 
-#include "../../../type_ids.hpp"
+#include "type_ids.hpp"
 #include "basic_base.hpp"
 
 namespace xpcc
@@ -45,14 +45,11 @@ namespace stm32
  {%- endif %}
  *
  * @author		Fabian Greif
- * @ingroup		{{target.string}}_timer
+ * @ingroup		{{partname}}_timer
  */
 class Timer{{ id }} : public BasicTimer
 {
 public:
-
-%% set connectors = []
-%% import 'connectors.macros' as cons with context
 %% for c in connectors
 	/// TypeId used to connect GPIO pins to this peripheral's {{ c }}.
 	static const TypeId::Timer{{ id ~ c}} {{ c }};

@@ -9,7 +9,7 @@
 #ifndef XPCC_STM32_TIMER_{{ id }}_HPP
 #define XPCC_STM32_TIMER_{{ id }}_HPP
 
-#include "../../../type_ids.hpp"
+#include "type_ids.hpp"
 #include "advanced_base.hpp"
 
 namespace xpcc
@@ -63,14 +63,11 @@ namespace stm32
  *
  * @author		Fabian Greif
  * @author		Kevin Laeufer
- * @ingroup		{{target.string}}_timer
+ * @ingroup		{{partname}}_timer
  */
 class Timer{{ id }} : public AdvancedControlTimer
 {
 public:
-
-%% set connectors = []
-%% import 'connectors.macros' as cons with context
 %% for c in connectors
 	/// TypeId used to connect GPIO pins to this peripheral's {{ c }}.
 	static const TypeId::Timer{{ id ~ c}} {{ c }};
@@ -100,7 +97,7 @@ public:
 			SlaveMode slaveMode = SlaveMode::Disabled,
 			SlaveModeTrigger slaveModeTrigger = SlaveModeTrigger::Internal0,
 			MasterMode masterMode = MasterMode::Reset
-%% if target is stm32f3 or target is stm32f7
+%% if target.family in ["f3", "f7"]
 			, MasterMode2 masterMode2 = MasterMode2::Reset
 %% endif
 			);
@@ -201,7 +198,7 @@ public:
 	{
 		TIM{{ id }}->BDTR |= TIM_BDTR_MOE;
 	}
-	
+
 	static inline void
 	disableOutput()
 	{
@@ -353,7 +350,7 @@ public:
 	static inline void
 	setCompareValue(uint32_t channel, uint16_t value)
 	{
-%% if target is stm32f1
+%% if target.family == "f1"
 		*(&TIM{{ id }}->CCR1 + ((channel - 1) * 2)) = value;
 %% else
 		*(&TIM{{ id }}->CCR1 + (channel - 1)) = value;
@@ -363,7 +360,7 @@ public:
 	static inline uint16_t
 	getCompareValue(uint32_t channel)
 	{
-%% if target is stm32f1
+%% if target.family == "f1"
 		return *(&TIM{{ id }}->CCR1 + ((channel - 1) * 2));
 %% else
 		return *(&TIM{{ id }}->CCR1 + (channel - 1));

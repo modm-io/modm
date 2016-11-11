@@ -18,7 +18,7 @@ namespace xpcc
 namespace stm32
 {
 
-/// @ingroup	{{target.string}}_timer
+/// @ingroup	{{partname}}_timer
 class GeneralPurposeTimer : public BasicTimer
 {
 public:

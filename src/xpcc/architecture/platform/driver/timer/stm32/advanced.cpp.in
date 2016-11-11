@@ -7,7 +7,6 @@
 */
 // ----------------------------------------------------------------------------
 
-#include <xpcc_config.hpp>
 #include "timer_{{ id }}.hpp"
 
 // ----------------------------------------------------------------------------
@@ -37,7 +36,7 @@ xpcc::stm32::Timer{{ id }}::disable()
 void
 xpcc::stm32::Timer{{ id }}::setMode(Mode mode, SlaveMode slaveMode,
 		SlaveModeTrigger slaveModeTrigger, MasterMode masterMode
-%% if target is stm32f3 or target is stm32f7
+%% if target.family in ["f3", "f7"]
 		, MasterMode2 masterMode2
 %% endif
 		)
@@ -55,7 +54,7 @@ xpcc::stm32::Timer{{ id }}::setMode(Mode mode, SlaveMode slaveMode,
 
 	// ARR Register is buffered, only Under/Overflow generates update interrupt
 	TIM{{ id }}->CR1 = TIM_CR1_ARPE | TIM_CR1_URS | static_cast<uint32_t>(mode);
-%% if target is stm32f3 or target is stm32f7
+%% if target.family in ["f3", "f7"]
 	TIM{{ id }}->CR2 = 	static_cast<uint32_t>(masterMode) |
 						static_cast<uint32_t>(masterMode2);
 %% else
@@ -243,7 +242,7 @@ nvicDisableInterrupt(IRQn_Type IRQn)
 {
 	NVIC_DisableIRQ(IRQn);
 }
-%% if target is stm32f2 or target is stm32f4 or target is stm32f7
+%% if target.family in ["f2", "f4", "f7"]
 	%% if id == 1
 #	define TIM1_BRK_IRQn		TIM1_BRK_TIM9_IRQn
 #	define TIM1_UP_IRQn			TIM1_UP_TIM10_IRQn
@@ -253,7 +252,7 @@ nvicDisableInterrupt(IRQn_Type IRQn)
 #	define TIM8_UP_IRQn			TIM8_UP_TIM13_IRQn
 #	define TIM8_TRG_COM_IRQn	TIM8_TRG_COM_TIM14_IRQn
 	%% endif
-%% elif target is stm32f3
+%% elif target.family == "f3"
 	%% if id == 1
 #	define TIM1_BRK_IRQn		TIM1_BRK_TIM15_IRQn
 #	define TIM1_UP_IRQn			TIM1_UP_TIM16_IRQn
@@ -267,7 +266,7 @@ xpcc::stm32::Timer{{ id }}::enableInterruptVector(Interrupt interrupt, bool enab
 {
 	if (enable)
 	{
-%% if target is stm32f0
+%% if target.family == "f0"
 		if(interrupt & (Interrupt::Update | Interrupt::Break | Interrupt::COM | Interrupt::Trigger)) {
 			NVIC_SetPriority(TIM{{ id }}_BRK_UP_TRG_COM_IRQn, priority);
 			nvicEnableInterrupt(TIM{{ id }}_BRK_UP_TRG_COM_IRQn);
@@ -297,7 +296,7 @@ xpcc::stm32::Timer{{ id }}::enableInterruptVector(Interrupt interrupt, bool enab
 	}
 	else
 	{
-%% if target is stm32f0
+%% if target.family == "f0"
 		if(interrupt & (Interrupt::Update | Interrupt::Break | Interrupt::COM | Interrupt::Trigger)) {
 			nvicDisableInterrupt(TIM{{ id }}_BRK_UP_TRG_COM_IRQn);
 		}

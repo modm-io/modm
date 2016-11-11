@@ -10,12 +10,12 @@
 #define XPCC_STM32_TIMER_BASIC_BASE_HPP
 
 #include <stdint.h>
-#include "../../../device.hpp"
+#include "../device.hpp"
 #include <xpcc/architecture/interface/register.hpp>
 
 /**
- * @ingroup 	{{target.string}}
- * @defgroup	{{target.string}}_timer Timer
+ * @ingroup 	{{partname}}
+ * @defgroup	{{partname}}_timer Timer
  */
 
 namespace xpcc
@@ -24,7 +24,7 @@ namespace xpcc
 namespace stm32
 {
 
-/// @ingroup	{{target.string}}_timer
+/// @ingroup	{{partname}}_timer
 class BasicTimer
 {
 public:
@@ -210,11 +210,11 @@ public:
 	 * 				value, since multiple flags may be set!
 	 *
 	 * \code
-	 * InterruptFlag flags = Timer{{ id }}::getInterruptFlags()
-	 * if (flags & Timer{{ id }}::FLAG_XX){
+	 * InterruptFlag flags = TimerX::getInterruptFlags()
+	 * if (flags & TimerX::FLAG_XX){
 	 *     // Flag was set, clear the flag since flags are set by
 	 *     // hardware, but have to be cleared by software
-	 *     Timer{{ id }}::resetInterruptFlags(TIM{{ id }}::FLAG_XX)
+	 *     TimerX::resetInterruptFlags(TIMx::FLAG_XX)
 	 * }
 	 * \endcode
 	 */
