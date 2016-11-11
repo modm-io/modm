@@ -1,0 +1,12 @@
+
+def init(module):
+    module.name = "debug"
+
+def prepare(module, options):
+    return True
+
+def build(env):
+    env.outbasepath = "src/modm/debug"
+
+    env.copy("../debug.hpp")
+    env.copy(".", ignore=env.ignore_files("*.lb"))
