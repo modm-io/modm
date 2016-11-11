@@ -6,18 +6,17 @@
  * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
-{{ generation_block }}
 
 #ifndef XPCC_STM32_I2C_{{ id }}_HPP
 #define XPCC_STM32_I2C_{{ id }}_HPP
 
-#include "../../../device.hpp"
+#include "../device.hpp"
 #include "type_ids.hpp"
 #include <xpcc/architecture/interface/i2c_master.hpp>
 
 /**
- * @ingroup 	{{target.string}}
- * @defgroup	{{target.string}}_i2c I2C
+ * @ingroup 	{{partname}}
+ * @defgroup	{{partname}}_i2c I2C
  */
 
 namespace xpcc
@@ -33,7 +32,7 @@ namespace stm32
  *
  * @author		Georgi Grinshpun
  * @author		Niklas Hauser
- * @ingroup		{{target.string}}_i2c
+ * @ingroup		{{partname}}_i2c
  */
 class I2cMaster{{ id }} : public ::xpcc::I2cMaster
 {

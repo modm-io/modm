@@ -6,7 +6,6 @@
  * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
-{{ generation_block }}
 
 /*
  * This driver was not so straight forward to implement, because the official
@@ -191,7 +190,7 @@ namespace
 		xpcc::I2c::ConfigurationHandler configuration;
 	};
 
-	static xpcc::BoundedQueue<ConfiguredTransaction, {{ parameters.transaction_buffer }}> queue;
+	static xpcc::BoundedQueue<ConfiguredTransaction, {{ options["buffer.transaction"] }}> queue;
 	static xpcc::I2c::ConfigurationHandler configuration(nullptr);
 
 	// delegating
@@ -595,7 +594,7 @@ xpcc::stm32::I2cMaster{{ id }}::initializeWithPrescaler(uint8_t peripheralFreque
 	I2C{{ id }}->CR2 = peripheralFrequency;
 	I2C{{ id }}->CCR = prescaler;
 	I2C{{ id }}->TRISE = riseTime;
-%% if target is stm32f2 or target is stm32f4
+%% if target.family in ["f2", "f4"]
 	// analog filter on, digital filter = 2
 	I2C{{ id }}->FLTR = (1 << 4) | 4;
 %% endif
@@ -664,4 +663,3 @@ xpcc::stm32::I2cMaster{{ id }}::getErrorState()
 {
 	return error;
 }
-
