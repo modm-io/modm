@@ -11,17 +11,17 @@
 #define XPCC_STM32_DMA{{ id }}_HPP
 
 #include <stdint.h>
-#include "../../../type_ids.hpp"
-#include "../../../device.hpp"
+#include "type_ids.hpp"
+#include "../device.hpp"
 
 /**
- * @ingroup 	{{target.string}}
- * @defgroup	{{target.string}}_dma DMA
+ * @ingroup 	{{partname}}
+ * @defgroup	{{partname}}_dma DMA
  */
 
-%% if target is stm32f4
+%% if target.family == "f4"
 	%% set streams = range(0,8)
-%% elif target is stm32f3
+%% elif target.family == "f3"
 	%% if id == 1
 		%% set streams = range(1,7)
 	%% elif id == 2
@@ -41,7 +41,7 @@ namespace stm32
  * Does not support - among other things - double buffering or FIFO usage
  *
  * @author	Kevin Laeufer
- * @ingroup	{{target.string}}_dma
+ * @ingroup	{{partname}}_dma
  */
 class Dma{{ id }}
 {
@@ -64,9 +64,9 @@ public:
 		static inline void
 		setMemorySource(uint{{type}}_t* address,
 			MemoryIncrementMode inc = MemoryIncrementMode::Increment
-		%% if target is stm32f4
+		%% if target.family == "f4"
 			, MemoryBurstTransfer transfer = MemoryBurstTransfer::Single);
-		%% elif target is stm32f3
+		%% elif target.family == "f3"
 			);
 		%% endif
 
@@ -74,9 +74,9 @@ public:
 		static inline void
 		setPeripheralSource(uint{{type}}_t* address,
 			PeripheralIncrementMode inc = PeripheralIncrementMode::Fixed
-		%% if target is stm32f4
+		%% if target.family == "f4"
 			, PeripheralBurstTransfer transfer = PeripheralBurstTransfer::Single);
-		%% elif target is stm32f3
+		%% elif target.family == "f3"
 			);
 		%% endif
 	%% endfor
@@ -86,9 +86,9 @@ public:
 		static inline void
 		setMemoryDestination(uint{{type}}_t* address,
 			MemoryIncrementMode inc = MemoryIncrementMode::Increment
-		%% if target is stm32f4
+		%% if target.family == "f4"
 			, MemoryBurstTransfer transfer = MemoryBurstTransfer::Single);
-		%% elif target is stm32f3
+		%% elif target.family == "f3"
 			);
 		%% endif
 
@@ -96,9 +96,9 @@ public:
 		static inline void
 		setPeripheralDestination(uint{{type}}_t* address,
 			PeripheralIncrementMode inc = PeripheralIncrementMode::Fixed
-		%% if target is stm32f4
+		%% if target.family == "f4"
 			, PeripheralBurstTransfer transfer = PeripheralBurstTransfer::Single);
-		%% elif target is stm32f3
+		%% elif target.family == "f3"
 			);
 		%% endif
 	%% endfor
@@ -109,15 +109,15 @@ public:
 		/// will disable the stream
 		static inline void
 		configure(
-		%% if target is stm32f4
+		%% if target.family == "f4"
 			Channel channel,
 		%% endif
 			uint16_t sample_length,
 			Priority priority = Priority::Medium,
 			CircularMode circular = CircularMode::Disabled
-		%% if target is stm32f4
+		%% if target.family == "f4"
 			, FlowControl flow = FlowControl::Dma);
-		%% elif target is stm32f3
+		%% elif target.family == "f3"
 			);
 		%% endif
 

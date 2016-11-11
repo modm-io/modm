@@ -1,0 +1,57 @@
+
+class Instance(Module):
+    def __init__(self, instance):
+        self.instance = instance
+
+    def init(self, module):
+        module.name = str(self.instance)
+        module.description = "DMA {} instance".format(self.instance)
+
+    def prepare(self, module, options):
+        module.depends(":platform:dma")
+        return True
+
+    def build(self, env):
+        device = env[":target"]
+        driver = device.get_driver("dma")
+
+        properties = device.properties
+        properties["target"] = target = device.identifier
+        properties["partname"] = device.partname
+        properties["id"] = self.instance
+
+        env.substitutions = properties
+        env.outbasepath = "src/modm/platform/dma"
+
+        env.template("dma.hpp.in", "dma_{}.hpp".format(self.instance))
+        env.template("dma_impl.hpp.in", "dma_{}_impl.hpp".format(self.instance))
+
+def init(module):
+    module.name = "dma"
+    module.parent = "platform"
+
+def prepare(module, options):
+    device = options[":target"]
+    if not device.has_driver("dma:stm32"):
+        return False
+
+    module.depends(":platform:core")
+
+    for instance in listify(device.get_driver("dma")["instance"]):
+        module.add_submodule(Instance(int(instance)))
+
+    return True
+
+def build(env):
+    device = env[":target"]
+    driver = device.get_driver("dma")
+
+    properties = device.properties
+    properties["target"] = device.identifier
+    properties["partname"] = device.partname
+
+    env.substitutions = properties
+    env.outbasepath = "src/modm/platform/dma"
+
+    env.copy("type_ids.hpp")
+    env.template("dma_base.hpp.in")
