@@ -1,0 +1,16 @@
+
+def init(module):
+    module.name = "i2c.generic"
+    module.parent = "platform"
+
+def prepare(module, options):
+    module.depends(":platform:core")
+
+    return True
+
+def build(env):
+    env.outbasepath = "src/modm/platform/i2c"
+
+    env.copy("software_i2c_master_impl.hpp")
+    env.copy("software_i2c_master.hpp")
+    env.copy("software_type_ids.hpp")
