@@ -11,7 +11,7 @@
 #define XPCC_LPC11_UART_1_HPP
 
 #include <xpcc/architecture/interface/uart.hpp>
-#include "../../../type_ids.hpp"
+#include "type_ids.hpp"
 
 namespace xpcc
 {

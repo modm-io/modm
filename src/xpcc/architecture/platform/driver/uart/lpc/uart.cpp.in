@@ -9,8 +9,8 @@
 
 #include <xpcc/architecture/driver/atomic.hpp>
 
-#include "../../../device.hpp"
-#include "../../clock/lpc/clock.hpp"
+#include "../device.hpp"
+#include "../clock/lpc/clock.hpp"
 
 #include "uart_1.hpp"
 #include "lpc11_uart_registers.hpp"

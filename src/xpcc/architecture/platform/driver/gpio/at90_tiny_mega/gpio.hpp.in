@@ -11,8 +11,8 @@
 #ifndef XPCC_{{target.family | upper}}_GPIO_HPP
 #define XPCC_{{target.family | upper}}_GPIO_HPP
 
-#include "../../../device.hpp"
-#include "../../../type_ids.hpp"
+#include "../device.hpp"
+#include "type_ids.hpp"
 #include "gpio_define.h"
 #include <xpcc/architecture/interface/gpio.hpp>
 #include <xpcc/architecture/interface/i2c.hpp>

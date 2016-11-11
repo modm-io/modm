@@ -5,7 +5,7 @@
 #include <xpcc/utils.hpp>
 
 #include "timer_registers.hpp"
-#include "../../../device.hpp"
+#include "../device.hpp"
 
 %% set name = id|replace('_', 'B')
 %% set reg = "LPC_TMR" ~ name

@@ -16,7 +16,7 @@
 #define XPCC_ATMEGA_ADC_HPP
 
 #include <xpcc/architecture/interface/adc.hpp>
-#include "../../../device.hpp"
+#include "../device.hpp"
 
 #if defined (__AVR_ATmega64HVE__) || defined(__AVR_ATmega64HVE2__)
 #	error "The ATmega64HVE2 is not supported by this ADC class."

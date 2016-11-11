@@ -16,7 +16,7 @@
 #define XPCC_ATTINY_ADC_HPP
 
 #include <xpcc/architecture/interface/adc.hpp>
-#include "../../../device.hpp"
+#include "../device.hpp"
 
 {#- The ATtiny ADC module is also fragmented, these defines help a tiny bit -#}
 

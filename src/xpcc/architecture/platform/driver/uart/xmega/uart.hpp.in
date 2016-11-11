@@ -11,7 +11,7 @@
 #ifndef XPCC_ATXMEGA_UART_{{ id }}_HPP
 #define XPCC_ATXMEGA_UART_{{ id }}_HPP
 
-#include "../../../device.hpp"
+#include "../device.hpp"
 #include <xpcc/architecture/interface/uart.hpp>
 #include "type_ids.hpp"
 #include "uart_baudrate.hpp"

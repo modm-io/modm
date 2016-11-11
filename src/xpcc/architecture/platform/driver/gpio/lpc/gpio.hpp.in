@@ -10,8 +10,8 @@
 #ifndef XPCC_LPC_GPIO_HPP
 #define XPCC_LPC_GPIO_HPP
 
-#include "../../../device.hpp"
-#include "../../../type_ids.hpp"
+#include "../device.hpp"
+#include "type_ids.hpp"
 
 // TODO: Move to common file
 #define SYSAHBCLKCTRL_GPIO		(1<<6)

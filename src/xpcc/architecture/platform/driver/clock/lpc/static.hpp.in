@@ -34,9 +34,9 @@
 #define XPCC_LPC__STATIC_HPP
 
 #include <stdint.h>		// uint32_t
-#include "../../../device.hpp"
-#include "../../../type_ids.hpp"
-#include "../generic/common_clock.hpp"
+#include "../device.hpp"
+#include "type_ids.hpp"
+#include "../common_clock.hpp"
 #include "pll_calculator.hpp"
 #include "clock.hpp"
 

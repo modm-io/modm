@@ -11,10 +11,10 @@
 #ifndef XPCC_XMEGA_GPIO_HPP
 #define XPCC_XMEGA_GPIO_HPP
 
-#include "../../../device.hpp"
+#include "../device.hpp"
 #include "../../../core/avr/interrupts.hpp"
 #include <xpcc/architecture/interface/gpio.hpp>
-#include "../../../type_ids.hpp"
+#include "type_ids.hpp"
 
 namespace xpcc
 {
