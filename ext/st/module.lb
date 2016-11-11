@@ -1,0 +1,38 @@
+
+import os
+
+def init(module):
+    module.name = "cmsis.device"
+
+def prepare(module, options):
+    device = options[":target"]
+    if not device.identifier.platform == "stm32":
+        return False
+
+    return True
+
+def build(env):
+    device = env[":target"]
+
+    env.outbasepath = "ext/cmsis_device"
+
+    defines = []
+    headers = []
+
+    folder = "stm32{}xx".format(device.identifier.family)
+    for define in device.properties["define"]:
+        filename = "{}.h".format(define.lower())
+        env.copy(os.path.join(folder, "Include", filename), filename)
+
+        defines.append(define)
+        headers.append(filename)
+
+    system_header = "system_{}.h".format(folder)
+    env.copy(os.path.join(folder, "Include", system_header), system_header)
+
+    env.substitutions = {
+        'headers': headers,
+        'defines': defines,
+    }
+    env.outbasepath = "src/modm/platform"
+    env.template("device.hpp.in")
