@@ -6,18 +6,15 @@
  * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
-%% if id in [1, 2, 3, 6] or target is stm32f0
-%%	set uart = "Usart"
-%% elif id in [4, 5, 7, 8]
-%%	set uart = "Uart"
-%% endif
-%% set hal = uart ~ "Hal" ~ id
+
+%% set hal = uart_name ~ "Hal" ~ id
+%% set name = uart_name ~ id
 
 #ifndef XPCC_STM32_UART_{{ id }}_HPP
 #define XPCC_STM32_UART_{{ id }}_HPP
 
 #include <xpcc/architecture/interface/uart.hpp>
-#include "../../../type_ids.hpp"
+#include "type_ids.hpp"
 #include "uart_base.hpp"
 #include "uart_baudrate.hpp"
 #include "uart_hal_{{ id }}.hpp"
@@ -29,13 +26,13 @@ namespace stm32
 {
 
 /**
- * Universal asynchronous receiver transmitter ({{ uart | upper ~ id }})
+ * Universal asynchronous receiver transmitter ({{ uart_name | upper ~ id }})
  *
  * @author		Kevin Laeufer
  * @author		Niklas Hauser
- * @ingroup		{{target.string}}_uart
+ * @ingroup		{{partname}}_uart
  */
-class {{ uart ~ id }} : public UartBase, public ::xpcc::Uart
+class {{ name }} : public UartBase, public ::xpcc::Uart
 {
 public:
 	/// TypeId used to connect GPIO pins to this peripheral's rx.
@@ -43,7 +40,7 @@ public:
 	/// TypeId used to connect GPIO pins to this peripheral's tx.
 	static const TypeId::Uart{{ id }}Tx Tx;
 
-%% if parameters.buffered
+%% if options["buffered"]
 private:
 	/// Second stage initialize for buffered uart
 	// that need to be implemented in the .cpp
@@ -55,26 +52,26 @@ public:
 template< 	class SystemClock, uint32_t baudrate,
 		uint16_t tolerance = xpcc::Tolerance::OnePercent >
 	static void xpcc_always_inline
-%% if parameters.buffered
+%% if options["buffered"]
 	initialize(uint32_t interruptPriority, Parity parity = Parity::Disabled)
 %% else
 	initialize(Parity parity = Parity::Disabled)
 %% endif
 	{
-%% if target is not stm32f1
+%% if target.family != "f1"
 		constexpr UartBase::OversamplingMode oversample =
-				UartBaudrate::getOversamplingMode(SystemClock::{{ uart ~ id }}, baudrate);
+				UartBaudrate::getOversamplingMode(SystemClock::{{ name }}, baudrate);
 %% endif
 
 		{{ hal }}::initializeWithBrr(
-				UartBaudrate::getBrr<SystemClock::{{ uart ~ id }}, baudrate, tolerance>(),
-%% if target is stm32f1
+				UartBaudrate::getBrr<SystemClock::{{ name }}, baudrate, tolerance>(),
+%% if target.family == "f1"
 				parity);
 %% else
 				parity,
 				oversample);
 %% endif
-%% if parameters.buffered
+%% if options["buffered"]
 		initializeBuffered(interruptPriority);
 %% endif
 		{{ hal }}::setTransmitterEnable(true);

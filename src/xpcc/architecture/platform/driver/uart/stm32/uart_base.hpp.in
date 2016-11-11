@@ -13,18 +13,18 @@
 #define XPCC_STM32_UART_BASE_HPP
 
 #include <stdint.h>
-#include "../../../device.hpp"
+#include "../device.hpp"
 #include <xpcc/architecture/interface/register.hpp>
 
-%% if target is stm32f1 or target is stm32f2 or target is stm32f4
+%% if target.family in ["f1", "f2", "f4"]
 // STM has some weird ideas about continuity
 #define	USART_BRR_DIV_MANTISSA	USART_BRR_DIV_Mantissa
 #define	USART_BRR_DIV_FRACTION	USART_BRR_DIV_Fraction
 %% endif
 
 /**
-* @ingroup 	{{target.string}}
-* @defgroup	{{target.string}}_uart UART
+* @ingroup 	{{partname}}
+* @defgroup	{{partname}}_uart UART
 */
 
 namespace xpcc
@@ -38,7 +38,7 @@ namespace stm32
  *
  * @author Kevin Laeufer
  * @internal
- * @ingroup		{{target.string}}_uart
+ * @ingroup		{{partname}}_uart
  */
 class UartBase
 {
@@ -46,7 +46,7 @@ class UartBase
 public:
 	enum class Interrupt : uint32_t
 	{
-%% if target is stm32f0 or target is stm32f3 or target is stm32f7
+%% if target.family in ["f0", "f3", "f7"]
 		/// A USART interrupt is generated when match character is received.
 		CharacterMatch = USART_CR1_CMIE,
 %% endif
@@ -63,7 +63,7 @@ public:
 
 	enum class InterruptFlag : uint32_t
 	{
-%% if target is stm32f0 or target is stm32f3 or target is stm32f7
+%% if target.family in ["f0", "f3", "f7"]
 %%	set reg = "ISR"
 		/// Set if match character is received.
 		CharacterMatch	= USART_{{reg}}_CMF,
@@ -103,7 +103,7 @@ public:
 		///< clock inverted, sample on rising edge
 	};
 
-%% if target is not stm32f1
+%% if target.family not in ["f1"]
 	enum class
 	OversamplingMode : uint32_t
 	{

@@ -32,12 +32,12 @@ namespace stm32
  *
  * @author	Kevin Laeufer
  * @author	Niklas Hauser
- * @ingroup	{{target.string}}_uart
+ * @ingroup	{{partname}}_uart
  */
 class UartBaudrate : /** @cond */protected xpcc::Peripheral /** @endcond */
 {
 public:
-%% if target is not stm32f1
+%% if target.family != "f1"
 	/**
 	 * Returns the highest Oversampling Mode that is possible for this configuration.
 	 */
@@ -62,7 +62,7 @@ public:
 	static uint16_t xpcc_always_inline
 	getBrr()
 	{
-%% if target is stm32f1
+%% if target.family == "f1"
 		constexpr uint32_t scalar = 16;
 %% else
 		constexpr uint32_t scalar = (baudrate * 16l > clockrate) ? 8 : 16;

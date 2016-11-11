@@ -1,0 +1,84 @@
+
+def get_properties(env):
+    device = env[":target"]
+    driver = device.get_driver("uart")
+    properties = device.properties
+    properties["target"] = device.identifier
+    properties["partname"] = device.partname
+    properties["driver"] = driver
+    return properties
+
+
+class Instance(Module):
+    def __init__(self, instance):
+        self.instance = instance
+
+    def init(self, module):
+        module.name = str(self.instance)
+        module.description = "UART {} instance".format(self.instance)
+
+    def prepare(self, module, options):
+        module.depends(":platform:uart")
+
+        module.add_option(
+            BooleanOption(
+                name="buffered",
+                description="",
+                default=True))
+        module.add_option(
+            NumericOption(
+                name="buffer.tx",
+                description="",
+                minimum=1, maximum=2 ** 16 - 2,
+                default=250))
+        module.add_option(
+            NumericOption(
+                name="buffer.rx",
+                description="",
+                minimum=1, maximum=2 ** 16 - 2,
+                default=16))
+
+        return True
+
+    def build(self, env):
+        properties = get_properties(env)
+        properties["id"] = self.instance
+        properties["apb"] = "2" if self.instance in [1, 6] else "1"
+
+        if self.instance in [1, 2, 3, 6] or properties["target"].family == "f0":
+            properties["uart_name"] = "Usart"
+        else:
+            properties["uart_name"] = "Uart"
+
+        env.substitutions = properties
+        env.outbasepath = "src/modm/platform/uart"
+
+        env.template("uart_hal.hpp.in", "uart_hal_{}.hpp".format(self.instance))
+        env.template("uart_hal_impl.hpp.in", "uart_hal_{}_impl.hpp".format(self.instance))
+        env.template("uart.hpp.in", "uart_{}.hpp".format(self.instance))
+        env.template("uart.cpp.in", "uart_{}.cpp".format(self.instance))
+
+
+def init(module):
+    module.name = "uart"
+    module.parent = "platform"
+
+def prepare(module, options):
+    device = options[":target"]
+    if not device.has_driver("uart:stm32"):
+        return False
+
+    module.depends(":platform:core")
+
+    for instance in listify(device.get_driver("uart")["instance"]):
+        module.add_submodule(Instance(int(instance)))
+
+    return True
+
+def build(env):
+    env.substitutions = get_properties(env)
+    env.outbasepath = "src/modm/platform/uart"
+
+    env.template("uart_base.hpp.in")
+    env.template("type_ids.hpp.in")
+    env.template("uart_baudrate.hpp.in")

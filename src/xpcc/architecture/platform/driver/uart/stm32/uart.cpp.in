@@ -6,30 +6,25 @@
  * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
-%% if id in [1, 2, 3, 6] or target is stm32f0
-%%	set uart = "Usart"
-%% elif id in [4, 5, 7, 8]
-%%	set uart = "Uart"
-%% endif
-%#
-%% set name = uart ~ id
-%% set hal = uart ~ "Hal" ~ id
 
-#include "../../../device.hpp"
+%% set name = uart_name ~ id
+%% set hal = uart_name ~ "Hal" ~ id
+
+#include "../device.hpp"
 #include "uart_hal_{{ id }}.hpp"
 #include "uart_{{ id }}.hpp"
 
-%% if parameters.buffered
+%% if options["buffered"]
 #include <xpcc/architecture/driver/atomic.hpp>
 
 namespace
 {
-	static xpcc::atomic::Queue<uint8_t, {{ parameters.rx_buffer }}> rxBuffer;
-	static xpcc::atomic::Queue<uint8_t, {{ parameters.tx_buffer }}> txBuffer;
+	static xpcc::atomic::Queue<uint8_t, {{ options["buffer.rx"] }}> rxBuffer;
+	static xpcc::atomic::Queue<uint8_t, {{ options["buffer.tx"] }}> txBuffer;
 }
 %% endif
 
-%% if parameters.buffered
+%% if options["buffered"]
 void
 xpcc::stm32::{{ name }}::initializeBuffered(uint32_t interruptPriority)
 {
@@ -56,7 +51,7 @@ xpcc::stm32::{{ name }}::writeBlocking(const uint8_t *data, std::size_t length)
 void
 xpcc::stm32::{{ name }}::flushWriteBuffer()
 {
-%% if parameters.buffered
+%% if options["buffered"]
 	while(!isWriteFinished());
 %% else
 	return;
@@ -66,7 +61,7 @@ xpcc::stm32::{{ name }}::flushWriteBuffer()
 bool
 xpcc::stm32::{{ name }}::write(uint8_t data)
 {
-%% if parameters.buffered
+%% if options["buffered"]
 	if(txBuffer.isEmpty() && {{ hal }}::isTransmitRegisterEmpty()) {
 		{{ hal }}::write(data);
 	} else {
@@ -104,7 +99,7 @@ xpcc::stm32::{{ name }}::write(const uint8_t *data, std::size_t length)
 bool
 xpcc::stm32::{{ name }}::isWriteFinished()
 {
-%% if parameters.buffered
+%% if options["buffered"]
 	return txBuffer.isEmpty() && {{ hal }}::isTransmitRegisterEmpty();
 %% else
 	return {{ hal }}::isTransmitRegisterEmpty();
@@ -114,7 +109,7 @@ xpcc::stm32::{{ name }}::isWriteFinished()
 std::size_t
 xpcc::stm32::{{ name }}::discardTransmitBuffer()
 {
-%% if parameters.buffered
+%% if options["buffered"]
 	std::size_t count = 0;
 	// disable interrupt since buffer will be cleared
 	{{ hal }}::disableInterrupt({{ hal }}::Interrupt::TxEmpty);
@@ -131,7 +126,7 @@ xpcc::stm32::{{ name }}::discardTransmitBuffer()
 bool
 xpcc::stm32::{{ name }}::read(uint8_t &data)
 {
-%% if parameters.buffered
+%% if options["buffered"]
 	if (rxBuffer.isEmpty()) {
 		return false;
 	} else {
@@ -152,7 +147,7 @@ xpcc::stm32::{{ name }}::read(uint8_t &data)
 std::size_t
 xpcc::stm32::{{ name }}::read(uint8_t *data, std::size_t length)
 {
-%% if parameters.buffered
+%% if options["buffered"]
 	uint32_t i = 0;
 	for (; i < length; ++i)
 	{
@@ -177,7 +172,7 @@ xpcc::stm32::{{ name }}::read(uint8_t *data, std::size_t length)
 std::size_t
 xpcc::stm32::{{ name }}::discardReceiveBuffer()
 {
-%% if parameters.buffered
+%% if options["buffered"]
 	std::size_t count = 0;
 	while(!rxBuffer.isEmpty()) {
 		++count;
@@ -190,9 +185,9 @@ xpcc::stm32::{{ name }}::discardReceiveBuffer()
 }
 
 
-%% if parameters.buffered
+%% if options["buffered"]
 %% set hal = "xpcc::stm32::" ~ hal
-XPCC_ISR({{ uart | upper ~ id }})
+XPCC_ISR({{ name | upper }})
 {
 	if ({{ hal }}::isReceiveRegisterNotEmpty()) {
 		// TODO: save the errors

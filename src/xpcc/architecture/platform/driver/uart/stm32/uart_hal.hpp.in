@@ -6,18 +6,13 @@
  * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
-%% if id in [1, 2, 3, 6] or target is stm32f0
-%%	set uart = "Usart"
-%% elif id in [4, 5, 7, 8]
-%%	set uart = "Uart"
-%% endif
 
 #ifndef XPCC_STM32_UARTHAL_{{ id }}_HPP
 #define XPCC_STM32_UARTHAL_{{ id }}_HPP
 
 #include <stdint.h>
-#include "../../../type_ids.hpp"
-#include "../../../device.hpp"
+#include "type_ids.hpp"
+#include "../device.hpp"
 #include "uart_base.hpp"
 #include "uart_baudrate.hpp"
 
@@ -28,7 +23,7 @@ namespace stm32
 {
 
 /**
- * Universal asynchronous receiver transmitter ({{ uart ~ id }})
+ * Universal asynchronous receiver transmitter ({{ uart_name ~ "Hal" ~ id }})
  *
  * Not available on the low- and medium density devices.
  *
@@ -36,9 +31,9 @@ namespace stm32
  * the regular Usart classes.
  *
  * @author		Kevin Laeufer
- * @ingroup		{{target.string}}_uart
+ * @ingroup		{{partname}}_uart
  */
-class {{ uart ~ "Hal" ~ id }} : public UartBase
+class {{ uart_name ~ "Hal" ~ id }} : public UartBase
 {
 private:
 	/**
@@ -76,7 +71,7 @@ public:
 	static void
 	initialize(	Parity parity = Parity::Disabled);
 
-%% if target is not stm32f1
+%% if target.family != "f1"
 	/**
 	 * Initialize Uart HAL Peripheral
 	 *
@@ -98,7 +93,7 @@ public:
 	*/
 	static void
 	initializeWithBrr(uint16_t brr,
-%% if target is stm32f1
+%% if target.family == "f1"
 			Parity parity);
 %% else
 			Parity parity,
@@ -108,7 +103,7 @@ public:
 	static inline void
 	setOversamplingMode(OversamplingMode mode);
 %% endif
-%% if id in [1, 2, 3, 6]
+%% if uart_name == "Usart"
 	// Methods needed to use this Usart Peripheral for SPI
 	static inline void
 	setSpiClock(SpiClock clk);
