@@ -7,12 +7,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "../../../device.hpp"
-#include "../../clock/generic/common_clock.hpp"
+#include "../device.hpp"
+#include "../clock/common_clock.hpp"
 
-%% if target is cortex_m0
+%% if core.startswith("cortex-m0"):
 	%% set loop = 4
-%% elif target is cortex_m7
+%% elif core.startswith("cortex-m7"):
 	%# Cortex-M7 is superscalar with dual issue ALU and a 6-stage pipeline
 	%# _and_ branches in 1 cycle => The entire loop is in the pipeline.
 	%% set loop = 1
@@ -20,21 +20,18 @@
 	%% set loop = 3
 %% endif
 
-%% if target is stm32f3 and not noiccm is defined
-	%% set overhead = 29
+%# TODO: These numbers were measured from a few example applications.
+%#       A statistical analysis of the average overhead cycles is required!
+%% if target.platform == "stm32" and target.family == "f4"
+	%% set overhead = 25
+%% elif target.platform == "stm32" and target.family == "f1"
+	%% set overhead = 12
 %% else
-	%% if target is stm32f4
-		%% set overhead = 25
-	%% elif target is stm32f1
-		%% set overhead = 12
-	%% else
-		%% set overhead = 30
-	%% endif
+	%% set overhead = 30
 %% endif
 
 extern "C"
 {
-
 
 void xpcc_fastcode
 _delay_ns(uint16_t ns)
@@ -50,13 +47,12 @@ _delay_ns(uint16_t ns)
 	// => loop is {{loop}} cycles long
 }
 
-
 void xpcc_fastcode
 _delay_us(uint16_t us)
 {
 	if (!us) return;    // 1 cycle, or 2 when taken
 
-%% if target is cortex_m0 or target is cortex_m7
+%% if core.startswith("cortex-m0") or core.startswith("cortex-m7")
 	asm volatile (
 		".syntax unified"       "\n\t"
 		"muls.n	%0, %0, %1"     "\n\t"  // get number of cycles by us * fcpu_MHz:               1-2 cycles on cm3, up to 32 cycles on cm0
@@ -73,13 +69,12 @@ _delay_us(uint16_t us)
 %% endif
 }
 
-
 void xpcc_fastcode
 _delay_ms(uint16_t ms)
 {
 	if (!ms) return;    // 1 cycle, or 2 when taken
 
-%% if target is cortex_m0 or target is cortex_m7
+%% if core.startswith("cortex-m0") or core.startswith("cortex-m7")
 	asm volatile (
 		".syntax unified"       "\n\t"
 		"muls.n	%0, %0, %1"     "\n\t"  // get number of cycles by ms * fcpu_kHz:               1-2 cycles on cm3, up to 32 cycles on cm0
@@ -94,6 +89,5 @@ _delay_ms(uint16_t ms)
 		;
 %% endif
 }
-
 
 }

@@ -175,7 +175,7 @@ SECTIONS
 	{{ linker.section_heap("SRAM3", "heap3") }}
 %% endif
 
-	{{ parameters.linkerscript_sections }}
+	{{ options["linkerscript.sections"] }}
 
 	/* TABLES! TABLES! ALL THE TABLES YOU COULD EVER WANT! TABLES! */
 	{{ linker.section_table_zero(["bss"]) }}
@@ -184,7 +184,7 @@ SECTIONS
 %% if 'backup' in regions
 	%% do copy_table.append("backup")
 %% endif
-%% if parameters.vector_table_in_ram
+%% if vector_table_location == "ram"
 	%% do copy_table.append("vector_table_ram")
 %% endif
 	{{ linker.section_table_copy(copy_table) }}

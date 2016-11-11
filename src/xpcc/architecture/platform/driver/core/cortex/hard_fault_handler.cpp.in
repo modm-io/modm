@@ -30,14 +30,14 @@
 
 #include <stdint.h>
 
-#include "../../../device.hpp"
+#include "../device.hpp"
 
-%% if parameters.enable_hardfault_handler_led or (parameters.enable_hardfault_handler_log != "false")
-#include "../../clock/generic/common_clock.hpp"
+%% if options["hardfault.led"] != "disabled" or (options["hardfault.log"] != "disabled")
+#include "../clock/common_clock.hpp"
 %% endif
 
-%% if parameters.enable_hardfault_handler_led
-	%% if target is stm32f1
+%% if options["hardfault.led"] != "disabled"
+	%% if partname.startswith("stm32f1")
 #include "../../gpio/stm32f1/gpio.hpp"
 	%% else
 #include "../../gpio/stm32/gpio.hpp"
@@ -46,20 +46,20 @@
 extern "C" void _initHardFaultHandlerLed() __attribute__((optimize("Os")));
 extern "C" void _initHardFaultHandlerLed()
 {
-	xpcc::stm32::Gpio{{ parameters.hardfault_handler_led_port }}{{ parameters.hardfault_handler_led_pin }}::setOutput();
+	xpcc::stm32::Gpio{{ options["hardfault.led"] }}::setOutput();
 }
 
 extern "C" void _toggleHardFaultHandlerLed() __attribute__((optimize("Os")));
 extern "C" void _toggleHardFaultHandlerLed()
 {
-	xpcc::stm32::Gpio{{ parameters.hardfault_handler_led_port }}{{ parameters.hardfault_handler_led_pin }}::toggle();
+	xpcc::stm32::Gpio{{ options["hardfault.led"] }}::toggle();
 }
 
 %% endif
 
-%% if parameters.enable_hardfault_handler_log != "false"
+%% if options["hardfault.log"] != "disabled"
 #include <xpcc/debug/logger.hpp>
-	%% set id = parameters.hardfault_handler_uart
+	%% set id = options["hardfault.log.uart"]
 
 	%% if id in [1, 2, 3, 6]
 		%%	set uart = "Usart"
@@ -98,7 +98,7 @@ constexpr uint8_t    bus_fault_mask = 0xbf;
 constexpr uint8_t    mem_fault_mask = 0xbb;
 %% endif
 
-%% if parameters.enable_hardfault_handler_log == "true" and target is not cortex_m0
+%% if options["hardfault.log"] == "full" and not core.startswith("cortex-m0"):
 const char *mem_fault_bits[] = {
 	"MMARVALID",
 	"MLSPERR",
@@ -125,7 +125,7 @@ const char *usage_fault_bits[] = {
 	"UNDEFINSTR"
 };
 %% endif
-%% if parameters.enable_hardfault_handler_log != "false"
+%% if options["hardfault.log"] != "disabled"
 const char *stack_frame_names[] = {
 	"R0",
 	"R1",
@@ -135,7 +135,7 @@ const char *stack_frame_names[] = {
 	"LR",
 	"PC",
 	"xPSR",
-	%% if target is not cortex_m0
+	%% if not core.startswith("cortex-m0")
 	"S0",
 	"S1",
 	"S2",
@@ -159,7 +159,7 @@ const char *stack_frame_names[] = {
 const char *exception_stack_frame = " ^-- exception stack frame\n";
 %% endif
 
-%% if parameters.enable_hardfault_handler_log != "false"
+%% if options["hardfault.log"] != "disabled"
 // ----------------------------------------------------------------------------
 extern "C" void _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp) __attribute__((noreturn, optimize("Os")));
 extern "C" void _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
@@ -167,7 +167,7 @@ extern "C" void _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 #undef XPCC_LOG_LEVEL
 #define XPCC_LOG_LEVEL	xpcc::log::ERROR
 	// all CPU registers
-	%% if target is cortex_m0
+	%% if core.startswith("cortex-m0"):
 	const uint32_t& stacked_r8  = ctx[ 0];
 	const uint32_t& stacked_r9  = ctx[ 1];
 	const uint32_t& stacked_r10 = ctx[ 2];
@@ -217,7 +217,7 @@ extern "C" void _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 	xpcc::stm32::{{ uart ~ id }}::discardTransmitBuffer();
 
 	// Infinite loop
-	%% if parameters.enable_hardfault_handler_led
+	%% if options["hardfault.led"] != "disabled"
 	volatile uint32_t ledCounter = 1;
 	_initHardFaultHandlerLed();
 	%% endif
@@ -226,7 +226,7 @@ extern "C" void _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 
 	while(1)
 	{
-	%% if parameters.enable_hardfault_handler_led
+	%% if options["hardfault.led"] != "disabled"
 		if (--ledCounter == 0)
 		{
 			ledCounter = xpcc::clock::fcpu / 20;
@@ -239,7 +239,7 @@ extern "C" void _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 		{
 			logCounter = xpcc::clock::fcpu;
 
-	%% if target is not cortex_m0
+	%% if not core.startswith("cortex-m0"):
 			// isolate the fault registers
 			uint16_t usage_fault = ((cfsr & SCB_CFSR_USGFAULTSR_Msk) >> SCB_CFSR_USGFAULTSR_Pos) & usage_fault_mask;
 			uint8_t    bus_fault = ((cfsr & SCB_CFSR_BUSFAULTSR_Msk) >> SCB_CFSR_BUSFAULTSR_Pos) &   bus_fault_mask;
@@ -308,7 +308,7 @@ extern "C" void _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 			XPCC_LOG_ERROR.printf("r6 : 0x%08lx   pc  : 0x%08lx%s\n", stacked_r6, stacked_pc,  (is_stack_overflow or is_stack_underflow) ? invalid : valid); flushUart();
 			XPCC_LOG_ERROR.printf("r7 : 0x%08lx   psr : 0x%08lx%s\n", stacked_r7, stacked_psr, (is_stack_overflow or is_stack_underflow) ? invalid : valid); flushUart();
 
-	%% if target is not cortex_m0
+	%% if core.startswith("cortex-m0")
 			XPCC_LOG_ERROR << '\n';
 			XPCC_LOG_ERROR.printf("SHCSR : 0x%08lx\n",   shcrs); flushUart();
 			XPCC_LOG_ERROR.printf("CFSR  : 0x%08lx\n",   cfsr);  flushUart();
@@ -317,7 +317,7 @@ extern "C" void _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 			XPCC_LOG_ERROR.printf("MMAR  : 0x%08lx%s\n", mmar, is_mmar_valid ? valid : invalid); flushUart();
 			XPCC_LOG_ERROR.printf("BFAR  : 0x%08lx%s\n", bfar, is_bfar_valid ? valid : invalid); flushUart();
 			XPCC_LOG_ERROR.printf("AFSR  : 0x%08lx\n",   afsr);  flushUart();
-		%% if parameters.enable_hardfault_handler_log != "basic"
+		%% if options["hardfault.log"] != "basic"
 			XPCC_LOG_ERROR << '\n';
 			if (mem_fault)
 			{
@@ -368,7 +368,7 @@ extern "C" void _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 	%% endif
 			if (is_stack_execution) { XPCC_LOG_ERROR << "  ### STACK EXECUTION ###\n"; flushUart(); }
 			if (is_stack_overflow)  { XPCC_LOG_ERROR << "  ### STACK OVERFLOW  ###\n"; flushUart(); }
-	%% if target is not cortex_m0
+	%% if not core.startswith("cortex-m0"):
 			if (is_stack_underflow) { XPCC_LOG_ERROR << "  ### STACK UNDERFLOW ###\n"; flushUart(); }
 	%% endif
 		}

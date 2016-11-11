@@ -177,13 +177,13 @@ SECTIONS
 
 	{{ linker.section_heap("SRAM2", "heap2") }}
 
-	{{ parameters.linkerscript_sections }}
+	{{ options["linkerscript.sections"] }}
 
 	/* TABLES! TABLES! ALL THE TABLES YOU COULD EVER WANT! TABLES! */
 	{{ linker.section_table_zero(["bss"]) }}
 
 %% set copy_table = ["data", "fastdata", "fastcode"]
-%% if parameters.vector_table_in_ram
+%% if vector_table_location == "ram"
 	%% do copy_table.append("vector_table_ram")
 %% endif
 	{{ linker.section_table_copy(copy_table) }}

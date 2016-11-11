@@ -1,0 +1,192 @@
+
+import os
+
+def init(module):
+    module.name = "core"
+    module.parent = "platform"
+
+def prepare(module, options):
+    if not options[":target"].has_driver("core:cortex"):
+        return False
+
+    module.add_option(
+        EnumerationOption(
+            name="allocator",
+            description=FileReader("option/allocator.md"),
+            enumeration=["newlib", "block_allocator", "tlsf"],
+            default="newlib"))
+    module.add_option(
+        BooleanOption(
+            name="enable_gpio",
+            description="Enable clock for GPIO during startup",
+            default=True))
+    module.add_option(
+        EnumerationOption(
+            name="vector_table_location",
+            description=FileReader("option/vector_table_location.md"),
+            enumeration=["rom", "ram", "fastest"],
+            default="fastest"))
+    module.add_option(
+        NumericOption(
+            name="main_stack_size",
+            description=FileReader("option/main_stack_size.md"),
+            minimum=2**8,
+            maximum=2**16,
+            default=2**10 * 3 - 32))
+
+    uarts = options[":target"].get_driver("uart")["instance"]
+    module.add_option(
+        EnumerationOption(
+            name="hardfault.log",
+            description="",
+            enumeration=["disabled", "basic", "full"],
+            default="disabled"))
+    module.add_option(
+        EnumerationOption(
+            name="hardfault.log.uart",
+            description="",
+            enumeration=uarts,
+            default=uarts[0]))
+
+    pins = [p["@port"] + p["@id"] for p in options[":target"].get_driver("gpio")["gpio"]]
+    module.add_option(
+        EnumerationOption(
+            name="hardfault.led",
+            description="",
+            enumeration=pins + ["disabled"],
+            default="disabled"))
+
+    module.add_option(
+        StringOption(
+            name="linkerscript.memory",
+            description="",
+            default=""))
+    module.add_option(
+        StringOption(
+            name="linkerscript.sections",
+            description="",
+            default=""))
+    module.add_option(
+        StringOption(
+            name="linkerscript.table_extern.zero",
+            description="",
+            default=""))
+    module.add_option(
+        StringOption(
+            name="linkerscript.table_extern.copy",
+            description="",
+            default=""))
+    module.add_option(
+        StringOption(
+            name="linkerscript.table_extern.heap",
+            description="",
+            default=""))
+
+    module.add_option(
+        BooleanOption(
+            name="free_rtos.support",
+            description="",
+            default=False))
+    module.add_option(
+        NumericOption(
+            name="free_rtos.frequency",
+            description="",
+            minimum=1000,
+            maximum=10000,
+            default=1000))
+
+    return True
+
+def build(env):
+    device = env[":target"]
+    driver = device.get_driver("core")
+
+    properties = device.properties
+    properties["target"] = target = device.identifier
+    properties["partname"] = device.partname
+    properties["driver"] = driver
+    properties["vector_table_location"] = env["::vector_table_location"]
+
+    # Add ARM Cortex-M exceptions
+    interrupts = {
+        -15: "Reset_Handler",
+        -14: "NMI_Handler",
+        -13: "HardFault_Handler",
+        -5: "SVC_Handler",
+        -2: "PendSV_Handler",
+        -1: "SysTick_Handler"
+    }
+    if properties["core"] != "cortex-m0":
+        interrupts.update({
+            -12: "MemManage_Handler",
+            -11: "BusFault_Handler",
+            -10: "UsageFault_Handler",
+            -4: "DebugMon_Handler"
+        })
+    # Append `_IRQHandler` to all
+    for vector in driver["vector"]:
+        interrupts[int(vector["@position"])] = vector["@name"] + "_IRQHandler"
+    properties["interrupt_table"] = interrupts
+    properties["number_of_interrupts"] = max(interrupts.keys())
+
+    env.substitutions = properties
+    env.outbasepath = "link"
+
+    for memory in driver["memory"]:
+        if memory["@name"] == "ccm":
+            if "x" in memory["@access"]:
+                if properties["vector_table_location"] == "fastest":
+                    properties["vector_table_location"] = "ram"
+                # Executable CCM (Instruction Core-Coupled Memory)
+                env.template("linkerscript/stm32_iccm.ld.in", "linkerscript.ld")
+                break
+            else:
+                # Non-executable CCM (Data Core-Coupled Memory)
+                env.template("linkerscript/stm32_dccm.ld.in", "linkerscript.ld")
+                break
+        elif memory["@name"] == "dtcm":
+            if properties["vector_table_location"] == "fastest":
+                properties["vector_table_location"] = "ram"
+            # Executable ITCM and DTCM (Tightly-Coupled Memory)
+            env.template("linkerscript/stm32_idtcm.ld.in", "linkerscript.ld")
+            break
+    else:
+        env.template("linkerscript/stm32_ram.ld.in", "linkerscript.ld")
+
+    env.outbasepath = "src/modm/platform/core"
+
+    # dealing with runtime assertions
+    env.copy("assert.cpp")
+
+    # dealing with C++
+    env.copy("cxxabi.cpp")
+
+    # dealing with newlib
+    env.copy("syscalls.c")
+
+    # startup script
+    env.template("startup.c.in")
+    env.copy("default_handler.sx")
+
+    # everything to do with dynamic memory
+    env.copy("heap_table.c")
+    if env["::allocator"] == "newlib":
+        env.template("heap_newlib.c.in")
+    if env["::allocator"] == "tlsf":
+        env.template("heap_tlsf.c.in")
+    if env["::allocator"] == "block_allocator":
+        env.template("heap_block_allocator.cpp.in")
+
+    env.template("delay.cpp.in")
+
+    if properties["core"] != "cortex-m0":
+        env.copy("cycle_counter.hpp")
+
+    # Systick Timer
+    env.template("systick/systick_timer.hpp.in")
+    env.template("systick/systick_timer.cpp.in")
+
+    # Hard Fault Handler
+    if target.platform == "stm32":
+        env.template("hard_fault_handler.cpp.in")
+        env.template("hard_fault.sx.in")

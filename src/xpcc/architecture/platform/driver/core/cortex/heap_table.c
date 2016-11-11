@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 /**
- * @ingroup 	{{target.string}}
- * @defgroup	{{target.string}}_core Core
+ * @ingroup 	{{partname}}
+ * @defgroup	{{partname}}_core Core
  */
 
 #include <stddef.h>

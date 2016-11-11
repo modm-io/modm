@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 /**
- * @ingroup 	{{target.string}}
- * @defgroup	{{target.string}}_core Core
+ * @ingroup 	{{partname}}
+ * @defgroup	{{partname}}_core Core
  */
 
 #include <stdlib.h>
@@ -18,7 +18,6 @@
 #include <errno.h>
 
 // ----------------------------------------------------------------------------
-%% if parameters.allocator == "block_allocator"
 // Using the XPCC Block Allocator
 #include <xpcc/architecture/driver/heap/block_allocator.hpp>
 
@@ -102,5 +101,3 @@ void *malloc_tr(size_t size, uint32_t traits)
 }
 
 } // extern "C"
-
-%% endif

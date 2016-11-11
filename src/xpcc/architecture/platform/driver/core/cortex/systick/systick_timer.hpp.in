@@ -49,10 +49,10 @@ public:
 	static void
 	initialize()
 	{
-%% if parameters.free_rtos_support
-		static_assert({{ parameters.free_rtos_frequency }} % 1000 == 0,
+%% if options["free_rtos.support"]
+		static_assert({{ options["free_rtos.frequency"] }} % 1000 == 0,
 				"FreeRTOS switching frequency must be a multiple of 1000Hz!");
-		constexpr float desired = float(SystemClock::Frequency) / {{ parameters.free_rtos_frequency }};
+		constexpr float desired = float(SystemClock::Frequency) / {{ options["free_rtos.frequency"] }};
 %% else
 		constexpr float desired = float(SystemClock::Frequency) / 1000;
 %% endif
@@ -70,8 +70,8 @@ public:
 		constexpr uint32_t generated_rate = SystemClock::Frequency / reload;
 		Peripheral::assertBaudrateInTolerance<
 				/* nearest possible value */ generated_rate,
-%% if parameters.free_rtos_support
-				/* desired = */ {{ parameters.free_rtos_frequency }},
+%% if options["free_rtos.support"]
+				/* desired = */ {{ options["free_rtos.frequency"] }},
 %% else
 				/* desired = */ 1000,
 %% endif

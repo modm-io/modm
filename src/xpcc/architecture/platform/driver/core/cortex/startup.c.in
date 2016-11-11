@@ -10,29 +10,9 @@
 %# Include Target Specific Files
 %% import 'platform.macros' as platform with context
 
-%# This dictionary contains the devices interrupt table
-%% set i = {}
-%# Generate Cortex Interrupts
-%% if target is cortex_m3 or target is cortex_m4 or target is cortex_m7
-%% 	do i.update({-12:  ["MemManage_Handler", "MPU Fault Handler"]})
-%% 	do i.update({-11:  ["BusFault_Handler", "Bus Fault Handler"]})
-%% 	do i.update({-10:  ["UsageFault_Handler", "Usage Fault Handler"]})
-%% 	do i.update({ -4: ["DebugMon_Handler", "Debug Monitor Handler"]})
-%% endif
-%% do i.update({-5: ["SVC_Handler", "SVCall Handler"]})
-%% do i.update({-2: ["PendSV_Handler", "PendSV Handler"]})
-%% do i.update({-1: ["SysTick_Handler", "SysTick Handler"]})
-%% for vector in vectors
-%%  do i.update({(vector.position | int) : [vector.name, ""]})
-%% endfor
-
-%# Count Interrupts
-%% set number_of_interrupts = i.keys() | sort | last
-
 #include <stdint.h>
 #include <xpcc/architecture/utils.hpp>
-#include "../../../device.hpp"
-#include "xpcc_config.hpp"
+#include "../device.hpp"
 
 {{ platform.defines() }}
 
@@ -42,23 +22,16 @@
  * As they are weak aliases, any function with the same name will override
  * this definition.
  */
-void Reset_Handler(void)				__attribute__((noreturn));
-void NMI_Handler(void)					__attribute__ ((weak, alias("defaultHandler")));
-%% if target is stm32
+void Reset_Handler(void)						__attribute__((noreturn));
+void NMI_Handler(void)							__attribute__((weak, alias("defaultHandler")));
+%% if target.family == "stm32"
 void HardFault_Handler(void);
 %% else
-void HardFault_Handler(void)			__attribute__ ((weak, alias("defaultHandler")));
+void HardFault_Handler(void)					__attribute__((weak, alias("defaultHandler")));
 %% endif
-%# Remember declarations to avoid redeclarations
-%% set declarations = []
-%% for addr, interrupt in i.iteritems()
-%% 	if interrupt[0] not in declarations
-%%		do declarations.append(interrupt[0])
-%%		set suffix = "_IRQHandler"
-%%		if addr < 0
-%%			set suffix = ""
-%%		endif
-{{ ("void " + interrupt[0] + suffix + "(void)") | xpcc.pad(36)}}__attribute__ ((weak, alias("defaultHandler")));
+%% for pos in range(4 - 16, number_of_interrupts + 1)
+%% 	if pos in interrupt_table
+{{ ("void " ~ interrupt_table[pos] ~ "(void)") | lbuild.pad(47)}}__attribute__((weak, alias("defaultHandler")));
 %%	endif
 %% endfor
 // ----------------------------------------------------------------------------
@@ -69,7 +42,7 @@ typedef void (* const FunctionPointer)(void);
 extern uint32_t __main_stack_top[];
 extern uint32_t __process_stack_top[];
 
-%% if parameters.vector_table_in_ram
+%% if vector_table_location == "ram"
 // reserve space for the remapped vector table in RAM
 __attribute__(( section(".vectors") ))
 FunctionPointer ramVectors[{{number_of_interrupts + 16}}];
@@ -82,15 +55,11 @@ FunctionPointer flashVectors[] =
 	Reset_Handler,							// -15: code entry point
 	NMI_Handler,							// -14: Non Maskable Interrupt handler
 	HardFault_Handler,						// -13: hard fault handler
-%% for addr in range(4 - 16, number_of_interrupts + 1)
-%% 	if addr in i
-%%		set suffix = "_IRQHandler"
-%%		if addr < 0
-%%			set suffix = ""
-%%		endif
-	{{ (i[addr][0] + suffix + ",") | xpcc.pad(36) }}// {{ (addr|string).rjust(3) }}
+%% for pos in range(4 - 16, number_of_interrupts + 1)
+%% 	if pos in interrupt_table
+	{{ (interrupt_table[pos] ~ ",") | lbuild.pad(39) }}// {{ (pos|string).rjust(3) }}
 %% 	else
-	0,										// {{ (addr|string).rjust(3) }}
+	0,										// {{ (pos|string).rjust(3) }}
 %% 	endif
 %% endfor
 };
@@ -133,7 +102,7 @@ void xpcc_hook_hardware_init(void) {}
 
 extern void __xpcc_initialize_memory(void);
 
-%% if parameters.enable_gpio
+%% if options["::enable_gpio"]
 extern void xpcc_gpio_enable(void);
 %% endif
 
@@ -208,7 +177,7 @@ Reset_Handler(void)
 	table_zero(	(uint32_t**)__table_zero_intern_start,
 				(uint32_t**)__table_zero_intern_end);
 
-%% if not (target is cortex_m0 or target is cortex_m7)
+%% if core not in ["cortex-m0", "cortex-m7f", "cortex-m7fd"]
 	// Enable Tracing Debug Unit
 	CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
 	DWT->CYCCNT = 0;
@@ -216,20 +185,20 @@ Reset_Handler(void)
 	DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
 %% endif
 
-%% if target is cortex_m7
+%% if core in ["cortex-m7f", "cortex-m7fd"]
 	// enable instruction cache
 	SCB_EnableICache();
 %% endif
 
-%% if target is cortex_m4f or target is cortex_m7f or target is cortex_m7fd
+%% if core in ["cortex-m4f", "cortex-m7f", "cortex-m7fd"]
 	// Enable FPU in privileged and user mode
 	SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  // set CP10 and CP11 Full Access
 %% endif
 
-%% if target is cortex_m3 or target is cortex_m4 or target is cortex_m7
+%% if core in ["cortex-m3", "cortex-m4f", "cortex-m7f", "cortex-m7fd"]
 	// Setup NVIC
 	// Set vector table
-	%% if parameters.vector_table_in_ram
+	%% if vector_table_location == "ram"
 	SCB->VTOR = (uint32_t)(__vector_table_ram_start);
 	%% else
 	SCB->VTOR = (uint32_t)(__vector_table_rom_start);
@@ -256,13 +225,13 @@ Reset_Handler(void)
 			SCB_SHCSR_USGFAULTENA_Msk |
 			SCB_SHCSR_MEMFAULTENA_Msk;*/
 %% else
-	%% if parameters.vector_table_in_ram
+	%% if vector_table_location == "ram"
 	// cortex-m0 does not provide the SCB->VTOR register
 	#error "Placing the vector table in RAM is not supported on Cortex-M0 targets."
 	%% endif
 %% endif
 
-%% if parameters.enable_gpio
+%% if options["::enable_gpio"]
 	// Enable GPIO Clock
 	xpcc_gpio_enable();
 %% endif

@@ -15,18 +15,18 @@
 
 MEMORY
 {
-%% for memory in memorys
-	{{ memory.name | upper }} ({{ memory.access }}) : ORIGIN = {{ memory.start }}, LENGTH = {{ memory.size }}k
-	%% do regions.append(memory.name)
-	%% if 'sram1' == memory.name
-		%% do ram_origin.append(memory.start)
+%% for memory in driver["memory"]
+	{{ memory["@name"] | upper }} ({{ memory["@access"] }}) : ORIGIN = {{ memory["@start"] }}, LENGTH = {{ memory["@size"] }}k
+	%% do regions.append(memory["@name"])
+	%% if 'sram1' == memory["@name"]
+		%% do ram_origin.append(memory["@start"])
 	%% endif
-	%% if 'sram' in memory.name
-		%% do ram_sizes.append(memory.size | int)
+	%% if 'sram' in memory["@name"]
+		%% do ram_sizes.append(memory["@size"] | int)
 	%% endif
 %% endfor
 	RAM (rwx) : ORIGIN = {{ ram_origin[0] }}, LENGTH = {{ ram_sizes | sum }}k
-	{{ parameters.linkerscript_memory }}
+	{{ options["linkerscript.memory"] }}
 }
 
 OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
@@ -45,16 +45,16 @@ PROVIDE(__rom_start = ORIGIN(FLASH));
 PROVIDE(__rom_end   = ORIGIN(FLASH) + LENGTH(FLASH));
 
 /* the thread stack is used only for reporting hard fault conditions! It may therefore be small. */
-%% if (not parameters.enable_hardfault_handler_led) and (parameters.enable_hardfault_handler_log == "false")
+%% if (options["hardfault.led"] == "disabled") and (options["hardfault.log"] == "disabled")
 	%% set pss = 0
-%% elif parameters.enable_hardfault_handler_log == "false"
+%% elif options["hardfault.log"] == "disabled"
 	%% set pss = 32
 %% else
 	%% set pss = 512
 %% endif
 PROCESS_STACK_SIZE  = {{ pss }};
 /* the handler stack is used for main program as well as interrupts */
-MAIN_STACK_SIZE     = {{ parameters.main_stack_size }};
+MAIN_STACK_SIZE     = {{ options.main_stack_size }};
 /* combined stack size */
 TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 %% endmacro
@@ -168,14 +168,14 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 	.table.zero.extern : ALIGN(4)
 	{
 		__table_zero_extern_start = .;
-		{{ parameters.linkerscript_table_zero_extern }}
+		{{ options["linkerscript.table_extern.zero"] }}
 		__table_zero_extern_end = .;
 	} >FLASH
 
 	.table.copy.extern : ALIGN(4)
 	{
 		__table_copy_extern_start = .;
-		{{ parameters.linkerscript_table_copy_extern }}
+		{{ options["linkerscript.table_extern.copy"] }}
 		__table_copy_extern_end = .;
 	} >FLASH
 %% endmacro
@@ -204,7 +204,7 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		LONG(__{{ section['name'] }}_start)
 		LONG(__{{ section['name'] }}_end)
 	%% endfor
-		{{ parameters.linkerscript_table_heap_extern }}
+		{{ options["linkerscript.table_extern.heap"] }}
 		__table_heap_end = .;
 	} >FLASH
 %% endmacro

@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 /**
- * @ingroup 	{{target.string}}
- * @defgroup	{{target.string}}_core Core
+ * @ingroup 	{{partname}}
+ * @defgroup	{{partname}}_core Core
  */
 
 #include <stdlib.h>
@@ -18,7 +18,6 @@
 #include <errno.h>
 
 // ----------------------------------------------------------------------------
-%% if parameters.allocator == "tlsf"
 #include <tlsf.h>
 
 #ifndef XPCC_TLSF_MAX_MEM_POOL_COUNT
@@ -176,4 +175,3 @@ _sbrk_r(struct _reent *r,  ptrdiff_t size)
 	(void) size;
 	return NULL;
 }
-%% endif

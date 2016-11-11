@@ -45,7 +45,7 @@
 	.func	HardFault_Handler
 HardFault_Handler:
 
-%% if (target is stm32) and (target is not stm32f0)
+%% if partname.startswith("stm32") and not partname.startswith("stm32f0"):
 	/* When a hard fault occurs, this handler will move the stack pointer around.
  	 * This makes it harder to debug a hard fault with a real debugger, so if one is connected we would
 	 * like to trigger a software breakpoint before moving the stack pointer.
@@ -93,7 +93,7 @@ HardFault_Handler:
 no_debugger:
 %% endif
 
-%% if (not parameters.enable_hardfault_handler_led) and (parameters.enable_hardfault_handler_log == "false")
+%% if (options["hardfault.led"] == "disabled") and (options["hardfault.log"] == "disabled")
 	b HardFault_Handler					// busy wait in a loop forever
 %% else
 	// Save the current main stack pointer into the PSP register.
@@ -101,7 +101,7 @@ no_debugger:
 	mov r0, sp							// move SP into r0
 	msr psp, r0							// save SP into the process stack pointer (PSP)
 
-%% if parameters.enable_hardfault_handler_log == "false"
+%% if options["hardfault.log"] == "disabled"
 	/* The LED blinking code consumes at most 32B of stack.
 	 * If there is >32B of space on the main stack, we do not switch the
 	 * stack pointer to the reserved hard fault handler stack.
@@ -121,7 +121,7 @@ no_debugger:
 use_main_stack:
 	mov r0, lr							// restore register 0 from the LR
 
-%% if parameters.enable_hardfault_handler_log == "false"
+%% if options["hardfault.log"] == "disabled"
 	/* This sets up and toggles an LED.
 	 * The actual setup and toggle code is delegated to C++ world,
 	 * so that the xpcc GPIO API can be used.
@@ -173,7 +173,7 @@ loop:
 //	mrs r7, psr							// INVALID!
 	push {r0-r7}				// +8	// push registers r8 through r12, lr, pc, psr onto the stack
 	mov r2, sp							// buffer the current PSP for later
-%% if target is not cortex_m0
+%% if not core.startswith("cortex-m0"):
 
 	// we now push all valuable information about the bus fault onto the stack
 	// this means loading a range or registers from SCB and preserving them
@@ -195,7 +195,7 @@ loop:
 	ldr r3, [r1, #28]					// load  PSR
 	str r3, [r2, #28]					// store PSR
 
-%% if target is cortex_m0
+%% if core.startswith("cortex-m0"):
 	// 16 registers have been pushed onto the stack, => 64 bytes of the process stack have already been used!
 %% else
 	// 23 registers have been pushed onto the stack, => 92 bytes of the process stack have already been used!
