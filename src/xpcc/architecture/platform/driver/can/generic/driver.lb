@@ -1,0 +1,12 @@
+
+def init(module):
+    module.name = "can.generic"
+    module.parent = "platform"
+
+def prepare(module, options):
+    module.depends(":platform:clock.generic")
+    return True
+
+def build(env):
+    env.outbasepath = "src/modm/platform/can"
+    env.copy("can_bit_timings.hpp")

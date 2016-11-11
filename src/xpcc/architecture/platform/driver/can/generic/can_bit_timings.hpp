@@ -12,7 +12,7 @@
 
 #include <xpcc/architecture/interface.hpp>
 
-#include "../../clock/generic/common_clock.hpp"
+#include "../clock/common_clock.hpp"
 
 namespace xpcc
 {
