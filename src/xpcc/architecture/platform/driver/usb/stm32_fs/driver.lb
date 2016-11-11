@@ -1,0 +1,15 @@
+
+def init(module):
+    module.name = "usb"
+    module.parent = "platform"
+
+def prepare(module, options):
+    if not options[":target"].has_driver("usb:stm32_fs"):
+        return False
+
+    module.depends(":platform:core")
+    return True
+
+def build(env):
+    env.outbasepath = "src/modm/platform/usb"
+    env.copy("type_ids.hpp")
