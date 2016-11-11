@@ -1,0 +1,44 @@
+
+def init(module):
+    module.name = "clock"
+    module.parent = "platform"
+
+def prepare(module, options):
+    if not options[":target"].has_driver("clock:stm32"):
+        return False
+
+    module.depends([":platform:core", ":platform:clock.generic"])
+    return True
+
+def build(env):
+    device = env[":target"]
+    driver = device.get_driver("clock")
+
+    properties = device.properties
+    properties["target"] = target = device.identifier
+    properties["partname"] = device.partname
+    properties["driver"] = driver
+
+    if target.family in ["f1", "f3", "f4"]:
+        properties["hsi_frequency"] = 8
+        properties["lsi_frequency"] = 40
+    else:
+        properties["hsi_frequency"] = 16
+        properties["lsi_frequency"] = 32
+
+    # TODO: Move this data into the device files
+    properties["usbprescaler"] = \
+        (target.name in ["042", "048", "070", "072", "078", "102", "103", "302", "373"] or
+        (target.name in ["303", "358", "398"] and target.size_id in ["b", "c", "d", "e"]))
+    properties["pllprediv"] = \
+        (target.family in ["f0", "f3"] or target.name in ["100", "105", "107"])
+    properties["hsi48"] = \
+        target.name in ["042", "048", "071", "072", "078", "091", "098"]
+
+    env.substitutions = properties
+    env.outbasepath = "src/modm/platform/clock"
+
+    env.template("latency.cpp.in")
+    env.template("clock.cpp.in")
+    env.template("clock.hpp.in")
+    env.copy("type_ids.hpp")

@@ -17,9 +17,9 @@ namespace clock
 uint32_t xpcc_fastdata fcpu({{ hsi_frequency|int * 1000000 }});
 uint32_t xpcc_fastdata fcpu_kHz({{ hsi_frequency|int * 1000 }});
 uint16_t xpcc_fastdata fcpu_MHz({{ hsi_frequency }});
-%% if target is cortex_m0
+%% if core.startswith("cortex-m0")
 	%% set loops = 4000.0
-%% elif target is cortex_m7
+%% elif core.startswith("cortex-m7")
 	%% set loops = 1000.0
 %% else
 	%% set loops = 3000.0
@@ -30,7 +30,7 @@ uint16_t xpcc_fastdata ns_per_loop({{ loops / hsi_frequency|int}});
 }
 
 // ----------------------------------------------------------------------------
-%% if target is stm32f0
+%% if target.family == "f0"
 bool
 xpcc::stm32::ClockControl::enableInternalClockMHz14(uint32_t waitCycles)
 {
@@ -42,7 +42,7 @@ xpcc::stm32::ClockControl::enableInternalClockMHz14(uint32_t waitCycles)
 }
 %% endif
 
-%% if hsi48 is defined
+%% if hsi48
 bool
 xpcc::stm32::ClockControl::enableInternalClockMHz48(uint32_t waitCycles)
 {
@@ -114,7 +114,7 @@ xpcc::stm32::ClockControl::enableLowSpeedExternalCrystal(uint32_t waitCycles)
 	return retval;
 }
 
-%% if target is stm32f2 or target is stm32f4 or target is stm32f7
+%% if target.family in ["f2", "f4", "f7"]
 // ----------------------------------------------------------------------------
 bool
 xpcc::stm32::ClockControl::enablePll(PllSource source, uint8_t pllM,
@@ -156,20 +156,20 @@ xpcc::stm32::ClockControl::enablePll(PllSource source, uint8_t pllM,
 // ----------------------------------------------------------------------------
 bool
 xpcc::stm32::ClockControl::enablePll(PllSource source,
-%% if usbprescaler is defined
+%% if usbprescaler
 			UsbPrescaler usb,
 %% endif
-%% if pllprediv2 is defined
+%% if pllprediv2
 			uint8_t pllMul, uint8_t pllPrediv, uint8_t pllPrediv2, uint32_t waitCycles)
-%% elif pllprediv is defined
+%% elif pllprediv
 			uint8_t pllMul, uint8_t pllPrediv, uint32_t waitCycles)
 %% else
 			uint8_t pllMul, uint32_t waitCycles)
 %% endif
 {
-%% set pullmul = 'RCC_CFGR_PLLMULL' if target is stm32f1 else 'RCC_CFGR_PLLMUL'
+%% set pullmul = 'RCC_CFGR_PLLMULL' if target.family == "f1" else 'RCC_CFGR_PLLMUL'
 	// Read reserved values and clear all other values
-%% if usbprescaler is defined
+%% if usbprescaler
 	uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_USBPRE | {{pullmul}} | RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE);
 
 	// Divide Output for USB Clock by 1.5?
@@ -184,8 +184,8 @@ xpcc::stm32::ClockControl::enablePll(PllSource source,
 	// Pll multiplication factor
 	tmp |= (static_cast<uint32_t>(pllMul - 2) << 18) & {{pullmul}};
 
-%% if pllprediv is defined
-	%% set mask = 'RCC_CFGR2_PREDIV1' if target is stm32f1 else 'RCC_CFGR2_PREDIV'
+%% if pllprediv
+	%% set mask = 'RCC_CFGR2_PREDIV1' if target.family == "f1" else 'RCC_CFGR2_PREDIV'
 #ifdef {{mask}}
 	// HSE PREDIV division factor
 	RCC->CFGR2 = (RCC->CFGR2 & ~({{mask}})) | (uint32_t(pllPrediv - 1) & {{mask}});
@@ -194,7 +194,7 @@ xpcc::stm32::ClockControl::enablePll(PllSource source,
 #endif
 %% endif
 	RCC->CFGR = tmp;
-%% if pllprediv2 is defined
+%% if pllprediv2
 	RCC->CFGR2 = (RCC->CFGR2 & ~(RCC_CFGR2_PREDIV2)) | ((uint32_t(pllPrediv2 - 1) << 4) & RCC_CFGR2_PREDIV2);
 %% endif
 	// enable pll

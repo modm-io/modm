@@ -11,13 +11,13 @@
 #define XPCC_STM32_CLOCK_HPP
 
 /**
- * @ingroup 	{{target.string}}
- * @defgroup	{{target.string}}_clock System Clock
+ * @ingroup 	{{partname}}
+ * @defgroup	{{partname}}_clock System Clock
  */
 
 #include <stdint.h>
-#include "../../../device.hpp"
-#include "../generic/common_clock.hpp"
+#include "../device.hpp"
+#include "common_clock.hpp"
 
 using namespace xpcc::clock;
 
@@ -36,7 +36,7 @@ namespace stm32
  * Don't forget to set the flash latencies.
  *
  * @author		Niklas Hauser
- * @ingroup		{{target.string}}_clock
+ * @ingroup		{{partname}}_clock
  */
 class ClockControl
 {
@@ -44,23 +44,23 @@ public:
 	enum class
 	PllSource : uint32_t
 	{
-%% if target is stm32f2 or target is stm32f4 or target is stm32f7
+%% if target.family in ["f2", "f4", "f7"]
 		/// High speed internal clock (16 MHz)
 		Hsi = RCC_PLLCFGR_PLLSRC_HSI,
 		/// High speed external clock (see HseConfig)
 		Hse = RCC_PLLCFGR_PLLSRC_HSE,
-%% elif target is stm32f0 or target is stm32f3
+%% elif target.family in ["f0", "f3"]
 		/// High speed internal clock (8 MHz)
 		Hsi = RCC_CFGR_PLLSRC_HSI_DIV2,
 		/// High speed external clock (see HseConfig)
 		Hse = RCC_CFGR_PLLSRC_HSE_PREDIV,
-%% elif target is stm32f1
+%% elif target.family == "f1"
 		/// High speed internal clock (8 MHz)
 		Hsi = 0,
 		/// High speed external clock (see HseConfig)
 		Hse = RCC_CFGR_PLLSRC,
 %% endif
-%% if hsi48 is defined
+%% if hsi48
 		/// High speed internal clock (48 MHz)
 		Hsi48 = RCC_CFGR_PLLSRC_HSI48_PREDIV,
 		InternalClockMHz48 = Hsi48,
@@ -76,7 +76,7 @@ public:
 	{
 		Hsi = RCC_CFGR_SW_HSI,
 		Hse = RCC_CFGR_SW_HSE,
-%% if hsi48 is defined
+%% if hsi48
 		Hsi48 = RCC_CFGR_SW_HSI48,
 		InternalClockMHz48 = Hsi48,
 %% endif
@@ -121,7 +121,7 @@ public:
 		Div512 = RCC_CFGR_HPRE_DIV512
 	};
 
-%% if target is stm32f0
+%% if target.family == "f0"
 	enum class
 	ApbPrescaler : uint32_t
 	{
@@ -153,7 +153,7 @@ public:
 	};
 %% endif
 
-%% if target is stm32f2 or target is stm32f4 or target is stm32f7
+%% if target.family in ["f2", "f4", "f7"]
 	enum class
 	ClockOutput1Source : uint32_t
 	{
@@ -179,20 +179,20 @@ public:
 		InternalClock = RCC_CFGR_MCO_HSI,
 		ExternalClock = RCC_CFGR_MCO_HSE,
 		ExternalCrystal = RCC_CFGR_MCO_HSE,
-	%% if target is stm32f0
+	%% if target.family == "f0"
 		InternalClockMHz14 = RCC_CFGR_MCO_HSI14,
 	%% endif
-	%% if hsi48 is defined
+	%% if hsi48
 		InternalClockMHz48 = RCC_CFGR_MCO_HSI48,
 	%% endif
-	%% if target is stm32f1
+	%% if target.family == "f1"
 		Pll = RCC_CFGR_MCO_PLLCLK_DIV2,	///< divided by 2
 	%% else
 		Pll = RCC_CFGR_MCO_PLL,	///< divided by 2
 	%% endif
 	};
 %% endif
-%% if usbprescaler is defined
+%% if usbprescaler
 	enum class
 	UsbPrescaler : uint32_t
 	{
@@ -205,12 +205,12 @@ public:
 	static bool
 	enableInternalClock(uint32_t waitCycles = 2048);
 
-%% if target is stm32f0
+%% if target.family == "f0"
 	static bool
 	enableInternalClockMHz14(uint32_t waitCycles = 2048);
 %% endif
 
-%% if hsi48 is defined
+%% if hsi48
 	static bool
 	enableInternalClockMHz48(uint32_t waitCycles = 2048);
 %% endif
@@ -231,7 +231,7 @@ public:
 	enableLowSpeedExternalCrystal(uint32_t waitCycles = 2048);
 
 	// plls
-%% if target is stm32f2 or target is stm32f4 or target is stm32f7
+%% if target.family in ["f2", "f4", "f7"]
 	/**
 	 * Enable PLL.
 	 *
@@ -267,12 +267,12 @@ public:
 %% else
 	static bool
 	enablePll(PllSource source,
-%% if usbprescaler is defined
+%% if usbprescaler
 				UsbPrescaler usb,
 %% endif
-	%% if pllprediv2 is defined
+	%% if pllprediv2
 				uint8_t pllMul, uint8_t pllPrediv, uint8_t pllPrediv2, uint32_t waitCycles = 2048);
-	%% elif pllprediv is defined
+	%% elif pllprediv
 				uint8_t pllMul, uint8_t pllPrediv, uint32_t waitCycles = 2048);
 	%% else
 				uint8_t pllMul, uint32_t waitCycles = 2048);
@@ -294,7 +294,7 @@ public:
 	enableWatchdogClock(WatchdogClockSource /*src*/)
 	{ return true; }
 
-%% if target is stm32f2 or target is stm32f4 or target is stm32f7
+%% if target.family in ["f2", "f4", "f7"]
 	static inline bool
 	enableClockOutput1(ClockOutput1Source src, uint8_t div)
 	{
@@ -329,7 +329,7 @@ public:
 		return true;
 	}
 
-%% if target is stm32f0
+%% if target.family == "f0"
 	static inline bool
 	setApbPrescaler(ApbPrescaler prescaler)
 	{
