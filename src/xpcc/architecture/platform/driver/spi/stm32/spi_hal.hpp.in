@@ -10,7 +10,7 @@
 #ifndef XPCC_STM32_SPI_HAL{{ id }}_HPP
 #define XPCC_STM32_SPI_HAL{{ id }}_HPP
 
-#include "../../clock/generic/common_clock.hpp"
+#include "../clock/common_clock.hpp"
 #include "spi_base.hpp"
 
 namespace xpcc
@@ -26,7 +26,7 @@ namespace stm32
  * the regular Spi classes.
  *
  * @author		Kevin Laeufer
- * @ingroup		{{target.string}}_spi
+ * @ingroup		{{partname}}_spi
  */
 class SpiHal{{ id }} : public SpiBase
 {

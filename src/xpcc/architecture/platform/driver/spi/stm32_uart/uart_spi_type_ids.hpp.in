@@ -6,7 +6,6 @@
  * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
-{{ generation_block }}
 
 #ifndef XPCC_STM32_UART_SPI_TYPE_IDS_HPP
 #define XPCC_STM32_UART_SPI_TYPE_IDS_HPP

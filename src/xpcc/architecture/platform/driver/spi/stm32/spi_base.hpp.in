@@ -11,11 +11,11 @@
 #define XPCC_STM32_SPI_BASE_HPP
 
 #include <stdint.h>
-#include "../../../device.hpp"
+#include "../device.hpp"
 
 /**
- * @ingroup 	{{target.string}}
- * @defgroup	{{target.string}}_spi SPI
+ * @ingroup 	{{partname}}
+ * @defgroup	{{partname}}_spi SPI
  */
 
 namespace xpcc
@@ -31,7 +31,7 @@ namespace stm32
  *
  * @author Kevin Laeufer
  * @internal
- * @ingroup		{{target.string}}_spi
+ * @ingroup		{{partname}}_spi
  */
 class SpiBase
 {
@@ -54,10 +54,10 @@ public:
 		ModeFaultError		= SPI_SR_MODF,
 		OverrunError		= SPI_SR_OVR,
 		Busy				= SPI_SR_BSY,
-%% if target is not stm32f1
+%% if target.family != "f1"
 		FrameFormatError	= SPI_SR_FRE,
 %% endif
-%% if target is stm32f0 or target is stm32f3 or target is stm32f7
+%% if target.family in ["f0", "f3", "f7"]
 		FifoRxLevel			= SPI_SR_FRLVL,
 		FifoTxLevel			= SPI_SR_FTLVL,
 %% endif
@@ -94,7 +94,7 @@ public:
 	enum class
 	DataSize : uint32_t
 	{
-%% if target is stm32f0 or target is stm32f3 or target is stm32f7
+%% if target.family in ["f0", "f3", "f7"]
 		Bit4  = SPI_CR2_DS_1 | SPI_CR2_DS_0,				///< 0b0011
 		Bit5  = SPI_CR2_DS_2,								///< 0b0100
 		Bit6  = SPI_CR2_DS_2 | SPI_CR2_DS_0,				///< 0b0101

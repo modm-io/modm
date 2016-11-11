@@ -1,0 +1,58 @@
+
+def get_properties(env):
+    device = env[":target"]
+    driver = device.get_driver("spi:stm32")
+    properties = device.properties
+    properties["target"] = device.identifier
+    properties["partname"] = device.partname
+    properties["driver"] = driver
+    return properties
+
+class Instance(Module):
+    def __init__(self, instance):
+        self.instance = instance
+
+    def init(self, module):
+        module.name = str(self.instance)
+        module.description = "SPI {} instance".format(self.instance)
+
+    def prepare(self, module, options):
+        module.depends(":platform:spi")
+        return True
+
+    def build(self, env):
+        properties = get_properties(env)
+        properties["id"] = self.instance
+        properties["apb"] = "2" if self.instance in [1, 4] else "1"
+
+        env.substitutions = properties
+        env.outbasepath = "src/modm/platform/spi"
+
+        env.template("spi_hal.hpp.in", "spi_hal_{}.hpp".format(self.instance))
+        env.template("spi_hal_impl.hpp.in", "spi_hal_{}_impl.hpp".format(self.instance))
+        env.template("spi_master.hpp.in", "spi_master_{}.hpp".format(self.instance))
+        env.template("spi_master.cpp.in", "spi_master_{}.cpp".format(self.instance))
+
+
+def init(module):
+    module.name = "spi"
+    module.parent = "platform"
+
+def prepare(module, options):
+    device = options[":target"]
+    if not device.has_driver("spi:stm32"):
+        return False
+
+    module.depends([":platform:core", ":platform:clock.generic"])
+
+    for instance in listify(device.get_driver("spi:stm32")["instance"]):
+        module.add_submodule(Instance(int(instance)))
+
+    return True
+
+def build(env):
+    env.substitutions = get_properties(env)
+    env.outbasepath = "src/modm/platform/spi"
+
+    env.template("spi_base.hpp.in")
+    env.template("type_ids.hpp.in")

@@ -11,7 +11,9 @@
 #define XPCC_STM32_UART_SPI_MASTER{{ id }}_HPP
 
 #include <xpcc/architecture/interface/spi_master.hpp>
-#include "../../uart/stm32/uart_hal_{{ id }}.hpp"
+#include "../uart/uart_hal_{{ id }}.hpp"
+#include "../uart/type_ids.hpp"
+#include "uart_spi_type_ids.hpp"
 #include "type_ids.hpp"
 
 namespace xpcc
@@ -27,7 +29,7 @@ namespace stm32
  *			Therefore the data is bit reversed in software for DataOrder::MsbFirst.
  *
  * @author		Niklas Hauser
- * @ingroup		{{target.string}}_spi
+ * @ingroup		{{partname}}_spi
  */
 class UartSpiMaster{{ id }} : public xpcc::SpiMaster, public UartBase
 {
@@ -58,13 +60,13 @@ public:
 	static void
 	initialize()
 	{
-%% if target is not stm32f1
+%% if target.family != "f1"
 		constexpr UartBase::OversamplingMode oversample =
 				UartBaudrate::getOversamplingMode(SystemClock::Usart{{ id }}, baudrate);
 %% endif
 		UsartHal{{ id }}::initializeWithBrr(
 				UartBaudrate::getBrr<SystemClock::Usart{{ id }}, baudrate, tolerance>(),
-%% if target is stm32f1
+%% if target.family == "f1"
 				UsartHal{{ id }}::Parity::Disabled);
 %% else
 				UsartHal{{ id }}::Parity::Disabled,
