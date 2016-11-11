@@ -1,0 +1,16 @@
+
+def init(module):
+    module.name = "adc"
+    module.parent = "platform"
+
+def prepare(module, options):
+    device = options[":target"]
+    if not device.has_driver("adc:stm32f0"):
+        return False
+
+    module.depends(":platform:core")
+    return True
+
+def build(env):
+    env.outbasepath = "src/modm/platform/adc"
+    env.template("type_ids.hpp.in")

@@ -15,7 +15,7 @@ namespace stm32
 {
 namespace TypeId
 {
-%% for id in [1,2,3]
+%% for id in driver.instance
 	%% for channel in range(0,19)
 	typedef struct{} Adc{{ id }}Channel{{ channel }};
 	%% endfor

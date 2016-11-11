@@ -6,19 +6,7 @@
  * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
-%#
-%% if target is stm32f2 or target is stm32f4 or target is stm32f7 or (target is stm32f1 and id == 1)
-	%% set temperature_available = true
-%% else
-	%% set temperature_available = false
-%% endif
 
-%% if target is stm32f4 or target is stm32f7
-	%% set max_frequency = 36000000
-%% else
-	%% set max_frequency = 14000000
-%% endif
-%#
 #ifndef XPCC_STM32_ADC{{ id }}_HPP
 #	error 	"Don't include this file directly, use 'adc_{{ id }}.hpp' instead!"
 #endif
@@ -76,9 +64,9 @@ xpcc::stm32::Adc{{ id }}::initialize()
 void
 xpcc::stm32::Adc{{ id }}::setPrescaler(const Prescaler prescaler)
 {
-%% if target is stm32f2 or target is stm32f4 or target is stm32f7
+%% if target.family in ["f2", "f4", "f7"]
 	ADC->CCR = (ADC->CCR & ~(0b11 << 17)) | (uint32_t(prescaler) << 17);
-%% elif target is stm32f1 or target is stm32f3
+%% elif target.family in ["f1", "f3"]
 	RCC->CFGR = (RCC->CFGR & ~(0b11 << 14)) | (uint32_t(prescaler) << 14);
 %% endif
 }
@@ -87,9 +75,9 @@ xpcc::stm32::Adc{{ id }}::setPrescaler(const Prescaler prescaler)
 void
 xpcc::stm32::Adc{{ id }}::enableTemperatureRefVMeasurement()
 {
-	%% if target is stm32f2 or target is stm32f4 or target is stm32f7
+	%% if target.family in ["f2", "f4", "f7"]
 	ADC->CCR |= ADC_CCR_TSVREFE;
-	%% elif target is stm32f1
+	%% elif target.family == "f1"
 	ADC{{ id }}->CR2 |= ADC_CR2_TSVREFE;
 	%% endif
 }
@@ -97,9 +85,9 @@ xpcc::stm32::Adc{{ id }}::enableTemperatureRefVMeasurement()
 void
 xpcc::stm32::Adc{{ id }}::disableTemperatureRefVMeasurement()
 {
-	%% if target is stm32f2 or target is stm32f4 or target is stm32f7
+	%% if target.family in ["f2", "f4", "f7"]
 	ADC->CCR &= ~ADC_CCR_TSVREFE;
-	%% elif target is stm32f1
+	%% elif target.family == "f1"
 	ADC{{ id }}->CR2 &= ~ADC_CR2_TSVREFE;
 	%% endif
 }
@@ -201,7 +189,7 @@ void
 xpcc::stm32::Adc{{ id }}::startConversion()
 {
 	acknowledgeInterruptFlags(InterruptFlag::All);
-%% if target is stm32f1
+%% if target.family == "f1"
 	// select the SWSTART event used to trigger the start of
 	// conversion of a regular group
 	ADC{{ id }}->CR2 |= ADC_CR2_EXTTRIG | ADC_CR2_EXTSEL_0 | ADC_CR2_EXTSEL_1 | ADC_CR2_EXTSEL_2;
@@ -263,9 +251,9 @@ void
 xpcc::stm32::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
 												const bool enable)
 {
-%% if target is stm32f2 or target is stm32f4 or target is stm32f7
+%% if target.family in ["f2", "f4", "f7"]
 	const IRQn_Type InterruptVector = ADC_IRQn;
-%% elif target is stm32f1 or target is stm32f3
+%% elif target.family in ["f1", "f3"]
 	%% if id < 3
 	const IRQn_Type InterruptVector = ADC1_2_IRQn;
 	%% elif id == 3

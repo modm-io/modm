@@ -1,0 +1,75 @@
+
+class Instance(Module):
+    def __init__(self, instance):
+        self.instance = instance
+
+    def init(self, module):
+        module.name = str(self.instance)
+        module.description = "ADC {} instance".format(self.instance)
+
+    def prepare(self, module, options):
+        module.depends(":platform:adc")
+        return True
+
+    def build(self, env):
+        device = env[":target"]
+        driver = device.get_driver("adc")
+
+        properties = device.properties
+        properties["target"] = target = device.identifier
+        properties["partname"] = device.partname
+        properties["id"] = int(self.instance)
+
+        if id == 1:
+            if target.family == "f3":
+                # 13-14 reserved
+                channels = [1,2,3,4,5,6,7,8,9,10,11,12,15,16,17,18]
+            else:
+                # 11-14 reserved
+                channels = [1,2,3,4,5,6,7,8,9,10,15,16,17,18]
+        elif id == 2:
+            # 13-16 reserved
+            channels = [1,2,3,4,5,6,7,8,9,10,11,12,17,18]
+        elif id == 3:
+            channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
+        elif id == 4:
+            # 14-16 reserved
+            channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,17,18]
+        properties["channels"] = sorted(channels)
+
+        env.substitutions = properties
+        env.outbasepath = "src/modm/platform/adc"
+
+        env.template("adc.hpp.in", "adc_{}.hpp".format(self.instance))
+        env.template("adc_impl.hpp.in", "adc_{}_impl.hpp".format(self.instance))
+
+
+def init(module):
+    module.name = "adc"
+    module.parent = "platform"
+
+def prepare(module, options):
+    device = options[":target"]
+    if not device.has_driver("adc:stm32f3"):
+        return False
+
+    module.depends(":platform:core")
+
+    for instance in listify(device.get_driver("adc")["instance"]):
+        module.add_submodule(Instance(int(instance)))
+
+    return True
+
+def build(env):
+    device = env[":target"]
+    driver = device.get_driver("adc")
+
+    properties = device.properties
+    properties["target"] = device.identifier
+    properties["partname"] = device.partname
+    properties["driver"] = driver
+
+    env.substitutions = properties
+    env.outbasepath = "src/modm/platform/adc"
+
+    env.template("type_ids.hpp.in")
