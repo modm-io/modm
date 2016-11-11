@@ -1,0 +1,15 @@
+
+def init(module):
+    module.name = "cmsis"
+
+def prepare(module, options):
+    device = options[":target"]
+    if not device.properties["core"].startswith("cortex"):
+        return False
+
+    return True
+
+def build(env):
+    env.outbasepath = "ext"
+
+    env.copy("Include/", "cmsis/")
