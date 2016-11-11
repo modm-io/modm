@@ -43,7 +43,7 @@ namespace TypeId
 
 	typedef struct{} FsmcNios16;
 	
-%% if (target is stm32f4 and (target.name not in ["405", "407", "415", "417"])) or target is stm32f7
+%% if (target.family == "f4" and (target.name not in ["405", "407", "415", "417"])) or target.family == "f7"
     typedef struct{} FsmcSdclk;
     typedef struct{} FsmcNbl2;
     typedef struct{} FsmcNbl3;

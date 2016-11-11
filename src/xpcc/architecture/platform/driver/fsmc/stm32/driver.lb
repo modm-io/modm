@@ -1,0 +1,26 @@
+
+def init(module):
+    module.name = "fsmc"
+    module.parent = "platform"
+
+def prepare(module, options):
+    if not options[":target"].has_driver("fsmc:stm32"):
+        return False
+
+    module.depends(":platform:core")
+    return True
+
+def build(env):
+    device = env[":target"]
+    driver = device.get_driver("core")
+
+    properties = device.properties
+    properties["target"] = device.identifier
+    properties["partname"] = device.partname
+
+    env.substitutions = properties
+    env.outbasepath = "src/modm/platform/fsmc"
+
+    env.template("fsmc.hpp.in")
+    env.template("fsmc.cpp.in")
+    env.template("type_ids.hpp.in")
