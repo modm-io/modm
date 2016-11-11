@@ -38,7 +38,6 @@
 #include <xpcc/architecture/platform/avr/xmega/gpio.hpp>
 
 #include "uart_{{ id.lower() }}.hpp"
-#include "xpcc_config.hpp"
 
 #ifdef USART{{ id }}_RXC_vect
 

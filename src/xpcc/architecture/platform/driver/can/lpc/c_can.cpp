@@ -8,8 +8,6 @@
 
 #include <strings.h>	// for ffs()
 
-#include <xpcc_config.hpp>
-
 // ----------------------------------------------------------------------------
 namespace xpcc
 {

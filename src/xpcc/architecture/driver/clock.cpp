@@ -10,7 +10,6 @@
 #include <xpcc/architecture/detect.hpp>
 
 #include "clock.hpp"
-#include "xpcc_config.hpp"
 
 #if (XPCC__CLOCK_TESTMODE == 1)
 
