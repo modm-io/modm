@@ -1,9 +1,0 @@
-<?xml version='1.0' encoding='UTF-8' ?>
-<!DOCTYPE rca SYSTEM "../../xml/driver.dtd">
-<rca version="1.0">
-	<driver type="gpio" name="stm32">
-		<!-- Template: file that needs to be turned into a source file -->
-		<template>gpio.hpp.in</template>
-		<template>gpio_enable.cpp.in</template>
-	</driver>
-</rca>

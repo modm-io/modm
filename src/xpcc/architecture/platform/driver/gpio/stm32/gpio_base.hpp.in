@@ -1,0 +1,168 @@
+// coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+#ifndef XPCC_STM32_GPIO_BASE_HPP
+#define XPCC_STM32_GPIO_BASE_HPP
+
+#include "../device.hpp"
+#include <xpcc/architecture/interface/gpio.hpp>
+#include <xpcc/architecture/interface/i2c.hpp>
+#include <xpcc/math/utils/bit_operation.hpp>
+
+extern void xpcc_gpio_enable(void);
+
+/**
+ * @ingroup 	platform
+ * @defgroup	{{partname}}
+ */
+
+/**
+ * @ingroup 	{{partname}}
+ * @defgroup	{{partname}}_gpio GPIO
+ */
+
+namespace xpcc
+{
+
+namespace stm32
+{
+
+/// @ingroup {{partname}}_gpio
+struct Gpio
+{
+	enum class
+	InputType
+	{
+%% if target.family in ["f1"]
+		Floating = 0x4,	///< floating on input
+		PullUp = 0x9,	///< pull-up on input
+		PullDown = 0x8,	///< pull-down on input
+%% else
+		Floating = 0x0,	///< floating on input
+		PullUp = 0x1,	///< pull-up on input
+		PullDown = 0x2,	///< pull-down on input
+%% endif
+	};
+
+	enum class
+	OutputType
+	{
+		PushPull = 0x0,		///< push-pull on output
+		PushPull = 0x0,		///< push-pull on output
+%% if target.family in ["f1"]
+		OpenDrain = 0x4,	///< open-drain on output
+%% else
+		OpenDrain = 0x1,	///< open-drain on output
+%% endif
+	};
+
+	enum class
+	OutputSpeed
+	{
+%% if target.family in ["f2", "f4", "f7"]
+		MHz2 = 0,		///< Low speed
+		MHz25 = 0x1,	///< Medium speed
+		MHz50 = 0x2,	///< Fast speed
+		MHz100 = 0x3,	///< High speed on 30 pF (80 MHz Output max speed on 15 pF)
+%% elif target.family in ["f0", "f3"]
+		MHz2 = 0,		///< Low speed
+		MHz10 = 0x1,	///< Medium speed
+		MHz50 = 0x3,	///< Fast speed
+%% elif target.family in ["f1"]
+		MHz2  = 0x2,	///< Low speed
+		MHz10 = 0x1,	///< Medium speed
+		MHz50 = 0x3,	///< Fast speed
+%% endif
+	};
+
+	enum class
+	InputTrigger
+	{
+		RisingEdge,
+		FallingEdge,
+		BothEdges,
+	};
+
+	/// The Port a Gpio Pin is connected to.
+	enum class
+	Port
+	{
+%% for port in ports
+		{{ port | upper }} = {{ port | letterToNum }},
+%% endfor
+	};
+
+	static void
+	enable()
+	{
+		xpcc_gpio_enable();
+	}
+
+	static void
+	disable()
+	{
+		// FIXME: Implement
+	}
+
+protected:
+	/// @cond
+%% if target.family not in ["f1"]
+	/// I/O Direction Mode values for this specific pin.
+	enum class
+	Mode
+	{
+		Input  = 0x0,
+		Output = 0x1,
+		AlternateFunction = 0x2,
+		Analog = 0x3,
+		Mask   = 0x3,
+	};
+
+	// 0..7 = AFRL[31:0]
+	// 8..15 = AFRH[31:0]
+	enum class
+	AlternateFunction
+	{
+		AF_0 = 0x00,		///< System
+		AF_1 = 0x01,		///< TIM1/2
+		AF_2 = 0x02,		///< TIM3..5
+		AF_3 = 0x03,		///< TIM8...11
+		AF_4 = 0x04,		///< I2C1..3
+		AF_5 = 0x05,		///< SPI1/2
+		AF_6 = 0x06,		///< SPI3
+		AF_7 = 0x07,		///< USART1..3
+		AF_8 = 0x08,		///< USART4..6
+		AF_9 = 0x09,		///< CAN1/2, TIM12..14
+		AF_10 = 0x0a,		///< OTG_FS, OTG_HS
+		AF_11 = 0x0b,		///< ETH
+		AF_12 = 0x0c,		///< FSMC, SDIO, OTG_HS (configured as FS)
+		AF_13 = 0x0d,		///< DCMI
+		AF_14 = 0x0e,		///< Reserved
+		AF_15 = 0x0f,		///< EVENTOUT
+	};
+
+	static constexpr uint32_t
+	i(Mode mode) { return uint32_t(mode); }
+	static constexpr uint32_t
+	i(AlternateFunction af) { return uint32_t(af); }
+%% endif
+	// Enum Class To Integer helper functions.
+	static constexpr uint32_t
+	i(InputType pull) { return uint32_t(pull); }
+	static constexpr uint32_t
+	i(OutputType out) { return uint32_t(out); }
+	static constexpr uint32_t
+	i(OutputSpeed speed) { return uint32_t(speed); }
+	/// @endcond
+};
+
+} // namespace stm32
+
+} // namespace xpcc
+
+#endif // XPCC_STM32_GPIO_BASE_HPP

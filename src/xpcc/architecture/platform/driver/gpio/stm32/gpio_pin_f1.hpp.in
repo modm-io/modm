@@ -1,0 +1,326 @@
+// coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+#ifndef XPCC_STM32_GPIO_PIN_HPP
+#define XPCC_STM32_GPIO_PIN_HPP
+
+#include "../device.hpp"
+
+
+namespace xpcc
+{
+
+namespace stm32
+{
+
+// Gpio Classes created from the XML Device File Gpio Description
+%% for gpio in driver.gpio
+	%% set port = gpio["@port"] | upper
+	%% set reg  = "GPIO" ~ port
+	%% set pin  = gpio["@id"]
+	%% set cr = "CRL" if pin|int < 8 else "CRH"
+
+	%% for type in ["Output", "Input", ""]
+		%% set name = "Gpio" ~ type ~ port ~ gpio["@id"]
+		%% set superclass = "Gpio" ~ (type if type != "" else "IO")
+
+/// {{type if type != "" else "IO"}} class for Pin {{port ~ pin}}
+/// @ingroup	{{partname}}_gpio
+struct {{name}} : public Gpio, ::xpcc::{{superclass}}
+{
+public:
+	/// Port name.
+	static constexpr Port port = Port::{{port}};
+	/// Pin Number.
+	static constexpr uint8_t pin = {{pin}};
+	/// Bitmask for registers that contain a 1bit value for every pin.
+	static constexpr uint16_t mask  = 0x1 << pin;
+private:
+	static constexpr uint8_t cr_pin = {{ pin }} % 8;
+	/// Bitmask for the configuration register with a 4bit mask.
+	static constexpr uint32_t mask4 = 0xf << (cr_pin * 4);
+	/// Port Number.
+	static constexpr uint8_t port_nr = static_cast<uint8_t>(port);
+
+%% if pin|int in range(0,5)
+	static constexpr IRQn_Type ExternalInterruptIRQ = EXTI{{pin}}_IRQn;
+%% elif pin|int in range(5,10)
+	static constexpr IRQn_Type ExternalInterruptIRQ = EXTI9_5_IRQn;
+%% elif pin|int in range(10,16)
+	static constexpr IRQn_Type ExternalInterruptIRQ = EXTI15_10_IRQn;
+%% endif
+
+	/// Enable Analog Mode which is needed to use this pin as an ADC input.
+	xpcc_always_inline static void
+	setAnalogInput() {
+		{{reg}}->{{cr}} &= ~mask4;
+	}
+
+public:
+	xpcc_always_inline static void
+	configure(OutputType type,
+			  OutputSpeed speed = OutputSpeed::MHz50) {
+		{{reg}}->{{cr}}  = ({{reg}}->{{cr}}  & ~mask4)  | ((i(type) | i(speed)) << (cr_pin * 4));
+	}
+	xpcc_always_inline static void configure(InputType type) {
+		{{reg}}->{{cr}}  = ({{reg}}->{{cr}}  & ~mask4)  | ((i(type) & 0xc) << (cr_pin * 4));
+		if (type == InputType::PullUp) {{reg}}->BSRR = mask;
+		else {{reg}}->BRR = mask;
+	}
+		%% for af in (gpio.af if "af" in gpio else [])
+			%% if af["@type"] == "analog"
+	/// {{name}} connects to {{af["@name"]}} of {{af["@peripheral"]}}
+	//static const ::xpcc::stm32::{{af["@peripheral"]}}::Channel
+	//{{af["@peripheral"]}}Channel = ::xpcc::stm32::{{af["@peripheral"]}}::Channel::{{ af["@name"] }};
+			%% endif
+		%% endfor
+		%% if type in ["" , "Output"]
+	// GpioOutput
+	// start documentation inherited
+	xpcc_always_inline static void setOutput() {
+		configure(OutputType::PushPull);
+	}
+	xpcc_always_inline static void setOutput(bool status) {
+		set(status);
+		setOutput();
+	}
+	xpcc_always_inline static void set() {
+		{{reg}}->BSRR = mask;
+	}
+	xpcc_always_inline static void set(bool status) {
+		if (status) {
+			set();
+		} else {
+			reset();
+		}
+	}
+	xpcc_always_inline static void reset() {
+		{{reg}}->BRR = mask;
+	}
+	xpcc_always_inline static void toggle() {
+		if (isSet()) {
+			reset();
+		} else {
+			set();
+		}
+	}
+	xpcc_always_inline static bool isSet() {
+		return ({{reg}}->ODR & mask);
+	}
+	// stop documentation inherited
+	xpcc_always_inline static void
+	setOutput(OutputType type,
+			  OutputSpeed speed = OutputSpeed::MHz50) {
+		configure(type, speed);
+		setOutput();
+	}
+		%% endif
+		%% if type in ["", "Input"]
+	// GpioInput
+	// start documentation inherited
+	xpcc_always_inline static void
+	setInput() {
+		configure(InputType::Floating);
+	}
+	xpcc_always_inline static bool read() {
+		return ({{reg}}->IDR & mask);
+	}
+	// end documentation inherited
+	xpcc_always_inline static void setInput(InputType type) {
+		configure(type);
+	}
+	// External Interrupts
+	xpcc_always_inline static void
+	enableExternalInterrupt()
+	{
+		// PA[x], x =  0 ..  3 maps to EXTICR[0]
+		// PA[x], x =  4 ..  7 maps to EXTICR[1]
+		// PA[x], x =  8 .. 11 maps to EXTICR[2]
+		// PA[x], x = 12 .. 15 maps to EXTICR[3]
+		// => bit3 and bit2 (mask 0x0c) specify the register
+		// => bit1 and bit0 (mask 0x03) specify the bit position
+		constexpr uint8_t index = (pin & 0x0c) >> 2;
+		constexpr uint8_t bit_pos = (pin & 0x03) << 2;
+		constexpr uint16_t syscfg_mask = (0x0f) << bit_pos;
+		constexpr uint16_t syscfg_value = (port_nr & (0x0f)) << bit_pos;
+		// Enable AFIO
+		RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
+		AFIO->EXTICR[index] = (AFIO->EXTICR[index] & ~syscfg_mask) | syscfg_value;
+		EXTI->IMR |= mask;
+	}
+	xpcc_always_inline static void
+	disableExternalInterrupt()
+	{
+		EXTI->IMR &= ~mask;
+	}
+	xpcc_always_inline static void
+	enableExternalInterruptVector(const uint32_t priority)
+	{
+		NVIC_SetPriority(ExternalInterruptIRQ, priority);
+		NVIC_EnableIRQ(ExternalInterruptIRQ);
+	}
+	xpcc_always_inline static void
+	disableExternalInterruptVector()
+	{
+		NVIC_DisableIRQ(ExternalInterruptIRQ);
+	}
+	inline static void
+	setInputTrigger(const InputTrigger trigger)
+	{
+		switch (trigger)
+		{
+		case InputTrigger::RisingEdge:
+			EXTI->RTSR |=  (mask);
+			EXTI->FTSR &= ~(mask);
+			break;
+		case InputTrigger::FallingEdge:
+			EXTI->RTSR &= ~(mask);
+			EXTI->FTSR |=  (mask);
+			break;
+		case InputTrigger::BothEdges:
+			EXTI->RTSR |=  (mask);
+			EXTI->FTSR |=  (mask);
+			break;
+		}
+	}
+	xpcc_always_inline static bool
+	getExternalInterruptFlag() {
+		return (EXTI->PR & mask);
+	}
+	/**	\brief	Reset the interrupt flag in the interrupt routine. */
+	xpcc_always_inline static void
+	acknowledgeExternalInterruptFlag()
+	{
+		// Flags are cleared by writing a one to the flag position.
+		EXTI->PR |= mask;
+	}
+		%% endif
+	// GpioIO
+	// start documentation inherited
+	inline static Direction getDirection() {
+		uint32_t mode = ({{reg}}->{{cr}} & mask4);
+		if ((mode == 0) or (mode > (uint32_t(0b1001) << (cr_pin * 4))))
+			return Direction::Special;
+		if (mode > 0)
+			return Direction::Out;
+		return Direction::In;
+	}
+	// end documentation inherited
+	xpcc_always_inline static void
+	disconnect() {
+		{{reg}}->{{cr}} = ({{reg}}->{{cr}}  & ~mask4)  | ((i(InputType::Floating)) << (cr_pin * 4));
+		{{reg}}->BRR = mask;
+	}
+	// connect: Hardware Gpio
+		%% for af in (gpio.af if "af" in gpio else [])
+			%% if af["@id"] is not defined
+				%% set enableAlternateFunction = ""
+			%% else
+				%% set af_all = ("" ~ af["@id"]) | split(",")
+				%% set afpos = af_all[0]
+				%% set afmask = af_all[1]
+				%% set afval = af_all[2]
+				%% set enableAlternateFunction = "AFIO->MAPR = (AFIO->MAPR & ~(" ~ afmask ~ " << " ~ afpos ~ ")) | (" ~ afval ~ " << " ~ afpos ~ ");"
+			%% endif
+
+			%% set use = not (	"@type" not in af or
+								(af["@type"] == "in"     and type == "Output") or
+								(af["@type"] == "analog" and type == "Output") or
+								(af["@type"] == "out"    and type == "Input" ))
+			%% if use
+				%% if "@name" in af and af["@name"] not in ["Scl", "Sda"]
+	/// Connect {{name}} as {{af["@name"]}} to {{af["@peripheral"]}}.
+	xpcc_always_inline static void
+	connect(TypeId::{{ af["@peripheral"] }}{{ af["@name"] }} /* t */) {
+					%% if "@type" in af and af["@type"] == "analog"
+		setAnalogInput();
+					%% else
+						%% if "@type" in af and af["@type"] == "out"
+		configure(OutputType(i(OutputType::PushPull) | 0x8), OutputSpeed::MHz50);
+						%% else
+		configure(InputType::Floating);
+						%% endif
+		{{ enableAlternateFunction }}
+					%% endif
+	}
+				%% endif
+				%% if "@type" in af and af["@type"]|string in ["", "out"] and type != "Input" and "@name" in af and af["@name"] not in ["Scl", "Sda"]
+	/// Connect {{name}} as {{af["@name"]}} to {{af["@peripheral"]}}.
+	xpcc_always_inline static void
+	connect(TypeId::{{ af["@peripheral"] }}{{ af["@name"] }} /* t */,
+		OutputType type, OutputSpeed speed = OutputSpeed::MHz50) {
+		configure(OutputType(i(type) | 0x8), speed);
+		{{ enableAlternateFunction }}
+	}
+				%% endif
+				%% if type == "" and "@name" in af and af["@name"] in ["Scl", "Sda"]
+	/// Connect {{name}} as {{af["@name"]}} to {{af["@peripheral"]}}.
+	inline static void
+	connect(TypeId::{{ af["@peripheral"] }}{{ af["@name"] }} /* t */) {
+					%% if af["@name"] in ["Scl"]
+		I2c::resetDevices< {{name}} >();
+					%% endif
+		configure(OutputType(i(OutputType::OpenDrain) | 0x8));
+		{{ enableAlternateFunction }}
+	}
+				%% endif
+				%% if"@type" in af and  af["@type"]|string in ["", "in"] and type != "Output" and "@name" in af and af["@name"] not in ["Scl", "Sda"]
+	/// Connect {{name}} as {{af["@name"]}} to {{af["@peripheral"]}}.
+	xpcc_always_inline static void
+	connect(TypeId::{{ af["@peripheral"] }}{{ af["@name"] }} /* t */, InputType type) {
+		configure(type);
+		{{ enableAlternateFunction }}
+	}
+				%% endif
+			%% endif
+		%% endfor
+	// connect: Software Gpio
+		%% if type in ["", "Output"]
+			%% for peripheral in   ["SoftwareSpiMasterMosi",
+									"SoftwareSpiMasterSck"]
+	/// Connect to `{{peripheral}}`.
+	xpcc_always_inline static void
+	connect(::xpcc::TypeId::{{ peripheral }}) {
+		set();
+		configure(OutputType::PushPull);
+	}
+			%% endfor
+		%% endif
+		%% if type in [""]
+			%% for peripheral in   ["SoftwareI2cMasterSda",
+									"SoftwareI2cMasterScl"]
+	/// Connect to `{{peripheral}}`.
+	inline static void
+	connect(::xpcc::TypeId::{{ peripheral }}) {
+				%% if peripheral in ["SoftwareI2cMasterScl"]
+		I2c::resetDevices< {{name}} >();
+				%% endif
+		set();
+		configure(OutputType::OpenDrain);
+	}
+			%% endfor
+		%% endif
+		%% if type in ["", "Input"]
+			%% for peripheral in ["SoftwareSpiMasterMiso"]
+	/// Connect to `{{peripheral}}`.
+	xpcc_always_inline static void
+	connect(::xpcc::TypeId::{{ peripheral }}) {
+		configure(InputType::Floating);
+	}
+			%% endfor
+		%% endif
+};
+
+	%% endfor
+%% endfor
+
+} // namespace stm32
+
+} // namespace xpcc
+
+#endif // XPCC_STM32_GPIO_PIN_HPP

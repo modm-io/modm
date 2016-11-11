@@ -1,0 +1,76 @@
+
+def filter_port_ranges(gpios):
+    """
+    This filter accepts a list of gpios as e.g. used by the stm32af driver
+    and tries to extract information about port which is returned as a list
+    of dictionaries with the following structure:
+    {'name': "C", 'startPin': 0, 'width': 16}
+    """
+    # collect information on available gpios
+    port_ids = {}
+    for gpio in gpios:
+        if not gpio['@port'] in port_ids:
+            port_ids[gpio['@port']] = [0] * 16
+        port_ids[gpio['@port']][int(gpio['@id'])] = 1
+    # create port list
+    ports = []
+    for name, ids in port_ids.items():
+        # if the port consists of at least one gpio pin
+        if 1 in ids:
+            port = {}
+            port['@name'] = name
+            # find start pin as well as width
+            ii = ids.index(1)
+            port['@startPin'] = ii
+            while ii < 16 and ids[ii] == 1:
+                ii = ii + 1
+            port['@width'] = ii - port['@startPin']
+            ports.append(port)
+    return ports
+
+def filter_letter_to_num(letter):
+    """
+    This filter turns one letter into a number.
+    A is 0, B is 1, etc. This is not case sensitive.
+    """
+    letter = letter[0].lower()
+    return ord(letter) - ord('a')
+
+def init(module):
+    module.name = "gpio"
+    module.parent = "platform"
+
+def prepare(module, options):
+    if not options[":target"].has_driver("gpio", compatible=["stm32", "stm32f1"]):
+        return False
+
+    # FIXME: All these depencies come from TypeIds
+    module.depends([":platform:core", ":platform:gpio.generic",
+                    ":platform:adc", ":platform:can", ":platform:clock", ":platform:fsmc", ":platform:i2c",
+                    ":platform:spi", ":platform:timer", ":platform:uart", ":platform:usb"])
+    return True
+
+def build(env):
+    device = env[":target"]
+    driver = device.get_driver("gpio")
+
+    properties = device.properties
+    properties["target"] = device.identifier
+    properties["partname"] = device.partname
+    properties["driver"] = driver
+    properties["adcs"] = device.get_driver("adc")["instance"]
+    properties["ports"] = sorted(list(set([p["@port"] for p in driver["gpio"]])))
+
+    env.substitutions = properties
+    env.outbasepath = "src/modm/platform/gpio"
+
+    gpio_source = "gpio_pin.hpp.in"
+    if driver["@compatible"] == "stm32f1":
+       gpio_source = "gpio_pin_f1.hpp.in"
+
+    for pin in driver["gpio"]:
+        env.template(gpio_source, "gpio_{}{}.hpp".format(pin["@port"], pin["@id"]),
+                    substitutions=properties.update({'gpio': pin}),
+                    filters={"portRanges": filter_port_ranges})
+    env.template("gpio_base.hpp.in", filters={"letterToNum": filter_letter_to_num})
+    env.template("gpio_enable.cpp.in")
