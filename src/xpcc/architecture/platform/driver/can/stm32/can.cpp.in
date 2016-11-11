@@ -12,9 +12,8 @@
 #include <xpcc/utils.hpp>
 
 #include "can_{{ id }}.hpp"
-#include <xpcc_config.hpp>
 
-%% if target is stm32f3 or target is stm32f0
+%% if target.family in ["f3", "f0"]
 	%% set reg = 'CAN'
 %% else
 	%% set reg = 'CAN' ~ id
@@ -26,7 +25,7 @@
 #define CAN_BTR_TS2_POS		20
 #define CAN_BTR_TS1_POS		16
 
-%% if target is stm32f3
+%% if target.family == "f3"
 #	define	XPCC_ISR_NAME(CAN1_TX)		XPCC_ISR_NAME(USB_HP_CAN1_TX)
 #	define	XPCC_ISR_NAME(CAN1_RX0)		XPCC_ISR_NAME(USB_LP_CAN1_RX0)
 #	define	CAN1_TX_IRQn				USB_HP_CAN1_TX_IRQn
@@ -34,11 +33,11 @@
 %% endif
 
 // ----------------------------------------------------------------------------
-%% if parameters.tx_buffer > 0
-static xpcc::atomic::Queue<xpcc::can::Message, {{ parameters.tx_buffer }}> txQueue;
+%% if options["buffer.tx"] > 0
+static xpcc::atomic::Queue<xpcc::can::Message, {{ options["buffer.tx"] }}> txQueue;
 %% endif
-%% if parameters.rx_buffer > 0
-static xpcc::atomic::Queue<xpcc::can::Message, {{ parameters.rx_buffer }}> rxQueue;
+%% if options["buffer.rx"] > 0
+static xpcc::atomic::Queue<xpcc::can::Message, {{ options["buffer.rx"] }}> rxQueue;
 %% endif
 
 
@@ -98,11 +97,11 @@ xpcc::stm32::Can{{ id }}::initializeWithPrescaler(
 	// FIFO1 Overrun, FIFO0 Overrun
 	{{ reg }}->IER = CAN_IER_FOVIE1 | CAN_IER_FOVIE0;
 
-%% if parameters.tx_buffer > 0
+%% if options["buffer.tx"] > 0
 	{{ reg }}->IER |= CAN_IER_TMEIE;
 %% endif
 
-%% if target is stm32f0
+%% if target.family == "f0"
 	// Set vector priority
 	NVIC_SetPriority(CEC_CAN_IRQn, interruptPriority);
 
@@ -117,7 +116,7 @@ xpcc::stm32::Can{{ id }}::initializeWithPrescaler(
 	nvicEnableInterrupt({{ reg }}_RX0_IRQn);
 	nvicEnableInterrupt({{ reg }}_RX1_IRQn);
 
-	%% if parameters.tx_buffer > 0
+	%% if options["buffer.tx"] > 0
 	nvicEnableInterrupt({{ reg }}_TX_IRQn);
 	NVIC_SetPriority({{ reg }}_TX_IRQn, interruptPriority);
 	%% endif
@@ -125,7 +124,7 @@ xpcc::stm32::Can{{ id }}::initializeWithPrescaler(
 
 
 
-%% if parameters.rx_buffer > 0
+%% if options["buffer.rx"] > 0
 	{{ reg }}->IER |= CAN_IER_FMPIE1 | CAN_IER_FMPIE0;
 %% endif
 
@@ -152,26 +151,26 @@ static void
 sendMailbox(const xpcc::can::Message& message, uint32_t mailboxId)
 {
 	CAN_TxMailBox_TypeDef* mailbox = &{{ reg }}->sTxMailBox[mailboxId];
-	
+
 	if (message.isExtended()) {
 		mailbox->TIR = message.identifier << 3 | CAN_TI0R_IDE;
 	}
 	else {
 		mailbox->TIR = message.identifier << 21;
 	}
-	
+
 	if (message.isRemoteTransmitRequest()) {
 		mailbox->TIR |= CAN_TI0R_RTR;
 	}
-	
+
 	// Set up the DLC
 	mailbox->TDTR = message.getLength();
-	
+
 	// Set up the data field (copy the 8x8-bits into two 32-bit registers)
 	const uint8_t * xpcc_may_alias data = message.data;
 	mailbox->TDLR = reinterpret_cast<const uint32_t *>(data)[0];
 	mailbox->TDHR = reinterpret_cast<const uint32_t *>(data)[1];
-	
+
 	// Request transmission
 	mailbox->TIR |= CAN_TI0R_TXRQ;
 }
@@ -183,7 +182,7 @@ static void
 readMailbox(xpcc::can::Message& message, uint32_t mailboxId)
 {
 	CAN_FIFOMailBox_TypeDef* mailbox = &{{ reg }}->sFIFOMailBox[mailboxId];
-	
+
 	uint32_t rir = mailbox->RIR;
 	if (rir & CAN_RI0R_IDE) {
 		message.identifier = rir >> 3;
@@ -194,9 +193,9 @@ readMailbox(xpcc::can::Message& message, uint32_t mailboxId)
 		message.setExtended(false);
 	}
 	message.setRemoteTransmitRequest(rir & CAN_RI0R_RTR);
-	
+
 	message.length = mailbox->RDTR & CAN_TDT1R_DLC;
-	
+
 	uint8_t * xpcc_may_alias data = message.data;
 	reinterpret_cast<uint32_t *>(data)[0] = mailbox->RDLR;
 	reinterpret_cast<uint32_t *>(data)[1] = mailbox->RDHR;
@@ -210,10 +209,10 @@ readMailbox(xpcc::can::Message& message, uint32_t mailboxId)
 
 XPCC_ISR({{ reg }}_TX)
 {
-%% if parameters.tx_buffer > 0
+%% if options["buffer.tx"] > 0
 	uint32_t mailbox;
 	uint32_t tsr = {{ reg }}->TSR;
-	
+
 	if (tsr & CAN_TSR_RQCP2) {
 		mailbox = 2;
 		{{ reg }}->TSR = CAN_TSR_RQCP2;
@@ -226,7 +225,7 @@ XPCC_ISR({{ reg }}_TX)
 		mailbox = 0;
 		{{ reg }}->TSR = CAN_TSR_RQCP0;
 	}
-	
+
 	if (!txQueue.isEmpty())
 	{
 		sendMailbox(txQueue.get(), mailbox);
@@ -245,18 +244,18 @@ XPCC_ISR({{ reg }}_RX0)
 {
 	if ({{ reg }}->RF0R & CAN_RF0R_FOVR0) {
 		xpcc::ErrorReport::report(xpcc::stm32::CAN{{ id }}_FIFO0_OVERFLOW);
-		
+
 		// release overrun flag & access the next message
 		{{ reg }}->RF0R = CAN_RF0R_FOVR0 | CAN_RF0R_RFOM0;
 	}
-	
-%% if parameters.rx_buffer > 0
+
+%% if options["buffer.rx"] > 0
 	xpcc::can::Message message;
 	readMailbox(message, 0);
-	
+
 	// Release FIFO (access the next message)
 	{{ reg }}->RF0R = CAN_RF0R_RFOM0;
-	
+
 	if (!rxQueue.push(message)) {
 		xpcc::ErrorReport::report(xpcc::stm32::CAN{{ id }}_FIFO0_OVERFLOW);
 	}
@@ -272,25 +271,25 @@ XPCC_ISR({{ reg }}_RX1)
 {
 	if ({{ reg }}->RF1R & CAN_RF1R_FOVR1) {
 		xpcc::ErrorReport::report(xpcc::stm32::CAN{{ id }}_FIFO1_OVERFLOW);
-		
+
 		// release overrun flag & access the next message
 		{{ reg }}->RF1R = CAN_RF1R_FOVR1 | CAN_RF1R_RFOM1;
 	}
-	
-%% if parameters.rx_buffer > 0
+
+%% if options["buffer.rx"] > 0
 	xpcc::can::Message message;
 	readMailbox(message, 1);
-	
+
 	// Release FIFO (access the next message)
 	{{ reg }}->RF1R = CAN_RF1R_RFOM1;
-	
+
 	if (!rxQueue.push(message)) {
 		xpcc::ErrorReport::report(xpcc::stm32::CAN{{ id }}_FIFO1_OVERFLOW);
 	}
 %% endif
 }
 
-%% if target is stm32f0
+%% if target.family == "f0"
 // On stm32f0, ST has decided to use only one interrupt vector for all
 // CAN interrupts. In order to avoide duplicate code, we try to determine
 // the interrupt source and call the correct interrupts function defined above.
@@ -350,7 +349,7 @@ xpcc::stm32::Can{{ id }}::setAutomaticRetransmission(bool retransmission)
 bool
 xpcc::stm32::Can{{ id }}::isMessageAvailable()
 {
-%% if parameters.rx_buffer > 0
+%% if options["buffer.rx"] > 0
 	return !rxQueue.isEmpty();
 %% else
 	// Check if there are any messages pending in the receive registers
@@ -362,7 +361,7 @@ xpcc::stm32::Can{{ id }}::isMessageAvailable()
 bool
 xpcc::stm32::Can{{ id }}::getMessage(can::Message& message)
 {
-%% if parameters.rx_buffer > 0
+%% if options["buffer.rx"] > 0
 	if (rxQueue.isEmpty())
 	{
 		// no message in the receive buffer
@@ -377,7 +376,7 @@ xpcc::stm32::Can{{ id }}::getMessage(can::Message& message)
 	if (({{ reg }}->RF0R & CAN_RF0R_FMP0) > 0)
 	{
 		readMailbox(message, 0);
-		
+
 		// Release FIFO (access the next message)
 		{{ reg }}->RF0R = CAN_RF0R_RFOM0;
 		return true;
@@ -385,7 +384,7 @@ xpcc::stm32::Can{{ id }}::getMessage(can::Message& message)
 	else if (({{ reg }}->RF1R & CAN_RF1R_FMP1) > 0)
 	{
 		readMailbox(message, 1);
-		
+
 		// Release FIFO (access the next message)
 		{{ reg }}->RF1R = CAN_RF1R_RFOM1;
 		return true;
@@ -398,7 +397,7 @@ xpcc::stm32::Can{{ id }}::getMessage(can::Message& message)
 bool
 xpcc::stm32::Can{{ id }}::isReadyToSend()
 {
-%% if parameters.tx_buffer > 0
+%% if options["buffer.tx"] > 0
 	return txQueue.isNotFull();
 %% else
 	return (({{ reg }}->TSR & (CAN_TSR_TME0 | CAN_TSR_TME1 | CAN_TSR_TME2)) != 0);
@@ -415,7 +414,7 @@ xpcc::stm32::Can{{ id }}::sendMessage(const can::Message& message)
 	if (({{ reg }}->TSR & (CAN_TSR_TME0 | CAN_TSR_TME1 | CAN_TSR_TME2)) == 0)
 	{
 		// All mailboxes used at the moment
-%% if parameters.tx_buffer > 0
+%% if options["buffer.tx"] > 0
 		if (!txQueue.push(message)) {
 			xpcc::ErrorReport::report(xpcc::stm32::CAN{{ id }}_TX_OVERFLOW);
 			return false;
@@ -428,7 +427,7 @@ xpcc::stm32::Can{{ id }}::sendMessage(const can::Message& message)
 	else {
 		// Get number of the first free mailbox
 		uint32_t mailbox = ({{ reg }}->TSR & CAN_TSR_CODE) >> 24;
-		
+
 		sendMailbox(message, mailbox);
 		return true;
 	}
@@ -458,7 +457,7 @@ xpcc::stm32::Can{{ id }}::enableStatusChangeInterrupt(
 		uint32_t interruptEnable,
 		uint32_t interruptPriority)
 {
-%% if not target is stm32f0
+%% if not target.family == "f0"
 	NVIC_SetPriority({{ reg }}_SCE_IRQn, interruptPriority);
 	nvicEnableInterrupt({{ reg }}_SCE_IRQn);
 

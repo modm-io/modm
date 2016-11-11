@@ -35,7 +35,7 @@ namespace xpcc
 {
 	namespace stm32
 	{
-		/// @ingroup {{target.string}}_can
+		/// @ingroup {{partname}}_can
 		enum ErrorCode
 		{
 			CAN1_ERROR_PASSIVE_MODE = 0x0010,

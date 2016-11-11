@@ -1,0 +1,77 @@
+
+class Instance(Module):
+    def __init__(self, instance):
+        self.instance = instance
+
+    def init(self, module):
+        module.name = str(self.instance)
+        module.description = "CAN {} instance".format(self.instance)
+
+    def prepare(self, module, options):
+        module.depends(":platform:can")
+        module.depends(":debug")
+
+        module.add_option(
+            NumericOption(
+                name="buffer.tx",
+                description="",
+                minimum=1, maximum=2 ** 16 - 2,
+                default=32))
+        module.add_option(
+            NumericOption(
+                name="buffer.rx",
+                description="",
+                minimum=1, maximum=2 ** 16 - 2,
+                default=32))
+
+        return True
+
+    def build(self, env):
+        device = env[":target"]
+        driver = device.get_driver("can")
+
+        properties = device.properties
+        properties["target"] = target = device.identifier
+        properties["partname"] = device.partname
+        properties["driver"] = driver
+        properties["id"] = self.instance
+
+        env.substitutions = properties
+        env.outbasepath = "src/modm/platform/can"
+
+        env.template("can.hpp.in", "can_{}.hpp".format(self.instance))
+        env.template("can.cpp.in", "can_{}.cpp".format(self.instance))
+
+
+def init(module):
+    module.name = "can"
+    module.parent = "platform"
+
+def prepare(module, options):
+    device = options[":target"]
+    if not device.has_driver("can:stm32"):
+        return False
+
+    module.depends([":platform:core", ":platform:clock.generic", ":platform:can.generic"])
+
+    for instance in listify(device.get_driver("can")["instance"]):
+        module.add_submodule(Instance(int(instance)))
+
+    return True
+
+def build(env):
+    device = env[":target"]
+    driver = device.get_driver("can")
+
+    properties = device.properties
+    properties["target"] = device.identifier
+    properties["partname"] = device.partname
+    properties["driver"] = driver
+
+    env.substitutions = properties
+    env.outbasepath = "src/modm/platform/can"
+
+    env.template("can_filter.hpp.in")
+    env.template("can_filter.cpp.in")
+    env.copy("error_code.hpp")
+    env.copy("type_ids.hpp")

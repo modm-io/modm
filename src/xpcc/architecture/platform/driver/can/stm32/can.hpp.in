@@ -11,15 +11,15 @@
 #define XPCC_STM32_CAN{{ id }}_HPP
 
 #include <xpcc/architecture/interface/can.hpp>
-#include "../../../device.hpp"
-#include "../../../type_ids.hpp"
+#include "../device.hpp"
+#include "type_ids.hpp"
 
-#include "../../clock/generic/common_clock.hpp"
-#include "../generic/can_bit_timings.hpp"
+#include "../clock/common_clock.hpp"
+#include "can_bit_timings.hpp"
 #include "error_code.hpp"
 #include "can_filter.hpp"
 
-%% if target is stm32f3 or target is stm32f0
+%% if target.family in ["f3", "f0"]
 	%% set reg = 'CAN'
 %% else
 	%% set reg = 'CAN' ~ id
@@ -28,8 +28,8 @@
 using namespace xpcc::clock; // for MHzxx
 
 /**
- * @ingroup 	{{target.string}}
- * @defgroup	{{target.string}}_can CAN
+ * @ingroup 	{{partname}}
+ * @defgroup	{{partname}}_can CAN
  */
 
 namespace xpcc
@@ -58,7 +58,7 @@ namespace stm32
  * You can set the buffer size using the `tx_buffer` and `rx_buffer` parameters.
  *
  * @author		Fabian Greif <fabian.greif@rwth-aachen.de>
- * @ingroup		{{target.string}}_can
+ * @ingroup		{{partname}}_can
  */
 class Can{{ id }} : public ::xpcc::Can
 {
