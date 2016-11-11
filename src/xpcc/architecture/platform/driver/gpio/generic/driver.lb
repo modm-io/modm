@@ -1,0 +1,11 @@
+
+def init(module):
+    module.name = "gpio.generic"
+    module.parent = "platform"
+
+def prepare(module, options):
+    return True
+
+def build(env):
+    env.outbasepath = "src/modm/platform/gpio"
+    env.copy("software_gpio.hpp")
