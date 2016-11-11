@@ -3,11 +3,11 @@
 <rca version="1.0">
   <device platform="hosted" family="linux">
     <naming-schema>{{ platform }}/{{ family }}</naming-schema>
-    <driver type="can" name="socketcan"/>
-    <driver type="can" name="canusb"/>
-    <driver type="core" name="hosted"/>
-    <driver type="graphics" name="hosted"/>
-    <driver type="uart" name="hosted"/>
-    <driver type="uart" name="posix"/>
+    <driver type="can" compatible="socketcan"/>
+    <driver type="can" compatible="canusb"/>
+    <driver type="core" compatible="hosted"/>
+    <driver type="graphics" compatible="hosted"/>
+    <driver type="uart" compatible="hosted"/>
+    <driver type="uart" compatible="posix"/>
   </device>
 </rca>

@@ -16,7 +16,7 @@
 		<define>LPC11C_CAN_TX_BUFFER_SIZE = 16</define>
 		<define>LPC11C_CAN_RX_BUFFER_SIZE = 16</define>
 		<!-- Core Driver -->
-		<driver type="core" name="cortex">
+		<driver type="core" compatible="cortex">
 			<parameter name="main_stack_size">1024</parameter>
 			<parameter name="allocator">block_allocator</parameter>
 			<memory access="rx" start="0x00000000" name="flash" size="32"/>
@@ -53,11 +53,17 @@
 			<vector position="31" name="PIOINT0"/>
 		</driver>
 		<!-- Peripheral Drivers -->
-		<driver type="clock" name="lpc" />
-		<driver type="timer" instances="16_0" name="lpc" />
-		<driver type="uart" name="lpc" instances="1"/>
-		<driver type="can"  name="lpc" instances="1"/>
-		<driver type="gpio" name="lpc">
+		<driver type="clock" compatible="lpc" />
+		<driver type="timer" compatible="lpc">
+			<instance>16_0</instance>
+		</driver>
+		<driver type="uart" compatible="lpc">
+			<instance>1</instance>
+		</driver>
+		<driver type="can"  compatible="lpc">
+			<instance>1</instance>
+		</driver>
+		<driver type="gpio" compatible="lpc">
 			<!--<gpio port="0" id="0" func="Reset,Gpio" bits="mode,hys,od"/>-->
 			<gpio port="0" id="1"  func="Gpio,ClockOutput,Timer32_0" bits="mode,hys,od"/>
 			<gpio port="0" id="2"  func="Gpio,Spi0,Timer16_0"     bits="mode,hys,od"/>
