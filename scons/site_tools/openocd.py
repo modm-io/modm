@@ -44,6 +44,10 @@ def openocd_run(env, source, alias='openocd_run'):
 	if platform.system() == "Windows":
 		env['OPENOCD_COMMANDS'] = env['OPENOCD_COMMANDS'].replace("$SOURCE", str(source[0]).replace("\\","/"))
 
+	# Provide additional search paths via the OPENOCD_SCRIPTS environment variable
+	# See http://openocd.org/doc/html/Running.html
+	env['ENV']['OPENOCD_SCRIPTS'] = os.environ.get('OPENOCD_SCRIPTS')
+
 	commands = [c for c in env['OPENOCD_COMMANDS'].split('\n') if c != '']
 	action = Action("$OPENOCD -f $OPENOCD_CONFIGFILE %s" % ' '.join(['-c "%s"' % c for c in commands]),
 		cmdstr="$OPENOCD_COMSTR")
