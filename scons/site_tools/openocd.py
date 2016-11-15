@@ -26,6 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import os
 import platform
 from SCons.Script import *
 
@@ -48,8 +49,9 @@ def openocd_run(env, source, alias='openocd_run'):
 	# See http://openocd.org/doc/html/Running.html
 	env['ENV']['OPENOCD_SCRIPTS'] = os.environ.get('OPENOCD_SCRIPTS')
 
+	searchdir = os.path.abspath(os.path.join(env['XPCC_ROOTPATH'], "tools", "openocd"))
 	commands = [c for c in env['OPENOCD_COMMANDS'].split('\n') if c != '']
-	action = Action("$OPENOCD -f $OPENOCD_CONFIGFILE %s" % ' '.join(['-c "%s"' % c for c in commands]),
+	action = Action("$OPENOCD -f $OPENOCD_CONFIGFILE -s %s %s" % (searchdir, ' '.join(['-c "%s"' % c for c in commands])),
 		cmdstr="$OPENOCD_COMSTR")
 	return env.AlwaysBuild(env.Alias(alias, source, action))
 
