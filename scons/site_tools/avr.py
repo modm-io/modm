@@ -167,6 +167,7 @@ def generate(env, **kw):
 		"-mmcu=$AVR_DEVICE", 
 		"-Wl,--relax", 
 		"-Wl,--gc-sections",
+		"-Wl,-T,${XPCC_ROOTPATH}/src/xpcc/architecture/platform/driver/core/avr/linkerscript.ld",
 #		"-Wl,-Map=${TARGET.base}.map,--cref", 
 #		"-Wl,-u,vfprintf -lprintf_flt"		# enable float support for vfprinft
 	]

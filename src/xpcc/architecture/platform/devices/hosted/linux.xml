@@ -5,6 +5,7 @@
     <naming-schema>{{ platform }}/{{ family }}</naming-schema>
     <driver type="can" name="socketcan"/>
     <driver type="can" name="canusb"/>
+    <driver type="core" name="hosted"/>
     <driver type="graphics" name="hosted"/>
     <driver type="uart" name="hosted"/>
     <driver type="uart" name="posix"/>
