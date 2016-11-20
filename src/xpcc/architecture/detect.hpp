@@ -130,8 +130,13 @@
 #	define XPCC__COMPILER_STRING	"Clang"
 #	define XPCC__COMPILER_CLANG 1
 #elif defined __GNUC__
-#	define XPCC__COMPILER_STRING	"Gnu GCC"
 #	define XPCC__COMPILER_GCC 1
+#	if defined __MINGW32__
+#		define XPCC__COMPILER_STRING	"MinGW / MinGW-w64"
+#		define XPCC__COMPILER_MINGW 1
+#	else
+#		define XPCC__COMPILER_STRING	"Gnu GCC"
+#	endif
 #endif
 
 #if defined _MSC_VER

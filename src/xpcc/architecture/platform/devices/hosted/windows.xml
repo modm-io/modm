@@ -3,5 +3,7 @@
 <rca version="1.0">
   <device platform="hosted" family="windows">
     <naming-schema>{{ platform }}/{{ family }}</naming-schema>
+    <driver type="graphics" name="hosted"/>
+    <driver type="uart" name="hosted"/>
   </device>
 </rca>

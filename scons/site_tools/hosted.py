@@ -42,6 +42,8 @@ def generate(env, **kw):
 		env['LIBS'] = ['boost_thread', 'boost_system', 'pthread']
 	elif env['HOSTED_DEVICE'] == 'darwin':
 		env['LIBS'] = ['boost_thread-mt', 'boost_system']
+	elif env.System() == 'windows':
+		env['LIBS'] = ['winpthread', 'boost_thread-mt', 'boost_system', 'wsock32', 'mingw32', 'SDLmain', 'SDL', 'winmm', 'gdi32', 'dxguid', 'gdi32', 'winmm', 'gdi32']
 
 	if 'CC' in os.environ:
 		c_compiler = os.environ['CC']
@@ -55,7 +57,7 @@ def generate(env, **kw):
 
 	env.Append(ENV = {'PATH' : os.environ['PATH']})
 
-	if platform.system() == 'Windows':
+	if env.System() == 'windows':
 		env.Tool('mingw')
 	else:
 		env.Tool('gcc')
@@ -110,9 +112,14 @@ def generate(env, **kw):
 		flags = "".join(os.environ['LDFLAGS'])
 		env['LINKFLAGS'] = flags
 
-	# required for __attribute__((packed))
-	if platform.system() == 'Windows':
-		env['CXXFLAGS'].append("-mno-ms-bitfields")
+	if env.System() == 'windows':
+		env['CXXFLAGS'].append("-mno-ms-bitfields") # required for __attribute__((packed))
+		env['CXXFLAGS'].append("-static") # static link libraries if possible on windows
+		env['CXXFLAGS'].append("-mconsole")
+		env['LINKFLAGS'].append("-Wl,--export-all-symbols")
+		env['LINKFLAGS'].append("-static") # static link libraries if possible on windows
+		env['LINKFLAGS'].append("-static-libgcc") # aims for a console even if we use SDL, so we can mix a Window + Debug console
+		env['LINKFLAGS'].append("-static-libstdc++")
 
 def exists(env):
 	return env.Detect('g++')
