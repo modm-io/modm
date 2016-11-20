@@ -61,8 +61,8 @@ namespace
 
 // ----------------------------------------------------------------------------
 #if UART{{ id }}_RTS_PIN != -1
-ISR(USART{{ id }}_RXC_vect)
-{		
+XPCC_ISR(USART{{ id }}_RXC)
+{
 	// first save the errors
 	error |= USART{{ id }}_STATUS & (USART_FERR_bm | USART_BUFOVF_bm | USART_PERR_bm);
 	

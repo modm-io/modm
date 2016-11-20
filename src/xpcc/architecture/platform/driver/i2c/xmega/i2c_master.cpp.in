@@ -104,7 +104,7 @@ namespace
 
 // ----------------------------------------------------------------------------
 /// TWI state machine interrupt handler
-ISR(TWI{{ id }}_TWIM_vect)
+XPCC_ISR(TWI{{ id }}_TWIM)
 {
 	switch(TWI{{ id }}_MASTER_STATUS & TWI_MASTER_BUSSTATE_gm)
 	{

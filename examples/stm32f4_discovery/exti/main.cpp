@@ -16,16 +16,15 @@ typedef GpioInputE11 Irq;
 
 /* When you choose a different pin you must choose the corresponding
  * interrupt handler: (x in A, B, C, D, E, F, G, H, I)
- * Px0:          EXTI0_IRQHandler(void)
- * Px1:          EXTI1_IRQHandler(void)
- * Px2:          EXTI2_IRQHandler(void)
- * Px3:          EXTI3_IRQHandler(void)
- * Px4:          EXTI4_IRQHandler(void)
- * Px5  to Px9:  EXTI9_5_IRQHandler(void)
- * Px10 to Px15: EXTI15_10_IRQHandler(void)
+ * Px0:          EXTI0
+ * Px1:          EXTI1
+ * Px2:          EXTI2
+ * Px3:          EXTI3
+ * Px4:          EXTI4
+ * Px5  to Px9:  EXTI9_5
+ * Px10 to Px15: EXTI15_10
  */
-extern "C" void
-EXTI0_IRQHandler(void)
+XPCC_ISR(EXTI0)
 {
 	Button::acknowledgeExternalInterruptFlag();
 	LedBlue::set();
@@ -34,8 +33,7 @@ EXTI0_IRQHandler(void)
 }
 
 
-extern "C" void
-EXTI15_10_IRQHandler(void)
+XPCC_ISR(EXTI15_10)
 {
 	Irq::acknowledgeExternalInterruptFlag();
 	LedOrange::set();

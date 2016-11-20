@@ -16,7 +16,7 @@
 static xpcc::atomic::Queue<uint8_t, {{parameters.tx_buffer}}> txBuffer;
 
 // ----------------------------------------------------------------------------
-ISR(USART{{ id }}_DRE_vect)
+XPCC_ISR(USART{{ id }}_DRE)
 {
 	if (txBuffer.isEmpty())
 	{

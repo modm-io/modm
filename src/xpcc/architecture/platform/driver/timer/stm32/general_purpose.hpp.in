@@ -22,8 +22,7 @@ namespace stm32
  *
  * Interrupt handler:
  * @code
- * extern "C" void
- * TIM{{ id }}_IRQHandler(void)
+ * XPCC_ISR(TIM{{ id }})
  * {
  *     Timer{{ id }}::resetInterruptFlags(Timer{{ id }}::...);
  *

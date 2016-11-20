@@ -326,8 +326,8 @@ public:
 	 * Enables the ADC Conversion Complete Interrupt.
 	 *
 	 * You could catch the interrupt using this example function:
-	 * @li for STM32F4XX: `extern "C" void ADC_IRQHandler()`
-	 * @li for STM32F10X: `extern "C" void ADC1_2_IRQHandler()`
+	 * @li for STM32F4XX: `XPCC_ISR(ADC)`
+	 * @li for STM32F10X: `XPCC_ISR(ADC1_2)`
 	 *
 	 * @pre The ADC clock must be started and the ADC switched on with
 	 * 	initialize(). Also the Interrupt Vector needs to be enabled first.

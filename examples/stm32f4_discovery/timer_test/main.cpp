@@ -235,49 +235,37 @@ main()
     return 0;
 }
 
-extern "C"
-void
-TIM2_IRQHandler(void)
+XPCC_ISR(TIM2)
 {
     xpcc::stm32::Timer2::acknowledgeInterruptFlags(xpcc::stm32::Timer2::InterruptFlag::Update);
     LedGreen::toggle();
 }
 
-extern "C"
-void
-TIM3_IRQHandler(void)
+XPCC_ISR(TIM3)
 {
     xpcc::stm32::Timer3::acknowledgeInterruptFlags(xpcc::stm32::Timer3::InterruptFlag::Update);
     LedRed::toggle();
 }
 
-extern "C"
-void
-TIM4_IRQHandler(void)
+XPCC_ISR(TIM4)
 {
     xpcc::stm32::Timer4::acknowledgeInterruptFlags(xpcc::stm32::Timer4::InterruptFlag::Update);
     LedGreen::toggle();
 }
 
-extern "C"
-void
-TIM5_IRQHandler(void)
+XPCC_ISR(TIM5)
 {
     xpcc::stm32::Timer5::acknowledgeInterruptFlags(xpcc::stm32::Timer5::InterruptFlag::Update);
     LedRed::toggle();
 }
 
-extern "C"
-void
-TIM6_DAC_IRQHandler(void)
+XPCC_ISR(TIM6_DAC)
 {
     xpcc::stm32::Timer6::acknowledgeInterruptFlags(xpcc::stm32::Timer6::InterruptFlag::Update);
     LedGreen::toggle();
 }
 
-extern "C"
-void
-TIM7_IRQHandler(void)
+XPCC_ISR(TIM7)
 {
     xpcc::stm32::Timer7::acknowledgeInterruptFlags(xpcc::stm32::Timer7::InterruptFlag::Update);
     LedRed::toggle();
@@ -285,52 +273,40 @@ TIM7_IRQHandler(void)
 
 // For TIM8 See TIM13
 
-extern "C"
-void
-TIM1_BRK_TIM9_IRQHandler(void)
+XPCC_ISR(TIM1_BRK_TIM9)
 {
     xpcc::stm32::Timer9::acknowledgeInterruptFlags(xpcc::stm32::Timer9::InterruptFlag::Update);
     LedGreen::toggle();
 }
 
 // Timer 1 and 10
-extern "C"
-void
-TIM1_UP_TIM10_IRQHandler(void)
+XPCC_ISR(TIM1_UP_TIM10)
 {
     xpcc::stm32::Timer1::acknowledgeInterruptFlags(xpcc::stm32::Timer1::InterruptFlag::Update);
     xpcc::stm32::Timer10::acknowledgeInterruptFlags(xpcc::stm32::Timer10::InterruptFlag::Update);
     LedRed::toggle();
 }
 
-extern "C"
-void
-TIM1_TRG_COM_TIM11_IRQHandler(void)
+XPCC_ISR(TIM1_TRG_COM_TIM11)
 {
     xpcc::stm32::Timer11::acknowledgeInterruptFlags(xpcc::stm32::Timer11::InterruptFlag::Update);
     LedGreen::toggle();
 }
 
-extern "C"
-void
-TIM8_BRK_TIM12_IRQHandler(void)
+XPCC_ISR(TIM8_BRK_TIM12)
 {
     xpcc::stm32::Timer12::acknowledgeInterruptFlags(xpcc::stm32::Timer12::InterruptFlag::Update);
     LedRed::toggle();
 }
 
-extern "C"
-void
-TIM8_UP_TIM13_IRQHandler(void)
+XPCC_ISR(TIM8_UP_TIM13)
 {
     xpcc::stm32::Timer8::acknowledgeInterruptFlags(xpcc::stm32::Timer8::InterruptFlag::Update);
     xpcc::stm32::Timer13::acknowledgeInterruptFlags(xpcc::stm32::Timer13::InterruptFlag::Update);
     LedGreen::toggle();
 }
 
-extern "C"
-void
-TIM8_TRG_COM_TIM14_IRQHandler(void)
+XPCC_ISR(TIM8_TRG_COM_TIM14)
 {
     xpcc::stm32::Timer14::acknowledgeInterruptFlags(xpcc::stm32::Timer14::InterruptFlag::Update);
     LedRed::toggle();

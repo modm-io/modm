@@ -107,5 +107,6 @@ public:
 #include "interface/register.hpp"
 #include "interface/memory.hpp"
 #include "interface/assert.hpp"
+#include "interface/interrupt.hpp"
 
 #endif	// XPCC_INTERFACE_HPP

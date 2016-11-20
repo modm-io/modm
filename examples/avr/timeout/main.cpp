@@ -8,7 +8,7 @@ using namespace xpcc::atmega;
 typedef GpioOutputB0 Led;
 
 // timer interrupt routine
-ISR(TIMER2_COMPA_vect)
+XPCC_ISR(TIMER2_COMPA)
 {
 	xpcc::Clock::increment();
 }

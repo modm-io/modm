@@ -24,8 +24,7 @@ namespace stm32
  *
  * Interrupt handler:
  * \code
- * extern "C" void
- * TIM{{ id }}_IRQHandler(void)
+ * XPCC_ISR(TIM{{ id }})
  * {
  *     Timer{{ id }}::resetInterruptFlags(Timer{{ id }}::FLAG_UPDATE);
  *
@@ -36,8 +35,7 @@ namespace stm32
  {% if id == 6 -%}
  * For the STM32F2xx and STM32F4xx:
  * \code
- * extern "C" void
- * TIM{{ id }}_DAC_IRQHandler(void)
+ * XPCC_ISR(TIM{{ id }}_DAC)
  * {
  *     Timer{{ id }}::resetInterruptFlags(Timer{{ id }}::FLAG_UPDATE);
  *

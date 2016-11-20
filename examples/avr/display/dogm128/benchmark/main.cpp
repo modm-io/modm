@@ -34,7 +34,7 @@ xpcc::DogM128< lcd::SPI, lcd::Cs, lcd::A0, lcd::Reset, true > display;
 using namespace xpcc::glcd;
 
 // timer interrupt routine
-ISR(TIMER2_COMPA_vect)
+XPCC_ISR(TIMER2_COMPA)
 {
 	xpcc::Clock::increment();
 }

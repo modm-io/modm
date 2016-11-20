@@ -57,8 +57,7 @@ main()
 }
 
 
-extern "C" void
-ADC4_IRQHandler(void)
+XPCC_ISR(ADC4)
 {
 	if (Adc4::getInterruptFlags() & Adc4::InterruptFlag::EndOfRegularConversion) {
 		Adc4::acknowledgeInterruptFlag(Adc4::InterruptFlag::EndOfRegularConversion);

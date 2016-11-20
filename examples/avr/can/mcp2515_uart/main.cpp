@@ -40,7 +40,7 @@ FLASH_STORAGE(uint8_t canFilter[]) =
 Uart0 uart;
 
 // timer interrupt routine
-ISR(TIMER2_COMPA_vect)
+XPCC_ISR(TIMER2_COMPA)
 {
 	xpcc::Clock::increment();
 }

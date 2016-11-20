@@ -27,10 +27,10 @@
 #define CAN_BTR_TS1_POS		16
 
 %% if target is stm32f3
-#	define	CAN1_TX_IRQHandler		USB_HP_CAN1_TX_IRQHandler
-#	define	CAN1_RX0_IRQHandler		USB_LP_CAN1_RX0_IRQHandler
-#	define	CAN1_TX_IRQn			USB_HP_CAN1_TX_IRQn
-#	define	CAN1_RX0_IRQn			USB_LP_CAN1_RX0_IRQn
+#	define	XPCC_ISR_NAME(CAN1_TX)		XPCC_ISR_NAME(USB_HP_CAN1_TX)
+#	define	XPCC_ISR_NAME(CAN1_RX0)		XPCC_ISR_NAME(USB_LP_CAN1_RX0)
+#	define	CAN1_TX_IRQn				USB_HP_CAN1_TX_IRQn
+#	define	CAN1_RX0_IRQn				USB_LP_CAN1_RX0_IRQn
 %% endif
 
 // ----------------------------------------------------------------------------
@@ -207,8 +207,8 @@ readMailbox(xpcc::can::Message& message, uint32_t mailboxId)
  *
  * Generated when Transmit Mailbox 0..2 becomes empty.
  */
-extern "C" void
-{{ reg }}_TX_IRQHandler()
+
+XPCC_ISR({{ reg }}_TX)
 {
 %% if parameters.tx_buffer > 0
 	uint32_t mailbox;
@@ -241,8 +241,7 @@ extern "C" void
  * Generated on a new received message, FIFO0 full condition and Overrun
  * Condition.
  */
-extern "C" void
-{{ reg }}_RX0_IRQHandler()
+XPCC_ISR({{ reg }}_RX0)
 {
 	if ({{ reg }}->RF0R & CAN_RF0R_FOVR0) {
 		xpcc::ErrorReport::report(xpcc::stm32::CAN{{ id }}_FIFO0_OVERFLOW);
@@ -269,8 +268,7 @@ extern "C" void
  *
  * See FIFO0 Interrupt
  */
-extern "C" void
-{{ reg }}_RX1_IRQHandler()
+XPCC_ISR({{ reg }}_RX1)
 {
 	if ({{ reg }}->RF1R & CAN_RF1R_FOVR1) {
 		xpcc::ErrorReport::report(xpcc::stm32::CAN{{ id }}_FIFO1_OVERFLOW);
@@ -298,19 +296,18 @@ extern "C" void
 // the interrupt source and call the correct interrupts function defined above.
 // Sources for the different interrupts are specified in the Reference Manual
 // in the "bxCAN interrupts" section.
-extern "C" void
-CEC_CAN_IRQHandler()
+XPCC_ISR(CEC_CAN)
 {
 	if({{ reg }}->TSR & (CAN_TSR_RQCP0 | CAN_TSR_RQCP1 | CAN_TSR_RQCP2)) {
-		{{ reg }}_TX_IRQHandler();
+		XPCC_ISR_CALL({{ reg }}_TX);
 	}
 
 	if({{ reg }}->RF0R & (CAN_RF0R_FMP0 | CAN_RF0R_FULL0 | CAN_RF0R_FOVR0)) {
-		{{ reg }}_RX0_IRQHandler();
+		XPCC_ISR_CALL({{ reg }}_RX0);
 	}
 
 	if({{ reg }}->RF1R & (CAN_RF1R_FMP1 | CAN_RF1R_FULL1 | CAN_RF1R_FOVR1)) {
-		{{ reg }}_RX1_IRQHandler();
+		XPCC_ISR_CALL({{ reg }}_RX1);
 	}
 
 	// TODO: we do not handle status changes at the moment.

@@ -135,6 +135,12 @@
 	#	define xpcc_fastdata		xpcc_section(".fastdata")
 	#endif
 
+	#ifdef __cplusplus
+	#	define xpcc_extern_c extern "C"
+	#else
+	#	define xpcc_extern_c
+	#endif
+
 	#define XPCC_ARRAY_SIZE(x)	(sizeof(x) / sizeof(x[0]))
 
 #endif	// !__DOXYGEN__

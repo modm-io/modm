@@ -236,8 +236,7 @@ xpcc::lpc::Can::CAN_error(uint32_t /* error_info */)
 /*	CAN interrupt handler */
 /*	The CAN interrupt handler must be provided by the user application.
 	It's function is to call the isr() API located in the ROM */
-extern "C" void
-CAN_IRQHandler(void) {
+XPCC_ISR(CAN) {
 	LPC11C_ROM_CAN->pCAND->isr();
 }
 
