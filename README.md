@@ -196,12 +196,6 @@ Daniel Krebs ([@daniel-k](https://github.com/daniel-k)),
 </dd>
 </dl>
 
-
-
-[virtualbox]: https://www.virtualbox.org/wiki/Downloads
-[vagrant]: http://www.vagrantup.com/downloads.html
-[rca-vm]: https://github.com/roboterclubaachen/rca-vm
-
 [prs]: https://github.com/roboterclubaachen/xpcc/pulls
 [contributing]: https://github.com/roboterclubaachen/xpcc/tree/develop/CONTRIBUTING.md
 [porting]: https://github.com/roboterclubaachen/xpcc/blob/develop/PORTING.md
