@@ -66,8 +66,8 @@ class Builder(object):
 												component 'driver'
 	self.tree.components["driver"].events.publish
 	self.tree.components["driver"].events.subscribe
-	self.tree.container
-	self.tree.container["PC"].components	--	only components form the
+	self.tree.containers
+	self.tree.containers["PC"].components	--	only components form the
 												container 'PC'
 	self.tree.types
 	self.tree.events

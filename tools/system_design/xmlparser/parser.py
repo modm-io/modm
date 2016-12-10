@@ -25,15 +25,15 @@ class Tree(object):
 	types		-- List of all types
 	events		-- List of all events
 	components	-- List of all components
-	container	-- List of all container
+	containers	-- List of all container
 	domains		-- List of all domains
 	"""
 	def __init__(self):
 		self.types = utils.SingleAssignDictionary("types")
 		self.events = utils.SingleAssignDictionary("events")
 		self.components = component.ComponentDictionary("components")
-		self.container = utils.SingleAssignDictionary("container")
-		self.domains = utils.SingleAssignDictionary("domain")
+		self.containers = utils.SingleAssignDictionary("containers")
+		self.domains = utils.SingleAssignDictionary("domains")
 	
 	def dump(self):
 		output = "Types:\n"
@@ -45,8 +45,8 @@ class Tree(object):
 		output += "\nComponents:\n"
 		for element in self.components:
 			output += "- %s\n" % element
-		output += "\nContainer:\n"
-		for element in self.container:
+		output += "\nContainers:\n"
+		for element in self.containers:
 			output += "- %s\n" % element
 		output += "\nDomains:\n"
 		for element in self.domains:
@@ -86,12 +86,12 @@ class Parser(object):
 		
 		Parsing is done in two steps: Creating the empty elements first, fill and link them then.
 		 1. Creating the elements and add them to the tree parsing the names only. This should be an independent task
-		  types, events, components, container, doains
+		  types, events, components, containers, domains
 		 2. Evaluate the elements parsing the remaining xml elements. Since all elements are in tree already, these may be also independent tasks.
 		  1. Evaluate types, create dependency hierarchy
 		  2. Evaluate events, link with types 
 		  3. Evaluate components, link with types and events
-		  4. Evaluate container, link with components
+		  4. Evaluate containers, link with components
 		
 		After all a checking and optimizing step is performed
 		
@@ -198,7 +198,7 @@ class Parser(object):
 			component.flattened()
 		self.tree.components.updateIndex()
 		
-		for container in self.tree.container:
+		for container in self.tree.containers:
 			container.updateIndex()
 
 	@staticmethod
@@ -266,10 +266,10 @@ class Parser(object):
 	def _parse_container(self, xmltree):
 		for node in xmltree.findall('container'):
 			element = container.Container(node)
-			self.tree.container[element.name] = element
+			self.tree.containers[element.name] = element
 			
 	def _evaluate_container(self):
-		for c in self.tree.container:
+		for c in self.tree.containers:
 			c.evaluate(self.tree)
 	
 	def _parse_domains(self, xmltree):
@@ -302,4 +302,4 @@ if __name__ == "__main__":
 	#print tree.components["driver"].flattened().dump()
 	#print tree.components["driver"].abstract
 	
-	#print tree.container["drive"].subscriptions
+	#print tree.containers["drive"].subscriptions

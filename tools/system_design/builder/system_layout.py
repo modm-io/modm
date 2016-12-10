@@ -100,7 +100,7 @@ class SystemLayoutBuilder(builder_base.Builder):
 	  
 	def get_graph_width(self, tree):
 	    width = 0
-	    for container in tree.container:
+	    for container in tree.containers:
 	        # skip containers that the user asked to skip
 	        if self.options.skipList is not None and container.name in self.options.skipList:
 	            continue
@@ -173,12 +173,12 @@ class SystemLayoutBuilder(builder_base.Builder):
 		self.eventsSorted = []
 
 		print("Analysing containers:")
-		for container in self.tree.container:
+		for container in self.tree.containers:
 			print " * " + container.name
 
 		print("Done. Creating graph")
 
-		for container in self.tree.container:
+		for container in self.tree.containers:
 			if container.name is None:
 				continue
 			if self.options.skipList is not None and container.name in self.options.skipList:
@@ -270,7 +270,7 @@ class SystemLayoutBuilder(builder_base.Builder):
 
 		# Draw containers at the top
 		container_x = 2.5
-		for container in self.tree.container:
+		for container in self.tree.containers:
 			# skip containers that are requested to skip
 			if self.options.skipList is not None and container.name in self.options.skipList:
 				continue

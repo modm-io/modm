@@ -57,7 +57,7 @@ class PostmanBuilder(builder_base.Builder):
 		# check the commandline options
 		if not self.options.outpath:
 			raise builder_base.BuilderException("You need to provide an output path!")
-		if not self.options.container or self.options.container not in self.tree.container:
+		if not self.options.container or self.options.container not in self.tree.containers:
 			raise builder_base.BuilderException("Please specify a valid container!")
 
 		if self.options.namespace:
@@ -72,7 +72,7 @@ class PostmanBuilder(builder_base.Builder):
 			'CAMELCASE': filter.enumElement,
 		}
 
-		container = self.tree.container[self.options.container]
+		container = self.tree.containers[self.options.container]
 
 		components = []
 		for component in container.components:
