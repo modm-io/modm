@@ -98,7 +98,7 @@ class Container:
 		return cmp(self.name.lower(), other.name.lower())
 	
 	def dump(self):
-		str = "%s : container\n" % self.name
+		str = "%s : container\n" % self.__str__()
 		for component in self.components:
 			str += "- %s\n" % '\n'.join(["  " + line for line in component.__str__().split('\n')])[2:]
 		return str[:-1]

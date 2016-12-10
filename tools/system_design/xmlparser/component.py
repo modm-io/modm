@@ -311,10 +311,7 @@ class Component(object):
 		hexadecimal). First block shows the actions and the second the events.
 		
 		"""
-		if self.id is None:
-			name = "%s" % self.name
-		else:
-			name = "%s [%02x]" % (self.name, self.id)
+		name = self.__str__()
 		max_length = len(name)
 		
 		elements = [["actions:"], ["publish:"], ["subscribe:"]]
