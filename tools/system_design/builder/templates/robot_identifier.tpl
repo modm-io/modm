@@ -35,6 +35,16 @@ namespace {{ namespace }}
 			}
 		}
 	}
+
+	namespace container
+	{
+		enum class Identifier : uint8_t
+		{
+		{%- for item in containers %}
+			{{ item.name | enumElementStrong }} = {{ item.id | enumValue }},
+		{%- endfor %}
+		};
+	}
 	
 	namespace component
 	{

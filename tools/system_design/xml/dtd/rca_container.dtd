@@ -13,6 +13,7 @@
 <!ELEMENT container (description|bootloader|component)*>
 <!ATTLIST container
 	name CDATA #REQUIRED
+	id CDATA #REQUIRED
 >
 
 <!ELEMENT domain (#PCDATA)>

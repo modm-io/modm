@@ -71,24 +71,24 @@
 </component>
 
 <!-- Containers -->
-<container name="sender">
+<container name="sender" id="0x10">
 	<component name="sender" />
 </container>
 
-<container name="receiver">
+<container name="receiver" id="0x20">
 	<component name="receiver" />
 </container>
 
-<container name="odometry">
+<container name="odometry" id="0x30">
 	<component name="odometry" />
 </container>
 
-<container name="senderreceiver">
+<container name="sender receiver" id="0x40">
 	<component name="sender" />
 	<component name="receiver" />
 </container>
 
-<container name="gui">
+<container name="gui" id="0x50">
 	<component name="gui" />
 </container>
 

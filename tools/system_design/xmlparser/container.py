@@ -9,9 +9,11 @@ from parser_exception import ParserException
 
 class Container:
 	""" Representation of a container which bundles components.
+		For microcontrollers, each container runs on a separate controller.
 	
 	Attributes:
 	name			--	Name of the container
+	id				--	Globally unique identifier of the container (0..255).
 	bootloader		--	Information about a bootloader used to program this
 						container.
 	description		--	Description string
@@ -43,6 +45,7 @@ class Container:
 		self.bootloader = bootloader
 		
 		self.description = xml_utils.get_description(node)
+		self.id = xml_utils.get_identifier(self.node)
 		
 		self.components = None
 		self.events = EventContainer()
@@ -95,7 +98,7 @@ class Container:
 		self.indexReady = True
 	
 	def __cmp__(self, other):
-		return cmp(self.name.lower(), other.name.lower())
+		return cmp(self.name.lower(), other.name.lower()) or cmp(self.id, other.id)
 	
 	def dump(self):
 		str = "%s : container\n" % self.__str__()
@@ -104,4 +107,8 @@ class Container:
 		return str[:-1]
 	
 	def __str__(self):
-		return self.name
+		if self.id is None:
+			name = "[--] %s" % self.name
+		else:
+			name = "[%02x] %s" % (self.id, self.name)
+		return name
