@@ -15,12 +15,12 @@
 #include "../device.hpp"
 
 // ----------------------------------------------------------------------------
-xpcc::{{ target.family }}::AdcInterrupt::Handler
-xpcc::{{ target.family }}::AdcInterrupt::handler(xpcc::dummy);
+xpcc::{{ target["family"] }}::AdcInterrupt::Handler
+xpcc::{{ target["family"] }}::AdcInterrupt::handler(xpcc::dummy);
 
 // ----------------------------------------------------------------------------
 XPCC_ISR(ADC, xpcc_weak)
 {
-	xpcc::{{ target.family }}::AdcInterrupt::handler();
+	xpcc::{{ target["family"] }}::AdcInterrupt::handler();
 }
 

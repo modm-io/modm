@@ -18,9 +18,9 @@
 #include "type_ids.hpp"
 #include "../device.hpp"
 
-%% if target.family == "f4"
+%% if target["family"] == "f4"
 	%% set reg_prefix = "DMA_SxCR"
-%% elif target.family == "f3"
+%% elif target["family"] == "f3"
 	%% set reg_prefix = "DMA_CCR"
 %% endif
 
@@ -40,7 +40,7 @@ class DmaBase
 {
 public:
 	// Enums
-%% if target.family == "f4"
+%% if target["family"] == "f4"
 	enum class
 	Channel : uint32_t
 	{
@@ -137,14 +137,14 @@ public:
 	enum class
 	DataTransferDirection : uint32_t
 	{
-%% if target.family == "f4"
+%% if target["family"] == "f4"
 		/// Source: DMA_SxPAR; Sink: DMA_SxM0AR
 		PeripheralToMemory 	= 0,
 		/// Source: DMA_SxM0AR; Sink: DMA_SxPAR
 		MemoryToPeripheral 	= DMA_SxCR_DIR_0,
 		/// Source: DMA_SxPAR; Sink: DMA_SxM0AR
 		MemoryToMemory 		= DMA_SxCR_DIR_1,
-%% elif target.family == "f3"
+%% elif target["family"] == "f3"
 		/// Source: DMA_CPARx; Sink: DMA_CMARx
 		PeripheralToMemory 	= 0,
 		/// Source: DMA_CMARx; Sink: DMA_CPARx
@@ -155,7 +155,7 @@ public:
 	};
 
 protected:
-%% if target.family == "f4"
+%% if target["family"] == "f4"
 	static constexpr uint32_t memoryMask =
 			DMA_SxCR_MBURST_1 | DMA_SxCR_MBURST_0 |	// MemoryBurstTransfer
 			DMA_SxCR_MSIZE_0  | DMA_SxCR_MSIZE_1  |	// MemoryDataSize
@@ -171,7 +171,7 @@ protected:
 			DMA_SxCR_PL_1    | DMA_SxCR_PL_0    |						// Priority
 			DMA_SxCR_CIRC    |											// CircularMode
 			DMA_SxCR_PFCTRL;											// FlowControl
-%% elif target.family == "f3"
+%% elif target["family"] == "f3"
 	static constexpr uint32_t memoryMask =
 			DMA_CCR_MSIZE_0  | DMA_CCR_MSIZE_1  |	// MemoryDataSize
 			DMA_CCR_MINC                        |	// MemoryIncrementMode

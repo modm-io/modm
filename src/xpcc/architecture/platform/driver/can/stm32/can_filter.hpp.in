@@ -365,7 +365,7 @@ public:
 	static void
 	disableFilter(uint8_t bank);
 
-%% if target.family in ["f1", "f2", "f4"]
+%% if target["family"] in ["f1", "f2", "f4"]
 	/**
 	 * Set the first filter bank for CAN2.
 	 *

@@ -38,27 +38,27 @@
 #	define REFS0 REFS
 #endif
 
-%% if target.name in ['5', '10', '24', '44', '84']
+%% if target["name"] in ['5', '10', '24', '44', '84']
 	%% set has_ref = False
 %% else
 	%% set has_ref = True
 %% endif
 
-%% if target.name in ['26']
+%% if target["name"] in ['26']
 	%% set adfr = 1
 %% endif
-%% if target.name in ['261', '461', '861', '828']
+%% if target["name"] in ['261', '461', '861', '828']
 	%% set mux5 = 1
 %% endif
 
 
-%% if target.name in ['20', '40', '828', '1634', '24', '44', '84']
+%% if target["name"] in ['20', '40', '828', '1634', '24', '44', '84']
 	%% set adlar_reg = 'ADCSRB'
 %% else
 	%% set adlar_reg = 'ADMUX'
 %% endif
 
-%% if target.name in ['828']
+%% if target["name"] in ['828']
 	%% set admuxb = 'ADMUXB'
 	%% set admuxa = 'ADMUXA'
 %% else
@@ -66,16 +66,16 @@
 	%% set admuxa = 'ADMUX'
 %% endif
 
-%% if target.name in ['261', '461', '861', '828']
+%% if target["name"] in ['261', '461', '861', '828']
 	%% set channels = 2**6
 	%% set mux_mask = '0b00011111'
-%% elif target.name in ['26', '87', '167']
+%% elif target["name"] in ['26', '87', '167']
 	%% set channels = 2**5
 	%% set mux_mask = '0b00011111'
-%% elif target.name in ['43']
+%% elif target["name"] in ['43']
 	%% set channels = 2**3
 	%% set mux_mask = '0b00000111'
-%% elif target.name in ['5', '10', '13']
+%% elif target["name"] in ['5', '10', '13']
 	%% set channels = 2**2
 	%% set mux_mask = '0b00000011'
 %% else
@@ -83,7 +83,7 @@
 	%% set mux_mask = '0b00001111'
 %% endif
 
-%% set resolution = 8 if target.name in ['5', '10'] else 10
+%% set resolution = 8 if target["name"] in ['5', '10'] else 10
 
 namespace xpcc
 {
@@ -123,28 +123,28 @@ public:
 	enum class
 	Reference : uint8_t
 	{
-	%% if target.name in ['87', '167']
+	%% if target["name"] in ['87', '167']
 		InternalVcc = 0,
 		ExternalRef = (1 << AREFEN),
 		Internal1V1 = (1 << REFS0),
 		Internal2V56 = (1 << REFS1) | (1 << REFS0),
-	%% elif target.name in ['261', '461', '861', '25', '45', '85']
+	%% elif target["name"] in ['261', '461', '861', '25', '45', '85']
 		InternalVcc = 0,
 		ExternalRef = (1 << REFS0),
 		Internal1V1 = (1 << REFS1),
 		Internal2V56 = (1 << REFS2) | (1 << REFS1),
 		Internal2V56WithCap = (1 << REFS2) | (1 << REFS1) | (1 << REFS0),
-	%% elif target.name in ['13', '20', '40', '43', '828']
+	%% elif target["name"] in ['13', '20', '40', '43', '828']
 		InternalVcc = 0,
 		Internal1V1 = (1 << REFS0),
-	%% elif target.name in ['48', '88']
+	%% elif target["name"] in ['48', '88']
 		InternalVcc = (1 << REFS0),
 		Internal1V1 = 0,
-	%% elif target.name in ['1634']
+	%% elif target["name"] in ['1634']
 		InternalVcc = 0,
 		ExternalRef = (1 << REFS0),
 		Internal1V1 = (1 << REFS1),
-	%% elif target.name in ['26']
+	%% elif target["name"] in ['26']
 		InternalVcc = 0,
 		ExternalRef = (1 << REFS0),
 		Internal2V56 = (1 << REFS1),
@@ -304,7 +304,7 @@ public:
 	static inline void
 	setLeftAdjustResult()
 	{
-%% if target.name not in ['5', '10']
+%% if target["name"] not in ['5', '10']
 		{{ adlar_reg }} |= (1 << ADLAR);
 %% endif
 	}
@@ -312,7 +312,7 @@ public:
 	static inline void
 	setRightAdjustResult()
 	{
-%% if target.name not in ['5', '10']
+%% if target["name"] not in ['5', '10']
 		{{ adlar_reg }} &= ~(1 << ADLAR);
 %% endif
 	}
@@ -329,15 +329,15 @@ public:
 	static inline void
 	setReference(Reference reference)
 	{
-	%% if target.name in ['87', '167']
+	%% if target["name"] in ['87', '167']
 		AMISCR = (AMISCR & ~(1 << AREFEN)) | (uint8_t(reference) & (1 << AREFEN));
 		ADMUX = (ADMUX & ~0xc0) | (uint8_t(reference) & 0xc0);
-	%% elif target.name in ['828']
+	%% elif target["name"] in ['828']
 		ADMUXB = (ADMUXB & ~0x20) | uint8_t(reference);
-	%% elif target.name in ['261', '461', '861']
+	%% elif target["name"] in ['261', '461', '861']
 		ADCSRB = (ADCSRB & ~(1 << REFS2)) | (uint8_t(reference) & (1 << REFS2));
 		ADMUX = (ADMUX & ~0xc0) | (uint8_t(reference) & 0xc0);
-	%% elif target.name in ['25', '45', '85']
+	%% elif target["name"] in ['25', '45', '85']
 		ADMUX = (ADMUX & ~0xd0) | uint8_t(reference);
 	%% else
 		ADMUX = (ADMUX & ~0xc0) | uint8_t(reference);

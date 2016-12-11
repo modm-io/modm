@@ -17,7 +17,7 @@ def init(module):
 
 def prepare(module, options):
     device = options[":target"]
-    if not device.identifier.platform == "stm32":
+    if not device.identifier["platform"] == "stm32":
         return False
 
     return True
@@ -30,7 +30,7 @@ def build(env):
     defines = []
     headers = []
 
-    folder = "stm32{}xx".format(device.identifier.family)
+    folder = "stm32{}xx".format(device.identifier["family"])
     for define in device.properties["define"]:
         filename = "{}.h".format(define.lower())
         env.copy(os.path.join(folder, "Include", filename), filename)

@@ -11,13 +11,13 @@
 
 {{ generation_block }}
 
-#ifndef XPCC_{{target.family | upper}}_SPI_TYPE_IDS_HPP
-#define XPCC_{{target.family | upper}}_SPI_TYPE_IDS_HPP
+#ifndef XPCC_{{target["family"] | upper}}_SPI_TYPE_IDS_HPP
+#define XPCC_{{target["family"] | upper}}_SPI_TYPE_IDS_HPP
 
 namespace xpcc
 {
 
-namespace {{target.family}}
+namespace {{target["family"]}}
 {
 
 namespace TypeId
@@ -33,8 +33,8 @@ namespace TypeId
 	typedef struct{} SpiSlaveSs;
 }
 
-} // namespace {{target.family}}
+} // namespace {{target["family"]}}
 
 } // namespace xpcc
 
-#endif // XPCC_{{target.family | upper}}_SPI_TYPE_IDS_HPP
+#endif // XPCC_{{target["family"] | upper}}_SPI_TYPE_IDS_HPP

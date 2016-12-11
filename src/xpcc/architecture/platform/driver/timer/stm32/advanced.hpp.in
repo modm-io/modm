@@ -105,7 +105,7 @@ public:
 			SlaveMode slaveMode = SlaveMode::Disabled,
 			SlaveModeTrigger slaveModeTrigger = SlaveModeTrigger::Internal0,
 			MasterMode masterMode = MasterMode::Reset
-%% if target.family in ["f3", "f7"]
+%% if target["family"] in ["f3", "f7"]
 			, MasterMode2 masterMode2 = MasterMode2::Reset
 %% endif
 			);
@@ -358,7 +358,7 @@ public:
 	static inline void
 	setCompareValue(uint32_t channel, uint16_t value)
 	{
-%% if target.family == "f1"
+%% if target["family"] == "f1"
 		*(&TIM{{ id }}->CCR1 + ((channel - 1) * 2)) = value;
 %% else
 		*(&TIM{{ id }}->CCR1 + (channel - 1)) = value;
@@ -368,7 +368,7 @@ public:
 	static inline uint16_t
 	getCompareValue(uint32_t channel)
 	{
-%% if target.family == "f1"
+%% if target["family"] == "f1"
 		return *(&TIM{{ id }}->CCR1 + ((channel - 1) * 2));
 %% else
 		return *(&TIM{{ id }}->CCR1 + (channel - 1));

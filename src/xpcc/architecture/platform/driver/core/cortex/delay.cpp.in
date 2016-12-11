@@ -25,9 +25,9 @@
 
 %# TODO: These numbers were measured from a few example applications.
 %#       A statistical analysis of the average overhead cycles is required!
-%% if target.platform == "stm32" and target.family == "f4"
+%% if target["platform"] == "stm32" and target["family"] == "f4"
 	%% set overhead = 25
-%% elif target.platform == "stm32" and target.family == "f1"
+%% elif target["platform"] == "stm32" and target["family"] == "f1"
 	%% set overhead = 12
 %% else
 	%% set overhead = 30

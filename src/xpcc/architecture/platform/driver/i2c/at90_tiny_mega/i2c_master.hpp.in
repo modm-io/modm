@@ -14,8 +14,8 @@
 
 {{ generation_block }}
 
-#ifndef XPCC_{{target.family | upper}}_I2C_MASTER_HPP
-#define XPCC_{{target.family | upper}}_I2C_MASTER_HPP
+#ifndef XPCC_{{target["family"] | upper}}_I2C_MASTER_HPP
+#define XPCC_{{target["family"] | upper}}_I2C_MASTER_HPP
 
 #include "../device.hpp"
 #include <xpcc/architecture/interface/i2c_master.hpp>
@@ -25,7 +25,7 @@
 namespace xpcc
 {
 
-namespace {{target.family}}
+namespace {{target["family"]}}
 {
 
 /**
@@ -108,8 +108,8 @@ private:
 	initialize(uint8_t twbr, Prescaler prescaler=Prescaler::Div1);
 };
 
-} // namespace {{target.family}}
+} // namespace {{target["family"]}}
 
 } // namespace xpcc
 
-#endif // XPCC_{{target.family | upper}}_I2C_MASTER_HPP
+#endif // XPCC_{{target["family"] | upper}}_I2C_MASTER_HPP

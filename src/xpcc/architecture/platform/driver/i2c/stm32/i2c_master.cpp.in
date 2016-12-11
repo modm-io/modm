@@ -599,7 +599,7 @@ xpcc::stm32::I2cMaster{{ id }}::initializeWithPrescaler(uint8_t peripheralFreque
 	I2C{{ id }}->CR2 = peripheralFrequency;
 	I2C{{ id }}->CCR = prescaler;
 	I2C{{ id }}->TRISE = riseTime;
-%% if target.family in ["f2", "f4"]
+%% if target["family"] in ["f2", "f4"]
 	// analog filter on, digital filter = 2
 	I2C{{ id }}->FLTR = (1 << 4) | 4;
 %% endif

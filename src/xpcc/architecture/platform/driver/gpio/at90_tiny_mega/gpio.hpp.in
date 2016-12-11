@@ -12,8 +12,8 @@
 
 {{ generation_block }}
 
-#ifndef XPCC_{{target.family | upper}}_GPIO_HPP
-#define XPCC_{{target.family | upper}}_GPIO_HPP
+#ifndef XPCC_{{target["family"] | upper}}_GPIO_HPP
+#define XPCC_{{target["family"] | upper}}_GPIO_HPP
 
 #include "../device.hpp"
 #include "type_ids.hpp"
@@ -36,7 +36,7 @@
 namespace xpcc
 {
 
-namespace {{target.family}}
+namespace {{target["family"]}}
 {
 
 /// @ingroup	{{target.string}}_gpio
@@ -252,12 +252,12 @@ public:
 				%% set af_id = gpio.pcint | int
 				%#- Go home Atmel, you're drunk!
 				%% set af_reg = (af_id / 8) | int
-				%% if target.family == 'attiny'
-					%% if (target.name in ['2313', '4313']) and af_id >= 11 and af_id <= 17
+				%% if target["family"] == 'attiny'
+					%% if (target["name"] in ['2313', '4313']) and af_id >= 11 and af_id <= 17
 						%% set af_reg = 2
-					%% elif (target.name in ['20', '40', '1634']) and af_id >= 12 and af_id <= 17
+					%% elif (target["name"] in ['20', '40', '1634']) and af_id >= 12 and af_id <= 17
 						%% set af_reg = 2
-					%% elif (target.name in ['13', '25', '45', '85', '2313', '4313'])
+					%% elif (target["name"] in ['13', '25', '45', '85', '2313', '4313'])
 						%% set af_reg = ""
 					%% endif
 				%% endif
@@ -527,7 +527,7 @@ public:
 %% endfor
 /// @endcond
 
-}	// namespace {{target.family}}
+}	// namespace {{target["family"]}}
 
 }	// namespace xpcc
 

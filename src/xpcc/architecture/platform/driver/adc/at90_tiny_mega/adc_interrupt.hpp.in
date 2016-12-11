@@ -9,8 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_{{ target.family | upper }}_ADC_INTERRUPT_HPP
-#define XPCC_{{ target.family | upper }}_ADC_INTERRUPT_HPP
+#ifndef XPCC_{{ target["family"] | upper }}_ADC_INTERRUPT_HPP
+#define XPCC_{{ target["family"] | upper }}_ADC_INTERRUPT_HPP
 
 #include <xpcc/utils/dummy.hpp>
 #include "adc.hpp"
@@ -20,7 +20,7 @@
 namespace xpcc
 {
 
-namespace {{ target.family }}
+namespace {{ target["family"] }}
 {
 
 /**
@@ -41,8 +41,8 @@ public:
 	static Handler handler;
 };
 
-}	// namespace {{ target.family }}
+}	// namespace {{ target["family"] }}
 
 }	// namespace xpcc
 
-#endif // XPCC_{{ target.family | upper }}_ADC_INTERRUPT_HPP
+#endif // XPCC_{{ target["family"] | upper }}_ADC_INTERRUPT_HPP

@@ -65,13 +65,13 @@ public:
 	static void
 	initialize()
 	{
-%% if target.family != "f1"
+%% if target["family"] != "f1"
 		constexpr UartBase::OversamplingMode oversample =
 				UartBaudrate::getOversamplingMode(SystemClock::Usart{{ id }}, baudrate);
 %% endif
 		UsartHal{{ id }}::initializeWithBrr(
 				UartBaudrate::getBrr<SystemClock::Usart{{ id }}, baudrate, tolerance>(),
-%% if target.family == "f1"
+%% if target["family"] == "f1"
 				UsartHal{{ id }}::Parity::Disabled);
 %% else
 				UsartHal{{ id }}::Parity::Disabled,

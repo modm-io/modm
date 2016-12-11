@@ -15,9 +15,9 @@
 #	error 	"Don't include this file directly, use 'dma_{{ id }}.hpp' instead!"
 #endif
 
-%% if target.family == "f4"
+%% if target["family"] == "f4"
 	%% set streams = range(0,8)
-%% elif target.family == "f3"
+%% elif target["family"] == "f3"
 	%% if id == 1
 		%% set streams = range(1,7)
 	%% elif id == 2
@@ -28,11 +28,11 @@
 void
 xpcc::stm32::Dma{{ id }}::enable()
 {
-%% if target.family == "f4"
+%% if target["family"] == "f4"
 	RCC->AHB1ENR  |= RCC_AHB1ENR_DMA{{ id }}EN;
 	RCC->AHB1RSTR |=  RCC_AHB1RSTR_DMA{{ id }}RST;
 	RCC->AHB1RSTR &= ~RCC_AHB1RSTR_DMA{{ id }}RST;
-%% elif target.family == "f3"
+%% elif target["family"] == "f3"
 	RCC->AHBENR  |= RCC_AHBENR_DMA{{ id }}EN;
 %% endif
 }
@@ -40,9 +40,9 @@ xpcc::stm32::Dma{{ id }}::enable()
 void
 xpcc::stm32::Dma{{ id }}::disable()
 {
-%% if target.family == "f4"
+%% if target["family"] == "f4"
 	RCC->AHB1ENR &= ~RCC_AHB1ENR_DMA{{ id }}EN;
-%% elif target.family == "f3"
+%% elif target["family"] == "f3"
 	RCC->AHBENR &= ~RCC_AHBENR_DMA{{ id }}EN;
 %% endif
 
@@ -51,14 +51,14 @@ xpcc::stm32::Dma{{ id }}::disable()
 
 %% for stream_id in streams
 
-%% if target.family == "f4"
+%% if target["family"] == "f4"
 	%% set stream = "DMA" ~ id ~ "_Stream" ~ stream_id
 	%% set reg = stream ~ "->CR"
 	%% set mem = stream ~ "->M0AR"
 	%% set per = stream ~ "->PAR"
 	%% set length = stream ~ "->NDTR"
 	%% set prefix = "DMA_SxCR"
-%% elif target.family == "f3"
+%% elif target["family"] == "f3"
 	%% set channel = "DMA" ~ id ~ "_Channel" ~ stream_id
 	%% set reg = channel ~ "->CCR"
 	%% set mem = channel ~ "->CMAR"
@@ -72,7 +72,7 @@ xpcc::stm32::Dma{{ id }}::disable()
 void
 xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::setMemorySource(uint{{type}}_t* address,
 	MemoryIncrementMode inc
-%% if target.family == "f4"
+%% if target["family"] == "f4"
 , MemoryBurstTransfer transfer)
 %% else
 )
@@ -94,7 +94,7 @@ xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::setMemorySource(uint{{type}}_t*
 	}
 	{{ reg }} = ({{ reg }} & ~memoryMask) | static_cast<uint32_t>(size)
 		| static_cast<uint32_t>(inc)      | static_cast<uint32_t>(dir)
-%% if target.family == "f4"
+%% if target["family"] == "f4"
 		| static_cast<uint32_t>(transfer);
 %% else
 		;
@@ -104,7 +104,7 @@ xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::setMemorySource(uint{{type}}_t*
 void
 xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::setPeripheralSource(uint{{type}}_t* address,
 	PeripheralIncrementMode inc
-%% if target.family == "f4"
+%% if target["family"] == "f4"
 , PeripheralBurstTransfer transfer)
 %% else
 )
@@ -116,7 +116,7 @@ xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::setPeripheralSource(uint{{type}
 	{{ per }} = reinterpret_cast<uint32_t>(address);
 	{{ reg }} = ({{ reg }} & ~peripheralMask) | static_cast<uint32_t>(size)
 		| static_cast<uint32_t>(inc)          | static_cast<uint32_t>(dir)
-%% if target.family == "f4"
+%% if target["family"] == "f4"
 		| static_cast<uint32_t>(transfer);
 %% else
 		;
@@ -129,7 +129,7 @@ xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::setPeripheralSource(uint{{type}
 void
 xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::setMemoryDestination(uint{{type}}_t* address,
 	MemoryIncrementMode inc
-%% if target.family == "f4"
+%% if target["family"] == "f4"
 , MemoryBurstTransfer transfer)
 %% else
 )
@@ -150,7 +150,7 @@ xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::setMemoryDestination(uint{{type
 	}
 	{{ reg }} = ({{ reg }} & ~memoryMask) | static_cast<uint32_t>(size)
 		| static_cast<uint32_t>(inc)      | static_cast<uint32_t>(dir)
-%% if target.family == "f4"
+%% if target["family"] == "f4"
 		| static_cast<uint32_t>(transfer);
 %% else
 		;
@@ -161,7 +161,7 @@ xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::setMemoryDestination(uint{{type
 void
 xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::setPeripheralDestination(uint{{type}}_t* address,
 	PeripheralIncrementMode inc
-%% if target.family == "f4"
+%% if target["family"] == "f4"
 , PeripheralBurstTransfer transfer)
 %% else
 )
@@ -180,7 +180,7 @@ xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::setPeripheralDestination(uint{{
 	{{ per }} = reinterpret_cast<uint32_t>(address);
 	{{ reg }} = ({{ reg }} & ~peripheralMask) | static_cast<uint32_t>(size)
 		| static_cast<uint32_t>(inc)          | static_cast<uint32_t>(dir)
-%% if target.family == "f4"
+%% if target["family"] == "f4"
 		| static_cast<uint32_t>(transfer);
 %% else
 		;
@@ -191,7 +191,7 @@ xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::setPeripheralDestination(uint{{
 void
 xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::stop()
 {
-%% if target.family == "f4"
+%% if target["family"] == "f4"
 	{{ reg }} &= ~DMA_SxCR_EN;
 	while({{ reg }} & DMA_SxCR_EN); // wait for stream to be stopped
 %% else
@@ -202,20 +202,20 @@ xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::stop()
 
 void
 xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::configure(
-%% if target.family == "f4"
+%% if target["family"] == "f4"
 	Channel channel,
 %% endif
 	uint16_t sample_length, Priority priority, CircularMode circular
-%% if target.family == "f4"
+%% if target["family"] == "f4"
 	, FlowControl flow)
-%% elif target.family == "f3"
+%% elif target["family"] == "f3"
 	)
 %% endif
 {
 	//stop();
 	{{ reg }} = ({{ reg }} & ~configmask) | static_cast<uint32_t>(priority)
 										  | static_cast<uint32_t>(circular)
-%% if target.family == "f4"
+%% if target["family"] == "f4"
 		| static_cast<uint32_t>(channel) | static_cast<uint32_t>(flow);
 %% else
 		;
@@ -226,7 +226,7 @@ xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::configure(
 void
 xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::start()
 {
-%% if target.family == "f4"
+%% if target["family"] == "f4"
 	{{ reg }} |= DMA_SxCR_EN;
 %% else
 	// clear interrupt flags
@@ -241,7 +241,7 @@ xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::start()
 bool
 xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::isFinished()
 {
-%% if target.family == "f4"
+%% if target["family"] == "f4"
 	return !({{ reg }} & DMA_SxCR_EN);
 %% else
 	return (DMA{{ id }}->ISR & DMA_ISR_TCIF{{ stream_id }});
@@ -252,7 +252,7 @@ xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::DataTransferDirection
 xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::getDataTransferDirection()
 {
 	return static_cast<DataTransferDirection>(
-%% if target.family == "f4"
+%% if target["family"] == "f4"
 		{{ reg }} & (DMA_SxCR_DIR_0 | DMA_SxCR_DIR_1));
 %% else
 		{{ reg }} & (DMA_CCR_MEM2MEM | DMA_CCR_DIR));

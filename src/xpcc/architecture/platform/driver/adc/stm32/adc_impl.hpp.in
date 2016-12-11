@@ -68,9 +68,9 @@ xpcc::stm32::Adc{{ id }}::initialize()
 void
 xpcc::stm32::Adc{{ id }}::setPrescaler(const Prescaler prescaler)
 {
-%% if target.family in ["f2", "f4", "f7"]
+%% if target["family"] in ["f2", "f4", "f7"]
 	ADC->CCR = (ADC->CCR & ~(0b11 << 17)) | (uint32_t(prescaler) << 17);
-%% elif target.family in ["f1", "f3"]
+%% elif target["family"] in ["f1", "f3"]
 	RCC->CFGR = (RCC->CFGR & ~(0b11 << 14)) | (uint32_t(prescaler) << 14);
 %% endif
 }
@@ -79,9 +79,9 @@ xpcc::stm32::Adc{{ id }}::setPrescaler(const Prescaler prescaler)
 void
 xpcc::stm32::Adc{{ id }}::enableTemperatureRefVMeasurement()
 {
-	%% if target.family in ["f2", "f4", "f7"]
+	%% if target["family"] in ["f2", "f4", "f7"]
 	ADC->CCR |= ADC_CCR_TSVREFE;
-	%% elif target.family == "f1"
+	%% elif target["family"] == "f1"
 	ADC{{ id }}->CR2 |= ADC_CR2_TSVREFE;
 	%% endif
 }
@@ -89,9 +89,9 @@ xpcc::stm32::Adc{{ id }}::enableTemperatureRefVMeasurement()
 void
 xpcc::stm32::Adc{{ id }}::disableTemperatureRefVMeasurement()
 {
-	%% if target.family in ["f2", "f4", "f7"]
+	%% if target["family"] in ["f2", "f4", "f7"]
 	ADC->CCR &= ~ADC_CCR_TSVREFE;
-	%% elif target.family == "f1"
+	%% elif target["family"] == "f1"
 	ADC{{ id }}->CR2 &= ~ADC_CR2_TSVREFE;
 	%% endif
 }
@@ -193,7 +193,7 @@ void
 xpcc::stm32::Adc{{ id }}::startConversion()
 {
 	acknowledgeInterruptFlags(InterruptFlag::All);
-%% if target.family == "f1"
+%% if target["family"] == "f1"
 	// select the SWSTART event used to trigger the start of
 	// conversion of a regular group
 	ADC{{ id }}->CR2 |= ADC_CR2_EXTTRIG | ADC_CR2_EXTSEL_0 | ADC_CR2_EXTSEL_1 | ADC_CR2_EXTSEL_2;
@@ -255,9 +255,9 @@ void
 xpcc::stm32::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
 												const bool enable)
 {
-%% if target.family in ["f2", "f4", "f7"]
+%% if target["family"] in ["f2", "f4", "f7"]
 	const IRQn_Type InterruptVector = ADC_IRQn;
-%% elif target.family in ["f1", "f3"]
+%% elif target["family"] in ["f1", "f3"]
 	%% if id < 3
 	const IRQn_Type InterruptVector = ADC1_2_IRQn;
 	%% elif id == 3

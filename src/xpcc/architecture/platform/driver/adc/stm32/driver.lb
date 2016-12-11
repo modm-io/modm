@@ -33,15 +33,15 @@ class Instance(Module):
         properties["id"] = self.instance
 
         # TODO: Consider moving this data to device file!
-        properties["temperature_available"] = (target.family in ["f2", "f4", "f7"] or
-                                              (target.family == "f1" and self.instance == 1))
+        properties["temperature_available"] = (target["family"] in ["f2", "f4", "f7"] or
+                                              (target["family"] == "f1" and self.instance == 1))
         properties["resolution"] = 12
-        properties["max_frequency"] = 36000000 if target.family in ["f4", "f7"] else 14000000
+        properties["max_frequency"] = 36000000 if target["family"] in ["f4", "f7"] else 14000000
 
         channels = [0,1,2,3,4,5,6,7,8,10,11,12,13]
-        if target.family in ["f2", "f4", "f7"]:
+        if target["family"] in ["f2", "f4", "f7"]:
             channels.extend([9,14,15,16,17,18])
-        elif target.family in ["f1", "f3"]:
+        elif target["family"] in ["f1", "f3"]:
             if self.instance == 1:
                 channels.extend([16,17])
             if self.instance < 3:

@@ -13,7 +13,7 @@
 
 #include "can_filter.hpp"
 
-%% if target.family in ["f3", "f0"]
+%% if target["family"] in ["f3", "f0"]
 	%% set reg = 'CAN'
 %% else
 	%% set reg = 'CAN1'
@@ -78,7 +78,7 @@ xpcc::stm32::CanFilter::disableFilter(uint8_t id)
 }
 
 // ----------------------------------------------------------------------------
-%% if target.family in ["f1", "f2", "f4"]
+%% if target["family"] in ["f1", "f2", "f4"]
 void
 xpcc::stm32::CanFilter::setStartFilterBankForCan2(uint8_t startBank)
 {

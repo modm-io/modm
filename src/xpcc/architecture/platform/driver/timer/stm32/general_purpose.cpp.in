@@ -20,7 +20,7 @@
 %%   set apb = "APB1"
 %% endif
 
-%% if (target.family == "f3" and target.name == "373") or target.family == "f0"
+%% if (target["family"] == "f3" and target["name"] == "373") or target["family"] == "f0"
 %%   set irq_name = id
 %% else
 %%   if id == 9
@@ -33,7 +33,7 @@
 %%     set irq_name = "8_BRK_TIM12"
 %%   elif id == 13
 %%     set irq_name = "8_UP_TIM13"
-%%   elif id == 14 and not target.family == "f0"
+%%   elif id == 14 and not target["family"] == "f0"
 %%     set irq_name = "8_TRG_COM_TIM14"
 %%   elif id == 15
 %%     set irq_name = "1_BRK_TIM15"

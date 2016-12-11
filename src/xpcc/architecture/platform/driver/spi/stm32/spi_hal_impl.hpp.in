@@ -47,9 +47,9 @@ xpcc::stm32::SpiHal{{ id }}::initialize(Prescaler prescaler,
 						| static_cast<uint32_t>(dataOrder)
 						| static_cast<uint32_t>(masterSelection)
 						| static_cast<uint32_t>(prescaler)
-%% if target.family in ["f1", "f2", "f4"]
+%% if target["family"] in ["f1", "f2", "f4"]
 						| static_cast<uint32_t>(dataSize);
-%% elif target.family in ["f0", "f3", "f7"]
+%% elif target["family"] in ["f0", "f3", "f7"]
 						;
 	SPI{{ id }}->CR2 = static_cast<uint32_t>(dataSize);
 
@@ -83,10 +83,10 @@ xpcc::stm32::SpiHal{{ id }}::setDataOrder(DataOrder dataOrder)
 void inline
 xpcc::stm32::SpiHal{{ id }}::setDataSize(DataSize dataSize)
 {
-%% if target.family in ["f0", "f3", "f7"]
+%% if target["family"] in ["f0", "f3", "f7"]
 	SPI{{ id }}->CR2 = (SPI{{ id }}->CR2 & ~static_cast<uint32_t>(DataSize::All))
 										 | static_cast<uint32_t>(dataSize);
-%% elif target.family in ["f1", "f2", "f4"]
+%% elif target["family"] in ["f1", "f2", "f4"]
 	// TODO: implement as set/reset bit
 	SPI{{ id }}->CR1 = (SPI{{ id }}->CR1 & ~static_cast<uint32_t>(DataSize::All))
 										 | static_cast<uint32_t>(dataSize);
@@ -122,9 +122,9 @@ xpcc::stm32::SpiHal{{ id }}::write(uint16_t data)
 void inline
 xpcc::stm32::SpiHal{{ id }}::write(uint8_t data)
 {
-%% if target.family in ["f0", "f3", "f7"]
+%% if target["family"] in ["f0", "f3", "f7"]
 	*((__IO uint8_t *) &SPI{{ id}}->DR) = data;
-%% elif target.family in ["f1", "f2", "f4"]
+%% elif target["family"] in ["f1", "f2", "f4"]
 	write(static_cast<uint16_t>(data));
 %% endif
 

@@ -37,7 +37,7 @@ uint16_t xpcc_fastdata ns_per_loop({{ loops / hsi_frequency|int}});
 }
 
 // ----------------------------------------------------------------------------
-%% if target.family == "f0"
+%% if target["family"] == "f0"
 bool
 xpcc::stm32::ClockControl::enableInternalClockMHz14(uint32_t waitCycles)
 {
@@ -121,7 +121,7 @@ xpcc::stm32::ClockControl::enableLowSpeedExternalCrystal(uint32_t waitCycles)
 	return retval;
 }
 
-%% if target.family in ["f2", "f4", "f7"]
+%% if target["family"] in ["f2", "f4", "f7"]
 // ----------------------------------------------------------------------------
 bool
 xpcc::stm32::ClockControl::enablePll(PllSource source, uint8_t pllM,
@@ -174,7 +174,7 @@ xpcc::stm32::ClockControl::enablePll(PllSource source,
 			uint8_t pllMul, uint32_t waitCycles)
 %% endif
 {
-%% set pullmul = 'RCC_CFGR_PLLMULL' if target.family == "f1" else 'RCC_CFGR_PLLMUL'
+%% set pullmul = 'RCC_CFGR_PLLMULL' if target["family"] == "f1" else 'RCC_CFGR_PLLMUL'
 	// Read reserved values and clear all other values
 %% if usbprescaler
 	uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_USBPRE | {{pullmul}} | RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE);
@@ -192,7 +192,7 @@ xpcc::stm32::ClockControl::enablePll(PllSource source,
 	tmp |= (static_cast<uint32_t>(pllMul - 2) << 18) & {{pullmul}};
 
 %% if pllprediv
-	%% set mask = 'RCC_CFGR2_PREDIV1' if target.family == "f1" else 'RCC_CFGR2_PREDIV'
+	%% set mask = 'RCC_CFGR2_PREDIV1' if target["family"] == "f1" else 'RCC_CFGR2_PREDIV'
 #ifdef {{mask}}
 	// HSE PREDIV division factor
 	RCC->CFGR2 = (RCC->CFGR2 & ~({{mask}})) | (uint32_t(pllPrediv - 1) & {{mask}});

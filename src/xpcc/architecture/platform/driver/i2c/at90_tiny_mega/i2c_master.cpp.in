@@ -16,7 +16,7 @@
 // uncomment to debug your driver using simple uart
 /*
 #include "../../uart/at90_tiny_mega/uart0.hpp"
-#define DEBUG(x) xpcc::{{target.family}}::Uart0::write(x)
+#define DEBUG(x) xpcc::{{target["family"]}}::Uart0::write(x)
 /*/
 #define DEBUG(x)
 //*/
@@ -203,7 +203,7 @@ XPCC_ISR(TWI)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::{{target.family}}::I2cMaster::initialize(uint8_t twbr, Prescaler prescaler)
+xpcc::{{target["family"]}}::I2cMaster::initialize(uint8_t twbr, Prescaler prescaler)
 {
 	// no reset, since we want to keep the transaction attached!
 	TWBR = twbr;
@@ -216,7 +216,7 @@ xpcc::{{target.family}}::I2cMaster::initialize(uint8_t twbr, Prescaler prescaler
 }
 
 void
-xpcc::{{target.family}}::I2cMaster::reset()
+xpcc::{{target["family"]}}::I2cMaster::reset()
 {
 	DEBUG('T');
 	writing.length = 0;
@@ -227,13 +227,13 @@ xpcc::{{target.family}}::I2cMaster::reset()
 }
 
 xpcc::I2cMaster::Error
-xpcc::{{target.family}}::I2cMaster::getErrorState()
+xpcc::{{target["family"]}}::I2cMaster::getErrorState()
 {
 	return errorState;
 }
 
 bool
-xpcc::{{target.family}}::I2cMaster::start(I2cTransaction *transaction, ConfigurationHandler handler)
+xpcc::{{target["family"]}}::I2cMaster::start(I2cTransaction *transaction, ConfigurationHandler handler)
 {
 	if (!xpcc::accessor::asVolatile(::transaction) && transaction)
 	{

@@ -15,15 +15,15 @@
 
 #include "fsmc.hpp"
 
-%% if target.family in ["f2", "f4", "f7"]
+%% if target["family"] in ["f2", "f4", "f7"]
 %%  set BCRx = "BCR1"
 %%  set BTRx = "BTR1"
-%% elif target.family == "f1"
+%% elif target["family"] == "f1"
 %%  set BCRx = "BCRx"
 %%  set BTRx = "BTRx"
 %% endif
 
-%% if (target.family == "f4" and (target.name not in ["405", "407", "415", "417"])) or target.family == "f7"
+%% if (target["family"] == "f4" and (target["name"] not in ["405", "407", "415", "417"])) or target["family"] == "f7"
 %%   set FMC = "FMC"
 %% else
 %%   set FMC = "FSMC"

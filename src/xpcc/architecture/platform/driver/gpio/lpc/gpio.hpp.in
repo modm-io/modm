@@ -66,7 +66,7 @@ struct Gpio
  * You must use this class for `SoftwareI2cMaster`!
  *
  * @see ::xpcc::SoftwareI2cMaster
- * @ingroup	{{target.family}}
+ * @ingroup	{{target["family"]}}
  * @{
  */
 template< class IO >

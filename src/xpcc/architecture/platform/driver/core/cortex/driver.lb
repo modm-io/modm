@@ -199,6 +199,6 @@ def build(env):
     env.template("systick/systick_timer.cpp.in")
 
     # Hard Fault Handler
-    if target.platform == "stm32":
+    if target["platform"] == "stm32":
         env.template("hard_fault_handler.cpp.in")
         env.template("hard_fault.sx.in")

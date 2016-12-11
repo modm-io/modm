@@ -34,7 +34,7 @@ XPCC_ISR(USART{{ id }}_RX)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::{{target.family}}::Uart{{ id }}::initialize(uint16_t ubrr)
+xpcc::{{target["family"]}}::Uart{{ id }}::initialize(uint16_t ubrr)
 {
 	atomic::Lock lock;
 	// Set baud rate
@@ -61,7 +61,7 @@ xpcc::{{target.family}}::Uart{{ id }}::initialize(uint16_t ubrr)
 
 // MARK: - read
 bool
-xpcc::{{target.family}}::Uart{{ id }}::read(uint8_t& data)
+xpcc::{{target["family"]}}::Uart{{ id }}::read(uint8_t& data)
 {
 	if (rxBuffer.isEmpty())
 		return false;
@@ -73,7 +73,7 @@ xpcc::{{target.family}}::Uart{{ id }}::read(uint8_t& data)
 }
 
 std::size_t
-xpcc::{{target.family}}::Uart{{ id }}::read(uint8_t *buffer, std::size_t length)
+xpcc::{{target["family"]}}::Uart{{ id }}::read(uint8_t *buffer, std::size_t length)
 {
 	for (std::size_t i = 0; i < length; ++i)
 	{
@@ -91,7 +91,7 @@ xpcc::{{target.family}}::Uart{{ id }}::read(uint8_t *buffer, std::size_t length)
 
 // MARK: - discard
 std::size_t
-xpcc::{{target.family}}::Uart{{ id }}::discardReceiveBuffer()
+xpcc::{{target["family"]}}::Uart{{ id }}::discardReceiveBuffer()
 {
 	std::size_t i(0);
 	while(!rxBuffer.isEmpty())
@@ -114,13 +114,13 @@ xpcc::{{target.family}}::Uart{{ id }}::discardReceiveBuffer()
 
 // MARK: - error
 uint8_t
-xpcc::{{target.family}}::Uart{{ id }}::getErrorFlags()
+xpcc::{{target["family"]}}::Uart{{ id }}::getErrorFlags()
 {
 	return error;
 }
 
 void
-xpcc::{{target.family}}::Uart{{ id }}::acknowledgeErrorFlags()
+xpcc::{{target["family"]}}::Uart{{ id }}::acknowledgeErrorFlags()
 {
 	error = 0;
 }

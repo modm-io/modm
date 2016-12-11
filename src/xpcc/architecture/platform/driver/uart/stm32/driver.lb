@@ -57,7 +57,7 @@ class Instance(Module):
         properties["id"] = self.instance
         properties["apb"] = "2" if self.instance in [1, 6] else "1"
 
-        if self.instance in [1, 2, 3, 6] or properties["target"].family == "f0":
+        if self.instance in [1, 2, 3, 6] or properties["target"]["family"] == "f0":
             properties["uart_name"] = "Usart"
         else:
             properties["uart_name"] = "Uart"

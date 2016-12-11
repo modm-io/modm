@@ -70,7 +70,7 @@ public:
 		Channel{{ channel }} = {{ channel }},
 %% endfor
 %#
-%% if target.family in ["f2", "f4", "f7"]
+%% if target["family"] in ["f2", "f4", "f7"]
 		BatDiv2 = 18, /// Half the V_BAT voltage.
 %% endif
 %#
@@ -120,7 +120,7 @@ public:
 	enum class
 	SampleTime : uint8_t
 	{
-%% if target.family in ["f2", "f4", "f7"]
+%% if target["family"] in ["f2", "f4", "f7"]
 		Cycles3 	= 0b000,	///< 3 ADCCLK cycles
 		Cycles15 	= 0b001,	///< 15 ADCCLK cycles
 		Cycles28 	= 0b010,	///< 28 ADCCLK cycles
@@ -129,7 +129,7 @@ public:
 		Cycles112 	= 0b101,	///< 112 ADCCLK cycles
 		Cycles144 	= 0b110,	///< 144 ADCCLK cycles
 		Cycles480 	= 0b111		///< 480 ADCCLK cycles
-%% elif target.family == "f1"
+%% elif target["family"] == "f1"
 		Cycles2 	= 0b000,	///< 1.5 ADCCLK cycles
 		Cycles8 	= 0b001,	///< 7.5 ADCCLK cycles
 		Cycles14 	= 0b010,	///< 13.5 ADCCLK cycles
@@ -157,7 +157,7 @@ public:
 		EndOfRegularConversion	= ADC_CR1_EOCIE,
 		/// End of conversion of an injected group
 		EndOfInjectedConversion	= ADC_CR1_JEOCIE,
-%% if target.family in ["f2", "f4", "f7"]
+%% if target["family"] in ["f2", "f4", "f7"]
 		/// Overrun (if data are lost)
 		Overrun					= ADC_CR1_OVRIE,
 %% endif
@@ -173,7 +173,7 @@ public:
 		EndOfRegularConversion	= ADC_SR_EOC,
 		/// End of conversion of an injected group
 		EndOfInjectedConversion	= ADC_SR_JEOC,
-%% if target.family in ["f2", "f4", "f7"]
+%% if target["family"] in ["f2", "f4", "f7"]
 		/// Overrun (if data are lost)
 		Overrun					= ADC_SR_OVR,
 		/// All InterruptFlags
@@ -193,7 +193,7 @@ public:
 	 * Enables the ADC clock and switches on the ADC. The ADC clock
 	 * prescaler will be set as well.
 	 *
-%% if target.family in ["f4", "f7"]
+%% if target["family"] in ["f4", "f7"]
 	 * The ADC clock must not exceed 36 MHz for Vdd > 2.4V, or 18MHz for Vdd < 2.4V.
 %% else
 	 * The ADC clock must not exceed 14 MHz.

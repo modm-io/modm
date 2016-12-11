@@ -49,17 +49,17 @@ public:
 	enum class
 	PllSource : uint32_t
 	{
-%% if target.family in ["f2", "f4", "f7"]
+%% if target["family"] in ["f2", "f4", "f7"]
 		/// High speed internal clock (16 MHz)
 		Hsi = RCC_PLLCFGR_PLLSRC_HSI,
 		/// High speed external clock (see HseConfig)
 		Hse = RCC_PLLCFGR_PLLSRC_HSE,
-%% elif target.family in ["f0", "f3"]
+%% elif target["family"] in ["f0", "f3"]
 		/// High speed internal clock (8 MHz)
 		Hsi = RCC_CFGR_PLLSRC_HSI_DIV2,
 		/// High speed external clock (see HseConfig)
 		Hse = RCC_CFGR_PLLSRC_HSE_PREDIV,
-%% elif target.family == "f1"
+%% elif target["family"] == "f1"
 		/// High speed internal clock (8 MHz)
 		Hsi = 0,
 		/// High speed external clock (see HseConfig)
@@ -126,7 +126,7 @@ public:
 		Div512 = RCC_CFGR_HPRE_DIV512
 	};
 
-%% if target.family == "f0"
+%% if target["family"] == "f0"
 	enum class
 	ApbPrescaler : uint32_t
 	{
@@ -158,7 +158,7 @@ public:
 	};
 %% endif
 
-%% if target.family in ["f2", "f4", "f7"]
+%% if target["family"] in ["f2", "f4", "f7"]
 	enum class
 	ClockOutput1Source : uint32_t
 	{
@@ -184,13 +184,13 @@ public:
 		InternalClock = RCC_CFGR_MCO_HSI,
 		ExternalClock = RCC_CFGR_MCO_HSE,
 		ExternalCrystal = RCC_CFGR_MCO_HSE,
-	%% if target.family == "f0"
+	%% if target["family"] == "f0"
 		InternalClockMHz14 = RCC_CFGR_MCO_HSI14,
 	%% endif
 	%% if hsi48
 		InternalClockMHz48 = RCC_CFGR_MCO_HSI48,
 	%% endif
-	%% if target.family == "f1"
+	%% if target["family"] == "f1"
 		Pll = RCC_CFGR_MCO_PLLCLK_DIV2,	///< divided by 2
 	%% else
 		Pll = RCC_CFGR_MCO_PLL,	///< divided by 2
@@ -210,7 +210,7 @@ public:
 	static bool
 	enableInternalClock(uint32_t waitCycles = 2048);
 
-%% if target.family == "f0"
+%% if target["family"] == "f0"
 	static bool
 	enableInternalClockMHz14(uint32_t waitCycles = 2048);
 %% endif
@@ -236,7 +236,7 @@ public:
 	enableLowSpeedExternalCrystal(uint32_t waitCycles = 2048);
 
 	// plls
-%% if target.family in ["f2", "f4", "f7"]
+%% if target["family"] in ["f2", "f4", "f7"]
 	/**
 	 * Enable PLL.
 	 *
@@ -299,7 +299,7 @@ public:
 	enableWatchdogClock(WatchdogClockSource /*src*/)
 	{ return true; }
 
-%% if target.family in ["f2", "f4", "f7"]
+%% if target["family"] in ["f2", "f4", "f7"]
 	static inline bool
 	enableClockOutput1(ClockOutput1Source src, uint8_t div)
 	{
@@ -334,7 +334,7 @@ public:
 		return true;
 	}
 
-%% if target.family == "f0"
+%% if target["family"] == "f0"
 	static inline bool
 	setApbPrescaler(ApbPrescaler prescaler)
 	{

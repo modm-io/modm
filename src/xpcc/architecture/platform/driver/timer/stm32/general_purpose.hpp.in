@@ -71,12 +71,12 @@ public:
 
 	enum class SlaveModeTrigger : uint32_t
 	{
-	%% if (id < 2 or id > 5) or target.family == "f3"
+	%% if (id < 2 or id > 5) or target["family"] == "f3"
 		Internal0 = 0,
 	%% endif
 		Internal1 = TIM_SMCR_TS_0,
 		Internal2 = TIM_SMCR_TS_1,
-	%% if ((id < 2 or id > 5) and id != 9 and id != 12) or target.family == "f3"
+	%% if ((id < 2 or id > 5) and id != 9 and id != 12) or target["family"] == "f3"
 		Internal3 = TIM_SMCR_TS_1 | TIM_SMCR_TS_0,
 	%% endif
 		TimerInput1EdgeDetector = TIM_SMCR_TS_2,
@@ -107,7 +107,7 @@ public:
 		Trigger	= TIM_SMCR_SMS_2 | TIM_SMCR_SMS_1,
 		/// Rising edges of the selected trigger (TRGI) clock the counter.
 		ExternalClock = TIM_SMCR_SMS_2 | TIM_SMCR_SMS_1 | TIM_SMCR_SMS_0,
-	%% if (target.family == "f3" and target.name != "373") or target.family == "f7" and (id >= 2 and id <= 4)
+	%% if (target["family"] == "f3" and target["name"] != "373") or target["family"] == "f7" and (id >= 2 and id <= 4)
 		/// reinitialize and start counter
 		SLAVE_RESET_TRIGGER	= TIM_SMCR_SMS_3,
 	%% endif
@@ -116,7 +116,7 @@ public:
 	// This type is the internal size of the counter.
 	// Timer 2 and 5 are the only one which have the size of 32 bit and
 	// only on stm32f2, stm32f4 and stm32f7
-%% if id in [2, 5] and (target.family in ["f2", "f3", "f4", "f7"])
+%% if id in [2, 5] and (target["family"] in ["f2", "f3", "f4", "f7"])
 	typedef uint32_t Value;
 
 %% else
@@ -350,7 +350,7 @@ public:
 	static inline void
 	setCompareValue(uint32_t channel, Value value)
 	{
-%% if target.family == "f1"
+%% if target["family"] == "f1"
 		*(&TIM{{ id }}->CCR1 + ((channel - 1) * 2)) = value;
 %% else
 		*(&TIM{{ id }}->CCR1 + (channel - 1)) = value;
@@ -360,7 +360,7 @@ public:
 	static inline Value
 	getCompareValue(uint32_t channel)
 	{
-%% if target.family == "f1"
+%% if target["family"] == "f1"
 		return *(&TIM{{ id }}->CCR1 + ((channel - 1) * 2));
 %% else
 		return *(&TIM{{ id }}->CCR1 + (channel - 1));

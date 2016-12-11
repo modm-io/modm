@@ -18,7 +18,7 @@
 #include "../device.hpp"
 #include <xpcc/architecture/interface/register.hpp>
 
-%% if target.family in ["f1", "f2", "f4"]
+%% if target["family"] in ["f1", "f2", "f4"]
 // STM has some weird ideas about continuity
 #define	USART_BRR_DIV_MANTISSA	USART_BRR_DIV_Mantissa
 #define	USART_BRR_DIV_FRACTION	USART_BRR_DIV_Fraction
@@ -48,7 +48,7 @@ class UartBase
 public:
 	enum class Interrupt : uint32_t
 	{
-%% if target.family in ["f0", "f3", "f7"]
+%% if target["family"] in ["f0", "f3", "f7"]
 		/// A USART interrupt is generated when match character is received.
 		CharacterMatch = USART_CR1_CMIE,
 %% endif
@@ -65,7 +65,7 @@ public:
 
 	enum class InterruptFlag : uint32_t
 	{
-%% if target.family in ["f0", "f3", "f7"]
+%% if target["family"] in ["f0", "f3", "f7"]
 %%	set reg = "ISR"
 		/// Set if match character is received.
 		CharacterMatch	= USART_{{reg}}_CMF,
@@ -105,7 +105,7 @@ public:
 		///< clock inverted, sample on rising edge
 	};
 
-%% if target.family not in ["f1"]
+%% if target["family"] not in ["f1"]
 	enum class
 	OversamplingMode : uint32_t
 	{

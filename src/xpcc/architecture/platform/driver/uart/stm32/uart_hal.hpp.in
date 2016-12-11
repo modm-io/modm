@@ -76,7 +76,7 @@ public:
 	static void
 	initialize(	Parity parity = Parity::Disabled);
 
-%% if target.family != "f1"
+%% if target["family"] != "f1"
 	/**
 	 * Initialize Uart HAL Peripheral
 	 *
@@ -98,7 +98,7 @@ public:
 	*/
 	static void
 	initializeWithBrr(uint16_t brr,
-%% if target.family == "f1"
+%% if target["family"] == "f1"
 			Parity parity);
 %% else
 			Parity parity,

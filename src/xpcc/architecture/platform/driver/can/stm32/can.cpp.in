@@ -19,7 +19,7 @@
 
 #include "can_{{ id }}.hpp"
 
-%% if target.family in ["f3", "f0"]
+%% if target["family"] in ["f3", "f0"]
 	%% set reg = 'CAN'
 %% else
 	%% set reg = 'CAN' ~ id
@@ -31,7 +31,7 @@
 #define CAN_BTR_TS2_POS		20
 #define CAN_BTR_TS1_POS		16
 
-%% if target.family == "f3"
+%% if target["family"] == "f3"
 #	define	XPCC_ISR_NAME(CAN1_TX)		XPCC_ISR_NAME(USB_HP_CAN1_TX)
 #	define	XPCC_ISR_NAME(CAN1_RX0)		XPCC_ISR_NAME(USB_LP_CAN1_RX0)
 #	define	CAN1_TX_IRQn				USB_HP_CAN1_TX_IRQn
@@ -107,7 +107,7 @@ xpcc::stm32::Can{{ id }}::initializeWithPrescaler(
 	{{ reg }}->IER |= CAN_IER_TMEIE;
 %% endif
 
-%% if target.family == "f0"
+%% if target["family"] == "f0"
 	// Set vector priority
 	NVIC_SetPriority(CEC_CAN_IRQn, interruptPriority);
 
@@ -295,7 +295,7 @@ XPCC_ISR({{ reg }}_RX1)
 %% endif
 }
 
-%% if target.family == "f0"
+%% if target["family"] == "f0"
 // On stm32f0, ST has decided to use only one interrupt vector for all
 // CAN interrupts. In order to avoide duplicate code, we try to determine
 // the interrupt source and call the correct interrupts function defined above.
@@ -463,7 +463,7 @@ xpcc::stm32::Can{{ id }}::enableStatusChangeInterrupt(
 		uint32_t interruptEnable,
 		uint32_t interruptPriority)
 {
-%% if not target.family == "f0"
+%% if not target["family"] == "f0"
 	NVIC_SetPriority({{ reg }}_SCE_IRQn, interruptPriority);
 	nvicEnableInterrupt({{ reg }}_SCE_IRQn);
 

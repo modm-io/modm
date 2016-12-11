@@ -85,7 +85,7 @@ class GpioPortBase<Gpio::Port::{{port["@name"]}}, StartPin, Width, PortOrder> : 
 	static constexpr uint16_t dataMask = (1 << Width) - 1;
 	static constexpr uint16_t portMask = dataMask << StartPin;
 
-	%% if target.family in ["f1"]
+	%% if target["family"] in ["f1"]
 	static constexpr uint64_t configMask = ((1ULL << (Width * 4)) - 1) << (StartPin * 4);
 	static constexpr uint32_t configMaskL = static_cast<uint32_t>(configMask);
 	static constexpr uint32_t configMaskH = static_cast<uint32_t>(configMask >> 32);
@@ -107,7 +107,7 @@ class GpioPortBase<Gpio::Port::{{port["@name"]}}, StartPin, Width, PortOrder> : 
 
 public:
 	xpcc_always_inline static void setOutput() {
-	%% if target.family in ["f1"]
+	%% if target["family"] in ["f1"]
 		GPIO{{port["@name"]}}->CRH = (GPIO{{port["@name"]}}->CRH & ~configMaskH) | port0001H | port0010H;
 		GPIO{{port["@name"]}}->CRL = (GPIO{{port["@name"]}}->CRL & ~configMaskL) | port0001L | port0010L;
 	%% else
@@ -115,7 +115,7 @@ public:
 	%% endif
 	}
 	xpcc_always_inline static void setInput() {
-	%% if target.family in ["f1"]
+	%% if target["family"] in ["f1"]
 		GPIO{{port["@name"]}}->CRH = (GPIO{{port["@name"]}}->CRH & ~configMaskH) | port0100H;
 		GPIO{{port["@name"]}}->CRL = (GPIO{{port["@name"]}}->CRL & ~configMaskL) | port0100L;
 	%% else
@@ -126,7 +126,7 @@ public:
 	configure(OutputType type,
 			  OutputSpeed speed = OutputSpeed::MHz50)
 	{
-	%% if target.family in ["f1"]
+	%% if target["family"] in ["f1"]
 		uint32_t crh = 0;
 		uint32_t crl = 0;
 
@@ -162,7 +162,7 @@ public:
 	}
 	inline static void configure(InputType type)
 	{
-	%% if target.family in ["f1"]
+	%% if target["family"] in ["f1"]
 		if (type == InputType::Floating) {
 			GPIO{{port["@name"]}}->CRH = (GPIO{{port["@name"]}}->CRH & ~configMaskH) | port0100H;
 			GPIO{{port["@name"]}}->CRL = (GPIO{{port["@name"]}}->CRL & ~configMaskL) | port0100L;

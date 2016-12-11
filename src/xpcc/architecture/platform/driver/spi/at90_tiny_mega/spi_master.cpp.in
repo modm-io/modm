@@ -18,17 +18,17 @@
 // bit 6 (0x40) is used for transfer multiple byte
 // bit 5-0 (0x3f) are used to store the acquire count
 uint8_t
-xpcc::{{target.family}}::SpiMaster::state(0);
+xpcc::{{target["family"]}}::SpiMaster::state(0);
 
 void *
-xpcc::{{target.family}}::SpiMaster::context(nullptr);
+xpcc::{{target["family"]}}::SpiMaster::context(nullptr);
 
 xpcc::Spi::ConfigurationHandler
-xpcc::{{target.family}}::SpiMaster::configuration(nullptr);
+xpcc::{{target["family"]}}::SpiMaster::configuration(nullptr);
 // ----------------------------------------------------------------------------
 
 void
-xpcc::{{target.family}}::SpiMaster::initialize(Prescaler prescaler)
+xpcc::{{target["family"]}}::SpiMaster::initialize(Prescaler prescaler)
 {
 	xpcc::atomic::Lock lock;
 
@@ -39,7 +39,7 @@ xpcc::{{target.family}}::SpiMaster::initialize(Prescaler prescaler)
 // ----------------------------------------------------------------------------
 
 uint8_t
-xpcc::{{target.family}}::SpiMaster::acquire(void *ctx, ConfigurationHandler handler)
+xpcc::{{target["family"]}}::SpiMaster::acquire(void *ctx, ConfigurationHandler handler)
 {
 	if (context == nullptr)
 	{
@@ -60,7 +60,7 @@ xpcc::{{target.family}}::SpiMaster::acquire(void *ctx, ConfigurationHandler hand
 }
 
 uint8_t
-xpcc::{{target.family}}::SpiMaster::release(void *ctx)
+xpcc::{{target["family"]}}::SpiMaster::release(void *ctx)
 {
 	if (ctx == context)
 	{
@@ -72,7 +72,7 @@ xpcc::{{target.family}}::SpiMaster::release(void *ctx)
 // ----------------------------------------------------------------------------
 
 xpcc::ResumableResult<uint8_t>
-xpcc::{{target.family}}::SpiMaster::transfer(uint8_t data)
+xpcc::{{target["family"]}}::SpiMaster::transfer(uint8_t data)
 {
 %% if parameters.busywait
 	SPDR = data;
@@ -111,7 +111,7 @@ xpcc::{{target.family}}::SpiMaster::transfer(uint8_t data)
 }
 
 xpcc::ResumableResult<void>
-xpcc::{{target.family}}::SpiMaster::transfer(
+xpcc::{{target["family"]}}::SpiMaster::transfer(
 		uint8_t *tx, uint8_t *rx, std::size_t length)
 {
 %% if parameters.busywait

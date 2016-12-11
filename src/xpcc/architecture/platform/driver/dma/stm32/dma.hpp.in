@@ -23,9 +23,9 @@
  * @defgroup	{{partname}}_dma DMA
  */
 
-%% if target.family == "f4"
+%% if target["family"] == "f4"
 	%% set streams = range(0,8)
-%% elif target.family == "f3"
+%% elif target["family"] == "f3"
 	%% if id == 1
 		%% set streams = range(1,7)
 	%% elif id == 2
@@ -68,9 +68,9 @@ public:
 		static inline void
 		setMemorySource(uint{{type}}_t* address,
 			MemoryIncrementMode inc = MemoryIncrementMode::Increment
-		%% if target.family == "f4"
+		%% if target["family"] == "f4"
 			, MemoryBurstTransfer transfer = MemoryBurstTransfer::Single);
-		%% elif target.family == "f3"
+		%% elif target["family"] == "f3"
 			);
 		%% endif
 
@@ -78,9 +78,9 @@ public:
 		static inline void
 		setPeripheralSource(uint{{type}}_t* address,
 			PeripheralIncrementMode inc = PeripheralIncrementMode::Fixed
-		%% if target.family == "f4"
+		%% if target["family"] == "f4"
 			, PeripheralBurstTransfer transfer = PeripheralBurstTransfer::Single);
-		%% elif target.family == "f3"
+		%% elif target["family"] == "f3"
 			);
 		%% endif
 	%% endfor
@@ -90,9 +90,9 @@ public:
 		static inline void
 		setMemoryDestination(uint{{type}}_t* address,
 			MemoryIncrementMode inc = MemoryIncrementMode::Increment
-		%% if target.family == "f4"
+		%% if target["family"] == "f4"
 			, MemoryBurstTransfer transfer = MemoryBurstTransfer::Single);
-		%% elif target.family == "f3"
+		%% elif target["family"] == "f3"
 			);
 		%% endif
 
@@ -100,9 +100,9 @@ public:
 		static inline void
 		setPeripheralDestination(uint{{type}}_t* address,
 			PeripheralIncrementMode inc = PeripheralIncrementMode::Fixed
-		%% if target.family == "f4"
+		%% if target["family"] == "f4"
 			, PeripheralBurstTransfer transfer = PeripheralBurstTransfer::Single);
-		%% elif target.family == "f3"
+		%% elif target["family"] == "f3"
 			);
 		%% endif
 	%% endfor
@@ -113,15 +113,15 @@ public:
 		/// will disable the stream
 		static inline void
 		configure(
-		%% if target.family == "f4"
+		%% if target["family"] == "f4"
 			Channel channel,
 		%% endif
 			uint16_t sample_length,
 			Priority priority = Priority::Medium,
 			CircularMode circular = CircularMode::Disabled
-		%% if target.family == "f4"
+		%% if target["family"] == "f4"
 			, FlowControl flow = FlowControl::Dma);
-		%% elif target.family == "f3"
+		%% elif target["family"] == "f3"
 			);
 		%% endif
 

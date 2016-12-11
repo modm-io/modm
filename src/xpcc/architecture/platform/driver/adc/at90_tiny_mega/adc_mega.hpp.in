@@ -27,12 +27,12 @@
 #endif
 
 {#- The ATmega ADC module is incredibly fragmented, these defines help a tiny bit #}
-%% if target.name in ['16', '32', '64'] and target.type in ['m1', 'c1']
+%% if target["name"] in ['16', '32', '64'] and target["type"] in ['m1', 'c1']
 	%% set adcsrb = 'AREFEN'
-%% elif target.name in ['64', '128', '256', '644', '1284', '2564'] and target.type in ['rfa1', 'rfr2']
+%% elif target["name"] in ['64', '128', '256', '644', '1284', '2564'] and target["type"] in ['rfa1', 'rfr2']
 	%% set adcsrb = 'REFOK'
 %% endif
-%% if target.name in ['8', '16', '32'] and target.type in ['hva', 'hvab', 'hvabrevb']
+%% if target["name"] in ['8', '16', '32'] and target["type"] in ['hva', 'hvab', 'hvabrevb']
 	%% set vadc = 1
 // sane register definitions
 #define ADC		VADC
@@ -44,20 +44,20 @@
 #define ADIF	VADCCIF
 #define ADIE	VADCCIE
 %% endif
-%% if target.name in ['8', '128'] and target.type in ['a', None]
+%% if target["name"] in ['8', '128'] and target["type"] in ['a', None]
 	%% set adfr = 1
 %% endif
-%% if (target.name in ['16', '32'] and target.type in ['u4']) or (target.name in ['640', '1280', '2560'] and target.type in [None]) or (target.name in ['64', '128', '256', '644', '1284', '2564'] and target.type in ['rfa1', 'rfr2'])
+%% if (target["name"] in ['16', '32'] and target["type"] in ['u4']) or (target["name"] in ['640', '1280', '2560'] and target["type"] in [None]) or (target["name"] in ['64', '128', '256', '644', '1284', '2564'] and target["type"] in ['rfa1', 'rfr2'])
 	%% set mux5 = 1
 %% endif
-%% if target.name in ['8', '48', '88', '168', '328'] and target.type in ['a', None, 'p', 'pa']
+%% if target["name"] in ['8', '48', '88', '168', '328'] and target["type"] in ['a', None, 'p', 'pa']
 	%% set nomux4 = 1
 %% endif
-%% if target.name in ['16', '32', '8535'] and target.type in ['a', None]
+%% if target["name"] in ['16', '32', '8535'] and target["type"] in ['a', None]
 	%% set sfior = 1
 %% endif
 {#- ADC High Speed Mode has been removed from some chips #}
-%% if target.name in ['8', '16', '32', '64'] and target.type in ['m1', 'u4', 'c1', 'u6', 'a']
+%% if target["name"] in ['8', '16', '32', '64'] and target["type"] in ['m1', 'u4', 'c1', 'u6', 'a']
 	%% set adhsm = 1
 %% endif
 

@@ -11,8 +11,8 @@
 
 {{ generation_block }}
 
-#ifndef XPCC_{{target.family | upper}}_SPI_HPP
-#define XPCC_{{target.family | upper}}_SPI_HPP
+#ifndef XPCC_{{target["family"] | upper}}_SPI_HPP
+#define XPCC_{{target["family"] | upper}}_SPI_HPP
 
 /**
  * @ingroup 	{{target.string}}
@@ -22,7 +22,7 @@
 namespace xpcc
 {
 
-namespace {{target.family}}
+namespace {{target["family"]}}
 {
 
 /// @ingroup	{{target.string}}_spi
@@ -41,8 +41,8 @@ struct Spi
 	};
 };
 
-} // namespace {{target.family}}
+} // namespace {{target["family"]}}
 
 } // namespace xpcc
 
-#endif	// XPCC_{{target.family | upper}}_SPI_HPP
+#endif	// XPCC_{{target["family"] | upper}}_SPI_HPP

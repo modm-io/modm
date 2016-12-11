@@ -57,7 +57,7 @@ xpcc::stm32::{{ name }}::disable()
 	// disable clock
 	RCC->APB{{ apb }}ENR &= ~RCC_APB{{ apb }}ENR_{{ peripheral }}EN;
 }
-%% if target.family != "f1"
+%% if target["family"] != "f1"
 template<class SystemClock, uint32_t baudrate,
 		xpcc::stm32::{{ name }}::OversamplingMode oversample>
 void xpcc_always_inline
@@ -73,7 +73,7 @@ template<class SystemClock, uint32_t baudrate>
 void xpcc_always_inline
 xpcc::stm32::{{ name }}::initialize(Parity parity)
 {
-%% if target.family == "f1"
+%% if target["family"] == "f1"
 	initializeWithBrr(UartBaudrate::getBrr<SystemClock::{{ uart_name ~ id }}, baudrate>(), parity);
 %% else
 	initializeWithBrr(UartBaudrate::getBrr<SystemClock::{{ uart_name ~ id }}, baudrate>(), parity,
@@ -83,7 +83,7 @@ xpcc::stm32::{{ name }}::initialize(Parity parity)
 
 
 void inline
-%% if target.family != "f1"
+%% if target["family"] != "f1"
 xpcc::stm32::{{ name }}::initializeWithBrr(uint16_t brr, Parity parity, OversamplingMode oversample)
 %% else
 xpcc::stm32::{{ name }}::initializeWithBrr(uint16_t brr, Parity parity)
@@ -96,13 +96,13 @@ xpcc::stm32::{{ name }}::initializeWithBrr(uint16_t brr, Parity parity)
 	// set baudrate
 	{{ peripheral }}->BRR = brr;
 	setParity(parity);
-%% if target.family != "f1"
+%% if target["family"] != "f1"
 	setOversamplingMode(oversample);
 %% endif
 	{{ peripheral }}->CR1 |=  USART_CR1_UE;	// Uart Reenable
 }
 
-%% if target.family != "f1"
+%% if target["family"] != "f1"
 void
 xpcc::stm32::{{ name }}::setOversamplingMode(OversamplingMode mode)
 {
@@ -147,7 +147,7 @@ xpcc::stm32::{{ name }}::setLastBitClockPulse(LastBitClockPulse pulse)
 void
 xpcc::stm32::{{ name }}::write(uint8_t data)
 {
-%% if target.family in ["f0", "f3", "f7"]
+%% if target["family"] in ["f0", "f3", "f7"]
 	{{ peripheral }}->TDR = data;
 %% else
 	{{ peripheral }}->DR = data;
@@ -157,7 +157,7 @@ xpcc::stm32::{{ name }}::write(uint8_t data)
 void
 xpcc::stm32::{{ name }}::read(uint8_t &data)
 {
-%% if target.family in ["f0", "f3", "f7"]
+%% if target["family"] in ["f0", "f3", "f7"]
 	data = {{ peripheral }}->RDR;
 %% else
 	data = {{ peripheral }}->DR;
@@ -187,7 +187,7 @@ xpcc::stm32::{{ name }}::setReceiverEnable(bool enable)
 bool
 xpcc::stm32::{{ name }}::isReceiveRegisterNotEmpty()
 {
-%% if target.family in ["f0", "f3", "f7"]
+%% if target["family"] in ["f0", "f3", "f7"]
 	return {{ peripheral }}->ISR & USART_ISR_RXNE;
 %% else
 	return {{ peripheral }}->SR & USART_SR_RXNE;
@@ -197,7 +197,7 @@ xpcc::stm32::{{ name }}::isReceiveRegisterNotEmpty()
 bool
 xpcc::stm32::{{ name }}::isTransmitRegisterEmpty()
 {
-%% if target.family in ["f0", "f3", "f7"]
+%% if target["family"] in ["f0", "f3", "f7"]
 	return {{ peripheral }}->ISR & USART_ISR_TXE;
 %% else
 	return {{ peripheral }}->SR & USART_SR_TXE;
@@ -207,7 +207,7 @@ xpcc::stm32::{{ name }}::isTransmitRegisterEmpty()
 void
 xpcc::stm32::{{ name }}::enableInterruptVector(bool enable, uint32_t priority)
 {
-%% if target.family == "f0" and id in [3,4]
+%% if target["family"] == "f0" and id in [3,4]
 	%% set irq = "USART3_4"
 %% else
 	%% set irq = peripheral
@@ -239,7 +239,7 @@ xpcc::stm32::{{ name }}::disableInterrupt(Interrupt_t interrupt)
 xpcc::stm32::{{ name }}::InterruptFlag_t
 xpcc::stm32::{{ name }}::getInterruptFlags()
 {
-%% if target.family in ["f0", "f3", "f7"]
+%% if target["family"] in ["f0", "f3", "f7"]
 	return InterruptFlag_t( {{ peripheral }}->ISR );
 %% else
 	return InterruptFlag_t( {{ peripheral }}->SR );
@@ -249,7 +249,7 @@ xpcc::stm32::{{ name }}::getInterruptFlags()
 void
 xpcc::stm32::{{ name }}::acknowledgeInterruptFlags(InterruptFlag_t flags)
 {
-%% if target.family in ["f0", "f3", "f7"]
+%% if target["family"] in ["f0", "f3", "f7"]
 	// Not all flags can be cleared by writing to this reg
 	const uint32_t mask = USART_ICR_PECF  | USART_ICR_FECF   |
 		USART_ICR_NCF   | USART_ICR_ORECF | USART_ICR_IDLECF |

@@ -29,7 +29,7 @@
  */
 void Reset_Handler(void)						__attribute__((noreturn));
 void NMI_Handler(void)							__attribute__((weak, alias("defaultHandler")));
-%% if target.family == "stm32"
+%% if target["family"] == "stm32"
 void HardFault_Handler(void);
 %% else
 void HardFault_Handler(void)					__attribute__((weak, alias("defaultHandler")));

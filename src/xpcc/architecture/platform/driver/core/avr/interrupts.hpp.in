@@ -27,7 +27,7 @@ namespace xpcc
 {
 
 /// @ingroup	{{target.string}}_core
-namespace {{ target.family }}
+namespace {{ target["family"] }}
 {
 
 /// enables global interrupts
@@ -44,7 +44,7 @@ disableInterrupts()
 	cli();
 }
 
-%% if target.family == 'xmega'
+%% if target["family"] == 'xmega'
 /// Used to set the interrupt level of all modules.
 /// @ingroup	xmega
 enum class
@@ -112,7 +112,7 @@ disableInterruptLevel(InterruptControlLevel level)
 }
 %% endif
 
-}	// namespace {{ target.family }}
+}	// namespace {{ target["family"] }}
 
 }	// namespace xpcc
 

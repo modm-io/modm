@@ -65,14 +65,14 @@ template< 	class SystemClock, uint32_t baudrate,
 	initialize(Parity parity = Parity::Disabled)
 %% endif
 	{
-%% if target.family != "f1"
+%% if target["family"] != "f1"
 		constexpr UartBase::OversamplingMode oversample =
 				UartBaudrate::getOversamplingMode(SystemClock::{{ name }}, baudrate);
 %% endif
 
 		{{ hal }}::initializeWithBrr(
 				UartBaudrate::getBrr<SystemClock::{{ name }}, baudrate, tolerance>(),
-%% if target.family == "f1"
+%% if target["family"] == "f1"
 				parity);
 %% else
 				parity,

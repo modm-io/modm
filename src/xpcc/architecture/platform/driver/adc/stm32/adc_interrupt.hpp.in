@@ -50,8 +50,8 @@ public:
 	static Handler handler;
 };
 
-}	// namespace {{ target.family }}
+}	// namespace {{ target["family"] }}
 
 }	// namespace xpcc
 
-#endif // XPCC_{{ target.family | upper }}_ADC_INTERRUPT_HPP
+#endif // XPCC_{{ target["family"] | upper }}_ADC_INTERRUPT_HPP

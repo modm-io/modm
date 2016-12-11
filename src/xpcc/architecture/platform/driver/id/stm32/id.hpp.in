@@ -37,11 +37,11 @@ public:
 	getUniqueId(uint8_t offset)
 	{
 		if (offset > 2) return 0;
-%% if target.family in ["f2", "f3", "f4"]
+%% if target["family"] in ["f2", "f3", "f4"]
 		uint32_t *baseaddress = (uint32_t*) 0x1FFF7A10;
-%% elif target.family == "f7"
+%% elif target["family"] == "f7"
 		uint32_t *baseaddress = (uint32_t*) 0x1FF0F420;
-%% elif target.family == "f1"
+%% elif target["family"] == "f1"
 		uint32_t *baseaddress = (uint32_t*) 0x1FFFF7E8;
 %% else
 # error "Core only supported on STM32F1, F2, F3, F4 and F7. Please port to your target."
