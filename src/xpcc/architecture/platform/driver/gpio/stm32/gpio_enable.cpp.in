@@ -30,7 +30,7 @@ xpcc_gpio_enable(void)
 
 	// Enable GPIO clock
 	RCC->{{ clock_tree }}ENR  |=
-%% for port in driver.gpio | lbuild.values("@port") | sort
+%% for port in driver.gpio | lbuild.values("port") | sort
 %%	if not loop.last
 		RCC_{{ clock_tree }}ENR_{{ prefix }}{{ port }}EN |
 %%	else
@@ -40,7 +40,7 @@ xpcc_gpio_enable(void)
 
 	// Reset GPIO peripheral
 	RCC->{{ clock_tree }}RSTR |=
-%% for port in driver.gpio | lbuild.values("@port") | sort
+%% for port in driver.gpio | lbuild.values("port") | sort
 %%	if not loop.last
 		RCC_{{ clock_tree }}RSTR_{{ prefix }}{{ port }}RST |
 %%	else
@@ -49,7 +49,7 @@ xpcc_gpio_enable(void)
 %% endfor
 
 	RCC->{{ clock_tree }}RSTR &= ~(
-%% for port in driver.gpio | lbuild.values("@port") | sort
+%% for port in driver.gpio | lbuild.values("port") | sort
 %%	if not loop.last
 		RCC_{{ clock_tree }}RSTR_{{ prefix }}{{ port }}RST |
 %%	else

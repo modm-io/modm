@@ -20,13 +20,13 @@
 MEMORY
 {
 %% for memory in driver["memory"]
-	{{ memory["@name"] | upper }} ({{ memory["@access"] }}) : ORIGIN = {{ memory["@start"] }}, LENGTH = {{ memory["@size"] }}k
-	%% do regions.append(memory["@name"])
-	%% if 'sram1' == memory["@name"]
-		%% do ram_origin.append(memory["@start"])
+	{{ memory["name"] | upper }} ({{ memory["access"] }}) : ORIGIN = {{ memory["start"] }}, LENGTH = {{ memory["size"] }}k
+	%% do regions.append(memory["name"])
+	%% if 'sram1' == memory["name"]
+		%% do ram_origin.append(memory["start"])
 	%% endif
-	%% if 'sram' in memory["@name"]
-		%% do ram_sizes.append(memory["@size"] | int)
+	%% if 'sram' in memory["name"]
+		%% do ram_sizes.append(memory["size"] | int)
 	%% endif
 %% endfor
 	RAM (rwx) : ORIGIN = {{ ram_origin[0] }}, LENGTH = {{ ram_sizes | sum }}k

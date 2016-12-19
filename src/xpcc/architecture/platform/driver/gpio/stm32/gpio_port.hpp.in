@@ -70,16 +70,16 @@ public:
 // a 16bit port is relatively rare and the optimizer will optimize the heck out of it anyway.
 %% for port in driver.gpio | getPorts
 template< uint8_t StartPin, uint8_t Width, ::xpcc::GpioPort::DataOrder PortOrder >
-class GpioPortBase<Gpio::Port::{{port["@name"]}}, StartPin, Width, PortOrder> : public Gpio
+class GpioPortBase<Gpio::Port::{{port["name"]}}, StartPin, Width, PortOrder> : public Gpio
 {
-	static_assert(StartPin < {{port["@startPin"] + port["@width"]}},
-			"Port StartPin too large, maximum {{port["@startPin"] + port["@width"]}}.");
-	static_assert(Width <= {{port["@width"]}},
-			"Port Width too large, maximum {{port["@width"]}}.");
+	static_assert(StartPin < {{port["startPin"] + port["width"]}},
+			"Port StartPin too large, maximum {{port["startPin"] + port["width"]}}.");
+	static_assert(Width <= {{port["width"]}},
+			"Port Width too large, maximum {{port["width"]}}.");
 	static_assert(Width > 0,
 			"Port Width should be at least 1.");
-	static_assert(StartPin + Width <= {{port["@startPin"] + port["@width"]}},
-			"Port StartPin + Width too large, maximum {{port["@startPin"] + port["@width"]}}.");
+	static_assert(StartPin + Width <= {{port["startPin"] + port["width"]}},
+			"Port StartPin + Width too large, maximum {{port["startPin"] + port["width"]}}.");
 
 	static constexpr uint8_t StartPinReversed = (8 - StartPin - Width) + 8;
 	static constexpr uint16_t dataMask = (1 << Width) - 1;
@@ -108,18 +108,18 @@ class GpioPortBase<Gpio::Port::{{port["@name"]}}, StartPin, Width, PortOrder> : 
 public:
 	xpcc_always_inline static void setOutput() {
 	%% if target["family"] in ["f1"]
-		GPIO{{port["@name"]}}->CRH = (GPIO{{port["@name"]}}->CRH & ~configMaskH) | port0001H | port0010H;
-		GPIO{{port["@name"]}}->CRL = (GPIO{{port["@name"]}}->CRL & ~configMaskL) | port0001L | port0010L;
+		GPIO{{port["name"]}}->CRH = (GPIO{{port["name"]}}->CRH & ~configMaskH) | port0001H | port0010H;
+		GPIO{{port["name"]}}->CRL = (GPIO{{port["name"]}}->CRL & ~configMaskL) | port0001L | port0010L;
 	%% else
-		GPIO{{port["@name"]}}->MODER = (GPIO{{port["@name"]}}->MODER & ~portMask2) | port01;
+		GPIO{{port["name"]}}->MODER = (GPIO{{port["name"]}}->MODER & ~portMask2) | port01;
 	%% endif
 	}
 	xpcc_always_inline static void setInput() {
 	%% if target["family"] in ["f1"]
-		GPIO{{port["@name"]}}->CRH = (GPIO{{port["@name"]}}->CRH & ~configMaskH) | port0100H;
-		GPIO{{port["@name"]}}->CRL = (GPIO{{port["@name"]}}->CRL & ~configMaskL) | port0100L;
+		GPIO{{port["name"]}}->CRH = (GPIO{{port["name"]}}->CRH & ~configMaskH) | port0100H;
+		GPIO{{port["name"]}}->CRL = (GPIO{{port["name"]}}->CRL & ~configMaskL) | port0100L;
 	%% else
-		GPIO{{port["@name"]}}->MODER &= ~portMask2;
+		GPIO{{port["name"]}}->MODER &= ~portMask2;
 	%% endif
 	}
 	inline static void
@@ -142,21 +142,21 @@ public:
 			crh |= port0010H;
 			crl |= port0010L;
 		}
-		GPIO{{port["@name"]}}->CRH = (GPIO{{port["@name"]}}->CRH & ~configMaskH) | crh;
-		GPIO{{port["@name"]}}->CRL = (GPIO{{port["@name"]}}->CRL & ~configMaskL) | crl;
+		GPIO{{port["name"]}}->CRH = (GPIO{{port["name"]}}->CRH & ~configMaskH) | crh;
+		GPIO{{port["name"]}}->CRL = (GPIO{{port["name"]}}->CRL & ~configMaskL) | crl;
 	%% else
 		if (type == OutputType::OpenDrain) {
-			GPIO{{port["@name"]}}->OTYPER |= portMask;
+			GPIO{{port["name"]}}->OTYPER |= portMask;
 		} else {
-			GPIO{{port["@name"]}}->OTYPER &= ~portMask;
+			GPIO{{port["name"]}}->OTYPER &= ~portMask;
 		}
-		GPIO{{port["@name"]}}->OSPEEDR &= ~portMask2;
+		GPIO{{port["name"]}}->OSPEEDR &= ~portMask2;
 		if (i(speed) == 0b01) {
-			GPIO{{port["@name"]}}->OSPEEDR |= port01;
+			GPIO{{port["name"]}}->OSPEEDR |= port01;
 		} else if (i(speed) == 0b10) {
-			GPIO{{port["@name"]}}->OSPEEDR |= port10;
+			GPIO{{port["name"]}}->OSPEEDR |= port10;
 		} else if (i(speed) == 0b11) {
-			GPIO{{port["@name"]}}->OSPEEDR |= portMask2;
+			GPIO{{port["name"]}}->OSPEEDR |= portMask2;
 		}
 	%% endif
 	}
@@ -164,42 +164,42 @@ public:
 	{
 	%% if target["family"] in ["f1"]
 		if (type == InputType::Floating) {
-			GPIO{{port["@name"]}}->CRH = (GPIO{{port["@name"]}}->CRH & ~configMaskH) | port0100H;
-			GPIO{{port["@name"]}}->CRL = (GPIO{{port["@name"]}}->CRL & ~configMaskL) | port0100L;
+			GPIO{{port["name"]}}->CRH = (GPIO{{port["name"]}}->CRH & ~configMaskH) | port0100H;
+			GPIO{{port["name"]}}->CRL = (GPIO{{port["name"]}}->CRL & ~configMaskL) | port0100L;
 		}
 		else {
-			GPIO{{port["@name"]}}->CRH = (GPIO{{port["@name"]}}->CRH & ~configMaskH) | port1000H;
-			GPIO{{port["@name"]}}->CRL = (GPIO{{port["@name"]}}->CRL & ~configMaskL) | port1000L;
+			GPIO{{port["name"]}}->CRH = (GPIO{{port["name"]}}->CRH & ~configMaskH) | port1000H;
+			GPIO{{port["name"]}}->CRL = (GPIO{{port["name"]}}->CRL & ~configMaskL) | port1000L;
 			if (type == InputType::PullUp)
-				GPIO{{port["@name"]}}->BSRR = portMask;
+				GPIO{{port["name"]}}->BSRR = portMask;
 			else
-				GPIO{{port["@name"]}}->BRR = portMask;
+				GPIO{{port["name"]}}->BRR = portMask;
 		}
 	%% else
-		GPIO{{port["@name"]}}->PUPDR &= ~portMask2;
+		GPIO{{port["name"]}}->PUPDR &= ~portMask2;
 		if (i(type) == 0b01) {
-			GPIO{{port["@name"]}}->PUPDR |= port01;
+			GPIO{{port["name"]}}->PUPDR |= port01;
 		} else if (i(type) == 0b10) {
-			GPIO{{port["@name"]}}->PUPDR |= port10;
+			GPIO{{port["name"]}}->PUPDR |= port10;
 		}
 	%% endif
 	}
 	inline static uint16_t read() {
 		if (PortOrder == ::xpcc::GpioPort::DataOrder::Normal) {   // this branch is optimized away
-			uint16_t data = GPIO{{port["@name"]}}->IDR & portMask;
+			uint16_t data = GPIO{{port["name"]}}->IDR & portMask;
 			return (data >> StartPin);
 		} else {
-			uint16_t data = xpcc::bitReverse(uint16_t(GPIO{{port["@name"]}}->IDR & portMask));
+			uint16_t data = xpcc::bitReverse(uint16_t(GPIO{{port["name"]}}->IDR & portMask));
 			return (data >> StartPinReversed);
 		}
 	}
 	inline static void write(uint16_t data) {
 		if (PortOrder == ::xpcc::GpioPort::DataOrder::Normal) {   // this branch is optimized away
 			data <<= StartPin;
-			GPIO{{port["@name"]}}->ODR = (GPIO{{port["@name"]}}->ODR & ~portMask) | (data & portMask);
+			GPIO{{port["name"]}}->ODR = (GPIO{{port["name"]}}->ODR & ~portMask) | (data & portMask);
 		} else {
 			data = xpcc::bitReverse(uint16_t(data << StartPinReversed));
-			GPIO{{port["@name"]}}->ODR = (GPIO{{port["@name"]}}->ODR & ~portMask) | (data & portMask);
+			GPIO{{port["name"]}}->ODR = (GPIO{{port["name"]}}->ODR & ~portMask) | (data & portMask);
 		}
 	}
 };

@@ -60,7 +60,7 @@ def prepare(module, options):
             enumeration=uarts,
             default=uarts[0]))
 
-    pins = [p["@port"] + p["@id"] for p in options[":target"].get_driver("gpio")["gpio"]]
+    pins = [p["port"] + p["id"] for p in options[":target"].get_driver("gpio")["gpio"]]
     module.add_option(
         EnumerationOption(
             name="hardfault.led",
@@ -137,7 +137,7 @@ def build(env):
         })
     # Append `_IRQHandler` to all
     for vector in driver["vector"]:
-        interrupts[int(vector["@position"])] = vector["@name"] + "_IRQHandler"
+        interrupts[int(vector["position"])] = vector["name"] + "_IRQHandler"
     properties["interrupt_table"] = interrupts
     properties["number_of_interrupts"] = max(interrupts.keys())
 
@@ -145,8 +145,8 @@ def build(env):
     env.outbasepath = "link"
 
     for memory in driver["memory"]:
-        if memory["@name"] == "ccm":
-            if "x" in memory["@access"]:
+        if memory["name"] == "ccm":
+            if "x" in memory["access"]:
                 if properties["vector_table_location"] == "fastest":
                     properties["vector_table_location"] = "ram"
                 # Executable CCM (Instruction Core-Coupled Memory)
@@ -156,7 +156,7 @@ def build(env):
                 # Non-executable CCM (Data Core-Coupled Memory)
                 env.template("linkerscript/stm32_dccm.ld.in", "linkerscript.ld")
                 break
-        elif memory["@name"] == "dtcm":
+        elif memory["name"] == "dtcm":
             if properties["vector_table_location"] == "fastest":
                 properties["vector_table_location"] = "ram"
             # Executable ITCM and DTCM (Tightly-Coupled Memory)

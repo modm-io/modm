@@ -21,22 +21,22 @@ def filter_port_ranges(gpios):
     # collect information on available gpios
     port_ids = {}
     for gpio in gpios:
-        if not gpio['@port'] in port_ids:
-            port_ids[gpio['@port']] = [0] * 16
-        port_ids[gpio['@port']][int(gpio['@id'])] = 1
+        if not gpio['port'] in port_ids:
+            port_ids[gpio['port']] = [0] * 16
+        port_ids[gpio['port']][int(gpio['id'])] = 1
     # create port list
     ports = []
     for name, ids in port_ids.items():
         # if the port consists of at least one gpio pin
         if 1 in ids:
             port = {}
-            port['@name'] = name
+            port['name'] = name
             # find start pin as well as width
             ii = ids.index(1)
-            port['@startPin'] = ii
+            port['startPin'] = ii
             while ii < 16 and ids[ii] == 1:
                 ii = ii + 1
-            port['@width'] = ii - port['@startPin']
+            port['width'] = ii - port['startPin']
             ports.append(port)
     return ports
 
@@ -71,17 +71,17 @@ def build(env):
     properties["partname"] = device.partname
     properties["driver"] = driver
     properties["adcs"] = device.get_driver("adc")["instance"]
-    properties["ports"] = sorted(list(set([p["@port"] for p in driver["gpio"]])))
+    properties["ports"] = sorted(list(set([p["port"] for p in driver["gpio"]])))
 
     env.substitutions = properties
     env.outbasepath = "src/modm/platform/gpio"
 
     gpio_source = "gpio_pin.hpp.in"
-    if driver["@compatible"] == "stm32f1":
+    if driver["compatible"] == "stm32f1":
        gpio_source = "gpio_pin_f1.hpp.in"
 
     for pin in driver["gpio"]:
-        env.template(gpio_source, "gpio_{}{}.hpp".format(pin["@port"], pin["@id"]),
+        env.template(gpio_source, "gpio_{}{}.hpp".format(pin["port"], pin["id"]),
                     substitutions=properties.update({'gpio': pin}),
                     filters={"portRanges": filter_port_ranges})
     env.template("gpio_base.hpp.in", filters={"letterToNum": filter_letter_to_num})
