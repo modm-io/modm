@@ -30,6 +30,10 @@
 %#          In that case, consider using inline assembly to manage stack access
 %#          manually, until the memory is enabled.
 
+%% if target is stm32f7
+	// Reset from DFU settings to reset values.
+	RCC->DCKCFGR2 = 0;
+%% endif
 %% if target is stm32f3
 	// enable clock
 	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
