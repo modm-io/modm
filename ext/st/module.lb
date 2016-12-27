@@ -31,7 +31,7 @@ def build(env):
     headers = []
 
     folder = "stm32{}xx".format(device.identifier["family"])
-    for define in device.properties["define"]:
+    for define in listify(device.properties["define"]):
         filename = "{}.h".format(define.lower())
         env.copy(os.path.join(folder, "Include", filename), filename)
 
