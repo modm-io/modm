@@ -258,7 +258,7 @@ public:
 		{{reg}}->AFR[af_id] = ({{reg}}->AFR[af_id] & ~af_mask);
 	}
 	// connect: Hardware Gpio
-	%% for af in (gpio.af if "af" in gpio else [])
+	%% for af in (gpio.af|lbuild.listify if "af" in gpio else [])
 		%% set use = not (	"type" not in af or
 							(af["type"] == "in"     and type == "Output") or
 							(af["type"] == "analog" and type == "Output") or
