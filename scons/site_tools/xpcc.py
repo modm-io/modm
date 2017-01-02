@@ -187,10 +187,31 @@ def c_string_literal(env, string):
 		Escapes string and adds quotes.
 	"""
 	# Warning: Order Matters! Replace '\\' first!
-	e = [("\\", "\\\\"), ("\'", "\\\'"), ("\"", "\\\""), ("\t", "\\t"), ("\n", "\\n")]
+	e = [("\\", "\\\\"), ("\'", "\\\'"), ("\"", "\\\""), ("\t", "\\t"), ("\n", "\\n"), ("\f", ""), ("\r", "")]
 	for r in e:
 		string = string.replace(r[0], r[1])
 	return "\"" + string + "\""
+
+def detect_system(env):
+	"""
+		Provide an unified method to determine running platform.
+	"""
+	# will return lowcase names so it can be used building paths
+
+	system_name = platform.system()
+	standards = {'Darwin': 'darwin', 'Linux': 'linux',
+						'Windows': 'windows' }
+
+	if system_name in standards:
+		return standards[platform.system()]
+
+	if system_name.startswith('MSYS') or system_name.startswith('CYGWIN') or system_name.startswith('MINGW'):
+		return 'windows'
+
+	# if this fails, don't bother continuing, it can only escaladate
+	env.Error("Could not detect the running platform, " + system_name + " unsupported. " \
+		"Currently supported by xpcc : Linux, Windows (MSYS, Cygwin), Darwin")
+	env.Exit(1)
 
 def define_header(env, defines, header, comment, template="define_template.hpp.in"):
 	"""
@@ -219,22 +240,26 @@ def define_header(env, defines, header, comment, template="define_template.hpp.i
 	env.AppendUnique(CPPPATH = env['XPCC_BUILDPATH'])
 
 def build_info_header(env):
+	print('Building: Info Header xpcc_build_info.hpp')
 	defines = {}
 	defines['XPCC_BUILD_PROJECT_NAME'] = env.CStringLiteral(env['XPCC_PROJECT_NAME'])
 	defines['XPCC_BUILD_MACHINE'] = env.CStringLiteral(platform.node())
 	defines['XPCC_BUILD_USER'] = env.CStringLiteral(getpass.getuser())
 	# Generate OS String
-	if platform.system() == 'Linux':
+	if env.System() == 'linux':
 		os = " ".join(platform.linux_distribution())
-	elif platform.system() == 'Windows':
-		os = " ".join(platform.win32_ver())
-	elif platform.system() == 'Darwin':
+	elif env.System() == 'darwin':
 		os = "Mac {0} ({2})".format(*platform.mac_ver())
 	else:
 		os = platform.system()
 	defines['XPCC_BUILD_OS'] = env.CStringLiteral(os)
 	# This contains the version of the compiler that is used to build the project
-	c = subprocess.check_output([env['CXX'], '--version']).split('\n', 1)[0]
+	try:
+		c = subprocess.check_output([env['CXX'], '--version']).split('\n', 1)[0]
+	except Exception, e:
+		env.Error("[CXX] compiler " + env['CXX'] + " is not in path or could not be executed")
+		Exit(1)
+
 	m = re.match("(?P<name>[a-z\-\+]+)[a-zA-Z\(\) ]* (?P<version>\d+\.\d+\.\d+)", c)
 	if m: comp = "{0} {1}".format(m.group('name'), m.group('version'))
 	else: comp = c
@@ -250,6 +275,8 @@ def generate(env, **kw):
 	# features from this version like os.path.relpath() are used.
 	EnsurePythonVersion(2, 6)
 	EnsureSConsVersion(1, 0)
+
+	env.AddMethod(detect_system, 'System')
 
 	# Import Logger Tool
 	env.Tool('logger_tools')
@@ -318,8 +345,8 @@ def generate(env, **kw):
 
 		device = parser.get('build', 'device')
 
-		hosted_device = {'Darwin': 'darwin', 'Linux': 'linux',
-						 'Windows': 'windows' }[platform.system()]
+		hosted_device = env.System()
+
 		if device == 'hosted':
 			device = hosted_device
 		elif device.startswith('hosted/'):
@@ -530,13 +557,25 @@ def generate(env, **kw):
 		Exit(1)
 
 	# append all values from environment section to the real environment
+	#
+	# adding * to a key name will add a space before and append to existing values
+	# adding / to a key name will replace any existing value
+	# raw key name means it will append to existing env value without any adjustment
 	for key, value in configuration['environment'].iteritems():
-		if key.endswith('*'):
+		replace = False
+		if '/' in key:
+			replace = True
+		if '*' in key or '/' in key:
+			if '*' in key:
+				value = " " + value
 			key = key[:-1]
-			value = " " + value
 		if key.upper() == "CPPPATH":
 			value = value.split(':')
-		env.Append(**{ key.upper(): value } )
+
+		if replace:
+			env.Replace(**{ key.upper(): value } )
+		else:
+			env.Append(**{ key.upper(): value } )
 
 	# append defines from user config
 	user_conf = {}

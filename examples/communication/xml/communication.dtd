@@ -89,4 +89,5 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 <!ELEMENT container (description|component)*>
 <!ATTLIST container
 	name CDATA #REQUIRED
+	id CDATA #REQUIRED
 >

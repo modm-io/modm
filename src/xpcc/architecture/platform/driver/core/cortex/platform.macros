@@ -1,9 +1,13 @@
 %# coding: utf-8
-%# Copyright (c) 2011-2016, Roboterclub Aachen e.V.
-%# All Rights Reserved.
+%# Copyright (c) 2016, Niklas Hauser
+%# Copyright (c) 2016, Fabian Greif
+%# Copyright (c) 2016, Sascha Schade
 %#
-%# The file is part of the xpcc library and is released under the 3-clause BSD
-%# license. See the file `LICENSE` for the full license governing this code.
+%# This file is part of the modm project.
+%#
+%# This Source Code Form is subject to the terms of the Mozilla Public
+%# License, v. 2.0. If a copy of the MPL was not distributed with this
+%# file, You can obtain one at http://mozilla.org/MPL/2.0/.
 %# ----------------------------------------------------------------------------
 
 %# This File includes platform specific macros for the generic Cortex-M startup
@@ -30,6 +34,10 @@
 %#          In that case, consider using inline assembly to manage stack access
 %#          manually, until the memory is enabled.
 
+%% if partname.startswith("stm32f7")
+	// Reset from DFU settings to reset values.
+	RCC->DCKCFGR2 = 0;
+%% endif
 %% if partname.startswith("stm32f3")
 	// enable clock
 	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;

@@ -319,7 +319,7 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		__assertion_table_start = .;
 		KEEP(*(.assertion))
 		__assertion_table_end = .;
-	}
+	} >{{memory}}
 %% endmacro
 
 

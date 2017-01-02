@@ -103,7 +103,6 @@
 
 	#define xpcc_always_inline		inline __attribute__((always_inline))
 	#define xpcc_unused				__attribute__((unused))
-	#define xpcc_weak				__attribute__((weak))
 	#define xpcc_aligned(n)			__attribute__((aligned(n)))
 	#define xpcc_packed				__attribute__((packed))
 	// see http://dbp-consulting.com/tutorials/StrictAliasing.html
@@ -112,6 +111,16 @@
 	#define xpcc_likely(x)			__builtin_expect(!!(x), 1)
 	#define xpcc_unlikely(x)		__builtin_expect(!!(x), 0)
 	#define xpcc_section(s)			__attribute__((section(s)))
+
+	#ifdef XPCC__COMPILER_MINGW
+	 	// FIXME: Windows Object Format PE does not support weak symbols
+	 	//	- Bug reported for mingw32 : https://sourceware.org/bugzilla/show_bug.cgi?id=9687
+	 	// 	- Investigate Boost libs how they solve this issue
+	 	//	- __attribute__ ((weak, alias ("__aliasedFunction"))) seems to work on Windows
+	#	define xpcc_weak
+	#else
+ 	#	define xpcc_weak			__attribute__((weak))
+	#endif
 
 	#ifdef XPCC__OS_HOSTED
 	#	define xpcc_fastcode

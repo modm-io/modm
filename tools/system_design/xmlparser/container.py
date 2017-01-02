@@ -4,7 +4,7 @@
 # Copyright (c) 2011-2012, Fabian Greif
 # Copyright (c) 2014, Martin Rosekeit
 # Copyright (c) 2015, Georgi Grinshpun
-# Copyright (c) 2015, Sascha Schade
+# Copyright (c) 2015-2016, Sascha Schade
 # Copyright (c) 2016, Daniel Krebs
 #
 # This file is part of the modm project.
@@ -22,9 +22,11 @@ from parser_exception import ParserException
 
 class Container:
 	""" Representation of a container which bundles components.
-	
+		For microcontrollers, each container runs on a separate controller.
+
 	Attributes:
 	name			--	Name of the container
+	id				--	Globally unique identifier of the container (0..255).
 	bootloader		--	Information about a bootloader used to program this
 						container.
 	description		--	Description string
@@ -33,30 +35,31 @@ class Container:
 	subscriptions	--	Dictionary about which event is subscribed by
 						which component. Needed for example to generate filters
 						for a container.
-	
+
 	The events and subscriptions lists are empty until createEventLists() is
 	called. This must be done only after all components are expanded.
 	"""
 	def __init__(self, node):
 		""" Constructor
-		
+
 		Keyword arguments:
 		node	--	XML node defining this event
 		tree	--	currently evaluted communication structure tree
-		
+
 		Resets the 'abstract' flag for every component beeing contained here.
 		"""
 		self.node = node
 		self.name = node.get('name')
 		utils.check_name(self.name)
-		
+
 		bootloader = node.find('bootloader')
 		if bootloader is not None:
 			bootloader = bootloader.attrib
 		self.bootloader = bootloader
-		
+
 		self.description = xml_utils.get_description(node)
-		
+		self.id = xml_utils.get_identifier(self.node)
+
 		self.components = None
 		self.events = EventContainer()
 		self.subscriptions = None
@@ -75,7 +78,7 @@ class Container:
 			try:
 				component = tree.components[component_name]
 				component.abstract = False
-				
+
 				self.components[component_name] = component
 			except KeyError:
 				raise ParserException("Unknown component '%s' in container '%s'." % (component_name, self.name))
@@ -89,32 +92,36 @@ class Container:
 		"""
 		if self.indexReady:
 			return
-		
+
 		for component in self.components:
 			self.events.update(component.flattened().events)
-			
+
 			for event in component.flattened().events.subscribe:
 				# append new events to the list
 				key = event.name
 				componentList = self.subscriptions.get(key, [])
 				componentList.append(component)
 				self.subscriptions[key] = componentList
-			
+
 			# check that every component has an Identifier
 			if component.flattened().id is None:
 				raise ParserException("Undefined identifier for component '%s' in container '%s'" % \
 						(component.flattened().name, self.name))
-		
+
 		self.indexReady = True
-	
+
 	def __cmp__(self, other):
-		return cmp(self.name.lower(), other.name.lower())
-	
+		return cmp(self.name.lower(), other.name.lower()) or cmp(self.id, other.id)
+
 	def dump(self):
-		str = "%s : container\n" % self.name
+		str = "%s : container\n" % self.__str__()
 		for component in self.components:
 			str += "- %s\n" % '\n'.join(["  " + line for line in component.__str__().split('\n')])[2:]
 		return str[:-1]
-	
+
 	def __str__(self):
-		return self.name
+		if self.id is None:
+			name = "[--] %s" % self.name
+		else:
+			name = "[%02x] %s" % (self.id, self.name)
+		return name

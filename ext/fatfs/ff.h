@@ -57,15 +57,15 @@ extern PARTITION VolToPart[];	/* Volume - Partition resolution table */
 #endif
 #ifndef _INC_TCHAR
 typedef WCHAR TCHAR;
-#define _T(x) L ## x
-#define _TEXT(x) L ## x
+#define FF_T(x) L ## x
+#define FF_TEXT(x) L ## x
 #endif
 
 #else						/* ANSI/OEM string */
 #ifndef _INC_TCHAR
 typedef char TCHAR;
-#define _T(x) x
-#define _TEXT(x) x
+#define FF_T(x) x
+#define FF_TEXT(x) x
 #endif
 
 #endif

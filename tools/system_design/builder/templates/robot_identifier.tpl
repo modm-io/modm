@@ -1,6 +1,6 @@
 %# Copyright (c) 2010-2011, Fabian Greif
 %# Copyright (c) 2011, 2014, Martin Rosekeit
-%# Copyright (c) 2014, Sascha Schade
+%# Copyright (c) 2014, 2016, Sascha Schade
 %# Copyright (c) 2015, Georgi Grinshpun
 %# Copyright (c) 2015, Niklas Hauser
 %#
@@ -31,8 +31,8 @@ namespace {{ namespace }}
 		{%- endif -%}
 		{%- endfor %}
 		};
-				
-		inline const char* 
+
+		inline const char*
 		enumToString(Identifier e)
 		{
 			switch (e)
@@ -46,7 +46,17 @@ namespace {{ namespace }}
 			}
 		}
 	}
-	
+
+	namespace container
+	{
+		enum class Identifier : uint8_t
+		{
+		{%- for item in containers %}
+			{{ item.name | enumElementStrong }} = {{ item.id | enumValue }},
+		{%- endfor %}
+		};
+	}
+
 	namespace component
 	{
 		enum Identifier
@@ -55,8 +65,8 @@ namespace {{ namespace }}
 			{{ item.name | enumElement }} = {{ item.id | enumValue }},
 		{%- endfor %}
 		};
-				
-		inline const char* 
+
+		inline const char*
 		enumToString(Identifier e)
 		{
 			switch (e)
@@ -68,7 +78,7 @@ namespace {{ namespace }}
 			}
 		}
 	}
-	
+
 	namespace action
 	{
 		enum Identifier
@@ -77,8 +87,8 @@ namespace {{ namespace }}
 			{{ item.name | enumElement }} = {{ item.id | enumValue }},
 		{%- endfor %}
 		};
-				
-		inline const char* 
+
+		inline const char*
 		enumToString(Identifier e)
 		{
 			switch (e)
@@ -90,7 +100,7 @@ namespace {{ namespace }}
 			}
 		}
 	}
-		
+
 	namespace event
 	{
 		enum Identifier
@@ -99,8 +109,8 @@ namespace {{ namespace }}
 			{{ item.name | enumElement }} = {{ item.id | enumValue }},
 		{%- endfor %}
 		};
-		
-		inline const char* 
+
+		inline const char*
 		enumToString(Identifier e)
 		{
 			switch (e)

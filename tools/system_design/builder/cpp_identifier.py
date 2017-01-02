@@ -42,6 +42,7 @@ class IdentifierBuilder(builder_base.Builder):
 
 		cppFilter = {
 			'enumElement': filter.enumElement,
+			'enumElementStrong': filter.typeName,
 			'enumValue': filter.toHexValue,
 		}
 		
@@ -53,6 +54,7 @@ class IdentifierBuilder(builder_base.Builder):
 		
 		substitutions = {
 			'domains' : self.tree.domains,
+			'containers' : self.tree.containers,
 			'components': components,
 			'actions': self.tree.components.actions,
 			'events': self.tree.events,

@@ -14,6 +14,9 @@
 #ifndef XPCC_LOG__LEVEL_HPP
 #define XPCC_LOG__LEVEL_HPP
 
+#pragma push_macro("ERROR") // avoid collision with ERROR defined macro in winsock.h
+#undef ERROR
+
 namespace xpcc
 {
 	namespace log
@@ -54,5 +57,7 @@ namespace xpcc
 	 */
 	#define XPCC_LOG_LEVEL xpcc::log::DEBUG
 #endif // XPCC_LOG_LEVEL
+
+#pragma pop_macro("ERROR")
 
 #endif // XPCC_LOG__LEVEL_HPP
