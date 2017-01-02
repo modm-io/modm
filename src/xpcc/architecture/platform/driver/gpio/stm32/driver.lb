@@ -57,9 +57,9 @@ def prepare(module, options):
         return False
 
     # FIXME: All these depencies come from TypeIds
-    module.depends([":platform:core", ":platform:gpio.generic",
-                    ":platform:adc", ":platform:can", ":platform:clock", ":platform:fsmc", ":platform:i2c",
-                    ":platform:spi", ":platform:timer", ":platform:uart", ":platform:usb"])
+    #module.depends([":platform:core", ":platform:gpio.generic",
+    #                ":platform:adc", ":platform:can", ":platform:clock", ":platform:fsmc", ":platform:i2c",
+    #                ":platform:spi", ":platform:timer", ":platform:uart", ":platform:usb"])
     return True
 
 def build(env):
