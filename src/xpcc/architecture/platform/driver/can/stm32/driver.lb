@@ -11,6 +11,20 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
+def load_options(module):
+    module.add_option(
+        NumericOption(
+            name="buffer.tx",
+            description="",
+            minimum=1, maximum=2 ** 16 - 2,
+            default=32))
+    module.add_option(
+        NumericOption(
+            name="buffer.rx",
+            description="",
+            minimum=1, maximum=2 ** 16 - 2,
+            default=32))
+
 class Instance(Module):
     def __init__(self, instance):
         self.instance = instance
@@ -23,19 +37,7 @@ class Instance(Module):
         module.depends(":platform:can")
         module.depends(":debug")
 
-        module.add_option(
-            NumericOption(
-                name="buffer.tx",
-                description="",
-                minimum=1, maximum=2 ** 16 - 2,
-                default=32))
-        module.add_option(
-            NumericOption(
-                name="buffer.rx",
-                description="",
-                minimum=1, maximum=2 ** 16 - 2,
-                default=32))
-
+        load_options(module)
         return True
 
     def build(self, env):
@@ -66,8 +68,15 @@ def prepare(module, options):
 
     module.depends([":platform:core", ":platform:clock.generic", ":platform:can.generic"])
 
-    for instance in listify(device.get_driver("can")["instance"]):
-        module.add_submodule(Instance(int(instance)))
+    driver = device.get_driver("can")
+    # If there is only one instance of the peripheral it is not numbered and
+    # merged into the generic can module.
+    if "instance" in driver:
+        for instance in listify(driver["instance"]):
+            module.add_submodule(Instance(int(instance)))
+    else:
+        module.depends(":debug")
+        load_options(module)
 
     return True
 
@@ -80,6 +89,9 @@ def build(env):
     properties["partname"] = device.partname
     properties["driver"] = driver
 
+    if not "instance" in driver:
+        properties["id"] = ""
+
     env.substitutions = properties
     env.outbasepath = "src/modm/platform/can"
 
@@ -87,3 +99,7 @@ def build(env):
     env.template("can_filter.cpp.in")
     env.copy("error_code.hpp")
     env.copy("type_ids.hpp")
+
+    if not "instance" in driver:
+        env.template("can.hpp.in")
+        env.template("can.cpp.in")

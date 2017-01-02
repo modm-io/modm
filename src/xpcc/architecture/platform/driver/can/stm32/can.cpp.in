@@ -17,12 +17,12 @@
 #include <xpcc/architecture/driver/atomic/queue.hpp>
 #include <xpcc/utils.hpp>
 
-#include "can_{{ id }}.hpp"
-
 %% if target["family"] in ["f3", "f0"]
 	%% set reg = 'CAN'
+#include "can.hpp"
 %% else
 	%% set reg = 'CAN' ~ id
+#include "can_{{ id }}.hpp"
 %% endif
 
 // ----------------------------------------------------------------------------
