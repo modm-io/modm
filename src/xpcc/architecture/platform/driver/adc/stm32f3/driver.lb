@@ -30,21 +30,22 @@ class Instance(Module):
         properties = device.properties
         properties["target"] = target = device.identifier
         properties["partname"] = device.partname
-        properties["id"] = int(self.instance)
+        instance_id = int(self.instance)
+        properties["id"] = instance_id
 
-        if id == 1:
+        if instance_id == 1:
             if target["family"] == "f3":
                 # 13-14 reserved
                 channels = [1,2,3,4,5,6,7,8,9,10,11,12,15,16,17,18]
             else:
                 # 11-14 reserved
                 channels = [1,2,3,4,5,6,7,8,9,10,15,16,17,18]
-        elif id == 2:
+        elif instance_id == 2:
             # 13-16 reserved
             channels = [1,2,3,4,5,6,7,8,9,10,11,12,17,18]
-        elif id == 3:
+        elif instance_id == 3:
             channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
-        elif id == 4:
+        elif instance_id == 4:
             # 14-16 reserved
             channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,17,18]
         properties["channels"] = sorted(channels)
