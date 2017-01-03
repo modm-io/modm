@@ -17,7 +17,7 @@
 #define XPCC_DEVICE_HPP
 
 %% for define in defines:
-#define {{ define }}
+#define {{ define }} 1
 %% endfor
 
 #include <stdint.h>
