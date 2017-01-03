@@ -126,7 +126,7 @@ xpcc::stm32::Timer{{ id }}::configureInputChannel(uint32_t channel,
 	uint32_t flags = static_cast<uint32_t>(input);
 	flags |= static_cast<uint32_t>(prescaler) << 2;
 	flags |= (static_cast<uint32_t>(filter) & 0xf) << 4;
-	
+
 	if (channel <= 1)
 	{
 		uint32_t offset = 8 * channel;
@@ -149,7 +149,7 @@ xpcc::stm32::Timer{{ id }}::configureInputChannel(uint32_t channel,
 		flags <<= offset;
 		flags |= TIM{{ id }}->CCMR2 & ~(0xff << offset);
 
-		TIM{{ id }}->CCMR2 = flags; 
+		TIM{{ id }}->CCMR2 = flags;
 	}
 
 	TIM{{ id }}->CCER |=
@@ -162,33 +162,33 @@ xpcc::stm32::Timer{{ id }}::configureOutputChannel(uint32_t channel,
 		OutputCompareMode_t mode, Value compareValue, PinState out)
 {
 	channel -= 1;	// 1..4 -> 0..3
-	
+
 	// disable channel
 	TIM{{ id }}->CCER &= ~((TIM_CCER_CC1NP | TIM_CCER_CC1P | TIM_CCER_CC1E) << (channel * 4));
-	
+
 	setCompareValue(channel + 1, compareValue);
-	
+
 	// enable preload (the compare value is loaded at each update event)
 	uint32_t flags = mode.value | TIM_CCMR1_OC1PE;
-	
+
 	if (channel <= 1)
 	{
 		uint32_t offset = 8 * channel;
-		
+
 		flags <<= offset;
 		flags |= TIM{{ id }}->CCMR1 & ~(0xff << offset);
-		
+
 		TIM{{ id }}->CCMR1 = flags;
 	}
 	else {
 		uint32_t offset = 8 * (channel - 2);
-		
+
 		flags <<= offset;
 		flags |= TIM{{ id }}->CCMR2 & ~(0xff << offset);
-		
-		TIM{{ id }}->CCMR2 = flags; 
+
+		TIM{{ id }}->CCMR2 = flags;
 	}
-	
+
 	if (mode != OutputCompareMode::Inactive && out == PinState::Enable) {
 		TIM{{ id }}->CCER |= (TIM_CCER_CC1E) << (channel * 4);
 	}
@@ -201,7 +201,7 @@ xpcc::stm32::Timer{{ id }}::enableInterruptVector(bool enable, uint32_t priority
 	if (enable) {
 		// Set priority for the interrupt vector
 		NVIC_SetPriority(TIM{{ irq_name }}_IRQn, priority);
-		
+
 		// register IRQ at the NVIC
 		NVIC_EnableIRQ(TIM{{ irq_name }}_IRQn);
 	}

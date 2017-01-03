@@ -21,7 +21,7 @@ xpcc::stm32::Timer{{ id }}::enable()
 {
 	// enable clock
 	RCC->APB2ENR  |=  RCC_APB2ENR_TIM{{ id }}EN;
-	
+
 	// reset timer
 	RCC->APB2RSTR |=  RCC_APB2RSTR_TIM{{ id }}RST;
 	RCC->APB2RSTR &= ~RCC_APB2RSTR_TIM{{ id }}RST;
@@ -32,7 +32,7 @@ xpcc::stm32::Timer{{ id }}::disable()
 {
 	// disable clock
 	RCC->APB2ENR &= ~RCC_APB2ENR_TIM{{ id }}EN;
-	
+
 	TIM{{ id }}->CR1 = 0;
 	TIM{{ id }}->DIER = 0;
 	TIM{{ id }}->CCER = 0;
@@ -50,7 +50,7 @@ xpcc::stm32::Timer{{ id }}::setMode(Mode mode, SlaveMode slaveMode,
 	// disable timer
 	TIM{{ id }}->CR1 = 0;
 	TIM{{ id }}->CR2 = 0;
-	
+
 	if (slaveMode == SlaveMode::Encoder1 ||
 		slaveMode == SlaveMode::Encoder2 ||
 		slaveMode == SlaveMode::Encoder3)
@@ -78,14 +78,14 @@ xpcc::stm32::Timer{{ id }}::configureInputChannel(uint32_t channel,
 		bool xor_ch1_3)
 {
 	channel -= 1;	// 1..4 -> 0..3
-	
+
 	// disable channel
 	TIM{{ id }}->CCER &= ~((TIM_CCER_CC1NP | TIM_CCER_CC1P | TIM_CCER_CC1E) << (channel * 4));
-	
+
 	uint32_t flags = static_cast<uint32_t>(input);
 	flags |= static_cast<uint32_t>(prescaler) << 2;
 	flags |= static_cast<uint32_t>(filter&0xf) << 4;
-	
+
 	if (channel <= 1)
 	{
 		uint32_t offset = 8 * channel;
@@ -104,13 +104,13 @@ xpcc::stm32::Timer{{ id }}::configureInputChannel(uint32_t channel,
 	}
 	else {
 		uint32_t offset = 8 * (channel - 2);
-		
+
 		flags <<= offset;
 		flags |= TIM{{ id }}->CCMR2 & ~(0xff << offset);
-		
-		TIM{{ id }}->CCMR2 = flags; 
+
+		TIM{{ id }}->CCMR2 = flags;
 	}
-	
+
 	TIM{{ id }}->CCER |= (TIM_CCER_CC1E | static_cast<uint32_t>(polarity)) << (channel * 4);
 }
 
@@ -120,36 +120,36 @@ xpcc::stm32::Timer{{ id }}::configureOutputChannel(uint32_t channel,
 		OutputCompareMode mode, uint16_t compareValue)
 {
 	channel -= 1;	// 1..4 -> 0..3
-	
+
 	// disable output
 	TIM{{ id }}->CCER &= ~(0xf << (channel * 4));
-	
+
 	setCompareValue(channel + 1, compareValue);
-	
+
 	// enable preload (the compare value is loaded at each update event)
 	uint32_t flags = static_cast<uint32_t>(mode) | TIM_CCMR1_OC1PE;
-		
+
 	if (channel <= 1)
 	{
 		uint32_t offset = 8 * channel;
-		
+
 		flags <<= offset;
 		flags |= TIM{{ id }}->CCMR1 & ~(0xff << offset);
-		
+
 		TIM{{ id }}->CCMR1 = flags;
 	}
 	else {
 		uint32_t offset = 8 * (channel - 2);
-		
+
 		flags <<= offset;
 		flags |= TIM{{ id }}->CCMR2 & ~(0xff << offset);
-		
-		TIM{{ id }}->CCMR2 = flags; 
+
+		TIM{{ id }}->CCMR2 = flags;
 	}
-	
+
 	// Disable Repetition Counter (FIXME has to be done here for some unknown reason)
 	TIM{{ id }}->RCR = 0;
-	
+
 	if (mode != OutputCompareMode::Inactive) {
 		TIM{{ id }}->CCER |= (TIM_CCER_CC1E) << (channel * 4);
 	}
@@ -184,7 +184,7 @@ OutputComparePreload preload)
 		flags <<= offset;
 		flags |= TIM{{ id }}->CCMR2 & ~(0xff << offset);
 
-		TIM{{ id }}->CCMR2 = flags; 
+		TIM{{ id }}->CCMR2 = flags;
 	}
 
 	// Disable Repetition Counter (FIXME has to be done here for some unknown reason)
@@ -282,18 +282,18 @@ xpcc::stm32::Timer{{ id }}::enableInterruptVector(Interrupt interrupt, bool enab
 			NVIC_SetPriority(TIM{{ id }}_UP_IRQn, priority);
 			nvicEnableInterrupt(TIM{{ id }}_UP_IRQn);
 		}
-		
+
 		if (interrupt & Interrupt::Break) {
 			NVIC_SetPriority(TIM{{ id }}_BRK_IRQn, priority);
 			nvicEnableInterrupt(TIM{{ id }}_BRK_IRQn);
 		}
-		
+
 		if (interrupt & (Interrupt::COM | Interrupt::Trigger)) {
 			NVIC_SetPriority(TIM{{ id }}_TRG_COM_IRQn, priority);
 			nvicEnableInterrupt(TIM{{ id }}_TRG_COM_IRQn);
-		}	
+		}
 %% endif
-		if (interrupt & 
+		if (interrupt &
 				(Interrupt::CaptureCompare1 | Interrupt::CaptureCompare2 |
 				 Interrupt::CaptureCompare3 | Interrupt::CaptureCompare4)) {
 			NVIC_SetPriority(TIM{{ id }}_CC_IRQn, priority);
@@ -310,16 +310,16 @@ xpcc::stm32::Timer{{ id }}::enableInterruptVector(Interrupt interrupt, bool enab
 		if (interrupt & Interrupt::Update) {
 			nvicDisableInterrupt(TIM{{ id }}_UP_IRQn);
 		}
-		
+
 		if (interrupt & Interrupt::Break) {
 			nvicDisableInterrupt(TIM{{ id }}_BRK_IRQn);
 		}
-		
+
 		if (interrupt & (Interrupt::COM | Interrupt::Trigger)) {
 			nvicDisableInterrupt(TIM{{ id }}_TRG_COM_IRQn);
 		}
 %% endif
-		if (interrupt & 
+		if (interrupt &
 				(Interrupt::CaptureCompare1 | Interrupt::CaptureCompare2 |
 				 Interrupt::CaptureCompare3 | Interrupt::CaptureCompare4)) {
 			nvicDisableInterrupt(TIM{{ id }}_CC_IRQn);
