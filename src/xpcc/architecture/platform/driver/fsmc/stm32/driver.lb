@@ -31,7 +31,7 @@ def build(env):
     properties["partname"] = device.partname
 
     target = device.identifier
-    if (target["family"] == "f4" and (target["name"] not in ["405", "407", "412", "415", "417"])) or target["family"] == "f7":
+    if (target["family"] == "f4" and (target["name"] not in ["405", "407", "412", "415", "417"])) or target["family"] == "f7" or target["family"] == "f3":
         properties["FMC"] = "FMC"
     else:
         properties["FMC"] = "FSMC"

@@ -14,13 +14,13 @@
  */
 // ----------------------------------------------------------------------------
 
-%% if id in range(9,12) or id in range(15,20)
+%% if id in range(9,12) or id in range(15,21)
 %%   set apb = "APB2"
 %% else
 %%   set apb = "APB1"
 %% endif
 
-%% if (target["family"] == "f3" and target["name"] == "373") or target["family"] == "f0"
+%% if (target["family"] == "f3" and target["name"] in ["373", "378"]) or target["family"] == "f0"
 %%   set irq_name = id
 %% else
 %%   if id == 9
@@ -41,6 +41,8 @@
 %%     set irq_name = "1_UP_TIM16"
 %%   elif id == 17
 %%     set irq_name = "1_TRG_COM_TIM17"
+%%   elif id == 20
+%%     set irq_name = "20_UP"
 %%   else
 %%     set irq_name = id
 %%   endif

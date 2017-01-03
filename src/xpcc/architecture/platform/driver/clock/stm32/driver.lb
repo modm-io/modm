@@ -41,9 +41,10 @@ def build(env):
     # TODO: Move this data into the device files
     properties["usbprescaler"] = \
         (target["name"] in ["042", "048", "070", "072", "078", "102", "103", "302", "373"] or
-        (target["name"] in ["303", "358", "398"] and target["size-id"] in ["b", "c", "d", "e"]))
+        (target["name"] in ["303"] and target["size"] in ["b", "c", "d", "e"]))
     properties["pllprediv"] = \
         (target["family"] in ["f0", "f3"] or target["name"] in ["100", "105", "107"])
+    properties["pllprediv2"] = False    # FIXME: not sure what value this should have
     properties["hsi48"] = \
         target["name"] in ["042", "048", "071", "072", "078", "091", "098"]
 

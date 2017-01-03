@@ -24,7 +24,7 @@
 #include "error_code.hpp"
 #include "can_filter.hpp"
 
-%% if id == ""
+%% if id == "" or target["family"] in ["f0", "f3"]
 	%% set reg = 'CAN'
 %% else
 	%% set reg = 'CAN' ~ id

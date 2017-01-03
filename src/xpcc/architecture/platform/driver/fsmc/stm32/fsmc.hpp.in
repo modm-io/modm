@@ -27,7 +27,7 @@
  * @defgroup	{{partname}}_fsmc FSMC
  */
 
-%% if target["family"] in ["f2", "f4", "f7"]
+%% if target["family"] in ["f2", "f3", "f4", "f7"]
 %%  set BCRx = "BCR1"
 %%  set BTRx = "BTR1"
 %% elif target["family"] == "f1"
@@ -332,7 +332,7 @@ namespace xpcc
 %% if target["family"] in ["f2", "f4", "f7"]
 				RCC->AHB3ENR |= RCC_AHB3ENR_{{ FMC }}EN;
 %% else
-				RCC->AHBENR |= RCC_AHBENR_FSMCEN;
+				RCC->AHBENR |= RCC_AHBENR_{{ FMC }}EN;
 %% endif
 			}
 
@@ -342,7 +342,7 @@ namespace xpcc
 %% if target["family"] in ["f2", "f4", "f7"]
 				RCC->AHB3ENR &= ~RCC_AHB3ENR_{{ FMC }}EN;
 %% else
-				RCC->AHBENR &= ~RCC_AHBENR_FSMCEN;
+				RCC->AHBENR &= ~RCC_AHBENR_{{ FMC }}EN;
 %% endif
 			}
 		};

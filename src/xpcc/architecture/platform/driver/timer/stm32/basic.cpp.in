@@ -46,9 +46,9 @@ xpcc::stm32::Timer{{ id }}::setMode(Mode mode)
 
 %% if (id == 6) and (target["family"] in ["f2", "f3", "f4", "f7"]) and not partname.startswith("stm32f412")
 %%   set interrupt_vector = "TIM6_DAC_IRQn"
-%% elif (id == 7) and ((target["name"] in ["328", "334"]) or (target["name"] in ["303"] and target["size-id"] in ["8"]))
+%% elif (id == 7) and ((target["name"] in ["328", "334"]) or (target["name"] in ["303"] and target["size"] in ["8"]))
 %%   set interrupt_vector = "TIM7_DAC2_IRQn"
-%% elif (id == 18) and (target["family"] == "f3" and target["name"] == "373")
+%% elif (id == 18) and (target["family"] == "f3" and target["name"] in ["373", "378"])
 %%   set interrupt_vector = "TIM18_DAC2_IRQn"
 %% else
 %%   set interrupt_vector = "TIM" ~ id ~ "_IRQn"
