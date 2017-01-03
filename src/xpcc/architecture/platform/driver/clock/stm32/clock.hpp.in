@@ -168,6 +168,7 @@ public:
 		Pll = RCC_CFGR_MCO1_1 | RCC_CFGR_MCO1_0,
 	};
 
+	%% if not partname.startswith("stm32f412c")
 	enum class
 	ClockOutput2Source : uint32_t
 	{
@@ -176,6 +177,7 @@ public:
 		ExternalCrystal = RCC_CFGR_MCO2_1,
 		Pll = RCC_CFGR_MCO2_1 | RCC_CFGR_MCO2_0,
 	};
+	%% endif
 %% else
 	enum class
 	ClockOutputSource : uint32_t
@@ -309,6 +311,7 @@ public:
 		return true;
 	}
 
+	%% if not partname.startswith("stm32f412c")
 	static inline bool
 	enableClockOutput2(ClockOutput2Source src, uint8_t div)
 	{
@@ -317,6 +320,7 @@ public:
 		RCC->CFGR = tmp | uint32_t(src);
 		return true;
 	}
+	%% endif
 %% else
 	static inline bool
 	enableClockOutput(ClockOutputSource src)

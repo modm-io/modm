@@ -251,7 +251,9 @@ nvicDisableInterrupt(IRQn_Type IRQn)
 %% if target["family"] in ["f2", "f4", "f7"]
 	%% if id == 1
 #	define TIM1_BRK_IRQn		TIM1_BRK_TIM9_IRQn
+%% if not partname.startswith("stm32f410")
 #	define TIM1_UP_IRQn			TIM1_UP_TIM10_IRQn
+%% endif
 #	define TIM1_TRG_COM_IRQn	TIM1_TRG_COM_TIM11_IRQn
 	%% elif id == 8
 #	define TIM8_BRK_IRQn		TIM8_BRK_TIM12_IRQn

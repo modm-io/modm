@@ -17,7 +17,7 @@
 #include <xpcc/architecture/driver/atomic/queue.hpp>
 #include <xpcc/utils.hpp>
 
-%% if target["family"] in ["f3", "f0"]
+%% if id == ""
 	%% set reg = 'CAN'
 #include "can.hpp"
 %% else
