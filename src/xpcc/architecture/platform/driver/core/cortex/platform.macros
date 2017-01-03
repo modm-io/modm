@@ -41,7 +41,7 @@
 %% if partname.startswith("stm32f3")
 	// enable clock
 	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
-%% if target["name"] in ["302"] or (target["name"] in ["303"] and target["size-id"] in ["c", "e"])
+%% if target["name"] in ["302"] or (target["name"] in ["303"] and target["size"] in ["c", "e"])
 	// Remap USB Interrupts
 	SYSCFG->CFGR1 |= SYSCFG_CFGR1_USB_IT_RMP;
 %%   endif
