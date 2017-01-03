@@ -30,6 +30,12 @@ def build(env):
     properties["target"] = device.identifier
     properties["partname"] = device.partname
 
+    target = device.identifier
+    if (target["family"] == "f4" and (target["name"] not in ["405", "407", "412", "415", "417"])) or target["family"] == "f7":
+        properties["FMC"] = "FMC"
+    else:
+        properties["FMC"] = "FSMC"
+
     env.substitutions = properties
     env.outbasepath = "src/modm/platform/fsmc"
 

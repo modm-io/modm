@@ -35,12 +35,6 @@
 %%  set BTRx = "BTRx"
 %% endif
 
-%% if (target["family"] == "f4" and (target["name"] not in ["405", "407", "415", "417"])) or target["family"] == "f7"
-%%   set FMC = "FMC"
-%% else
-%%   set FMC = "FSMC"
-%% endif
-
 namespace xpcc
 {
 	namespace stm32

@@ -23,12 +23,6 @@
 %%  set BTRx = "BTRx"
 %% endif
 
-%% if (target["family"] == "f4" and (target["name"] not in ["405", "407", "415", "417"])) or target["family"] == "f7"
-%%   set FMC = "FMC"
-%% else
-%%   set FMC = "FSMC"
-%% endif
-
 // ----------------------------------------------------------------------------
 /*
  * - Byte select lanes (NBL[1:0]) are not used during read access (they are
