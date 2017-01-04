@@ -11,11 +11,11 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "utils"
+    module.name = "math"
 
 def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/utils"
-    env.copy(".", ignore=env.ignore_files("*.lb"))
+    env.outbasepath = "src/modm/math"
+    env.copy('.')
