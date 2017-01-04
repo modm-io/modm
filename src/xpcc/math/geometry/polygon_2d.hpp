@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__POLYGON_2D_HPP
-#define XPCC__POLYGON_2D_HPP
+#ifndef XPCC_POLYGON_2D_HPP
+#define XPCC_POLYGON_2D_HPP
 
 #include "point_set_2d.hpp"
 #include "vector2.hpp"
@@ -109,4 +109,4 @@ namespace xpcc
 
 #include "polygon_2d_impl.hpp"
 
-#endif // XPCC__POLYGON_2D_HPP
+#endif // XPCC_POLYGON_2D_HPP

@@ -13,8 +13,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__VIRTUAL_GRAPHIC_DISPLAY
-#define XPCC__VIRTUAL_GRAPHIC_DISPLAY
+#ifndef XPCC_VIRTUAL_GRAPHIC_DISPLAY
+#define XPCC_VIRTUAL_GRAPHIC_DISPLAY
 
 #include <modm/ui/display/graphic_display.hpp>
 
@@ -71,4 +71,4 @@ namespace xpcc
 
 }
 
-#endif //XPCC__VIRTUAL_GRAPHIC_DISPLAY
+#endif //XPCC_VIRTUAL_GRAPHIC_DISPLAY

@@ -13,8 +13,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__DEVICE_HPP
-#define XPCC__DEVICE_HPP
+#ifndef XPCC_DEVICE_HPP
+#define XPCC_DEVICE_HPP
 
 #include <stdint.h>
 // Defines for example the xpcc_always_inline macro
@@ -25,5 +25,5 @@
 #include <{{header}}>
 {% endfor -%}
 
-#endif	// XPCC__DEVICE_HPP
+#endif	// XPCC_DEVICE_HPP
 

@@ -13,8 +13,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__COMMUNICATABLE_HPP
-#define	XPCC__COMMUNICATABLE_HPP
+#ifndef	XPCC_COMMUNICATABLE_HPP
+#define	XPCC_COMMUNICATABLE_HPP
 
 namespace xpcc
 {
@@ -30,4 +30,4 @@ namespace xpcc
 	};
 }
 
-#endif // XPCC__COMMUNICATABLE_HPP
+#endif // XPCC_COMMUNICATABLE_HPP

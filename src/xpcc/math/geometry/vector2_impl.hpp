@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__VECTOR2_HPP
+#ifndef XPCC_VECTOR2_HPP
 	#error	"Don't include this file directly, use 'vector2.hpp' instead!"
 #endif
 

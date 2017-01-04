@@ -45,4 +45,4 @@ namespace my_namespace
 	};
 }
 
-#endif // NAMESPACE__FILENAME_HPP
+#endif // NAMESPACE_FILENAME_HPP

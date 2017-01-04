@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_ACCESSOR__RAM_HPP
-#define	XPCC_ACCESSOR__RAM_HPP
+#ifndef	XPCC_ACCESSOR_RAM_HPP
+#define	XPCC_ACCESSOR_RAM_HPP
 
 #include <cstddef>
 #include <modm/architecture/utils.hpp>
@@ -121,4 +121,4 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC_ACCESSOR__RAM_HPP
+#endif	// XPCC_ACCESSOR_RAM_HPP

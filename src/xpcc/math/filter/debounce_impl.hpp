@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FILTER__DEBOUNCE_HPP
+#ifndef XPCC_FILTER_DEBOUNCE_HPP
 	#error	"Don't include this file directly, use 'debounce.hpp' instead!"
 #endif
 

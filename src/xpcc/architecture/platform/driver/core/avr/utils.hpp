@@ -84,4 +84,4 @@ softwareReset()
 
 }	// namespace xpcc
 
-#endif	// XPCC_ATXMEGA__UTILS_HPP
+#endif	// XPCC_ATXMEGA_UTILS_HPP

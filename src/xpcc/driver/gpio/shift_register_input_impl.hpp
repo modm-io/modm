@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SHIFT_REGISTER_INPUT_HPP
+#ifndef XPCC_SHIFT_REGISTER_INPUT_HPP
 	#error	"Don't include this file directly, use 'shift_register_input.hpp' instead!"
 #endif
 

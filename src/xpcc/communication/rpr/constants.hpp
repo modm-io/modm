@@ -9,8 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_RPR__CONSTANTS_HPP
-#define	XPCC_RPR__CONSTANTS_HPP
+#ifndef	XPCC_RPR_CONSTANTS_HPP
+#define	XPCC_RPR_CONSTANTS_HPP
 
 #include <stdint.h>
 
@@ -97,4 +97,4 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC_RPR__CONSTANTS_HPP
+#endif	// XPCC_RPR_CONSTANTS_HPP

@@ -100,11 +100,11 @@
  * @author	Fabian Greif
  */
 
-#ifndef XPCC__SAB_HPP
-#define XPCC__SAB_HPP
+#ifndef XPCC_SAB_HPP
+#define XPCC_SAB_HPP
 
 #include "sab/interface.hpp"
 #include "sab/slave.hpp"
 #include "sab/master.hpp"
 
-#endif	// XPCC__SAB_HPP
+#endif	// XPCC_SAB_HPP

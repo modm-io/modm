@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LOG__STD_COLOUR_HPP
+#ifndef XPCC_LOG_STD_COLOUR_HPP
 	#error "Don't include this file directly, use 'std_colour.hpp' instead!"
 #endif
 

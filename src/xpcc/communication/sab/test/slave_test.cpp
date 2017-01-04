@@ -80,10 +80,10 @@ namespace
 	
 	FLASH_STORAGE(xpcc::sab::Action actionList[]) =
 	{
-		SAB__ACTION(0x01, testingObject, TestingObject::emptyFunction, 0),
-		SAB__ACTION(0x02, testingObject, TestingObject::responseFunction, 0),
-		SAB__ACTION(0x03, testingObject, TestingObject::errorFunction, 0),
-		SAB__ACTION(0x04, testingObject, TestingObject::parameterFunction, 2),
+		SAB_ACTION(0x01, testingObject, TestingObject::emptyFunction, 0),
+		SAB_ACTION(0x02, testingObject, TestingObject::responseFunction, 0),
+		SAB_ACTION(0x03, testingObject, TestingObject::errorFunction, 0),
+		SAB_ACTION(0x04, testingObject, TestingObject::parameterFunction, 2),
 	};
 }
 

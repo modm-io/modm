@@ -9,7 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__BMA180_HPP
+#ifndef XPCC_BMA180_HPP
 #	error  "Don't include this file directly, use 'bma180.hpp' instead!"
 #endif
 

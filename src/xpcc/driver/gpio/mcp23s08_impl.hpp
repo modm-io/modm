@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__MCP23S08_HPP
+#ifndef XPCC_MCP23S08_HPP
 	#error	"Don't include this file directly, use 'mcp23s08.hpp' instead!"
 #endif
 

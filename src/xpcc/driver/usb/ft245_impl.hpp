@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__FT245_HPP
+#ifndef XPCC_FT245_HPP
 #	error	"Don't include this file directly, use 'ft245.hpp' instead!"
 #endif
 

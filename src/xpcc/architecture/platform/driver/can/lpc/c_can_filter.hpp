@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LPC11C__CAN_FILTER_HPP
-#define XPCC_LPC11C__CAN_FILTER_HPP
+#ifndef XPCC_LPC11C_CAN_FILTER_HPP
+#define XPCC_LPC11C_CAN_FILTER_HPP
 
 #include <modm/architecture/interface/can.hpp>
 
@@ -135,4 +135,4 @@ namespace xpcc
 	} // lpc namespace
 } // xpcc namespace
 
-#endif // XPCC_LPC11C__CAN_FILTER_HPP
+#endif // XPCC_LPC11C_CAN_FILTER_HPP

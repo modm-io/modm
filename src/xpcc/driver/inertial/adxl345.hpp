@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__ADXL345_HPP
-#define XPCC__ADXL345_HPP
+#ifndef XPCC_ADXL345_HPP
+#define XPCC_ADXL345_HPP
 
 #include <modm/architecture/interface/i2c_adapter.hpp>
 
@@ -236,4 +236,4 @@ namespace xpcc
 
 #include "adxl345_impl.hpp"
 
-#endif // XPCC__ADXL345_HPP
+#endif // XPCC_ADXL345_HPP

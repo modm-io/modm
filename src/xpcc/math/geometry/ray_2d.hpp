@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__RAY_2D_HPP
-#define XPCC__RAY_2D_HPP
+#ifndef XPCC_RAY_2D_HPP
+#define XPCC_RAY_2D_HPP
 
 #include "geometric_traits.hpp"
 
@@ -134,4 +134,4 @@ namespace xpcc
 
 #include "ray_2d_impl.hpp"
 
-#endif // XPCC__RAY_2D_HPP
+#endif // XPCC_RAY_2D_HPP

@@ -113,4 +113,4 @@ public:
 
 }
 
-#endif	// XPCC__PWM_RGB_LED_HPP
+#endif	// XPCC_PWM_RGB_LED_HPP

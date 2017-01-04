@@ -10,10 +10,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_BOOST__SEMAPHORE_HPP
-#define XPCC_BOOST__SEMAPHORE_HPP
+#ifndef XPCC_BOOST_SEMAPHORE_HPP
+#define XPCC_BOOST_SEMAPHORE_HPP
 
-#ifndef XPCC_RTOS__SEMAPHORE_HPP
+#ifndef XPCC_RTOS_SEMAPHORE_HPP
 #	error "Don't include this file directly, use <modm/processing/rtos/semaphore.hpp>"
 #endif
 
@@ -137,4 +137,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_BOOST__SEMAPHORE_HPP
+#endif // XPCC_BOOST_SEMAPHORE_HPP

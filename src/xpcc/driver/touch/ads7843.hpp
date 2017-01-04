@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__ADS7843_HPP
-#define XPCC__ADS7843_HPP
+#ifndef XPCC_ADS7843_HPP
+#define XPCC_ADS7843_HPP
 
 #include <stdint.h>
 #include <modm/ui/display/graphic_display.hpp>
@@ -80,4 +80,4 @@ namespace xpcc
 
 #include "ads7843_impl.hpp"
 
-#endif // XPCC__ADS7843_HPP
+#endif // XPCC_ADS7843_HPP

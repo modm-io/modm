@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SOFTWARE_ONE_WIRE_HPP
+#ifndef XPCC_SOFTWARE_ONE_WIRE_HPP
 	#error	"Don't include this file directly, use 'software_one_wire.hpp' instead!"
 #endif
 

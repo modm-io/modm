@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FILTER__DEBOUNCE_HPP
-#define XPCC_FILTER__DEBOUNCE_HPP
+#ifndef XPCC_FILTER_DEBOUNCE_HPP
+#define XPCC_FILTER_DEBOUNCE_HPP
 
 #include <stdint.h>
 
@@ -63,4 +63,4 @@ namespace xpcc
 
 #include "debounce_impl.hpp"
 
-#endif // XPCC_FILTER__DEBOUNCE_HPP
+#endif // XPCC_FILTER_DEBOUNCE_HPP

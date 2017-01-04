@@ -23,8 +23,8 @@
 
 namespace
 {
-//	GPIO__INPUT(RXD, {{ id[0] }}, {{ number * 4 + 2 }});
-//	GPIO__OUTPUT(TXD, {{ id[0] }}, {{ number * 4 + 3 }});
+//	GPIO_INPUT(RXD, {{ id[0] }}, {{ number * 4 + 2 }});
+//	GPIO_OUTPUT(TXD, {{ id[0] }}, {{ number * 4 + 3 }});
 }
 
 // ----------------------------------------------------------------------------

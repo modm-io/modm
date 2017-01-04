@@ -18,8 +18,8 @@
  * @defgroup	{{target.string}}_uart UART
  */
 
-#ifndef XPCC_{{target["family"] | upper}}__UART{{ id }}_HPP
-#define XPCC_{{target["family"] | upper}}__UART{{ id }}_HPP
+#ifndef XPCC_{{target["family"] | upper}}_UART{{ id }}_HPP
+#define XPCC_{{target["family"] | upper}}_UART{{ id }}_HPP
 
 #include "../device.hpp"
 #include <modm/architecture/interface/uart.hpp>
@@ -156,4 +156,4 @@ protected:
 
 } // namespace xpcc
 
-#endif // XPCC_{{target["family"] | upper}}__UART{{ id }}_HPP
+#endif // XPCC_{{target["family"] | upper}}_UART{{ id }}_HPP

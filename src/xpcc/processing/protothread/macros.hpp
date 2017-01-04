@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PT__MACROS_HPP
-#define XPCC_PT__MACROS_HPP
+#ifndef XPCC_PT_MACROS_HPP
+#define XPCC_PT_MACROS_HPP
 
 #include <modm/processing/resumable.hpp>
 
@@ -141,4 +141,4 @@
 		return false; \
 	} while (0)
 
-#endif // XPCC_PT__MACROS_HPP
+#endif // XPCC_PT_MACROS_HPP

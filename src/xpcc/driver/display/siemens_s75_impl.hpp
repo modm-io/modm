@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SIEMENS_S75_HPP
+#ifndef XPCC_SIEMENS_S75_HPP
 #error	"Don't include this file directly, use 'siemens_s75.hpp' instead!"
 #endif
 

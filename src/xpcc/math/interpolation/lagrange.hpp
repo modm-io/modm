@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_INTERPOLATION__LAGRANGE_HPP
-#define	XPCC_INTERPOLATION__LAGRANGE_HPP
+#ifndef	XPCC_INTERPOLATION_LAGRANGE_HPP
+#define	XPCC_INTERPOLATION_LAGRANGE_HPP
 
 #include <stdint.h>
 
@@ -104,5 +104,5 @@ namespace xpcc
 
 #include "lagrange_impl.hpp"
 
-#endif	// XPCC_INTERPOLATION__LAGRANGE_HPP
+#endif	// XPCC_INTERPOLATION_LAGRANGE_HPP
 

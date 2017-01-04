@@ -15,8 +15,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__RESPONSE_CALLBACK_HPP
-#define	XPCC__RESPONSE_CALLBACK_HPP
+#ifndef	XPCC_RESPONSE_CALLBACK_HPP
+#define	XPCC_RESPONSE_CALLBACK_HPP
 
 #include <modm/container/smart_pointer.hpp>
 
@@ -97,4 +97,4 @@ namespace xpcc
 
 }
 
-#endif // XPCC__RESPONSE_CALLBACK_HPP
+#endif // XPCC_RESPONSE_CALLBACK_HPP

@@ -17,8 +17,8 @@
  *
  */
 
-#ifndef XPCC__MATRIX_HPP
-#define XPCC__MATRIX_HPP
+#ifndef XPCC_MATRIX_HPP
+#define XPCC_MATRIX_HPP
 
 #include <cmath>
 #include <string.h>		// for memset() and memcmp()
@@ -266,4 +266,4 @@ namespace xpcc
 
 #include "matrix_impl.hpp"
 
-#endif	// XPCC__MATRIX_HPP
+#endif	// XPCC_MATRIX_HPP

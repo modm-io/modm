@@ -9,7 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_RPR__INTERFACE_HPP
+#ifndef	XPCC_RPR_INTERFACE_HPP
 #	error	"Don't include this file directly, use 'interface.hpp' instead!"
 #endif
 

@@ -15,8 +15,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__DELAY_HPP
-#define	XPCC__DELAY_HPP
+#ifndef	XPCC_DELAY_HPP
+#define	XPCC_DELAY_HPP
 
 #include <stdint.h>
 
@@ -51,7 +51,7 @@ namespace xpcc
 #include <modm/architecture/detect.hpp>
 #include <modm/architecture/utils.hpp>
 
-#if defined(XPCC__CPU_AVR)
+#if defined(XPCC_CPU_AVR)
 
 	#include <util/delay.h>
 
@@ -76,7 +76,7 @@ namespace xpcc
 		}
 	}
 
-#elif defined(XPCC__OS_UNIX) || defined(XPCC__OS_OSX)
+#elif defined(XPCC_OS_UNIX) || defined(XPCC_OS_OSX)
 
 	#include <unistd.h>
 
@@ -101,7 +101,7 @@ namespace xpcc
 		}
 	}
 
-#elif defined(XPCC__OS_WIN32)
+#elif defined(XPCC_OS_WIN32)
 
 	namespace xpcc
 	{
@@ -140,7 +140,7 @@ namespace xpcc
 		}
 	}
 
-#elif defined(XPCC__CPU_ARM)
+#elif defined(XPCC_CPU_ARM)
 
 	extern "C" void _delay_ns(uint32_t ns);
 	extern "C" void _delay_us(uint32_t us);
@@ -174,4 +174,4 @@ namespace xpcc
 #endif
 
 #endif	// !__DOXYGEN__
-#endif	// XPCC__DELAY_HPP
+#endif	// XPCC_DELAY_HPP

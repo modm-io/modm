@@ -14,8 +14,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__MENU_ENTRY_CALLBACK
-#define XPCC__MENU_ENTRY_CALLBACK
+#ifndef XPCC_MENU_ENTRY_CALLBACK
+#define XPCC_MENU_ENTRY_CALLBACK
 
 #include "abstract_menu.hpp"
 
@@ -44,4 +44,4 @@ namespace xpcc
 			Function const function;
 		};
 }
-#endif // XPCC__MENU_ENTRY_CALLBACK
+#endif // XPCC_MENU_ENTRY_CALLBACK

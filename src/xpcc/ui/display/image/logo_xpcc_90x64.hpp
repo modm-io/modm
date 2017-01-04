@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef BITMAP__LOGO_XPCC_90X64_HPP
-#define BITMAP__LOGO_XPCC_90X64_HPP
+#ifndef BITMAP_LOGO_XPCC_90X64_HPP
+#define BITMAP_LOGO_XPCC_90X64_HPP
 
 #include <modm/architecture/driver/accessor.hpp>
 
@@ -31,5 +31,5 @@ namespace bitmap
 	EXTERN_FLASH_STORAGE(uint8_t logo_xpcc_90x64[]);
 }
 
-#endif // BITMAP__LOGO_XPCC_90X64_HPP
+#endif // BITMAP_LOGO_XPCC_90X64_HPP
 

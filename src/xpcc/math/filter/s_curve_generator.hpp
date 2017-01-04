@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__S_CURVE_GENERATOR_HPP
-#define XPCC__S_CURVE_GENERATOR_HPP
+#ifndef XPCC_S_CURVE_GENERATOR_HPP
+#define XPCC_S_CURVE_GENERATOR_HPP
 
 namespace xpcc
 {
@@ -54,4 +54,4 @@ namespace xpcc
 
 #include "s_curve_generator_impl.hpp"
 
-#endif // XPCC__S_CURVE_GENERATOR_HPP
+#endif // XPCC_S_CURVE_GENERATOR_HPP

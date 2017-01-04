@@ -9,8 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef COMPONENT__GUI_HPP
-#define COMPONENT__GUI_HPP
+#ifndef COMPONENT_GUI_HPP
+#define COMPONENT_GUI_HPP
 
 #include <modm/communication/xpcc/abstract_component.hpp>
 #include <modm/processing/timer.hpp>
@@ -32,4 +32,4 @@ namespace component
 	};
 }
 
-#endif // COMPONENT__GUI_HPP
+#endif // COMPONENT_GUI_HPP

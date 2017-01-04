@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__LOCATION_2D_HPP
+#ifndef	XPCC_LOCATION_2D_HPP
 	#error	"Don't include this file directly use 'location.hpp' instead!"
 #endif
 

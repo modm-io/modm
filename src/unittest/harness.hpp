@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	UNITTEST__HARNESS_HPP
-#define	UNITTEST__HARNESS_HPP
+#ifndef	UNITTEST_HARNESS_HPP
+#define	UNITTEST_HARNESS_HPP
 
 #include "controller.hpp"
 
@@ -93,13 +93,13 @@ namespace unittest
 	EXTERN_FLASH_STORAGE_STRING(stringNotFalse);
 }
 
-#ifdef	UNITTEST__RETURN_ON_FAIL
-	#define	TEST_RETURN__(x)	do { if (!x) { return; } } while (0)
+#ifdef	UNITTEST_RETURN_ON_FAIL
+	#define	TEST_RETURN_(x)	do { if (!x) { return; } } while (0)
 #else
-	#define	TEST_RETURN__(x)	x
+	#define	TEST_RETURN_(x)	x
 #endif
 
-#define	TEST_REPORTER__		unittest::Controller::instance().getReporter()
+#define	TEST_REPORTER_		unittest::Controller::instance().getReporter()
 
 namespace unittest
 {
@@ -117,11 +117,11 @@ namespace unittest
 	checkEqual(const A& a, const B& b, unsigned int line)
 	{
 		if (a == b) {
-			TEST_REPORTER__.reportPass();
+			TEST_REPORTER_.reportPass();
 			return true;
 		}
 		else {
-			TEST_REPORTER__.reportFailure(line)
+			TEST_REPORTER_.reportFailure(line)
 				<< a << xpcc::accessor::asFlash(unittest::stringEqual) << b << '\n';
 			return false;
 		}
@@ -133,11 +133,11 @@ namespace unittest
 	checkDiffer(const A& a, const B& b, unsigned int line)
 	{
 		if (a != b) {
-			TEST_REPORTER__.reportPass();
+			TEST_REPORTER_.reportPass();
 			return true;
 		}
 		else {
-			TEST_REPORTER__.reportFailure(line)
+			TEST_REPORTER_.reportFailure(line)
 				<< a << xpcc::accessor::asFlash(unittest::stringDiffer) << b << '\n';
 			return false;
 		}
@@ -149,11 +149,11 @@ namespace unittest
 	{
 		if (((a + delta) >= b) and ((a - delta) <= b))
 		{
-			TEST_REPORTER__.reportPass();
+			TEST_REPORTER_.reportPass();
 			return true;
 		}
 		else {
-			TEST_REPORTER__.reportFailure(line)
+			TEST_REPORTER_.reportFailure(line)
 				<< a << xpcc::accessor::asFlash(unittest::stringEqual) << b << '\n';
 			return false;
 		}
@@ -165,11 +165,11 @@ namespace unittest
 	{
 		if ((value >= lower) && (value <= upper))
 		{
-			TEST_REPORTER__.reportPass();
+			TEST_REPORTER_.reportPass();
 			return true;
 		}
 		else {
-			TEST_REPORTER__.reportFailure(line)
+			TEST_REPORTER_.reportFailure(line)
 				<< value << xpcc::accessor::asFlash(unittest::stringNotInRange)
 				<< '[' << lower << ',' << upper << ']' << '\n';
 			return false;
@@ -191,7 +191,7 @@ namespace unittest
 		size_t ii = 0;
 		while(a[ii] != '\0' && b[ii] != '\0') {
 			if (a[ii] != b[ii]) {
-				xpcc::IOStream& stream = TEST_REPORTER__.reportFailure(line);
+				xpcc::IOStream& stream = TEST_REPORTER_.reportFailure(line);
 				printString(stream, a, b, ii);
 				return false;
 			}
@@ -199,11 +199,11 @@ namespace unittest
 		}
 		// strings are not of equal length
 		if(a[ii] != '\0' || b[ii] != '\0') {
-			xpcc::IOStream& stream = TEST_REPORTER__.reportFailure(line);
+			xpcc::IOStream& stream = TEST_REPORTER_.reportFailure(line);
 			printString(stream, a, b, ii);
 			return false;
 		}
-		TEST_REPORTER__.reportPass();
+		TEST_REPORTER_.reportPass();
 		return true;
 	}
 
@@ -230,7 +230,7 @@ namespace unittest
 		{
 			if (a[i] != b[i])
 			{
-				xpcc::IOStream& stream = TEST_REPORTER__.reportFailure(line);
+				xpcc::IOStream& stream = TEST_REPORTER_.reportFailure(line);
 				
 				stream << '\n';
 				
@@ -240,44 +240,44 @@ namespace unittest
 			}
 		}
 		
-		TEST_REPORTER__.reportPass();
+		TEST_REPORTER_.reportPass();
 		return true;
 	}
 }
 
 #define	TEST_ASSERT_TRUE(expr)	\
-	TEST_RETURN__(::unittest::checkExpression((expr), __LINE__))
+	TEST_RETURN_(::unittest::checkExpression((expr), __LINE__))
 
 #define	TEST_ASSERT_FALSE(expr)	\
-	TEST_RETURN__(::unittest::checkExpression(!static_cast<bool>(expr), __LINE__))
+	TEST_RETURN_(::unittest::checkExpression(!static_cast<bool>(expr), __LINE__))
 
 #define	TEST_ASSERT_EQUALS(x, y) \
-	TEST_RETURN__(::unittest::checkEqual((x), (y), __LINE__))
+	TEST_RETURN_(::unittest::checkEqual((x), (y), __LINE__))
 
 #define TEST_ASSERT_DIFFERS(x, y) \
-	TEST_RETURN__(::unittest::checkDiffer((x), (y), __LINE__))
+	TEST_RETURN_(::unittest::checkDiffer((x), (y), __LINE__))
 
 #define	TEST_ASSERT_EQUALS_FLOAT(x, y) \
-	TEST_RETURN__(::unittest::checkEqual(static_cast<float>(x), static_cast<float>(y), __LINE__))
+	TEST_RETURN_(::unittest::checkEqual(static_cast<float>(x), static_cast<float>(y), __LINE__))
 
 #define	TEST_ASSERT_EQUALS_DELTA(x, y, d) \
-	TEST_RETURN__(::unittest::checkEqualDelta((x), (y), (d), __LINE__))
+	TEST_RETURN_(::unittest::checkEqualDelta((x), (y), (d), __LINE__))
 
 #define	TEST_ASSERT_EQUALS_RANGE(value, lower, upper) \
-	TEST_RETURN__(::unittest::checkRange((value), (lower), (upper), __LINE__))
+	TEST_RETURN_(::unittest::checkRange((value), (lower), (upper), __LINE__))
 
 #define	TEST_ASSERT_EQUALS_STRING(x, y) \
-	TEST_RETURN__(::unittest::checkString((x), (y), __LINE__))
+	TEST_RETURN_(::unittest::checkString((x), (y), __LINE__))
 
 #define	TEST_ASSERT_EQUALS_ARRAY(x, y, ...) \
-	TEST_RETURN__(::unittest::checkArray((x), (y), __LINE__, __VA_ARGS__))
+	TEST_RETURN_(::unittest::checkArray((x), (y), __LINE__, __VA_ARGS__))
 
 #define	TEST_FAIL(msg) \
-	do {	TEST_REPORTER__.reportFailure(__LINE__) \
+	do {	TEST_REPORTER_.reportFailure(__LINE__) \
 			<< msg << '\n'; \
 	} while (0); \
-	TEST_RETURN__((void) false)
+	TEST_RETURN_((void) false)
 
 #endif	// __DOXYGEN__
 
-#endif	// UNITTEST__HARNESS_HPP
+#endif	// UNITTEST_HARNESS_HPP

@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__BUTTON_HPP
-#define	XPCC__BUTTON_HPP
+#ifndef XPCC_BUTTON_HPP
+#define	XPCC_BUTTON_HPP
 
 #include <stdint.h>
 
@@ -50,4 +50,4 @@ namespace xpcc
 
 #include "button_impl.hpp"
 
-#endif	// XPCC__BUTTON_HPP
+#endif	// XPCC_BUTTON_HPP

@@ -14,8 +14,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FONT__SCRIPTO_NARROW_HPP
-#define	XPCC_FONT__SCRIPTO_NARROW_HPP
+#ifndef XPCC_FONT_SCRIPTO_NARROW_HPP
+#define	XPCC_FONT_SCRIPTO_NARROW_HPP
 
 #include <modm/architecture/driver/accessor.hpp>
 
@@ -41,5 +41,5 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC_FONT__SCRIPTO_NARROW_HPP
+#endif	// XPCC_FONT_SCRIPTO_NARROW_HPP
 

@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_CAN__MESSAGE_HPP
-#define XPCC_CAN__MESSAGE_HPP
+#ifndef XPCC_CAN_MESSAGE_HPP
+#define XPCC_CAN_MESSAGE_HPP
 
 #include <stdint.h>
 #include <modm/io/iostream.hpp>
@@ -107,4 +107,4 @@ operator << (xpcc::IOStream& s, const xpcc::can::Message m);
 
 }	// namespace xpcc
 
-#endif // XPCC_CAN__MESSAGE_HPP
+#endif // XPCC_CAN_MESSAGE_HPP

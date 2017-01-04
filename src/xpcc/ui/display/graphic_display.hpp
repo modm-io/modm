@@ -14,8 +14,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__GRAPHIC_DISPLAY_HPP
-#define XPCC__GRAPHIC_DISPLAY_HPP
+#ifndef XPCC_GRAPHIC_DISPLAY_HPP
+#define XPCC_GRAPHIC_DISPLAY_HPP
 
 #include <modm/architecture/driver/accessor.hpp>
 #include <modm/math/geometry.hpp>
@@ -493,4 +493,4 @@ namespace xpcc
 	};
 }
 
-#endif	// XPCC__GRAPHIC_DISPLAY_HPP
+#endif	// XPCC_GRAPHIC_DISPLAY_HPP

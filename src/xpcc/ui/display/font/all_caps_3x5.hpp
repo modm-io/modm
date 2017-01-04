@@ -14,8 +14,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FONT__ALL_CAPS_3X5_HPP
-#define	XPCC_FONT__ALL_CAPS_3X5_HPP
+#ifndef XPCC_FONT_ALL_CAPS_3X5_HPP
+#define	XPCC_FONT_ALL_CAPS_3X5_HPP
 
 #include <modm/architecture/driver/accessor.hpp>
 
@@ -41,5 +41,5 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC_FONT__ALL_CAPS_3X5_HPP
+#endif	// XPCC_FONT_ALL_CAPS_3X5_HPP
 

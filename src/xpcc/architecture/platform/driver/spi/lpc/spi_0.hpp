@@ -18,8 +18,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LPC11__SPI_0_HPP
-#define XPCC_LPC11__SPI_0_HPP
+#ifndef XPCC_LPC11_SPI_0_HPP
+#define XPCC_LPC11_SPI_0_HPP
 
 #include <stdint.h>
 #include <modm/communication/spi/spi_master.hpp>
@@ -272,4 +272,4 @@ namespace xpcc
 		};
 	} // lpc namespace
 } // xpcc namespace
-#endif // XPCC_LPC11__SPI_0_HPP
+#endif // XPCC_LPC11_SPI_0_HPP

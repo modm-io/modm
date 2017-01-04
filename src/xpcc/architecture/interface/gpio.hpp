@@ -311,4 +311,4 @@ public:
 
 } // namespace xpcc
 
-#endif // XPCC__GPIO_HPP
+#endif // XPCC_GPIO_HPP

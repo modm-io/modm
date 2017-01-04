@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__FIR_IMPL_HPP
-#define XPCC__FIR_IMPL_HPP
+#ifndef XPCC_FIR_IMPL_HPP
+#define XPCC_FIR_IMPL_HPP
 
 #include <modm/architecture/utils.hpp>
 
@@ -130,4 +130,4 @@ xpcc::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::update()
 	printf("sum=%.3f\n", output);
 #endif // FIR_DEBUG_UPDATE
 }
-#endif // XPCC__FIR_IMPL_HPP
+#endif // XPCC_FIR_IMPL_HPP

@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__ST7565_HPP
-#define XPCC__ST7565_HPP
+#ifndef XPCC_ST7565_HPP
+#define XPCC_ST7565_HPP
 
 #include <modm/architecture/driver/accessor/flash.hpp>
 #include <modm/architecture/driver/delay.hpp>
@@ -59,4 +59,4 @@ namespace xpcc
 
 #include "st7565_impl.hpp"
 
-#endif // XPCC__ST7565_HPP
+#endif // XPCC_ST7565_HPP

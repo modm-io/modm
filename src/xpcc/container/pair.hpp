@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__PAIR_HPP
-#define	XPCC__PAIR_HPP
+#ifndef	XPCC_PAIR_HPP
+#define	XPCC_PAIR_HPP
 
 namespace xpcc
 {
@@ -109,4 +109,4 @@ namespace xpcc
 	};
 }
 
-#endif	// XPCC__PAIR_HPP
+#endif	// XPCC_PAIR_HPP

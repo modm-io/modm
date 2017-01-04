@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__KS0108_HPP
+#ifndef XPCC_KS0108_HPP
 	#error	"Don't include this file directly, use 'ks0108.hpp' instead!"
 #endif
 

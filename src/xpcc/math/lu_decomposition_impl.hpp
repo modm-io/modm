@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__LU_DECOMPOSITION_HPP
+#ifndef XPCC_LU_DECOMPOSITION_HPP
 	#error	"Don't include this file directly, use 'lu_decomposition.hpp' instead!"
 #endif
 

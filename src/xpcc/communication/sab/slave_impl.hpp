@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_SAB__SLAVE_HPP
+#ifndef	XPCC_SAB_SLAVE_HPP
 	#error	"Don't include this file directly, use 'slave.hpp' instead!"
 #endif
 
@@ -35,7 +35,7 @@ xpcc::sab::Action::call(Response& response, const void *payload)
 // Disable warnings for Visual Studio about using 'this' in a base member
 // initializer list.
 // In this case though it is totally safe so it is ok to disable this warning.
-#ifdef XPCC__COMPILER_MSVC
+#ifdef XPCC_COMPILER_MSVC
 #	pragma warning(disable:4355)
 #endif
 
@@ -76,18 +76,18 @@ xpcc::sab::Slave<Interface>::update()
 						action.call(this->response, Interface::getPayload());
 						
 						if (!this->response.triggered) {
-							this->response.error(ERROR__NO_RESPONSE);
+							this->response.error(ERROR_NO_RESPONSE);
 						}
 					}
 					else {
-						this->response.error(ERROR__WRONG_PAYLOAD_LENGTH);
+						this->response.error(ERROR_WRONG_PAYLOAD_LENGTH);
 					}
 					break;
 				}
 			}
 			
 			if (!this->response.triggered) {
-				this->response.error(ERROR__NO_ACTION);
+				this->response.error(ERROR_NO_ACTION);
 			}
 		}
 		Interface::dropMessage();

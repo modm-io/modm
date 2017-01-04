@@ -14,8 +14,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__UTILS_HPP
-#define XPCC__UTILS_HPP
+#ifndef XPCC_UTILS_HPP
+#define XPCC_UTILS_HPP
 
 #include "detect.hpp"
 #include "legacy_macros.hpp"
@@ -80,25 +80,25 @@
 
 #else // !__DOXYGEN__
 
-	#define	XPCC_STRINGIFY(s)	XPCC_STRINGIFY_(s)
-	#define	XPCC_STRINGIFY_(s)	XPCC_STRINGIFY__(s)
-	#define	XPCC_STRINGIFY__(s)	#s
+	#define	XPCC_STRINGIFY(s)	XPCC_STRINGIFYx(s)
+	#define	XPCC_STRINGIFYx(s)	XPCC_STRINGIFYxx(s)
+	#define	XPCC_STRINGIFYxx(s)	#s
 
-	#define	XPCC_CONCAT(a,b)	XPCC_CONCAT_(a,b)
-	#define	XPCC_CONCAT_(a,b)	XPCC_CONCAT__(a,b)
-	#define	XPCC_CONCAT__(a,b)	a ## b
+	#define	XPCC_CONCAT(a,b)	XPCC_CONCATx(a,b)
+	#define	XPCC_CONCATx(a,b)	XPCC_CONCATxx(a,b)
+	#define	XPCC_CONCATxx(a,b)	a ## b
 
-	#define	XPCC_CONCAT3(a,b,c)		XPCC_CONCAT3_(a,b,c)
-	#define	XPCC_CONCAT3_(a,b,c)	XPCC_CONCAT3__(a,b,c)
-	#define	XPCC_CONCAT3__(a,b,c)	a ## b ## c
+	#define	XPCC_CONCAT3(a,b,c)		XPCC_CONCAT3x(a,b,c)
+	#define	XPCC_CONCAT3x(a,b,c)	XPCC_CONCAT3xx(a,b,c)
+	#define	XPCC_CONCAT3xx(a,b,c)	a ## b ## c
 
-	#define	XPCC_CONCAT4(a,b,c,d)	XPCC_CONCAT4_(a,b,c,d)
-	#define	XPCC_CONCAT4_(a,b,c,d)	XPCC_CONCAT4__(a,b,c,d)
-	#define	XPCC_CONCAT4__(a,b,c,d)	a ## b ## c ## d
+	#define	XPCC_CONCAT4(a,b,c,d)	XPCC_CONCAT4x(a,b,c,d)
+	#define	XPCC_CONCAT4x(a,b,c,d)	XPCC_CONCAT4xx(a,b,c,d)
+	#define	XPCC_CONCAT4xx(a,b,c,d)	a ## b ## c ## d
 
-	#define	XPCC_CONCAT5(a,b,c,d,e)		XPCC_CONCAT5_(a,b,c,d,e)
-	#define	XPCC_CONCAT5_(a,b,c,d,e)	XPCC_CONCAT5__(a,b,c,d,e)
-	#define	XPCC_CONCAT5__(a,b,c,d,e)	a ## b ## c ## d ## e
+	#define	XPCC_CONCAT5(a,b,c,d,e)		XPCC_CONCAT5x(a,b,c,d,e)
+	#define	XPCC_CONCAT5x(a,b,c,d,e)	XPCC_CONCAT5xx(a,b,c,d,e)
+	#define	XPCC_CONCAT5xx(a,b,c,d,e)	a ## b ## c ## d ## e
 
 
 	#define xpcc_always_inline		inline __attribute__((always_inline))
@@ -112,7 +112,7 @@
 	#define xpcc_unlikely(x)		__builtin_expect(!!(x), 0)
 	#define xpcc_section(s)			__attribute__((section(s)))
 
-	#ifdef XPCC__COMPILER_MINGW
+	#ifdef XPCC_COMPILER_MINGW
 	 	// FIXME: Windows Object Format PE does not support weak symbols
 	 	//	- Bug reported for mingw32 : https://sourceware.org/bugzilla/show_bug.cgi?id=9687
 	 	// 	- Investigate Boost libs how they solve this issue
@@ -122,7 +122,7 @@
  	#	define xpcc_weak			__attribute__((weak))
 	#endif
 
-	#ifdef XPCC__OS_HOSTED
+	#ifdef XPCC_OS_HOSTED
 	#	define xpcc_fastcode
 	#	define xpcc_fastdata
 	#else
@@ -140,4 +140,4 @@
 
 #endif	// !__DOXYGEN__
 
-#endif	// XPCC__UTILS_HPP
+#endif	// XPCC_UTILS_HPP

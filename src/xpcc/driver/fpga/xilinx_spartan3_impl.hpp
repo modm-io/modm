@@ -13,7 +13,7 @@
 #ifndef XILINX_SPARTAN3_IMPL_HPP_
 #define XILINX_SPARTAN3_IMPL_HPP_
 
-#ifndef XPCC__XILINX_SPARTAN_3
+#ifndef XPCC_XILINX_SPARTAN_3
 #error "Please include xilinx_spartan3.hpp instead."
 #endif
 

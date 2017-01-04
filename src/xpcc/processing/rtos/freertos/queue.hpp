@@ -10,10 +10,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FREERTOS__QUEUE_HPP
-#define XPCC_FREERTOS__QUEUE_HPP
+#ifndef XPCC_FREERTOS_QUEUE_HPP
+#define XPCC_FREERTOS_QUEUE_HPP
 
-#ifndef XPCC_RTOS__QUEUE_HPP
+#ifndef XPCC_RTOS_QUEUE_HPP
 #	error "Don't include this file directly, use <modm/processing/rtos/queue.hpp>"
 #endif
 
@@ -161,4 +161,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_FREERTOS__QUEUE_HPP
+#endif // XPCC_FREERTOS_QUEUE_HPP

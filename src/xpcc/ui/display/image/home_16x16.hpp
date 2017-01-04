@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef BITMAP__HOME_16X16_HPP
-#define BITMAP__HOME_16X16_HPP
+#ifndef BITMAP_HOME_16X16_HPP
+#define BITMAP_HOME_16X16_HPP
 
 #include <modm/architecture/driver/accessor.hpp>
 
@@ -31,5 +31,5 @@ namespace bitmap
 	EXTERN_FLASH_STORAGE(uint8_t home_16x16[]);
 }
 
-#endif // BITMAP__HOME_16X16_HPP
+#endif // BITMAP_HOME_16X16_HPP
 

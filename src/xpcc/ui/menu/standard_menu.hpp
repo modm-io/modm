@@ -15,8 +15,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__STANDARD_MENU_HPP
-#define XPCC__STANDARD_MENU_HPP
+#ifndef XPCC_STANDARD_MENU_HPP
+#define XPCC_STANDARD_MENU_HPP
 
 #include "abstract_menu.hpp"
 #include "scrollable_text.hpp"
@@ -142,4 +142,4 @@ namespace xpcc
 	};
 }
 
-#endif // XPCC__STANDARD_MENU_HPP
+#endif // XPCC_STANDARD_MENU_HPP

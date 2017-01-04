@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_SAB__INTERFACE_HPP
-#define	XPCC_SAB__INTERFACE_HPP
+#ifndef	XPCC_SAB_INTERFACE_HPP
+#define	XPCC_SAB_INTERFACE_HPP
 
 #include <cstddef>
 #include <stdint.h>
@@ -159,4 +159,4 @@ namespace xpcc
 
 #include "interface_impl.hpp"
 
-#endif	// XPCC_SAB__INTERFACE_HPP
+#endif	// XPCC_SAB_INTERFACE_HPP

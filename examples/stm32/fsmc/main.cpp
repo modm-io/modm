@@ -73,7 +73,7 @@ namespace lcd
 	typedef GpioE10 D7;
 
 	// The Command / Data Pin is mapped to an address pin of the FSMC.
-	// GPIO__OUTPUT(Cd,    D, 11);	// Command / Data,  FSMC: A16
+	// GPIO_OUTPUT(Cd,    D, 11);	// Command / Data,  FSMC: A16
 	typedef GpioOutputE2 Cd;		// Command / Data,  FSMC: A23
 
 	typedef GpioOutputD7 Cs;		// Chip Select,     FSMC: NE1

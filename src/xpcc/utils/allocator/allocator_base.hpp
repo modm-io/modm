@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ALLOCATOR__ALLOCATOR_BASE_HPP
-#define XPCC_ALLOCATOR__ALLOCATOR_BASE_HPP
+#ifndef XPCC_ALLOCATOR_ALLOCATOR_BASE_HPP
+#define XPCC_ALLOCATOR_ALLOCATOR_BASE_HPP
 
 #include <cstddef>
 #include <new>		// needed for placement new
@@ -72,4 +72,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_ALLOCATOR__ALLOCATOR_BASE_HPP
+#endif // XPCC_ALLOCATOR_ALLOCATOR_BASE_HPP

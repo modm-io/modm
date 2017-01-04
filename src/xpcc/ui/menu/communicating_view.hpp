@@ -14,8 +14,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__COMMUNICATING_VIEW_HPP
-#define XPCC__COMMUNICATING_VIEW_HPP
+#ifndef XPCC_COMMUNICATING_VIEW_HPP
+#define XPCC_COMMUNICATING_VIEW_HPP
 
 #include <modm/communication/xpcc/communicatable.hpp>
 
@@ -39,4 +39,4 @@ namespace xpcc
 	};
 }
 
-#endif // XPCC__COMMUNICATING_VIEW_HPP
+#endif // XPCC_COMMUNICATING_VIEW_HPP

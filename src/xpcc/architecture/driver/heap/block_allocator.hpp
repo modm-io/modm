@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__BLOCK_ALLOCATOR_HPP
-#define XPCC__BLOCK_ALLOCATOR_HPP
+#ifndef XPCC_BLOCK_ALLOCATOR_HPP
+#define XPCC_BLOCK_ALLOCATOR_HPP
 
 #include <stdint.h>
 #include <cstddef>
@@ -80,7 +80,7 @@ namespace xpcc
 		getAvailableSize() const;
 		
 	private:
-		// Align the pointer to a multiple of XPCC__ALIGNMENT
+		// Align the pointer to a multiple of XPCC_ALIGNMENT
 		xpcc_always_inline T *
 		alignPointer(void * ptr) const;
 		
@@ -95,4 +95,4 @@ namespace xpcc
 
 #include "block_allocator_impl.hpp"
 
-#endif	// XPCC__BLOCK_ALLOCATOR_HPP
+#endif	// XPCC_BLOCK_ALLOCATOR_HPP

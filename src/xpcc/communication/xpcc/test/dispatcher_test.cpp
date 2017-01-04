@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#define	UNITTEST__RETURN_ON_FAIL
+#define	UNITTEST_RETURN_ON_FAIL
 #include "dispatcher_test.hpp"
 
 #include <modm/architecture/driver/test/testing_clock.hpp>

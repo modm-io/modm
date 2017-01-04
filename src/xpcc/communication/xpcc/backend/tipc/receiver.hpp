@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_TIPC__RECEIVER_HPP
-#define XPCC_TIPC__RECEIVER_HPP
+#ifndef XPCC_TIPC_RECEIVER_HPP
+#define XPCC_TIPC_RECEIVER_HPP
 
 #include <queue>
 
@@ -108,4 +108,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_TIPC__RECEIVER_HPP
+#endif // XPCC_TIPC_RECEIVER_HPP

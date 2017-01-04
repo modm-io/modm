@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__LPC_TIMER_TYPE_IDS_HPP
-#define XPCC__LPC_TIMER_TYPE_IDS_HPP
+#ifndef XPCC_LPC_TIMER_TYPE_IDS_HPP
+#define XPCC_LPC_TIMER_TYPE_IDS_HPP
 
 namespace xpcc
 {
@@ -29,4 +29,4 @@ namespace xpcc
 	}
 }
 
-#endif /* XPCC__LPC_TIMER_TYPE_IDS_HPP */
+#endif /* XPCC_LPC_TIMER_TYPE_IDS_HPP */

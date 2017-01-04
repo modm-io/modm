@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__TIPC_TRANSMITTER_SOCKET_H_
-#define XPCC__TIPC_TRANSMITTER_SOCKET_H_
+#ifndef XPCC_TIPC_TRANSMITTER_SOCKET_H_
+#define XPCC_TIPC_TRANSMITTER_SOCKET_H_
  
 #include <cstring>
 #include <stdint.h>

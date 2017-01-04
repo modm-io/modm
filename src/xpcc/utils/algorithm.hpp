@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__ALGORITHM_HPP
-#define XPCC__ALGORITHM_HPP
+#ifndef XPCC_ALGORITHM_HPP
+#define XPCC_ALGORITHM_HPP
 
 namespace xpcc
 {
@@ -30,4 +30,4 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC__ALGORITHM_HPP
+#endif	// XPCC_ALGORITHM_HPP

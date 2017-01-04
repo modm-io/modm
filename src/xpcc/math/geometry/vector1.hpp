@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__VECTOR1_HPP
-#define XPCC__VECTOR1_HPP
+#ifndef XPCC_VECTOR1_HPP
+#define XPCC_VECTOR1_HPP
 
 #include <cmath>
 #include <cstdlib>
@@ -113,4 +113,4 @@ namespace xpcc
 
 #include "vector1_impl.hpp"
 
-#endif // XPCC__VECTOR1_HPP
+#endif // XPCC_VECTOR1_HPP

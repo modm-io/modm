@@ -19,7 +19,7 @@
 
 #include "clock.hpp"
 
-#if (XPCC__CLOCK_TESTMODE == 1)
+#if (XPCC_CLOCK_TESTMODE == 1)
 
 	xpcc::Clock::Type xpcc::Clock::time = 0;
 
@@ -30,7 +30,7 @@
 		return TimestampType(time);
 	}
 
-#elif ( defined(XPCC__OS_UNIX) || defined(XPCC__OS_OSX) )
+#elif ( defined(XPCC_OS_UNIX) || defined(XPCC_OS_OSX) )
 #	include <sys/time.h>
 
 	template< typename TimestampType >
@@ -43,7 +43,7 @@
 		return TimestampType( now.tv_sec*1000 + now.tv_usec/1000 );
 	}
 
-#elif defined(XPCC__OS_WIN32) || defined(XPCC__OS_WIN64)
+#elif defined(XPCC_OS_WIN32) || defined(XPCC_OS_WIN64)
 #	include <windows.h>
 
 	template< typename TimestampType >
@@ -56,7 +56,7 @@
 		return TimestampType( now.wMilliseconds + now.wSecond*1000 + now.wMinute*1000*60 );
 	}
 
-#elif defined(XPCC__CPU_AVR) || defined(XPCC__CPU_ARM) || defined(XPCC__CPU_AVR32)
+#elif defined(XPCC_CPU_AVR) || defined(XPCC_CPU_ARM) || defined(XPCC_CPU_AVR32)
 #	include <modm/architecture/driver/atomic/lock.hpp>
 
 	xpcc::Clock::Type xpcc::Clock::time = 0;
@@ -67,7 +67,7 @@
 	{
 		typename TimestampType::Type tempTime;
 		{
-#if defined(XPCC__CPU_AVR)
+#if defined(XPCC_CPU_AVR)
 			// only applicable for 8bit memory access
 			// where reads are not atomic
 			atomic::Lock lock;

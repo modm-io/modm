@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__BITBANG_MEMORY_INTERFACE_HPP
+#ifndef XPCC_BITBANG_MEMORY_INTERFACE_HPP
 #	error "Don't include this file directly, use 'bitbang_memory_interface.hpp' instead!"
 #endif
 

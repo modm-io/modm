@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef COMPONENT__RECEIVER_HPP
-#define COMPONENT__RECEIVER_HPP
+#ifndef COMPONENT_RECEIVER_HPP
+#define COMPONENT_RECEIVER_HPP
 
 #include <modm/communication/xpcc/abstract_component.hpp>
 
@@ -41,4 +41,4 @@ namespace component
 	};
 }
 
-#endif // COMPONENT__RECEIVER_HPP
+#endif // COMPONENT_RECEIVER_HPP

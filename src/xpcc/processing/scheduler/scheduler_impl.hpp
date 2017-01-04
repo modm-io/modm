@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SCHEDULER_HPP
+#ifndef XPCC_SCHEDULER_HPP
 	#error	"Don't include this file directly, use 'scheduler.hpp' instead!"
 #endif
 

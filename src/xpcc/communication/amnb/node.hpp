@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_AMNB__NODE_HPP
-#define	XPCC_AMNB__NODE_HPP
+#ifndef	XPCC_AMNB_NODE_HPP
+#define	XPCC_AMNB_NODE_HPP
 
 #include <cstddef>
 #include <modm/architecture/driver/accessor/flash.hpp>
@@ -58,7 +58,7 @@ namespace xpcc
 			 * \see		xpcc::amnb::Error
 			 */
 			void
-			error(uint8_t errorCode = ERROR__GENERAL_ERROR);
+			error(uint8_t errorCode = ERROR_GENERAL_ERROR);
 			
 			/**
 			 * \brief	Send a response without any data
@@ -128,7 +128,7 @@ namespace xpcc
 		/**
 		 * \brief	Possible Action
 		 * 
-		 * \see		AMNB__ACTION()
+		 * \see		AMNB_ACTION()
 		 * \ingroup	amnb
 		 */
 		struct Action
@@ -147,7 +147,7 @@ namespace xpcc
 		/**
 		 * \brief	Possible Listener
 		 * 
-		 * \see		AMNB__LISTEN()
+		 * \see		AMNB_LISTEN()
 		 * \ingroup	amnb
 		 */
 		struct Listener
@@ -166,7 +166,7 @@ namespace xpcc
 		/**
 		 * \brief	Possible Error
 		 * 
-		 * \see		AMNB__ERROR()
+		 * \see		AMNB_ERROR()
 		 * \ingroup	amnb
 		 */
 		struct ErrorHandler
@@ -190,18 +190,18 @@ namespace xpcc
 		 * 
 		 * FLASH_STORAGE(xpcc::amnb::Action actionList[]) =
 		 * {
-		 *     AMNB__ACTION(0x57, object, Object::method1,  0),
-		 *     AMNB__ACTION(0x03, object, Object::method2,  2),
+		 *     AMNB_ACTION(0x57, object, Object::method1,  0),
+		 *     AMNB_ACTION(0x03, object, Object::method2,  2),
 		 * };
 		 * // optional
 		 * FLASH_STORAGE(xpcc::amnb::Listener listenList[]) =
 		 * {
-		 *     AMNB__LISTEN(0x29, 0x46,	object, Object::method)
+		 *     AMNB_LISTEN(0x29, 0x46,	object, Object::method)
 		 * };
 		 * // also optional
 		 * FLASH_STORAGE(xpcc::amnb::ErrorHandler errorHandlerList[]) =
 		 * {
-		 *     AMNB__LISTEN(0x29, 0x46,	object, Object::method)
+		 *     AMNB_LISTEN(0x29, 0x46,	object, Object::method)
 		 * };
 		 * 
 		 * int
@@ -247,9 +247,9 @@ namespace xpcc
 			 *								need to be stored in flash-memory
 			 * \param	errorHandlerCount	Number of entries in \a errorHandlerList
 			 *
-			 * \see		AMNB__ACTION()
-			 * \see		AMNB__LISTEN()
-			 * \see		AMNB__ERROR()
+			 * \see		AMNB_ACTION()
+			 * \see		AMNB_LISTEN()
+			 * \see		AMNB_ERROR()
 			 */
 			Node(uint8_t address, xpcc::accessor::Flash<Action> actionList, uint8_t actionCount,
 				 xpcc::accessor::Flash<Listener> listenList, uint8_t listenCount,
@@ -438,8 +438,8 @@ namespace xpcc
 	 * 
 	 * FLASH_STORAGE(xpcc::amnb::Action actionList[]) =
 	 * {
-	 *     AMNB__ACTION(0x57, sensor, Sensor::sendValue,   0),
-	 *     AMNB__ACTION(0x03, sensor, Sensor::doSomething, sizeof(uint32_t)),
+	 *     AMNB_ACTION(0x57, sensor, Sensor::sendValue,   0),
+	 *     AMNB_ACTION(0x03, sensor, Sensor::doSomething, sizeof(uint32_t)),
 	 * };
 	 * \endcode
 	 * 
@@ -453,9 +453,9 @@ namespace xpcc
 	 * \see		xpcc::amnb::Action
 	 * \ingroup	amnb
 	 */
-	#define	AMNB__ACTION(command, object, function, length)
+	#define	AMNB_ACTION(command, object, function, length)
 #else
-	#define	AMNB__ACTION(command, object, function, length)		\
+	#define	AMNB_ACTION(command, object, function, length)		\
 		{	command, \
 			length, \
 			static_cast<xpcc::amnb::Callable *>(&object), \
@@ -494,7 +494,7 @@ namespace xpcc
 	 * 
 	 * FLASH_STORAGE(xpcc::amnb::Listener listenList[]) =
 	 * {
-	 *     AMNB__LISTEN(0x46, 0x03, listen, ListenToNodes::listenToCommand),
+	 *     AMNB_LISTEN(0x46, 0x03, listen, ListenToNodes::listenToCommand),
 	 * };
 	 * \endcode
 	 * 
@@ -508,9 +508,9 @@ namespace xpcc
 	 * \see		xpcc::amnb::Listener
 	 * \ingroup	amnb
 	 */
-	#define	AMNB__LISTEN(address, command, object, function)
+	#define	AMNB_LISTEN(address, command, object, function)
 #else
-	#define	AMNB__LISTEN(address, command, object, function)	\
+	#define	AMNB_LISTEN(address, command, object, function)	\
 		{	address, \
 			command, \
 			static_cast<xpcc::amnb::Callable *>(&object), \
@@ -541,7 +541,7 @@ namespace xpcc
 	 * 
 	 * FLASH_STORAGE(xpcc::amnb::Listener listenList[]) =
 	 * {
-	 *     AMNB__LISTEN(0x37, 0x57, errorhandler, handleErrors::errorForCommand),
+	 *     AMNB_LISTEN(0x37, 0x57, errorhandler, handleErrors::errorForCommand),
 	 * };
 	 * \endcode
 	 * 
@@ -555,9 +555,9 @@ namespace xpcc
 	 * \see		xpcc::amnb::ErrorHandler
 	 * \ingroup	amnb
 	 */
-	#define	AMNB__ERROR(address, command, object, function)
+	#define	AMNB_ERROR(address, command, object, function)
 #else
-	#define	AMNB__ERROR(address, command, object, function)	\
+	#define	AMNB_ERROR(address, command, object, function)	\
 		{	address, \
 			command, \
 			static_cast<xpcc::amnb::Callable *>(&object), \
@@ -566,4 +566,4 @@ namespace xpcc
 
 #include "node_impl.hpp"
 
-#endif	// XPCC_AMNB__NODE_HPP
+#endif	// XPCC_AMNB_NODE_HPP

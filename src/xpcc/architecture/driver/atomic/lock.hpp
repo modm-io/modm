@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_ATOMIC__LOCK_HPP
-#define	XPCC_ATOMIC__LOCK_HPP
+#ifndef	XPCC_ATOMIC_LOCK_HPP
+#define	XPCC_ATOMIC_LOCK_HPP
 
 #include <stdint.h>
 #include <modm/architecture/utils.hpp>
@@ -67,9 +67,9 @@ namespace xpcc
 			~Lock();
 		
 		private:
-#if defined(XPCC__CPU_AVR)
+#if defined(XPCC_CPU_AVR)
 			uint8_t sreg;
-#elif defined(XPCC__CPU_ARM)
+#elif defined(XPCC_CPU_ARM)
 			uint32_t cpsr;
 #endif
 		};
@@ -104,16 +104,16 @@ namespace xpcc
 			~Unlock();
 		
 		private:
-#if defined(XPCC__CPU_AVR)
+#if defined(XPCC_CPU_AVR)
 			uint8_t sreg;
-#elif defined(XPCC__CPU_ARM)
+#elif defined(XPCC_CPU_ARM)
 			uint32_t cpsr;
 #endif
 		};
 	}
 }
 
-#ifdef XPCC__CPU_AVR
+#ifdef XPCC_CPU_AVR
 
 	#include <avr/interrupt.h>
 
@@ -143,7 +143,7 @@ namespace xpcc
 		__asm__ volatile ("" ::: "memory");
 	}
 
-#elif defined(XPCC__CPU_CORTEX_M0) || defined(XPCC__CPU_CORTEX_M3) || defined(XPCC__CPU_CORTEX_M4) || defined(XPCC__CPU_CORTEX_M7)
+#elif defined(XPCC_CPU_CORTEX_M0) || defined(XPCC_CPU_CORTEX_M3) || defined(XPCC_CPU_CORTEX_M4) || defined(XPCC_CPU_CORTEX_M7)
 
 	xpcc_always_inline
 	xpcc::atomic::Lock::Lock()
@@ -187,7 +187,7 @@ namespace xpcc
 		asm volatile ("msr PRIMASK, %0" : : "r" (cpsr) : "memory" );
 	}
 
-#elif defined(XPCC__OS_HOSTED)
+#elif defined(XPCC_OS_HOSTED)
 
 	xpcc::atomic::Lock::Lock()
 	{
@@ -208,4 +208,4 @@ namespace xpcc
 #	error	"Please provide an atomic lock implementation for this target!"
 #endif
 
-#endif	// XPCC_ATOMIC__LOCK_HPP
+#endif	// XPCC_ATOMIC_LOCK_HPP

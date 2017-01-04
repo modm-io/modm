@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PT__SEMAPHORE_HPP
-#define XPCC_PT__SEMAPHORE_HPP
+#ifndef XPCC_PT_SEMAPHORE_HPP
+#define XPCC_PT_SEMAPHORE_HPP
 
 #include <stdint.h>
 #include "macros.hpp"
@@ -119,4 +119,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_PT__SEMAPHORE_HPP
+#endif // XPCC_PT_SEMAPHORE_HPP

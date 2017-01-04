@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__FLASH_READER_HPP
-#define	XPCC__FLASH_READER_HPP
+#ifndef	XPCC_FLASH_READER_HPP
+#define	XPCC_FLASH_READER_HPP
 
 #include <modm/architecture/utils.hpp>
 
@@ -38,7 +38,7 @@
 
 #else // !__DOXYGEN__
 
-	#ifdef XPCC__CPU_AVR
+	#ifdef XPCC_CPU_AVR
 	
 		#include "flash_reader_avr_impl.hpp"
 	
@@ -78,4 +78,4 @@
 
 #endif
 
-#endif	// XPCC__FLASH_READER_HPP
+#endif	// XPCC_FLASH_READER_HPP

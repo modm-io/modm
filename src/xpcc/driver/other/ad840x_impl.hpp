@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__AD840x_HPP
+#ifndef XPCC_AD840x_HPP
 #	error "Don't include this file directly, use 'ad840x.hpp' instead!"
 #endif
 

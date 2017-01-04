@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__NRF24_PHY_HPP
+#ifndef XPCC_NRF24_PHY_HPP
 #   error "Don't include this file directly, use 'nrf24_phy.hpp' instead!"
 #endif
 

@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__POINT_SET_2D_HPP
-#define XPCC__POINT_SET_2D_HPP
+#ifndef XPCC_POINT_SET_2D_HPP
+#define XPCC_POINT_SET_2D_HPP
 
 #include <modm/container/dynamic_array.hpp>
 #include "vector.hpp"
@@ -95,4 +95,4 @@ namespace xpcc
 
 #include "point_set_2d_impl.hpp"
 
-#endif // XPCC__POINT_SET_2D_HPP
+#endif // XPCC_POINT_SET_2D_HPP

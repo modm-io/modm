@@ -13,8 +13,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__DYNAMIC_ARRAY_HPP
-#define XPCC__DYNAMIC_ARRAY_HPP
+#ifndef XPCC_DYNAMIC_ARRAY_HPP
+#define XPCC_DYNAMIC_ARRAY_HPP
 
 #include <cstddef>
 #include <modm/utils/allocator.hpp>
@@ -394,4 +394,4 @@ namespace xpcc
 #include "dynamic_array_impl.hpp"
 #include "dynamic_array_iterator_impl.hpp"
 
-#endif // XPCC__DYNAMIC_ARRAY_HPP
+#endif // XPCC_DYNAMIC_ARRAY_HPP

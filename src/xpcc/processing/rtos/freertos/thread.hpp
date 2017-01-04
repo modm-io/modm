@@ -12,10 +12,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FREERTOS__THREAD_HPP
-#define XPCC_FREERTOS__THREAD_HPP
+#ifndef XPCC_FREERTOS_THREAD_HPP
+#define XPCC_FREERTOS_THREAD_HPP
 
-#ifndef XPCC_RTOS__THREAD_HPP
+#ifndef XPCC_RTOS_THREAD_HPP
 #	error "Don't include this file directly, use <modm/processing/rtos/thread.hpp>"
 #endif
 
@@ -229,4 +229,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_FREERTOS__THREAD_HPP
+#endif // XPCC_FREERTOS_THREAD_HPP

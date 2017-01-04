@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__TIPC_HPP
-#define XPCC__TIPC_HPP
+#ifndef XPCC_TIPC_HPP
+#define XPCC_TIPC_HPP
 
 #include "header.hpp"
 #include "receiver.hpp"
@@ -124,4 +124,4 @@ namespace xpcc
 	};
 };
 
-#endif	// XPCC__TIPC_HPP
+#endif	// XPCC_TIPC_HPP

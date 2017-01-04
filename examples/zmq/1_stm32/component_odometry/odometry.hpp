@@ -9,8 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef COMPONENT__ODOMETRY_HPP
-#define COMPONENT__ODOMETRY_HPP
+#ifndef COMPONENT_ODOMETRY_HPP
+#define COMPONENT_ODOMETRY_HPP
 
 #include <modm/communication/xpcc/abstract_component.hpp>
 #include <modm/processing/timer.hpp>
@@ -36,4 +36,4 @@ namespace component
 	};
 }
 
-#endif // COMPONENT__ODOMETRY_HPP
+#endif // COMPONENT_ODOMETRY_HPP

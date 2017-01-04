@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef BITMAP__SKULL_64X64_HPP
-#define BITMAP__SKULL_64X64_HPP
+#ifndef BITMAP_SKULL_64X64_HPP
+#define BITMAP_SKULL_64X64_HPP
 
 #include <modm/architecture/driver/accessor.hpp>
 
@@ -31,5 +31,5 @@ namespace bitmap
 	EXTERN_FLASH_STORAGE(uint8_t skull_64x64[]);
 }
 
-#endif // BITMAP__SKULL_64X64_HPP
+#endif // BITMAP_SKULL_64X64_HPP
 

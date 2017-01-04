@@ -268,7 +268,7 @@ public:
 		return *this;
 	}
 
-#if defined(XPCC__OS_OSX) || defined(XPCC__CPU_I386)
+#if defined(XPCC_OS_OSX) || defined(XPCC_CPU_I386)
 	// For OSX 'int64_t' is of type 'int'. Therefore there is no
 	// function here for the default type 'long int'. As 'long int' has the same
 	// width as 'int64_t' we just use a typedef here.
@@ -287,7 +287,7 @@ public:
 	}
 #endif
 
-#if defined(XPCC__CPU_ARM) && defined(XPCC__OS_NONE)
+#if defined(XPCC_CPU_ARM) && defined(XPCC_OS_NONE)
 	// For ARM 'int32_t' is of type 'long'. Therefore there is no
 	// function here for the default type 'int'. As 'int' has the same
 	// width as 'int32_t' we just use a typedef here.
@@ -308,7 +308,7 @@ public:
 
 // The 64-bit types on the AVR are extremely slow and are
 // therefore excluded here
-#if !defined(XPCC__CPU_AVR)
+#if !defined(XPCC_CPU_AVR)
 	xpcc_always_inline IOStream&
 	operator << (const uint64_t& v)
 	{
@@ -334,7 +334,7 @@ public:
 	xpcc_always_inline IOStream&
 	operator << (const double& v)
 	{
-#if defined(XPCC__CPU_AVR)
+#if defined(XPCC_CPU_AVR)
 		this->writeFloat(static_cast<float>(v));
 #else
 		this->writeDouble(v);
@@ -510,7 +510,7 @@ protected:
 	void
 	writeFloat(const float& value);
 
-#if !defined(XPCC__CPU_AVR)
+#if !defined(XPCC_CPU_AVR)
 	void
 	writeDouble(const double& value);
 #endif

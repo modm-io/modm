@@ -12,10 +12,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_BOOST__MUTEX_HPP
-#define XPCC_BOOST__MUTEX_HPP
+#ifndef XPCC_BOOST_MUTEX_HPP
+#define XPCC_BOOST_MUTEX_HPP
 
-#ifndef XPCC_RTOS__MUTEX_HPP
+#ifndef XPCC_RTOS_MUTEX_HPP
 #	error "Don't include this file directly, use <modm/processing/rtos/mutex.hpp>"
 #endif
 
@@ -92,4 +92,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_BOOST__MUTEX_HPP
+#endif // XPCC_BOOST_MUTEX_HPP

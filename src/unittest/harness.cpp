@@ -26,10 +26,10 @@ bool
 unittest::checkExpression(bool expr, unsigned int line)
 {
 	if (expr) {
-		TEST_REPORTER__.reportPass();
+		TEST_REPORTER_.reportPass();
 		return true;
 	} else {
-		TEST_REPORTER__.reportFailure(line)
+		TEST_REPORTER_.reportFailure(line)
 			<< xpcc::accessor::asFlash(unittest::stringNotTrue);
 		return false;
 	}
@@ -40,11 +40,11 @@ unittest::checkEqual(const float& a, const float& b, unsigned int line)
 {
 	if (((a + TEST_FLOAT_EPISLON) >= b) and ((a - TEST_FLOAT_EPISLON) <= b))
 	{
-		TEST_REPORTER__.reportPass();
+		TEST_REPORTER_.reportPass();
 		return true;
 	}
 	else {
-		TEST_REPORTER__.reportFailure(line)
+		TEST_REPORTER_.reportFailure(line)
 			<< a << xpcc::accessor::asFlash(unittest::stringEqual) << b << '\n';
 		return false;
 	}

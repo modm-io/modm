@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_ATOMIC__QUEUE_IMPL_HPP
-#define	XPCC_ATOMIC__QUEUE_IMPL_HPP
+#ifndef	XPCC_ATOMIC_QUEUE_IMPL_HPP
+#define	XPCC_ATOMIC_QUEUE_IMPL_HPP
 
 #include <modm/architecture/detect.hpp>
 
@@ -20,7 +20,7 @@ template<typename T, std::size_t N>
 xpcc::atomic::Queue<T, N>::Queue() :
 	head(0), tail(0)
 {
-#if defined(XPCC__CPU_AVR)
+#if defined(XPCC_CPU_AVR)
 	static_assert(N <= 254, "A maximum of 254 elements is allowed for AVRs!");
 #endif
 }
@@ -128,4 +128,4 @@ xpcc::atomic::Queue<T, N>::pop()
 	this->tail = tmptail;
 }
 
-#endif	// XPCC_ATOMIC__QUEUE_IMPL_HPP
+#endif	// XPCC_ATOMIC_QUEUE_IMPL_HPP

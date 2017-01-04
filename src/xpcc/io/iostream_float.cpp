@@ -27,10 +27,10 @@ xpcc::IOStream::writeFloat(const float& value)
 	// hard coded for -2.22507e-308
 	char str[13 + 1]; // +1 for '\0'
 
-#if defined(XPCC__CPU_AVR)
+#if defined(XPCC_CPU_AVR)
 	dtostre(value, str, 5, 0);
 	this->device->write(str);
-#elif defined(XPCC__CPU_CORTEX_M4) || defined(XPCC__CPU_CORTEX_M3) || defined(XPCC__CPU_CORTEX_M0) || defined(XPCC__OS_WIN32)
+#elif defined(XPCC_CPU_CORTEX_M4) || defined(XPCC_CPU_CORTEX_M3) || defined(XPCC_CPU_CORTEX_M0) || defined(XPCC_OS_WIN32)
 	float v;
 	char *ptr = &str[0];
 
@@ -91,11 +91,11 @@ xpcc::IOStream::writeFloat(const float& value)
 }
 
 // ----------------------------------------------------------------------------
-#if !defined(XPCC__CPU_AVR)
+#if !defined(XPCC_CPU_AVR)
 void
 xpcc::IOStream::writeDouble(const double& value)
 {
-#if defined(XPCC__CPU_CORTEX_M4) || defined(XPCC__CPU_CORTEX_M3) || defined(XPCC__CPU_CORTEX_M0) || defined(XPCC__OS_WIN32)
+#if defined(XPCC_CPU_CORTEX_M4) || defined(XPCC_CPU_CORTEX_M3) || defined(XPCC_CPU_CORTEX_M0) || defined(XPCC_OS_WIN32)
 	// TODO do this better
 	writeFloat(static_cast<float>(value));
 #else

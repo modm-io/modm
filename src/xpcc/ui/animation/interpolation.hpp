@@ -177,7 +177,7 @@ private:
 	// On the AVR 64bit variables do not exist, therefore this must be excluded,
 	// so that it may revert back to using floats.
 	// It's not pretty, but neither is using uint32_t on an 8bit CPU to begin with.
-#if !defined(XPCC__CPU_AVR)
+#if !defined(XPCC_CPU_AVR)
 
 	/**
 	 * uint32_t implementation using signed 32.16 fixed point arithmetic.

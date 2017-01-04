@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_SAB__SLAVE_HPP
-#define	XPCC_SAB__SLAVE_HPP
+#ifndef	XPCC_SAB_SLAVE_HPP
+#define	XPCC_SAB_SLAVE_HPP
 
 #include <cstddef>
 #include <modm/architecture/driver/accessor/flash.hpp>
@@ -58,7 +58,7 @@ namespace xpcc
 			 * \see		xpcc::sab::Error
 			 */
 			void
-			error(uint8_t errorCode = ERROR__GENERAL_ERROR);
+			error(uint8_t errorCode = ERROR_GENERAL_ERROR);
 			
 			/**
 			 * \brief	Send a response without any data
@@ -128,7 +128,7 @@ namespace xpcc
 		/**
 		 * \brief	Possible Action
 		 * 
-		 * \see		SAB__ACTION()
+		 * \see		SAB_ACTION()
 		 * \ingroup	sab
 		 */
 		struct Action
@@ -152,8 +152,8 @@ namespace xpcc
 		 * 
 		 * FLASH_STORAGE(xpcc::sab::Action actionList[]) =
 		 * {
-		 *     SAB__ACTION(0x57, object, Object::method1,  0),
-		 *     SAB__ACTION(0x03, object, Object::method2,  2),
+		 *     SAB_ACTION(0x57, object, Object::method1,  0),
+		 *     SAB_ACTION(0x03, object, Object::method2,  2),
 		 * };
 		 * 
 		 * int
@@ -189,7 +189,7 @@ namespace xpcc
 			 * \param	count		Number of entries in \a actionList
 			 *
 			 * \see		sab::xpcc::Action
-			 * \see		SAB__ACTION()
+			 * \see		SAB_ACTION()
 			 */
 			Slave(uint8_t address, xpcc::accessor::Flash<Action> list, uint8_t count);
 			
@@ -250,8 +250,8 @@ namespace xpcc
 	 * 
 	 * FLASH_STORAGE(xpcc::sab::Action actionList[]) =
 	 * {
-	 *     SAB__ACTION(0x57, sensor, Sensor::sendValue,   0),
-	 *     SAB__ACTION(0x03, sensor, Sensor::doSomething, sizeof(uint32_t)),
+	 *     SAB_ACTION(0x57, sensor, Sensor::sendValue,   0),
+	 *     SAB_ACTION(0x03, sensor, Sensor::doSomething, sizeof(uint32_t)),
 	 * };
 	 * \endcode
 	 * 
@@ -265,9 +265,9 @@ namespace xpcc
 	 * \see		xpcc::sab::Action
 	 * \ingroup	sab
 	 */
-	#define	SAB__ACTION(command, object, function, length)
+	#define	SAB_ACTION(command, object, function, length)
 #else
-	#define	SAB__ACTION(command, object, function, length)		\
+	#define	SAB_ACTION(command, object, function, length)		\
 		{	static_cast<xpcc::sab::Callable *>(&object), \
 			reinterpret_cast<xpcc::sab::Action::Callback>(&function), \
 			length, \
@@ -276,4 +276,4 @@ namespace xpcc
 
 #include "slave_impl.hpp"
 
-#endif	// XPCC_SAB__SLAVE_HPP
+#endif	// XPCC_SAB_SLAVE_HPP

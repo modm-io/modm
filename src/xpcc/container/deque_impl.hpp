@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__DEQUE_HPP
+#ifndef	XPCC_DEQUE_HPP
 	#error	"Don't include this file directly use 'container/deque.hpp' instead!"
 #endif
 

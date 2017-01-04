@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__POLYGON_2D_HPP
+#ifndef XPCC_POLYGON_2D_HPP
 	#error	"Don't include this file directly, use 'polygon_2d.hpp' instead!"
 #endif
 

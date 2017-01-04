@@ -9,7 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__RAY_2D_HPP
+#ifndef XPCC_RAY_2D_HPP
 	#error	"Don't include this file directly, use 'ray_2d.hpp' instead!"
 #endif
 

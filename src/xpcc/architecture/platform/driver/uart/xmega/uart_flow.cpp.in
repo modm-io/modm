@@ -32,11 +32,11 @@ namespace
 	static xpcc::atomic::Queue<uint8_t, UART{{ id }}_RX_BUFFER_SIZE> rxBuffer;
 	static xpcc::atomic::Queue<uint8_t, UART{{ id }}_TX_BUFFER_SIZE> txBuffer;
 	
-	GPIO__INPUT (RXD, {{ id[0] }}, {{ number * 4 + 2 }});
-	GPIO__OUTPUT(TXD, {{ id[0] }}, {{ number * 4 + 3 }});
+	GPIO_INPUT (RXD, {{ id[0] }}, {{ number * 4 + 2 }});
+	GPIO_OUTPUT(TXD, {{ id[0] }}, {{ number * 4 + 3 }});
 	
-	GPIO__INPUT (RTS, UART{{ id }}_RTS_PORT, UART{{ id }}_RTS_PIN);
-	GPIO__OUTPUT(CTS, UART{{ id }}_CTS_PORT, UART{{ id }}_CTS_PIN);
+	GPIO_INPUT (RTS, UART{{ id }}_RTS_PORT, UART{{ id }}_RTS_PIN);
+	GPIO_OUTPUT(CTS, UART{{ id }}_CTS_PORT, UART{{ id }}_CTS_PIN);
 
 	uint8_t error;
 }

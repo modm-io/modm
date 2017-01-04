@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__FIR_HPP
-#define XPCC__FIR_HPP
+#ifndef XPCC_FIR_HPP
+#define XPCC_FIR_HPP
 
 #include <stdint.h>
 
@@ -88,4 +88,4 @@ namespace xpcc
 
 #include "fir_impl.hpp"
 
-#endif // XPCC__FIR_HPP
+#endif // XPCC_FIR_HPP

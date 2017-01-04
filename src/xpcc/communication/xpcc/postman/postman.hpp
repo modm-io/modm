@@ -14,8 +14,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__POSTMAN_HPP
-#define	XPCC__POSTMAN_HPP
+#ifndef	XPCC_POSTMAN_HPP
+#define	XPCC_POSTMAN_HPP
 
 #include "../backend/backend_interface.hpp"
 #include "response.hpp"
@@ -61,4 +61,4 @@ namespace xpcc
 	};
 }
 
-#endif // XPCC__POSTMAN_HPP
+#endif // XPCC_POSTMAN_HPP

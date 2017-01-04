@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SHIFT_REGISTER_OUTPUT_HPP
+#ifndef XPCC_SHIFT_REGISTER_OUTPUT_HPP
 	#error	"Don't include this file directly, use 'shift_register_output.hpp' instead!"
 #endif
 

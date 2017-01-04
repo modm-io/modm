@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__BUFFERED_GRAPHIC_DISPLAY_HPP
+#ifndef XPCC_BUFFERED_GRAPHIC_DISPLAY_HPP
 	#error	"Don't include this file directly, use 'buffered_graphic_display.hpp' instead!"
 #endif
 

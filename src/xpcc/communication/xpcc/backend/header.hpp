@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__HEADER_HPP
-#define	XPCC__HEADER_HPP
+#ifndef	XPCC_HEADER_HPP
+#define	XPCC_HEADER_HPP
 
 #include <stdint.h>
 
@@ -78,4 +78,4 @@ namespace xpcc
 	operator << (IOStream& s, const Header& header);
 }
 
-#endif	// XPCC__HEADER_HPP
+#endif	// XPCC_HEADER_HPP

@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SCHEDULER_HPP
-#define XPCC__SCHEDULER_HPP
+#ifndef XPCC_SCHEDULER_HPP
+#define XPCC_SCHEDULER_HPP
 
 #include <stdint.h>
 
@@ -109,4 +109,4 @@ namespace xpcc
 
 #include "scheduler_impl.hpp"
 
-#endif // XPCC__SCHEDULER_HPP
+#endif // XPCC_SCHEDULER_HPP

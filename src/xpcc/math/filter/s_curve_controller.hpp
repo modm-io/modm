@@ -14,8 +14,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__S_CURVE_CONTROLLER_HPP
-#define XPCC__S_CURVE_CONTROLLER_HPP
+#ifndef XPCC_S_CURVE_CONTROLLER_HPP
+#define XPCC_S_CURVE_CONTROLLER_HPP
 
 #include <cmath>
 
@@ -109,4 +109,4 @@ namespace xpcc
 
 #include "s_curve_controller_impl.hpp"
 
-#endif // XPCC__S_CURVE_CONTROLLER_HPP
+#endif // XPCC_S_CURVE_CONTROLLER_HPP

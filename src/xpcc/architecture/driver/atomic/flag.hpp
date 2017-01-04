@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_ATOMIC__FLAG_HPP
-#define	XPCC_ATOMIC__FLAG_HPP
+#ifndef	XPCC_ATOMIC_FLAG_HPP
+#define	XPCC_ATOMIC_FLAG_HPP
 
 #include "lock.hpp"
 
@@ -101,4 +101,4 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC_ATOMIC__FLAG_HPP
+#endif	// XPCC_ATOMIC_FLAG_HPP

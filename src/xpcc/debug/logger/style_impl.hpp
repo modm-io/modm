@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LOG__STYLE_HPP
+#ifndef XPCC_LOG_STYLE_HPP
 	#error "Don't include this file directly, use 'style.hpp' instead!"
 #endif
 

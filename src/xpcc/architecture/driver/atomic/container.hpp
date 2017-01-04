@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_ATOMIC__CONTAINER_HPP
-#define	XPCC_ATOMIC__CONTAINER_HPP
+#ifndef	XPCC_ATOMIC_CONTAINER_HPP
+#define	XPCC_ATOMIC_CONTAINER_HPP
 
 #include "lock.hpp"
 #include <modm/architecture/driver/accessor.hpp>
@@ -155,4 +155,4 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC_ATOMIC__CONTAINER_HPP
+#endif	// XPCC_ATOMIC_CONTAINER_HPP

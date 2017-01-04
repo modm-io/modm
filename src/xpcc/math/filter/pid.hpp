@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__PID_HPP
-#define XPCC__PID_HPP
+#ifndef XPCC_PID_HPP
+#define XPCC_PID_HPP
 
 #include <cstdlib>
 #include <cmath>
@@ -188,4 +188,4 @@ namespace xpcc
 
 #include "pid_impl.hpp"
 
-#endif // XPCC__PID_HPP
+#endif // XPCC_PID_HPP

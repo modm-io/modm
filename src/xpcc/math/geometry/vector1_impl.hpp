@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__VECTOR1_HPP
+#ifndef XPCC_VECTOR1_HPP
 	#error	"Don't include this file directly, use 'vector1.hpp' instead!"
 #endif
 

@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_INTERPOLATION__LINEAR_HPP
+#ifndef	XPCC_INTERPOLATION_LINEAR_HPP
    #error "Don't include this file directly. Use 'xpcc/math/interpolation/linear.hpp' instead!"
 #endif
 

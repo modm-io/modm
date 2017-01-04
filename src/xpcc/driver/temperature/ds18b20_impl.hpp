@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__DS18B20_HPP
+#ifndef XPCC_DS18B20_HPP
 	#error	"Don't include this file directly, use 'ds18b20.hpp' instead!"
 #endif
 

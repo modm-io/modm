@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__EA_DOG_HPP
-#define XPCC__EA_DOG_HPP
+#ifndef XPCC_EA_DOG_HPP
+#define XPCC_EA_DOG_HPP
 
 #include "st7565.hpp"
 #include "st7036.hpp"
@@ -169,4 +169,4 @@ namespace xpcc
 	};
 }
 
-#endif // XPCC__EA_DOG_HPP
+#endif // XPCC_EA_DOG_HPP

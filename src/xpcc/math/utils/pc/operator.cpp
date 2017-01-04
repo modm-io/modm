@@ -16,7 +16,7 @@
 
 extern "C"
 uint16_t
-xpcc__sqrt32(uint32_t input)
+xpcc_sqrt32(uint32_t input)
 {
 	return round(std::sqrt(static_cast<double>(input)));
 }

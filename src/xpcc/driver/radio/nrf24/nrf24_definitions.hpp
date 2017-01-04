@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__NRF24_DEFINITIONS_HPP
-#define XPCC__NRF24_DEFINITIONS_HPP
+#ifndef XPCC_NRF24_DEFINITIONS_HPP
+#define XPCC_NRF24_DEFINITIONS_HPP
 
 #include <stdint.h>
 #include <modm/architecture/interface/register.hpp>
@@ -286,4 +286,4 @@ struct Nrf24Register
 
 }   // namespace xpcc
 
-#endif /* XPCC__NRF24_DEFINITIONS_HPP */
+#endif /* XPCC_NRF24_DEFINITIONS_HPP */

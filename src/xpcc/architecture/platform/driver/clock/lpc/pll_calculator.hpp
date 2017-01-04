@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LPC__PLL_HPP
-#define XPCC_LPC__PLL_HPP
+#ifndef XPCC_LPC_PLL_HPP
+#define XPCC_LPC_PLL_HPP
 
 #include "../generic/common_clock.hpp"
 
@@ -96,4 +96,4 @@ namespace xpcc
 	}
 }
 
-#endif	//  XPCC_LPC__PLL_HPP
+#endif	//  XPCC_LPC_PLL_HPP

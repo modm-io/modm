@@ -15,8 +15,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__DISPATCHER_HPP
-#define	XPCC__DISPATCHER_HPP
+#ifndef	XPCC_DISPATCHER_HPP
+#define	XPCC_DISPATCHER_HPP
 
 #include <modm/processing/timer.hpp>
 #include <modm/container/linked_list.hpp>
@@ -167,4 +167,4 @@ namespace xpcc
 	};
 }
 
-#endif // XPCC__DISPATCHER_HPP
+#endif // XPCC_DISPATCHER_HPP

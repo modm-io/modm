@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_INTERPOLATION__LAGRANGE_HPP
+#ifndef	XPCC_INTERPOLATION_LAGRANGE_HPP
    #error "Don't include this file directly. Use 'xpcc/math/interpolation/lagrange.hpp' instead!"
 #endif
 

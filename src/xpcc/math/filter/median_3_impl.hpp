@@ -70,9 +70,9 @@ xpcc::filter::Median<T, 3>::update()
 	// buffer and sort it afterwards
 	std::memcpy((void *) sorted, (const void * const) buffer, sizeof(sorted));
 	
-	XPCC_MEDIAN__SORT(sorted[0], sorted[1]);
-	XPCC_MEDIAN__SORT(sorted[1], sorted[2]);
-	XPCC_MEDIAN__SORT(sorted[0], sorted[1]);
+	XPCC_MEDIAN_SORT(sorted[0], sorted[1]);
+	XPCC_MEDIAN_SORT(sorted[1], sorted[2]);
+	XPCC_MEDIAN_SORT(sorted[0], sorted[1]);
 }
 
 template <typename T>

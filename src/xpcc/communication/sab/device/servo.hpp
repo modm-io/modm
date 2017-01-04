@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SAB__SERVO_HPP
-#define XPCC_SAB__SERVO_HPP
+#ifndef XPCC_SAB_SERVO_HPP
+#define XPCC_SAB_SERVO_HPP
 
 #include "../interface.hpp"
 
@@ -26,4 +26,4 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC_SAB__SERVO_HPP
+#endif	// XPCC_SAB_SERVO_HPP

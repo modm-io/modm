@@ -14,8 +14,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__LOGGER_HPP
-#define XPCC__LOGGER_HPP
+#ifndef XPCC_LOGGER_HPP
+#define XPCC_LOGGER_HPP
 
 #include <modm/architecture/utils.hpp>
 #include <modm/io/iostream.hpp>
@@ -204,4 +204,4 @@ namespace xpcc
 #define	XPCC_FILE_INFO		"[" FILENAME "(" XPCC_STRINGIFY(__LINE__) ")] "
 
 #endif	// __DOXYGEN__
-#endif // XPCC__LOGGER_HPP
+#endif // XPCC_LOGGER_HPP

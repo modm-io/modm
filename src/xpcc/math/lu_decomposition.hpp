@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__LU_DECOMPOSITION_HPP
-#define XPCC__LU_DECOMPOSITION_HPP
+#ifndef XPCC_LU_DECOMPOSITION_HPP
+#define XPCC_LU_DECOMPOSITION_HPP
 
 #include "matrix.hpp"
 #include "geometry/vector.hpp"
@@ -156,4 +156,4 @@ namespace xpcc
 }
 #include "lu_decomposition_impl.hpp"
 
-#endif // XPCC__LU_DECOMPOSITION_HPP
+#endif // XPCC_LU_DECOMPOSITION_HPP

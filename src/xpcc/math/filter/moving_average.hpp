@@ -14,8 +14,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__MOVING_AVERAGE_HPP
-#define XPCC__MOVING_AVERAGE_HPP
+#ifndef XPCC_MOVING_AVERAGE_HPP
+#define XPCC_MOVING_AVERAGE_HPP
 
 #include <cstddef>
 #include <stdint.h>
@@ -119,4 +119,4 @@ xpcc::filter::MovingAverage<T, N>::getValue() const
 
 
 #include "moving_average_float_impl.hpp"
-#endif // XPCC__MOVING_AVERAGE_HPP
+#endif // XPCC_MOVING_AVERAGE_HPP

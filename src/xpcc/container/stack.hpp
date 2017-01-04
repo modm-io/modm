@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__STACK_HPP
-#define	XPCC__STACK_HPP
+#ifndef	XPCC_STACK_HPP
+#define	XPCC_STACK_HPP
 
 #include <cstddef>
 #include <stdint.h>
@@ -107,4 +107,4 @@ namespace xpcc
 	};
 }
 
-#endif	// XPCC__STACK_HPP
+#endif	// XPCC_STACK_HPP

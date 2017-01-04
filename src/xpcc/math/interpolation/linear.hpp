@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_INTERPOLATION__LINEAR_HPP
-#define	XPCC_INTERPOLATION__LINEAR_HPP
+#ifndef	XPCC_INTERPOLATION_LINEAR_HPP
+#define	XPCC_INTERPOLATION_LINEAR_HPP
 
 #include <stdint.h>
 
@@ -127,4 +127,4 @@ namespace xpcc
 
 #include "linear_impl.hpp"
 
-#endif	// XPCC_INTERPOLATION__LINEAR_HPP
+#endif	// XPCC_INTERPOLATION_LINEAR_HPP

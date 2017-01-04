@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__TIPC_TRANSMITTER_HPP
-#define XPCC__TIPC_TRANSMITTER_HPP
+#ifndef XPCC_TIPC_TRANSMITTER_HPP
+#define XPCC_TIPC_TRANSMITTER_HPP
 
 // STD exceptions...
 //#include <stdexcept>
@@ -61,4 +61,4 @@ namespace xpcc
 		};
 	}
 }
-#endif // XPCC__TIPC_TRANSMITTER_HPP
+#endif // XPCC_TIPC_TRANSMITTER_HPP

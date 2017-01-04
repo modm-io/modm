@@ -12,15 +12,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_RTOS__SCHEDULER_HPP
-#define XPCC_RTOS__SCHEDULER_HPP
+#ifndef XPCC_RTOS_SCHEDULER_HPP
+#define XPCC_RTOS_SCHEDULER_HPP
 
 #include <modm/architecture/utils.hpp>
 
-#ifdef XPCC__OS_HOSTED
+#ifdef XPCC_OS_HOSTED
 #	include "boost/scheduler.hpp"
-#elif defined(XPCC__CPU_CORTEX_M3) || defined(XPCC__CPU_CORTEX_M4)
+#elif defined(XPCC_CPU_CORTEX_M3) || defined(XPCC_CPU_CORTEX_M4)
 #	include "freertos/scheduler.hpp"
 #endif
 
-#endif // XPCC_RTOS__SCHEDULER_HPP
+#endif // XPCC_RTOS_SCHEDULER_HPP

@@ -33,8 +33,8 @@
  *         xpcc::font::FixedWidth5x8
  */
 
-#ifndef XPCC__MENU_HPP
-#define XPCC__MENU_HPP
+#ifndef XPCC_MENU_HPP
+#define XPCC_MENU_HPP
 
 #include "menu/view_stack.hpp"
 #include "menu/abstract_view.hpp"
@@ -48,4 +48,4 @@
 #include "menu/choice_menu.hpp"
 #include "menu/choice_menu_entry.hpp"
 
-#endif	// XPCC__MENU_HPP
+#endif	// XPCC_MENU_HPP

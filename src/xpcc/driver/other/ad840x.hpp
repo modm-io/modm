@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__AD840x_HPP
-#define XPCC__AD840x_HPP
+#ifndef XPCC_AD840x_HPP
+#define XPCC_AD840x_HPP
 
 #include <stdint.h>
 #include <modm/architecture/interface/gpio.hpp>
@@ -191,4 +191,4 @@ namespace xpcc
 
 #include "ad840x_impl.hpp"
 
-#endif // XPCC__AD840x_HPP
+#endif // XPCC_AD840x_HPP

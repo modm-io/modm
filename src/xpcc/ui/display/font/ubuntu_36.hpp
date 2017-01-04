@@ -14,8 +14,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FONT__UBUNTU_36_HPP
-#define	XPCC_FONT__UBUNTU_36_HPP
+#ifndef XPCC_FONT_UBUNTU_36_HPP
+#define	XPCC_FONT_UBUNTU_36_HPP
 
 #include <modm/architecture/driver/accessor.hpp>
 
@@ -41,5 +41,5 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC_FONT__UBUNTU_36_HPP
+#endif	// XPCC_FONT_UBUNTU_36_HPP
 

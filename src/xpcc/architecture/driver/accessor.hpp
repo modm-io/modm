@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__ACCESSOR_HPP
-#define XPCC__ACCESSOR_HPP
+#ifndef XPCC_ACCESSOR_HPP
+#define XPCC_ACCESSOR_HPP
 
 #include "accessor/ram.hpp"
 #include "accessor/flash.hpp"
@@ -42,4 +42,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC__ACCESSOR_HPP
+#endif // XPCC_ACCESSOR_HPP

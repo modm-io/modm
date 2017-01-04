@@ -13,8 +13,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__MCP2515_HPP
-#define XPCC__MCP2515_HPP
+#ifndef XPCC_MCP2515_HPP
+#define XPCC_MCP2515_HPP
 
 #include <stdint.h>
 #include <modm/architecture/driver/accessor.hpp>
@@ -206,4 +206,4 @@ namespace xpcc
 
 #include "mcp2515_impl.hpp"
 
-#endif // XPCC__MCP2515_HPP
+#endif // XPCC_MCP2515_HPP

@@ -9,8 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_TOKEN_RING__NODE_HPP
-#define	XPCC_TOKEN_RING__NODE_HPP
+#ifndef	XPCC_TOKEN_RING_NODE_HPP
+#define	XPCC_TOKEN_RING_NODE_HPP
 
 #include <cstddef>
 #include <modm/architecture/driver/accessor/flash.hpp>
@@ -57,7 +57,7 @@ namespace xpcc
 		/**
 		 * \brief	Possible Listener
 		 * 
-		 * \see		RPR__LISTEN()
+		 * \see		RPR_LISTEN()
 		 * \ingroup	rpr
 		 */
 		struct Listener
@@ -77,7 +77,7 @@ namespace xpcc
 		/**
 		 * \brief	Possible Error
 		 * 
-		 * \see		RPR__ERROR()
+		 * \see		RPR_ERROR()
 		 * \ingroup	rpr
 		 */
 		struct Error
@@ -112,8 +112,8 @@ namespace xpcc
 			 *								need to be stored in flash-memory
 			 * \param	errorHandlerCount	Number of entries in \a errorHandlerList
 			 *
-			 * \see		RPR__LISTEN()
-			 * \see		RPR__ERROR()
+			 * \see		RPR_LISTEN()
+			 * \see		RPR_ERROR()
 			 */
 			Node(xpcc::accessor::Flash<Listener> listenerCallbackList,
 				 uint8_t listenerCallbackCount,
@@ -202,9 +202,9 @@ namespace xpcc
 	 * \see		xpcc::rpr::Listener
 	 * \ingroup	rpr
 	 */
-	#define	RPR__LISTEN(type, source, command, object, function)
+	#define	RPR_LISTEN(type, source, command, object, function)
 #else
-	#define	RPR__LISTEN(type, source, command, object, function)	\
+	#define	RPR_LISTEN(type, source, command, object, function)	\
 		{	type, \
 			source, \
 			command, \
@@ -225,9 +225,9 @@ namespace xpcc
 	 * \see		xpcc::rpr::ErrorHandler
 	 * \ingroup	rpr
 	 */
-	#define	RPR__ERROR(address, command, object, function)
+	#define	RPR_ERROR(address, command, object, function)
 #else
-	#define	RPR__ERROR(address, command, object, function)	\
+	#define	RPR_ERROR(address, command, object, function)	\
 		{	address, \
 			command, \
 			static_cast<xpcc::rpr::Callable *>(&object), \
@@ -236,4 +236,4 @@ namespace xpcc
 
 #include "node_impl.hpp"
 
-#endif	// XPCC_TOKEN_RING__NODE_HPP
+#endif	// XPCC_TOKEN_RING_NODE_HPP

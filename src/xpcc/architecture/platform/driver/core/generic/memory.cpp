@@ -12,7 +12,7 @@
 
 #include <modm/architecture/detect.hpp>
 
-#ifdef XPCC__OS_HOSTED
+#ifdef XPCC_OS_HOSTED
 
 #include <modm/architecture/interface/memory.hpp>
 #include <stdlib.h>

@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__PCA9685_HPP
+#ifndef XPCC_PCA9685_HPP
 #	error "Don't include this file directly, use 'pca9685.hpp' instead!"
 #endif
 

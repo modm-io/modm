@@ -13,8 +13,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__VIEWSTACK_HPP
-#define XPCC__VIEWSTACK_HPP
+#ifndef XPCC_VIEWSTACK_HPP
+#define XPCC_VIEWSTACK_HPP
 
 #include "../display/graphic_display.hpp"
 #include "../../container/stack.hpp"
@@ -104,4 +104,4 @@ namespace xpcc
 	};
 }
 
-#endif // XPCC__VIEWSTACK_HPP
+#endif // XPCC_VIEWSTACK_HPP

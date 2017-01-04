@@ -13,8 +13,8 @@
 
 %%	import '../generic/static.macros' as static with context
 
-#ifndef XPCC_LPC__STATIC_HPP
-#define XPCC_LPC__STATIC_HPP
+#ifndef XPCC_LPC_STATIC_HPP
+#define XPCC_LPC_STATIC_HPP
 
 #include <stdint.h>		// uint32_t
 #include "../device.hpp"
@@ -89,4 +89,4 @@ namespace xpcc
 	}
 }
 
-#endif	//  XPCC_LPC__STATIC_HPP
+#endif	//  XPCC_LPC_STATIC_HPP

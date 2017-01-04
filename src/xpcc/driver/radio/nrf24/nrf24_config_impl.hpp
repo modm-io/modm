@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__NRF24_CONFIG_HPP
+#ifndef XPCC_NRF24_CONFIG_HPP
 #   error "Don't include this file directly, use 'nrf24_config.hpp' instead!"
 #endif
 

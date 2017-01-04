@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LPC111X__ADC_HPP
-#define XPCC_LPC111X__ADC_HPP
+#ifndef XPCC_LPC111X_ADC_HPP
+#define XPCC_LPC111X_ADC_HPP
 
 #include "../device.h"
 
@@ -426,4 +426,4 @@ namespace xpcc
 	}  // namespace lpc
 }
 
-#endif // XPCC_LPC111X__ADC_HPP
+#endif // XPCC_LPC111X_ADC_HPP

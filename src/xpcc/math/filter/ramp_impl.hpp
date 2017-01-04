@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FILTER__RAMP_HPP
+#ifndef XPCC_FILTER_RAMP_HPP
 	#error	"Don't include this file directly, use 'ramp.hpp' instead!"
 #endif
 

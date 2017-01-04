@@ -9,8 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__FPGA_TYPE
-#define XPCC__FPGA_TYPE
+#ifndef XPCC_FPGA_TYPE
+#define XPCC_FPGA_TYPE
 
 namespace xpcc
 {

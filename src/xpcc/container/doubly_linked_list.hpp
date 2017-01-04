@@ -13,8 +13,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__DOUBLY_LINKED_LIST_HPP
-#define	XPCC__DOUBLY_LINKED_LIST_HPP
+#ifndef	XPCC_DOUBLY_LINKED_LIST_HPP
+#define	XPCC_DOUBLY_LINKED_LIST_HPP
 
 #include <stdint.h>
 #include <modm/utils/allocator.hpp>
@@ -221,4 +221,4 @@ namespace xpcc
 #include "doubly_linked_list_impl.hpp"
 #include "doubly_linked_list_iterator_impl.hpp"
 
-#endif	// XPCC__DOUBLY_LINKED_LIST_HPP
+#endif	// XPCC_DOUBLY_LINKED_LIST_HPP

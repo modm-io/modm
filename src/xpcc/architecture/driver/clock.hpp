@@ -64,7 +64,7 @@ public:
 		return now<ShortTimestamp>();
 	}
 
-#if !defined(XPCC__OS_HOSTED)
+#if !defined(XPCC_OS_HOSTED)
 	/// Set the current time
 	static inline void
 	increment(uint_fast16_t step = 1)

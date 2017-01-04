@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__CIRCLE_2D_HPP
-#define XPCC__CIRCLE_2D_HPP
+#ifndef XPCC_CIRCLE_2D_HPP
+#define XPCC_CIRCLE_2D_HPP
 
 #include <cmath>
 #include "geometric_traits.hpp"
@@ -108,4 +108,4 @@ namespace xpcc
 
 #include "circle_2d_impl.hpp"
 
-#endif // XPCC__CIRCLE_2D_HPP
+#endif // XPCC_CIRCLE_2D_HPP

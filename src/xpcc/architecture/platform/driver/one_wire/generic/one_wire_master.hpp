@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SOFTWARE_ONE_WIRE_HPP
-#define XPCC__SOFTWARE_ONE_WIRE_HPP
+#ifndef XPCC_SOFTWARE_ONE_WIRE_HPP
+#define XPCC_SOFTWARE_ONE_WIRE_HPP
 
 #include <modm/architecture/utils.hpp>
 #include <modm/architecture/driver/delay.hpp>
@@ -175,4 +175,4 @@ namespace xpcc
 
 #include "one_wire_master_impl.hpp"
 
-#endif // XPCC__SOFTWARE_ONE_WIRE_HPP
+#endif // XPCC_SOFTWARE_ONE_WIRE_HPP

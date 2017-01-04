@@ -13,8 +13,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__COMMUNICATOR_HPP
-#define	XPCC__COMMUNICATOR_HPP
+#ifndef	XPCC_COMMUNICATOR_HPP
+#define	XPCC_COMMUNICATOR_HPP
 
 #include <stdint.h>
 
@@ -108,4 +108,4 @@ namespace xpcc
 
 #include "communicator_impl.hpp"
 
-#endif // XPCC__COMMUNICATOR_HPP
+#endif // XPCC_COMMUNICATOR_HPP

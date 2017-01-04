@@ -60,7 +60,7 @@ main()
 	Led::reset();
 	Led::toggle();
 
-	GPIO__IO(Io, 0, 3);
+	GPIO_IO(Io, 0, 3);
 	Io::setOutput();
 	Io::setOutput(true);
 	Io::setOutput(false);

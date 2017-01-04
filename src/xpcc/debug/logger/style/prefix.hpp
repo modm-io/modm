@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LOG__PREFIX_HPP
-#define XPCC_LOG__PREFIX_HPP
+#ifndef XPCC_LOG_PREFIX_HPP
+#define XPCC_LOG_PREFIX_HPP
 
 #include <cstring>
 
@@ -66,4 +66,4 @@ namespace xpcc
 
 #include "prefix_impl.hpp"
 
-#endif // XPCC_LOG__PREFIX_HPP
+#endif // XPCC_LOG_PREFIX_HPP

@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SAB__MASTER_HPP
+#ifndef XPCC_SAB_MASTER_HPP
 #	error	"Don't include this file directly, use 'master.hpp' instead!"
 #endif
 

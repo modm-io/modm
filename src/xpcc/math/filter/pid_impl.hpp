@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__PID_IMPL_HPP
-#define XPCC__PID_IMPL_HPP
+#ifndef XPCC_PID_IMPL_HPP
+#define XPCC_PID_IMPL_HPP
 
 template<typename T, unsigned int ScaleFactor>
 xpcc::Pid<T, ScaleFactor>::Parameter::Parameter(
@@ -106,4 +106,4 @@ xpcc::Pid<T, ScaleFactor>::update(const T& input, bool externalLimitation)
 	this->lastError = input;
 }
 
-#endif // XPCC__PID_IMPL_HPP
+#endif // XPCC_PID_IMPL_HPP

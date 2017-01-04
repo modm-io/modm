@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SCP1000_HPP
-#define XPCC__SCP1000_HPP
+#ifndef XPCC_SCP1000_HPP
+#define XPCC_SCP1000_HPP
 
 #include <stdint.h>
 #include <modm/architecture/driver/delay.hpp>
@@ -226,4 +226,4 @@ Ultra Low Power :   ~1Hz  |  15bit   |   14bit
 
 #include "scp1000_impl.hpp"
 
-#endif // XPCC__SCP1000_HPP
+#endif // XPCC_SCP1000_HPP

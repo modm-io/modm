@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__BMA180_HPP
-#define XPCC__BMA180_HPP
+#ifndef XPCC_BMA180_HPP
+#define XPCC_BMA180_HPP
 
 #include <modm/architecture/interface/i2c_adapter.hpp>
 
@@ -478,4 +478,4 @@ namespace xpcc
 
 #include "bma180_impl.hpp"
 
-#endif // XPCC__BMA180_HPP
+#endif // XPCC_BMA180_HPP

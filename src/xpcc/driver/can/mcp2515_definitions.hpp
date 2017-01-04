@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_MCP2515__DEFINITIONS_HPP
-#define	XPCC_MCP2515__DEFINITIONS_HPP
+#ifndef	XPCC_MCP2515_DEFINITIONS_HPP
+#define	XPCC_MCP2515_DEFINITIONS_HPP
 
 namespace xpcc
 {
@@ -421,4 +421,4 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC_MCP2515__DEFINITIONS_HPP
+#endif	// XPCC_MCP2515_DEFINITIONS_HPP

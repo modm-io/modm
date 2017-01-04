@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	UNITTEST__CONTROLLER_HPP
-#define	UNITTEST__CONTROLLER_HPP
+#ifndef	UNITTEST_CONTROLLER_HPP
+#define	UNITTEST_CONTROLLER_HPP
 
 #include <modm/io/iostream.hpp>
 #include <modm/architecture/driver/accessor/flash.hpp>
@@ -70,4 +70,4 @@ namespace unittest
 	};
 }
 
-#endif	// UNITTEST__CONTROLLER_HPP
+#endif	// UNITTEST_CONTROLLER_HPP

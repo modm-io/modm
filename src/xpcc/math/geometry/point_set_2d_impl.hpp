@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__POINT_SET_2D_HPP
+#ifndef XPCC_POINT_SET_2D_HPP
 	#error	"Don't include this file directly, use 'point_set_2d.hpp' instead!"
 #endif
 

@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_AMNB__NODE_HPP
+#ifndef	XPCC_AMNB_NODE_HPP
 #error	"Don't include this file directly, use 'node.hpp' instead!"
 #endif
 
@@ -79,7 +79,7 @@ xpcc::amnb::ErrorHandler::call(Flags type, const uint8_t errorCode)
 // Disable warnings for Visual Studio about using 'this' in a base member
 // initializer list.
 // In this case though it is totally safe so it is ok to disable this warning.
-#ifdef XPCC__COMPILER_MSVC
+#ifdef XPCC_COMPILER_MSVC
 #	pragma warning(disable:4355)
 #endif
 
@@ -139,7 +139,7 @@ xpcc::amnb::Node<Interface>::query(uint8_t slaveAddress, uint8_t command,
 								   const T& payload, uint8_t responseLength)
 {
 	if (queryStatus == IN_PROGRESS) {
-		checkErrorHandlers(slaveAddress, command, REQUEST, ERROR__QUERY_IN_PROGRESS);
+		checkErrorHandlers(slaveAddress, command, REQUEST, ERROR_QUERY_IN_PROGRESS);
 		return false;
 	}
 	
@@ -148,11 +148,11 @@ xpcc::amnb::Node<Interface>::query(uint8_t slaveAddress, uint8_t command,
 		checkErrorHandlers(Interface::getTransmittedAddress(),
 						   Interface::getTransmittedCommand(),
 						   Interface::getTransmittedFlags(),
-						   ERROR__MESSAGE_OVERWRITTEN);
+						   ERROR_MESSAGE_OVERWRITTEN);
 		noError = false;
 	}
 	if (!Interface::sendMessage(slaveAddress, REQUEST, command, payload)) {
-		checkErrorHandlers(slaveAddress, command, REQUEST, ERROR__TRANSMITTER_BUSY);
+		checkErrorHandlers(slaveAddress, command, REQUEST, ERROR_TRANSMITTER_BUSY);
 		noError = false;
 	}
 	
@@ -170,7 +170,7 @@ xpcc::amnb::Node<Interface>::query(uint8_t slaveAddress, uint8_t command,
 								   const void *payload, uint8_t payloadLength, uint8_t responseLength)
 {
 	if (queryStatus == IN_PROGRESS) {
-		checkErrorHandlers(slaveAddress, command, REQUEST, ERROR__QUERY_IN_PROGRESS);
+		checkErrorHandlers(slaveAddress, command, REQUEST, ERROR_QUERY_IN_PROGRESS);
 		return false;
 	}
 	
@@ -179,11 +179,11 @@ xpcc::amnb::Node<Interface>::query(uint8_t slaveAddress, uint8_t command,
 		checkErrorHandlers(Interface::getTransmittedAddress(),
 						   Interface::getTransmittedCommand(),
 						   Interface::getTransmittedFlags(),
-						   ERROR__MESSAGE_OVERWRITTEN);
+						   ERROR_MESSAGE_OVERWRITTEN);
 		noError = false;
 	}
 	if (!Interface::sendMessage(slaveAddress, REQUEST, command, payload, payloadLength)) {
-		checkErrorHandlers(slaveAddress, command, REQUEST, ERROR__TRANSMITTER_BUSY);
+		checkErrorHandlers(slaveAddress, command, REQUEST, ERROR_TRANSMITTER_BUSY);
 		noError = false;
 	}
 	
@@ -201,7 +201,7 @@ xpcc::amnb::Node<Interface>::query(uint8_t slaveAddress, uint8_t command,
 								   uint8_t responseLength)
 {
 	if (queryStatus == IN_PROGRESS) {
-		checkErrorHandlers(slaveAddress, command, REQUEST, ERROR__QUERY_IN_PROGRESS);
+		checkErrorHandlers(slaveAddress, command, REQUEST, ERROR_QUERY_IN_PROGRESS);
 		return false;
 	}
 	
@@ -210,11 +210,11 @@ xpcc::amnb::Node<Interface>::query(uint8_t slaveAddress, uint8_t command,
 		checkErrorHandlers(Interface::getTransmittedAddress(),
 						   Interface::getTransmittedCommand(),
 						   Interface::getTransmittedFlags(),
-						   ERROR__MESSAGE_OVERWRITTEN);
+						   ERROR_MESSAGE_OVERWRITTEN);
 		noError = false;
 	}
 	if (!Interface::sendMessage(slaveAddress, REQUEST, command, 0, 0)) {
-		checkErrorHandlers(slaveAddress, command, REQUEST, ERROR__TRANSMITTER_BUSY);
+		checkErrorHandlers(slaveAddress, command, REQUEST, ERROR_TRANSMITTER_BUSY);
 		noError = false;
 	}
 	
@@ -236,12 +236,12 @@ xpcc::amnb::Node<Interface>::broadcast(uint8_t command, const T& payload)
 		checkErrorHandlers(Interface::getTransmittedAddress(),
 						   Interface::getTransmittedCommand(),
 						   Interface::getTransmittedFlags(),
-						   ERROR__MESSAGE_OVERWRITTEN);
+						   ERROR_MESSAGE_OVERWRITTEN);
 		noError = false;
 		
 	}
 	if (!Interface::sendMessage(this->ownAddress, BROADCAST, command, payload)) {
-		checkErrorHandlers(this->ownAddress, command, BROADCAST, ERROR__TRANSMITTER_BUSY);
+		checkErrorHandlers(this->ownAddress, command, BROADCAST, ERROR_TRANSMITTER_BUSY);
 		noError = false;
 	}
 	return noError;
@@ -256,11 +256,11 @@ xpcc::amnb::Node<Interface>::broadcast(uint8_t command, const void *payload, uin
 		checkErrorHandlers(Interface::getTransmittedAddress(),
 						   Interface::getTransmittedCommand(),
 						   Interface::getTransmittedFlags(),
-						   ERROR__MESSAGE_OVERWRITTEN);
+						   ERROR_MESSAGE_OVERWRITTEN);
 		noError = false;
 	}
 	if (!Interface::sendMessage(this->ownAddress, BROADCAST, command, payload, payloadLength)) {
-		checkErrorHandlers(this->ownAddress, command, BROADCAST, ERROR__TRANSMITTER_BUSY);
+		checkErrorHandlers(this->ownAddress, command, BROADCAST, ERROR_TRANSMITTER_BUSY);
 		noError = false;
 	}
 	return noError;
@@ -275,11 +275,11 @@ xpcc::amnb::Node<Interface>::broadcast(uint8_t command)
 		checkErrorHandlers(Interface::getTransmittedAddress(),
 						   Interface::getTransmittedCommand(),
 						   Interface::getTransmittedFlags(),
-						   ERROR__MESSAGE_OVERWRITTEN);
+						   ERROR_MESSAGE_OVERWRITTEN);
 		noError = false;
 	}
 	if (!Interface::sendMessage(this->ownAddress, BROADCAST, command, 0,0)) {
-		checkErrorHandlers(this->ownAddress, command, BROADCAST, ERROR__TRANSMITTER_BUSY);
+		checkErrorHandlers(this->ownAddress, command, BROADCAST, ERROR_TRANSMITTER_BUSY);
 		noError = false;
 	}
 	return noError;
@@ -357,12 +357,12 @@ xpcc::amnb::Node<Interface>::update()
 					}
 					else {
 						queryStatus = ERROR_PAYLOAD;
-						checkErrorHandlers(messageAddress, messageCommand, ACK, ERROR__QUERY_WRONG_PAYLOAD_LENGTH);
+						checkErrorHandlers(messageAddress, messageCommand, ACK, ERROR_QUERY_WRONG_PAYLOAD_LENGTH);
 					}
 				}
 				else {
 					queryStatus = ERROR_RESPONSE;
-					checkErrorHandlers(messageAddress, messageCommand, NACK, ERROR__QUERY_ERROR_CODE);
+					checkErrorHandlers(messageAddress, messageCommand, NACK, ERROR_QUERY_ERROR_CODE);
 				}
 			}
 			// other request answer
@@ -392,13 +392,13 @@ xpcc::amnb::Node<Interface>::update()
 								action.call(this->response, Interface::getPayload());
 								
 								if (!this->response.triggered) {
-									this->response.error(ERROR__ACTION_NO_RESPONSE);
-									checkErrorHandlers(messageAddress, messageCommand, NACK, ERROR__ACTION_NO_RESPONSE);
+									this->response.error(ERROR_ACTION_NO_RESPONSE);
+									checkErrorHandlers(messageAddress, messageCommand, NACK, ERROR_ACTION_NO_RESPONSE);
 								}
 							}
 							else {
-								this->response.error(ERROR__ACTION_WRONG_PAYLOAD_LENGTH);
-								checkErrorHandlers(messageAddress, messageCommand, NACK, ERROR__ACTION_WRONG_PAYLOAD_LENGTH);
+								this->response.error(ERROR_ACTION_WRONG_PAYLOAD_LENGTH);
+								checkErrorHandlers(messageAddress, messageCommand, NACK, ERROR_ACTION_WRONG_PAYLOAD_LENGTH);
 							}
 							break;
 						}
@@ -411,8 +411,8 @@ xpcc::amnb::Node<Interface>::update()
 			}
 			
 			if (!this->response.triggered) {
-				this->response.error(ERROR__ACTION_NO_ACTION);
-				checkErrorHandlers(messageAddress, messageCommand, NACK, ERROR__ACTION_NO_ACTION);
+				this->response.error(ERROR_ACTION_NO_ACTION);
+				checkErrorHandlers(messageAddress, messageCommand, NACK, ERROR_ACTION_NO_ACTION);
 			}
 		}
 		// --------------------------------------------------------------------
@@ -438,7 +438,7 @@ xpcc::amnb::Node<Interface>::update()
 	else if (timer.isExpired() && (queryStatus == IN_PROGRESS))
 	{
 		queryStatus = ERROR_TIMEOUT;
-		checkErrorHandlers(Interface::getTransmittedAddress(), Interface::getTransmittedCommand(), REQUEST, ERROR__QUERY_TIMEOUT);
+		checkErrorHandlers(Interface::getTransmittedAddress(), Interface::getTransmittedCommand(), REQUEST, ERROR_QUERY_TIMEOUT);
 	}
 }
 

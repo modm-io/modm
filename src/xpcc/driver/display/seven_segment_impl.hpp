@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SEVEN_SEGMENT_DISPLAY_HPP
+#ifndef XPCC_SEVEN_SEGMENT_DISPLAY_HPP
 #	error "Don't include this file directly, use 'seven_segment.hpp' instead!"
 #endif
 

@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__DOUBLY_LINKED_LIST_HPP
+#ifndef	XPCC_DOUBLY_LINKED_LIST_HPP
 	#error	"Don't include this file directly, use 'doubly_linked_list.hpp' instead"
 #endif
 

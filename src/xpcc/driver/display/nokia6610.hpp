@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__NOKIA6610_HPP
-#define XPCC__NOKIA6610_HPP
+#ifndef XPCC_NOKIA6610_HPP
+#define XPCC_NOKIA6610_HPP
 
 #include <modm/architecture/driver/delay.hpp>
 
@@ -80,4 +80,4 @@ namespace xpcc
 
 #include "nokia6610_impl.hpp"
 
-#endif // XPCC__NOKIA6610_HPP
+#endif // XPCC_NOKIA6610_HPP

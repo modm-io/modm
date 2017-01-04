@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__QUATERNION_HPP
+#ifndef XPCC_QUATERNION_HPP
 #	error	"Don't include this file directly, use 'quaternion.hpp' instead!"
 #endif
 

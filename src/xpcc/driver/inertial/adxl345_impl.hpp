@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__ADXL345_HPP
+#ifndef XPCC_ADXL345_HPP
 #	error  "Don't include this file directly, use 'adxl345.hpp' instead!"
 #endif
 

@@ -17,8 +17,8 @@
  * May be added to ext directory.
  */
 
-#ifndef XPCC__LPC11_UART_REGISTERS_HPP_
-#define XPCC__LPC11_UART_REGISTERS_HPP_
+#ifndef XPCC_LPC11_UART_REGISTERS_HPP_
+#define XPCC_LPC11_UART_REGISTERS_HPP_
 
 // ----------------------------------------------------------------------------
 
@@ -67,4 +67,4 @@
 #define FCR_RXTL_8_CHR	((0x02) << 6)	///< RX Trigger level:  8 characters
 #define FCR_RXTL_14_CHR	((0x03) << 6)	///< RX Trigger level: 14 characters
 
-#endif /* XPCC__LPC11_UART_REGISTERS_HPP_ */
+#endif /* XPCC_LPC11_UART_REGISTERS_HPP_ */

@@ -12,15 +12,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_RTOS__MUTEX_HPP
-#define XPCC_RTOS__MUTEX_HPP
+#ifndef XPCC_RTOS_MUTEX_HPP
+#define XPCC_RTOS_MUTEX_HPP
 
 #include <modm/architecture/utils.hpp>
 
-#ifdef XPCC__OS_HOSTED
+#ifdef XPCC_OS_HOSTED
 #	include "boost/mutex.hpp"
-#elif defined(XPCC__CPU_CORTEX_M3) || defined(XPCC__CPU_CORTEX_M4)
+#elif defined(XPCC_CPU_CORTEX_M3) || defined(XPCC_CPU_CORTEX_M4)
 #	include "freertos/mutex.hpp"
 #endif
 
-#endif // XPCC_RTOS__MUTEX_HPP
+#endif // XPCC_RTOS_MUTEX_HPP

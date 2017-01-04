@@ -35,15 +35,13 @@
 #	define likely(x)			xpcc_likely(x)
 #	define unlikely(x)			xpcc_unlikely(x)
 
-#	ifdef XPCC__OS_HOSTED
+#	ifdef XPCC_OS_HOSTED
 #		define 	MAIN_FUNCTION		int main( int argc, char* argv[] )
 #		define	MAIN_FUNCTION_NAKED	int main( int,      char**       )
 #	else
 #		define	MAIN_FUNCTION	int main(void)
 #		define	MAIN_FUNCTION_NAKED MAIN_FUNCTION
 #	endif
-
-#	define XPCC__ARRAY_SIZE(x)	XPCC_ARRAY_SIZE(x)
 
 #	define ENUM_CLASS_FLAG(name) \
 		inline name operator|(name a, name b) \

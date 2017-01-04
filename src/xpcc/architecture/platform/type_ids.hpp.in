@@ -12,12 +12,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__TYPE_IDS_HPP
-#define XPCC__TYPE_IDS_HPP
+#ifndef XPCC_TYPE_IDS_HPP
+#define XPCC_TYPE_IDS_HPP
 
 %% for header in headers
 #include "{{header}}"
 %% endfor
 
-#endif	// XPCC__TYPE_IDS_HPP
+#endif	// XPCC_TYPE_IDS_HPP
 

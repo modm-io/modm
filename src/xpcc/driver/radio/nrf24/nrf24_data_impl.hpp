@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__NRF24_DATA_HPP
+#ifndef XPCC_NRF24_DATA_HPP
 #   error "Don't include this file directly, use 'nrf24_data.hpp' instead!"
 #endif
 

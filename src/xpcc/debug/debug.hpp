@@ -16,10 +16,10 @@
  * \defgroup	debug	Debugging utilities
  * \brief		Logging etc.
  */
-#ifndef XPCC__DEBUG_HPP
-#define XPCC__DEBUG_HPP
+#ifndef XPCC_DEBUG_HPP
+#define XPCC_DEBUG_HPP
 
 #include "logger.hpp"
 #include "error_report.hpp"
 
-#endif	// XPCC__DEBUG_HPP
+#endif	// XPCC_DEBUG_HPP

@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__LOCATION_2D_HPP
-#define	XPCC__LOCATION_2D_HPP
+#ifndef	XPCC_LOCATION_2D_HPP
+#define	XPCC_LOCATION_2D_HPP
 
 #include <cmath>
 
@@ -143,4 +143,4 @@ namespace xpcc
 
 #include "location_2d_impl.hpp"
 
-#endif	// XPCC__LOCATION_2D_HPP
+#endif	// XPCC_LOCATION_2D_HPP

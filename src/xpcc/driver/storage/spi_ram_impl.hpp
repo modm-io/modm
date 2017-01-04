@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SPI_RAM_HPP
+#ifndef XPCC_SPI_RAM_HPP
 	#error	"Don't include this file directly, use 'spi_ram.hpp' instead!"
 #endif
 

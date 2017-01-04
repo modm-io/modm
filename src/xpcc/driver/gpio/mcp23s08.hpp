@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__MCP23S08_HPP
-#define XPCC__MCP23S08_HPP
+#ifndef XPCC_MCP23S08_HPP
+#define XPCC_MCP23S08_HPP
 
 #include <modm/architecture/utils.hpp>
 #include <modm/architecture/interface/gpio.hpp>
@@ -84,4 +84,4 @@ namespace xpcc
 
 #include "mcp23s08_impl.hpp"
 
-#endif	// XPCC__MCP23S08_HPP
+#endif	// XPCC_MCP23S08_HPP

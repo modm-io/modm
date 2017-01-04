@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__NRF24_CONFIG_HPP
-#define XPCC__NRF24_CONFIG_HPP
+#ifndef XPCC_NRF24_CONFIG_HPP
+#define XPCC_NRF24_CONFIG_HPP
 
 #include <stdint.h>
 #include <modm/debug/logger.hpp>
@@ -200,4 +200,4 @@ public:
 
 #include "nrf24_config_impl.hpp"
 
-#endif /* XPCC__NRF24_CONFIG_HPP */
+#endif /* XPCC_NRF24_CONFIG_HPP */

@@ -59,7 +59,7 @@ InterfaceTest::testSendAck()
 	TEST_ASSERT_EQUALS_ARRAY(FakeIODevice::sendBuffer, testMessage, 7);
 }
 
-#ifdef XPCC__COMPILER_MSVC
+#ifdef XPCC_COMPILER_MSVC
 	#pragma pack(push, 1)
 	struct Data
 	{

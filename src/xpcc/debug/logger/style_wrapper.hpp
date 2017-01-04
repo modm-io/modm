@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LOG_STYLE_WRAPPER__HPP
-#define XPCC_LOG_STYLE_WRAPPER__HPP
+#ifndef XPCC_LOG_STYLE_WRAPPER_HPP
+#define XPCC_LOG_STYLE_WRAPPER_HPP
 
 #include <modm/io/iodevice.hpp>
 #include "style.hpp"
@@ -113,4 +113,4 @@ xpcc::log::StyleWrapper<STYLE>::read(char& c)
 }
 
 
-#endif // XPCC_LOG_STYLE_WRAPPER__HPP
+#endif // XPCC_LOG_STYLE_WRAPPER_HPP

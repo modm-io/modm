@@ -44,7 +44,7 @@ unaligned_t
 	inline unaligned_t() : data{0} {}
 
 	inline unaligned_t(T value)
-#ifdef XPCC__CPU_CORTEX_M0
+#ifdef XPCC_CPU_CORTEX_M0
 	{ write(value); }
 #else
 	: data(value) {}
@@ -53,7 +53,7 @@ unaligned_t
 
 	inline operator T() const
 	{
-#ifdef XPCC__CPU_CORTEX_M0
+#ifdef XPCC_CPU_CORTEX_M0
 		T t;
 		read(t);
 		return t;
@@ -66,7 +66,7 @@ protected:
 	void inline
 	write(T &value)
 	{
-#ifdef XPCC__CPU_CORTEX_M0
+#ifdef XPCC_CPU_CORTEX_M0
 		// memcpy(data, (uint8_t*)&value, sizeof(T));
 		// manual copy is faster for small sizes
 		for(uint_fast8_t ii=0; ii<sizeof(T); ii++)
@@ -79,7 +79,7 @@ protected:
 	void inline
 	read(T &value) const
 	{
-#ifdef XPCC__CPU_CORTEX_M0
+#ifdef XPCC_CPU_CORTEX_M0
 		// memcpy((uint8_t*)&value, data, sizeof(T));
 		// manual copy is faster for small sizes
 		for(uint_fast8_t ii=0; ii<sizeof(T); ii++)
@@ -91,7 +91,7 @@ protected:
 
 
 protected:
-#ifdef XPCC__CPU_CORTEX_M0
+#ifdef XPCC_CPU_CORTEX_M0
 	uint8_t data[sizeof(T)];
 #else
 	T data;

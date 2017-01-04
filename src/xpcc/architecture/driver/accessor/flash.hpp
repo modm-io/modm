@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_ACCESSOR__FLASH_HPP
-#define	XPCC_ACCESSOR__FLASH_HPP
+#ifndef	XPCC_ACCESSOR_FLASH_HPP
+#define	XPCC_ACCESSOR_FLASH_HPP
 
 #include <modm/architecture/utils.hpp>
 #include <modm/io/iostream.hpp>
@@ -184,4 +184,4 @@ operator << (xpcc::IOStream& os, xpcc::accessor::Flash<T> ptr)
 xpcc::IOStream&
 operator << (xpcc::IOStream& os, xpcc::accessor::Flash<char> ptr);
 
-#endif	// XPCC_ACCESSOR__FLASH_HPP
+#endif	// XPCC_ACCESSOR_FLASH_HPP

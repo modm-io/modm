@@ -18,8 +18,8 @@
  * 
  */
 
-#ifndef	XPCC__GEOMETRY_HPP
-#define	XPCC__GEOMETRY_HPP
+#ifndef	XPCC_GEOMETRY_HPP
+#define	XPCC_GEOMETRY_HPP
 
 #include "geometry/angle.hpp"
 #include "geometry/circle_2d.hpp"
@@ -31,4 +31,4 @@
 #include "geometry/quaternion.hpp"
 #include "geometry/vector.hpp"
 
-#endif	// XPCC__GEOMETRY_HPP
+#endif	// XPCC_GEOMETRY_HPP

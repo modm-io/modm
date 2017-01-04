@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__PARALLEL_TFT_HPP
+#ifndef XPCC_PARALLEL_TFT_HPP
 #	error	"Don't include this file directly, use 'parallel_tft.hpp' instead!"
 #endif
 

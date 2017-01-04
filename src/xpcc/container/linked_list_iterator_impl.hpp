@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__LINKED_LIST_HPP
+#ifndef	XPCC_LINKED_LIST_HPP
 	#error	"Don't include this file directly, use 'linked_list.hpp' instead"
 #endif
 

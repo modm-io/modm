@@ -14,8 +14,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__ABSTRACT_MENU_HPP
-#define XPCC__ABSTRACT_MENU_HPP
+#ifndef XPCC_ABSTRACT_MENU_HPP
+#define XPCC_ABSTRACT_MENU_HPP
 
 #include "view_stack.hpp"
 #include "abstract_view.hpp"
@@ -47,4 +47,4 @@ namespace xpcc{
 
 }
 
-#endif // XPCC__ABSTRACT_MENU_HPP
+#endif // XPCC_ABSTRACT_MENU_HPP

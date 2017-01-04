@@ -18,8 +18,8 @@
  * 
  */
 
-#ifndef XPCC__INTERPOLATION_HPP
-#define XPCC__INTERPOLATION_HPP
+#ifndef XPCC_INTERPOLATION_HPP
+#define XPCC_INTERPOLATION_HPP
 
 namespace xpcc
 {
@@ -34,4 +34,4 @@ namespace xpcc
 #include "interpolation/linear.hpp"
 #include "interpolation/lagrange.hpp"
 
-#endif	// XPCC__INTERPOLATION_HPP
+#endif	// XPCC_INTERPOLATION_HPP

@@ -13,8 +13,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__RESPONSE_HANDLE_HPP
-#define	XPCC__RESPONSE_HANDLE_HPP
+#ifndef	XPCC_RESPONSE_HANDLE_HPP
+#define	XPCC_RESPONSE_HANDLE_HPP
 
 #include "backend/header.hpp"
 
@@ -60,4 +60,4 @@ namespace xpcc
 	};
 }
 
-#endif // XPCC__RESPONSE_HANDLE_HPP
+#endif // XPCC_RESPONSE_HANDLE_HPP

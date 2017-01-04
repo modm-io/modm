@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__GEOMETRIC_TRAITS_HPP
-#define XPCC__GEOMETRIC_TRAITS_HPP
+#ifndef XPCC_GEOMETRIC_TRAITS_HPP
+#define XPCC_GEOMETRIC_TRAITS_HPP
 
 #include <cmath>
 #include <stdint.h>
@@ -141,4 +141,4 @@ namespace xpcc
 	};
 }
 
-#endif // XPCC__GEOMETRIC_TRAITS_HPP
+#endif // XPCC_GEOMETRIC_TRAITS_HPP

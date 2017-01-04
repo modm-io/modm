@@ -91,9 +91,9 @@
  * @author	Niklas Hauser
  */
 
-#ifndef XPCC__AMNB_HPP
-#define XPCC__AMNB_HPP
+#ifndef XPCC_AMNB_HPP
+#define XPCC_AMNB_HPP
 
 #include "amnb/node.hpp"
 
-#endif	// XPCC__AMNB_HPP
+#endif	// XPCC_AMNB_HPP

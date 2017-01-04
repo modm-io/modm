@@ -12,12 +12,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_MATH__UTILS_HPP
-#define XPCC_MATH__UTILS_HPP
+#ifndef XPCC_MATH_UTILS_HPP
+#define XPCC_MATH_UTILS_HPP
 
 #include "utils/misc.hpp"
 #include "utils/bit_operation.hpp"
 #include "utils/operator.hpp"
 #include "utils/endianness.hpp"
 
-#endif // XPCC_MATH__UTILS_HPP
+#endif // XPCC_MATH_UTILS_HPP

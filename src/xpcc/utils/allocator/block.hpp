@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ALLOCATOR__BLOCK_HPP
-#define XPCC_ALLOCATOR__BLOCK_HPP
+#ifndef XPCC_ALLOCATOR_BLOCK_HPP
+#define XPCC_ALLOCATOR_BLOCK_HPP
 
 #include "allocator_base.hpp"
 
@@ -71,4 +71,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_ALLOCATOR__BLOCK_HPP
+#endif // XPCC_ALLOCATOR_BLOCK_HPP

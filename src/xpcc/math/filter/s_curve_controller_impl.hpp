@@ -14,7 +14,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__S_CURVE_CONTROLLER_HPP
+#ifndef XPCC_S_CURVE_CONTROLLER_HPP
 	#error	"Don't include this file directly, use 's_curve_controller.hpp' instead!"
 #endif
 

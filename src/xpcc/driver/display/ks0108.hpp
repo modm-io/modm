@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__KS0108_HPP
-#define XPCC__KS0108_HPP
+#ifndef XPCC_KS0108_HPP
+#define XPCC_KS0108_HPP
 
 #include <modm/architecture/driver/delay.hpp>
 
@@ -34,7 +34,7 @@ namespace xpcc
 	 * \tparam	PIN_CS1	Chip-Select 1
 	 * \tparam	PIN_CS2	Chip-Select 2
 	 * \tparam	PORT	Needs to be a 8-Bit Port. See xpcc::gpio::Port() or
-	 * 					GPIO__PORT() for more details.
+	 * 					GPIO_PORT() for more details.
 	 *
 	 * \author	Fabian Greif
 	 * \ingroup	driver_display
@@ -113,4 +113,4 @@ namespace xpcc
 
 #include "ks0108_impl.hpp"
 
-#endif // XPCC__KS0108_HPP
+#endif // XPCC_KS0108_HPP

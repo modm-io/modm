@@ -74,19 +74,19 @@ template <typename T>
 void
 xpcc::filter::Median<T, 7>::update()
 {
-	XPCC_MEDIAN__SORT(sorted[0], sorted[5]);
-	XPCC_MEDIAN__SORT(sorted[0], sorted[3]);
-	XPCC_MEDIAN__SORT(sorted[1], sorted[6]);
-	XPCC_MEDIAN__SORT(sorted[2], sorted[4]);
-	XPCC_MEDIAN__SORT(sorted[0], sorted[1]);
-	XPCC_MEDIAN__SORT(sorted[3], sorted[5]);
-	XPCC_MEDIAN__SORT(sorted[2], sorted[6]);
-	XPCC_MEDIAN__SORT(sorted[2], sorted[3]);
-	XPCC_MEDIAN__SORT(sorted[3], sorted[6]);
-	XPCC_MEDIAN__SORT(sorted[4], sorted[5]);
-	XPCC_MEDIAN__SORT(sorted[1], sorted[4]);
-	XPCC_MEDIAN__SORT(sorted[1], sorted[3]);
-	XPCC_MEDIAN__SORT(sorted[3], sorted[4]);
+	XPCC_MEDIAN_SORT(sorted[0], sorted[5]);
+	XPCC_MEDIAN_SORT(sorted[0], sorted[3]);
+	XPCC_MEDIAN_SORT(sorted[1], sorted[6]);
+	XPCC_MEDIAN_SORT(sorted[2], sorted[4]);
+	XPCC_MEDIAN_SORT(sorted[0], sorted[1]);
+	XPCC_MEDIAN_SORT(sorted[3], sorted[5]);
+	XPCC_MEDIAN_SORT(sorted[2], sorted[6]);
+	XPCC_MEDIAN_SORT(sorted[2], sorted[3]);
+	XPCC_MEDIAN_SORT(sorted[3], sorted[6]);
+	XPCC_MEDIAN_SORT(sorted[4], sorted[5]);
+	XPCC_MEDIAN_SORT(sorted[1], sorted[4]);
+	XPCC_MEDIAN_SORT(sorted[1], sorted[3]);
+	XPCC_MEDIAN_SORT(sorted[3], sorted[4]);
 }
 
 template <typename T>

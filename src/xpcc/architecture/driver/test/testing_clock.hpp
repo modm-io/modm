@@ -19,7 +19,7 @@
 /**
  * Gain full access to xpcc::Clock
  *
- * This class is only useful if the define XPCC__CLOCK_TESTMODE is set to 1.
+ * This class is only useful if the define XPCC_CLOCK_TESTMODE is set to 1.
  * Otherwise the `time` member will be ignored on any non AVR target.
  */
 class TestingClock : public xpcc::Clock

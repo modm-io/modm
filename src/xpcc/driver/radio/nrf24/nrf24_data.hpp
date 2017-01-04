@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__NRF24_DATA_HPP
-#define XPCC__NRF24_DATA_HPP
+#ifndef XPCC_NRF24_DATA_HPP
+#define XPCC_NRF24_DATA_HPP
 
 #include <stdint.h>
 #include <modm/debug/logger.hpp>
@@ -234,4 +234,4 @@ private:
 
 #include "nrf24_data_impl.hpp"
 
-#endif /* XPCC__NRF24_DATA_HPP */
+#endif /* XPCC_NRF24_DATA_HPP */

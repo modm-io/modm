@@ -13,8 +13,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__BACKEND_INTERFACE_HPP
-#define	XPCC__BACKEND_INTERFACE_HPP
+#ifndef	XPCC_BACKEND_INTERFACE_HPP
+#define	XPCC_BACKEND_INTERFACE_HPP
 
 #include <stdint.h>
 
@@ -72,4 +72,4 @@ namespace xpcc
 	};
 }
 
-#endif	// XPCC__BACKEND_INTERFACE_HPP
+#endif	// XPCC_BACKEND_INTERFACE_HPP

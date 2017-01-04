@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_BOOST__QUEUE_HPP
+#ifndef XPCC_BOOST_QUEUE_HPP
 #	error "Don't use this file directly, use 'queue.hpp' instead!"
 #endif
 

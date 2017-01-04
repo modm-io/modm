@@ -13,8 +13,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__ABSTRACT_COMPONENT_HPP
-#define	XPCC__ABSTRACT_COMPONENT_HPP
+#ifndef	XPCC_ABSTRACT_COMPONENT_HPP
+#define	XPCC_ABSTRACT_COMPONENT_HPP
 
 #include <stdint.h>
 
@@ -134,4 +134,4 @@ namespace xpcc
 
 #include "abstract_component_impl.hpp"
 
-#endif // XPCC__ABSTRACT_COMPONENT_HPP
+#endif // XPCC_ABSTRACT_COMPONENT_HPP

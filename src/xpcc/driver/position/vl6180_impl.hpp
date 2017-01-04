@@ -29,7 +29,7 @@ xpcc::Vl6180<I2cMaster>::ping()
 {
 	RF_BEGIN();
 
-	if (not RF_CALL(read(Register::IDENTIFICATION__MODEL_ID, i2cBuffer[2])))
+	if (not RF_CALL(read(Register::IDENTIFICATION_MODEL_ID, i2cBuffer[2])))
 		RF_RETURN(false);
 
 	RF_END_RETURN(i2cBuffer[2] == 0xB4);
@@ -68,9 +68,9 @@ xpcc::Vl6180<I2cMaster>::readSensor(bool isDistance)
 	// for this relatively complicated sequence, see the datasheet page 17
 	RF_BEGIN();
 
-	// Write 0x01 to the SYSRANGE__START or SYSALS__START register.
+	// Write 0x01 to the SYSRANGE_START or SYSALS_START register.
 	// The start bit auto-clears after completion.
-	logicBuffer.reg = isDistance ? Register::SYSRANGE__START : Register::SYSALS__START;
+	logicBuffer.reg = isDistance ? Register::SYSRANGE_START : Register::SYSALS_START;
 	if ( RF_CALL(write(logicBuffer.reg, uint8_t(Start::StartStop))) )
 	{
 		// Measurement will take 7.5ms + convergence time (< ~10ms) for ranging
@@ -79,12 +79,12 @@ xpcc::Vl6180<I2cMaster>::readSensor(bool isDistance)
 		RF_WAIT_UNTIL(timeout.isExpired());
 
 		// When the measurement is completed, the interrupt source of ALS or range
-		// in RESULT__INTERRUPT_STATUS_GPIO will set to New Sample Ready.
+		// in RESULT_INTERRUPT_STATUS_GPIO will set to New Sample Ready.
 		logicBuffer.byte[0] = 3;	// 3ms initial wait
 		while(true)
 		{
 			// read the byte
-			if ( !RF_CALL(read(Register::RESULT__INTERRUPT_STATUS_GPIO, i2cBuffer[2])) )
+			if ( !RF_CALL(read(Register::RESULT_INTERRUPT_STATUS_GPIO, i2cBuffer[2])) )
 				RF_RETURN(false);
 
 			// break if the correct interrupt source is set
@@ -108,8 +108,8 @@ xpcc::Vl6180<I2cMaster>::readSensor(bool isDistance)
 			RF_WAIT_UNTIL(timeout.isExpired());
 		}
 
-		// The range result is read from RESULT__RANGE_VAL or RESULT__ALS_VAL.
-		logicBuffer.reg = isDistance ? Register::RESULT__RANGE_VAL : Register::RESULT__ALS_VAL;
+		// The range result is read from RESULT_RANGE_VAL or RESULT_ALS_VAL.
+		logicBuffer.reg = isDistance ? Register::RESULT_RANGE_VAL : Register::RESULT_ALS_VAL;
 		if ( RF_CALL(read(logicBuffer.reg, i2cBuffer+2, isDistance ? 1 : 2)) )
 		{
 			if (isDistance)
@@ -119,11 +119,11 @@ xpcc::Vl6180<I2cMaster>::readSensor(bool isDistance)
 				data.data[2] = i2cBuffer[3];
 			}
 
-			// Interrupt status flags are cleared by writing a 0x07 to SYSTEM__INTERRUPT_CLEAR.
-			if ( RF_CALL(write(Register::SYSTEM__INTERRUPT_CLEAR, (InterruptClear::Range | InterruptClear::ALS | InterruptClear::Error).value)) )
+			// Interrupt status flags are cleared by writing a 0x07 to SYSTEM_INTERRUPT_CLEAR.
+			if ( RF_CALL(write(Register::SYSTEM_INTERRUPT_CLEAR, (InterruptClear::Range | InterruptClear::ALS | InterruptClear::Error).value)) )
 			{
-				// Bit 0 of RESULT__RANGE_STATUS or RESULT__ALS_STATUS indicates when either sensor is ready for the next operation.
-				logicBuffer.reg = isDistance ? Register::RESULT__RANGE_STATUS : Register::RESULT__ALS_STATUS;
+				// Bit 0 of RESULT_RANGE_STATUS or RESULT_ALS_STATUS indicates when either sensor is ready for the next operation.
+				logicBuffer.reg = isDistance ? Register::RESULT_RANGE_STATUS : Register::RESULT_ALS_STATUS;
 				i2cBuffer[3] = 0;
 				while(true)
 				{
@@ -162,7 +162,7 @@ xpcc::Vl6180<I2cMaster>::setDeviceAddress(uint8_t address)
 {
 	RF_BEGIN();
 
-	if ( RF_CALL(write(Register::I2C_SLAVE__DEVICE_ADDRESS, (address & 0x7f))) )
+	if ( RF_CALL(write(Register::I2C_SLAVE_DEVICE_ADDRESS, (address & 0x7f))) )
 	{
 		this->setAddress(address);
 		RF_RETURN(true);
@@ -177,7 +177,7 @@ xpcc::Vl6180<I2cMaster>::setGain(AnalogGain gain)
 {
 	RF_BEGIN();
 
-	if ( RF_CALL(write(Register::SYSALS__ANALOGUE_GAIN, uint8_t(gain))) )
+	if ( RF_CALL(write(Register::SYSALS_ANALOGUE_GAIN, uint8_t(gain))) )
 	{
 		data.gain = uint8_t(gain);
 		RF_RETURN(true);
@@ -198,7 +198,7 @@ xpcc::Vl6180<I2cMaster>::setIntegrationTime(uint16_t time)
 	i2cBuffer[2] = time >> 8;
 	i2cBuffer[3] = time;
 
-	if ( RF_CALL(write(Register::SYSALS__INTEGRATION_PERIOD, i2cBuffer[2], 2)) )
+	if ( RF_CALL(write(Register::SYSALS_INTEGRATION_PERIOD, i2cBuffer[2], 2)) )
 	{
 		// data.time must never be zero!
 		data.time = time + 1;

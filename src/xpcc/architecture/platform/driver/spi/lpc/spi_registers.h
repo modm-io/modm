@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SPI_REGISTERS_HPP
-#define XPCC__SPI_REGISTERS_HPP
+#ifndef XPCC_SPI_REGISTERS_HPP
+#define XPCC_SPI_REGISTERS_HPP
 
 /*******************  Bit definition for SPI_CR0 register  ********************/
 #define SPI_CR0_CPOL						((uint16_t)(1 <<  6))
@@ -36,4 +36,4 @@
 #define SYSAHBCLKCTRL_SSP0					((uint16_t)(1 << 11)) ///< Enables clock for SPI0
 #define SYSAHBCLKCTRL_SSP1					((uint32_t)(1 << 18)) ///< Enables clock for SPI1
 
-#endif // XPCC__SPI_REGISTERS_HPP
+#endif // XPCC_SPI_REGISTERS_HPP

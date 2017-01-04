@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__VECTOR4_HPP
-#define XPCC__VECTOR4_HPP
+#ifndef XPCC_VECTOR4_HPP
+#define XPCC_VECTOR4_HPP
 
 #include <stdint.h>
 #include "vector.hpp"
@@ -261,4 +261,4 @@ namespace xpcc
 
 #include "vector4_impl.hpp"
 
-#endif // XPCC__VECTOR4_HPP
+#endif // XPCC_VECTOR4_HPP

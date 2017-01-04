@@ -50,7 +50,7 @@
  * (everything before the CRC).
  */
 
-#ifndef XPCC__AD7280A_HPP
+#ifndef XPCC_AD7280A_HPP
 #	error "Don't include this file directly! Use 'ad7280a.hpp' instead."
 #endif
 

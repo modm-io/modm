@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_AMNB__INTERFACE_HPP
-#define	XPCC_AMNB__INTERFACE_HPP
+#ifndef	XPCC_AMNB_INTERFACE_HPP
+#define	XPCC_AMNB_INTERFACE_HPP
 
 #include <cstddef>
 #include <stdint.h>
@@ -230,4 +230,4 @@ namespace xpcc
 
 #include "interface_impl.hpp"
 
-#endif	// XPCC_AMNB__INTERFACE_HPP
+#endif	// XPCC_AMNB_INTERFACE_HPP

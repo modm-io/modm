@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_SAB2__INTERFACE_HPP
+#ifndef	XPCC_SAB2_INTERFACE_HPP
 	#error	"Don't include this file directly, use 'interface.hpp' instead!"
 #endif
 

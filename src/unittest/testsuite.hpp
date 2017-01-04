@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	UNITTEST__TESTSUITE_HPP
-#define	UNITTEST__TESTSUITE_HPP
+#ifndef	UNITTEST_TESTSUITE_HPP
+#define	UNITTEST_TESTSUITE_HPP
 
 #include "harness.hpp"
 
@@ -38,4 +38,4 @@ namespace unittest
 	};
 }
 
-#endif	// UNITTEST__TESTSUITE_HPP
+#endif	// UNITTEST_TESTSUITE_HPP

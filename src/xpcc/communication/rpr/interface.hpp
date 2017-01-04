@@ -9,8 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_RPR__INTERFACE_HPP
-#define	XPCC_RPR__INTERFACE_HPP
+#ifndef	XPCC_RPR_INTERFACE_HPP
+#define	XPCC_RPR_INTERFACE_HPP
 
 #include <cstddef>
 #include <stdint.h>
@@ -152,4 +152,4 @@ namespace xpcc
 
 #include "interface_impl.hpp"
 
-#endif	// XPCC_RPR__INTERFACE_HPP
+#endif	// XPCC_RPR_INTERFACE_HPP

@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__BLOCK_ALLOCATOR_HPP
+#ifndef	XPCC_BLOCK_ALLOCATOR_HPP
 	#error	"Don't include this file directly use 'block_allocator.hpp' instead!"
 #endif
 
@@ -211,9 +211,9 @@ template<typename T, unsigned int BLOCK_SIZE >
 xpcc_always_inline T *
 xpcc::BlockAllocator<T, BLOCK_SIZE>::alignPointer(void * ptr) const
 {
-	// (XPCC__ALIGNMENT - 1) is used as a bitmask
-	std::size_t misalignment = ((uintptr_t) ptr & (XPCC__ALIGNMENT - 1));
-#if XPCC__ALIGNMENT == 8
+	// (XPCC_ALIGNMENT - 1) is used as a bitmask
+	std::size_t misalignment = ((uintptr_t) ptr & (XPCC_ALIGNMENT - 1));
+#if XPCC_ALIGNMENT == 8
 	const uint8_t offset[8] = { 6, 5, 4, 3, 2, 1, 0, 7 };
 #else
 	const uint8_t offset[4] = { 2, 1, 0, 3 };

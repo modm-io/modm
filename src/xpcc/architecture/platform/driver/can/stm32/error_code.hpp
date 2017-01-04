@@ -13,8 +13,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32__ERROR_HPP
-#define XPCC_STM32__ERROR_HPP
+#ifndef XPCC_STM32_ERROR_HPP
+#define XPCC_STM32_ERROR_HPP
 
 namespace xpcc
 {

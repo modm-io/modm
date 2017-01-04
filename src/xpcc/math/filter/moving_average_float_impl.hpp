@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__MOVING_AVERAGE_HPP
+#ifndef XPCC_MOVING_AVERAGE_HPP
 	#error	"Don't include this file directly, use 'moving_average.hpp' instead!"
 #endif
 

@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PC__TERMINAL_HPP
-#define XPCC_PC__TERMINAL_HPP
+#ifndef XPCC_PC_TERMINAL_HPP
+#define XPCC_PC_TERMINAL_HPP
 
 #include <modm/io/iodevice.hpp>
 
@@ -45,4 +45,4 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC_PC__TERMINAL_HPP
+#endif	// XPCC_PC_TERMINAL_HPP

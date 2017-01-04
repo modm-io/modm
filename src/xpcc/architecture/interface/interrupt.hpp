@@ -90,7 +90,7 @@
 
 #else
 
-#ifdef XPCC__CPU_AVR
+#ifdef XPCC_CPU_AVR
 
 #	define XPCC_ISR_NAME(vector) \
 		vector ## _vect
@@ -101,7 +101,7 @@
 #	define XPCC_ISR(vector, ...) \
 		ISR( vector ## _vect, ##__VA_ARGS__)
 
-#elif defined XPCC__CPU_ARM
+#elif defined XPCC_CPU_ARM
 
 #	define XPCC_ISR_NAME(vector) \
 		vector ## _IRQHandler

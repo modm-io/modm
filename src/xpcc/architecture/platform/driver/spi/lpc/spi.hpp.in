@@ -14,8 +14,8 @@
 
 {{ generation_block }}
 
-#ifndef XPCC_LPC11__SPI_{{ id }}_HPP
-#define XPCC_LPC11__SPI_{{ id }}_HPP
+#ifndef XPCC_LPC11_SPI_{{ id }}_HPP
+#define XPCC_LPC11_SPI_{{ id }}_HPP
 
 #include <stdint.h>
 #include <modm/communication/spi/spi_master.hpp>
@@ -276,4 +276,4 @@ namespace xpcc
 		};
 	} // lpc namespace
 } // xpcc namespace
-#endif // XPCC_LPC11__SPI_{{ id }}_HPP
+#endif // XPCC_LPC11_SPI_{{ id }}_HPP

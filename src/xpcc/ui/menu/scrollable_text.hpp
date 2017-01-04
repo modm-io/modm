@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SCROLLABLE_TEXT_HPP
-#define XPCC__SCROLLABLE_TEXT_HPP
+#ifndef XPCC_SCROLLABLE_TEXT_HPP
+#define XPCC_SCROLLABLE_TEXT_HPP
 
 #include <stdint.h>
 
@@ -119,4 +119,4 @@ namespace xpcc
 	
 	};
 }
-#endif // XPCC__SCROLLABLE_TEXT_HPP
+#endif // XPCC_SCROLLABLE_TEXT_HPP

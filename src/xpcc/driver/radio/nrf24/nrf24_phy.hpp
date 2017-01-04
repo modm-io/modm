@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__NRF24_PHY_HPP
-#define XPCC__NRF24_PHY_HPP
+#ifndef XPCC_NRF24_PHY_HPP
+#define XPCC_NRF24_PHY_HPP
 
 #include <stdint.h>
 #include <modm/debug/logger.hpp>

@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__AT45DB0X1D_HPP
-#define XPCC__AT45DB0X1D_HPP
+#ifndef XPCC_AT45DB0X1D_HPP
+#define XPCC_AT45DB0X1D_HPP
 
 namespace xpcc
 {
@@ -306,4 +306,4 @@ namespace xpcc
 
 #include "at45db0x1d_impl.hpp"
 
-#endif // XPCC__AT45DB0X1D_HPP
+#endif // XPCC_AT45DB0X1D_HPP

@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LPC11__TIMER_{{ id }}_HPP
-#define XPCC_LPC11__TIMER_{{ id }}_HPP
+#ifndef XPCC_LPC11_TIMER_{{ id }}_HPP
+#define XPCC_LPC11_TIMER_{{ id }}_HPP
 
 #include <stdint.h>
 #include <modm/utils/utils.hpp>
@@ -125,4 +125,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_LPC11__TIMER_{{ id }}_HPP
+#endif // XPCC_LPC11_TIMER_{{ id }}_HPP

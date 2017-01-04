@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__ERROR_REPORT_HPP
-#define XPCC__ERROR_REPORT_HPP
+#ifndef XPCC_ERROR_REPORT_HPP
+#define XPCC_ERROR_REPORT_HPP
 
 #include <stdint.h>
 
@@ -59,4 +59,4 @@ namespace xpcc
 	};
 }
 
-#endif	// XPCC__ERROR_REPORT_HPP
+#endif	// XPCC_ERROR_REPORT_HPP

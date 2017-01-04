@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SAB__MASTER_HPP
-#define XPCC_SAB__MASTER_HPP
+#ifndef XPCC_SAB_MASTER_HPP
+#define XPCC_SAB_MASTER_HPP
 
 #include <stdint.h>
 #include <modm/processing/timer.hpp>
@@ -126,4 +126,4 @@ namespace xpcc
 
 #include "master_impl.hpp"
 
-#endif	// XPCC_SAB__MASTER_HPP
+#endif	// XPCC_SAB_MASTER_HPP

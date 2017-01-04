@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__LINE_SEGMENT_2D_HPP
+#ifndef XPCC_LINE_SEGMENT_2D_HPP
 	#error	"Don't include this file directly, use 'line_segment_2d.hpp' instead!"
 #endif
 

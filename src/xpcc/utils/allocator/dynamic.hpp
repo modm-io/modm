@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ALLOCATOR__DYNAMIC_HPP
-#define XPCC_ALLOCATOR__DYNAMIC_HPP
+#ifndef XPCC_ALLOCATOR_DYNAMIC_HPP
+#define XPCC_ALLOCATOR_DYNAMIC_HPP
 
 #include "allocator_base.hpp"
 
@@ -76,4 +76,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_ALLOCATOR__DYNAMIC_HPP
+#endif // XPCC_ALLOCATOR_DYNAMIC_HPP

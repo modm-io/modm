@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SCP1000_HPP
+#ifndef XPCC_SCP1000_HPP
 	#error	"Don't include this file directly, use 'scp1000.hpp' instead!"
 #endif
 
@@ -43,7 +43,7 @@ xpcc::Scp1000<Spi, Cs, Int>::initialize(scp1000::Operation opMode)
 {
 	chipSelect.setOutput();
 	chipSelect.set();
-#if defined XPCC__CPU_ATXMEGA
+#if defined XPCC_CPU_ATXMEGA
 	interruptPin.setInput(::xpcc::atxmega::PULLDOWN);
 #else
 	interruptPin.setInput();

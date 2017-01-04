@@ -16,7 +16,7 @@
 using xpcc::AssertionHandler;
 using xpcc::Abandonment;
 
-#ifdef XPCC__OS_OSX
+#ifdef XPCC_OS_OSX
 extern AssertionHandler __assertion_table_start __asm("section$start$__DATA$xpcc_assertion");
 extern AssertionHandler __assertion_table_end __asm("section$end$__DATA$xpcc_assertion");
 #else

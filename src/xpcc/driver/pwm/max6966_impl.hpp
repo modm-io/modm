@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__MAX6966_HPP
+#ifndef XPCC_MAX6966_HPP
 #	error "Don't include this file directly, use 'max6966.hpp' instead!"
 #endif
 

@@ -103,4 +103,4 @@ protected:
 
 #include "adns9800_impl.hpp"
 
-#endif // XPCC__ADNS9800_HPP
+#endif // XPCC_ADNS9800_HPP

@@ -14,8 +14,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FONT__NUMBERS_14X32_HPP
-#define	XPCC_FONT__NUMBERS_14X32_HPP
+#ifndef XPCC_FONT_NUMBERS_14X32_HPP
+#define	XPCC_FONT_NUMBERS_14X32_HPP
 
 #include <modm/architecture/driver/accessor.hpp>
 
@@ -41,5 +41,5 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC_FONT__NUMBERS_14X32_HPP
+#endif	// XPCC_FONT_NUMBERS_14X32_HPP
 

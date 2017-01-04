@@ -68,7 +68,7 @@ xpcc::IOStream::writeInteger(uint16_t value)
 void
 xpcc::IOStream::writeInteger(int32_t value)
 {
-#if defined(XPCC__CPU_AVR)
+#if defined(XPCC_CPU_AVR)
 	char buffer[ArithmeticTraits<int32_t>::decimalDigits + 1]; // +1 for '\0'
 
 	// Uses the optimized non standard function 'ltoa()' which is
@@ -89,7 +89,7 @@ xpcc::IOStream::writeInteger(int32_t value)
 void
 xpcc::IOStream::writeInteger(uint32_t value)
 {
-#if defined(XPCC__CPU_AVR)
+#if defined(XPCC_CPU_AVR)
 	char buffer[ArithmeticTraits<uint32_t>::decimalDigits + 1]; // +1 for '\0'
 
 	// Uses the optimized non standard function 'ultoa()' which is
@@ -116,7 +116,7 @@ xpcc::IOStream::writeInteger(uint32_t value)
 #endif
 }
 
-#ifndef XPCC__CPU_AVR
+#ifndef XPCC_CPU_AVR
 void
 xpcc::IOStream::writeInteger(int64_t value)
 {
@@ -225,7 +225,7 @@ xpcc::IOStream::operator << (const myfunc& value)
 xpcc::IOStream&
 xpcc::IOStream::operator << (const void* p)
 {
-#if XPCC__SIZEOF_POINTER == 2
+#if XPCC_SIZEOF_POINTER == 2
 
 	this->device->write('0');
 	this->device->write('x');
@@ -235,7 +235,7 @@ xpcc::IOStream::operator << (const void* p)
 	writeHex(value >> 8);
 	writeHex(value);
 
-#elif XPCC__SIZEOF_POINTER == 4
+#elif XPCC_SIZEOF_POINTER == 4
 
 	this->device->write('0');
 	this->device->write('x');
@@ -247,7 +247,7 @@ xpcc::IOStream::operator << (const void* p)
 	writeHex(value >> 8);
 	writeHex(value);
 
-#elif XPCC__SIZEOF_POINTER == 8
+#elif XPCC_SIZEOF_POINTER == 8
 
 	this->device->write('0');
 	this->device->write('x');

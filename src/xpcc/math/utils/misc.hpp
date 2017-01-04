@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_MATH_UTILS_HPP
-#define	XPCC_MATH_UTILS_HPP
+#ifndef	XPCC_MATH_UTILS_MISC_HPP
+#define	XPCC_MATH_UTILS_MISC_HPP
 
 #include <cstddef>
 #include <cmath>
@@ -164,4 +164,4 @@ max(const T& a, const T& b, Compare compare)
 
 }	// namespace xpcc
 
-#endif	// XPCC_MATH_UTILS_HPP
+#endif

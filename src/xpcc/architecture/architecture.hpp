@@ -18,9 +18,9 @@
  * Supported platforms
  */
 
-#ifndef XPCC__ARCHITECTURE_HPP
-#define XPCC__ARCHITECTURE_HPP
+#ifndef XPCC_ARCHITECTURE_HPP
+#define XPCC_ARCHITECTURE_HPP
 
 #include "driver.hpp"
 
-#endif	// XPCC__ARCHITECTURE_HPP
+#endif	// XPCC_ARCHITECTURE_HPP

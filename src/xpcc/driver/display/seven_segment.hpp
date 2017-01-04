@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SEVEN_SEGMENT_DISPLAY_HPP
-#define XPCC__SEVEN_SEGMENT_DISPLAY_HPP
+#ifndef XPCC_SEVEN_SEGMENT_DISPLAY_HPP
+#define XPCC_SEVEN_SEGMENT_DISPLAY_HPP
 
 #include <stdint.h>
 #include <modm/architecture/interface/gpio.hpp>
@@ -97,4 +97,4 @@ namespace xpcc
 
 #include "seven_segment_impl.hpp"
 
-#endif // XPCC__SEVEN_SEGMENT_DISPLAY_HPP
+#endif // XPCC_SEVEN_SEGMENT_DISPLAY_HPP

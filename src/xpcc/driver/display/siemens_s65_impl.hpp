@@ -20,7 +20,7 @@
  * http://www.juras-projects.org/eng/lcd.php
  */
 
-#ifndef XPCC__SIEMENS_S65_HPP
+#ifndef XPCC_SIEMENS_S65_HPP
 #	error	"Don't include this file directly, use 'siemens_s65.hpp' instead!"
 #endif
 

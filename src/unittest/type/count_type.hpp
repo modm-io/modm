@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef UNITTEST__COUNT_TYPE_HPP
-#define UNITTEST__COUNT_TYPE_HPP
+#ifndef UNITTEST_COUNT_TYPE_HPP
+#define UNITTEST_COUNT_TYPE_HPP
 
 #include <cstddef>
 #include <stdint.h>
@@ -50,4 +50,4 @@ namespace unittest
 	};
 }
 
-#endif // UNITTEST__COUNT_TYPE_HPP
+#endif // UNITTEST_COUNT_TYPE_HPP

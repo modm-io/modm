@@ -14,8 +14,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__CHOICE_MENU_ENTRY
-#define XPCC__CHOICE_MENU_ENTRY
+#ifndef XPCC_CHOICE_MENU_ENTRY
+#define XPCC_CHOICE_MENU_ENTRY
 
 #include <stdint.h>
 #include "scrollable_text.hpp"
@@ -31,4 +31,4 @@ namespace xpcc
 		bool defaultValue;
 	};
 }
-#endif // XPCC__CHOICE_MENU_ENTRY
+#endif // XPCC_CHOICE_MENU_ENTRY

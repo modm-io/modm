@@ -13,8 +13,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__ANGLE_HPP
-#define	XPCC__ANGLE_HPP
+#ifndef	XPCC_ANGLE_HPP
+#define	XPCC_ANGLE_HPP
 
 #include <cmath>
 #include <math.h>
@@ -123,4 +123,4 @@ namespace xpcc
 	};
 }
 
-#endif	// XPCC__ANGLE_HPP
+#endif	// XPCC_ANGLE_HPP

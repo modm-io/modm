@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__AD7280A_HPP
-#define XPCC__AD7280A_HPP
+#ifndef XPCC_AD7280A_HPP
+#define XPCC_AD7280A_HPP
 
 #include <stdint.h>
 
@@ -258,4 +258,4 @@ namespace xpcc
 
 #include "ad7280a_impl.hpp"
 
-#endif // XPCC__AD7280A_HPP
+#endif // XPCC_AD7280A_HPP

@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__BUTTON_HPP
+#ifndef XPCC_BUTTON_HPP
 	#error	"Don't include this file directly, use 'button.hpp' instead!"
 #endif
 

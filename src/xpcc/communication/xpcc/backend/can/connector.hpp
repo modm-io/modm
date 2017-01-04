@@ -14,8 +14,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__CAN_CONNECTOR_HPP
-#define	XPCC__CAN_CONNECTOR_HPP
+#ifndef	XPCC_CAN_CONNECTOR_HPP
+#define	XPCC_CAN_CONNECTOR_HPP
 
 #include <modm/container/linked_list.hpp>
 #include "../backend_interface.hpp"
@@ -242,4 +242,4 @@ namespace xpcc
 
 #include "connector_impl.hpp"
 
-#endif	// XPCC__CAN_CONNECTOR_HPP
+#endif	// XPCC_CAN_CONNECTOR_HPP

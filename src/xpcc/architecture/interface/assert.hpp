@@ -139,11 +139,11 @@ xpcc_abandon(const char * module,
 
 #else
 
-#if defined XPCC__CPU_ARM || defined XPCC__CPU_AVR
+#if defined XPCC_CPU_ARM || defined XPCC_CPU_AVR
 #	define XPCC_ASSERTION_LINKER_SECTION ".assertion"
-#elif defined XPCC__OS_OSX
+#elif defined XPCC_OS_OSX
 #	define XPCC_ASSERTION_LINKER_SECTION "__DATA,xpcc_assertion"
-#elif defined XPCC__OS_LINUX
+#elif defined XPCC_OS_LINUX
 #	define XPCC_ASSERTION_LINKER_SECTION "xpcc_assertion"
 #endif
 

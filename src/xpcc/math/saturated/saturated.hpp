@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__SATURATED_HPP
-#define	XPCC__SATURATED_HPP
+#ifndef	XPCC_SATURATED_HPP
+#define	XPCC_SATURATED_HPP
 
 #include <modm/utils/arithmetic_traits.hpp>
 
@@ -121,4 +121,4 @@ namespace xpcc
 
 #include "saturated_impl.hpp"
 
-#endif	// XPCC__SATURATED_HPP
+#endif	// XPCC_SATURATED_HPP

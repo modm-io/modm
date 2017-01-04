@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__TIME_HPP
-#define XPCC__TIME_HPP
+#ifndef XPCC_TIME_HPP
+#define XPCC_TIME_HPP
 
 #include <stdint.h>
 
@@ -79,4 +79,4 @@ namespace xpcc
 	};
 }
 
-#endif	// XPCC__TIME_HPP
+#endif	// XPCC_TIME_HPP

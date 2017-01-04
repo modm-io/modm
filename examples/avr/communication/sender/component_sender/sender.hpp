@@ -13,8 +13,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef COMPONENT__SENDER_HPP
-#define COMPONENT__SENDER_HPP
+#ifndef COMPONENT_SENDER_HPP
+#define COMPONENT_SENDER_HPP
 
 #include <modm/communication/xpcc/abstract_component.hpp>
 #include <modm/processing/timer.hpp>
@@ -41,4 +41,4 @@ namespace component
 	};
 }
 
-#endif // COMPONENT__SENDER_HPP
+#endif // COMPONENT_SENDER_HPP

@@ -9,7 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_TOKEN_RING__NODE_HPP
+#ifndef	XPCC_TOKEN_RING_NODE_HPP
 #	error	"Don't include this file directly, use 'node.hpp' instead!"
 #endif
 

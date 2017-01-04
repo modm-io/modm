@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__FLASH_READER_HPP
+#ifndef	XPCC_FLASH_READER_HPP
 	#error	"Don't include this file directly, use 'flash_reader.hpp' instead!"
 #endif
 

@@ -9,8 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__ZEROMQ_CONNECTOR_HPP
-#define	XPCC__ZEROMQ_CONNECTOR_HPP
+#ifndef	XPCC_ZEROMQ_CONNECTOR_HPP
+#define	XPCC_ZEROMQ_CONNECTOR_HPP
 
 #include <cstring>		// for std::memcpy
 
@@ -192,4 +192,4 @@ protected:
 
 } // xpcc namespace
 
-#endif // XPCC__ZEROMQ_CONNECTOR_HPP
+#endif // XPCC_ZEROMQ_CONNECTOR_HPP

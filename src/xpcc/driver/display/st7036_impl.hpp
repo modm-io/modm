@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__ST7036_HPP
+#ifndef XPCC_ST7036_HPP
 	#error	"Don't include this file directly, use 'st7036.hpp' instead!"
 #endif
 

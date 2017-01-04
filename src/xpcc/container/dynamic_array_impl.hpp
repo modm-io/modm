@@ -13,7 +13,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__DYNAMIC_ARRAY_HPP
+#ifndef XPCC_DYNAMIC_ARRAY_HPP
 	#error	"Don't include this file directly, use 'vector.hpp' instead"
 #endif
 

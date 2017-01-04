@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SD_HPP
-#define XPCC__SD_HPP
+#ifndef XPCC_SD_HPP
+#define XPCC_SD_HPP
 
 #include "fat.hpp"
 
@@ -21,4 +21,4 @@ namespace xpcc
 	
 }
 
-#endif // XPCC__SD_HPP
+#endif // XPCC_SD_HPP

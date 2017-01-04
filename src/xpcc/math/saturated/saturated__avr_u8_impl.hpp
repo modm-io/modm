@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SATURATED_HPP
+#ifndef XPCC_SATURATED_HPP
 	#error	"Don't include this file directly use 'math/saturated.hpp' instead!"
 #endif
 

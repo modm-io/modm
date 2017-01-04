@@ -12,8 +12,8 @@
 
 {{ generation_block }}
 
-#ifndef XPCC_STM32__COMP{{ id }}_HPP
-#define XPCC_STM32__COMP{{ id }}_HPP
+#ifndef XPCC_STM32_COMP{{ id }}_HPP
+#define XPCC_STM32_COMP{{ id }}_HPP
 
 /**
  * @ingroup 	{{target.string}}
@@ -712,4 +712,4 @@ namespace xpcc
 				"feature is enabled on you platform?"
 #endif
 
-#endif	//  XPCC_STM32__COMP{{ id }}_HPP
+#endif	//  XPCC_STM32_COMP{{ id }}_HPP

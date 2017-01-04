@@ -13,8 +13,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	UNITTEST__REPORTER_HPP
-#define	UNITTEST__REPORTER_HPP
+#ifndef	UNITTEST_REPORTER_HPP
+#define	UNITTEST_REPORTER_HPP
 
 #include <stdint.h>
 
@@ -86,4 +86,4 @@ namespace unittest
 	};
 }
 
-#endif	// UNITTEST__REPORTER_HPP
+#endif	// UNITTEST_REPORTER_HPP

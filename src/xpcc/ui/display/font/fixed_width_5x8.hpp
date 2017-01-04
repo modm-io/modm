@@ -14,8 +14,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FONT__FIXED_WIDTH_5X8_HPP
-#define	XPCC_FONT__FIXED_WIDTH_5X8_HPP
+#ifndef XPCC_FONT_FIXED_WIDTH_5X8_HPP
+#define	XPCC_FONT_FIXED_WIDTH_5X8_HPP
 
 #include <modm/architecture/driver/accessor.hpp>
 
@@ -41,5 +41,5 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC_FONT__FIXED_WIDTH_5X8_HPP
+#endif	// XPCC_FONT_FIXED_WIDTH_5X8_HPP
 

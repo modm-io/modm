@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__AT45DB0X1D_HPP
+#ifndef XPCC_AT45DB0X1D_HPP
 	#error	"Don't include this file directly, use 'at45db0x1d.hpp' instead!"
 #endif
 

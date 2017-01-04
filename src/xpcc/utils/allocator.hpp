@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__ALLOCATOR_HPP
-#define XPCC__ALLOCATOR_HPP
+#ifndef XPCC_ALLOCATOR_HPP
+#define XPCC_ALLOCATOR_HPP
 
 #include "allocator/dynamic.hpp"
 #include "allocator/static.hpp"
@@ -33,4 +33,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC__ALLOCATOR_HPP
+#endif // XPCC_ALLOCATOR_HPP

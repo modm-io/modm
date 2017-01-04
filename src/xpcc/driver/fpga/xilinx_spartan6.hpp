@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__XILINX_SPARTAN_6
-#define XPCC__XILINX_SPARTAN_6
+#ifndef XPCC_XILINX_SPARTAN_6
+#define XPCC_XILINX_SPARTAN_6
 
 #include <modm/architecture/architecture.hpp>
 #include <modm/architecture/interface/gpio.hpp>
@@ -80,4 +80,4 @@ private:
 
 #include "xilinx_spartan6_impl.hpp"
 
-#endif // XPCC__XILINX_SPARTAN_6
+#endif // XPCC_XILINX_SPARTAN_6

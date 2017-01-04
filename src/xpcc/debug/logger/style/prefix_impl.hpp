@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LOG__PREFIX_HPP
+#ifndef XPCC_LOG_PREFIX_HPP
 	#error "Don't include this file directly, use 'prefix.hpp' instead!"
 #endif
 

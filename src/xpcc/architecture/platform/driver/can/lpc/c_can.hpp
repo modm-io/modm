@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LPC11C__C_CAN_HPP
-#define XPCC_LPC11C__C_CAN_HPP
+#ifndef XPCC_LPC11C_C_CAN_HPP
+#define XPCC_LPC11C_C_CAN_HPP
 
 #include <modm/architecture/interface/can.hpp>
 
@@ -205,4 +205,4 @@ protected:
 } // lpc namespace
 } // xpcc namespace
 
-#endif // XPCC_LPC11C__C_CAN_HPP
+#endif // XPCC_LPC11C_C_CAN_HPP

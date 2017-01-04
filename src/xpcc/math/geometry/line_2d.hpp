@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__LINE_2D_HPP
-#define XPCC__LINE_2D_HPP
+#ifndef XPCC_LINE_2D_HPP
+#define XPCC_LINE_2D_HPP
 
 #include "vector.hpp"
 #include "point_set_2d.hpp"
@@ -103,4 +103,4 @@ namespace xpcc
 
 #include "line_2d_impl.hpp"
 
-#endif // XPCC__LINE_2D_HPP
+#endif // XPCC_LINE_2D_HPP

@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__MAX6966_HPP
-#define XPCC__MAX6966_HPP
+#ifndef XPCC_MAX6966_HPP
+#define XPCC_MAX6966_HPP
 
 #include <stdint.h>
 #include <modm/architecture/interface/gpio.hpp>
@@ -261,4 +261,4 @@ namespace xpcc
 
 #include "max6966_impl.hpp"
 
-#endif // XPCC__MAX6966_HPP
+#endif // XPCC_MAX6966_HPP

@@ -12,9 +12,9 @@
 
 #include <modm/architecture/architecture.hpp>
 
-GPIO__OUTPUT(Out, A, 0);
-GPIO__INPUT(In, A, 1);
-GPIO__IO(Io, A, 2);
+GPIO_OUTPUT(Out, A, 0);
+GPIO_INPUT(In, A, 1);
+GPIO_IO(Io, A, 2);
 
 int
 main()

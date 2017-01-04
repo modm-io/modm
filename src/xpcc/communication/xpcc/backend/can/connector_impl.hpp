@@ -13,7 +13,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__CAN_CONNECTOR_HPP
+#ifndef XPCC_CAN_CONNECTOR_HPP
 	#error	"Don't include this file directly, use 'can_connector.hpp' instead!"
 #endif
 

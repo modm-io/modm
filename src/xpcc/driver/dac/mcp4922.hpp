@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__MCP4922_HPP
-#define XPCC__MCP4922_HPP
+#ifndef XPCC_MCP4922_HPP
+#define XPCC_MCP4922_HPP
 
 namespace xpcc
 {
@@ -98,4 +98,4 @@ namespace xpcc
 
 #include "mcp4922_impl.hpp"
 
-#endif // XPCC__MCP4922_HPP
+#endif // XPCC_MCP4922_HPP

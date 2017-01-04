@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__ST7565_HPP
+#ifndef XPCC_ST7565_HPP
 	#error	"Don't include this file directly, use 'st7565.hpp' instead!"
 #endif
 

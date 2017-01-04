@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__DEQUE_HPP
-#define	XPCC__DEQUE_HPP
+#ifndef	XPCC_DEQUE_HPP
+#define	XPCC_DEQUE_HPP
 
 #include <cstddef>
 
@@ -165,4 +165,4 @@ namespace xpcc
 
 #include "deque_impl.hpp"
 
-#endif	// XPCC__DEQUE_HPP
+#endif	// XPCC_DEQUE_HPP

@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__PCA9685_HPP
-#define XPCC__PCA9685_HPP
+#ifndef XPCC_PCA9685_HPP
+#define XPCC_PCA9685_HPP
 
 #include <modm/architecture/interface/i2c_device.hpp>
 
@@ -198,4 +198,4 @@ public:
 
 #include "pca9685_impl.hpp"
 
-#endif // XPCC__PCA9685_HPP
+#endif // XPCC_PCA9685_HPP

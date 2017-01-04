@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SPI_RAM_HPP
-#define XPCC__SPI_RAM_HPP
+#ifndef XPCC_SPI_RAM_HPP
+#define XPCC_SPI_RAM_HPP
 
 #include <stdint.h>
 
@@ -164,4 +164,4 @@ namespace xpcc
 
 #include "spi_ram_impl.hpp"
 
-#endif // XPCC__SPI_RAM_HPP
+#endif // XPCC_SPI_RAM_HPP

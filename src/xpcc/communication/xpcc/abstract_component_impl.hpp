@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__ABSTRACT_COMPONENT_HPP
+#ifndef	XPCC_ABSTRACT_COMPONENT_HPP
 	#error	"Don't include this file directly, use 'abstract_component.hpp' instead"
 #endif
 

@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__BITBANG_MEMORY_INTERFACE_HPP
-#define XPCC__BITBANG_MEMORY_INTERFACE_HPP
+#ifndef XPCC_BITBANG_MEMORY_INTERFACE_HPP
+#define XPCC_BITBANG_MEMORY_INTERFACE_HPP
 
 namespace xpcc
 {
@@ -66,4 +66,4 @@ namespace xpcc
 
 #include "bitbang_memory_interface_impl.hpp"
 
-#endif // XPCC__BITBANG_MEMORY_INTERFACE_HPP
+#endif // XPCC_BITBANG_MEMORY_INTERFACE_HPP

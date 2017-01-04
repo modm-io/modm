@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__MATRIX_HPP
+#ifndef XPCC_MATRIX_HPP
 #	error	"Don't include this file directly, use 'matrix.hpp' instead!"
 #endif
 

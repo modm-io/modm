@@ -11,21 +11,21 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FILTER__MEDIAN_HPP
+#ifndef XPCC_FILTER_MEDIAN_HPP
 	#error	"Don't include this file directly, use 'median.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
-#define XPCC_MEDIAN__SORT(a,b) do { if (a > b) { XPCC_MEDIAN__SWAP(a, b); } } while (0);
-#define XPCC_MEDIAN__SWAP(a,b) do { T temp = a; a = b; b = temp; } while (0);
+#define XPCC_MEDIAN_SORT(a,b) do { if (a > b) { XPCC_MEDIAN_SWAP(a, b); } } while (0);
+#define XPCC_MEDIAN_SWAP(a,b) do { T temp = a; a = b; b = temp; } while (0);
 
 #include "median_3_impl.hpp"
 #include "median_5_impl.hpp"
 #include "median_7_impl.hpp"
 #include "median_9_impl.hpp"
 
-#undef XPCC_MEDIAN__SORT
-#undef XPCC_MEDIAN__SWAP
+#undef XPCC_MEDIAN_SORT
+#undef XPCC_MEDIAN_SWAP
 
 // ----------------------------------------------------------------------------
 // TODO General implementation

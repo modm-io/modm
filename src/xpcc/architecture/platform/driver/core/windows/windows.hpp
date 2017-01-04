@@ -13,8 +13,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__WINDOWS_HPP
-#define XPCC__WINDOWS_HPP
+#ifndef XPCC_WINDOWS_HPP
+#define XPCC_WINDOWS_HPP
 
 /**
  * \internal
@@ -125,4 +125,4 @@ namespace std
 	isinf(float f);
 }
 
-#endif // XPCC__WINDOWS_HPP
+#endif // XPCC_WINDOWS_HPP

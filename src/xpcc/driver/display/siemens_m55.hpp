@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SIEMENS_M55_HPP
-#define XPCC__SIEMENS_M55_HPP
+#ifndef XPCC_SIEMENS_M55_HPP
+#define XPCC_SIEMENS_M55_HPP
 
 #include <modm/architecture/driver/delay.hpp>
 
@@ -52,4 +52,4 @@ namespace xpcc
 
 #include "siemens_m55_impl.hpp"
 
-#endif // XPCC__SIEMENS_M55_HPP
+#endif // XPCC_SIEMENS_M55_HPP

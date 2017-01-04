@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__QUATERNION_HPP
-#define XPCC__QUATERNION_HPP
+#ifndef XPCC_QUATERNION_HPP
+#define XPCC_QUATERNION_HPP
 
 #include <cmath>
 #include <stdint.h>
@@ -112,4 +112,4 @@ namespace xpcc
 
 #include "quaternion_impl.hpp"
 
-#endif	// XPCC__QUATERNION_HPP
+#endif	// XPCC_QUATERNION_HPP

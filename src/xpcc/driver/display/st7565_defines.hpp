@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__ST7565_DEFINES_HPP
-#define XPCC__ST7565_DEFINES_HPP
+#ifndef XPCC_ST7565_DEFINES_HPP
+#define XPCC_ST7565_DEFINES_HPP
 
 // ----------------------------------------------------------------------------
 // Defines for the ST7565 display controller.
@@ -105,4 +105,4 @@ namespace xpcc
 	#define ST7565_NOP					0xE3
 }
 
-#endif // XPCC__ST7565_DEFINES_HPP
+#endif // XPCC_ST7565_DEFINES_HPP

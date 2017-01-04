@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__DS18B20_HPP
-#define XPCC__DS18B20_HPP
+#ifndef XPCC_DS18B20_HPP
+#define XPCC_DS18B20_HPP
 
 #include <modm/architecture/interface/one_wire.hpp>
 
@@ -129,4 +129,4 @@ namespace xpcc
 
 #include "ds18b20_impl.hpp"
 
-#endif // XPCC__DS18B20_HPP
+#endif // XPCC_DS18B20_HPP

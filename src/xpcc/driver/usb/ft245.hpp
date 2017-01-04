@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__FT245_HPP
-#define XPCC__FT245_HPP
+#ifndef XPCC_FT245_HPP
+#define XPCC_FT245_HPP
 
 #include <modm/architecture/interface/gpio.hpp>
 
@@ -118,4 +118,4 @@ namespace xpcc
 
 #include "ft245_impl.hpp"
 
-#endif // XPCC__FT2425_HPP
+#endif // XPCC_FT2425_HPP

@@ -13,8 +13,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__BUFFERED_GRAPHIC_DISPLAY_HPP
-#define XPCC__BUFFERED_GRAPHIC_DISPLAY_HPP
+#ifndef XPCC_BUFFERED_GRAPHIC_DISPLAY_HPP
+#define XPCC_BUFFERED_GRAPHIC_DISPLAY_HPP
 
 #include <stdlib.h>
 #include "graphic_display.hpp"
@@ -95,4 +95,4 @@ namespace xpcc
 
 #include "buffered_graphic_display_impl.hpp"
 
-#endif	// XPCC__GRAPHIC_DISPLAY_HPP
+#endif	// XPCC_GRAPHIC_DISPLAY_HPP

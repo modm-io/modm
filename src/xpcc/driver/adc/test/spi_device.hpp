@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef TEST__SPI_DEVICE_HPP
-#define TEST__SPI_DEVICE_HPP
+#ifndef TEST_SPI_DEVICE_HPP
+#define TEST_SPI_DEVICE_HPP
 
 #include <cstddef>
 #include <stdint.h>
@@ -127,5 +127,5 @@ namespace test
 	};
 }
 
-#endif // TEST__SPI_DEVICE_HPP
+#endif // TEST_SPI_DEVICE_HPP
 

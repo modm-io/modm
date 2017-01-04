@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__FAT_HPP
-#define XPCC__FAT_HPP
+#ifndef XPCC_FAT_HPP
+#define XPCC_FAT_HPP
 
 #include <stdint.h>
 #include <fatfs/ff.h>
@@ -155,4 +155,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC__FAT_HPP
+#endif // XPCC_FAT_HPP

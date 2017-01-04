@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_MATH__OPERATOR_HPP
+#ifndef	XPCC_MATH_OPERATOR_HPP
 	#error	"Don't include this file directly, use 'operator.hpp' instead!"
 #endif
 

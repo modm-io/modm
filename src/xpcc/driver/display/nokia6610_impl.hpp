@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__NOKIA6610_HPP
+#ifndef XPCC_NOKIA6610_HPP
 #error	"Don't include this file directly, use 'nokia6610.hpp' instead!"
 #endif
 

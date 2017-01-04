@@ -13,7 +13,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__ADS7843_HPP
+#ifndef XPCC_ADS7843_HPP
 #	error "Don't include this file directly, use 'ads7843.hpp' instead!"
 #endif
 

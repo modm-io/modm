@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__CIRCLE_2D_HPP
+#ifndef XPCC_CIRCLE_2D_HPP
 	#error	"Don't include this file directly, use 'circle_2d.hpp' instead!"
 #endif
 

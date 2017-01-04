@@ -13,9 +13,9 @@
 
 #include <modm/architecture/architecture.hpp>
 
-GPIO__OUTPUT(Out, 0, 0);
-GPIO__INPUT(In, 0, 1);
-GPIO__IO(Io, 0, 2);
+GPIO_OUTPUT(Out, 0, 0);
+GPIO_INPUT(In, 0, 1);
+GPIO_IO(Io, 0, 2);
 
 int
 main()

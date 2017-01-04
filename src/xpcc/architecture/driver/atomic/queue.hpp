@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_ATOMIC__QUEUE_HPP
-#define	XPCC_ATOMIC__QUEUE_HPP
+#ifndef	XPCC_ATOMIC_QUEUE_HPP
+#define	XPCC_ATOMIC_QUEUE_HPP
 
 #include <cstddef>
 #include <stdint.h>
@@ -101,4 +101,4 @@ namespace xpcc
 
 #include "queue_impl.hpp"
 
-#endif	// XPCC_ATOMIC__QUEUE_HPP
+#endif	// XPCC_ATOMIC_QUEUE_HPP

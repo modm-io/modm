@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__TOUCHSCREEN_CALIBRATOR_HPP
-#define XPCC__TOUCHSCREEN_CALIBRATOR_HPP
+#ifndef XPCC_TOUCHSCREEN_CALIBRATOR_HPP
+#define XPCC_TOUCHSCREEN_CALIBRATOR_HPP
 
 namespace xpcc
 {
@@ -42,9 +42,9 @@ namespace xpcc
 	};
 }
 
-#endif // XPCC__TOUCHSCREEN_CALIBRATOR_HPP
+#endif // XPCC_TOUCHSCREEN_CALIBRATOR_HPP
 
-#ifndef XPCC__TOUCHSCREEN_CALIBRATOR_HPP
+#ifndef XPCC_TOUCHSCREEN_CALIBRATOR_HPP
 #	error "Don't include this file directly, use touchscreen_calibrator.hpp instead!"
 #endif
 

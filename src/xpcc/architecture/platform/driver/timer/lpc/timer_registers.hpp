@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LPC11__TIMER_REGISTERS_HPP
-#define XPCC_LPC11__TIMER_REGISTERS_HPP
+#ifndef XPCC_LPC11_TIMER_REGISTERS_HPP
+#define XPCC_LPC11_TIMER_REGISTERS_HPP
 
 namespace xpcc
 {
@@ -95,4 +95,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_LPC11__TIMER_REGISTERS_HPP
+#endif // XPCC_LPC11_TIMER_REGISTERS_HPP

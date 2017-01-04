@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__NOKIA6610_DEFINES_HPP
-#define XPCC__NOKIA6610_DEFINES_HPP
+#ifndef XPCC_NOKIA6610_DEFINES_HPP
+#define XPCC_NOKIA6610_DEFINES_HPP
 
 // ----------------------------------------------------------------------------
 // Defines for the NOKIA6610 display controller.
@@ -110,4 +110,4 @@ namespace xpcc{
 	}
 }
 
-#endif // XPCC__NOKIA6610_DEFINES_HPP
+#endif // XPCC_NOKIA6610_DEFINES_HPP

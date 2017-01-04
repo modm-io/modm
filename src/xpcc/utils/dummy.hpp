@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__DUMMY_HPP
-#define XPCC__DUMMY_HPP
+#ifndef XPCC_DUMMY_HPP
+#define XPCC_DUMMY_HPP
 
 namespace xpcc
 {
@@ -26,4 +26,4 @@ namespace xpcc
 	dummy();
 }
 
-#endif // XPCC__DUMMY_HPP
+#endif // XPCC_DUMMY_HPP

@@ -13,7 +13,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__COMMUNICATOR_HPP
+#ifndef	XPCC_COMMUNICATOR_HPP
 	#error	"Don't include this file directly, use 'communicator.hpp' instead"
 #endif
 

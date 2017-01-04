@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SIEMENS_S75_HPP
-#define XPCC__SIEMENS_S75_HPP
+#ifndef XPCC_SIEMENS_S75_HPP
+#define XPCC_SIEMENS_S75_HPP
 
 #include <modm/architecture/driver/delay.hpp>
 #include <modm/driver/bus/bitbang_memory_interface.hpp>
@@ -146,4 +146,4 @@ namespace xpcc
 
 #include "siemens_s75_impl.hpp"
 
-#endif // XPCC__SIEMENS_S75_HPP
+#endif // XPCC_SIEMENS_S75_HPP

@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_AMNB__INTERFACE_HPP
+#ifndef	XPCC_AMNB_INTERFACE_HPP
 #	error	"Don't include this file directly, use 'interface.hpp' instead!"
 #endif
 

@@ -14,8 +14,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FONT__ARCADE_CLASSIC_HPP
-#define	XPCC_FONT__ARCADE_CLASSIC_HPP
+#ifndef XPCC_FONT_ARCADE_CLASSIC_HPP
+#define	XPCC_FONT_ARCADE_CLASSIC_HPP
 
 #include <modm/architecture/driver/accessor.hpp>
 
@@ -41,5 +41,5 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC_FONT__ARCADE_CLASSIC_HPP
+#endif	// XPCC_FONT_ARCADE_CLASSIC_HPP
 

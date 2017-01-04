@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__LINE_SEGMENT_2D_HPP
-#define XPCC__LINE_SEGMENT_2D_HPP
+#ifndef XPCC_LINE_SEGMENT_2D_HPP
+#define XPCC_LINE_SEGMENT_2D_HPP
 
 #include "geometric_traits.hpp"
 
@@ -133,4 +133,4 @@ namespace xpcc
 
 #include "line_segment_2d_impl.hpp"
 
-#endif // XPCC__LINE_SEGMENT_2D_HPP
+#endif // XPCC_LINE_SEGMENT_2D_HPP

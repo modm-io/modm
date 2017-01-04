@@ -13,8 +13,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SDL_DISPLAY_HPP
-#define XPCC__SDL_DISPLAY_HPP
+#ifndef XPCC_SDL_DISPLAY_HPP
+#define XPCC_SDL_DISPLAY_HPP
 
 #include <modm/ui/display.hpp>
 #include <modm/debug/logger.hpp>
@@ -84,4 +84,4 @@ namespace xpcc
 
 	};
 }
-#endif /* XPCC__SDL_DISPLAY_HPP */
+#endif /* XPCC_SDL_DISPLAY_HPP */

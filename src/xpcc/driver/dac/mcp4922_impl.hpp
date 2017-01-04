@@ -13,7 +13,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__MCP4922_HPP
+#ifndef XPCC_MCP4922_HPP
 	#error	"Don't include this file directly, use 'mcp4922.hpp' instead!"
 #endif
 

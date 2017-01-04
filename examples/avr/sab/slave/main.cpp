@@ -81,10 +81,10 @@ InOut inOut;
 // create a list of all possible actions
 FLASH_STORAGE(xpcc::sab::Action actionList[]) =
 {
-	SAB__ACTION( 'A', analogDigital,	AnalogDigital::readChannel,	1 ),
-	SAB__ACTION( 'D', inOut,			InOut::setDirection,		1 ),
-	SAB__ACTION( 'I', inOut,			InOut::readInput,			0 ),
-	SAB__ACTION( 'O', inOut,			InOut::setOutput,			1 ),
+	SAB_ACTION( 'A', analogDigital,	AnalogDigital::readChannel,	1 ),
+	SAB_ACTION( 'D', inOut,			InOut::setDirection,		1 ),
+	SAB_ACTION( 'I', inOut,			InOut::readInput,			0 ),
+	SAB_ACTION( 'O', inOut,			InOut::setOutput,			1 ),
 };
 
 // wrap the type definition inside a typedef to make the code more readable

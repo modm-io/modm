@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LPC__CLOCK_HPP
-#define XPCC_LPC__CLOCK_HPP
+#ifndef XPCC_LPC_CLOCK_HPP
+#define XPCC_LPC_CLOCK_HPP
 
 #include <stdint.h>
 #include "../common_clock.hpp"
@@ -152,4 +152,4 @@ namespace xpcc
 	}
 }
 
-#endif	//  XPCC_LPC__CLOCK_HPP
+#endif	//  XPCC_LPC_CLOCK_HPP

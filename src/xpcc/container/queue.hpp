@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__QUEUE_HPP
-#define	XPCC__QUEUE_HPP
+#ifndef	XPCC_QUEUE_HPP
+#define	XPCC_QUEUE_HPP
 
 #include <cstddef>
 
@@ -117,4 +117,4 @@ namespace xpcc
 
 }
 
-#endif	// XPCC__QUEUE_HPP
+#endif	// XPCC_QUEUE_HPP

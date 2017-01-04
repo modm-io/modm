@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_SAB2__CONSTANTS_HPP
-#define	XPCC_SAB2__CONSTANTS_HPP
+#ifndef	XPCC_SAB2_CONSTANTS_HPP
+#define	XPCC_SAB2_CONSTANTS_HPP
 
 #include <stdint.h>
 #include "../sab/constants.hpp"
@@ -39,8 +39,8 @@ namespace xpcc
 			 * the user should react to the error code, create a specific
 			 * one for the given problem.
 			 */
-			ERROR__GENERAL_ERROR = 0x00,
-			ERROR__NO_ACTION = 0x01, 		///< No corresponding action found for this command
+			ERROR_GENERAL_ERROR = 0x00,
+			ERROR_NO_ACTION = 0x01, 		///< No corresponding action found for this command
 			
 			/**
 			 * \brief	Unexpected payload length
@@ -48,7 +48,7 @@ namespace xpcc
 			 * The payload length of the received message differs from the
 			 * expected length for the given command.
 			 */
-			ERROR__WRONG_PAYLOAD_LENGTH = 0x02,
+			ERROR_WRONG_PAYLOAD_LENGTH = 0x02,
 			
 			/**
 			 * \brief	No response given by the user
@@ -56,7 +56,7 @@ namespace xpcc
 			 * This error code is generated when no response method is called
 			 * by the user during an action callback.
 			 */
-			ERROR__NO_RESPONSE = 0x03,
+			ERROR_NO_RESPONSE = 0x03,
 		};
 		
 		/**
@@ -87,4 +87,4 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC_SAB__CONSTANTS_HPP
+#endif	// XPCC_SAB_CONSTANTS_HPP
