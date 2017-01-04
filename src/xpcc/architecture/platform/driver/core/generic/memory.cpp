@@ -10,11 +10,11 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/detect.hpp>
+#include <modm/architecture/detect.hpp>
 
 #ifdef XPCC__OS_HOSTED
 
-#include <xpcc/architecture/interface/memory.hpp>
+#include <modm/architecture/interface/memory.hpp>
 #include <stdlib.h>
 
 void *

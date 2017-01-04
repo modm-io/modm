@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/filter/s_curve_controller.hpp>
+#include <modm/math/filter/s_curve_controller.hpp>
 
 #include "s_curve_controller_test.hpp"
 

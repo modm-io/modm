@@ -16,8 +16,8 @@
 #ifndef COMPONENT__SENDER_HPP
 #define COMPONENT__SENDER_HPP
 
-#include <xpcc/communication/xpcc/abstract_component.hpp>
-#include <xpcc/processing/timer.hpp>
+#include <modm/communication/xpcc/abstract_component.hpp>
+#include <modm/processing/timer.hpp>
 
 #include "communication/packets.hpp"
 

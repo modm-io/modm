@@ -17,8 +17,8 @@
  * from extern.
  */
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/communication/sab/slave.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/communication/sab/slave.hpp>
 
 using namespace xpcc::atmega;
 typedef xpcc::avr::SystemClock clock;

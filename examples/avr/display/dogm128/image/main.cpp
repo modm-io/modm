@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture.hpp>
-#include <xpcc/driver/display.hpp>
+#include <modm/architecture.hpp>
+#include <modm/driver/display.hpp>
 
 #include "images/image_64x64_0.hpp"
 #include "images/image_64x64_1.hpp"

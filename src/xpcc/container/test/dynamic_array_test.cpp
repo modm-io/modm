@@ -12,7 +12,7 @@
 // ----------------------------------------------------------------------------
 
 #include <unittest/type/count_type.hpp>
-#include <xpcc/container/dynamic_array.hpp>
+#include <modm/container/dynamic_array.hpp>
 
 #include "dynamic_array_test.hpp"
 

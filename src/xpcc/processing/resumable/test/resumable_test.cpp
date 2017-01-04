@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/processing/resumable.hpp>
+#include <modm/processing/resumable.hpp>
 #include "resumable_test.hpp"
 
 // ----------------------------------------------------------------------------
@@ -571,7 +571,7 @@ ResumableTest::testSpawn()
 	TEST_ASSERT_EQUALS(thread.state, 4);
 }
 
-#include <xpcc/math/filter/moving_average.hpp>
+#include <modm/math/filter/moving_average.hpp>
 
 class TestingSpawningComplexThread : public xpcc::NestedResumable<2>
 {

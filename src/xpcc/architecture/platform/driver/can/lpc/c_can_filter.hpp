@@ -15,7 +15,7 @@
 #ifndef XPCC_LPC11C__CAN_FILTER_HPP
 #define XPCC_LPC11C__CAN_FILTER_HPP
 
-#include <xpcc/architecture/interface/can.hpp>
+#include <modm/architecture/interface/can.hpp>
 
 #include "c_can_registers.h"
 

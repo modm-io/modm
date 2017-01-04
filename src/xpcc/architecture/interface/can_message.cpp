@@ -10,9 +10,9 @@
 // ----------------------------------------------------------------------------
 
 #include <stdint.h>
-#include <xpcc/io/iostream.hpp>
-#include <xpcc/architecture/utils.hpp>
-#include <xpcc/architecture/interface/can_message.hpp>
+#include <modm/io/iostream.hpp>
+#include <modm/architecture/utils.hpp>
+#include <modm/architecture/interface/can_message.hpp>
 
 namespace xpcc
 {

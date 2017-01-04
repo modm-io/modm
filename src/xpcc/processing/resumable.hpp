@@ -37,8 +37,8 @@
  * Here is a (slightly over-engineered) example:
  *
  * @code
- * #include <xpcc/architecture.hpp>
- * #include <xpcc/processing.hpp>
+ * #include <modm/architecture.hpp>
+ * #include <modm/processing.hpp>
  *
  * typedef GpioOutputB0 Led;
  *

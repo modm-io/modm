@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/geometry/location_2d.hpp>
+#include <modm/math/geometry/location_2d.hpp>
 
 #include "location_2d_test.hpp"
 

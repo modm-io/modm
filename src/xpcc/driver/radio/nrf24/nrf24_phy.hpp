@@ -16,9 +16,9 @@
 #define XPCC__NRF24_PHY_HPP
 
 #include <stdint.h>
-#include <xpcc/debug/logger.hpp>
+#include <modm/debug/logger.hpp>
 
-#include <xpcc/architecture/driver/delay.hpp>
+#include <modm/architecture/driver/delay.hpp>
 #include "nrf24_definitions.hpp"
 
 #undef  XPCC_LOG_LEVEL

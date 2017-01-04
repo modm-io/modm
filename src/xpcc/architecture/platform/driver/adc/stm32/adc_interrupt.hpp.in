@@ -12,9 +12,9 @@
 #ifndef XPCC_STM32_ADC_INTERRUPT_{{ id }}_HPP
 #define XPCC_STM32_ADC_INTERRUPT_{{ id }}_HPP
 
-#include <xpcc/utils/dummy.hpp>
+#include <modm/utils/dummy.hpp>
 #include "adc_{{ id }}.hpp"
-#include <xpcc/architecture/interface/adc_interrupt.hpp>
+#include <modm/architecture/interface/adc_interrupt.hpp>
 
 
 namespace xpcc

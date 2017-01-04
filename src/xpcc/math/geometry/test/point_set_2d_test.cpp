@@ -13,7 +13,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/geometry/point_set_2d.hpp>
+#include <modm/math/geometry/point_set_2d.hpp>
 
 #include "point_set_2d_test.hpp"
 

@@ -17,7 +17,7 @@
 #ifndef XPCC_FONT__FIXED_WIDTH_5X8_HPP
 #define	XPCC_FONT__FIXED_WIDTH_5X8_HPP
 
-#include <xpcc/architecture/driver/accessor.hpp>
+#include <modm/architecture/driver/accessor.hpp>
 
 namespace xpcc
 {

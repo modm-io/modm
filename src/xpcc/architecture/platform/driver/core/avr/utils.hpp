@@ -16,7 +16,7 @@
 #define XPCC_ATXMEGA_UTILS_HPP
 
 #include <stddef.h>		// for offsetof()
-#include <xpcc/architecture/utils.hpp>
+#include <modm/architecture/utils.hpp>
 #include "../../../device.hpp"
 
 namespace xpcc

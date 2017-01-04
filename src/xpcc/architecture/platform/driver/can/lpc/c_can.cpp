@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/debug/error_report.hpp>
-#include <xpcc/architecture/driver/atomic/queue.hpp>
+#include <modm/debug/error_report.hpp>
+#include <modm/architecture/driver/atomic/queue.hpp>
 
 #include "error_code.hpp"
 

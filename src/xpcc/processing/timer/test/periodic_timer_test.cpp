@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/processing/timer.hpp>
-#include <xpcc/architecture/driver/clock_dummy.hpp>
+#include <modm/processing/timer.hpp>
+#include <modm/architecture/driver/clock_dummy.hpp>
 
 #include "periodic_timer_test.hpp"
 

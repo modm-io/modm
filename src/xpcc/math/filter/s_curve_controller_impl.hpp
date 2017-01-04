@@ -19,7 +19,7 @@
 #endif
 
 
-#include <xpcc/math/utils.hpp>
+#include <modm/math/utils.hpp>
 
 // ----------------------------------------------------------------------------
 template<typename T>

@@ -15,7 +15,7 @@
 #ifndef XPCC_STM32_UART_SPI_MASTER{{ id }}_HPP
 #define XPCC_STM32_UART_SPI_MASTER{{ id }}_HPP
 
-#include <xpcc/architecture/interface/spi_master.hpp>
+#include <modm/architecture/interface/spi_master.hpp>
 #include "../uart/uart_hal_{{ id }}.hpp"
 #include "../uart/type_ids.hpp"
 #include "uart_spi_type_ids.hpp"

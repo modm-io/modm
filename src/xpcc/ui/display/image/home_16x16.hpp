@@ -14,7 +14,7 @@
 #ifndef BITMAP__HOME_16X16_HPP
 #define BITMAP__HOME_16X16_HPP
 
-#include <xpcc/architecture/driver/accessor.hpp>
+#include <modm/architecture/driver/accessor.hpp>
 
 namespace bitmap
 {

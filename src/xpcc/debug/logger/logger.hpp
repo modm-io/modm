@@ -17,8 +17,8 @@
 #ifndef XPCC__LOGGER_HPP
 #define XPCC__LOGGER_HPP
 
-#include <xpcc/architecture/utils.hpp>
-#include <xpcc/io/iostream.hpp>
+#include <modm/architecture/utils.hpp>
+#include <modm/io/iostream.hpp>
 
 #include "level.hpp"
 #include "style.hpp"

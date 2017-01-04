@@ -15,7 +15,7 @@
 #ifndef XPCC_RTOS__MUTEX_HPP
 #define XPCC_RTOS__MUTEX_HPP
 
-#include <xpcc/architecture/utils.hpp>
+#include <modm/architecture/utils.hpp>
 
 #ifdef XPCC__OS_HOSTED
 #	include "boost/mutex.hpp"

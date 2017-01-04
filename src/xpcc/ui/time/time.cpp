@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/driver/accessor.hpp>
+#include <modm/architecture/driver/accessor.hpp>
 #include "time.hpp"
 
 // ----------------------------------------------------------------------------

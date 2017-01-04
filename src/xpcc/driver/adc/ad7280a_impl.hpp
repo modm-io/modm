@@ -54,11 +54,11 @@
 #	error "Don't include this file directly! Use 'ad7280a.hpp' instead."
 #endif
 
-#include <xpcc/math/utils/bit_operation.hpp>
-#include <xpcc/utils/template_metaprogramming.hpp>
+#include <modm/math/utils/bit_operation.hpp>
+#include <modm/utils/template_metaprogramming.hpp>
 
 /*// TODO DEBUG!
-#include <xpcc/debug/logger.hpp>
+#include <modm/debug/logger.hpp>
 #undef XPCC_LOG_LEVEL
 #define XPCC_LOG_LEVEL	xpcc::log::DEBUG
 */

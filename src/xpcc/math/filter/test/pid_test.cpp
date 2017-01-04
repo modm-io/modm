@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/filter/pid.hpp>
+#include <modm/math/filter/pid.hpp>
 
 #include "pid_test.hpp"
 

@@ -17,8 +17,8 @@
 #define XPCC_SOFTWARE_SPI_MASTER_HPP
 
 #include <stdint.h>
-#include <xpcc/architecture/interface/spi_master.hpp>
-#include <xpcc/architecture/driver/delay.hpp>
+#include <modm/architecture/interface/spi_master.hpp>
+#include <modm/architecture/driver/delay.hpp>
 #include "../../gpio/generic/gpio.hpp"
 #include "type_ids.hpp"
 

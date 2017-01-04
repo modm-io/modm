@@ -12,9 +12,9 @@
 #ifndef XPCC_SOFTWARE_GPIO_HPP
 #define XPCC_SOFTWARE_GPIO_HPP
 
-#include <xpcc/architecture/utils.hpp>
-#include <xpcc/architecture/interface/gpio.hpp>
-#include <xpcc/utils/template_metaprogramming.hpp>
+#include <modm/architecture/utils.hpp>
+#include <modm/architecture/interface/gpio.hpp>
+#include <modm/utils/template_metaprogramming.hpp>
 
 namespace xpcc
 {
@@ -33,7 +33,7 @@ namespace xpcc
  *
  * Example:
  * @code
- * #include <xpcc/architecture/platform.hpp>
+ * #include <modm/architecture/platform.hpp>
  *
  * namespace pin
  * {
@@ -104,7 +104,7 @@ public:
  *
  * Example:
  * @code
- * #include <xpcc/architecture/platform.hpp>
+ * #include <modm/architecture/platform.hpp>
  *
  * typedef xpcc::GpioInverted< GpioOutputB0 > Led;
  *

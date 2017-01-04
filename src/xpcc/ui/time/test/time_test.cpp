@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/ui/time/time.hpp>
+#include <modm/ui/time/time.hpp>
 
 #include "time_test.hpp"
 

@@ -16,7 +16,7 @@
 %% import 'platform.macros' as platform with context
 
 #include <stdint.h>
-#include <xpcc/architecture/utils.hpp>
+#include <modm/architecture/utils.hpp>
 #include "../device.hpp"
 
 {{ platform.defines() }}

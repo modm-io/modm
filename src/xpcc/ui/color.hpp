@@ -16,8 +16,8 @@
 #define XPCC_COLOR_HPP
 
 #include <stdint.h>
-#include <xpcc/io/iostream.hpp>
-#include <xpcc/utils/arithmetic_traits.hpp>
+#include <modm/io/iostream.hpp>
+#include <modm/utils/arithmetic_traits.hpp>
 
 namespace xpcc
 {

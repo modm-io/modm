@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture.hpp>
-#include <xpcc/debug/logger.hpp>
+#include <modm/architecture.hpp>
+#include <modm/debug/logger.hpp>
 
 // Set the log level
 #undef	XPCC_LOG_LEVEL

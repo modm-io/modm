@@ -11,9 +11,9 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/driver/atomic/lock.hpp>
-#include <xpcc/architecture/driver/clock.hpp>
-#include <xpcc/utils/dummy.hpp>
+#include <modm/architecture/driver/atomic/lock.hpp>
+#include <modm/architecture/driver/clock.hpp>
+#include <modm/utils/dummy.hpp>
 
 #include "../../../../device.hpp"
 #include "systick_timer.hpp"

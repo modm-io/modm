@@ -15,7 +15,7 @@
 #define XPCC__NRF24_CONFIG_HPP
 
 #include <stdint.h>
-#include <xpcc/debug/logger.hpp>
+#include <modm/debug/logger.hpp>
 
 #include "nrf24_phy.hpp"
 #include "nrf24_definitions.hpp"

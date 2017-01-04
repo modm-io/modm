@@ -17,7 +17,7 @@
 #ifndef XPCC_FONT__NUMBERS_40X56_HPP
 #define	XPCC_FONT__NUMBERS_40X56_HPP
 
-#include <xpcc/architecture/driver/accessor.hpp>
+#include <modm/architecture/driver/accessor.hpp>
 
 namespace xpcc
 {

@@ -12,9 +12,9 @@
 #ifndef XPCC_MCP23X17_HPP
 #define XPCC_MCP23X17_HPP
 
-#include <xpcc/architecture/interface/gpio.hpp>
-#include <xpcc/architecture/interface/gpio_expander.hpp>
-#include <xpcc/architecture/interface/register.hpp>
+#include <modm/architecture/interface/gpio.hpp>
+#include <modm/architecture/interface/gpio_expander.hpp>
+#include <modm/architecture/interface/register.hpp>
 #include "mcp23_transport.hpp"
 
 namespace xpcc

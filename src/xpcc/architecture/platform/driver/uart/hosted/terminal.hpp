@@ -14,7 +14,7 @@
 #ifndef XPCC_PC__TERMINAL_HPP
 #define XPCC_PC__TERMINAL_HPP
 
-#include <xpcc/io/iodevice.hpp>
+#include <modm/io/iodevice.hpp>
 
 namespace xpcc
 {

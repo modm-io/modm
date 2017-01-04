@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture.hpp>
-#include <xpcc/driver/can/mcp2515.hpp>
+#include <modm/architecture.hpp>
+#include <modm/driver/can/mcp2515.hpp>
 
 using namespace xpcc::atmega;
 typedef xpcc::avr::SystemClock clock;

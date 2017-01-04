@@ -13,9 +13,9 @@
 #ifndef XPCC_VL6180_HPP
 #define XPCC_VL6180_HPP
 
-#include <xpcc/architecture/interface/i2c_device.hpp>
-#include <xpcc/architecture/driver/accessor.hpp>
-#include <xpcc/processing.hpp>
+#include <modm/architecture/interface/i2c_device.hpp>
+#include <modm/architecture/driver/accessor.hpp>
+#include <modm/processing.hpp>
 
 namespace xpcc
 {

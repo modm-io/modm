@@ -12,14 +12,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture.hpp>
-#include <xpcc/processing.hpp>
-#include <xpcc/debug.hpp>
+#include <modm/architecture.hpp>
+#include <modm/processing.hpp>
+#include <modm/debug.hpp>
 
-#include <xpcc/driver/display.hpp>
-#include <xpcc/ui/display/font.hpp>
+#include <modm/driver/display.hpp>
+#include <modm/ui/display/font.hpp>
 
-#include <xpcc/processing/rtos.hpp>
+#include <modm/processing/rtos.hpp>
 
 using namespace xpcc::stm32;
 

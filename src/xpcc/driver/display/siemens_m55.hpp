@@ -15,9 +15,9 @@
 #ifndef XPCC__SIEMENS_M55_HPP
 #define XPCC__SIEMENS_M55_HPP
 
-#include <xpcc/architecture/driver/delay.hpp>
+#include <modm/architecture/driver/delay.hpp>
 
-#include <xpcc/ui/display/buffered_graphic_display.hpp>
+#include <modm/ui/display/buffered_graphic_display.hpp>
 
 namespace xpcc
 {

@@ -16,7 +16,7 @@
 
 #include "dispatcher.hpp"
 
-#include <xpcc/debug/logger/logger.hpp>
+#include <modm/debug/logger/logger.hpp>
 // set the Loglevel
 #undef  XPCC_LOG_LEVEL
 #define XPCC_LOG_LEVEL xpcc::log::INFO

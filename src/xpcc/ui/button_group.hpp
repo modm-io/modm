@@ -18,8 +18,8 @@
 
 #include <stdint.h>
 
-#include <xpcc/architecture/utils.hpp>
-#include <xpcc/architecture/driver/atomic/lock.hpp>
+#include <modm/architecture/utils.hpp>
+#include <modm/architecture/driver/atomic/lock.hpp>
 
 namespace xpcc
 {

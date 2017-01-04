@@ -18,7 +18,7 @@
 #ifndef	XPCC__RESPONSE_CALLBACK_HPP
 #define	XPCC__RESPONSE_CALLBACK_HPP
 
-#include <xpcc/container/smart_pointer.hpp>
+#include <modm/container/smart_pointer.hpp>
 
 #include "backend/backend_interface.hpp"
 #include "communicatable.hpp"

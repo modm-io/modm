@@ -9,18 +9,18 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/debug/logger.hpp>
-#include <xpcc/architecture.hpp>
+#include <modm/debug/logger.hpp>
+#include <modm/architecture.hpp>
 
-#include <xpcc/architecture/interface/can.hpp>
-#include <xpcc/architecture/platform/driver/can/canusb/canusb.hpp>
-#include <xpcc/architecture/platform/driver/can/socketcan/socketcan.hpp>
+#include <modm/architecture/interface/can.hpp>
+#include <modm/architecture/platform/driver/can/canusb/canusb.hpp>
+#include <modm/architecture/platform/driver/can/socketcan/socketcan.hpp>
 
-#include <xpcc/communication.hpp>
-#include <xpcc/communication/xpcc/backend/can.hpp>
+#include <modm/communication.hpp>
+#include <modm/communication/xpcc/backend/can.hpp>
 
-#include <xpcc/communication/xpcc/backend/can/connector.hpp>
-#include <xpcc/communication/xpcc/backend/zeromq/connector.hpp>
+#include <modm/communication/xpcc/backend/can/connector.hpp>
+#include <modm/communication/xpcc/backend/zeromq/connector.hpp>
 
 /**
  * Listens to a CAN bus connected by a CAN2USB and publishes xpcc messages with zeromq.

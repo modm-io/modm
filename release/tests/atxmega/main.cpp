@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture.hpp>
+#include <modm/architecture.hpp>
 
 xpcc::xmega::BufferedUartD0 uart(9600);
 

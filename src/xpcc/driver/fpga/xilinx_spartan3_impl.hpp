@@ -18,7 +18,7 @@
 #endif
 
 #include <stdint.h>
-#include <xpcc/debug.hpp>
+#include <modm/debug.hpp>
 
 #undef  XPCC_LOG_LEVEL
 #define	XPCC_LOG_LEVEL xpcc::log::DEBUG

@@ -12,9 +12,9 @@
 #ifndef XPCC_{{ target["family"] | upper }}_ADC_INTERRUPT_HPP
 #define XPCC_{{ target["family"] | upper }}_ADC_INTERRUPT_HPP
 
-#include <xpcc/utils/dummy.hpp>
+#include <modm/utils/dummy.hpp>
 #include "adc.hpp"
-#include <xpcc/architecture/interface/adc_interrupt.hpp>
+#include <modm/architecture/interface/adc_interrupt.hpp>
 
 
 namespace xpcc

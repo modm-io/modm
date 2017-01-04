@@ -18,9 +18,9 @@
 #include "../device.hpp"
 #include "type_ids.hpp"
 #include "gpio_define.h"
-#include <xpcc/architecture/interface/gpio.hpp>
-#include <xpcc/architecture/interface/i2c.hpp>
-#include <xpcc/math/utils/bit_operation.hpp>
+#include <modm/architecture/interface/gpio.hpp>
+#include <modm/architecture/interface/i2c.hpp>
+#include <modm/math/utils/bit_operation.hpp>
 
 /**
  * @ingroup 	platform

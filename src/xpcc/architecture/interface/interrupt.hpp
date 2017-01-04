@@ -13,7 +13,7 @@
 #define XPCC_INTERRUPT_HPP
 
 #include <stdint.h>
-#include <xpcc/architecture/utils.hpp>
+#include <modm/architecture/utils.hpp>
 
 #ifdef __DOXYGEN__
 

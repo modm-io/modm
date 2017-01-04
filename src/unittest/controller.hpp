@@ -14,8 +14,8 @@
 #ifndef	UNITTEST__CONTROLLER_HPP
 #define	UNITTEST__CONTROLLER_HPP
 
-#include <xpcc/io/iostream.hpp>
-#include <xpcc/architecture/driver/accessor/flash.hpp>
+#include <modm/io/iostream.hpp>
+#include <modm/architecture/driver/accessor/flash.hpp>
 
 #include "reporter.hpp"
 

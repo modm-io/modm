@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/filter/debounce.hpp>
+#include <modm/math/filter/debounce.hpp>
 
 #include "debounce_test.hpp"
 

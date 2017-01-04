@@ -20,7 +20,7 @@
 #ifndef XPCC_STM32_UART_{{ id }}_HPP
 #define XPCC_STM32_UART_{{ id }}_HPP
 
-#include <xpcc/architecture/interface/uart.hpp>
+#include <modm/architecture/interface/uart.hpp>
 #include "type_ids.hpp"
 #include "uart_base.hpp"
 #include "uart_baudrate.hpp"

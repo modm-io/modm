@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <cmath>
 
-#include <xpcc/debug/logger/logger.hpp>
+#include <modm/debug/logger/logger.hpp>
 
 #ifndef XPCC_BME280_DATA_HPP
 #define XPCC_BME280_DATA_HPP

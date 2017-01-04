@@ -12,8 +12,8 @@
 #ifndef LEDS_HPP
 #define LEDS_HPP
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/ui/led.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/ui/led.hpp>
 
 // create the leds with these lambda callbacks
 xpcc::ui::Led orange([](uint8_t brightness)

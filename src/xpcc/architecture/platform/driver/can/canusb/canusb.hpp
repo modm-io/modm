@@ -21,7 +21,7 @@
 
 // FIXME: remove this dependency!
 #include "../../uart/hosted/serial_interface.hpp"
-#include <xpcc/architecture/interface/can.hpp>
+#include <modm/architecture/interface/can.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread.hpp>
 

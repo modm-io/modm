@@ -14,7 +14,7 @@
 #ifndef	XPCC__FLASH_READER_HPP
 #define	XPCC__FLASH_READER_HPP
 
-#include <xpcc/architecture/utils.hpp>
+#include <modm/architecture/utils.hpp>
 
 #ifdef	__DOXYGEN__
 

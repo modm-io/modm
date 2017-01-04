@@ -9,8 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/driver/pressure/bme280.hpp>
-#include <xpcc/debug/logger/logger.hpp>
+#include <modm/driver/pressure/bme280.hpp>
+#include <modm/debug/logger/logger.hpp>
 
 #include "bme280_test.hpp"
 

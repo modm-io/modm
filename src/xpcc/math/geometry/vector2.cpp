@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/utils/operator.hpp>
+#include <modm/math/utils/operator.hpp>
 
 #include "vector2.hpp"
 

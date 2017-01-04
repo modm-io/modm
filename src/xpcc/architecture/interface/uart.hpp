@@ -14,7 +14,7 @@
 #ifndef XPCC_INTERFACE_UART_HPP
 #define XPCC_INTERFACE_UART_HPP
 
-#include <xpcc/architecture/interface.hpp>
+#include <modm/architecture/interface.hpp>
 
 /**
  * @ingroup		interface

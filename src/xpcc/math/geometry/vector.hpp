@@ -18,7 +18,7 @@
 #include <cmath>
 #include <stdint.h>
 
-#include <xpcc/math/matrix.hpp>
+#include <modm/math/matrix.hpp>
 
 namespace xpcc
 {

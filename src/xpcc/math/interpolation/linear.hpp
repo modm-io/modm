@@ -16,9 +16,9 @@
 
 #include <stdint.h>
 
-#include <xpcc/utils/arithmetic_traits.hpp>
-#include <xpcc/container/pair.hpp>
-#include <xpcc/architecture/driver/accessor.hpp>
+#include <modm/utils/arithmetic_traits.hpp>
+#include <modm/container/pair.hpp>
+#include <modm/architecture/driver/accessor.hpp>
 
 namespace xpcc
 {

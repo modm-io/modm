@@ -12,9 +12,9 @@
 #ifndef XPCC_MCP23_TRANSPORT_HPP
 #define XPCC_MCP23_TRANSPORT_HPP
 
-#include <xpcc/architecture/interface/spi_device.hpp>
-#include <xpcc/architecture/interface/i2c_device.hpp>
-#include <xpcc/processing/resumable.hpp>
+#include <modm/architecture/interface/spi_device.hpp>
+#include <modm/architecture/interface/i2c_device.hpp>
+#include <modm/processing/resumable.hpp>
 
 namespace xpcc
 {

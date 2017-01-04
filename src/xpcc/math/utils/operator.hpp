@@ -17,7 +17,7 @@
 #include <cmath>
 #include <stdint.h>
 
-#include <xpcc/architecture/utils.hpp>
+#include <modm/architecture/utils.hpp>
 
 extern "C" uint16_t xpcc__sqrt32(uint32_t a);
 

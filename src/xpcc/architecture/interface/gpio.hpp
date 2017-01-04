@@ -14,7 +14,7 @@
 #define XPCC_GPIO_HPP
 
 #include <stdint.h>
-#include <xpcc/architecture/utils.hpp>
+#include <modm/architecture/utils.hpp>
 
 /**
  * @ingroup		interface
@@ -31,8 +31,8 @@
  *
  * Example:
  * @code
- * #include <xpcc/architecture/platform.hpp>
- * #include <xpcc/driver/lcd/st7036.hpp>
+ * #include <modm/architecture/platform.hpp>
+ * #include <modm/driver/lcd/st7036.hpp>
  *
  * typedef GpioOutputD7 Clk;
  * typedef GpioOutputD5 Mosi;
@@ -63,8 +63,8 @@
  *
  * Creating a simple flashing light:
  * @code
- * #include <xpcc/architecture/platform.hpp>
- * #include <xpcc/architecture/driver/delay.hpp>
+ * #include <modm/architecture/platform.hpp>
+ * #include <modm/architecture/driver/delay.hpp>
  *
  * typedef GpioOutputB0 Led;
  *

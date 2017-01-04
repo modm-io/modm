@@ -14,10 +14,10 @@
 #ifndef XPCC__ST7565_HPP
 #define XPCC__ST7565_HPP
 
-#include <xpcc/architecture/driver/accessor/flash.hpp>
-#include <xpcc/architecture/driver/delay.hpp>
+#include <modm/architecture/driver/accessor/flash.hpp>
+#include <modm/architecture/driver/delay.hpp>
 
-#include <xpcc/ui/display/buffered_graphic_display.hpp>
+#include <modm/ui/display/buffered_graphic_display.hpp>
 
 namespace xpcc
 {

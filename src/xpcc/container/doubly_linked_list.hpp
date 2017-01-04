@@ -17,7 +17,7 @@
 #define	XPCC__DOUBLY_LINKED_LIST_HPP
 
 #include <stdint.h>
-#include <xpcc/utils/allocator.hpp>
+#include <modm/utils/allocator.hpp>
 
 namespace xpcc
 {

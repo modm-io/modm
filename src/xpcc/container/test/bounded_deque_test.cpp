@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/container/deque.hpp>
+#include <modm/container/deque.hpp>
 
 #include "bounded_deque_test.hpp"
 

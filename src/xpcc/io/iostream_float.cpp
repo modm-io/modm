@@ -16,8 +16,8 @@
 #include <stdio.h>		// snprintf()
 #include <stdlib.h>
 
-#include <xpcc/utils/arithmetic_traits.hpp>
-#include <xpcc/utils/template_metaprogramming.hpp>
+#include <modm/utils/arithmetic_traits.hpp>
+#include <modm/utils/template_metaprogramming.hpp>
 
 #include "iostream.hpp"
 

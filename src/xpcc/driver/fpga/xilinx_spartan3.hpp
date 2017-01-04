@@ -13,8 +13,8 @@
 #ifndef XPCC__XILINX_SPARTAN_3
 #define XPCC__XILINX_SPARTAN_3
 
-#include <xpcc/architecture.hpp>
-#include <xpcc/architecture/interface/gpio.hpp>
+#include <modm/architecture.hpp>
+#include <modm/architecture/interface/gpio.hpp>
 #include "fpga_type.hpp"
 
 namespace xpcc

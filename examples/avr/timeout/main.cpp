@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/processing/timer.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/processing/timer.hpp>
 
 using namespace xpcc::atmega;
 

@@ -20,7 +20,7 @@
 // ----------------------------------------------------------------------------
 
 #include <stdlib.h>                   // for prototypes of malloc() and free()
-#include <xpcc/architecture/interface/memory.hpp>
+#include <modm/architecture/interface/memory.hpp>
 
 extern "C"
 {

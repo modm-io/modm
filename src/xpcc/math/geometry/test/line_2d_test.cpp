@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/geometry/line_2d.hpp>
+#include <modm/math/geometry/line_2d.hpp>
 
 #include "line_2d_test.hpp"
 

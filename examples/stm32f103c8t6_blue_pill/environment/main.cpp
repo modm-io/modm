@@ -9,11 +9,11 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/debug/logger.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/debug/logger.hpp>
 
-#include <xpcc/processing/timer.hpp>
-#include <xpcc/processing/protothread.hpp>
+#include <modm/processing/timer.hpp>
+#include <modm/processing/protothread.hpp>
 
 #include "hardware.hpp"
 

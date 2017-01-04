@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture.hpp>
-#include <xpcc/debug/logger.hpp>
+#include <modm/architecture.hpp>
+#include <modm/debug/logger.hpp>
 
 #include <xpcc_build_info.hpp>
 

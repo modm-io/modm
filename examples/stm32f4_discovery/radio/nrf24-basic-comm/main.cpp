@@ -11,12 +11,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/driver/radio/nrf24/nrf24_phy.hpp>
-#include <xpcc/debug/logger.hpp>
-#include <xpcc/processing.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/driver/radio/nrf24/nrf24_phy.hpp>
+#include <modm/debug/logger.hpp>
+#include <modm/processing.hpp>
 
-#include <xpcc/driver/radio/nrf24/nrf24_definitions.hpp>
+#include <modm/driver/radio/nrf24/nrf24_definitions.hpp>
 
 using xpcc::Nrf24Register;
 using xpcc::Nrf24Phy;

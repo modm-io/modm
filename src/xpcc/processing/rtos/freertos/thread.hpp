@@ -16,7 +16,7 @@
 #define XPCC_FREERTOS__THREAD_HPP
 
 #ifndef XPCC_RTOS__THREAD_HPP
-#	error "Don't include this file directly, use <xpcc/processing/rtos/thread.hpp>"
+#	error "Don't include this file directly, use <modm/processing/rtos/thread.hpp>"
 #endif
 
 #include <freertos/FreeRTOS.h>

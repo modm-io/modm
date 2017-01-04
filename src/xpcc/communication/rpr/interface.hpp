@@ -15,11 +15,11 @@
 #include <cstddef>
 #include <stdint.h>
 
-#include <xpcc/architecture/utils.hpp>
-#include <xpcc/utils/template_metaprogramming.hpp>
-#include <xpcc/container/queue.hpp>
-#include <xpcc/processing/timer.hpp>
-#include <xpcc/utils/allocator/dynamic.hpp>
+#include <modm/architecture/utils.hpp>
+#include <modm/utils/template_metaprogramming.hpp>
+#include <modm/container/queue.hpp>
+#include <modm/processing/timer.hpp>
+#include <modm/utils/allocator/dynamic.hpp>
 
 #include "constants.hpp"
 

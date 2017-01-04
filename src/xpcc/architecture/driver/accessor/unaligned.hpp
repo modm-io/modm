@@ -12,8 +12,8 @@
 #ifndef XPCC_ACCESSOR_UNALIGNED_HPP
 #define XPCC_ACCESSOR_UNALIGNED_HPP
 
-#include <xpcc/architecture/detect.hpp>
-#include <xpcc/architecture/utils.hpp>
+#include <modm/architecture/detect.hpp>
+#include <modm/architecture/utils.hpp>
 
 namespace xpcc
 {

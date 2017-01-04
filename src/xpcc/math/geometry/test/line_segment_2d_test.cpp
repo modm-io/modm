@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/geometry/line_segment_2d.hpp>
+#include <modm/math/geometry/line_segment_2d.hpp>
 
 #include "line_segment_2d_test.hpp"
 

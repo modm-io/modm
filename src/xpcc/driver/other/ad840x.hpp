@@ -14,8 +14,8 @@
 #define XPCC__AD840x_HPP
 
 #include <stdint.h>
-#include <xpcc/architecture/interface/gpio.hpp>
-#include <xpcc/architecture/driver/delay.hpp>
+#include <modm/architecture/interface/gpio.hpp>
+#include <modm/architecture/driver/delay.hpp>
 
 namespace xpcc
 {

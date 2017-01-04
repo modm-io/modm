@@ -14,7 +14,7 @@
 #ifndef XPCC__ST7036_HPP
 #define XPCC__ST7036_HPP
 
-#include <xpcc/ui/display/character_display.hpp>
+#include <modm/ui/display/character_display.hpp>
 
 namespace xpcc
 {

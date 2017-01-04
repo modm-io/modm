@@ -15,7 +15,7 @@
 #define	XPCC_ACCESSOR__RAM_HPP
 
 #include <cstddef>
-#include <xpcc/architecture/utils.hpp>
+#include <modm/architecture/utils.hpp>
 
 namespace xpcc
 {

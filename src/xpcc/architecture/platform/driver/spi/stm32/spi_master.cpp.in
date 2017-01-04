@@ -15,7 +15,7 @@
 // ----------------------------------------------------------------------------
 
 #include "spi_master_{{id}}.hpp"
-#include <xpcc/architecture/interface/register.hpp>
+#include <modm/architecture/interface/register.hpp>
 
 // Bit0: single transfer state
 // Bit1: block transfer state

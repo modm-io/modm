@@ -18,9 +18,9 @@
 
 #include <cstring>		// for std::memcpy
 #include <stdint.h>
-#include <xpcc/architecture/utils.hpp>
+#include <modm/architecture/utils.hpp>
 
-#include <xpcc/io/iostream.hpp>
+#include <modm/io/iostream.hpp>
 
 namespace xpcc
 {

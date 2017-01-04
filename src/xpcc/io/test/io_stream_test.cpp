@@ -15,7 +15,7 @@
 
 #include "io_stream_test.hpp"
 
-#include <xpcc/architecture/utils.hpp> // XPCC_ARRAY_SIZE
+#include <modm/architecture/utils.hpp> // XPCC_ARRAY_SIZE
 #include <stdio.h>	// snprintf
 #include <string.h>	// memset
 

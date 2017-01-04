@@ -20,8 +20,8 @@
 #ifndef XPCC_STM32_F072_DISCOVERY_HPP
 #define XPCC_STM32_F072_DISCOVERY_HPP
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/driver/inertial/l3gd20.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/driver/inertial/l3gd20.hpp>
 
 using namespace xpcc::stm32;
 

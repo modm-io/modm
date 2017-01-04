@@ -11,9 +11,9 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture.hpp>
-#include <xpcc/driver/display.hpp>
-#include <xpcc/ui/button_group.hpp>
+#include <modm/architecture.hpp>
+#include <modm/driver/display.hpp>
+#include <modm/ui/button_group.hpp>
 
 using namespace xpcc::atmega;
 

@@ -13,11 +13,11 @@
 #ifndef XPCC_SSD1306_HPP
 #define XPCC_SSD1306_HPP
 
-#include <xpcc/ui/display/buffered_graphic_display.hpp>
-#include <xpcc/processing/protothread.hpp>
-#include <xpcc/processing/resumable.hpp>
-#include <xpcc/architecture/interface/i2c_device.hpp>
-#include <xpcc/processing/timer.hpp>
+#include <modm/ui/display/buffered_graphic_display.hpp>
+#include <modm/processing/protothread.hpp>
+#include <modm/processing/resumable.hpp>
+#include <modm/architecture/interface/i2c_device.hpp>
+#include <modm/processing/timer.hpp>
 
 namespace xpcc
 {

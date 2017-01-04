@@ -12,9 +12,9 @@
 #ifndef XPCC_LSM303A_HPP
 #define XPCC_LSM303A_HPP
 
-#include <xpcc/architecture/interface/register.hpp>
-#include <xpcc/processing/resumable.hpp>
-#include <xpcc/math/utils/endianness.hpp>
+#include <modm/architecture/interface/register.hpp>
+#include <modm/processing/resumable.hpp>
+#include <modm/math/utils/endianness.hpp>
 #include "lis3_transport.hpp"
 
 namespace xpcc

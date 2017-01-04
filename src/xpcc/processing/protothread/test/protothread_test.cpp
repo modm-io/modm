@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/processing/protothread.hpp>
+#include <modm/processing/protothread.hpp>
 
 #include "protothread_test.hpp"
 

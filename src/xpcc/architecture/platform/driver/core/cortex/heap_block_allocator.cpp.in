@@ -23,7 +23,7 @@
 
 // ----------------------------------------------------------------------------
 // Using the XPCC Block Allocator
-#include <xpcc/architecture/driver/heap/block_allocator.hpp>
+#include <modm/architecture/driver/heap/block_allocator.hpp>
 
 #ifndef XPCC_MEMORY_BLOCK_ALLOCATOR_TYPE
 #define XPCC_MEMORY_BLOCK_ALLOCATOR_TYPE uint16_t

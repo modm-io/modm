@@ -15,7 +15,7 @@
 #ifndef XPCC_LOG_STYLE_WRAPPER__HPP
 #define XPCC_LOG_STYLE_WRAPPER__HPP
 
-#include <xpcc/io/iodevice.hpp>
+#include <modm/io/iodevice.hpp>
 #include "style.hpp"
 
 namespace xpcc

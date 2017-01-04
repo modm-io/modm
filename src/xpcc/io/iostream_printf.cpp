@@ -15,7 +15,7 @@
 #include <stdarg.h>
 #include <stdio.h>		// snprintf()
 #include <stdlib.h>
-#include <xpcc/math/utils/misc.hpp>        // xpcc::pow
+#include <modm/math/utils/misc.hpp>        // xpcc::pow
 
 #include "iostream.hpp"
 

@@ -24,8 +24,8 @@
 #include <string.h>		// for memset() and memcmp()
 #include <stdint.h>
 
-#include <xpcc/io/iostream.hpp>
-#include <xpcc/utils/template_metaprogramming.hpp>
+#include <modm/io/iostream.hpp>
+#include <modm/utils/template_metaprogramming.hpp>
 
 namespace xpcc
 {

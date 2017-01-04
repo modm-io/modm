@@ -11,9 +11,9 @@
 // ----------------------------------------------------------------------------
 
 #include "uart_spi_master_{{ id }}.hpp"
-#include <xpcc/architecture/driver/atomic.hpp>
-#include <xpcc/math/utils/bit_operation.hpp>
-#include <xpcc/architecture/interface/register.hpp>
+#include <modm/architecture/driver/atomic.hpp>
+#include <modm/math/utils/bit_operation.hpp>
+#include <modm/architecture/interface/register.hpp>
 
 %% if extended is not defined
 xpcc::{{target["family"]}}::UartSpiMaster{{id}}::DataOrder

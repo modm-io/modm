@@ -9,9 +9,9 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/debug/logger.hpp>
-#include <xpcc/processing.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/debug/logger.hpp>
+#include <modm/processing.hpp>
 
 // ----------------------------------------------------------------------------
 // Set the log level
@@ -34,7 +34,7 @@ Adc2::Channel sensorMapping[3] = {
 // the results are up to 16 bit wide
 uint32_t sensorData[3];
 // 3 channels and averages of 100 oversamples
-#include <xpcc/driver/adc/adc_sampler.hpp>
+#include <modm/driver/adc/adc_sampler.hpp>
 typedef xpcc::AdcSampler< AdcInterrupt2, 3, 100 > sensors;
 xpcc::ShortTimeout timeout(100);
 

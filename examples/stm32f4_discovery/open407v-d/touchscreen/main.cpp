@@ -14,12 +14,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
+#include <modm/architecture/platform.hpp>
 
-#include <xpcc/driver/display/parallel_tft.hpp>
-#include <xpcc/driver/bus/tft_memory_bus.hpp>
-#include <xpcc/ui/display/image.hpp>
-#include <xpcc/driver/touch/ads7843.hpp>
+#include <modm/driver/display/parallel_tft.hpp>
+#include <modm/driver/bus/tft_memory_bus.hpp>
+#include <modm/ui/display/image.hpp>
+#include <modm/driver/touch/ads7843.hpp>
 
 #include "touchscreen_calibrator.hpp"
 

@@ -12,8 +12,8 @@
 #ifndef THREAD_BLINK
 #define THREAD_BLINK
 
-#include <xpcc/processing/timer.hpp>
-#include <xpcc/processing/protothread.hpp>
+#include <modm/processing/timer.hpp>
+#include <modm/processing/protothread.hpp>
 
 class BlinkThread: public xpcc::pt::Protothread
 {

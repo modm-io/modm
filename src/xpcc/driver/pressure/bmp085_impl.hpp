@@ -13,8 +13,8 @@
 #ifndef XPCC_BMP085_HPP
 #	error  "Don't include this file directly, use 'bmp085.hpp' instead!"
 #endif
-#include <xpcc/math/utils/operator.hpp>
-#include <xpcc/math/utils/bit_operation.hpp>
+#include <modm/math/utils/operator.hpp>
+#include <modm/math/utils/bit_operation.hpp>
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >

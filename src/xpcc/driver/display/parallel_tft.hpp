@@ -15,8 +15,8 @@
 #ifndef XPCC__PARALLEL_TFT_HPP
 #define XPCC__PARALLEL_TFT_HPP
 
-#include <xpcc/architecture/driver/delay.hpp>
-#include <xpcc/ui/display/graphic_display.hpp>
+#include <modm/architecture/driver/delay.hpp>
+#include <modm/ui/display/graphic_display.hpp>
 
 namespace xpcc
 {

@@ -14,7 +14,7 @@
 #define XPCC_BOOST__SEMAPHORE_HPP
 
 #ifndef XPCC_RTOS__SEMAPHORE_HPP
-#	error "Don't include this file directly, use <xpcc/processing/rtos/semaphore.hpp>"
+#	error "Don't include this file directly, use <modm/processing/rtos/semaphore.hpp>"
 #endif
 
 #include <boost/thread/mutex.hpp>    

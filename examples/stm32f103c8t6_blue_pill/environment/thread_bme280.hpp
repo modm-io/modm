@@ -12,10 +12,10 @@
 #ifndef THREAD_BME280
 #define THREAD_BME280
 
-#include <xpcc/processing/timer.hpp>
-#include <xpcc/processing/protothread.hpp>
+#include <modm/processing/timer.hpp>
+#include <modm/processing/protothread.hpp>
 
-#include <xpcc/driver/pressure/bme280.hpp>
+#include <modm/driver/pressure/bme280.hpp>
 
 #include "hardware.hpp"
 

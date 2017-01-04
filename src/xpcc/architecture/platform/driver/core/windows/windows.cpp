@@ -13,7 +13,7 @@
 // ----------------------------------------------------------------------------
 
 #include "windows.hpp"
-#include <xpcc/math/utils/operator.hpp>
+#include <modm/math/utils/operator.hpp>
 #include <math.h>
 
 // ----------------------------------------------------------------------------

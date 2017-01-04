@@ -17,7 +17,7 @@
 #ifndef XPCC_FONT__SCRIPTO_NARROW_HPP
 #define	XPCC_FONT__SCRIPTO_NARROW_HPP
 
-#include <xpcc/architecture/driver/accessor.hpp>
+#include <modm/architecture/driver/accessor.hpp>
 
 namespace xpcc
 {

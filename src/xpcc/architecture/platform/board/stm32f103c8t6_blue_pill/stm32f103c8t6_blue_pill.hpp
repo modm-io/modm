@@ -21,7 +21,7 @@
 #ifndef XPCC_STM32_F103C8T6_BLUE_PILL_HPP
 #define XPCC_STM32_F103C8T6_BLUE_PILL_HPP
 
-#include <xpcc/architecture/platform.hpp>
+#include <modm/architecture/platform.hpp>
 
 using namespace xpcc::stm32;
 

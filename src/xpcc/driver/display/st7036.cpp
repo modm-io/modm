@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/driver.hpp>
+#include <modm/architecture/driver.hpp>
 #include "st7036.hpp"
 
 #include "xpcc_config.hpp"

@@ -12,7 +12,7 @@
 #ifndef XPCC_FT6X06_HPP
 #define XPCC_FT6X06_HPP
 
-#include <xpcc/architecture/interface/i2c_device.hpp>
+#include <modm/architecture/interface/i2c_device.hpp>
 
 namespace xpcc
 {

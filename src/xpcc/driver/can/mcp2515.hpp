@@ -17,9 +17,9 @@
 #define XPCC__MCP2515_HPP
 
 #include <stdint.h>
-#include <xpcc/architecture/driver/accessor.hpp>
-#include <xpcc/architecture/driver/delay.hpp>
-#include <xpcc/architecture/interface/can.hpp>
+#include <modm/architecture/driver/accessor.hpp>
+#include <modm/architecture/driver/delay.hpp>
+#include <modm/architecture/interface/can.hpp>
 
 #include "mcp2515_definitions.hpp"
 

@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
+#include <modm/architecture/platform.hpp>
 
 int global_a = 1;
 int global_b = 2;

@@ -13,7 +13,7 @@
 #define ANIMATIONS_HPP
 
 #include "leds.hpp"
-#include <xpcc/ui/animation.hpp>
+#include <modm/ui/animation.hpp>
 
 // apply some animations to the leds
 xpcc::ui::Pulse<uint8_t> pulse(red);

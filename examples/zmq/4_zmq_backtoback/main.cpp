@@ -9,13 +9,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/debug/logger.hpp>
-#include <xpcc/architecture.hpp>
+#include <modm/debug/logger.hpp>
+#include <modm/architecture.hpp>
 
-#include <xpcc/processing/timer.hpp>
+#include <modm/processing/timer.hpp>
 
-#include <xpcc/communication.hpp>
-#include <xpcc/communication/xpcc/backend/zeromq/connector.hpp>
+#include <modm/communication.hpp>
+#include <modm/communication/xpcc/backend/zeromq/connector.hpp>
 
 xpcc::PeriodicTimer pt(2000);
 

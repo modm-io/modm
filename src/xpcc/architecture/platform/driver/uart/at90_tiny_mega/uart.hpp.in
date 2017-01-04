@@ -22,7 +22,7 @@
 #define XPCC_{{target["family"] | upper}}__UART{{ id }}_HPP
 
 #include "../device.hpp"
-#include <xpcc/architecture/interface/uart.hpp>
+#include <modm/architecture/interface/uart.hpp>
 #include "type_ids.hpp"
 
 namespace xpcc

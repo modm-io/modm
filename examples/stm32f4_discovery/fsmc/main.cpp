@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/architecture/platform.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/architecture/platform.hpp>
 
 /*
  * This example shows how to use the FSMC in "Muxed Mode"

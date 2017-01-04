@@ -12,7 +12,7 @@
 #ifndef ENVIRONMENT_HARDWARE_HPP
 #define ENVIRONMENT_HARDWARE_HPP
 
-#include <xpcc/architecture/platform.hpp>
+#include <modm/architecture/platform.hpp>
 
 // ----------------------------------------------------------------------------
 // Sensors at I2C

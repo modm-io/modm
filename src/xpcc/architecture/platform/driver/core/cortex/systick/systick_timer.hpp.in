@@ -15,7 +15,7 @@
 #define XPCC_CORTEX_SYSTICK_TIMER_HPP
 
 #include <stdint.h>
-#include <xpcc/architecture/interface.hpp>
+#include <modm/architecture/interface.hpp>
 
 namespace xpcc
 {

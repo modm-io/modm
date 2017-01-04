@@ -9,8 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/driver/display/ssd1306.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/driver/display/ssd1306.hpp>
 
 /**
  * Example to demonstrate a XPCC graphics display SSD1306.

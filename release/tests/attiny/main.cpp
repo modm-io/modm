@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture.hpp>
+#include <modm/architecture.hpp>
 
 GPIO__OUTPUT(Out, B, 0);
 GPIO__INPUT(In, B, 1);

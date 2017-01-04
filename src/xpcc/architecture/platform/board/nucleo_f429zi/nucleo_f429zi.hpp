@@ -17,8 +17,8 @@
 #ifndef XPCC_STM32_NUCLEO_F429ZI_HPP
 #define XPCC_STM32_NUCLEO_F429ZI_HPP
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/debug/logger.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/debug/logger.hpp>
 
 using namespace xpcc::stm32;
 

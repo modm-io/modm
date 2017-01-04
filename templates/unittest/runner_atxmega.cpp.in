@@ -15,7 +15,7 @@
 // Please modify the corresponding 'runner_atxmega.cpp.in' file instead.
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
+#include <modm/architecture/platform.hpp>
 
 #include <unittest/reporter.hpp>
 #include <unittest/controller.hpp>

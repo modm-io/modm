@@ -22,7 +22,7 @@
 
 #include <stdint.h>
 // Defines for example the xpcc_always_inline macro
-#include <xpcc/architecture/utils.hpp>
+#include <modm/architecture/utils.hpp>
 
 // Include external device headers:
 %% for header in headers

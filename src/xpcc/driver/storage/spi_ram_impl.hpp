@@ -15,7 +15,7 @@
 	#error	"Don't include this file directly, use 'spi_ram.hpp' instead!"
 #endif
 
-#include <xpcc/architecture/driver/delay.hpp>
+#include <modm/architecture/driver/delay.hpp>
 
 template <typename Spi, typename Cs, typename Hold>
 Spi xpcc::SpiRam<Spi, Cs, Hold>::spi;

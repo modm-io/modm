@@ -15,8 +15,8 @@
 #ifndef XPCC_INTERFACE_I2C_HPP
 #define XPCC_INTERFACE_I2C_HPP
 
-#include <xpcc/architecture/interface.hpp>
-#include <xpcc/architecture/driver/delay.hpp>
+#include <modm/architecture/interface.hpp>
+#include <modm/architecture/driver/delay.hpp>
 
 /**
  * @ingroup		interface

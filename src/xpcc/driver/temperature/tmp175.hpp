@@ -14,9 +14,9 @@
 #ifndef XPCC_TMP175_HPP
 #define XPCC_TMP175_HPP
 
-#include <xpcc/architecture/interface/register.hpp>
-#include <xpcc/architecture/interface/i2c_device.hpp>
-#include <xpcc/processing/protothread.hpp>
+#include <modm/architecture/interface/register.hpp>
+#include <modm/architecture/interface/i2c_device.hpp>
+#include <modm/processing/protothread.hpp>
 #include "lm75.hpp"
 
 namespace xpcc

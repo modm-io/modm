@@ -15,7 +15,7 @@
 #ifndef XPCC_GUI_COLORPALETTE_HPP
 #define XPCC_GUI_COLORPALETTE_HPP
 
-#include <xpcc/ui/display/graphic_display.hpp>
+#include <modm/ui/display/graphic_display.hpp>
 
 
 namespace xpcc

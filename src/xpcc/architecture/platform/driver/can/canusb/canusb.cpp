@@ -14,12 +14,12 @@
 // ----------------------------------------------------------------------------
 
 #include <iostream>
-#include <xpcc/debug/logger.hpp>
+#include <modm/debug/logger.hpp>
 
-#include <xpcc/architecture/driver.hpp>
-#include <xpcc/processing/timer.hpp>
+#include <modm/architecture/driver.hpp>
+#include <modm/processing/timer.hpp>
 
-#include <xpcc/driver/can/can_lawicel_formatter.hpp>
+#include <modm/driver/can/can_lawicel_formatter.hpp>
 #include "canusb.hpp"
 
 #undef  XPCC_LOG_LEVEL

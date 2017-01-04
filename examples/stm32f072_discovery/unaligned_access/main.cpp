@@ -9,9 +9,9 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/architecture/driver/accessor.hpp>
-#include <xpcc/container/smart_pointer.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/architecture/driver/accessor.hpp>
+#include <modm/container/smart_pointer.hpp>
 
 using namespace Board;
 

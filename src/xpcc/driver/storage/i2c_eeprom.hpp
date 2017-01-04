@@ -15,8 +15,8 @@
 #ifndef XPCC_I2C_EEPROM_HPP
 #define XPCC_I2C_EEPROM_HPP
 
-#include <xpcc/processing/resumable.hpp>
-#include <xpcc/architecture/interface/i2c_device.hpp>
+#include <modm/processing/resumable.hpp>
+#include <modm/architecture/interface/i2c_device.hpp>
 
 namespace xpcc
 {

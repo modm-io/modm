@@ -16,7 +16,7 @@
 #define XPCC_UNITTEST_CAN_MESSAGE_HPP
 
 #include <unittest/testsuite.hpp>
-#include <xpcc/architecture/interface/can_message.hpp>
+#include <modm/architecture/interface/can_message.hpp>
 
 // @author strogly-typed
 class CanMessageTest : public unittest::TestSuite

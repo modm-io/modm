@@ -20,8 +20,8 @@
 
 #include <cstddef>
 
-#include <xpcc/architecture/detect.hpp>
-#include <xpcc/architecture/utils.hpp>
+#include <modm/architecture/detect.hpp>
+#include <modm/architecture/utils.hpp>
 
 #include <stdarg.h>	// va_list
 

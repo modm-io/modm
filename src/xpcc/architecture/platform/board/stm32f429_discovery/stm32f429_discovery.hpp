@@ -18,7 +18,7 @@
 #ifndef XPCC_STM32_F429_DISCOVERY_HPP
 #define XPCC_STM32_F429_DISCOVERY_HPP
 
-#include <xpcc/architecture/platform.hpp>
+#include <modm/architecture/platform.hpp>
 
 using namespace xpcc::stm32;
 

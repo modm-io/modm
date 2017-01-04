@@ -17,9 +17,9 @@
  *
  */
 
-#include <xpcc/architecture.hpp>
+#include <modm/architecture.hpp>
 
-#include <xpcc/debug/logger.hpp>
+#include <modm/debug/logger.hpp>
 
 using namespace xpcc::lpc;
 

@@ -17,7 +17,7 @@
 #include <stdint.h>
 #include "type_ids.hpp"
 #include "../device.hpp"
-#include <xpcc/architecture/interface/register.hpp>
+#include <modm/architecture/interface/register.hpp>
 
 namespace xpcc
 {

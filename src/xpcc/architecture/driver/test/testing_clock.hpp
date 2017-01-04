@@ -14,7 +14,7 @@
 #ifndef	TESTING_CLOCK_HPP
 #define	TESTING_CLOCK_HPP
 
-#include <xpcc/architecture/driver/clock.hpp>
+#include <modm/architecture/driver/clock.hpp>
 
 /**
  * Gain full access to xpcc::Clock

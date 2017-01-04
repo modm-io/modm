@@ -14,7 +14,7 @@
 #define XPCC_RESUMABLE_HPP
 
 #include "macros.hpp"
-#include <xpcc/architecture/utils.hpp>
+#include <modm/architecture/utils.hpp>
 #include <stdint.h>
 #include <initializer_list>
 

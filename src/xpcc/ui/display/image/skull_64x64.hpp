@@ -14,7 +14,7 @@
 #ifndef BITMAP__SKULL_64X64_HPP
 #define BITMAP__SKULL_64X64_HPP
 
-#include <xpcc/architecture/driver/accessor.hpp>
+#include <modm/architecture/driver/accessor.hpp>
 
 namespace bitmap
 {

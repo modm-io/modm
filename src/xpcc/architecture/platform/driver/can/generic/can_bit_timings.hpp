@@ -14,7 +14,7 @@
 #ifndef XPCC_COMMON_CAN_BIT_TIMINGS_HPP
 #define XPCC_COMMON_CAN_BIT_TIMINGS_HPP
 
-#include <xpcc/architecture/interface.hpp>
+#include <modm/architecture/interface.hpp>
 
 #include "../clock/common_clock.hpp"
 

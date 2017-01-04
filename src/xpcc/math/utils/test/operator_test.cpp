@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/utils/operator.hpp>
+#include <modm/math/utils/operator.hpp>
 
 #include "operator_test.hpp"
 

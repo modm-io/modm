@@ -10,9 +10,9 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/processing.hpp>
-#include <xpcc/driver/display/max7219matrix.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/processing.hpp>
+#include <modm/driver/display/max7219matrix.hpp>
 
 /**
  * Example to demonstrate a XPCC graphics display made

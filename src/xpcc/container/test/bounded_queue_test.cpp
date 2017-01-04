@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/container/queue.hpp>
+#include <modm/container/queue.hpp>
 
 #include "bounded_queue_test.hpp"
 

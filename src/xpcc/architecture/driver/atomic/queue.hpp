@@ -17,9 +17,9 @@
 
 #include <cstddef>
 #include <stdint.h>
-#include <xpcc/architecture/utils.hpp>
-#include <xpcc/architecture/driver/accessor.hpp>
-#include <xpcc/utils/template_metaprogramming.hpp>
+#include <modm/architecture/utils.hpp>
+#include <modm/architecture/driver/accessor.hpp>
+#include <modm/utils/template_metaprogramming.hpp>
 
 namespace xpcc
 {

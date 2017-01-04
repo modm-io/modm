@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/geometry/angle.hpp>
+#include <modm/math/geometry/angle.hpp>
 
 #include "angle_test.hpp"
 

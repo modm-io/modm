@@ -10,12 +10,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
+#include <modm/architecture/platform.hpp>
 
-#include <xpcc/processing.hpp>
-#include <xpcc/driver/position/vl6180.hpp>
-#include <xpcc/io/iostream.hpp>
-#include <xpcc/debug/logger.hpp>
+#include <modm/processing.hpp>
+#include <modm/driver/position/vl6180.hpp>
+#include <modm/io/iostream.hpp>
+#include <modm/debug/logger.hpp>
 
 xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > device;
 

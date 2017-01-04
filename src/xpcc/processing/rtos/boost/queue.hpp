@@ -14,14 +14,14 @@
 #define XPCC_BOOST__QUEUE_HPP
 
 #ifndef XPCC_RTOS__QUEUE_HPP
-#	error "Don't include this file directly, use <xpcc/processing/rtos/queue.hpp>"
+#	error "Don't include this file directly, use <modm/processing/rtos/queue.hpp>"
 #endif
 
 #include <stdint.h>
 #include <deque>
 
 #include <boost/thread/mutex.hpp>
-#include <xpcc/container/deque.hpp>
+#include <modm/container/deque.hpp>
 
 namespace xpcc
 {

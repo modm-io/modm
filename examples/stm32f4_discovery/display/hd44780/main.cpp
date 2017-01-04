@@ -23,13 +23,13 @@
  *
  */
 
-#include <xpcc/debug/logger.hpp>
-#include <xpcc/processing/timer.hpp>
-#include <xpcc/processing/protothread.hpp>
-#include <xpcc/driver/display/hd44780.hpp>
-#include <xpcc/driver/gpio/pca8574.hpp>
+#include <modm/debug/logger.hpp>
+#include <modm/processing/timer.hpp>
+#include <modm/processing/protothread.hpp>
+#include <modm/driver/display/hd44780.hpp>
+#include <modm/driver/gpio/pca8574.hpp>
 
-#include <xpcc/architecture/platform.hpp>
+#include <modm/architecture/platform.hpp>
 
 xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > device;
 xpcc::IOStream stream(device);

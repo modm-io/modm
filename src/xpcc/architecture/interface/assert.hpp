@@ -13,9 +13,9 @@
 #define XPCC_ASSERT_HPP
 
 #include <stdint.h>
-#include <xpcc/architecture/utils.hpp>
-#include <xpcc/utils/bit_constants.hpp>
-#include <xpcc/architecture/driver/accessor/flash.hpp>
+#include <modm/architecture/utils.hpp>
+#include <modm/utils/bit_constants.hpp>
+#include <modm/architecture/driver/accessor/flash.hpp>
 
 /**
  * @ingroup		interface

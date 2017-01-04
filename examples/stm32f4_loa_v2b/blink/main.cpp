@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture.hpp>
+#include <modm/architecture.hpp>
 #include "../stm32f4_loa_v2b.hpp"
 
 int

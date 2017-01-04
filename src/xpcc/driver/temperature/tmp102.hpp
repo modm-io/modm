@@ -14,10 +14,10 @@
 #ifndef XPCC_TMP102_HPP
 #define XPCC_TMP102_HPP
 
-#include <xpcc/architecture/interface/register.hpp>
-#include <xpcc/architecture/interface/i2c_device.hpp>
-#include <xpcc/processing/protothread.hpp>
-#include <xpcc/math/utils/endianness.hpp>
+#include <modm/architecture/interface/register.hpp>
+#include <modm/architecture/interface/i2c_device.hpp>
+#include <modm/processing/protothread.hpp>
+#include <modm/math/utils/endianness.hpp>
 
 #include "lm75.hpp"
 

@@ -15,7 +15,7 @@
 #define XPCC_LOG__STD_COLOUR_HPP
 
 #include "../style.hpp"
-#include <xpcc/utils/template_metaprogramming.hpp>
+#include <modm/utils/template_metaprogramming.hpp>
 
 namespace xpcc
 {

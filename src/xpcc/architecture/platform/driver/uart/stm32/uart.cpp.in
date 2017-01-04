@@ -22,7 +22,7 @@
 #include "uart_{{ id }}.hpp"
 
 %% if options["buffered"]
-#include <xpcc/architecture/driver/atomic.hpp>
+#include <modm/architecture/driver/atomic.hpp>
 
 namespace
 {

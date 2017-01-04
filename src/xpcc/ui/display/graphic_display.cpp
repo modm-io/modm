@@ -16,7 +16,7 @@
 // ----------------------------------------------------------------------------
 
 #include <stdlib.h>
-#include <xpcc/math/utils/bit_operation.hpp>
+#include <modm/math/utils/bit_operation.hpp>
 
 #include "font/fixed_width_5x8.hpp"
 #include "graphic_display.hpp"

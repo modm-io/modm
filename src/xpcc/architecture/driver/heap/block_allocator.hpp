@@ -18,8 +18,8 @@
 #include <stdint.h>
 #include <cstddef>
 
-#include <xpcc/architecture/utils.hpp>
-#include <xpcc/utils/arithmetic_traits.hpp>
+#include <modm/architecture/utils.hpp>
+#include <modm/utils/arithmetic_traits.hpp>
 
 /**
  * Memory allocator.

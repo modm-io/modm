@@ -11,12 +11,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture.hpp>
-#include <xpcc/debug/logger.hpp>
+#include <modm/architecture.hpp>
+#include <modm/debug/logger.hpp>
 
-#include <xpcc/ui/display/image.hpp>
-#include <xpcc/ui/gui.hpp>
-#include <xpcc/container.hpp>
+#include <modm/ui/display/image.hpp>
+#include <modm/ui/gui.hpp>
+#include <modm/container.hpp>
 
 #include "screens/homeview.hpp"
 #include "screens/choose_color.hpp"

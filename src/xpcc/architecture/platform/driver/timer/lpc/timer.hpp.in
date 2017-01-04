@@ -16,7 +16,7 @@
 #define XPCC_LPC11__TIMER_{{ id }}_HPP
 
 #include <stdint.h>
-#include <xpcc/utils.hpp>
+#include <modm/utils.hpp>
 
 #include "timer_registers.hpp"
 #include "../device.hpp"

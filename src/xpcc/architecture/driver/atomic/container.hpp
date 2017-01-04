@@ -15,7 +15,7 @@
 #define	XPCC_ATOMIC__CONTAINER_HPP
 
 #include "lock.hpp"
-#include <xpcc/architecture/driver/accessor.hpp>
+#include <modm/architecture/driver/accessor.hpp>
 
 namespace xpcc
 {

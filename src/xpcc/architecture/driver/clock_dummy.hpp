@@ -14,7 +14,7 @@
 #ifndef	XPCC_CLOCK_DUMMY_HPP
 #define XPCC_CLOCK_DUMMY_HPP
 
-#include <xpcc/processing/timer/timestamp.hpp>
+#include <modm/processing/timer/timestamp.hpp>
 
 namespace xpcc
 {

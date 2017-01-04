@@ -17,8 +17,8 @@
 #include "../style/prefix.hpp"
 #include "../style/std_colour.hpp"
 
-#include <xpcc/architecture/utils.hpp>
-#include <xpcc/architecture/platform/driver/uart/hosted/terminal.hpp>
+#include <modm/architecture/utils.hpp>
+#include <modm/architecture/platform/driver/uart/hosted/terminal.hpp>
 
 static xpcc::pc::Terminal device;
 

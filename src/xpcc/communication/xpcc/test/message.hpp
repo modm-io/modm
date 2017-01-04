@@ -14,7 +14,7 @@
 #ifndef MESSAGE_HPP
 #define MESSAGE_HPP
 
-#include <xpcc/communication.hpp>
+#include <modm/communication.hpp>
 
 struct Message
 {

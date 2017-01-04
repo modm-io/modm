@@ -12,7 +12,7 @@
 
 #include "../generic/common_clock.hpp"
 
-#include <xpcc/architecture/detect.hpp>
+#include <modm/architecture/detect.hpp>
 
 namespace xpcc
 {

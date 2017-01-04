@@ -19,7 +19,7 @@
 #include <cmath>
 #include <stdint.h>
 
-#include <xpcc/utils/arithmetic_traits.hpp>
+#include <modm/utils/arithmetic_traits.hpp>
 
 namespace xpcc
 {

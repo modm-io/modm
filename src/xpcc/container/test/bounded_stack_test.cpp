@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/container/stack.hpp>
+#include <modm/container/stack.hpp>
 
 #include "bounded_stack_test.hpp"
 

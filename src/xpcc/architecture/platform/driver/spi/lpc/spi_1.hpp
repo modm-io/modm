@@ -22,7 +22,7 @@
 #define XPCC_LPC11__SPI_1_HPP
 
 #include <stdint.h>
-#include <xpcc/communication/spi/spi_master.hpp>
+#include <modm/communication/spi/spi_master.hpp>
 
 #include "spi_registers.h"
 namespace xpcc

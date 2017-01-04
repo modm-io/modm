@@ -14,8 +14,8 @@
 #ifndef XPCC__SHIFT_REGISTER_OUTPUT_HPP
 #define XPCC__SHIFT_REGISTER_OUTPUT_HPP
 
-#include <xpcc/architecture/utils.hpp>
-#include <xpcc/architecture/interface/gpio.hpp>
+#include <modm/architecture/utils.hpp>
+#include <modm/architecture/interface/gpio.hpp>
 
 namespace xpcc
 {

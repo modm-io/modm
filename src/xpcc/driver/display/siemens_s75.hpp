@@ -15,10 +15,10 @@
 #ifndef XPCC__SIEMENS_S75_HPP
 #define XPCC__SIEMENS_S75_HPP
 
-#include <xpcc/architecture/driver/delay.hpp>
-#include <xpcc/driver/bus/bitbang_memory_interface.hpp>
+#include <modm/architecture/driver/delay.hpp>
+#include <modm/driver/bus/bitbang_memory_interface.hpp>
 
-#include <xpcc/ui/display/buffered_graphic_display.hpp>
+#include <modm/ui/display/buffered_graphic_display.hpp>
 
 namespace xpcc
 {

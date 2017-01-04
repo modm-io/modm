@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/utils.hpp>
-#include <xpcc/architecture/driver.hpp>
+#include <modm/architecture/utils.hpp>
+#include <modm/architecture/driver.hpp>
 
 #include "st7565_defines.hpp"
 

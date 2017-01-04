@@ -17,7 +17,7 @@
 #ifndef XPCC_FONT__ALL_CAPS_3X5_HPP
 #define	XPCC_FONT__ALL_CAPS_3X5_HPP
 
-#include <xpcc/architecture/driver/accessor.hpp>
+#include <modm/architecture/driver/accessor.hpp>
 
 namespace xpcc
 {

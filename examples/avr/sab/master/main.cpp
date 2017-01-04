@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/communication/sab/interface.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/communication/sab/interface.hpp>
 
 using namespace xpcc::atmega;
 

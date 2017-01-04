@@ -17,7 +17,7 @@
 #define XPCC__DYNAMIC_ARRAY_HPP
 
 #include <cstddef>
-#include <xpcc/utils/allocator.hpp>
+#include <modm/utils/allocator.hpp>
 #include <initializer_list>
 
 namespace xpcc

@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/debug/logger.hpp>
+#include <modm/debug/logger.hpp>
 
 // set new log level
 #undef XPCC_LOG_LEVEL

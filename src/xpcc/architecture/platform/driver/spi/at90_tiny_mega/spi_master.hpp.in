@@ -15,7 +15,7 @@
 #ifndef XPCC_{{target["family"] | upper}}_SPI_MASTER_HPP
 #define XPCC_{{target["family"] | upper}}_SPI_MASTER_HPP
 
-#include <xpcc/architecture/interface/spi_master.hpp>
+#include <modm/architecture/interface/spi_master.hpp>
 #include "type_ids.hpp"
 #include "spi.hpp"
 

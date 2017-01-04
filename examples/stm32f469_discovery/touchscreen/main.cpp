@@ -9,8 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/processing/protothread.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/processing/protothread.hpp>
 
 using namespace Board;
 using namespace xpcc::glcd;

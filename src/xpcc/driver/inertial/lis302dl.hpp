@@ -12,8 +12,8 @@
 #ifndef XPCC_LIS302DL_HPP
 #define XPCC_LIS302DL_HPP
 
-#include <xpcc/architecture/interface/register.hpp>
-#include <xpcc/processing/resumable.hpp>
+#include <modm/architecture/interface/register.hpp>
+#include <modm/processing/resumable.hpp>
 #include "lis3_transport.hpp"
 
 namespace xpcc

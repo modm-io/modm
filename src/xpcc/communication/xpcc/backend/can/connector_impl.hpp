@@ -17,8 +17,8 @@
 	#error	"Don't include this file directly, use 'can_connector.hpp' instead!"
 #endif
 
-#include <xpcc/math/utils/bit_operation.hpp>
-#include <xpcc/architecture/interface/can_message.hpp>
+#include <modm/math/utils/bit_operation.hpp>
+#include <modm/architecture/interface/can_message.hpp>
 
 // ----------------------------------------------------------------------------
 template<typename Driver>

@@ -21,7 +21,7 @@
 #include <bitset>
 
 #include "transmitter_socket.hpp"
-#include <xpcc/container/smart_pointer.hpp>
+#include <modm/container/smart_pointer.hpp>
 
 namespace xpcc
 {

@@ -16,8 +16,8 @@
 #ifndef XPCC__SDL_DISPLAY_HPP
 #define XPCC__SDL_DISPLAY_HPP
 
-#include <xpcc/ui/display.hpp>
-#include <xpcc/debug/logger.hpp>
+#include <modm/ui/display.hpp>
+#include <modm/debug/logger.hpp>
 #include <SDL/SDL.h>
 
 namespace xpcc

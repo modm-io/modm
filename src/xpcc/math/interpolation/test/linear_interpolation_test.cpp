@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/interpolation/linear.hpp>
+#include <modm/math/interpolation/linear.hpp>
 
 #include "linear_interpolation_test.hpp"
 

@@ -14,8 +14,8 @@
 #ifndef XPCC_HCLAX_HPP
 #define XPCC_HCLAX_HPP
 
-#include <xpcc/architecture/interface/i2c_device.hpp>
-#include <xpcc/math/utils/endianness.hpp>
+#include <modm/architecture/interface/i2c_device.hpp>
+#include <modm/math/utils/endianness.hpp>
 
 namespace xpcc
 {

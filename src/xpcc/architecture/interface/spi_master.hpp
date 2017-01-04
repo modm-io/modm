@@ -15,7 +15,7 @@
 #ifndef XPCC_INTERFACE_SPI_MASTER_HPP
 #define XPCC_INTERFACE_SPI_MASTER_HPP
 
-#include <xpcc/processing/resumable.hpp>
+#include <modm/processing/resumable.hpp>
 #include "spi.hpp"
 
 namespace xpcc

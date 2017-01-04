@@ -21,7 +21,7 @@
 #define SYSAHBCLKCTRL_GPIO		(1<<6)
 #define IOCON_ADMODE_DIGITAL	(1<<7)
 
-#include <xpcc/architecture/interface/gpio.hpp>
+#include <modm/architecture/interface/gpio.hpp>
 
 namespace xpcc
 {

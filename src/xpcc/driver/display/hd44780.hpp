@@ -14,8 +14,8 @@
 #ifndef XPCC_HD44780_HPP
 #define XPCC_HD44780_HPP
 
-#include <xpcc/architecture/interface/gpio.hpp>
-#include <xpcc/ui/display/character_display.hpp>
+#include <modm/architecture/interface/gpio.hpp>
+#include <modm/ui/display/character_display.hpp>
 #include "hd44780_base.hpp"
 
 namespace xpcc

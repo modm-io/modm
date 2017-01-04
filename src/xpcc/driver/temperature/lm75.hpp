@@ -14,8 +14,8 @@
 #ifndef XPCC_LM75_HPP
 #define XPCC_LM75_HPP
 
-#include <xpcc/architecture/interface/register.hpp>
-#include <xpcc/architecture/interface/i2c_device.hpp>
+#include <modm/architecture/interface/register.hpp>
+#include <modm/architecture/interface/i2c_device.hpp>
 
 namespace xpcc
 {

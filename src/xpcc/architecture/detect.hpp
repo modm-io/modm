@@ -131,7 +131,7 @@
 
 #if !defined XPCC__COMPILER_STRING
 #	define XPCC__COMPILER_STRING 	"Unknown compiler"
-#	warning	"Couldn't determine the used compiler! Please add it to <xpcc/architecture/detect.hpp>"
+#	warning	"Couldn't determine the used compiler! Please add it to <modm/architecture/detect.hpp>"
 #endif
 
 // ----------------------------------------------------------------------------

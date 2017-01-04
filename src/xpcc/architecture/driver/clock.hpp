@@ -14,8 +14,8 @@
 #ifndef	XPCC_CLOCK_HPP
 #define	XPCC_CLOCK_HPP
 
-#include <xpcc/architecture/utils.hpp>
-#include <xpcc/processing/timer/timestamp.hpp>
+#include <modm/architecture/utils.hpp>
+#include <modm/processing/timer/timestamp.hpp>
 
 namespace xpcc
 {

@@ -15,7 +15,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/detect.hpp>
+#include <modm/architecture/detect.hpp>
 
 #include "clock.hpp"
 
@@ -57,7 +57,7 @@
 	}
 
 #elif defined(XPCC__CPU_AVR) || defined(XPCC__CPU_ARM) || defined(XPCC__CPU_AVR32)
-#	include <xpcc/architecture/driver/atomic/lock.hpp>
+#	include <modm/architecture/driver/atomic/lock.hpp>
 
 	xpcc::Clock::Type xpcc::Clock::time = 0;
 

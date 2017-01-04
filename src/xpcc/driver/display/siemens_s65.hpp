@@ -15,9 +15,9 @@
 #ifndef XPCC__SIEMENS_S65_HPP
 #define XPCC__SIEMENS_S65_HPP
 
-#include <xpcc/architecture/driver/delay.hpp>
+#include <modm/architecture/driver/delay.hpp>
 
-#include <xpcc/ui/display/buffered_graphic_display.hpp>
+#include <modm/ui/display/buffered_graphic_display.hpp>
 
 // to enable this define add it to your ``project.cfg`` and
 // include <xpcc_config.hpp> before including this file.

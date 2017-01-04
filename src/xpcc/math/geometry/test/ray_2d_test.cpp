@@ -9,7 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/geometry/ray_2d.hpp>
+#include <modm/math/geometry/ray_2d.hpp>
 
 #include "ray_2d_test.hpp"
 

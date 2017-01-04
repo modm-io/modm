@@ -13,8 +13,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/math.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/math.hpp>
 
 // ----------------------------------------------------------------------------
 int

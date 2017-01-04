@@ -14,7 +14,7 @@
 #ifndef	XPCC_ATOMIC__QUEUE_IMPL_HPP
 #define	XPCC_ATOMIC__QUEUE_IMPL_HPP
 
-#include <xpcc/architecture/detect.hpp>
+#include <modm/architecture/detect.hpp>
 
 template<typename T, std::size_t N>
 xpcc::atomic::Queue<T, N>::Queue() :

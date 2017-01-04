@@ -14,7 +14,7 @@
 #define XPCC_CHARACTER_DISPLAY_HPP
 
 #include <stdint.h>
-#include <xpcc/io/iostream.hpp>
+#include <modm/io/iostream.hpp>
 
 namespace xpcc
 {

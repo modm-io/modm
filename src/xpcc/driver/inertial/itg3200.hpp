@@ -12,8 +12,8 @@
 #ifndef XPCC_ITG3200_HPP
 #define XPCC_ITG3200_HPP
 
-#include <xpcc/architecture/interface/i2c_device.hpp>
-#include <xpcc/math/geometry/angle.hpp>
+#include <modm/architecture/interface/i2c_device.hpp>
+#include <modm/math/geometry/angle.hpp>
 
 namespace xpcc
 {

@@ -10,11 +10,11 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/processing.hpp>
-#include <xpcc/io/iostream.hpp>
-#include <xpcc/architecture/interface/gpio.hpp>
-#include <xpcc/driver/pressure/bmp085.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/processing.hpp>
+#include <modm/io/iostream.hpp>
+#include <modm/architecture/interface/gpio.hpp>
+#include <modm/driver/pressure/bmp085.hpp>
 
 xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > device;
 xpcc::IOStream stream(device);

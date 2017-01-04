@@ -14,7 +14,7 @@
 #ifndef XPCC_STM32_CAN_FILTER_HPP
 #define XPCC_STM32_CAN_FILTER_HPP
 
-#include <xpcc/architecture/interface/can.hpp>
+#include <modm/architecture/interface/can.hpp>
 #include "../device.hpp"
 
 namespace xpcc

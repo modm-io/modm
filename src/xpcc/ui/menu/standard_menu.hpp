@@ -21,8 +21,8 @@
 #include "abstract_menu.hpp"
 #include "scrollable_text.hpp"
 #include "menu_entry_callback.hpp"
-#include <xpcc/container/doubly_linked_list.hpp>
-#include <xpcc/processing/timer.hpp>
+#include <modm/container/doubly_linked_list.hpp>
+#include <modm/processing/timer.hpp>
 
 
 namespace xpcc

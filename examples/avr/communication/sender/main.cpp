@@ -11,12 +11,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture.hpp>
-#include <xpcc/communication.hpp>
-#include <xpcc/communication/xpcc/backend/can.hpp>
-#include <xpcc/debug/logger.hpp>
+#include <modm/architecture.hpp>
+#include <modm/communication.hpp>
+#include <modm/communication/xpcc/backend/can.hpp>
+#include <modm/debug/logger.hpp>
 
-#include <xpcc/driver/can/mcp2515.hpp>
+#include <modm/driver/can/mcp2515.hpp>
 
 using namespace xpcc::atmega;
 typedef xpcc::avr::SystemClock clock;

@@ -18,7 +18,7 @@
 #include <cstddef>
 
 #include <stdint.h>
-#include <xpcc/utils/template_metaprogramming.hpp>
+#include <modm/utils/template_metaprogramming.hpp>
 
 namespace xpcc
 {

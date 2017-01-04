@@ -10,13 +10,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
+#include <modm/architecture/platform.hpp>
 
-#include <xpcc/processing/timer.hpp>
-#include <xpcc/processing/protothread.hpp>
-#include <xpcc/driver/temperature/tmp102.hpp>
+#include <modm/processing/timer.hpp>
+#include <modm/processing/protothread.hpp>
+#include <modm/driver/temperature/tmp102.hpp>
 
-#include <xpcc/io/iostream.hpp>
+#include <modm/io/iostream.hpp>
 
 xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > device;
 xpcc::IOStream stream(device);

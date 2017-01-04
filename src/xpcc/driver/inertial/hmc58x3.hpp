@@ -13,7 +13,7 @@
 #ifndef XPCC_HMC58X3_HPP
 #define XPCC_HMC58X3_HPP
 
-#include <xpcc/architecture/interface/i2c_device.hpp>
+#include <modm/architecture/interface/i2c_device.hpp>
 
 namespace xpcc
 {

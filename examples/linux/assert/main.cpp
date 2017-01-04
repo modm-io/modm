@@ -9,7 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
+#include <modm/architecture/platform.hpp>
 
 #define XPCC_CAN_MODULE_NAME "can"
 #define XPCC_IOBUFFER_MODULE_NAME "iobuffer"

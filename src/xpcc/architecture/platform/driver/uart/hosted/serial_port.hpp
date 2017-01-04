@@ -22,7 +22,7 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread.hpp>
 
-#include <xpcc/io/iodevice.hpp>
+#include <modm/io/iodevice.hpp>
 
 namespace xpcc
 {

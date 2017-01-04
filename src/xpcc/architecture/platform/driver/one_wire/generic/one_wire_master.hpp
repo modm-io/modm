@@ -15,8 +15,8 @@
 #ifndef XPCC__SOFTWARE_ONE_WIRE_HPP
 #define XPCC__SOFTWARE_ONE_WIRE_HPP
 
-#include <xpcc/architecture/utils.hpp>
-#include <xpcc/architecture/driver/delay.hpp>
+#include <modm/architecture/utils.hpp>
+#include <modm/architecture/driver/delay.hpp>
 
 namespace xpcc
 {

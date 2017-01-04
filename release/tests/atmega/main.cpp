@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture.hpp>
+#include <modm/architecture.hpp>
 
 #if defined(__AVR_AT90CAN128__) || defined(__AVR_AT90CAN64__) || defined(__AVR_AT90CAN32__)
 using namespace xpcc::at90;

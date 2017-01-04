@@ -14,8 +14,8 @@
 #ifndef	XPCC_ACCESSOR__FLASH_HPP
 #define	XPCC_ACCESSOR__FLASH_HPP
 
-#include <xpcc/architecture/utils.hpp>
-#include <xpcc/io/iostream.hpp>
+#include <modm/architecture/utils.hpp>
+#include <modm/io/iostream.hpp>
 
 #include "flash_reader.hpp"
 

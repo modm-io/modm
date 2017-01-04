@@ -16,7 +16,7 @@
 
 #include <stdint.h>
 #include <cstddef>
-#include <xpcc/math/tolerance.hpp>
+#include <modm/math/tolerance.hpp>
 
 /**
  * @ingroup 	architecture

@@ -9,7 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
+#include <modm/architecture/platform.hpp>
 #include <avr/pgmspace.h>
 
 using xpcc::accessor::asFlash;

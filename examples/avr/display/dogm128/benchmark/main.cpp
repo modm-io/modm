@@ -11,11 +11,11 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture.hpp>
+#include <modm/architecture.hpp>
 
-#include <xpcc/driver/display.hpp>
-#include <xpcc/ui/display.hpp>
-#include <xpcc/processing.hpp>
+#include <modm/driver/display.hpp>
+#include <modm/ui/display.hpp>
+#include <modm/processing.hpp>
 
 #include "images/rca_logo_128x64.hpp"
 

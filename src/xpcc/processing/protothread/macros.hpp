@@ -13,7 +13,7 @@
 #ifndef XPCC_PT__MACROS_HPP
 #define XPCC_PT__MACROS_HPP
 
-#include <xpcc/processing/resumable.hpp>
+#include <modm/processing/resumable.hpp>
 
 /**
  * Declare start of protothread

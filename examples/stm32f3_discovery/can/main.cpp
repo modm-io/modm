@@ -11,9 +11,9 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/processing.hpp>
-#include <xpcc/debug/logger.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/processing.hpp>
+#include <modm/debug/logger.hpp>
 
 /**
  * Example of CAN Hardware on STM32 F3 Discovery Board.

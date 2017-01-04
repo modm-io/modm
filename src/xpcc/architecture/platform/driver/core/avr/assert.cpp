@@ -9,7 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/interface/assert.hpp>
+#include <modm/architecture/interface/assert.hpp>
 #include <stdlib.h>
 #include <string.h>
 #include <avr/pgmspace.h>

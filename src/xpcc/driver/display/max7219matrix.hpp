@@ -13,7 +13,7 @@
 #ifndef XPCC_MAX7219_MATRIX_HPP
 #define XPCC_MAX7219_MATRIX_HPP
 
-#include <xpcc/ui/display/buffered_graphic_display.hpp>
+#include <modm/ui/display/buffered_graphic_display.hpp>
 
 namespace xpcc
 {

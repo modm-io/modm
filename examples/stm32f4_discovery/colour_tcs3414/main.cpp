@@ -10,15 +10,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
+#include <modm/architecture/platform.hpp>
 
-#include <xpcc/processing.hpp>
-#include <xpcc/processing/protothread.hpp>
-#include <xpcc/driver/color/tcs3414.hpp>
+#include <modm/processing.hpp>
+#include <modm/processing/protothread.hpp>
+#include <modm/driver/color/tcs3414.hpp>
 
-#include <xpcc/io/iostream.hpp>
+#include <modm/io/iostream.hpp>
 
-#include <xpcc/architecture/interface/gpio.hpp>
+#include <modm/architecture/interface/gpio.hpp>
 
 xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > device;
 xpcc::IOStream stream(device);

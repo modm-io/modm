@@ -13,7 +13,7 @@
 
 // Inspired by: http://arduino.cc/en/Tutorial/DigitalReadSerial
 
-#include <xpcc/architecture/platform.hpp>
+#include <modm/architecture/platform.hpp>
 
 // name pin2
 using PushButton = D2;

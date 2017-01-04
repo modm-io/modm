@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/processing/scheduler/scheduler.hpp>
+#include <modm/processing/scheduler/scheduler.hpp>
 
 #include "scheduler_test.hpp"
 

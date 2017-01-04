@@ -13,8 +13,8 @@
 #define	XPCC_TOKEN_RING__NODE_HPP
 
 #include <cstddef>
-#include <xpcc/architecture/driver/accessor/flash.hpp>
-#include <xpcc/processing/timer.hpp>
+#include <modm/architecture/driver/accessor/flash.hpp>
+#include <modm/processing/timer.hpp>
 #include <stdint.h>
 
 #include "interface.hpp"

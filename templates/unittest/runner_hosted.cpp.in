@@ -20,8 +20,8 @@
 #include <unittest/reporter.hpp>
 #include <unittest/controller.hpp>
 
-#include <xpcc/debug/logger.hpp>
-#include <xpcc/architecture/platform.hpp>
+#include <modm/debug/logger.hpp>
+#include <modm/architecture/platform.hpp>
 
 xpcc::pc::Terminal outputDevice;
 

@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/geometry/vector.hpp>
+#include <modm/math/geometry/vector.hpp>
 #include "vector_test.hpp"
 
 void

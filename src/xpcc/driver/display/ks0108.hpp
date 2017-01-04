@@ -14,9 +14,9 @@
 #ifndef XPCC__KS0108_HPP
 #define XPCC__KS0108_HPP
 
-#include <xpcc/architecture/driver/delay.hpp>
+#include <modm/architecture/driver/delay.hpp>
 
-#include <xpcc/ui/display/buffered_graphic_display.hpp>
+#include <modm/ui/display/buffered_graphic_display.hpp>
 
 namespace xpcc
 {

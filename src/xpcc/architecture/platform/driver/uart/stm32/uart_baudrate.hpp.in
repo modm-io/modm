@@ -14,7 +14,7 @@
 #define XPCC_STM32_UART_BAUDRATE_HPP
 
 #include "uart_base.hpp"
-#include <xpcc/architecture/interface.hpp>
+#include <modm/architecture/interface.hpp>
 
 namespace xpcc
 {

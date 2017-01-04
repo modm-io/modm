@@ -14,9 +14,9 @@
 #define XPCC_REGISTER_HPP
 
 #include <stdint.h>
-#include <xpcc/utils/bit_constants.hpp>
-#include <xpcc/architecture/detect.hpp>
-#include <xpcc/io/iostream.hpp>
+#include <modm/utils/bit_constants.hpp>
+#include <modm/architecture/detect.hpp>
+#include <modm/io/iostream.hpp>
 
 /**
  * @ingroup		interface

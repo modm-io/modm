@@ -12,7 +12,7 @@
 
 #include "overview.hpp"
 
-#include <xpcc/ui/gui/widgets.hpp>
+#include <modm/ui/gui/widgets.hpp>
 
 using namespace xpcc::gui;
 

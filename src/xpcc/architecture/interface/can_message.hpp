@@ -14,8 +14,8 @@
 #define XPCC_CAN__MESSAGE_HPP
 
 #include <stdint.h>
-#include <xpcc/io/iostream.hpp>
-#include <xpcc/architecture/utils.hpp>
+#include <modm/io/iostream.hpp>
+#include <modm/architecture/utils.hpp>
 
 namespace xpcc
 {

@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/utils/misc.hpp>
+#include <modm/math/utils/misc.hpp>
 
 #include "angle.hpp"
 

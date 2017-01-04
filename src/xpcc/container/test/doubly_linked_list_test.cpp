@@ -13,7 +13,7 @@
 // ----------------------------------------------------------------------------
 
 #include <unittest/type/count_type.hpp>
-#include <xpcc/container/doubly_linked_list.hpp>
+#include <modm/container/doubly_linked_list.hpp>
 
 #include "doubly_linked_list_test.hpp"
 

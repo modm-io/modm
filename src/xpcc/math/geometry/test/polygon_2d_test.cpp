@@ -13,7 +13,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/geometry/polygon_2d.hpp>
+#include <modm/math/geometry/polygon_2d.hpp>
 
 #include "polygon_2d_test.hpp"
 

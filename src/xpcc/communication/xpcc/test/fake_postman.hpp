@@ -15,8 +15,8 @@
 #ifndef FAKE_POSTMAN_HPP
 #define FAKE_POSTMAN_HPP
 
-#include <xpcc/communication/xpcc/postman/postman.hpp>
-#include <xpcc/container/linked_list.hpp>
+#include <modm/communication/xpcc/postman/postman.hpp>
+#include <modm/container/linked_list.hpp>
 
 #include "testing_component_1.hpp"
 #include "testing_component_2.hpp"

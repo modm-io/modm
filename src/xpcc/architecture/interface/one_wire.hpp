@@ -31,8 +31,8 @@
 #ifndef XPCC_ONE_WIRE_HPP
 #define XPCC_ONE_WIRE_HPP
 
-#include <xpcc/architecture/utils.hpp>
-#include <xpcc/architecture/interface.hpp>
+#include <modm/architecture/utils.hpp>
+#include <modm/architecture/interface.hpp>
 
 namespace xpcc
 {

@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <cmath>
 
-#include <xpcc/debug/logger/logger.hpp>
+#include <modm/debug/logger/logger.hpp>
 
 #ifndef XPCC_BMP085_DATA_HPP
 #	error  "Don't include this file directly, use 'bmp180_data.hpp' instead!"

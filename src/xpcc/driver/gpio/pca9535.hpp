@@ -12,9 +12,9 @@
 #ifndef XPCC_PCA9535_HPP
 #define XPCC_PCA9535_HPP
 
-#include <xpcc/architecture/interface/i2c_device.hpp>
-#include <xpcc/architecture/interface/gpio_expander.hpp>
-#include <xpcc/math/geometry/angle.hpp>
+#include <modm/architecture/interface/i2c_device.hpp>
+#include <modm/architecture/interface/gpio_expander.hpp>
+#include <modm/math/geometry/angle.hpp>
 
 namespace xpcc
 {

@@ -13,8 +13,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/driver/adc/ad7280a.hpp>
-#include <xpcc/architecture/platform/driver/gpio/generic/gpio.hpp>
+#include <modm/driver/adc/ad7280a.hpp>
+#include <modm/architecture/platform/driver/gpio/generic/gpio.hpp>
 
 #include "ad7280a_test.hpp"
 

@@ -9,7 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/debug/logger.hpp>
+#include <modm/debug/logger.hpp>
 
 // set new log level
 #undef XPCC_LOG_LEVEL
@@ -21,7 +21,7 @@
 
 #include "odometry.hpp"
 
-#include <xpcc/architecture/platform.hpp>
+#include <modm/architecture/platform.hpp>
 
 // ----------------------------------------------------------------------------
 component::Odometry::Odometry(uint8_t id, xpcc::Dispatcher &communication) :

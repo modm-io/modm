@@ -10,10 +10,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/geometry/vector.hpp>
-#include <xpcc/math/geometry/quaternion.hpp>
+#include <modm/math/geometry/vector.hpp>
+#include <modm/math/geometry/quaternion.hpp>
 #include "quaternion_test.hpp"
-#include <xpcc/math/geometry/angle.hpp>
+#include <modm/math/geometry/angle.hpp>
 
 void
 QuaternionTest::testConstructor()

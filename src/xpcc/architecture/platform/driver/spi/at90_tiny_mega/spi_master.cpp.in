@@ -11,8 +11,8 @@
 // ----------------------------------------------------------------------------
 
 #include "spi_master.hpp"
-#include <xpcc/architecture/interface/register.hpp>
-#include <xpcc/architecture/driver/atomic.hpp>
+#include <modm/architecture/interface/register.hpp>
+#include <modm/architecture/driver/atomic.hpp>
 
 // bit 7 (0x80) is used for transfer 1 byte
 // bit 6 (0x40) is used for transfer multiple byte

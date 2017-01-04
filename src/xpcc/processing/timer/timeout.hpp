@@ -16,7 +16,7 @@
 #ifndef XPCC_TIMEOUT_HPP
 #define XPCC_TIMEOUT_HPP
 
-#include <xpcc/architecture/driver/clock.hpp>
+#include <modm/architecture/driver/clock.hpp>
 
 #include "timestamp.hpp"
 

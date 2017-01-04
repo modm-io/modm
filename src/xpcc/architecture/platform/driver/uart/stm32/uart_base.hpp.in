@@ -16,7 +16,7 @@
 
 #include <stdint.h>
 #include "../device.hpp"
-#include <xpcc/architecture/interface/register.hpp>
+#include <modm/architecture/interface/register.hpp>
 
 %% if target["family"] in ["f1", "f2", "f4"]
 // STM has some weird ideas about continuity

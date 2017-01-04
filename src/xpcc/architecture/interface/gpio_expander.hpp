@@ -12,10 +12,10 @@
 #ifndef XPCC_GPIO_EXPANDER_HPP
 #define XPCC_GPIO_EXPANDER_HPP
 
-#include <xpcc/architecture/interface/gpio.hpp>
-#include <xpcc/architecture/interface/register.hpp>
-#include <xpcc/processing/resumable.hpp>
-#include <xpcc/math/utils/bit_operation.hpp>
+#include <modm/architecture/interface/gpio.hpp>
+#include <modm/architecture/interface/register.hpp>
+#include <modm/processing/resumable.hpp>
+#include <modm/math/utils/bit_operation.hpp>
 
 namespace xpcc
 {

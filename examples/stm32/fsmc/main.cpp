@@ -51,9 +51,9 @@
  *
  */
 
-#include <xpcc/architecture.hpp>
-#include <xpcc/driver/bus/tft_memory_bus.hpp>
-#include <xpcc/driver/display/siemens_s75.hpp>
+#include <modm/architecture.hpp>
+#include <modm/driver/bus/tft_memory_bus.hpp>
+#include <modm/driver/display/siemens_s75.hpp>
 
 // ----------------------------------------------------------------------------
 using namespace xpcc::stm32;

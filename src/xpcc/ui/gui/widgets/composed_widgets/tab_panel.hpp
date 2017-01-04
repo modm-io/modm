@@ -13,7 +13,7 @@
 #ifndef XPCC_GUI_TAB_PANE_HPP
 #define XPCC_GUI_TAB_PANE_HPP
 
-#include <xpcc/debug/logger.hpp>
+#include <modm/debug/logger.hpp>
 
 #include "../../widgets.hpp"
 

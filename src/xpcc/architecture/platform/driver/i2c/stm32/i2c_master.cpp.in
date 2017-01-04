@@ -139,7 +139,7 @@
 /* To debug the internal state of the driver, you can instantiate a
  * xpcc::IOStream in your main souce file, which will then be used to dump
  * state data of the operations via the serial port, e.g.
- *   #include <xpcc/io/iostream.hpp>
+ *   #include <modm/io/iostream.hpp>
  *   xpcc::IODeviceWrapper< Uart5, * xpcc::IOBuffer::BlockIfFull > device;
  *   xpcc::IOStream stream(device);
 
@@ -153,7 +153,7 @@
 #if SERIAL_DEBUGGING
 #	include "../../uart/stm32/uart_5.hpp"
 	typedef xpcc::stm32::Uart5 DebugUart;
-#	include <xpcc/io/iostream.hpp>
+#	include <modm/io/iostream.hpp>
 	extern xpcc::IOStream stream;
 #	define DEBUG_STREAM(x) stream << x << "\n"
 #	define DEBUG(x) xpcc::stm32::Uart5::write(x)
@@ -163,9 +163,9 @@
 #endif
 
 #include "i2c_master_{{ id }}.hpp"
-#include <xpcc/architecture/driver/accessor.hpp>
-#include <xpcc/architecture/driver/atomic.hpp>
-#include <xpcc/container.hpp>
+#include <modm/architecture/driver/accessor.hpp>
+#include <modm/architecture/driver/atomic.hpp>
+#include <modm/container.hpp>
 
 XPCC_ISR_DECL(I2C{{ id }}_ER);
 

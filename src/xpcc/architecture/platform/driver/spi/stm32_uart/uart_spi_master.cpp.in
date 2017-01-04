@@ -12,8 +12,8 @@
 // ----------------------------------------------------------------------------
 
 #include "uart_spi_master_{{id}}.hpp"
-#include <xpcc/math/utils/bit_operation.hpp>
-#include <xpcc/architecture/interface/register.hpp>
+#include <modm/math/utils/bit_operation.hpp>
+#include <modm/architecture/interface/register.hpp>
 
 xpcc::stm32::UartSpiMaster{{ id }}::DataOrder
 	xpcc::stm32::UartSpiMaster{{ id }}::dataOrder =

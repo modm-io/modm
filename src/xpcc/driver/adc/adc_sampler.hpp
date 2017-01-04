@@ -12,9 +12,9 @@
 #ifndef XPCC_ADC_SAMPLER_HPP
 #define XPCC_ADC_SAMPLER_HPP
 
-#include <xpcc/architecture/interface/adc_interrupt.hpp>
-#include <xpcc/utils/template_metaprogramming.hpp>
-#include <xpcc/math/utils/misc.hpp>
+#include <modm/architecture/interface/adc_interrupt.hpp>
+#include <modm/utils/template_metaprogramming.hpp>
+#include <modm/math/utils/misc.hpp>
 
 
 namespace xpcc

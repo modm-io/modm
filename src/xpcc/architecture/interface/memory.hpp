@@ -13,8 +13,8 @@
 #define XPCC_MEMORY_HPP
 
 #include <stdint.h>
-#include <xpcc/architecture/utils.hpp>
-#include <xpcc/architecture/interface/register.hpp>
+#include <modm/architecture/utils.hpp>
+#include <modm/architecture/interface/register.hpp>
 
 /**
  * @ingroup		interface

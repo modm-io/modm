@@ -12,7 +12,7 @@
 // ----------------------------------------------------------------------------
 
 #include "connector.hpp"
-#include <xpcc/debug/logger.hpp>
+#include <modm/debug/logger.hpp>
 
 #undef  XPCC_LOG_LEVEL
 #define XPCC_LOG_LEVEL xpcc::log::WARNING

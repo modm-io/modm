@@ -14,9 +14,9 @@
 #define XPCC_TLC594X_HPP
 
 #include <stdint.h>
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/architecture/interface/gpio.hpp>
-#include <xpcc/architecture/driver/delay.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/architecture/interface/gpio.hpp>
+#include <modm/architecture/driver/delay.hpp>
 
 namespace xpcc
 {

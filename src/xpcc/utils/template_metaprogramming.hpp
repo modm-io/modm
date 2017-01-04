@@ -16,7 +16,7 @@
 #ifndef XPCC_TMP__TEMPLATE_METAPROGRAMMING_HPP
 #define XPCC_TMP__TEMPLATE_METAPROGRAMMING_HPP
 
-#include <xpcc/architecture/utils.hpp>
+#include <modm/architecture/utils.hpp>
 
 /**
  * \ingroup		utils

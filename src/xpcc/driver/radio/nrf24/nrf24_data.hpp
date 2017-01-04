@@ -15,8 +15,8 @@
 #define XPCC__NRF24_DATA_HPP
 
 #include <stdint.h>
-#include <xpcc/debug/logger.hpp>
-#include <xpcc/processing/timer.hpp>
+#include <modm/debug/logger.hpp>
+#include <modm/processing/timer.hpp>
 
 #include "nrf24_phy.hpp"
 #include "nrf24_config.hpp"

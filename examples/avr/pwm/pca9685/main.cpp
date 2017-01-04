@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/driver/pwm/pca9685.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/driver/pwm/pca9685.hpp>
 
 using namespace xpcc::atmega;
 typedef xpcc::avr::SystemClock systemClock;

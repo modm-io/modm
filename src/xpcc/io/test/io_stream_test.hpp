@@ -13,7 +13,7 @@
 // ----------------------------------------------------------------------------
 
 #include <unittest/testsuite.hpp>
-#include <xpcc/io/iostream.hpp>
+#include <modm/io/iostream.hpp>
 
 class IoStreamTest : public unittest::TestSuite
 {

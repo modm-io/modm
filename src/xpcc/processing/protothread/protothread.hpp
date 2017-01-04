@@ -36,9 +36,9 @@ namespace xpcc
 		 *
 		 * Example:
 		 * \code
-		 * #include <xpcc/architecture.hpp>
-		 * #include <xpcc/utils/protothread.hpp>
-		 * #include <xpcc/utils/timeout.hpp>
+		 * #include <modm/architecture.hpp>
+		 * #include <modm/utils/protothread.hpp>
+		 * #include <modm/utils/timeout.hpp>
 		 *
 		 * typedef GpioOutputB0 Led;
 		 *

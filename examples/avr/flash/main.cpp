@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/architecture/driver/accessor/flash.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/architecture/driver/accessor/flash.hpp>
 
 //extern const int a PROGMEM;
 //const int a = 12;

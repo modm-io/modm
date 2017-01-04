@@ -16,7 +16,7 @@
 //
 
 #include "stm32f469_discovery.hpp"
-#include <xpcc/utils/bit_constants.hpp>
+#include <modm/utils/bit_constants.hpp>
 
 // Create an IODeviceWrapper around the Uart Peripheral we want to use
 xpcc::IODeviceWrapper< Board::stlink::Uart, xpcc::IOBuffer::BlockIfFull > loggerDevice;

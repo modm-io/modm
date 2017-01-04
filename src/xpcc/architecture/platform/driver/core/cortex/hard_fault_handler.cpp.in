@@ -44,7 +44,7 @@ extern "C" void _toggleHardFaultHandlerLed()
 %% endif
 
 %% if options["hardfault.log"] != "disabled"
-#include <xpcc/debug/logger.hpp>
+#include <modm/debug/logger.hpp>
 	%% set id = options["hardfault.log.uart"]
 
 	%% if id in [1, 2, 3, 6]

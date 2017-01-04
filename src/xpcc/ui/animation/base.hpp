@@ -13,8 +13,8 @@
 #define XPCC_UI_LINEAR_ANIMATION_HPP
 
 #include <stdint.h>
-#include <xpcc/architecture/driver/clock.hpp>
-#include <xpcc/utils/arithmetic_traits.hpp>
+#include <modm/architecture/driver/clock.hpp>
+#include <modm/utils/arithmetic_traits.hpp>
 #include "interpolation.hpp"
 
 namespace xpcc

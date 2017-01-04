@@ -14,7 +14,7 @@
 #ifndef XPCC_GUI_BUTTON_HPP
 #define XPCC_GUI_BUTTON_HPP
 
-#include <xpcc/ui/display/font.hpp>
+#include <modm/ui/display/font.hpp>
 #include "widget.hpp"
 
 namespace xpcc

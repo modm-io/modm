@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/driver/usb/ft245.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/driver/usb/ft245.hpp>
 
 /**
  * Example of FT245 usage.

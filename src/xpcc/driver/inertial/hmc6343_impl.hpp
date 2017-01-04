@@ -12,7 +12,7 @@
 #ifndef XPCC_HMC6343_HPP
 #	error  "Don't include this file directly, use 'hmc6343.hpp' instead!"
 #endif
-#include <xpcc/math/utils/endianness.hpp>
+#include <modm/math/utils/endianness.hpp>
 
 // ----------------------------------------------------------------------------
 template < class I2cMaster >

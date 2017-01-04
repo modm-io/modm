@@ -12,10 +12,10 @@
 #ifndef THREAD_BMP180
 #define THREAD_BMP180
 
-#include <xpcc/processing/timer.hpp>
-#include <xpcc/processing/protothread.hpp>
+#include <modm/processing/timer.hpp>
+#include <modm/processing/protothread.hpp>
 
-#include <xpcc/driver/pressure/bmp085.hpp>
+#include <modm/driver/pressure/bmp085.hpp>
 
 #include "hardware.hpp"
 

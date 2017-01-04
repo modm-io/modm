@@ -18,7 +18,7 @@
 #error  "Don't include this file directly, use 'adns9800.hpp' instead!"
 #endif
 
-#include <xpcc/debug/logger.hpp>
+#include <modm/debug/logger.hpp>
 
 #include "adns9800.hpp"
 

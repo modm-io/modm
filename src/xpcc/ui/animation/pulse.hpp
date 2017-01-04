@@ -14,7 +14,7 @@
 
 #include <stdint.h>
 #include "key_frame.hpp"
-#include <xpcc/utils/arithmetic_traits.hpp>
+#include <modm/utils/arithmetic_traits.hpp>
 
 namespace xpcc
 {

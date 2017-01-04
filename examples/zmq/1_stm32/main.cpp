@@ -9,12 +9,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
+#include <modm/architecture/platform.hpp>
 
-#include <xpcc/processing/timer/periodic_timer.hpp>
+#include <modm/processing/timer/periodic_timer.hpp>
 
-#include <xpcc/communication.hpp>
-#include <xpcc/communication/xpcc/backend/can.hpp>
+#include <modm/communication.hpp>
+#include <modm/communication/xpcc/backend/can.hpp>
 
 #include "component_odometry/odometry.hpp"
 

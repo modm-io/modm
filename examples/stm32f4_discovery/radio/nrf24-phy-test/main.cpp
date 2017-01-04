@@ -11,9 +11,9 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/driver/radio/nrf24/nrf24_phy.hpp>
-#include <xpcc/debug/logger.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/driver/radio/nrf24/nrf24_phy.hpp>
+#include <modm/debug/logger.hpp>
 
 /*
  * Test SPI communication by writing and reading out registers on the

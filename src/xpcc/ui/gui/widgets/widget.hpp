@@ -15,13 +15,13 @@
 #ifndef XPCC_GUI_WIDGET_HPP
 #define XPCC_GUI_WIDGET_HPP
 
-#include <xpcc/ui/display/graphic_display.hpp>
-#include <xpcc/ui/gui/colorpalette.hpp>
-#include <xpcc/ui/gui/types.hpp>
+#include <modm/ui/display/graphic_display.hpp>
+#include <modm/ui/gui/colorpalette.hpp>
+#include <modm/ui/gui/types.hpp>
 
 #include "../view.hpp"
 
-#include <xpcc/debug/logger.hpp>
+#include <modm/debug/logger.hpp>
 
 
 namespace xpcc

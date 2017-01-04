@@ -14,7 +14,7 @@
 #define XPCC__SEVEN_SEGMENT_DISPLAY_HPP
 
 #include <stdint.h>
-#include <xpcc/architecture/interface/gpio.hpp>
+#include <modm/architecture/interface/gpio.hpp>
 
 namespace xpcc
 {

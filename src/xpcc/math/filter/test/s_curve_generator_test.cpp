@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/filter/s_curve_generator.hpp>
+#include <modm/math/filter/s_curve_generator.hpp>
 
 #include "s_curve_generator_test.hpp"
 

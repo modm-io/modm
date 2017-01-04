@@ -18,10 +18,10 @@
 #ifndef XPCC_STM32_F469_DISCOVERY_HPP
 #define XPCC_STM32_F469_DISCOVERY_HPP
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/ui/display/graphic_display.hpp>
-#include <xpcc/driver/touch/ft6x06.hpp>
-#include <xpcc/debug/logger.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/ui/display/graphic_display.hpp>
+#include <modm/driver/touch/ft6x06.hpp>
+#include <modm/debug/logger.hpp>
 #define XPCC_BOARD_HAS_LOGGER
 
 using namespace xpcc::stm32;

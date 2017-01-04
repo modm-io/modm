@@ -14,7 +14,7 @@
 #define XPCC__SCP1000_HPP
 
 #include <stdint.h>
-#include <xpcc/architecture/driver/delay.hpp>
+#include <modm/architecture/driver/delay.hpp>
 
 namespace xpcc
 {

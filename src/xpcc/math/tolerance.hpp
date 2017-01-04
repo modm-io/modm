@@ -13,7 +13,7 @@
 #define XPCC_MATH_TOLERANCE_HPP
 
 #include <stdint.h>
-#include <xpcc/math.hpp>
+#include <modm/math.hpp>
 
 namespace xpcc
 {

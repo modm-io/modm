@@ -9,7 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/debug/logger.hpp>
+#include <modm/debug/logger.hpp>
 
 #include "communication/identifier.hpp"
 #include "communication/packets.hpp"

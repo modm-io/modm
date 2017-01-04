@@ -13,7 +13,7 @@
 // ----------------------------------------------------------------------------
 
 #include "ram.hpp"
-#include <xpcc/architecture/interface/memory.hpp>
+#include <modm/architecture/interface/memory.hpp>
 
 void *
 operator new(size_t size)

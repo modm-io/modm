@@ -16,11 +16,11 @@
 #include <sys/socket.h>
 #include <unistd.h> // close()
 #include <linux/tipc.h>
-#include <xpcc/container/smart_pointer.hpp>
+#include <modm/container/smart_pointer.hpp>
 
 #include <iostream>
 
-#include <xpcc/debug/logger.hpp>
+#include <modm/debug/logger.hpp>
 
 #undef  XPCC_LOG_LEVEL
 #define XPCC_LOG_LEVEL xpcc::log::WARNING

@@ -17,11 +17,11 @@
 #ifndef XPCC__GRAPHIC_DISPLAY_HPP
 #define XPCC__GRAPHIC_DISPLAY_HPP
 
-#include <xpcc/architecture/driver/accessor.hpp>
-#include <xpcc/math/geometry.hpp>
+#include <modm/architecture/driver/accessor.hpp>
+#include <modm/math/geometry.hpp>
 
-#include <xpcc/io/iodevice.hpp>
-#include <xpcc/io/iostream.hpp>
+#include <modm/io/iodevice.hpp>
+#include <modm/io/iostream.hpp>
 
 #include "font.hpp"
 

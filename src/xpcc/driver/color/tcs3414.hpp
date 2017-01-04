@@ -22,10 +22,10 @@
 
 #include <stdint.h>
 
-#include <xpcc/ui/color.hpp>
-#include <xpcc/processing/protothread.hpp>
-#include <xpcc/processing/resumable.hpp>
-#include <xpcc/architecture/interface/i2c_device.hpp>
+#include <modm/ui/color.hpp>
+#include <modm/processing/protothread.hpp>
+#include <modm/processing/resumable.hpp>
+#include <modm/architecture/interface/i2c_device.hpp>
 
 namespace xpcc
 {

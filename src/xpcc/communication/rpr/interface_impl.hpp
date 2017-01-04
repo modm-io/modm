@@ -21,7 +21,7 @@
 #include <cstring>
 
 #if XPCC_RPR_DEBUG
-#	include <xpcc/debug/logger.hpp>
+#	include <modm/debug/logger.hpp>
 #	undef XPCC_LOG_LEVEL
 #	define XPCC_LOG_LEVEL	xpcc::log::DEBUG
 #	define XPCC_RPR_LOG(x) XPCC_LOG_DEBUG << x << xpcc::endl

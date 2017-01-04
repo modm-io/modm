@@ -14,10 +14,10 @@
 #define OVERVIEW_HPP_
 
 
-#include <xpcc/ui/gui/view.hpp>
-#include <xpcc/ui/gui/view_stack.hpp>
+#include <modm/ui/gui/view.hpp>
+#include <modm/ui/gui/view_stack.hpp>
 
-#include <xpcc/ui/gui.hpp>
+#include <modm/ui/gui.hpp>
 
 using namespace xpcc::gui;
 

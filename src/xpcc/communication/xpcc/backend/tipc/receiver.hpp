@@ -20,7 +20,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/scoped_ptr.hpp>
 
-#include <xpcc/container/smart_pointer.hpp>
+#include <modm/container/smart_pointer.hpp>
 
 #include "receiver_socket.hpp"
 

@@ -11,9 +11,9 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture.hpp>
+#include <modm/architecture.hpp>
 
-#include <xpcc/io/iostream.hpp>
+#include <modm/io/iostream.hpp>
 
 using namespace xpcc::atmega;
 typedef xpcc::avr::SystemClock clock;

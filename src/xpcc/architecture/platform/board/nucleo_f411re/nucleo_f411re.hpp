@@ -17,8 +17,8 @@
 #ifndef XPCC_STM32_NUCLEO_F411RE_HPP
 #define XPCC_STM32_NUCLEO_F411RE_HPP
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/debug/logger.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/debug/logger.hpp>
 #define XPCC_BOARD_HAS_LOGGER
 
 using namespace xpcc::stm32;

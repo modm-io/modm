@@ -15,7 +15,7 @@
 #include <stdint.h>
 #include "bit_operation.hpp"
 
-#include <xpcc/architecture/detect.hpp>
+#include <modm/architecture/detect.hpp>
 
 namespace xpcc
 {

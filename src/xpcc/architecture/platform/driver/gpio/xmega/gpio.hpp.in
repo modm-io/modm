@@ -17,7 +17,7 @@
 
 #include "../device.hpp"
 #include "../../../core/avr/interrupts.hpp"
-#include <xpcc/architecture/interface/gpio.hpp>
+#include <modm/architecture/interface/gpio.hpp>
 #include "type_ids.hpp"
 
 namespace xpcc

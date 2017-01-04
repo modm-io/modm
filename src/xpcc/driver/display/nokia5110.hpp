@@ -12,7 +12,7 @@
 #ifndef XPCC_NOKIA5110_HPP
 #define XPCC_NOKIA5110_HPP
 
-#include <xpcc/ui/display/buffered_graphic_display.hpp>
+#include <modm/ui/display/buffered_graphic_display.hpp>
 
 namespace xpcc
 {

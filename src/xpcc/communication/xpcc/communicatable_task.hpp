@@ -15,7 +15,7 @@
 #include "communicatable.hpp"
 #include "communicator.hpp"
 
-#include <xpcc/processing/task.hpp>
+#include <modm/processing/task.hpp>
 
 namespace xpcc
 {

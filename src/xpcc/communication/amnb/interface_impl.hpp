@@ -16,7 +16,7 @@
 #	error	"Don't include this file directly, use 'interface.hpp' instead!"
 #endif
 
-#include <xpcc/architecture/driver/atomic/lock.hpp>
+#include <modm/architecture/driver/atomic/lock.hpp>
 
 uint_fast16_t xpcc::amnb::Clock::time = 0;
 

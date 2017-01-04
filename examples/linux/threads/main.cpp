@@ -10,9 +10,9 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture.hpp>
-#include <xpcc/processing/rtos.hpp>
-#include <xpcc/debug/logger.hpp>
+#include <modm/architecture.hpp>
+#include <modm/processing/rtos.hpp>
+#include <modm/debug/logger.hpp>
 
 // ----------------------------------------------------------------------------
 xpcc::rtos::BinarySemaphore event;

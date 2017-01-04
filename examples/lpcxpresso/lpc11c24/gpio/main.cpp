@@ -22,7 +22,7 @@
  * Tested again 2014-08-01.
  */
 
-#include <xpcc/architecture.hpp>
+#include <modm/architecture.hpp>
 #include "../lpcxpresso11c24.hpp"
 
 int

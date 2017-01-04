@@ -15,7 +15,7 @@
 #define XPCC_FREERTOS__MUTEX_HPP
 
 #ifndef XPCC_RTOS__MUTEX_HPP
-#	error "Don't include this file directly, use <xpcc/processing/rtos/mutex.hpp>"
+#	error "Don't include this file directly, use <modm/processing/rtos/mutex.hpp>"
 #endif
 
 #include <freertos/FreeRTOS.h>

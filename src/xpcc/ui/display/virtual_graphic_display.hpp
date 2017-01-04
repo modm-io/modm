@@ -16,7 +16,7 @@
 #ifndef XPCC__VIRTUAL_GRAPHIC_DISPLAY
 #define XPCC__VIRTUAL_GRAPHIC_DISPLAY
 
-#include <xpcc/ui/display/graphic_display.hpp>
+#include <modm/ui/display/graphic_display.hpp>
 
 namespace xpcc
 {

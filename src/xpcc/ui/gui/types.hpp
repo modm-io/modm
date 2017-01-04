@@ -14,14 +14,14 @@
 #ifndef XPCC_GUI_TYPES_HPP
 #define XPCC_GUI_TYPES_HPP
 
-#include <xpcc/ui/display.hpp>
-#include <xpcc/container/dynamic_array.hpp>
-#include <xpcc/container/linked_list.hpp>
-#include <xpcc/container/queue.hpp>
-#include <xpcc/container/doubly_linked_list.hpp>
-#include <xpcc/processing.hpp>
+#include <modm/ui/display.hpp>
+#include <modm/container/dynamic_array.hpp>
+#include <modm/container/linked_list.hpp>
+#include <modm/container/queue.hpp>
+#include <modm/container/doubly_linked_list.hpp>
+#include <modm/processing.hpp>
 
-#include <xpcc/debug/logger.hpp>
+#include <modm/debug/logger.hpp>
 
 /* Eclipse needs this to resolve NULL*/
 #ifndef NULL

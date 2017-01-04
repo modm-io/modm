@@ -15,7 +15,7 @@
 #define XPCC_PWM_LED_TABLE_HPP
 
 #include <stdint.h>
-#include <xpcc/architecture/driver/accessor/flash.hpp>
+#include <modm/architecture/driver/accessor/flash.hpp>
 
 namespace xpcc
 {

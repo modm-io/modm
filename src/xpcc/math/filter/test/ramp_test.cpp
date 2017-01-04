@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/filter/ramp.hpp>
+#include <modm/math/filter/ramp.hpp>
 
 #include "ramp_test.hpp"
 

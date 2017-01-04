@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/driver/pressure/bmp085.hpp>
-#include <xpcc/debug/logger/logger.hpp>
+#include <modm/driver/pressure/bmp085.hpp>
+#include <modm/debug/logger/logger.hpp>
 
 #include "bmp085_test.hpp"
 

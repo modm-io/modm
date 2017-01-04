@@ -13,7 +13,7 @@
 #	error	"Don't include this file directly, use 'color.hpp' instead!"
 #endif
 
-#include <xpcc/math/utils.hpp>
+#include <modm/math/utils.hpp>
 
 /**
  * @see http://de.wikipedia.org/wiki/HSV-Farbraum#Umrechnung_RGB_in_HSV.2FHSL

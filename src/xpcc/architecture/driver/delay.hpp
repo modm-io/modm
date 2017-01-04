@@ -48,8 +48,8 @@ namespace xpcc
 
 #else // !__DOXYGEN__
 
-#include <xpcc/architecture/detect.hpp>
-#include <xpcc/architecture/utils.hpp>
+#include <modm/architecture/detect.hpp>
+#include <modm/architecture/utils.hpp>
 
 #if defined(XPCC__CPU_AVR)
 

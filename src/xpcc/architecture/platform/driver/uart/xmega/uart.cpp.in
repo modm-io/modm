@@ -14,8 +14,8 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include <xpcc/architecture/platform/avr/xmega.hpp>
-#include <xpcc/architecture/interface/gpio.hpp>
+#include <modm/architecture/platform/avr/xmega.hpp>
+#include <modm/architecture/interface/gpio.hpp>
 
 #include "uart_{{ id.lower() }}.hpp"
 

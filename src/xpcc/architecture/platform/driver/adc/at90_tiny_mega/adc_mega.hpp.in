@@ -19,7 +19,7 @@
 #ifndef XPCC_ATMEGA_ADC_HPP
 #define XPCC_ATMEGA_ADC_HPP
 
-#include <xpcc/architecture/interface/adc.hpp>
+#include <modm/architecture/interface/adc.hpp>
 #include "../device.hpp"
 
 #if defined (__AVR_ATmega64HVE__) || defined(__AVR_ATmega64HVE2__)

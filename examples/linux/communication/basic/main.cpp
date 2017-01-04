@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture.hpp>
+#include <modm/architecture.hpp>
 
-#include <xpcc/communication.hpp>
-// #include <xpcc/communication/xpcc/backend/tipc.hpp>
-#include <xpcc/communication/xpcc/backend/zeromq.hpp>
+#include <modm/communication.hpp>
+// #include <modm/communication/xpcc/backend/tipc.hpp>
+#include <modm/communication/xpcc/backend/zeromq.hpp>
 
-#include <xpcc/debug/logger.hpp>
+#include <modm/debug/logger.hpp>
 
 // set new log level
 #undef XPCC_LOG_LEVEL

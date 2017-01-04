@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/utils/bit_operation.hpp>
+#include <modm/math/utils/bit_operation.hpp>
 
 #include "bit_operation_test.hpp"
 

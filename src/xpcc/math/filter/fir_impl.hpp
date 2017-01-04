@@ -14,7 +14,7 @@
 #ifndef XPCC__FIR_IMPL_HPP
 #define XPCC__FIR_IMPL_HPP
 
-#include <xpcc/architecture/utils.hpp>
+#include <modm/architecture/utils.hpp>
 
 //#define FIR_DEBUG
 

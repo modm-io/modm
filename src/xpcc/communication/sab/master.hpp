@@ -16,7 +16,7 @@
 #define XPCC_SAB__MASTER_HPP
 
 #include <stdint.h>
-#include <xpcc/processing/timer.hpp>
+#include <modm/processing/timer.hpp>
 
 #include "interface.hpp"
 

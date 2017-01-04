@@ -12,7 +12,7 @@
 // ----------------------------------------------------------------------------
 
 #include "label.hpp"
-#include <xpcc/ui/gui/colorpalette.hpp>
+#include <modm/ui/gui/colorpalette.hpp>
 
 void
 xpcc::gui::Label::render(View* view)

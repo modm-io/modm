@@ -17,7 +17,7 @@
 #ifndef	XPCC__CAN_CONNECTOR_HPP
 #define	XPCC__CAN_CONNECTOR_HPP
 
-#include <xpcc/container/linked_list.hpp>
+#include <modm/container/linked_list.hpp>
 #include "../backend_interface.hpp"
 
 // Filter

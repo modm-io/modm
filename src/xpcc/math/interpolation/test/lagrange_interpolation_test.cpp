@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/interpolation/lagrange.hpp>
+#include <modm/math/interpolation/lagrange.hpp>
 
 #include "lagrange_interpolation_test.hpp"
 

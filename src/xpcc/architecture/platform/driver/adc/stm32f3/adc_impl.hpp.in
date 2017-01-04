@@ -24,7 +24,7 @@
 %% endif
 %#
 
-#include <xpcc/architecture/driver/delay.hpp>	// xpcc::delayMicroseconds
+#include <modm/architecture/driver/delay.hpp>	// xpcc::delayMicroseconds
 
 void
 xpcc::stm32::Adc{{ id }}::initialize(const ClockMode clk, const Prescaler pre,

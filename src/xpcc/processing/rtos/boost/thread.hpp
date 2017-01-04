@@ -15,7 +15,7 @@
 #define XPCC_BOOST__THREAD_HPP
 
 #ifndef XPCC_RTOS__THREAD_HPP
-#	error "Don't include this file directly, use <xpcc/processing/rtos/thread.hpp>"
+#	error "Don't include this file directly, use <modm/processing/rtos/thread.hpp>"
 #endif
 
 #include <boost/scoped_ptr.hpp>

@@ -17,12 +17,12 @@
 
 #include <cstddef>
 #include <stdint.h>
-#include <xpcc/architecture/utils.hpp>
-#include <xpcc/processing/timer.hpp>
-#include <xpcc/architecture/driver/delay.hpp>
+#include <modm/architecture/utils.hpp>
+#include <modm/processing/timer.hpp>
+#include <modm/architecture/driver/delay.hpp>
 #include <stdlib.h>
-#include <xpcc/architecture/driver/clock.hpp>
-#include <xpcc/processing/timer/timestamp.hpp>
+#include <modm/architecture/driver/clock.hpp>
+#include <modm/processing/timer/timestamp.hpp>
 
 #include "constants.hpp"
 

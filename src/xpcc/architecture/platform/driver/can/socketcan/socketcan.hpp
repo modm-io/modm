@@ -14,7 +14,7 @@
 
 #include <iostream>
 
-#include <xpcc/architecture/interface/can.hpp>
+#include <modm/architecture/interface/can.hpp>
 
 namespace xpcc
 {

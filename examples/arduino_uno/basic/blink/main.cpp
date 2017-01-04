@@ -13,7 +13,7 @@
 
 // Inspired by: http://arduino.cc/en/Tutorial/Blink
 
-#include <xpcc/architecture/platform.hpp>
+#include <modm/architecture/platform.hpp>
 
 int
 main()

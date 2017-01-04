@@ -19,8 +19,8 @@
 #ifndef XPCC_STM32_F4_DISCOVERY_HPP
 #define XPCC_STM32_F4_DISCOVERY_HPP
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/driver/inertial/lis3dsh.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/driver/inertial/lis3dsh.hpp>
 
 using namespace xpcc::stm32;
 

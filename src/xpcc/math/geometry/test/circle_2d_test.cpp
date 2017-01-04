@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/geometry/circle_2d.hpp>
+#include <modm/math/geometry/circle_2d.hpp>
 
 #include "circle_2d_test.hpp"
 

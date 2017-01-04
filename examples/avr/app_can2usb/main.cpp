@@ -24,9 +24,9 @@
  *
  */
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/driver/usb/ft245.hpp>
-#include <xpcc/debug/logger.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/driver/usb/ft245.hpp>
+#include <modm/debug/logger.hpp>
 
 using namespace xpcc::at90;
 

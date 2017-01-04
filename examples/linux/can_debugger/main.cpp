@@ -9,11 +9,11 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/debug/logger.hpp>
-#include <xpcc/architecture.hpp>
+#include <modm/debug/logger.hpp>
+#include <modm/architecture.hpp>
 
-#include <xpcc/architecture/interface/can.hpp>
-#include <xpcc/architecture/platform/driver/can/canusb/canusb.hpp>
+#include <modm/architecture/interface/can.hpp>
+#include <modm/architecture/platform/driver/can/canusb/canusb.hpp>
 
 #include <cstdlib>
 

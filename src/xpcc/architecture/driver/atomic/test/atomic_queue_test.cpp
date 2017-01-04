@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/driver/atomic/queue.hpp>
+#include <modm/architecture/driver/atomic/queue.hpp>
 
 #include "atomic_queue_test.hpp"
 

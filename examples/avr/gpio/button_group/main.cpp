@@ -11,10 +11,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
+#include <modm/architecture/platform.hpp>
 
-#include <xpcc/architecture/interface/gpio.hpp>
-#include <xpcc/ui/button_group.hpp>
+#include <modm/architecture/interface/gpio.hpp>
+#include <modm/ui/button_group.hpp>
 
 using namespace xpcc::atmega;
 

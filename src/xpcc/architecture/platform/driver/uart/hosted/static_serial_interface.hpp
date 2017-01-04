@@ -13,7 +13,7 @@
 #ifndef XPCC_HOSTED_STATIC_SERIAL_INTERFACE_HPP
 #define XPCC_HOSTED_STATIC_SERIAL_INTERFACE_HPP
 
-#include <xpcc/architecture/interface/uart.hpp>
+#include <modm/architecture/interface/uart.hpp>
 
 #include "serial_interface.hpp"
 

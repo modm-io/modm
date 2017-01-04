@@ -15,8 +15,8 @@
 #define	XPCC_AMNB__NODE_HPP
 
 #include <cstddef>
-#include <xpcc/architecture/driver/accessor/flash.hpp>
-#include <xpcc/processing/timer.hpp>
+#include <modm/architecture/driver/accessor/flash.hpp>
+#include <modm/processing/timer.hpp>
 
 #include "interface.hpp"
 

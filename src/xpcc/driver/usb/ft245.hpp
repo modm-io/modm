@@ -15,7 +15,7 @@
 #ifndef XPCC__FT245_HPP
 #define XPCC__FT245_HPP
 
-#include <xpcc/architecture/interface/gpio.hpp>
+#include <modm/architecture/interface/gpio.hpp>
 
 namespace xpcc
 {
@@ -32,8 +32,8 @@ namespace xpcc
 	 * \section ft245_example Example
 	 *
 	 * \code
-	 * #include <xpcc/architecture.hpp>
-	 * #include <xpcc/driver/usb/ft245.hpp>
+	 * #include <modm/architecture.hpp>
+	 * #include <modm/driver/usb/ft245.hpp>
 	 *
 	 * typedef xpcc::stm32::GpioPort<xpcc::stm32::GpioD0, 8> myPort;
 	 * typedef xpcc::stm32::GpioInputC11  Rxf;

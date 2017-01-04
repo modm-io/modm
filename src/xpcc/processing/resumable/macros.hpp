@@ -13,7 +13,7 @@
 #ifndef XPCC_RF_MACROS_HPP
 #define XPCC_RF_MACROS_HPP
 
-#include <xpcc/utils/arithmetic_traits.hpp>
+#include <modm/utils/arithmetic_traits.hpp>
 
 #ifdef __DOXYGEN__
 /**

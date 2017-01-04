@@ -20,8 +20,8 @@
 #ifndef XPCC_STM32_F746G_DISCOVERY_HPP
 #define XPCC_STM32_F746G_DISCOVERY_HPP
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/debug/logger.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/debug/logger.hpp>
 #define XPCC_BOARD_HAS_LOGGER
 
 using namespace xpcc::stm32;

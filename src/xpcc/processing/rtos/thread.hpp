@@ -15,7 +15,7 @@
 #ifndef XPCC_RTOS__THREAD_HPP
 #define XPCC_RTOS__THREAD_HPP
 
-#include <xpcc/architecture/utils.hpp>
+#include <modm/architecture/utils.hpp>
 
 #ifdef XPCC__OS_HOSTED
 #	include "boost/thread.hpp"

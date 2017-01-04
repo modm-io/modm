@@ -14,7 +14,7 @@
 #include "transmitter.hpp"
 #include "header.hpp"
 
-#include <xpcc/debug/logger.hpp>
+#include <modm/debug/logger.hpp>
 
 // TODO: IMPORTANT! If the TIPC-Module is not loaded terminate with appropriate
 // error message!!!!

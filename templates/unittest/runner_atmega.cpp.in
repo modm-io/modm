@@ -19,7 +19,7 @@
 #include <unittest/reporter.hpp>
 #include <unittest/controller.hpp>
 
-#include <xpcc/architecture/platform.hpp>
+#include <modm/architecture/platform.hpp>
 
 using namespace xpcc::atmega;
 typedef xpcc::avr::SystemClock clock;

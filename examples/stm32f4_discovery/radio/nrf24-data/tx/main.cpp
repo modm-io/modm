@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/debug/logger.hpp>
-#include <xpcc/processing.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/debug/logger.hpp>
+#include <modm/processing.hpp>
 
-#include <xpcc/driver/radio/nrf24/nrf24_phy.hpp>
-#include <xpcc/driver/radio/nrf24/nrf24_config.hpp>
-#include <xpcc/driver/radio/nrf24/nrf24_data.hpp>
+#include <modm/driver/radio/nrf24/nrf24_phy.hpp>
+#include <modm/driver/radio/nrf24/nrf24_config.hpp>
+#include <modm/driver/radio/nrf24/nrf24_data.hpp>
 
 
 /*

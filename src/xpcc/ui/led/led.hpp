@@ -15,9 +15,9 @@
 #define XPCC_UI_LED_HPP
 
 #include <stdint.h>
-#include <xpcc/processing/timer.hpp>
-#include <xpcc/architecture/driver/clock.hpp>
-#include <xpcc/ui/animation.hpp>
+#include <modm/processing/timer.hpp>
+#include <modm/architecture/driver/clock.hpp>
+#include <modm/ui/animation.hpp>
 
 namespace xpcc
 {
@@ -33,7 +33,7 @@ namespace ui
  *
  * Here is an example for the STM32F4:
  * @code
- * #include <xpcc/ui/led.hpp>
+ * #include <modm/ui/led.hpp>
  * // use a lambda function without a closure, this is equivalent to a normal function pointer
  * xpcc::ui::Led orange([](uint8_t brightness)
  * {

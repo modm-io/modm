@@ -15,8 +15,8 @@
 #ifndef FAKE_BACKEND_HPP
 #define FAKE_BACKEND_HPP
 
-#include <xpcc/communication/xpcc/backend/backend_interface.hpp>
-#include <xpcc/container/linked_list.hpp>
+#include <modm/communication/xpcc/backend/backend_interface.hpp>
+#include <modm/container/linked_list.hpp>
 
 #include "message.hpp"
 

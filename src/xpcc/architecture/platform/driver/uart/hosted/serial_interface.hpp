@@ -18,7 +18,7 @@
 #include <stdint.h>
 #include <ostream>
 
-#include <xpcc/io/iodevice.hpp>
+#include <modm/io/iodevice.hpp>
 
 namespace xpcc
 {

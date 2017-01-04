@@ -16,7 +16,7 @@
 #ifndef XPCC_CAN_LAWICEL_FORMATTER_HPP
 #define XPCC_CAN_LAWICEL_FORMATTER_HPP
 
-#include <xpcc/architecture/interface/can_message.hpp>
+#include <modm/architecture/interface/can_message.hpp>
 
 namespace xpcc
 {

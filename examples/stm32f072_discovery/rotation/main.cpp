@@ -10,9 +10,9 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/processing.hpp>
-#include <xpcc/math.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/processing.hpp>
+#include <modm/math.hpp>
 
 using namespace Board;
 

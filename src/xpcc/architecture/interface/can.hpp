@@ -13,7 +13,7 @@
 #ifndef XPCC_INTERFACE_CAN_HPP
 #define XPCC_INTERFACE_CAN_HPP
 
-#include <xpcc/architecture/interface.hpp>
+#include <modm/architecture/interface.hpp>
 #include "can_message.hpp"
 
 /**

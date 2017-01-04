@@ -16,8 +16,8 @@
 #ifndef XPCC_AL_AVREB_CAN_HPP
 #define XPCC_AL_AVREB_CAN_HPP
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/debug/logger.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/debug/logger.hpp>
 
 using namespace xpcc::at90;
 

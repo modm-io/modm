@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/driver/atomic.hpp>
+#include <modm/architecture/driver/atomic.hpp>
 
 #include "../device.hpp"
 #include "../clock/lpc/clock.hpp"

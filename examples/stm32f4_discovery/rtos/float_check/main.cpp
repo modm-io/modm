@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/processing/rtos.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/processing/rtos.hpp>
 
 using namespace xpcc::stm32;
 using namespace xpcc::cortex;

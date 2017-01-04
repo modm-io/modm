@@ -13,9 +13,9 @@
 #ifndef XPCC_PCA8574_HPP
 #define XPCC_PCA8574_HPP
 
-#include <xpcc/architecture/interface/i2c_device.hpp>
-#include <xpcc/processing/protothread.hpp>
-#include <xpcc/architecture/interface/gpio_expander.hpp>
+#include <modm/architecture/interface/i2c_device.hpp>
+#include <modm/processing/protothread.hpp>
+#include <modm/architecture/interface/gpio_expander.hpp>
 
 namespace xpcc
 {

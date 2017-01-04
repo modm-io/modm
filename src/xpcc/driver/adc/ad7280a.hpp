@@ -15,10 +15,10 @@
 
 #include <stdint.h>
 
-#include <xpcc/architecture/interface/gpio.hpp>
-#include <xpcc/architecture/driver/delay.hpp>
+#include <modm/architecture/interface/gpio.hpp>
+#include <modm/architecture/driver/delay.hpp>
 
-#include <xpcc/io/iostream.hpp>
+#include <modm/io/iostream.hpp>
 
 // Forward declaration for the Unit-tests
 class Ad7280aTest;

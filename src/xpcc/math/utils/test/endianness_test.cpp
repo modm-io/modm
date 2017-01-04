@@ -9,7 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/utils/endianness.hpp>
+#include <modm/math/utils/endianness.hpp>
 
 #include "endianness_test.hpp"
 

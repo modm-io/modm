@@ -18,7 +18,7 @@
 #include "receiver.hpp"
 #include "transmitter.hpp"
 
-#include <xpcc/container/smart_pointer.hpp>
+#include <modm/container/smart_pointer.hpp>
 
 #include "../backend_interface.hpp"
 

@@ -14,8 +14,8 @@
 #ifndef FAKE_CAN_DRIVER_HPP
 #define FAKE_CAN_DRIVER_HPP
 
-#include <xpcc/container/linked_list.hpp>
-#include <xpcc/architecture/interface/can.hpp>
+#include <modm/container/linked_list.hpp>
+#include <modm/architecture/interface/can.hpp>
 
 class FakeCanDriver : public xpcc::Can
 {

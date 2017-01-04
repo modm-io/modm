@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/filter/fir.hpp>
+#include <modm/math/filter/fir.hpp>
 
 #include "fir_test.hpp"
 

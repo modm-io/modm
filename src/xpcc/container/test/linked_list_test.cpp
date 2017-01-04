@@ -14,7 +14,7 @@
 // ----------------------------------------------------------------------------
 
 #include <unittest/type/count_type.hpp>
-#include <xpcc/container/linked_list.hpp>
+#include <modm/container/linked_list.hpp>
 
 #include "linked_list_test.hpp"
 

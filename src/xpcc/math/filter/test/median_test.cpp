@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/filter/median.hpp>
+#include <modm/math/filter/median.hpp>
 
 #include "median_test.hpp"
 

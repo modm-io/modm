@@ -19,12 +19,12 @@
 *
 */
 
-#include <xpcc/debug/logger.hpp>
-#include <xpcc/processing/timer.hpp>
-#include <xpcc/processing/protothread.hpp>
-#include <xpcc/driver/display/nokia5110.hpp>
+#include <modm/debug/logger.hpp>
+#include <modm/processing/timer.hpp>
+#include <modm/processing/protothread.hpp>
+#include <modm/driver/display/nokia5110.hpp>
 
-#include <xpcc/architecture/platform.hpp>
+#include <modm/architecture/platform.hpp>
 
 xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > device;
 xpcc::IOStream stream(device);

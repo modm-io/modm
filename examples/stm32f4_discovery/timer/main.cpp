@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/processing.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/processing.hpp>
 #include "leds.hpp"
 #include "animations.hpp"
 

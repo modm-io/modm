@@ -14,7 +14,7 @@
 //
 
 #include "arduino_uno.hpp"
-#include <xpcc/architecture/driver/clock.hpp>
+#include <modm/architecture/driver/clock.hpp>
 
 XPCC_ISR(TIMER0_COMPA)
 {

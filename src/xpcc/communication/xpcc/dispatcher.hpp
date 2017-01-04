@@ -18,8 +18,8 @@
 #ifndef	XPCC__DISPATCHER_HPP
 #define	XPCC__DISPATCHER_HPP
 
-#include <xpcc/processing/timer.hpp>
-#include <xpcc/container/linked_list.hpp>
+#include <modm/processing/timer.hpp>
+#include <modm/container/linked_list.hpp>
 
 #include "backend/backend_interface.hpp"
 #include "postman/postman.hpp"

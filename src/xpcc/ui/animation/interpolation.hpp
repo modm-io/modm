@@ -13,8 +13,8 @@
 #define XPCC_UI_LINEAR_INTERPOLATION_HPP
 
 #include <stdint.h>
-#include <xpcc/utils/arithmetic_traits.hpp>
-#include <xpcc/utils/template_metaprogramming.hpp>
+#include <modm/utils/arithmetic_traits.hpp>
+#include <modm/utils/template_metaprogramming.hpp>
 
 namespace xpcc
 {

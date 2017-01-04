@@ -11,10 +11,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture.hpp>
-#include <xpcc/driver/temperature/ds18b20.hpp>
+#include <modm/architecture.hpp>
+#include <modm/driver/temperature/ds18b20.hpp>
 
-#include <xpcc/io/iostream.hpp>
+#include <modm/io/iostream.hpp>
 
 using namespace xpcc::atmega;
 

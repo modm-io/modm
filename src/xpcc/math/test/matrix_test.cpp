@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/matrix.hpp>
+#include <modm/math/matrix.hpp>
 
 #include "matrix_test.hpp"
 

@@ -16,7 +16,7 @@
 
 #include <cmath>
 
-#include <xpcc/math/filter/moving_average.hpp>
+#include <modm/math/filter/moving_average.hpp>
 
 #include "moving_average_test.hpp"
 

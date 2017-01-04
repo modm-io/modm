@@ -16,8 +16,8 @@
 #ifndef XPCC_ARDUINO_UNO_HPP
 #define XPCC_ARDUINO_UNO_HPP
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/debug/logger.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/debug/logger.hpp>
 
 using namespace xpcc::atmega;
 

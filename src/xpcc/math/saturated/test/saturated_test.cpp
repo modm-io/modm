@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/saturated/saturated.hpp>
+#include <modm/math/saturated/saturated.hpp>
 
 #include "saturated_test.hpp"
 

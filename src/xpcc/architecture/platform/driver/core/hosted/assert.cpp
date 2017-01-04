@@ -10,8 +10,8 @@
 // ----------------------------------------------------------------------------
 
 #include <stdlib.h>
-#include <xpcc/debug/logger.hpp>
-#include <xpcc/architecture/interface/assert.hpp>
+#include <modm/debug/logger.hpp>
+#include <modm/architecture/interface/assert.hpp>
 
 using xpcc::AssertionHandler;
 using xpcc::Abandonment;

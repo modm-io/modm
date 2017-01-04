@@ -15,7 +15,7 @@
 
 #include <cmath>
 #include <stdint.h>
-#include <xpcc/architecture/utils.hpp>
+#include <modm/architecture/utils.hpp>
 
 namespace xpcc
 {

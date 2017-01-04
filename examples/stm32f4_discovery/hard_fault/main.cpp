@@ -9,8 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/debug/logger.hpp>
+#include <modm/architecture/platform.hpp>
+#include <modm/debug/logger.hpp>
 
 /* This example showcases the hard fault handler LED blinking and UART logging.
  * You can trigger the hard fault by pressing the blue button, which will execute an undefined instruction.

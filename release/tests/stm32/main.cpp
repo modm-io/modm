@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture.hpp>
+#include <modm/architecture.hpp>
 
 #if !defined(STM32F3XX)
 // Not yet implemented for STM32 F3 series
