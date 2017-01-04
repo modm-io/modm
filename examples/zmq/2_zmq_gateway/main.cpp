@@ -10,13 +10,13 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/debug/logger.hpp>
-#include <modm/architecture.hpp>
+#include <modm/architecture/architecture.hpp>
 
 #include <modm/architecture/interface/can.hpp>
 #include <modm/architecture/platform/driver/can/canusb/canusb.hpp>
 #include <modm/architecture/platform/driver/can/socketcan/socketcan.hpp>
 
-#include <modm/communication.hpp>
+#include <modm/communication/communication.hpp>
 #include <modm/communication/xpcc/backend/can.hpp>
 
 #include <modm/communication/xpcc/backend/can/connector.hpp>

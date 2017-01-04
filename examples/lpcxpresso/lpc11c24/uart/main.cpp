@@ -17,7 +17,7 @@
  *
  */
 
-#include <modm/architecture.hpp>
+#include <modm/architecture/architecture.hpp>
 
 #include <modm/debug/logger.hpp>
 

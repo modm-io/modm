@@ -15,7 +15,7 @@
 
 #include <modm/debug/error_report.hpp>
 #include <modm/architecture/driver/atomic/queue.hpp>
-#include <modm/utils.hpp>
+#include <modm/utils/utils.hpp>
 
 %% if id == ""
 #include "can.hpp"

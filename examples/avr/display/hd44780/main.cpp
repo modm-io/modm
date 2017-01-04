@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture.hpp>
+#include <modm/architecture/architecture.hpp>
 #include <modm/driver/display.hpp>
 
 using namespace xpcc::atmega;

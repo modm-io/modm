@@ -19,7 +19,7 @@
 #include <modm/container/linked_list.hpp>
 #include <modm/container/queue.hpp>
 #include <modm/container/doubly_linked_list.hpp>
-#include <modm/processing.hpp>
+#include <modm/processing/processing.hpp>
 
 #include <modm/debug/logger.hpp>
 

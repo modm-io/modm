@@ -51,7 +51,7 @@
  *
  */
 
-#include <modm/architecture.hpp>
+#include <modm/architecture/architecture.hpp>
 #include <modm/driver/bus/tft_memory_bus.hpp>
 #include <modm/driver/display/siemens_s75.hpp>
 

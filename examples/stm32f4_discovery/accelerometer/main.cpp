@@ -13,8 +13,8 @@
 
 #include <modm/architecture/platform.hpp>
 #include <modm/driver/inertial/lis302dl.hpp>
-#include <modm/processing.hpp>
-#include <modm/math.hpp>
+#include <modm/processing/processing.hpp>
+#include <modm/math/math.hpp>
 
 
 // ST changed the accelerometer in the C revision (MB997C)

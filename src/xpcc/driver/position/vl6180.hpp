@@ -15,7 +15,7 @@
 
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/architecture/driver/accessor.hpp>
-#include <modm/processing.hpp>
+#include <modm/processing/processing.hpp>
 
 namespace xpcc
 {

@@ -11,11 +11,11 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture.hpp>
+#include <modm/architecture/architecture.hpp>
 
 #include <modm/driver/display.hpp>
 #include <modm/ui/display.hpp>
-#include <modm/processing.hpp>
+#include <modm/processing/processing.hpp>
 
 #include "images/rca_logo_128x64.hpp"
 

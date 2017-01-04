@@ -13,7 +13,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/debug/logger.hpp>
-#include <modm/architecture.hpp>
+#include <modm/architecture/architecture.hpp>
 
 #include <cstdlib>
 

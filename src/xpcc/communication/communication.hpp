@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009, Martin Rosekeit
- * Copyright (c) 2009-2011, Fabian Greif
+ * Copyright (c) 2009-2011, 2016, Fabian Greif
  * Copyright (c) 2012-2015, Niklas Hauser
  *
  * This file is part of the modm project.
@@ -16,8 +16,8 @@
  * @brief 		Communication systems
  */
 
-#include "communication/xpcc.hpp"
-#include "communication/rpr.hpp"
-//#include "communication/amnb.hpp"
-#include "communication/sab.hpp"
-#include "communication/sab2.hpp"
+#include "xpcc.hpp"
+#include "rpr.hpp"
+//#include "amnb.hpp"
+#include "sab.hpp"
+#include "sab2.hpp"

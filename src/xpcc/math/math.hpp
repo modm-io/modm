@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2011, Fabian Greif
+ * Copyright (c) 2009-2011, 2016, Fabian Greif
  * Copyright (c) 2009, Georgi Grinshpun
  * Copyright (c) 2010, Martin Rosekeit
  * Copyright (c) 2012-2013, Niklas Hauser
@@ -21,12 +21,12 @@
 #ifndef XPCC__MATH_HPP
 #define XPCC__MATH_HPP
 
-#include "math/filter.hpp"
-#include "math/geometry.hpp"
-#include "math/matrix.hpp"
-#include "math/lu_decomposition.hpp"
-#include "math/interpolation.hpp"
-#include "math/tolerance.hpp"
-#include "math/utils.hpp"
+#include "filter.hpp"
+#include "geometry.hpp"
+#include "matrix.hpp"
+#include "lu_decomposition.hpp"
+#include "interpolation.hpp"
+#include "tolerance.hpp"
+#include "utils.hpp"
 
 #endif	// XPCC__MATH_HPP

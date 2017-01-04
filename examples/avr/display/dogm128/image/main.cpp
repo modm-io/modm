@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture.hpp>
+#include <modm/architecture/architecture.hpp>
 #include <modm/driver/display.hpp>
 
 #include "images/image_64x64_0.hpp"

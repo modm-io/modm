@@ -12,7 +12,7 @@
 
 #include <modm/architecture/platform.hpp>
 
-#include <modm/processing.hpp>
+#include <modm/processing/processing.hpp>
 #include <modm/driver/position/vl6180.hpp>
 #include <modm/io/iostream.hpp>
 #include <modm/debug/logger.hpp>

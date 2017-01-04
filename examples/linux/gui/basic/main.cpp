@@ -11,12 +11,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture.hpp>
+#include <modm/architecture/architecture.hpp>
 #include <modm/debug/logger.hpp>
 
 #include <modm/ui/display/image.hpp>
 #include <modm/ui/gui.hpp>
-#include <modm/container.hpp>
+#include <modm/container/container.hpp>
 
 #include "screens/homeview.hpp"
 #include "screens/choose_color.hpp"

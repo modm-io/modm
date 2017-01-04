@@ -10,9 +10,9 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/debug/logger.hpp>
-#include <modm/architecture.hpp>
+#include <modm/architecture/architecture.hpp>
 
-#include <modm/communication.hpp>
+#include <modm/communication/communication.hpp>
 #include <modm/communication/xpcc/backend/zeromq/connector.hpp>
 
 #include "component_gui/gui.hpp"

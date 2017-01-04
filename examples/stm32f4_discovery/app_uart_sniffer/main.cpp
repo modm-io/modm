@@ -13,7 +13,7 @@
 
 #include <modm/architecture/platform.hpp>
 #include <modm/debug/logger.hpp>
-#include <modm/processing.hpp>
+#include <modm/processing/processing.hpp>
 
 Usart2 uart;
 xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > loggerDevice(uart);

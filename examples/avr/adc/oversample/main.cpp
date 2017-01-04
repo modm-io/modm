@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture.hpp>
-#include <modm/processing.hpp>
+#include <modm/architecture/architecture.hpp>
+#include <modm/processing/processing.hpp>
 
 using namespace xpcc::atmega;
 

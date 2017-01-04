@@ -165,7 +165,7 @@
 #include "i2c_master_{{ id }}.hpp"
 #include <modm/architecture/driver/accessor.hpp>
 #include <modm/architecture/driver/atomic.hpp>
-#include <modm/container.hpp>
+#include <modm/container/container.hpp>
 
 XPCC_ISR_DECL(I2C{{ id }}_ER);
 

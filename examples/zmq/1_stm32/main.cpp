@@ -13,7 +13,7 @@
 
 #include <modm/processing/timer/periodic_timer.hpp>
 
-#include <modm/communication.hpp>
+#include <modm/communication/communication.hpp>
 #include <modm/communication/xpcc/backend/can.hpp>
 
 #include "component_odometry/odometry.hpp"

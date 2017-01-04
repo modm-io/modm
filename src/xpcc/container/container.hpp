@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, Fabian Greif
+ * Copyright (c) 2010, 2016, Fabian Greif
  * Copyright (c) 2012, Niklas Hauser
  *
  * This file is part of the modm project.
@@ -42,7 +42,7 @@ Sequence containers:
 Container adaptors:
  - xpcc::Queue
  - xpcc::Stack
- 
+
  - xpcc::BoundedStack
  - xpcc::BoundedQueue
 
@@ -76,33 +76,33 @@ every one of it, only a subset which is sufficient for the container.
  - (remove)
  - getFront
  - getBack
- 
+
  - push (only Stack and Queue)
  - pop (only Stack and Queue)
  - get (only Stack and Queue)
 
  - at
  - operator []
- 
+
  - clear
- 
+
  - isEmpty
  - isFull
  - getSize
  - getMaxSize
- - getCapacity 
+ - getCapacity
 */
 
-#include "container/deque.hpp"
-#include "container/queue.hpp"
-#include "container/stack.hpp"
+#include "deque.hpp"
+#include "queue.hpp"
+#include "stack.hpp"
 
-#include "container/linked_list.hpp"
-#include "container/doubly_linked_list.hpp"
+#include "linked_list.hpp"
+#include "doubly_linked_list.hpp"
 
-#include "container/dynamic_array.hpp"
+#include "dynamic_array.hpp"
 
-#include "container/pair.hpp"
-#include "container/smart_pointer.hpp"
+#include "pair.hpp"
+#include "smart_pointer.hpp"
 
 

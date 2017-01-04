@@ -11,7 +11,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/architecture/platform.hpp>
-#include <modm/processing.hpp>
+#include <modm/processing/processing.hpp>
 #include <modm/driver/display/max7219matrix.hpp>
 
 /**

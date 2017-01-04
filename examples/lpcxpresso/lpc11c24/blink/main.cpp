@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture.hpp>
+#include <modm/architecture/architecture.hpp>
 
 // ----------------------------------------------------------------------------
 using namespace xpcc::lpc;

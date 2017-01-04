@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009, Martin Rosekeit
- * Copyright (c) 2009-2011, Fabian Greif
+ * Copyright (c) 2009-2011, 2016, Fabian Greif
  * Copyright (c) 2012, Sascha Schade
  * Copyright (c) 2012, Niklas Hauser
  *
@@ -19,7 +19,7 @@
 #ifndef XPCC__DEBUG_HPP
 #define XPCC__DEBUG_HPP
 
-#include "debug/logger.hpp"
-#include "debug/error_report.hpp"
+#include "logger.hpp"
+#include "error_report.hpp"
 
 #endif	// XPCC__DEBUG_HPP

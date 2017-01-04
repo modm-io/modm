@@ -10,7 +10,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/debug/logger.hpp>
-#include <modm/architecture.hpp>
+#include <modm/architecture/architecture.hpp>
 
 #include <modm/architecture/interface/can.hpp>
 #include <modm/architecture/platform/driver/can/canusb/canusb.hpp>

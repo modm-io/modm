@@ -11,8 +11,8 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/architecture/platform.hpp>
-#include <modm/processing.hpp>
-#include <modm/math.hpp>
+#include <modm/processing/processing.hpp>
+#include <modm/math/math.hpp>
 
 using namespace Board;
 

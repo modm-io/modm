@@ -12,7 +12,7 @@
 
 #include <modm/architecture/platform.hpp>
 
-#include <modm/processing.hpp>
+#include <modm/processing/processing.hpp>
 #include <modm/processing/protothread.hpp>
 #include <modm/driver/color/tcs3414.hpp>
 

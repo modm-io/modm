@@ -32,7 +32,7 @@ namespace xpcc
 	 * \section ft245_example Example
 	 *
 	 * \code
-	 * #include <modm/architecture.hpp>
+	 * #include <modm/architecture/architecture.hpp>
 	 * #include <modm/driver/usb/ft245.hpp>
 	 *
 	 * typedef xpcc::stm32::GpioPort<xpcc::stm32::GpioD0, 8> myPort;

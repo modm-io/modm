@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009, Martin Rosekeit
- * Copyright (c) 2009-2011, Fabian Greif
+ * Copyright (c) 2009-2011, 2016, Fabian Greif
  * Copyright (c) 2011-2012, Niklas Hauser
  * Copyright (c) 2014, Kevin Laeufer
  *
@@ -15,14 +15,14 @@
 /**
  * \defgroup 	utils Utilities
  * \brief 		Some Utilities
- * 
+ *
  */
 
-#include "architecture/utils.hpp"
+#include <modm/architecture/utils.hpp>
 
-#include "utils/algorithm.hpp"
-#include "utils/allocator.hpp"
-#include "utils/arithmetic_traits.hpp"
-#include "utils/template_metaprogramming.hpp"
-#include "utils/dummy.hpp"
-#include "utils/bit_constants.hpp"
+#include "algorithm.hpp"
+#include "allocator.hpp"
+#include "arithmetic_traits.hpp"
+#include "template_metaprogramming.hpp"
+#include "dummy.hpp"
+#include "bit_constants.hpp"

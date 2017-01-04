@@ -11,7 +11,7 @@
 
 #include <modm/architecture/platform.hpp>
 #include <modm/debug/logger.hpp>
-#include <modm/processing.hpp>
+#include <modm/processing/processing.hpp>
 
 // ----------------------------------------------------------------------------
 // Set the log level

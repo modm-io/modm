@@ -12,9 +12,9 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture.hpp>
-#include <modm/processing.hpp>
-#include <modm/debug.hpp>
+#include <modm/architecture/architecture.hpp>
+#include <modm/processing/processing.hpp>
+#include <modm/debug/debug.hpp>
 
 #include <modm/driver/display.hpp>
 #include <modm/ui/display/font.hpp>

@@ -13,7 +13,7 @@
 
 #include <modm/architecture/platform.hpp>
 #include <modm/debug/logger.hpp>
-#include <modm/processing.hpp>
+#include <modm/processing/processing.hpp>
 
 #include <modm/driver/radio/nrf24/nrf24_phy.hpp>
 #include <modm/driver/radio/nrf24/nrf24_config.hpp>

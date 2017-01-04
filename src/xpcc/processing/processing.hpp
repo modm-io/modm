@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010, Fabian Greif
+ * Copyright (c) 2009-2010, 2016, Fabian Greif
  * Copyright (c) 2009-2010, Martin Rosekeit
  * Copyright (c) 2012, 2015, Niklas Hauser
  *
@@ -20,12 +20,12 @@
 #ifndef XPCC_PROCESSING_HPP
 #define	XPCC_PROCESSING_HPP
 
-#include "processing/timer.hpp"
+#include "timer.hpp"
 
-#include "processing/protothread.hpp"
-#include "processing/resumable.hpp"
+#include "protothread.hpp"
+#include "resumable.hpp"
 
-#include "processing/task.hpp"
-#include "processing/scheduler/scheduler.hpp"
+#include "task.hpp"
+#include "scheduler/scheduler.hpp"
 
 #endif	// XPCC_PROCESSING_HPP
