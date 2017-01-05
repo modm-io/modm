@@ -14,8 +14,8 @@
 #include <modm/architecture/driver/atomic/lock.hpp>
 #include <modm/architecture/driver/clock.hpp>
 #include <modm/utils/dummy.hpp>
+#include <modm/platform/device.hpp>
 
-#include "../../../../device.hpp"
 #include "systick_timer.hpp"
 
 static modm::cortex::InterruptHandler sysTickHandler(nullptr);

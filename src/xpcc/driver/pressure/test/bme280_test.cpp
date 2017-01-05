@@ -219,8 +219,8 @@ Bme280Test::testConversion()
 			adc_temp_step = 1;
 		}
 
-		for (uint32_t adc_temp = adc_temp_min[jj]; 
-			 adc_temp <= adc_temp_max[jj]; 
+		for (uint32_t adc_temp = adc_temp_min[jj];
+			 adc_temp <= adc_temp_max[jj];
 			 adc_temp += adc_temp_step)
 		{
 			dataDouble->raw[3] = adc_temp >> 12;
@@ -268,7 +268,7 @@ Bme280Test::testConversion()
 				}
 
 				int32_t error = pressFp - pressDp;
-				MODM_LOG_DEBUG.printf("  adc_press = %05x  PressFp = %9d Pa\t PressDp = %9d Pa \t Diff = %5d Pa\n", 
+				MODM_LOG_DEBUG.printf("  adc_press = %05x  PressFp = %9d Pa\t PressDp = %9d Pa \t Diff = %5d Pa\n",
 					adc_press, pressFp, pressDp, error);
 
 				error = std::abs(error);

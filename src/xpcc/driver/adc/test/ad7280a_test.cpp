@@ -14,7 +14,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/driver/adc/ad7280a.hpp>
-#include <modm/architecture/platform/driver/gpio/generic/gpio.hpp>
+#include <modm/platform/gpio/software_gpio.hpp>
 
 #include "ad7280a_test.hpp"
 
@@ -197,7 +197,7 @@ Ad7280aTest::testChannelRead()
 
 	device.start(transmissionsInitialize, ARRAY_SIZE(transmissionsInitialize), __LINE__);
 
-	uint16_t value;
+	uint16_t value = 0;
 	TEST_ASSERT_TRUE(Ad7280a::readChannel(0, modm::ad7280a::CELL_VOLTAGE_4, &value));
 
 	TEST_ASSERT_EQUALS(value, 549u);

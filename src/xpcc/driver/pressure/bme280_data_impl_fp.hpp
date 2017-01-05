@@ -21,11 +21,18 @@
 #undef  MODM_LOG_LEVEL
 #define MODM_LOG_LEVEL modm::log::DISABLED
 
-namespace modm {
-
-namespace bme280data {
+namespace modm
+{
+namespace bme280data
+{
 
 // Fixed point implementation
+
+Data::Data() :
+	calibratedPressure(0),
+	t_fine(0)
+{
+}
 
 void
 Data::calculateCalibratedTemperature()
@@ -42,7 +49,7 @@ Data::calculateCalibratedTemperature()
 	int32_t var1 = ((((adc >> 3) - (T1 << 1))) * (T2)) >> 11;
 
 
-	int32_t var2 = (  (  ( ((adc >> 4) - (T1)) * 
+	int32_t var2 = (  (  ( ((adc >> 4) - (T1)) *
 		                   ((adc >> 4) - (T1))
 		                 ) >> 12
 				 	  ) * (T3)
@@ -117,8 +124,8 @@ Data::calculateCalibratedHumidity()
 
   	int32_t v = (t_fine - int32_t(76800));
 
-	v = (((((adc << 14) - (H4 << 20) - (H5 * v)) + (int32_t(16384))) >> 15) * 
-		  (((((((v * H6) >> 10) * (((v * (H3)) >> 11) + (int32_t(32768)))) >> 10) + 
+	v = (((((adc << 14) - (H4 << 20) - (H5 * v)) + (int32_t(16384))) >> 15) *
+		  (((((((v * H6) >> 10) * (((v * (H3)) >> 11) + (int32_t(32768)))) >> 10) +
 		  	(int32_t(2097152))) * H2 + 8192) >> 14));
 
 	v = (v - (((((v >> 15) * (v >> 15)) >> 7) * H1) >> 4));

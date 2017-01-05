@@ -18,4 +18,9 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "src/modm/processing"
-    env.copy('.')
+
+    device = env[":target"]
+    if device.properties["core"].startswith("cortex-m4"):
+        env.copy(".", ignore=env.ignore_patterns("*.lb", "*/rtos/boost*"))
+    else:
+        env.copy(".", ignore=env.ignore_patterns("*.lb", "*/rtos/boost*", "*/rtos/freertos*"))

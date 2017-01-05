@@ -13,15 +13,13 @@
 #include <modm/architecture/driver.hpp>
 #include "st7036.hpp"
 
-#include "modm_config.hpp"
-
 namespace modm
 {
 	namespace st7036
 	{
 		FLASH_STORAGE(uint8_t configuration[10]) =
 		{
-#if (ST7036_VOLTAGE == 3)
+%% if options["::ST7036_voltage"] == "3.3V"
 
 			0x39,
 			0x14,
@@ -29,7 +27,7 @@ namespace modm
 			0x6d,
 			0x78,
 
-#elif (ST7036_VOLTAGE == 5)
+%% elif options["::ST7036_voltage"] == "5V"
 
 			0x39,
 			0x1C,
@@ -37,9 +35,7 @@ namespace modm
 			0x69,
 			0x74,
 
-#else
-	#error "Unknown definition for 'ST7036_VOLTAGE', allowed values are '3' for 3,3V and '5' for 5V!"
-#endif
+%% endif
 			0x0f,
 			0x01,		// clear display
 			0x03,		// return to home position

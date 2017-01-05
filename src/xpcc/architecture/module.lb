@@ -18,4 +18,4 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "src/modm/architecture"
-    env.copy('.', ignore=env.ignore_patterns("*platform/devices*", "*platform/driver*"))
+    env.copy('.', ignore=env.ignore_patterns("*.lb", "*.in", "*platform/*"))

@@ -72,6 +72,12 @@ DataBase
 	friend class ::Bme280Test;
 
 public:
+	inline
+	DataBase() :
+		meta(0)
+	{
+	}
+
 	// DATA ACCESS
 	inline Calibration &
 	getCalibration() {
@@ -121,6 +127,8 @@ class modm_packed
 Data : public DataBase
 {
 public:
+	Data();
+
 	/**
 	 * Get the calibrated temperature for the device in 0.01 degree Celsius
 	 *
@@ -182,13 +190,16 @@ private:
 	int32_t calibratedPressure;    // in Pa
 	int32_t calibratedHumidity;    // in ???
 
-	int32_t t_fine; // calculated in calculateCalibratedTemperature, needed for calculateCalibratedPressure and calculateCalibratedHumidity
+	// calculated in calculateCalibratedTemperature, needed for calculateCalibratedPressure and calculateCalibratedHumidity
+	int32_t t_fine;
 };
 
 class modm_packed
 DataDouble : public DataBase
 {
 public:
+	DataDouble();
+
 	int32_t inline
 	getTemperature();
 
@@ -227,8 +238,8 @@ private:
 	// Stored pressure in double precision in ???
 	double calibratedHumidityDouble;
 
-	// calculated in calculateCalibratedTemperature, needed for calculateCalibratedPressure and calculateCalibratedHumidity	
-	double t_fine; 
+	// calculated in calculateCalibratedTemperature, needed for calculateCalibratedPressure and calculateCalibratedHumidity
+	double t_fine;
 };
 
 } // bme280data namespace

@@ -11,13 +11,11 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "debug"
+    module.name = "fatfs"
 
 def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/debug"
-
-    # FIXME reenable default style if target is hosted
-    env.copy(".", ignore=env.ignore_patterns("*.lb", "*logger/hosted/*"))
+    env.outbasepath = "src/fatfs"
+    env.copy('.')

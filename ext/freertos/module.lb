@@ -11,13 +11,16 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "debug"
+    module.name = "freertos"
 
 def prepare(module, options):
+    device = options[":target"]
+    if not device.properties["core"].startswith("cortex-m4"):
+        return False
+
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/debug"
+    env.outbasepath = "ext/freertos"
 
-    # FIXME reenable default style if target is hosted
-    env.copy(".", ignore=env.ignore_patterns("*.lb", "*logger/hosted/*"))
+    env.copy(".", ignore=env.ignore_files("*.lb"))

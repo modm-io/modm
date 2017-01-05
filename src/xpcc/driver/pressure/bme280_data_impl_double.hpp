@@ -21,16 +21,21 @@
 #undef  MODM_LOG_LEVEL
 #define MODM_LOG_LEVEL modm::log::DISABLED
 
-namespace modm {
-
-namespace bme280data {
-
+namespace modm
+{
+namespace bme280data
+{
 // Double precision implementation
+
+DataDouble::DataDouble() :
+	t_fine(0)
+{
+}
 
 void
 DataDouble::calculateCalibratedTemperature()
 {
-	// Temperature value is expected to be received in 20 bit format, 
+	// Temperature value is expected to be received in 20 bit format,
 	// positive, stored in a 32 bit signed integer.
 	int32_t adc = ((raw[3] << 16) | (raw[4] << 8) | (raw[5] << 0));
 	adc >>= 4;

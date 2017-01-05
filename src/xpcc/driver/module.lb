@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2016, Fabian Greif
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = "driver"
+
+def prepare(module, options):
+    module.add_option(
+        EnumerationOption(
+            name="MCP2515_clock",
+            enumeration=["16MHz", "20MHz"],
+            description=
+                "Used clock for the MCP2515. The device configuration "
+                "is selected according to the clock speed.",
+            default="16MHz"))
+    module.add_option(
+        EnumerationOption(
+            name="ST7036_voltage",
+            enumeration=["3.3V", "5V"],
+            description="Select the supply voltage of the ST7036.",
+            default="3.3V"))
+
+    module.depends([":fatfs", ":ui"])
+    return True
+
+def build(env):
+    env.outbasepath = "src/modm/driver"
+
+    # Copy all files except for the templates and the module file.
+    env.copy(".", ignore=env.ignore_files("*.lb", "*.in"))
+
+    env.template("can/mcp2515.cpp.in")

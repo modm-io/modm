@@ -12,8 +12,8 @@
 
 #include "can_bit_timings_test.hpp"
 
-#include "../driver/clock/generic/common_clock.hpp"
-#include "../driver/can/generic/can_bit_timings.hpp"
+#include <modm/platform/clock/common_clock.hpp>
+#include <modm/platform/can/can_bit_timings.hpp>
 
 using namespace modm;
 using namespace modm::clock;
