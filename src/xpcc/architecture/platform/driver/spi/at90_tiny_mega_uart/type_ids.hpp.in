@@ -11,10 +11,10 @@
 
 {{ generation_block }}
 
-#ifndef XPCC_{{target["family"] | upper}}_UART_SPI_TYPE_IDS_HPP
-#define XPCC_{{target["family"] | upper}}_UART_SPI_TYPE_IDS_HPP
+#ifndef MODM_{{target["family"] | upper}}_UART_SPI_TYPE_IDS_HPP
+#define MODM_{{target["family"] | upper}}_UART_SPI_TYPE_IDS_HPP
 
-namespace xpcc
+namespace modm
 {
 
 namespace {{target["family"]}}
@@ -31,6 +31,6 @@ namespace TypeId
 
 } // namespace {{target["family"]}}
 
-} // namespace xpcc
+} // namespace modm
 
-#endif // XPCC_{{target["family"] | upper}}_UART_SPI_TYPE_IDS_HPP
+#endif // MODM_{{target["family"] | upper}}_UART_SPI_TYPE_IDS_HPP

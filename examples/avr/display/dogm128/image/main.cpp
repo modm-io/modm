@@ -25,7 +25,7 @@
 #include "images/image_64x64_8.hpp"
 #include "images/image_64x64_9.hpp"
 
-using namespace xpcc::atmega;
+using namespace modm::atmega;
 
 namespace led
 {
@@ -44,10 +44,10 @@ namespace lcd
 	typedef GpioOutputD3 A0;
 	typedef GpioOutputD4 Reset;
 
-	typedef xpcc::SoftwareSpiMaster< Sck, Mosi > SPI;
+	typedef modm::SoftwareSpiMaster< Sck, Mosi > SPI;
 }
 
-xpcc::DogM128< lcd::SPI, lcd::Cs, lcd::A0, lcd::Reset, true > display;
+modm::DogM128< lcd::SPI, lcd::Cs, lcd::A0, lcd::Reset, true > display;
 
 FLASH_STORAGE(uint8_t bootscreen[]) =
 {
@@ -159,39 +159,39 @@ FLASH_STORAGE(uint8_t bootscreen[]) =
 };
 
 void
-drawNumber(xpcc::glcd::Point cursor, uint8_t number)
+drawNumber(modm::glcd::Point cursor, uint8_t number)
 {
 	switch (number)
 	{
 		case 0:
-			display.drawImage(cursor, xpcc::accessor::asFlash(bitmap::image_64x64_0));
+			display.drawImage(cursor, modm::accessor::asFlash(bitmap::image_64x64_0));
 			break;
 		case 1:
-			display.drawImage(cursor, xpcc::accessor::asFlash(bitmap::image_64x64_1));
+			display.drawImage(cursor, modm::accessor::asFlash(bitmap::image_64x64_1));
 			break;
 		case 2:
-			display.drawImage(cursor, xpcc::accessor::asFlash(bitmap::image_64x64_2));
+			display.drawImage(cursor, modm::accessor::asFlash(bitmap::image_64x64_2));
 			break;
 		case 3:
-			display.drawImage(cursor, xpcc::accessor::asFlash(bitmap::image_64x64_3));
+			display.drawImage(cursor, modm::accessor::asFlash(bitmap::image_64x64_3));
 			break;
 		case 4:
-			display.drawImage(cursor, xpcc::accessor::asFlash(bitmap::image_64x64_4));
+			display.drawImage(cursor, modm::accessor::asFlash(bitmap::image_64x64_4));
 			break;
 		case 5:
-			display.drawImage(cursor, xpcc::accessor::asFlash(bitmap::image_64x64_5));
+			display.drawImage(cursor, modm::accessor::asFlash(bitmap::image_64x64_5));
 			break;
 		case 6:
-			display.drawImage(cursor, xpcc::accessor::asFlash(bitmap::image_64x64_6));
+			display.drawImage(cursor, modm::accessor::asFlash(bitmap::image_64x64_6));
 			break;
 		case 7:
-			display.drawImage(cursor, xpcc::accessor::asFlash(bitmap::image_64x64_7));
+			display.drawImage(cursor, modm::accessor::asFlash(bitmap::image_64x64_7));
 			break;
 		case 8:
-			display.drawImage(cursor, xpcc::accessor::asFlash(bitmap::image_64x64_8));
+			display.drawImage(cursor, modm::accessor::asFlash(bitmap::image_64x64_8));
 			break;
 		case 9:
-			display.drawImage(cursor, xpcc::accessor::asFlash(bitmap::image_64x64_9));
+			display.drawImage(cursor, modm::accessor::asFlash(bitmap::image_64x64_9));
 			break;
 	}
 }
@@ -209,10 +209,10 @@ main()
 
 	display.initialize();
 
-	display.drawImage(xpcc::glcd::Point(0, 0), xpcc::accessor::asFlash(bootscreen));
+	display.drawImage(modm::glcd::Point(0, 0), modm::accessor::asFlash(bootscreen));
 	display.update();
 
-	xpcc::delayMilliseconds(1500);
+	modm::delayMilliseconds(1500);
 
 	uint8_t units = 0;
 	uint8_t tens = 0;
@@ -227,10 +227,10 @@ main()
 			}
 		}
 
-		drawNumber(xpcc::glcd::Point(0, 0), tens);
-		drawNumber(xpcc::glcd::Point(64, 0), units);
+		drawNumber(modm::glcd::Point(0, 0), tens);
+		drawNumber(modm::glcd::Point(64, 0), units);
 		display.update();
 
-		xpcc::delayMilliseconds(200);
+		modm::delayMilliseconds(200);
 	}
 }

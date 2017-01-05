@@ -27,6 +27,6 @@ main()
 		LedUp::toggle();
 		LedLeft::toggle();
 		LedDown::toggle();
-		xpcc::delayMilliseconds(1000);
+		modm::delayMilliseconds(1000);
 	}
 }

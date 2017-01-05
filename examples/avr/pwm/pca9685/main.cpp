@@ -13,8 +13,8 @@
 #include <modm/architecture/platform.hpp>
 #include <modm/driver/pwm/pca9685.hpp>
 
-using namespace xpcc::atmega;
-typedef xpcc::avr::SystemClock systemClock;
+using namespace modm::atmega;
+typedef modm::avr::SystemClock systemClock;
 
 int 
 main()
@@ -28,12 +28,12 @@ main()
 	// Create the PWM controller and set it up to use I2C address 0x50.
 	// The controller's address depends on the configuration of pins A0-A5 and
 	// is in range of 0x40 to 0x7f
-	xpcc::Pca9685<I2cMaster> pwmController = xpcc::Pca9685<I2cMaster>(0x50);
+	modm::Pca9685<I2cMaster> pwmController = modm::Pca9685<I2cMaster>(0x50);
 
 
 	// Initialize the controller. I use RGB-LEDs with common annode.
 	// Therfore the controllers output needs to be inverted.
-	RF_CALL_BLOCKING(pwmController.initialize(0, xpcc::pca9685::MODE2_INVRT));
+	RF_CALL_BLOCKING(pwmController.initialize(0, modm::pca9685::MODE2_INVRT));
 
 	uint16_t pwm = 0;
 

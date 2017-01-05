@@ -13,8 +13,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_ANGLE_HPP
-#define	XPCC_ANGLE_HPP
+#ifndef	MODM_ANGLE_HPP
+#define	MODM_ANGLE_HPP
 
 #include <cmath>
 #include <math.h>
@@ -49,7 +49,7 @@
 #define M_SQRT2  1.41421356237309504880
 #endif
 
-namespace xpcc
+namespace modm
 {
 	static constexpr float
 	toRadian(float angle)
@@ -92,7 +92,7 @@ namespace xpcc
 		 *
 		 * Equivalent to:
 		 * \code
-		 * float angle = xpcc::Angle::normalize(angle + M_PI);
+		 * float angle = modm::Angle::normalize(angle + M_PI);
 		 * \endcode
 		 */
 		static float
@@ -112,15 +112,15 @@ namespace xpcc
 		static constexpr float
 		toRadian(float angle)
 		{
-			return ::xpcc::toRadian(angle);
+			return ::modm::toRadian(angle);
 		}
 
 		static constexpr float
 		toDegree(float angle)
 		{
-			return ::xpcc::toDegree(angle);
+			return ::modm::toDegree(angle);
 		}
 	};
 }
 
-#endif	// XPCC_ANGLE_HPP
+#endif	// MODM_ANGLE_HPP

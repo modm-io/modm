@@ -10,15 +10,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_TLC594X_HPP
-#define XPCC_TLC594X_HPP
+#ifndef MODM_TLC594X_HPP
+#define MODM_TLC594X_HPP
 
 #include <stdint.h>
 #include <modm/architecture/platform.hpp>
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/architecture/driver/delay.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -53,8 +53,8 @@ namespace xpcc
  * @tparam CHANNELS	Number of channels must be multiples of 4, adjust for daisy-chained chips
  * @tparam	Spi		Spi interface
  * @tparam	Xlat	Level triggered latch pin
- * @tparam	Vprog	Vprog pin, use xpcc::GpioUnused if not connected
- * @tparam	Xerr	Error pin, use xpcc::GpioUnused if not connected
+ * @tparam	Vprog	Vprog pin, use modm::GpioUnused if not connected
+ * @tparam	Xerr	Error pin, use modm::GpioUnused if not connected
  *
  * @author	Niklas Hauser
  * @ingroup	driver_pwm
@@ -63,8 +63,8 @@ template<
 	uint16_t CHANNELS,
 	typename Spi,
 	typename Xlat,
-	typename Vprog=xpcc::GpioUnused,
-	typename Xerr=xpcc::GpioUnused >
+	typename Vprog=modm::GpioUnused,
+	typename Xerr=modm::GpioUnused >
 class TLC594X
 {
 public:
@@ -123,26 +123,26 @@ public:
 	latch();
 
 	/// @return true if LOD or TEF is detected
-	xpcc_always_inline
+	modm_always_inline
 	static bool
 	isError()
 	{
 		return !Xerr::read();
 	}
 
-	xpcc_always_inline
+	modm_always_inline
 	static uint8_t*
 	getGrayscaleData()
 	{
 		return gs;
 	}
-	xpcc_always_inline
+	modm_always_inline
 	static uint8_t*
 	getDotCorrectionData()
 	{
 		return dc;
 	}
-	xpcc_always_inline
+	modm_always_inline
 	static uint8_t*
 	getStatusData()
 	{
@@ -159,4 +159,4 @@ private:
 
 #include "tlc594x_impl.hpp"
 
-#endif // XPCC_TLC594X_HPP
+#endif // MODM_TLC594X_HPP

@@ -56,8 +56,8 @@
 #include <modm/driver/display/siemens_s75.hpp>
 
 // ----------------------------------------------------------------------------
-using namespace xpcc::stm32;
-using namespace xpcc::stm32::fsmc;
+using namespace modm::stm32;
+using namespace modm::stm32::fsmc;
 
 typedef GpioOutputA8 Led;
 
@@ -82,14 +82,14 @@ namespace lcd
 	typedef GpioOutputE3 Reset;     // Reset, not part of FSMC
 
 	// FSMC
-	typedef xpcc::TftMemoryBus8Bit ParallelBus;
+	typedef modm::TftMemoryBus8Bit ParallelBus;
 
 	// non-FSMC: GPIO
-//	typedef xpcc::gpio::Port<D7, D6, D5, D4, D3, D2, D1, D0> Port;
-//	typedef xpcc::TftMemoryBus8BitGpio<Port, Cs, xpcc::gpio::Unused, Wr, Cd> ParallelBus;
+//	typedef modm::gpio::Port<D7, D6, D5, D4, D3, D2, D1, D0> Port;
+//	typedef modm::TftMemoryBus8BitGpio<Port, Cs, modm::gpio::Unused, Wr, Cd> ParallelBus;
 
 	// Display
-	typedef xpcc::SiemensS75LandscapeRight<lcd::ParallelBus, lcd::Reset> Display;
+	typedef modm::SiemensS75LandscapeRight<lcd::ParallelBus, lcd::Reset> Display;
 }
 
 /**
@@ -117,35 +117,35 @@ main()
 	// Switch STM32F4 to 168 MHz (HSE clocked by an 25 MHz external clock)
     defaultSystemClock::enable();
 
-	Led::setOutput(xpcc::Gpio::Low);
+	Led::setOutput(modm::Gpio::Low);
 
-	lcd::Reset::setOutput(xpcc::Gpio::Low);
+	lcd::Reset::setOutput(modm::Gpio::Low);
 
 	//------------------------------------------------------
 
 	// FSMC
-	xpcc::stm32::Fsmc::initialize();
+	modm::stm32::Fsmc::initialize();
 
 	// A23
-    lcd::Cd::connect(Fsmc::A23, xpcc::stm32::Gpio::OutputType::PushPull, xpcc::stm32::Gpio::OutputSpeed::MHz100);
+    lcd::Cd::connect(Fsmc::A23, modm::stm32::Gpio::OutputType::PushPull, modm::stm32::Gpio::OutputSpeed::MHz100);
 
 	// FSMC_NE1
-    lcd::Cs::connect(Fsmc::Ne1, xpcc::stm32::Gpio::OutputType::PushPull, xpcc::stm32::Gpio::OutputSpeed::MHz100);
+    lcd::Cs::connect(Fsmc::Ne1, modm::stm32::Gpio::OutputType::PushPull, modm::stm32::Gpio::OutputSpeed::MHz100);
 
 	// FSMC_NWE
-	lcd::Wr::connect(Fsmc::Nwe, xpcc::stm32::Gpio::OutputType::PushPull, xpcc::stm32::Gpio::OutputSpeed::MHz100);
+	lcd::Wr::connect(Fsmc::Nwe, modm::stm32::Gpio::OutputType::PushPull, modm::stm32::Gpio::OutputSpeed::MHz100);
 
-    lcd::D0::connect(Fsmc::D0, xpcc::stm32::Gpio::OutputType::PushPull, xpcc::stm32::Gpio::OutputSpeed::MHz100);
-    lcd::D1::connect(Fsmc::D1, xpcc::stm32::Gpio::OutputType::PushPull, xpcc::stm32::Gpio::OutputSpeed::MHz100);
-    lcd::D2::connect(Fsmc::D2, xpcc::stm32::Gpio::OutputType::PushPull, xpcc::stm32::Gpio::OutputSpeed::MHz100);
-    lcd::D3::connect(Fsmc::D3, xpcc::stm32::Gpio::OutputType::PushPull, xpcc::stm32::Gpio::OutputSpeed::MHz100);
-    lcd::D4::connect(Fsmc::D4, xpcc::stm32::Gpio::OutputType::PushPull, xpcc::stm32::Gpio::OutputSpeed::MHz100);
-    lcd::D5::connect(Fsmc::D5, xpcc::stm32::Gpio::OutputType::PushPull, xpcc::stm32::Gpio::OutputSpeed::MHz100);
-    lcd::D6::connect(Fsmc::D6, xpcc::stm32::Gpio::OutputType::PushPull, xpcc::stm32::Gpio::OutputSpeed::MHz100);
-    lcd::D7::connect(Fsmc::D7, xpcc::stm32::Gpio::OutputType::PushPull, xpcc::stm32::Gpio::OutputSpeed::MHz100);
+    lcd::D0::connect(Fsmc::D0, modm::stm32::Gpio::OutputType::PushPull, modm::stm32::Gpio::OutputSpeed::MHz100);
+    lcd::D1::connect(Fsmc::D1, modm::stm32::Gpio::OutputType::PushPull, modm::stm32::Gpio::OutputSpeed::MHz100);
+    lcd::D2::connect(Fsmc::D2, modm::stm32::Gpio::OutputType::PushPull, modm::stm32::Gpio::OutputSpeed::MHz100);
+    lcd::D3::connect(Fsmc::D3, modm::stm32::Gpio::OutputType::PushPull, modm::stm32::Gpio::OutputSpeed::MHz100);
+    lcd::D4::connect(Fsmc::D4, modm::stm32::Gpio::OutputType::PushPull, modm::stm32::Gpio::OutputSpeed::MHz100);
+    lcd::D5::connect(Fsmc::D5, modm::stm32::Gpio::OutputType::PushPull, modm::stm32::Gpio::OutputSpeed::MHz100);
+    lcd::D6::connect(Fsmc::D6, modm::stm32::Gpio::OutputType::PushPull, modm::stm32::Gpio::OutputSpeed::MHz100);
+    lcd::D7::connect(Fsmc::D7, modm::stm32::Gpio::OutputType::PushPull, modm::stm32::Gpio::OutputSpeed::MHz100);
 
 
-	xpcc::stm32::fsmc::NorSram::AsynchronousTiming timing = {
+	modm::stm32::fsmc::NorSram::AsynchronousTiming timing = {
 		// read
 		0,	// readAddressSetup
 		15,	// readAddressHold
@@ -160,14 +160,14 @@ main()
 		0
 	};
 
-	xpcc::stm32::fsmc::NorSram::configureAsynchronousRegion(
-			xpcc::stm32::fsmc::NorSram::CHIP_SELECT_1, /* NE1 */
-			xpcc::stm32::fsmc::NorSram::NO_MULTIPLEX_8BIT,
-			xpcc::stm32::fsmc::NorSram::SRAM_ROM,
-			xpcc::stm32::fsmc::NorSram::MODE_A,
+	modm::stm32::fsmc::NorSram::configureAsynchronousRegion(
+			modm::stm32::fsmc::NorSram::CHIP_SELECT_1, /* NE1 */
+			modm::stm32::fsmc::NorSram::NO_MULTIPLEX_8BIT,
+			modm::stm32::fsmc::NorSram::SRAM_ROM,
+			modm::stm32::fsmc::NorSram::MODE_A,
 			timing);
 
-	xpcc::stm32::fsmc::NorSram::enableRegion(xpcc::stm32::fsmc::NorSram::CHIP_SELECT_1);
+	modm::stm32::fsmc::NorSram::enableRegion(modm::stm32::fsmc::NorSram::CHIP_SELECT_1);
 
 	//------------------------------------------------------
 
@@ -190,7 +190,7 @@ main()
 	//------------------------------------------------------
 
 	display.initialize();
-	display.setFont(xpcc::font::Assertion);
+	display.setFont(modm::font::Assertion);
 
 	while (1)
 	{
@@ -206,7 +206,7 @@ main()
 		display.update();
 		Led::reset();
 
-		xpcc::delayMilliseconds(20);
+		modm::delayMilliseconds(20);
 
 		if (++x > 170)
 		{

@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_NRF24_CONFIG_HPP
-#define XPCC_NRF24_CONFIG_HPP
+#ifndef MODM_NRF24_CONFIG_HPP
+#define MODM_NRF24_CONFIG_HPP
 
 #include <stdint.h>
 #include <modm/debug/logger.hpp>
@@ -20,10 +20,10 @@
 #include "nrf24_phy.hpp"
 #include "nrf24_definitions.hpp"
 
-#undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::DISABLED
+#undef  MODM_LOG_LEVEL
+#define MODM_LOG_LEVEL modm::log::DISABLED
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -196,8 +196,8 @@ public:
 
 };
 
-}   // namespace xpcc
+}   // namespace modm
 
 #include "nrf24_config_impl.hpp"
 
-#endif /* XPCC_NRF24_CONFIG_HPP */
+#endif /* MODM_NRF24_CONFIG_HPP */

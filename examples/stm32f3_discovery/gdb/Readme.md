@@ -1,6 +1,6 @@
 # Debugging with GDB and OpenOCD
 
-To debug XPCC programs on your target you need OpenOCD
+To debug MODM programs on your target you need OpenOCD
 as well as a target specific _arm-none-eabi-_ **gdb** in your PATH.
 
 If you only want to debug this _gdb_ example project, you can skip right to

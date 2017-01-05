@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LPC11_CAN_REGISTERS
-#define XPCC_LPC11_CAN_REGISTERS
+#ifndef MODM_LPC11_CAN_REGISTERS
+#define MODM_LPC11_CAN_REGISTERS
 
 // ---- Bitnames for LPC_CAN IF1 and IF2 command register
 #define	CAN_IFn_CMDMSK_DATAB	(1 << 0)	/* 1 is transfer data byte 4-7 to message object, 0 is not */
@@ -49,4 +49,4 @@
 // ---- Bitnames for LPC_CAN IF1 and IF2 Command request register CAN_IFn_CMDREQ_BUSY
 #define	CAN_IFn_CMDREQ_BUSY		(1 << 15)
 
-#endif // XPCC_LPC11_CAN_REGISTERS
+#endif // MODM_LPC11_CAN_REGISTERS

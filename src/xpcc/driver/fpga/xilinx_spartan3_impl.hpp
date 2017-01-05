@@ -13,15 +13,15 @@
 #ifndef XILINX_SPARTAN3_IMPL_HPP_
 #define XILINX_SPARTAN3_IMPL_HPP_
 
-#ifndef XPCC_XILINX_SPARTAN_3
+#ifndef MODM_XILINX_SPARTAN_3
 #error "Please include xilinx_spartan3.hpp instead."
 #endif
 
 #include <stdint.h>
 #include <modm/debug/debug.hpp>
 
-#undef  XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::DEBUG
+#undef  MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::DEBUG
 
 
 template <	typename Cclk,
@@ -31,22 +31,22 @@ template <	typename Cclk,
 			typename Done,
 			typename DataSource >
 void
-xpcc::XilinxSpartan3<Cclk, Din, ProgB, InitB, Done, DataSource>::configurePins()
+modm::XilinxSpartan3<Cclk, Din, ProgB, InitB, Done, DataSource>::configurePins()
 {
 	Cclk::setOutput(
-			xpcc::stm32::Gpio::OutputType::PushPull,
-			xpcc::stm32::Gpio::OutputSpeed::MHz50);
+			modm::stm32::Gpio::OutputType::PushPull,
+			modm::stm32::Gpio::OutputSpeed::MHz50);
 	Cclk::reset();
 
-	Done::setInput(xpcc::stm32::Gpio::InputType::Floating);
+	Done::setInput(modm::stm32::Gpio::InputType::Floating);
 	ProgB::setOutput(
-			xpcc::stm32::Gpio::OutputType::OpenDrain,
-			xpcc::stm32::Gpio::OutputSpeed::MHz50);
+			modm::stm32::Gpio::OutputType::OpenDrain,
+			modm::stm32::Gpio::OutputSpeed::MHz50);
 
-	InitB::setInput(xpcc::stm32::Gpio::InputType::PullDown);
+	InitB::setInput(modm::stm32::Gpio::InputType::PullDown);
 	Din::setOutput(
-			xpcc::stm32::Gpio::OutputType::PushPull,
-			xpcc::stm32::Gpio::OutputSpeed::MHz50);
+			modm::stm32::Gpio::OutputType::PushPull,
+			modm::stm32::Gpio::OutputSpeed::MHz50);
 }
 
 template <	typename Cclk,
@@ -56,52 +56,52 @@ template <	typename Cclk,
 			typename Done,
 			typename DataSource >
 bool
-xpcc::XilinxSpartan3<Cclk, Din, ProgB, InitB, Done, DataSource>::configure(const FpgaType fpgaType)
+modm::XilinxSpartan3<Cclk, Din, ProgB, InitB, Done, DataSource>::configure(const FpgaType fpgaType)
 {
 
 	configurePins();
 
-	XPCC_LOG_DEBUG << XPCC_FILE_INFO;
-	XPCC_LOG_DEBUG << "Configuring FPGA" << xpcc::endl;
+	MODM_LOG_DEBUG << MODM_FILE_INFO;
+	MODM_LOG_DEBUG << "Configuring FPGA" << modm::endl;
 
 	ProgB::reset();
 
 	{
 		// wait until InitB and Done go low
 		uint32_t counter = 0;
-		while (InitB::read() == xpcc::Gpio::High ||
-				Done::read() == xpcc::Gpio::High)
+		while (InitB::read() == modm::Gpio::High ||
+				Done::read() == modm::Gpio::High)
 		{
-			xpcc::delayMicroseconds(1);
+			modm::delayMicroseconds(1);
 			if (counter++ > 1000) {
 				// Timeout (1ms) reached, FPGA is not responding abort configuration
-				XPCC_LOG_ERROR << XPCC_FILE_INFO;
-				XPCC_LOG_ERROR << "FPGA not responding during reset!" << xpcc::endl;
+				MODM_LOG_ERROR << MODM_FILE_INFO;
+				MODM_LOG_ERROR << "FPGA not responding during reset!" << modm::endl;
 				return false;
 			}
 		}
 	}
 	// Led1::reset();
 
-	xpcc::delayMicroseconds(1);
+	modm::delayMicroseconds(1);
 	ProgB::set();
 
 	// Wait until INIT_B goes high
 	uint32_t counter = 0;
-	while (InitB::read() == xpcc::Gpio::Low)
+	while (InitB::read() == modm::Gpio::Low)
 	{
-		xpcc::delayMicroseconds(1);
+		modm::delayMicroseconds(1);
 		if (counter++ > 1000) {
 			// Timeout (1ms) reached, FPGA is not responding abort configuration
-			XPCC_LOG_ERROR << XPCC_FILE_INFO;
-			XPCC_LOG_ERROR << "FPGA not responding!" << xpcc::endl;
+			MODM_LOG_ERROR << MODM_FILE_INFO;
+			MODM_LOG_ERROR << "FPGA not responding!" << modm::endl;
 			return false;
 		}
 	}
 	// Led2::reset();
 
 	// wait 0.5..4us before starting the configuration
-	xpcc::delayMicroseconds(4);
+	modm::delayMicroseconds(4);
 
 	uint8_t buffer[256];
 
@@ -127,16 +127,16 @@ xpcc::XilinxSpartan3<Cclk, Din, ProgB, InitB, Done, DataSource>::configure(const
 			Cclk::set();
 			Cclk::reset();
 
-			if (Done::read() == xpcc::Gpio::High) {
-				XPCC_LOG_DEBUG << "FPGA configuration successful" << xpcc::endl;
-				XPCC_LOG_ERROR << "addr=" << pos << xpcc::endl;
+			if (Done::read() == modm::Gpio::High) {
+				MODM_LOG_DEBUG << "FPGA configuration successful" << modm::endl;
+				MODM_LOG_ERROR << "addr=" << pos << modm::endl;
 				break;
 			}
 
-			if (InitB::read() == xpcc::Gpio::Low) {
+			if (InitB::read() == modm::Gpio::Low) {
 				// error in configuration
-				XPCC_LOG_ERROR << "FPGA configuration aborted!" << xpcc::endl;
-				XPCC_LOG_ERROR << "addr=" << pos << xpcc::endl;
+				MODM_LOG_ERROR << "FPGA configuration aborted!" << modm::endl;
+				MODM_LOG_ERROR << "addr=" << pos << modm::endl;
 				return false;
 			}
 		}
@@ -152,11 +152,11 @@ xpcc::XilinxSpartan3<Cclk, Din, ProgB, InitB, Done, DataSource>::configure(const
 
 		if (pos > static_cast<uint32_t>(fpgaType) + 100) {
 			// More bits written than available
-			XPCC_LOG_ERROR << XPCC_FILE_INFO;
-			XPCC_LOG_ERROR << "FPGA configuration failed!" << xpcc::endl;
+			MODM_LOG_ERROR << MODM_FILE_INFO;
+			MODM_LOG_ERROR << "FPGA configuration failed!" << modm::endl;
 			return false;
 		}
-	} while (Done::read() == xpcc::Gpio::Low);
+	} while (Done::read() == modm::Gpio::Low);
 	// Led3::reset();
 
 	// TODO see Xilinx UG332 if there are more clock cycles needed

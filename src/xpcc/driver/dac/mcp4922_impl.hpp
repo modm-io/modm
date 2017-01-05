@@ -13,25 +13,25 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_MCP4922_HPP
+#ifndef MODM_MCP4922_HPP
 	#error	"Don't include this file directly, use 'mcp4922.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Ldac>
 void
-xpcc::Mcp4922<Spi, Cs, Ldac>::initialize()
+modm::Mcp4922<Spi, Cs, Ldac>::initialize()
 {
 	//spi.initialize();
 	
-	Cs::setOutput(xpcc::Gpio::High);
-	Ldac::setOutput(xpcc::Gpio::High);
+	Cs::setOutput(modm::Gpio::High);
+	Ldac::setOutput(modm::Gpio::High);
 }
 
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Ldac>
 void
-xpcc::Mcp4922<Spi, Cs, Ldac>::setChannelA(uint16_t value, bool doubleGain)
+modm::Mcp4922<Spi, Cs, Ldac>::setChannelA(uint16_t value, bool doubleGain)
 {
 	if (doubleGain) {
 		writeRegister(BUF | SHDN | (value & 0x0fff));
@@ -43,7 +43,7 @@ xpcc::Mcp4922<Spi, Cs, Ldac>::setChannelA(uint16_t value, bool doubleGain)
 
 template <typename Spi, typename Cs, typename Ldac>
 void
-xpcc::Mcp4922<Spi, Cs, Ldac>::setChannelB(uint16_t value, bool doubleGain)
+modm::Mcp4922<Spi, Cs, Ldac>::setChannelB(uint16_t value, bool doubleGain)
 {
 	if (doubleGain) {
 		writeRegister(CHANNEL_B | BUF | SHDN | (value & 0x0fff));
@@ -56,18 +56,18 @@ xpcc::Mcp4922<Spi, Cs, Ldac>::setChannelB(uint16_t value, bool doubleGain)
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Ldac>
 void
-xpcc::Mcp4922<Spi, Cs, Ldac>::update()
+modm::Mcp4922<Spi, Cs, Ldac>::update()
 {
-	xpcc::delayMicroseconds(1); // 40 nanoseconds
+	modm::delayMicroseconds(1); // 40 nanoseconds
 	Ldac::reset();
-	xpcc::delayMicroseconds(1); // 100 nanoseconds
+	modm::delayMicroseconds(1); // 100 nanoseconds
 	Ldac::set();
 }
 
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Ldac>
 void
-xpcc::Mcp4922<Spi, Cs, Ldac>::writeRegister(uint16_t value)
+modm::Mcp4922<Spi, Cs, Ldac>::writeRegister(uint16_t value)
 {
 	Cs::reset();
 	

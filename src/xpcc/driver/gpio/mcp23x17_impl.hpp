@@ -9,21 +9,21 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_MCP23X17_HPP
+#ifndef MODM_MCP23X17_HPP
 #	error	"Don't include this file directly, use 'mcp23x17.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template < class Transport >
-xpcc::Mcp23x17<Transport>::Mcp23x17(uint8_t address) :
+modm::Mcp23x17<Transport>::Mcp23x17(uint8_t address) :
 	Transport(address), memory()
 {
 }
 
 // MARK: - Tasks
 template < class Transport >
-xpcc::ResumableResult<bool>
-xpcc::Mcp23x17<Transport>::setOutput(Pins pins)
+modm::ResumableResult<bool>
+modm::Mcp23x17<Transport>::setOutput(Pins pins)
 {
 	RF_BEGIN();
 
@@ -34,8 +34,8 @@ xpcc::Mcp23x17<Transport>::setOutput(Pins pins)
 }
 
 template < class Transport >
-xpcc::ResumableResult<bool>
-xpcc::Mcp23x17<Transport>::set(Pins pins)
+modm::ResumableResult<bool>
+modm::Mcp23x17<Transport>::set(Pins pins)
 {
 	RF_BEGIN();
 
@@ -47,8 +47,8 @@ xpcc::Mcp23x17<Transport>::set(Pins pins)
 }
 
 template < class Transport >
-xpcc::ResumableResult<bool>
-xpcc::Mcp23x17<Transport>::reset(Pins pins)
+modm::ResumableResult<bool>
+modm::Mcp23x17<Transport>::reset(Pins pins)
 {
 	RF_BEGIN();
 
@@ -60,8 +60,8 @@ xpcc::Mcp23x17<Transport>::reset(Pins pins)
 }
 
 template < class Transport >
-xpcc::ResumableResult<bool>
-xpcc::Mcp23x17<Transport>::toggle(Pins pins)
+modm::ResumableResult<bool>
+modm::Mcp23x17<Transport>::toggle(Pins pins)
 {
 	RF_BEGIN();
 
@@ -73,8 +73,8 @@ xpcc::Mcp23x17<Transport>::toggle(Pins pins)
 }
 
 template < class Transport >
-xpcc::ResumableResult<bool>
-xpcc::Mcp23x17<Transport>::set(Pins pins, bool value)
+modm::ResumableResult<bool>
+modm::Mcp23x17<Transport>::set(Pins pins, bool value)
 {
 	RF_BEGIN();
 
@@ -86,8 +86,8 @@ xpcc::Mcp23x17<Transport>::set(Pins pins, bool value)
 }
 
 template < class Transport >
-xpcc::ResumableResult<bool>
-xpcc::Mcp23x17<Transport>::setInput(Pins pins)
+modm::ResumableResult<bool>
+modm::Mcp23x17<Transport>::setInput(Pins pins)
 {
 	RF_BEGIN();
 
@@ -99,8 +99,8 @@ xpcc::Mcp23x17<Transport>::setInput(Pins pins)
 }
 
 template < class Transport >
-xpcc::ResumableResult<bool>
-xpcc::Mcp23x17<Transport>::setPullUp(Pins pins)
+modm::ResumableResult<bool>
+modm::Mcp23x17<Transport>::setPullUp(Pins pins)
 {
 	RF_BEGIN();
 
@@ -111,8 +111,8 @@ xpcc::Mcp23x17<Transport>::setPullUp(Pins pins)
 }
 
 template < class Transport >
-xpcc::ResumableResult<bool>
-xpcc::Mcp23x17<Transport>::resetPullUp(Pins pins)
+modm::ResumableResult<bool>
+modm::Mcp23x17<Transport>::resetPullUp(Pins pins)
 {
 	RF_BEGIN();
 
@@ -123,8 +123,8 @@ xpcc::Mcp23x17<Transport>::resetPullUp(Pins pins)
 }
 
 template < class Transport >
-xpcc::ResumableResult<bool>
-xpcc::Mcp23x17<Transport>::setInvertInput(Pins pins)
+modm::ResumableResult<bool>
+modm::Mcp23x17<Transport>::setInvertInput(Pins pins)
 {
 	RF_BEGIN();
 
@@ -135,8 +135,8 @@ xpcc::Mcp23x17<Transport>::setInvertInput(Pins pins)
 }
 
 template < class Transport >
-xpcc::ResumableResult<bool>
-xpcc::Mcp23x17<Transport>::resetInvertInput(Pins pins)
+modm::ResumableResult<bool>
+modm::Mcp23x17<Transport>::resetInvertInput(Pins pins)
 {
 	RF_BEGIN();
 
@@ -147,8 +147,8 @@ xpcc::Mcp23x17<Transport>::resetInvertInput(Pins pins)
 }
 
 template < class Transport >
-xpcc::ResumableResult<bool>
-xpcc::Mcp23x17<Transport>::writePort(uint16_t data)
+modm::ResumableResult<bool>
+modm::Mcp23x17<Transport>::writePort(uint16_t data)
 {
 	RF_BEGIN();
 
@@ -164,8 +164,8 @@ xpcc::Mcp23x17<Transport>::writePort(uint16_t data)
 }
 
 template < class Transport >
-xpcc::ResumableResult<bool>
-xpcc::Mcp23x17<Transport>::readPort(uint16_t &data)
+modm::ResumableResult<bool>
+modm::Mcp23x17<Transport>::readPort(uint16_t &data)
 {
 	RF_BEGIN();
 

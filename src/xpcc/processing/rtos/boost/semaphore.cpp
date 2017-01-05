@@ -13,14 +13,14 @@
 #include "../semaphore.hpp"
 
 // ----------------------------------------------------------------------------
-xpcc::rtos::Semaphore::Semaphore(uint32_t max, uint32_t initial) :
+modm::rtos::Semaphore::Semaphore(uint32_t max, uint32_t initial) :
 	count(initial), maxCount(max)
 {
 }
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::rtos::Semaphore::acquire(uint32_t timeout)
+modm::rtos::Semaphore::acquire(uint32_t timeout)
 {
 	boost::unique_lock<boost::mutex> lock(mutex);
 	while (count == 0)
@@ -36,7 +36,7 @@ xpcc::rtos::Semaphore::acquire(uint32_t timeout)
 }
 
 void
-xpcc::rtos::Semaphore::release()
+modm::rtos::Semaphore::release()
 {
 	boost::unique_lock<boost::mutex> lock(mutex);
 	
@@ -52,7 +52,7 @@ xpcc::rtos::Semaphore::release()
 }
 
 // ----------------------------------------------------------------------------
-xpcc::rtos::BinarySemaphore::BinarySemaphore() :
+modm::rtos::BinarySemaphore::BinarySemaphore() :
 		Semaphore(1, 1)
 {
 }

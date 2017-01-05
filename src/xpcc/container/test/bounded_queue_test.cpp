@@ -18,7 +18,7 @@
 void
 BoundedQueueTest::testQueue()
 {
-	xpcc::BoundedQueue<int16_t, 5> queue;
+	modm::BoundedQueue<int16_t, 5> queue;
 	
 	TEST_ASSERT_TRUE(queue.isEmpty());
 	

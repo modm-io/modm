@@ -9,14 +9,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LIS3_TRANSPORT_HPP
-#define XPCC_LIS3_TRANSPORT_HPP
+#ifndef MODM_LIS3_TRANSPORT_HPP
+#define MODM_LIS3_TRANSPORT_HPP
 
 #include <modm/architecture/interface/spi_device.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/processing/resumable.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -36,7 +36,7 @@ namespace xpcc
  * @author	Niklas Hauser
  */
 template < class I2cMaster >
-class Lis3TransportI2c : public xpcc::I2cDevice< I2cMaster, 2 >
+class Lis3TransportI2c : public modm::I2cDevice< I2cMaster, 2 >
 {
 public:
 	Lis3TransportI2c(uint8_t address);
@@ -44,18 +44,18 @@ public:
 protected:
 	// RAW REGISTER ACCESS
 	/// write a 8bit value
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	write(uint8_t reg, uint8_t value);
 
 	/// read a 8bit value
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	read(uint8_t reg, uint8_t &value)
 	{
 		return read(reg, &value, 1);
 	}
 
 	/// read multiple 8bit values from a start register
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	read(uint8_t reg, uint8_t *buffer, uint8_t length);
 
 	// increment address or not?
@@ -83,30 +83,30 @@ private:
  * @author	Niklas Hauser
  */
 template < class SpiMaster, class Cs >
-class Lis3TransportSpi : public xpcc::SpiDevice< SpiMaster >, protected xpcc::NestedResumable<2>
+class Lis3TransportSpi : public modm::SpiDevice< SpiMaster >, protected modm::NestedResumable<2>
 {
 public:
 	Lis3TransportSpi(uint8_t /*address*/);
 
 	/// pings the sensor
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	ping();
 
 protected:
 	// RAW REGISTER ACCESS
 	/// write a 8bit value
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	write(uint8_t reg, uint8_t value);
 
 	/// read a 8bit value
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	read(uint8_t reg, uint8_t &value)
 	{
 		return read(reg, &value, 1);
 	}
 
 	/// read multiple 8bit values from a start register
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	read(uint8_t reg, uint8_t *buffer, uint8_t length);
 
 	// increment address or not?
@@ -123,8 +123,8 @@ private:
 	static constexpr uint8_t Write = 0x00;
 };
 
-} // namespace xpcc
+} // namespace modm
 
 #include "lis3_transport_impl.hpp"
 
-#endif	// XPCC_LIS3_TRANSPORT_HPP
+#endif	// MODM_LIS3_TRANSPORT_HPP

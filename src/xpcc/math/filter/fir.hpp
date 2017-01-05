@@ -12,12 +12,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FIR_HPP
-#define XPCC_FIR_HPP
+#ifndef MODM_FIR_HPP
+#define MODM_FIR_HPP
 
 #include <stdint.h>
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	A finit impulse response (FIR) filter implementation
@@ -88,4 +88,4 @@ namespace xpcc
 
 #include "fir_impl.hpp"
 
-#endif // XPCC_FIR_HPP
+#endif // MODM_FIR_HPP

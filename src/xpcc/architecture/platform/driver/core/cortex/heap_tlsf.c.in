@@ -24,8 +24,8 @@
 // ----------------------------------------------------------------------------
 #include <tlsf.h>
 
-#ifndef XPCC_TLSF_MAX_MEM_POOL_COUNT
-#define XPCC_TLSF_MAX_MEM_POOL_COUNT 6
+#ifndef MODM_TLSF_MAX_MEM_POOL_COUNT
+#define MODM_TLSF_MAX_MEM_POOL_COUNT 6
 #endif
 
 typedef struct
@@ -35,14 +35,14 @@ typedef struct
 	uint32_t * end;
 } mem_pool_t;
 
-static mem_pool_t mem_pools[XPCC_TLSF_MAX_MEM_POOL_COUNT];
+static mem_pool_t mem_pools[MODM_TLSF_MAX_MEM_POOL_COUNT];
 
 
 extern uint32_t __table_heap_start[];
 extern uint32_t __table_heap_end[];
 
 void
-__xpcc_initialize_memory(void)
+__modm_initialize_memory(void)
 {
 	typedef struct
 	{
@@ -56,7 +56,7 @@ __xpcc_initialize_memory(void)
 
 	// iterate over the entire table but not longer than mem_pools
 	for (table_pool_t *table = (table_pool_t *)__table_heap_start;
-		 (table < (table_pool_t *)__table_heap_end) && (current_pool < (mem_pools + XPCC_TLSF_MAX_MEM_POOL_COUNT));
+		 (table < (table_pool_t *)__table_heap_end) && (current_pool < (mem_pools + MODM_TLSF_MAX_MEM_POOL_COUNT));
 		 table++)
 	{
 		// if the pool has a new trait than the previous one, or
@@ -84,7 +84,7 @@ static tlsf_t
 get_tlsf_for_ptr(void *p)
 {
 	for (mem_pool_t *pool = mem_pools;
-		 pool < (mem_pools + XPCC_TLSF_MAX_MEM_POOL_COUNT);
+		 pool < (mem_pools + MODM_TLSF_MAX_MEM_POOL_COUNT);
 		 pool++)
 	{
 		if ((pool->tlsf < p) && (p < (void *) pool->end))
@@ -100,7 +100,7 @@ void * malloc_tr(size_t size, uint32_t traits)
 {
 try_again:
 	for (mem_pool_t *pool = mem_pools;
-		 pool < (mem_pools + XPCC_TLSF_MAX_MEM_POOL_COUNT);
+		 pool < (mem_pools + MODM_TLSF_MAX_MEM_POOL_COUNT);
 		 pool++)
 	{
 		if ((pool->traits & traits) == traits)

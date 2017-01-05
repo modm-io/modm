@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_MATH_UTILS_MISC_HPP
-#define	XPCC_MATH_UTILS_MISC_HPP
+#ifndef	MODM_MATH_UTILS_MISC_HPP
+#define	MODM_MATH_UTILS_MISC_HPP
 
 #include <cstddef>
 #include <cmath>
@@ -21,7 +21,7 @@
 
 #include <modm/architecture/utils.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -47,7 +47,7 @@ isPositive(const float& a)
  * Otherwise the result is computed at runtime, which might be very expensive.
  *
  * @code
- * constexpr int value = xpcc::pow(10, 2);
+ * constexpr int value = modm::pow(10, 2);
  * @endcode
  *
  * @ingroup	math
@@ -162,6 +162,6 @@ max(const T& a, const T& b, Compare compare)
 		return a;
 }
 
-}	// namespace xpcc
+}	// namespace modm
 
 #endif

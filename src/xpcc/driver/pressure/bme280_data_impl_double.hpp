@@ -14,14 +14,14 @@
 
 #include <modm/debug/logger/logger.hpp>
 
-#ifndef XPCC_BME280_DATA_HPP
+#ifndef MODM_BME280_DATA_HPP
 #	error  "Don't include this file directly, use 'bme280_data.hpp' instead!"
 #endif
 
-#undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::DISABLED
+#undef  MODM_LOG_LEVEL
+#define MODM_LOG_LEVEL modm::log::DISABLED
 
-namespace xpcc {
+namespace modm {
 
 namespace bme280data {
 
@@ -51,7 +51,7 @@ DataDouble::calculateCalibratedTemperature()
 
 	calibratedTemperatureDouble = (var1 + var2) / double(5120.0);
 
-	XPCC_LOG_DEBUG.printf("T dp = %4.2f\n", calibratedTemperatureDouble);
+	MODM_LOG_DEBUG.printf("T dp = %4.2f\n", calibratedTemperatureDouble);
 
 	meta |= TEMPERATURE_CALCULATED;
 }
@@ -144,4 +144,4 @@ DataDouble::getPressure()
 
 } // bme280 namespace
 
-} // xpcc namespace
+} // modm namespace

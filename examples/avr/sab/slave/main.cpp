@@ -20,12 +20,12 @@
 #include <modm/architecture/platform.hpp>
 #include <modm/communication/sab/slave.hpp>
 
-using namespace xpcc::atmega;
-typedef xpcc::avr::SystemClock clock;
+using namespace modm::atmega;
+typedef modm::avr::SystemClock clock;
 
 // ----------------------------------------------------------------------------
 // wrapper class for the A/D converter
-class AnalogDigital : public xpcc::sab::Callable
+class AnalogDigital : public modm::sab::Callable
 {
 public:
 	AnalogDigital()
@@ -36,7 +36,7 @@ public:
 	}
 
 	void
-	readChannel(xpcc::sab::Response& response, const uint8_t *channel)
+	readChannel(modm::sab::Response& response, const uint8_t *channel)
 	{
 		uint16_t value = Adc::readChannel(*channel);
 		response.send(value);
@@ -45,11 +45,11 @@ public:
 
 // ----------------------------------------------------------------------------
 // wrapper for PORTD
-class InOut : public xpcc::sab::Callable
+class InOut : public modm::sab::Callable
 {
 public:
 	void
-	setDirection(xpcc::sab::Response& response, const uint8_t *direction)
+	setDirection(modm::sab::Response& response, const uint8_t *direction)
 	{
 		DDRD = *direction;
 
@@ -58,14 +58,14 @@ public:
 	}
 
 	void
-	readInput(xpcc::sab::Response& response)
+	readInput(modm::sab::Response& response)
 	{
 		uint8_t value = PIND;
 		response.send(value);
 	}
 
 	void
-	setOutput(xpcc::sab::Response& response, const uint8_t *output)
+	setOutput(modm::sab::Response& response, const uint8_t *output)
 	{
 		PORTD = *output;
 		response.send();
@@ -79,7 +79,7 @@ InOut inOut;
 
 // ----------------------------------------------------------------------------
 // create a list of all possible actions
-FLASH_STORAGE(xpcc::sab::Action actionList[]) =
+FLASH_STORAGE(modm::sab::Action actionList[]) =
 {
 	SAB_ACTION( 'A', analogDigital,	AnalogDigital::readChannel,	1 ),
 	SAB_ACTION( 'D', inOut,			InOut::setDirection,		1 ),
@@ -88,7 +88,7 @@ FLASH_STORAGE(xpcc::sab::Action actionList[]) =
 };
 
 // wrap the type definition inside a typedef to make the code more readable
-typedef xpcc::sab::Slave< xpcc::sab::Interface< Uart0 > > Slave;
+typedef modm::sab::Slave< modm::sab::Interface< Uart0 > > Slave;
 
 // ----------------------------------------------------------------------------
 int 
@@ -96,8 +96,8 @@ main()
 {
 	// initialize ABP interface, set baudrate etc.
 	Slave slave(0x02,
-			xpcc::accessor::asFlash(actionList),
-			sizeof(actionList) / sizeof(xpcc::sab::Action));
+			modm::accessor::asFlash(actionList),
+			sizeof(actionList) / sizeof(modm::sab::Action));
 
 	// enable interrupts
 	enableInterrupts();

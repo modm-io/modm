@@ -9,13 +9,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_INTERFACE_I2C_MASTER_HPP
-#define XPCC_INTERFACE_I2C_MASTER_HPP
+#ifndef MODM_INTERFACE_I2C_MASTER_HPP
+#define MODM_INTERFACE_I2C_MASTER_HPP
 
 #include "i2c.hpp"
 #include "i2c_transaction.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -29,7 +29,7 @@ namespace xpcc
  * @author	Niklas Hauser
  * @ingroup i2c
  */
-class I2cMaster : public ::xpcc::Peripheral, public ::xpcc::I2c
+class I2cMaster : public ::modm::Peripheral, public ::modm::I2c
 {
 public:
 	/// Errors that can happen during master operation
@@ -107,6 +107,6 @@ public:
 #endif
 };
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif // XPCC_INTERFACE_I2C_MASTER_HPP
+#endif // MODM_INTERFACE_I2C_MASTER_HPP

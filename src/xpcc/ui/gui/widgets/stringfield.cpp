@@ -16,13 +16,13 @@
 #include "stringfield.hpp"
 
 void
-xpcc::gui::StringField::render(View* view)
+modm::gui::StringField::render(View* view)
 {
 	if(view == 0)
 		return;
 
 	// output device of view
-	xpcc::GraphicDisplay* out = &view->display();
+	modm::GraphicDisplay* out = &view->display();
 
 	// color palette of view
 	ColorPalette cp = this->color_palette;

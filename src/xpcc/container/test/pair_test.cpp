@@ -17,7 +17,7 @@
 #include "pair_test.hpp"
 
 // check if Pair could be stored inside the Flash memory
-typedef xpcc::Pair<uint8_t, int16_t> myPair;
+typedef modm::Pair<uint8_t, int16_t> myPair;
 
 FLASH_STORAGE(myPair values[]) = {
 	{ 1, 3 },
@@ -28,7 +28,7 @@ FLASH_STORAGE(myPair values[]) = {
 void
 PairTest::testPair()
 {
-	xpcc::accessor::Flash<myPair> ptr(values);
+	modm::accessor::Flash<myPair> ptr(values);
 	
 	TEST_ASSERT_EQUALS(ptr[1].getFirst(), 5);
 	TEST_ASSERT_EQUALS(ptr[1].getSecond(), 30);
@@ -36,7 +36,7 @@ PairTest::testPair()
 	TEST_ASSERT_EQUALS(ptr[2].getFirst(), 27);
 	TEST_ASSERT_EQUALS(ptr[2].getSecond(), 100);
 	
-	xpcc::Pair<int16_t, int16_t> pair = { 124, -1523 };
+	modm::Pair<int16_t, int16_t> pair = { 124, -1523 };
 	
 	TEST_ASSERT_EQUALS(pair.getFirst(), 124);
 	TEST_ASSERT_EQUALS(pair.getSecond(), -1523);

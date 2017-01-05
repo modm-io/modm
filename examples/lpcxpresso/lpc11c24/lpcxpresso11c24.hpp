@@ -14,11 +14,11 @@
 // http://www.embeddedartists.com/products/lpcxpresso/lpc11C24_xpr.php
 //
 
-#ifndef XPCC_LPC_XPRESSO_11C24_HPP
-#define XPCC_LPC_XPRESSO_11C24_HPP
+#ifndef MODM_LPC_XPRESSO_11C24_HPP
+#define MODM_LPC_XPRESSO_11C24_HPP
 
-using namespace xpcc::lpc;
-using namespace xpcc::cortex;
+using namespace modm::lpc;
+using namespace modm::cortex;
 
 typedef GpioOutput0_7 Led;
 typedef GpioInput3_2 Button;
@@ -26,4 +26,4 @@ typedef GpioInput3_2 Button;
 
 typedef SystemClock<Pll<ExternalCrystal<MHz12>, MHz48> > defaultSystemClock;
 
-#endif	// XPCC_LPC_XPRESSO_11C24_HPP
+#endif	// MODM_LPC_XPRESSO_11C24_HPP

@@ -12,14 +12,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_BUFFERED_GRAPHIC_DISPLAY_HPP
+#ifndef MODM_BUFFERED_GRAPHIC_DISPLAY_HPP
 	#error	"Don't include this file directly, use 'buffered_graphic_display.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template <uint16_t Width, uint16_t Height>
 void
-xpcc::BufferedGraphicDisplay<Width, Height>::clear()
+modm::BufferedGraphicDisplay<Width, Height>::clear()
 {
 	for (uint_fast16_t y = 0; y < Height / 8; ++y) {
 		for (uint_fast16_t x = 0; x < Width; ++x) {
@@ -34,7 +34,7 @@ xpcc::BufferedGraphicDisplay<Width, Height>::clear()
 // ----------------------------------------------------------------------------
 template <uint16_t Width, uint16_t Height>
 void
-xpcc::BufferedGraphicDisplay<Width, Height>::drawHorizontalLine(
+modm::BufferedGraphicDisplay<Width, Height>::drawHorizontalLine(
 		glcd::Point start,
 		uint16_t length)
 {
@@ -62,9 +62,9 @@ xpcc::BufferedGraphicDisplay<Width, Height>::drawHorizontalLine(
 // ----------------------------------------------------------------------------
 template <uint16_t Width, uint16_t Height>
 void
-xpcc::BufferedGraphicDisplay<Width, Height>::drawImageRaw(glcd::Point upperLeft,
+modm::BufferedGraphicDisplay<Width, Height>::drawImageRaw(glcd::Point upperLeft,
 		uint16_t width, uint16_t height,
-		xpcc::accessor::Flash<uint8_t> data)
+		modm::accessor::Flash<uint8_t> data)
 {
 	if ((upperLeft.getY() & 0x07) == 0)
 	{
@@ -95,7 +95,7 @@ xpcc::BufferedGraphicDisplay<Width, Height>::drawImageRaw(glcd::Point upperLeft,
 // ----------------------------------------------------------------------------
 template <uint16_t Width, uint16_t Height>
 void
-xpcc::BufferedGraphicDisplay<Width, Height>::setPixel(int16_t x, int16_t y)
+modm::BufferedGraphicDisplay<Width, Height>::setPixel(int16_t x, int16_t y)
 {
 	if (static_cast<uint16_t>(x) < Width && static_cast<uint16_t>(y) < Height) {
 		this->buffer[x][y / 8] |= (1 << (y & 0x07));
@@ -104,7 +104,7 @@ xpcc::BufferedGraphicDisplay<Width, Height>::setPixel(int16_t x, int16_t y)
 
 template <uint16_t Width, uint16_t Height>
 void
-xpcc::BufferedGraphicDisplay<Width, Height>::clearPixel(int16_t x, int16_t y)
+modm::BufferedGraphicDisplay<Width, Height>::clearPixel(int16_t x, int16_t y)
 {
 	if (static_cast<uint16_t>(x) < Width && static_cast<uint16_t>(y) < Height) {
 		this->buffer[x][y / 8] &= ~(1 << (y & 0x07));
@@ -113,7 +113,7 @@ xpcc::BufferedGraphicDisplay<Width, Height>::clearPixel(int16_t x, int16_t y)
 
 template <uint16_t Width, uint16_t Height>
 bool
-xpcc::BufferedGraphicDisplay<Width, Height>::getPixel(int16_t x, int16_t y)
+modm::BufferedGraphicDisplay<Width, Height>::getPixel(int16_t x, int16_t y)
 {
 	if (static_cast<uint16_t>(x) < Width && static_cast<uint16_t>(y) < Height) {
 		return (this->buffer[x][y / 8] & (1 << (y & 0x07)));

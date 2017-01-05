@@ -12,15 +12,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_RTOS_THREAD_HPP
-#define XPCC_RTOS_THREAD_HPP
+#ifndef MODM_RTOS_THREAD_HPP
+#define MODM_RTOS_THREAD_HPP
 
 #include <modm/architecture/utils.hpp>
 
-#ifdef XPCC_OS_HOSTED
+#ifdef MODM_OS_HOSTED
 #	include "boost/thread.hpp"
-#elif defined(XPCC_CPU_CORTEX_M3) || defined(XPCC_CPU_CORTEX_M4)
+#elif defined(MODM_CPU_CORTEX_M3) || defined(MODM_CPU_CORTEX_M4)
 #	include "freertos/thread.hpp"
 #endif
 
-#endif // XPCC_RTOS_THREAD_HPP
+#endif // MODM_RTOS_THREAD_HPP

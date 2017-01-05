@@ -10,13 +10,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_GUI_NUMBERROCKER_HPP
+#ifndef MODM_GUI_NUMBERROCKER_HPP
 #   error	"Don't include this file directly, use 'numberrocker.hpp' instead!"
 #endif
 
 template<typename T>
 void
-xpcc::gui::NumberRocker<T>::increase()
+modm::gui::NumberRocker<T>::increase()
 {
 	this->value += this->step;
 	this->num_field.setValue(this->value);
@@ -30,7 +30,7 @@ xpcc::gui::NumberRocker<T>::increase()
 
 template<typename T>
 void
-xpcc::gui::NumberRocker<T>::decrease()
+modm::gui::NumberRocker<T>::decrease()
 {
 	this->value -= this->step;
 	this->num_field.setValue(this->value);
@@ -44,21 +44,21 @@ xpcc::gui::NumberRocker<T>::decrease()
 
 template<typename T>
 void
-xpcc::gui::NumberRocker<T>::activate(const InputEvent& ev, void* /*data*/)
+modm::gui::NumberRocker<T>::activate(const InputEvent& ev, void* /*data*/)
 {
 	this->handleInputEvent(&ev);
 }
 
 template<typename T>
 void
-xpcc::gui::NumberRocker<T>::deactivate(const InputEvent& ev, void* /*data*/)
+modm::gui::NumberRocker<T>::deactivate(const InputEvent& ev, void* /*data*/)
 {
 	this->handleInputEvent(&ev);
 }
 
 template<typename T>
 void
-xpcc::gui::NumberRocker<T>::increase_cb(const InputEvent& /*ev*/, Widget* w, void* /*data*/)
+modm::gui::NumberRocker<T>::increase_cb(const InputEvent& /*ev*/, Widget* w, void* /*data*/)
 {
 	NumberRocker *rocker = static_cast<NumberRocker*>(w->parent);
 
@@ -67,7 +67,7 @@ xpcc::gui::NumberRocker<T>::increase_cb(const InputEvent& /*ev*/, Widget* w, voi
 
 template<typename T>
 void
-xpcc::gui::NumberRocker<T>::decrease_cb(const InputEvent& /*ev*/, Widget* w, void* /*data*/)
+modm::gui::NumberRocker<T>::decrease_cb(const InputEvent& /*ev*/, Widget* w, void* /*data*/)
 {
 	NumberRocker *rocker = static_cast<NumberRocker*>(w->parent);
 

@@ -18,21 +18,21 @@
 
 #include <modm/ui/gui.hpp>
 
-class HomeView : public xpcc::gui::View
+class HomeView : public modm::gui::View
 {
 public:
 
-	HomeView(xpcc::gui::GuiViewStack* stack, uint8_t identifier);
+	HomeView(modm::gui::GuiViewStack* stack, uint8_t identifier);
 
 	~HomeView() {}
 
 	bool
 	hasChanged();
 private:
-	xpcc::gui::ButtonWidget toggleLedButton;
-	xpcc::gui::ButtonWidget doNothingButton;
-	xpcc::gui::NumberRocker<int16_t> rocker1;
-	xpcc::gui::CheckboxWidget checkbox1;
+	modm::gui::ButtonWidget toggleLedButton;
+	modm::gui::ButtonWidget doNothingButton;
+	modm::gui::NumberRocker<int16_t> rocker1;
+	modm::gui::CheckboxWidget checkbox1;
 
 };
 

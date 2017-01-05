@@ -14,14 +14,14 @@
 // Nucleo kit for STM32F303K8
 //
 
-#ifndef XPCC_STM32_NUCLEO_F303K8_HPP
-#define XPCC_STM32_NUCLEO_F303K8_HPP
+#ifndef MODM_STM32_NUCLEO_F303K8_HPP
+#define MODM_STM32_NUCLEO_F303K8_HPP
 
 #include <modm/architecture/platform.hpp>
 #include <modm/debug/logger.hpp>
-#define XPCC_BOARD_HAS_LOGGER
+#define MODM_BOARD_HAS_LOGGER
 
-using namespace xpcc::stm32;
+using namespace modm::stm32;
 
 
 namespace Board
@@ -74,10 +74,10 @@ struct systemClock {
 		ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div2);
 		ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div1);
 		// update frequencies for busy-wait delay functions
-		xpcc::clock::fcpu     = Frequency;
-		xpcc::clock::fcpu_kHz = Frequency / 1000;
-		xpcc::clock::fcpu_MHz = Frequency / 1000000;
-		xpcc::clock::ns_per_loop = ::round(3000 / (Frequency / 1000000));
+		modm::clock::fcpu     = Frequency;
+		modm::clock::fcpu_kHz = Frequency / 1000;
+		modm::clock::fcpu_MHz = Frequency / 1000000;
+		modm::clock::ns_per_loop = ::round(3000 / (Frequency / 1000000));
 
 		return true;
 	}
@@ -106,10 +106,10 @@ using D11 = GpioB5;
 using D12 = GpioB4;
 using D13 = GpioB3;
 
-using Button = xpcc::GpioUnused;
+using Button = modm::GpioUnused;
 using LedD13 = D13;
 
-using Leds = xpcc::SoftwareGpioPort< LedD13 >;
+using Leds = modm::SoftwareGpioPort< LedD13 >;
 
 
 namespace stlink
@@ -124,7 +124,7 @@ inline void
 initialize()
 {
 	systemClock::enable();
-	xpcc::cortex::SysTickTimer::initialize<systemClock>();
+	modm::cortex::SysTickTimer::initialize<systemClock>();
 
 	stlink::Tx::connect(stlink::Uart::Tx);
 	stlink::Rx::connect(stlink::Uart::Rx, Gpio::InputType::PullUp);
@@ -133,4 +133,4 @@ initialize()
 
 }
 
-#endif	// XPCC_STM32_NUCLEO_F303K8_HPP
+#endif	// MODM_STM32_NUCLEO_F303K8_HPP

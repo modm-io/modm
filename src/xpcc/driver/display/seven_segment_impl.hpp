@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SEVEN_SEGMENT_DISPLAY_HPP
+#ifndef MODM_SEVEN_SEGMENT_DISPLAY_HPP
 #	error "Don't include this file directly, use 'seven_segment.hpp' instead!"
 #endif
 
@@ -18,14 +18,14 @@
 
 template<typename Spi, typename Load, uint8_t DIGITS>
 void
-xpcc::sevenSegment::SevenSegmentDisplay<Spi, Load, DIGITS>::initialize()
+modm::sevenSegment::SevenSegmentDisplay<Spi, Load, DIGITS>::initialize()
 {
 
 }
 
 template<typename Spi, typename Load, uint8_t DIGITS>
 void
-xpcc::sevenSegment::SevenSegmentDisplay<Spi, Load, DIGITS>::write(uint32_t val)
+modm::sevenSegment::SevenSegmentDisplay<Spi, Load, DIGITS>::write(uint32_t val)
 {
 	for (uint_fast8_t ii = 0; ii < DIGITS; ++ii)
 	{
@@ -41,7 +41,7 @@ xpcc::sevenSegment::SevenSegmentDisplay<Spi, Load, DIGITS>::write(uint32_t val)
 
 template<typename Spi, typename Load, uint8_t DIGITS>
 void
-xpcc::sevenSegment::SevenSegmentDisplay<Spi, Load, DIGITS>::writeHex(uint32_t val)
+modm::sevenSegment::SevenSegmentDisplay<Spi, Load, DIGITS>::writeHex(uint32_t val)
 {
 	for (uint_fast8_t ii = 0; ii < DIGITS; ++ii)
 	{

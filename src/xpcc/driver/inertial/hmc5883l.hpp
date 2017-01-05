@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_HMC5883L_HPP
-#define XPCC_HMC5883L_HPP
+#ifndef MODM_HMC5883L_HPP
+#define MODM_HMC5883L_HPP
 
 #include "hmc58x3.hpp"
 #include <cmath>
 
-namespace xpcc
+namespace modm
 {
 
 struct hmc5883 : public hmc58x3
@@ -94,25 +94,25 @@ public:
 	{
 	}
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	configure(MeasurementRate rate=MeasurementRate::Hz15,
 			  Gain gain=Gain::Ga1_3,
 			  MeasurementAverage average=MeasurementAverage::Average1)
 	{ return this->configureRaw(uint8_t(rate), uint8_t(gain), gainValues, uint8_t(average)); }
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	setMeasurementAverage(MeasurementAverage average)
 	{ return this->updateConfigA(ConfigA_t(uint8_t(average)), ConfigA::MA_Mask); }
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	setMeasurementRate(MeasurementRate rate)
 	{ return this->updateConfigA(ConfigA_t(uint8_t(rate)), ConfigA::DO_Mask); }
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	setGain(Gain gain)
 	{ return this->setGainRaw(uint8_t(gain), gainValues); }
 };
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif // XPCC_HMC5883L_HPP
+#endif // MODM_HMC5883L_HPP

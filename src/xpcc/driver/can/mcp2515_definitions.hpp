@@ -12,10 +12,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_MCP2515_DEFINITIONS_HPP
-#define	XPCC_MCP2515_DEFINITIONS_HPP
+#ifndef	MODM_MCP2515_DEFINITIONS_HPP
+#define	MODM_MCP2515_DEFINITIONS_HPP
 
-namespace xpcc
+namespace modm
 {
 	namespace mcp2515
 	{
@@ -421,4 +421,4 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC_MCP2515_DEFINITIONS_HPP
+#endif	// MODM_MCP2515_DEFINITIONS_HPP

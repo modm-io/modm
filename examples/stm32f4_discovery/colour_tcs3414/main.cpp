@@ -20,11 +20,11 @@
 
 #include <modm/architecture/interface/gpio.hpp>
 
-xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > device;
-xpcc::IOStream stream(device);
+modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
+modm::IOStream stream(device);
 
 /**
- * Example to demonstrate a XPCC driver for colour sensor TCS3414
+ * Example to demonstrate a MODM driver for colour sensor TCS3414
  *
  * This example uses I2cMaster2 of STM32F407
  *
@@ -37,9 +37,9 @@ xpcc::IOStream stream(device);
 
 // typedef I2cMaster1 MyI2cMaster;
 typedef I2cMaster2 MyI2cMaster;
-// typedef xpcc::SoftwareI2cMaster<GpioB10, GpioB11> MyI2cMaster;
+// typedef modm::SoftwareI2cMaster<GpioB10, GpioB11> MyI2cMaster;
 
-class ThreadOne : public xpcc::pt::Protothread
+class ThreadOne : public modm::pt::Protothread
 {
 public:
 	ThreadOne() :
@@ -52,7 +52,7 @@ public:
 	{
 		PT_BEGIN();
 
-		stream << "Ping the device from ThreadOne" << xpcc::endl;
+		stream << "Ping the device from ThreadOne" << modm::endl;
 
 		// ping the device until it responds
 		while (true)
@@ -66,7 +66,7 @@ public:
 			PT_WAIT_UNTIL(this->timeout.isExpired());
 		}
 
-		stream << "Device responded" << xpcc::endl;
+		stream << "Device responded" << modm::endl;
 
 		while (true)
 		{
@@ -78,15 +78,15 @@ public:
 			PT_WAIT_UNTIL(this->timeout.isExpired());
 		}
 
-		stream << "Device initialized" << xpcc::endl;
+		stream << "Device initialized" << modm::endl;
 
 		while (true)
 		{
 			if (PT_CALL(colorSensor.configure(
-					xpcc::tcs3414::Gain::X16,
-					xpcc::tcs3414::Prescaler::DEFAULT,
-					xpcc::tcs3414::IntegrationMode::INTERNAL,
-					static_cast<uint8_t>(xpcc::tcs3414::NominalIntegrationTime::MSEC_100)))){
+					modm::tcs3414::Gain::X16,
+					modm::tcs3414::Prescaler::DEFAULT,
+					modm::tcs3414::IntegrationMode::INTERNAL,
+					static_cast<uint8_t>(modm::tcs3414::NominalIntegrationTime::MSEC_100)))){
 				break;
 			}
 			// otherwise, try again in 100ms
@@ -94,14 +94,14 @@ public:
 			PT_WAIT_UNTIL(this->timeout.isExpired());
 		}
 
-		stream << "Device configured" << xpcc::endl;
+		stream << "Device configured" << modm::endl;
 
 		while (true)
 		{
 			if (PT_CALL(colorSensor.refreshAllColors())) {
 				auto colors = colorSensor.getOldColors();
 				stream.printf("RGB: %5d %5d %5d", colors.red, colors.green, colors.blue);
-				xpcc::color::HsvT<xpcc::tcs3414::UnderlyingType> hsv;
+				modm::color::HsvT<modm::tcs3414::UnderlyingType> hsv;
 				colors.toHsv(&hsv);
 				stream.printf("  %5d\n", hsv.hue);
 			}
@@ -113,8 +113,8 @@ public:
 	}
 
 private:
-	xpcc::ShortTimeout timeout;
-	xpcc::Tcs3414<MyI2cMaster> colorSensor;
+	modm::ShortTimeout timeout;
+	modm::Tcs3414<MyI2cMaster> colorSensor;
 };
 
 ThreadOne one;
@@ -126,7 +126,7 @@ main()
 	Board::initialize();
 
 	GpioOutputA2::connect(Usart2::Tx);
-	Usart2::initialize<Board::systemClock, xpcc::Uart::B115200>(10);
+	Usart2::initialize<Board::systemClock, modm::Uart::B115200>(10);
 
 	GpioB11::connect(I2cMaster2::Sda);
 	GpioB10::connect(I2cMaster2::Scl);
@@ -135,7 +135,7 @@ main()
 
 	stream << "\n\nWelcome to TCS3414 demo!\n\n";
 
-	xpcc::ShortPeriodicTimer tmr(500);
+	modm::ShortPeriodicTimer tmr(500);
 
 	while (1)
 	{

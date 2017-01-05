@@ -12,4 +12,4 @@
 
 #include "clock_dummy.hpp"
 
-xpcc::ClockDummy::Type xpcc::ClockDummy::time = 0;
+modm::ClockDummy::Type modm::ClockDummy::time = 0;

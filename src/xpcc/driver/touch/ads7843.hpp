@@ -12,13 +12,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ADS7843_HPP
-#define XPCC_ADS7843_HPP
+#ifndef MODM_ADS7843_HPP
+#define MODM_ADS7843_HPP
 
 #include <stdint.h>
 #include <modm/ui/display/graphic_display.hpp>
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * ADS7843 Touch Screen Controller.
@@ -50,7 +50,7 @@ namespace xpcc
 		 * 			stable enough to provide a reading, otherwise `false`.
 		 */
 		static bool
-		read(xpcc::glcd::Point * point);
+		read(modm::glcd::Point * point);
 
 		static inline uint16_t
 		readX()
@@ -80,4 +80,4 @@ namespace xpcc
 
 #include "ads7843_impl.hpp"
 
-#endif // XPCC_ADS7843_HPP
+#endif // MODM_ADS7843_HPP

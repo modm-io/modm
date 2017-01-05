@@ -11,15 +11,15 @@
 
 {{ generation_block }}
 
-#ifndef XPCC_{{target["family"] | upper}}_I2C_HPP
-#define XPCC_{{target["family"] | upper}}_I2C_HPP
+#ifndef MODM_{{target["family"] | upper}}_I2C_HPP
+#define MODM_{{target["family"] | upper}}_I2C_HPP
 
 /**
  * @ingroup 	{{target.string}}
  * @defgroup	{{target.string}}_i2c I2C
  */
 
-namespace xpcc
+namespace modm
 {
 
 namespace {{target["family"]}}
@@ -40,6 +40,6 @@ struct I2c
 
 } // namespace {{target["family"]}}
 
-} // namespace xpcc
+} // namespace modm
 
-#endif	// XPCC_{{target["family"] | upper}}_I2C_HPP
+#endif	// MODM_{{target["family"] | upper}}_I2C_HPP

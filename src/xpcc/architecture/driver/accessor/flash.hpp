@@ -11,15 +11,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_ACCESSOR_FLASH_HPP
-#define	XPCC_ACCESSOR_FLASH_HPP
+#ifndef	MODM_ACCESSOR_FLASH_HPP
+#define	MODM_ACCESSOR_FLASH_HPP
 
 #include <modm/architecture/utils.hpp>
 #include <modm/io/iostream.hpp>
 
 #include "flash_reader.hpp"
 
-namespace xpcc
+namespace modm
 {
 	namespace accessor
 	{
@@ -40,34 +40,34 @@ namespace xpcc
 		class Flash
 		{
 		public:
-			xpcc_always_inline
+			modm_always_inline
 			explicit Flash(const T* addr = 0) :
 				address(addr)
 			{
 			}
 			
 			template <typename U>
-			xpcc_always_inline
+			modm_always_inline
 			explicit Flash(const Flash<U>& rhs) :
 				address((T*) rhs.address)
 			{
 			}
 			
-			xpcc_always_inline
+			modm_always_inline
 			const T
 			operator *() const
 			{
 				return FlashReader<T, sizeof(T)>::read(address);
 			}
 			
-			xpcc_always_inline
+			modm_always_inline
 			const T
 			operator [](size_t index) const
 			{
 				return FlashReader<T, sizeof(T)>::read(address + index);
 			}
 			
-			xpcc_always_inline
+			modm_always_inline
 			Flash&
 			operator++()
 			{
@@ -75,7 +75,7 @@ namespace xpcc
 				return *this;
 			}
 
-			xpcc_always_inline
+			modm_always_inline
 			Flash
 			operator++(int)
 			{
@@ -84,7 +84,7 @@ namespace xpcc
 				return ret;
 			}
 
-			xpcc_always_inline
+			modm_always_inline
 			Flash&
 			operator--()
 			{
@@ -92,7 +92,7 @@ namespace xpcc
 				return *this;
 			}
 
-			xpcc_always_inline
+			modm_always_inline
 			Flash&
 			operator--(int)
 			{
@@ -101,7 +101,7 @@ namespace xpcc
 				return ret;
 			}
 			
-			xpcc_always_inline
+			modm_always_inline
 			Flash&
 			operator+=(size_t rhs)
 			{
@@ -109,7 +109,7 @@ namespace xpcc
 				return *this;
 			}
 			
-			xpcc_always_inline
+			modm_always_inline
 			Flash&
 			operator-=(size_t rhs)
 			{
@@ -117,14 +117,14 @@ namespace xpcc
 				return *this;
 			}
 			
-			xpcc_always_inline
+			modm_always_inline
 			bool
 			isValid() const
 			{
 				return (address != 0);
 			}
 			
-			xpcc_always_inline
+			modm_always_inline
 			const T*
 			getPointer() const
 			{
@@ -146,10 +146,10 @@ namespace xpcc
 		 * \ingroup	accessor
 		 */
 		template<typename T>
-		xpcc_always_inline ::xpcc::accessor::Flash<T>
+		modm_always_inline ::modm::accessor::Flash<T>
 		asFlash(const T* ptr)
 		{
-			return ::xpcc::accessor::Flash<T>(ptr);
+			return ::modm::accessor::Flash<T>(ptr);
 		}
 	}
 }
@@ -165,10 +165,10 @@ namespace xpcc
  * \ingroup accessor
  */
 template<typename T>
-xpcc::IOStream&
-operator << (xpcc::IOStream& os, xpcc::accessor::Flash<T> ptr)
+modm::IOStream&
+operator << (modm::IOStream& os, modm::accessor::Flash<T> ptr)
 {
-	ptr.XPCC_NOT_IMPLEMENTED_YET_streamoperator_of_not_char_type;
+	ptr.MODM_NOT_IMPLEMENTED_YET_streamoperator_of_not_char_type;
 	// Not implemented YET
 	// problem:
 	//  Is ptr a pointer of an array?
@@ -181,7 +181,7 @@ operator << (xpcc::IOStream& os, xpcc::accessor::Flash<T> ptr)
  * \brief	Streamoperator - specialization for \c char
  * \ingroup accessor
  */
-xpcc::IOStream&
-operator << (xpcc::IOStream& os, xpcc::accessor::Flash<char> ptr);
+modm::IOStream&
+operator << (modm::IOStream& os, modm::accessor::Flash<char> ptr);
 
-#endif	// XPCC_ACCESSOR_FLASH_HPP
+#endif	// MODM_ACCESSOR_FLASH_HPP

@@ -12,14 +12,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SIEMENS_M55_HPP
-#define XPCC_SIEMENS_M55_HPP
+#ifndef MODM_SIEMENS_M55_HPP
+#define MODM_SIEMENS_M55_HPP
 
 #include <modm/architecture/driver/delay.hpp>
 
 #include <modm/ui/display/buffered_graphic_display.hpp>
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	Driver for Siemens M55 displays
@@ -42,14 +42,14 @@ namespace xpcc
 		update();
 
 	private:
-		xpcc_always_inline void
+		modm_always_inline void
 		lcdSettings(void);
 
-		xpcc_always_inline void
+		modm_always_inline void
 		lcdCls(uint16_t colour);
 	};
 }
 
 #include "siemens_m55_impl.hpp"
 
-#endif // XPCC_SIEMENS_M55_HPP
+#endif // MODM_SIEMENS_M55_HPP

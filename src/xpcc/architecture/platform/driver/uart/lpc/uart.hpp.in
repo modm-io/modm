@@ -12,13 +12,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LPC11_UART_1_HPP
-#define XPCC_LPC11_UART_1_HPP
+#ifndef MODM_LPC11_UART_1_HPP
+#define MODM_LPC11_UART_1_HPP
 
 #include <modm/architecture/interface/uart.hpp>
 #include "type_ids.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 namespace lpc
@@ -50,7 +50,7 @@ namespace lpc
  * @author		Strongly Typed
  * @author		Niklas Hauser
  */
-class Uart1 : public xpcc::Uart
+class Uart1 : public modm::Uart
 {
 	static void
 	initialize(uint32_t baudrate);
@@ -63,8 +63,8 @@ public:
 
 public:
 	template< class SystemClock, uint32_t baudrate,
-			uint16_t tolerance = xpcc::Tolerance::OnePercent >
-	static void xpcc_always_inline
+			uint16_t tolerance = modm::Tolerance::OnePercent >
+	static void modm_always_inline
 	initialize()
 	{
 		initialize(baudrate);
@@ -103,6 +103,6 @@ public:
 
 }	// lpc namespace
 
-}	// xpcc namespace
+}	// modm namespace
 
-#endif // XPCC_LPC11_UART_1_HPP
+#endif // MODM_LPC11_UART_1_HPP

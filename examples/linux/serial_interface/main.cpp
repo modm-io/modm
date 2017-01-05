@@ -20,10 +20,10 @@
 int
 main()
 {
-	xpcc::hosted::SerialInterface port("/dev/ttyUSB0", 115200);
+	modm::hosted::SerialInterface port("/dev/ttyUSB0", 115200);
 	
 	if (not port.open()) {
-		XPCC_LOG_ERROR << "Could not open port: " << port.getDeviceName().c_str() << xpcc::endl;
+		MODM_LOG_ERROR << "Could not open port: " << port.getDeviceName().c_str() << modm::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -31,7 +31,7 @@ main()
 	{
 		uint8_t a;
 		port.readBytes(&a, 1);
-		XPCC_LOG_DEBUG << "Read: " << a << xpcc::endl; 
+		MODM_LOG_DEBUG << "Read: " << a << modm::endl; 
 
 		/*char a;
 		if (port.read(a))

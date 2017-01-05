@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32_CAN{{ id }}_HPP
-#define XPCC_STM32_CAN{{ id }}_HPP
+#ifndef MODM_STM32_CAN{{ id }}_HPP
+#define MODM_STM32_CAN{{ id }}_HPP
 
 #include <modm/architecture/interface/can.hpp>
 #include "../device.hpp"
@@ -30,14 +30,14 @@
 	%% set reg = 'CAN' ~ id
 %% endif
 
-using namespace xpcc::clock; // for MHzxx
+using namespace modm::clock; // for MHzxx
 
 /**
  * @ingroup 	{{partname}}
  * @defgroup	{{partname}}_can CAN
  */
 
-namespace xpcc
+namespace modm
 {
 
 namespace stm32
@@ -65,7 +65,7 @@ namespace stm32
  * @author		Fabian Greif <fabian.greif@rwth-aachen.de>
  * @ingroup		{{partname}}_can
  */
-class Can{{ id }} : public ::xpcc::Can
+class Can{{ id }} : public ::modm::Can
 {
 public:
 	enum class
@@ -188,7 +188,7 @@ public:
 	 * You need to create you own interrupt handler for this interrupt.
 	 * The interrupt handler has a fixed name:
 	 * \code
-	 * XPCC_ISR(CAN{{ id }}_SCE)
+	 * MODM_ISR(CAN{{ id }}_SCE)
 	 * {
 	 *     ...
 	 *
@@ -213,7 +213,7 @@ public:
 
 }	// namespace stm32
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif	//  XPCC_STM32_CAN{{ id }}_HPP
+#endif	//  MODM_STM32_CAN{{ id }}_HPP
 

@@ -34,13 +34,13 @@
 
 static constexpr uint32_t canBusBaudRate = 125000;
 
-xpcc::hosted::CanUsb canUsb;
+modm::hosted::CanUsb canUsb;
 
 int
 main()
 {
 	if (not canUsb.open("/dev/ttyUSB0", canBusBaudRate)) {
-		XPCC_LOG_ERROR << "Could not open port" << xpcc::endl;
+		MODM_LOG_ERROR << "Could not open port" << modm::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -48,10 +48,10 @@ main()
 	{
 		if (canUsb.isMessageAvailable())
 		{
-			xpcc::can::Message message;
+			modm::can::Message message;
 			canUsb.getMessage(message);
 			
-			XPCC_LOG_DEBUG << message << xpcc::endl;
+			MODM_LOG_DEBUG << message << modm::endl;
 		}
 	}
 

@@ -23,15 +23,15 @@
 #include <strings.h>	// for ffs()
 
 // ----------------------------------------------------------------------------
-namespace xpcc
+namespace modm
 {
 namespace lpc
 {
 #if LPC11C_CAN_TX_BUFFER_SIZE > 0
-xpcc::atomic::Queue<xpcc::can::Message, LPC11C_CAN_TX_BUFFER_SIZE> txQueue;
+modm::atomic::Queue<modm::can::Message, LPC11C_CAN_TX_BUFFER_SIZE> txQueue;
 #endif
 #if LPC11C_CAN_RX_BUFFER_SIZE > 0
-xpcc::atomic::Queue<xpcc::can::Message, LPC11C_CAN_RX_BUFFER_SIZE> rxQueue;
+modm::atomic::Queue<modm::can::Message, LPC11C_CAN_RX_BUFFER_SIZE> rxQueue;
 #endif
 }
 }
@@ -40,7 +40,7 @@ xpcc::atomic::Queue<xpcc::can::Message, LPC11C_CAN_RX_BUFFER_SIZE> rxQueue;
 /* Low level function:
  * Use a Message Object to send a message */
 static void
-sendMessageObject(const xpcc::can::Message & message, uint8_t messageObjectId)
+sendMessageObject(const modm::can::Message & message, uint8_t messageObjectId)
 {
 	// NXP's data structure for sending CAN messages
 	CAN_MSG_OBJ msg_obj;
@@ -80,7 +80,7 @@ sendMessageObject(const xpcc::can::Message & message, uint8_t messageObjectId)
 /* Low level function:
  * Called by interrupt or by getMessage to receive a message */
 static void
-readMessageObject(xpcc::can::Message & message, uint8_t messageObjectId)
+readMessageObject(modm::can::Message & message, uint8_t messageObjectId)
 {
 	// NXP's data structure for sending CAN messages
 	CAN_MSG_OBJ msg_obj;
@@ -125,8 +125,8 @@ readMessageObject(xpcc::can::Message & message, uint8_t messageObjectId)
 #define STAT_EWARN		(1 << 6)
 #define STAT_BOFF		(1 << 7)
 
-xpcc::lpc::Can::BusState
-xpcc::lpc::Can::getBusState()
+modm::lpc::Can::BusState
+modm::lpc::Can::getBusState()
 {
 	if (LPC_CAN->STAT & STAT_BOFF) {
 		return BusState::Off;
@@ -152,7 +152,7 @@ xpcc::lpc::Can::getBusState()
  *
  */
 void
-xpcc::lpc::Can::CAN_tx(uint8_t /* msg_obj_num */)
+modm::lpc::Can::CAN_tx(uint8_t /* msg_obj_num */)
 {
 #if LPC11C_CAN_TX_BUFFER_SIZE > 0
 	// Send next from queue, if available
@@ -204,15 +204,15 @@ xpcc::lpc::Can::CAN_tx(uint8_t /* msg_obj_num */)
  */
 #if LPC11C_CAN_RX_BUFFER_SIZE > 0
 void
-xpcc::lpc::Can::CAN_rx(uint8_t msg_obj_num)
+modm::lpc::Can::CAN_rx(uint8_t msg_obj_num)
 {
 	// Move received message to queue if possible
 
 	if (rxQueue.isNotFull()) {
-		xpcc::can::Message message;
+		modm::can::Message message;
 		readMessageObject(message, msg_obj_num);
 		if (!rxQueue.push(message)) {
-			xpcc::ErrorReport::report(xpcc::lpc::CAN_RX_OVERFLOW);
+			modm::ErrorReport::report(modm::lpc::CAN_RX_OVERFLOW);
 		}
 	}
 	else {
@@ -230,7 +230,7 @@ xpcc::lpc::Can::CAN_rx(uint8_t msg_obj_num)
 }
 #else
 void
-xpcc::lpc::Can::CAN_rx(uint8_t /* msg_obj_num */)
+modm::lpc::Can::CAN_rx(uint8_t /* msg_obj_num */)
 {
 }
 #endif
@@ -238,7 +238,7 @@ xpcc::lpc::Can::CAN_rx(uint8_t /* msg_obj_num */)
 // ----------------------------------------------------------------------------
 
 void
-xpcc::lpc::Can::CAN_error(uint32_t /* error_info */)
+modm::lpc::Can::CAN_error(uint32_t /* error_info */)
 {
 	// TODO Do some error handling, use ErrorReporter.
 }
@@ -248,14 +248,14 @@ xpcc::lpc::Can::CAN_error(uint32_t /* error_info */)
 /*	CAN interrupt handler */
 /*	The CAN interrupt handler must be provided by the user application.
 	It's function is to call the isr() API located in the ROM */
-XPCC_ISR(CAN) {
+MODM_ISR(CAN) {
 	LPC11C_ROM_CAN->pCAND->isr();
 }
 
 // ----------------------------------------------------------------------------
 
 bool
-xpcc::lpc::Can::sendMessage(const can::Message & message)
+modm::lpc::Can::sendMessage(const can::Message & message)
 {
 	// This function is not reentrant. If one of the mailboxes is empty it
 	// means that the software buffer is empty too. Therefore the mailbox
@@ -272,7 +272,7 @@ xpcc::lpc::Can::sendMessage(const can::Message & message)
 		 * at the moment. */
 #if LPC11C_CAN_TX_BUFFER_SIZE > 0
 		if (!txQueue.push(message)) {
-			xpcc::ErrorReport::report(xpcc::lpc::CAN_TX_OVERFLOW);
+			modm::ErrorReport::report(modm::lpc::CAN_TX_OVERFLOW);
 			// All Message Objects are full and no space left in software buffer.
 			return false;
 		}
@@ -302,7 +302,7 @@ xpcc::lpc::Can::sendMessage(const can::Message & message)
 // ----------------------------------------------------------------------------
 
 bool
-xpcc::lpc::Can::getMessage(can::Message & message)
+modm::lpc::Can::getMessage(can::Message & message)
 {
 #if LPC11C_CAN_RX_BUFFER_SIZE > 0
 	if (rxQueue.isEmpty())
@@ -320,10 +320,10 @@ xpcc::lpc::Can::getMessage(can::Message & message)
 		// See Rx Interrupt for further explanation.
 		while ((rxQueue.isNotFull()) && (LPC_CAN->ND1 & 0xffff)) {
 			uint8_t messageObjectId = ffs(LPC_CAN->ND1 & 0xffff) - 1;
-			xpcc::can::Message newMessage;
+			modm::can::Message newMessage;
 			readMessageObject(newMessage, messageObjectId);
 			if (!rxQueue.push(newMessage)) {
-				xpcc::ErrorReport::report(xpcc::lpc::CAN_RX_OVERFLOW);
+				modm::ErrorReport::report(modm::lpc::CAN_RX_OVERFLOW);
 			}
 		}
 		return true;
@@ -346,7 +346,7 @@ xpcc::lpc::Can::getMessage(can::Message & message)
 // ----------------------------------------------------------------------------
 
 bool
-xpcc::lpc::Can::isMessageAvailable()
+modm::lpc::Can::isMessageAvailable()
 {
 #if LPC11C_CAN_RX_BUFFER_SIZE > 0
 	return !rxQueue.isEmpty();
@@ -360,7 +360,7 @@ xpcc::lpc::Can::isMessageAvailable()
 // ----------------------------------------------------------------------------
 
 bool
-xpcc::lpc::Can::isReadyToSend()
+modm::lpc::Can::isReadyToSend()
 {
 #if LPC11C_CAN_TX_BUFFER_SIZE > 0
 	return txQueue.isNotFull();

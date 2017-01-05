@@ -12,13 +12,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LOG_STYLE_WRAPPER_HPP
-#define XPCC_LOG_STYLE_WRAPPER_HPP
+#ifndef MODM_LOG_STYLE_WRAPPER_HPP
+#define MODM_LOG_STYLE_WRAPPER_HPP
 
 #include <modm/io/iodevice.hpp>
 #include "style.hpp"
 
-namespace xpcc
+namespace modm
 {
 	namespace log
 	{
@@ -63,7 +63,7 @@ namespace xpcc
 // -----------------------------------------------------------------------------
 
 template < typename STYLE >
-xpcc::log::StyleWrapper<STYLE>::StyleWrapper( STYLE inStyle ) :
+modm::log::StyleWrapper<STYLE>::StyleWrapper( STYLE inStyle ) :
 	style( inStyle )
 {
 }
@@ -71,7 +71,7 @@ xpcc::log::StyleWrapper<STYLE>::StyleWrapper( STYLE inStyle ) :
 // -----------------------------------------------------------------------------
 
 template < typename STYLE >
-xpcc::log::StyleWrapper<STYLE>::~StyleWrapper()
+modm::log::StyleWrapper<STYLE>::~StyleWrapper()
 {
 }
 
@@ -79,7 +79,7 @@ xpcc::log::StyleWrapper<STYLE>::~StyleWrapper()
 
 template < typename STYLE >
 void
-xpcc::log::StyleWrapper<STYLE>::write( char c )
+modm::log::StyleWrapper<STYLE>::write( char c )
 {
 	this->style.write( c );
 }
@@ -88,7 +88,7 @@ xpcc::log::StyleWrapper<STYLE>::write( char c )
 
 template < typename STYLE >
 void
-xpcc::log::StyleWrapper<STYLE>::write( const char* s )
+modm::log::StyleWrapper<STYLE>::write( const char* s )
 {
 	this->style.write( s );
 }
@@ -97,7 +97,7 @@ xpcc::log::StyleWrapper<STYLE>::write( const char* s )
 
 template < typename STYLE >
 void
-xpcc::log::StyleWrapper<STYLE>::flush()
+modm::log::StyleWrapper<STYLE>::flush()
 {
 	this->style.flush( );
 }
@@ -106,11 +106,11 @@ xpcc::log::StyleWrapper<STYLE>::flush()
 
 template < typename STYLE >
 bool
-xpcc::log::StyleWrapper<STYLE>::read(char& c)
+modm::log::StyleWrapper<STYLE>::read(char& c)
 {
 	(void) c;
 	return false;
 }
 
 
-#endif // XPCC_LOG_STYLE_WRAPPER_HPP
+#endif // MODM_LOG_STYLE_WRAPPER_HPP

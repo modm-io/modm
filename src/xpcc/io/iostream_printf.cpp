@@ -15,12 +15,12 @@
 #include <stdarg.h>
 #include <stdio.h>		// snprintf()
 #include <stdlib.h>
-#include <modm/math/utils/misc.hpp>        // xpcc::pow
+#include <modm/math/utils/misc.hpp>        // modm::pow
 
 #include "iostream.hpp"
 
-xpcc::IOStream&
-xpcc::IOStream::printf(const char *fmt, ...)
+modm::IOStream&
+modm::IOStream::printf(const char *fmt, ...)
 {
 	va_list ap;
 	va_start(ap, fmt);
@@ -31,8 +31,8 @@ xpcc::IOStream::printf(const char *fmt, ...)
 	return *this;
 }
 
-xpcc::IOStream&
-xpcc::IOStream::vprintf(const char *fmt, va_list ap)
+modm::IOStream&
+modm::IOStream::vprintf(const char *fmt, va_list ap)
 {
 	unsigned char c;
 
@@ -141,7 +141,7 @@ xpcc::IOStream::vprintf(const char *fmt, va_list ap)
 			}
 
 			// Rounding
-			float_value += 0.5 / xpcc::pow(10, width_frac);
+			float_value += 0.5 / modm::pow(10, width_frac);
 
 			// 1) Print integer part
 			int width_integer = width - width_frac - 1;
@@ -156,7 +156,7 @@ xpcc::IOStream::vprintf(const char *fmt, va_list ap)
 
 			// 3) Fractional part
 			float_value = float_value - ((int) float_value);
-			float_value *= xpcc::pow(10, width_frac);
+			float_value *= modm::pow(10, width_frac);
 
 			// Alternative: Smaller code size but probably less precise
 			// for (uint_fast8_t ii = 0; ii < width_frac; ++ii) {
@@ -202,7 +202,7 @@ xpcc::IOStream::vprintf(const char *fmt, va_list ap)
 }
 
 void
-xpcc::IOStream::writeUnsignedInteger(
+modm::IOStream::writeUnsignedInteger(
 	unsigned long unsignedValue, uint_fast8_t base,
 	size_t width, char fill, bool isNegative)
 {

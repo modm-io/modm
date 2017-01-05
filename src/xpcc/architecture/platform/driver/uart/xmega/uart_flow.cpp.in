@@ -29,8 +29,8 @@
 
 namespace
 {
-	static xpcc::atomic::Queue<uint8_t, UART{{ id }}_RX_BUFFER_SIZE> rxBuffer;
-	static xpcc::atomic::Queue<uint8_t, UART{{ id }}_TX_BUFFER_SIZE> txBuffer;
+	static modm::atomic::Queue<uint8_t, UART{{ id }}_RX_BUFFER_SIZE> rxBuffer;
+	static modm::atomic::Queue<uint8_t, UART{{ id }}_TX_BUFFER_SIZE> txBuffer;
 	
 	GPIO_INPUT (RXD, {{ id[0] }}, {{ number * 4 + 2 }});
 	GPIO_OUTPUT(TXD, {{ id[0] }}, {{ number * 4 + 3 }});
@@ -43,7 +43,7 @@ namespace
 
 // ----------------------------------------------------------------------------
 #if UART{{ id }}_RTS_PIN != -1
-XPCC_ISR(USART{{ id }}_RXC)
+MODM_ISR(USART{{ id }}_RXC)
 {
 	// first save the errors
 	error |= USART{{ id }}_STATUS & (USART_FERR_bm | USART_BUFOVF_bm | USART_PERR_bm);
@@ -96,7 +96,7 @@ ISR(USART{{ id }}_DRE_vect)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::xmega::BufferedUartFlow{{ id }}::initialize()
+modm::xmega::BufferedUartFlow{{ id }}::initialize()
 {
 	TXD::set();
 	TXD::setOutput();
@@ -104,8 +104,8 @@ xpcc::xmega::BufferedUartFlow{{ id }}::initialize()
 	RXD::setInput();
 	
 	// RTS and CTS pins, ready for reception in few cycles.
-	CTS::setOutput(xpcc::Gpio::Low);
-	RTS::setInput(xpcc::xmega::PULLUP);
+	CTS::setOutput(modm::Gpio::Low);
+	RTS::setInput(modm::xmega::PULLUP);
 	
 	// interrupts should be disabled during initialisation
 	atomic::Lock lock;
@@ -122,7 +122,7 @@ xpcc::xmega::BufferedUartFlow{{ id }}::initialize()
 
 // ----------------------------------------------------------------------------
 void
-xpcc::xmega::BufferedUartFlow{{ id }}::write(uint8_t c)
+modm::xmega::BufferedUartFlow{{ id }}::write(uint8_t c)
 {
 	while ( !txBuffer.push(c) ) {
 		// wait for a free slot in the buffer
@@ -140,7 +140,7 @@ xpcc::xmega::BufferedUartFlow{{ id }}::write(uint8_t c)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::xmega::BufferedUartFlow{{ id }}::write(const uint8_t *s, uint8_t n)
+modm::xmega::BufferedUartFlow{{ id }}::write(const uint8_t *s, uint8_t n)
 {
 	while (n-- != 0) {
 		BufferedUartFlow{{ id }}::write(*s++);
@@ -149,7 +149,7 @@ xpcc::xmega::BufferedUartFlow{{ id }}::write(const uint8_t *s, uint8_t n)
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::xmega::BufferedUartFlow{{ id }}::read(uint8_t& c)
+modm::xmega::BufferedUartFlow{{ id }}::read(uint8_t& c)
 {
 	if (rxBuffer.isNearlyEmpty()) {
 		// When the buffer is nearly empty allow remote device to send again.
@@ -179,7 +179,7 @@ xpcc::xmega::BufferedUartFlow{{ id }}::read(uint8_t& c)
 
 // ----------------------------------------------------------------------------
 uint8_t
-xpcc::xmega::BufferedUartFlow{{ id }}::read(uint8_t *buffer, uint8_t n)
+modm::xmega::BufferedUartFlow{{ id }}::read(uint8_t *buffer, uint8_t n)
 {
 	uint8_t i;
 	for (i = 0; i < n; ++i)
@@ -205,20 +205,20 @@ xpcc::xmega::BufferedUartFlow{{ id }}::read(uint8_t *buffer, uint8_t n)
 
 // ----------------------------------------------------------------------------
 uint8_t
-xpcc::xmega::BufferedUartFlow{{ id }}::readErrorFlags()
+modm::xmega::BufferedUartFlow{{ id }}::readErrorFlags()
 {
 	return error;
 }
 
 void
-xpcc::xmega::BufferedUartFlow{{ id }}::resetErrorFlags()
+modm::xmega::BufferedUartFlow{{ id }}::resetErrorFlags()
 {
 	error = 0;
 }
 
 // ----------------------------------------------------------------------------
 uint8_t
-xpcc::xmega::BufferedUartFlow{{ id }}::flushReceiveBuffer()
+modm::xmega::BufferedUartFlow{{ id }}::flushReceiveBuffer()
 {
 	uint8_t i = 0;
 	while(!rxBuffer.isEmpty()) {
@@ -235,7 +235,7 @@ xpcc::xmega::BufferedUartFlow{{ id }}::flushReceiveBuffer()
 }
 
 //uint8_t
-//xpcc::xmega::BufferedUartFlow{{ id }}::flushTransmitBuffer()
+//modm::xmega::BufferedUartFlow{{ id }}::flushTransmitBuffer()
 //{
 //	uint8_t i(0);
 //	while(!txBuffer.isEmpty()) {

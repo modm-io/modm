@@ -12,26 +12,26 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_PERIODIC_TIMER_HPP
+#ifndef	MODM_PERIODIC_TIMER_HPP
 #	error	"Don't include this file directly, use 'periodic_timeout.hpp' instead!"
 #endif
 
 template< class Clock , typename TimestampType >
-xpcc::GenericPeriodicTimer<Clock, TimestampType>::GenericPeriodicTimer(const TimestampType period) :
+modm::GenericPeriodicTimer<Clock, TimestampType>::GenericPeriodicTimer(const TimestampType period) :
 	period(period), timeout(period)
 {
 }
 
 template< class Clock , typename TimestampType >
 void
-xpcc::GenericPeriodicTimer<Clock, TimestampType>::restart()
+modm::GenericPeriodicTimer<Clock, TimestampType>::restart()
 {
 	timeout.restart(period);
 }
 
 template< class Clock , typename TimestampType >
 void
-xpcc::GenericPeriodicTimer<Clock, TimestampType>::restart(const TimestampType period)
+modm::GenericPeriodicTimer<Clock, TimestampType>::restart(const TimestampType period)
 {
 	this->period = period;
 	restart();
@@ -39,28 +39,28 @@ xpcc::GenericPeriodicTimer<Clock, TimestampType>::restart(const TimestampType pe
 
 template< class Clock , typename TimestampType >
 void
-xpcc::GenericPeriodicTimer<Clock, TimestampType>::stop()
+modm::GenericPeriodicTimer<Clock, TimestampType>::stop()
 {
 	timeout.stop();
 }
 
 template< class Clock, class TimestampType >
-xpcc::PeriodicTimerState
-xpcc::GenericPeriodicTimer<Clock, TimestampType>::getState() const
+modm::PeriodicTimerState
+modm::GenericPeriodicTimer<Clock, TimestampType>::getState() const
 {
 	return PeriodicTimerState(timeout.getState());
 }
 
 template< class Clock , typename TimestampType >
 bool
-xpcc::GenericPeriodicTimer<Clock, TimestampType>::isStopped() const
+modm::GenericPeriodicTimer<Clock, TimestampType>::isStopped() const
 {
 	return timeout.isStopped();
 }
 
 template< class Clock , typename TimestampType >
 bool
-xpcc::GenericPeriodicTimer<Clock, TimestampType>::execute()
+modm::GenericPeriodicTimer<Clock, TimestampType>::execute()
 {
 	if (timeout.execute())
 	{
@@ -80,7 +80,7 @@ xpcc::GenericPeriodicTimer<Clock, TimestampType>::execute()
 
 template< class Clock, class TimestampType >
 typename TimestampType::SignedType
-xpcc::GenericPeriodicTimer<Clock, TimestampType>::remaining() const
+modm::GenericPeriodicTimer<Clock, TimestampType>::remaining() const
 {
 	return timeout.remaining();
 }

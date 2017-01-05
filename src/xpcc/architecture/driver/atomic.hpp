@@ -15,7 +15,7 @@
 \defgroup	atomic	Atomic operations and container
 */
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \ingroup	atomic

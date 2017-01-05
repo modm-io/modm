@@ -11,31 +11,31 @@
 
 #include "sdl_display.hpp"
 
-xpcc::SDLDisplay::SDLDisplay(int16_t width, int16_t height):
+modm::SDLDisplay::SDLDisplay(int16_t width, int16_t height):
 	width(width), height(height), memory(0), screen(0)
 {
 	this->memory = new uint16_t[this->width*this->height];
 	for(int i = 0; i< this->width*this->height; i++)
 	{
-		this->memory[i] = xpcc::glcd::Color::red().getValue();
+		this->memory[i] = modm::glcd::Color::red().getValue();
 	}
 	screen = SDL_SetVideoMode( this->width, this->height, 32, SDL_SWSURFACE );
 	this->clear();
 }
 
-xpcc::SDLDisplay::~SDLDisplay()
+modm::SDLDisplay::~SDLDisplay()
 {
 	delete this->memory;
 }
 
 void
-xpcc::SDLDisplay::update()
+modm::SDLDisplay::update()
 {
 	for(int i = 0; i < this->width; i++)
 	{
 		for(int j = 0; j < this->height; j++)
 		{
-			this->setColor(xpcc::glcd::Color(this->memory[j*this->width+i]));
+			this->setColor(modm::glcd::Color(this->memory[j*this->width+i]));
 			this->setPixelOnScreen(i, j);
 		}
 	}
@@ -43,19 +43,19 @@ xpcc::SDLDisplay::update()
 }
 
 void
-xpcc::SDLDisplay::setPixel(int16_t x, int16_t y)
+modm::SDLDisplay::setPixel(int16_t x, int16_t y)
 {
 	this->memory[y*this->width+x] = this->foregroundColor.getValue();
 }
 
 void
-xpcc::SDLDisplay::clearPixel(int16_t x, int16_t y)
+modm::SDLDisplay::clearPixel(int16_t x, int16_t y)
 {
 	this->memory[y*this->width+x] = this->backgroundColor.getValue();
 }
 
 bool
-xpcc::SDLDisplay::getPixel(int16_t x, int16_t y)
+modm::SDLDisplay::getPixel(int16_t x, int16_t y)
 {
 	(void) x;
 	(void) y;
@@ -64,11 +64,11 @@ xpcc::SDLDisplay::getPixel(int16_t x, int16_t y)
 }
 
 void
-xpcc::SDLDisplay::setPixelOnScreen(int16_t x, int16_t y)
+modm::SDLDisplay::setPixelOnScreen(int16_t x, int16_t y)
 {
-	//XPCC_LOG_DEBUG << "setPixelOnScreen(" << x << ", " << y << ");" << xpcc::endl;
-	//XPCC_LOG_DEBUG << "  color: " << this->foregroundColor.getValue() << xpcc::endl;
-	//XPCC_LOG_DEBUG << "red: " << colorToRed(this->foregroundColor) << " green: " << colorToGreen(this->foregroundColor) << " blue: " << colorToBlue(this->foregroundColor) << xpcc::endl;
+	//MODM_LOG_DEBUG << "setPixelOnScreen(" << x << ", " << y << ");" << modm::endl;
+	//MODM_LOG_DEBUG << "  color: " << this->foregroundColor.getValue() << modm::endl;
+	//MODM_LOG_DEBUG << "red: " << colorToRed(this->foregroundColor) << " green: " << colorToGreen(this->foregroundColor) << " blue: " << colorToBlue(this->foregroundColor) << modm::endl;
 
 	Uint32 pixel = SDL_MapRGB( this->screen->format, colorToRed(this->foregroundColor), colorToGreen(this->foregroundColor), colorToBlue(this->foregroundColor) );
 
@@ -79,7 +79,7 @@ xpcc::SDLDisplay::setPixelOnScreen(int16_t x, int16_t y)
 }
 
 void
-xpcc::SDLDisplay::clearWholeScreen()
+modm::SDLDisplay::clearWholeScreen()
 {
 
 	Uint32 pixel = SDL_MapRGB( this->screen->format, colorToRed(this->backgroundColor), colorToGreen(this->backgroundColor), colorToBlue(this->backgroundColor) );
@@ -95,17 +95,17 @@ xpcc::SDLDisplay::clearWholeScreen()
 	}
 }
 
-inline uint8_t xpcc::SDLDisplay::colorToRed(xpcc::glcd::Color& color)
+inline uint8_t modm::SDLDisplay::colorToRed(modm::glcd::Color& color)
 {
 	return color.getValue() >> 8;
 }
 
-inline uint8_t xpcc::SDLDisplay::colorToGreen(xpcc::glcd::Color& color)
+inline uint8_t modm::SDLDisplay::colorToGreen(modm::glcd::Color& color)
 {
 	return static_cast<uint8_t>((color.getValue() << 5) >> 8);
 }
 
-inline uint8_t xpcc::SDLDisplay::colorToBlue(xpcc::glcd::Color& color)
+inline uint8_t modm::SDLDisplay::colorToBlue(modm::glcd::Color& color)
 {
 	return static_cast<uint8_t>((color.getValue() << 11) >> 8);
 }

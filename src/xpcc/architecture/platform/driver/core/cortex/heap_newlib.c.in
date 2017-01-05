@@ -22,15 +22,15 @@
 #include <errno.h>
 
 // ----------------------------------------------------------------------------
-extern void xpcc_heap_table_find_largest(const uint32_t, uint32_t **, uint32_t **);
+extern void modm_heap_table_find_largest(const uint32_t, uint32_t **, uint32_t **);
 
 uint8_t *__brkval = 0;
 uint8_t *heap_end = 0;
 
-void __xpcc_initialize_memory(void)
+void __modm_initialize_memory(void)
 {
 	// find the largest heap that is DMA-able and S-Bus accessible
-	xpcc_heap_table_find_largest(0x9, (uint32_t **) &__brkval, (uint32_t **) &heap_end);
+	modm_heap_table_find_largest(0x9, (uint32_t **) &__brkval, (uint32_t **) &heap_end);
 	if (!__brkval) exit(ENOMEM);
 }
 

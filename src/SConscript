@@ -24,7 +24,7 @@ Import('env')
 # remains untouched
 envOld = env
 env = env.Clone()
-env.Append(CPPPATH = env['XPCC_BUILDPATH'])
+env.Append(CPPPATH = env['MODM_BUILDPATH'])
 
 # find all files, except the one located in the 'test' folders
 scan = env.FindFiles(path = '.', unittest=False)
@@ -33,13 +33,13 @@ sources = scan.sources
 defines = scan.defines
 
 # Platform Files
-architecture_path = os.path.join('.', 'xpcc', 'architecture')
+architecture_path = os.path.join('.', 'modm', 'architecture')
 p_sources, p_defines, p_includes = env.GeneratePlatform(architecture_path)
 
-# add sources to xpcc library in order for them to be built
+# add sources to modm library in order for them to be built
 sources.append(p_sources)
 
-# hand defines to gcc through the -D flag for both xpcc and user code
+# hand defines to gcc through the -D flag for both modm and user code
 envOld.Append(CPPDEFINES = p_defines)
 env.Append(CPPDEFINES = p_defines)
 
@@ -47,7 +47,7 @@ for path in p_includes:
 	if os.path.isabs(path):
 		envOld.AppendUnique(CPPPATH = path)
 	else:
-		envOld.AppendUnique(CPPPATH = os.path.join(env['XPCC_ROOTPATH'], 'src', path))
+		envOld.AppendUnique(CPPPATH = os.path.join(env['MODM_ROOTPATH'], 'src', path))
 
 # Update Enivronment Vars set by env.GeneratePlatform for "envOld"
 # TODO: check if GeneratePlatform could just be called through the
@@ -61,14 +61,14 @@ if 'DEVICE_SIZE' in env:
 
 # External Library Files
 sources, defines, includes = env.SConscript(
-		os.path.join(env['XPCC_ROOTPATH'], 'ext', 'SConscript'),
+		os.path.join(env['MODM_ROOTPATH'], 'ext', 'SConscript'),
 		exports = 'env sources defines')
 
 for path in includes:
-	envOld.AppendUnique(CPPPATH = os.path.join(env['XPCC_ROOTPATH'], 'ext', path))
+	envOld.AppendUnique(CPPPATH = os.path.join(env['MODM_ROOTPATH'], 'ext', path))
 
 # Generate Library
-library = env.Library(target = 'xpcc', source = sources)
+library = env.Library(target = 'modm', source = sources)
 
 result = (library, defines)
 Return('result')

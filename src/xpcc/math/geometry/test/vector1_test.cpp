@@ -16,33 +16,33 @@
 void
 Vector1Test::testConstructor()
 {
-	xpcc::Vector1i a;
+	modm::Vector1i a;
 	TEST_ASSERT_EQUALS(a.x, 0);
 	
-	xpcc::Vector1i b(20);
+	modm::Vector1i b(20);
 	TEST_ASSERT_EQUALS(b.x, 20);
 	
 	a.x = 100;
 	TEST_ASSERT_EQUALS(a.x, 100);
 	
-	xpcc::Vector1i c(a);
+	modm::Vector1i c(a);
 	TEST_ASSERT_EQUALS(c.x, 100);
 	
 	int16_t array[1] = {-4};
-	xpcc::Matrix<int16_t, 1, 1> m(array);
+	modm::Matrix<int16_t, 1, 1> m(array);
 	
-	xpcc::Vector1i d(m);
+	modm::Vector1i d(m);
 	TEST_ASSERT_EQUALS(d.x, -4);
 }
 
 void
 Vector1Test::testAssign()
 {
-	xpcc::Vector1i a(42);
+	modm::Vector1i a(42);
 	int16_t array[1] = {-42};
-	xpcc::Matrix<int16_t, 1, 1> m(array);
+	modm::Matrix<int16_t, 1, 1> m(array);
 	
-	xpcc::Vector1i b;
+	modm::Vector1i b;
 	
 	b = a;
 	TEST_ASSERT_EQUALS(b.x, 42);
@@ -54,9 +54,9 @@ Vector1Test::testAssign()
 void
 Vector1Test::testCompare()
 {
-	xpcc::Vector1i a(2);
-	xpcc::Vector1i b(4);
-	xpcc::Vector1i c(4);
+	modm::Vector1i a(2);
+	modm::Vector1i b(4);
+	modm::Vector1i c(4);
 	// ==
 	TEST_ASSERT_TRUE(b == c);
 	TEST_ASSERT_FALSE(a == c);
@@ -84,7 +84,7 @@ Vector1Test::testCompare()
 void
 Vector1Test::testRawDataAccess()
 {
-	xpcc::Vector1i a(2);
+	modm::Vector1i a(2);
 	int16_t *pointer = a.ptr();
 	
 	TEST_ASSERT_EQUALS(a[0], 2);
@@ -94,8 +94,8 @@ Vector1Test::testRawDataAccess()
 void
 Vector1Test::testOperators()
 {
-	xpcc::Vector1i a(7);
-	xpcc::Vector1i b(-18);
+	modm::Vector1i a(7);
+	modm::Vector1i b(-18);
 	
 	TEST_ASSERT_EQUALS((a + b).x, 7-18);
 	TEST_ASSERT_EQUALS((a - b).x, 7-(-18));
@@ -118,7 +118,7 @@ Vector1Test::testOperators()
 	TEST_ASSERT_EQUALS(b.x, 18/2);
 	
 	// test division of floats
-	xpcc::Vector1f c(-18.7f);
+	modm::Vector1f c(-18.7f);
 	TEST_ASSERT_EQUALS_FLOAT((c / 2.4f).x, -7.7916666667);
 	c /= 7.5f;
 	TEST_ASSERT_EQUALS_FLOAT(c.x, -2.4933333333);
@@ -127,7 +127,7 @@ Vector1Test::testOperators()
 void
 Vector1Test::testLength()
 {
-	xpcc::Vector1i a(7);
+	modm::Vector1i a(7);
 	
 	TEST_ASSERT_EQUALS(a.getLength(), 7);
 	TEST_ASSERT_EQUALS(a.getLengthSquared(), 7*7);
@@ -136,9 +136,9 @@ Vector1Test::testLength()
 void
 Vector1Test::testMathDefs()
 {
-	xpcc::Vector1i a(7);
-	xpcc::Vector1f b(NAN);
-	xpcc::Vector1f c(INFINITY);
+	modm::Vector1i a(7);
+	modm::Vector1f b(NAN);
+	modm::Vector1f c(INFINITY);
 	
 	TEST_ASSERT_FALSE(a.hasNan());
 	TEST_ASSERT_FALSE(a.hasInf());

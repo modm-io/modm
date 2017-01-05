@@ -9,13 +9,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ITG3200_HPP
+#ifndef MODM_ITG3200_HPP
 #	error "Don't include this file directly, use 'itg3200.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
-xpcc::Itg3200<I2cMaster>::Itg3200(Data &data, uint8_t address)
+modm::Itg3200<I2cMaster>::Itg3200(Data &data, uint8_t address)
 :	I2cDevice<I2cMaster,2>(address), data(data),
 	rawBuffer{0x00, 0x00, 0x00, 0,0,0,0,0,0,0,0, 0x00}
 {
@@ -23,8 +23,8 @@ xpcc::Itg3200<I2cMaster>::Itg3200(Data &data, uint8_t address)
 
 // MARK: - Tasks
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Itg3200<I2cMaster>::configure(LowPassFilter filter, uint8_t divider)
+modm::ResumableResult<bool>
+modm::Itg3200<I2cMaster>::configure(LowPassFilter filter, uint8_t divider)
 {
 	RF_BEGIN();
 
@@ -36,8 +36,8 @@ xpcc::Itg3200<I2cMaster>::configure(LowPassFilter filter, uint8_t divider)
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Itg3200<I2cMaster>::readRotation()
+modm::ResumableResult<bool>
+modm::Itg3200<I2cMaster>::readRotation()
 {
 	RF_BEGIN();
 
@@ -51,8 +51,8 @@ xpcc::Itg3200<I2cMaster>::readRotation()
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Itg3200<I2cMaster>::setSampleRateDivider(uint8_t divider)
+modm::ResumableResult<bool>
+modm::Itg3200<I2cMaster>::setSampleRateDivider(uint8_t divider)
 {
 	RF_BEGIN();
 
@@ -64,16 +64,16 @@ xpcc::Itg3200<I2cMaster>::setSampleRateDivider(uint8_t divider)
 // ----------------------------------------------------------------------------
 // MARK: - register access
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Itg3200<I2cMaster>::readStatus()
+modm::ResumableResult<bool>
+modm::Itg3200<I2cMaster>::readStatus()
 {
 	return read(Register::INT_STATUS, rawBuffer[2]);
 }
 
 // MARK: update register
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Itg3200<I2cMaster>::updateRegister(uint8_t index, uint8_t setMask, uint8_t clearMask)
+modm::ResumableResult<bool>
+modm::Itg3200<I2cMaster>::updateRegister(uint8_t index, uint8_t setMask, uint8_t clearMask)
 {
 	RF_BEGIN();
 
@@ -84,8 +84,8 @@ xpcc::Itg3200<I2cMaster>::updateRegister(uint8_t index, uint8_t setMask, uint8_t
 
 // MARK: write multilength register
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Itg3200<I2cMaster>::write(Register reg, uint8_t *buffer, uint8_t length, bool copyBuffer)
+modm::ResumableResult<bool>
+modm::Itg3200<I2cMaster>::write(Register reg, uint8_t *buffer, uint8_t length, bool copyBuffer)
 {
 	RF_BEGIN();
 
@@ -102,8 +102,8 @@ xpcc::Itg3200<I2cMaster>::write(Register reg, uint8_t *buffer, uint8_t length, b
 
 // MARK: read multilength register
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Itg3200<I2cMaster>::read(Register reg, uint8_t *buffer, uint8_t length)
+modm::ResumableResult<bool>
+modm::Itg3200<I2cMaster>::read(Register reg, uint8_t *buffer, uint8_t length)
 {
 	RF_BEGIN();
 

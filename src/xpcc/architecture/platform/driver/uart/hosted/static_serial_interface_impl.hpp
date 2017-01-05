@@ -10,20 +10,20 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_HOSTED_STATIC_SERIAL_INTERFACE_HPP
+#ifndef MODM_HOSTED_STATIC_SERIAL_INTERFACE_HPP
 #	error "Do not include this file directly. Use 'static_serial_interfac.hpp'!"
 #endif
 
 #include "static_serial_interface.hpp"
 
 template<int N>
-xpcc::hosted::SerialInterface*
-xpcc::hosted::StaticSerialInterface<N>::backend = 0;
+modm::hosted::SerialInterface*
+modm::hosted::StaticSerialInterface<N>::backend = 0;
 
 template<int N>
 template<uint32_t baudrate>
 bool
-xpcc::hosted::StaticSerialInterface<N>::initialize(SerialInterface& interface)
+modm::hosted::StaticSerialInterface<N>::initialize(SerialInterface& interface)
 {
 	backend = &interface;
 
@@ -33,49 +33,49 @@ xpcc::hosted::StaticSerialInterface<N>::initialize(SerialInterface& interface)
 
 template<int N>
 void
-xpcc::hosted::StaticSerialInterface<N>::writeBlocking(uint8_t data)
+modm::hosted::StaticSerialInterface<N>::writeBlocking(uint8_t data)
 {
 	backend->write(data);
 }
 
 template<int N>
 void
-xpcc::hosted::StaticSerialInterface<N>::writeBlocking(const uint8_t *data, std::size_t length)
+modm::hosted::StaticSerialInterface<N>::writeBlocking(const uint8_t *data, std::size_t length)
 {
 	backend->writeBytes(data, length);
 }
 
 template<int N>
 void
-xpcc::hosted::StaticSerialInterface<N>::flushWriteBuffer()
+modm::hosted::StaticSerialInterface<N>::flushWriteBuffer()
 {
 	backend->flush();
 }
 
 template<int N>
 bool
-xpcc::hosted::StaticSerialInterface<N>::write(uint8_t data)
+modm::hosted::StaticSerialInterface<N>::write(uint8_t data)
 {
 	backend->write(data);
 }
 
 template<int N>
 std::size_t
-xpcc::hosted::StaticSerialInterface<N>::write(const uint8_t *data, std::size_t length)
+modm::hosted::StaticSerialInterface<N>::write(const uint8_t *data, std::size_t length)
 {
 	backend->writeBytes(data, length);
 }
 
 template<int N>
 bool
-xpcc::hosted::StaticSerialInterface<N>::isWriteFinished()
+modm::hosted::StaticSerialInterface<N>::isWriteFinished()
 {
 	return true;
 }
 
 template<int N>
 bool
-xpcc::hosted::StaticSerialInterface<N>::read(uint8_t &data)
+modm::hosted::StaticSerialInterface<N>::read(uint8_t &data)
 {
 	char c;
 	if (backend->read(c)) {
@@ -88,7 +88,7 @@ xpcc::hosted::StaticSerialInterface<N>::read(uint8_t &data)
 
 template<int N>
 std::size_t
-xpcc::hosted::StaticSerialInterface<N>::read(uint8_t *data, std::size_t length)
+modm::hosted::StaticSerialInterface<N>::read(uint8_t *data, std::size_t length)
 {
 	// Check how many bytes are available before reading to
 	// avoid a blocking access.
@@ -104,14 +104,14 @@ xpcc::hosted::StaticSerialInterface<N>::read(uint8_t *data, std::size_t length)
 
 template<int N>
 std::size_t
-xpcc::hosted::StaticSerialInterface<N>::discardReceiveBuffer()
+modm::hosted::StaticSerialInterface<N>::discardReceiveBuffer()
 {
 	return 0;
 }
 
 template<int N>
 std::size_t
-xpcc::hosted::StaticSerialInterface<N>::discardTransmitBuffer()
+modm::hosted::StaticSerialInterface<N>::discardTransmitBuffer()
 {
 	return 0;
 }

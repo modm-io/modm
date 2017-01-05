@@ -10,15 +10,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32_GPIO_BASE_HPP
-#define XPCC_STM32_GPIO_BASE_HPP
+#ifndef MODM_STM32_GPIO_BASE_HPP
+#define MODM_STM32_GPIO_BASE_HPP
 
 #include "../device.hpp"
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/architecture/interface/i2c.hpp>
 #include <modm/math/utils/bit_operation.hpp>
 
-extern void xpcc_gpio_enable(void);
+extern void modm_gpio_enable(void);
 
 /**
  * @ingroup 	platform
@@ -30,7 +30,7 @@ extern void xpcc_gpio_enable(void);
  * @defgroup	{{partname}}_gpio GPIO
  */
 
-namespace xpcc
+namespace modm
 {
 
 namespace stm32
@@ -104,7 +104,7 @@ struct Gpio
 	static void
 	enable()
 	{
-		xpcc_gpio_enable();
+		modm_gpio_enable();
 	}
 
 	static void
@@ -167,6 +167,6 @@ protected:
 
 } // namespace stm32
 
-} // namespace xpcc
+} // namespace modm
 
-#endif // XPCC_STM32_GPIO_BASE_HPP
+#endif // MODM_STM32_GPIO_BASE_HPP

@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_UNITTEST_CAN_MESSAGE_HPP
-#define XPCC_UNITTEST_CAN_MESSAGE_HPP
+#ifndef MODM_UNITTEST_CAN_MESSAGE_HPP
+#define MODM_UNITTEST_CAN_MESSAGE_HPP
 
 #include <unittest/testsuite.hpp>
 #include <modm/architecture/interface/can_message.hpp>
@@ -26,4 +26,4 @@ public:
 	testEqualOperator();
 };
 
-#endif // XPCC_UNITTEST_CAN_MESSAGE_HPP
+#endif // MODM_UNITTEST_CAN_MESSAGE_HPP

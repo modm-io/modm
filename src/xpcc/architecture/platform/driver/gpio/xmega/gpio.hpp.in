@@ -12,15 +12,15 @@
 
 {{ generation_block }}
 
-#ifndef XPCC_XMEGA_GPIO_HPP
-#define XPCC_XMEGA_GPIO_HPP
+#ifndef MODM_XMEGA_GPIO_HPP
+#define MODM_XMEGA_GPIO_HPP
 
 #include "../device.hpp"
 #include "../../../core/avr/interrupts.hpp"
 #include <modm/architecture/interface/gpio.hpp>
 #include "type_ids.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 namespace xmega
@@ -75,7 +75,7 @@ struct Gpio
 	enum class
 	Port : uint8_t
 	{
-%% for port in gpios | xpcc.values('port') | sort
+%% for port in gpios | modm.values('port') | sort
 		Port{{port}} = PORTCFG_VP13MAP_PORT{{port}}_gc | PORTCFG_VP02MAP_PORT{{port}}_gc,
 %% endfor
 	};
@@ -105,7 +105,7 @@ public:
 	enum class
 	Output : uint8_t
 	{
-%% for port in gpios | xpcc.values('port') | sort
+%% for port in gpios | modm.values('port') | sort
 	%% if port in ['C', 'D', 'E']
 		Gpio{{port}}4 = PORTCFG_CLKEVPIN_bm | PORTCFG_EVOUT_P{{port}}7_gc | PORTCFG_CLKOUT_P{{port}}7_gc,
 		Gpio{{port}}7 = PORTCFG_EVOUT_P{{port}}7_gc | PORTCFG_CLKOUT_P{{port}}7_gc,
@@ -122,45 +122,45 @@ public:
 		Mult4X = PORTCFG_CLKOUTSEL_CLK4X_gc,
 	};
 
-	xpcc_always_inline static void setVirtualPort0(Port port) {
+	modm_always_inline static void setVirtualPort0(Port port) {
 		PORTCFG_VPCTRLA = (PORTCFG_VPCTRLA & ~PORTCFG_VP0MAP_gm) | (static_cast<uint8_t>(port) & PORTCFG_VP0MAP_gm);
 	}
-	xpcc_always_inline static void setVirtualPort1(Port port) {
+	modm_always_inline static void setVirtualPort1(Port port) {
 		PORTCFG_VPCTRLA = (PORTCFG_VPCTRLA & ~PORTCFG_VP1MAP_gm) | (static_cast<uint8_t>(port) & PORTCFG_VP1MAP_gm);
 	}
-	xpcc_always_inline static void setVirtualPort2(Port port) {
+	modm_always_inline static void setVirtualPort2(Port port) {
 		PORTCFG_VPCTRLB = (PORTCFG_VPCTRLB & ~PORTCFG_VP2MAP_gm) | (static_cast<uint8_t>(port) & PORTCFG_VP2MAP_gm);
 	}
-	xpcc_always_inline static void setVirtualPort3(Port port) {
+	modm_always_inline static void setVirtualPort3(Port port) {
 		PORTCFG_VPCTRLB = (PORTCFG_VPCTRLB & ~PORTCFG_VP3MAP_gm) | (static_cast<uint8_t>(port) & PORTCFG_VP3MAP_gm);
 	}
 	
 	/// enables RTC output on `GpioC6`
-	xpcc_always_inline static void enableRTC_Output() {
+	modm_always_inline static void enableRTC_Output() {
 		PORTCFG_CLKEVOUT |= PORTCFG_RTCOUT_bm;
 	}
 	/// disables RTC output on `GpioC6`
-	xpcc_always_inline static void disableRTC_Output() {
+	modm_always_inline static void disableRTC_Output() {
 		PORTCFG_CLKEVOUT &= ~PORTCFG_RTCOUT_bm;
 	}
 	
 	/// @warning some Xmegas output only channel 7 regardless of selection
-	xpcc_always_inline static void enableEventChannelOutput(Output output, uint8_t channel) {
+	modm_always_inline static void enableEventChannelOutput(Output output, uint8_t channel) {
 		PORTCFG_CLKEVOUT = (PORTCFG_CLKEVOUT & ~(PORTCFG_CLKEVPIN_bm | PORTCFG_EVOUT_gm)) |
 				(i(output) & (PORTCFG_CLKEVPIN_bm | PORTCFG_EVOUT_gm));
 		PORTCFG_EVOUTSEL = (PORTCFG_EVOUTSEL & ~PORTCFG_EVOUTSEL_gm) | (channel & PORTCFG_EVOUTSEL_gm);
 	}
-	xpcc_always_inline static void disableEventChannelOutput() {
+	modm_always_inline static void disableEventChannelOutput() {
 		PORTCFG_CLKEVOUT &= ~PORTCFG_EVOUT_gm;
 	}
 	
 	/// @warning this overrides the output of `enableEventChannelOutput()`!
-	xpcc_always_inline static void enablePeripheralClockOutput(Output output,
+	modm_always_inline static void enablePeripheralClockOutput(Output output,
 			ClockMultiplier multiplier = ClockMultiplier::Mult1X) {
 		PORTCFG_CLKEVOUT = (PORTCFG_CLKEVOUT & ~(PORTCFG_CLKEVPIN_bm | PORTCFG_CLKOUT_gm | PORTCFG_CLKOUTSEL_gm)) |
 				(i(output) & (PORTCFG_CLKEVPIN_bm | PORTCFG_CLKOUT_gm)) | i(multiplier);
 	}
-	xpcc_always_inline static void enablePeripheralClockOutput() {
+	modm_always_inline static void enablePeripheralClockOutput() {
 		PORTCFG_CLKEVOUT &= ~PORTCFG_CLKOUT_gm;
 	}
 	
@@ -183,7 +183,7 @@ protected:
 		%% set superclass = "Gpio" ~ (type if type != "" else "IO")
 /// {{type if type != "" else "IO"}} class for Pin {{port ~ pin}}
 /// @ingroup	xmega
-class {{name}} : public Gpio, ::xpcc::{{superclass}}
+class {{name}} : public Gpio, ::modm::{{superclass}}
 {
 private:
 	static constexpr uint8_t pin = {{pin}};
@@ -195,7 +195,7 @@ private:
 	static constexpr uint16_t interrupt1VectorNumber = PORT{{port}}_INT1_vect_num;
 
 public:
-	xpcc_always_inline static void
+	modm_always_inline static void
 	configure(Configuration config,
 			  Inverted invert = Inverted::No) {
 		PORT{{port}}_PIN{{pin}}CTRL = (PORT{{port}}_PIN{{pin}}CTRL & ~(PORT_OPC_gm | PORT_INVEN_bm)) |
@@ -204,91 +204,91 @@ public:
 		%% if type in ["", "Output"]
 	// GpioOutput
 	// start documentation inherited
-	xpcc_always_inline static void setOutput() {
+	modm_always_inline static void setOutput() {
 		PORT{{port}}_DIRSET = mask;
 	}
-	xpcc_always_inline static void setOutput(bool value) {
+	modm_always_inline static void setOutput(bool value) {
 		set(value);
 		setOutput();
 	}
-	xpcc_always_inline static void set() {
+	modm_always_inline static void set() {
 		PORT{{port}}_OUTSET = mask;
 	}
-	xpcc_always_inline static void set(bool status) {
+	modm_always_inline static void set(bool status) {
 		if (status) { set(); }
 		else { reset(); }
 	}
-	xpcc_always_inline static void reset() {
+	modm_always_inline static void reset() {
 		PORT{{port}}_OUTCLR = mask;
 	}
-	xpcc_always_inline static void toggle() {
+	modm_always_inline static void toggle() {
 		PORT{{port}}_OUTTGL = mask;
 	}
 	// end documentation inherited
-	xpcc_always_inline static void setOutput(Configuration config,
+	modm_always_inline static void setOutput(Configuration config,
 										Inverted invert = Inverted::No) {
 		configure(config, invert);
 		setOutput();
 	}
-	xpcc_always_inline static void enableSlewRateLimit() {
+	modm_always_inline static void enableSlewRateLimit() {
 		PORT{{port}}_PIN{{pin}}CTRL |= PORT_SRLEN_bm;
 	}
-	xpcc_always_inline static void disableSlewRateLimit() {
+	modm_always_inline static void disableSlewRateLimit() {
 		PORT{{port}}_PIN{{pin}}CTRL &= ~PORT_SRLEN_bm;
 	}
 		%% endif
 		%% if type in ["", "Input"]
 	// GpioInput
 	// start documentation inherited
-	xpcc_always_inline static void
+	modm_always_inline static void
 	setInput() {
 		 PORT{{port}}_DIRCLR = mask; 
 	}
-	xpcc_always_inline static bool read() {
+	modm_always_inline static bool read() {
 		(void) {{pin}};
 		return (PORT{{port}}_IN & mask);
 	}
 	// end documentation inherited
-	xpcc_always_inline static void setInput(Configuration config,
+	modm_always_inline static void setInput(Configuration config,
 										Inverted invert = Inverted::No) {
 		setInput();
 		configure(config, invert);
 	}
-	xpcc_always_inline static void setInputTrigger(InputTrigger trigger) {
+	modm_always_inline static void setInputTrigger(InputTrigger trigger) {
 		PORT{{port}}_PIN{{pin}}CTRL = (PORT{{port}}_PIN{{pin}}CTRL & ~PORT_ISC_gm) | i(trigger);
 	}
-	xpcc_always_inline static void enableExternalInterrupt0(InterruptLevel level) {
+	modm_always_inline static void enableExternalInterrupt0(InterruptLevel level) {
 		PORT{{port}}_INT0MASK |= mask;
-		PORT{{port}}_INTCTRL = (PORT{{port}}_INTCTRL & ~PORT_INT0LVL_gm) | (::xpcc::xmega::i(level) & PORT_INT0LVL_gm);
+		PORT{{port}}_INTCTRL = (PORT{{port}}_INTCTRL & ~PORT_INT0LVL_gm) | (::modm::xmega::i(level) & PORT_INT0LVL_gm);
 	}
-	xpcc_always_inline static void enableExternalInterrupt1(InterruptLevel level) {
+	modm_always_inline static void enableExternalInterrupt1(InterruptLevel level) {
 		PORT{{port}}_INT1MASK |= mask;
-		PORT{{port}}_INTCTRL = (PORT{{port}}_INTCTRL & ~PORT_INT1LVL_gm) | ((::xpcc::xmega::i(level) << 2) & PORT_INT1LVL_gm);
+		PORT{{port}}_INTCTRL = (PORT{{port}}_INTCTRL & ~PORT_INT1LVL_gm) | ((::modm::xmega::i(level) << 2) & PORT_INT1LVL_gm);
 	}
-	xpcc_always_inline static void disableExternalInterrupt0() {
+	modm_always_inline static void disableExternalInterrupt0() {
 		PORT{{port}}_INT0MASK &= ~mask;
 	}
-	xpcc_always_inline static void disableExternalInterrupt1() {
+	modm_always_inline static void disableExternalInterrupt1() {
 		PORT{{port}}_INT1MASK &= ~mask;
 	}
-	xpcc_always_inline static bool getExternalInterruptFlag0() {
+	modm_always_inline static bool getExternalInterruptFlag0() {
 		return (PORT{{port}}_INTFLAGS & PORT_INT0IF_bm);
 	}
-	xpcc_always_inline static bool getExternalInterruptFlag1() {
+	modm_always_inline static bool getExternalInterruptFlag1() {
 		return (PORT{{port}}_INTFLAGS & PORT_INT1IF_bm);
 	}
-	xpcc_always_inline static void acknowledgeExternalInterruptFlag0() {
+	modm_always_inline static void acknowledgeExternalInterruptFlag0() {
 		PORT{{port}}_INTFLAGS |= PORT_INT0IF_bm;
 	}
-	xpcc_always_inline static void acknowledgeExternalInterruptFlag1() {
+	modm_always_inline static void acknowledgeExternalInterruptFlag1() {
 		PORT{{port}}_INTFLAGS |= PORT_INT1IF_bm;
 	}
 			%% if port in ['A', 'B', 'C', 'D', 'E', 'F']
-	xpcc_always_inline static void enableInputBuffer() {
+	modm_always_inline static void enableInputBuffer() {
 		PORT{{port}}_PIN{{pin}}CTRL &= ~PORT_ISC_gm;
 	}
 	/// disables the input buffer, when using this pin as analog input
-	xpcc_always_inline static void disableInputBuffer() {
+	modm_always_inline static void disableInputBuffer() {
 		PORT{{port}}_PIN{{pin}}CTRL = (PORT{{port}}_PIN{{pin}}CTRL & ~PORT_ISC_gm) | PORT_ISC_INPUT_DISABLE_gc;
 	}
 			%% endif
@@ -323,7 +323,7 @@ public:
 						%% endif
 					%% endif
 				%% endif
-	xpcc_always_inline static void
+	modm_always_inline static void
 	connect(TypeId::{{ af.peripheral }}{{ af.name }}) {
 				%% if 'remap' in af
 					%% if af.peripheral.startswith('Spi')
@@ -355,8 +355,8 @@ public:
 			%% for peripheral in   ['SoftwareSpiMasterMosi',
 									'SoftwareSpiMasterSck']
 	/// Connect to `{{peripheral}}`.
-	xpcc_always_inline static void
-	connect(::xpcc::TypeId::{{ peripheral }}) {
+	modm_always_inline static void
+	connect(::modm::TypeId::{{ peripheral }}) {
 		configure(Configuration::Floating);
 		setOutput();
 		set();
@@ -365,8 +365,8 @@ public:
 			%% for peripheral in   ['SoftwareI2cMasterSda',
 									'SoftwareI2cMasterScl']
 	/// Connect to `{{peripheral}}`.
-	xpcc_always_inline static void
-	connect(::xpcc::TypeId::{{ peripheral }}) {
+	modm_always_inline static void
+	connect(::modm::TypeId::{{ peripheral }}) {
 		configure(Configuration::OpenDrain);
 		setOutput();
 		set();
@@ -376,8 +376,8 @@ public:
 		%% if type in ['', 'Input']
 			%% for peripheral in ['SoftwareSpiMasterMiso']
 	/// Connect to `{{peripheral}}`.
-	xpcc_always_inline static void
-	connect(::xpcc::TypeId::{{ peripheral }}) {
+	modm_always_inline static void
+	connect(::modm::TypeId::{{ peripheral }}) {
 		configure(Configuration::Floating);
 		setInput();
 	}
@@ -392,7 +392,7 @@ public:
 /// Hardware access for port {{port.name}}.
 /// @ingroup xmega
 template< uint8_t START_PIN, uint8_t WIDTH >
-class GpioPort{{port.name}} : public ::xpcc::GpioPort, public Gpio
+class GpioPort{{port.name}} : public ::modm::GpioPort, public Gpio
 {
 	static_assert(START_PIN >= {{port.startPin}}, "START_PIN too small, minimum {{port.startPin}}.");
 	static_assert(START_PIN < {{port.startPin + port.width}}, "START_PIN too large, maximum {{port.startPin + port.width-1}}.");
@@ -407,22 +407,22 @@ public:
 	static constexpr uint8_t width = WIDTH;
 	
 public:
-	xpcc_always_inline static void setOutput() {
+	modm_always_inline static void setOutput() {
 		PORT{{port.name}}_DIRSET |= portMask;
 	}
-	xpcc_always_inline static void setInput() {
+	modm_always_inline static void setInput() {
 		PORT{{port.name}}_DIRCLR |= portMask;
 	}
-	xpcc_always_inline static void configure(Configuration config,
+	modm_always_inline static void configure(Configuration config,
 										Inverted invert = Inverted::No) {
 		PORTCFG_MPCMASK = portMask;
 		*(&PORT{{port.name}}_PIN0CTRL + START_PIN) = i(config) | ((invert == Inverted::Yes) ? PORT_INVEN_bm : 0);
 	}
-	xpcc_always_inline static uint8_t read() {
+	modm_always_inline static uint8_t read() {
 		uint8_t data = PORT{{port.name}}_IN & portMask;
 		return (data >> START_PIN);
 	}
-	xpcc_always_inline static void write(uint8_t data) {
+	modm_always_inline static void write(uint8_t data) {
 		data <<= START_PIN;
 		PORT{{port.name}}_OUTCLR |= portMask;
 		PORT{{port.name}}_OUTSET |= (data & portMask);
@@ -433,7 +433,7 @@ public:
 
 }	// namespace xmega
 
-}	// namespace xpcc
+}	// namespace modm
 
 #endif
 

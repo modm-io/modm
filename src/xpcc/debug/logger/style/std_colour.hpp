@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LOG_STD_COLOUR_HPP
-#define XPCC_LOG_STD_COLOUR_HPP
+#ifndef MODM_LOG_STD_COLOUR_HPP
+#define MODM_LOG_STD_COLOUR_HPP
 
 #include "../style.hpp"
 #include <modm/utils/template_metaprogramming.hpp>
 
-namespace xpcc
+namespace modm
 {
 	namespace log
 	{
@@ -81,4 +81,4 @@ namespace xpcc
 
 #include "std_colour_impl.hpp"
 
-#endif // XPCC_LOG_STD_COLOUR_HPP
+#endif // MODM_LOG_STD_COLOUR_HPP

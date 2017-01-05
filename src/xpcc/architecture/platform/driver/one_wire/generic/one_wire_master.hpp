@@ -12,13 +12,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SOFTWARE_ONE_WIRE_HPP
-#define XPCC_SOFTWARE_ONE_WIRE_HPP
+#ifndef MODM_SOFTWARE_ONE_WIRE_HPP
+#define MODM_SOFTWARE_ONE_WIRE_HPP
 
 #include <modm/architecture/utils.hpp>
 #include <modm/architecture/driver/delay.hpp>
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	Software emulation of a 1-wire master
@@ -175,4 +175,4 @@ namespace xpcc
 
 #include "one_wire_master_impl.hpp"
 
-#endif // XPCC_SOFTWARE_ONE_WIRE_HPP
+#endif // MODM_SOFTWARE_ONE_WIRE_HPP

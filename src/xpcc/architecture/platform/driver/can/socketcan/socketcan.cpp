@@ -23,19 +23,19 @@
 #include <linux/can/raw.h>
 #include <string.h>
 
-#undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::DEBUG
+#undef  MODM_LOG_LEVEL
+#define MODM_LOG_LEVEL modm::log::DEBUG
 
-xpcc::hosted::SocketCan::SocketCan()
+modm::hosted::SocketCan::SocketCan()
 {
 }
 
-xpcc::hosted::SocketCan::~SocketCan()
+modm::hosted::SocketCan::~SocketCan()
 {
 }
 
 bool
-xpcc::hosted::SocketCan::open(std::string deviceName /*, xpcc::Can::Bitrate canBitrate */)
+modm::hosted::SocketCan::open(std::string deviceName /*, modm::Can::Bitrate canBitrate */)
 {
 	skt = socket(PF_CAN, SOCK_RAW, CAN_RAW);
 
@@ -50,32 +50,32 @@ xpcc::hosted::SocketCan::open(std::string deviceName /*, xpcc::Can::Bitrate canB
 	addr.can_ifindex = ifr.ifr_ifindex;
 	if (bind( skt, (struct sockaddr*)&addr, sizeof(addr) ) < 0)
 	{
-		XPCC_LOG_ERROR << XPCC_FILE_INFO;
-		XPCC_LOG_ERROR << "Could not open SocketCAN" << xpcc::endl;
+		MODM_LOG_ERROR << MODM_FILE_INFO;
+		MODM_LOG_ERROR << "Could not open SocketCAN" << modm::endl;
 		return false;
 	};
 
 	fcntl(skt, F_SETFL, O_NONBLOCK);
 
-	XPCC_LOG_INFO << XPCC_FILE_INFO;
-	XPCC_LOG_INFO << "SocketCAN opened successfully with skt = " << skt << xpcc::endl;
+	MODM_LOG_INFO << MODM_FILE_INFO;
+	MODM_LOG_INFO << "SocketCAN opened successfully with skt = " << skt << modm::endl;
 
 	return true;
 }
 
 void
-xpcc::hosted::SocketCan::close()
+modm::hosted::SocketCan::close()
 {
 }
 
-xpcc::Can::BusState
-xpcc::hosted::SocketCan::getBusState()
+modm::Can::BusState
+modm::hosted::SocketCan::getBusState()
 {
 	return BusState::Connected;
 }
 
 bool
-xpcc::hosted::SocketCan::isMessageAvailable()
+modm::hosted::SocketCan::isMessageAvailable()
 {
 	struct can_frame frame;
 	int nbytes = recv(skt, &frame, sizeof(struct can_frame), MSG_DONTWAIT | MSG_PEEK);
@@ -83,15 +83,15 @@ xpcc::hosted::SocketCan::isMessageAvailable()
 	// recv returns 'Resource temporary not available' which is wired but ignored here.
 	/* if (nbytes < 0)
 	{
-		XPCC_LOG_DEBUG << XPCC_FILE_INFO;
-		XPCC_LOG_DEBUG << strerror(errno) << xpcc::endl;
+		MODM_LOG_DEBUG << MODM_FILE_INFO;
+		MODM_LOG_DEBUG << strerror(errno) << modm::endl;
 	} */
 
 	return (nbytes > 0);
 }
 
 bool
-xpcc::hosted::SocketCan::getMessage(can::Message& message)
+modm::hosted::SocketCan::getMessage(can::Message& message)
 {
 	struct can_frame frame;
 	int nbytes = recv(skt, &frame, sizeof(struct can_frame), MSG_DONTWAIT);
@@ -111,7 +111,7 @@ xpcc::hosted::SocketCan::getMessage(can::Message& message)
 }
 
 bool
-xpcc::hosted::SocketCan::sendMessage(const can::Message& message)
+modm::hosted::SocketCan::sendMessage(const can::Message& message)
 {
 	struct can_frame frame;
 

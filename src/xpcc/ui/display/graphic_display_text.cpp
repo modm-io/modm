@@ -15,13 +15,13 @@
 
 // ----------------------------------------------------------------------------
 uint8_t
-xpcc::GraphicDisplay::getFontHeight() const
+modm::GraphicDisplay::getFontHeight() const
 {
-	return xpcc::GraphicDisplay::getFontHeight(&(this->font));
+	return modm::GraphicDisplay::getFontHeight(&(this->font));
 }
 
 uint8_t
-xpcc::GraphicDisplay::getFontHeight(const xpcc::accessor::Flash<uint8_t> *font)
+modm::GraphicDisplay::getFontHeight(const modm::accessor::Flash<uint8_t> *font)
 {
 	if (!font->isValid())
 		return 0;
@@ -31,14 +31,14 @@ xpcc::GraphicDisplay::getFontHeight(const xpcc::accessor::Flash<uint8_t> *font)
 
 // ----------------------------------------------------------------------------
 uint16_t
-xpcc::GraphicDisplay::getStringWidth(const char* s) const
+modm::GraphicDisplay::getStringWidth(const char* s) const
 {
-	return xpcc::GraphicDisplay::getStringWidth(s, &(this->font));
+	return modm::GraphicDisplay::getStringWidth(s, &(this->font));
 }
 
 
 uint16_t
-xpcc::GraphicDisplay::getStringWidth(const char* s, const xpcc::accessor::Flash<uint8_t> *font)
+modm::GraphicDisplay::getStringWidth(const char* s, const modm::accessor::Flash<uint8_t> *font)
 {
 	if (!font->isValid())
 		return 0;
@@ -60,7 +60,7 @@ xpcc::GraphicDisplay::getStringWidth(const char* s, const xpcc::accessor::Flash<
 
 // ----------------------------------------------------------------------------
 void
-xpcc::GraphicDisplay::write(char c)
+modm::GraphicDisplay::write(char c)
 {
 	if (!this->font.isValid())
 		return;
@@ -117,18 +117,18 @@ xpcc::GraphicDisplay::write(char c)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::GraphicDisplay::Writer::write(char c)
+modm::GraphicDisplay::Writer::write(char c)
 {
 	this->parent->write(c);
 }
 
 void
-xpcc::GraphicDisplay::Writer::flush()
+modm::GraphicDisplay::Writer::flush()
 {
 }
 
 bool
-xpcc::GraphicDisplay::Writer::read(char&)
+modm::GraphicDisplay::Writer::read(char&)
 {
 	return false;
 }

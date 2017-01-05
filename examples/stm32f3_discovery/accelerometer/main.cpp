@@ -22,7 +22,7 @@ Board::lsm3::Accelerometer::Data data;
 Board::lsm3::Accelerometer accelerometer(data);
 
 
-class ReaderThread : public xpcc::pt::Protothread
+class ReaderThread : public modm::pt::Protothread
 {
 public:
 	bool
@@ -69,9 +69,9 @@ public:
 	}
 
 private:
-	xpcc::ShortTimeout timeout;
-	xpcc::filter::MovingAverage<float, 25> averageX;
-	xpcc::filter::MovingAverage<float, 25> averageY;
+	modm::ShortTimeout timeout;
+	modm::filter::MovingAverage<float, 25> averageX;
+	modm::filter::MovingAverage<float, 25> averageY;
 };
 
 ReaderThread reader;

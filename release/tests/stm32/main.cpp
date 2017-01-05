@@ -15,9 +15,9 @@
 
 #if !defined(STM32F3XX)
 // Not yet implemented for STM32 F3 series
-//xpcc::stm32::Usart1             uart1(115200);
-//xpcc::stm32::BufferedUsart2     uart2(115200, 15);
-//xpcc::stm32::BufferedFlowUsart3 uart3(115200, 15);
+//modm::stm32::Usart1             uart1(115200);
+//modm::stm32::BufferedUsart2     uart2(115200, 15);
+//modm::stm32::BufferedFlowUsart3 uart3(115200, 15);
 #endif
 
 #if defined(STM32F10X_HD) || \
@@ -26,17 +26,17 @@
 	defined(STM32F2XX)    || \
 	defined(STM32F4XX)
 
-//xpcc::stm32::Uart4          uart4(115200);
-//xpcc::stm32::BufferedUart5  uart5(115200, 15);
+//modm::stm32::Uart4          uart4(115200);
+//modm::stm32::BufferedUart5  uart5(115200, 15);
 #endif
 
 #if defined(STM32F2XX) || defined(STM32F4XX)
-//xpcc::stm32::BufferedFlowUsart6 uart6(115200, 15);
+//modm::stm32::BufferedFlowUsart6 uart6(115200, 15);
 #endif
 
-typedef xpcc::stm32::GpioOutputA0 Out;
-typedef xpcc::stm32::GpioInputA1  In;
-typedef xpcc::stm32::GpioA2       Io;
+typedef modm::stm32::GpioOutputA0 Out;
+typedef modm::stm32::GpioInputA1  In;
+typedef modm::stm32::GpioA2       Io;
 
 int
 main()

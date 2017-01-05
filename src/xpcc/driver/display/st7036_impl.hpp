@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ST7036_HPP
+#ifndef MODM_ST7036_HPP
 	#error	"Don't include this file directly, use 'st7036.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 
-namespace xpcc {
+namespace modm {
 	namespace st7036 {
 		EXTERN_FLASH_STORAGE(uint8_t configuration[10]);
 	}
@@ -26,7 +26,7 @@ namespace xpcc {
 // ----------------------------------------------------------------------------
 
 template <typename SPI, typename CS, typename RS, unsigned int Width, unsigned int Heigth>
-xpcc::St7036<SPI, CS, RS, Width, Heigth>::St7036() :
+modm::St7036<SPI, CS, RS, Width, Heigth>::St7036() :
 	CharacterDisplay(Width, Heigth)
 {
 }
@@ -35,7 +35,7 @@ xpcc::St7036<SPI, CS, RS, Width, Heigth>::St7036() :
 
 template <typename SPI, typename CS, typename RS, unsigned int Width, unsigned int Heigth>
 void
-xpcc::St7036<SPI, CS, RS, Width, Heigth>::initialize()
+modm::St7036<SPI, CS, RS, Width, Heigth>::initialize()
 {
 	accessor::Flash<uint8_t> config(st7036::configuration);
 	for (uint8_t i = 0; i < 10; ++i)
@@ -46,7 +46,7 @@ xpcc::St7036<SPI, CS, RS, Width, Heigth>::initialize()
 
 template <typename SPI, typename CS, typename RS, unsigned int Width, unsigned int Heigth>
 void
-xpcc::St7036<SPI, CS, RS, Width, Heigth>::writeRaw(char c)
+modm::St7036<SPI, CS, RS, Width, Heigth>::writeRaw(char c)
 {
 	RS::set();
 
@@ -57,14 +57,14 @@ xpcc::St7036<SPI, CS, RS, Width, Heigth>::writeRaw(char c)
 
 template <typename SPI, typename CS, typename RS, unsigned int Width, unsigned int Heigth>
 void
-xpcc::St7036<SPI, CS, RS, Width, Heigth>::execute(Command command)
+modm::St7036<SPI, CS, RS, Width, Heigth>::execute(Command command)
 {
 	writeCommand(command);
 }
 
 template <typename SPI, typename CS, typename RS, unsigned int Width, unsigned int Heigth>
 void
-xpcc::St7036<SPI, CS, RS, Width, Heigth>::setCursor(uint8_t newLine, uint8_t newColumn)
+modm::St7036<SPI, CS, RS, Width, Heigth>::setCursor(uint8_t newLine, uint8_t newColumn)
 {
 	this->column = newColumn;
 	this->line = newLine;
@@ -77,7 +77,7 @@ xpcc::St7036<SPI, CS, RS, Width, Heigth>::setCursor(uint8_t newLine, uint8_t new
 
 template <typename SPI, typename CS, typename RS, unsigned int Width, unsigned int Heigth>
 void
-xpcc::St7036<SPI, CS, RS, Width, Heigth>::writeCommand(uint8_t inCommand)
+modm::St7036<SPI, CS, RS, Width, Heigth>::writeCommand(uint8_t inCommand)
 {
 	RS::reset();
 
@@ -88,9 +88,9 @@ xpcc::St7036<SPI, CS, RS, Width, Heigth>::writeCommand(uint8_t inCommand)
 	// check if the command is 'clear display' oder 'return home', these
 	// commands take a bit longer until they are finished.
 	if ((inCommand & 0xfc) == 0) {
-		xpcc::delayMicroseconds(1200);
+		modm::delayMicroseconds(1200);
 	}
 	else {
-		xpcc::delayMicroseconds(27);
+		modm::delayMicroseconds(27);
 	}
 }

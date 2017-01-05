@@ -13,18 +13,18 @@
 // Arduino UNO
 //
 
-#ifndef XPCC_ARDUINO_UNO_HPP
-#define XPCC_ARDUINO_UNO_HPP
+#ifndef MODM_ARDUINO_UNO_HPP
+#define MODM_ARDUINO_UNO_HPP
 
 #include <modm/architecture/platform.hpp>
 #include <modm/debug/logger.hpp>
 
-using namespace xpcc::atmega;
+using namespace modm::atmega;
 
 namespace Board
 {
 
-using systemClock = xpcc::avr::SystemClock;
+using systemClock = modm::avr::SystemClock;
 
 // Arduino Footprint
 using A0 = GpioC0;
@@ -49,10 +49,10 @@ using D11 = GpioB3;
 using D12 = GpioB4;
 using D13 = GpioB5;
 
-using Button = xpcc::GpioUnused;
+using Button = modm::GpioUnused;
 using LedD13 = D13;
 
-using Leds = xpcc::SoftwareGpioPort< LedD13 >;
+using Leds = modm::SoftwareGpioPort< LedD13 >;
 
 
 inline void
@@ -64,7 +64,7 @@ initialize()
 	D1::connect(Uart0::Tx);
 	Uart0::initialize<systemClock, 9600>();
 
-	// xpcc::Clock initialization
+	// modm::Clock initialization
 	// Clear Timer on Compare Match Mode
 	TCCR0A = (1 << WGM01);
 	TIMSK0 = (1 << OCIE0A);
@@ -91,6 +91,6 @@ initialize()
 }
 
 using namespace Board;
-extern xpcc::IOStream serialStream;
+extern modm::IOStream serialStream;
 
-#endif	// XPCC_ARDUINO_UNO_HPP
+#endif	// MODM_ARDUINO_UNO_HPP

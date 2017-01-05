@@ -12,16 +12,16 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_AMNB_INTERFACE_HPP
+#ifndef	MODM_AMNB_INTERFACE_HPP
 #	error	"Don't include this file directly, use 'interface.hpp' instead!"
 #endif
 
 #include <modm/architecture/driver/atomic/lock.hpp>
 
-uint_fast16_t xpcc::amnb::Clock::time = 0;
+uint_fast16_t modm::amnb::Clock::time = 0;
 
-xpcc::Timestamp
-xpcc::amnb::Clock::now()
+modm::Timestamp
+modm::amnb::Clock::now()
 {
 	uint_fast16_t tempTime;
 	{
@@ -38,7 +38,7 @@ xpcc::amnb::Clock::now()
 #endif
 
 uint8_t
-xpcc::amnb::crcUpdate(uint8_t crc, uint8_t data)
+modm::amnb::crcUpdate(uint8_t crc, uint8_t data)
 {
 #ifdef __AVR__
 	return _crc_ibutton_update(crc, data);
@@ -58,64 +58,64 @@ xpcc::amnb::crcUpdate(uint8_t crc, uint8_t data)
 }
 
 // ----------------------------------------------------------------------------
-template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT> typename xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::State \
-	xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::state = SYNC;
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT> typename modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::State \
+	modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::state = SYNC;
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT> 
-uint8_t xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::rx_buffer[maxPayloadLength + 3];
+uint8_t modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::rx_buffer[maxPayloadLength + 3];
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT> 
-uint8_t xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::tx_buffer[maxPayloadLength + 4];
+uint8_t modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::tx_buffer[maxPayloadLength + 4];
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
-uint8_t xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::crc;
+uint8_t modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::crc;
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
-uint8_t xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::position;
+uint8_t modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::position;
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
-uint8_t xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::length;
+uint8_t modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::length;
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
-uint8_t xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::lengthOfReceivedMessage = 0;
+uint8_t modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::lengthOfReceivedMessage = 0;
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
-uint8_t xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::lengthOfTransmitMessage = 0;
+uint8_t modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::lengthOfTransmitMessage = 0;
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
-bool xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::hasMessageToSend = false;
+bool modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::hasMessageToSend = false;
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
-bool xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::rescheduleTransmit = false;
+bool modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::rescheduleTransmit = false;
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
-bool xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::transmitting = false;
+bool modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::transmitting = false;
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
-xpcc::ShortTimeout xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::resetTimer;
+modm::ShortTimeout modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::resetTimer;
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
-xpcc::Timeout<xpcc::amnb::Clock> xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::rescheduleTimer;
+modm::Timeout<modm::amnb::Clock> modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::rescheduleTimer;
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
-uint8_t xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::rescheduleTimeout;
+uint8_t modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::rescheduleTimeout;
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
-bool xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::messageSent = false;
+bool modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::messageSent = false;
 
 #if AMNB_TIMING_DEBUG
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
-xpcc::Timestamp xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::latency;
+modm::Timestamp modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::latency;
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
-uint8_t xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::collisions;
+uint8_t modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::collisions;
 #endif
 
 // ----------------------------------------------------------------------------
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 void
-xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::initialize(int seed)
+modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::initialize(int seed)
 {
 	srand(seed);
 	rescheduleTimeout = static_cast<uint8_t>(rand());
@@ -126,7 +126,7 @@ xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::initialize(int seed)
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 bool
-xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::writeMessage()
+modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::writeMessage()
 {
 	uint8_t check;
 	transmitting = true;
@@ -155,7 +155,7 @@ xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::writeMessage()
 	}
 	
 #if AMNB_TIMING_DEBUG
-	latency = xpcc::Clock::now() - latency;
+	latency = modm::Clock::now() - latency;
 #endif
 	
 	messageSent = true;
@@ -166,7 +166,7 @@ xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::writeMessage()
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 bool
-xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::sendMessage(uint8_t address, Flags flags, 
+modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::sendMessage(uint8_t address, Flags flags, 
 		uint8_t command,
 		const void *payload, uint8_t payloadLength)
 {
@@ -178,7 +178,7 @@ xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::sendMessage(uint8_t address, 
 	uint8_t crc;
 
 #if AMNB_TIMING_DEBUG
-	latency = xpcc::Clock::now();
+	latency = modm::Clock::now();
 #endif
 	
 	tx_buffer[0] = syncByte;
@@ -208,7 +208,7 @@ xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::sendMessage(uint8_t address, 
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT> template <typename T>
 bool
-xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::sendMessage(uint8_t address, Flags flags,
+modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::sendMessage(uint8_t address, Flags flags,
 		uint8_t command,
 		const T& payload)
 {
@@ -219,7 +219,7 @@ xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::sendMessage(uint8_t address, 
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 bool
-xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::sendMessage(uint8_t address, Flags flags, uint8_t command)
+modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::sendMessage(uint8_t address, Flags flags, uint8_t command)
 {
 	return sendMessage(address, flags,
 				command,
@@ -230,91 +230,91 @@ xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::sendMessage(uint8_t address, 
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 bool
-xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::isMessageAvailable()
+modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::isMessageAvailable()
 {
 	return (lengthOfReceivedMessage != 0);
 }
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 uint8_t
-xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::getTransmittedAddress()
+modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::getTransmittedAddress()
 {
 	return (tx_buffer[0] & 0x3f);
 }
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 uint8_t
-xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::getTransmittedCommand()
+modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::getTransmittedCommand()
 {
 	return tx_buffer[1];
 }
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
-xpcc::amnb::Flags
-xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::getTransmittedFlags()
+modm::amnb::Flags
+modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::getTransmittedFlags()
 {
 	return static_cast<Flags>(tx_buffer[0] & 0xc0);
 }
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 uint8_t
-xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::getAddress()
+modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::getAddress()
 {
 	return (rx_buffer[0] & 0x3f);
 }
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 uint8_t
-xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::getCommand()
+modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::getCommand()
 {
 	return rx_buffer[1];
 }
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 bool
-xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::isResponse()
+modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::isResponse()
 {
 	return (rx_buffer[0] & 0x80);
 }
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 bool
-xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::isAcknowledge()
+modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::isAcknowledge()
 {
 	return (rx_buffer[0] & 0x40);
 }
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 bool
-xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::isBusAvailable()
+modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::isBusAvailable()
 {
 	return (state == SYNC) && !transmitting && !rescheduleTransmit;
 }
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 bool
-xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::messageTransmitted()
+modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::messageTransmitted()
 {
 	return messageSent;
 }
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 const uint8_t*
-xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::getPayload()
+modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::getPayload()
 {
 	return rx_buffer+2;
 }
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 uint8_t
-xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::getPayloadLength()
+modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::getPayloadLength()
 {
 	return (lengthOfReceivedMessage - 3);
 }
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 void
-xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::dropMessage()
+modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::dropMessage()
 {
 	lengthOfReceivedMessage = 0;
 }
@@ -323,7 +323,7 @@ xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::dropMessage()
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 void
-xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::update()
+modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::update()
 {
 	uint8_t byte;
 	while (Device::read(byte))

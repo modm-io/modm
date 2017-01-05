@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-namespace xpcc
+namespace modm
 {
 	namespace filter
 	{
@@ -40,7 +40,7 @@ namespace xpcc
 
 // ----------------------------------------------------------------------------
 template <typename T>
-xpcc::filter::Median<T, 9>::Median(const T& initialValue) :
+modm::filter::Median<T, 9>::Median(const T& initialValue) :
 	index(0)
 {
 	for (uint_fast8_t i = 0; i < 9; ++i) {
@@ -51,7 +51,7 @@ xpcc::filter::Median<T, 9>::Median(const T& initialValue) :
 
 template <typename T>
 void
-xpcc::filter::Median<T, 9>::append(const T& input)
+modm::filter::Median<T, 9>::append(const T& input)
 {
 	// Remove the old value from the sorted set and replace it with the
 	// new input. This way the array remains mostly sorted.
@@ -71,32 +71,32 @@ xpcc::filter::Median<T, 9>::append(const T& input)
 
 template <typename T>
 void
-xpcc::filter::Median<T, 9>::update()
+modm::filter::Median<T, 9>::update()
 {
-	XPCC_MEDIAN_SORT(sorted[1], sorted[2]);
-	XPCC_MEDIAN_SORT(sorted[4], sorted[5]);
-	XPCC_MEDIAN_SORT(sorted[7], sorted[8]);
-	XPCC_MEDIAN_SORT(sorted[0], sorted[1]);
-	XPCC_MEDIAN_SORT(sorted[3], sorted[4]);
-	XPCC_MEDIAN_SORT(sorted[6], sorted[7]);
-	XPCC_MEDIAN_SORT(sorted[1], sorted[2]);
-	XPCC_MEDIAN_SORT(sorted[4], sorted[5]);
-	XPCC_MEDIAN_SORT(sorted[7], sorted[8]);
-	XPCC_MEDIAN_SORT(sorted[0], sorted[3]);
-	XPCC_MEDIAN_SORT(sorted[5], sorted[8]);
-	XPCC_MEDIAN_SORT(sorted[4], sorted[7]);
-	XPCC_MEDIAN_SORT(sorted[3], sorted[6]);
-	XPCC_MEDIAN_SORT(sorted[1], sorted[4]);
-	XPCC_MEDIAN_SORT(sorted[2], sorted[5]);
-	XPCC_MEDIAN_SORT(sorted[4], sorted[7]);
-	XPCC_MEDIAN_SORT(sorted[4], sorted[2]);
-	XPCC_MEDIAN_SORT(sorted[6], sorted[4]);
-	XPCC_MEDIAN_SORT(sorted[4], sorted[2]);
+	MODM_MEDIAN_SORT(sorted[1], sorted[2]);
+	MODM_MEDIAN_SORT(sorted[4], sorted[5]);
+	MODM_MEDIAN_SORT(sorted[7], sorted[8]);
+	MODM_MEDIAN_SORT(sorted[0], sorted[1]);
+	MODM_MEDIAN_SORT(sorted[3], sorted[4]);
+	MODM_MEDIAN_SORT(sorted[6], sorted[7]);
+	MODM_MEDIAN_SORT(sorted[1], sorted[2]);
+	MODM_MEDIAN_SORT(sorted[4], sorted[5]);
+	MODM_MEDIAN_SORT(sorted[7], sorted[8]);
+	MODM_MEDIAN_SORT(sorted[0], sorted[3]);
+	MODM_MEDIAN_SORT(sorted[5], sorted[8]);
+	MODM_MEDIAN_SORT(sorted[4], sorted[7]);
+	MODM_MEDIAN_SORT(sorted[3], sorted[6]);
+	MODM_MEDIAN_SORT(sorted[1], sorted[4]);
+	MODM_MEDIAN_SORT(sorted[2], sorted[5]);
+	MODM_MEDIAN_SORT(sorted[4], sorted[7]);
+	MODM_MEDIAN_SORT(sorted[4], sorted[2]);
+	MODM_MEDIAN_SORT(sorted[6], sorted[4]);
+	MODM_MEDIAN_SORT(sorted[4], sorted[2]);
 }
 
 template <typename T>
 const T
-xpcc::filter::Median<T, 9>::getValue() const
+modm::filter::Median<T, 9>::getValue() const
 {
 	return sorted[4];
 }

@@ -12,12 +12,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SCROLLABLE_TEXT_HPP
-#define XPCC_SCROLLABLE_TEXT_HPP
+#ifndef MODM_SCROLLABLE_TEXT_HPP
+#define MODM_SCROLLABLE_TEXT_HPP
 
 #include <stdint.h>
 
-namespace xpcc
+namespace modm
 {
 
 	 /**
@@ -27,7 +27,7 @@ namespace xpcc
 	 *
 	 *\author Thorsten Lajewski
 	 *\ingroup display_menu
-	 *\warning This class only works in combination with xpcc::font::FixedWidth5x8
+	 *\warning This class only works in combination with modm::font::FixedWidth5x8
 	 *\todo A better implementation is needed.
 	 */
 	class ScrollableText
@@ -119,4 +119,4 @@ namespace xpcc
 	
 	};
 }
-#endif // XPCC_SCROLLABLE_TEXT_HPP
+#endif // MODM_SCROLLABLE_TEXT_HPP

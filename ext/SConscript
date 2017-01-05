@@ -37,39 +37,39 @@ if env['ARCHITECTURE'].startswith('cortex-m'):
 
 # -----------------------------------------------------------------------------
 # Add the STM32 device header files
-if env['XPCC_DEVICE'].startswith('stm32f0'):
+if env['MODM_DEVICE'].startswith('stm32f0'):
 	globalIncludes += ['st/stm32f0xx/Include']
 
-if env['XPCC_DEVICE'].startswith('stm32f1'):
+if env['MODM_DEVICE'].startswith('stm32f1'):
 	globalIncludes += ['st/stm32f1xx/Include']
 
-# if env['XPCC_DEVICE'].startswith('stm32f2'):
+# if env['MODM_DEVICE'].startswith('stm32f2'):
 # 	globalIncludes += [
 # 		'st/stm32f2xx/Include']
 
-if env['XPCC_DEVICE'].startswith('stm32f3'):
+if env['MODM_DEVICE'].startswith('stm32f3'):
 	globalIncludes += ['st/stm32f3xx/Include']
 
-if env['XPCC_DEVICE'].startswith('stm32f4'):
+if env['MODM_DEVICE'].startswith('stm32f4'):
 	globalIncludes += ['st/stm32f4xx/Include']
 
-if env['XPCC_DEVICE'].startswith('stm32f7'):
+if env['MODM_DEVICE'].startswith('stm32f7'):
 	globalIncludes += ['st/stm32f7xx/Include']
 
 # -----------------------------------------------------------------------------
 # Add the LPC device header files
-if env['XPCC_DEVICE'].startswith('lpc11'):
+if env['MODM_DEVICE'].startswith('lpc11'):
 	globalIncludes += ['nxp/lpc11xx/Include']
 
 # -----------------------------------------------------------------------------
-if 'stm32f' in env['XPCC_DEVICE'] and not env['XPCC_DEVICE'].startswith('stm32f0'):
+if 'stm32f' in env['MODM_DEVICE'] and not env['MODM_DEVICE'].startswith('stm32f0'):
 	sourcePath += ['freertos']		# FreeRTOS for STM32
 	sourcePath += ['fatfs']			# FatFS
 
 
 includes = buildIncludes + globalIncludes
 for path in includes:
-	env.AppendUnique(CPPPATH = os.path.join(env['XPCC_ROOTPATH'], 'ext', path))
+	env.AppendUnique(CPPPATH = os.path.join(env['MODM_ROOTPATH'], 'ext', path))
 
 for path in sourcePath:
 	scan = env.FindFiles(path = path)

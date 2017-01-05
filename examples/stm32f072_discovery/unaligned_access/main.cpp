@@ -25,7 +25,7 @@ void error()
 	while(1)
 	{
 		LedUp::toggle();
-		xpcc::delayMilliseconds(100);
+		modm::delayMilliseconds(100);
 	}
 }
 
@@ -33,7 +33,7 @@ void error()
 int
 main()
 {
-	LedRight::setOutput(xpcc::Gpio::High);
+	LedRight::setOutput(modm::Gpio::High);
 	LedLeft::setOutput();
 	LedUp::setOutput();
 	LedDown::setOutput();
@@ -46,7 +46,7 @@ main()
 	{
 		{
 			// "smart" pointer is created on the heap
-			xpcc::SmartPointer p(&input);
+			modm::SmartPointer p(&input);
 
 			// manually interpreting the pointer
 			output = *reinterpret_cast<uint32_t*>(p.getPointer());
@@ -58,10 +58,10 @@ main()
 		}
 
 		{
-			// `u32` is a pointer to a xpcc::unaligned_t<uint32_t> !
-			auto *u32 = xpcc::asUnaligned<uint32_t>(buffer + offset);
+			// `u32` is a pointer to a modm::unaligned_t<uint32_t> !
+			auto *u32 = modm::asUnaligned<uint32_t>(buffer + offset);
 			// this is short for:
-			// xpcc::unaligned_t<uint32_t> *u32 = reinterpret_cast<xpcc::unaligned_t<uint32_t>*>(buffer + offset);
+			// modm::unaligned_t<uint32_t> *u32 = reinterpret_cast<modm::unaligned_t<uint32_t>*>(buffer + offset);
 			// write to the unaligned location
 			*u32 = input;
 			// read from the unaligned location
@@ -69,8 +69,8 @@ main()
 			if (output != input) error();
 
 			// Anonymous form
-			*xpcc::asUnaligned<uint32_t>(buffer + offset) = input;
-			output = *xpcc::asUnaligned<uint32_t>(buffer + offset);
+			*modm::asUnaligned<uint32_t>(buffer + offset) = input;
+			output = *modm::asUnaligned<uint32_t>(buffer + offset);
 			if (output != input) error();
 		}
 
@@ -79,7 +79,7 @@ main()
 
 		LedRight::toggle();
 		LedLeft::toggle();
-		xpcc::delayMilliseconds(Button::read() ? 250 : 500);
+		modm::delayMilliseconds(Button::read() ? 250 : 500);
 	}
 
 	return 0;

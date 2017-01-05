@@ -80,9 +80,9 @@ namespace xpcc
 
 		/// \todo check packet size?
 		inline void
-		call(const Header& header, const SmartPointer &payload) const
+		call(const Header& header, const modm::SmartPointer &payload) const
 		{
-			if(isCallable()) {
+			if (isCallable()) {
 				(component->*function)(header, payload.getPointer());
 			}
 			// TODO spezieller Aufruf für packetgröße = 0, funktioniert zwar

@@ -14,7 +14,7 @@
 
 namespace
 {
-	class TestingObject : public xpcc::sab::Callable
+	class TestingObject : public modm::sab::Callable
 	{
 	public:
 		TestingObject() :
@@ -31,13 +31,13 @@ namespace
 		
 		
 		void
-		emptyFunction(xpcc::sab::Response& /*response*/)
+		emptyFunction(modm::sab::Response& /*response*/)
 		{
 			calledFunction = EMPTY;
 		}
 		
 		void
-		responseFunction(xpcc::sab::Response& response)
+		responseFunction(modm::sab::Response& response)
 		{
 			calledFunction = RESPONSE;
 			
@@ -46,7 +46,7 @@ namespace
 		}
 		
 		void
-		errorFunction(xpcc::sab::Response& response)
+		errorFunction(modm::sab::Response& response)
 		{
 			calledFunction = ERROR;
 			
@@ -54,7 +54,7 @@ namespace
 		}
 		
 		void
-		parameterFunction(xpcc::sab::Response& response, const uint16_t* parameter)
+		parameterFunction(modm::sab::Response& response, const uint16_t* parameter)
 		{
 			calledFunction = PARAMETER;
 			
@@ -78,7 +78,7 @@ namespace
 	
 	TestingObject testingObject;
 	
-	FLASH_STORAGE(xpcc::sab::Action actionList[]) =
+	FLASH_STORAGE(modm::sab::Action actionList[]) =
 	{
 		SAB_ACTION(0x01, testingObject, TestingObject::emptyFunction, 0),
 		SAB_ACTION(0x02, testingObject, TestingObject::responseFunction, 0),
@@ -95,8 +95,8 @@ SlaveTest::setUp()
 	testingObject.reset();
 	
 	slave = new TestingSlave(0x3f,
-					xpcc::accessor::asFlash(actionList),
-					sizeof(actionList) / sizeof(xpcc::sab::Action));
+					modm::accessor::asFlash(actionList),
+					sizeof(actionList) / sizeof(modm::sab::Action));
 }
 
 void
@@ -109,7 +109,7 @@ SlaveTest::tearDown()
 void
 SlaveTest::testEmptyMethod()
 {
-	TestingInterface::sendMessage(0x3f, xpcc::sab::REQUEST, 0x01);
+	TestingInterface::sendMessage(0x3f, modm::sab::REQUEST, 0x01);
 	FakeIODevice::moveSendToReceiveBuffer();
 	
 	slave->update();
@@ -130,7 +130,7 @@ SlaveTest::testEmptyMethod()
 void
 SlaveTest::testResponseMethod()
 {
-	TestingInterface::sendMessage(0x3f, xpcc::sab::REQUEST, 0x02);
+	TestingInterface::sendMessage(0x3f, modm::sab::REQUEST, 0x02);
 	FakeIODevice::moveSendToReceiveBuffer();
 	
 	slave->update();
@@ -156,7 +156,7 @@ SlaveTest::testResponseMethod()
 void
 SlaveTest::testErrorResponse()
 {
-	TestingInterface::sendMessage(0x3f, xpcc::sab::REQUEST, 0x03);
+	TestingInterface::sendMessage(0x3f, modm::sab::REQUEST, 0x03);
 	FakeIODevice::moveSendToReceiveBuffer();
 	
 	slave->update();
@@ -180,7 +180,7 @@ SlaveTest::testParameterMethod()
 {
 	uint16_t value = 0x9876;
 	
-	TestingInterface::sendMessage(0x3f, xpcc::sab::REQUEST, 0x04, value);
+	TestingInterface::sendMessage(0x3f, modm::sab::REQUEST, 0x04, value);
 	FakeIODevice::moveSendToReceiveBuffer();
 	
 	slave->update();
@@ -208,7 +208,7 @@ SlaveTest::testWrongParameterSize()
 {
 	uint32_t value = 0xbaab;
 	
-	TestingInterface::sendMessage(0x3f, xpcc::sab::REQUEST, 0x04, value);
+	TestingInterface::sendMessage(0x3f, modm::sab::REQUEST, 0x04, value);
 	FakeIODevice::moveSendToReceiveBuffer();
 	
 	slave->update();
@@ -230,7 +230,7 @@ SlaveTest::testWrongParameterSize()
 void
 SlaveTest::testNoMethod()
 {
-	TestingInterface::sendMessage(0x3f, xpcc::sab::REQUEST, 0x05);
+	TestingInterface::sendMessage(0x3f, modm::sab::REQUEST, 0x05);
 	FakeIODevice::moveSendToReceiveBuffer();
 	
 	slave->update();

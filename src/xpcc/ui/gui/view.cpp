@@ -17,7 +17,7 @@
 #include "types.hpp"
 
 // ----------------------------------------------------------------------------
-xpcc::gui::View::View(xpcc::gui::GuiViewStack* stack, uint8_t identifier, xpcc::gui::Dimension dimension) :
+modm::gui::View::View(modm::gui::GuiViewStack* stack, uint8_t identifier, modm::gui::Dimension dimension) :
 	AbstractView(stack, identifier),
 	stack(stack),
 	dimension(dimension)
@@ -26,19 +26,19 @@ xpcc::gui::View::View(xpcc::gui::GuiViewStack* stack, uint8_t identifier, xpcc::
 }
 
 // ----------------------------------------------------------------------------
-xpcc::gui::View::~View()
+modm::gui::View::~View()
 {
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::gui::View::update()
+modm::gui::View::update()
 {
 	preUpdate();
 
 	InputEvent* ev;
 
-	xpcc::gui::inputQueue* input_queue = this->stack->getInputQueue();
+	modm::gui::inputQueue* input_queue = this->stack->getInputQueue();
 
 	while(!input_queue->isEmpty()) {
 
@@ -70,7 +70,7 @@ xpcc::gui::View::update()
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::gui::View::pack(Widget *w, const xpcc::glcd::Point &coord)
+modm::gui::View::pack(Widget *w, const modm::glcd::Point &coord)
 {
 	if(coord.x >= this->dimension.width ||
 	   coord.y >= this->dimension.height ||
@@ -102,13 +102,13 @@ xpcc::gui::View::pack(Widget *w, const xpcc::glcd::Point &coord)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::gui::View::remove()
+modm::gui::View::remove()
 {
 	this->alive = false;
 }
 
 // ----------------------------------------------------------------------------
-void xpcc::gui::View::draw()
+void modm::gui::View::draw()
 {
 //	auto display = &this->stack->getDisplay();
 
@@ -128,7 +128,7 @@ void xpcc::gui::View::draw()
 
 // ----------------------------------------------------------------------------
 void
-xpcc::gui::View::setColorPalette(ColorPalette& cp)
+modm::gui::View::setColorPalette(ColorPalette& cp)
 {
 	this->colorpalette = cp;
 	this->display().setBackgroundColor(cp.getColor(Color::BACKGROUND));
@@ -146,7 +146,7 @@ xpcc::gui::View::setColorPalette(ColorPalette& cp)
 	}
 }
 
-void xpcc::gui::View::markDirty()
+void modm::gui::View::markDirty()
 {
 	for(auto iter = widgets.begin(); iter != widgets.end(); ++iter)
 	{
@@ -154,7 +154,7 @@ void xpcc::gui::View::markDirty()
 	}
 }
 
-void xpcc::gui::View::markDrawn()
+void modm::gui::View::markDrawn()
 {
 	for(auto iter = widgets.begin(); iter != widgets.end(); ++iter)
 	{

@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_QUATERNION_HPP
+#ifndef MODM_QUATERNION_HPP
 #	error	"Don't include this file directly, use 'quaternion.hpp' instead!"
 #endif
 
@@ -19,7 +19,7 @@
 
 // ----------------------------------------------------------------------------
 template<class T>
-xpcc::Quaternion<T>::Quaternion()
+modm::Quaternion<T>::Quaternion()
 :
 	w(),
 	x(),
@@ -30,7 +30,7 @@ xpcc::Quaternion<T>::Quaternion()
 
 // ----------------------------------------------------------------------------
 template<class T>
-xpcc::Quaternion<T>::Quaternion(T inW, T inX, T inY, T inZ)
+modm::Quaternion<T>::Quaternion(T inW, T inX, T inY, T inZ)
 :
 	w(inW),
 	x(inX),
@@ -41,7 +41,7 @@ xpcc::Quaternion<T>::Quaternion(T inW, T inX, T inY, T inZ)
 
 // ----------------------------------------------------------------------------
 template<class T>
-xpcc::Quaternion<T>::Quaternion(const Vector<T, 3> &axis, T angle)
+modm::Quaternion<T>::Quaternion(const Vector<T, 3> &axis, T angle)
 :
 	w(),
 	x(),
@@ -58,7 +58,7 @@ xpcc::Quaternion<T>::Quaternion(const Vector<T, 3> &axis, T angle)
 
 // ----------------------------------------------------------------------------
 template<class T>
-xpcc::Quaternion<T>::Quaternion(const Matrix<T, 4, 1> &rhs)
+modm::Quaternion<T>::Quaternion(const Matrix<T, 4, 1> &rhs)
 :
 	w(reinterpret_cast<const T*>(&rhs)[0]),
 	x(reinterpret_cast<const T*>(&rhs)[1]),
@@ -69,7 +69,7 @@ xpcc::Quaternion<T>::Quaternion(const Matrix<T, 4, 1> &rhs)
 
 // ----------------------------------------------------------------------------
 template<class T>
-xpcc::Quaternion<T>::Quaternion(const Quaternion<T> &rhs)
+modm::Quaternion<T>::Quaternion(const Quaternion<T> &rhs)
 :
 	w(rhs.w),
 	x(rhs.x),
@@ -80,7 +80,7 @@ xpcc::Quaternion<T>::Quaternion(const Quaternion<T> &rhs)
 
 // ----------------------------------------------------------------------------
 template<class T>
-xpcc::Quaternion<T>& xpcc::Quaternion<T>::operator = (const Matrix<T, 4, 1> &rhs)
+modm::Quaternion<T>& modm::Quaternion<T>::operator = (const Matrix<T, 4, 1> &rhs)
 {
 	w = reinterpret_cast<const T*>(&rhs)[0];
 	x = reinterpret_cast<const T*>(&rhs)[1];
@@ -91,7 +91,7 @@ xpcc::Quaternion<T>& xpcc::Quaternion<T>::operator = (const Matrix<T, 4, 1> &rhs
 
 // ----------------------------------------------------------------------------
 template<class T>
-xpcc::Quaternion<T>& xpcc::Quaternion<T>::operator = (const Quaternion<T> &rhs)
+modm::Quaternion<T>& modm::Quaternion<T>::operator = (const Quaternion<T> &rhs)
 {
 	w = rhs.w;
 	x = rhs.x;
@@ -104,7 +104,7 @@ xpcc::Quaternion<T>& xpcc::Quaternion<T>::operator = (const Quaternion<T> &rhs)
 // ----------------------------------------------------------------------------
 template<class T>
 bool
-xpcc::Quaternion<T>::operator == (const Quaternion<T> &rhs) const
+modm::Quaternion<T>::operator == (const Quaternion<T> &rhs) const
 {
 	return (rhs.w == w) && (rhs.x == x) && (rhs.y == y) && (rhs.z == z);
 }
@@ -112,7 +112,7 @@ xpcc::Quaternion<T>::operator == (const Quaternion<T> &rhs) const
 // ----------------------------------------------------------------------------
 template<class T>
 bool
-xpcc::Quaternion<T>::operator != (const Quaternion<T> &rhs) const
+modm::Quaternion<T>::operator != (const Quaternion<T> &rhs) const
 {
 	return (rhs.w != w) || (rhs.x != x) || (rhs.y != y) || (rhs.z != z);
 }
@@ -120,7 +120,7 @@ xpcc::Quaternion<T>::operator != (const Quaternion<T> &rhs) const
 // ----------------------------------------------------------------------------
 template<class T>
 bool
-xpcc::Quaternion<T>::operator < (const Quaternion<T> &rhs) const
+modm::Quaternion<T>::operator < (const Quaternion<T> &rhs) const
 {
 	return (w < rhs.w) || ((w == rhs.w) && ((x < rhs.x) || ((x == rhs.x) && ((y < rhs.y) || ((y == rhs.y) && (z < rhs.z))))));
 }
@@ -128,7 +128,7 @@ xpcc::Quaternion<T>::operator < (const Quaternion<T> &rhs) const
 // ----------------------------------------------------------------------------
 template<class T>
 bool
-xpcc::Quaternion<T>::operator <= (const Quaternion<T> &rhs) const
+modm::Quaternion<T>::operator <= (const Quaternion<T> &rhs) const
 {
 	return (w < rhs.w) || ((w == rhs.w) && ((x < rhs.x) || ((x == rhs.x) && ((y < rhs.y) || ((y == rhs.y) && (z <= rhs.z))))));
 }
@@ -136,7 +136,7 @@ xpcc::Quaternion<T>::operator <= (const Quaternion<T> &rhs) const
 // ----------------------------------------------------------------------------
 template<class T>
 bool
-xpcc::Quaternion<T>::operator > (const Quaternion<T> &rhs) const
+modm::Quaternion<T>::operator > (const Quaternion<T> &rhs) const
 {
 	return (w > rhs.w) || ((w == rhs.w) && ((x > rhs.x) || ((x == rhs.x) && ((y > rhs.y) || ((y == rhs.y) && (z > rhs.z))))));
 }
@@ -144,7 +144,7 @@ xpcc::Quaternion<T>::operator > (const Quaternion<T> &rhs) const
 // ----------------------------------------------------------------------------
 template<class T>
 bool
-xpcc::Quaternion<T>::operator >= (const Quaternion<T> &rhs) const
+modm::Quaternion<T>::operator >= (const Quaternion<T> &rhs) const
 {
 	return (w > rhs.w) || ((w == rhs.w) && ((x > rhs.x) || ((x == rhs.x) && ((y > rhs.y) || ((y == rhs.y) && (z >= rhs.z))))));
 }
@@ -152,7 +152,7 @@ xpcc::Quaternion<T>::operator >= (const Quaternion<T> &rhs) const
 // ----------------------------------------------------------------------------
 template<class T>
 const T&
-xpcc::Quaternion<T>::operator [] (int index) const
+modm::Quaternion<T>::operator [] (int index) const
 {
 	return reinterpret_cast<const T*>(this)[index];
 }
@@ -160,7 +160,7 @@ xpcc::Quaternion<T>::operator [] (int index) const
 // ----------------------------------------------------------------------------
 template<class T>
 T*
-xpcc::Quaternion<T>::ptr()
+modm::Quaternion<T>::ptr()
 {
 	return reinterpret_cast<T*>(this);
 }
@@ -168,31 +168,31 @@ xpcc::Quaternion<T>::ptr()
 // ----------------------------------------------------------------------------
 template<class T>
 const T*
-xpcc::Quaternion<T>::ptr() const
+modm::Quaternion<T>::ptr() const
 {
 	return reinterpret_cast<const T*>(this);
 }
 
 // ----------------------------------------------------------------------------
 template<class T>
-xpcc::Quaternion<T>
-xpcc::Quaternion<T>::operator + (const Quaternion<T> &rhs) const
+modm::Quaternion<T>
+modm::Quaternion<T>::operator + (const Quaternion<T> &rhs) const
 {
 	return Quaternion(w+rhs.w, x+rhs.x, y+rhs.y, z+rhs.z);
 }
 
 // ----------------------------------------------------------------------------
 template<class T>
-xpcc::Quaternion<T>
-xpcc::Quaternion<T>::operator - (const Quaternion<T> &rhs) const
+modm::Quaternion<T>
+modm::Quaternion<T>::operator - (const Quaternion<T> &rhs) const
 {
 	return Quaternion(w-rhs.w, x-rhs.x, y-rhs.y, z-rhs.z);
 }
 
 // ----------------------------------------------------------------------------
 template<class T>
-xpcc::Quaternion<T>
-xpcc::Quaternion<T>::operator * (const Quaternion<T> &rhs) const
+modm::Quaternion<T>
+modm::Quaternion<T>::operator * (const Quaternion<T> &rhs) const
 {
 	return Quaternion(
 		w*rhs.w - x*rhs.x - y*rhs.y - z*rhs.z,
@@ -204,24 +204,24 @@ xpcc::Quaternion<T>::operator * (const Quaternion<T> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<class T>
-xpcc::Quaternion<T>
-xpcc::Quaternion<T>::operator * (const T &rhs) const
+modm::Quaternion<T>
+modm::Quaternion<T>::operator * (const T &rhs) const
 {
 	return Quaternion(w*rhs, x*rhs, y*rhs, z*rhs);
 }
 
 // ----------------------------------------------------------------------------
 template<class T>
-xpcc::Quaternion<T>
-xpcc::Quaternion<T>::operator / (const T &rhs) const
+modm::Quaternion<T>
+modm::Quaternion<T>::operator / (const T &rhs) const
 {
 	return Quaternion(w/rhs, x/rhs, y/rhs, z/rhs);
 }
 
 // ----------------------------------------------------------------------------
 template<class T>
-xpcc::Quaternion<T>&
-xpcc::Quaternion<T>::operator += (const Quaternion<T> &rhs)
+modm::Quaternion<T>&
+modm::Quaternion<T>::operator += (const Quaternion<T> &rhs)
 {
 	w+= rhs.w; x += rhs.x; y += rhs.y; z += rhs.z;
 	return *this;
@@ -229,8 +229,8 @@ xpcc::Quaternion<T>::operator += (const Quaternion<T> &rhs)
 
 // ----------------------------------------------------------------------------
 template<class T>
-xpcc::Quaternion<T>&
-xpcc::Quaternion<T>::operator -= (const Quaternion<T> &rhs)
+modm::Quaternion<T>&
+modm::Quaternion<T>::operator -= (const Quaternion<T> &rhs)
 {
 	w -= rhs.w; x -= rhs.x; y -= rhs.y; z -= rhs.z;
 	return *this;
@@ -238,8 +238,8 @@ xpcc::Quaternion<T>::operator -= (const Quaternion<T> &rhs)
 
 // ----------------------------------------------------------------------------
 template<class T>
-xpcc::Quaternion<T>&
-xpcc::Quaternion<T>::operator *= (const T &rhs)
+modm::Quaternion<T>&
+modm::Quaternion<T>::operator *= (const T &rhs)
 {
 	*this = *this * rhs;
 
@@ -248,8 +248,8 @@ xpcc::Quaternion<T>::operator *= (const T &rhs)
 
 // ----------------------------------------------------------------------------
 template<class T>
-xpcc::Quaternion<T>&
-xpcc::Quaternion<T>::operator /= (const T &rhs)
+modm::Quaternion<T>&
+modm::Quaternion<T>::operator /= (const T &rhs)
 {
 	w /= rhs; x /= rhs; y /= rhs; z /= rhs;
 	return *this;
@@ -257,8 +257,8 @@ xpcc::Quaternion<T>::operator /= (const T &rhs)
 
 // ----------------------------------------------------------------------------
 template<class T>
-xpcc::Quaternion<T>
-xpcc::Quaternion<T>::operator - ()
+modm::Quaternion<T>
+modm::Quaternion<T>::operator - ()
 {
 	return Quaternion(-w, -x, -y, -z);
 }
@@ -266,7 +266,7 @@ xpcc::Quaternion<T>::operator - ()
 // ----------------------------------------------------------------------------
 template<class T>
 float
-xpcc::Quaternion<T>::getLength() const
+modm::Quaternion<T>::getLength() const
 {
 	return std::sqrt(getLengthSquared());
 }
@@ -274,15 +274,15 @@ xpcc::Quaternion<T>::getLength() const
 // ----------------------------------------------------------------------------
 template<class T>
 float
-xpcc::Quaternion<T>::getLengthSquared() const
+modm::Quaternion<T>::getLengthSquared() const
 {
 	return w*w + x*x + y*y + z*z;
 }
 
 // ----------------------------------------------------------------------------
 template<class T>
-xpcc::Quaternion<T>&
-xpcc::Quaternion<T>::scale(float newLength)
+modm::Quaternion<T>&
+modm::Quaternion<T>::scale(float newLength)
 {
 	float s = newLength / getLength();
 	w *= s;
@@ -295,16 +295,16 @@ xpcc::Quaternion<T>::scale(float newLength)
 
 // ----------------------------------------------------------------------------
 template<class T>
-xpcc::Quaternion<T>&
-xpcc::Quaternion<T>::normalize()
+modm::Quaternion<T>&
+modm::Quaternion<T>::normalize()
 {
 	return scale(1.0f);
 }
 
 // ----------------------------------------------------------------------------
 template<class T>
-xpcc::Quaternion<T>&
-xpcc::Quaternion<T>::conjugate()
+modm::Quaternion<T>&
+modm::Quaternion<T>::conjugate()
 {
 	x = -x;
 	y = -y;
@@ -315,8 +315,8 @@ xpcc::Quaternion<T>::conjugate()
 
 // ----------------------------------------------------------------------------
 template<class T>
-xpcc::Quaternion<T>
-xpcc::Quaternion<T>::scaled(float newLength) const
+modm::Quaternion<T>
+modm::Quaternion<T>::scaled(float newLength) const
 {
 	float s = newLength / getLength();
 	return Quaternion(w*s, x*s, y*s, z*s);
@@ -324,32 +324,32 @@ xpcc::Quaternion<T>::scaled(float newLength) const
 
 // ----------------------------------------------------------------------------
 template<class T>
-xpcc::Quaternion<T>
-xpcc::Quaternion<T>::normalized() const
+modm::Quaternion<T>
+modm::Quaternion<T>::normalized() const
 {
 	return scaled(1.0f);
 }
 
 // ----------------------------------------------------------------------------
 template<class T>
-xpcc::Quaternion<T>
-xpcc::Quaternion<T>::conjugated() const
+modm::Quaternion<T>
+modm::Quaternion<T>::conjugated() const
 {
 	return Quaternion(w, -x, -y, -z);
 }
 
 // ----------------------------------------------------------------------------
 template<class T>
-xpcc::Quaternion<T>
-xpcc::Quaternion<T>::unitInverse()	//	assumes we have a unit quaternion
+modm::Quaternion<T>
+modm::Quaternion<T>::unitInverse()	//	assumes we have a unit quaternion
 {
 	return conjugate();
 }
 
 // ----------------------------------------------------------------------------
 template<class T>
-xpcc::Quaternion<T>
-xpcc::Quaternion<T>::inverse()
+modm::Quaternion<T>
+modm::Quaternion<T>::inverse()
 {
 	return conjugate() / getLengthSquared();
 }
@@ -357,7 +357,7 @@ xpcc::Quaternion<T>::inverse()
 // ----------------------------------------------------------------------------
 template<class T>
 void
-xpcc::Quaternion<T>::to4x4Matrix(Matrix<T, 4, 4> *outMatrix)
+modm::Quaternion<T>::to4x4Matrix(Matrix<T, 4, 4> *outMatrix)
 {
 	// avoid depending on Matrix.h
 	T* m = reinterpret_cast<T*>(outMatrix);
@@ -379,7 +379,7 @@ xpcc::Quaternion<T>::to4x4Matrix(Matrix<T, 4, 4> *outMatrix)
 // ----------------------------------------------------------------------------
 template<class T>
 void
-xpcc::Quaternion<T>::to3x3Matrix(Matrix<T, 3, 3> *outMatrix)
+modm::Quaternion<T>::to3x3Matrix(Matrix<T, 3, 3> *outMatrix)
 {
 	// avoid depending on Matrix.h
 	T* m = reinterpret_cast<T*>(outMatrix);
@@ -399,8 +399,8 @@ xpcc::Quaternion<T>::to3x3Matrix(Matrix<T, 3, 3> *outMatrix)
 
 // ----------------------------------------------------------------------------
 template<class T>
-xpcc::Quaternion<T>
-xpcc::operator * (const T &lhs, const xpcc::Quaternion<T> &rhs)
+modm::Quaternion<T>
+modm::operator * (const T &lhs, const modm::Quaternion<T> &rhs)
 {
 	return rhs * lhs;
 }

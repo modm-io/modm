@@ -10,27 +10,27 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SAB_MASTER_HPP
+#ifndef MODM_SAB_MASTER_HPP
 #	error	"Don't include this file directly, use 'master.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template <typename Interface>
-Interface xpcc::sab::Master<Interface>::interface;
+Interface modm::sab::Master<Interface>::interface;
 
 template <typename Interface>
-typename xpcc::sab::Master<Interface>::QueryStatus xpcc::sab::Master<Interface>::queryStatus;
+typename modm::sab::Master<Interface>::QueryStatus modm::sab::Master<Interface>::queryStatus;
 
 template <typename Interface>
-uint8_t xpcc::sab::Master<Interface>::expectedResponseLength;
+uint8_t modm::sab::Master<Interface>::expectedResponseLength;
 
 template <typename Interface>
-xpcc::ShortTimeout xpcc::sab::Master<Interface>::timer;
+modm::ShortTimeout modm::sab::Master<Interface>::timer;
 
 // ----------------------------------------------------------------------------
 template <typename Interface>
 void
-xpcc::sab::Master<Interface>::initialize()
+modm::sab::Master<Interface>::initialize()
 {
 	queryStatus = ERROR_TIMEOUT;
 }
@@ -38,7 +38,7 @@ xpcc::sab::Master<Interface>::initialize()
 // ----------------------------------------------------------------------------
 template <typename Interface>
 void
-xpcc::sab::Master<Interface>::query(uint8_t slaveAddress, uint8_t command,
+modm::sab::Master<Interface>::query(uint8_t slaveAddress, uint8_t command,
 									const void *payload, uint8_t payloadLength, uint8_t responseLength)
 {
 	while (interface.isMessageAvailable()) {
@@ -54,7 +54,7 @@ xpcc::sab::Master<Interface>::query(uint8_t slaveAddress, uint8_t command,
 
 template <typename Interface> template <typename T>
 void
-xpcc::sab::Master<Interface>::query(uint8_t slaveAddress, uint8_t command,
+modm::sab::Master<Interface>::query(uint8_t slaveAddress, uint8_t command,
 		const T& payload, uint8_t responseLength)
 {
 	while (interface.isMessageAvailable()) {
@@ -70,7 +70,7 @@ xpcc::sab::Master<Interface>::query(uint8_t slaveAddress, uint8_t command,
 
 template <typename Interface>
 void
-xpcc::sab::Master<Interface>::query(uint8_t slaveAddress, uint8_t command,
+modm::sab::Master<Interface>::query(uint8_t slaveAddress, uint8_t command,
 		uint8_t responseLength)
 {
 	while (interface.isMessageAvailable()) {
@@ -87,7 +87,7 @@ xpcc::sab::Master<Interface>::query(uint8_t slaveAddress, uint8_t command,
 // ----------------------------------------------------------------------------
 template <typename Interface>
 bool
-xpcc::sab::Master<Interface>::isQueryCompleted()
+modm::sab::Master<Interface>::isQueryCompleted()
 {
 	return (queryStatus != IN_PROGRESS);
 }
@@ -95,7 +95,7 @@ xpcc::sab::Master<Interface>::isQueryCompleted()
 // ----------------------------------------------------------------------------
 template <typename Interface>
 bool
-xpcc::sab::Master<Interface>::isSuccess()
+modm::sab::Master<Interface>::isSuccess()
 {
 	return (queryStatus == SUCCESS);
 }
@@ -103,7 +103,7 @@ xpcc::sab::Master<Interface>::isSuccess()
 // ----------------------------------------------------------------------------
 template <typename Interface>
 uint8_t
-xpcc::sab::Master<Interface>::getErrorCode()
+modm::sab::Master<Interface>::getErrorCode()
 {
 	if (queryStatus == ERROR_RESPONSE) {
 		// Error code is in the first payload byte
@@ -117,14 +117,14 @@ xpcc::sab::Master<Interface>::getErrorCode()
 // ----------------------------------------------------------------------------
 template <typename Interface> template <typename T>
 const T *
-xpcc::sab::Master<Interface>::getResponse()
+modm::sab::Master<Interface>::getResponse()
 {
 	return reinterpret_cast<const T *>(interface.getPayload());
 }
 
 template <typename Interface>
 const uint8_t *
-xpcc::sab::Master<Interface>::getResponse()
+modm::sab::Master<Interface>::getResponse()
 {
 	return reinterpret_cast<const uint8_t *>(interface.getPayload());
 }
@@ -132,7 +132,7 @@ xpcc::sab::Master<Interface>::getResponse()
 // ----------------------------------------------------------------------------
 template <typename Interface>
 void
-xpcc::sab::Master<Interface>::update()
+modm::sab::Master<Interface>::update()
 {
 	interface.update();
 	

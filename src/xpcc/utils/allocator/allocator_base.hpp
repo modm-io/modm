@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ALLOCATOR_ALLOCATOR_BASE_HPP
-#define XPCC_ALLOCATOR_ALLOCATOR_BASE_HPP
+#ifndef MODM_ALLOCATOR_ALLOCATOR_BASE_HPP
+#define MODM_ALLOCATOR_ALLOCATOR_BASE_HPP
 
 #include <cstddef>
 #include <new>		// needed for placement new
 
-namespace xpcc
+namespace modm
 {
 	namespace allocator
 	{
@@ -72,4 +72,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_ALLOCATOR_ALLOCATOR_BASE_HPP
+#endif // MODM_ALLOCATOR_ALLOCATOR_BASE_HPP

@@ -9,14 +9,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_UI_STROBE_HPP
-#define XPCC_UI_STROBE_HPP
+#ifndef MODM_UI_STROBE_HPP
+#define MODM_UI_STROBE_HPP
 
 #include <stdint.h>
 #include "key_frame.hpp"
 #include <modm/utils/arithmetic_traits.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 namespace ui
@@ -43,18 +43,18 @@ class Strobe
 public:
 	Strobe(Animation<T> &animator)
 	:	animator(animator), frames{
-			xpcc::ui::KeyFrame<T>(60, xpcc::ArithmeticTraits<T>::max),
-			xpcc::ui::KeyFrame<T>(40, xpcc::ArithmeticTraits<T>::max),
-			xpcc::ui::KeyFrame<T>(90, xpcc::ArithmeticTraits<T>::min),
-			xpcc::ui::KeyFrame<T>(110, xpcc::ArithmeticTraits<T>::min),
-			xpcc::ui::KeyFrame<T>(60, xpcc::ArithmeticTraits<T>::max),
-			xpcc::ui::KeyFrame<T>(40, xpcc::ArithmeticTraits<T>::max),
-			xpcc::ui::KeyFrame<T>(90, xpcc::ArithmeticTraits<T>::min),
-			xpcc::ui::KeyFrame<T>(510, xpcc::ArithmeticTraits<T>::min),
+			modm::ui::KeyFrame<T>(60, modm::ArithmeticTraits<T>::max),
+			modm::ui::KeyFrame<T>(40, modm::ArithmeticTraits<T>::max),
+			modm::ui::KeyFrame<T>(90, modm::ArithmeticTraits<T>::min),
+			modm::ui::KeyFrame<T>(110, modm::ArithmeticTraits<T>::min),
+			modm::ui::KeyFrame<T>(60, modm::ArithmeticTraits<T>::max),
+			modm::ui::KeyFrame<T>(40, modm::ArithmeticTraits<T>::max),
+			modm::ui::KeyFrame<T>(90, modm::ArithmeticTraits<T>::min),
+			modm::ui::KeyFrame<T>(510, modm::ArithmeticTraits<T>::min),
 		}
 	{
 		this->animator.setKeyFrames(frames, 8);
-		this->animator.setMode(xpcc::ui::KeyFrameAnimationMode::Repeat);
+		this->animator.setMode(modm::ui::KeyFrameAnimationMode::Repeat);
 	}
 
 	/// @param	period		in ms
@@ -153,7 +153,7 @@ public:
 	}
 
 private:
-	xpcc::ui::KeyFrameAnimation<T> animator;
+	modm::ui::KeyFrameAnimation<T> animator;
 	// 1. fade up to max
 	// 2. stay at max (on1)
 	// 3. fade down to min
@@ -163,11 +163,11 @@ private:
 	// 7. fade down to min
 	// 8. stay at min
 	// (cycle)
-	xpcc::ui::KeyFrame<T> frames[8];
+	modm::ui::KeyFrame<T> frames[8];
 };
 
 }
 
 }
 
-#endif	// XPCC_UI_STROBE_HPP
+#endif	// MODM_UI_STROBE_HPP

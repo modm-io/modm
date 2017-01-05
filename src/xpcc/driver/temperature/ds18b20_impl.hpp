@@ -11,14 +11,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_DS18B20_HPP
+#ifndef MODM_DS18B20_HPP
 	#error	"Don't include this file directly, use 'ds18b20.hpp' instead!"
 #endif
 
 #include <cstring>		// for std::memcpy
 
 template <typename OneWire>
-xpcc::Ds18b20<OneWire>::Ds18b20(const uint8_t *rom)
+modm::Ds18b20<OneWire>::Ds18b20(const uint8_t *rom)
 {
 	std::memcpy(this->identifier, rom, 8);
 }
@@ -26,7 +26,7 @@ xpcc::Ds18b20<OneWire>::Ds18b20(const uint8_t *rom)
 // ----------------------------------------------------------------------------
 template <typename OneWire>
 bool
-xpcc::Ds18b20<OneWire>::isAvailable()
+modm::Ds18b20<OneWire>::isAvailable()
 {
 	return ow.verifyDevice(this->identifier);
 }
@@ -34,7 +34,7 @@ xpcc::Ds18b20<OneWire>::isAvailable()
 // ----------------------------------------------------------------------------
 template <typename OneWire>
 void
-xpcc::Ds18b20<OneWire>::startConversion()
+modm::Ds18b20<OneWire>::startConversion()
 {
 	selectDevice();
 	
@@ -43,7 +43,7 @@ xpcc::Ds18b20<OneWire>::startConversion()
 
 template <typename OneWire>
 void
-xpcc::Ds18b20<OneWire>::startConversions()
+modm::Ds18b20<OneWire>::startConversions()
 {
 	//Reset the bus / Initialization
 	if (!ow.touchReset()) {
@@ -60,7 +60,7 @@ xpcc::Ds18b20<OneWire>::startConversions()
 
 template <typename OneWire>
 bool
-xpcc::Ds18b20<OneWire>::isConversionDone()
+modm::Ds18b20<OneWire>::isConversionDone()
 {
 	return ow.readBit();
 }
@@ -68,7 +68,7 @@ xpcc::Ds18b20<OneWire>::isConversionDone()
 // ----------------------------------------------------------------------------
 template <typename OneWire>
 int16_t
-xpcc::Ds18b20<OneWire>::readTemperature()
+modm::Ds18b20<OneWire>::readTemperature()
 {
 	selectDevice();
 	ow.writeByte(this->READ_SCRATCHPAD);
@@ -105,7 +105,7 @@ xpcc::Ds18b20<OneWire>::readTemperature()
 // ----------------------------------------------------------------------------
 template <typename OneWire>
 bool
-xpcc::Ds18b20<OneWire>::selectDevice()
+modm::Ds18b20<OneWire>::selectDevice()
 {
 	// Reset the bus / Initialization
 	if (!ow.touchReset()) {

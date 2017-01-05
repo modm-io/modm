@@ -9,15 +9,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_MCP23X17_HPP
-#define XPCC_MCP23X17_HPP
+#ifndef MODM_MCP23X17_HPP
+#define MODM_MCP23X17_HPP
 
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/architecture/interface/gpio_expander.hpp>
 #include <modm/architecture/interface/register.hpp>
 #include "mcp23_transport.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 struct mcp23x17
@@ -52,7 +52,7 @@ protected:
 		Odr = Bit2,		///< This bit configures the INT pin as an open-drain output
 		IntPol = Bit1	///< This bit sets the polarity of the INT output pin
 	};
-	XPCC_FLAGS8(IoCon);
+	MODM_FLAGS8(IoCon);
 
 	static constexpr uint8_t
 	i(Register reg) { return uint8_t(reg); }
@@ -80,8 +80,8 @@ public:
 		B6 = (1 << 14),
 		B7 = (1 << 15)
 	};
-	typedef xpcc::Flags16<Pin> Pins;
-	XPCC_INT_TYPE_FLAGS(Pins);
+	typedef modm::Flags16<Pin> Pins;
+	MODM_INT_TYPE_FLAGS(Pins);
 }; // struct mcp23x17
 
 /**
@@ -109,7 +109,7 @@ public:
  * @ingroup driver_gpio
  */
 template <class Transport>
-class Mcp23x17 : public mcp23x17, public Transport, public xpcc::GpioExpander
+class Mcp23x17 : public mcp23x17, public Transport, public modm::GpioExpander
 {
 public:
 	static constexpr uint8_t width = 16;
@@ -119,7 +119,7 @@ public:
 	static constexpr uint8_t
 	indexFromPin(Pin pin)
 	{
-		return xpcc::leftmostBit(PortType(pin));
+		return modm::leftmostBit(PortType(pin));
 	}
 
 public:
@@ -127,19 +127,19 @@ public:
 	Mcp23x17(uint8_t address=0x20);
 
 public:
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setOutput(Pins pins);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	set(Pins pins);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	reset(Pins pins);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	toggle(Pins pins);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	set(Pins pins, bool value);
 
 	bool
@@ -149,29 +149,29 @@ public:
 		return memory.outputLatch.any(pin);
 	}
 
-	xpcc::Gpio::Direction
+	modm::Gpio::Direction
 	getDirection(Pin pin)
 	{
 		// output is 0, input is 1
 		return memory.direction.any(pin) ?
-				xpcc::Gpio::Direction::In :
-				xpcc::Gpio::Direction::Out;
+				modm::Gpio::Direction::In :
+				modm::Gpio::Direction::Out;
 	}
 
 public:
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setInput(Pins pins);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setPullUp(Pins pins);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	resetPullUp(Pins pins);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setInvertInput(Pins pins);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	resetInvertInput(Pins pins);
 
 	bool
@@ -181,19 +181,19 @@ public:
 		return memory.gpio.any(pin);
 	}
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	readInput()
 	{ return Transport::read(i(Register::GPIO), buffer + 18, 2); }
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	readAllInput()
 	{ return Transport::read(i(Register::INTF), buffer + 14, 8); }
 
 public:
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	writePort(PortType data);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	readPort(PortType &data);
 
 public:
@@ -256,7 +256,7 @@ public:
 	using Port = GpioExpanderPort< Mcp23x17<Transport>, object, StartPin, Width, DataOrder >;
 
 private:
-	struct xpcc_packed
+	struct modm_packed
 	Memory
 	{
 		Memory() :
@@ -294,8 +294,8 @@ private:
 	};
 };
 
-}	// namespace xpcc
+}	// namespace modm
 
 #include "mcp23x17_impl.hpp"
 
-#endif	// XPCC_MCP23X17_HPP
+#endif	// MODM_MCP23X17_HPP

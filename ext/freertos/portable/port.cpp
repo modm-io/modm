@@ -146,7 +146,7 @@ portBASE_TYPE xPortStartScheduler( void )
 	*(portNVIC_SYSPRI2) |= portNVIC_PENDSV_PRI;
 	*(portNVIC_SYSPRI2) |= portNVIC_SYSTICK_PRI;
 
-	xpcc::cortex::SysTickTimer::attachInterruptHandler(vPortSysTickHandler);
+	modm::cortex::SysTickTimer::attachInterruptHandler(vPortSysTickHandler);
 
 	/* Initialize the critical nesting count ready for the first task. */
 	uxCriticalNesting = 0;

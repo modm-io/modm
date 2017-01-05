@@ -11,12 +11,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ERROR_REPORT_HPP
-#define XPCC_ERROR_REPORT_HPP
+#ifndef MODM_ERROR_REPORT_HPP
+#define MODM_ERROR_REPORT_HPP
 
 #include <stdint.h>
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * Global error reporter
@@ -59,4 +59,4 @@ namespace xpcc
 	};
 }
 
-#endif	// XPCC_ERROR_REPORT_HPP
+#endif	// MODM_ERROR_REPORT_HPP

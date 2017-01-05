@@ -19,7 +19,7 @@
 
 static unsigned int count = 1;
 
-class TestTask : public xpcc::Scheduler::Task
+class TestTask : public modm::Scheduler::Task
 {
 public:
 	TestTask() :
@@ -42,7 +42,7 @@ public:
 void
 SchedulerTest::testScheduler()
 {
-	xpcc::Scheduler scheduler;
+	modm::Scheduler scheduler;
 	
 	TestTask task1;
 	TestTask task2;

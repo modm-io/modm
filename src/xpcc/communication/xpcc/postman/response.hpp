@@ -72,7 +72,7 @@ public:
 };
 
 template < typename T >
-using ActionResponse = xpcc::ResumableResult< xpcc::ActionResult< T > >;
+using ActionResponse = modm::ResumableResult< xpcc::ActionResult< T > >;
 
 }	// namespace xpcc
 

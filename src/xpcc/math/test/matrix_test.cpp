@@ -23,7 +23,7 @@ MatrixTest::testConstruction()
 		7, 8, 9
 	};
 	
-	xpcc::Matrix<int16_t, 3, 3> a(m);
+	modm::Matrix<int16_t, 3, 3> a(m);
 	
 	TEST_ASSERT_EQUALS(a[0][0], 1);
 	TEST_ASSERT_EQUALS(a[0][1], 2);
@@ -41,7 +41,7 @@ MatrixTest::testConstruction()
 		5, 6,
 	};
 	
-	xpcc::Matrix<int16_t, 3, 2> b(n);
+	modm::Matrix<int16_t, 3, 2> b(n);
 	
 	TEST_ASSERT_EQUALS(b.getNumberOfRows(), 3);
 	TEST_ASSERT_EQUALS(b.getNumberOfColumns(), 2);
@@ -57,7 +57,7 @@ MatrixTest::testConstruction()
 void
 MatrixTest::testAssign()
 {
-	xpcc::Matrix<int16_t, 3, 2> a;
+	modm::Matrix<int16_t, 3, 2> a;
 	
 	a[0][0] = 1;
 	a[0][1] = 2;
@@ -77,7 +77,7 @@ MatrixTest::testAssign()
 void
 MatrixTest::testIdentityMatrix()
 {
-	xpcc::Matrix<int16_t, 3, 3> a = xpcc::Matrix<int16_t, 3, 3>::identityMatrix();
+	modm::Matrix<int16_t, 3, 3> a = modm::Matrix<int16_t, 3, 3>::identityMatrix();
 	
 	for (uint_fast8_t i = 0; i < 3; ++i)
 	{
@@ -96,7 +96,7 @@ MatrixTest::testIdentityMatrix()
 void
 MatrixTest::testZeroMatrix()
 {
-	xpcc::Matrix<int16_t, 3, 3> a = xpcc::Matrix<int16_t, 3, 3>::zeroMatrix();
+	modm::Matrix<int16_t, 3, 3> a = modm::Matrix<int16_t, 3, 3>::zeroMatrix();
 	
 	for (uint_fast8_t i = 0; i < 3; ++i)
 	{
@@ -116,23 +116,23 @@ MatrixTest::testSubMatrix()
 		7, 8, 9
 	};
 	
-	xpcc::Matrix<int16_t, 3, 3> a(m);
+	modm::Matrix<int16_t, 3, 3> a(m);
 	
-	xpcc::Matrix<int16_t, 2, 2> b = a.subMatrix<2, 2>(1, 1);
+	modm::Matrix<int16_t, 2, 2> b = a.subMatrix<2, 2>(1, 1);
 	
 	TEST_ASSERT_EQUALS(b[0][0], 5);
 	TEST_ASSERT_EQUALS(b[0][1], 6);
 	TEST_ASSERT_EQUALS(b[1][0], 8);
 	TEST_ASSERT_EQUALS(b[1][1], 9);
 	
-	xpcc::Matrix<int16_t, 2, 2> c = a.subMatrix<2, 2>(0, 0);
+	modm::Matrix<int16_t, 2, 2> c = a.subMatrix<2, 2>(0, 0);
 	
 	TEST_ASSERT_EQUALS(c[0][0], 1);
 	TEST_ASSERT_EQUALS(c[0][1], 2);
 	TEST_ASSERT_EQUALS(c[1][0], 4);
 	TEST_ASSERT_EQUALS(c[1][1], 5);
 	
-	xpcc::Matrix<int16_t, 3, 2> d = a.subMatrix<3, 2>(0, 1);
+	modm::Matrix<int16_t, 3, 2> d = a.subMatrix<3, 2>(0, 1);
 	
 	TEST_ASSERT_EQUALS(d[0][0], 2);
 	TEST_ASSERT_EQUALS(d[0][1], 3);
@@ -151,15 +151,15 @@ MatrixTest::testAccess()
 		7, 8, 9
 	};
 	
-	xpcc::Matrix<int16_t, 3, 3> a(m);
+	modm::Matrix<int16_t, 3, 3> a(m);
 	
-	xpcc::Matrix<int16_t, 3, 1> b = a.getColumn(1);
+	modm::Matrix<int16_t, 3, 1> b = a.getColumn(1);
 	
 	TEST_ASSERT_EQUALS(b[0][0], 2);
 	TEST_ASSERT_EQUALS(b[0][1], 5);
 	TEST_ASSERT_EQUALS(b[0][2], 8);
 	
-	xpcc::Matrix<int16_t, 1, 3> c = a.getRow(2);
+	modm::Matrix<int16_t, 1, 3> c = a.getRow(2);
 	
 	TEST_ASSERT_EQUALS(c[0][0], 7);
 	TEST_ASSERT_EQUALS(c[0][1], 8);
@@ -174,8 +174,8 @@ MatrixTest::testCompare()
 		3, 4,
 	};
 	
-	xpcc::Matrix<int16_t, 2, 2> a(m);
-	xpcc::Matrix<int16_t, 2, 2> b(a);
+	modm::Matrix<int16_t, 2, 2> a(m);
+	modm::Matrix<int16_t, 2, 2> b(a);
 	
 	TEST_ASSERT_TRUE(a == b);
 	TEST_ASSERT_FALSE(a != b);
@@ -199,8 +199,8 @@ MatrixTest::testArithmetics()
 		3, 4,
 	};
 	
-	xpcc::Matrix<int16_t, 2, 2> a(m);
-	xpcc::Matrix<int16_t, 2, 2> b(a);
+	modm::Matrix<int16_t, 2, 2> a(m);
+	modm::Matrix<int16_t, 2, 2> b(a);
 	
 	-a;
 	TEST_ASSERT_EQUALS(a, b);
@@ -210,7 +210,7 @@ MatrixTest::testArithmetics()
 	TEST_ASSERT_EQUALS(a[1][0], -3);
 	TEST_ASSERT_EQUALS(a[1][1], -4);
 	
-	xpcc::Matrix<int16_t, 2, 2> c = b - a;
+	modm::Matrix<int16_t, 2, 2> c = b - a;
 	TEST_ASSERT_EQUALS(c[0][0], 2);
 	TEST_ASSERT_EQUALS(c[0][1], 4);
 	TEST_ASSERT_EQUALS(c[1][0], 6);
@@ -254,8 +254,8 @@ MatrixTest::testMatrixMultiplicationInPlace()
 		1, 2,
 	};
 	
-	xpcc::Matrix<int16_t, 2, 2> a(m);
-	xpcc::Matrix<int16_t, 2, 2> b(n);
+	modm::Matrix<int16_t, 2, 2> a(m);
+	modm::Matrix<int16_t, 2, 2> b(n);
 	
 	a *= b;
 	TEST_ASSERT_EQUALS(a[0][0], 3);
@@ -273,10 +273,10 @@ MatrixTest::testMatrixMultiplication()
 		3,
 	};
 	
-	xpcc::Matrix<int16_t, 3, 1> a(m);
-	xpcc::Matrix<int16_t, 1, 3> b(m);
+	modm::Matrix<int16_t, 3, 1> a(m);
+	modm::Matrix<int16_t, 1, 3> b(m);
 	
-	xpcc::Matrix<int16_t, 3, 3> c = a * b;
+	modm::Matrix<int16_t, 3, 3> c = a * b;
 	
 	TEST_ASSERT_EQUALS(c[0][0], 1);
 	TEST_ASSERT_EQUALS(c[0][1], 2);
@@ -288,7 +288,7 @@ MatrixTest::testMatrixMultiplication()
 	TEST_ASSERT_EQUALS(c[2][1], 6);
 	TEST_ASSERT_EQUALS(c[2][2], 9);
 	
-	xpcc::Matrix<int16_t, 1, 1> d = b * a;
+	modm::Matrix<int16_t, 1, 1> d = b * a;
 	
 	TEST_ASSERT_EQUALS(d[0][0], 14);
 	
@@ -298,8 +298,8 @@ MatrixTest::testMatrixMultiplication()
 		5, 6,
 	};
 	
-	xpcc::Matrix<int16_t, 3, 2> e(n);
-	xpcc::Matrix<int16_t, 2, 3> f(n);
+	modm::Matrix<int16_t, 3, 2> e(n);
+	modm::Matrix<int16_t, 2, 3> f(n);
 	
 	c = e * f;
 	
@@ -313,7 +313,7 @@ MatrixTest::testMatrixMultiplication()
 	TEST_ASSERT_EQUALS(c[2][1], 40);
 	TEST_ASSERT_EQUALS(c[2][2], 51);
 	
-	xpcc::Matrix<int16_t, 2, 2> g = f * e;
+	modm::Matrix<int16_t, 2, 2> g = f * e;
 	
 	TEST_ASSERT_EQUALS(g[0][0], 22);
 	TEST_ASSERT_EQUALS(g[0][1], 28);
@@ -330,8 +330,8 @@ MatrixTest::testTranspose()
 		5, 6,
 	};
 	
-	xpcc::Matrix<int16_t, 3, 2> a(m);
-	xpcc::Matrix<int16_t, 2, 3> b(a.asTransposed());
+	modm::Matrix<int16_t, 3, 2> a(m);
+	modm::Matrix<int16_t, 2, 3> b(a.asTransposed());
 	
 	TEST_ASSERT_EQUALS(b[0][0], 1);
 	TEST_ASSERT_EQUALS(b[0][1], 3);
@@ -345,7 +345,7 @@ MatrixTest::testTranspose()
 		3, 4,
 	};
 	
-	xpcc::Matrix<int16_t, 2, 2> c(n);
+	modm::Matrix<int16_t, 2, 2> c(n);
 	
 	c.transpose();
 	
@@ -364,17 +364,17 @@ MatrixTest::testReplace()
 		7, 8, 9
 	};
 	
-	xpcc::Matrix<int16_t, 3, 3> a(m);
-	xpcc::Matrix<int16_t, 3, 3> b;
+	modm::Matrix<int16_t, 3, 3> a(m);
+	modm::Matrix<int16_t, 3, 3> b;
 	
 	b.replace(m);
 	TEST_ASSERT_EQUALS(a, b);
 	
-	b = xpcc::Matrix<int16_t, 3, 3>::zeroMatrix();
+	b = modm::Matrix<int16_t, 3, 3>::zeroMatrix();
 	b.replace(0, 0, a);
 	TEST_ASSERT_EQUALS(a, b);
 	
-	xpcc::Matrix<int16_t, 2, 2> c = a.subMatrix<2, 2>(1, 0);
+	modm::Matrix<int16_t, 2, 2> c = a.subMatrix<2, 2>(1, 0);
 	
 	a.replace(0, 1, c);
 	TEST_ASSERT_EQUALS(a[0][0], 1);
@@ -388,7 +388,7 @@ MatrixTest::testReplace()
 	TEST_ASSERT_EQUALS(a[2][2], 9);
 	
 	const int16_t n[] = { 1, 2 };
-	xpcc::Matrix<int16_t, 2, 1> column(n);
+	modm::Matrix<int16_t, 2, 1> column(n);
 	
 	c.replaceColumn(1, column);
 	
@@ -398,7 +398,7 @@ MatrixTest::testReplace()
 	TEST_ASSERT_EQUALS(c[1][1], 2);
 	
 	const int16_t o[2] = { 10, 12 };
-	xpcc::Matrix<int16_t, 1, 2> row(o);
+	modm::Matrix<int16_t, 1, 2> row(o);
 	
 	c.replaceRow(0, row);
 	
@@ -419,10 +419,10 @@ MatrixTest::testAddRowColumn()
 		5, 6,
 	};
 	
-	xpcc::Matrix<int16_t, 2, 2> a(in);
+	modm::Matrix<int16_t, 2, 2> a(in);
 	
-	xpcc::Matrix<int16_t, 1, 2> row2(in2);
-	xpcc::Matrix<int16_t, 3, 2> b = a.addRow(0, row2);
+	modm::Matrix<int16_t, 1, 2> row2(in2);
+	modm::Matrix<int16_t, 3, 2> b = a.addRow(0, row2);
 	TEST_ASSERT_EQUALS(b[0][0], 5);
 	TEST_ASSERT_EQUALS(b[0][1], 6);
 	TEST_ASSERT_EQUALS(b[1][0], 1);
@@ -450,8 +450,8 @@ MatrixTest::testAddRowColumn()
 		7, 8, 9,
 	};
 	
-	xpcc::Matrix<int16_t, 3, 1> colum3(in3);
-	xpcc::Matrix<int16_t, 3, 3> c = b.addColumn(0, colum3);
+	modm::Matrix<int16_t, 3, 1> colum3(in3);
+	modm::Matrix<int16_t, 3, 3> c = b.addColumn(0, colum3);
 	TEST_ASSERT_EQUALS(c[0][0], 7);
 	TEST_ASSERT_EQUALS(c[0][1], 1);
 	TEST_ASSERT_EQUALS(c[0][2], 2);
@@ -494,8 +494,8 @@ MatrixTest::testRemoveRowColumn()
 		7, 8, 9
 	};
 	
-	xpcc::Matrix<int16_t, 3, 3> a(m);
-	xpcc::Matrix<int16_t, 3, 2> b = a.removeColumn(0);
+	modm::Matrix<int16_t, 3, 3> a(m);
+	modm::Matrix<int16_t, 3, 2> b = a.removeColumn(0);
 	TEST_ASSERT_EQUALS(b[0][0], 2);
 	TEST_ASSERT_EQUALS(b[0][1], 3);
 	TEST_ASSERT_EQUALS(b[1][0], 5);
@@ -519,7 +519,7 @@ MatrixTest::testRemoveRowColumn()
 	TEST_ASSERT_EQUALS(b[2][0], 7);
 	TEST_ASSERT_EQUALS(b[2][1], 8);
 	
-	xpcc::Matrix<int16_t, 2, 3> c = a.removeRow(0);
+	modm::Matrix<int16_t, 2, 3> c = a.removeRow(0);
 	TEST_ASSERT_EQUALS(c[0][0], 4);
 	TEST_ASSERT_EQUALS(c[0][1], 5);
 	TEST_ASSERT_EQUALS(c[0][2], 6);
@@ -554,20 +554,20 @@ MatrixTest::testDeterminant()
 	};
 	
 	// determinate 3x3
-	xpcc::Matrix<int16_t, 3, 3> a(m);
+	modm::Matrix<int16_t, 3, 3> a(m);
 	TEST_ASSERT_EQUALS(a.determinant(), 0);
 	
 	a[2][2] = 10;
 	TEST_ASSERT_EQUALS(a.determinant(), -3);
 	
 	// determinate 2x2
-	xpcc::Matrix<int16_t, 2, 2> b = a.subMatrix<2, 2>(0, 0);
+	modm::Matrix<int16_t, 2, 2> b = a.subMatrix<2, 2>(0, 0);
 	TEST_ASSERT_EQUALS(b.determinant(), -3);
 	
-	xpcc::Matrix<int16_t, 2, 2> c = a.subMatrix<2, 2>(1, 1);
+	modm::Matrix<int16_t, 2, 2> c = a.subMatrix<2, 2>(1, 1);
 	TEST_ASSERT_EQUALS(c.determinant(), 2);
 	
 	// determinate 1x1
-	xpcc::Matrix<int16_t, 1, 1> d = a.subMatrix<1, 1>(1, 1);
+	modm::Matrix<int16_t, 1, 1> d = a.subMatrix<1, 1>(1, 1);
 	TEST_ASSERT_EQUALS(d.determinant(), 5);
 }

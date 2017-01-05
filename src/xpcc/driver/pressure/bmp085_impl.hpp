@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_BMP085_HPP
+#ifndef MODM_BMP085_HPP
 #	error  "Don't include this file directly, use 'bmp085.hpp' instead!"
 #endif
 #include <modm/math/utils/operator.hpp>
@@ -18,7 +18,7 @@
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
-xpcc::Bmp085<I2cMaster>::Bmp085(DataBase &data, uint8_t address) :
+modm::Bmp085<I2cMaster>::Bmp085(DataBase &data, uint8_t address) :
 	I2cDevice<I2cMaster, 1>(address), data(data)
 {
 }
@@ -26,8 +26,8 @@ xpcc::Bmp085<I2cMaster>::Bmp085(DataBase &data, uint8_t address) :
 // ----------------------------------------------------------------------------
 // MARK: - Tasks
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Bmp085<I2cMaster>::initialize(Mode mode)
+modm::ResumableResult<bool>
+modm::Bmp085<I2cMaster>::initialize(Mode mode)
 {
 	RF_BEGIN();
 
@@ -39,19 +39,19 @@ xpcc::Bmp085<I2cMaster>::initialize(Mode mode)
 	if (RF_CALL( this->runTransaction() ))
 	{
 		uint16_t* element = reinterpret_cast<uint16_t*>(&data.calibration);
-		element[ 0] = xpcc::fromBigEndian(element[0]);
-		element[ 1] = xpcc::fromBigEndian(element[1]);
-		element[ 2] = xpcc::fromBigEndian(element[2]);
-		element[ 3] = xpcc::fromBigEndian(element[3]);
-		element[ 4] = xpcc::fromBigEndian(element[4]);
-		element[ 5] = xpcc::fromBigEndian(element[5]);
+		element[ 0] = modm::fromBigEndian(element[0]);
+		element[ 1] = modm::fromBigEndian(element[1]);
+		element[ 2] = modm::fromBigEndian(element[2]);
+		element[ 3] = modm::fromBigEndian(element[3]);
+		element[ 4] = modm::fromBigEndian(element[4]);
+		element[ 5] = modm::fromBigEndian(element[5]);
 
-		element[ 6] = xpcc::fromBigEndian(element[6]);
-		element[ 7] = xpcc::fromBigEndian(element[7]);
+		element[ 6] = modm::fromBigEndian(element[6]);
+		element[ 7] = modm::fromBigEndian(element[7]);
 
-		element[ 8] = xpcc::fromBigEndian(element[8]);
-		element[ 9] = xpcc::fromBigEndian(element[9]);
-		element[10] = xpcc::fromBigEndian(element[10]);
+		element[ 8] = modm::fromBigEndian(element[8]);
+		element[ 9] = modm::fromBigEndian(element[9]);
+		element[10] = modm::fromBigEndian(element[10]);
 
 		RF_RETURN(true);
 	}
@@ -60,8 +60,8 @@ xpcc::Bmp085<I2cMaster>::initialize(Mode mode)
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Bmp085<I2cMaster>::readout()
+modm::ResumableResult<bool>
+modm::Bmp085<I2cMaster>::readout()
 {
 	RF_BEGIN();
 
@@ -115,4 +115,4 @@ xpcc::Bmp085<I2cMaster>::readout()
 
 template < typename I2cMaster >
 constexpr uint8_t
-xpcc::Bmp085< I2cMaster >::conversionDelay[];
+modm::Bmp085< I2cMaster >::conversionDelay[];

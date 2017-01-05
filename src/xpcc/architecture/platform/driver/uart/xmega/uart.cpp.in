@@ -29,7 +29,7 @@ namespace
 
 // ----------------------------------------------------------------------------
 void
-xpcc::xmega::Uart{{ id }}::initializeWithFractionalBaudrate(uint16_t bsel, uint8_t bscale)
+modm::xmega::Uart{{ id }}::initializeWithFractionalBaudrate(uint16_t bsel, uint8_t bscale)
 {
 //	TXD::set();
 //	TXD::setOutput();
@@ -47,7 +47,7 @@ xpcc::xmega::Uart{{ id }}::initializeWithFractionalBaudrate(uint16_t bsel, uint8
 
 // ----------------------------------------------------------------------------
 void
-xpcc::xmega::Uart{{ id }}::write(uint8_t c)
+modm::xmega::Uart{{ id }}::write(uint8_t c)
 {
 	while (!(USART{{ id }}_STATUS & USART_DREIF_bm))
 		;
@@ -57,7 +57,7 @@ xpcc::xmega::Uart{{ id }}::write(uint8_t c)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::xmega::Uart{{ id }}::write(const uint8_t *s, uint8_t n)
+modm::xmega::Uart{{ id }}::write(const uint8_t *s, uint8_t n)
 {
 	while (--n != 0) {
 		Uart{{ id }}::write(*s++);
@@ -66,7 +66,7 @@ xpcc::xmega::Uart{{ id }}::write(const uint8_t *s, uint8_t n)
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::xmega::Uart{{ id }}::read(uint8_t& c)
+modm::xmega::Uart{{ id }}::read(uint8_t& c)
 {
 	if (USART{{ id }}_STATUS & USART_RXCIF_bm) {
 		// the status flag is cleared by reading DATA
@@ -78,7 +78,7 @@ xpcc::xmega::Uart{{ id }}::read(uint8_t& c)
 
 // ----------------------------------------------------------------------------
 uint8_t
-xpcc::xmega::Uart{{ id }}::read(uint8_t *b, uint8_t n)
+modm::xmega::Uart{{ id }}::read(uint8_t *b, uint8_t n)
 {
 	/*
 	 * The delay of 1.5 times frame time could be calculated at compile time

@@ -9,11 +9,11 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_NOKIA5110_HPP
+#ifndef MODM_NOKIA5110_HPP
 #error "Do not include this file directly. Include nokia5110.hpp instead."
 #endif
 
-namespace xpcc
+namespace modm
 {
 
 template< typename Spi, typename Ce, typename Dc, typename Reset >
@@ -29,7 +29,7 @@ Nokia5110< Spi, Ce, Dc, Reset >::initialize()
 	writeCommand(0xc2); // Set Vop
 
 	// Basic instruction set, vertical addressing
-	// Matches well with xpcc's BufferedGraphicDisplay memory layout
+	// Matches well with modm's BufferedGraphicDisplay memory layout
 	writeCommand(0x20 | (1 << 1));
 
 	// writeCommand(0x08); // display blank
@@ -66,4 +66,4 @@ Nokia5110< Spi, Ce, Dc, Reset >::writeCommand(uint8_t data)
 	Ce::set();
 }
 
-} // xpcc namespace
+} // modm namespace

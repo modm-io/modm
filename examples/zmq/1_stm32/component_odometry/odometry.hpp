@@ -12,27 +12,27 @@
 #ifndef COMPONENT_ODOMETRY_HPP
 #define COMPONENT_ODOMETRY_HPP
 
-#include <modm/communication/xpcc/abstract_component.hpp>
+#include <modm/communication/modm/abstract_component.hpp>
 #include <modm/processing/timer.hpp>
 
 #include "communication/packets.hpp"
 
 namespace component
 {
-	class Odometry : public xpcc::AbstractComponent
+	class Odometry : public modm::AbstractComponent
 	{
 	public:
-		Odometry(uint8_t id, xpcc::Dispatcher &communication);
+		Odometry(uint8_t id, modm::Dispatcher &communication);
 		
 		void
 		update();
 
 	public:
-		// Callback for xpcc
-		void actionSetLedRed(const xpcc::ResponseHandle& responseHandle, const robot::packet::Bool *payload);
+		// Callback for modm
+		void actionSetLedRed(const modm::ResponseHandle& responseHandle, const robot::packet::Bool *payload);
 		
 	private:
-		xpcc::ShortPeriodicTimer timer;
+		modm::ShortPeriodicTimer timer;
 	};
 }
 

@@ -12,8 +12,8 @@
 
 {{ generation_block }}
 
-#ifndef XPCC_{{target["family"] | upper}}_GPIO_HPP
-#define XPCC_{{target["family"] | upper}}_GPIO_HPP
+#ifndef MODM_{{target["family"] | upper}}_GPIO_HPP
+#define MODM_{{target["family"] | upper}}_GPIO_HPP
 
 #include "../device.hpp"
 #include "type_ids.hpp"
@@ -33,7 +33,7 @@
  */
 
 
-namespace xpcc
+namespace modm
 {
 
 namespace {{target["family"]}}
@@ -83,7 +83,7 @@ protected:
  * simulate an open-drain output (with internal pullups if needed).
  * You must use this class for `SoftwareI2cMaster`!
  *
- * @see ::xpcc::SoftwareI2cMaster
+ * @see ::modm::SoftwareI2cMaster
  * @ingroup	{{target.string}}_gpio
  * @{
  */
@@ -91,51 +91,51 @@ protected:
 template< class Pin >
 class {{name}} : public Pin
 {
-	static_assert(Pin::direction == xpcc::Gpio::Direction::InOut, "Pin must inherit from xpcc::GpioIO");
+	static_assert(Pin::direction == modm::Gpio::Direction::InOut, "Pin must inherit from modm::GpioIO");
 public:
-	static constexpr xpcc::Gpio::Direction direction = xpcc::Gpio::Direction::Out;
+	static constexpr modm::Gpio::Direction direction = modm::Gpio::Direction::Out;
 
 public:
-	xpcc_always_inline static void configure(Gpio::InputType /*type*/) {}
-	xpcc_always_inline static void setInput() {}
-	xpcc_always_inline static void setInput(Gpio::InputType /*type*/) {}
-	xpcc_always_inline static void setOutput() {}
-	xpcc_always_inline static void setOutput(bool status) {
+	modm_always_inline static void configure(Gpio::InputType /*type*/) {}
+	modm_always_inline static void setInput() {}
+	modm_always_inline static void setInput(Gpio::InputType /*type*/) {}
+	modm_always_inline static void setOutput() {}
+	modm_always_inline static void setOutput(bool status) {
 		set(status);
 	}
 	%% if name == 'GpioOpenDrain'
 	/// maps to `setInput(InputType::Floating)`
-	xpcc_always_inline static void set() {
+	modm_always_inline static void set() {
 		Pin::setInput(Gpio::InputType::Floating);
 	}
 	%% else
 	/// maps to `setInput(InputType::PullUp)`
-	xpcc_always_inline static void set() {
+	modm_always_inline static void set() {
 		Pin::setInput(Gpio::InputType::PullUp);
 	}
 	%% endif
-	/// maps to `setOutput(::xpcc::Gpio::Low)`
-	xpcc_always_inline static void reset() {
-		Pin::setOutput(::xpcc::Gpio::Low);
+	/// maps to `setOutput(::modm::Gpio::Low)`
+	modm_always_inline static void reset() {
+		Pin::setOutput(::modm::Gpio::Low);
 	}
-	xpcc_always_inline static void set(bool status) {
+	modm_always_inline static void set(bool status) {
 		if (status) { set(); }
 		else { reset(); }
 	}
-	xpcc_always_inline static bool isSet() {
-		return (Pin::getDirection() == xpcc::Gpio::Direction::In);
+	modm_always_inline static bool isSet() {
+		return (Pin::getDirection() == modm::Gpio::Direction::In);
 	}
-	xpcc_always_inline static xpcc::Gpio::Direction getDirection() {
-		return xpcc::Gpio::Direction::Out;
+	modm_always_inline static modm::Gpio::Direction getDirection() {
+		return modm::Gpio::Direction::Out;
 	}
-	xpcc_always_inline static void
-	connect(::xpcc::TypeId::SoftwareI2cMasterSda) {
+	modm_always_inline static void
+	connect(::modm::TypeId::SoftwareI2cMasterSda) {
 		set();
 	}
-	xpcc_always_inline static void
-	connect(::xpcc::TypeId::SoftwareI2cMasterScl) {
+	modm_always_inline static void
+	connect(::modm::TypeId::SoftwareI2cMasterScl) {
 		set();
-		xpcc::I2c::resetDevices< Pin >();
+		modm::I2c::resetDevices< Pin >();
 		set();
 	}
 };
@@ -152,7 +152,7 @@ public:
 
 /// {{type}} class for Pin {{port ~ pin}}
 /// @ingroup	{{target.string}}_gpio
-struct {{name}} : public Gpio, ::xpcc::{{superclass}}
+struct {{name}} : public Gpio, ::modm::{{superclass}}
 {
 public:
 	static constexpr Port port = Port::{{port}};		///< the port of this GPIO
@@ -160,39 +160,39 @@ public:
 	static constexpr uint8_t mask = (1 << pin);	///< the mask of this GPIO
 
 		%% if type in ["IO", "Output"]
-	xpcc_always_inline static void setOutput(bool status) {
+	modm_always_inline static void setOutput(bool status) {
 		setOutput();
 		set(status);
 	}
-	xpcc_always_inline static void setOutput() {
+	modm_always_inline static void setOutput() {
 			%% if pue is defined
 		PUE{{port}} &= ~mask;
 			%% endif
 		DDR{{port}} |= mask;
 	}
-	xpcc_always_inline static void set() {
+	modm_always_inline static void set() {
 		PORT{{port}} |= mask;
 	}
-	xpcc_always_inline static void set(bool status) {
+	modm_always_inline static void set(bool status) {
 		if (status) { set(); }
 		else { reset(); }
 	}
-	xpcc_always_inline static void reset() {
+	modm_always_inline static void reset() {
 		PORT{{port}} &= ~mask;
 	}
-	xpcc_always_inline static void toggle() {
+	modm_always_inline static void toggle() {
 			%% if notoggle is defined
 		PORT{{port}} ^= mask;
 			%% else
 		PIN{{port}} = mask;
 			%% endif
 	}
-	xpcc_always_inline static bool isSet() {
+	modm_always_inline static bool isSet() {
 		return (PORT{{port}} & mask);
 	}
 		%% endif
 		%% if type in ["IO", "Input"]
-	xpcc_always_inline static void configure(InputType type) {
+	modm_always_inline static void configure(InputType type) {
 		if (type == InputType::PullUp) {
 			%% if pue is defined
 			PUE{{port}} |= mask;
@@ -208,15 +208,15 @@ public:
 			%% endif
 		}
 	}
-	xpcc_always_inline static void
+	modm_always_inline static void
 	setInput(InputType type) {
 		setInput();
 		configure(type);
 	}
-	xpcc_always_inline static void setInput() {
+	modm_always_inline static void setInput() {
 		DDR{{port}} &= ~mask;
 	}
-	xpcc_always_inline static bool read() {
+	modm_always_inline static bool read() {
 		return (PIN{{port}} & mask);
 	}
 			%% if 'extint' in gpio
@@ -224,7 +224,7 @@ public:
 				%% if eicra is not defined
 					%% set eicra = 'EICRA'
 				%% endif
-	xpcc_always_inline static void setInputTrigger(InputTrigger trigger) {
+	modm_always_inline static void setInputTrigger(InputTrigger trigger) {
 				%% if af_id < 4
 					%% if isc2 is defined and af_id == 2
 		{{isc2}} = ({{isc2}} & ~(1 << ISC2)) | ((i(trigger) & 0b01) << ISC2);
@@ -235,16 +235,16 @@ public:
 		EICRB = (EICRB & ~(0b11 << 2*{{af_id - 4}})) | (i(trigger) << 2*{{af_id - 4}});
 				%% endif
 	}
-	xpcc_always_inline static void enableExternalInterrupt() {
+	modm_always_inline static void enableExternalInterrupt() {
 		EIMSK |= (1 << INT{{af_id}});
 	}
-	xpcc_always_inline static void disableExternalInterrupt() {
+	modm_always_inline static void disableExternalInterrupt() {
 		EIMSK &= ~(1 << INT{{af_id}});
 	}
-	xpcc_always_inline static bool getExternalInterruptFlag() {
+	modm_always_inline static bool getExternalInterruptFlag() {
 		return (EIFR & (1 << INTF{{af_id}}));
 	}
-	xpcc_always_inline static void acknowledgeExternalInterruptFlag() {
+	modm_always_inline static void acknowledgeExternalInterruptFlag() {
 		EIFR |= (1 << INTF{{af_id}});
 	}
 			%% endif
@@ -261,30 +261,30 @@ public:
 						%% set af_reg = ""
 					%% endif
 				%% endif
-	xpcc_always_inline static void enablePCInterrupt() {
+	modm_always_inline static void enablePCInterrupt() {
 		PCMSK{{af_reg}} |= (1 << PCINT{{af_id}});
 		PCICR |= (1 << PCIE{{af_reg}});
 	}
-	xpcc_always_inline static void disablePCInterrupt() {
+	modm_always_inline static void disablePCInterrupt() {
 		PCMSK{{af_reg}} &= ~(1 << PCINT{{af_id}});
 		if (!PCMSK{{af_reg}}) {
 			PCICR &= ~(1 << PCIE{{af_reg}});
 		}
 	}
-	xpcc_always_inline static bool readPCInterruptFlag() {
+	modm_always_inline static bool readPCInterruptFlag() {
 		return (PCIFR & (1 << PCIF{{af_reg}}));
 	}
-	xpcc_always_inline static void acknowledgePCInterruptFlag() {
+	modm_always_inline static void acknowledgePCInterruptFlag() {
 		PCIFR |= (1 << PCIF{{af_reg}});
 	}
 			%% endif
 		%% endif
 		%% if type in ["IO"]
-	xpcc_always_inline static Direction getDirection() {
+	modm_always_inline static Direction getDirection() {
 		return (DDR{{port}} & mask) ? Direction::Out : Direction::In;
 	}
 		%% endif
-	xpcc_always_inline static void
+	modm_always_inline static void
 	disconnect() {
 		%% if type == "Output"
 		DDR{{port}} &= ~mask;   // manual call to setInput()
@@ -305,7 +305,7 @@ public:
 	inline static void
 	connect(TypeId::{{ af.peripheral }}{{ af.name }}) {
 				%% if af.name == "Scl" and type == 'IO'
-		xpcc::I2c::resetDevices< {{name}} >();
+		modm::I2c::resetDevices< {{name}} >();
 				%% endif
 				%% if af.name == "Txd"
 		set();
@@ -322,8 +322,8 @@ public:
 			%% for peripheral in   ['SoftwareSpiMasterMosi',
 									'SoftwareSpiMasterSck']
 	/// Connect to `{{peripheral}}`.
-	xpcc_always_inline static void
-	connect(::xpcc::TypeId::{{ peripheral }}) {
+	modm_always_inline static void
+	connect(::modm::TypeId::{{ peripheral }}) {
 		setOutput();
 	}
 			%% endfor
@@ -331,8 +331,8 @@ public:
 		%% if type in ['IO', 'Input']
 			%% for peripheral in ['SoftwareSpiMasterMiso']
 	/// Connect to `{{peripheral}}`.
-	xpcc_always_inline static void
-	connect(::xpcc::TypeId::{{ peripheral }}) {
+	modm_always_inline static void
+	connect(::modm::TypeId::{{ peripheral }}) {
 		setInput();
 	}
 			%% endfor
@@ -356,8 +356,8 @@ class GpioPortBase;
  * @tparam	Width		required width of the port (up to 8)
  * @ingroup {{target.string}}_gpio
  */
-template< class StartPin, uint8_t Width, ::xpcc::GpioPort::DataOrder PortOrder = GpioPort::DataOrder::Normal >
-class GpioPort : public ::xpcc::GpioPort, /** @cond */ public GpioPortBase< StartPin::port, StartPin::pin, Width, PortOrder > /** @endcond */
+template< class StartPin, uint8_t Width, ::modm::GpioPort::DataOrder PortOrder = GpioPort::DataOrder::Normal >
+class GpioPort : public ::modm::GpioPort, /** @cond */ public GpioPortBase< StartPin::port, StartPin::pin, Width, PortOrder > /** @endcond */
 {
 public:
 	static constexpr uint8_t width = Width;
@@ -388,7 +388,7 @@ public:
 
 /// @cond
 %% for port in gpios | getPorts
-template< uint8_t StartPin, uint8_t Width, ::xpcc::GpioPort::DataOrder PortOrder >
+template< uint8_t StartPin, uint8_t Width, ::modm::GpioPort::DataOrder PortOrder >
 class GpioPortBase<Gpio::Port::{{port.name}}, StartPin, Width, PortOrder> : public Gpio
 {
 	static_assert(StartPin < {{port.startPin + port.width}},
@@ -404,10 +404,10 @@ class GpioPortBase<Gpio::Port::{{port.name}}, StartPin, Width, PortOrder> : publ
 	static constexpr uint8_t portMask = dataMask << StartPin;
 
 public:
-	xpcc_always_inline static void setOutput() {
+	modm_always_inline static void setOutput() {
 		DDR{{port.name}} |= portMask;
 	}
-	xpcc_always_inline static void setInput() {
+	modm_always_inline static void setInput() {
 		DDR{{port.name}} &= ~portMask;
 	}
 	inline static uint8_t read() {
@@ -418,7 +418,7 @@ public:
 		data <<= StartPin;
 		PORT{{port.name}} = (PORT{{port.name}} & ~portMask) | (data & portMask);
 	}
-	xpcc_always_inline static void toggle() {
+	modm_always_inline static void toggle() {
 	%% if notoggle is defined
 		PORT{{port.name}} ^= portMask;
 	%% else
@@ -428,7 +428,7 @@ public:
 };
 // another specialization for DataOrder::Reversed
 template< uint8_t StartPin, uint8_t Width >
-class GpioPortBase<Gpio::Port::{{port.name}}, StartPin, Width, ::xpcc::GpioPort::DataOrder::Reversed> : public Gpio
+class GpioPortBase<Gpio::Port::{{port.name}}, StartPin, Width, ::modm::GpioPort::DataOrder::Reversed> : public Gpio
 {
 	static_assert(StartPin < {{port.startPin + port.width}},
 			"StartPin too large, maximum {{port.startPin + port.width - 1}}.");
@@ -444,21 +444,21 @@ class GpioPortBase<Gpio::Port::{{port.name}}, StartPin, Width, ::xpcc::GpioPort:
 	static constexpr uint8_t portMask = dataMask << StartPin;
 
 public:
-	xpcc_always_inline static void setOutput() {
+	modm_always_inline static void setOutput() {
 		DDR{{port.name}} |= portMask;
 	}
-	xpcc_always_inline static void setInput() {
+	modm_always_inline static void setInput() {
 		DDR{{port.name}} &= ~portMask;
 	}
 	inline static uint8_t read() {
-		uint8_t data = xpcc::bitReverse(uint8_t(PIN{{port.name}} & portMask));
+		uint8_t data = modm::bitReverse(uint8_t(PIN{{port.name}} & portMask));
 		return (data >> StartPinReversed);
 	}
 	inline static void write(uint8_t data) {
-		data = xpcc::bitReverse(uint8_t(data << StartPinReversed));
+		data = modm::bitReverse(uint8_t(data << StartPinReversed));
 		PORT{{port.name}} = (PORT{{port.name}} & ~portMask) | (data & portMask);
 	}
-	xpcc_always_inline static void toggle() {
+	modm_always_inline static void toggle() {
 	%% if notoggle is defined
 		PORT{{port.name}} ^= portMask;
 	%% else
@@ -467,26 +467,26 @@ public:
 	}
 };
 	%% if port.startPin == 0 and port.width == 8
-template< ::xpcc::GpioPort::DataOrder DataOrder >
+template< ::modm::GpioPort::DataOrder DataOrder >
 class GpioPortBase<Gpio::Port::{{port.name}}, 0, 8, DataOrder > : public Gpio
 {
 public:
 	static constexpr uint8_t width = 8;
 
 public:
-	xpcc_always_inline static void setOutput() {
+	modm_always_inline static void setOutput() {
 		DDR{{port.name}} = 0xff;
 	}
-	xpcc_always_inline static void setInput() {
+	modm_always_inline static void setInput() {
 		DDR{{port.name}} = 0;
 	}
-	xpcc_always_inline static uint8_t read() {
+	modm_always_inline static uint8_t read() {
 		return PIN{{port.name}};
 	}
-	xpcc_always_inline static void write(uint8_t data) {
+	modm_always_inline static void write(uint8_t data) {
 		PORT{{port.name}} = data;
 	}
-	xpcc_always_inline static void toggle() {
+	modm_always_inline static void toggle() {
 		%% if notoggle is defined
 		PORT{{port.name}} ^= 0xff;
 		%% else
@@ -496,25 +496,25 @@ public:
 };
 // another specialization for DataOrder::Reversed
 template<>
-class GpioPortBase<Gpio::Port::{{port.name}}, 0, 8, ::xpcc::GpioPort::DataOrder::Reversed > : public Gpio
+class GpioPortBase<Gpio::Port::{{port.name}}, 0, 8, ::modm::GpioPort::DataOrder::Reversed > : public Gpio
 {
 public:
 	static constexpr uint8_t width = 8;
 
 public:
-	xpcc_always_inline static void setOutput() {
+	modm_always_inline static void setOutput() {
 		DDR{{port.name}} = 0xff;
 	}
-	xpcc_always_inline static void setInput() {
+	modm_always_inline static void setInput() {
 		DDR{{port.name}} = 0;
 	}
-	xpcc_always_inline static uint8_t read() {
-		return xpcc::bitReverse(uint8_t(PIN{{port.name}}));
+	modm_always_inline static uint8_t read() {
+		return modm::bitReverse(uint8_t(PIN{{port.name}}));
 	}
-	xpcc_always_inline static void write(uint8_t data) {
-		PORT{{port.name}} = xpcc::bitReverse(data);
+	modm_always_inline static void write(uint8_t data) {
+		PORT{{port.name}} = modm::bitReverse(data);
 	}
-	xpcc_always_inline static void toggle() {
+	modm_always_inline static void toggle() {
 		%% if notoggle is defined
 		PORT{{port.name}} ^= 0xff;
 		%% else
@@ -529,6 +529,6 @@ public:
 
 }	// namespace {{target["family"]}}
 
-}	// namespace xpcc
+}	// namespace modm
 
 #endif

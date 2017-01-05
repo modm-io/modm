@@ -11,10 +11,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_IODEVICE_HPP
-#define XPCC_IODEVICE_HPP
+#ifndef MODM_IODEVICE_HPP
+#define MODM_IODEVICE_HPP
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -54,6 +54,6 @@ private :
 	IODevice(const IODevice&);
 };
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif // XPCC_IODEVICE_HPP
+#endif // MODM_IODEVICE_HPP

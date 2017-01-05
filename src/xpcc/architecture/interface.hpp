@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_INTERFACE_HPP
-#define XPCC_INTERFACE_HPP
+#ifndef MODM_INTERFACE_HPP
+#define MODM_INTERFACE_HPP
 
 #include <stdint.h>
 #include <cstddef>
@@ -25,7 +25,7 @@
  * All hardware peripherals with common interfaces.
  */
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -95,12 +95,12 @@ public:
 	static void
 	assertBaudrateInTolerance()
 	{
-		static_assert(xpcc::Tolerance::isValueInTolerance(requested, available, tolerance),
+		static_assert(modm::Tolerance::isValueInTolerance(requested, available, tolerance),
 				"The closest available baudrate exceeds the tolerance of the requested baudrate!");
 	}
 };
 
-} // namespace xpcc
+} // namespace modm
 
 #include "interface/can.hpp"
 #include "interface/gpio.hpp"
@@ -113,4 +113,4 @@ public:
 #include "interface/assert.hpp"
 #include "interface/interrupt.hpp"
 
-#endif	// XPCC_INTERFACE_HPP
+#endif	// MODM_INTERFACE_HPP

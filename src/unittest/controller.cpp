@@ -32,7 +32,7 @@ unittest::Controller::getReporter() const
 }
 
 void
-unittest::Controller::nextTestSuite(xpcc::accessor::Flash<char> name) const
+unittest::Controller::nextTestSuite(modm::accessor::Flash<char> name) const
 {
 	reporter->nextTestSuite(name);
 }

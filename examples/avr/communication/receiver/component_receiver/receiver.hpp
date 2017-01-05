@@ -16,23 +16,23 @@
 #ifndef COMPONENT_RECEIVER_HPP
 #define COMPONENT_RECEIVER_HPP
 
-#include <modm/communication/xpcc/abstract_component.hpp>
+#include <modm/communication/modm/abstract_component.hpp>
 
 #include "communication/packets.hpp"
 
 namespace component
 {
-	class Receiver : public xpcc::AbstractComponent
+	class Receiver : public modm::AbstractComponent
 	{
 	public:
-		Receiver(uint8_t id, xpcc::Dispatcher &communication);
+		Receiver(uint8_t id, modm::Dispatcher &communication);
 		
 		void
-		actionSetPosition(const xpcc::ResponseHandle& handle,
+		actionSetPosition(const modm::ResponseHandle& handle,
 				const robot::packet::Position *parameter);
 		
 		void
-		actionGetPosition(const xpcc::ResponseHandle& handle);
+		actionGetPosition(const modm::ResponseHandle& handle);
 		
 		void
 		update();

@@ -10,30 +10,30 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_VECTOR_HPP
+#ifndef MODM_VECTOR_HPP
 	#error	"Don't include this file directly, use 'vector.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-xpcc::Vector<T, N>::Vector()
+modm::Vector<T, N>::Vector()
 {
 }
 
 template<typename T, uint8_t N>
-xpcc::Vector<T, N>::Vector(const T *ptData)
+modm::Vector<T, N>::Vector(const T *ptData)
 {
 	memcpy(coords, ptData, sizeof(T) * N);
 }
 
 template<typename T, uint8_t N>
-xpcc::Vector<T, N>::Vector(const xpcc::Matrix<T, N, 1> &rhs)
+modm::Vector<T, N>::Vector(const modm::Matrix<T, N, 1> &rhs)
 {
 	memcpy(coords, &rhs, sizeof(T) * N);
 }
 
 template<typename T, uint8_t N>
-xpcc::Vector<T, N>::Vector(const xpcc::Vector<T, N> &rhs)
+modm::Vector<T, N>::Vector(const modm::Vector<T, N> &rhs)
 {
 	memcpy(coords, rhs.coords, sizeof(T) * N);
 }
@@ -41,15 +41,15 @@ xpcc::Vector<T, N>::Vector(const xpcc::Vector<T, N> &rhs)
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
 uint8_t
-xpcc::Vector<T, N>::getSize()
+modm::Vector<T, N>::getSize()
 {
 	return N;
 }
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-xpcc::Vector<T, N>&
-xpcc::Vector<T, N>::operator = (const xpcc::Matrix<T, N, 1> &rhs)
+modm::Vector<T, N>&
+modm::Vector<T, N>::operator = (const modm::Matrix<T, N, 1> &rhs)
 {
 	memcpy(coords, &rhs, sizeof(T) * N);
 	return *this;
@@ -57,8 +57,8 @@ xpcc::Vector<T, N>::operator = (const xpcc::Matrix<T, N, 1> &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-xpcc::Vector<T, N>&
-xpcc::Vector<T, N>::operator = (const xpcc::Vector<T, N> &rhs)
+modm::Vector<T, N>&
+modm::Vector<T, N>::operator = (const modm::Vector<T, N> &rhs)
 {
 	memcpy(coords, rhs.coords, sizeof(T)*N);
 	return *this;
@@ -67,7 +67,7 @@ xpcc::Vector<T, N>::operator = (const xpcc::Vector<T, N> &rhs)
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
 bool
-xpcc::Vector<T, N>::operator == (const xpcc::Vector<T, N> &rhs) const
+modm::Vector<T, N>::operator == (const modm::Vector<T, N> &rhs) const
 {
 	return memcmp(coords, rhs.coords, sizeof(T)*N) == 0;
 }
@@ -75,7 +75,7 @@ xpcc::Vector<T, N>::operator == (const xpcc::Vector<T, N> &rhs) const
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
 bool
-xpcc::Vector<T, N>::operator != (const xpcc::Vector<T, N> &rhs) const
+modm::Vector<T, N>::operator != (const modm::Vector<T, N> &rhs) const
 {
 	return memcmp(coords, rhs.coords, sizeof(T)*N) != 0;
 }
@@ -83,7 +83,7 @@ xpcc::Vector<T, N>::operator != (const xpcc::Vector<T, N> &rhs) const
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
 bool
-xpcc::Vector<T, N>::operator < (const xpcc::Vector<T, N> &rhs) const
+modm::Vector<T, N>::operator < (const modm::Vector<T, N> &rhs) const
 {
 	for (uint_fast8_t i = 0; i < N; ++i)
 	{
@@ -100,7 +100,7 @@ xpcc::Vector<T, N>::operator < (const xpcc::Vector<T, N> &rhs) const
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
 bool
-xpcc::Vector<T, N>::operator <= (const xpcc::Vector<T, N> &rhs) const
+modm::Vector<T, N>::operator <= (const modm::Vector<T, N> &rhs) const
 {
 	for (uint_fast8_t i = 0; i < N; ++i)
 	{
@@ -117,7 +117,7 @@ xpcc::Vector<T, N>::operator <= (const xpcc::Vector<T, N> &rhs) const
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
 bool
-xpcc::Vector<T, N>::operator > (const xpcc::Vector<T, N> &rhs) const
+modm::Vector<T, N>::operator > (const modm::Vector<T, N> &rhs) const
 {
 	for (uint_fast8_t i = 0; i < N; ++i)
 	{
@@ -134,7 +134,7 @@ xpcc::Vector<T, N>::operator > (const xpcc::Vector<T, N> &rhs) const
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
 bool
-xpcc::Vector<T, N>::operator >= (const xpcc::Vector<T, N> &rhs) const
+modm::Vector<T, N>::operator >= (const modm::Vector<T, N> &rhs) const
 {
 	for (uint_fast8_t i = 0; i < N; ++i)
 	{
@@ -151,7 +151,7 @@ xpcc::Vector<T, N>::operator >= (const xpcc::Vector<T, N> &rhs) const
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
 const T&
-xpcc::Vector<T, N>::operator [] (uint8_t index) const
+modm::Vector<T, N>::operator [] (uint8_t index) const
 {
 	return coords[index];
 }
@@ -159,7 +159,7 @@ xpcc::Vector<T, N>::operator [] (uint8_t index) const
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
 T&
-xpcc::Vector<T, N>::operator [] (uint8_t index)
+modm::Vector<T, N>::operator [] (uint8_t index)
 {
 	return coords[index];
 }
@@ -167,7 +167,7 @@ xpcc::Vector<T, N>::operator [] (uint8_t index)
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
 T*
-xpcc::Vector<T, N>::ptr()
+modm::Vector<T, N>::ptr()
 {
 	return reinterpret_cast<T*>(this);
 }
@@ -175,17 +175,17 @@ xpcc::Vector<T, N>::ptr()
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
 const T*
-xpcc::Vector<T, N>::ptr() const
+modm::Vector<T, N>::ptr() const
 {
 	return reinterpret_cast<const T*>(this);
 }
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-xpcc::Vector<T, N>
-xpcc::Vector<T, N>::operator + (const xpcc::Vector<T, N> &rhs) const
+modm::Vector<T, N>
+modm::Vector<T, N>::operator + (const modm::Vector<T, N> &rhs) const
 {
-	xpcc::Vector<T, N> pt;
+	modm::Vector<T, N> pt;
 	for (uint_fast8_t i = 0; i < N; ++i) {
 		pt[i] = coords[i] + rhs.coords[i];
 	}
@@ -194,10 +194,10 @@ xpcc::Vector<T, N>::operator + (const xpcc::Vector<T, N> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-xpcc::Vector<T, N>
-xpcc::Vector<T, N>::operator - (const xpcc::Vector<T, N> &rhs) const
+modm::Vector<T, N>
+modm::Vector<T, N>::operator - (const modm::Vector<T, N> &rhs) const
 {
-	xpcc::Vector<T, N> pt;
+	modm::Vector<T, N> pt;
 	for (uint_fast8_t i = 0; i < N; ++i) {
 		pt[i] = coords[i] - rhs.coords[i];
 	}
@@ -206,38 +206,38 @@ xpcc::Vector<T, N>::operator - (const xpcc::Vector<T, N> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-xpcc::Matrix<T, N, 1>&
-xpcc::Vector<T, N>::asMatrix()
+modm::Matrix<T, N, 1>&
+modm::Vector<T, N>::asMatrix()
 {
-	return *reinterpret_cast<xpcc::Matrix<T, N, 1>*>(this);
+	return *reinterpret_cast<modm::Matrix<T, N, 1>*>(this);
 }
 
 template<typename T, uint8_t N>
-const xpcc::Matrix<T, N, 1>&
-xpcc::Vector<T, N>::asMatrix() const
+const modm::Matrix<T, N, 1>&
+modm::Vector<T, N>::asMatrix() const
 {
-	return *reinterpret_cast<const xpcc::Matrix<T, N, 1>*>(this);
+	return *reinterpret_cast<const modm::Matrix<T, N, 1>*>(this);
 }
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-const xpcc::Matrix<T, 1, N>&
-xpcc::Vector<T, N>::asTransposedMatrix() const
+const modm::Matrix<T, 1, N>&
+modm::Vector<T, N>::asTransposedMatrix() const
 {
-	return *reinterpret_cast<const xpcc::Matrix<T, 1, N>*>(this);
+	return *reinterpret_cast<const modm::Matrix<T, 1, N>*>(this);
 }
 
 template<typename T, uint8_t N>
-xpcc::Matrix<T, 1, N>&
-xpcc::Vector<T, N>::asTransposedMatrix()
+modm::Matrix<T, 1, N>&
+modm::Vector<T, N>::asTransposedMatrix()
 {
-	return *reinterpret_cast<xpcc::Matrix<T, 1, N>*>(this);
+	return *reinterpret_cast<modm::Matrix<T, 1, N>*>(this);
 }
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
 T
-xpcc::Vector<T, N>::operator * (const Vector &rhs) const
+modm::Vector<T, N>::operator * (const Vector &rhs) const
 {
 	T v = 0;
 	for (uint_fast8_t i = 0; i < N; ++i) {
@@ -249,10 +249,10 @@ xpcc::Vector<T, N>::operator * (const Vector &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-xpcc::Vector<T, N>
-xpcc::Vector<T, N>::operator * (const T &rhs) const
+modm::Vector<T, N>
+modm::Vector<T, N>::operator * (const T &rhs) const
 {
-	xpcc::Vector<T, N> pt;
+	modm::Vector<T, N> pt;
 	for (uint_fast8_t i = 0; i < N; ++i) {
 		pt[i] = coords[i] * rhs;
 	}
@@ -261,10 +261,10 @@ xpcc::Vector<T, N>::operator * (const T &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-xpcc::Vector<T, N>
-xpcc::Vector<T, N>::operator / (const T &rhs) const
+modm::Vector<T, N>
+modm::Vector<T, N>::operator / (const T &rhs) const
 {
-	xpcc::Vector<T, N> pt;
+	modm::Vector<T, N> pt;
 	for (uint_fast8_t i = 0; i < N; ++i) {
 		pt[i] = coords[i] / rhs;
 	}
@@ -273,8 +273,8 @@ xpcc::Vector<T, N>::operator / (const T &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-xpcc::Vector<T, N>&
-xpcc::Vector<T, N>::operator += (const Vector &rhs)
+modm::Vector<T, N>&
+modm::Vector<T, N>::operator += (const Vector &rhs)
 {
 	for (uint_fast8_t i = 0; i < N; ++i) {
 		coords[i] += rhs.coords[i];
@@ -284,8 +284,8 @@ xpcc::Vector<T, N>::operator += (const Vector &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-xpcc::Vector<T, N>&
-xpcc::Vector<T, N>::operator -= (const Vector &rhs)
+modm::Vector<T, N>&
+modm::Vector<T, N>::operator -= (const Vector &rhs)
 {
 	for (uint_fast8_t i = 0; i < N; ++i) {
 		coords[i] -= rhs.coords[i];
@@ -295,8 +295,8 @@ xpcc::Vector<T, N>::operator -= (const Vector &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-xpcc::Vector<T, N>&
-xpcc::Vector<T, N>::operator *= (const T &rhs)
+modm::Vector<T, N>&
+modm::Vector<T, N>::operator *= (const T &rhs)
 {
 	for (uint_fast8_t i = 0; i < N; ++i) {
 		coords[i] -= rhs;
@@ -306,8 +306,8 @@ xpcc::Vector<T, N>::operator *= (const T &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-xpcc::Vector<T, N>&
-xpcc::Vector<T, N>::operator /= (const T &rhs)
+modm::Vector<T, N>&
+modm::Vector<T, N>::operator /= (const T &rhs)
 {
 	for (uint_fast8_t i = 0; i < N; ++i) {
 		coords[i] /= rhs;
@@ -317,8 +317,8 @@ xpcc::Vector<T, N>::operator /= (const T &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-xpcc::Vector<T, N>&
-xpcc::Vector<T, N>::operator - ()
+modm::Vector<T, N>&
+modm::Vector<T, N>::operator - ()
 {
 	for (uint_fast8_t i = 0; i < N; ++i) {
 		coords[i] = -coords[i];
@@ -329,7 +329,7 @@ xpcc::Vector<T, N>::operator - ()
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
 T
-xpcc::Vector<T, N>::getLength() const
+modm::Vector<T, N>::getLength() const
 {
 	return std::sqrt(getLengthSquared());
 }
@@ -337,7 +337,7 @@ xpcc::Vector<T, N>::getLength() const
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
 T
-xpcc::Vector<T, N>::getLengthSquared() const
+modm::Vector<T, N>::getLengthSquared() const
 {
 	T len2 = 0;
 	for (uint_fast8_t i = 0; i < N; ++i) {

@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_NRF24_DATA_HPP
-#define XPCC_NRF24_DATA_HPP
+#ifndef MODM_NRF24_DATA_HPP
+#define MODM_NRF24_DATA_HPP
 
 #include <stdint.h>
 #include <modm/debug/logger.hpp>
@@ -22,10 +22,10 @@
 #include "nrf24_config.hpp"
 #include "nrf24_definitions.hpp"
 
-#undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::DISABLED
+#undef  MODM_LOG_LEVEL
+#define MODM_LOG_LEVEL modm::log::DISABLED
 
-namespace xpcc
+namespace modm
 {
 
 /* Pipe layout:
@@ -42,7 +42,7 @@ namespace xpcc
 /// @ingroup	nrf24
 /// @author		Daniel Krebs
 template<typename Nrf24Phy>
-class Nrf24Data : xpcc::Nrf24Register
+class Nrf24Data : modm::Nrf24Register
 {
 public:
 
@@ -66,7 +66,7 @@ public:
 	/// @{
 	/// @ingroup	nrf24
 	/// Data structure that user uses to pass data to the data layer
-	struct xpcc_packed Packet
+	struct modm_packed Packet
 	{
 		Packet() :
 			dest(0), src(0)
@@ -74,7 +74,7 @@ public:
 			payload.length = Nrf24Phy::getMaxPayload();
 		}
 
-		struct xpcc_packed Payload
+		struct modm_packed Payload
 		{
 			uint8_t data[Nrf24Phy::getMaxPayload()];
 			uint8_t length;      // max. 30!
@@ -87,14 +87,14 @@ public:
 
 
 	/// Header of Frame
-	struct xpcc_packed Header
+	struct modm_packed Header
 	{
 		uint8_t     src;
 		uint8_t     dest;
 	};
 
 	/// Data that will be sent over the air
-	struct xpcc_packed Frame
+	struct modm_packed Frame
 	{
 		Header      header;
 		uint8_t     data[30];   // max. possible payload size (32 byte) - 2 byte (src + dest)
@@ -104,7 +104,7 @@ public:
 public:
 
 	/* typedef config and physical layer for simplicity */
-	typedef xpcc::Nrf24Config<Nrf24Phy> Config;
+	typedef modm::Nrf24Config<Nrf24Phy> Config;
 	typedef Nrf24Phy Phy;
 
 
@@ -226,12 +226,12 @@ private:
 
 	/* This is a workaround because some times the radio module doesn't
 	 * throw an interrupt after sending */
-	static xpcc::Timeout sendingInterruptTimeout;
+	static modm::Timeout sendingInterruptTimeout;
 	static constexpr int interruptTimeoutAfterSending = 15; // in ms
 };
 
-}	// namespace xpcc
+}	// namespace modm
 
 #include "nrf24_data_impl.hpp"
 
-#endif /* XPCC_NRF24_DATA_HPP */
+#endif /* MODM_NRF24_DATA_HPP */

@@ -10,12 +10,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_CORTEX_CORE_HPP
-#define XPCC_CORTEX_CORE_HPP
+#ifndef MODM_CORTEX_CORE_HPP
+#define MODM_CORTEX_CORE_HPP
 
 #include <stdint.h>
 
-namespace xpcc
+namespace modm
 {
 
 namespace cortex
@@ -54,4 +54,4 @@ public:
 
 }
 
-#endif	// XPCC_CORTEX_CORE_HPP
+#endif	// MODM_CORTEX_CORE_HPP

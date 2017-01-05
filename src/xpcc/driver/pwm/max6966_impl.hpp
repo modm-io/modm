@@ -11,16 +11,16 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_MAX6966_HPP
+#ifndef MODM_MAX6966_HPP
 #	error "Don't include this file directly, use 'max6966.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template<typename Spi, typename Cs, uint8_t DRIVERS>
 void
-xpcc::MAX6966<Spi, Cs, DRIVERS>::initialize(max6966::Current current, uint8_t config)
+modm::MAX6966<Spi, Cs, DRIVERS>::initialize(max6966::Current current, uint8_t config)
 {
-	Cs::setOutput(xpcc::Gpio::High);
+	Cs::setOutput(modm::Gpio::High);
 
 	setAllConfiguration(config | max6966::CONFIG_RUN_MODE);
 	setAllCurrent(current);
@@ -29,7 +29,7 @@ xpcc::MAX6966<Spi, Cs, DRIVERS>::initialize(max6966::Current current, uint8_t co
 // MARK: configuration
 template<typename Spi, typename Cs, uint8_t DRIVERS>
 void
-xpcc::MAX6966<Spi, Cs, DRIVERS>::setAllConfiguration(uint8_t config)
+modm::MAX6966<Spi, Cs, DRIVERS>::setAllConfiguration(uint8_t config)
 {
 	Cs::reset();
 	for (uint_fast8_t i=0; i < DRIVERS; ++i)
@@ -43,7 +43,7 @@ xpcc::MAX6966<Spi, Cs, DRIVERS>::setAllConfiguration(uint8_t config)
 // MARK: channels and currents
 template<typename Spi, typename Cs, uint8_t DRIVERS>
 void
-xpcc::MAX6966<Spi, Cs, DRIVERS>::setChannel(uint16_t channel, uint8_t value)
+modm::MAX6966<Spi, Cs, DRIVERS>::setChannel(uint16_t channel, uint8_t value)
 {
 	if (channel >= DRIVERS*10)
 		return;
@@ -56,7 +56,7 @@ xpcc::MAX6966<Spi, Cs, DRIVERS>::setChannel(uint16_t channel, uint8_t value)
 
 template<typename Spi, typename Cs, uint8_t DRIVERS>
 void
-xpcc::MAX6966<Spi, Cs, DRIVERS>::setChannels(uint8_t * values)
+modm::MAX6966<Spi, Cs, DRIVERS>::setChannels(uint8_t * values)
 {
 	// for all channels
 	for (uint_fast8_t ch = 0; ch < 10; ++ch)
@@ -74,7 +74,7 @@ xpcc::MAX6966<Spi, Cs, DRIVERS>::setChannels(uint8_t * values)
 
 template<typename Spi, typename Cs, uint8_t DRIVERS>
 void
-xpcc::MAX6966<Spi, Cs, DRIVERS>::setAllChannels(uint8_t value)
+modm::MAX6966<Spi, Cs, DRIVERS>::setAllChannels(uint8_t value)
 {
 	Cs::reset();
 	for (uint_fast8_t i=0; i < DRIVERS; ++i)
@@ -87,7 +87,7 @@ xpcc::MAX6966<Spi, Cs, DRIVERS>::setAllChannels(uint8_t value)
 
 template<typename Spi, typename Cs, uint8_t DRIVERS>
 uint8_t
-xpcc::MAX6966<Spi, Cs, DRIVERS>::getChannel(uint16_t channel)
+modm::MAX6966<Spi, Cs, DRIVERS>::getChannel(uint16_t channel)
 {
 	if (channel >= DRIVERS*10)
 		return 0;
@@ -100,7 +100,7 @@ xpcc::MAX6966<Spi, Cs, DRIVERS>::getChannel(uint16_t channel)
 
 template<typename Spi, typename Cs, uint8_t DRIVERS>
 void
-xpcc::MAX6966<Spi, Cs, DRIVERS>::setHalfCurrent(uint16_t channel, bool full)
+modm::MAX6966<Spi, Cs, DRIVERS>::setHalfCurrent(uint16_t channel, bool full)
 {
 	if (channel >= DRIVERS*10)
 		return;
@@ -126,7 +126,7 @@ xpcc::MAX6966<Spi, Cs, DRIVERS>::setHalfCurrent(uint16_t channel, bool full)
 
 template<typename Spi, typename Cs, uint8_t DRIVERS>
 void
-xpcc::MAX6966<Spi, Cs, DRIVERS>::setAllCurrent(max6966::Current current)
+modm::MAX6966<Spi, Cs, DRIVERS>::setAllCurrent(max6966::Current current)
 {
 	Cs::reset();
 	for (uint_fast8_t i=0; i < DRIVERS; ++i)
@@ -140,7 +140,7 @@ xpcc::MAX6966<Spi, Cs, DRIVERS>::setAllCurrent(max6966::Current current)
 // MARK: protected
 template<typename Spi, typename Cs, uint8_t DRIVERS>
 void
-xpcc::MAX6966<Spi, Cs, DRIVERS>::writeToDriver(uint8_t driver, max6966::Register reg, uint8_t data)
+modm::MAX6966<Spi, Cs, DRIVERS>::writeToDriver(uint8_t driver, max6966::Register reg, uint8_t data)
 {
 	Cs::reset();
 	for (uint_fast8_t i=0; i < DRIVERS; ++i)
@@ -153,7 +153,7 @@ xpcc::MAX6966<Spi, Cs, DRIVERS>::writeToDriver(uint8_t driver, max6966::Register
 
 template<typename Spi, typename Cs, uint8_t DRIVERS>
 uint8_t
-xpcc::MAX6966<Spi, Cs, DRIVERS>::readFromDriver(uint8_t driver, max6966::Register reg)
+modm::MAX6966<Spi, Cs, DRIVERS>::readFromDriver(uint8_t driver, max6966::Register reg)
 {
 	// write the register we want to read
 	Cs::reset();
@@ -165,7 +165,7 @@ xpcc::MAX6966<Spi, Cs, DRIVERS>::readFromDriver(uint8_t driver, max6966::Registe
 	Cs::set();
 
 	// TODO: Add delay here?
-//	xpcc::delayMilliseconds(1);
+//	modm::delayMilliseconds(1);
 
 	// send dummy data and get the right register
 	uint8_t data=0;

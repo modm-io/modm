@@ -11,40 +11,40 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_ATOMIC_QUEUE_IMPL_HPP
-#define	XPCC_ATOMIC_QUEUE_IMPL_HPP
+#ifndef	MODM_ATOMIC_QUEUE_IMPL_HPP
+#define	MODM_ATOMIC_QUEUE_IMPL_HPP
 
 #include <modm/architecture/detect.hpp>
 
 template<typename T, std::size_t N>
-xpcc::atomic::Queue<T, N>::Queue() :
+modm::atomic::Queue<T, N>::Queue() :
 	head(0), tail(0)
 {
-#if defined(XPCC_CPU_AVR)
+#if defined(MODM_CPU_AVR)
 	static_assert(N <= 254, "A maximum of 254 elements is allowed for AVRs!");
 #endif
 }
 
 template<typename T, std::size_t N>
-xpcc_always_inline bool
-xpcc::atomic::Queue<T, N>::isFull() const
+modm_always_inline bool
+modm::atomic::Queue<T, N>::isFull() const
 {
-	Index tmphead = xpcc::accessor::asVolatile(this->head) + 1;
+	Index tmphead = modm::accessor::asVolatile(this->head) + 1;
 	if (tmphead >= (N+1)) {
 		tmphead = 0;
 	}
 	
-	return (tmphead == xpcc::accessor::asVolatile(this->tail));
+	return (tmphead == modm::accessor::asVolatile(this->tail));
 }
 
 template<typename T, std::size_t N>
 bool
-xpcc::atomic::Queue<T, N>::isNearlyFull() const
+modm::atomic::Queue<T, N>::isNearlyFull() const
 {
 	static_assert(N > 3, "Not possible the check for 'nearly full' of such a small queue.");
 	
-	Index tmphead = xpcc::accessor::asVolatile(this->head);
-	Index tmptail = xpcc::accessor::asVolatile(this->tail);
+	Index tmphead = modm::accessor::asVolatile(this->head);
+	Index tmptail = modm::accessor::asVolatile(this->tail);
 
 	Index free;
 	if (tmphead >= tmptail) {
@@ -58,20 +58,20 @@ xpcc::atomic::Queue<T, N>::isNearlyFull() const
 }
 
 template<typename T, std::size_t N>
-xpcc_always_inline bool
-xpcc::atomic::Queue<T, N>::isEmpty() const
+modm_always_inline bool
+modm::atomic::Queue<T, N>::isEmpty() const
 {
-	return (xpcc::accessor::asVolatile(this->head) == xpcc::accessor::asVolatile(this->tail));
+	return (modm::accessor::asVolatile(this->head) == modm::accessor::asVolatile(this->tail));
 }
 
 template<typename T, std::size_t N>
 bool
-xpcc::atomic::Queue<T, N>::isNearlyEmpty() const
+modm::atomic::Queue<T, N>::isNearlyEmpty() const
 {
 	static_assert(N > 3, "Not possible the check for 'nearly empty' of such a small queue. ");
 
-	uint8_t tmphead = xpcc::accessor::asVolatile(this->head);
-	uint8_t tmptail = xpcc::accessor::asVolatile(this->tail);
+	uint8_t tmphead = modm::accessor::asVolatile(this->head);
+	uint8_t tmptail = modm::accessor::asVolatile(this->tail);
 
 	Index stored;
 	if (tmphead >= tmptail) {
@@ -86,28 +86,28 @@ xpcc::atomic::Queue<T, N>::isNearlyEmpty() const
 
 
 template<typename T, std::size_t N>
-xpcc_always_inline typename xpcc::atomic::Queue<T, N>::Size
-xpcc::atomic::Queue<T, N>::getMaxSize() const
+modm_always_inline typename modm::atomic::Queue<T, N>::Size
+modm::atomic::Queue<T, N>::getMaxSize() const
 {
 	return N;
 }
 
 template<typename T, std::size_t N>
-xpcc_always_inline const T&
-xpcc::atomic::Queue<T, N>::get() const
+modm_always_inline const T&
+modm::atomic::Queue<T, N>::get() const
 {
 	return this->buffer[this->tail];
 }
 
 template<typename T, std::size_t N>
-xpcc_always_inline bool
-xpcc::atomic::Queue<T, N>::push(const T& value)
+modm_always_inline bool
+modm::atomic::Queue<T, N>::push(const T& value)
 {
 	Index tmphead = this->head + 1;
 	if (tmphead >= (N+1)) {
 		tmphead = 0;
 	}
-	if (tmphead == xpcc::accessor::asVolatile(this->tail)) {
+	if (tmphead == modm::accessor::asVolatile(this->tail)) {
 		return false;
 	}
 	else {
@@ -118,8 +118,8 @@ xpcc::atomic::Queue<T, N>::push(const T& value)
 }
 
 template<typename T, std::size_t N>
-xpcc_always_inline void
-xpcc::atomic::Queue<T, N>::pop()
+modm_always_inline void
+modm::atomic::Queue<T, N>::pop()
 {
 	Index tmptail = this->tail + 1;
 	if (tmptail >= (N+1)) {
@@ -128,4 +128,4 @@ xpcc::atomic::Queue<T, N>::pop()
 	this->tail = tmptail;
 }
 
-#endif	// XPCC_ATOMIC_QUEUE_IMPL_HPP
+#endif	// MODM_ATOMIC_QUEUE_IMPL_HPP

@@ -67,8 +67,8 @@ main()
 
 	volatile uint16_t * const out = fsmc::NorSram::getRegionPointer<uint16_t>(fsmc::NorSram::CHIP_SELECT_1);
 
-	Board::LedOrange::setOutput(xpcc::Gpio::High);
-	Board::LedGreen::setOutput(xpcc::Gpio::Low);
+	Board::LedOrange::setOutput(modm::Gpio::High);
+	Board::LedGreen::setOutput(modm::Gpio::Low);
 
 	while(!Board::Button::read());
 
@@ -86,7 +86,7 @@ main()
 		++ii;
 		Board::LedOrange::toggle();
 		Board::LedGreen::toggle();
-		xpcc::delayMilliseconds(data[ii]);
+		modm::delayMilliseconds(data[ii]);
 	}
 
 	return 0;

@@ -66,7 +66,7 @@ namespace xpcc
 			 *
 			 * This is only valid if hasPacket() has returned \c true.
 			 */
-			const xpcc::SmartPointer&
+			const modm::SmartPointer&
 			getPacket() const;
 
 			/**
@@ -78,7 +78,7 @@ namespace xpcc
 			dropPacket();
 
 		private:
-			typedef xpcc::SmartPointer			Payload;
+			typedef modm::SmartPointer			Payload;
 			typedef boost::mutex				Mutex;
 			typedef boost::mutex::scoped_lock	MutexGuard;
 			typedef	boost::thread				Thread;

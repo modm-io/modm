@@ -14,14 +14,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32_SPI_MASTER{{ id }}_HPP
-#define XPCC_STM32_SPI_MASTER{{ id }}_HPP
+#ifndef MODM_STM32_SPI_MASTER{{ id }}_HPP
+#define MODM_STM32_SPI_MASTER{{ id }}_HPP
 
 #include <modm/architecture/interface/spi_master.hpp>
 #include "spi_hal_{{ id }}.hpp"
 #include "type_ids.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 namespace stm32
@@ -35,7 +35,7 @@ namespace stm32
  * @author	Niklas Hauser
  * @ingroup	{{partname}}_spi
  */
-class SpiMaster{{ id }} : public xpcc::SpiMaster
+class SpiMaster{{ id }} : public modm::SpiMaster
 {
 	static uint8_t state;
 	static uint8_t count;
@@ -69,7 +69,7 @@ public:
 public:
 	// start documentation inherited
 	template< class SystemClock, uint32_t baudrate,
-			uint16_t tolerance = xpcc::Tolerance::FivePercent >
+			uint16_t tolerance = modm::Tolerance::FivePercent >
 	static void
 	initialize()
 	{
@@ -110,13 +110,13 @@ public:
 	}
 
 
-	static xpcc_always_inline void
+	static modm_always_inline void
 	setDataMode(DataMode mode)
 	{
 		SpiHal{{ id }}::setDataMode(static_cast<SpiHal{{ id }}::DataMode>(mode));
 	}
 
-	static xpcc_always_inline void
+	static modm_always_inline void
 	setDataOrder(DataOrder order)
 	{
 		SpiHal{{ id }}::setDataOrder(static_cast<SpiHal{{ id }}::DataOrder>(order));
@@ -143,16 +143,16 @@ public:
 	}
 
 
-	static xpcc::ResumableResult<uint8_t>
+	static modm::ResumableResult<uint8_t>
 	transfer(uint8_t data);
 
-	static xpcc::ResumableResult<void>
+	static modm::ResumableResult<void>
 	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
 	// end documentation inherited
 };
 
 } // namespace stm32
 
-} // namespace xpcc
+} // namespace modm
 
-#endif // XPCC_STM32_SPI_MASTER{{ id }}_HPP
+#endif // MODM_STM32_SPI_MASTER{{ id }}_HPP

@@ -12,32 +12,32 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_POLYGON_2D_HPP
+#ifndef MODM_POLYGON_2D_HPP
 	#error	"Don't include this file directly, use 'polygon_2d.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template <typename T>
-xpcc::Polygon2D<T>::Polygon2D(SizeType n) :
+modm::Polygon2D<T>::Polygon2D(SizeType n) :
 	PointSet2D<T>(n)
 {
 }
 
 template <typename T>
-xpcc::Polygon2D<T>::Polygon2D(const Polygon2D<T>& other) :
+modm::Polygon2D<T>::Polygon2D(const Polygon2D<T>& other) :
 	PointSet2D<T>(other)
 {
 }
 
 template <typename T>
-xpcc::Polygon2D<T>::Polygon2D(std::initializer_list<xpcc::Polygon2D<T>::PointType> init) :
+modm::Polygon2D<T>::Polygon2D(std::initializer_list<modm::Polygon2D<T>::PointType> init) :
 	PointSet2D<T>(init)
 {
 }
 
 template <typename T>
-xpcc::Polygon2D<T>&
-xpcc::Polygon2D<T>::operator = (const Polygon2D<T>& other)
+modm::Polygon2D<T>&
+modm::Polygon2D<T>::operator = (const Polygon2D<T>& other)
 {
 	this->points = other.points;
 	return *this;
@@ -45,8 +45,8 @@ xpcc::Polygon2D<T>::operator = (const Polygon2D<T>& other)
 
 // ----------------------------------------------------------------------------
 template <typename T>
-xpcc::Polygon2D<T>&
-xpcc::Polygon2D<T>::operator << (const xpcc::Polygon2D<T>::PointType& point)
+modm::Polygon2D<T>&
+modm::Polygon2D<T>::operator << (const modm::Polygon2D<T>::PointType& point)
 {
 	this->append(point);
 	return *this;
@@ -55,7 +55,7 @@ xpcc::Polygon2D<T>::operator << (const xpcc::Polygon2D<T>::PointType& point)
 // ----------------------------------------------------------------------------
 template <typename T>
 bool
-xpcc::Polygon2D<T>::intersects(const Polygon2D& other) const
+modm::Polygon2D<T>::intersects(const Polygon2D& other) const
 {
 	SizeType n = this->points.getSize();
 	SizeType m = other.points.getSize();
@@ -79,7 +79,7 @@ xpcc::Polygon2D<T>::intersects(const Polygon2D& other) const
 // ----------------------------------------------------------------------------
 template <typename T>
 bool
-xpcc::Polygon2D<T>::intersects(const Circle2D<T>& circle) const
+modm::Polygon2D<T>::intersects(const Circle2D<T>& circle) const
 {
 	SizeType n = this->points.getSize();
 	for (SizeType i = 0; i < n; ++i)
@@ -98,7 +98,7 @@ xpcc::Polygon2D<T>::intersects(const Circle2D<T>& circle) const
 // ----------------------------------------------------------------------------
 template <typename T>
 bool
-xpcc::Polygon2D<T>::intersects(const LineSegment2D<T>& segment) const
+modm::Polygon2D<T>::intersects(const LineSegment2D<T>& segment) const
 {
 	SizeType n = this->points.getSize();
 	for (SizeType i = 0; i < n; ++i)
@@ -116,7 +116,7 @@ xpcc::Polygon2D<T>::intersects(const LineSegment2D<T>& segment) const
 // ----------------------------------------------------------------------------
 template <typename T>
 bool
-xpcc::Polygon2D<T>::intersects(const Ray2D<T>& segment) const
+modm::Polygon2D<T>::intersects(const Ray2D<T>& segment) const
 {
 	SizeType n = this->points.getSize();
 	for (SizeType i = 0; i < n; ++i)
@@ -134,7 +134,7 @@ xpcc::Polygon2D<T>::intersects(const Ray2D<T>& segment) const
 // ----------------------------------------------------------------------------
 template <typename T>
 bool
-xpcc::Polygon2D<T>::getIntersections(const LineSegment2D<T>& segment, PointSet2D<T>& intersectionPoints) const
+modm::Polygon2D<T>::getIntersections(const LineSegment2D<T>& segment, PointSet2D<T>& intersectionPoints) const
 {
 	bool intersectionFound = false;
 	
@@ -154,7 +154,7 @@ xpcc::Polygon2D<T>::getIntersections(const LineSegment2D<T>& segment, PointSet2D
 // ----------------------------------------------------------------------------
 template <typename T>
 bool
-xpcc::Polygon2D<T>::isInside(const xpcc::Polygon2D<T>::PointType& point)
+modm::Polygon2D<T>::isInside(const modm::Polygon2D<T>::PointType& point)
 {
 	bool cw = true;
 	bool ccw = true;

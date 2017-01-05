@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_NOKIA6610_HPP
+#ifndef MODM_NOKIA6610_HPP
 #error	"Don't include this file directly, use 'nokia6610.hpp' instead!"
 #endif
 
@@ -20,7 +20,7 @@
 // ----------------------------------------------------------------------------
 template <typename SPI, typename CS, typename Reset, bool GE12>
 void
-xpcc::Nokia6610<SPI, CS, Reset, GE12>::initialize()
+modm::Nokia6610<SPI, CS, Reset, GE12>::initialize()
 {
 
 	// CS pin
@@ -31,9 +31,9 @@ xpcc::Nokia6610<SPI, CS, Reset, GE12>::initialize()
 	// Reset pin
 	Reset::setOutput();
 	Reset::reset();
-	xpcc::delayMilliseconds(1);
+	modm::delayMilliseconds(1);
 	Reset::set();
-	xpcc::delayMilliseconds(10);
+	modm::delayMilliseconds(10);
 
 
 	lcdSettings();
@@ -44,7 +44,7 @@ xpcc::Nokia6610<SPI, CS, Reset, GE12>::initialize()
 
 template <typename SPI, typename CS, typename Reset, bool GE12>
 void
-xpcc::Nokia6610<SPI, CS, Reset, GE12>::writeSpi9Bit(uint16_t data){
+modm::Nokia6610<SPI, CS, Reset, GE12>::writeSpi9Bit(uint16_t data){
 	// add new bits to temp
 	temp = temp | ((data&0x1ff)<< (7-countValidBits));
 	countValidBits += 9;
@@ -58,7 +58,7 @@ xpcc::Nokia6610<SPI, CS, Reset, GE12>::writeSpi9Bit(uint16_t data){
 
 template <typename SPI, typename CS, typename Reset, bool GE12>
 void
-xpcc::Nokia6610<SPI, CS, Reset, GE12>::writeSpi9BitFlush(){
+modm::Nokia6610<SPI, CS, Reset, GE12>::writeSpi9BitFlush(){
 	if (countValidBits > 0){
 		SPI::write(temp>>8);
 	}
@@ -69,19 +69,19 @@ xpcc::Nokia6610<SPI, CS, Reset, GE12>::writeSpi9BitFlush(){
 
 template <typename SPI, typename CS, typename Reset, bool GE12>
 void
-xpcc::Nokia6610<SPI, CS, Reset, GE12>::writeSpiCommand(uint16_t data){
+modm::Nokia6610<SPI, CS, Reset, GE12>::writeSpiCommand(uint16_t data){
 	writeSpi9Bit(data & ~0x0100);
 }
 
 template <typename SPI, typename CS, typename Reset, bool GE12>
 void
-xpcc::Nokia6610<SPI, CS, Reset, GE12>::writeSpiData(uint16_t data){
+modm::Nokia6610<SPI, CS, Reset, GE12>::writeSpiData(uint16_t data){
 	writeSpi9Bit(data | 0x0100);
 }
 
 template <typename SPI, typename CS, typename Reset, bool GE12>
 void
-xpcc::Nokia6610<SPI, CS, Reset, GE12>::setContrast(uint8_t contrast) {
+modm::Nokia6610<SPI, CS, Reset, GE12>::setContrast(uint8_t contrast) {
 	CS::reset();
 
 	if (GE12){
@@ -99,7 +99,7 @@ xpcc::Nokia6610<SPI, CS, Reset, GE12>::setContrast(uint8_t contrast) {
 
 template <typename SPI, typename CS, typename Reset, bool GE12>
 void
-xpcc::Nokia6610<SPI, CS, Reset, GE12>::lcdSettings() {
+modm::Nokia6610<SPI, CS, Reset, GE12>::lcdSettings() {
 	CS::reset();
 
 	if( GE12){
@@ -107,9 +107,9 @@ xpcc::Nokia6610<SPI, CS, Reset, GE12>::lcdSettings() {
 	else{
 		// Hardware reset
 		Reset::reset();
-		xpcc::delayMilliseconds(50);
+		modm::delayMilliseconds(50);
 		Reset::set();
-		xpcc::delayMilliseconds(50);
+		modm::delayMilliseconds(50);
 
 		// Display vontrol
 		writeSpiCommand(nokia::NOKIA_GE8_DISCTL);
@@ -128,7 +128,7 @@ xpcc::Nokia6610<SPI, CS, Reset, GE12>::lcdSettings() {
 
 		CS::set();
 		// wait aproximetly 100ms
-		xpcc::delayMilliseconds(100);
+		modm::delayMilliseconds(100);
 		CS::reset();
 
 		// Sleep out
@@ -170,7 +170,7 @@ xpcc::Nokia6610<SPI, CS, Reset, GE12>::lcdSettings() {
 
 template <typename SPI, typename CS, typename Reset, bool GE12>
 void
-xpcc::Nokia6610<SPI, CS, Reset, GE12>::update() {
+modm::Nokia6610<SPI, CS, Reset, GE12>::update() {
 	CS::reset();
 
 	if (GE12)
@@ -219,7 +219,7 @@ xpcc::Nokia6610<SPI, CS, Reset, GE12>::update() {
 	else
 	{
 		// wait approximately 100ms
-		xpcc::delayMilliseconds(100);
+		modm::delayMilliseconds(100);
 
 		// Display On
 		writeSpiCommand(nokia::NOKIA_GE8_DISON);

@@ -9,14 +9,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SOFTWARE_GPIO_HPP
-#define XPCC_SOFTWARE_GPIO_HPP
+#ifndef MODM_SOFTWARE_GPIO_HPP
+#define MODM_SOFTWARE_GPIO_HPP
 
 #include <modm/architecture/utils.hpp>
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/utils/template_metaprogramming.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -26,7 +26,7 @@ namespace xpcc
  * are dummy functions which do nothing. `read()` will always
  * return `false`.
  *
- * For example when creating a software SPI with the xpcc::SoftwareSimpleSpi
+ * For example when creating a software SPI with the modm::SoftwareSimpleSpi
  * class and the return channel (MISO - Master In Slave Out) is not needed,
  * a good way is to use this class as a parameter when defining the
  * SPI class.
@@ -41,7 +41,7 @@ namespace xpcc
  *     typedef GpioOutputD5 Mosi;
  * }
  *
- * xpcc::SoftwareSpiMaster< pin::Clk, pin::Mosi, xpcc::GpioUnused > Spi;
+ * modm::SoftwareSpiMaster< pin::Clk, pin::Mosi, modm::GpioUnused > Spi;
  *
  * ...
  * Spi::write(0xaa);
@@ -53,43 +53,43 @@ namespace xpcc
 class GpioUnused : GpioIO
 {
 public:
-	xpcc_always_inline static void
+	modm_always_inline static void
 	setOutput()
 	{
 	}
 
-	xpcc_always_inline static void
+	modm_always_inline static void
 	setOutput(bool)
 	{
 	}
 
-	xpcc_always_inline static void
+	modm_always_inline static void
 	setInput()
 	{
 	}
 
-	xpcc_always_inline static void
+	modm_always_inline static void
 	set()
 	{
 	}
 
-	xpcc_always_inline static void
+	modm_always_inline static void
 	set(bool)
 	{
 	}
 
-	xpcc_always_inline static void
+	modm_always_inline static void
 	reset()
 	{
 	}
 
-	xpcc_always_inline static void
+	modm_always_inline static void
 	toggle()
 	{
 	}
 
 	/// Always returns `false`
-	xpcc_always_inline static bool
+	modm_always_inline static bool
 	read()
 	{
 		return false;
@@ -106,7 +106,7 @@ public:
  * @code
  * #include <modm/architecture/platform.hpp>
  *
- * typedef xpcc::GpioInverted< GpioOutputB0 > Led;
+ * typedef modm::GpioInverted< GpioOutputB0 > Led;
  *
  * ...
  * Led::setOutput();
@@ -120,37 +120,37 @@ template < class Pin >
 class GpioInverted : public Pin
 {
 public:
-	xpcc_always_inline static void
+	modm_always_inline static void
 	setOutput()
 	{
 		Pin::setOutput();
 	}
 
-	xpcc_always_inline static void
+	modm_always_inline static void
 	setOutput(bool value)
 	{
 		Pin::setOutput(!value);
 	}
 
-	xpcc_always_inline static void
+	modm_always_inline static void
 	set()
 	{
 		Pin::reset();
 	}
 
-	xpcc_always_inline static void
+	modm_always_inline static void
 	set(bool value)
 	{
 		Pin::set(!value);
 	}
 
-	xpcc_always_inline static void
+	modm_always_inline static void
 	reset()
 	{
 		Pin::set();
 	}
 
-	xpcc_always_inline static bool
+	modm_always_inline static bool
 	read()
 	{
 		return !Pin::read();
@@ -221,7 +221,7 @@ public:
 	getDataOrder()
 	{ return GpioPort::DataOrder::Normal; }
 private:
-	typedef typename xpcc::tmp::Select< (width > 8),
+	typedef typename modm::tmp::Select< (width > 8),
 										uint16_t,
 										uint8_t >::Result PortType;
 
@@ -288,6 +288,6 @@ public:
 };
 /// @endcond
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif // XPCC_SOFTWARE_GPIO_HPP
+#endif // MODM_SOFTWARE_GPIO_HPP

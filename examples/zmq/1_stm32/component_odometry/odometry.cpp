@@ -12,8 +12,8 @@
 #include <modm/debug/logger.hpp>
 
 // set new log level
-#undef XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::DISABLED
+#undef MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::DISABLED
 
 #include "communication/identifier.hpp"
 #include "communication/packets.hpp"
@@ -24,8 +24,8 @@
 #include <modm/architecture/platform.hpp>
 
 // ----------------------------------------------------------------------------
-component::Odometry::Odometry(uint8_t id, xpcc::Dispatcher &communication) :
-	xpcc::AbstractComponent(id, communication),
+component::Odometry::Odometry(uint8_t id, modm::Dispatcher &communication) :
+	modm::AbstractComponent(id, communication),
 	timer(50)
 {
 }
@@ -37,9 +37,9 @@ component::Odometry::update()
 {
 	if (timer.execute())
 	{
-		XPCC_LOG_INFO << XPCC_FILE_INFO << "Odometry update" << xpcc::endl;
+		MODM_LOG_INFO << MODM_FILE_INFO << "Odometry update" << modm::endl;
 
-		robot::packet::Location location(xpcc::stm32::Timer1::getValue(), 11, 0.5);
+		robot::packet::Location location(modm::stm32::Timer1::getValue(), 11, 0.5);
 
 		robot::EventPublisher::robotLocation(getCommunicator(), location);
 	}
@@ -47,9 +47,9 @@ component::Odometry::update()
 
 void
 component::Odometry::actionSetLedRed(
-	const xpcc::ResponseHandle& responseHandle,
+	const modm::ResponseHandle& responseHandle,
 	const robot::packet::Bool *payload)
 {
-	xpcc::stm32::GpioOutputB14::set(*payload);
+	modm::stm32::GpioOutputB14::set(*payload);
 	sendResponse(responseHandle);
 }

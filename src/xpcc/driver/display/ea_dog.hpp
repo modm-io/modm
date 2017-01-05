@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_EA_DOG_HPP
-#define XPCC_EA_DOG_HPP
+#ifndef MODM_EA_DOG_HPP
+#define MODM_EA_DOG_HPP
 
 #include "st7565.hpp"
 #include "st7036.hpp"
 
-namespace xpcc
+namespace modm
 {
 	namespace st7565
 	{
@@ -48,7 +48,7 @@ namespace xpcc
 		initialize()
 		{
 			St7565<SPI, CS, A0, Reset, 102, 64, TopView>::initialize(
-					xpcc::accessor::asFlash(st7565::configuration_dogs102),
+					modm::accessor::asFlash(st7565::configuration_dogs102),
 					sizeof(st7565::configuration_dogs102));
 		}
 	};
@@ -73,7 +73,7 @@ namespace xpcc
 		initialize()
 		{
 			St7565<SPI, CS, A0, Reset, 132, 32, TopView>::initialize(
-					xpcc::accessor::asFlash(st7565::configuration_dogm132),
+					modm::accessor::asFlash(st7565::configuration_dogm132),
 					sizeof(st7565::configuration_dogm132));
 		}
 	};
@@ -98,7 +98,7 @@ namespace xpcc
 		initialize()
 		{
 			St7565<SPI, CS, A0, Reset, 128, 64, TopView>::initialize(
-					xpcc::accessor::asFlash(st7565::configuration_dogx128),
+					modm::accessor::asFlash(st7565::configuration_dogx128),
 					sizeof(st7565::configuration_dogx128));
 		}
 	};
@@ -123,7 +123,7 @@ namespace xpcc
 		initialize()
 		{
 			St7565<SPI, CS, A0, Reset, 128, 64, TopView>::initialize(
-					xpcc::accessor::asFlash(st7565::configuration_dogx128),
+					modm::accessor::asFlash(st7565::configuration_dogx128),
 					sizeof(st7565::configuration_dogx128));
 		}
 	};
@@ -169,4 +169,4 @@ namespace xpcc
 	};
 }
 
-#endif // XPCC_EA_DOG_HPP
+#endif // MODM_EA_DOG_HPP

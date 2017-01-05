@@ -10,10 +10,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LPC_UART_TYPE_IDS_HPP
-#define XPCC_LPC_UART_TYPE_IDS_HPP
+#ifndef MODM_LPC_UART_TYPE_IDS_HPP
+#define MODM_LPC_UART_TYPE_IDS_HPP
 
-namespace xpcc
+namespace modm
 {
 
 namespace lpc
@@ -27,6 +27,6 @@ namespace TypeId
 
 }	// namespace lpc
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif // XPCC_LPC_UART_TYPE_IDS_HPP
+#endif // MODM_LPC_UART_TYPE_IDS_HPP

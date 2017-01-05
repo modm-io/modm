@@ -15,16 +15,16 @@
 
 #include <modm/debug/logger/logger.hpp>
 
-#ifndef XPCC_BMP085_DATA_HPP
-#define XPCC_BMP085_DATA_HPP
+#ifndef MODM_BMP085_DATA_HPP
+#define MODM_BMP085_DATA_HPP
 
-#undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::DISABLED
+#undef  MODM_LOG_LEVEL
+#define MODM_LOG_LEVEL modm::log::DISABLED
 
 // Forward declaration the test class
 class Bmp085Test;
 
-namespace xpcc
+namespace modm
 {
 
 template < typename I2cMaster >
@@ -38,7 +38,7 @@ namespace bmp085data
  * Values are used for calculation of calibrated
  * sensor values from raw sensor data
  */
-struct xpcc_packed
+struct modm_packed
 Calibration
 {
 	int16_t  ac1;
@@ -56,11 +56,11 @@ Calibration
 	int16_t  md;
 };
 
-class xpcc_packed
+class modm_packed
 DataBase
 {
 	template < typename I2cMaster >
-	friend class ::xpcc::Bmp085;
+	friend class ::modm::Bmp085;
 
 	// Grant unit test full access to private members.
 	friend class ::Bmp085Test;
@@ -108,7 +108,7 @@ protected:
 	};
 };
 
-class xpcc_packed
+class modm_packed
 Data : public DataBase
 {
 public:
@@ -168,7 +168,7 @@ private:
 	int32_t b5; // calculated in calculateCalibratedTemperature, needed for calculateCalibratedPressure
 };
 
-class xpcc_packed
+class modm_packed
 DataDouble : public DataBase
 {
 public:
@@ -212,9 +212,9 @@ private:
 
 } // bmp085data namespace
 
-} // xpcc namespace
+} // modm namespace
 
 #include "bmp085_data_impl_fp.hpp"
 #include "bmp085_data_impl_double.hpp"
 
-#endif // XPCC_BMP085_DATA_HPP
+#endif // MODM_BMP085_DATA_HPP

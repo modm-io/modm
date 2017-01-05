@@ -58,10 +58,10 @@ namespace
 void
 MedianTest::testDefaultConstructor()
 {
-	xpcc::filter::Median<uint8_t, 3> filter3;
-	xpcc::filter::Median<uint8_t, 5> filter5;
-	xpcc::filter::Median<uint8_t, 7> filter7;
-	xpcc::filter::Median<uint8_t, 9> filter9;
+	modm::filter::Median<uint8_t, 3> filter3;
+	modm::filter::Median<uint8_t, 5> filter5;
+	modm::filter::Median<uint8_t, 7> filter7;
+	modm::filter::Median<uint8_t, 9> filter9;
 	
 	TEST_ASSERT_EQUALS(filter3.getValue(), 0);
 	TEST_ASSERT_EQUALS(filter5.getValue(), 0);
@@ -72,10 +72,10 @@ MedianTest::testDefaultConstructor()
 void
 MedianTest::testMedian()
 {
-	xpcc::filter::Median<uint8_t, 3> filter3(5);
-	xpcc::filter::Median<uint8_t, 5> filter5(5);
-	xpcc::filter::Median<uint8_t, 7> filter7(5);
-	xpcc::filter::Median<uint8_t, 9> filter9(5);
+	modm::filter::Median<uint8_t, 3> filter3(5);
+	modm::filter::Median<uint8_t, 5> filter5(5);
+	modm::filter::Median<uint8_t, 7> filter7(5);
+	modm::filter::Median<uint8_t, 9> filter9(5);
 	
 	TEST_ASSERT_EQUALS(filter3.getValue(), 5);
 	TEST_ASSERT_EQUALS(filter5.getValue(), 5);

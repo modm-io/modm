@@ -25,8 +25,8 @@ SaturatedTest::testSigned8bit()
 void
 SaturatedTest::testUnsigned8bit()
 {
-	xpcc::Saturated<uint8_t> x;
-	xpcc::Saturated<uint8_t> y(100);
+	modm::Saturated<uint8_t> x;
+	modm::Saturated<uint8_t> y(100);
 	
 	TEST_ASSERT_EQUALS(x.getValue(), 0);
 	TEST_ASSERT_EQUALS(y.getValue(), 100);
@@ -45,7 +45,7 @@ SaturatedTest::testUnsigned8bit()
 	
 	TEST_ASSERT_EQUALS(x.getValue(), 0);
 	
-	xpcc::Saturated<uint8_t> z;
+	modm::Saturated<uint8_t> z;
 	
 	x = 20;
 	y = 10;

@@ -36,7 +36,7 @@
 extern "C"
 {
 
-void xpcc_fastcode
+void modm_fastcode
 _delay_ns(uint16_t ns)
 {
 	// ns_per_loop = nanoseconds per cycle times cycles per loop ({{loop}} cycles)
@@ -46,11 +46,11 @@ _delay_ns(uint16_t ns)
 		"subs.n	%0, %0, %2"     "\n\t"  // subtract the overhead in ns from the input:          1 cycle
 	"1:  subs.n	%0, %0, %1"     "\n\t"  // subtract the ns per loop from the input:             1 cycle
 		"bpl.n	1b"             "\n\t"  // keep doing that while result is still positive:      2 cycles (when taken)
-	:: "r" (ns), "r" (xpcc::clock::ns_per_loop), "r" ({{ (overhead / loop) | int}}));
+	:: "r" (ns), "r" (modm::clock::ns_per_loop), "r" ({{ (overhead / loop) | int}}));
 	// => loop is {{loop}} cycles long
 }
 
-void xpcc_fastcode
+void modm_fastcode
 _delay_us(uint16_t us)
 {
 	if (!us) return;    // 1 cycle, or 2 when taken
@@ -61,18 +61,18 @@ _delay_us(uint16_t us)
 		"muls.n	%0, %0, %1"     "\n\t"  // get number of cycles by us * fcpu_MHz:               1-2 cycles on cm3, up to 32 cycles on cm0
 	"1:  subs.n	%0, %0, #{{loop}}"     "\n\t"  // subtract the loop cycles from the input:             1 cycle
 		"bpl.n	1b"             "\n\t"  // keep doing that while result is still positive:      2 cycles (when taken)
-	:: "r" (us), "r" (xpcc::clock::fcpu_MHz));
+	:: "r" (us), "r" (modm::clock::fcpu_MHz));
 %% else
 	uint32_t start = DWT->CYCCNT;
 	// prefer this for cores with fast hardware multiplication
-	int32_t delay = int32_t(xpcc::clock::fcpu_MHz) * us - {{ overhead }};
+	int32_t delay = int32_t(modm::clock::fcpu_MHz) * us - {{ overhead }};
 
 	while (int32_t(DWT->CYCCNT - start) < delay)
 		;
 %% endif
 }
 
-void xpcc_fastcode
+void modm_fastcode
 _delay_ms(uint16_t ms)
 {
 	if (!ms) return;    // 1 cycle, or 2 when taken
@@ -83,10 +83,10 @@ _delay_ms(uint16_t ms)
 		"muls.n	%0, %0, %1"     "\n\t"  // get number of cycles by ms * fcpu_kHz:               1-2 cycles on cm3, up to 32 cycles on cm0
 	"1:  subs.n	%0, %0, #{{loop}}"     "\n\t"  // subtract the loop cycles from the input:             1 cycle
 		"bpl.n	1b"             "\n\t"  // keep doing that while result is still positive:      2 cycles (when taken)
-	:: "r" (ms), "r" (xpcc::clock::fcpu_kHz));
+	:: "r" (ms), "r" (modm::clock::fcpu_kHz));
 %% else
 	uint32_t start = DWT->CYCCNT;
-	int32_t delay = int32_t(xpcc::clock::fcpu_kHz) * ms - {{ overhead }};
+	int32_t delay = int32_t(modm::clock::fcpu_kHz) * ms - {{ overhead }};
 
 	while (int32_t(DWT->CYCCNT - start) < delay)
 		;

@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32_ADC{{ id }}_HPP
+#ifndef MODM_STM32_ADC{{ id }}_HPP
 #	error 	"Don't include this file directly, use 'adc_{{ id }}.hpp' instead!"
 #endif
 
 template< class SystemClock, uint32_t frequency, uint16_t tolerance >
 void
-xpcc::stm32::Adc{{ id }}::initialize()
+modm::stm32::Adc{{ id }}::initialize()
 {
 	constexpr float desired = float(SystemClock::Adc) / (frequency > {{ max_frequency }} ? {{ max_frequency }} : frequency);
 
@@ -66,7 +66,7 @@ xpcc::stm32::Adc{{ id }}::initialize()
 }
 
 void
-xpcc::stm32::Adc{{ id }}::setPrescaler(const Prescaler prescaler)
+modm::stm32::Adc{{ id }}::setPrescaler(const Prescaler prescaler)
 {
 %% if target["family"] in ["f2", "f4", "f7"]
 	ADC->CCR = (ADC->CCR & ~(0b11 << 17)) | (uint32_t(prescaler) << 17);
@@ -77,7 +77,7 @@ xpcc::stm32::Adc{{ id }}::setPrescaler(const Prescaler prescaler)
 
 %% if temperature_available
 void
-xpcc::stm32::Adc{{ id }}::enableTemperatureRefVMeasurement()
+modm::stm32::Adc{{ id }}::enableTemperatureRefVMeasurement()
 {
 	%% if target["family"] in ["f2", "f4", "f7"]
 	ADC->CCR |= ADC_CCR_TSVREFE;
@@ -87,7 +87,7 @@ xpcc::stm32::Adc{{ id }}::enableTemperatureRefVMeasurement()
 }
 
 void
-xpcc::stm32::Adc{{ id }}::disableTemperatureRefVMeasurement()
+modm::stm32::Adc{{ id }}::disableTemperatureRefVMeasurement()
 {
 	%% if target["family"] in ["f2", "f4", "f7"]
 	ADC->CCR &= ~ADC_CCR_TSVREFE;
@@ -98,19 +98,19 @@ xpcc::stm32::Adc{{ id }}::disableTemperatureRefVMeasurement()
 %% endif
 
 void
-xpcc::stm32::Adc{{ id }}::setLeftAdjustResult()
+modm::stm32::Adc{{ id }}::setLeftAdjustResult()
 {
 	ADC{{ id }}->CR2 |= ADC_CR2_ALIGN;
 }
 
 void
-xpcc::stm32::Adc{{ id }}::setRightAdjustResult()
+modm::stm32::Adc{{ id }}::setRightAdjustResult()
 {
 	ADC{{ id }}->CR2 &= ~ADC_CR2_ALIGN;
 }
 
 bool
-xpcc::stm32::Adc{{ id }}::setChannel(const Channel channel,
+modm::stm32::Adc{{ id }}::setChannel(const Channel channel,
 									 const SampleTime sampleTime)
 {
 	if (uint32_t(channel) >= 18) return false;
@@ -124,14 +124,14 @@ xpcc::stm32::Adc{{ id }}::setChannel(const Channel channel,
 	return true;
 }
 
-xpcc::stm32::Adc{{ id }}::Channel
-xpcc::stm32::Adc{{ id }}::getChannel()
+modm::stm32::Adc{{ id }}::Channel
+modm::stm32::Adc{{ id }}::getChannel()
 {
 	return Channel(ADC{{ id }}->SQR3 & 0x1f);
 }
 
 bool
-xpcc::stm32::Adc{{ id }}::addChannel(const Channel channel,
+modm::stm32::Adc{{ id }}::addChannel(const Channel channel,
 									const SampleTime sampleTime)
 {
 	// read channel count
@@ -157,7 +157,7 @@ xpcc::stm32::Adc{{ id }}::addChannel(const Channel channel,
 }
 
 void
-xpcc::stm32::Adc{{ id }}::setSampleTime(const Channel channel,
+modm::stm32::Adc{{ id }}::setSampleTime(const Channel channel,
 										const SampleTime sampleTime)
 {
 	if (uint32_t(channel) < 10) {
@@ -171,26 +171,26 @@ xpcc::stm32::Adc{{ id }}::setSampleTime(const Channel channel,
 }
 
 void
-xpcc::stm32::Adc{{ id }}::enableFreeRunningMode()
+modm::stm32::Adc{{ id }}::enableFreeRunningMode()
 {
 	ADC{{ id }}->CR2 |= ADC_CR2_CONT;	// set to continuous mode
 }
 
 void
-xpcc::stm32::Adc{{ id }}::disableFreeRunningMode()
+modm::stm32::Adc{{ id }}::disableFreeRunningMode()
 {
 	ADC{{ id }}->CR2 &= ~ADC_CR2_CONT;		// set to single mode
 }
 
 void
-xpcc::stm32::Adc{{ id }}::disable()
+modm::stm32::Adc{{ id }}::disable()
 {
 	ADC{{ id }}->CR2 &= ~(ADC_CR2_ADON);		// switch off ADC
 	RCC->APB2ENR &= ~RCC_APB2ENR_ADC{{ id }}EN; // stop ADC Clock
 }
 
 void
-xpcc::stm32::Adc{{ id }}::startConversion()
+modm::stm32::Adc{{ id }}::startConversion()
 {
 	acknowledgeInterruptFlags(InterruptFlag::All);
 %% if target["family"] == "f1"
@@ -203,20 +203,20 @@ xpcc::stm32::Adc{{ id }}::startConversion()
 }
 
 bool
-xpcc::stm32::Adc{{ id }}::isConversionFinished()
+modm::stm32::Adc{{ id }}::isConversionFinished()
 {
 	return (ADC{{ id }}->SR & ADC_SR_EOC);
 }
 
 uint16_t
-xpcc::stm32::Adc{{ id }}::getValue()
+modm::stm32::Adc{{ id }}::getValue()
 {
 	return ADC{{ id }}->DR;
 }
 
 
 uint16_t
-xpcc::stm32::Adc{{ id }}::readChannel(Channel channel)
+modm::stm32::Adc{{ id }}::readChannel(Channel channel)
 {
 	if (!setChannel(channel)) return 0;
 
@@ -234,25 +234,25 @@ xpcc::stm32::Adc{{ id }}::readChannel(Channel channel)
 // below are constant the compiler is able to calculate everything at
 // compile time.
 
-#ifndef XPCC_CUSTOM_NVIC_FUNCTIONS
-#define XPCC_CUSTOM_NVIC_FUNCTIONS
+#ifndef MODM_CUSTOM_NVIC_FUNCTIONS
+#define MODM_CUSTOM_NVIC_FUNCTIONS
 
-static xpcc_always_inline void
+static modm_always_inline void
 nvicEnableInterrupt(const IRQn_Type IRQn)
 {
 	NVIC->ISER[(uint32_t(IRQn) >> 5)] = (1 << (uint32_t(IRQn) & 0x1F));
 }
 
-static xpcc_always_inline void
+static modm_always_inline void
 nvicDisableInterrupt(IRQn_Type IRQn)
 {
 	NVIC_DisableIRQ(IRQn);
 }
 
-#endif // XPCC_CUSTOM_NVIC_FUNCTIONS
+#endif // MODM_CUSTOM_NVIC_FUNCTIONS
 
 void
-xpcc::stm32::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
+modm::stm32::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
 												const bool enable)
 {
 %% if target["family"] in ["f2", "f4", "f7"]
@@ -274,25 +274,25 @@ xpcc::stm32::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
 }
 
 void
-xpcc::stm32::Adc{{ id }}::enableInterrupt(const Interrupt_t interrupt)
+modm::stm32::Adc{{ id }}::enableInterrupt(const Interrupt_t interrupt)
 {
 	ADC{{ id }}->CR1 |= interrupt.value;
 }
 
 void
-xpcc::stm32::Adc{{ id }}::disableInterrupt(const Interrupt_t interrupt)
+modm::stm32::Adc{{ id }}::disableInterrupt(const Interrupt_t interrupt)
 {
 	ADC{{ id }}->CR1 &= ~interrupt.value;
 }
 
-xpcc::stm32::Adc{{ id }}::InterruptFlag_t
-xpcc::stm32::Adc{{ id }}::getInterruptFlags()
+modm::stm32::Adc{{ id }}::InterruptFlag_t
+modm::stm32::Adc{{ id }}::getInterruptFlags()
 {
 	return InterruptFlag_t(ADC{{ id }}->SR);
 }
 
 void
-xpcc::stm32::Adc{{ id }}::acknowledgeInterruptFlags(const InterruptFlag_t flags)
+modm::stm32::Adc{{ id }}::acknowledgeInterruptFlags(const InterruptFlag_t flags)
 {
 	// Flags are cleared by writing a one to the flag position.
 	// Writing a zero is ignored.

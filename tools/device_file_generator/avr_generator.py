@@ -54,7 +54,7 @@ if __name__ == "__main__":
 	merger = DeviceMerger(devices, logger)
 	merger.mergedByPlatform('avr')
 
-	folder = os.path.join(os.path.dirname(__file__), '..', '..', 'src', 'xpcc', 'architecture', 'platform', 'devices', 'avr')
+	folder = os.path.join(os.path.dirname(__file__), '..', '..', 'src', 'modm', 'architecture', 'platform', 'devices', 'avr')
 
 	for dev in merger.mergedDevices:
 		writer = AVRDeviceWriter(dev, logger)

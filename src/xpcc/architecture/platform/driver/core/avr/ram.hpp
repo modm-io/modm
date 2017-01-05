@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_AVR_RAM_HPP
-#define	XPCC_AVR_RAM_HPP
+#ifndef	MODM_AVR_RAM_HPP
+#define	MODM_AVR_RAM_HPP
 
 #include <stdint.h>
 #include <cstddef>
 
-namespace xpcc
+namespace modm
 {
 
 namespace avr
@@ -33,7 +33,7 @@ freeMemory(void *ptr);
 
 }	// namespace avr
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif	// XPCC_AVR_RAM_HPP
+#endif	// MODM_AVR_RAM_HPP
 

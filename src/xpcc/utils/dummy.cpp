@@ -14,7 +14,7 @@
 #include "dummy.hpp"
 
 void
-xpcc::dummy()
+modm::dummy()
 {
 	// get coffee
 }

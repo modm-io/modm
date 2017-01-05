@@ -10,14 +10,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_XILINX_SPARTAN_3
-#define XPCC_XILINX_SPARTAN_3
+#ifndef MODM_XILINX_SPARTAN_3
+#define MODM_XILINX_SPARTAN_3
 
 #include <modm/architecture/architecture.hpp>
 #include <modm/architecture/interface/gpio.hpp>
 #include "fpga_type.hpp"
 
-namespace xpcc
+namespace modm
 {
 /**
  * Configure an Xilinx Spartan 3 series FPGA in Slave Serial mode.
@@ -58,4 +58,4 @@ protected:
 
 #include "xilinx_spartan3_impl.hpp"
 
-#endif // XPCC_XILINX_SPARTAN_3
+#endif // MODM_XILINX_SPARTAN_3

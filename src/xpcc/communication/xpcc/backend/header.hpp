@@ -23,7 +23,7 @@ namespace xpcc
 {
 	/**
 	 * \brief 	Header of a packet
-	 * 
+	 *
 	 * \ingroup	backend
 	 * \author	Martin Rosekeit
 	 * \author	Fabian Greif
@@ -37,7 +37,7 @@ namespace xpcc
 			RESPONSE,
 			NEGATIVE_RESPONSE,
 		};
-		
+
 	public:
 		Header() :
 			type(Type::REQUEST),
@@ -47,7 +47,7 @@ namespace xpcc
 			packetIdentifier(0)
 		{
 		}
-		
+
 		Header(Type type, bool ack,
 				uint8_t dest, uint8_t src,
 				uint8_t id) :
@@ -58,24 +58,24 @@ namespace xpcc
 			packetIdentifier(id)
 		{
 		}
-		
+
 		Type type;
 		bool isAcknowledge;
-		
+
 		uint8_t destination;
 		uint8_t source;
 		uint8_t packetIdentifier;
-		
+
 		bool
 		operator == (const Header& other) const;
 	};
-	
+
 	/**
 	 * \brief	Stream operator for a packet header
 	 * \ingroup	backend
 	 */
-	IOStream&
-	operator << (IOStream& s, const Header& header);
+	modm::IOStream&
+	operator << (modm::IOStream& s, const Header& header);
 }
 
 #endif	// XPCC_HEADER_HPP

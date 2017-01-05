@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SHIFT_REGISTER_OUTPUT_HPP
+#ifndef MODM_SHIFT_REGISTER_OUTPUT_HPP
 	#error	"Don't include this file directly, use 'shift_register_output.hpp' instead!"
 #endif
 
@@ -24,21 +24,21 @@
  */
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Store, size_t N>
-Spi xpcc::ShiftRegisterOutput<Spi, Store, N>::spi;
+Spi modm::ShiftRegisterOutput<Spi, Store, N>::spi;
 
 template <typename Spi, typename Store, size_t N>
-Store xpcc::ShiftRegisterOutput<Spi, Store, N>::store;
+Store modm::ShiftRegisterOutput<Spi, Store, N>::store;
 
 template <typename Spi, typename Store, size_t N>
-uint8_t xpcc::ShiftRegisterOutput<Spi, Store, N>::value[N];
+uint8_t modm::ShiftRegisterOutput<Spi, Store, N>::value[N];
 
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Store, size_t N>
 void
-xpcc::ShiftRegisterOutput<Spi, Store, N>::initialize()
+modm::ShiftRegisterOutput<Spi, Store, N>::initialize()
 {
 	spi.initialize();
-	store.setOutput(xpcc::Gpio::Low);
+	store.setOutput(modm::Gpio::Low);
 	
 	for (uint_fast8_t i = 0; i < N; ++i) {
 		cache[i] = 0;
@@ -48,7 +48,7 @@ xpcc::ShiftRegisterOutput<Spi, Store, N>::initialize()
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Store, size_t N>
 const uint8_t&
-xpcc::ShiftRegisterOutput<Spi, Store, N>::operator [] (uint_fast8_t port) const
+modm::ShiftRegisterOutput<Spi, Store, N>::operator [] (uint_fast8_t port) const
 {
 	return cache[port];
 }
@@ -56,7 +56,7 @@ xpcc::ShiftRegisterOutput<Spi, Store, N>::operator [] (uint_fast8_t port) const
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Store, size_t N>
 uint8_t&
-xpcc::ShiftRegisterOutput<Spi, Store, N>::operator [] (uint_fast8_t port)
+modm::ShiftRegisterOutput<Spi, Store, N>::operator [] (uint_fast8_t port)
 {
 	return cache[port];
 }
@@ -64,7 +64,7 @@ xpcc::ShiftRegisterOutput<Spi, Store, N>::operator [] (uint_fast8_t port)
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Store, size_t N>
 void
-xpcc::ShiftRegisterOutput<Spi, Store, N>::update()
+modm::ShiftRegisterOutput<Spi, Store, N>::update()
 {
 	for (int_fast8_t i = N-1; i >= 0; --i) {
 		spi.write(cache[i]);

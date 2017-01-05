@@ -14,14 +14,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_MOVING_AVERAGE_HPP
-#define XPCC_MOVING_AVERAGE_HPP
+#ifndef MODM_MOVING_AVERAGE_HPP
+#define MODM_MOVING_AVERAGE_HPP
 
 #include <cstddef>
 #include <stdint.h>
 #include <modm/utils/template_metaprogramming.hpp>
 
-namespace xpcc
+namespace modm
 {
 	namespace filter{
 		/**
@@ -56,7 +56,7 @@ namespace xpcc
 		class MovingAverage
 		{
 		private:
-			typedef typename ::xpcc::tmp::Select<
+			typedef typename ::modm::tmp::Select<
 				(N >= 256),
 				uint_fast16_t,
 				uint_fast8_t >::Result Index;
@@ -82,7 +82,7 @@ namespace xpcc
 
 // ----------------------------------------------------------------------------
 template<typename T, std::size_t N>
-xpcc::filter::MovingAverage<T, N>::MovingAverage(const T& initialValue) :
+modm::filter::MovingAverage<T, N>::MovingAverage(const T& initialValue) :
 	index(0), sum(N * initialValue)
 {
 	for (Index i = 0; i < N; ++i) {
@@ -94,7 +94,7 @@ xpcc::filter::MovingAverage<T, N>::MovingAverage(const T& initialValue) :
 // TODO implementierung für float anpassen
 template<typename T, std::size_t N>
 void
-xpcc::filter::MovingAverage<T, N>::update(const T& input)
+modm::filter::MovingAverage<T, N>::update(const T& input)
 {
 	sum -= buffer[index];
 	sum += input;
@@ -112,11 +112,11 @@ xpcc::filter::MovingAverage<T, N>::update(const T& input)
 
 template<typename T, std::size_t N>
 const T
-xpcc::filter::MovingAverage<T, N>::getValue() const
+modm::filter::MovingAverage<T, N>::getValue() const
 {
 	return (sum / N);
 }
 
 
 #include "moving_average_float_impl.hpp"
-#endif // XPCC_MOVING_AVERAGE_HPP
+#endif // MODM_MOVING_AVERAGE_HPP

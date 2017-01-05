@@ -16,8 +16,8 @@
 
 // ----------------------------------------------------------------------------
 // Set the log level
-#undef	XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::INFO
+#undef	MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::INFO
 
 // ----------------------------------------------------------------------------
 Bmp180Thread::Bmp180Thread() :
@@ -41,8 +41,8 @@ Bmp180Thread::update()
 {
 	PT_BEGIN();
 
-	XPCC_LOG_DEBUG << XPCC_FILE_INFO;
-	XPCC_LOG_DEBUG << "Ping the Barometer BMP180" << xpcc::endl;
+	MODM_LOG_DEBUG << MODM_FILE_INFO;
+	MODM_LOG_DEBUG << "Ping the Barometer BMP180" << modm::endl;
 
 	// ping the device until it responds
 	while(true)
@@ -65,8 +65,8 @@ Bmp180Thread::update()
 		PT_WAIT_UNTIL(this->timeout.isExpired());
 	}
 
-	XPCC_LOG_DEBUG << XPCC_FILE_INFO;
-	XPCC_LOG_DEBUG << "Barometer BMP180 responded" << xpcc::endl;
+	MODM_LOG_DEBUG << MODM_FILE_INFO;
+	MODM_LOG_DEBUG << "Barometer BMP180 responded" << modm::endl;
 
 	// Configure the device until it responds
 	while(true)
@@ -89,23 +89,23 @@ Bmp180Thread::update()
 		PT_WAIT_UNTIL(this->timeout.isExpired());
 	}
 
-	XPCC_LOG_DEBUG << XPCC_FILE_INFO;
-	XPCC_LOG_DEBUG << "BMP180 configured" << xpcc::endl;
+	MODM_LOG_DEBUG << MODM_FILE_INFO;
+	MODM_LOG_DEBUG << "BMP180 configured" << modm::endl;
 
-	// static xpcc::bmp085::Calibration &cal = data.getCalibration();
+	// static modm::bmp085::Calibration &cal = data.getCalibration();
 
-	// XPCC_LOG_DEBUG << "Calibration data is: \n";
-	// XPCC_LOG_DEBUG.printf(" ac1 %d\n", cal.ac1);
-	// XPCC_LOG_DEBUG.printf(" ac2 %d\n", cal.ac2);
-	// XPCC_LOG_DEBUG.printf(" ac3 %d\n", cal.ac3);
-	// XPCC_LOG_DEBUG.printf(" ac4 %d\n", cal.ac4);
-	// XPCC_LOG_DEBUG.printf(" ac5 %d\n", cal.ac5);
-	// XPCC_LOG_DEBUG.printf(" ac6 %d\n", cal.ac6);
-	// XPCC_LOG_DEBUG.printf(" b1 %d\n", cal.b1);
-	// XPCC_LOG_DEBUG.printf(" b2 %d\n", cal.b2);
-	// XPCC_LOG_DEBUG.printf(" mb %d\n", cal.mb);
-	// XPCC_LOG_DEBUG.printf(" mc %d\n", cal.mc);
-	// XPCC_LOG_DEBUG.printf(" md %d\n", cal.md);
+	// MODM_LOG_DEBUG << "Calibration data is: \n";
+	// MODM_LOG_DEBUG.printf(" ac1 %d\n", cal.ac1);
+	// MODM_LOG_DEBUG.printf(" ac2 %d\n", cal.ac2);
+	// MODM_LOG_DEBUG.printf(" ac3 %d\n", cal.ac3);
+	// MODM_LOG_DEBUG.printf(" ac4 %d\n", cal.ac4);
+	// MODM_LOG_DEBUG.printf(" ac5 %d\n", cal.ac5);
+	// MODM_LOG_DEBUG.printf(" ac6 %d\n", cal.ac6);
+	// MODM_LOG_DEBUG.printf(" b1 %d\n", cal.b1);
+	// MODM_LOG_DEBUG.printf(" b2 %d\n", cal.b2);
+	// MODM_LOG_DEBUG.printf(" mb %d\n", cal.mb);
+	// MODM_LOG_DEBUG.printf(" mc %d\n", cal.mc);
+	// MODM_LOG_DEBUG.printf(" md %d\n", cal.md);
 
 	while (true)
 	{
@@ -120,10 +120,10 @@ Bmp180Thread::update()
 			auto temp = dataA.getTemperature();
 			auto press = dataA.getPressure();
 
-			XPCC_LOG_DEBUG << XPCC_FILE_INFO;
-			XPCC_LOG_DEBUG.printf("BMP180: Calibrated temperature in 0.1 degree Celsius is : %d\n", temp  );
-			XPCC_LOG_DEBUG << XPCC_FILE_INFO;
-			XPCC_LOG_DEBUG.printf("BMP180: Calibrated pressure in Pa is                    : %d\n", press );
+			MODM_LOG_DEBUG << MODM_FILE_INFO;
+			MODM_LOG_DEBUG.printf("BMP180: Calibrated temperature in 0.1 degree Celsius is : %d\n", temp  );
+			MODM_LOG_DEBUG << MODM_FILE_INFO;
+			MODM_LOG_DEBUG.printf("BMP180: Calibrated pressure in Pa is                    : %d\n", press );
 		}
 
 		start_measurement = false;

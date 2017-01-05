@@ -12,40 +12,40 @@
 #include <modm/architecture/architecture.hpp>
 #include <modm/debug/logger.hpp>
 
-#include <xpcc_git_info.hpp>
+#include <modm_git_info.hpp>
 
 // Set the log level
-#undef	XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::INFO
+#undef	MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::INFO
 
 int
 main()
 {
-	// Let's print some information that is provided in the xpcc_git_info.hpp
-	XPCC_LOG_INFO << "Local Git User:" << xpcc::endl;
-	XPCC_LOG_INFO << "Name:  " << XPCC_GIT_CONFIG_USER_NAME      << xpcc::endl;
-	XPCC_LOG_INFO << "Email: " << XPCC_GIT_CONFIG_USER_EMAIL     << xpcc::endl;
-	XPCC_LOG_INFO << "Last Commit:" << xpcc::endl;
-	XPCC_LOG_INFO << "SHA:             " << XPCC_GIT_SHA      << xpcc::endl;
-	XPCC_LOG_INFO << "Abbreviated SHA: " << XPCC_GIT_SHA_ABBR << xpcc::endl;
-	XPCC_LOG_INFO << "Subject:         " << XPCC_GIT_SUBJECT  << xpcc::endl;
-	XPCC_LOG_INFO << xpcc::endl << "Author:" << xpcc::endl;
-	XPCC_LOG_INFO << "Name:      " << XPCC_GIT_AUTHOR                << xpcc::endl;
-	XPCC_LOG_INFO << "Email:     " << XPCC_GIT_AUTHOR_EMAIL          << xpcc::endl;
-	XPCC_LOG_INFO << "Date:      " << XPCC_GIT_AUTHOR_DATE           << xpcc::endl;
-	XPCC_LOG_INFO << "Timestamp: " << XPCC_GIT_AUTHOR_DATE_TIMESTAMP << xpcc::endl;
-	XPCC_LOG_INFO << xpcc::endl << "Committer:" << xpcc::endl;
-	XPCC_LOG_INFO << "Name:      " << XPCC_GIT_COMMITTER                << xpcc::endl;
-	XPCC_LOG_INFO << "Email:     " << XPCC_GIT_COMMITTER_EMAIL          << xpcc::endl;
-	XPCC_LOG_INFO << "Date:      " << XPCC_GIT_COMMITTER_DATE           << xpcc::endl;
-	XPCC_LOG_INFO << "Timestamp: " << XPCC_GIT_COMMITTER_DATE_TIMESTAMP << xpcc::endl;
-	XPCC_LOG_INFO << xpcc::endl << "File Status:" << xpcc::endl;
-	XPCC_LOG_INFO << "Modified:  " << XPCC_GIT_MODIFIED  << xpcc::endl;
-	XPCC_LOG_INFO << "Added:     " << XPCC_GIT_ADDED     << xpcc::endl;
-	XPCC_LOG_INFO << "Deleted:   " << XPCC_GIT_DELETED   << xpcc::endl;
-	XPCC_LOG_INFO << "Renamed:   " << XPCC_GIT_RENAMED   << xpcc::endl;
-	XPCC_LOG_INFO << "Copied:    " << XPCC_GIT_COPIED    << xpcc::endl;
-	XPCC_LOG_INFO << "Untracked: " << XPCC_GIT_UNTRACKED << xpcc::endl;
+	// Let's print some information that is provided in the modm_git_info.hpp
+	MODM_LOG_INFO << "Local Git User:" << modm::endl;
+	MODM_LOG_INFO << "Name:  " << MODM_GIT_CONFIG_USER_NAME      << modm::endl;
+	MODM_LOG_INFO << "Email: " << MODM_GIT_CONFIG_USER_EMAIL     << modm::endl;
+	MODM_LOG_INFO << "Last Commit:" << modm::endl;
+	MODM_LOG_INFO << "SHA:             " << MODM_GIT_SHA      << modm::endl;
+	MODM_LOG_INFO << "Abbreviated SHA: " << MODM_GIT_SHA_ABBR << modm::endl;
+	MODM_LOG_INFO << "Subject:         " << MODM_GIT_SUBJECT  << modm::endl;
+	MODM_LOG_INFO << modm::endl << "Author:" << modm::endl;
+	MODM_LOG_INFO << "Name:      " << MODM_GIT_AUTHOR                << modm::endl;
+	MODM_LOG_INFO << "Email:     " << MODM_GIT_AUTHOR_EMAIL          << modm::endl;
+	MODM_LOG_INFO << "Date:      " << MODM_GIT_AUTHOR_DATE           << modm::endl;
+	MODM_LOG_INFO << "Timestamp: " << MODM_GIT_AUTHOR_DATE_TIMESTAMP << modm::endl;
+	MODM_LOG_INFO << modm::endl << "Committer:" << modm::endl;
+	MODM_LOG_INFO << "Name:      " << MODM_GIT_COMMITTER                << modm::endl;
+	MODM_LOG_INFO << "Email:     " << MODM_GIT_COMMITTER_EMAIL          << modm::endl;
+	MODM_LOG_INFO << "Date:      " << MODM_GIT_COMMITTER_DATE           << modm::endl;
+	MODM_LOG_INFO << "Timestamp: " << MODM_GIT_COMMITTER_DATE_TIMESTAMP << modm::endl;
+	MODM_LOG_INFO << modm::endl << "File Status:" << modm::endl;
+	MODM_LOG_INFO << "Modified:  " << MODM_GIT_MODIFIED  << modm::endl;
+	MODM_LOG_INFO << "Added:     " << MODM_GIT_ADDED     << modm::endl;
+	MODM_LOG_INFO << "Deleted:   " << MODM_GIT_DELETED   << modm::endl;
+	MODM_LOG_INFO << "Renamed:   " << MODM_GIT_RENAMED   << modm::endl;
+	MODM_LOG_INFO << "Copied:    " << MODM_GIT_COPIED    << modm::endl;
+	MODM_LOG_INFO << "Untracked: " << MODM_GIT_UNTRACKED << modm::endl;
 
 	return 0;
 }

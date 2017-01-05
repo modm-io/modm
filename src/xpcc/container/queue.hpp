@@ -12,14 +12,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_QUEUE_HPP
-#define	XPCC_QUEUE_HPP
+#ifndef	MODM_QUEUE_HPP
+#define	MODM_QUEUE_HPP
 
 #include <cstddef>
 
 #include "deque.hpp"
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	FIFO queue
@@ -117,4 +117,4 @@ namespace xpcc
 
 }
 
-#endif	// XPCC_QUEUE_HPP
+#endif	// MODM_QUEUE_HPP

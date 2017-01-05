@@ -11,12 +11,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ALLOCATOR_STATIC_HPP
-#define XPCC_ALLOCATOR_STATIC_HPP
+#ifndef MODM_ALLOCATOR_STATIC_HPP
+#define MODM_ALLOCATOR_STATIC_HPP
 
 #include "allocator_base.hpp"
 
-namespace xpcc
+namespace modm
 {
 	namespace allocator
 	{
@@ -70,4 +70,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_ALLOCATOR_STATIC_HPP
+#endif // MODM_ALLOCATOR_STATIC_HPP

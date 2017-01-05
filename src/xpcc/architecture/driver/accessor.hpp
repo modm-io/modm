@@ -11,14 +11,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ACCESSOR_HPP
-#define XPCC_ACCESSOR_HPP
+#ifndef MODM_ACCESSOR_HPP
+#define MODM_ACCESSOR_HPP
 
 #include "accessor/ram.hpp"
 #include "accessor/flash.hpp"
 #include "accessor/unaligned.hpp"
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \defgroup	accessor	Accessor classes
@@ -34,7 +34,7 @@ namespace xpcc
 		 * \ingroup	accessor
 		 */
 		template<typename T>
-		xpcc_always_inline volatile T&
+		modm_always_inline volatile T&
 		asVolatile(T& value)
 		{
 			return (volatile T&) value;
@@ -42,4 +42,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_ACCESSOR_HPP
+#endif // MODM_ACCESSOR_HPP

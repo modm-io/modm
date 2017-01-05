@@ -21,8 +21,8 @@
 
 #include <modm/architecture/platform.hpp>
 
-using namespace xpcc::atmega;
-typedef xpcc::avr::SystemClock clock;
+using namespace modm::atmega;
+typedef modm::avr::SystemClock clock;
 
 ${includes}
 
@@ -43,10 +43,10 @@ main()
 	// initialize output device
 	GpioOutputE1::connect(Uart0::Tx);
 	GpioInputE0::connect(Uart0::Rx);
-	Uart0::initialize< clock, 115200, xpcc::Tolerance::TenPercent >();
+	Uart0::initialize< clock, 115200, modm::Tolerance::TenPercent >();
 
 	Uart0 uart;
-	xpcc::IODeviceWrapper< Uart0, xpcc::IOBuffer::BlockIfFull > loggerDevice(uart);
+	modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > loggerDevice(uart);
 
 	sei();
 

@@ -21,17 +21,17 @@
 class CanConnectorTest : public unittest::TestSuite
 {
 	void
-	checkShortMessage(const xpcc::can::Message& message) const;
+	checkShortMessage(const modm::can::Message& message) const;
 	
 	uint8_t
     getPayloadLength(uint8_t offset) const;
 	
 	void
-	checkFragmentedMessage(const xpcc::can::Message& message,
+	checkFragmentedMessage(const modm::can::Message& message,
 			uint8_t fragmentId) const;
 	
 	void
-	createMessage(xpcc::can::Message& message,
+	createMessage(modm::can::Message& message,
 			uint8_t fragmentId) const;
 public:
     virtual void

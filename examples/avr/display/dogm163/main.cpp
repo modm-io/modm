@@ -15,8 +15,8 @@
 #include <modm/driver/display.hpp>
 #include <modm/ui/display/font.hpp>
 
-using namespace xpcc::atmega;
-typedef xpcc::avr::SystemClock clock;
+using namespace modm::atmega;
+typedef modm::avr::SystemClock clock;
 
 // Graphic LCD
 namespace lcd
@@ -29,9 +29,9 @@ namespace lcd
 	typedef GpioOutputD3 Rs;
 }
 
-typedef xpcc::SoftwareSpiMaster< lcd::Scl, lcd::Mosi, lcd::Miso > SPI;
+typedef modm::SoftwareSpiMaster< lcd::Scl, lcd::Mosi, lcd::Miso > SPI;
 
-xpcc::DogM163< SPI, lcd::Cs, lcd::Rs > display;
+modm::DogM163< SPI, lcd::Cs, lcd::Rs > display;
 
 int 
 main()
@@ -43,9 +43,9 @@ main()
 	display.initialize();
 
 	display.setCursor(0, 0);
-	display << "ABCDEFGHIJKLMNOP" << xpcc::endl;
-	display << "abcdefghijklmnop" << xpcc::endl;
-	display << 0 << 12 << 345 << 6789 << "!\"§$%" << xpcc::endl;
+	display << "ABCDEFGHIJKLMNOP" << modm::endl;
+	display << "abcdefghijklmnop" << modm::endl;
+	display << 0 << 12 << 345 << 6789 << "!\"§$%" << modm::endl;
 
 	while (1)
 	{

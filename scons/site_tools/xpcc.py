@@ -51,8 +51,8 @@ def relocate_to_buildpath(env, path, strip_extension=False):
 	if strip_extension:
 		path = os.path.splitext(path)[0]
 
-	# needed when xpcc path has a symlink
-	base = os.path.realpath(env['XPCC_BASEPATH'])
+	# needed when modm path has a symlink
+	base = os.path.realpath(env['MODM_BASEPATH'])
 
 	path = os.path.relpath(path, base)
 	if path.startswith('..'):
@@ -62,7 +62,7 @@ def relocate_to_buildpath(env, path, strip_extension=False):
 			path = path[3:]
 		#path = os.path.basename(path)
 
-	return os.path.abspath(os.path.join(env['XPCC_BUILDPATH'], path))
+	return os.path.abspath(os.path.join(env['MODM_BUILDPATH'], path))
 
 def check_architecture(env, architecture):
 	if re.match(architecture, env['ARCHITECTURE']):
@@ -71,16 +71,16 @@ def check_architecture(env, architecture):
 		return False
 
 def show_defines_action(target, source, env):
-	projectConfig = env['XPCC_CONFIG']['defines'].keys()
-	keys = env['XPCC_LIBRARY_DEFINES'].keys()
+	projectConfig = env['MODM_CONFIG']['defines'].keys()
+	keys = env['MODM_LIBRARY_DEFINES'].keys()
 	keys.sort()
 
 	print ""
-	print "XPCC:"
+	print "MODM:"
 	for key in keys:
-		default = env['XPCC_LIBRARY_DEFAULT_DEFINES'][key]
+		default = env['MODM_LIBRARY_DEFAULT_DEFINES'][key]
 		if key in projectConfig:
-			value = env['XPCC_CONFIG']['defines'][key]
+			value = env['MODM_CONFIG']['defines'][key]
 			projectConfig.remove(key)
 			if value != default:
 				print "  %s => %s (default: %s)" % (key.upper(), value, default)
@@ -91,73 +91,73 @@ def show_defines_action(target, source, env):
 	if projectConfig:
 		print "\nOther:"
 		for key in projectConfig:
-			print "  %s => %s" % (key.upper(), env['XPCC_CONFIG']['defines'][key])
+			print "  %s => %s" % (key.upper(), env['MODM_CONFIG']['defines'][key])
 	print ""
 
 def show_defines(env, alias="__show"):
 	action = Action(show_defines_action, cmdstr="Show Defines:")
 	return env.AlwaysBuild(env.Alias(alias, [], action))
 
-def xpcc_library(env, buildpath=None):
-	env.AppendUnique(CPPPATH = env['XPCC_LIBRARY_PATH'])
-	env.AppendUnique(CPPPATH = os.path.join(env['XPCC_ROOTPATH'], 'ext'))
+def modm_library(env, buildpath=None):
+	env.AppendUnique(CPPPATH = env['MODM_LIBRARY_PATH'])
+	env.AppendUnique(CPPPATH = os.path.join(env['MODM_ROOTPATH'], 'ext'))
 
-	backup = env['XPCC_BUILDPATH'], env['XPCC_BASEPATH']
+	backup = env['MODM_BUILDPATH'], env['MODM_BASEPATH']
 
 	# set a new buildpath for the library
 	if buildpath is None:
-		buildpath = os.path.join(env['XPCC_BUILDPATH'], 'libxpcc')
-	env['XPCC_BUILDPATH'] = os.path.abspath(buildpath)
-	env['XPCC_BASEPATH'] = env['XPCC_ROOTPATH']
+		buildpath = os.path.join(env['MODM_BUILDPATH'], 'libmodm')
+	env['MODM_BUILDPATH'] = os.path.abspath(buildpath)
+	env['MODM_BASEPATH'] = env['MODM_ROOTPATH']
 
 	# exclude the buildpath from the FileScanner
-	exclude_from_scanner(env['XPCC_BUILDPATH'])
+	exclude_from_scanner(env['MODM_BUILDPATH'])
 
 	# build the library
 	library, defines = env.SConscript(
-			os.path.join(env['XPCC_ROOTPATH'], 'src', 'SConscript'),
+			os.path.join(env['MODM_ROOTPATH'], 'src', 'SConscript'),
 			exports = 'env')
 
-	# generate 'xpcc_config.hpp'
-	env['XPCC_LIBRARY_DEFINES'] = defines.copy()
-	env['XPCC_LIBRARY_DEFAULT_DEFINES'] = defines.copy()
+	# generate 'modm_config.hpp'
+	env['MODM_LIBRARY_DEFINES'] = defines.copy()
+	env['MODM_LIBRARY_DEFAULT_DEFINES'] = defines.copy()
 	for key in defines.iterkeys():
-		if key in env['XPCC_CONFIG']['defines']:
-			env['XPCC_LIBRARY_DEFINES'][key] = env['XPCC_CONFIG']['defines'][key]
+		if key in env['MODM_CONFIG']['defines']:
+			env['MODM_LIBRARY_DEFINES'][key] = env['MODM_CONFIG']['defines'][key]
 
 	define_list = ["#define %s %s" % (key.upper(), value) \
-				for key, value in env['XPCC_LIBRARY_DEFINES'].iteritems()]
+				for key, value in env['MODM_LIBRARY_DEFINES'].iteritems()]
 	define_list.sort()
 
 	substitutions = {
 		'defines': '\n'.join(define_list),
-		'name': env['XPCC_PROJECT_NAME']
+		'name': env['MODM_PROJECT_NAME']
 	}
 
 	file = env.Template(
-			target = os.path.join(env['XPCC_BUILDPATH'], 'xpcc_config.hpp'),
-			source = os.path.join(env['XPCC_ROOTPATH'],
-								  'templates/xpcc_config.hpp.in'),
+			target = os.path.join(env['MODM_BUILDPATH'], 'modm_config.hpp'),
+			source = os.path.join(env['MODM_ROOTPATH'],
+								  'templates/modm_config.hpp.in'),
 			substitutions = substitutions)
 
-	env.PrependUnique(LIBS = ['xpcc'])
-	env.PrependUnique(LIBPATH = [os.path.join(env['XPCC_BUILDPATH'], 'src')])
+	env.PrependUnique(LIBS = ['modm'])
+	env.PrependUnique(LIBPATH = [os.path.join(env['MODM_BUILDPATH'], 'src')])
 
 	# restore original environment
-	env['XPCC_BUILDPATH'], env['XPCC_BASEPATH'] = backup
+	env['MODM_BUILDPATH'], env['MODM_BASEPATH'] = backup
 
 	return library
 
-def xpcc_communication_header(env, xmlfile, path='.', dtdPath=None, namespace='robot'):
+def modm_communication_header(env, xmlfile, path='.', dtdPath=None, namespace='robot'):
 	files  = env.SystemCppPackets(xmlfile, path=path, dtdPath=dtdPath, namespace=namespace)
 	files += env.SystemCppIdentifier(xmlfile, path=path, dtdPath=dtdPath, namespace=namespace)
 	files += env.SystemCppCommunication(xmlfile, path=path, dtdPath=dtdPath, namespace=namespace)
 	files += env.SystemCppXpccTaskCaller(xmlfile, path=path, dtdPath=dtdPath, namespace=namespace)
-	if 'communication' in env['XPCC_CONFIG']:
+	if 'communication' in env['MODM_CONFIG']:
 		files += env.SystemCppPostman(
 				target='postman',
 				source=xmlfile,
-				container=env['XPCC_CONFIG']['communication']['container'],
+				container=env['MODM_CONFIG']['communication']['container'],
 				path=path,
 				dtdPath=dtdPath,
 				namespace=namespace)
@@ -170,14 +170,14 @@ def xpcc_communication_header(env, xmlfile, path='.', dtdPath=None, namespace='r
 	return source
 
 def generate_defines(env, filename='defines.hpp'):
-	defines = env['XPCC_CONFIG']['defines']
+	defines = env['MODM_CONFIG']['defines']
 	substitutions = {
 		'defines': '\n'.join(["#define %s %s" % (key.upper(), value) \
 				for key, value in defines.iteritems()])
 	}
 	file = env.Template(
 			target = filename,
-			source = os.path.join(env['XPCC_ROOTPATH'],
+			source = os.path.join(env['MODM_ROOTPATH'],
 								  'templates/defines.hpp.in'),
 			substitutions = substitutions)
 	return file
@@ -210,14 +210,14 @@ def detect_system(env):
 
 	# if this fails, don't bother continuing, it can only escaladate
 	env.Error("Could not detect the running platform, " + system_name + " unsupported. " \
-		"Currently supported by xpcc : Linux, Windows (MSYS, Cygwin), Darwin")
+		"Currently supported by modm : Linux, Windows (MSYS, Cygwin), Darwin")
 	env.Exit(1)
 
 def define_header(env, defines, header, comment, template="define_template.hpp.in"):
 	"""
 		Shows Scons how to build a header file containing defines.
-		The headerfile will be created in the XPCC_BUILDPATH
-		and the XPCC_BUILDPATH will be added to the include
+		The headerfile will be created in the MODM_BUILDPATH
+		and the MODM_BUILDPATH will be added to the include
 		search path.
 		:param defines: dictionary containing key value pairs
 		:param header: name of the header, #include<${header}>
@@ -232,19 +232,19 @@ def define_header(env, defines, header, comment, template="define_template.hpp.i
 	#	comment = comment[70:]
 	define_list = ["#define %s %s" % (key.upper(), value) for key, value in defines.iteritems()]
 	file = env.Template(
-		target = os.path.join(env['XPCC_BUILDPATH'], header),
-		source = os.path.join(env['XPCC_ROOTPATH'], 'templates', template),
+		target = os.path.join(env['MODM_BUILDPATH'], header),
+		source = os.path.join(env['MODM_ROOTPATH'], 'templates', template),
 		substitutions = {'defines':       '\n'.join(define_list),
 		                 'include_guard': include_guard,
 		                 'comment':       comment})
-	env.AppendUnique(CPPPATH = env['XPCC_BUILDPATH'])
+	env.AppendUnique(CPPPATH = env['MODM_BUILDPATH'])
 
 def build_info_header(env):
-	print('Building: Info Header xpcc_build_info.hpp')
+	print('Building: Info Header modm_build_info.hpp')
 	defines = {}
-	defines['XPCC_BUILD_PROJECT_NAME'] = env.CStringLiteral(env['XPCC_PROJECT_NAME'])
-	defines['XPCC_BUILD_MACHINE'] = env.CStringLiteral(platform.node())
-	defines['XPCC_BUILD_USER'] = env.CStringLiteral(getpass.getuser())
+	defines['MODM_BUILD_PROJECT_NAME'] = env.CStringLiteral(env['MODM_PROJECT_NAME'])
+	defines['MODM_BUILD_MACHINE'] = env.CStringLiteral(platform.node())
+	defines['MODM_BUILD_USER'] = env.CStringLiteral(getpass.getuser())
 	# Generate OS String
 	if env.System() == 'linux':
 		os = " ".join(platform.linux_distribution())
@@ -252,7 +252,7 @@ def build_info_header(env):
 		os = "Mac {0} ({2})".format(*platform.mac_ver())
 	else:
 		os = platform.system()
-	defines['XPCC_BUILD_OS'] = env.CStringLiteral(os)
+	defines['MODM_BUILD_OS'] = env.CStringLiteral(os)
 	# This contains the version of the compiler that is used to build the project
 	try:
 		c = subprocess.check_output([env['CXX'], '--version']).split('\n', 1)[0]
@@ -263,9 +263,9 @@ def build_info_header(env):
 	m = re.match("(?P<name>[a-z\-\+]+)[a-zA-Z\(\) ]* (?P<version>\d+\.\d+\.\d+)", c)
 	if m: comp = "{0} {1}".format(m.group('name'), m.group('version'))
 	else: comp = c
-	defines['XPCC_BUILD_COMPILER'] = env.CStringLiteral(comp)
+	defines['MODM_BUILD_COMPILER'] = env.CStringLiteral(comp)
 	c = "Its content is created by a call to env.BuildInfoHeader() in your SConstruct file."
-	env.DefineHeader(defines=defines, header="xpcc_build_info.hpp", comment=c)
+	env.DefineHeader(defines=defines, header="modm_build_info.hpp", comment=c)
 
 #def get_compiler_version_string
 
@@ -291,21 +291,21 @@ def generate(env, **kw):
 		# copy terminal settings from os.environ for color output
 		env['ENV']['TERM'] = os.environ['TERM']
 
-	# detect the rootpath to the xpcc folder
+	# detect the rootpath to the modm folder
 	rootpath = env.get('rootpath')
 
 	if rootpath is None:
 		# Check if a global environment variable exists that point to
-		# the root of the xpcc-folder
-		rootpath = ARGUMENTS.get('XPCC_HOME', None)
+		# the root of the modm-folder
+		rootpath = ARGUMENTS.get('MODM_HOME', None)
 		if rootpath is not None:
-			env.Info("Use path from 'XPCC_HOME': '%s'" % rootpath)
+			env.Info("Use path from 'MODM_HOME': '%s'" % rootpath)
 
 	if rootpath is None:
 		# try to detect the rootpath
 		sitepath = os.path.join('scons', 'site_tools')
 
-		# DefaultToolpath is used when the xpcc toolpath is added via --site-dir=$/xpcc/scons
+		# DefaultToolpath is used when the modm toolpath is added via --site-dir=$/modm/scons
 		searchpath = env.get('toolpath', []) + SCons.Tool.DefaultToolpath
 
 		for path in searchpath:
@@ -320,8 +320,8 @@ def generate(env, **kw):
 					break
 
 		if rootpath is None:
-			env.Error("Could not detect the path to the xpcc-library. Use " \
-				  "'Environment(rootpath=...)' to set the path to the root folder of xpcc.")
+			env.Error("Could not detect the path to the modm-library. Use " \
+				  "'Environment(rootpath=...)' to set the path to the root folder of modm.")
 			env.Exit(1)
 	rootpath = os.path.abspath(rootpath)
 
@@ -333,15 +333,15 @@ def generate(env, **kw):
 
 		board = parser.get('build', 'board', 'undeclared')
 		if board != 'undeclared':
-			boardpath = os.path.join(rootpath, 'src', 'xpcc', 'architecture', 'platform', 'board', board)
+			boardpath = os.path.join(rootpath, 'src', 'modm', 'architecture', 'platform', 'board', board)
 			if not os.path.exists(boardpath):
 				available = map(os.path.basename, glob.glob(os.path.dirname(boardpath) + '/*'))
 				available.remove('build.cfg')
 				env.Error("Board '{}' not found! Available boards are:\n\t- {}".format(board, "\n\t- ".join(available)))
 				env.Exit(1)
 			parser.read([os.path.join(boardpath, 'board.cfg'), configfile])
-			env['XPCC_BOARD'] = board
-			env['XPCC_BOARD_PATH'] = boardpath
+			env['MODM_BOARD'] = board
+			env['MODM_BOARD_PATH'] = boardpath
 
 		device = parser.get('build', 'device')
 
@@ -363,7 +363,7 @@ def generate(env, **kw):
 			project_name = parser.get('build', 'name', os.path.basename(os.path.dirname(configfile)))
 		else:
 			env.Warn("Specifying 'general.name' is deprecated and replaced by 'build.name'!")
-		env['XPCC_PROJECT_NAME'] = project_name
+		env['MODM_PROJECT_NAME'] = project_name
 
 		buildpath = env.get('buildpath')
 		# put together build path
@@ -375,21 +375,21 @@ def generate(env, **kw):
 		# but can be overwritten by command line
 		optimization = ARGUMENTS.get('optimization', optimization)
 
-		env['XPCC_ADDITIONAL_CCFLAGS'] = parser.get('build', 'ccflags', '').split()
+		env['MODM_ADDITIONAL_CCFLAGS'] = parser.get('build', 'ccflags', '').split()
 
 		# load parameters if available
 		if parser.has_section('parameters'):
-			env['XPCC_USER_PARAMETERS'] = parser.items('parameters')
+			env['MODM_USER_PARAMETERS'] = parser.items('parameters')
 		else:
-			env['XPCC_USER_PARAMETERS'] = []
+			env['MODM_USER_PARAMETERS'] = []
 
 		# load modules if available
-		env['XPCC_ACTIVE_MODULES'] = []
+		env['MODM_ACTIVE_MODULES'] = []
 		if parser.has_section('modules'):
 			modules = parser.items('modules')
 			for m in modules:
 				if m[1].lower() == 'include':
-					env['XPCC_ACTIVE_MODULES'].append(m[0].lower())
+					env['MODM_ACTIVE_MODULES'].append(m[0].lower())
 
 	except configparser.ParserException, msg:
 		env.Error("Error parsing file configuration file '%s':\n%s" % (configfile, str(msg)))
@@ -403,13 +403,13 @@ def generate(env, **kw):
 		configuration[section] = s
 
 
-	env['XPCC_ROOTPATH'] = rootpath			# xpcc rootpath
-	env['XPCC_BASEPATH'] = os.curdir		# path of the current project
-	env['XPCC_LIBRARY_PATH'] = os.path.join(rootpath, 'src')
-	env['XPCC_CONFIG'] = configuration
-	env['XPCC_CONFIG_FILE'] = os.path.abspath(configfile)
-	env['XPCC_SYSTEM_BUILDER'] = os.path.join(rootpath, 'tools', 'system_design', 'builder')
-	env['XPCC_DEVICE'] = device 			# needed by the platform tools
+	env['MODM_ROOTPATH'] = rootpath			# modm rootpath
+	env['MODM_BASEPATH'] = os.curdir		# path of the current project
+	env['MODM_LIBRARY_PATH'] = os.path.join(rootpath, 'src')
+	env['MODM_CONFIG'] = configuration
+	env['MODM_CONFIG_FILE'] = os.path.abspath(configfile)
+	env['MODM_SYSTEM_BUILDER'] = os.path.join(rootpath, 'tools', 'system_design', 'builder')
+	env['MODM_DEVICE'] = device 			# needed by the platform tools
 
 	# compiler optimization
 	optimization_levels = ['0', '1', '2', '3', 's']
@@ -426,7 +426,7 @@ def generate(env, **kw):
 	env.Tool('configfile')
 	env.Tool('helper')
 	env.Tool('system_design')
-	# Will validate the env['XPCC_DEVICE'] and set env['ARCHITECTURE']
+	# Will validate the env['MODM_DEVICE'] and set env['ARCHITECTURE']
 	env.Tool('platform_tools')
 
 	env.Tool('git')
@@ -437,13 +437,13 @@ def generate(env, **kw):
 	buildpath = string.Template(buildpath).safe_substitute({
 				'arch': env['ARCHITECTURE'],
 				'device': device,
-				'name': env['XPCC_PROJECT_NAME'],
-				'xpccpath': rootpath
+				'name': env['MODM_PROJECT_NAME'],
+				'modmpath': rootpath
 			})
 	buildpath = os.path.abspath(buildpath)
 	# exclude the buildpath from the FileScanner
 	exclude_from_scanner(buildpath)
-	env['XPCC_BUILDPATH'] = buildpath
+	env['MODM_BUILDPATH'] = buildpath
 
 	env['LIBS'] = ['']
 	env['LIBPATH'] = []
@@ -507,7 +507,7 @@ def generate(env, **kw):
 			env['ARM_ARCH'] = env['ARCHITECTURE']
 		env['ARM_DEVICE'] = device
 		env['ARM_CLOCK'] = clock
-		if clock != "NaN" and not 'freertos' in env['XPCC_ACTIVE_MODULES']:
+		if clock != "NaN" and not 'freertos' in env['MODM_ACTIVE_MODULES']:
 			env.Warn("Specifying clock for ARM devices is deprecated.")
 
 		env.Tool('arm')
@@ -553,7 +553,7 @@ def generate(env, **kw):
 			env.Error("Error in Configuration: %s" % e)
 
 	else:
-		env.Error("xpcc Error: Unknown architecture '%s'!" % env['ARCHITECTURE'])
+		env.Error("modm Error: Unknown architecture '%s'!" % env['ARCHITECTURE'])
 		Exit(1)
 
 	# append all values from environment section to the real environment
@@ -604,8 +604,8 @@ def generate(env, **kw):
 	env.AddMethod(relocate_to_buildpath, 'Buildpath')
 	env.AddMethod(check_architecture, 'CheckArchitecture')
 	env.AddMethod(show_defines, 'ShowDefines')
-	env.AddMethod(xpcc_library, 'XpccLibrary')
-	env.AddMethod(xpcc_communication_header, 'XpccCommunication')
+	env.AddMethod(modm_library, 'ModmLibrary')
+	env.AddMethod(modm_communication_header, 'XpccCommunication')
 	env.AddMethod(generate_defines, 'Defines')
 	env.AddMethod(c_string_literal, 'CStringLiteral')
 	env.AddMethod(define_header, 'DefineHeader')

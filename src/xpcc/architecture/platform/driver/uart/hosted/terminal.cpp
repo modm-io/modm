@@ -18,25 +18,25 @@
 
 // ----------------------------------------------------------------------------
 void
-xpcc::pc::Terminal::write(char c)
+modm::pc::Terminal::write(char c)
 {
 	std::cout << c;
 }
 
 void
-xpcc::pc::Terminal::write(const char* s)
+modm::pc::Terminal::write(const char* s)
 {
 	std::cout << s;
 }
 
 void
-xpcc::pc::Terminal::flush()
+modm::pc::Terminal::flush()
 {
 	std::cout << std::flush;
 }
 
 bool
-xpcc::pc::Terminal::read(char& value)
+modm::pc::Terminal::read(char& value)
 {
 	std::cin.get(value);
 	return std::cin.good();

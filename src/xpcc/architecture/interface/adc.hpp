@@ -9,8 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_INTERFACE_ADC_HPP
-#define XPCC_INTERFACE_ADC_HPP
+#ifndef MODM_INTERFACE_ADC_HPP
+#define MODM_INTERFACE_ADC_HPP
 
 #include <modm/architecture/interface.hpp>
 
@@ -19,7 +19,7 @@
  * @defgroup	adc		Analog-to-Digital Converter
  */
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -53,7 +53,7 @@ namespace xpcc
  * @author	Niklas Hauser
  * @ingroup adc
  */
-class Adc : public ::xpcc::Peripheral
+class Adc : public ::modm::Peripheral
 {
 #ifdef __DOXYGEN__
 public:
@@ -153,6 +153,6 @@ public:
 #endif
 };
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif // XPCC_INTERFACE_ADC_HPP
+#endif // MODM_INTERFACE_ADC_HPP

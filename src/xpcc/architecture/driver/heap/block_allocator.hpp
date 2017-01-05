@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_BLOCK_ALLOCATOR_HPP
-#define XPCC_BLOCK_ALLOCATOR_HPP
+#ifndef MODM_BLOCK_ALLOCATOR_HPP
+#define MODM_BLOCK_ALLOCATOR_HPP
 
 #include <stdint.h>
 #include <cstddef>
@@ -35,12 +35,12 @@
  * \author	Fabian Greif
  */
 
-namespace xpcc
+namespace modm
 {
 	template <typename T, unsigned int BLOCK_SIZE >
 	class BlockAllocator
 	{
-		typedef typename xpcc::ArithmeticTraits<T>::SignedType SignedType;
+		typedef typename modm::ArithmeticTraits<T>::SignedType SignedType;
 		
 	public:
 		/**
@@ -55,14 +55,14 @@ namespace xpcc
 		 * 		Needs to point directly above the last available memory
 		 * 		position.
 		 */
-		xpcc_always_inline void
+		modm_always_inline void
 		initialize(void * heapStart, void * heapEnd);
 		
 		/**
 		 * Allocate memory
 		 * 
 		 */
-		xpcc_always_inline void *
+		modm_always_inline void *
 		allocate(std::size_t requestedSize);
 		
 		/**
@@ -72,7 +72,7 @@ namespace xpcc
 		 * 		Must be the same pointer previously acquired by
 		 * 		allocate().
 		 */
-		xpcc_always_inline void
+		modm_always_inline void
 		free(void *ptr);
 		
 	public:
@@ -80,8 +80,8 @@ namespace xpcc
 		getAvailableSize() const;
 		
 	private:
-		// Align the pointer to a multiple of XPCC_ALIGNMENT
-		xpcc_always_inline T *
+		// Align the pointer to a multiple of MODM_ALIGNMENT
+		modm_always_inline T *
 		alignPointer(void * ptr) const;
 		
 		//static const int MAX_BLOCK_PARTS = 2048;
@@ -95,4 +95,4 @@ namespace xpcc
 
 #include "block_allocator_impl.hpp"
 
-#endif	// XPCC_BLOCK_ALLOCATOR_HPP
+#endif	// MODM_BLOCK_ALLOCATOR_HPP

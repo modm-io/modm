@@ -24,8 +24,8 @@
 
 #include <modm/debug/logger.hpp>
 
-#undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::WARNING
+#undef  MODM_LOG_LEVEL
+#define MODM_LOG_LEVEL modm::log::WARNING
 
 // ----------------------------------------------------------------------------
 xpcc::tipc::ReceiverSocket::ReceiverSocket() :
@@ -55,7 +55,7 @@ xpcc::tipc::ReceiverSocket::registerOnPacket(	unsigned int typeId,
 	fromAddress.addr.nameseq.upper	=	upperInstance;
 	fromAddress.scope				=	TIPC_CLUSTER_SCOPE;	// Scope of puplisching is cluster (node < cluster < zone)
 
-	XPCC_LOG_INFO << XPCC_FILE_INFO << "(typeId, lowerBound, upperBound) = (" << typeId << ", " << lowerInstance << ", " << upperInstance << ")" << xpcc::flush;
+	MODM_LOG_INFO << MODM_FILE_INFO << "(typeId, lowerBound, upperBound) = (" << typeId << ", " << lowerInstance << ", " << upperInstance << ")" << modm::flush;
 
 	// Binding means registering to a specific packet
 	result = 	bind (	this->socketDescriptor_,
@@ -65,7 +65,7 @@ xpcc::tipc::ReceiverSocket::registerOnPacket(	unsigned int typeId,
 	// If there was an error binding the socket throw an exception because this case
 	// cannot be handled here.
 	if (0 != result) {
-		XPCC_LOG_ERROR << XPCC_FILE_INFO << "Port {" << typeId << ", " << lowerInstance << ", " << upperInstance << "}  could not be created." << xpcc::flush;
+		MODM_LOG_ERROR << MODM_FILE_INFO << "Port {" << typeId << ", " << lowerInstance << ", " << upperInstance << "}  could not be created." << modm::flush;
 		// TODO: Throw an exception!!
 	}
 }
@@ -99,20 +99,20 @@ xpcc::tipc::ReceiverSocket::receiveHeader(
 		return true;
 	}
 	else if ( errno == EWOULDBLOCK ) {
-//		XPCC_LOG_DEBUG << __FILE__ << __FUNCTION__ << " no data in buffer" << xpcc::flush;
+//		MODM_LOG_DEBUG << __FILE__ << __FUNCTION__ << " no data in buffer" << modm::flush;
 		// no data in the buffer
 	}
 	else if ( errno == 9 ) {
-		xpcc::log::error
-				<< XPCC_FILE_INFO
+		modm::log::error
+				<< MODM_FILE_INFO
 				<< "Bad file descriptor"
-				<< xpcc::flush;
+				<< modm::flush;
 	}
 	else {
-		xpcc::log::error
-				<< XPCC_FILE_INFO
+		modm::log::error
+				<< MODM_FILE_INFO
 				<< "Sorry: unknown Error while receiving data. errno=" << errno
-				<< xpcc::flush;
+				<< modm::flush;
 		// TODO: Error handling??!!
 	}
 
@@ -140,31 +140,31 @@ xpcc::tipc::ReceiverSocket::receivePayload(uint8_t* payloadPointer, size_t paylo
 		// Copy the payload-part of the packet to it's destination!
 		memcpy(payloadPointer, packetPointer.get()+sizeof(Header), payloadLength);
 
-/*		XPCC_LOG_DEBUG << __FILE__ << __FUNCTION__;
+/*		MODM_LOG_DEBUG << __FILE__ << __FUNCTION__;
 		for(unsigned int i=0; i<payloadLength; i++) {
-			XPCC_LOG_DEBUG << " " << (int)(*(payloadPointer+i));
+			MODM_LOG_DEBUG << " " << (int)(*(payloadPointer+i));
 		}
-		XPCC_LOG_DEBUG << xpcc::flush;
+		MODM_LOG_DEBUG << modm::flush;
 */
 		return true;
 	}
 	else if ( errno == EWOULDBLOCK ) {
-		xpcc::log::debug
-				<< XPCC_FILE_INFO
+		modm::log::debug
+				<< MODM_FILE_INFO
 				<< "no data in buffer"
-				<< xpcc::flush;
+				<< modm::flush;
 		// no data in the buffer
 	}
 	else if ( errno == 9 ) {
-		xpcc::log::error
-				<< XPCC_FILE_INFO
+		modm::log::error
+				<< MODM_FILE_INFO
 				<< "Bad file descriptor"
-				<< xpcc::flush;
+				<< modm::flush;
 	}
 	else {
-		xpcc::log::error
-				<< XPCC_FILE_INFO
-				<< xpcc::flush;
+		modm::log::error
+				<< MODM_FILE_INFO
+				<< modm::flush;
 		// TODO: Error handling??!!
 	}
 
@@ -189,22 +189,22 @@ xpcc::tipc::ReceiverSocket::popPayload()
 		return true;
 	}
 	else if ( errno == EWOULDBLOCK ) {
-		xpcc::log::debug
-				<< XPCC_FILE_INFO
+		modm::log::debug
+				<< MODM_FILE_INFO
 				<< "no data in buffer"
-				<< xpcc::flush;
+				<< modm::flush;
 		// no data in the buffer
 	}
 	else if ( errno == 9 ) {
-		xpcc::log::error
-				<< XPCC_FILE_INFO
+		modm::log::error
+				<< MODM_FILE_INFO
 				<< " Bad file descriptor"
-				<< xpcc::flush;
+				<< modm::flush;
 	}
 	else {
-		xpcc::log::error
-				<< XPCC_FILE_INFO
-				<< xpcc::flush;
+		modm::log::error
+				<< MODM_FILE_INFO
+				<< modm::flush;
 		// TODO: Error handling??!!
 	}
 

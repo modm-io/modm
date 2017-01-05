@@ -14,25 +14,25 @@
 #include "../mutex.hpp"
 
 // ----------------------------------------------------------------------------
-xpcc::rtos::Mutex::Mutex()
+modm::rtos::Mutex::Mutex()
 {
 	this->handle = xSemaphoreCreateMutex();
 }
 
-xpcc::rtos::Mutex::~Mutex()
+modm::rtos::Mutex::~Mutex()
 {
 	vQueueDelete(this->handle);
 }
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::rtos::Mutex::acquire(portTickType timeout)
+modm::rtos::Mutex::acquire(portTickType timeout)
 {
 	return (xSemaphoreTake(this->handle, timeout) == pdTRUE);
 }
 
 void
-xpcc::rtos::Mutex::release()
+modm::rtos::Mutex::release()
 {
 	xSemaphoreGive(this->handle);
 }

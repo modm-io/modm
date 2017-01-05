@@ -15,8 +15,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_GUI_VIEW_HPP
-#define XPCC_GUI_VIEW_HPP
+#ifndef MODM_GUI_VIEW_HPP
+#define MODM_GUI_VIEW_HPP
 
 #include "../display/graphic_display.hpp"
 
@@ -26,7 +26,7 @@
 
 #include "../menu/abstract_view.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 namespace gui
@@ -41,7 +41,7 @@ class GuiViewStack;
  * @ingroup	gui
  * @author	Thorsten Lajewski
  */
-class View : public xpcc::AbstractView
+class View : public modm::AbstractView
 {
 	friend class GuiViewStack;
 
@@ -51,7 +51,7 @@ public:
 	 * @param identifier can be used to determine which screen is the currently
 	 *        displayed on the graphicDisplay
 	 */
-	View(xpcc::gui::GuiViewStack* stack, uint8_t identifier, xpcc::gui::Dimension dimension);
+	View(modm::gui::GuiViewStack* stack, uint8_t identifier, modm::gui::Dimension dimension);
 
 	virtual
 	~View() = 0;
@@ -77,7 +77,7 @@ public:
 
 	/// Add widget to view
 	bool
-	pack(Widget *w, const xpcc::glcd::Point &coord);
+	pack(Widget *w, const modm::glcd::Point &coord);
 
 	/// Remove the view from the screen. The viewStack handles the deletion.
 	void
@@ -99,22 +99,22 @@ public:
 	void
 	markDrawn();
 
-	inline xpcc::gui::GuiViewStack*
+	inline modm::gui::GuiViewStack*
 	getViewStack()
 	{
 		return stack;
 	}
 
 protected:
-	xpcc::gui::GuiViewStack* stack;
+	modm::gui::GuiViewStack* stack;
 	Dimension dimension;
 	WidgetContainer widgets;
 
-	xpcc::gui::ColorPalette colorpalette;
+	modm::gui::ColorPalette colorpalette;
 };
 
 }	// namespace gui
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif  // XPCC_GUI_VIEW_HPP
+#endif  // MODM_GUI_VIEW_HPP

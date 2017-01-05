@@ -15,7 +15,7 @@
 #include "widget.hpp"
 
 bool
-xpcc::gui::WidgetGroup::pack(Widget* w, const xpcc::glcd::Point& coord)
+modm::gui::WidgetGroup::pack(Widget* w, const modm::glcd::Point& coord)
 {
 	if(coord.x > (this->dimension.width - w->dimension.width ) || coord.y > (this->dimension.height - w->dimension.height) || coord.x < 0 || coord.y < 0)
 		return false;
@@ -35,7 +35,7 @@ xpcc::gui::WidgetGroup::pack(Widget* w, const xpcc::glcd::Point& coord)
 }
 
 void
-xpcc::gui::WidgetGroup::render(View* view)
+modm::gui::WidgetGroup::render(View* view)
 {
 	/* draw all widgets */
 	for(auto iter = widgets.begin(); iter != widgets.end(); ++iter)
@@ -47,7 +47,7 @@ xpcc::gui::WidgetGroup::render(View* view)
 	}
 }
 
-void xpcc::gui::WidgetGroup::setColorPalette(ColorPalette& cp)
+void modm::gui::WidgetGroup::setColorPalette(ColorPalette& cp)
 {
 	this->setColorPalette(cp);
 
@@ -58,7 +58,7 @@ void xpcc::gui::WidgetGroup::setColorPalette(ColorPalette& cp)
 }
 
 void
-xpcc::gui::WidgetGroup::setPosition(const xpcc::glcd::Point& pos)
+modm::gui::WidgetGroup::setPosition(const modm::glcd::Point& pos)
 {
 	/* the same as in Widget::setPosition() */
 	this->setRelativePosition(pos);
@@ -72,7 +72,7 @@ xpcc::gui::WidgetGroup::setPosition(const xpcc::glcd::Point& pos)
 }
 
 void
-xpcc::gui::Widget::updateIntersections(WidgetContainer *widgets)
+modm::gui::Widget::updateIntersections(WidgetContainer *widgets)
 {
 	/* clear list, but keep size. it won't shrink unless widgets will be removed */
 	this->intersecting_widgets.removeAll();
@@ -93,13 +93,13 @@ xpcc::gui::Widget::updateIntersections(WidgetContainer *widgets)
 }
 
 bool
-xpcc::gui::Widget::hasIntersections()
+modm::gui::Widget::hasIntersections()
 {
 	return !this->intersecting_widgets.isEmpty();
 }
 
 bool
-xpcc::gui::Widget::checkIntersection(Widget* w)
+modm::gui::Widget::checkIntersection(Widget* w)
 {
 	/* intersection with itself makes no sense */
 	if(w->uid == this->uid)
@@ -107,11 +107,11 @@ xpcc::gui::Widget::checkIntersection(Widget* w)
 
 	/* coordinates of upper left and lower right corner of this widget */
 	auto upper_left = this->getPosition();
-	auto lower_right = xpcc::glcd::Point(upper_left.x + this->getWidth(), upper_left.y + this->getHeight());
+	auto lower_right = modm::glcd::Point(upper_left.x + this->getWidth(), upper_left.y + this->getHeight());
 
 	/* coordinates of upper left and lower right corner of the argument Widget* w */
 	auto upper_left2 = w->getPosition();
-	auto lower_right2 = xpcc::glcd::Point(upper_left2.x + w->getWidth(), upper_left2.y + w->getHeight());
+	auto lower_right2 = modm::glcd::Point(upper_left2.x + w->getWidth(), upper_left2.y + w->getHeight());
 
 	/* check if rectangles contituted by precedingly defined
 	 * coordinates DON'T overlap
@@ -129,7 +129,7 @@ xpcc::gui::Widget::checkIntersection(Widget* w)
 }
 
 bool
-xpcc::gui::Widget::handleInputEvent(const InputEvent* ev)
+modm::gui::Widget::handleInputEvent(const InputEvent* ev)
 {
 	/* absolute position of widget */
 	auto position = this->getPosition();
@@ -143,9 +143,9 @@ xpcc::gui::Widget::handleInputEvent(const InputEvent* ev)
 		/* check if widget has interaction */
 		if(this->isInteractive())
 		{
-			if(ev->direction == xpcc::gui::InputEvent::Direction::DOWN) {
+			if(ev->direction == modm::gui::InputEvent::Direction::DOWN) {
 				this->activate(*ev, this->cbData);
-			} else if(ev->direction == xpcc::gui::InputEvent::Direction::UP) {
+			} else if(ev->direction == modm::gui::InputEvent::Direction::UP) {
 				this->deactivate(*ev, this->cbData);
 			}
 		}
@@ -157,7 +157,7 @@ xpcc::gui::Widget::handleInputEvent(const InputEvent* ev)
 }
 
 bool
-xpcc::gui::WidgetGroup::handleInputEvent(const InputEvent* ev)
+modm::gui::WidgetGroup::handleInputEvent(const InputEvent* ev)
 {
 	for(auto iter = widgets.begin(); iter != widgets.end(); ++iter)
 	{

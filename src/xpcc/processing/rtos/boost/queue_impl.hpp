@@ -11,24 +11,24 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_BOOST_QUEUE_HPP
+#ifndef MODM_BOOST_QUEUE_HPP
 #	error "Don't use this file directly, use 'queue.hpp' instead!"
 #endif
 
 template <typename T>
-xpcc::rtos::Queue<T>::Queue(uint32_t length) :
+modm::rtos::Queue<T>::Queue(uint32_t length) :
 	maxSize(length)
 {
 }
 
 template <typename T>
-xpcc::rtos::Queue<T>::~Queue()
+modm::rtos::Queue<T>::~Queue()
 {
 }
 
 template <typename T>
 std::size_t
-xpcc::rtos::Queue<T>::getSize() const
+modm::rtos::Queue<T>::getSize() const
 {
 	boost::lock_guard<boost::timed_mutex> lock(mutex);
 	deque.size();
@@ -36,7 +36,7 @@ xpcc::rtos::Queue<T>::getSize() const
 
 template <typename T>
 bool
-xpcc::rtos::Queue<T>::append(const T& item, uint32_t timeout = -1)
+modm::rtos::Queue<T>::append(const T& item, uint32_t timeout = -1)
 {
 	if (!mutex.timed_lock(boost::posix_time::milliseconds(timeout)) ||
 			deque.size() >= maxSize) {
@@ -49,7 +49,7 @@ xpcc::rtos::Queue<T>::append(const T& item, uint32_t timeout = -1)
 
 template <typename T>
 bool
-xpcc::rtos::Queue<T>::prepend(const T& item, uint32_t timeout = -1)
+modm::rtos::Queue<T>::prepend(const T& item, uint32_t timeout = -1)
 {
 	if (!mutex.timed_lock(boost::posix_time::milliseconds(timeout))) {
 		return false;
@@ -69,7 +69,7 @@ xpcc::rtos::Queue<T>::prepend(const T& item, uint32_t timeout = -1)
 // ----------------------------------------------------------------------------
 template <typename T>
 bool
-xpcc::rtos::Queue<T>::peek(T& item, uint32_t timeout = -1) const
+modm::rtos::Queue<T>::peek(T& item, uint32_t timeout = -1) const
 {
 	if (!mutex.timed_lock(boost::posix_time::milliseconds(timeout))) {
 		return false;
@@ -88,7 +88,7 @@ xpcc::rtos::Queue<T>::peek(T& item, uint32_t timeout = -1) const
 
 template <typename T>
 bool
-xpcc::rtos::Queue<T>::get(T& item, uint32_t timeout = -1)
+modm::rtos::Queue<T>::get(T& item, uint32_t timeout = -1)
 {
 	if (!mutex.timed_lock(boost::posix_time::milliseconds(timeout))) {
 		return false;
@@ -109,21 +109,21 @@ xpcc::rtos::Queue<T>::get(T& item, uint32_t timeout = -1)
 // ----------------------------------------------------------------------------
 template <typename T>
 inline bool
-xpcc::rtos::Queue<T>::appendFromInterrupt(const T& item)
+modm::rtos::Queue<T>::appendFromInterrupt(const T& item)
 {
 	return append(item);
 }
 
 template <typename T>
 inline bool
-xpcc::rtos::Queue<T>::prependFromInterrupt(const T& item)
+modm::rtos::Queue<T>::prependFromInterrupt(const T& item)
 {
 	return prepend(item);
 }
 
 template <typename T>
 inline bool
-xpcc::rtos::Queue<T>::getFromInterrupt(T& item)
+modm::rtos::Queue<T>::getFromInterrupt(T& item)
 {
 	return get(item);
 }

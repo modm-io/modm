@@ -12,13 +12,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_COMMON_CLOCK_HPP
-#define XPCC_COMMON_CLOCK_HPP
+#ifndef MODM_COMMON_CLOCK_HPP
+#define MODM_COMMON_CLOCK_HPP
 
 #include <stdint.h>
 #include <modm/architecture/utils.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 namespace clock
@@ -78,18 +78,18 @@ enum Frequency
 static constexpr int
 MHz(int f) { return (f == HzDontCare)? HzDontCare : (f / MHz1); }
 
-xpcc_unused
+modm_unused
 static constexpr uint32_t
 u32MHz(int f) { return static_cast<uint32_t>(MHz(f)); }
 
 static constexpr int
 kHz(int f) { return (f == HzDontCare)? HzDontCare : (f / kHz1); }
 
-xpcc_unused
+modm_unused
 static constexpr uint32_t
 u32kHz(int f) { return static_cast<uint32_t>(kHz(f)); }
 
-xpcc_unused
+modm_unused
 static constexpr int
 Hz(int f)  { return (f == HzDontCare)? HzDontCare : (f / Hz1); }
 
@@ -113,13 +113,13 @@ StartupError : uint8_t
 	WatchdogClock
 };
 
-extern uint32_t xpcc_fastdata fcpu;
-extern uint32_t xpcc_fastdata fcpu_kHz;
-extern uint16_t xpcc_fastdata fcpu_MHz;
-extern uint16_t xpcc_fastdata ns_per_loop;
+extern uint32_t modm_fastdata fcpu;
+extern uint32_t modm_fastdata fcpu_kHz;
+extern uint16_t modm_fastdata fcpu_MHz;
+extern uint16_t modm_fastdata ns_per_loop;
 
 }	// namespace clock
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif	// XPCC_COMMON_CLOCK_HPP
+#endif	// MODM_COMMON_CLOCK_HPP

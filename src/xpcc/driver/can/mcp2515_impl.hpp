@@ -13,7 +13,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_MCP2515_HPP
+#ifndef MODM_MCP2515_HPP
 	#error	"Don't include this file directly, use 'mcp2515.hpp' instead!"
 #endif
 
@@ -21,16 +21,16 @@
 
 // ----------------------------------------------------------------------------
 template <typename SPI, typename CS, typename INT>
-SPI xpcc::Mcp2515<SPI, CS, INT>::spi;
+SPI modm::Mcp2515<SPI, CS, INT>::spi;
 
 template <typename SPI, typename CS, typename INT>
-CS xpcc::Mcp2515<SPI, CS, INT>::chipSelect;
+CS modm::Mcp2515<SPI, CS, INT>::chipSelect;
 
 template <typename SPI, typename CS, typename INT>
-INT xpcc::Mcp2515<SPI, CS, INT>::interruptPin;
+INT modm::Mcp2515<SPI, CS, INT>::interruptPin;
 
 // ----------------------------------------------------------------------------
-namespace xpcc
+namespace modm
 {
 	namespace mcp2515
 	{
@@ -41,7 +41,7 @@ namespace xpcc
 // ----------------------------------------------------------------------------
 template <typename SPI, typename CS, typename INT>
 bool
-xpcc::Mcp2515<SPI, CS, INT>::initialize(uint32_t bitrate)
+modm::Mcp2515<SPI, CS, INT>::initialize(uint32_t bitrate)
 {
 	using namespace mcp2515;
 
@@ -49,11 +49,11 @@ xpcc::Mcp2515<SPI, CS, INT>::initialize(uint32_t bitrate)
 	// configuration mode
 	chipSelect.reset();
 	spi.transferBlocking(RESET);
-	xpcc::delayMilliseconds(1);
+	modm::delayMilliseconds(1);
 	chipSelect.set();
 
 	// wait a bit to give the MCP2515 some time to restart
-	xpcc::delayMilliseconds(30);
+	modm::delayMilliseconds(30);
 
 	chipSelect.reset();
 	spi.transferBlocking(WRITE);
@@ -96,7 +96,7 @@ xpcc::Mcp2515<SPI, CS, INT>::initialize(uint32_t bitrate)
 // ----------------------------------------------------------------------------
 template <typename SPI, typename CS, typename INT>
 void
-xpcc::Mcp2515<SPI, CS, INT>::setFilter(accessor::Flash<uint8_t> filter)
+modm::Mcp2515<SPI, CS, INT>::setFilter(accessor::Flash<uint8_t> filter)
 {
 	using namespace mcp2515;
 
@@ -131,7 +131,7 @@ xpcc::Mcp2515<SPI, CS, INT>::setFilter(accessor::Flash<uint8_t> filter)
 // ----------------------------------------------------------------------------
 template <typename SPI, typename CS, typename INT>
 void
-xpcc::Mcp2515<SPI, CS, INT>::setMode(Can::Mode mode)
+modm::Mcp2515<SPI, CS, INT>::setMode(Can::Mode mode)
 {
 	using namespace mcp2515;
 
@@ -154,7 +154,7 @@ xpcc::Mcp2515<SPI, CS, INT>::setMode(Can::Mode mode)
 // ----------------------------------------------------------------------------
 template <typename SPI, typename CS, typename INT>
 bool
-xpcc::Mcp2515<SPI, CS, INT>::isMessageAvailable()
+modm::Mcp2515<SPI, CS, INT>::isMessageAvailable()
 {
 	return !interruptPin.read();
 }
@@ -162,7 +162,7 @@ xpcc::Mcp2515<SPI, CS, INT>::isMessageAvailable()
 // ----------------------------------------------------------------------------
 template <typename SPI, typename CS, typename INT>
 bool
-xpcc::Mcp2515<SPI, CS, INT>::getMessage(can::Message& message)
+modm::Mcp2515<SPI, CS, INT>::getMessage(can::Message& message)
 {
 	using namespace mcp2515;
 
@@ -210,7 +210,7 @@ xpcc::Mcp2515<SPI, CS, INT>::getMessage(can::Message& message)
 
 template <typename SPI, typename CS, typename INT>
 bool
-xpcc::Mcp2515<SPI, CS, INT>::isReadyToSend()
+modm::Mcp2515<SPI, CS, INT>::isReadyToSend()
 {
 	using namespace mcp2515;
 
@@ -229,7 +229,7 @@ xpcc::Mcp2515<SPI, CS, INT>::isReadyToSend()
 
 template <typename SPI, typename CS, typename INT>
 bool
-xpcc::Mcp2515<SPI, CS, INT>::sendMessage(const can::Message& message)
+modm::Mcp2515<SPI, CS, INT>::sendMessage(const can::Message& message)
 {
 	using namespace mcp2515;
 
@@ -266,7 +266,7 @@ xpcc::Mcp2515<SPI, CS, INT>::sendMessage(const can::Message& message)
 	}
 	chipSelect.set();
 
-	xpcc::delayMicroseconds(1);
+	modm::delayMicroseconds(1);
 
 	// send message via RTS command
 	chipSelect.reset();
@@ -281,7 +281,7 @@ xpcc::Mcp2515<SPI, CS, INT>::sendMessage(const can::Message& message)
 
 template <typename SPI, typename CS, typename INT>
 void
-xpcc::Mcp2515<SPI, CS, INT>::writeRegister(uint8_t address, uint8_t data)
+modm::Mcp2515<SPI, CS, INT>::writeRegister(uint8_t address, uint8_t data)
 {
 	chipSelect.reset();
 
@@ -294,7 +294,7 @@ xpcc::Mcp2515<SPI, CS, INT>::writeRegister(uint8_t address, uint8_t data)
 
 template <typename SPI, typename CS, typename INT>
 uint8_t
-xpcc::Mcp2515<SPI, CS, INT>::readRegister(uint8_t address)
+modm::Mcp2515<SPI, CS, INT>::readRegister(uint8_t address)
 {
 	chipSelect.reset();
 
@@ -309,7 +309,7 @@ xpcc::Mcp2515<SPI, CS, INT>::readRegister(uint8_t address)
 
 template <typename SPI, typename CS, typename INT>
 void
-xpcc::Mcp2515<SPI, CS, INT>::bitModify(uint8_t address, uint8_t mask, uint8_t data)
+modm::Mcp2515<SPI, CS, INT>::bitModify(uint8_t address, uint8_t mask, uint8_t data)
 {
 	chipSelect.reset();
 
@@ -323,7 +323,7 @@ xpcc::Mcp2515<SPI, CS, INT>::bitModify(uint8_t address, uint8_t mask, uint8_t da
 
 template <typename SPI, typename CS, typename INT>
 uint8_t
-xpcc::Mcp2515<SPI, CS, INT>::readStatus(uint8_t type)
+modm::Mcp2515<SPI, CS, INT>::readStatus(uint8_t type)
 {
 	chipSelect.reset();
 
@@ -339,7 +339,7 @@ xpcc::Mcp2515<SPI, CS, INT>::readStatus(uint8_t type)
 
 template <typename SPI, typename CS, typename INT>
 void
-xpcc::Mcp2515<SPI, CS, INT>::writeIdentifier(const uint32_t& identifier,
+modm::Mcp2515<SPI, CS, INT>::writeIdentifier(const uint32_t& identifier,
 											 bool isExtendedFrame)
 {
 	using namespace mcp2515;
@@ -371,7 +371,7 @@ xpcc::Mcp2515<SPI, CS, INT>::writeIdentifier(const uint32_t& identifier,
 
 template <typename SPI, typename CS, typename INT>
 bool
-xpcc::Mcp2515<SPI, CS, INT>::readIdentifier(uint32_t& identifier)
+modm::Mcp2515<SPI, CS, INT>::readIdentifier(uint32_t& identifier)
 {
 	using namespace mcp2515;
 

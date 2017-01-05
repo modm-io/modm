@@ -20,9 +20,9 @@
 #include "identifier.hpp"
 #include "packets.hpp"
 
-#include <xpcc/communication/xpcc/communicatable_task.hpp>
-#include <xpcc/processing/protothread.hpp>
-#include <xpcc/processing/resumable.hpp>
+#include <modm/communication/xpcc/communicatable_task.hpp>
+#include <modm/processing/protothread.hpp>
+#include <modm/processing/resumable.hpp>
 
 namespace {{ namespace }}
 {
@@ -31,18 +31,18 @@ namespace caller
 {
 
 {%- for component in components.iter() %}
-{% if component.description %}/** {{ component.description | xpcc.wordwrap(72) | xpcc.indent(2) }} */{% endif %}
+{% if component.description %}/** {{ component.description | modm.wordwrap(72) | modm.indent(2) }} */{% endif %}
 class {{ component.name | CamelCase }}
 {
 public:
 	{%- for action in component.flattened().actions %}
 	{%- if action.description %}
 	{%- if action.parameterType %}
-	/** {{ action.description | xpcc.wordwrap(72) | xpcc.indent(2) }}
+	/** {{ action.description | modm.wordwrap(72) | modm.indent(2) }}
 	Parameter: {{ namespace }}::packet::{{ action.parameterType.flattened().name | CamelCase }}&
 	 */
 	{%- else %}
-	/** {{ action.description | xpcc.wordwrap(72) | xpcc.indent(2) }} */
+	/** {{ action.description | modm.wordwrap(72) | modm.indent(2) }} */
 	{%- endif %}
 	{%- else %}
 	{%- if action.parameterType %}
@@ -51,7 +51,7 @@ public:
 	 */
 	{%- endif %}
 	{%- endif %}
-	class {{ action.name | CamelCase }} : public xpcc::CommunicatableTask, private xpcc::pt::Protothread, private xpcc::Resumable<1>
+	class {{ action.name | CamelCase }} : public xpcc::CommunicatableTask, private modm::pt::Protothread, private modm::Resumable<1>
 	{
 	public:
 		{%- if action.parameterType %}
@@ -173,7 +173,7 @@ public:
 		{
 			PT_BEGIN();
 
-		//	XPCC_LOG_INFO << XPCC_FILE_INFO << " run : {{ action.name | CamelCase }} " << xpcc::endl;
+		//	MODM_LOG_INFO << MODM_FILE_INFO << " run : {{ action.name | CamelCase }} " << modm::endl;
 
 			this->waitForResponse = true;
 
@@ -187,7 +187,7 @@ public:
 
 			PT_WAIT_UNTIL( !this->waitForResponse );
 
-		//	XPCC_LOG_INFO << XPCC_FILE_INFO << " ready : {{ action.name | CamelCase }} " << xpcc::endl;
+		//	MODM_LOG_INFO << MODM_FILE_INFO << " ready : {{ action.name | CamelCase }} " << modm::endl;
 
 			PT_END();
 

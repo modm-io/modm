@@ -12,14 +12,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_UI_RGB_LED_HPP
-#define XPCC_UI_RGB_LED_HPP
+#ifndef MODM_UI_RGB_LED_HPP
+#define MODM_UI_RGB_LED_HPP
 
 #include <stdint.h>
 #include "led.hpp"
 #include "../color.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 namespace ui
@@ -39,7 +39,7 @@ class RgbLed
 	Led& green;
 	Led& blue;
 
-	::xpcc::color::Rgb absolute;
+	::modm::color::Rgb absolute;
 
 public:
 	RgbLed(Led& red, Led& green, Led& blue)
@@ -48,7 +48,7 @@ public:
 	}
 
 	inline void
-	setColor(::xpcc::color::Rgb color)
+	setColor(::modm::color::Rgb color)
 	{
 		absolute = color;
 
@@ -58,16 +58,16 @@ public:
 	}
 
 	inline void
-	setColor(::xpcc::color::Hsv color)
+	setColor(::modm::color::Hsv color)
 	{
 		color.toRgb(&absolute);
 		setColor(absolute);
 	}
 
-	inline ::xpcc::color::Rgb
+	inline ::modm::color::Rgb
 	getColor()
 	{
-		return ::xpcc::color::Rgb(
+		return ::modm::color::Rgb(
 			red.getBrightness(),
 			green.getBrightness(),
 			blue.getBrightness()
@@ -83,7 +83,7 @@ public:
 	}
 
 	inline void
-	fadeTo(::xpcc::color::Rgb color, uint16_t time)
+	fadeTo(::modm::color::Rgb color, uint16_t time)
 	{
 		absolute = color;
 
@@ -93,7 +93,7 @@ public:
 	}
 
 	inline void
-	fadeTo(::xpcc::color::Hsv color, uint16_t time)
+	fadeTo(::modm::color::Hsv color, uint16_t time)
 	{
 		color.toRgb(&absolute);
 		fadeTo(absolute, time);
@@ -113,4 +113,4 @@ public:
 
 }
 
-#endif	// XPCC_PWM_RGB_LED_HPP
+#endif	// MODM_PWM_RGB_LED_HPP

@@ -26,18 +26,18 @@ Bme280Thread bme280Thread;
 
 // ----------------------------------------------------------------------------
 // Set the log level
-#undef	XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::DEBUG
+#undef	MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::DEBUG
 
 // Create an IODeviceWrapper around the Uart Peripheral we want to use
-xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > loggerDevice;
-xpcc::IOStream stream(loggerDevice);
+modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
+modm::IOStream stream(loggerDevice);
 
 // Set all four logger streams to use the UART
-xpcc::log::Logger xpcc::log::debug(loggerDevice);
-xpcc::log::Logger xpcc::log::info(loggerDevice);
-xpcc::log::Logger xpcc::log::warning(loggerDevice);
-xpcc::log::Logger xpcc::log::error(loggerDevice);
+modm::log::Logger modm::log::debug(loggerDevice);
+modm::log::Logger modm::log::info(loggerDevice);
+modm::log::Logger modm::log::warning(loggerDevice);
+modm::log::Logger modm::log::error(loggerDevice);
 
 // ----------------------------------------------------------------------------
 
@@ -59,12 +59,12 @@ main()
 	SensorsBI2cMaster::initialize<Board::systemClock, 10000>();
 
 	// ------------------------------------------------------------------------
-	// initialize Uart2 for XPCC_LOG_*
+	// initialize Uart2 for MODM_LOG_*
 	GpioOutputA2::connect(Usart2::Tx);
 	GpioInputA3::connect(Usart2::Rx, Gpio::InputType::PullUp);
 	Usart2::initialize<Board::systemClock, 115200>(12);
 
-	XPCC_LOG_DEBUG << "Welcome to Environment Sensor Test" << xpcc::endl;
+	MODM_LOG_DEBUG << "Welcome to Environment Sensor Test" << modm::endl;
 
 	LedGreen::set();
 

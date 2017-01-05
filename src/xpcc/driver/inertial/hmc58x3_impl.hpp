@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_HMC58X3_HPP
+#ifndef MODM_HMC58X3_HPP
 #	error "Don't include this file directly, use 'hmc58x3.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
-xpcc::Hmc58x3<I2cMaster>::Hmc58x3(Data &data, uint8_t address)
+modm::Hmc58x3<I2cMaster>::Hmc58x3(Data &data, uint8_t address)
 :	I2cDevice<I2cMaster,2>(address), data(data),
 	rawBuffer{0x10, 0x20, 0x01, 0,0,0,0,0,0, 0x00}
 {
@@ -25,8 +25,8 @@ xpcc::Hmc58x3<I2cMaster>::Hmc58x3(Data &data, uint8_t address)
 
 // MARK: - Tasks
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Hmc58x3<I2cMaster>::readMagneticField()
+modm::ResumableResult<bool>
+modm::Hmc58x3<I2cMaster>::readMagneticField()
 {
 	RF_BEGIN();
 
@@ -42,8 +42,8 @@ xpcc::Hmc58x3<I2cMaster>::readMagneticField()
 // ----------------------------------------------------------------------------
 // MARK: - base methods
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Hmc58x3<I2cMaster>::configureRaw(uint8_t rate, uint8_t gain, const uint8_t* gainValues, uint8_t average)
+modm::ResumableResult<bool>
+modm::Hmc58x3<I2cMaster>::configureRaw(uint8_t rate, uint8_t gain, const uint8_t* gainValues, uint8_t average)
 {
 	RF_BEGIN();
 
@@ -62,8 +62,8 @@ xpcc::Hmc58x3<I2cMaster>::configureRaw(uint8_t rate, uint8_t gain, const uint8_t
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Hmc58x3<I2cMaster>::setGainRaw(uint8_t gain, const uint8_t* gainValues)
+modm::ResumableResult<bool>
+modm::Hmc58x3<I2cMaster>::setGainRaw(uint8_t gain, const uint8_t* gainValues)
 {
 	RF_BEGIN();
 
@@ -82,16 +82,16 @@ xpcc::Hmc58x3<I2cMaster>::setGainRaw(uint8_t gain, const uint8_t* gainValues)
 // ----------------------------------------------------------------------------
 // MARK: - register access
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Hmc58x3<I2cMaster>::readStatus()
+modm::ResumableResult<bool>
+modm::Hmc58x3<I2cMaster>::readStatus()
 {
 	return read(Register::Status, rawBuffer[9]);
 }
 
 // MARK: update register
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Hmc58x3<I2cMaster>::updateRegister(uint8_t index, uint8_t setMask, uint8_t clearMask)
+modm::ResumableResult<bool>
+modm::Hmc58x3<I2cMaster>::updateRegister(uint8_t index, uint8_t setMask, uint8_t clearMask)
 {
 	RF_BEGIN();
 
@@ -102,8 +102,8 @@ xpcc::Hmc58x3<I2cMaster>::updateRegister(uint8_t index, uint8_t setMask, uint8_t
 
 // MARK: write multilength register
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Hmc58x3<I2cMaster>::write(Register reg, uint8_t *buffer, uint8_t length)
+modm::ResumableResult<bool>
+modm::Hmc58x3<I2cMaster>::write(Register reg, uint8_t *buffer, uint8_t length)
 {
 	RF_BEGIN();
 
@@ -120,8 +120,8 @@ xpcc::Hmc58x3<I2cMaster>::write(Register reg, uint8_t *buffer, uint8_t length)
 
 // MARK: read multilength register
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Hmc58x3<I2cMaster>::read(Register reg, uint8_t *buffer, uint8_t length)
+modm::ResumableResult<bool>
+modm::Hmc58x3<I2cMaster>::read(Register reg, uint8_t *buffer, uint8_t length)
 {
 	RF_BEGIN();
 

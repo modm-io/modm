@@ -12,7 +12,7 @@
 
 #include <modm/architecture/architecture.hpp>
 
-xpcc::xmega::BufferedUartD0 uart(9600);
+modm::xmega::BufferedUartD0 uart(9600);
 
 GPIO_OUTPUT(Out, A, 0);
 GPIO_INPUT(In, A, 1);

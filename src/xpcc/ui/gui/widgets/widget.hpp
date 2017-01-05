@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_GUI_WIDGET_HPP
-#define XPCC_GUI_WIDGET_HPP
+#ifndef MODM_GUI_WIDGET_HPP
+#define MODM_GUI_WIDGET_HPP
 
 #include <modm/ui/display/graphic_display.hpp>
 #include <modm/ui/gui/colorpalette.hpp>
@@ -24,7 +24,7 @@
 #include <modm/debug/logger.hpp>
 
 
-namespace xpcc
+namespace modm
 {
 
 namespace gui
@@ -48,11 +48,11 @@ public:
 		cbData(NULL),
 		cb_activate(NULL),
 		cb_deactivate(NULL),
-		position(xpcc::glcd::Point(-10,-10)),
-		relative_position(xpcc::glcd::Point(-10,-10)),
+		position(modm::glcd::Point(-10,-10)),
+		relative_position(modm::glcd::Point(-10,-10)),
 		dirty(true),
 		is_interactive(is_interactive),
-		font(xpcc::accessor::asFlash(xpcc::font::FixedWidth5x8))
+		font(modm::accessor::asFlash(modm::font::FixedWidth5x8))
 	{
 		// assign unique id
 		uid = uid_global++;
@@ -154,7 +154,7 @@ public:
 	}
 
 	void
-	setColor(xpcc::gui::Color name, xpcc::glcd::Color color)
+	setColor(modm::gui::Color name, modm::glcd::Color color)
 	{
 		this->color_palette.setColor(name, color);
 		this->markDirty();
@@ -165,7 +165,7 @@ public:
 	 * position by looping through parents.
 	 */
 	virtual void
-	setPosition(const xpcc::glcd::Point& pos)
+	setPosition(const modm::glcd::Point& pos)
 	{
 		this->setRelativePosition(pos);
 
@@ -173,14 +173,14 @@ public:
 	}
 
 	/// Get absolute position of widget on screen.
-	inline xpcc::glcd::Point
+	inline modm::glcd::Point
 	getPosition()
 	{
 		return this->position;
 	}
 
 	/// Get position of widget relative to its parent.
-	inline xpcc::glcd::Point
+	inline modm::glcd::Point
 	getRelativePosition()
 	{
 		return this->relative_position;
@@ -188,7 +188,7 @@ public:
 
 	/// Only set the relative position.
 	inline void
-	setRelativePosition(const xpcc::glcd::Point& pos)
+	setRelativePosition(const modm::glcd::Point& pos)
 	{
 		this->relative_position = pos;
 	}
@@ -220,7 +220,7 @@ public:
 	}
 
 	/// Get dimension of widget.
-	inline xpcc::gui::Dimension
+	inline modm::gui::Dimension
 	getDimension()
 	{
 		return this->dimension;
@@ -268,16 +268,16 @@ public:
 		this->dirty = true;
 	}
 
-	/// Set widget-specific font. Use xpcc::font::FontName as argument.
+	/// Set widget-specific font. Use modm::font::FontName as argument.
 	virtual void
 	setFont(const uint8_t *newFont)
 	{
-		this->font = xpcc::accessor::asFlash(newFont);
+		this->font = modm::accessor::asFlash(newFont);
 	}
 
 	/// Set widget-specific font. Use pointer to Flash as argument.
 	virtual void
-	setFont(const xpcc::accessor::Flash<uint8_t> *font)
+	setFont(const modm::accessor::Flash<uint8_t> *font)
 	{
 		this->font = *font;
 	}
@@ -313,10 +313,10 @@ public:
 
 	/// position on screen (used for rendering), may be recomputed based on
 	/// relative position
-	xpcc::glcd::Point position;
+	modm::glcd::Point position;
 
 	/// relative position inside a WidgetGroup for exemple
-	xpcc::glcd::Point relative_position;
+	modm::glcd::Point relative_position;
 
 	/// has changes to be drawed
 	bool dirty;
@@ -325,7 +325,7 @@ public:
 	bool is_interactive;
 
 	/// widget specific font
-	xpcc::accessor::Flash<uint8_t> font;
+	modm::accessor::Flash<uint8_t> font;
 
 	/// list of widgets that intersect with this widget
 	WidgetContainer intersecting_widgets;
@@ -346,7 +346,7 @@ public:
 
 	/// packs widgets inside WidgetGroup (relative coordinates!)
 	bool
-	pack(Widget* w, const xpcc::glcd::Point &coord);
+	pack(Widget* w, const modm::glcd::Point &coord);
 
 	void
 	render(View* view);
@@ -358,7 +358,7 @@ public:
 	setColorPalette(ColorPalette& cb);
 
 	void
-	setPosition(const xpcc::glcd::Point& pos);
+	setPosition(const modm::glcd::Point& pos);
 
 	bool
 	isDirty()
@@ -414,6 +414,6 @@ protected:
 
 }	// namespace gui
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif  // XPCC_GUI_WIDGET_HPP
+#endif  // MODM_GUI_WIDGET_HPP

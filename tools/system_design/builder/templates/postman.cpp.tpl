@@ -31,7 +31,7 @@ namespace component
 
 // ----------------------------------------------------------------------------
 xpcc::Postman::DeliverInfo
-Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& payload)
+Postman::deliverPacket(const xpcc::Header& header, const modm::SmartPointer& payload)
 {
 	xpcc::ResponseHandle response(header);
 
@@ -71,7 +71,7 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 					if (actionBuffer[{{ actionNumber.__len__() }}].destination != 0) {
 						component::{{component.name | camelCase}}.getCommunicator()->sendNegativeResponse(response);
 					}
-					else if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(response{{ payload }}) == xpcc::rf::Running) {
+					else if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(response{{ payload }}) == modm::rf::Running) {
 						actionBuffer[{{ actionNumber.__len__() }}] = ActionBuffer(header);
 			{%- if actionNumber.append(1)%}{%- endif %}
 			{%- if action.parameterType != None %}
@@ -166,7 +166,7 @@ Postman::update()
 						{%- set payload = ", payloadBuffer[" ~ payloadNumber.__len__() ~ "].payload.get<" ~ typePrefix ~ (action.parameterType.name | CamelCase) ~ ">()" %}
 					{%- endif %}
 					case {{ namespace }}::action::{{ action.name | CAMELCASE }}:
-						if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(action.response{{ payload }}) != xpcc::rf::Running) {
+						if (component_{{ component.name | camelCase }}_action{{ action.name | CamelCase }}(action.response{{ payload }}) != modm::rf::Running) {
 							action.remove();
 					{%- if action.parameterType != None %}
 							payloadBuffer[{{ payloadNumber.__len__() }}].remove();
@@ -216,8 +216,8 @@ Postman::component_{{ component.name | camelCase }}_action{{ action.name | Camel
 {
 	// xpcc::ActionResponse<{{ returns }}> action{{ action.name | CamelCase }}({{ typePayload }});
 	xpcc::ActionResponse<{{ returns }}> result = component::{{ component.name | camelCase }}.action{{ action.name | CamelCase }}({{ payload }});
-	if (result.getState() < xpcc::rf::Running) {
-		if (result.getState() == xpcc::rf::Stop and result.getResult().response == xpcc::Response::Positive) {
+	if (result.getState() < modm::rf::Running) {
+		if (result.getState() == modm::rf::Stop and result.getResult().response == xpcc::Response::Positive) {
 			{%- if action.returnType != None %}
 			component::{{component.name | camelCase}}.getCommunicator()->sendResponse(response, result.getResult().data);
 			{%- else %}

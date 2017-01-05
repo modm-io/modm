@@ -9,14 +9,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LIS302DL_HPP
-#define XPCC_LIS302DL_HPP
+#ifndef MODM_LIS302DL_HPP
+#define MODM_LIS302DL_HPP
 
 #include <modm/architecture/interface/register.hpp>
 #include <modm/processing/resumable.hpp>
 #include "lis3_transport.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 // forward declaration for friending with lis3dsh::Data
@@ -76,7 +76,7 @@ public:
 		Yen = Bit1,		///< Y axis enable. (0: Y axis disabled; 1: Y axis enabled)
 		Xen = Bit0,		///< X axis enable. (0: X axis disabled; 1: X axis enabled)
 	};
-	XPCC_FLAGS8(Control1);
+	MODM_FLAGS8(Control1);
 
 	/// CTRL_REG2 default value is 0x00
 	enum class
@@ -91,7 +91,7 @@ public:
 		HP_COEFF2 = Bit1,	///< High pass filter cut-off frequency configuration.
 		HP_COEFF1 = Bit0,	///< High pass filter cut-off frequency configuration.
 	};
-	XPCC_FLAGS8(Control2);
+	MODM_FLAGS8(Control2);
 
 	/// CTRL_REG3 default value is 0x00
 	enum class
@@ -108,7 +108,7 @@ public:
 		I1CFG1 = Bit1,	///< Data Signal on Int1 pad control bits.
 		I1CFG0 = Bit0,	///< Data Signal on Int1 pad control bits.
 	};
-	XPCC_FLAGS8(Control3);
+	MODM_FLAGS8(Control3);
 
 	typedef FlagsGroup<Control1_t, Control2_t, Control3_t> Control_t;
 
@@ -126,7 +126,7 @@ public:
 		YDA = Bit1,		///< Y axis new data available.
 		XDA = Bit0,		///< X axis new data available.
 	};
-	XPCC_FLAGS8(Status);
+	MODM_FLAGS8(Status);
 
 	/// FF_WU_CFG default value is 0x00
 	enum class
@@ -141,7 +141,7 @@ public:
 		XHIE = Bit1,	///< Enable interrupt generation on X high event.
 		XLIE = Bit0,	///< Enable interrupt generation on X low event.
 	};
-	XPCC_FLAGS8(FreeFallConfig);
+	MODM_FLAGS8(FreeFallConfig);
 
 	/// FF_WU_SRC default value is 0x00
 	enum class
@@ -155,7 +155,7 @@ public:
 		XH = Bit1,	///< X high.
 		XL = Bit0,	///< X low.
 	};
-	XPCC_FLAGS8(FreeFallSource);
+	MODM_FLAGS8(FreeFallSource);
 
 	/// FF_WU_THS default value is 0x00
 	enum class
@@ -164,7 +164,7 @@ public:
 		DRCM = Bit7,		///< Resetting mode selection.
 		THS_Mask = 0x7F,	///< Free-fall / wake-up Threshold.
 	};
-	XPCC_FLAGS8(FreeFallThreshold);
+	MODM_FLAGS8(FreeFallThreshold);
 
 	/// CLOCK_CFG default value is 0x00
 	enum class
@@ -178,7 +178,7 @@ public:
 		DoubleX = Bit1,
 		SingleX = Bit0,
 	};
-	XPCC_FLAGS8(ClickConfig);
+	MODM_FLAGS8(ClickConfig);
 
 	/// CLOCK_SRC default value is 0x00
 	enum class
@@ -192,7 +192,7 @@ public:
 		DoubleX = Bit1,
 		SingleX = Bit0,
 	};
-	XPCC_FLAGS8(ClickSource);
+	MODM_FLAGS8(ClickSource);
 
 	typedef FlagsGroup<
 			Control1_t, Control2_t, Control3_t, Status_t,
@@ -242,7 +242,7 @@ public:
 	};
 
 public:
-	struct xpcc_packed
+	struct modm_packed
 	Data
 	{
 		template < class Transport >
@@ -324,29 +324,29 @@ public:
 		return RF_CALL_BLOCKING(configure(scale, rate));
 	}
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	configure(Scale scale, MeasurementRate rate = MeasurementRate::Hz100);
 
 	// MARK: Control Registers
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	updateControlRegister(Control1_t setMask, Control1_t clearMask = Control1_t(0xff))
 	{
 		return updateControlRegister(0, setMask, clearMask);
 	}
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	updateControlRegister(Control2_t setMask, Control2_t clearMask = Control2_t(0xff))
 	{
 		return updateControlRegister(1, setMask, clearMask);
 	}
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	updateControlRegister(Control3_t setMask, Control3_t clearMask = Control3_t(0xff))
 	{
 		return updateControlRegister(2, setMask, clearMask);
 	}
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	writeInterruptSource(Interrupt interrupt, InterruptSource source)
 	{
 		if (interrupt == Interrupt::One)
@@ -356,65 +356,65 @@ public:
 	}
 
 	// MARK: Free Fall Registers
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	updateFreeFallConfiguration(Interrupt interrupt, FreeFallConfig_t setMask, FreeFallConfig_t clearMask = FreeFallConfig_t(0xff))
 	{
 		return updateRegister(i(Register::FfWuCfg1) | i(interrupt), setMask.value, clearMask.value);
 	}
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	readFreeFallSource(Interrupt interrupt, FreeFallSource_t &source)
 	{
 		return this->read(i(Register::FfWuSrc1) | i(interrupt), source.value);
 	}
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	setFreeFallThreshold(Interrupt interrupt, uint8_t threshold)
 	{
 		return this->write(i(Register::FfWuThs1) | i(interrupt), threshold);
 	}
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	setFreeFallDuration(Interrupt interrupt, uint8_t duration)
 	{
 		return this->write(i(Register::FfWuDuration1) | i(interrupt), duration);
 	}
 
 	// MARK: Clock Registers
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	updateClickConfiguration(ClickConfig_t setMask, ClickConfig_t clearMask)
 	{
 		return updateRegister(i(Register::ClickCfg), setMask, clearMask);
 	}
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	readClickSource(ClickSource_t &source)
 	{
 		return this->read(i(Register::ClickSrc), source);
 	}
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	setClickThreshold(Axis axis, uint8_t threshold);
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	setClickTimeLimit(uint8_t limit)
 	{
 		return this->write(i(Register::ClickTimeLimit), limit);
 	}
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	setClickLatency(uint8_t latency)
 	{
 		return this->write(i(Register::ClickLatency), latency);
 	}
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	setClickWindow(uint8_t window)
 	{
 		return this->write(i(Register::ClickWindow), window);
 	}
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	readAcceleration();
 
 	Status_t
@@ -440,10 +440,10 @@ public:
 	{ return data; }
 
 private:
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	updateControlRegister(uint8_t index, Control_t setMask, Control_t clearMask = Control_t(0xff));
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	updateRegister(uint8_t reg, uint8_t setMask, uint8_t clearMask = 0xff);
 
 	Data &data;
@@ -458,8 +458,8 @@ private:
 	uint8_t rawBuffer[10];
 };
 
-} // namespace xpcc
+} // namespace modm
 
 #include "lis302dl_impl.hpp"
 
-#endif	// XPCC_LIS302DL_HPP
+#endif	// MODM_LIS302DL_HPP

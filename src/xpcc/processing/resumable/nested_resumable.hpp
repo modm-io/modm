@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_NESTED_RESUMABLE_HPP
-#define XPCC_NESTED_RESUMABLE_HPP
+#ifndef MODM_NESTED_RESUMABLE_HPP
+#define MODM_NESTED_RESUMABLE_HPP
 
 #include "macros.hpp"
 #include <modm/architecture/utils.hpp>
@@ -23,7 +23,7 @@
  * Nested Resumables protect against memory corruption by checking if the nesting level
  * is within the allocated nesting level depth.
  * If the allocated nesting level is exceeded, the resumable function does not execute, but returns
- * the `xpcc::rf::NestingError` state value.
+ * the `modm::rf::NestingError` state value.
  * However, the `PT_CALL()` or `RF_CALL()` macros are not constructed to handle this error and
  * will interpret this error as a normal resumable function stop and therefore immediately continue program
  * execution.
@@ -40,22 +40,22 @@
  *
 @verbatim
 [defines]
-XPCC_RESUMABLE_CHECK_NESTING_DEPTH = false
+MODM_RESUMABLE_CHECK_NESTING_DEPTH = false
 @endverbatim
  *
  * @see	NestedResumable
  * @ingroup	resumable
  */
-#define XPCC_RESUMABLE_CHECK_NESTING_DEPTH	true
+#define MODM_RESUMABLE_CHECK_NESTING_DEPTH	true
 
 #else
 // by default we check all nesting level depths
-#	ifndef	XPCC_RESUMABLE_CHECK_NESTING_DEPTH
-#		define XPCC_RESUMABLE_CHECK_NESTING_DEPTH	true
+#	ifndef	MODM_RESUMABLE_CHECK_NESTING_DEPTH
+#		define MODM_RESUMABLE_CHECK_NESTING_DEPTH	true
 #	endif
 #endif
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -65,15 +65,15 @@ namespace xpcc
  * You are responsible to choosing the right nesting depth!
  * This class will guard itself against calling another resumable function at too
  * deep a nesting level and inform you gently of this by returning
- * `xpcc::rf::NestingError` from your called `resumable()`.
+ * `modm::rf::NestingError` from your called `resumable()`.
  * It is then up to you to recognise this in your program design
  * and increase the nesting depth or rethink your code.
- * You may disable the check by setting `XPCC_RESUMABLE_CHECK_NESTING_DEPTH`
+ * You may disable the check by setting `MODM_RESUMABLE_CHECK_NESTING_DEPTH`
  * to `false` in your project configuration.
  *
  * The resumable functions of this class are mutually exclusive, so only one
  * resumable function of the same object can run at the same time. Even if you
- * call another resumable function, it will simply return `xpcc::rf::WrongState`.
+ * call another resumable function, it will simply return `modm::rf::WrongState`.
  * Using the `RF_CALL(resumable())` macro, you can wait for these
  * resumable functions to become available and then run them, so you usually do
  * not need to worry about those cases.
@@ -81,7 +81,7 @@ namespace xpcc
  * You must begin each resumable function using `RF_BEGIN()`.
  * You may exit and return a value by using `RF_RETURN(value)` or
  * return the result of another resumable function using `RF_RETURN_CALL(resumable())`.
- * This return value is wrapped in a `xpcc::ResumableResult<Type>` struct
+ * This return value is wrapped in a `modm::ResumableResult<Type>` struct
  * and transparently returned by the `RF_CALL` macro so it can be used
  * to influence your program flow.
  * If the resumable function reaches `RF_END()` it will exit automatically,
@@ -150,7 +150,7 @@ public:
 	 *
 	 * @return	>`NestingError` if still running, <=`NestingError` if it has finished.
 	 */
-	xpcc::ResumableResult< ReturnType >
+	modm::ResumableResult< ReturnType >
 	resumable function(...);
 	/// @endcond
 #endif
@@ -195,7 +195,7 @@ protected:
 	bool inline
 	nestingOkRf() const
 	{
-#if XPCC_RESUMABLE_CHECK_NESTING_DEPTH
+#if MODM_RESUMABLE_CHECK_NESTING_DEPTH
 		return (rfLevel < Levels);
 #else
 		return true;
@@ -282,7 +282,7 @@ protected:
 	bool inline
 	nestingOkRf() const
 	{
-#if XPCC_RESUMABLE_CHECK_NESTING_DEPTH
+#if MODM_RESUMABLE_CHECK_NESTING_DEPTH
 		return (rfLevel != 0);
 #else
 		return true;
@@ -319,6 +319,6 @@ private:
 };
 /// @endcond
 
-} // namespace xpcc
+} // namespace modm
 
-#endif // XPCC_NESTED_RESUMABLE_HPP
+#endif // MODM_NESTED_RESUMABLE_HPP

@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SD_CONSTANTS_HPP
-#define XPCC_SD_CONSTANTS_HPP
+#ifndef MODM_SD_CONSTANTS_HPP
+#define MODM_SD_CONSTANTS_HPP
 
 // Definitions for MMC/SDC command
 #define CMD0	(0x40 + 0)	// GO_IDLE_STATE
@@ -41,4 +41,4 @@
 #define CT_SDC		(CT_SD1|CT_SD2)	// SD
 #define CT_BLOCK	0x08		// Block addressing
 
-#endif // XPCC_SD_CONSTANTS_HPP
+#endif // MODM_SD_CONSTANTS_HPP

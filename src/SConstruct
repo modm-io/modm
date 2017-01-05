@@ -17,7 +17,7 @@ Help("""
 DESCRIPTION
 
    This SConstruct file has two responsibilities: run the unittests or build
-   the xpcc-library.
+   the modm-library.
 
 COMMANDLINE ARGUMENTS
  
@@ -50,7 +50,7 @@ template=file
  
 library
    Build only the library without running the tests. The result is a file
-   named 'libxpcc.a' located in this directory. If no other configuration
+   named 'libmodm.a' located in this directory. If no other configuration
    file is specified the file called 'library.cfg' will be used.
 
 size
@@ -83,23 +83,23 @@ else:
 
 # create the build environment
 env = Environment(
-		tools = ['xpcc'],
+		tools = ['modm'],
 		toolpath = ['../scons/site_tools'],
 		configfile = ARGUMENTS.get('config', defaultConfigfile))
 
-# build the xpcc library
-xpccLibrary = env.XpccLibrary()
+# build the modm library
+modmLibrary = env.ModmLibrary()
 
 if 'library' in BUILD_TARGETS:
-	env.Clean('library', 'libxpcc.a')
-	env.Alias('library', [xpccLibrary,
-			Command('libxpcc.a', xpccLibrary, Copy("$TARGET", "$SOURCE"))])
+	env.Clean('library', 'libmodm.a')
+	env.Alias('library', [modmLibrary,
+			Command('libmodm.a', modmLibrary, Copy("$TARGET", "$SOURCE"))])
 else:
 	# find only files located in 'test' folders
 	files = env.FindFiles(path = '.', unittest=True)
 	
 	# declare a file which later runs all the tests
-	template = ARGUMENTS.get('template', env['XPCC_CONFIG']['build']['template'])
+	template = ARGUMENTS.get('template', env['MODM_CONFIG']['build']['template'])
 	runner = env.UnittestRunner(target = env.Buildpath('runner.cpp'),
 								source = files.header,
 								template = template)

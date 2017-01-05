@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FILTER_RAMP_HPP
+#ifndef MODM_FILTER_RAMP_HPP
 	#error	"Don't include this file directly, use 'ramp.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::filter::Ramp<T>::Ramp(const T& increment, const T& decrement, const T& initialValue) : 
+modm::filter::Ramp<T>::Ramp(const T& increment, const T& decrement, const T& initialValue) : 
 	target(initialValue),
 	value(initialValue),
 	targetReached(true),
@@ -29,7 +29,7 @@ xpcc::filter::Ramp<T>::Ramp(const T& increment, const T& decrement, const T& ini
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::filter::Ramp<T>::setTarget(const T& target)
+modm::filter::Ramp<T>::setTarget(const T& target)
 {
 	this->target = target;
 	this->targetReached = false;
@@ -38,7 +38,7 @@ xpcc::filter::Ramp<T>::setTarget(const T& target)
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::filter::Ramp<T>::update()
+modm::filter::Ramp<T>::update()
 {
 	if (target > value)
 	{
@@ -67,7 +67,7 @@ xpcc::filter::Ramp<T>::update()
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::filter::Ramp<T>::reset(const T& value)
+modm::filter::Ramp<T>::reset(const T& value)
 {
 	this->value = value;
 }
@@ -75,7 +75,7 @@ xpcc::filter::Ramp<T>::reset(const T& value)
 // ----------------------------------------------------------------------------
 template<typename T>
 const T&
-xpcc::filter::Ramp<T>::getValue() const
+modm::filter::Ramp<T>::getValue() const
 {
 	return this->value;
 }
@@ -83,7 +83,7 @@ xpcc::filter::Ramp<T>::getValue() const
 // ----------------------------------------------------------------------------
 template<typename T>
 bool
-xpcc::filter::Ramp<T>::isTargetReached() const
+modm::filter::Ramp<T>::isTargetReached() const
 {
 	return targetReached;
 }

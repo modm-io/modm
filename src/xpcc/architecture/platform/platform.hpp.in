@@ -14,12 +14,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PLATFORM_HPP
-#define XPCC_PLATFORM_HPP
+#ifndef MODM_PLATFORM_HPP
+#define MODM_PLATFORM_HPP
 
 #include <stdint.h>
 
-#include <modm/architecture/detect.hpp>		// sets XPCC_CPU_xx etc. macros
+#include <modm/architecture/detect.hpp>		// sets MODM_CPU_xx etc. macros
 #include <modm/architecture/utils.hpp>
 
 // Include generated Platform sources:
@@ -29,4 +29,4 @@
 #include <modm/architecture/platform/board/{{board}}/{{board}}.hpp>
 %% endif
 
-#endif	// XPCC_PLATFORM_HPP
+#endif	// MODM_PLATFORM_HPP

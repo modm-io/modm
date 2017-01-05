@@ -13,13 +13,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_BUFFERED_GRAPHIC_DISPLAY_HPP
-#define XPCC_BUFFERED_GRAPHIC_DISPLAY_HPP
+#ifndef MODM_BUFFERED_GRAPHIC_DISPLAY_HPP
+#define MODM_BUFFERED_GRAPHIC_DISPLAY_HPP
 
 #include <stdlib.h>
 #include "graphic_display.hpp"
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * Base class for graphical displays with a RAM buffer.
@@ -69,7 +69,7 @@ namespace xpcc
 		virtual void
 		drawImageRaw(glcd::Point upperLeft,
 				uint16_t width, uint16_t height,
-				xpcc::accessor::Flash<uint8_t> data);
+				modm::accessor::Flash<uint8_t> data);
 
 	protected:
 		// Faster version adapted for the RAM buffer
@@ -95,4 +95,4 @@ namespace xpcc
 
 #include "buffered_graphic_display_impl.hpp"
 
-#endif	// XPCC_GRAPHIC_DISPLAY_HPP
+#endif	// MODM_GRAPHIC_DISPLAY_HPP

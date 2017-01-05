@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SIEMENS_M55_HPP
+#ifndef MODM_SIEMENS_M55_HPP
 #error	"Don't include this file directly, use 'siemens_m55.hpp' instead!"
 #endif
 
@@ -40,7 +40,7 @@ uint8_t initData_lm15[] =    // initialisation data for LCD
 // ----------------------------------------------------------------------------
 template <typename SPI, typename CS, typename RS, typename Reset>
 void
-xpcc::SiemensM55<SPI, CS, RS, Reset>::initialize()
+modm::SiemensM55<SPI, CS, RS, Reset>::initialize()
 {
 	// CS pin
 	CS::setOutput(true);
@@ -59,11 +59,11 @@ xpcc::SiemensM55<SPI, CS, RS, Reset>::initialize()
 
 template <typename SPI, typename CS, typename RS, typename Reset>
 void
-xpcc::SiemensM55<SPI, CS, RS, Reset>::lcdSettings() {
+modm::SiemensM55<SPI, CS, RS, Reset>::lcdSettings() {
 	// Hardware reset is low from initialize
-	xpcc::delayMilliseconds(10);
+	modm::delayMilliseconds(10);
 	Reset::set();
-	xpcc::delayMilliseconds(10);
+	modm::delayMilliseconds(10);
 
 	RS::set();	// command mode
 	CS::reset();	// select display
@@ -72,10 +72,10 @@ xpcc::SiemensM55<SPI, CS, RS, Reset>::lcdSettings() {
 	{
 	  SPI::write(initData_lm15[ii]);   // send initialization data
 	}
-	xpcc::delayMilliseconds(1);
+	modm::delayMilliseconds(1);
 	CS::set();	// deactivate LCD CS
 
-	xpcc::delayMilliseconds(1);
+	modm::delayMilliseconds(1);
 	CS::reset();	// activate LCD CS
 
 	SPI::write(0xF0);
@@ -98,7 +98,7 @@ xpcc::SiemensM55<SPI, CS, RS, Reset>::lcdSettings() {
 	CS::set();	 // deactivate LCD CS
 	RS::reset();	// set LCD to data mode
 
-	xpcc::delayMilliseconds(10);
+	modm::delayMilliseconds(10);
 
 
 	static uint8_t contrast = 22;
@@ -117,7 +117,7 @@ xpcc::SiemensM55<SPI, CS, RS, Reset>::lcdSettings() {
 
 template <typename SPI, typename CS, typename RS, typename Reset>
 void
-xpcc::SiemensM55<SPI, CS, RS, Reset>::lcdCls(uint16_t colour) {
+modm::SiemensM55<SPI, CS, RS, Reset>::lcdCls(uint16_t colour) {
 	RS::reset();
 	CS::reset();
 
@@ -134,7 +134,7 @@ xpcc::SiemensM55<SPI, CS, RS, Reset>::lcdCls(uint16_t colour) {
 
 template <typename SPI, typename CS, typename RS, typename Reset>
 void
-xpcc::SiemensM55<SPI, CS, RS, Reset>::update() {
+modm::SiemensM55<SPI, CS, RS, Reset>::update() {
 
 	// WRITE MEMORY
 	RS::set();

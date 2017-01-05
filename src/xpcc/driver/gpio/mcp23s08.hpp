@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_MCP23S08_HPP
-#define XPCC_MCP23S08_HPP
+#ifndef MODM_MCP23S08_HPP
+#define MODM_MCP23S08_HPP
 
 #include <modm/architecture/utils.hpp>
 #include <modm/architecture/interface/gpio.hpp>
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	8-Bit I/O Expander with Serial Interface
@@ -84,4 +84,4 @@ namespace xpcc
 
 #include "mcp23s08_impl.hpp"
 
-#endif	// XPCC_MCP23S08_HPP
+#endif	// MODM_MCP23S08_HPP

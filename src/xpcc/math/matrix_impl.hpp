@@ -10,19 +10,19 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_MATRIX_HPP
+#ifndef MODM_MATRIX_HPP
 #	error	"Don't include this file directly, use 'matrix.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-xpcc::Matrix<T, ROWS, COLUMNS>::Matrix()
+modm::Matrix<T, ROWS, COLUMNS>::Matrix()
 {
 }
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-xpcc::Matrix<T, ROWS, COLUMNS>::Matrix(const T *data)
+modm::Matrix<T, ROWS, COLUMNS>::Matrix(const T *data)
 {
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		element[i] = data[i];
@@ -31,7 +31,7 @@ xpcc::Matrix<T, ROWS, COLUMNS>::Matrix(const T *data)
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS> 
-xpcc::Matrix<T, ROWS, COLUMNS>::Matrix(const Matrix &m)
+modm::Matrix<T, ROWS, COLUMNS>::Matrix(const Matrix &m)
 {
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		element[i] = m.element[i];
@@ -41,8 +41,8 @@ xpcc::Matrix<T, ROWS, COLUMNS>::Matrix(const Matrix &m)
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 template<typename U>
-xpcc::Matrix<T, ROWS, COLUMNS>& 
-xpcc::Matrix<T, ROWS, COLUMNS>::operator = (const xpcc::Matrix<U, ROWS, COLUMNS> &m)
+modm::Matrix<T, ROWS, COLUMNS>& 
+modm::Matrix<T, ROWS, COLUMNS>::operator = (const modm::Matrix<U, ROWS, COLUMNS> &m)
 {
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		element[i] = m.element[i];
@@ -53,10 +53,10 @@ xpcc::Matrix<T, ROWS, COLUMNS>::operator = (const xpcc::Matrix<U, ROWS, COLUMNS>
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-const xpcc::Matrix<T, ROWS, COLUMNS>&
-xpcc::Matrix<T, ROWS, COLUMNS>::identityMatrix()
+const modm::Matrix<T, ROWS, COLUMNS>&
+modm::Matrix<T, ROWS, COLUMNS>::identityMatrix()
 {
-	static xpcc::Matrix<T, ROWS, COLUMNS> matrix = zeroMatrix();
+	static modm::Matrix<T, ROWS, COLUMNS> matrix = zeroMatrix();
 	static bool hasIdentityMatrix = false;
 	
 	if (!hasIdentityMatrix)
@@ -82,10 +82,10 @@ xpcc::Matrix<T, ROWS, COLUMNS>::identityMatrix()
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-const xpcc::Matrix<T, ROWS, COLUMNS>&
-xpcc::Matrix<T, ROWS, COLUMNS>::zeroMatrix()
+const modm::Matrix<T, ROWS, COLUMNS>&
+modm::Matrix<T, ROWS, COLUMNS>::zeroMatrix()
 {
-	static xpcc::Matrix<T, ROWS, COLUMNS> matrix;
+	static modm::Matrix<T, ROWS, COLUMNS> matrix;
 	static bool hasZeroMatrix = false;
 	
 	if (!hasZeroMatrix)
@@ -100,7 +100,7 @@ xpcc::Matrix<T, ROWS, COLUMNS>::zeroMatrix()
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 bool
-xpcc::Matrix<T, ROWS, COLUMNS>::operator == (const xpcc::Matrix<T, ROWS, COLUMNS> &m) const
+modm::Matrix<T, ROWS, COLUMNS>::operator == (const modm::Matrix<T, ROWS, COLUMNS> &m) const
 {
 	return memcmp(element, m.element, getSize()) == 0;
 }
@@ -108,23 +108,23 @@ xpcc::Matrix<T, ROWS, COLUMNS>::operator == (const xpcc::Matrix<T, ROWS, COLUMNS
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 bool
-xpcc::Matrix<T, ROWS, COLUMNS>::operator != (const xpcc::Matrix<T, ROWS, COLUMNS> &m) const
+modm::Matrix<T, ROWS, COLUMNS>::operator != (const modm::Matrix<T, ROWS, COLUMNS> &m) const
 {
 	return memcmp(element, m.element, getSize()) != 0;
 }
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-xpcc::Matrix<T, 1, COLUMNS>
-xpcc::Matrix<T, ROWS, COLUMNS>::getRow(uint8_t index) const
+modm::Matrix<T, 1, COLUMNS>
+modm::Matrix<T, ROWS, COLUMNS>::getRow(uint8_t index) const
 {
 	return subMatrix<1, COLUMNS>(index, 0);
 }
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-xpcc::Matrix<T, ROWS, 1>
-xpcc::Matrix<T, ROWS, COLUMNS>::getColumn(uint8_t index) const
+modm::Matrix<T, ROWS, 1>
+modm::Matrix<T, ROWS, COLUMNS>::getColumn(uint8_t index) const
 {
 	return subMatrix<ROWS, 1>(0, index);
 }
@@ -132,14 +132,14 @@ xpcc::Matrix<T, ROWS, COLUMNS>::getColumn(uint8_t index) const
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 T*
-xpcc::Matrix<T, ROWS, COLUMNS>::operator [] (uint8_t row)
+modm::Matrix<T, ROWS, COLUMNS>::operator [] (uint8_t row)
 {
 	return &element[row * COLUMNS];
 }
 
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 const T*
-xpcc::Matrix<T, ROWS, COLUMNS>::operator [] (uint8_t row) const
+modm::Matrix<T, ROWS, COLUMNS>::operator [] (uint8_t row) const
 {
 	return &element[row * COLUMNS];
 }
@@ -147,7 +147,7 @@ xpcc::Matrix<T, ROWS, COLUMNS>::operator [] (uint8_t row) const
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 uint8_t
-xpcc::Matrix<T, ROWS, COLUMNS>::getNumberOfRows() const	
+modm::Matrix<T, ROWS, COLUMNS>::getNumberOfRows() const	
 {
 	return ROWS;
 }
@@ -155,7 +155,7 @@ xpcc::Matrix<T, ROWS, COLUMNS>::getNumberOfRows() const
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 uint8_t
-xpcc::Matrix<T, ROWS, COLUMNS>::getNumberOfColumns() const	
+modm::Matrix<T, ROWS, COLUMNS>::getNumberOfColumns() const	
 {
 	return COLUMNS;
 }
@@ -163,24 +163,24 @@ xpcc::Matrix<T, ROWS, COLUMNS>::getNumberOfColumns() const
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 const T*
-xpcc::Matrix<T, ROWS, COLUMNS>::ptr() const
+modm::Matrix<T, ROWS, COLUMNS>::ptr() const
 {
 	return element;
 }
 
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 T*
-xpcc::Matrix<T, ROWS, COLUMNS>::ptr()
+modm::Matrix<T, ROWS, COLUMNS>::ptr()
 {
 	return element;
 }
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-xpcc::Matrix<T, ROWS, COLUMNS>
-xpcc::Matrix<T, ROWS, COLUMNS>::operator - ()
+modm::Matrix<T, ROWS, COLUMNS>
+modm::Matrix<T, ROWS, COLUMNS>::operator - ()
 {
-	xpcc::Matrix<T, ROWS, COLUMNS> m;
+	modm::Matrix<T, ROWS, COLUMNS> m;
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		m.element[i] = -this->element[i];
 	}
@@ -190,10 +190,10 @@ xpcc::Matrix<T, ROWS, COLUMNS>::operator - ()
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-xpcc::Matrix<T, ROWS, COLUMNS>
-xpcc::Matrix<T, ROWS, COLUMNS>::operator - (const xpcc::Matrix<T, ROWS, COLUMNS> &rhs) const
+modm::Matrix<T, ROWS, COLUMNS>
+modm::Matrix<T, ROWS, COLUMNS>::operator - (const modm::Matrix<T, ROWS, COLUMNS> &rhs) const
 {
-	xpcc::Matrix<T, ROWS, COLUMNS> m;
+	modm::Matrix<T, ROWS, COLUMNS> m;
 	
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		m.element[i] = element[i] - rhs.element[i];
@@ -204,10 +204,10 @@ xpcc::Matrix<T, ROWS, COLUMNS>::operator - (const xpcc::Matrix<T, ROWS, COLUMNS>
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-xpcc::Matrix<T, ROWS, COLUMNS>
-xpcc::Matrix<T, ROWS, COLUMNS>::operator + (const xpcc::Matrix<T, ROWS, COLUMNS> &rhs) const
+modm::Matrix<T, ROWS, COLUMNS>
+modm::Matrix<T, ROWS, COLUMNS>::operator + (const modm::Matrix<T, ROWS, COLUMNS> &rhs) const
 {
-	xpcc::Matrix<T, ROWS, COLUMNS> m;
+	modm::Matrix<T, ROWS, COLUMNS> m;
 	
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		m.element[i] = element[i] + rhs.element[i];
@@ -218,8 +218,8 @@ xpcc::Matrix<T, ROWS, COLUMNS>::operator + (const xpcc::Matrix<T, ROWS, COLUMNS>
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-xpcc::Matrix<T, ROWS, COLUMNS>&
-xpcc::Matrix<T, ROWS, COLUMNS>::operator += (const xpcc::Matrix<T, ROWS, COLUMNS> &rhs)
+modm::Matrix<T, ROWS, COLUMNS>&
+modm::Matrix<T, ROWS, COLUMNS>::operator += (const modm::Matrix<T, ROWS, COLUMNS> &rhs)
 {
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		element[i] += rhs.element[i];
@@ -230,8 +230,8 @@ xpcc::Matrix<T, ROWS, COLUMNS>::operator += (const xpcc::Matrix<T, ROWS, COLUMNS
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-xpcc::Matrix<T, ROWS, COLUMNS>&
-xpcc::Matrix<T, ROWS, COLUMNS>::operator -= (const xpcc::Matrix<T, ROWS, COLUMNS> &rhs)
+modm::Matrix<T, ROWS, COLUMNS>&
+modm::Matrix<T, ROWS, COLUMNS>::operator -= (const modm::Matrix<T, ROWS, COLUMNS> &rhs)
 {
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		element[i] -= rhs.element[i];
@@ -243,10 +243,10 @@ xpcc::Matrix<T, ROWS, COLUMNS>::operator -= (const xpcc::Matrix<T, ROWS, COLUMNS
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 template<uint8_t RHSCOL>
-xpcc::Matrix<T, ROWS, ROWS>
-xpcc::Matrix<T, ROWS, COLUMNS>::operator * (const Matrix<T, COLUMNS, RHSCOL> &rhs) const
+modm::Matrix<T, ROWS, ROWS>
+modm::Matrix<T, ROWS, COLUMNS>::operator * (const Matrix<T, COLUMNS, RHSCOL> &rhs) const
 {
-	xpcc::Matrix<T, ROWS, ROWS> m;
+	modm::Matrix<T, ROWS, ROWS> m;
 	
 	for (uint_fast8_t i = 0; i < ROWS; ++i)
 	{
@@ -264,8 +264,8 @@ xpcc::Matrix<T, ROWS, COLUMNS>::operator * (const Matrix<T, COLUMNS, RHSCOL> &rh
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-xpcc::Matrix<T, ROWS, COLUMNS>
-xpcc::Matrix<T, ROWS, COLUMNS>::operator *= (const xpcc::Matrix<T, ROWS, COLUMNS> &rhs)
+modm::Matrix<T, ROWS, COLUMNS>
+modm::Matrix<T, ROWS, COLUMNS>::operator *= (const modm::Matrix<T, ROWS, COLUMNS> &rhs)
 {
 	(*this) = (*this) * rhs;
 	return *this;
@@ -273,10 +273,10 @@ xpcc::Matrix<T, ROWS, COLUMNS>::operator *= (const xpcc::Matrix<T, ROWS, COLUMNS
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-xpcc::Matrix<T, ROWS, COLUMNS>
-xpcc::Matrix<T, ROWS, COLUMNS>::operator * (const T &rhs) const
+modm::Matrix<T, ROWS, COLUMNS>
+modm::Matrix<T, ROWS, COLUMNS>::operator * (const T &rhs) const
 {
-	xpcc::Matrix<T, ROWS, COLUMNS> m;
+	modm::Matrix<T, ROWS, COLUMNS> m;
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		m.element[i] = element[i] * rhs;
 	}
@@ -286,8 +286,8 @@ xpcc::Matrix<T, ROWS, COLUMNS>::operator * (const T &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-xpcc::Matrix<T, ROWS, COLUMNS>&
-xpcc::Matrix<T, ROWS, COLUMNS>::operator *= (const T &rhs)
+modm::Matrix<T, ROWS, COLUMNS>&
+modm::Matrix<T, ROWS, COLUMNS>::operator *= (const T &rhs)
 {
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		element[i] *= rhs;
@@ -298,10 +298,10 @@ xpcc::Matrix<T, ROWS, COLUMNS>::operator *= (const T &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-xpcc::Matrix<T, ROWS, COLUMNS>
-xpcc::Matrix<T, ROWS, COLUMNS>::operator / (const T &rhs) const
+modm::Matrix<T, ROWS, COLUMNS>
+modm::Matrix<T, ROWS, COLUMNS>::operator / (const T &rhs) const
 {
-	xpcc::Matrix<T, ROWS, COLUMNS> m;
+	modm::Matrix<T, ROWS, COLUMNS> m;
 	
 	float oneOverRhs = 1.0f / rhs;
 	
@@ -314,8 +314,8 @@ xpcc::Matrix<T, ROWS, COLUMNS>::operator / (const T &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-xpcc::Matrix<T, ROWS, COLUMNS>&
-xpcc::Matrix<T, ROWS, COLUMNS>::operator /= (const T &rhs)
+modm::Matrix<T, ROWS, COLUMNS>&
+modm::Matrix<T, ROWS, COLUMNS>::operator /= (const T &rhs)
 {
 	float oneOverRhs = 1.0f / rhs;
 	
@@ -328,10 +328,10 @@ xpcc::Matrix<T, ROWS, COLUMNS>::operator /= (const T &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-xpcc::Matrix<T, COLUMNS, ROWS>
-xpcc::Matrix<T, ROWS, COLUMNS>::asTransposed() const
+modm::Matrix<T, COLUMNS, ROWS>
+modm::Matrix<T, ROWS, COLUMNS>::asTransposed() const
 {
-	xpcc::Matrix<T, COLUMNS, ROWS> m;
+	modm::Matrix<T, COLUMNS, ROWS> m;
 	
 	for (uint_fast8_t i = 0; i < ROWS; ++i) {
 		for (uint_fast8_t j = 0; j < COLUMNS; ++j) {
@@ -345,7 +345,7 @@ xpcc::Matrix<T, ROWS, COLUMNS>::asTransposed() const
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 void
-xpcc::Matrix<T, ROWS, COLUMNS>::transpose()
+modm::Matrix<T, ROWS, COLUMNS>::transpose()
 {
 	static_assert(ROWS == COLUMNS, "transpose() only possible for square matrices");
 	
@@ -355,17 +355,17 @@ xpcc::Matrix<T, ROWS, COLUMNS>::transpose()
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 inline T
-xpcc::Matrix<T, ROWS, COLUMNS>::determinant() const
+modm::Matrix<T, ROWS, COLUMNS>::determinant() const
 {
 	static_assert(ROWS == COLUMNS, "determinant() only possible for square matrices");
 	
-	return xpcc::determinant(*this);
+	return modm::determinant(*this);
 }
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 bool
-xpcc::Matrix<T, ROWS, COLUMNS>::hasNan() const
+modm::Matrix<T, ROWS, COLUMNS>::hasNan() const
 {
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		if (isnan(element[i])) {
@@ -379,7 +379,7 @@ xpcc::Matrix<T, ROWS, COLUMNS>::hasNan() const
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 bool
-xpcc::Matrix<T, ROWS, COLUMNS>::hasInf() const
+modm::Matrix<T, ROWS, COLUMNS>::hasInf() const
 {
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		if (isinf(element[i])) {
@@ -392,16 +392,16 @@ xpcc::Matrix<T, ROWS, COLUMNS>::hasInf() const
  
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>
-operator * (int8_t lhs, const xpcc::Matrix<T, WIDTH, HEIGHT> &m)
+modm::Matrix<T, WIDTH, HEIGHT>
+operator * (int8_t lhs, const modm::Matrix<T, WIDTH, HEIGHT> &m)
 {
 	return m * lhs;
 }
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>
-operator * (float lhs, const xpcc::Matrix<T, WIDTH, HEIGHT> &m)
+modm::Matrix<T, WIDTH, HEIGHT>
+operator * (float lhs, const modm::Matrix<T, WIDTH, HEIGHT> &m)
 {
 	return m * lhs;
 }
@@ -409,25 +409,25 @@ operator * (float lhs, const xpcc::Matrix<T, WIDTH, HEIGHT> &m)
 // ----------------------------------------------------------------------------
 /*template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 void
-xpcc::Matrix<T, ROWS, COLUMNS>::inverse()
+modm::Matrix<T, ROWS, COLUMNS>::inverse()
 {
 	*this = inversed();
 }
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-xpcc::Matrix<T, ROWS, COLUMNS>
-xpcc::Matrix<T, ROWS, COLUMNS>::inversed() const
+modm::Matrix<T, ROWS, COLUMNS>
+modm::Matrix<T, ROWS, COLUMNS>::inversed() const
 {
-	xpcc::Matrix<T, ROWS, COLUMNS> inverse;
-	xpcc::MatrixUtils::luInverse(*this, &inverse, true);
+	modm::Matrix<T, ROWS, COLUMNS> inverse;
+	modm::MatrixUtils::luInverse(*this, &inverse, true);
 	return inverse;
 }*/
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 size_t
-xpcc::Matrix<T, ROWS, COLUMNS>::getSize() const
+modm::Matrix<T, ROWS, COLUMNS>::getSize() const
 {
 	return getNumberOfElements() * sizeof(T);
 }
@@ -435,7 +435,7 @@ xpcc::Matrix<T, ROWS, COLUMNS>::getSize() const
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 uint8_t
-xpcc::Matrix<T, ROWS, COLUMNS>::getNumberOfElements() const
+modm::Matrix<T, ROWS, COLUMNS>::getNumberOfElements() const
 {
 	return ROWS * COLUMNS;
 }
@@ -443,8 +443,8 @@ xpcc::Matrix<T, ROWS, COLUMNS>::getNumberOfElements() const
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 template <uint8_t MR, uint8_t MC>
-xpcc::Matrix<T, MR, MC>
-xpcc::Matrix<T, ROWS, COLUMNS>::subMatrix(uint8_t row, uint8_t column) const
+modm::Matrix<T, MR, MC>
+modm::Matrix<T, ROWS, COLUMNS>::subMatrix(uint8_t row, uint8_t column) const
 {
 	static_assert(MR <= ROWS, "sub matrix must be smaller than the original");
 	static_assert(MC <= COLUMNS, "sub matrix must be smaller than the original");
@@ -461,8 +461,8 @@ xpcc::Matrix<T, ROWS, COLUMNS>::subMatrix(uint8_t row, uint8_t column) const
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS> template<typename U>
-xpcc::Matrix<T, ROWS, COLUMNS>&
-xpcc::Matrix<T, ROWS, COLUMNS>::replace(const U *data)
+modm::Matrix<T, ROWS, COLUMNS>&
+modm::Matrix<T, ROWS, COLUMNS>::replace(const U *data)
 {
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		element[i] = data[i];
@@ -474,8 +474,8 @@ xpcc::Matrix<T, ROWS, COLUMNS>::replace(const U *data)
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 template <uint8_t MR, uint8_t MC>
-xpcc::Matrix<T, ROWS, COLUMNS>&
-xpcc::Matrix<T, ROWS, COLUMNS>::replace(uint8_t row, uint8_t column, const xpcc::Matrix<T, MR, MC> &m)
+modm::Matrix<T, ROWS, COLUMNS>&
+modm::Matrix<T, ROWS, COLUMNS>::replace(uint8_t row, uint8_t column, const modm::Matrix<T, MR, MC> &m)
 {
 	static_assert(MR <= ROWS, "replacement matrix can't be larger than the original");
 	static_assert(MC <= COLUMNS, "replacement matrix can't be larger than the original");
@@ -493,26 +493,26 @@ xpcc::Matrix<T, ROWS, COLUMNS>::replace(uint8_t row, uint8_t column, const xpcc:
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-xpcc::Matrix<T, ROWS, COLUMNS>&
-xpcc::Matrix<T, ROWS, COLUMNS>::replaceRow(uint8_t index, const xpcc::Matrix<T, 1, COLUMNS> &m)
+modm::Matrix<T, ROWS, COLUMNS>&
+modm::Matrix<T, ROWS, COLUMNS>::replaceRow(uint8_t index, const modm::Matrix<T, 1, COLUMNS> &m)
 {
 	return replace(index, 0, m);
 }
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-xpcc::Matrix<T, ROWS, COLUMNS>&
-xpcc::Matrix<T, ROWS, COLUMNS>::replaceColumn(uint8_t index, const xpcc::Matrix<T, ROWS, 1> &m)
+modm::Matrix<T, ROWS, COLUMNS>&
+modm::Matrix<T, ROWS, COLUMNS>::replaceColumn(uint8_t index, const modm::Matrix<T, ROWS, 1> &m)
 {
 	return replace(0, index, m);
 }
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-xpcc::Matrix<T, ROWS+1, COLUMNS>
-xpcc::Matrix<T, ROWS, COLUMNS>::addRow(uint8_t index, const xpcc::Matrix<T, 1, COLUMNS> &r) const
+modm::Matrix<T, ROWS+1, COLUMNS>
+modm::Matrix<T, ROWS, COLUMNS>::addRow(uint8_t index, const modm::Matrix<T, 1, COLUMNS> &r) const
 {
-	xpcc::Matrix<T, ROWS+1, COLUMNS> m;
+	modm::Matrix<T, ROWS+1, COLUMNS> m;
 	uint_fast8_t i = 0, ri = 0;
 	
 	for (; i < index; ++i) {
@@ -528,10 +528,10 @@ xpcc::Matrix<T, ROWS, COLUMNS>::addRow(uint8_t index, const xpcc::Matrix<T, 1, C
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-xpcc::Matrix<T, ROWS, COLUMNS+1>
-xpcc::Matrix<T, ROWS, COLUMNS>::addColumn(uint8_t index, const xpcc::Matrix<T, ROWS, 1> &c) const
+modm::Matrix<T, ROWS, COLUMNS+1>
+modm::Matrix<T, ROWS, COLUMNS>::addColumn(uint8_t index, const modm::Matrix<T, ROWS, 1> &c) const
 {
-	xpcc::Matrix<T, ROWS, COLUMNS+1> m;
+	modm::Matrix<T, ROWS, COLUMNS+1> m;
 	uint_fast8_t i = 0, ci = 0;
 	
 	for (; i < index; ++i) {
@@ -547,8 +547,8 @@ xpcc::Matrix<T, ROWS, COLUMNS>::addColumn(uint8_t index, const xpcc::Matrix<T, R
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-xpcc::Matrix<T, ROWS-1, COLUMNS>
-xpcc::Matrix<T, ROWS, COLUMNS>::removeRow(uint8_t index ) const
+modm::Matrix<T, ROWS-1, COLUMNS>
+modm::Matrix<T, ROWS, COLUMNS>::removeRow(uint8_t index ) const
 {
 	if (index == 0)
 	{
@@ -577,8 +577,8 @@ xpcc::Matrix<T, ROWS, COLUMNS>::removeRow(uint8_t index ) const
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-xpcc::Matrix<T, ROWS, COLUMNS-1>
-xpcc::Matrix<T, ROWS, COLUMNS>::removeColumn(uint8_t index) const
+modm::Matrix<T, ROWS, COLUMNS-1>
+modm::Matrix<T, ROWS, COLUMNS>::removeColumn(uint8_t index) const
 {
 	if (index == 0)
 	{
@@ -607,8 +607,8 @@ xpcc::Matrix<T, ROWS, COLUMNS>::removeColumn(uint8_t index) const
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-xpcc::IOStream&
-xpcc::operator << (xpcc::IOStream& os, const xpcc::Matrix<T, ROWS, COLUMNS> &m)
+modm::IOStream&
+modm::operator << (modm::IOStream& os, const modm::Matrix<T, ROWS, COLUMNS> &m)
 {
 	os << "{ ";
 	
@@ -637,7 +637,7 @@ xpcc::operator << (xpcc::IOStream& os, const xpcc::Matrix<T, ROWS, COLUMNS> &m)
 // ----------------------------------------------------------------------------
 template<typename T>
 T
-xpcc::determinant(const xpcc::Matrix<T, 1, 1> &m)
+modm::determinant(const modm::Matrix<T, 1, 1> &m)
 {
 	return m[0][0];
 }
@@ -645,7 +645,7 @@ xpcc::determinant(const xpcc::Matrix<T, 1, 1> &m)
 // ----------------------------------------------------------------------------
 template<typename T>
 T
-xpcc::determinant(const xpcc::Matrix<T, 2, 2> &m)
+modm::determinant(const modm::Matrix<T, 2, 2> &m)
 {
 	return (m[0][0] * m[1][1] - m[0][1] * m[1][0]);
 }
@@ -653,7 +653,7 @@ xpcc::determinant(const xpcc::Matrix<T, 2, 2> &m)
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
 T
-xpcc::determinant(const xpcc::Matrix<T, N, N> &m)
+modm::determinant(const modm::Matrix<T, N, N> &m)
 {
 	// not the most efficient way, but should work for now...
 	T value = 0;
@@ -661,7 +661,7 @@ xpcc::determinant(const xpcc::Matrix<T, N, N> &m)
 	for (uint_fast8_t i = 0; i < N; ++i)
 	{
 		T coeff = m[0][i];
-		xpcc::Matrix<T, N-1, N-1> subM;
+		modm::Matrix<T, N-1, N-1> subM;
 		
 		for (uint_fast8_t x = 0; x < i; ++x) {
 			for (uint_fast8_t y = 1; y < N; ++y) {

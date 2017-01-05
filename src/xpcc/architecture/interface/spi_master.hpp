@@ -12,13 +12,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_INTERFACE_SPI_MASTER_HPP
-#define XPCC_INTERFACE_SPI_MASTER_HPP
+#ifndef MODM_INTERFACE_SPI_MASTER_HPP
+#define MODM_INTERFACE_SPI_MASTER_HPP
 
 #include <modm/processing/resumable.hpp>
 #include "spi.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -28,7 +28,7 @@ namespace xpcc
  * @author	Niklas Hauser
  * @ingroup	spi
  */
-class SpiMaster : public ::xpcc::Peripheral, public Spi
+class SpiMaster : public ::modm::Peripheral, public Spi
 {
 #ifdef __DOXYGEN__
 public:
@@ -120,7 +120,7 @@ public:
 	 * 		data to be sent
 	 * @return	received data
 	 */
-	static xpcc::ResumableResult<uint8_t>
+	static modm::ResumableResult<uint8_t>
 	transfer(uint8_t data);
 
 	/**
@@ -141,11 +141,11 @@ public:
 	 * @param       length
 	 *      number of bytes to be shifted out
 	 */
-	static xpcc::ResumableResult<void>
+	static modm::ResumableResult<void>
 	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
 #endif
 };
 
-} // namespace xpcc
+} // namespace modm
 
-#endif // XPCC_INTERFACE_SPI_MASTER_HPP
+#endif // MODM_INTERFACE_SPI_MASTER_HPP

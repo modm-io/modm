@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LOG_STYLE_HPP
-#define XPCC_LOG_STYLE_HPP
+#ifndef MODM_LOG_STYLE_HPP
+#define MODM_LOG_STYLE_HPP
 
 #include <modm/io/iodevice.hpp>
 #include <modm/utils/template_metaprogramming.hpp>
 
-namespace xpcc
+namespace modm
 {
 	namespace log
 	{
@@ -113,4 +113,4 @@ namespace xpcc
 
 #include "style_impl.hpp"
 
-#endif // XPCC_LOG_STYLE_HPP
+#endif // MODM_LOG_STYLE_HPP

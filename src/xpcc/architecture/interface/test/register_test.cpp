@@ -19,7 +19,7 @@ RegisterTest::testAssignments()
 	TEST_ASSERT_EQUALS(v0.value, 0);
 	Common_t c0;
 	TEST_ASSERT_EQUALS(c0.value, 0);
-	xpcc::Register8 r0;
+	modm::Register8 r0;
 	TEST_ASSERT_EQUALS(r0.value, 0);
 
 	// to Test struct
@@ -56,10 +56,10 @@ RegisterTest::testAssignments()
 	// these are not possible!
 	//r0 = Test::A;
 	//TEST_ASSERT_EQUALS(r0.value, 0b1);
-	//xpcc::Register8 r1 = Test::A;
+	//modm::Register8 r1 = Test::A;
 	//TEST_ASSERT_EQUALS(r1.value, 0b1);
 
-	xpcc::Register8 r2 = v2;
+	modm::Register8 r2 = v2;
 	TEST_ASSERT_EQUALS(r2.value, 0b1);
 
 	// to raw value
@@ -268,28 +268,28 @@ RegisterTest::testConfigurations()
 	TEST_ASSERT_EQUALS(v1.value, 0b0100);
 
 	v1 = Test3::Bit | Config0(Config::Two);
-	TEST_ASSERT_EQUALS(v1.value, (xpcc::Bit4 | 0b10));
+	TEST_ASSERT_EQUALS(v1.value, (modm::Bit4 | 0b10));
 
 	v1 = Config0(Config::Two) | Test3::Bit;
-	TEST_ASSERT_EQUALS(v1.value, (xpcc::Bit4 | 0b10));
+	TEST_ASSERT_EQUALS(v1.value, (modm::Bit4 | 0b10));
 
 	v1 = Config2(Config::Three) | Config0(Config::Two);
 	TEST_ASSERT_EQUALS(v1.value, ((0b11 << 2) | 0b10));
 
 	v1 = Test3::Bit | Config2(Config::Three) | Config0(Config::Two);
-	TEST_ASSERT_EQUALS(v1.value, (xpcc::Bit4 | (0b11 << 2) | 0b10));
+	TEST_ASSERT_EQUALS(v1.value, (modm::Bit4 | (0b11 << 2) | 0b10));
 
 	Config2::reset(v1);
-	TEST_ASSERT_EQUALS(v1.value, xpcc::Bit4 | 0b10);
+	TEST_ASSERT_EQUALS(v1.value, modm::Bit4 | 0b10);
 
 	v1 |= Config2(Config::One);
-	TEST_ASSERT_EQUALS(v1.value, (xpcc::Bit4 | (0b01 << 2) | 0b10));
+	TEST_ASSERT_EQUALS(v1.value, (modm::Bit4 | (0b01 << 2) | 0b10));
 
 	Config0::set(v1, Config::Three);
-	TEST_ASSERT_EQUALS(v1.value, xpcc::Bit4 | (0b01 << 2) | 0b11);
+	TEST_ASSERT_EQUALS(v1.value, modm::Bit4 | (0b01 << 2) | 0b11);
 
 	Config2::set(v1, Config::Two);
-	TEST_ASSERT_EQUALS(v1.value, xpcc::Bit4 | (0b10 << 2) | 0b11);
+	TEST_ASSERT_EQUALS(v1.value, modm::Bit4 | (0b10 << 2) | 0b11);
 
 	Config current = Config2::get(v1);
 	TEST_ASSERT_EQUALS(uint8_t(current), uint8_t(Config::Two));
@@ -303,22 +303,22 @@ void
 RegisterTest::testValue()
 {
 	Test3_t v1 = Test3::Bit | Config0(Config::Two) | Address(6);
-	TEST_ASSERT_EQUALS(v1.value, (xpcc::Bit4 | 0b10 | (6 << 5)));
+	TEST_ASSERT_EQUALS(v1.value, (modm::Bit4 | 0b10 | (6 << 5)));
 
 	v1 = Config0(Config::Two) | Address(6) | Test3::Bit;
-	TEST_ASSERT_EQUALS(v1.value, (xpcc::Bit4 | 0b10 | (6 << 5)));
+	TEST_ASSERT_EQUALS(v1.value, (modm::Bit4 | 0b10 | (6 << 5)));
 
 	v1 = Address(6) | Config0(Config::Two) | Test3::Bit;
-	TEST_ASSERT_EQUALS(v1.value, (xpcc::Bit4 | 0b10 | (6 << 5)));
+	TEST_ASSERT_EQUALS(v1.value, (modm::Bit4 | 0b10 | (6 << 5)));
 
 	Address::reset(v1);
-	TEST_ASSERT_EQUALS(v1.value, (xpcc::Bit4 | 0b10));
+	TEST_ASSERT_EQUALS(v1.value, (modm::Bit4 | 0b10));
 
 	v1 |= Address(5);
-	TEST_ASSERT_EQUALS(v1.value, xpcc::Bit4 | 0b10 | (5 << 5));
+	TEST_ASSERT_EQUALS(v1.value, modm::Bit4 | 0b10 | (5 << 5));
 
 	Address::set(v1, 1);
-	TEST_ASSERT_EQUALS(v1.value, xpcc::Bit4 | 0b10 | (1 << 5));
+	TEST_ASSERT_EQUALS(v1.value, modm::Bit4 | 0b10 | (1 << 5));
 
 	uint8_t addr = Address::get(v1);
 	TEST_ASSERT_EQUALS(addr, 1);

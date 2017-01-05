@@ -11,12 +11,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_GUI_CHECKBOX_HPP
-#define XPCC_GUI_CHECKBOX_HPP
+#ifndef MODM_GUI_CHECKBOX_HPP
+#define MODM_GUI_CHECKBOX_HPP
 
 #include "widget.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 namespace gui
@@ -55,6 +55,6 @@ private:
 
 }	// namespace gui
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif  // XPCC_GUI_CHECKBOX_HPP
+#endif  // MODM_GUI_CHECKBOX_HPP

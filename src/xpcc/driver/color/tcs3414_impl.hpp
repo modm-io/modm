@@ -11,18 +11,18 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_TCS3414_HPP
+#ifndef MODM_TCS3414_HPP
 #	error	"Don't include this file directly, use 'tcs3414.hpp' instead!"
 #endif
 
 template<typename I2cMaster>
-typename xpcc::Tcs3414<I2cMaster>::Data xpcc::Tcs3414<I2cMaster>::data;
+typename modm::Tcs3414<I2cMaster>::Data modm::Tcs3414<I2cMaster>::data;
 
 template<typename I2cMaster>
-typename xpcc::tcs3414::Rgb xpcc::Tcs3414<I2cMaster>::color;
+typename modm::tcs3414::Rgb modm::Tcs3414<I2cMaster>::color;
 
 template < typename I2cMaster >
-xpcc::Tcs3414<I2cMaster>::Tcs3414(uint8_t address)
+modm::Tcs3414<I2cMaster>::Tcs3414(uint8_t address)
 : I2cDevice<I2cMaster,2>(address),
   commandBuffer{0,0,0,0}
 {
@@ -30,8 +30,8 @@ xpcc::Tcs3414<I2cMaster>::Tcs3414(uint8_t address)
 
 // ----------------------------------------------------------------------------
 template<typename I2cMaster>
-xpcc::ResumableResult<bool>
-xpcc::Tcs3414<I2cMaster>::configure(
+modm::ResumableResult<bool>
+modm::Tcs3414<I2cMaster>::configure(
 		const Gain gain,
 		const Prescaler prescaler,
 		const IntegrationMode mode,
@@ -53,8 +53,8 @@ xpcc::Tcs3414<I2cMaster>::configure(
 // ----------------------------------------------------------------------------
 // MARK: - Tasks
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Tcs3414<I2cMaster>::refreshAllColors()
+modm::ResumableResult<bool>
+modm::Tcs3414<I2cMaster>::refreshAllColors()
 {
 	RF_BEGIN();
 
@@ -97,8 +97,8 @@ xpcc::Tcs3414<I2cMaster>::refreshAllColors()
 
 // ----------------------------------------------------------------------------
 template<typename I2cMaster>
-xpcc::ResumableResult<bool>
-xpcc::Tcs3414<I2cMaster>::writeRegister(
+modm::ResumableResult<bool>
+modm::Tcs3414<I2cMaster>::writeRegister(
 		const RegisterAddress address,
 		const uint8_t value)
 {
@@ -116,8 +116,8 @@ xpcc::Tcs3414<I2cMaster>::writeRegister(
 }
 
 template<typename I2cMaster>
-xpcc::ResumableResult<bool>
-xpcc::Tcs3414<I2cMaster>::readRegisters(
+modm::ResumableResult<bool>
+modm::Tcs3414<I2cMaster>::readRegisters(
 		const RegisterAddress address,
 		uint8_t* const values,
 		const uint8_t count)

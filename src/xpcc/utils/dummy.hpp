@@ -12,10 +12,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_DUMMY_HPP
-#define XPCC_DUMMY_HPP
+#ifndef MODM_DUMMY_HPP
+#define MODM_DUMMY_HPP
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \ingroup	utils
@@ -26,4 +26,4 @@ namespace xpcc
 	dummy();
 }
 
-#endif // XPCC_DUMMY_HPP
+#endif // MODM_DUMMY_HPP

@@ -13,27 +13,27 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_DYNAMIC_ARRAY_HPP
+#ifndef MODM_DYNAMIC_ARRAY_HPP
 	#error	"Don't include this file directly, use 'vector.hpp' instead"
 #endif
 
 // ----------------------------------------------------------------------------
 template <typename T, typename Allocator>
-xpcc::DynamicArray<T, Allocator>::DynamicArray(const Allocator& alloc) :
+modm::DynamicArray<T, Allocator>::DynamicArray(const Allocator& alloc) :
 	allocator(alloc),
 	size(0), capacity(0), values(0)
 {
 }
 
 template <typename T, typename Allocator>
-xpcc::DynamicArray<T, Allocator>::DynamicArray(SizeType n, const Allocator& alloc) :
+modm::DynamicArray<T, Allocator>::DynamicArray(SizeType n, const Allocator& alloc) :
 	allocator(alloc), size(0), capacity(n)
 {
 	this->values = this->allocator.allocate(n);
 }
 
 template <typename T, typename Allocator>
-xpcc::DynamicArray<T, Allocator>::DynamicArray(SizeType n, const T& value, const Allocator& alloc) :
+modm::DynamicArray<T, Allocator>::DynamicArray(SizeType n, const T& value, const Allocator& alloc) :
 	allocator(alloc), size(n), capacity(n)
 {
 	this->values = this->allocator.allocate(n);
@@ -43,7 +43,7 @@ xpcc::DynamicArray<T, Allocator>::DynamicArray(SizeType n, const T& value, const
 }
 
 template <typename T, typename Allocator>
-xpcc::DynamicArray<T, Allocator>::DynamicArray(std::initializer_list<T> init, const Allocator& alloc) :
+modm::DynamicArray<T, Allocator>::DynamicArray(std::initializer_list<T> init, const Allocator& alloc) :
 	allocator(alloc), size(init.size()), capacity(init.size())
 {
 	this->values = this->allocator.allocate(init.size());
@@ -55,7 +55,7 @@ xpcc::DynamicArray<T, Allocator>::DynamicArray(std::initializer_list<T> init, co
 }
 
 template <typename T, typename Allocator>
-xpcc::DynamicArray<T, Allocator>::DynamicArray(const DynamicArray& other) :
+modm::DynamicArray<T, Allocator>::DynamicArray(const DynamicArray& other) :
 	allocator(other.allocator),
 	size(other.size), capacity(other.capacity)
 {
@@ -66,7 +66,7 @@ xpcc::DynamicArray<T, Allocator>::DynamicArray(const DynamicArray& other) :
 }
 
 template <typename T, typename Allocator>
-xpcc::DynamicArray<T, Allocator>::~DynamicArray()
+modm::DynamicArray<T, Allocator>::~DynamicArray()
 {
 	for (SizeType i = 0; i < this->size; ++i) {
 		this->allocator.destroy(&this->values[i]);
@@ -75,8 +75,8 @@ xpcc::DynamicArray<T, Allocator>::~DynamicArray()
 }
 
 template <typename T, typename Allocator>
-xpcc::DynamicArray<T, Allocator>&
-xpcc::DynamicArray<T, Allocator>::operator = (const DynamicArray& other)
+modm::DynamicArray<T, Allocator>&
+modm::DynamicArray<T, Allocator>::operator = (const DynamicArray& other)
 {
 	for (SizeType i = 0; i < this->size; ++i) {
 		this->allocator.destroy(&this->values[i]);
@@ -97,7 +97,7 @@ xpcc::DynamicArray<T, Allocator>::operator = (const DynamicArray& other)
 // ----------------------------------------------------------------------------
 template <typename T, typename Allocator>
 void
-xpcc::DynamicArray<T, Allocator>::reserve(SizeType n)
+modm::DynamicArray<T, Allocator>::reserve(SizeType n)
 {
 	if (n <= (this->capacity - this->size)) {
 		// capacity is already big enough, nothing to do.
@@ -111,7 +111,7 @@ xpcc::DynamicArray<T, Allocator>::reserve(SizeType n)
 // ----------------------------------------------------------------------------
 template <typename T, typename Allocator>
 void
-xpcc::DynamicArray<T, Allocator>::clear()
+modm::DynamicArray<T, Allocator>::clear()
 {
 	for (SizeType i = 0; i < this->size; ++i) {
 		this->allocator.destroy(&this->values[i]);
@@ -126,7 +126,7 @@ xpcc::DynamicArray<T, Allocator>::clear()
 // ----------------------------------------------------------------------------
 template <typename T, typename Allocator>
 void
-xpcc::DynamicArray<T, Allocator>::removeAll()
+modm::DynamicArray<T, Allocator>::removeAll()
 {
 	for (SizeType i = 0; i < this->size; ++i) {
 		this->allocator.destroy(&this->values[i]);
@@ -137,7 +137,7 @@ xpcc::DynamicArray<T, Allocator>::removeAll()
 // ----------------------------------------------------------------------------
 template <typename T, typename Allocator>
 void
-xpcc::DynamicArray<T, Allocator>::append(const T& value)
+modm::DynamicArray<T, Allocator>::append(const T& value)
 {
 	if (this->capacity == this->size)
 	{
@@ -156,7 +156,7 @@ xpcc::DynamicArray<T, Allocator>::append(const T& value)
 // ----------------------------------------------------------------------------
 template <typename T, typename Allocator>
 void
-xpcc::DynamicArray<T, Allocator>::removeBack()
+modm::DynamicArray<T, Allocator>::removeBack()
 {
 	--this->size;
 
@@ -167,7 +167,7 @@ xpcc::DynamicArray<T, Allocator>::removeBack()
 // ----------------------------------------------------------------------------
 template <typename T, typename Allocator>
 void
-xpcc::DynamicArray<T, Allocator>::relocate(SizeType n)
+modm::DynamicArray<T, Allocator>::relocate(SizeType n)
 {
 	this->capacity = n;
 	
@@ -183,24 +183,24 @@ xpcc::DynamicArray<T, Allocator>::relocate(SizeType n)
 
 // ----------------------------------------------------------------------------
 template <typename T, typename Allocator>
-typename xpcc::DynamicArray<T, Allocator>::iterator 
-xpcc::DynamicArray<T, Allocator>::begin()
+typename modm::DynamicArray<T, Allocator>::iterator 
+modm::DynamicArray<T, Allocator>::begin()
 {
 	return iterator(this, 0);
 }
 
 template <typename T, typename Allocator>
-typename xpcc::DynamicArray<T, Allocator>::iterator
-xpcc::DynamicArray<T, Allocator>::end()
+typename modm::DynamicArray<T, Allocator>::iterator
+modm::DynamicArray<T, Allocator>::end()
 {
 	return iterator(this, size);
 }
 
 template <typename T, typename Allocator>
-typename xpcc::DynamicArray<T, Allocator>::iterator
-xpcc::DynamicArray<T, Allocator>::find(const T& value)
+typename modm::DynamicArray<T, Allocator>::iterator
+modm::DynamicArray<T, Allocator>::find(const T& value)
 {
-	xpcc::DynamicArray<T, Allocator>::iterator iter = this->begin();
+	modm::DynamicArray<T, Allocator>::iterator iter = this->begin();
 
 	for(; iter != this->end(); ++iter)
 	{
@@ -214,24 +214,24 @@ xpcc::DynamicArray<T, Allocator>::find(const T& value)
 }
 
 template <typename T, typename Allocator>
-typename xpcc::DynamicArray<T, Allocator>::const_iterator 
-xpcc::DynamicArray<T, Allocator>::begin() const
+typename modm::DynamicArray<T, Allocator>::const_iterator 
+modm::DynamicArray<T, Allocator>::begin() const
 {
 	return const_iterator(this, 0);
 }
 
 template <typename T, typename Allocator>
-typename xpcc::DynamicArray<T, Allocator>::const_iterator
-xpcc::DynamicArray<T, Allocator>::end() const
+typename modm::DynamicArray<T, Allocator>::const_iterator
+modm::DynamicArray<T, Allocator>::end() const
 {
 	return const_iterator(this, size);
 }
 
 template <typename T, typename Allocator>
-typename xpcc::DynamicArray<T, Allocator>::const_iterator
-xpcc::DynamicArray<T, Allocator>::find(const T& value) const
+typename modm::DynamicArray<T, Allocator>::const_iterator
+modm::DynamicArray<T, Allocator>::find(const T& value) const
 {
-	xpcc::DynamicArray<T, Allocator>::const_iterator iter = this->begin();
+	modm::DynamicArray<T, Allocator>::const_iterator iter = this->begin();
 
 	for(; iter != this->end(); ++iter)
 	{

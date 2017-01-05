@@ -15,7 +15,7 @@
 
 #include <modm/driver/display.hpp>
 
-using namespace xpcc::atmega;
+using namespace modm::atmega;
 
 namespace led
 {
@@ -34,12 +34,12 @@ namespace lcd
 	typedef GpioOutputD3 A0;
 	typedef GpioOutputD4 Reset;
 
-	typedef xpcc::SoftwareSpiMaster< Scl, Mosi > SPI;
+	typedef modm::SoftwareSpiMaster< Scl, Mosi > SPI;
 }
 
-xpcc::DogM128< lcd::SPI, lcd::Cs, lcd::A0, lcd::Reset, true > display;
+modm::DogM128< lcd::SPI, lcd::Cs, lcd::A0, lcd::Reset, true > display;
 
-using namespace xpcc::glcd;
+using namespace modm::glcd;
 
 int
 main()

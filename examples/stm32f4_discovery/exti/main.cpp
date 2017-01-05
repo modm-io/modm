@@ -39,20 +39,20 @@ typedef GpioInputE11 Irq;
  * Px5  to Px9:  EXTI9_5
  * Px10 to Px15: EXTI15_10
  */
-XPCC_ISR(EXTI0)
+MODM_ISR(EXTI0)
 {
 	Button::acknowledgeExternalInterruptFlag();
 	LedBlue::set();
-	xpcc::delayMicroseconds(1000);
+	modm::delayMicroseconds(1000);
 	LedBlue::reset();
 }
 
 
-XPCC_ISR(EXTI15_10)
+MODM_ISR(EXTI15_10)
 {
 	Irq::acknowledgeExternalInterruptFlag();
 	LedOrange::set();
-	xpcc::delayMicroseconds(1000);
+	modm::delayMicroseconds(1000);
 	LedOrange::reset();
 }
 
@@ -63,12 +63,12 @@ main()
 	Board::initialize();
 
 	// will be used to indicate external interrupts
-	LedOrange::setOutput(xpcc::Gpio::Low);
-	LedBlue::setOutput(xpcc::Gpio::Low);
+	LedOrange::setOutput(modm::Gpio::Low);
+	LedBlue::setOutput(modm::Gpio::Low);
 
 	// will be toggled to indicate that the program is still running
-	LedGreen::setOutput(xpcc::Gpio::Low);
-	LedRed::setOutput(xpcc::Gpio::High);
+	LedGreen::setOutput(modm::Gpio::Low);
+	LedRed::setOutput(modm::Gpio::High);
 
 	// push the button to see the blue led light up
 	Button::setInput(Gpio::InputType::Floating);
@@ -86,7 +86,7 @@ main()
 	{
 		LedRed::toggle();
 		LedGreen::toggle();
-		xpcc::delayMilliseconds(500);
+		modm::delayMilliseconds(500);
 	}
 
 	return 0;

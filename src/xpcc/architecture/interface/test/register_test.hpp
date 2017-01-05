@@ -9,13 +9,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_UNITTEST_REGISTER_HPP
-#define XPCC_UNITTEST_REGISTER_HPP
+#ifndef MODM_UNITTEST_REGISTER_HPP
+#define MODM_UNITTEST_REGISTER_HPP
 
 #include <unittest/testsuite.hpp>
 #include <modm/architecture/interface/register.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 struct testing
@@ -33,7 +33,7 @@ protected:
 		G = Bit6,
 		H = Bit7,
 	};
-	XPCC_FLAGS8(Test);
+	MODM_FLAGS8(Test);
 
 	enum class
 	Test2 : uint8_t
@@ -47,7 +47,7 @@ protected:
 		G = Bit6,
 		H = Bit7,
 	};
-	XPCC_FLAGS8(Test2);
+	MODM_FLAGS8(Test2);
 
 	typedef FlagsGroup< Test_t, Test2_t > Common_t;
 
@@ -73,7 +73,7 @@ protected:
 	};
 
 	typedef Flags8<Test3> Test3_t;
-	XPCC_INT_TYPE_FLAGS(Test3_t);
+	MODM_INT_TYPE_FLAGS(Test3_t);
 
 	typedef Value< Test3_t, 3, 5 > Address;
 	typedef Configuration< Test3_t, Config, Bit1 | Bit0, 2 > Config2;
@@ -109,12 +109,12 @@ Test4
 typedef Flags8<Test4> Test4_t;
 // test macro outside of struct
 // all enum operations must not be declared 'friend'
-XPCC_TYPE_FLAGS(Test4_t)
+MODM_TYPE_FLAGS(Test4_t)
 
 }
 
 // @author Niklas Hauser
-class RegisterTest : public unittest::TestSuite, public xpcc::testing
+class RegisterTest : public unittest::TestSuite, public modm::testing
 {
 public:
 	void
@@ -140,4 +140,4 @@ public:
 
 };
 
-#endif // XPCC_UNITTEST_REGISTER_HPP
+#endif // MODM_UNITTEST_REGISTER_HPP

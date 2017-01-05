@@ -12,16 +12,16 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_RTOS_BOOST_SCHEDULER_HPP
-#define XPCC_RTOS_BOOST_SCHEDULER_HPP
+#ifndef MODM_RTOS_BOOST_SCHEDULER_HPP
+#define MODM_RTOS_BOOST_SCHEDULER_HPP
 
-#ifndef XPCC_RTOS_SCHEDULER_HPP
+#ifndef MODM_RTOS_SCHEDULER_HPP
 #	error "Don't include this file directly, use <modm/processing/rtos/scheduler.hpp>"
 #endif
 
 #include <boost/thread/thread.hpp>
 
-namespace xpcc
+namespace modm
 {
 	namespace rtos
 	{
@@ -39,4 +39,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_RTOS_BOOST_SCHEDULER_HPP
+#endif // MODM_RTOS_BOOST_SCHEDULER_HPP

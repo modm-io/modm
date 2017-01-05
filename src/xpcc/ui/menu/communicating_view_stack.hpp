@@ -13,34 +13,34 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_COMMUNICATING_VIEW_STACK_HPP
-#define XPCC_COMMUNICATING_VIEW_STACK_HPP
+#ifndef MODM_COMMUNICATING_VIEW_STACK_HPP
+#define MODM_COMMUNICATING_VIEW_STACK_HPP
 
-#include <modm/communication/xpcc/communicator.hpp>
-#include <modm/communication/xpcc/communicatable.hpp>
+#include <modm/communication/modm/communicator.hpp>
+#include <modm/communication/modm/communicatable.hpp>
 
 #include "view_stack.hpp"
 
-namespace xpcc
+namespace modm
 {
 	class CommunicatingViewStack : public ViewStack
 	{
 	public:
-		CommunicatingViewStack(xpcc::GraphicDisplay* display, xpcc::Communicator* communicator) :
+		CommunicatingViewStack(modm::GraphicDisplay* display, modm::Communicator* communicator) :
 			ViewStack(display),
 			communicator(communicator)
 		{
 		}
 		
-		inline xpcc::Communicator*
+		inline modm::Communicator*
 		getCommunicator()
 		{
 			return communicator;
 		}
 		
 	protected:
-		xpcc::Communicator* communicator;
+		modm::Communicator* communicator;
 	};
 }
 
-#endif // XPCC_COMMUNICATING_VIEW_STACK_HPP
+#endif // MODM_COMMUNICATING_VIEW_STACK_HPP

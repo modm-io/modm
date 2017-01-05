@@ -16,13 +16,13 @@
 
 // ----------------------------------------------------------------------------
 // Set the log level
-#undef	XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::INFO
+#undef	MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::INFO
 
 typedef GpioInputB12 AdcIn0;
 
-xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > loggerDevice;
-xpcc::log::Logger xpcc::log::info(loggerDevice);
+modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
+modm::log::Logger modm::log::info(loggerDevice);
 
 static void
 printAdc()
@@ -31,9 +31,9 @@ printAdc()
 	float voltage = 0.0;
 	int adcValue = 0;
 	adcValue = Adc4::getValue();
-	XPCC_LOG_INFO << "adcValue=" << adcValue;
+	MODM_LOG_INFO << "adcValue=" << adcValue;
 	voltage = adcValue * maxVoltage / 0xfff;
-	XPCC_LOG_INFO << " voltage=" << voltage << xpcc::endl;
+	MODM_LOG_INFO << " voltage=" << voltage << modm::endl;
 }
 
 // ----------------------------------------------------------------------------
@@ -42,7 +42,7 @@ main()
 {
 	Board::initialize();
 
-	// initialize Uart2 for XPCC_LOG_INFO
+	// initialize Uart2 for MODM_LOG_INFO
 	GpioOutputA2::connect(Usart2::Tx);
 	GpioInputA3::connect(Usart2::Rx, Gpio::InputType::PullUp);
 	Usart2::initialize<Board::systemClock, 115200>(12);
@@ -63,14 +63,14 @@ main()
 		Adc4::startConversion();
 		while(!Adc4::isConversionFinished);
 		printAdc();
-		xpcc::delayMilliseconds(500);
+		modm::delayMilliseconds(500);
 	}
 
 	return 0;
 }
 
 
-XPCC_ISR(ADC4)
+MODM_ISR(ADC4)
 {
 	if (Adc4::getInterruptFlags() & Adc4::InterruptFlag::EndOfRegularConversion) {
 		Adc4::acknowledgeInterruptFlag(Adc4::InterruptFlag::EndOfRegularConversion);

@@ -19,14 +19,14 @@ main()
 {
 	defaultSystemClock::enable();
 
-	LedWhite::setOutput(xpcc::Gpio::High);
-	LedGreen::setOutput(xpcc::Gpio::Low);
+	LedWhite::setOutput(modm::Gpio::High);
+	LedGreen::setOutput(modm::Gpio::Low);
 
 	while (1)
 	{
 		LedWhite::toggle();
 		LedGreen::toggle();
-		xpcc::delayMilliseconds(100);
+		modm::delayMilliseconds(100);
 	}
 
 	return 0;

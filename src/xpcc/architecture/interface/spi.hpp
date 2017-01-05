@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_INTERFACE_SPI_HPP
-#define XPCC_INTERFACE_SPI_HPP
+#ifndef MODM_INTERFACE_SPI_HPP
+#define MODM_INTERFACE_SPI_HPP
 
 #include <modm/architecture/interface.hpp>
 
@@ -22,7 +22,7 @@
  * @defgroup	spi		Serial Peripheral Interface (SPI)
  */
 
-namespace xpcc
+namespace modm
 {
 
 /// @ingroup spi
@@ -50,6 +50,6 @@ struct Spi
 	};
 };
 
-} // namespace xpcc
+} // namespace modm
 
-#endif // XPCC_INTERFACE_SPI_HPP
+#endif // MODM_INTERFACE_SPI_HPP

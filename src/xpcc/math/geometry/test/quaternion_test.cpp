@@ -18,15 +18,15 @@
 void
 QuaternionTest::testConstructor()
 {
-	xpcc::Vector<float,3> v(1,2,3);
+	modm::Vector<float,3> v(1,2,3);
 	float mData[] = {1,2,3,4};
-	xpcc::Matrix<float, 4, 1> m(mData);
+	modm::Matrix<float, 4, 1> m(mData);
 	
-	xpcc::Quaternion<float> q0;
-	xpcc::Quaternion<float> q1(1,2,3,4);
-	xpcc::Quaternion<float> q2(v, M_PI/4);
-	xpcc::Quaternion<float> q3(m);
-	xpcc::Quaternion<float> q4(q1);
+	modm::Quaternion<float> q0;
+	modm::Quaternion<float> q1(1,2,3,4);
+	modm::Quaternion<float> q2(v, M_PI/4);
+	modm::Quaternion<float> q3(m);
+	modm::Quaternion<float> q4(q1);
 	
 	TEST_ASSERT_EQUALS(q0.w, 0);
 	TEST_ASSERT_EQUALS(q0.x, 0);
@@ -67,8 +67,8 @@ QuaternionTest::testConstructor()
 void
 QuaternionTest::testAssign()
 {
-	xpcc::Quaternion<float> q1(1,2,3,4);
-	xpcc::Quaternion<float> q5;
+	modm::Quaternion<float> q1(1,2,3,4);
+	modm::Quaternion<float> q5;
 	q5 = q1;
 	TEST_ASSERT_EQUALS(q5.w, 1);
 	TEST_ASSERT_EQUALS(q5.x, 2);
@@ -77,8 +77,8 @@ QuaternionTest::testAssign()
 	
 	
 	float mData[] = {1,2,3,4};
-	xpcc::Matrix<float, 4, 1> m(mData);
-	xpcc::Quaternion<float> q6;
+	modm::Matrix<float, 4, 1> m(mData);
+	modm::Quaternion<float> q6;
 	q6 = m;
 	TEST_ASSERT_EQUALS(q6.w, 1);
 	TEST_ASSERT_EQUALS(q6.x, 2);
@@ -89,7 +89,7 @@ QuaternionTest::testAssign()
 void
 QuaternionTest::testRawDataAccess()
 {
-	xpcc::Quaternion<float> a(1,2,3,4);
+	modm::Quaternion<float> a(1,2,3,4);
 	float *pointer = a.ptr();
 
 	TEST_ASSERT_EQUALS(a[0], 1);
@@ -106,8 +106,8 @@ void
 QuaternionTest::testOperators()
 {
 	// there are +q, -q, *q, *T, T*, /T, -, +=q, -=q, *=T, /=T
-	xpcc::Quaternion<float> a(1, 2, 3, 4);
-	xpcc::Quaternion<float> b(4, 5, 6, 7);
+	modm::Quaternion<float> a(1, 2, 3, 4);
+	modm::Quaternion<float> b(4, 5, 6, 7);
 
 	TEST_ASSERT_EQUALS((a + b).w, 1+4);
 	TEST_ASSERT_EQUALS((a + b).x, 2+5);
@@ -119,7 +119,7 @@ QuaternionTest::testOperators()
 	TEST_ASSERT_EQUALS((a - b).y, 3-6);
 	TEST_ASSERT_EQUALS((a - b).z, 4-7);
 
-	xpcc::Quaternion<float> product(a*b);
+	modm::Quaternion<float> product(a*b);
 	TEST_ASSERT_EQUALS(product.w, -52);
 	TEST_ASSERT_EQUALS(product.x, 10);
 	TEST_ASSERT_EQUALS(product.y, 24);
@@ -175,7 +175,7 @@ QuaternionTest::testOperators()
 void
 QuaternionTest::testLength()
 {
-	xpcc::Quaternion<float> a(1.f,2.f,3.f,4.f);
+	modm::Quaternion<float> a(1.f,2.f,3.f,4.f);
 
 	TEST_ASSERT_EQUALS_FLOAT(a.getLengthSquared(), 1.f*1.f+2.f*2.f+3.f*3.f+4.f*4.f);
 	TEST_ASSERT_EQUALS_FLOAT(a.getLength(), 5.477225575);

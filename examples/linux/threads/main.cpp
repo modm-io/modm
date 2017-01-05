@@ -15,14 +15,14 @@
 #include <modm/debug/logger.hpp>
 
 // ----------------------------------------------------------------------------
-xpcc::rtos::BinarySemaphore event;
+modm::rtos::BinarySemaphore event;
 
 // ----------------------------------------------------------------------------
-class Thread1 : public xpcc::rtos::Thread
+class Thread1 : public modm::rtos::Thread
 {
 public:
 	Thread1() :
-		xpcc::rtos::Thread(2)
+		modm::rtos::Thread(2)
 	{
 	}
 	
@@ -31,7 +31,7 @@ public:
 	{
 		while (1)
 		{
-			XPCC_LOG_DEBUG << "ping" << xpcc::endl;
+			MODM_LOG_DEBUG << "ping" << modm::endl;
 			
 			// synchronize with Task2
 			event.release();
@@ -41,11 +41,11 @@ public:
 	}
 };
 
-class Thread2 : public xpcc::rtos::Thread
+class Thread2 : public modm::rtos::Thread
 {
 public:
 	Thread2() :
-		xpcc::rtos::Thread(2)
+		modm::rtos::Thread(2)
 	{
 	}
 	
@@ -54,7 +54,7 @@ public:
 	{
 		while (1)
 		{
-			XPCC_LOG_DEBUG << "pong" << xpcc::endl;
+			MODM_LOG_DEBUG << "pong" << modm::endl;
 			
 			// wait for the other task
 			event.acquire();
@@ -71,7 +71,7 @@ int
 main()
 {
 	// start scheduler
-	xpcc::rtos::Scheduler::schedule();	
+	modm::rtos::Scheduler::schedule();	
 	
 	return 0;
 }

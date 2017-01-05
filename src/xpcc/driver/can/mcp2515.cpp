@@ -12,9 +12,8 @@
 // ----------------------------------------------------------------------------
 
 #include "mcp2515.hpp"
-#include "xpcc_config.hpp"
 
-namespace xpcc
+namespace modm
 {
 	namespace mcp2515
 	{
@@ -26,37 +25,37 @@ namespace xpcc
 			0x04,		// CNF3
 			0xb6,		// CNF2
 			0xe7,		// CNF1
-			
+
 			// 20 kbps
 			0x04,
 			0xb6,
 			0xd3,
-		
+
 			// 50 kbps
 			0x04,
 			0xb6,
 			0xc7,
-			
+
 			// 100 kbps
 			0x04,
 			0xb6,
 			0xc3,
-			
+
 			// 125 kbps
 			PHSEG21,
 			BTLMODE | PHSEG11,
 			MCP2515_BRP2 | MCP2515_BRP1 | MCP2515_BRP0,
-			
+
 			// 250 kbps
 			0x03,
 			0xac,
 			0x81,
-			
+
 			// 500 kbps
 			0x03,
 			0xac,
 			0x80,
-			
+
 			// 1 Mbps
 			PHSEG21,
 			BTLMODE | PHSEG11,
@@ -68,37 +67,37 @@ namespace xpcc
 			0x04,		// CNF3
 			0xb6,		// CNF2
 			0x31,		// CNF1
-			
+
 			// 20 kbps
 			0x04,
 			0xb6,
 			0x18,
-		
+
 			// 50 kbps
 			0x04,
 			0xb6,
 			0x18,
-			
+
 			// 100 kbps
 			0x04,
 			0xb6,
 			0x04,
-			
+
 			// 125 kbps
 			0x04,
 			0xb6,
 			0x03,
-			
+
 			// 250 kbps
 			0x04,
 			0xb6,
 			0x01,
-			
+
 			// 500 kbps
 			0x04,
 			0xb6,
 			0x00,
-			
+
 			// 1 Mbps
 			0x02,
 			0x92,

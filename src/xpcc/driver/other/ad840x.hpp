@@ -10,14 +10,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_AD840x_HPP
-#define XPCC_AD840x_HPP
+#ifndef MODM_AD840x_HPP
+#define MODM_AD840x_HPP
 
 #include <stdint.h>
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/architecture/driver/delay.hpp>
 
-namespace xpcc
+namespace modm
 {
 	namespace ad840x
 	{
@@ -86,8 +86,8 @@ namespace xpcc
 	 * 
 	 * \tparam	Spi		SPI interface (MISO pin is not used)
 	 * \tparam	Cs		Chip-Select pin
-	 * \tparam	Rs		Reset (low active), use xpcc::Unused for the AD8400
-	 * \tparam	Shdn	Shutdown (low active), use xpcc::Unused for the AD8400
+	 * \tparam	Rs		Reset (low active), use modm::Unused for the AD8400
+	 * \tparam	Shdn	Shutdown (low active), use modm::Unused for the AD8400
 	 * 
 	 * \see		ad840x
 	 * \author	Fabian Greif
@@ -191,4 +191,4 @@ namespace xpcc
 
 #include "ad840x_impl.hpp"
 
-#endif // XPCC_AD840x_HPP
+#endif // MODM_AD840x_HPP

@@ -40,20 +40,20 @@ def git_info_header(env):
 	defines = {}
 	try:
 		# Last Commit Values
-		defines['XPCC_GIT_SHA']             = env.CStringLiteral(git_show('%H'))
-		defines['XPCC_GIT_SHA_ABBR']        = env.CStringLiteral(git_show('%h'))
-		defines['XPCC_GIT_AUTHOR']          = env.CStringLiteral(git_show('%an'))
-		defines['XPCC_GIT_AUTHOR_EMAIL']    = env.CStringLiteral(git_show('%ae'))
-		defines['XPCC_GIT_AUTHOR_DATE']     = env.CStringLiteral(git_show('%ad'))
-		defines['XPCC_GIT_AUTHOR_DATE_TIMESTAMP'] = git_show('%at')
-		defines['XPCC_GIT_COMMITTER']       = env.CStringLiteral(git_show('%cn'))
-		defines['XPCC_GIT_COMMITTER_EMAIL'] = env.CStringLiteral(git_show('%ce'))
-		defines['XPCC_GIT_COMMITTER_DATE']  = env.CStringLiteral(git_show('%cd'))
-		defines['XPCC_GIT_COMMITTER_DATE_TIMESTAMP'] = git_show('%ct')
-		defines['XPCC_GIT_SUBJECT']         = env.CStringLiteral(git_show('%s'))
+		defines['MODM_GIT_SHA']             = env.CStringLiteral(git_show('%H'))
+		defines['MODM_GIT_SHA_ABBR']        = env.CStringLiteral(git_show('%h'))
+		defines['MODM_GIT_AUTHOR']          = env.CStringLiteral(git_show('%an'))
+		defines['MODM_GIT_AUTHOR_EMAIL']    = env.CStringLiteral(git_show('%ae'))
+		defines['MODM_GIT_AUTHOR_DATE']     = env.CStringLiteral(git_show('%ad'))
+		defines['MODM_GIT_AUTHOR_DATE_TIMESTAMP'] = git_show('%at')
+		defines['MODM_GIT_COMMITTER']       = env.CStringLiteral(git_show('%cn'))
+		defines['MODM_GIT_COMMITTER_EMAIL'] = env.CStringLiteral(git_show('%ce'))
+		defines['MODM_GIT_COMMITTER_DATE']  = env.CStringLiteral(git_show('%cd'))
+		defines['MODM_GIT_COMMITTER_DATE_TIMESTAMP'] = git_show('%ct')
+		defines['MODM_GIT_SUBJECT']         = env.CStringLiteral(git_show('%s'))
 		# Git Config
-		defines['XPCC_GIT_CONFIG_USER_NAME']  = env.CStringLiteral(git_config('user.name'))
-		defines['XPCC_GIT_CONFIG_USER_EMAIL'] = env.CStringLiteral(git_config('user.email'))
+		defines['MODM_GIT_CONFIG_USER_NAME']  = env.CStringLiteral(git_config('user.name'))
+		defines['MODM_GIT_CONFIG_USER_EMAIL'] = env.CStringLiteral(git_config('user.email'))
 		# Status
 		s = subprocess.check_output(['git', '--no-pager', 'status', '--porcelain']).split('\n')
 		f = { 'M': 0, 'A': 0, 'D': 0, 'R': 0, 'C': 0, 'U': 0, '?': 0}
@@ -61,17 +61,17 @@ def git_info_header(env):
 			if len(line.strip()) > 0:
 				c = line.strip()[0]
 				f[c] = f[c] + 1
-		defines['XPCC_GIT_MODIFIED']  = f['M']
-		defines['XPCC_GIT_ADDED']     = f['A']
-		defines['XPCC_GIT_DELETED']   = f['D']
-		defines['XPCC_GIT_RENAMED']   = f['R']
-		defines['XPCC_GIT_COPIED']    = f['C']
-		defines['XPCC_GIT_UPDATED_NOT_MERGED'] = f['U']
-		defines['XPCC_GIT_UNTRACKED'] = f['?']
+		defines['MODM_GIT_MODIFIED']  = f['M']
+		defines['MODM_GIT_ADDED']     = f['A']
+		defines['MODM_GIT_DELETED']   = f['D']
+		defines['MODM_GIT_RENAMED']   = f['R']
+		defines['MODM_GIT_COPIED']    = f['C']
+		defines['MODM_GIT_UPDATED_NOT_MERGED'] = f['U']
+		defines['MODM_GIT_UNTRACKED'] = f['?']
 	except subprocess.CalledProcessError as e:
 		env.Error('failed to run git command: %s' % e)
 	c = "Its content is created by a call to env.GitInfoHeader() in your SConstruct file."
-	env.DefineHeader(defines=defines, header="xpcc_git_info.hpp", comment=c)
+	env.DefineHeader(defines=defines, header="modm_git_info.hpp", comment=c)
 
 def generate(env, **kw):
 	env.AddMethod(git_info_header, 'GitInfoHeader')

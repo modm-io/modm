@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2011, Fabian Greif
+ * Copyright (c) 2009-2011, 2016, Fabian Greif
  * Copyright (c) 2009, Georgi Grinshpun
  * Copyright (c) 2010, Martin Rosekeit
  * Copyright (c) 2012-2015, Niklas Hauser
@@ -46,8 +46,11 @@ namespace xpcc
 		};
 
 	public:
+		virtual
+		~Postman();
+
 		virtual DeliverInfo
-		deliverPacket(const Header& header, const SmartPointer& payload) = 0;
+		deliverPacket(const Header& header, const modm::SmartPointer& payload) = 0;
 
 		/**
 		 * \brief	Check if a component is available on this board

@@ -12,14 +12,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_COLOR_HPP
-#define XPCC_COLOR_HPP
+#ifndef MODM_COLOR_HPP
+#define MODM_COLOR_HPP
 
 #include <stdint.h>
 #include <modm/io/iostream.hpp>
 #include <modm/utils/arithmetic_traits.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 namespace color
@@ -127,8 +127,8 @@ IOStream& operator << ( IOStream& os, const color::RgbT<UnderlyingType>& color);
 
 } // namespace color
 
-} // namespace xpcc
+} // namespace modm
 
 #include "color_impl.hpp"
 
-#endif // XPCC_COLOR_HPP
+#endif // MODM_COLOR_HPP

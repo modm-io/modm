@@ -31,7 +31,7 @@
  * \see	http://www.freertos.org/
  */
 
-namespace xpcc
+namespace modm
 {
 	/// \ingroup	freertos
 	namespace freertos

@@ -21,7 +21,7 @@
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::CanFilter::setFilterBase(uint8_t bank, uint32_t flags, uint32_t fr1, uint32_t fr2)
+modm::stm32::CanFilter::setFilterBase(uint8_t bank, uint32_t flags, uint32_t fr1, uint32_t fr2)
 {
 	uint32_t mask = (1UL << bank);
 
@@ -63,7 +63,7 @@ xpcc::stm32::CanFilter::setFilterBase(uint8_t bank, uint32_t flags, uint32_t fr1
 }
 
 void
-xpcc::stm32::CanFilter::disableFilter(uint8_t id)
+modm::stm32::CanFilter::disableFilter(uint8_t id)
 {
 	uint32_t mask = (1UL << id);
 
@@ -80,7 +80,7 @@ xpcc::stm32::CanFilter::disableFilter(uint8_t id)
 // ----------------------------------------------------------------------------
 %% if target["family"] in ["f1", "f2", "f4"]
 void
-xpcc::stm32::CanFilter::setStartFilterBankForCan2(uint8_t startBank)
+modm::stm32::CanFilter::setStartFilterBankForCan2(uint8_t startBank)
 {
 	// Initialization mode for the filter
 	{{ reg }}->FMR |= CAN_FMR_FINIT;

@@ -12,32 +12,32 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SIEMENS_S75_HPP
+#ifndef MODM_SIEMENS_S75_HPP
 #error	"Don't include this file directly, use 'siemens_s75.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 
-template <typename MEMORY, typename RESET, uint16_t WIDTH, uint16_t HEIGHT, xpcc::Orientation ORIENTATION>
+template <typename MEMORY, typename RESET, uint16_t WIDTH, uint16_t HEIGHT, modm::Orientation ORIENTATION>
 void
-xpcc::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::update()
+modm::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::update()
 {
 	uint8_t width;
 	uint8_t height;
 
 	switch (ORIENTATION)
 	{
-	case xpcc::Orientation::LandscapeLeft:
-	case xpcc::Orientation::LandscapeRight:
+	case modm::Orientation::LandscapeLeft:
+	case modm::Orientation::LandscapeRight:
 	{
 		// Set CGRAM Address to height - 1 = upper left corner
 		interface.writeRegister(0x21, 0xAF00);
-		// size of the XPCC Display buffer, not the hardware pixels
+		// size of the MODM Display buffer, not the hardware pixels
 		width  = 176;
 		height = 136 / 8; // Display is only 132 pixels high.
 	}
 	break;
-	case xpcc::Orientation::Portrait:
+	case modm::Orientation::Portrait:
 	{
 		// Set CGRAM Address to 0 = upper left corner
 		interface.writeRegister(0x21, 0x0000);
@@ -45,7 +45,7 @@ xpcc::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::update()
 		height = 176 / 8;
 	}
 	break;
-	case xpcc::Orientation::PortraitUpsideDown:
+	case modm::Orientation::PortraitUpsideDown:
 	{
 		interface.writeRegister(0x21, 131);
 		width  = 132;
@@ -70,8 +70,8 @@ xpcc::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::update()
 			uint_fast8_t PortIdx = 0;
 
 			uint_fast8_t pixels;
-			if ((ORIENTATION == xpcc::Orientation::LandscapeLeft) ||
-				(ORIENTATION == xpcc::Orientation::LandscapeRight))
+			if ((ORIENTATION == modm::Orientation::LandscapeLeft) ||
+				(ORIENTATION == modm::Orientation::LandscapeRight))
 			{
 				// Only 4 pixels at the lower end of the display in landscape mode
 				if (y == (height - 1)) {
@@ -102,9 +102,9 @@ xpcc::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::update()
 }
 
 
-template <typename MEMORY, typename RESET, uint16_t WIDTH, uint16_t HEIGHT, xpcc::Orientation ORIENTATION>
+template <typename MEMORY, typename RESET, uint16_t WIDTH, uint16_t HEIGHT, modm::Orientation ORIENTATION>
 void
-xpcc::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::initialize()
+modm::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::initialize()
 {
 	// Reset pin
 	RESET::setOutput(false);
@@ -114,9 +114,9 @@ xpcc::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::initialize()
 	this->clear();
 }
 
-template <typename MEMORY, typename RESET, uint16_t WIDTH, uint16_t HEIGHT, xpcc::Orientation ORIENTATION>
+template <typename MEMORY, typename RESET, uint16_t WIDTH, uint16_t HEIGHT, modm::Orientation ORIENTATION>
 void
-xpcc::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::lcdCls(const uint16_t colour)
+modm::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::lcdCls(const uint16_t colour)
 {
 	// Set CGRAM Address to 0 = upper left corner
 	interface.writeRegister(0x21, 0x0000);
@@ -130,17 +130,17 @@ xpcc::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::lcdCls(const 
 	}
 }
 
-template <typename MEMORY, typename RESET, uint16_t WIDTH, uint16_t HEIGHT, xpcc::Orientation ORIENTATION>
+template <typename MEMORY, typename RESET, uint16_t WIDTH, uint16_t HEIGHT, modm::Orientation ORIENTATION>
 void
-xpcc::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::lcdSettings()
+modm::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::lcdSettings()
 {
 	// Hardware reset is low from initialize
-	xpcc::delayMilliseconds(50);
+	modm::delayMilliseconds(50);
 	RESET::set();
-	xpcc::delayMilliseconds(50);
+	modm::delayMilliseconds(50);
 
 	interface.writeRegister(0x00, 0x0001); // R00: Start oscillation
-	xpcc::delayMilliseconds(10);
+	modm::delayMilliseconds(10);
 
 	//power on sequence
 	interface.writeRegister(0x10, 0x1f92);	// R10: Power Control 1
@@ -152,21 +152,21 @@ xpcc::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::lcdSettings()
 	interface.writeRegister(0x02, 0x0000);	// R02: LCD drive AC control
 	interface.writeRegister(0x12, 0x040f);	// R12: Power Control 2
 
-	xpcc::delayMilliseconds(100);
+	modm::delayMilliseconds(100);
 
 	// R03: Entry mode
 	switch(ORIENTATION)
 	{
-	case xpcc::Orientation::LandscapeLeft:
+	case modm::Orientation::LandscapeLeft:
 		interface.writeRegister(0x03, 0x7820);
 		break;
-	case xpcc::Orientation::LandscapeRight:
+	case modm::Orientation::LandscapeRight:
 		interface.writeRegister(0x03, 0x7810);
 		break;
-	case xpcc::Orientation::Portrait:
+	case modm::Orientation::Portrait:
 		interface.writeRegister(0x03, 0x7838);
 		break;
-	case xpcc::Orientation::PortraitUpsideDown:
+	case modm::Orientation::PortraitUpsideDown:
 		interface.writeRegister(0x03, 0x7808);
 		break;
 	}
@@ -190,7 +190,7 @@ xpcc::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::lcdSettings()
 
 	interface.writeRegister(0x44, 0x8300); // Horizontal RAM Address
 	interface.writeRegister(0x45, 0xaf00); // Vertical RAM Address
-	xpcc::delayMilliseconds(10);
+	modm::delayMilliseconds(10);
 
 	// colourful test
 	lcdCls(0x0000); // black

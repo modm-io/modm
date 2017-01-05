@@ -15,7 +15,7 @@
 
 #include "io_stream_test.hpp"
 
-#include <modm/architecture/utils.hpp> // XPCC_ARRAY_SIZE
+#include <modm/architecture/utils.hpp> // MODM_ARRAY_SIZE
 #include <stdio.h>	// snprintf
 #include <string.h>	// memset
 
@@ -23,7 +23,7 @@
 // simple IODevice which stores all data in a memory buffer
 // used for testing the output of an IOStream
 
-class MemoryWriter : public xpcc::IODevice
+class MemoryWriter : public modm::IODevice
 {
 public:
 	MemoryWriter() :
@@ -37,7 +37,7 @@ public:
 		this->bytesWritten++;
 	}
 
-	using xpcc::IODevice::write;
+	using modm::IODevice::write;
 
 	virtual void
 	flush()
@@ -73,7 +73,7 @@ void
 IoStreamTest::setUp()
 {
 	device.clear();
-	stream = new xpcc::IOStream(device);
+	stream = new modm::IOStream(device);
 }
 
 void
@@ -101,7 +101,7 @@ IoStreamTest::testFlashString()
 {
 	char string[] = "abc";
 
-	(*stream) << xpcc::accessor::asFlash(flashString);
+	(*stream) << modm::accessor::asFlash(flashString);
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 3);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 3);
@@ -340,7 +340,7 @@ IoStreamTest::testHex1()
 
 	char c = 0x10;
 
-	(*stream) << xpcc::hex << c;
+	(*stream) << modm::hex << c;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 2);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 2);
@@ -353,7 +353,7 @@ IoStreamTest::testHex2()
 
 	char s[] = "Hallo";
 
-	(*stream) << xpcc::hex << s;
+	(*stream) << modm::hex << s;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 10);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 10);
@@ -366,7 +366,7 @@ IoStreamTest::testHex3()
 
 	int16_t i = 0x123;
 
-	(*stream) << xpcc::hex << i;
+	(*stream) << modm::hex << i;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 4);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 4);
@@ -379,7 +379,7 @@ IoStreamTest::testHex4()
 
 	int32_t i = 0x12345645;
 
-	(*stream) << xpcc::hex << i;
+	(*stream) << modm::hex << i;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 8);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 8);
@@ -392,10 +392,10 @@ IoStreamTest::testHex5()
 
 	bool boo = true;
 
-	(*stream) << xpcc::hex << boo;
+	(*stream) << modm::hex << boo;
 
 	boo = false;
-	(*stream) << xpcc::hex << boo;
+	(*stream) << modm::hex << boo;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 4);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 4);
@@ -409,7 +409,7 @@ IoStreamTest::testBin1()
 
 	char c = 0x12;
 
-	(*stream) << xpcc::bin << c;
+	(*stream) << modm::bin << c;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 8);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 8);
@@ -422,7 +422,7 @@ IoStreamTest::testBin2()
 
 	char s[] = "Hallo";
 
-	(*stream) << xpcc::bin << s;
+	(*stream) << modm::bin << s;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 40);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 40);
@@ -435,7 +435,7 @@ IoStreamTest::testBin3()
 
 	int16_t i = 0x0123;
 
-	(*stream) << xpcc::bin << i;
+	(*stream) << modm::bin << i;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 16);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 16);
@@ -448,7 +448,7 @@ IoStreamTest::testBin4()
 
 	int32_t i = 0x12345645;
 
-	(*stream) << xpcc::bin << i;
+	(*stream) << modm::bin << i;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 32);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 32);
@@ -461,10 +461,10 @@ IoStreamTest::testBin5()
 
 	bool boo = true;
 
-	(*stream) << xpcc::bin << boo;
+	(*stream) << modm::bin << boo;
 
 	boo = false;
-	(*stream) << xpcc::bin << boo;
+	(*stream) << modm::bin << boo;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 16);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 16);
@@ -483,7 +483,7 @@ IoStreamTest::testPrintf1()
 void
 IoStreamTest::testPrintf2()
 {
-	// Compare xpcc's formatter with glibc's formatter
+	// Compare modm's formatter with glibc's formatter
 
 	float ff_testvector[] = {
 		123.456789
@@ -498,7 +498,7 @@ IoStreamTest::testPrintf2()
 		+0.0067890
 	};
 
-	for (std::size_t ii = 0; ii < XPCC_ARRAY_SIZE(ff_testvector); ++ii)
+	for (std::size_t ii = 0; ii < MODM_ARRAY_SIZE(ff_testvector); ++ii)
 	{
 		float ff = ff_testvector[ii];
 

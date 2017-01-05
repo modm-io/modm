@@ -24,8 +24,8 @@ main()
 	while (1)
 	{
 		LedD13::set();
-		xpcc::delayMilliseconds(1000);
+		modm::delayMilliseconds(1000);
 		LedD13::reset();
-		xpcc::delayMilliseconds(1000);
+		modm::delayMilliseconds(1000);
 	}
 }

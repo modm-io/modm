@@ -32,9 +32,9 @@ namespace lis
 // I2c Transport Layer
 typedef GpioA5 Scl;
 typedef GpioA7 Sda;
-typedef xpcc::SoftwareI2cMaster<Scl, Sda> I2cMaster;
+typedef modm::SoftwareI2cMaster<Scl, Sda> I2cMaster;
 
-typedef xpcc::Lis3TransportI2c< I2cMaster > Transport;
+typedef modm::Lis3TransportI2c< I2cMaster > Transport;
 #else
 typedef Board::lis3::Transport Transport;
 #endif
@@ -43,15 +43,15 @@ typedef Board::lis3::Transport Transport;
 
 // Data and Driver object
 #if REVISION_C
-xpcc::lis3dsh::Data data;
-xpcc::Lis3dsh< lis::Transport > accel(data);
+modm::lis3dsh::Data data;
+modm::Lis3dsh< lis::Transport > accel(data);
 #else
-xpcc::lis302dl::Data data;
-xpcc::Lis302dl< lis::Transport > accel(data);
+modm::lis302dl::Data data;
+modm::Lis302dl< lis::Transport > accel(data);
 #endif
 
 
-class ReaderThread : public xpcc::pt::Protothread
+class ReaderThread : public modm::pt::Protothread
 {
 public:
 	bool
@@ -100,9 +100,9 @@ public:
 	}
 
 private:
-	xpcc::ShortTimeout timeout;
-	xpcc::filter::MovingAverage<float, 25> averageX;
-	xpcc::filter::MovingAverage<float, 25> averageY;
+	modm::ShortTimeout timeout;
+	modm::filter::MovingAverage<float, 25> averageX;
+	modm::filter::MovingAverage<float, 25> averageY;
 };
 
 ReaderThread reader;
@@ -113,8 +113,8 @@ main()
 	Board::initialize();
 
 #if USE_I2C
-	Board::lis3::Cs::setOutput(xpcc::Gpio::High);
-	Board::lis3::Mosi::setOutput(xpcc::Gpio::High);
+	Board::lis3::Cs::setOutput(modm::Gpio::High);
+	Board::lis3::Mosi::setOutput(modm::Gpio::High);
 
 	lis::Scl::connect(lis::I2cMaster::Scl, Gpio::InputType::PullUp);
 	lis::Sda::connect(lis::I2cMaster::Sda, Gpio::InputType::PullUp);

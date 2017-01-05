@@ -15,19 +15,19 @@
 #include <modm/driver/display.hpp>
 #include <modm/ui/button_group.hpp>
 
-using namespace xpcc::atmega;
-typedef xpcc::avr::SystemClock clock;
+using namespace modm::atmega;
+typedef modm::avr::SystemClock clock;
 
 typedef GpioOutputD2 Cs;
 typedef GpioOutputB6 Mosi;
 typedef GpioOutputB7 Sck;
 
-typedef xpcc::SoftwareSpiMaster<Sck, Mosi, xpcc::GpioUnused> SPI;
+typedef modm::SoftwareSpiMaster<Sck, Mosi, modm::GpioUnused> SPI;
 
 typedef GpioOutputD3 A0;
 typedef GpioOutputD4 Reset;
 
-typedef xpcc::DogM132<SPI, Cs, A0, Reset> Display;
+typedef modm::DogM132<SPI, Cs, A0, Reset> Display;
 
 typedef GpioOutputD7 Backlight;
 
@@ -42,7 +42,7 @@ main()
 	SPI::initialize<clock, 1000000>();
 
 	display.initialize();
-	display.setFont(xpcc::font::Assertion);
+	display.setFont(modm::font::Assertion);
 
 	bool dir = true;
 	uint8_t y = 0;

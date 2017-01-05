@@ -19,17 +19,17 @@ dummyErrorHandler(uint16_t)
 }
 
 // ----------------------------------------------------------------------------
-xpcc::ErrorReport::Handler xpcc::ErrorReport::globalErrorHandler = &dummyErrorHandler;
+modm::ErrorReport::Handler modm::ErrorReport::globalErrorHandler = &dummyErrorHandler;
 
 // ----------------------------------------------------------------------------
 void
-xpcc::ErrorReport::attach(Handler handler)
+modm::ErrorReport::attach(Handler handler)
 {
 	globalErrorHandler = handler;
 }
 
 void
-xpcc::ErrorReport::detach()
+modm::ErrorReport::detach()
 {
 	globalErrorHandler = &dummyErrorHandler;
 }

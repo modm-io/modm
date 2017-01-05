@@ -11,7 +11,7 @@
 
 #include <modm/architecture/platform.hpp>
 using namespace Board;
-using namespace xpcc::glcd;
+using namespace modm::glcd;
 
 // ----------------------------------------------------------------------------
 int
@@ -20,8 +20,8 @@ main()
 	Board::initialize();
 	Board::initializeDisplay();
 
-	xpcc::GraphicDisplay& display = Board::getDisplay();
-	display.setFont(xpcc::font::Assertion);
+	modm::GraphicDisplay& display = Board::getDisplay();
+	display.setFont(modm::font::Assertion);
 
 	display.drawRectangle(0,0, 10, 10);
 	display.drawRectangle(0,470, 10, 10);
@@ -35,7 +35,7 @@ main()
 
 	while (1)
 	{
-		xpcc::delayMilliseconds(50);
+		modm::delayMilliseconds(50);
 
 		if (Button::read()) {
 			display.clear();

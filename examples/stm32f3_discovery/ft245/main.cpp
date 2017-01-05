@@ -29,16 +29,16 @@ main()
 {
 	Board::initialize();
 
-	typedef xpcc::stm32::GpioPort<xpcc::stm32::GpioD0, 8> myPort;
-	typedef xpcc::stm32::GpioInputC11  Rxf;
-	typedef xpcc::stm32::GpioInputC10  Txe;
-	typedef xpcc::stm32::GpioOutputA15 Rd;
-	typedef xpcc::stm32::GpioOutputA9  Wr;
+	typedef modm::stm32::GpioPort<modm::stm32::GpioD0, 8> myPort;
+	typedef modm::stm32::GpioInputC11  Rxf;
+	typedef modm::stm32::GpioInputC10  Txe;
+	typedef modm::stm32::GpioOutputA15 Rd;
+	typedef modm::stm32::GpioOutputA9  Wr;
 
-	Rd::setOutput(xpcc::Gpio::High);
-	Wr::setOutput(xpcc::Gpio::Low);
+	Rd::setOutput(modm::Gpio::High);
+	Wr::setOutput(modm::Gpio::Low);
 
-	typedef xpcc::Ft245<myPort, Rd, Wr, Rxf, Txe> myFt;
+	typedef modm::Ft245<myPort, Rd, Wr, Rxf, Txe> myFt;
 
 	while (1)
 	{

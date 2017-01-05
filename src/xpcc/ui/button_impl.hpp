@@ -10,15 +10,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_BUTTON_HPP
+#ifndef MODM_BUTTON_HPP
 	#error	"Don't include this file directly, use 'button.hpp' instead!"
 #endif
 
-template <typename T> uint8_t xpcc::Button<T>::state;
+template <typename T> uint8_t modm::Button<T>::state;
 
 template <typename T>
 void
-xpcc::Button<T>::update()
+modm::Button<T>::update()
 {
 	uint8_t i;
 	if (T::read()) {
@@ -44,14 +44,14 @@ xpcc::Button<T>::update()
 
 template <typename T>
 bool
-xpcc::Button<T>::getState()
+modm::Button<T>::getState()
 {
 	return (state & 0x01);
 }
 
 template <typename T>
 bool
-xpcc::Button<T>::isPressed()
+modm::Button<T>::isPressed()
 {
 	return false;
 }

@@ -14,14 +14,14 @@
 
 #include "bme280_test.hpp"
 
-#undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::DISABLED
+#undef  MODM_LOG_LEVEL
+#define MODM_LOG_LEVEL modm::log::DISABLED
 
 void
 Bme280Test::testConversion()
 {
 	static constexpr size_t table_size = 4;
-	xpcc::bme280::DataDouble dataTable[table_size];
+	modm::bme280::DataDouble dataTable[table_size];
 	uint32_t adc_temp_min[table_size];
 	uint32_t adc_temp_max[table_size];
 
@@ -134,14 +134,14 @@ Bme280Test::testConversion()
 	adc_press_max[3] = 0x62090;
 
 
-	for (size_t jj = 0; jj < XPCC_ARRAY_SIZE(dataTable); ++jj)
+	for (size_t jj = 0; jj < MODM_ARRAY_SIZE(dataTable); ++jj)
 	{
-		xpcc::bme280::DataDouble* dataDouble;
+		modm::bme280::DataDouble* dataDouble;
 
 		dataDouble = &(dataTable[jj]);
 
 		// Fixed Point
-		xpcc::bme280::Data data;
+		modm::bme280::Data data;
 
 		// Copy calibration from double precision to fixed point
 		data.calibration.T1 = dataDouble->calibration.T1;
@@ -170,7 +170,7 @@ Bme280Test::testConversion()
 		uint32_t total_error = 0;
 		uint32_t max_error = 0;
 
-		XPCC_LOG_DEBUG.printf("ADC --double--\t--int--\t--error--\n");
+		MODM_LOG_DEBUG.printf("ADC --double--\t--int--\t--error--\n");
 
 		for (uint32_t adc = adc_temp_min[jj]; adc <= adc_temp_max[jj]; ++adc)
 		{
@@ -189,7 +189,7 @@ Bme280Test::testConversion()
 
 			int32_t error = tempDouble - temp;
 
-			XPCC_LOG_DEBUG.printf("%05x\t%5d\t%5d\t%2d\n", adc, tempDouble, temp, error);
+			MODM_LOG_DEBUG.printf("%05x\t%5d\t%5d\t%2d\n", adc, tempDouble, temp, error);
 
 			error = std::abs(error);
 			total_error += error;
@@ -198,9 +198,9 @@ Bme280Test::testConversion()
 			}
 		}
 
-		XPCC_LOG_DEBUG.printf("== Errors ==\n");
-		XPCC_LOG_DEBUG.printf(" max = %d\n", max_error);
-		XPCC_LOG_DEBUG.printf(" sum = %d\n", total_error);
+		MODM_LOG_DEBUG.printf("== Errors ==\n");
+		MODM_LOG_DEBUG.printf(" max = %d\n", max_error);
+		MODM_LOG_DEBUG.printf(" sum = %d\n", total_error);
 
 		TEST_ASSERT_TRUE(total_error < 51000);
 		TEST_ASSERT_TRUE(max_error <= 1);
@@ -236,7 +236,7 @@ Bme280Test::testConversion()
 			double temp;
 			dataDouble->getTemperature(temp);
 
-			XPCC_LOG_DEBUG.printf("adc_temp = %05x, T = %f\n", adc_temp, temp);
+			MODM_LOG_DEBUG.printf("adc_temp = %05x, T = %f\n", adc_temp, temp);
 
 			uint32_t adc_press_span = adc_press_max[jj] - adc_press_min[jj];
 
@@ -268,7 +268,7 @@ Bme280Test::testConversion()
 				}
 
 				int32_t error = pressFp - pressDp;
-				XPCC_LOG_DEBUG.printf("  adc_press = %05x  PressFp = %9d Pa\t PressDp = %9d Pa \t Diff = %5d Pa\n", 
+				MODM_LOG_DEBUG.printf("  adc_press = %05x  PressFp = %9d Pa\t PressDp = %9d Pa \t Diff = %5d Pa\n", 
 					adc_press, pressFp, pressDp, error);
 
 				error = std::abs(error);
@@ -279,9 +279,9 @@ Bme280Test::testConversion()
 			}
 		}
 
-		XPCC_LOG_DEBUG.printf("== Errors ==\n");
-		XPCC_LOG_DEBUG.printf(" max = %d\n", max_error);
-		XPCC_LOG_DEBUG.printf(" sum = %d\n", total_error);
+		MODM_LOG_DEBUG.printf("== Errors ==\n");
+		MODM_LOG_DEBUG.printf(" max = %d\n", max_error);
+		MODM_LOG_DEBUG.printf(" sum = %d\n", total_error);
 
 		TEST_ASSERT_TRUE(total_error <= 2455);
 		TEST_ASSERT_TRUE(max_error <= 50);

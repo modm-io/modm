@@ -13,16 +13,16 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_CAN_LAWICEL_FORMATTER_HPP
-#define XPCC_CAN_LAWICEL_FORMATTER_HPP
+#ifndef MODM_CAN_LAWICEL_FORMATTER_HPP
+#define MODM_CAN_LAWICEL_FORMATTER_HPP
 
 #include <modm/architecture/interface/can_message.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 /**
- * Converts XPCC CAN messages (xpcc::can::Message) to and from the Lawicel string format (char *).
+ * Converts MODM CAN messages (modm::can::Message) to and from the Lawicel string format (char *).
  *
  * Lawicel AB offers medium sized CAN to USB
  * and CAN to RS232 converters. Their data format is widely used, including
@@ -57,6 +57,6 @@ private:
 	byteToHex(uint8_t num);
 };
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif // XPCC_CAN_LAWICEL_FORMATTER_HPP
+#endif // MODM_CAN_LAWICEL_FORMATTER_HPP

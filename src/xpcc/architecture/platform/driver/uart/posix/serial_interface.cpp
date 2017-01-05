@@ -28,11 +28,11 @@
 
 #include <modm/debug/logger.hpp>
 
-#undef XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL 	xpcc::log::ERROR
+#undef MODM_LOG_LEVEL
+#define MODM_LOG_LEVEL 	modm::log::ERROR
 
 // ----------------------------------------------------------------------------
-xpcc::hosted::SerialInterface::SerialInterface() :
+modm::hosted::SerialInterface::SerialInterface() :
 	isConnected(false),
 	deviceName("unknown"),
 	baudRate(0),
@@ -40,7 +40,7 @@ xpcc::hosted::SerialInterface::SerialInterface() :
 {
 }
 
-xpcc::hosted::SerialInterface::SerialInterface(
+modm::hosted::SerialInterface::SerialInterface(
 		const std::string& device, unsigned int baudRate) :
 	isConnected(false),
 	deviceName(device),
@@ -50,28 +50,28 @@ xpcc::hosted::SerialInterface::SerialInterface(
 }
 
 // ----------------------------------------------------------------------------
-xpcc::hosted::SerialInterface::~SerialInterface()
+modm::hosted::SerialInterface::~SerialInterface()
 {
 	this->close();
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::hosted::SerialInterface::setDeviceName(const std::string& name)
+modm::hosted::SerialInterface::setDeviceName(const std::string& name)
 {
 	this->deviceName = name;
 }
 
 // ----------------------------------------------------------------------------
 const std::string&
-xpcc::hosted::SerialInterface::getDeviceName() const
+modm::hosted::SerialInterface::getDeviceName() const
 {
 	return this->deviceName;
 }
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::hosted::SerialInterface::setBaudRate(unsigned int rate)
+modm::hosted::SerialInterface::setBaudRate(unsigned int rate)
 {
 	struct termios configuration;
 	int result1, result2, result3;
@@ -79,7 +79,7 @@ xpcc::hosted::SerialInterface::setBaudRate(unsigned int rate)
 	// Read current configuration structure
 	tcgetattr(this->fileDescriptor, &configuration);
 
-	XPCC_LOG_INFO << "Set baud rate to '" << this->baudRate << "'" << xpcc::endl;
+	MODM_LOG_INFO << "Set baud rate to '" << this->baudRate << "'" << modm::endl;
 
 	this->baudRate = rate;
 
@@ -101,7 +101,7 @@ xpcc::hosted::SerialInterface::setBaudRate(unsigned int rate)
 
 	if (result1 < 0 || result2 < 0 || result3 < 0)
 	{
-		XPCC_LOG_ERROR << "Could not set the baud rate!" << xpcc::endl;
+		MODM_LOG_ERROR << "Could not set the baud rate!" << modm::endl;
 		return false;
 	}
 
@@ -111,36 +111,36 @@ xpcc::hosted::SerialInterface::setBaudRate(unsigned int rate)
 
 // ----------------------------------------------------------------------------
 unsigned int
-xpcc::hosted::SerialInterface::getBaudRate() const
+modm::hosted::SerialInterface::getBaudRate() const
 {
 	return this->baudRate;
 }
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::hosted::SerialInterface::open()
+modm::hosted::SerialInterface::open()
 {
-	XPCC_LOG_INFO
-		<< XPCC_FILE_INFO
+	MODM_LOG_INFO
+		<< MODM_FILE_INFO
 		<< "Opening port '"	<< this->deviceName.c_str()
 		<< "' at speed '" << this->baudRate << "'"
-		<< xpcc::endl;
+		<< modm::endl;
 
 	// Complain if device is already opened.
 	if (this->isConnected)
 	{
-		XPCC_LOG_ERROR << "Port is already open." << xpcc::endl;
+		MODM_LOG_ERROR << "Port is already open." << modm::endl;
 	}
 	else
 	{
-		XPCC_LOG_INFO << "Trying to create file descriptor ... ";
+		MODM_LOG_INFO << "Trying to create file descriptor ... ";
 
 		this->fileDescriptor = ::open(this->deviceName.c_str(), O_RDWR | O_NOCTTY | O_EXCL | O_NDELAY);
 
-		XPCC_LOG_INFO << this->fileDescriptor << xpcc::endl;
+		MODM_LOG_INFO << this->fileDescriptor << modm::endl;
 
 		if (this->fileDescriptor == -1) {
-			XPCC_LOG_ERROR << "Invalid file descriptor!" << xpcc::endl;
+			MODM_LOG_ERROR << "Invalid file descriptor!" << modm::endl;
 		}
 		else {
 			// Set parameter for this port
@@ -151,7 +151,7 @@ xpcc::hosted::SerialInterface::open()
 			fcntl(this->fileDescriptor, F_SETFL, FNDELAY);
 			this->isConnected = true;
 
-			XPCC_LOG_INFO << "Connected!" << xpcc::endl;
+			MODM_LOG_INFO << "Connected!" << modm::endl;
 			return true;
 		}
 	}
@@ -161,21 +161,21 @@ xpcc::hosted::SerialInterface::open()
 
 // ----------------------------------------------------------------------------
 void
-xpcc::hosted::SerialInterface::initSerial()
+modm::hosted::SerialInterface::initSerial()
 {
 	struct termios configuration;
 
 	// Read old configuration
 	tcgetattr(this->fileDescriptor, &configuration);
 
-	XPCC_LOG_INFO
-		<< "Read old configuration:" << xpcc::endl
-		<< " - iflag = " << configuration.c_iflag << xpcc::endl
-		<< " - oflag = " << configuration.c_oflag << xpcc::endl
-		<< " - cflag = " << configuration.c_cflag << xpcc::endl
-		<< " - lflag = " << configuration.c_lflag << xpcc::endl;
+	MODM_LOG_INFO
+		<< "Read old configuration:" << modm::endl
+		<< " - iflag = " << configuration.c_iflag << modm::endl
+		<< " - oflag = " << configuration.c_oflag << modm::endl
+		<< " - cflag = " << configuration.c_cflag << modm::endl
+		<< " - lflag = " << configuration.c_lflag << modm::endl;
 
-	XPCC_LOG_INFO << "Set new configuration" << xpcc::endl;
+	MODM_LOG_INFO << "Set new configuration" << modm::endl;
 
 	configuration.c_cflag &= ~PARENB;   // no parity
 	configuration.c_cflag &= ~CSIZE;    // clear old data bit value
@@ -215,10 +215,10 @@ xpcc::hosted::SerialInterface::initSerial()
 
 // ----------------------------------------------------------------------------
 void
-xpcc::hosted::SerialInterface::close()
+modm::hosted::SerialInterface::close()
 {
 	if (this->isConnected) {
-		XPCC_LOG_INFO << "Closing port!!" << xpcc::endl;
+		MODM_LOG_INFO << "Closing port!!" << modm::endl;
 
 		int result = ::close(this->fileDescriptor);
 		(void) result;
@@ -229,18 +229,18 @@ xpcc::hosted::SerialInterface::close()
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::hosted::SerialInterface::isOpen()
+modm::hosted::SerialInterface::isOpen()
 {
 	return this->isConnected;
 }
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::hosted::SerialInterface::read(char& c)
+modm::hosted::SerialInterface::read(char& c)
 {
 	if (::read(this->fileDescriptor, &c, 1) > 0)
 	{
-		XPCC_LOG_DEBUG << "0x" << xpcc::hex << c << " " << xpcc::endl;
+		MODM_LOG_DEBUG << "0x" << modm::hex << c << " " << modm::endl;
 		return true;
 	}
 
@@ -249,7 +249,7 @@ xpcc::hosted::SerialInterface::read(char& c)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::hosted::SerialInterface::readBytes(uint8_t* data, std::size_t length)
+modm::hosted::SerialInterface::readBytes(uint8_t* data, std::size_t length)
 {
 	int delta = length;
 	int result = 0 ;
@@ -264,14 +264,14 @@ xpcc::hosted::SerialInterface::readBytes(uint8_t* data, std::size_t length)
 	}
 
 	for (std::size_t i = 0; i < length; i++) {
-		XPCC_LOG_DEBUG << "0x" << xpcc::hex << data[i] << xpcc::ascii << " ";
+		MODM_LOG_DEBUG << "0x" << modm::hex << data[i] << modm::ascii << " ";
 	}
-	XPCC_LOG_DEBUG << xpcc::endl;
+	MODM_LOG_DEBUG << modm::endl;
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::hosted::SerialInterface::write(char c)
+modm::hosted::SerialInterface::write(char c)
 {
 /*	SUB_LOGGER_LOG(logger, Logger::ERROR, "writeByte")
 		<< "0x" << std::hex << (int)data << "; ";
@@ -286,7 +286,7 @@ xpcc::hosted::SerialInterface::write(char c)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::hosted::SerialInterface::write(const char* str)
+modm::hosted::SerialInterface::write(const char* str)
 {
 	char c;
 	while ((c = *str++)) {
@@ -296,7 +296,7 @@ xpcc::hosted::SerialInterface::write(const char* str)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::hosted::SerialInterface::writeBytes(const uint8_t* data, std::size_t length)
+modm::hosted::SerialInterface::writeBytes(const uint8_t* data, std::size_t length)
 {
 	for (std::size_t i = 0; i < length; ++i) {
 		this->write(static_cast<char>(*data++));
@@ -305,51 +305,51 @@ xpcc::hosted::SerialInterface::writeBytes(const uint8_t* data, std::size_t lengt
 
 // ----------------------------------------------------------------------------
 void
-xpcc::hosted::SerialInterface::dumpErrorMessage()
+modm::hosted::SerialInterface::dumpErrorMessage()
 {
 	switch(errno)
 	{
 		case EBADF:
-			XPCC_LOG_ERROR << "The argument is not a valid file descriptor." << xpcc::endl;
+			MODM_LOG_ERROR << "The argument is not a valid file descriptor." << modm::endl;
 			break;
 
 		case EINVAL:
-			XPCC_LOG_ERROR << "Invalid argument." << xpcc::endl;
+			MODM_LOG_ERROR << "Invalid argument." << modm::endl;
 			break;
 
 		case EFAULT:
-			XPCC_LOG_ERROR << "Bad Address. Pointer address outside the address "\
-							  "space of the process." << xpcc::endl;
+			MODM_LOG_ERROR << "Bad Address. Pointer address outside the address "\
+							  "space of the process." << modm::endl;
 			break;
 
 		case EAGAIN:
-			XPCC_LOG_ERROR << "Normally, when no input is immediately available, "\
+			MODM_LOG_ERROR << "Normally, when no input is immediately available, "\
 				"read waits for some input. But if the O_NONBLOCK flag is set "\
 				"for the file (see section File Status Flags), read returns "\
-				"immediately without reading any data, and reports this error." << xpcc::endl;
+				"immediately without reading any data, and reports this error." << modm::endl;
 			break;
 
 		case ENOSPC:
-			XPCC_LOG_ERROR << "The device is full." << xpcc::endl;
+			MODM_LOG_ERROR << "The device is full." << modm::endl;
 			break;
 
 		case EPIPE:
-			XPCC_LOG_ERROR << "Trying to write to a pipe or FIFO that isn't "\
-							  "open for reading by any process" << xpcc::endl;
+			MODM_LOG_ERROR << "Trying to write to a pipe or FIFO that isn't "\
+							  "open for reading by any process" << modm::endl;
 			break;
 
 		case EINTR:
-			XPCC_LOG_ERROR << "The call was interrupted by a signal." << xpcc::endl;
+			MODM_LOG_ERROR << "The call was interrupted by a signal." << modm::endl;
 			break;
 
 		default:
-			XPCC_LOG_ERROR	<< "Unknown error: " << errno << xpcc::endl;
+			MODM_LOG_ERROR	<< "Unknown error: " << errno << modm::endl;
 			break;
 	}
 }
 // ----------------------------------------------------------------------------
 std::size_t
-xpcc::hosted::SerialInterface::bytesAvailable() const
+modm::hosted::SerialInterface::bytesAvailable() const
 {
 	std::size_t bytesAvailable;
 
@@ -360,17 +360,17 @@ xpcc::hosted::SerialInterface::bytesAvailable() const
 
 // ----------------------------------------------------------------------------
 void
-xpcc::hosted::SerialInterface::flush()
+modm::hosted::SerialInterface::flush()
 {
 	// TODO flush buffers
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::hosted::SerialInterface::dump()
+modm::hosted::SerialInterface::dump()
 {
 	if (!this->isConnected) {
-		XPCC_LOG_DEBUG	<< "Port is not connected device!!" << xpcc::endl;
+		MODM_LOG_DEBUG	<< "Port is not connected device!!" << modm::endl;
 	}
 	else {
 		struct termios configStatus;
@@ -378,19 +378,19 @@ xpcc::hosted::SerialInterface::dump()
 		// Fill the configuration structure
 		tcgetattr( this->fileDescriptor, &configStatus);
 
-		XPCC_LOG_DEBUG
-			<< "parity:       " << ((configStatus.c_cflag & PARENB) ? "yes" : "no") << xpcc::endl
-			<< "8 data bits:  " << ((configStatus.c_cflag & CS8) 	? "yes" : "no") << xpcc::endl
-			<< "ready:        " << ((configStatus.c_cflag & CREAD) 	? "yes" : "no") << xpcc::endl
-			<< "input speed:  " << configStatus.c_ispeed << xpcc::endl
-			<< "output speed: " << configStatus.c_ospeed << xpcc::endl
-			<< "speed:        " << ( configStatus.c_cflag ) << xpcc::endl;
+		MODM_LOG_DEBUG
+			<< "parity:       " << ((configStatus.c_cflag & PARENB) ? "yes" : "no") << modm::endl
+			<< "8 data bits:  " << ((configStatus.c_cflag & CS8) 	? "yes" : "no") << modm::endl
+			<< "ready:        " << ((configStatus.c_cflag & CREAD) 	? "yes" : "no") << modm::endl
+			<< "input speed:  " << configStatus.c_ispeed << modm::endl
+			<< "output speed: " << configStatus.c_ospeed << modm::endl
+			<< "speed:        " << ( configStatus.c_cflag ) << modm::endl;
 	}
 }
 
 // ----------------------------------------------------------------------------
 /*std::ostream&
-operator << (std::ostream& os, const xpcc::hosted::SerialInterface& c)
+operator << (std::ostream& os, const modm::hosted::SerialInterface& c)
 {
 	os << "\nPort-Identifier: " << c.portIdentifier_;
 	os << "\nBaud-Rate:       "	<< ::std::dec << c.baudRate_;

@@ -39,7 +39,7 @@ namespace unittest
 		 *
 		 * \param	device	IODevice used for printing
 		 */
-		Reporter(xpcc::IODevice& device);
+		Reporter(modm::IODevice& device);
 		
 		/**
 		 * \brief	Switch to the next test suite
@@ -47,7 +47,7 @@ namespace unittest
 		 * \param	name	Name of the test suite
 		 */
 		void
-		nextTestSuite(xpcc::accessor::Flash<char> name);
+		nextTestSuite(modm::accessor::Flash<char> name);
 		
 		/**
 		 * \brief	Report a passed test
@@ -64,7 +64,7 @@ namespace unittest
 		 * Generates a basic failure message, the returned stream can then
 		 * be used to write some more specific information about the failure.
 		 */
-		xpcc::IOStream&
+		modm::IOStream&
 		reportFailure(unsigned int lineNumber);
 		
 		/**
@@ -78,8 +78,8 @@ namespace unittest
 		printSummary();
 		
 	private:
-		xpcc::IOStream outputStream;
-		xpcc::accessor::Flash<char> testName;
+		modm::IOStream outputStream;
+		modm::accessor::Flash<char> testName;
 		
 		int_fast16_t testsPassed;
 		int_fast16_t testsFailed;

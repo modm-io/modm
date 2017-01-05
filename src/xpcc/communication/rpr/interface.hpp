@@ -9,8 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_RPR_INTERFACE_HPP
-#define	XPCC_RPR_INTERFACE_HPP
+#ifndef	MODM_RPR_INTERFACE_HPP
+#define	MODM_RPR_INTERFACE_HPP
 
 #include <cstddef>
 #include <stdint.h>
@@ -23,7 +23,7 @@
 
 #include "constants.hpp"
 
-namespace xpcc
+namespace modm
 {
 	namespace rpr
 	{
@@ -96,7 +96,7 @@ namespace xpcc
 			update();
 			
 		private:
-			typedef xpcc::BoundedQueue< Message, 10 > Queue;
+			typedef modm::BoundedQueue< Message, 10 > Queue;
 			
 			static void
 			writeByteEscaped(uint8_t data);
@@ -124,7 +124,7 @@ namespace xpcc
 			static Queue messagesToSend;
 			static Queue receivedMessages;
 			
-			static xpcc::allocator::Dynamic<uint8_t> bufferAllocator;
+			static modm::allocator::Dynamic<uint8_t> bufferAllocator;
 			
 			static Message receiveBuffer;
 			static uint8_t rx_buffer[N+8];
@@ -152,4 +152,4 @@ namespace xpcc
 
 #include "interface_impl.hpp"
 
-#endif	// XPCC_RPR_INTERFACE_HPP
+#endif	// MODM_RPR_INTERFACE_HPP

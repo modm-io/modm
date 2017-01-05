@@ -10,10 +10,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_HD44780_BASE_HPP
-#define XPCC_HD44780_BASE_HPP
+#ifndef MODM_HD44780_BASE_HPP
+#define MODM_HD44780_BASE_HPP
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -85,12 +85,12 @@ public:
 
 	/// Clear the display of all Data
 	/// @return	`true` if operation successful, `false` if controller is busy
-	static xpcc_always_inline bool
+	static modm_always_inline bool
 	clear();
 
 	/// Reset the cursor to (0,0) home position
 	/// @return	`true` if operation successful, `false` if controller is busy
-	static xpcc_always_inline bool
+	static modm_always_inline bool
 	resetCursor();
 
 	// write
@@ -112,7 +112,7 @@ public:
 	// read
 	/// Read the cursor position
 	/// @return	`true` if operation successful, `false` if controller is busy
-	static xpcc_always_inline bool
+	static modm_always_inline bool
 	readAddress(uint8_t &address);
 
 	/// Read the character at the current cursor position
@@ -130,23 +130,23 @@ public:
 
 protected:
 	/// unconditionally write data to the controller
-	static xpcc_always_inline void
+	static modm_always_inline void
 	write(uint8_t data);
 
 	/// unconditionally read data from the controller
-	static xpcc_always_inline uint8_t
+	static modm_always_inline uint8_t
 	read();
 
 private:
 	// R\W line
-	static constexpr bool RW_Write		= xpcc::Gpio::Low;
-	static constexpr bool RW_Read		= xpcc::Gpio::High;
+	static constexpr bool RW_Write		= modm::Gpio::Low;
+	static constexpr bool RW_Read		= modm::Gpio::High;
 	// Rs line
-	static constexpr bool RS_Command	= xpcc::Gpio::Low;
-	static constexpr bool RS_RAM		= xpcc::Gpio::High;
+	static constexpr bool RS_Command	= modm::Gpio::Low;
+	static constexpr bool RS_RAM		= modm::Gpio::High;
 	// Enable line
-	static constexpr bool E_Disable		= xpcc::Gpio::Low;
-	static constexpr bool E_Enable		= xpcc::Gpio::High;
+	static constexpr bool E_Disable		= modm::Gpio::Low;
+	static constexpr bool E_Enable		= modm::Gpio::High;
 
 	// Masks
 	static constexpr uint8_t CGRAM_AddressMask	= 0b00111111;
@@ -177,7 +177,7 @@ private:
 
 		/// only writes the high nibble of data
 		/// Use this in the initialization, when bus width is not determined yet
-		static xpcc_always_inline void
+		static modm_always_inline void
 		writeHighNibble(uint8_t data);
 
 		/// toggles the Enable line and reads the port
@@ -198,7 +198,7 @@ private:
 
 		/// only writes the high nibble of data
 		/// Use this in the initialization, when bus width is not determined yet
-		static xpcc_always_inline void
+		static modm_always_inline void
 		writeHighNibble(uint8_t data);
 
 		/// toggles the Enable line and reads the port
@@ -210,8 +210,8 @@ private:
 	};
 };
 
-} // namespace xpcc
+} // namespace modm
 
 #include "hd44780_base_impl.hpp"
 
-#endif // XPCC_HD44780_BASE_HPP
+#endif // MODM_HD44780_BASE_HPP

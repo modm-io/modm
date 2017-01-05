@@ -100,9 +100,9 @@
  * @author	Fabian Greif
  */
 
-#ifndef XPCC_SAB2_HPP
-#define XPCC_SAB2_HPP
+#ifndef MODM_SAB2_HPP
+#define MODM_SAB2_HPP
 
 #include "sab2/interface.hpp"
 
-#endif	// XPCC_SAB2_HPP
+#endif	// MODM_SAB2_HPP

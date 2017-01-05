@@ -10,14 +10,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_CAN_MESSAGE_HPP
-#define XPCC_CAN_MESSAGE_HPP
+#ifndef MODM_CAN_MESSAGE_HPP
+#define MODM_CAN_MESSAGE_HPP
 
 #include <stdint.h>
 #include <modm/io/iostream.hpp>
 #include <modm/architecture/utils.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 namespace can
@@ -82,7 +82,7 @@ struct Message
 
 public:
 	uint32_t identifier;
-	uint8_t xpcc_aligned(4) data[8];
+	uint8_t modm_aligned(4) data[8];
 	struct Flags
 	{
 		Flags() :
@@ -97,14 +97,14 @@ public:
 
 public:
 	bool
-	operator == (const xpcc::can::Message& rhs) const;
+	operator == (const modm::can::Message& rhs) const;
 };
 
-xpcc::IOStream&
-operator << (xpcc::IOStream& s, const xpcc::can::Message m);
+modm::IOStream&
+operator << (modm::IOStream& s, const modm::can::Message m);
 
 }	// namespace can
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif // XPCC_CAN_MESSAGE_HPP
+#endif // MODM_CAN_MESSAGE_HPP

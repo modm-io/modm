@@ -54,7 +54,7 @@ namespace xpcc
 		/// Send a Message.
 		virtual void
 		sendPacket(const Header &header,
-				SmartPointer payload = SmartPointer()) = 0;
+				modm::SmartPointer payload = modm::SmartPointer()) = 0;
 
 		/// Check if a new packet was received by the backend
 		virtual bool
@@ -64,7 +64,7 @@ namespace xpcc
 		virtual const Header&
 		getPacketHeader() const = 0;
 
-		virtual const SmartPointer
+		virtual const modm::SmartPointer
 		getPacketPayload() const = 0;
 
 		virtual void

@@ -9,12 +9,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_RPR_CONSTANTS_HPP
-#define	XPCC_RPR_CONSTANTS_HPP
+#ifndef	MODM_RPR_CONSTANTS_HPP
+#define	MODM_RPR_CONSTANTS_HPP
 
 #include <stdint.h>
 
-namespace xpcc
+namespace modm
 {
 	namespace rpr
 	{
@@ -97,4 +97,4 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC_RPR_CONSTANTS_HPP
+#endif	// MODM_RPR_CONSTANTS_HPP

@@ -9,12 +9,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FT6X06_HPP
-#define XPCC_FT6X06_HPP
+#ifndef MODM_FT6X06_HPP
+#define MODM_FT6X06_HPP
 
 #include <modm/architecture/interface/i2c_device.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 // forward declaration for friending with ft6x06::Data
@@ -121,7 +121,7 @@ public:
 		// uint8_t area;
 	};
 
-	struct xpcc_packed
+	struct modm_packed
 	Data
 	{
 		template< class I2cMaster >
@@ -166,17 +166,17 @@ public:
  * @ingroup driver_touch
  */
 template < typename I2cMaster >
-class Ft6x06 : public ft6x06, public xpcc::I2cDevice< I2cMaster, 3 >
+class Ft6x06 : public ft6x06, public modm::I2cDevice< I2cMaster, 3 >
 {
 public:
 	/// Constructor, requires an ft6x06::Data object, sets address to default of 0x2A
 	Ft6x06(Data &data, uint8_t address=0x2A);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	configure(InterruptMode mode, uint8_t activeRate = 60, uint8_t monitorRate = 25);
 
 	/// Reads all touches and writes the result to the data object
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	readTouches();
 
 public:
@@ -188,11 +188,11 @@ public:
 protected:
 	/// @cond
 	/// write a 8bit value a register
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	write(Register reg, uint8_t value);
 
 	/// read multiple 8bit values from a start register
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	read(Register reg, uint8_t *buffer, uint8_t length);
 	/// @endcond
 
@@ -204,8 +204,8 @@ protected:
 	/// @endcond
 };
 
-}	// namespace xpcc
+}	// namespace modm
 
 #include "ft6x06_impl.hpp"
 
-#endif // XPCC_FT6X06_HPP
+#endif // MODM_FT6X06_HPP

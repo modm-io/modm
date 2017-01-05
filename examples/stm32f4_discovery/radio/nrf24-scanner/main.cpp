@@ -34,25 +34,25 @@
  * PA2  - TXD
  */
 
-#undef	XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::INFO
+#undef	MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::INFO
 
 
 // Create an IODeviceWrapper around the Uart Peripheral we want to use
-xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > loggerDevice;
+modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
 
 // Set all four logger streams to use the UART
-xpcc::log::Logger xpcc::log::debug(loggerDevice);
-xpcc::log::Logger xpcc::log::info(loggerDevice);
-xpcc::log::Logger xpcc::log::warning(loggerDevice);
-xpcc::log::Logger xpcc::log::error(loggerDevice);
+modm::log::Logger modm::log::debug(loggerDevice);
+modm::log::Logger modm::log::info(loggerDevice);
+modm::log::Logger modm::log::warning(loggerDevice);
+modm::log::Logger modm::log::error(loggerDevice);
 
 typedef GpioOutputE11 Ce;
 typedef GpioOutputE12 Csn;
 
 
 
-typedef xpcc::Nrf24Phy<SpiMaster2, Csn, Ce> nrf24hal;
+typedef modm::Nrf24Phy<SpiMaster2, Csn, Ce> nrf24hal;
 
 
 int
@@ -60,10 +60,10 @@ main()
 {
 	Board::initialize();
 
-	Csn::setOutput(xpcc::Gpio::High);
-	Ce::setOutput(xpcc::Gpio::Low);
+	Csn::setOutput(modm::Gpio::High);
+	Ce::setOutput(modm::Gpio::Low);
 
-	Board::LedOrange::setOutput(xpcc::Gpio::Low);
+	Board::LedOrange::setOutput(modm::Gpio::Low);
 
 	// Enable SPI 2
 	GpioOutputB15::connect(SpiMaster2::Mosi);
@@ -80,7 +80,7 @@ main()
 	// Initialize nRF24-HAL
 	nrf24hal::initialize();
 
-//	XPCC_LOG_INFO << "Hello from nRF24-HAL example" << xpcc::endl;
+//	MODM_LOG_INFO << "Hello from nRF24-HAL example" << modm::endl;
 
 
 	/*
@@ -114,15 +114,15 @@ main()
 		channel_info[i] = 0;
 	}
 
-//	xpcc::ShortPeriodicTimer divide_timer((max_channel*rx_settle)/1000 * divider);
-	xpcc::ShortPeriodicTimer divide_timer(500);
-	xpcc::ShortPeriodicTimer refreshTerminal(500);
+//	modm::ShortPeriodicTimer divide_timer((max_channel*rx_settle)/1000 * divider);
+	modm::ShortPeriodicTimer divide_timer(500);
+	modm::ShortPeriodicTimer refreshTerminal(500);
 
 	bool divide_now = false;
 
-	XPCC_LOG_INFO.printf("\033[2J");
-	XPCC_LOG_INFO.printf("\033[1;10H");
-	XPCC_LOG_INFO.printf("2.4GHz scanner");
+	MODM_LOG_INFO.printf("\033[2J");
+	MODM_LOG_INFO.printf("\033[1;10H");
+	MODM_LOG_INFO.printf("2.4GHz scanner");
 
 	while (1)
 	{
@@ -135,9 +135,9 @@ main()
 			nrf24hal::writeRegister(nrf24hal::NrfRegister::RF_CH, i + channel_start);
 
 			Ce::set();
-			xpcc::delayMicroseconds(rx_settle);
+			modm::delayMicroseconds(rx_settle);
 			Ce::reset();
-			xpcc::delayMicroseconds(2);
+			modm::delayMicroseconds(2);
 			channel_info[i] += 5*nrf24hal::readRegister(nrf24hal::NrfRegister::RPD);
 
 			if(channel_info[i] > max)
@@ -158,22 +158,22 @@ main()
 
 		if(refreshTerminal.execute())
 		{
-			XPCC_LOG_INFO.printf("\033[2J");
-			XPCC_LOG_INFO.printf("\033[1;10H");
-			XPCC_LOG_INFO.printf("2.4GHz scanner");
-			XPCC_LOG_INFO.printf("   max: %d", max);
+			MODM_LOG_INFO.printf("\033[2J");
+			MODM_LOG_INFO.printf("\033[1;10H");
+			MODM_LOG_INFO.printf("2.4GHz scanner");
+			MODM_LOG_INFO.printf("   max: %d", max);
 
 			for(i = 0; i < max_channel; i++)
 			{
-				XPCC_LOG_INFO.printf("\033[%d;0H", i+2); // down one line
+				MODM_LOG_INFO.printf("\033[%d;0H", i+2); // down one line
 
 				j=0;
-				XPCC_LOG_INFO.printf("%02d ", channel_start + i);
+				MODM_LOG_INFO.printf("%02d ", channel_start + i);
 
 				uint32_t width = max_width * ( (1.0 * channel_info[i]) / max);
 				for(j = 0; j < width; j++)
 				{
-					XPCC_LOG_INFO.printf("+");
+					MODM_LOG_INFO.printf("+");
 				}
 			}
 

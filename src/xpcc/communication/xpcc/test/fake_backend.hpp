@@ -28,7 +28,7 @@ public:
 	
 	virtual void
 	sendPacket(const xpcc::Header &header,
-			xpcc::SmartPointer payload = xpcc::SmartPointer());
+			modm::SmartPointer payload = modm::SmartPointer());
 	
 	
 	virtual bool
@@ -37,7 +37,7 @@ public:
 	virtual const xpcc::Header&
 	getPacketHeader() const;
 	
-	virtual const xpcc::SmartPointer
+	virtual const modm::SmartPointer
 	getPacketPayload() const;
 	
 	virtual void
@@ -45,11 +45,11 @@ public:
 
 public:
 	/// Messages send by the dispatcher via sendPacket
-	xpcc::LinkedList<Message> messagesSend;
+	modm::LinkedList<Message> messagesSend;
 	
 	/// Messages which should be received. isPacketAvailable(), getPacketHeader(),
 	/// getPacketPayload() and dropPacket() operate on this list.
-	xpcc::LinkedList<Message> messagesToReceive;
+	modm::LinkedList<Message> messagesToReceive;
 };
 
 #endif

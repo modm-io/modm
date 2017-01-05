@@ -11,12 +11,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PC_TERMINAL_HPP
-#define XPCC_PC_TERMINAL_HPP
+#ifndef MODM_PC_TERMINAL_HPP
+#define MODM_PC_TERMINAL_HPP
 
 #include <modm/io/iodevice.hpp>
 
-namespace xpcc
+namespace modm
 {
 	namespace pc
 	{
@@ -45,4 +45,4 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC_PC_TERMINAL_HPP
+#endif	// MODM_PC_TERMINAL_HPP

@@ -22,32 +22,32 @@
 #include <errno.h>
 
 // ----------------------------------------------------------------------------
-// Using the XPCC Block Allocator
+// Using the MODM Block Allocator
 #include <modm/architecture/driver/heap/block_allocator.hpp>
 
-#ifndef XPCC_MEMORY_BLOCK_ALLOCATOR_TYPE
-#define XPCC_MEMORY_BLOCK_ALLOCATOR_TYPE uint16_t
+#ifndef MODM_MEMORY_BLOCK_ALLOCATOR_TYPE
+#define MODM_MEMORY_BLOCK_ALLOCATOR_TYPE uint16_t
 #endif
 
-#ifndef XPCC_MEMORY_BLOCK_ALLOCATOR_CHUNK_SIZE
-#define XPCC_MEMORY_BLOCK_ALLOCATOR_CHUNK_SIZE 8
+#ifndef MODM_MEMORY_BLOCK_ALLOCATOR_CHUNK_SIZE
+#define MODM_MEMORY_BLOCK_ALLOCATOR_CHUNK_SIZE 8
 #endif
 
-static xpcc::BlockAllocator< XPCC_MEMORY_BLOCK_ALLOCATOR_TYPE, XPCC_MEMORY_BLOCK_ALLOCATOR_CHUNK_SIZE >
+static modm::BlockAllocator< MODM_MEMORY_BLOCK_ALLOCATOR_TYPE, MODM_MEMORY_BLOCK_ALLOCATOR_CHUNK_SIZE >
 	allocator;
 // this allocator has a maximum heap size!
-const size_t max_heap_size = (1 << (sizeof(XPCC_MEMORY_BLOCK_ALLOCATOR_TYPE) * 8)) *
-							  XPCC_MEMORY_BLOCK_ALLOCATOR_CHUNK_SIZE;
+const size_t max_heap_size = (1 << (sizeof(MODM_MEMORY_BLOCK_ALLOCATOR_TYPE) * 8)) *
+							  MODM_MEMORY_BLOCK_ALLOCATOR_CHUNK_SIZE;
 
 extern "C"
 {
-extern void xpcc_heap_table_find_largest(const uint32_t, uint32_t **, uint32_t **);
+extern void modm_heap_table_find_largest(const uint32_t, uint32_t **, uint32_t **);
 
-void __xpcc_initialize_memory(void)
+void __modm_initialize_memory(void)
 {
 	uint32_t *heap_start, *heap_end;
 	// find the largest heap that is DMA-able and S-Bus accessible
-	xpcc_heap_table_find_largest(0x9, &heap_start, &heap_end);
+	modm_heap_table_find_largest(0x9, &heap_start, &heap_end);
 	if (!heap_start) exit(ENOMEM);
 	// clamp the heap size to the maximum
 	if ((size_t) heap_end - (size_t) heap_start > max_heap_size) {

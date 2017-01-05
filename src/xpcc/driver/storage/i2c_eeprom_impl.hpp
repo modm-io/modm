@@ -13,21 +13,21 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_I2C_EEPROM_HPP
+#ifndef MODM_I2C_EEPROM_HPP
 #	error	"Don't include this file directly, use 'i2c_eeprom.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template <typename I2cMaster>
-xpcc::I2cEeprom<I2cMaster>::I2cEeprom(uint8_t address) :
+modm::I2cEeprom<I2cMaster>::I2cEeprom(uint8_t address) :
 	I2cDevice<I2cMaster, 1, i2cEeprom::DataTransmissionAdapter>(address)
 {
 }
 
 // MARK: - write operations
 template <typename I2cMaster>
-xpcc::ResumableResult<bool>
-xpcc::I2cEeprom<I2cMaster>::write(uint32_t address, const uint8_t *data, std::size_t length)
+modm::ResumableResult<bool>
+modm::I2cEeprom<I2cMaster>::write(uint32_t address, const uint8_t *data, std::size_t length)
 {
 	RF_BEGIN();
 
@@ -43,8 +43,8 @@ xpcc::I2cEeprom<I2cMaster>::write(uint32_t address, const uint8_t *data, std::si
 
 // MARK: - read operations
 template <typename I2cMaster>
-xpcc::ResumableResult<bool>
-xpcc::I2cEeprom<I2cMaster>::read(uint32_t address, uint8_t *data, std::size_t length)
+modm::ResumableResult<bool>
+modm::I2cEeprom<I2cMaster>::read(uint32_t address, uint8_t *data, std::size_t length)
 {
 	RF_BEGIN();
 

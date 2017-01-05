@@ -11,12 +11,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_BUTTON_HPP
-#define	XPCC_BUTTON_HPP
+#ifndef MODM_BUTTON_HPP
+#define	MODM_BUTTON_HPP
 
 #include <stdint.h>
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	Simple Button
@@ -50,4 +50,4 @@ namespace xpcc
 
 #include "button_impl.hpp"
 
-#endif	// XPCC_BUTTON_HPP
+#endif	// MODM_BUTTON_HPP

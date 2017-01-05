@@ -17,8 +17,8 @@
  * \author	David Hebbeker
  */
 
-#ifndef XPCC_TCS3414_HPP
-#define XPCC_TCS3414_HPP
+#ifndef MODM_TCS3414_HPP
+#define MODM_TCS3414_HPP
 
 #include <stdint.h>
 
@@ -27,7 +27,7 @@
 #include <modm/processing/resumable.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
 
-namespace xpcc
+namespace modm
 {
 /**
  * \brief 	Settings to configure the digital color sensor TCS3414 / TCS3413 / TCS3415 / TCS3416.
@@ -147,13 +147,13 @@ struct tcs3414
  * 			yet.
  *
  * \tparam	I2CMaster	I2C interface which needs an \em initialized
- * 						xpcc::i2c::Master
+ * 						modm::i2c::Master
  * \see		tcs3414
  * \author	David Hebbeker
  * \ingroup	driver_other
  */
 template < typename I2cMaster >
-class Tcs3414 : public tcs3414, public xpcc::I2cDevice< I2cMaster, 2 >
+class Tcs3414 : public tcs3414, public modm::I2cDevice< I2cMaster, 2 >
 {
 public:
 	Tcs3414(uint8_t address = 0x39);
@@ -189,7 +189,7 @@ public:
 	}
 
 	//! \brief	The gain can be used to adjust the sensitivity of all ADC output channels.
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setGain(
 			const Gain      gain      = Gain::DEFAULT,
 			const Prescaler prescaler = Prescaler::DEFAULT)
@@ -199,7 +199,7 @@ public:
 	}
 
 	//! \brief Sets the integration time for the ADCs.
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setIntegrationTime(
 			const IntegrationMode        mode = IntegrationMode::DEFAULT,
 			const NominalIntegrationTime time = NominalIntegrationTime::DEFAULT)
@@ -208,7 +208,7 @@ public:
 	}
 
 	//! \brief Sets the integration time for the ADCs.
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setIntegrationTime(
 			const IntegrationMode mode = IntegrationMode::DEFAULT,
 			const SyncPulseCount  time = SyncPulseCount::DEFAULT)
@@ -243,17 +243,17 @@ public:
 
 	//! \brief	Read current samples of ADC conversions for all channels.
 	// Non-blocking
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	refreshAllColors();
 
 	// MARK: - TASKS
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	initialize()
 	{
 		return writeRegister(RegisterAddress::CONTROL, 0b11);	// control to power up and start conversion
 	};
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	configure(
 			const Gain            gain      = Gain::DEFAULT,
 			const Prescaler       prescaler = Prescaler::DEFAULT,
@@ -262,7 +262,7 @@ public:
 
 private:
 	//! \brief Sets the integration time for the ADCs.
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setIntegrationTime(
 			const IntegrationMode mode = IntegrationMode::DEFAULT,
 			const uint8_t         time = 0)
@@ -278,13 +278,13 @@ private:
 
 private:
 	//! \brief	Read value of specific register.
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	readRegisters(
 			const RegisterAddress address,
 			uint8_t * const values,
 			const uint8_t count = 1);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	writeRegister(
 			const RegisterAddress address,
 			const uint8_t value);
@@ -305,7 +305,7 @@ private:
 		}
 		inline uint8_t getLSB()	const { return low; }
 		inline uint8_t getMSB()	const { return high; }
-	} xpcc_packed;
+	} modm_packed;
 
 	static union Data
 	{
@@ -316,7 +316,7 @@ private:
 			uint16_t_LOW_HIGH red;
 			uint16_t_LOW_HIGH blue;
 			uint16_t_LOW_HIGH clear;
-		} xpcc_packed;
+		} modm_packed;
 	} data;
 
 	static Rgb	color;
@@ -325,4 +325,4 @@ private:
 
 #include "tcs3414_impl.hpp"
 
-#endif // XPCC_TCS3414_HPP
+#endif // MODM_TCS3414_HPP

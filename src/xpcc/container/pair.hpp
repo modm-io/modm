@@ -12,10 +12,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_PAIR_HPP
-#define	XPCC_PAIR_HPP
+#ifndef	MODM_PAIR_HPP
+#define	MODM_PAIR_HPP
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief		Pair<FirstType, SecondType> is a heterogeneous pair
@@ -28,16 +28,16 @@ namespace xpcc
 	 * is possible to storage objects of this type inside the flash-memory
 	 * which is desirable for example for the interpolation classes.
 	 * 
-	 * \see	xpcc::interpolation::Linear
+	 * \see	modm::interpolation::Linear
 	 * 
 	 * This constraint make a the usage rather unusual. See this example:
 	 * \code
 	 * // construction
-	 * xpcc::Pair<uint8_t, uint16_t> pair = { 12, -12345 };
+	 * modm::Pair<uint8_t, uint16_t> pair = { 12, -12345 };
 	 * 
 	 * // this typedef is necessary to be able to use
 	 * // the type inside the FLASH macro
-	 * typedef xpcc::Pair<int8_t, int8_t> MyPair;
+	 * typedef modm::Pair<int8_t, int8_t> MyPair;
 	 * 
 	 * // put some values into the flash memory
 	 * FLASH_STORAGE(MyPair pairs[3]) =
@@ -51,7 +51,7 @@ namespace xpcc
 	 * As this class has no constructor you need to use the following syntax
 	 * to initialize an instance of this class: 
 	 * \code
-	 *	xpcc::Pair<int, float> pair = { 1203, 1035.234 };
+	 *	modm::Pair<int, float> pair = { 1203, 1035.234 };
 	 * \endcode
 	 * 
 	 * \note	Even if this class provides public attributes it is recommend to use
@@ -109,4 +109,4 @@ namespace xpcc
 	};
 }
 
-#endif	// XPCC_PAIR_HPP
+#endif	// MODM_PAIR_HPP

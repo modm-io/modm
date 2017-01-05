@@ -50,7 +50,7 @@
  * (everything before the CRC).
  */
 
-#ifndef XPCC_AD7280A_HPP
+#ifndef MODM_AD7280A_HPP
 #	error "Don't include this file directly! Use 'ad7280a.hpp' instead."
 #endif
 
@@ -59,8 +59,8 @@
 
 /*// TODO DEBUG!
 #include <modm/debug/logger.hpp>
-#undef XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL	xpcc::log::DEBUG
+#undef MODM_LOG_LEVEL
+#define MODM_LOG_LEVEL	modm::log::DEBUG
 */
 // ----------------------------------------------------------------------------
 // Bits and Masks
@@ -133,25 +133,25 @@
 
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Cnvst, int N>
-uint8_t xpcc::Ad7280a<Spi, Cs, Cnvst, N>::controlHighByte = 0;
+uint8_t modm::Ad7280a<Spi, Cs, Cnvst, N>::controlHighByte = 0;
 
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Cnvst, int N>
 void
-xpcc::Ad7280a<Spi, Cs, Cnvst, N>::initialize(ad7280a::Average average)
+modm::Ad7280a<Spi, Cs, Cnvst, N>::initialize(ad7280a::Average average)
 {
 	static_assert(N == 1, "Daisy chain length is currently limited to 1!");
 	
 	controlHighByte = average;
 	
-	Cs::setOutput(xpcc::Gpio::High);
-	Cnvst::setOutput(xpcc::Gpio::High);
+	Cs::setOutput(modm::Gpio::High);
+	Cnvst::setOutput(modm::Gpio::High);
 }
 
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Cnvst, int N>
 bool
-xpcc::Ad7280a<Spi, Cs, Cnvst, N>::chainSetup()
+modm::Ad7280a<Spi, Cs, Cnvst, N>::chainSetup()
 {
 	// Set reset bit for all devices
 	write(ad7280a::MASTER, ad7280a::CTRL_LB, true,
@@ -174,7 +174,7 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::chainSetup()
 	// register, 0x0E, to the read register on all devices.
 	write(ad7280a::MASTER, ad7280a::READ, true, ad7280a::CTRL_LB << 2);
 	
-	//XPCC_LOG_DEBUG << "chain setup" << xpcc::endl;
+	//MODM_LOG_DEBUG << "chain setup" << modm::endl;
 	// To verify that all AD7280As in the chain have received and
 	// locked their unique device address, a daisy-chain register read
 	// should be requested from all devices. This can be done by
@@ -203,7 +203,7 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::chainSetup()
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Cnvst, int N>
 void
-xpcc::Ad7280a<Spi, Cs, Cnvst, N>::enableBalancer(uint8_t device, uint8_t cells)
+modm::Ad7280a<Spi, Cs, Cnvst, N>::enableBalancer(uint8_t device, uint8_t cells)
 {
 	write(device, ad7280a::CELL_BALANCE, false, cells);
 }
@@ -211,7 +211,7 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::enableBalancer(uint8_t device, uint8_t cells)
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Cnvst, int N>
 bool
-xpcc::Ad7280a<Spi, Cs, Cnvst, N>::performSelftest()
+modm::Ad7280a<Spi, Cs, Cnvst, N>::performSelftest()
 {
 	// Set Bit D0 of the control register to 1 on all parts. This
 	// setting enables the daisy-chain register read operation on
@@ -230,7 +230,7 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::performSelftest()
 	
 	// Allow sufficient time for the self-test conversions to be
 	// completed plus tWAIT.
-	xpcc::delayMilliseconds(50);		// TODO
+	modm::delayMilliseconds(50);		// TODO
 	
 	// The register address corresponding to the self-test
 	// conversion should be written to the read register of all
@@ -238,7 +238,7 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::performSelftest()
 	// command is 0x03 86 17 CA (see Table 29, Write 3).
 	write(0, ad7280a::READ, true, static_cast<uint8_t>(ad7280a::SELF_TEST << 2));
 	
-	//XPCC_LOG_DEBUG << "result:" << xpcc::endl;
+	//MODM_LOG_DEBUG << "result:" << modm::endl;
 	// Apply a CS low pulse that frames 32 SCLKs to read back
 	// the desired voltage. This frame should simultaneously
 	// write the 32-bit command 0xF800030A, as described in
@@ -248,7 +248,7 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::performSelftest()
 	// result typically varies between Code 970 and Code 990.
 	ad7280a::ConversionValue conversion;
 	if (readConversionResult(&conversion)) {
-		//XPCC_LOG_DEBUG << "selftest = " << conversion.value << xpcc::endl;
+		//MODM_LOG_DEBUG << "selftest = " << conversion.value << modm::endl;
 		if (conversion.value > 970 && conversion.value < 990) {
 			return true;
 		}
@@ -259,7 +259,7 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::performSelftest()
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Cnvst, int N>
 void
-xpcc::Ad7280a<Spi, Cs, Cnvst, N>::softwareReset()
+modm::Ad7280a<Spi, Cs, Cnvst, N>::softwareReset()
 {
 	// Set reset bit for all devices
 	write(ad7280a::MASTER, ad7280a::CTRL_LB, true,
@@ -278,7 +278,7 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::softwareReset()
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Cnvst, int N>
 bool
-xpcc::Ad7280a<Spi, Cs, Cnvst, N>::readChannel(uint8_t device,
+modm::Ad7280a<Spi, Cs, Cnvst, N>::readChannel(uint8_t device,
 		ad7280a::Channel channel, uint16_t *value)
 {
 	write(ad7280a::MASTER, ad7280a::CTRL_HB, true,
@@ -291,7 +291,7 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::readChannel(uint8_t device,
 			AD7280A_CTRL_HB_CONV_START_CS);
 	
 	// Wait for the conversion to finish
-	xpcc::delayMilliseconds(5);
+	modm::delayMilliseconds(5);
 	
 	// Read one channel
 	write(device, ad7280a::READ, false, channel);
@@ -311,7 +311,7 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::readChannel(uint8_t device,
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Cnvst, int N>
 bool
-xpcc::Ad7280a<Spi, Cs, Cnvst, N>::readAllChannels(uint16_t *values)
+modm::Ad7280a<Spi, Cs, Cnvst, N>::readAllChannels(uint16_t *values)
 {
 	// Write Register Address 0x00 to the read register on all
 	// parts. A device address of 0x00 is used when computing
@@ -324,7 +324,7 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::readAllChannels(uint16_t *values)
 			AD7280A_CTRL_HB_CONV_START_CS);
 	
 	// Allow sufficient time for all conversions to be completed plus tWAIT.
-	xpcc::delayMilliseconds(5);
+	modm::delayMilliseconds(5);
 	
 	// Apply a CS low pulse that frames 32 SCLKs to read back
 	// the desired voltage. This frame should simultaneously
@@ -353,7 +353,7 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::readAllChannels(uint16_t *values)
  */
 template <typename Spi, typename Cs, typename Cnvst, int N>
 uint8_t
-xpcc::Ad7280a<Spi, Cs, Cnvst, N>::updateCrc(uint8_t data)
+modm::Ad7280a<Spi, Cs, Cnvst, N>::updateCrc(uint8_t data)
 {
 	for (uint_fast8_t i = 0; i < 8; i++) {
 		uint8_t bit = data & 0x80;
@@ -369,7 +369,7 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::updateCrc(uint8_t data)
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Cnvst, int N>
 uint8_t
-xpcc::Ad7280a<Spi, Cs, Cnvst, N>::calculateCrc(uint32_t data)
+modm::Ad7280a<Spi, Cs, Cnvst, N>::calculateCrc(uint32_t data)
 {
 	uint8_t crc;
 	
@@ -382,7 +382,7 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::calculateCrc(uint32_t data)
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Cnvst, int N>
 bool
-xpcc::Ad7280a<Spi, Cs, Cnvst, N>::write(uint8_t device, ad7280a::Register reg,
+modm::Ad7280a<Spi, Cs, Cnvst, N>::write(uint8_t device, ad7280a::Register reg,
 		bool addressAll, uint8_t value)
 {
 	// The device address is send with LSB first
@@ -402,14 +402,14 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::write(uint8_t device, ad7280a::Register reg,
 	Cs::set();
 	
 	// TODO remove this
-	xpcc::delayMicroseconds(1);
+	modm::delayMicroseconds(1);
 	return true;
 }
 
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Cnvst, int N>
 bool
-xpcc::Ad7280a<Spi, Cs, Cnvst, N>::read(uint32_t *value)
+modm::Ad7280a<Spi, Cs, Cnvst, N>::read(uint32_t *value)
 {
 	Cs::reset();
 	*value  = static_cast<uint32_t>(Spi::write(0xF8)) << 24;
@@ -418,14 +418,14 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::read(uint32_t *value)
 	*value |= static_cast<uint32_t>(Spi::write(0x0A));
 	Cs::set();
 	
-	//XPCC_LOG_DEBUG << "read = " << xpcc::hex << *value << xpcc::ascii << xpcc::endl;
+	//MODM_LOG_DEBUG << "read = " << modm::hex << *value << modm::ascii << modm::endl;
 	
 	uint8_t crc = calculateCrc(*value >> 10);
 	if (crc == ((*value >> 2) & 0xff)) {
 		return true;
 	}
 	else {
-		//XPCC_LOG_DEBUG << "expected=" << crc << ", got=" << ((*value >> 2) & 0xff) << xpcc::endl;
+		//MODM_LOG_DEBUG << "expected=" << crc << ", got=" << ((*value >> 2) & 0xff) << modm::endl;
 		return false;
 	}
 }
@@ -433,7 +433,7 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::read(uint32_t *value)
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Cnvst, int N>
 bool
-xpcc::Ad7280a<Spi, Cs, Cnvst, N>::readRegister(ad7280a::RegisterValue* result)
+modm::Ad7280a<Spi, Cs, Cnvst, N>::readRegister(ad7280a::RegisterValue* result)
 {
 	uint32_t value;
 	if (read(&value))
@@ -452,7 +452,7 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::readRegister(ad7280a::RegisterValue* result)
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Cnvst, int N>
 bool
-xpcc::Ad7280a<Spi, Cs, Cnvst, N>::readConversionResult(ad7280a::ConversionValue* result)
+modm::Ad7280a<Spi, Cs, Cnvst, N>::readConversionResult(ad7280a::ConversionValue* result)
 {
 	uint32_t value;
 	if (read(&value))

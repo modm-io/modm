@@ -16,8 +16,8 @@
 
 // ----------------------------------------------------------------------------
 // Set the log level
-#undef	XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::INFO
+#undef	MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::INFO
 
 // ----------------------------------------------------------------------------
 Bme280Thread::Bme280Thread() :
@@ -41,8 +41,8 @@ Bme280Thread::update()
 {
 	PT_BEGIN()
 
-	XPCC_LOG_DEBUG << XPCC_FILE_INFO;
-	XPCC_LOG_DEBUG << "Ping the BME280" << xpcc::endl;
+	MODM_LOG_DEBUG << MODM_FILE_INFO;
+	MODM_LOG_DEBUG << "Ping the BME280" << modm::endl;
 
 	// ping the device until it responds
 	while(true)
@@ -65,7 +65,7 @@ Bme280Thread::update()
 		PT_WAIT_UNTIL(this->timeout.isExpired());
 	}
 
-	// stream << "Barometer BME280 responded" << xpcc::endl;
+	// stream << "Barometer BME280 responded" << modm::endl;
 
 	// Configure the device until it responds
 	while(true)
@@ -88,57 +88,57 @@ Bme280Thread::update()
 		PT_WAIT_UNTIL(this->timeout.isExpired());
 	}
 
-	XPCC_LOG_DEBUG << XPCC_FILE_INFO;
-	XPCC_LOG_DEBUG << "BME280 configured" << xpcc::endl;
+	MODM_LOG_DEBUG << MODM_FILE_INFO;
+	MODM_LOG_DEBUG << "BME280 configured" << modm::endl;
 
 	{
-		static xpcc::bme280::Calibration &cal = dataA.getCalibration();
+		static modm::bme280::Calibration &cal = dataA.getCalibration();
 
-		XPCC_LOG_DEBUG << XPCC_FILE_INFO;
-		XPCC_LOG_DEBUG << "BME280 A Calibration data is: " << xpcc::endl;
-		XPCC_LOG_DEBUG.printf(" T1 %d\n", cal.T1);
-		XPCC_LOG_DEBUG.printf(" T2 %d\n", cal.T2);
-		XPCC_LOG_DEBUG.printf(" T3 %d\n", cal.T3);
-		XPCC_LOG_DEBUG.printf(" P1 %d\n", cal.P1);
-		XPCC_LOG_DEBUG.printf(" P2 %d\n", cal.P2);
-		XPCC_LOG_DEBUG.printf(" P3 %d\n", cal.P3);
-		XPCC_LOG_DEBUG.printf(" P4 %d\n", cal.P4);
-		XPCC_LOG_DEBUG.printf(" P5 %d\n", cal.P5);
-		XPCC_LOG_DEBUG.printf(" P6 %d\n", cal.P6);
-		XPCC_LOG_DEBUG.printf(" P7 %d\n", cal.P7);
-		XPCC_LOG_DEBUG.printf(" P8 %d\n", cal.P8);
-		XPCC_LOG_DEBUG.printf(" P9 %d\n", cal.P9);
-		XPCC_LOG_DEBUG.printf(" H1 %d\n", cal.H1);
-		XPCC_LOG_DEBUG.printf(" H2 %d\n", cal.H2);
-		XPCC_LOG_DEBUG.printf(" H3 %d\n", cal.H3);
-		XPCC_LOG_DEBUG.printf(" H4 %d\n", cal.H4);
-		XPCC_LOG_DEBUG.printf(" H5 %d\n", cal.H5);
-		XPCC_LOG_DEBUG.printf(" H6 %d\n", cal.H6);
+		MODM_LOG_DEBUG << MODM_FILE_INFO;
+		MODM_LOG_DEBUG << "BME280 A Calibration data is: " << modm::endl;
+		MODM_LOG_DEBUG.printf(" T1 %d\n", cal.T1);
+		MODM_LOG_DEBUG.printf(" T2 %d\n", cal.T2);
+		MODM_LOG_DEBUG.printf(" T3 %d\n", cal.T3);
+		MODM_LOG_DEBUG.printf(" P1 %d\n", cal.P1);
+		MODM_LOG_DEBUG.printf(" P2 %d\n", cal.P2);
+		MODM_LOG_DEBUG.printf(" P3 %d\n", cal.P3);
+		MODM_LOG_DEBUG.printf(" P4 %d\n", cal.P4);
+		MODM_LOG_DEBUG.printf(" P5 %d\n", cal.P5);
+		MODM_LOG_DEBUG.printf(" P6 %d\n", cal.P6);
+		MODM_LOG_DEBUG.printf(" P7 %d\n", cal.P7);
+		MODM_LOG_DEBUG.printf(" P8 %d\n", cal.P8);
+		MODM_LOG_DEBUG.printf(" P9 %d\n", cal.P9);
+		MODM_LOG_DEBUG.printf(" H1 %d\n", cal.H1);
+		MODM_LOG_DEBUG.printf(" H2 %d\n", cal.H2);
+		MODM_LOG_DEBUG.printf(" H3 %d\n", cal.H3);
+		MODM_LOG_DEBUG.printf(" H4 %d\n", cal.H4);
+		MODM_LOG_DEBUG.printf(" H5 %d\n", cal.H5);
+		MODM_LOG_DEBUG.printf(" H6 %d\n", cal.H6);
 	}
 
 	{
-		static xpcc::bme280::Calibration &cal = dataB.getCalibration();
+		static modm::bme280::Calibration &cal = dataB.getCalibration();
 
-		XPCC_LOG_DEBUG << XPCC_FILE_INFO;
-		XPCC_LOG_DEBUG << "BME280 B Calibration data is: " << xpcc::endl;
-		XPCC_LOG_DEBUG.printf(" T1 %d\n", cal.T1);
-		XPCC_LOG_DEBUG.printf(" T2 %d\n", cal.T2);
-		XPCC_LOG_DEBUG.printf(" T3 %d\n", cal.T3);
-		XPCC_LOG_DEBUG.printf(" P1 %d\n", cal.P1);
-		XPCC_LOG_DEBUG.printf(" P2 %d\n", cal.P2);
-		XPCC_LOG_DEBUG.printf(" P3 %d\n", cal.P3);
-		XPCC_LOG_DEBUG.printf(" P4 %d\n", cal.P4);
-		XPCC_LOG_DEBUG.printf(" P5 %d\n", cal.P5);
-		XPCC_LOG_DEBUG.printf(" P6 %d\n", cal.P6);
-		XPCC_LOG_DEBUG.printf(" P7 %d\n", cal.P7);
-		XPCC_LOG_DEBUG.printf(" P8 %d\n", cal.P8);
-		XPCC_LOG_DEBUG.printf(" P9 %d\n", cal.P9);
-		XPCC_LOG_DEBUG.printf(" H1 %d\n", cal.H1);
-		XPCC_LOG_DEBUG.printf(" H2 %d\n", cal.H2);
-		XPCC_LOG_DEBUG.printf(" H3 %d\n", cal.H3);
-		XPCC_LOG_DEBUG.printf(" H4 %d\n", cal.H4);
-		XPCC_LOG_DEBUG.printf(" H5 %d\n", cal.H5);
-		XPCC_LOG_DEBUG.printf(" H6 %d\n", cal.H6);
+		MODM_LOG_DEBUG << MODM_FILE_INFO;
+		MODM_LOG_DEBUG << "BME280 B Calibration data is: " << modm::endl;
+		MODM_LOG_DEBUG.printf(" T1 %d\n", cal.T1);
+		MODM_LOG_DEBUG.printf(" T2 %d\n", cal.T2);
+		MODM_LOG_DEBUG.printf(" T3 %d\n", cal.T3);
+		MODM_LOG_DEBUG.printf(" P1 %d\n", cal.P1);
+		MODM_LOG_DEBUG.printf(" P2 %d\n", cal.P2);
+		MODM_LOG_DEBUG.printf(" P3 %d\n", cal.P3);
+		MODM_LOG_DEBUG.printf(" P4 %d\n", cal.P4);
+		MODM_LOG_DEBUG.printf(" P5 %d\n", cal.P5);
+		MODM_LOG_DEBUG.printf(" P6 %d\n", cal.P6);
+		MODM_LOG_DEBUG.printf(" P7 %d\n", cal.P7);
+		MODM_LOG_DEBUG.printf(" P8 %d\n", cal.P8);
+		MODM_LOG_DEBUG.printf(" P9 %d\n", cal.P9);
+		MODM_LOG_DEBUG.printf(" H1 %d\n", cal.H1);
+		MODM_LOG_DEBUG.printf(" H2 %d\n", cal.H2);
+		MODM_LOG_DEBUG.printf(" H3 %d\n", cal.H3);
+		MODM_LOG_DEBUG.printf(" H4 %d\n", cal.H4);
+		MODM_LOG_DEBUG.printf(" H5 %d\n", cal.H5);
+		MODM_LOG_DEBUG.printf(" H6 %d\n", cal.H6);
 	}
 
 	while (true)
@@ -154,12 +154,12 @@ Bme280Thread::update()
 			int32_t temp = dataA.getTemperature();
 			int32_t press = dataA.getPressure();
 			int32_t hum = dataA.getHumidity();
-			XPCC_LOG_DEBUG << XPCC_FILE_INFO;
-			XPCC_LOG_DEBUG.printf("BME280: Calibrated temperature in 0.01 degree Celsius is: %d\n", temp  );
-			XPCC_LOG_DEBUG << XPCC_FILE_INFO;
-			XPCC_LOG_DEBUG.printf("BME280: Calibrated pressure in mPa is                   : %d\n", press );
-			XPCC_LOG_DEBUG << XPCC_FILE_INFO;
-			XPCC_LOG_DEBUG.printf("BME280: Calibrated humidity in 0.001 %% is               : %d\n", hum );
+			MODM_LOG_DEBUG << MODM_FILE_INFO;
+			MODM_LOG_DEBUG.printf("BME280: Calibrated temperature in 0.01 degree Celsius is: %d\n", temp  );
+			MODM_LOG_DEBUG << MODM_FILE_INFO;
+			MODM_LOG_DEBUG.printf("BME280: Calibrated pressure in mPa is                   : %d\n", press );
+			MODM_LOG_DEBUG << MODM_FILE_INFO;
+			MODM_LOG_DEBUG.printf("BME280: Calibrated humidity in 0.001 %% is               : %d\n", hum );
 		}
 
 

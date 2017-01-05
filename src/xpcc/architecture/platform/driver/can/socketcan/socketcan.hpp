@@ -9,20 +9,20 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_HOSTED_SOCKETCAN_HPP
-#define XPCC_HOSTED_SOCKETCAN_HPP
+#ifndef MODM_HOSTED_SOCKETCAN_HPP
+#define MODM_HOSTED_SOCKETCAN_HPP
 
 #include <iostream>
 
 #include <modm/architecture/interface/can.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 namespace hosted
 {
 
-class SocketCan : public ::xpcc::Can
+class SocketCan : public ::modm::Can
 {
 public:
 	SocketCan();
@@ -30,7 +30,7 @@ public:
 	~SocketCan();
 
 	bool
-	open(std::string deviceName /*, xpcc::Can::Bitrate canBitrate = xpcc::Can::kBps125 */);
+	open(std::string deviceName /*, modm::Can::Bitrate canBitrate = modm::Can::kBps125 */);
 
 	void
 	close();
@@ -55,6 +55,6 @@ private:
 };
 
 } // hosted namespace
-} // xpcc namespace
+} // modm namespace
 
-#endif // XPCC_HOSTED_SOCKETCAN_HPP
+#endif // MODM_HOSTED_SOCKETCAN_HPP

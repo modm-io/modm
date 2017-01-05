@@ -150,7 +150,7 @@ public class Packets
 	
 {%- for packet in packets %}
 	
-	{% if packet.description %}/** {{ packet.description | xpcc.wordwrap(72) | xpcc.indent(1) }} */{% endif %}
+	{% if packet.description %}/** {{ packet.description | modm.wordwrap(72) | modm.indent(1) }} */{% endif %}
 	{%- if packet.isStruct %}
 	@XmlRootElement
 	public static {% if (not packet.extending) %}final {% endif %}class {{ packet.flattened().name | typeName }} extends {% if packet.extends %}{{ packet.extends.name | typeName }}{% else %}Struct{% endif %}

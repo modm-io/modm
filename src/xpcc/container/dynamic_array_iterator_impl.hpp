@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_DYNAMIC_ARRAY_HPP
+#ifndef	MODM_DYNAMIC_ARRAY_HPP
 	#error	"Don't include this file directly, use 'dynamic_array.hpp' instead"
 #endif
 
@@ -22,14 +22,14 @@
 
 // const iterator
 template <typename T, typename Allocator>
-xpcc::DynamicArray<T, Allocator>::const_iterator::const_iterator() :
+modm::DynamicArray<T, Allocator>::const_iterator::const_iterator() :
 	parent(0),
 	index(0)
 {
 }
 
 template <typename T, typename Allocator>
-xpcc::DynamicArray<T, Allocator>::const_iterator::const_iterator(
+modm::DynamicArray<T, Allocator>::const_iterator::const_iterator(
 		const DynamicArray* inParent, SizeType inIndex) :
 	parent(inParent),
 	index(inIndex)
@@ -37,7 +37,7 @@ xpcc::DynamicArray<T, Allocator>::const_iterator::const_iterator(
 }
 
 template <typename T, typename Allocator>
-xpcc::DynamicArray<T, Allocator>::const_iterator::const_iterator(
+modm::DynamicArray<T, Allocator>::const_iterator::const_iterator(
 		const iterator& other) :
 	parent(other.parent),
 	index(other.index)
@@ -45,7 +45,7 @@ xpcc::DynamicArray<T, Allocator>::const_iterator::const_iterator(
 }
 
 template <typename T, typename Allocator>
-xpcc::DynamicArray<T, Allocator>::const_iterator::const_iterator(
+modm::DynamicArray<T, Allocator>::const_iterator::const_iterator(
 		const const_iterator& other) :
 	parent(other.parent),
 	index(other.index)
@@ -53,8 +53,8 @@ xpcc::DynamicArray<T, Allocator>::const_iterator::const_iterator(
 }
 
 template <typename T, typename Allocator>
-typename xpcc::DynamicArray<T, Allocator>::const_iterator&
-xpcc::DynamicArray<T, Allocator>::const_iterator::operator = (
+typename modm::DynamicArray<T, Allocator>::const_iterator&
+modm::DynamicArray<T, Allocator>::const_iterator::operator = (
 		const const_iterator& other)
 {
 	this->parent = other.parent;
@@ -63,16 +63,16 @@ xpcc::DynamicArray<T, Allocator>::const_iterator::operator = (
 }
 
 template <typename T, typename Allocator>
-typename xpcc::DynamicArray<T, Allocator>::const_iterator&
-xpcc::DynamicArray<T, Allocator>::const_iterator::operator ++ ()
+typename modm::DynamicArray<T, Allocator>::const_iterator&
+modm::DynamicArray<T, Allocator>::const_iterator::operator ++ ()
 {
 	++this->index;
 	return *this;
 }
 
 template <typename T, typename Allocator>
-typename xpcc::DynamicArray<T, Allocator>::const_iterator&
-xpcc::DynamicArray<T, Allocator>::const_iterator::operator -- ()
+typename modm::DynamicArray<T, Allocator>::const_iterator&
+modm::DynamicArray<T, Allocator>::const_iterator::operator -- ()
 {
 	--this->index;
 	return *this;
@@ -80,7 +80,7 @@ xpcc::DynamicArray<T, Allocator>::const_iterator::operator -- ()
 
 template <typename T, typename Allocator>
 bool
-xpcc::DynamicArray<T, Allocator>::const_iterator::operator == (
+modm::DynamicArray<T, Allocator>::const_iterator::operator == (
 		const const_iterator& other) const
 {
 	return ((parent == other.parent) &&
@@ -89,7 +89,7 @@ xpcc::DynamicArray<T, Allocator>::const_iterator::operator == (
 
 template <typename T, typename Allocator>
 bool
-xpcc::DynamicArray<T, Allocator>::const_iterator::operator != (
+modm::DynamicArray<T, Allocator>::const_iterator::operator != (
 		const const_iterator& other) const
 {
 	return ((parent != other.parent) ||
@@ -98,14 +98,14 @@ xpcc::DynamicArray<T, Allocator>::const_iterator::operator != (
 
 template <typename T, typename Allocator>
 const T&
-xpcc::DynamicArray<T, Allocator>::const_iterator::operator * () const
+modm::DynamicArray<T, Allocator>::const_iterator::operator * () const
 {
 	return parent->values[index];
 }
 
 template <typename T, typename Allocator>
 const T* 
-xpcc::DynamicArray<T, Allocator>::const_iterator::operator -> () const
+modm::DynamicArray<T, Allocator>::const_iterator::operator -> () const
 {
 	return &parent->values[index];
 }
@@ -113,14 +113,14 @@ xpcc::DynamicArray<T, Allocator>::const_iterator::operator -> () const
 // ----------------------------------------------------------------------------
 // iterator
 template <typename T, typename Allocator>
-xpcc::DynamicArray<T, Allocator>::iterator::iterator() :
+modm::DynamicArray<T, Allocator>::iterator::iterator() :
 	parent(0),
 	index(0)
 {
 }
 
 template <typename T, typename Allocator>
-xpcc::DynamicArray<T, Allocator>::iterator::iterator(
+modm::DynamicArray<T, Allocator>::iterator::iterator(
 		DynamicArray* inParent, SizeType inIndex) :
 	parent(inParent),
 	index(inIndex)
@@ -128,15 +128,15 @@ xpcc::DynamicArray<T, Allocator>::iterator::iterator(
 }
 
 template <typename T, typename Allocator>
-xpcc::DynamicArray<T, Allocator>::iterator::iterator(const iterator& other) :
+modm::DynamicArray<T, Allocator>::iterator::iterator(const iterator& other) :
 	parent(other.parent),
 	index(other.index)
 {
 }
 
 template <typename T, typename Allocator>
-typename xpcc::DynamicArray<T, Allocator>::iterator&
-xpcc::DynamicArray<T, Allocator>::iterator::operator = (const iterator& other)
+typename modm::DynamicArray<T, Allocator>::iterator&
+modm::DynamicArray<T, Allocator>::iterator::operator = (const iterator& other)
 {
 	this->parent = other.parent;
 	this->index = other.index;
@@ -144,16 +144,16 @@ xpcc::DynamicArray<T, Allocator>::iterator::operator = (const iterator& other)
 }
 
 template <typename T, typename Allocator>
-typename xpcc::DynamicArray<T, Allocator>::iterator&
-xpcc::DynamicArray<T, Allocator>::iterator::operator ++ ()
+typename modm::DynamicArray<T, Allocator>::iterator&
+modm::DynamicArray<T, Allocator>::iterator::operator ++ ()
 {
 	++index;
 	return *this;
 }
 
 template <typename T, typename Allocator>
-typename xpcc::DynamicArray<T, Allocator>::iterator&
-xpcc::DynamicArray<T, Allocator>::iterator::operator -- ()
+typename modm::DynamicArray<T, Allocator>::iterator&
+modm::DynamicArray<T, Allocator>::iterator::operator -- ()
 {
 	--index;
 	return *this;
@@ -161,7 +161,7 @@ xpcc::DynamicArray<T, Allocator>::iterator::operator -- ()
 
 template <typename T, typename Allocator>
 bool
-xpcc::DynamicArray<T, Allocator>::iterator::operator == (
+modm::DynamicArray<T, Allocator>::iterator::operator == (
 		const iterator& other) const
 {
 	return ((parent == other.parent) &&
@@ -170,7 +170,7 @@ xpcc::DynamicArray<T, Allocator>::iterator::operator == (
 
 template <typename T, typename Allocator>
 bool
-xpcc::DynamicArray<T, Allocator>::iterator::operator != (
+modm::DynamicArray<T, Allocator>::iterator::operator != (
 		const iterator& other) const
 {
 	return ((parent != other.parent) ||
@@ -179,7 +179,7 @@ xpcc::DynamicArray<T, Allocator>::iterator::operator != (
 
 template <typename T, typename Allocator>
 bool
-xpcc::DynamicArray<T, Allocator>::iterator::operator < (
+modm::DynamicArray<T, Allocator>::iterator::operator < (
 		const iterator& other) const
 {
 	return ((parent == other.parent) &&
@@ -188,7 +188,7 @@ xpcc::DynamicArray<T, Allocator>::iterator::operator < (
 
 template <typename T, typename Allocator>
 bool
-xpcc::DynamicArray<T, Allocator>::iterator::operator > (
+modm::DynamicArray<T, Allocator>::iterator::operator > (
 		const iterator& other) const
 {
 	return ((parent == other.parent) &&
@@ -198,14 +198,14 @@ xpcc::DynamicArray<T, Allocator>::iterator::operator > (
 
 template <typename T, typename Allocator>
 T&
-xpcc::DynamicArray<T, Allocator>::iterator::operator * ()
+modm::DynamicArray<T, Allocator>::iterator::operator * ()
 {
 	return parent->values[index];
 }
 
 template <typename T, typename Allocator>
 T* 
-xpcc::DynamicArray<T, Allocator>::iterator::operator -> ()
+modm::DynamicArray<T, Allocator>::iterator::operator -> ()
 {
 	return &parent->values[index];
 }

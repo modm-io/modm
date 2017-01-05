@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_CIRCLE_2D_HPP
-#define XPCC_CIRCLE_2D_HPP
+#ifndef MODM_CIRCLE_2D_HPP
+#define MODM_CIRCLE_2D_HPP
 
 #include <cmath>
 #include "geometric_traits.hpp"
@@ -19,7 +19,7 @@
 #include "vector.hpp"
 #include "point_set_2d.hpp"
 
-namespace xpcc
+namespace modm
 {
 	// forward declarations
 	template <typename T>
@@ -108,4 +108,4 @@ namespace xpcc
 
 #include "circle_2d_impl.hpp"
 
-#endif // XPCC_CIRCLE_2D_HPP
+#endif // MODM_CIRCLE_2D_HPP

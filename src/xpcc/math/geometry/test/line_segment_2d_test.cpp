@@ -19,72 +19,72 @@
 void
 LineSegment2DTest::testDefaultConstructor()
 {
-	xpcc::LineSegment2D<int16_t> line;
+	modm::LineSegment2D<int16_t> line;
 	
-	TEST_ASSERT_EQUALS(line.getStartPoint(), xpcc::Vector2i(0, 0));
-	TEST_ASSERT_EQUALS(line.getEndPoint(), xpcc::Vector2i(0, 0));
+	TEST_ASSERT_EQUALS(line.getStartPoint(), modm::Vector2i(0, 0));
+	TEST_ASSERT_EQUALS(line.getEndPoint(), modm::Vector2i(0, 0));
 }
 
 void
 LineSegment2DTest::testConstructor()
 {
-	xpcc::LineSegment2D<int16_t> line(
-			xpcc::Vector2i(-20, -60),
-			xpcc::Vector2i(70, 30));
+	modm::LineSegment2D<int16_t> line(
+			modm::Vector2i(-20, -60),
+			modm::Vector2i(70, 30));
 	
-	TEST_ASSERT_EQUALS(line.getStartPoint(), xpcc::Vector2i(-20, -60));
-	TEST_ASSERT_EQUALS(line.getEndPoint(), xpcc::Vector2i(70, 30));
+	TEST_ASSERT_EQUALS(line.getStartPoint(), modm::Vector2i(-20, -60));
+	TEST_ASSERT_EQUALS(line.getEndPoint(), modm::Vector2i(70, 30));
 }
 
 void
 LineSegment2DTest::testAccessor()
 {
-	xpcc::LineSegment2D<int16_t> line;
+	modm::LineSegment2D<int16_t> line;
 	
-	line.setStartPoint(xpcc::Vector2i(30, 40));
+	line.setStartPoint(modm::Vector2i(30, 40));
 	
-	TEST_ASSERT_EQUALS(line.getStartPoint(), xpcc::Vector2i(30, 40));
-	TEST_ASSERT_EQUALS(line.getEndPoint(), xpcc::Vector2i(0, 0));
+	TEST_ASSERT_EQUALS(line.getStartPoint(), modm::Vector2i(30, 40));
+	TEST_ASSERT_EQUALS(line.getEndPoint(), modm::Vector2i(0, 0));
 	
-	line.setEndPoint(xpcc::Vector2i(50, 60));
+	line.setEndPoint(modm::Vector2i(50, 60));
 	
-	TEST_ASSERT_EQUALS(line.getStartPoint(), xpcc::Vector2i(30, 40));
-	TEST_ASSERT_EQUALS(line.getEndPoint(), xpcc::Vector2i(50, 60));
+	TEST_ASSERT_EQUALS(line.getStartPoint(), modm::Vector2i(30, 40));
+	TEST_ASSERT_EQUALS(line.getEndPoint(), modm::Vector2i(50, 60));
 	
-	line.set(xpcc::Vector2i(-60, -40),
-			xpcc::Vector2i(70, 80));
+	line.set(modm::Vector2i(-60, -40),
+			modm::Vector2i(70, 80));
 	
-	TEST_ASSERT_EQUALS(line.getStartPoint(), xpcc::Vector2i(-60, -40));
-	TEST_ASSERT_EQUALS(line.getEndPoint(), xpcc::Vector2i(70, 80));
+	TEST_ASSERT_EQUALS(line.getStartPoint(), modm::Vector2i(-60, -40));
+	TEST_ASSERT_EQUALS(line.getEndPoint(), modm::Vector2i(70, 80));
 }
 
 void
 LineSegment2DTest::testTranslation()
 {
-	xpcc::LineSegment2D<int16_t> line(
-			xpcc::Vector2i(12, 34),
-			xpcc::Vector2i(56, 78));
+	modm::LineSegment2D<int16_t> line(
+			modm::Vector2i(12, 34),
+			modm::Vector2i(56, 78));
 	
-	line.translate(xpcc::Vector2i(10, 20));
+	line.translate(modm::Vector2i(10, 20));
 	
-	TEST_ASSERT_EQUALS(line.getStartPoint(), xpcc::Vector2i(22, 54));
-	TEST_ASSERT_EQUALS(line.getEndPoint(), xpcc::Vector2i(66, 98));
+	TEST_ASSERT_EQUALS(line.getStartPoint(), modm::Vector2i(22, 54));
+	TEST_ASSERT_EQUALS(line.getEndPoint(), modm::Vector2i(66, 98));
 }
 
 void
 LineSegment2DTest::testComparision()
 {
-	xpcc::LineSegment2D<int16_t> a(
-			xpcc::Vector2i(12, 34),
-			xpcc::Vector2i(56, 78));
+	modm::LineSegment2D<int16_t> a(
+			modm::Vector2i(12, 34),
+			modm::Vector2i(56, 78));
 	
-	xpcc::LineSegment2D<int16_t> b(
-			xpcc::Vector2i(12, 34),
-			xpcc::Vector2i(0, 0));
+	modm::LineSegment2D<int16_t> b(
+			modm::Vector2i(12, 34),
+			modm::Vector2i(0, 0));
 	
-	xpcc::LineSegment2D<int16_t> c(
-			xpcc::Vector2i(12, 34),
-			xpcc::Vector2i(56, 78));
+	modm::LineSegment2D<int16_t> c(
+			modm::Vector2i(12, 34),
+			modm::Vector2i(56, 78));
 	
 	TEST_ASSERT_FALSE(a == b);
 	TEST_ASSERT_TRUE(a != b);
@@ -96,14 +96,14 @@ LineSegment2DTest::testComparision()
 void
 LineSegment2DTest::testLength()
 {
-	xpcc::LineSegment2D<int16_t> line(
-			xpcc::Vector2i(0, 0),
-			xpcc::Vector2i(70, 0));
+	modm::LineSegment2D<int16_t> line(
+			modm::Vector2i(0, 0),
+			modm::Vector2i(70, 0));
 	
 	TEST_ASSERT_EQUALS(line.getLength(), 70);
 	
-	line.set(xpcc::Vector2i(-20, -60),
-			xpcc::Vector2i(70, 30));
+	line.set(modm::Vector2i(-20, -60),
+			modm::Vector2i(70, 30));
 	
 	TEST_ASSERT_EQUALS(line.getLength(), 127);
 }
@@ -111,9 +111,9 @@ LineSegment2DTest::testLength()
 void
 LineSegment2DTest::testLengthFloat()
 {
-	xpcc::LineSegment2D<float> line(
-			xpcc::Vector<float, 2>(0, 0),
-			xpcc::Vector<float, 2>(70, 10));
+	modm::LineSegment2D<float> line(
+			modm::Vector<float, 2>(0, 0),
+			modm::Vector<float, 2>(70, 10));
 	
 	TEST_ASSERT_EQUALS_FLOAT(line.getLength(), 70.71067812f);
 }
@@ -121,25 +121,25 @@ LineSegment2DTest::testLengthFloat()
 void
 LineSegment2DTest::testDistanceToPoint()
 {
-	xpcc::LineSegment2D<int16_t> line(
-			xpcc::Vector2i(-20, -60),
-			xpcc::Vector2i(50, 10));
+	modm::LineSegment2D<int16_t> line(
+			modm::Vector2i(-20, -60),
+			modm::Vector2i(50, 10));
 	
-	int16_t distance = line.getDistanceTo(xpcc::Vector2i(10, 30));
+	int16_t distance = line.getDistanceTo(modm::Vector2i(10, 30));
 	
 	// closest point is (40, 0) => sqrt(30^2 + 30^2) = 42.4264..
 	TEST_ASSERT_EQUALS(distance, 42);
 	
-	TEST_ASSERT_EQUALS(line.getStartPoint(), xpcc::Vector2i(-20, -60));
-	TEST_ASSERT_EQUALS(line.getEndPoint(), xpcc::Vector2i(50, 10));
+	TEST_ASSERT_EQUALS(line.getStartPoint(), modm::Vector2i(-20, -60));
+	TEST_ASSERT_EQUALS(line.getEndPoint(), modm::Vector2i(50, 10));
 	
-	int16_t distance2 = line.getDistanceTo(xpcc::Vector2i(-50, -70));
+	int16_t distance2 = line.getDistanceTo(modm::Vector2i(-50, -70));
 	
 	// closest point of the line is before the start point
 	// => closest point is (-20, -60) => sqrt(30^2 + 10^2) = 31.6227766..
 	TEST_ASSERT_EQUALS(distance2, 32);
 	
-	int16_t distance3 = line.getDistanceTo(xpcc::Vector2i(100, 20));
+	int16_t distance3 = line.getDistanceTo(modm::Vector2i(100, 20));
 	
 	// closest point of the line is after the end point
 	// closest point is (50, 10) => sqrt(50^2 + 10^2) = 50.9901951..
@@ -149,29 +149,29 @@ LineSegment2DTest::testDistanceToPoint()
 void
 LineSegment2DTest::testIntersectsLineSegment()
 {
-	xpcc::LineSegment2D<int16_t> line1(
-			xpcc::Vector2i(-20, -60),
-			xpcc::Vector2i(50, 10));
+	modm::LineSegment2D<int16_t> line1(
+			modm::Vector2i(-20, -60),
+			modm::Vector2i(50, 10));
 	
-	xpcc::LineSegment2D<int16_t> line2(
-			xpcc::Vector2i(0, 0),
-			xpcc::Vector2i(90, 30));
+	modm::LineSegment2D<int16_t> line2(
+			modm::Vector2i(0, 0),
+			modm::Vector2i(90, 30));
 	
-	xpcc::LineSegment2D<int16_t> line3(
-			xpcc::Vector2i(10, -60),
-			xpcc::Vector2i(40, -30));
+	modm::LineSegment2D<int16_t> line3(
+			modm::Vector2i(10, -60),
+			modm::Vector2i(40, -30));
 	
-	xpcc::LineSegment2D<int16_t> line4(
-			xpcc::Vector2i(50, 10),
-			xpcc::Vector2i(50, 50));
+	modm::LineSegment2D<int16_t> line4(
+			modm::Vector2i(50, 10),
+			modm::Vector2i(50, 50));
 	
-	xpcc::LineSegment2D<int16_t> line5(
-			xpcc::Vector2i(10, 30),
-			xpcc::Vector2i(70, -30));
+	modm::LineSegment2D<int16_t> line5(
+			modm::Vector2i(10, 30),
+			modm::Vector2i(70, -30));
 	
-	xpcc::LineSegment2D<int16_t> line6(
-			xpcc::Vector2i(30, -40),
-			xpcc::Vector2i(60, 50));
+	modm::LineSegment2D<int16_t> line6(
+			modm::Vector2i(30, -40),
+			modm::Vector2i(60, 50));
 	
 	TEST_ASSERT_FALSE(line1.intersects(line2));
 	TEST_ASSERT_FALSE(line1.intersects(line3));
@@ -197,27 +197,27 @@ LineSegment2DTest::testIntersectsLineSegment()
 void
 LineSegment2DTest::testIntersectionPointsLineSegment()
 {
-	xpcc::LineSegment2D<int16_t> line1(
-			xpcc::Vector2i(-20, -60),
-			xpcc::Vector2i(50, 10));
+	modm::LineSegment2D<int16_t> line1(
+			modm::Vector2i(-20, -60),
+			modm::Vector2i(50, 10));
 	
-	xpcc::LineSegment2D<int16_t> line2(
-			xpcc::Vector2i(0, 0),
-			xpcc::Vector2i(90, 30));
+	modm::LineSegment2D<int16_t> line2(
+			modm::Vector2i(0, 0),
+			modm::Vector2i(90, 30));
 	
-	xpcc::LineSegment2D<int16_t> line3(
-			xpcc::Vector2i(10, -60),
-			xpcc::Vector2i(40, -30));
+	modm::LineSegment2D<int16_t> line3(
+			modm::Vector2i(10, -60),
+			modm::Vector2i(40, -30));
 	
-	xpcc::LineSegment2D<int16_t> line4(
-			xpcc::Vector2i(50, 10),
-			xpcc::Vector2i(50, 50));
+	modm::LineSegment2D<int16_t> line4(
+			modm::Vector2i(50, 10),
+			modm::Vector2i(50, 50));
 	
-	xpcc::LineSegment2D<int16_t> line5(
-			xpcc::Vector2i(10, 30),
-			xpcc::Vector2i(70, -30));
+	modm::LineSegment2D<int16_t> line5(
+			modm::Vector2i(10, 30),
+			modm::Vector2i(70, -30));
 	
-	xpcc::PointSet2D<int16_t> points;
+	modm::PointSet2D<int16_t> points;
 	
 	// line1 - line2
 	TEST_ASSERT_FALSE(line1.getIntersections(line2, points));
@@ -283,15 +283,15 @@ LineSegment2DTest::testIntersectionPointsLineSegment()
 void
 LineSegment2DTest::testIntersectionPointsCircle()
 {
-	xpcc::LineSegment2D<int16_t> line(
-			xpcc::Vector2i(-10, -10),
-			xpcc::Vector2i(10, 10));
+	modm::LineSegment2D<int16_t> line(
+			modm::Vector2i(-10, -10),
+			modm::Vector2i(10, 10));
 	
-	xpcc::Circle2D<int16_t> circle(
-			xpcc::Vector2i(0, 0),
+	modm::Circle2D<int16_t> circle(
+			modm::Vector2i(0, 0),
 			20);
 	
-	xpcc::PointSet2D<int16_t> points;
+	modm::PointSet2D<int16_t> points;
 	
 	// line is contained inside the circle
 	TEST_ASSERT_FALSE(line.getIntersections(circle, points));
@@ -300,8 +300,8 @@ LineSegment2DTest::testIntersectionPointsCircle()
 	points.removeAll();
 	
 	// end point inside the circle
-	line.set(xpcc::Vector2i(-30, -30),
-			xpcc::Vector2i(10, 10));
+	line.set(modm::Vector2i(-30, -30),
+			modm::Vector2i(10, 10));
 	
 	TEST_ASSERT_TRUE(line.getIntersections(circle, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 1U);
@@ -312,8 +312,8 @@ LineSegment2DTest::testIntersectionPointsCircle()
 	points.removeAll();
 	
 	// start point inside the circle
-	line.set(xpcc::Vector2i(-10, -10),
-			xpcc::Vector2i(30, 30));
+	line.set(modm::Vector2i(-10, -10),
+			modm::Vector2i(30, 30));
 	
 	TEST_ASSERT_TRUE(line.getIntersections(circle, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 1U);
@@ -324,8 +324,8 @@ LineSegment2DTest::testIntersectionPointsCircle()
 	points.removeAll();
 	
 	// two intersections
-	line.set(xpcc::Vector2i(30, -30),
-			xpcc::Vector2i(-30, 30));
+	line.set(modm::Vector2i(30, -30),
+			modm::Vector2i(-30, 30));
 	
 	TEST_ASSERT_TRUE(line.getIntersections(circle, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 2U);
@@ -339,8 +339,8 @@ LineSegment2DTest::testIntersectionPointsCircle()
 	points.removeAll();
 	
 	// line is a tangent
-	line.set(xpcc::Vector2i(20, 0),
-			xpcc::Vector2i(20, 30));
+	line.set(modm::Vector2i(20, 0),
+			modm::Vector2i(20, 30));
 	
 	TEST_ASSERT_TRUE(line.getIntersections(circle, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 1U);
@@ -351,8 +351,8 @@ LineSegment2DTest::testIntersectionPointsCircle()
 	points.removeAll();
 	
 	// line ends before the circle
-	line.set(xpcc::Vector2i(20, 20),
-			xpcc::Vector2i(30, 30));
+	line.set(modm::Vector2i(20, 20),
+			modm::Vector2i(30, 30));
 	
 	TEST_ASSERT_FALSE(line.getIntersections(circle, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 0U);

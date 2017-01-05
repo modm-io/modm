@@ -14,13 +14,13 @@
 #include <modm/architecture/platform.hpp>
 #include <modm/processing/rtos.hpp>
 
-using namespace xpcc::stm32;
-using namespace xpcc::cortex;
+using namespace modm::stm32;
+using namespace modm::cortex;
 
 /**
  * Check FPU support in FreeRTOS for STM32F4.
  *
- * FreeRTOS included in xpcc had no out of the box support for FPU.
+ * FreeRTOS included in modm had no out of the box support for FPU.
  * FPU support was added manually.
  *
  * This example uses four threads to check if task switching still works when
@@ -56,7 +56,7 @@ using namespace xpcc::cortex;
 
 // ----------------------------------------------------------------------------
 template <typename Gpio, int SleepTime>
-class P: xpcc::rtos::Thread {
+class P: modm::rtos::Thread {
 private:
 	char c;
 	int i;
@@ -76,7 +76,7 @@ public:
 			sleep(SleepTime);
 
 			Gpio::toggle();
-			xpcc::stm32::Usart2::writeBlocking(i + c);
+			modm::stm32::Usart2::writeBlocking(i + c);
 
 			i = (i+1)%10;
 
@@ -98,13 +98,13 @@ main()
 {
 	Board::initialize();
 
-	GpioA2::connect(xpcc::stm32::Usart2::Tx);
-	GpioA3::connect(xpcc::stm32::Usart2::Rx, Gpio::InputType::PullUp);
-	xpcc::stm32::Usart2::initialize<Board::systemClock, xpcc::stm32::Usart2::B115200>(6);
+	GpioA2::connect(modm::stm32::Usart2::Tx);
+	GpioA3::connect(modm::stm32::Usart2::Rx, Gpio::InputType::PullUp);
+	modm::stm32::Usart2::initialize<Board::systemClock, modm::stm32::Usart2::B115200>(6);
 
     while (1)
     {
-    	xpcc::rtos::Scheduler::schedule();
+    	modm::rtos::Scheduler::schedule();
     }
 
     // should not get here!

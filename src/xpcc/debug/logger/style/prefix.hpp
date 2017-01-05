@@ -11,15 +11,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LOG_PREFIX_HPP
-#define XPCC_LOG_PREFIX_HPP
+#ifndef MODM_LOG_PREFIX_HPP
+#define MODM_LOG_PREFIX_HPP
 
 #include <cstring>
 
 #include "../style.hpp"
 #include <modm/utils/template_metaprogramming.hpp>
 
-namespace xpcc
+namespace modm
 {
 	namespace log
 	{
@@ -28,9 +28,9 @@ namespace xpcc
 		 * \brief 	Add a prefix to the log message
 		 *
 		 * \code
-		 *	xpcc::log::StyleWrapper< xpcc::log::Prefix< char[9] > > loggerDevicePrefix (
-		 * 			xpcc::log::Prefix< char[9] > ( "Prefix: ", loggerDevice ) );
-		 * 	xpcc::log::Logger loggerPrefix( loggerDevicePrefix );
+		 *	modm::log::StyleWrapper< modm::log::Prefix< char[9] > > loggerDevicePrefix (
+		 * 			modm::log::Prefix< char[9] > ( "Prefix: ", loggerDevice ) );
+		 * 	modm::log::Logger loggerPrefix( loggerDevicePrefix );
 		 * \endcode
 		 *
 		 * \ingroup logger
@@ -66,4 +66,4 @@ namespace xpcc
 
 #include "prefix_impl.hpp"
 
-#endif // XPCC_LOG_PREFIX_HPP
+#endif // MODM_LOG_PREFIX_HPP

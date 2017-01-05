@@ -14,7 +14,7 @@
 #include <cstring>
 
 // ----------------------------------------------------------------------------
-namespace xpcc
+namespace modm
 {
 	namespace filter
 	{
@@ -43,7 +43,7 @@ namespace xpcc
 
 // ----------------------------------------------------------------------------
 template <typename T>
-xpcc::filter::Median<T, 3>::Median(const T& initialValue) :
+modm::filter::Median<T, 3>::Median(const T& initialValue) :
 	index(0)
 {
 	for (uint_fast8_t i = 0; i < 3; ++i) {
@@ -54,7 +54,7 @@ xpcc::filter::Median<T, 3>::Median(const T& initialValue) :
 
 template <typename T>
 void
-xpcc::filter::Median<T, 3>::append(const T& input)
+modm::filter::Median<T, 3>::append(const T& input)
 {
 	this->buffer[index] = input;
 	if (++index >= 3) {
@@ -64,20 +64,20 @@ xpcc::filter::Median<T, 3>::append(const T& input)
 
 template <typename T>
 void
-xpcc::filter::Median<T, 3>::update()
+modm::filter::Median<T, 3>::update()
 {
 	// for small sample sizes it is the fastest way to just copy the
 	// buffer and sort it afterwards
 	std::memcpy((void *) sorted, (const void * const) buffer, sizeof(sorted));
 	
-	XPCC_MEDIAN_SORT(sorted[0], sorted[1]);
-	XPCC_MEDIAN_SORT(sorted[1], sorted[2]);
-	XPCC_MEDIAN_SORT(sorted[0], sorted[1]);
+	MODM_MEDIAN_SORT(sorted[0], sorted[1]);
+	MODM_MEDIAN_SORT(sorted[1], sorted[2]);
+	MODM_MEDIAN_SORT(sorted[0], sorted[1]);
 }
 
 template <typename T>
 const T
-xpcc::filter::Median<T, 3>::getValue() const
+modm::filter::Median<T, 3>::getValue() const
 {
 	return sorted[1];
 }

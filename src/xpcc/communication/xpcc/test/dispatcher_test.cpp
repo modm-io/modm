@@ -48,7 +48,7 @@ void
 DispatcherTest::testReceiveRequest()
 {
 	Message message(xpcc::Header(xpcc::Header::Type::REQUEST, false, 1, 10, 0x10),
-			xpcc::SmartPointer());
+			modm::SmartPointer());
 	
 	backend->messagesToReceive.append(message);
 	
@@ -70,7 +70,7 @@ void
 DispatcherTest::testReceiveRequestNoComponent()
 {
 	Message message(xpcc::Header(xpcc::Header::Type::REQUEST, false, 11, 10, 0x10),
-			xpcc::SmartPointer());
+			modm::SmartPointer());
 	
 	backend->messagesToReceive.append(message);
 	
@@ -88,7 +88,7 @@ void
 DispatcherTest::testReceiveResponse()
 {
 	Message message(xpcc::Header(xpcc::Header::Type::RESPONSE, false, 1, 10, 0x10),
-			xpcc::SmartPointer());
+			modm::SmartPointer());
 	
 	backend->messagesToReceive.append(message);
 	
@@ -108,7 +108,7 @@ void
 DispatcherTest::testReceiveResponseNoComponent()
 {
 	Message message(xpcc::Header(xpcc::Header::Type::RESPONSE, false, 11, 10, 0x10),
-			xpcc::SmartPointer());
+			modm::SmartPointer());
 	
 	backend->messagesToReceive.append(message);
 	
@@ -123,7 +123,7 @@ void
 DispatcherTest::testEventReception()
 {
 	Message message(xpcc::Header(xpcc::Header::Type::REQUEST, false, 0, 10, 0x20),
-			xpcc::SmartPointer());
+			modm::SmartPointer());
 	
 	backend->messagesToReceive.append(message);
 	
@@ -436,7 +436,7 @@ DispatcherTest::testActionRetransmission()
 	// send requested ACK
 	backend->messagesToReceive.append(
 			Message(xpcc::Header(xpcc::Header::Type::REQUEST, true, 1, 10, 0xf3),
-					xpcc::SmartPointer()));
+					modm::SmartPointer()));
 	
 	// reset time so that the timeout is expired
 	TestingClock::time += 500;
@@ -451,7 +451,7 @@ DispatcherTest::testResponseRetransmissionWithAbort()
 {
 	backend->messagesToReceive.append(
 			Message(xpcc::Header(xpcc::Header::Type::REQUEST, false, 1, 10, 0x12),
-					xpcc::SmartPointer()));
+					modm::SmartPointer()));
 	
 	dispatcher->update();
 	
@@ -491,7 +491,7 @@ DispatcherTest::testResponseRetransmission()
 {
 	backend->messagesToReceive.append(
 			Message(xpcc::Header(xpcc::Header::Type::REQUEST, false, 1, 10, 0x12),
-					xpcc::SmartPointer()));
+					modm::SmartPointer()));
 	
 	dispatcher->update();
 	
@@ -518,7 +518,7 @@ DispatcherTest::testResponseRetransmission()
 	// send requested ACK
 	backend->messagesToReceive.append(
 			Message(xpcc::Header(xpcc::Header::Type::RESPONSE, true, 1, 10, 0x12),
-					xpcc::SmartPointer()));
+					modm::SmartPointer()));
 	
 	// reset time so that the timeout is expired if still active
 	TestingClock::time += 100;

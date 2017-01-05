@@ -16,32 +16,32 @@
 
 #include <modm/io/iostream.hpp>
 
-using namespace xpcc::atmega;
+using namespace modm::atmega;
 
 typedef GpioC2 OneWirePin;
-xpcc::SoftwareOneWireMaster<OneWirePin> ow;
+modm::SoftwareOneWireMaster<OneWirePin> ow;
 
 int
 main()
 {
-	typedef xpcc::avr::SystemClock c;
+	typedef modm::avr::SystemClock c;
 	Uart0::initialize<c, 9600>();
 
 	// Enable interrupts, this is needed for every buffered UART
 	enableInterrupts();
 
 	// Create a IOStream for complex formatting tasks
-	xpcc::IODeviceWrapper< Uart0, xpcc::IOBuffer::BlockIfFull > device;
-	xpcc::IOStream output(device);
+	modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > device;
+	modm::IOStream output(device);
 
-	output << "Welcome" << xpcc::endl;
-	xpcc::delayMilliseconds(100);
+	output << "Welcome" << modm::endl;
+	modm::delayMilliseconds(100);
 
 	ow.initialize();
 
 	if (!ow.touchReset()) {
-		output << "No devices found!" << xpcc::endl;
-		xpcc::delayMilliseconds(100);
+		output << "No devices found!" << modm::endl;
+		modm::delayMilliseconds(100);
 		while (1) {
 			// wait forever
 		}
@@ -52,17 +52,17 @@ main()
 
 	uint8_t rom[8];
 	while (ow.searchNext(rom)) {
-		output << "found: " << xpcc::hex;
+		output << "found: " << modm::hex;
 		for (uint8_t i = 0; i < 8; ++i) {
 			output << rom[i];
 		}
-		output << xpcc::ascii << xpcc::endl;
-		xpcc::delayMilliseconds(100);
+		output << modm::ascii << modm::endl;
+		modm::delayMilliseconds(100);
 	}
-	output << "finished!" << xpcc::endl;
+	output << "finished!" << modm::endl;
 
 	// read the temperature from a connected DS18B20
-	xpcc::Ds18b20< xpcc::SoftwareOneWireMaster<OneWirePin> > ds18b20(rom);
+	modm::Ds18b20< modm::SoftwareOneWireMaster<OneWirePin> > ds18b20(rom);
 
 	ds18b20.startConversion();
 
@@ -72,8 +72,8 @@ main()
 		{
 			int16_t temperature = ds18b20.readTemperature();
 
-			output << "Temperature: " << temperature << xpcc::endl;
-			xpcc::delayMilliseconds(100);
+			output << "Temperature: " << temperature << modm::endl;
+			modm::delayMilliseconds(100);
 
 			ds18b20.startConversion();
 		}

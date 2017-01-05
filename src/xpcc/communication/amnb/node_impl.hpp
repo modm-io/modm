@@ -11,26 +11,26 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_AMNB_NODE_HPP
+#ifndef	MODM_AMNB_NODE_HPP
 #error	"Don't include this file directly, use 'node.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template <typename T>
 void
-xpcc::amnb::Response::send(const T& payload)
+modm::amnb::Response::send(const T& payload)
 {
 	triggered = true;
 	transmitter->send(true, reinterpret_cast<const void *>(&payload), sizeof(T));
 }
 
-xpcc::amnb::Response::Response(Transmitter *parent) :
+modm::amnb::Response::Response(Transmitter *parent) :
 transmitter(parent), triggered(false)
 {
 }
 
 void
-xpcc::amnb::Response::error(uint8_t errorCode)
+modm::amnb::Response::error(uint8_t errorCode)
 {
 	triggered = true;
 	
@@ -39,14 +39,14 @@ xpcc::amnb::Response::error(uint8_t errorCode)
 }
 
 void
-xpcc::amnb::Response::send()
+modm::amnb::Response::send()
 {
 	triggered = true;
 	transmitter->send(true, 0, 0);
 }
 
 void
-xpcc::amnb::Response::send(const void *payload, std::size_t length)
+modm::amnb::Response::send(const void *payload, std::size_t length)
 {
 	triggered = true;
 	transmitter->send(true, payload, length);
@@ -54,7 +54,7 @@ xpcc::amnb::Response::send(const void *payload, std::size_t length)
 
 // ----------------------------------------------------------------------------
 inline void
-xpcc::amnb::Action::call(Response& response, const void *payload)
+modm::amnb::Action::call(Response& response, const void *payload)
 {
 	// redirect call to the actual object
 	(object->*function)(response, payload);
@@ -62,7 +62,7 @@ xpcc::amnb::Action::call(Response& response, const void *payload)
 
 // ----------------------------------------------------------------------------
 inline void
-xpcc::amnb::Listener::call(const void *payload, const uint8_t length, const uint8_t sender)
+modm::amnb::Listener::call(const void *payload, const uint8_t length, const uint8_t sender)
 {
 	// redirect call to the actual object
 	(object->*function)(payload, length, sender);
@@ -70,7 +70,7 @@ xpcc::amnb::Listener::call(const void *payload, const uint8_t length, const uint
 
 // ----------------------------------------------------------------------------
 inline void
-xpcc::amnb::ErrorHandler::call(Flags type, const uint8_t errorCode)
+modm::amnb::ErrorHandler::call(Flags type, const uint8_t errorCode)
 {
 	// redirect call to the actual object
 	(object->*function)(type, errorCode);
@@ -79,18 +79,18 @@ xpcc::amnb::ErrorHandler::call(Flags type, const uint8_t errorCode)
 // Disable warnings for Visual Studio about using 'this' in a base member
 // initializer list.
 // In this case though it is totally safe so it is ok to disable this warning.
-#ifdef XPCC_COMPILER_MSVC
+#ifdef MODM_COMPILER_MSVC
 #	pragma warning(disable:4355)
 #endif
 
 // ----------------------------------------------------------------------------
 template <typename Interface>
-xpcc::amnb::Node<Interface>::Node(uint8_t address,
-								  xpcc::accessor::Flash<Action> actionList,
+modm::amnb::Node<Interface>::Node(uint8_t address,
+								  modm::accessor::Flash<Action> actionList,
 								  uint8_t actionCount,
-								  xpcc::accessor::Flash<Listener> listenList,
+								  modm::accessor::Flash<Listener> listenList,
 								  uint8_t listenCount,
-								  xpcc::accessor::Flash<ErrorHandler> errorHandlerList,
+								  modm::accessor::Flash<ErrorHandler> errorHandlerList,
 								  uint8_t errorHandlerCount) :
 ownAddress(address),
 actionList(actionList), actionCount(actionCount),
@@ -103,10 +103,10 @@ response(this)
 }
 
 template <typename Interface>
-xpcc::amnb::Node<Interface>::Node(uint8_t address,
-								  xpcc::accessor::Flash<Action> actionList,
+modm::amnb::Node<Interface>::Node(uint8_t address,
+								  modm::accessor::Flash<Action> actionList,
 								  uint8_t actionCount,
-								  xpcc::accessor::Flash<Listener> listenList,
+								  modm::accessor::Flash<Listener> listenList,
 								  uint8_t listenCount) :
 ownAddress(address),
 actionList(actionList), actionCount(actionCount),
@@ -119,8 +119,8 @@ response(this)
 }
 
 template <typename Interface>
-xpcc::amnb::Node<Interface>::Node(uint8_t address,
-								  xpcc::accessor::Flash<Action> actionList,
+modm::amnb::Node<Interface>::Node(uint8_t address,
+								  modm::accessor::Flash<Action> actionList,
 								  uint8_t actionCount) :
 ownAddress(address),
 actionList(actionList), actionCount(actionCount),
@@ -135,7 +135,7 @@ response(this)
 // ----------------------------------------------------------------------------
 template <typename Interface> template <typename T>
 bool
-xpcc::amnb::Node<Interface>::query(uint8_t slaveAddress, uint8_t command,
+modm::amnb::Node<Interface>::query(uint8_t slaveAddress, uint8_t command,
 								   const T& payload, uint8_t responseLength)
 {
 	if (queryStatus == IN_PROGRESS) {
@@ -166,7 +166,7 @@ xpcc::amnb::Node<Interface>::query(uint8_t slaveAddress, uint8_t command,
 
 template <typename Interface> template <typename T>
 bool
-xpcc::amnb::Node<Interface>::query(uint8_t slaveAddress, uint8_t command,
+modm::amnb::Node<Interface>::query(uint8_t slaveAddress, uint8_t command,
 								   const void *payload, uint8_t payloadLength, uint8_t responseLength)
 {
 	if (queryStatus == IN_PROGRESS) {
@@ -197,7 +197,7 @@ xpcc::amnb::Node<Interface>::query(uint8_t slaveAddress, uint8_t command,
 
 template <typename Interface>
 bool
-xpcc::amnb::Node<Interface>::query(uint8_t slaveAddress, uint8_t command,
+modm::amnb::Node<Interface>::query(uint8_t slaveAddress, uint8_t command,
 								   uint8_t responseLength)
 {
 	if (queryStatus == IN_PROGRESS) {
@@ -229,7 +229,7 @@ xpcc::amnb::Node<Interface>::query(uint8_t slaveAddress, uint8_t command,
 // ----------------------------------------------------------------------------
 template <typename Interface> template <typename T>
 bool
-xpcc::amnb::Node<Interface>::broadcast(uint8_t command, const T& payload)
+modm::amnb::Node<Interface>::broadcast(uint8_t command, const T& payload)
 {
 	bool noError(true);
 	if (!Interface::messageTransmitted()) {
@@ -249,7 +249,7 @@ xpcc::amnb::Node<Interface>::broadcast(uint8_t command, const T& payload)
 
 template <typename Interface>
 bool
-xpcc::amnb::Node<Interface>::broadcast(uint8_t command, const void *payload, uint8_t payloadLength)
+modm::amnb::Node<Interface>::broadcast(uint8_t command, const void *payload, uint8_t payloadLength)
 {
 	bool noError(true);
 	if (!Interface::messageTransmitted()) {
@@ -268,7 +268,7 @@ xpcc::amnb::Node<Interface>::broadcast(uint8_t command, const void *payload, uin
 
 template <typename Interface>
 bool
-xpcc::amnb::Node<Interface>::broadcast(uint8_t command)
+modm::amnb::Node<Interface>::broadcast(uint8_t command)
 {
 	bool noError(true);
 	if (!Interface::messageTransmitted()) {
@@ -288,7 +288,7 @@ xpcc::amnb::Node<Interface>::broadcast(uint8_t command)
 // ----------------------------------------------------------------------------
 template <typename Interface>
 bool
-xpcc::amnb::Node<Interface>::isQueryCompleted()
+modm::amnb::Node<Interface>::isQueryCompleted()
 {
 	return (queryStatus != IN_PROGRESS);
 }
@@ -296,7 +296,7 @@ xpcc::amnb::Node<Interface>::isQueryCompleted()
 // ----------------------------------------------------------------------------
 template <typename Interface>
 bool
-xpcc::amnb::Node<Interface>::isSuccess()
+modm::amnb::Node<Interface>::isSuccess()
 {
 	return (queryStatus == SUCCESS);
 }
@@ -304,7 +304,7 @@ xpcc::amnb::Node<Interface>::isSuccess()
 // ----------------------------------------------------------------------------
 template <typename Interface>
 uint8_t
-xpcc::amnb::Node<Interface>::getErrorCode()
+modm::amnb::Node<Interface>::getErrorCode()
 {
 	if (queryStatus == ERROR_RESPONSE) {
 		// Error code is in the first payload byte
@@ -318,14 +318,14 @@ xpcc::amnb::Node<Interface>::getErrorCode()
 // ----------------------------------------------------------------------------
 template <typename Interface> template <typename T>
 const T *
-xpcc::amnb::Node<Interface>::getResponse()
+modm::amnb::Node<Interface>::getResponse()
 {
 	return reinterpret_cast<const T *>(Interface::getPayload());
 }
 
 template <typename Interface>
 const void *
-xpcc::amnb::Node<Interface>::getResponse()
+modm::amnb::Node<Interface>::getResponse()
 {
 	return reinterpret_cast<const void *>(Interface::getPayload());
 }
@@ -333,7 +333,7 @@ xpcc::amnb::Node<Interface>::getResponse()
 // ----------------------------------------------------------------------------
 template <typename Interface>
 void
-xpcc::amnb::Node<Interface>::update()
+modm::amnb::Node<Interface>::update()
 {	
 	Interface::update();
 	
@@ -380,7 +380,7 @@ xpcc::amnb::Node<Interface>::update()
 					this->response.triggered = false;
 					this->currentCommand = messageCommand;
 					
-					xpcc::accessor::Flash<Action> list = actionList;
+					modm::accessor::Flash<Action> list = actionList;
 					for (uint8_t i = 0; i < actionCount; ++i, ++list)
 					{
 						Action action(*list);
@@ -419,7 +419,7 @@ xpcc::amnb::Node<Interface>::update()
 		
 		if (checkListeners && (listenCount > 0))
 		{	// check if we want to listen to it
-			xpcc::accessor::Flash<Listener> list = listenList;
+			modm::accessor::Flash<Listener> list = listenList;
 			for (uint8_t i = 0; i < listenCount; ++i, ++list)
 			{
 				Listener listen(*list);
@@ -445,11 +445,11 @@ xpcc::amnb::Node<Interface>::update()
 
 template <typename Interface>
 bool
-xpcc::amnb::Node<Interface>::checkErrorHandlers(uint8_t address, uint8_t command, Flags type, uint8_t errorCode)
+modm::amnb::Node<Interface>::checkErrorHandlers(uint8_t address, uint8_t command, Flags type, uint8_t errorCode)
 {
 	if (errorHandlerCount == 0) return false;
 	
-	xpcc::accessor::Flash<ErrorHandler> list = errorHandlerList;
+	modm::accessor::Flash<ErrorHandler> list = errorHandlerList;
 	for (uint8_t i = 0; i < errorHandlerCount; ++i, ++list)
 	{
 		ErrorHandler errorHandler(*list);
@@ -466,15 +466,15 @@ xpcc::amnb::Node<Interface>::checkErrorHandlers(uint8_t address, uint8_t command
 // ----------------------------------------------------------------------------
 template <typename Interface>
 void
-xpcc::amnb::Node<Interface>::send(bool acknowledge,
+modm::amnb::Node<Interface>::send(bool acknowledge,
 								  const void *payload, uint8_t payloadLength)
 {
 	Flags flags;
 	if (acknowledge) {
-		flags = xpcc::amnb::ACK;
+		flags = modm::amnb::ACK;
 	}
 	else {
-		flags = xpcc::amnb::NACK;
+		flags = modm::amnb::NACK;
 	}
 	
 	Interface::sendMessage(this->ownAddress, flags, this->currentCommand,

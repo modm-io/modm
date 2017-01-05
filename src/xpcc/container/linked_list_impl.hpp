@@ -14,19 +14,19 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_LINKED_LIST_HPP
+#ifndef	MODM_LINKED_LIST_HPP
 	#error	"Don't include this file directly, use 'linked_list.hpp' instead"
 #endif
 
 // ----------------------------------------------------------------------------
 template <typename T, typename Allocator>
-xpcc::LinkedList<T, Allocator>::LinkedList(const Allocator& allocator) :
+modm::LinkedList<T, Allocator>::LinkedList(const Allocator& allocator) :
 	nodeAllocator(allocator), front(0), back(0)
 {
 }
 
 template <typename T, typename Allocator>
-xpcc::LinkedList<T, Allocator>::~LinkedList()
+modm::LinkedList<T, Allocator>::~LinkedList()
 {
 	while (this->front != 0)
 	{
@@ -40,14 +40,14 @@ xpcc::LinkedList<T, Allocator>::~LinkedList()
 
 template <typename T, typename Allocator>
 bool
-xpcc::LinkedList<T, Allocator>::isEmpty() const
+modm::LinkedList<T, Allocator>::isEmpty() const
 {
 	return (this->front == 0);
 }
 
 template <typename T, typename Allocator>
 std::size_t
-xpcc::LinkedList<T, Allocator>::getSize() const
+modm::LinkedList<T, Allocator>::getSize() const
 {
 	std::size_t count = 0;
 	for (const_iterator it = this->begin(); it != this->end(); ++it) {
@@ -59,7 +59,7 @@ xpcc::LinkedList<T, Allocator>::getSize() const
 // ----------------------------------------------------------------------------
 template <typename T, typename Allocator>
 bool
-xpcc::LinkedList<T, Allocator>::prepend(const T& value)
+modm::LinkedList<T, Allocator>::prepend(const T& value)
 {
 	// allocate memory for the new node and copy the value into it
 	Node *node = this->nodeAllocator.allocate(1);
@@ -79,7 +79,7 @@ xpcc::LinkedList<T, Allocator>::prepend(const T& value)
 
 template <typename T, typename Allocator>
 bool
-xpcc::LinkedList<T, Allocator>::append(const T& value)
+modm::LinkedList<T, Allocator>::append(const T& value)
 {
 	// allocate memory for the new node and copy the value into it
 	Node *node = this->nodeAllocator.allocate(1);
@@ -102,7 +102,7 @@ xpcc::LinkedList<T, Allocator>::append(const T& value)
 
 template <typename T, typename Allocator>
 bool
-xpcc::LinkedList<T, Allocator>::insert(const_iterator pos, const T& value)
+modm::LinkedList<T, Allocator>::insert(const_iterator pos, const T& value)
 {
 	// if pos is the `end` iterator
 	if(pos.node == nullptr) {
@@ -126,7 +126,7 @@ xpcc::LinkedList<T, Allocator>::insert(const_iterator pos, const T& value)
 // ----------------------------------------------------------------------------
 template <typename T, typename Allocator>
 void
-xpcc::LinkedList<T, Allocator>::removeFront()
+modm::LinkedList<T, Allocator>::removeFront()
 {
 	// remove node from the list
 	Node *node = this->front;
@@ -148,28 +148,28 @@ xpcc::LinkedList<T, Allocator>::removeFront()
 // ----------------------------------------------------------------------------
 template <typename T, typename Allocator>
 inline const T&
-xpcc::LinkedList<T, Allocator>::getFront() const
+modm::LinkedList<T, Allocator>::getFront() const
 {
 	return this->front->value;
 }
 
 template <typename T, typename Allocator>
 inline T&
-xpcc::LinkedList<T, Allocator>::getFront()
+modm::LinkedList<T, Allocator>::getFront()
 {
 	return this->front->value;
 }
 
 template <typename T, typename Allocator>
 inline const T&
-xpcc::LinkedList<T, Allocator>::getBack() const
+modm::LinkedList<T, Allocator>::getBack() const
 {
 	return this->back->value;
 }
 
 template <typename T, typename Allocator>
 inline T&
-xpcc::LinkedList<T, Allocator>::getBack()
+modm::LinkedList<T, Allocator>::getBack()
 {
 	return this->back->value;
 }
@@ -177,7 +177,7 @@ xpcc::LinkedList<T, Allocator>::getBack()
 // ----------------------------------------------------------------------------
 template <typename T, typename Allocator>
 void
-xpcc::LinkedList<T, Allocator>::removeAll()
+modm::LinkedList<T, Allocator>::removeAll()
 {
 	while (!this->isEmpty()) {
 		this->removeFront();
@@ -186,8 +186,8 @@ xpcc::LinkedList<T, Allocator>::removeAll()
 
 // ----------------------------------------------------------------------------
 template <typename T, typename Allocator>
-typename xpcc::LinkedList<T, Allocator>::iterator
-xpcc::LinkedList<T, Allocator>::remove(const iterator& iter)
+typename modm::LinkedList<T, Allocator>::iterator
+modm::LinkedList<T, Allocator>::remove(const iterator& iter)
 {
 	if (this->isEmpty()) {
 		return this->begin();

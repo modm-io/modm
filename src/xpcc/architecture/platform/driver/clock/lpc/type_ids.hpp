@@ -12,10 +12,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LPC_CLOCK_TYPE_IDS_HPP
-#define XPCC_LPC_CLOCK_TYPE_IDS_HPP
+#ifndef MODM_LPC_CLOCK_TYPE_IDS_HPP
+#define MODM_LPC_CLOCK_TYPE_IDS_HPP
 
-namespace xpcc
+namespace modm
 {
 	namespace lpc
 	{
@@ -31,4 +31,4 @@ namespace xpcc
 	}
 }
 
-#endif /* XPCC_LPC_CLOCK_TYPE_IDS_HPP */
+#endif /* MODM_LPC_CLOCK_TYPE_IDS_HPP */

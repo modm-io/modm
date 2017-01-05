@@ -137,11 +137,11 @@
  */
 
 /* To debug the internal state of the driver, you can instantiate a
- * xpcc::IOStream in your main souce file, which will then be used to dump
+ * modm::IOStream in your main souce file, which will then be used to dump
  * state data of the operations via the serial port, e.g.
  *   #include <modm/io/iostream.hpp>
- *   xpcc::IODeviceWrapper< Uart5, * xpcc::IOBuffer::BlockIfFull > device;
- *   xpcc::IOStream stream(device);
+ *   modm::IODeviceWrapper< Uart5, * modm::IOBuffer::BlockIfFull > device;
+ *   modm::IOStream stream(device);
 
  * Be advised, that a typical I2C read/write operation can take 10 to 100 longer
  * because the strings have to be copied during the interrupt!
@@ -152,11 +152,11 @@
 
 #if SERIAL_DEBUGGING
 #	include "../../uart/stm32/uart_5.hpp"
-	typedef xpcc::stm32::Uart5 DebugUart;
+	typedef modm::stm32::Uart5 DebugUart;
 #	include <modm/io/iostream.hpp>
-	extern xpcc::IOStream stream;
+	extern modm::IOStream stream;
 #	define DEBUG_STREAM(x) stream << x << "\n"
-#	define DEBUG(x) xpcc::stm32::Uart5::write(x)
+#	define DEBUG(x) modm::stm32::Uart5::write(x)
 #else
 #	define DEBUG_STREAM(x)
 #	define DEBUG(x)
@@ -167,12 +167,12 @@
 #include <modm/architecture/driver/atomic.hpp>
 #include <modm/container/container.hpp>
 
-XPCC_ISR_DECL(I2C{{ id }}_ER);
+MODM_ISR_DECL(I2C{{ id }}_ER);
 
 namespace
 {
 	// parameter advice
-	static xpcc::I2c::Operation nextOperation;
+	static modm::I2c::Operation nextOperation;
 	static enum CheckNextOperation
 	{
 		CHECK_NEXT_OPERATION_NO,
@@ -188,24 +188,24 @@ namespace
 		ConfiguredTransaction()
 		:	transaction(nullptr), configuration(nullptr) {}
 
-		ConfiguredTransaction(xpcc::I2cTransaction *transaction, xpcc::I2c::ConfigurationHandler configuration)
+		ConfiguredTransaction(modm::I2cTransaction *transaction, modm::I2c::ConfigurationHandler configuration)
 		:	transaction(transaction), configuration(configuration) {}
 
-		xpcc::I2cTransaction *transaction;
-		xpcc::I2c::ConfigurationHandler configuration;
+		modm::I2cTransaction *transaction;
+		modm::I2c::ConfigurationHandler configuration;
 	};
 
-	static xpcc::BoundedQueue<ConfiguredTransaction, {{ options["buffer.transaction"] }}> queue;
-	static xpcc::I2c::ConfigurationHandler configuration(nullptr);
+	static modm::BoundedQueue<ConfiguredTransaction, {{ options["buffer.transaction"] }}> queue;
+	static modm::I2c::ConfigurationHandler configuration(nullptr);
 
 	// delegating
-	static xpcc::I2cTransaction *transaction(nullptr);
-	static xpcc::I2cMaster::Error error(xpcc::I2cMaster::Error::NoError);
+	static modm::I2cTransaction *transaction(nullptr);
+	static modm::I2cMaster::Error error(modm::I2cMaster::Error::NoError);
 
 	// buffer management
-	static xpcc::I2cTransaction::Starting starting(0, xpcc::I2c::OperationAfterStart::Stop);
-	static xpcc::I2cTransaction::Writing writing(nullptr, 0, xpcc::I2c::OperationAfterWrite::Stop);
-	static xpcc::I2cTransaction::Reading reading(nullptr, 0, xpcc::I2c::OperationAfterRead::Stop);
+	static modm::I2cTransaction::Starting starting(0, modm::I2c::OperationAfterStart::Stop);
+	static modm::I2cTransaction::Writing writing(nullptr, 0, modm::I2c::OperationAfterWrite::Stop);
+	static modm::I2cTransaction::Reading reading(nullptr, 0, modm::I2c::OperationAfterRead::Stop);
 
 	// helper functions
 	static inline void
@@ -217,7 +217,7 @@ namespace
 
 		// If the bus is busy during a starting condition, we generate an error and detach the transaction
 		// Before a restart condition the clock line is pulled low, and this check would trigger falsely.
-		if ((I2C{{ id }}->SR2 & I2C_SR2_BUSY) and (nextOperation != xpcc::I2c::Operation::Restart))
+		if ((I2C{{ id }}->SR2 & I2C_SR2_BUSY) and (nextOperation != modm::I2c::Operation::Restart))
 		{
 			// we wait a short amount of time for the bus to become free.
 			deadlockPreventer = 10000;
@@ -229,15 +229,15 @@ namespace
 				// either SDA or SCL is low, which leads to irrecoverable deadlock.
 				// Call error handler manually to detach the transaction object and resolve the deadlock.
 				// Further transactions may not succeed either, but will not lead to a deadlock.
-				error = xpcc::I2cMaster::Error::BusBusy;
-				XPCC_ISR_CALL(I2C{{ id }}_ER);
+				error = modm::I2cMaster::Error::BusBusy;
+				MODM_ISR_CALL(I2C{{ id }}_ER);
 				return;
 			}
 		}
 
 		DEBUG_STREAM("callStarting");
 		checkNextOperation = CHECK_NEXT_OPERATION_NO;
-		error = xpcc::I2cMaster::Error::NoError;
+		error = modm::I2cMaster::Error::NoError;
 
 		I2C{{ id }}->CR1 &= ~I2C_CR1_POS;
 		I2C{{ id }}->SR1 = 0;
@@ -279,7 +279,7 @@ namespace
 }
 
 // ----------------------------------------------------------------------------
-XPCC_ISR(I2C{{ id }}_EV)
+MODM_ISR(I2C{{ id }}_EV)
 {
 	DEBUG_STREAM("\n--- interrupt ---");
 
@@ -291,14 +291,14 @@ XPCC_ISR(I2C{{ id }}_EV)
 		DEBUG_STREAM("startbit set");
 
 		starting = transaction->starting();
-		uint8_t addressMode = xpcc::I2c::Write;
+		uint8_t addressMode = modm::I2c::Write;
 
 		switch (starting.next)
 		{
-			case xpcc::I2c::OperationAfterStart::Read:
-				addressMode = xpcc::I2c::Read;
+			case modm::I2c::OperationAfterStart::Read:
+				addressMode = modm::I2c::Read;
 				reading = transaction->reading();
-				nextOperation = static_cast<xpcc::I2c::Operation>(reading.next);
+				nextOperation = static_cast<modm::I2c::Operation>(reading.next);
 
 				if (reading.length < 2)
 				{
@@ -318,18 +318,18 @@ XPCC_ISR(I2C{{ id }}_EV)
 				DEBUG_STREAM("read op: reading=" << reading.length);
 				break;
 
-			case xpcc::I2c::OperationAfterStart::Write:
+			case modm::I2c::OperationAfterStart::Write:
 				writing = transaction->writing();
-				nextOperation = static_cast<xpcc::I2c::Operation>(writing.next);
+				nextOperation = static_cast<modm::I2c::Operation>(writing.next);
 
 				DEBUG_STREAM("write op: writing=" << writing.length);
 				break;
 
 			default:
-			case xpcc::I2c::OperationAfterStart::Stop:
+			case modm::I2c::OperationAfterStart::Stop:
 				writing.length = 0;
 				reading.length = 0;
-				nextOperation = xpcc::I2c::Operation::Stop;
+				nextOperation = modm::I2c::Operation::Stop;
 
 				DEBUG_STREAM("stop op");
 				break;
@@ -342,7 +342,7 @@ XPCC_ISR(I2C{{ id }}_EV)
 
 	else if (sr1 & I2C_SR1_ADDR)
 	{
-		xpcc::atomic::Lock lock;
+		modm::atomic::Lock lock;
 		starting.address = 0;
 		// EV6: ADDR=1, cleared by reading SR1 register followed by reading SR2.
 		DEBUG_STREAM("address sent");
@@ -444,7 +444,7 @@ XPCC_ISR(I2C{{ id }}_EV)
 
 		if (reading.length == 2)
 		{
-			xpcc::atomic::Lock lock;
+			modm::atomic::Lock lock;
 			// EV7_1: RxNE=1, cleared by reading DR register, programming STOP=1
 			DEBUG_STREAM("STOP");
 			I2C{{ id }}->CR1 |= I2C_CR1_STOP;
@@ -495,18 +495,18 @@ XPCC_ISR(I2C{{ id }}_EV)
 	{
 		switch (nextOperation)
 		{
-			case xpcc::I2c::Operation::Write:
+			case modm::I2c::Operation::Write:
 				if (checkNextOperation != CHECK_NEXT_OPERATION_YES_NO_STOP_BIT)
 				{
 					writing = transaction->writing();
-					nextOperation = static_cast<xpcc::I2c::Operation>(writing.next);
+					nextOperation = static_cast<modm::I2c::Operation>(writing.next);
 					// reenable TXE
 					I2C{{ id }}->CR2 |= I2C_CR2_ITBUFEN;
 					DEBUG_STREAM("write op");
 				}
 				break;
 
-			case xpcc::I2c::Operation::Restart:
+			case modm::I2c::Operation::Restart:
 				callStarting();
 				DEBUG_STREAM("restart op");
 				break;
@@ -520,7 +520,7 @@ XPCC_ISR(I2C{{ id }}_EV)
 
 				DEBUG_STREAM("disable interrupts");
 				I2C{{ id }}->CR2 &= ~(I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN);
-				if (transaction) transaction->detaching(xpcc::I2c::DetachCause::NormalStop);
+				if (transaction) transaction->detaching(modm::I2c::DetachCause::NormalStop);
 				transaction = nullptr;
 				DEBUG_STREAM("transaction finished");
 				callNextTransaction();
@@ -531,7 +531,7 @@ XPCC_ISR(I2C{{ id }}_EV)
 }
 
 // ----------------------------------------------------------------------------
-XPCC_ISR(I2C{{ id }}_ER)
+MODM_ISR(I2C{{ id }}_ER)
 {
 	DEBUG_STREAM("ERROR!");
 	uint16_t sr1 = I2C{{ id }}->SR1;
@@ -540,27 +540,27 @@ XPCC_ISR(I2C{{ id }}_ER)
 	{
 		DEBUG_STREAM("BUS ERROR");
 		I2C{{ id }}->CR1 |= I2C_CR1_STOP;
-		error = xpcc::I2cMaster::Error::BusCondition;
+		error = modm::I2cMaster::Error::BusCondition;
 	}
 	else if (sr1 & I2C_SR1_AF)
 	{	// acknowledge fail
 		I2C{{ id }}->CR1 |= I2C_CR1_STOP;
 		DEBUG_STREAM("ACK FAIL");
 		 // may also be ADDRESS_NACK
-		error = starting.address ? xpcc::I2cMaster::Error::AddressNack : xpcc::I2cMaster::Error::DataNack;
+		error = starting.address ? modm::I2cMaster::Error::AddressNack : modm::I2cMaster::Error::DataNack;
 	}
 	else if (sr1 & I2C_SR1_ARLO)
 	{	// arbitration lost
 		DEBUG_STREAM("ARBITRATION LOST");
-		error = xpcc::I2cMaster::Error::ArbitrationLost;
+		error = modm::I2cMaster::Error::ArbitrationLost;
 	}
-	else if (error == xpcc::I2cMaster::Error::NoError)
+	else if (error == modm::I2cMaster::Error::NoError)
 	{
 		DEBUG_STREAM("UNKNOWN");
-		error = xpcc::I2cMaster::Error::Unknown;
+		error = modm::I2cMaster::Error::Unknown;
 	}
 
-	if (transaction) transaction->detaching(xpcc::I2c::DetachCause::ErrorCondition);
+	if (transaction) transaction->detaching(modm::I2c::DetachCause::ErrorCondition);
 	transaction = nullptr;
 
 	// Overrun error is not handled here separately
@@ -581,7 +581,7 @@ XPCC_ISR(I2C{{ id }}_ER)
 // ----------------------------------------------------------------------------
 
 void
-xpcc::stm32::I2cMaster{{ id }}::initializeWithPrescaler(uint8_t peripheralFrequency, uint8_t riseTime, uint16_t prescaler)
+modm::stm32::I2cMaster{{ id }}::initializeWithPrescaler(uint8_t peripheralFrequency, uint8_t riseTime, uint16_t prescaler)
 {
 	// no reset, since we want to keep the transaction attached!
 
@@ -608,7 +608,7 @@ xpcc::stm32::I2cMaster{{ id }}::initializeWithPrescaler(uint8_t peripheralFreque
 }
 
 void
-xpcc::stm32::I2cMaster{{ id }}::reset()
+modm::stm32::I2cMaster{{ id }}::reset()
 {
 	reading.length = 0;
 	writing.length = 0;
@@ -626,9 +626,9 @@ xpcc::stm32::I2cMaster{{ id }}::reset()
 
 // MARK: - ownership
 bool
-xpcc::stm32::I2cMaster{{ id }}::start(I2cTransaction *transaction, ConfigurationHandler handler)
+modm::stm32::I2cMaster{{ id }}::start(I2cTransaction *transaction, ConfigurationHandler handler)
 {
-	xpcc::atomic::Lock lock;
+	modm::atomic::Lock lock;
 	// if we have a place in the queue and the transaction object is valid
 	if (queue.isNotFull() && transaction)
 	{
@@ -636,7 +636,7 @@ xpcc::stm32::I2cMaster{{ id }}::start(I2cTransaction *transaction, Configuration
 		if (transaction->attaching())
 		{
 			// if no current transaction is taking place
-			if (!xpcc::accessor::asVolatile(::transaction))
+			if (!modm::accessor::asVolatile(::transaction))
 			{
 				// configure the peripheral
 				if (handler and configuration != handler) {
@@ -657,14 +657,14 @@ xpcc::stm32::I2cMaster{{ id }}::start(I2cTransaction *transaction, Configuration
 			return true;
 		}
 		else {
-			transaction->detaching(xpcc::I2c::DetachCause::FailedToAttach);
+			transaction->detaching(modm::I2c::DetachCause::FailedToAttach);
 		}
 	}
 	return false;
 }
 
-xpcc::I2cMaster::Error
-xpcc::stm32::I2cMaster{{ id }}::getErrorState()
+modm::I2cMaster::Error
+modm::stm32::I2cMaster{{ id }}::getErrorState()
 {
 	return error;
 }

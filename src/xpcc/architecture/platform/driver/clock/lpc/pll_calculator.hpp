@@ -10,14 +10,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LPC_PLL_HPP
-#define XPCC_LPC_PLL_HPP
+#ifndef MODM_LPC_PLL_HPP
+#define MODM_LPC_PLL_HPP
 
 #include "../generic/common_clock.hpp"
 
-using namespace xpcc::clock;
+using namespace modm::clock;
 
-namespace xpcc
+namespace modm
 {
 	namespace lpc
 	{
@@ -96,4 +96,4 @@ namespace xpcc
 	}
 }
 
-#endif	//  XPCC_LPC_PLL_HPP
+#endif	//  MODM_LPC_PLL_HPP

@@ -10,12 +10,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_MATH_OPERATOR_HPP
+#ifndef	MODM_MATH_OPERATOR_HPP
 	#error	"Don't include this file directly, use 'operator.hpp' instead!"
 #endif
 
 inline uint32_t
-xpcc::math::mul(uint16_t a, uint16_t b)
+modm::math::mul(uint16_t a, uint16_t b)
 {
 	uint32_t result;
 	asm(
@@ -41,7 +41,7 @@ xpcc::math::mul(uint16_t a, uint16_t b)
 }
 
 inline int32_t
-xpcc::math::mul(int16_t a, int16_t b)
+modm::math::mul(int16_t a, int16_t b)
 {
 	int32_t result;
 	int8_t help_reg;
@@ -78,7 +78,7 @@ xpcc::math::mul(int16_t a, int16_t b)
 }
 
 inline int32_t
-xpcc::math::mac(int32_t result, int16_t a, int16_t b)
+modm::math::mac(int32_t result, int16_t a, int16_t b)
 {
 	int8_t help_reg;
 	

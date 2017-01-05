@@ -15,8 +15,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_IOSTREAM_HPP
-#define XPCC_IOSTREAM_HPP
+#ifndef MODM_IOSTREAM_HPP
+#define MODM_IOSTREAM_HPP
 
 #include <cstddef>
 
@@ -28,7 +28,7 @@
 #include "iodevice.hpp"
 #include "iodevice_wrapper.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -111,7 +111,7 @@ public:
 	}
 
 	/// set the output mode to binary style for `char` and `char*`
-	xpcc_always_inline IOStream&
+	modm_always_inline IOStream&
 	bin()
 	{
 		this->mode = Mode::Binary;
@@ -119,7 +119,7 @@ public:
 	}
 
 	/// set the output mode to hexadecimal style for `char` and `char*`
-	xpcc_always_inline IOStream&
+	modm_always_inline IOStream&
 	hex()
 	{
 		this->mode = Mode::Hexadecimal;
@@ -127,7 +127,7 @@ public:
 	}
 
 	/// set the output mode to ASCII style for `char` and `char*`
-	xpcc_always_inline IOStream&
+	modm_always_inline IOStream&
 	ascii()
 	{
 		this->mode = Mode::Ascii;
@@ -192,7 +192,7 @@ public:
 		return *this;
 	}
 
-	xpcc_always_inline IOStream&
+	modm_always_inline IOStream&
 	operator << (const uint16_t& v)
 	{
 		if (this->mode == Mode::Ascii) {
@@ -209,7 +209,7 @@ public:
 		return *this;
 	}
 
-	xpcc_always_inline IOStream&
+	modm_always_inline IOStream&
 	operator << (const int16_t& v)
 	{
 		if (this->mode == Mode::Ascii) {
@@ -226,7 +226,7 @@ public:
 		return *this;
 	}
 
-	xpcc_always_inline IOStream&
+	modm_always_inline IOStream&
 	operator << (const uint32_t& v)
 	{
 		if (this->mode == Mode::Ascii) {
@@ -247,7 +247,7 @@ public:
 		return *this;
 	}
 
-	xpcc_always_inline IOStream&
+	modm_always_inline IOStream&
 	operator << (const int32_t& v)
 	{
 		if (this->mode == Mode::Ascii) {
@@ -268,18 +268,18 @@ public:
 		return *this;
 	}
 
-#if defined(XPCC_OS_OSX) || defined(XPCC_CPU_I386)
+#if defined(MODM_OS_OSX) || defined(MODM_CPU_I386)
 	// For OSX 'int64_t' is of type 'int'. Therefore there is no
 	// function here for the default type 'long int'. As 'long int' has the same
 	// width as 'int64_t' we just use a typedef here.
-	xpcc_always_inline IOStream&
+	modm_always_inline IOStream&
 	operator << (const long int& v)
 	{
 		this->writeInteger(static_cast<int64_t>(v));
 		return *this;
 	}
 
-	xpcc_always_inline IOStream&
+	modm_always_inline IOStream&
 	operator << (const long unsigned int& v)
 	{
 		this->writeInteger(static_cast<uint64_t>(v));
@@ -287,18 +287,18 @@ public:
 	}
 #endif
 
-#if defined(XPCC_CPU_ARM) && defined(XPCC_OS_NONE)
+#if defined(MODM_CPU_ARM) && defined(MODM_OS_NONE)
 	// For ARM 'int32_t' is of type 'long'. Therefore there is no
 	// function here for the default type 'int'. As 'int' has the same
 	// width as 'int32_t' we just use a typedef here.
-	xpcc_always_inline IOStream&
+	modm_always_inline IOStream&
 	operator << (const int& v)
 	{
 		this->writeInteger(static_cast<int32_t>(v));
 		return *this;
 	}
 
-	xpcc_always_inline IOStream&
+	modm_always_inline IOStream&
 	operator << (const unsigned int& v)
 	{
 		this->writeInteger(static_cast<uint32_t>(v));
@@ -308,15 +308,15 @@ public:
 
 // The 64-bit types on the AVR are extremely slow and are
 // therefore excluded here
-#if !defined(XPCC_CPU_AVR)
-	xpcc_always_inline IOStream&
+#if !defined(MODM_CPU_AVR)
+	modm_always_inline IOStream&
 	operator << (const uint64_t& v)
 	{
 		this->writeInteger(v);
 		return *this;
 	}
 
-	xpcc_always_inline IOStream&
+	modm_always_inline IOStream&
 	operator << (const int64_t& v)
 	{
 		this->writeInteger(v);
@@ -324,17 +324,17 @@ public:
 	}
 #endif
 
-	xpcc_always_inline IOStream&
+	modm_always_inline IOStream&
 	operator << (const float& v)
 	{
 		this->writeFloat(v);
 		return *this;
 	}
 
-	xpcc_always_inline IOStream&
+	modm_always_inline IOStream&
 	operator << (const double& v)
 	{
-#if defined(XPCC_CPU_AVR)
+#if defined(MODM_CPU_AVR)
 		this->writeFloat(static_cast<float>(v));
 #else
 		this->writeDouble(v);
@@ -361,7 +361,7 @@ public:
 	IOStream&
 	operator << (const void* p);
 
-	xpcc_always_inline IOStream&
+	modm_always_inline IOStream&
 	operator << (IOStream& (*function)(IOStream&))
 	{
 		return function(*this);
@@ -510,7 +510,7 @@ protected:
 	void
 	writeFloat(const float& value);
 
-#if !defined(XPCC_CPU_AVR)
+#if !defined(MODM_CPU_AVR)
 	void
 	writeDouble(const double& value);
 #endif
@@ -670,6 +670,6 @@ white(IOStream& ios)
 }
 /// @}
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif // XPCC_IOSTREAM_HPP
+#endif // MODM_IOSTREAM_HPP

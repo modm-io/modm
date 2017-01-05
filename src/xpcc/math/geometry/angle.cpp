@@ -18,7 +18,7 @@
 
 // ----------------------------------------------------------------------------
 float
-xpcc::Angle::normalize(float angle)
+modm::Angle::normalize(float angle)
 {
 	if (isPositive(angle))
 	{
@@ -37,7 +37,7 @@ xpcc::Angle::normalize(float angle)
 
 // ----------------------------------------------------------------------------
 float
-xpcc::Angle::reverse(float angle)
+modm::Angle::reverse(float angle)
 {
 	if (isPositive(angle))
 	{
@@ -52,14 +52,14 @@ xpcc::Angle::reverse(float angle)
 
 // ----------------------------------------------------------------------------
 float
-xpcc::Angle::perpendicular(float angle, const bool cw)
+modm::Angle::perpendicular(float angle, const bool cw)
 {
 	if (cw)
 	{
-		angle = xpcc::Angle::normalize(angle - M_PI_2);
+		angle = modm::Angle::normalize(angle - M_PI_2);
 	}
 	else {
-		angle = xpcc::Angle::normalize(angle + M_PI_2);
+		angle = modm::Angle::normalize(angle + M_PI_2);
 	}
 
 	return angle;

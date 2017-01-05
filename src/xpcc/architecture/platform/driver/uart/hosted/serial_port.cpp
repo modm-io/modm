@@ -14,41 +14,41 @@
 #include "serial_port.hpp"
 #include <iostream>
 
-xpcc::hosted::SerialPort::SerialPort():
+modm::hosted::SerialPort::SerialPort():
 	shutdown(true),
 	port(io_service)
 {
 }
 
-xpcc::hosted::SerialPort::~SerialPort()
+modm::hosted::SerialPort::~SerialPort()
 {
 	this->close();
 }
 
 void
-xpcc::hosted::SerialPort::write(char c)
+modm::hosted::SerialPort::write(char c)
 {
-	this->io_service.post(boost::bind(&xpcc::hosted::SerialPort::doWrite, this, c));
+	this->io_service.post(boost::bind(&modm::hosted::SerialPort::doWrite, this, c));
 }
 
 
 void
-xpcc::hosted::SerialPort::flush()
+modm::hosted::SerialPort::flush()
 {
 }
 
 void
-xpcc::hosted::SerialPort::readStart()
+modm::hosted::SerialPort::readStart()
 {
 	port.async_read_some(boost::asio::buffer(&this->tmpRead, sizeof(this->tmpRead)),
-			boost::bind(&xpcc::hosted::SerialPort::readComplete,
+			boost::bind(&modm::hosted::SerialPort::readComplete,
 					this,
 					boost::asio::placeholders::error,
 					boost::asio::placeholders::bytes_transferred));
 }
 
 bool
-xpcc::hosted::SerialPort::read(char& value)
+modm::hosted::SerialPort::read(char& value)
 {
 	if(this->readBuffer.empty())
 		return false;
@@ -62,7 +62,7 @@ xpcc::hosted::SerialPort::read(char& value)
 }
 
 bool
-xpcc::hosted::SerialPort::open(std::string deviceName, unsigned int baudRate)
+modm::hosted::SerialPort::open(std::string deviceName, unsigned int baudRate)
 {
 	if (!this->isOpen())
 	{
@@ -97,19 +97,19 @@ xpcc::hosted::SerialPort::open(std::string deviceName, unsigned int baudRate)
 
 
 bool
-xpcc::hosted::SerialPort::isOpen()
+modm::hosted::SerialPort::isOpen()
 {
 	return this->port.is_open() && !this->shutdown;
 }
 
 void
-xpcc::hosted::SerialPort::close()
+modm::hosted::SerialPort::close()
 {
 	if (!this->isOpen())
 		return;
 
 	this->io_service.post(boost::bind(
-			&xpcc::hosted::SerialPort::doClose,
+			&modm::hosted::SerialPort::doClose,
 			this,
 			boost::system::error_code()));
 
@@ -119,13 +119,13 @@ xpcc::hosted::SerialPort::close()
 }
 
 void
-xpcc::hosted::SerialPort::kill()
+modm::hosted::SerialPort::kill()
 {
 	if (!this->isOpen())
 		return;
 
 	this->io_service.post(boost::bind(
-				&xpcc::hosted::SerialPort::doAbort,
+				&modm::hosted::SerialPort::doAbort,
 				this,
 				boost::system::error_code()));
 	this->shutdown = true;
@@ -135,7 +135,7 @@ xpcc::hosted::SerialPort::kill()
 }
 
 void
-xpcc::hosted::SerialPort::doAbort(const boost::system::error_code& error)
+modm::hosted::SerialPort::doAbort(const boost::system::error_code& error)
 {
 
 	if (error)
@@ -146,7 +146,7 @@ xpcc::hosted::SerialPort::doAbort(const boost::system::error_code& error)
 }
 
 void
-xpcc::hosted::SerialPort::doClose(const boost::system::error_code& error)
+modm::hosted::SerialPort::doClose(const boost::system::error_code& error)
 {
 	if( this->writeBuffer.empty() ) {
 		this->doAbort(error);
@@ -155,7 +155,7 @@ xpcc::hosted::SerialPort::doClose(const boost::system::error_code& error)
 }
 
 void
-xpcc::hosted::SerialPort::doWrite(const char c) {
+modm::hosted::SerialPort::doWrite(const char c) {
 	if (!this->shutdown)
 	{
 		std::cout<<"get 0x"<< std::hex << (int) c << std::dec
@@ -172,16 +172,16 @@ xpcc::hosted::SerialPort::doWrite(const char c) {
 }
 
 void
-xpcc::hosted::SerialPort::writeStart(void)
+modm::hosted::SerialPort::writeStart(void)
 {
 	boost::asio::async_write(this->port,
 			boost::asio::buffer(&this->writeBuffer.front(), 1),
-			boost::bind(&xpcc::hosted::SerialPort::writeComplete, this,
+			boost::bind(&modm::hosted::SerialPort::writeComplete, this,
 					boost::asio::placeholders::error));
 }
 
 void
-xpcc::hosted::SerialPort::writeComplete(const boost::system::error_code& error)
+modm::hosted::SerialPort::writeComplete(const boost::system::error_code& error)
 {
 	if (!error) {
 		MutexGuard mutex(this->writeMutex);
@@ -201,7 +201,7 @@ xpcc::hosted::SerialPort::writeComplete(const boost::system::error_code& error)
 }
 
 void
-xpcc::hosted::SerialPort::readComplete(const boost::system::error_code& error, size_t bytes_transferred)
+modm::hosted::SerialPort::readComplete(const boost::system::error_code& error, size_t bytes_transferred)
 {
     if (!error)
     {
@@ -223,7 +223,7 @@ xpcc::hosted::SerialPort::readComplete(const boost::system::error_code& error, s
 }
 
 void
-xpcc::hosted::SerialPort::clearReadBuffer()
+modm::hosted::SerialPort::clearReadBuffer()
 {
 	MutexGuard queueGuard( this->readMutex);
 	while(!this->readBuffer.empty()) {
@@ -232,7 +232,7 @@ xpcc::hosted::SerialPort::clearReadBuffer()
 }
 
 void
-xpcc::hosted::SerialPort::clearWriteBuffer()
+modm::hosted::SerialPort::clearWriteBuffer()
 {
 	while(!this->writeBuffer.empty()) {
 		this->writeBuffer.pop();

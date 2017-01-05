@@ -9,15 +9,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_{{ target["family"] | upper }}_ADC_INTERRUPT_HPP
-#define XPCC_{{ target["family"] | upper }}_ADC_INTERRUPT_HPP
+#ifndef MODM_{{ target["family"] | upper }}_ADC_INTERRUPT_HPP
+#define MODM_{{ target["family"] | upper }}_ADC_INTERRUPT_HPP
 
 #include <modm/utils/dummy.hpp>
 #include "adc.hpp"
 #include <modm/architecture/interface/adc_interrupt.hpp>
 
 
-namespace xpcc
+namespace modm
 {
 
 namespace {{ target["family"] }}
@@ -28,11 +28,11 @@ namespace {{ target["family"] }}
  *
  * @ingroup		{{target.string}}_adc
  */
-class AdcInterrupt : public Adc, public xpcc::AdcInterrupt
+class AdcInterrupt : public Adc, public modm::AdcInterrupt
 {
 public:
 	static inline void
-	attachInterruptHandler(Handler handler=xpcc::dummy)
+	attachInterruptHandler(Handler handler=modm::dummy)
 	{
 		AdcInterrupt::handler = handler;
 	}
@@ -43,6 +43,6 @@ public:
 
 }	// namespace {{ target["family"] }}
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif // XPCC_{{ target["family"] | upper }}_ADC_INTERRUPT_HPP
+#endif // MODM_{{ target["family"] | upper }}_ADC_INTERRUPT_HPP

@@ -16,8 +16,8 @@
  * @defgroup	{{target.string}}_adc ADC
  */
 
-#ifndef XPCC_ATMEGA_ADC_HPP
-#define XPCC_ATMEGA_ADC_HPP
+#ifndef MODM_ATMEGA_ADC_HPP
+#define MODM_ATMEGA_ADC_HPP
 
 #include <modm/architecture/interface/adc.hpp>
 #include "../device.hpp"
@@ -63,7 +63,7 @@
 
 %% set resolution = 10
 
-namespace xpcc
+namespace modm
 {
 
 namespace atmega
@@ -91,7 +91,7 @@ namespace atmega
  * @author	Niklas Hauser
  * @ingroup	{{target.string}}_adc
  */
-class Adc : public xpcc::Adc
+class Adc : public modm::Adc
 {
 public:
 	typedef uint8_t Channel;
@@ -137,7 +137,7 @@ private:
 public:
 	// start inherited documentation
 	template< class SystemClock, uint32_t frequency=100000,
-			uint16_t tolerance = xpcc::Tolerance::TenPercent >
+			uint16_t tolerance = modm::Tolerance::TenPercent >
 	static void
 	initialize()
 	{
@@ -491,6 +491,6 @@ private:
 
 }	// namespace atmega
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif	// XPCC_ATMEGA_ADC_HPP
+#endif	// MODM_ATMEGA_ADC_HPP

@@ -51,7 +51,7 @@ env = Environment(
 		toolpath = ['scons/site_tools'],
 		tools = ['template', 'doxygen', 'configfile', 'helper', 'font', 'bitmap'],
 		ENV = os.environ)
-env['XPCC_LIBRARY_PATH'] = os.path.join('.')
+env['MODM_LIBRARY_PATH'] = os.path.join('.')
 
 class Generator:
 	def __init__(self, env, basepath):
@@ -68,13 +68,13 @@ class Generator:
 env['TemplateGenerator'] = Generator
 
 # Generate C++ arrays for gamma corrected led brightness lookup tables
-env.SConscript('src/xpcc/ui/led/tables/SConscript.generate', exports='env')
+env.SConscript('src/modm/ui/led/tables/SConscript.generate', exports='env')
 
 # Generate C++ arrays from the font definition files
-env.SConscript('src/xpcc/ui/display/font/SConscript.generate', exports='env')
+env.SConscript('src/modm/ui/display/font/SConscript.generate', exports='env')
 
 # Generate C++ arrays from the image files
-env.SConscript('src/xpcc/ui/display/image/SConscript.generate', exports='env')
+env.SConscript('src/modm/ui/display/image/SConscript.generate', exports='env')
 
 # Generate SConstruct files for all projects in the example/ and tests/ folders
 env.SConscript('SConscript.generate', exports='env')

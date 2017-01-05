@@ -14,7 +14,7 @@
 
 #include <string.h>
 
-xpcc::ScrollableText::ScrollableText(const char* text, uint16_t space):
+modm::ScrollableText::ScrollableText(const char* text, uint16_t space):
 paused(true), text(text), startPosition(0), length(strlen(text)), space(space)
 {
 	this->print = new char[space+1];
@@ -28,12 +28,12 @@ paused(true), text(text), startPosition(0), length(strlen(text)), space(space)
 	}
 }
 
-xpcc::ScrollableText::~ScrollableText()
+modm::ScrollableText::~ScrollableText()
 {
 	delete [] this->print;
 }
 
-xpcc::ScrollableText::ScrollableText(const ScrollableText& text)
+modm::ScrollableText::ScrollableText(const ScrollableText& text)
 {
 	this->paused = true;
 	this->space = text.space;
@@ -53,8 +53,8 @@ xpcc::ScrollableText::ScrollableText(const ScrollableText& text)
 	}
 }
 
-xpcc::ScrollableText&
-xpcc::ScrollableText::operator=(const ScrollableText& text)
+modm::ScrollableText&
+modm::ScrollableText::operator=(const ScrollableText& text)
 {
 	if(&text == this) return *this;
 
@@ -79,7 +79,7 @@ xpcc::ScrollableText::operator=(const ScrollableText& text)
 }
 
 const char*
-xpcc::ScrollableText::getText()
+modm::ScrollableText::getText()
 {	
 	if(this->needsScrolling())
 	{
@@ -115,7 +115,7 @@ xpcc::ScrollableText::getText()
 
 
 void
-xpcc::ScrollableText::setToStart()
+modm::ScrollableText::setToStart()
 {
 	this->startPosition = 0;
 	if(this->needsScrolling())

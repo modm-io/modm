@@ -32,7 +32,7 @@ main()
 		LedGreen::toggle();
 		LedOrange::toggle();
 		LedRed::toggle();
-		xpcc::delayMilliseconds(Button::read() ? 250 : 500);
+		modm::delayMilliseconds(Button::read() ? 250 : 500);
 	}
 
 	return 0;

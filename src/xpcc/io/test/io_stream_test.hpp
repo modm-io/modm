@@ -136,5 +136,5 @@ public:
 	testFp();
 
 private:
-	xpcc::IOStream *stream;
+	modm::IOStream *stream;
 };

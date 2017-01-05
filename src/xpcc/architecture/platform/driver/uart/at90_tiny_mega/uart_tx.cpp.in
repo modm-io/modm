@@ -20,10 +20,10 @@
 #include "uart_defines.h"
 #include "uart{{ id }}.hpp"
 
-static xpcc::atomic::Queue<uint8_t, {{parameters.tx_buffer}}> txBuffer;
+static modm::atomic::Queue<uint8_t, {{parameters.tx_buffer}}> txBuffer;
 
 // ----------------------------------------------------------------------------
-XPCC_ISR(USART{{ id }}_UDRE)
+MODM_ISR(USART{{ id }}_UDRE)
 {
 	if (txBuffer.isEmpty())
 	{
@@ -40,7 +40,7 @@ XPCC_ISR(USART{{ id }}_UDRE)
 
 // MARK: - write blocking
 void
-xpcc::{{target["family"]}}::Uart{{ id }}::writeBlocking(uint8_t data)
+modm::{{target["family"]}}::Uart{{ id }}::writeBlocking(uint8_t data)
 {
 	// wait until there is some place in the buffer
 	while (!write(data))
@@ -52,7 +52,7 @@ xpcc::{{target["family"]}}::Uart{{ id }}::writeBlocking(uint8_t data)
 }
 
 void
-xpcc::{{target["family"]}}::Uart{{ id }}::writeBlocking(const uint8_t *data, std::size_t length)
+modm::{{target["family"]}}::Uart{{ id }}::writeBlocking(const uint8_t *data, std::size_t length)
 {
 	// first push everything into the buffer
 	for (std::size_t i = 0; i < length; ++i)
@@ -67,7 +67,7 @@ xpcc::{{target["family"]}}::Uart{{ id }}::writeBlocking(const uint8_t *data, std
 }
 
 void
-xpcc::{{target["family"]}}::Uart{{ id }}::flushWriteBuffer()
+modm::{{target["family"]}}::Uart{{ id }}::flushWriteBuffer()
 {
 	// just wait until the last byte has been sent
 	while (!isWriteFinished())
@@ -76,12 +76,12 @@ xpcc::{{target["family"]}}::Uart{{ id }}::flushWriteBuffer()
 
 // MARK: - write
 bool
-xpcc::{{target["family"]}}::Uart{{ id }}::write(uint8_t data)
+modm::{{target["family"]}}::Uart{{ id }}::write(uint8_t data)
 {
 	if (!txBuffer.push(data))
 		return false;
 
-	::xpcc::atomic::Lock lock;
+	::modm::atomic::Lock lock;
 
 	// enable UDRE interrupt
 	UCSR{{ id }}B |= (1 << UDRIE{{ id }});
@@ -90,7 +90,7 @@ xpcc::{{target["family"]}}::Uart{{ id }}::write(uint8_t data)
 }
 
 std::size_t
-xpcc::{{target["family"]}}::Uart{{ id }}::write(const uint8_t *data, std::size_t length)
+modm::{{target["family"]}}::Uart{{ id }}::write(const uint8_t *data, std::size_t length)
 {
 	for (std::size_t i = 0; i < length; ++i)
 	{
@@ -104,17 +104,17 @@ xpcc::{{target["family"]}}::Uart{{ id }}::write(const uint8_t *data, std::size_t
 }
 
 bool
-xpcc::{{target["family"]}}::Uart{{ id }}::isWriteFinished()
+modm::{{target["family"]}}::Uart{{ id }}::isWriteFinished()
 {
 	return (txBuffer.isEmpty() && !(UCSR{{ id }}B & (1 << UDRIE{{ id }})));
 }
 
 // MARK: - discard
 std::size_t
-xpcc::{{target["family"]}}::Uart{{ id }}::discardTransmitBuffer()
+modm::{{target["family"]}}::Uart{{ id }}::discardTransmitBuffer()
 {
 	{
-		::xpcc::atomic::Lock lock;
+		::modm::atomic::Lock lock;
 		UCSR{{ id }}B &= ~(1 << UDRIE{{ id }});
 	}
 

@@ -19,13 +19,13 @@
 
 #include <modm/ui/gui.hpp>
 
-using namespace xpcc::gui;
+using namespace modm::gui;
 
-class Overview : public xpcc::gui::View
+class Overview : public modm::gui::View
 {
 public:
 
-	Overview(xpcc::gui::GuiViewStack* stack, uint8_t identifier);
+	Overview(modm::gui::GuiViewStack* stack, uint8_t identifier);
 
 	~Overview() {}
 
@@ -33,10 +33,10 @@ public:
 	hasChanged();
 
 public:
-	xpcc::gui::TabPanel tabpanel;
-	xpcc::gui::ButtonWidget buttonLeft;
-	xpcc::gui::ButtonWidget buttonMiddle;
-	xpcc::gui::ButtonWidget buttonRight;
+	modm::gui::TabPanel tabpanel;
+	modm::gui::ButtonWidget buttonLeft;
+	modm::gui::ButtonWidget buttonMiddle;
+	modm::gui::ButtonWidget buttonRight;
 
 };
 

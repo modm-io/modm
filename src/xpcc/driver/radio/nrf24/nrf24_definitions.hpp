@@ -11,14 +11,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_NRF24_DEFINITIONS_HPP
-#define XPCC_NRF24_DEFINITIONS_HPP
+#ifndef MODM_NRF24_DEFINITIONS_HPP
+#define MODM_NRF24_DEFINITIONS_HPP
 
 #include <stdint.h>
 #include <modm/architecture/interface/register.hpp>
 #include <modm/utils/bit_constants.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 struct Nrf24Register
@@ -40,7 +40,7 @@ struct Nrf24Register
 		W_TX_PAYLOAD_NOACK  = 0b10110000,   ///< 1 - 32 data bytes
 		NOP                 = 0b11111111    ///<      0 data bytes
 	};
-	XPCC_FLAGS8(Command);
+	MODM_FLAGS8(Command);
 
 	enum class
 	Pipe : uint8_t
@@ -53,7 +53,7 @@ struct Nrf24Register
 		PIPE_5 = 0b101,
 		//PIPE_6 = 0b110    // TODO: check if this is legal, data sheet says it isn't ...
 	};
-	XPCC_FLAGS8(Pipe);
+	MODM_FLAGS8(Pipe);
 
 	enum class
 	NrfRegister : uint8_t
@@ -85,7 +85,7 @@ struct Nrf24Register
 		DYNPD = 0x1c,           ///< Enable dynamic payload length
 		FEATURE = 0x1d          ///< Feature Register
 	};
-	XPCC_FLAGS8(NrfRegister);
+	MODM_FLAGS8(NrfRegister);
 
 	/* Not every element possible is legal, please refer to RawCommand or to
 	 * data sheet on page 51. Only certain RawCommands have to be combined with
@@ -109,7 +109,7 @@ struct Nrf24Register
 		MASK_TX_DS   = Bit5,
 		MASK_RX_DR   = Bit6
 	};
-	XPCC_FLAGS8(Config);
+	MODM_FLAGS8(Config);
 
 	enum class
 	EnAA : uint8_t
@@ -121,7 +121,7 @@ struct Nrf24Register
 		ENAA_P4 = Bit4,
 		ENAA_P5 = Bit5
 	};
-	XPCC_FLAGS8(EnAA);
+	MODM_FLAGS8(EnAA);
 
 	enum class
 	EnRxAddr : uint8_t
@@ -133,14 +133,14 @@ struct Nrf24Register
 		ERX_P4 = Bit4,
 		ERX_P5 = Bit5
 	};
-	XPCC_FLAGS8(EnRxAddr);
+	MODM_FLAGS8(EnRxAddr);
 
 	enum class
 	SetupAw : uint8_t
 	{
 		AW = Bit0 | Bit1
 	};
-	XPCC_FLAGS8(SetupAw);
+	MODM_FLAGS8(SetupAw);
 
 	enum class
 	SetupRetr : uint8_t
@@ -148,14 +148,14 @@ struct Nrf24Register
 		ARC = Bit0 | Bit1 | Bit2 | Bit3,
 		ARD = Bit4 | Bit5 | Bit6 | Bit7
 	};
-	XPCC_FLAGS8(SetupRetr);
+	MODM_FLAGS8(SetupRetr);
 
 	enum class
 	RfCh : uint8_t
 	{
 		RF_CH = Bit0 | Bit1 | Bit2 | Bit3 | Bit4 | Bit5 | Bit6
 	};
-	XPCC_FLAGS8(RfCh);
+	MODM_FLAGS8(RfCh);
 
 	enum class
 	RfSetup : uint8_t
@@ -166,7 +166,7 @@ struct Nrf24Register
 		RF_DR_LOW    = Bit5,
 		CONT_WAVE    = Bit7
 	};
-	XPCC_FLAGS8(RfSetup);
+	MODM_FLAGS8(RfSetup);
 
 	enum class
 	Status : uint8_t
@@ -177,7 +177,7 @@ struct Nrf24Register
 		TX_DS    = Bit5,
 		RX_DR    = Bit6
 	};
-	XPCC_FLAGS8(Status);
+	MODM_FLAGS8(Status);
 
 	enum class
 	ObserveTx : uint8_t
@@ -185,56 +185,56 @@ struct Nrf24Register
 		ARC_CNT  = Bit0 | Bit1 | Bit2 | Bit3,
 		PLOS_CNT = Bit4 | Bit5 | Bit6 | Bit7
 	};
-	XPCC_FLAGS8(ObserveTx);
+	MODM_FLAGS8(ObserveTx);
 
 	enum class
 	Rpd : uint8_t
 	{
 		RPD = Bit0
 	};
-	XPCC_FLAGS8(Rpd);
+	MODM_FLAGS8(Rpd);
 
 	enum class
 	RxPwP0 : uint8_t
 	{
 		RX_PW_P0 = Bit0 | Bit1 | Bit2 | Bit3 | Bit4 | Bit5
 	};
-	XPCC_FLAGS8(RxPwP0);
+	MODM_FLAGS8(RxPwP0);
 
 	enum class
 	RxPwP1 : uint8_t
 	{
 		RX_PW_P1 = Bit0 | Bit1 | Bit2 | Bit3 | Bit4 | Bit5
 	};
-	XPCC_FLAGS8(RxPwP1);
+	MODM_FLAGS8(RxPwP1);
 
 	enum class
 	RxPwP2 : uint8_t
 	{
 		RX_PW_P2 = Bit0 | Bit1 | Bit2 | Bit3 | Bit4 | Bit5
 	};
-	XPCC_FLAGS8(RxPwP2);
+	MODM_FLAGS8(RxPwP2);
 
 	enum class
 	RxPwP3 : uint8_t
 	{
 		RX_PW_P3 = Bit0 | Bit1 | Bit2 | Bit3 | Bit4 | Bit5
 	};
-	XPCC_FLAGS8(RxPwP3);
+	MODM_FLAGS8(RxPwP3);
 
 	enum class
 	RxPwP4 : uint8_t
 	{
 		RX_PW_P4 = Bit0 | Bit1 | Bit2 | Bit3 | Bit4 | Bit5
 	};
-	XPCC_FLAGS8(RxPwP4);
+	MODM_FLAGS8(RxPwP4);
 
 	enum class
 	RxPwP5 : uint8_t
 	{
 		RX_PW_P5 = Bit0 | Bit1 | Bit2 | Bit3 | Bit4 | Bit5
 	};
-	XPCC_FLAGS8(RxPwP5);
+	MODM_FLAGS8(RxPwP5);
 
 	enum class
 	FifoStatus : uint8_t
@@ -245,7 +245,7 @@ struct Nrf24Register
 		TX_FULL  = Bit5,
 		TX_REUSE = Bit6
 	};
-	XPCC_FLAGS8(FifoStatus);
+	MODM_FLAGS8(FifoStatus);
 
 	enum class
 	DynPd : uint8_t
@@ -257,7 +257,7 @@ struct Nrf24Register
 		DPL_P4 = Bit4,
 		DPL_P5 = Bit5
 	};
-	XPCC_FLAGS8(DynPd);
+	MODM_FLAGS8(DynPd);
 
 	enum class
 	Feature : uint8_t
@@ -266,7 +266,7 @@ struct Nrf24Register
 		EN_ACK_PAY   = Bit1,
 		EN_DPL       = Bit2
 	};
-	XPCC_FLAGS8(Feature);
+	MODM_FLAGS8(Feature);
 
 	typedef FlagsGroup<
 			Feature_t, DynPd_t, FifoStatus_t, Rpd_t, ObserveTx_t, Status_t,
@@ -281,9 +281,9 @@ struct Nrf24Register
 		RX_DR  = Bit6,
 		ALL    = Bit4 | Bit5 | Bit6
 	};
-	XPCC_FLAGS8(InterruptFlag);
+	MODM_FLAGS8(InterruptFlag);
 };
 
-}   // namespace xpcc
+}   // namespace modm
 
-#endif /* XPCC_NRF24_DEFINITIONS_HPP */
+#endif /* MODM_NRF24_DEFINITIONS_HPP */

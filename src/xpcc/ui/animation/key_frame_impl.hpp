@@ -9,26 +9,26 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_UI_KEY_FRAME_HPP
-#	error	"Don't include this file directly, use 'xpcc/ui/animator/key_frame.hpp' instead!"
+#ifndef MODM_UI_KEY_FRAME_HPP
+#	error	"Don't include this file directly, use 'modm/ui/animator/key_frame.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template< typename T, class... Args >
-xpcc::ui::KeyFrameAnimationBase<T, Args...>::KeyFrameAnimationBase(Animation<Args>&... animator)
+modm::ui::KeyFrameAnimationBase<T, Args...>::KeyFrameAnimationBase(Animation<Args>&... animator)
 :	KeyFrameAnimationBase(nullptr,0, animator...)
 {
 }
 
 template< typename T, class... Args >
 template< uint16_t N >
-xpcc::ui::KeyFrameAnimationBase<T, Args...>::KeyFrameAnimationBase(const KeyFrame<T, size> (&frames)[N], Animation<Args>&... animator)
+modm::ui::KeyFrameAnimationBase<T, Args...>::KeyFrameAnimationBase(const KeyFrame<T, size> (&frames)[N], Animation<Args>&... animator)
 :	KeyFrameAnimationBase(frames, N, animator...)
 {
 }
 
 template< typename T, class... Args >
-xpcc::ui::KeyFrameAnimationBase<T, Args...>::KeyFrameAnimationBase(
+modm::ui::KeyFrameAnimationBase<T, Args...>::KeyFrameAnimationBase(
 		const KeyFrame<T, size> *frames, uint16_t length,
 		Animation<Args>&... animator)
 :	animator{(&animator)...}, frames(frames), length(length),
@@ -38,7 +38,7 @@ xpcc::ui::KeyFrameAnimationBase<T, Args...>::KeyFrameAnimationBase(
 
 template< typename T, class... Args >
 bool
-xpcc::ui::KeyFrameAnimationBase<T, Args...>::start(uint8_t repeat)
+modm::ui::KeyFrameAnimationBase<T, Args...>::start(uint8_t repeat)
 {
 	// sanity check
 	if (frames && length > 0)
@@ -55,7 +55,7 @@ xpcc::ui::KeyFrameAnimationBase<T, Args...>::start(uint8_t repeat)
 
 template< typename T, class... Args >
 void
-xpcc::ui::KeyFrameAnimationBase<T, Args...>::stop()
+modm::ui::KeyFrameAnimationBase<T, Args...>::stop()
 {
 	if (frames && length > 0)
 	{
@@ -71,7 +71,7 @@ xpcc::ui::KeyFrameAnimationBase<T, Args...>::stop()
 
 template< typename T, class... Args >
 void
-xpcc::ui::KeyFrameAnimationBase<T, Args...>::cancel()
+modm::ui::KeyFrameAnimationBase<T, Args...>::cancel()
 {
 	// disable
 	currentFrame = 0;
@@ -84,14 +84,14 @@ xpcc::ui::KeyFrameAnimationBase<T, Args...>::cancel()
 
 template< typename T, class... Args >
 bool
-xpcc::ui::KeyFrameAnimationBase<T, Args...>::isAnimating() const
+modm::ui::KeyFrameAnimationBase<T, Args...>::isAnimating() const
 {
 	return (currentFrame > 0);
 }
 
 template< typename T, class... Args >
 void
-xpcc::ui::KeyFrameAnimationBase<T, Args...>::update()
+modm::ui::KeyFrameAnimationBase<T, Args...>::update()
 {
 	// are we running?
 	if (currentFrame > 0)
@@ -158,7 +158,7 @@ xpcc::ui::KeyFrameAnimationBase<T, Args...>::update()
 
 template< typename T, class... Args >
 bool
-xpcc::ui::KeyFrameAnimationBase<T, Args...>::checkRepeat()
+modm::ui::KeyFrameAnimationBase<T, Args...>::checkRepeat()
 {
 	if (repeat == 1)
 	{
@@ -173,15 +173,15 @@ xpcc::ui::KeyFrameAnimationBase<T, Args...>::checkRepeat()
 
 // MARK: - getters and setters
 template< typename T, class... Args >
-xpcc::ui::KeyFrame<T, xpcc::ui::KeyFrameAnimationBase<T, Args...>::size> *
-xpcc::ui::KeyFrameAnimationBase<T, Args...>::getKeyFrames() const
+modm::ui::KeyFrame<T, modm::ui::KeyFrameAnimationBase<T, Args...>::size> *
+modm::ui::KeyFrameAnimationBase<T, Args...>::getKeyFrames() const
 {
 	return frames;
 }
 
 template< typename T, class... Args >
 void
-xpcc::ui::KeyFrameAnimationBase<T, Args...>::setKeyFrames(KeyFrame<T, size> *frames, uint16_t length)
+modm::ui::KeyFrameAnimationBase<T, Args...>::setKeyFrames(KeyFrame<T, size> *frames, uint16_t length)
 {
 	cancel();
 	this->frames = frames;
@@ -190,21 +190,21 @@ xpcc::ui::KeyFrameAnimationBase<T, Args...>::setKeyFrames(KeyFrame<T, size> *fra
 
 template< typename T, class... Args >
 uint16_t
-xpcc::ui::KeyFrameAnimationBase<T, Args...>::getLength() const
+modm::ui::KeyFrameAnimationBase<T, Args...>::getLength() const
 {
 	return length;
 }
 
 template< typename T, class... Args >
-xpcc::ui::KeyFrameAnimationMode
-xpcc::ui::KeyFrameAnimationBase<T, Args...>::getMode() const
+modm::ui::KeyFrameAnimationMode
+modm::ui::KeyFrameAnimationBase<T, Args...>::getMode() const
 {
 	return mode;
 }
 
 template< typename T, class... Args >
 void
-xpcc::ui::KeyFrameAnimationBase<T, Args...>::setMode(KeyFrameAnimationMode const mode)
+modm::ui::KeyFrameAnimationBase<T, Args...>::setMode(KeyFrameAnimationMode const mode)
 {
 	// this clears the reversed bit mask!
 	this->mode = static_cast<uint8_t>(mode);

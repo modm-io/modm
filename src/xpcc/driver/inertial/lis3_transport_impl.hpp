@@ -9,14 +9,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LIS3_TRANSPORT_HPP
+#ifndef MODM_LIS3_TRANSPORT_HPP
 #	error  "Don't include this file directly, use 'lis3_transport.hpp' instead!"
 #endif
 
 // ============================================================================
 // MARK: I2C TRANSPORT
 template < class I2cMaster >
-xpcc::Lis3TransportI2c<I2cMaster>::Lis3TransportI2c(uint8_t address)
+modm::Lis3TransportI2c<I2cMaster>::Lis3TransportI2c(uint8_t address)
 :	I2cDevice<I2cMaster, 2>(address)
 {
 }
@@ -24,8 +24,8 @@ xpcc::Lis3TransportI2c<I2cMaster>::Lis3TransportI2c(uint8_t address)
 // MARK: - register access
 // MARK: write register
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Lis3TransportI2c<I2cMaster>::write(uint8_t reg, uint8_t value)
+modm::ResumableResult<bool>
+modm::Lis3TransportI2c<I2cMaster>::write(uint8_t reg, uint8_t value)
 {
 	RF_BEGIN();
 
@@ -39,8 +39,8 @@ xpcc::Lis3TransportI2c<I2cMaster>::write(uint8_t reg, uint8_t value)
 
 // MARK: read register
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Lis3TransportI2c<I2cMaster>::read(uint8_t reg, uint8_t *buffer, uint8_t length)
+modm::ResumableResult<bool>
+modm::Lis3TransportI2c<I2cMaster>::read(uint8_t reg, uint8_t *buffer, uint8_t length)
 {
 	RF_BEGIN();
 
@@ -53,16 +53,16 @@ xpcc::Lis3TransportI2c<I2cMaster>::read(uint8_t reg, uint8_t *buffer, uint8_t le
 // ============================================================================
 // MARK: SPI TRANSPORT
 template < class SpiMaster, class Cs >
-xpcc::Lis3TransportSpi<SpiMaster, Cs>::Lis3TransportSpi(uint8_t /*address*/)
+modm::Lis3TransportSpi<SpiMaster, Cs>::Lis3TransportSpi(uint8_t /*address*/)
 :	whoAmI(0)
 {
-	Cs::setOutput(xpcc::Gpio::High);
+	Cs::setOutput(modm::Gpio::High);
 }
 
 // MARK: ping
 template < class SpiMaster, class Cs >
-xpcc::ResumableResult<bool>
-xpcc::Lis3TransportSpi<SpiMaster, Cs>::ping()
+modm::ResumableResult<bool>
+modm::Lis3TransportSpi<SpiMaster, Cs>::ping()
 {
 	RF_BEGIN();
 
@@ -76,8 +76,8 @@ xpcc::Lis3TransportSpi<SpiMaster, Cs>::ping()
 // MARK: - register access
 // MARK: write register
 template < class SpiMaster, class Cs >
-xpcc::ResumableResult<bool>
-xpcc::Lis3TransportSpi<SpiMaster, Cs>::write(uint8_t reg, uint8_t value)
+modm::ResumableResult<bool>
+modm::Lis3TransportSpi<SpiMaster, Cs>::write(uint8_t reg, uint8_t value)
 {
 	RF_BEGIN();
 
@@ -95,8 +95,8 @@ xpcc::Lis3TransportSpi<SpiMaster, Cs>::write(uint8_t reg, uint8_t value)
 
 // MARK: read register
 template < class SpiMaster, class Cs >
-xpcc::ResumableResult<bool>
-xpcc::Lis3TransportSpi<SpiMaster, Cs>::read(uint8_t reg, uint8_t *buffer, uint8_t length)
+modm::ResumableResult<bool>
+modm::Lis3TransportSpi<SpiMaster, Cs>::read(uint8_t reg, uint8_t *buffer, uint8_t length)
 {
 	RF_BEGIN();
 

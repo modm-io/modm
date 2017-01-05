@@ -12,19 +12,19 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_I2C_EEPROM_HPP
-#define XPCC_I2C_EEPROM_HPP
+#ifndef MODM_I2C_EEPROM_HPP
+#define MODM_I2C_EEPROM_HPP
 
 #include <modm/processing/resumable.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 /// @cond
 struct i2cEeprom
 {
-	class DataTransmissionAdapter : public xpcc::I2cWriteReadTransaction
+	class DataTransmissionAdapter : public modm::I2cWriteReadTransaction
 	{
 	public:
 		DataTransmissionAdapter(uint8_t address);
@@ -61,7 +61,7 @@ struct i2cEeprom
  * @author	Niklas Hauser
  */
 template <typename I2cMaster>
-class I2cEeprom : public xpcc::I2cDevice< I2cMaster, 1, i2cEeprom::DataTransmissionAdapter >
+class I2cEeprom : public modm::I2cDevice< I2cMaster, 1, i2cEeprom::DataTransmissionAdapter >
 {
 public:
 	I2cEeprom(uint8_t address = 0x50);
@@ -75,7 +75,7 @@ public:
 	 * @return	`true`	if the data could be written,
 	 * 			`false` otherwise
 	 */
-	inline xpcc::ResumableResult<bool>
+	inline modm::ResumableResult<bool>
 	writeByte(uint32_t address, uint8_t data)
 	{
 		return write(address, &data, 1);
@@ -91,7 +91,7 @@ public:
 	 * @return	`true`	if the data could be written,
 	 * 			`false` otherwise
 	 */
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	write(uint32_t address, const uint8_t *data, std::size_t length);
 
 	/**
@@ -103,21 +103,21 @@ public:
 	 * @endcode
 	 */
 	template <typename T>
-	inline xpcc::ResumableResult<bool>
+	inline modm::ResumableResult<bool>
 	write(uint32_t address, const T& data)
 	{
 		return write(address, reinterpret_cast<const uint8_t *>(&data), sizeof(T));
 	}
 
 	/// Read byte
-	inline xpcc::ResumableResult<bool>
+	inline modm::ResumableResult<bool>
 	readByte(uint32_t address, uint8_t &data)
 	{
 		return read(address, &data, 1);
 	}
 
 	/// Read block
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	read(uint32_t address, uint8_t *data, std::size_t length);
 
 	/**
@@ -129,15 +129,15 @@ public:
 	 * @endcode
 	 */
 	template <typename T>
-	inline xpcc::ResumableResult<bool>
+	inline modm::ResumableResult<bool>
 	read(uint16_t address, T& data)
 	{
 		return read(address, reinterpret_cast<uint8_t *>(&data), sizeof(T));
 	}
 };
 
-}	// namespace xpcc
+}	// namespace modm
 
 #include "i2c_eeprom_impl.hpp"
 
-#endif // XPCC_I2C_EEPROM_HPP
+#endif // MODM_I2C_EEPROM_HPP

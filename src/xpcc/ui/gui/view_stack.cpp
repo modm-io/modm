@@ -19,22 +19,22 @@
 #include "view_stack.hpp"
 
 // ----------------------------------------------------------------------------
-xpcc::gui::GuiViewStack::GuiViewStack(xpcc::GraphicDisplay* display, xpcc::gui::inputQueue* queue) :
+modm::gui::GuiViewStack::GuiViewStack(modm::GraphicDisplay* display, modm::gui::inputQueue* queue) :
 	ViewStack(display),
 	input_queue(queue)
 {
 }
 
 // ----------------------------------------------------------------------------
-xpcc::gui::GuiViewStack::~GuiViewStack()
+modm::gui::GuiViewStack::~GuiViewStack()
 {
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::gui::GuiViewStack::pop()
+modm::gui::GuiViewStack::pop()
 {
-	xpcc::gui::View *topElement = this->stack.get();
+	modm::gui::View *topElement = this->stack.get();
 	this->stack.pop();
 
 	delete topElement;
@@ -42,9 +42,9 @@ xpcc::gui::GuiViewStack::pop()
 
 // ----------------------------------------------------------------------------
 void
-xpcc::gui::GuiViewStack::update()
+modm::gui::GuiViewStack::update()
 {
-	xpcc::gui::View* top = this->get();
+	modm::gui::View* top = this->get();
 
 	if(top == NULL)
 		return;
@@ -66,7 +66,7 @@ xpcc::gui::GuiViewStack::update()
 
 		// Get new screen
 		top = this->get();
-		top->markDirty();	// Only difference to xpcc::ViewStack::update()
+		top->markDirty();	// Only difference to modm::ViewStack::update()
 		top->update();
 		this->display->clear();
 		top->draw();

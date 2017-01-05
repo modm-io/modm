@@ -9,22 +9,22 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_GPIO_EXPANDER_HPP
-#define XPCC_GPIO_EXPANDER_HPP
+#ifndef MODM_GPIO_EXPANDER_HPP
+#define MODM_GPIO_EXPANDER_HPP
 
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/architecture/interface/register.hpp>
 #include <modm/processing/resumable.hpp>
 #include <modm/math/utils/bit_operation.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 /**
  * Interface of an IO expander driver.
  *
  * All IO expander driver should implement this interface, so that they can be wrapped
- * into `xpcc::GpioExpanderPin` and `xpcc::GpioExpanderPort`.
+ * into `modm::GpioExpanderPin` and `modm::GpioExpanderPort`.
  *
  * The interface is almost identical to an GPIO pin, except multiple pins can be set at once.
  *
@@ -35,11 +35,11 @@ namespace xpcc
  * @warning The `read()` function does not perform a read bus access, but operates on the
  *          buffered result of `readInput()`. This allows a capture-and-evaluate approach, which
  *          is especially useful for reducing bus traffic and necessary for sampling all pins at
- *          the same time for `xpcc::GpioExpanderPort`.
+ *          the same time for `modm::GpioExpanderPort`.
  *
- * @see xpcc::GpioExpanderPin
- * @see xpcc::GpioExpanderPort
- * @see xpcc::GpioIO
+ * @see modm::GpioExpanderPin
+ * @see modm::GpioExpanderPort
+ * @see modm::GpioIO
  *
  * @author  Niklas Hauser
  * @ingroup gpio
@@ -63,37 +63,37 @@ public:
 	enum class
 	Pin : PortType;
 	/// Use type-safe flags container for the pins
-	typedef xpcc::Flags<Pin, PortType> Pins;
+	typedef modm::Flags<Pin, PortType> Pins;
 
 	/// Returns the *index* of the pin as a constexpr function.
 	/// The mapping is implementation defined, however, as an implementation hint
-	/// when using a bit mask, you should use `xpcc::leftmostBit()`
+	/// when using a bit mask, you should use `modm::leftmostBit()`
 	static constexpr uint8_t
 	indexFromPin(Pin pin);
 
 public:
 	/// Sets one or more pins to output
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setOutput(Pins pins);
 
 	/// Sets one or more pins to logic high
 	/// @warning only modifies pins that have previously been set to output!
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	set(Pins pins);
 
 	/// Resets one or more pins to logic low
 	/// @warning only modifies pins that have previously been set to output!
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	reset(Pins pins);
 
 	/// Toggles one or more pins
 	/// @warning only modifies pins that have previously been set to output!
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	toggle(Pins pins);
 
 	/// sets one or more pins to high or low level
 	/// @warning only modifies pins that have previously been set to output!
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	set(Pins pins, bool value);
 
 	/// Returns the set logical output state of the pin.
@@ -101,12 +101,12 @@ public:
 	isSet(Pin pin) const;
 
 	/// returns direction of one pin at run-time
-	xpcc::Gpio::Direction
+	modm::Gpio::Direction
 	getDirection(Pin pin) const;
 
 public:
 	/// Sets one or more pins to input
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setInput(Pins pins);
 
 	/// Returns true if **all** pins have a high level
@@ -116,17 +116,17 @@ public:
 	read(Pins pins) const;
 
 	/// Reads the inputs and buffers them
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	readInput();
 
 public:
 	/// Writes data to the entire port
 	/// @warning only modifies pins that have previously been set to output!
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	writePort(PortType data);
 
 	/// Reads the entire port, buffers them and outputs the result to data.
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	readPort(PortType &data);
 
 public:
@@ -145,8 +145,8 @@ public:
 };
 
 /**
- * Create an `xpcc::GpioIO` compatible interface from any IO-expander
- * conforming to the `xpcc::GpioExpander` interface.
+ * Create an `modm::GpioIO` compatible interface from any IO-expander
+ * conforming to the `modm::GpioExpander` interface.
  *
  * This allows the transparent usage of IO Expander pins in classes that require
  * Gpios as template arguments.
@@ -156,17 +156,17 @@ public:
  *
  * Usage:
  * @code
- * typedef xpcc::Pca8574<MyI2cMaster> Expander;
+ * typedef modm::Pca8574<MyI2cMaster> Expander;
  * Expander expander;
  *
- * typedef xpcc::GpioExpanderPin< Expander, expander, Expander::Pin::P0 > Rs;
+ * typedef modm::GpioExpanderPin< Expander, expander, Expander::Pin::P0 > Rs;
  * @endcode
  *
  * However, instead of using this class like that, prefer using the alias-template
  * types provided by the IO-expander of your choice for better readability:
  *
  * @code
- * typedef xpcc::Pca8574<MyI2cMaster> Expander;
+ * typedef modm::Pca8574<MyI2cMaster> Expander;
  * Expander expander;
  *
  * // use predefined pin types of the local IO-expander
@@ -183,10 +183,10 @@ public:
  *
  * @pre     The IO-expander needs to be initialized externally, if required.
  *
- * @see xpcc::GpioExpander
- * @see xpcc::GpioIO
+ * @see modm::GpioExpander
+ * @see modm::GpioIO
  *
- * @tparam  GpioExpander    Type of class conforming to the `xpcc::GpioExpander` interface
+ * @tparam  GpioExpander    Type of class conforming to the `modm::GpioExpander` interface
  * @tparam  expander        instance of the expander
  * @tparam  pin             pin identifier of desired expander pin
  *
@@ -198,7 +198,7 @@ template <
 	typename GpioExpander,
 	GpioExpander &expander,
 	typename GpioExpander::Pin pin >
-class GpioExpanderPin : public xpcc::GpioIO
+class GpioExpanderPin : public modm::GpioIO
 {
 public:
 	static constexpr Direction direction = Direction::InOut;
@@ -270,8 +270,8 @@ public:
 
 
 /**
- * Create an `xpcc::GpioPort` compatible interface from any IO-expander
- * conforming to the `xpcc::GpioExpander` interface.
+ * Create an `modm::GpioPort` compatible interface from any IO-expander
+ * conforming to the `modm::GpioExpander` interface.
  *
  * This allows the transparent usage of IO Expander ports in classes that require
  * Ports as template arguments.
@@ -283,24 +283,24 @@ public:
  * @note For every port access a blocking bus transfer is performed, therefore
  *       do not expect these ports to be fast!
  *
- * @warning You can also use `xpcc::SoftwareGpioPort` to create a port out of individual
+ * @warning You can also use `modm::SoftwareGpioPort` to create a port out of individual
  *          `GpioExpanderPin` classes, however, since each pin is individually accessed,
  *          this means more bus traffic and a non-atomic write and read of port data!
  *          It is strongly recommended to use this optimized class instead!
  *
  * Usage:
  * @code
- * typedef xpcc::Pca8574<MyI2cMaster> Expander;
+ * typedef modm::Pca8574<MyI2cMaster> Expander;
  * Expander expander;
  *
- * typedef xpcc::GpioExpanderPort< Expander, expander, Expander::Pin::P4, 4 > Data;
+ * typedef modm::GpioExpanderPort< Expander, expander, Expander::Pin::P4, 4 > Data;
  * @endcode
  *
  * However, instead of using this class like that, prefer using the alias-template
  * types provided by the IO-expander of your choice for better readability:
  *
  * @code
- * typedef xpcc::Pca8574<MyI2cMaster> Expander;
+ * typedef modm::Pca8574<MyI2cMaster> Expander;
  * Expander expander;
  *
  * // a 4bit wide port in the upper nibble
@@ -315,7 +315,7 @@ public:
  *
  * @code
  * // a 4bit wide port in the upper nibble with reversed bit order
- * typedef Expander::Port< expander, Expander::Pin::P4, 4, xpcc::GpioPort::DataOrder::Reversed > Data;
+ * typedef Expander::Port< expander, Expander::Pin::P4, 4, modm::GpioPort::DataOrder::Reversed > Data;
  *
  * // writes 0xa0 on the port
  * Data::write(0x5);
@@ -326,10 +326,10 @@ public:
  *
  * @pre     The IO-expander needs to be initialized externally, if required.
  *
- * @see xpcc::GpioExpander
- * @see xpcc::GpioIO
+ * @see modm::GpioExpander
+ * @see modm::GpioIO
  *
- * @tparam  GpioExpander    Type of class conforming to the `xpcc::GpioExpander` interface
+ * @tparam  GpioExpander    Type of class conforming to the `modm::GpioExpander` interface
  * @tparam  expander        instance of the expander with the selected pin
  * @tparam  StartPin        starting pin of the port, physically LSB
  * @tparam  Width           width of the entire port in bits
@@ -344,7 +344,7 @@ template <
 	typename GpioExpander::Pin StartPin,
 	uint8_t Width,
 	GpioPort::DataOrder DataOrder = GpioPort::DataOrder::Normal >
-class GpioExpanderPort : public xpcc::GpioPort
+class GpioExpanderPort : public modm::GpioPort
 {
 	static constexpr uint8_t StartIndex = GpioExpander::indexFromPin(StartPin);
 
@@ -409,7 +409,7 @@ template <
 	GpioExpander &expander,
 	typename GpioExpander::Pin StartPin,
 	uint8_t Width >
-class GpioExpanderPort<GpioExpander, expander, StartPin, Width, GpioPort::DataOrder::Reversed> : public xpcc::GpioPort
+class GpioExpanderPort<GpioExpander, expander, StartPin, Width, GpioPort::DataOrder::Reversed> : public modm::GpioPort
 {
 	using Pins = typename GpioExpander::Pins;
 	using PortType = typename GpioExpander::PortType;
@@ -453,13 +453,13 @@ public:
 	{
 		RF_CALL_BLOCKING(expander.readInput());
 
-		return (xpcc::bitReverse(PortType(expander.getInputs().value & portMask))) >> StartIndexReversed;
+		return (modm::bitReverse(PortType(expander.getInputs().value & portMask))) >> StartIndexReversed;
 	}
 
 	static void
 	write(PortType data)
 	{
-		data = xpcc::bitReverse(PortType(data << StartIndexReversed));
+		data = modm::bitReverse(PortType(data << StartIndexReversed));
 		data = (expander.getOutputs().value & ~portMask) | (data & portMask);
 		RF_CALL_BLOCKING( expander.writePort(data) );
 	}
@@ -472,6 +472,6 @@ public:
 };
 /// @endcond
 
-} // xpcc namespace
+} // modm namespace
 
-#endif // XPCC_IO_EXPANDER_PIN_HPP
+#endif // MODM_IO_EXPANDER_PIN_HPP

@@ -25,7 +25,7 @@ from logger import Logger
 
 class DeviceFile:
 	""" DeviceFile
-	Represents a device target for xpcc.
+	Represents a device target for modm.
 	This can be a microcontroller, a pc or a doxygen "fake" target.
 	"""
 

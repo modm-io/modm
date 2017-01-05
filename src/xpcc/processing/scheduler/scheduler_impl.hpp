@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SCHEDULER_HPP
+#ifndef MODM_SCHEDULER_HPP
 	#error	"Don't include this file directly, use 'scheduler.hpp' instead!"
 #endif
 
@@ -33,7 +33,7 @@
  * ----------------------------------------------------------------------------
  */
 inline void
-xpcc::Scheduler::scheduleInterupt()
+modm::Scheduler::scheduleInterupt()
 {
 	if (taskList == 0) {
 		// nothing to schedule right now
@@ -75,14 +75,14 @@ xpcc::Scheduler::scheduleInterupt()
 	while ((item = item->nextTask) != 0);
 	
 	// now execute the tasks which are ready
-	while (((item = xpcc::accessor::asVolatile(readyList)) != 0) &&
+	while (((item = modm::accessor::asVolatile(readyList)) != 0) &&
 			(item->priority > currentPriority))
 	{
 		item->state = TaskListItem::RUNNING;
 		readyList = item->nextReady;
 		currentPriority = item->priority;
 		{
-			xpcc::atomic::Unlock();
+			modm::atomic::Unlock();
 			
 			// the actual execution of the task happens with interrupts
 			// enabled

@@ -10,14 +10,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_VL6180_HPP
-#define XPCC_VL6180_HPP
+#ifndef MODM_VL6180_HPP
+#define MODM_VL6180_HPP
 
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/architecture/driver/accessor.hpp>
 #include <modm/processing/processing.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 /// @cond
@@ -30,10 +30,10 @@ namespace vl6180_private
 		uint8_t value;
 	};
 	// see Application Note AN4545 page 24: SR03 settings
-	extern xpcc::accessor::Flash<vl6180_private::BinaryConfiguration> configuration;
+	extern modm::accessor::Flash<vl6180_private::BinaryConfiguration> configuration;
 
 	// gain settings
-	extern xpcc::accessor::Flash<float> gain;
+	extern modm::accessor::Flash<float> gain;
 }	// namespace vl6180_private
 /// @endcond
 
@@ -135,7 +135,7 @@ public:
 		Polarity = Bit5,		///< Signal Polarity Selection. 0: Active-low, 1: Active-high
 		Select = Bit4,			///< Functional configuration options. 0: OFF (Hi-Z), 1: GPIO Interrupt output
 	};
-	XPCC_FLAGS8(GpioMode);
+	MODM_FLAGS8(GpioMode);
 
 	/// SYSTEM_HISTORY_CTRL
 	enum class
@@ -147,11 +147,11 @@ public:
 		BufferMode = Bit1,
 		BufferEnable = Bit0,	///< Enable History buffering. 0: Disabled, 1: Enabled
 	};
-	XPCC_FLAGS8(HistoryControl);
+	MODM_FLAGS8(HistoryControl);
 
 	/// SYSTEM_INTERRUPT_CONFIG_GPIO
 	enum class InterruptConfig {};
-	typedef xpcc::Flags8<InterruptConfig> InterruptConfig_t;
+	typedef modm::Flags8<InterruptConfig> InterruptConfig_t;
 
 	enum class
 	InterruptSource : uint8_t
@@ -162,8 +162,8 @@ public:
 		OutOfWindow = 3,	///< (value < thresh_low  OR  value > thresh_high)
 		NewSampleReady = 4,
 	};
-	typedef xpcc::Configuration<InterruptConfig_t, InterruptSource, 0x7> RangeInterruptSource_t;
-	typedef xpcc::Configuration<InterruptConfig_t, InterruptSource, 0x7, 3> ALS_InterruptSource_t;
+	typedef modm::Configuration<InterruptConfig_t, InterruptSource, 0x7> RangeInterruptSource_t;
+	typedef modm::Configuration<InterruptConfig_t, InterruptSource, 0x7, 3> ALS_InterruptSource_t;
 
 	/// SYSTEM_INTERRUPT_CLEAR
 	enum class
@@ -173,7 +173,7 @@ public:
 		ALS = Bit1,
 		Range = Bit0,
 	};
-	XPCC_FLAGS8(InterruptClear);
+	MODM_FLAGS8(InterruptClear);
 
 	/// SYSRANGE_START
 	/// SYSALS_START
@@ -187,7 +187,7 @@ public:
 		/// This bit is auto-cleared in both modes of operation.
 		StartStop = Bit0,
 	};
-	XPCC_FLAGS8(Start);
+	MODM_FLAGS8(Start);
 
 	/// SYSRANGE_RANGE_CHECK_ENABLES
 	enum class
@@ -197,7 +197,7 @@ public:
 		RangeIgnore = Bit1,			///< 0: Disabled, 1: Enabled
 		EarlyConvergence = Bit0,	///< 0: Disabled, 1: Enabled
 	};
-	XPCC_FLAGS8(RangeCheck);
+	MODM_FLAGS8(RangeCheck);
 
 	/// SYSRANGE_VHV_RECALIBRATE
 	enum class
@@ -211,7 +211,7 @@ public:
 		/// 0: Disabled, 1: Manual trigger for VHV recalibration. Can only be called when ALS and ranging are in STOP mode
 		Recalibrate = Bit0,
 	};
-	XPCC_FLAGS8(VhvRecalibrate);
+	MODM_FLAGS8(VhvRecalibrate);
 
 	/// SYSALS_ANALOGUE_GAIN
 	enum class
@@ -235,7 +235,7 @@ public:
 		/// new start command will be accepted. When 0, indicates the device is busy.
 		DeviceReady = Bit0,
 	};
-	XPCC_FLAGS8(RangeStatus);
+	MODM_FLAGS8(RangeStatus);
 
 	enum class
 	RangeErrorCode : uint8_t
@@ -255,7 +255,7 @@ public:
 		RangingAlgoUnderflow = 0xE0,
 		RangingAlgoOverflow = 0xF0,
 	};
-	typedef xpcc::Configuration<RangeStatus_t, RangeErrorCode, 0xF0> RangeErrorCode_t;
+	typedef modm::Configuration<RangeStatus_t, RangeErrorCode, 0xF0> RangeErrorCode_t;
 
 	/// RESULT_ALS_STATUS
 	enum class
@@ -265,7 +265,7 @@ public:
 		/// new start command will be accepted. When 0, indicates the device is busy.
 		DeviceReady = Bit0,
 	};
-	XPCC_FLAGS8(ALS_Status);
+	MODM_FLAGS8(ALS_Status);
 
 	enum class
 	ALS_ErrorCode : uint8_t
@@ -274,14 +274,14 @@ public:
 		OverflowError = 0x10,
 		UnderflowError = 0x20,
 	};
-	typedef xpcc::Configuration<ALS_Status_t, ALS_ErrorCode, 0xF0> ALS_ErrorCode_t;
+	typedef modm::Configuration<ALS_Status_t, ALS_ErrorCode, 0xF0> ALS_ErrorCode_t;
 
 	/// RESULT_INTERRUPT_STATUS_GPIO
 	enum class InterruptStatus {};
-	typedef xpcc::Flags8<InterruptStatus> InterruptStatus_t;
+	typedef modm::Flags8<InterruptStatus> InterruptStatus_t;
 
-	typedef xpcc::Configuration<InterruptStatus_t, InterruptSource, 0x7> RangeInterruptStatus_t;
-	typedef xpcc::Configuration<InterruptStatus_t, InterruptSource, 0x7, 3> ALS_InterruptStatus_t;
+	typedef modm::Configuration<InterruptStatus_t, InterruptSource, 0x7> RangeInterruptStatus_t;
+	typedef modm::Configuration<InterruptStatus_t, InterruptSource, 0x7, 3> ALS_InterruptStatus_t;
 
 	enum class
 	InterruptError : uint8_t
@@ -290,10 +290,10 @@ public:
 		LaserSafetyError = (1 << 6),	///< Run for your lives! (GET TO THE CHOPPER!)
 		PLL_Error = (2 << 6),			///< either PLL1 or PLL2
 	};
-	typedef xpcc::Configuration<InterruptStatus_t, InterruptError, (3 << 6)> InterruptError_t;
+	typedef modm::Configuration<InterruptStatus_t, InterruptError, (3 << 6)> InterruptError_t;
 
 public:
-	using Control_t = xpcc::FlagsGroup<
+	using Control_t = modm::FlagsGroup<
 			GpioMode_t,
 			HistoryControl_t,
 			InterruptConfig_t,
@@ -306,7 +306,7 @@ public:
 			InterruptStatus_t>;
 
 public:
-	struct xpcc_packed
+	struct modm_packed
 	Data
 	{
 		template< class I2cMaster >
@@ -323,8 +323,8 @@ public:
 		inline float
 		getAmbientLight()
 		{
-			auto* rawData = xpcc::asUnaligned<uint16_t>(data+1);
-			uint16_t value = xpcc::fromBigEndian(*rawData);
+			auto* rawData = modm::asUnaligned<uint16_t>(data+1);
+			uint16_t value = modm::fromBigEndian(*rawData);
 			float lux = (32.f * value);
 			lux /= (vl6180_private::gain[gain & 0x7] * time);
 			return lux;
@@ -349,7 +349,7 @@ public:
  * @ingroup driver_position
  */
 template < typename I2cMaster >
-class Vl6180 : public vl6180, public xpcc::I2cDevice< I2cMaster, 2 >
+class Vl6180 : public vl6180, public modm::I2cDevice< I2cMaster, 2 >
 {
 public:
 	/// Constructor, requires an vl6180::Data object, sets address to default of 0x29
@@ -357,34 +357,34 @@ public:
 
 	/// Ping the I2C devide.
 	/// This overwrites the build-in ping method of I2cDevice with a read of the model number.
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	ping();
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	initialize();
 
 	/// Set a new I2C address (< 128) for this device.
 	/// The address is not permanent and must be set again after every device boot.
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setDeviceAddress(uint8_t address);
 
 	/// Sets a new analog gain for ALS.
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setGain(AnalogGain gain);
 
 	/// Sets a new integration time for ALS.
 	/// @param	time	integration time in ms, max ~500ms.
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setIntegrationTime(uint16_t time);
 
 	/// Reads the distance and buffer the results (can take 10-55ms).
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	readDistance()
 	{ return readSensor(true); }
 
 	/// Reads the ambient light and buffer the results.
 	/// This takes as long as the chosen integration time (100ms default).
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	readAmbientLight()
 	{ return readSensor(false); }
 
@@ -398,7 +398,7 @@ public:
 
 
 	template <typename T>
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	updateRegister(Register reg, T setMask, T clearMask = T(0xff))
 	{
 		return updateControlRegister(reg, Control_t(setMask), Control_t(clearMask));
@@ -406,14 +406,14 @@ public:
 
 public:
 	/// write a 8bit value a register
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	write(Register reg, uint8_t value)
 	{ return write(reg, value, 1); }
 
 protected:
 	/// @cond
 	/// read a 8bit value from a register
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	read(Register reg, uint8_t &value)
 	{ return read(reg, &value, 1); }
 	/// @endcond
@@ -427,29 +427,29 @@ public:
 protected:
 	/// @cond
 	/// write multiple 8bit values from a start register
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	write(Register reg, uint8_t value, uint8_t length);
 	/// @endcond
 
 public:
 	/// read multiple 8bit values from a start register
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	read(Register reg, uint8_t *buffer, uint8_t length);
 
 protected:
 	/// @cond
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	updateControlRegister(Register reg, Control_t setMask, Control_t clearMask = Control_t(0xff));
 	/// @endcond
 
 private:
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	readSensor(bool isDistance = true);
 
 private:
 	Data &data;
 
-	xpcc::ShortTimeout timeout;
+	modm::ShortTimeout timeout;
 	RangeErrorCode rangeError;
 	ALS_ErrorCode alsError;
 
@@ -466,8 +466,8 @@ private:
 	} logicBuffer;
 };
 
-}	// namespace xpcc
+}	// namespace modm
 
 #include "vl6180_impl.hpp"
 
-#endif // XPCC_VL6180_HPP
+#endif // MODM_VL6180_HPP

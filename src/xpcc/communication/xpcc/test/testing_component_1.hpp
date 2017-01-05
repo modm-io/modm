@@ -22,52 +22,52 @@ class TestingComponent1 : public xpcc::AbstractComponent
 {
 public:
 	TestingComponent1(xpcc::Dispatcher &communication, Timeline *timeline);
-	
-	virtual void
+
+	void
 	update();
-	
+
 	// expose protected methods
 	using xpcc::AbstractComponent::callAction;
 	using xpcc::AbstractComponent::publishEvent;
-	
+
 	// Action id: 0x10
 	void
 	actionNoParameter(const xpcc::ResponseHandle& handle);
-	
+
 	// Action id: 0x11
 	void
 	actionUint16(const xpcc::ResponseHandle& handle,
 			const uint16_t *parameter);
-	
+
 	// Action id: 0x12
 	// This method will generate an response
 	void
 	actionDirectResponse(const xpcc::ResponseHandle& handle);
-	
+
 	// Action id: 0x13
 	// Generates an response the next time update gets called
 	void
 	actionDelayedResponse(const xpcc::ResponseHandle& handle);
-	
+
 	// Action id: 0x14
 	// This method will call action 0x11 of component 2 when executed
 	void
 	actionUint16CallAction(const xpcc::ResponseHandle& handle,
 			const uint16_t *parameter);
-	
-	
-	
+
+
+
 	// Event id: 0x20
 	void
 	eventNoParameter(const xpcc::Header& header);
-	
+
 	// Event id: 0x21
 	void
 	eventUint32(const xpcc::Header& header, const uint32_t *parameter);
-	
+
 private:
 	Timeline *timeline;
-	
+
 	bool isDelayedResponseActive;
 	xpcc::ResponseHandle delayedResponseHandle;
 };

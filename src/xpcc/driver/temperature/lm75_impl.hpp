@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LM75_HPP
+#ifndef MODM_LM75_HPP
 #	error  "Don't include this file directly, use 'lm75.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
-xpcc::Lm75<I2cMaster>::Lm75(Data &data, uint8_t address) :
+modm::Lm75<I2cMaster>::Lm75(Data &data, uint8_t address) :
 	I2cDevice<I2cMaster, 2>(address),
 	data(data), config_msb(0)
 {
@@ -27,8 +27,8 @@ xpcc::Lm75<I2cMaster>::Lm75(Data &data, uint8_t address) :
 // MARK: - tasks
 // MARK: Alert mode
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Lm75<I2cMaster>::configureAlertMode(ThermostatMode mode, AlertPolarity polarity, FaultQueue faults)
+modm::ResumableResult<bool>
+modm::Lm75<I2cMaster>::configureAlertMode(ThermostatMode mode, AlertPolarity polarity, FaultQueue faults)
 {
 	RF_BEGIN();
 
@@ -46,8 +46,8 @@ xpcc::Lm75<I2cMaster>::configureAlertMode(ThermostatMode mode, AlertPolarity pol
 
 // MARK: read temperature
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Lm75<I2cMaster>::readTemperature()
+modm::ResumableResult<bool>
+modm::Lm75<I2cMaster>::readTemperature()
 {
 	RF_BEGIN();
 
@@ -59,8 +59,8 @@ xpcc::Lm75<I2cMaster>::readTemperature()
 
 // MARK: configuration
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Lm75<I2cMaster>::setLimitRegister(Register reg, float temperature)
+modm::ResumableResult<bool>
+modm::Lm75<I2cMaster>::setLimitRegister(Register reg, float temperature)
 {
 	RF_BEGIN();
 

@@ -10,10 +10,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FREERTOS_QUEUE_HPP
-#define XPCC_FREERTOS_QUEUE_HPP
+#ifndef MODM_FREERTOS_QUEUE_HPP
+#define MODM_FREERTOS_QUEUE_HPP
 
-#ifndef XPCC_RTOS_QUEUE_HPP
+#ifndef MODM_RTOS_QUEUE_HPP
 #	error "Don't include this file directly, use <modm/processing/rtos/queue.hpp>"
 #endif
 
@@ -22,7 +22,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
 
-namespace xpcc
+namespace modm
 {
 	namespace rtos
 	{
@@ -161,4 +161,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_FREERTOS_QUEUE_HPP
+#endif // MODM_FREERTOS_QUEUE_HPP

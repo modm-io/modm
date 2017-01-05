@@ -12,12 +12,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_AMNB_CONSTANTS_HPP
-#define	XPCC_AMNB_CONSTANTS_HPP
+#ifndef	MODM_AMNB_CONSTANTS_HPP
+#define	MODM_AMNB_CONSTANTS_HPP
 
 #include <stdint.h>
 
-namespace xpcc
+namespace modm
 {
 	namespace amnb
 	{
@@ -104,4 +104,4 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC_AMNB_CONSTANTS_HPP
+#endif	// MODM_AMNB_CONSTANTS_HPP

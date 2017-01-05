@@ -11,12 +11,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FILTER_DEBOUNCE_HPP
-#define XPCC_FILTER_DEBOUNCE_HPP
+#ifndef MODM_FILTER_DEBOUNCE_HPP
+#define MODM_FILTER_DEBOUNCE_HPP
 
 #include <stdint.h>
 
-namespace xpcc
+namespace modm
 {
 	namespace filter
 	{
@@ -63,4 +63,4 @@ namespace xpcc
 
 #include "debounce_impl.hpp"
 
-#endif // XPCC_FILTER_DEBOUNCE_HPP
+#endif // MODM_FILTER_DEBOUNCE_HPP

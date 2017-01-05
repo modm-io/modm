@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_LOCATION_2D_HPP
-#define	XPCC_LOCATION_2D_HPP
+#ifndef	MODM_LOCATION_2D_HPP
+#define	MODM_LOCATION_2D_HPP
 
 #include <cmath>
 
@@ -22,7 +22,7 @@
 #include "angle.hpp"
 #include "vector.hpp"
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	Location in a 2D coordinate system
@@ -121,7 +121,7 @@ namespace xpcc
 	// Global functions
 	// ------------------------------------------------------------------------
 	/**
-	 * \brief	Stream operator to \b xpcc::Location<T>
+	 * \brief	Stream operator to \b modm::Location<T>
 	 * 
 	 * \ingroup	geometry
 	 */
@@ -143,4 +143,4 @@ namespace xpcc
 
 #include "location_2d_impl.hpp"
 
-#endif	// XPCC_LOCATION_2D_HPP
+#endif	// MODM_LOCATION_2D_HPP

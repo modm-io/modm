@@ -16,17 +16,17 @@
 #include <modm/processing/processing.hpp>
 
 Usart2 uart;
-xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > loggerDevice(uart);
+modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice(uart);
 
 // Set all four logger streams to use the UART
-xpcc::log::Logger xpcc::log::debug(loggerDevice);
-xpcc::log::Logger xpcc::log::info(loggerDevice);
-xpcc::log::Logger xpcc::log::warning(loggerDevice);
-xpcc::log::Logger xpcc::log::error(loggerDevice);
+modm::log::Logger modm::log::debug(loggerDevice);
+modm::log::Logger modm::log::info(loggerDevice);
+modm::log::Logger modm::log::warning(loggerDevice);
+modm::log::Logger modm::log::error(loggerDevice);
 
 // Set the log level
-#undef	XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::DEBUG
+#undef	MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::DEBUG
 
 
 
@@ -46,11 +46,11 @@ setDirection(Direction dir)
 	} else {
 		direction = dir;
 		static uint16_t counter = 0;
-		static xpcc::Timestamp lastTimestamp = xpcc::Clock::now();
+		static modm::Timestamp lastTimestamp = modm::Clock::now();
 
-		xpcc::Timestamp timestamp = xpcc::Clock::now();
+		modm::Timestamp timestamp = modm::Clock::now();
 
-		XPCC_LOG_INFO.printf("\e[39m\n%04d %02d:%03d +%01d:%03d ",
+		MODM_LOG_INFO.printf("\e[39m\n%04d %02d:%03d +%01d:%03d ",
 				counter,
 				timestamp.getTime() / 1000,
 				timestamp.getTime() % 1000,
@@ -63,10 +63,10 @@ setDirection(Direction dir)
 			// Error
 			break;
 		case Direction::Host2Node:
-			XPCC_LOG_INFO.printf("\e[91m");
+			MODM_LOG_INFO.printf("\e[91m");
 			break;
 		case Direction::Node2Host:
-			XPCC_LOG_INFO.printf("\e[92m");
+			MODM_LOG_INFO.printf("\e[92m");
 			break;
 		}
 
@@ -97,27 +97,27 @@ main()
 	GpioInputD9::connect(Usart3::Rx, Gpio::InputType::PullUp);
 	Usart3::initialize<Board::systemClock, 115200>(12);
 
-	XPCC_LOG_INFO.printf("\e[H\e[J\e[39m");
-	XPCC_LOG_INFO.printf("Welcome to XPCC Bidirectional UART Sniffer.\n\n");
-	XPCC_LOG_INFO.printf("\e[91mRed PD9    \e[92mGreen PA10\n\n\e[39m");
-	XPCC_LOG_INFO.printf("ctr   time  relati data\n");
-	XPCC_LOG_INFO.printf("==== ====== ====== ===== ...\n");
+	MODM_LOG_INFO.printf("\e[H\e[J\e[39m");
+	MODM_LOG_INFO.printf("Welcome to MODM Bidirectional UART Sniffer.\n\n");
+	MODM_LOG_INFO.printf("\e[91mRed PD9    \e[92mGreen PA10\n\n\e[39m");
+	MODM_LOG_INFO.printf("ctr   time  relati data\n");
+	MODM_LOG_INFO.printf("==== ====== ====== ===== ...\n");
 
 	while (1)
 	{
 		uint8_t c;
 		while (Usart3::read(c)) {
 			setDirection(Direction::Node2Host);
-			XPCC_LOG_INFO.printf("%02x ", c);
+			MODM_LOG_INFO.printf("%02x ", c);
 			Board::LedRed::toggle();
 		}
 		while (Usart1::read(c)) {
 			setDirection(Direction::Host2Node);
-			XPCC_LOG_INFO.printf("%02x ", c);
+			MODM_LOG_INFO.printf("%02x ", c);
 			Board::LedGreen::toggle();
 		}
 
-		xpcc::delayMicroseconds(100);
+		modm::delayMicroseconds(100);
 	}
 
 	return 0;

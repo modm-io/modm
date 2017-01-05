@@ -9,13 +9,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_UI_KEY_FRAME_HPP
-#define XPCC_UI_KEY_FRAME_HPP
+#ifndef MODM_UI_KEY_FRAME_HPP
+#define MODM_UI_KEY_FRAME_HPP
 
 #include <stdint.h>
 #include "base.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 namespace ui
@@ -41,7 +41,7 @@ struct KeyFrameBase
 	:	length(length), value{values...}
 	{
 	}
-} xpcc_packed;
+} modm_packed;
 
 template<typename T, int remaining, typename... Args>
 struct KeyFrameHelper
@@ -225,8 +225,8 @@ public:
 
 }	// namespace ui
 
-}	// namespace xpcc
+}	// namespace modm
 
 #include "key_frame_impl.hpp"
 
-#endif	// XPCC_UI_KEY_FRAME_HPP
+#endif	// MODM_UI_KEY_FRAME_HPP

@@ -10,14 +10,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_GUI_STRINGROCKER_HPP
-#define XPCC_GUI_STRINGROCKER_HPP
+#ifndef MODM_GUI_STRINGROCKER_HPP
+#define MODM_GUI_STRINGROCKER_HPP
 
 #include "../widget.hpp"
 #include "../button.hpp"
 #include "../stringfield.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 namespace gui
@@ -47,9 +47,9 @@ public:
 
 		string_field.setValue(this->getValue());
 
-		this->pack(&button_next, xpcc::glcd::Point(d.width - d.height,0));
-		this->pack(&button_previous, xpcc::glcd::Point(0, 0));
-		this->pack(&string_field, xpcc::glcd::Point(d.height, 0));
+		this->pack(&button_next, modm::glcd::Point(d.width - d.height,0));
+		this->pack(&button_previous, modm::glcd::Point(0, 0));
+		this->pack(&string_field, modm::glcd::Point(d.height, 0));
 	}
 
 	void
@@ -96,6 +96,6 @@ private:
 
 }	// namespace gui
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif  // XPCC_GUI_STRINGROCKER_HPP
+#endif  // MODM_GUI_STRINGROCKER_HPP

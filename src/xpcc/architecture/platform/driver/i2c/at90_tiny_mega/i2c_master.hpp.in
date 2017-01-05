@@ -14,15 +14,15 @@
 
 {{ generation_block }}
 
-#ifndef XPCC_{{target["family"] | upper}}_I2C_MASTER_HPP
-#define XPCC_{{target["family"] | upper}}_I2C_MASTER_HPP
+#ifndef MODM_{{target["family"] | upper}}_I2C_MASTER_HPP
+#define MODM_{{target["family"] | upper}}_I2C_MASTER_HPP
 
 #include "../device.hpp"
 #include <modm/architecture/interface/i2c_master.hpp>
 #include "type_ids.hpp"
 #include "i2c.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 namespace {{target["family"]}}
@@ -36,15 +36,15 @@ namespace {{target["family"]}}
  * @author Niklas Hauser
  * @ingroup	{{target.string}}_i2c
  */
-class I2cMaster : public ::xpcc::I2cMaster, I2c
+class I2cMaster : public ::modm::I2cMaster, I2c
 {
 public:
 	static const TypeId::I2cMasterSda Sda;
 	static const TypeId::I2cMasterScl Scl;
 
 	template< class SystemClock, uint32_t baudrate=Baudrate::Standard,
-			uint16_t tolerance = xpcc::Tolerance::FivePercent >
-	static xpcc_always_inline void
+			uint16_t tolerance = modm::Tolerance::FivePercent >
+	static modm_always_inline void
 	initialize()
 	{
 		// Prescalers: 1, 4, 16, 64
@@ -110,6 +110,6 @@ private:
 
 } // namespace {{target["family"]}}
 
-} // namespace xpcc
+} // namespace modm
 
-#endif // XPCC_{{target["family"] | upper}}_I2C_MASTER_HPP
+#endif // MODM_{{target["family"] | upper}}_I2C_MASTER_HPP

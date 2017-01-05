@@ -17,52 +17,52 @@
 #include "abstract_view.hpp"
 
 // ----------------------------------------------------------------------------
-xpcc::AbstractView::AbstractView(xpcc::ViewStack* stack, uint8_t identifier) :
+modm::AbstractView::AbstractView(modm::ViewStack* stack, uint8_t identifier) :
 	stack(stack), identifier(identifier), alive(true)
 {
 }
 
-xpcc::AbstractView::~AbstractView()
+modm::AbstractView::~AbstractView()
 {
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::AbstractView::update()
+modm::AbstractView::update()
 {
 	//nothing to be done
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::AbstractView::shortButtonPress(xpcc::MenuButtons::Button /*button*/)
+modm::AbstractView::shortButtonPress(modm::MenuButtons::Button /*button*/)
 {
 	//nothing to be done
 }
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::AbstractView::isAlive() const
+modm::AbstractView::isAlive() const
 {
 	return this->alive;
 }
 
 void
-xpcc::AbstractView::remove()
+modm::AbstractView::remove()
 {
 	this->alive = false;
 }
 
 void
-xpcc::AbstractView::onRemove()
+modm::AbstractView::onRemove()
 {
 	//nothing to be done here
 }
 
 // ----------------------------------------------------------------------------
 
-xpcc::GraphicDisplay&
-xpcc::AbstractView::display()
+modm::GraphicDisplay&
+modm::AbstractView::display()
 {
 	return stack->getDisplay();
 }

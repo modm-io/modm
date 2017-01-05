@@ -13,12 +13,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_BUTTON_GROUP_HPP
+#ifndef MODM_BUTTON_GROUP_HPP
 	#error	"Don't include this file directly, use 'button_group.hpp' instead!"
 #endif
 
 template <typename T>
-xpcc::ButtonGroup<T>::ButtonGroup(T mask, uint16_t inTimeout, uint16_t interval) :
+modm::ButtonGroup<T>::ButtonGroup(T mask, uint16_t inTimeout, uint16_t interval) :
 	timeout(inTimeout), interval(interval), repeatMask(mask), repeatCounter(inTimeout),
 	state(), pressState(), releaseState(), repeatState(), ct0(), ct1()
 {
@@ -27,7 +27,7 @@ xpcc::ButtonGroup<T>::ButtonGroup(T mask, uint16_t inTimeout, uint16_t interval)
 // ----------------------------------------------------------------------------
 template <typename T>
 T
-xpcc::ButtonGroup<T>::getState(T mask) const
+modm::ButtonGroup<T>::getState(T mask) const
 {
 	atomic::Lock lock;
 
@@ -37,7 +37,7 @@ xpcc::ButtonGroup<T>::getState(T mask) const
 // ----------------------------------------------------------------------------
 template <typename T>
 T
-xpcc::ButtonGroup<T>::isReleased(T mask)
+modm::ButtonGroup<T>::isReleased(T mask)
 {
 	atomic::Lock lock;
 
@@ -51,7 +51,7 @@ xpcc::ButtonGroup<T>::isReleased(T mask)
 // ----------------------------------------------------------------------------
 template <typename T>
 T
-xpcc::ButtonGroup<T>::isPressed(T mask)
+modm::ButtonGroup<T>::isPressed(T mask)
 {
 	atomic::Lock lock;
 
@@ -64,7 +64,7 @@ xpcc::ButtonGroup<T>::isPressed(T mask)
 
 template <typename T>
 T
-xpcc::ButtonGroup<T>::isRepeated(T mask)
+modm::ButtonGroup<T>::isRepeated(T mask)
 {
 	atomic::Lock lock;
 
@@ -78,7 +78,7 @@ xpcc::ButtonGroup<T>::isRepeated(T mask)
 // ----------------------------------------------------------------------------
 template <typename T>
 T
-xpcc::ButtonGroup<T>::isPressedShort(T mask)
+modm::ButtonGroup<T>::isPressedShort(T mask)
 {
 	atomic::Lock lock;
 
@@ -93,7 +93,7 @@ xpcc::ButtonGroup<T>::isPressedShort(T mask)
 
 template <typename T>
 T
-xpcc::ButtonGroup<T>::isPressedLong(T mask)
+modm::ButtonGroup<T>::isPressedLong(T mask)
 {
 	atomic::Lock lock;
 
@@ -110,7 +110,7 @@ xpcc::ButtonGroup<T>::isPressedLong(T mask)
 // ----------------------------------------------------------------------------
 template <typename T>
 void
-xpcc::ButtonGroup<T>::update(T input)
+modm::ButtonGroup<T>::update(T input)
 {
 	// key changed?
 	T i = state ^ ~input;

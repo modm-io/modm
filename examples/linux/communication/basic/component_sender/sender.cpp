@@ -14,8 +14,8 @@
 #include <modm/debug/logger.hpp>
 
 // set new log level
-#undef XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::DEBUG
+#undef MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::DEBUG
 
 #include "communication/identifier.hpp"
 #include "communication/packets.hpp"
@@ -23,8 +23,8 @@
 #include "sender.hpp"
 
 // ----------------------------------------------------------------------------
-component::Sender::Sender(uint8_t id, xpcc::Dispatcher &communication) :
-	xpcc::AbstractComponent(id, communication),
+component::Sender::Sender(uint8_t id, modm::Dispatcher &communication) :
+	modm::AbstractComponent(id, communication),
 	positionCallback(this, &Sender::getPositionCallback),
 	timer(2000)
 {
@@ -32,12 +32,12 @@ component::Sender::Sender(uint8_t id, xpcc::Dispatcher &communication) :
 
 // ----------------------------------------------------------------------------
 void
-component::Sender::getPositionCallback(const xpcc::Header&,
+component::Sender::getPositionCallback(const modm::Header&,
 		const robot::packet::Position *parameter)
 {
-	XPCC_LOG_INFO << XPCC_FILE_INFO
+	MODM_LOG_INFO << MODM_FILE_INFO
 			<< "get position callback: x=" << parameter->x
-			<< ", y=" << parameter->y << xpcc::endl;
+			<< ", y=" << parameter->y << modm::endl;
 }
 
 // ----------------------------------------------------------------------------
@@ -46,7 +46,7 @@ component::Sender::update()
 {
 	if (timer.execute())
 	{
-		XPCC_LOG_INFO << XPCC_FILE_INFO << "sender update" << xpcc::endl;
+		MODM_LOG_INFO << MODM_FILE_INFO << "sender update" << modm::endl;
 		
 		robot::packet::Position position(10, 20);
 		

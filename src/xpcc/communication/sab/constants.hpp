@@ -12,12 +12,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_SAB_CONSTANTS_HPP
-#define	XPCC_SAB_CONSTANTS_HPP
+#ifndef	MODM_SAB_CONSTANTS_HPP
+#define	MODM_SAB_CONSTANTS_HPP
 
 #include <stdint.h>
 
-namespace xpcc
+namespace modm
 {
 	namespace sab
 	{
@@ -91,4 +91,4 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC_SAB_CONSTANTS_HPP
+#endif	// MODM_SAB_CONSTANTS_HPP

@@ -9,15 +9,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ADC_SAMPLER_HPP
-#define XPCC_ADC_SAMPLER_HPP
+#ifndef MODM_ADC_SAMPLER_HPP
+#define MODM_ADC_SAMPLER_HPP
 
 #include <modm/architecture/interface/adc_interrupt.hpp>
 #include <modm/utils/template_metaprogramming.hpp>
 #include <modm/math/utils/misc.hpp>
 
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -66,19 +66,19 @@ public:
 
 	static constexpr uint32_t totalSamples = Oversamples * Channels;
 
-	typedef typename xpcc::tmp::Select<
-			totalSamples < xpcc::pow(2, 16),
-			typename xpcc::tmp::Select<
+	typedef typename modm::tmp::Select<
+			totalSamples < modm::pow(2, 16),
+			typename modm::tmp::Select<
 					totalSamples < 256,
 					uint8_t,
 					uint16_t >::Result,
 			uint32_t >::Result SampleType;
 
 public:
-	typedef typename xpcc::tmp::Select<
-			(xpcc::pow(2, AdcInterrupt::Resolution) * Oversamples) < xpcc::pow(2, 16),
-			typename xpcc::tmp::Select<
-					(xpcc::pow(2, AdcInterrupt::Resolution) * Oversamples) < 256,
+	typedef typename modm::tmp::Select<
+			(modm::pow(2, AdcInterrupt::Resolution) * Oversamples) < modm::pow(2, 16),
+			typename modm::tmp::Select<
+					(modm::pow(2, AdcInterrupt::Resolution) * Oversamples) < 256,
 					uint8_t,
 					uint16_t >::Result,
 			uint32_t >::Result DataType;
@@ -124,8 +124,8 @@ private:
 	static bool newData;
 };
 
-}	// namespace xpcc
+}	// namespace modm
 
 #include "adc_sampler_impl.hpp"
 
-#endif // XPCC_ADC_SAMPLER_HPP
+#endif // MODM_ADC_SAMPLER_HPP

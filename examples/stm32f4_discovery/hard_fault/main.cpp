@@ -31,17 +31,17 @@
 
 // ----------------------------------------------------------------------------
 // Set the log level
-#undef	XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::INFO
+#undef	MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::INFO
 
 // Create an IODeviceWrapper around the Uart Peripheral we want to use
-xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > loggerDevice;
+modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
 
 // Set all four logger streams to use the UART
-xpcc::log::Logger xpcc::log::debug(loggerDevice);
-xpcc::log::Logger xpcc::log::info(loggerDevice);
-xpcc::log::Logger xpcc::log::warning(loggerDevice);
-xpcc::log::Logger xpcc::log::error(loggerDevice);
+modm::log::Logger modm::log::debug(loggerDevice);
+modm::log::Logger modm::log::info(loggerDevice);
+modm::log::Logger modm::log::warning(loggerDevice);
+modm::log::Logger modm::log::error(loggerDevice);
 
 using namespace Board;
 
@@ -52,16 +52,16 @@ main()
 	Board::initialize();
 	LedOrange::set();
 
-	// initialize Uart2 for XPCC_LOG_
+	// initialize Uart2 for MODM_LOG_
 	GpioOutputA2::connect(Usart2::Tx);
 	Usart2::initialize<Board::systemClock, 115200>(12);
 
-	XPCC_LOG_INFO << "Press Button to cause a Hardfault!" << xpcc::endl;
+	MODM_LOG_INFO << "Press Button to cause a Hardfault!" << modm::endl;
 
 	if (CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) {
 		// if this LED is on, the debugger is connected
 		LedRed::set();
-		XPCC_LOG_INFO << "Debugger connected!" << xpcc::endl;
+		MODM_LOG_INFO << "Debugger connected!" << modm::endl;
 	}
 
 	while (1)
@@ -76,7 +76,7 @@ main()
 			asm volatile (".short 0xde00");
 		}
 
-		xpcc::delayMilliseconds(500);
+		modm::delayMilliseconds(500);
 
 	}
 

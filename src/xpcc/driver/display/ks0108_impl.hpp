@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_KS0108_HPP
+#ifndef MODM_KS0108_HPP
 	#error	"Don't include this file directly, use 'ks0108.hpp' instead!"
 #endif
 
@@ -38,7 +38,7 @@
 template < typename E, typename RW, typename RS,
 		   typename PIN_CS1, typename PIN_CS2, typename PORT >
 void
-xpcc::Ks0108<E, RW, RS, PIN_CS1, PIN_CS2, PORT>::initialize()
+modm::Ks0108<E, RW, RS, PIN_CS1, PIN_CS2, PORT>::initialize()
 {
 	// configure pins
 	e.reset();
@@ -80,7 +80,7 @@ xpcc::Ks0108<E, RW, RS, PIN_CS1, PIN_CS2, PORT>::initialize()
 template < typename E, typename RW, typename RS,
 		   typename PIN_CS1, typename PIN_CS2, typename PORT >
 void
-xpcc::Ks0108<E, RW, RS, PIN_CS1, PIN_CS2, PORT>::update()
+modm::Ks0108<E, RW, RS, PIN_CS1, PIN_CS2, PORT>::update()
 {
 	this->selectLeftChip();
 	this->waitBusy();
@@ -118,7 +118,7 @@ xpcc::Ks0108<E, RW, RS, PIN_CS1, PIN_CS2, PORT>::update()
 template < typename E, typename RW, typename RS,
 		   typename PIN_CS1, typename PIN_CS2, typename PORT >
 void
-xpcc::Ks0108<E, RW, RS, PIN_CS1, PIN_CS2, PORT>::writeByte(uint8_t data)
+modm::Ks0108<E, RW, RS, PIN_CS1, PIN_CS2, PORT>::writeByte(uint8_t data)
 {
 	port.setOutput();
 	port.write(data);
@@ -137,7 +137,7 @@ xpcc::Ks0108<E, RW, RS, PIN_CS1, PIN_CS2, PORT>::writeByte(uint8_t data)
 template < typename E, typename RW, typename RS,
 		   typename PIN_CS1, typename PIN_CS2, typename PORT >
 uint8_t
-xpcc::Ks0108<E, RW, RS, PIN_CS1, PIN_CS2, PORT>::readByte()
+modm::Ks0108<E, RW, RS, PIN_CS1, PIN_CS2, PORT>::readByte()
 {
 	port.setInput();
 	rw.set();
@@ -159,7 +159,7 @@ xpcc::Ks0108<E, RW, RS, PIN_CS1, PIN_CS2, PORT>::readByte()
 template < typename E, typename RW, typename RS,
 		   typename PIN_CS1, typename PIN_CS2, typename PORT >
 void
-xpcc::Ks0108<E, RW, RS, PIN_CS1, PIN_CS2, PORT>::waitBusy()
+modm::Ks0108<E, RW, RS, PIN_CS1, PIN_CS2, PORT>::waitBusy()
 {
 	rs.reset();
 	
@@ -175,7 +175,7 @@ xpcc::Ks0108<E, RW, RS, PIN_CS1, PIN_CS2, PORT>::waitBusy()
 template < typename E, typename RW, typename RS,
 		   typename PIN_CS1, typename PIN_CS2, typename PORT >
 void
-xpcc::Ks0108<E, RW, RS, PIN_CS1, PIN_CS2, PORT>::writeData(uint8_t data)
+modm::Ks0108<E, RW, RS, PIN_CS1, PIN_CS2, PORT>::writeData(uint8_t data)
 {
 	rs.set();
 	this->writeByte(data);
@@ -185,7 +185,7 @@ xpcc::Ks0108<E, RW, RS, PIN_CS1, PIN_CS2, PORT>::writeData(uint8_t data)
 template < typename E, typename RW, typename RS,
 		   typename PIN_CS1, typename PIN_CS2, typename PORT >
 void
-xpcc::Ks0108<E, RW, RS, PIN_CS1, PIN_CS2, PORT>::writeCommand(uint8_t command)
+modm::Ks0108<E, RW, RS, PIN_CS1, PIN_CS2, PORT>::writeCommand(uint8_t command)
 {
 	rs.reset();
 	this->writeByte(command);

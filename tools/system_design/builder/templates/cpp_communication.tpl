@@ -19,7 +19,7 @@
 
 #include "identifier.hpp"
 #include "packets.hpp"
-#include <xpcc/communication/xpcc/communicator.hpp>
+#include <modm/communication/xpcc/communicator.hpp>
 
 namespace {{ namespace }}
 {
@@ -31,7 +31,7 @@ namespace {{ namespace }}
 
 	{%- for event in events.iter() %}
 		{% if event.type -%}
-		{% if event.description %}/** {{ event.description | xpcc.wordwrap(72) | xpcc.indent(2) }}
+		{% if event.description %}/** {{ event.description | modm.wordwrap(72) | modm.indent(2) }}
 		* \param const {{ namespace }}::packet::{{ event.type.name | CamelCase -}}& */{% endif %}
 		static inline void
 		{{ event.name | camelCase }}(
@@ -48,7 +48,7 @@ namespace {{ namespace }}
 				packet);
 		}
 		{% else -%}
-		{% if event.description %}/** {{ event.description | xpcc.wordwrap(72) | xpcc.indent(2) }}*/{% endif %}
+		{% if event.description %}/** {{ event.description | modm.wordwrap(72) | modm.indent(2) }}*/{% endif %}
 		static inline void
 		{{ event.name | camelCase }}(xpcc::Communicator *communicator) {
 			communicator->publishEvent(
@@ -60,18 +60,18 @@ namespace {{ namespace }}
 
 {%- for component in components.iter() %}
 
-	{% if component.description %}/** {{ component.description | xpcc.wordwrap(72) | xpcc.indent(2) }} */{% endif %}
+	{% if component.description %}/** {{ component.description | modm.wordwrap(72) | modm.indent(2) }} */{% endif %}
 	class {{ component.name | CamelCase }}
 	{
 	public:
 		{% for action in component.flattened().actions %}
 		{% if action.description -%}
 		{% if action.parameterType -%}
-		/** {{ action.description | xpcc.wordwrap(72) | xpcc.indent(2) }}
+		/** {{ action.description | modm.wordwrap(72) | modm.indent(2) }}
 		\param packet {{ namespace }}::packet::{{ action.parameterType.flattened().name | CamelCase }}&
 		 */
 		{% else -%}
-		/** {{ action.description | xpcc.wordwrap(72) | xpcc.indent(2) }} */
+		/** {{ action.description | modm.wordwrap(72) | modm.indent(2) }} */
 		{% endif -%}
 		{% else -%}
 		{% if action.parameterType -%}

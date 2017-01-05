@@ -17,7 +17,7 @@
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Timer{{ id }}::enable()
+modm::stm32::Timer{{ id }}::enable()
 {
 	// enable clock
 	RCC->APB2ENR  |=  RCC_APB2ENR_TIM{{ id }}EN;
@@ -28,7 +28,7 @@ xpcc::stm32::Timer{{ id }}::enable()
 }
 
 void
-xpcc::stm32::Timer{{ id }}::disable()
+modm::stm32::Timer{{ id }}::disable()
 {
 	// disable clock
 	RCC->APB2ENR &= ~RCC_APB2ENR_TIM{{ id }}EN;
@@ -40,7 +40,7 @@ xpcc::stm32::Timer{{ id }}::disable()
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Timer{{ id }}::setMode(Mode mode, SlaveMode slaveMode,
+modm::stm32::Timer{{ id }}::setMode(Mode mode, SlaveMode slaveMode,
 		SlaveModeTrigger slaveModeTrigger, MasterMode masterMode
 %% if target["family"] in ["f3", "f7"]
 		, MasterMode2 masterMode2
@@ -72,7 +72,7 @@ xpcc::stm32::Timer{{ id }}::setMode(Mode mode, SlaveMode slaveMode,
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Timer{{ id }}::configureInputChannel(uint32_t channel,
+modm::stm32::Timer{{ id }}::configureInputChannel(uint32_t channel,
 		InputCaptureMapping input, InputCapturePrescaler prescaler,
 		InputCapturePolarity polarity, uint8_t filter,
 		bool xor_ch1_3)
@@ -116,7 +116,7 @@ xpcc::stm32::Timer{{ id }}::configureInputChannel(uint32_t channel,
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Timer{{ id }}::configureOutputChannel(uint32_t channel,
+modm::stm32::Timer{{ id }}::configureOutputChannel(uint32_t channel,
 		OutputCompareMode mode, uint16_t compareValue)
 {
 	channel -= 1;	// 1..4 -> 0..3
@@ -156,7 +156,7 @@ xpcc::stm32::Timer{{ id }}::configureOutputChannel(uint32_t channel,
 }
 
 void
-xpcc::stm32::Timer{{ id }}::configureOutputChannel(uint32_t channel,
+modm::stm32::Timer{{ id }}::configureOutputChannel(uint32_t channel,
 OutputCompareMode mode,
 PinState out, OutputComparePolarity polarity,
 PinState out_n, OutputComparePolarity polarity_n,
@@ -199,7 +199,7 @@ OutputComparePreload preload)
 }
 
 void
-xpcc::stm32::Timer{{ id }}::configureOutputChannel(uint32_t channel,
+modm::stm32::Timer{{ id }}::configureOutputChannel(uint32_t channel,
 uint32_t modeOutputPorts)
 {
 	channel -= 1;	// 1..4 -> 0..3
@@ -237,13 +237,13 @@ uint32_t modeOutputPorts)
 // Re-implemented here to save some code space. As all arguments in the calls
 // below are constant the compiler is able to calculate everything at
 // compile time.
-static xpcc_always_inline void
+static modm_always_inline void
 nvicEnableInterrupt(IRQn_Type IRQn)
 {
 	NVIC->ISER[((uint32_t)(IRQn) >> 5)] = (1 << ((uint32_t)(IRQn) & 0x1F));
 }
 
-static xpcc_always_inline void
+static modm_always_inline void
 nvicDisableInterrupt(IRQn_Type IRQn)
 {
 	NVIC_DisableIRQ(IRQn);
@@ -270,7 +270,7 @@ nvicDisableInterrupt(IRQn_Type IRQn)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Timer{{ id }}::enableInterruptVector(Interrupt interrupt, bool enable, uint32_t priority)
+modm::stm32::Timer{{ id }}::enableInterruptVector(Interrupt interrupt, bool enable, uint32_t priority)
 {
 	if (enable)
 	{

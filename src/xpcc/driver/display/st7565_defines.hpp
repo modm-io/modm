@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ST7565_DEFINES_HPP
-#define XPCC_ST7565_DEFINES_HPP
+#ifndef MODM_ST7565_DEFINES_HPP
+#define MODM_ST7565_DEFINES_HPP
 
 // ----------------------------------------------------------------------------
 // Defines for the ST7565 display controller.
@@ -20,7 +20,7 @@
 //51mmx31mm
 // Command table EA DOGM128-6 Page 5
 
-namespace xpcc
+namespace modm
 {
 	// (1) Display ON/OFF
 	#define ST7565_ON       			0xAF
@@ -105,4 +105,4 @@ namespace xpcc
 	#define ST7565_NOP					0xE3
 }
 
-#endif // XPCC_ST7565_DEFINES_HPP
+#endif // MODM_ST7565_DEFINES_HPP

@@ -11,25 +11,25 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SPI_RAM_HPP
+#ifndef MODM_SPI_RAM_HPP
 	#error	"Don't include this file directly, use 'spi_ram.hpp' instead!"
 #endif
 
 #include <modm/architecture/driver/delay.hpp>
 
 template <typename Spi, typename Cs, typename Hold>
-Spi xpcc::SpiRam<Spi, Cs, Hold>::spi;
+Spi modm::SpiRam<Spi, Cs, Hold>::spi;
 
 template <typename Spi, typename Cs, typename Hold>
-Cs xpcc::SpiRam<Spi, Cs, Hold>::cs;
+Cs modm::SpiRam<Spi, Cs, Hold>::cs;
 
 template <typename Spi, typename Cs, typename Hold>
-Hold xpcc::SpiRam<Spi, Cs, Hold>::hold;
+Hold modm::SpiRam<Spi, Cs, Hold>::hold;
 
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Hold>
 bool
-xpcc::SpiRam<Spi, Cs, Hold>::initialize()
+modm::SpiRam<Spi, Cs, Hold>::initialize()
 {
 	cs.set();
 	cs.setOutput();
@@ -39,14 +39,14 @@ xpcc::SpiRam<Spi, Cs, Hold>::initialize()
 	hold.set();
 	hold.setOutput();
 	
-	xpcc::delayMicroseconds(1);
+	modm::delayMicroseconds(1);
 	
 	cs.reset();
 	spi.write(WRITE_STATUS_REGISTER);
 	spi.write(SEQUENTIAL_MODE);
 	cs.set();
 	
-	xpcc::delayMicroseconds(1);
+	modm::delayMicroseconds(1);
 	
 	// Check if the status register has the right content. This also used
 	// as a general check that the device is available.
@@ -61,7 +61,7 @@ xpcc::SpiRam<Spi, Cs, Hold>::initialize()
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Hold>
 void
-xpcc::SpiRam<Spi, Cs, Hold>::startRead(uint16_t address)
+modm::SpiRam<Spi, Cs, Hold>::startRead(uint16_t address)
 {
 	cs.reset();
 	spi.write(READ);
@@ -72,7 +72,7 @@ xpcc::SpiRam<Spi, Cs, Hold>::startRead(uint16_t address)
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Hold>
 void
-xpcc::SpiRam<Spi, Cs, Hold>::startWrite(uint16_t address)
+modm::SpiRam<Spi, Cs, Hold>::startWrite(uint16_t address)
 {
 	cs.reset();
 	spi.write(WRITE);
@@ -83,7 +83,7 @@ xpcc::SpiRam<Spi, Cs, Hold>::startWrite(uint16_t address)
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Hold>
 void
-xpcc::SpiRam<Spi, Cs, Hold>::writeByte(uint8_t data)
+modm::SpiRam<Spi, Cs, Hold>::writeByte(uint8_t data)
 {
 	spi.write(data);
 }
@@ -91,7 +91,7 @@ xpcc::SpiRam<Spi, Cs, Hold>::writeByte(uint8_t data)
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Hold>
 void
-xpcc::SpiRam<Spi, Cs, Hold>::write(const uint8_t *data, std::size_t size)
+modm::SpiRam<Spi, Cs, Hold>::write(const uint8_t *data, std::size_t size)
 {
 	for (std::size_t i = 0; i < size; ++i) {
 		spi.write(*data++);
@@ -101,7 +101,7 @@ xpcc::SpiRam<Spi, Cs, Hold>::write(const uint8_t *data, std::size_t size)
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Hold>
 uint8_t
-xpcc::SpiRam<Spi, Cs, Hold>::readByte()
+modm::SpiRam<Spi, Cs, Hold>::readByte()
 {
 	return spi.write(0);
 }
@@ -109,7 +109,7 @@ xpcc::SpiRam<Spi, Cs, Hold>::readByte()
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Hold>
 void
-xpcc::SpiRam<Spi, Cs, Hold>::read(uint8_t *data, std::size_t size)
+modm::SpiRam<Spi, Cs, Hold>::read(uint8_t *data, std::size_t size)
 {
 	for (std::size_t i = 0; i < size; ++i) {
 		*data++ = spi.write(0);
@@ -119,7 +119,7 @@ xpcc::SpiRam<Spi, Cs, Hold>::read(uint8_t *data, std::size_t size)
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Hold>
 void
-xpcc::SpiRam<Spi, Cs, Hold>::suspend()
+modm::SpiRam<Spi, Cs, Hold>::suspend()
 {
 	hold.reset();
 }
@@ -127,7 +127,7 @@ xpcc::SpiRam<Spi, Cs, Hold>::suspend()
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Hold>
 void
-xpcc::SpiRam<Spi, Cs, Hold>::resume()
+modm::SpiRam<Spi, Cs, Hold>::resume()
 {
 	hold.set();
 }
@@ -135,7 +135,7 @@ xpcc::SpiRam<Spi, Cs, Hold>::resume()
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Hold>
 void
-xpcc::SpiRam<Spi, Cs, Hold>::finish()
+modm::SpiRam<Spi, Cs, Hold>::finish()
 {
 	resume();
 	cs.set();
@@ -144,7 +144,7 @@ xpcc::SpiRam<Spi, Cs, Hold>::finish()
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Hold>
 void
-xpcc::SpiRam<Spi, Cs, Hold>::writeData(uint16_t address,
+modm::SpiRam<Spi, Cs, Hold>::writeData(uint16_t address,
 		const uint8_t *data, std::size_t size)
 {
 	startWrite(address);
@@ -155,7 +155,7 @@ xpcc::SpiRam<Spi, Cs, Hold>::writeData(uint16_t address,
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Hold>
 void
-xpcc::SpiRam<Spi, Cs, Hold>::readData(uint16_t address,
+modm::SpiRam<Spi, Cs, Hold>::readData(uint16_t address,
 		uint8_t *data, std::size_t size)
 {
 	startRead(address);

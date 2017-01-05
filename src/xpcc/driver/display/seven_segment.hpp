@@ -10,13 +10,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SEVEN_SEGMENT_DISPLAY_HPP
-#define XPCC_SEVEN_SEGMENT_DISPLAY_HPP
+#ifndef MODM_SEVEN_SEGMENT_DISPLAY_HPP
+#define MODM_SEVEN_SEGMENT_DISPLAY_HPP
 
 #include <stdint.h>
 #include <modm/architecture/interface/gpio.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 	namespace sevenSegment
@@ -93,8 +93,8 @@ namespace xpcc
 		};
 
 	}  // namespace sevenSegment
-}  // namespace xpcc
+}  // namespace modm
 
 #include "seven_segment_impl.hpp"
 
-#endif // XPCC_SEVEN_SEGMENT_DISPLAY_HPP
+#endif // MODM_SEVEN_SEGMENT_DISPLAY_HPP

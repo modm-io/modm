@@ -46,8 +46,8 @@ public:
 	
 	
 protected:
-	typedef xpcc::sab::Interface< FakeIODevice > TestingInterface;
-	typedef xpcc::sab::Slave< TestingInterface > TestingSlave;
+	typedef modm::sab::Interface< FakeIODevice > TestingInterface;
+	typedef modm::sab::Slave< TestingInterface > TestingSlave;
 	
 	TestingSlave *slave;
 };

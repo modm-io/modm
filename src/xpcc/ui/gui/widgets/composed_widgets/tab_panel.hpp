@@ -10,14 +10,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_GUI_TAB_PANE_HPP
-#define XPCC_GUI_TAB_PANE_HPP
+#ifndef MODM_GUI_TAB_PANE_HPP
+#define MODM_GUI_TAB_PANE_HPP
 
 #include <modm/debug/logger.hpp>
 
 #include "../../widgets.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 namespace gui
@@ -56,6 +56,6 @@ public:
 
 }	// namespace gui
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif  // XPCC_GUI_TAB_PANE_HPP
+#endif  // MODM_GUI_TAB_PANE_HPP

@@ -12,12 +12,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SAB_SERVO_HPP
-#define XPCC_SAB_SERVO_HPP
+#ifndef MODM_SAB_SERVO_HPP
+#define MODM_SAB_SERVO_HPP
 
 #include "../interface.hpp"
 
-namespace xpcc
+namespace modm
 {
 	namespace sab
 	{
@@ -26,4 +26,4 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC_SAB_SERVO_HPP
+#endif	// MODM_SAB_SERVO_HPP

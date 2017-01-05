@@ -19,23 +19,23 @@
 
 #include "clock.hpp"
 
-#if (XPCC_CLOCK_TESTMODE == 1)
+#if defined(MODM_CLOCK_TESTMODE) && (MODM_CLOCK_TESTMODE == 1)
 
-	xpcc::Clock::Type xpcc::Clock::time = 0;
+	modm::Clock::Type modm::Clock::time = 0;
 
 	template< typename TimestampType >
 	TimestampType
-	xpcc::Clock::now()
+	modm::Clock::now()
 	{
 		return TimestampType(time);
 	}
 
-#elif ( defined(XPCC_OS_UNIX) || defined(XPCC_OS_OSX) )
+#elif ( defined(MODM_OS_UNIX) || defined(MODM_OS_OSX) )
 #	include <sys/time.h>
 
 	template< typename TimestampType >
 	TimestampType
-	xpcc::Clock::now()
+	modm::Clock::now()
 	{
 		struct timeval now;
 		gettimeofday(&now, 0);
@@ -43,12 +43,12 @@
 		return TimestampType( now.tv_sec*1000 + now.tv_usec/1000 );
 	}
 
-#elif defined(XPCC_OS_WIN32) || defined(XPCC_OS_WIN64)
+#elif defined(MODM_OS_WIN32) || defined(MODM_OS_WIN64)
 #	include <windows.h>
 
 	template< typename TimestampType >
 	TimestampType
-	xpcc::Clock::now()
+	modm::Clock::now()
 	{
 		SYSTEMTIME now;
 		GetSystemTime(&now);
@@ -56,18 +56,18 @@
 		return TimestampType( now.wMilliseconds + now.wSecond*1000 + now.wMinute*1000*60 );
 	}
 
-#elif defined(XPCC_CPU_AVR) || defined(XPCC_CPU_ARM) || defined(XPCC_CPU_AVR32)
+#elif defined(MODM_CPU_AVR) || defined(MODM_CPU_ARM) || defined(MODM_CPU_AVR32)
 #	include <modm/architecture/driver/atomic/lock.hpp>
 
-	xpcc::Clock::Type xpcc::Clock::time = 0;
+	modm::Clock::Type modm::Clock::time = 0;
 
 	template< typename TimestampType >
 	TimestampType
-	xpcc::Clock::now()
+	modm::Clock::now()
 	{
 		typename TimestampType::Type tempTime;
 		{
-#if defined(XPCC_CPU_AVR)
+#if defined(MODM_CPU_AVR)
 			// only applicable for 8bit memory access
 			// where reads are not atomic
 			atomic::Lock lock;
@@ -82,5 +82,5 @@
 #endif
 
 // explicit declaration of what member function templates we need to generate
-template xpcc::ShortTimestamp xpcc::Clock::now();
-template xpcc::Timestamp xpcc::Clock::now();
+template modm::ShortTimestamp modm::Clock::now();
+template modm::Timestamp modm::Clock::now();

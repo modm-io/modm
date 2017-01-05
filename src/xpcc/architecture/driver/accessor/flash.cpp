@@ -14,8 +14,8 @@
 #include "flash.hpp"
 
 // ----------------------------------------------------------------------------
-xpcc::IOStream&
-operator << (xpcc::IOStream& os, xpcc::accessor::Flash<char> ptr)
+modm::IOStream&
+operator << (modm::IOStream& os, modm::accessor::Flash<char> ptr)
 {
 	char c;
 	while ((c = *ptr++)) {

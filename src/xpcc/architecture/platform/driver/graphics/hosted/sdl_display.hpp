@@ -12,13 +12,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SDL_DISPLAY_HPP
-#define XPCC_SDL_DISPLAY_HPP
+#ifndef MODM_SDL_DISPLAY_HPP
+#define MODM_SDL_DISPLAY_HPP
 
 #include <modm/ui/display/graphic_display.hpp>
 #include <SDL/SDL.h>
 
-namespace xpcc
+namespace modm
 {
 
      /**
@@ -31,7 +31,7 @@ namespace xpcc
      * \warning SDL_Init( SDL_INIT_EVERYTHING ); needs to be  called, before
      *          any instance of the SDLDisplay can be used
      */
-	class SDLDisplay: public xpcc::GraphicDisplay
+	class SDLDisplay: public modm::GraphicDisplay
 	{
 	public:
 		SDLDisplay(int16_t width, int16_t height);
@@ -84,4 +84,4 @@ namespace xpcc
 
 	};
 }
-#endif /* XPCC_SDL_DISPLAY_HPP */
+#endif /* MODM_SDL_DISPLAY_HPP */

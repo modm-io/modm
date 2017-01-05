@@ -45,14 +45,14 @@ from parameters import ParameterDB
 #------------------------------------------------------------------------------
 #
 def platform_tools_find_device_file(env):
-	architecture_path = os.path.join(env['XPCC_LIBRARY_PATH'], 'xpcc', 'architecture')
-	device = env['XPCC_DEVICE']
+	architecture_path = os.path.join(env['MODM_LIBRARY_PATH'], 'modm', 'architecture')
+	device = env['MODM_DEVICE']
 	env.Debug("Device String: %s" % device)
 
 	id = DeviceIdentifier(device)
 
 	# Find Device File
-	xml_path = os.path.join(env['XPCC_PLATFORM_PATH'], 'devices', id.platform)
+	xml_path = os.path.join(env['MODM_PLATFORM_PATH'], 'devices', id.platform)
 	files = []
 	device_file = None
 
@@ -103,43 +103,43 @@ def platform_tools_find_device_file(env):
 
 	# Check for error
 	if device_file == None:
-		env.Error("XPCC Error: Could not find xml device file." + os.linesep)
+		env.Error("MODM Error: Could not find xml device file." + os.linesep)
 		# for f in files:
 		#	env.Error("Tried: " + f + os.linesep)
 		Exit(1)
 
 	# Now we need to parse the Xml File
 	env.Debug("Found device file: " + device_file)
-	env['XPCC_DEVICE_FILE'] = DeviceFile(device_file, env.GetLogger())
+	env['MODM_DEVICE_FILE'] = DeviceFile(device_file, env.GetLogger())
 
 	if id.platform == 'hosted':
 		env['ARCHITECTURE'] = 'hosted/' + id.family
 	else:
 		# for microcontrollers architecture = core
-		env['ARCHITECTURE'] = env['XPCC_DEVICE_FILE'].getProperties(device)['core']
+		env['ARCHITECTURE'] = env['MODM_DEVICE_FILE'].getProperties(device)['core']
 		if id.platform == 'avr':
-			env['AVRDUDE_DEVICE'] = env['XPCC_DEVICE_FILE'].getProperties(device)['mcu']
+			env['AVRDUDE_DEVICE'] = env['MODM_DEVICE_FILE'].getProperties(device)['mcu']
 
 #------------------------------------------------------------------------------
-# env['XPCC_PLATFORM_PATH'] is used for absolute paths
+# env['MODM_PLATFORM_PATH'] is used for absolute paths
 # architecture_path for relative build paths
 def platform_tools_generate(env, architecture_path):
 
-	env['XPCC_PLATFORM_GENERATED_PATH'] = \
-		os.path.join(env['XPCC_BUILDPATH'], 'generated_platform')
+	env['MODM_PLATFORM_GENERATED_PATH'] = \
+		os.path.join(env['MODM_BUILDPATH'], 'generated_platform')
 
 
-	device = env['XPCC_DEVICE']
+	device = env['MODM_DEVICE']
 
 	# Initialize Return Lists/Dicts
 	sources = []
 	defines = {}
 	# make paths
 	platform_path = os.path.join(architecture_path, 'platform')
-	generated_path = env['XPCC_PLATFORM_GENERATED_PATH']
+	generated_path = env['MODM_PLATFORM_GENERATED_PATH']
 
 
-	dev = env['XPCC_DEVICE_FILE']
+	dev = env['MODM_DEVICE_FILE']
 
 	# Parse Properties
 	prop = dev.getProperties(device)
@@ -153,30 +153,30 @@ def platform_tools_generate(env, architecture_path):
 
 		if not env['ARCHITECTURE'].startswith('avr'):
 			# Find Linkerscript:
-			linkerfile = os.path.join(env['XPCC_PLATFORM_GENERATED_PATH'], 'driver', 'core', 'cortex', 'linkerscript.ld')
+			linkerfile = os.path.join(env['MODM_PLATFORM_GENERATED_PATH'], 'driver', 'core', 'cortex', 'linkerscript.ld')
 			# make the program depend directly on the linkerscript, so it re-links when something changed!
-			Depends(os.path.join(env['XPCC_BUILDPATH'], "..", env['XPCC_PROJECT_NAME'] + ".elf"), linkerfile)
+			Depends(os.path.join(env['MODM_BUILDPATH'], "..", env['MODM_PROJECT_NAME'] + ".elf"), linkerfile)
 			# TODO: This is a hack for unittests on stm32. Their elf file is called "executable" instead of the project name.
 			#       This should be properly solved using a custom env.Program wrapper!
 			#       cc @ekiwi
-			Depends(os.path.join(env['XPCC_BUILDPATH'], "..", "executable.elf"), linkerfile)
+			Depends(os.path.join(env['MODM_BUILDPATH'], "..", "executable.elf"), linkerfile)
 
 			linkdir, linkfile = os.path.split(linkerfile)
-			linkdir = linkdir.replace(env['XPCC_ROOTPATH'], "${XPCC_ROOTPATH}")
+			linkdir = linkdir.replace(env['MODM_ROOTPATH'], "${MODM_ROOTPATH}")
 			env['LINKPATH'] = str(linkdir)
 			env['LINKFILE'] = str(linkfile)
 
 	# Loop through Drivers
 	driver_list = []
 	type_id_headers = []
-	drivers = dev.getDriverList(device, env['XPCC_PLATFORM_PATH'])
+	drivers = dev.getDriverList(device, env['MODM_PLATFORM_PATH'])
 	for driver in drivers:
 		ddic = {} # create dictionary describing the driver
-		d = DriverFile.fromDict(driver, env['XPCC_PARAMETER_DB'], env.GetLogger())
+		d = DriverFile.fromDict(driver, env['MODM_PARAMETER_DB'], env.GetLogger())
 		ddic['name'] = d.name
 		ddic['type'] = d.type
 		ddic['headers'] = []
-		build = d.getBuildList(env['XPCC_PLATFORM_PATH'], env['XPCC_DEVICE'])
+		build = d.getBuildList(env['MODM_PLATFORM_PATH'], env['MODM_DEVICE'])
 		for f in build:
 			src = os.path.join(platform_path, f[0])
 			tar = os.path.join(generated_path, f[1])
@@ -199,13 +199,13 @@ def platform_tools_generate(env, architecture_path):
 	####### Generate Header Templates #########################################
 	# Show SCons how to build the architecture/platform.hpp file:
 	# each platform will get it's own platform.hpp in 'generated_platform_xxx/include_platform_hack'
-	# Choosing this folder and appending to CPPPATH ensures the usage: #include <xpcc/architecture/platform.hpp>
+	# Choosing this folder and appending to CPPPATH ensures the usage: #include <modm/architecture/platform.hpp>
 
 	src = os.path.join(platform_path, 'platform.hpp.in')
 	tar = env.Buildpath(os.path.join(architecture_path, 'platform.hpp'))
 	sub = {'include_path': '../../../generated_platform/drivers.hpp'}
-	if 'XPCC_BOARD' in env:
-		sub['board'] = env['XPCC_BOARD']
+	if 'MODM_BOARD' in env:
+		sub['board'] = env['MODM_BOARD']
 	env.Jinja2Template(target = tar, source = src, substitutions = sub)
 
 	#append and return additional CPPPATH
@@ -311,11 +311,11 @@ def filter_letter_to_num(letter):
 # -----------------------------------------------------------------------------
 ###################### Generate Platform Tools ################################
 def generate(env, **kw):
-	env['XPCC_PLATFORM_PATH'] = \
-		os.path.join(env['XPCC_LIBRARY_PATH'], 'xpcc', 'architecture', 'platform')
+	env['MODM_PLATFORM_PATH'] = \
+		os.path.join(env['MODM_LIBRARY_PATH'], 'modm', 'architecture', 'platform')
 
 	# Create Parameter DB and parse User parameters
-	env['XPCC_PARAMETER_DB'] = ParameterDB(env['XPCC_USER_PARAMETERS'], env.GetLogger()).toDictionary()
+	env['MODM_PARAMETER_DB'] = ParameterDB(env['MODM_USER_PARAMETERS'], env.GetLogger()).toDictionary()
 
 	# Add Method to Parse XML Files, and create Template / Copy Dependencies
 	env.AddMethod(platform_tools_generate, 'GeneratePlatform')

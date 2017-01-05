@@ -11,14 +11,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_INTERPOLATION_LAGRANGE_HPP
-   #error "Don't include this file directly. Use 'xpcc/math/interpolation/lagrange.hpp' instead!"
+#ifndef	MODM_INTERPOLATION_LAGRANGE_HPP
+   #error "Don't include this file directly. Use 'modm/math/interpolation/lagrange.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template <typename T,
 		  template <typename> class Accessor>
-xpcc::interpolation::Lagrange<T, Accessor>::Lagrange(
+modm::interpolation::Lagrange<T, Accessor>::Lagrange(
 		Accessor<T> supportingPoints, uint8_t numberOfPoints) :
 	supportingPoints(supportingPoints), numberOfPoints(numberOfPoints)
 {
@@ -28,8 +28,8 @@ xpcc::interpolation::Lagrange<T, Accessor>::Lagrange(
 
 template <typename T,
 		  template <typename> class Accessor>
-typename xpcc::interpolation::Lagrange<T, Accessor>::OutputType
-xpcc::interpolation::Lagrange<T, Accessor>::interpolate(const InputType& value) const
+typename modm::interpolation::Lagrange<T, Accessor>::OutputType
+modm::interpolation::Lagrange<T, Accessor>::interpolate(const InputType& value) const
 {
 	OutputType ret = 0;
 	for (uint8_t i = 0; i < this->numberOfPoints; ++i)

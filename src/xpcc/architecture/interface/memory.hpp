@@ -9,8 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_MEMORY_HPP
-#define XPCC_MEMORY_HPP
+#ifndef MODM_MEMORY_HPP
+#define MODM_MEMORY_HPP
 
 #include <stdint.h>
 #include <modm/architecture/utils.hpp>
@@ -26,7 +26,7 @@
  * @author	Niklas Hauser
  */
 
-namespace xpcc
+namespace modm
 {
 
 /// Describes access and type of dynamic memory.
@@ -51,7 +51,7 @@ MemoryTrait : uint16_t
 /// A memory can have multiple traits.
 /// @ingroup memory_traits
 using MemoryTraits = Flags16<MemoryTrait>;
-XPCC_TYPE_FLAGS(MemoryTraits);
+MODM_TYPE_FLAGS(MemoryTraits);
 
 /// Fast code memory is accessible by at least the I-Bus and it is core-coupled.
 /// Fallback memory on exhaustion is not core-coupled.
@@ -84,28 +84,28 @@ constexpr MemoryTraits MemoryBackup = (MemoryTrait::AccessSBus | MemoryTrait::Ty
 /// @ingroup memory_traits
 constexpr MemoryTraits MemoryDefault = MemoryDMA;
 
-} // namespace xpcc
+} // namespace modm
 
 /** Request object memory with defined traits.
  * @code
- *    Foo *p = new (xpcc::MemoryFastData) Foo;
+ *    Foo *p = new (modm::MemoryFastData) Foo;
  * @endcode
  *
  * @note Memory traits are ignored on AVRs.
  * @ingroup memory_traits
  */
 void *
-operator new(size_t size, xpcc::MemoryTraits traits);
+operator new(size_t size, modm::MemoryTraits traits);
 
 /** Request array memory with defined traits.
  * @code
- *    uint32_t *p = new (xpcc::MemoryFastData) uint32_t[200];
+ *    uint32_t *p = new (modm::MemoryFastData) uint32_t[200];
  * @endcode
  *
  * @note Memory traits are ignored on AVRs.
  * @ingroup memory_traits
  */
 void *
-operator new[](size_t size, xpcc::MemoryTraits traits);
+operator new[](size_t size, modm::MemoryTraits traits);
 
-#endif // XPCC_MEMORY_HPP
+#endif // MODM_MEMORY_HPP

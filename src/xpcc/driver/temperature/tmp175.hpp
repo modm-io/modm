@@ -11,15 +11,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_TMP175_HPP
-#define XPCC_TMP175_HPP
+#ifndef MODM_TMP175_HPP
+#define MODM_TMP175_HPP
 
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/processing/protothread.hpp>
 #include "lm75.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 // forward declaration for friending with tmp175::Data
@@ -40,7 +40,7 @@ protected:
 		ThermostatMode = Bit1,
 		ShutdownMode = Bit0,
 	};
-	XPCC_FLAGS8(Config1);
+	MODM_FLAGS8(Config1);
 	/// @endcond
 
 public:
@@ -76,14 +76,14 @@ protected:
  */
 template < typename I2cMaster >
 class Tmp175 :	public tmp175, public Lm75< I2cMaster >,
-				protected xpcc::pt::Protothread
+				protected modm::pt::Protothread
 {
 public:
 	/// Constructor, requires a tmp175::Data object,
 	/// sets address to default of 0x48 (alternatives are 0x49, 0x4A and 0x4B).
 	Tmp175(Data &data, uint8_t address=0x48);
 
-	void xpcc_always_inline
+	void modm_always_inline
 	update()
 	{ run(); }
 
@@ -91,21 +91,21 @@ public:
 	void
 	setUpdateRate(uint8_t rate);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setResolution(Resolution resolution);
 
 	/// Writes the upper limit of the alarm.
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	setUpperLimit(float temperature)
 	{ return setLimitRegister(Register::TemperatureUpperLimit, temperature); }
 
 	/// Writes the lower limit of the alarm.
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	setLowerLimit(float temperature)
 	{ return setLimitRegister(Register::TemperatureLowerLimit, temperature); }
 
 	/// starts a temperature conversion right now
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	startConversion();
 
 	inline Data&
@@ -115,20 +115,20 @@ private:
 	bool
 	run();
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	writeConfiguration();
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setLimitRegister(Register reg, float temperature);
 
-	xpcc::ShortTimeout periodTimeout;
-	xpcc::ShortTimeout conversionTimeout;
+	modm::ShortTimeout periodTimeout;
+	modm::ShortTimeout conversionTimeout;
 	uint16_t updateTime;
 	uint8_t conversionTime;
 };
 
-} // namespace xpcc
+} // namespace modm
 
 #include "tmp175_impl.hpp"
 
-#endif // XPCC_TMP175_HPP
+#endif // MODM_TMP175_HPP

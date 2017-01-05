@@ -15,7 +15,7 @@
 #include "color.hpp"
 
 // ----------------------------------------------------------------------------
-namespace xpcc {
+namespace modm {
 namespace color {
 template<> template<>
 void
@@ -50,4 +50,4 @@ HsvT<uint8_t>::toRgb(RgbT<uint8_t>* color) const
 	color->blue = b;
 }
 } // namespace color
-} // namespace xpcc
+} // namespace modm

@@ -9,15 +9,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LSM303A_HPP
-#define XPCC_LSM303A_HPP
+#ifndef MODM_LSM303A_HPP
+#define MODM_LSM303A_HPP
 
 #include <modm/architecture/interface/register.hpp>
 #include <modm/processing/resumable.hpp>
 #include <modm/math/utils/endianness.hpp>
 #include "lis3_transport.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 // forward declaration for friending with lsm303a::Data
@@ -85,7 +85,7 @@ public:
 		Yen = Bit1,		///< Y axis enable
 		Xen = Bit0,		///< X axis enable
 	};
-	XPCC_FLAGS8(Control1);
+	MODM_FLAGS8(Control1);
 
 	/// CTRL_REG2 default value is 0x00
 	enum class
@@ -104,7 +104,7 @@ public:
 		HPIS2 = Bit1,	///< High-pass filter enabled for AOI function on Interrupt 2
 		HPIS1 = Bit0	///< High-pass filter enabled for AOI function on Interrupt 1
 	};
-	XPCC_FLAGS8(Control2);
+	MODM_FLAGS8(Control2);
 
 	/// CTRL_REG3 default value is 0x00
 	enum class
@@ -118,7 +118,7 @@ public:
 		I1_WTM = Bit2,		///< FIFO watermark interrupt on DRDY/INT1.
 		I1_OVERRUN = Bit1,	///< FIFO overrun interrupt on DRDY/INT1.
 	};
-	XPCC_FLAGS8(Control3);
+	MODM_FLAGS8(Control3);
 
 	/// CTRL_REG4 default value is 0x00
 	enum class
@@ -133,7 +133,7 @@ public:
 		HR = Bit3,		///< High-resolution output mode
 		SIM = Bit0,		///< SPI serial interface mode selection. (0: 4-wire interface; 1: 3-wire interface).
 	};
-	XPCC_FLAGS8(Control4);
+	MODM_FLAGS8(Control4);
 
 	/// CTRL_REG5 default value is 0x00
 	enum class
@@ -147,7 +147,7 @@ public:
 		LIR_INT2 = Bit1,	///< Latch interrupt request on INT2_SRC register, with INT2_SRC register cleared by reading INT2_SRC itself.
 		D4D_INT2 = Bit0,	///< 4D enable: 4D detection is enabled on INT2 when 6D bit on INT2_CFG is set to 1.
 	};
-	XPCC_FLAGS8(Control5);
+	MODM_FLAGS8(Control5);
 
 		/// CTRL_REG6 default value is 0x00
 	enum class
@@ -161,7 +161,7 @@ public:
 
 		H_LACTIVE = Bit1,	///< Interrupt active high, low.
 	};
-	XPCC_FLAGS8(Control6);
+	MODM_FLAGS8(Control6);
 
 	/// STATUS is read-only
 	enum class
@@ -176,7 +176,7 @@ public:
 		YDA = Bit1,		///< Y axis new data available.
 		XDA = Bit0,		///< X axis new data available.
 	};
-	XPCC_FLAGS8(Status);
+	MODM_FLAGS8(Status);
 
 	/// FIFO_CTRL default value is 0x00
 	enum class
@@ -193,7 +193,7 @@ public:
 		FTH1 = Bit1,
 		FTH0 = Bit0,
 	};
-	XPCC_FLAGS8(FifoControl);
+	MODM_FLAGS8(FifoControl);
 
 	/// FIFO_SRC is read-only
 	enum class
@@ -209,7 +209,7 @@ public:
 		FSS1 = Bit1,
 		FSS0 = Bit0,
 	};
-	XPCC_FLAGS8(FifoSource);
+	MODM_FLAGS8(FifoSource);
 
 		/// INT_CFG default value is 0x00
 	enum class
@@ -224,7 +224,7 @@ public:
 		XHIE = Bit1,	///< Enable interrupt generation on X high event.
 		XLIE = Bit0,	///< Enable interrupt generation on X low event.
 	};
-	XPCC_FLAGS8(IntConfig);
+	MODM_FLAGS8(IntConfig);
 
 	/// INT1_SRC default value is 0x00
 	enum class
@@ -238,7 +238,7 @@ public:
 		XH = Bit1,	///< X high.
 		XL = Bit0,	///< X low.
 	};
-	XPCC_FLAGS8(IntSource);
+	MODM_FLAGS8(IntSource);
 
 	/// CLOCK_CFG default value is 0x00
 	enum class
@@ -251,7 +251,7 @@ public:
 		XD = Bit1,
 		XS = Bit0,
 	};
-	XPCC_FLAGS8(ClickConfig);
+	MODM_FLAGS8(ClickConfig);
 
 	/// CLOCK_SRC default value is 0x00
 	enum class
@@ -265,7 +265,7 @@ public:
 		Y = Bit1,
 		X = Bit0,
 	};
-	XPCC_FLAGS8(ClickSource);
+	MODM_FLAGS8(ClickSource);
 
 public:
 	typedef FlagsGroup<
@@ -309,7 +309,7 @@ public:
 	};
 
 public:
-	struct xpcc_packed
+	struct modm_packed
 	Data
 	{
 		template < class Transport >
@@ -344,7 +344,7 @@ public:
 		getData(uint8_t index)
 		{
 			int16_t *rData = reinterpret_cast<int16_t*>(data);
-			return (xpcc::fromLittleEndian(rData[index]) >> 4);
+			return (modm::fromLittleEndian(rData[index]) >> 4);
 		}
 
 		// data 0-5 = xl,xh,yl,yh,zl,zh
@@ -401,47 +401,47 @@ public:
 		return RF_CALL_BLOCKING(configure(scale, rate));
 	}
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	configure(Scale scale, MeasurementRate rate = MeasurementRate::Hz100);
 
 	// MARK: Control Registers
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	updateControl(Control1_t setMask, Control1_t clearMask = Control1_t(0xff))
 	{
 		return updateControlRegister(1, setMask, clearMask);
 	}
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	updateControl(Control2_t setMask, Control2_t clearMask = Control2_t(0xff))
 	{
 		return updateControlRegister(2, setMask, clearMask);
 	}
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	updateControl(Control3_t setMask, Control3_t clearMask = Control3_t(0xff))
 	{
 		return updateControlRegister(3, setMask, clearMask);
 	}
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	updateControl(Control4_t setMask, Control4_t clearMask = Control4_t(0xff))
 	{
 		return updateControlRegister(0, setMask, clearMask);
 	}
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	updateControl(Control5_t setMask, Control5_t clearMask = Control5_t(0xff))
 	{
 		return updateControlRegister(4, setMask, clearMask);
 	}
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	updateControl(Control6_t setMask, Control6_t clearMask = Control6_t(0xff))
 	{
 		return updateControlRegister(5, setMask, clearMask);
 	}
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	updateFifoControl(FifoControl_t setMask, FifoControl_t clearMask = FifoControl_t(0xff))
 	{
 		return updateControlRegister(14, setMask, clearMask);
@@ -449,7 +449,7 @@ public:
 
 
 	// MARK: Read access
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	readAcceleration();
 
 	// MARK: Registers with instant access
@@ -491,10 +491,10 @@ public:
 	{ return data; }
 
 private:
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	updateControlRegister(uint8_t index, Control_t setMask, Control_t clearMask = static_cast<Control_t>(0xff));
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	updateRegister(uint8_t reg, uint8_t setMask, uint8_t clearMask = 0xff);
 
 	Data &data;
@@ -526,8 +526,8 @@ private:
 	uint8_t rawBuffer[16];
 };
 
-} // namespace xpcc
+} // namespace modm
 
 #include "lsm303a_impl.hpp"
 
-#endif	// XPCC_LSM303A_HPP
+#endif	// MODM_LSM303A_HPP

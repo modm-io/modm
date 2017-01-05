@@ -11,12 +11,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ST7036_HPP
-#define XPCC_ST7036_HPP
+#ifndef MODM_ST7036_HPP
+#define MODM_ST7036_HPP
 
 #include <modm/ui/display/character_display.hpp>
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	Driver for ST7036 based LC-displays
@@ -69,4 +69,4 @@ namespace xpcc
 
 #include "st7036_impl.hpp"
 
-#endif // XPCC_ST7036_HPP
+#endif // MODM_ST7036_HPP

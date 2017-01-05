@@ -14,14 +14,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ABSTRACT_VIEW_HPP
-#define XPCC_ABSTRACT_VIEW_HPP
+#ifndef MODM_ABSTRACT_VIEW_HPP
+#define MODM_ABSTRACT_VIEW_HPP
 
 #include "../display/graphic_display.hpp"
 
 #include "menu_buttons.hpp"
 
-namespace xpcc
+namespace modm
 {
 	// forward declaration
 	class ViewStack;
@@ -44,7 +44,7 @@ namespace xpcc
 		 * @param identifier can be used to determine which screen is the currently
 		 *        displayed on the graphicDisplay
 		 */
-		AbstractView(xpcc::ViewStack* stack, uint8_t identifier);
+		AbstractView(modm::ViewStack* stack, uint8_t identifier);
 		
 		virtual ~AbstractView() = 0;
 
@@ -75,7 +75,7 @@ namespace xpcc
 		 * @brief shortButtonPress handle the action for the pressed button
 		 */
 		virtual void 
-		shortButtonPress(xpcc::MenuButtons::Button button);
+		shortButtonPress(modm::MenuButtons::Button button);
 
 		/**
 		 * @brief isAlive tells the ViewStack if it should remove this screen.
@@ -99,7 +99,7 @@ namespace xpcc
 
 	public:
 
-		xpcc::GraphicDisplay&
+		modm::GraphicDisplay&
 		display();
 		
 		/**
@@ -109,14 +109,14 @@ namespace xpcc
 		virtual void
 		onRemove();
 		
-		inline xpcc::ViewStack*
+		inline modm::ViewStack*
 		getViewStack()
 		{
 			return stack;
 		}
 		
 	private:
-		xpcc::ViewStack* stack;
+		modm::ViewStack* stack;
 
 	public:
 		const uint8_t identifier;
@@ -126,4 +126,4 @@ namespace xpcc
 
 #include "view_stack.hpp"
 
-#endif // XPCC_ABSTRACT_VIEW_HPP
+#endif // MODM_ABSTRACT_VIEW_HPP

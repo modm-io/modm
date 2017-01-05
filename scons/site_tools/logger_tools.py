@@ -22,35 +22,35 @@ from logger import Logger
 
 # -----------------------------------------------------------------------------
 def logger_debug(env, s, alias='logger_debug'):
-	env['XPCC_LOGGER'].debug(s)
+	env['MODM_LOGGER'].debug(s)
 
 # -----------------------------------------------------------------------------
 def logger_info(env, s, alias='logger_info'):
-	env['XPCC_LOGGER'].info(s)
+	env['MODM_LOGGER'].info(s)
 
 # -----------------------------------------------------------------------------
 def logger_warn(env, s, alias='logger_warn'):
-	env['XPCC_LOGGER'].warn(s)
+	env['MODM_LOGGER'].warn(s)
 
 # -----------------------------------------------------------------------------
 def logger_error(env, s, alias='logger_error'):
-	env['XPCC_LOGGER'].error(s)
+	env['MODM_LOGGER'].error(s)
 
 # -----------------------------------------------------------------------------
 def logger_set_log_level(env, new_level, alias='logger_set_log_level'):
-	env['XPCC_LOGGER'].setLogLevel(new_level)
+	env['MODM_LOGGER'].setLogLevel(new_level)
 
 # -----------------------------------------------------------------------------
 def logger_is_log_level(env, log_level, alias='logger_is_log_level'):
-	env['XPCC_LOGGER'].isLogLevel(log_level)
+	env['MODM_LOGGER'].isLogLevel(log_level)
 
 # -----------------------------------------------------------------------------
 def logger_get_logger(env, alias='logger_is_log_level'):
-	return env['XPCC_LOGGER']
+	return env['MODM_LOGGER']
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
-	env['XPCC_LOGGER'] = Logger()
+	env['MODM_LOGGER'] = Logger()
 	env.AddMethod(logger_debug, 'Debug')
 	env.AddMethod(logger_info,  'Info')
 	env.AddMethod(logger_warn,  'Warn')

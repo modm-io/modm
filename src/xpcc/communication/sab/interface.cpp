@@ -16,7 +16,7 @@
 #include "interface.hpp"
 
 uint8_t
-xpcc::sab::crcUpdate(uint8_t crc, uint8_t data)
+modm::sab::crcUpdate(uint8_t crc, uint8_t data)
 {
 #ifdef __AVR__
 	return _crc_ibutton_update(crc, data);

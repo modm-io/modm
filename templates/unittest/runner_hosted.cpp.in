@@ -23,23 +23,23 @@
 #include <modm/debug/logger.hpp>
 #include <modm/architecture/platform.hpp>
 
-xpcc::pc::Terminal outputDevice;
+modm::pc::Terminal outputDevice;
 
-xpcc::log::StyleWrapper< xpcc::log::Prefix< char[10] > > loggerDeviceDebug( \
-		xpcc::log::Prefix< char[10] >("Debug  : ", outputDevice ));
-xpcc::log::Logger xpcc::log::debug( loggerDeviceDebug );
+modm::log::StyleWrapper< modm::log::Prefix< char[10] > > loggerDeviceDebug( \
+		modm::log::Prefix< char[10] >("Debug  : ", outputDevice ));
+modm::log::Logger modm::log::debug( loggerDeviceDebug );
 
-xpcc::log::StyleWrapper< xpcc::log::Prefix< char[10] > > loggerDeviceInfo( \
-		xpcc::log::Prefix< char[10] >("Info   : ", outputDevice ));
-xpcc::log::Logger xpcc::log::info( loggerDeviceInfo );
+modm::log::StyleWrapper< modm::log::Prefix< char[10] > > loggerDeviceInfo( \
+		modm::log::Prefix< char[10] >("Info   : ", outputDevice ));
+modm::log::Logger modm::log::info( loggerDeviceInfo );
 
-xpcc::log::StyleWrapper< xpcc::log::Prefix< char[10] > > loggerDeviceWarning( \
-		xpcc::log::Prefix< char[10] >("Warning: ", outputDevice ));
-xpcc::log::Logger xpcc::log::warning(loggerDeviceWarning);
+modm::log::StyleWrapper< modm::log::Prefix< char[10] > > loggerDeviceWarning( \
+		modm::log::Prefix< char[10] >("Warning: ", outputDevice ));
+modm::log::Logger modm::log::warning(loggerDeviceWarning);
 
-xpcc::log::StyleWrapper< xpcc::log::Prefix< char[10] > > loggerDeviceError( \
-		xpcc::log::Prefix< char[10] >("Error  : ", outputDevice ));
-xpcc::log::Logger xpcc::log::error(loggerDeviceError);
+modm::log::StyleWrapper< modm::log::Prefix< char[10] > > loggerDeviceError( \
+		modm::log::Prefix< char[10] >("Error  : ", outputDevice ));
+modm::log::Logger modm::log::error(loggerDeviceError);
 
 ${includes}
 

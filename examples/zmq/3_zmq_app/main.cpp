@@ -13,7 +13,7 @@
 #include <modm/architecture/architecture.hpp>
 
 #include <modm/communication/communication.hpp>
-#include <modm/communication/xpcc/backend/zeromq/connector.hpp>
+#include <modm/communication/modm/backend/zeromq/connector.hpp>
 
 #include "component_gui/gui.hpp"
 
@@ -23,21 +23,21 @@
 /**
  * Simple subscriber with zeromq.
  *
- * The XPCC Header and Payload is reconstructed from the zeromq message.
+ * The MODM Header and Payload is reconstructed from the zeromq message.
  */
 
 // set new log level
-#undef XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::DEBUG
+#undef MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::DEBUG
 
 const std::string endpointIn  = "tcp://127.0.0.1:8211";
 const std::string endpointOut = "tcp://127.0.0.1:8212";
-static xpcc::ZeroMQConnector connector(endpointIn, endpointOut, xpcc::ZeroMQConnector::Mode::SubPush);
+static modm::ZeroMQConnector connector(endpointIn, endpointOut, modm::ZeroMQConnector::Mode::SubPush);
 
 // create an instance of the generated postman
 Postman postman;
 
-xpcc::Dispatcher dispatcher(&connector, &postman);
+modm::Dispatcher dispatcher(&connector, &postman);
 
 namespace component
 {
@@ -52,6 +52,6 @@ main()
 		dispatcher.update();
 		component::gui.update();
 
-		xpcc::delayMilliseconds(25);
+		modm::delayMilliseconds(25);
 	}
 }

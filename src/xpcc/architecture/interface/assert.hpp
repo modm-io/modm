@@ -9,8 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ASSERT_HPP
-#define XPCC_ASSERT_HPP
+#ifndef MODM_ASSERT_HPP
+#define MODM_ASSERT_HPP
 
 #include <stdint.h>
 #include <modm/architecture/utils.hpp>
@@ -25,16 +25,16 @@
  * failure handlers in your application that can decide what to do with this
  * assertion and provide custom functionality.
  *
- * Each assertion has the form `xpcc_assert(condition, module, location, failure)`,
+ * Each assertion has the form `modm_assert(condition, module, location, failure)`,
  * where the condition is a boolean and rest are strings, so that a simple
  * string compare can be used to match for module, location or failure.
  * For example, the identifier `"can", "init", "timeout"` describes a timeout
  * failure in the CAN initializer function.
- * The assert `xpcc_assert_debug(condition, module, location, failure)` is only
+ * The assert `modm_assert_debug(condition, module, location, failure)` is only
  * available on debug builds and is removed from the code for a release build.
  *
  * The user can define one or multiple assertion handlers in any part of the
- * application using the `XPCC_ASSERTION_HANDLER(function)` macro.
+ * application using the `MODM_ASSERTION_HANDLER(function)` macro.
  * All assertion handlers will be executed when an assertion fails anywhere in
  * the code and get passed the identifier string.
  *
@@ -55,7 +55,7 @@
  * @note It is intended that the assertion handlers do not block (forever), so
  *       that all assertion handlers can get called.
  *
- * On program abandonment `xpcc_abandon(module, location, failure)` is called,
+ * On program abandonment `modm_abandon(module, location, failure)` is called,
  * which exits the program silently by default.
  * Only on hosted an formatted error string is output by default.
  * It is therefore recommended to overwrite this function on embedded targets
@@ -67,7 +67,7 @@
  * @author	Niklas Hauser
  */
 
-namespace xpcc
+namespace modm
 {
 
 /// Describes abandonment type of assertions.
@@ -86,7 +86,7 @@ using AssertionHandler = Abandonment (*)(const char * module,
 										 const char * location,
 					 					 const char * failure);
 
-} // namespace xpcc
+} // namespace modm
 
 #ifdef __DOXYGEN__
 
@@ -102,7 +102,7 @@ using AssertionHandler = Abandonment (*)(const char * module,
  *
  * @ingroup assert
  */
-#define XPCC_ASSERTION_HANDLER(handler)
+#define MODM_ASSERTION_HANDLER(handler)
 
 /**
  * Assert a condition to be true with failure identifier.
@@ -112,7 +112,7 @@ using AssertionHandler = Abandonment (*)(const char * module,
  *
  * @ingroup assert
  */
-#define xpcc_assert(condition, module, location, failure)
+#define modm_assert(condition, module, location, failure)
 
 /**
  * Assert a condition to be true with failure identifier.
@@ -122,7 +122,7 @@ using AssertionHandler = Abandonment (*)(const char * module,
  *
  * @ingroup assert
  */
-#define xpcc_assert_debug(condition, module, location, failure)
+#define modm_assert_debug(condition, module, location, failure)
 
 /**
  * Overwriteable abandonment handler for all targets.
@@ -133,50 +133,50 @@ using AssertionHandler = Abandonment (*)(const char * module,
  * @ingroup assert
  */
 extern "C" void
-xpcc_abandon(const char * module,
+modm_abandon(const char * module,
 			 const char * location,
-			 const char * failure) xpcc_weak;
+			 const char * failure) modm_weak;
 
 #else
 
-#if defined XPCC_CPU_ARM || defined XPCC_CPU_AVR
-#	define XPCC_ASSERTION_LINKER_SECTION ".assertion"
-#elif defined XPCC_OS_OSX
-#	define XPCC_ASSERTION_LINKER_SECTION "__DATA,xpcc_assertion"
-#elif defined XPCC_OS_LINUX
-#	define XPCC_ASSERTION_LINKER_SECTION "xpcc_assertion"
+#if defined MODM_CPU_ARM || defined MODM_CPU_AVR
+#	define MODM_ASSERTION_LINKER_SECTION ".assertion"
+#elif defined MODM_OS_OSX
+#	define MODM_ASSERTION_LINKER_SECTION "__DATA,modm_assertion"
+#elif defined MODM_OS_LINUX
+#	define MODM_ASSERTION_LINKER_SECTION "modm_assertion"
 #endif
 
-#ifdef XPCC_ASSERTION_LINKER_SECTION
-#	define XPCC_ASSERTION_HANDLER(handler) \
-		__attribute__((section(XPCC_ASSERTION_LINKER_SECTION), used)) \
-		const xpcc::AssertionHandler \
+#ifdef MODM_ASSERTION_LINKER_SECTION
+#	define MODM_ASSERTION_HANDLER(handler) \
+		__attribute__((section(MODM_ASSERTION_LINKER_SECTION), used)) \
+		const modm::AssertionHandler \
 		handler ## _assertion_handler_ptr = handler
 #else
-#	define XPCC_ASSERTION_HANDLER(handler)
+#	define MODM_ASSERTION_HANDLER(handler)
 #endif
 
-#define xpcc_assert(condition, module, location, failure) \
-	xpcc_assert_evaluate((condition), INLINE_FLASH_STORAGE_STRING(module "\0" location "\0" failure));
+#define modm_assert(condition, module, location, failure) \
+	modm_assert_evaluate((condition), INLINE_FLASH_STORAGE_STRING(module "\0" location "\0" failure));
 
 #ifndef NDEBUG
-#	define xpcc_assert_debug(condition, module, location, failure) \
-		xpcc_assert(condition, module, location, failure)
-#	define XPCC_ASSERTION_HANDLER_DEBUG(handler) \
-		XPCC_ASSERTION_HANDLER(handler)
+#	define modm_assert_debug(condition, module, location, failure) \
+		modm_assert(condition, module, location, failure)
+#	define MODM_ASSERTION_HANDLER_DEBUG(handler) \
+		MODM_ASSERTION_HANDLER(handler)
 #else
-#	define xpcc_assert_debug(condition, module, location, failure)
-#	define XPCC_ASSERTION_HANDLER_DEBUG(handler)
+#	define modm_assert_debug(condition, module, location, failure)
+#	define MODM_ASSERTION_HANDLER_DEBUG(handler)
 #endif
 
 extern "C" {
 
-void xpcc_assert_evaluate(bool condition, const char * identifier);
+void modm_assert_evaluate(bool condition, const char * identifier);
 
-void xpcc_abandon(const char * module, const char * location, const char * failure);
+void modm_abandon(const char * module, const char * location, const char * failure);
 
 }
 
 #endif // __DOXYGEN__
 
-#endif // XPCC_ASSERT_HPP
+#endif // MODM_ASSERT_HPP

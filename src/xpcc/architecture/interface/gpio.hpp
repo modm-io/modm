@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_GPIO_HPP
-#define XPCC_GPIO_HPP
+#ifndef MODM_GPIO_HPP
+#define MODM_GPIO_HPP
 
 #include <stdint.h>
 #include <modm/architecture/utils.hpp>
@@ -41,10 +41,10 @@
  * typedef GpioOutputD0 LcdRs;
  *
  * // Create a new type for the software SPI for the display
- * typedef xpcc::SoftwareSimpleSpi< Clk, Mosi > SpiInterface;
+ * typedef modm::SoftwareSimpleSpi< Clk, Mosi > SpiInterface;
  *
  * // Create a instance of the ST7036 based display class
- * xpcc::St7036< SpiInterface,
+ * modm::St7036< SpiInterface,
  *               LcdCs,
  *               LcdRs > display;
  *
@@ -59,7 +59,7 @@
  * The pins don't need to initialized here because the initialize()
  * method of the display does this for us.
  *
- * @see xpcc::St7036
+ * @see modm::St7036
  *
  * Creating a simple flashing light:
  * @code
@@ -77,7 +77,7 @@
  *     while (1)
  *     {
  *         Led::toggle();
- *         xpcc::delayMilliseconds(500);
+ *         modm::delayMilliseconds(500);
  *     }
  * }
  * @endcode
@@ -100,7 +100,7 @@
 8e: 84 27          eor  r24, r20
 90: 85 b9          out  0x05, r24
 
-92: c9 01          movw r24, r18       ; xpcc::delayMilliseconds(500);
+92: c9 01          movw r24, r18       ; modm::delayMilliseconds(500);
 94: 01 97          sbiw r24, 0x01
 96: f1 f7          brne .-4            ; 0x94 <main+0x12>
 
@@ -120,7 +120,7 @@
 
 23e: 40 93 27 06   sts  0x0627, r20    ; Led::toggle();
 
-242: c9 01         movw r24, r18       ; xpcc::delayMilliseconds(500);
+242: c9 01         movw r24, r18       ; modm::delayMilliseconds(500);
 244: 01 97         sbiw r24, 0x01
 246: f1 f7         brne .-4            ; 0x244 <main+0x16>
 
@@ -134,7 +134,7 @@
  * @author	Niklas Hauser
  */
 
-namespace xpcc
+namespace modm
 {
 
 struct Gpio
@@ -309,6 +309,6 @@ public:
 #endif
 };
 
-} // namespace xpcc
+} // namespace modm
 
-#endif // XPCC_GPIO_HPP
+#endif // MODM_GPIO_HPP

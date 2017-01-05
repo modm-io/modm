@@ -21,7 +21,7 @@
 
 
 bool
-xpcc::CanLawicelFormatter::convertToCanMessage(const char* in, can::Message& out)
+modm::CanLawicelFormatter::convertToCanMessage(const char* in, can::Message& out)
 {
 	bool error = false;
 	uint8_t dlc_pos;
@@ -102,7 +102,7 @@ xpcc::CanLawicelFormatter::convertToCanMessage(const char* in, can::Message& out
 
 
 bool
-xpcc::CanLawicelFormatter::convertToString(const can::Message& in, char* out)
+modm::CanLawicelFormatter::convertToString(const can::Message& in, char* out)
 {
 	if(in.flags.extended){
 		if(in.flags.rtr){
@@ -161,7 +161,7 @@ xpcc::CanLawicelFormatter::convertToString(const can::Message& in, char* out)
 
 
 uint8_t
-xpcc::CanLawicelFormatter::charToByte(const char cc, bool& error)
+modm::CanLawicelFormatter::charToByte(const char cc, bool& error)
 {
 	if(cc >= '0' && cc <= '9') {
 		return cc - '0';
@@ -176,7 +176,7 @@ xpcc::CanLawicelFormatter::charToByte(const char cc, bool& error)
 }
 
 char
-xpcc::CanLawicelFormatter::byteToHex(uint8_t num)
+modm::CanLawicelFormatter::byteToHex(uint8_t num)
 {
 	num &= 0x0f;
 	if(num<10)

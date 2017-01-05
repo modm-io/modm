@@ -18,8 +18,8 @@
 
 #include <modm/debug/logger/logger.hpp>
 // set the Loglevel
-#undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::INFO
+#undef  MODM_LOG_LEVEL
+#define MODM_LOG_LEVEL modm::log::INFO
 
 xpcc::Dispatcher::Dispatcher(BackendInterface *backend_, Postman* postman_) :
 	backend(backend_), postman(postman_)
@@ -31,13 +31,13 @@ void
 xpcc::Dispatcher::update()
 {
 	this->backend->update();
-	
+
 	//Check if a new packet was received by the backend
 	while (this->backend->isPacketAvailable())
 	{
 		const Header& header = this->backend->getPacketHeader();
-		const SmartPointer& payload = this->backend->getPacketPayload();
-		
+		const modm::SmartPointer& payload = this->backend->getPacketPayload();
+
 		if (header.type == Header::Type::REQUEST && !header.isAcknowledge)
 		{
 			this->handleActionCall(header, payload);
@@ -52,7 +52,7 @@ xpcc::Dispatcher::update()
 				}
 			}
 		}
-		
+
 		this->backend->dropPacket();
 	}
 
@@ -62,10 +62,10 @@ xpcc::Dispatcher::update()
 
 void
 xpcc::Dispatcher::handleActionCall(const Header& header,
-		const SmartPointer& payload)
+		const modm::SmartPointer& payload)
 {
 	xpcc::Postman::DeliverInfo result = postman->deliverPacket(header, payload);
-	
+
 	if (result == Postman::OK && header.destination != 0)
 	{
 		// transmit ACK:
@@ -74,7 +74,7 @@ xpcc::Dispatcher::handleActionCall(const Header& header,
 		// by the backend
 		this->sendAcknowledge(header);
 	}
-	
+
 	// TODO Error reporting
 }
 
@@ -85,7 +85,7 @@ xpcc::Dispatcher::sendAcknowledge(const Header& header)
 			header.type, true,
 			header.source, header.destination,
 			header.packetIdentifier);
-	
+
 	this->backend->sendPacket(ackHeader);
 }
 
@@ -99,7 +99,7 @@ xpcc::Dispatcher::Entry::headerFits(const Header& inHeader) const
 
 void
 xpcc::Dispatcher::handlePacket(const Header& header,
-		const SmartPointer& payload)
+		const modm::SmartPointer& payload)
 {
 	auto entry = this->entries.begin();
 	while(entry != this->entries.end())
@@ -154,12 +154,12 @@ xpcc::Dispatcher::sendMessageToInnerComponent(EntryIterator entry)
 	// send message also out, so it is possible to log
 	// communication externally
 	backend->sendPacket(entry->header, entry->payload);
-	
+
 	if (entry->header.type == Header::Type::REQUEST)
 	{
 		postman->deliverPacket(entry->header, entry->payload);
 		// TODO handle postman errors?
-		
+
 		if (entry->type == Entry::Type::Callback)
 		{
 			// TODO timer for RESPONSES not handeled yet
@@ -197,10 +197,10 @@ xpcc::Dispatcher::sendMessageToInnerComponent(EntryIterator entry)
 				break;
 			}
 		}
-		
+
 		return this->entries.remove(entry);
 	}
-	
+
 	return entry;
 }
 
@@ -263,7 +263,7 @@ xpcc::Dispatcher::handleWaitingMessages()
 
 			++entry;
 		}
-		else 
+		else
 		{
 			// WAIT_FOR_RESPONSE
 			// Responses stay in the queue for ever if no response ever
@@ -276,24 +276,24 @@ xpcc::Dispatcher::handleWaitingMessages()
 // ----------------------------------------------------------------------------
 void
 xpcc::Dispatcher::addMessage(const Header& header,
-		SmartPointer& smartPayload)
+		modm::SmartPointer& smartPayload)
 {
 	this->entries.append(Entry(header, smartPayload));
 }
 
 void
 xpcc::Dispatcher::addMessage(const Header& header,
-		SmartPointer& smartPayload, ResponseCallback& responseCallback)
+		modm::SmartPointer& smartPayload, ResponseCallback& responseCallback)
 {
 	this->entries.append(Entry(header, smartPayload, responseCallback));
 }
 
 void
 xpcc::Dispatcher::addResponse(const Header& header,
-		SmartPointer& smartPayload)
+		modm::SmartPointer& smartPayload)
 {
 	// it makes response more important, than requests
-	// it prevents intern loops. Since it is possible to give a response while 
+	// it prevents intern loops. Since it is possible to give a response while
 	// an action is handled and call an action while response is handled
 	// one component calling one action on another component on same board
 	// handling its response in the same callback-function would cause a loop

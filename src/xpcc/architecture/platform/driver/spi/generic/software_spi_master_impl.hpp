@@ -12,35 +12,35 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SOFTWARE_SPI_MASTER_HPP
+#ifndef MODM_SOFTWARE_SPI_MASTER_HPP
 #	error	"Don't include this file directly, use 'simple_spi.hpp' instead!"
 #endif
 
 template <typename SCK, typename MOSI, typename MISO>
 uint16_t
-xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::delayTime(1);
+modm::SoftwareSpiMaster<SCK, MOSI, MISO>::delayTime(1);
 
 template <typename SCK, typename MOSI, typename MISO>
 uint8_t
-xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::operationMode(0);
+modm::SoftwareSpiMaster<SCK, MOSI, MISO>::operationMode(0);
 
 template <typename SCK, typename MOSI, typename MISO>
 uint8_t
-xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::count(0);
+modm::SoftwareSpiMaster<SCK, MOSI, MISO>::count(0);
 
 template <typename SCK, typename MOSI, typename MISO>
 void *
-xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::context(nullptr);
+modm::SoftwareSpiMaster<SCK, MOSI, MISO>::context(nullptr);
 
 template <typename SCK, typename MOSI, typename MISO>
-xpcc::Spi::ConfigurationHandler
-xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::configuration(nullptr);
+modm::Spi::ConfigurationHandler
+modm::SoftwareSpiMaster<SCK, MOSI, MISO>::configuration(nullptr);
 // ----------------------------------------------------------------------------
 
 template <typename SCK, typename MOSI, typename MISO>
 template< class SystemClock, uint32_t baudrate, uint16_t tolerance >
 void
-xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::initialize()
+modm::SoftwareSpiMaster<SCK, MOSI, MISO>::initialize()
 {
 	delayTime = 500000000 / baudrate;
 	if (delayTime == 0) delayTime = 1;
@@ -51,7 +51,7 @@ xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::initialize()
 
 template <typename SCK, typename MOSI, typename MISO>
 void
-xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::setDataMode(DataMode mode)
+modm::SoftwareSpiMaster<SCK, MOSI, MISO>::setDataMode(DataMode mode)
 {
 	operationMode = (operationMode & ~0b11) | static_cast<uint8_t>(mode);
 	SCK::set(operationMode & 0b10);
@@ -59,7 +59,7 @@ xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::setDataMode(DataMode mode)
 
 template <typename SCK, typename MOSI, typename MISO>
 void
-xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::setDataOrder(DataOrder order)
+modm::SoftwareSpiMaster<SCK, MOSI, MISO>::setDataOrder(DataOrder order)
 {
 	if (order == DataOrder::LsbFirst)
 		operationMode |= 0b100;
@@ -70,7 +70,7 @@ xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::setDataOrder(DataOrder order)
 
 template <typename SCK, typename MOSI, typename MISO>
 uint8_t
-xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::acquire(void *ctx, ConfigurationHandler handler)
+modm::SoftwareSpiMaster<SCK, MOSI, MISO>::acquire(void *ctx, ConfigurationHandler handler)
 {
 	if (ctx == nullptr)
 	{
@@ -92,7 +92,7 @@ xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::acquire(void *ctx, ConfigurationHandle
 
 template <typename SCK, typename MOSI, typename MISO>
 uint8_t
-xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::release(void *ctx)
+modm::SoftwareSpiMaster<SCK, MOSI, MISO>::release(void *ctx)
 {
 	if (ctx == context)
 	{
@@ -105,7 +105,7 @@ xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::release(void *ctx)
 
 template <typename SCK, typename MOSI, typename MISO>
 uint8_t
-xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::transferBlocking(uint8_t data)
+modm::SoftwareSpiMaster<SCK, MOSI, MISO>::transferBlocking(uint8_t data)
 {
 	for (uint_fast8_t ii = 0; ii < 8; ++ii)
 	{
@@ -155,7 +155,7 @@ xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::transferBlocking(uint8_t data)
 
 template <typename SCK, typename MOSI, typename MISO>
 void
-xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::transferBlocking(
+modm::SoftwareSpiMaster<SCK, MOSI, MISO>::transferBlocking(
 		uint8_t *tx, uint8_t *rx, std::size_t length)
 {
 	uint8_t tx_byte = 0xff;
@@ -172,27 +172,27 @@ xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::transferBlocking(
 }
 
 template <typename SCK, typename MOSI, typename MISO>
-xpcc::ResumableResult<uint8_t>
-xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::transfer(uint8_t data)
+modm::ResumableResult<uint8_t>
+modm::SoftwareSpiMaster<SCK, MOSI, MISO>::transfer(uint8_t data)
 {
 	data = transferBlocking(data);
-	return {xpcc::rf::Stop, data};
+	return {modm::rf::Stop, data};
 }
 
 template <typename SCK, typename MOSI, typename MISO>
-xpcc::ResumableResult<void>
-xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::transfer(
+modm::ResumableResult<void>
+modm::SoftwareSpiMaster<SCK, MOSI, MISO>::transfer(
 		uint8_t *tx, uint8_t *rx, std::size_t length)
 {
 	transferBlocking(tx, rx, length);
-	return {xpcc::rf::Stop, 0};
+	return {modm::rf::Stop, 0};
 }
 
 // ----------------------------------------------------------------------------
 
 template <typename SCK, typename MOSI, typename MISO>
-void xpcc_always_inline
-xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::delay()
+void modm_always_inline
+modm::SoftwareSpiMaster<SCK, MOSI, MISO>::delay()
 {
-	xpcc::delayNanoseconds(delayTime);
+	modm::delayNanoseconds(delayTime);
 }

@@ -14,8 +14,8 @@
 #include <modm/architecture/architecture.hpp>
 #include <modm/driver/can/mcp2515.hpp>
 
-using namespace xpcc::atmega;
-typedef xpcc::avr::SystemClock clock;
+using namespace modm::atmega;
+typedef modm::avr::SystemClock clock;
 
 typedef GpioOutputB4 Cs;
 typedef GpioInputB2 Int;
@@ -24,10 +24,10 @@ typedef GpioOutputB7 Sclk;
 typedef GpioOutputB5 Mosi;
 typedef GpioInputB6 Miso;
 
-//typedef xpcc::SoftwareSpiMaster<Sclk, Mosi, Miso> SPI;
+//typedef modm::SoftwareSpiMaster<Sclk, Mosi, Miso> SPI;
 typedef SpiMaster SPI;
 
-xpcc::Mcp2515<SPI, Cs, Int> mcp2515;
+modm::Mcp2515<SPI, Cs, Int> mcp2515;
 
 // Default filters to receive any extended CAN frame
 FLASH_STORAGE(uint8_t canFilter[]) =
@@ -54,12 +54,12 @@ main()
 	Int::setInput(Gpio::InputType::PullUp);
 
 	// Configure MCP2515 and set the filters
-        // Fixme: xpcc::Can::Bitrate is incompatitlbe with device driver
+        // Fixme: modm::Can::Bitrate is incompatitlbe with device driver
 //  mcp2515.initialize(bitrate);
-//  mcp2515.setFilter(xpcc::accessor::asFlash(canFilter));
+//  mcp2515.setFilter(modm::accessor::asFlash(canFilter));
 
 	// Create a new message
-	xpcc::can::Message message(0x123456);
+	modm::can::Message message(0x123456);
 	message.length = 2;
 	message.data[0] = 0xab;
 	message.data[1] = 0xcd;
@@ -70,7 +70,7 @@ main()
 	{
 		if (mcp2515.isMessageAvailable())
 		{
-			xpcc::can::Message message;
+			modm::can::Message message;
 			if (mcp2515.getMessage(message))
 			{
 				// do something

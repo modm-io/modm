@@ -15,13 +15,13 @@
 
 #include "bmp085_test.hpp"
 
-#undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::DISABLED
+#undef  MODM_LOG_LEVEL
+#define MODM_LOG_LEVEL modm::log::DISABLED
 
 void
 Bmp085Test::testConversion()
 {
-	xpcc::bmp085::DataDouble dataTable[3];
+	modm::bmp085::DataDouble dataTable[3];
 	uint16_t adc_temp_min[3];
 	uint16_t adc_temp_max[3];
 
@@ -80,13 +80,13 @@ Bmp085Test::testConversion()
 	adc_press_min[2] = 0x4000;
 	adc_press_max[2] = 0xE000;
 
-	for (size_t jj = 0; jj < XPCC_ARRAY_SIZE(dataTable); ++jj)
+	for (size_t jj = 0; jj < MODM_ARRAY_SIZE(dataTable); ++jj)
 	{
-		xpcc::bmp085::DataDouble* dataDouble;
+		modm::bmp085::DataDouble* dataDouble;
 
 		dataDouble = &(dataTable[jj]);
 
-		xpcc::bmp085::Data data;
+		modm::bmp085::Data data;
 
 		data.calibration.ac1 = dataDouble->calibration.ac1;
 		data.calibration.ac2 = dataDouble->calibration.ac2;
@@ -105,7 +105,7 @@ Bmp085Test::testConversion()
 		uint16_t total_error = 0;
 		uint16_t max_error = 0;
 
-		XPCC_LOG_DEBUG.printf("ADC --double--\t--int--\t--error--\n");
+		MODM_LOG_DEBUG.printf("ADC --double--\t--int--\t--error--\n");
 
 		for (uint16_t adc = adc_temp_min[jj]; adc <= adc_temp_max[jj]; ++adc)
 		{
@@ -122,7 +122,7 @@ Bmp085Test::testConversion()
 
 			int16_t error = tempDouble - temp;
 
-			XPCC_LOG_DEBUG.printf("%04x\t%5d\t%5d\t%2d\n", adc, tempDouble, temp, error);
+			MODM_LOG_DEBUG.printf("%04x\t%5d\t%5d\t%2d\n", adc, tempDouble, temp, error);
 
 			error = std::abs(error);
 			total_error += error;
@@ -131,9 +131,9 @@ Bmp085Test::testConversion()
 			}
 		}
 
-		XPCC_LOG_DEBUG.printf("== Errors ==\n");
-		XPCC_LOG_DEBUG.printf(" max = %d\n", max_error);
-		XPCC_LOG_DEBUG.printf(" sum = %d\n", total_error);
+		MODM_LOG_DEBUG.printf("== Errors ==\n");
+		MODM_LOG_DEBUG.printf(" max = %d\n", max_error);
+		MODM_LOG_DEBUG.printf(" sum = %d\n", total_error);
 
 		TEST_ASSERT_TRUE(total_error < 1000);
 		TEST_ASSERT_TRUE(max_error <= 1);
@@ -161,7 +161,7 @@ Bmp085Test::testConversion()
 			double temp;
 			dataDouble->getTemperature(temp);
 
-			XPCC_LOG_DEBUG.printf("adc_temp = %04x, T = %f\n", adc_temp, temp);
+			MODM_LOG_DEBUG.printf("adc_temp = %04x, T = %f\n", adc_temp, temp);
 
 			uint16_t adc_press_span = adc_press_max[jj] - adc_press_min[jj];
 			for (uint16_t adc_press = adc_press_min[jj];
@@ -187,7 +187,7 @@ Bmp085Test::testConversion()
 				}
 
 				int16_t error = pressFp - pressDp;
-				XPCC_LOG_DEBUG.printf("  adc_press = %04x  PressFp = %6d Pa\t PressDp = %6d Pa \t Diff = %3d Pa\n", adc_press, pressFp, pressDp, error);
+				MODM_LOG_DEBUG.printf("  adc_press = %04x  PressFp = %6d Pa\t PressDp = %6d Pa \t Diff = %3d Pa\n", adc_press, pressFp, pressDp, error);
 
 				error = std::abs(error);
 				total_error += error;
@@ -197,9 +197,9 @@ Bmp085Test::testConversion()
 			}
 		}
 
-		XPCC_LOG_DEBUG.printf("== Errors ==\n");
-		XPCC_LOG_DEBUG.printf(" max = %d\n", max_error);
-		XPCC_LOG_DEBUG.printf(" sum = %d\n", total_error);
+		MODM_LOG_DEBUG.printf("== Errors ==\n");
+		MODM_LOG_DEBUG.printf(" max = %d\n", max_error);
+		MODM_LOG_DEBUG.printf(" sum = %d\n", total_error);
 
 		TEST_ASSERT_TRUE(total_error <= 1541);
 		TEST_ASSERT_TRUE(max_error <= 71);

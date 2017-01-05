@@ -9,12 +9,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_INTERFACE_I2C_TRANSACTION_HPP
-#define XPCC_INTERFACE_I2C_TRANSACTION_HPP
+#ifndef MODM_INTERFACE_I2C_TRANSACTION_HPP
+#define MODM_INTERFACE_I2C_TRANSACTION_HPP
 
 #include "i2c.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -31,7 +31,7 @@ namespace xpcc
  * @author	Niklas Hauser
  * @ingroup	i2c
  */
-class I2cTransaction : public ::xpcc::I2c
+class I2cTransaction : public ::modm::I2c
 {
 public:
 	struct Starting
@@ -226,7 +226,7 @@ protected:
 };
 
 /**
- * This class is an implementation of xpcc::I2cTransaction which,
+ * This class is an implementation of modm::I2cTransaction which,
  * when passed to an i2c driver, performs the sequence:
  * start - address - write - restart - address - read - stop.
  *
@@ -247,7 +247,7 @@ public:
 	{
 	}
 
-	bool xpcc_always_inline
+	bool modm_always_inline
 	configurePing()
 	{
 		return configureWriteRead(nullptr, 0, nullptr, 0);
@@ -304,7 +304,7 @@ public:
 	 * @return  `true` if adapter was not in use,
 	 *          `false` otherwise
 	 */
-	bool xpcc_always_inline
+	bool modm_always_inline
 	configureWrite(const uint8_t *buffer, std::size_t size)
 	{
 		return configureWriteRead(buffer, size, nullptr, 0);
@@ -319,7 +319,7 @@ public:
 	 * @return  `true` if adapter was not in use,
 	 *          `false` otherwise
 	 */
-	bool xpcc_always_inline
+	bool modm_always_inline
 	configureRead(uint8_t *buffer, std::size_t size)
 	{
 		return configureWriteRead(nullptr, 0, buffer, size);
@@ -394,7 +394,7 @@ protected:
 };
 
 /**
- * This class is an implementation of xpcc::I2cTransaction which,
+ * This class is an implementation of modm::I2cTransaction which,
  * when passed to an i2c driver, performs the sequence:
  * start - address - write - stop.
  *
@@ -414,13 +414,13 @@ public:
 	{
 	}
 
-	bool xpcc_always_inline
+	bool modm_always_inline
 	configurePing()
 	{
 		return configureWrite(nullptr, 0);
 	}
 
-	bool xpcc_always_inline
+	bool modm_always_inline
 	configureWriteRead(const uint8_t *, std::size_t, uint8_t *, std::size_t)
 	{
 		return false;
@@ -438,7 +438,7 @@ public:
 		return false;
 	}
 
-	bool xpcc_always_inline
+	bool modm_always_inline
 	configureRead(uint8_t *, std::size_t)
 	{
 		return false;
@@ -469,7 +469,7 @@ protected:
 };
 
 /**
- * This class is an implementation of xpcc::I2cTransaction which,
+ * This class is an implementation of modm::I2cTransaction which,
  * when passed to an i2c driver, performs the sequence:
  * start - address - read - stop.
  *
@@ -489,19 +489,19 @@ public:
 	{
 	}
 
-	bool xpcc_always_inline
+	bool modm_always_inline
 	configurePing()
 	{
 		return configureRead(nullptr, 0);
 	}
 
-	bool xpcc_always_inline
+	bool modm_always_inline
 	configureWriteRead(const uint8_t *, std::size_t, uint8_t *, std::size_t)
 	{
 		return false;
 	}
 
-	bool xpcc_always_inline
+	bool modm_always_inline
 	configureWrite(uint8_t *, std::size_t)
 	{
 		return false;
@@ -542,6 +542,6 @@ protected:
 	uint8_t *buffer;
 };
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif // XPCC_INTERFACE_I2C_TRANSACTION_HPP
+#endif // MODM_INTERFACE_I2C_TRANSACTION_HPP

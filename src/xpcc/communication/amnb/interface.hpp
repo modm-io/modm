@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_AMNB_INTERFACE_HPP
-#define	XPCC_AMNB_INTERFACE_HPP
+#ifndef	MODM_AMNB_INTERFACE_HPP
+#define	MODM_AMNB_INTERFACE_HPP
 
 #include <cstddef>
 #include <stdint.h>
@@ -28,7 +28,7 @@
 
 #define AMNB_TIMING_DEBUG 0
 
-namespace xpcc
+namespace modm
 {
 	namespace amnb
 	{
@@ -90,7 +90,7 @@ namespace xpcc
 			 * \brief	Send a message
 			 * 
 			 * \param	address			receiver address
-			 * \param	flags			see xpcc::amnb::Flags
+			 * \param	flags			see modm::amnb::Flags
 			 * \param	command			command byte
 			 * \param	*payload		data field
 			 * \param	payloadLength	size of the data field
@@ -103,14 +103,14 @@ namespace xpcc
 			 * \brief	Send a message
 			 */
 			template <typename T>
-			static bool xpcc_always_inline
+			static bool modm_always_inline
 			sendMessage(uint8_t address, Flags flags, uint8_t command,
 					const T& payload);
 			
 			/**
 			 * \brief	Send a empty message
 			 */
-			static bool xpcc_always_inline
+			static bool modm_always_inline
 			sendMessage(uint8_t address, Flags flags, uint8_t command);
 			
 			/**
@@ -118,38 +118,38 @@ namespace xpcc
 			 * 
 			 * Reset the status with a call of dropMessage().
 			 */
-			static xpcc_always_inline bool
+			static modm_always_inline bool
 			isMessageAvailable();
 			
-			static xpcc_always_inline uint8_t
+			static modm_always_inline uint8_t
 			getTransmittedAddress();
 			
-			static xpcc_always_inline uint8_t
+			static modm_always_inline uint8_t
 			getTransmittedCommand();
 			
-			static xpcc_always_inline Flags
+			static modm_always_inline Flags
 			getTransmittedFlags();
 			
-			static xpcc_always_inline uint8_t
+			static modm_always_inline uint8_t
 			getAddress();
 			
-			static xpcc_always_inline uint8_t
+			static modm_always_inline uint8_t
 			getCommand();
 			
-			static xpcc_always_inline bool
+			static modm_always_inline bool
 			isResponse();
 			
 			/**
 			 * \brief	Check if the message is an ACK or NACK
 			 * \return	\c true if the message is an ACK, \c false on NACK.
 			 */
-			static xpcc_always_inline bool
+			static modm_always_inline bool
 			isAcknowledge();
 			
 			/**
 			 * \return	\c true you are allowed to send right now
 			 */
-			static xpcc_always_inline bool
+			static modm_always_inline bool
 			isBusAvailable();
 			
 			/**
@@ -157,7 +157,7 @@ namespace xpcc
 			 * \return	\c true if the message has been transmitted without
 			 *			collision.
 			 */
-			static xpcc_always_inline bool
+			static modm_always_inline bool
 			messageTransmitted();
 			
 			/**
@@ -166,14 +166,14 @@ namespace xpcc
 			 * Data access is only valid after isMessageAvailable() returns
 			 * \c true and before any call of dropMessage() or update()
 			 */
-			static xpcc_always_inline const uint8_t *
+			static modm_always_inline const uint8_t *
 			getPayload();
 			
 			/**
 			 * \return	Size of the received message. Zero if no message
 			 * 			is available at the moment.
 			 */
-			static xpcc_always_inline uint8_t
+			static modm_always_inline uint8_t
 			getPayloadLength();
 			
 			/**
@@ -191,7 +191,7 @@ namespace xpcc
 			update();
 			
 #if AMNB_TIMING_DEBUG
-			static xpcc::Timestamp latency;
+			static modm::Timestamp latency;
 			static uint8_t collisions;
 #endif
 			
@@ -213,14 +213,14 @@ namespace xpcc
 			static uint8_t length;
 			static uint8_t lengthOfReceivedMessage;
 			static uint8_t lengthOfTransmitMessage;
-			static xpcc::ShortTimeout resetTimer;
+			static modm::ShortTimeout resetTimer;
 			static const uint8_t resetTimeout = 4;
 			
 			static bool rescheduleTransmit;
 			static bool hasMessageToSend;
 			static bool messageSent;
 			static bool transmitting;
-			static xpcc::Timeout<xpcc::amnb::Clock> rescheduleTimer;
+			static modm::Timeout<modm::amnb::Clock> rescheduleTimer;
 			static uint8_t rescheduleTimeout;
 			
 			static State state;
@@ -230,4 +230,4 @@ namespace xpcc
 
 #include "interface_impl.hpp"
 
-#endif	// XPCC_AMNB_INTERFACE_HPP
+#endif	// MODM_AMNB_INTERFACE_HPP

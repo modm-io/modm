@@ -18,7 +18,7 @@
 
 struct Message
 {
-	Message(const xpcc::Header& header, const xpcc::SmartPointer& payload) :
+	Message(const xpcc::Header& header, const modm::SmartPointer& payload) :
 		header(header), payload(payload)
 	{
 	}
@@ -29,7 +29,7 @@ struct Message
 	}
 	
 	xpcc::Header header;
-	xpcc::SmartPointer payload;
+	modm::SmartPointer payload;
 };
 
 #endif

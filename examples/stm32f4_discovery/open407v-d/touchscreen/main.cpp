@@ -41,11 +41,11 @@
  * the address pins A24:A0.
  * So when writing to offset +((1 << 16) << 1) pin A16 is high.
  */
-xpcc::TftMemoryBus16Bit parallelBus(
+modm::TftMemoryBus16Bit parallelBus(
 		(volatile uint16_t *) 0x60000000,
 		(volatile uint16_t *) 0x60020000);
 
-xpcc::ParallelTft<xpcc::TftMemoryBus16Bit> tft(parallelBus);
+modm::ParallelTft<modm::TftMemoryBus16Bit> tft(parallelBus);
 
 // ----------------------------------------------------------------------------
 // Touchscreen
@@ -53,8 +53,8 @@ xpcc::ParallelTft<xpcc::TftMemoryBus16Bit> tft(parallelBus);
 typedef GpioOutputC4 CsTouchscreen;
 typedef GpioInputC5  IntTouchscreen;
 
-xpcc::Ads7843<SpiMaster2, CsTouchscreen, IntTouchscreen> ads7843;
-xpcc::TouchscreenCalibrator touchscreen;
+modm::Ads7843<SpiMaster2, CsTouchscreen, IntTouchscreen> ads7843;
+modm::TouchscreenCalibrator touchscreen;
 
 typedef GpioOutputD7 CS;
 
@@ -135,15 +135,15 @@ initTouchscreen()
 
 // ----------------------------------------------------------------------------
 static void
-drawCross(xpcc::GraphicDisplay& display, xpcc::glcd::Point center)
+drawCross(modm::GraphicDisplay& display, modm::glcd::Point center)
 {
-	display.setColor(xpcc::glcd::Color::red());
+	display.setColor(modm::glcd::Color::red());
 	display.drawLine(center.x - 15, center.y, center.x - 2, center.y);
 	display.drawLine(center.x + 2, center.y, center.x + 15, center.y);
 	display.drawLine(center.x, center.y - 15, center.x, center.y - 2);
 	display.drawLine(center.x, center.y + 2, center.x, center.y + 15);
 
-	display.setColor(xpcc::glcd::Color::white());
+	display.setColor(modm::glcd::Color::white());
 	display.drawLine(center.x - 15, center.y + 15, center.x - 7, center.y + 15);
 	display.drawLine(center.x - 15, center.y + 7, center.x - 15, center.y + 15);
 
@@ -158,21 +158,21 @@ drawCross(xpcc::GraphicDisplay& display, xpcc::glcd::Point center)
 }
 
 static void
-calibrateTouchscreen(xpcc::GraphicDisplay& display)
+calibrateTouchscreen(modm::GraphicDisplay& display)
 {
-	xpcc::glcd::Point calibrationPoint[3] = { { 45, 45 }, { 270, 90 }, { 100, 190 } };
-	xpcc::glcd::Point sample[3];
+	modm::glcd::Point calibrationPoint[3] = { { 45, 45 }, { 270, 90 }, { 100, 190 } };
+	modm::glcd::Point sample[3];
 
 	for (uint8_t i = 0; i < 3; i++)
 	{
 		display.clear();
 
-		display.setColor(xpcc::glcd::Color::yellow());
+		display.setColor(modm::glcd::Color::yellow());
 		display.setCursor(50, 5);
 		display << "Touch crosshair to calibrate";
 
 		drawCross(display, calibrationPoint[i]);
-		xpcc::delayMilliseconds(500);
+		modm::delayMilliseconds(500);
 
 		while (!ads7843.read(&sample[i])) {
 			// wait until a valid sample can be taken
@@ -185,7 +185,7 @@ calibrateTouchscreen(xpcc::GraphicDisplay& display)
 }
 
 void
-drawPoint(xpcc::GraphicDisplay& display, xpcc::glcd::Point point)
+drawPoint(modm::GraphicDisplay& display, modm::glcd::Point point)
 {
 	if (point.x < 0 || point.y < 0) {
 		return;
@@ -210,14 +210,14 @@ main()
 
 	calibrateTouchscreen(tft);
 
-	tft.setColor(xpcc::glcd::Color::lime());
+	tft.setColor(modm::glcd::Color::lime());
 
 	while (1)
 	{
-		xpcc::glcd::Point raw;
+		modm::glcd::Point raw;
 		if (ads7843.read(&raw))
 		{
-			xpcc::glcd::Point point;
+			modm::glcd::Point point;
 
 			touchscreen.translate(&raw, &point);
 			drawPoint(tft, point);

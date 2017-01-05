@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PT_MACROS_HPP
-#define XPCC_PT_MACROS_HPP
+#ifndef MODM_PT_MACROS_HPP
+#define MODM_PT_MACROS_HPP
 
 #include <modm/processing/resumable.hpp>
 
@@ -108,7 +108,7 @@
 		this->ptState = __LINE__; \
 		case __LINE__: \
 			auto rfResult = resumable; \
-			if (rfResult.getState() > xpcc::rf::NestingError) { \
+			if (rfResult.getState() > modm::rf::NestingError) { \
 				return true; \
 			} \
 			rfResult.getResult(); \
@@ -141,4 +141,4 @@
 		return false; \
 	} while (0)
 
-#endif // XPCC_PT_MACROS_HPP
+#endif // MODM_PT_MACROS_HPP

@@ -12,15 +12,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SIEMENS_S75_HPP
-#define XPCC_SIEMENS_S75_HPP
+#ifndef MODM_SIEMENS_S75_HPP
+#define MODM_SIEMENS_S75_HPP
 
 #include <modm/architecture/driver/delay.hpp>
 #include <modm/driver/bus/bitbang_memory_interface.hpp>
 
 #include <modm/ui/display/buffered_graphic_display.hpp>
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	Driver for Siemens S75/CX75/C81/M75 displays
@@ -30,7 +30,7 @@ namespace xpcc
 	 * displays of up to 132 x 176 pixels in 18 bit colour.
 	 *
 	 * The portrait mode is a bit more 'native' for this display because
-	 * xpcc::BufferedGraphicDisplay requests that the vertical resolution is
+	 * modm::BufferedGraphicDisplay requests that the vertical resolution is
 	 * dividable by 8.
 	 *
 	 * In portrait mode the connector is at top.
@@ -80,7 +80,7 @@ namespace xpcc
 		typename RESET,
 		uint16_t  WIDTH,
 		uint16_t  HEIGHT,
-		xpcc::Orientation ORIENTATION>
+		modm::Orientation ORIENTATION>
 	class SiemensS75Common :
 			public BufferedGraphicDisplay<WIDTH, HEIGHT>
 	{
@@ -97,10 +97,10 @@ namespace xpcc
 		initialize(void);
 
 	protected:
-		xpcc_always_inline void
+		modm_always_inline void
 		lcdCls(const uint16_t colour);
 
-		xpcc_always_inline void
+		modm_always_inline void
 		lcdSettings();
 
 	private:
@@ -109,13 +109,13 @@ namespace xpcc
 
 	template <typename MEMORY, typename RESET>
 	class SiemensS75Portrait :
-		public SiemensS75Common<MEMORY, RESET, 136, 176, xpcc::Orientation::Portrait>
+		public SiemensS75Common<MEMORY, RESET, 136, 176, modm::Orientation::Portrait>
 	{
 	};
 
 	template <typename MEMORY, typename RESET>
 	class SiemensS75PortraitUpsideDown:
-		public SiemensS75Common<MEMORY, RESET, 136, 176, xpcc::Orientation::PortraitUpsideDown>
+		public SiemensS75Common<MEMORY, RESET, 136, 176, modm::Orientation::PortraitUpsideDown>
 	{
 	};
 
@@ -127,23 +127,23 @@ namespace xpcc
 	 */
 	template <typename MEMORY, typename RESET>
 	class SiemensS75LandscapeLeft :
-		public SiemensS75Common<MEMORY, RESET, 176, 136, xpcc::Orientation::LandscapeLeft>
+		public SiemensS75Common<MEMORY, RESET, 176, 136, modm::Orientation::LandscapeLeft>
 	{
 	public:
 		explicit SiemensS75LandscapeLeft(MEMORY& interface) :
-		SiemensS75Common<MEMORY, RESET, 176, 136, xpcc::Orientation::LandscapeLeft>(interface) { }
+		SiemensS75Common<MEMORY, RESET, 176, 136, modm::Orientation::LandscapeLeft>(interface) { }
 	};
 
 	template <typename MEMORY, typename RESET>
 	class SiemensS75LandscapeRight :
-		public SiemensS75Common<MEMORY, RESET, 176, 136, xpcc::Orientation::LandscapeRight>
+		public SiemensS75Common<MEMORY, RESET, 176, 136, modm::Orientation::LandscapeRight>
 	{
 	public:
 		explicit SiemensS75LandscapeRight(MEMORY& interface) :
-		SiemensS75Common<MEMORY, RESET, 176, 136, xpcc::Orientation::LandscapeRight>(interface) { }
+		SiemensS75Common<MEMORY, RESET, 176, 136, modm::Orientation::LandscapeRight>(interface) { }
 	};
 }
 
 #include "siemens_s75_impl.hpp"
 
-#endif // XPCC_SIEMENS_S75_HPP
+#endif // MODM_SIEMENS_S75_HPP

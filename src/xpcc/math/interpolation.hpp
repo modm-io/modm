@@ -18,10 +18,10 @@
  * 
  */
 
-#ifndef XPCC_INTERPOLATION_HPP
-#define XPCC_INTERPOLATION_HPP
+#ifndef MODM_INTERPOLATION_HPP
+#define MODM_INTERPOLATION_HPP
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \ingroup	interpolation
@@ -34,4 +34,4 @@ namespace xpcc
 #include "interpolation/linear.hpp"
 #include "interpolation/lagrange.hpp"
 
-#endif	// XPCC_INTERPOLATION_HPP
+#endif	// MODM_INTERPOLATION_HPP

@@ -10,10 +10,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_S_CURVE_GENERATOR_HPP
-#define XPCC_S_CURVE_GENERATOR_HPP
+#ifndef MODM_S_CURVE_GENERATOR_HPP
+#define MODM_S_CURVE_GENERATOR_HPP
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	Trapezoidal S-Curve Trajectory
@@ -54,4 +54,4 @@ namespace xpcc
 
 #include "s_curve_generator_impl.hpp"
 
-#endif // XPCC_S_CURVE_GENERATOR_HPP
+#endif // MODM_S_CURVE_GENERATOR_HPP

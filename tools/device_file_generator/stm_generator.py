@@ -64,7 +64,7 @@ if __name__ == "__main__":
 	merger = DeviceMerger(devices, logger)
 	merger.mergedByPlatform('stm32')
 
-	folder = os.path.join(os.path.dirname(__file__), '..', '..', 'src', 'xpcc', 'architecture', 'platform', 'devices', 'stm32')
+	folder = os.path.join(os.path.dirname(__file__), '..', '..', 'src', 'modm', 'architecture', 'platform', 'devices', 'stm32')
 
 	for dev in merger.mergedDevices:
 		writer = STMDeviceWriter(dev, logger)

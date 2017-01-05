@@ -59,8 +59,8 @@
 #define GCC_ARMCM3
 
 // MUST be multiples of 1000 !!!
-#ifndef XPCC_CORTEX_SYSTICK_HZ
-#define XPCC_CORTEX_SYSTICK_HZ 1000
+#ifndef MODM_CORTEX_SYSTICK_HZ
+#define MODM_CORTEX_SYSTICK_HZ 1000
 #endif
 
 /*-----------------------------------------------------------
@@ -76,8 +76,8 @@
  *----------------------------------------------------------*/
 
 #define configUSE_PREEMPTION			1
-#define configCPU_CLOCK_HZ				F_CPU	// set by xpcc
-#define configTICK_RATE_HZ				XPCC_CORTEX_SYSTICK_HZ
+#define configCPU_CLOCK_HZ				F_CPU	// set by modm
+#define configTICK_RATE_HZ				MODM_CORTEX_SYSTICK_HZ
 #define configMAX_PRIORITIES			255
 #define configMINIMAL_STACK_SIZE		128
 #define configTOTAL_HEAP_SIZE			( ( size_t ) ( 8 * 1024 ) )

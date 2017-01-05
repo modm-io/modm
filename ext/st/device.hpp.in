@@ -13,15 +13,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_DEVICE_HPP
-#define XPCC_DEVICE_HPP
+#ifndef MODM_DEVICE_HPP
+#define MODM_DEVICE_HPP
 
 %% for define in defines:
 #define {{ define }} 1
 %% endfor
 
 #include <stdint.h>
-// Defines for example the xpcc_always_inline macro
+// Defines for example the modm_always_inline macro
 #include <modm/architecture/utils.hpp>
 
 // Include external device headers:
@@ -29,4 +29,4 @@
 #include <{{ header }}>
 %% endfor
 
-#endif  // XPCC_DEVICE_HPP
+#endif  // MODM_DEVICE_HPP

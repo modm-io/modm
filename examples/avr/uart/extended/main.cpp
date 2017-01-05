@@ -14,8 +14,8 @@
 #include <modm/architecture/platform.hpp>
 #include <modm/io/iostream.hpp>
 
-using namespace xpcc::atmega;
-typedef xpcc::avr::SystemClock systemClock;
+using namespace modm::atmega;
+typedef modm::avr::SystemClock systemClock;
 
 // Create a new UART object and configure it to a baudrate of 115200
 Uart0 uart;
@@ -29,13 +29,13 @@ main()
 	sei();
 
 	// Create a IOStream for complex formatting tasks
-	xpcc::IODeviceWrapper< Uart0, xpcc::IOBuffer::BlockIfFull > device;
-	xpcc::IOStream stream(device);
+	modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > device;
+	modm::IOStream stream(device);
 
 	// Now we can print numbers and other objects to the stream
 	// The following will result in the string "24 is a nice number!\n" with
 	// the number formatted as ASCII text.
-	stream << 24 << " is a nice number!" << xpcc::endl;
+	stream << 24 << " is a nice number!" << modm::endl;
 
 	while (1)
 	{

@@ -10,17 +10,17 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_BOOST_SEMAPHORE_HPP
-#define XPCC_BOOST_SEMAPHORE_HPP
+#ifndef MODM_BOOST_SEMAPHORE_HPP
+#define MODM_BOOST_SEMAPHORE_HPP
 
-#ifndef XPCC_RTOS_SEMAPHORE_HPP
+#ifndef MODM_RTOS_SEMAPHORE_HPP
 #	error "Don't include this file directly, use <modm/processing/rtos/semaphore.hpp>"
 #endif
 
 #include <boost/thread/mutex.hpp>    
 #include <boost/thread/condition_variable.hpp>
 
-namespace xpcc
+namespace modm
 {
 	namespace rtos
 	{
@@ -137,4 +137,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_BOOST_SEMAPHORE_HPP
+#endif // MODM_BOOST_SEMAPHORE_HPP

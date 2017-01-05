@@ -27,7 +27,7 @@ public class Communication {
 	public final EventPublisher eventPublisher = new EventPublisher();
 	
 	{% for component in components.iter() %}
-	{% if component.description %}/** {{ component.description | xpcc.wordwrap(72) | xpcc.indent(1) }} */{% endif %}
+	{% if component.description %}/** {{ component.description | modm.wordwrap(72) | modm.indent(1) }} */{% endif %}
 	public final {{ component.name | typeName }} {{ component.name | variableName }} = new {{ component.name | typeName }}();
 	{% endfor %}
 
@@ -43,7 +43,7 @@ public class Communication {
 		
 	{%- for event in events.iter() %}
 		{% if event.type -%}
-		{% if event.description %}/** {{ event.description | xpcc.wordwrap(72) | xpcc.indent(1) }}
+		{% if event.description %}/** {{ event.description | modm.wordwrap(72) | modm.indent(1) }}
 		* @param packet {@link Packets.{{ event.type.name | typeObjectName -}} }*/{% endif %}
 		public void {{ event.name | variableName }}(Packets.{{ event.type.name | typeObjectName }} packet) {
 			Header header = new Header(HeaderType.REQUEST, false, Identifier.Component.BROADCAST.id, me.id, Identifier.Event.{{ event.name | enumElement }}.id);
@@ -51,7 +51,7 @@ public class Communication {
 			sender.sendPacket(message);
 		}
 		{% else -%}
-		{% if event.description %}/** {{ event.description | xpcc.wordwrap(72) | xpcc.indent(1) }}*/{% endif %}
+		{% if event.description %}/** {{ event.description | modm.wordwrap(72) | modm.indent(1) }}*/{% endif %}
 		public void {{ event.name | variableName }}() {
 			Header header = new Header(HeaderType.REQUEST, false, Identifier.Component.BROADCAST.id, me.id, Identifier.Event.{{ event.name | enumElement }}.id);
 			DefaultXpccMessage message = new DefaultXpccMessage(header, null);
@@ -76,7 +76,7 @@ public class Communication {
 	
 {%- for component in components.iter() %}
 	
-	{% if component.description %}/** {{ component.description | xpcc.wordwrap(72) | xpcc.indent(1) }} */{% endif %}
+	{% if component.description %}/** {{ component.description | modm.wordwrap(72) | modm.indent(1) }} */{% endif %}
 	public class {{ component.name | typeName }} extends Component {
 		private {{ component.name | typeName }}() {
 			super (Identifier.Component.{{ component.flattened().name | enumElement }});
@@ -85,11 +85,11 @@ public class Communication {
 		{% for action in component.flattened().actions %}
 		{% if action.description -%}
 		{% if action.parameterType -%}
-		/** {{ action.description | xpcc.wordwrap(72) | xpcc.indent(2) }}
+		/** {{ action.description | modm.wordwrap(72) | modm.indent(2) }}
 		@param packet Packets.{{ action.parameterType.flattened().name | typeObjectName }}
 		 */
 		{% else -%}
-		/** {{ action.description | xpcc.wordwrap(72) | xpcc.indent(2) }} */
+		/** {{ action.description | modm.wordwrap(72) | modm.indent(2) }} */
 		{% endif -%}
 		{% else -%}
 		{% if action.parameterType -%}

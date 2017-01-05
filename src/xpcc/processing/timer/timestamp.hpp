@@ -14,15 +14,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_TIMESTAMP_HPP
-#define	XPCC_TIMESTAMP_HPP
+#ifndef	MODM_TIMESTAMP_HPP
+#define	MODM_TIMESTAMP_HPP
 
 #include <stdint.h>
 
 #include <modm/io/iostream.hpp>
 #include <modm/utils/arithmetic_traits.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -37,7 +37,7 @@ class GenericTimestamp
 {
 public:
 	typedef T Type;
-	typedef typename xpcc::ArithmeticTraits<T>::SignedType SignedType;
+	typedef typename modm::ArithmeticTraits<T>::SignedType SignedType;
 
 public:
 	/// @param time in ms
@@ -126,6 +126,6 @@ operator << (IOStream& os, const GenericTimestamp<T>& t)
 	return os;
 }
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif	// XPCC_TIMESTAMP_HPP
+#endif	// MODM_TIMESTAMP_HPP

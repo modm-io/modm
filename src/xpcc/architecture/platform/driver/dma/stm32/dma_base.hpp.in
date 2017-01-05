@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32F3_DMA_BASE_HPP
-#define XPCC_STM32F3_DMA_BASE_HPP
+#ifndef MODM_STM32F3_DMA_BASE_HPP
+#define MODM_STM32F3_DMA_BASE_HPP
 
 #include <stdint.h>
 #include "type_ids.hpp"
@@ -24,7 +24,7 @@
 	%% set reg_prefix = "DMA_CCR"
 %% endif
 
-namespace xpcc
+namespace modm
 {
 
 namespace stm32
@@ -188,7 +188,7 @@ protected:
 
 }	// namespace stm32
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif	// XPCC_STM32F3_DMA_BASE_HPP
+#endif	// MODM_STM32F3_DMA_BASE_HPP
 

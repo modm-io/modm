@@ -1,11 +1,11 @@
 #include <modm/architecture/architecture.hpp>
 #include <modm/debug/logger.hpp>
 
-#include <xpcc_build_info.hpp>
+#include <modm_build_info.hpp>
 
 // Set the log level
-#undef	XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::INFO
+#undef	MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::INFO
 
 // SDLMain will generate WinMain function and call main bellow
 int main(int argc, char** argv)
@@ -18,11 +18,11 @@ int main(int argc, char** argv)
 	freopen ("CON", "r", stdin);
 	freopen ("CON", "a", stderr);
 
-	// Let's print some information that is provided in the xpcc_build_info.hpp
-	XPCC_LOG_INFO << "Machine:  " << XPCC_BUILD_MACHINE << xpcc::endl;
-	XPCC_LOG_INFO << "User:     " << XPCC_BUILD_USER << xpcc::endl;
-	XPCC_LOG_INFO << "Os:       " << XPCC_BUILD_OS << xpcc::endl;
-	XPCC_LOG_INFO << "Compiler: " << XPCC_BUILD_COMPILER << xpcc::endl;
+	// Let's print some information that is provided in the modm_build_info.hpp
+	MODM_LOG_INFO << "Machine:  " << MODM_BUILD_MACHINE << modm::endl;
+	MODM_LOG_INFO << "User:     " << MODM_BUILD_USER << modm::endl;
+	MODM_LOG_INFO << "Os:       " << MODM_BUILD_OS << modm::endl;
+	MODM_LOG_INFO << "Compiler: " << MODM_BUILD_COMPILER << modm::endl;
 
 	return 0;
 }

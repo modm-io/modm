@@ -17,7 +17,7 @@
 
 xpcc::Postman::DeliverInfo
 FakePostman::deliverPacket(const xpcc::Header& header,
-			const xpcc::SmartPointer& payload)
+			const modm::SmartPointer& payload)
 {
 	this->messagesToDeliver.append(Message(header, payload));
 	

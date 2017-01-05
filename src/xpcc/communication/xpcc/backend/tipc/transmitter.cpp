@@ -40,7 +40,7 @@ xpcc::tipc::Transmitter::setDomainId(unsigned int id)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::tipc::Transmitter::transmitRequest( uint8_t destination, const SmartPointer& payload )
+xpcc::tipc::Transmitter::transmitRequest( uint8_t destination, const modm::SmartPointer& payload )
 {
 	this->tipcTransmitterSocket_.transmitPayload(
 			REQUEST_OFFSET + destination + TYPE_ID_OFFSET,
@@ -52,7 +52,7 @@ xpcc::tipc::Transmitter::transmitRequest( uint8_t destination, const SmartPointe
 
 // ----------------------------------------------------------------------------
 void
-xpcc::tipc::Transmitter::transmitEvent( uint8_t event, const SmartPointer& payload )
+xpcc::tipc::Transmitter::transmitEvent( uint8_t event, const modm::SmartPointer& payload )
 {
 	this->tipcTransmitterSocket_.transmitPayload(
 			EVENT_OFFSET + event + TYPE_ID_OFFSET,

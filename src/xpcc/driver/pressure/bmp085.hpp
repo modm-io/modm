@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_BMP085_HPP
-#define XPCC_BMP085_HPP
+#ifndef MODM_BMP085_HPP
+#define MODM_BMP085_HPP
 
 #include <modm/processing/protothread.hpp>
 #include <modm/processing/resumable.hpp>
@@ -20,16 +20,16 @@
 
 #include "bmp085_data.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 struct bmp085
 {
 
-using Calibration = xpcc::bmp085data::Calibration;
-using Data = xpcc::bmp085data::Data;
-using DataBase = xpcc::bmp085data::DataBase;
-using DataDouble = xpcc::bmp085data::DataDouble;
+using Calibration = modm::bmp085data::Calibration;
+using Data = modm::bmp085data::Data;
+using DataBase = modm::bmp085data::DataBase;
+using DataDouble = modm::bmp085data::DataDouble;
 
 protected:
 	/// @cond
@@ -115,7 +115,7 @@ protected:
  * @tparam I2cMaster I2C interface
  */
 template < typename I2cMaster >
-class Bmp085 : public bmp085, public xpcc::I2cDevice<I2cMaster, 1>
+class Bmp085 : public bmp085, public modm::I2cDevice<I2cMaster, 1>
 {
 public:
 	/**
@@ -126,11 +126,11 @@ public:
 
 	// MARK: - TASKS
 	/// Reads out and stores the calibration bytes
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	initialize(Mode mode = Mode::Standard);
 
 	/// Do a readout sequence to convert and read temperature and then pressure from sensor
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	readout();
 
 	/// Configures the sensor
@@ -149,7 +149,7 @@ public:
 
 private:
 	DataBase &data;
-	xpcc::ShortTimeout timeout;
+	modm::ShortTimeout timeout;
 
 	/**
 	 * Maximum conversion time for pressure from datasheet for
@@ -163,8 +163,8 @@ private:
 	uint8_t bufferedMode;
 };
 
-} // namespace xpcc
+} // namespace modm
 
 #include "bmp085_impl.hpp"
 
-#endif // XPCC_BMP085_HPP
+#endif // MODM_BMP085_HPP

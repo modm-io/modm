@@ -13,13 +13,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_LINKED_LIST_HPP
-#define	XPCC_LINKED_LIST_HPP
+#ifndef	MODM_LINKED_LIST_HPP
+#define	MODM_LINKED_LIST_HPP
 
 #include <stdint.h>
 #include <modm/utils/allocator.hpp>
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	Singly-linked list
@@ -29,7 +29,7 @@ namespace xpcc
 	 * 
 	 * \tparam	T			Type of list entries
 	 * \tparam	Allocator	Allocator used for memory allocation. See
-	 * 						classes from xpcc::allocator namespace.
+	 * 						classes from modm::allocator namespace.
 	 * 
 	 * \author	Fabian Greif
 	 * \ingroup	container
@@ -236,4 +236,4 @@ namespace xpcc
 #include "linked_list_impl.hpp"
 #include "linked_list_iterator_impl.hpp"
 
-#endif	// XPCC_LINKED_LIST_HPP
+#endif	// MODM_LINKED_LIST_HPP

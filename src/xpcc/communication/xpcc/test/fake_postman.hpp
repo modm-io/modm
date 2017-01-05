@@ -32,13 +32,13 @@ class FakePostman : public xpcc::Postman
 public:
 	virtual DeliverInfo
 	deliverPacket(const xpcc::Header& header,
-			const xpcc::SmartPointer& payload);
+			const modm::SmartPointer& payload);
 	
 	virtual bool
 	isComponentAvailable(uint8_t component) const;
 	
 public:
-	xpcc::LinkedList<Message> messagesToDeliver;
+	modm::LinkedList<Message> messagesToDeliver;
 	
 	TestingComponent1 *component1;	///< must be created external!
 	TestingComponent2 *component2;	///< must be created external!

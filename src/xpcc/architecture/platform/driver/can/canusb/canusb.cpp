@@ -22,15 +22,15 @@
 #include <modm/driver/can/can_lawicel_formatter.hpp>
 #include "canusb.hpp"
 
-#undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::INFO
+#undef  MODM_LOG_LEVEL
+#define MODM_LOG_LEVEL modm::log::INFO
 
-xpcc::hosted::CanUsb::CanUsb()
+modm::hosted::CanUsb::CanUsb()
 :	active(false), busState(BusState::Off)
 {
 }
 
-xpcc::hosted::CanUsb::~CanUsb()
+modm::hosted::CanUsb::~CanUsb()
 {
 	if (this->active)
 	{
@@ -50,7 +50,7 @@ xpcc::hosted::CanUsb::~CanUsb()
 }
 
 bool
-xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int serialBaudRate, xpcc::Can::Bitrate canBitrate)
+modm::hosted::CanUsb::open(std::string deviceName, unsigned int serialBaudRate, modm::Can::Bitrate canBitrate)
 {
 	if (this->serialPort.isOpen())
 		this->serialPort.close();
@@ -65,11 +65,11 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int serialBaudRate, 
 
 	if (this->serialPort.open())
 	{
-		XPCC_LOG_DEBUG << XPCC_FILE_INFO << "SerialPort opened in canusb" << xpcc::endl;
-		XPCC_LOG_DEBUG << XPCC_FILE_INFO << "write 'C'" << xpcc::endl;
+		MODM_LOG_DEBUG << MODM_FILE_INFO << "SerialPort opened in canusb" << modm::endl;
+		MODM_LOG_DEBUG << MODM_FILE_INFO << "write 'C'" << modm::endl;
 		this->serialPort.write("C\r");
 
-		xpcc::ShortTimeout timeout;
+		modm::ShortTimeout timeout;
 		timeout.restart(500);
 		while (!timeout.isExpired())
 		{
@@ -79,7 +79,7 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int serialBaudRate, 
 		while( this->serialPort.read(a) );
 
 		// Set CAN bitrate
-		XPCC_LOG_DEBUG << XPCC_FILE_INFO << "Set CAN bitrate" << xpcc::endl;
+		MODM_LOG_DEBUG << MODM_FILE_INFO << "Set CAN bitrate" << modm::endl;
 		
 		switch (canBitrate)
 		{
@@ -116,7 +116,7 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int serialBaudRate, 
 		{
 			if (timeout.isExpired())
 			{
-				XPCC_LOG_DEBUG << XPCC_FILE_INFO << "Timer expired" << xpcc::endl;
+				MODM_LOG_DEBUG << MODM_FILE_INFO << "Timer expired" << modm::endl;
 				this->serialPort.close();
 				while (this->serialPort.isOpen())
 				{
@@ -127,7 +127,7 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int serialBaudRate, 
 		}
 		if (a != '\r')
 		{
-			XPCC_LOG_ERROR << XPCC_FILE_INFO << "Wrong answer on set CAN bitrate: " << xpcc::hex << (int) a	<< xpcc::endl;
+			MODM_LOG_ERROR << MODM_FILE_INFO << "Wrong answer on set CAN bitrate: " << modm::hex << (int) a	<< modm::endl;
 			this->serialPort.close();
 			while (this->serialPort.isOpen())
 			{
@@ -138,13 +138,13 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int serialBaudRate, 
 		
 		// Open CAN channel
 		this->serialPort.write("O\r");
-		XPCC_LOG_DEBUG << XPCC_FILE_INFO << "written 'O'" << xpcc::endl;
+		MODM_LOG_DEBUG << MODM_FILE_INFO << "written 'O'" << modm::endl;
 		timeout.restart(500);
 		while (!this->serialPort.read(a))
 		{
 			if (timeout.isExpired())
 			{
-				XPCC_LOG_DEBUG << XPCC_FILE_INFO << "Timer expired" << xpcc::endl;
+				MODM_LOG_DEBUG << MODM_FILE_INFO << "Timer expired" << modm::endl;
 				this->serialPort.close();
 				while (this->serialPort.isOpen())
 				{
@@ -156,7 +156,7 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int serialBaudRate, 
 
 		if (a != '\r')
 		{
-			XPCC_LOG_ERROR << XPCC_FILE_INFO << "Wrong answer on O: " << xpcc::hex << (int) a << xpcc::endl;
+			MODM_LOG_ERROR << MODM_FILE_INFO << "Wrong answer on O: " << modm::hex << (int) a << modm::endl;
 			this->serialPort.close();
 			while (this->serialPort.isOpen())
 			{
@@ -170,7 +170,7 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int serialBaudRate, 
 			this->active = true;
 		}
 		this->thread = new boost::thread(
-				boost::bind(&xpcc::hosted::CanUsb::update, this));
+				boost::bind(&modm::hosted::CanUsb::update, this));
 
 		busState = BusState::Connected;
 		this->tmpRead.clear();
@@ -179,13 +179,13 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int serialBaudRate, 
 	else
 	{
 		busState = BusState::Off;
-		XPCC_LOG_ERROR << XPCC_FILE_INFO << "Could not open Canusb" << xpcc::endl;
+		MODM_LOG_ERROR << MODM_FILE_INFO << "Could not open Canusb" << modm::endl;
 		return false;
 	}
 }
 
 void
-xpcc::hosted::CanUsb::close()
+modm::hosted::CanUsb::close()
 {
 	this->serialPort.write("C\r");
 	{
@@ -200,14 +200,14 @@ xpcc::hosted::CanUsb::close()
 	busState = BusState::Off;
 }
 
-xpcc::Can::BusState
-xpcc::hosted::CanUsb::getBusState()
+modm::Can::BusState
+modm::hosted::CanUsb::getBusState()
 {
 	return busState;
 }
 
 bool
-xpcc::hosted::CanUsb::getMessage(can::Message& message)
+modm::hosted::CanUsb::getMessage(can::Message& message)
 {
 	if (!this->readBuffer.empty())
 	{
@@ -222,14 +222,14 @@ xpcc::hosted::CanUsb::getMessage(can::Message& message)
 }
 
 bool
-xpcc::hosted::CanUsb::sendMessage(const can::Message& message)
+modm::hosted::CanUsb::sendMessage(const can::Message& message)
 {
 	char str[128];
-	xpcc::CanLawicelFormatter::convertToString(message, str);
-	XPCC_LOG_DEBUG.printf("Sending ");
+	modm::CanLawicelFormatter::convertToString(message, str);
+	MODM_LOG_DEBUG.printf("Sending ");
 	char *p = str;
 	while (*p != '\0') {
-		XPCC_LOG_DEBUG.printf("%02x %c, ", *p, *p);
+		MODM_LOG_DEBUG.printf("%02x %c, ", *p, *p);
 		++p;
 	}
 	this->serialPort.write(str);
@@ -238,14 +238,14 @@ xpcc::hosted::CanUsb::sendMessage(const can::Message& message)
 }
 
 void
-xpcc::hosted::CanUsb::update()
+modm::hosted::CanUsb::update()
 {
 	while (1)
 	{
 		char a;
 		if (this->serialPort.read(a))
 		{
-			XPCC_LOG_DEBUG.printf("Received %02x\n", a);
+			MODM_LOG_DEBUG.printf("Received %02x\n", a);
 			if (a == 'T' || a == 't' || a == 'r' || a == 'R')
 			{
 				this->tmpRead.clear();
@@ -253,7 +253,7 @@ xpcc::hosted::CanUsb::update()
 			this->tmpRead += a;
 
 			can::Message message;
-			if (xpcc::CanLawicelFormatter::convertToCanMessage(
+			if (modm::CanLawicelFormatter::convertToCanMessage(
 					this->tmpRead.c_str(), message))
 			{
 				this->readBuffer.push(message);

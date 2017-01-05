@@ -10,10 +10,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_AT45DB0X1D_HPP
-#define XPCC_AT45DB0X1D_HPP
+#ifndef MODM_AT45DB0X1D_HPP
+#define MODM_AT45DB0X1D_HPP
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \see		At45db0x1d
@@ -306,4 +306,4 @@ namespace xpcc
 
 #include "at45db0x1d_impl.hpp"
 
-#endif // XPCC_AT45DB0X1D_HPP
+#endif // MODM_AT45DB0X1D_HPP

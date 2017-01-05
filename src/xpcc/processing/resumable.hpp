@@ -42,7 +42,7 @@
  *
  * typedef GpioOutputB0 Led;
  *
- * class BlinkingLight : public xpcc::pt::Protothread, private xpcc::NestedResumable<2>
+ * class BlinkingLight : public modm::pt::Protothread, private modm::NestedResumable<2>
  * {
  * public:
  *     bool
@@ -68,7 +68,7 @@
  *         PT_END();
  *     }
  *
- *     xpcc::ResumableResult<bool>
+ *     modm::ResumableResult<bool>
  *     waitForTimer()
  *     {
  *         RF_BEGIN();
@@ -83,7 +83,7 @@
  *         RF_END_RETURN(false);
  *     }
  *
- *     xpcc::ResumableResult<bool>
+ *     modm::ResumableResult<bool>
  *     setTimer(uint16_t timeout)
  *     {
  *         RF_BEGIN();
@@ -99,7 +99,7 @@
  *     }
  *
  * private:
- *     xpcc::ShortTimeout timeout;
+ *     modm::ShortTimeout timeout;
  * };
  *
  *
@@ -111,7 +111,7 @@
  * }
  * @endcode
  *
- * For other examples take a look in the `examples` folder in the XPCC
+ * For other examples take a look in the `examples` folder in the MODM
  * root folder.
  */
 

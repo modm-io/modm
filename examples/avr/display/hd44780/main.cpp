@@ -14,7 +14,7 @@
 #include <modm/architecture/architecture.hpp>
 #include <modm/driver/display.hpp>
 
-using namespace xpcc::atmega;
+using namespace modm::atmega;
 
 // define the pins used by the LCD
 namespace lcd
@@ -33,10 +33,10 @@ namespace lcd
 // The driver will handle it internally.
 
 // create a LCD object with an 8bit data port
-xpcc::Hd44780< lcd::Data8Bit, lcd::Rw, lcd::Rs, lcd::E > display(20, 4);
+modm::Hd44780< lcd::Data8Bit, lcd::Rw, lcd::Rs, lcd::E > display(20, 4);
 
 // create a LCD object with an 4bit data port
-//xpcc::Hd44780< lcd::Data4Bit, lcd::Rw, lcd::Rs, lcd::E > display(20, 4);
+//modm::Hd44780< lcd::Data4Bit, lcd::Rw, lcd::Rs, lcd::E > display(20, 4);
 
 int
 main()
@@ -46,7 +46,7 @@ main()
 
 	// The LCD needs at least 50ms after power-up until it can be
 	// initialized. To make sure this is met we wait here
-	xpcc::delayMilliseconds(50);
+	modm::delayMilliseconds(50);
 
 	display.initialize();
 	display.setCursor(0, 0);
@@ -64,6 +64,6 @@ main()
 
 		counter++;
 
-		xpcc::delayMilliseconds(200);
+		modm::delayMilliseconds(200);
 	}
 }

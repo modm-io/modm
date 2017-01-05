@@ -9,14 +9,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_UI_INDICATOR_HPP
-#define XPCC_UI_INDICATOR_HPP
+#ifndef MODM_UI_INDICATOR_HPP
+#define MODM_UI_INDICATOR_HPP
 
 #include <stdint.h>
 #include "key_frame.hpp"
 #include <modm/utils/arithmetic_traits.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 namespace ui
@@ -45,14 +45,14 @@ public:
 	/// constructs an indicator with a period of 1s
 	Indicator(Animation<T> &animator)
 	:	animator(animator), frames{
-			xpcc::ui::KeyFrame<T>(75, xpcc::ArithmeticTraits<T>::max),
-			xpcc::ui::KeyFrame<T>(375, xpcc::ArithmeticTraits<T>::max),
-			xpcc::ui::KeyFrame<T>(115, xpcc::ArithmeticTraits<T>::min),
-			xpcc::ui::KeyFrame<T>(435, xpcc::ArithmeticTraits<T>::min)
+			modm::ui::KeyFrame<T>(75, modm::ArithmeticTraits<T>::max),
+			modm::ui::KeyFrame<T>(375, modm::ArithmeticTraits<T>::max),
+			modm::ui::KeyFrame<T>(115, modm::ArithmeticTraits<T>::min),
+			modm::ui::KeyFrame<T>(435, modm::ArithmeticTraits<T>::min)
 		}
 	{
 		this->animator.setKeyFrames(frames, 4);
-		this->animator.setMode(xpcc::ui::KeyFrameAnimationMode::Repeat);
+		this->animator.setMode(modm::ui::KeyFrameAnimationMode::Repeat);
 	}
 
 	/// @param	period		in ms
@@ -119,17 +119,17 @@ public:
 	}
 
 private:
-	xpcc::ui::KeyFrameAnimation<T> animator;
+	modm::ui::KeyFrameAnimation<T> animator;
 	// 1. fade up to max
 	// 2. stay at max
 	// 3. fade down to min
 	// 4. stay at min
 	// (cycle)
-	xpcc::ui::KeyFrame<T> frames[4];
+	modm::ui::KeyFrame<T> frames[4];
 };
 
 }
 
 }
 
-#endif	// XPCC_UI_INDICATOR_HPP
+#endif	// MODM_UI_INDICATOR_HPP

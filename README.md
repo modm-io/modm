@@ -1,18 +1,18 @@
-# xpcc: C++ microcontroller framework <span style="float:right;"><a href="https://travis-ci.org/roboterclubaachen/xpcc" style="border-bottom:none">![Build Status](https://travis-ci.org/roboterclubaachen/xpcc.svg?branch=develop)</a></span>
+# modm: C++ microcontroller framework <span style="float:right;"><a href="https://travis-ci.org/roboterclubaachen/modm" style="border-bottom:none">![Build Status](https://travis-ci.org/roboterclubaachen/modm.svg?branch=develop)</a></span>
 
-The xpcc framework consists of powerful hardware abstraction layers for many
+The modm framework consists of powerful hardware abstraction layers for many
 different microcontrollers, a set of drivers for various external targets and a general purpose toolbox for building hardware orientated applications.
 
-The main goal of xpcc is to provide a usable API for barebone microcontroller programming,
+The main goal of modm is to provide a usable API for barebone microcontroller programming,
 which is efficient enough to be deployed on a small ATtiny, yet powerful enough to make
 use of advanced capabilities found on the 32bit ARM Cortex-M.
 
-xpcc is [battle-tested](#who-we-are) in the real-world, highly competitive
+modm is [battle-tested](#who-we-are) in the real-world, highly competitive
 environment of [Eurobot][].
 It is the foundation of all of [@RCA_eV][rca]'s robot code, and is the
 culmination of many years worth of effort, experience and improvements.
 
-- [This project has a homepage](http://xpcc.io) with [install instructions][install] and a [getting started guide][guide].
+- [This project has a homepage](http://modm.io) with [install instructions][install] and a [getting started guide][guide].
 - [Feast your eyes on lots of working examples][examples].
 - [API reference is available here][reference].
 - [We have continuous integration as well][travis_ci].
@@ -24,7 +24,7 @@ This project also has [guide for developers][guide] as well as a [technical blog
 or [have a look at the archive][mailing_archive].
 - You found a bug? [Open up an issue, we don't bite][issues].
 - You want to contribute? [Read the contribution guidelines][contributing] and [open a pull request so we can merge it][prs].
-- You want to port xpcc? [Read our porting guide][porting].
+- You want to port modm? [Read our porting guide][porting].
 
 The source code is freely available under a 3-clause BSD license, so feel
 free to fork this project and adapt it to your needs.
@@ -90,7 +90,7 @@ Please see [our examples for a complete list][examples] of tested projects.
 
 ### Your target
 
-While the xpcc API is designed to be portable, we are only a small team of developers and are limited in the amount of platforms we can support and test in hardware.
+While the modm API is designed to be portable, we are only a small team of developers and are limited in the amount of platforms we can support and test in hardware.
 The following microcontrollers should be able to compile, but *have not been tested extensively* in hardware:
 
 - All AT90 targets
@@ -107,21 +107,21 @@ There are more platforms which we have prepared, but currently not finished supp
 
 ## Documentation
 
-The project homepage is located at [xpcc.io](http://xpcc.io).  
+The project homepage is located at [modm.io](http://modm.io).  
 Complete installation instructions for our build system and toolchains can [be found here][install].
 
-The API documentation is created from doxygen files in the doc-folder and can be found [online here](http://xpcc.io/api/modules.html).  
+The API documentation is created from doxygen files in the doc-folder and can be found [online here](http://modm.io/api/modules.html).  
 If you want to have up-to-date documentation of the develop branch, execute `scons doc`
-in the xpcc root directory and the current development documentation will be available
-in `xpcc/doc/build/api/index.html`.
+in the modm root directory and the current development documentation will be available
+in `modm/doc/build/api/index.html`.
 
-xpcc also has [a blog for in-depth write ups](http://blog.xpcc.io) of the programming techniques used.
+modm also has [a blog for in-depth write ups](http://blog.modm.io) of the programming techniques used.
 
 ## How can I contribute?
 
-The easiest way for you and the best way for us to see if something is unclear or missing, is if you use the library and [give us some feedback](http://mailman.rwth-aachen.de/mailman/listinfo/xpcc-dev).
+The easiest way for you and the best way for us to see if something is unclear or missing, is if you use the library and [give us some feedback](http://mailman.rwth-aachen.de/mailman/listinfo/modm-dev).
 
-You may of course [file a bug report](https://github.com/roboterclubaachen/xpcc/issues) or if you have a fix already, [open a pull request](https://github.com/roboterclubaachen/xpcc/pulls).
+You may of course [file a bug report](https://github.com/roboterclubaachen/modm/issues) or if you have a fix already, [open a pull request](https://github.com/roboterclubaachen/modm/pulls).
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for our contributing guidelines.
 
@@ -129,9 +129,9 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for our contributing guidelines.
 
 During the last decade the [Roboterclub Aachen e.V.][rca_ev] has developed a software library for communication among components that are distributed on PCs and microcontrollers. This library was used in autonomous robots for the [Eurobot competition][eurobot].
 
-In 2009, xpcc became a separate project and since then focussed on a new approach to cross target microcontroller libraries. Over the years xpcc grew from a communication library to a general purpose framework suitable for all kinds of embedded applications.
+In 2009, modm became a separate project and since then focussed on a new approach to cross target microcontroller libraries. Over the years modm grew from a communication library to a general purpose framework suitable for all kinds of embedded applications.
 
-The xpcc project is maintained by
+The modm project is maintained by
 Niklas Hauser ([@salkinium](https://github.com/salkinium)) and
 Kevin Läufer ([@ekiwi](https://github.com/ekiwi)) with significant contributions from
 Fabian Greif ([@dergraaf](https://github.com/dergraaf)),
@@ -157,7 +157,7 @@ Sascha Schade [@strongly-typed](https://github.com/strongly-typed), [@georgi-g](
 
 <dt>examples</dt>
 <dd>
-  Example projects that show the usage of parts of the xpcc library. These
+  Example projects that show the usage of parts of the modm library. These
   projects are always up to date and are tested to compile before a
   release.
 </dd>
@@ -170,7 +170,7 @@ Sascha Schade [@strongly-typed](https://github.com/strongly-typed), [@georgi-g](
 
 <dt>scons</dt>
 <dd>
-  SCons tools (e.g. xpcc.py for the build process, avr.py for compiling for
+  SCons tools (e.g. modm.py for the build process, avr.py for compiling for
   AVR microcontrollers, arm.py for compiling for Cortex-M3/4, etc.)
 
   Look at the SConstruct files in the example folder and the online
@@ -179,12 +179,12 @@ Sascha Schade [@strongly-typed](https://github.com/strongly-typed), [@georgi-g](
 
 <dt>src</dt>
 <dd>
-  Source files for the xpcc library
+  Source files for the modm library
 </dd>
 
 <dt>templates</dt>
 <dd>
-  Template files for xpcc, Unit-Tests etc.
+  Template files for modm, Unit-Tests etc.
 </dd>
 
 <dt>tools</dt>
@@ -196,21 +196,21 @@ Sascha Schade [@strongly-typed](https://github.com/strongly-typed), [@georgi-g](
 </dd>
 </dl>
 
-[prs]: https://github.com/roboterclubaachen/xpcc/pulls
-[contributing]: https://github.com/roboterclubaachen/xpcc/tree/develop/CONTRIBUTING.md
-[porting]: https://github.com/roboterclubaachen/xpcc/blob/develop/PORTING.md
-[issues]: https://github.com/roboterclubaachen/xpcc/issues
+[prs]: https://github.com/roboterclubaachen/modm/pulls
+[contributing]: https://github.com/roboterclubaachen/modm/tree/develop/CONTRIBUTING.md
+[porting]: https://github.com/roboterclubaachen/modm/blob/develop/PORTING.md
+[issues]: https://github.com/roboterclubaachen/modm/issues
 [rca_ev]: http://www.roboterclub.rwth-aachen.de/
 [eurobot]: http://www.eurobot.org/
-[travis_ci]: https://travis-ci.org/roboterclubaachen/xpcc
-[testing]: http://xpcc.io/guide/testing
-[mailing_archive]: https://www.mail-archive.com/xpcc-dev@lists.rwth-aachen.de
-[examples]: https://github.com/roboterclubaachen/xpcc/tree/develop/examples
-[mailing_list]: http://mailman.rwth-aachen.de/mailman/listinfo/xpcc-dev
-[guide]: http://xpcc.io/guide/getting-started
-[install]: http://xpcc.io/installation
-[reference]: http://xpcc.io/reference/api
-[blog]: http://blog.xpcc.io
+[travis_ci]: https://travis-ci.org/roboterclubaachen/modm
+[testing]: http://modm.io/guide/testing
+[mailing_archive]: https://www.mail-archive.com/modm-dev@lists.rwth-aachen.de
+[examples]: https://github.com/roboterclubaachen/modm/tree/develop/examples
+[mailing_list]: http://mailman.rwth-aachen.de/mailman/listinfo/modm-dev
+[guide]: http://modm.io/guide/getting-started
+[install]: http://modm.io/installation
+[reference]: http://modm.io/reference/api
+[blog]: http://blog.modm.io
 [rca]: http://www.roboterclub.rwth-aachen.de
 
 [Arduino Uno]: https://www.arduino.cc/en/Main/ArduinoBoardUno

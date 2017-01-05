@@ -21,7 +21,7 @@ namespace bitmap
 	/**
 	 * \brief	Generated bitmap
 	 *
-	 * Generated from file "src/xpcc/ui/display/image/skull_64x64.pbm".
+	 * Generated from file "src/modm/ui/display/image/skull_64x64.pbm".
 	 *
 	 * - Width  : 64
 	 * - Height : 64

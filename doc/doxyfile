@@ -26,7 +26,7 @@ DOXYFILE_ENCODING      = UTF-8
 # identify the project. Note that if you do not use Doxywizard you need
 # to put quotes around the project name if it contains spaces.
 
-PROJECT_NAME           = xpcc
+PROJECT_NAME           = modm
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number.
 # This could be handy for archiving the generated documentation or
@@ -140,9 +140,9 @@ STRIP_FROM_PATH        =
 # are normally passed to the compiler using the -I flag.
 
 STRIP_FROM_INC_PATH    = ../src/ \
-                         ../build/avr/basic/libxpcc/generated_platform/ \
-                         ../build/avr/blinking/libxpcc/generated_platform/ \
-                         ../build/stm32f4_discovery/blink/libxpcc/generated_platform/
+                         ../build/avr/basic/libmodm/generated_platform/ \
+                         ../build/avr/blinking/libmodm/generated_platform/ \
+                         ../build/stm32f4_discovery/blink/libmodm/generated_platform/
 
 # If the SHORT_NAMES tag is set to YES, doxygen will generate much shorter
 # (but less readable) file names. This can be useful if your file system
@@ -665,9 +665,9 @@ WARN_LOGFILE           =
 # with spaces.
 
 INPUT                  = ../src/ \
-                         ../build/avr/basic/libxpcc/generated_platform/ \
-                         ../build/avr/blinking/libxpcc/generated_platform/ \
-                         ../build/stm32f4_discovery/blink/libxpcc/generated_platform/ \
+                         ../build/avr/basic/libmodm/generated_platform/ \
+                         ../build/avr/blinking/libmodm/generated_platform/ \
+                         ../build/stm32f4_discovery/blink/libmodm/generated_platform/ \
                          .
 
 # This tag can be used to specify the character encoding of the source files
@@ -1137,7 +1137,7 @@ GENERATE_ECLIPSEHELP   = YES
 # the directory name containing the HTML and XML files should also have
 # this name.
 
-ECLIPSE_DOC_ID         = org.roboterclubaachen.xpcc
+ECLIPSE_DOC_ID         = org.roboterclubaachen.modm
 
 # The DISABLE_INDEX tag can be used to turn on/off the condensed index (tabs)
 # at top of each HTML page. The value NO (the default) enables the index and
@@ -1542,14 +1542,14 @@ INCLUDE_FILE_PATTERNS  =
 PREDEFINED             = __DOXYGEN__ \
                          __cplusplus \
                          "EXTERN_FLASH_STORAGE(x):=const x" \
-                         xpcc_always_inline=inline \
-                         "XPCC_FLAGS8(x):=typedef xpcc::Flags8< x > x ## _t" \
-                         "XPCC_FLAGS16(x):=typedef xpcc::Flags16< x > x ## _t" \
-                         "XPCC_FLAGS32(x):=typedef xpcc::Flags32< x > x ## _t" \
-                         XPCC_TYPE_FLAGS(x)= \
-                         XPCC_INT_TYPE_FLAGS(x)= \
+                         modm_always_inline=inline \
+                         "MODM_FLAGS8(x):=typedef modm::Flags8< x > x ## _t" \
+                         "MODM_FLAGS16(x):=typedef modm::Flags16< x > x ## _t" \
+                         "MODM_FLAGS32(x):=typedef modm::Flags32< x > x ## _t" \
+                         MODM_TYPE_FLAGS(x)= \
+                         MODM_INT_TYPE_FLAGS(x)= \
                          __attribute__(x)= \
-                         xpcc_packed=
+                         modm_packed=
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then
 # this tag can be used to specify a list of macro names that should be expanded.

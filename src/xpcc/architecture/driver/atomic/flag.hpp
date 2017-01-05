@@ -11,12 +11,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_ATOMIC_FLAG_HPP
-#define	XPCC_ATOMIC_FLAG_HPP
+#ifndef	MODM_ATOMIC_FLAG_HPP
+#define	MODM_ATOMIC_FLAG_HPP
 
 #include "lock.hpp"
 
-namespace xpcc
+namespace modm
 {
 	namespace atomic
 	{
@@ -28,7 +28,7 @@ namespace xpcc
 		 * routine and the main-loop. 
 		 * 
 		 * \code
-		 * xpcc::atomic::Flag isrFlag;
+		 * modm::atomic::Flag isrFlag;
 		 * 
 		 * ISR() {
 		 *     ...
@@ -101,4 +101,4 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC_ATOMIC_FLAG_HPP
+#endif	// MODM_ATOMIC_FLAG_HPP

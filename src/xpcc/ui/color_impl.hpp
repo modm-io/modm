@@ -9,7 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_COLOR_HPP
+#ifndef MODM_COLOR_HPP
 #	error	"Don't include this file directly, use 'color.hpp' instead!"
 #endif
 
@@ -21,10 +21,10 @@
  */
 template<typename UnderlyingType> template<typename T>
 inline void
-xpcc::color::RgbT<UnderlyingType>::toHsv(HsvT<T>* color) const
+modm::color::RgbT<UnderlyingType>::toHsv(HsvT<T>* color) const
 {
 	typedef float CalcType;
-	const CalcType maxValue = xpcc::ArithmeticTraits<T>::max;
+	const CalcType maxValue = modm::ArithmeticTraits<T>::max;
 	const CalcType _red		= static_cast<CalcType>(red) / maxValue;
 	const CalcType _blue	= static_cast<CalcType>(blue) / maxValue;
 	const CalcType _green	= static_cast<CalcType>(green) / maxValue;
@@ -68,8 +68,8 @@ xpcc::color::RgbT<UnderlyingType>::toHsv(HsvT<T>* color) const
 }
 
 template <typename UnderlyingType>
-xpcc::IOStream&
-xpcc::color::operator << ( xpcc::IOStream& os, const xpcc::color::RgbT<UnderlyingType>& color)
+modm::IOStream&
+modm::color::operator << ( modm::IOStream& os, const modm::color::RgbT<UnderlyingType>& color)
 {
 	os << color.red << "\t" << color.green << "\t" << color.blue;
 	return os;

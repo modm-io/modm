@@ -13,10 +13,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FILTER_RAMP_HPP
-#define XPCC_FILTER_RAMP_HPP
+#ifndef MODM_FILTER_RAMP_HPP
+#define MODM_FILTER_RAMP_HPP
 
-namespace xpcc
+namespace modm
 {
 	namespace filter
 	{
@@ -82,4 +82,4 @@ namespace xpcc
 
 #include "ramp_impl.hpp"
 
-#endif // XPCC_FILTER_RAMP_HPP
+#endif // MODM_FILTER_RAMP_HPP

@@ -9,10 +9,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FPGA_TYPE
-#define XPCC_FPGA_TYPE
+#ifndef MODM_FPGA_TYPE
+#define MODM_FPGA_TYPE
 
-namespace xpcc
+namespace modm
 {
 
 struct Xilinx

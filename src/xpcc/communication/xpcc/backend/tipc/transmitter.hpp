@@ -47,10 +47,10 @@ namespace xpcc
 			setDomainId( unsigned int id );
 
 			void
-			transmitRequest( uint8_t destination, const SmartPointer& payload );
+			transmitRequest( uint8_t destination, const modm::SmartPointer& payload );
 
 			void
-			transmitEvent( uint8_t event, const SmartPointer& payload );
+			transmitEvent( uint8_t event, const modm::SmartPointer& payload );
 
 			uint32_t
 			getPortId();

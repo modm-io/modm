@@ -14,8 +14,8 @@
 #include "ad7280a.hpp"
 
 // ----------------------------------------------------------------------------
-xpcc::IOStream&
-xpcc::operator << (xpcc::IOStream& s, const ad7280a::RegisterValue& c)
+modm::IOStream&
+modm::operator << (modm::IOStream& s, const ad7280a::RegisterValue& c)
 {
 	s	<< " (dev=" << c.device
 		<< ", reg=" << c.registerAddress
@@ -26,8 +26,8 @@ xpcc::operator << (xpcc::IOStream& s, const ad7280a::RegisterValue& c)
 }
 
 // ----------------------------------------------------------------------------
-xpcc::IOStream&
-xpcc::operator << (xpcc::IOStream& s, const ad7280a::ConversionValue& c)
+modm::IOStream&
+modm::operator << (modm::IOStream& s, const ad7280a::ConversionValue& c)
 {
 	s	<< " (dev=" << c.device
 		<< ", ch =" << c.channel

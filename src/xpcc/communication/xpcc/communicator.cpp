@@ -30,8 +30,8 @@ xpcc::Communicator::callAction(uint8_t receiver, uint8_t actionIdentifier)
 			receiver,
 			this->ownIdentifier,
 			actionIdentifier);
-	
-	SmartPointer payload;
+
+	modm::SmartPointer payload;
 	this->dispatcher.addMessage(header, payload);
 }
 
@@ -42,8 +42,8 @@ xpcc::Communicator::callAction(uint8_t receiver, uint8_t actionIdentifier, Respo
 			receiver,
 			this->ownIdentifier,
 			actionIdentifier);
-	
-	SmartPointer payload;
+
+	modm::SmartPointer payload;
 	this->dispatcher.addMessage(header, payload, responseCallback);
 }
 
@@ -55,8 +55,8 @@ xpcc::Communicator::publishEvent(uint8_t eventIdentifier)
 			0,
 			this->ownIdentifier,
 			eventIdentifier);
-	
-	SmartPointer payload;
+
+	modm::SmartPointer payload;
 	this->dispatcher.addMessage(header, payload);
 }
 
@@ -68,8 +68,8 @@ xpcc::Communicator::sendResponse(const ResponseHandle& handle)
 			handle.destination,
 			this->ownIdentifier,
 			handle.packetIdentifier);
-	
-	SmartPointer payload;
+
+	modm::SmartPointer payload;
 	this->dispatcher.addResponse(header, payload);
 }
 
@@ -80,7 +80,7 @@ xpcc::Communicator::sendNegativeResponse(const ResponseHandle& handle)
 			handle.destination,
 			this->ownIdentifier,
 			handle.packetIdentifier);
-	
-	SmartPointer payload;
+
+	modm::SmartPointer payload;
 	this->dispatcher.addResponse(header, payload);
 }

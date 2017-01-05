@@ -12,19 +12,19 @@
 
 #include <modm/architecture/detect.hpp>
 
-#ifdef XPCC_OS_HOSTED
+#ifdef MODM_OS_HOSTED
 
 #include <modm/architecture/interface/memory.hpp>
 #include <stdlib.h>
 
 void *
-operator new(size_t size, xpcc::MemoryTraits)
+operator new(size_t size, modm::MemoryTraits)
 {
 	return ::operator new(size);
 }
 
 void *
-operator new[](size_t size, xpcc::MemoryTraits)
+operator new[](size_t size, modm::MemoryTraits)
 {
 	return ::operator new[](size);
 }

@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LOG_PREFIX_HPP
+#ifndef MODM_LOG_PREFIX_HPP
 	#error "Don't include this file directly, use 'prefix.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template <typename T, typename STYLE>
-xpcc::log::Prefix<T, STYLE>::Prefix( const T& str, STYLE style ) :
+modm::log::Prefix<T, STYLE>::Prefix( const T& str, STYLE style ) :
 	Style<STYLE> ( style ),
 	flushed ( true )
 {
@@ -25,7 +25,7 @@ xpcc::log::Prefix<T, STYLE>::Prefix( const T& str, STYLE style ) :
 }
 
 template <typename T, typename STYLE>
-xpcc::log::Prefix<T, STYLE>::Prefix( const T& str, IODevice &device ) :
+modm::log::Prefix<T, STYLE>::Prefix( const T& str, IODevice &device ) :
 	Style<STYLE> ( device ),
 	flushed ( true )
 {
@@ -35,7 +35,7 @@ xpcc::log::Prefix<T, STYLE>::Prefix( const T& str, IODevice &device ) :
 // ----------------------------------------------------------------------------
 template <typename T, typename STYLE>
 void
-xpcc::log::Prefix<T, STYLE>::write( char c )
+modm::log::Prefix<T, STYLE>::write( char c )
 {
 	if( this->flushed ) {
 		this->flushed = false;
@@ -46,7 +46,7 @@ xpcc::log::Prefix<T, STYLE>::write( char c )
 
 template <typename T, typename STYLE>
 void
-xpcc::log::Prefix<T, STYLE>::write( const char* s )
+modm::log::Prefix<T, STYLE>::write( const char* s )
 {
 	if( this->flushed ) {
 		this->flushed = false;
@@ -58,7 +58,7 @@ xpcc::log::Prefix<T, STYLE>::write( const char* s )
 // ----------------------------------------------------------------------------
 template <typename T, typename STYLE>
 void
-xpcc::log::Prefix<T, STYLE>::flush()
+modm::log::Prefix<T, STYLE>::flush()
 {
 	this->flushed = true;
 	this->Style<STYLE>::flush();

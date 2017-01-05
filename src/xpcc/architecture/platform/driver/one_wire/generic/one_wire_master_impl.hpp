@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SOFTWARE_ONE_WIRE_HPP
+#ifndef MODM_SOFTWARE_ONE_WIRE_HPP
 	#error	"Don't include this file directly, use 'software_one_wire.hpp' instead!"
 #endif
 
@@ -20,18 +20,18 @@
 #endif
 
 // ----------------------------------------------------------------------------
-template <typename Pin> Pin xpcc::SoftwareOneWireMaster<Pin>::pin;
+template <typename Pin> Pin modm::SoftwareOneWireMaster<Pin>::pin;
 
-template <typename Pin> uint8_t xpcc::SoftwareOneWireMaster<Pin>::lastDiscrepancy;
-template <typename Pin> uint8_t xpcc::SoftwareOneWireMaster<Pin>::lastFamilyDiscrepancy;
-template <typename Pin> bool    xpcc::SoftwareOneWireMaster<Pin>::lastDeviceFlag;
-template <typename Pin> uint8_t xpcc::SoftwareOneWireMaster<Pin>::crc8;
-template <typename Pin> uint8_t xpcc::SoftwareOneWireMaster<Pin>::romBuffer[8];
+template <typename Pin> uint8_t modm::SoftwareOneWireMaster<Pin>::lastDiscrepancy;
+template <typename Pin> uint8_t modm::SoftwareOneWireMaster<Pin>::lastFamilyDiscrepancy;
+template <typename Pin> bool    modm::SoftwareOneWireMaster<Pin>::lastDeviceFlag;
+template <typename Pin> uint8_t modm::SoftwareOneWireMaster<Pin>::crc8;
+template <typename Pin> uint8_t modm::SoftwareOneWireMaster<Pin>::romBuffer[8];
 
 // ----------------------------------------------------------------------------
 template <typename Pin>
 void
-xpcc::SoftwareOneWireMaster<Pin>::initialize()
+modm::SoftwareOneWireMaster<Pin>::initialize()
 {
 	pin.setInput();
 	pin.reset();
@@ -39,7 +39,7 @@ xpcc::SoftwareOneWireMaster<Pin>::initialize()
 
 template <typename Pin>
 bool
-xpcc::SoftwareOneWireMaster<Pin>::touchReset()
+modm::SoftwareOneWireMaster<Pin>::touchReset()
 {
 	delayMicroseconds(G);
 	pin.setOutput();	// drives the bus low
@@ -57,7 +57,7 @@ xpcc::SoftwareOneWireMaster<Pin>::touchReset()
 
 template <typename Pin>
 void
-xpcc::SoftwareOneWireMaster<Pin>::writeBit(bool bit)
+modm::SoftwareOneWireMaster<Pin>::writeBit(bool bit)
 {
 	if (bit)
 	{
@@ -77,7 +77,7 @@ xpcc::SoftwareOneWireMaster<Pin>::writeBit(bool bit)
 
 template <typename Pin>
 bool
-xpcc::SoftwareOneWireMaster<Pin>::readBit()
+modm::SoftwareOneWireMaster<Pin>::readBit()
 {
 	pin.setOutput();	// drives the bus low
 	delayMicroseconds(A);
@@ -95,7 +95,7 @@ xpcc::SoftwareOneWireMaster<Pin>::readBit()
 // ----------------------------------------------------------------------------
 template <typename Pin>
 void
-xpcc::SoftwareOneWireMaster<Pin>::writeByte(uint8_t data)
+modm::SoftwareOneWireMaster<Pin>::writeByte(uint8_t data)
 {
 	// Loop to write each bit in the byte, LS-bit first
 	for (uint8_t i = 0; i < 8; ++i)
@@ -107,7 +107,7 @@ xpcc::SoftwareOneWireMaster<Pin>::writeByte(uint8_t data)
 
 template <typename Pin>
 uint8_t
-xpcc::SoftwareOneWireMaster<Pin>::readByte()
+modm::SoftwareOneWireMaster<Pin>::readByte()
 {
 	uint8_t result = 0;
 	for (uint8_t i = 0; i < 8; ++i)
@@ -124,7 +124,7 @@ xpcc::SoftwareOneWireMaster<Pin>::readByte()
 // ----------------------------------------------------------------------------
 template <typename Pin>
 uint8_t
-xpcc::SoftwareOneWireMaster<Pin>::touchByte(uint8_t data)
+modm::SoftwareOneWireMaster<Pin>::touchByte(uint8_t data)
 {
 	uint8_t result = 0;
 	for (uint8_t i = 0; i < 8; ++i)
@@ -151,7 +151,7 @@ xpcc::SoftwareOneWireMaster<Pin>::touchByte(uint8_t data)
 // ----------------------------------------------------------------------------
 template <typename Pin>
 void
-xpcc::SoftwareOneWireMaster<Pin>::resetSearch()
+modm::SoftwareOneWireMaster<Pin>::resetSearch()
 {
 	// reset the search state
 	lastDiscrepancy = 0;
@@ -161,7 +161,7 @@ xpcc::SoftwareOneWireMaster<Pin>::resetSearch()
 
 template <typename Pin>
 void
-xpcc::SoftwareOneWireMaster<Pin>::resetSearch(uint8_t familyCode)
+modm::SoftwareOneWireMaster<Pin>::resetSearch(uint8_t familyCode)
 {
 	// set the search state to find family type devices
 	romBuffer[0] = familyCode;
@@ -176,7 +176,7 @@ xpcc::SoftwareOneWireMaster<Pin>::resetSearch(uint8_t familyCode)
 
 template <typename Pin>
 bool
-xpcc::SoftwareOneWireMaster<Pin>::searchNext(uint8_t *rom)
+modm::SoftwareOneWireMaster<Pin>::searchNext(uint8_t *rom)
 {
 	if (performSearch())
 	{
@@ -190,7 +190,7 @@ xpcc::SoftwareOneWireMaster<Pin>::searchNext(uint8_t *rom)
 
 template <typename Pin>
 void
-xpcc::SoftwareOneWireMaster<Pin>::searchSkipCurrentFamily()
+modm::SoftwareOneWireMaster<Pin>::searchSkipCurrentFamily()
 {
 	// set the Last discrepancy to last family discrepancy
 	lastDiscrepancy = lastFamilyDiscrepancy;
@@ -204,7 +204,7 @@ xpcc::SoftwareOneWireMaster<Pin>::searchSkipCurrentFamily()
 
 template <typename Pin>
 bool
-xpcc::SoftwareOneWireMaster<Pin>::verifyDevice(const uint8_t *rom)
+modm::SoftwareOneWireMaster<Pin>::verifyDevice(const uint8_t *rom)
 {
 	uint8_t romBufferBackup[8];
 	bool result;
@@ -253,7 +253,7 @@ xpcc::SoftwareOneWireMaster<Pin>::verifyDevice(const uint8_t *rom)
 // ----------------------------------------------------------------------------
 template <typename Pin>
 uint8_t
-xpcc::SoftwareOneWireMaster<Pin>::crcUpdate(uint8_t crc, uint8_t data)
+modm::SoftwareOneWireMaster<Pin>::crcUpdate(uint8_t crc, uint8_t data)
 {
 #ifdef __AVR__
 	return _crc_ibutton_update(crc, data);
@@ -275,7 +275,7 @@ xpcc::SoftwareOneWireMaster<Pin>::crcUpdate(uint8_t crc, uint8_t data)
 // ----------------------------------------------------------------------------
 template <typename Pin>
 bool
-xpcc::SoftwareOneWireMaster<Pin>::performSearch()
+modm::SoftwareOneWireMaster<Pin>::performSearch()
 {
 	bool searchResult = false;
 	

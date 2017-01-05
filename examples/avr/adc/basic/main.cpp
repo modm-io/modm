@@ -15,9 +15,9 @@
 
 #include <modm/io/iostream.hpp>
 
-using namespace xpcc::atmega;
-typedef xpcc::avr::SystemClock clock;
-xpcc::atmega::Uart0 uart;
+using namespace modm::atmega;
+typedef modm::avr::SystemClock clock;
+modm::atmega::Uart0 uart;
 
 
 int
@@ -32,10 +32,10 @@ main()
 	sei();
 
 	// Create a IOStream for complex formatting tasks
-	xpcc::IODeviceWrapper< Uart0, xpcc::IOBuffer::BlockIfFull > device(uart);
-	xpcc::IOStream output(device);
+	modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > device(uart);
+	modm::IOStream output(device);
 
-	output << "Welcome!" << xpcc::endl;
+	output << "Welcome!" << modm::endl;
 
 	// Initialize the analog to digital converter
 	// With the AVR running at 14.7456Mhz and a prescaler of 128 the
@@ -48,7 +48,7 @@ main()
 	uint16_t value = Adc::readChannel(0);
 
 	// send it via UART
-	output << value << xpcc::endl;
+	output << value << modm::endl;
 
 	// now lets use the asynchronous version the be able to do other stuff
 	// while waiting for the result
@@ -60,13 +60,13 @@ main()
 		if (Adc::isConversionFinished())
 		{
 			// send the result
-			output << Adc::getValue() << xpcc::endl;
+			output << Adc::getValue() << modm::endl;
 
 			// wait a bit so that the result stays readable when
 			// receiving the UART output on a PC. If you want to do further
 			// calculations with the results instead of sending it
 			// you do not need this.
-			xpcc::delayMilliseconds(300);
+			modm::delayMilliseconds(300);
 
 			// restart the conversion
 			Adc::setChannel(0);

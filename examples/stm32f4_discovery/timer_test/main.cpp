@@ -95,9 +95,9 @@ main()
     while (1)
     {
         LedBlue::set();
-        xpcc::delayMilliseconds(20);
+        modm::delayMilliseconds(20);
         LedBlue::reset();
-        xpcc::delayMilliseconds(150);
+        modm::delayMilliseconds(150);
 
 		if (restart) {
 			restart = false;
@@ -247,79 +247,79 @@ main()
     return 0;
 }
 
-XPCC_ISR(TIM2)
+MODM_ISR(TIM2)
 {
-    xpcc::stm32::Timer2::acknowledgeInterruptFlags(xpcc::stm32::Timer2::InterruptFlag::Update);
+    modm::stm32::Timer2::acknowledgeInterruptFlags(modm::stm32::Timer2::InterruptFlag::Update);
     LedGreen::toggle();
 }
 
-XPCC_ISR(TIM3)
+MODM_ISR(TIM3)
 {
-    xpcc::stm32::Timer3::acknowledgeInterruptFlags(xpcc::stm32::Timer3::InterruptFlag::Update);
+    modm::stm32::Timer3::acknowledgeInterruptFlags(modm::stm32::Timer3::InterruptFlag::Update);
     LedRed::toggle();
 }
 
-XPCC_ISR(TIM4)
+MODM_ISR(TIM4)
 {
-    xpcc::stm32::Timer4::acknowledgeInterruptFlags(xpcc::stm32::Timer4::InterruptFlag::Update);
+    modm::stm32::Timer4::acknowledgeInterruptFlags(modm::stm32::Timer4::InterruptFlag::Update);
     LedGreen::toggle();
 }
 
-XPCC_ISR(TIM5)
+MODM_ISR(TIM5)
 {
-    xpcc::stm32::Timer5::acknowledgeInterruptFlags(xpcc::stm32::Timer5::InterruptFlag::Update);
+    modm::stm32::Timer5::acknowledgeInterruptFlags(modm::stm32::Timer5::InterruptFlag::Update);
     LedRed::toggle();
 }
 
-XPCC_ISR(TIM6_DAC)
+MODM_ISR(TIM6_DAC)
 {
-    xpcc::stm32::Timer6::acknowledgeInterruptFlags(xpcc::stm32::Timer6::InterruptFlag::Update);
+    modm::stm32::Timer6::acknowledgeInterruptFlags(modm::stm32::Timer6::InterruptFlag::Update);
     LedGreen::toggle();
 }
 
-XPCC_ISR(TIM7)
+MODM_ISR(TIM7)
 {
-    xpcc::stm32::Timer7::acknowledgeInterruptFlags(xpcc::stm32::Timer7::InterruptFlag::Update);
+    modm::stm32::Timer7::acknowledgeInterruptFlags(modm::stm32::Timer7::InterruptFlag::Update);
     LedRed::toggle();
 }
 
 // For TIM8 See TIM13
 
-XPCC_ISR(TIM1_BRK_TIM9)
+MODM_ISR(TIM1_BRK_TIM9)
 {
-    xpcc::stm32::Timer9::acknowledgeInterruptFlags(xpcc::stm32::Timer9::InterruptFlag::Update);
+    modm::stm32::Timer9::acknowledgeInterruptFlags(modm::stm32::Timer9::InterruptFlag::Update);
     LedGreen::toggle();
 }
 
 // Timer 1 and 10
-XPCC_ISR(TIM1_UP_TIM10)
+MODM_ISR(TIM1_UP_TIM10)
 {
-    xpcc::stm32::Timer1::acknowledgeInterruptFlags(xpcc::stm32::Timer1::InterruptFlag::Update);
-    xpcc::stm32::Timer10::acknowledgeInterruptFlags(xpcc::stm32::Timer10::InterruptFlag::Update);
+    modm::stm32::Timer1::acknowledgeInterruptFlags(modm::stm32::Timer1::InterruptFlag::Update);
+    modm::stm32::Timer10::acknowledgeInterruptFlags(modm::stm32::Timer10::InterruptFlag::Update);
     LedRed::toggle();
 }
 
-XPCC_ISR(TIM1_TRG_COM_TIM11)
+MODM_ISR(TIM1_TRG_COM_TIM11)
 {
-    xpcc::stm32::Timer11::acknowledgeInterruptFlags(xpcc::stm32::Timer11::InterruptFlag::Update);
+    modm::stm32::Timer11::acknowledgeInterruptFlags(modm::stm32::Timer11::InterruptFlag::Update);
     LedGreen::toggle();
 }
 
-XPCC_ISR(TIM8_BRK_TIM12)
+MODM_ISR(TIM8_BRK_TIM12)
 {
-    xpcc::stm32::Timer12::acknowledgeInterruptFlags(xpcc::stm32::Timer12::InterruptFlag::Update);
+    modm::stm32::Timer12::acknowledgeInterruptFlags(modm::stm32::Timer12::InterruptFlag::Update);
     LedRed::toggle();
 }
 
-XPCC_ISR(TIM8_UP_TIM13)
+MODM_ISR(TIM8_UP_TIM13)
 {
-    xpcc::stm32::Timer8::acknowledgeInterruptFlags(xpcc::stm32::Timer8::InterruptFlag::Update);
-    xpcc::stm32::Timer13::acknowledgeInterruptFlags(xpcc::stm32::Timer13::InterruptFlag::Update);
+    modm::stm32::Timer8::acknowledgeInterruptFlags(modm::stm32::Timer8::InterruptFlag::Update);
+    modm::stm32::Timer13::acknowledgeInterruptFlags(modm::stm32::Timer13::InterruptFlag::Update);
     LedGreen::toggle();
 }
 
-XPCC_ISR(TIM8_TRG_COM_TIM14)
+MODM_ISR(TIM8_TRG_COM_TIM14)
 {
-    xpcc::stm32::Timer14::acknowledgeInterruptFlags(xpcc::stm32::Timer14::InterruptFlag::Update);
+    modm::stm32::Timer14::acknowledgeInterruptFlags(modm::stm32::Timer14::InterruptFlag::Update);
     LedRed::toggle();
 }

@@ -12,13 +12,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_DS1631_HPP
+#ifndef MODM_DS1631_HPP
 #	error	"Don't include this file directly, use 'ds1631.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template <typename I2cMaster>
-xpcc::Ds1631<I2cMaster>::Ds1631(Data &data, uint8_t address) :
+modm::Ds1631<I2cMaster>::Ds1631(Data &data, uint8_t address) :
 	I2cDevice<I2cMaster,2>(address), data(data), config(0),
 	periodTimeout(250), conversionTimeout(250), updateTime(250), conversionTime(232)
 {
@@ -26,8 +26,8 @@ xpcc::Ds1631<I2cMaster>::Ds1631(Data &data, uint8_t address) :
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Ds1631<I2cMaster>::initialize()
+modm::ResumableResult<bool>
+modm::Ds1631<I2cMaster>::initialize()
 {
 	RF_BEGIN();
 
@@ -40,7 +40,7 @@ xpcc::Ds1631<I2cMaster>::initialize()
 
 template < typename I2cMaster >
 bool
-xpcc::Ds1631<I2cMaster>::run()
+modm::Ds1631<I2cMaster>::run()
 {
 	PT_BEGIN();
 
@@ -64,8 +64,8 @@ xpcc::Ds1631<I2cMaster>::run()
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Ds1631<I2cMaster>::setUpdateRate(uint8_t rate)
+modm::ResumableResult<bool>
+modm::Ds1631<I2cMaster>::setUpdateRate(uint8_t rate)
 {
 	RF_BEGIN();
 
@@ -87,8 +87,8 @@ xpcc::Ds1631<I2cMaster>::setUpdateRate(uint8_t rate)
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Ds1631<I2cMaster>::setResolution(Resolution resolution)
+modm::ResumableResult<bool>
+modm::Ds1631<I2cMaster>::setResolution(Resolution resolution)
 {
 	RF_BEGIN();
 
@@ -98,8 +98,8 @@ xpcc::Ds1631<I2cMaster>::setResolution(Resolution resolution)
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Ds1631<I2cMaster>::setAlertPolarity(AlertPolarity polarity)
+modm::ResumableResult<bool>
+modm::Ds1631<I2cMaster>::setAlertPolarity(AlertPolarity polarity)
 {
 	RF_BEGIN();
 
@@ -109,8 +109,8 @@ xpcc::Ds1631<I2cMaster>::setAlertPolarity(AlertPolarity polarity)
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Ds1631<I2cMaster>::setConversionMode(ConversionMode mode)
+modm::ResumableResult<bool>
+modm::Ds1631<I2cMaster>::setConversionMode(ConversionMode mode)
 {
 	RF_BEGIN();
 
@@ -121,8 +121,8 @@ xpcc::Ds1631<I2cMaster>::setConversionMode(ConversionMode mode)
 
 // MARK: read temperature
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Ds1631<I2cMaster>::readTemperature()
+modm::ResumableResult<bool>
+modm::Ds1631<I2cMaster>::readTemperature()
 {
 	RF_BEGIN();
 
@@ -134,8 +134,8 @@ xpcc::Ds1631<I2cMaster>::readTemperature()
 
 // MARK: configuration
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Ds1631<I2cMaster>::writeConfiguration()
+modm::ResumableResult<bool>
+modm::Ds1631<I2cMaster>::writeConfiguration()
 {
 	RF_BEGIN();
 
@@ -148,8 +148,8 @@ xpcc::Ds1631<I2cMaster>::writeConfiguration()
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Ds1631<I2cMaster>::writeCommand(Command cmd)
+modm::ResumableResult<bool>
+modm::Ds1631<I2cMaster>::writeCommand(Command cmd)
 {
 	RF_BEGIN();
 
@@ -160,8 +160,8 @@ xpcc::Ds1631<I2cMaster>::writeCommand(Command cmd)
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Ds1631<I2cMaster>::setLimitRegister(Command cmd, float temperature)
+modm::ResumableResult<bool>
+modm::Ds1631<I2cMaster>::setLimitRegister(Command cmd, float temperature)
 {
 	RF_BEGIN();
 

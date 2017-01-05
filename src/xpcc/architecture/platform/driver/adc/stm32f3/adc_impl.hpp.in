@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32F3_ADC{{ id }}_HPP
+#ifndef MODM_STM32F3_ADC{{ id }}_HPP
 #	error 	"Don't include this file directly, use 'adc_{{ id }}.hpp' instead!"
 #endif
 %#
@@ -24,10 +24,10 @@
 %% endif
 %#
 
-#include <modm/architecture/driver/delay.hpp>	// xpcc::delayMicroseconds
+#include <modm/architecture/driver/delay.hpp>	// modm::delayMicroseconds
 
 void
-xpcc::stm32::Adc{{ id }}::initialize(const ClockMode clk, const Prescaler pre,
+modm::stm32::Adc{{ id }}::initialize(const ClockMode clk, const Prescaler pre,
 		const CalibrationMode cal, const bool blocking)
 {
 	uint32_t tmp = 0;
@@ -55,7 +55,7 @@ xpcc::stm32::Adc{{ id }}::initialize(const ClockMode clk, const Prescaler pre,
 	// enable regulator
 	ADC{{ id }}->CR &= ~ADC_CR_ADVREGEN;
 	ADC{{ id }}->CR |= static_cast<uint32_t>(VoltageRegulatorState::Enabled);
-	xpcc::delayMicroseconds(10);	// FIXME: this is ugly -> find better solution
+	modm::delayMicroseconds(10);	// FIXME: this is ugly -> find better solution
 
 	calibrate(cal, true);	// blocking calibration
 
@@ -67,7 +67,7 @@ xpcc::stm32::Adc{{ id }}::initialize(const ClockMode clk, const Prescaler pre,
 }
 
 void
-xpcc::stm32::Adc{{ id }}::disable(const bool blocking)
+modm::stm32::Adc{{ id }}::disable(const bool blocking)
 {
 	ADC{{ id }}->CR |= ADC_CR_ADDIS;
 	if (blocking) {
@@ -79,7 +79,7 @@ xpcc::stm32::Adc{{ id }}::disable(const bool blocking)
 }
 
 void
-xpcc::stm32::Adc{{ id }}::setPrescaler(const Prescaler pre)
+modm::stm32::Adc{{ id }}::setPrescaler(const Prescaler pre)
 {
 	uint32_t tmp;
 	tmp  = RCC->CFGR2;
@@ -89,13 +89,13 @@ xpcc::stm32::Adc{{ id }}::setPrescaler(const Prescaler pre)
 }
 
 bool
-xpcc::stm32::Adc{{ id }}::isReady()
+modm::stm32::Adc{{ id }}::isReady()
 {
 	return (getInterruptFlags() & InterruptFlag::Ready);
 }
 
 void
-xpcc::stm32::Adc{{ id }}::calibrate(const CalibrationMode mode,
+modm::stm32::Adc{{ id }}::calibrate(const CalibrationMode mode,
 									const bool blocking)
 {
 	if (mode != CalibrationMode::DoNotCalibrate) {
@@ -109,7 +109,7 @@ xpcc::stm32::Adc{{ id }}::calibrate(const CalibrationMode mode,
 }
 
 void
-xpcc::stm32::Adc{{ id }}::setLeftAdjustResult(const bool enable)
+modm::stm32::Adc{{ id }}::setLeftAdjustResult(const bool enable)
 {
 	if (enable) {
 		ADC{{ id }}->CFGR |= ADC_CFGR_ALIGN;
@@ -120,7 +120,7 @@ xpcc::stm32::Adc{{ id }}::setLeftAdjustResult(const bool enable)
 }
 
 void
-xpcc::stm32::Adc{{ id }}::setChannel(	const Channel channel,
+modm::stm32::Adc{{ id }}::setChannel(	const Channel channel,
 										const SampleTime sampleTime)
 {
 	uint32_t tmpreg;
@@ -144,7 +144,7 @@ xpcc::stm32::Adc{{ id }}::setChannel(	const Channel channel,
 }
 
 void
-xpcc::stm32::Adc{{ id }}::setFreeRunningMode(const bool enable)
+modm::stm32::Adc{{ id }}::setFreeRunningMode(const bool enable)
 {
 	if (enable) {
 		ADC{{ id }}->CFGR |=  ADC_CFGR_CONT; // set to continuous mode
@@ -155,7 +155,7 @@ xpcc::stm32::Adc{{ id }}::setFreeRunningMode(const bool enable)
 
 
 void
-xpcc::stm32::Adc{{ id }}::startConversion(void)
+modm::stm32::Adc{{ id }}::startConversion(void)
 {
 	// TODO: maybe add more interrupt flags
 	acknowledgeInterruptFlag(InterruptFlag::EndOfSampling | InterruptFlag::Overrun);
@@ -164,7 +164,7 @@ xpcc::stm32::Adc{{ id }}::startConversion(void)
 }
 
 bool
-xpcc::stm32::Adc{{ id }}::isConversionFinished(void)
+modm::stm32::Adc{{ id }}::isConversionFinished(void)
 {
 	return (getInterruptFlags() & InterruptFlag::EndOfSampling);
 }
@@ -175,26 +175,26 @@ xpcc::stm32::Adc{{ id }}::isConversionFinished(void)
 // below are constant the compiler is able to calculate everything at
 // compile time.
 
-#ifndef XPCC_CUSTOM_NVIC_FUNCTIONS
-#define XPCC_CUSTOM_NVIC_FUNCTIONS
+#ifndef MODM_CUSTOM_NVIC_FUNCTIONS
+#define MODM_CUSTOM_NVIC_FUNCTIONS
 
-static xpcc_always_inline void
+static modm_always_inline void
 nvicEnableInterrupt(const IRQn_Type IRQn)
 {
 	NVIC->ISER[(static_cast<uint32_t>(IRQn) >> 5)] =
 								(1 << ((uint32_t)(IRQn) & 0x1F));
 }
 
-static xpcc_always_inline void
+static modm_always_inline void
 nvicDisableInterrupt(IRQn_Type IRQn)
 {
 	NVIC_DisableIRQ(IRQn);
 }
 
-#endif // XPCC_CUSTOM_NVIC_FUNCTIONS
+#endif // MODM_CUSTOM_NVIC_FUNCTIONS
 
 void
-xpcc::stm32::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
+modm::stm32::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
 												const bool enable)
 {
 %% if id < 3
@@ -212,25 +212,25 @@ xpcc::stm32::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
 }
 
 void
-xpcc::stm32::Adc{{ id }}::enableInterrupt(const Interrupt_t interrupt)
+modm::stm32::Adc{{ id }}::enableInterrupt(const Interrupt_t interrupt)
 {
 	ADC{{ id }}->IER |= interrupt.value;
 }
 
 void
-xpcc::stm32::Adc{{ id }}::disableInterrupt(const Interrupt_t interrupt)
+modm::stm32::Adc{{ id }}::disableInterrupt(const Interrupt_t interrupt)
 {
 	ADC{{ id }}->IER &= ~interrupt.value;
 }
 
-xpcc::stm32::Adc{{ id }}::InterruptFlag_t
-xpcc::stm32::Adc{{ id }}::getInterruptFlags()
+modm::stm32::Adc{{ id }}::InterruptFlag_t
+modm::stm32::Adc{{ id }}::getInterruptFlags()
 {
 	return InterruptFlag_t(ADC{{ id }}->ISR);
 }
 
 void
-xpcc::stm32::Adc{{ id }}::acknowledgeInterruptFlag(const InterruptFlag_t flags)
+modm::stm32::Adc{{ id }}::acknowledgeInterruptFlag(const InterruptFlag_t flags)
 {
 	// Flags are cleared by writing a one to the flag position.
 	// Writing a zero is ignored.

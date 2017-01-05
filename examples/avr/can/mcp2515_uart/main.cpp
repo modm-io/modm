@@ -16,8 +16,8 @@
 #include <modm/driver/can/mcp2515.hpp>
 #include <modm/processing/timer.hpp>
 
-using namespace xpcc::atmega;
-typedef xpcc::avr::SystemClock clock;
+using namespace modm::atmega;
+typedef modm::avr::SystemClock clock;
 
 typedef GpioOutputB0 LedGreen;
 typedef GpioOutputB1 LedRed;
@@ -29,9 +29,9 @@ typedef GpioOutputB7 Sclk;
 typedef GpioOutputB5 Mosi;
 typedef GpioInputB6 Miso;
 
-typedef xpcc::SoftwareSpiMaster<Sclk, Mosi, Miso> SPI;
+typedef modm::SoftwareSpiMaster<Sclk, Mosi, Miso> SPI;
 
-xpcc::Mcp2515<SPI, Cs, Int> mcp2515;
+modm::Mcp2515<SPI, Cs, Int> mcp2515;
 
 // Default filters to receive any extended CAN frame
 FLASH_STORAGE(uint8_t canFilter[]) =
@@ -52,16 +52,16 @@ FLASH_STORAGE(uint8_t canFilter[]) =
 Uart0 uart;
 
 // timer interrupt routine
-XPCC_ISR(TIMER2_COMPA)
+MODM_ISR(TIMER2_COMPA)
 {
-	xpcc::Clock::increment();
+	modm::Clock::increment();
 }
 
 int
 main()
 {
-	LedGreen::setOutput(xpcc::Gpio::High);
-	LedRed::setOutput(xpcc::Gpio::Low);
+	LedGreen::setOutput(modm::Gpio::High);
+	LedRed::setOutput(modm::Gpio::Low);
 
 	// timer initialization
 	// compare-match-interrupt every 1 ms at 14.7456 MHz
@@ -75,13 +75,13 @@ main()
     Uart0::initialize<clock, 115200>();
 
 	// Create a IOStream for complex formatting tasks
-	xpcc::IODeviceWrapper< Uart0, xpcc::IOBuffer::BlockIfFull > device(uart);
-	xpcc::IOStream stream(device);
+	modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > device(uart);
+	modm::IOStream stream(device);
 
 	// enable interrupts
 	sei();
 
-	stream << "CAN Demo" << xpcc::endl;
+	stream << "CAN Demo" << modm::endl;
 
 	// Initialize SPI interface and the other pins
 	// needed by the MCP2515
@@ -90,29 +90,29 @@ main()
 	Int::setInput(Gpio::InputType::PullUp);
 
 	// Configure MCP2515 and set the filters
-    // Fixme: xpcc::Can::Bitrate is incompatitlbe with device driver
-//	mcp2515.initialize(xpcc::can::BITRATE_125_KBPS);
-	mcp2515.setFilter(xpcc::accessor::asFlash(canFilter));
+    // Fixme: modm::Can::Bitrate is incompatitlbe with device driver
+//	mcp2515.initialize(modm::can::BITRATE_125_KBPS);
+	mcp2515.setFilter(modm::accessor::asFlash(canFilter));
 
 	// Create a new message
-	xpcc::can::Message message(0x123456);
+	modm::can::Message message(0x123456);
 	message.length = 2;
 	message.data[0] = 0xab;
 	message.data[1] = 0xcd;
 
 	mcp2515.sendMessage(message);
 
-	xpcc::ShortPeriodicTimer timer(200);
+	modm::ShortPeriodicTimer timer(200);
 	while (1)
 	{
 		if (mcp2515.isMessageAvailable())
 		{
-			xpcc::can::Message message;
+			modm::can::Message message;
 			if (mcp2515.getMessage(message))
 			{
 				LedRed::toggle();
 
-				stream << "Message received:" << xpcc::endl;
+				stream << "Message received:" << modm::endl;
 				stream.printf(" id   = %lx", message.getIdentifier());
 				if (message.isExtended()) {
 					stream << " extended";
@@ -123,16 +123,16 @@ main()
 				if (message.isRemoteTransmitRequest()) {
 					stream << ", rtr";
 				}
-				stream << xpcc::endl;
+				stream << modm::endl;
 
-				stream << " dlc  = " << message.getLength() << xpcc::endl;
+				stream << " dlc  = " << message.getLength() << modm::endl;
 				if (!message.isRemoteTransmitRequest())
 				{
 					stream << " data = ";
 					for (uint32_t i = 0; i < message.getLength(); ++i) {
-						stream << xpcc::hex << message.data[i] << xpcc::ascii << ' ';
+						stream << modm::hex << message.data[i] << modm::ascii << ' ';
 					}
-					stream << xpcc::endl;
+					stream << modm::endl;
 				}
 			}
 		}

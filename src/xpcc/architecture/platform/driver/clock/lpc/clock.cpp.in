@@ -42,13 +42,13 @@
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::lpc::ClockControl::enableInternalClock(uint32_t, uint32_t)
+modm::lpc::ClockControl::enableInternalClock(uint32_t, uint32_t)
 {
 	return true;
 }
 
 bool
-xpcc::lpc::ClockControl::enableExternalClock(uint32_t, uint32_t)
+modm::lpc::ClockControl::enableExternalClock(uint32_t, uint32_t)
 {
 	LPC_SYSCON->PDRUNCFG &= ~PDRUNCFG_SYSOSC_PD;	// powerup
 	LPC_SYSCON->SYSOSCCTRL |= SYSOSCCTRL_BYPASS;	// enable bypass
@@ -56,7 +56,7 @@ xpcc::lpc::ClockControl::enableExternalClock(uint32_t, uint32_t)
 }
 
 bool
-xpcc::lpc::ClockControl::enableExternalCrystal(uint32_t f_kHz, uint32_t)
+modm::lpc::ClockControl::enableExternalCrystal(uint32_t f_kHz, uint32_t)
 {
 	LPC_SYSCON->PDRUNCFG &= ~PDRUNCFG_SYSOSC_PD;	// powerup
 	LPC_SYSCON->SYSOSCCTRL &= ~SYSOSCCTRL_BYPASS;	// do not bypass
@@ -72,7 +72,7 @@ xpcc::lpc::ClockControl::enableExternalCrystal(uint32_t f_kHz, uint32_t)
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::lpc::ClockControl::enablePll(PllSource source, uint8_t pllM, uint8_t pllP)
+modm::lpc::ClockControl::enablePll(PllSource source, uint8_t pllM, uint8_t pllP)
 {
 	// SYSPLLCLKSEL
 	LPC_SYSCON->SYSPLLCLKSEL = (LPC_SYSCON->SYSPLLCLKSEL & 0b11)
@@ -89,7 +89,7 @@ xpcc::lpc::ClockControl::enablePll(PllSource source, uint8_t pllM, uint8_t pllP)
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::lpc::ClockControl::enableSystemClock(SystemClockSource src, uint32_t /*waitCycles*/)
+modm::lpc::ClockControl::enableSystemClock(SystemClockSource src, uint32_t /*waitCycles*/)
 {
 	LPC_SYSCON->MAINCLKSEL = static_cast<uint32_t>(src);
 	LPC_SYSCON->MAINCLKUEN = 0x01;	// toggle update enable register

@@ -9,14 +9,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_UI_PULSE_HPP
-#define XPCC_UI_PULSE_HPP
+#ifndef MODM_UI_PULSE_HPP
+#define MODM_UI_PULSE_HPP
 
 #include <stdint.h>
 #include "key_frame.hpp"
 #include <modm/utils/arithmetic_traits.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 namespace ui
@@ -44,8 +44,8 @@ class Pulse
 public:
 	Pulse(Animation<T> &animator)
 	:	animator(animator), frames{
-			xpcc::ui::KeyFrame<T>(500, xpcc::ArithmeticTraits<T>::max),
-			xpcc::ui::KeyFrame<T>(500, xpcc::ArithmeticTraits<T>::min)
+			modm::ui::KeyFrame<T>(500, modm::ArithmeticTraits<T>::max),
+			modm::ui::KeyFrame<T>(500, modm::ArithmeticTraits<T>::min)
 		}
 	{
 		this->animator.setKeyFrames(frames, 2);
@@ -96,15 +96,15 @@ public:
 	}
 
 private:
-	xpcc::ui::KeyFrameAnimation<T> animator;
+	modm::ui::KeyFrameAnimation<T> animator;
 	// 1. fade up to max
 	// 2. fade down to min
 	// (cycle)
-	xpcc::ui::KeyFrame<T> frames[2];
+	modm::ui::KeyFrame<T> frames[2];
 };
 
 }
 
 }
 
-#endif	// XPCC_UI_PULSE_HPP
+#endif	// MODM_UI_PULSE_HPP

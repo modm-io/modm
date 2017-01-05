@@ -49,7 +49,7 @@ template<typename T, int N, int BLOCK_SIZE, unsigned int ScaleFactor>
 void FirTest::testFilter(const float (&coeff)[N],
 	 const T taps[], int taps_length, const T results[])
 {
-	xpcc::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor> filter(coeff);
+	modm::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor> filter(coeff);
 	for(int i = 0; i < (taps_length + N); i++){
 		if(i < taps_length)
 			filter.append(taps[i]);

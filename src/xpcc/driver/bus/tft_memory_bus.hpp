@@ -13,7 +13,7 @@
 #ifndef TFT_MEMORY_BUS_HPP_
 #define TFT_MEMORY_BUS_HPP_
 
-namespace xpcc
+namespace modm
 {
 /**
  * @author	Fabian Greif
@@ -29,32 +29,32 @@ public:
 	{
 	}
 
-	xpcc_always_inline void
+	modm_always_inline void
 	writeIndex(uint16_t index)
 	{
 		*ptrIndex = index;
 	}
 
-	xpcc_always_inline void
+	modm_always_inline void
 	writeData(uint16_t data)
 	{
 		*ptrData = data;
 	}
 
-	xpcc_always_inline uint16_t
+	modm_always_inline uint16_t
 	readData()
 	{
 		return *ptrData;
 	}
 
-	xpcc_always_inline void
+	modm_always_inline void
 	writeRegister(uint16_t reg, uint16_t value)
 	{
 		writeIndex(reg);
 		writeData(value);
 	}
 
-	xpcc_always_inline uint16_t
+	modm_always_inline uint16_t
 	readRegister(uint16_t reg)
 	{
 		writeIndex(reg);
@@ -77,34 +77,34 @@ public:
 	{
 	}
 
-	xpcc_always_inline void
+	modm_always_inline void
 	writeIndex(uint8_t index)
 	{
 		*ptrIndex = 0;
 		*ptrIndex = index;
 	}
 
-	xpcc_always_inline void
+	modm_always_inline void
 	writeData(uint16_t data)
 	{
 		*ptrData = data >> 8;
 		*ptrData = data & 0xff;
 	}
 
-//	xpcc_always_inline uint16_t
+//	modm_always_inline uint16_t
 //	readData()
 //	{
 //		return *ptrData;
 //	}
 
-	xpcc_always_inline void
+	modm_always_inline void
 	writeRegister(uint8_t reg, uint16_t value)
 	{
 		writeIndex(reg);
 		writeData(value);
 	}
 
-//	xpcc_always_inline uint16_t
+//	modm_always_inline uint16_t
 //	readRegister(uint16_t reg)
 //	{
 //		writeIndex(reg);
@@ -131,7 +131,7 @@ template <
 class MemoryBus
 {
 public:
-	static xpcc_always_inline void
+	static modm_always_inline void
 	initialize()
 	{
 		CS::set();
@@ -140,7 +140,7 @@ public:
 		PORT::setInput();
 	}
 
-	static xpcc_always_inline void
+	static modm_always_inline void
 	write(const uint8_t data)
 	{
 		CS::reset();
@@ -150,30 +150,30 @@ public:
 		PORT::write(data);
 
 		// t_AS
-		xpcc::delayMicroseconds(1);
+		modm::delayMicroseconds(1);
 		WR::reset();
 
-		xpcc::delayMicroseconds(1);
+		modm::delayMicroseconds(1);
 		WR::set();
 
-		xpcc::delayMicroseconds(1);
+		modm::delayMicroseconds(1);
 		PORT::setInput();
 
 		CS::set();
 	}
 
-	static xpcc_always_inline uint8_t
+	static modm_always_inline uint8_t
 	read()
 	{
 		uint8_t ret;
 		CS::reset();
 		WR::set();
 
-		xpcc::delayMicroseconds(1);
+		modm::delayMicroseconds(1);
 
 		RD::reset();
 
-		xpcc::delayMicroseconds(1);
+		modm::delayMicroseconds(1);
 		ret = PORT::read();
 
 		RD::set();
@@ -196,13 +196,13 @@ class TftMemoryBus8BitGpio
 public:
 	typedef MemoryBus<PORT, CS, RD, WR> BUS;
 
-	static xpcc_always_inline void
+	static modm_always_inline void
 	initialize()
 	{
 		BUS::initialize();
 	}
 
-	static xpcc_always_inline void
+	static modm_always_inline void
 	writeIndex(uint8_t index)
 	{
 		// *ptrIndex = 0;
@@ -213,7 +213,7 @@ public:
 		BUS::write(index);
 	}
 
-	static xpcc_always_inline void
+	static modm_always_inline void
 	writeData(uint16_t data)
 	{
 		// *ptrData = data >> 8;
@@ -224,20 +224,20 @@ public:
 		BUS::write(data & 0xff);
 	}
 
-//	static xpcc_always_inline uint16_t
+//	static modm_always_inline uint16_t
 //	readData()
 //	{
 //		return *ptrData;
 //	}
 
-	static xpcc_always_inline void
+	static modm_always_inline void
 	writeRegister(uint8_t reg, uint16_t value)
 	{
 		writeIndex(reg);
 		writeData(value);
 	}
 
-//	static xpcc_always_inline uint16_t
+//	static modm_always_inline uint16_t
 //	readRegister(uint16_t reg)
 //	{
 //		writeIndex(reg);

@@ -10,19 +10,19 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PCA9685_HPP
+#ifndef MODM_PCA9685_HPP
 #	error "Don't include this file directly, use 'pca9685.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template<typename I2cMaster>
-xpcc::Pca9685<I2cMaster>::Pca9685(uint8_t address) :
+modm::Pca9685<I2cMaster>::Pca9685(uint8_t address) :
 	I2cDevice<I2cMaster, 1, I2cWriteTransaction>(address)
 {}
 
 template<typename I2cMaster>
-xpcc::ResumableResult<bool>
-xpcc::Pca9685<I2cMaster>::initialize(uint8_t mode1, uint8_t mode2)
+modm::ResumableResult<bool>
+modm::Pca9685<I2cMaster>::initialize(uint8_t mode1, uint8_t mode2)
 {
 	RF_BEGIN();
 
@@ -55,8 +55,8 @@ xpcc::Pca9685<I2cMaster>::initialize(uint8_t mode1, uint8_t mode2)
 }
 
 template<typename I2cMaster>
-xpcc::ResumableResult<bool>
-xpcc::Pca9685<I2cMaster>::setChannel(uint8_t channel, uint16_t value)
+modm::ResumableResult<bool>
+modm::Pca9685<I2cMaster>::setChannel(uint8_t channel, uint16_t value)
 {
 	RF_BEGIN();
 
@@ -75,8 +75,8 @@ xpcc::Pca9685<I2cMaster>::setChannel(uint8_t channel, uint16_t value)
 }
 
 template<typename I2cMaster>
-xpcc::ResumableResult<bool>
-xpcc::Pca9685<I2cMaster>::setAllChannels(uint16_t value)
+modm::ResumableResult<bool>
+modm::Pca9685<I2cMaster>::setAllChannels(uint16_t value)
 {
 	RF_BEGIN();
 

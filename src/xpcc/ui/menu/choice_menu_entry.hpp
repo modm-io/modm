@@ -14,13 +14,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_CHOICE_MENU_ENTRY
-#define XPCC_CHOICE_MENU_ENTRY
+#ifndef MODM_CHOICE_MENU_ENTRY
+#define MODM_CHOICE_MENU_ENTRY
 
 #include <stdint.h>
 #include "scrollable_text.hpp"
 
-namespace xpcc
+namespace modm
 {
 	class ChoiceMenuEntry
 	{
@@ -31,4 +31,4 @@ namespace xpcc
 		bool defaultValue;
 	};
 }
-#endif // XPCC_CHOICE_MENU_ENTRY
+#endif // MODM_CHOICE_MENU_ENTRY

@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_GUI_STRINGFIELD_HPP
-#define XPCC_GUI_STRINGFIELD_HPP
+#ifndef MODM_GUI_STRINGFIELD_HPP
+#define MODM_GUI_STRINGFIELD_HPP
 
 #include "widget.hpp"
 #include "label.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 namespace gui
@@ -60,6 +60,6 @@ private:
 
 }	// namespace gui
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif  // XPCC_GUI_STRINGFIELD_HPP
+#endif  // MODM_GUI_STRINGFIELD_HPP

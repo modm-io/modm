@@ -21,7 +21,7 @@ Notice that type and pin-id have different interpretations on the STM32 and AVR 
 
 ## Naming Scheme
 
-All device files can be currently found in the `xpcc/architecture/platform/devices/`, with the naming schemes dependend on architecture.
+All device files can be currently found in the `modm/architecture/platform/devices/`, with the naming schemes dependend on architecture.
 Examples include:
 
 - avr:
@@ -103,7 +103,7 @@ As the device file is declarative, the filtering engine will resolve all depende
 
 ### Available Drivers
 
-The driver elements link the device hardware peripheral with a software implementation, which are found in `xpcc/architecture/platform/driver/`.
+The driver elements link the device hardware peripheral with a software implementation, which are found in `modm/architecture/platform/driver/`.
 Each driver is divided into several hardware dependend implementations.
 
 A selection of the most important drivers are:

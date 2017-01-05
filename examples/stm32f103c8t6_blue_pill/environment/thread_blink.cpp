@@ -16,8 +16,8 @@
 
 // ----------------------------------------------------------------------------
 // Set the log level
-#undef	XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::INFO
+#undef	MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::INFO
 
 // ----------------------------------------------------------------------------
 BlinkThread::BlinkThread() :
@@ -58,7 +58,7 @@ BlinkThread::update()
 		int32_t bme280_b_press = bme280Thread.getPressureB();
 		int32_t bme280_b_humid = bme280Thread.getHumidityB();
 
-		XPCC_LOG_INFO.printf("%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n",
+		MODM_LOG_INFO.printf("%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n",
 			uptime,
 			bmp180_a_temp, bmp180_a_press,
 			bmp180_b_temp, bmp180_b_press,
@@ -66,8 +66,8 @@ BlinkThread::update()
 			bme280_b_temp, bme280_b_press, bme280_b_humid);
 
 
-		XPCC_LOG_DEBUG << XPCC_FILE_INFO;
-		XPCC_LOG_DEBUG << "Uptime: " << uptime << xpcc::endl;
+		MODM_LOG_DEBUG << MODM_FILE_INFO;
+		MODM_LOG_DEBUG << "Uptime: " << uptime << modm::endl;
 
 		++uptime;
 	}

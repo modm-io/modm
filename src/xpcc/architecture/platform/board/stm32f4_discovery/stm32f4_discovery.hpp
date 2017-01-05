@@ -16,13 +16,13 @@
 // http://www.st.com/web/en/catalog/tools/FM116/SC959/SS1532/PF252419
 //
 
-#ifndef XPCC_STM32_F4_DISCOVERY_HPP
-#define XPCC_STM32_F4_DISCOVERY_HPP
+#ifndef MODM_STM32_F4_DISCOVERY_HPP
+#define MODM_STM32_F4_DISCOVERY_HPP
 
 #include <modm/architecture/platform.hpp>
 #include <modm/driver/inertial/lis3dsh.hpp>
 
-using namespace xpcc::stm32;
+using namespace modm::stm32;
 
 
 namespace Board
@@ -30,7 +30,7 @@ namespace Board
 
 /* SystemClock generator is only available for selected STM32F4 devices.
  * The idea is that it is generated automatically for you like the rest of the
- * HAL, however, xpcc does not have this capability yet. See PR #36.
+ * HAL, however, modm does not have this capability yet. See PR #36.
  */
 // using systemClock = SystemClock<Pll<ExternalCrystal<MHz8>, MHz168, MHz48> >;
 
@@ -105,10 +105,10 @@ struct systemClock {
 		ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div4);
 		ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div2);
 		// update frequencies for busy-wait delay functions
-		xpcc::clock::fcpu     = Frequency;
-		xpcc::clock::fcpu_kHz = Frequency / 1000;
-		xpcc::clock::fcpu_MHz = Frequency / 1000000;
-		xpcc::clock::ns_per_loop = ::round(3000 / (Frequency / 1000000));
+		modm::clock::fcpu     = Frequency;
+		modm::clock::fcpu_kHz = Frequency / 1000;
+		modm::clock::fcpu_MHz = Frequency / 1000000;
+		modm::clock::ns_per_loop = ::round(3000 / (Frequency / 1000000));
 
 		return true;
 	}
@@ -124,7 +124,7 @@ using LedGreen  = GpioOutputD12;	// User LED 4
 using LedRed    = GpioOutputD14;	// User LED 5
 using LedBlue   = GpioOutputD15;	// User LED 6
 
-using Leds = xpcc::SoftwareGpioPort< LedGreen, LedBlue, LedRed, LedOrange >;
+using Leds = modm::SoftwareGpioPort< LedGreen, LedBlue, LedRed, LedOrange >;
 
 
 namespace lis3
@@ -137,7 +137,7 @@ using Mosi = GpioOutputA7;	// SPI1_MOSI
 using Miso = GpioInputA6;	// SPI1_MISO
 
 using SpiMaster = SpiMaster1;
-using Transport = xpcc::Lis3TransportSpi< SpiMaster, Cs >;
+using Transport = modm::Lis3TransportSpi< SpiMaster, Cs >;
 }
 
 
@@ -182,12 +182,12 @@ inline void
 initialize()
 {
 	systemClock::enable();
-	xpcc::cortex::SysTickTimer::initialize<systemClock>();
+	modm::cortex::SysTickTimer::initialize<systemClock>();
 
-	LedOrange::setOutput(xpcc::Gpio::Low);
-	LedGreen::setOutput(xpcc::Gpio::Low);
-	LedRed::setOutput(xpcc::Gpio::Low);
-	LedBlue::setOutput(xpcc::Gpio::Low);
+	LedOrange::setOutput(modm::Gpio::Low);
+	LedGreen::setOutput(modm::Gpio::Low);
+	LedRed::setOutput(modm::Gpio::Low);
+	LedBlue::setOutput(modm::Gpio::Low);
 
 	Button::setInput();
 	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
@@ -203,7 +203,7 @@ initializeLis3()
 	lis3::Int::enableExternalInterrupt();
 //	lis3::Int::enableExternalInterruptVector(12);
 
-	lis3::Cs::setOutput(xpcc::Gpio::High);
+	lis3::Cs::setOutput(modm::Gpio::High);
 
 	lis3::Sck::connect(lis3::SpiMaster::Sck);
 	lis3::Mosi::connect(lis3::SpiMaster::Mosi);
@@ -222,7 +222,7 @@ initializeCs43()
 //	cs43::Sclk::connect(cs43::I2sMaster::Ck);
 //	cs43::Sdin::connect(cs43::I2sMaster::Sd);
 
-	cs43::Reset::setOutput(xpcc::Gpio::High);
+	cs43::Reset::setOutput(modm::Gpio::High);
 
 	cs43::Scl::connect(cs43::I2cMaster::Scl);
 	cs43::Sda::connect(cs43::I2cMaster::Sda);
@@ -253,4 +253,4 @@ initializeUsb()
 
 }
 
-#endif	// XPCC_STM32_F4_DISCOVERY_HPP
+#endif	// MODM_STM32_F4_DISCOVERY_HPP

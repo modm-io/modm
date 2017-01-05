@@ -9,15 +9,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_L3GD20_HPP
-#define XPCC_L3GD20_HPP
+#ifndef MODM_L3GD20_HPP
+#define MODM_L3GD20_HPP
 
 #include <modm/architecture/interface/register.hpp>
 #include <modm/processing/resumable.hpp>
 #include <modm/math/utils/endianness.hpp>
 #include "lis3_transport.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 // forward declaration for friending with l3gd20::Data
@@ -80,7 +80,7 @@ public:
 		YEN = Bit1,		///< Y axis enable
 		XEN = Bit0,		///< X axis enable
 	};
-	XPCC_FLAGS8(Control1);
+	MODM_FLAGS8(Control1);
 
 	/// CTRL_REG2 default value is 0x00
 	enum class
@@ -94,7 +94,7 @@ public:
 		HPCF1 = Bit1,
 		HPCF0 = Bit0,
 	};
-	XPCC_FLAGS8(Control2);
+	MODM_FLAGS8(Control2);
 
 	/// CTRL_REG3 default value is 0x00
 	enum class
@@ -109,7 +109,7 @@ public:
 		I2_ORun = Bit1,		///< FIFO overrun interrupt on DRDY/INT2.
 		I2_Empty = Bit0,	///< FIFO empty interrupt on DRDY/INT2.
 	};
-	XPCC_FLAGS8(Control3);
+	MODM_FLAGS8(Control3);
 
 	/// CTRL_REG4 default value is 0x00
 	enum class
@@ -122,7 +122,7 @@ public:
 
 		SIM = Bit0,		///<SPI serial interface mode selection. (0: 4-wire interface; 1: 3-wire interface).
 	};
-	XPCC_FLAGS8(Control4);
+	MODM_FLAGS8(Control4);
 
 	/// CTRL_REG5 default value is 0x00
 	enum class
@@ -137,7 +137,7 @@ public:
 		Out_Sel1 = Bit1,	///< FIFO overrun interrupt on int1.
 		Out_Sel0 = Bit0,	///< PI serial interface mode selection.
 	};
-	XPCC_FLAGS8(Control5);
+	MODM_FLAGS8(Control5);
 
 	/// STATUS is read-only
 	enum class
@@ -152,7 +152,7 @@ public:
 		YDA = Bit1,		///< Y axis new data available.
 		XDA = Bit0,		///< X axis new data available.
 	};
-	XPCC_FLAGS8(Status);
+	MODM_FLAGS8(Status);
 
 	/// FIFO_CTRL default value is 0x00
 	enum class
@@ -168,7 +168,7 @@ public:
 		WTM1 = Bit1,
 		WTM0 = Bit0,
 	};
-	XPCC_FLAGS8(FifoControl);
+	MODM_FLAGS8(FifoControl);
 
 	/// FIFO_SRC is read-only
 	enum class
@@ -184,7 +184,7 @@ public:
 		FSS1 = Bit1,
 		FSS0 = Bit0,
 	};
-	XPCC_FLAGS8(FifoSource);
+	MODM_FLAGS8(FifoSource);
 
 	/// INT1_CFG default value is 0x00
 	enum class
@@ -199,7 +199,7 @@ public:
 		XHIE = Bit1,	///< Enable interrupt generation on X high event.
 		XLIE = Bit0,	///< Enable interrupt generation on X low event.
 	};
-	XPCC_FLAGS8(IntConfig);
+	MODM_FLAGS8(IntConfig);
 
 	/// INT1_SRC default value is 0x00
 	enum class
@@ -213,7 +213,7 @@ public:
 		XH = Bit1,	///< X high.
 		XL = Bit0,	///< X low.
 	};
-	XPCC_FLAGS8(IntSource);
+	MODM_FLAGS8(IntSource);
 
 public:
 	typedef FlagsGroup<
@@ -251,7 +251,7 @@ public:
 	};
 
 public:
-	struct xpcc_packed
+	struct modm_packed
 	Data
 	{
 		template < class Transport >
@@ -289,7 +289,7 @@ public:
 		getData(uint8_t index)
 		{
 			int16_t *rData = reinterpret_cast<int16_t*>(data);
-			return xpcc::fromLittleEndian(rData[index]);
+			return modm::fromLittleEndian(rData[index]);
 		}
 
 		// data 0-5 = xl,xh,yl,yh,zl,zh
@@ -346,47 +346,47 @@ public:
 		return RF_CALL_BLOCKING(configure(scale, rate));
 	}
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	configure(Scale scale, MeasurementRate rate = MeasurementRate::Hz380);
 
 	// MARK: Control Registers
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	updateControl(Control1_t setMask, Control1_t clearMask = Control1_t(0xff))
 	{
 		return updateControlRegister(1, setMask, clearMask);
 	}
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	updateControl(Control2_t setMask, Control2_t clearMask = Control2_t(0xff))
 	{
 		return updateControlRegister(2, setMask, clearMask);
 	}
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	updateControl(Control3_t setMask, Control3_t clearMask = Control3_t(0xff))
 	{
 		return updateControlRegister(3, setMask, clearMask);
 	}
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	updateControl(Control4_t setMask, Control4_t clearMask = Control4_t(0xff))
 	{
 		return updateControlRegister(0, setMask, clearMask);
 	}
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	updateControl(Control5_t setMask, Control5_t clearMask = Control5_t(0xff))
 	{
 		return updateControlRegister(4, setMask, clearMask);
 	}
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	updateFifoControl(FifoControl_t setMask, FifoControl_t clearMask = FifoControl_t(0xff))
 	{
 		return updateControlRegister(14, setMask, clearMask);
 	}
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	updateInterruptConfiguration(IntConfig_t setMask, IntConfig_t clearMask = IntConfig_t(0xff))
 	{
 		return updateControlRegister(16, setMask, clearMask);
@@ -394,7 +394,7 @@ public:
 
 
 	// MARK: Read access
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	readRotation();
 
 	// MARK: Registers with instant access
@@ -439,10 +439,10 @@ public:
 	{ return data; }
 
 private:
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	updateControlRegister(uint8_t index, Control_t setMask, Control_t clearMask = static_cast<Control_t>(0xff));
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	updateRegister(uint8_t reg, uint8_t setMask, uint8_t clearMask = 0xff);
 
 	Data &data;
@@ -464,8 +464,8 @@ private:
 	uint8_t rawBuffer[18];
 };
 
-} // namespace xpcc
+} // namespace modm
 
 #include "l3gd20_impl.hpp"
 
-#endif	// XPCC_L3GD20_HPP
+#endif	// MODM_L3GD20_HPP

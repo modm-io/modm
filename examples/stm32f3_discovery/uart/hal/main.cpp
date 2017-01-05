@@ -34,7 +34,7 @@ main()
 }
 
 // Interrupt Handler
-XPCC_ISR(USART2)
+MODM_ISR(USART2)
 {
 	UsartHal2::getInterruptFlags();
 	if(UsartHal2::isTransmitRegisterEmpty()) {

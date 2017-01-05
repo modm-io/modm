@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_HOSTED_SERIAL_PORT_HPP
-#define XPCC_HOSTED_SERIAL_PORT_HPP
+#ifndef MODM_HOSTED_SERIAL_PORT_HPP
+#define MODM_HOSTED_SERIAL_PORT_HPP
 
 #include <string>
 #include <queue>
@@ -24,7 +24,7 @@
 
 #include <modm/io/iodevice.hpp>
 
-namespace xpcc
+namespace modm
 {
 	namespace hosted
 	{
@@ -114,4 +114,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_HOSTED_SERIAL_PORT_HPP
+#endif // MODM_HOSTED_SERIAL_PORT_HPP

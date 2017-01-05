@@ -19,9 +19,9 @@
 void
 PidTest::testCreation()
 {
-	xpcc::Pid<int16_t, 10> controller;
+	modm::Pid<int16_t, 10> controller;
 	
-	xpcc::Pid<int16_t, 10>::Parameter parameter(0.1, 0.2, 0.3, 32767, 100);
+	modm::Pid<int16_t, 10>::Parameter parameter(0.1, 0.2, 0.3, 32767, 100);
 	
 	controller.setParameter(parameter);
 	

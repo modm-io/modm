@@ -13,10 +13,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_TOUCHSCREEN_CALIBRATOR_HPP
-#define XPCC_TOUCHSCREEN_CALIBRATOR_HPP
+#ifndef MODM_TOUCHSCREEN_CALIBRATOR_HPP
+#define MODM_TOUCHSCREEN_CALIBRATOR_HPP
 
-namespace xpcc
+namespace modm
 {
 	class TouchscreenCalibrator
 	{
@@ -27,10 +27,10 @@ namespace xpcc
 		 * 
 		 */
 		bool
-		calibrate(xpcc::glcd::Point * display, xpcc::glcd::Point * sample);
+		calibrate(modm::glcd::Point * display, modm::glcd::Point * sample);
 		
 		void
-		translate(xpcc::glcd::Point * raw, xpcc::glcd::Point * translated);
+		translate(modm::glcd::Point * raw, modm::glcd::Point * translated);
 		
 	private:
 		float An;
@@ -43,20 +43,20 @@ namespace xpcc
 	};
 }
 
-#endif // XPCC_TOUCHSCREEN_CALIBRATOR_HPP
+#endif // MODM_TOUCHSCREEN_CALIBRATOR_HPP
 
-#ifndef XPCC_TOUCHSCREEN_CALIBRATOR_HPP
+#ifndef MODM_TOUCHSCREEN_CALIBRATOR_HPP
 #	error "Don't include this file directly, use touchscreen_calibrator.hpp instead!"
 #endif
 
-xpcc::TouchscreenCalibrator::TouchscreenCalibrator() :
+modm::TouchscreenCalibrator::TouchscreenCalibrator() :
 	scale(0.f)
 {
 }
 
 bool
-xpcc::TouchscreenCalibrator::calibrate(
-		xpcc::glcd::Point * display, xpcc::glcd::Point * sample)
+modm::TouchscreenCalibrator::calibrate(
+		modm::glcd::Point * display, modm::glcd::Point * sample)
 {
 	// K��(X0��X2) (Y1��Y2)��(X1��X2) (Y0��Y2)
 	scale =	((sample[0].x - sample[2].x) * (sample[1].y - sample[2].y)) -
@@ -92,7 +92,7 @@ xpcc::TouchscreenCalibrator::calibrate(
 }
 
 void
-xpcc::TouchscreenCalibrator::translate(xpcc::glcd::Point * raw, xpcc::glcd::Point * translated)
+modm::TouchscreenCalibrator::translate(modm::glcd::Point * raw, modm::glcd::Point * translated)
 {
 	if (scale != 0)
 	{

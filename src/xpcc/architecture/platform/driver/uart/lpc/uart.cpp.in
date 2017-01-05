@@ -27,10 +27,10 @@ namespace
 // If requested buffer size is larger than hardware buffer size create a
 // software queue for the remaining bytes.
 %% if parameters.rx_buffer > 16
-	static xpcc::atomic::Queue<uint8_t, {{ parameters.rx_buffer }} - 16> rxBuffer;
+	static modm::atomic::Queue<uint8_t, {{ parameters.rx_buffer }} - 16> rxBuffer;
 %% endif
 %% if parameters.tx_buffer > 16
-	static xpcc::atomic::Queue<uint8_t, {{ parameters.tx_buffer }} - 16> txBuffer;
+	static modm::atomic::Queue<uint8_t, {{ parameters.tx_buffer }} - 16> txBuffer;
 %% endif
 
 	/**
@@ -45,7 +45,7 @@ namespace
 
 // ----------------------------------------------------------------------------
 void
-xpcc::lpc::Uart1::initialize(uint32_t baudrate)
+modm::lpc::Uart1::initialize(uint32_t baudrate)
 {
 	atomic::Lock lock;
 
@@ -61,7 +61,7 @@ xpcc::lpc::Uart1::initialize(uint32_t baudrate)
 
 	LPC_UART->LCR = LCR_DLAB;
 	uint32_t regVal = LPC_SYSCON->UARTCLKDIV;
-	uint32_t   Fdiv = (((xpcc::lpc::ClockControl::getCpuFrequency() * LPC_SYSCON->SYSAHBCLKDIV)/regVal)/16)/baudrate ; //390;
+	uint32_t   Fdiv = (((modm::lpc::ClockControl::getCpuFrequency() * LPC_SYSCON->SYSAHBCLKDIV)/regVal)/16)/baudrate ; //390;
 	LPC_UART->DLM = Fdiv >>    8;
 	LPC_UART->DLL = Fdiv  & 0xff;
 	//LPC_UART->DLM = 0;
@@ -97,13 +97,13 @@ xpcc::lpc::Uart1::initialize(uint32_t baudrate)
 }
 
 void
-xpcc::lpc::Uart1::writeBlocking(uint8_t data)
+modm::lpc::Uart1::writeBlocking(uint8_t data)
 {
 	while (not write(data));
 }
 
 void
-xpcc::lpc::Uart1::writeBlocking(const uint8_t *data, std::size_t length)
+modm::lpc::Uart1::writeBlocking(const uint8_t *data, std::size_t length)
 {
 	while (length--)
 	{
@@ -112,7 +112,7 @@ xpcc::lpc::Uart1::writeBlocking(const uint8_t *data, std::size_t length)
 }
 
 void
-xpcc::lpc::Uart1::flushWriteBuffer()
+modm::lpc::Uart1::flushWriteBuffer()
 {
 	while(!isWriteFinished())
 		;
@@ -120,7 +120,7 @@ xpcc::lpc::Uart1::flushWriteBuffer()
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::lpc::Uart1::write(uint8_t data)
+modm::lpc::Uart1::write(uint8_t data)
 {
 %% if parameters.tx_buffer <= 16
 	// No software buffer necessary, use hardware buffer only.
@@ -169,7 +169,7 @@ xpcc::lpc::Uart1::write(uint8_t data)
 
 // ----------------------------------------------------------------------------
 std::size_t
-xpcc::lpc::Uart1::write(const uint8_t *buffer, std::size_t length)
+modm::lpc::Uart1::write(const uint8_t *buffer, std::size_t length)
 {
 	std::size_t written(0);
 
@@ -219,7 +219,7 @@ xpcc::lpc::Uart1::write(const uint8_t *buffer, std::size_t length)
 }
 
 bool
-xpcc::lpc::Uart1::isWriteFinished()
+modm::lpc::Uart1::isWriteFinished()
 {
 %% if parameters.tx_buffer > 16
 	return txBuffer.isEmpty() and (LPC_UART->LSR & LSR_THRE);
@@ -229,7 +229,7 @@ xpcc::lpc::Uart1::isWriteFinished()
 }
 
 std::size_t
-xpcc::lpc::Uart1::discardTransmitBuffer()
+modm::lpc::Uart1::discardTransmitBuffer()
 {
 %% if parameters.tx_buffer > 16
 	atomic::Lock lock;
@@ -248,7 +248,7 @@ xpcc::lpc::Uart1::discardTransmitBuffer()
 }
 
 bool
-xpcc::lpc::Uart1::read(uint8_t& data)
+modm::lpc::Uart1::read(uint8_t& data)
 {
 %% if parameters.rx_buffer > 16
 	if (not rxBuffer.isEmpty())
@@ -279,7 +279,7 @@ xpcc::lpc::Uart1::read(uint8_t& data)
 }
 
 std::size_t
-xpcc::lpc::Uart1::read(uint8_t *buffer, std::size_t length)
+modm::lpc::Uart1::read(uint8_t *buffer, std::size_t length)
 {
 	std::size_t ret = 0;
 
@@ -293,7 +293,7 @@ xpcc::lpc::Uart1::read(uint8_t *buffer, std::size_t length)
 }
 
 std::size_t
-xpcc::lpc::Uart1::discardReceiveBuffer()
+modm::lpc::Uart1::discardReceiveBuffer()
 {
 	std::size_t count(0);
 %% if parameters.rx_buffer > 16
@@ -312,7 +312,7 @@ xpcc::lpc::Uart1::discardReceiveBuffer()
 }
 
 // ----------------------------------------------------------------------------
-XPCC_ISR(UART)
+MODM_ISR(UART)
 {
 	// read IIR to clear Interrupt Status and mask
 	uint8_t IIRValue = LPC_UART->IIR & IIR_INTID_MASK;

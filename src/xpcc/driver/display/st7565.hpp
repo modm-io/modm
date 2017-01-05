@@ -11,15 +11,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ST7565_HPP
-#define XPCC_ST7565_HPP
+#ifndef MODM_ST7565_HPP
+#define MODM_ST7565_HPP
 
 #include <modm/architecture/driver/accessor/flash.hpp>
 #include <modm/architecture/driver/delay.hpp>
 
 #include <modm/ui/display/buffered_graphic_display.hpp>
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	Driver for ST7565 based LC-displays
@@ -47,8 +47,8 @@ namespace xpcc
 		setInvert(bool invert);
 
 	protected:
-		xpcc_always_inline void
-		initialize(xpcc::accessor::Flash<uint8_t> configuration, uint8_t size);
+		modm_always_inline void
+		initialize(modm::accessor::Flash<uint8_t> configuration, uint8_t size);
 
 		SPI spi;
 		CS cs;
@@ -59,4 +59,4 @@ namespace xpcc
 
 #include "st7565_impl.hpp"
 
-#endif // XPCC_ST7565_HPP
+#endif // MODM_ST7565_HPP

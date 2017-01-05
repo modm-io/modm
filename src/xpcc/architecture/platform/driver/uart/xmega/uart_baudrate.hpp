@@ -9,12 +9,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ATXMEGA_UART_BAUDRATE_HPP
-#define XPCC_ATXMEGA_UART_BAUDRATE_HPP
+#ifndef MODM_ATXMEGA_UART_BAUDRATE_HPP
+#define MODM_ATXMEGA_UART_BAUDRATE_HPP
 
 #include "../../../device.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 namespace xmega
@@ -116,7 +116,7 @@ private:
 
 } // xmega namespace
 
-} // xpcc namespace
+} // modm namespace
 
-#endif // XPCC_ATXMEGA_UART_BAUDRATE_HPP
+#endif // MODM_ATXMEGA_UART_BAUDRATE_HPP
 

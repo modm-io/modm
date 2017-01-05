@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_ATOMIC_QUEUE_HPP
-#define	XPCC_ATOMIC_QUEUE_HPP
+#ifndef	MODM_ATOMIC_QUEUE_HPP
+#define	MODM_ATOMIC_QUEUE_HPP
 
 #include <cstddef>
 #include <stdint.h>
@@ -21,7 +21,7 @@
 #include <modm/architecture/driver/accessor.hpp>
 #include <modm/utils/template_metaprogramming.hpp>
 
-namespace xpcc
+namespace modm
 {
 	namespace atomic
 	{
@@ -39,7 +39,7 @@ namespace xpcc
 		{
 		public:
 			// select the type of the index variables with some template magic :-)
-			typedef typename xpcc::tmp::Select< (N >= 254),
+			typedef typename modm::tmp::Select< (N >= 254),
 												uint16_t,
 												uint8_t >::Result Index;
 			
@@ -48,10 +48,10 @@ namespace xpcc
 		public:
 			Queue();
 			
-			xpcc_always_inline bool
+			modm_always_inline bool
 			isFull() const;
 			
-			xpcc_always_inline bool
+			modm_always_inline bool
 			isNotFull() const { return not isFull(); }
 
 			/**
@@ -63,7 +63,7 @@ namespace xpcc
 			bool
 			isNearlyFull() const;
 
-			xpcc_always_inline bool
+			modm_always_inline bool
 			isEmpty() const;
 			
 			/**
@@ -78,7 +78,7 @@ namespace xpcc
 			bool
 			isNearlyEmpty() const;
 			
-			xpcc_always_inline Size
+			modm_always_inline Size
 			getMaxSize() const;
 			
 			const T&
@@ -101,4 +101,4 @@ namespace xpcc
 
 #include "queue_impl.hpp"
 
-#endif	// XPCC_ATOMIC_QUEUE_HPP
+#endif	// MODM_ATOMIC_QUEUE_HPP

@@ -10,13 +10,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LU_DECOMPOSITION_HPP
-#define XPCC_LU_DECOMPOSITION_HPP
+#ifndef MODM_LU_DECOMPOSITION_HPP
+#define MODM_LU_DECOMPOSITION_HPP
 
 #include "matrix.hpp"
 #include "geometry/vector.hpp"
 
-namespace xpcc
+namespace modm
 {
 	// forward declaration
 	template <class T, uint8_t ROWS, uint8_t COLUMNS> class Matrix;
@@ -156,4 +156,4 @@ namespace xpcc
 }
 #include "lu_decomposition_impl.hpp"
 
-#endif // XPCC_LU_DECOMPOSITION_HPP
+#endif // MODM_LU_DECOMPOSITION_HPP

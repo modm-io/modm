@@ -15,19 +15,19 @@
 #include "../driver/clock/generic/common_clock.hpp"
 #include "../driver/can/generic/can_bit_timings.hpp"
 
-using namespace xpcc;
-using namespace xpcc::clock;
+using namespace modm;
+using namespace modm::clock;
 
 #define TEST_TIMING(clk, bitrate, bs1, bs2, prescaler) \
-	TEST_ASSERT_EQUALS((xpcc::CanBitTiming<clk, Can::Bitrate::bitrate>::getBS1()), bs1); \
-	TEST_ASSERT_EQUALS((xpcc::CanBitTiming<clk, Can::Bitrate::bitrate>::getBS2()), bs2); \
-	TEST_ASSERT_EQUALS((xpcc::CanBitTiming<clk, Can::Bitrate::bitrate>::getPrescaler()), prescaler);
+	TEST_ASSERT_EQUALS((modm::CanBitTiming<clk, Can::Bitrate::bitrate>::getBS1()), bs1); \
+	TEST_ASSERT_EQUALS((modm::CanBitTiming<clk, Can::Bitrate::bitrate>::getBS2()), bs2); \
+	TEST_ASSERT_EQUALS((modm::CanBitTiming<clk, Can::Bitrate::bitrate>::getPrescaler()), prescaler);
 
 void
 CanBitTimingsTest::testPrecalculatedValues()
 {
 	// this tests some timings, that were calculated by hand
-	// and used in xpcc from 2011 through 2015
+	// and used in modm from 2011 through 2015
 	//
 	// This is the old code:
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

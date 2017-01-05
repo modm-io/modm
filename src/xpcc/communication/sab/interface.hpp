@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_SAB_INTERFACE_HPP
-#define	XPCC_SAB_INTERFACE_HPP
+#ifndef	MODM_SAB_INTERFACE_HPP
+#define	MODM_SAB_INTERFACE_HPP
 
 #include <cstddef>
 #include <stdint.h>
@@ -21,7 +21,7 @@
 
 #include "constants.hpp"
 
-namespace xpcc
+namespace modm
 {
 	namespace sab
 	{
@@ -61,7 +61,7 @@ namespace xpcc
 			 * \brief	Send a message
 			 * 
 			 * \param	address			receiver address
-			 * \param	flags			see xpcc::sab::Flags
+			 * \param	flags			see modm::sab::Flags
 			 * \param	command			command byte
 			 * \param	*payload		data field
 			 * \param	payloadLength	size of the data field
@@ -74,14 +74,14 @@ namespace xpcc
 			 * \brief	Send a message
 			 */
 			template <typename T>
-			static void xpcc_always_inline
+			static void modm_always_inline
 			sendMessage(uint8_t address, Flags flags, uint8_t command,
 					const T& payload);
 			
 			/**
 			 * \brief	Send a empty message
 			 */
-			static void xpcc_always_inline
+			static void modm_always_inline
 			sendMessage(uint8_t address, Flags flags, uint8_t command);
 			
 			/**
@@ -159,4 +159,4 @@ namespace xpcc
 
 #include "interface_impl.hpp"
 
-#endif	// XPCC_SAB_INTERFACE_HPP
+#endif	// MODM_SAB_INTERFACE_HPP

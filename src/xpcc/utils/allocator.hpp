@@ -11,14 +11,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ALLOCATOR_HPP
-#define XPCC_ALLOCATOR_HPP
+#ifndef MODM_ALLOCATOR_HPP
+#define MODM_ALLOCATOR_HPP
 
 #include "allocator/dynamic.hpp"
 #include "allocator/static.hpp"
 #include "allocator/block.hpp"
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \ingroup	utils
@@ -33,4 +33,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_ALLOCATOR_HPP
+#endif // MODM_ALLOCATOR_HPP

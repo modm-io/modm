@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_AMNB_NODE_HPP
-#define	XPCC_AMNB_NODE_HPP
+#ifndef	MODM_AMNB_NODE_HPP
+#define	MODM_AMNB_NODE_HPP
 
 #include <cstddef>
 #include <modm/architecture/driver/accessor/flash.hpp>
@@ -20,7 +20,7 @@
 
 #include "interface.hpp"
 
-namespace xpcc
+namespace modm
 {
 	namespace amnb
 	{
@@ -55,7 +55,7 @@ namespace xpcc
 			 * 						for the system, feel free to use any other
 			 * 						value for specific error conditions.
 			 * 
-			 * \see		xpcc::amnb::Error
+			 * \see		modm::amnb::Error
 			 */
 			void
 			error(uint8_t errorCode = ERROR_GENERAL_ERROR);
@@ -79,7 +79,7 @@ namespace xpcc
 			 * \brief	Send a response with an attached payload
 			 */
 			template <typename T>
-			xpcc_always_inline void
+			modm_always_inline void
 			send(const T& payload);
 			
 		protected:
@@ -100,11 +100,11 @@ namespace xpcc
 		 * 
 		 * Example:
 		 * \code
-		 * class Sensor : public xpcc::amnb::Callable
+		 * class Sensor : public modm::amnb::Callable
 		 * {
 		 * public:
 		 *     void
-		 *     sendValue(xpcc::amnb::Response& response)
+		 *     sendValue(modm::amnb::Response& response)
 		 *     {
 		 *         response.send(this->value);
 		 *     }
@@ -118,7 +118,7 @@ namespace xpcc
 		 * 
 		 * A complete example is available in the \c example/amnb folder.
 		 * 
-		 * \see		xpcc::amnb::Node
+		 * \see		modm::amnb::Node
 		 * \ingroup	amnb
 		 */
 		struct Callable
@@ -186,20 +186,20 @@ namespace xpcc
 		 * \brief	AMNB Node
 		 * 
 		 * \code
-		 * typedef xpcc::amnb::Node< xpcc::amnb::Interface< xpcc::BufferedUart0 > > Node;
+		 * typedef modm::amnb::Node< modm::amnb::Interface< modm::BufferedUart0 > > Node;
 		 * 
-		 * FLASH_STORAGE(xpcc::amnb::Action actionList[]) =
+		 * FLASH_STORAGE(modm::amnb::Action actionList[]) =
 		 * {
 		 *     AMNB_ACTION(0x57, object, Object::method1,  0),
 		 *     AMNB_ACTION(0x03, object, Object::method2,  2),
 		 * };
 		 * // optional
-		 * FLASH_STORAGE(xpcc::amnb::Listener listenList[]) =
+		 * FLASH_STORAGE(modm::amnb::Listener listenList[]) =
 		 * {
 		 *     AMNB_LISTEN(0x29, 0x46,	object, Object::method)
 		 * };
 		 * // also optional
-		 * FLASH_STORAGE(xpcc::amnb::ErrorHandler errorHandlerList[]) =
+		 * FLASH_STORAGE(modm::amnb::ErrorHandler errorHandlerList[]) =
 		 * {
 		 *     AMNB_LISTEN(0x29, 0x46,	object, Object::method)
 		 * };
@@ -209,13 +209,13 @@ namespace xpcc
 		 * {
 		 *     // initialize the interface
 		 *     Node node(0x02,
-		 *               xpcc::accessor::asFlash(actionList),
-		 *               sizeof(actionList) / sizeof(xpcc::amnb::Action),
+		 *               modm::accessor::asFlash(actionList),
+		 *               sizeof(actionList) / sizeof(modm::amnb::Action),
 		 *				 // optional
-		 *               xpcc::accessor::asFlash(listenList),
-		 *               sizeof(listenList) / sizeof(xpcc::amnb::Listener),
-		 *               xpcc::accessor::asFlash(errorHandlerList),
-		 *               sizeof(errorHandlerList) / sizeof(xpcc::amnb::ErrorHandler));
+		 *               modm::accessor::asFlash(listenList),
+		 *               sizeof(listenList) / sizeof(modm::amnb::Listener),
+		 *               modm::accessor::asFlash(errorHandlerList),
+		 *               sizeof(errorHandlerList) / sizeof(modm::amnb::ErrorHandler));
 		 *     
 		 *     while(1)
 		 *     {
@@ -251,20 +251,20 @@ namespace xpcc
 			 * \see		AMNB_LISTEN()
 			 * \see		AMNB_ERROR()
 			 */
-			Node(uint8_t address, xpcc::accessor::Flash<Action> actionList, uint8_t actionCount,
-				 xpcc::accessor::Flash<Listener> listenList, uint8_t listenCount,
-				 xpcc::accessor::Flash<ErrorHandler> errorHandlerList, uint8_t errorHandlerCount);
+			Node(uint8_t address, modm::accessor::Flash<Action> actionList, uint8_t actionCount,
+				 modm::accessor::Flash<Listener> listenList, uint8_t listenCount,
+				 modm::accessor::Flash<ErrorHandler> errorHandlerList, uint8_t errorHandlerCount);
 			
 			/**
 			 * \brief	Initialize the node without error handlers
 			 */
-			Node(uint8_t address, xpcc::accessor::Flash<Action> actionList, uint8_t actionCount,
-				 xpcc::accessor::Flash<Listener> listenList, uint8_t listenCount);
+			Node(uint8_t address, modm::accessor::Flash<Action> actionList, uint8_t actionCount,
+				 modm::accessor::Flash<Listener> listenList, uint8_t listenCount);
 			
 			/**
 			 * \brief	Initialize the node without listeners or error handlers
 			 */
-			Node(uint8_t address, xpcc::accessor::Flash<Action> actionList, uint8_t actionCount);
+			Node(uint8_t address, modm::accessor::Flash<Action> actionList, uint8_t actionCount);
 			
 			/**
 			 * \brief	Start a new query with a payload
@@ -344,7 +344,7 @@ namespace xpcc
 			 * isSuccess() returns \c false.
 			 * 
 			 * \return	Error code
-			 * \see		xpcc::amnb::Error
+			 * \see		modm::amnb::Error
 			 */
 			uint8_t
 			getErrorCode();
@@ -376,11 +376,11 @@ namespace xpcc
 			
 			
 			uint8_t ownAddress;
-			xpcc::accessor::Flash<Action> actionList;
+			modm::accessor::Flash<Action> actionList;
 			uint8_t actionCount;
-			xpcc::accessor::Flash<Listener> listenList;
+			modm::accessor::Flash<Listener> listenList;
 			uint8_t listenCount;
-			xpcc::accessor::Flash<ErrorHandler> errorHandlerList;
+			modm::accessor::Flash<ErrorHandler> errorHandlerList;
 			uint8_t errorHandlerCount;
 			
 			uint8_t currentCommand;
@@ -398,7 +398,7 @@ namespace xpcc
 			QueryStatus queryStatus;
 			uint8_t expectedAddress;
 			uint8_t expectedResponseLength;
-			xpcc::ShortTimeout timer;
+			modm::ShortTimeout timer;
 			
 			static const uint8_t timeout = 10;		///< timeout value in milliseconds
 		};
@@ -411,17 +411,17 @@ namespace xpcc
 	 * 
 	 * Example:
 	 * \code
-	 * class Sensor : public xpcc::amnb::Callable
+	 * class Sensor : public modm::amnb::Callable
 	 * {
 	 * public:
 	 *     void
-	 *     sendValue(xpcc::amnb::Response& response)
+	 *     sendValue(modm::amnb::Response& response)
 	 *     {
 	 *         response.send(this->value);
 	 *     }
 	 *     
 	 *     void
-	 *     doSomething(xpcc::amnb::Response& response, const uint32_t* parameter)
+	 *     doSomething(modm::amnb::Response& response, const uint32_t* parameter)
 	 *     {
 	 *         // ... do something useful ...
 	 *         
@@ -436,7 +436,7 @@ namespace xpcc
 	 * 
 	 * Sensor sensor;
 	 * 
-	 * FLASH_STORAGE(xpcc::amnb::Action actionList[]) =
+	 * FLASH_STORAGE(modm::amnb::Action actionList[]) =
 	 * {
 	 *     AMNB_ACTION(0x57, sensor, Sensor::sendValue,   0),
 	 *     AMNB_ACTION(0x03, sensor, Sensor::doSomething, sizeof(uint32_t)),
@@ -450,7 +450,7 @@ namespace xpcc
 	 * \param	function	Member function of object
 	 * \param	length		Parameter size in bytes
 	 * 
-	 * \see		xpcc::amnb::Action
+	 * \see		modm::amnb::Action
 	 * \ingroup	amnb
 	 */
 	#define	AMNB_ACTION(command, object, function, length)
@@ -458,8 +458,8 @@ namespace xpcc
 	#define	AMNB_ACTION(command, object, function, length)		\
 		{	command, \
 			length, \
-			static_cast<xpcc::amnb::Callable *>(&object), \
-			reinterpret_cast<xpcc::amnb::Action::Callback>(&function) }
+			static_cast<modm::amnb::Callable *>(&object), \
+			reinterpret_cast<modm::amnb::Action::Callback>(&function) }
 #endif	// __DOXYGEN__
 
 
@@ -470,7 +470,7 @@ namespace xpcc
 	 * 
 	 * Example:
 	 * \code
-	 * class ListenToNodes : public xpcc::amnb::Callable
+	 * class ListenToNodes : public modm::amnb::Callable
 	 * {
 	 * public:
 	 *     void
@@ -492,7 +492,7 @@ namespace xpcc
 	 * 
 	 * ListenToNodes listen;
 	 * 
-	 * FLASH_STORAGE(xpcc::amnb::Listener listenList[]) =
+	 * FLASH_STORAGE(modm::amnb::Listener listenList[]) =
 	 * {
 	 *     AMNB_LISTEN(0x46, 0x03, listen, ListenToNodes::listenToCommand),
 	 * };
@@ -505,7 +505,7 @@ namespace xpcc
 	 * \param	object		
 	 * \param	function	Member function of object
 	 * 
-	 * \see		xpcc::amnb::Listener
+	 * \see		modm::amnb::Listener
 	 * \ingroup	amnb
 	 */
 	#define	AMNB_LISTEN(address, command, object, function)
@@ -513,8 +513,8 @@ namespace xpcc
 	#define	AMNB_LISTEN(address, command, object, function)	\
 		{	address, \
 			command, \
-			static_cast<xpcc::amnb::Callable *>(&object), \
-			reinterpret_cast<xpcc::amnb::Listener::Callback>(&function) }
+			static_cast<modm::amnb::Callable *>(&object), \
+			reinterpret_cast<modm::amnb::Listener::Callback>(&function) }
 #endif	// __DOXYGEN__
 
 
@@ -524,11 +524,11 @@ namespace xpcc
 	 * 
 	 * Example:
 	 * \code
-	 * class handleErrors : public xpcc::amnb::Callable
+	 * class handleErrors : public modm::amnb::Callable
 	 * {
 	 * public:
 	 *     void
-	 *     errorForCommand(xpcc::amnb::Flags type, const uint8_t errorCode)
+	 *     errorForCommand(modm::amnb::Flags type, const uint8_t errorCode)
 	 *     {
 	 *         // ... do something useful with that information ...
 	 *         
@@ -539,7 +539,7 @@ namespace xpcc
 	 * 
 	 * handleErrors errorhandler;
 	 * 
-	 * FLASH_STORAGE(xpcc::amnb::Listener listenList[]) =
+	 * FLASH_STORAGE(modm::amnb::Listener listenList[]) =
 	 * {
 	 *     AMNB_LISTEN(0x37, 0x57, errorhandler, handleErrors::errorForCommand),
 	 * };
@@ -552,7 +552,7 @@ namespace xpcc
 	 * \param	object		
 	 * \param	function	Member function of object
 	 * 
-	 * \see		xpcc::amnb::ErrorHandler
+	 * \see		modm::amnb::ErrorHandler
 	 * \ingroup	amnb
 	 */
 	#define	AMNB_ERROR(address, command, object, function)
@@ -560,10 +560,10 @@ namespace xpcc
 	#define	AMNB_ERROR(address, command, object, function)	\
 		{	address, \
 			command, \
-			static_cast<xpcc::amnb::Callable *>(&object), \
-			reinterpret_cast<xpcc::amnb::ErrorHandler::Callback>(&function) }
+			static_cast<modm::amnb::Callable *>(&object), \
+			reinterpret_cast<modm::amnb::ErrorHandler::Callback>(&function) }
 #endif	// __DOXYGEN__
 
 #include "node_impl.hpp"
 
-#endif	// XPCC_AMNB_NODE_HPP
+#endif	// MODM_AMNB_NODE_HPP

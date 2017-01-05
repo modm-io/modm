@@ -100,20 +100,20 @@ def jinja2_template_action(target, source, env):
 			return posixpath.normpath(d)
 
 	# path, filename = os.path.split(source[0].path)
-	path = env['XPCC_ROOTPATH']
+	path = env['MODM_ROOTPATH']
 	filename = os.path.relpath(source[0].path, path)
 	loader = RelEnvironment(loader = jinja2.FileSystemLoader(path), extensions=['jinja2.ext.do'])
-	if 'XPCC_JINJA2_FILTER' in env:
+	if 'MODM_JINJA2_FILTER' in env:
 		loader.filters = dict(loader.filters.items() +
-								env['XPCC_JINJA2_FILTER'].items())
-	loader.filters['xpcc.wordwrap'] = filter_wordwrap
-	loader.filters['xpcc.indent'] = filter_indent
-	loader.filters['xpcc.pad'] = filter_pad
-	loader.filters['xpcc.values'] = filter_values
-	loader.filters['split'] = filter_split	# not XPCC specific
-	if 'XPCC_JINJA2_TEST' in env:
+								env['MODM_JINJA2_FILTER'].items())
+	loader.filters['modm.wordwrap'] = filter_wordwrap
+	loader.filters['modm.indent'] = filter_indent
+	loader.filters['modm.pad'] = filter_pad
+	loader.filters['modm.values'] = filter_values
+	loader.filters['split'] = filter_split	# not MODM specific
+	if 'MODM_JINJA2_TEST' in env:
 		loader.tests = dict(loader.tests.items() +
-								env['XPCC_JINJA2_TEST'].items())
+								env['MODM_JINJA2_TEST'].items())
 	# Jinja2 Line Statements
 	loader.line_statement_prefix = '%%'
 	loader.line_comment_prefix = '%#'
@@ -143,14 +143,14 @@ def template_string(target, source, env):
 	return "Template: '%s' to '%s'" % (str(source[0]), str(target[0]))
 
 def template_add_test(env, test_name, test_function, alias='template_add_test'):
-	if 'XPCC_JINJA2_TEST' not in env:
-		env['XPCC_JINJA2_TEST'] = {}
-	env['XPCC_JINJA2_TEST'][test_name] = test_function
+	if 'MODM_JINJA2_TEST' not in env:
+		env['MODM_JINJA2_TEST'] = {}
+	env['MODM_JINJA2_TEST'][test_name] = test_function
 
 def template_add_filter(env, filter_name, filter_function, alias='template_add_filter'):
-	if 'XPCC_JINJA2_FILTER' not in env:
-		env['XPCC_JINJA2_FILTER'] = {}
-	env['XPCC_JINJA2_FILTER'][filter_name] = filter_function
+	if 'MODM_JINJA2_FILTER' not in env:
+		env['MODM_JINJA2_FILTER'] = {}
+	env['MODM_JINJA2_FILTER'][filter_name] = filter_function
 
 # -----------------------------------------------------------------------------
 includeExpression = re.compile(r"(\{%|%%)\s+(import|include)\s+'(?P<file>\S+)'")

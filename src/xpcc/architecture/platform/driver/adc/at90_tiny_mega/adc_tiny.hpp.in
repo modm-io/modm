@@ -15,8 +15,8 @@
  * @defgroup	{{target.string}}_adc ADC
  */
 
-#ifndef XPCC_ATTINY_ADC_HPP
-#define XPCC_ATTINY_ADC_HPP
+#ifndef MODM_ATTINY_ADC_HPP
+#define MODM_ATTINY_ADC_HPP
 
 #include <modm/architecture/interface/adc.hpp>
 #include "../device.hpp"
@@ -85,7 +85,7 @@
 
 %% set resolution = 8 if target["name"] in ['5', '10'] else 10
 
-namespace xpcc
+namespace modm
 {
 
 namespace attiny
@@ -113,7 +113,7 @@ namespace attiny
  * @author	Niklas Hauser
  * @ingroup	{{target.string}}_adc
  */
-class Adc : public xpcc::Adc
+class Adc : public modm::Adc
 {
 public:
 	typedef uint8_t Channel;
@@ -169,7 +169,7 @@ private:
 public:
 	// start inherited documentation
 	template< class SystemClock, uint32_t frequency=100000,
-			uint16_t tolerance = xpcc::Tolerance::TenPercent >
+			uint16_t tolerance = modm::Tolerance::TenPercent >
 	static void
 	initialize()
 	{
@@ -426,6 +426,6 @@ private:
 
 }	// namespace attiny
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif	// XPCC_ATTINY_ADC_HPP
+#endif	// MODM_ATTINY_ADC_HPP

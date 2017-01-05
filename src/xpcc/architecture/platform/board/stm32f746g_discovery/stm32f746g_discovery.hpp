@@ -17,14 +17,14 @@
 // http://www.st.com/content/st_com/en/products/evaluation-tools/product-evaluation-tools/mcu-eval-tools/stm32-mcu-eval-tools/stm32-mcu-discovery-kits/32f746gdiscovery.html
 //
 
-#ifndef XPCC_STM32_F746G_DISCOVERY_HPP
-#define XPCC_STM32_F746G_DISCOVERY_HPP
+#ifndef MODM_STM32_F746G_DISCOVERY_HPP
+#define MODM_STM32_F746G_DISCOVERY_HPP
 
 #include <modm/architecture/platform.hpp>
 #include <modm/debug/logger.hpp>
-#define XPCC_BOARD_HAS_LOGGER
+#define MODM_BOARD_HAS_LOGGER
 
-using namespace xpcc::stm32;
+using namespace modm::stm32;
 
 namespace Board
 {
@@ -96,10 +96,10 @@ struct systemClock
 		// APB2 is running only at 54MHz, since AHB / 2 = 108MHz > 90MHz limit!
 		ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div4);
 		// update clock frequencies
-		xpcc::clock::fcpu     = Frequency;
-		xpcc::clock::fcpu_kHz = Frequency / 1000;
-		xpcc::clock::fcpu_MHz = Frequency / 1000000;
-		xpcc::clock::ns_per_loop = ::round(1000 / (Frequency / 1000000));
+		modm::clock::fcpu     = Frequency;
+		modm::clock::fcpu_kHz = Frequency / 1000;
+		modm::clock::fcpu_MHz = Frequency / 1000000;
+		modm::clock::ns_per_loop = ::round(1000 / (Frequency / 1000000));
 
 		return true;
 	}
@@ -109,7 +109,7 @@ struct systemClock
 using Button = GpioInputI11;	// User Button
 using LedD13 = GpioOutputI1;	// User LED 1 (Arduino D13)
 
-using Leds = xpcc::SoftwareGpioPort< LedD13 >;
+using Leds = modm::SoftwareGpioPort< LedD13 >;
 
 
 namespace stlink
@@ -123,7 +123,7 @@ inline void
 initialize()
 {
 	systemClock::enable();
-	xpcc::cortex::SysTickTimer::initialize<systemClock>();
+	modm::cortex::SysTickTimer::initialize<systemClock>();
 
 	stlink::Tx::connect(stlink::Uart::Tx);
 	stlink::Rx::connect(stlink::Uart::Rx, Gpio::InputType::PullUp);
@@ -137,4 +137,4 @@ initialize()
 
 }
 
-#endif	// XPCC_STM32_F746G_DISCOVERY_HPP
+#endif	// MODM_STM32_F746G_DISCOVERY_HPP

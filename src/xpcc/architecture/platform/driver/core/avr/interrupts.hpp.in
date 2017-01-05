@@ -13,8 +13,8 @@
 
 {{ generation_block }}
 
-#ifndef XPCC_AVR_INTERRUPTS_HPP
-#define XPCC_AVR_INTERRUPTS_HPP
+#ifndef MODM_AVR_INTERRUPTS_HPP
+#define MODM_AVR_INTERRUPTS_HPP
 
 #include "../device.hpp"
 
@@ -23,7 +23,7 @@
  * @defgroup	{{target.string}}_core Core
  */
 
-namespace xpcc
+namespace modm
 {
 
 /// @ingroup	{{target.string}}_core
@@ -31,14 +31,14 @@ namespace {{ target["family"] }}
 {
 
 /// enables global interrupts
-static xpcc_always_inline void
+static modm_always_inline void
 enableInterrupts()
 {
 	sei();
 }
 
 /// disables global interrupts
-static xpcc_always_inline void
+static modm_always_inline void
 disableInterrupts()
 {
 	cli();
@@ -83,7 +83,7 @@ i(InterruptControlLevel level) { return static_cast<uint8_t>(level); }
  *
  * Example:
  * @code
- * using namespace xpcc::xmega;
+ * using namespace modm::xmega;
  * // reset all interrupt levels
  * resetInterruptLevel(InterruptControlLevel::All);
  * // set only High and Medium
@@ -114,7 +114,7 @@ disableInterruptLevel(InterruptControlLevel level)
 
 }	// namespace {{ target["family"] }}
 
-}	// namespace xpcc
+}	// namespace modm
 
 
-#endif	// XPCC_AVR_INTERRUPTS_HPP
+#endif	// MODM_AVR_INTERRUPTS_HPP

@@ -17,8 +17,8 @@
  *
  */
 
-#ifndef XPCC_MATRIX_HPP
-#define XPCC_MATRIX_HPP
+#ifndef MODM_MATRIX_HPP
+#define MODM_MATRIX_HPP
 
 #include <cmath>
 #include <string.h>		// for memset() and memcmp()
@@ -27,7 +27,7 @@
 #include <modm/io/iostream.hpp>
 #include <modm/utils/template_metaprogramming.hpp>
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	Class for handling common matrix operations
@@ -78,7 +78,7 @@ namespace xpcc
 		 *     5, 6,
 		 * };
 		 * 
-		 * xpcc::Matrix<int16_t, 3, 2> a(m);
+		 * modm::Matrix<int16_t, 3, 2> a(m);
 		 * \endcode
 		 */
 		Matrix(const T *data);
@@ -175,7 +175,7 @@ namespace xpcc
 		/**
 		 * \brief	Calculate the determinant
 		 * 
-		 * Uses xpcc::determinant(*this);
+		 * Uses modm::determinant(*this);
 		 */
 		inline T
 		determinant() const;
@@ -246,12 +246,12 @@ namespace xpcc
 	/// \internal
 	template<typename T>
 	T
-	determinant(const xpcc::Matrix<T, 1, 1> &m);
+	determinant(const modm::Matrix<T, 1, 1> &m);
 	
 	/// \internal
 	template<typename T>
 	T
-	determinant(const xpcc::Matrix<T, 2, 2> &m);
+	determinant(const modm::Matrix<T, 2, 2> &m);
 	
 	/**
 	 * \brief	Calculate the determinant
@@ -261,9 +261,9 @@ namespace xpcc
 	 */
 	template<typename T, uint8_t N>
 	T
-	determinant(const xpcc::Matrix<T, N, N> &m);
+	determinant(const modm::Matrix<T, N, N> &m);
 }
 
 #include "matrix_impl.hpp"
 
-#endif	// XPCC_MATRIX_HPP
+#endif	// MODM_MATRIX_HPP

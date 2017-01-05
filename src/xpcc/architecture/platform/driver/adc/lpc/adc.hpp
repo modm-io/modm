@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LPC111X_ADC_HPP
-#define XPCC_LPC111X_ADC_HPP
+#ifndef MODM_LPC111X_ADC_HPP
+#define MODM_LPC111X_ADC_HPP
 
 #include "../device.h"
 
@@ -49,7 +49,7 @@
 #define ADC_OFFSET		0x10
 #define ADC_INDEX		4
 
-namespace xpcc
+namespace modm
 {
 	namespace lpc
 	{
@@ -426,4 +426,4 @@ namespace xpcc
 	}  // namespace lpc
 }
 
-#endif // XPCC_LPC111X_ADC_HPP
+#endif // MODM_LPC111X_ADC_HPP

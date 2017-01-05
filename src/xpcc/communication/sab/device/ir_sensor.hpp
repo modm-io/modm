@@ -12,12 +12,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SAB_IR_SENSOR_HPP
-#define XPCC_SAB_IR_SENSOR_HPP
+#ifndef MODM_SAB_IR_SENSOR_HPP
+#define MODM_SAB_IR_SENSOR_HPP
 
 #include "../interface.hpp"
 
-namespace xpcc
+namespace modm
 {
 	namespace sab
 	{
@@ -26,4 +26,4 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC_SAB_IR_SENSOR_HPP
+#endif	// MODM_SAB_IR_SENSOR_HPP

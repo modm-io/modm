@@ -17,7 +17,7 @@
 #include <modm/container/linked_list.hpp>
 #include <modm/architecture/interface/can.hpp>
 
-class FakeCanDriver : public xpcc::Can
+class FakeCanDriver : public modm::Can
 {
 public:
 	FakeCanDriver();
@@ -26,13 +26,13 @@ public:
 	isMessageAvailable();
 	
 	bool
-	getMessage(xpcc::can::Message& message);
+	getMessage(modm::can::Message& message);
 	
 	bool
 	isReadyToSend();
 	
 	bool
-	sendMessage(const xpcc::can::Message& message);
+	sendMessage(const modm::can::Message& message);
 
 	static uint8_t
 	getReceiveErrorCounter();
@@ -45,10 +45,10 @@ public:
 	
 public:
 	/// Messages which should be received
-	xpcc::LinkedList<xpcc::can::Message> receiveList;
+	modm::LinkedList<modm::can::Message> receiveList;
 	
 	/// List of all messages send
-	xpcc::LinkedList<xpcc::can::Message> sendList;
+	modm::LinkedList<modm::can::Message> sendList;
 	
 	/// number of messages which could be send
 	uint8_t sendSlots;

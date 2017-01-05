@@ -9,7 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LSM303A_HPP
+#ifndef MODM_LSM303A_HPP
 #	error  "Don't include this file directly, use 'lsm303a.hpp' instead!"
 #endif
 
@@ -18,14 +18,14 @@
 // ----------------------------------------------------------------------------
 // MARK: LIS302 DRIVER
 template < class I2cMaster >
-xpcc::Lsm303a<I2cMaster>::Lsm303a(Data &data, uint8_t address)
+modm::Lsm303a<I2cMaster>::Lsm303a(Data &data, uint8_t address)
 :	Lis3TransportI2c<I2cMaster>(address), data(data), rawBuffer{7,0,0,0,0,0, 0,0, 0,0,0,0,0,0, 0,0}
 {
 }
 
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Lsm303a<I2cMaster>::configure(Scale scale, MeasurementRate rate)
+modm::ResumableResult<bool>
+modm::Lsm303a<I2cMaster>::configure(Scale scale, MeasurementRate rate)
 {
 	RF_BEGIN();
 
@@ -47,8 +47,8 @@ xpcc::Lsm303a<I2cMaster>::configure(Scale scale, MeasurementRate rate)
 }
 
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Lsm303a<I2cMaster>::updateControlRegister(uint8_t index, Control_t setMask, Control_t clearMask)
+modm::ResumableResult<bool>
+modm::Lsm303a<I2cMaster>::updateControlRegister(uint8_t index, Control_t setMask, Control_t clearMask)
 {
 	RF_BEGIN();
 
@@ -67,8 +67,8 @@ xpcc::Lsm303a<I2cMaster>::updateControlRegister(uint8_t index, Control_t setMask
 }
 
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Lsm303a<I2cMaster>::readAcceleration()
+modm::ResumableResult<bool>
+modm::Lsm303a<I2cMaster>::readAcceleration()
 {
 	RF_BEGIN();
 
@@ -84,8 +84,8 @@ xpcc::Lsm303a<I2cMaster>::readAcceleration()
 
 // ----------------------------------------------------------------------------
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Lsm303a<I2cMaster>::updateRegister(uint8_t reg, uint8_t setMask, uint8_t clearMask)
+modm::ResumableResult<bool>
+modm::Lsm303a<I2cMaster>::updateRegister(uint8_t reg, uint8_t setMask, uint8_t clearMask)
 {
 	RF_BEGIN();
 

@@ -18,7 +18,7 @@
 void
 TimeTest::testConversionToUnixTime()
 {
-	xpcc::Date date;
+	modm::Date date;
 	
 	// 01:46:40 UTC on 9 September 2001
 	date.second = 40;
@@ -37,7 +37,7 @@ TimeTest::testConversionToUnixTime()
 void
 TimeTest::testConversionToUnixTime2()
 {
-	xpcc::Date date;
+	modm::Date date;
 	
 	//13:37:04 UTC on 10 January 2004
 	date.second = 4;
@@ -56,7 +56,7 @@ TimeTest::testConversionToUnixTime2()
 void
 TimeTest::testConversionToUnixTime3()
 {
-	xpcc::Date date;
+	modm::Date date;
 	
 	// 03:42:01 UTC on 27 July 2011
 	date.second = 1;
@@ -75,7 +75,7 @@ TimeTest::testConversionToUnixTime3()
 void
 TimeTest::testConversionToUnixTime4()
 {
-	xpcc::Date date;
+	modm::Date date;
 	
 	date.second = 44;
 	date.minute = 14;
@@ -93,7 +93,7 @@ TimeTest::testConversionToUnixTime4()
 void
 TimeTest::testConversionToUnixTime5()
 {
-	xpcc::Date date;
+	modm::Date date;
 	
 	// 00:37:33 UTC on 21 July 2069
 	date.second = 33;
@@ -114,8 +114,8 @@ TimeTest::testConversionToUnixTime5()
 void
 TimeTest::testConversionToDate()
 {
-	xpcc::Date date;
-	xpcc::UnixTime(1000000000UL).toDate(&date);
+	modm::Date date;
+	modm::UnixTime(1000000000UL).toDate(&date);
 	
 	TEST_ASSERT_EQUALS(date.second, 40);
 	TEST_ASSERT_EQUALS(date.minute, 46);
@@ -131,8 +131,8 @@ TimeTest::testConversionToDate()
 void
 TimeTest::testConversionToDate2()
 {
-	xpcc::Date date;
-	xpcc::UnixTime(1073741824UL).toDate(&date);
+	modm::Date date;
+	modm::UnixTime(1073741824UL).toDate(&date);
 	
 	TEST_ASSERT_EQUALS(date.second, 4);
 	TEST_ASSERT_EQUALS(date.minute, 37);
@@ -148,8 +148,8 @@ TimeTest::testConversionToDate2()
 void
 TimeTest::testConversionToDate3()
 {
-	xpcc::Date date;
-	xpcc::UnixTime(1311738121UL).toDate(&date);
+	modm::Date date;
+	modm::UnixTime(1311738121UL).toDate(&date);
 	
 	TEST_ASSERT_EQUALS(date.second, 1);
 	TEST_ASSERT_EQUALS(date.minute, 42);
@@ -165,8 +165,8 @@ TimeTest::testConversionToDate3()
 void
 TimeTest::testConversionToDate4()
 {
-	xpcc::Date date;
-	xpcc::UnixTime(1333329284UL).toDate(&date);
+	modm::Date date;
+	modm::UnixTime(1333329284UL).toDate(&date);
 	
 	TEST_ASSERT_EQUALS(date.second, 44);
 	TEST_ASSERT_EQUALS(date.minute, 14);
@@ -182,8 +182,8 @@ TimeTest::testConversionToDate4()
 void
 TimeTest::testConversionToDate5()
 {
-	xpcc::Date date;
-	xpcc::UnixTime(3141592653UL).toDate(&date);
+	modm::Date date;
+	modm::UnixTime(3141592653UL).toDate(&date);
 	
 	// 00:37:33 UTC on 21 July 2069
 	TEST_ASSERT_EQUALS(date.second, 33);

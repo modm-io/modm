@@ -17,8 +17,8 @@
 %% set hal = uart_name ~ "Hal" ~ id
 %% set name = uart_name ~ id
 
-#ifndef XPCC_STM32_UART_{{ id }}_HPP
-#define XPCC_STM32_UART_{{ id }}_HPP
+#ifndef MODM_STM32_UART_{{ id }}_HPP
+#define MODM_STM32_UART_{{ id }}_HPP
 
 #include <modm/architecture/interface/uart.hpp>
 #include "type_ids.hpp"
@@ -26,7 +26,7 @@
 #include "uart_baudrate.hpp"
 #include "uart_hal_{{ id }}.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 namespace stm32
@@ -39,7 +39,7 @@ namespace stm32
  * @author		Niklas Hauser
  * @ingroup		{{partname}}_uart
  */
-class {{ name }} : public UartBase, public ::xpcc::Uart
+class {{ name }} : public UartBase, public ::modm::Uart
 {
 public:
 	/// TypeId used to connect GPIO pins to this peripheral's rx.
@@ -57,8 +57,8 @@ private:
 
 public:
 template< 	class SystemClock, uint32_t baudrate,
-		uint16_t tolerance = xpcc::Tolerance::OnePercent >
-	static void xpcc_always_inline
+		uint16_t tolerance = modm::Tolerance::OnePercent >
+	static void modm_always_inline
 %% if options["buffered"]
 	initialize(uint32_t interruptPriority, Parity parity = Parity::Disabled)
 %% else
@@ -118,6 +118,6 @@ template< 	class SystemClock, uint32_t baudrate,
 
 }	// namespace stm32
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif // XPCC_STM32_UART_{{ id }}_HPP
+#endif // MODM_STM32_UART_{{ id }}_HPP

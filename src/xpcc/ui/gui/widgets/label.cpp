@@ -15,13 +15,13 @@
 #include <modm/ui/gui/colorpalette.hpp>
 
 void
-xpcc::gui::Label::render(View* view)
+modm::gui::Label::render(View* view)
 {
 	if(view == NULL)
 		return;
 
 	// output device of view
-	xpcc::GraphicDisplay* out = &view->display();
+	modm::GraphicDisplay* out = &view->display();
 
 	out->setColor(color);
 

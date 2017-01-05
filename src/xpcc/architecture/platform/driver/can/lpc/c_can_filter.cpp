@@ -18,7 +18,7 @@
 #include "../../../device.hpp"
 // ----------------------------------------------------------------------------
 void
-xpcc::lpc::CanFilter::setFilter(
+modm::lpc::CanFilter::setFilter(
 					ExtendedIdentifier id,
 					ExtendedFilterMask mask,
 					uint8_t firstMob,

@@ -21,10 +21,10 @@ extern void
 board_initialize_display(uint8_t);
 
 // Basic implementation of display running on memory mapped buffer
-class DsiDisplay : public xpcc::GraphicDisplay
+class DsiDisplay : public modm::GraphicDisplay
 {
 public:
-	DsiDisplay() : buffer(new (xpcc::MemoryExternal) uint16_t[800*480])
+	DsiDisplay() : buffer(new (modm::MemoryExternal) uint16_t[800*480])
 	{
 		// ColorCoding: 0 = ARGB8888, 2 = RGB565
 		board_initialize_display(2);
@@ -90,7 +90,7 @@ Board::initializeDisplay()
 	board_initialize_display(2);
 }
 
-xpcc::GraphicDisplay&
+modm::GraphicDisplay&
 Board::getDisplay()
 {
 	static DsiDisplay display;

@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_NRF24_DATA_HPP
+#ifndef MODM_NRF24_DATA_HPP
 #   error "Don't include this file directly, use 'nrf24_data.hpp' instead!"
 #endif
 
@@ -20,43 +20,43 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 template<typename Nrf24Phy>
-typename xpcc::Nrf24Data<Nrf24Phy>::BaseAddress
-xpcc::Nrf24Data<Nrf24Phy>::baseAddress;
+typename modm::Nrf24Data<Nrf24Phy>::BaseAddress
+modm::Nrf24Data<Nrf24Phy>::baseAddress;
 
 template<typename Nrf24Phy>
-typename xpcc::Nrf24Data<Nrf24Phy>::Address
-xpcc::Nrf24Data<Nrf24Phy>::broadcastAddress;
+typename modm::Nrf24Data<Nrf24Phy>::Address
+modm::Nrf24Data<Nrf24Phy>::broadcastAddress;
 
 template<typename Nrf24Phy>
-typename xpcc::Nrf24Data<Nrf24Phy>::Address
-xpcc::Nrf24Data<Nrf24Phy>::ownAddress;
+typename modm::Nrf24Data<Nrf24Phy>::Address
+modm::Nrf24Data<Nrf24Phy>::ownAddress;
 
 template<typename Nrf24Phy>
-typename xpcc::Nrf24Data<Nrf24Phy>::Address
-xpcc::Nrf24Data<Nrf24Phy>::connections[3];
+typename modm::Nrf24Data<Nrf24Phy>::Address
+modm::Nrf24Data<Nrf24Phy>::connections[3];
 
 template<typename Nrf24Phy>
-typename xpcc::Nrf24Data<Nrf24Phy>::Frame
-xpcc::Nrf24Data<Nrf24Phy>::assemblyFrame;
+typename modm::Nrf24Data<Nrf24Phy>::Frame
+modm::Nrf24Data<Nrf24Phy>::assemblyFrame;
 
 template<typename Nrf24Phy>
-typename xpcc::Nrf24Data<Nrf24Phy>::SendingState
-xpcc::Nrf24Data<Nrf24Phy>::state = SendingState::Undefined;
+typename modm::Nrf24Data<Nrf24Phy>::SendingState
+modm::Nrf24Data<Nrf24Phy>::state = SendingState::Undefined;
 
 template<typename Nrf24Phy>
 bool
-xpcc::Nrf24Data<Nrf24Phy>::packetProcessed = false;
+modm::Nrf24Data<Nrf24Phy>::packetProcessed = false;
 
 template<typename Nrf24Phy>
-xpcc::Timeout
-xpcc::Nrf24Data<Nrf24Phy>::sendingInterruptTimeout;
+modm::Timeout
+modm::Nrf24Data<Nrf24Phy>::sendingInterruptTimeout;
 
 // --------------------------------------------------------------------------------------------------------------------
 
 
 template<typename Nrf24Phy>
 void
-xpcc::Nrf24Data<Nrf24Phy>::initialize(BaseAddress base_address, Address own_address, Address broadcast_address)
+modm::Nrf24Data<Nrf24Phy>::initialize(BaseAddress base_address, Address own_address, Address broadcast_address)
 {
 	// Set base address and clear lower byte. When assembling full addresses,
 	// each Address (1 byte) will be ORed to the lower byte of this base address
@@ -127,7 +127,7 @@ xpcc::Nrf24Data<Nrf24Phy>::initialize(BaseAddress base_address, Address own_addr
 
 template<typename Nrf24Phy>
 void
-xpcc::Nrf24Data<Nrf24Phy>::setAddress(Address address)
+modm::Nrf24Data<Nrf24Phy>::setAddress(Address address)
 {
 	// overwrite connection
 	ownAddress = address;
@@ -143,11 +143,11 @@ xpcc::Nrf24Data<Nrf24Phy>::setAddress(Address address)
 
 template<typename Nrf24Phy>
 bool
-xpcc::Nrf24Data<Nrf24Phy>::sendPacket(Packet& packet)
+modm::Nrf24Data<Nrf24Phy>::sendPacket(Packet& packet)
 {
 	if(not isReadyToSend())
 	{
-		XPCC_LOG_WARNING << "Warning: Not ready to send" << xpcc::endl;
+		MODM_LOG_WARNING << "Warning: Not ready to send" << modm::endl;
 		state = SendingState::Failed;
 		packetProcessed = true;
 		return false;
@@ -155,8 +155,8 @@ xpcc::Nrf24Data<Nrf24Phy>::sendPacket(Packet& packet)
 
 	if(packet.payload.length > getPayloadLength())
 	{
-		XPCC_LOG_ERROR << "Error: Payload length was " << packet.payload.length
-		               << ", max is " << getPayloadLength() << xpcc::endl;
+		MODM_LOG_ERROR << "Error: Payload length was " << packet.payload.length
+		               << ", max is " << getPayloadLength() << modm::endl;
 		state = SendingState::Failed;
 		return false;
 	}
@@ -207,14 +207,14 @@ xpcc::Nrf24Data<Nrf24Phy>::sendPacket(Packet& packet)
 
 template<typename Nrf24Phy>
 bool
-xpcc::Nrf24Data<Nrf24Phy>::getPacket(Packet& packet)
+modm::Nrf24Data<Nrf24Phy>::getPacket(Packet& packet)
 {
 	if(!isPacketAvailable())
 		return false;
 
 	// Don't care about pipe numbers for now as we use our own header within each packet
 	// Pipe_t pipe = Config::getPayloadPipe();
-	// XPCC_LOG_DEBUG.printf("Received on pipe %d\n", pipe.value);
+	// MODM_LOG_DEBUG.printf("Received on pipe %d\n", pipe.value);
 
 	/*
 	 * TODO: Replace Packet by Frame because there's no reason to trade some bytes of RAM against the runtime
@@ -241,7 +241,7 @@ xpcc::Nrf24Data<Nrf24Phy>::getPacket(Packet& packet)
 
 template<typename Nrf24Phy>
 bool
-xpcc::Nrf24Data<Nrf24Phy>::isReadyToSend()
+modm::Nrf24Data<Nrf24Phy>::isReadyToSend()
 {
 	if(state == SendingState::Failed)
 		return true;
@@ -260,7 +260,7 @@ xpcc::Nrf24Data<Nrf24Phy>::isReadyToSend()
 
 template<typename Nrf24Phy>
 bool
-xpcc::Nrf24Data<Nrf24Phy>::updateSendingState()
+modm::Nrf24Data<Nrf24Phy>::updateSendingState()
 {
 	// directly return state if not busy, because nothing needs to be updated then
 	if(state != SendingState::Busy)
@@ -272,7 +272,7 @@ xpcc::Nrf24Data<Nrf24Phy>::updateSendingState()
 
 	if(sendingInterruptTimeout.execute())
 	{
-		XPCC_LOG_ERROR << "[nrf24-data] IRQ timed out" << xpcc::endl;
+		MODM_LOG_ERROR << "[nrf24-data] IRQ timed out" << modm::endl;
 
 		state = SendingState::DontKnow;
 
@@ -282,7 +282,7 @@ xpcc::Nrf24Data<Nrf24Phy>::updateSendingState()
 
 	} else if(status & (uint8_t)Status::MAX_RT)
 	{
-		XPCC_LOG_DEBUG << "Interrupt: MAX_RT" << xpcc::endl;
+		MODM_LOG_DEBUG << "Interrupt: MAX_RT" << modm::endl;
 
 		state = SendingState::FinishedNack;
 
@@ -293,7 +293,7 @@ xpcc::Nrf24Data<Nrf24Phy>::updateSendingState()
 
 	} else if(status & (uint8_t)Status::TX_DS)
 	{
-		XPCC_LOG_DEBUG << "Interrupt: TX_DS" << xpcc::endl;
+		MODM_LOG_DEBUG << "Interrupt: TX_DS" << modm::endl;
 
 		state = SendingState::FinishedAck;
 
@@ -315,7 +315,7 @@ xpcc::Nrf24Data<Nrf24Phy>::updateSendingState()
 
 template<typename Nrf24Phy>
 void
-xpcc::Nrf24Data<Nrf24Phy>::update()
+modm::Nrf24Data<Nrf24Phy>::update()
 {
 	// When sending state changed the communication has finished and we switch
 	// back to Rx mode
@@ -329,7 +329,7 @@ xpcc::Nrf24Data<Nrf24Phy>::update()
 
 template<typename Nrf24Phy>
 bool
-xpcc::Nrf24Data<Nrf24Phy>::isPacketAvailable()
+modm::Nrf24Data<Nrf24Phy>::isPacketAvailable()
 {
 	uint8_t fifo_status = Phy::readFifoStatus();
 	uint8_t status = Phy::readStatus();
@@ -346,7 +346,7 @@ xpcc::Nrf24Data<Nrf24Phy>::isPacketAvailable()
 
 template<typename Nrf24Phy>
 bool
-xpcc::Nrf24Data<Nrf24Phy>::establishConnection()
+modm::Nrf24Data<Nrf24Phy>::establishConnection()
 {
 	// not yet implemented
 	return false;
@@ -356,7 +356,7 @@ xpcc::Nrf24Data<Nrf24Phy>::establishConnection()
 
 template<typename Nrf24Phy>
 bool
-xpcc::Nrf24Data<Nrf24Phy>::destroyConnection()
+modm::Nrf24Data<Nrf24Phy>::destroyConnection()
 {
 	// not yet implemented
 	return false;

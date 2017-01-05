@@ -17,13 +17,13 @@
 // http://www.st.com/web/en/catalog/tools/FM116/SC959/SS1532/PF259724
 //
 
-#ifndef XPCC_STM32_F072_DISCOVERY_HPP
-#define XPCC_STM32_F072_DISCOVERY_HPP
+#ifndef MODM_STM32_F072_DISCOVERY_HPP
+#define MODM_STM32_F072_DISCOVERY_HPP
 
 #include <modm/architecture/platform.hpp>
 #include <modm/driver/inertial/l3gd20.hpp>
 
-using namespace xpcc::stm32;
+using namespace modm::stm32;
 
 
 namespace Board
@@ -50,10 +50,10 @@ struct systemClock
 		// Switch to the 48MHz clock
 		ClockControl::enableSystemClock(ClockControl::SystemClockSource::InternalClockMHz48);
 		// update frequencies for busy-wait delay functions
-		xpcc::clock::fcpu     = Frequency;
-		xpcc::clock::fcpu_kHz = Frequency / 1000;
-		xpcc::clock::fcpu_MHz = Frequency / 1000000;
-		xpcc::clock::ns_per_loop = ::round(4000 / (Frequency / 1000000));
+		modm::clock::fcpu     = Frequency;
+		modm::clock::fcpu_kHz = Frequency / 1000;
+		modm::clock::fcpu_MHz = Frequency / 1000000;
+		modm::clock::ns_per_loop = ::round(4000 / (Frequency / 1000000));
 
 		return true;
 	}
@@ -67,7 +67,7 @@ using LedDown  = GpioOutputC7;
 using LedLeft  = GpioOutputC8;
 using LedRight = GpioOutputC9;
 
-using Leds = xpcc::SoftwareGpioPort< LedLeft, LedDown, LedRight, LedUp >;
+using Leds = modm::SoftwareGpioPort< LedLeft, LedDown, LedRight, LedUp >;
 
 
 namespace l3g
@@ -81,8 +81,8 @@ using Mosi = GpioOutputB15;	// SPI2_MISO [L3GD20_SDA/SDI/SDO]
 using Miso = GpioInputB14;	// SPI2_MISO [L3GD20_SA0/SDO]
 
 using SpiMaster = SpiMaster2;
-using Transport = xpcc::Lis3TransportSpi< SpiMaster, Cs >;
-using Gyroscope = xpcc::L3gd20< Transport >;
+using Transport = modm::Lis3TransportSpi< SpiMaster, Cs >;
+using Gyroscope = modm::L3gd20< Transport >;
 }
 
 
@@ -90,12 +90,12 @@ inline void
 initialize()
 {
 	systemClock::enable();
-	xpcc::cortex::SysTickTimer::initialize<systemClock>();
+	modm::cortex::SysTickTimer::initialize<systemClock>();
 
-	LedUp::setOutput(xpcc::Gpio::Low);
-	LedDown::setOutput(xpcc::Gpio::Low);
-	LedLeft::setOutput(xpcc::Gpio::Low);
-	LedRight::setOutput(xpcc::Gpio::Low);
+	LedUp::setOutput(modm::Gpio::Low);
+	LedDown::setOutput(modm::Gpio::Low);
+	LedLeft::setOutput(modm::Gpio::Low);
+	LedRight::setOutput(modm::Gpio::Low);
 
 	Button::setInput();
 	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
@@ -117,7 +117,7 @@ initializeL3g()
 	l3g::Int2::enableExternalInterrupt();
 //	l3g::Int2::enableExternalInterruptVector(12);
 
-	l3g::Cs::setOutput(xpcc::Gpio::High);
+	l3g::Cs::setOutput(modm::Gpio::High);
 
 	l3g::Sck::connect(l3g::SpiMaster::Sck);
 	l3g::Mosi::connect(l3g::SpiMaster::Mosi);
@@ -129,4 +129,4 @@ initializeL3g()
 
 } // namespace Board
 
-#endif	// XPCC_STM32_F072_DISCOVERY_HPP
+#endif	// MODM_STM32_F072_DISCOVERY_HPP

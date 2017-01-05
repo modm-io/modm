@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_FLASH_READER_HPP
+#ifndef	MODM_FLASH_READER_HPP
 	#error	"Don't include this file directly, use 'flash_reader.hpp' instead!"
 #endif
 
@@ -25,12 +25,12 @@
 
 #define	INLINE_FLASH_STORAGE_STRING(s)	PSTR(s)
 
-namespace xpcc
+namespace modm
 {
 	template<typename T, std::size_t size>
 	struct FlashReader
 	{
-		xpcc_always_inline
+		modm_always_inline
 		static T
 		read(const void* p)
 		{
@@ -43,7 +43,7 @@ namespace xpcc
 	template<typename T>
 	struct FlashReader<T, 1>
 	{
-		xpcc_always_inline
+		modm_always_inline
 		static T
 		read(const void* p)
 		{
@@ -60,7 +60,7 @@ namespace xpcc
 	template<typename T>
 	struct FlashReader<T, 2>
 	{
-		xpcc_always_inline
+		modm_always_inline
 		static T
 		read(const void* p)
 		{
@@ -77,7 +77,7 @@ namespace xpcc
 	template<typename T>
 	struct FlashReader<T, 4>
 	{
-		xpcc_always_inline
+		modm_always_inline
 		static T
 		read(const void* p)
 		{

@@ -13,16 +13,16 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SDL_DISPLAY_HPP
-#define XPCC_SDL_DISPLAY_HPP
+#ifndef MODM_SDL_DISPLAY_HPP
+#define MODM_SDL_DISPLAY_HPP
 
 #include <modm/ui/display.hpp>
 #include <modm/debug/logger.hpp>
 #include <SDL/SDL.h>
 
-namespace xpcc
+namespace modm
 {
-	class SDLDisplay: public xpcc::GraphicDisplay
+	class SDLDisplay: public modm::GraphicDisplay
 	{
 	public:
 		SDLDisplay(int16_t width, int16_t height);
@@ -67,13 +67,13 @@ namespace xpcc
 		void clearWholeScreen();
 
 		inline uint8_t
-		colorToRed(xpcc::glcd::Color& color);
+		colorToRed(modm::glcd::Color& color);
 
 		inline uint8_t
-		colorToGreen(xpcc::glcd::Color& color);
+		colorToGreen(modm::glcd::Color& color);
 
 		inline uint8_t
-		colorToBlue(xpcc::glcd::Color& color);
+		colorToBlue(modm::glcd::Color& color);
 
 
 		const int16_t width;
@@ -84,4 +84,4 @@ namespace xpcc
 
 	};
 }
-#endif /* XPCC_SDL_DISPLAY_HPP */
+#endif /* MODM_SDL_DISPLAY_HPP */

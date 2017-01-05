@@ -13,7 +13,7 @@
 
 extern "C"
 void
-xpcc_gpio_enable(void)
+modm_gpio_enable(void)
 {
 	LPC_SYSCON->SYSAHBCLKCTRL |= SYSAHBCLKCTRL_GPIO;
 }

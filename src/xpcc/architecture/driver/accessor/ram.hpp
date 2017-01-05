@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_ACCESSOR_RAM_HPP
-#define	XPCC_ACCESSOR_RAM_HPP
+#ifndef	MODM_ACCESSOR_RAM_HPP
+#define	MODM_ACCESSOR_RAM_HPP
 
 #include <cstddef>
 #include <modm/architecture/utils.hpp>
 
-namespace xpcc
+namespace modm
 {
 	namespace accessor
 	{
@@ -31,34 +31,34 @@ namespace xpcc
 		class Ram
 		{
 		public:
-			xpcc_always_inline
+			modm_always_inline
 			Ram(const T* addr = 0) :
 				address(addr)
 			{
 			}
 			
 			template <typename U>
-			xpcc_always_inline
+			modm_always_inline
 			explicit Ram(const Ram<U>& rhs) :
 				address((T*) rhs.address)
 			{
 			}
 			
-			xpcc_always_inline
+			modm_always_inline
 			const T
 			operator *() const
 			{
 				return *address;
 			}
 			
-			xpcc_always_inline
+			modm_always_inline
 			const T
 			operator [](std::size_t index) const
 			{
 				return *(address + index);
 			}
 			
-			xpcc_always_inline
+			modm_always_inline
 			Ram&
 			operator ++ ()
 			{
@@ -66,7 +66,7 @@ namespace xpcc
 				return *this;
 			}
 
-			xpcc_always_inline
+			modm_always_inline
 			Ram
 			operator ++ (int)
 			{
@@ -75,7 +75,7 @@ namespace xpcc
 				return ret;
 			}
 
-			xpcc_always_inline
+			modm_always_inline
 			Ram&
 			operator -- ()
 			{
@@ -83,7 +83,7 @@ namespace xpcc
 				return *this;
 			}
 
-			xpcc_always_inline
+			modm_always_inline
 			Ram&
 			operator -- (int)
 			{
@@ -92,7 +92,7 @@ namespace xpcc
 				return ret;
 			}
 			
-			xpcc_always_inline
+			modm_always_inline
 			Ram&
 			operator += (std::size_t rhs)
 			{
@@ -100,7 +100,7 @@ namespace xpcc
 				return *this;
 			}
 			
-			xpcc_always_inline
+			modm_always_inline
 			Ram&
 			operator -= (std::size_t rhs)
 			{
@@ -108,7 +108,7 @@ namespace xpcc
 				return *this;
 			}
 			
-			xpcc_always_inline
+			modm_always_inline
 			const T*
 			getPointer() const
 			{
@@ -121,4 +121,4 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC_ACCESSOR_RAM_HPP
+#endif	// MODM_ACCESSOR_RAM_HPP

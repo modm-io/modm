@@ -13,8 +13,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_WINDOWS_HPP
-#define XPCC_WINDOWS_HPP
+#ifndef MODM_WINDOWS_HPP
+#define MODM_WINDOWS_HPP
 
 /**
  * \internal
@@ -125,4 +125,4 @@ namespace std
 	isinf(float f);
 }
 
-#endif // XPCC_WINDOWS_HPP
+#endif // MODM_WINDOWS_HPP

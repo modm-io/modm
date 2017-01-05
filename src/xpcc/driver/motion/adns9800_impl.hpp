@@ -14,7 +14,7 @@
  * Based on https://github.com/mrjohnk/ADNS-9800
  */
 
-#ifndef XPCC_ADNS9800_HPP
+#ifndef MODM_ADNS9800_HPP
 #error  "Don't include this file directly, use 'adns9800.hpp' instead!"
 #endif
 
@@ -28,12 +28,12 @@
 #include "adns9800_srom_a6.hpp"
 
 // Set the log level
-#undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::DEBUG
+#undef  MODM_LOG_LEVEL
+#define MODM_LOG_LEVEL modm::log::DEBUG
 
 template < typename Spi, typename Cs >
 bool
-xpcc::Adns9800< Spi, Cs>::isNewMotionDataAvailable()
+modm::Adns9800< Spi, Cs>::isNewMotionDataAvailable()
 {
 	uint8_t const motion_reg = readReg(Register::Motion);
 	bool const new_data_available = (motion_reg & 0x80) > 0;
@@ -42,15 +42,15 @@ xpcc::Adns9800< Spi, Cs>::isNewMotionDataAvailable()
 
 template < typename Spi, typename Cs >
 void
-xpcc::Adns9800< Spi, Cs>::getDeltaXY(int16_t &delta_x, int16_t &delta_y)
+modm::Adns9800< Spi, Cs>::getDeltaXY(int16_t &delta_x, int16_t &delta_y)
 {
 	Cs::reset();
-	xpcc::delayMicroseconds(100); // tSRAD
+	modm::delayMicroseconds(100); // tSRAD
 
 	Spi::transferBlocking(static_cast<uint8_t>(Register::Motion_Burst));
 
 	// Delay tSRAD
-	xpcc::delayMicroseconds(100);
+	modm::delayMicroseconds(100);
 
 	static constexpr uint8_t buf_size = 6;
 	uint8_t tx_buf[buf_size];
@@ -58,7 +58,7 @@ xpcc::Adns9800< Spi, Cs>::getDeltaXY(int16_t &delta_x, int16_t &delta_y)
 
 	Spi::transferBlocking(tx_buf, rx_buf, buf_size);
 
-	xpcc::delayNanoseconds(120); // tSCLK-NCS for read operation is 120ns
+	modm::delayNanoseconds(120); // tSCLK-NCS for read operation is 120ns
 	Cs::set();
 
 	uint8_t delta_x_l = rx_buf[2];
@@ -72,7 +72,7 @@ xpcc::Adns9800< Spi, Cs>::getDeltaXY(int16_t &delta_x, int16_t &delta_y)
 
 template < typename Spi, typename Cs >
 uint8_t
-xpcc::Adns9800< Spi, Cs>::readReg(Register const reg)
+modm::Adns9800< Spi, Cs>::readReg(Register const reg)
 {
 	Cs::reset();
 
@@ -80,21 +80,21 @@ xpcc::Adns9800< Spi, Cs>::readReg(Register const reg)
 
 	// send adress of the register, with MSBit = 0 to indicate it's a read
 	Spi::transferBlocking(address & 0x7f);
-	xpcc::delayMicroseconds(100); // tSRAD
+	modm::delayMicroseconds(100); // tSRAD
 	
 	// read data
 	uint8_t data = Spi::transferBlocking(0);
 
-	xpcc::delayNanoseconds(120); // tSCLK-NCS for read operation is 120ns
+	modm::delayNanoseconds(120); // tSCLK-NCS for read operation is 120ns
 	Cs::set();
-	xpcc::delayMicroseconds(19); // tSRW/tSRR (=20us) minus tSCLK-NCS
+	modm::delayMicroseconds(19); // tSRW/tSRR (=20us) minus tSCLK-NCS
 
 	return data; 
 }
 
 template < typename Spi, typename Cs >
 void
-xpcc::Adns9800< Spi, Cs>::writeReg(Register const reg, uint8_t const data)
+modm::Adns9800< Spi, Cs>::writeReg(Register const reg, uint8_t const data)
 {
 	Cs::reset();
 
@@ -106,14 +106,14 @@ xpcc::Adns9800< Spi, Cs>::writeReg(Register const reg, uint8_t const data)
 	//send data
 	Spi::transferBlocking(data);
 
-	xpcc::delayMicroseconds(20); // tSCLK-NCS for write operation
+	modm::delayMicroseconds(20); // tSCLK-NCS for write operation
 	Cs::set();
-	xpcc::delayMicroseconds(100); // tSWW/tSWR (=120us) minus tSCLK-NCS. Could be shortened, but is looks like a safe lower bound 
+	modm::delayMicroseconds(100); // tSWW/tSWR (=120us) minus tSCLK-NCS. Could be shortened, but is looks like a safe lower bound 
 }
 
 template < typename Spi, typename Cs >
 void
-xpcc::Adns9800< Spi, Cs >::uploadFirmware()
+modm::Adns9800< Spi, Cs >::uploadFirmware()
 {
 	// set the configuration_IV register in 3k firmware mode
 	writeReg(Register::Configuration_IV, 0x02); // bit 1 = 1 for 3k mode, other bits are reserved 
@@ -122,7 +122,7 @@ xpcc::Adns9800< Spi, Cs >::uploadFirmware()
 	writeReg(Register::SROM_Enable, 0x1d); 
 
 	// wait for more than one frame period
-	xpcc::delayMilliseconds(10); // assume that the frame rate is as low as 100fps... even if it should never be that low
+	modm::delayMilliseconds(10); // assume that the frame rate is as low as 100fps... even if it should never be that low
 
 	// write 0x18 to SROM_enable to start SROM download
 	writeReg(Register::SROM_Enable, 0x18); 
@@ -133,13 +133,13 @@ xpcc::Adns9800< Spi, Cs >::uploadFirmware()
 	// write burst destination address
 	uint8_t address = static_cast<uint8_t>(Register::SROM_Load_Burst) | 0x80;
 	Spi::transferBlocking(address);
-	xpcc::delayMicroseconds(15);
+	modm::delayMicroseconds(15);
 
 	// send all bytes of the firmware
 	for(int ii = 0; ii < firmware_length; ++ii)
 	{ 
 		Spi::transferBlocking(firmware_data[ii]);
-		xpcc::delayMicroseconds(15);
+		modm::delayMicroseconds(15);
 	}
 
 	Cs::set(); 
@@ -147,7 +147,7 @@ xpcc::Adns9800< Spi, Cs >::uploadFirmware()
 
 template < typename Spi, typename Cs >
 bool
-xpcc::Adns9800< Spi, Cs >::initialise()
+modm::Adns9800< Spi, Cs >::initialise()
 {
 	bool success = true;
 
@@ -157,14 +157,14 @@ xpcc::Adns9800< Spi, Cs >::initialise()
 	Cs::set();
 
 	writeReg(Register::Power_Up_Reset, 0x5a); // force reset
-	xpcc::delayMilliseconds(50); // wait for it to reboot
+	modm::delayMilliseconds(50); // wait for it to reboot
 
 	// Read Product ID
 	uint8_t id = readReg(Register::Product_ID);
 	static constexpr uint8_t id_expected = 0x33;
 	if (id != id_expected)
 	{
-		XPCC_LOG_ERROR.printf("Product Id = %02x. Expected %02x\n", id, id_expected);
+		MODM_LOG_ERROR.printf("Product Id = %02x. Expected %02x\n", id, id_expected);
 		success = false;
 	}
 
@@ -172,14 +172,14 @@ xpcc::Adns9800< Spi, Cs >::initialise()
 	id = readReg(Register::Revision_ID);
 	if (id != rev_expected)
 	{
-		XPCC_LOG_DEBUG.printf("Revision Id = %02x. Expected %02x\n", id, rev_expected);
+		MODM_LOG_DEBUG.printf("Revision Id = %02x. Expected %02x\n", id, rev_expected);
 		success = false;
 	}
 
 	id = readReg(Register::Inverse_Product_ID);
 	if (id != ~id_expected)
 	{
-		XPCC_LOG_DEBUG.printf("Inverse Product Id = %02x. Expected %02x\n", id, ~id_expected);
+		MODM_LOG_DEBUG.printf("Inverse Product Id = %02x. Expected %02x\n", id, ~id_expected);
 		success = false;
 	}
 
@@ -191,7 +191,7 @@ xpcc::Adns9800< Spi, Cs >::initialise()
 	readReg(Register::Delta_Y_H);
 
 	uploadFirmware();
-	xpcc::delayMilliseconds(10);
+	modm::delayMilliseconds(10);
 
 	// enable laser(bit 0 = 0b), in normal mode (bits 3,2,1 = 000b)
 	// reading the actual value of the register is important because the real
@@ -214,7 +214,7 @@ xpcc::Adns9800< Spi, Cs >::initialise()
 	writeReg(Register::Frame_Period_Max_Bound_Lower, 0x20);
 	writeReg(Register::Frame_Period_Max_Bound_Upper, 0x1b);
 
-	xpcc::delayMilliseconds(1);
+	modm::delayMilliseconds(1);
 
 	return success;
 }

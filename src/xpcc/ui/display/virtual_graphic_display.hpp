@@ -13,23 +13,23 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_VIRTUAL_GRAPHIC_DISPLAY
-#define XPCC_VIRTUAL_GRAPHIC_DISPLAY
+#ifndef MODM_VIRTUAL_GRAPHIC_DISPLAY
+#define MODM_VIRTUAL_GRAPHIC_DISPLAY
 
 #include <modm/ui/display/graphic_display.hpp>
 
-namespace xpcc
+namespace modm
 {
 	/// @ingroup	graphics
 	class VirtualGraphicDisplay:
-			public xpcc::GraphicDisplay
+			public modm::GraphicDisplay
 	{
 	public:
-		VirtualGraphicDisplay(xpcc::GraphicDisplay* display,
-				xpcc::glcd::Point leftUpper, xpcc::glcd::Point rightLower);
+		VirtualGraphicDisplay(modm::GraphicDisplay* display,
+				modm::glcd::Point leftUpper, modm::glcd::Point rightLower);
 
 		void
-		setDisplay(xpcc::GraphicDisplay* display);
+		setDisplay(modm::GraphicDisplay* display);
 
 		virtual inline uint16_t
 		getWidth() const
@@ -61,9 +61,9 @@ namespace xpcc
 		getPixel(int16_t x, int16_t y);
 
  	private:
-		xpcc::GraphicDisplay* display;
-		xpcc::glcd::Point leftUpper;
-		xpcc::glcd::Point rightLower;
+		modm::GraphicDisplay* display;
+		modm::glcd::Point leftUpper;
+		modm::glcd::Point rightLower;
 		const uint16_t width;
 		const uint16_t height;
 	};
@@ -71,4 +71,4 @@ namespace xpcc
 
 }
 
-#endif //XPCC_VIRTUAL_GRAPHIC_DISPLAY
+#endif //MODM_VIRTUAL_GRAPHIC_DISPLAY

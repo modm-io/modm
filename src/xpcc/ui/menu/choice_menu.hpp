@@ -19,7 +19,7 @@
 #include <modm/container/doubly_linked_list.hpp>
 #include <modm/processing/timer.hpp>
 
-namespace xpcc{
+namespace modm{
 
 	 /**
 	 * @brief The ChoiceMenu class provides a simmliar list like the Standard Menu.
@@ -41,9 +41,9 @@ namespace xpcc{
 	{
 	public:
 
-		ChoiceMenu(xpcc::ViewStack* stack, uint8_t identifier);
+		ChoiceMenu(modm::ViewStack* stack, uint8_t identifier);
 
-		ChoiceMenu(xpcc::ViewStack* stack, uint8_t identifier, const char* title);
+		ChoiceMenu(modm::ViewStack* stack, uint8_t identifier, const char* title);
 
 		/**
 		 * @brief addEntry a new entry to the ChoiceMenu
@@ -72,7 +72,7 @@ namespace xpcc{
 		 * @brief shortButtonPress handle the button press actions
 		 */
 		virtual void
-		shortButtonPress(xpcc::MenuButtons::Button button);
+		shortButtonPress(modm::MenuButtons::Button button);
 
 		/**
 		 * @brief hasChanged returns true if the screen needs to be drawn again
@@ -95,7 +95,7 @@ namespace xpcc{
 	private:
 		uint16_t display_update_time;
 
-		xpcc::ShortPeriodicTimer timer;
+		modm::ShortPeriodicTimer timer;
 		bool buttonAction;
 
 		const char* title;
@@ -107,7 +107,7 @@ namespace xpcc{
 
 	protected:
 
-		typedef xpcc::DoublyLinkedList<ChoiceMenuEntry> EntryList;
+		typedef modm::DoublyLinkedList<ChoiceMenuEntry> EntryList;
 		EntryList entries;
 	};
 }

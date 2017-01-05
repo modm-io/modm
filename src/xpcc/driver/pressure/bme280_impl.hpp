@@ -9,18 +9,18 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_BME280_HPP
+#ifndef MODM_BME280_HPP
 #	error  "Don't include this file directly, use 'bme280.hpp' instead!"
 #endif
 #include <modm/math/utils/operator.hpp>
 #include <modm/math/utils/bit_operation.hpp>
 
-#undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::DISABLED
+#undef  MODM_LOG_LEVEL
+#define MODM_LOG_LEVEL modm::log::DISABLED
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
-xpcc::Bme280<I2cMaster>::Bme280(Data &data, uint8_t address) :
+modm::Bme280<I2cMaster>::Bme280(Data &data, uint8_t address) :
 	I2cDevice<I2cMaster, 1>(address), data(data)
 {
 }
@@ -28,8 +28,8 @@ xpcc::Bme280<I2cMaster>::Bme280(Data &data, uint8_t address) :
 // ----------------------------------------------------------------------------
 // MARK: - Tasks
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Bme280<I2cMaster>::initialize(Mode mode, Oversampling pressure, Oversampling temperature, Oversampling humidity)
+modm::ResumableResult<bool>
+modm::Bme280<I2cMaster>::initialize(Mode mode, Oversampling pressure, Oversampling temperature, Oversampling humidity)
 {
 	RF_BEGIN();
 
@@ -42,9 +42,9 @@ xpcc::Bme280<I2cMaster>::initialize(Mode mode, Oversampling pressure, Oversampli
 
 	// 	if (RF_CALL( this->runTransaction() ))
 	// 	{
-	// 		XPCC_LOG_DEBUG.printf("BME280 Chip Id check. Read %02x, expected %02x\n", chid, ChipId);
+	// 		MODM_LOG_DEBUG.printf("BME280 Chip Id check. Read %02x, expected %02x\n", chid, ChipId);
 	// 		if (chid != ChipId) {
-	// 			XPCC_LOG_ERROR.printf("BME280 Chip Id mismatch. Read %02x, expected %02x\n", chid, ChipId);
+	// 			MODM_LOG_ERROR.printf("BME280 Chip Id mismatch. Read %02x, expected %02x\n", chid, ChipId);
 	// 			RF_RETURN(false);
 	// 		}
 	// 	} else {
@@ -103,30 +103,30 @@ xpcc::Bme280<I2cMaster>::initialize(Mode mode, Oversampling pressure, Oversampli
 	if (RF_CALL( this->runTransaction() ))
 	{
 		{
-			XPCC_LOG_DEBUG << "Raw calibration data: ";
+			MODM_LOG_DEBUG << "Raw calibration data: ";
 			uint8_t *rr = reinterpret_cast<uint8_t*>(&data.calibration);
 			for (uint8_t ii = 0; ii < 26; ++ii) {
-				XPCC_LOG_DEBUG.printf("%x ", rr[ii]);
+				MODM_LOG_DEBUG.printf("%x ", rr[ii]);
 			}
-			XPCC_LOG_DEBUG << xpcc::endl;
+			MODM_LOG_DEBUG << modm::endl;
 		}
 
 		uint16_t* element = reinterpret_cast<uint16_t*>(&data.calibration);
-		element[ 0] = xpcc::fromLittleEndian(element[0]);
-		element[ 1] = xpcc::fromLittleEndian(element[1]);
-		element[ 2] = xpcc::fromLittleEndian(element[2]);
-		element[ 3] = xpcc::fromLittleEndian(element[3]);
-		element[ 4] = xpcc::fromLittleEndian(element[4]);
-		element[ 5] = xpcc::fromLittleEndian(element[5]);
+		element[ 0] = modm::fromLittleEndian(element[0]);
+		element[ 1] = modm::fromLittleEndian(element[1]);
+		element[ 2] = modm::fromLittleEndian(element[2]);
+		element[ 3] = modm::fromLittleEndian(element[3]);
+		element[ 4] = modm::fromLittleEndian(element[4]);
+		element[ 5] = modm::fromLittleEndian(element[5]);
 
-		element[ 6] = xpcc::fromLittleEndian(element[6]);
-		element[ 7] = xpcc::fromLittleEndian(element[7]);
+		element[ 6] = modm::fromLittleEndian(element[6]);
+		element[ 7] = modm::fromLittleEndian(element[7]);
 
-		element[ 8] = xpcc::fromLittleEndian(element[8]);
-		element[ 9] = xpcc::fromLittleEndian(element[9]);
-		element[10] = xpcc::fromLittleEndian(element[10]);
-		element[11] = xpcc::fromLittleEndian(element[11]);
-		element[12] = xpcc::fromLittleEndian(element[12]);
+		element[ 8] = modm::fromLittleEndian(element[8]);
+		element[ 9] = modm::fromLittleEndian(element[9]);
+		element[10] = modm::fromLittleEndian(element[10]);
+		element[11] = modm::fromLittleEndian(element[11]);
+		element[12] = modm::fromLittleEndian(element[12]);
 	} else {
 		RF_RETURN(false);
 	}
@@ -158,8 +158,8 @@ xpcc::Bme280<I2cMaster>::initialize(Mode mode, Oversampling pressure, Oversampli
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Bme280<I2cMaster>::readout()
+modm::ResumableResult<bool>
+modm::Bme280<I2cMaster>::readout()
 {
 	RF_BEGIN();
 
@@ -171,7 +171,7 @@ xpcc::Bme280<I2cMaster>::readout()
 	buffer[0] = i(Register::PRESS_MSB);
 	this->transaction.configureWriteRead(buffer, 1, data.raw, 8);
 
-	XPCC_LOG_DEBUG.printf("RAW: %02x %02x %02x %02x %02x %02x %02x %02x\n",
+	MODM_LOG_DEBUG.printf("RAW: %02x %02x %02x %02x %02x %02x %02x %02x\n",
 		data.raw[0], data.raw[1], data.raw[2], data.raw[3],
 		data.raw[4], data.raw[5], data.raw[6], data.raw[7]);
 

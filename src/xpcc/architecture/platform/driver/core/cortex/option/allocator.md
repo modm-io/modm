@@ -31,7 +31,7 @@ To use all non-statically allocated memory for heap, use the TLSF strategy,
 which natively supports multiple memory regions. Our implementation treats
 all internal memories as separate regions, so unaligned accesses across memory
 boundaries are not an issue. To request heap memory of different traits, see
-`xpcc::MemoryTraits`.
+`modm::MemoryTraits`.
 
 !!! note
     The TLSF implementation has a static overhead of about 1kB per memory trait

@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_CLOCK_HPP
-#define	XPCC_CLOCK_HPP
+#ifndef	MODM_CLOCK_HPP
+#define	MODM_CLOCK_HPP
 
 #include <modm/architecture/utils.hpp>
 #include <modm/processing/timer/timestamp.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -26,7 +26,7 @@ namespace xpcc
  * This class is implemented using `gettimeofday()` from <sys/time.h> for
  * any Unix-OS.
  *
- * For Cortex-M targets the user has to enable the `xpcc::SysTick` timer.
+ * For Cortex-M targets the user has to enable the `modm::SysTick` timer.
  *
  * For the AVRs targets the user has to use the increment() method to
  * generate a suitable timebase, preferably by incrementing the time
@@ -37,7 +37,7 @@ namespace xpcc
  * // Interrupt every 1ms
  * ISR(TIMER)
  * {
- *     xpcc::Clock::increment();
+ *     modm::Clock::increment();
  * }
  * @endcode
  *
@@ -64,7 +64,7 @@ public:
 		return now<ShortTimestamp>();
 	}
 
-#if !defined(XPCC_OS_HOSTED)
+#if !defined(MODM_OS_HOSTED)
 	/// Set the current time
 	static inline void
 	increment(uint_fast16_t step = 1)
@@ -77,6 +77,6 @@ protected:
 	static Type time;
 };
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif	// XPCC_CLOCK_HPP
+#endif	// MODM_CLOCK_HPP

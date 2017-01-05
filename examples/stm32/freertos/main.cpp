@@ -21,7 +21,7 @@
 
 #include <modm/processing/rtos.hpp>
 
-using namespace xpcc::stm32;
+using namespace modm::stm32;
 
 // ----------------------------------------------------------------------------
 typedef SystemClock<Pll<ExternalCrystal<MHz8>, MHz168, MHz48> > defaultSystemClock;
@@ -30,7 +30,7 @@ typedef GpioOutputC12 LedStatInverted;	// inverted, 0=on, 1=off
 typedef GpioOutputA1  Led1;
 typedef GpioOutputA8  Led2;
 
-typedef xpcc::GpioInverted<LedStatInverted> LedStat;
+typedef modm::GpioInverted<LedStatInverted> LedStat;
 
 typedef GpioInputA0 ButtonWakeUp;		// 1=pressed, 0=not pressed
 
@@ -42,17 +42,17 @@ namespace lcd
 }
 
 // Graphic LCD
-xpcc::DogS102< xpcc::stm32::SpiMaster1, lcd::CS, lcd::A0, lcd::Reset, false > display;
+modm::DogS102< modm::stm32::SpiMaster1, lcd::CS, lcd::A0, lcd::Reset, false > display;
 
 // ----------------------------------------------------------------------------
-xpcc::rtos::BinarySemaphore event;
+modm::rtos::BinarySemaphore event;
 
 // ----------------------------------------------------------------------------
-class LedThread1 : public xpcc::rtos::Thread
+class LedThread1 : public modm::rtos::Thread
 {
 public:
 	LedThread1() :
-		xpcc::rtos::Thread(2)
+		modm::rtos::Thread(2)
 	{
 	}
 
@@ -74,11 +74,11 @@ public:
 };
 
 // Toggle Led2 when LedThread1 starts a new cycle
-class LedThread2 : public xpcc::rtos::Thread
+class LedThread2 : public modm::rtos::Thread
 {
 public:
 	LedThread2() :
-		xpcc::rtos::Thread(2)
+		modm::rtos::Thread(2)
 	{
 	}
 
@@ -97,11 +97,11 @@ public:
 
 // Display a rotating hand in a circle and some fonts. Lowest priority, will
 // be interrupted by the other Threads
-class DisplayThread : public xpcc::rtos::Thread
+class DisplayThread : public modm::rtos::Thread
 {
 public:
 	DisplayThread() :
-		xpcc::rtos::Thread(0), index(0)
+		modm::rtos::Thread(0), index(0)
 	{
 	}
 
@@ -110,7 +110,7 @@ public:
 	{
 		while (1)
 		{
-			const xpcc::glcd::Point center(80, 32);
+			const modm::glcd::Point center(80, 32);
 			const uint16_t radius = 20;
 
 			index = (index + 1) % 360;
@@ -118,17 +118,17 @@ public:
 			display.clear();
 
 			display.setCursor(4, 10);
-			display.setFont(xpcc::font::FixedWidth5x8);
+			display.setFont(modm::font::FixedWidth5x8);
 			display << "angle=";
 
 			display.setCursor(4, 20);
-			display.setFont(xpcc::font::Numbers14x32);
+			display.setFont(modm::font::Numbers14x32);
 			display << index;
 
 			display.drawCircle(center, radius);
 			float angle = (index * M_PI) / 180.0;
 			display.drawLine(center,
-					center + xpcc::glcd::Point(
+					center + modm::glcd::Point(
 							 sin(angle) * radius,
 							-cos(angle) * radius));
 			display.update();
@@ -156,19 +156,19 @@ main()
 	// Switch to the external clock and enable the PLL to let
 	// the STM32 run at 168 MHz.
 	defaultSystemClock::enable();
-	xpcc::cortex::SysTickTimer::initialize<defaultSystemClock>();
+	modm::cortex::SysTickTimer::initialize<defaultSystemClock>();
 
-	LedStat::setOutput(xpcc::Gpio::High);
-	Led1::setOutput(xpcc::Gpio::Low);
-	Led2::setOutput(xpcc::Gpio::Low);
+	LedStat::setOutput(modm::Gpio::High);
+	Led1::setOutput(modm::Gpio::Low);
+	Led2::setOutput(modm::Gpio::Low);
 
 	// The Button has an external Pull-Down resistor
     ButtonWakeUp::setInput(Gpio::InputType::Floating);
 
 	display.initialize();
-	display.setFont(xpcc::font::FixedWidth5x8);
+	display.setFont(modm::font::FixedWidth5x8);
 
 	// Start the FreeRTOS scheduler
-	xpcc::rtos::Scheduler::schedule();
+	modm::rtos::Scheduler::schedule();
 }
 

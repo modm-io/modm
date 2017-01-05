@@ -122,7 +122,7 @@ namespace unittest
 		}
 		else {
 			TEST_REPORTER_.reportFailure(line)
-				<< a << xpcc::accessor::asFlash(unittest::stringEqual) << b << '\n';
+				<< a << modm::accessor::asFlash(unittest::stringEqual) << b << '\n';
 			return false;
 		}
 	}
@@ -138,7 +138,7 @@ namespace unittest
 		}
 		else {
 			TEST_REPORTER_.reportFailure(line)
-				<< a << xpcc::accessor::asFlash(unittest::stringDiffer) << b << '\n';
+				<< a << modm::accessor::asFlash(unittest::stringDiffer) << b << '\n';
 			return false;
 		}
 	}
@@ -154,7 +154,7 @@ namespace unittest
 		}
 		else {
 			TEST_REPORTER_.reportFailure(line)
-				<< a << xpcc::accessor::asFlash(unittest::stringEqual) << b << '\n';
+				<< a << modm::accessor::asFlash(unittest::stringEqual) << b << '\n';
 			return false;
 		}
 	}
@@ -170,7 +170,7 @@ namespace unittest
 		}
 		else {
 			TEST_REPORTER_.reportFailure(line)
-				<< value << xpcc::accessor::asFlash(unittest::stringNotInRange)
+				<< value << modm::accessor::asFlash(unittest::stringNotInRange)
 				<< '[' << lower << ',' << upper << ']' << '\n';
 			return false;
 		}
@@ -178,11 +178,11 @@ namespace unittest
 
 	// ------------------------------------------------------------------------
 	inline void
-	printString(xpcc::IOStream& stream, const char* a, const char* b, size_t pos)
+	printString(modm::IOStream& stream, const char* a, const char* b, size_t pos)
 	{
-		stream << xpcc::endl << a << xpcc::endl << b << xpcc::endl;
+		stream << modm::endl << a << modm::endl << b << modm::endl;
 		for(size_t ii = 0; ii < pos; ++ii) { stream << " "; }
-		stream << "^" << xpcc::endl;
+		stream << "^" << modm::endl;
 	}
 
 	inline bool
@@ -191,7 +191,7 @@ namespace unittest
 		size_t ii = 0;
 		while(a[ii] != '\0' && b[ii] != '\0') {
 			if (a[ii] != b[ii]) {
-				xpcc::IOStream& stream = TEST_REPORTER_.reportFailure(line);
+				modm::IOStream& stream = TEST_REPORTER_.reportFailure(line);
 				printString(stream, a, b, ii);
 				return false;
 			}
@@ -199,7 +199,7 @@ namespace unittest
 		}
 		// strings are not of equal length
 		if(a[ii] != '\0' || b[ii] != '\0') {
-			xpcc::IOStream& stream = TEST_REPORTER_.reportFailure(line);
+			modm::IOStream& stream = TEST_REPORTER_.reportFailure(line);
 			printString(stream, a, b, ii);
 			return false;
 		}
@@ -210,7 +210,7 @@ namespace unittest
 	// ------------------------------------------------------------------------
 	template <typename T>
 	inline void
-	printArray(xpcc::IOStream& stream, unsigned int start, unsigned int count, const T& array)
+	printArray(modm::IOStream& stream, unsigned int start, unsigned int count, const T& array)
 	{
 		stream << '[';
 		for (unsigned int i = start; i < (start + count); ++i) {
@@ -230,7 +230,7 @@ namespace unittest
 		{
 			if (a[i] != b[i])
 			{
-				xpcc::IOStream& stream = TEST_REPORTER_.reportFailure(line);
+				modm::IOStream& stream = TEST_REPORTER_.reportFailure(line);
 				
 				stream << '\n';
 				

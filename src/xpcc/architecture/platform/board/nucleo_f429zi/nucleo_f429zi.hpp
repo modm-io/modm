@@ -14,13 +14,13 @@
 // http://www.st.com/web/en/catalog/tools/PF262637
 //
 
-#ifndef XPCC_STM32_NUCLEO_F429ZI_HPP
-#define XPCC_STM32_NUCLEO_F429ZI_HPP
+#ifndef MODM_STM32_NUCLEO_F429ZI_HPP
+#define MODM_STM32_NUCLEO_F429ZI_HPP
 
 #include <modm/architecture/platform.hpp>
 #include <modm/debug/logger.hpp>
 
-using namespace xpcc::stm32;
+using namespace modm::stm32;
 
 namespace Board
 {
@@ -90,10 +90,10 @@ struct systemClock
 		ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div4);
 		ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div2);
 		// update clock frequencies
-		xpcc::clock::fcpu     = Frequency;
-		xpcc::clock::fcpu_kHz = Frequency / 1000;
-		xpcc::clock::fcpu_MHz = Frequency / 1000000;
-		xpcc::clock::ns_per_loop = ::round(3000 / (Frequency / 1000000));
+		modm::clock::fcpu     = Frequency;
+		modm::clock::fcpu_kHz = Frequency / 1000;
+		modm::clock::fcpu_MHz = Frequency / 1000000;
+		modm::clock::ns_per_loop = ::round(3000 / (Frequency / 1000000));
 
 		return true;
 	}
@@ -185,14 +185,14 @@ using D68 = GpioF0;
 using D69 = GpioF1;
 using D70 = GpioF2;
 using D71 = GpioA7;
-using D72 = xpcc::GpioUnused;
+using D72 = modm::GpioUnused;
 
 using Button = GpioInputC13;
 
 using LedGreen = GpioOutputB0;	// LED1 [Green]
 using LedBlue = GpioOutputB7;	// LED2 [Blue]
 using LedRed = GpioOutputB14;	// LED3 [Red]
-using Leds = xpcc::SoftwareGpioPort< LedRed, LedBlue, LedGreen >;
+using Leds = modm::SoftwareGpioPort< LedRed, LedBlue, LedGreen >;
 
 namespace stlink
 {
@@ -206,15 +206,15 @@ inline void
 initialize()
 {
     systemClock::enable();
-    xpcc::cortex::SysTickTimer::initialize<systemClock>();
+    modm::cortex::SysTickTimer::initialize<systemClock>();
 
     stlink::Tx::connect(stlink::Uart::Tx);
     stlink::Rx::connect(stlink::Uart::Rx, Gpio::InputType::PullUp);
     stlink::Uart::initialize<systemClock, 115200>(12);
 
-    LedGreen::setOutput(xpcc::Gpio::Low);
-    LedBlue::setOutput(xpcc::Gpio::Low);
-    LedRed::setOutput(xpcc::Gpio::Low);
+    LedGreen::setOutput(modm::Gpio::Low);
+    LedBlue::setOutput(modm::Gpio::Low);
+    LedRed::setOutput(modm::Gpio::Low);
 
     Button::setInput();
     Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
@@ -224,4 +224,4 @@ initialize()
 
 }
 
-#endif  // XPCC_STM32_NUCLEO_F429ZI_HPP
+#endif  // MODM_STM32_NUCLEO_F429ZI_HPP

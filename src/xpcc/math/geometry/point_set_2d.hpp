@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_POINT_SET_2D_HPP
-#define XPCC_POINT_SET_2D_HPP
+#ifndef MODM_POINT_SET_2D_HPP
+#define MODM_POINT_SET_2D_HPP
 
 #include <modm/container/dynamic_array.hpp>
 #include "vector.hpp"
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	Point set
@@ -25,7 +25,7 @@ namespace xpcc
 	 * Collection of points, represented by their corresponding vectors.
 	 * Used for example to hold the result of a intersection-operation.
 	 * 
-	 * Based on the xpcc::DynamicArray class, therefore grows automatically
+	 * Based on the modm::DynamicArray class, therefore grows automatically
 	 * if more space than currently allocated is needed. But because this
 	 * is an expensive operation it should be avoid if possible.
 	 * 
@@ -73,8 +73,8 @@ namespace xpcc
 		removeAll();
 		
 	public:
-		typedef typename xpcc::DynamicArray< PointType >::iterator iterator;
-		typedef typename xpcc::DynamicArray< PointType >::const_iterator const_iterator;
+		typedef typename modm::DynamicArray< PointType >::iterator iterator;
+		typedef typename modm::DynamicArray< PointType >::const_iterator const_iterator;
 		
 		inline iterator
 		begin();
@@ -89,10 +89,10 @@ namespace xpcc
 		end() const;
 		
 	protected:
-		xpcc::DynamicArray< PointType > points;
+		modm::DynamicArray< PointType > points;
 	};
 }
 
 #include "point_set_2d_impl.hpp"
 
-#endif // XPCC_POINT_SET_2D_HPP
+#endif // MODM_POINT_SET_2D_HPP

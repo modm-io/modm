@@ -10,15 +10,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_STACK_HPP
-#define	XPCC_STACK_HPP
+#ifndef	MODM_STACK_HPP
+#define	MODM_STACK_HPP
 
 #include <cstddef>
 #include <stdint.h>
 
 #include "deque.hpp"
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	LIFO stack
@@ -107,4 +107,4 @@ namespace xpcc
 	};
 }
 
-#endif	// XPCC_STACK_HPP
+#endif	// MODM_STACK_HPP

@@ -14,8 +14,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LOGGER_HPP
-#define XPCC_LOGGER_HPP
+#ifndef MODM_LOGGER_HPP
+#define MODM_LOGGER_HPP
 
 #include <modm/architecture/utils.hpp>
 #include <modm/io/iostream.hpp>
@@ -25,7 +25,7 @@
 #include "style_wrapper.hpp"
 #include "style/prefix.hpp"
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \ingroup	logger
@@ -43,10 +43,10 @@ namespace xpcc
 		 * \ingroup logger
 		 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 		 */
-		class Logger : public ::xpcc::IOStream
+		class Logger : public ::modm::IOStream
 		{
 			public:
-				Logger(::xpcc::IODevice& outputDevice) :
+				Logger(::modm::IODevice& outputDevice) :
 					IOStream(outputDevice)
 				{
 				}
@@ -54,31 +54,31 @@ namespace xpcc
 				/**
 				 * @brief	Output forwarding
 				 * 
-				 * We must use xpcc_always_inline here to prevent the generation of
+				 * We must use modm_always_inline here to prevent the generation of
 				 * specialized functions for every type. Especially for strings
 				 * this might cause a lot of code size bloat.
 				 * 
-				 * Example without xpcc_always_inline or only \c inline:
+				 * Example without modm_always_inline or only \c inline:
 				 * \code
 				 * $ scons symbols | grep "Logger"
 				 * ...
-				 * 01049436 00000016 W xpcc::log::Logger& xpcc::log::Logger::operator<< <char [12]>(char const (&) [12])
-				 * 01050808 00000016 W xpcc::log::Logger& xpcc::log::Logger::operator<< <char [13]>(char const (&) [13])
-				 * 01050744 00000016 W xpcc::log::Logger& xpcc::log::Logger::operator<< <char [15]>(char const (&) [15])
-				 * 01050792 00000016 W xpcc::log::Logger& xpcc::log::Logger::operator<< <char [16]>(char const (&) [16])
-				 * 01050728 00000016 W xpcc::log::Logger& xpcc::log::Logger::operator<< <char [19]>(char const (&) [19])
-				 * 01050760 00000016 W xpcc::log::Logger& xpcc::log::Logger::operator<< <char [22]>(char const (&) [22])
-				 * 01050712 00000016 W xpcc::log::Logger& xpcc::log::Logger::operator<< <char [26]>(char const (&) [26])
+				 * 01049436 00000016 W modm::log::Logger& modm::log::Logger::operator<< <char [12]>(char const (&) [12])
+				 * 01050808 00000016 W modm::log::Logger& modm::log::Logger::operator<< <char [13]>(char const (&) [13])
+				 * 01050744 00000016 W modm::log::Logger& modm::log::Logger::operator<< <char [15]>(char const (&) [15])
+				 * 01050792 00000016 W modm::log::Logger& modm::log::Logger::operator<< <char [16]>(char const (&) [16])
+				 * 01050728 00000016 W modm::log::Logger& modm::log::Logger::operator<< <char [19]>(char const (&) [19])
+				 * 01050760 00000016 W modm::log::Logger& modm::log::Logger::operator<< <char [22]>(char const (&) [22])
+				 * 01050712 00000016 W modm::log::Logger& modm::log::Logger::operator<< <char [26]>(char const (&) [26])
 				 * ...
 				 * \endcode
 				 * 
-				 * With xpcc_always_inline all these functions are gone.
+				 * With modm_always_inline all these functions are gone.
 				 */
 				template<typename T>
-				xpcc_always_inline Logger&
+				modm_always_inline Logger&
 				operator << (const T& msg)
 				{
-					*(xpcc::IOStream *) this << msg;
+					*(modm::IOStream *) this << msg;
 					return *this;
 				}
 
@@ -93,8 +93,8 @@ namespace xpcc
 		 * \name	Output streams
 		 * 
 		 * Don't use this instances directly! Prefer an access through the
-		 * XPCC_LOG_DEBUG, XPCC_LOG_INFO, XPCC_LOG_WARNING and
-		 * XPCC_LOG_ERROR macros.
+		 * MODM_LOG_DEBUG, MODM_LOG_INFO, MODM_LOG_WARNING and
+		 * MODM_LOG_ERROR macros.
 		 * 
 		 * \ingroup logger
 		 */
@@ -109,7 +109,7 @@ namespace xpcc
 
 // these macros are defined like this to avoid the dangling else problem.
 // if (condition)
-// 		XPCC_LOG_DEBUG << "string";
+// 		MODM_LOG_DEBUG << "string";
 // else
 //		expression;
 
@@ -117,41 +117,41 @@ namespace xpcc
  * \brief	Turn off messages print
  * \ingroup logger
  */
-#define XPCC_LOG_OFF \
+#define MODM_LOG_OFF \
 	if ( true ){}	\
-	else xpcc::log::debug
+	else modm::log::debug
 
 /**
  * \brief	Output stream for debug messages
  * \ingroup logger
  */
-#define XPCC_LOG_DEBUG \
-	if (XPCC_LOG_LEVEL > xpcc::log::DEBUG){} \
-	else xpcc::log::debug
+#define MODM_LOG_DEBUG \
+	if (MODM_LOG_LEVEL > modm::log::DEBUG){} \
+	else modm::log::debug
 
 /**
  * \brief	Output stream for info messages
  * \ingroup logger
  */
-#define XPCC_LOG_INFO \
-	if (XPCC_LOG_LEVEL > xpcc::log::INFO){}	\
-	else xpcc::log::info
+#define MODM_LOG_INFO \
+	if (MODM_LOG_LEVEL > modm::log::INFO){}	\
+	else modm::log::info
 
 /**
  * \brief	Output stream for warnings
  * \ingroup logger
  */
-#define XPCC_LOG_WARNING \
-	if (XPCC_LOG_LEVEL > xpcc::log::WARNING){}	\
-	else xpcc::log::warning
+#define MODM_LOG_WARNING \
+	if (MODM_LOG_LEVEL > modm::log::WARNING){}	\
+	else modm::log::warning
 
 /**
  * \brief	Output stream for error messages
  * \ingroup logger
  */
-#define XPCC_LOG_ERROR \
-	if (XPCC_LOG_LEVEL > xpcc::log::ERROR){}	\
-	else xpcc::log::error
+#define MODM_LOG_ERROR \
+	if (MODM_LOG_LEVEL > modm::log::ERROR){}	\
+	else modm::log::error
 
 #ifdef __DOXYGEN__
 
@@ -175,9 +175,9 @@ namespace xpcc
  * 
  * This can be very useful the track the origin of log-messages:
  * \code
- * XPCC_LOG_DEBUG   << XPCC_FILE_INFO
+ * MODM_LOG_DEBUG   << MODM_FILE_INFO
  *                  << "... something has happened ..."
- *                  << xpcc::endl;
+ *                  << modm::endl;
  * \endcode
  * 
  * This will result into:
@@ -187,7 +187,7 @@ namespace xpcc
  * 
  * \ingroup	logger
  */
-#define	XPCC_FILE_INFO
+#define	MODM_FILE_INFO
 
 #else	// !__DOXYGEN__
 
@@ -198,10 +198,10 @@ namespace xpcc
 #		define FILENAME __BASE_FILE__
 #	endif
 #else
-#	define	FILENAME	XPCC_STRINGIFY(BASENAME)
+#	define	FILENAME	MODM_STRINGIFY(BASENAME)
 #endif
 
-#define	XPCC_FILE_INFO		"[" FILENAME "(" XPCC_STRINGIFY(__LINE__) ")] "
+#define	MODM_FILE_INFO		"[" FILENAME "(" MODM_STRINGIFY(__LINE__) ")] "
 
 #endif	// __DOXYGEN__
-#endif // XPCC_LOGGER_HPP
+#endif // MODM_LOGGER_HPP

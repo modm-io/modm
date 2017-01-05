@@ -17,8 +17,8 @@
  * 				synchronisation and delegation.
  */
 
-#ifndef XPCC_PROCESSING_HPP
-#define	XPCC_PROCESSING_HPP
+#ifndef MODM_PROCESSING_HPP
+#define	MODM_PROCESSING_HPP
 
 #include "timer.hpp"
 
@@ -28,4 +28,4 @@
 #include "task.hpp"
 #include "scheduler/scheduler.hpp"
 
-#endif	// XPCC_PROCESSING_HPP
+#endif	// MODM_PROCESSING_HPP

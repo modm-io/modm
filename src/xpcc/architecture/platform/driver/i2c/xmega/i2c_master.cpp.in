@@ -17,7 +17,7 @@
 // uncomment to debug your driver using simple uart
 /*
 #include "../uart.hpp"
-#define DEBUG(x) xpcc::xmega::UartF0::write(x)
+#define DEBUG(x) modm::xmega::UartF0::write(x)
 /*/
 #define DEBUG(x)
 //*/
@@ -26,7 +26,7 @@
 namespace
 {
 	// parameter advice
-	static xpcc::I2c::Operation nextOperation;
+	static modm::I2c::Operation nextOperation;
 	
 	// buffer management
 	static uint8_t *readPointer;
@@ -35,36 +35,36 @@ namespace
 	static std::size_t writeBytesLeft;
 	
 	// delegating
-	static xpcc::I2cDelegate *delegate = 0;
-	static xpcc::I2cMaster::Error errorState(xpcc::I2cMaster::Error::NoError);
+	static modm::I2cDelegate *delegate = 0;
+	static modm::I2cMaster::Error errorState(modm::I2cMaster::Error::NoError);
 	
 	// helper functions
-	static xpcc_always_inline void
-	initializeWrite(xpcc::I2cDelegate::Writing w) {
+	static modm_always_inline void
+	initializeWrite(modm::I2cDelegate::Writing w) {
 		writePointer = w.buffer;
 		writeBytesLeft = w.size;
-		nextOperation = static_cast<xpcc::I2c::Operation>(w.next);
+		nextOperation = static_cast<modm::I2c::Operation>(w.next);
 	}
 	
-	static xpcc_always_inline void
-	initializeRead(xpcc::I2cDelegate::Reading r) {
+	static modm_always_inline void
+	initializeRead(modm::I2cDelegate::Reading r) {
 		readPointer = r.buffer;
 		readBytesLeft = r.size;
-		nextOperation = static_cast<xpcc::I2c::Operation>(r.next);
+		nextOperation = static_cast<modm::I2c::Operation>(r.next);
 	}
 	
-	static xpcc_always_inline void
+	static modm_always_inline void
 	initializeStopAfterAddress() {
 		//writePointer = ..;
 		writeBytesLeft = 0;
-		nextOperation = xpcc::I2c::Operation::Stop;
+		nextOperation = modm::I2c::Operation::Stop;
 	}
 	
-	static xpcc_always_inline void
+	static modm_always_inline void
 	initializeRestartAfterAddress() {
 		//writePointer = ..;
 		writeBytesLeft = 0;
-		nextOperation = xpcc::I2c::Operation::Restart;
+		nextOperation = modm::I2c::Operation::Restart;
 	}
 	
 	static void
@@ -74,40 +74,40 @@ namespace
 		writeBytesLeft = 0;
 		readBytesLeft = 0;
 		TWI{{ id }}_MASTER_CTRLA &= ~(TWI_MASTER_RIEN_bm | TWI_MASTER_WIEN_bm);
-		xpcc::I2cDelegate::Starting s = delegate->starting();
+		modm::I2cDelegate::Starting s = delegate->starting();
 		uint8_t address;
 		switch (s.next)
 		{
-			case xpcc::I2c::Operation::Read:
-				address = (s.address & 0xfe) | xpcc::I2c::Read;
+			case modm::I2c::Operation::Read:
+				address = (s.address & 0xfe) | modm::I2c::Read;
 				initializeRead(delegate->reading());
 				break;
 				
-			case xpcc::I2c::Operation::Write:
-				address = (s.address & 0xfe) | xpcc::I2c::Write;
+			case modm::I2c::Operation::Write:
+				address = (s.address & 0xfe) | modm::I2c::Write;
 				initializeWrite(delegate->writing());
 				break;
 				
 			default:
-			case xpcc::I2c::Operation::Stop:
-				address = (s.address & 0xfe) | xpcc::I2c::Write;
+			case modm::I2c::Operation::Stop:
+				address = (s.address & 0xfe) | modm::I2c::Write;
 				initializeStopAfterAddress();
 				break;
 				
-			case xpcc::I2c::Operation::Restart:
-				address = (s.address & 0xfe) | xpcc::I2c::Write;
+			case modm::I2c::Operation::Restart:
+				address = (s.address & 0xfe) | modm::I2c::Write;
 				initializeRestartAfterAddress();
 				break;
 		}
 		// This also generates a start condition
 		TWI{{ id }}_MASTER_ADDR = address;
-		TWI{{ id }}_MASTER_CTRLA |= (address & xpcc::I2c::Read) ? TWI_MASTER_RIEN_bm : TWI_MASTER_WIEN_bm;
+		TWI{{ id }}_MASTER_CTRLA |= (address & modm::I2c::Read) ? TWI_MASTER_RIEN_bm : TWI_MASTER_WIEN_bm;
 	}
 }
 
 // ----------------------------------------------------------------------------
 /// TWI state machine interrupt handler
-XPCC_ISR(TWI{{ id }}_TWIM)
+MODM_ISR(TWI{{ id }}_TWIM)
 {
 	switch(TWI{{ id }}_MASTER_STATUS & TWI_MASTER_BUSSTATE_gm)
 	{
@@ -130,9 +130,9 @@ XPCC_ISR(TWI{{ id }}_TWIM)
 				if (TWI{{ id }}_MASTER_STATUS & TWI_MASTER_RXACK_bm)
 				{
 					DEBUG('N');
-					errorState = xpcc::I2cMaster::Error::DataNack;
+					errorState = modm::I2cMaster::Error::DataNack;
 					TWI{{ id }}_MASTER_CTRLC = TWI_MASTER_ACKACT_bm | TWI_MASTER_CMD_STOP_gc;
-					xpcc::xmega::I2cMaster{{ id }}::reset(xpcc::I2c::DetachCause::ErrorCondition);
+					modm::xmega::I2cMaster{{ id }}::reset(modm::I2c::DetachCause::ErrorCondition);
 					// (M2)
 					TWI{{ id }}_MASTER_STATUS = TWI_MASTER_BUSSTATE_IDLE_gc;
 					break;
@@ -155,7 +155,7 @@ XPCC_ISR(TWI{{ id }}_TWIM)
 				{
 					switch (nextOperation)
 					{
-						case xpcc::I2c::Operation::Write:
+						case modm::I2c::Operation::Write:
 							DEBUG('C');
 							initializeWrite(delegate->writing());
 							TWI{{ id }}_MASTER_DATA = *writePointer++;
@@ -163,7 +163,7 @@ XPCC_ISR(TWI{{ id }}_TWIM)
 							DEBUG('A');
 							break;
 							
-						case xpcc::I2c::Operation::Restart:
+						case modm::I2c::Operation::Restart:
 							DEBUG('R');
 							TWI{{ id }}_MASTER_CTRLC = TWI_MASTER_CMD_REPSTART_gc;
 							callStarting();
@@ -172,7 +172,7 @@ XPCC_ISR(TWI{{ id }}_TWIM)
 						default:
 							DEBUG('S');
 							TWI{{ id }}_MASTER_CTRLC = TWI_MASTER_ACKACT_bm | TWI_MASTER_CMD_STOP_gc;
-							delegate->stopped(xpcc::I2c::DetachCause::NormalStop);
+							delegate->stopped(modm::I2c::DetachCause::NormalStop);
 							delegate = 0;
 							break;
 					}
@@ -198,17 +198,17 @@ XPCC_ISR(TWI{{ id }}_TWIM)
 					DEBUG('n');
 					switch (nextOperation)
 					{
-						case xpcc::I2c::Operation::Restart:
+						case modm::I2c::Operation::Restart:
 							DEBUG('r');
 							TWI{{ id }}_MASTER_CTRLC = TWI_MASTER_ACKACT_bm | TWI_MASTER_CMD_REPSTART_gc;
 							callStarting();
 							break;
 							
 						default:
-						case xpcc::I2c::Operation::Stop:
+						case modm::I2c::Operation::Stop:
 							DEBUG('S');
 							TWI{{ id }}_MASTER_CTRLC = TWI_MASTER_ACKACT_bm | TWI_MASTER_CMD_STOP_gc;
-							delegate->stopped(xpcc::I2c::DetachCause::NormalStop);
+							delegate->stopped(modm::I2c::DetachCause::NormalStop);
 							delegate = 0;
 							break;
 					}
@@ -222,8 +222,8 @@ XPCC_ISR(TWI{{ id }}_TWIM)
 			// cancel all pending messages
 			DEBUG('E');
 			
-			errorState = xpcc::I2cMaster::Error::ArbitrationLost;
-			xpcc::xmega::I2cMaster{{ id }}::reset(xpcc::I2c::DetachCause::ErrorCondition);
+			errorState = modm::I2cMaster::Error::ArbitrationLost;
+			modm::xmega::I2cMaster{{ id }}::reset(modm::I2c::DetachCause::ErrorCondition);
 			
 		default:
 			TWI{{ id }}_MASTER_STATUS = TWI_MASTER_BUSSTATE_IDLE_gc;
@@ -234,9 +234,9 @@ XPCC_ISR(TWI{{ id }}_TWIM)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::xmega::I2cMaster{{ id }}::initializeWithBaud(uint8_t baud)
+modm::xmega::I2cMaster{{ id }}::initializeWithBaud(uint8_t baud)
 {
-	reset(xpcc::I2c::DetachCause::SoftwareReset);
+	reset(modm::I2c::DetachCause::SoftwareReset);
 	// SDA Hold Time and External Driver Interface disabled
 	TWI{{ id }}_CTRL = 0;
 	
@@ -254,7 +254,7 @@ xpcc::xmega::I2cMaster{{ id }}::initializeWithBaud(uint8_t baud)
 }
 
 void
-xpcc::xmega::I2cMaster{{ id }}::reset(DetachCause cause)
+modm::xmega::I2cMaster{{ id }}::reset(DetachCause cause)
 {
 	DEBUG('T');
 	writeBytesLeft = 0;
@@ -263,14 +263,14 @@ xpcc::xmega::I2cMaster{{ id }}::reset(DetachCause cause)
 	delegate = 0;
 }
 
-xpcc::I2cMaster::Error
-xpcc::xmega::I2cMaster{{ id }}::getErrorState()
+modm::I2cMaster::Error
+modm::xmega::I2cMaster{{ id }}::getErrorState()
 {
 	return errorState;
 }
 
 bool
-xpcc::xmega::I2cMaster{{ id }}::start(xpcc::I2cDelegate *delegate)
+modm::xmega::I2cMaster{{ id }}::start(modm::I2cDelegate *delegate)
 {
 	if (!::delegate && delegate && delegate->attaching())
 	{
@@ -283,7 +283,7 @@ xpcc::xmega::I2cMaster{{ id }}::start(xpcc::I2cDelegate *delegate)
 }
 
 bool
-xpcc::xmega::I2cMaster{{ id }}::startBlocking(xpcc::I2cDelegate *delegate)
+modm::xmega::I2cMaster{{ id }}::startBlocking(modm::I2cDelegate *delegate)
 {
 	if (!::delegate && delegate && delegate->attaching())
 	{

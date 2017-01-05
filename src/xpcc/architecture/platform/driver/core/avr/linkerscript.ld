@@ -11,7 +11,7 @@
 
 SECTIONS
 {
-	.xpcc_assertion : AT( ADDR(.text) + SIZEOF(.text) + SIZEOF(.data))
+	.modm_assertion : AT( ADDR(.text) + SIZEOF(.text) + SIZEOF(.data))
 	{
 		. = ALIGN(2);
 		__assertion_table_start = . + SIZEOF(.data);

@@ -16,16 +16,16 @@
 
 // ----------------------------------------------------------------------------
 // Set the log level
-#undef	XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::INFO
+#undef	MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::INFO
 
 typedef GpioInputC0  Adc1In;
 typedef GpioInputC2  Adc2In;
 typedef GpioInputB13 Adc3In;
 typedef GpioInputB12 Adc4In;
 
-xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > loggerDevice;
-xpcc::log::Logger xpcc::log::info(loggerDevice);
+modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
+modm::log::Logger modm::log::info(loggerDevice);
 
 static void
 printAdc()
@@ -34,23 +34,23 @@ printAdc()
 	float voltage = 0.0;
 	int adcValue = 0;
 	adcValue = Adc1::getValue();
-	XPCC_LOG_INFO << "Adc1: value=" << adcValue;
+	MODM_LOG_INFO << "Adc1: value=" << adcValue;
 	voltage = adcValue * maxVoltage / 0xfff;
-	XPCC_LOG_INFO << "; voltage=" << voltage << xpcc::endl;
+	MODM_LOG_INFO << "; voltage=" << voltage << modm::endl;
 
 /*
 	adcValue = Adc2::getValue();
-	XPCC_LOG_INFO << "Adc2: value=" << adcValue;
+	MODM_LOG_INFO << "Adc2: value=" << adcValue;
 	voltage = adcValue * maxVoltage / 0xfff;
-	XPCC_LOG_INFO << "; voltage=" << voltage << xpcc::endl;
+	MODM_LOG_INFO << "; voltage=" << voltage << modm::endl;
 	adcValue = Adc3::getValue();
-	XPCC_LOG_INFO << "Adc3: value=" << adcValue;
+	MODM_LOG_INFO << "Adc3: value=" << adcValue;
 	voltage = adcValue * maxVoltage / 0xfff;
-	XPCC_LOG_INFO << "; voltage=" << voltage << xpcc::endl;
+	MODM_LOG_INFO << "; voltage=" << voltage << modm::endl;
 	adcValue = Adc4::getValue();
-	XPCC_LOG_INFO << "Adc4: value=" << adcValue;
+	MODM_LOG_INFO << "Adc4: value=" << adcValue;
 	voltage = adcValue * maxVoltage / 0xfff;
-	XPCC_LOG_INFO << "; voltage=" << voltage << xpcc::endl;
+	MODM_LOG_INFO << "; voltage=" << voltage << modm::endl;
 */
 }
 
@@ -60,7 +60,7 @@ main()
 {
 	Board::initialize();
 
-	// initialize Uart2 for XPCC_LOG_INFO
+	// initialize Uart2 for MODM_LOG_INFO
 	GpioOutputA2::connect(Usart2::Tx);
 	GpioInputA3::connect(Usart2::Rx, Gpio::InputType::PullUp);
 	Usart2::initialize<Board::systemClock, 115200>(12);
@@ -96,7 +96,7 @@ main()
 
 	while (1)
 	{
-		xpcc::delayMilliseconds(200);
+		modm::delayMilliseconds(200);
 		printAdc();
 	}
 

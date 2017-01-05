@@ -10,15 +10,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_RESUMABLE_HPP
-#define XPCC_RESUMABLE_HPP
+#ifndef MODM_RESUMABLE_HPP
+#define MODM_RESUMABLE_HPP
 
 #include "macros.hpp"
 #include <modm/architecture/utils.hpp>
 #include <stdint.h>
 #include <initializer_list>
 
-namespace xpcc
+namespace modm
 {
 
 namespace rf
@@ -109,7 +109,7 @@ private:
  * the unique index of your resumable function starting at zero.
  * You may exit and return a value by using `RF_RETURN(value)` or
  * return the result of another resumable function using `RF_RETURN_CALL(resumable())`.
- * This return value is wrapped in a `xpcc::ResumableResult<Type>` struct
+ * This return value is wrapped in a `modm::ResumableResult<Type>` struct
  * and transparently returned by the `RF_CALL` macro so it can be used
  * to influence your program flow.
  * If the resumable function reaches `RF_END()` it will exit automatically,
@@ -228,7 +228,7 @@ public:
 	 *
 	 * @return	>`NestingError` if still running, <=`NestingError` if it has finished.
 	 */
-	xpcc::ResumableResult< ReturnType >
+	modm::ResumableResult< ReturnType >
 	resumable(...);
 	/// @endcond
 #endif
@@ -238,7 +238,7 @@ protected:
 
 	/// increases nesting level, call this in the switch statement!
 	/// @return current state before increasing nesting level
-	rf::State xpcc_always_inline
+	rf::State modm_always_inline
 	pushRf(uint_fast8_t index) const
 	{
 		return rfStateArray[index];
@@ -246,13 +246,13 @@ protected:
 
 	/// always call this before returning from the run function!
 	/// decreases nesting level
-	void xpcc_always_inline
+	void modm_always_inline
 	popRf() const
 	{}
 
 	// invalidates the parent nesting level
 	// @warning	be aware in which nesting level you call this! (before popRf()!)
-	void xpcc_always_inline
+	void modm_always_inline
 	stopRf(uint_fast8_t index)
 	{
 		rfStateArray[index] = rf::Stopped;
@@ -260,20 +260,20 @@ protected:
 
 	/// sets the state of the parent nesting level
 	/// @warning	be aware in which nesting level you call this! (before popRf()!)
-	void xpcc_always_inline
+	void modm_always_inline
 	setRf(rf::State state, uint_fast8_t index)
 	{
 		rfStateArray[index] = state;
 	}
 
-	bool xpcc_always_inline
+	bool modm_always_inline
 	nestingOkRf() const
 	{
 		return true;
 	}
 
 	/// @return	`true` if `stopRf()` has been called before
-	bool xpcc_always_inline
+	bool modm_always_inline
 	isStoppedRf(uint_fast8_t index) const
 	{
 		return (rfStateArray[index] == rf::Stopped);
@@ -301,6 +301,6 @@ private:
 	rf::State rfStateArray[Functions];
 };
 
-} // namespace xpcc
+} // namespace modm
 
-#endif // XPCC_RESUMABLE_HPP
+#endif // MODM_RESUMABLE_HPP

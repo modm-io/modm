@@ -15,8 +15,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32_FSMC_HPP
-#define XPCC_STM32_FSMC_HPP
+#ifndef MODM_STM32_FSMC_HPP
+#define MODM_STM32_FSMC_HPP
 
 #include <stdint.h>
 #include "../device.hpp"
@@ -35,7 +35,7 @@
 %%  set BTRx = "BTRx"
 %% endif
 
-namespace xpcc
+namespace modm
 {
 	namespace stm32
 	{

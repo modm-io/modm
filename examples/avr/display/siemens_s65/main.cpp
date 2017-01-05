@@ -15,16 +15,16 @@
 #include <modm/driver/display.hpp>
 #include <modm/ui/button_group.hpp>
 
-using namespace xpcc::atmega;
+using namespace modm::atmega;
 
 typedef GpioOutputA0 Mosi;
 typedef GpioOutputA1 Sck;
-typedef xpcc::SoftwareSpiMaster<Sck, Mosi> SPI;
+typedef modm::SoftwareSpiMaster<Sck, Mosi> SPI;
 
 typedef GpioOutputA2 Cs;
 typedef GpioOutputA3 Rs;
 typedef GpioOutputA4 Reset;
-typedef xpcc::SiemensS65Portrait<SPI, Cs, Rs, Reset> Display;
+typedef modm::SiemensS65Portrait<SPI, Cs, Rs, Reset> Display;
 
 typedef GpioOutputA5 Backlight;
 
@@ -37,7 +37,7 @@ main()
 	Backlight::set();
 
 	display.initialize();
-	display.setFont(xpcc::font::Assertion);
+	display.setFont(modm::font::Assertion);
 
 	bool dir = true;
 	uint8_t y = 0;

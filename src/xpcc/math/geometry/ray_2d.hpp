@@ -11,15 +11,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_RAY_2D_HPP
-#define XPCC_RAY_2D_HPP
+#ifndef MODM_RAY_2D_HPP
+#define MODM_RAY_2D_HPP
 
 #include "geometric_traits.hpp"
 
 #include "vector.hpp"
 #include "point_set_2d.hpp"
 
-namespace xpcc
+namespace modm
 {
 	// forward declaration
 	template <typename T>
@@ -114,7 +114,7 @@ namespace xpcc
 //				PointSet2D<T>& intersectionPoints) const;
 		
 		bool
-		ccw(const xpcc::Vector<T, 2>& point);
+		ccw(const modm::Vector<T, 2>& point);
 		
 		bool
 		operator == (const Ray2D &other) const;
@@ -123,8 +123,8 @@ namespace xpcc
 		operator != (const Ray2D &other) const;
 		
 	protected:
-		xpcc::Vector<T, 2> basePoint;
-		xpcc::Vector<T, 2> direction;
+		modm::Vector<T, 2> basePoint;
+		modm::Vector<T, 2> direction;
 	};
 }
 
@@ -134,4 +134,4 @@ namespace xpcc
 
 #include "ray_2d_impl.hpp"
 
-#endif // XPCC_RAY_2D_HPP
+#endif // MODM_RAY_2D_HPP

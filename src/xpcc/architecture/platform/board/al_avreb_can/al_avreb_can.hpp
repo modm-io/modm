@@ -13,27 +13,27 @@
 // https://www.alvidi.de/products/DE/AVR_Entwicklungsboards/avr_modul_avreb_can.php
 // Tested with 16MHz external crystal
 
-#ifndef XPCC_AL_AVREB_CAN_HPP
-#define XPCC_AL_AVREB_CAN_HPP
+#ifndef MODM_AL_AVREB_CAN_HPP
+#define MODM_AL_AVREB_CAN_HPP
 
 #include <modm/architecture/platform.hpp>
 #include <modm/debug/logger.hpp>
 
-using namespace xpcc::at90;
+using namespace modm::at90;
 
 namespace Board
 {
 
-using systemClock = xpcc::avr::SystemClock;
+using systemClock = modm::avr::SystemClock;
 
 // Arduino Footprint
-using Led0 = xpcc::GpioInverted<GpioOutputF0>;
-using Led1 = xpcc::GpioInverted<GpioOutputF1>;
-using Led2 = xpcc::GpioInverted<GpioOutputF2>;
-using Led3 = xpcc::GpioInverted<GpioOutputF3>;
+using Led0 = modm::GpioInverted<GpioOutputF0>;
+using Led1 = modm::GpioInverted<GpioOutputF1>;
+using Led2 = modm::GpioInverted<GpioOutputF2>;
+using Led3 = modm::GpioInverted<GpioOutputF3>;
 
-using Button = xpcc::GpioUnused;
-using Leds = xpcc::SoftwareGpioPort< Led3, Led2, Led1, Led0 >;
+using Button = modm::GpioUnused;
+using Leds = modm::SoftwareGpioPort< Led3, Led2, Led1, Led0 >;
 
 
 inline void
@@ -45,7 +45,7 @@ initialize()
 	GpioD3::connect(Uart1::Tx);
 	Uart1::initialize<systemClock, 38400>();
 
-	// xpcc::Clock initialization
+	// modm::Clock initialization
 	// Clear Timer on Compare Match Mode
 	TCCR0A = (1 << WGM01);
 	TIMSK0 = (1 << OCIE0A);
@@ -72,6 +72,6 @@ initialize()
 }
 
 using namespace Board;
-extern xpcc::IOStream serialStream;
+extern modm::IOStream serialStream;
 
-#endif	// XPCC_ARDUINO_UNO_HPP
+#endif	// MODM_ARDUINO_UNO_HPP

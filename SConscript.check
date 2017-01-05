@@ -137,8 +137,8 @@ if check is not None:
 				if exitStatus != 0:
 					everythingOk = False
 	
-	# Check if the XPCC library compiles against different targets without errors. 
-	# The examples from xpcc/release/tests are compiled for all targets from the
+	# Check if the MODM library compiles against different targets without errors. 
+	# The examples from modm/release/tests are compiled for all targets from the
 	# list 'devices' (at top of this file. 
 	if check in ['all', 'devices']:
 		result.append("\nDevices")

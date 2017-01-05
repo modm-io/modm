@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32_ADC{{ id }}_HPP
-#define XPCC_STM32_ADC{{ id }}_HPP
+#ifndef MODM_STM32_ADC{{ id }}_HPP
+#define MODM_STM32_ADC{{ id }}_HPP
 
 #include <stdint.h>
 #include "type_ids.hpp"
@@ -25,7 +25,7 @@
  * @defgroup	{{partname}}_adc ADC
  */
 
-namespace xpcc
+namespace modm
 {
 
 namespace stm32
@@ -45,7 +45,7 @@ namespace stm32
  * @author	ekiwi
  * @ingroup	{{partname}}_adc
  */
-class Adc{{ id }} : public xpcc::Adc
+class Adc{{ id }} : public modm::Adc
 {
 public:
 %% for channel in channels
@@ -162,7 +162,7 @@ public:
 		Overrun					= ADC_CR1_OVRIE,
 %% endif
 	};
-	XPCC_FLAGS32(Interrupt);
+	MODM_FLAGS32(Interrupt);
 
 	enum class
 	InterruptFlag : uint32_t
@@ -183,7 +183,7 @@ public:
 		All						= ADC_SR_AWD | ADC_SR_EOC | ADC_SR_JEOC,
 %% endif
 	};
-	XPCC_FLAGS32(InterruptFlag);
+	MODM_FLAGS32(InterruptFlag);
 
 public:
 	// start documentation inherited
@@ -200,7 +200,7 @@ public:
 %% endif
 	 */
 	template< class SystemClock, uint32_t frequency=10000000,
-			uint16_t tolerance = xpcc::Tolerance::TenPercent >
+			uint16_t tolerance = modm::Tolerance::TenPercent >
 	static void
 	initialize();
 
@@ -306,8 +306,8 @@ public:
 	 * Enables the ADC Conversion Complete Interrupt.
 	 *
 	 * You could catch the interrupt using this example function:
-	 * @li for STM32F4XX: `XPCC_ISR(ADC)`
-	 * @li for STM32F10X: `XPCC_ISR(ADC1_2)`
+	 * @li for STM32F4XX: `MODM_ISR(ADC)`
+	 * @li for STM32F10X: `MODM_ISR(ADC1_2)`
 	 *
 	 * @pre The ADC clock must be started and the ADC switched on with
 	 * 	initialize(). Also the Interrupt Vector needs to be enabled first.
@@ -369,8 +369,8 @@ private:
 
 } // namespace stm32
 
-} // namespace xpcc
+} // namespace modm
 
 #include "adc_{{ id }}_impl.hpp"
 
-#endif	// XPCC_STM32_ADC{{ id }}_HPP
+#endif	// MODM_STM32_ADC{{ id }}_HPP

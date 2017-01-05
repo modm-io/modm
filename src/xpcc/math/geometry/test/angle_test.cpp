@@ -19,35 +19,35 @@
 void
 AngleTest::testNormalize()
 {
-	TEST_ASSERT_EQUALS_FLOAT(xpcc::Angle::normalize( 0.3 * M_PI),  0.3 * M_PI);
-	TEST_ASSERT_EQUALS_FLOAT(xpcc::Angle::normalize(-0.6 * M_PI), -0.6 * M_PI);
-	TEST_ASSERT_EQUALS_FLOAT(xpcc::Angle::normalize( 2.9 * M_PI),  0.9 * M_PI);
-	TEST_ASSERT_EQUALS_FLOAT(xpcc::Angle::normalize(-2.9 * M_PI), -0.9 * M_PI);
-	TEST_ASSERT_EQUALS_FLOAT(xpcc::Angle::normalize( 1.5 * M_PI), -0.5 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(modm::Angle::normalize( 0.3 * M_PI),  0.3 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(modm::Angle::normalize(-0.6 * M_PI), -0.6 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(modm::Angle::normalize( 2.9 * M_PI),  0.9 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(modm::Angle::normalize(-2.9 * M_PI), -0.9 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(modm::Angle::normalize( 1.5 * M_PI), -0.5 * M_PI);
 }
 
 void
 AngleTest::testReverse()
 {
-	TEST_ASSERT_EQUALS_FLOAT(xpcc::Angle::reverse(-0.5 * M_PI),  0.5 * M_PI);
-	TEST_ASSERT_EQUALS_FLOAT(xpcc::Angle::reverse(-0.9 * M_PI),  0.1 * M_PI);
-	TEST_ASSERT_EQUALS_FLOAT(xpcc::Angle::reverse( 0.7 * M_PI), -0.3 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(modm::Angle::reverse(-0.5 * M_PI),  0.5 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(modm::Angle::reverse(-0.9 * M_PI),  0.1 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(modm::Angle::reverse( 0.7 * M_PI), -0.3 * M_PI);
 }
 
 void
 AngleTest::testPerpendicularCw()
 {
-	TEST_ASSERT_EQUALS_FLOAT(xpcc::Angle::perpendicular(-0.5 * M_PI, true),  1.0 * M_PI);
-	TEST_ASSERT_EQUALS_FLOAT(xpcc::Angle::perpendicular(-0.9 * M_PI, true),  0.6 * M_PI);
-	TEST_ASSERT_EQUALS_FLOAT(xpcc::Angle::perpendicular( 0.7 * M_PI, true),  0.2 * M_PI);
-	TEST_ASSERT_EQUALS_FLOAT(xpcc::Angle::perpendicular( 0.1 * M_PI, true), -0.4 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(modm::Angle::perpendicular(-0.5 * M_PI, true),  1.0 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(modm::Angle::perpendicular(-0.9 * M_PI, true),  0.6 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(modm::Angle::perpendicular( 0.7 * M_PI, true),  0.2 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(modm::Angle::perpendicular( 0.1 * M_PI, true), -0.4 * M_PI);
 }
 
 void
 AngleTest::testPerpendicularCcw()
 {
-	TEST_ASSERT_EQUALS_FLOAT(xpcc::Angle::perpendicular(-0.5 * M_PI, false),  0.0 * M_PI);
-	TEST_ASSERT_EQUALS_FLOAT(xpcc::Angle::perpendicular(-0.9 * M_PI, false), -0.4 * M_PI);
-	TEST_ASSERT_EQUALS_FLOAT(xpcc::Angle::perpendicular( 0.7 * M_PI, false), -0.8 * M_PI);
-	TEST_ASSERT_EQUALS_FLOAT(xpcc::Angle::perpendicular( 0.1 * M_PI, false),  0.6 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(modm::Angle::perpendicular(-0.5 * M_PI, false),  0.0 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(modm::Angle::perpendicular(-0.9 * M_PI, false), -0.4 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(modm::Angle::perpendicular( 0.7 * M_PI, false), -0.8 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(modm::Angle::perpendicular( 0.1 * M_PI, false),  0.6 * M_PI);
 }

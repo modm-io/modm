@@ -11,12 +11,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_CLOCK_DUMMY_HPP
-#define XPCC_CLOCK_DUMMY_HPP
+#ifndef	MODM_CLOCK_DUMMY_HPP
+#define MODM_CLOCK_DUMMY_HPP
 
 #include <modm/processing/timer/timestamp.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -53,6 +53,6 @@ private:
 	static Type time;
 };
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif // XPCC_CLOCK_DUMMY_HPP
+#endif // MODM_CLOCK_DUMMY_HPP

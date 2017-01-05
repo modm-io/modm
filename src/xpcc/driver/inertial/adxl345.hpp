@@ -11,12 +11,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ADXL345_HPP
-#define XPCC_ADXL345_HPP
+#ifndef MODM_ADXL345_HPP
+#define MODM_ADXL345_HPP
 
 #include <modm/architecture/interface/i2c_adapter.hpp>
 
-namespace xpcc
+namespace modm
 {
 	namespace adxl345
 	{
@@ -157,7 +157,7 @@ namespace xpcc
 	 * \tparam I2cMaster Asynchronous Two Wire interface
 	 */
 	template < typename I2cMaster >
-	class Adxl345 : protected xpcc::I2cWriteReadTransaction
+	class Adxl345 : protected modm::I2cWriteReadTransaction
 	{
 	public:
 		/**
@@ -236,4 +236,4 @@ namespace xpcc
 
 #include "adxl345_impl.hpp"
 
-#endif // XPCC_ADXL345_HPP
+#endif // MODM_ADXL345_HPP

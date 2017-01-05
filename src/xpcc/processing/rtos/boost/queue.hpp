@@ -10,10 +10,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_BOOST_QUEUE_HPP
-#define XPCC_BOOST_QUEUE_HPP
+#ifndef MODM_BOOST_QUEUE_HPP
+#define MODM_BOOST_QUEUE_HPP
 
-#ifndef XPCC_RTOS_QUEUE_HPP
+#ifndef MODM_RTOS_QUEUE_HPP
 #	error "Don't include this file directly, use <modm/processing/rtos/queue.hpp>"
 #endif
 
@@ -23,7 +23,7 @@
 #include <boost/thread/mutex.hpp>
 #include <modm/container/deque.hpp>
 
-namespace xpcc
+namespace modm
 {
 	namespace rtos
 	{
@@ -91,4 +91,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_BOOST_QUEUE_HPP
+#endif // MODM_BOOST_QUEUE_HPP

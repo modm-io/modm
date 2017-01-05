@@ -19,7 +19,7 @@
 void
 LinearInterpolationTest::testInterpolationRam()
 {
-	typedef xpcc::Pair<int16_t, uint16_t> Point;
+	typedef modm::Pair<int16_t, uint16_t> Point;
 	
 	Point points[3] =
 	{
@@ -28,7 +28,7 @@ LinearInterpolationTest::testInterpolationRam()
 		{ 100,  0 }
 	};
 	
-	xpcc::interpolation::Linear<Point> value(points, 3);
+	modm::interpolation::Linear<Point> value(points, 3);
 	
 	TEST_ASSERT_EQUALS(value.interpolate(-20), 50U);
 	TEST_ASSERT_EQUALS(value.interpolate( 10), 37U);
@@ -37,7 +37,7 @@ LinearInterpolationTest::testInterpolationRam()
 	TEST_ASSERT_EQUALS(value.interpolate(150),  0U);
 }
 
-typedef xpcc::Pair<uint8_t, int16_t> MyPair;
+typedef modm::Pair<uint8_t, int16_t> MyPair;
 
 FLASH_STORAGE(MyPair flashValues[6]) =
 {
@@ -52,8 +52,8 @@ FLASH_STORAGE(MyPair flashValues[6]) =
 void 
 LinearInterpolationTest::testInterpolationFlash()
 {
-	xpcc::interpolation::Linear<MyPair, xpcc::accessor::Flash> \
-		value(xpcc::accessor::asFlash(flashValues), 6);
+	modm::interpolation::Linear<MyPair, modm::accessor::Flash> \
+		value(modm::accessor::asFlash(flashValues), 6);
 	
 	TEST_ASSERT_EQUALS(value.interpolate(  0),  -200);
 	TEST_ASSERT_EQUALS(value.interpolate( 10),  -200);

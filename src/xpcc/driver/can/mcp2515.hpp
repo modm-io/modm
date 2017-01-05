@@ -13,8 +13,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_MCP2515_HPP
-#define XPCC_MCP2515_HPP
+#ifndef MODM_MCP2515_HPP
+#define MODM_MCP2515_HPP
 
 #include <stdint.h>
 #include <modm/architecture/driver/accessor.hpp>
@@ -100,7 +100,7 @@
 #endif
 //\}
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 *
@@ -119,7 +119,7 @@ namespace xpcc
 	template < typename SPI,
 			   typename CS,
 			   typename INT >
-    class Mcp2515 : public ::xpcc::Can
+    class Mcp2515 : public ::modm::Can
 	{
 	public:
 		static bool
@@ -206,4 +206,4 @@ namespace xpcc
 
 #include "mcp2515_impl.hpp"
 
-#endif // XPCC_MCP2515_HPP
+#endif // MODM_MCP2515_HPP

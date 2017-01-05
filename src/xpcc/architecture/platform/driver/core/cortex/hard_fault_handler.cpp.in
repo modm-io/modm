@@ -32,13 +32,13 @@
 extern "C" void _initHardFaultHandlerLed() __attribute__((optimize("Os")));
 extern "C" void _initHardFaultHandlerLed()
 {
-	xpcc::stm32::Gpio{{ options["hardfault.led"] }}::setOutput();
+	modm::stm32::Gpio{{ options["hardfault.led"] }}::setOutput();
 }
 
 extern "C" void _toggleHardFaultHandlerLed() __attribute__((optimize("Os")));
 extern "C" void _toggleHardFaultHandlerLed()
 {
-	xpcc::stm32::Gpio{{ options["hardfault.led"] }}::toggle();
+	modm::stm32::Gpio{{ options["hardfault.led"] }}::toggle();
 }
 
 %% endif
@@ -55,18 +55,18 @@ extern "C" void _toggleHardFaultHandlerLed()
 
 #include "../../uart/stm32/uart_{{ id }}.hpp"
 
-XPCC_ISR_DECL({{ uart | upper ~ id }});
+MODM_ISR_DECL({{ uart | upper ~ id }});
 
 // since the hard fault handler cannot be preempted by any other handler or IRQ
 // we have to manually call it here. Not pretty, but it works.
 extern "C"
 void flushUart()
 {
-	while(not xpcc::stm32::{{ uart ~ id }}::isWriteFinished())
+	while(not modm::stm32::{{ uart ~ id }}::isWriteFinished())
 	{
-		if (xpcc::stm32::{{ uart }}Hal{{ id }}::isTransmitRegisterEmpty())
+		if (modm::stm32::{{ uart }}Hal{{ id }}::isTransmitRegisterEmpty())
 		{
-			XPCC_ISR_CALL({{ uart | upper ~ id }});
+			MODM_ISR_CALL({{ uart | upper ~ id }});
 		}
 	}
 }
@@ -150,8 +150,8 @@ const char *exception_stack_frame = " ^-- exception stack frame\n";
 extern "C" void _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp) __attribute__((noreturn, optimize("Os")));
 extern "C" void _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 {
-#undef XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL	xpcc::log::ERROR
+#undef MODM_LOG_LEVEL
+#define MODM_LOG_LEVEL	modm::log::ERROR
 	// all CPU registers
 	%% if core.startswith("cortex-m0"):
 	const uint32_t& stacked_r8  = ctx[ 0];
@@ -200,7 +200,7 @@ extern "C" void _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 	const uint32_t& stacked_r7  = ctx[22];
 	%% endif
 
-	xpcc::stm32::{{ uart ~ id }}::discardTransmitBuffer();
+	modm::stm32::{{ uart ~ id }}::discardTransmitBuffer();
 
 	// Infinite loop
 	%% if options["hardfault.led"] != "disabled"
@@ -215,7 +215,7 @@ extern "C" void _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 	%% if options["hardfault.led"] != "disabled"
 		if (--ledCounter == 0)
 		{
-			ledCounter = xpcc::clock::fcpu / 20;
+			ledCounter = modm::clock::fcpu / 20;
 
 			_toggleHardFaultHandlerLed();
 		}
@@ -223,7 +223,7 @@ extern "C" void _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 
 		if (--logCounter == 0)
 		{
-			logCounter = xpcc::clock::fcpu;
+			logCounter = modm::clock::fcpu;
 
 	%% if not core.startswith("cortex-m0"):
 			// isolate the fault registers
@@ -252,7 +252,7 @@ extern "C" void _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 			const bool is_stack_overflow = (msp < &__stack_start);
 			constexpr bool is_stack_underflow = false;
 	%% endif
-			XPCC_LOG_ERROR.printf("\n\n\n####  Hard Fault Exception  ####\n\n"); flushUart();
+			MODM_LOG_ERROR.printf("\n\n\n####  Hard Fault Exception  ####\n\n"); flushUart();
 
 			// search for the highest watermark level on the stack
 			uint32_t *ii = ((uint32_t*)&__stack_start) + 1;
@@ -270,92 +270,92 @@ extern "C" void _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 			uint32_t *sp = (uint32_t*)&__main_stack_top;
 			for (; sp >= main_stack_end; sp--)
 			{
-				XPCC_LOG_ERROR.printf("sp[0x%08lx] : 0x%08lx", sp, *sp); flushUart();
+				MODM_LOG_ERROR.printf("sp[0x%08lx] : 0x%08lx", sp, *sp); flushUart();
 
 				// annotate the stack
-				if (sp == &__main_stack_top) { XPCC_LOG_ERROR << " <-- __main_stack_top\n"; }
-				else if (sp == (msp + (is_floating_point_active ? 26 : 8))) { XPCC_LOG_ERROR << " <-- main stack pointer\n"; }
-				else if (sp < (msp + (is_floating_point_active ? 26 : 8)) and sp >= msp) { XPCC_LOG_ERROR.printf(" | %s\n", stack_frame_names[sp - msp]); }
-				else if (sp == msp - 1) { XPCC_LOG_ERROR << exception_stack_frame; }
-				else { XPCC_LOG_ERROR << '\n'; }
+				if (sp == &__main_stack_top) { MODM_LOG_ERROR << " <-- __main_stack_top\n"; }
+				else if (sp == (msp + (is_floating_point_active ? 26 : 8))) { MODM_LOG_ERROR << " <-- main stack pointer\n"; }
+				else if (sp < (msp + (is_floating_point_active ? 26 : 8)) and sp >= msp) { MODM_LOG_ERROR.printf(" | %s\n", stack_frame_names[sp - msp]); }
+				else if (sp == msp - 1) { MODM_LOG_ERROR << exception_stack_frame; }
+				else { MODM_LOG_ERROR << '\n'; }
 			}
-			if (sp == msp - 1) { XPCC_LOG_ERROR << "                           "; XPCC_LOG_ERROR << exception_stack_frame; }
+			if (sp == msp - 1) { MODM_LOG_ERROR << "                           "; MODM_LOG_ERROR << exception_stack_frame; }
 			*/
-			XPCC_LOG_ERROR.printf("Main Stack Pointer: 0x%08lx\n", msp + 8); flushUart();
-			XPCC_LOG_ERROR.printf("Maximum Stack Usage: %u Bytes\n", (&__main_stack_top - main_stack_end)*4); flushUart();
+			MODM_LOG_ERROR.printf("Main Stack Pointer: 0x%08lx\n", msp + 8); flushUart();
+			MODM_LOG_ERROR.printf("Maximum Stack Usage: %u Bytes\n", (&__main_stack_top - main_stack_end)*4); flushUart();
 
-			XPCC_LOG_ERROR << '\n';
-			XPCC_LOG_ERROR.printf("r0 : 0x%08lx   r8  : 0x%08lx\n",   stacked_r0, stacked_r8);  flushUart();
-			XPCC_LOG_ERROR.printf("r1 : 0x%08lx   r9  : 0x%08lx\n",   stacked_r1, stacked_r9);  flushUart();
-			XPCC_LOG_ERROR.printf("r2 : 0x%08lx   r10 : 0x%08lx\n",   stacked_r2, stacked_r10); flushUart();
-			XPCC_LOG_ERROR.printf("r3 : 0x%08lx   r11 : 0x%08lx\n",   stacked_r3, stacked_r11); flushUart();
-			XPCC_LOG_ERROR.printf("r4 : 0x%08lx   r12 : 0x%08lx\n",   stacked_r4, stacked_r12); flushUart();
-			XPCC_LOG_ERROR.printf("r5 : 0x%08lx   lr  : 0x%08lx%s\n", stacked_r5, stacked_lr,  (is_stack_overflow or is_stack_underflow) ? invalid : valid); flushUart();
-			XPCC_LOG_ERROR.printf("r6 : 0x%08lx   pc  : 0x%08lx%s\n", stacked_r6, stacked_pc,  (is_stack_overflow or is_stack_underflow) ? invalid : valid); flushUart();
-			XPCC_LOG_ERROR.printf("r7 : 0x%08lx   psr : 0x%08lx%s\n", stacked_r7, stacked_psr, (is_stack_overflow or is_stack_underflow) ? invalid : valid); flushUart();
+			MODM_LOG_ERROR << '\n';
+			MODM_LOG_ERROR.printf("r0 : 0x%08lx   r8  : 0x%08lx\n",   stacked_r0, stacked_r8);  flushUart();
+			MODM_LOG_ERROR.printf("r1 : 0x%08lx   r9  : 0x%08lx\n",   stacked_r1, stacked_r9);  flushUart();
+			MODM_LOG_ERROR.printf("r2 : 0x%08lx   r10 : 0x%08lx\n",   stacked_r2, stacked_r10); flushUart();
+			MODM_LOG_ERROR.printf("r3 : 0x%08lx   r11 : 0x%08lx\n",   stacked_r3, stacked_r11); flushUart();
+			MODM_LOG_ERROR.printf("r4 : 0x%08lx   r12 : 0x%08lx\n",   stacked_r4, stacked_r12); flushUart();
+			MODM_LOG_ERROR.printf("r5 : 0x%08lx   lr  : 0x%08lx%s\n", stacked_r5, stacked_lr,  (is_stack_overflow or is_stack_underflow) ? invalid : valid); flushUart();
+			MODM_LOG_ERROR.printf("r6 : 0x%08lx   pc  : 0x%08lx%s\n", stacked_r6, stacked_pc,  (is_stack_overflow or is_stack_underflow) ? invalid : valid); flushUart();
+			MODM_LOG_ERROR.printf("r7 : 0x%08lx   psr : 0x%08lx%s\n", stacked_r7, stacked_psr, (is_stack_overflow or is_stack_underflow) ? invalid : valid); flushUart();
 
 	%% if core.startswith("cortex-m0")
-			XPCC_LOG_ERROR << '\n';
-			XPCC_LOG_ERROR.printf("SHCSR : 0x%08lx\n",   shcrs); flushUart();
-			XPCC_LOG_ERROR.printf("CFSR  : 0x%08lx\n",   cfsr);  flushUart();
-			XPCC_LOG_ERROR.printf("HFSR  : 0x%08lx\n",   hfsr);  flushUart();
-			XPCC_LOG_ERROR.printf("DFSR  : 0x%08lx\n",   dfsr);  flushUart();
-			XPCC_LOG_ERROR.printf("MMAR  : 0x%08lx%s\n", mmar, is_mmar_valid ? valid : invalid); flushUart();
-			XPCC_LOG_ERROR.printf("BFAR  : 0x%08lx%s\n", bfar, is_bfar_valid ? valid : invalid); flushUart();
-			XPCC_LOG_ERROR.printf("AFSR  : 0x%08lx\n",   afsr);  flushUart();
+			MODM_LOG_ERROR << '\n';
+			MODM_LOG_ERROR.printf("SHCSR : 0x%08lx\n",   shcrs); flushUart();
+			MODM_LOG_ERROR.printf("CFSR  : 0x%08lx\n",   cfsr);  flushUart();
+			MODM_LOG_ERROR.printf("HFSR  : 0x%08lx\n",   hfsr);  flushUart();
+			MODM_LOG_ERROR.printf("DFSR  : 0x%08lx\n",   dfsr);  flushUart();
+			MODM_LOG_ERROR.printf("MMAR  : 0x%08lx%s\n", mmar, is_mmar_valid ? valid : invalid); flushUart();
+			MODM_LOG_ERROR.printf("BFAR  : 0x%08lx%s\n", bfar, is_bfar_valid ? valid : invalid); flushUart();
+			MODM_LOG_ERROR.printf("AFSR  : 0x%08lx\n",   afsr);  flushUart();
 		%% if options["hardfault.log"] != "basic"
-			XPCC_LOG_ERROR << '\n';
+			MODM_LOG_ERROR << '\n';
 			if (mem_fault)
 			{
-				XPCC_LOG_ERROR.printf("Memory Manage Faults:"); flushUart();
+				MODM_LOG_ERROR.printf("Memory Manage Faults:"); flushUart();
 				for(uint8_t index = 0, mask = 0x80; mask; mask >>= 1)
 				{
 					if (mem_fault_mask & mask)
 					{
 						if (mem_fault & mask) {
-							XPCC_LOG_ERROR << ' ' << mem_fault_bits[index]; flushUart();
+							MODM_LOG_ERROR << ' ' << mem_fault_bits[index]; flushUart();
 						}
 						index++;
 					}
 				};
-				XPCC_LOG_ERROR << '\n';
+				MODM_LOG_ERROR << '\n';
 			}
 			if (bus_fault)
 			{
-				XPCC_LOG_ERROR.printf("Bus Faults:"); flushUart();
+				MODM_LOG_ERROR.printf("Bus Faults:"); flushUart();
 				for(uint8_t index = 0, mask = 0x80; mask; mask >>= 1)
 				{
 					if (bus_fault_mask & mask)
 					{
 						if (bus_fault & mask) {
-							XPCC_LOG_ERROR << ' ' << bus_fault_bits[index]; flushUart();
+							MODM_LOG_ERROR << ' ' << bus_fault_bits[index]; flushUart();
 						}
 						index++;
 					}
 				};
-				XPCC_LOG_ERROR << '\n';
+				MODM_LOG_ERROR << '\n';
 			}
 			if (usage_fault)
 			{
-				XPCC_LOG_ERROR.printf("Usage Faults:"); flushUart();
+				MODM_LOG_ERROR.printf("Usage Faults:"); flushUart();
 				for(uint16_t index = 0, mask = 0x8000; mask; mask >>= 1)
 				{
 					if (usage_fault_mask & mask)
 					{
 						if (usage_fault & mask) {
-							XPCC_LOG_ERROR << ' ' << usage_fault_bits[index]; flushUart();
+							MODM_LOG_ERROR << ' ' << usage_fault_bits[index]; flushUart();
 						}
 						index++;
 					}
 				};
-				XPCC_LOG_ERROR << '\n';
+				MODM_LOG_ERROR << '\n';
 			}
 		%% endif
 	%% endif
-			if (is_stack_execution) { XPCC_LOG_ERROR << "  ### STACK EXECUTION ###\n"; flushUart(); }
-			if (is_stack_overflow)  { XPCC_LOG_ERROR << "  ### STACK OVERFLOW  ###\n"; flushUart(); }
+			if (is_stack_execution) { MODM_LOG_ERROR << "  ### STACK EXECUTION ###\n"; flushUart(); }
+			if (is_stack_overflow)  { MODM_LOG_ERROR << "  ### STACK OVERFLOW  ###\n"; flushUart(); }
 	%% if not core.startswith("cortex-m0"):
-			if (is_stack_underflow) { XPCC_LOG_ERROR << "  ### STACK UNDERFLOW ###\n"; flushUart(); }
+			if (is_stack_underflow) { MODM_LOG_ERROR << "  ### STACK UNDERFLOW ###\n"; flushUart(); }
 	%% endif
 		}
 	}

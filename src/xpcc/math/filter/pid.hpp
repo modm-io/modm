@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PID_HPP
-#define XPCC_PID_HPP
+#ifndef MODM_PID_HPP
+#define MODM_PID_HPP
 
 #include <cstdlib>
 #include <cmath>
@@ -21,7 +21,7 @@
 
 #include <modm/utils/arithmetic_traits.hpp>
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	A proportional-integral-derivative controller (PID controller)
@@ -188,4 +188,4 @@ namespace xpcc
 
 #include "pid_impl.hpp"
 
-#endif // XPCC_PID_HPP
+#endif // MODM_PID_HPP

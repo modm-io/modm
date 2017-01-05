@@ -25,7 +25,7 @@ FLASH_STORAGE(int32_t bla[4]) = {1,2,3,4};
 volatile uint8_t out;
 
 void
-function(xpcc::accessor::Flash<char> s)
+function(modm::accessor::Flash<char> s)
 {
 	char c;
 	while ((c = *s++)) {
@@ -36,13 +36,13 @@ function(xpcc::accessor::Flash<char> s)
 int
 main()
 {
-	xpcc::accessor::Flash<int> bar(&foo);
+	modm::accessor::Flash<int> bar(&foo);
 
 	out = *bar;
 
-	function(xpcc::accessor::asFlash(string));
+	function(modm::accessor::asFlash(string));
 
-	xpcc::accessor::Flash<int32_t> blub(bla);
+	modm::accessor::Flash<int32_t> blub(bla);
 
 	out = blub[2];
 

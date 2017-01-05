@@ -13,8 +13,8 @@
 
 #include <modm/architecture/platform.hpp>
 
-using namespace xpcc::atmega;
-typedef xpcc::avr::SystemClock clock;
+using namespace modm::atmega;
+typedef modm::avr::SystemClock clock;
 
 // Create a new UART object and configure it to a baudrate of 115200
 typedef Uart0 uart;

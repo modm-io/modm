@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_LOCATION_2D_HPP
+#ifndef	MODM_LOCATION_2D_HPP
 	#error	"Don't include this file directly use 'location.hpp' instead!"
 #endif
 
@@ -20,13 +20,13 @@
 
 // -----------------------------------------------------------------------------
 template <typename T>
-xpcc::Location2D<T>::Location2D() :
+modm::Location2D<T>::Location2D() :
 	position(), orientation()
 {
 }
 
 template <typename T>
-xpcc::Location2D<T>::Location2D(const Vector<T, 2>& position,
+modm::Location2D<T>::Location2D(const Vector<T, 2>& position,
 		const float& orientation) :
 	position(position),
 	orientation(orientation)
@@ -34,7 +34,7 @@ xpcc::Location2D<T>::Location2D(const Vector<T, 2>& position,
 }
 
 template <typename T>
-xpcc::Location2D<T>::Location2D(const T& x, const T& y, const float& orientation) :
+modm::Location2D<T>::Location2D(const T& x, const T& y, const float& orientation) :
 	position(x, y),
 	orientation(orientation)
 {
@@ -42,50 +42,50 @@ xpcc::Location2D<T>::Location2D(const T& x, const T& y, const float& orientation
 
 // ----------------------------------------------------------------------------
 template <typename T>
-const xpcc::Vector<T, 2>&
-xpcc::Location2D<T>::getPosition() const
+const modm::Vector<T, 2>&
+modm::Location2D<T>::getPosition() const
 {
 	return this->position;
 }
 
 template <typename T>
 inline const T&
-xpcc::Location2D<T>::getX() const
+modm::Location2D<T>::getX() const
 {
 	return this->position.x;
 }
 
 template <typename T>
 inline const T&
-xpcc::Location2D<T>::getY() const
+modm::Location2D<T>::getY() const
 {
 	return this->position.y;
 }
 
 template <typename T>
 void
-xpcc::Location2D<T>::setPosition(const Vector<T, 2>& point)
+modm::Location2D<T>::setPosition(const Vector<T, 2>& point)
 {
 	this->position = point;
 }
 
 template <typename T>
 void
-xpcc::Location2D<T>::setPosition(const T& x, const T& y)
+modm::Location2D<T>::setPosition(const T& x, const T& y)
 {
 	this->position.set(x, y);
 }
 
 template <typename T>
 float
-xpcc::Location2D<T>::getOrientation() const
+modm::Location2D<T>::getOrientation() const
 {
 	return this->orientation;
 }
 
 template <typename T>
 void
-xpcc::Location2D<T>::setOrientation(const float& orientation)
+modm::Location2D<T>::setOrientation(const float& orientation)
 {
 	this->orientation = orientation;
 }
@@ -93,7 +93,7 @@ xpcc::Location2D<T>::setOrientation(const float& orientation)
 // -----------------------------------------------------------------------------
 template <typename T>
 void
-xpcc::Location2D<T>::move(const Location2D<T>& diff)
+modm::Location2D<T>::move(const Location2D<T>& diff)
 {
 	Vector<T, 2> movement = diff.position;
 	movement.rotate(this->orientation);
@@ -104,7 +104,7 @@ xpcc::Location2D<T>::move(const Location2D<T>& diff)
 
 template <typename T>
 void
-xpcc::Location2D<T>::move(const Vector<T, 2>& diff)
+modm::Location2D<T>::move(const Vector<T, 2>& diff)
 {
 	Vector<T, 2> movement(diff);
 	movement.rotate(this->orientation);
@@ -114,7 +114,7 @@ xpcc::Location2D<T>::move(const Vector<T, 2>& diff)
 
 template <typename T>
 void
-xpcc::Location2D<T>::move(T x, float phi)
+modm::Location2D<T>::move(T x, float phi)
 {
 	Vector<T, 2> vector(GeometricTraits<T>::round(x * std::cos(this->orientation)),
 					   GeometricTraits<T>::round(x * std::sin(this->orientation)));
@@ -125,8 +125,8 @@ xpcc::Location2D<T>::move(T x, float phi)
 
 // ----------------------------------------------------------------------------
 template <typename T>
-xpcc::Vector<T, 2>
-xpcc::Location2D<T>::translated(const Vector<T, 2>& vector) const
+modm::Vector<T, 2>
+modm::Location2D<T>::translated(const Vector<T, 2>& vector) const
 {
 	Vector<T, 2> result(vector);
 	result.rotate(this->orientation);
@@ -137,8 +137,8 @@ xpcc::Location2D<T>::translated(const Vector<T, 2>& vector) const
 
 // ----------------------------------------------------------------------------
 template<typename T> template<typename U>
-xpcc::Location2D<U>
-xpcc::Location2D<T>::convert() const
+modm::Location2D<U>
+modm::Location2D<T>::convert() const
 {
 	return Location2D<U>(this->position.template convert<U>(), this->orientation);
 }
@@ -146,7 +146,7 @@ xpcc::Location2D<T>::convert() const
 // ----------------------------------------------------------------------------
 template<typename T>
 bool
-xpcc::Location2D<T>::operator == (const Location2D &other) const
+modm::Location2D<T>::operator == (const Location2D &other) const
 {
 	return ((this->position == other.position) &&
 			(std::abs(this->orientation - other.orientation) < __FLT_EPSILON__));
@@ -154,7 +154,7 @@ xpcc::Location2D<T>::operator == (const Location2D &other) const
 
 template<typename T>
 bool
-xpcc::Location2D<T>::operator != (const Location2D &other) const
+modm::Location2D<T>::operator != (const Location2D &other) const
 {
 	return ((this->position != other.position) ||
 			(std::abs(this->orientation - other.orientation) > __FLT_EPSILON__));
@@ -162,8 +162,8 @@ xpcc::Location2D<T>::operator != (const Location2D &other) const
 
 // ----------------------------------------------------------------------------
 template<class T>
-xpcc::IOStream&
-xpcc::operator << (xpcc::IOStream& os, const xpcc::Location2D<T>& location)
+modm::IOStream&
+modm::operator << (modm::IOStream& os, const modm::Location2D<T>& location)
 {
 	os << location.position << ", phi=" << location.orientation;
 	return os;

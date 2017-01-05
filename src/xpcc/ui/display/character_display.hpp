@@ -10,13 +10,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_CHARACTER_DISPLAY_HPP
-#define XPCC_CHARACTER_DISPLAY_HPP
+#ifndef MODM_CHARACTER_DISPLAY_HPP
+#define MODM_CHARACTER_DISPLAY_HPP
 
 #include <stdint.h>
 #include <modm/io/iostream.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -147,6 +147,6 @@ protected:
 	uint8_t line;
 };
 
-} // namespace xpcc
+} // namespace modm
 
-#endif // XPCC_CHARACTER_DISPLAY_HPP
+#endif // MODM_CHARACTER_DISPLAY_HPP

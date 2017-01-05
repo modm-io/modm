@@ -18,8 +18,8 @@
 
 #include <modm/debug/logger.hpp>
 
-#undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::WARNING
+#undef  MODM_LOG_LEVEL
+#define MODM_LOG_LEVEL modm::log::WARNING
 
 // ----------------------------------------------------------------------------
 xpcc::tipc::Receiver::Receiver(
@@ -88,7 +88,7 @@ xpcc::tipc::Receiver::runReceiver()
 		usleep(1000);
 	}
 
-	XPCC_LOG_INFO << XPCC_FILE_INFO << "Thread terminates." << xpcc::flush;
+	MODM_LOG_INFO << MODM_FILE_INFO << "Thread terminates." << modm::flush;
 	return 0;
 }
 
@@ -109,7 +109,7 @@ xpcc::tipc::Receiver::update()
 		if 		(tipcPortId != this->ignoreTipcPortId_ &&
 				(this->domainId_==Header::DOMAIN_ID_UNDEFINED || this->domainId_==tipcHeader.domainId) )
 		{
-			XPCC_LOG_DEBUG << XPCC_FILE_INFO << "Header available." << xpcc::flush;
+			MODM_LOG_DEBUG << MODM_FILE_INFO << "Header available." << modm::flush;
 
 			// Try to allocate memory for the packet
 			Payload payload ( tipcHeader.size );
@@ -131,7 +131,7 @@ xpcc::tipc::Receiver::update()
 	}
 }
 // ----------------------------------------------------------------------------
-const xpcc::SmartPointer&
+const modm::SmartPointer&
 xpcc::tipc::Receiver::getPacket() const
 {
 	// Set the mutex guard for the packetQueue
@@ -142,7 +142,7 @@ xpcc::tipc::Receiver::getPacket() const
 	}
 	else {
 		// No packet was available
-		XPCC_LOG_ERROR << XPCC_FILE_INFO << "Empty packet queue." << xpcc::flush;
+		MODM_LOG_ERROR << MODM_FILE_INFO << "Empty packet queue." << modm::flush;
 		throw "xpcc::tipc::Receiver::frontPayload() : Empty packet queue.";
 	}
 }

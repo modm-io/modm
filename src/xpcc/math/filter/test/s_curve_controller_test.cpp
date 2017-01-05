@@ -18,9 +18,9 @@
 void
 SCurveControllerTest::testConstructor()
 {
-	xpcc::SCurveController<int16_t>::Parameter parameter;
+	modm::SCurveController<int16_t>::Parameter parameter;
 	
-	xpcc::SCurveController<int16_t> controller(parameter);
+	modm::SCurveController<int16_t> controller(parameter);
 	
 	int16_t target = 200;
 	int16_t input = 200;

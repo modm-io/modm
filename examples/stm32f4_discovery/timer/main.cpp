@@ -45,7 +45,7 @@ main()
 	Timer4::start();
 
 	// set the animation mode for autoreverse the keyframes
-	animator.setMode(xpcc::ui::KeyFrameAnimationMode::Autoreverse);
+	animator.setMode(modm::ui::KeyFrameAnimationMode::Autoreverse);
 	// set the indicator period change to 15s
 	pulsePeriod.setPeriod(10000);
 	// pulse between 0.5s and 5s.

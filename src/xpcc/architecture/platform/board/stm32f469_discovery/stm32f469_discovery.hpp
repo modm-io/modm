@@ -15,16 +15,16 @@
 // http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF262395
 //
 
-#ifndef XPCC_STM32_F469_DISCOVERY_HPP
-#define XPCC_STM32_F469_DISCOVERY_HPP
+#ifndef MODM_STM32_F469_DISCOVERY_HPP
+#define MODM_STM32_F469_DISCOVERY_HPP
 
 #include <modm/architecture/platform.hpp>
 #include <modm/ui/display/graphic_display.hpp>
 #include <modm/driver/touch/ft6x06.hpp>
 #include <modm/debug/logger.hpp>
-#define XPCC_BOARD_HAS_LOGGER
+#define MODM_BOARD_HAS_LOGGER
 
-using namespace xpcc::stm32;
+using namespace modm::stm32;
 
 namespace Board
 {
@@ -98,10 +98,10 @@ struct systemClock
 		ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div4);
 		ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div2);
 		// update clock frequencies
-		xpcc::clock::fcpu     = Frequency;
-		xpcc::clock::fcpu_kHz = Frequency / 1000;
-		xpcc::clock::fcpu_MHz = Frequency / 1000000;
-		xpcc::clock::ns_per_loop = ::round(3000 / (Frequency / 1000000));
+		modm::clock::fcpu     = Frequency;
+		modm::clock::fcpu_kHz = Frequency / 1000;
+		modm::clock::fcpu_MHz = Frequency / 1000000;
+		modm::clock::ns_per_loop = ::round(3000 / (Frequency / 1000000));
 
 		return true;
 	}
@@ -134,14 +134,14 @@ using D15 = GpioB8;
 
 using Button = GpioInputA0;
 
-using LedGreen  = xpcc::GpioInverted<GpioOutputG6>;		// LED1 [Green]
-using LedOrange = xpcc::GpioInverted<GpioOutputD4>;		// LED2 [Orange]
-using LedRed    = xpcc::GpioInverted<GpioOutputD5>;		// LED3 [Red]
-using LedBlue   = xpcc::GpioInverted<GpioOutputK3>;		// LED4 [Blue]
-using LedUsb    = xpcc::GpioInverted<GpioOutputB7>;		// LED5 [Red] USB Overcurrent
+using LedGreen  = modm::GpioInverted<GpioOutputG6>;		// LED1 [Green]
+using LedOrange = modm::GpioInverted<GpioOutputD4>;		// LED2 [Orange]
+using LedRed    = modm::GpioInverted<GpioOutputD5>;		// LED3 [Red]
+using LedBlue   = modm::GpioInverted<GpioOutputK3>;		// LED4 [Blue]
+using LedUsb    = modm::GpioInverted<GpioOutputB7>;		// LED5 [Red] USB Overcurrent
 using LedD13    = GpioOutputD3;							// LED7 [Green]
 
-using Leds = xpcc::SoftwareGpioPort< LedBlue, LedRed, LedOrange, LedGreen >;
+using Leds = modm::SoftwareGpioPort< LedBlue, LedRed, LedOrange, LedGreen >;
 
 using DisplayReset = GpioOutputH7;
 
@@ -151,7 +151,7 @@ using Int = GpioInputJ5;
 using Scl = GpioB8;
 using Sda = GpioB9;
 using I2cMaster = I2cMaster1;
-using Touch = xpcc::Ft6x06< I2cMaster >;
+using Touch = modm::Ft6x06< I2cMaster >;
 }
 
 namespace stlink
@@ -177,24 +177,24 @@ initializeTouchscreen()
 void
 initializeDisplay();
 
-xpcc::GraphicDisplay&
+modm::GraphicDisplay&
 getDisplay();
 
 inline void
 initialize()
 {
-	// initialized in `xpcc_hook_hardware_init()`
+	// initialized in `modm_hook_hardware_init()`
 	// systemClock::enable();
-	xpcc::cortex::SysTickTimer::initialize<systemClock>();
+	modm::cortex::SysTickTimer::initialize<systemClock>();
 
 	stlink::Tx::connect(stlink::Uart::Tx);
 	stlink::Rx::connect(stlink::Uart::Rx, Gpio::InputType::PullUp);
 	stlink::Uart::initialize<systemClock, 115200>(12);
 
-	LedGreen::setOutput(xpcc::Gpio::Low);
-	LedRed::setOutput(xpcc::Gpio::Low);
-	LedBlue::setOutput(xpcc::Gpio::Low);
-	LedOrange::setOutput(xpcc::Gpio::Low);
+	LedGreen::setOutput(modm::Gpio::Low);
+	LedRed::setOutput(modm::Gpio::Low);
+	LedBlue::setOutput(modm::Gpio::Low);
+	LedOrange::setOutput(modm::Gpio::Low);
 
 	Button::setInput();
 	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
@@ -204,4 +204,4 @@ initialize()
 
 }
 
-#endif	// XPCC_STM32_F469_DISCOVERY_HPP
+#endif	// MODM_STM32_F469_DISCOVERY_HPP

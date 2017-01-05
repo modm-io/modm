@@ -11,7 +11,7 @@
 
 #include "vl6180.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 namespace vl6180_private
@@ -81,7 +81,7 @@ FLASH_STORAGE(BinaryConfiguration configurationFlash[]) =
 //	{0x02D, 0x11},	// Range check enabled: SNR and ECE
 	// 46
 };
-xpcc::accessor::Flash<BinaryConfiguration> configuration(configurationFlash);
+modm::accessor::Flash<BinaryConfiguration> configuration(configurationFlash);
 
 FLASH_STORAGE(float gainFlash[]) =
 {
@@ -94,8 +94,8 @@ FLASH_STORAGE(float gainFlash[]) =
 	1.01,	//0x46
 	40		//0x47
 };
-xpcc::accessor::Flash<float> gain(gainFlash);
+modm::accessor::Flash<float> gain(gainFlash);
 
 }	// namespace vl6180_private
 
-}	// namespace xpcc
+}	// namespace modm

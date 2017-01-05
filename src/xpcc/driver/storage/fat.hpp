@@ -12,14 +12,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FAT_HPP
-#define XPCC_FAT_HPP
+#ifndef MODM_FAT_HPP
+#define MODM_FAT_HPP
 
 #include <stdint.h>
 #include <fatfs/ff.h>
 #include <fatfs/diskio.h>
 
-namespace xpcc
+namespace modm
 {
 	namespace fat
 	{
@@ -155,4 +155,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_FAT_HPP
+#endif // MODM_FAT_HPP

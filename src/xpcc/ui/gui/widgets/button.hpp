@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_GUI_BUTTON_HPP
-#define XPCC_GUI_BUTTON_HPP
+#ifndef MODM_GUI_BUTTON_HPP
+#define MODM_GUI_BUTTON_HPP
 
 #include <modm/ui/display/font.hpp>
 #include "widget.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 namespace gui
@@ -77,14 +77,14 @@ private:
 class FilledAreaButton : public Widget
 {
 public:
-	FilledAreaButton(xpcc::glcd::Color color, Dimension d) :
+	FilledAreaButton(modm::glcd::Color color, Dimension d) :
 		Widget(d, true),
 		color(color)
 	{
 	}
 
 	void
-	setBackgroundColor(xpcc::glcd::Color color)
+	setBackgroundColor(modm::glcd::Color color)
 	{
 		this->color = color;
 	}
@@ -93,11 +93,11 @@ public:
 	render(View* view);
 
 private:
-	xpcc::glcd::Color color;
+	modm::glcd::Color color;
 };
 
 }	// namespace gui
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif  // XPCC_GUI_BUTTON_HPP
+#endif  // MODM_GUI_BUTTON_HPP

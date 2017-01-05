@@ -13,8 +13,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_HOSTED_CAN_USB_HPP
-#define XPCC_HOSTED_CAN_USB_HPP
+#ifndef MODM_HOSTED_CAN_USB_HPP
+#define MODM_HOSTED_CAN_USB_HPP
 
 #include <queue>
 #include <string>
@@ -25,7 +25,7 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 namespace hosted
@@ -38,7 +38,7 @@ namespace hosted
  * @see		http://www.can232.com/
  * @ingroup	hosted
  */
-class CanUsb : public ::xpcc::Can
+class CanUsb : public ::modm::Can
 {
 public:
 	CanUsb();
@@ -46,7 +46,7 @@ public:
 	~CanUsb();
 
 	bool
-	open(std::string deviceName, unsigned int serialBaudRate, xpcc::Can::Bitrate canBitrate = xpcc::Can::kBps125);
+	open(std::string deviceName, unsigned int serialBaudRate, modm::Can::Bitrate canBitrate = modm::Can::kBps125);
 
 	void
 	close();
@@ -99,7 +99,7 @@ private:
 
 	BusState busState;
 
-	xpcc::hosted::SerialInterface serialPort;
+	modm::hosted::SerialInterface serialPort;
 
 	std::string tmpRead;
 	std::queue<can::Message> readBuffer;
@@ -109,6 +109,6 @@ private:
 
 }	// namespace hosted
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif // XPCC_HOSTED_CAN_USB_HPP
+#endif // MODM_HOSTED_CAN_USB_HPP

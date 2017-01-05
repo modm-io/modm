@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_INTERFACE_CAN_HPP
-#define XPCC_INTERFACE_CAN_HPP
+#ifndef MODM_INTERFACE_CAN_HPP
+#define MODM_INTERFACE_CAN_HPP
 
 #include <modm/architecture/interface.hpp>
 #include "can_message.hpp"
@@ -30,11 +30,11 @@
  * and medical equipment.
  */
 
-namespace xpcc
+namespace modm
 {
 
 /// @ingroup can
-class Can : public ::xpcc::Peripheral
+class Can : public ::modm::Peripheral
 {
 public:
 	/// Possible modes of the CAN controller
@@ -128,6 +128,6 @@ public:
 #endif
 };
 
-} // namespace xpcc
+} // namespace modm
 
-#endif // XPCC_INTERFACE_CAN_HPP
+#endif // MODM_INTERFACE_CAN_HPP

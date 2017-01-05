@@ -12,7 +12,7 @@
 
 #include "sdl_display.hpp"
 
-xpcc::SDLDisplay::SDLDisplay(int16_t width, int16_t height):
+modm::SDLDisplay::SDLDisplay(int16_t width, int16_t height):
 	width(width), height(height), memory(0), screen(0)
 {
 	this->memory = new bool[this->width*this->height];
@@ -24,13 +24,13 @@ xpcc::SDLDisplay::SDLDisplay(int16_t width, int16_t height):
 	this->clear();
 }
 
-xpcc::SDLDisplay::~SDLDisplay()
+modm::SDLDisplay::~SDLDisplay()
 {
 	delete this->memory;
 }
 
 void
-xpcc::SDLDisplay::update()
+modm::SDLDisplay::update()
 {
 	for(int i = 0; i < this->width; i++)
 	{
@@ -49,25 +49,25 @@ xpcc::SDLDisplay::update()
 }
 
 void
-xpcc::SDLDisplay::setPixel(int16_t x, int16_t y)
+modm::SDLDisplay::setPixel(int16_t x, int16_t y)
 {
 	this->memory[y*this->width+x] = true;
 }
 
 void
-xpcc::SDLDisplay::clearPixel(int16_t x, int16_t y)
+modm::SDLDisplay::clearPixel(int16_t x, int16_t y)
 {
 	this->memory[y*this->width+x] = false;
 }
 
 bool
-xpcc::SDLDisplay::getPixel(int16_t x, int16_t y)
+modm::SDLDisplay::getPixel(int16_t x, int16_t y)
 {
 	return 	this->memory[y*this->width+x];
 }
 
 void
-xpcc::SDLDisplay::setPixelOnScreen(int16_t x, int16_t y, bool value)
+modm::SDLDisplay::setPixelOnScreen(int16_t x, int16_t y, bool value)
 {
 	Uint32 pixel = SDL_MapRGB( this->screen->format, 0, 0, 0 );
 	if(!value)
@@ -81,7 +81,7 @@ xpcc::SDLDisplay::setPixelOnScreen(int16_t x, int16_t y, bool value)
 }
 
 void
-xpcc::SDLDisplay::clearWholeScreen()
+modm::SDLDisplay::clearWholeScreen()
 {
 	Uint32 pixel = SDL_MapRGB( this->screen->format, 0xFF, 0xFF, 0xFF );
 	//Convert the pixels to 32 bit Uint32

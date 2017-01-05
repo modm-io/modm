@@ -11,12 +11,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32_TIMER_ADVANCED_BASE_HPP
-#define XPCC_STM32_TIMER_ADVANCED_BASE_HPP
+#ifndef MODM_STM32_TIMER_ADVANCED_BASE_HPP
+#define MODM_STM32_TIMER_ADVANCED_BASE_HPP
 
 #include "general_purpose_base.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 namespace stm32
@@ -162,6 +162,6 @@ public:
 
 }	// namespace stm32
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif // XPCC_STM32_TIMER_ADVANCED_BASE_HPP
+#endif // MODM_STM32_TIMER_ADVANCED_BASE_HPP

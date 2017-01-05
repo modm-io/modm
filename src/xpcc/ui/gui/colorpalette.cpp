@@ -14,21 +14,21 @@
 
 #include "colorpalette.hpp"
 
-xpcc::glcd::Color defaultColors[] = {
-	xpcc::glcd::Color::black(),		// BLACK
-	xpcc::glcd::Color::white(),		// WHITE
-	xpcc::glcd::Color::gray(),		// GRAY
-	xpcc::glcd::Color::red(),		// RED
-	xpcc::glcd::Color::green(),		// GREEN
-	xpcc::glcd::Color::blue(),		// BLUE
-	xpcc::glcd::Color::yellow(),	// YELLOW
-	xpcc::glcd::Color::signalViolet(), //SIGNALVIOLET
-	xpcc::glcd::Color::emeraldGreen(), //EMERALDGREEN
-	xpcc::glcd::Color::blue(),		// BORDER
-	xpcc::glcd::Color::yellow(),	// TEXT
-	xpcc::glcd::Color::black(),		// BACKGROUND
-	xpcc::glcd::Color::red(),		// ACTIVATED
-	xpcc::glcd::Color::blue(),		// DEACTIVATED
+modm::glcd::Color defaultColors[] = {
+	modm::glcd::Color::black(),		// BLACK
+	modm::glcd::Color::white(),		// WHITE
+	modm::glcd::Color::gray(),		// GRAY
+	modm::glcd::Color::red(),		// RED
+	modm::glcd::Color::green(),		// GREEN
+	modm::glcd::Color::blue(),		// BLUE
+	modm::glcd::Color::yellow(),	// YELLOW
+	modm::glcd::Color::signalViolet(), //SIGNALVIOLET
+	modm::glcd::Color::emeraldGreen(), //EMERALDGREEN
+	modm::glcd::Color::blue(),		// BORDER
+	modm::glcd::Color::yellow(),	// TEXT
+	modm::glcd::Color::black(),		// BACKGROUND
+	modm::glcd::Color::red(),		// ACTIVATED
+	modm::glcd::Color::blue(),		// DEACTIVATED
 };
 
-xpcc::gui::ColorPalette xpcc::gui::DefaultColorPalette(defaultColors);
+modm::gui::ColorPalette modm::gui::DefaultColorPalette(defaultColors);

@@ -15,7 +15,7 @@
 
 #include "../tables.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 namespace ui
@@ -23,10 +23,10 @@ namespace ui
 
 FLASH_STORAGE({{ type }} table[]) =
 {
-	{{ table | xpcc.indent(1) }}
+	{{ table | modm.indent(1) }}
 };
 
-xpcc::accessor::Flash<{{ type }}> table{{ gamma }}_{{ bit }}_{{ length }}{{ inverted }}(table);
+modm::accessor::Flash<{{ type }}> table{{ gamma }}_{{ bit }}_{{ length }}{{ inverted }}(table);
 
 }
 

@@ -16,7 +16,7 @@
 
 #include "dynamic_array_test.hpp"
 
-typedef xpcc::DynamicArray<int16_t> Container;
+typedef modm::DynamicArray<int16_t> Container;
 
 void
 DynamicArrayTest::setUp()
@@ -143,7 +143,7 @@ DynamicArrayTest::testRemove()
 void
 DynamicArrayTest::testClear()
 {
-	xpcc::DynamicArray<unittest::CountType> array(5);
+	modm::DynamicArray<unittest::CountType> array(5);
 	
 	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDefaultConstructorCalls, 0U);
 	TEST_ASSERT_EQUALS(unittest::CountType::numberOfOperations, 0U);
@@ -176,7 +176,7 @@ DynamicArrayTest::testClear()
 void
 DynamicArrayTest::testRemoveAll()
 {
-	xpcc::DynamicArray<unittest::CountType> array(5);
+	modm::DynamicArray<unittest::CountType> array(5);
 	
 	unittest::CountType data;
 	
@@ -219,8 +219,8 @@ namespace
 void
 DynamicArrayTest::testConstIterator()
 {
-	xpcc::DynamicArray<int16_t> writableList(5);
-	const xpcc::DynamicArray<int16_t>& list = writableList;
+	modm::DynamicArray<int16_t> writableList(5);
+	const modm::DynamicArray<int16_t>& list = writableList;
 	
 	TEST_ASSERT_TRUE(list.begin() == list.end());
 	TEST_ASSERT_FALSE(list.begin() != list.end());
@@ -234,7 +234,7 @@ DynamicArrayTest::testConstIterator()
 	writableList.append(3);
 	
 	uint8_t i;
-	xpcc::DynamicArray<int16_t>::const_iterator it;
+	modm::DynamicArray<int16_t>::const_iterator it;
 	
 	it = list.begin();
 	TEST_ASSERT_TRUE(it == list.begin());
@@ -259,10 +259,10 @@ DynamicArrayTest::testConstIterator()
 void
 DynamicArrayTest::testConstIteratorAccess()
 {
-	xpcc::DynamicArray<IteratorTestClass> list(2);
+	modm::DynamicArray<IteratorTestClass> list(2);
 	list.append(IteratorTestClass(12, -1532));
 	
-	xpcc::DynamicArray<IteratorTestClass>::const_iterator it = list.begin();
+	modm::DynamicArray<IteratorTestClass>::const_iterator it = list.begin();
 	
 	TEST_ASSERT_EQUALS(it->a, 12);
 	TEST_ASSERT_EQUALS(it->b, -1532);
@@ -271,7 +271,7 @@ DynamicArrayTest::testConstIteratorAccess()
 void
 DynamicArrayTest::testIterator()
 {
-	xpcc::DynamicArray<int16_t> list(5);
+	modm::DynamicArray<int16_t> list(5);
 	
 	TEST_ASSERT_TRUE(list.begin() == list.end());
 	TEST_ASSERT_FALSE(list.begin() != list.end());
@@ -285,7 +285,7 @@ DynamicArrayTest::testIterator()
 	list.append(3);
 	
 	uint8_t i;
-	xpcc::DynamicArray<int16_t>::iterator it;
+	modm::DynamicArray<int16_t>::iterator it;
 	
 	it = list.begin();
 	TEST_ASSERT_TRUE(it == list.begin());
@@ -310,10 +310,10 @@ DynamicArrayTest::testIterator()
 void
 DynamicArrayTest::testIteratorAccess()
 {
-	xpcc::DynamicArray<IteratorTestClass> list(2);
+	modm::DynamicArray<IteratorTestClass> list(2);
 	list.append(IteratorTestClass(12, -1532));
 	
-	xpcc::DynamicArray<IteratorTestClass>::iterator it = list.begin();
+	modm::DynamicArray<IteratorTestClass>::iterator it = list.begin();
 	
 	TEST_ASSERT_EQUALS(it->a, 12);
 	TEST_ASSERT_EQUALS(it->b, -1532);

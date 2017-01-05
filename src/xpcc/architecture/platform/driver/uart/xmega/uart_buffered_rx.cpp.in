@@ -16,11 +16,11 @@
 
 #include "uart_{{ id.lower() }}.hpp"
 
-static xpcc::atomic::Queue<uint8_t, {{parameters.rx_buffer}}> rxBuffer;
+static modm::atomic::Queue<uint8_t, {{parameters.rx_buffer}}> rxBuffer;
 static uint8_t error;
 
 // ----------------------------------------------------------------------------
-XPCC_ISR(USART{{ id }}_RXC)
+MODM_ISR(USART{{ id }}_RXC)
 {
 	// first save the errors
 	error |= USART{{ id }}_STATUS & (USART_FERR_bm | USART_BUFOVF_bm | USART_PERR_bm);
@@ -32,7 +32,7 @@ XPCC_ISR(USART{{ id }}_RXC)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::xmega::Uart{{ id }}::initializeWithFractionalBaudrate(uint16_t bsel, uint8_t bscale)
+modm::xmega::Uart{{ id }}::initializeWithFractionalBaudrate(uint16_t bsel, uint8_t bscale)
 {
 	atomic::Lock lock;
 	
@@ -51,7 +51,7 @@ xpcc::xmega::Uart{{ id }}::initializeWithFractionalBaudrate(uint16_t bsel, uint8
 
 // MARK: - read
 bool
-xpcc::xmega::Uart{{ id }}::read(uint8_t& data)
+modm::xmega::Uart{{ id }}::read(uint8_t& data)
 {
 	if (rxBuffer.isEmpty())
 		return false;
@@ -63,7 +63,7 @@ xpcc::xmega::Uart{{ id }}::read(uint8_t& data)
 }
 
 std::size_t
-xpcc::xmega::Uart{{ id }}::read(uint8_t *buffer, std::size_t length)
+modm::xmega::Uart{{ id }}::read(uint8_t *buffer, std::size_t length)
 {
 	for (std::size_t i = 0; i < length; ++i)
 	{
@@ -81,7 +81,7 @@ xpcc::xmega::Uart{{ id }}::read(uint8_t *buffer, std::size_t length)
 
 // MARK: - discard
 std::size_t
-xpcc::xmega::Uart{{ id }}::discardReceiveBuffer()
+modm::xmega::Uart{{ id }}::discardReceiveBuffer()
 {
 	std::size_t i(0);
 	while(!rxBuffer.isEmpty())
@@ -102,13 +102,13 @@ xpcc::xmega::Uart{{ id }}::discardReceiveBuffer()
 
 // MARK: - error
 uint8_t
-xpcc::xmega::Uart{{ id }}::getErrorFlags()
+modm::xmega::Uart{{ id }}::getErrorFlags()
 {
 	return error;
 }
 
 void
-xpcc::xmega::Uart{{ id }}::acknowledgeErrorFlags()
+modm::xmega::Uart{{ id }}::acknowledgeErrorFlags()
 {
 	error = 0;
 }

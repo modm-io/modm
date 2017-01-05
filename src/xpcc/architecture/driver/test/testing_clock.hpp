@@ -17,16 +17,16 @@
 #include <modm/architecture/driver/clock.hpp>
 
 /**
- * Gain full access to xpcc::Clock
+ * Gain full access to modm::Clock
  *
- * This class is only useful if the define XPCC_CLOCK_TESTMODE is set to 1.
+ * This class is only useful if the define MODM_CLOCK_TESTMODE is set to 1.
  * Otherwise the `time` member will be ignored on any non AVR target.
  */
-class TestingClock : public xpcc::Clock
+class TestingClock : public modm::Clock
 {
 public:
 	// expose protected members
-	using xpcc::Clock::time;
+	using modm::Clock::time;
 };
 
 #endif

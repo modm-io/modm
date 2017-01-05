@@ -11,7 +11,7 @@
 // ----------------------------------------------------------------------------
 
 /**
- * Example to demonstrate a XPCC driver for HD44780 displays,
+ * Example to demonstrate a MODM driver for HD44780 displays,
  * including displays with I2C PCA8574 port expanders.
  *
  * This example uses I2cMaster2 of STM32F407
@@ -31,23 +31,23 @@
 
 #include <modm/architecture/platform.hpp>
 
-xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > device;
-xpcc::IOStream stream(device);
+modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
+modm::IOStream stream(device);
 
 // Set all four logger streams to use the UART
-xpcc::log::Logger xpcc::log::debug(device);
-xpcc::log::Logger xpcc::log::info(device);
-xpcc::log::Logger xpcc::log::warning(device);
-xpcc::log::Logger xpcc::log::error(device);
+modm::log::Logger modm::log::debug(device);
+modm::log::Logger modm::log::info(device);
+modm::log::Logger modm::log::warning(device);
+modm::log::Logger modm::log::error(device);
 
 // Set the log level
-#undef	XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::DEBUG
+#undef	MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::DEBUG
 
 using namespace Board;
 
 typedef I2cMaster2 MyI2cMaster;
-// typedef xpcc::SoftwareI2cMaster<GpioB10, GpioB11> MyI2cMaster;
+// typedef modm::SoftwareI2cMaster<GpioB10, GpioB11> MyI2cMaster;
 
 // define the pins used by the LCD when not using a port expander
 namespace lcd
@@ -62,7 +62,7 @@ namespace lcd
 	typedef GpioPort<GpioOutputC4, 4> Data4Bit;
 }
 
-typedef xpcc::Pca8574<MyI2cMaster> GpioExpander;
+typedef modm::Pca8574<MyI2cMaster> GpioExpander;
 GpioExpander gpioExpander;
 
 namespace expander
@@ -76,7 +76,7 @@ namespace expander
 	typedef GpioExpander::P5< gpioExpander > Pin5;
 	typedef GpioExpander::P6< gpioExpander > Pin6;
 	// you can also declare the pin like this, however it is too verbose
-	typedef xpcc::GpioExpanderPin< GpioExpander, gpioExpander, GpioExpander::Pin::P7 > Pin7;
+	typedef modm::GpioExpanderPin< GpioExpander, gpioExpander, GpioExpander::Pin::P7 > Pin7;
 //	typedef GpioExpander::P7< gpioExpander > Pin7;
 
 	// Form a GpioPort out of four single pins.
@@ -84,22 +84,22 @@ namespace expander
 			GpioExpander::Pin::P4, 4 > Data4BitGpio;
 	// You can also use SoftwareGpioPort, note however, that every pin is set separately,
 	// so this requires four times as many bus accesses as the optimized version above.
-//	typedef xpcc::SoftwareGpioPort<Pin7, Pin6, Pin5, Pin4> Data4BitGpio;
+//	typedef modm::SoftwareGpioPort<Pin7, Pin6, Pin5, Pin4> Data4BitGpio;
 }
 
 // You can choose either port width simply by using it.
 // The driver will handle it internally.
 
 // create a LCD object with an 8bit data port
-// xpcc::Hd44780< lcd::Data8Bit, lcd::Rw, lcd::Rs, lcd::E > display(20, 4);
+// modm::Hd44780< lcd::Data8Bit, lcd::Rw, lcd::Rs, lcd::E > display(20, 4);
 
 // create a LCD object with an 4bit data port
-// xpcc::Hd44780< lcd::Data4Bit, lcd::Rw, lcd::Rs, lcd::E  > display(20, 4);
+// modm::Hd44780< lcd::Data4Bit, lcd::Rw, lcd::Rs, lcd::E  > display(20, 4);
 
 // create a LCD object with an 4bit data port at a I2C Gpio port expander
-xpcc::Hd44780< expander::Data4BitGpio, expander::Rw, expander::Rs, expander::E  > display(20, 4);
+modm::Hd44780< expander::Data4BitGpio, expander::Rw, expander::Rs, expander::E  > display(20, 4);
 
-class ThreadOne : public xpcc::pt::Protothread
+class ThreadOne : public modm::pt::Protothread
 {
 public:
 	ThreadOne()
@@ -110,7 +110,7 @@ public:
 	update()
 	{
 		PT_BEGIN();
-		XPCC_LOG_DEBUG << "Ping the device from ThreadOne" << xpcc::endl;
+		MODM_LOG_DEBUG << "Ping the device from ThreadOne" << modm::endl;
 
 		// ping the device until it responds
 		while (true)
@@ -119,14 +119,14 @@ public:
 			if (PT_CALL(gpioExpander.ping())) {
 			 	break;
 			}
-			XPCC_LOG_DEBUG << "Device did not respond" << xpcc::endl;
+			MODM_LOG_DEBUG << "Device did not respond" << modm::endl;
 
 			// otherwise, try again in 100ms
 			this->timeout.restart(1000);
 			PT_WAIT_UNTIL(this->timeout.isExpired());
 		}
 
-		XPCC_LOG_DEBUG << "Device responded" << xpcc::endl;
+		MODM_LOG_DEBUG << "Device responded" << modm::endl;
 
 		// Actually, this is not needed because of hardware defaults, but this is better style.
 		expander::Backlight::setOutput();
@@ -151,7 +151,7 @@ public:
 		display.setCursor(0, 0);
 
 		// Write the standard welcome message ;-)
-		display << "Hello xpcc.io **\n";
+		display << "Hello modm.io **\n";
 
 		// Write two special characters in second row
 		display.setCursor(0, 1);
@@ -175,7 +175,7 @@ public:
 	}
 
 private:
-	xpcc::ShortTimeout timeout;
+	modm::ShortTimeout timeout;
 	uint8_t counter;
 
 	// Bitmaps for special characters
@@ -191,16 +191,16 @@ main()
 	Board::initialize();
 
 	GpioOutputA2::connect(Usart2::Tx);
-	Usart2::initialize<Board::systemClock, xpcc::Uart::B115200>(10);
+	Usart2::initialize<Board::systemClock, modm::Uart::B115200>(10);
 
-	XPCC_LOG_INFO << "\n\nWelcome to HD44780 I2C demo!\n\n";
+	MODM_LOG_INFO << "\n\nWelcome to HD44780 I2C demo!\n\n";
 
 	GpioB11::connect(MyI2cMaster::Sda, Gpio::InputType::PullUp);
 	GpioB10::connect(MyI2cMaster::Scl, Gpio::InputType::PullUp);
 
 	MyI2cMaster::initialize<Board::systemClock, 100000>();
 
-	xpcc::ShortPeriodicTimer tmr(500);
+	modm::ShortPeriodicTimer tmr(500);
 
 	while(true)
 	{

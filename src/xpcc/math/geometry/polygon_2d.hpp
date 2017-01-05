@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_POLYGON_2D_HPP
-#define XPCC_POLYGON_2D_HPP
+#ifndef MODM_POLYGON_2D_HPP
+#define MODM_POLYGON_2D_HPP
 
 #include "point_set_2d.hpp"
 #include "vector2.hpp"
 
-namespace xpcc
+namespace modm
 {
 	// forward declaration
 	template <typename T>
@@ -109,4 +109,4 @@ namespace xpcc
 
 #include "polygon_2d_impl.hpp"
 
-#endif // XPCC_POLYGON_2D_HPP
+#endif // MODM_POLYGON_2D_HPP

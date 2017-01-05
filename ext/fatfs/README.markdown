@@ -2,4 +2,4 @@
 ====================================
 
 This repository has the purpose to mirror the releases of FatFS.
-It can then be used as a git submodule in the xpcc library.
+It can then be used as a git submodule in the modm library.

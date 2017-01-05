@@ -10,25 +10,25 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_TLC594X_HPP
+#ifndef MODM_TLC594X_HPP
 #	error "Don't include this file directly, use 'tlc594x.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typename Xerr>
-uint8_t xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::status[CHANNELS*3/2];
+uint8_t modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::status[CHANNELS*3/2];
 template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typename Xerr>
-uint8_t xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::gs[CHANNELS*3/2];
+uint8_t modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::gs[CHANNELS*3/2];
 template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typename Xerr>
-uint8_t xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::dc[CHANNELS*3/4];
+uint8_t modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::dc[CHANNELS*3/4];
 
 // ----------------------------------------------------------------------------
 template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typename Xerr>
 void
-xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::initialize(uint16_t channels, uint8_t dots, bool writeCH, bool writeDC)
+modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::initialize(uint16_t channels, uint8_t dots, bool writeCH, bool writeDC)
 {
-	Xlat::setOutput(xpcc::Gpio::Low);
-	Vprog::setOutput(xpcc::Gpio::Low);
+	Xlat::setOutput(modm::Gpio::Low);
+	Vprog::setOutput(modm::Gpio::Low);
 	Xerr::setInput();
 
 	if (dots != 0xff) setAllDotCorrection(dots, writeDC);
@@ -37,18 +37,18 @@ xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::initialize(uint16_t channels, u
 
 template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typename Xerr>
 void
-xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::latch()
+modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::latch()
 {
 	Xlat::set();
 	// datasheet says 20ns but that is unreliable
 	// => wait for at least 900ns
-	xpcc::delayMicroseconds(0.9);
+	modm::delayMicroseconds(0.9);
 	Xlat::reset();
 }
 
 template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typename Xerr>
 void
-xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::setChannel(uint16_t channel, uint16_t value)
+modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::setChannel(uint16_t channel, uint16_t value)
 {
 	if (channel > CHANNELS-1) return;
 
@@ -80,7 +80,7 @@ xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::setChannel(uint16_t channel, ui
 
 template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typename Xerr>
 void
-xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::setAllChannels(uint16_t value, bool update)
+modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::setAllChannels(uint16_t value, bool update)
 {
 	uint8_t first  = static_cast<uint8_t>(value >> 4);
 	uint8_t second = static_cast<uint8_t>(value << 4) | (static_cast<uint8_t>(value >> 8) & 0x0f);
@@ -95,7 +95,7 @@ xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::setAllChannels(uint16_t value, 
 
 template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typename Xerr>
 uint16_t
-xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::getChannel(uint16_t channel)
+modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::getChannel(uint16_t channel)
 {
 	if (channel > CHANNELS-1) return 0;
 
@@ -114,7 +114,7 @@ xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::getChannel(uint16_t channel)
 
 template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typename Xerr>
 void
-xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::setDotCorrection(uint16_t channel, uint8_t value)
+modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::setDotCorrection(uint16_t channel, uint8_t value)
 {
 	if (channel > CHANNELS-1) return;
 
@@ -161,7 +161,7 @@ xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::setDotCorrection(uint16_t chann
 
 template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typename Xerr>
 void
-xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::setAllDotCorrection(uint8_t value, bool update)
+modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::setAllDotCorrection(uint8_t value, bool update)
 {
 	uint8_t first  = (value << 2) | (value >> 4);
 	uint8_t second = (value << 4) | (value >> 2);
@@ -177,7 +177,7 @@ xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::setAllDotCorrection(uint8_t val
 
 template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typename Xerr>
 uint8_t
-xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::getDotCorrection(uint16_t channel)
+modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::getDotCorrection(uint16_t channel)
 {
 	if (channel > CHANNELS-1) return 0;
 
@@ -207,7 +207,7 @@ xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::getDotCorrection(uint16_t chann
 
 template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typename Xerr>
 void
-xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::writeChannels(bool flush)
+modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::writeChannels(bool flush)
 {
 	Spi::transferBlocking(gs, status, CHANNELS*3/2);
 
@@ -216,7 +216,7 @@ xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::writeChannels(bool flush)
 
 template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typename Xerr>
 void
-xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::writeDotCorrection()
+modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::writeDotCorrection()
 {
 	Vprog::set();
 

@@ -28,10 +28,10 @@
  * Protothreads are non-preemptable. Therefore, a context switch can only take
  * place on blocking operations. Therefore you don't need complex
  * synchronisation. Protothreads are also stackless, which means
- * member variables of the xpcc::Protothread subclasses are needed for
+ * member variables of the modm::Protothread subclasses are needed for
  * preserving variables across context switches.
  *
- * A protothread runs within a single function (xpcc::Protothread::run()) and
+ * A protothread runs within a single function (modm::Protothread::run()) and
  * cannot span over other functions. A protothread may call normal functions,
  * but cannot block inside a called function. Blocking inside nested function
  * calls is instead made by spawning a separate protothread for each

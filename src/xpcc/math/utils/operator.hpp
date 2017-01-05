@@ -11,17 +11,17 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_MATH_OPERATOR_HPP
-#define	XPCC_MATH_OPERATOR_HPP
+#ifndef	MODM_MATH_OPERATOR_HPP
+#define	MODM_MATH_OPERATOR_HPP
 
 #include <cmath>
 #include <stdint.h>
 
 #include <modm/architecture/utils.hpp>
 
-extern "C" uint16_t xpcc_sqrt32(uint32_t a);
+extern "C" uint16_t modm_sqrt32(uint32_t a);
 
-namespace xpcc
+namespace modm
 {
 	namespace math
 	{
@@ -41,7 +41,7 @@ namespace xpcc
 		inline uint16_t
 		sqrt(uint32_t a)
 		{
-			return xpcc_sqrt32(a);
+			return modm_sqrt32(a);
 		}
 		
 		/**
@@ -84,4 +84,4 @@ namespace xpcc
 	#include "operator_impl.hpp"
 #endif
 
-#endif	// XPCC_MATH_OPERATOR_HPP
+#endif	// MODM_MATH_OPERATOR_HPP

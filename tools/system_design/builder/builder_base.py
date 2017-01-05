@@ -171,9 +171,9 @@ class Builder(object):
 		
 		Uses the jinja2 template engine. The following additional filters
 		are included:
-		xpcc.wordwrap(with)		--	like the original filter, but with correct
+		modm.wordwrap(with)		--	like the original filter, but with correct
 									handling of newlines
-		xpcc.indent(level)		--	indent every line with \a level tabs
+		modm.indent(level)		--	indent every line with \a level tabs
 		
 		Keyword arguments:
 		filename	--	Template file
@@ -203,8 +203,8 @@ class Builder(object):
 		environment = jinja2.Environment(
 				loader=jinja2.FileSystemLoader(path),
 				extensions=["jinja2.ext.loopcontrols"])
-		environment.filters['xpcc.wordwrap'] = filter_wordwrap
-		environment.filters['xpcc.indent'] = filter_indent
+		environment.filters['modm.wordwrap'] = filter_wordwrap
+		environment.filters['modm.indent'] = filter_indent
 		if filter:
 			environment.filters.update(filter)
 		template = environment.get_template(name, globals=self.globals)

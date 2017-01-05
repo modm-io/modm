@@ -40,13 +40,13 @@ board_initialize_display(uint8_t ColorCoding)
 		DSI->WRPCR = DSI_WRPCR_REGEN;
 		// Wait until stable
 		for (int t = 1024; not (DSI->WISR & DSI_WISR_RRS) and t; t--) {
-			xpcc::delayMilliseconds(1);
+			modm::delayMilliseconds(1);
 		}
 		// Set up PLL and enable it
 		DSI->WRPCR |= (0 << 16) | (2 << 11) | (125 << 2) | DSI_WRPCR_PLLEN;
 		// Wait until stable
 		for (int t = 1024; not (DSI->WISR & DSI_WISR_PLLLS) and t; t--) {
-			xpcc::delayMilliseconds(1);
+			modm::delayMilliseconds(1);
 		}
 		// D-PHY clock and digital enable
 		DSI->PCTLR = DSI_PCTLR_CKE | DSI_PCTLR_DEN;
@@ -140,7 +140,7 @@ board_initialize_display(uint8_t ColorCoding)
 		// Enable PLLSAI
 		RCC->CR |= RCC_CR_PLLSAION;
 		for (int t = 1024; not (RCC->CR & RCC_CR_PLLSAIRDY) and t; t--) {
-			xpcc::delayMilliseconds(1);
+			modm::delayMilliseconds(1);
 		}
 	}
 

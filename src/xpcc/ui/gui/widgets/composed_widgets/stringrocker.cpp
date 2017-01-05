@@ -13,7 +13,7 @@
 #include "stringrocker.hpp"
 
 void
-xpcc::gui::StringRocker::next()
+modm::gui::StringRocker::next()
 {
 	if(string_id >= end)
 	{
@@ -33,7 +33,7 @@ xpcc::gui::StringRocker::next()
 }
 
 void
-xpcc::gui::StringRocker::previous()
+modm::gui::StringRocker::previous()
 {
 	if(string_id <= start)
 	{
@@ -53,19 +53,19 @@ xpcc::gui::StringRocker::previous()
 }
 
 void
-xpcc::gui::StringRocker::activate(const InputEvent& ev, void* /*data*/)
+modm::gui::StringRocker::activate(const InputEvent& ev, void* /*data*/)
 {
 	this->handleInputEvent(&ev);
 }
 
 void
-xpcc::gui::StringRocker::deactivate(const InputEvent& ev, void* /*data*/)
+modm::gui::StringRocker::deactivate(const InputEvent& ev, void* /*data*/)
 {
 	this->handleInputEvent(&ev);
 }
 
 void
-xpcc::gui::StringRocker::next_cb(const InputEvent& /*ev*/, Widget* w, void* /*data*/)
+modm::gui::StringRocker::next_cb(const InputEvent& /*ev*/, Widget* w, void* /*data*/)
 {
 	StringRocker *rocker = static_cast<StringRocker*>(w->parent);
 
@@ -73,7 +73,7 @@ xpcc::gui::StringRocker::next_cb(const InputEvent& /*ev*/, Widget* w, void* /*da
 }
 
 void
-xpcc::gui::StringRocker::previous_cb(const InputEvent& /*ev*/, Widget* w, void* /*data*/)
+modm::gui::StringRocker::previous_cb(const InputEvent& /*ev*/, Widget* w, void* /*data*/)
 {
 	StringRocker *rocker = static_cast<StringRocker*>(w->parent);
 

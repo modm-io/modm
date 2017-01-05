@@ -14,44 +14,44 @@
 #include "../queue.hpp"
 
 // ----------------------------------------------------------------------------
-xpcc::rtos::QueueBase::QueueBase(unsigned portBASE_TYPE length,
+modm::rtos::QueueBase::QueueBase(unsigned portBASE_TYPE length,
 		unsigned portBASE_TYPE itemSize)
 {
 	this->handle = xQueueCreate(length, itemSize);
 }
 
-xpcc::rtos::QueueBase::~QueueBase()
+modm::rtos::QueueBase::~QueueBase()
 {
 	vQueueDelete(this->handle);
 }
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::rtos::QueueBase::append(const void *item, portTickType timeout)
+modm::rtos::QueueBase::append(const void *item, portTickType timeout)
 {
 	return (xQueueSendToBack(this->handle, item, timeout) == pdTRUE);
 }
 
 bool
-xpcc::rtos::QueueBase::prepend(const void *item, portTickType timeout)
+modm::rtos::QueueBase::prepend(const void *item, portTickType timeout)
 {
 	return (xQueueSendToFront(this->handle, item, timeout) == pdTRUE);
 }
 
 bool
-xpcc::rtos::QueueBase::peek(void *item, portTickType timeout) const
+modm::rtos::QueueBase::peek(void *item, portTickType timeout) const
 {
 	return (xQueuePeek(this->handle, item, timeout) == pdTRUE);
 }
 
 bool
-xpcc::rtos::QueueBase::get(void *item, portTickType timeout)
+modm::rtos::QueueBase::get(void *item, portTickType timeout)
 {
 	return (xQueueReceive(this->handle, item, timeout) == pdTRUE);
 }
 
 bool
-xpcc::rtos::QueueBase::appendFromInterrupt(const void *item)
+modm::rtos::QueueBase::appendFromInterrupt(const void *item)
 {
 	portBASE_TYPE threadWoken = pdFALSE;
 	portBASE_TYPE result = xQueueSendToBackFromISR(this->handle, item, &threadWoken);
@@ -64,7 +64,7 @@ xpcc::rtos::QueueBase::appendFromInterrupt(const void *item)
 }
 
 bool
-xpcc::rtos::QueueBase::prependFromInterrupt(const void *item)
+modm::rtos::QueueBase::prependFromInterrupt(const void *item)
 {
 	portBASE_TYPE threadWoken = pdFALSE;
 	portBASE_TYPE result = xQueueSendToFrontFromISR(this->handle, item, &threadWoken);
@@ -77,7 +77,7 @@ xpcc::rtos::QueueBase::prependFromInterrupt(const void *item)
 }
 
 bool
-xpcc::rtos::QueueBase::getFromInterrupt(void *item)
+modm::rtos::QueueBase::getFromInterrupt(void *item)
 {
 	portBASE_TYPE threadWoken = pdFALSE;
 	portBASE_TYPE result = xQueueReceiveFromISR(this->handle, item, &threadWoken);

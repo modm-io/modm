@@ -14,5 +14,5 @@
 
 ISR(TIMER0_COMP_vect)
 {
-	xpcc::Clock::increment();
+	modm::Clock::increment();
 }

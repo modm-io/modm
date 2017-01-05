@@ -22,10 +22,10 @@ if __name__ == "__main__":
 	"""
 	Some test code
 	"""
-	p_dir = os.path.abspath("../../src/xpcc/architecture/platform")
+	p_dir = os.path.abspath("../../src/modm/architecture/platform")
 
 	# Test Device File Class
-	dev = DeviceFile("../../src/xpcc/architecture/platform/xml/stm32f40.xml")
+	dev = DeviceFile("../../src/modm/architecture/platform/xml/stm32f40.xml")
 	print "dev.getProperties('stm32f407vg'): %s" % dev.getProperties('stm32f407vg')
 	print "dev.getProperties('stm32f407ve'): %s" % dev.getProperties('stm32f407ve')
 	print "dev.getDriverList('stm32f407vg', a_dir):"

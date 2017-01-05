@@ -13,8 +13,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_VIEWSTACK_HPP
-#define XPCC_VIEWSTACK_HPP
+#ifndef MODM_VIEWSTACK_HPP
+#define MODM_VIEWSTACK_HPP
 
 #include "../display/graphic_display.hpp"
 #include "../../container/stack.hpp"
@@ -22,7 +22,7 @@
 #include "menu_buttons.hpp"
 #include "abstract_view.hpp"
 
-namespace xpcc
+namespace modm
 {
 	/**
 	* \brief Stack which handles the displaying
@@ -38,7 +38,7 @@ namespace xpcc
 	class ViewStack
 	{
 	public:
-		ViewStack(xpcc::GraphicDisplay* display);
+		ViewStack(modm::GraphicDisplay* display);
 		
 		virtual ~ViewStack();
 		
@@ -47,7 +47,7 @@ namespace xpcc
 		 * @return pointer to view from stack
 		 */
 
-		inline xpcc::AbstractView* 
+		inline modm::AbstractView* 
 		get()
 		{
 			return this->stack.get();
@@ -61,11 +61,11 @@ namespace xpcc
 		 * @param view next displayed view
 		 */
 		inline void
-		push(xpcc::AbstractView* view)
+		push(modm::AbstractView* view)
 		{
 			this->stack.push(view);
 			this->getDisplay().clear();
-			xpcc::AbstractView* top = this->get();
+			modm::AbstractView* top = this->get();
 			top->draw();
 			this->display->update();
 		}
@@ -73,7 +73,7 @@ namespace xpcc
 		/**
 		 * @brief getDisplay access underlying GraphicDisplay
 		 */
-		inline xpcc::GraphicDisplay&
+		inline modm::GraphicDisplay&
 		getDisplay()
 		{
 			return *this->display;
@@ -96,12 +96,12 @@ namespace xpcc
 		 */
 		
 		void
-		shortButtonPress(xpcc::MenuButtons::Button button);
+		shortButtonPress(modm::MenuButtons::Button button);
 
 	protected:
-		xpcc::GraphicDisplay* display;
-		xpcc::Stack< xpcc::AbstractView* , xpcc::LinkedList< xpcc::AbstractView* > > stack;
+		modm::GraphicDisplay* display;
+		modm::Stack< modm::AbstractView* , modm::LinkedList< modm::AbstractView* > > stack;
 	};
 }
 
-#endif // XPCC_VIEWSTACK_HPP
+#endif // MODM_VIEWSTACK_HPP

@@ -12,15 +12,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_VECTOR_HPP
-#define XPCC_VECTOR_HPP
+#ifndef MODM_VECTOR_HPP
+#define MODM_VECTOR_HPP
 
 #include <cmath>
 #include <stdint.h>
 
 #include <modm/math/matrix.hpp>
 
-namespace xpcc
+namespace modm
 {
 	// forward declaration
 	template<typename T, uint8_t W, uint8_t H> class Matrix;
@@ -138,4 +138,4 @@ namespace xpcc
 #include "vector3.hpp"
 #include "vector4.hpp"
 
-#endif // XPCC_VECTOR_HPP
+#endif // MODM_VECTOR_HPP

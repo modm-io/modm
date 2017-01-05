@@ -28,10 +28,10 @@ main()
 	while (true)
 	{
 		LedGreen::set();
-		xpcc::delayMilliseconds(900);
+		modm::delayMilliseconds(900);
 
 		LedGreen::reset();
-		xpcc::delayMilliseconds(100);
+		modm::delayMilliseconds(100);
 	}
 
 	return 0;

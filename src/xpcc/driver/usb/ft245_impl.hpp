@@ -11,29 +11,29 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FT245_HPP
+#ifndef MODM_FT245_HPP
 #	error	"Don't include this file directly, use 'ft245.hpp' instead!"
 #endif
 
 template <typename PORT, typename RD, typename WR, typename RXF, typename TXE>
-PORT xpcc::Ft245<PORT, RD, WR, RXF, TXE>::port;
+PORT modm::Ft245<PORT, RD, WR, RXF, TXE>::port;
 
 template <typename PORT, typename RD, typename WR, typename RXF, typename TXE>
-RD xpcc::Ft245<PORT, RD, WR, RXF, TXE>::rd;
+RD modm::Ft245<PORT, RD, WR, RXF, TXE>::rd;
 
 template <typename PORT, typename RD, typename WR, typename RXF, typename TXE>
-WR xpcc::Ft245<PORT, RD, WR, RXF, TXE>::wr;
+WR modm::Ft245<PORT, RD, WR, RXF, TXE>::wr;
 
 template <typename PORT, typename RD, typename WR, typename RXF, typename TXE>
-RXF xpcc::Ft245<PORT, RD, WR, RXF, TXE>::rxf;
+RXF modm::Ft245<PORT, RD, WR, RXF, TXE>::rxf;
 
 template <typename PORT, typename RD, typename WR, typename RXF, typename TXE>
-TXE xpcc::Ft245<PORT, RD, WR, RXF, TXE>::txe;
+TXE modm::Ft245<PORT, RD, WR, RXF, TXE>::txe;
 
 // ----------------------------------------------------------------------------
 template <typename PORT, typename RD, typename WR, typename RXF, typename TXE>
 bool
-xpcc::Ft245<PORT, RD, WR, RXF, TXE>::read(uint8_t &c)
+modm::Ft245<PORT, RD, WR, RXF, TXE>::read(uint8_t &c)
 {
 	// When RXF is high, do not read data from the FIFO
 	if (rxf.read()) {
@@ -52,7 +52,7 @@ xpcc::Ft245<PORT, RD, WR, RXF, TXE>::read(uint8_t &c)
 // ----------------------------------------------------------------------------
 template <typename PORT, typename RD, typename WR, typename RXF, typename TXE>
 uint8_t
-xpcc::Ft245<PORT, RD, WR, RXF, TXE>::read(uint8_t *buffer, uint8_t n)
+modm::Ft245<PORT, RD, WR, RXF, TXE>::read(uint8_t *buffer, uint8_t n)
 {
 	uint8_t rcvd = 0;
 	uint8_t delay = 20;		// TODO Make depend on CPU frequency
@@ -82,7 +82,7 @@ xpcc::Ft245<PORT, RD, WR, RXF, TXE>::read(uint8_t *buffer, uint8_t n)
 // ----------------------------------------------------------------------------
 template <typename PORT, typename RD, typename WR, typename RXF, typename TXE>
 bool
-xpcc::Ft245<PORT, RD, WR, RXF, TXE>::write(uint8_t c)
+modm::Ft245<PORT, RD, WR, RXF, TXE>::write(uint8_t c)
 {
 	// When TXE is high do not write data into the FIFO
 	while (txe.read())
@@ -100,7 +100,7 @@ xpcc::Ft245<PORT, RD, WR, RXF, TXE>::write(uint8_t c)
 // ----------------------------------------------------------------------------
 template <typename PORT, typename RD, typename WR, typename RXF, typename TXE>
 void
-xpcc::Ft245<PORT, RD, WR, RXF, TXE>::write(const uint8_t *buffer, uint8_t n)
+modm::Ft245<PORT, RD, WR, RXF, TXE>::write(const uint8_t *buffer, uint8_t n)
 {
 	port.setOutput();
 	

@@ -43,7 +43,7 @@ main()
 		if (c > 'Z') {
 			c = 'A';
 		}
-		xpcc::delayMilliseconds(500);
+		modm::delayMilliseconds(500);
 	}
 
 	return 0;

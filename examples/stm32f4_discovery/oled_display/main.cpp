@@ -13,7 +13,7 @@
 #include <modm/driver/display/ssd1306.hpp>
 
 /**
- * Example to demonstrate a XPCC graphics display SSD1306.
+ * Example to demonstrate a MODM graphics display SSD1306.
  *
  * PB9	SDA
  * PB8	SCL
@@ -24,7 +24,7 @@
 typedef GpioB9 Sda;
 typedef GpioB8 Scl;
 typedef I2cMaster1 MyI2cMaster;
-xpcc::Ssd1306<MyI2cMaster> display;
+modm::Ssd1306<MyI2cMaster> display;
 
 // ----------------------------------------------------------------------------
 int
@@ -37,11 +37,11 @@ main()
 	MyI2cMaster::initialize<Board::systemClock, 420000>();
 
 	display.initializeBlocking();
-	display.setFont(xpcc::font::Assertion);
+	display.setFont(modm::font::Assertion);
 	display << "Hello World!";
 	display.update();
 
-	xpcc::ShortPeriodicTimer timer(1000);
+	modm::ShortPeriodicTimer timer(1000);
 	uint16_t counter(0);
 
 	while (1)

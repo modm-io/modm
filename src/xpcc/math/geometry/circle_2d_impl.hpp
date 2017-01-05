@@ -12,48 +12,48 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_CIRCLE_2D_HPP
+#ifndef MODM_CIRCLE_2D_HPP
 	#error	"Don't include this file directly, use 'circle_2d.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template <typename T>
-xpcc::Circle2D<T>::Circle2D() :
+modm::Circle2D<T>::Circle2D() :
 	center(), radius(0)
 {
 }
 
 template <typename T>
-xpcc::Circle2D<T>::Circle2D(const Vector<T, 2>& inCenter, T inRadius) :
+modm::Circle2D<T>::Circle2D(const Vector<T, 2>& inCenter, T inRadius) :
 	center(inCenter), radius(inRadius)
 {
 }
 
 // ----------------------------------------------------------------------------
 template <typename T>
-inline const xpcc::Vector<T, 2>&
-xpcc::Circle2D<T>::getCenter() const
+inline const modm::Vector<T, 2>&
+modm::Circle2D<T>::getCenter() const
 {
 	return this->center;
 }
 
 template <typename T>
 inline void
-xpcc::Circle2D<T>::setCenter(const Vector<T, 2>& point)
+modm::Circle2D<T>::setCenter(const Vector<T, 2>& point)
 {
 	this->center = point;
 }
 
 template <typename T>
 inline T
-xpcc::Circle2D<T>::getRadius() const
+modm::Circle2D<T>::getRadius() const
 {
 	return this->radius;
 }
 
 template <typename T>
 inline void
-xpcc::Circle2D<T>::setRadius(T newRadius)
+modm::Circle2D<T>::setRadius(T newRadius)
 {
 	this->radius = newRadius;
 }
@@ -61,7 +61,7 @@ xpcc::Circle2D<T>::setRadius(T newRadius)
 // ----------------------------------------------------------------------------
 template<typename T>
 bool
-xpcc::Circle2D<T>::intersects(const Polygon2D<T>& polygon) const
+modm::Circle2D<T>::intersects(const Polygon2D<T>& polygon) const
 {
 	return polygon.intersects(*this);
 }
@@ -69,7 +69,7 @@ xpcc::Circle2D<T>::intersects(const Polygon2D<T>& polygon) const
 // ----------------------------------------------------------------------------
 template <typename T>
 bool
-xpcc::Circle2D<T>::getIntersections(const Circle2D& other,
+modm::Circle2D<T>::getIntersections(const Circle2D& other,
 		PointSet2D<T>& intersections) const
 {
 	Vector<T, 2> circleToCircle = other.center - this->center;
@@ -127,7 +127,7 @@ xpcc::Circle2D<T>::getIntersections(const Circle2D& other,
 // ----------------------------------------------------------------------------
 template <typename T>
 bool
-xpcc::Circle2D<T>::getIntersections(const Line2D<T>& line,
+modm::Circle2D<T>::getIntersections(const Line2D<T>& line,
 		PointSet2D<T>& intersections) const
 {
 	return line.getIntersections(*this, intersections);
@@ -136,7 +136,7 @@ xpcc::Circle2D<T>::getIntersections(const Line2D<T>& line,
 // ----------------------------------------------------------------------------
 template <typename T>
 bool
-xpcc::Circle2D<T>::getIntersections(const LineSegment2D<T>& line,
+modm::Circle2D<T>::getIntersections(const LineSegment2D<T>& line,
 		PointSet2D<T>& intersections) const
 {
 	return line.getIntersections(*this, intersections);

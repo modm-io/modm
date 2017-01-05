@@ -10,14 +10,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_XILINX_SPARTAN_6
-#define XPCC_XILINX_SPARTAN_6
+#ifndef MODM_XILINX_SPARTAN_6
+#define MODM_XILINX_SPARTAN_6
 
 #include <modm/architecture/architecture.hpp>
 #include <modm/architecture/interface/gpio.hpp>
 #include "fpga_type.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -51,8 +51,8 @@ template <	typename Cclk,			///< Clock output to FPGA
 			typename InitB,			///< InitB input from FPGA
 			typename Done,			///< Done  input from FPGA. FPGA signalises end of configuration.
 			typename DataSource,	///< Source of configuration data, e.g. serial external flash.
-			typename Led0 = xpcc::GpioUnused,
-			typename Led1 = xpcc::GpioUnused >
+			typename Led0 = modm::GpioUnused,
+			typename Led1 = modm::GpioUnused >
 class XilinxSpartan6Parallel : public Xilinx
 {
 public:
@@ -80,4 +80,4 @@ private:
 
 #include "xilinx_spartan6_impl.hpp"
 
-#endif // XPCC_XILINX_SPARTAN_6
+#endif // MODM_XILINX_SPARTAN_6

@@ -21,7 +21,7 @@
 
 #include <modm/debug/logger.hpp>
 
-using namespace xpcc::lpc;
+using namespace modm::lpc;
 
 typedef GpioOutput0_7 Led;
 typedef GpioOutput3_1 WriteInd;
@@ -31,12 +31,12 @@ typedef SystemClock<Pll<ExternalCrystal<MHz12>, MHz48>> systemClock;
 // ----------------------------------------------------------------------------
 // Logging
 typedef Uart1 Uart;
-xpcc::IODeviceWrapper< Uart, xpcc::IOBuffer::BlockIfFull > loggerDevice;
+modm::IODeviceWrapper< Uart, modm::IOBuffer::BlockIfFull > loggerDevice;
 
-xpcc::log::Logger xpcc::log::debug(loggerDevice);
-xpcc::log::Logger xpcc::log::info(loggerDevice);
-xpcc::log::Logger xpcc::log::warning(loggerDevice);
-xpcc::log::Logger xpcc::log::error(loggerDevice);
+modm::log::Logger modm::log::debug(loggerDevice);
+modm::log::Logger modm::log::info(loggerDevice);
+modm::log::Logger modm::log::warning(loggerDevice);
+modm::log::Logger modm::log::error(loggerDevice);
 // ----------------------------------------------------------------------------
 
 
@@ -47,7 +47,7 @@ void
 testWriteBuffer(void);
 
 void
-testXpccLogger(void);
+testModmLogger(void);
 
 int
 main()
@@ -67,7 +67,7 @@ main()
 
 	Uart::initialize<systemClock, 115200>();
 
-	xpcc::delayMilliseconds(100); // glitch ?
+	modm::delayMilliseconds(100); // glitch ?
 
 	Uart::write('X');
 	Uart::write('I');
@@ -76,7 +76,7 @@ main()
 //	testWriteSingle();
 //	testWriteBuffer();
 
-	testXpccLogger();
+	testModmLogger();
 
 	while(1);
 
@@ -108,14 +108,14 @@ testWriteSingle(void)
 			WriteInd::setOutput(false);
 		}
 
-		xpcc::delayMilliseconds(2);
+		modm::delayMilliseconds(2);
 
 		// Some pause between burst otherwise USB is overloaded.
 		static uint8_t burst = 0;
 		if (burst++ > 5)
 		{
 			burst = 0;
-			xpcc::delayMilliseconds(500);
+			modm::delayMilliseconds(500);
 		}
 	} // while (1)
 }
@@ -140,22 +140,22 @@ testWriteBuffer(void)
 		Uart::write('\n');
 		WriteInd::setOutput(false);
 
-		xpcc::delayMilliseconds(2);
+		modm::delayMilliseconds(2);
 
 		// Some pause between burst otherwise USB is overloaded.
 		static uint8_t burst = 0;
 		if (burst++ > 5) {
 			burst = 0;
-			xpcc::delayMilliseconds(5000);
+			modm::delayMilliseconds(5000);
 		}
 	} // while (1)
 }
 
 void
-testXpccLogger(void)
+testModmLogger(void)
 {
 	while (1)
 	{
-		XPCC_LOG_DEBUG << "Hello world" << xpcc::endl;
+		MODM_LOG_DEBUG << "Hello world" << modm::endl;
 	}
 }

@@ -45,7 +45,7 @@ public:
 	DynamicPostman();
 
 	DeliverInfo
-	deliverPacket(const Header &header, const SmartPointer& payload) override;
+	deliverPacket(const Header &header, const modm::SmartPointer& payload) override;
 
 	bool
 	isComponentAvailable(uint8_t component) const override;
@@ -89,7 +89,7 @@ private:
 		EventListener(EventCallback call);
 		EventListener(EventCallbackSimple call);
 
-		void operator()(const Header& header, const SmartPointer& payload) const;
+		void operator()(const Header& header, const modm::SmartPointer& payload) const;
 	};
 
 	class ActionHandler
@@ -103,7 +103,7 @@ private:
 		ActionHandler(ActionCallback call);
 		ActionHandler(ActionCallbackSimple call);
 
-		void operator()(const ResponseHandle& response, const SmartPointer& payload) const;
+		void operator()(const ResponseHandle& response, const modm::SmartPointer& payload) const;
 	};
 
 	/// packetIdentifier -> callback

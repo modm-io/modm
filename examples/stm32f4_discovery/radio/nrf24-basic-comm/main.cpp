@@ -18,8 +18,8 @@
 
 #include <modm/driver/radio/nrf24/nrf24_definitions.hpp>
 
-using xpcc::Nrf24Register;
-using xpcc::Nrf24Phy;
+using modm::Nrf24Register;
+using modm::Nrf24Phy;
 
 /*
  * Basic communication with least config possible
@@ -51,17 +51,17 @@ using xpcc::Nrf24Phy;
  * PA2  - TXD
  */
 
-#undef	XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::INFO
+#undef	MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::INFO
 
 // Create an IODeviceWrapper around the Uart Peripheral we want to use
-xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > loggerDevice;
+modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
 
 // Set all four logger streams to use the UART
-xpcc::log::Logger xpcc::log::debug(loggerDevice);
-xpcc::log::Logger xpcc::log::info(loggerDevice);
-xpcc::log::Logger xpcc::log::warning(loggerDevice);
-xpcc::log::Logger xpcc::log::error(loggerDevice);
+modm::log::Logger modm::log::debug(loggerDevice);
+modm::log::Logger modm::log::info(loggerDevice);
+modm::log::Logger modm::log::warning(loggerDevice);
+modm::log::Logger modm::log::error(loggerDevice);
 
 
 typedef GpioOutputB7 Ce1;
@@ -94,23 +94,23 @@ main()
 {
 	Board::initialize();
 
-	Csn1::setOutput(xpcc::Gpio::High);
-	Csn2::setOutput(xpcc::Gpio::High);
-	Ce1::setOutput(xpcc::Gpio::Low);
-	Ce2::setOutput(xpcc::Gpio::Low);
+	Csn1::setOutput(modm::Gpio::High);
+	Csn2::setOutput(modm::Gpio::High);
+	Ce1::setOutput(modm::Gpio::Low);
+	Ce2::setOutput(modm::Gpio::Low);
 
 
 	// Enable SPI 1
 	GpioOutputB5::connect(SpiMaster1::Mosi);
 	GpioInputB4::connect(SpiMaster1::Miso);
 	GpioOutputB3::connect(SpiMaster1::Sck);
-	SpiMaster1::initialize<Board::systemClock, 10500000, xpcc::Tolerance::Exact>();
+	SpiMaster1::initialize<Board::systemClock, 10500000, modm::Tolerance::Exact>();
 
 	// Enable SPI 2
 	GpioOutputB15::connect(SpiMaster2::Mosi);
 	GpioInputB14::connect(SpiMaster2::Miso);
 	GpioOutputB13::connect(SpiMaster2::Sck);
-	SpiMaster2::initialize<Board::systemClock, 10500000, xpcc::Tolerance::Exact>();
+	SpiMaster2::initialize<Board::systemClock, 10500000, modm::Tolerance::Exact>();
 
 
 	// Enable UART 2
@@ -145,7 +145,7 @@ main()
 	nrf24prx::initialize(payload_length);
 
 
-	XPCC_LOG_INFO << "Hello from nrf24-basic-comm example" << xpcc::endl;
+	MODM_LOG_INFO << "Hello from nrf24-basic-comm example" << modm::endl;
 
 	/* set RF channel */
 	nrf24ptx::writeRegister(nrf24ptx::NrfRegister::RF_CH, rf_channel);
@@ -178,7 +178,7 @@ main()
 
 
 	/* Timer to send packets every 1000ms */
-	xpcc::ShortPeriodicTimer sendPacket(1000);
+	modm::ShortPeriodicTimer sendPacket(1000);
 
 	/* Buffer for received payload */
 	uint8_t received_data[payload_length];
@@ -205,13 +205,13 @@ main()
 		{
 			if(nrf24ptx::readStatus() & (uint8_t)Status::MAX_RT)
 			{
-				XPCC_LOG_INFO.printf("Packet lost, MAX_RT reached\n");
-				XPCC_LOG_INFO.printf("  Status: %x\n", nrf24ptx::readStatus());
+				MODM_LOG_INFO.printf("Packet lost, MAX_RT reached\n");
+				MODM_LOG_INFO.printf("  Status: %x\n", nrf24ptx::readStatus());
 				nrf24ptx::setBits(Register::STATUS, Status::MAX_RT);
-				XPCC_LOG_INFO.printf("  Status: %x\n", nrf24ptx::readStatus());
+				MODM_LOG_INFO.printf("  Status: %x\n", nrf24ptx::readStatus());
 			} else
 			{
-				XPCC_LOG_INFO.printf("Packet successfully sent\n");
+				MODM_LOG_INFO.printf("Packet successfully sent\n");
 				nrf24ptx::setBits(Register::STATUS, Status::TX_DS);
 			}
 
@@ -232,7 +232,7 @@ main()
 			/* Clear RX_DR flag after payload is read */
 			nrf24prx::setBits(Register::STATUS, Status::RX_DR);
 
-			XPCC_LOG_INFO.printf("Received packet, pl=%d, data: %x %x %x %x\n", pl, received_data[3], received_data[2], received_data[1], received_data[0]);
+			MODM_LOG_INFO.printf("Received packet, pl=%d, data: %x %x %x %x\n", pl, received_data[3], received_data[2], received_data[1], received_data[0]);
 
 		Board::LedGreen::toggle();
 		}

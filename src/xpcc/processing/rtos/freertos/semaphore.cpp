@@ -13,7 +13,7 @@
 #include "../semaphore.hpp"
 
 // ----------------------------------------------------------------------------
-xpcc::rtos::SemaphoreBase::~SemaphoreBase()
+modm::rtos::SemaphoreBase::~SemaphoreBase()
 {
 	// As semaphores are based on queues we use the queue functions to delete
 	// the semaphore
@@ -22,20 +22,20 @@ xpcc::rtos::SemaphoreBase::~SemaphoreBase()
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::rtos::SemaphoreBase::acquire(portTickType timeout)
+modm::rtos::SemaphoreBase::acquire(portTickType timeout)
 {
 	
 	return (xSemaphoreTake(this->handle, timeout) == pdTRUE);
 }
 
 void
-xpcc::rtos::SemaphoreBase::release()
+modm::rtos::SemaphoreBase::release()
 {
 	xSemaphoreGive(this->handle);
 }
 
 void
-xpcc::rtos::SemaphoreBase::releaseFromInterrupt()
+modm::rtos::SemaphoreBase::releaseFromInterrupt()
 {
 	portBASE_TYPE threadWoken = pdFALSE;
 	
@@ -47,14 +47,14 @@ xpcc::rtos::SemaphoreBase::releaseFromInterrupt()
 }
 
 // ----------------------------------------------------------------------------
-xpcc::rtos::Semaphore::Semaphore(unsigned portBASE_TYPE max,
+modm::rtos::Semaphore::Semaphore(unsigned portBASE_TYPE max,
 		unsigned portBASE_TYPE initial)
 {
 	this->handle = xSemaphoreCreateCounting(max, initial);
 }
 
 // ----------------------------------------------------------------------------
-xpcc::rtos::BinarySemaphore::BinarySemaphore()
+modm::rtos::BinarySemaphore::BinarySemaphore()
 {
 	vSemaphoreCreateBinary(this->handle);
 }

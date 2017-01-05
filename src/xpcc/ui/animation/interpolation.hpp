@@ -9,14 +9,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_UI_LINEAR_INTERPOLATION_HPP
-#define XPCC_UI_LINEAR_INTERPOLATION_HPP
+#ifndef MODM_UI_LINEAR_INTERPOLATION_HPP
+#define MODM_UI_LINEAR_INTERPOLATION_HPP
 
 #include <stdint.h>
 #include <modm/utils/arithmetic_traits.hpp>
 #include <modm/utils/template_metaprogramming.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 namespace ui
@@ -47,12 +47,12 @@ template< typename T = uint8_t >
 class FastRamp
 {
 private:
-	typedef typename xpcc::ArithmeticTraits<T>::UnsignedType UnsignedType;
+	typedef typename modm::ArithmeticTraits<T>::UnsignedType UnsignedType;
 public:
 	/// for 8bit value types, the steps are limited to 2^15 anyway,
 	/// so we do not need uint32_t for the steps, but we can use uint16_t
-	typedef typename xpcc::tmp::Select<
-			xpcc::tmp::SameType<UnsignedType, uint8_t>::value,
+	typedef typename modm::tmp::Select<
+			modm::tmp::SameType<UnsignedType, uint8_t>::value,
 			uint16_t,
 			uint32_t >::Result StepType;
 private:
@@ -74,7 +74,7 @@ private:
 			float delta = (static_cast<float>(end) - begin);
 			deltaValue = delta / steps;
 			if (deltaValue == 0)
-				deltaValue = delta > 0 ? xpcc::ArithmeticTraits<float>::epsilon : -xpcc::ArithmeticTraits<float>::epsilon;
+				deltaValue = delta > 0 ? modm::ArithmeticTraits<float>::epsilon : -modm::ArithmeticTraits<float>::epsilon;
 			accumulatedValue = static_cast<float>(begin) + deltaValue / 2;
 		}
 
@@ -177,7 +177,7 @@ private:
 	// On the AVR 64bit variables do not exist, therefore this must be excluded,
 	// so that it may revert back to using floats.
 	// It's not pretty, but neither is using uint32_t on an 8bit CPU to begin with.
-#if !defined(XPCC_CPU_AVR)
+#if !defined(MODM_CPU_AVR)
 
 	/**
 	 * uint32_t implementation using signed 32.16 fixed point arithmetic.
@@ -238,28 +238,28 @@ public:
 	 * @param	end		the end of the ramp
 	 * @param	steps	the number of steps for the ramp.
 	 */
-	void xpcc_always_inline
+	void modm_always_inline
 	initialize(T begin, T end, StepType steps)
 	{
 		computations.initialize(begin, end, steps);
 	}
 
 	/// update the intermediate value for one step
-	void xpcc_always_inline
+	void modm_always_inline
 	step()
 	{
 		computations.step();
 	}
 
 	/// @return the intermediate value.
-	T xpcc_always_inline
+	T modm_always_inline
 	getValue()
 	{
 		return computations.get();
 	}
 
 	/// stops the interpolation.
-	void xpcc_always_inline
+	void modm_always_inline
 	stop()
 	{
 		computations.deltaValue = 0;
@@ -268,6 +268,6 @@ public:
 
 }	// namespace ui
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif	// XPCC_UI_LINEAR_INTERPOLATION_HPP
+#endif	// MODM_UI_LINEAR_INTERPOLATION_HPP

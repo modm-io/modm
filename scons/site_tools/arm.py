@@ -140,7 +140,7 @@ def generate(env, **kw):
 		"-DBASENAME=${SOURCE.file}",
 		"-fdiagnostics-color=auto",
 	]
-	env['CCFLAGS'] += env['XPCC_ADDITIONAL_CCFLAGS']
+	env['CCFLAGS'] += env['MODM_ADDITIONAL_CCFLAGS']
 
 	# Platforms with single precision float support
 	if env['ARCHITECTURE'] in ['cortex-m4f', 'cortex-m7f']:
@@ -184,7 +184,7 @@ def generate(env, **kw):
 	# these values can be overwritten by the user
 	# now set in platform_tools.py
 	# linkdir, linkfile = os.path.split(linkerscript)
-	# env['LINKPATH'] = "${XPCC_ROOTPATH}/src/xpcc/architecture/platform/%s" % linkdir
+	# env['LINKPATH'] = "${MODM_ROOTPATH}/src/modm/architecture/platform/%s" % linkdir
 	# env['LINKFILE'] = "%s" % linkfile
 	
 	env['LINKFLAGS'] = [

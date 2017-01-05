@@ -27,7 +27,7 @@ main stack, an alignment buffer up to 1kB is added to the main stack.
 
 !!! note
     The main stack is watermarked and you can get the maximum stack usage using
-    the `uint32_t xpcc::cortex::getMaximumStackUsage()` function.
+    the `uint32_t modm::cortex::getMaximumStackUsage()` function.
 
     |              ...                |
     |---------------------------------|

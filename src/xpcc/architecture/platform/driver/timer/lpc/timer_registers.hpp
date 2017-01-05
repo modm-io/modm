@@ -11,10 +11,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LPC11_TIMER_REGISTERS_HPP
-#define XPCC_LPC11_TIMER_REGISTERS_HPP
+#ifndef MODM_LPC11_TIMER_REGISTERS_HPP
+#define MODM_LPC11_TIMER_REGISTERS_HPP
 
-namespace xpcc
+namespace modm
 {
 	///< 
 	namespace lpc
@@ -95,4 +95,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_LPC11_TIMER_REGISTERS_HPP
+#endif // MODM_LPC11_TIMER_REGISTERS_HPP

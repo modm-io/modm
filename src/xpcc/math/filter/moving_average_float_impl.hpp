@@ -12,18 +12,18 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_MOVING_AVERAGE_HPP
+#ifndef MODM_MOVING_AVERAGE_HPP
 	#error	"Don't include this file directly, use 'moving_average.hpp' instead!"
 #endif
 
-namespace xpcc
+namespace modm
 {
 	namespace filter{
 		template<std::size_t N>
 		class MovingAverage<double, N >
 		{
 		private:
-			typedef typename ::xpcc::tmp::Select<
+			typedef typename ::modm::tmp::Select<
 				(N >= 256),
 				uint_fast16_t,
 				uint_fast8_t >::Result Index;
@@ -51,7 +51,7 @@ namespace xpcc
 //---------------------------------------------------------------------------------
 
 template<std::size_t N>
-xpcc::filter::MovingAverage<double, N>::MovingAverage(const double& initialValue) :
+modm::filter::MovingAverage<double, N>::MovingAverage(const double& initialValue) :
 	index(0), sum(N * initialValue)
 {
 	for (Index i = 0; i < N; ++i) {
@@ -63,7 +63,7 @@ xpcc::filter::MovingAverage<double, N>::MovingAverage(const double& initialValue
 //---------------------------------------------------------------------------------
 template<std::size_t N>
 void
-xpcc::filter::MovingAverage<double, N>::update(const double& input){
+modm::filter::MovingAverage<double, N>::update(const double& input){
 	buffer[index] = input;
 
 	index++;
@@ -81,7 +81,7 @@ xpcc::filter::MovingAverage<double, N>::update(const double& input){
 // ------------------------------------------------------------------------------
 template<std::size_t N>
 double
-xpcc::filter::MovingAverage<double, N>::getValue() const
+modm::filter::MovingAverage<double, N>::getValue() const
 {
 	return (sum / N);
 }

@@ -12,17 +12,17 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FREERTOS_SCHEDULER_HPP
-#define XPCC_FREERTOS_SCHEDULER_HPP
+#ifndef MODM_FREERTOS_SCHEDULER_HPP
+#define MODM_FREERTOS_SCHEDULER_HPP
 
-#ifndef XPCC_RTOS_SCHEDULER_HPP
+#ifndef MODM_RTOS_SCHEDULER_HPP
 #	error "Don't include this file directly, use <modm/processing/rtos/scheduler.hpp>"
 #endif
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
-namespace xpcc
+namespace modm
 {
 	namespace rtos
 	{
@@ -85,4 +85,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_FREERTOS_SCHEDULER_HPP
+#endif // MODM_FREERTOS_SCHEDULER_HPP

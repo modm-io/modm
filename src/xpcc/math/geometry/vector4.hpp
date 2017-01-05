@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_VECTOR4_HPP
-#define XPCC_VECTOR4_HPP
+#ifndef MODM_VECTOR4_HPP
+#define MODM_VECTOR4_HPP
 
 #include <stdint.h>
 #include "vector.hpp"
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	Class for handling common vector operations (4D)
@@ -261,4 +261,4 @@ namespace xpcc
 
 #include "vector4_impl.hpp"
 
-#endif // XPCC_VECTOR4_HPP
+#endif // MODM_VECTOR4_HPP

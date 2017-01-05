@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_QUATERNION_HPP
-#define XPCC_QUATERNION_HPP
+#ifndef MODM_QUATERNION_HPP
+#define MODM_QUATERNION_HPP
 
 #include <cmath>
 #include <stdint.h>
 
-namespace xpcc
+namespace modm
 {
 	// forward declaration
 	template<class T, uint8_t N>
@@ -112,4 +112,4 @@ namespace xpcc
 
 #include "quaternion_impl.hpp"
 
-#endif	// XPCC_QUATERNION_HPP
+#endif	// MODM_QUATERNION_HPP

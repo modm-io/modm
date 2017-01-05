@@ -14,7 +14,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_S_CURVE_CONTROLLER_HPP
+#ifndef MODM_S_CURVE_CONTROLLER_HPP
 	#error	"Don't include this file directly, use 's_curve_controller.hpp' instead!"
 #endif
 
@@ -23,7 +23,7 @@
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::SCurveController<T>::Parameter::Parameter(
+modm::SCurveController<T>::Parameter::Parameter(
 		const T& targetArea, const T& increment, const T& decreaseFactor, const T& kp, 
 		const T& speedMaximum, const T& speedMinimum, const T& speedTarget) :
 	targetArea(targetArea), increment(increment), decreaseFactor(decreaseFactor), kp(kp),
@@ -36,7 +36,7 @@ xpcc::SCurveController<T>::Parameter::Parameter(
 
 template<typename T>
 void
-xpcc::SCurveController<T>::setParameter(const Parameter& parameter)
+modm::SCurveController<T>::setParameter(const Parameter& parameter)
 {
 	this->parameter = parameter;
 }
@@ -44,7 +44,7 @@ xpcc::SCurveController<T>::setParameter(const Parameter& parameter)
 // ----------------------------------------------------------------------------
 
 template<typename T>
-xpcc::SCurveController<T>::SCurveController(const Parameter& parameter) :
+modm::SCurveController<T>::SCurveController(const Parameter& parameter) :
 	output(), targetReached(false), parameter(parameter)
 {
 }
@@ -52,7 +52,7 @@ xpcc::SCurveController<T>::SCurveController(const Parameter& parameter) :
 // ----------------------------------------------------------------------------
 template<typename T>
 inline void
-xpcc::SCurveController<T>::setSpeedMaximum( const T& speed )
+modm::SCurveController<T>::setSpeedMaximum( const T& speed )
 {
 	this->parameter.speedMaximum = speed;
 }
@@ -60,7 +60,7 @@ xpcc::SCurveController<T>::setSpeedMaximum( const T& speed )
 // ----------------------------------------------------------------------------
 template<typename T>
 inline void
-xpcc::SCurveController<T>::setSpeedMinimim( const T& speed )
+modm::SCurveController<T>::setSpeedMinimim( const T& speed )
 {
 	this->parameter.speedMinimum = speed;
 }
@@ -68,7 +68,7 @@ xpcc::SCurveController<T>::setSpeedMinimim( const T& speed )
 // ----------------------------------------------------------------------------
 template<typename T>
 inline void
-xpcc::SCurveController<T>::setSpeedTarget( const T& speed )
+modm::SCurveController<T>::setSpeedTarget( const T& speed )
 {
 	this->parameter.speedTarget = speed;
 }
@@ -76,7 +76,7 @@ xpcc::SCurveController<T>::setSpeedTarget( const T& speed )
 // ----------------------------------------------------------------------------
 template<typename T>
 bool
-xpcc::SCurveController<T>::isTargetReached() const
+modm::SCurveController<T>::isTargetReached() const
 {
 	return this->targetReached;
 }
@@ -84,7 +84,7 @@ xpcc::SCurveController<T>::isTargetReached() const
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::SCurveController<T>::update(T error, const T& speed)
+modm::SCurveController<T>::update(T error, const T& speed)
 {
 	// adjust sign to be always positive
 	bool invert = false;
@@ -109,9 +109,9 @@ xpcc::SCurveController<T>::update(T error, const T& speed)
 			parameter.decreaseFactor * 2) + parameter.speedTarget;
 	}
 	
-	output = xpcc::min(outputIncrement, outputDecrement);
+	output = modm::min(outputIncrement, outputDecrement);
 	// TODO smooth breaking if the speedMaximum has changed to a lower value
-	output = xpcc::min(output, parameter.speedMaximum);
+	output = modm::min(output, parameter.speedMaximum);
 	
 	if (output < parameter.speedMinimum) {
 		output = parameter.speedMinimum;
@@ -126,7 +126,7 @@ xpcc::SCurveController<T>::update(T error, const T& speed)
 // ----------------------------------------------------------------------------
 template<typename T>
 inline const T&
-xpcc::SCurveController<T>::getValue() const
+modm::SCurveController<T>::getValue() const
 {
 	return this->output;
 }

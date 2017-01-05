@@ -11,51 +11,51 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LOG_STD_COLOUR_HPP
+#ifndef MODM_LOG_STD_COLOUR_HPP
 	#error "Don't include this file directly, use 'std_colour.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
-template <xpcc::log::Colour TEXT, xpcc::log::Colour BACKGROUND, typename STYLE>
-xpcc::log::StdColour<TEXT, BACKGROUND, STYLE>::StdColour( STYLE style ) :
+template <modm::log::Colour TEXT, modm::log::Colour BACKGROUND, typename STYLE>
+modm::log::StdColour<TEXT, BACKGROUND, STYLE>::StdColour( STYLE style ) :
 	Style<STYLE> ( style )
 {
 }
 
-template <xpcc::log::Colour TEXT, xpcc::log::Colour BACKGROUND, typename STYLE>
-xpcc::log::StdColour<TEXT, BACKGROUND, STYLE>::StdColour(IODevice &device) :
+template <modm::log::Colour TEXT, modm::log::Colour BACKGROUND, typename STYLE>
+modm::log::StdColour<TEXT, BACKGROUND, STYLE>::StdColour(IODevice &device) :
 	Style<STYLE> ( device )
 {
 }
 
-template <xpcc::log::Colour TEXT, xpcc::log::Colour BACKGROUND, typename STYLE>
-xpcc::log::StdColour<TEXT, BACKGROUND, STYLE>::~StdColour()
+template <modm::log::Colour TEXT, modm::log::Colour BACKGROUND, typename STYLE>
+modm::log::StdColour<TEXT, BACKGROUND, STYLE>::~StdColour()
 {
 }
 
 // ----------------------------------------------------------------------------
 
-template <xpcc::log::Colour TEXT, xpcc::log::Colour BACKGROUND, typename STYLE>
+template <modm::log::Colour TEXT, modm::log::Colour BACKGROUND, typename STYLE>
 void
-xpcc::log::StdColour<TEXT, BACKGROUND, STYLE>::parseArg( int argc, char * argv )
+modm::log::StdColour<TEXT, BACKGROUND, STYLE>::parseArg( int argc, char * argv )
 {
 	this->Style<STYLE>::parseArg( argc, argv );
 }
 
 // -----------------------------------------------------------------------------
 
-template <xpcc::log::Colour TEXT, xpcc::log::Colour BACKGROUND, typename STYLE>
+template <modm::log::Colour TEXT, modm::log::Colour BACKGROUND, typename STYLE>
 void
-xpcc::log::StdColour<TEXT, BACKGROUND, STYLE>::write( char c )
+modm::log::StdColour<TEXT, BACKGROUND, STYLE>::write( char c )
 {
 	this->Style<STYLE>::write(this->getTextColour());
 	this->Style<STYLE>::write(this->getBackgroundColour());
 	this->Style<STYLE>::write(c);
 }
 
-template <xpcc::log::Colour TEXT, xpcc::log::Colour BACKGROUND, typename STYLE>
+template <modm::log::Colour TEXT, modm::log::Colour BACKGROUND, typename STYLE>
 void
-xpcc::log::StdColour<TEXT, BACKGROUND, STYLE>::write( const char* s )
+modm::log::StdColour<TEXT, BACKGROUND, STYLE>::write( const char* s )
 {
 	this->Style<STYLE>::write(this->getTextColour());
 	this->Style<STYLE>::write(this->getBackgroundColour());
@@ -64,18 +64,18 @@ xpcc::log::StdColour<TEXT, BACKGROUND, STYLE>::write( const char* s )
 
 // ----------------------------------------------------------------------------
 
-template <xpcc::log::Colour TEXT, xpcc::log::Colour BACKGROUND, typename STYLE>
+template <modm::log::Colour TEXT, modm::log::Colour BACKGROUND, typename STYLE>
 void
-xpcc::log::StdColour<TEXT, BACKGROUND, STYLE>::flush()
+modm::log::StdColour<TEXT, BACKGROUND, STYLE>::flush()
 {
 	this->Style<STYLE>::write("\033[0m");
 	this->Style<STYLE>::flush();
 }
 
 // ----------------------------------------------------------------------------
-template <xpcc::log::Colour TEXT, xpcc::log::Colour BACKGROUND, typename STYLE>
+template <modm::log::Colour TEXT, modm::log::Colour BACKGROUND, typename STYLE>
 const char*
-xpcc::log::StdColour<TEXT, BACKGROUND, STYLE>::getTextColour()
+modm::log::StdColour<TEXT, BACKGROUND, STYLE>::getTextColour()
 {
 	switch( TEXT )
 	{
@@ -110,9 +110,9 @@ xpcc::log::StdColour<TEXT, BACKGROUND, STYLE>::getTextColour()
 
 // ----------------------------------------------------------------------------
 
-template <xpcc::log::Colour TEXT, xpcc::log::Colour BACKGROUND, typename STYLE>
+template <modm::log::Colour TEXT, modm::log::Colour BACKGROUND, typename STYLE>
 const char*
-xpcc::log::StdColour<TEXT, BACKGROUND, STYLE>::getBackgroundColour()
+modm::log::StdColour<TEXT, BACKGROUND, STYLE>::getBackgroundColour()
 {
 	switch( BACKGROUND )
 	{

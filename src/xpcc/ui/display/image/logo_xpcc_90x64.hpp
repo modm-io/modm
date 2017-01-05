@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef BITMAP_LOGO_XPCC_90X64_HPP
-#define BITMAP_LOGO_XPCC_90X64_HPP
+#ifndef BITMAP_LOGO_MODM_90X64_HPP
+#define BITMAP_LOGO_MODM_90X64_HPP
 
 #include <modm/architecture/driver/accessor.hpp>
 
@@ -21,15 +21,15 @@ namespace bitmap
 	/**
 	 * \brief	Generated bitmap
 	 *
-	 * Generated from file "src/xpcc/ui/display/image/logo_xpcc_90x64.pbm".
+	 * Generated from file "src/modm/ui/display/image/logo_modm_90x64.pbm".
 	 *
 	 * - Width  : 90
 	 * - Height : 64
 	 *
 	 * \ingroup	image
 	 */
-	EXTERN_FLASH_STORAGE(uint8_t logo_xpcc_90x64[]);
+	EXTERN_FLASH_STORAGE(uint8_t logo_modm_90x64[]);
 }
 
-#endif // BITMAP_LOGO_XPCC_90X64_HPP
+#endif // BITMAP_LOGO_MODM_90X64_HPP
 

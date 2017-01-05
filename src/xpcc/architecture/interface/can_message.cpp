@@ -14,14 +14,14 @@
 #include <modm/architecture/utils.hpp>
 #include <modm/architecture/interface/can_message.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 namespace can
 {
 
-xpcc::IOStream&
-operator << (xpcc::IOStream& s, const xpcc::can::Message m)
+modm::IOStream&
+operator << (modm::IOStream& s, const modm::can::Message m)
 {
     s.printf("id = %04x, len = ", m.identifier);
     s << m.length;
@@ -35,7 +35,7 @@ operator << (xpcc::IOStream& s, const xpcc::can::Message m)
 }
 
 bool
-xpcc::can::Message::operator == (const xpcc::can::Message& rhs) const
+modm::can::Message::operator == (const modm::can::Message& rhs) const
 {
 	if ((this->identifier     == rhs.identifier) and
 		(this->length         == rhs.length)     and
@@ -54,4 +54,4 @@ xpcc::can::Message::operator == (const xpcc::can::Message& rhs) const
 	return false;
 }
 } // can namespace
-} // xpcc namespace
+} // modm namespace

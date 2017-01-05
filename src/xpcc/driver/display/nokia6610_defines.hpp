@@ -10,14 +10,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_NOKIA6610_DEFINES_HPP
-#define XPCC_NOKIA6610_DEFINES_HPP
+#ifndef MODM_NOKIA6610_DEFINES_HPP
+#define MODM_NOKIA6610_DEFINES_HPP
 
 // ----------------------------------------------------------------------------
 // Defines for the NOKIA6610 display controller.
 // ----------------------------------------------------------------------------
 
-namespace xpcc{
+namespace modm{
 	namespace nokia {
 		enum NokiaGE12 {
 			NOKIA_GE12_NOP = 0x00, // nop
@@ -110,4 +110,4 @@ namespace xpcc{
 	}
 }
 
-#endif // XPCC_NOKIA6610_DEFINES_HPP
+#endif // MODM_NOKIA6610_DEFINES_HPP

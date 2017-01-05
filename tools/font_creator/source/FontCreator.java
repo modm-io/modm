@@ -19,7 +19,7 @@
  * - fixed wrong font size calculation
  * - fixed blank character
  * 
- * Version 2.2 (xpcc) created on 23.9.2010 by Fabian Greif
+ * Version 2.2 (modm) created on 23.9.2010 by Fabian Greif
  */
 
 import javax.swing.JFrame;

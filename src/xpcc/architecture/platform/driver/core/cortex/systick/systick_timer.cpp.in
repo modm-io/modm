@@ -18,7 +18,7 @@
 #include "../../../../device.hpp"
 #include "systick_timer.hpp"
 
-static xpcc::cortex::InterruptHandler sysTickHandler(nullptr);
+static modm::cortex::InterruptHandler sysTickHandler(nullptr);
 %% if options["free_rtos.support"]
 static uint16_t counter(1);
 static uint16_t counterReload(1);
@@ -30,18 +30,18 @@ SysTick_Handler(void)
 %% if options["free_rtos.support"]
 	if (--counter == 0)
 	{
-		xpcc::Clock::increment();
+		modm::Clock::increment();
 		counter = counterReload;
 	}
 %% else
-	xpcc::Clock::increment();
+	modm::Clock::increment();
 %% endif
 	if (sysTickHandler) sysTickHandler();
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::cortex::SysTickTimer::enable(uint32_t reload)
+modm::cortex::SysTickTimer::enable(uint32_t reload)
 {
 %% if options["free_rtos.support"]
 	counterReload = {{ options["free_rtos.frequency"] }} / 1000;
@@ -60,21 +60,21 @@ xpcc::cortex::SysTickTimer::enable(uint32_t reload)
 }
 
 void
-xpcc::cortex::SysTickTimer::disable()
+modm::cortex::SysTickTimer::disable()
 {
 	SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk;
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::cortex::SysTickTimer::attachInterruptHandler(InterruptHandler handler)
+modm::cortex::SysTickTimer::attachInterruptHandler(InterruptHandler handler)
 {
 	atomic::Lock lock;
 	sysTickHandler = handler;
 }
 
 void
-xpcc::cortex::SysTickTimer::detachInterruptHandler()
+modm::cortex::SysTickTimer::detachInterruptHandler()
 {
 	atomic::Lock lock;
 	sysTickHandler = nullptr;

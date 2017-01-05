@@ -44,7 +44,7 @@ namespace
 void
 DebounceTest::testDebounce()
 {
-	xpcc::filter::Debounce<> filter(4);
+	modm::filter::Debounce<> filter(4);
 	
 	TEST_ASSERT_FALSE(filter.getValue());
 	

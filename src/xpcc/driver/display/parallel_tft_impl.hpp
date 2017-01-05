@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PARALLEL_TFT_HPP
+#ifndef MODM_PARALLEL_TFT_HPP
 #	error	"Don't include this file directly, use 'parallel_tft.hpp' instead!"
 #endif
 
@@ -36,14 +36,14 @@
 #endif
 
 template <typename INTERFACE>
-xpcc::ParallelTft<INTERFACE>::ParallelTft(INTERFACE& interface) :
+modm::ParallelTft<INTERFACE>::ParallelTft(INTERFACE& interface) :
 	interface(interface)
 {
 }
 
 template <typename INTERFACE>
 void
-xpcc::ParallelTft<INTERFACE>::initialize()
+modm::ParallelTft<INTERFACE>::initialize()
 {
 	// Read LCD ID
 	//uint16_t code = interface.readRegister(0x0000);
@@ -103,7 +103,7 @@ xpcc::ParallelTft<INTERFACE>::initialize()
 
 template <typename INTERFACE>
 uint16_t
-xpcc::ParallelTft<INTERFACE>::getWidth() const
+modm::ParallelTft<INTERFACE>::getWidth() const
 {
 	// TODO
 	return 320;
@@ -111,7 +111,7 @@ xpcc::ParallelTft<INTERFACE>::getWidth() const
 
 template <typename INTERFACE>
 uint16_t
-xpcc::ParallelTft<INTERFACE>::getHeight() const
+modm::ParallelTft<INTERFACE>::getHeight() const
 {
 	// TODO
 	return 240;
@@ -119,7 +119,7 @@ xpcc::ParallelTft<INTERFACE>::getHeight() const
 
 template <typename INTERFACE>
 void
-xpcc::ParallelTft<INTERFACE>::clear()
+modm::ParallelTft<INTERFACE>::clear()
 {
 	writeCursor(0, 0);
 	
@@ -132,7 +132,7 @@ xpcc::ParallelTft<INTERFACE>::clear()
 
 template <typename INTERFACE>
 void
-xpcc::ParallelTft<INTERFACE>::setPixel(int16_t x, int16_t y)
+modm::ParallelTft<INTERFACE>::setPixel(int16_t x, int16_t y)
 {
 	if (x >= MAX_X || y >= MAX_Y) {
 		return;
@@ -144,7 +144,7 @@ xpcc::ParallelTft<INTERFACE>::setPixel(int16_t x, int16_t y)
 
 template <typename INTERFACE>
 void
-xpcc::ParallelTft<INTERFACE>::clearPixel(int16_t x, int16_t y)
+modm::ParallelTft<INTERFACE>::clearPixel(int16_t x, int16_t y)
 {
 	(void) x;
 	(void) y;
@@ -159,7 +159,7 @@ xpcc::ParallelTft<INTERFACE>::clearPixel(int16_t x, int16_t y)
 
 template <typename INTERFACE>
 bool
-xpcc::ParallelTft<INTERFACE>::getPixel(int16_t x, int16_t y)
+modm::ParallelTft<INTERFACE>::getPixel(int16_t x, int16_t y)
 {
 	(void) x;
 	(void) y;
@@ -170,7 +170,7 @@ xpcc::ParallelTft<INTERFACE>::getPixel(int16_t x, int16_t y)
 // ----------------------------------------------------------------------------
 template <typename INTERFACE>
 void
-xpcc::ParallelTft<INTERFACE>::writeCursor(uint16_t x, uint16_t y)
+modm::ParallelTft<INTERFACE>::writeCursor(uint16_t x, uint16_t y)
 {
 
 #if ( DISP_ORIENTATION == 90 )

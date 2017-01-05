@@ -40,7 +40,7 @@ main()
 	uint8_t i = 0;
 	while (1){
 		Timer1::setCompareValue(1, ++i);
-		xpcc::delayMilliseconds(10);
+		modm::delayMilliseconds(10);
 	}
 
 	return 0;

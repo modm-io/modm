@@ -12,14 +12,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_IODEVICE_WRAPPER_HPP
-#define XPCC_IODEVICE_WRAPPER_HPP
+#ifndef MODM_IODEVICE_WRAPPER_HPP
+#define MODM_IODEVICE_WRAPPER_HPP
 
 #include <stdint.h>
 
 #include "iodevice.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 /// The preferred behavior when the IODevice buffer is full
@@ -66,13 +66,13 @@ IOBuffer
  * Uart0 uart;
  *
  * // wrap it into an IODevice
- * xpcc::IODeviceWrapper<Uart0, xpcc::IOBuffer::DiscardIfFull> device;
+ * modm::IODeviceWrapper<Uart0, modm::IOBuffer::DiscardIfFull> device;
  *
  * // use this device to print a message
  * device.write("Hello");
  *
  * // or create a IOStream and use the stream to print something
- * xpcc::IOStream stream(device);
+ * modm::IOStream stream(device);
  * stream << " World!";
  * @endcode
  *
@@ -147,4 +147,4 @@ public:
 
 }
 
-#endif // XPCC_IODEVICE_WRAPPER_HPP
+#endif // MODM_IODEVICE_WRAPPER_HPP

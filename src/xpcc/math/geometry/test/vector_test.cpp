@@ -17,9 +17,9 @@ void
 VectorTest::testConstructor()
 {
 	int16_t array[2] = {1, 2};
-	xpcc::Matrix<int16_t, 2, 1> m(array);
+	modm::Matrix<int16_t, 2, 1> m(array);
 	
-	xpcc::Vector<int16_t, 2> a;
+	modm::Vector<int16_t, 2> a;
 	TEST_ASSERT_EQUALS(a[0], 0);
 	TEST_ASSERT_EQUALS(a[1], 0);
 	
@@ -28,15 +28,15 @@ VectorTest::testConstructor()
 	TEST_ASSERT_EQUALS(a[0], 1);
 	TEST_ASSERT_EQUALS(a[1], 2);
 	
-	xpcc::Vector<int16_t, 2> c(array);
+	modm::Vector<int16_t, 2> c(array);
 	TEST_ASSERT_EQUALS(c[0], 1);
 	TEST_ASSERT_EQUALS(c[1], 2);
 	
-	xpcc::Vector<int16_t, 2> p(a);
+	modm::Vector<int16_t, 2> p(a);
 	TEST_ASSERT_EQUALS(p[0], 1);
 	TEST_ASSERT_EQUALS(p[1], 2);
 	
-	xpcc::Vector<int16_t, 2> q(m);
+	modm::Vector<int16_t, 2> q(m);
 	TEST_ASSERT_EQUALS(q[0], 1);
 	TEST_ASSERT_EQUALS(q[1], 2);
 }
@@ -45,12 +45,12 @@ void
 VectorTest::testAssign()
 {
 	int16_t array1[4] = {1, 2, 3, 4};
-	xpcc::Vector<int16_t, 4> a(array1);
+	modm::Vector<int16_t, 4> a(array1);
 	
 	int16_t array2[4] = {5, 6, 7, 8};
-	xpcc::Matrix<int16_t, 4, 1> m(array2);
+	modm::Matrix<int16_t, 4, 1> m(array2);
 	
-	xpcc::Vector<int16_t, 4> b;
+	modm::Vector<int16_t, 4> b;
 	
 	b = a;
 	TEST_ASSERT_EQUALS(b[0], 1);
@@ -69,11 +69,11 @@ void
 VectorTest::testCompare()
 {
 	int16_t array1[4] = {4, 5, 2, 1};
-	xpcc::Vector<int16_t, 4> a(array1);
+	modm::Vector<int16_t, 4> a(array1);
 	
 	int16_t array2[4] = {4, 5, 2, 3};
-	xpcc::Vector<int16_t, 4> b(array2);
-	xpcc::Vector<int16_t, 4> c(array2);
+	modm::Vector<int16_t, 4> b(array2);
+	modm::Vector<int16_t, 4> c(array2);
 	
 	// ==
 	TEST_ASSERT_TRUE(b == c);
@@ -103,7 +103,7 @@ void
 VectorTest::testRawDataAccess()
 {
 	int16_t array[4] = {0, 1, 2, 3};
-	xpcc::Vector<int16_t,4> a(array);
+	modm::Vector<int16_t,4> a(array);
 	int16_t *pointer = a.ptr();
 	
 	TEST_ASSERT_EQUALS(a[0], 0);
@@ -120,10 +120,10 @@ void
 VectorTest::testOperators()
 {
 	int16_t array1[4] = {1, 2, 3, 4};
-	xpcc::Vector<int16_t,4> a(array1);
+	modm::Vector<int16_t,4> a(array1);
 	
 	int16_t array2[4] = {4, 5, 6, 7};
-	xpcc::Vector<int16_t,4> b(array2);
+	modm::Vector<int16_t,4> b(array2);
 	
 	TEST_ASSERT_EQUALS((a + b)[0], 1+4);
 	TEST_ASSERT_EQUALS((a + b)[1], 2+5);
@@ -188,7 +188,7 @@ void
 VectorTest::testLength()
 {
 	float array[4] = {1.f, 2.f, 3.f, 4.f}; 
-	xpcc::Vector<float, 4> a(array);
+	modm::Vector<float, 4> a(array);
 	
 	TEST_ASSERT_EQUALS_FLOAT(a.getLengthSquared(), 1.f*1.f + 2.f*2.f + 3.f*3.f + 4.f*4.f);
 	TEST_ASSERT_EQUALS_FLOAT(a.getLength(), 5.477225575);

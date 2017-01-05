@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SSD1306_HPP
-#define XPCC_SSD1306_HPP
+#ifndef MODM_SSD1306_HPP
+#define MODM_SSD1306_HPP
 
 #include <modm/ui/display/buffered_graphic_display.hpp>
 #include <modm/processing/protothread.hpp>
@@ -19,7 +19,7 @@
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/processing/timer.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 struct ssd1306
@@ -116,12 +116,12 @@ protected:
 	i(ScrollStep step) { return uint8_t(step); }
 
 public:
-	class DataTransmissionAdapter : public xpcc::I2cWriteTransaction
+	class DataTransmissionAdapter : public modm::I2cWriteTransaction
 	{
 	public:
 		DataTransmissionAdapter(uint8_t address);
 
-		void xpcc_always_inline
+		void modm_always_inline
 		setCommandBuffer(uint8_t *buffer)
 		{ commands = buffer; }
 
@@ -133,7 +133,7 @@ public:
 		writing() override;
 
 		virtual void
-		detaching(xpcc::I2c::DetachCause cause) override;
+		detaching(modm::I2c::DetachCause cause) override;
 
 	private:
 		uint8_t *commands;
@@ -182,7 +182,7 @@ public:
 	/// Use this method to synchronize writing to the displays buffer
 	/// to avoid tearing.
 	/// @return	`true` if the frame buffer is not being copied to the display
-	bool xpcc_always_inline
+	bool modm_always_inline
 	isWritable()
 	{
 		return this->transaction.writeable;
@@ -190,53 +190,53 @@ public:
 
 	// MARK: - TASKS
 	/// initializes for 3V3 with charge-pump asynchronously
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	initialize();
 
 	// starts a frame transfer and waits for completion
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	writeDisplay();
 
 
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	setDisplayMode(DisplayMode mode = DisplayMode::Normal)
 	{ return writeCommand(static_cast<Command>(mode)); }
 
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	setContrast(uint8_t contrast = 0xCE)
 	{ return writeCommand(Command::SetContrastControl, contrast); }
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setRotation(Rotation rotation=Rotation::Normal);
 
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	configureScroll(uint8_t origin, uint8_t size,
 			ScrollDirection direction, ScrollStep steps);
 
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	enableScroll()
 	{ return writeCommand(Command::SetEnableScroll); }
 
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	disableScroll()
 	{ return writeCommand(Command::SetDisableScroll); }
 
 protected:
 	/// Write a command without data
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	writeCommand(uint8_t command);
 
 	/// Write a command with one byte data
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	writeCommand(uint8_t command, uint8_t data);
 
 	/// Write a command with two bytes data
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	writeCommand(uint8_t command, uint8_t data1, uint8_t data2);
 
 private:
-	xpcc::ResumableResult<void>
+	modm::ResumableResult<void>
 	startWriteDisplay();
 
 	bool
@@ -246,8 +246,8 @@ private:
 	uint8_t commandBuffer[14];
 };
 
-} // namespace xpcc
+} // namespace modm
 
 #include "ssd1306_impl.hpp"
 
-#endif // XPCC_SSD1306_HPP
+#endif // MODM_SSD1306_HPP

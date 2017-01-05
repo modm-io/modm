@@ -16,7 +16,7 @@
 
 #include "st7565_defines.hpp"
 
-namespace xpcc
+namespace modm
 {
 	namespace st7565
 	{

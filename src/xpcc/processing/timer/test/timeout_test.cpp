@@ -21,14 +21,14 @@
 void
 TimeoutTest::setUp()
 {
-	xpcc::ClockDummy::setTime(0);
+	modm::ClockDummy::setTime(0);
 }
 
 void
 TimeoutTest::testDefaultConstructor()
 {
-	xpcc::GenericTimeout<xpcc::ClockDummy, xpcc::ShortTimestamp> timeoutShort;
-	xpcc::GenericTimeout<xpcc::ClockDummy, xpcc::Timestamp> timeout;
+	modm::GenericTimeout<modm::ClockDummy, modm::ShortTimestamp> timeoutShort;
+	modm::GenericTimeout<modm::ClockDummy, modm::Timestamp> timeout;
 
 	TEST_ASSERT_EQUALS(timeoutShort.remaining(), 0l);
 	TEST_ASSERT_EQUALS(timeout.remaining(), 0l);
@@ -55,8 +55,8 @@ TimeoutTest::testDefaultConstructor()
 void
 TimeoutTest::testBasics()
 {
-	xpcc::GenericTimeout<xpcc::ClockDummy, xpcc::ShortTimestamp> timeoutShort(10);
-	xpcc::GenericTimeout<xpcc::ClockDummy, xpcc::Timestamp> timeout(10);
+	modm::GenericTimeout<modm::ClockDummy, modm::ShortTimestamp> timeoutShort(10);
+	modm::GenericTimeout<modm::ClockDummy, modm::Timestamp> timeout(10);
 
 	TEST_ASSERT_EQUALS(timeoutShort.remaining(), 10l);
 	TEST_ASSERT_EQUALS(timeout.remaining(), 10l);
@@ -72,7 +72,7 @@ TimeoutTest::testBasics()
 
 	int i;
 	for (i = 0; i < 9; ++i) {
-		xpcc::ClockDummy::setTime(i);
+		modm::ClockDummy::setTime(i);
 		TEST_ASSERT_FALSE(timeoutShort.execute());
 		TEST_ASSERT_FALSE(timeout.execute());
 
@@ -83,7 +83,7 @@ TimeoutTest::testBasics()
 		TEST_ASSERT_EQUALS(timeout.remaining(), (10l-i));
 	}
 
-	xpcc::ClockDummy::setTime(10);
+	modm::ClockDummy::setTime(10);
 	TEST_ASSERT_TRUE(timeoutShort.isExpired());
 	TEST_ASSERT_TRUE(timeout.isExpired());
 
@@ -110,7 +110,7 @@ TimeoutTest::testBasics()
 
 
 	// check that the class does not hold the state
-	xpcc::ClockDummy::setTime(11);
+	modm::ClockDummy::setTime(11);
 	TEST_ASSERT_FALSE(timeoutShort.execute());
 	TEST_ASSERT_FALSE(timeout.execute());
 
@@ -142,34 +142,34 @@ TimeoutTest::testBasics()
 void
 TimeoutTest::testTimeOverflow()
 {
-	xpcc::ShortTimestamp::Type time = xpcc::ArithmeticTraits<xpcc::ShortTimestamp::Type>::max;
+	modm::ShortTimestamp::Type time = modm::ArithmeticTraits<modm::ShortTimestamp::Type>::max;
 	TEST_ASSERT_EQUALS(time, 65535);
 
 	// overflow after 65535 for uint16_t => 32767+100 = 32867
-	xpcc::ClockDummy::setTime(time / 2 + 100);
+	modm::ClockDummy::setTime(time / 2 + 100);
 	TEST_ASSERT_EQUALS((time / 2 + 100), 32867);
 
-	xpcc::GenericTimeout<xpcc::ClockDummy, xpcc::ShortTimestamp> timeoutShort(time / 2 - 1);	//=> 32867 + 32766 = 97
+	modm::GenericTimeout<modm::ClockDummy, modm::ShortTimestamp> timeoutShort(time / 2 - 1);	//=> 32867 + 32766 = 97
 	TEST_ASSERT_EQUALS(((signed)(time / 2) - 1), 32766);
 
 	TEST_ASSERT_FALSE(timeoutShort.execute());
 
-	xpcc::ClockDummy::setTime(time);
+	modm::ClockDummy::setTime(time);
 	TEST_ASSERT_FALSE(timeoutShort.execute());
 
-	xpcc::ClockDummy::setTime(0);
+	modm::ClockDummy::setTime(0);
 	TEST_ASSERT_FALSE(timeoutShort.execute());
 
 	// Overflow happened. This needs to be avoided by the user!
-	xpcc::ClockDummy::setTime(100);
+	modm::ClockDummy::setTime(100);
 	TEST_ASSERT_TRUE(timeoutShort.execute());
 }
 
 void
 TimeoutTest::testRestart()
 {
-	xpcc::GenericTimeout<xpcc::ClockDummy, xpcc::ShortTimestamp> timeoutShort;
-	xpcc::GenericTimeout<xpcc::ClockDummy, xpcc::Timestamp> timeout;
+	modm::GenericTimeout<modm::ClockDummy, modm::ShortTimestamp> timeoutShort;
+	modm::GenericTimeout<modm::ClockDummy, modm::Timestamp> timeout;
 
 	TEST_ASSERT_FALSE(timeoutShort.execute());
 	TEST_ASSERT_FALSE(timeout.execute());
@@ -200,7 +200,7 @@ TimeoutTest::testRestart()
 	TEST_ASSERT_FALSE(timeout.isExpired());
 
 
-	xpcc::ClockDummy::setTime(10);
+	modm::ClockDummy::setTime(10);
 	TEST_ASSERT_FALSE(timeoutShort.execute());
 	TEST_ASSERT_FALSE(timeout.execute());
 
@@ -213,7 +213,7 @@ TimeoutTest::testRestart()
 	TEST_ASSERT_EQUALS(timeoutShort.remaining(), 32l);
 	TEST_ASSERT_EQUALS(timeout.remaining(), 32l);
 
-	xpcc::ClockDummy::setTime(50);
+	modm::ClockDummy::setTime(50);
 	TEST_ASSERT_FALSE(timeoutShort.isArmed());
 	TEST_ASSERT_FALSE(timeout.isArmed());
 
@@ -252,7 +252,7 @@ TimeoutTest::testRestart()
 	TEST_ASSERT_EQUALS(timeout.remaining(), 60l);
 
 
-	xpcc::ClockDummy::setTime(150);
+	modm::ClockDummy::setTime(150);
 
 	TEST_ASSERT_TRUE(timeoutShort.execute());
 	TEST_ASSERT_TRUE(timeout.execute());

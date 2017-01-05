@@ -16,7 +16,7 @@
 // uncomment to debug your driver using simple uart
 /*
 #include "../../uart/at90_tiny_mega/uart0.hpp"
-#define DEBUG(x) xpcc::{{target["family"]}}::Uart0::write(x)
+#define DEBUG(x) modm::{{target["family"]}}::Uart0::write(x)
 /*/
 #define DEBUG(x)
 //*/
@@ -25,22 +25,22 @@
 namespace
 {
 	// parameter advice
-	static xpcc::I2c::Operation nextOperation;
+	static modm::I2c::Operation nextOperation;
 
 	// delegating
-	static xpcc::I2cTransaction *transaction(nullptr);
-	static xpcc::I2cMaster::Error errorState(xpcc::I2cMaster::Error::NoError);
-	static xpcc::I2c::ConfigurationHandler configuration(nullptr);
+	static modm::I2cTransaction *transaction(nullptr);
+	static modm::I2cMaster::Error errorState(modm::I2cMaster::Error::NoError);
+	static modm::I2c::ConfigurationHandler configuration(nullptr);
 
 	// buffer management
-	static xpcc::I2cTransaction::Starting starting(0, xpcc::I2c::OperationAfterStart::Stop);
-	static xpcc::I2cTransaction::Writing writing(nullptr, 0, xpcc::I2c::OperationAfterWrite::Stop);
-	static xpcc::I2cTransaction::Reading reading(nullptr, 0, xpcc::I2c::OperationAfterRead::Stop);
+	static modm::I2cTransaction::Starting starting(0, modm::I2c::OperationAfterStart::Stop);
+	static modm::I2cTransaction::Writing writing(nullptr, 0, modm::I2c::OperationAfterWrite::Stop);
+	static modm::I2cTransaction::Reading reading(nullptr, 0, modm::I2c::OperationAfterRead::Stop);
 }
 
 // ----------------------------------------------------------------------------
 /// TWI state machine interrupt handler
-XPCC_ISR(TWI)
+MODM_ISR(TWI)
 {
 	switch(TW_STATUS)
 	{
@@ -53,25 +53,25 @@ XPCC_ISR(TWI)
 				// REPEATED START has been transmitted
 
 				starting = transaction->starting();
-				uint8_t addressMode = xpcc::I2c::Write;
+				uint8_t addressMode = modm::I2c::Write;
 
 				switch (starting.next)
 				{
-					case xpcc::I2c::OperationAfterStart::Read:
-						addressMode = xpcc::I2c::Read;
+					case modm::I2c::OperationAfterStart::Read:
+						addressMode = modm::I2c::Read;
 						reading = transaction->reading();
-						nextOperation = static_cast<xpcc::I2c::Operation>(reading.next);
+						nextOperation = static_cast<modm::I2c::Operation>(reading.next);
 						break;
 
-					case xpcc::I2c::OperationAfterStart::Write:
+					case modm::I2c::OperationAfterStart::Write:
 						writing = transaction->writing();
-						nextOperation = static_cast<xpcc::I2c::Operation>(writing.next);
+						nextOperation = static_cast<modm::I2c::Operation>(writing.next);
 						break;
 
-					case xpcc::I2c::OperationAfterStart::Stop:
+					case modm::I2c::OperationAfterStart::Stop:
 						writing.length = 0;
 						reading.length = 0;
-						nextOperation = xpcc::I2c::Operation::Stop;
+						nextOperation = modm::I2c::Operation::Stop;
 						break;
 				}
 
@@ -99,17 +99,17 @@ XPCC_ISR(TWI)
 			{
 				switch (nextOperation)
 				{
-					case xpcc::I2c::Operation::Write:
+					case modm::I2c::Operation::Write:
 						DEBUG('C');
 						writing = transaction->writing();
-						nextOperation = static_cast<xpcc::I2c::Operation>(writing.next);
+						nextOperation = static_cast<modm::I2c::Operation>(writing.next);
 						TWDR = *writing.buffer++;
 						--writing.length;
 						TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWIE);
 						DEBUG('A');
 						break;
 
-					case xpcc::I2c::Operation::Restart:
+					case modm::I2c::Operation::Restart:
 						DEBUG('R');
 						TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN) | (1 << TWIE);
 						break;
@@ -117,7 +117,7 @@ XPCC_ISR(TWI)
 					default:
 						DEBUG('S');
 						TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
-						transaction->detaching(xpcc::I2c::DetachCause::NormalStop);
+						transaction->detaching(modm::I2c::DetachCause::NormalStop);
 						transaction = nullptr;
 						break;
 				}
@@ -154,7 +154,7 @@ XPCC_ISR(TWI)
 
 			switch (nextOperation)
 			{
-				case xpcc::I2c::Operation::Restart:
+				case modm::I2c::Operation::Restart:
 					DEBUG('r');
 					TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN) | (1 << TWIE);
 					break;
@@ -162,7 +162,7 @@ XPCC_ISR(TWI)
 				default:
 					DEBUG('S');
 					TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
-					transaction->detaching(xpcc::I2c::DetachCause::NormalStop);
+					transaction->detaching(modm::I2c::DetachCause::NormalStop);
 					transaction = nullptr;
 					break;
 			}
@@ -170,29 +170,29 @@ XPCC_ISR(TWI)
 
 		case TW_MT_SLA_NACK:	// SLA+W transmitted, NACK received
 		case TW_MR_SLA_NACK:	// SLA+R transmitted, NACK received
-			if (errorState == xpcc::I2cMaster::Error::NoError) {
-				errorState = xpcc::I2cMaster::Error::AddressNack;
+			if (errorState == modm::I2cMaster::Error::NoError) {
+				errorState = modm::I2cMaster::Error::AddressNack;
 			}
 			DEBUG('A');
 		case TW_MT_DATA_NACK:	// data transmitted, NACK received
-			if (errorState == xpcc::I2cMaster::Error::NoError) {
-				errorState = xpcc::I2cMaster::Error::DataNack;
+			if (errorState == modm::I2cMaster::Error::NoError) {
+				errorState = modm::I2cMaster::Error::DataNack;
 			}
 			DEBUG('d');
 			// generate a stop condition
 			TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
 		case TW_MT_ARB_LOST:	// arbitration lost in SLA+W or data
 //		case TW_MR_ARB_LOST:	// arbitration lost in SLA+R or NACK
-			if (errorState == xpcc::I2cMaster::Error::NoError) {
-				errorState = xpcc::I2cMaster::Error::ArbitrationLost;
+			if (errorState == modm::I2cMaster::Error::NoError) {
+				errorState = modm::I2cMaster::Error::ArbitrationLost;
 			}
 			DEBUG('d');
 		default:
-			if (errorState == xpcc::I2cMaster::Error::NoError) {
-				errorState = xpcc::I2cMaster::Error::Unknown;
+			if (errorState == modm::I2cMaster::Error::NoError) {
+				errorState = modm::I2cMaster::Error::Unknown;
 			}
 			DEBUG('r');
-			if (transaction) transaction->detaching(xpcc::I2c::DetachCause::ErrorCondition);
+			if (transaction) transaction->detaching(modm::I2c::DetachCause::ErrorCondition);
 			transaction = nullptr;
 			TWDR = 0xff;
 			TWCR = (1 << TWEN);
@@ -203,7 +203,7 @@ XPCC_ISR(TWI)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::{{target["family"]}}::I2cMaster::initialize(uint8_t twbr, Prescaler prescaler)
+modm::{{target["family"]}}::I2cMaster::initialize(uint8_t twbr, Prescaler prescaler)
 {
 	// no reset, since we want to keep the transaction attached!
 	TWBR = twbr;
@@ -216,7 +216,7 @@ xpcc::{{target["family"]}}::I2cMaster::initialize(uint8_t twbr, Prescaler presca
 }
 
 void
-xpcc::{{target["family"]}}::I2cMaster::reset()
+modm::{{target["family"]}}::I2cMaster::reset()
 {
 	DEBUG('T');
 	writing.length = 0;
@@ -226,16 +226,16 @@ xpcc::{{target["family"]}}::I2cMaster::reset()
 	transaction = nullptr;
 }
 
-xpcc::I2cMaster::Error
-xpcc::{{target["family"]}}::I2cMaster::getErrorState()
+modm::I2cMaster::Error
+modm::{{target["family"]}}::I2cMaster::getErrorState()
 {
 	return errorState;
 }
 
 bool
-xpcc::{{target["family"]}}::I2cMaster::start(I2cTransaction *transaction, ConfigurationHandler handler)
+modm::{{target["family"]}}::I2cMaster::start(I2cTransaction *transaction, ConfigurationHandler handler)
 {
-	if (!xpcc::accessor::asVolatile(::transaction) && transaction)
+	if (!modm::accessor::asVolatile(::transaction) && transaction)
 	{
 		if (transaction->attaching())
 		{
@@ -252,7 +252,7 @@ xpcc::{{target["family"]}}::I2cMaster::start(I2cTransaction *transaction, Config
 			return true;
 		}
 		else {
-			transaction->detaching(xpcc::I2c::DetachCause::FailedToAttach);
+			transaction->detaching(modm::I2c::DetachCause::FailedToAttach);
 		}
 	}
 	return false;

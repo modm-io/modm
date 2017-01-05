@@ -11,12 +11,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_GUI_LABEL_HPP
-#define XPCC_GUI_LABEL_HPP
+#ifndef MODM_GUI_LABEL_HPP
+#define MODM_GUI_LABEL_HPP
 
 #include "widget.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 namespace gui
@@ -29,7 +29,7 @@ namespace gui
 class Label : public Widget
 {
 public:
-	Label(const char* lbl, xpcc::glcd::Color color) :
+	Label(const char* lbl, modm::glcd::Color color) :
 		Widget(Dimension(0,0), false),
 		label(lbl),
 		color(color)
@@ -41,7 +41,7 @@ public:
 	render(View* view);
 
 	void
-	setColor(xpcc::glcd::Color color)
+	setColor(modm::glcd::Color color)
 	{
 		this->color = color;
 		this->markDirty();
@@ -56,7 +56,7 @@ public:
 	}
 
 	void
-	setFont(const xpcc::accessor::Flash<uint8_t> *font)
+	setFont(const modm::accessor::Flash<uint8_t> *font)
 	{
 		this->font = *font;
 		this->updateDimension();
@@ -65,7 +65,7 @@ public:
 	void
 	setFont(const uint8_t *newFont)
 	{
-		this->font = xpcc::accessor::asFlash(newFont);
+		this->font = modm::accessor::asFlash(newFont);
 		this->updateDimension();
 	}
 
@@ -76,18 +76,18 @@ private:
 		// Update label dimension
 		if(this->font.isValid())
 		{
-			this->dimension.width = xpcc::GraphicDisplay::getStringWidth(this->label, &(this->font));
-			this->dimension.height = xpcc::GraphicDisplay::getFontHeight(&(this->font));
+			this->dimension.width = modm::GraphicDisplay::getStringWidth(this->label, &(this->font));
+			this->dimension.height = modm::GraphicDisplay::getFontHeight(&(this->font));
 		}
 	}
 
 private:
 	const char* label;
-	xpcc::glcd::Color color;
+	modm::glcd::Color color;
 };
 
 }	// namespace gui
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif  // XPCC_GUI_LABEL_HPP
+#endif  // MODM_GUI_LABEL_HPP

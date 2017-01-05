@@ -13,8 +13,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SOFTWARE_SPI_MASTER_HPP
-#define XPCC_SOFTWARE_SPI_MASTER_HPP
+#ifndef MODM_SOFTWARE_SPI_MASTER_HPP
+#define MODM_SOFTWARE_SPI_MASTER_HPP
 
 #include <stdint.h>
 #include <modm/architecture/interface/spi_master.hpp>
@@ -22,7 +22,7 @@
 #include "../../gpio/generic/gpio.hpp"
 #include "type_ids.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -39,7 +39,7 @@ namespace xpcc
 template< typename SCK,
 		  typename MOSI,
 		  typename MISO = GpioUnused >
-class SoftwareSpiMaster : public ::xpcc::SpiMaster
+class SoftwareSpiMaster : public ::modm::SpiMaster
 {
 public:
 	static const TypeId::SoftwareSpiMasterMosi Mosi;
@@ -76,10 +76,10 @@ public:
 	transferBlocking(uint8_t *tx, uint8_t *rx, std::size_t length);
 
 
-	static xpcc::ResumableResult<uint8_t>
+	static modm::ResumableResult<uint8_t>
 	transfer(uint8_t data);
 
-	static xpcc::ResumableResult<void>
+	static modm::ResumableResult<void>
 	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
 	// end documentation inherited
 
@@ -95,8 +95,8 @@ private:
 	static ConfigurationHandler configuration;
 };
 
-} // namespace xpcc
+} // namespace modm
 
 #include "spi_master_impl.hpp"
 
-#endif // XPCC_SOFTWARE_SPI_MASTER_HPP
+#endif // MODM_SOFTWARE_SPI_MASTER_HPP

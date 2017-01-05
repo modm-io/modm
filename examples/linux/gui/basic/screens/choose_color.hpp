@@ -19,13 +19,13 @@
 
 #include <modm/ui/gui.hpp>
 
-using namespace xpcc::gui;
+using namespace modm::gui;
 
-class ChooseColorView : public xpcc::gui::View
+class ChooseColorView : public modm::gui::View
 {
 public:
 
-	ChooseColorView(xpcc::gui::GuiViewStack* stack, uint8_t identifier);
+	ChooseColorView(modm::gui::GuiViewStack* stack, uint8_t identifier);
 
 	~ChooseColorView() {}
 
@@ -45,11 +45,11 @@ public:
 	deactivate_red(const InputEvent&, Widget*, void*);
 
 public:
-//	xpcc::gui::ButtonWidget button1;
-	xpcc::gui::Label lbl_yellow;
-	xpcc::gui::Label lbl_red;
-	xpcc::gui::FilledAreaButton yellow;
-	xpcc::gui::FilledAreaButton red;
+//	modm::gui::ButtonWidget button1;
+	modm::gui::Label lbl_yellow;
+	modm::gui::Label lbl_red;
+	modm::gui::FilledAreaButton yellow;
+	modm::gui::FilledAreaButton red;
 
 
 };

@@ -18,7 +18,7 @@
 
 #include <modm/architecture/driver/accessor.hpp>
 
-namespace xpcc
+namespace modm
 {
 	namespace font
 	{

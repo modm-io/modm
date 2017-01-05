@@ -126,8 +126,8 @@ class Scanner:
 			ignoreList = listify(ignore)
 		pathlist = listify(path)
 
-		if 'XPCC_BOARD_PATH' in self.env:
-			pathlist.append(self.env['XPCC_BOARD_PATH'])
+		if 'MODM_BOARD_PATH' in self.env:
+			pathlist.append(self.env['MODM_BOARD_PATH'])
 
 		self.sources = FileList()
 		self.header = FileList()
@@ -159,7 +159,7 @@ class Scanner:
 					except (OSError, xml.parsers.expat.ExpatError, xml.etree.ElementTree.ParseError) as e:
 						env.Error("while parsing xml-file '%s': %s" % (filename, e))
 					module_name = xmltree[0].get('name').lower()
-					if not module_name in self.env['XPCC_ACTIVE_MODULES']:
+					if not module_name in self.env['MODM_ACTIVE_MODULES']:
 						self.env.Debug('Excluding module "%s"' % (module_name))
 						directories = self._excludeDirectories(directories)
 						continue

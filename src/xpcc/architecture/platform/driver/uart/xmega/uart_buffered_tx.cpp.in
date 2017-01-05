@@ -19,10 +19,10 @@
 
 #include "uart_{{ id.lower() }}.hpp"
 
-static xpcc::atomic::Queue<uint8_t, {{parameters.tx_buffer}}> txBuffer;
+static modm::atomic::Queue<uint8_t, {{parameters.tx_buffer}}> txBuffer;
 
 // ----------------------------------------------------------------------------
-XPCC_ISR(USART{{ id }}_DRE)
+MODM_ISR(USART{{ id }}_DRE)
 {
 	if (txBuffer.isEmpty())
 	{
@@ -39,7 +39,7 @@ XPCC_ISR(USART{{ id }}_DRE)
 
 // MARK: - write blocking
 void
-xpcc::xmega::Uart{{ id }}::writeBlocking(uint8_t data)
+modm::xmega::Uart{{ id }}::writeBlocking(uint8_t data)
 {
 	// wait until there is some place in the buffer
 	while (!write(data))
@@ -51,7 +51,7 @@ xpcc::xmega::Uart{{ id }}::writeBlocking(uint8_t data)
 }
 
 void
-xpcc::xmega::Uart{{ id }}::writeBlocking(const uint8_t *data, std::size_t length)
+modm::xmega::Uart{{ id }}::writeBlocking(const uint8_t *data, std::size_t length)
 {
 	// first push everything into the buffer
 	for (std::size_t i = 0; i < length; ++i)
@@ -66,7 +66,7 @@ xpcc::xmega::Uart{{ id }}::writeBlocking(const uint8_t *data, std::size_t length
 }
 
 void
-xpcc::xmega::Uart{{ id }}::flushWriteBuffer()
+modm::xmega::Uart{{ id }}::flushWriteBuffer()
 {
 	// just wait until the last byte has been sent
 	while (!isWriteFinished())
@@ -75,12 +75,12 @@ xpcc::xmega::Uart{{ id }}::flushWriteBuffer()
 
 // MARK: - write
 bool
-xpcc::xmega::Uart{{ id }}::write(uint8_t data)
+modm::xmega::Uart{{ id }}::write(uint8_t data)
 {
 	if (!txBuffer.push(data))
 		return false;
 	
-	::xpcc::atomic::Lock lock;
+	::modm::atomic::Lock lock;
 	
 	// enable DRE interrupt
 	USART{{ id }}_CTRLA = USART_RXCINTLVL_MED_gc | USART_DREINTLVL_MED_gc;
@@ -89,7 +89,7 @@ xpcc::xmega::Uart{{ id }}::write(uint8_t data)
 }
 
 std::size_t
-xpcc::xmega::Uart{{ id }}::write(const uint8_t *data, std::size_t length)
+modm::xmega::Uart{{ id }}::write(const uint8_t *data, std::size_t length)
 {
 	for (std::size_t i = 0; i < length; ++i)
 	{
@@ -103,17 +103,17 @@ xpcc::xmega::Uart{{ id }}::write(const uint8_t *data, std::size_t length)
 }
 
 bool
-xpcc::xmega::Uart{{ id }}::isWriteFinished()
+modm::xmega::Uart{{ id }}::isWriteFinished()
 {
 	return (txBuffer.isEmpty() && (USART{{ id }}_STATUS & USART_DREIF_bm));
 }
 
 // MARK: - discard
 std::size_t
-xpcc::xmega::Uart{{ id }}::discardTransmitBuffer()
+modm::xmega::Uart{{ id }}::discardTransmitBuffer()
 {
 	{
-		::xpcc::atomic::Lock lock;
+		::modm::atomic::Lock lock;
 		USART{{ id }}_CTRLA = USART_RXCINTLVL_MED_gc;
 	}
 

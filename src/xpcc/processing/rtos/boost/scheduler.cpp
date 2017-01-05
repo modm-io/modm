@@ -16,7 +16,7 @@
 #include "../thread.hpp"
 
 void
-xpcc::rtos::Scheduler::schedule()
+modm::rtos::Scheduler::schedule()
 {
 	// Start all threads
 	Thread* list = Thread::head;

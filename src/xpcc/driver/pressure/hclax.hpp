@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_HCLAX_HPP
-#define XPCC_HCLAX_HPP
+#ifndef MODM_HCLAX_HPP
+#define MODM_HCLAX_HPP
 
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/math/utils/endianness.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 // forward declaration for friending with hclax::Data
@@ -26,7 +26,7 @@ class HclaX;
 
 struct hclax
 {
-	struct xpcc_packed
+	struct modm_packed
 	Data
 	{
 		template < typename I2cMaster >
@@ -47,7 +47,7 @@ struct hclax
 		{
 			// Full scale span is 0x6666, with offset 0x0666
 			uint16_t *rData = reinterpret_cast<uint16_t*>(data);
-			uint16_t pressure = xpcc::fromBigEndian(*rData) - 0x0666;
+			uint16_t pressure = modm::fromBigEndian(*rData) - 0x0666;
 			return float(pressure) / 0x6666;
 		}
 
@@ -68,7 +68,7 @@ struct hclax
  * @author	Niklas Hauser
  */
 template < typename I2cMaster >
-class HclaX : public hclax, public xpcc::I2cDevice<I2cMaster, 1, I2cReadTransaction>
+class HclaX : public hclax, public modm::I2cDevice<I2cMaster, 1, I2cReadTransaction>
 {
 public:
 	/**
@@ -84,7 +84,7 @@ public:
 	}
 
 	/// pings the sensor
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	ping()
 	{
 		RF_BEGIN();
@@ -99,7 +99,7 @@ public:
 	}
 
 	/// reads the Pressure registers and buffers the results
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	readPressure()
 	{
 		RF_BEGIN();
@@ -117,6 +117,6 @@ private:
 	Data &data;
 };
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif // XPCC_HCLAX_HPP
+#endif // MODM_HCLAX_HPP

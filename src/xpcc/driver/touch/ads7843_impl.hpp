@@ -13,14 +13,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ADS7843_HPP
+#ifndef MODM_ADS7843_HPP
 #	error "Don't include this file directly, use 'ads7843.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Int>
 void
-xpcc::Ads7843<Spi, Cs, Int>::initialize()
+modm::Ads7843<Spi, Cs, Int>::initialize()
 {
 
 }
@@ -28,7 +28,7 @@ xpcc::Ads7843<Spi, Cs, Int>::initialize()
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Int>
 bool
-xpcc::Ads7843<Spi, Cs, Int>::getAverage(uint16_t * buffer, int16_t & value)
+modm::Ads7843<Spi, Cs, Int>::getAverage(uint16_t * buffer, int16_t & value)
 {
 	uint16_t temp[3];
 	temp[0] = (buffer[0] + buffer[1] + buffer[2]) / 3;
@@ -64,7 +64,7 @@ xpcc::Ads7843<Spi, Cs, Int>::getAverage(uint16_t * buffer, int16_t & value)
 
 template <typename Spi, typename Cs, typename Int>
 bool
-xpcc::Ads7843<Spi, Cs, Int>::read(glcd::Point * point)
+modm::Ads7843<Spi, Cs, Int>::read(glcd::Point * point)
 {
 	uint_fast8_t count = 0;
 	uint16_t bufferX[9];
@@ -91,16 +91,16 @@ xpcc::Ads7843<Spi, Cs, Int>::read(glcd::Point * point)
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Int>
 uint16_t
-xpcc::Ads7843<Spi, Cs, Int>::readData(uint8_t command)
+modm::Ads7843<Spi, Cs, Int>::readData(uint8_t command)
 {
 	Cs::reset();
-	xpcc::delayMicroseconds(1);	// xpcc::delay_ns(100);
+	modm::delayMicroseconds(1);	// modm::delay_ns(100);
 	Spi::transferBlocking(command);
-	xpcc::delayMicroseconds(1);
+	modm::delayMicroseconds(1);
 
 	uint16_t temp = Spi::transferBlocking(0x00);
 	temp <<= 8;
-	xpcc::delayMicroseconds(1);
+	modm::delayMicroseconds(1);
 
 	temp |= Spi::transferBlocking(0x00);
 	temp >>= 3;

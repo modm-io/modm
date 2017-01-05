@@ -14,18 +14,18 @@
 #include <modm/debug/logger.hpp>
 
 // Set the log level
-#undef	XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::DEBUG
+#undef	MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::DEBUG
 
 int
 main()
 {
 	// Use the logging streams to print some messages.
-	// Change XPCC_LOG_LEVEL above to enable or disable these messages 
-	XPCC_LOG_DEBUG   << XPCC_FILE_INFO << "debug"   << xpcc::endl;
-	XPCC_LOG_INFO    << XPCC_FILE_INFO << "info"    << xpcc::endl;
-	XPCC_LOG_WARNING << XPCC_FILE_INFO << "warning" << xpcc::endl;
-	XPCC_LOG_ERROR   << XPCC_FILE_INFO << "error"   << xpcc::endl;
+	// Change MODM_LOG_LEVEL above to enable or disable these messages 
+	MODM_LOG_DEBUG   << MODM_FILE_INFO << "debug"   << modm::endl;
+	MODM_LOG_INFO    << MODM_FILE_INFO << "info"    << modm::endl;
+	MODM_LOG_WARNING << MODM_FILE_INFO << "warning" << modm::endl;
+	MODM_LOG_ERROR   << MODM_FILE_INFO << "error"   << modm::endl;
 	
 	return 0;
 }

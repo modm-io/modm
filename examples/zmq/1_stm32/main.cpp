@@ -14,7 +14,7 @@
 #include <modm/processing/timer/periodic_timer.hpp>
 
 #include <modm/communication/communication.hpp>
-#include <modm/communication/xpcc/backend/can.hpp>
+#include <modm/communication/modm/backend/can.hpp>
 
 #include "component_odometry/odometry.hpp"
 
@@ -31,10 +31,10 @@ namespace Led
 }
 
 /*
- * Periodically publish an XPCC message on the CAN bus.
+ * Periodically publish an MODM message on the CAN bus.
  * If it is longer than eight bytes it will fragmented and creates more than one CAN frame.
  *
- * Used in the ZeroMQ Example to generate XPCC Odometry messages on the CAN bus.
+ * Used in the ZeroMQ Example to generate MODM Odometry messages on the CAN bus.
  *
  * When rotating the encoder the x coordinate of the odometry message changes.
  *
@@ -52,20 +52,20 @@ namespace Led
 
 static Can1 device;
 
-// CanConnector does the fragmentation and defragmentation of xpcc messages to and from CAN frames.
-static xpcc::CanConnector< Can1 > connector(&device);
+// CanConnector does the fragmentation and defragmentation of modm messages to and from CAN frames.
+static modm::CanConnector< Can1 > connector(&device);
 
 // create an instance of the generated postman
 Postman postman;
 
-xpcc::Dispatcher dispatcher(&connector, &postman);
+modm::Dispatcher dispatcher(&connector, &postman);
 
 namespace component
 {
 	Odometry odometry(robot::component::ODOMETRY, dispatcher);
 }
 
-xpcc::ShortPeriodicTimer tmr(50);
+modm::ShortPeriodicTimer tmr(50);
 
 int
 main()
@@ -76,7 +76,7 @@ main()
 	// Led::G::setOutput();
 	// Led::B::setOutput();
 
-	using Timer = xpcc::stm32::Timer1;
+	using Timer = modm::stm32::Timer1;
 	using ChannelA = GpioInputE9;
 	using ChannelB = GpioInputE11;
 	auto ChannelAInputType = Gpio::InputType::PullUp;
@@ -111,7 +111,7 @@ main()
 			LedOrange::toggle();
 		}
 
-		xpcc::delayMicroseconds(100);
+		modm::delayMicroseconds(100);
 	}
 
 	return 0;

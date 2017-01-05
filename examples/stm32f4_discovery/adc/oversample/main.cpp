@@ -15,15 +15,15 @@
 
 // ----------------------------------------------------------------------------
 // Set the log level
-#undef	XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::INFO
+#undef	MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::INFO
 
 typedef GpioInputA7 AdcIn0;
 typedef GpioInputA4 AdcIn1;
 typedef GpioInputA2 AdcIn2;
 
-xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > loggerDevice;
-xpcc::log::Logger xpcc::log::info(loggerDevice);
+modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
+modm::log::Logger modm::log::info(loggerDevice);
 
 // the three sensors are mapped: x = ch1, y = ch2, z = ch0
 Adc2::Channel sensorMapping[3] = {
@@ -35,8 +35,8 @@ Adc2::Channel sensorMapping[3] = {
 uint32_t sensorData[3];
 // 3 channels and averages of 100 oversamples
 #include <modm/driver/adc/adc_sampler.hpp>
-typedef xpcc::AdcSampler< AdcInterrupt2, 3, 100 > sensors;
-xpcc::ShortTimeout timeout(100);
+typedef modm::AdcSampler< AdcInterrupt2, 3, 100 > sensors;
+modm::ShortTimeout timeout(100);
 
 // ----------------------------------------------------------------------------
 int
@@ -44,7 +44,7 @@ main()
 {
 	Board::initialize();
 
-	// initialize Uart2 for XPCC_LOG_INFO
+	// initialize Uart2 for MODM_LOG_INFO
 	GpioOutputA2::connect(Usart2::Tx);
 	GpioInputA3::connect(Usart2::Rx, Gpio::InputType::PullUp);
 	Usart2::initialize<Board::systemClock, 115200>(12);
@@ -67,9 +67,9 @@ main()
 		{
 			uint32_t* data = sensors::getData();
 			// send it via UART
-			XPCC_LOG_INFO <<"x="  << data[0] << xpcc::endl;
-			XPCC_LOG_INFO <<"y="  << data[1] << xpcc::endl;
-			XPCC_LOG_INFO <<"z="  << data[2] << xpcc::endl;
+			MODM_LOG_INFO <<"x="  << data[0] << modm::endl;
+			MODM_LOG_INFO <<"y="  << data[1] << modm::endl;
+			MODM_LOG_INFO <<"z="  << data[2] << modm::endl;
 
 			// start another readout
 			sensors::startReadout();

@@ -22,15 +22,15 @@
 	{%- if packet.isBuiltIn %}{% continue %}{% endif %}
 
 	{%- if packet.isEnum %}
-xpcc::IOStream&
-{{ namespace }}::packet::operator << (xpcc::IOStream& s, const {{ packet.name | typeName }} e)
+modm::IOStream&
+{{ namespace }}::packet::operator << (modm::IOStream& s, const {{ packet.name | typeName }} e)
 {
 	s << "{{ (packet.name | typeName) ~ "::" }}" << enumToString(e);
 	return s;
 }
 	{% elif packet.flattened().isStruct %}
-xpcc::IOStream&
-{{ namespace }}::packet::operator << (xpcc::IOStream& s, const {{ packet.flattened().name | typeName }} e)
+modm::IOStream&
+{{ namespace }}::packet::operator << (modm::IOStream& s, const {{ packet.flattened().name | typeName }} e)
 {
 	s << "{{ packet.flattened().name | typeName }}(";
 		{%- for element in packet.flattened().iter() %}

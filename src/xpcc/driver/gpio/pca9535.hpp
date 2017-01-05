@@ -9,14 +9,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PCA9535_HPP
-#define XPCC_PCA9535_HPP
+#ifndef MODM_PCA9535_HPP
+#define MODM_PCA9535_HPP
 
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/architecture/interface/gpio_expander.hpp>
 #include <modm/math/geometry/angle.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 struct pca9535
@@ -60,8 +60,8 @@ public:
 		P1_6 = (1 << 14),
 		P1_7 = (1 << 15)
 	};
-	typedef xpcc::Flags16<Pin> Pins;
-	XPCC_INT_TYPE_FLAGS(Pins);
+	typedef modm::Flags16<Pin> Pins;
+	MODM_INT_TYPE_FLAGS(Pins);
 }; // struct pca9535
 
 /**
@@ -79,8 +79,8 @@ public:
  * getters.
  *
  * @code
- * typedef xpcc::pca9535::Pin Pin;
- * typedef xpcc::pca9535::Pins Pins;
+ * typedef modm::pca9535::Pin Pin;
+ * typedef modm::pca9535::Pins Pins;
  *
  * RF_CALL_BLOCKING(expander.setOutput(Pins(0xff));	// set all lower 8 pins to output
  * RF_CALL_BLOCKING(expander.set(Pin::P0_0));		// set only pin 00 high
@@ -98,7 +98,7 @@ public:
  * @ingroup driver_gpio
  */
 template < typename I2cMaster >
-class Pca9535 : public pca9535, public xpcc::I2cDevice< I2cMaster, 2 >, public xpcc::GpioExpander
+class Pca9535 : public pca9535, public modm::I2cDevice< I2cMaster, 2 >, public modm::GpioExpander
 {
 	enum class
 	Index : uint8_t
@@ -117,7 +117,7 @@ public:
 	static constexpr uint8_t
 	indexFromPin(Pin pin)
 	{
-		return xpcc::leftmostBit(PortType(pin));
+		return modm::leftmostBit(PortType(pin));
 	}
 
 public:
@@ -125,19 +125,19 @@ public:
 	Pca9535(uint8_t address=0x20);
 
 public:
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setOutput(Pins pins);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	set(Pins pins);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	reset(Pins pins);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	toggle(Pins pins);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	set(Pins pins, bool value);
 
 	bool inline
@@ -147,23 +147,23 @@ public:
 		return memory.output.any(pin);
 	}
 
-	xpcc::Gpio::Direction inline
+	modm::Gpio::Direction inline
 	getDirection(Pin pin) const
 	{
 		// output is 0, input is 1
 		return memory.configuration.any(pin) ?
-				xpcc::Gpio::Direction::In :
-				xpcc::Gpio::Direction::Out;
+				modm::Gpio::Direction::In :
+				modm::Gpio::Direction::Out;
 	}
 
 public:
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setInput(Pins pins);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setInvertInput(Pins pins);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	resetInvertInput(Pins pins);
 
 	bool inline
@@ -173,15 +173,15 @@ public:
 		return memory.input.all(pins);
 	}
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	readInput()
 	{ return readMemory(Index::Input); }
 
 public:
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	writePort(PortType data);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	readPort(PortType &data);
 
 
@@ -245,14 +245,14 @@ public:
 	using Port = GpioExpanderPort< Pca9535<I2cMaster>, object, StartPin, Width, DataOrder >;
 
 private:
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	writeMemory(Index index);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	readMemory(Index index);
 
 	/// @cond
-	struct xpcc_packed
+	struct modm_packed
 	Memory
 	{
 		Memory() :
@@ -287,8 +287,8 @@ private:
 	/// @endcond
 };
 
-}	// namespace xpcc
+}	// namespace modm
 
 #include "pca9535_impl.hpp"
 
-#endif // XPCC_PCA9535_HPP
+#endif // MODM_PCA9535_HPP

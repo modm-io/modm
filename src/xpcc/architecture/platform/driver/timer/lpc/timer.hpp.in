@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LPC11_TIMER_{{ id }}_HPP
-#define XPCC_LPC11_TIMER_{{ id }}_HPP
+#ifndef MODM_LPC11_TIMER_{{ id }}_HPP
+#define MODM_LPC11_TIMER_{{ id }}_HPP
 
 #include <stdint.h>
 #include <modm/utils/utils.hpp>
@@ -24,7 +24,7 @@
 %% set name = id|replace('_', 'B')
 %% set reg = "LPC_TMR" ~ name
 
-namespace xpcc
+namespace modm
 {
 	namespace lpc
 	{
@@ -111,12 +111,12 @@ namespace xpcc
 				{{reg}}->TCR = TCR_CRst;
 			}
 
-			static xpcc_always_inline Value
+			static modm_always_inline Value
 			getValue() {
 				return {{reg}}->TC;
 			}
 
-			static xpcc_always_inline void
+			static modm_always_inline void
 			setValue(uint16_t value) {
 				{{reg}}->TC = value;
 			}
@@ -125,4 +125,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_LPC11_TIMER_{{ id }}_HPP
+#endif // MODM_LPC11_TIMER_{{ id }}_HPP

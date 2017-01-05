@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LPC_GPIO_HPP
-#define XPCC_LPC_GPIO_HPP
+#ifndef MODM_LPC_GPIO_HPP
+#define MODM_LPC_GPIO_HPP
 
 #include "../device.hpp"
 #include "type_ids.hpp"
@@ -23,7 +23,7 @@
 
 #include <modm/architecture/interface/gpio.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 namespace lpc
@@ -65,7 +65,7 @@ struct Gpio
  * simulate an open-drain Output (with internal pullups if needed).
  * You must use this class for `SoftwareI2cMaster`!
  *
- * @see ::xpcc::SoftwareI2cMaster
+ * @see ::modm::SoftwareI2cMaster
  * @ingroup	{{target["family"]}}
  * @{
  */
@@ -74,31 +74,31 @@ class GpioOpenDrain : Gpio
 {
 public:
 	/// calls set
-	xpcc_always_inline static void set() {
+	modm_always_inline static void set() {
 		IO::set();
 	}
 	/// calls reset
-	xpcc_always_inline static void reset() {
+	modm_always_inline static void reset() {
 		IO::reset();
 	}
-	xpcc_always_inline static void set(bool status) {
+	modm_always_inline static void set(bool status) {
 		if (status) { set(); }
 		else { reset(); }
 	}
-	xpcc_always_inline static bool read() {
+	modm_always_inline static bool read() {
 		bool lastOutput = IO::read();
 		IO::setInput();
 		bool read = IO::read();
 		IO::setOutput(lastOutput);
 		return read;
 	}
-	xpcc_always_inline static void
-	connect(::xpcc::TypeId::SoftwareI2cMasterSda) {
+	modm_always_inline static void
+	connect(::modm::TypeId::SoftwareI2cMasterSda) {
 		IO::setOutput();
 		IO::set();
 	}
-	xpcc_always_inline static void
-	connect(::xpcc::TypeId::SoftwareI2cMasterScl) {
+	modm_always_inline static void
+	connect(::modm::TypeId::SoftwareI2cMasterScl) {
 		IO::setOutput();
 		IO::set();
 	}
@@ -140,7 +140,7 @@ public:
 	};
 
 	/// change the function of the pin
-	xpcc_always_inline static void
+	modm_always_inline static void
 	selectFunction(Function f){
 		uint32_t temp;
 		temp = {{ conf_reg }} & ~(7<<0);	// FUNC REG is 3 bits wide
@@ -150,7 +150,7 @@ public:
 
 public:
 		%% if "i2c_mode" in bits
-	xpcc_always_inline static void
+	modm_always_inline static void
 	configure(I2cMode mode) {
 		uint32_t temp;
 		temp = {{ conf_reg }} & ~(3<<8);
@@ -162,7 +162,7 @@ public:
 		%% if type == "" or type == "Output"
 
 			%% if "od" in bits
-	xpcc_always_inline static void
+	modm_always_inline static void
 	configure(OutputType type) {
 		if(type == OutputType::PushPull) {
 			{{ conf_reg }} &= ~static_cast<uint32_t>(OutputType::OpenDrain);
@@ -172,7 +172,7 @@ public:
 	}
 			%% endif
 
-	xpcc_always_inline static void
+	modm_always_inline static void
 	setOutput() {
 			%% if "admode" in bits
 		{{ conf_reg }} |= IOCON_ADMODE_DIGITAL;	// configure as digital pin
@@ -181,14 +181,14 @@ public:
 		{{ gpio_reg }}->DIR |= (1 << {{ pin}});
 	}
 
-	xpcc_always_inline static void
+	modm_always_inline static void
 	setOutput(bool status) {
 		setOutput();
 		set(status);
 	}
 
 			%% if "od" in bits
-	xpcc_always_inline static void
+	modm_always_inline static void
 	setOutput(OutputType type) {
 		configure(type);
 		setOutput();
@@ -196,30 +196,30 @@ public:
 			%% endif
 
 			%% if "i2c_mode" in bits
-	xpcc_always_inline static void
+	modm_always_inline static void
 	setOutput(I2cMode type) {
 		configure(type);
 		setOutput();
 	}
 			%% endif
 
-	xpcc_always_inline static void
+	modm_always_inline static void
 	set() {
 		{{ gpio_reg }}->MASKED_ACCESS[1 << {{ pin }}] = (1 << {{pin}});
 	}
 
-	xpcc_always_inline static void
+	modm_always_inline static void
 	set(bool status) {
 		if (status) { set(); }
 		else { reset(); }
 	}
 
-	xpcc_always_inline static void
+	modm_always_inline static void
 	reset() {
 		{{ gpio_reg }}->MASKED_ACCESS[1 << {{ pin }}] = 0;
 	}
 
-	xpcc_always_inline static void
+	modm_always_inline static void
 	toggle() {
 		if (({{ gpio_reg }}->MASKED_ACCESS[1 << {{ pin }}]) >> {{ pin }})
 		{ reset(); } else { set(); }
@@ -228,7 +228,7 @@ public:
 		%% if type == "" or type == "Input"
 
 			%% if "mode" in bits
-	xpcc_always_inline static void
+	modm_always_inline static void
 	configure(InputType type) {
 		uint32_t temp;
 		temp = {{ conf_reg }} & ~static_cast<uint32_t>(InputType::Repeater);
@@ -238,7 +238,7 @@ public:
 			%% endif
 
 
-	xpcc_always_inline static void
+	modm_always_inline static void
 	setInput() {
 			%% if "admode" in bits
 		{{ conf_reg }} |= IOCON_ADMODE_DIGITAL;	// configure as digital pin
@@ -247,13 +247,13 @@ public:
 		{{ gpio_reg }}->DIR &= ~(1 << {{ pin}});
 	}
 
-	xpcc_always_inline static bool
+	modm_always_inline static bool
 	read() {
 		return ({{ gpio_reg }}->MASKED_ACCESS[1 << {{ pin }}]) >> {{ pin }};
 	}
 
 			%% if "mode" in bits
-	xpcc_always_inline static void
+	modm_always_inline static void
 	setInput(InputType type) {
 		configure(type);
 		setInput();
@@ -261,7 +261,7 @@ public:
 			%% endif
 
 			%% if "i2c_mode" in bits
-	xpcc_always_inline static void
+	modm_always_inline static void
 	setInput(I2cMode type) {
 		configure(type);
 		setInput();
@@ -275,8 +275,8 @@ public:
 			%% for peripheral in   ['SoftwareSpiMasterMosi',
 									'SoftwareSpiMasterSck']
 	/// Connect to `{{peripheral}}`.
-	xpcc_always_inline static void
-	connect(::xpcc::TypeId::{{ peripheral }}) {
+	modm_always_inline static void
+	connect(::modm::TypeId::{{ peripheral }}) {
 				%% if "mode" in bits
 		configure(OutputType::PushPull);
 				%% elif "i2c_mode" in bits
@@ -290,8 +290,8 @@ public:
 		%% if type in ['', 'Input']
 			%% for peripheral in ['SoftwareSpiMasterMiso']
 	/// Connect to `{{peripheral}}`.
-	xpcc_always_inline static void
-	connect(::xpcc::TypeId::{{ peripheral }}) {
+	modm_always_inline static void
+	connect(::modm::TypeId::{{ peripheral }}) {
 				%% if "mode" in bits
 		configure(InputType::Floating);
 				%% endif
@@ -306,6 +306,6 @@ public:
 
 }	// namespace lpc
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif // XPCC_LPC_GPIO_HPP
+#endif // MODM_LPC_GPIO_HPP

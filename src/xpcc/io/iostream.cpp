@@ -23,7 +23,7 @@
 FLASH_STORAGE(uint16_t base[]) = { 10, 100, 1000, 10000 };
 
 // ----------------------------------------------------------------------------
-xpcc::IOStream::IOStream(IODevice& outputDevice) :
+modm::IOStream::IOStream(IODevice& outputDevice) :
 	device(&outputDevice),
 	mode(Mode::Ascii)
 {
@@ -31,7 +31,7 @@ xpcc::IOStream::IOStream(IODevice& outputDevice) :
 
 // ----------------------------------------------------------------------------
 void
-xpcc::IOStream::writeInteger(int16_t value)
+modm::IOStream::writeInteger(int16_t value)
 {
 	if (value < 0) {
 		this->device->write('-');
@@ -43,9 +43,9 @@ xpcc::IOStream::writeInteger(int16_t value)
 }
 
 void
-xpcc::IOStream::writeInteger(uint16_t value)
+modm::IOStream::writeInteger(uint16_t value)
 {
-	accessor::Flash<uint16_t> basePtr = xpcc::accessor::asFlash(base);
+	accessor::Flash<uint16_t> basePtr = modm::accessor::asFlash(base);
 
 	bool zero = true;
 	uint8_t i = 4;
@@ -66,9 +66,9 @@ xpcc::IOStream::writeInteger(uint16_t value)
 }
 
 void
-xpcc::IOStream::writeInteger(int32_t value)
+modm::IOStream::writeInteger(int32_t value)
 {
-#if defined(XPCC_CPU_AVR)
+#if defined(MODM_CPU_AVR)
 	char buffer[ArithmeticTraits<int32_t>::decimalDigits + 1]; // +1 for '\0'
 
 	// Uses the optimized non standard function 'ltoa()' which is
@@ -87,9 +87,9 @@ xpcc::IOStream::writeInteger(int32_t value)
 }
 
 void
-xpcc::IOStream::writeInteger(uint32_t value)
+modm::IOStream::writeInteger(uint32_t value)
 {
-#if defined(XPCC_CPU_AVR)
+#if defined(MODM_CPU_AVR)
 	char buffer[ArithmeticTraits<uint32_t>::decimalDigits + 1]; // +1 for '\0'
 
 	// Uses the optimized non standard function 'ultoa()' which is
@@ -116,9 +116,9 @@ xpcc::IOStream::writeInteger(uint32_t value)
 #endif
 }
 
-#ifndef XPCC_CPU_AVR
+#ifndef MODM_CPU_AVR
 void
-xpcc::IOStream::writeInteger(int64_t value)
+modm::IOStream::writeInteger(int64_t value)
 {
 	if (value < 0) {
 		this->device->write('-');
@@ -130,7 +130,7 @@ xpcc::IOStream::writeInteger(int64_t value)
 }
 
 void
-xpcc::IOStream::writeInteger(uint64_t value)
+modm::IOStream::writeInteger(uint64_t value)
 {
 	char buffer[ArithmeticTraits<uint64_t>::decimalDigits + 1]; // +1 for '\0'
 
@@ -154,7 +154,7 @@ xpcc::IOStream::writeInteger(uint64_t value)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::IOStream::writeHex(const char* s)
+modm::IOStream::writeHex(const char* s)
 {
 	while (*s != '\0') {
 		this->writeHex(*s);
@@ -163,7 +163,7 @@ xpcc::IOStream::writeHex(const char* s)
 }
 
 void
-xpcc::IOStream::writeBin(const char* s)
+modm::IOStream::writeBin(const char* s)
 {
 	while (*s != '\0') {
 		this->writeBin(*s);
@@ -173,7 +173,7 @@ xpcc::IOStream::writeBin(const char* s)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::IOStream::writeHexNibble(uint8_t nibble)
+modm::IOStream::writeHexNibble(uint8_t nibble)
 {
 	char character;
 	if (nibble > 9) {
@@ -187,14 +187,14 @@ xpcc::IOStream::writeHexNibble(uint8_t nibble)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::IOStream::writeHex(uint8_t value)
+modm::IOStream::writeHex(uint8_t value)
 {
 	writeHexNibble(value >> 4);
 	writeHexNibble(value & 0xF);
 }
 
 void
-xpcc::IOStream::writeBin(uint8_t value)
+modm::IOStream::writeBin(uint8_t value)
 {
 	for (uint_fast8_t ii = 0; ii < 8; ii++)
 	{
@@ -210,8 +210,8 @@ xpcc::IOStream::writeBin(uint8_t value)
 }
 
 // ----------------------------------------------------------------------------
-xpcc::IOStream&
-xpcc::IOStream::operator << (const myfunc& value)
+modm::IOStream&
+modm::IOStream::operator << (const myfunc& value)
 {
 	unsigned char *p = (unsigned char *)&value;
 
@@ -222,10 +222,10 @@ xpcc::IOStream::operator << (const myfunc& value)
 	return *this;
 }
 
-xpcc::IOStream&
-xpcc::IOStream::operator << (const void* p)
+modm::IOStream&
+modm::IOStream::operator << (const void* p)
 {
-#if XPCC_SIZEOF_POINTER == 2
+#if MODM_SIZEOF_POINTER == 2
 
 	this->device->write('0');
 	this->device->write('x');
@@ -235,7 +235,7 @@ xpcc::IOStream::operator << (const void* p)
 	writeHex(value >> 8);
 	writeHex(value);
 
-#elif XPCC_SIZEOF_POINTER == 4
+#elif MODM_SIZEOF_POINTER == 4
 
 	this->device->write('0');
 	this->device->write('x');
@@ -247,7 +247,7 @@ xpcc::IOStream::operator << (const void* p)
 	writeHex(value >> 8);
 	writeHex(value);
 
-#elif XPCC_SIZEOF_POINTER == 8
+#elif MODM_SIZEOF_POINTER == 8
 
 	this->device->write('0');
 	this->device->write('x');

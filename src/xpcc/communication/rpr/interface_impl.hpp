@@ -9,71 +9,71 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_RPR_INTERFACE_HPP
+#ifndef	MODM_RPR_INTERFACE_HPP
 #	error	"Don't include this file directly, use 'interface.hpp' instead!"
 #endif
 
 
-#ifndef XPCC_RPR_DEBUG
-#	define XPCC_RPR_DEBUG 0
+#ifndef MODM_RPR_DEBUG
+#	define MODM_RPR_DEBUG 0
 #endif
 
 #include <cstring>
 
-#if XPCC_RPR_DEBUG
+#if MODM_RPR_DEBUG
 #	include <modm/debug/logger.hpp>
-#	undef XPCC_LOG_LEVEL
-#	define XPCC_LOG_LEVEL	xpcc::log::DEBUG
-#	define XPCC_RPR_LOG(x) XPCC_LOG_DEBUG << x << xpcc::endl
+#	undef MODM_LOG_LEVEL
+#	define MODM_LOG_LEVEL	modm::log::DEBUG
+#	define MODM_RPR_LOG(x) MODM_LOG_DEBUG << x << modm::endl
 #else
-#	define XPCC_RPR_LOG(x)
+#	define MODM_RPR_LOG(x)
 #endif
 
 // ----------------------------------------------------------------------------
 template <typename Device, std::size_t N>
-uint16_t xpcc::rpr::Interface<Device, N>::_address = 0;
+uint16_t modm::rpr::Interface<Device, N>::_address = 0;
 
 template <typename Device, std::size_t N>
-uint16_t xpcc::rpr::Interface<Device, N>::_groupAddress = 0x7fff;
-
-
-template <typename Device, std::size_t N>
-typename xpcc::rpr::Interface<Device, N>::Queue
-xpcc::rpr::Interface<Device, N>::messagesToSend;
-
-template <typename Device, std::size_t N>
-typename xpcc::rpr::Interface<Device, N>::Queue
-xpcc::rpr::Interface<Device, N>::receivedMessages;
+uint16_t modm::rpr::Interface<Device, N>::_groupAddress = 0x7fff;
 
 
 template <typename Device, std::size_t N>
-xpcc::rpr::Message
-xpcc::rpr::Interface<Device, N>::receiveBuffer;
+typename modm::rpr::Interface<Device, N>::Queue
+modm::rpr::Interface<Device, N>::messagesToSend;
 
 template <typename Device, std::size_t N>
-uint8_t xpcc::rpr::Interface<Device, N>::rx_buffer[N+8];
-
-
-template <typename Device, std::size_t N>
-uint16_t xpcc::rpr::Interface<Device, N>::crc = crcInitialValue;
-
-template <typename Device, std::size_t N>
-uint8_t xpcc::rpr::Interface<Device, N>::length = 0;
-
-template <typename Device, std::size_t N>
-bool xpcc::rpr::Interface<Device, N>::nextEscaped = false;
+typename modm::rpr::Interface<Device, N>::Queue
+modm::rpr::Interface<Device, N>::receivedMessages;
 
 
 template <typename Device, std::size_t N>
-uint8_t xpcc::rpr::Interface<Device, N>::addressBuffer = 0;
+modm::rpr::Message
+modm::rpr::Interface<Device, N>::receiveBuffer;
 
 template <typename Device, std::size_t N>
-uint8_t xpcc::rpr::Interface<Device, N>::status = 0;
+uint8_t modm::rpr::Interface<Device, N>::rx_buffer[N+8];
+
+
+template <typename Device, std::size_t N>
+uint16_t modm::rpr::Interface<Device, N>::crc = crcInitialValue;
+
+template <typename Device, std::size_t N>
+uint8_t modm::rpr::Interface<Device, N>::length = 0;
+
+template <typename Device, std::size_t N>
+bool modm::rpr::Interface<Device, N>::nextEscaped = false;
+
+
+template <typename Device, std::size_t N>
+uint8_t modm::rpr::Interface<Device, N>::addressBuffer = 0;
+
+template <typename Device, std::size_t N>
+uint8_t modm::rpr::Interface<Device, N>::status = 0;
 
 // ----------------------------------------------------------------------------
 template <typename Device, std::size_t N>
 void
-xpcc::rpr::Interface<Device, N>::initialize(uint16_t address, uint16_t groupAddress)
+modm::rpr::Interface<Device, N>::initialize(uint16_t address, uint16_t groupAddress)
 {
 	_address = address & ADDRESS_VALUE;
 	_groupAddress = groupAddress & ADDRESS_VALUE;
@@ -84,7 +84,7 @@ xpcc::rpr::Interface<Device, N>::initialize(uint16_t address, uint16_t groupAddr
 // ----------------------------------------------------------------------------
 template <typename Device, std::size_t N>
 bool
-xpcc::rpr::Interface<Device, N>::sendMessage(uint16_t destination,
+modm::rpr::Interface<Device, N>::sendMessage(uint16_t destination,
 											   MessageType type,
 											   uint8_t command,
 											   const void *payload,
@@ -104,7 +104,7 @@ xpcc::rpr::Interface<Device, N>::sendMessage(uint16_t destination,
 
 template <typename Device, std::size_t N>
 bool
-xpcc::rpr::Interface<Device, N>::sendMessage(Message *message)
+modm::rpr::Interface<Device, N>::sendMessage(Message *message)
 {
 	if (status & STATUS_START_DELIMITER_RECEIVED)
 	{
@@ -127,15 +127,15 @@ xpcc::rpr::Interface<Device, N>::sendMessage(Message *message)
 // ----------------------------------------------------------------------------
 
 template <typename Device, std::size_t N>
-xpcc::rpr::Message *
-xpcc::rpr::Interface<Device, N>::getReceivedMessage()
+modm::rpr::Message *
+modm::rpr::Interface<Device, N>::getReceivedMessage()
 {
 	return getMessage(receivedMessages);
 }
 
 template <typename Device, std::size_t N>
 void
-xpcc::rpr::Interface<Device, N>::dropReceivedMessage()
+modm::rpr::Interface<Device, N>::dropReceivedMessage()
 {
 	popMessage(receivedMessages);
 }
@@ -143,7 +143,7 @@ xpcc::rpr::Interface<Device, N>::dropReceivedMessage()
 // ----------------------------------------------------------------------------
 template <typename Device, std::size_t N>
 void
-xpcc::rpr::Interface<Device, N>::update()
+modm::rpr::Interface<Device, N>::update()
 {
 	uint8_t data;
 	
@@ -155,14 +155,14 @@ xpcc::rpr::Interface<Device, N>::update()
 	
 	while (Device::read(data))
 	{
-		XPCC_RPR_LOG("receiving raw " << xpcc::hex << data << xpcc::ascii);
+		MODM_RPR_LOG("receiving raw " << modm::hex << data << modm::ascii);
 		
 		if (data == startDelimiterByte)
 		{
 			status &= ~STATUS_END_DELIMITER_RECEIVED;
 			status |= STATUS_START_DELIMITER_RECEIVED;
 
-			XPCC_RPR_LOG("start delimiter");
+			MODM_RPR_LOG("start delimiter");
 			
 			crc = crcInitialValue;
 			length = 0;
@@ -179,16 +179,16 @@ xpcc::rpr::Interface<Device, N>::update()
 				
 				if (!(status & STATUS_SOURCE_RECOGNISED) && (receiveBuffer.type != MESSAGE_TYPE_UNICAST))
 				{
-					XPCC_RPR_LOG("tx: forwarding endDelimiterByte");
+					MODM_RPR_LOG("tx: forwarding endDelimiterByte");
 					Device::write(endDelimiterByte);
 				}
-				XPCC_RPR_LOG("end delimiter with length=" << length);
+				MODM_RPR_LOG("end delimiter with length=" << length);
 				
 				if (status & STATUS_DESTINATION_RECOGNISED)
 				{
 					if (crc == 0)
 					{
-						XPCC_RPR_LOG("crc check success");
+						MODM_RPR_LOG("crc check success");
 						if (receiveBuffer.length > 1)
 						{
 							receiveBuffer.command = receiveBuffer.payload[0];
@@ -199,7 +199,7 @@ xpcc::rpr::Interface<Device, N>::update()
 						receiveBuffer.payload = rx_buffer;
 					}
 					else {
-						XPCC_RPR_LOG("crc check failure");
+						MODM_RPR_LOG("crc check failure");
 					}
 				}
 			}
@@ -211,7 +211,7 @@ xpcc::rpr::Interface<Device, N>::update()
 		{
 			// the next byte is escaped
 			nextEscaped = true;
-			XPCC_RPR_LOG("escape sequence");
+			MODM_RPR_LOG("escape sequence");
 			continue;
 		}
 		else
@@ -221,7 +221,7 @@ xpcc::rpr::Interface<Device, N>::update()
 				nextEscaped = false;
 				// toggle bit 5
 				data = data ^ 0x20;
-				XPCC_RPR_LOG("data escaped");
+				MODM_RPR_LOG("data escaped");
 			}
 			// all data is now escaped
 			
@@ -233,14 +233,14 @@ xpcc::rpr::Interface<Device, N>::update()
 			{
 				// LSB of destination address
 				case 0:
-					XPCC_RPR_LOG("rx: LSB dest");
+					MODM_RPR_LOG("rx: LSB dest");
 					addressBuffer = data;
 					break;
 					
 					// MSB of destination address
 				case 1:
 				{
-					XPCC_RPR_LOG("rx: MSB dest");
+					MODM_RPR_LOG("rx: MSB dest");
 					// check the destination address against our own
 					uint16_t dest = (data << 8) | addressBuffer;
 					status &= ~(STATUS_DESTINATION_RECOGNISED | STATUS_RX_BUFFER_OVERFLOW | STATUS_SOURCE_RECOGNISED);
@@ -251,7 +251,7 @@ xpcc::rpr::Interface<Device, N>::update()
 					// it is a broadcast, we need to listen
 					if (receiveBuffer.destination == ADDRESS_BROADCAST)
 					{
-						XPCC_RPR_LOG("rx: broadcast");
+						MODM_RPR_LOG("rx: broadcast");
 						receiveBuffer.type = MESSAGE_TYPE_BROADCAST;
 						status |= STATUS_DESTINATION_RECOGNISED;
 					}
@@ -262,7 +262,7 @@ xpcc::rpr::Interface<Device, N>::update()
 							// group address
 							if (_groupAddress == (receiveBuffer.destination & ADDRESS_VALUE))
 							{
-								XPCC_RPR_LOG("rx: my group");
+								MODM_RPR_LOG("rx: my group");
 								receiveBuffer.type = MESSAGE_TYPE_MULTICAST;
 								status |= STATUS_DESTINATION_RECOGNISED;
 							}
@@ -271,7 +271,7 @@ xpcc::rpr::Interface<Device, N>::update()
 							// individual address
 							if (_address == (receiveBuffer.destination & ADDRESS_VALUE))
 							{
-								XPCC_RPR_LOG("rx: my address");
+								MODM_RPR_LOG("rx: my address");
 								receiveBuffer.type = MESSAGE_TYPE_UNICAST;
 								status |= STATUS_DESTINATION_RECOGNISED;
 							}
@@ -288,14 +288,14 @@ xpcc::rpr::Interface<Device, N>::update()
 					
 					// LSB of source address
 				case 2:
-					XPCC_RPR_LOG("rx: LSB source");
+					MODM_RPR_LOG("rx: LSB source");
 					addressBuffer = data;
 					break;
 					
 					// MSB of Source Address
 				case 3:
 				{
-					XPCC_RPR_LOG("rx: MSB source");
+					MODM_RPR_LOG("rx: MSB source");
 					// check the source address against our own
 					uint16_t source = (data << 8) | addressBuffer;
 					receiveBuffer.source = (source & ADDRESS_VALUE);
@@ -313,17 +313,17 @@ xpcc::rpr::Interface<Device, N>::update()
 					
 					if (!(status & STATUS_SOURCE_RECOGNISED) && (receiveBuffer.type != MESSAGE_TYPE_UNICAST))
 					{
-						XPCC_RPR_LOG("tx: forwarding destination");
+						MODM_RPR_LOG("tx: forwarding destination");
 						Device::write(startDelimiterByte);
 						writeByteEscaped(receiveBuffer.destination);
 						writeByteEscaped(receiveBuffer.destination >> 8);
 						
-						XPCC_RPR_LOG("tx: forwarding source");
+						MODM_RPR_LOG("tx: forwarding source");
 						writeByteEscaped(addressBuffer);
 						writeByteEscaped(data);
 					}
 					else {
-						XPCC_RPR_LOG("rx: no forwarding");
+						MODM_RPR_LOG("rx: no forwarding");
 					}
 
 				}
@@ -334,7 +334,7 @@ xpcc::rpr::Interface<Device, N>::update()
 					{
 						if (length <= N+8)
 						{
-							XPCC_RPR_LOG("rx: buffering payload");
+							MODM_RPR_LOG("rx: buffering payload");
 							receiveBuffer.payload[length-5] = data;
 							receiveBuffer.length++;
 							crc = crcUpdate(crc, data);
@@ -343,13 +343,13 @@ xpcc::rpr::Interface<Device, N>::update()
 							// really, really bad programmer !
 							// now go sit in the corner and increase dat payload buffer
 							status |= STATUS_RX_BUFFER_OVERFLOW;
-							XPCC_RPR_LOG("rx: buffer overflow!!!");
+							MODM_RPR_LOG("rx: buffer overflow!!!");
 						}
 					}
 					
 					if (!(status & STATUS_SOURCE_RECOGNISED) && (receiveBuffer.type != MESSAGE_TYPE_UNICAST))
 					{
-						XPCC_RPR_LOG("forwarding payload");
+						MODM_RPR_LOG("forwarding payload");
 						writeByteEscaped(data);
 					}
 					break;
@@ -361,25 +361,25 @@ xpcc::rpr::Interface<Device, N>::update()
 // ----------------------------------------------------------------------------
 template <typename Device, std::size_t N>
 void
-xpcc::rpr::Interface<Device, N>::writeByteEscaped(uint8_t data)
+modm::rpr::Interface<Device, N>::writeByteEscaped(uint8_t data)
 {
 	if (data == startDelimiterByte || data == endDelimiterByte || data == controlEscapeByte)
 	{
-		XPCC_RPR_LOG("tx: " << xpcc::hex << controlEscapeByte << xpcc::ascii);
-		XPCC_RPR_LOG("tx: " << xpcc::hex << (data ^ 0x20) << xpcc::ascii);
+		MODM_RPR_LOG("tx: " << modm::hex << controlEscapeByte << modm::ascii);
+		MODM_RPR_LOG("tx: " << modm::hex << (data ^ 0x20) << modm::ascii);
 		Device::write(controlEscapeByte);
 		Device::write(data ^ 0x20);		// toggle bit 5
 	}
 	else
 	{
-		XPCC_RPR_LOG("tx: " << xpcc::hex << data << xpcc::ascii);
+		MODM_RPR_LOG("tx: " << modm::hex << data << modm::ascii);
 		Device::write(data);
 	}
 }
 
 template <typename Device, std::size_t N>
 void
-xpcc::rpr::Interface<Device, N>::writeMessage(Message *message)
+modm::rpr::Interface<Device, N>::writeMessage(Message *message)
 {
 	uint16_t crc = crcInitialValue;
 	
@@ -438,26 +438,26 @@ xpcc::rpr::Interface<Device, N>::writeMessage(Message *message)
 // ----------------------------------------------------------------------------
 template <typename Device, std::size_t N>
 bool
-xpcc::rpr::Interface<Device, N>::pushMessage(Queue &queue, Message *message)
+modm::rpr::Interface<Device, N>::pushMessage(Queue &queue, Message *message)
 {
 	if (queue.isFull()) {
-		XPCC_RPR_LOG("queue full");
+		MODM_RPR_LOG("queue full");
 		return false;
 	}
-	XPCC_RPR_LOG("allocating");
+	MODM_RPR_LOG("allocating");
 	// manually create a new buffer
 	uint8_t *newBuffer = bufferAllocator.allocate(message->length);
 	if (newBuffer)
 	{
-		XPCC_RPR_LOG("allocated " << message->length << " uint8_t");
+		MODM_RPR_LOG("allocated " << message->length << " uint8_t");
 		// copy the content into the new buffer
 		std::memcpy(newBuffer, message->payload, message->length);
-		XPCC_RPR_LOG("copying payload");
+		MODM_RPR_LOG("copying payload");
 		// point the message payload pointer to the new buffer
 		message->payload = newBuffer;
 		// push it into the list, which will copy the rest
 		queue.push(*message);
-		XPCC_RPR_LOG("pushing");
+		MODM_RPR_LOG("pushing");
 		return true;
 	}
 	return false;
@@ -465,13 +465,13 @@ xpcc::rpr::Interface<Device, N>::pushMessage(Queue &queue, Message *message)
 
 template <typename Device, std::size_t N>
 void
-xpcc::rpr::Interface<Device, N>::popMessage(Queue &queue)
+modm::rpr::Interface<Device, N>::popMessage(Queue &queue)
 {
 	if (!queue.isEmpty())
 	{
 		// deallocate the external buffer
 		Message message = queue.get();
-		XPCC_RPR_LOG("deallocating");
+		MODM_RPR_LOG("deallocating");
 		bufferAllocator.deallocate(message.payload);
 		// then remove the rest
 		queue.pop();
@@ -479,8 +479,8 @@ xpcc::rpr::Interface<Device, N>::popMessage(Queue &queue)
 }
 
 template <typename Device, std::size_t N>
-xpcc::rpr::Message *
-xpcc::rpr::Interface<Device, N>::getMessage(Queue &queue)
+modm::rpr::Message *
+modm::rpr::Interface<Device, N>::getMessage(Queue &queue)
 {
 	if (queue.isEmpty())
 		return 0;
@@ -490,14 +490,14 @@ xpcc::rpr::Interface<Device, N>::getMessage(Queue &queue)
 
 template <typename Device, std::size_t N>
 bool
-xpcc::rpr::Interface<Device, N>::moveMessage(Queue &destination, Queue &source)
+modm::rpr::Interface<Device, N>::moveMessage(Queue &destination, Queue &source)
 {
 	// do not reallocate the payload buffer!
 	// just move what is essential
 	if (source.isEmpty())
 		return false;
 	
-	XPCC_RPR_LOG("moving");
+	MODM_RPR_LOG("moving");
 	destination.push(source.get());
 	source.pop();
 	return true;

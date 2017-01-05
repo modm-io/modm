@@ -11,10 +11,10 @@
 # -----------------------------------------------------------------------------
 
 """
-# xpcc QtCreator Project Tool
+# modm QtCreator Project Tool
 
 This tool makes it possible to automatically generate a QtCreator project for
-applications using xpcc.
+applications using modm.
 
 You need to add something like this to your application's `SConstruct`:
 
@@ -47,8 +47,8 @@ def collect_defines(defines, source):
 
 def qt_creator_project_method(env, file_scanner, additional_sources=[]):
 	# collect values
-	project_name = env['XPCC_PROJECT_NAME']
-	project_path = env['XPCC_BASEPATH']
+	project_name = env['MODM_PROJECT_NAME']
+	project_path = env['MODM_BASEPATH']
 	defines = {}
 	collect_defines(defines, env['CPPDEFINES'])
 	collect_defines(defines, file_scanner.defines)
@@ -58,7 +58,7 @@ def qt_creator_project_method(env, file_scanner, additional_sources=[]):
 
 	# generate project files
 	proj_path = os.path.join(project_path, project_name)
-	temp_path = os.path.join(env['XPCC_ROOTPATH'], 'templates', 'qtcreator', 'project')
+	temp_path = os.path.join(env['MODM_ROOTPATH'], 'templates', 'qtcreator', 'project')
 	return [
 		env.Jinja2Template(
 			target = proj_path + '.creator', source = temp_path + '.creator.in',

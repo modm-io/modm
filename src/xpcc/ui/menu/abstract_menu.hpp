@@ -14,13 +14,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ABSTRACT_MENU_HPP
-#define XPCC_ABSTRACT_MENU_HPP
+#ifndef MODM_ABSTRACT_MENU_HPP
+#define MODM_ABSTRACT_MENU_HPP
 
 #include "view_stack.hpp"
 #include "abstract_view.hpp"
 
-namespace xpcc{
+namespace modm{
 	
 	 /**
 	 * @brief The AbstractMenu class is the same as the AbstractView class,
@@ -34,11 +34,11 @@ namespace xpcc{
 	{
 		public:
 
-			AbstractMenu(xpcc::ViewStack* stack, uint8_t identifier);
+			AbstractMenu(modm::ViewStack* stack, uint8_t identifier);
 			
 
 			virtual void
-			shortButtonPress(xpcc::MenuButtons::Button button) = 0;
+			shortButtonPress(modm::MenuButtons::Button button) = 0;
 
 		private:
 			
@@ -47,4 +47,4 @@ namespace xpcc{
 
 }
 
-#endif // XPCC_ABSTRACT_MENU_HPP
+#endif // MODM_ABSTRACT_MENU_HPP

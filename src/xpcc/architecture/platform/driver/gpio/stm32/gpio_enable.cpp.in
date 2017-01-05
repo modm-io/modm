@@ -15,7 +15,7 @@
 
 extern "C"
 void
-xpcc_gpio_enable(void)
+modm_gpio_enable(void)
 {
 %%	set prefix = "GPIO"
 	// FIXME: add possibility to switch individual clocks on and off

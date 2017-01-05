@@ -33,18 +33,18 @@
  * PA2  - TXD
  */
 
-#undef	XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::INFO
+#undef	MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::INFO
 
 
 // Create an IODeviceWrapper around the Uart Peripheral we want to use
-xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > loggerDevice;
+modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
 
 // Set all four logger streams to use the UART
-xpcc::log::Logger xpcc::log::debug(loggerDevice);
-xpcc::log::Logger xpcc::log::info(loggerDevice);
-xpcc::log::Logger xpcc::log::warning(loggerDevice);
-xpcc::log::Logger xpcc::log::error(loggerDevice);
+modm::log::Logger modm::log::debug(loggerDevice);
+modm::log::Logger modm::log::info(loggerDevice);
+modm::log::Logger modm::log::warning(loggerDevice);
+modm::log::Logger modm::log::error(loggerDevice);
 
 typedef GpioOutputE12 Csn;
 
@@ -52,14 +52,14 @@ typedef GpioOutputE12 Csn;
 typedef GpioOutputA1  Ce;
 
 
-typedef xpcc::Nrf24Phy<SpiMaster2, Csn, Ce> nrf24phy;
+typedef modm::Nrf24Phy<SpiMaster2, Csn, Ce> nrf24phy;
 
 int
 main()
 {
 	Board::initialize();
 
-	Csn::setOutput(xpcc::Gpio::High);
+	Csn::setOutput(modm::Gpio::High);
 
 	// Enable SPI 2
 	GpioOutputB15::connect(SpiMaster2::Mosi);
@@ -76,7 +76,7 @@ main()
 	// Initialize nRF24-Phy
 	nrf24phy::initialize();
 
-	XPCC_LOG_INFO << "Hello from nRF24-phy-test example" << xpcc::endl;
+	MODM_LOG_INFO << "Hello from nRF24-phy-test example" << modm::endl;
 
 
 	uint8_t rf_ch;
@@ -88,19 +88,19 @@ main()
 
 		nrf24phy::setRxAddress(nrf24phy::Pipe::PIPE_0, 0xdeadb33f05);
 		addr = nrf24phy::getRxAddress(nrf24phy::Pipe::PIPE_0);
-		XPCC_LOG_INFO.printf("Setting RX_P0 address to:  0xDEADB33F05\n");
-		XPCC_LOG_INFO.printf("Reading RX_P0 address:     0x%x%x\n", static_cast<uint32_t>((addr >> 32) & 0xffffffff), static_cast<uint32_t>(addr & 0xffffffff));
+		MODM_LOG_INFO.printf("Setting RX_P0 address to:  0xDEADB33F05\n");
+		MODM_LOG_INFO.printf("Reading RX_P0 address:     0x%x%x\n", static_cast<uint32_t>((addr >> 32) & 0xffffffff), static_cast<uint32_t>(addr & 0xffffffff));
 
 		nrf24phy::setTxAddress(0xabcdef55ff);
 		addr = nrf24phy::getTxAddress();
-		XPCC_LOG_INFO.printf("Setting TX address to:     0xABCDEF55FF\n");
-		XPCC_LOG_INFO.printf("Reading TX address:        0x%x%x\n", static_cast<uint32_t>((addr >> 32) & 0xffffffff), static_cast<uint32_t>(addr & 0xffffffff));
+		MODM_LOG_INFO.printf("Setting TX address to:     0xABCDEF55FF\n");
+		MODM_LOG_INFO.printf("Reading TX address:        0x%x%x\n", static_cast<uint32_t>((addr >> 32) & 0xffffffff), static_cast<uint32_t>(addr & 0xffffffff));
 
 		rf_ch = nrf24phy::readRegister(nrf24phy::NrfRegister::RF_CH);
-		XPCC_LOG_INFO.printf("Expected output for RF_CH: 0x2\n");
-		XPCC_LOG_INFO.printf("Reading RF_CH:             0x%x\n\n", rf_ch);
+		MODM_LOG_INFO.printf("Expected output for RF_CH: 0x2\n");
+		MODM_LOG_INFO.printf("Reading RF_CH:             0x%x\n\n", rf_ch);
 
-		xpcc::delayMilliseconds(1000);
+		modm::delayMilliseconds(1000);
 	}
 
 	return 0;

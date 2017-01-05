@@ -23,10 +23,10 @@ main()
 	while (1)
 	{
 		LedGreen::toggle();
-		xpcc::delayMilliseconds(Button::read() ? 100 : 300);
+		modm::delayMilliseconds(Button::read() ? 100 : 300);
 
 		LedBlue::toggle();
-		xpcc::delayMilliseconds(Button::read() ? 100 : 300);
+		modm::delayMilliseconds(Button::read() ? 100 : 300);
 	}
 
 	return 0;

@@ -39,25 +39,25 @@ namespace std
 	uint16_t
 	sqrt(uint16_t x)
 	{
-		return xpcc::math::sqrt(x);
+		return modm::math::sqrt(x);
 	}
 
 	uint16_t
 	sqrt(int16_t x)
 	{
-		return xpcc::math::sqrt(x);
+		return modm::math::sqrt(x);
 	}
 
 	uint16_t
 	sqrt(uint32_t x)
 	{
-		return xpcc::math::sqrt(x);
+		return modm::math::sqrt(x);
 	}
 
 	uint16_t
 	sqrt(int32_t x)
 	{
-		return xpcc::math::sqrt(x);
+		return modm::math::sqrt(x);
 	}
 
 	float

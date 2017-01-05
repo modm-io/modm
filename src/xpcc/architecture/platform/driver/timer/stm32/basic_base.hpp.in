@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32_TIMER_BASIC_BASE_HPP
-#define XPCC_STM32_TIMER_BASIC_BASE_HPP
+#ifndef MODM_STM32_TIMER_BASIC_BASE_HPP
+#define MODM_STM32_TIMER_BASIC_BASE_HPP
 
 #include <stdint.h>
 #include "../device.hpp"
@@ -23,7 +23,7 @@
  * @defgroup	{{partname}}_timer Timer
  */
 
-namespace xpcc
+namespace modm
 {
 
 namespace stm32
@@ -43,13 +43,13 @@ public:
 	{
 		Update = TIM_DIER_UIE,
 	};
-	XPCC_FLAGS32(Interrupt);
+	MODM_FLAGS32(Interrupt);
 
 	enum class InterruptFlag : uint32_t
 	{
 		Update = TIM_SR_UIF,
 	};
-	XPCC_FLAGS32(InterruptFlag);
+	MODM_FLAGS32(InterruptFlag);
 
 public:
 	/**
@@ -237,6 +237,6 @@ public:
 
 } // namespace stm32
 
-} // namespace xpcc
+} // namespace modm
 
-#endif // XPCC_STM32_TIMER_BASIC_BASE_HPP
+#endif // MODM_STM32_TIMER_BASIC_BASE_HPP

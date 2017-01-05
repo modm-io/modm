@@ -20,30 +20,30 @@ int
 main()
 {
 	Board::initialize();
-	LedJ13::setOutput(xpcc::Gpio::Low);
-	LedJ5::setOutput(xpcc::Gpio::Low);
-	LedA12::setOutput(xpcc::Gpio::Low);
-	LedD4::setOutput(xpcc::Gpio::Low);
+	LedJ13::setOutput(modm::Gpio::Low);
+	LedJ5::setOutput(modm::Gpio::Low);
+	LedA12::setOutput(modm::Gpio::Low);
+	LedD4::setOutput(modm::Gpio::Low);
 
 	// Use the logging streams to print some messages.
-	// Change XPCC_LOG_LEVEL above to enable or disable these messages
-	XPCC_LOG_DEBUG   << "debug"   << xpcc::endl;
-	XPCC_LOG_INFO    << "info"    << xpcc::endl;
-	XPCC_LOG_WARNING << "warning" << xpcc::endl;
-	XPCC_LOG_ERROR   << "error"   << xpcc::endl;
+	// Change MODM_LOG_LEVEL above to enable or disable these messages
+	MODM_LOG_DEBUG   << "debug"   << modm::endl;
+	MODM_LOG_INFO    << "info"    << modm::endl;
+	MODM_LOG_WARNING << "warning" << modm::endl;
+	MODM_LOG_ERROR   << "error"   << modm::endl;
 
 	uint32_t counter(0);
 
 	while (true)
 	{
-		xpcc::delayMilliseconds(Button::read() ? 250 : 1000);
+		modm::delayMilliseconds(Button::read() ? 250 : 1000);
 		LedJ13::toggle();
 		LedJ5::toggle();
 		LedA12::toggle();
 		LedD4::toggle();
 
-		XPCC_LOG_INFO << "loop: " << counter++ << xpcc::endl;
-		XPCC_LOG_INFO << "double: " << Calc::get() << xpcc::endl;
+		MODM_LOG_INFO << "loop: " << counter++ << modm::endl;
+		MODM_LOG_INFO << "double: " << Calc::get() << modm::endl;
 
 		Calc::calc();
 	}

@@ -12,15 +12,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_DEQUE_HPP
-#define	XPCC_DEQUE_HPP
+#ifndef	MODM_DEQUE_HPP
+#define	MODM_DEQUE_HPP
 
 #include <cstddef>
 
 #include <stdint.h>
 #include <modm/utils/template_metaprogramming.hpp>
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	Double ended queue
@@ -57,7 +57,7 @@ namespace xpcc
 	{
 	public:
 		// select the type of the index variables with some template magic :-)
-		typedef typename xpcc::tmp::Select< (N >= 255),
+		typedef typename modm::tmp::Select< (N >= 255),
 											uint_fast16_t,
 											uint_fast8_t >::Result Index;
 		
@@ -165,4 +165,4 @@ namespace xpcc
 
 #include "deque_impl.hpp"
 
-#endif	// XPCC_DEQUE_HPP
+#endif	// MODM_DEQUE_HPP

@@ -21,7 +21,7 @@ BlockAllocatorTest::testAvailableSize()
 {
 	uint8_t *heap = new uint8_t[512];
 	
-	xpcc::BlockAllocator<uint16_t, 8> allocator;
+	modm::BlockAllocator<uint16_t, 8> allocator;
 	allocator.initialize(heap, heap + 512);
 	
 	TEST_ASSERT_EQUALS(allocator.getAvailableSize(), 496U);
@@ -34,7 +34,7 @@ BlockAllocatorTest::testAllocate()
 {
 	uint8_t *heap = new uint8_t[512];
 	
-	xpcc::BlockAllocator<uint16_t, 8> allocator;
+	modm::BlockAllocator<uint16_t, 8> allocator;
 	allocator.initialize(heap, heap + 512);
 	
 	TEST_ASSERT_EQUALS(allocator.getAvailableSize(), 496U);
@@ -60,7 +60,7 @@ BlockAllocatorTest::testFree()
 {
 	uint8_t *heap = new uint8_t[512];
 	
-	xpcc::BlockAllocator<uint16_t, 8> allocator;
+	modm::BlockAllocator<uint16_t, 8> allocator;
 	allocator.initialize(heap, heap + 512);
 	
 	TEST_ASSERT_EQUALS(allocator.getAvailableSize(), 496U);
@@ -86,7 +86,7 @@ BlockAllocatorTest::testAlignment()
 
 	for (uint_fast8_t misalignment = 0; misalignment < 6; ++misalignment)
 	{
-		xpcc::BlockAllocator<uint16_t, 8> allocator;
+		modm::BlockAllocator<uint16_t, 8> allocator;
 		allocator.initialize(heap + misalignment, heap + 512);
 
 		TEST_ASSERT_EQUALS(allocator.getAvailableSize(), 496U);

@@ -18,7 +18,7 @@
 void
 BoundedStackTest::testStack()
 {
-	xpcc::BoundedStack<int16_t, 3> stack;
+	modm::BoundedStack<int16_t, 3> stack;
 	
 	TEST_ASSERT_TRUE(stack.isEmpty());
 	TEST_ASSERT_EQUALS(stack.getMaxSize(), 3U);

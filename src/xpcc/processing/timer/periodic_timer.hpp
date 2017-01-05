@@ -12,12 +12,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PERIODIC_TIMER_HPP
-#define XPCC_PERIODIC_TIMER_HPP
+#ifndef MODM_PERIODIC_TIMER_HPP
+#define MODM_PERIODIC_TIMER_HPP
 
 #include "timeout.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 /// Possible states of a timer
@@ -91,7 +91,7 @@ Remaining:     +    |0|   +   |     -     |0|  +  | -|  + |0| +| -  |0|+| 0
  * @see		GenericTimeout
  *
  * @tparam	Clock
- * 		Used clock which inherits from xpcc::Clock, may have a variable timebase.
+ * 		Used clock which inherits from modm::Clock, may have a variable timebase.
  * @tparam	TimestampType
  * 		Used timestamp which is compatible with the chosen Clock.
  *
@@ -99,7 +99,7 @@ Remaining:     +    |0|   +   |     -     |0|  +  | -|  + |0| +| -  |0|+| 0
  * @author	Niklas Hauser
  * @ingroup	software_timer
  */
-template< class Clock, typename TimestampType = xpcc::Timestamp >
+template< class Clock, typename TimestampType = modm::Timestamp >
 class GenericPeriodicTimer
 {
 public:
@@ -156,14 +156,14 @@ private:
  *
  * @ingroup		software_timer
  */
-using ShortPeriodicTimer = GenericPeriodicTimer< ::xpcc::Clock, ShortTimestamp>;
+using ShortPeriodicTimer = GenericPeriodicTimer< ::modm::Clock, ShortTimestamp>;
 
 /// Periodic software timer for up to 24 days with millisecond resolution.
 /// @ingroup	software_timer
-using PeriodicTimer      = GenericPeriodicTimer< ::xpcc::Clock, Timestamp>;
+using PeriodicTimer      = GenericPeriodicTimer< ::modm::Clock, Timestamp>;
 
 }	// namespace
 
 #include "periodic_timer_impl.hpp"
 
-#endif // XPCC_PERIODIC_TIMER_HPP
+#endif // MODM_PERIODIC_TIMER_HPP

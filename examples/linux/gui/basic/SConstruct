@@ -14,7 +14,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-# path to the xpcc root directory
-xpccpath = '../../../..'
-# execute the xpcc basic
-execfile(xpccpath + '/scons/SConstruct')
+# path to the modm root directory
+modmpath = '../../../..'
+# execute the modm basic
+execfile(modmpath + '/scons/SConstruct')

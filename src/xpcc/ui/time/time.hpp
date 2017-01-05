@@ -11,12 +11,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_TIME_HPP
-#define XPCC_TIME_HPP
+#ifndef MODM_TIME_HPP
+#define MODM_TIME_HPP
 
 #include <stdint.h>
 
-namespace xpcc
+namespace modm
 {
 	// forward declaration
 	class Date;
@@ -41,7 +41,7 @@ namespace xpcc
 		}
 
 		/**
-		 * Converts given time since epoch as xpcc::UnixTime value into
+		 * Converts given time since epoch as modm::UnixTime value into
 		 * calendar time, expressed in Coordinated Universal Time (UTC).
 		 */
 		void
@@ -62,7 +62,7 @@ namespace xpcc
 	public:
 		/**
 		 * Converts calendar time to a time since epoch as a
-		 * xpcc::UnixTime object.
+		 * modm::UnixTime object.
 		 */
 		UnixTime
 		toUnixTimestamp() const;
@@ -79,4 +79,4 @@ namespace xpcc
 	};
 }
 
-#endif	// XPCC_TIME_HPP
+#endif	// MODM_TIME_HPP

@@ -10,13 +10,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32_UART_BAUDRATE_HPP
-#define XPCC_STM32_UART_BAUDRATE_HPP
+#ifndef MODM_STM32_UART_BAUDRATE_HPP
+#define MODM_STM32_UART_BAUDRATE_HPP
 
 #include "uart_base.hpp"
 #include <modm/architecture/interface.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 namespace stm32
@@ -37,7 +37,7 @@ namespace stm32
  * @author	Niklas Hauser
  * @ingroup	{{partname}}_uart
  */
-class UartBaudrate : /** @cond */protected xpcc::Peripheral /** @endcond */
+class UartBaudrate : /** @cond */protected modm::Peripheral /** @endcond */
 {
 public:
 %% if target["family"] != "f1"
@@ -62,7 +62,7 @@ public:
 	 * 		the allowed absolute tolerance for the resulting baudrate
 	 */
 	template< uint32_t clockrate, uint32_t baudrate, uint16_t tolerance = 1000 >
-	static uint16_t xpcc_always_inline
+	static uint16_t modm_always_inline
 	getBrr()
 	{
 %% if target["family"] == "f1"
@@ -105,7 +105,7 @@ public:
 
 }	// namespace stm32
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif // XPCC_STM32_UART_BAUDRATE_HPP
+#endif // MODM_STM32_UART_BAUDRATE_HPP
 

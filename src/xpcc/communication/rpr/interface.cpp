@@ -16,7 +16,7 @@
 #include "interface.hpp"
 
 uint16_t
-xpcc::rpr::crcUpdate(uint16_t crc, uint8_t data)
+modm::rpr::crcUpdate(uint16_t crc, uint8_t data)
 {
 #ifdef __AVR__
 	return _crc16_update(crc, data);

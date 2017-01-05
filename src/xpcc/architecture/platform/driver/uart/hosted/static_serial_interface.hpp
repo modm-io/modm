@@ -10,14 +10,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_HOSTED_STATIC_SERIAL_INTERFACE_HPP
-#define XPCC_HOSTED_STATIC_SERIAL_INTERFACE_HPP
+#ifndef MODM_HOSTED_STATIC_SERIAL_INTERFACE_HPP
+#define MODM_HOSTED_STATIC_SERIAL_INTERFACE_HPP
 
 #include <modm/architecture/interface/uart.hpp>
 
 #include "serial_interface.hpp"
 
-namespace xpcc
+namespace modm
 {
 	namespace hosted
 	{
@@ -32,7 +32,7 @@ namespace xpcc
 		 * @ingroup	linux
 		 */
 		template<int N>
-		class StaticSerialInterface : public xpcc::Uart
+		class StaticSerialInterface : public modm::Uart
 		{
 		public:
 			/**
@@ -100,4 +100,4 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC_HOSTED_STATIC_SERIAL_INTERFACE_HPP
+#endif	// MODM_HOSTED_STATIC_SERIAL_INTERFACE_HPP

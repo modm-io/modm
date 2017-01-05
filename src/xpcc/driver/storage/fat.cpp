@@ -34,7 +34,7 @@ get_fattime(void)
 // ----------------------------------------------------------------------------
 #if _VOLUMES == 1
 
-static xpcc::fat::PhysicalVolume * globalVolume;
+static modm::fat::PhysicalVolume * globalVolume;
 
 extern "C"
 DSTATUS
@@ -95,7 +95,7 @@ disk_ioctl(BYTE /*drive*/, BYTE command, void* buffer)
 #endif
 
 // ----------------------------------------------------------------------------
-xpcc::fat::FileSystem::FileSystem(PhysicalVolume *volume,
+modm::fat::FileSystem::FileSystem(PhysicalVolume *volume,
 		uint8_t drive)
 {
 	globalVolume = volume;
@@ -104,13 +104,13 @@ xpcc::fat::FileSystem::FileSystem(PhysicalVolume *volume,
 	f_mount(drive, &this->fileSystem);
 }
 
-xpcc::fat::FileSystem::~FileSystem()
+modm::fat::FileSystem::~FileSystem()
 {
 	f_mount(this->fileSystem.drv, 0);
 }
 
 // ----------------------------------------------------------------------------
-xpcc::fat::FileInfo::FileInfo()
+modm::fat::FileInfo::FileInfo()
 {
 	info.lfname = 0;
 	info.lfsize = 0;

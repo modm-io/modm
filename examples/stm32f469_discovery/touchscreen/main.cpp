@@ -13,10 +13,10 @@
 #include <modm/processing/protothread.hpp>
 
 using namespace Board;
-using namespace xpcc::glcd;
+using namespace modm::glcd;
 using namespace Board::ft6;
 
-class LineDrawer : public xpcc::pt::Protothread
+class LineDrawer : public modm::pt::Protothread
 {
 public:
 	LineDrawer() :
@@ -84,7 +84,7 @@ public:
 private:
 	Touch::Data touchData;
 	Touch touch;
-	xpcc::GraphicDisplay& display;
+	modm::GraphicDisplay& display;
 	int16_t px[2], py[2];
 	Color c[2];
 };

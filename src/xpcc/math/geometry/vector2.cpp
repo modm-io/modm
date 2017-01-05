@@ -18,7 +18,7 @@
 
 // this explicit namespace is needed here, otherwise we get an error about 
 // "specialization of ... in different namespace"
-namespace xpcc
+namespace modm
 {
 	template<>
 	int16_t
@@ -46,7 +46,7 @@ namespace xpcc
 	
 	template<>
 	int32_t
-	Vector<int16_t, 2>::dot(const xpcc::Vector<int16_t, 2>& other) const
+	Vector<int16_t, 2>::dot(const modm::Vector<int16_t, 2>& other) const
 	{
 		int32_t t;
 		

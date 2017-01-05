@@ -16,12 +16,12 @@ CanMessageTest::testEqualOperator()
 {
 	// Construct two equal messages
 
-	xpcc::can::Message msgA(0x12);
+	modm::can::Message msgA(0x12);
 	msgA.setLength(2);
 	msgA.data[0] = 0x82;
 	msgA.data[1] = 0x22;
 
-	xpcc::can::Message msgB(0x12);
+	modm::can::Message msgB(0x12);
 	msgB.setLength(2);
 	msgB.data[0] = 0x82;
 	msgB.data[1] = 0x22;

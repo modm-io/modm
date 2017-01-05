@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_NRF24_PHY_HPP
-#define XPCC_NRF24_PHY_HPP
+#ifndef MODM_NRF24_PHY_HPP
+#define MODM_NRF24_PHY_HPP
 
 #include <stdint.h>
 #include <modm/debug/logger.hpp>
@@ -21,10 +21,10 @@
 #include <modm/architecture/driver/delay.hpp>
 #include "nrf24_definitions.hpp"
 
-#undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::DISABLED
+#undef  MODM_LOG_LEVEL
+#define MODM_LOG_LEVEL modm::log::DISABLED
 
-namespace xpcc
+namespace modm
 {
 
 //namespace nrf24
@@ -326,7 +326,7 @@ private:
 
 //} // namespace nrf24
 
-} // namespace xpcc
+} // namespace modm
 
 #include "nrf24_phy_impl.hpp"
 

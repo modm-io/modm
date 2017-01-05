@@ -14,22 +14,22 @@
 #include <modm/architecture/platform.hpp>
 #include <modm/debug/logger.hpp>
 
-using namespace xpcc::atmega;
-typedef xpcc::avr::SystemClock clock;
+using namespace modm::atmega;
+typedef modm::avr::SystemClock clock;
 
 // Create a new UART object and configure it to a baudrate of 115200
 Uart0 uart;
-xpcc::IODeviceWrapper< Uart0, xpcc::IOBuffer::BlockIfFull > loggerDevice(uart);
+modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > loggerDevice(uart);
 
 // Set all four logger streams to use the UART
-xpcc::log::Logger xpcc::log::debug(loggerDevice);
-xpcc::log::Logger xpcc::log::info(loggerDevice);
-xpcc::log::Logger xpcc::log::warning(loggerDevice);
-xpcc::log::Logger xpcc::log::error(loggerDevice);
+modm::log::Logger modm::log::debug(loggerDevice);
+modm::log::Logger modm::log::info(loggerDevice);
+modm::log::Logger modm::log::warning(loggerDevice);
+modm::log::Logger modm::log::error(loggerDevice);
 
 // Set the log level
-#undef	XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::DEBUG
+#undef	MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::DEBUG
 
 int
 main()
@@ -42,11 +42,11 @@ main()
 	sei();
 
 	// Use the logging streams to print some messages.
-	// Change XPCC_LOG_LEVEL above to enable or disable these messages
-	XPCC_LOG_DEBUG   << "debug"   << xpcc::endl;
-	XPCC_LOG_INFO    << "info"    << xpcc::endl;
-	XPCC_LOG_WARNING << "warning" << xpcc::endl;
-	XPCC_LOG_ERROR   << "error"   << xpcc::endl;
+	// Change MODM_LOG_LEVEL above to enable or disable these messages
+	MODM_LOG_DEBUG   << "debug"   << modm::endl;
+	MODM_LOG_INFO    << "info"    << modm::endl;
+	MODM_LOG_WARNING << "warning" << modm::endl;
+	MODM_LOG_ERROR   << "error"   << modm::endl;
 
 	while (1)
 	{

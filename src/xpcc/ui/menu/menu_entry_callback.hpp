@@ -14,21 +14,21 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_MENU_ENTRY_CALLBACK
-#define XPCC_MENU_ENTRY_CALLBACK
+#ifndef MODM_MENU_ENTRY_CALLBACK
+#define MODM_MENU_ENTRY_CALLBACK
 
 #include "abstract_menu.hpp"
 
-namespace xpcc
+namespace modm
 {
 	class MenuEntryCallback
 	{
 	public:
-			typedef void (xpcc::AbstractMenu::*Function)();
+			typedef void (modm::AbstractMenu::*Function)();
 
 			template <typename M>
 			MenuEntryCallback(M *menu, void (M::*function)()) :
-				menu(reinterpret_cast<xpcc::AbstractMenu *>(menu)),
+				menu(reinterpret_cast<modm::AbstractMenu *>(menu)),
 				function(reinterpret_cast<Function>(function))
 			{
 			}
@@ -40,8 +40,8 @@ namespace xpcc
 			}
 
 		protected:
-			xpcc::AbstractMenu * const menu;
+			modm::AbstractMenu * const menu;
 			Function const function;
 		};
 }
-#endif // XPCC_MENU_ENTRY_CALLBACK
+#endif // MODM_MENU_ENTRY_CALLBACK

@@ -10,12 +10,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_DS18B20_HPP
-#define XPCC_DS18B20_HPP
+#ifndef MODM_DS18B20_HPP
+#define MODM_DS18B20_HPP
 
 #include <modm/architecture/interface/one_wire.hpp>
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	Programmable resolution 1-wire digital thermometer
@@ -129,4 +129,4 @@ namespace xpcc
 
 #include "ds18b20_impl.hpp"
 
-#endif // XPCC_DS18B20_HPP
+#endif // MODM_DS18B20_HPP

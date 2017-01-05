@@ -17,7 +17,7 @@ these building blocks where possible.
 
 ### Clock Sources
 
-On almost every controller supported by XPCC there are three different clock
+On almost every controller supported by MODM there are three different clock
 sources:
 
 1. **InternalClock**: the clock the controller runs on at startup

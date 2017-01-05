@@ -16,7 +16,7 @@
 
 // ----------------------------------------------------------------------------
 std::size_t
-xpcc::bitCount(uint8_t n)
+modm::bitCount(uint8_t n)
 {
 	n = ((uint8_t) (n >> 1) & 0x55) + (n & 0x55);
 	n = ((uint8_t) (n >> 2) & 0x33) + (n & 0x33);
@@ -26,14 +26,14 @@ xpcc::bitCount(uint8_t n)
 }
 
 std::size_t
-xpcc::bitCount(uint16_t n)
+modm::bitCount(uint16_t n)
 {
 	return (bitCount((uint8_t) (n)) +
 			bitCount((uint8_t) (n >> 8)));
 }
 
 std::size_t
-xpcc::bitCount(uint32_t n)
+modm::bitCount(uint32_t n)
 {
 	n = ((n >> 1) & 0x55555555) + (n & 0x55555555);
 	n = ((n >> 2) & 0x33333333) + (n & 0x33333333);

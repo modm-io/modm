@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_CORTEX_SYSTICK_TIMER_HPP
-#define XPCC_CORTEX_SYSTICK_TIMER_HPP
+#ifndef MODM_CORTEX_SYSTICK_TIMER_HPP
+#define MODM_CORTEX_SYSTICK_TIMER_HPP
 
 #include <stdint.h>
 #include <modm/architecture/interface.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 namespace cortex
@@ -37,19 +37,19 @@ public:
 	 *
 	 *
 	 * @warning	The SysTick Timer is used by default to increment
-	 * 			xpcc::Clock, which is used by xpcc::Timeout and other
+	 * 			modm::Clock, which is used by modm::Timeout and other
 	 * 			similar processing classes.
-	 * 			You must not increment the xpcc::Clock
+	 * 			You must not increment the modm::Clock
 	 * 			additionally somewhere else.
 	 *
 	 * @tparam	SystemClock
 	 * 		the currently active system clock
 	 * @tparam	rate
-	 * 		the desired update rate of the xpcc::Clock
+	 * 		the desired update rate of the modm::Clock
 	 * @tparam	tolerance
 	 * 		the allowed absolute tolerance for the resulting clock rate
 	 */
-	template< class SystemClock, uint16_t tolerance = xpcc::Tolerance::ZeroPercent >
+	template< class SystemClock, uint16_t tolerance = modm::Tolerance::ZeroPercent >
 	static void
 	initialize()
 	{
@@ -87,9 +87,9 @@ public:
 	/**
 	 * Disables SysTick Timer.
 	 *
-	 * @warning	If the SysTick Timer is disabled xpcc::Clock is not
+	 * @warning	If the SysTick Timer is disabled modm::Clock is not
 	 * 			incremented automatically. Workflow classes which
-	 * 			rely on xpcc::Clock will not work if xpcc::Clock
+	 * 			rely on modm::Clock will not work if modm::Clock
 	 * 			is not incremented.
 	 */
 	static void
@@ -117,4 +117,4 @@ private:
 
 }
 
-#endif	//  XPCC_STM32_CORTEX_TIMER_HPP
+#endif	//  MODM_STM32_CORTEX_TIMER_HPP

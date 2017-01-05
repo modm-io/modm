@@ -13,8 +13,8 @@
 // This implementation is adapted from the Loki library, distributed under
 // the MIT license with Copyright (c) 2001 by Andrei Alexandrescu.
 
-#ifndef XPCC_TMP_TEMPLATE_METAPROGRAMMING_HPP
-#define XPCC_TMP_TEMPLATE_METAPROGRAMMING_HPP
+#ifndef MODM_TMP_TEMPLATE_METAPROGRAMMING_HPP
+#define MODM_TMP_TEMPLATE_METAPROGRAMMING_HPP
 
 #include <modm/architecture/utils.hpp>
 
@@ -30,7 +30,7 @@
  * \see		http://en.wikipedia.org/wiki/Template_metaprogramming
  */
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	Template Metaprogramming
@@ -315,21 +315,21 @@ namespace xpcc
 		 * \deprecated Use static_assert(bool_constexpr, string) (since C++11) instead.
 		 */
 #ifdef __DOXYGEN__
-		#define	XPCC_STATIC_ASSERT(condition, msg)
+		#define	MODM_STATIC_ASSERT(condition, msg)
 #else
 		// automatically use C++11 if possible
 #	if __cplusplus < 201103L
-		#define	XPCC_STATIC_ASSERT(condition, msg) 					\
-			typedef ::xpcc::tmp::static_assert_test<					\
-				sizeof(::xpcc::tmp::STATIC_ASSERTION_FAILURE< (bool) (condition) >) >\
-					XPCC_CONCAT(static_assert_typedef_, __LINE__)
+		#define	MODM_STATIC_ASSERT(condition, msg) 					\
+			typedef ::modm::tmp::static_assert_test<					\
+				sizeof(::modm::tmp::STATIC_ASSERTION_FAILURE< (bool) (condition) >) >\
+					MODM_CONCAT(static_assert_typedef_, __LINE__)
 #	else
-		#define	XPCC_STATIC_ASSERT(condition, msg) 					\
+		#define	MODM_STATIC_ASSERT(condition, msg) 					\
 			static_assert(condition, msg)
 #	endif
 #endif
 	}
 }
 
-#endif // XPCC_TMP_TEMPLATE_METAPROGRAMMING_HPP
+#endif // MODM_TMP_TEMPLATE_METAPROGRAMMING_HPP
 

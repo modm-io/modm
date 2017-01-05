@@ -13,10 +13,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32_ERROR_HPP
-#define XPCC_STM32_ERROR_HPP
+#ifndef MODM_STM32_ERROR_HPP
+#define MODM_STM32_ERROR_HPP
 
-namespace xpcc
+namespace modm
 {
 	namespace stm32
 	{

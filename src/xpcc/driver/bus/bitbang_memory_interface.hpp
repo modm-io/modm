@@ -10,10 +10,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_BITBANG_MEMORY_INTERFACE_HPP
-#define XPCC_BITBANG_MEMORY_INTERFACE_HPP
+#ifndef MODM_BITBANG_MEMORY_INTERFACE_HPP
+#define MODM_BITBANG_MEMORY_INTERFACE_HPP
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	Access external parallel memory with bit-bang mode.
@@ -36,13 +36,13 @@ namespace xpcc
 	class BitbangMemoryInterface
 	{
 	public:
-		xpcc_always_inline static void
+		modm_always_inline static void
 		initialize();
 
-		xpcc_always_inline static void
+		modm_always_inline static void
 		writeRegister(const uint8_t reg);
 
-		xpcc_always_inline static void
+		modm_always_inline static void
 		writeCommand(const uint8_t command, const uint16_t data);
 
 		static void
@@ -52,7 +52,7 @@ namespace xpcc
 		writeRam(uint8_t * addr, const uint16_t size);
 
 	protected:
-		xpcc_always_inline static void
+		modm_always_inline static void
 		writeData(const uint16_t data);
 
 	protected:
@@ -66,4 +66,4 @@ namespace xpcc
 
 #include "bitbang_memory_interface_impl.hpp"
 
-#endif // XPCC_BITBANG_MEMORY_INTERFACE_HPP
+#endif // MODM_BITBANG_MEMORY_INTERFACE_HPP

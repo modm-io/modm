@@ -75,7 +75,7 @@ sdram_send_command(uint8_t mode, uint8_t auto_refresh = 1, uint16_t mode_registe
 
 	int t = 1024;
 	for (; (FMC_Bank5_6->SDSR & FMC_SDSR_BUSY) and t; t--) {
-		xpcc::delayMilliseconds(1);
+		modm::delayMilliseconds(1);
 	}
 
 	return t;
@@ -84,7 +84,7 @@ sdram_send_command(uint8_t mode, uint8_t auto_refresh = 1, uint16_t mode_registe
 void
 board_initialize_sdram()
 {
-	using namespace xpcc;
+	using namespace modm;
 	// Strongly inspired by the F469I-DISCO BSP from ST
 
 	// Configure all pins
@@ -135,7 +135,7 @@ board_initialize_sdram()
 
 	// FMC_SDRAM_CMD_CLK_ENABLE
 	sdram_send_command(1);
-	xpcc::delayMilliseconds(1);
+	modm::delayMilliseconds(1);
 	// FMC_SDRAM_CMD_PALL
 	sdram_send_command(2);
 	// FMC_SDRAM_CMD_AUTOREFRESH_MODE

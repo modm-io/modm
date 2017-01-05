@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_ATOMIC_CONTAINER_HPP
-#define	XPCC_ATOMIC_CONTAINER_HPP
+#ifndef	MODM_ATOMIC_CONTAINER_HPP
+#define	MODM_ATOMIC_CONTAINER_HPP
 
 #include "lock.hpp"
 #include <modm/architecture/driver/accessor.hpp>
 
-namespace xpcc
+namespace modm
 {
 	namespace atomic
 	{
@@ -34,7 +34,7 @@ namespace xpcc
 		 * 
 		 * Example: 
 		 * \code
-		 * xpcc::atomic::Containter<uint32_t> data;
+		 * modm::atomic::Containter<uint32_t> data;
 		 * 
 		 * // interrupt routine
 		 * ISR() {
@@ -51,7 +51,7 @@ namespace xpcc
 		 * for the ATmega, but not for the ATxmega!) no atomic access is needed
 		 * then:
 		 * \code
-		 * xpcc::atomic::Containter<uint32_t> data;
+		 * modm::atomic::Containter<uint32_t> data;
 		 * 
 		 * ISR() {
 		 *     data.directAccess() = 123;
@@ -62,7 +62,7 @@ namespace xpcc
 		 * 
 		 * If the object is big or a lot of accessed one after another are
 		 * done, consider dropping this class and create critical sections
-		 * for the access by yourself with xpcc::atomic::Lock.
+		 * for the access by yourself with modm::atomic::Lock.
 		 * 
 		 * This can be a lot faster because the object don't need to be copied
 		 * as it is the case here!
@@ -101,7 +101,7 @@ namespace xpcc
 			 * between interrupt routines and the main-loop. 
 			 * 
 			 * \code
-			 * xpcc::atomic::Container<uint8_t> isrCounter;
+			 * modm::atomic::Container<uint8_t> isrCounter;
 			 * 
 			 * ISR() {
 			 *     ...
@@ -116,7 +116,7 @@ namespace xpcc
 			 * \endcode
 			 * 
 			 * The same behavior for boolean values is provide by
-			 * xpcc::atomic::Flag()
+			 * modm::atomic::Flag()
 			 */
 			inline T
 			swap(T value)
@@ -155,4 +155,4 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC_ATOMIC_CONTAINER_HPP
+#endif	// MODM_ATOMIC_CONTAINER_HPP

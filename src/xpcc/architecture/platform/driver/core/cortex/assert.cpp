@@ -13,8 +13,8 @@
 
 extern "C" void exit(int);
 
-using xpcc::AssertionHandler;
-using xpcc::Abandonment;
+using modm::AssertionHandler;
+using modm::Abandonment;
 
 extern AssertionHandler __assertion_table_start;
 extern AssertionHandler __assertion_table_end;
@@ -22,7 +22,7 @@ extern AssertionHandler __assertion_table_end;
 extern "C"
 {
 
-void xpcc_assert_evaluate(bool condition, const char * identifier)
+void modm_assert_evaluate(bool condition, const char * identifier)
 {
 	if (!condition)
 	{
@@ -40,13 +40,13 @@ void xpcc_assert_evaluate(bool condition, const char * identifier)
 		if (state == (uint8_t) Abandonment::DontCare or
 			state & (uint8_t) Abandonment::Fail)
 		{
-			xpcc_abandon(module, location, failure);
+			modm_abandon(module, location, failure);
 			exit(1);
 		}
 	}
 }
 
-void xpcc_abandon(const char *, const char *, const char *) __attribute__((weak));
-void xpcc_abandon(const char *, const char *, const char *) {}
+void modm_abandon(const char *, const char *, const char *) __attribute__((weak));
+void modm_abandon(const char *, const char *, const char *) {}
 
 }

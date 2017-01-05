@@ -36,17 +36,17 @@
  */
 
 // Set the log level
-#undef	XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::DEBUG
+#undef	MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::DEBUG
 
 // Create an IODeviceWrapper around the Uart Peripheral we want to use
-xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > loggerDevice;
+modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
 
 // Set all four logger streams to use the UART
-xpcc::log::Logger xpcc::log::debug(loggerDevice);
-xpcc::log::Logger xpcc::log::info(loggerDevice);
-xpcc::log::Logger xpcc::log::warning(loggerDevice);
-xpcc::log::Logger xpcc::log::error(loggerDevice);
+modm::log::Logger modm::log::debug(loggerDevice);
+modm::log::Logger modm::log::info(loggerDevice);
+modm::log::Logger modm::log::warning(loggerDevice);
+modm::log::Logger modm::log::error(loggerDevice);
 
 
 void
@@ -74,11 +74,11 @@ initLogger()
  * the address pins A24:A0.
  * So when writing to offset +((1 << 16) << 1) pin A16 is high.
  */
-xpcc::TftMemoryBus16Bit parallelBus(
+modm::TftMemoryBus16Bit parallelBus(
 		(volatile uint16_t *) 0x60000000,
 		(volatile uint16_t *) 0x60020000);
 
-xpcc::ParallelTft<xpcc::TftMemoryBus16Bit> tft(parallelBus);
+modm::ParallelTft<modm::TftMemoryBus16Bit> tft(parallelBus);
 
 // ----------------------------------------------------------------------------
 
@@ -86,9 +86,9 @@ constexpr uint8_t 	TP_TOLERANCE 		= 	30;		// in pixels
 constexpr uint16_t	TOUCH_REPEAT_RATE	=	600;	// in ms, 0 to disable
 
 
-xpcc::gui::inputQueue input_queue;
-xpcc::gui::AsyncEventList async_events;
-xpcc::glcd::Point last_point;
+modm::gui::inputQueue input_queue;
+modm::gui::AsyncEventList async_events;
+modm::glcd::Point last_point;
 
 // ----------------------------------------------------------------------------
 // Touchscreen
@@ -96,8 +96,8 @@ xpcc::glcd::Point last_point;
 typedef GpioOutputC4 CsTouchscreen;
 typedef GpioInputC5  IntTouchscreen;
 
-xpcc::Ads7843<SpiMaster2, CsTouchscreen, IntTouchscreen> ads7843;
-xpcc::TouchscreenCalibrator touchscreen;
+modm::Ads7843<SpiMaster2, CsTouchscreen, IntTouchscreen> ads7843;
+modm::TouchscreenCalibrator touchscreen;
 
 typedef GpioOutputD7 CS;
 
@@ -179,15 +179,15 @@ initTouchscreen()
 // ----------------------------------------------------------------------------
 /* screen calibration  */
 static void
-drawCross(xpcc::GraphicDisplay& display, xpcc::glcd::Point center)
+drawCross(modm::GraphicDisplay& display, modm::glcd::Point center)
 {
-	display.setColor(xpcc::glcd::Color::red());
+	display.setColor(modm::glcd::Color::red());
 	display.drawLine(center.x - 15, center.y, center.x - 2, center.y);
 	display.drawLine(center.x + 2, center.y, center.x + 15, center.y);
 	display.drawLine(center.x, center.y - 15, center.x, center.y - 2);
 	display.drawLine(center.x, center.y + 2, center.x, center.y + 15);
 	typedef void (*genericCallback)(void*);
-	display.setColor(xpcc::glcd::Color::white());
+	display.setColor(modm::glcd::Color::white());
 	display.drawLine(center.x - 15, center.y + 15, center.x - 7, center.y + 15);
 	display.drawLine(center.x - 15, center.y + 7, center.x - 15, center.y + 15);
 
@@ -202,28 +202,28 @@ drawCross(xpcc::GraphicDisplay& display, xpcc::glcd::Point center)
 }
 
 static void
-calibrateTouchscreen(xpcc::GraphicDisplay& display, xpcc::glcd::Point *fixed_samples = NULL)
+calibrateTouchscreen(modm::GraphicDisplay& display, modm::glcd::Point *fixed_samples = NULL)
 {
-	xpcc::glcd::Point calibrationPoint[3] = { { 45, 45 }, { 270, 90 }, { 100, 190 } };
-	xpcc::glcd::Point sample[3];
+	modm::glcd::Point calibrationPoint[3] = { { 45, 45 }, { 270, 90 }, { 100, 190 } };
+	modm::glcd::Point sample[3];
 
 	if(!fixed_samples) {
 		for (uint8_t i = 0; i < 3; i++)
 		{
 			display.clear();
 
-			display.setColor(xpcc::glcd::Color::yellow());
+			display.setColor(modm::glcd::Color::yellow());
 			display.setCursor(50, 5);
 			display << "Touch crosshair to calibrate";
 
 			drawCross(display, calibrationPoint[i]);
-			xpcc::delayMilliseconds(500);
+			modm::delayMilliseconds(500);
 
 			while (!ads7843.read(&sample[i])) {
 				// wait until a valid sample can be taken
 			}
 
-			XPCC_LOG_DEBUG << "calibration point: (" << sample[i].x << " | " << sample[i].y << ")" << xpcc::endl;
+			MODM_LOG_DEBUG << "calibration point: (" << sample[i].x << " | " << sample[i].y << ")" << modm::endl;
 		}
 
 		touchscreen.calibrate(calibrationPoint, sample);
@@ -236,7 +236,7 @@ calibrateTouchscreen(xpcc::GraphicDisplay& display, xpcc::glcd::Point *fixed_sam
 }
 
 void
-drawPoint(xpcc::GraphicDisplay& display, xpcc::glcd::Point point)
+drawPoint(modm::GraphicDisplay& display, modm::glcd::Point point)
 {
 	if (point.x < 0 || point.y < 0) {
 		return;
@@ -273,7 +273,7 @@ touchActive()
 	bool m1, m2;
 
 	m1 = !IntTouchscreen::read();
-	xpcc::delayMicroseconds(130);
+	modm::delayMicroseconds(130);
 	m2 = !IntTouchscreen::read();
 
 	return (m1 || m2);
@@ -282,13 +282,13 @@ touchActive()
 void
 resetTouchLock(void* data)
 {
-	last_point = xpcc::glcd::Point(-400, -400);
+	last_point = modm::glcd::Point(-400, -400);
 }
 
 bool
-debounceTouch(xpcc::glcd::Point *out, xpcc::glcd::Point *old)
+debounceTouch(modm::glcd::Point *out, modm::glcd::Point *old)
 {
-	xpcc::glcd::Point raw, point;
+	modm::glcd::Point raw, point;
 
 	if(touchActive()) {
 
@@ -313,14 +313,14 @@ debounceTouch(xpcc::glcd::Point *out, xpcc::glcd::Point *old)
 			// schedule a reset for debounce lock, so that holding the finger fires repeated touch events
 			if(TOUCH_REPEAT_RATE)
 			{
-				async_events.append(new xpcc::gui::AsyncEvent(TOUCH_REPEAT_RATE, &resetTouchLock, NULL));
+				async_events.append(new modm::gui::AsyncEvent(TOUCH_REPEAT_RATE, &resetTouchLock, NULL));
 			}
 
 			return true;
 		}
 	} else {
 		// reset old point so that when touched again you can touch the same spot
-		*old = xpcc::glcd::Point(-400, -400);
+		*old = modm::glcd::Point(-400, -400);
 	}
 	return false;
 }
@@ -328,11 +328,11 @@ debounceTouch(xpcc::glcd::Point *out, xpcc::glcd::Point *old)
 void
 touchUp(void* data)
 {
-	xpcc::gui::InputEvent* ev = static_cast<xpcc::gui::InputEvent*>(data);
+	modm::gui::InputEvent* ev = static_cast<modm::gui::InputEvent*>(data);
 
-	XPCC_LOG_DEBUG << "asynchronous UP-event:" << xpcc::endl;
-	XPCC_LOG_DEBUG << "x: " << ev->coord.x << xpcc::endl;
-	XPCC_LOG_DEBUG << "y: " << ev->coord.y << xpcc::endl;
+	MODM_LOG_DEBUG << "asynchronous UP-event:" << modm::endl;
+	MODM_LOG_DEBUG << "x: " << ev->coord.x << modm::endl;
+	MODM_LOG_DEBUG << "y: " << ev->coord.y << modm::endl;
 
 	// queue UP-event as new input event
 	input_queue.push(ev);
@@ -343,27 +343,27 @@ void
 gatherInput()
 {
 
-	xpcc::glcd::Point point;
+	modm::glcd::Point point;
 
 	if (debounceTouch(&point, &last_point)) {
 
-		auto ev_down = new xpcc::gui::InputEvent(point,
-											 	 xpcc::gui::InputEvent::Type::TOUCH,
-											 	 xpcc::gui::InputEvent::Direction::DOWN);
+		auto ev_down = new modm::gui::InputEvent(point,
+											 	 modm::gui::InputEvent::Type::TOUCH,
+											 	 modm::gui::InputEvent::Direction::DOWN);
 
-		auto ev_up = new xpcc::gui::InputEvent( point,
-												xpcc::gui::InputEvent::Type::TOUCH,
-												xpcc::gui::InputEvent::Direction::UP);
+		auto ev_up = new modm::gui::InputEvent( point,
+												modm::gui::InputEvent::Type::TOUCH,
+												modm::gui::InputEvent::Direction::UP);
 
 		// queue down event
 		input_queue.push(ev_down);
 
 		// create an asynchronous event with Direction::UP and 200ms delay
-		auto async_ev = new xpcc::gui::AsyncEvent(500, &touchUp, (void*)(ev_up));
+		auto async_ev = new modm::gui::AsyncEvent(500, &touchUp, (void*)(ev_up));
 		async_events.append(async_ev);
 
-		XPCC_LOG_DEBUG << "touch down x: " << point.x << xpcc::endl;
-		XPCC_LOG_DEBUG << "touch down y: " << point.y << xpcc::endl;
+		MODM_LOG_DEBUG << "touch down x: " << point.x << modm::endl;
+		MODM_LOG_DEBUG << "touch down y: " << point.y << modm::endl;
 
 	}
 }
@@ -388,7 +388,7 @@ updateAsyncEvents()
 // ----------------------------------------------------------------------------
 
 void
-test_callback(const xpcc::gui::InputEvent& ev, xpcc::gui::Widget* w, void* data)
+test_callback(const modm::gui::InputEvent& ev, modm::gui::Widget* w, void* data)
 {
 	// avoid warnings
 	(void) ev;
@@ -399,25 +399,25 @@ test_callback(const xpcc::gui::InputEvent& ev, xpcc::gui::Widget* w, void* data)
 }
 
 
-//xpcc::gui::ColorPalette colorpalette[xpcc::gui::Color::PALETTE_SIZE] = {
-//	xpcc::glcd::Color::black(),
-//	xpcc::glcd::Color::white(),
-//	xpcc::glcd::Color::gray(),
-//	xpcc::glcd::Color::red(),
-//	xpcc::glcd::Color::green(),
-//	xpcc::glcd::Color::blue(),
-//	xpcc::glcd::Color::blue(),		// BORDER
-//	xpcc::glcd::Color::red(),		// TEXT
-//	xpcc::glcd::Color::black(),		// BACKGROUND
-//	xpcc::glcd::Color::red(),		// ACTIVATED
-//	xpcc::glcd::Color::blue(),		// DEACTIVATED
+//modm::gui::ColorPalette colorpalette[modm::gui::Color::PALETTE_SIZE] = {
+//	modm::glcd::Color::black(),
+//	modm::glcd::Color::white(),
+//	modm::glcd::Color::gray(),
+//	modm::glcd::Color::red(),
+//	modm::glcd::Color::green(),
+//	modm::glcd::Color::blue(),
+//	modm::glcd::Color::blue(),		// BORDER
+//	modm::glcd::Color::red(),		// TEXT
+//	modm::glcd::Color::black(),		// BACKGROUND
+//	modm::glcd::Color::red(),		// ACTIVATED
+//	modm::glcd::Color::blue(),		// DEACTIVATED
 //
 //};
 
 /*
  * empirically found calibration points
  */
-xpcc::glcd::Point calibration[] = {{3339, 3046},{931, 2428},{2740, 982}};
+modm::glcd::Point calibration[] = {{3339, 3046},{931, 2428},{2740, 982}};
 
 // ----------------------------------------------------------------------------
 int
@@ -427,7 +427,7 @@ main()
 
 	initLogger();
 
-	XPCC_LOG_DEBUG << "Hello from xpcc gui example!" << xpcc::endl;
+	MODM_LOG_DEBUG << "Hello from modm gui example!" << modm::endl;
 
 	initDisplay();
 	initTouchscreen();
@@ -443,19 +443,19 @@ main()
 	 * manipulate the color palette
 	 */
 
-//	colorpalette[xpcc::gui::Color::TEXT] = xpcc::glcd::Color::yellow();
+//	colorpalette[modm::gui::Color::TEXT] = modm::glcd::Color::yellow();
 
 
 	/*
 	 * Create a view and some widgets
 	 */
 
-//	xpcc::gui::View myView(&tft, colorpalette, &input_queue);
+//	modm::gui::View myView(&tft, colorpalette, &input_queue);
 
-	xpcc::gui::ButtonWidget toggleLedButton((char*)"Toggle Green", xpcc::gui::Dimension(100, 50));
-	xpcc::gui::ButtonWidget doNothingButton((char*)"Do nothing", xpcc::gui::Dimension(100, 50));
+	modm::gui::ButtonWidget toggleLedButton((char*)"Toggle Green", modm::gui::Dimension(100, 50));
+	modm::gui::ButtonWidget doNothingButton((char*)"Do nothing", modm::gui::Dimension(100, 50));
 
-	xpcc::gui::IntegerRocker rocker1(100, 50, xpcc::gui::Dimension(200, 30));
+	modm::gui::IntegerRocker rocker1(100, 50, modm::gui::Dimension(200, 30));
 
 
 	/*
@@ -469,9 +469,9 @@ main()
 	 * place widgets in view
 	 */
 
-//	myView.pack(&toggleLedButton, xpcc::glcd::Point(110, 10));
-//	myView.pack(&doNothingButton, xpcc::glcd::Point(110, 80));
-//	myView.pack(&rocker1, xpcc::glcd::Point(60, 200));
+//	myView.pack(&toggleLedButton, modm::glcd::Point(110, 10));
+//	myView.pack(&doNothingButton, modm::glcd::Point(110, 80));
+//	myView.pack(&rocker1, modm::glcd::Point(60, 200));
 
 	/*
 	 * main loop
@@ -490,7 +490,7 @@ main()
 		/*
 		 * display an arbitrary image
 		 */
-		//tft.drawImage(xpcc::glcd::Point(304, 3),xpcc::accessor::asFlash(bitmap::bluetooth_12x16));
+		//tft.drawImage(modm::glcd::Point(304, 3),modm::accessor::asFlash(bitmap::bluetooth_12x16));
 
 	}
 

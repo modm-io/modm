@@ -11,12 +11,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_SATURATED_HPP
-#define	XPCC_SATURATED_HPP
+#ifndef	MODM_SATURATED_HPP
+#define	MODM_SATURATED_HPP
 
 #include <modm/utils/arithmetic_traits.hpp>
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \ingroup	math
@@ -121,4 +121,4 @@ namespace xpcc
 
 #include "saturated_impl.hpp"
 
-#endif	// XPCC_SATURATED_HPP
+#endif	// MODM_SATURATED_HPP

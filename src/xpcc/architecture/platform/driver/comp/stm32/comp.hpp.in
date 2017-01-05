@@ -12,8 +12,8 @@
 
 {{ generation_block }}
 
-#ifndef XPCC_STM32_COMP{{ id }}_HPP
-#define XPCC_STM32_COMP{{ id }}_HPP
+#ifndef MODM_STM32_COMP{{ id }}_HPP
+#define MODM_STM32_COMP{{ id }}_HPP
 
 /**
  * @ingroup 	{{target.string}}
@@ -21,7 +21,7 @@
  */
 
 #if defined(STM32F3XX)
-namespace xpcc
+namespace modm
 {
 	namespace stm32
 	{
@@ -712,4 +712,4 @@ namespace xpcc
 				"feature is enabled on you platform?"
 #endif
 
-#endif	//  XPCC_STM32_COMP{{ id }}_HPP
+#endif	//  MODM_STM32_COMP{{ id }}_HPP

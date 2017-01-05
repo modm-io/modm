@@ -20,14 +20,14 @@
 void
 PeriodicTimerTest::setUp()
 {
-	xpcc::ClockDummy::setTime(0);
+	modm::ClockDummy::setTime(0);
 }
 
 void
 PeriodicTimerTest::testConstructor()
 {
-	xpcc::GenericPeriodicTimer<xpcc::ClockDummy, xpcc::ShortTimestamp> timerShort(10);
-	xpcc::GenericPeriodicTimer<xpcc::ClockDummy, xpcc::Timestamp> timer(10);
+	modm::GenericPeriodicTimer<modm::ClockDummy, modm::ShortTimestamp> timerShort(10);
+	modm::GenericPeriodicTimer<modm::ClockDummy, modm::Timestamp> timer(10);
 
 	TEST_ASSERT_EQUALS(timerShort.remaining(), 10l);
 	TEST_ASSERT_EQUALS(timer.remaining(), 10l);
@@ -35,8 +35,8 @@ PeriodicTimerTest::testConstructor()
 	TEST_ASSERT_FALSE(timerShort.isStopped());
 	TEST_ASSERT_FALSE(timer.isStopped());
 
-	TEST_ASSERT_TRUE(timerShort.getState() == xpcc::PeriodicTimerState::Armed);
-	TEST_ASSERT_TRUE(timer.getState() == xpcc::PeriodicTimerState::Armed);
+	TEST_ASSERT_TRUE(timerShort.getState() == modm::PeriodicTimerState::Armed);
+	TEST_ASSERT_TRUE(timer.getState() == modm::PeriodicTimerState::Armed);
 
 	TEST_ASSERT_FALSE(timerShort.execute());
 	TEST_ASSERT_FALSE(timer.execute());
@@ -45,8 +45,8 @@ PeriodicTimerTest::testConstructor()
 void
 PeriodicTimerTest::testTimer()
 {
-	xpcc::GenericPeriodicTimer<xpcc::ClockDummy, xpcc::ShortTimestamp> timerShort(10);
-	xpcc::GenericPeriodicTimer<xpcc::ClockDummy, xpcc::Timestamp> timer(10);
+	modm::GenericPeriodicTimer<modm::ClockDummy, modm::ShortTimestamp> timerShort(10);
+	modm::GenericPeriodicTimer<modm::ClockDummy, modm::Timestamp> timer(10);
 
 	TEST_ASSERT_EQUALS(timerShort.remaining(), 10l);
 	TEST_ASSERT_EQUALS(timer.remaining(), 10l);
@@ -56,7 +56,7 @@ PeriodicTimerTest::testTimer()
 
 	int i;
 	for (i = 0; i < 9; ++i) {
-		xpcc::ClockDummy::setTime(i);
+		modm::ClockDummy::setTime(i);
 
 		TEST_ASSERT_FALSE(timerShort.execute());
 		TEST_ASSERT_FALSE(timer.execute());
@@ -65,10 +65,10 @@ PeriodicTimerTest::testTimer()
 		TEST_ASSERT_EQUALS(timer.remaining(), (10l-i));
 	}
 
-	TEST_ASSERT_TRUE(timerShort.getState() == xpcc::PeriodicTimerState::Armed);
-	TEST_ASSERT_TRUE(timer.getState() == xpcc::PeriodicTimerState::Armed);
+	TEST_ASSERT_TRUE(timerShort.getState() == modm::PeriodicTimerState::Armed);
+	TEST_ASSERT_TRUE(timer.getState() == modm::PeriodicTimerState::Armed);
 
-	xpcc::ClockDummy::setTime(10);
+	modm::ClockDummy::setTime(10);
 
 	TEST_ASSERT_EQUALS(timerShort.remaining(), 0l);
 	TEST_ASSERT_EQUALS(timer.remaining(), 0l);
@@ -82,13 +82,13 @@ PeriodicTimerTest::testTimer()
 	TEST_ASSERT_EQUALS(timerShort.remaining(), 10l);
 	TEST_ASSERT_EQUALS(timer.remaining(), 10l);
 
-	TEST_ASSERT_TRUE(timerShort.getState() == xpcc::PeriodicTimerState::Armed);
-	TEST_ASSERT_TRUE(timer.getState() == xpcc::PeriodicTimerState::Armed);
+	TEST_ASSERT_TRUE(timerShort.getState() == modm::PeriodicTimerState::Armed);
+	TEST_ASSERT_TRUE(timer.getState() == modm::PeriodicTimerState::Armed);
 
 
-	xpcc::ClockDummy::setTime(20);
-	TEST_ASSERT_TRUE(timerShort.getState() == xpcc::PeriodicTimerState::Expired);
-	TEST_ASSERT_TRUE(timer.getState() == xpcc::PeriodicTimerState::Expired);
+	modm::ClockDummy::setTime(20);
+	TEST_ASSERT_TRUE(timerShort.getState() == modm::PeriodicTimerState::Expired);
+	TEST_ASSERT_TRUE(timer.getState() == modm::PeriodicTimerState::Expired);
 
 	TEST_ASSERT_TRUE(timerShort.execute());
 	TEST_ASSERT_FALSE(timerShort.execute());
@@ -96,15 +96,15 @@ PeriodicTimerTest::testTimer()
 	TEST_ASSERT_TRUE(timer.execute());
 	TEST_ASSERT_FALSE(timer.execute());
 
-	TEST_ASSERT_TRUE(timerShort.getState() == xpcc::PeriodicTimerState::Armed);
-	TEST_ASSERT_TRUE(timer.getState() == xpcc::PeriodicTimerState::Armed);
+	TEST_ASSERT_TRUE(timerShort.getState() == modm::PeriodicTimerState::Armed);
+	TEST_ASSERT_TRUE(timer.getState() == modm::PeriodicTimerState::Armed);
 
 
 	// we are going to miss the 30, 40, 50, 60, 70, 80, 90 periods
 	// however, execute() should still only return exactly once
-	xpcc::ClockDummy::setTime(100);
-	TEST_ASSERT_TRUE(timerShort.getState() == xpcc::PeriodicTimerState::Expired);
-	TEST_ASSERT_TRUE(timer.getState() == xpcc::PeriodicTimerState::Expired);
+	modm::ClockDummy::setTime(100);
+	TEST_ASSERT_TRUE(timerShort.getState() == modm::PeriodicTimerState::Expired);
+	TEST_ASSERT_TRUE(timer.getState() == modm::PeriodicTimerState::Expired);
 
 	TEST_ASSERT_EQUALS(timerShort.remaining(), -70l);
 	TEST_ASSERT_EQUALS(timer.remaining(), -70l);
@@ -119,18 +119,18 @@ PeriodicTimerTest::testTimer()
 	TEST_ASSERT_EQUALS(timer.remaining(), 10l);
 
 	// we are going to miss a couple of periods more
-	xpcc::ClockDummy::setTime(150);
-	TEST_ASSERT_TRUE(timerShort.getState() == xpcc::PeriodicTimerState::Expired);
-	TEST_ASSERT_TRUE(timer.getState() == xpcc::PeriodicTimerState::Expired);
+	modm::ClockDummy::setTime(150);
+	TEST_ASSERT_TRUE(timerShort.getState() == modm::PeriodicTimerState::Expired);
+	TEST_ASSERT_TRUE(timer.getState() == modm::PeriodicTimerState::Expired);
 
 	TEST_ASSERT_EQUALS(timerShort.remaining(), -40l);
 	TEST_ASSERT_EQUALS(timer.remaining(), -40l);
 
 	// lets call execute() with a delay of 5ms after period expiration.
 	// it should expired once, and then reschedule for 160ms, not 165ms!!
-	xpcc::ClockDummy::setTime(155);
-	TEST_ASSERT_TRUE(timerShort.getState() == xpcc::PeriodicTimerState::Expired);
-	TEST_ASSERT_TRUE(timer.getState() == xpcc::PeriodicTimerState::Expired);
+	modm::ClockDummy::setTime(155);
+	TEST_ASSERT_TRUE(timerShort.getState() == modm::PeriodicTimerState::Expired);
+	TEST_ASSERT_TRUE(timer.getState() == modm::PeriodicTimerState::Expired);
 
 	TEST_ASSERT_EQUALS(timerShort.remaining(), -45l);
 	TEST_ASSERT_EQUALS(timer.remaining(), -45l);
@@ -145,17 +145,17 @@ PeriodicTimerTest::testTimer()
 	TEST_ASSERT_EQUALS(timer.remaining(), 5l);
 
 	// not yet
-	xpcc::ClockDummy::setTime(159);
-	TEST_ASSERT_TRUE(timerShort.getState() == xpcc::PeriodicTimerState::Armed);
-	TEST_ASSERT_TRUE(timer.getState() == xpcc::PeriodicTimerState::Armed);
+	modm::ClockDummy::setTime(159);
+	TEST_ASSERT_TRUE(timerShort.getState() == modm::PeriodicTimerState::Armed);
+	TEST_ASSERT_TRUE(timer.getState() == modm::PeriodicTimerState::Armed);
 
 	TEST_ASSERT_EQUALS(timerShort.remaining(), 1l);
 	TEST_ASSERT_EQUALS(timer.remaining(), 1l);
 
 	// now it should expire
-	xpcc::ClockDummy::setTime(160);
-	TEST_ASSERT_TRUE(timerShort.getState() == xpcc::PeriodicTimerState::Expired);
-	TEST_ASSERT_TRUE(timer.getState() == xpcc::PeriodicTimerState::Expired);
+	modm::ClockDummy::setTime(160);
+	TEST_ASSERT_TRUE(timerShort.getState() == modm::PeriodicTimerState::Expired);
+	TEST_ASSERT_TRUE(timer.getState() == modm::PeriodicTimerState::Expired);
 
 	TEST_ASSERT_EQUALS(timerShort.remaining(), 0l);
 	TEST_ASSERT_EQUALS(timer.remaining(), 0l);
@@ -170,9 +170,9 @@ PeriodicTimerTest::testTimer()
 	TEST_ASSERT_EQUALS(timer.remaining(), 10l);
 
 	// it should not fire at 165ms
-	xpcc::ClockDummy::setTime(165);
-	TEST_ASSERT_TRUE(timerShort.getState() == xpcc::PeriodicTimerState::Armed);
-	TEST_ASSERT_TRUE(timer.getState() == xpcc::PeriodicTimerState::Armed);
+	modm::ClockDummy::setTime(165);
+	TEST_ASSERT_TRUE(timerShort.getState() == modm::PeriodicTimerState::Armed);
+	TEST_ASSERT_TRUE(timer.getState() == modm::PeriodicTimerState::Armed);
 
 	TEST_ASSERT_FALSE(timerShort.execute());
 	TEST_ASSERT_FALSE(timer.execute());
@@ -184,11 +184,11 @@ PeriodicTimerTest::testTimer()
 void
 PeriodicTimerTest::testRestart()
 {
-	xpcc::GenericPeriodicTimer<xpcc::ClockDummy, xpcc::ShortTimestamp> timerShort(10);
-	xpcc::GenericPeriodicTimer<xpcc::ClockDummy, xpcc::ShortTimestamp> timer(10);
+	modm::GenericPeriodicTimer<modm::ClockDummy, modm::ShortTimestamp> timerShort(10);
+	modm::GenericPeriodicTimer<modm::ClockDummy, modm::ShortTimestamp> timer(10);
 
-	TEST_ASSERT_TRUE(timerShort.getState() == xpcc::PeriodicTimerState::Armed);
-	TEST_ASSERT_TRUE(timer.getState() == xpcc::PeriodicTimerState::Armed);
+	TEST_ASSERT_TRUE(timerShort.getState() == modm::PeriodicTimerState::Armed);
+	TEST_ASSERT_TRUE(timer.getState() == modm::PeriodicTimerState::Armed);
 
 	TEST_ASSERT_FALSE(timerShort.isStopped());
 	TEST_ASSERT_FALSE(timer.isStopped());
@@ -200,8 +200,8 @@ PeriodicTimerTest::testRestart()
 	timerShort.stop();
 	timer.stop();
 
-	TEST_ASSERT_FALSE(timerShort.getState() == xpcc::PeriodicTimerState::Armed);
-	TEST_ASSERT_FALSE(timer.getState() == xpcc::PeriodicTimerState::Armed);
+	TEST_ASSERT_FALSE(timerShort.getState() == modm::PeriodicTimerState::Armed);
+	TEST_ASSERT_FALSE(timer.getState() == modm::PeriodicTimerState::Armed);
 
 	TEST_ASSERT_TRUE(timerShort.isStopped());
 	TEST_ASSERT_TRUE(timer.isStopped());
@@ -213,14 +213,14 @@ PeriodicTimerTest::testRestart()
 	TEST_ASSERT_FALSE(timerShort.isStopped());
 	TEST_ASSERT_FALSE(timer.isStopped());
 
-	TEST_ASSERT_TRUE(timerShort.getState() == xpcc::PeriodicTimerState::Armed);
-	TEST_ASSERT_TRUE(timer.getState() == xpcc::PeriodicTimerState::Armed);
+	TEST_ASSERT_TRUE(timerShort.getState() == modm::PeriodicTimerState::Armed);
+	TEST_ASSERT_TRUE(timer.getState() == modm::PeriodicTimerState::Armed);
 
 	TEST_ASSERT_FALSE(timerShort.execute());
 	TEST_ASSERT_FALSE(timer.execute());
 
 
-	xpcc::ClockDummy::setTime(5);
+	modm::ClockDummy::setTime(5);
 	TEST_ASSERT_TRUE(timerShort.execute());
 	TEST_ASSERT_FALSE(timerShort.execute());
 

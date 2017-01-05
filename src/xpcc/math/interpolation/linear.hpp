@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_INTERPOLATION_LINEAR_HPP
-#define	XPCC_INTERPOLATION_LINEAR_HPP
+#ifndef	MODM_INTERPOLATION_LINEAR_HPP
+#define	MODM_INTERPOLATION_LINEAR_HPP
 
 #include <stdint.h>
 
@@ -20,7 +20,7 @@
 #include <modm/container/pair.hpp>
 #include <modm/architecture/driver/accessor.hpp>
 
-namespace xpcc
+namespace modm
 {
 	namespace interpolation
 	{
@@ -31,7 +31,7 @@ namespace xpcc
 		 * \code
 		 * // Definition of the supporting points. The first type is the
 		 * // input type, the second the output type
-		 * typedef xpcc::Pair<int8_t, int16_t> Point;
+		 * typedef modm::Pair<int8_t, int16_t> Point;
 		 * 
 		 * // Create a array of supporting points describing the curve.
 		 * Point supportingPoints[6] =
@@ -44,7 +44,7 @@ namespace xpcc
 		 *     { 220, 20000 }
 		 * };
 		 * 
-		 * xpcc::interpolation::Linear<Point>
+		 * modm::interpolation::Linear<Point>
 		 *         value(supportingPoints, 6);
 		 * 
 		 * ...
@@ -56,7 +56,7 @@ namespace xpcc
 		 * Example with supporting points read from flash:
 		 * \code
 		 * // Definition of a supporting point
-		 * typedef xpcc::Pair<int8_t, int16_t> Point;
+		 * typedef modm::Pair<int8_t, int16_t> Point;
 		 * 
 		 * // Array of supporting points in flash
 		 * FLASH_STORAGE(Point supportingPoints[6]) =
@@ -71,8 +71,8 @@ namespace xpcc
 		 * 
 		 * // Create an interpolator object which reads the
 		 * // supporting points from flash.
-		 * xpcc::interpolation::Linear<Point, xpcc::accessor::Flash>
-		 *         value(xpcc::accessor::asFlash(supportingPoints), 6);
+		 * modm::interpolation::Linear<Point, modm::accessor::Flash>
+		 *         value(modm::accessor::asFlash(supportingPoints), 6);
 		 * 
 		 * ...
 		 * 
@@ -80,16 +80,16 @@ namespace xpcc
 		 * int16_t b = value.interpolate(a);
 		 * \endcode
 		 * 
-		 * \tparam	T			Any specialization of xpcc::Pair<>
-		 * \tparam	Accessor	Accessor class. Can be xpcc::accessor::Ram,
-		 * 						xpcc::accessor::Flash or any self defined
+		 * \tparam	T			Any specialization of modm::Pair<>
+		 * \tparam	Accessor	Accessor class. Can be modm::accessor::Ram,
+		 * 						modm::accessor::Flash or any self defined
 		 * 						accessor class.
-		 * 						Default is xpcc::accessor::Ram.
+		 * 						Default is modm::accessor::Ram.
 		 * 
 		 * \ingroup	interpolation
 		 */
 		template <typename T,
-				  template <typename> class Accessor = ::xpcc::accessor::Ram>
+				  template <typename> class Accessor = ::modm::accessor::Ram>
 		class Linear
 		{
 		public:
@@ -104,7 +104,7 @@ namespace xpcc
 			 * \brief	Constructor
 			 * 
 			 * \param	supportingPoints	Supporting points of the curve.
-			 * 								Needs to be an Array of xpcc::Pair<>.
+			 * 								Needs to be an Array of modm::Pair<>.
 			 * \param	numberOfPoints		length of \p supportingPoints
 			 */
 			Linear(Accessor<T> supportingPoints, uint8_t numberOfPoints);
@@ -127,4 +127,4 @@ namespace xpcc
 
 #include "linear_impl.hpp"
 
-#endif	// XPCC_INTERPOLATION_LINEAR_HPP
+#endif	// MODM_INTERPOLATION_LINEAR_HPP

@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_VECTOR2_HPP
-#define XPCC_VECTOR2_HPP
+#ifndef MODM_VECTOR2_HPP
+#define MODM_VECTOR2_HPP
 
 #include <cmath>
 #include <stdint.h>
@@ -23,7 +23,7 @@
 #include "angle.hpp"
 #include "vector.hpp"
 
-namespace xpcc
+namespace modm
 {
 	// forward declaration
 	template <typename T>
@@ -318,7 +318,7 @@ namespace xpcc
 	// Global functions
 	// ------------------------------------------------------------------------
 	/**
-	 * \brief	Stream operator for \b xpcc::Vector<U, 2>
+	 * \brief	Stream operator for \b modm::Vector<U, 2>
 	 * \ingroup	geometry
 	 */
 	template<typename U>
@@ -354,7 +354,7 @@ namespace xpcc
 	
 	template<>
 	int32_t
-	Vector<int16_t, 2>::dot(const xpcc::Vector<int16_t, 2>& other) const;
+	Vector<int16_t, 2>::dot(const modm::Vector<int16_t, 2>& other) const;
 	
 	
 	template<> template<>
@@ -383,4 +383,4 @@ namespace xpcc
 
 #include "vector2_impl.hpp"
 
-#endif // XPCC_VECTOR2_HPP
+#endif // MODM_VECTOR2_HPP

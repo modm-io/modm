@@ -14,10 +14,10 @@
  * Based on https://github.com/mrjohnk/ADNS-9800
  */
 
-#ifndef XPCC_ADNS9800_HPP
-#define XPCC_ADNS9800_HPP
+#ifndef MODM_ADNS9800_HPP
+#define MODM_ADNS9800_HPP
 
-namespace xpcc
+namespace modm
 {
 
 struct adns9800
@@ -99,8 +99,8 @@ protected:
 	uploadFirmware();
 };
 
-} // xpcc namespace
+} // modm namespace
 
 #include "adns9800_impl.hpp"
 
-#endif // XPCC_ADNS9800_HPP
+#endif // MODM_ADNS9800_HPP

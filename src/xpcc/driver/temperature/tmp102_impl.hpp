@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_TMP102_HPP
+#ifndef MODM_TMP102_HPP
 #	error  "Don't include this file directly, use 'tmp102.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
-xpcc::Tmp102<I2cMaster>::Tmp102(Data &data, uint8_t address)
+modm::Tmp102<I2cMaster>::Tmp102(Data &data, uint8_t address)
 :	Lm75<I2cMaster>(reinterpret_cast<lm75::Data&>(data), address),
 	timeout(250), updateTime(250),
 	config_lsb(ConversionRate_t(ConversionRate::Hz4))
@@ -27,7 +27,7 @@ xpcc::Tmp102<I2cMaster>::Tmp102(Data &data, uint8_t address)
 
 template < typename I2cMaster >
 bool
-xpcc::Tmp102<I2cMaster>::run()
+modm::Tmp102<I2cMaster>::run()
 {
 	PT_BEGIN();
 
@@ -51,8 +51,8 @@ xpcc::Tmp102<I2cMaster>::run()
 }
 
 template < typename I2cMaster >
-xpcc::tmp102::Data&
-xpcc::Tmp102<I2cMaster>::getData()
+modm::tmp102::Data&
+modm::Tmp102<I2cMaster>::getData()
 {
 	return reinterpret_cast<Data&>(this->data);
 }
@@ -60,8 +60,8 @@ xpcc::Tmp102<I2cMaster>::getData()
 // ----------------------------------------------------------------------------
 // MARK: - tasks
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Tmp102<I2cMaster>::setUpdateRate(uint8_t rate)
+modm::ResumableResult<bool>
+modm::Tmp102<I2cMaster>::setUpdateRate(uint8_t rate)
 {
 	RF_BEGIN();
 
@@ -104,8 +104,8 @@ xpcc::Tmp102<I2cMaster>::setUpdateRate(uint8_t rate)
 
 // MARK: Extended mode
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Tmp102<I2cMaster>::enableExtendedMode(bool enable)
+modm::ResumableResult<bool>
+modm::Tmp102<I2cMaster>::enableExtendedMode(bool enable)
 {
 	RF_BEGIN();
 
@@ -116,8 +116,8 @@ xpcc::Tmp102<I2cMaster>::enableExtendedMode(bool enable)
 
 // MARK: conversion
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Tmp102<I2cMaster>::startConversion()
+modm::ResumableResult<bool>
+modm::Tmp102<I2cMaster>::startConversion()
 {
 	RF_BEGIN();
 
@@ -134,8 +134,8 @@ xpcc::Tmp102<I2cMaster>::startConversion()
 
 // MARK: read temperature
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Tmp102<I2cMaster>::readComparatorMode(bool &result)
+modm::ResumableResult<bool>
+modm::Tmp102<I2cMaster>::readComparatorMode(bool &result)
 {
 	RF_BEGIN();
 
@@ -155,8 +155,8 @@ xpcc::Tmp102<I2cMaster>::readComparatorMode(bool &result)
 
 // MARK: configuration
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Tmp102<I2cMaster>::writeConfiguration(uint8_t length)
+modm::ResumableResult<bool>
+modm::Tmp102<I2cMaster>::writeConfiguration(uint8_t length)
 {
 	RF_BEGIN();
 
@@ -170,8 +170,8 @@ xpcc::Tmp102<I2cMaster>::writeConfiguration(uint8_t length)
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Tmp102<I2cMaster>::setLimitRegister(Register reg, float temperature)
+modm::ResumableResult<bool>
+modm::Tmp102<I2cMaster>::setLimitRegister(Register reg, float temperature)
 {
 	RF_BEGIN();
 

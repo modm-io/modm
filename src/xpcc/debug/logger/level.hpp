@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LOG_LEVEL_HPP
-#define XPCC_LOG_LEVEL_HPP
+#ifndef MODM_LOG_LEVEL_HPP
+#define MODM_LOG_LEVEL_HPP
 
 #pragma push_macro("ERROR") // avoid collision with ERROR defined macro in winsock.h
 #undef ERROR
 
-namespace xpcc
+namespace modm
 {
 	namespace log
 	{
@@ -39,7 +39,7 @@ namespace xpcc
 	}
 }
 
-#ifndef XPCC_LOG_LEVEL
+#ifndef MODM_LOG_LEVEL
 	/**
 	 * \brief	Default log level
 	 * 
@@ -47,17 +47,17 @@ namespace xpcc
 	 * To change the logging level in a source file use \c \#undef
 	 * 
 	 * \code
-	 * #undef  XPCC_LOG_LEVEL
-	 * #define XPCC_LOG_LEVEL xpcc::log::INFO
+	 * #undef  MODM_LOG_LEVEL
+	 * #define MODM_LOG_LEVEL modm::log::INFO
 	 * \endcode
 	 * 
 	 * DEBUG < INFO < WARNING < ERROR < DISABLED
 	 * 
 	 * \ingroup logger
 	 */
-	#define XPCC_LOG_LEVEL xpcc::log::DEBUG
-#endif // XPCC_LOG_LEVEL
+	#define MODM_LOG_LEVEL modm::log::DEBUG
+#endif // MODM_LOG_LEVEL
 
 #pragma pop_macro("ERROR")
 
-#endif // XPCC_LOG_LEVEL_HPP
+#endif // MODM_LOG_LEVEL_HPP

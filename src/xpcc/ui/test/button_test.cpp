@@ -28,7 +28,7 @@ struct TestPin
 void
 ButtonTest::testButton()
 {
-	xpcc::Button<TestPin> button;
+	modm::Button<TestPin> button;
 	
 	TEST_ASSERT_FALSE(button.isPressed());
 	

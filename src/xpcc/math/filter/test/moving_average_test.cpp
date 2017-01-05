@@ -82,7 +82,7 @@ namespace
 void
 MovingAverageTest::testDefaultConstructor()
 {
-	xpcc::filter::MovingAverage<int16_t, 4> filter;
+	modm::filter::MovingAverage<int16_t, 4> filter;
 
 	TEST_ASSERT_EQUALS(filter.getValue(), 0);
 }
@@ -90,7 +90,7 @@ MovingAverageTest::testDefaultConstructor()
 void
 MovingAverageTest::testConstructor()
 {
-	xpcc::filter::MovingAverage<int16_t, 4> filter(20);
+	modm::filter::MovingAverage<int16_t, 4> filter(20);
 
 	TEST_ASSERT_EQUALS(filter.getValue(), 20);
 }
@@ -98,7 +98,7 @@ MovingAverageTest::testConstructor()
 void
 MovingAverageTest::testAverage()
 {
-	xpcc::filter::MovingAverage<TestData::Type, 4> filter;
+	modm::filter::MovingAverage<TestData::Type, 4> filter;
 
 	for (uint_fast8_t i = 0; i < (sizeof(data) / sizeof(TestData)); ++i)
 	{
@@ -110,7 +110,7 @@ MovingAverageTest::testAverage()
 void
 MovingAverageTest::testFloatAverage()
 {
-	xpcc::filter::MovingAverage<TestDataFloat::Type, 4> filter;
+	modm::filter::MovingAverage<TestDataFloat::Type, 4> filter;
 	for (uint_fast8_t i = 0; i < (sizeof(data) / sizeof(TestDataFloat)); ++i)
 	{
 		filter.update(dataF[i].input);

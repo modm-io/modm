@@ -15,7 +15,7 @@
 #include <modm/architecture/architecture.hpp>
 
 // ----------------------------------------------------------------------------
-using namespace xpcc::lpc;
+using namespace modm::lpc;
 
 typedef GpioOutput0_7 Led;
 
@@ -36,6 +36,6 @@ main()
 	while (1)
 	{
 		Led::toggle();
-		xpcc::delayMilliseconds(100);
+		modm::delayMilliseconds(100);
 	}
 }

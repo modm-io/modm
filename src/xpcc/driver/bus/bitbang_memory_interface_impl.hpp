@@ -10,26 +10,26 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_BITBANG_MEMORY_INTERFACE_HPP
+#ifndef MODM_BITBANG_MEMORY_INTERFACE_HPP
 #	error "Don't include this file directly, use 'bitbang_memory_interface.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 
 template <typename PORT, typename CS, typename CD, typename WR>
-PORT xpcc::BitbangMemoryInterface<PORT, CS, CD, WR>::port;
+PORT modm::BitbangMemoryInterface<PORT, CS, CD, WR>::port;
 
 template <typename PORT, typename CS, typename CD, typename WR>
-CS xpcc::BitbangMemoryInterface<PORT, CS, CD, WR>::cs;
+CS modm::BitbangMemoryInterface<PORT, CS, CD, WR>::cs;
 
 template <typename PORT, typename CS, typename CD, typename WR>
-CD xpcc::BitbangMemoryInterface<PORT, CS, CD, WR>::cd;
+CD modm::BitbangMemoryInterface<PORT, CS, CD, WR>::cd;
 
 template <typename PORT, typename CS, typename CD, typename WR>
-WR xpcc::BitbangMemoryInterface<PORT, CS, CD, WR>::wr;
+WR modm::BitbangMemoryInterface<PORT, CS, CD, WR>::wr;
 
 template <typename PORT, typename CS, typename CD, typename WR>
-void xpcc::BitbangMemoryInterface<PORT, CS, CD, WR>::initialize()
+void modm::BitbangMemoryInterface<PORT, CS, CD, WR>::initialize()
 {
 	cs.setOutput(true);
 	cd.setOutput(false);
@@ -38,7 +38,7 @@ void xpcc::BitbangMemoryInterface<PORT, CS, CD, WR>::initialize()
 }
 
 template <typename PORT, typename CS, typename CD, typename WR>
-void xpcc::BitbangMemoryInterface<PORT, CS, CD, WR>::writeRegister(uint8_t reg)
+void modm::BitbangMemoryInterface<PORT, CS, CD, WR>::writeRegister(uint8_t reg)
 {
 	CD::reset();
 
@@ -47,24 +47,24 @@ void xpcc::BitbangMemoryInterface<PORT, CS, CD, WR>::writeRegister(uint8_t reg)
 	WR::reset();
 	PORT::write(0);
 
-	xpcc::delayMicroseconds(1);
+	modm::delayMicroseconds(1);
 	WR::set();		// Low-to-High strobe
-	xpcc::delayMicroseconds(1);
+	modm::delayMicroseconds(1);
 
 
 	WR::reset();
 	PORT::write(reg);
 
-	xpcc::delayMicroseconds(1);
+	modm::delayMicroseconds(1);
 	WR::set();		// Low-to-High strobe
-	xpcc::delayMicroseconds(1);
+	modm::delayMicroseconds(1);
 
 
 	CS::set();
 }
 
 template <typename PORT, typename CS, typename CD, typename WR>
-void xpcc::BitbangMemoryInterface<PORT, CS, CD, WR>::writeData(const uint16_t data)
+void modm::BitbangMemoryInterface<PORT, CS, CD, WR>::writeData(const uint16_t data)
 {
 	CD::set();
 
@@ -73,23 +73,23 @@ void xpcc::BitbangMemoryInterface<PORT, CS, CD, WR>::writeData(const uint16_t da
 	WR::reset();
 	PORT::write(data >> 8);
 
-	xpcc::delayMicroseconds(1);
+	modm::delayMicroseconds(1);
 	WR::set();		// Low-to-High strobe
-	xpcc::delayMicroseconds(1);
+	modm::delayMicroseconds(1);
 
 
 	WR::reset();
 	PORT::write(data);
 
-	xpcc::delayMicroseconds(1);
+	modm::delayMicroseconds(1);
 	WR::set();		// Low-to-High strobe
-	xpcc::delayMicroseconds(1);
+	modm::delayMicroseconds(1);
 
 	CS::set();
 }
 
 template <typename PORT, typename CS, typename CD, typename WR>
-void xpcc::BitbangMemoryInterface<PORT, CS, CD, WR>::writeDataMult(const uint16_t data, const uint16_t count)
+void modm::BitbangMemoryInterface<PORT, CS, CD, WR>::writeDataMult(const uint16_t data, const uint16_t count)
 {
 	CD::set();
 
@@ -99,15 +99,15 @@ void xpcc::BitbangMemoryInterface<PORT, CS, CD, WR>::writeDataMult(const uint16_
 	{
 		WR::reset();
 		PORT::write(data >> 8);
-		xpcc::delayMicroseconds(1);
+		modm::delayMicroseconds(1);
 		WR::set();		// Low-to-High strobe
 
 		WR::reset();
 		PORT::write(data);
 
-		xpcc::delayMicroseconds(1);
+		modm::delayMicroseconds(1);
 		WR::set();		// Low-to-High strobe
-		xpcc::delayMicroseconds(1);
+		modm::delayMicroseconds(1);
 
 	}
 
@@ -115,7 +115,7 @@ void xpcc::BitbangMemoryInterface<PORT, CS, CD, WR>::writeDataMult(const uint16_
 }
 
 template <typename PORT, typename CS, typename CD, typename WR>
-void xpcc::BitbangMemoryInterface<PORT, CS, CD, WR>::writeCommand(const uint8_t command, const uint16_t data)
+void modm::BitbangMemoryInterface<PORT, CS, CD, WR>::writeCommand(const uint8_t command, const uint16_t data)
 {
 	writeRegister(command);
 	writeData(data);
@@ -123,7 +123,7 @@ void xpcc::BitbangMemoryInterface<PORT, CS, CD, WR>::writeCommand(const uint8_t 
 
 
 template <typename PORT, typename CS, typename CD, typename WR>
-void xpcc::BitbangMemoryInterface<PORT, CS, CD, WR>::writeRam(uint8_t * addr, const uint16_t size)
+void modm::BitbangMemoryInterface<PORT, CS, CD, WR>::writeRam(uint8_t * addr, const uint16_t size)
 {
 	CD::set();
 
@@ -134,9 +134,9 @@ void xpcc::BitbangMemoryInterface<PORT, CS, CD, WR>::writeRam(uint8_t * addr, co
 		WR::reset();
 		PORT::write( *(addr++) );
 
-		xpcc::delayMicroseconds(1);
+		modm::delayMicroseconds(1);
 		WR::set();		// Low-to-high strobe
-		xpcc::delayMicroseconds(1);
+		modm::delayMicroseconds(1);
 	}
 
 	CS::set();

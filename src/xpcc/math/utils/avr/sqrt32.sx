@@ -21,9 +21,9 @@
 ;------------------------------------------------------------------------------
 
 	.text
-	.global	xpcc__sqrt32
-	.type	xpcc__sqrt32, @function
-xpcc__sqrt32:
+	.global	modm__sqrt32
+	.type	modm__sqrt32, @function
+modm__sqrt32:
 	ldi   R19, 0xc0
 	clr   R18          ; rotation mask in R19:R18
 	ldi   R27, 0x40
@@ -66,4 +66,4 @@ xpcc__sqrt32:
 	mov   R24, R26
 	ret
 
-	.size	xpcc__sqrt32, . - xpcc__sqrt32
+	.size	modm__sqrt32, . - modm__sqrt32

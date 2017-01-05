@@ -9,13 +9,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ITG3200_HPP
-#define XPCC_ITG3200_HPP
+#ifndef MODM_ITG3200_HPP
+#define MODM_ITG3200_HPP
 
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/math/geometry/angle.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 // forward declaration for friending with itg3200::Data
@@ -81,7 +81,7 @@ public:
 
 protected:
 	/// @cond
-	XPCC_FLAGS8(Filter);
+	MODM_FLAGS8(Filter);
 	typedef Configuration< Filter_t, LowPassFilter, (Bit2 | Bit1 | Bit0) > LowPassFilter_t;
 	/// @endcond
 
@@ -97,7 +97,7 @@ public:
 		ITG_RDY_EN = Bit2,			///< Enable interrupt when device is ready (PLL ready after changing clock source)
 		RAW_RDY_EN = Bit0,			///< Enable interrupt when data is available
 	};
-	XPCC_FLAGS8(Interrupt);
+	MODM_FLAGS8(Interrupt);
 
 	/// The bit masks of the INT_STATUS register
 	enum class
@@ -106,7 +106,7 @@ public:
 		ITG_RDY = Bit2,			///< PLL ready
 		RAW_DATA_RDY = Bit0,	///< Raw data is ready
 	};
-	XPCC_FLAGS8(Status);
+	MODM_FLAGS8(Status);
 
 	/// The bit masks of the PWR_MGM register
 	enum class
@@ -124,7 +124,7 @@ public:
 		CLK_SEL0 = Bit0,
 		CLK_SEL_Mask = Bit2 | Bit1 | Bit0,
 	};
-	XPCC_FLAGS8(Power);
+	MODM_FLAGS8(Power);
 
 	enum class
 	ClockSource : uint8_t
@@ -139,7 +139,7 @@ public:
 	typedef Configuration< Power_t, ClockSource, (Bit2 | Bit1 | Bit0) > ClockSource_t;
 
 public:
-	struct xpcc_packed
+	struct modm_packed
 	Data
 	{
 		template< class I2cMaster >
@@ -162,7 +162,7 @@ public:
 		getTemperature()
 		{
 			int16_t* rawData = reinterpret_cast<int16_t*>(data);
-			int16_t rateValue = xpcc::fromBigEndian(rawData[0]) + 13200;
+			int16_t rateValue = modm::fromBigEndian(rawData[0]) + 13200;
 			return (rateValue / 280.f) + 35.f;
 		}
 
@@ -178,7 +178,7 @@ public:
 		getRate(uint8_t index)
 		{
 			int16_t* rawData = reinterpret_cast<int16_t*>(data);
-			int16_t rateValue = xpcc::fromBigEndian(rawData[index]);
+			int16_t rateValue = modm::fromBigEndian(rawData[index]);
 			return rateValue * (1.f / 14.375f);
 		}
 	};
@@ -195,34 +195,34 @@ public:
  * @ingroup driver_inertial
  */
 template < typename I2cMaster >
-class Itg3200 : public itg3200, public xpcc::I2cDevice< I2cMaster, 2 >
+class Itg3200 : public itg3200, public modm::I2cDevice< I2cMaster, 2 >
 {
 public:
 	/// Constructor, requires an itg3200::Data object, sets address to default of 0x68 (AD0 low: 0x69)
 	Itg3200(Data &data, uint8_t address=0x68);
 
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	configure(LowPassFilter filter=LowPassFilter::Hz20, uint8_t divider=0);
 
 	/// reads the temperature and gyro registers and buffer the results
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	readRotation();
 
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	setLowPassFilter(LowPassFilter filter)
 	{ return updateFilter(filter, Filter::DLPF_CFG_Mask); }
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	setSampleRateDivider(uint8_t divider);
 
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	updateInterrupt(Interrupt_t setMask, Interrupt_t clearMask = Interrupt_t(0xf5))
 	{ return updateRegister(1, setMask.value, clearMask.value); }
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	updatePower(Power_t setMask, Power_t clearMask = Power_t(0xff))
 	{ return updateRegister(11, setMask.value, clearMask.value); }
 
@@ -241,12 +241,12 @@ public:
 	Status_t getStatus()
 	{ return Status_t(rawBuffer[2]); }
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	readStatus();
 
 protected:
 	/// @cond
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	updateFilter(Filter_t setMask, Filter_t clearMask = Filter_t(0x1f))
 	{ return updateRegister(0, setMask.value, clearMask.value); }
 
@@ -264,25 +264,25 @@ public:
 protected:
 	/// @cond
 	/// write a 8bit value a register
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	write(Register reg, uint8_t &value)
 	{ return write(reg, &value, 1); }
 
 	/// write multiple 8bit values from a start register
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	write(Register reg, uint8_t *buffer, uint8_t length, bool copyBuffer=true);
 
 	/// read a 8bit value from a register
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	read(Register reg, uint8_t &value)
 	{ return read(reg, &value, 1); }
 
 	/// read multiple 8bit values from a start register
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	read(Register reg, uint8_t *buffer, uint8_t length);
 
 private:
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	updateRegister(uint8_t index, uint8_t setMask, uint8_t clearMask = 0xff);
 	/// @endcond
 
@@ -309,8 +309,8 @@ protected:
 	/// @endcond
 };
 
-}	// namespace xpcc
+}	// namespace modm
 
 #include "itg3200_impl.hpp"
 
-#endif // XPCC_ITG3200_HPP
+#endif // MODM_ITG3200_HPP

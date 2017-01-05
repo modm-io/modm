@@ -30,11 +30,11 @@
  * OK: Edit selected entry
  *
  *\warning Some classes currently only work with the font
- *         xpcc::font::FixedWidth5x8
+ *         modm::font::FixedWidth5x8
  */
 
-#ifndef XPCC_MENU_HPP
-#define XPCC_MENU_HPP
+#ifndef MODM_MENU_HPP
+#define MODM_MENU_HPP
 
 #include "menu/view_stack.hpp"
 #include "menu/abstract_view.hpp"
@@ -48,4 +48,4 @@
 #include "menu/choice_menu.hpp"
 #include "menu/choice_menu_entry.hpp"
 
-#endif	// XPCC_MENU_HPP
+#endif	// MODM_MENU_HPP

@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_GUI_WIDGETS_HPP
-#define XPCC_GUI_WIDGETS_HPP
+#ifndef MODM_GUI_WIDGETS_HPP
+#define MODM_GUI_WIDGETS_HPP
 
 #include "widgets/widget.hpp"
 #include "widgets/button.hpp"
@@ -23,4 +23,4 @@
 #include "widgets/composed_widgets/tab_panel.hpp"
 #include "widgets/composed_widgets/stringrocker.hpp"
 
-#endif  // XPCC_GUI_WIDGETS_HPP
+#endif  // MODM_GUI_WIDGETS_HPP

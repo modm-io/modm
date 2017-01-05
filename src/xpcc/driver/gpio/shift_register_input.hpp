@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SHIFT_REGISTER_INPUT_HPP
-#define XPCC_SHIFT_REGISTER_INPUT_HPP
+#ifndef MODM_SHIFT_REGISTER_INPUT_HPP
+#define MODM_SHIFT_REGISTER_INPUT_HPP
 
 #include <modm/architecture/utils.hpp>
 #include <modm/architecture/interface/gpio.hpp>
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	Shift register
@@ -77,4 +77,4 @@ namespace xpcc
 
 #include "shift_register_input_impl.hpp"
 
-#endif	// XPCC_SHIFT_REGISTER_INPUT_HPP
+#endif	// MODM_SHIFT_REGISTER_INPUT_HPP

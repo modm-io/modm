@@ -15,12 +15,12 @@
 // http://www.st.com/web/en/catalog/tools/FM116/SC959/SS1532/PF250863
 //
 
-#ifndef XPCC_STM32_F1_DISCOVERY_HPP
-#define XPCC_STM32_F1_DISCOVERY_HPP
+#ifndef MODM_STM32_F1_DISCOVERY_HPP
+#define MODM_STM32_F1_DISCOVERY_HPP
 
 #include <modm/architecture/platform.hpp>
 
-using namespace xpcc::stm32;
+using namespace modm::stm32;
 
 
 namespace Board
@@ -30,7 +30,7 @@ namespace Board
 /// supplied by the on-board st-link
 /* SystemClock generator is only available for selected STM32F1 devices.
  * The idea is that it is generated automatically for you like the rest of the
- * HAL, however, xpcc does not have this capability yet. See PR #36.
+ * HAL, however, modm does not have this capability yet. See PR #36.
  */
 // using systemClock = SystemClock<Pll<ExternalCrystal<MHz8>, MHz24> >;
 
@@ -95,10 +95,10 @@ struct systemClock {
 		ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div1);
 		ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div1);
 		// update frequencies for busy-wait delay functions
-		xpcc::clock::fcpu     = Frequency;
-		xpcc::clock::fcpu_kHz = Frequency / 1000;
-		xpcc::clock::fcpu_MHz = Frequency / 1000000;
-		xpcc::clock::ns_per_loop = ::round(3000 / (Frequency / 1000000));
+		modm::clock::fcpu     = Frequency;
+		modm::clock::fcpu_kHz = Frequency / 1000;
+		modm::clock::fcpu_MHz = Frequency / 1000000;
+		modm::clock::ns_per_loop = ::round(3000 / (Frequency / 1000000));
 
 		return true;
 	}
@@ -110,17 +110,17 @@ using Button = GpioInputA0;	// Blue PushButton
 using LedGreen = GpioOutputC9;		// User LED 3
 using LedBlue  = GpioOutputC8;		// User LED 4
 
-using Leds = xpcc::SoftwareGpioPort< LedBlue, LedGreen >;
+using Leds = modm::SoftwareGpioPort< LedBlue, LedGreen >;
 
 
 inline void
 initialize()
 {
 	systemClock::enable();
-	xpcc::cortex::SysTickTimer::initialize<systemClock>();
+	modm::cortex::SysTickTimer::initialize<systemClock>();
 
-	LedGreen::setOutput(xpcc::Gpio::Low);
-	LedBlue::setOutput(xpcc::Gpio::Low);
+	LedGreen::setOutput(modm::Gpio::Low);
+	LedBlue::setOutput(modm::Gpio::Low);
 
 	Button::setInput();
 	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
@@ -130,4 +130,4 @@ initialize()
 
 }
 
-#endif	// XPCC_STM32_F1_DISCOVERY_HPP
+#endif	// MODM_STM32_F1_DISCOVERY_HPP

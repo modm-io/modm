@@ -11,15 +11,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LINE_SEGMENT_2D_HPP
-#define XPCC_LINE_SEGMENT_2D_HPP
+#ifndef MODM_LINE_SEGMENT_2D_HPP
+#define MODM_LINE_SEGMENT_2D_HPP
 
 #include "geometric_traits.hpp"
 
 #include "vector.hpp"
 #include "point_set_2d.hpp"
 
-namespace xpcc
+namespace modm
 {
 	// forward declaration
 	template <typename T>
@@ -123,8 +123,8 @@ namespace xpcc
 		operator != (const LineSegment2D &other) const;
 		
 	protected:
-		xpcc::Vector<T, 2> startPoint;
-		xpcc::Vector<T, 2> endPoint;
+		modm::Vector<T, 2> startPoint;
+		modm::Vector<T, 2> endPoint;
 	};
 }
 
@@ -133,4 +133,4 @@ namespace xpcc
 
 #include "line_segment_2d_impl.hpp"
 
-#endif // XPCC_LINE_SEGMENT_2D_HPP
+#endif // MODM_LINE_SEGMENT_2D_HPP

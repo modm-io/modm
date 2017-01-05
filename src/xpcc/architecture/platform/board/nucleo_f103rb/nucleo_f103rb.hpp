@@ -15,14 +15,14 @@
 // http://www.st.com/web/catalog/tools/FM116/SC959/SS1532/LN1847/PF259875
 //
 
-#ifndef XPCC_STM32_NUCLEO_F103RB_HPP
-#define XPCC_STM32_NUCLEO_F103RB_HPP
+#ifndef MODM_STM32_NUCLEO_F103RB_HPP
+#define MODM_STM32_NUCLEO_F103RB_HPP
 
 #include <modm/architecture/platform.hpp>
 #include <modm/debug/logger.hpp>
-#define XPCC_BOARD_HAS_LOGGER
+#define MODM_BOARD_HAS_LOGGER
 
-using namespace xpcc::stm32;
+using namespace modm::stm32;
 
 
 namespace Board
@@ -81,10 +81,10 @@ struct systemClock {
 		ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div2);
 		ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div1);
 		// update frequencies for busy-wait delay functions
-		xpcc::clock::fcpu     = Frequency;
-		xpcc::clock::fcpu_kHz = Frequency / 1000;
-		xpcc::clock::fcpu_MHz = Frequency / 1000000;
-		xpcc::clock::ns_per_loop = ::round(3000 / (Frequency / 1000000));
+		modm::clock::fcpu     = Frequency;
+		modm::clock::fcpu_kHz = Frequency / 1000;
+		modm::clock::fcpu_MHz = Frequency / 1000000;
+		modm::clock::ns_per_loop = ::round(3000 / (Frequency / 1000000));
 
 		return true;
 	}
@@ -115,10 +115,10 @@ using D13 = GpioA5;
 using D14 = GpioB9;
 using D15 = GpioB8;
 
-using Button = xpcc::GpioInverted<GpioInputC13>;
+using Button = modm::GpioInverted<GpioInputC13>;
 using LedD13 = D13;
 
-using Leds = xpcc::SoftwareGpioPort< LedD13 >;
+using Leds = modm::SoftwareGpioPort< LedD13 >;
 
 
 namespace stlink
@@ -133,7 +133,7 @@ inline void
 initialize()
 {
 	systemClock::enable();
-	xpcc::cortex::SysTickTimer::initialize<systemClock>();
+	modm::cortex::SysTickTimer::initialize<systemClock>();
 
 	stlink::Tx::connect(stlink::Uart::Tx);
 	stlink::Rx::connect(stlink::Uart::Rx, Gpio::InputType::PullUp);
@@ -147,4 +147,4 @@ initialize()
 
 }
 
-#endif	// XPCC_STM32_NUCLEO_F103RB_HPP
+#endif	// MODM_STM32_NUCLEO_F103RB_HPP

@@ -11,12 +11,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_AVR_MAIN_HPP
-#define	XPCC_AVR_MAIN_HPP
+#ifndef	MODM_AVR_MAIN_HPP
+#define	MODM_AVR_MAIN_HPP
 
 #include <stdint.h>
 
 // saves a couple of bytes of stack and program.
 int main(void) __attribute__((OS_main));
 
-#endif	// XPCC_AVR_MAIN_HPP
+#endif	// MODM_AVR_MAIN_HPP

@@ -10,17 +10,17 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FREERTOS_SEMAPHORE_HPP
-#define XPCC_FREERTOS_SEMAPHORE_HPP
+#ifndef MODM_FREERTOS_SEMAPHORE_HPP
+#define MODM_FREERTOS_SEMAPHORE_HPP
 
-#ifndef XPCC_RTOS_SEMAPHORE_HPP
+#ifndef MODM_RTOS_SEMAPHORE_HPP
 #	error "Don't include this file directly, use <modm/processing/rtos/semaphore.hpp>"
 #endif
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 
-namespace xpcc
+namespace modm
 {
 	namespace rtos
 	{
@@ -150,4 +150,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_FREERTOS_SEMAPHORE_HPP
+#endif // MODM_FREERTOS_SEMAPHORE_HPP

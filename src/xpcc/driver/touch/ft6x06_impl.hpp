@@ -9,21 +9,21 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FT6X06_HPP
+#ifndef MODM_FT6X06_HPP
 #	error "Don't include this file directly, use 'ft6x06.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
-xpcc::Ft6x06<I2cMaster>::Ft6x06(Data &data, uint8_t address)
+modm::Ft6x06<I2cMaster>::Ft6x06(Data &data, uint8_t address)
 :	I2cDevice<I2cMaster,3>(address), data(data)
 {
 }
 
 // MARK: - Tasks
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Ft6x06<I2cMaster>::configure(InterruptMode mode, uint8_t activeRate, uint8_t monitorRate)
+modm::ResumableResult<bool>
+modm::Ft6x06<I2cMaster>::configure(InterruptMode mode, uint8_t activeRate, uint8_t monitorRate)
 {
 	RF_BEGIN();
 
@@ -39,8 +39,8 @@ xpcc::Ft6x06<I2cMaster>::configure(InterruptMode mode, uint8_t activeRate, uint8
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Ft6x06<I2cMaster>::readTouches()
+modm::ResumableResult<bool>
+modm::Ft6x06<I2cMaster>::readTouches()
 {
 	RF_BEGIN();
 
@@ -56,8 +56,8 @@ xpcc::Ft6x06<I2cMaster>::readTouches()
 // ----------------------------------------------------------------------------
 // MARK: write register
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Ft6x06<I2cMaster>::write(Register reg, uint8_t value)
+modm::ResumableResult<bool>
+modm::Ft6x06<I2cMaster>::write(Register reg, uint8_t value)
 {
 	RF_BEGIN();
 
@@ -70,8 +70,8 @@ xpcc::Ft6x06<I2cMaster>::write(Register reg, uint8_t value)
 
 // MARK: read multilength register
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Ft6x06<I2cMaster>::read(Register reg, uint8_t *buffer, uint8_t length)
+modm::ResumableResult<bool>
+modm::Ft6x06<I2cMaster>::read(Register reg, uint8_t *buffer, uint8_t length)
 {
 	RF_BEGIN();
 

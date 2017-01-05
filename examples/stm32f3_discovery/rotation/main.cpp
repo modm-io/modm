@@ -17,7 +17,7 @@
 using namespace Board;
 
 // maps arbitrary gpios to a bit
-using LedRingLeft = xpcc::SoftwareGpioPort<
+using LedRingLeft = modm::SoftwareGpioPort<
 	Board::LedSouth,		// 4
 	Board::LedSouthWest,	// 3
 	Board::LedWest,			// 2
@@ -25,7 +25,7 @@ using LedRingLeft = xpcc::SoftwareGpioPort<
 	Board::LedNorth			// 0
 	>;
 // Symmetry \o/
-using LedRingRight = xpcc::SoftwareGpioPort<
+using LedRingRight = modm::SoftwareGpioPort<
 	Board::LedSouth,		// 4
 	Board::LedSouthEast,	// 3
 	Board::LedEast,			// 2
@@ -39,7 +39,7 @@ Board::l3g::Gyroscope::Data data;
 Board::l3g::Gyroscope gyro(data);
 
 
-class ReaderThread : public xpcc::pt::Protothread
+class ReaderThread : public modm::pt::Protothread
 {
 public:
 	bool
@@ -84,8 +84,8 @@ public:
 	}
 
 private:
-	xpcc::ShortTimeout timeout;
-	xpcc::filter::MovingAverage<float, 25> averageZ;
+	modm::ShortTimeout timeout;
+	modm::filter::MovingAverage<float, 25> averageZ;
 };
 
 ReaderThread reader;

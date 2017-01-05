@@ -39,7 +39,7 @@ OUTPUT_ARCH(arm)
 /* First executable instruction in an output file */
 ENTRY(Reset_Handler)
 
-/* force linker to include the syscalls from libxpcc.a */
+/* force linker to include the syscalls from libmodm.a */
 EXTERN(_sbrk_r)
 EXTERN(_init)
 
@@ -294,7 +294,7 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 	} >{{memory}}
 
 	/* Unwind tables are used to unwind the stack for C++ exceptions.
-	 * On xpcc these are disabled by default, so these sections are empty.
+	 * On modm these are disabled by default, so these sections are empty.
 	.ARM.extab : ALIGN(4)
 	{
 		*(.ARM.extab* .gnu.linkonce.armextab.*)

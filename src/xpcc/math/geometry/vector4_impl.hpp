@@ -10,13 +10,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_VECTOR4_HPP
+#ifndef MODM_VECTOR4_HPP
 	#error	"Don't include this file directly, use 'vector4.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector()
+modm::Vector<T, 4>::Vector()
 :
 	x(),
 	y(),
@@ -27,7 +27,7 @@ xpcc::Vector<T, 4>::Vector()
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(T inX, T inY, T inZ, T inW)
+modm::Vector<T, 4>::Vector(T inX, T inY, T inZ, T inW)
 :
 	x(inX),
 	y(inY),
@@ -38,7 +38,7 @@ xpcc::Vector<T, 4>::Vector(T inX, T inY, T inZ, T inW)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 1> &inX, const xpcc::Vector<T, 1> &inY, const xpcc::Vector<T, 1> &inZ, const xpcc::Vector<T, 1> &inW)
+modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 1> &inY, const modm::Vector<T, 1> &inZ, const modm::Vector<T, 1> &inW)
 :
 	x(inX.x),
 	y(inY.x),
@@ -49,7 +49,7 @@ xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 1> &inX, const xpcc::Vector<T, 
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 1> &inX, const xpcc::Vector<T, 1> &inY, const xpcc::Vector<T, 1> &inZ, const T &inW)
+modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 1> &inY, const modm::Vector<T, 1> &inZ, const T &inW)
 :
 	x(inX.x),
 	y(inY.x),
@@ -61,7 +61,7 @@ xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 1> &inX, const xpcc::Vector<T, 
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 1> &inX, const xpcc::Vector<T, 1> &inY, const T &inZ, const T &inW)
+modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 1> &inY, const T &inZ, const T &inW)
 :
 	x(inX.x),
 	y(inY.x),
@@ -73,7 +73,7 @@ xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 1> &inX, const xpcc::Vector<T, 
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 1> &inX, const T &inY, const xpcc::Vector<T, 1> &inZ, const T &inW)
+modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const T &inY, const modm::Vector<T, 1> &inZ, const T &inW)
 :
 	x(inX.x),
 	y(inY),
@@ -85,7 +85,7 @@ xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 1> &inX, const T &inY, const xp
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const T &inX, const xpcc::Vector<T, 1> &inY, const xpcc::Vector<T, 1> &inZ, const T &inW)
+modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 1> &inY, const modm::Vector<T, 1> &inZ, const T &inW)
 :
 	x(inX),
 	y(inY.x),
@@ -97,7 +97,7 @@ xpcc::Vector<T, 4>::Vector(const T &inX, const xpcc::Vector<T, 1> &inY, const xp
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 1> &inX, const T &inY, const T &inZ, const T &inW)
+modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const T &inY, const T &inZ, const T &inW)
 :
 	x(inX.x),
 	y(inY),
@@ -109,7 +109,7 @@ xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 1> &inX, const T &inY, const T 
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const T &inX, const xpcc::Vector<T, 1> &inY, const T &inZ, const T &inW)
+modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 1> &inY, const T &inZ, const T &inW)
 :
 	x(inX),
 	y(inY.x),
@@ -121,7 +121,7 @@ xpcc::Vector<T, 4>::Vector(const T &inX, const xpcc::Vector<T, 1> &inY, const T 
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 1> &inX, const xpcc::Vector<T, 1> &inY, const T &inZ, const xpcc::Vector<T, 1> &inW)
+modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 1> &inY, const T &inZ, const modm::Vector<T, 1> &inW)
 :
 	x(inX.x),
 	y(inY.x),
@@ -133,7 +133,7 @@ xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 1> &inX, const xpcc::Vector<T, 
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 1> &inX, const T &inY, const T &inZ, const xpcc::Vector<T, 1> &inW)
+modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const T &inY, const T &inZ, const modm::Vector<T, 1> &inW)
 :
 	x(inX.x),
 	y(inY),
@@ -145,7 +145,7 @@ xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 1> &inX, const T &inY, const T 
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const T &inX, const xpcc::Vector<T, 1> &inY, const T &inZ, const xpcc::Vector<T, 1> &inW)
+modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 1> &inY, const T &inZ, const modm::Vector<T, 1> &inW)
 :
 	x(inX),
 	y(inY.x),
@@ -157,7 +157,7 @@ xpcc::Vector<T, 4>::Vector(const T &inX, const xpcc::Vector<T, 1> &inY, const T 
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const T &inX, const T &inY, const T &inZ, const xpcc::Vector<T, 1> &inW)
+modm::Vector<T, 4>::Vector(const T &inX, const T &inY, const T &inZ, const modm::Vector<T, 1> &inW)
 :
 	x(inX),
 	y(inY),
@@ -169,7 +169,7 @@ xpcc::Vector<T, 4>::Vector(const T &inX, const T &inY, const T &inZ, const xpcc:
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 1> &inX, const T &inY, const xpcc::Vector<T, 1> &inZ, const xpcc::Vector<T, 1> &inW)
+modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const T &inY, const modm::Vector<T, 1> &inZ, const modm::Vector<T, 1> &inW)
 :
 	x(inX.x),
 	y(inY),
@@ -181,7 +181,7 @@ xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 1> &inX, const T &inY, const xp
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const T &inX, const T &inY, const xpcc::Vector<T, 1> &inZ, const xpcc::Vector<T, 1> &inW)
+modm::Vector<T, 4>::Vector(const T &inX, const T &inY, const modm::Vector<T, 1> &inZ, const modm::Vector<T, 1> &inW)
 :
 	x(inX),
 	y(inY),
@@ -193,7 +193,7 @@ xpcc::Vector<T, 4>::Vector(const T &inX, const T &inY, const xpcc::Vector<T, 1> 
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const T &inX, const xpcc::Vector<T, 1> &inY, const xpcc::Vector<T, 1> &inZ, const xpcc::Vector<T, 1> &inW)
+modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 1> &inY, const modm::Vector<T, 1> &inZ, const modm::Vector<T, 1> &inW)
 :
 	x(inX),
 	y(inY.x),
@@ -205,7 +205,7 @@ xpcc::Vector<T, 4>::Vector(const T &inX, const xpcc::Vector<T, 1> &inY, const xp
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 2> &inXY, const xpcc::Vector<T, 1> &inZ, const xpcc::Vector<T, 1> &inW)
+modm::Vector<T, 4>::Vector(const modm::Vector<T, 2> &inXY, const modm::Vector<T, 1> &inZ, const modm::Vector<T, 1> &inW)
 :
 	x(inXY.x),
 	y(inXY.y),
@@ -217,7 +217,7 @@ xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 2> &inXY, const xpcc::Vector<T,
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 2> &inXY, const xpcc::Vector<T, 1> &inZ, const T &inW)
+modm::Vector<T, 4>::Vector(const modm::Vector<T, 2> &inXY, const modm::Vector<T, 1> &inZ, const T &inW)
 :
 	x(inXY.x),
 	y(inXY.y),
@@ -229,7 +229,7 @@ xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 2> &inXY, const xpcc::Vector<T,
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 2> &inXY, const T &inZ, const T &inW)
+modm::Vector<T, 4>::Vector(const modm::Vector<T, 2> &inXY, const T &inZ, const T &inW)
 :
 	x(inXY.x),
 	y(inXY.y),
@@ -241,7 +241,7 @@ xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 2> &inXY, const T &inZ, const T
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 2> &inXY, const T &inZ, const xpcc::Vector<T, 1> &inW)
+modm::Vector<T, 4>::Vector(const modm::Vector<T, 2> &inXY, const T &inZ, const modm::Vector<T, 1> &inW)
 :
 	x(inXY.x),
 	y(inXY.y),
@@ -253,7 +253,7 @@ xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 2> &inXY, const T &inZ, const x
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 1> &inX, const xpcc::Vector<T, 2> &inYZ, const xpcc::Vector<T, 1> &inW)
+modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 2> &inYZ, const modm::Vector<T, 1> &inW)
 :
 	x(inX.x),
 	y(inYZ.x),
@@ -265,7 +265,7 @@ xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 1> &inX, const xpcc::Vector<T, 
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 1> &inX, const xpcc::Vector<T, 2> &inYZ, const T &inW)
+modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 2> &inYZ, const T &inW)
 :
 	x(inX.x),
 	y(inYZ.x),
@@ -277,7 +277,7 @@ xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 1> &inX, const xpcc::Vector<T, 
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const T &inX, const xpcc::Vector<T, 2> &inYZ, const T &inW)
+modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 2> &inYZ, const T &inW)
 :
 	x(inX),
 	y(inYZ.x),
@@ -289,7 +289,7 @@ xpcc::Vector<T, 4>::Vector(const T &inX, const xpcc::Vector<T, 2> &inYZ, const T
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const T &inX, const xpcc::Vector<T, 2> &inYZ, const xpcc::Vector<T, 1> &inW)
+modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 2> &inYZ, const modm::Vector<T, 1> &inW)
 :
 	x(inX),
 	y(inYZ.x),
@@ -301,7 +301,7 @@ xpcc::Vector<T, 4>::Vector(const T &inX, const xpcc::Vector<T, 2> &inYZ, const x
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 1> &inX, const xpcc::Vector<T, 1> &inY, const xpcc::Vector<T, 2> &inZW)
+modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 1> &inY, const modm::Vector<T, 2> &inZW)
 :
 	x(inX.x),
 	y(inY.x),
@@ -313,7 +313,7 @@ xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 1> &inX, const xpcc::Vector<T, 
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 1> &inX, const T &inY, const xpcc::Vector<T, 2> &inZW)
+modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const T &inY, const modm::Vector<T, 2> &inZW)
 :
 	x(inX.x),
 	y(inY),
@@ -325,7 +325,7 @@ xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 1> &inX, const T &inY, const xp
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const T &inX, const T &inY, const xpcc::Vector<T, 2> &inZW)
+modm::Vector<T, 4>::Vector(const T &inX, const T &inY, const modm::Vector<T, 2> &inZW)
 :
 	x(inX),
 	y(inY),
@@ -337,7 +337,7 @@ xpcc::Vector<T, 4>::Vector(const T &inX, const T &inY, const xpcc::Vector<T, 2> 
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const T &inX, const xpcc::Vector<T, 1> &inY, const xpcc::Vector<T, 2> &inZW)
+modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 1> &inY, const modm::Vector<T, 2> &inZW)
 :
 	x(inX),
 	y(inY.x),
@@ -349,7 +349,7 @@ xpcc::Vector<T, 4>::Vector(const T &inX, const xpcc::Vector<T, 1> &inY, const xp
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 2> &inXY, const xpcc::Vector<T, 2> &inZW)
+modm::Vector<T, 4>::Vector(const modm::Vector<T, 2> &inXY, const modm::Vector<T, 2> &inZW)
 :
 	x(inXY.x),
 	y(inXY.y),
@@ -361,7 +361,7 @@ xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 2> &inXY, const xpcc::Vector<T,
 	
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 3> &inXYZ, const xpcc::Vector<T, 1> &inW)
+modm::Vector<T, 4>::Vector(const modm::Vector<T, 3> &inXYZ, const modm::Vector<T, 1> &inW)
 :
 	x(inXYZ.x),
 	y(inXYZ.y),
@@ -373,7 +373,7 @@ xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 3> &inXYZ, const xpcc::Vector<T
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 3> &inXYZ, const T &inW)
+modm::Vector<T, 4>::Vector(const modm::Vector<T, 3> &inXYZ, const T &inW)
 :
 	x(inXYZ.x),
 	y(inXYZ.y),
@@ -385,7 +385,7 @@ xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 3> &inXYZ, const T &inW)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 1> &inX, const xpcc::Vector<T, 3> &inYZW)
+modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 3> &inYZW)
 :
 	x(inX.x),
 	y(inYZW.x),
@@ -397,7 +397,7 @@ xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 1> &inX, const xpcc::Vector<T, 
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const T &inX, const xpcc::Vector<T, 3> &inYZW)
+modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 3> &inYZW)
 :
 	x(inX),
 	y(inYZW.x),
@@ -409,7 +409,7 @@ xpcc::Vector<T, 4>::Vector(const T &inX, const xpcc::Vector<T, 3> &inYZW)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const xpcc::Matrix<T, 4, 1> &rhs)
+modm::Vector<T, 4>::Vector(const modm::Matrix<T, 4, 1> &rhs)
 :
 	x(reinterpret_cast<const T*>(&rhs)[0]),
 	y(reinterpret_cast<const T*>(&rhs)[1]),
@@ -420,7 +420,7 @@ xpcc::Vector<T, 4>::Vector(const xpcc::Matrix<T, 4, 1> &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 4> &rhs)
+modm::Vector<T, 4>::Vector(const modm::Vector<T, 4> &rhs)
 :
 	x(rhs.x),
 	y(rhs.y),
@@ -431,7 +431,7 @@ xpcc::Vector<T, 4>::Vector(const xpcc::Vector<T, 4> &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(T inVal)
+modm::Vector<T, 4>::Vector(T inVal)
 :
 	x(inVal),
 	y(inVal),
@@ -443,7 +443,7 @@ xpcc::Vector<T, 4>::Vector(T inVal)
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::Vector<T, 4>::set(const T& x_, const T& y_, const T& z_, const T& w_)
+modm::Vector<T, 4>::set(const T& x_, const T& y_, const T& z_, const T& w_)
 {
 	this->x = x_;
 	this->y = y_;
@@ -454,28 +454,28 @@ xpcc::Vector<T, 4>::set(const T& x_, const T& y_, const T& z_, const T& w_)
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::Vector<T, 4>::setX(const T& value)
+modm::Vector<T, 4>::setX(const T& value)
 {
 	this->x = value;
 }
 
 template<typename T>
 void
-xpcc::Vector<T, 4>::setY(const T& value)
+modm::Vector<T, 4>::setY(const T& value)
 {
 	this->y = value;
 }
 
 template<typename T>
 void
-xpcc::Vector<T, 4>::setZ(const T& value)
+modm::Vector<T, 4>::setZ(const T& value)
 {
 	this->z = value;
 }
 
 template<typename T>
 void
-xpcc::Vector<T, 4>::setW(const T& value)
+modm::Vector<T, 4>::setW(const T& value)
 {
 	this->w = value;
 }
@@ -483,36 +483,36 @@ xpcc::Vector<T, 4>::setW(const T& value)
 // ----------------------------------------------------------------------------
 template<typename T>
 const T&
-xpcc::Vector<T, 4>::getX() const
+modm::Vector<T, 4>::getX() const
 {
 	return this->x;
 }
 
 template<typename T>
 const T&
-xpcc::Vector<T, 4>::getY() const
+modm::Vector<T, 4>::getY() const
 {
 	return this->y;
 }
 
 template<typename T>
 const T&
-xpcc::Vector<T, 4>::getZ() const
+modm::Vector<T, 4>::getZ() const
 {
 	return this->z;
 }
 
 template<typename T>
 const T&
-xpcc::Vector<T, 4>::getW() const
+modm::Vector<T, 4>::getW() const
 {
 	return this->w;
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>&
-xpcc::Vector<T, 4>::operator = (const xpcc::Matrix<T, 4, 1> &rhs)
+modm::Vector<T, 4>&
+modm::Vector<T, 4>::operator = (const modm::Matrix<T, 4, 1> &rhs)
 {
 	x = reinterpret_cast<const T*>(&rhs)[0];
 	y = reinterpret_cast<const T*>(&rhs)[1];
@@ -524,8 +524,8 @@ xpcc::Vector<T, 4>::operator = (const xpcc::Matrix<T, 4, 1> &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>&
-xpcc::Vector<T, 4>::operator = (const xpcc::Vector<T, 4> &rhs)
+modm::Vector<T, 4>&
+modm::Vector<T, 4>::operator = (const modm::Vector<T, 4> &rhs)
 {
 	x = rhs.x;
 	y = rhs.y;
@@ -538,7 +538,7 @@ xpcc::Vector<T, 4>::operator = (const xpcc::Vector<T, 4> &rhs)
 // ----------------------------------------------------------------------------
 template<typename T>
 bool
-xpcc::Vector<T, 4>::operator == (const xpcc::Vector<T, 4> &rhs) const
+modm::Vector<T, 4>::operator == (const modm::Vector<T, 4> &rhs) const
 {
 	return (rhs.x == x) && (rhs.y == y) && (rhs.z == z) && (rhs.w == w);
 }
@@ -546,7 +546,7 @@ xpcc::Vector<T, 4>::operator == (const xpcc::Vector<T, 4> &rhs) const
 // ----------------------------------------------------------------------------
 template<typename T>
 bool
-xpcc::Vector<T, 4>::operator != (const xpcc::Vector<T, 4> &rhs) const
+modm::Vector<T, 4>::operator != (const modm::Vector<T, 4> &rhs) const
 {
 	return (rhs.x != x) || (rhs.y != y) || (rhs.z != z) || (rhs.w != w);
 }
@@ -554,7 +554,7 @@ xpcc::Vector<T, 4>::operator != (const xpcc::Vector<T, 4> &rhs) const
 // ----------------------------------------------------------------------------
 template<typename T>
 bool
-xpcc::Vector<T, 4>::operator < (const xpcc::Vector<T, 4> &rhs) const
+modm::Vector<T, 4>::operator < (const modm::Vector<T, 4> &rhs) const
 {
 	return (x < rhs.x) || ((x == rhs.x) && ((y < rhs.y) || ((y == rhs.y) && ((z < rhs.z) || ((z == rhs.z) && (w < rhs.w))))));
 }
@@ -562,7 +562,7 @@ xpcc::Vector<T, 4>::operator < (const xpcc::Vector<T, 4> &rhs) const
 // ----------------------------------------------------------------------------
 template<typename T>
 bool
-xpcc::Vector<T, 4>::operator <= (const xpcc::Vector<T, 4> &rhs) const
+modm::Vector<T, 4>::operator <= (const modm::Vector<T, 4> &rhs) const
 {
 	return (x < rhs.x) || ((x == rhs.x) && ((y < rhs.y) || ((y == rhs.y) && ((z < rhs.z) || ((z == rhs.z) && (w <= rhs.w))))));
 }
@@ -570,7 +570,7 @@ xpcc::Vector<T, 4>::operator <= (const xpcc::Vector<T, 4> &rhs) const
 // ----------------------------------------------------------------------------
 template<typename T>
 bool
-xpcc::Vector<T, 4>::operator > (const xpcc::Vector<T, 4> &rhs) const
+modm::Vector<T, 4>::operator > (const modm::Vector<T, 4> &rhs) const
 {
 	return (x > rhs.x) || ((x == rhs.x) && ((y > rhs.y) || ((y == rhs.y) && ((z > rhs.z) || ((z == rhs.z) && (w > rhs.w))))));
 }
@@ -578,7 +578,7 @@ xpcc::Vector<T, 4>::operator > (const xpcc::Vector<T, 4> &rhs) const
 // ----------------------------------------------------------------------------
 template<typename T>
 bool
-xpcc::Vector<T, 4>::operator >= (const xpcc::Vector<T, 4> &rhs) const
+modm::Vector<T, 4>::operator >= (const modm::Vector<T, 4> &rhs) const
 {
 	return (x > rhs.x) || ((x == rhs.x) && ((y > rhs.y) || ((y == rhs.y) && ((z > rhs.z) || ((z == rhs.z) && (w >= rhs.w))))));
 }
@@ -586,7 +586,7 @@ xpcc::Vector<T, 4>::operator >= (const xpcc::Vector<T, 4> &rhs) const
 // ----------------------------------------------------------------------------
 template<typename T>
 const T&
-xpcc::Vector<T, 4>::operator [] (uint8_t index) const
+modm::Vector<T, 4>::operator [] (uint8_t index) const
 {
 	return reinterpret_cast<const T*>(this)[index];
 }
@@ -594,7 +594,7 @@ xpcc::Vector<T, 4>::operator [] (uint8_t index) const
 // ----------------------------------------------------------------------------
 template<typename T>
 T&
-xpcc::Vector<T, 4>::operator [] (uint8_t index)
+modm::Vector<T, 4>::operator [] (uint8_t index)
 {
 	return reinterpret_cast<T*>(this)[index];
 }
@@ -602,7 +602,7 @@ xpcc::Vector<T, 4>::operator [] (uint8_t index)
 // ----------------------------------------------------------------------------
 template<typename T>
 T*
-xpcc::Vector<T, 4>::ptr()
+modm::Vector<T, 4>::ptr()
 {
 	return reinterpret_cast<T*>(this);
 }
@@ -610,55 +610,55 @@ xpcc::Vector<T, 4>::ptr()
 // ----------------------------------------------------------------------------
 template<typename T>
 const T*
-xpcc::Vector<T, 4>::ptr() const
+modm::Vector<T, 4>::ptr() const
 {
 	return reinterpret_cast<const T*>(this);
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>
-xpcc::Vector<T, 4>::operator + (const xpcc::Vector<T, 4> &rhs) const
+modm::Vector<T, 4>
+modm::Vector<T, 4>::operator + (const modm::Vector<T, 4> &rhs) const
 {
-	return xpcc::Vector<T, 4>(x+rhs.x, y+rhs.y, z+rhs.z, w+rhs.w);
+	return modm::Vector<T, 4>(x+rhs.x, y+rhs.y, z+rhs.z, w+rhs.w);
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>
-xpcc::Vector<T, 4>::operator - (const xpcc::Vector<T, 4> &rhs) const
+modm::Vector<T, 4>
+modm::Vector<T, 4>::operator - (const modm::Vector<T, 4> &rhs) const
 {
-	return xpcc::Vector<T, 4>(x-rhs.x, y-rhs.y, z-rhs.z, w-rhs.w);
+	return modm::Vector<T, 4>(x-rhs.x, y-rhs.y, z-rhs.z, w-rhs.w);
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
 T
-xpcc::Vector<T, 4>::operator * (const xpcc::Vector<T, 4> &rhs) const
+modm::Vector<T, 4>::operator * (const modm::Vector<T, 4> &rhs) const
 {
 	return x*rhs.x + y*rhs.y + z*rhs.z + w*rhs.w;
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>
-xpcc::Vector<T, 4>::operator * (const T &rhs) const
+modm::Vector<T, 4>
+modm::Vector<T, 4>::operator * (const T &rhs) const
 {
-	return xpcc::Vector<T, 4>(x*rhs, y*rhs, z*rhs, w*rhs);
+	return modm::Vector<T, 4>(x*rhs, y*rhs, z*rhs, w*rhs);
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>
-xpcc::Vector<T, 4>::operator / (const T &rhs) const
+modm::Vector<T, 4>
+modm::Vector<T, 4>::operator / (const T &rhs) const
 {
-	return xpcc::Vector<T, 4>(x/rhs, y/rhs, z/rhs, w/rhs);
+	return modm::Vector<T, 4>(x/rhs, y/rhs, z/rhs, w/rhs);
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>&
-xpcc::Vector<T, 4>::operator += (const xpcc::Vector<T, 4> &rhs)
+modm::Vector<T, 4>&
+modm::Vector<T, 4>::operator += (const modm::Vector<T, 4> &rhs)
 {
 	x += rhs.x;
 	y += rhs.y;
@@ -670,8 +670,8 @@ xpcc::Vector<T, 4>::operator += (const xpcc::Vector<T, 4> &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>&
-xpcc::Vector<T, 4>::operator -= (const xpcc::Vector<T, 4> &rhs)
+modm::Vector<T, 4>&
+modm::Vector<T, 4>::operator -= (const modm::Vector<T, 4> &rhs)
 {
 	x -= rhs.x;
 	y -= rhs.y;
@@ -683,8 +683,8 @@ xpcc::Vector<T, 4>::operator -= (const xpcc::Vector<T, 4> &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>&
-xpcc::Vector<T, 4>::operator *= (const T &rhs)
+modm::Vector<T, 4>&
+modm::Vector<T, 4>::operator *= (const T &rhs)
 {
 	x *= rhs;
 	y *= rhs;
@@ -696,8 +696,8 @@ xpcc::Vector<T, 4>::operator *= (const T &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>&
-xpcc::Vector<T, 4>::operator /= (const T &rhs)
+modm::Vector<T, 4>&
+modm::Vector<T, 4>::operator /= (const T &rhs)
 {
 	x /= rhs;
 	y /= rhs;
@@ -709,16 +709,16 @@ xpcc::Vector<T, 4>::operator /= (const T &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>
-xpcc::Vector<T, 4>::operator - () const
+modm::Vector<T, 4>
+modm::Vector<T, 4>::operator - () const
 {
-	return xpcc::Vector<T, 4>(-x, -y, -z, -w);
+	return modm::Vector<T, 4>(-x, -y, -z, -w);
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
 float
-xpcc::Vector<T, 4>::getLength() const
+modm::Vector<T, 4>::getLength() const
 {
 	return std::sqrt(getLengthSquared());
 }
@@ -726,7 +726,7 @@ xpcc::Vector<T, 4>::getLength() const
 // ----------------------------------------------------------------------------
 template<typename T>
 float
-xpcc::Vector<T, 4>::getLengthSquared() const
+modm::Vector<T, 4>::getLengthSquared() const
 {
 	return x*x + y*y + z*z + w*w;
 }
@@ -734,15 +734,15 @@ xpcc::Vector<T, 4>::getLengthSquared() const
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::Vector<T, 4>::scale(float newLength)
+modm::Vector<T, 4>::scale(float newLength)
 {
 	*this = scaled(newLength);
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>
-xpcc::Vector<T, 4>::scaled(float newLength) const
+modm::Vector<T, 4>
+modm::Vector<T, 4>::scaled(float newLength) const
 {
 	float scale = newLength / getLength();
 	return *this * scale;
@@ -751,61 +751,61 @@ xpcc::Vector<T, 4>::scaled(float newLength) const
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::Vector<T, 4>::normalize()
+modm::Vector<T, 4>::normalize()
 {
 	scale(1.0f);
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>
-xpcc::Vector<T, 4>::normalized() const
+modm::Vector<T, 4>
+modm::Vector<T, 4>::normalized() const
 {
 	return scaled(1.0);
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Matrix<T, 4, 1>&
-xpcc::Vector<T, 4>::asMatrix()
+modm::Matrix<T, 4, 1>&
+modm::Vector<T, 4>::asMatrix()
 {
-	return *(xpcc::Matrix<T, 4, 1>*)this;
+	return *(modm::Matrix<T, 4, 1>*)this;
 }
 
 template<typename T>
-const xpcc::Matrix<T, 4, 1>&
-xpcc::Vector<T, 4>::asMatrix() const
+const modm::Matrix<T, 4, 1>&
+modm::Vector<T, 4>::asMatrix() const
 {
-	return *(xpcc::Matrix<T, 4, 1>*)this;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T>
-xpcc::Matrix<T, 1, 4>&
-xpcc::Vector<T, 4>::asTransposedMatrix()
-{
-	return *(xpcc::Matrix<T, 1, 4>*)this;
-}
-
-
-template<typename T>
-const xpcc::Matrix<T, 1, 4>&
-xpcc::Vector<T, 4>::asTransposedMatrix() const
-{
-	return *(xpcc::Matrix<T, 1, 4>*)this;
+	return *(modm::Matrix<T, 4, 1>*)this;
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
-static inline xpcc::Vector<T,4>
-operator * (const T &lhs, const xpcc::Vector<T,4> &rhs)
+modm::Matrix<T, 1, 4>&
+modm::Vector<T, 4>::asTransposedMatrix()
+{
+	return *(modm::Matrix<T, 1, 4>*)this;
+}
+
+
+template<typename T>
+const modm::Matrix<T, 1, 4>&
+modm::Vector<T, 4>::asTransposedMatrix() const
+{
+	return *(modm::Matrix<T, 1, 4>*)this;
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+static inline modm::Vector<T,4>
+operator * (const T &lhs, const modm::Vector<T,4> &rhs)
 {
 	return rhs * lhs;
 }
 
 template<class T, class U>
-static inline xpcc::Vector<U,4>
-operator * (const xpcc::Matrix<T, 4, 4> &lhs, const xpcc::Vector<U,4> &rhs)
+static inline modm::Vector<U,4>
+operator * (const modm::Matrix<T, 4, 4> &lhs, const modm::Vector<U,4> &rhs)
 {
 	return lhs * rhs.asTMatrix();
 }

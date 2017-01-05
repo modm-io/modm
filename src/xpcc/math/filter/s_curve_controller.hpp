@@ -14,12 +14,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_S_CURVE_CONTROLLER_HPP
-#define XPCC_S_CURVE_CONTROLLER_HPP
+#ifndef MODM_S_CURVE_CONTROLLER_HPP
+#define MODM_S_CURVE_CONTROLLER_HPP
 
 #include <cmath>
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	S-Curve trajectory generation with feedback
@@ -109,4 +109,4 @@ namespace xpcc
 
 #include "s_curve_controller_impl.hpp"
 
-#endif // XPCC_S_CURVE_CONTROLLER_HPP
+#endif // MODM_S_CURVE_CONTROLLER_HPP

@@ -11,14 +11,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LOG_STYLE_HPP
+#ifndef MODM_LOG_STYLE_HPP
 	#error "Don't include this file directly, use 'style.hpp' instead!"
 #endif
 
 // -----------------------------------------------------------------------------
 
 template < typename STYLE >
-xpcc::log::Style<STYLE>::Style( STYLE style ) :
+modm::log::Style<STYLE>::Style( STYLE style ) :
 	style( style ),
 	device ( 0 )
 {
@@ -27,7 +27,7 @@ xpcc::log::Style<STYLE>::Style( STYLE style ) :
 // -----------------------------------------------------------------------------
 
 template < typename STYLE >
-xpcc::log::Style<STYLE>::Style( IODevice &outputDevice) :
+modm::log::Style<STYLE>::Style( IODevice &outputDevice) :
 	device ( &outputDevice )
 {
 }
@@ -35,7 +35,7 @@ xpcc::log::Style<STYLE>::Style( IODevice &outputDevice) :
 // -----------------------------------------------------------------------------
 
 template < typename STYLE >
-xpcc::log::Style<STYLE>::~Style()
+modm::log::Style<STYLE>::~Style()
 {
 }
 
@@ -43,7 +43,7 @@ xpcc::log::Style<STYLE>::~Style()
 
 template < typename STYLE >
 void
-xpcc::log::Style<STYLE>::parseArg( int /*argc*/, char * /*argv*/ )
+modm::log::Style<STYLE>::parseArg( int /*argc*/, char * /*argv*/ )
 {
 }
 
@@ -51,7 +51,7 @@ xpcc::log::Style<STYLE>::parseArg( int /*argc*/, char * /*argv*/ )
 
 template < typename STYLE >
 void
-xpcc::log::Style<STYLE>::write( char c )
+modm::log::Style<STYLE>::write( char c )
 {
 	if ( tmp::SameType<STYLE, DefaultStyle >::value ) {
 		this->device->write( c );
@@ -65,7 +65,7 @@ xpcc::log::Style<STYLE>::write( char c )
 
 template < typename STYLE >
 void
-xpcc::log::Style<STYLE>::write( const char* s )
+modm::log::Style<STYLE>::write( const char* s )
 {
 	if ( tmp::SameType<STYLE, DefaultStyle>::value ) {
 		this->device->write( s );
@@ -79,7 +79,7 @@ xpcc::log::Style<STYLE>::write( const char* s )
 
 template < typename STYLE >
 void
-xpcc::log::Style<STYLE>::flush()
+modm::log::Style<STYLE>::flush()
 {
 	if ( tmp::SameType<STYLE, DefaultStyle >::value ) {
 		this->device->flush();

@@ -13,9 +13,9 @@
 #include <modm/architecture/driver.hpp>
 #include "st7036.hpp"
 
-#include "xpcc_config.hpp"
+#include "modm_config.hpp"
 
-namespace xpcc
+namespace modm
 {
 	namespace st7036
 	{

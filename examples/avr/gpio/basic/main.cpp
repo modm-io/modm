@@ -13,11 +13,11 @@
 
 #include <modm/architecture/platform.hpp>
 
-using namespace xpcc::attiny;
+using namespace modm::attiny;
 
 typedef GpioOutputB0 Led;
 // create a wrapper for a output pin
-typedef xpcc::GpioInverted< GpioOutputB1 > LedInverted;
+typedef modm::GpioInverted< GpioOutputB1 > LedInverted;
 
 int
 main()
@@ -25,7 +25,7 @@ main()
 	Led::setOutput();
 	Led::set();
 
-	LedInverted::setOutput(xpcc::Gpio::Low);
+	LedInverted::setOutput(modm::Gpio::Low);
 
 	while (1)
 	{

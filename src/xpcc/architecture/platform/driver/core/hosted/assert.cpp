@@ -13,21 +13,21 @@
 #include <modm/debug/logger.hpp>
 #include <modm/architecture/interface/assert.hpp>
 
-using xpcc::AssertionHandler;
-using xpcc::Abandonment;
+using modm::AssertionHandler;
+using modm::Abandonment;
 
-#ifdef XPCC_OS_OSX
-extern AssertionHandler __assertion_table_start __asm("section$start$__DATA$xpcc_assertion");
-extern AssertionHandler __assertion_table_end __asm("section$end$__DATA$xpcc_assertion");
+#ifdef MODM_OS_OSX
+extern AssertionHandler __assertion_table_start __asm("section$start$__DATA$modm_assertion");
+extern AssertionHandler __assertion_table_end __asm("section$end$__DATA$modm_assertion");
 #else
-extern AssertionHandler __assertion_table_start __asm("__start_xpcc_assertion");
-extern AssertionHandler __assertion_table_end __asm("__stop_xpcc_assertion");
+extern AssertionHandler __assertion_table_start __asm("__start_modm_assertion");
+extern AssertionHandler __assertion_table_end __asm("__stop_modm_assertion");
 #endif
 
 extern "C"
 {
 
-void xpcc_assert_evaluate(bool condition, const char * identifier)
+void modm_assert_evaluate(bool condition, const char * identifier)
 {
 	if (!condition)
 	{
@@ -45,18 +45,18 @@ void xpcc_assert_evaluate(bool condition, const char * identifier)
 		if (state == (uint8_t) Abandonment::DontCare or
 			state & (uint8_t) Abandonment::Fail)
 		{
-			xpcc_abandon(module, location, failure);
+			modm_abandon(module, location, failure);
 			exit(1);
 		}
 	}
 }
 
-void xpcc_abandon(const char * module, const char * location, const char * failure) __attribute__((weak));
-void xpcc_abandon(const char * module, const char * location, const char * failure)
+void modm_abandon(const char * module, const char * location, const char * failure) __attribute__((weak));
+void modm_abandon(const char * module, const char * location, const char * failure)
 {
-	XPCC_LOG_ERROR << "Assertion '"
+	MODM_LOG_ERROR << "Assertion '"
 			<< module << "." << location << "." << failure
-			<< "' failed! Abandoning." << xpcc::endl;
+			<< "' failed! Abandoning." << modm::endl;
 }
 
 }

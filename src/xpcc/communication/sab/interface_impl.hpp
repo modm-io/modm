@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_SAB_INTERFACE_HPP
+#ifndef	MODM_SAB_INTERFACE_HPP
 	#error	"Don't include this file directly, use 'interface.hpp' instead!"
 #endif
 
@@ -22,24 +22,24 @@
 
 /*#include <modm/debug/logger.hpp>
 
-#undef XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL	xpcc::log::DEBUG*/
+#undef MODM_LOG_LEVEL
+#define MODM_LOG_LEVEL	modm::log::DEBUG*/
 
 // ----------------------------------------------------------------------------
-template <typename Device> typename xpcc::sab::Interface<Device>::State \
-	xpcc::sab::Interface<Device>::state = SYNC;
+template <typename Device> typename modm::sab::Interface<Device>::State \
+	modm::sab::Interface<Device>::state = SYNC;
 
-template <typename Device> uint8_t xpcc::sab::Interface<Device>::buffer[maxPayloadLength + 3];
-template <typename Device> uint8_t xpcc::sab::Interface<Device>::crc;
-template <typename Device> uint8_t xpcc::sab::Interface<Device>::position;
-template <typename Device> uint8_t xpcc::sab::Interface<Device>::length;
-template <typename Device> uint8_t xpcc::sab::Interface<Device>::lengthOfReceivedMessage = 0;
+template <typename Device> uint8_t modm::sab::Interface<Device>::buffer[maxPayloadLength + 3];
+template <typename Device> uint8_t modm::sab::Interface<Device>::crc;
+template <typename Device> uint8_t modm::sab::Interface<Device>::position;
+template <typename Device> uint8_t modm::sab::Interface<Device>::length;
+template <typename Device> uint8_t modm::sab::Interface<Device>::lengthOfReceivedMessage = 0;
 
 // ----------------------------------------------------------------------------
 
 template <typename Device>
 void
-xpcc::sab::Interface<Device>::initialize()
+modm::sab::Interface<Device>::initialize()
 {
 	//Device::setBaudrate(115200UL);
 	state = SYNC;
@@ -49,7 +49,7 @@ xpcc::sab::Interface<Device>::initialize()
 
 template <typename Device>
 void
-xpcc::sab::Interface<Device>::sendMessage(uint8_t address, Flags flags, 
+modm::sab::Interface<Device>::sendMessage(uint8_t address, Flags flags, 
 		uint8_t command,
 		const void *payload, uint8_t payloadLength)
 {
@@ -76,7 +76,7 @@ xpcc::sab::Interface<Device>::sendMessage(uint8_t address, Flags flags,
 
 template <typename Device> template <typename T>
 void
-xpcc::sab::Interface<Device>::sendMessage(uint8_t address, Flags flags,
+modm::sab::Interface<Device>::sendMessage(uint8_t address, Flags flags,
 		uint8_t command,
 		const T& payload)
 {
@@ -87,7 +87,7 @@ xpcc::sab::Interface<Device>::sendMessage(uint8_t address, Flags flags,
 
 template <typename Device>
 void
-xpcc::sab::Interface<Device>::sendMessage(uint8_t address, Flags flags, uint8_t command)
+modm::sab::Interface<Device>::sendMessage(uint8_t address, Flags flags, uint8_t command)
 {
 	sendMessage(address, flags,
 			command,
@@ -98,56 +98,56 @@ xpcc::sab::Interface<Device>::sendMessage(uint8_t address, Flags flags, uint8_t 
 
 template <typename Device>
 bool
-xpcc::sab::Interface<Device>::isMessageAvailable()
+modm::sab::Interface<Device>::isMessageAvailable()
 {
 	return (lengthOfReceivedMessage != 0);
 }
 
 template <typename Device>
 uint8_t
-xpcc::sab::Interface<Device>::getAddress()
+modm::sab::Interface<Device>::getAddress()
 {
 	return (buffer[0] & 0x3f);
 }
 
 template <typename Device>
 uint8_t
-xpcc::sab::Interface<Device>::getCommand()
+modm::sab::Interface<Device>::getCommand()
 {
 	return buffer[1];
 }
 
 template <typename Device>
 bool
-xpcc::sab::Interface<Device>::isResponse()
+modm::sab::Interface<Device>::isResponse()
 {
 	return (buffer[0] & 0x80) ? true : false;
 }
 
 template <typename Device>
 bool
-xpcc::sab::Interface<Device>::isAcknowledge()
+modm::sab::Interface<Device>::isAcknowledge()
 {
 	return (buffer[0] & 0x40) ? true : false;
 }
 
 template <typename Device>
 const uint8_t*
-xpcc::sab::Interface<Device>::getPayload()
+modm::sab::Interface<Device>::getPayload()
 {
 	return &buffer[2];
 }
 
 template <typename Device>
 uint8_t
-xpcc::sab::Interface<Device>::getPayloadLength()
+modm::sab::Interface<Device>::getPayloadLength()
 {
 	return (lengthOfReceivedMessage - 3);
 }
 
 template <typename Device>
 void
-xpcc::sab::Interface<Device>::dropMessage()
+modm::sab::Interface<Device>::dropMessage()
 {
 	lengthOfReceivedMessage = 0;
 }
@@ -156,12 +156,12 @@ xpcc::sab::Interface<Device>::dropMessage()
 
 template <typename Device>
 void
-xpcc::sab::Interface<Device>::update()
+modm::sab::Interface<Device>::update()
 {
 	uint8_t byte;
 	while (Device::read(byte))
 	{
-		//XPCC_LOG_DEBUG.printf("%02x ", byte);
+		//MODM_LOG_DEBUG.printf("%02x ", byte);
 		switch (state)
 		{
 			case SYNC:
@@ -190,10 +190,10 @@ xpcc::sab::Interface<Device>::update()
 				if (position >= length) {
 					if (crc == 0) {
 						lengthOfReceivedMessage = length;
-						//XPCC_LOG_DEBUG << "SAB received" << xpcc::endl;
+						//MODM_LOG_DEBUG << "SAB received" << modm::endl;
 					}
 					else {
-						//XPCC_LOG_ERROR << "CRC error" << xpcc::endl;
+						//MODM_LOG_ERROR << "CRC error" << modm::endl;
 					}
 					state = SYNC;
 				}

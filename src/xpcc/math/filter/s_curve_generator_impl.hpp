@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_S_CURVE_GENERATOR_HPP
+#ifndef MODM_S_CURVE_GENERATOR_HPP
 	#error	"Don't include this file directly, use 's_curve_generator.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::SCurveGenerator<T>::SCurveGenerator(const T& initialValue) :
+modm::SCurveGenerator<T>::SCurveGenerator(const T& initialValue) :
 	target(), value(initialValue), targetReached(false)
 {
 }
@@ -25,7 +25,7 @@ xpcc::SCurveGenerator<T>::SCurveGenerator(const T& initialValue) :
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::SCurveGenerator<T>::setTarget(const T& target)
+modm::SCurveGenerator<T>::setTarget(const T& target)
 {
 	this->target = target;
 	targetReached = false;
@@ -33,13 +33,13 @@ xpcc::SCurveGenerator<T>::setTarget(const T& target)
 
 template<typename T>
 void
-xpcc::SCurveGenerator<T>::update()
+modm::SCurveGenerator<T>::update()
 {
 }
 
 template<typename T>
 bool
-xpcc::SCurveGenerator<T>::isTargetReached() const
+modm::SCurveGenerator<T>::isTargetReached() const
 {
 	return targetReached;
 }

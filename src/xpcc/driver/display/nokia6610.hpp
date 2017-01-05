@@ -12,14 +12,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_NOKIA6610_HPP
-#define XPCC_NOKIA6610_HPP
+#ifndef MODM_NOKIA6610_HPP
+#define MODM_NOKIA6610_HPP
 
 #include <modm/architecture/driver/delay.hpp>
 
 #include <modm/ui/display/buffered_graphic_display.hpp>
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	Driver for Nokia6610 displays
@@ -54,19 +54,19 @@ namespace xpcc
 		setContrast(uint8_t contrast);
 
 	private:
-		xpcc_always_inline void
+		modm_always_inline void
 		lcdSettings(void);
 
-		xpcc_always_inline void
+		modm_always_inline void
 		writeSpiCommand(uint16_t data);
 
-		xpcc_always_inline void
+		modm_always_inline void
 		writeSpiData(uint16_t data);
 
-		xpcc_always_inline void
+		modm_always_inline void
 		writeSpi9Bit(uint16_t data);
 
-		xpcc_always_inline void
+		modm_always_inline void
 		writeSpi9BitFlush();
 
 		void
@@ -80,4 +80,4 @@ namespace xpcc
 
 #include "nokia6610_impl.hpp"
 
-#endif // XPCC_NOKIA6610_HPP
+#endif // MODM_NOKIA6610_HPP

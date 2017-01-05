@@ -12,42 +12,42 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_AD840x_HPP
+#ifndef MODM_AD840x_HPP
 #	error "Don't include this file directly, use 'ad840x.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template<typename Spi, typename Cs, typename Rs, typename Shdn>
 void
-xpcc::AD840x<Spi, Cs, Rs, Shdn>::initialize()
+modm::AD840x<Spi, Cs, Rs, Shdn>::initialize()
 {
 //	Spi::initialize();
-	Cs::setOutput(xpcc::Gpio::High);
-	Rs::setOutput(xpcc::Gpio::High);
-	Shdn::setOutput(xpcc::Gpio::High);
+	Cs::setOutput(modm::Gpio::High);
+	Rs::setOutput(modm::Gpio::High);
+	Shdn::setOutput(modm::Gpio::High);
 }
 
 // ----------------------------------------------------------------------------
 template<typename Spi, typename Cs, typename Rs, typename Shdn>
 inline void
-xpcc::AD840x<Spi, Cs, Rs, Shdn>::reset()
+modm::AD840x<Spi, Cs, Rs, Shdn>::reset()
 {
 	Rs::reset();
-	xpcc::delayMicroseconds(1);		// wait at least 50ns
+	modm::delayMicroseconds(1);		// wait at least 50ns
 	Rs::set();
 }
 
 // ----------------------------------------------------------------------------
 template<typename Spi, typename Cs, typename Rs, typename Shdn>
 inline void
-xpcc::AD840x<Spi, Cs, Rs, Shdn>::shutdown()
+modm::AD840x<Spi, Cs, Rs, Shdn>::shutdown()
 {
 	Shdn::reset();
 }
 
 template<typename Spi, typename Cs, typename Rs, typename Shdn>
 inline void
-xpcc::AD840x<Spi, Cs, Rs, Shdn>::resume()
+modm::AD840x<Spi, Cs, Rs, Shdn>::resume()
 {
 	Shdn::set();
 }
@@ -55,7 +55,7 @@ xpcc::AD840x<Spi, Cs, Rs, Shdn>::resume()
 // ----------------------------------------------------------------------------
 template<typename Spi, typename Cs, typename Rs, typename Shdn>
 void
-xpcc::AD840x<Spi, Cs, Rs, Shdn>::setValue(ad840x::Channel channel, uint8_t data)
+modm::AD840x<Spi, Cs, Rs, Shdn>::setValue(ad840x::Channel channel, uint8_t data)
 {
 	Cs::reset();
 	

@@ -14,9 +14,9 @@
 
 #include <modm/ui/gui/widgets.hpp>
 
-using namespace xpcc::gui;
+using namespace modm::gui;
 
-Overview::Overview(xpcc::gui::GuiViewStack* stack, uint8_t identifier) :
+Overview::Overview(modm::gui::GuiViewStack* stack, uint8_t identifier) :
 	View(stack, identifier, Dimension(320, 240)),
 	tabpanel(Dimension(320, 240), 0.2),
 	buttonLeft("Back", tabpanel.buttonDimension),
@@ -29,7 +29,7 @@ Overview::Overview(xpcc::gui::GuiViewStack* stack, uint8_t identifier) :
 	tabpanel.packTabRight(&buttonRight);
 
 
-	this->pack(&tabpanel, xpcc::glcd::Point(0, 0));
+	this->pack(&tabpanel, modm::glcd::Point(0, 0));
 
 }
 

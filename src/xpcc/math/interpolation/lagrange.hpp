@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_INTERPOLATION_LAGRANGE_HPP
-#define	XPCC_INTERPOLATION_LAGRANGE_HPP
+#ifndef	MODM_INTERPOLATION_LAGRANGE_HPP
+#define	MODM_INTERPOLATION_LAGRANGE_HPP
 
 #include <stdint.h>
 
@@ -22,7 +22,7 @@
 
 #include <modm/utils/template_metaprogramming.hpp>
 
-namespace xpcc
+namespace modm
 {
 	namespace interpolation
 	{
@@ -31,7 +31,7 @@ namespace xpcc
 		 * 
 		 * Example:
 		 * \code
-		 * typedef xpcc::Pair<float, float> Point;
+		 * typedef modm::Pair<float, float> Point;
 		 * 
 		 * // interpolate x^2 over the range of 1 <= x <= 3
 		 * Point points[3] =
@@ -41,7 +41,7 @@ namespace xpcc
 		 *     { 3, 9 }
 		 * };
 		 * 
-		 * xpcc::interpolation::Lagrange<Point> value(points, 3);
+		 * modm::interpolation::Lagrange<Point> value(points, 3);
 		 * 
 		 * ...
 		 * float output = value.interpolate(1.5f);
@@ -51,20 +51,20 @@ namespace xpcc
 		 * \see http://en.wikipedia.org/wiki/Lagrange_interpolation
 		 * 
 		 * \warning	Only floating points types are allowed as second type of
-		 * 			xpcc::Pair, otherwise the calculation will deliver wrong
+		 * 			modm::Pair, otherwise the calculation will deliver wrong
 		 * 			results!
 		 * 
-		 * \tparam	T	Any specialization of xpcc::Pair<> with a floating
+		 * \tparam	T	Any specialization of modm::Pair<> with a floating
 		 * 				point type as second template argument.
-		 * \tparam	Accessor	Accessor class. Can be xpcc::accessor::Ram,
-		 * 						xpcc::accessor::Flash or any self defined
+		 * \tparam	Accessor	Accessor class. Can be modm::accessor::Ram,
+		 * 						modm::accessor::Flash or any self defined
 		 * 						accessor class.
-		 * 						Default is xpcc::accessor::Ram.
+		 * 						Default is modm::accessor::Ram.
 		 * 
 		 * \ingroup	interpolation
 		 */
 		template <typename T,
-				  template <typename> class Accessor = ::xpcc::accessor::Ram>
+				  template <typename> class Accessor = ::modm::accessor::Ram>
 		class Lagrange
 		{
 		public:
@@ -72,16 +72,16 @@ namespace xpcc
 			typedef typename T::SecondType OutputType;
 			
 			// WARNING:
-			// Only floating point types are allowed as second type of xpcc::Pair
+			// Only floating point types are allowed as second type of modm::Pair
 			// because the calculation will deliver wrong results otherwise!
-			static_assert(xpcc::ArithmeticTraits<OutputType>::isFloatingPoint, 
-					"Only floating point types are allowed as second type of xpcc::Pair");
+			static_assert(modm::ArithmeticTraits<OutputType>::isFloatingPoint, 
+					"Only floating point types are allowed as second type of modm::Pair");
 		public:
 			/**
 			 * \brief	Constructor
 			 * 
 			 * \param	supportingPoints	Supporting points of the curve.
-			 * 								Needs to be an Array of xpcc::Pair<>.
+			 * 								Needs to be an Array of modm::Pair<>.
 			 * \param	numberOfPoints		length of \p supportingPoints
 			 */
 			Lagrange(Accessor<T> supportingPoints, uint8_t numberOfPoints);
@@ -104,5 +104,5 @@ namespace xpcc
 
 #include "lagrange_impl.hpp"
 
-#endif	// XPCC_INTERPOLATION_LAGRANGE_HPP
+#endif	// MODM_INTERPOLATION_LAGRANGE_HPP
 

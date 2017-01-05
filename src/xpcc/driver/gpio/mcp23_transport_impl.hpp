@@ -9,14 +9,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_MCP23_TRANSPORT_HPP
+#ifndef MODM_MCP23_TRANSPORT_HPP
 #	error  "Don't include this file directly, use 'mcp23_transport.hpp' instead!"
 #endif
 
 // ============================================================================
 // MARK: I2C TRANSPORT
 template < class I2cMaster >
-xpcc::Mcp23TransportI2c<I2cMaster>::Mcp23TransportI2c(uint8_t address)
+modm::Mcp23TransportI2c<I2cMaster>::Mcp23TransportI2c(uint8_t address)
 :	I2cDevice<I2cMaster, 2>(address)
 {
 }
@@ -24,8 +24,8 @@ xpcc::Mcp23TransportI2c<I2cMaster>::Mcp23TransportI2c(uint8_t address)
 // MARK: - register access
 // MARK: write register
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Mcp23TransportI2c<I2cMaster>::write(uint8_t reg, uint8_t value)
+modm::ResumableResult<bool>
+modm::Mcp23TransportI2c<I2cMaster>::write(uint8_t reg, uint8_t value)
 {
 	RF_BEGIN();
 
@@ -38,8 +38,8 @@ xpcc::Mcp23TransportI2c<I2cMaster>::write(uint8_t reg, uint8_t value)
 }
 
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Mcp23TransportI2c<I2cMaster>::write16(uint8_t reg, uint16_t value)
+modm::ResumableResult<bool>
+modm::Mcp23TransportI2c<I2cMaster>::write16(uint8_t reg, uint16_t value)
 {
 	RF_BEGIN();
 
@@ -54,8 +54,8 @@ xpcc::Mcp23TransportI2c<I2cMaster>::write16(uint8_t reg, uint16_t value)
 
 // MARK: read register
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Mcp23TransportI2c<I2cMaster>::read(uint8_t reg, uint8_t *buffer, uint8_t length)
+modm::ResumableResult<bool>
+modm::Mcp23TransportI2c<I2cMaster>::read(uint8_t reg, uint8_t *buffer, uint8_t length)
 {
 	RF_BEGIN();
 
@@ -68,25 +68,25 @@ xpcc::Mcp23TransportI2c<I2cMaster>::read(uint8_t reg, uint8_t *buffer, uint8_t l
 // ============================================================================
 // MARK: SPI TRANSPORT
 template < class SpiMaster, class Cs >
-xpcc::Mcp23TransportSpi<SpiMaster, Cs>::Mcp23TransportSpi(uint8_t address)
+modm::Mcp23TransportSpi<SpiMaster, Cs>::Mcp23TransportSpi(uint8_t address)
 :	address(address << 1)
 {
-	Cs::setOutput(xpcc::Gpio::High);
+	Cs::setOutput(modm::Gpio::High);
 }
 
 // MARK: ping
 template < class SpiMaster, class Cs >
-xpcc::ResumableResult<bool>
-xpcc::Mcp23TransportSpi<SpiMaster, Cs>::ping()
+modm::ResumableResult<bool>
+modm::Mcp23TransportSpi<SpiMaster, Cs>::ping()
 {
-	return { xpcc::rf::Stop, true };
+	return { modm::rf::Stop, true };
 }
 
 // MARK: - register access
 // MARK: write register
 template < class SpiMaster, class Cs >
-xpcc::ResumableResult<bool>
-xpcc::Mcp23TransportSpi<SpiMaster, Cs>::write(uint8_t reg, uint8_t value)
+modm::ResumableResult<bool>
+modm::Mcp23TransportSpi<SpiMaster, Cs>::write(uint8_t reg, uint8_t value)
 {
 	RF_BEGIN();
 
@@ -104,8 +104,8 @@ xpcc::Mcp23TransportSpi<SpiMaster, Cs>::write(uint8_t reg, uint8_t value)
 }
 
 template < class SpiMaster, class Cs >
-xpcc::ResumableResult<bool>
-xpcc::Mcp23TransportSpi<SpiMaster, Cs>::write16(uint8_t reg, uint16_t value)
+modm::ResumableResult<bool>
+modm::Mcp23TransportSpi<SpiMaster, Cs>::write16(uint8_t reg, uint16_t value)
 {
 	RF_BEGIN();
 
@@ -125,8 +125,8 @@ xpcc::Mcp23TransportSpi<SpiMaster, Cs>::write16(uint8_t reg, uint16_t value)
 
 // MARK: read register
 template < class SpiMaster, class Cs >
-xpcc::ResumableResult<bool>
-xpcc::Mcp23TransportSpi<SpiMaster, Cs>::read(uint8_t reg, uint8_t *buffer, uint8_t length)
+modm::ResumableResult<bool>
+modm::Mcp23TransportSpi<SpiMaster, Cs>::read(uint8_t reg, uint8_t *buffer, uint8_t length)
 {
 	RF_BEGIN();
 

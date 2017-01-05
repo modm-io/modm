@@ -13,14 +13,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_TIMEOUT_HPP
-#define XPCC_TIMEOUT_HPP
+#ifndef MODM_TIMEOUT_HPP
+#define MODM_TIMEOUT_HPP
 
 #include <modm/architecture/driver/clock.hpp>
 
 #include "timestamp.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 /// Possible states of a timeout
@@ -98,7 +98,7 @@ Remaining:   0  |   +   |      -      |     0      |     +     |   -
  * @see		GenericPeriodicTimer
  *
  * @tparam	Clock
- * 		Used clock which inherits from xpcc::Clock, may have a variable timebase.
+ * 		Used clock which inherits from modm::Clock, may have a variable timebase.
  * @tparam	TimestampType
  * 		Used timestamp which is compatible with the chosen Clock.
  *
@@ -106,7 +106,7 @@ Remaining:   0  |   +   |      -      |     0      |     +     |   -
  * @author	Niklas Hauser
  * @ingroup	software_timer
  */
-template< class Clock, class TimestampType = xpcc::Timestamp >
+template< class Clock, class TimestampType = modm::Timestamp >
 class GenericTimeout
 {
 public:
@@ -186,14 +186,14 @@ private:
  *
  * @ingroup		software_timer
  */
-using ShortTimeout = GenericTimeout< ::xpcc::Clock, ShortTimestamp>;
+using ShortTimeout = GenericTimeout< ::modm::Clock, ShortTimestamp>;
 
 /// Software timeout for up to 24 days with millisecond resolution.
 /// @ingroup	software_timer
-using Timeout      = GenericTimeout< ::xpcc::Clock, Timestamp>;
+using Timeout      = GenericTimeout< ::modm::Clock, Timestamp>;
 
-}	// namespace xpcc
+}	// namespace modm
 
 #include "timeout_impl.hpp"
 
-#endif // XPCC_TIMEOUT_HPP
+#endif // MODM_TIMEOUT_HPP

@@ -32,7 +32,7 @@ FLASH_STORAGE(uint8_t monthDays[]) = {
 
 // ----------------------------------------------------------------------------
 void
-xpcc::UnixTime::toDate(xpcc::Date* date) const
+modm::UnixTime::toDate(modm::Date* date) const
 {
 	uint32_t seconds = time;
 	
@@ -85,8 +85,8 @@ xpcc::UnixTime::toDate(xpcc::Date* date) const
 }
 
 // ----------------------------------------------------------------------------
-xpcc::UnixTime
-xpcc::Date::toUnixTimestamp() const
+modm::UnixTime
+modm::Date::toUnixTimestamp() const
 {
 	uint16_t currentYear = this->year + 1900;
 	uint32_t seconds;

@@ -16,9 +16,9 @@
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/ui/button_group.hpp>
 
-using namespace xpcc::atmega;
+using namespace modm::atmega;
 
-static xpcc::ButtonGroup<> buttons(0);
+static modm::ButtonGroup<> buttons(0);
 enum
 {
 	BUTTON_1 = 0x01
@@ -27,7 +27,7 @@ typedef GpioOutputB0 Led;
 typedef GpioInputB3 Button;
 
 // Timer interrupt used to query the button status
-XPCC_ISR(TIMER2_COMPA)
+MODM_ISR(TIMER2_COMPA)
 {
 	buttons.update(Button::read() ? BUTTON_1 : 0);
 }

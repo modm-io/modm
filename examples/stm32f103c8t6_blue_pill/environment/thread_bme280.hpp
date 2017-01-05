@@ -19,7 +19,7 @@
 
 #include "hardware.hpp"
 
-class Bme280Thread: public xpcc::pt::Protothread
+class Bme280Thread: public modm::pt::Protothread
 {
 public:
 	Bme280Thread();
@@ -66,13 +66,13 @@ public:
 	}
 
 private:
-	xpcc::ShortTimeout timeout;
+	modm::ShortTimeout timeout;
 
-	xpcc::bme280::Data dataA;
-	xpcc::Bme280<SensorsAI2cMaster> barometerA;
+	modm::bme280::Data dataA;
+	modm::Bme280<SensorsAI2cMaster> barometerA;
 
-	xpcc::bme280::Data dataB;
-	xpcc::Bme280<SensorsBI2cMaster> barometerB;
+	modm::bme280::Data dataB;
+	modm::Bme280<SensorsBI2cMaster> barometerB;
 
 	bool start_measurement;
 	bool new_data;

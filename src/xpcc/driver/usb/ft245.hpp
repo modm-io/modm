@@ -12,12 +12,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FT245_HPP
-#define XPCC_FT245_HPP
+#ifndef MODM_FT245_HPP
+#define MODM_FT245_HPP
 
 #include <modm/architecture/interface/gpio.hpp>
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * FT245 USB FIFO
@@ -35,19 +35,19 @@ namespace xpcc
 	 * #include <modm/architecture/architecture.hpp>
 	 * #include <modm/driver/usb/ft245.hpp>
 	 *
-	 * typedef xpcc::stm32::GpioPort<xpcc::stm32::GpioD0, 8> myPort;
-	 * typedef xpcc::stm32::GpioInputC11  Rxf;
-	 * typedef xpcc::stm32::GpioInputC10  Txe;
-	 * typedef xpcc::stm32::GpioOutputA15 Rd;
-	 * typedef xpcc::stm32::GpioOutputA9  Wr;
+	 * typedef modm::stm32::GpioPort<modm::stm32::GpioD0, 8> myPort;
+	 * typedef modm::stm32::GpioInputC11  Rxf;
+	 * typedef modm::stm32::GpioInputC10  Txe;
+	 * typedef modm::stm32::GpioOutputA15 Rd;
+	 * typedef modm::stm32::GpioOutputA9  Wr;
 	 *
-	 * typedef xpcc::Ft245<myPort, Rd, Wr, Rxf, Txe> myFt;
+	 * typedef modm::Ft245<myPort, Rd, Wr, Rxf, Txe> myFt;
 	 *
 	 * int
 	 * main()
 	 * {
-	 *   Rd::setOutput(xpcc::Gpio::High);
-	 *   Wr::setOutput(xpcc::Gpio::Low);
+	 *   Rd::setOutput(modm::Gpio::High);
+	 *   Wr::setOutput(modm::Gpio::Low);
 	 *
 	 *   while (1)
 	 *   {
@@ -118,4 +118,4 @@ namespace xpcc
 
 #include "ft245_impl.hpp"
 
-#endif // XPCC_FT2425_HPP
+#endif // MODM_FT2425_HPP

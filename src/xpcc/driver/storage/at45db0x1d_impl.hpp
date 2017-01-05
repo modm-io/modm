@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_AT45DB0X1D_HPP
+#ifndef MODM_AT45DB0X1D_HPP
 	#error	"Don't include this file directly, use 'at45db0x1d.hpp' instead!"
 #endif
 
@@ -19,7 +19,7 @@
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs>
 bool
-xpcc::At45db0x1d<Spi, Cs>::initialize()
+modm::At45db0x1d<Spi, Cs>::initialize()
 {
 	Cs::set();
 	Cs::setOutput();
@@ -53,7 +53,7 @@ xpcc::At45db0x1d<Spi, Cs>::initialize()
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs>
 void
-xpcc::At45db0x1d<Spi, Cs>::copyPageToBuffer(uint16_t pageAddress, at45db::Buffer buffer)
+modm::At45db0x1d<Spi, Cs>::copyPageToBuffer(uint16_t pageAddress, at45db::Buffer buffer)
 {
 	Cs::reset();
 
@@ -75,7 +75,7 @@ xpcc::At45db0x1d<Spi, Cs>::copyPageToBuffer(uint16_t pageAddress, at45db::Buffer
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs>
 void
-xpcc::At45db0x1d<Spi, Cs>::comparePageToBuffer(uint16_t pageAddress, at45db::Buffer buffer)
+modm::At45db0x1d<Spi, Cs>::comparePageToBuffer(uint16_t pageAddress, at45db::Buffer buffer)
 {
 	Cs::reset();
 
@@ -97,7 +97,7 @@ xpcc::At45db0x1d<Spi, Cs>::comparePageToBuffer(uint16_t pageAddress, at45db::Buf
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs>
 bool
-xpcc::At45db0x1d<Spi, Cs>::isCompareEqual()
+modm::At45db0x1d<Spi, Cs>::isCompareEqual()
 {
 	return ((readStatus() & COMP) == 0);
 }
@@ -105,7 +105,7 @@ xpcc::At45db0x1d<Spi, Cs>::isCompareEqual()
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs>
 void
-xpcc::At45db0x1d<Spi, Cs>::copyBufferToPage(at45db::Buffer buffer, uint16_t pageAddress)
+modm::At45db0x1d<Spi, Cs>::copyBufferToPage(at45db::Buffer buffer, uint16_t pageAddress)
 {
 	Cs::reset();
 
@@ -127,7 +127,7 @@ xpcc::At45db0x1d<Spi, Cs>::copyBufferToPage(at45db::Buffer buffer, uint16_t page
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs>
 void
-xpcc::At45db0x1d<Spi, Cs>::copyBufferToPageWithoutErase(at45db::Buffer buffer, uint16_t pageAddress)
+modm::At45db0x1d<Spi, Cs>::copyBufferToPageWithoutErase(at45db::Buffer buffer, uint16_t pageAddress)
 {
 	Cs::reset();
 
@@ -149,7 +149,7 @@ xpcc::At45db0x1d<Spi, Cs>::copyBufferToPageWithoutErase(at45db::Buffer buffer, u
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs>
 void
-xpcc::At45db0x1d<Spi, Cs>::readFromBuffer(at45db::Buffer buffer,
+modm::At45db0x1d<Spi, Cs>::readFromBuffer(at45db::Buffer buffer,
 		uint8_t address, uint8_t *data, std::size_t size)
 {
 	Cs::reset();
@@ -177,7 +177,7 @@ xpcc::At45db0x1d<Spi, Cs>::readFromBuffer(at45db::Buffer buffer,
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs>
 void
-xpcc::At45db0x1d<Spi, Cs>::writeToBuffer(at45db::Buffer buffer,
+modm::At45db0x1d<Spi, Cs>::writeToBuffer(at45db::Buffer buffer,
 		uint8_t address, const uint8_t *data, std::size_t size)
 {
 	Cs::reset();
@@ -202,7 +202,7 @@ xpcc::At45db0x1d<Spi, Cs>::writeToBuffer(at45db::Buffer buffer,
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs>
 void
-xpcc::At45db0x1d<Spi, Cs>::readFromMemory(uint32_t address, uint8_t *data, std::size_t size)
+modm::At45db0x1d<Spi, Cs>::readFromMemory(uint32_t address, uint8_t *data, std::size_t size)
 {
 	Cs::reset();
 	Spi::transferBlocking(CONTINOUS_ARRAY_READ);
@@ -221,7 +221,7 @@ xpcc::At45db0x1d<Spi, Cs>::readFromMemory(uint32_t address, uint8_t *data, std::
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs>
 void
-xpcc::At45db0x1d<Spi, Cs>::readPageFromMemory(uint32_t address, uint8_t *data, std::size_t size)
+modm::At45db0x1d<Spi, Cs>::readPageFromMemory(uint32_t address, uint8_t *data, std::size_t size)
 {
 	Cs::reset();
 	Spi::transferBlocking(MAIN_MEMORY_PAGE_READ);
@@ -246,7 +246,7 @@ xpcc::At45db0x1d<Spi, Cs>::readPageFromMemory(uint32_t address, uint8_t *data, s
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs>
 void
-xpcc::At45db0x1d<Spi, Cs>::pageErase(uint16_t pageAddress)
+modm::At45db0x1d<Spi, Cs>::pageErase(uint16_t pageAddress)
 {
 	waitUntilReady();
 
@@ -263,7 +263,7 @@ xpcc::At45db0x1d<Spi, Cs>::pageErase(uint16_t pageAddress)
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs>
 void
-xpcc::At45db0x1d<Spi, Cs>::pageRewrite(uint16_t pageAddress, at45db::Buffer buffer)
+modm::At45db0x1d<Spi, Cs>::pageRewrite(uint16_t pageAddress, at45db::Buffer buffer)
 {
 	Cs::reset();
 
@@ -285,7 +285,7 @@ xpcc::At45db0x1d<Spi, Cs>::pageRewrite(uint16_t pageAddress, at45db::Buffer buff
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs>
 void
-xpcc::At45db0x1d<Spi, Cs>::blockErase(uint16_t blockAddress)
+modm::At45db0x1d<Spi, Cs>::blockErase(uint16_t blockAddress)
 {
 	waitUntilReady();
 
@@ -302,7 +302,7 @@ xpcc::At45db0x1d<Spi, Cs>::blockErase(uint16_t blockAddress)
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs>
 void
-xpcc::At45db0x1d<Spi, Cs>::chipErase()
+modm::At45db0x1d<Spi, Cs>::chipErase()
 {
 	waitUntilReady();
 
@@ -320,7 +320,7 @@ xpcc::At45db0x1d<Spi, Cs>::chipErase()
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs>
 bool
-xpcc::At45db0x1d<Spi, Cs>::isReady()
+modm::At45db0x1d<Spi, Cs>::isReady()
 {
 	return (readStatus() & READY);
 }
@@ -328,7 +328,7 @@ xpcc::At45db0x1d<Spi, Cs>::isReady()
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs>
 void
-xpcc::At45db0x1d<Spi, Cs>::waitUntilReady()
+modm::At45db0x1d<Spi, Cs>::waitUntilReady()
 {
 	while (!isReady()) {
 		// wait until the device is ready
@@ -338,7 +338,7 @@ xpcc::At45db0x1d<Spi, Cs>::waitUntilReady()
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs>
 uint8_t
-xpcc::At45db0x1d<Spi, Cs>::readStatus()
+modm::At45db0x1d<Spi, Cs>::readStatus()
 {
 	Cs::reset();
 	Spi::transferBlocking(READ_STATUS_REGISTER);

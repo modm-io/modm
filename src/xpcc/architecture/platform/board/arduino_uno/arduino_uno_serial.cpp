@@ -15,5 +15,5 @@
 
 #include "arduino_uno.hpp"
 
-xpcc::IODeviceWrapper< Uart0, xpcc::IOBuffer::BlockIfFull > serialDevice;
-xpcc::IOStream serialStream(serialDevice);
+modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > serialDevice;
+modm::IOStream serialStream(serialDevice);

@@ -9,20 +9,20 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_TOKEN_RING_NODE_HPP
+#ifndef	MODM_TOKEN_RING_NODE_HPP
 #	error	"Don't include this file directly, use 'node.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 inline void
-xpcc::rpr::Listener::call(Transmitter& node, Message *message)
+modm::rpr::Listener::call(Transmitter& node, Message *message)
 {
 	// redirect call to the actual object
 	(object->*function)(node, message);
 }
 
 inline void
-xpcc::rpr::Error::call(Transmitter& node, ErrorMessage *error)
+modm::rpr::Error::call(Transmitter& node, ErrorMessage *error)
 {
 	// redirect call to the actual object
 	(object->*function)(node, error);
@@ -30,9 +30,9 @@ xpcc::rpr::Error::call(Transmitter& node, ErrorMessage *error)
 
 // ----------------------------------------------------------------------------
 template <typename Interface>
-xpcc::rpr::Node<Interface>::Node(xpcc::accessor::Flash<Listener> listenerCallbackList,
+modm::rpr::Node<Interface>::Node(modm::accessor::Flash<Listener> listenerCallbackList,
 								   uint8_t listenerCallbackCount,
-								   xpcc::accessor::Flash<Error> errorCallbackList,
+								   modm::accessor::Flash<Error> errorCallbackList,
 								   uint8_t errorCallbackCount) :
 listenerCallbackList(listenerCallbackList), listenerCallbackCount(listenerCallbackCount),
 errorCallbackList(errorCallbackList), errorCallbackCount(errorCallbackCount)
@@ -40,7 +40,7 @@ errorCallbackList(errorCallbackList), errorCallbackCount(errorCallbackCount)
 }
 
 template <typename Interface>
-xpcc::rpr::Node<Interface>::Node(xpcc::accessor::Flash<Listener> listenerCallbackList,
+modm::rpr::Node<Interface>::Node(modm::accessor::Flash<Listener> listenerCallbackList,
 								   uint8_t listenerCallbackCount) :
 listenerCallbackList(listenerCallbackList), listenerCallbackCount(listenerCallbackCount),
 errorCallbackCount(0)
@@ -50,7 +50,7 @@ errorCallbackCount(0)
 // ----------------------------------------------------------------------------
 template <typename Interface>
 void
-xpcc::rpr::Node<Interface>::setAddress(uint16_t address, uint16_t groupAddress)
+modm::rpr::Node<Interface>::setAddress(uint16_t address, uint16_t groupAddress)
 {
 	Interface::initialize(address, groupAddress);
 }
@@ -58,7 +58,7 @@ xpcc::rpr::Node<Interface>::setAddress(uint16_t address, uint16_t groupAddress)
 // ----------------------------------------------------------------------------
 template <typename Interface>
 void
-xpcc::rpr::Node<Interface>::unicastMessage(uint16_t destination,
+modm::rpr::Node<Interface>::unicastMessage(uint16_t destination,
 											 uint8_t command,
 											 const void *payload,
 											 std::size_t payloadLength)
@@ -72,7 +72,7 @@ xpcc::rpr::Node<Interface>::unicastMessage(uint16_t destination,
 
 template <typename Interface>
 void
-xpcc::rpr::Node<Interface>::multicastMessage(uint16_t destination,
+modm::rpr::Node<Interface>::multicastMessage(uint16_t destination,
 											   uint8_t command,
 											   const void *payload,
 											   std::size_t payloadLength)
@@ -86,7 +86,7 @@ xpcc::rpr::Node<Interface>::multicastMessage(uint16_t destination,
 
 template <typename Interface>
 void
-xpcc::rpr::Node<Interface>::broadcastMessage(uint8_t command,
+modm::rpr::Node<Interface>::broadcastMessage(uint8_t command,
 											   const void *payload,
 											   std::size_t payloadLength)
 {
@@ -100,7 +100,7 @@ xpcc::rpr::Node<Interface>::broadcastMessage(uint8_t command,
 // ----------------------------------------------------------------------------
 template <typename Interface>
 void
-xpcc::rpr::Node<Interface>::update()
+modm::rpr::Node<Interface>::update()
 {	
 	Interface::update();
 	
@@ -115,12 +115,12 @@ xpcc::rpr::Node<Interface>::update()
 // ----------------------------------------------------------------------------
 template <typename Interface>
 bool
-xpcc::rpr::Node<Interface>::checkErrorCallbacks(ErrorMessage *errorMessage)
+modm::rpr::Node<Interface>::checkErrorCallbacks(ErrorMessage *errorMessage)
 {
 	if (errorCallbackCount == 0)
 		return false;
 	
-	xpcc::accessor::Flash<Error> list = errorCallbackList;
+	modm::accessor::Flash<Error> list = errorCallbackList;
 	for (uint_fast8_t i = 0; i < errorCallbackCount; ++i, ++list)
 	{
 		Error handler(*list);
@@ -136,12 +136,12 @@ xpcc::rpr::Node<Interface>::checkErrorCallbacks(ErrorMessage *errorMessage)
 
 template <typename Interface>
 bool
-xpcc::rpr::Node<Interface>::checkListenerCallbacks(Message *message)
+modm::rpr::Node<Interface>::checkListenerCallbacks(Message *message)
 {
 	if (listenerCallbackCount == 0)
 		return false;
 	
-	xpcc::accessor::Flash<Listener> list = listenerCallbackList;
+	modm::accessor::Flash<Listener> list = listenerCallbackList;
 	for (uint_fast8_t i = 0; i < listenerCallbackCount; ++i, ++list)
 	{
 		Listener handler(*list);

@@ -15,7 +15,7 @@
 
 // ----------------------------------------------------------------------------
 void
-xpcc::IODevice::write(const char* str)
+modm::IODevice::write(const char* str)
 {
 	char c;
 	while ((c = *str++)) {

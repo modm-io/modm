@@ -43,7 +43,7 @@ namespace xpcc
 	 * complete components but want send messages in the name of a parent
 	 * component. Use xpcc::CommunicatableTask for such type of Tasks.
 	 *
-	 * \see		xpcc::Task
+	 * \see		modm::Task
 	 * \see		xpcc::Communicatable
 	 *
 	 * \ingroup	xpcc_comm

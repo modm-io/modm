@@ -24,7 +24,7 @@ extern uint32_t __table_heap_end[];
 
 // Finds the largest heap with declared traits
 void
-xpcc_heap_table_find_largest(const uint32_t trait_mask, uint32_t **start, uint32_t **end)
+modm_heap_table_find_largest(const uint32_t trait_mask, uint32_t **start, uint32_t **end)
 {
 	typedef struct
 	{

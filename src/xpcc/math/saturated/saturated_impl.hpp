@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SATURATED_HPP
+#ifndef MODM_SATURATED_HPP
 	#error	"Don't include this file directly use 'math/saturated.hpp' instead!"
 #endif
 
@@ -21,7 +21,7 @@
 	#include "saturated__avr_s8_impl.hpp"
 #endif
 
-namespace xpcc
+namespace modm
 {
 	template<typename T>
 	Saturated<T>::Saturated() : 

@@ -22,8 +22,8 @@
 
 #include <modm/debug/logger.hpp>
 
-#undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::WARNING
+#undef  MODM_LOG_LEVEL
+#define MODM_LOG_LEVEL modm::log::WARNING
 
 // ----------------------------------------------------------------------------
 xpcc::tipc::TransmitterSocket::TransmitterSocket() :
@@ -65,7 +65,7 @@ xpcc::tipc::TransmitterSocket::transmitPayload(
 	Header header(length, domainId);
 
 	// Allocate memory for whole packet (header plus payload)
-	xpcc::SmartPointer tipcPacketPointer ( sizeof(Header) + length );
+	modm::SmartPointer tipcPacketPointer ( sizeof(Header) + length );
 
 	// Put things together - first the tipc-header and then the payload
 	memcpy( tipcPacketPointer.getPointer(), &header, sizeof(Header) );
@@ -78,16 +78,16 @@ xpcc::tipc::TransmitterSocket::transmitPayload(
 								(struct sockaddr*)&tipcToAddresse,
 								(size_t)sizeof(tipcToAddresse));
 
-	XPCC_LOG_DEBUG << XPCC_FILE_INFO
+	MODM_LOG_DEBUG << MODM_FILE_INFO
 			<< " tid=" << (int)typeId
 			<< " iid=" << (int)instanceId
 			<< " domain=" << (int)domainId
 			<< " value=" << tipcPacketPointer;
-	XPCC_LOG_DEBUG << xpcc::flush;
+	MODM_LOG_DEBUG << modm::flush;
 
 	// Check if the sending failed
 	if (sendToResult < 0) {
-		XPCC_LOG_ERROR << XPCC_FILE_INFO << __FUNCTION__ << "on transmit" << xpcc::flush;
+		MODM_LOG_ERROR << MODM_FILE_INFO << __FUNCTION__ << "on transmit" << modm::flush;
 
 		// Throw an exception because a connection error cannot be handled here.
 		// Just closing and opening the socket again is not suitable because one
@@ -116,10 +116,10 @@ xpcc::tipc::TransmitterSocket::getPortId()
 	socklen_t sz = sizeof(addr);
 
 	if ( getsockname( this->socketDescriptor_, (struct sockaddr *)&addr, &sz) < 0 ) {
-		XPCC_LOG_ERROR
-				<< XPCC_FILE_INFO
+		MODM_LOG_ERROR
+				<< MODM_FILE_INFO
 				<< "Failed to get sock address"
-				<< xpcc::endl;
+				<< modm::endl;
 		return 0;
 	}
 

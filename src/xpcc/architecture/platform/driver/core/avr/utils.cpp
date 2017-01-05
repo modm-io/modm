@@ -18,7 +18,7 @@
 #include "utils.hpp"
 
 uint8_t
-xpcc::xmega::readCalibrationByte(uint8_t index)
+modm::xmega::readCalibrationByte(uint8_t index)
 {
 	// Load the NVM Command register to read the calibration row.
 	NVM_CMD = NVM_CMD_READ_CALIB_ROW_gc;

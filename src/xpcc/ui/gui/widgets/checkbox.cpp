@@ -15,7 +15,7 @@
 
 
 void
-xpcc::gui::CheckboxWidget::render(View* view)
+modm::gui::CheckboxWidget::render(View* view)
 {
 	if(view == NULL)
 		return;
@@ -23,7 +23,7 @@ xpcc::gui::CheckboxWidget::render(View* view)
 	constexpr uint16_t padding = 5;
 
 	// output device of view
-	xpcc::GraphicDisplay* out = &view->display();
+	modm::GraphicDisplay* out = &view->display();
 
 	// color palette of view
 	ColorPalette cp = this->color_palette;
@@ -54,7 +54,7 @@ xpcc::gui::CheckboxWidget::render(View* view)
 }
 
 void
-xpcc::gui::CheckboxWidget::click_cb(const InputEvent& /*ev*/, Widget* w, void* /*data*/)
+modm::gui::CheckboxWidget::click_cb(const InputEvent& /*ev*/, Widget* w, void* /*data*/)
 {
 	auto checkbox = static_cast<CheckboxWidget*>(w);
 

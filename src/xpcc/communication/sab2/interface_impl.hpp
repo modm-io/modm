@@ -12,32 +12,32 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_SAB2_INTERFACE_HPP
+#ifndef	MODM_SAB2_INTERFACE_HPP
 	#error	"Don't include this file directly, use 'interface.hpp' instead!"
 #endif
 
 #include "constants.hpp"
 
 //#include <modm/debug/logger.hpp>
-//#undef XPCC_LOG_LEVEL
-//#define XPCC_LOG_LEVEL	xpcc::log::DEBUG
+//#undef MODM_LOG_LEVEL
+//#define MODM_LOG_LEVEL	modm::log::DEBUG
 
 // ----------------------------------------------------------------------------
-template <typename Device, std::size_t N> uint8_t xpcc::sab2::Interface<Device, N>::buffer[N + 4];
-template <typename Device, std::size_t N> uint16_t xpcc::sab2::Interface<Device, N>::crc = crcInitialValue;
+template <typename Device, std::size_t N> uint8_t modm::sab2::Interface<Device, N>::buffer[N + 4];
+template <typename Device, std::size_t N> uint16_t modm::sab2::Interface<Device, N>::crc = crcInitialValue;
 
-template <typename Device, std::size_t N> typename xpcc::sab2::Interface<Device, N>::Size \
-	xpcc::sab2::Interface<Device, N>::length;
-template <typename Device, std::size_t N> typename xpcc::sab2::Interface<Device, N>::Size \
-	xpcc::sab2::Interface<Device, N>::lengthOfReceivedMessage = 0;
+template <typename Device, std::size_t N> typename modm::sab2::Interface<Device, N>::Size \
+	modm::sab2::Interface<Device, N>::length;
+template <typename Device, std::size_t N> typename modm::sab2::Interface<Device, N>::Size \
+	modm::sab2::Interface<Device, N>::lengthOfReceivedMessage = 0;
 
-template <typename Device, std::size_t N> bool xpcc::sab2::Interface<Device, N>::nextEscaped = false;
+template <typename Device, std::size_t N> bool modm::sab2::Interface<Device, N>::nextEscaped = false;
 
 // ----------------------------------------------------------------------------
 
 template <typename Device, std::size_t N>
 void
-xpcc::sab2::Interface<Device, N>::initialize()
+modm::sab2::Interface<Device, N>::initialize()
 {
 }
 
@@ -45,7 +45,7 @@ xpcc::sab2::Interface<Device, N>::initialize()
 
 template <typename Device, std::size_t N>
 void
-xpcc::sab2::Interface<Device, N>::sendMessage(uint8_t address, Flags flags, 
+modm::sab2::Interface<Device, N>::sendMessage(uint8_t address, Flags flags, 
 		uint8_t command,
 		const void *payload, Size payloadLength)
 {
@@ -74,7 +74,7 @@ xpcc::sab2::Interface<Device, N>::sendMessage(uint8_t address, Flags flags,
 
 template <typename Device, std::size_t N> template <typename T>
 void
-xpcc::sab2::Interface<Device, N>::sendMessage(uint8_t address, Flags flags,
+modm::sab2::Interface<Device, N>::sendMessage(uint8_t address, Flags flags,
 		uint8_t command,
 		const T& payload)
 {
@@ -85,7 +85,7 @@ xpcc::sab2::Interface<Device, N>::sendMessage(uint8_t address, Flags flags,
 
 template <typename Device, std::size_t N>
 void
-xpcc::sab2::Interface<Device, N>::sendMessage(uint8_t address, Flags flags, uint8_t command)
+modm::sab2::Interface<Device, N>::sendMessage(uint8_t address, Flags flags, uint8_t command)
 {
 	sendMessage(address, flags,
 			command,
@@ -96,56 +96,56 @@ xpcc::sab2::Interface<Device, N>::sendMessage(uint8_t address, Flags flags, uint
 
 template <typename Device, std::size_t N>
 bool
-xpcc::sab2::Interface<Device, N>::isMessageAvailable()
+modm::sab2::Interface<Device, N>::isMessageAvailable()
 {
 	return (lengthOfReceivedMessage != 0);
 }
 
 template <typename Device, std::size_t N>
 uint8_t
-xpcc::sab2::Interface<Device, N>::getAddress()
+modm::sab2::Interface<Device, N>::getAddress()
 {
 	return (buffer[0] & 0x3f);
 }
 
 template <typename Device, std::size_t N>
 uint8_t
-xpcc::sab2::Interface<Device, N>::getCommand()
+modm::sab2::Interface<Device, N>::getCommand()
 {
 	return buffer[1];
 }
 
 template <typename Device, std::size_t N>
 bool
-xpcc::sab2::Interface<Device, N>::isResponse()
+modm::sab2::Interface<Device, N>::isResponse()
 {
 	return (buffer[0] & 0x80) ? true : false;
 }
 
 template <typename Device, std::size_t N>
 bool
-xpcc::sab2::Interface<Device, N>::isAcknowledge()
+modm::sab2::Interface<Device, N>::isAcknowledge()
 {
 	return (buffer[0] & 0x40) ? true : false;
 }
 
 template <typename Device, std::size_t N>
 const uint8_t*
-xpcc::sab2::Interface<Device, N>::getPayload()
+modm::sab2::Interface<Device, N>::getPayload()
 {
 	return &buffer[2];
 }
 
 template <typename Device, std::size_t N>
-typename xpcc::sab2::Interface<Device, N>::Size
-xpcc::sab2::Interface<Device, N>::getPayloadLength()
+typename modm::sab2::Interface<Device, N>::Size
+modm::sab2::Interface<Device, N>::getPayloadLength()
 {
 	return (lengthOfReceivedMessage - 4);
 }
 
 template <typename Device, std::size_t N>
 void
-xpcc::sab2::Interface<Device, N>::dropMessage()
+modm::sab2::Interface<Device, N>::dropMessage()
 {
 	lengthOfReceivedMessage = 0;
 }
@@ -153,16 +153,16 @@ xpcc::sab2::Interface<Device, N>::dropMessage()
 // ----------------------------------------------------------------------------
 template <typename Device, std::size_t N>
 void
-xpcc::sab2::Interface<Device, N>::update()
+modm::sab2::Interface<Device, N>::update()
 {
 	uint8_t data;
 	while ((lengthOfReceivedMessage == 0) && Device::read(data))
 	{
-		//XPCC_LOG_DEBUG.printf("%02x ", data);
+		//MODM_LOG_DEBUG.printf("%02x ", data);
 		
 		if (data == frameBounderyByte) {
 			if (nextEscaped) {
-				//XPCC_LOG_ERROR << "framing error" << xpcc::endl;
+				//MODM_LOG_ERROR << "framing error" << modm::endl;
 			}
 			else {
 				if (length >= 4) {
@@ -170,7 +170,7 @@ xpcc::sab2::Interface<Device, N>::update()
 						lengthOfReceivedMessage = length;
 					}
 					else {
-						//XPCC_LOG_ERROR.printf("crc=%04x\n", crc);
+						//MODM_LOG_ERROR.printf("crc=%04x\n", crc);
 					}
 				}
 			}
@@ -193,7 +193,7 @@ xpcc::sab2::Interface<Device, N>::update()
 			if (length >= (N+4)) {
 				// Error message to long
 				length = 0;
-				//XPCC_LOG_ERROR << "message to long" << xpcc::endl;
+				//MODM_LOG_ERROR << "message to long" << modm::endl;
 			}
 			else {
 				buffer[length] = data;
@@ -208,7 +208,7 @@ xpcc::sab2::Interface<Device, N>::update()
 // ----------------------------------------------------------------------------
 template <typename Device, std::size_t N>
 void
-xpcc::sab2::Interface<Device, N>::writeByteEscaped(uint8_t data)
+modm::sab2::Interface<Device, N>::writeByteEscaped(uint8_t data)
 {
 	if (data == frameBounderyByte || data == controlEscapeByte) {
 		Device::write(controlEscapeByte);

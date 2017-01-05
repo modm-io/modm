@@ -20,20 +20,20 @@
 // Bit0: single transfer state
 // Bit1: block transfer state
 uint8_t
-xpcc::stm32::SpiMaster{{ id }}::state(0);
+modm::stm32::SpiMaster{{ id }}::state(0);
 
 uint8_t
-xpcc::stm32::SpiMaster{{ id }}::count(0);
+modm::stm32::SpiMaster{{ id }}::count(0);
 
 void *
-xpcc::stm32::SpiMaster{{ id }}::context(nullptr);
+modm::stm32::SpiMaster{{ id }}::context(nullptr);
 
-xpcc::Spi::ConfigurationHandler
-xpcc::stm32::SpiMaster{{ id }}::configuration(nullptr);
+modm::Spi::ConfigurationHandler
+modm::stm32::SpiMaster{{ id }}::configuration(nullptr);
 // ----------------------------------------------------------------------------
 
 uint8_t
-xpcc::stm32::SpiMaster{{ id }}::acquire(void *ctx, ConfigurationHandler handler)
+modm::stm32::SpiMaster{{ id }}::acquire(void *ctx, ConfigurationHandler handler)
 {
 	if (context == nullptr)
 	{
@@ -54,7 +54,7 @@ xpcc::stm32::SpiMaster{{ id }}::acquire(void *ctx, ConfigurationHandler handler)
 }
 
 uint8_t
-xpcc::stm32::SpiMaster{{ id }}::release(void *ctx)
+modm::stm32::SpiMaster{{ id }}::release(void *ctx)
 {
 	if (ctx == context)
 	{
@@ -65,8 +65,8 @@ xpcc::stm32::SpiMaster{{ id }}::release(void *ctx)
 }
 // ----------------------------------------------------------------------------
 
-xpcc::ResumableResult<uint8_t>
-xpcc::stm32::SpiMaster{{ id }}::transfer(uint8_t data)
+modm::ResumableResult<uint8_t>
+modm::stm32::SpiMaster{{ id }}::transfer(uint8_t data)
 {
 	// this is a manually implemented "fast resumable function"
 	// there is no context or nesting protection, since we don't need it.
@@ -79,7 +79,7 @@ xpcc::stm32::SpiMaster{{ id }}::transfer(uint8_t data)
 	{
 		// wait for previous transfer to finish
 		if (!SpiHal{{ id }}::isTransmitRegisterEmpty())
-			return {xpcc::rf::Running};
+			return {modm::rf::Running};
 
 		// start transfer by copying data into register
 		SpiHal{{ id }}::write(data);
@@ -89,17 +89,17 @@ xpcc::stm32::SpiMaster{{ id }}::transfer(uint8_t data)
 	}
 
 	if (!SpiHal{{ id }}::isReceiveRegisterNotEmpty())
-		return {xpcc::rf::Running};
+		return {modm::rf::Running};
 
 	SpiHal{{ id }}::read(data);
 
 	// transfer finished
 	state &= ~Bit0;
-	return {xpcc::rf::Stop, data};
+	return {modm::rf::Stop, data};
 }
 
-xpcc::ResumableResult<void>
-xpcc::stm32::SpiMaster{{ id }}::transfer(
+modm::ResumableResult<void>
+modm::stm32::SpiMaster{{ id }}::transfer(
 		uint8_t * tx, uint8_t * rx, std::size_t length)
 {
 	// this is a manually implemented "fast resumable function"
@@ -127,11 +127,11 @@ xpcc::stm32::SpiMaster{{ id }}::transfer(
 				// if tx == 0, we use a dummy byte 0x00
 				// else we copy it from the array
 				// call the resumable function
-				xpcc::ResumableResult<uint8_t> result = transfer(tx ? tx[index] : 0);
+				modm::ResumableResult<uint8_t> result = transfer(tx ? tx[index] : 0);
 
 				// if the resumable function is still running, so are we
-				if (result.getState() > xpcc::rf::NestingError)
-					return {xpcc::rf::Running};
+				if (result.getState() > modm::rf::NestingError)
+					return {modm::rf::Running};
 
 				// if rx != 0, we copy the result into the array
 				if (rx) rx[index] = result.getResult();
@@ -141,6 +141,6 @@ xpcc::stm32::SpiMaster{{ id }}::transfer(
 
 			// clear the state
 			state &= ~Bit1;
-			return {xpcc::rf::Stop};
+			return {modm::rf::Stop};
 	}
 }

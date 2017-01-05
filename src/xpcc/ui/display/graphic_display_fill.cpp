@@ -16,7 +16,7 @@
 
 // ----------------------------------------------------------------------------
 void
-xpcc::GraphicDisplay::fillRectangle(glcd::Point upperLeft,
+modm::GraphicDisplay::fillRectangle(glcd::Point upperLeft,
 		uint16_t width, uint16_t height)
 {
 	for (uint16_t i = upperLeft.getX();
@@ -33,7 +33,7 @@ xpcc::GraphicDisplay::fillRectangle(glcd::Point upperLeft,
 }
 
 void
-xpcc::GraphicDisplay::fillCircle(glcd::Point center, uint16_t radius)
+modm::GraphicDisplay::fillCircle(glcd::Point center, uint16_t radius)
 {
 	int16_t f = 1 - radius;
 	int16_t ddF_x = 0;

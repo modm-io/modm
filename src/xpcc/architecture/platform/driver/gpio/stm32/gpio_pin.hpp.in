@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32_GPIO_PIN_HPP
-#define XPCC_STM32_GPIO_PIN_HPP
+#ifndef MODM_STM32_GPIO_PIN_HPP
+#define MODM_STM32_GPIO_PIN_HPP
 
 #include "../device.hpp"
 #include "gpio_base.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 namespace stm32
@@ -33,7 +33,7 @@ namespace stm32
 
 /// {{type if type != "" else "IO"}} class for Pin {{port ~ pin}}
 /// @ingroup	{{partname}}_gpio
-struct {{name}} : public Gpio, ::xpcc::{{superclass}}
+struct {{name}} : public Gpio, ::modm::{{superclass}}
 {
 public:
 	/// Port name.
@@ -77,7 +77,7 @@ private:
 	%% endif
 %% endif
 
-	xpcc_always_inline static void
+	modm_always_inline static void
 	setAlternateFunction(AlternateFunction alt) {
 		{{reg}}->AFR[af_id] = ({{reg}}->AFR[af_id] & ~af_mask)
 								| (i(alt) << af_offset);
@@ -86,63 +86,63 @@ private:
 	}
 
 	/// Enable Analog Mode which is needed to use this pin as an ADC input.
-	xpcc_always_inline static void
+	modm_always_inline static void
 	setAnalogInput() {
 		{{reg}}->MODER |= i(Mode::Analog) << (pin * 2);
 	}
 
 public:
-	xpcc_always_inline static void
+	modm_always_inline static void
 	configure(OutputType type,
 			  OutputSpeed speed = OutputSpeed::MHz50) {
 		{{reg}}->OTYPER  = ({{reg}}->OTYPER  & ~mask)  | (i(type) << pin);
 		{{reg}}->OSPEEDR = ({{reg}}->OSPEEDR & ~mask2) | (i(speed) << (pin * 2));
 	}
-	xpcc_always_inline static void configure(InputType type) {
+	modm_always_inline static void configure(InputType type) {
 		{{reg}}->PUPDR   = ({{reg}}->PUPDR   & ~mask2) | (i(type)  << (pin * 2));
 	}
 	%% for af in (gpio.af if "af" in gpio else [])
 		%% if "type" in af and "name" in af and af["type"] == "analog" and target["family"] != "f0"
 	/// {{name}} connects to {{af["name"]}} of {{af["peripheral"]}}
-	static const ::xpcc::stm32::{{af["peripheral"]}}::Channel
-	{{af["peripheral"]}}Channel = ::xpcc::stm32::{{af["peripheral"]}}::Channel::{{ af["name"] }};
+	static const ::modm::stm32::{{af["peripheral"]}}::Channel
+	{{af["peripheral"]}}Channel = ::modm::stm32::{{af["peripheral"]}}::Channel::{{ af["name"] }};
 		%% endif
 	%% endfor
 	%% if type in ["" , "Output"]
 	// GpioOutput
 	// start documentation inherited
-	xpcc_always_inline static void setOutput() {
+	modm_always_inline static void setOutput() {
 		{{reg}}->MODER   = ({{reg}}->MODER   & ~mask2) | (i(Mode::Output)<< pin * 2);
 	}
-	xpcc_always_inline static void setOutput(bool status) {
+	modm_always_inline static void setOutput(bool status) {
 		set(status);
 		setOutput();
 	}
-	xpcc_always_inline static void set() {
+	modm_always_inline static void set() {
 		{{reg}}->BSRR = mask;
 	}
-	xpcc_always_inline static void set(bool status) {
+	modm_always_inline static void set(bool status) {
 		if (status) {
 			set();
 		} else {
 			reset();
 		}
 	}
-	xpcc_always_inline static void reset() {
+	modm_always_inline static void reset() {
 		{{reg}}->BSRR = (uint32_t(mask) << 16);
 	}
-	xpcc_always_inline static void toggle() {
+	modm_always_inline static void toggle() {
 		if (isSet()) {
 			reset();
 		} else {
 			set();
 		}
 	}
-	xpcc_always_inline static bool isSet() {
+	modm_always_inline static bool isSet() {
 		return ({{reg}}->ODR & mask);
 	}
 	// stop documentation inherited
-	xpcc_always_inline static void
+	modm_always_inline static void
 	setOutput(OutputType type,
 			  OutputSpeed speed = OutputSpeed::MHz50) {
 		configure(type, speed);
@@ -159,16 +159,16 @@ public:
 		{{reg}}->OTYPER  &= ~mask;
 		{{reg}}->OSPEEDR &= ~mask2;
 	}
-	xpcc_always_inline static bool read() {
+	modm_always_inline static bool read() {
 		return ({{reg}}->IDR & mask);
 	}
 	// end documentation inherited
-	xpcc_always_inline static void setInput(InputType type) {
+	modm_always_inline static void setInput(InputType type) {
 		configure(type);
 		setInput();
 	}
 	// External Interrupts
-	xpcc_always_inline static void
+	modm_always_inline static void
 	enableExternalInterrupt()
 	{
 		// PA[x], x =  0 ..  3 maps to EXTICR[0]
@@ -186,18 +186,18 @@ public:
 		SYSCFG->EXTICR[index] = (SYSCFG->EXTICR[index] & ~syscfg_mask) | syscfg_value;
 		EXTI->IMR |= mask;
 	}
-	xpcc_always_inline static void
+	modm_always_inline static void
 	disableExternalInterrupt()
 	{
 		EXTI->IMR &= ~mask;
 	}
-	xpcc_always_inline static void
+	modm_always_inline static void
 	enableExternalInterruptVector(const uint32_t priority)
 	{
 		NVIC_SetPriority(ExternalInterruptIRQ, priority);
 		NVIC_EnableIRQ(ExternalInterruptIRQ);
 	}
-	xpcc_always_inline static void
+	modm_always_inline static void
 	disableExternalInterruptVector()
 	{
 		NVIC_DisableIRQ(ExternalInterruptIRQ);
@@ -221,13 +221,13 @@ public:
 			break;
 		}
 	}
-	xpcc_always_inline static bool
+	modm_always_inline static bool
 	getExternalInterruptFlag()
 	{
 		return (EXTI->PR & mask);
 	}
 	/**	\brief	Reset the interrupt flag in the interrupt routine. */
-	xpcc_always_inline static void
+	modm_always_inline static void
 	acknowledgeExternalInterruptFlag()
 	{
 		// Flags are cleared by writing a one to the flag position.
@@ -245,7 +245,7 @@ public:
 		return Direction::Special;
 	}
 	// end documentation inherited
-	xpcc_always_inline static void
+	modm_always_inline static void
 	disconnect() {
 	%% if type == "Output"
 		{{reg}}->MODER &= ~mask2;
@@ -266,7 +266,7 @@ public:
 		%% if use
 			%% if "name" in af and af["name"] not in ["Scl", "Sda"]
 	/// Connect {{name}} as {{af["name"]}} to {{af["peripheral"]}}.
-	xpcc_always_inline static void
+	modm_always_inline static void
 	connect(TypeId::{{ af["peripheral"] }}{{ af["name"] }} /* t */) {
 				%% if "type" in af and af["type"] == "analog"
 		setAnalogInput();
@@ -277,7 +277,7 @@ public:
 			%% endif
 			%% if "type" in af and af["type"]|string in ["", "out"] and type != "Input" and "name" in af and af["name"] not in ["Scl", "Sda"]
 	/// Connect {{name}} as {{af["name"]}} to {{af["peripheral"]}}.
-	xpcc_always_inline static void
+	modm_always_inline static void
 	connect(TypeId::{{ af["peripheral"] }}{{ af["name"] }} /* t */,
 		OutputType type, OutputSpeed speed = OutputSpeed::MHz50) {
 		configure(type, speed);
@@ -298,7 +298,7 @@ public:
 			%% endif
 			%% if "type" in af and af["type"]|string in ["", "in"] and type != "Output" and "name" in af and af["name"] not in ["Scl", "Sda"]
 	/// Connect {{name}} as {{af["name"]}} to {{af["peripheral"]}}.
-	xpcc_always_inline static void
+	modm_always_inline static void
 	connect(TypeId::{{ af["peripheral"] }}{{ af["name"] }} /* t */, InputType type) {
 		configure(type);
 		setAlternateFunction(AlternateFunction::AF_{{ af["id"] }});
@@ -312,7 +312,7 @@ public:
 								"SoftwareSpiMasterSck"]
 	/// Connect to `{{peripheral}}`.
 	inline static void
-	connect(::xpcc::TypeId::{{ peripheral }}) {
+	connect(::modm::TypeId::{{ peripheral }}) {
 		configure(OutputType::PushPull);
 		setOutput();
 		set();
@@ -324,7 +324,7 @@ public:
 								"SoftwareI2cMasterScl"]
 	/// Connect to `{{peripheral}}`.
 	inline static void
-	connect(::xpcc::TypeId::{{ peripheral }}, InputType type=InputType::Floating) {
+	connect(::modm::TypeId::{{ peripheral }}, InputType type=InputType::Floating) {
 		configure(type);
 			%% if peripheral in ["SoftwareI2cMasterScl"]
 		I2c::resetDevices< {{name}} >();
@@ -337,8 +337,8 @@ public:
 	%% if type in ["", "Input"]
 		%% for peripheral in ["SoftwareSpiMasterMiso"]
 	/// Connect to `{{peripheral}}`.
-	xpcc_always_inline static void
-	connect(::xpcc::TypeId::{{ peripheral }}) {
+	modm_always_inline static void
+	connect(::modm::TypeId::{{ peripheral }}) {
 		configure(InputType::Floating);
 		setInput();
 	}
@@ -350,6 +350,6 @@ public:
 
 } // namespace stm32
 
-} // namespace xpcc
+} // namespace modm
 
-#endif // XPCC_STM32_GPIO_PIN_HPP
+#endif // MODM_STM32_GPIO_PIN_HPP

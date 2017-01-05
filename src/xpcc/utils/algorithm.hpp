@@ -12,10 +12,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ALGORITHM_HPP
-#define XPCC_ALGORITHM_HPP
+#ifndef MODM_ALGORITHM_HPP
+#define MODM_ALGORITHM_HPP
 
-namespace xpcc
+namespace modm
 {
 	template<class InputIterator, class T>
 	InputIterator
@@ -30,4 +30,4 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC_ALGORITHM_HPP
+#endif	// MODM_ALGORITHM_HPP

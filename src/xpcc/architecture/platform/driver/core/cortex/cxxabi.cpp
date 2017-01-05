@@ -77,13 +77,13 @@ operator new[](size_t size) throw ()
 }
 
 void *
-operator new(size_t size, xpcc::MemoryTraits traits)
+operator new(size_t size, modm::MemoryTraits traits)
 {
 	return malloc_tr(size, traits.value);
 }
 
 void *
-operator new[](size_t size, xpcc::MemoryTraits traits)
+operator new[](size_t size, modm::MemoryTraits traits)
 {
 	return malloc_tr(size, traits.value);
 }

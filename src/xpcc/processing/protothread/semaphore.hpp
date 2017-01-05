@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PT_SEMAPHORE_HPP
-#define XPCC_PT_SEMAPHORE_HPP
+#ifndef MODM_PT_SEMAPHORE_HPP
+#define MODM_PT_SEMAPHORE_HPP
 
 #include <stdint.h>
 #include "macros.hpp"
 
-namespace xpcc
+namespace modm
 {
 	namespace pt
 	{
@@ -78,7 +78,7 @@ namespace xpcc
 			 * value larger than zero, the protothread will continue.
 			 * 
 			 * Use this always within a PT_WAIT_UNITL() macro inside
-			 * a xpcc::pt::Thread::run() method.
+			 * a modm::pt::Thread::run() method.
 			 * 
 			 * \code
 			 * PT_WAIT_UNTIL(semaphore.acquire());
@@ -119,4 +119,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_PT_SEMAPHORE_HPP
+#endif // MODM_PT_SEMAPHORE_HPP

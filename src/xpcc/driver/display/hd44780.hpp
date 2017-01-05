@@ -11,14 +11,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_HD44780_HPP
-#define XPCC_HD44780_HPP
+#ifndef MODM_HD44780_HPP
+#define MODM_HD44780_HPP
 
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/ui/display/character_display.hpp>
 #include "hd44780_base.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -133,8 +133,8 @@ protected:
 	typedef Hd44780Base<DATA, RW, RS, E2> driver2;
 };
 
-} // namespace xpcc
+} // namespace modm
 
 #include "hd44780_impl.hpp"
 
-#endif // XPCC_HD44780_HPP
+#endif // MODM_HD44780_HPP

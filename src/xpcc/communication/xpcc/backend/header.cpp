@@ -27,14 +27,14 @@ xpcc::Header::operator == (const Header& other) const
 }
 
 // ----------------------------------------------------------------------------
-xpcc::IOStream&
-xpcc::operator << (IOStream& s, const Header& header)
+modm::IOStream&
+xpcc::operator << (modm::IOStream& s, const Header& header)
 {
 	s	<< "(t=" << static_cast<int32_t>(header.type)
 		<< ",a=" << header.isAcknowledge
-		<< ",d=" << xpcc::hex << header.destination << xpcc::ascii
-		<< ",s=" << xpcc::hex << header.source << xpcc::ascii
-		<< ",i=" << xpcc::hex << header.packetIdentifier << xpcc::ascii << ")";
-	
+		<< ",d=" << modm::hex << header.destination << modm::ascii
+		<< ",s=" << modm::hex << header.source << modm::ascii
+		<< ",i=" << modm::hex << header.packetIdentifier << modm::ascii << ")";
+
 	return s;
 }

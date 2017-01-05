@@ -48,7 +48,7 @@ xpcc::CanConnector<Driver>::getPacketHeader() const
 }
 
 template<typename Driver>
-const xpcc::SmartPointer
+const modm::SmartPointer
 xpcc::CanConnector<Driver>::getPacketPayload() const
 {
 	return this->receivedMessages.getFront().payload;
@@ -57,7 +57,7 @@ xpcc::CanConnector<Driver>::getPacketPayload() const
 // ----------------------------------------------------------------------------
 template<typename Driver>
 void
-xpcc::CanConnector<Driver>::sendPacket(const Header &header, SmartPointer payload)
+xpcc::CanConnector<Driver>::sendPacket(const Header &header, modm::SmartPointer payload)
 {
 	bool successful = false;
 	bool fragmented = (payload.getSize() > 8);
@@ -105,7 +105,7 @@ bool
 xpcc::CanConnector<Driver>::sendMessage(const uint32_t & identifier,
 		const uint8_t *data, uint8_t size)
 {
-	xpcc::can::Message message(identifier, size);
+	modm::can::Message message(identifier, size);
 
 	// copy payload data
 	std::memcpy(message.data, data, size);
@@ -179,7 +179,7 @@ template<typename Driver>
 bool
 xpcc::CanConnector<Driver>::retrieveMessage()
 {
-	can::Message message;
+	modm::can::Message message;
 	if (this->canDriver->getMessage(message))
 	{
 		xpcc::Header header;
@@ -256,7 +256,7 @@ xpcc::CanConnector<Driver>::retrieveMessage()
 			if (currentFragment & packet->receivedFragments)
 			{
 				// error: received fragment twice -> most likely a new message -> delete the old one
-				//XPCC_LOG_WARNING << "lost fragment" << xpcc::flush;
+				//MODM_LOG_WARNING << "lost fragment" << modm::flush;
 				packet->receivedFragments = 0;
 			}
 			packet->receivedFragments |= currentFragment;
@@ -267,7 +267,7 @@ xpcc::CanConnector<Driver>::retrieveMessage()
 
 			// test if this was the last segment, otherwise we have to wait
 			// for more messages
-			if (xpcc::bitCount(packet->receivedFragments) == numberOfFragments)
+			if (modm::bitCount(packet->receivedFragments) == numberOfFragments)
 			{
 				this->receivedMessages.append(*packet);
 				this->pendingMessages.remove(packet);

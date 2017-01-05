@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FIR_IMPL_HPP
-#define XPCC_FIR_IMPL_HPP
+#ifndef MODM_FIR_IMPL_HPP
+#define MODM_FIR_IMPL_HPP
 
 #include <modm/architecture/utils.hpp>
 
@@ -36,7 +36,7 @@
 
 
 template<typename T, int N, int BLOCK_SIZE, signed int ScaleFactor>
-xpcc::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::Fir(const float (&coeff)[N])
+modm::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::Fir(const float (&coeff)[N])
 {
 	setCoefficients(coeff);
 	reset();
@@ -45,7 +45,7 @@ xpcc::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::Fir(const float (&coeff)[N])
 // -----------------------------------------------------------------------------
 template<typename T, int N, int BLOCK_SIZE, signed int ScaleFactor>
 void
-xpcc::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::setCoefficients(const float (&coeff)[N])
+modm::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::setCoefficients(const float (&coeff)[N])
 {
 	for(int i = 0; i < N; i++){
 		coefficients[i] = static_cast<T>(coeff[i] * ScaleFactor);
@@ -55,7 +55,7 @@ xpcc::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::setCoefficients(const float (&
 // -----------------------------------------------------------------------------
 template<typename T, int N, int BLOCK_SIZE, signed int ScaleFactor>
 void
-xpcc::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::reset()
+modm::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::reset()
 {
 	// reset all to make debugging easier
 	for(int i = 0; i < N + BLOCK_SIZE; i++){
@@ -67,7 +67,7 @@ xpcc::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::reset()
 // -----------------------------------------------------------------------------
 template<typename T, int N, int BLOCK_SIZE, signed int ScaleFactor>
 void
-xpcc::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::append(const T& input)
+modm::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::append(const T& input)
 {
 #ifdef FIR_DEBUG_APPEND
 	printf("append(%f);\ttaps_index=%d\n", input, taps_index);
@@ -77,7 +77,7 @@ xpcc::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::append(const T& input)
 		else printf("(%.3f)    ", taps[i]);
 	printf("\n");
 #endif // FIR_DEBUG_APPEND
-	if(xpcc_likely(taps_index > 0)){
+	if(modm_likely(taps_index > 0)){
 		taps_index--;
 	}
 	else{
@@ -99,7 +99,7 @@ xpcc::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::append(const T& input)
 // -----------------------------------------------------------------------------
 template<typename T, int N, int BLOCK_SIZE, signed int ScaleFactor>
 void
-xpcc::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::update()
+modm::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::update()
 {
 #ifdef FIR_DEBUG_UPDATE
 	printf("update();\ttaps_index=%d\n", taps_index);
@@ -130,4 +130,4 @@ xpcc::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::update()
 	printf("sum=%.3f\n", output);
 #endif // FIR_DEBUG_UPDATE
 }
-#endif // XPCC_FIR_IMPL_HPP
+#endif // MODM_FIR_IMPL_HPP

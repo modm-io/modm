@@ -19,7 +19,7 @@
 void
 LagrangeInterpolationTest::testCreation()
 {
-	typedef xpcc::Pair<uint8_t, float> Point;
+	typedef modm::Pair<uint8_t, float> Point;
 	
 	Point points[3] =
 	{
@@ -28,13 +28,13 @@ LagrangeInterpolationTest::testCreation()
 		{ 100,  50 }
 	};
 	
-	xpcc::interpolation::Lagrange<Point> value(points, 3);
+	modm::interpolation::Lagrange<Point> value(points, 3);
 }
 
 void 
 LagrangeInterpolationTest::testInterpolation()
 {
-	typedef xpcc::Pair<float, float> Point;
+	typedef modm::Pair<float, float> Point;
 	
 	// interpolate x^2 over the range of 1 <= x <= 3
 	Point points[3] =
@@ -44,7 +44,7 @@ LagrangeInterpolationTest::testInterpolation()
 		{ 3, 9 }
 	};
 	
-	xpcc::interpolation::Lagrange<Point> value(points, 3);
+	modm::interpolation::Lagrange<Point> value(points, 3);
 	
 	TEST_ASSERT_EQUALS_FLOAT(value.interpolate(1.f),   1.f);
 	TEST_ASSERT_EQUALS_FLOAT(value.interpolate(1.5f),  2.25f);

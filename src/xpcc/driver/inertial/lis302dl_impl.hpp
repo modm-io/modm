@@ -9,28 +9,28 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LIS302DL_HPP
+#ifndef MODM_LIS302DL_HPP
 #	error  "Don't include this file directly, use 'lis302dl.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 // MARK: LIS302 DRIVER
 template < class Transport >
-xpcc::Lis302dl<Transport>::Lis302dl(Data &data, uint8_t address)
+modm::Lis302dl<Transport>::Lis302dl(Data &data, uint8_t address)
 :	Transport(address), data(data), rawBuffer{0,0,0,0,0,0,0,0,0,0}
 {
 }
 
 template < class Transport >
-xpcc::ResumableResult<bool>
-xpcc::Lis302dl<Transport>::configure(Scale scale, MeasurementRate rate)
+modm::ResumableResult<bool>
+modm::Lis302dl<Transport>::configure(Scale scale, MeasurementRate rate)
 {
 	return updateControlRegister(r(scale) | r(rate) | Control1_t(0x47));
 }
 
 template < class Transport >
-xpcc::ResumableResult<bool>
-xpcc::Lis302dl<Transport>::updateControlRegister(uint8_t index, Control_t setMask, Control_t clearMask)
+modm::ResumableResult<bool>
+modm::Lis302dl<Transport>::updateControlRegister(uint8_t index, Control_t setMask, Control_t clearMask)
 {
 	RF_BEGIN();
 
@@ -42,8 +42,8 @@ xpcc::Lis302dl<Transport>::updateControlRegister(uint8_t index, Control_t setMas
 }
 
 template < class Transport >
-xpcc::ResumableResult<bool>
-xpcc::Lis302dl<Transport>::setClickThreshold(Axis axis, uint8_t threshold)
+modm::ResumableResult<bool>
+modm::Lis302dl<Transport>::setClickThreshold(Axis axis, uint8_t threshold)
 {
 	switch(axis)
 	{
@@ -60,8 +60,8 @@ xpcc::Lis302dl<Transport>::setClickThreshold(Axis axis, uint8_t threshold)
 }
 
 template < class Transport >
-xpcc::ResumableResult<bool>
-xpcc::Lis302dl<Transport>::readAcceleration()
+modm::ResumableResult<bool>
+modm::Lis302dl<Transport>::readAcceleration()
 {
 	RF_BEGIN();
 
@@ -78,8 +78,8 @@ xpcc::Lis302dl<Transport>::readAcceleration()
 
 // ----------------------------------------------------------------------------
 template < class Transport >
-xpcc::ResumableResult<bool>
-xpcc::Lis302dl<Transport>::updateRegister(uint8_t reg, uint8_t setMask, uint8_t clearMask)
+modm::ResumableResult<bool>
+modm::Lis302dl<Transport>::updateRegister(uint8_t reg, uint8_t setMask, uint8_t clearMask)
 {
 	RF_BEGIN();
 

@@ -43,14 +43,14 @@ public:
 		uint8_t id;
 		uint8_t source;
 		
-		xpcc::SmartPointer payload;
+		modm::SmartPointer payload;
 		
 	private:
 		Event&
 		operator = (const Event& other);
 	};
 	
-	xpcc::LinkedList<Event> events;
+	modm::LinkedList<Event> events;
 };
 
 template <typename T>

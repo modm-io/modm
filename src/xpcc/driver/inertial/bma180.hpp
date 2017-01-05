@@ -10,12 +10,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_BMA180_HPP
-#define XPCC_BMA180_HPP
+#ifndef MODM_BMA180_HPP
+#define MODM_BMA180_HPP
 
 #include <modm/architecture/interface/i2c_adapter.hpp>
 
-namespace xpcc
+namespace modm
 {
 	namespace bma180
 	{
@@ -391,7 +391,7 @@ namespace xpcc
 	 * \tparam I2cMaster Asynchronous Two Wire interface
 	 */
 	template < typename I2cMaster >
-	class Bma180 : protected xpcc::I2cWriteReadTransaction
+	class Bma180 : protected modm::I2cWriteReadTransaction
 	{
 	public:
 		/**
@@ -414,7 +414,7 @@ namespace xpcc
 		 * only read the X-ZDATA0-1 registers and buffer the results
 		 * sets isNewDataAvailable() to \c true
 		 */
-		xpcc_always_inline void
+		modm_always_inline void
 		readAccelerometer();
 
 		/* \return pointer to 8bit array containing xyzt temperature and accelerations
@@ -427,7 +427,7 @@ namespace xpcc
 		 * \c false, when the data has been accessed, or data is being
 		 * copied into the buffer.
 		 */
-		xpcc_always_inline bool
+		modm_always_inline bool
 		isNewDataAvailable();
 
 		void
@@ -478,4 +478,4 @@ namespace xpcc
 
 #include "bma180_impl.hpp"
 
-#endif // XPCC_BMA180_HPP
+#endif // MODM_BMA180_HPP

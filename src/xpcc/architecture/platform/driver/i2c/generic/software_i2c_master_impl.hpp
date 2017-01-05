@@ -14,46 +14,46 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SOFTWARE_I2C_HPP
+#ifndef MODM_SOFTWARE_I2C_HPP
 #	error	"Don't include this file directly, use 'i2c_master.hpp' instead!"
 #endif
 
 // debugging for serious dummies
 /*
 #include "../../uart/stm32/usart_2.hpp"
-#define DEBUG_SW_I2C(x) xpcc::stm32::Usart2::write(x)
+#define DEBUG_SW_I2C(x) modm::stm32::Usart2::write(x)
 /*/
 #define DEBUG_SW_I2C(x)
 //*/
 
 template <class SCL, class SDA>
-uint16_t xpcc::SoftwareI2cMaster<SCL, SDA>::delayTime(3);
+uint16_t modm::SoftwareI2cMaster<SCL, SDA>::delayTime(3);
 
 template <class SCL, class SDA>
-xpcc::I2c::Operation xpcc::SoftwareI2cMaster<SCL, SDA>::nextOperation;
+modm::I2c::Operation modm::SoftwareI2cMaster<SCL, SDA>::nextOperation;
 template <class SCL, class SDA>
-xpcc::I2cTransaction *xpcc::SoftwareI2cMaster<SCL, SDA>::transactionObject(nullptr);
+modm::I2cTransaction *modm::SoftwareI2cMaster<SCL, SDA>::transactionObject(nullptr);
 template <class SCL, class SDA>
-xpcc::I2cMaster::Error xpcc::SoftwareI2cMaster<SCL, SDA>::errorState(xpcc::I2cMaster::Error::NoError);
+modm::I2cMaster::Error modm::SoftwareI2cMaster<SCL, SDA>::errorState(modm::I2cMaster::Error::NoError);
 template <class SCL, class SDA>
-xpcc::I2c::ConfigurationHandler xpcc::SoftwareI2cMaster<SCL, SDA>::configuration(nullptr);
+modm::I2c::ConfigurationHandler modm::SoftwareI2cMaster<SCL, SDA>::configuration(nullptr);
 
 template <class SCL, class SDA>
-xpcc::I2cTransaction::Starting xpcc::SoftwareI2cMaster<SCL, SDA>::starting(0, xpcc::I2c::OperationAfterStart::Stop);
+modm::I2cTransaction::Starting modm::SoftwareI2cMaster<SCL, SDA>::starting(0, modm::I2c::OperationAfterStart::Stop);
 template <class SCL, class SDA>
-xpcc::I2cTransaction::Writing xpcc::SoftwareI2cMaster<SCL, SDA>::writing(nullptr, 0, xpcc::I2c::OperationAfterWrite::Stop);
+modm::I2cTransaction::Writing modm::SoftwareI2cMaster<SCL, SDA>::writing(nullptr, 0, modm::I2c::OperationAfterWrite::Stop);
 template <class SCL, class SDA>
-xpcc::I2cTransaction::Reading xpcc::SoftwareI2cMaster<SCL, SDA>::reading(nullptr, 0, xpcc::I2c::OperationAfterRead::Stop);
+modm::I2cTransaction::Reading modm::SoftwareI2cMaster<SCL, SDA>::reading(nullptr, 0, modm::I2c::OperationAfterRead::Stop);
 
 template <class SCL, class SDA>
 bool
-xpcc::SoftwareI2cMaster<SCL, SDA>::start(xpcc::I2cTransaction *transaction, ConfigurationHandler handler)
+modm::SoftwareI2cMaster<SCL, SDA>::start(modm::I2cTransaction *transaction, ConfigurationHandler handler)
 {
 	if (!transactionObject and transaction)
 	{
 		if (!transaction->attaching())
 		{
-			transaction->detaching(xpcc::I2c::DetachCause::FailedToAttach);
+			transaction->detaching(modm::I2c::DetachCause::FailedToAttach);
 			// return false; // done at the end of the function
 		}
 		else
@@ -78,9 +78,9 @@ xpcc::SoftwareI2cMaster<SCL, SDA>::start(xpcc::I2cTransaction *transaction, Conf
 				uint8_t address = (starting.address & 0xfe);
 
 				// set the correct addressing bit
-				DEBUG_SW_I2C((starting.next == xpcc::I2c::OperationAfterStart::Read) ? 'r': 'w');
-				if (starting.next == xpcc::I2c::OperationAfterStart::Read)
-					address |= xpcc::I2c::Read;
+				DEBUG_SW_I2C((starting.next == modm::I2c::OperationAfterStart::Read) ? 'r': 'w');
+				if (starting.next == modm::I2c::OperationAfterStart::Read)
+					address |= modm::I2c::Read;
 
 				// write address
 				if (!write(address)) return true;
@@ -88,15 +88,15 @@ xpcc::SoftwareI2cMaster<SCL, SDA>::start(xpcc::I2cTransaction *transaction, Conf
 				starting.address = 0;
 
 				// if the inner loop required a restart, we arrive here again
-				if (nextOperation == xpcc::I2c::Operation::Restart) {DEBUG_SW_I2C('R');}
+				if (nextOperation == modm::I2c::Operation::Restart) {DEBUG_SW_I2C('R');}
 				// what is the first operation after (re-)start?
-				nextOperation = static_cast<xpcc::I2c::Operation>(starting.next);
+				nextOperation = static_cast<modm::I2c::Operation>(starting.next);
 
 				do
 				{
 					switch (nextOperation)
 					{
-						case xpcc::I2c::Operation::Read:
+						case modm::I2c::Operation::Read:
 							// ask TO about reading
 							reading = transactionObject->reading();
 							while (reading.length > 1)
@@ -108,10 +108,10 @@ xpcc::SoftwareI2cMaster<SCL, SDA>::start(xpcc::I2cTransaction *transaction, Conf
 							// read last byte, conclude with NACK
 							if (!read(*reading.buffer, NACK)) return true;
 							// what next?
-							nextOperation = static_cast<xpcc::I2c::Operation>(reading.next);
+							nextOperation = static_cast<modm::I2c::Operation>(reading.next);
 							break;
 
-						case xpcc::I2c::Operation::Write:
+						case modm::I2c::Operation::Write:
 							// ask TO about writing
 							writing = transactionObject->writing();
 							while (writing.length > 0)
@@ -121,18 +121,18 @@ xpcc::SoftwareI2cMaster<SCL, SDA>::start(xpcc::I2cTransaction *transaction, Conf
 								writing.length--;
 							}
 							// what next?
-							nextOperation = static_cast<xpcc::I2c::Operation>(writing.next);
+							nextOperation = static_cast<modm::I2c::Operation>(writing.next);
 							break;
 
 						default:
-						case xpcc::I2c::Operation::Stop:
-							transactionObject->detaching(xpcc::I2c::DetachCause::NormalStop);
+						case modm::I2c::Operation::Stop:
+							transactionObject->detaching(modm::I2c::DetachCause::NormalStop);
 							transactionObject = nullptr;
 							stopCondition();
 							return true;
 					}
 				} // continue doing this inner loop, until a restart is required
-				while (nextOperation != xpcc::I2c::Operation::Restart);
+				while (nextOperation != modm::I2c::Operation::Restart);
 			}
 		}
 	}
@@ -142,7 +142,7 @@ xpcc::SoftwareI2cMaster<SCL, SDA>::start(xpcc::I2cTransaction *transaction, Conf
 // ----------------------------------------------------------------------------
 template <class SCL, class SDA>
 void
-xpcc::SoftwareI2cMaster<SCL, SDA>::reset()
+modm::SoftwareI2cMaster<SCL, SDA>::reset()
 {
 	DEBUG_SW_I2C('E');
 	DEBUG_SW_I2C('0' + static_cast<uint8_t>(Error::SoftwareReset));
@@ -155,7 +155,7 @@ xpcc::SoftwareI2cMaster<SCL, SDA>::reset()
 // MARK: - error handling
 template <class SCL, class SDA>
 void
-xpcc::SoftwareI2cMaster<SCL, SDA>::error(Error error)
+modm::SoftwareI2cMaster<SCL, SDA>::error(Error error)
 {
 	DEBUG_SW_I2C('E');
 	DEBUG_SW_I2C('0' + static_cast<uint8_t>(error));
@@ -183,14 +183,14 @@ xpcc::SoftwareI2cMaster<SCL, SDA>::error(Error error)
 // MARK: - bus condition operations
 template <class SCL, class SDA>
 bool
-xpcc::SoftwareI2cMaster<SCL, SDA>::startCondition()
+modm::SoftwareI2cMaster<SCL, SDA>::startCondition()
 {
 	DEBUG_SW_I2C('\n');
 	DEBUG_SW_I2C('s');
 	// release data line
 	SDA::set();
 	delay4();
-	if(SDA::read() == xpcc::Gpio::Low)
+	if(SDA::read() == modm::Gpio::Low)
 	{
 		// could not release data line
 		errorState = Error::BusBusy;
@@ -222,7 +222,7 @@ xpcc::SoftwareI2cMaster<SCL, SDA>::startCondition()
 
 template <class SCL, class SDA>
 bool
-xpcc::SoftwareI2cMaster<SCL, SDA>::stopCondition()
+modm::SoftwareI2cMaster<SCL, SDA>::stopCondition()
 {
 	DEBUG_SW_I2C('S');
 	// pull down both lines
@@ -243,7 +243,7 @@ xpcc::SoftwareI2cMaster<SCL, SDA>::stopCondition()
 	SDA::set();
 	delay4();
 
-	if (SDA::read() == xpcc::Gpio::Low)
+	if (SDA::read() == modm::Gpio::Low)
 	{
 		// could not release data line
 		errorState = Error::BusCondition;
@@ -256,18 +256,18 @@ xpcc::SoftwareI2cMaster<SCL, SDA>::stopCondition()
 
 template <class SCL, class SDA>
 bool
-xpcc::SoftwareI2cMaster<SCL, SDA>::sclSetAndWait()
+modm::SoftwareI2cMaster<SCL, SDA>::sclSetAndWait()
 {
 	SCL::set();
 	// wait for clock stretching by slave
 	// only wait a maximum of 250 half clock cycles
 	uint_fast8_t deadlockPreventer = 250;
-	while (SCL::read() == xpcc::Gpio::Low && deadlockPreventer)
+	while (SCL::read() == modm::Gpio::Low && deadlockPreventer)
 	{
 		delay4();
 		deadlockPreventer--;
 		// double the read amount
-		if (SCL::read() == xpcc::Gpio::High) return true;
+		if (SCL::read() == modm::Gpio::High) return true;
 		delay4();
 	}
 	// if extreme clock stretching occurs, then there might be an external error
@@ -278,7 +278,7 @@ xpcc::SoftwareI2cMaster<SCL, SDA>::sclSetAndWait()
 // MARK: - byte operations
 template <class SCL, class SDA>
 bool
-xpcc::SoftwareI2cMaster<SCL, SDA>::write(uint8_t data)
+modm::SoftwareI2cMaster<SCL, SDA>::write(uint8_t data)
 {
 	DEBUG_SW_I2C('W');
 	// shift through all 8 bits
@@ -305,7 +305,7 @@ xpcc::SoftwareI2cMaster<SCL, SDA>::write(uint8_t data)
 		return false;
 	}
 	// sample the data line for acknowledge bit
-	if(SDA::read() == xpcc::Gpio::High)
+	if(SDA::read() == modm::Gpio::High)
 	{
 		DEBUG_SW_I2C('n');
 		// we have not received an ACK
@@ -323,7 +323,7 @@ xpcc::SoftwareI2cMaster<SCL, SDA>::write(uint8_t data)
 
 template <class SCL, class SDA>
 bool
-xpcc::SoftwareI2cMaster<SCL, SDA>::read(uint8_t &data, bool ack)
+modm::SoftwareI2cMaster<SCL, SDA>::read(uint8_t &data, bool ack)
 {
 	DEBUG_SW_I2C('R');
 	// release data line
@@ -360,7 +360,7 @@ xpcc::SoftwareI2cMaster<SCL, SDA>::read(uint8_t &data, bool ack)
 // MARK: - bit operations
 template <class SCL, class SDA>
 bool
-xpcc::SoftwareI2cMaster<SCL, SDA>::writeBit(bool bit)
+modm::SoftwareI2cMaster<SCL, SDA>::writeBit(bool bit)
 {
 	// set the data pin
 	SDA::set(bit);
@@ -381,7 +381,7 @@ xpcc::SoftwareI2cMaster<SCL, SDA>::writeBit(bool bit)
 
 template <class SCL, class SDA>
 bool
-xpcc::SoftwareI2cMaster<SCL, SDA>::readBit(uint8_t &data)
+modm::SoftwareI2cMaster<SCL, SDA>::readBit(uint8_t &data)
 {
 	// slave sets data line
 	delay2();
@@ -389,7 +389,7 @@ xpcc::SoftwareI2cMaster<SCL, SDA>::readBit(uint8_t &data)
 	if (sclSetAndWait())
 	{
 		// copy bit into data
-		if(SDA::read() == xpcc::Gpio::High)
+		if(SDA::read() == modm::Gpio::High)
 			data |= 0x01;
 
 		delay2();

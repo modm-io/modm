@@ -9,7 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LIS3DSH_HPP
+#ifndef MODM_LIS3DSH_HPP
 #	error  "Don't include this file directly, use 'lis3dsh.hpp' instead!"
 #endif
 
@@ -18,14 +18,14 @@
 // ----------------------------------------------------------------------------
 // MARK: LIS302 DRIVER
 template < class Transport >
-xpcc::Lis3dsh<Transport>::Lis3dsh(Data &data, uint8_t address)
+modm::Lis3dsh<Transport>::Lis3dsh(Data &data, uint8_t address)
 :	Transport(address), data(data), rawBuffer{7,0,0,0,0,0, 0, 0,0,0,0,0,0, 0,0}
 {
 }
 
 template < class Transport >
-xpcc::ResumableResult<bool>
-xpcc::Lis3dsh<Transport>::configure(Scale scale, MeasurementRate rate)
+modm::ResumableResult<bool>
+modm::Lis3dsh<Transport>::configure(Scale scale, MeasurementRate rate)
 {
 	RF_BEGIN();
 
@@ -52,8 +52,8 @@ xpcc::Lis3dsh<Transport>::configure(Scale scale, MeasurementRate rate)
 }
 
 template < class Transport >
-xpcc::ResumableResult<bool>
-xpcc::Lis3dsh<Transport>::updateControlRegister(uint8_t index, Control_t setMask, Control_t clearMask)
+modm::ResumableResult<bool>
+modm::Lis3dsh<Transport>::updateControlRegister(uint8_t index, Control_t setMask, Control_t clearMask)
 {
 	RF_BEGIN();
 
@@ -72,8 +72,8 @@ xpcc::Lis3dsh<Transport>::updateControlRegister(uint8_t index, Control_t setMask
 }
 
 template < class Transport >
-xpcc::ResumableResult<bool>
-xpcc::Lis3dsh<Transport>::readAcceleration()
+modm::ResumableResult<bool>
+modm::Lis3dsh<Transport>::readAcceleration()
 {
 	RF_BEGIN();
 
@@ -89,8 +89,8 @@ xpcc::Lis3dsh<Transport>::readAcceleration()
 
 // ----------------------------------------------------------------------------
 template < class Transport >
-xpcc::ResumableResult<bool>
-xpcc::Lis3dsh<Transport>::updateRegister(uint8_t reg, uint8_t setMask, uint8_t clearMask)
+modm::ResumableResult<bool>
+modm::Lis3dsh<Transport>::updateRegister(uint8_t reg, uint8_t setMask, uint8_t clearMask)
 {
 	RF_BEGIN();
 

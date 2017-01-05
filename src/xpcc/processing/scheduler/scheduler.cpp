@@ -13,14 +13,14 @@
 #include "scheduler.hpp"
 
 // ----------------------------------------------------------------------------
-xpcc::Scheduler::Scheduler() :
+modm::Scheduler::Scheduler() :
 	taskList(0), readyList(0), currentPriority(0)
 {
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::Scheduler::scheduleTask(Task& task,
+modm::Scheduler::scheduleTask(Task& task,
 		uint16_t period,
 		Priority priority)
 {
@@ -37,14 +37,14 @@ xpcc::Scheduler::scheduleTask(Task& task,
 
 // ----------------------------------------------------------------------------
 /*bool
-xpcc::Scheduler::removeTask(const Task& task)
+modm::Scheduler::removeTask(const Task& task)
 {
 }
 */
 
 // ----------------------------------------------------------------------------
 void
-xpcc::Scheduler::schedule()
+modm::Scheduler::schedule()
 {
 	this->scheduleInterupt();
 }

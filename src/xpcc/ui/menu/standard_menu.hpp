@@ -15,8 +15,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STANDARD_MENU_HPP
-#define XPCC_STANDARD_MENU_HPP
+#ifndef MODM_STANDARD_MENU_HPP
+#define MODM_STANDARD_MENU_HPP
 
 #include "abstract_menu.hpp"
 #include "scrollable_text.hpp"
@@ -25,7 +25,7 @@
 #include <modm/processing/timer.hpp>
 
 
-namespace xpcc
+namespace modm
 {
 
 	/**
@@ -65,11 +65,11 @@ namespace xpcc
 	{
 	public:
 
-		StandardMenu(xpcc::ViewStack* stack, uint8_t identifier);
+		StandardMenu(modm::ViewStack* stack, uint8_t identifier);
 		
 		virtual ~StandardMenu() = 0;
 
-		StandardMenu(xpcc::ViewStack* stack, uint8_t identifier, const char* title);
+		StandardMenu(modm::ViewStack* stack, uint8_t identifier, const char* title);
 
 		/**
 		 * @brief addEntry adds a new option to the displayed list
@@ -87,7 +87,7 @@ namespace xpcc
 		 * @brief shortButtonPress handles normal button actions
 		 */
 		virtual void
-		shortButtonPress(xpcc::MenuButtons::Button button);
+		shortButtonPress(modm::MenuButtons::Button button);
 
 		/**
 		 * @brief hasChanged, returns true if the screen has to be redrawn
@@ -123,7 +123,7 @@ namespace xpcc
 		uint16_t display_update_time; //after this time the display is redrawn,
 									  // important for scrolling
 
-		xpcc::ShortPeriodicTimer timer;
+		modm::ShortPeriodicTimer timer;
 		bool buttonAction;
 
 		const char* title;
@@ -136,10 +136,10 @@ namespace xpcc
 
 	protected:
 
-		typedef xpcc::DoublyLinkedList<MenuEntry> EntryList;
+		typedef modm::DoublyLinkedList<MenuEntry> EntryList;
 		EntryList entries;
 
 	};
 }
 
-#endif // XPCC_STANDARD_MENU_HPP
+#endif // MODM_STANDARD_MENU_HPP

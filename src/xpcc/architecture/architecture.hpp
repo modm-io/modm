@@ -18,9 +18,9 @@
  * Supported platforms
  */
 
-#ifndef XPCC_ARCHITECTURE_HPP
-#define XPCC_ARCHITECTURE_HPP
+#ifndef MODM_ARCHITECTURE_HPP
+#define MODM_ARCHITECTURE_HPP
 
 #include "driver.hpp"
 
-#endif	// XPCC_ARCHITECTURE_HPP
+#endif	// MODM_ARCHITECTURE_HPP

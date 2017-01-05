@@ -20,7 +20,7 @@ FLASH_STORAGE(int intValue) = 12345;
 void
 FlashTest::testIntegerAccess()
 {
-	xpcc::accessor::Flash<int> intPointer(&intValue);
+	modm::accessor::Flash<int> intPointer(&intValue);
 	
 	TEST_ASSERT_EQUALS(*intPointer, 12345);
 }	
@@ -31,7 +31,7 @@ void
 FlashTest::testStringAccess()
 {
 	char string[] = "Hallo Welt!";
-	xpcc::accessor::Flash<char> stringPointer(stringValue);
+	modm::accessor::Flash<char> stringPointer(stringValue);
 	
 	TEST_ASSERT_EQUALS_ARRAY(stringPointer, string, sizeof(string));
 }

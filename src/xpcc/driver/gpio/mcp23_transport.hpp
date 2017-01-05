@@ -9,14 +9,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_MCP23_TRANSPORT_HPP
-#define XPCC_MCP23_TRANSPORT_HPP
+#ifndef MODM_MCP23_TRANSPORT_HPP
+#define MODM_MCP23_TRANSPORT_HPP
 
 #include <modm/architecture/interface/spi_device.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/processing/resumable.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -26,14 +26,14 @@ namespace xpcc
  *
  * The I2C interface is compliant with Fast Mode (up to 400kHz).
  *
- * @see xpcc::Mcp23x08
- * @see xpcc::Mcp23x17
+ * @see modm::Mcp23x08
+ * @see modm::Mcp23x17
  *
  * @ingroup driver_gpio
  * @author	Niklas Hauser
  */
 template < class I2cMaster >
-class Mcp23TransportI2c : public xpcc::I2cDevice< I2cMaster, 2 >
+class Mcp23TransportI2c : public modm::I2cDevice< I2cMaster, 2 >
 {
 public:
 	Mcp23TransportI2c(uint8_t address);
@@ -41,22 +41,22 @@ public:
 protected:
 	// RAW REGISTER ACCESS
 	/// write a 8bit value
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	write(uint8_t reg, uint8_t value);
 
 	/// write a 16bit value
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	write16(uint8_t reg, uint16_t value);
 
 	/// read a 8bit value
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	read(uint8_t reg, uint8_t &value)
 	{
 		return read(reg, &value, 1);
 	}
 
 	/// read multiple 8bit values from a start register
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	read(uint8_t reg, uint8_t *buffer, uint8_t length);
 
 private:
@@ -78,34 +78,34 @@ private:
  * @author	Niklas Hauser
  */
 template < class SpiMaster, class Cs >
-class Mcp23TransportSpi : public xpcc::SpiDevice< SpiMaster >, protected xpcc::NestedResumable<2>
+class Mcp23TransportSpi : public modm::SpiDevice< SpiMaster >, protected modm::NestedResumable<2>
 {
 public:
 	Mcp23TransportSpi(uint8_t address);
 
 	/// pings the sensor
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	ping();
 
 protected:
 	// RAW REGISTER ACCESS
 	/// write a 8bit value
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	write(uint8_t reg, uint8_t value);
 
 	/// write a 16bit value
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	write16(uint8_t reg, uint16_t value);
 
 	/// read a 8bit value
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	read(uint8_t reg, uint8_t &value)
 	{
 		return read(reg, &value, 1);
 	}
 
 	/// read multiple 8bit values from a start register
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	read(uint8_t reg, uint8_t *buffer, uint8_t length);
 
 private:
@@ -116,8 +116,8 @@ private:
 	static constexpr uint8_t Write = 0x00;
 };
 
-} // namespace xpcc
+} // namespace modm
 
 #include "mcp23_transport_impl.hpp"
 
-#endif	// XPCC_MCP23_TRANSPORT_HPP
+#endif	// MODM_MCP23_TRANSPORT_HPP

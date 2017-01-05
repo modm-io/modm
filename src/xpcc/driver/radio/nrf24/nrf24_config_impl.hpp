@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_NRF24_CONFIG_HPP
+#ifndef MODM_NRF24_CONFIG_HPP
 #   error "Don't include this file directly, use 'nrf24_config.hpp' instead!"
 #endif
 
@@ -23,19 +23,19 @@
 
 template<typename Nrf24Phy>
 void
-xpcc::Nrf24Config<Nrf24Phy>::setMode(Mode mode)
+modm::Nrf24Config<Nrf24Phy>::setMode(Mode mode)
 {
 	Nrf24Phy::clearInterrupt(InterruptFlag::ALL);
 
 	if(mode == Mode::Rx)
 	{
-		XPCC_LOG_DEBUG << "Set mode Rx" << xpcc::endl;
+		MODM_LOG_DEBUG << "Set mode Rx" << modm::endl;
 
 		Nrf24Phy::flushRxFifo();
 		Nrf24Phy::setBits(NrfRegister::CONFIG, Config::PRIM_RX);
 	} else
 	{
-		XPCC_LOG_DEBUG << "Set mode Tx" << xpcc::endl;
+		MODM_LOG_DEBUG << "Set mode Tx" << modm::endl;
 
 		Nrf24Phy::clearInterrupt(Nrf24Phy::InterruptFlag::ALL);		// Not sure if needed
 		Nrf24Phy::clearBits(NrfRegister::CONFIG, Config::PRIM_RX);
@@ -52,7 +52,7 @@ xpcc::Nrf24Config<Nrf24Phy>::setMode(Mode mode)
 
 template<typename Nrf24Phy>
 void
-xpcc::Nrf24Config<Nrf24Phy>::setSpeed(Speed speed)
+modm::Nrf24Config<Nrf24Phy>::setSpeed(Speed speed)
 {
 	switch (speed)
 	{
@@ -74,7 +74,7 @@ xpcc::Nrf24Config<Nrf24Phy>::setSpeed(Speed speed)
 // --------------------------------------------------------------------------------------------------------------------
 
 template<typename Nrf24Phy>
-void xpcc::Nrf24Config<Nrf24Phy>::setCrc(Crc crc)
+void modm::Nrf24Config<Nrf24Phy>::setCrc(Crc crc)
 {
 	if(crc == Crc::NoCrc)
 	{
@@ -98,7 +98,7 @@ void xpcc::Nrf24Config<Nrf24Phy>::setCrc(Crc crc)
 // --------------------------------------------------------------------------------------------------------------------
 
 template<typename Nrf24Phy>
-void xpcc::Nrf24Config<Nrf24Phy>::setRfPower(RfPower power)
+void modm::Nrf24Config<Nrf24Phy>::setRfPower(RfPower power)
 {
 	uint8_t reg = Nrf24Phy::readRegister(NrfRegister::RF_SETUP);
 	reg &= ~(static_cast<uint8_t>(RfSetup::RF_PWR));	// Clear bits
@@ -109,7 +109,7 @@ void xpcc::Nrf24Config<Nrf24Phy>::setRfPower(RfPower power)
 // --------------------------------------------------------------------------------------------------------------------
 
 template<typename Nrf24Phy>
-void xpcc::Nrf24Config<Nrf24Phy>::setAutoRetransmitDelay(AutoRetransmitDelay delay)
+void modm::Nrf24Config<Nrf24Phy>::setAutoRetransmitDelay(AutoRetransmitDelay delay)
 {
 	uint8_t reg = Nrf24Phy::readRegister(NrfRegister::SETUP_RETR);
 	reg &= ~(static_cast<uint8_t>(SetupRetr::ARD));		// Clear bits
@@ -120,7 +120,7 @@ void xpcc::Nrf24Config<Nrf24Phy>::setAutoRetransmitDelay(AutoRetransmitDelay del
 // --------------------------------------------------------------------------------------------------------------------
 
 template<typename Nrf24Phy>
-void xpcc::Nrf24Config<Nrf24Phy>::setAutoRetransmitCount(AutoRetransmitCount count)
+void modm::Nrf24Config<Nrf24Phy>::setAutoRetransmitCount(AutoRetransmitCount count)
 {
 	uint8_t reg = Nrf24Phy::readRegister(NrfRegister::SETUP_RETR);
 	reg &= ~(static_cast<uint8_t>(SetupRetr::ARC));		// Clear bits
@@ -132,7 +132,7 @@ void xpcc::Nrf24Config<Nrf24Phy>::setAutoRetransmitCount(AutoRetransmitCount cou
 
 template<typename Nrf24Phy>
 void
-xpcc::Nrf24Config<Nrf24Phy>::enablePipe(Pipe_t pipe, bool enableAutoAck)
+modm::Nrf24Config<Nrf24Phy>::enablePipe(Pipe_t pipe, bool enableAutoAck)
 {
 
 	uint16_t payload_length = Nrf24Phy::getPayloadLength();
@@ -162,8 +162,8 @@ xpcc::Nrf24Config<Nrf24Phy>::enablePipe(Pipe_t pipe, bool enableAutoAck)
 // --------------------------------------------------------------------------------------------------------------------
 
 template<typename Nrf24Phy>
-typename xpcc::Nrf24Config<Nrf24Phy>::Pipe_t
-xpcc::Nrf24Config<Nrf24Phy>::getPayloadPipe()
+typename modm::Nrf24Config<Nrf24Phy>::Pipe_t
+modm::Nrf24Config<Nrf24Phy>::getPayloadPipe()
 {
 	uint8_t status = Nrf24Phy::readStatus();
 

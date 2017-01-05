@@ -9,12 +9,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_NOKIA5110_HPP
-#define XPCC_NOKIA5110_HPP
+#ifndef MODM_NOKIA5110_HPP
+#define MODM_NOKIA5110_HPP
 
 #include <modm/ui/display/buffered_graphic_display.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -41,8 +41,8 @@ protected:
 	void writeCommand(uint8_t data);
 };
 
-} // xpcc namespace
+} // modm namespace
 
 #include "nokia5110_impl.hpp"
 
-#endif // XPCC_NOKIA5110_HPP
+#endif // MODM_NOKIA5110_HPP

@@ -10,12 +10,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_MAX7219_MATRIX_HPP
-#define XPCC_MAX7219_MATRIX_HPP
+#ifndef MODM_MAX7219_MATRIX_HPP
+#define MODM_MAX7219_MATRIX_HPP
 
 #include <modm/ui/display/buffered_graphic_display.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -176,13 +176,13 @@ protected:
 	Max7219< SPI, CS, COLUMNS * ROWS > max;
 
 };
-} // xpcc namespace
+} // modm namespace
 
 /* ------------------- Implementation --------------------- */
 
 template < typename SPI, typename CS, uint8_t COLUMNS, uint8_t ROWS >
 void
-xpcc::Max7219matrix< SPI, CS, COLUMNS, ROWS >::initialize()
+modm::Max7219matrix< SPI, CS, COLUMNS, ROWS >::initialize()
 {
 	max.initialize();
 	max.clear();
@@ -190,7 +190,7 @@ xpcc::Max7219matrix< SPI, CS, COLUMNS, ROWS >::initialize()
 
 template < typename SPI, typename CS, uint8_t COLUMNS, uint8_t ROWS >
 void
-xpcc::Max7219matrix< SPI, CS, COLUMNS, ROWS >::update()
+modm::Max7219matrix< SPI, CS, COLUMNS, ROWS >::update()
 {
 	// Iterate column 0 to 7 of MAX LED driver
 	for (uint8_t ledCol = 0; ledCol < 8; ++ledCol)
@@ -219,4 +219,4 @@ xpcc::Max7219matrix< SPI, CS, COLUMNS, ROWS >::update()
 	}
 }
 
-#endif	// XPCC_MAX7219_MATRIX_HPP
+#endif	// MODM_MAX7219_MATRIX_HPP

@@ -20,14 +20,14 @@
  * http://www.juras-projects.org/eng/lcd.php
  */
 
-#ifndef XPCC_SIEMENS_S65_HPP
+#ifndef MODM_SIEMENS_S65_HPP
 #	error	"Don't include this file directly, use 'siemens_s65.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template <typename SPI, typename CS, typename RS, typename Reset>
 void
-xpcc::SiemensS65Portrait<SPI, CS, RS, Reset>::initialize()
+modm::SiemensS65Portrait<SPI, CS, RS, Reset>::initialize()
 {
 	// CS pin
 	CS::setOutput(true);
@@ -47,7 +47,7 @@ xpcc::SiemensS65Portrait<SPI, CS, RS, Reset>::initialize()
 
 template <typename SPI, typename CS, typename RS, typename Reset>
 void
-xpcc::SiemensS65Landscape<SPI, CS, RS, Reset>::initialize()
+modm::SiemensS65Landscape<SPI, CS, RS, Reset>::initialize()
 {
 	// CS pin
 	CS::setOutput(true);
@@ -67,7 +67,7 @@ xpcc::SiemensS65Landscape<SPI, CS, RS, Reset>::initialize()
 
 template <typename SPI, typename CS, typename RS, typename Reset>
 void
-xpcc::SiemensS65Common<SPI, CS, RS, Reset>::writeCmd(uint8_t reg, uint16_t param)
+modm::SiemensS65Common<SPI, CS, RS, Reset>::writeCmd(uint8_t reg, uint16_t param)
 {
 	writeReg(reg);
 	writeData(param);
@@ -75,7 +75,7 @@ xpcc::SiemensS65Common<SPI, CS, RS, Reset>::writeCmd(uint8_t reg, uint16_t param
 
 template <typename SPI, typename CS, typename RS, typename Reset>
 void
-xpcc::SiemensS65Common<SPI, CS, RS, Reset>::writeReg(uint8_t reg)
+modm::SiemensS65Common<SPI, CS, RS, Reset>::writeReg(uint8_t reg)
 {
 	CS::reset();
 	SPI::transferBlocking(0x74); // start byte, RS = 0, R/W = 0, write index register
@@ -86,7 +86,7 @@ xpcc::SiemensS65Common<SPI, CS, RS, Reset>::writeReg(uint8_t reg)
 
 template <typename SPI, typename CS, typename RS, typename Reset>
 void
-xpcc::SiemensS65Common<SPI, CS, RS, Reset>::writeData(uint16_t data)
+modm::SiemensS65Common<SPI, CS, RS, Reset>::writeData(uint16_t data)
 {
 	CS::reset();
 	SPI::transferBlocking(0x76);	// start byte, RS = 1, R/W = 0, write instruction or RAM data
@@ -97,14 +97,14 @@ xpcc::SiemensS65Common<SPI, CS, RS, Reset>::writeData(uint16_t data)
 
 template <typename SPI, typename CS, typename RS, typename Reset>
 void
-xpcc::SiemensS65Common<SPI, CS, RS, Reset>::lcdSettings(bool landscape) {
+modm::SiemensS65Common<SPI, CS, RS, Reset>::lcdSettings(bool landscape) {
 	// Hardware reset is low from initialize
-	xpcc::delayMilliseconds(50);
+	modm::delayMilliseconds(50);
 	Reset::set();
-	xpcc::delayMilliseconds(50);
+	modm::delayMilliseconds(50);
 
 	writeCmd(0x07, 0x0000); //display off
-	xpcc::delayMilliseconds(10);
+	modm::delayMilliseconds(10);
 
 	//power on sequence
 	writeCmd(0x02, 0x0400); //lcd drive control
@@ -117,11 +117,11 @@ xpcc::SiemensS65Common<SPI, CS, RS, Reset>::lcdSettings(bool landscape) {
 	writeCmd(0x03, 0x0000); //power control 1: BT        //step 2
 	writeCmd(0x03, 0x0000); //power control 1: DC
 	writeCmd(0x03, 0x000C); //power control 1: AP
-	xpcc::delayMilliseconds(40);
+	modm::delayMilliseconds(40);
 	writeCmd(0x0E, 0x2D1F); //power control 5: VCOMG     //step 3
-	xpcc::delayMilliseconds(40);
+	modm::delayMilliseconds(40);
 	writeCmd(0x0D, 0x0616); //power control 4: PON       //step 4
-	xpcc::delayMilliseconds(100);
+	modm::delayMilliseconds(100);
 
 	//display options
 	if (landscape) {
@@ -141,13 +141,13 @@ xpcc::SiemensS65Common<SPI, CS, RS, Reset>::lcdSettings(bool landscape) {
 	writeCmd(0x07, 0x0025); //display control: GON
 	writeCmd(0x07, 0x0027); //display control: D1
 	writeCmd(0x07, 0x0037); //display control: DTE
-	xpcc::delayMilliseconds(10);
+	modm::delayMilliseconds(10);
 	lcdCls(0x03e0);
 }
 
 template <typename SPI, typename CS, typename RS, typename Reset>
 void
-xpcc::SiemensS65Common<SPI, CS, RS, Reset>::lcdCls(uint16_t colour) {
+modm::SiemensS65Common<SPI, CS, RS, Reset>::lcdCls(uint16_t colour) {
 	// Set CGRAM Address to 0 = upper left corner
 	writeCmd(0x21, 0x0000);
 
@@ -192,7 +192,7 @@ xpcc::SiemensS65Common<SPI, CS, RS, Reset>::lcdCls(uint16_t colour) {
 
 template <typename SPI, typename CS, typename RS, typename Reset>
 void
-xpcc::SiemensS65Portrait<SPI, CS, RS, Reset>::update() {
+modm::SiemensS65Portrait<SPI, CS, RS, Reset>::update() {
 	// Set CGRAM Address to 0 = upper left corner
 	SiemensS65Common<SPI, CS, RS, Reset>::writeCmd(0x21, 0x0000);
 
@@ -289,7 +289,7 @@ xpcc::SiemensS65Portrait<SPI, CS, RS, Reset>::update() {
 
 template <typename SPI, typename CS, typename RS, typename Reset>
 void
-xpcc::SiemensS65Landscape<SPI, CS, RS, Reset>::update() {
+modm::SiemensS65Landscape<SPI, CS, RS, Reset>::update() {
 	// Set CGRAM Address to 0 = upper left corner
 	SiemensS65Common<SPI, CS, RS, Reset>::writeCmd(0x21, 0x0000);
 
@@ -303,7 +303,7 @@ xpcc::SiemensS65Landscape<SPI, CS, RS, Reset>::update() {
 	const uint16_t maskBlank  = 0x0000; // RRRR RGGG GGGB BBBB
 	const uint16_t maskFilled = 0x37e0; // RRRR RGGG GGGB BBBB
 
-	// size of the XPCC Display buffer, not the hardware pixels
+	// size of the MODM Display buffer, not the hardware pixels
 	const uint8_t width = 176;
 	const uint8_t height = 136 / 8; // Display is only 132 pixels high.
 

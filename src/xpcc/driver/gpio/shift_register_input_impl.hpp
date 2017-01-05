@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SHIFT_REGISTER_INPUT_HPP
+#ifndef MODM_SHIFT_REGISTER_INPUT_HPP
 	#error	"Don't include this file directly, use 'shift_register_input.hpp' instead!"
 #endif
 
@@ -31,21 +31,21 @@
  */
 // ----------------------------------------------------------------------------
 template <typename Spi,	typename Load, size_t N>
-Spi xpcc::ShiftRegisterInput<Spi, Load, N>::spi;
+Spi modm::ShiftRegisterInput<Spi, Load, N>::spi;
 
 template <typename Spi,	typename Load, size_t N>
-Load xpcc::ShiftRegisterInput<Spi, Load, N>::load;
+Load modm::ShiftRegisterInput<Spi, Load, N>::load;
 
 template <typename Spi,	typename Load, size_t N>
-uint8_t xpcc::ShiftRegisterInput<Spi, Load, N>::value[N];
+uint8_t modm::ShiftRegisterInput<Spi, Load, N>::value[N];
 
 // ----------------------------------------------------------------------------
 template <typename Spi,	typename Load, size_t N>
 void
-xpcc::ShiftRegisterInput<Spi, Load, N>::initialize()
+modm::ShiftRegisterInput<Spi, Load, N>::initialize()
 {
 	spi.initialize();
-	store.setOutput(xpcc::Gpio::Low);
+	store.setOutput(modm::Gpio::Low);
 	
 	for (uint_fast8_t i = 0; i < N; ++i) {
 		cache[i] = 0;
@@ -55,7 +55,7 @@ xpcc::ShiftRegisterInput<Spi, Load, N>::initialize()
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Store, size_t N>
 const uint8_t&
-xpcc::ShiftRegisterInput<Spi, Store, N>::operator [] (uint_fast8_t port) const
+modm::ShiftRegisterInput<Spi, Store, N>::operator [] (uint_fast8_t port) const
 {
 	return cache[port];
 }
@@ -63,7 +63,7 @@ xpcc::ShiftRegisterInput<Spi, Store, N>::operator [] (uint_fast8_t port) const
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Store, size_t N>
 uint8_t&
-xpcc::ShiftRegisterInput<Spi, Store, N>::operator [] (uint_fast8_t port)
+modm::ShiftRegisterInput<Spi, Store, N>::operator [] (uint_fast8_t port)
 {
 	return cache[port];
 }
@@ -71,7 +71,7 @@ xpcc::ShiftRegisterInput<Spi, Store, N>::operator [] (uint_fast8_t port)
 // ----------------------------------------------------------------------------
 template <typename Spi,	typename Load, size_t N>
 void
-xpcc::ShiftRegisterInput<Spi, Load, N>::update()
+modm::ShiftRegisterInput<Spi, Load, N>::update()
 {
 	/* Load Parallel */
 	store.set();

@@ -1,8 +1,8 @@
-# Porting to xpcc
+# Porting to modm
 
-## What xpcc already supports
+## What modm already supports
 
-xpcc contains extensive support for AVR and STM32 devices, specifically:
+modm contains extensive support for AVR and STM32 devices, specifically:
 
 - AT90, ATtiny, ATmega devices
 - STM32 F0, F1, F3, F4, F7 devices.
@@ -10,13 +10,13 @@ xpcc contains extensive support for AVR and STM32 devices, specifically:
 If your device falls into any of those categories, you can just use the specific device
 identifier in your `project.cfg` and it'll very likely just work out-of-the-box.
 
-If you want to add a development board for an existing device, have a look at [`xpcc/architecture/platform/board`](https://github.com/roboterclubaachen/xpcc/tree/develop/src/xpcc/architecture/platform/board).
+If you want to add a development board for an existing device, have a look at [`modm/architecture/platform/board`](https://github.com/roboterclubaachen/modm/tree/develop/src/modm/architecture/platform/board).
 
 ## Adding support for new AVR or STM32 devices
 
-It may be as easy as adding a new device file, but if it's a brand new device, [the device headers also need to be updated](https://github.com/roboterclubaachen/xpcc/tree/develop/ext/). When porting a new series (for example the STM32L4), a lot of existing code can be reused, but there may be very important differences between the two that are not immediately obvious to someone who isn't that familiar with STM32 devices.
+It may be as easy as adding a new device file, but if it's a brand new device, [the device headers also need to be updated](https://github.com/roboterclubaachen/modm/tree/develop/ext/). When porting a new series (for example the STM32L4), a lot of existing code can be reused, but there may be very important differences between the two that are not immediately obvious to someone who isn't that familiar with STM32 devices.
 
-We recommend [writing us an email][mailing_list], or [opening up an issue on GitHub](https://github.com/roboterclubaachen/xpcc/issues).
+We recommend [writing us an email][mailing_list], or [opening up an issue on GitHub](https://github.com/roboterclubaachen/modm/issues).
 
 ## Porting a new device from a new vendor
 
@@ -37,20 +37,20 @@ We'll discuss every point in detail for the rest of this chapter.
 ### Adding device header files
 
 Copy the [CMSIS header files](https://www.arm.com/products/processors/cortex-m/cortex-microcontroller-software-interface-standard.php)  for the device family into the `ext/` folder. You can usually download them as part of a driver pack from the vendor's website.
-Have a look at [the STM32 device headers](https://github.com/roboterclubaachen/xpcc/tree/develop/ext/st) as an example for what you are looking for.
+Have a look at [the STM32 device headers](https://github.com/roboterclubaachen/modm/tree/develop/ext/st) as an example for what you are looking for.
 
 Create a `README.md` that contains information on the source of the header files, with a link to the vendor website, the download date/version and most importantly the license text.
-Don't forget to add the include path of the device files to the [`ext/SConstruct`](https://github.com/roboterclubaachen/xpcc/blob/develop/ext/SConscript) file!
+Don't forget to add the include path of the device files to the [`ext/SConstruct`](https://github.com/roboterclubaachen/modm/blob/develop/ext/SConscript) file!
 
 
 ### Adding device files
 
-The [xpcc device files](https://github.com/roboterclubaachen/xpcc/tree/develop/src/xpcc/architecture/platform/devices) contain the information that is used to generate the HAL. For AVR and STM32 devices these files are generated from another (vendor specific) data source.
+The [modm device files](https://github.com/roboterclubaachen/modm/tree/develop/src/modm/architecture/platform/devices) contain the information that is used to generate the HAL. For AVR and STM32 devices these files are generated from another (vendor specific) data source.
 However, for a new vendor such machine readable data might not be available and if it is, it will require some work to create the necessary parser to automatically generate device files.
 We recommend building a minimal proof-of-concept port for one device first.
 Once you have one device working, you can get started working on an automatic parser if you want to support a wide range of devices.
 
-You need to manually create a new device file for your device. We recommend copying [this device file for the STM32F303](https://github.com/roboterclubaachen/xpcc/blob/develop/src/xpcc/architecture/platform/devices/stm32/stm32f303-c_k_r-6_8.xml) to a new folder named after the platform (like `devices/sam`).
+You need to manually create a new device file for your device. We recommend copying [this device file for the STM32F303](https://github.com/roboterclubaachen/modm/blob/develop/src/modm/architecture/platform/devices/stm32/stm32f303-c_k_r-6_8.xml) to a new folder named after the platform (like `devices/sam`).
 
 Vendors usually have a naming convention of their devices, make sure the device attributes and file name reflect this. The semantics of the vendor's device naming scheme can sometimes be gathered directly from the datasheet or by comparing different devices (i.e. their names and capabilities).
 For example, the `SAM4LC4B` identifier can be split like this:
@@ -123,36 +123,36 @@ Remove all other drivers.
 
 Our build system is organically grown, er, I mean, *has* organically grown. Therefore it is a bit hacky in places and you now need to make it aware of the new devices from a new vendor:
 
-1. [Split the device identifier into the vendor naming scheme useful](https://github.com/roboterclubaachen/xpcc/blob/7b32f74cc43c7bfaf815287902ef2bd4a6baa84d/tools/device_files/device_identifier.py?ts=4#L86-L95).
-2. [Find the device file using the naming scheme](https://github.com/roboterclubaachen/xpcc/blob/3c7cd31e5aad66e47d073dc445551a21416d21eb/scons/site_tools/platform_tools.py?ts=4#L92-L103).
-3. [Thou Shalt ~~Not~~ Pass](https://github.com/roboterclubaachen/xpcc/blob/7b32f74cc43c7bfaf815287902ef2bd4a6baa84d/tools/device_files/device.py#L134-L139).
-4. [Add some platform-specific tests for the new devices](https://github.com/roboterclubaachen/xpcc/blob/3c7cd31e5aad66e47d073dc445551a21416d21eb/scons/site_tools/platform_tools.py?ts=4#L385-L414). These tests are [custom Jinja2 filters](http://jinja.pocoo.org/docs/dev/api/#custom-filters) that can conveniently be used in the driver templates.
+1. [Split the device identifier into the vendor naming scheme useful](https://github.com/roboterclubaachen/modm/blob/7b32f74cc43c7bfaf815287902ef2bd4a6baa84d/tools/device_files/device_identifier.py?ts=4#L86-L95).
+2. [Find the device file using the naming scheme](https://github.com/roboterclubaachen/modm/blob/3c7cd31e5aad66e47d073dc445551a21416d21eb/scons/site_tools/platform_tools.py?ts=4#L92-L103).
+3. [Thou Shalt ~~Not~~ Pass](https://github.com/roboterclubaachen/modm/blob/7b32f74cc43c7bfaf815287902ef2bd4a6baa84d/tools/device_files/device.py#L134-L139).
+4. [Add some platform-specific tests for the new devices](https://github.com/roboterclubaachen/modm/blob/3c7cd31e5aad66e47d073dc445551a21416d21eb/scons/site_tools/platform_tools.py?ts=4#L385-L414). These tests are [custom Jinja2 filters](http://jinja.pocoo.org/docs/dev/api/#custom-filters) that can conveniently be used in the driver templates.
 
 ### Adapt the startup- and linkerscripts
 
-The [Cortex-M startup script](https://github.com/roboterclubaachen/xpcc/blob/develop/src/xpcc/architecture/platform/driver/core/cortex/startup.c.in?ts=4) is pretty universal. These are the steps it does:
+The [Cortex-M startup script](https://github.com/roboterclubaachen/modm/blob/develop/src/modm/architecture/platform/driver/core/cortex/startup.c.in?ts=4) is pretty universal. These are the steps it does:
 
 1. Generate the exception table and places it at the beginning of Flash.
 2. Call platform specific code to enable internal memories (**needs porting**).
 3. Fill the stack with magic values to catch unintentional stack execution.
 4. Copy and zero internal memories.
 5. Initialize the Cortex-M CPU.
-6. Call `xpcc_gpio_enable()` to enable clock to GPIO (**needs porting**).
+6. Call `modm_gpio_enable()` to enable clock to GPIO (**needs porting**).
 7. Call external hardware initialize hook.
 8. Copy and zero external memories.
 9. Initialize heap on all memories.
 10. Call libc init incl. execution of C++ static constructors.
 11. Call `main()`.
 
-We'll write the `xpcc_gpio_enable()` function when we port the GPIO driver.
+We'll write the `modm_gpio_enable()` function when we port the GPIO driver.
 
-To provide code for step 2 adapt [the platform macro file](https://github.com/roboterclubaachen/xpcc/blob/develop/src/xpcc/architecture/platform/driver/core/cortex/platform.macros?ts=4).
+To provide code for step 2 adapt [the platform macro file](https://github.com/roboterclubaachen/modm/blob/develop/src/modm/architecture/platform/driver/core/cortex/platform.macros?ts=4).
 Add whatever code is needed to initialize the internal memories. Don't do complicated stuff here, the system is not fully booted yet!
 
-The [simplest linkerscript available is `linkerscript/stm32_ram.ld.in`](https://github.com/roboterclubaachen/xpcc/blob/develop/src/xpcc/architecture/platform/driver/core/cortex/linkerscript/stm32_ram.ld.in?ts=4), which fits everything into one SRAM region.
+The [simplest linkerscript available is `linkerscript/stm32_ram.ld.in`](https://github.com/roboterclubaachen/modm/blob/develop/src/modm/architecture/platform/driver/core/cortex/linkerscript/stm32_ram.ld.in?ts=4), which fits everything into one SRAM region.
 The linkerscipt diagram in the comment gives you an overview of what goes where, check that against the devices memory map. Note that while the diagram shows specific addresses, the section addresses and sizes are taken from the device file!
 
-You need to tell the [core driver which linkerscript to use for you device](https://github.com/roboterclubaachen/xpcc/blob/develop/src/xpcc/architecture/platform/driver/core/cortex/driver.xml?ts=4#L29-L40):
+You need to tell the [core driver which linkerscript to use for you device](https://github.com/roboterclubaachen/modm/blob/develop/src/modm/architecture/platform/driver/core/cortex/driver.xml?ts=4#L29-L40):
 ```xml
 <template device-platform="sam" out="linkerscript.ld">linkerscript/stm32_ram.ld.in</template>
 ```
@@ -160,14 +160,14 @@ You need to tell the [core driver which linkerscript to use for you device](http
 ### Compile a minimal example
 
 At this point you should test your changes to the build system and the port of the core driver.
-Create an minimal example in `xpcc/examples/sam4/minimal`, containing:
+Create an minimal example in `modm/examples/sam4/minimal`, containing:
 
 - the default `SConstruct` file:
 ```python
-# path to the xpcc root directory
-xpccpath = '../../..'
+# path to the modm root directory
+modmpath = '../../..'
 # execute the common SConstruct file
-execfile(xpccpath + '/scons/SConstruct')
+execfile(modmpath + '/scons/SConstruct')
 ```
 
 - a minimal `main.cpp` file:
@@ -175,13 +175,13 @@ execfile(xpccpath + '/scons/SConstruct')
 /* Copyright (c) {{ year }}, {{ your name }}
  * All Rights Reserved.
  *
- * The file is part of the xpcc library and is released under the 3-clause BSD
+ * The file is part of the modm library and is released under the 3-clause BSD
  * license. See the file `LICENSE` for the full license governing this code.
  */
-#include <xpcc/architecture/platform.hpp>
+#include <modm/architecture/platform.hpp>
 
 // Leave this function empty for now
-extern "C" void xpcc_gpio_enable(void) {}
+extern "C" void modm_gpio_enable(void) {}
 
 int main()
 {
@@ -207,7 +207,7 @@ int main()
 ```ini
 [build]
 device = sam4lc4b
-buildpath = ${xpccpath}/build/sam4/${name}
+buildpath = ${modmpath}/build/sam4/${name}
 ```
 
 To compile this example, `cd` into the folder and execute `scons`.
@@ -230,19 +230,19 @@ Heap:      9999 bytes (97.0% available)
 (.heap1)
 ```
 
-You can explore the generated code for the core driver in `xpcc/build/sam4/minimal/libxpcc/generated_platform/driver/core/cortex/`.
+You can explore the generated code for the core driver in `modm/build/sam4/minimal/libmodm/generated_platform/driver/core/cortex/`.
 
 If your development board is natively supported via OpenOCD (any of the scripts inside `openocd/share/openocd/scripts/`), you can just add it to your `project.cfg` file:
 ```ini
 [openocd]
 configfile = board/atmel_sam4l8_xplained_pro.cfg
 ```
-For custom setups, [read this](http://xpcc.io/reference/build-system/#project-configuration).
+For custom setups, [read this](http://modm.io/reference/build-system/#project-configuration).
 
 You should now be able to program the device using `scons program`.
 Check if the LED is blinking at a constant interval.
 
-If the LED is not blinking and you have OpenOCD connected, you can [launch a GDB debug session](https://github.com/roboterclubaachen/xpcc/tree/develop/examples/stm32f3_discovery/gdb).
+If the LED is not blinking and you have OpenOCD connected, you can [launch a GDB debug session](https://github.com/roboterclubaachen/modm/tree/develop/examples/stm32f3_discovery/gdb).
 
 If something goes wrong in the building step, check the previous steps, maybe you missed something, or we forgot to add something to this guide.
 If you're totally stuck [write us an email][mailing_list].
@@ -250,82 +250,82 @@ If you're totally stuck [write us an email][mailing_list].
 ### Porting the delay functions
 
 To keep it simple, we'll leave the device running on the clock it boots up on. This is usually some internal oscillator in the MHz range.
-In order to enable the accurate busy-wait delay functions (`xpcc::delay{Nano|Micro|Milli}seconds(uint16_t)`) you need to provide some information about the frequency that the CPU core is running at.
+In order to enable the accurate busy-wait delay functions (`modm::delay{Nano|Micro|Milli}seconds(uint16_t)`) you need to provide some information about the frequency that the CPU core is running at.
 
 - `fcpu` contains the CPU frequency in Hz
 - `fcpu_kHz` contains the CPU frequency in kHz
 - `fcpu_MHz` contains the CPU frequency in MHz
 - `ns_per_loop` contains the ns per busy-wait delay loop (processor dependent)
 
-Create two files in the `xpcc/architecture/platform/driver/clock/sam4` folder:
+Create two files in the `modm/architecture/platform/driver/clock/sam4` folder:
 
-- `clock.hpp` (see [STM32 version for verbatim](https://github.com/roboterclubaachen/xpcc/blob/develop/src/xpcc/architecture/platform/driver/clock/stm32/clock.hpp.in?ts=4)):
+- `clock.hpp` (see [STM32 version for verbatim](https://github.com/roboterclubaachen/modm/blob/develop/src/modm/architecture/platform/driver/clock/stm32/clock.hpp.in?ts=4)):
 ```cpp
 /* Copyright (c) {{ year }}, {{ your name }}
  * All Rights Reserved.
  *
- * The file is part of the xpcc library and is released under the 3-clause BSD
+ * The file is part of the modm library and is released under the 3-clause BSD
  * license. See the file `LICENSE` for the full license governing this code.
  */
 #include <stdint.h>
 #include "../../../device.hpp"
 #include "../generic/common_clock.hpp"
 
-using namespace xpcc::clock;
+using namespace modm::clock;
 ```
 
-- `clock.cpp` ([STM32 version](https://github.com/roboterclubaachen/xpcc/blob/develop/src/xpcc/architecture/platform/driver/clock/stm32/clock.cpp.in?ts=4)) (assuming 8 MHz initial clock):
+- `clock.cpp` ([STM32 version](https://github.com/roboterclubaachen/modm/blob/develop/src/modm/architecture/platform/driver/clock/stm32/clock.cpp.in?ts=4)) (assuming 8 MHz initial clock):
 ```cpp
 /* Copyright (c) {{ year }}, {{ your name }}
  * All Rights Reserved.
  *
- * The file is part of the xpcc library and is released under the 3-clause BSD
+ * The file is part of the modm library and is released under the 3-clause BSD
  * license. See the file `LICENSE` for the full license governing this code.
  */
 #include "clock.hpp"
 
-namespace xpcc
+namespace modm
 {
 namespace clock
 {
 
-uint32_t xpcc_fastdata fcpu(8000000);
-uint32_t xpcc_fastdata fcpu_kHz(8000);
-uint16_t xpcc_fastdata fcpu_MHz(8);
+uint32_t modm_fastdata fcpu(8000000);
+uint32_t modm_fastdata fcpu_kHz(8000);
+uint16_t modm_fastdata fcpu_MHz(8);
 // Cortex-M0: 4000 loops per MHz
 // Cortex-M7: 1000 loops per MHz
 // otherwise: 3000 loops per MHz
-uint16_t xpcc_fastdata ns_per_loop(3000 / 8);
+uint16_t modm_fastdata ns_per_loop(3000 / 8);
 
 }
 }
 ```
 
-If you [look at the STM32 `driver.xml` file](https://github.com/roboterclubaachen/xpcc/blob/develop/src/xpcc/architecture/platform/driver/clock/stm32/driver.xml#L19-L22), you'll see that the internal high- and low-speed oscillator values differ even within the same platform. These values are therefore initialized in the clock driver and not the core driver.
+If you [look at the STM32 `driver.xml` file](https://github.com/roboterclubaachen/modm/blob/develop/src/modm/architecture/platform/driver/clock/stm32/driver.xml#L19-L22), you'll see that the internal high- and low-speed oscillator values differ even within the same platform. These values are therefore initialized in the clock driver and not the core driver.
 
 ### Porting the GPIO driver
 
-In xpcc, GPIOs are assumed to be usable without explicitly initializing the subsystem.
+In modm, GPIOs are assumed to be usable without explicitly initializing the subsystem.
 For other peripheral IP, the clock is enabled by the `initialize` method that needs to be explicitly called by the user.
 
-You need to implement the real [`xpcc_gpio_enable()` function here](https://github.com/roboterclubaachen/xpcc/blob/develop/src/xpcc/architecture/platform/driver/gpio/stm32/gpio_enable.cpp.in), that enables the clocks to all GPIOs on this chip.
+You need to implement the real [`modm_gpio_enable()` function here](https://github.com/roboterclubaachen/modm/blob/develop/src/modm/architecture/platform/driver/gpio/stm32/gpio_enable.cpp.in), that enables the clocks to all GPIOs on this chip.
 ```cpp
 extern "C"
 void
-xpcc_gpio_enable(void)
+modm_gpio_enable(void)
 {
     // do your magic
 }
 ```
 
-The GPIO driver is the most important driver of them all, because it gives you bit-banged versions of SPI and I2C through the `xpcc::SoftwareSpiMaster` and `xpcc::SoftwareI2cMaster` classes.
+The GPIO driver is the most important driver of them all, because it gives you bit-banged versions of SPI and I2C through the `modm::SoftwareSpiMaster` and `modm::SoftwareI2cMaster` classes.
 
-The [STM32 GPIO driver is quite complicated](https://github.com/roboterclubaachen/xpcc/blob/develop/src/xpcc/architecture/platform/driver/gpio/stm32/gpio.hpp.in?ts=4), but the only methods need to implement right now are [these ones from the GPIO interface](https://github.com/roboterclubaachen/xpcc/blob/develop/src/xpcc/architecture/interface/gpio.hpp?ts=4#L167-L246).
+The [STM32 GPIO driver is quite complicated](https://github.com/roboterclubaachen/modm/blob/develop/src/modm/architecture/platform/driver/gpio/stm32/gpio.hpp.in?ts=4), but the only methods need to implement right now are [these ones from the GPIO interface](https://github.com/roboterclubaachen/modm/blob/develop/src/modm/architecture/interface/gpio.hpp?ts=4#L167-L246).
 
 Use the STM32 driver as a template, and modify it. For now you can ignore anything to do with interrupts, analog, alternate functions, `connect` methods, channels, triggers and ports.
 It is recommended that you implement the `configure`, `setOutput`, `setInput` methods for `InputType` and `OutputType`, so that you can put the GPIO into open drain mode for I2C.
 
-All GPIO classes are generated by passing in the information of the device file into the [Jinja2 template engine](http://jinja.pocoo.org/docs/dev/templates/#list-of-control-structures), which generates C++ code. In fact, the entire xpcc HAL is build around this principle.
+All GPIO classes are generated by passing in the information of the device file into the [Jinja2 template engine](http://jinja.pocoo.org/docs/dev/templates/#list-of-control-structures), which generates C++ code. In fact, the entire modm HAL is build around this principle.
 
 The children of the `<driver type="gpio" ...>` node from the device file are available as a name-mangled dictionary, with `<gpio port="A" ...>` attributes available as their members.
 So the `gpio` children are places in the `gpio` + `s` = `gpios` dictionary, which can be accessed by iterating over it:
@@ -338,7 +338,7 @@ So the `gpio` children are places in the `gpio` + `s` = `gpios` dictionary, whic
 %% endfor
 ```
 
-Remember, you can always check the generated code for this driver in `xpcc/build/sam4/minimal/libxpcc/generated_platform/driver/gpio/sam4/`
+Remember, you can always check the generated code for this driver in `modm/build/sam4/minimal/libmodm/generated_platform/driver/gpio/sam4/`
 
 ### Blinking an LED
 
@@ -347,12 +347,12 @@ Copy your working `minimal` example and modify the main function to this:
 /* Copyright (c) {{ year }}, {{ your name }}
  * All Rights Reserved.
  *
- * The file is part of the xpcc library and is released under the 3-clause BSD
+ * The file is part of the modm library and is released under the 3-clause BSD
  * license. See the file `LICENSE` for the full license governing this code.
  */
-#include <xpcc/architecture/platform.hpp>
+#include <modm/architecture/platform.hpp>
 
-using namespace xpcc::sam4;
+using namespace modm::sam4;
 
 using Led = GpioA1;
 
@@ -363,7 +363,7 @@ int main()
     while(1)
     {
         Led::toggle();
-        xpcc::delayMilliseconds(500);
+        modm::delayMilliseconds(500);
     }
 
     return 0;
@@ -375,11 +375,11 @@ After compilation and programming, the the LED should now be blinking at a 1 sec
 ### What's next?
 
 Please create a PR with this work, so we can review it and discuss the next steps.
-Please include all the sources that you used for your port as well as the associated licenses. All code that does not reside in `xpcc/ext` must be licensed under BSD license.
+Please include all the sources that you used for your port as well as the associated licenses. All code that does not reside in `modm/ext` must be licensed under BSD license.
 
 Note that adding full support for all interfaces is a huge task, and won't happen over night. But now that you've got a blinking LED, you've had a successful crash course through our build system, the Cortex-M boot up sequence and the basic GPIO driver. That's a very good start, since this stuff isn't easy.
 
 Thanks for porting!
 
 
-[mailing_list]: http://mailman.rwth-aachen.de/mailman/listinfo/xpcc-dev
+[mailing_list]: http://mailman.rwth-aachen.de/mailman/listinfo/modm-dev

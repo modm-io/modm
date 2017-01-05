@@ -11,7 +11,7 @@
 // ----------------------------------------------------------------------------
 
 /**
-* Example to demonstrate a XPCC driver for Nokia 5110 displays.
+* Example to demonstrate a MODM driver for Nokia 5110 displays.
 *
 * This example uses SpiMaster2 of STM32F407
 *
@@ -26,18 +26,18 @@
 
 #include <modm/architecture/platform.hpp>
 
-xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > device;
-xpcc::IOStream stream(device);
+modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
+modm::IOStream stream(device);
 
 // Set all four logger streams to use the UART
-xpcc::log::Logger xpcc::log::debug(device);
-xpcc::log::Logger xpcc::log::info(device);
-xpcc::log::Logger xpcc::log::warning(device);
-xpcc::log::Logger xpcc::log::error(device);
+modm::log::Logger modm::log::debug(device);
+modm::log::Logger modm::log::info(device);
+modm::log::Logger modm::log::warning(device);
+modm::log::Logger modm::log::error(device);
 
 // Set the log level
-#undef	XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::DEBUG
+#undef	MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::DEBUG
 
 using namespace Board;
 
@@ -53,13 +53,13 @@ namespace lcd
 }
 
 // Select if hardware or software SPI Master shall be used
-// typedef xpcc::SoftwareSpiMaster< lcd::Clk, lcd::Din> mySpiMaster;
+// typedef modm::SoftwareSpiMaster< lcd::Clk, lcd::Din> mySpiMaster;
 typedef SpiMaster2 mySpiMaster;
 
 // create a LCD object
-xpcc::Nokia5110< mySpiMaster, lcd::Ce, lcd::Dc, lcd::Reset > display;
+modm::Nokia5110< mySpiMaster, lcd::Ce, lcd::Dc, lcd::Reset > display;
 
-class ThreadOne : public xpcc::pt::Protothread
+class ThreadOne : public modm::pt::Protothread
 {
 public:
 	ThreadOne()
@@ -71,10 +71,10 @@ public:
 	{
 		PT_BEGIN();
 
-		lcd::Reset::setOutput(xpcc::Gpio::Low);
-		lcd::Ce::setOutput(xpcc::Gpio::High);
-		lcd::Dc::setOutput(xpcc::Gpio::Low);
-		lcd::Backlight::setOutput(xpcc::Gpio::High);
+		lcd::Reset::setOutput(modm::Gpio::Low);
+		lcd::Ce::setOutput(modm::Gpio::High);
+		lcd::Dc::setOutput(modm::Gpio::Low);
+		lcd::Backlight::setOutput(modm::Gpio::High);
 
 		// Initialize
 		display.initialize();
@@ -82,7 +82,7 @@ public:
 		display.setCursor(0, 0);
 
 		// Write the standard welcome message ;-)
-		display << "Hello xpcc.io";
+		display << "Hello modm.io";
 
 		counter = 0;
 
@@ -102,7 +102,7 @@ public:
 	}
 
 private:
-	xpcc::ShortTimeout timeout;
+	modm::ShortTimeout timeout;
 	uint8_t counter;
 };
 
@@ -114,9 +114,9 @@ main()
 	Board::initialize();
 
 	GpioOutputA2::connect(Usart2::Tx);
-	Usart2::initialize<Board::systemClock, xpcc::Uart::B115200>(10);
+	Usart2::initialize<Board::systemClock, modm::Uart::B115200>(10);
 
-	XPCC_LOG_INFO << "\n\nWelcome to Nokia 5110 display demo!\n\n";
+	MODM_LOG_INFO << "\n\nWelcome to Nokia 5110 display demo!\n\n";
 
 	// Software SPI Master
 	// GpioOutputB15::setOutput();
@@ -128,7 +128,7 @@ main()
 
 	mySpiMaster::initialize<Board::systemClock, 2625000ul>();
 
-	xpcc::ShortPeriodicTimer tmr(500);
+	modm::ShortPeriodicTimer tmr(500);
 
 	while(true)
 	{

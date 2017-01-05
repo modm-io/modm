@@ -21,7 +21,7 @@ namespace bitmap
 	/**
 	 * \brief	Generated bitmap
 	 *
-	 * Generated from file "src/xpcc/ui/display/image/home_16x16.pbm".
+	 * Generated from file "src/modm/ui/display/image/home_16x16.pbm".
 	 *
 	 * - Width  : 16
 	 * - Height : 16

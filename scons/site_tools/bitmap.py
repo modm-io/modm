@@ -22,7 +22,7 @@ from SCons.Script import *
 
 # -----------------------------------------------------------------------------
 template_source = """
-#include <xpcc/architecture/driver/accessor.hpp>
+#include <modm/architecture/driver/accessor.hpp>
 
 namespace bitmap
 {
@@ -39,7 +39,7 @@ template_header = """
 #ifndef ${include_guard}
 #define ${include_guard}
 
-#include <xpcc/architecture/driver/accessor.hpp>
+#include <modm/architecture/driver/accessor.hpp>
 
 namespace bitmap
 {

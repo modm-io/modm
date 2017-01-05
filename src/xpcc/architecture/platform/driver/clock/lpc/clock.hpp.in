@@ -11,17 +11,17 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LPC_CLOCK_HPP
-#define XPCC_LPC_CLOCK_HPP
+#ifndef MODM_LPC_CLOCK_HPP
+#define MODM_LPC_CLOCK_HPP
 
 #include <stdint.h>
 #include "../common_clock.hpp"
 #include "../device.hpp"
 // #include "static.hpp"
 
-using namespace xpcc::clock;
+using namespace modm::clock;
 
-namespace xpcc
+namespace modm
 {
 	namespace lpc
 	{
@@ -134,22 +134,22 @@ namespace xpcc
 			static inline uint32_t
 			getCpuFrequency()
 			{
-				return xpcc::clock::fcpu;
+				return modm::clock::fcpu;
 			}
 
 			static inline uint32_t
 			getCpuFrequencykHz()
 			{
-				return xpcc::clock::fcpu_kHz;
+				return modm::clock::fcpu_kHz;
 			}
 
 			static inline uint32_t
 			getCpuFrequencyMHz()
 			{
-				return xpcc::clock::fcpu_MHz;
+				return modm::clock::fcpu_MHz;
 			}
 		};
 	}
 }
 
-#endif	//  XPCC_LPC_CLOCK_HPP
+#endif	//  MODM_LPC_CLOCK_HPP

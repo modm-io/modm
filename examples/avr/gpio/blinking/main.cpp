@@ -12,7 +12,7 @@
 
 #include <modm/architecture/architecture.hpp>
 
-using namespace xpcc::atmega;
+using namespace modm::atmega;
 
 typedef GpioOutputB0 Led;
 
@@ -25,7 +25,7 @@ main()
 	{
 		Led::toggle();
 
-		xpcc::delayMilliseconds(1000);
+		modm::delayMilliseconds(1000);
 	}
 }
 

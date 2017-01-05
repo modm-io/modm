@@ -12,25 +12,25 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_TIMEOUT_HPP
+#ifndef	MODM_TIMEOUT_HPP
 #	error	"Don't include this file directly, use 'timeout.hpp' instead!"
 #endif
 
 template< class Clock, class TimestampType >
-xpcc::GenericTimeout<Clock, TimestampType>::GenericTimeout() :
+modm::GenericTimeout<Clock, TimestampType>::GenericTimeout() :
 	endTime(0), state(STOPPED)
 {
 }
 
 template< class Clock, class TimestampType >
-xpcc::GenericTimeout<Clock, TimestampType>::GenericTimeout(const TimestampType time)
+modm::GenericTimeout<Clock, TimestampType>::GenericTimeout(const TimestampType time)
 {
 	restart(time);
 }
 
 template< class Clock, class TimestampType >
 void
-xpcc::GenericTimeout<Clock, TimestampType>::restart(TimestampType time)
+modm::GenericTimeout<Clock, TimestampType>::restart(TimestampType time)
 {
 	endTime = Clock::template now<TimestampType>() + time;
 	state = ARMED;
@@ -38,7 +38,7 @@ xpcc::GenericTimeout<Clock, TimestampType>::restart(TimestampType time)
 
 template< class Clock, class TimestampType >
 void
-xpcc::GenericTimeout<Clock, TimestampType>::stop()
+modm::GenericTimeout<Clock, TimestampType>::stop()
 {
 	state = STOPPED;
 }
@@ -46,7 +46,7 @@ xpcc::GenericTimeout<Clock, TimestampType>::stop()
 // ----------------------------------------------------------------------------
 template< class Clock, class TimestampType >
 bool
-xpcc::GenericTimeout<Clock, TimestampType>::execute()
+modm::GenericTimeout<Clock, TimestampType>::execute()
 {
 	if (state & EXECUTED)
 		return false;
@@ -63,7 +63,7 @@ xpcc::GenericTimeout<Clock, TimestampType>::execute()
 
 template< class Clock, class TimestampType >
 typename TimestampType::SignedType
-xpcc::GenericTimeout<Clock, TimestampType>::remaining() const
+modm::GenericTimeout<Clock, TimestampType>::remaining() const
 {
 	if (state != STOPPED)
 		return (endTime - Clock::template now<TimestampType>()).getTime();
@@ -73,8 +73,8 @@ xpcc::GenericTimeout<Clock, TimestampType>::remaining() const
 
 // ----------------------------------------------------------------------------
 template< class Clock, class TimestampType >
-xpcc::TimeoutState
-xpcc::GenericTimeout<Clock, TimestampType>::getState() const
+modm::TimeoutState
+modm::GenericTimeout<Clock, TimestampType>::getState() const
 {
 	if (checkExpiration())
 	{
@@ -86,7 +86,7 @@ xpcc::GenericTimeout<Clock, TimestampType>::getState() const
 
 template< class Clock, class TimestampType >
 bool
-xpcc::GenericTimeout<Clock, TimestampType>::isStopped() const
+modm::GenericTimeout<Clock, TimestampType>::isStopped() const
 {
 	// we do not need to use `getState()` here, since stopping a timeout
 	// has to be done by the user, it will not stop itself.
@@ -95,14 +95,14 @@ xpcc::GenericTimeout<Clock, TimestampType>::isStopped() const
 
 template< class Clock, class TimestampType >
 bool
-xpcc::GenericTimeout<Clock, TimestampType>::isArmed() const
+modm::GenericTimeout<Clock, TimestampType>::isArmed() const
 {
 	return getState() == TimeoutState::Armed;
 }
 
 template< class Clock, class TimestampType >
 bool
-xpcc::GenericTimeout<Clock, TimestampType>::isExpired() const
+modm::GenericTimeout<Clock, TimestampType>::isExpired() const
 {
 	return getState() == TimeoutState::Expired;
 }
@@ -110,7 +110,7 @@ xpcc::GenericTimeout<Clock, TimestampType>::isExpired() const
 // ----------------------------------------------------------------------------
 template< class Clock, class TimestampType >
 bool
-xpcc::GenericTimeout<Clock, TimestampType>::checkExpiration() const
+modm::GenericTimeout<Clock, TimestampType>::checkExpiration() const
 {
 	return (state & ARMED) and (Clock::template now<TimestampType>() >= endTime);
 }

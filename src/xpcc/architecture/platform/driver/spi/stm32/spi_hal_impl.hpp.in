@@ -12,12 +12,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32_SPI_HAL{{ id }}_HPP
+#ifndef MODM_STM32_SPI_HAL{{ id }}_HPP
 #	error 	"Don't include this file directly, use 'spi_hal{{ id }}.hpp' instead!"
 #endif
 
 void inline
-xpcc::stm32::SpiHal{{ id }}::enable()
+modm::stm32::SpiHal{{ id }}::enable()
 {
 	// enable clock
 	RCC->APB{{ apb }}ENR |= RCC_APB{{ apb }}ENR_SPI{{ id }}EN;
@@ -28,14 +28,14 @@ xpcc::stm32::SpiHal{{ id }}::enable()
 }
 
 void inline
-xpcc::stm32::SpiHal{{ id }}::disable()
+modm::stm32::SpiHal{{ id }}::disable()
 {
 	// disable clock
 	RCC->APB{{ apb }}ENR &= ~RCC_APB{{ apb }}ENR_SPI{{ id }}EN;
 }
 
 void inline
-xpcc::stm32::SpiHal{{ id }}::initialize(Prescaler prescaler,
+modm::stm32::SpiHal{{ id }}::initialize(Prescaler prescaler,
 		MasterSelection masterSelection, DataMode dataMode,
 		DataOrder dataOrder, DataSize dataSize)
 {
@@ -67,21 +67,21 @@ xpcc::stm32::SpiHal{{ id }}::initialize(Prescaler prescaler,
 }
 
 void inline
-xpcc::stm32::SpiHal{{ id }}::setDataMode(DataMode dataMode)
+modm::stm32::SpiHal{{ id }}::setDataMode(DataMode dataMode)
 {
 	SPI{{ id }}->CR1 = (SPI{{ id }}->CR1 & ~static_cast<uint32_t>(DataMode::All))
 										 | static_cast<uint32_t>(dataMode);
 }
 
 void inline
-xpcc::stm32::SpiHal{{ id }}::setDataOrder(DataOrder dataOrder)
+modm::stm32::SpiHal{{ id }}::setDataOrder(DataOrder dataOrder)
 {
 	SPI{{ id }}->CR1 = (SPI{{ id }}->CR1 & ~static_cast<uint32_t>(DataOrder::All))
 										 | static_cast<uint32_t>(dataOrder);
 }
 
 void inline
-xpcc::stm32::SpiHal{{ id }}::setDataSize(DataSize dataSize)
+modm::stm32::SpiHal{{ id }}::setDataSize(DataSize dataSize)
 {
 %% if target["family"] in ["f0", "f3", "f7"]
 	SPI{{ id }}->CR2 = (SPI{{ id }}->CR2 & ~static_cast<uint32_t>(DataSize::All))
@@ -94,7 +94,7 @@ xpcc::stm32::SpiHal{{ id }}::setDataSize(DataSize dataSize)
 }
 
 void inline
-xpcc::stm32::SpiHal{{ id }}::setMasterSelection(MasterSelection masterSelection)
+modm::stm32::SpiHal{{ id }}::setMasterSelection(MasterSelection masterSelection)
 {
 	// TODO: implement as set/reset bit
 	SPI{{ id }}->CR1 = (SPI{{ id }}->CR1 & ~static_cast<uint32_t>(MasterSelection::All))
@@ -102,25 +102,25 @@ xpcc::stm32::SpiHal{{ id }}::setMasterSelection(MasterSelection masterSelection)
 }
 
 inline bool
-xpcc::stm32::SpiHal{{ id }}::isReceiveRegisterNotEmpty()
+modm::stm32::SpiHal{{ id }}::isReceiveRegisterNotEmpty()
 {
 	return getInterruptFlags() & InterruptFlag::RxBufferNotEmpty;
 }
 
 inline bool
-xpcc::stm32::SpiHal{{ id }}::isTransmitRegisterEmpty()
+modm::stm32::SpiHal{{ id }}::isTransmitRegisterEmpty()
 {
 	return getInterruptFlags() & InterruptFlag::TxBufferEmpty;
 }
 
 void inline
-xpcc::stm32::SpiHal{{ id }}::write(uint16_t data)
+modm::stm32::SpiHal{{ id }}::write(uint16_t data)
 {
 	SPI{{ id }}->DR = data;
 }
 
 void inline
-xpcc::stm32::SpiHal{{ id }}::write(uint8_t data)
+modm::stm32::SpiHal{{ id }}::write(uint8_t data)
 {
 %% if target["family"] in ["f0", "f3", "f7"]
 	*((__IO uint8_t *) &SPI{{ id}}->DR) = data;
@@ -131,19 +131,19 @@ xpcc::stm32::SpiHal{{ id }}::write(uint8_t data)
 }
 
 void inline
-xpcc::stm32::SpiHal{{ id }}::read(uint8_t &data)
+modm::stm32::SpiHal{{ id }}::read(uint8_t &data)
 {
 	data = static_cast<uint8_t>(SPI{{ id }}->DR);
 }
 
 void inline
-xpcc::stm32::SpiHal{{ id }}::read(uint16_t &data)
+modm::stm32::SpiHal{{ id }}::read(uint16_t &data)
 {
 	data = static_cast<uint16_t>(SPI{{ id }}->DR);
 }
 
 void inline
-xpcc::stm32::SpiHal{{ id }}::enableInterruptVector(bool enable, uint32_t priority)
+modm::stm32::SpiHal{{ id }}::enableInterruptVector(bool enable, uint32_t priority)
 {
 	if (enable) {
 		// Set priority for the interrupt vector
@@ -157,25 +157,25 @@ xpcc::stm32::SpiHal{{ id }}::enableInterruptVector(bool enable, uint32_t priorit
 }
 
 void inline
-xpcc::stm32::SpiHal{{ id }}::enableInterrupt(Interrupt_t interrupt)
+modm::stm32::SpiHal{{ id }}::enableInterrupt(Interrupt_t interrupt)
 {
 	SPI{{ id }}->CR2 |= interrupt.value;
 }
 
 void inline
-xpcc::stm32::SpiHal{{ id }}::disableInterrupt(Interrupt_t interrupt)
+modm::stm32::SpiHal{{ id }}::disableInterrupt(Interrupt_t interrupt)
 {
 	SPI{{ id }}->CR2 &= ~interrupt.value;
 }
 
-xpcc::stm32::SpiHal{{ id }}::InterruptFlag_t inline
-xpcc::stm32::SpiHal{{ id }}::getInterruptFlags()
+modm::stm32::SpiHal{{ id }}::InterruptFlag_t inline
+modm::stm32::SpiHal{{ id }}::getInterruptFlags()
 {
 	return InterruptFlag_t(SPI{{ id }}->SR);
 }
 
 void inline
-xpcc::stm32::SpiHal{{ id }}::acknowledgeInterruptFlag(InterruptFlag_t /*flags*/)
+modm::stm32::SpiHal{{ id }}::acknowledgeInterruptFlag(InterruptFlag_t /*flags*/)
 {
 	// TODO: implement; see STM32F3 reference manual p. 736
 	// SPI{{ id }}->SR = flags.value;

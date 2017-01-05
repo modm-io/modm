@@ -10,14 +10,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PCA8574_HPP
-#define XPCC_PCA8574_HPP
+#ifndef MODM_PCA8574_HPP
+#define MODM_PCA8574_HPP
 
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/processing/protothread.hpp>
 #include <modm/architecture/interface/gpio_expander.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 struct pca8574
@@ -35,8 +35,8 @@ public:
 		P6 = (1 << 6),
 		P7 = (1 << 7)
 	};
-	typedef xpcc::Flags8<Pin> Pins;
-	XPCC_INT_TYPE_FLAGS(Pins);
+	typedef modm::Flags8<Pin> Pins;
+	MODM_INT_TYPE_FLAGS(Pins);
 }; // struct pca8574
 
 /**
@@ -50,7 +50,7 @@ public:
  * @author  Niklas Hauser
  */
 template < class I2cMaster >
-class Pca8574 : public pca8574, public xpcc::I2cDevice< I2cMaster, 2 >, public xpcc::GpioExpander
+class Pca8574 : public pca8574, public modm::I2cDevice< I2cMaster, 2 >, public modm::GpioExpander
 {
 public:
 	static constexpr uint8_t width = 8;
@@ -60,7 +60,7 @@ public:
 	static constexpr uint8_t
 	indexFromPin(Pin pin)
 	{
-		return xpcc::leftmostBit(PortType(pin));
+		return modm::leftmostBit(PortType(pin));
 	}
 
 public:
@@ -68,24 +68,24 @@ public:
 	Pca8574(uint8_t address=0x27);
 
 public:
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	setOutput(Pins pins)
 	{
 		// nothing needs to be changed for switching to output
 		direction.set(pins);
-		return {xpcc::rf::Stopped, true};
+		return {modm::rf::Stopped, true};
 	}
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	set(Pins pins);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	reset(Pins pins);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	toggle(Pins pins);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	set(Pins pins, bool value);
 
 	bool inline
@@ -95,15 +95,15 @@ public:
 		return output.any(pin);
 	}
 
-	xpcc::Gpio::Direction inline
+	modm::Gpio::Direction inline
 	getDirection(Pin /*pin*/) const
 	{
 		// all pins are always in open-drain mode
-		return xpcc::Gpio::Direction::InOut;
+		return modm::Gpio::Direction::InOut;
 	}
 
 public:
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setInput(Pins pins);
 
 	bool inline
@@ -114,15 +114,15 @@ public:
 	}
 
 public:
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	readInput()
 	{ return readPort(input.value); }
 
 public:
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	writePort(PortType value);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	readPort(PortType &value);
 
 public:
@@ -171,8 +171,8 @@ private:
 	Pins input;     // high = 1, low = 0
 };
 
-} // namespace xpcc
+} // namespace modm
 
 #include "pca8574_impl.hpp"
 
-#endif // XPCC_PCA8574_HPP
+#endif // MODM_PCA8574_HPP

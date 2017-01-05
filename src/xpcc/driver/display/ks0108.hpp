@@ -11,14 +11,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_KS0108_HPP
-#define XPCC_KS0108_HPP
+#ifndef MODM_KS0108_HPP
+#define MODM_KS0108_HPP
 
 #include <modm/architecture/driver/delay.hpp>
 
 #include <modm/ui/display/buffered_graphic_display.hpp>
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	Driver for KS0108 based LC-displays
@@ -33,7 +33,7 @@ namespace xpcc
 	 * 					(Low = instruction, High = data)
 	 * \tparam	PIN_CS1	Chip-Select 1
 	 * \tparam	PIN_CS2	Chip-Select 2
-	 * \tparam	PORT	Needs to be a 8-Bit Port. See xpcc::gpio::Port() or
+	 * \tparam	PORT	Needs to be a 8-Bit Port. See modm::gpio::Port() or
 	 * 					GPIO_PORT() for more details.
 	 *
 	 * \author	Fabian Greif
@@ -113,4 +113,4 @@ namespace xpcc
 
 #include "ks0108_impl.hpp"
 
-#endif // XPCC_KS0108_HPP
+#endif // MODM_KS0108_HPP

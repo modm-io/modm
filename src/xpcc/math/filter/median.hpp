@@ -11,12 +11,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FILTER_MEDIAN_HPP
-#define XPCC_FILTER_MEDIAN_HPP
+#ifndef MODM_FILTER_MEDIAN_HPP
+#define MODM_FILTER_MEDIAN_HPP
 
 #include <stdint.h>
 
-namespace xpcc
+namespace modm
 {
 	namespace filter
 	{
@@ -32,7 +32,7 @@ namespace xpcc
 		 * 
 		 * \code
 		 * // create a new filter for five samples
-		 * xpcc::filter::Median<uint8_t, 5> filter;
+		 * modm::filter::Median<uint8_t, 5> filter;
 		 * 
 		 * // append new signal values
 		 * filter.append(10);
@@ -79,4 +79,4 @@ namespace xpcc
 
 #include "median_impl.hpp"
 
-#endif // XPCC_FILTER_MEDIAN_HPP
+#endif // MODM_FILTER_MEDIAN_HPP

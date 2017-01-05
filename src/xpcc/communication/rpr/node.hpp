@@ -9,8 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_TOKEN_RING_NODE_HPP
-#define	XPCC_TOKEN_RING_NODE_HPP
+#ifndef	MODM_TOKEN_RING_NODE_HPP
+#define	MODM_TOKEN_RING_NODE_HPP
 
 #include <cstddef>
 #include <modm/architecture/driver/accessor/flash.hpp>
@@ -19,7 +19,7 @@
 
 #include "interface.hpp"
 
-namespace xpcc
+namespace modm
 {
 	namespace rpr
 	{
@@ -115,15 +115,15 @@ namespace xpcc
 			 * \see		RPR_LISTEN()
 			 * \see		RPR_ERROR()
 			 */
-			Node(xpcc::accessor::Flash<Listener> listenerCallbackList,
+			Node(modm::accessor::Flash<Listener> listenerCallbackList,
 				 uint8_t listenerCallbackCount,
-				 xpcc::accessor::Flash<Error> errorCallbackList,
+				 modm::accessor::Flash<Error> errorCallbackList,
 				 uint8_t errorCallbackCount);
 			
 			/**
 			 * \brief	Initialize the node without error handlers
 			 */
-			Node(xpcc::accessor::Flash<Listener> listenerCallbackList,
+			Node(modm::accessor::Flash<Listener> listenerCallbackList,
 				 uint8_t listenerCallbackCount);
 			
 			
@@ -181,9 +181,9 @@ namespace xpcc
 			bool
 			checkListenerCallbacks(Message *message);
 			
-			xpcc::accessor::Flash<Listener> listenerCallbackList;
+			modm::accessor::Flash<Listener> listenerCallbackList;
 			uint8_t listenerCallbackCount;
-			xpcc::accessor::Flash<Error> errorCallbackList;
+			modm::accessor::Flash<Error> errorCallbackList;
 			uint8_t errorCallbackCount;
 		};
 	}
@@ -199,7 +199,7 @@ namespace xpcc
 	 * \param	object		object of class to be called
 	 * \param	function	Member function of object
 	 * 
-	 * \see		xpcc::rpr::Listener
+	 * \see		modm::rpr::Listener
 	 * \ingroup	rpr
 	 */
 	#define	RPR_LISTEN(type, source, command, object, function)
@@ -208,8 +208,8 @@ namespace xpcc
 		{	type, \
 			source, \
 			command, \
-			static_cast<xpcc::rpr::Callable *>(&object), \
-			reinterpret_cast<xpcc::rpr::Listener::Callback>(&function) }
+			static_cast<modm::rpr::Callable *>(&object), \
+			reinterpret_cast<modm::rpr::Listener::Callback>(&function) }
 #endif	// __DOXYGEN__
 
 
@@ -222,7 +222,7 @@ namespace xpcc
 	 * \param	object		
 	 * \param	function	Member function of object
 	 * 
-	 * \see		xpcc::rpr::ErrorHandler
+	 * \see		modm::rpr::ErrorHandler
 	 * \ingroup	rpr
 	 */
 	#define	RPR_ERROR(address, command, object, function)
@@ -230,10 +230,10 @@ namespace xpcc
 	#define	RPR_ERROR(address, command, object, function)	\
 		{	address, \
 			command, \
-			static_cast<xpcc::rpr::Callable *>(&object), \
-			reinterpret_cast<xpcc::rpr::ErrorHandler::Callback>(&function) }
+			static_cast<modm::rpr::Callable *>(&object), \
+			reinterpret_cast<modm::rpr::ErrorHandler::Callback>(&function) }
 #endif	// __DOXYGEN__
 
 #include "node_impl.hpp"
 
-#endif	// XPCC_TOKEN_RING_NODE_HPP
+#endif	// MODM_TOKEN_RING_NODE_HPP

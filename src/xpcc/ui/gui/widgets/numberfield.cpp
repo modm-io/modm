@@ -15,19 +15,19 @@
 
 #include "numberfield.hpp"
 
-xpcc::gui::FloatField::FloatField(float value, Dimension d) :
+modm::gui::FloatField::FloatField(float value, Dimension d) :
 	NumberField<float>(value, d)
 {
 }
 
 void
-xpcc::gui::FloatField::render(View* view)
+modm::gui::FloatField::render(View* view)
 {
 	if(view == 0)
 		return;
 
 	// output device of view
-	xpcc::GraphicDisplay* out = &view->display();
+	modm::GraphicDisplay* out = &view->display();
 
 	// color palette of view
 	ColorPalette cp = this->color_palette;

@@ -12,11 +12,11 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PID_IMPL_HPP
-#define XPCC_PID_IMPL_HPP
+#ifndef MODM_PID_IMPL_HPP
+#define MODM_PID_IMPL_HPP
 
 template<typename T, unsigned int ScaleFactor>
-xpcc::Pid<T, ScaleFactor>::Parameter::Parameter(
+modm::Pid<T, ScaleFactor>::Parameter::Parameter(
 		const float& kp, const float& ki, const float& kd,
 		const T& maxErrorSum, const T& maxOutput) :
 	kp(static_cast<T>(kp * ScaleFactor)),
@@ -29,7 +29,7 @@ xpcc::Pid<T, ScaleFactor>::Parameter::Parameter(
 
 // -----------------------------------------------------------------------------
 template<typename T, unsigned int ScaleFactor>
-xpcc::Pid<T, ScaleFactor>::Pid(
+modm::Pid<T, ScaleFactor>::Pid(
 		const float& kp, const float& ki, const float& kd,
 		const T& maxErrorSum, const T& maxOutput) :
 	parameter(kp, ki, kd, maxErrorSum, maxOutput)
@@ -39,7 +39,7 @@ xpcc::Pid<T, ScaleFactor>::Pid(
 
 // -----------------------------------------------------------------------------
 template<typename T, unsigned int ScaleFactor>
-xpcc::Pid<T, ScaleFactor>::Pid(
+modm::Pid<T, ScaleFactor>::Pid(
 		Parameter& parameter) :
 	parameter(parameter)
 {
@@ -48,7 +48,7 @@ xpcc::Pid<T, ScaleFactor>::Pid(
 
 template<typename T, unsigned int ScaleFactor>
 void
-xpcc::Pid<T, ScaleFactor>::reset()
+modm::Pid<T, ScaleFactor>::reset()
 {
 	this->errorSum = 0;
 	this->lastError = 0;
@@ -57,14 +57,14 @@ xpcc::Pid<T, ScaleFactor>::reset()
 
 template<typename T, unsigned int ScaleFactor>
 void
-xpcc::Pid<T, ScaleFactor>::setParameter(const Parameter& parameter)
+modm::Pid<T, ScaleFactor>::setParameter(const Parameter& parameter)
 {
 	this->parameter = parameter;
 }
 
 template<typename T, unsigned int ScaleFactor>
 void
-xpcc::Pid<T, ScaleFactor>::update(const T& input, bool externalLimitation)
+modm::Pid<T, ScaleFactor>::update(const T& input, bool externalLimitation)
 {
 	bool limitation = externalLimitation;
 	
@@ -106,4 +106,4 @@ xpcc::Pid<T, ScaleFactor>::update(const T& input, bool externalLimitation)
 	this->lastError = input;
 }
 
-#endif // XPCC_PID_IMPL_HPP
+#endif // MODM_PID_IMPL_HPP

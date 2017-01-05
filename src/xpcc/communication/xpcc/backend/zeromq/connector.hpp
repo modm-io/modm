@@ -17,8 +17,8 @@
 #include <zmqpp/zmqpp.hpp>
 
 #include <modm/debug/logger.hpp>
-#undef XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::ERROR
+#undef MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::ERROR
 
 #include "../backend_interface.hpp"
 
@@ -61,7 +61,8 @@ public:
 	}
 
 	virtual
-	~ZeroMQConnector() {
+	~ZeroMQConnector()
+	{
 		this->socketIn.unsubscribe("");
 		this->socketOut.unsubscribe("");
 		this->socketIn.close();
@@ -69,7 +70,7 @@ public:
 	}
 
 	virtual void
-	sendPacket(const Header &header, SmartPointer payload)
+	sendPacket(const Header &header, modm::SmartPointer payload)
 	{
 		// Publish the reassembled message with zeromq
 		zmqpp::message message;
@@ -90,17 +91,17 @@ public:
 
 		memcpy(buf + 5, payload.getPointer(), payload.getSize());
 
-#		if ZMQPP_VERSION_MAJOR >= 4
+#if ZMQPP_VERSION_MAJOR >= 4
 		/**
 		 * Breaking change in 4.1.1:
-		 * Removed message::add(pointer, size_t) as there were situations it conflicts with the new easier 
+		 * Removed message::add(pointer, size_t) as there were situations it conflicts with the new easier
 		 * to use templated add. This has been replaced with a message::add_raw(pointer, size_t) method.
 		 * https://github.com/zeromq/zmqpp/blob/develop/CHANGES.md
 		 */
 		message.add_raw(buf, buf_size);
-#		else
+#else
 		message.add(buf, buf_size);
-#		endif
+#endif
 
 		socketOut.send(message, /* dont_block = */ true);
 	}
@@ -113,7 +114,7 @@ public:
 	virtual const Header&
 	getPacketHeader() const { return receiveItem->header; };
 
-	virtual const xpcc::SmartPointer
+	virtual const modm::SmartPointer
 	getPacketPayload() const { return receiveItem->payload; };
 
 	virtual void
@@ -160,8 +161,8 @@ public:
 				}
 				else
 				{
-					XPCC_LOG_ERROR << XPCC_FILE_INFO;
-					XPCC_LOG_ERROR << "Message length is " << size << " which is smaller than expected size of 5+" << xpcc::endl;
+					MODM_LOG_ERROR << MODM_FILE_INFO;
+					MODM_LOG_ERROR << "Message length is " << size << " which is smaller than expected size of 5+" << modm::endl;
 				}
 			}
 		}
@@ -184,7 +185,7 @@ protected:
 
 	public:
 		xpcc::Header header;
-		xpcc::SmartPointer payload;
+		modm::SmartPointer payload;
 	};
 
 	ReceiveItem *receiveItem;

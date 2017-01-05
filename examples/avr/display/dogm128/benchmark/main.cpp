@@ -19,7 +19,7 @@
 
 #include "images/rca_logo_128x64.hpp"
 
-using namespace xpcc::atmega;
+using namespace modm::atmega;
 
 namespace led
 {
@@ -38,17 +38,17 @@ namespace lcd
 	typedef GpioOutputD3 A0;
 	typedef GpioOutputD4 Reset;
 
-	typedef xpcc::SoftwareSpiMaster< Sck, Mosi > SPI;
+	typedef modm::SoftwareSpiMaster< Sck, Mosi > SPI;
 }
 
-xpcc::DogM128< lcd::SPI, lcd::Cs, lcd::A0, lcd::Reset, true > display;
+modm::DogM128< lcd::SPI, lcd::Cs, lcd::A0, lcd::Reset, true > display;
 
-using namespace xpcc::glcd;
+using namespace modm::glcd;
 
 // timer interrupt routine
-XPCC_ISR(TIMER2_COMPA)
+MODM_ISR(TIMER2_COMPA)
 {
-	xpcc::Clock::increment();
+	modm::Clock::increment();
 }
 
 void
@@ -80,52 +80,52 @@ introScreen()
 {
 	display.drawImage(
 			Point(0, 0),
-			xpcc::accessor::asFlash(bitmap::rca_logo_128x64));
+			modm::accessor::asFlash(bitmap::rca_logo_128x64));
 	display.update();
 
-	xpcc::delayMilliseconds(2000);
+	modm::delayMilliseconds(2000);
 
 	display.clear();
 
-	display.setFont(xpcc::font::ScriptoNarrow);
+	display.setFont(modm::font::ScriptoNarrow);
 	display.setCursor(Point(0, 0));
-	display << "ABCDEFGHIJKLMNOPQRSTUVWXYZ!\"§$%&" << xpcc::endl;
+	display << "ABCDEFGHIJKLMNOPQRSTUVWXYZ!\"§$%&" << modm::endl;
 	display << "abcdefghijklmnopqrstuvwxyz012345";
 
-	display.setFont(xpcc::font::AllCaps3x5);
+	display.setFont(modm::font::AllCaps3x5);
 	display.setCursor(Point(0, 20));
-	display << "ABCDEFGHIJKLMNOPQRSTUVWXYZ!\"§$%&/()" << xpcc::endl;
+	display << "ABCDEFGHIJKLMNOPQRSTUVWXYZ!\"§$%&/()" << modm::endl;
 	display << "abcdefghijklmnopqrstuvwxyz01234567";
 
-	display.setFont(xpcc::font::FixedWidth5x8);
+	display.setFont(modm::font::FixedWidth5x8);
 	display.setCursor(Point(0, 35));
-	display << "ABCDEFGHIJKLMNOPQRSTU" << xpcc::endl;
+	display << "ABCDEFGHIJKLMNOPQRSTU" << modm::endl;
 	display << "abcdefghijklmnopqrstu";
 
 	display.update();
 
-	xpcc::delayMilliseconds(1000);
+	modm::delayMilliseconds(1000);
 	display.setCursor(Point(40, 55));
 
 	display << "5 ";
 	display.update();
-	xpcc::delayMilliseconds(1000);
+	modm::delayMilliseconds(1000);
 
 	display << "4 ";
 	display.update();
-	xpcc::delayMilliseconds(1000);
+	modm::delayMilliseconds(1000);
 
 	display << "3 ";
 	display.update();
-	xpcc::delayMilliseconds(1000);
+	modm::delayMilliseconds(1000);
 
 	display << "2 ";
 	display.update();
-	xpcc::delayMilliseconds(1000);
+	modm::delayMilliseconds(1000);
 
 	display << "1";
 	display.update();
-	xpcc::delayMilliseconds(1000);
+	modm::delayMilliseconds(1000);
 
 	display.clear();
 }
@@ -158,9 +158,9 @@ main()
 
 	introScreen();
 
-	display.setFont(xpcc::font::FixedWidth5x8);
+	display.setFont(modm::font::FixedWidth5x8);
 
-	xpcc::ShortPeriodicTimer timer(1000);
+	modm::ShortPeriodicTimer timer(1000);
 	while (1)
 	{
 		uint8_t iter = 0;

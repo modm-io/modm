@@ -9,13 +9,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_HMC6343_HPP
-#define XPCC_HMC6343_HPP
+#ifndef MODM_HMC6343_HPP
+#define MODM_HMC6343_HPP
 
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/processing/protothread.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 // forward declaration for friending with hmc6343::Data
@@ -109,7 +109,7 @@ public:
 		UprightEdgeOrientation = Bit1,	///< Upright Edge Orientation if set.
 		LevelOrientation = Bit0,		///< Level Orientation if set
 	};
-	XPCC_FLAGS8(OperationMode);
+	MODM_FLAGS8(OperationMode);
 
 	enum class
 	MeasurementRate : uint8_t
@@ -119,7 +119,7 @@ public:
 		Hz10 = 0x02,
 	};
 
-	struct xpcc_packed
+	struct modm_packed
 	Data
 	{
 		template < class I2cMaster >
@@ -128,46 +128,46 @@ public:
 		// DATA ACCESS
 		/// returns the acceleration in unknown units
 		///@{
-		int16_t xpcc_always_inline
+		int16_t modm_always_inline
 		getAccelerationX() { return swapData(0); }
 
-		int16_t xpcc_always_inline
+		int16_t modm_always_inline
 		getAccelerationY() { return swapData(1); }
 
-		int16_t xpcc_always_inline
+		int16_t modm_always_inline
 		getAccelerationZ() { return swapData(2); }
 		///@}
 
 		/// returns the magnetic field in unknown units
 		///@{
-		int16_t xpcc_always_inline
+		int16_t modm_always_inline
 		getMagneticFieldX() { return swapData(3); }
 
-		int16_t xpcc_always_inline
+		int16_t modm_always_inline
 		getMagneticFieldY() { return swapData(4); }
 
-		int16_t xpcc_always_inline
+		int16_t modm_always_inline
 		getMagneticFieldZ() { return swapData(5); }
 		///@}
 
 		/// returns the heading in tenth of degrees (0 -> 3600)
-		int16_t xpcc_always_inline
+		int16_t modm_always_inline
 		getHeading() { return swapData(6); }
 
 		/// returns the Pitch in tenth of degrees (-900 -> 0 -> 900)
-		int16_t xpcc_always_inline
+		int16_t modm_always_inline
 		getPitch() { return swapData(7); }
 
 		/// returns the Roll in tenth of degrees (-900 -> 0 -> 900)
-		int16_t xpcc_always_inline
+		int16_t modm_always_inline
 		getRoll() { return swapData(8); }
 
 		/// returns the temperature in unknown format (was not specified in datasheet)
-		int16_t xpcc_always_inline
+		int16_t modm_always_inline
 		getTemperature() { return swapData(9); }
 
 		/// returns the value of the operation mode register
-		OperationMode_t xpcc_always_inline
+		OperationMode_t modm_always_inline
 		getOperationMode() { return OperationMode_t(data[20]); }
 
 
@@ -182,7 +182,7 @@ public:
 		swapData(uint8_t index)
 		{
 			int16_t* rawData = reinterpret_cast<int16_t*>(data);
-			return xpcc::fromBigEndian(rawData[index]);
+			return modm::fromBigEndian(rawData[index]);
 		}
 	};
 
@@ -215,7 +215,7 @@ protected:
  * @author	Niklas Hauser
  */
 template < class I2cMaster >
-class Hmc6343 : public hmc6343, public xpcc::I2cDevice< I2cMaster, 2 >
+class Hmc6343 : public hmc6343, public modm::I2cDevice< I2cMaster, 2 >
 {
 public:
 	/// Constructor, requires a hmc6343::Data object, sets address to default of 0x19
@@ -224,7 +224,7 @@ public:
 
 	// READING RAM
 	/// read operation mode register 2
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	readOperationMode()
 	{ return readPostData(Command::PostOperationMode, 20, 1); }
 
@@ -232,22 +232,22 @@ public:
 
 	// WRITING EEPROM
 	/// Configures the sensor to normal orientation mode with 10Hz data rate.
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	setMeasurementRate(MeasurementRate measurementRate=MeasurementRate::Hz10)
 	{ return writeRegister(Register::OperationMode2, i(measurementRate)); }
 
 	/// sets a new deviation angle in eeprom
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	setDeviationAngle(int16_t angle)
 	{ return writeRegister(Register16::DeviationAngle, static_cast<uint16_t>(angle)); }
 
 	/// sets a new variation angle in eeprom
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	setVariationAngle(int16_t angle)
 	{ return writeRegister(Register16::VariationAngle, static_cast<uint16_t>(angle)); }
 
 	/// sets a new IIR filter in eeprom
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	setIIR_Filter(uint8_t filter)
 	{ return writeRegister(Register::Filter, filter & 0x0f); }
 
@@ -255,12 +255,12 @@ public:
 
 	// READING EEPROM
 	/// reads the device id from eeprom
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	getDeviceId(uint16_t &value)
 	{ return readRegister(Register16::DeviceSerial, value); }
 
 	/// sets a new IIR filter in eeprom
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	getIIR_Filter(uint8_t &value)
 	{ return readRegister(Register::Filter, value); }
 
@@ -268,42 +268,42 @@ public:
 
 	// COMMANDS
 	/// Sets the specified orientation
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	setOrientation(Orientation orientation)
 	{ return writeCommand(static_cast<Command>(orientation)); }
 
 	/// enters run mode
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	enterRunMode()
 	{ return writeCommand(Command::EnterRunMode); }
 
 	/// enters standby mode
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	enterStandbyMode()
 	{ return writeCommand(Command::EnterStandbyMode); }
 
 	/// enters sleep mode
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	enterSleepMode()
 	{ return writeCommand(Command::EnterSleepMode); }
 
 	/// exit sleep mode
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	exitSleepMode()
 	{ return writeCommand(Command::ExitSleepMode, 20); }
 
 	/// enters user calibration mode
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	enterUserCalibrationMode()
 	{ return writeCommand(Command::EnterUserCalibrationMode); }
 
 	/// exit user calibration mode
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	exitUserCalibrationMode()
 	{ return writeCommand(Command::ExitUserCalibrationMode, 50); }
 
 	/// resets the processor, any new command is delayed by 500ms
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	resetProcessor()
 	{ return writeCommand(Command::ResetProcessor, 500); }
 
@@ -311,22 +311,22 @@ public:
 
 	// DATA REQUESTS
 	/// reads the Acceleration registers and buffer the results
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	readAcceleration()
 	{ return readPostData(Command::PostAccelData, 0, 6); }
 
 	/// reads the Magnetometer registers and buffer the results
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	readMagneticField()
 	{ return readPostData(Command::PostMagData, 6, 6); }
 
 	/// reads the Heading registers and buffer the results
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	readHeading()
 	{ return readPostData(Command::PostHeadingData, 12, 6); }
 
 	/// reads the Tilt registers and buffer the results
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	readTilt()
 	{ return readPostData(Command::PostTiltData, 14, 6); }
 
@@ -337,19 +337,19 @@ protected:
 
 	// RAW REGISTER ACCESS
 	/// write a 8bit value into the eeprom
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	writeRegister(Register reg, uint8_t value);
 
 	/// write a 16bit value into the eeprom
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	writeRegister(Register16 reg, uint16_t value);
 
 	/// read a 8bit value from the eeprom
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	readRegister(Register reg, uint8_t &value);
 
 	/// read a 16bit value from the eeprom
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	readRegister(Register16 reg, uint16_t &value);
 
 	/// @}
@@ -361,20 +361,20 @@ public:
 	{ return data; }
 
 private:
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	writeCommand(Command command, uint16_t timeout = 1);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	readPostData(Command command, uint8_t offset, uint8_t readSize);
 
 private:
 	Data &data;
 	uint8_t buffer[4];
-	xpcc::ShortTimeout timeout;
+	modm::ShortTimeout timeout;
 };
 
-} // namespace xpcc
+} // namespace modm
 
 #include "hmc6343_impl.hpp"
 
-#endif	// XPCC_HMC6343_HPP
+#endif	// MODM_HMC6343_HPP

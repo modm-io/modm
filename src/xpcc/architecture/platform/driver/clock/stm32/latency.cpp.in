@@ -280,7 +280,7 @@ flash_latency_{{ mV }}[] =
 %% endfor
 
 uint32_t
-xpcc::stm32::ClockControl::setFlashLatency(const uint32_t CPU_Frequency, const uint16_t mV)
+modm::stm32::ClockControl::setFlashLatency(const uint32_t CPU_Frequency, const uint16_t mV)
 {
 %% if target["name"] != "100"
 	const uint32_t *lut(flash_latency_3600);

@@ -15,7 +15,7 @@
 
 // ----------------------------------------------------------------------------
 void
-CanConnectorTest::checkShortMessage(const xpcc::can::Message& message) const
+CanConnectorTest::checkShortMessage(const modm::can::Message& message) const
 {
 	TEST_ASSERT_EQUALS(message.identifier, normalIdentifier);
 	TEST_ASSERT_EQUALS(message.length, sizeof(shortPayload));
@@ -33,7 +33,7 @@ CanConnectorTest::getPayloadLength(uint8_t offset) const
 }
 
 void
-CanConnectorTest::checkFragmentedMessage(const xpcc::can::Message& message,
+CanConnectorTest::checkFragmentedMessage(const modm::can::Message& message,
 		uint8_t fragmentId) const
 {
 	uint8_t offset = fragmentId * 6;
@@ -49,7 +49,7 @@ CanConnectorTest::checkFragmentedMessage(const xpcc::can::Message& message,
 }
 
 void
-CanConnectorTest::createMessage(xpcc::can::Message& message,
+CanConnectorTest::createMessage(modm::can::Message& message,
 		uint8_t fragmentId) const
 {
 	uint8_t offset = fragmentId * 6;
@@ -101,7 +101,7 @@ CanConnectorTest::testSendShortMessageDirect()
 {
 	driver->sendSlots = 1;
 	
-	xpcc::SmartPointer payload(&shortPayload);
+	modm::SmartPointer payload(&shortPayload);
 	connector->sendPacket(xpccHeader, payload);
 	
 	// short messages might be send directly without any call to update
@@ -112,7 +112,7 @@ CanConnectorTest::testSendShortMessageDirect()
 void
 CanConnectorTest::testSendShortMessage()
 {
-	xpcc::SmartPointer payload(&shortPayload);
+	modm::SmartPointer payload(&shortPayload);
 	connector->sendPacket(xpccHeader, payload);
 	
 	TEST_ASSERT_EQUALS(driver->sendList.getSize(), 0U);
@@ -130,7 +130,7 @@ CanConnectorTest::testSendFragmentedMessage()
 	driver->sendSlots = 2;
 	this->messageCounter = connector->messageCounter = 0x30;
 	
-	xpcc::SmartPointer payload(&fragmentedPayload);
+	modm::SmartPointer payload(&fragmentedPayload);
 	connector->sendPacket(xpccHeader, payload);
 	
 	// fragmented messages aren't send directly but queued immediately
@@ -165,7 +165,7 @@ CanConnectorTest::testReceiveShortMessage()
 	TEST_ASSERT_FALSE(connector->isPacketAvailable());
 	
 	// create a new can message
-	xpcc::can::Message message(normalIdentifier, 8);
+	modm::can::Message message(normalIdentifier, 8);
 	memcpy(&message.data, shortPayload, 8);
 	
 	driver->receiveList.append(message);
@@ -192,7 +192,7 @@ CanConnectorTest::testReceiveFragmentedMessage()
 	TEST_ASSERT_FALSE(connector->isPacketAvailable());
 	
 	this->messageCounter = 0x50;
-	xpcc::can::Message message;
+	modm::can::Message message;
 	
 	createMessage(message, 0);
 	driver->receiveList.append(message);

@@ -14,14 +14,14 @@
 
 #include <modm/debug/logger/logger.hpp>
 
-#ifndef XPCC_BME280_DATA_HPP
+#ifndef MODM_BME280_DATA_HPP
 #	error  "Don't include this file directly, use 'bme280_data.hpp' instead!"
 #endif
 
-#undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::DISABLED
+#undef  MODM_LOG_LEVEL
+#define MODM_LOG_LEVEL modm::log::DISABLED
 
-namespace xpcc {
+namespace modm {
 
 namespace bme280data {
 
@@ -33,7 +33,7 @@ Data::calculateCalibratedTemperature()
 	int32_t adc = ((raw[3] << 16) | (raw[4] << 8) | (raw[5] << 0));
 	adc >>= 4;
 
-	XPCC_LOG_DEBUG.printf("adc = 0x%05x\n", adc);
+	MODM_LOG_DEBUG.printf("adc = 0x%05x\n", adc);
 
 	int32_t T1 = calibration.T1;
 	int32_t T2 = calibration.T2;
@@ -159,4 +159,4 @@ Data::getHumidity()
 
 } // bme280data namespace
 
-} // xpcc namespace
+} // modm namespace

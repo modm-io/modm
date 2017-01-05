@@ -11,14 +11,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_COMMON_CAN_BIT_TIMINGS_HPP
-#define XPCC_COMMON_CAN_BIT_TIMINGS_HPP
+#ifndef MODM_COMMON_CAN_BIT_TIMINGS_HPP
+#define MODM_COMMON_CAN_BIT_TIMINGS_HPP
 
 #include <modm/architecture/interface.hpp>
 
 #include "../clock/common_clock.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -59,21 +59,21 @@ private:
 	};
 
 	static constexpr uint8_t calcBS1() {
-		return (Clk ==  xpcc::clock::MHz8)? 11 :
-		       (Clk == xpcc::clock::MHz48)? 11 :
-		       (Clk == xpcc::clock::MHz30)? 10 :
-		       (Clk == xpcc::clock::MHz36)? 12 :
-		       (Clk == xpcc::clock::MHz42)? 14 :
-		       (Clk == xpcc::clock::MHz32)? 11 : 0;
+		return (Clk ==  modm::clock::MHz8)? 11 :
+		       (Clk == modm::clock::MHz48)? 11 :
+		       (Clk == modm::clock::MHz30)? 10 :
+		       (Clk == modm::clock::MHz36)? 12 :
+		       (Clk == modm::clock::MHz42)? 14 :
+		       (Clk == modm::clock::MHz32)? 11 : 0;
 	}
 
 	static constexpr uint8_t calcBS2() {
-		return (Clk ==  xpcc::clock::MHz8)?  4 :
-		       (Clk == xpcc::clock::MHz48)?  4 :
-		       (Clk == xpcc::clock::MHz30)?  4 :
-		       (Clk == xpcc::clock::MHz36)?  5 :
-		       (Clk == xpcc::clock::MHz42)?  6 :
-		       (Clk == xpcc::clock::MHz32)?  4 : 0;
+		return (Clk ==  modm::clock::MHz8)?  4 :
+		       (Clk == modm::clock::MHz48)?  4 :
+		       (Clk == modm::clock::MHz30)?  4 :
+		       (Clk == modm::clock::MHz36)?  5 :
+		       (Clk == modm::clock::MHz42)?  6 :
+		       (Clk == modm::clock::MHz32)?  4 : 0;
 	}
 
 	static constexpr CanBitTimingConfguration calculateBestConfig() {
@@ -96,7 +96,7 @@ private:
 	static_assert(getPrescaler() > 0, "CAN bitrate is too high for standard bit timings!");
 };
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif // XPCC_COMMON_CAN_BIT_TIMINGS_HPP
+#endif // MODM_COMMON_CAN_BIT_TIMINGS_HPP
 

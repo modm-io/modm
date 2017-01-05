@@ -16,11 +16,11 @@
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/driver/pressure/bmp085.hpp>
 
-xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > device;
-xpcc::IOStream stream(device);
+modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
+modm::IOStream stream(device);
 
 /**
- * Example to demonstrate a XPCC driver for barometer and
+ * Example to demonstrate a MODM driver for barometer and
  * thermometer BMP085 and BMP180 (which are compatible).
  *
  * PB9	SDA
@@ -32,7 +32,7 @@ xpcc::IOStream stream(device);
 
 typedef I2cMaster1 MyI2cMaster;
 
-class ThreadOne : public xpcc::pt::Protothread
+class ThreadOne : public modm::pt::Protothread
 {
 public:
 	ThreadOne() :
@@ -45,7 +45,7 @@ public:
 	{
 		PT_BEGIN()
 
-		stream << "Ping the device from ThreadOne" << xpcc::endl;
+		stream << "Ping the device from ThreadOne" << modm::endl;
 
 		// ping the device until it responds
 		while(true)
@@ -58,7 +58,7 @@ public:
 			PT_WAIT_UNTIL(this->timeout.isExpired());
 		}
 
-		stream << "Device responded" << xpcc::endl;
+		stream << "Device responded" << modm::endl;
 
 		// Configure the device until it responds
 		while(true)
@@ -71,9 +71,9 @@ public:
 			PT_WAIT_UNTIL(this->timeout.isExpired());
 		}
 
-		stream << "Device configured" << xpcc::endl;
+		stream << "Device configured" << modm::endl;
 
-		static xpcc::bmp085::Calibration &cal = data.getCalibration();
+		static modm::bmp085::Calibration &cal = data.getCalibration();
 
 		stream << "Calibration data is: ";
 		stream.printf(" ac1 %d\n", cal.ac1);
@@ -90,7 +90,7 @@ public:
 
 		while (1)
 		{
-			static xpcc::ShortPeriodicTimer timer(250);
+			static modm::ShortPeriodicTimer timer(250);
 
 			PT_WAIT_UNTIL(timer.execute());
 
@@ -110,10 +110,10 @@ public:
 	}
 
 private:
-	xpcc::ShortTimeout timeout;
+	modm::ShortTimeout timeout;
 
-	xpcc::bmp085::Data data;
-	xpcc::Bmp085<MyI2cMaster> barometer;
+	modm::bmp085::Data data;
+	modm::Bmp085<MyI2cMaster> barometer;
 };
 
 
@@ -126,7 +126,7 @@ main()
 	Board::initialize();
 
 	GpioOutputA2::connect(Usart2::Tx);
-	Usart2::initialize<Board::systemClock, xpcc::Uart::B115200>(10);
+	Usart2::initialize<Board::systemClock, modm::Uart::B115200>(10);
 
 	GpioB9::connect(MyI2cMaster::Sda);
 	GpioB8::connect(MyI2cMaster::Scl);

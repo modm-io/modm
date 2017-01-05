@@ -17,13 +17,13 @@ void
 Vector3Test::testConstructor()
 {
 	
-	xpcc::Vector1i p1(3);
-	xpcc::Vector2i p2(1, 2);
+	modm::Vector1i p1(3);
+	modm::Vector2i p2(1, 2);
 	
 	int16_t array[3] = {-4, 5, 7};
-	xpcc::Matrix<int16_t, 3, 1> m(array);
+	modm::Matrix<int16_t, 3, 1> m(array);
 	
-	xpcc::Vector3i a;
+	modm::Vector3i a;
 	TEST_ASSERT_EQUALS(a.x, 0);
 	TEST_ASSERT_EQUALS(a.y, 0);
 	TEST_ASSERT_EQUALS(a.z, 0);
@@ -35,82 +35,82 @@ Vector3Test::testConstructor()
 	TEST_ASSERT_EQUALS(a.y, 9);
 	TEST_ASSERT_EQUALS(a.z, 4);
 	
-	xpcc::Vector3i b(20,1,-4);
+	modm::Vector3i b(20,1,-4);
 	TEST_ASSERT_EQUALS(b.x, 20);
 	TEST_ASSERT_EQUALS(b.y, 1);
 	TEST_ASSERT_EQUALS(b.z, -4);
 	
-	xpcc::Vector3i c(array);
+	modm::Vector3i c(array);
 	TEST_ASSERT_EQUALS(c.x, -4);
 	TEST_ASSERT_EQUALS(c.y, 5);
 	TEST_ASSERT_EQUALS(c.z, 7);
 	
-	xpcc::Vector3i d(4);
+	modm::Vector3i d(4);
 	TEST_ASSERT_EQUALS(d.x, 4);
 	TEST_ASSERT_EQUALS(d.y, 4);
 	TEST_ASSERT_EQUALS(d.z, 4);
 	
-	xpcc::Vector3i e(1,2,p1);
+	modm::Vector3i e(1,2,p1);
 	TEST_ASSERT_EQUALS(e.x, 1);
 	TEST_ASSERT_EQUALS(e.y, 2);
 	TEST_ASSERT_EQUALS(e.z, 3);
 	
-	xpcc::Vector3i f(1,p1,2);
+	modm::Vector3i f(1,p1,2);
 	TEST_ASSERT_EQUALS(f.x, 1);
 	TEST_ASSERT_EQUALS(f.y, 3);
 	TEST_ASSERT_EQUALS(f.z, 2);
 	
-	xpcc::Vector3i g(p1,2,1);
+	modm::Vector3i g(p1,2,1);
 	TEST_ASSERT_EQUALS(g.x, 3);
 	TEST_ASSERT_EQUALS(g.y, 2);
 	TEST_ASSERT_EQUALS(g.z, 1);
 	
-	xpcc::Vector3i h(1,p1,p1);
+	modm::Vector3i h(1,p1,p1);
 	TEST_ASSERT_EQUALS(h.x, 1);
 	TEST_ASSERT_EQUALS(h.y, 3);
 	TEST_ASSERT_EQUALS(h.z, 3);
 	
-	xpcc::Vector3i i(p1,1,p1);
+	modm::Vector3i i(p1,1,p1);
 	TEST_ASSERT_EQUALS(i.x, 3);
 	TEST_ASSERT_EQUALS(i.y, 1);
 	TEST_ASSERT_EQUALS(i.z, 3);
 	
-	xpcc::Vector3i j(p1,p1,1);
+	modm::Vector3i j(p1,p1,1);
 	TEST_ASSERT_EQUALS(j.x, 3);
 	TEST_ASSERT_EQUALS(j.y, 3);
 	TEST_ASSERT_EQUALS(j.z, 1);
 	
-	xpcc::Vector3i k(p1,p1,p1);
+	modm::Vector3i k(p1,p1,p1);
 	TEST_ASSERT_EQUALS(k.x, 3);
 	TEST_ASSERT_EQUALS(k.y, 3);
 	TEST_ASSERT_EQUALS(k.z, 3);
 	
-	xpcc::Vector3i l(2,p2);
+	modm::Vector3i l(2,p2);
 	TEST_ASSERT_EQUALS(l.x, 2);
 	TEST_ASSERT_EQUALS(l.y, 1);
 	TEST_ASSERT_EQUALS(l.z, 2);
 	
-	xpcc::Vector3i r(p2,6);
+	modm::Vector3i r(p2,6);
 	TEST_ASSERT_EQUALS(r.x, 1);
 	TEST_ASSERT_EQUALS(r.y, 2);
 	TEST_ASSERT_EQUALS(r.z, 6);
 	
-	xpcc::Vector3i n(p1,p2);
+	modm::Vector3i n(p1,p2);
 	TEST_ASSERT_EQUALS(n.x, 3);
 	TEST_ASSERT_EQUALS(n.y, 1);
 	TEST_ASSERT_EQUALS(n.z, 2);
 	
-	xpcc::Vector3i o(p2,p1);
+	modm::Vector3i o(p2,p1);
 	TEST_ASSERT_EQUALS(o.x, 1);
 	TEST_ASSERT_EQUALS(o.y, 2);
 	TEST_ASSERT_EQUALS(o.z, 3);
 	
-	xpcc::Vector3i p(a);
+	modm::Vector3i p(a);
 	TEST_ASSERT_EQUALS(p.x, 100);
 	TEST_ASSERT_EQUALS(p.y, 9);
 	TEST_ASSERT_EQUALS(p.z, 4);
 	
-	xpcc::Vector3i q(m);
+	modm::Vector3i q(m);
 	TEST_ASSERT_EQUALS(q.x, -4);
 	TEST_ASSERT_EQUALS(q.y, 5);
 	TEST_ASSERT_EQUALS(q.z, 7);
@@ -119,12 +119,12 @@ Vector3Test::testConstructor()
 void
 Vector3Test::testAssign()
 {
-	xpcc::Vector3i a(42,-4,3);
+	modm::Vector3i a(42,-4,3);
 	
 	int16_t array[3] = {-26,9,2};
-	xpcc::Matrix<int16_t, 3, 1> m(array);
+	modm::Matrix<int16_t, 3, 1> m(array);
 	
-	xpcc::Vector3i b;
+	modm::Vector3i b;
 	
 	b = a;
 	TEST_ASSERT_EQUALS(b.x, 42);
@@ -140,9 +140,9 @@ Vector3Test::testAssign()
 void
 Vector3Test::testCompare()
 {
-	xpcc::Vector3i a(4,5,1);
-	xpcc::Vector3i b(4,5,2);
-	xpcc::Vector3i c(4,5,2);
+	modm::Vector3i a(4,5,1);
+	modm::Vector3i b(4,5,2);
+	modm::Vector3i c(4,5,2);
 	// ==
 	TEST_ASSERT_TRUE(b == c);
 	TEST_ASSERT_FALSE(a == c);
@@ -170,7 +170,7 @@ Vector3Test::testCompare()
 void
 Vector3Test::testRawDataAccess()
 {
-	xpcc::Vector3i a(0, 1, 2);
+	modm::Vector3i a(0, 1, 2);
 	int16_t *pointer = a.ptr();
 	
 	TEST_ASSERT_EQUALS(a[0], 0);
@@ -184,8 +184,8 @@ Vector3Test::testRawDataAccess()
 void
 Vector3Test::testOperators()
 {
-	xpcc::Vector3i a(1, 2, 3);
-	xpcc::Vector3i b(4, 5, 6);
+	modm::Vector3i a(1, 2, 3);
+	modm::Vector3i b(4, 5, 6);
 	
 	TEST_ASSERT_EQUALS((a + b).x, 1+4);
 	TEST_ASSERT_EQUALS((a + b).y, 2+5);
@@ -241,7 +241,7 @@ Vector3Test::testOperators()
 void
 Vector3Test::testLength()
 {
-	xpcc::Vector3f a(1.f,2.f,3.f);
+	modm::Vector3f a(1.f,2.f,3.f);
 	
 	TEST_ASSERT_EQUALS_FLOAT(a.getLengthSquared(), 1.f*1.f+2.f*2.f+3.f*3.f);
 	TEST_ASSERT_EQUALS_FLOAT(a.getLength(), 3.741657387);
@@ -266,8 +266,8 @@ Vector3Test::testLength()
 void
 Vector3Test::testMathDefs()
 {
-	xpcc::Vector3i a(7,1,0);
-	xpcc::Vector3f b(INFINITY,NAN,1);
+	modm::Vector3i a(7,1,0);
+	modm::Vector3f b(INFINITY,NAN,1);
 	
 	TEST_ASSERT_FALSE(a.hasNan());
 	TEST_ASSERT_FALSE(a.hasInf());

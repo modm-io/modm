@@ -22,50 +22,50 @@
 #include "graphic_display.hpp"
 
 // ----------------------------------------------------------------------------
-xpcc::GraphicDisplay::GraphicDisplay() :
+modm::GraphicDisplay::GraphicDisplay() :
 	IOStream(writer),
 	writer(this),
-	draw(&xpcc::GraphicDisplay::setPixel),
+	draw(&modm::GraphicDisplay::setPixel),
 	foregroundColor(glcd::Color::white()),
 	backgroundColor(glcd::Color::black()),
-	font(xpcc::accessor::asFlash(xpcc::font::FixedWidth5x8))
+	font(modm::accessor::asFlash(modm::font::FixedWidth5x8))
 {
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::GraphicDisplay::setColor(const glcd::Color& newColor)
+modm::GraphicDisplay::setColor(const glcd::Color& newColor)
 {
 //	if (newColor == glcd::Color::black()) {
-//		draw = &xpcc::GraphicDisplay::clearPixel;
+//		draw = &modm::GraphicDisplay::clearPixel;
 //	}
 //	else {
-//		draw = &xpcc::GraphicDisplay::setPixel;
+//		draw = &modm::GraphicDisplay::setPixel;
 //	}
 
 	/* When using a multicolor display we don't need clearPixel(), or at least
 	 * not the way it was implemented above. Maybe check if newColor equals
 	 * backgroundColor.
 	 * */
-	draw = &xpcc::GraphicDisplay::setPixel;
+	draw = &modm::GraphicDisplay::setPixel;
 	this->foregroundColor = newColor;
 }
 
 void
-xpcc::GraphicDisplay::setBackgroundColor(const glcd::Color& newColor)
+modm::GraphicDisplay::setBackgroundColor(const glcd::Color& newColor)
 {
 	this->backgroundColor = newColor;
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::GraphicDisplay::drawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2)
+modm::GraphicDisplay::drawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2)
 {
 	if (x1 == x2)
 	{
 		// x1|y1 must be the upper point
 		if (y1 > y2) {
-			xpcc::swap(y1, y2);
+			modm::swap(y1, y2);
 		}
 		this->drawVerticalLine(glcd::Point(x1, y1), y2 - y1 + 1);
 	}
@@ -73,7 +73,7 @@ xpcc::GraphicDisplay::drawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2)
 	{
 		// x1|y1 must be the left point
 		if (x1 > x2) {
-			xpcc::swap(x1, x2);
+			modm::swap(x1, x2);
 		}
 		this->drawHorizontalLine(glcd::Point(x1, y1), x2 - x1 + 1);
 	}
@@ -82,12 +82,12 @@ xpcc::GraphicDisplay::drawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2)
 		// bresenham algorithm
 		bool steep = abs(y2 - y1) > abs(x2 - x1);
 		if (steep) {
-			xpcc::swap(x1, y1);
-			xpcc::swap(x2, y2);
+			modm::swap(x1, y1);
+			modm::swap(x2, y2);
 		}
 		if (x1 > x2) {
-			xpcc::swap(x1, x2);
-			xpcc::swap(y1, y2);
+			modm::swap(x1, x2);
+			modm::swap(y1, y2);
 		}
 
 		int16_t deltaX = x2 - x1;
@@ -122,7 +122,7 @@ xpcc::GraphicDisplay::drawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2)
 }
 
 void
-xpcc::GraphicDisplay::drawHorizontalLine(glcd::Point start, uint16_t length)
+modm::GraphicDisplay::drawHorizontalLine(glcd::Point start, uint16_t length)
 {
 	for (int_fast16_t i = start.getX(); i < static_cast<int16_t>(start.getX() + length); ++i) {
 		(this->*draw)(i, start.getY());
@@ -130,7 +130,7 @@ xpcc::GraphicDisplay::drawHorizontalLine(glcd::Point start, uint16_t length)
 }
 
 void
-xpcc::GraphicDisplay::drawVerticalLine(glcd::Point start, uint16_t length)
+modm::GraphicDisplay::drawVerticalLine(glcd::Point start, uint16_t length)
 {
 	for (int_fast16_t i = start.getY(); i < static_cast<int16_t>(start.getY() + length); ++i) {
 		(this->*draw)(start.getX(), i);
@@ -138,7 +138,7 @@ xpcc::GraphicDisplay::drawVerticalLine(glcd::Point start, uint16_t length)
 }
 
 void
-xpcc::GraphicDisplay::drawRectangle(glcd::Point upperLeft,
+modm::GraphicDisplay::drawRectangle(glcd::Point upperLeft,
 		uint16_t width, uint16_t height)
 {
 	uint16_t x2 = upperLeft.getX() + width  - 1;
@@ -151,7 +151,7 @@ xpcc::GraphicDisplay::drawRectangle(glcd::Point upperLeft,
 }
 
 void
-xpcc::GraphicDisplay::drawRoundedRectangle(glcd::Point upperLeft,
+modm::GraphicDisplay::drawRoundedRectangle(glcd::Point upperLeft,
 		uint16_t width, uint16_t height, uint16_t radius)
 {
 	if (radius == 0) {
@@ -194,7 +194,7 @@ xpcc::GraphicDisplay::drawRoundedRectangle(glcd::Point upperLeft,
 }
 
 void
-xpcc::GraphicDisplay::drawCircle(glcd::Point center, uint16_t radius)
+modm::GraphicDisplay::drawCircle(glcd::Point center, uint16_t radius)
 {
 	if (radius == 0) {
 		return;
@@ -224,7 +224,7 @@ xpcc::GraphicDisplay::drawCircle(glcd::Point center, uint16_t radius)
 }
 
 void
-xpcc::GraphicDisplay::drawCircle4(glcd::Point center, int16_t x, int16_t y)
+modm::GraphicDisplay::drawCircle4(glcd::Point center, int16_t x, int16_t y)
 {
 	const int16_t cx = center.getX();
 	const int16_t cy = center.getY();
@@ -240,7 +240,7 @@ xpcc::GraphicDisplay::drawCircle4(glcd::Point center, int16_t x, int16_t y)
 }
 
 void
-xpcc::GraphicDisplay::drawEllipse(glcd::Point center, int16_t rx, int16_t ry)
+modm::GraphicDisplay::drawEllipse(glcd::Point center, int16_t rx, int16_t ry)
 {
 	int32_t rx_2 = rx * rx;
 	int32_t ry_2 = ry * ry;
@@ -295,20 +295,20 @@ xpcc::GraphicDisplay::drawEllipse(glcd::Point center, int16_t rx, int16_t ry)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::GraphicDisplay::drawImage(glcd::Point upperLeft,
-		xpcc::accessor::Flash<uint8_t> image)
+modm::GraphicDisplay::drawImage(glcd::Point upperLeft,
+		modm::accessor::Flash<uint8_t> image)
 {
 	uint8_t width = image[0];
 	uint8_t height = image[1];
 
 	drawImageRaw(upperLeft, width, height,
-			xpcc::accessor::Flash<uint8_t>(image.getPointer() + 2));
+			modm::accessor::Flash<uint8_t>(image.getPointer() + 2));
 }
 
 void
-xpcc::GraphicDisplay::drawImageRaw(glcd::Point upperLeft,
+modm::GraphicDisplay::drawImageRaw(glcd::Point upperLeft,
 		uint16_t width, uint16_t height,
-		xpcc::accessor::Flash<uint8_t> data)
+		modm::accessor::Flash<uint8_t> data)
 {
 	uint16_t rows = (height + 7) / 8;
 	for (uint16_t i = 0; i < width; i++)

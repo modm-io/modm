@@ -13,8 +13,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_SMART_POINTER_H
-#define	XPCC_SMART_POINTER_H
+#ifndef	MODM_SMART_POINTER_H
+#define	MODM_SMART_POINTER_H
 
 #include <cstring>		// for std::memcpy
 #include <stdint.h>
@@ -22,7 +22,7 @@
 
 #include <modm/io/iostream.hpp>
 
-namespace xpcc
+namespace modm
 {
 	class SmartPointerVolatile;
 
@@ -130,13 +130,13 @@ namespace xpcc
 	protected:
 		friend IOStream&
 		operator <<( IOStream&, const SmartPointer&);
-	} xpcc_packed;
+	} modm_packed;
 
 	/**
 	 * \ingroup container
 	 */
-	xpcc::IOStream&
-	operator <<( xpcc::IOStream& s, const xpcc::SmartPointer& sPtr);
+	modm::IOStream&
+	operator <<( modm::IOStream& s, const modm::SmartPointer& sPtr);
 };
 
-#endif	// XPCC_SMART_POINTER_H
+#endif	// MODM_SMART_POINTER_H

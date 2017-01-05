@@ -12,23 +12,23 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SAB_MASTER_HPP
-#define XPCC_SAB_MASTER_HPP
+#ifndef MODM_SAB_MASTER_HPP
+#define MODM_SAB_MASTER_HPP
 
 #include <stdint.h>
 #include <modm/processing/timer.hpp>
 
 #include "interface.hpp"
 
-namespace xpcc
+namespace modm
 {
 	namespace sab
 	{
 		/**
 		 * 
-		 * Requires xpcc::Clock to be implemented.
+		 * Requires modm::Clock to be implemented.
 		 * 
-		 * \see	xpcc::Clock
+		 * \see	modm::Clock
 		 * 
 		 * \author	Fabian Greif
 		 * \ingroup	sab
@@ -86,7 +86,7 @@ namespace xpcc
 			 * isSuccess() returns \c false.
 			 * 
 			 * \return	Error code
-			 * \see		xpcc::sab::Error
+			 * \see		modm::sab::Error
 			 */
 			static uint8_t
 			getErrorCode();
@@ -117,7 +117,7 @@ namespace xpcc
 			
 			static QueryStatus queryStatus;
 			static uint8_t expectedResponseLength;
-			static xpcc::ShortTimeout timer;
+			static modm::ShortTimeout timer;
 			
 			static const uint8_t timeout = 10;		///< timeout value in milliseconds
 		};
@@ -126,4 +126,4 @@ namespace xpcc
 
 #include "master_impl.hpp"
 
-#endif	// XPCC_SAB_MASTER_HPP
+#endif	// MODM_SAB_MASTER_HPP

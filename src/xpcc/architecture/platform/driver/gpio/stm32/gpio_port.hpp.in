@@ -10,13 +10,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32_GPIO_HPP
-#define XPCC_STM32_GPIO_HPP
+#ifndef MODM_STM32_GPIO_HPP
+#define MODM_STM32_GPIO_HPP
 
 #include "../device.hpp"
 #include "gpio_base.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 namespace stm32
@@ -35,8 +35,8 @@ class GpioPortBase;
  * @tparam	Width		required width of the port (up to 16)
  * @ingroup {{partname}}_gpio
  */
-template< typename StartPin, uint8_t Width, ::xpcc::GpioPort::DataOrder PortOrder = GpioPort::DataOrder::Normal >
-class GpioPort : public ::xpcc::GpioPort, /** @cond */ public GpioPortBase< StartPin::port, StartPin::pin, Width, PortOrder > /** @endcond */
+template< typename StartPin, uint8_t Width, ::modm::GpioPort::DataOrder PortOrder = GpioPort::DataOrder::Normal >
+class GpioPort : public ::modm::GpioPort, /** @cond */ public GpioPortBase< StartPin::port, StartPin::pin, Width, PortOrder > /** @endcond */
 {
 public:
 	static constexpr uint8_t width = Width;
@@ -69,7 +69,7 @@ public:
 // there is no extra optimized specialization for Width=16 or DataOrder::Reversed, since using
 // a 16bit port is relatively rare and the optimizer will optimize the heck out of it anyway.
 %% for port in driver.gpio | getPorts
-template< uint8_t StartPin, uint8_t Width, ::xpcc::GpioPort::DataOrder PortOrder >
+template< uint8_t StartPin, uint8_t Width, ::modm::GpioPort::DataOrder PortOrder >
 class GpioPortBase<Gpio::Port::{{port["name"]}}, StartPin, Width, PortOrder> : public Gpio
 {
 	static_assert(StartPin < {{port["startPin"] + port["width"]}},
@@ -106,7 +106,7 @@ class GpioPortBase<Gpio::Port::{{port["name"]}}, StartPin, Width, PortOrder> : p
 	%% endif
 
 public:
-	xpcc_always_inline static void setOutput() {
+	modm_always_inline static void setOutput() {
 	%% if target["family"] in ["f1"]
 		GPIO{{port["name"]}}->CRH = (GPIO{{port["name"]}}->CRH & ~configMaskH) | port0001H | port0010H;
 		GPIO{{port["name"]}}->CRL = (GPIO{{port["name"]}}->CRL & ~configMaskL) | port0001L | port0010L;
@@ -114,7 +114,7 @@ public:
 		GPIO{{port["name"]}}->MODER = (GPIO{{port["name"]}}->MODER & ~portMask2) | port01;
 	%% endif
 	}
-	xpcc_always_inline static void setInput() {
+	modm_always_inline static void setInput() {
 	%% if target["family"] in ["f1"]
 		GPIO{{port["name"]}}->CRH = (GPIO{{port["name"]}}->CRH & ~configMaskH) | port0100H;
 		GPIO{{port["name"]}}->CRL = (GPIO{{port["name"]}}->CRL & ~configMaskL) | port0100L;
@@ -185,20 +185,20 @@ public:
 	%% endif
 	}
 	inline static uint16_t read() {
-		if (PortOrder == ::xpcc::GpioPort::DataOrder::Normal) {   // this branch is optimized away
+		if (PortOrder == ::modm::GpioPort::DataOrder::Normal) {   // this branch is optimized away
 			uint16_t data = GPIO{{port["name"]}}->IDR & portMask;
 			return (data >> StartPin);
 		} else {
-			uint16_t data = xpcc::bitReverse(uint16_t(GPIO{{port["name"]}}->IDR & portMask));
+			uint16_t data = modm::bitReverse(uint16_t(GPIO{{port["name"]}}->IDR & portMask));
 			return (data >> StartPinReversed);
 		}
 	}
 	inline static void write(uint16_t data) {
-		if (PortOrder == ::xpcc::GpioPort::DataOrder::Normal) {   // this branch is optimized away
+		if (PortOrder == ::modm::GpioPort::DataOrder::Normal) {   // this branch is optimized away
 			data <<= StartPin;
 			GPIO{{port["name"]}}->ODR = (GPIO{{port["name"]}}->ODR & ~portMask) | (data & portMask);
 		} else {
-			data = xpcc::bitReverse(uint16_t(data << StartPinReversed));
+			data = modm::bitReverse(uint16_t(data << StartPinReversed));
 			GPIO{{port["name"]}}->ODR = (GPIO{{port["name"]}}->ODR & ~portMask) | (data & portMask);
 		}
 	}
@@ -209,6 +209,6 @@ public:
 
 } // namespace stm32
 
-} // namespace xpcc
+} // namespace modm
 
-#endif // XPCC_STM32_GPIO_HPP
+#endif // MODM_STM32_GPIO_HPP

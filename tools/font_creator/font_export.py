@@ -34,9 +34,9 @@ template_source = """\
 ${copyright}
 // created with FontCreator 3.0
 
-#include <xpcc/architecture/driver/accessor.hpp>
+#include <modm/architecture/driver/accessor.hpp>
 
-namespace xpcc
+namespace modm
 {
 	namespace font
 	{
@@ -70,9 +70,9 @@ ${copyright}
 #ifndef ${include_guard}
 #define	${include_guard}
 
-#include <xpcc/architecture/driver/accessor.hpp>
+#include <modm/architecture/driver/accessor.hpp>
 
-namespace xpcc
+namespace modm
 {
 	namespace font
 	{
@@ -286,7 +286,7 @@ if __name__ == '__main__':
 		'count': len(font.chars),
 		'char_width': "\n\t\t\t".join(char_width),
 		'font_data': "\n\t\t\t".join(font_data),
-		'include_guard': "XPCC_FONT__" + os.path.basename(outfile).upper().replace(" ", "_") + "_HPP"
+		'include_guard': "MODM_FONT__" + os.path.basename(outfile).upper().replace(" ", "_") + "_HPP"
 	}
 	
 	output = string.Template(template_source).safe_substitute(substitutions)

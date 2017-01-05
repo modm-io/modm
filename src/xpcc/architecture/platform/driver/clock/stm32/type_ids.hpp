@@ -12,10 +12,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32_CLOCK_TYPE_IDS_HPP
-#define XPCC_STM32_CLOCK_TYPE_IDS_HPP
+#ifndef MODM_STM32_CLOCK_TYPE_IDS_HPP
+#define MODM_STM32_CLOCK_TYPE_IDS_HPP
 
-namespace xpcc
+namespace modm
 {
 
 namespace stm32
@@ -35,6 +35,6 @@ namespace TypeId
 
 }   // namespace stm32
 
-}   // namespace xpcc
+}   // namespace modm
 
-#endif // XPCC_STM32_CLOCK_TYPE_IDS_HPP
+#endif // MODM_STM32_CLOCK_TYPE_IDS_HPP

@@ -29,6 +29,6 @@ main()
 		// read the input pin
 		bool buttonState = PushButton::read();
 		// print button state
-		serialStream << buttonState << xpcc::endl;
+		serialStream << buttonState << modm::endl;
 	}
 }

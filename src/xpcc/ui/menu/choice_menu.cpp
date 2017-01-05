@@ -14,8 +14,8 @@
 #include "choice_menu.hpp"
 
 
-xpcc::ChoiceMenu::ChoiceMenu(xpcc::ViewStack* stack, uint8_t identifier) :
-	xpcc::AbstractMenu(stack, identifier),
+modm::ChoiceMenu::ChoiceMenu(modm::ViewStack* stack, uint8_t identifier) :
+	modm::AbstractMenu(stack, identifier),
 	display_update_time(500),
 	timer(display_update_time),
 	buttonAction(false),
@@ -26,8 +26,8 @@ xpcc::ChoiceMenu::ChoiceMenu(xpcc::ViewStack* stack, uint8_t identifier) :
 	this->maximalDrawnEntrys = (getViewStack()->getDisplay().getHeight()- 16) / 8 ;
 }
 
-xpcc::ChoiceMenu::ChoiceMenu(xpcc::ViewStack* stack, uint8_t identifier, const char* title) :
-	xpcc::AbstractMenu(stack, identifier),
+modm::ChoiceMenu::ChoiceMenu(modm::ViewStack* stack, uint8_t identifier, const char* title) :
+	modm::AbstractMenu(stack, identifier),
 	display_update_time(500),
 	timer(display_update_time),
 	buttonAction(false),
@@ -39,15 +39,15 @@ xpcc::ChoiceMenu::ChoiceMenu(xpcc::ViewStack* stack, uint8_t identifier, const c
 }
 
 void
-xpcc::ChoiceMenu::addEntry(const char* text,  bool *valuePtr, bool defaultValue)
+modm::ChoiceMenu::addEntry(const char* text,  bool *valuePtr, bool defaultValue)
 {
 	static uint16_t availableSpace = (getViewStack()->getDisplay().getWidth()-16)/6-6;
-	xpcc::ChoiceMenuEntry entry(text, availableSpace, valuePtr, defaultValue);
+	modm::ChoiceMenuEntry entry(text, availableSpace, valuePtr, defaultValue);
 	this->entries.append(entry);
 }
 
 void
-xpcc::ChoiceMenu::initialise()
+modm::ChoiceMenu::initialise()
 {
 	EntryList::iterator iter = this->entries.begin();
 	for(; iter!= this->entries.end(); ++iter){
@@ -63,16 +63,16 @@ xpcc::ChoiceMenu::initialise()
 }
 
 void
-xpcc::ChoiceMenu::setTitle(const char* text)
+modm::ChoiceMenu::setTitle(const char* text)
 {
 	this->title = text;
 }
 
 
 void
-xpcc::ChoiceMenu::draw()
+modm::ChoiceMenu::draw()
 {
-	xpcc::GraphicDisplay* display = &getViewStack()->getDisplay();
+	modm::GraphicDisplay* display = &getViewStack()->getDisplay();
 	display->clear();
 	display->setCursor(0,2);
 	(*display) << this->title;
@@ -116,7 +116,7 @@ xpcc::ChoiceMenu::draw()
 }
 
 bool
-xpcc::ChoiceMenu::hasChanged()
+modm::ChoiceMenu::hasChanged()
 {
 	if (timer.execute() || this->buttonAction)
 	{
@@ -132,11 +132,11 @@ xpcc::ChoiceMenu::hasChanged()
 
 
 void
-xpcc::ChoiceMenu::shortButtonPress(xpcc::MenuButtons::Button button)
+modm::ChoiceMenu::shortButtonPress(modm::MenuButtons::Button button)
 {
 	switch(button)
 	{
-		case xpcc::MenuButtons::DOWN:
+		case modm::MenuButtons::DOWN:
 		{
 			if (this->position + 1U < this->entries.getSize())
 			{
@@ -166,7 +166,7 @@ xpcc::ChoiceMenu::shortButtonPress(xpcc::MenuButtons::Button button)
 			}
 			break;
 		}
-		case xpcc::MenuButtons::UP:
+		case modm::MenuButtons::UP:
 		{
 			if (this->position > 0)
 			{
@@ -197,12 +197,12 @@ xpcc::ChoiceMenu::shortButtonPress(xpcc::MenuButtons::Button button)
 			}
 			break;
 		}
-		case xpcc::MenuButtons::LEFT:
+		case modm::MenuButtons::LEFT:
 		{
 			this->remove();
 			break;
 		}
-		case xpcc::MenuButtons::OK:
+		case modm::MenuButtons::OK:
 		{
 			EntryList::iterator iter = this->entries.begin();
 
@@ -215,7 +215,7 @@ xpcc::ChoiceMenu::shortButtonPress(xpcc::MenuButtons::Button button)
 			this->buttonAction = true;
 			break;
 		}
-		case xpcc::MenuButtons::RIGHT:
+		case modm::MenuButtons::RIGHT:
 		{
 			this->openNextScreen();
 		}

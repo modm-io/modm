@@ -13,14 +13,14 @@
 
 #include "standard_menu.hpp"
 
-xpcc::MenuEntry::MenuEntry(const char* text, uint16_t space, MenuEntryCallback func):
+modm::MenuEntry::MenuEntry(const char* text, uint16_t space, MenuEntryCallback func):
 	text(text, space),
 	callback(func)
 {
 }
 
-xpcc::StandardMenu::StandardMenu(xpcc::ViewStack* stack, uint8_t identifier) :
-	xpcc::AbstractMenu(stack, identifier),
+modm::StandardMenu::StandardMenu(modm::ViewStack* stack, uint8_t identifier) :
+	modm::AbstractMenu(stack, identifier),
 	display_update_time(500),
 	timer(display_update_time),
 	buttonAction(false),
@@ -31,8 +31,8 @@ xpcc::StandardMenu::StandardMenu(xpcc::ViewStack* stack, uint8_t identifier) :
 	this->maximalDrawnEntrys = (getViewStack()->getDisplay().getHeight()- 16) / 8 ;
 }
 
-xpcc::StandardMenu::StandardMenu(xpcc::ViewStack* stack, uint8_t identifier, const char* title) :
-	xpcc::AbstractMenu(stack, identifier),
+modm::StandardMenu::StandardMenu(modm::ViewStack* stack, uint8_t identifier, const char* title) :
+	modm::AbstractMenu(stack, identifier),
 	display_update_time(500),
 	timer(display_update_time),
 	buttonAction(false),
@@ -43,28 +43,28 @@ xpcc::StandardMenu::StandardMenu(xpcc::ViewStack* stack, uint8_t identifier, con
 	this->maximalDrawnEntrys = (getViewStack()->getDisplay().getHeight()- 16) / 8 ;
 }
 
-xpcc::StandardMenu::~StandardMenu()
+modm::StandardMenu::~StandardMenu()
 {
 }
 
 void
-xpcc::StandardMenu::addEntry(const char* text, MenuEntryCallback func)
+modm::StandardMenu::addEntry(const char* text, MenuEntryCallback func)
 {
-	xpcc::MenuEntry entry(text, (getViewStack()->getDisplay().getWidth()-16)/6, func);
+	modm::MenuEntry entry(text, (getViewStack()->getDisplay().getWidth()-16)/6, func);
 	this->entries.append(entry);
 }
 
 void
-xpcc::StandardMenu::setTitle(const char* text)
+modm::StandardMenu::setTitle(const char* text)
 {
 	this->title = text;
 }
 
 
 void
-xpcc::StandardMenu::draw()
+modm::StandardMenu::draw()
 {
-	xpcc::GraphicDisplay* display = &getViewStack()->getDisplay();
+	modm::GraphicDisplay* display = &getViewStack()->getDisplay();
 	display->clear();
 	display->setCursor(0,2);
 	(*display) << this->title;
@@ -99,7 +99,7 @@ xpcc::StandardMenu::draw()
 }
 
 bool
-xpcc::StandardMenu::hasChanged()
+modm::StandardMenu::hasChanged()
 {
 	if (timer.execute() || this->buttonAction)
 	{
@@ -114,17 +114,17 @@ xpcc::StandardMenu::hasChanged()
 }
 
 void
-xpcc::StandardMenu::selectedEntryFunction(uint8_t /*selected*/)
+modm::StandardMenu::selectedEntryFunction(uint8_t /*selected*/)
 {
 
 }
 
 void
-xpcc::StandardMenu::shortButtonPress(xpcc::MenuButtons::Button button)
+modm::StandardMenu::shortButtonPress(modm::MenuButtons::Button button)
 {
 	switch(button)
 	{
-		case xpcc::MenuButtons::DOWN:
+		case modm::MenuButtons::DOWN:
 		{
 			if (this->position + 1U < this->entries.getSize())
 			{
@@ -155,7 +155,7 @@ xpcc::StandardMenu::shortButtonPress(xpcc::MenuButtons::Button button)
 			}
 			break;
 		}
-		case xpcc::MenuButtons::UP:
+		case modm::MenuButtons::UP:
 		{
 			if (this->position > 0)
 			{
@@ -187,16 +187,16 @@ xpcc::StandardMenu::shortButtonPress(xpcc::MenuButtons::Button button)
 			}
 			break;
 		}
-		case xpcc::MenuButtons::LEFT:
+		case modm::MenuButtons::LEFT:
 		{
 			this->remove();
 			break;
 		}
-		case xpcc::MenuButtons::OK:
+		case modm::MenuButtons::OK:
 		{
 			break;
 		}
-		case xpcc::MenuButtons::RIGHT:
+		case modm::MenuButtons::RIGHT:
 		{
 			EntryList::iterator iter = this->entries.begin();
 

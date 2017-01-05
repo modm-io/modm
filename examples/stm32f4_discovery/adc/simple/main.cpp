@@ -16,13 +16,13 @@
 
 // ----------------------------------------------------------------------------
 // Set the log level
-#undef	XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::INFO
+#undef	MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::INFO
 
 typedef GpioInputA7 AdcIn;
 
-xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > loggerDevice;
-xpcc::log::Logger xpcc::log::info(loggerDevice);
+modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
+modm::log::Logger modm::log::info(loggerDevice);
 
 // ----------------------------------------------------------------------------
 int
@@ -30,7 +30,7 @@ main()
 {
 	Board::initialize();
 
-	// initialize Uart2 for XPCC_LOG_INFO
+	// initialize Uart2 for MODM_LOG_INFO
 	GpioOutputA2::connect(Usart2::Tx);
 	GpioInputA3::connect(Usart2::Rx, Gpio::InputType::PullUp);
 	Usart2::initialize<Board::systemClock, 115200>(12);
@@ -48,10 +48,10 @@ main()
 		while(!Adc2::isConversionFinished());
 		// print result
 		int adcValue = Adc2::getValue();
-		XPCC_LOG_INFO << "adcValue=" << adcValue;
+		MODM_LOG_INFO << "adcValue=" << adcValue;
 		float voltage = adcValue * 3.3 / 0xfff;
-		XPCC_LOG_INFO << " voltage=" << voltage << xpcc::endl;
-		xpcc::delayMilliseconds(500);
+		MODM_LOG_INFO << " voltage=" << voltage << modm::endl;
+		modm::delayMilliseconds(500);
 	}
 
 	return 0;

@@ -9,10 +9,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_XMEGA_TIMER_TYPE_IDS_HPP
-#define XPCC_XMEGA_TIMER_TYPE_IDS_HPP
+#ifndef MODM_XMEGA_TIMER_TYPE_IDS_HPP
+#define MODM_XMEGA_TIMER_TYPE_IDS_HPP
 
-namespace xpcc
+namespace modm
 {
 
 namespace xmega
@@ -35,6 +35,6 @@ namespace TypeId
 
 } // namespace xmega
 
-} // namespace xpcc
+} // namespace modm
 
-#endif // XPCC_XMEGA_TIMER_TYPE_IDS_HPP
+#endif // MODM_XMEGA_TIMER_TYPE_IDS_HPP

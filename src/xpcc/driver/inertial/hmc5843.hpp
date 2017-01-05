@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_HMC5843_HPP
-#define XPCC_HMC5843_HPP
+#ifndef MODM_HMC5843_HPP
+#define MODM_HMC5843_HPP
 
 #include "hmc58x3.hpp"
 #include <cmath>
 
-namespace xpcc
+namespace modm
 {
 
 struct hmc5843 : public hmc58x3
@@ -86,19 +86,19 @@ public:
 	{
 	}
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	configure(MeasurementRate rate=MeasurementRate::Hz10, Gain gain=Gain::Ga1_0)
 	{ return this->configureRaw(uint8_t(rate), uint8_t(gain), gainValues); }
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	setMeasurementRate(MeasurementRate rate)
 	{ return this->updateConfigA(ConfigA_t(uint8_t(rate)), ConfigA::DO_Mask); }
 
-	xpcc::ResumableResult<bool> inline
+	modm::ResumableResult<bool> inline
 	setGain(Gain gain)
 	{ return this->setGainRaw(uint8_t(gain), gainValues); }
 };
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif // XPCC_HMC5843_HPP
+#endif // MODM_HMC5843_HPP

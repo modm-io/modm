@@ -9,12 +9,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_INTERFACE_ADC_INTERRUPT_HPP
-#define XPCC_INTERFACE_ADC_INTERRUPT_HPP
+#ifndef MODM_INTERFACE_ADC_INTERRUPT_HPP
+#define MODM_INTERFACE_ADC_INTERRUPT_HPP
 
 #include "adc.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -46,17 +46,17 @@ namespace xpcc
  * @author	Niklas Hauser
  * @ingroup adc
  */
-class AdcInterrupt : public xpcc::Adc
+class AdcInterrupt : public modm::Adc
 {
 protected:
 	typedef void (*Handler) ();
 #ifdef __DOXYGEN__
 public:
 	static inline void
-	attachInterruptHandler(Handler handler=xpcc::dummy);
+	attachInterruptHandler(Handler handler=modm::dummy);
 #endif
 };
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif // XPCC_INTERFACE_ADC_INTERRUPT_HPP
+#endif // MODM_INTERFACE_ADC_INTERRUPT_HPP

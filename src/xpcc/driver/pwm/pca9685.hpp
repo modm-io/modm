@@ -10,12 +10,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PCA9685_HPP
-#define XPCC_PCA9685_HPP
+#ifndef MODM_PCA9685_HPP
+#define MODM_PCA9685_HPP
 
 #include <modm/architecture/interface/i2c_device.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 struct pca9685
@@ -145,7 +145,7 @@ struct pca9685
  * @ingroup driver_pwm
  */
 template<typename I2cMaster>
-class Pca9685 : public pca9685, public xpcc::I2cDevice< I2cMaster, 1, I2cWriteTransaction >
+class Pca9685 : public pca9685, public modm::I2cDevice< I2cMaster, 1, I2cWriteTransaction >
 {
 	uint8_t buffer[3];
 
@@ -166,7 +166,7 @@ public:
 	 * @param mode1 value to be written to MODE1 register
 	 * @param mode2 value to be written to MODE2 register
 	 */
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	initialize(uint8_t mode1 = 0, uint8_t mode2 = 0);
 
 	/**
@@ -179,7 +179,7 @@ public:
 	 * @param channel one of the 16 channels (0-15)
 	 * @param value   12-bit PWM value to be written
 	 */
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setChannel(uint8_t channel, uint16_t value);
 
 	/**
@@ -190,12 +190,12 @@ public:
 	 *
 	 * @param value 12-bit PWM value to be written
 	 */
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setAllChannels(uint16_t value);
 };
 
-}	// namespace xpcc
+}	// namespace modm
 
 #include "pca9685_impl.hpp"
 
-#endif // XPCC_PCA9685_HPP
+#endif // MODM_PCA9685_HPP

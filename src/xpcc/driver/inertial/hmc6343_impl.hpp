@@ -9,14 +9,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_HMC6343_HPP
+#ifndef MODM_HMC6343_HPP
 #	error  "Don't include this file directly, use 'hmc6343.hpp' instead!"
 #endif
 #include <modm/math/utils/endianness.hpp>
 
 // ----------------------------------------------------------------------------
 template < class I2cMaster >
-xpcc::Hmc6343<I2cMaster>::Hmc6343(Data &data, uint8_t address)
+modm::Hmc6343<I2cMaster>::Hmc6343(Data &data, uint8_t address)
 :	I2cDevice<I2cMaster,2>(address), data(data), timeout(500)
 {
 }
@@ -25,8 +25,8 @@ xpcc::Hmc6343<I2cMaster>::Hmc6343(Data &data, uint8_t address)
 // MARK: - register access
 // MARK: write command
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Hmc6343<I2cMaster>::writeCommand(Command command, uint16_t timeout)
+modm::ResumableResult<bool>
+modm::Hmc6343<I2cMaster>::writeCommand(Command command, uint16_t timeout)
 {
 	RF_BEGIN();
 
@@ -41,8 +41,8 @@ xpcc::Hmc6343<I2cMaster>::writeCommand(Command command, uint16_t timeout)
 
 // MARK: write register
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Hmc6343<I2cMaster>::writeRegister(Register reg, uint8_t value)
+modm::ResumableResult<bool>
+modm::Hmc6343<I2cMaster>::writeRegister(Register reg, uint8_t value)
 {
 	RF_BEGIN();
 
@@ -60,13 +60,13 @@ xpcc::Hmc6343<I2cMaster>::writeRegister(Register reg, uint8_t value)
 
 // MARK: write 16bit register
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Hmc6343<I2cMaster>::writeRegister(Register16 reg, uint16_t value)
+modm::ResumableResult<bool>
+modm::Hmc6343<I2cMaster>::writeRegister(Register16 reg, uint16_t value)
 {
 	RF_BEGIN();
 
 	// for little endian machines this endianness "conversion" does nothing
-	*reinterpret_cast<uint16_t*>(buffer+2) = xpcc::toLittleEndian(value);
+	*reinterpret_cast<uint16_t*>(buffer+2) = modm::toLittleEndian(value);
 	// for big endian machines, the bytes are swapped, so that the following is always true!
 	// buffer[2] has LSB, buffer[3] has MSB
 
@@ -82,8 +82,8 @@ xpcc::Hmc6343<I2cMaster>::writeRegister(Register16 reg, uint16_t value)
 
 // MARK: read register
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Hmc6343<I2cMaster>::readRegister(Register reg, uint8_t &value)
+modm::ResumableResult<bool>
+modm::Hmc6343<I2cMaster>::readRegister(Register reg, uint8_t &value)
 {
 	RF_BEGIN();
 
@@ -108,8 +108,8 @@ xpcc::Hmc6343<I2cMaster>::readRegister(Register reg, uint8_t &value)
 
 // MARK: read 16bit register
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Hmc6343<I2cMaster>::readRegister(Register16 reg, uint16_t &value)
+modm::ResumableResult<bool>
+modm::Hmc6343<I2cMaster>::readRegister(Register16 reg, uint16_t &value)
 {
 	RF_BEGIN();
 
@@ -121,7 +121,7 @@ xpcc::Hmc6343<I2cMaster>::readRegister(Register16 reg, uint16_t &value)
 		{
 			// buffer[2] has LSB, buffer[3] has MSB
 			// bytes get swapped on big endian machines
-			value = xpcc::fromLittleEndian(*reinterpret_cast<uint16_t*>(buffer+2));
+			value = modm::fromLittleEndian(*reinterpret_cast<uint16_t*>(buffer+2));
 			RF_RETURN(true);
 		}
 	}
@@ -131,8 +131,8 @@ xpcc::Hmc6343<I2cMaster>::readRegister(Register16 reg, uint16_t &value)
 
 // MARK: read 6 or 1 bytes of data
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Hmc6343<I2cMaster>::readPostData(Command command, uint8_t offset, uint8_t readSize)
+modm::ResumableResult<bool>
+modm::Hmc6343<I2cMaster>::readPostData(Command command, uint8_t offset, uint8_t readSize)
 {
 	RF_BEGIN();
 

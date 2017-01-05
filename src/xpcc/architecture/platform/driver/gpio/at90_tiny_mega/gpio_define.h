@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_AT90_ATTINY_ATMEGA_GPIO_DEFINES_H
-#define	XPCC_AT90_ATTINY_ATMEGA_GPIO_DEFINES_H
+#ifndef	MODM_AT90_ATTINY_ATMEGA_GPIO_DEFINES_H
+#define	MODM_AT90_ATTINY_ATMEGA_GPIO_DEFINES_H
 
 // Atmel made a mess with the register names for GPIO between the "old" devices.
 // To avoid to much conditional compiling we try to mimic the new names for
@@ -69,5 +69,5 @@
 #	endif
 #endif
 
-#endif	// XPCC_AT90_ATTINY_ATMEGA_GPIO_DEFINES_H
+#endif	// MODM_AT90_ATTINY_ATMEGA_GPIO_DEFINES_H
 

@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LM75_HPP
-#define XPCC_LM75_HPP
+#ifndef MODM_LM75_HPP
+#define MODM_LM75_HPP
 
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 // forward declaration for friending with lm75::Data
@@ -54,7 +54,7 @@ protected:
 		ThermostatMode = Bit1,
 		ShutdownMode = Bit0,
 	};
-	XPCC_FLAGS8(Config1);
+	MODM_FLAGS8(Config1);
 
 public:
 	enum class
@@ -85,7 +85,7 @@ protected:
 	/// @endcond
 
 public:
-	struct xpcc_packed
+	struct modm_packed
 	Data
 	{
 		template < class I2cMaster >
@@ -97,7 +97,7 @@ public:
 		getTemperature()
 		{
 			int16_t *rData = reinterpret_cast<int16_t*>(data);
-			int16_t temp = xpcc::fromBigEndian(*rData);
+			int16_t temp = modm::fromBigEndian(*rData);
 			return temp / 256.f;
 		}
 
@@ -142,21 +142,21 @@ public:
 	/// sets address to default of 0x48 (7 alternative addresses up to 0x4F possible).
 	Lm75(Data &data, uint8_t address=0x48);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	configureAlertMode(ThermostatMode mode, AlertPolarity polarity, FaultQueue faults);
 
 	/// Writes the upper limit of the alarm.
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	setUpperLimit(float temperature)
 	{ return setLimitRegister(Register::TemperatureUpperLimit, temperature); }
 
 	/// Writes the lower limit of the alarm.
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	setLowerLimit(float temperature)
 	{ return setLimitRegister(Register::TemperatureLowerLimit, temperature); }
 
 	/// reads the Temperature registers and buffers the results
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	readTemperature();
 
 	inline Data&
@@ -164,7 +164,7 @@ public:
 	{ return data; }
 
 private:
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setLimitRegister(Register reg, float temperature);
 
 	Data &data;
@@ -172,8 +172,8 @@ private:
 	Config1_t config_msb;
 };
 
-}	// namespace xpcc
+}	// namespace modm
 
 #include "lm75_impl.hpp"
 
-#endif // XPCC_LM75_HPP
+#endif // MODM_LM75_HPP

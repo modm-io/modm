@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32_CLOCK_HPP
-#define XPCC_STM32_CLOCK_HPP
+#ifndef MODM_STM32_CLOCK_HPP
+#define MODM_STM32_CLOCK_HPP
 
 /**
  * @ingroup 	{{partname}}
@@ -24,9 +24,9 @@
 #include "../device.hpp"
 #include "common_clock.hpp"
 
-using namespace xpcc::clock;
+using namespace modm::clock;
 
-namespace xpcc
+namespace modm
 {
 
 namespace stm32
@@ -381,24 +381,24 @@ public:
 	static inline uint32_t
 	getCpuFrequency()
 	{
-		return xpcc::clock::fcpu;
+		return modm::clock::fcpu;
 	}
 
 	static inline uint32_t
 	getCpuFrequencykHz()
 	{
-		return xpcc::clock::fcpu_kHz;
+		return modm::clock::fcpu_kHz;
 	}
 
 	static inline uint32_t
 	getCpuFrequencyMHz()
 	{
-		return xpcc::clock::fcpu_MHz;
+		return modm::clock::fcpu_MHz;
 	}
 };
 
 }   // namespace stm32
 
-}   // namespace xpcc
+}   // namespace modm
 
-#endif	//  XPCC_STM32_CLOCK_HPP
+#endif	//  MODM_STM32_CLOCK_HPP

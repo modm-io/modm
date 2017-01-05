@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_VECTOR1_HPP
-#define XPCC_VECTOR1_HPP
+#ifndef MODM_VECTOR1_HPP
+#define MODM_VECTOR1_HPP
 
 #include <cmath>
 #include <cstdlib>
@@ -20,7 +20,7 @@
 
 #include "vector.hpp"
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	Class for handling common vector operations (1D)
@@ -113,4 +113,4 @@ namespace xpcc
 
 #include "vector1_impl.hpp"
 
-#endif // XPCC_VECTOR1_HPP
+#endif // MODM_VECTOR1_HPP

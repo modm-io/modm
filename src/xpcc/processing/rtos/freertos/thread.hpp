@@ -12,10 +12,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FREERTOS_THREAD_HPP
-#define XPCC_FREERTOS_THREAD_HPP
+#ifndef MODM_FREERTOS_THREAD_HPP
+#define MODM_FREERTOS_THREAD_HPP
 
-#ifndef XPCC_RTOS_THREAD_HPP
+#ifndef MODM_RTOS_THREAD_HPP
 #	error "Don't include this file directly, use <modm/processing/rtos/thread.hpp>"
 #endif
 
@@ -75,7 +75,7 @@
  */
 #define	MILLISECONDS		(configTICK_RATE_HZ / 1000.0)
 
-namespace xpcc
+namespace modm
 {
 	namespace rtos
 	{
@@ -101,7 +101,7 @@ namespace xpcc
 		 * If 2.1 happens during 1.2 the first flow for ever brakes, and the
 		 * second - is for ever tired of waiting.
 		 * 
-		 * Use xpcc::rtos::Semaphore if you need to suspend the execution
+		 * Use modm::rtos::Semaphore if you need to suspend the execution
 		 * of a thread.  
          * 
          * Sideeffects: 
@@ -229,4 +229,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_FREERTOS_THREAD_HPP
+#endif // MODM_FREERTOS_THREAD_HPP

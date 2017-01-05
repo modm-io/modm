@@ -14,13 +14,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32_TIMER_{{ id }}_HPP
-#define XPCC_STM32_TIMER_{{ id }}_HPP
+#ifndef MODM_STM32_TIMER_{{ id }}_HPP
+#define MODM_STM32_TIMER_{{ id }}_HPP
 
 #include "type_ids.hpp"
 #include "general_purpose_base.hpp"
 
-namespace xpcc
+namespace modm
 {
 namespace stm32
 {
@@ -29,7 +29,7 @@ namespace stm32
  *
  * Interrupt handler:
  * @code
- * XPCC_ISR(TIM{{ id }})
+ * MODM_ISR(TIM{{ id }})
  * {
  *     Timer{{ id }}::resetInterruptFlags(Timer{{ id }}::...);
  *
@@ -412,6 +412,6 @@ public:
 
 }	// namespace stm32
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif // XPCC_STM32_TIMER_{{ id }}_HPP
+#endif // MODM_STM32_TIMER_{{ id }}_HPP

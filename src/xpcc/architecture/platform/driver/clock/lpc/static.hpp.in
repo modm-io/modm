@@ -13,8 +13,8 @@
 
 %%	import '../generic/static.macros' as static with context
 
-#ifndef XPCC_LPC_STATIC_HPP
-#define XPCC_LPC_STATIC_HPP
+#ifndef MODM_LPC_STATIC_HPP
+#define MODM_LPC_STATIC_HPP
 
 #include <stdint.h>		// uint32_t
 #include "../device.hpp"
@@ -23,9 +23,9 @@
 #include "pll_calculator.hpp"
 #include "clock.hpp"
 
-using namespace xpcc::clock;
+using namespace modm::clock;
 
-namespace xpcc
+namespace modm
 {
 	namespace lpc
 	{
@@ -42,10 +42,10 @@ namespace xpcc
 			enable()
 			{
 				ClockControl::enablePll(Source, p::PllM, p::PllP);
-				xpcc::clock::fcpu     = OutputFrequency;
-				xpcc::clock::fcpu_kHz = OutputFrequency / 1000;
-				xpcc::clock::fcpu_MHz = OutputFrequency / 1000000;
-				xpcc::clock::ns_per_loop = ::round(1000000000.f / OutputFrequency * 4.f);
+				modm::clock::fcpu     = OutputFrequency;
+				modm::clock::fcpu_kHz = OutputFrequency / 1000;
+				modm::clock::fcpu_MHz = OutputFrequency / 1000000;
+				modm::clock::ns_per_loop = ::round(1000000000.f / OutputFrequency * 4.f);
 				return StartupError::None;
 			}
 		};
@@ -74,19 +74,19 @@ namespace xpcc
 										 externalCrystal, systemClock] }
 
 	// Static Clocks/Plls/Osciallators
-{{ static.source(internalClock, "xpcc::lpc") }}
+{{ static.source(internalClock, "modm::lpc") }}
 
-{{ static.source(externalClock, "xpcc::lpc") }}
+{{ static.source(externalClock, "modm::lpc") }}
 
-{{ static.source(externalCrystal, "xpcc::lpc") }}
+{{ static.source(externalCrystal, "modm::lpc") }}
 
-{{ static.pll(pll, "xpcc::lpc") }}
+{{ static.pll(pll, "modm::lpc") }}
 
-{{ static.sink(systemClock, "xpcc::lpc")}}
+{{ static.sink(systemClock, "modm::lpc")}}
 
-{{ static.output(clockOut, "xpcc::lpc")}}
+{{ static.output(clockOut, "modm::lpc")}}
 
 	}
 }
 
-#endif	//  XPCC_LPC_STATIC_HPP
+#endif	//  MODM_LPC_STATIC_HPP

@@ -109,7 +109,7 @@ use_main_stack:
 %% if options["hardfault.log"] == "disabled"
 	/* This sets up and toggles an LED.
 	 * The actual setup and toggle code is delegated to C++ world,
-	 * so that the xpcc GPIO API can be used.
+	 * so that the modm GPIO API can be used.
 	 * This consumes very, very little stack, definitely less than 32B.
 	 *
 	 * This code clobbers R0,R1,R2 & R3, hopefully they were saved on exception entry.
@@ -120,7 +120,7 @@ use_main_stack:
 	ldr r0, =0xfffffff9					// ARMv6 cannot load directly into LR
 	mov lr, r0							// restore link register for GDB
 loop:
-	ldr r0, =_ZN4xpcc5clock4fcpuE		// load xpcc::clock::fcpu
+	ldr r0, =_ZN4modm5clock4fcpuE		// load modm::clock::fcpu
 1:	subs r0, r0, #5						// subtract 5 from value
 	bpl	1b								// loop while positive
 	ldr r0, =_toggleHardFaultHandlerLed

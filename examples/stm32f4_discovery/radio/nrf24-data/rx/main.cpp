@@ -41,18 +41,18 @@
  * PA2  - TXD
  */
 
-#undef	XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::INFO
+#undef	MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::INFO
 
 
 // Create an IODeviceWrapper around the Uart Peripheral we want to use
-xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > loggerDevice;
+modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
 
 // Set all four logger streams to use the UART
-xpcc::log::Logger xpcc::log::debug(loggerDevice);
-xpcc::log::Logger xpcc::log::info(loggerDevice);
-xpcc::log::Logger xpcc::log::warning(loggerDevice);
-xpcc::log::Logger xpcc::log::error(loggerDevice);
+modm::log::Logger modm::log::debug(loggerDevice);
+modm::log::Logger modm::log::info(loggerDevice);
+modm::log::Logger modm::log::warning(loggerDevice);
+modm::log::Logger modm::log::error(loggerDevice);
 
 /* nrf24 interface */
 typedef SpiMaster2      Spi;
@@ -60,9 +60,9 @@ typedef GpioOutputE12   Csn;
 typedef GpioOutputE11   Ce;
 
 /* Setup and connect layers */
-typedef xpcc::Nrf24Phy<Spi, Csn, Ce> nrf24phy;
-typedef xpcc::Nrf24Config<nrf24phy> nrf24config;
-typedef xpcc::Nrf24Data<nrf24phy> nrf24data;
+typedef modm::Nrf24Phy<Spi, Csn, Ce> nrf24phy;
+typedef modm::Nrf24Config<nrf24phy> nrf24config;
+typedef modm::Nrf24Data<nrf24phy> nrf24data;
 
 int
 main()
@@ -70,8 +70,8 @@ main()
 	Board::initialize();
 
 	// Setup GPIOs
-	Csn::setOutput(xpcc::Gpio::High);
-	Ce::setOutput(xpcc::Gpio::Low);
+	Csn::setOutput(modm::Gpio::High);
+	Ce::setOutput(modm::Gpio::Low);
 
 	// Enable SPI 2
 	GpioOutputB15::connect(Spi::Mosi);
@@ -84,10 +84,10 @@ main()
 	GpioInputA3::connect(Usart2::Rx, Gpio::InputType::PullUp);
 	Usart2::initialize<Board::systemClock, 115200>(12);
 
-	XPCC_LOG_INFO << "Hello from nrf24-data-rx example" << xpcc::endl;
+	MODM_LOG_INFO << "Hello from nrf24-data-rx example" << modm::endl;
 
 	// Send alive message every 5 seconds
-	xpcc::PeriodicTimer aliveTimer(5000);
+	modm::PeriodicTimer aliveTimer(5000);
 
 	// Initialize physical layer with payload size of 6 bytes, this gives us
 	// a payload size of 4 bytes in the data layer, as the header takes 2 bytes.
@@ -120,8 +120,8 @@ main()
 	{
 		if (nrf24data::getPacket(packet))
 		{
-			XPCC_LOG_INFO.printf("Received packet from 0x%02x\n", packet.src);
-			XPCC_LOG_INFO.printf("Data: %02x %02x %02x %02x\n",
+			MODM_LOG_INFO.printf("Received packet from 0x%02x\n", packet.src);
+			MODM_LOG_INFO.printf("Data: %02x %02x %02x %02x\n",
 					packet.payload.data[3],
 					packet.payload.data[2],
 					packet.payload.data[1],
@@ -130,7 +130,7 @@ main()
 
 		if(aliveTimer.execute())
 		{
-			XPCC_LOG_INFO << "Rx is still alive" << xpcc::endl;
+			MODM_LOG_INFO << "Rx is still alive" << modm::endl;
 		}
 
 		nrf24data::update();

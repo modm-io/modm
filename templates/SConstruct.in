@@ -1,7 +1,7 @@
 # WARNING: This file is generated automatically from templates/SConstruct.in
 # do not edit!
 
-# path to the xpcc root directory
-xpccpath = '${rootpath}'
-# execute the xpcc basic
-execfile(xpccpath + '/scons/SConstruct')
+# path to the modm root directory
+modmpath = '${rootpath}'
+# execute the modm basic
+execfile(modmpath + '/scons/SConstruct')

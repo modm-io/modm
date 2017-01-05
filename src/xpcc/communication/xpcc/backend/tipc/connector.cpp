@@ -14,8 +14,8 @@
 #include "connector.hpp"
 #include <modm/debug/logger.hpp>
 
-#undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::WARNING
+#undef  MODM_LOG_LEVEL
+#define MODM_LOG_LEVEL modm::log::WARNING
 
 // ----------------------------------------------------------------------------
 xpcc::TipcConnector::TipcConnector() :
@@ -51,10 +51,10 @@ xpcc::TipcConnector::getPacketHeader() const
 }
 
 // ----------------------------------------------------------------------------
-const xpcc::SmartPointer
+const modm::SmartPointer
 xpcc::TipcConnector::getPacketPayload() const
 {
-	SmartPointer payload( this->receiver.getPacket().getSize() - sizeof(xpcc::Header) );
+	modm::SmartPointer payload( this->receiver.getPacket().getSize() - sizeof(xpcc::Header) );
 	if( payload.getSize() > 0 ) {
 		memcpy(
 				payload.getPointer(),
@@ -73,14 +73,14 @@ xpcc::TipcConnector::dropPacket()
 
 // ----------------------------------------------------------------------------
 void
-xpcc::TipcConnector::sendPacket(const xpcc::Header &header, SmartPointer payload)
+xpcc::TipcConnector::sendPacket(const xpcc::Header &header, modm::SmartPointer payload)
 {
-//	XPCC_LOG_DEBUG << XPCC_FILE_INFO
+//	MODM_LOG_DEBUG << MODM_FILE_INFO
 //			<< " payload size=" << payload.getSize()
 //			<< " payload=" << payload
-//			<< xpcc::flush;
+//			<< modm::flush;
 
-	SmartPointer combinedPayload( sizeof(xpcc::Header) + payload.getSize() );
+	modm::SmartPointer combinedPayload( sizeof(xpcc::Header) + payload.getSize() );
 
 	memcpy(	combinedPayload.getPointer(), &header, sizeof(xpcc::Header) );
 

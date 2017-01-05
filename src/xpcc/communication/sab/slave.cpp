@@ -14,29 +14,33 @@
 
 #include "slave.hpp"
 
-xpcc::sab::Response::Response(Transmitter *parent) :
+modm::sab::Transmitter::~Transmitter()
+{
+}
+
+modm::sab::Response::Response(Transmitter *parent) :
 	transmitter(parent), triggered(false)
 {
 }
 
 void
-xpcc::sab::Response::error(uint8_t errorCode)
+modm::sab::Response::error(uint8_t errorCode)
 {
 	triggered = true;
-	
+
 	uint8_t tempError = errorCode;
 	transmitter->send(false, &tempError, 1);
 }
 
 void
-xpcc::sab::Response::send()
+modm::sab::Response::send()
 {
 	triggered = true;
 	transmitter->send(true, 0, 0);
 }
 
 void
-xpcc::sab::Response::send(const void *payload, std::size_t length)
+modm::sab::Response::send(const void *payload, std::size_t length)
 {
 	triggered = true;
 	transmitter->send(true, payload, length);

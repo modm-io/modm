@@ -56,7 +56,7 @@ namespace unittest
 		 *					to generate messages
 		 */
 		void
-		nextTestSuite(xpcc::accessor::Flash<char> name) const;
+		nextTestSuite(modm::accessor::Flash<char> name) const;
 	
 	private:
 		Controller();

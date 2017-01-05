@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_INTERFACE_UART_HPP
-#define XPCC_INTERFACE_UART_HPP
+#ifndef MODM_INTERFACE_UART_HPP
+#define MODM_INTERFACE_UART_HPP
 
 #include <modm/architecture/interface.hpp>
 
@@ -21,7 +21,7 @@
  * @defgroup	uart	Universal Asynchronous Receiver/Transmitter (UART)
  */
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -32,7 +32,7 @@ namespace xpcc
  * @author	Niklas Hauser
  * @ingroup	uart
  */
-class Uart : public ::xpcc::Peripheral
+class Uart : public ::modm::Peripheral
 {
 public:
 	/**
@@ -162,6 +162,6 @@ public:
 #endif
 };
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif // XPCC_INTERFACE_UART_HPP
+#endif // MODM_INTERFACE_UART_HPP

@@ -12,13 +12,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ADXL345_HPP
+#ifndef MODM_ADXL345_HPP
 #	error  "Don't include this file directly, use 'adxl345.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
-xpcc::Adxl345<I2cMaster>::Adxl345(uint8_t* data, uint8_t address)
+modm::Adxl345<I2cMaster>::Adxl345(uint8_t* data, uint8_t address)
 :	I2cWriteReadTransaction(address), status(0), data(data)
 {
 	configureWriteRead(buffer, 0, data, 0);
@@ -26,7 +26,7 @@ xpcc::Adxl345<I2cMaster>::Adxl345(uint8_t* data, uint8_t address)
 
 template < typename I2cMaster >
 bool
-xpcc::Adxl345<I2cMaster>::configure(adxl345::Bandwidth bandwidth, bool streamMode, bool enableInterrupt)
+modm::Adxl345<I2cMaster>::configure(adxl345::Bandwidth bandwidth, bool streamMode, bool enableInterrupt)
 {
 	bool ok = writeRegister(adxl345::REGISTER_POWER_CTL, adxl345::POWER_MEASURE);
 	ok &= writeRegister(adxl345::REGISTER_DATA_FORMAT, adxl345::DATAFORMAT_FULL_RES);
@@ -38,28 +38,28 @@ xpcc::Adxl345<I2cMaster>::configure(adxl345::Bandwidth bandwidth, bool streamMod
 
 template < typename I2cMaster >
 void
-xpcc::Adxl345<I2cMaster>::readAccelerometer()
+modm::Adxl345<I2cMaster>::readAccelerometer()
 {
 	status |= READ_ACCELEROMETER_PENDING;
 }
 
 template < typename I2cMaster >
 bool
-xpcc::Adxl345<I2cMaster>::isDataReady()
+modm::Adxl345<I2cMaster>::isDataReady()
 {
 	return readRegister(adxl345::REGISTER_INT_SOURCE) & adxl345::INTERRUPT_DATA_READY;
 }
 
 template < typename I2cMaster >
 bool
-xpcc::Adxl345<I2cMaster>::isNewDataAvailable()
+modm::Adxl345<I2cMaster>::isNewDataAvailable()
 {
 	return status & NEW_ACCELEROMETER_DATA;
 }
 
 template < typename I2cMaster >
 uint8_t*
-xpcc::Adxl345<I2cMaster>::getData()
+modm::Adxl345<I2cMaster>::getData()
 {
 	status &= ~NEW_ACCELEROMETER_DATA;
 	return data;
@@ -67,10 +67,10 @@ xpcc::Adxl345<I2cMaster>::getData()
 
 template < typename I2cMaster >
 void
-xpcc::Adxl345<I2cMaster>::update()
+modm::Adxl345<I2cMaster>::update()
 {
 	if (status & READ_ACCELEROMETER_RUNNING &&
-		getAdapterState() == xpcc::I2c::AdapterState::Idle) {
+		getAdapterState() == modm::I2c::AdapterState::Idle) {
 		status &= ~READ_ACCELEROMETER_RUNNING;
 		status |= NEW_ACCELEROMETER_DATA;
 	}
@@ -89,9 +89,9 @@ xpcc::Adxl345<I2cMaster>::update()
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 bool
-xpcc::Adxl345<I2cMaster>::writeRegister(adxl345::Register reg, uint8_t value)
+modm::Adxl345<I2cMaster>::writeRegister(adxl345::Register reg, uint8_t value)
 {
-	while (getAdapterState() == xpcc::I2c::AdapterState::Busy)
+	while (getAdapterState() == modm::I2c::AdapterState::Busy)
 		;
 	buffer[0] = reg;
 	buffer[1] = value;
@@ -102,9 +102,9 @@ xpcc::Adxl345<I2cMaster>::writeRegister(adxl345::Register reg, uint8_t value)
 
 template < typename I2cMaster >
 uint8_t
-xpcc::Adxl345<I2cMaster>::readRegister(adxl345::Register reg)
+modm::Adxl345<I2cMaster>::readRegister(adxl345::Register reg)
 {
-	while (getAdapterState() == xpcc::I2c::AdapterState::Busy)
+	while (getAdapterState() == modm::I2c::AdapterState::Busy)
 		;
 	buffer[0] = reg;
 	configureWriteRead(buffer, 1, buffer, 1);

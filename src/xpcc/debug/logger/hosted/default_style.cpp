@@ -20,9 +20,9 @@
 #include <modm/architecture/utils.hpp>
 #include <modm/architecture/platform/driver/uart/hosted/terminal.hpp>
 
-static xpcc::pc::Terminal device;
+static modm::pc::Terminal device;
 
-namespace xpcc
+namespace modm
 {
 	namespace log
 	{
@@ -30,7 +30,7 @@ namespace xpcc
 		class Wrapper : public StyleWrapper< Prefix< T, StdColour<TEXT, BACKGROUND > > >
 		{
 			public:
-				Wrapper(const T& str, ::xpcc::IODevice& device) :
+				Wrapper(const T& str, ::modm::IODevice& device) :
 					StyleWrapper< Prefix< T, StdColour<TEXT, BACKGROUND > > > (
 							Prefix< T, StdColour<TEXT, BACKGROUND > >(
 									str,
@@ -40,15 +40,15 @@ namespace xpcc
 		};
 
 		static Wrapper< char[10], TURQUOISE, NONE > debugWrapper("Debug:   ", device);
-		Logger xpcc_weak debug(debugWrapper);
+		Logger modm_weak debug(debugWrapper);
 
 		static Wrapper< char[10], GREEN, NONE > debugInfo("Info:    ", device);
-		Logger xpcc_weak info(debugInfo);
+		Logger modm_weak info(debugInfo);
 
 		static Wrapper< char[10], YELLOW, NONE > warningInfo("Warning: ", device);
-		Logger xpcc_weak warning(warningInfo);
+		Logger modm_weak warning(warningInfo);
 
 		static Wrapper< char[10], RED, NONE > errorInfo("Error:   ", device);
-		Logger xpcc_weak error(errorInfo);
+		Logger modm_weak error(errorInfo);
 	}
 }

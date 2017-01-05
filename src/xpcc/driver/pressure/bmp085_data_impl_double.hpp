@@ -14,14 +14,14 @@
 
 #include <modm/debug/logger/logger.hpp>
 
-#ifndef XPCC_BMP085_DATA_HPP
+#ifndef MODM_BMP085_DATA_HPP
 #	error  "Don't include this file directly, use 'bmp180_data.hpp' instead!"
 #endif
 
-#undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::DISABLED
+#undef  MODM_LOG_LEVEL
+#define MODM_LOG_LEVEL modm::log::DISABLED
 
-namespace xpcc {
+namespace modm {
 
 namespace bmp085data {
 
@@ -50,22 +50,22 @@ DataDouble::calculateCalibratedTemperature()
 		p1 = double(1.0) - double(7357.0) * ::pow(2, -20);
 		p2 = double(3038.0) * double(100.0) * ::pow(2, -36);
 
-		XPCC_LOG_DEBUG.printf("c3 = %9.5f\n", c3);
-		XPCC_LOG_DEBUG.printf("c4 = %9.5f\n", c4);
-		XPCC_LOG_DEBUG.printf("b1 = %9.5f\n", b1);
-		XPCC_LOG_DEBUG.printf("c5 = %9.5f\n", c5);
-		XPCC_LOG_DEBUG.printf("c6 = %9.5f\n", c6);
-		XPCC_LOG_DEBUG.printf("mc = %9.5f\n", mc);
-		XPCC_LOG_DEBUG.printf("md = %9.5f\n", md);
-		XPCC_LOG_DEBUG.printf("x0 = %9.5f\n", x0);
-		XPCC_LOG_DEBUG.printf("x1 = %9.5f\n", x1);
-		XPCC_LOG_DEBUG.printf("x2 = %9.5f\n", x2);
-		XPCC_LOG_DEBUG.printf("y00 = %9.5f\n", y00);
-		XPCC_LOG_DEBUG.printf("y11 = %9.5f\n", y11);
-		XPCC_LOG_DEBUG.printf("y2 = %9.5f\n", y2);
-		XPCC_LOG_DEBUG.printf("p0 = %9.5f\n", p0);
-		XPCC_LOG_DEBUG.printf("p1 = %9.5f\n", p1);
-		XPCC_LOG_DEBUG.printf("p2 = %9.5f\n", p2);
+		MODM_LOG_DEBUG.printf("c3 = %9.5f\n", c3);
+		MODM_LOG_DEBUG.printf("c4 = %9.5f\n", c4);
+		MODM_LOG_DEBUG.printf("b1 = %9.5f\n", b1);
+		MODM_LOG_DEBUG.printf("c5 = %9.5f\n", c5);
+		MODM_LOG_DEBUG.printf("c6 = %9.5f\n", c6);
+		MODM_LOG_DEBUG.printf("mc = %9.5f\n", mc);
+		MODM_LOG_DEBUG.printf("md = %9.5f\n", md);
+		MODM_LOG_DEBUG.printf("x0 = %9.5f\n", x0);
+		MODM_LOG_DEBUG.printf("x1 = %9.5f\n", x1);
+		MODM_LOG_DEBUG.printf("x2 = %9.5f\n", x2);
+		MODM_LOG_DEBUG.printf("y00 = %9.5f\n", y00);
+		MODM_LOG_DEBUG.printf("y11 = %9.5f\n", y11);
+		MODM_LOG_DEBUG.printf("y2 = %9.5f\n", y2);
+		MODM_LOG_DEBUG.printf("p0 = %9.5f\n", p0);
+		MODM_LOG_DEBUG.printf("p1 = %9.5f\n", p1);
+		MODM_LOG_DEBUG.printf("p2 = %9.5f\n", p2);
 
 		meta |= CALIBRATION_CALCULATED;
 	}
@@ -76,7 +76,7 @@ DataDouble::calculateCalibratedTemperature()
 	double a = c5 * (tu - c6);
 	calibratedTemperatureDouble = (a + (mc / (a + md)));
 
-	XPCC_LOG_DEBUG.printf("T dp = %4.2f\n", calibratedTemperatureDouble);
+	MODM_LOG_DEBUG.printf("T dp = %4.2f\n", calibratedTemperatureDouble);
 
 	meta |= TEMPERATURE_CALCULATED;
 }
@@ -84,13 +84,13 @@ DataDouble::calculateCalibratedTemperature()
 void
 DataDouble::calculateCalibratedPressure()
 {
-	XPCC_LOG_DEBUG.printf("raw[2:5] = %02x %02x %02x\n", raw[2], raw[3], raw[4]);
+	MODM_LOG_DEBUG.printf("raw[2:5] = %02x %02x %02x\n", raw[2], raw[3], raw[4]);
 
 	uint32_t up = ( (uint32_t(raw[2]) << 16) | (uint16_t(raw[3]) << 8) | raw[4] );
-	XPCC_LOG_DEBUG.printf("up = %9d\n", up);
+	MODM_LOG_DEBUG.printf("up = %9d\n", up);
 
 	double pu = up / double(256.0);
-	XPCC_LOG_DEBUG.printf("pu = %9.5f\n", pu);
+	MODM_LOG_DEBUG.printf("pu = %9.5f\n", pu);
 
 	calculateCalibratedTemperature();
 
@@ -99,14 +99,14 @@ DataDouble::calculateCalibratedPressure()
 	double y = (y2 * pow(s, 2)) + (y11 * s) + y00;
 	double z = (pu - x) / y;
 
-	XPCC_LOG_DEBUG.printf("s = %9.5f\n", s);
-	XPCC_LOG_DEBUG.printf("x = %9.5f\n", x);
-	XPCC_LOG_DEBUG.printf("y = %9.5f\n", y);
-	XPCC_LOG_DEBUG.printf("z = %9.5f\n", z);
+	MODM_LOG_DEBUG.printf("s = %9.5f\n", s);
+	MODM_LOG_DEBUG.printf("x = %9.5f\n", x);
+	MODM_LOG_DEBUG.printf("y = %9.5f\n", y);
+	MODM_LOG_DEBUG.printf("z = %9.5f\n", z);
 
 	calibratedPressureDouble = (p2 * pow(z,2)) + (p1 * z) + p0;
 
-	XPCC_LOG_DEBUG.printf("calibratedPressureDouble = %9.5f\n", calibratedPressureDouble);
+	MODM_LOG_DEBUG.printf("calibratedPressureDouble = %9.5f\n", calibratedPressureDouble);
 
 	meta |= PRESSURE_CALCULATED;
 }
@@ -151,4 +151,4 @@ DataDouble::getPressure()
 
 } // bmp085data namespace
 
-} // xpcc namespace
+} // modm namespace

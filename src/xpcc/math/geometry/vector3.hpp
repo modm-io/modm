@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_VECTOR3_HPP
-#define XPCC_VECTOR3_HPP
+#ifndef MODM_VECTOR3_HPP
+#define MODM_VECTOR3_HPP
 
 #include <stdint.h>
 #include "vector.hpp"
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	Class for handling common vector operations (3D)
@@ -216,4 +216,4 @@ namespace xpcc
 
 #include "vector3_impl.hpp"
 
-#endif // XPCC_VECTOR3_HPP
+#endif // MODM_VECTOR3_HPP

@@ -9,19 +9,19 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_RAY_2D_HPP
+#ifndef MODM_RAY_2D_HPP
 	#error	"Don't include this file directly, use 'ray_2d.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Ray2D<T>::Ray2D() :
+modm::Ray2D<T>::Ray2D() :
 	basePoint(), direction()
 {
 }
 
 template<typename T>
-xpcc::Ray2D<T>::Ray2D(const Vector<T, 2>& start, const Vector<T, 2>& direction) :
+modm::Ray2D<T>::Ray2D(const Vector<T, 2>& start, const Vector<T, 2>& direction) :
 	basePoint(start), direction(direction)
 {
 }
@@ -29,29 +29,29 @@ xpcc::Ray2D<T>::Ray2D(const Vector<T, 2>& start, const Vector<T, 2>& direction) 
 // ----------------------------------------------------------------------------
 template <typename T>
 inline void
-xpcc::Ray2D<T>::setStartPoint(const Vector<T, 2>& point)
+modm::Ray2D<T>::setStartPoint(const Vector<T, 2>& point)
 {
 	this->basePoint = point;
 }
 
 template <typename T>
-inline const xpcc::Vector<T, 2>&
-xpcc::Ray2D<T>::getStartPoint() const
+inline const modm::Vector<T, 2>&
+modm::Ray2D<T>::getStartPoint() const
 {
 	return this->basePoint;
 }
 
 template <typename T>
 inline void
-xpcc::Ray2D<T>::setDirectionVector(const Vector<T, 2>& direction)
+modm::Ray2D<T>::setDirectionVector(const Vector<T, 2>& direction)
 {
 	this->direction = direction;
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
-const xpcc::Vector<T, 2>&
-xpcc::Ray2D<T>::getDirectionVector() const
+const modm::Vector<T, 2>&
+modm::Ray2D<T>::getDirectionVector() const
 {
 	return direction;
 }
@@ -59,7 +59,7 @@ xpcc::Ray2D<T>::getDirectionVector() const
 //// ----------------------------------------------------------------------------
 //template<typename T>
 //void
-//xpcc::Ray2D<T>::translate(const Vector<T, 2>& vector)
+//modm::Ray2D<T>::translate(const Vector<T, 2>& vector)
 //{
 //	this->startPoint.translate(vector);
 //	this->endPoint.translate(vector);
@@ -68,7 +68,7 @@ xpcc::Ray2D<T>::getDirectionVector() const
 //// ----------------------------------------------------------------------------
 //template<typename T>
 //T
-//xpcc::Ray2D<T>::getLength() const
+//modm::Ray2D<T>::getLength() const
 //{
 //	Vector<T, 2> directionVector = this->endPoint - this->startPoint;
 //	
@@ -78,7 +78,7 @@ xpcc::Ray2D<T>::getDirectionVector() const
 //// ----------------------------------------------------------------------------
 //template<typename T>
 //const T
-//xpcc::Ray2D<T>::getDistanceTo(const Vector<T, 2>& point) const
+//modm::Ray2D<T>::getDistanceTo(const Vector<T, 2>& point) const
 //{
 //	// vector from the base point of the line to the new point
 //	Vector<T, 2> startToPoint = point - this->startPoint;
@@ -112,8 +112,8 @@ xpcc::Ray2D<T>::getDirectionVector() const
 //
 //// ----------------------------------------------------------------------------
 //template<typename T>
-//const xpcc::Vector<T, 2>
-//xpcc::Ray2D<T>::getClosestPointTo(const Vector<T, 2>& point) const
+//const modm::Vector<T, 2>
+//modm::Ray2D<T>::getClosestPointTo(const Vector<T, 2>& point) const
 //{
 //	// vector from the base point of the line to the new point
 //	Vector<T, 2> startToPoint = point - this->startPoint;
@@ -142,7 +142,7 @@ xpcc::Ray2D<T>::getDirectionVector() const
 // ----------------------------------------------------------------------------
 template<typename T>
 bool
-xpcc::Ray2D<T>::intersects(const LineSegment2D<T>& line) const
+modm::Ray2D<T>::intersects(const LineSegment2D<T>& line) const
 {
 	// vector from the base point of the line to the new point
 	Vector<T, 2> startToPoint = line.getStartPoint() - this->basePoint;
@@ -167,7 +167,7 @@ xpcc::Ray2D<T>::intersects(const LineSegment2D<T>& line) const
 //// ----------------------------------------------------------------------------
 //template<typename T>
 //bool
-//xpcc::Ray2D<T>::intersects(const Polygon2D<T>& polygon) const
+//modm::Ray2D<T>::intersects(const Polygon2D<T>& polygon) const
 //{
 //	return polygon.intersects(*this);
 //	''
@@ -176,12 +176,12 @@ xpcc::Ray2D<T>::intersects(const LineSegment2D<T>& line) const
 //// ----------------------------------------------------------------------------
 //template <typename T>
 //bool
-//xpcc::Ray2D<T>::getIntersections(const Ray2D& other,
+//modm::Ray2D<T>::getIntersections(const Ray2D& other,
 //		PointSet2D<T>& intersectionPoints) const
 //{
-//	xpcc::Vector<T, 2> ownDirectionVector = this->endPoint - this->startPoint;
-//	xpcc::Vector<T, 2> otherDirectionVector = other.endPoint - other.startPoint;
-//	xpcc::Vector<T, 2> connectionVector = this->startPoint - other.startPoint;
+//	modm::Vector<T, 2> ownDirectionVector = this->endPoint - this->startPoint;
+//	modm::Vector<T, 2> otherDirectionVector = other.endPoint - other.startPoint;
+//	modm::Vector<T, 2> connectionVector = this->startPoint - other.startPoint;
 //	
 //	WideType d = ownDirectionVector.cross(otherDirectionVector);
 //	if (d)
@@ -207,14 +207,14 @@ xpcc::Ray2D<T>::intersects(const LineSegment2D<T>& line) const
 //// ----------------------------------------------------------------------------
 //template <typename T>
 //bool
-//xpcc::Ray2D<T>::getIntersections(const Circle2D<T>& circle,
+//modm::Ray2D<T>::getIntersections(const Circle2D<T>& circle,
 //		PointSet2D<T>& intersectionPoints) const
 //{
 //	// Direction vector of line, from start to end
-//	xpcc::Vector<T, 2> directionVector = this->endPoint - this->startPoint;
+//	modm::Vector<T, 2> directionVector = this->endPoint - this->startPoint;
 //	
 //	// vector from the center of the circle to line start
-//	xpcc::Vector<T, 2> circleToLine = this->startPoint - circle.center;
+//	modm::Vector<T, 2> circleToLine = this->startPoint - circle.center;
 //	
 //	WideType a = directionVector.dot(directionVector);
 //	WideType b = 2 * circleToLine.dot(directionVector);
@@ -258,7 +258,7 @@ xpcc::Ray2D<T>::intersects(const LineSegment2D<T>& line) const
 //// ----------------------------------------------------------------------------
 //template <typename T>
 //bool
-//xpcc::Ray2D<T>::getIntersections(const Polygon2D<T>& polygon,
+//modm::Ray2D<T>::getIntersections(const Polygon2D<T>& polygon,
 //		PointSet2D<T>& intersectionPoints) const
 //{
 //	// invoke intersection method of the polygon
@@ -268,7 +268,7 @@ xpcc::Ray2D<T>::intersects(const LineSegment2D<T>& line) const
 // ----------------------------------------------------------------------------
 template<typename T>
 bool
-xpcc::Ray2D<T>::ccw(const xpcc::Vector<T, 2>& point)
+modm::Ray2D<T>::ccw(const modm::Vector<T, 2>& point)
 {
 	// vector from the base point of the line to the new point
 	Vector<T, 2> startToPoint = point - this->basePoint;
@@ -282,7 +282,7 @@ xpcc::Ray2D<T>::ccw(const xpcc::Vector<T, 2>& point)
 // ----------------------------------------------------------------------------
 template<typename T>
 bool
-xpcc::Ray2D<T>::operator == (const Ray2D &other) const
+modm::Ray2D<T>::operator == (const Ray2D &other) const
 {
 	return ((this->basePoint == other.basePoint) &&
 			(this->direction == other.direction));
@@ -290,7 +290,7 @@ xpcc::Ray2D<T>::operator == (const Ray2D &other) const
 
 template<typename T>
 bool
-xpcc::Ray2D<T>::operator != (const Ray2D &other) const
+modm::Ray2D<T>::operator != (const Ray2D &other) const
 {
 	return ((this->basePoint != other.basePoint) ||
 			(this->direction != other.direction));

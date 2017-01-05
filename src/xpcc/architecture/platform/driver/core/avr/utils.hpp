@@ -12,14 +12,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ATXMEGA_UTILS_HPP
-#define XPCC_ATXMEGA_UTILS_HPP
+#ifndef MODM_ATXMEGA_UTILS_HPP
+#define MODM_ATXMEGA_UTILS_HPP
 
 #include <stddef.h>		// for offsetof()
 #include <modm/architecture/utils.hpp>
 #include "../../../device.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 namespace xmega
@@ -38,7 +38,7 @@ namespace xmega
  *
  * @ingroup	xmega
  */
-xpcc_always_inline static void
+modm_always_inline static void
 changeProtectedRegister(volatile uint8_t *address, uint8_t value)
 {
 #ifdef RAMPZ
@@ -74,7 +74,7 @@ readCalibrationByte(uint8_t index);
  *
  * @ingroup	xmega
  */
-xpcc_always_inline static void
+modm_always_inline static void
 softwareReset()
 {
 	changeProtectedRegister(&RST_CTRL, RST_SWRST_bm);
@@ -82,6 +82,6 @@ softwareReset()
 
 }	// namespace xmega
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif	// XPCC_ATXMEGA_UTILS_HPP
+#endif	// MODM_ATXMEGA_UTILS_HPP

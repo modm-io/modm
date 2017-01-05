@@ -14,6 +14,6 @@
 #include "adc_interrupt_{{ id }}.hpp"
 
 // ----------------------------------------------------------------------------
-xpcc::stm32::AdcInterrupt{{ id }}::Handler
-xpcc::stm32::AdcInterrupt{{ id }}::handler(xpcc::dummy);
+modm::stm32::AdcInterrupt{{ id }}::Handler
+modm::stm32::AdcInterrupt{{ id }}::handler(modm::dummy);
 

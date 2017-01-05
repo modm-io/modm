@@ -15,12 +15,12 @@
 #include <modm/processing/protothread.hpp>
 #include <modm/processing/timer.hpp>
 
-using namespace xpcc::atmega;
+using namespace modm::atmega;
 
 typedef GpioOutputB0 LedGreen;
 typedef GpioOutputB1 LedRed;
 
-class BlinkingLightGreen : public xpcc::pt::Protothread
+class BlinkingLightGreen : public modm::pt::Protothread
 {
 public:
 	bool
@@ -49,10 +49,10 @@ public:
 	}
 
 private:
-	xpcc::ShortTimeout timeout;
+	modm::ShortTimeout timeout;
 };
 
-class BlinkingLightRed : public xpcc::pt::Protothread
+class BlinkingLightRed : public modm::pt::Protothread
 {
 public:
 	bool
@@ -91,13 +91,13 @@ public:
 	}
 
 private:
-	xpcc::ShortTimeout timeout;
+	modm::ShortTimeout timeout;
 };
 
 // timer interrupt routine
-XPCC_ISR(TIMER2_COMPA)
+MODM_ISR(TIMER2_COMPA)
 {
-	xpcc::Clock::increment();
+	modm::Clock::increment();
 }
 
 int

@@ -19,7 +19,7 @@
 void
 SCurveGeneratorTest::testConstructor()
 {
-	xpcc::SCurveGenerator<int16_t> generator;
+	modm::SCurveGenerator<int16_t> generator;
 	
 	generator.setTarget(200);
 	

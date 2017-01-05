@@ -26,33 +26,33 @@ This is especially true for sequence containers, which offer different
 trade-offs in complexity between inserting/removing elements and accessing
 them.
 
-xpcc::Stack and xpcc::Queue are implemented as container adaptors. Container
+modm::Stack and modm::Queue are implemented as container adaptors. Container
 adaptors are not full container classes, but classes that provide a specific interface
-relying on an object of one of the container classes (such as xpcc::BoundedDeque or
-xpcc::LinkedList) to handle the elements. The underlying container is encapsulated
+relying on an object of one of the container classes (such as modm::BoundedDeque or
+modm::LinkedList) to handle the elements. The underlying container is encapsulated
 in such a way that its elements are accessed by the members of the container
 class independently of the underlying container class used.
 
 Sequence containers:
- - xpcc::DynamicArray
- - xpcc::LinkedList
- - xpcc::DoublyLinkedList
- - xpcc::BoundedDeque
+ - modm::DynamicArray
+ - modm::LinkedList
+ - modm::DoublyLinkedList
+ - modm::BoundedDeque
 
 Container adaptors:
- - xpcc::Queue
- - xpcc::Stack
+ - modm::Queue
+ - modm::Stack
 
- - xpcc::BoundedStack
- - xpcc::BoundedQueue
+ - modm::BoundedStack
+ - modm::BoundedQueue
 
 Other:
- - xpcc::SmartPointer
- - xpcc::Pair
+ - modm::SmartPointer
+ - modm::Pair
 
 Two special containers worth mentioning hide in \ref atomic "atomic" section:
- - xpcc::atomic::Queue
- - xpcc::atomic::Container
+ - modm::atomic::Queue
+ - modm::atomic::Container
 
 The first is a simple, interrupt-save queue (but only for the AVRs).
 Whenever you need an  to exchange data between a interrupt routine and

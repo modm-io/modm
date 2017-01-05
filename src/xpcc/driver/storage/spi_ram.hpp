@@ -11,12 +11,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SPI_RAM_HPP
-#define XPCC_SPI_RAM_HPP
+#ifndef MODM_SPI_RAM_HPP
+#define MODM_SPI_RAM_HPP
 
 #include <stdint.h>
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	256kBit (64kB) Serial SRAM
@@ -164,4 +164,4 @@ namespace xpcc
 
 #include "spi_ram_impl.hpp"
 
-#endif // XPCC_SPI_RAM_HPP
+#endif // MODM_SPI_RAM_HPP

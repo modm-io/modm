@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_REGISTER_HPP
-#define XPCC_REGISTER_HPP
+#ifndef MODM_REGISTER_HPP
+#define MODM_REGISTER_HPP
 
 #include <stdint.h>
 #include <modm/utils/bit_constants.hpp>
@@ -66,9 +66,9 @@
  *     DEL1 = Bit2,
  *     DEL0 = Bit1,
  * };
- * XPCC_FLAGS8(Control);
+ * MODM_FLAGS8(Control);
  * // expands to
- * // typedef xpcc::Flags8< Control >  Control_t;
+ * // typedef modm::Flags8< Control >  Control_t;
  * // and some enum operator overloading magic
  * @endcode
  *
@@ -101,7 +101,7 @@
  *     DIS = Bit4,
  *     HS = Bit3,
  * };
- * XPCC_FLAGS8(Control2);
+ * MODM_FLAGS8(Control2);
  *
  * auto control = Control::EN | Control2::HS; // compile error
  * @endcode
@@ -180,13 +180,13 @@
  * uint8_t delay = Delay_t::get(control);
  * @endcode
  *
- * @see	[Typesafe Register Access in C++](http://blog.xpcc.io/2015/02/25/typesafe-register-access-in-c++)
+ * @see	[Typesafe Register Access in C++](http://blog.modm.io/2015/02/25/typesafe-register-access-in-c++)
  * 		for a more detailed background on this implementation.
  *
  * @author	Niklas Hauser
  */
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -304,7 +304,7 @@ using Register32 = Register<uint32_t>;	///< Register class with 32-bit wide unde
  * @author	Niklas Hauser
  */
 template < typename Enum, typename T >
-struct FlagsOperators : public ::xpcc::Register<T>
+struct FlagsOperators : public ::modm::Register<T>
 {
 	/// @cond
 	typedef T UnderlyingType;
@@ -430,7 +430,7 @@ struct FlagsOperators : public ::xpcc::Register<T>
 	friend constexpr bool operator!=(Enum const &a, FlagsOperators const &b);
 	/// @}
 #endif
-} xpcc_packed;
+} modm_packed;
 
 /**
  * Class for operating on a register.
@@ -443,33 +443,33 @@ struct FlagsOperators : public ::xpcc::Register<T>
  * and operation can take place at compile time for efficiency.
  *
  * Unfortunately, you cannot typedef this class directly, you must use
- * the `XPCC_FLAGS` macro, which add the required external operator overloads
+ * the `MODM_FLAGS` macro, which add the required external operator overloads
  * for `Enum OP Enum`.
- * The macro `XPCC_FLAGS8(Enum)` expands as follows:
+ * The macro `MODM_FLAGS8(Enum)` expands as follows:
  * @code
- * typedef xpcc::Flags8<Enum> Enum_t;
- * XPCC_INT_TYPE_FLAGS(Enum_t);
+ * typedef modm::Flags8<Enum> Enum_t;
+ * MODM_INT_TYPE_FLAGS(Enum_t);
  * @endcode
  *
- * The `XPCC_FLAGS` macro by default only works in a class or struct, as this is
- * the primary use-case in xpcc.
+ * The `MODM_FLAGS` macro by default only works in a class or struct, as this is
+ * the primary use-case in modm.
  * To use it outside of a struct, use this:
  * @code
- * typedef xpcc::Flags8<Enum> Enum_t;
- * XPCC_TYPE_FLAGS(Enum_t);
+ * typedef modm::Flags8<Enum> Enum_t;
+ * MODM_TYPE_FLAGS(Enum_t);
  * @endcode
  *
  * @tparam	Enum	a Sascha Schade enum containing the bit masks
  * @tparam	T		the underlying integer type to be for internal representation
  *
  * @see Flags8, Flags16, Flags32
- * @see XPCC_FLAGS8, XPCC_FLAGS16, XPCC_FLAGS32
+ * @see MODM_FLAGS8, MODM_FLAGS16, MODM_FLAGS32
  *
  * @ingroup	register
  * @author	Niklas Hauser
  */
 template < typename Enum, typename T >
-struct Flags : public ::xpcc::FlagsOperators<Enum, T>
+struct Flags : public ::modm::FlagsOperators<Enum, T>
 {
 	/// @cond
 	typedef T UnderlyingType;
@@ -571,7 +571,7 @@ struct Flags : public ::xpcc::FlagsOperators<Enum, T>
 	constexpr bool none(Flags const &o) const
 	{ return (*this & o).value == 0; }
 	/// @}
-} xpcc_packed;
+} modm_packed;
 
 /// @ingroup	register
 /// @{
@@ -586,7 +586,7 @@ using Flags32 = Flags<Enum, uint32_t>;	///< Flags class with 32-bit wide underly
 
 /// @cond
 template < typename... T >
-struct FlagsGroup {} xpcc_packed;
+struct FlagsGroup {} modm_packed;
 
 
 template < typename T, typename... Ts >
@@ -604,7 +604,7 @@ struct FlagsGroup<T, Ts...> : public FlagsGroup<Ts...>
 	// Flags class
 	constexpr FlagsGroup(T value)
 	:	FlagsGroup<Ts...>(value.value) {}
-} xpcc_packed;
+} modm_packed;
 /// @endcond
 
 /**
@@ -662,7 +662,7 @@ struct FlagsGroup<T> : public Register<typename T::UnderlyingType>
 	/// Flags type constructor
 	constexpr FlagsGroup(T value)
 	:	Register<typename T::UnderlyingType>(value.value) {}
-} xpcc_packed;
+} modm_packed;
 
 /**
  * Class for accessing a configuration in a register.
@@ -741,7 +741,7 @@ struct FlagsGroup<T> : public Register<typename T::UnderlyingType>
  * @author	Niklas Hauser
  */
 template < typename Parent, typename Enum, typename Parent::UnderlyingType Mask, typename Parent::UnderlyingType Position = 0 >
-struct Configuration : public ::xpcc::FlagsOperators<typename Parent::EnumType, typename Parent::UnderlyingType>
+struct Configuration : public ::modm::FlagsOperators<typename Parent::EnumType, typename Parent::UnderlyingType>
 {
 private:
 	typedef typename Parent::UnderlyingType UnderlyingType;
@@ -784,7 +784,7 @@ public:
 	constexpr operator Parent() const
 	{	return Parent(FlagsOperators<EType, UType>::value); }
 	/// @endcond
-} xpcc_packed;
+} modm_packed;
 
 /**
  * Class for accessing a numeric value in a register.
@@ -808,7 +808,7 @@ public:
  * @author	Niklas Hauser
  */
 template < typename Parent, typename Parent::UnderlyingType Width, typename Parent::UnderlyingType Position = 0 >
-struct Value : public ::xpcc::FlagsOperators<typename Parent::EnumType, typename Parent::UnderlyingType>
+struct Value : public ::modm::FlagsOperators<typename Parent::EnumType, typename Parent::UnderlyingType>
 {
 private:
 	typedef typename Parent::UnderlyingType UnderlyingType;
@@ -849,20 +849,20 @@ public:
 	constexpr operator Parent() const
 	{	return Parent(FlagsOperators<EType, UType>::value); }
 	/// @endcond
-} xpcc_packed;
+} modm_packed;
 
-}	// namespace xpcc
+}	// namespace modm
 
 // these operator overloadings will overload *ALL* possible enum classes
 /*
 template <typename Enum>
-constexpr ::xpcc::Flags<Enum> operator~(Enum const &lhs) { return ~::xpcc::Flags<Enum>(lhs); }
+constexpr ::modm::Flags<Enum> operator~(Enum const &lhs) { return ~::modm::Flags<Enum>(lhs); }
 template <typename Enum>
-constexpr ::xpcc::Flags<Enum> operator|(Enum const &a, Enum const &b) { return ::xpcc::Flags<Enum>(a) | b;  }
+constexpr ::modm::Flags<Enum> operator|(Enum const &a, Enum const &b) { return ::modm::Flags<Enum>(a) | b;  }
 template <typename Enum>
-constexpr ::xpcc::Flags<Enum> operator&(Enum const &a, Enum const &b) { return ::xpcc::Flags<Enum>(a) & b; }
+constexpr ::modm::Flags<Enum> operator&(Enum const &a, Enum const &b) { return ::modm::Flags<Enum>(a) & b; }
 template <typename Enum>
-constexpr ::xpcc::Flags<Enum> operator^(Enum const &a, Enum const &b) { return ::xpcc::Flags<Enum>(a) ^ b; }
+constexpr ::modm::Flags<Enum> operator^(Enum const &a, Enum const &b) { return ::modm::Flags<Enum>(a) ^ b; }
 //*/
 
 /**
@@ -872,16 +872,16 @@ constexpr ::xpcc::Flags<Enum> operator^(Enum const &a, Enum const &b) { return :
  * The resulting Flags8 class type will have the signature `Enum_t`.
  *
  * @warning	This macro only works properly **inside** of a struct or class.
- * @see	XPCC_TYPE_FLAGS
+ * @see	MODM_TYPE_FLAGS
  *
  * @param	Enum	a Sascha Schade enum containing the bit masks
  *
  * @ingroup	register
  * @hideinitializer
  */
-#define XPCC_FLAGS8(Enum) \
-	typedef ::xpcc::Flags8<Enum> XPCC_CONCAT(Enum, _t); \
-	XPCC_INT_TYPE_FLAGS(XPCC_CONCAT(Enum, _t))
+#define MODM_FLAGS8(Enum) \
+	typedef ::modm::Flags8<Enum> MODM_CONCAT(Enum, _t); \
+	MODM_INT_TYPE_FLAGS(MODM_CONCAT(Enum, _t))
 
 /**
  * @details
@@ -890,16 +890,16 @@ constexpr ::xpcc::Flags<Enum> operator^(Enum const &a, Enum const &b) { return :
  * The resulting Flags16 class type will have the signature `Enum_t`.
  *
  * @warning	This macro only works properly **inside** of a struct or class.
- * @see	XPCC_TYPE_FLAGS
+ * @see	MODM_TYPE_FLAGS
  *
  * @param	Enum	a Sascha Schade enum containing the bit masks
  *
  * @ingroup	register
  * @hideinitializer
  */
-#define XPCC_FLAGS16(Enum) \
-	typedef ::xpcc::Flags16<Enum> XPCC_CONCAT(Enum, _t); \
-	XPCC_INT_TYPE_FLAGS(XPCC_CONCAT(Enum, _t))
+#define MODM_FLAGS16(Enum) \
+	typedef ::modm::Flags16<Enum> MODM_CONCAT(Enum, _t); \
+	MODM_INT_TYPE_FLAGS(MODM_CONCAT(Enum, _t))
 
 /**
  * @details
@@ -908,16 +908,16 @@ constexpr ::xpcc::Flags<Enum> operator^(Enum const &a, Enum const &b) { return :
  * The resulting Flags32 class type will have the signature `Enum_t`.
  *
  * @warning	This macro only works properly **inside** of a struct or class.
- * @see	XPCC_TYPE_FLAGS
+ * @see	MODM_TYPE_FLAGS
  *
  * @param	Enum	a Sascha Schade enum containing the bit masks
  *
  * @ingroup	register
  * @hideinitializer
  */
-#define XPCC_FLAGS32(Enum) \
-	typedef ::xpcc::Flags32<Enum> XPCC_CONCAT(Enum, _t); \
-	XPCC_INT_TYPE_FLAGS(XPCC_CONCAT(Enum, _t))
+#define MODM_FLAGS32(Enum) \
+	typedef ::modm::Flags32<Enum> MODM_CONCAT(Enum, _t); \
+	MODM_INT_TYPE_FLAGS(MODM_CONCAT(Enum, _t))
 
 /**
  * @details
@@ -931,25 +931,25 @@ constexpr ::xpcc::Flags<Enum> operator^(Enum const &a, Enum const &b) { return :
  * @ingroup	register
  * @hideinitializer
  */
-#define XPCC_TYPE_FLAGS(Parent) \
-	XPCC_INTERNAL_FLAGS(Parent,)
+#define MODM_TYPE_FLAGS(Parent) \
+	MODM_INTERNAL_FLAGS(Parent,)
 
 
 /// @cond
-#define XPCC_INT_TYPE_FLAGS(Parent) \
-	XPCC_INTERNAL_FLAGS(Parent, friend)
+#define MODM_INT_TYPE_FLAGS(Parent) \
+	MODM_INTERNAL_FLAGS(Parent, friend)
 
-#define XPCC_INTERNAL_FLAGS(Parent, scope) \
+#define MODM_INTERNAL_FLAGS(Parent, scope) \
 	scope constexpr Parent operator compl (Parent::EnumType const &lhs) \
 	{ return compl Parent(lhs); } \
-	XPCC_INTERNAL_FLAGS_EOP(type, Parent, &, scope) \
-	XPCC_INTERNAL_FLAGS_EOP(type, Parent, |, scope) \
-	XPCC_INTERNAL_FLAGS_EOP(type, Parent, ^, scope)
+	MODM_INTERNAL_FLAGS_EOP(type, Parent, &, scope) \
+	MODM_INTERNAL_FLAGS_EOP(type, Parent, |, scope) \
+	MODM_INTERNAL_FLAGS_EOP(type, Parent, ^, scope)
 
-#define XPCC_INTERNAL_FLAGS_EOP(type, Parent, op, scope) \
+#define MODM_INTERNAL_FLAGS_EOP(type, Parent, op, scope) \
 	scope constexpr Parent operator op (Parent::EnumType const &lhs, Parent::EnumType const &rhs) \
 	{ return Parent(Parent::EnumType(Parent::UnderlyingType(lhs) op Parent::UnderlyingType(rhs))); }
 /// @endcond
 
 
-#endif // XPCC_REGISTER_HPP
+#endif // MODM_REGISTER_HPP

@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32_UART_BASE_HPP
-#define XPCC_STM32_UART_BASE_HPP
+#ifndef MODM_STM32_UART_BASE_HPP
+#define MODM_STM32_UART_BASE_HPP
 
 #include <stdint.h>
 #include "../device.hpp"
@@ -29,7 +29,7 @@
 * @defgroup	{{partname}}_uart UART
 */
 
-namespace xpcc
+namespace modm
 {
 namespace stm32
 {
@@ -61,7 +61,7 @@ public:
 		/// Call interrupt when char received (RXNE) or overrun occurred (ORE)
 		RxNotEmpty	= USART_CR1_RXNEIE,
 	};
-	XPCC_FLAGS32(Interrupt);
+	MODM_FLAGS32(Interrupt);
 
 	enum class InterruptFlag : uint32_t
 	{
@@ -85,7 +85,7 @@ public:
 		/// Set if a parity error was detected.
 		ParityError		= USART_{{reg}}_PE,
 	};
-	XPCC_FLAGS32(InterruptFlag);
+	MODM_FLAGS32(InterruptFlag);
 
 	enum class Parity : uint32_t
 	{
@@ -131,6 +131,6 @@ public:
 
 }	// namespace stm32
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif // XPCC_STM32_UART_BASE_HPP
+#endif // MODM_STM32_UART_BASE_HPP

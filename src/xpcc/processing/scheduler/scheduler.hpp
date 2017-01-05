@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SCHEDULER_HPP
-#define XPCC_SCHEDULER_HPP
+#ifndef MODM_SCHEDULER_HPP
+#define MODM_SCHEDULER_HPP
 
 #include <stdint.h>
 
@@ -21,7 +21,7 @@
 #include <modm/architecture/driver/accessor.hpp>
 #include <modm/architecture/driver/atomic/lock.hpp>		// for Scheduler::scheduleInterrupt()
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \ingroup	processing
@@ -69,7 +69,7 @@ namespace xpcc
 		void
 		schedule();
 
-		xpcc_always_inline void
+		modm_always_inline void
 		scheduleInterupt();
 
 	private:
@@ -109,4 +109,4 @@ namespace xpcc
 
 #include "scheduler_impl.hpp"
 
-#endif // XPCC_SCHEDULER_HPP
+#endif // MODM_SCHEDULER_HPP

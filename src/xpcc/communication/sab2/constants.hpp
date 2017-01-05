@@ -12,13 +12,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_SAB2_CONSTANTS_HPP
-#define	XPCC_SAB2_CONSTANTS_HPP
+#ifndef	MODM_SAB2_CONSTANTS_HPP
+#define	MODM_SAB2_CONSTANTS_HPP
 
 #include <stdint.h>
 #include "../sab/constants.hpp"
 
-namespace xpcc
+namespace modm
 {
 	namespace sab2
 	{
@@ -87,4 +87,4 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC_SAB_CONSTANTS_HPP
+#endif	// MODM_SAB_CONSTANTS_HPP

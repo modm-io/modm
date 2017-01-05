@@ -11,5 +11,5 @@
 
 #include "al_avreb_can.hpp"
 
-xpcc::IODeviceWrapper< Uart1, xpcc::IOBuffer::BlockIfFull > serialDevice;
-xpcc::IOStream serialStream(serialDevice);
+modm::IODeviceWrapper< Uart1, modm::IOBuffer::BlockIfFull > serialDevice;
+modm::IOStream serialStream(serialDevice);

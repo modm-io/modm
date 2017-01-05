@@ -12,14 +12,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LPC11C_CAN_FILTER_HPP
-#define XPCC_LPC11C_CAN_FILTER_HPP
+#ifndef MODM_LPC11C_CAN_FILTER_HPP
+#define MODM_LPC11C_CAN_FILTER_HPP
 
 #include <modm/architecture/interface/can.hpp>
 
 #include "c_can_registers.h"
 
-namespace xpcc
+namespace modm
 {
 	namespace lpc
 	{
@@ -34,7 +34,7 @@ namespace xpcc
 		 * arbitrary length. This class can be used to configure the CAN
 		 * reception filters.
 		 *
-		 * When using the class with XPCC the following scenarios is likely:
+		 * When using the class with MODM the following scenarios is likely:
 		 * The container consists of several components. These receive events
 		 * and actions at different addresses. One filter with a small FIFO
 		 * is set up for events and one or more filters with an own FIFO is
@@ -45,7 +45,7 @@ namespace xpcc
 		 * Having several filters that all put their matched messages in one
 		 * FIFO (like in STM32) might be a better implementation of CAN filtering.
 		 *
-		 * This class is intended to be used with XPCC so only filtering
+		 * This class is intended to be used with MODM so only filtering
 		 * of Extended CAN messages (29 bit identifier) is implemented yet.
 		 *
 		 * \author		Sascha Schade
@@ -71,7 +71,7 @@ namespace xpcc
 			struct Identifier
 			{
 			protected:
-				xpcc_always_inline
+				modm_always_inline
 				Identifier(uint32_t identifier) :
 					value(identifier)
 				{
@@ -80,7 +80,7 @@ namespace xpcc
 				uint32_t value;
 
 			public:
-				xpcc_always_inline
+				modm_always_inline
 				operator uint32_t () const
 				{
 					return value;
@@ -96,7 +96,7 @@ namespace xpcc
 			 */
 			struct ExtendedIdentifier : public Identifier
 			{
-				xpcc_always_inline
+				modm_always_inline
 				ExtendedIdentifier(uint32_t identifier, RemoteRequestStatus rtr = NO_RTR) :
 					Identifier(identifier | (CAN_IFn_ARB2_MSGVAL << 16) | (CAN_IFn_ARB2_XTD << 16) | ((rtr) ? (CAN_IFn_ARB2_DIR << 16) : 0))
 				{
@@ -105,13 +105,13 @@ namespace xpcc
 
 			struct ExtendedFilterMask
 			{
-				xpcc_always_inline
+				modm_always_inline
 				ExtendedFilterMask(uint32_t identifier, RemoteRequestFilter rtr = RTR_MATCH) :
 					value(identifier | (CAN_IFn_MSK2_MXTD << 16) | ((rtr) ? (CAN_IFn_MSK2_MDIR << 16) : 0))
 				{
 				}
 
-				xpcc_always_inline
+				modm_always_inline
 				operator uint32_t () const
 				{
 					return value;
@@ -133,6 +133,6 @@ namespace xpcc
 
 		}; // CanFilter class
 	} // lpc namespace
-} // xpcc namespace
+} // modm namespace
 
-#endif // XPCC_LPC11C_CAN_FILTER_HPP
+#endif // MODM_LPC11C_CAN_FILTER_HPP

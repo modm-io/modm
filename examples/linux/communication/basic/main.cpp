@@ -14,14 +14,14 @@
 #include <modm/architecture/architecture.hpp>
 
 #include <modm/communication/communication.hpp>
-// #include <modm/communication/xpcc/backend/tipc.hpp>
-#include <modm/communication/xpcc/backend/zeromq.hpp>
+// #include <modm/communication/modm/backend/tipc.hpp>
+#include <modm/communication/modm/backend/zeromq.hpp>
 
 #include <modm/debug/logger.hpp>
 
 // set new log level
-#undef XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::DEBUG
+#undef MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::DEBUG
 
 #include "component_receiver/receiver.hpp"
 #include "component_sender/sender.hpp"
@@ -30,17 +30,17 @@
 #include "communication/identifier.hpp"
 
 // Use TIPC on Linux only
-// xpcc::TipcConnector connector;
+// modm::TipcConnector connector;
 
 // Use ZeroMQ on Linux and Darwin
 const std::string endpointIn  = "tcp://127.0.0.1:8211";
 const std::string endpointOut = "tcp://127.0.0.1:8212";
-static xpcc::ZeroMQConnector connector(endpointIn, endpointOut, xpcc::ZeroMQConnector::Mode::SubPush);
+static modm::ZeroMQConnector connector(endpointIn, endpointOut, modm::ZeroMQConnector::Mode::SubPush);
 
 // create an instance of the generated postman
 Postman postman;
 
-xpcc::Dispatcher dispatcher(&connector, &postman);
+modm::Dispatcher dispatcher(&connector, &postman);
 
 namespace component
 {
@@ -55,7 +55,7 @@ main()
 	// connector.addReceiverId(robot::component::SENDER);
 	// connector.addReceiverId(robot::component::RECEIVER);
 	
-	XPCC_LOG_INFO << "Welcome to the communication test!" << xpcc::endl; 
+	MODM_LOG_INFO << "Welcome to the communication test!" << modm::endl; 
 	
 	while (true)
 	{
@@ -65,6 +65,6 @@ main()
 		component::receiver.update();
 		component::sender.update();
 		
-		xpcc::delayMicroseconds(100);
+		modm::delayMicroseconds(100);
 	}
 }

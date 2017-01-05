@@ -9,13 +9,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_INTERFACE_SPI_DEVICE_HPP
-#define XPCC_INTERFACE_SPI_DEVICE_HPP
+#ifndef MODM_INTERFACE_SPI_DEVICE_HPP
+#define MODM_INTERFACE_SPI_DEVICE_HPP
 
 #include "spi.hpp"
 #include "spi_master.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -58,6 +58,6 @@ protected:
 	}
 };
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif // XPCC_INTERFACE_SPI_DEVICE_HPP
+#endif // MODM_INTERFACE_SPI_DEVICE_HPP

@@ -17,7 +17,7 @@
 
 #include <unittest/testsuite.hpp>
 
-// The only purpose of the test is to ensure that XPCC_CLOCK_TESTMODE is
+// The only purpose of the test is to ensure that MODM_CLOCK_TESTMODE is
 // set to 1 when running the other tests.
 class ClockTest : public unittest::TestSuite
 {

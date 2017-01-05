@@ -13,34 +13,34 @@
 #include <modm/debug/logger.hpp>
 
 // set new log level
-#undef XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::DEBUG
+#undef MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::DEBUG
 
 #include "receiver.hpp"
 
 // ----------------------------------------------------------------------------
-component::Receiver::Receiver(uint8_t id, xpcc::Dispatcher &communication) :
-	xpcc::AbstractComponent(id, communication)
+component::Receiver::Receiver(uint8_t id, modm::Dispatcher &communication) :
+	modm::AbstractComponent(id, communication)
 {
 }
 
 // ----------------------------------------------------------------------------
 void
-component::Receiver::actionSetPosition(const xpcc::ResponseHandle&,
+component::Receiver::actionSetPosition(const modm::ResponseHandle&,
 		const robot::packet::Position *parameter)
 {
-	XPCC_LOG_INFO << XPCC_FILE_INFO
+	MODM_LOG_INFO << MODM_FILE_INFO
 			<< "action set position: x=" << parameter->x
-			<< ", y=" << parameter->y << xpcc::endl;
+			<< ", y=" << parameter->y << modm::endl;
 	
 	position = *parameter;
 }
 
 // ----------------------------------------------------------------------------
 void
-component::Receiver::actionGetPosition(const xpcc::ResponseHandle& handle)
+component::Receiver::actionGetPosition(const modm::ResponseHandle& handle)
 {
-	XPCC_LOG_INFO << XPCC_FILE_INFO << "action get position" << xpcc::endl;
+	MODM_LOG_INFO << MODM_FILE_INFO << "action get position" << modm::endl;
 	
 	this->sendResponse(handle, position);
 }

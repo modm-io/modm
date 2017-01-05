@@ -9,10 +9,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SOFTWARE_I2C_TYPE_IDS_HPP
-#define XPCC_SOFTWARE_I2C_TYPE_IDS_HPP
+#ifndef MODM_SOFTWARE_I2C_TYPE_IDS_HPP
+#define MODM_SOFTWARE_I2C_TYPE_IDS_HPP
 
-namespace xpcc
+namespace modm
 {
 
 namespace TypeId
@@ -21,6 +21,6 @@ namespace TypeId
 	typedef struct{} SoftwareI2cMasterScl;
 }
 
-} // namespace xpcc
+} // namespace modm
 
-#endif // XPCC_SOFTWARE_I2C_TYPE_IDS_HPP
+#endif // MODM_SOFTWARE_I2C_TYPE_IDS_HPP

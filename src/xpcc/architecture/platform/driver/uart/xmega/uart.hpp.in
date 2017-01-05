@@ -13,15 +13,15 @@
 
 {{ generation_block }}
 
-#ifndef XPCC_ATXMEGA_UART_{{ id }}_HPP
-#define XPCC_ATXMEGA_UART_{{ id }}_HPP
+#ifndef MODM_ATXMEGA_UART_{{ id }}_HPP
+#define MODM_ATXMEGA_UART_{{ id }}_HPP
 
 #include "../device.hpp"
 #include <modm/architecture/interface/uart.hpp>
 #include "type_ids.hpp"
 #include "uart_baudrate.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 namespace xmega
@@ -49,7 +49,7 @@ namespace xmega
  * @author	Niklas Hauser
  * @ingroup	xmega
  */
-class Uart{{ id }} : public ::xpcc::Uart
+class Uart{{ id }} : public ::modm::Uart
 {
 public:
 	static const TypeId::Uart{{ id }}Rxd Rx;
@@ -66,7 +66,7 @@ public:
 	 *		desired baud rate
 	 */
 	template< uint32_t baudrate >
-	static xpcc_always_inline void
+	static modm_always_inline void
 	initialize()
 	{
 		static_assert(F_CPU/16l >= baudrate, "The CPU frequency must be at least 16x higher than UART baudrate.");
@@ -138,6 +138,6 @@ protected:
 
 } // namespace xmega
 
-} // namespace xpcc
+} // namespace modm
 
-#endif // XPCC_ATXMEGA_UART_{{ id }}_HPP
+#endif // MODM_ATXMEGA_UART_{{ id }}_HPP

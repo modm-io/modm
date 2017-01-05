@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_TMP102_HPP
-#define XPCC_TMP102_HPP
+#ifndef MODM_TMP102_HPP
+#define MODM_TMP102_HPP
 
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
@@ -21,7 +21,7 @@
 
 #include "lm75.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 // forward declaration for friending with tmp102::Data
@@ -42,7 +42,7 @@ protected:
 		ThermostatMode = Bit1,
 		ShutdownMode = Bit0,
 	};
-	XPCC_FLAGS8(Config1);
+	MODM_FLAGS8(Config1);
 	typedef Value< Config1_t, 2, 5 > Resolution_t;
 
 	enum class
@@ -52,7 +52,7 @@ protected:
 		Alert = Bit5,
 		ExtendedMode = Bit4
 	};
-	XPCC_FLAGS8(Config2);
+	MODM_FLAGS8(Config2);
 
 	enum class
 	ConversionRate : uint8_t
@@ -66,7 +66,7 @@ protected:
 	/// @endcond
 public:
 
-	struct xpcc_packed
+	struct modm_packed
 	Data
 	{
 		template < class I2cMaster >
@@ -78,7 +78,7 @@ public:
 		getTemperature()
 		{
 			int16_t *rData = reinterpret_cast<int16_t*>(data);
-			int16_t temp = xpcc::fromBigEndian(*rData);
+			int16_t temp = modm::fromBigEndian(*rData);
 			if (data[1] & 0x01)
 			{
 				// temperature extended mode
@@ -125,42 +125,42 @@ public:
  */
 template < class I2cMaster >
 class Tmp102 :	public tmp102, public Lm75< I2cMaster >,
-				protected xpcc::pt::Protothread
+				protected modm::pt::Protothread
 {
 public:
 	/// Constructor, requires a tmp102::Data object,
 	/// sets address to default of 0x48 (alternatives are 0x49, 0x4A and 0x4B).
 	Tmp102(Data &data, uint8_t address=0x48);
 
-	void xpcc_always_inline
+	void modm_always_inline
 	update()
 	{ run(); }
 
 	// MARK: Configuration
 	// @param	rate	Update rate in Hz: 0 to 33. (Use 0 to update at 0.25Hz).
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setUpdateRate(uint8_t rate);
 
 	/// Enables extended mode with 13 bit data format.
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	enableExtendedMode(bool enable = true);
 
 	/// param[out]	result	contains comparator mode alert in the configured polarity
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	readComparatorMode(bool &result);
 
 	/// Writes the upper limit of the alarm.
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	setUpperLimit(float temperature)
 	{ return setLimitRegister(Register::TemperatureUpperLimit, temperature); }
 
 	/// Writes the lower limit of the alarm.
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	setLowerLimit(float temperature)
 	{ return setLimitRegister(Register::TemperatureLowerLimit, temperature); }
 
 	/// starts a temperature conversion right now
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	startConversion();
 
 	inline Data&
@@ -170,20 +170,20 @@ private:
 	bool
 	run();
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	writeConfiguration(uint8_t length=3);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setLimitRegister(Register reg, float temperature);
 
-	xpcc::ShortTimeout timeout;
+	modm::ShortTimeout timeout;
 	uint16_t updateTime;
 
 	Config2_t config_lsb;
 };
 
-} // namespace xpcc
+} // namespace modm
 
 #include "tmp102_impl.hpp"
 
-#endif // XPCC_TMP102_HPP
+#endif // MODM_TMP102_HPP

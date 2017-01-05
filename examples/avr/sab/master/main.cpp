@@ -13,12 +13,12 @@
 #include <modm/architecture/platform.hpp>
 #include <modm/communication/sab/interface.hpp>
 
-using namespace xpcc::atmega;
+using namespace modm::atmega;
 
 int 
 main()
 {
-	xpcc::sab::Interface< Uart0 > interface;
+	modm::sab::Interface< Uart0 > interface;
 	
 	// set baudrate etc.
 	interface.initialize();

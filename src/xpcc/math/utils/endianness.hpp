@@ -9,15 +9,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_MATH_ENDIANNESS_HPP
-#define XPCC_MATH_ENDIANNESS_HPP
+#ifndef MODM_MATH_ENDIANNESS_HPP
+#define MODM_MATH_ENDIANNESS_HPP
 
 #include <stdint.h>
 #include "bit_operation.hpp"
 
 #include <modm/architecture/detect.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 /// checks if current architecture is big endian
@@ -25,7 +25,7 @@ namespace xpcc
 constexpr bool
 isBigEndian()
 {
-	return XPCC_IS_BIG_ENDIAN;
+	return MODM_IS_BIG_ENDIAN;
 }
 
 /// checks if current architecture is little endian
@@ -33,7 +33,7 @@ isBigEndian()
 constexpr bool
 isLittleEndian()
 {
-	return XPCC_IS_LITTLE_ENDIAN;
+	return MODM_IS_LITTLE_ENDIAN;
 }
 
 // MARK: - to host
@@ -42,7 +42,7 @@ isLittleEndian()
 inline uint16_t
 fromLittleEndian(uint16_t value)
 {
-#if XPCC_IS_LITTLE_ENDIAN
+#if MODM_IS_LITTLE_ENDIAN
 	return value;
 #else
 	return swap(value);
@@ -58,7 +58,7 @@ fromLittleEndian(int16_t value)
 inline uint32_t
 fromLittleEndian(uint32_t value)
 {
-#if XPCC_IS_LITTLE_ENDIAN
+#if MODM_IS_LITTLE_ENDIAN
 	return value;
 #else
 	return swap(value);
@@ -74,7 +74,7 @@ fromLittleEndian(int32_t value)
 inline uint16_t
 fromBigEndian(uint16_t value)
 {
-#if XPCC_IS_BIG_ENDIAN
+#if MODM_IS_BIG_ENDIAN
 	return value;
 #else
 	return swap(value);
@@ -90,7 +90,7 @@ fromBigEndian(int16_t value)
 inline uint32_t
 fromBigEndian(uint32_t value)
 {
-#if XPCC_IS_BIG_ENDIAN
+#if MODM_IS_BIG_ENDIAN
 	return value;
 #else
 	return swap(value);
@@ -107,7 +107,7 @@ fromBigEndian(int32_t value)
 inline uint16_t
 toLittleEndian(uint16_t value)
 {
-#if XPCC_IS_LITTLE_ENDIAN
+#if MODM_IS_LITTLE_ENDIAN
 	return value;
 #else
 	return swap(value);
@@ -123,7 +123,7 @@ toLittleEndian(int16_t value)
 inline uint32_t
 toLittleEndian(uint32_t value)
 {
-#if XPCC_IS_LITTLE_ENDIAN
+#if MODM_IS_LITTLE_ENDIAN
 	return value;
 #else
 	return swap(value);
@@ -139,7 +139,7 @@ toLittleEndian(int32_t value)
 inline uint16_t
 toBigEndian(uint16_t value)
 {
-#if XPCC_IS_BIG_ENDIAN
+#if MODM_IS_BIG_ENDIAN
 	return value;
 #else
 	return swap(value);
@@ -155,7 +155,7 @@ toBigEndian(int16_t value)
 inline uint32_t
 toBigEndian(uint32_t value)
 {
-#if XPCC_IS_BIG_ENDIAN
+#if MODM_IS_BIG_ENDIAN
 	return value;
 #else
 	return swap(value);
@@ -169,6 +169,6 @@ toBigEndian(int32_t value)
 }
 /// @}
 
-} // namespace xpcc
+} // namespace modm
 
-#endif // XPCC_MATH_ENDIANNESS_HPP
+#endif // MODM_MATH_ENDIANNESS_HPP

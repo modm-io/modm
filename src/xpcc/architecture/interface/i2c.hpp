@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_INTERFACE_I2C_HPP
-#define XPCC_INTERFACE_I2C_HPP
+#ifndef MODM_INTERFACE_I2C_HPP
+#define MODM_INTERFACE_I2C_HPP
 
 #include <modm/architecture/interface.hpp>
 #include <modm/architecture/driver/delay.hpp>
@@ -23,7 +23,7 @@
  * @defgroup	i2c		Inter-Integrated Circuit (I2C)
  */
 
-namespace xpcc
+namespace modm
 {
 
 /// @ingroup	i2c
@@ -124,14 +124,14 @@ struct I2c
 		Scl::setInput();
 
 		for (uint_fast8_t ii = 0; ii < 9; ++ii) {
-			Scl::setOutput(xpcc::Gpio::Low);
-			xpcc::delayMicroseconds(5);
+			Scl::setOutput(modm::Gpio::Low);
+			modm::delayMicroseconds(5);
 			Scl::setInput();
-			xpcc::delayMicroseconds(5);
+			modm::delayMicroseconds(5);
 		}
 	}
 };
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif // XPCC_INTERFACE_I2C_HPP
+#endif // MODM_INTERFACE_I2C_HPP

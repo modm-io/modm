@@ -11,31 +11,31 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_VECTOR1_HPP
+#ifndef MODM_VECTOR1_HPP
 	#error	"Don't include this file directly, use 'vector1.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 1>::Vector() :
+modm::Vector<T, 1>::Vector() :
 	x()
 {
 }
 
 template<typename T>
-xpcc::Vector<T, 1>::Vector(T inX) :
+modm::Vector<T, 1>::Vector(T inX) :
 	x(inX)
 {
 }
 
 template<typename T>
-xpcc::Vector<T, 1>::Vector(const xpcc::Matrix<T, 1, 1> &rhs) :
+modm::Vector<T, 1>::Vector(const modm::Matrix<T, 1, 1> &rhs) :
 	x(*reinterpret_cast<const T*>(&rhs))
 {
 }
 
 template<typename T>
-xpcc::Vector<T, 1>::Vector(const xpcc::Vector<T, 1> &rhs) :
+modm::Vector<T, 1>::Vector(const modm::Vector<T, 1> &rhs) :
 	x(rhs.x)
 {
 }
@@ -43,7 +43,7 @@ xpcc::Vector<T, 1>::Vector(const xpcc::Vector<T, 1> &rhs) :
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::Vector<T, 1>::set(const T& value)
+modm::Vector<T, 1>::set(const T& value)
 {
 	this->x = value;
 }
@@ -51,7 +51,7 @@ xpcc::Vector<T, 1>::set(const T& value)
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::Vector<T, 1>::setX(const T& value)
+modm::Vector<T, 1>::setX(const T& value)
 {
 	this->x = value;
 }
@@ -59,15 +59,15 @@ xpcc::Vector<T, 1>::setX(const T& value)
 // ----------------------------------------------------------------------------
 template<typename T>
 const T&
-xpcc::Vector<T, 1>::getX() const
+modm::Vector<T, 1>::getX() const
 {
 	return this->x;
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 1>&
-xpcc::Vector<T, 1>::operator = (const xpcc::Vector<T, 1> &rhs)
+modm::Vector<T, 1>&
+modm::Vector<T, 1>::operator = (const modm::Vector<T, 1> &rhs)
 {
 	x = rhs.x;
 	return *this;
@@ -75,8 +75,8 @@ xpcc::Vector<T, 1>::operator = (const xpcc::Vector<T, 1> &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 1>&
-xpcc::Vector<T, 1>::operator = (const xpcc::Matrix<T, 1, 1> &rhs)
+modm::Vector<T, 1>&
+modm::Vector<T, 1>::operator = (const modm::Matrix<T, 1, 1> &rhs)
 {
 	x = *reinterpret_cast<const T*>(&rhs);
 	return *this;
@@ -85,7 +85,7 @@ xpcc::Vector<T, 1>::operator = (const xpcc::Matrix<T, 1, 1> &rhs)
 // ----------------------------------------------------------------------------
 template<typename T>
 bool
-xpcc::Vector<T, 1>::operator == (const xpcc::Vector<T, 1> &rhs) const
+modm::Vector<T, 1>::operator == (const modm::Vector<T, 1> &rhs) const
 {
 	return (rhs.x == x);
 }
@@ -93,7 +93,7 @@ xpcc::Vector<T, 1>::operator == (const xpcc::Vector<T, 1> &rhs) const
 // ----------------------------------------------------------------------------
 template<typename T>
 bool
-xpcc::Vector<T, 1>::operator != (const xpcc::Vector<T, 1> &rhs) const
+modm::Vector<T, 1>::operator != (const modm::Vector<T, 1> &rhs) const
 {
 	return (rhs.x != x);
 }
@@ -101,7 +101,7 @@ xpcc::Vector<T, 1>::operator != (const xpcc::Vector<T, 1> &rhs) const
 // ----------------------------------------------------------------------------
 template<typename T>
 bool
-xpcc::Vector<T, 1>::operator < (const xpcc::Vector<T, 1> &rhs) const
+modm::Vector<T, 1>::operator < (const modm::Vector<T, 1> &rhs) const
 {
 	return (x < rhs.x);
 }
@@ -109,7 +109,7 @@ xpcc::Vector<T, 1>::operator < (const xpcc::Vector<T, 1> &rhs) const
 // ----------------------------------------------------------------------------
 template<typename T>
 bool
-xpcc::Vector<T, 1>::operator <= (const xpcc::Vector<T, 1> &rhs) const
+modm::Vector<T, 1>::operator <= (const modm::Vector<T, 1> &rhs) const
 {
 	return (x <= rhs.x);
 }
@@ -117,7 +117,7 @@ xpcc::Vector<T, 1>::operator <= (const xpcc::Vector<T, 1> &rhs) const
 // ----------------------------------------------------------------------------
 template<typename T>
 bool
-xpcc::Vector<T, 1>::operator > (const xpcc::Vector<T, 1> &rhs) const
+modm::Vector<T, 1>::operator > (const modm::Vector<T, 1> &rhs) const
 {
 	return (x > rhs.x);
 }
@@ -125,7 +125,7 @@ xpcc::Vector<T, 1>::operator > (const xpcc::Vector<T, 1> &rhs) const
 // ----------------------------------------------------------------------------
 template<typename T>
 bool
-xpcc::Vector<T, 1>::operator >= (const xpcc::Vector<T, 1> &rhs) const
+modm::Vector<T, 1>::operator >= (const modm::Vector<T, 1> &rhs) const
 {
 	return (x >= rhs.x);
 }
@@ -133,14 +133,14 @@ xpcc::Vector<T, 1>::operator >= (const xpcc::Vector<T, 1> &rhs) const
 // ----------------------------------------------------------------------------
 template<typename T>
 const T&
-xpcc::Vector<T, 1>::operator [] (uint8_t index) const
+modm::Vector<T, 1>::operator [] (uint8_t index) const
 {
 	return reinterpret_cast<const T*>(this)[index];
 }
 
 template<typename T>
 T&
-xpcc::Vector<T, 1>::operator [] (uint8_t index)
+modm::Vector<T, 1>::operator [] (uint8_t index)
 {
 	return reinterpret_cast<T*>(this)[index];
 }
@@ -148,62 +148,62 @@ xpcc::Vector<T, 1>::operator [] (uint8_t index)
 // ----------------------------------------------------------------------------
 template<typename T>
 T*
-xpcc::Vector<T, 1>::ptr()
+modm::Vector<T, 1>::ptr()
 {
 	return reinterpret_cast<T*>(this);
 }
 
 template<typename T>
 const T*
-xpcc::Vector<T, 1>::ptr() const
+modm::Vector<T, 1>::ptr() const
 {
 	return reinterpret_cast<const T*>(this);
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 1>
-xpcc::Vector<T, 1>::operator + (const xpcc::Vector<T, 1> &rhs) const
+modm::Vector<T, 1>
+modm::Vector<T, 1>::operator + (const modm::Vector<T, 1> &rhs) const
 {
-	return xpcc::Vector<T, 1>(x+rhs.x);
+	return modm::Vector<T, 1>(x+rhs.x);
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 1>
-xpcc::Vector<T, 1>::operator - (const xpcc::Vector<T, 1> &rhs) const
+modm::Vector<T, 1>
+modm::Vector<T, 1>::operator - (const modm::Vector<T, 1> &rhs) const
 {
-	return xpcc::Vector<T, 1>(x-rhs.x);
+	return modm::Vector<T, 1>(x-rhs.x);
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
 T
-xpcc::Vector<T, 1>::operator * (const xpcc::Vector<T, 1> &rhs) const
+modm::Vector<T, 1>::operator * (const modm::Vector<T, 1> &rhs) const
 {
 	return x*rhs.x;
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 1>
-xpcc::Vector<T, 1>::operator * (const T &rhs) const
+modm::Vector<T, 1>
+modm::Vector<T, 1>::operator * (const T &rhs) const
 {
-	return xpcc::Vector<T, 1>(x*rhs);
+	return modm::Vector<T, 1>(x*rhs);
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 1>
-xpcc::Vector<T, 1>::operator / (const T &rhs) const
+modm::Vector<T, 1>
+modm::Vector<T, 1>::operator / (const T &rhs) const
 {
-	return xpcc::Vector<T, 1>(x/rhs);
+	return modm::Vector<T, 1>(x/rhs);
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 1>&
-xpcc::Vector<T, 1>::operator += (const xpcc::Vector<T, 1> &rhs)
+modm::Vector<T, 1>&
+modm::Vector<T, 1>::operator += (const modm::Vector<T, 1> &rhs)
 {
 	x += rhs.x;
 	return *this;
@@ -211,8 +211,8 @@ xpcc::Vector<T, 1>::operator += (const xpcc::Vector<T, 1> &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 1>&
-xpcc::Vector<T, 1>::operator -= (const xpcc::Vector<T, 1> &rhs)
+modm::Vector<T, 1>&
+modm::Vector<T, 1>::operator -= (const modm::Vector<T, 1> &rhs)
 {
 	x -= rhs.x;
 	return *this;
@@ -220,8 +220,8 @@ xpcc::Vector<T, 1>::operator -= (const xpcc::Vector<T, 1> &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 1>&
-xpcc::Vector<T, 1>::operator *= (const T &rhs)
+modm::Vector<T, 1>&
+modm::Vector<T, 1>::operator *= (const T &rhs)
 {
 	x *= rhs;
 	return *this;
@@ -229,8 +229,8 @@ xpcc::Vector<T, 1>::operator *= (const T &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 1>&
-xpcc::Vector<T, 1>::operator /= (const T &rhs)
+modm::Vector<T, 1>&
+modm::Vector<T, 1>::operator /= (const T &rhs)
 {
 	x /= rhs;
 	return *this;
@@ -238,8 +238,8 @@ xpcc::Vector<T, 1>::operator /= (const T &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 1>
-xpcc::Vector<T, 1>::operator - () const
+modm::Vector<T, 1>
+modm::Vector<T, 1>::operator - () const
 {
 	return Vector<T, 1>(-x);
 }
@@ -247,7 +247,7 @@ xpcc::Vector<T, 1>::operator - () const
 // ----------------------------------------------------------------------------
 template<typename T>
 T
-xpcc::Vector<T, 1>::getLength() const
+modm::Vector<T, 1>::getLength() const
 {
 	return std::abs(x);
 }
@@ -255,31 +255,31 @@ xpcc::Vector<T, 1>::getLength() const
 // ----------------------------------------------------------------------------
 template<typename T>
 T
-xpcc::Vector<T, 1>::getLengthSquared() const
+modm::Vector<T, 1>::getLengthSquared() const
 {
 	return x * x;
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Matrix<T, 1, 1>&
-xpcc::Vector<T, 1>::asMatrix()
+modm::Matrix<T, 1, 1>&
+modm::Vector<T, 1>::asMatrix()
 {
-	return *(xpcc::Matrix<T, 1, 1>*) this;
+	return *(modm::Matrix<T, 1, 1>*) this;
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
-const xpcc::Matrix<T, 1, 1>&
-xpcc::Vector<T, 1>::asMatrix() const
+const modm::Matrix<T, 1, 1>&
+modm::Vector<T, 1>::asMatrix() const
 {
-	return *(xpcc::Matrix<T, 1, 1>*) this;
+	return *(modm::Matrix<T, 1, 1>*) this;
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
 bool
-xpcc::Vector<T, 1>::hasNan() const
+modm::Vector<T, 1>::hasNan() const
 {
 	return std::isnan(x);
 }
@@ -287,14 +287,14 @@ xpcc::Vector<T, 1>::hasNan() const
 // ----------------------------------------------------------------------------
 template<typename T>
 bool
-xpcc::Vector<T, 1>::hasInf() const
+modm::Vector<T, 1>::hasInf() const
 {
 	return std::isinf(x);
 }
 
 // ----------------------------------------------------------------------------
 //template<typename U, typename T>
-//static xpcc::Vector<T, 1> operator * (const U &lhs, const xpcc::Vector<T, 1> &rhs)
+//static modm::Vector<T, 1> operator * (const U &lhs, const modm::Vector<T, 1> &rhs)
 //{
 //	return rhs * lhs;
 //}

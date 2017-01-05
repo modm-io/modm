@@ -15,7 +15,7 @@
 
 #include "abstract_menu.hpp"
 
-xpcc::AbstractMenu::AbstractMenu(xpcc::ViewStack* stack, uint8_t identifier):
-	xpcc::AbstractView(stack, identifier)
+modm::AbstractMenu::AbstractMenu(modm::ViewStack* stack, uint8_t identifier):
+	modm::AbstractView(stack, identifier)
 {
 }

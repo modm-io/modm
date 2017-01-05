@@ -10,14 +10,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_GEOMETRIC_TRAITS_HPP
-#define XPCC_GEOMETRIC_TRAITS_HPP
+#ifndef MODM_GEOMETRIC_TRAITS_HPP
+#define MODM_GEOMETRIC_TRAITS_HPP
 
 #include <cmath>
 #include <stdint.h>
 #include <modm/architecture/utils.hpp>
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	Traits for all geometric classes
@@ -141,4 +141,4 @@ namespace xpcc
 	};
 }
 
-#endif // XPCC_GEOMETRIC_TRAITS_HPP
+#endif // MODM_GEOMETRIC_TRAITS_HPP

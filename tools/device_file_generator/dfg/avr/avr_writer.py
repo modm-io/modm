@@ -22,7 +22,7 @@ from . import avr_io
 
 class AVRDeviceWriter(XMLDeviceWriter):
 	""" AVRDeviceWriter
-	Translates the Device to a XPCC specific format.
+	Translates the Device to a MODM specific format.
 	"""
 	def __init__(self, device, logger=None):
 		XMLDeviceWriter.__init__(self, device, logger)

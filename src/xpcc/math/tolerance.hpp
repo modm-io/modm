@@ -9,13 +9,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_MATH_TOLERANCE_HPP
-#define XPCC_MATH_TOLERANCE_HPP
+#ifndef MODM_MATH_TOLERANCE_HPP
+#define MODM_MATH_TOLERANCE_HPP
 
 #include <stdint.h>
 #include <modm/math/math.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -76,6 +76,6 @@ public:
 	}
 };
 
-} // namespace xpcc
+} // namespace modm
 
-#endif	// XPCC_MATH_TOLERANCE_HPP
+#endif	// MODM_MATH_TOLERANCE_HPP

@@ -20,7 +20,7 @@
 
 #include "../tables.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 namespace ui
@@ -46,7 +46,7 @@ FLASH_STORAGE(uint16_t table[]) =
 	0xe008,0xe217,0xe428,0xe63d,0xe854,0xea6d,0xec89,0xeea8,0xf0ca,0xf2ee,0xf515,0xf73e,0xf96a,0xfb99,0xfdca,0xffff
 };
 
-xpcc::accessor::Flash<uint16_t> table22_16_256(table);
+modm::accessor::Flash<uint16_t> table22_16_256(table);
 
 }
 

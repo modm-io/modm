@@ -38,7 +38,7 @@ namespace
 }
 
 void
-xpcc::lpc::SpiMaster0::configurePins(MappingSck mapping, bool useSsel)
+modm::lpc::SpiMaster0::configurePins(MappingSck mapping, bool useSsel)
 {
 	// Deassert Reset
 	LPC_SYSCON->PRESETCTRL 		|= PRESETCTRL_SSP0_RST_N;
@@ -85,7 +85,7 @@ xpcc::lpc::SpiMaster0::configurePins(MappingSck mapping, bool useSsel)
 }
 
 void
-xpcc::lpc::SpiMaster0::initialize(
+modm::lpc::SpiMaster0::initialize(
 		Mode mode,
 		Presacler prescaler,
 		uint8_t serialClockRate,
@@ -115,7 +115,7 @@ xpcc::lpc::SpiMaster0::initialize(
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::lpc::SpiMaster0::setBuffer(uint16_t length, uint8_t* transmit, uint8_t* receive, BufferIncrease bufferIncrease)
+modm::lpc::SpiMaster0::setBuffer(uint16_t length, uint8_t* transmit, uint8_t* receive, BufferIncrease bufferIncrease)
 {
 	if (!isFinished()) {
 		return false;
@@ -132,7 +132,7 @@ xpcc::lpc::SpiMaster0::setBuffer(uint16_t length, uint8_t* transmit, uint8_t* re
 }
 
 bool
-xpcc::lpc::SpiMaster0::transfer(TransferOptions options)
+modm::lpc::SpiMaster0::transfer(TransferOptions options)
 {
 	if (status & BUFFER_IS_BUSY_SYNC_bm) {
 		return false;
@@ -206,20 +206,20 @@ xpcc::lpc::SpiMaster0::transfer(TransferOptions options)
 }
 
 bool
-xpcc::lpc::SpiMaster0::transferSync(TransferOptions options)
+modm::lpc::SpiMaster0::transferSync(TransferOptions options)
 {
 	return transfer(options);
 }
 
 bool
-xpcc::lpc::SpiMaster0::isFinished()
+modm::lpc::SpiMaster0::isFinished()
 {
 	return !(status & BUFFER_IS_BUSY_SYNC_bm);
 }
 
 // ----------------------------------------------------------------------------
 uint8_t
-xpcc::lpc::SpiMaster0::write(uint8_t data)
+modm::lpc::SpiMaster0::write(uint8_t data)
 {
 	/* Move on only if TX FIFO not full. */
 	while (!(LPC_SSP0->SR & SPI_SRn_TNF));

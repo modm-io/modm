@@ -10,13 +10,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PT_THREAD_HPP
-#define XPCC_PT_THREAD_HPP
+#ifndef MODM_PT_THREAD_HPP
+#define MODM_PT_THREAD_HPP
 
 #include <stdint.h>
 #include "macros.hpp"
 
-namespace xpcc
+namespace modm
 {
 	namespace pt
 	{
@@ -42,7 +42,7 @@ namespace xpcc
 		 *
 		 * typedef GpioOutputB0 Led;
 		 *
-		 * class BlinkingLight : public xpcc::pt::Protothread
+		 * class BlinkingLight : public modm::pt::Protothread
 		 * {
 		 * public:
 		 *     bool
@@ -69,7 +69,7 @@ namespace xpcc
 		 *     }
 		 *
 		 * private:
-		 *     xpcc::ShortTimeout timeout;
+		 *     modm::ShortTimeout timeout;
 		 * };
 		 *
 		 *
@@ -81,7 +81,7 @@ namespace xpcc
 		 * }
 		 * \endcode
 		 *
-		 * For other examples take a look in the \c examples folder in the XPCC
+		 * For other examples take a look in the \c examples folder in the MODM
 		 * root folder.
 		 *
 		 * \warning	The names \c ptState and \c ptYield are reserved and may not
@@ -175,4 +175,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_PT_THREAD_HPP
+#endif // MODM_PT_THREAD_HPP

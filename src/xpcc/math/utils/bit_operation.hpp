@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_BIT_OPERATION_HPP
-#define	XPCC_BIT_OPERATION_HPP
+#ifndef	MODM_BIT_OPERATION_HPP
+#define	MODM_BIT_OPERATION_HPP
 
 #include <cstddef>
 #include <cmath>
@@ -22,7 +22,7 @@
 #include <modm/architecture/detect.hpp>
 #include <modm/architecture/utils.hpp>
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	Exchange the two nibbles of a byte
@@ -33,10 +33,10 @@ namespace xpcc
 	 *
 	 * \ingroup	math
 	 */
-	xpcc_always_inline uint8_t
+	modm_always_inline uint8_t
 	swap(uint8_t n)
 	{
-#ifdef XPCC_CPU_AVR
+#ifdef MODM_CPU_AVR
 		if (__builtin_constant_p(n)) {
 			n = (n << 4) | (n >> 4);
 		}
@@ -55,7 +55,7 @@ namespace xpcc
 	 *
 	 * \ingroup	math
 	 */
-	xpcc_always_inline void
+	modm_always_inline void
 	swap(uint8_t& a, uint8_t& b)
 	{
 		uint8_t temp = a;
@@ -72,17 +72,17 @@ namespace xpcc
 	 *
 	 * \ingroup	math
 	 */
-	xpcc_always_inline uint16_t
+	modm_always_inline uint16_t
 	swap(uint16_t n)
 	{
-#ifdef XPCC_CPU_ARM
+#ifdef MODM_CPU_ARM
 		asm volatile(
 			"rev16 %0,%0"	"\n\t"
 			 : "=r" (n)
 			 : "0" (n)
 		);
 		return n;
-#elif defined XPCC_CPU_AVR
+#elif defined MODM_CPU_AVR
 		if (__builtin_constant_p(n)) {
 			n = (n << 8) | (n >> 8);
 		}
@@ -111,10 +111,10 @@ namespace xpcc
 	 *
 	 * \ingroup	math
 	 */
-	xpcc_always_inline uint32_t
+	modm_always_inline uint32_t
 	swap(uint32_t n)
 	{
-#ifdef XPCC_CPU_ARM
+#ifdef MODM_CPU_ARM
 		asm volatile(
 			"rev %0,%0"		"\n\t"
 			 : "=r" (n)
@@ -127,7 +127,7 @@ namespace xpcc
 #endif
 	}
 
-	xpcc_always_inline void
+	modm_always_inline void
 	swap(int16_t& a, int16_t& b)
 	{
 		int16_t temp = a;
@@ -150,7 +150,7 @@ namespace xpcc
 	inline uint8_t
 	bitReverse(uint8_t n)
 	{
-#if defined(XPCC_CPU_ARM) && !defined(XPCC_CPU_CORTEX_M0)
+#if defined(MODM_CPU_ARM) && !defined(MODM_CPU_CORTEX_M0)
 		asm volatile(
 			"rbit %0,%0"	"\n\t"
 			"rev %0,%0"		"\n\t"
@@ -174,7 +174,7 @@ namespace xpcc
 	inline uint16_t
 	bitReverse(uint16_t n)
 	{
-#if defined(XPCC_CPU_ARM) && !defined(XPCC_CPU_CORTEX_M0)
+#if defined(MODM_CPU_ARM) && !defined(MODM_CPU_CORTEX_M0)
 		asm volatile(
 			"rbit %0,%0"	"\n\t"
 			"rev16 %0,%0"	"\n\t"
@@ -200,7 +200,7 @@ namespace xpcc
 	inline uint32_t
 	bitReverse(uint32_t n)
 	{
-#if defined(XPCC_CPU_ARM) && !defined(XPCC_CPU_CORTEX_M0)
+#if defined(MODM_CPU_ARM) && !defined(MODM_CPU_CORTEX_M0)
 		asm volatile(
 			"rbit %0,%0"	"\n\t"
 			 : "=r" (n)
@@ -266,4 +266,4 @@ namespace xpcc
 	bitCount(uint32_t n);
 }
 
-#endif	// XPCC_BIT_OPERATION_HPP
+#endif	// MODM_BIT_OPERATION_HPP

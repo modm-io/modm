@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LPC11C_C_CAN_HPP
-#define XPCC_LPC11C_C_CAN_HPP
+#ifndef MODM_LPC11C_C_CAN_HPP
+#define MODM_LPC11C_C_CAN_HPP
 
 #include <modm/architecture/interface/can.hpp>
 
@@ -30,7 +30,7 @@
 
 #define LPC11C_ROM_CAN (*((ROM **)0x1fff1ff8))
 
-namespace xpcc
+namespace modm
 {
 namespace lpc
 {
@@ -60,7 +60,7 @@ namespace lpc
  * \author	Sascha Schade
  * \ingroup	lpc
  */
-class Can : public ::xpcc::Can
+class Can : public ::modm::Can
 {
 public:
 
@@ -82,7 +82,7 @@ public:
 		 *
 		 */
 
-		static_assert(SystemClock::Can == xpcc::clock::Frequency::MHz48,
+		static_assert(SystemClock::Can == modm::clock::Frequency::MHz48,
 				"Other main clocks than 48 MHz are not yet supported.");
 
 		uint16_t prescaler;
@@ -203,6 +203,6 @@ protected:
 };
 
 } // lpc namespace
-} // xpcc namespace
+} // modm namespace
 
-#endif // XPCC_LPC11C_C_CAN_HPP
+#endif // MODM_LPC11C_C_CAN_HPP

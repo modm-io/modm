@@ -18,14 +18,14 @@
  * @defgroup	{{target.string}}_uart UART
  */
 
-#ifndef XPCC_{{target["family"] | upper}}_UART{{ id }}_HPP
-#define XPCC_{{target["family"] | upper}}_UART{{ id }}_HPP
+#ifndef MODM_{{target["family"] | upper}}_UART{{ id }}_HPP
+#define MODM_{{target["family"] | upper}}_UART{{ id }}_HPP
 
 #include "../device.hpp"
 #include <modm/architecture/interface/uart.hpp>
 #include "type_ids.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 namespace {{target["family"]}}
@@ -52,7 +52,7 @@ namespace {{target["family"]}}
  * @author	Niklas Hauser
  * @ingroup	{{target.string}}_uart
  */
-class Uart{{ id }} : public ::xpcc::Uart
+class Uart{{ id }} : public ::modm::Uart
 {
 public:
 	static const TypeId::Uart{{ id }}Txd Tx;
@@ -61,8 +61,8 @@ public:
 public:
 	// start documentation inherited
 	template< class SystemClock, uint32_t baudrate,
-			uint16_t tolerance = xpcc::Tolerance::TwoPercent >
-	static xpcc_always_inline void
+			uint16_t tolerance = modm::Tolerance::TwoPercent >
+	static modm_always_inline void
 	initialize()
 	{
 		// use double speed when necessary
@@ -154,6 +154,6 @@ protected:
 
 } // namespace {{target["family"]}}
 
-} // namespace xpcc
+} // namespace modm
 
-#endif // XPCC_{{target["family"] | upper}}_UART{{ id }}_HPP
+#endif // MODM_{{target["family"] | upper}}_UART{{ id }}_HPP

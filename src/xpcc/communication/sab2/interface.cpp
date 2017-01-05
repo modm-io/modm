@@ -20,7 +20,7 @@
 #include "interface.hpp"
 
 uint16_t
-xpcc::sab2::crcUpdate(uint16_t crc, uint8_t data)
+modm::sab2::crcUpdate(uint16_t crc, uint8_t data)
 {
 #ifdef __AVR__
 	return _crc16_update(crc, data);

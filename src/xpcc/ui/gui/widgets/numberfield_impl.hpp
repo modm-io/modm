@@ -11,19 +11,19 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_GUI_NUMBERFIELD_HPP
+#ifndef MODM_GUI_NUMBERFIELD_HPP
 #   error	"Don't include this file directly, use 'numberfield.hpp' instead!"
 #endif
 
 template<typename T>
 void
-xpcc::gui::NumberField<T>::render(View* view)
+modm::gui::NumberField<T>::render(View* view)
 {
 	if(view == 0)
 		return;
 
 	// output device of view
-	xpcc::GraphicDisplay* out = &view->display();
+	modm::GraphicDisplay* out = &view->display();
 
 	// color palette of view
 	ColorPalette cp = this->color_palette;

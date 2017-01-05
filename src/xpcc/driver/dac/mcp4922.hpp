@@ -10,10 +10,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_MCP4922_HPP
-#define XPCC_MCP4922_HPP
+#ifndef MODM_MCP4922_HPP
+#define MODM_MCP4922_HPP
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	Dual-channel 12-Bit Digital-to-Analog Converter (DAC)
@@ -98,4 +98,4 @@ namespace xpcc
 
 #include "mcp4922_impl.hpp"
 
-#endif // XPCC_MCP4922_HPP
+#endif // MODM_MCP4922_HPP

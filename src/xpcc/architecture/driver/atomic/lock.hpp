@@ -12,13 +12,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_ATOMIC_LOCK_HPP
-#define	XPCC_ATOMIC_LOCK_HPP
+#ifndef	MODM_ATOMIC_LOCK_HPP
+#define	MODM_ATOMIC_LOCK_HPP
 
 #include <stdint.h>
 #include <modm/architecture/utils.hpp>
 
-namespace xpcc
+namespace modm
 {
 	namespace atomic
 	{
@@ -55,7 +55,7 @@ namespace xpcc
 			 * 
 			 * Disables interrupts.
 			 */
-			xpcc_always_inline
+			modm_always_inline
 			Lock();
 			
 			/**
@@ -63,13 +63,13 @@ namespace xpcc
 			 * 
 			 * Restore the interrupt settings.
 			 */
-			xpcc_always_inline
+			modm_always_inline
 			~Lock();
 		
 		private:
-#if defined(XPCC_CPU_AVR)
+#if defined(MODM_CPU_AVR)
 			uint8_t sreg;
-#elif defined(XPCC_CPU_ARM)
+#elif defined(MODM_CPU_ARM)
 			uint32_t cpsr;
 #endif
 		};
@@ -82,7 +82,7 @@ namespace xpcc
 		 * inside a locked block.
 		 * 
 		 * Most of the time you won't need this class. But on some rare
-		 * times it is useful. The xpcc::Scheduler is an example for that.
+		 * times it is useful. The modm::Scheduler is an example for that.
 		 */
 		class Unlock
 		{
@@ -92,7 +92,7 @@ namespace xpcc
 			 * 
 			 * Enable interrupts
 			 */
-			xpcc_always_inline
+			modm_always_inline
 			Unlock();
 			
 			/**
@@ -100,30 +100,30 @@ namespace xpcc
 			 * 
 			 * Restore the interrupt settings.
 			 */
-			xpcc_always_inline
+			modm_always_inline
 			~Unlock();
 		
 		private:
-#if defined(XPCC_CPU_AVR)
+#if defined(MODM_CPU_AVR)
 			uint8_t sreg;
-#elif defined(XPCC_CPU_ARM)
+#elif defined(MODM_CPU_ARM)
 			uint32_t cpsr;
 #endif
 		};
 	}
 }
 
-#ifdef XPCC_CPU_AVR
+#ifdef MODM_CPU_AVR
 
 	#include <avr/interrupt.h>
 
-	xpcc::atomic::Lock::Lock() :
+	modm::atomic::Lock::Lock() :
 		sreg(SREG)
 	{
 		cli();
 	}
 
-	xpcc::atomic::Lock::~Lock()
+	modm::atomic::Lock::~Lock()
 	{
 		SREG = sreg;
 		__asm__ volatile ("" ::: "memory");
@@ -131,22 +131,22 @@ namespace xpcc
 
 	// ------------------------------------------------------------------------
 
-	xpcc::atomic::Unlock::Unlock() :
+	modm::atomic::Unlock::Unlock() :
 		sreg(SREG)
 	{
 		sei();
 	}
 
-	xpcc::atomic::Unlock::~Unlock()
+	modm::atomic::Unlock::~Unlock()
 	{
 		SREG = sreg;
 		__asm__ volatile ("" ::: "memory");
 	}
 
-#elif defined(XPCC_CPU_CORTEX_M0) || defined(XPCC_CPU_CORTEX_M3) || defined(XPCC_CPU_CORTEX_M4) || defined(XPCC_CPU_CORTEX_M7)
+#elif defined(MODM_CPU_CORTEX_M0) || defined(MODM_CPU_CORTEX_M3) || defined(MODM_CPU_CORTEX_M4) || defined(MODM_CPU_CORTEX_M7)
 
-	xpcc_always_inline
-	xpcc::atomic::Lock::Lock()
+	modm_always_inline
+	modm::atomic::Lock::Lock()
 	{
 		// cpsr = __get_PRIMASK();
 		// __disable_irq();
@@ -159,15 +159,15 @@ namespace xpcc
 				:: "memory");
 	}
 
-	xpcc_always_inline
-	xpcc::atomic::Lock::~Lock()
+	modm_always_inline
+	modm::atomic::Lock::~Lock()
 	{
 		// __set_PRIMASK(cpsr);
 		asm volatile ("msr PRIMASK, %0" : : "r" (cpsr) : "memory" );
 	}
 
-	xpcc_always_inline
-	xpcc::atomic::Unlock::Unlock()
+	modm_always_inline
+	modm::atomic::Unlock::Unlock()
 	{
 		// cpsr = __get_PRIMASK();
 		// __disable_irq();
@@ -180,32 +180,32 @@ namespace xpcc
 				:: "memory");
 	}
 
-	xpcc_always_inline
-	xpcc::atomic::Unlock::~Unlock()
+	modm_always_inline
+	modm::atomic::Unlock::~Unlock()
 	{
 		// __set_PRIMASK(cpsr);
 		asm volatile ("msr PRIMASK, %0" : : "r" (cpsr) : "memory" );
 	}
 
-#elif defined(XPCC_OS_HOSTED)
+#elif defined(MODM_OS_HOSTED)
 
-	xpcc::atomic::Lock::Lock()
+	modm::atomic::Lock::Lock()
 	{
 	}
 
-	xpcc::atomic::Lock::~Lock()
+	modm::atomic::Lock::~Lock()
 	{
 	}
 
-	xpcc::atomic::Unlock::Unlock()
+	modm::atomic::Unlock::Unlock()
 	{
 	}
 
-	xpcc::atomic::Unlock::~Unlock()
+	modm::atomic::Unlock::~Unlock()
 	{
 	}
 #else
 #	error	"Please provide an atomic lock implementation for this target!"
 #endif
 
-#endif	// XPCC_ATOMIC_LOCK_HPP
+#endif	// MODM_ATOMIC_LOCK_HPP

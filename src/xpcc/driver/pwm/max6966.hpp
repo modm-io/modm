@@ -12,14 +12,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_MAX6966_HPP
-#define XPCC_MAX6966_HPP
+#ifndef MODM_MAX6966_HPP
+#define MODM_MAX6966_HPP
 
 #include <stdint.h>
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/architecture/driver/delay.hpp>
 
-namespace xpcc
+namespace modm
 {
 	namespace max6966
 	{
@@ -261,4 +261,4 @@ namespace xpcc
 
 #include "max6966_impl.hpp"
 
-#endif // XPCC_MAX6966_HPP
+#endif // MODM_MAX6966_HPP

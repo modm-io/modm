@@ -13,10 +13,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_MENU_BUTTONS_HPP
-#define XPCC_MENU_BUTTONS_HPP
+#ifndef MODM_MENU_BUTTONS_HPP
+#define MODM_MENU_BUTTONS_HPP
 
-namespace xpcc
+namespace modm
 {
 	namespace MenuButtons
 	{
@@ -39,4 +39,4 @@ namespace xpcc
 	}
 }
 
-#endif /* XPCC_MENU_BUTTONS_HPP */
+#endif /* MODM_MENU_BUTTONS_HPP */

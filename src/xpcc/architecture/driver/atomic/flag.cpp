@@ -14,18 +14,18 @@
 
 #include "flag.hpp"
 
-xpcc::atomic::Flag::Flag(bool inState) : 
+modm::atomic::Flag::Flag(bool inState) : 
 	state(inState)
 {
 }
 
-xpcc::atomic::Flag::Flag(const Flag& other) :
+modm::atomic::Flag::Flag(const Flag& other) :
 	state(other.state)
 {
 }
 
-xpcc::atomic::Flag&
-xpcc::atomic::Flag::operator = (const Flag& other)
+modm::atomic::Flag&
+modm::atomic::Flag::operator = (const Flag& other)
 {
 	this->state = other.state;
 	return *this;

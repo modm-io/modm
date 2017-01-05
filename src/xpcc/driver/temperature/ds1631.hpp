@@ -12,15 +12,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_DS1631_HPP
-#define XPCC_DS1631_HPP
+#ifndef MODM_DS1631_HPP
+#define MODM_DS1631_HPP
 
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/processing/protothread.hpp>
 #include "lm75.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 struct ds1631
@@ -63,7 +63,7 @@ protected:
 		Polarity = Bit1,
 		OneShot = Bit0
 	};
-	XPCC_FLAGS8(Config);
+	MODM_FLAGS8(Config);
 	/// @endcond
 
 public:
@@ -109,57 +109,57 @@ public:
  */
 template < typename I2cMaster >
 class Ds1631 :	public ds1631, public I2cDevice< I2cMaster, 2 >,
-				protected xpcc::pt::Protothread
+				protected modm::pt::Protothread
 {
 public:
 	///
 	Ds1631(Data &data, uint8_t address=0x90);
 
-	void xpcc_always_inline
+	void modm_always_inline
 	update()
 	{ run(); }
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	initialize();
 
 	// @param	rate	Update rate in Hz: 1 to 33.
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setUpdateRate(uint8_t rate);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setResolution(Resolution resolution);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setAlertPolarity(AlertPolarity polarity);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setConversionMode(ConversionMode mode);
 
 	/// Writes the upper limit of the alarm.
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	setUpperLimit(float temperature)
 	{ return setLimitRegister(Command::TemperatureUpperLimit, temperature); }
 
 	/// Writes the lower limit of the alarm.
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	setLowerLimit(float temperature)
 	{ return setLimitRegister(Command::TemperatureLowerLimit, temperature); }
 
 
 	/// reads the Temperature registers and buffers the results
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	readTemperature();
 
 
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	startConversion()
 	{ return writeCommand(Command::StartConvert); }
 
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	stopConversion()
 	{ return writeCommand(Command::StopConvert); }
 
-	xpcc::ResumableResult<bool> xpcc_always_inline
+	modm::ResumableResult<bool> modm_always_inline
 	reset()
 	{ return writeCommand(Command::SoftwareReset); }
 
@@ -172,27 +172,27 @@ private:
 	bool
 	run();
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	writeCommand(Command cmd);
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	writeConfiguration();
 
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	setLimitRegister(Command cmd, float temperature);
 
 	Data &data;
 	uint8_t buffer[3];
 	Config_t config;
 
-	xpcc::ShortTimeout periodTimeout;
-	xpcc::ShortTimeout conversionTimeout;
+	modm::ShortTimeout periodTimeout;
+	modm::ShortTimeout conversionTimeout;
 	uint16_t updateTime;
 	uint8_t conversionTime;
 };
 
-}	// namespace xpcc
+}	// namespace modm
 
 #include "ds1631_impl.hpp"
 
-#endif // XPCC_DS1631_HPP
+#endif // MODM_DS1631_HPP

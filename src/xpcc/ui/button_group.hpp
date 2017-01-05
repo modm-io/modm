@@ -13,15 +13,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_BUTTON_GROUP_HPP
-#define XPCC_BUTTON_GROUP_HPP
+#ifndef MODM_BUTTON_GROUP_HPP
+#define MODM_BUTTON_GROUP_HPP
 
 #include <stdint.h>
 
 #include <modm/architecture/utils.hpp>
 #include <modm/architecture/driver/atomic/lock.hpp>
 
-namespace xpcc
+namespace modm
 {
 /**
  * Debouncing signals
@@ -123,11 +123,11 @@ public:
 	 * Each pressed key is only reported once.
 	 *
 	 * @code
-	 * xpcc::ButtonGroup<> buttons;
+	 * modm::ButtonGroup<> buttons;
 	 * ...
 	 * while (1) {
 	 *		...
-	 * 	if (buttons.isPressed(xpcc::ButtonGroup::BUTTON0)) {
+	 * 	if (buttons.isPressed(modm::ButtonGroup::BUTTON0)) {
 	 * 		// do something
 	 * 	}
 	 * }
@@ -145,12 +145,12 @@ public:
 	 * repeatedly pressing and releasing the key.
 	 *
 	 * @code
-	 * xpcc::ButtonGroup<> buttons(xpcc::ButtonGroup::BUTTON0);
+	 * modm::ButtonGroup<> buttons(modm::ButtonGroup::BUTTON0);
 	 * ...
 	 * while (1) {
 	 *		...
-	 * 	if (buttons.isPressed(xpcc::ButtonGroup::BUTTON0) ||
-	 *		buttons.isRepeated(xpcc::ButtonGroup::BUTTON0))
+	 * 	if (buttons.isPressed(modm::ButtonGroup::BUTTON0) ||
+	 *		buttons.isRepeated(modm::ButtonGroup::BUTTON0))
 	 * 	{
 	 * 		// do something
 	 * 	}
@@ -166,14 +166,14 @@ public:
 	 * Get buttons which were pressed short.
 	 *
 	 * @code
-	 * xpcc::ButtonGroup<> buttons(xpcc::ButtonGroup::BUTTON0);
+	 * modm::ButtonGroup<> buttons(modm::ButtonGroup::BUTTON0);
 	 * ...
 	 * while (1) {
 	 * 	...
-	 * 	if (buttons.isPressedShort(xpcc::ButtonGroup::BUTTON0)) {
+	 * 	if (buttons.isPressedShort(modm::ButtonGroup::BUTTON0)) {
 	 * 		// do something
 	 * 	}
-	 * 	if (buttons.isPressedLong(xpcc::ButtonGroup::BUTTON0)) {
+	 * 	if (buttons.isPressedLong(modm::ButtonGroup::BUTTON0)) {
 	 * 		// do something different
 	 * 	}
 	 * }
@@ -205,7 +205,7 @@ public:
 	 * @param	input
 	 * 		input signals
 	 */
-	xpcc_always_inline void
+	modm_always_inline void
 	update(T input);
 
 protected:
@@ -228,4 +228,4 @@ private:
 
 #include "button_group_impl.hpp"
 
-#endif // XPCC_BUTTON_GROUP_HPP
+#endif // MODM_BUTTON_GROUP_HPP

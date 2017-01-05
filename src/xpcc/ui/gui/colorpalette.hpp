@@ -12,13 +12,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_GUI_COLORPALETTE_HPP
-#define XPCC_GUI_COLORPALETTE_HPP
+#ifndef MODM_GUI_COLORPALETTE_HPP
+#define MODM_GUI_COLORPALETTE_HPP
 
 #include <modm/ui/display/graphic_display.hpp>
 
 
-namespace xpcc
+namespace modm
 {
 
 namespace gui
@@ -54,7 +54,7 @@ Color {
 class ColorPalette
 {
 public:
-	ColorPalette(xpcc::glcd::Color colors[Color::PALETTE_SIZE]) :
+	ColorPalette(modm::glcd::Color colors[Color::PALETTE_SIZE]) :
 		colors(colors)
 	{
 	}
@@ -72,7 +72,7 @@ public:
 	}
 
 	void
-	setColor(Color name, xpcc::glcd::Color color)
+	setColor(Color name, modm::glcd::Color color)
 	{
 		if (name < Color::PALETTE_SIZE)
 		{
@@ -80,32 +80,32 @@ public:
 		}
 	}
 
-	const xpcc::glcd::Color
+	const modm::glcd::Color
 	getColor(Color name) const
 	{
 		if (name >= Color::PALETTE_SIZE)
-			return xpcc::glcd::Color(0xffff);
+			return modm::glcd::Color(0xffff);
 		return colors[name];
 	}
 
-	const xpcc::glcd::Color
+	const modm::glcd::Color
 	operator[](Color name)
 	{
 		return getColor(name);
 	}
 
-	const xpcc::glcd::Color*
+	const modm::glcd::Color*
 	getPointer() const
 	{
 		return colors;
 	}
 
 private:
-	xpcc::glcd::Color *colors;
+	modm::glcd::Color *colors;
 };
 
 }	// namespace gui
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif  // XPCC_GUI_COLORPALETTE_HPP
+#endif  // MODM_GUI_COLORPALETTE_HPP

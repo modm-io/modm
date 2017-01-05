@@ -11,12 +11,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ALLOCATOR_DYNAMIC_HPP
-#define XPCC_ALLOCATOR_DYNAMIC_HPP
+#ifndef MODM_ALLOCATOR_DYNAMIC_HPP
+#define MODM_ALLOCATOR_DYNAMIC_HPP
 
 #include "allocator_base.hpp"
 
-namespace xpcc
+namespace modm
 {
 	namespace allocator
 	{
@@ -76,4 +76,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_ALLOCATOR_DYNAMIC_HPP
+#endif // MODM_ALLOCATOR_DYNAMIC_HPP

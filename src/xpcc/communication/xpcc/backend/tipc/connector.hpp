@@ -92,7 +92,7 @@ namespace xpcc
 		 *
 		 * Only valid if isPacketAvailable() returns \c true.
 		 */
-		virtual const SmartPointer
+		virtual const modm::SmartPointer
 		getPacketPayload() const;
 
 		/**
@@ -116,7 +116,7 @@ namespace xpcc
 		 */
 		virtual void
 		sendPacket(const Header &header,
-				   SmartPointer payload = SmartPointer());
+				   modm::SmartPointer payload = modm::SmartPointer());
 
 	private:
 		tipc::Transmitter transmitter;

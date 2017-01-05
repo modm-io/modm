@@ -14,17 +14,17 @@
 #include "../mutex.hpp"
 
 // ----------------------------------------------------------------------------
-xpcc::rtos::Mutex::Mutex()
+modm::rtos::Mutex::Mutex()
 {
 }
 
-xpcc::rtos::Mutex::~Mutex()
+modm::rtos::Mutex::~Mutex()
 {
 }
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::rtos::Mutex::acquire(uint32_t timeout)
+modm::rtos::Mutex::acquire(uint32_t timeout)
 {
 	return mutex.timed_lock(
 			boost::posix_time::milliseconds(timeout));

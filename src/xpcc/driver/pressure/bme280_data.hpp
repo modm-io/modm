@@ -14,16 +14,16 @@
 
 #include <modm/debug/logger/logger.hpp>
 
-#ifndef XPCC_BME280_DATA_HPP
-#define XPCC_BME280_DATA_HPP
+#ifndef MODM_BME280_DATA_HPP
+#define MODM_BME280_DATA_HPP
 
-#undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::DISABLED
+#undef  MODM_LOG_LEVEL
+#define MODM_LOG_LEVEL modm::log::DISABLED
 
 // Forward declaration the test class
 class Bme280Test;
 
-namespace xpcc
+namespace modm
 {
 
 template < typename I2cMaster >
@@ -37,7 +37,7 @@ namespace bme280data
  * Values are used for calculation of calibrated
  * sensor values from raw sensor data
  */
-struct xpcc_packed
+struct modm_packed
 Calibration
 {
 	uint16_t T1; // 88 89
@@ -62,11 +62,11 @@ Calibration
 	int8_t   H6; // e7
 };
 
-struct xpcc_packed
+struct modm_packed
 DataBase
 {
 	template < typename I2cMaster >
-	friend class ::xpcc::Bme280;
+	friend class ::modm::Bme280;
 
 	// Grant unit test full access to private members.
 	friend class ::Bme280Test;
@@ -117,7 +117,7 @@ protected:
 	};
 };
 
-class xpcc_packed
+class modm_packed
 Data : public DataBase
 {
 public:
@@ -185,7 +185,7 @@ private:
 	int32_t t_fine; // calculated in calculateCalibratedTemperature, needed for calculateCalibratedPressure and calculateCalibratedHumidity
 };
 
-class xpcc_packed
+class modm_packed
 DataDouble : public DataBase
 {
 public:
@@ -233,9 +233,9 @@ private:
 
 } // bme280data namespace
 
-} // xpcc namespace
+} // modm namespace
 
 #include "bme280_data_impl_fp.hpp"
 #include "bme280_data_impl_double.hpp"
 
-#endif // XPCC_BME280_DATA_HPP
+#endif // MODM_BME280_DATA_HPP

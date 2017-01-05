@@ -11,14 +11,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_INTERPOLATION_LINEAR_HPP
-   #error "Don't include this file directly. Use 'xpcc/math/interpolation/linear.hpp' instead!"
+#ifndef	MODM_INTERPOLATION_LINEAR_HPP
+   #error "Don't include this file directly. Use 'modm/math/interpolation/linear.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template <typename T,
 		  template <typename> class Accessor>
-xpcc::interpolation::Linear<T, Accessor>::Linear(
+modm::interpolation::Linear<T, Accessor>::Linear(
 		Accessor<T> supportingPoints, uint8_t numberOfPoints) :
 	supportingPoints(supportingPoints), numberOfPoints(numberOfPoints)
 {
@@ -27,8 +27,8 @@ xpcc::interpolation::Linear<T, Accessor>::Linear(
 // ----------------------------------------------------------------------------
 template <typename T,
 		  template <typename> class Accessor>
-typename xpcc::interpolation::Linear<T, Accessor>::OutputType
-xpcc::interpolation::Linear<T, Accessor>::interpolate(const InputType& value) const
+typename modm::interpolation::Linear<T, Accessor>::OutputType
+modm::interpolation::Linear<T, Accessor>::interpolate(const InputType& value) const
 {
 	T current(this->supportingPoints[0]);
 	

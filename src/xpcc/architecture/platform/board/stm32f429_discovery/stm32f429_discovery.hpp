@@ -15,12 +15,12 @@
 // http://www.st.com/web/catalog/tools/FM116/SC959/SS1532/PF259090
 //
 
-#ifndef XPCC_STM32_F429_DISCOVERY_HPP
-#define XPCC_STM32_F429_DISCOVERY_HPP
+#ifndef MODM_STM32_F429_DISCOVERY_HPP
+#define MODM_STM32_F429_DISCOVERY_HPP
 
 #include <modm/architecture/platform.hpp>
 
-using namespace xpcc::stm32;
+using namespace modm::stm32;
 
 namespace Board
 {
@@ -90,10 +90,10 @@ struct systemClock
 		ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div4);
 		ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div2);
 		// update clock frequencies
-		xpcc::clock::fcpu     = Frequency;
-		xpcc::clock::fcpu_kHz = Frequency / 1000;
-		xpcc::clock::fcpu_MHz = Frequency / 1000000;
-		xpcc::clock::ns_per_loop = ::round(3000 / (Frequency / 1000000));
+		modm::clock::fcpu     = Frequency;
+		modm::clock::fcpu_kHz = Frequency / 1000;
+		modm::clock::fcpu_MHz = Frequency / 1000000;
+		modm::clock::ns_per_loop = ::round(3000 / (Frequency / 1000000));
 
 		return true;
 	}
@@ -105,7 +105,7 @@ using Button = GpioInputA0;
 using LedGreen = GpioOutputG13;	// User LED (LD3)
 using LedRed   = GpioOutputG14;	// User LED (LD4)
 
-using Leds = xpcc::SoftwareGpioPort< LedRed, LedGreen >;
+using Leds = modm::SoftwareGpioPort< LedRed, LedGreen >;
 
 namespace l3g
 {
@@ -226,10 +226,10 @@ inline void
 initialize()
 {
 	systemClock::enable();
-	xpcc::cortex::SysTickTimer::initialize<systemClock>();
+	modm::cortex::SysTickTimer::initialize<systemClock>();
 
-	LedGreen::setOutput(xpcc::Gpio::Low);
-	LedRed::setOutput(xpcc::Gpio::Low);
+	LedGreen::setOutput(modm::Gpio::Low);
+	LedRed::setOutput(modm::Gpio::Low);
 
 	Button::setInput();
 	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
@@ -251,7 +251,7 @@ initializeL3g()
 	l3g::Int2::enableExternalInterrupt();
 //	l3g::Int2::enableExternalInterruptVector(12);
 
-	l3g::Cs::setOutput(xpcc::Gpio::High);
+	l3g::Cs::setOutput(modm::Gpio::High);
 
 	l3g::Sck::connect(l3g::SpiMaster::Sck);
 	l3g::Mosi::connect(l3g::SpiMaster::Mosi);
@@ -263,4 +263,4 @@ initializeL3g()
 
 }
 
-#endif	// XPCC_STM32_F429_DISCOVERY_HPP
+#endif	// MODM_STM32_F429_DISCOVERY_HPP

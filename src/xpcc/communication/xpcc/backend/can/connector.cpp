@@ -93,7 +93,7 @@ xpcc::CanConnectorBase::convertToHeader(const uint32_t & identifier,
 			break;
 		default:
 			// unknown type
-			//XPCC_LOG_ERROR << "Unknown Type" << xpcc::flush;
+			//MODM_LOG_ERROR << "Unknown Type" << modm::flush;
 			header.type = xpcc::Header::Type::REQUEST;
 	}
 

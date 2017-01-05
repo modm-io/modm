@@ -15,8 +15,8 @@
 #include <modm/driver/display.hpp>
 #include <modm/io/iostream.hpp>
 
-using namespace xpcc::atmega;
-typedef xpcc::avr::SystemClock clock;
+using namespace modm::atmega;
+typedef modm::avr::SystemClock clock;
 
 namespace touch
 {
@@ -45,10 +45,10 @@ namespace lcd
 	typedef GpioOutputD3 A0;
 	typedef GpioOutputD4 Reset;
 
-	typedef xpcc::SoftwareSpiMaster< Scl, Mosi > SPI;
+	typedef modm::SoftwareSpiMaster< Scl, Mosi > SPI;
 }
 
-xpcc::DogM128< lcd::SPI, lcd::Cs, lcd::A0, lcd::Reset, true > display;
+modm::DogM128< lcd::SPI, lcd::Cs, lcd::A0, lcd::Reset, true > display;
 
 void
 drawCross(uint8_t x, uint8_t y)
@@ -71,10 +71,10 @@ main()
 	sei();
 
 	// Create a IOStream for complex formatting tasks
-	xpcc::IODeviceWrapper< Uart0, xpcc::IOBuffer::BlockIfFull > device(uart);
-	xpcc::IOStream output(device);
+	modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > device(uart);
+	modm::IOStream output(device);
 
-	output << "Welcome" << xpcc::endl;
+	output << "Welcome" << modm::endl;
 
 	led::R::set();
 	led::G::set();
@@ -114,7 +114,7 @@ main()
 		touch::Left::setOutput();
 		touch::Right::set();
 		touch::Right::setOutput();
-		xpcc::delayMilliseconds(2);
+		modm::delayMilliseconds(2);
 
 		int16_t xAdc = Adc::readChannel(0);
 
@@ -127,7 +127,7 @@ main()
 		touch::Bottom::setOutput();
 		touch::Top::set();
 		touch::Top::setOutput();
-		xpcc::delayMilliseconds(2);
+		modm::delayMilliseconds(2);
 
 		int16_t yAdc = Adc::readChannel(1);
 
@@ -136,7 +136,7 @@ main()
 		touch::Top::reset();
 
 		// print result
-		output << "x=" << xAdc << ", y=" << yAdc << xpcc::endl;
+		output << "x=" << xAdc << ", y=" << yAdc << modm::endl;
 
 		int16_t x = (static_cast<int32_t>(xAdc - 528) * (120 - 10)) / (115 - 528) + 10;
 		int16_t y = (static_cast<int32_t>(yAdc - 236) * (58 - 10)) / (690 - 236) + 10;

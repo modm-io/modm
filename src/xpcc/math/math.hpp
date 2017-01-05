@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef XPCC_MATH_HPP
-#define XPCC_MATH_HPP
+#ifndef MODM_MATH_HPP
+#define MODM_MATH_HPP
 
 #include "filter.hpp"
 #include "geometry.hpp"
@@ -29,4 +29,4 @@
 #include "tolerance.hpp"
 #include "utils.hpp"
 
-#endif	// XPCC_MATH_HPP
+#endif	// MODM_MATH_HPP

@@ -9,15 +9,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_UI_LINEAR_ANIMATION_HPP
-#define XPCC_UI_LINEAR_ANIMATION_HPP
+#ifndef MODM_UI_LINEAR_ANIMATION_HPP
+#define MODM_UI_LINEAR_ANIMATION_HPP
 
 #include <stdint.h>
 #include <modm/architecture/driver/clock.hpp>
 #include <modm/utils/arithmetic_traits.hpp>
 #include "interpolation.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 namespace ui
@@ -27,7 +27,7 @@ namespace ui
  * This class allows the linear animation of one value over time.
  *
  * Be aware that the algortihm for 8bit types is optimized for low computational costs,
- * developed for fast LED fading (@see xpcc::ui::Led).
+ * developed for fast LED fading (@see modm::ui::Led).
  * Therefore the animation length is limited to `128ms * value_difference`, which is
  * about 32s over the full 8bit range.
  * If you specify a longer time in this case, the animation simply finishes before.
@@ -91,14 +91,14 @@ private:
 	T &currentValue;
 	T endValue;
 	TimeType animationTime;
-	xpcc::ShortTimestamp previous;
+	modm::ShortTimestamp previous;
 	FastRamp<T> interpolation;
 };
 
 }	// namespace ui
 
-}	// namespace xpcc
+}	// namespace modm
 
 #include "base_impl.hpp"
 
-#endif	// XPCC_UI_LINEAR_ANIMATION_HPP
+#endif	// MODM_UI_LINEAR_ANIMATION_HPP

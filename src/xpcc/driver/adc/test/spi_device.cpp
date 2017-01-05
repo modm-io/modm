@@ -82,17 +82,17 @@ test::SpiDevice::deselect()
 		}
 		else if (error & DOUBLE_SELECT) {
 			error &= ~DOUBLE_SELECT;
-			reporter.reportFailure(lineNumber) << "Double select detected" << xpcc::endl;
+			reporter.reportFailure(lineNumber) << "Double select detected" << modm::endl;
 		}
 		else if (error & WRONG_LENGTH) {
 			error &= ~WRONG_LENGTH;
 			reporter.reportFailure(lineNumber)
 					<< "Wrong length (" << bytesWritten << " != "
-					<< expectedLength << ")" << xpcc::endl;
+					<< expectedLength << ")" << modm::endl;
 		}
 		else if (error & WRONG_DATA_RECEIVED) {
 			error &= ~WRONG_DATA_RECEIVED;
-			xpcc::IOStream& os = reporter.reportFailure(lineNumber);
+			modm::IOStream& os = reporter.reportFailure(lineNumber);
 			os << "Error in Transmission " << currentTransmission << "\n" " expected = ";
 			std::size_t length = transmissions[currentTransmission].length;
 			unittest::printArray(os, 0, length, transmissions[currentTransmission].rx);
@@ -180,7 +180,7 @@ test::SpiDevice::finish()
 			error &= ~MAX_TRANSMISSION_COUNT_EXCEEDED;
 			reporter.reportFailure(lineNumber)
 					<< "Transmission Count (" << currentTransmission << " == "
-					<< transmissionCount << ")" << xpcc::endl;
+					<< transmissionCount << ")" << modm::endl;
 		}
 	}
 }

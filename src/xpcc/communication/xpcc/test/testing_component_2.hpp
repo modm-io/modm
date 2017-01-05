@@ -22,40 +22,40 @@ class TestingComponent2 : public xpcc::AbstractComponent
 {
 public:
 	TestingComponent2(xpcc::Dispatcher &communication, Timeline *timeline);
-	
-	virtual void
+
+	void
 	update();
-	
+
 	// expose protected methods
 	using xpcc::AbstractComponent::callAction;
 	using xpcc::AbstractComponent::publishEvent;
-	
+
 	// Action id: 0x10
 	void
 	actionNoParameter(const xpcc::ResponseHandle& handle);
-	
+
 	// Action id: 0x11
 	void
 	actionUint16(const xpcc::ResponseHandle& handle,
 			const uint16_t *parameter);
-	
+
 	// Event id: 0x20
 	void
 	eventNoParameter(const xpcc::Header& header);
-	
-	
+
+
 	// id: 0x30
 	void
 	responseNoParameter(const xpcc::Header& header);
-	
+
 	// id: 0x31
 	void
 	responseUint16(const xpcc::Header& header, const uint16_t *parameter);
-	
+
 	// id: 0x32
 	void
 	responseCallAction(const xpcc::Header& header);
-	
+
 private:
 	Timeline *timeline;
 };

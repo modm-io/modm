@@ -31,6 +31,6 @@ main()
 		// read the input on analog pin 0
 		int sensorValue = Adc::readChannel(0);
 		// print analog readout
-		serialStream << sensorValue << xpcc::endl;
+		serialStream << sensorValue << modm::endl;
 	}
 }

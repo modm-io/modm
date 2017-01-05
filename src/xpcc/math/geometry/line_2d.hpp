@@ -10,15 +10,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LINE_2D_HPP
-#define XPCC_LINE_2D_HPP
+#ifndef MODM_LINE_2D_HPP
+#define MODM_LINE_2D_HPP
 
 #include "vector.hpp"
 #include "point_set_2d.hpp"
 
 #include "geometric_traits.hpp"
 
-namespace xpcc
+namespace modm
 {
 	// forward declaration
 	template <typename T>
@@ -103,4 +103,4 @@ namespace xpcc
 
 #include "line_2d_impl.hpp"
 
-#endif // XPCC_LINE_2D_HPP
+#endif // MODM_LINE_2D_HPP

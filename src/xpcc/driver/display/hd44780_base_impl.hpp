@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_HD44780_BASE_HPP
+#ifndef MODM_HD44780_BASE_HPP
 	#error	"Don't include this file directly, use 'hd44780_base.hpp' instead!"
 #endif
 
@@ -19,7 +19,7 @@
 // ----------------------------------------------------------------------------
 template <typename DATA, typename RW, typename RS, typename E>
 void
-xpcc::Hd44780Base<DATA, RW, RS, E>::initialize(LineMode lineMode)
+modm::Hd44780Base<DATA, RW, RS, E>::initialize(LineMode lineMode)
 {
 	E::setOutput(E_Disable);
 	RW::setOutput(RW_Write);
@@ -27,11 +27,11 @@ xpcc::Hd44780Base<DATA, RW, RS, E>::initialize(LineMode lineMode)
 
 	Bus<DATA, E, DATA::width>::writeHighNibble(Set8BitBus);
 
-	xpcc::delayMilliseconds(5);
+	modm::delayMilliseconds(5);
 
 	Bus<DATA, E, DATA::width>::writeHighNibble(Set8BitBus);
 
-	xpcc::delayMicroseconds(100);
+	modm::delayMicroseconds(100);
 
 	Bus<DATA, E, DATA::width>::writeHighNibble(Set8BitBus);
 
@@ -56,14 +56,14 @@ xpcc::Hd44780Base<DATA, RW, RS, E>::initialize(LineMode lineMode)
 
 template <typename DATA, typename RW, typename RS, typename E>
 bool
-xpcc::Hd44780Base<DATA, RW, RS, E>::clear()
+modm::Hd44780Base<DATA, RW, RS, E>::clear()
 {
 	return writeCommand(ClearDisplay);
 }
 
 template <typename DATA, typename RW, typename RS, typename E>
 bool
-xpcc::Hd44780Base<DATA, RW, RS, E>::resetCursor()
+modm::Hd44780Base<DATA, RW, RS, E>::resetCursor()
 {
 	return writeCommand(ResetCursor);
 }
@@ -71,7 +71,7 @@ xpcc::Hd44780Base<DATA, RW, RS, E>::resetCursor()
 // MARK: write
 template <typename DATA, typename RW, typename RS, typename E>
 void
-xpcc::Hd44780Base<DATA, RW, RS, E>::write(uint8_t data)
+modm::Hd44780Base<DATA, RW, RS, E>::write(uint8_t data)
 {
 	RW::set(RW_Write);
 	Bus<DATA, E, DATA::width>::write(data);
@@ -79,7 +79,7 @@ xpcc::Hd44780Base<DATA, RW, RS, E>::write(uint8_t data)
 
 template <typename DATA, typename RW, typename RS, typename E>
 bool
-xpcc::Hd44780Base<DATA, RW, RS, E>::writeAddress(uint8_t address)
+modm::Hd44780Base<DATA, RW, RS, E>::writeAddress(uint8_t address)
 {
 	if (isBusy())
 		return false;
@@ -94,7 +94,7 @@ xpcc::Hd44780Base<DATA, RW, RS, E>::writeAddress(uint8_t address)
 
 template <typename DATA, typename RW, typename RS, typename E>
 bool
-xpcc::Hd44780Base<DATA, RW, RS, E>::writeCommand(uint8_t command)
+modm::Hd44780Base<DATA, RW, RS, E>::writeCommand(uint8_t command)
 {
 	if (isBusy())
 		return false;
@@ -107,7 +107,7 @@ xpcc::Hd44780Base<DATA, RW, RS, E>::writeCommand(uint8_t command)
 
 template <typename DATA, typename RW, typename RS, typename E>
 bool
-xpcc::Hd44780Base<DATA, RW, RS, E>::writeRAM(uint8_t data)
+modm::Hd44780Base<DATA, RW, RS, E>::writeRAM(uint8_t data)
 {
 	if (isBusy())
 		return false;
@@ -122,7 +122,7 @@ xpcc::Hd44780Base<DATA, RW, RS, E>::writeRAM(uint8_t data)
 
 template <typename DATA, typename RW, typename RS, typename E>
 uint8_t
-xpcc::Hd44780Base<DATA, RW, RS, E>::read()
+modm::Hd44780Base<DATA, RW, RS, E>::read()
 {
 	RW::set(RW_Read);
 	return Bus<DATA, E, DATA::width>::read();
@@ -130,7 +130,7 @@ xpcc::Hd44780Base<DATA, RW, RS, E>::read()
 
 template <typename DATA, typename RW, typename RS, typename E>
 bool
-xpcc::Hd44780Base<DATA, RW, RS, E>::readAddress(uint8_t &address)
+modm::Hd44780Base<DATA, RW, RS, E>::readAddress(uint8_t &address)
 {
 	RS::set(RS_Command);
 	address = (read() & CGRAM_AddressMask);
@@ -140,7 +140,7 @@ xpcc::Hd44780Base<DATA, RW, RS, E>::readAddress(uint8_t &address)
 
 template <typename DATA, typename RW, typename RS, typename E>
 bool
-xpcc::Hd44780Base<DATA, RW, RS, E>::readRAM(uint8_t &data)
+modm::Hd44780Base<DATA, RW, RS, E>::readRAM(uint8_t &data)
 {
 	if (isBusy())
 		return false;
@@ -154,13 +154,13 @@ xpcc::Hd44780Base<DATA, RW, RS, E>::readRAM(uint8_t &data)
 // MARK: status
 template <typename DATA, typename RW, typename RS, typename E>
 bool
-xpcc::Hd44780Base<DATA, RW, RS, E>::isBusy()
+modm::Hd44780Base<DATA, RW, RS, E>::isBusy()
 {
 	RS::set(RS_Command);
 
 	if (read() & BusyFlagMask)
 	{
-		xpcc::delayMicroseconds(2);
+		modm::delayMicroseconds(2);
 		return true;
 	}
 	return false;
@@ -168,7 +168,7 @@ xpcc::Hd44780Base<DATA, RW, RS, E>::isBusy()
 
 template <typename DATA, typename RW, typename RS, typename E>
 bool
-xpcc::Hd44780Base<DATA, RW, RS, E>::writeCGRAM(uint8_t character, uint8_t *cg)
+modm::Hd44780Base<DATA, RW, RS, E>::writeCGRAM(uint8_t character, uint8_t *cg)
 {
 	while(not writeCommand(SetCGRAM_Address | (character << 3)))
 		;
@@ -183,26 +183,26 @@ xpcc::Hd44780Base<DATA, RW, RS, E>::writeCGRAM(uint8_t character, uint8_t *cg)
 template <typename DATA, typename RW, typename RS, typename E>
 template <typename Data, typename Enable>
 void
-xpcc::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 4>::write(uint8_t data)
+modm::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 4>::write(uint8_t data)
 {
 	DATA::setOutput();
 	DATA::write(data >> 4);
 
 	E::set();
-	xpcc::delayMicroseconds(1);
+	modm::delayMicroseconds(1);
 	E::reset();
 
 	DATA::write(data);
 
 	E::set();
-	xpcc::delayMicroseconds(1);
+	modm::delayMicroseconds(1);
 	E::reset();
 }
 
 template <typename DATA, typename RW, typename RS, typename E>
 template <typename Data, typename Enable>
 void
-xpcc::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 4>::writeHighNibble(uint8_t data)
+modm::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 4>::writeHighNibble(uint8_t data)
 {
 	Bus<DATA, E, 8>::write(data);
 }
@@ -210,20 +210,20 @@ xpcc::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 4>::writeHighNibble(uint8_
 template <typename DATA, typename RW, typename RS, typename E>
 template <typename Data, typename Enable>
 uint8_t
-xpcc::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 4>::read()
+modm::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 4>::read()
 {
 	uint8_t data;
 	DATA::setInput();
 
 	E::set();
-	xpcc::delayMicroseconds(1);
+	modm::delayMicroseconds(1);
 	data = DATA::read();
 	E::reset();
 
 	data <<= 4;
 
 	E::set();
-	xpcc::delayMicroseconds(1);
+	modm::delayMicroseconds(1);
 	data |= DATA::read();
 	E::reset();
 
@@ -234,20 +234,20 @@ xpcc::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 4>::read()
 template <typename DATA, typename RW, typename RS, typename E>
 template <typename Data, typename Enable>
 void
-xpcc::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 8>::write(uint8_t data)
+modm::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 8>::write(uint8_t data)
 {
 	DATA::setOutput();
 	DATA::write(data);
 
 	E::set();
-	xpcc::delayMicroseconds(1);
+	modm::delayMicroseconds(1);
 	E::reset();
 }
 
 template <typename DATA, typename RW, typename RS, typename E>
 template <typename Data, typename Enable>
 void
-xpcc::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 8>::writeHighNibble(uint8_t data)
+modm::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 8>::writeHighNibble(uint8_t data)
 {
 	write(data);
 }
@@ -255,13 +255,13 @@ xpcc::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 8>::writeHighNibble(uint8_
 template <typename DATA, typename RW, typename RS, typename E>
 template <typename Data, typename Enable>
 uint8_t
-xpcc::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 8>::read()
+modm::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 8>::read()
 {
 	uint8_t data;
 	DATA::setInput();
 
 	E::set();
-	xpcc::delayMicroseconds(1);
+	modm::delayMicroseconds(1);
 	data = DATA::read();
 	E::reset();
 

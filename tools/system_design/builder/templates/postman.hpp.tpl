@@ -17,15 +17,15 @@
 #ifndef	POSTMAN_HPP
 #define	POSTMAN_HPP
 
-#include <xpcc/communication.hpp>
-#include <xpcc/communication/xpcc/postman/postman.hpp>
+#include <modm/communication.hpp>
+#include <modm/communication/xpcc/postman/postman.hpp>
 #include "packets.hpp"
 
 class Postman : public xpcc::Postman
 {
 public:
 	xpcc::Postman::DeliverInfo
-	deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& payload);
+	deliverPacket(const xpcc::Header& header, const modm::SmartPointer& payload);
 
 	bool
 	isComponentAvailable(uint8_t component) const;
@@ -62,14 +62,14 @@ private:
 		PayloadBuffer()
 		{}
 
-		PayloadBuffer(const xpcc::SmartPointer& payload)
+		PayloadBuffer(const modm::SmartPointer& payload)
 		:	payload(payload) {}
 
 		void
 		remove()
-		{ payload = xpcc::SmartPointer(); }
+		{ payload = modm::SmartPointer(); }
 
-		xpcc::SmartPointer payload;
+		modm::SmartPointer payload;
 	};	// 2B (AVR), 4B (ARM) + 3B HEAP
 
 	static constexpr uint8_t resumablePayloads = {{ resumablePayloads }};

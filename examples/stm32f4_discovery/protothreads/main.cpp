@@ -18,13 +18,13 @@
 
 #include <modm/io/iostream.hpp>
 
-xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > device;
-xpcc::IOStream stream(device);
+modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
+modm::IOStream stream(device);
 
 typedef I2cMaster1 MyI2cMaster;
 
 
-class ThreadOne : public xpcc::pt::Protothread
+class ThreadOne : public modm::pt::Protothread
 {
 public:
 	ThreadOne()
@@ -55,9 +55,9 @@ public:
 		PT_CALL(temp.enableExtendedMode());
 
 		PT_CALL(temp.configureAlertMode(
-				xpcc::tmp102::ThermostatMode::Comparator,
-				xpcc::tmp102::AlertPolarity::ActiveLow,
-				xpcc::tmp102::FaultQueue::Faults6));
+				modm::tmp102::ThermostatMode::Comparator,
+				modm::tmp102::AlertPolarity::ActiveLow,
+				modm::tmp102::FaultQueue::Faults6));
 		PT_CALL(temp.setLowerLimit(28.f));
 		PT_CALL(temp.setUpperLimit(30.f));
 
@@ -81,8 +81,8 @@ public:
 				{
 					stream << tP << " C";
 				}
-				stream << xpcc::endl;
-				if (result) stream << "Heat me up!" << xpcc::endl;
+				stream << modm::endl;
+				if (result) stream << "Heat me up!" << modm::endl;
 			}
 			this->timeout.restart(200);
 			PT_WAIT_UNTIL(this->timeout.isExpired());
@@ -94,9 +94,9 @@ public:
 
 private:
 	bool result;
-	xpcc::ShortTimeout timeout;
-    xpcc::tmp102::Data temperatureData;
-	xpcc::Tmp102<MyI2cMaster> temp;
+	modm::ShortTimeout timeout;
+    modm::tmp102::Data temperatureData;
+	modm::Tmp102<MyI2cMaster> temp;
 };
 
 ThreadOne one;
@@ -108,7 +108,7 @@ main()
 	Board::initialize();
 
 	GpioOutputA2::connect(Usart2::Tx);
-	Usart2::initialize<Board::systemClock, xpcc::Uart::B38400>(10);
+	Usart2::initialize<Board::systemClock, modm::Uart::B38400>(10);
 
 	GpioB7::connect(MyI2cMaster::Sda, Gpio::InputType::PullUp);
 	GpioB8::connect(MyI2cMaster::Scl, Gpio::InputType::PullUp);

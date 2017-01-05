@@ -36,15 +36,15 @@
  */
 
 // Set the log level
-#undef	XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::DEBUG
+#undef	MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::DEBUG
 
 // ----------------------------------------------------------------------------
 
-xpcc::gui::AsyncEventList async_events;
-xpcc::gui::inputQueue input_queue;
+modm::gui::AsyncEventList async_events;
+modm::gui::inputQueue input_queue;
 
-xpcc::GraphicDisplay *display;
+modm::GraphicDisplay *display;
 
 bool quit = false;
 
@@ -55,7 +55,7 @@ initSDL()
     /* Enable Unicode translation */
     SDL_EnableUNICODE( 1 );
 
-	display = new xpcc::SDLDisplay(320, 240);
+	display = new modm::SDLDisplay(320, 240);
 
 	display->clear();
 
@@ -77,22 +77,22 @@ handleKeyDownEvent(SDL_Event& event)
 	{
 		case SDLK_LEFT:
 		{
-			XPCC_LOG_INFO << "Key pressend: LEFT" << xpcc::endl;
+			MODM_LOG_INFO << "Key pressend: LEFT" << modm::endl;
 			break;
 		}
 		case SDLK_RIGHT:
 		{
-			XPCC_LOG_INFO << "Key pressend: RIGHT" << xpcc::endl;
+			MODM_LOG_INFO << "Key pressend: RIGHT" << modm::endl;
 			break;
 		}
 		case SDLK_UP:
 		{
-			XPCC_LOG_INFO << "Key pressend: UP" << xpcc::endl;
+			MODM_LOG_INFO << "Key pressend: UP" << modm::endl;
 			break;
 		}
 		case SDLK_DOWN:
 		{
-			XPCC_LOG_INFO << "Key pressend: DOWN" << xpcc::endl;
+			MODM_LOG_INFO << "Key pressend: DOWN" << modm::endl;
 			break;
 		}
 		/*
@@ -156,9 +156,9 @@ pollSDL()
 
 			case SDL_MOUSEBUTTONDOWN:
 			{
-				auto ev_down = new xpcc::gui::InputEvent(xpcc::glcd::Point(event.button.x, event.button.y),
-													 	 xpcc::gui::InputEvent::Type::TOUCH,
-													 	 xpcc::gui::InputEvent::Direction::DOWN);
+				auto ev_down = new modm::gui::InputEvent(modm::glcd::Point(event.button.x, event.button.y),
+													 	 modm::gui::InputEvent::Type::TOUCH,
+													 	 modm::gui::InputEvent::Direction::DOWN);
 
 				// queue down event
 				input_queue.push(ev_down);
@@ -169,9 +169,9 @@ pollSDL()
 			case SDL_MOUSEBUTTONUP:
 			{
 
-				auto ev_up = new xpcc::gui::InputEvent(xpcc::glcd::Point(event.button.x, event.button.y),
-													   xpcc::gui::InputEvent::Type::TOUCH,
-													   xpcc::gui::InputEvent::Direction::UP);
+				auto ev_up = new modm::gui::InputEvent(modm::glcd::Point(event.button.x, event.button.y),
+													   modm::gui::InputEvent::Type::TOUCH,
+													   modm::gui::InputEvent::Direction::UP);
 
 				// queue up event
 				input_queue.push(ev_up);
@@ -223,30 +223,30 @@ updateAsyncEvents()
 // ----------------------------------------------------------------------------
 
 void
-test_callback(const xpcc::gui::InputEvent& ev, xpcc::gui::Widget* w, void* data)
+test_callback(const modm::gui::InputEvent& ev, modm::gui::Widget* w, void* data)
 {
 	// avoid warnings
 	(void) ev;
 	(void) w;
 	(void) data;
 
-	XPCC_LOG_DEBUG << "Hello from callback" << xpcc::endl;
+	MODM_LOG_DEBUG << "Hello from callback" << modm::endl;
 }
 
 
-//xpcc::gui::ColorPalette colorpalette[xpcc::gui::Color::PALETTE_SIZE] = {
-//	xpcc::glcd::Color::black(),
-//	xpcc::glcd::Color::white(),
-//	xpcc::glcd::Color::gray(),
-//	xpcc::glcd::Color::red(),
-//	xpcc::glcd::Color::green(),
-//	xpcc::glcd::Color::blue(),
-//	xpcc::glcd::Color::yellow(),
-//	xpcc::glcd::Color::blue(),		// BORDER
-//	xpcc::glcd::Color::yellow(),	// TEXT
-//	xpcc::glcd::Color::black(),		// BACKGROUND
-//	xpcc::glcd::Color::red(),		// ACTIVATED
-//	xpcc::glcd::Color::blue(),		// DEACTIVATED
+//modm::gui::ColorPalette colorpalette[modm::gui::Color::PALETTE_SIZE] = {
+//	modm::glcd::Color::black(),
+//	modm::glcd::Color::white(),
+//	modm::glcd::Color::gray(),
+//	modm::glcd::Color::red(),
+//	modm::glcd::Color::green(),
+//	modm::glcd::Color::blue(),
+//	modm::glcd::Color::yellow(),
+//	modm::glcd::Color::blue(),		// BORDER
+//	modm::glcd::Color::yellow(),	// TEXT
+//	modm::glcd::Color::black(),		// BACKGROUND
+//	modm::glcd::Color::red(),		// ACTIVATED
+//	modm::glcd::Color::blue(),		// DEACTIVATED
 //};
 
 
@@ -254,7 +254,7 @@ test_callback(const xpcc::gui::InputEvent& ev, xpcc::gui::Widget* w, void* data)
 int
 main(int, char**)
 {
-	XPCC_LOG_DEBUG << "Hello from xpcc gui example!" << xpcc::endl;
+	MODM_LOG_DEBUG << "Hello from modm gui example!" << modm::endl;
 
 	initSDL();
 
@@ -262,14 +262,14 @@ main(int, char**)
 	 * manipulate the color palette
 	 */
 
-//	colorpalette[xpcc::gui::Color::TEXT] = xpcc::glcd::Color::yellow();
+//	colorpalette[modm::gui::Color::TEXT] = modm::glcd::Color::yellow();
 
 
 	/*
 	 * Create a view and some widgets
 	 */
 
-	xpcc::gui::GuiViewStack myViewStack(display, &input_queue);
+	modm::gui::GuiViewStack myViewStack(display, &input_queue);
 
 	ChooseColorView colorchoose(&myViewStack, 1);
 

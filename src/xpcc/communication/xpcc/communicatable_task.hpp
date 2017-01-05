@@ -25,14 +25,14 @@ namespace xpcc
  *
  * Needs to be part of a xpcc::AbstractComponent
  *
- * @see		xpcc::Task
+ * @see		modm::Task
  * @see		xpcc::Communicator
  * @see		xpcc::Communicatable
  *
  * @ingroup	xpcc_com
  * @author	Fabian Greif
  */
-class CommunicatableTask : public Task, public Communicatable
+class CommunicatableTask : public modm::Task, public Communicatable
 {
 public:
 	CommunicatableTask(Communicator *parent) :

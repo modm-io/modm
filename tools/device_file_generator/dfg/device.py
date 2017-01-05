@@ -51,7 +51,7 @@ class Device:
 			return None
 		if self.getProperty('ram') == None:
 			self.log.error("No RAM found")
-			self.log.error("XPCC does not support Assembler-only programming!")
+			self.log.error("MODM does not support Assembler-only programming!")
 			return None
 		# eeprom is optional on AVR and not available on ARM devices
 		if (self.getProperty('eeprom') == None) and ('avr' == self.id.platform):

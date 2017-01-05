@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_TMP175_HPP
+#ifndef MODM_TMP175_HPP
 #	error  "Don't include this file directly, use 'tmp175.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
-xpcc::Tmp175<I2cMaster>::Tmp175(Data &data, uint8_t address)
+modm::Tmp175<I2cMaster>::Tmp175(Data &data, uint8_t address)
 :	Lm75<I2cMaster>(reinterpret_cast<lm75::Data&>(data), address),
 	periodTimeout(250), conversionTimeout(250), updateTime(250), conversionTime(232)
 {
@@ -26,7 +26,7 @@ xpcc::Tmp175<I2cMaster>::Tmp175(Data &data, uint8_t address)
 
 template < typename I2cMaster >
 bool
-xpcc::Tmp175<I2cMaster>::run()
+modm::Tmp175<I2cMaster>::run()
 {
 	PT_BEGIN();
 
@@ -47,8 +47,8 @@ xpcc::Tmp175<I2cMaster>::run()
 }
 
 template < typename I2cMaster >
-xpcc::tmp175::Data&
-xpcc::Tmp175<I2cMaster>::getData()
+modm::tmp175::Data&
+modm::Tmp175<I2cMaster>::getData()
 {
 	return reinterpret_cast<Data&>(this->data);
 }
@@ -56,7 +56,7 @@ xpcc::Tmp175<I2cMaster>::getData()
 // MARK: - tasks
 template < typename I2cMaster >
 void
-xpcc::Tmp175<I2cMaster>::setUpdateRate(uint8_t rate)
+modm::Tmp175<I2cMaster>::setUpdateRate(uint8_t rate)
 {
 	// clamp conversion rate to max 33Hz (=~30ms)
 	if (rate == 0) rate = 1;
@@ -69,8 +69,8 @@ xpcc::Tmp175<I2cMaster>::setUpdateRate(uint8_t rate)
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Tmp175<I2cMaster>::setResolution(Resolution resolution)
+modm::ResumableResult<bool>
+modm::Tmp175<I2cMaster>::setResolution(Resolution resolution)
 {
 	RF_BEGIN();
 
@@ -83,8 +83,8 @@ xpcc::Tmp175<I2cMaster>::setResolution(Resolution resolution)
 
 // MARK: conversion
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Tmp175<I2cMaster>::startConversion()
+modm::ResumableResult<bool>
+modm::Tmp175<I2cMaster>::startConversion()
 {
 	RF_BEGIN();
 
@@ -101,8 +101,8 @@ xpcc::Tmp175<I2cMaster>::startConversion()
 
 // MARK: configuration
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Tmp175<I2cMaster>::writeConfiguration()
+modm::ResumableResult<bool>
+modm::Tmp175<I2cMaster>::writeConfiguration()
 {
 	RF_BEGIN();
 
@@ -115,8 +115,8 @@ xpcc::Tmp175<I2cMaster>::writeConfiguration()
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Tmp175<I2cMaster>::setLimitRegister(Register reg, float temperature)
+modm::ResumableResult<bool>
+modm::Tmp175<I2cMaster>::setLimitRegister(Register reg, float temperature)
 {
 	RF_BEGIN();
 

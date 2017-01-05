@@ -127,7 +127,7 @@ def generate(env, **kw):
 		"-Wa,-adhlns=${TARGET.base}.lst",
 		"-DBASENAME=${SOURCE.file}",
 	]
-	env['CCFLAGS'] += env['XPCC_ADDITIONAL_CCFLAGS']
+	env['CCFLAGS'] += env['MODM_ADDITIONAL_CCFLAGS']
 	
 	# C++ flags
 	env['CXXFLAGS'] = [
@@ -154,7 +154,7 @@ def generate(env, **kw):
 		"-mmcu=$AVR_DEVICE", 
 		"-Wl,--relax", 
 		"-Wl,--gc-sections",
-		"-Wl,-T,${XPCC_ROOTPATH}/src/xpcc/architecture/platform/driver/core/avr/linkerscript.ld",
+		"-Wl,-T,${MODM_ROOTPATH}/src/modm/architecture/platform/driver/core/avr/linkerscript.ld",
 #		"-Wl,-Map=${TARGET.base}.map,--cref", 
 #		"-Wl,-u,vfprintf -lprintf_flt"		# enable float support for vfprinft
 	]

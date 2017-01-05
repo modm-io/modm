@@ -33,6 +33,6 @@ main()
 		// convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 5V):
 		float voltage = sensorValue * (5.0 / 1023.0);
 		// print voltage
-		serialStream << voltage << "V" << xpcc::endl;
+		serialStream << voltage << "V" << modm::endl;
 	}
 }

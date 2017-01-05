@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FILTER_DEBOUNCE_HPP
+#ifndef MODM_FILTER_DEBOUNCE_HPP
 	#error	"Don't include this file directly, use 'debounce.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::filter::Debounce<T>::Debounce(const T& maxValue, const T& lowerBound, const T& upperBound) : 
+modm::filter::Debounce<T>::Debounce(const T& maxValue, const T& lowerBound, const T& upperBound) : 
 	maxValue(maxValue),
 	sum(maxValue / 2),
 	lowerBound(lowerBound),
@@ -28,7 +28,7 @@ xpcc::filter::Debounce<T>::Debounce(const T& maxValue, const T& lowerBound, cons
 
 template<typename T>
 void
-xpcc::filter::Debounce<T>::update(bool input)
+modm::filter::Debounce<T>::update(bool input)
 {
 	if (input && (sum < maxValue)) {
 		sum++;
@@ -47,14 +47,14 @@ xpcc::filter::Debounce<T>::update(bool input)
 
 template<typename T>
 bool
-xpcc::filter::Debounce<T>::getValue() const
+modm::filter::Debounce<T>::getValue() const
 {
 	return state;
 }
 
 template<typename T>
 void
-xpcc::filter::Debounce<T>::reset(const bool state)
+modm::filter::Debounce<T>::reset(const bool state)
 {
 	if (state) {
 		sum = maxValue;

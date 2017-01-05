@@ -3,10 +3,10 @@
 // current project and the build.cfg in each include directory. 
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_CONFIG_HPP
-#define	XPCC_CONFIG_HPP
+#ifndef MODM_CONFIG_HPP
+#define	MODM_CONFIG_HPP
 
 ${defines}
 
-#endif	// XPCC_CONFIG_HPP
+#endif	// MODM_CONFIG_HPP
 

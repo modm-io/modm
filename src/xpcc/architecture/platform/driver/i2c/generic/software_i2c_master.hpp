@@ -13,15 +13,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SOFTWARE_I2C_HPP
-#define XPCC_SOFTWARE_I2C_HPP
+#ifndef MODM_SOFTWARE_I2C_HPP
+#define MODM_SOFTWARE_I2C_HPP
 
 #include <modm/architecture/driver/delay.hpp>
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/architecture/interface/i2c_master.hpp>
 #include "type_ids.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -36,7 +36,7 @@ namespace xpcc
  */
 template< class SCL,
 		  class SDA >
-class SoftwareI2cMaster : public xpcc::I2cMaster
+class SoftwareI2cMaster : public modm::I2cMaster
 {
 public:
 	static const TypeId::SoftwareI2cMasterSda Sda;
@@ -45,7 +45,7 @@ public:
 public:
 	/// Initializes the hardware, with the baudrate limited to about 250kbps.
 	template< class SystemClock, uint32_t baudrate=Baudrate::Standard,
-			uint16_t tolerance = xpcc::Tolerance::FivePercent >
+			uint16_t tolerance = modm::Tolerance::FivePercent >
 	static void
 	initialize()
 	{
@@ -61,7 +61,7 @@ public:
 	static bool
 	start(I2cTransaction *transaction, ConfigurationHandler handler = nullptr);
 
-	static Error xpcc_always_inline
+	static Error modm_always_inline
 	getErrorState()
 	{ return errorState; }
 
@@ -116,15 +116,15 @@ private:
 
 	// timings
 	/// busy waits a **half** clock cycle
-	static xpcc_always_inline void
+	static modm_always_inline void
 	delay2()
-	{ xpcc::delayNanoseconds(delayTime*2); }
+	{ modm::delayNanoseconds(delayTime*2); }
 
 	// timings
 	/// busy waits **quarter** clock cycle
-	static xpcc_always_inline void
+	static modm_always_inline void
 	delay4()
-	{ xpcc::delayNanoseconds(delayTime); }
+	{ modm::delayNanoseconds(delayTime); }
 
 	enum
 	{
@@ -136,18 +136,18 @@ private:
 	// requested I2C frequency
 	static uint16_t delayTime;
 
-	static xpcc::I2c::Operation nextOperation;
-	static xpcc::I2cTransaction *transactionObject;
+	static modm::I2c::Operation nextOperation;
+	static modm::I2cTransaction *transactionObject;
 	static Error errorState;
-	static xpcc::I2c::ConfigurationHandler configuration;
+	static modm::I2c::ConfigurationHandler configuration;
 
-	static xpcc::I2cTransaction::Starting starting;
-	static xpcc::I2cTransaction::Writing writing;
-	static xpcc::I2cTransaction::Reading reading;
+	static modm::I2cTransaction::Starting starting;
+	static modm::I2cTransaction::Writing writing;
+	static modm::I2cTransaction::Reading reading;
 };
 
-} // namespace xpcc
+} // namespace modm
 
 #include "i2c_master_impl.hpp"
 
-#endif // XPCC_SOFTWARE_I2C_HPP
+#endif // MODM_SOFTWARE_I2C_HPP

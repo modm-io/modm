@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_BLOCK_ALLOCATOR_HPP
+#ifndef	MODM_BLOCK_ALLOCATOR_HPP
 	#error	"Don't include this file directly use 'block_allocator.hpp' instead!"
 #endif
 
@@ -58,8 +58,8 @@
  *                             \-- end
  */
 template <typename T, unsigned int BLOCK_SIZE >
-xpcc_always_inline void
-xpcc::BlockAllocator<T, BLOCK_SIZE>::initialize(void * heapStart, void * heapEnd)
+modm_always_inline void
+modm::BlockAllocator<T, BLOCK_SIZE>::initialize(void * heapStart, void * heapEnd)
 {
 	start = alignPointer(heapStart);
 	
@@ -83,8 +83,8 @@ xpcc::BlockAllocator<T, BLOCK_SIZE>::initialize(void * heapStart, void * heapEnd
  * 
  */
 template <typename T, unsigned int BLOCK_SIZE >
-xpcc_always_inline void *
-xpcc::BlockAllocator<T, BLOCK_SIZE>::allocate(std::size_t requestedSize)
+modm_always_inline void *
+modm::BlockAllocator<T, BLOCK_SIZE>::allocate(std::size_t requestedSize)
 {
 	requestedSize += 4;	// bytes needed for the management
 	
@@ -130,8 +130,8 @@ xpcc::BlockAllocator<T, BLOCK_SIZE>::allocate(std::size_t requestedSize)
 
 // ----------------------------------------------------------------------------
 template <typename T, unsigned int BLOCK_SIZE >
-xpcc_always_inline void
-xpcc::BlockAllocator<T, BLOCK_SIZE>::free(void *ptr)
+modm_always_inline void
+modm::BlockAllocator<T, BLOCK_SIZE>::free(void *ptr)
 {
 	if (ptr == 0) {
 		return;
@@ -183,8 +183,8 @@ xpcc::BlockAllocator<T, BLOCK_SIZE>::free(void *ptr)
 
 // ----------------------------------------------------------------------------
 template <typename T, unsigned int BLOCK_SIZE >
-xpcc_always_inline std::size_t
-xpcc::BlockAllocator<T, BLOCK_SIZE>::getAvailableSize() const
+modm_always_inline std::size_t
+modm::BlockAllocator<T, BLOCK_SIZE>::getAvailableSize() const
 {
 	T *p = start;
 	std::size_t size = 0;
@@ -208,12 +208,12 @@ xpcc::BlockAllocator<T, BLOCK_SIZE>::getAvailableSize() const
 
 // ----------------------------------------------------------------------------
 template<typename T, unsigned int BLOCK_SIZE >
-xpcc_always_inline T *
-xpcc::BlockAllocator<T, BLOCK_SIZE>::alignPointer(void * ptr) const
+modm_always_inline T *
+modm::BlockAllocator<T, BLOCK_SIZE>::alignPointer(void * ptr) const
 {
-	// (XPCC_ALIGNMENT - 1) is used as a bitmask
-	std::size_t misalignment = ((uintptr_t) ptr & (XPCC_ALIGNMENT - 1));
-#if XPCC_ALIGNMENT == 8
+	// (MODM_ALIGNMENT - 1) is used as a bitmask
+	std::size_t misalignment = ((uintptr_t) ptr & (MODM_ALIGNMENT - 1));
+#if MODM_ALIGNMENT == 8
 	const uint8_t offset[8] = { 6, 5, 4, 3, 2, 1, 0, 7 };
 #else
 	const uint8_t offset[4] = { 2, 1, 0, 3 };

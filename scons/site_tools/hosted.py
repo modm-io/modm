@@ -84,7 +84,7 @@ def generate(env, **kw):
 		"-DBASENAME=${SOURCE.file}",
 		"$OPTIMIZATION",
 	]
-	env['CCFLAGS'] += env['XPCC_ADDITIONAL_CCFLAGS']
+	env['CCFLAGS'] += env['MODM_ADDITIONAL_CCFLAGS']
 
 	#if c_compiler == 'clang':
 	#	env['CCFLAGS'].append("-funsigned-bitfields")

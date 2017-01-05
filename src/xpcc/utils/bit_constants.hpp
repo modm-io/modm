@@ -10,12 +10,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_BIT_CONSTANTS_HPP
-#define XPCC_BIT_CONSTANTS_HPP
+#ifndef MODM_BIT_CONSTANTS_HPP
+#define MODM_BIT_CONSTANTS_HPP
 
 #include <stdint.h>
 
-namespace xpcc
+namespace modm
 {
 
 constexpr uint8_t  Bit0  = (1ul <<  0);
@@ -51,6 +51,6 @@ constexpr uint32_t Bit29 = (1ul << 29);
 constexpr uint32_t Bit30 = (1ul << 30);
 constexpr uint32_t Bit31 = (1ul << 31);
 
-};	// namespace xpcc
+};	// namespace modm
 
-#endif	// XPCC_BIT_CONSTANTS_HPP
+#endif	// MODM_BIT_CONSTANTS_HPP

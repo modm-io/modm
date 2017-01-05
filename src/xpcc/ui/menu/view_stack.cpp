@@ -17,21 +17,21 @@
 #include "view_stack.hpp"
 
 // ----------------------------------------------------------------------------
-xpcc::ViewStack::ViewStack(xpcc::GraphicDisplay* display) :
+modm::ViewStack::ViewStack(modm::GraphicDisplay* display) :
 	display(display)
 {
 }
 
 // ----------------------------------------------------------------------------
-xpcc::ViewStack::~ViewStack()
+modm::ViewStack::~ViewStack()
 {
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::ViewStack::pop()
+modm::ViewStack::pop()
 {
-	xpcc::AbstractView *topElement = this->stack.get();
+	modm::AbstractView *topElement = this->stack.get();
 	this->stack.pop();
 	
 	delete topElement;
@@ -39,9 +39,9 @@ xpcc::ViewStack::pop()
 
 // ----------------------------------------------------------------------------
 void
-xpcc::ViewStack::update()
+modm::ViewStack::update()
 {
-	xpcc::AbstractView* top = this->get();
+	modm::AbstractView* top = this->get();
 
 	if (top == NULL)
 		return;
@@ -72,8 +72,8 @@ xpcc::ViewStack::update()
 
 // ----------------------------------------------------------------------------
 void
-xpcc::ViewStack::shortButtonPress(xpcc::MenuButtons::Button button)
+modm::ViewStack::shortButtonPress(modm::MenuButtons::Button button)
 {
-	xpcc::AbstractView* top = this->get();
+	modm::AbstractView* top = this->get();
 	top->shortButtonPress(button);
 }

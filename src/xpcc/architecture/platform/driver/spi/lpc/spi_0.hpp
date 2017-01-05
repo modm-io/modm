@@ -18,14 +18,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LPC11_SPI_0_HPP
-#define XPCC_LPC11_SPI_0_HPP
+#ifndef MODM_LPC11_SPI_0_HPP
+#define MODM_LPC11_SPI_0_HPP
 
 #include <stdint.h>
 #include <modm/communication/spi/spi_master.hpp>
 
 #include "spi_registers.h"
-namespace xpcc
+namespace modm
 {
 	namespace lpc
 	{
@@ -46,7 +46,7 @@ namespace xpcc
 		 * \ingroup	lpc
 		 *
 		 */
-		class SpiMaster0 : public xpcc::SpiMaster
+		class SpiMaster0 : public modm::SpiMaster
 		{
 		public:
 			enum class TransferSize
@@ -225,7 +225,7 @@ namespace xpcc
 
 			static void
 			configurePins(
-					MappingSck mapping = xpcc::lpc::SpiMaster0::MappingSck::PIO0_6,
+					MappingSck mapping = modm::lpc::SpiMaster0::MappingSck::PIO0_6,
 					bool useSsel = false);
 
 		public:
@@ -260,7 +260,7 @@ namespace xpcc
 			static bool
 			transfer(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
 			
-			static xpcc_always_inline bool
+			static modm_always_inline bool
 			transferSync(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
 			
 			static bool
@@ -271,5 +271,5 @@ namespace xpcc
 			fifoSize = 8;
 		};
 	} // lpc namespace
-} // xpcc namespace
-#endif // XPCC_LPC11_SPI_0_HPP
+} // modm namespace
+#endif // MODM_LPC11_SPI_0_HPP

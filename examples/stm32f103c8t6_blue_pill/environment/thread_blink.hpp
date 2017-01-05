@@ -15,7 +15,7 @@
 #include <modm/processing/timer.hpp>
 #include <modm/processing/protothread.hpp>
 
-class BlinkThread: public xpcc::pt::Protothread
+class BlinkThread: public modm::pt::Protothread
 {
 public:
 	BlinkThread();
@@ -24,8 +24,8 @@ public:
 	update();
 
 private:
-	xpcc::ShortTimeout timeout;
-	xpcc::ShortPeriodicTimer timer;
+	modm::ShortTimeout timeout;
+	modm::ShortPeriodicTimer timer;
 	uint32_t uptime;
 };
 

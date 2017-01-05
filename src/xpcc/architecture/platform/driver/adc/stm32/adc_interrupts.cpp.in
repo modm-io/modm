@@ -23,8 +23,8 @@ ADC_IRQHandler(void)
 {
 
 %% for id in driver.instance
-	if (xpcc::stm32::AdcInterrupt{{ id }}::getInterruptFlags()) {
-		xpcc::stm32::AdcInterrupt{{ id }}::handler();
+	if (modm::stm32::AdcInterrupt{{ id }}::getInterruptFlags()) {
+		modm::stm32::AdcInterrupt{{ id }}::handler();
 	}
 %% endfor
 

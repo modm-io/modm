@@ -13,10 +13,10 @@
 
 #include "../thread.hpp"
 
-xpcc::rtos::Thread* xpcc::rtos::Thread::head = 0;
+modm::rtos::Thread* modm::rtos::Thread::head = 0;
 
 // ----------------------------------------------------------------------------
-xpcc::rtos::Thread::Thread(uint32_t priority, uint16_t stackDepth, const char* name) :
+modm::rtos::Thread::Thread(uint32_t priority, uint16_t stackDepth, const char* name) :
 	next(0),
 	thread()
 {
@@ -38,13 +38,13 @@ xpcc::rtos::Thread::Thread(uint32_t priority, uint16_t stackDepth, const char* n
 	}
 }
 
-xpcc::rtos::Thread::~Thread()
+modm::rtos::Thread::~Thread()
 {
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::rtos::Thread::start()
+modm::rtos::Thread::start()
 {
 	this->thread.reset(new boost::thread(boost::bind(&Thread::run, this)));
 }

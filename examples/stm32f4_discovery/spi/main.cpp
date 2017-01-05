@@ -20,7 +20,7 @@ using Mosi = GpioOutputB15;
 using Miso = GpioInputB14;
 using SpiMaster = SpiMaster2;
 // Note that you can also use a bit-banged SPI driver as a drop-in replacement
-// using SpiMaster = xpcc::SoftwareSpiMaster<Sck, Mosi, Miso>;
+// using SpiMaster = modm::SoftwareSpiMaster<Sck, Mosi, Miso>;
 
 int
 main()

@@ -12,20 +12,20 @@
 #	define _DEBUG 0
 #endif
 
-#ifndef XPCC_TLFS_SL_INDEX_COUNT_LOG2
+#ifndef MODM_TLFS_SL_INDEX_COUNT_LOG2
 // 4 or 5 are acceptable values (ie. 16 or 32 subdivisions)
-#	define XPCC_TLFS_SL_INDEX_COUNT_LOG2 4
+#	define MODM_TLFS_SL_INDEX_COUNT_LOG2 4
 #endif
 
-#ifndef XPCC_TLFS_FL_INDEX_MAX
+#ifndef MODM_TLFS_FL_INDEX_MAX
 // 512kB covers all internal SRAM of any STM32 device
-#	define XPCC_TLFS_FL_INDEX_MAX 19
+#	define MODM_TLFS_FL_INDEX_MAX 19
 #endif
 
 /*
 ** This prevents the usage of newlib's `assert` and `printf` functions,
 ** which add ~30kB of code and ~2kB of static RAM usage, but are usable,
-** since xpcc does not use newlib's printf.
+** since modm does not use newlib's printf.
 */
 #define tlsf_assert (void)
 static void silent_printf(char* fmt, ...) { (void)fmt; }
@@ -233,7 +233,7 @@ enum tlsf_public
 	** values require more memory in the control structure. Values of
 	** 4 or 5 are typical.
 	*/
-	SL_INDEX_COUNT_LOG2 = XPCC_TLFS_SL_INDEX_COUNT_LOG2,
+	SL_INDEX_COUNT_LOG2 = MODM_TLFS_SL_INDEX_COUNT_LOG2,
 };
 
 /* Private constants: do not modify. */
@@ -266,7 +266,7 @@ enum tlsf_private
 	*/
 	FL_INDEX_MAX = 32,
 #else
-	FL_INDEX_MAX = XPCC_TLFS_FL_INDEX_MAX,
+	FL_INDEX_MAX = MODM_TLFS_FL_INDEX_MAX,
 #endif
 	SL_INDEX_COUNT = (1 << SL_INDEX_COUNT_LOG2),
 	FL_INDEX_SHIFT = (SL_INDEX_COUNT_LOG2 + ALIGN_SIZE_LOG2),

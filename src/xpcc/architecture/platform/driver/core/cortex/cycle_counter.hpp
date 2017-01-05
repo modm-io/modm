@@ -9,12 +9,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_CORTEX_CYCLE_COUNTER_HPP
-#define XPCC_CORTEX_CYCLE_COUNTER_HPP
+#ifndef MODM_CORTEX_CYCLE_COUNTER_HPP
+#define MODM_CORTEX_CYCLE_COUNTER_HPP
 
 #include "../../../device.hpp"
 
-namespace xpcc
+namespace modm
 {
 namespace cortex
 {
@@ -34,5 +34,5 @@ public:
 };
 
 } // namespace cortex
-} // namespace xpcc
-#endif // XPCC_CORTEX_CYCLE_COUNTER_HPP
+} // namespace modm
+#endif // MODM_CORTEX_CYCLE_COUNTER_HPP

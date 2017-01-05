@@ -11,15 +11,15 @@
 
 {{ generation_block }}
 
-#ifndef XPCC_{{target["family"] | upper}}_SPI_HPP
-#define XPCC_{{target["family"] | upper}}_SPI_HPP
+#ifndef MODM_{{target["family"] | upper}}_SPI_HPP
+#define MODM_{{target["family"] | upper}}_SPI_HPP
 
 /**
  * @ingroup 	{{target.string}}
  * @defgroup	{{target.string}}_spi SPI
  */
 
-namespace xpcc
+namespace modm
 {
 
 namespace {{target["family"]}}
@@ -43,6 +43,6 @@ struct Spi
 
 } // namespace {{target["family"]}}
 
-} // namespace xpcc
+} // namespace modm
 
-#endif	// XPCC_{{target["family"] | upper}}_SPI_HPP
+#endif	// MODM_{{target["family"] | upper}}_SPI_HPP

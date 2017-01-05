@@ -11,13 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PWM_LED_TABLE_HPP
-#define XPCC_PWM_LED_TABLE_HPP
+#ifndef MODM_PWM_LED_TABLE_HPP
+#define MODM_PWM_LED_TABLE_HPP
 
 #include <stdint.h>
 #include <modm/architecture/driver/accessor/flash.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -34,21 +34,21 @@ namespace xpcc
 namespace ui
 {
 	/// Provides 7bit resolution (0 to 127) in 256 steps, 256 bytes of flash.
-	extern xpcc::accessor::Flash<uint8_t> table22_7_256;
+	extern modm::accessor::Flash<uint8_t> table22_7_256;
 
 	/// Provides 8bit resolution (0 to 255) in 256 steps, 256 bytes of flash.
-	extern xpcc::accessor::Flash<uint8_t> table22_8_256;
+	extern modm::accessor::Flash<uint8_t> table22_8_256;
 
 	/// Provides 10bit resolution (0 to 1023) in 256 steps, 512 bytes of flash.
-	extern xpcc::accessor::Flash<uint16_t> table22_10_256;
+	extern modm::accessor::Flash<uint16_t> table22_10_256;
 
 	/// Provides 12bit resolution (0 to 4095) in 256 steps, 512 bytes of flash.
-	extern xpcc::accessor::Flash<uint16_t> table22_12_256;
+	extern modm::accessor::Flash<uint16_t> table22_12_256;
 
 	/// Provides 16bit resolution (0 to 65535) in 256 steps, 512 bytes of flash.
-	extern xpcc::accessor::Flash<uint16_t> table22_16_256;
+	extern modm::accessor::Flash<uint16_t> table22_16_256;
 }
 
 }
 
-#endif	// XPCC_PWM_LED_TABLE_HPP
+#endif	// MODM_PWM_LED_TABLE_HPP

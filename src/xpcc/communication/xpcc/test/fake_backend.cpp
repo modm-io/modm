@@ -21,7 +21,7 @@ FakeBackend::update()
 // ----------------------------------------------------------------------------
 void
 FakeBackend::sendPacket(const xpcc::Header &header,
-		xpcc::SmartPointer payload)
+		modm::SmartPointer payload)
 {
 	this->messagesSend.append(Message(header, payload));
 }
@@ -39,7 +39,7 @@ FakeBackend::getPacketHeader() const
 	return this->messagesToReceive.getFront().header;
 }
 
-const xpcc::SmartPointer
+const modm::SmartPointer
 FakeBackend::getPacketPayload() const
 {
 	return this->messagesToReceive.getFront().payload;

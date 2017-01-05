@@ -12,13 +12,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PARALLEL_TFT_HPP
-#define XPCC_PARALLEL_TFT_HPP
+#ifndef MODM_PARALLEL_TFT_HPP
+#define MODM_PARALLEL_TFT_HPP
 
 #include <modm/architecture/driver/delay.hpp>
 #include <modm/ui/display/graphic_display.hpp>
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * TFT display connected to a 16 bit parallel bus
@@ -100,4 +100,4 @@ namespace xpcc
 
 #include "parallel_tft_impl.hpp"
 
-#endif // XPCC_PARALLEL_TFT_HPP
+#endif // MODM_PARALLEL_TFT_HPP

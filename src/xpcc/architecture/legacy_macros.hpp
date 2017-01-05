@@ -9,33 +9,33 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LEGACY_MACROS_HPP
-#define XPCC_LEGACY_MACROS_HPP
+#ifndef MODM_LEGACY_MACROS_HPP
+#define MODM_LEGACY_MACROS_HPP
 
 #include "detect.hpp"
 
 #ifndef __DOXYGEN__
 
-#ifndef XPCC_DISABLE_LEGACY_MACROS
+#ifndef MODM_DISABLE_LEGACY_MACROS
 
-#	define STRINGIFY(s)			XPCC_STRINGIFY(s)
-#	define CONCAT(a,b)			XPCC_CONCAT(a,b)
-#	define CONCAT3(a,b,c)		XPCC_CONCAT3(a,b,c)
-#	define CONCAT4(a,b,c,d)		XPCC_CONCAT4(a,b,c,d)
-#	define CONCAT5(a,b,c,d,e)	XPCC_CONCAT5(a,b,c,d,e)
+#	define STRINGIFY(s)			MODM_STRINGIFY(s)
+#	define CONCAT(a,b)			MODM_CONCAT(a,b)
+#	define CONCAT3(a,b,c)		MODM_CONCAT3(a,b,c)
+#	define CONCAT4(a,b,c,d)		MODM_CONCAT4(a,b,c,d)
+#	define CONCAT5(a,b,c,d,e)	MODM_CONCAT5(a,b,c,d,e)
 
-#	define ALWAYS_INLINE  		xpcc_always_inline
-#	define ATTRIBUTE_UNUSED		xpcc_unused
-#	define ATTRIBUTE_WEAK		xpcc_weak
-#	define ATTRIBUTE_ALIGNED(n)	xpcc_aligned(n)
-#	define ATTRIBUTE_PACKED		xpcc_packed
-#	define ATTRIBUTE_FASTCODE	xpcc_fastcode
-#	define ATTRIBUTE_FASTDATA	xpcc_fastdata
-#	define ATTRIBUTE_MAY_ALIAS	xpcc_may_alias
-#	define likely(x)			xpcc_likely(x)
-#	define unlikely(x)			xpcc_unlikely(x)
+#	define ALWAYS_INLINE  		modm_always_inline
+#	define ATTRIBUTE_UNUSED		modm_unused
+#	define ATTRIBUTE_WEAK		modm_weak
+#	define ATTRIBUTE_ALIGNED(n)	modm_aligned(n)
+#	define ATTRIBUTE_PACKED		modm_packed
+#	define ATTRIBUTE_FASTCODE	modm_fastcode
+#	define ATTRIBUTE_FASTDATA	modm_fastdata
+#	define ATTRIBUTE_MAY_ALIAS	modm_may_alias
+#	define likely(x)			modm_likely(x)
+#	define unlikely(x)			modm_unlikely(x)
 
-#	ifdef XPCC_OS_HOSTED
+#	ifdef MODM_OS_HOSTED
 #		define 	MAIN_FUNCTION		int main( int argc, char* argv[] )
 #		define	MAIN_FUNCTION_NAKED	int main( int,      char**       )
 #	else
@@ -55,9 +55,9 @@
 
 #endif
 
-#define XPCC_ARRAY_SIZE(x)	(sizeof(x) / sizeof(x[0]))
+#define MODM_ARRAY_SIZE(x)	(sizeof(x) / sizeof(x[0]))
 
 
 #endif	// !__DOXYGEN__
 
-#endif	// XPCC_LEGACY_MACROS_HPP
+#endif	// MODM_LEGACY_MACROS_HPP

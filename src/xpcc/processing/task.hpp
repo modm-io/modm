@@ -13,10 +13,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_TASK_HPP
-#define	XPCC_TASK_HPP
+#ifndef	MODM_TASK_HPP
+#define	MODM_TASK_HPP
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -48,6 +48,6 @@ public:
 	update() = 0;
 };
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif	// XPCC_TASK_HPP
+#endif	// MODM_TASK_HPP

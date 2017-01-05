@@ -17,14 +17,14 @@
 // http://www.st.com/content/st_com/en/products/evaluation-tools/product-evaluation-tools/mcu-eval-tools/stm32-mcu-eval-tools/stm32-mcu-discovery-kits/32f769idiscovery.html
 //
 
-#ifndef XPCC_STM32_F769I_DISCOVERY_HPP
-#define XPCC_STM32_F769I_DISCOVERY_HPP
+#ifndef MODM_STM32_F769I_DISCOVERY_HPP
+#define MODM_STM32_F769I_DISCOVERY_HPP
 
 #include <modm/architecture/platform.hpp>
 #include <modm/debug/logger.hpp>
-#define XPCC_BOARD_HAS_LOGGER
+#define MODM_BOARD_HAS_LOGGER
 
-using namespace xpcc::stm32;
+using namespace modm::stm32;
 
 namespace Board
 {
@@ -96,10 +96,10 @@ struct systemClock
 		// APB2 is running only at 54MHz, since AHB / 2 = 108MHz > 90MHz limit!
 		ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div4);
 		// update clock frequencies
-		xpcc::clock::fcpu     = Frequency;
-		xpcc::clock::fcpu_kHz = Frequency / 1000;
-		xpcc::clock::fcpu_MHz = Frequency / 1000000;
-		xpcc::clock::ns_per_loop = ::round(1000 / (Frequency / 1000000));
+		modm::clock::fcpu     = Frequency;
+		modm::clock::fcpu_kHz = Frequency / 1000;
+		modm::clock::fcpu_MHz = Frequency / 1000000;
+		modm::clock::ns_per_loop = ::round(1000 / (Frequency / 1000000));
 
 		return true;
 	}
@@ -110,9 +110,9 @@ using Button = GpioInputA0;	// User Button
 using LedJ13 = GpioOutputJ13;	// User LED 1 (red)
 using LedJ5  = GpioOutputJ5;	// User LED 2 (green)
 using LedA12 = GpioOutputA12;	// User LED 3 (green)
-using LedD4  = xpcc::GpioInverted<GpioOutputD4>;	// User Led 4 (red)
+using LedD4  = modm::GpioInverted<GpioOutputD4>;	// User Led 4 (red)
 
-using Leds = xpcc::SoftwareGpioPort< LedJ13, LedJ5, LedA12, LedD4 >;
+using Leds = modm::SoftwareGpioPort< LedJ13, LedJ5, LedA12, LedD4 >;
 
 
 namespace stlink
@@ -126,7 +126,7 @@ inline void
 initialize()
 {
 	systemClock::enable();
-	xpcc::cortex::SysTickTimer::initialize<systemClock>();
+	modm::cortex::SysTickTimer::initialize<systemClock>();
 
 	stlink::Tx::connect(stlink::Uart::Tx);
 	stlink::Rx::connect(stlink::Uart::Rx, Gpio::InputType::PullUp);
@@ -140,4 +140,4 @@ initialize()
 
 }
 
-#endif	// XPCC_STM32_F769I_DISCOVERY_HPP
+#endif	// MODM_STM32_F769I_DISCOVERY_HPP

@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_GUI_TYPES_HPP
-#define XPCC_GUI_TYPES_HPP
+#ifndef MODM_GUI_TYPES_HPP
+#define MODM_GUI_TYPES_HPP
 
 #include <modm/ui/display.hpp>
 #include <modm/container/dynamic_array.hpp>
@@ -28,7 +28,7 @@
 #define NULL 0
 #endif
 
-namespace xpcc
+namespace modm
 {
 
 namespace gui
@@ -40,7 +40,7 @@ class Widget;
 
 
 /// Container used in view to store widgets
-typedef xpcc::DynamicArray<Widget*> WidgetContainer;
+typedef modm::DynamicArray<Widget*> WidgetContainer;
 
 typedef void (*genericCallback)(void*);
 
@@ -66,7 +66,7 @@ public:
 		DOWN
 	};
 
-	InputEvent(xpcc::glcd::Point point, Type type, Direction direction) :
+	InputEvent(modm::glcd::Point point, Type type, Direction direction) :
 		type(type),
 		direction(direction),
 		coord(point)
@@ -80,7 +80,7 @@ public:
 	Type type;
 	Direction direction;
 
-	xpcc::glcd::Point coord;
+	modm::glcd::Point coord;
 };
 
 /**
@@ -122,13 +122,13 @@ public:
 private:
 	genericCallback cb;
 	void* cb_data;
-	xpcc::ShortTimeout timeout;
+	modm::ShortTimeout timeout;
 	bool already_run;
 };
 
-typedef xpcc::DoublyLinkedList<AsyncEvent*> AsyncEventList;
+typedef modm::DoublyLinkedList<AsyncEvent*> AsyncEventList;
 
-typedef xpcc::Queue<InputEvent*, xpcc::LinkedList<InputEvent*> > inputQueue;
+typedef modm::Queue<InputEvent*, modm::LinkedList<InputEvent*> > inputQueue;
 
 /// Callback when an event happend
 typedef void (*eventCallback)(const InputEvent&, Widget*, void*);
@@ -148,10 +148,10 @@ typedef struct Dimension
 
 } Dimension;
 
-typedef xpcc::glcd::Point Point;
+typedef modm::glcd::Point Point;
 
 }	// namespace gui
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif  // XPCC_GUI_TYPES_HPP
+#endif  // MODM_GUI_TYPES_HPP

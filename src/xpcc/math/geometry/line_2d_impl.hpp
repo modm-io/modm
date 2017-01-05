@@ -11,19 +11,19 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LINE_2D_HPP
+#ifndef MODM_LINE_2D_HPP
 	#error	"Don't include this file directly, use 'line_2d.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template <typename T>
-xpcc::Line2D<T>::Line2D() :
+modm::Line2D<T>::Line2D() :
 	point(), directionVector()
 {
 }
 
 template <typename T>
-xpcc::Line2D<T>::Line2D(const Vector<T, 2>& point, const Vector<T, 2>& direction) :
+modm::Line2D<T>::Line2D(const Vector<T, 2>& point, const Vector<T, 2>& direction) :
 	point(point), directionVector(direction)
 {
 }
@@ -31,35 +31,35 @@ xpcc::Line2D<T>::Line2D(const Vector<T, 2>& point, const Vector<T, 2>& direction
 // ----------------------------------------------------------------------------
 template <typename T>
 inline void
-xpcc::Line2D<T>::setPoint(const Vector<T, 2>& point)
+modm::Line2D<T>::setPoint(const Vector<T, 2>& point)
 {
 	this->point = point;
 }
 
 template <typename T>
-inline const xpcc::Vector<T, 2>&
-xpcc::Line2D<T>::getPoint() const
+inline const modm::Vector<T, 2>&
+modm::Line2D<T>::getPoint() const
 {
 	return this->point;
 }
 
 template <typename T>
 inline void
-xpcc::Line2D<T>::setDirectionVector(const Vector<T, 2>& vector)
+modm::Line2D<T>::setDirectionVector(const Vector<T, 2>& vector)
 {
 	this->directionVector = vector;
 }
 
 template <typename T>
-inline const xpcc::Vector<T, 2>&
-xpcc::Line2D<T>::getDirectionVector() const
+inline const modm::Vector<T, 2>&
+modm::Line2D<T>::getDirectionVector() const
 {
 	return this->directionVector;
 }
 
 template <typename T>
 inline void
-xpcc::Line2D<T>::set(const Vector<T, 2>& point, const Vector<T, 2>& direction)
+modm::Line2D<T>::set(const Vector<T, 2>& point, const Vector<T, 2>& direction)
 {
 	this->point = point;
 	this->directionVector = direction;
@@ -68,7 +68,7 @@ xpcc::Line2D<T>::set(const Vector<T, 2>& point, const Vector<T, 2>& direction)
 // ----------------------------------------------------------------------------
 template <typename T>
 T
-xpcc::Line2D<T>::getDistanceTo(const Vector<T, 2>& point) const
+modm::Line2D<T>::getDistanceTo(const Vector<T, 2>& point) const
 {
 	// vector from the base point of the line to the new point
 	Vector<T, 2> startToPoint = point - this->point;
@@ -89,10 +89,10 @@ xpcc::Line2D<T>::getDistanceTo(const Vector<T, 2>& point) const
 // ----------------------------------------------------------------------------
 template <typename T>
 bool
-xpcc::Line2D<T>::getIntersections(const Line2D& other,
+modm::Line2D<T>::getIntersections(const Line2D& other,
 		PointSet2D<T>& intersections) const
 {
-	xpcc::Vector<T, 2> connectionVector = this->point - other.point;
+	modm::Vector<T, 2> connectionVector = this->point - other.point;
 	
 	WideType d = this->directionVector.cross(other.directionVector);
 	if (d)
@@ -109,11 +109,11 @@ xpcc::Line2D<T>::getIntersections(const Line2D& other,
 // ----------------------------------------------------------------------------
 template <typename T>
 bool
-xpcc::Line2D<T>::getIntersections(const Circle2D<T>& circle,
+modm::Line2D<T>::getIntersections(const Circle2D<T>& circle,
 		PointSet2D<T>& intersections) const
 {
 	// vector from the center of the circle to line start
-	xpcc::Vector<T, 2> circleToLine = this->point - circle.center;
+	modm::Vector<T, 2> circleToLine = this->point - circle.center;
 	
 	WideType a = 2 * this->directionVector.dot(this->directionVector);
 	WideType b = 2 * circleToLine.dot(this->directionVector);

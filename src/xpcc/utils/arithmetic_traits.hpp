@@ -13,15 +13,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ARITHMETIC_TRAITS_HPP
-#define XPCC_ARITHMETIC_TRAITS_HPP
+#ifndef MODM_ARITHMETIC_TRAITS_HPP
+#define MODM_ARITHMETIC_TRAITS_HPP
 
 #include <stdint.h>
 
 #include <modm/architecture/utils.hpp>
 #include <modm/utils/template_metaprogramming.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -47,10 +47,10 @@ namespace xpcc
  *
  * @section usage	Usage
  * @code
- * typedef typename xpcc::ArithmeticTraits<T>::WideType T_DOUBLE;
+ * typedef typename modm::ArithmeticTraits<T>::WideType T_DOUBLE;
  *
- * T min = xpcc::ArithmeticTraits<T>::min;
- * T max = xpcc::ArithmeticTraits<T>::max;
+ * T min = modm::ArithmeticTraits<T>::min;
+ * T max = modm::ArithmeticTraits<T>::max;
  * @endcode
  *
  * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
@@ -151,7 +151,7 @@ struct ArithmeticTraits<uint16_t>
 template<>
 struct ArithmeticTraits<int32_t>
 {
-#if defined(XPCC_CPU_AVR)
+#if defined(MODM_CPU_AVR)
 	typedef float WideType; // int64_t is on AVRs only a int32_t
 #else
 	typedef int64_t WideType;
@@ -172,7 +172,7 @@ struct ArithmeticTraits<int32_t>
 template<>
 struct ArithmeticTraits<uint32_t>
 {
-#if defined(XPCC_CPU_AVR)
+#if defined(MODM_CPU_AVR)
 	typedef float WideType; // int64_t is on AVRs only a int32_t
 #else
 	typedef uint64_t WideType;
@@ -189,7 +189,7 @@ struct ArithmeticTraits<uint32_t>
 	static constexpr uint32_t max = 4294967295UL;
 };
 
-#if defined(XPCC_CPU_ARM) && defined(XPCC_OS_NONE)
+#if defined(MODM_CPU_ARM) && defined(MODM_OS_NONE)
 // ------------------------------------------------------------------------
 // For ARM 'int32_t' is of type 'long'. Therefore there is no
 // class here for the default type 'int'.
@@ -295,6 +295,6 @@ struct ArithmeticTraits<double>
 };
 
 //// @}
-} // namespace xpcc
+} // namespace modm
 
-#endif	// XPCC_ARITHMETIC_TRAITS_HPP
+#endif	// MODM_ARITHMETIC_TRAITS_HPP

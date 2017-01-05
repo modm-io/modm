@@ -14,15 +14,15 @@
 #include <modm/architecture/platform.hpp>
 #include <modm/processing/timer.hpp>
 
-using namespace xpcc::atmega;
+using namespace modm::atmega;
 
 // create a output device for the led
 typedef GpioOutputB0 Led;
 
 // timer interrupt routine
-XPCC_ISR(TIMER2_COMPA)
+MODM_ISR(TIMER2_COMPA)
 {
-	xpcc::Clock::increment();
+	modm::Clock::increment();
 }
 
 int
@@ -41,7 +41,7 @@ main()
 	// enable interrupts
 	enableInterrupts();
 	
-	xpcc::ShortTimeout timeout(200);
+	modm::ShortTimeout timeout(200);
 	while (1)
 	{
 		if (timeout.isExpired())

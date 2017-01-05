@@ -9,15 +9,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_INTERFACE_I2C_DEVICE_HPP
-#define XPCC_INTERFACE_I2C_DEVICE_HPP
+#ifndef MODM_INTERFACE_I2C_DEVICE_HPP
+#define MODM_INTERFACE_I2C_DEVICE_HPP
 
 #include "i2c.hpp"
 #include "i2c_master.hpp"
 #include "i2c_transaction.hpp"
 #include <modm/processing/resumable.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -41,7 +41,7 @@ namespace xpcc
  * @ingroup i2c
  */
 template < class I2cMaster, uint8_t NestingLevels = 10, class Transaction = I2cWriteReadTransaction >
-class I2cDevice : protected xpcc::NestedResumable< NestingLevels + 1 >
+class I2cDevice : protected modm::NestedResumable< NestingLevels + 1 >
 {
 public:
 	///	@param	address	the slave address not yet shifted left (address < 128).
@@ -68,7 +68,7 @@ public:
 
 	/// @retval true	device responds to address
 	/// @retval false	no device with address found
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	ping()
 	{
 		RF_BEGIN();
@@ -116,7 +116,7 @@ protected:
 
 	/// Starts the transaction with a seperate transaction object.
 	bool inline
-	startTransaction(xpcc::I2cTransaction *transaction)
+	startTransaction(modm::I2cTransaction *transaction)
 	{
 		return I2cMaster::start(transaction, configuration);
 	}
@@ -132,11 +132,11 @@ protected:
 	bool inline
 	wasTransactionSuccessful()
 	{
-		return (transaction.getState() != xpcc::I2c::TransactionState::Error);
+		return (transaction.getState() != modm::I2c::TransactionState::Error);
 	}
 
 	/// Starts our own transaction and waits until finished.
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	runTransaction()
 	{
 		RF_BEGIN();
@@ -154,6 +154,6 @@ private:
 	I2c::ConfigurationHandler configuration;
 };
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif // XPCC_INTERFACE_I2C_DEVICE_HPP
+#endif // MODM_INTERFACE_I2C_DEVICE_HPP

@@ -37,10 +37,10 @@
 
 // ----------------------------------------------------------------------------
 %% if options["buffer.tx"] > 0
-static xpcc::atomic::Queue<xpcc::can::Message, {{ options["buffer.tx"] }}> txQueue;
+static modm::atomic::Queue<modm::can::Message, {{ options["buffer.tx"] }}> txQueue;
 %% endif
 %% if options["buffer.rx"] > 0
-static xpcc::atomic::Queue<xpcc::can::Message, {{ options["buffer.rx"] }}> rxQueue;
+static modm::atomic::Queue<modm::can::Message, {{ options["buffer.rx"] }}> rxQueue;
 %% endif
 
 
@@ -48,7 +48,7 @@ static xpcc::atomic::Queue<xpcc::can::Message, {{ options["buffer.rx"] }}> rxQue
 // Re-implemented here to save some code space. As all arguments in the calls
 // below are constant the compiler is able to calculate everything at
 // compile time.
-static xpcc_always_inline void
+static modm_always_inline void
 nvicEnableInterrupt(IRQn_Type IRQn)
 {
 	NVIC->ISER[((uint32_t)(IRQn) >> 5)] = (1UL << ((uint32_t)(IRQn) & 0x1F));
@@ -56,7 +56,7 @@ nvicEnableInterrupt(IRQn_Type IRQn)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Can{{ id }}::initializeWithPrescaler(
+modm::stm32::Can{{ id }}::initializeWithPrescaler(
 		uint16_t prescaler, uint8_t bs1, uint8_t bs2,
 		uint32_t interruptPriority, Mode startupMode, bool overwriteOnOverrun)
 {
@@ -151,7 +151,7 @@ xpcc::stm32::Can{{ id }}::initializeWithPrescaler(
 // Configure the mailbox to send a CAN message.
 // Low level function called by sendMessage and by Tx Interrupt.
 static void
-sendMailbox(const xpcc::can::Message& message, uint32_t mailboxId)
+sendMailbox(const modm::can::Message& message, uint32_t mailboxId)
 {
 	CAN_TxMailBox_TypeDef* mailbox = &{{ reg }}->sTxMailBox[mailboxId];
 
@@ -170,7 +170,7 @@ sendMailbox(const xpcc::can::Message& message, uint32_t mailboxId)
 	mailbox->TDTR = message.getLength();
 
 	// Set up the data field (copy the 8x8-bits into two 32-bit registers)
-	const uint8_t * xpcc_may_alias data = message.data;
+	const uint8_t * modm_may_alias data = message.data;
 	mailbox->TDLR = reinterpret_cast<const uint32_t *>(data)[0];
 	mailbox->TDHR = reinterpret_cast<const uint32_t *>(data)[1];
 
@@ -182,7 +182,7 @@ sendMailbox(const xpcc::can::Message& message, uint32_t mailboxId)
 // Low level function to receive a message from mailbox.
 // Called by Rx Interrupt or by getMessage.
 static void
-readMailbox(xpcc::can::Message& message, uint32_t mailboxId)
+readMailbox(modm::can::Message& message, uint32_t mailboxId)
 {
 	CAN_FIFOMailBox_TypeDef* mailbox = &{{ reg }}->sFIFOMailBox[mailboxId];
 
@@ -199,7 +199,7 @@ readMailbox(xpcc::can::Message& message, uint32_t mailboxId)
 
 	message.length = mailbox->RDTR & CAN_TDT1R_DLC;
 
-	uint8_t * xpcc_may_alias data = message.data;
+	uint8_t * modm_may_alias data = message.data;
 	reinterpret_cast<uint32_t *>(data)[0] = mailbox->RDLR;
 	reinterpret_cast<uint32_t *>(data)[1] = mailbox->RDHR;
 }
@@ -210,7 +210,7 @@ readMailbox(xpcc::can::Message& message, uint32_t mailboxId)
  * Generated when Transmit Mailbox 0..2 becomes empty.
  */
 
-XPCC_ISR({{ reg }}_TX)
+MODM_ISR({{ reg }}_TX)
 {
 %% if options["buffer.tx"] > 0
 	uint32_t mailbox;
@@ -243,24 +243,24 @@ XPCC_ISR({{ reg }}_TX)
  * Generated on a new received message, FIFO0 full condition and Overrun
  * Condition.
  */
-XPCC_ISR({{ reg }}_RX0)
+MODM_ISR({{ reg }}_RX0)
 {
 	if ({{ reg }}->RF0R & CAN_RF0R_FOVR0) {
-		xpcc::ErrorReport::report(xpcc::stm32::CAN{{ id }}_FIFO0_OVERFLOW);
+		modm::ErrorReport::report(modm::stm32::CAN{{ id }}_FIFO0_OVERFLOW);
 
 		// release overrun flag & access the next message
 		{{ reg }}->RF0R = CAN_RF0R_FOVR0 | CAN_RF0R_RFOM0;
 	}
 
 %% if options["buffer.rx"] > 0
-	xpcc::can::Message message;
+	modm::can::Message message;
 	readMailbox(message, 0);
 
 	// Release FIFO (access the next message)
 	{{ reg }}->RF0R = CAN_RF0R_RFOM0;
 
 	if (!rxQueue.push(message)) {
-		xpcc::ErrorReport::report(xpcc::stm32::CAN{{ id }}_FIFO0_OVERFLOW);
+		modm::ErrorReport::report(modm::stm32::CAN{{ id }}_FIFO0_OVERFLOW);
 	}
 %% endif
 }
@@ -270,24 +270,24 @@ XPCC_ISR({{ reg }}_RX0)
  *
  * See FIFO0 Interrupt
  */
-XPCC_ISR({{ reg }}_RX1)
+MODM_ISR({{ reg }}_RX1)
 {
 	if ({{ reg }}->RF1R & CAN_RF1R_FOVR1) {
-		xpcc::ErrorReport::report(xpcc::stm32::CAN{{ id }}_FIFO1_OVERFLOW);
+		modm::ErrorReport::report(modm::stm32::CAN{{ id }}_FIFO1_OVERFLOW);
 
 		// release overrun flag & access the next message
 		{{ reg }}->RF1R = CAN_RF1R_FOVR1 | CAN_RF1R_RFOM1;
 	}
 
 %% if options["buffer.rx"] > 0
-	xpcc::can::Message message;
+	modm::can::Message message;
 	readMailbox(message, 1);
 
 	// Release FIFO (access the next message)
 	{{ reg }}->RF1R = CAN_RF1R_RFOM1;
 
 	if (!rxQueue.push(message)) {
-		xpcc::ErrorReport::report(xpcc::stm32::CAN{{ id }}_FIFO1_OVERFLOW);
+		modm::ErrorReport::report(modm::stm32::CAN{{ id }}_FIFO1_OVERFLOW);
 	}
 %% endif
 }
@@ -298,18 +298,18 @@ XPCC_ISR({{ reg }}_RX1)
 // the interrupt source and call the correct interrupts function defined above.
 // Sources for the different interrupts are specified in the Reference Manual
 // in the "bxCAN interrupts" section.
-XPCC_ISR(CEC_CAN)
+MODM_ISR(CEC_CAN)
 {
 	if({{ reg }}->TSR & (CAN_TSR_RQCP0 | CAN_TSR_RQCP1 | CAN_TSR_RQCP2)) {
-		XPCC_ISR_CALL({{ reg }}_TX);
+		MODM_ISR_CALL({{ reg }}_TX);
 	}
 
 	if({{ reg }}->RF0R & (CAN_RF0R_FMP0 | CAN_RF0R_FULL0 | CAN_RF0R_FOVR0)) {
-		XPCC_ISR_CALL({{ reg }}_RX0);
+		MODM_ISR_CALL({{ reg }}_RX0);
 	}
 
 	if({{ reg }}->RF1R & (CAN_RF1R_FMP1 | CAN_RF1R_FULL1 | CAN_RF1R_FOVR1)) {
-		XPCC_ISR_CALL({{ reg }}_RX1);
+		MODM_ISR_CALL({{ reg }}_RX1);
 	}
 
 	// TODO: we do not handle status changes at the moment.
@@ -318,7 +318,7 @@ XPCC_ISR(CEC_CAN)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Can{{ id }}::setMode(Mode mode)
+modm::stm32::Can{{ id }}::setMode(Mode mode)
 {
 	// Request initialization
 	{{ reg }}->MCR |= CAN_MCR_INRQ;
@@ -337,7 +337,7 @@ xpcc::stm32::Can{{ id }}::setMode(Mode mode)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Can{{ id }}::setAutomaticRetransmission(bool retransmission)
+modm::stm32::Can{{ id }}::setAutomaticRetransmission(bool retransmission)
 {
 	if (retransmission) {
 		// Enable retransmission
@@ -350,7 +350,7 @@ xpcc::stm32::Can{{ id }}::setAutomaticRetransmission(bool retransmission)
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::stm32::Can{{ id }}::isMessageAvailable()
+modm::stm32::Can{{ id }}::isMessageAvailable()
 {
 %% if options["buffer.rx"] > 0
 	return !rxQueue.isEmpty();
@@ -362,7 +362,7 @@ xpcc::stm32::Can{{ id }}::isMessageAvailable()
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::stm32::Can{{ id }}::getMessage(can::Message& message)
+modm::stm32::Can{{ id }}::getMessage(can::Message& message)
 {
 %% if options["buffer.rx"] > 0
 	if (rxQueue.isEmpty())
@@ -398,7 +398,7 @@ xpcc::stm32::Can{{ id }}::getMessage(can::Message& message)
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::stm32::Can{{ id }}::isReadyToSend()
+modm::stm32::Can{{ id }}::isReadyToSend()
 {
 %% if options["buffer.tx"] > 0
 	return txQueue.isNotFull();
@@ -409,7 +409,7 @@ xpcc::stm32::Can{{ id }}::isReadyToSend()
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::stm32::Can{{ id }}::sendMessage(const can::Message& message)
+modm::stm32::Can{{ id }}::sendMessage(const can::Message& message)
 {
 	// This function is not reentrant. If one of the mailboxes is empty it
 	// means that the software buffer is empty too. Therefore the mailbox
@@ -419,7 +419,7 @@ xpcc::stm32::Can{{ id }}::sendMessage(const can::Message& message)
 		// All mailboxes used at the moment
 %% if options["buffer.tx"] > 0
 		if (!txQueue.push(message)) {
-			xpcc::ErrorReport::report(xpcc::stm32::CAN{{ id }}_TX_OVERFLOW);
+			modm::ErrorReport::report(modm::stm32::CAN{{ id }}_TX_OVERFLOW);
 			return false;
 		}
 		return true;
@@ -437,8 +437,8 @@ xpcc::stm32::Can{{ id }}::sendMessage(const can::Message& message)
 }
 
 // ----------------------------------------------------------------------------
-xpcc::stm32::Can{{ id }}::BusState
-xpcc::stm32::Can{{ id }}::getBusState()
+modm::stm32::Can{{ id }}::BusState
+modm::stm32::Can{{ id }}::getBusState()
 {
 	if ({{ reg }}->ESR & CAN_ESR_BOFF) {
 		return BusState::Off;
@@ -456,7 +456,7 @@ xpcc::stm32::Can{{ id }}::getBusState()
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Can{{ id }}::enableStatusChangeInterrupt(
+modm::stm32::Can{{ id }}::enableStatusChangeInterrupt(
 		uint32_t interruptEnable,
 		uint32_t interruptPriority)
 {

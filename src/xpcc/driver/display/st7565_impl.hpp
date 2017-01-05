@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ST7565_HPP
+#ifndef MODM_ST7565_HPP
 	#error	"Don't include this file directly, use 'st7565.hpp' instead!"
 #endif
 
@@ -21,7 +21,7 @@
 // ----------------------------------------------------------------------------
 template <typename SPI, typename CS, typename A0, typename Reset, unsigned int Width, unsigned int Height, bool TopView>
 void
-xpcc::St7565<SPI, CS, A0, Reset, Width, Height, TopView>::update()
+modm::St7565<SPI, CS, A0, Reset, Width, Height, TopView>::update()
 {
 	cs.reset();
 	for(uint8_t y = 0; y < (Height / 8); ++y)
@@ -49,7 +49,7 @@ xpcc::St7565<SPI, CS, A0, Reset, Width, Height, TopView>::update()
 
 template <typename SPI, typename CS, typename A0, typename Reset, unsigned int Width, unsigned int Height, bool TopView>
 void
-xpcc::St7565<SPI, CS, A0, Reset, Width, Height, TopView>::setInvert(bool invert)
+modm::St7565<SPI, CS, A0, Reset, Width, Height, TopView>::setInvert(bool invert)
 {
 	cs.reset();
 	a0.reset();
@@ -66,8 +66,8 @@ xpcc::St7565<SPI, CS, A0, Reset, Width, Height, TopView>::setInvert(bool invert)
 // ----------------------------------------------------------------------------
 template <typename SPI, typename CS, typename A0, typename Reset, unsigned int Width, unsigned int Height, bool TopView>
 void
-xpcc::St7565<SPI, CS, A0, Reset, Width, Height, TopView>::initialize(
-		xpcc::accessor::Flash<uint8_t> configuration, uint8_t size)
+modm::St7565<SPI, CS, A0, Reset, Width, Height, TopView>::initialize(
+		modm::accessor::Flash<uint8_t> configuration, uint8_t size)
 {
 	//spi.initialize();
 	cs.set();
@@ -78,7 +78,7 @@ xpcc::St7565<SPI, CS, A0, Reset, Width, Height, TopView>::initialize(
 	// reset the controller
 	reset.setOutput();
 	reset.reset();
-	xpcc::delayMilliseconds(50);
+	modm::delayMilliseconds(50);
 	reset.set();
 
 	cs.reset();

@@ -51,7 +51,7 @@ namespace xpcc
 	private:
 		/// Does not handle requests which are not acknowledge.
 		void
-		handlePacket(const Header& header, const SmartPointer& payload);
+		handlePacket(const Header& header, const modm::SmartPointer& payload);
 
 		/// Sends messages which are waiting in the list.
 		void
@@ -88,13 +88,13 @@ namespace xpcc
 			 * and never else changed. this->typeInfo replaces runtime
 			 * information needed by handling of messages.
 			 */
-			Entry(Type type, const Header& inHeader, SmartPointer& inPayload) :
+			Entry(Type type, const Header& inHeader, modm::SmartPointer& inPayload) :
 				type(type),
 				header(inHeader), payload(inPayload)
 			{
 			}
 
-			Entry(const Header& inHeader, SmartPointer& inPayload) :
+			Entry(const Header& inHeader, modm::SmartPointer& inPayload) :
 				header(inHeader), payload(inPayload)
 			{
 			}
@@ -105,7 +105,7 @@ namespace xpcc
 			}
 
 			Entry(const Header& inHeader,
-					SmartPointer& inPayload, ResponseCallback& callback_) :
+					modm::SmartPointer& inPayload, ResponseCallback& callback_) :
 				type(Type::Callback),
 				header(inHeader), payload(inPayload),
 				callback(callback_)
@@ -120,38 +120,38 @@ namespace xpcc
 			headerFits(const Header& header) const;
 
 			inline void
-			callbackResponse(const Header& header, const SmartPointer &payload) const
+			callbackResponse(const Header& header, const modm::SmartPointer &payload) const
 			{
 				this->callback.call(header, payload);
 			}
 
 			const Type type = Type::Default;
 			const Header header;
-			const SmartPointer payload;
+			const modm::SmartPointer payload;
 			State state = State::TransmissionPending;
-			ShortTimeout time;
+			modm::ShortTimeout time;
 			uint8_t tries = 0;
 		private:
 			ResponseCallback callback;
 		};
 
 		void
-		addMessage(const Header& header, SmartPointer& smartPayload);
+		addMessage(const Header& header, modm::SmartPointer& smartPayload);
 
 		void
-		addMessage(const Header& header, SmartPointer& smartPayload,
+		addMessage(const Header& header, modm::SmartPointer& smartPayload,
 				ResponseCallback& responseCallback);
 
 		void
-		addResponse(const Header& header, SmartPointer& smartPayload);
+		addResponse(const Header& header, modm::SmartPointer& smartPayload);
 
 		inline void
-		handleActionCall(const Header& header, const SmartPointer& payload);
+		handleActionCall(const Header& header, const modm::SmartPointer& payload);
 
 		void
 		sendAcknowledge(const Header& header);
 
-		using EntryList = LinkedList<Entry>;
+		using EntryList = modm::LinkedList<Entry>;
 		using EntryIterator = EntryList::iterator;
 
 		EntryIterator

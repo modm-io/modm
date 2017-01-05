@@ -10,20 +10,20 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PCA8574_HPP
+#ifndef MODM_PCA8574_HPP
 #	error "Don't include this file directly, use 'pca8574.hpp' instead!"
 #endif
 
 template < class I2cMaster >
-xpcc::Pca8574<I2cMaster>::Pca8574(uint8_t address):
+modm::Pca8574<I2cMaster>::Pca8574(uint8_t address):
 	I2cDevice<I2cMaster, 2>(address),
 	direction(Pins(0xff)), output(Pins(0xff)), input(Pins(0xff))
 {
 }
 
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Pca8574<I2cMaster>::set(Pins pins)
+modm::ResumableResult<bool>
+modm::Pca8574<I2cMaster>::set(Pins pins)
 {
 	RF_BEGIN();
 
@@ -35,8 +35,8 @@ xpcc::Pca8574<I2cMaster>::set(Pins pins)
 }
 
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Pca8574<I2cMaster>::reset(Pins pins)
+modm::ResumableResult<bool>
+modm::Pca8574<I2cMaster>::reset(Pins pins)
 {
 	RF_BEGIN();
 
@@ -48,8 +48,8 @@ xpcc::Pca8574<I2cMaster>::reset(Pins pins)
 }
 
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Pca8574<I2cMaster>::toggle(Pins pins)
+modm::ResumableResult<bool>
+modm::Pca8574<I2cMaster>::toggle(Pins pins)
 {
 	RF_BEGIN();
 
@@ -61,8 +61,8 @@ xpcc::Pca8574<I2cMaster>::toggle(Pins pins)
 }
 
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Pca8574<I2cMaster>::set(Pins pins, bool value)
+modm::ResumableResult<bool>
+modm::Pca8574<I2cMaster>::set(Pins pins, bool value)
 {
 	RF_BEGIN();
 
@@ -74,8 +74,8 @@ xpcc::Pca8574<I2cMaster>::set(Pins pins, bool value)
 }
 
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Pca8574<I2cMaster>::setInput(Pins pins)
+modm::ResumableResult<bool>
+modm::Pca8574<I2cMaster>::setInput(Pins pins)
 {
 	RF_BEGIN();
 
@@ -88,8 +88,8 @@ xpcc::Pca8574<I2cMaster>::setInput(Pins pins)
 }
 
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Pca8574<I2cMaster>::writePort(uint8_t value)
+modm::ResumableResult<bool>
+modm::Pca8574<I2cMaster>::writePort(uint8_t value)
 {
 	RF_BEGIN();
 
@@ -100,8 +100,8 @@ xpcc::Pca8574<I2cMaster>::writePort(uint8_t value)
 };
 
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Pca8574<I2cMaster>::readPort(uint8_t &value)
+modm::ResumableResult<bool>
+modm::Pca8574<I2cMaster>::readPort(uint8_t &value)
 {
 	RF_BEGIN();
 

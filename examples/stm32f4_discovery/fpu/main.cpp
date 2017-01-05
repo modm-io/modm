@@ -24,10 +24,10 @@ main()
 
 	while (1)
 	{
-		xpcc::Vector<float, 2> v(1.0f, 2.0f);
+		modm::Vector<float, 2> v(1.0f, 2.0f);
 		v.getLength();
 
-		xpcc::Quaternion<float> q;
+		modm::Quaternion<float> q;
 		q.getLength();
 	}
 }

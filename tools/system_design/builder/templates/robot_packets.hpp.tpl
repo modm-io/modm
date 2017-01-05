@@ -21,8 +21,8 @@
 
 #include <stdint.h>
 #include <cstdlib>
-#include <xpcc/io/iostream.hpp>
-#include <xpcc/container/smart_pointer.hpp>
+#include <modm/io/iostream.hpp>
+#include <modm/container/smart_pointer.hpp>
 
 namespace {{ namespace }}
 {
@@ -31,7 +31,7 @@ namespace {{ namespace }}
 {%- for packet in packets %}
 {%- if packet.isBuiltIn %}{% continue %}{% endif %}
 		{%- if packet.description %}
-		/** {{ packet.description | xpcc.wordwrap(67) | xpcc.indent(2, " * ") }} */
+		/** {{ packet.description | modm.wordwrap(67) | modm.indent(2, " * ") }} */
 		{%- endif %}
 	{%- if packet.isEnum %}
 		enum {%- if packet.isStronglyTyped %} class{%- endif %}
@@ -39,7 +39,7 @@ namespace {{ namespace }}
 		{
 			{%- for element in packet.iter() %}
 				{%- if element.description %}
-			/** {{ element.description | xpcc.wordwrap(63) | xpcc.indent(3, " * ") }} */
+			/** {{ element.description | modm.wordwrap(63) | modm.indent(3, " * ") }} */
 				{%- endif %}
 				{%- if packet.isStronglyTyped %}
 			{{ element.name | enumElementStrong }} = {{ element.value }},
@@ -84,8 +84,8 @@ namespace {{ namespace }}
 			}
 		}
 
-		xpcc::IOStream&
-		operator << (xpcc::IOStream& s, const {{ packet.name | typeName }} e);
+		modm::IOStream&
+		operator << (modm::IOStream& s, const {{ packet.name | typeName }} e);
 
 	{% elif packet.isStruct %}
 		struct {{ packet.name | typeName }}
@@ -99,14 +99,14 @@ namespace {{ namespace }}
 			{%- endif %}
 			{% for element in packet.flattened().iter() %}
 			{%- if element.description %}
-			/** {{ element.description | xpcc.wordwrap(63) | xpcc.indent(3, " * ") }} */
+			/** {{ element.description | modm.wordwrap(63) | modm.indent(3, " * ") }} */
 			{%- endif %}
 			{{ element | subtype }};
 			{%- endfor %}
 		} __attribute__((packed));
 
-		xpcc::IOStream&
-		operator << (xpcc::IOStream& s, const {{ packet.name | typeName }} e);
+		modm::IOStream&
+		operator << (modm::IOStream& s, const {{ packet.name | typeName }} e);
 
 	{% elif packet.isTypedef %}
 		{%- if packet.subtype.type.isBuiltIn %}

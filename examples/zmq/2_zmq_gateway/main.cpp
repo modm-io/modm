@@ -17,13 +17,13 @@
 #include <modm/architecture/platform/driver/can/socketcan/socketcan.hpp>
 
 #include <modm/communication/communication.hpp>
-#include <modm/communication/xpcc/backend/can.hpp>
+#include <modm/communication/modm/backend/can.hpp>
 
-#include <modm/communication/xpcc/backend/can/connector.hpp>
-#include <modm/communication/xpcc/backend/zeromq/connector.hpp>
+#include <modm/communication/modm/backend/can/connector.hpp>
+#include <modm/communication/modm/backend/zeromq/connector.hpp>
 
 /**
- * Listens to a CAN bus connected by a CAN2USB and publishes xpcc messages with zeromq.
+ * Listens to a CAN bus connected by a CAN2USB and publishes modm messages with zeromq.
  *
  * How to use:
  * - Connect a CAN2USB to a CAN bus with traffic.
@@ -34,44 +34,44 @@
  * - Adjust the baud rate of the CAN bus in this example.
  * - Do
  *   scons run
- * - All xpcc messages will be published on port 8211 by zeromq
+ * - All modm messages will be published on port 8211 by zeromq
  */
 
 // Default baud rate
 static constexpr uint32_t canBusBaudRate = 125000;
 
-/* Either use an USB CAN2USB adaptor with xpcc Lawicel interpreter
+/* Either use an USB CAN2USB adaptor with modm Lawicel interpreter
    or use a CAN controller supported by Linux' SocketCAN.
 
    With SocketCAN the baudrate must be set with the operating system.
    $ ip link set can0 type can bitrate
 */
-// static xpcc::hosted::CanUsb canUsb;
-static xpcc::hosted::SocketCan canSocket;
+// static modm::hosted::CanUsb canUsb;
+static modm::hosted::SocketCan canSocket;
 
-// static xpcc::CanConnector< xpcc::hosted::CanUsb > canConnector(&canUsb);
-static xpcc::CanConnector< xpcc::hosted::SocketCan > canConnector(&canSocket);
+// static modm::CanConnector< modm::hosted::CanUsb > canConnector(&canUsb);
+static modm::CanConnector< modm::hosted::SocketCan > canConnector(&canSocket);
 
-#undef XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::DEBUG
+#undef MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::DEBUG
 
 int
 main()
 {
-	XPCC_LOG_DEBUG << "ZeroMQ SocketCAN XPCC bridge" << xpcc::endl;
+	MODM_LOG_DEBUG << "ZeroMQ SocketCAN MODM bridge" << modm::endl;
 
 	// if (not canUsb.open("/dev/ttyUSB0", canBusBaudRate)) {
 	if (not canSocket.open("can0" /*, canBusBaudRate */)) {
-		XPCC_LOG_ERROR << "Could not open port" << xpcc::endl;
+		MODM_LOG_ERROR << "Could not open port" << modm::endl;
 		exit(EXIT_FAILURE);
 	}
 
 	const std::string endpointOut = "tcp://*:8211";
 	const std::string endpointIn  = "tcp://*:8212";
 
-	xpcc::ZeroMQConnector zmqConnector(endpointIn, endpointOut, xpcc::ZeroMQConnector::Mode::PubPull);
+	modm::ZeroMQConnector zmqConnector(endpointIn, endpointOut, modm::ZeroMQConnector::Mode::PubPull);
 
-	XPCC_LOG_DEBUG << "Entering main loop" << xpcc::endl;
+	MODM_LOG_DEBUG << "Entering main loop" << modm::endl;
 
 	while(true)
 	{
@@ -80,10 +80,10 @@ main()
 
 		while (canConnector.isPacketAvailable())
 		{
-			xpcc::Header header = canConnector.getPacketHeader();
-			xpcc::SmartPointer payload = canConnector.getPacketPayload();
+			modm::Header header = canConnector.getPacketHeader();
+			modm::SmartPointer payload = canConnector.getPacketPayload();
 
-			XPCC_LOG_DEBUG << "C->Z " << header << " " << payload.getSize() << " " << payload << xpcc::endl;
+			MODM_LOG_DEBUG << "C->Z " << header << " " << payload.getSize() << " " << payload << modm::endl;
 
 			zmqConnector.sendPacket(header, payload);
 
@@ -92,17 +92,17 @@ main()
 
 		while (zmqConnector.isPacketAvailable())
 		{
-			xpcc::Header header = zmqConnector.getPacketHeader();
-			xpcc::SmartPointer payload = zmqConnector.getPacketPayload();
+			modm::Header header = zmqConnector.getPacketHeader();
+			modm::SmartPointer payload = zmqConnector.getPacketPayload();
 
-			XPCC_LOG_DEBUG << "Z->C " << header << " " << payload.getSize() << " " << payload << xpcc::endl;
+			MODM_LOG_DEBUG << "Z->C " << header << " " << payload.getSize() << " " << payload << modm::endl;
 
 			canConnector.sendPacket(header, payload);
 
 			zmqConnector.dropPacket();
 		}
 
-		xpcc::delayMilliseconds(10);
+		modm::delayMilliseconds(10);
 	}
 
 	// canUsb.close();

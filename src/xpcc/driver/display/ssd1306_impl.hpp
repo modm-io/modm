@@ -9,12 +9,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SSD1306_HPP
+#ifndef MODM_SSD1306_HPP
 #	error	"Don't include this file directly, use 'ssd1306.hpp' instead!"
 #endif
 
 template < class I2cMaster >
-xpcc::Ssd1306<I2cMaster>::Ssd1306(uint8_t address)
+modm::Ssd1306<I2cMaster>::Ssd1306(uint8_t address)
 :	I2cDevice<I2cMaster, 2, ssd1306::DataTransmissionAdapter>(address),
 	commandBuffer{0x80, 0, 0x80, 0, 0x80, 0, 0x80, 0, 0x80, 0, 0x80, 0, 0x80, 0}
 {
@@ -24,8 +24,8 @@ xpcc::Ssd1306<I2cMaster>::Ssd1306(uint8_t address)
 // ----------------------------------------------------------------------------
 // MARK: - Tasks
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Ssd1306<I2cMaster>::initialize()
+modm::ResumableResult<bool>
+modm::Ssd1306<I2cMaster>::initialize()
 {
 	RF_BEGIN();
 
@@ -54,8 +54,8 @@ xpcc::Ssd1306<I2cMaster>::initialize()
 
 // ----------------------------------------------------------------------------
 template < class I2cMaster >
-xpcc::ResumableResult<void>
-xpcc::Ssd1306<I2cMaster>::startWriteDisplay()
+modm::ResumableResult<void>
+modm::Ssd1306<I2cMaster>::startWriteDisplay()
 {
 	RF_BEGIN();
 
@@ -65,8 +65,8 @@ xpcc::Ssd1306<I2cMaster>::startWriteDisplay()
 }
 
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Ssd1306<I2cMaster>::writeDisplay()
+modm::ResumableResult<bool>
+modm::Ssd1306<I2cMaster>::writeDisplay()
 {
 	RF_BEGIN();
 
@@ -78,8 +78,8 @@ xpcc::Ssd1306<I2cMaster>::writeDisplay()
 }
 
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Ssd1306<I2cMaster>::setRotation(Rotation rotation)
+modm::ResumableResult<bool>
+modm::Ssd1306<I2cMaster>::setRotation(Rotation rotation)
 {
 	RF_BEGIN();
 
@@ -94,8 +94,8 @@ xpcc::Ssd1306<I2cMaster>::setRotation(Rotation rotation)
 }
 
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Ssd1306<I2cMaster>::configureScroll(uint8_t origin, uint8_t size,
+modm::ResumableResult<bool>
+modm::Ssd1306<I2cMaster>::configureScroll(uint8_t origin, uint8_t size,
 		ScrollDirection direction, ScrollStep steps)
 {
 	RF_BEGIN();
@@ -128,8 +128,8 @@ xpcc::Ssd1306<I2cMaster>::configureScroll(uint8_t origin, uint8_t size,
 // ----------------------------------------------------------------------------
 // MARK: write command
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Ssd1306<I2cMaster>::writeCommand(uint8_t command)
+modm::ResumableResult<bool>
+modm::Ssd1306<I2cMaster>::writeCommand(uint8_t command)
 {
 	RF_BEGIN();
 
@@ -142,8 +142,8 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(uint8_t command)
 }
 
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Ssd1306<I2cMaster>::writeCommand(uint8_t command, uint8_t data)
+modm::ResumableResult<bool>
+modm::Ssd1306<I2cMaster>::writeCommand(uint8_t command, uint8_t data)
 {
 	RF_BEGIN();
 
@@ -157,8 +157,8 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(uint8_t command, uint8_t data)
 }
 
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Ssd1306<I2cMaster>::writeCommand(uint8_t command, uint8_t data1, uint8_t data2)
+modm::ResumableResult<bool>
+modm::Ssd1306<I2cMaster>::writeCommand(uint8_t command, uint8_t data1, uint8_t data2)
 {
 	RF_BEGIN();
 
@@ -175,7 +175,7 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(uint8_t command, uint8_t data1, uint8_t d
 // ----------------------------------------------------------------------------
 template < class I2cMaster >
 bool
-xpcc::Ssd1306<I2cMaster>::startTransactionWithLength(uint8_t length)
+modm::Ssd1306<I2cMaster>::startTransactionWithLength(uint8_t length)
 {
 	return this->startWrite(commandBuffer, length);
 }

@@ -102,13 +102,13 @@ extern void
 exit(int) __attribute__ ((noreturn, weak));
 
 // default implementation is empty and does nothing
-void xpcc_hook_hardware_init(void) __attribute__(( weak ));
-void xpcc_hook_hardware_init(void) {}
+void modm_hook_hardware_init(void) __attribute__(( weak ));
+void modm_hook_hardware_init(void) {}
 
-extern void __xpcc_initialize_memory(void);
+extern void __modm_initialize_memory(void);
 
 %% if options["::enable_gpio"]
-extern void xpcc_gpio_enable(void);
+extern void modm_gpio_enable(void);
 %% endif
 
 static void
@@ -238,11 +238,11 @@ Reset_Handler(void)
 
 %% if options["::enable_gpio"]
 	// Enable GPIO Clock
-	xpcc_gpio_enable();
+	modm_gpio_enable();
 %% endif
 
 	// Use this hook to initialize external memories
-	xpcc_hook_hardware_init();
+	modm_hook_hardware_init();
 
 	// copy all external memory declared in linkerscript table
 	table_copy(	(uint32_t**)__table_copy_extern_start,
@@ -252,7 +252,7 @@ Reset_Handler(void)
 
 	// initialize heap
 	// needs to be done before calling the CTORS of static objects
-	__xpcc_initialize_memory();
+	__modm_initialize_memory();
 
 	// Call CTORS of static objects
 	__libc_init_array();

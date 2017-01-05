@@ -16,10 +16,10 @@
 // https://github.com/dergraaf/loa
 //
 
-#ifndef XPCC_STM32_F4_LOA_V2B_HPP
-#define XPCC_STM32_F4_LOA_V2B_HPP
+#ifndef MODM_STM32_F4_LOA_V2B_HPP
+#define MODM_STM32_F4_LOA_V2B_HPP
 
-using namespace xpcc::stm32;
+using namespace modm::stm32;
 
 typedef GpioOutputE5 LedWhite;
 typedef GpioOutputE6 LedGreen;
@@ -28,4 +28,4 @@ typedef GpioOutputE6 LedGreen;
 /// external on-board 25MHz oscillator
 typedef SystemClock<Pll<ExternalClock<MHz25>, MHz168, MHz48> > defaultSystemClock;
 
-#endif	// XPCC_STM32_F4_LOA_V2B_HPP
+#endif	// MODM_STM32_F4_LOA_V2B_HPP

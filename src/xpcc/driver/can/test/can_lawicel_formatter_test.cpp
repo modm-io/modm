@@ -23,14 +23,14 @@
 void
 CanLawicelFormatterTest::testIdentifierToStringExtended()
 {
-	xpcc::can::Message msg(0x75395165, 0);
+	modm::can::Message msg(0x75395165, 0);
 
 	char buffer[128];
 	for (int i = 0; i < 128; ++i) {
 		buffer[i] = 'a';
 	}
 	
-	TEST_ASSERT_TRUE(xpcc::CanLawicelFormatter::convertToString(msg, buffer));
+	TEST_ASSERT_TRUE(modm::CanLawicelFormatter::convertToString(msg, buffer));
 	
 	TEST_ASSERT_EQUALS(std::strlen(buffer), 10U);
 	/*              \0-terminatation of string >-+
@@ -44,7 +44,7 @@ CanLawicelFormatterTest::testIdentifierToStringExtended()
 void
 CanLawicelFormatterTest::testIdentifierToStringStandard()
 {
-	xpcc::can::Message msg(0x123, 0);
+	modm::can::Message msg(0x123, 0);
 	msg.flags.extended = false;
 	
 	char buffer[128];
@@ -52,7 +52,7 @@ CanLawicelFormatterTest::testIdentifierToStringStandard()
 		buffer[i] = 'a';
 	}
 	
-	TEST_ASSERT_TRUE(xpcc::CanLawicelFormatter::convertToString(msg, buffer));
+	TEST_ASSERT_TRUE(modm::CanLawicelFormatter::convertToString(msg, buffer));
 	
 	TEST_ASSERT_EQUALS(std::strlen(buffer), 5U);
 	TEST_ASSERT_EQUALS_ARRAY(buffer, "t1230\0", 6);
@@ -61,7 +61,7 @@ CanLawicelFormatterTest::testIdentifierToStringStandard()
 void
 CanLawicelFormatterTest::testMessageToStringStandard()
 {
-	xpcc::can::Message msg(0x123, 4);
+	modm::can::Message msg(0x123, 4);
 	msg.flags.extended = false;
 	msg.data[0] = 0x44;
 	msg.data[1] = 0xff;
@@ -73,7 +73,7 @@ CanLawicelFormatterTest::testMessageToStringStandard()
 		buffer[i] = 'a';
 	}
 	
-	TEST_ASSERT_TRUE(xpcc::CanLawicelFormatter::convertToString(msg, buffer));
+	TEST_ASSERT_TRUE(modm::CanLawicelFormatter::convertToString(msg, buffer));
 	
 	TEST_ASSERT_EQUALS(std::strlen(buffer), 13U);
 	/*                 \0-terminatation of string >-+
@@ -87,7 +87,7 @@ CanLawicelFormatterTest::testMessageToStringStandard()
 void
 CanLawicelFormatterTest::testMessageToStringExtended()
 {
-	xpcc::can::Message msg(0x123, 4);
+	modm::can::Message msg(0x123, 4);
 	msg.flags.extended = true;
 	msg.data[0] = 0x44;
 	msg.data[1] = 0xff;
@@ -99,7 +99,7 @@ CanLawicelFormatterTest::testMessageToStringExtended()
 		buffer[i] = 'a';
 	}
 	
-	TEST_ASSERT_TRUE(xpcc::CanLawicelFormatter::convertToString(msg, buffer));
+	TEST_ASSERT_TRUE(modm::CanLawicelFormatter::convertToString(msg, buffer));
 	
 	TEST_ASSERT_EQUALS(std::strlen(buffer), 18U);
 	TEST_ASSERT_EQUALS_ARRAY(buffer, "T00000123444FF1A12\0", 19);
@@ -109,9 +109,9 @@ void
 CanLawicelFormatterTest::testStringToMessage()
 {
 	const char *input = "T000016108F8FF00002394883D";
-	xpcc::can::Message output;
+	modm::can::Message output;
 	
-	TEST_ASSERT_TRUE(xpcc::CanLawicelFormatter::convertToCanMessage(input, output));
+	TEST_ASSERT_TRUE(modm::CanLawicelFormatter::convertToCanMessage(input, output));
 
 	TEST_ASSERT_EQUALS(output.identifier, 0x00001610U);
 	TEST_ASSERT_EQUALS(output.length, 8U);
@@ -132,15 +132,15 @@ void
 CanLawicelFormatterTest::testRoundtripMessage()
 {
 	const char *string = "T000016108F8FF00002394883D";
-	xpcc::can::Message message;
+	modm::can::Message message;
 
 	char buffer[128];
 	for (int i = 0; i < 128; ++i) {
 		buffer[i] = 'a';
 	}
 
-	TEST_ASSERT_TRUE(xpcc::CanLawicelFormatter::convertToCanMessage(string, message));
-	TEST_ASSERT_TRUE(xpcc::CanLawicelFormatter::convertToString(message, buffer));
+	TEST_ASSERT_TRUE(modm::CanLawicelFormatter::convertToCanMessage(string, message));
+	TEST_ASSERT_TRUE(modm::CanLawicelFormatter::convertToString(message, buffer));
 
 	/** check for 0-termination */
 	TEST_ASSERT_EQUALS_ARRAY(string, buffer, sizeof(string) + 1);
@@ -151,7 +151,7 @@ CanLawicelFormatterTest::testRoundtripMessage()
 void
 CanLawicelFormatterTest::testRoudtripString()
 {
-	xpcc::can::Message msg(0x123, 4);
+	modm::can::Message msg(0x123, 4);
 	msg.flags.extended = true;
 	msg.data[0] = 0x44;
 	msg.data[1] = 0xff;
@@ -163,10 +163,10 @@ CanLawicelFormatterTest::testRoudtripString()
 		buffer[i] = 'a';
 	}
 
-	TEST_ASSERT_TRUE(xpcc::CanLawicelFormatter::convertToString(msg, buffer));
+	TEST_ASSERT_TRUE(modm::CanLawicelFormatter::convertToString(msg, buffer));
 
-	xpcc::can::Message myMsg;
-	TEST_ASSERT_TRUE(xpcc::CanLawicelFormatter::convertToCanMessage(buffer, myMsg));
+	modm::can::Message myMsg;
+	TEST_ASSERT_TRUE(modm::CanLawicelFormatter::convertToCanMessage(buffer, myMsg));
 
 	TEST_ASSERT_EQUALS(msg.identifier, myMsg.identifier);
 	TEST_ASSERT_EQUALS(msg.length, myMsg.length);
@@ -178,8 +178,8 @@ CanLawicelFormatterTest::testRoudtripString()
 void
 CanLawicelFormatterTest::testInvalidInput()
 {
-	const auto& toCanMessage = xpcc::CanLawicelFormatter::convertToCanMessage;
-	xpcc::can::Message message;
+	const auto& toCanMessage = modm::CanLawicelFormatter::convertToCanMessage;
+	modm::can::Message message;
 
 	// id too high only 11 bits supported
 	TEST_ASSERT_FALSE(toCanMessage("tfff0", message));

@@ -9,15 +9,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_AVR_CLOCK_HPP
-#define XPCC_AVR_CLOCK_HPP
+#ifndef MODM_AVR_CLOCK_HPP
+#define MODM_AVR_CLOCK_HPP
 
 #include <stdint.h>
 #include "../generic/common_clock.hpp"
 
-using namespace xpcc::clock;
+using namespace modm::clock;
 
-namespace xpcc
+namespace modm
 {
 
 namespace avr
@@ -58,6 +58,6 @@ public:
 
 } // namespace avr
 
-} // namespace xpcc
+} // namespace modm
 
-#endif	//  XPCC_AVR_CLOCK_HPP
+#endif	//  MODM_AVR_CLOCK_HPP

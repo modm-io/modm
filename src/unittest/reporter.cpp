@@ -30,14 +30,14 @@ namespace
 	FLASH_STORAGE_STRING(reportFail) = "FAIL!\n";
 }
 
-unittest::Reporter::Reporter(xpcc::IODevice& device) :
-	outputStream(device), testName(xpcc::accessor::asFlash(invaildName)),
+unittest::Reporter::Reporter(modm::IODevice& device) :
+	outputStream(device), testName(modm::accessor::asFlash(invaildName)),
 	testsPassed(0), testsFailed(0)
 {
 }
 
 void
-unittest::Reporter::nextTestSuite(xpcc::accessor::Flash<char> name)
+unittest::Reporter::nextTestSuite(modm::accessor::Flash<char> name)
 {
 	testName = name;
 }
@@ -48,15 +48,15 @@ unittest::Reporter::reportPass()
 	testsPassed++;
 }
 
-xpcc::IOStream&
+modm::IOStream&
 unittest::Reporter::reportFailure(unsigned int lineNumber)
 {
 	testsFailed++;
-	outputStream << xpcc::accessor::asFlash(failHeader)
+	outputStream << modm::accessor::asFlash(failHeader)
 				 << testName
 				 << ':'
 				 << lineNumber
-				 << xpcc::accessor::asFlash(failColon);
+				 << modm::accessor::asFlash(failColon);
 	return outputStream;
 }
 
@@ -64,21 +64,21 @@ uint8_t
 unittest::Reporter::printSummary()
 {
 	if (testsFailed == 0) {
-		outputStream << xpcc::accessor::asFlash(reportPassed)
+		outputStream << modm::accessor::asFlash(reportPassed)
 					 << testsPassed
-					 << xpcc::accessor::asFlash(reportTests)
-					 << xpcc::accessor::asFlash(reportOk)
-					 << xpcc::endl;
+					 << modm::accessor::asFlash(reportTests)
+					 << modm::accessor::asFlash(reportOk)
+					 << modm::endl;
 		return 0;
 	}
 	else {
-		outputStream << xpcc::accessor::asFlash(reportFailed)
+		outputStream << modm::accessor::asFlash(reportFailed)
 					 << testsFailed
-					 << xpcc::accessor::asFlash(reportOf)
+					 << modm::accessor::asFlash(reportOf)
 					 << (testsFailed + testsPassed)
-					 << xpcc::accessor::asFlash(reportTests)
-					 << xpcc::accessor::asFlash(reportFail)
-					 << xpcc::endl;
+					 << modm::accessor::asFlash(reportTests)
+					 << modm::accessor::asFlash(reportFail)
+					 << modm::endl;
 		return 1;
 	}
 }

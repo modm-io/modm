@@ -46,16 +46,16 @@ main()
 /*
 	// Use all other defines once to verify that it is compilable
 	But::setInput();
-	But::setInput(xpcc::lpc::FLOATING);
-	But::setInput(xpcc::lpc::PULLUP);
-	But::setInput(xpcc::lpc::PULLDOWN);
-	But::setInput(xpcc::lpc::REPEATER);
+	But::setInput(modm::lpc::FLOATING);
+	But::setInput(modm::lpc::PULLUP);
+	But::setInput(modm::lpc::PULLDOWN);
+	But::setInput(modm::lpc::REPEATER);
 
 	Led::setOutput();
 	Led::setOutput(true);
 	Led::setOutput(false);
-	Led::setOutput(xpcc::lpc::PUSH_PULL);
-	Led::setOutput(xpcc::lpc::OPEN_DRAIN);
+	Led::setOutput(modm::lpc::PUSH_PULL);
+	Led::setOutput(modm::lpc::OPEN_DRAIN);
 	Led::set();
 	Led::reset();
 	Led::toggle();
@@ -64,13 +64,13 @@ main()
 	Io::setOutput();
 	Io::setOutput(true);
 	Io::setOutput(false);
-	Io::setOutput(xpcc::lpc::PUSH_PULL);
-	Io::setOutput(xpcc::lpc::OPEN_DRAIN);
+	Io::setOutput(modm::lpc::PUSH_PULL);
+	Io::setOutput(modm::lpc::OPEN_DRAIN);
 	Io::setInput();
-	Io::setInput(xpcc::lpc::FLOATING);
-	Io::setInput(xpcc::lpc::PULLUP);
-	Io::setInput(xpcc::lpc::PULLDOWN);
-	Io::setInput(xpcc::lpc::REPEATER);
+	Io::setInput(modm::lpc::FLOATING);
+	Io::setInput(modm::lpc::PULLUP);
+	Io::setInput(modm::lpc::PULLDOWN);
+	Io::setInput(modm::lpc::REPEATER);
 	Io::set();
 	Io::reset();
 	Io::toggle();

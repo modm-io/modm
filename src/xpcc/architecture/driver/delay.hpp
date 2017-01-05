@@ -15,14 +15,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_DELAY_HPP
-#define	XPCC_DELAY_HPP
+#ifndef	MODM_DELAY_HPP
+#define	MODM_DELAY_HPP
 
 #include <stdint.h>
 
 #ifdef __DOXYGEN__
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	Delay ns nanoseconds
@@ -51,59 +51,59 @@ namespace xpcc
 #include <modm/architecture/detect.hpp>
 #include <modm/architecture/utils.hpp>
 
-#if defined(XPCC_CPU_AVR)
+#if defined(MODM_CPU_AVR)
 
 	#include <util/delay.h>
 
-	namespace xpcc
+	namespace modm
 	{
-		void xpcc_always_inline
+		void modm_always_inline
 		delayNanoseconds(uint16_t /*ns*/)
 		{
 			_delay_us(1);
 		}
 
-		xpcc_always_inline void
+		modm_always_inline void
 		delayMicroseconds(uint16_t us)
 		{
 			while(us--) _delay_us(1);
 		}
 
-		xpcc_always_inline void
+		modm_always_inline void
 		delayMilliseconds(uint16_t ms)
 		{
 			while(ms--) _delay_ms(1);
 		}
 	}
 
-#elif defined(XPCC_OS_UNIX) || defined(XPCC_OS_OSX)
+#elif defined(MODM_OS_UNIX) || defined(MODM_OS_OSX)
 
 	#include <unistd.h>
 
-	namespace xpcc
+	namespace modm
 	{
-		void xpcc_always_inline
+		void modm_always_inline
 		delayNanoseconds(uint16_t /*ns*/)
 		{
 			usleep(1);
 		}
 
-		xpcc_always_inline void
+		modm_always_inline void
 		delayMicroseconds(uint16_t us)
 		{
 			usleep(us);
 		}
 
-		xpcc_always_inline void
+		modm_always_inline void
 		delayMilliseconds(uint16_t ms)
 		{
 			usleep(uint32_t(ms)*1000);
 		}
 	}
 
-#elif defined(XPCC_OS_WIN32)
+#elif defined(MODM_OS_WIN32)
 
-	namespace xpcc
+	namespace modm
 	{
 		/*inline void
 		delayMicroseconds(int us)
@@ -140,22 +140,22 @@ namespace xpcc
 		}
 	}
 
-#elif defined(XPCC_CPU_ARM)
+#elif defined(MODM_CPU_ARM)
 
 	extern "C" void _delay_ns(uint32_t ns);
 	extern "C" void _delay_us(uint32_t us);
 	extern "C" void _delay_ms(uint32_t ms);
 
-	namespace xpcc
+	namespace modm
 	{
 		/// @warning    There is little to no timing guarantee with this method!
-		xpcc_always_inline void
+		modm_always_inline void
 		delayNanoseconds(uint16_t ns)
 		{
 			::_delay_ns(ns);
 		}
 
-		xpcc_always_inline void
+		modm_always_inline void
 		delayMicroseconds(uint16_t us)
 		{
 			::_delay_us(us);
@@ -163,7 +163,7 @@ namespace xpcc
 
 		/// @warning    this method is _not_ guaranteed to work with inputs over 9000ms
 		///             since "It's Over 9000"! (meaning 32bit arithmetics).
-		xpcc_always_inline void
+		modm_always_inline void
 		delayMilliseconds(uint16_t ms)
 		{
 			::_delay_ms(ms);
@@ -174,4 +174,4 @@ namespace xpcc
 #endif
 
 #endif	// !__DOXYGEN__
-#endif	// XPCC_DELAY_HPP
+#endif	// MODM_DELAY_HPP

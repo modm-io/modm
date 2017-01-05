@@ -12,20 +12,20 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SIEMENS_S65_HPP
-#define XPCC_SIEMENS_S65_HPP
+#ifndef MODM_SIEMENS_S65_HPP
+#define MODM_SIEMENS_S65_HPP
 
 #include <modm/architecture/driver/delay.hpp>
 
 #include <modm/ui/display/buffered_graphic_display.hpp>
 
 // to enable this define add it to your ``project.cfg`` and
-// include <xpcc_config.hpp> before including this file.
+// include <modm_config.hpp> before including this file.
 #ifndef S65_LPC_ACCELERATED
 #	define S65_LPC_ACCELERATED 0
 #endif
 
-namespace xpcc
+namespace modm
 {
 	/**
 	 * \brief	Driver for Siemens S65 displays
@@ -34,7 +34,7 @@ namespace xpcc
 	 * ot 132 x 176 pixels in 18 bit colour.
 	 *
 	 * The portrait mode is a bit more 'native' for this display because
-	 * xpcc::BufferedGraphicDisplay requests that the vertical resolution is
+	 * modm::BufferedGraphicDisplay requests that the vertical resolution is
 	 * dividable by 8.
 	 *
 	 * In portrait mode the connector is at the bottom.
@@ -48,19 +48,19 @@ namespace xpcc
 	class SiemensS65Common
 	{
 	protected:
-		xpcc_always_inline void
+		modm_always_inline void
 		writeCmd(uint8_t reg, uint16_t param);
 
-		xpcc_always_inline void
+		modm_always_inline void
 		writeReg(uint8_t reg);
 
-		xpcc_always_inline void
+		modm_always_inline void
 		writeData(uint16_t param);
 
-		xpcc_always_inline void
+		modm_always_inline void
 		lcdCls(uint16_t colour);
 
-		xpcc_always_inline void
+		modm_always_inline void
 		lcdSettings(bool landscape);
 
 	};
@@ -108,4 +108,4 @@ namespace xpcc
 
 #include "siemens_s65_impl.hpp"
 
-#endif // XPCC_SIEMENS_S65_HPP
+#endif // MODM_SIEMENS_S65_HPP

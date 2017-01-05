@@ -25,7 +25,7 @@ FakeCanDriver::isMessageAvailable()
 }
 
 bool
-FakeCanDriver::getMessage(xpcc::can::Message& message)
+FakeCanDriver::getMessage(modm::can::Message& message)
 {
 	if (isMessageAvailable())
 	{
@@ -46,7 +46,7 @@ FakeCanDriver::isReadyToSend()
 }
 
 bool
-FakeCanDriver::sendMessage(const xpcc::can::Message& message)
+FakeCanDriver::sendMessage(const modm::can::Message& message)
 {
 	if (this->isReadyToSend())
 	{
@@ -71,8 +71,8 @@ FakeCanDriver::getTransmitErrorCounter()
 	return 0;
 }
 
-xpcc::Can::BusState
+modm::Can::BusState
 FakeCanDriver::getBusState()
 {
-	return xpcc::Can::BusState::Connected;
+	return modm::Can::BusState::Connected;
 }

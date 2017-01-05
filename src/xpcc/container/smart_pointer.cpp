@@ -17,7 +17,7 @@
 // ----------------------------------------------------------------------------
 // must allocate at least five bytes, so getPointer() does return
 // a valid address
-xpcc::SmartPointer::SmartPointer() :
+modm::SmartPointer::SmartPointer() :
 	ptr(new uint8_t[5])
 {
 	ptr[0] = 1;
@@ -25,7 +25,7 @@ xpcc::SmartPointer::SmartPointer() :
 	ptr[3] = 0;
 }
 
-xpcc::SmartPointer::SmartPointer(const SmartPointer& other) :
+modm::SmartPointer::SmartPointer(const SmartPointer& other) :
 	ptr(other.ptr)
 {
 	ptr[0]++;
@@ -33,14 +33,14 @@ xpcc::SmartPointer::SmartPointer(const SmartPointer& other) :
 
 // must allocate at least five bytes, so getPointer() does return
 // a valid address
-xpcc::SmartPointer::SmartPointer(uint16_t size) :
+modm::SmartPointer::SmartPointer(uint16_t size) :
 	ptr(new uint8_t[size ? size + 4 : 5])
 {
 	ptr[0] = 1;
 	*reinterpret_cast<uint16_t*>(ptr + 2) = size;
 }
 
-xpcc::SmartPointer::~SmartPointer()
+modm::SmartPointer::~SmartPointer()
 {
 	if (--ptr[0] == 0) {
 		delete[] ptr;
@@ -49,13 +49,13 @@ xpcc::SmartPointer::~SmartPointer()
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::SmartPointer::operator == (const SmartPointer& other)
+modm::SmartPointer::operator == (const SmartPointer& other)
 {
 	return (this->ptr == other.ptr);
 }
 
-xpcc::SmartPointer&
-xpcc::SmartPointer::operator = (const SmartPointer& other)
+modm::SmartPointer&
+modm::SmartPointer::operator = (const SmartPointer& other)
 {
 	if (--ptr[0] == 0) {
 		delete[] ptr;
@@ -68,14 +68,14 @@ xpcc::SmartPointer::operator = (const SmartPointer& other)
 }
 
 // ----------------------------------------------------------------------------
-xpcc::IOStream&
-xpcc::operator << (xpcc::IOStream& s, const xpcc::SmartPointer& v)
+modm::IOStream&
+modm::operator << (modm::IOStream& s, const modm::SmartPointer& v)
 {
-	s << "0x" << xpcc::hex;
+	s << "0x" << modm::hex;
 	for (uint8_t i = 4; i < v.getSize() + 4; i++)
 	{
 		s << v.ptr[i];
 	}
-	s << xpcc::ascii;
+	s << modm::ascii;
 	return s;
 }

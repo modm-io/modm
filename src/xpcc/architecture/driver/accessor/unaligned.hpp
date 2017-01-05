@@ -9,13 +9,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ACCESSOR_UNALIGNED_HPP
-#define XPCC_ACCESSOR_UNALIGNED_HPP
+#ifndef MODM_ACCESSOR_UNALIGNED_HPP
+#define MODM_ACCESSOR_UNALIGNED_HPP
 
 #include <modm/architecture/detect.hpp>
 #include <modm/architecture/utils.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 /**
@@ -27,7 +27,7 @@ namespace xpcc
  * @code
  * uint8_t *buffer;
  * // `u32` is a pointer to a unaligned_t<uint32_t> !
- * auto *u32 = xpcc::asUnaligned<uint32_t>(buffer);
+ * auto *u32 = modm::asUnaligned<uint32_t>(buffer);
  * // write to the unaligned location
  * *u32 = input;
  * // read from the unaligned location
@@ -44,7 +44,7 @@ unaligned_t
 	inline unaligned_t() : data{0} {}
 
 	inline unaligned_t(T value)
-#ifdef XPCC_CPU_CORTEX_M0
+#ifdef MODM_CPU_CORTEX_M0
 	{ write(value); }
 #else
 	: data(value) {}
@@ -53,7 +53,7 @@ unaligned_t
 
 	inline operator T() const
 	{
-#ifdef XPCC_CPU_CORTEX_M0
+#ifdef MODM_CPU_CORTEX_M0
 		T t;
 		read(t);
 		return t;
@@ -66,7 +66,7 @@ protected:
 	void inline
 	write(T &value)
 	{
-#ifdef XPCC_CPU_CORTEX_M0
+#ifdef MODM_CPU_CORTEX_M0
 		// memcpy(data, (uint8_t*)&value, sizeof(T));
 		// manual copy is faster for small sizes
 		for(uint_fast8_t ii=0; ii<sizeof(T); ii++)
@@ -79,7 +79,7 @@ protected:
 	void inline
 	read(T &value) const
 	{
-#ifdef XPCC_CPU_CORTEX_M0
+#ifdef MODM_CPU_CORTEX_M0
 		// memcpy((uint8_t*)&value, data, sizeof(T));
 		// manual copy is faster for small sizes
 		for(uint_fast8_t ii=0; ii<sizeof(T); ii++)
@@ -91,12 +91,12 @@ protected:
 
 
 protected:
-#ifdef XPCC_CPU_CORTEX_M0
+#ifdef MODM_CPU_CORTEX_M0
 	uint8_t data[sizeof(T)];
 #else
 	T data;
 #endif
-} xpcc_packed;
+} modm_packed;
 
 /**
  * Accesses a memory location using a unaligned-safe method.
@@ -104,7 +104,7 @@ protected:
  * @ingroup	accessor
  */
 template< typename T, typename U>
-xpcc_always_inline unaligned_t<T>*
+modm_always_inline unaligned_t<T>*
 asUnaligned(U* value)
 {
 	return reinterpret_cast< unaligned_t<T>* >(value);
@@ -112,4 +112,4 @@ asUnaligned(U* value)
 
 }
 
-#endif	// XPCC_ACCESSOR_UNALIGNED_HPP
+#endif	// MODM_ACCESSOR_UNALIGNED_HPP

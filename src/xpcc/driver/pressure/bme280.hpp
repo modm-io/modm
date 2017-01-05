@@ -9,8 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_BME280_HPP
-#define XPCC_BME280_HPP
+#ifndef MODM_BME280_HPP
+#define MODM_BME280_HPP
 
 #include <modm/processing/protothread.hpp>
 #include <modm/processing/resumable.hpp>
@@ -19,7 +19,7 @@
 
 #include "bme280_data.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 template < typename I2cMaster >
@@ -28,10 +28,10 @@ class Bme280;
 struct bme280
 {
 
-using Calibration = xpcc::bme280data::Calibration;
-using Data = xpcc::bme280data::Data;
-using DataBase = xpcc::bme280data::DataBase;
-using DataDouble = xpcc::bme280data::DataDouble;
+using Calibration = modm::bme280data::Calibration;
+using Data = modm::bme280data::Data;
+using DataBase = modm::bme280data::DataBase;
+using DataDouble = modm::bme280data::DataDouble;
 
 protected:
 	/// @cond
@@ -88,7 +88,7 @@ public:
 		OSRS_H1 = Bit1,
 		OSRS_H0 = Bit0,
 	};
-	XPCC_FLAGS8(CtrlHum);
+	MODM_FLAGS8(CtrlHum);
 
 	// Register 0xF3 "status"
 	enum class
@@ -97,7 +97,7 @@ public:
 		MEASURING = Bit3,	// Automatically set to ‘1’ whenever a conversion is running and back to ‘0’ when the results have been transferred to the data registers.
 		IM_UPDATE = Bit0,	// Automatically set to ‘1’ when the NVM data are being copied to image registers and back to ‘0’ when the copying is done. The data are copied at power-on-reset and before every conversion.
 	};
-	XPCC_FLAGS8(Status);
+	MODM_FLAGS8(Status);
 
 	// Register 0xF4 "ctrl_meas"
 	enum class
@@ -112,7 +112,7 @@ public:
 		Mode1   = Bit1,
 		Mode0   = Bit0,
 	};
-	XPCC_FLAGS8(CtrlMeas);
+	MODM_FLAGS8(CtrlMeas);
 
 	enum class
 	Mode : uint8_t
@@ -150,7 +150,7 @@ public:
 		FILTER_0 = Bit2,
 		SPI3W_EN = Bit0,
 	};
-	XPCC_FLAGS8(Config);
+	MODM_FLAGS8(Config);
 
 	enum class
 	TimeStandby : uint8_t
@@ -204,7 +204,7 @@ protected:
  * @tparam I2cMaster I2C interface
  */
 template < typename I2cMaster >
-class Bme280 : public bme280, public xpcc::I2cDevice<I2cMaster, 1>
+class Bme280 : public bme280, public modm::I2cDevice<I2cMaster, 1>
 {
 public:
 	/**
@@ -215,7 +215,7 @@ public:
 
 	// MARK: - TASKS
 	/// Reads out and stores the calibration bytes
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	initialize(
 			Mode mode = Mode::Normal, 
 			Oversampling temperature = Oversampling::Single,
@@ -223,7 +223,7 @@ public:
 			Oversampling humidity = Oversampling::Single);
 
 	/// Read the raw data from the sensor. Conversion must be freerunning.
-	xpcc::ResumableResult<bool>
+	modm::ResumableResult<bool>
 	readout();
 
 public:
@@ -242,8 +242,8 @@ private:
 	uint8_t calBuffer[7];
 };
 
-}	// namespace xpcc
+}	// namespace modm
 
 #include "bme280_impl.hpp"
 
-#endif // XPCC_BME280_HPP
+#endif // MODM_BME280_HPP

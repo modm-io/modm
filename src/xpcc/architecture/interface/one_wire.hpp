@@ -28,13 +28,13 @@
  * the data line is used for data.
  */
 
-#ifndef XPCC_ONE_WIRE_HPP
-#define XPCC_ONE_WIRE_HPP
+#ifndef MODM_ONE_WIRE_HPP
+#define MODM_ONE_WIRE_HPP
 
 #include <modm/architecture/utils.hpp>
 #include <modm/architecture/interface.hpp>
 
-namespace xpcc
+namespace modm
 {
 
 /// @ingroup	1-wire
@@ -68,6 +68,6 @@ enum RomCommand
 
 }	// namespace one_wire
 
-}	// namespace xpcc
+}	// namespace modm
 
-#endif // XPCC_ONE_WIRE_HPP
+#endif // MODM_ONE_WIRE_HPP

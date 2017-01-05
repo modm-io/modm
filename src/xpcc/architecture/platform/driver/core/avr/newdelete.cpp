@@ -18,47 +18,47 @@
 void *
 operator new(size_t size)
 {
-	return xpcc::avr::allocateMemory(size);
+	return modm::avr::allocateMemory(size);
 }
 
 void *
 operator new[](size_t size)
 {
-	return xpcc::avr::allocateMemory(size);
+	return modm::avr::allocateMemory(size);
 }
 
 void *
-operator new(size_t size, xpcc::MemoryTraits)
+operator new(size_t size, modm::MemoryTraits)
 {
-	return xpcc::avr::allocateMemory(size);
+	return modm::avr::allocateMemory(size);
 }
 
 void *
-operator new[](size_t size, xpcc::MemoryTraits)
+operator new[](size_t size, modm::MemoryTraits)
 {
-	return xpcc::avr::allocateMemory(size);
+	return modm::avr::allocateMemory(size);
 }
 
 void
 operator delete(void* ptr)
 {
-	xpcc::avr::freeMemory(ptr);
+	modm::avr::freeMemory(ptr);
 }
 
 void
 operator delete(void* ptr, size_t size __attribute__((unused)))
 {
-	xpcc::avr::freeMemory(ptr);
+	modm::avr::freeMemory(ptr);
 }
 
 void
 operator delete[](void* ptr)
 {
-	xpcc::avr::freeMemory(ptr);
+	modm::avr::freeMemory(ptr);
 }
 
 void
 operator delete[](void* ptr, size_t size __attribute__((unused)))
 {
-	xpcc::avr::freeMemory(ptr);
+	modm::avr::freeMemory(ptr);
 }

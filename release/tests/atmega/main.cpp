@@ -14,12 +14,12 @@
 #include <modm/architecture/architecture.hpp>
 
 #if defined(__AVR_AT90CAN128__) || defined(__AVR_AT90CAN64__) || defined(__AVR_AT90CAN32__)
-using namespace xpcc::at90;
+using namespace modm::at90;
 #else
-using namespace xpcc::atmega;
+using namespace modm::atmega;
 #endif
 
-typedef xpcc::avr::SystemClock clock;
+typedef modm::avr::SystemClock clock;
 
 typedef Uart0 uart;
 

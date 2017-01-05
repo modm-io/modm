@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_AD7280A_HPP
-#define XPCC_AD7280A_HPP
+#ifndef MODM_AD7280A_HPP
+#define MODM_AD7280A_HPP
 
 #include <stdint.h>
 
@@ -23,7 +23,7 @@
 // Forward declaration for the Unit-tests
 class Ad7280aTest;
 
-namespace xpcc
+namespace modm
 {
 	namespace ad7280a
 	{
@@ -258,4 +258,4 @@ namespace xpcc
 
 #include "ad7280a_impl.hpp"
 
-#endif // XPCC_AD7280A_HPP
+#endif // MODM_AD7280A_HPP

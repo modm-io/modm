@@ -11,14 +11,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SD_HPP
-#define XPCC_SD_HPP
+#ifndef MODM_SD_HPP
+#define MODM_SD_HPP
 
 #include "fat.hpp"
 
-namespace xpcc
+namespace modm
 {
 	
 }
 
-#endif // XPCC_SD_HPP
+#endif // MODM_SD_HPP

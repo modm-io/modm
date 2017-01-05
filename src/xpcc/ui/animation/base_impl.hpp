@@ -9,19 +9,19 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_UI_LINEAR_ANIMATION_HPP
-#	error	"Don't include this file directly, use 'xpcc/ui/animation/base.hpp' instead!"
+#ifndef MODM_UI_LINEAR_ANIMATION_HPP
+#	error	"Don't include this file directly, use 'modm/ui/animation/base.hpp' instead!"
 #endif
 // ----------------------------------------------------------------------------
 
 template< typename T >
-xpcc::ui::Animation<T>::Animation(T &value)
+modm::ui::Animation<T>::Animation(T &value)
 :	Animation(value, nullptr)
 {
 }
 
 template< typename T >
-xpcc::ui::Animation<T>::Animation(T &value, Handler handler)
+modm::ui::Animation<T>::Animation(T &value, Handler handler)
 :	handler(handler), currentValue(value), endValue(0),
 	 animationTime(0), previous(0)
 {
@@ -29,14 +29,14 @@ xpcc::ui::Animation<T>::Animation(T &value, Handler handler)
 
 template< typename T >
 void inline
-xpcc::ui::Animation<T>::attachCallback(Handler handler)
+modm::ui::Animation<T>::attachCallback(Handler handler)
 {
 	this->handler = handler;
 }
 
 template< typename T >
 void inline
-xpcc::ui::Animation<T>::setValue(T value)
+modm::ui::Animation<T>::setValue(T value)
 {
 	animationTime = 0;
 	currentValue = value;
@@ -46,21 +46,21 @@ xpcc::ui::Animation<T>::setValue(T value)
 
 template< typename T >
 T inline
-xpcc::ui::Animation<T>::getValue() const
+modm::ui::Animation<T>::getValue() const
 {
 	return currentValue;
 }
 
 template< typename T >
 bool inline
-xpcc::ui::Animation<T>::isAnimating() const
+modm::ui::Animation<T>::isAnimating() const
 {
 	return (animationTime > 0);
 }
 
 template< typename T >
 void inline
-xpcc::ui::Animation<T>::stop()
+modm::ui::Animation<T>::stop()
 {
 	endValue = currentValue;
 	setValue(currentValue);
@@ -68,7 +68,7 @@ xpcc::ui::Animation<T>::stop()
 
 template< typename T >
 bool
-xpcc::ui::Animation<T>::animateTo(T value, TimeType time)
+modm::ui::Animation<T>::animateTo(T value, TimeType time)
 {
 	if (value == currentValue)
 	{
@@ -85,13 +85,13 @@ xpcc::ui::Animation<T>::animateTo(T value, TimeType time)
 	endValue = value;
 	animationTime = time;
 	interpolation.initialize(currentValue, endValue, animationTime);
-	previous = xpcc::Clock::nowShort();
+	previous = modm::Clock::nowShort();
 	return true;
 }
 
 template< typename T >
 bool
-xpcc::ui::Animation<T>::update()
+modm::ui::Animation<T>::update()
 {
 	// this should be called at least once every 1 ms
 	// but if the clock gets incremented by more than 1 ms, or the main loop is
@@ -101,7 +101,7 @@ xpcc::ui::Animation<T>::update()
 	if (animationTime > 0)
 	{
 		// buffer the delta time
-		xpcc::ShortTimestamp now = xpcc::Clock::nowShort();
+		modm::ShortTimestamp now = modm::Clock::nowShort();
 		// this cast requires us to be updates once at least every 255ms
 		// If this method is not called every few ms, the animation does
 		// not look good anyways, so this limitation is okay.

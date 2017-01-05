@@ -34,7 +34,7 @@ class XMLDeviceWriter:
 		self.tree = XMLElement('rca')
 		self.tree.setAttribute('version', '1.0')
 		self.tree.addComment(' WARNING: This file is generated automatically, do not edit!\n \
-		Please modify the xpcc/tools/device_file_generator code instead and rebuild this file.\n \
+		Please modify the modm/tools/device_file_generator code instead and rebuild this file.\n \
 		Be aware, that regenerated files might have a different composition due to technical reasons. ')
 
 		props = self.device.ids.union.properties

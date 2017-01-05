@@ -9,13 +9,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_VL6180_HPP
+#ifndef MODM_VL6180_HPP
 #	error "Don't include this file directly, use 'vl6180.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
-xpcc::Vl6180<I2cMaster>::Vl6180(Data &data, uint8_t address)
+modm::Vl6180<I2cMaster>::Vl6180(Data &data, uint8_t address)
 :	I2cDevice<I2cMaster,2>(address), data(data),
 	i2cBuffer{0,0,0,0}, logicBuffer{Register(0)}
 {
@@ -24,8 +24,8 @@ xpcc::Vl6180<I2cMaster>::Vl6180(Data &data, uint8_t address)
 // MARK: - i2cTasks
 // MARK: ping
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Vl6180<I2cMaster>::ping()
+modm::ResumableResult<bool>
+modm::Vl6180<I2cMaster>::ping()
 {
 	RF_BEGIN();
 
@@ -36,8 +36,8 @@ xpcc::Vl6180<I2cMaster>::ping()
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Vl6180<I2cMaster>::initialize()
+modm::ResumableResult<bool>
+modm::Vl6180<I2cMaster>::initialize()
 {
 	using namespace vl6180_private;
 
@@ -62,8 +62,8 @@ xpcc::Vl6180<I2cMaster>::initialize()
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Vl6180<I2cMaster>::readSensor(bool isDistance)
+modm::ResumableResult<bool>
+modm::Vl6180<I2cMaster>::readSensor(bool isDistance)
 {
 	// for this relatively complicated sequence, see the datasheet page 17
 	RF_BEGIN();
@@ -157,8 +157,8 @@ xpcc::Vl6180<I2cMaster>::readSensor(bool isDistance)
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Vl6180<I2cMaster>::setDeviceAddress(uint8_t address)
+modm::ResumableResult<bool>
+modm::Vl6180<I2cMaster>::setDeviceAddress(uint8_t address)
 {
 	RF_BEGIN();
 
@@ -172,8 +172,8 @@ xpcc::Vl6180<I2cMaster>::setDeviceAddress(uint8_t address)
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Vl6180<I2cMaster>::setGain(AnalogGain gain)
+modm::ResumableResult<bool>
+modm::Vl6180<I2cMaster>::setGain(AnalogGain gain)
 {
 	RF_BEGIN();
 
@@ -187,8 +187,8 @@ xpcc::Vl6180<I2cMaster>::setGain(AnalogGain gain)
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Vl6180<I2cMaster>::setIntegrationTime(uint16_t time)
+modm::ResumableResult<bool>
+modm::Vl6180<I2cMaster>::setIntegrationTime(uint16_t time)
 {
 	RF_BEGIN();
 
@@ -211,8 +211,8 @@ xpcc::Vl6180<I2cMaster>::setIntegrationTime(uint16_t time)
 // ----------------------------------------------------------------------------
 // MARK: update register
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Vl6180<I2cMaster>::updateControlRegister(Register reg, Control_t setMask, Control_t clearMask)
+modm::ResumableResult<bool>
+modm::Vl6180<I2cMaster>::updateControlRegister(Register reg, Control_t setMask, Control_t clearMask)
 {
 	RF_BEGIN();
 
@@ -227,8 +227,8 @@ xpcc::Vl6180<I2cMaster>::updateControlRegister(Register reg, Control_t setMask, 
 
 // MARK: write multilength register
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Vl6180<I2cMaster>::write(Register reg, uint8_t value, uint8_t length)
+modm::ResumableResult<bool>
+modm::Vl6180<I2cMaster>::write(Register reg, uint8_t value, uint8_t length)
 {
 	RF_BEGIN();
 
@@ -243,8 +243,8 @@ xpcc::Vl6180<I2cMaster>::write(Register reg, uint8_t value, uint8_t length)
 
 // MARK: read multilength register
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Vl6180<I2cMaster>::read(Register reg, uint8_t *buffer, uint8_t length)
+modm::ResumableResult<bool>
+modm::Vl6180<I2cMaster>::read(Register reg, uint8_t *buffer, uint8_t length)
 {
 	RF_BEGIN();
 

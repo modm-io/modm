@@ -18,12 +18,12 @@
 // http://wiki.stm32duino.com/index.php?title=Blue_Pill
 //
 
-#ifndef XPCC_STM32_F103C8T6_BLUE_PILL_HPP
-#define XPCC_STM32_F103C8T6_BLUE_PILL_HPP
+#ifndef MODM_STM32_F103C8T6_BLUE_PILL_HPP
+#define MODM_STM32_F103C8T6_BLUE_PILL_HPP
 
 #include <modm/architecture/platform.hpp>
 
-using namespace xpcc::stm32;
+using namespace modm::stm32;
 
 
 namespace Board
@@ -83,10 +83,10 @@ struct systemClock {
 
 
 		// update frequencies for busy-wait delay functions
-		xpcc::clock::fcpu     = Frequency;
-		xpcc::clock::fcpu_kHz = Frequency / 1000;
-		xpcc::clock::fcpu_MHz = Frequency / 1000000;
-		xpcc::clock::ns_per_loop = ::round(3000 / (Frequency / 1000000));
+		modm::clock::fcpu     = Frequency;
+		modm::clock::fcpu_kHz = Frequency / 1000;
+		modm::clock::fcpu_MHz = Frequency / 1000000;
+		modm::clock::ns_per_loop = ::round(3000 / (Frequency / 1000000));
 
 		return true;
 	}
@@ -97,20 +97,20 @@ struct systemClock {
 // using systemClock = SystemClock<Pll<ExternalCrystal<MHz8>, MHz72> >;
 
 // User LED (inverted, because connected to 3V3)
-using LedGreen = xpcc::GpioInverted< GpioOutputC13 >;
-using Leds = xpcc::SoftwareGpioPort< LedGreen >;
+using LedGreen = modm::GpioInverted< GpioOutputC13 >;
+using Leds = modm::SoftwareGpioPort< LedGreen >;
 
-using Button = xpcc::GpioUnused;
+using Button = modm::GpioUnused;
 
 inline void
 initialize()
 {
 	systemClock::enable();
-	xpcc::cortex::SysTickTimer::initialize<systemClock>();
+	modm::cortex::SysTickTimer::initialize<systemClock>();
 
-	LedGreen::setOutput(xpcc::Gpio::Low);
+	LedGreen::setOutput(modm::Gpio::Low);
 }
 
 } // Board namespace
 
-#endif	// XPCC_STM32_F103C8T6_BLUE_PILL_HPP
+#endif	// MODM_STM32_F103C8T6_BLUE_PILL_HPP

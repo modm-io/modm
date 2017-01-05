@@ -11,30 +11,30 @@
 
 #include <modm/architecture/platform.hpp>
 
-#define XPCC_CAN_MODULE_NAME "can"
-#define XPCC_IOBUFFER_MODULE_NAME "iobuffer"
-#define XPCC_UART_MODULE_NAME "uart"
+#define MODM_CAN_MODULE_NAME "can"
+#define MODM_IOBUFFER_MODULE_NAME "iobuffer"
+#define MODM_UART_MODULE_NAME "uart"
 
-static xpcc::Abandonment
+static modm::Abandonment
 test_assertion_handler(const char * module,
 					   const char * location,
 					   const char * failure)
 {
-	if (strcmp(module, XPCC_IOBUFFER_MODULE_NAME) == 0)
-		return xpcc::Abandonment::Ignore;
-	return xpcc::Abandonment::DontCare;
+	if (strcmp(module, MODM_IOBUFFER_MODULE_NAME) == 0)
+		return modm::Abandonment::Ignore;
+	return modm::Abandonment::DontCare;
 }
-XPCC_ASSERTION_HANDLER(test_assertion_handler);
+MODM_ASSERTION_HANDLER(test_assertion_handler);
 
 // ----------------------------------------------------------------------------
 int
 main()
 {
-	xpcc_assert(true, XPCC_CAN_MODULE_NAME, "init", "timeout");
+	modm_assert(true, MODM_CAN_MODULE_NAME, "init", "timeout");
 
-	xpcc_assert_debug(false, XPCC_IOBUFFER_MODULE_NAME, "tx", "full");
+	modm_assert_debug(false, MODM_IOBUFFER_MODULE_NAME, "tx", "full");
 
-	xpcc_assert(false, XPCC_UART_MODULE_NAME, "init", "mode");
+	modm_assert(false, MODM_UART_MODULE_NAME, "init", "mode");
 
 	return 0;
 }

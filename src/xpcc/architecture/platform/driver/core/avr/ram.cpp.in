@@ -79,7 +79,7 @@ initializeMemory(void)
  * TODO description
  */
 void *
-xpcc::avr::allocateMemory(std::size_t requestedSize)
+modm::avr::allocateMemory(std::size_t requestedSize)
 {
 	if (requestedSize == 0 ||
 		requestedSize > MAX_BLOCK_PARTS * BLOCK_SIZE)
@@ -158,7 +158,7 @@ xpcc::avr::allocateMemory(std::size_t requestedSize)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::avr::freeMemory(void *ptr)
+modm::avr::freeMemory(void *ptr)
 {
 	if (ptr == 0) {
 		return;
@@ -241,13 +241,13 @@ printMemoryLayout(void)
 void *
 allocate(size_t size)
 {
-	return xpcc::avr::allocateMemory(size);
+	return modm::avr::allocateMemory(size);
 }
 
 void
 release(void *p)
 {
-	xpcc::avr::freeMemory(p);
+	modm::avr::freeMemory(p);
 }
 
 int

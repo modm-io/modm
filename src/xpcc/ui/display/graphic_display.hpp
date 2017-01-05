@@ -14,8 +14,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_GRAPHIC_DISPLAY_HPP
-#define XPCC_GRAPHIC_DISPLAY_HPP
+#ifndef MODM_GRAPHIC_DISPLAY_HPP
+#define MODM_GRAPHIC_DISPLAY_HPP
 
 #include <modm/architecture/driver/accessor.hpp>
 #include <modm/math/geometry.hpp>
@@ -25,7 +25,7 @@
 
 #include "font.hpp"
 
-namespace xpcc
+namespace modm
 {
 	/// @ingroup	graphics
 	namespace glcd
@@ -36,21 +36,21 @@ namespace xpcc
 		class Color
 		{
 		public:
-			static xpcc_always_inline Color white()   { return Color(0xffff); };
-			static xpcc_always_inline Color yellow()  { return Color(0xFFE0); };
-			static xpcc_always_inline Color magenta() { return Color(0xF81F); };
-			static xpcc_always_inline Color red()     { return Color(0xF800); };
-			static xpcc_always_inline Color orange()  { return Color(0xFD20); };
-			static xpcc_always_inline Color sliver()  { return Color(0xC618); };
-			static xpcc_always_inline Color gray()    { return Color(0x8410); };
-			static xpcc_always_inline Color maroon()  { return Color(0x8000); };
-			static xpcc_always_inline Color lime()    { return Color(0x07E0); };
-			static xpcc_always_inline Color green()   { return Color(0x0400); };
-			static xpcc_always_inline Color blue()    { return Color(0x001F); };
-			static xpcc_always_inline Color navy()    { return Color(0x0010); };
-			static xpcc_always_inline Color black()   { return Color(0x0000); };
-			static xpcc_always_inline Color signalViolet()   { return Color(0x8010); }; //0x84D0
-			static xpcc_always_inline Color emeraldGreen()   { return Color(0x5DCC); };
+			static modm_always_inline Color white()   { return Color(0xffff); };
+			static modm_always_inline Color yellow()  { return Color(0xFFE0); };
+			static modm_always_inline Color magenta() { return Color(0xF81F); };
+			static modm_always_inline Color red()     { return Color(0xF800); };
+			static modm_always_inline Color orange()  { return Color(0xFD20); };
+			static modm_always_inline Color sliver()  { return Color(0xC618); };
+			static modm_always_inline Color gray()    { return Color(0x8410); };
+			static modm_always_inline Color maroon()  { return Color(0x8000); };
+			static modm_always_inline Color lime()    { return Color(0x07E0); };
+			static modm_always_inline Color green()   { return Color(0x0400); };
+			static modm_always_inline Color blue()    { return Color(0x001F); };
+			static modm_always_inline Color navy()    { return Color(0x0010); };
+			static modm_always_inline Color black()   { return Color(0x0000); };
+			static modm_always_inline Color signalViolet()   { return Color(0x8010); }; //0x84D0
+			static modm_always_inline Color emeraldGreen()   { return Color(0x5DCC); };
 
 			/**
 			 * @param	red
@@ -316,7 +316,7 @@ namespace xpcc
 		 * \see	drawImage()
 		 */
 		void
-		drawImage(glcd::Point upperLeft, xpcc::accessor::Flash<uint8_t> image);
+		drawImage(glcd::Point upperLeft, modm::accessor::Flash<uint8_t> image);
 
 		/**
 		 * Draw an image.
@@ -326,7 +326,7 @@ namespace xpcc
 		virtual void
 		drawImageRaw(glcd::Point upperLeft,
 				uint16_t width, uint16_t height,
-				xpcc::accessor::Flash<uint8_t> data);
+				modm::accessor::Flash<uint8_t> data);
 
 		/**
 		 * Fill a rectangle.
@@ -350,19 +350,19 @@ namespace xpcc
 		/**
 		 * Set a new font.
 		 *
-		 * Default font is xpcc::font::FixedWidth5x8.
+		 * Default font is modm::font::FixedWidth5x8.
 		 *
 		 * \param	newFont	Active font
-		 * \see		xpcc::font
+		 * \see		modm::font
 		 */
 		inline void
 		setFont(const uint8_t *newFont)
 		{
-			this->font = xpcc::accessor::asFlash(newFont);
+			this->font = modm::accessor::asFlash(newFont);
 		}
 
 		inline void
-		setFont(const xpcc::accessor::Flash<uint8_t> *font)
+		setFont(const modm::accessor::Flash<uint8_t> *font)
 		{
 			this->font = *font;
 		}
@@ -374,7 +374,7 @@ namespace xpcc
 		getFontHeight() const;
 
 		static uint8_t
-		getFontHeight(const xpcc::accessor::Flash<uint8_t> *font);
+		getFontHeight(const modm::accessor::Flash<uint8_t> *font);
 
 		/**
 		* Get the width of (null terminated) string.
@@ -383,7 +383,7 @@ namespace xpcc
 		getStringWidth(const char* s) const;
 
 		static uint16_t
-		getStringWidth(const char* s, const xpcc::accessor::Flash<uint8_t> *font);
+		getStringWidth(const char* s, const modm::accessor::Flash<uint8_t> *font);
 
 		/**
 		 * Set the cursor for text drawing.
@@ -488,9 +488,9 @@ namespace xpcc
 
 		glcd::Color foregroundColor;
 		glcd::Color backgroundColor;
-		xpcc::accessor::Flash<uint8_t> font;
+		modm::accessor::Flash<uint8_t> font;
 		glcd::Point cursor;
 	};
 }
 
-#endif	// XPCC_GRAPHIC_DISPLAY_HPP
+#endif	// MODM_GRAPHIC_DISPLAY_HPP

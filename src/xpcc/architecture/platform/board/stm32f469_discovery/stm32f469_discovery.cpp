@@ -19,28 +19,28 @@
 #include <modm/utils/bit_constants.hpp>
 
 // Create an IODeviceWrapper around the Uart Peripheral we want to use
-xpcc::IODeviceWrapper< Board::stlink::Uart, xpcc::IOBuffer::BlockIfFull > loggerDevice;
+modm::IODeviceWrapper< Board::stlink::Uart, modm::IOBuffer::BlockIfFull > loggerDevice;
 
 // Set all four logger streams to use the UART
-xpcc::log::Logger xpcc::log::debug(loggerDevice);
-xpcc::log::Logger xpcc::log::info(loggerDevice);
-xpcc::log::Logger xpcc::log::warning(loggerDevice);
-xpcc::log::Logger xpcc::log::error(loggerDevice);
+modm::log::Logger modm::log::debug(loggerDevice);
+modm::log::Logger modm::log::info(loggerDevice);
+modm::log::Logger modm::log::warning(loggerDevice);
+modm::log::Logger modm::log::error(loggerDevice);
 
 extern "C" void
-xpcc_hook_hardware_init(void);
+modm_hook_hardware_init(void);
 
 extern void
 board_initialize_sdram();
 
 void
-xpcc_hook_hardware_init(void)
+modm_hook_hardware_init(void)
 {
 	// Reset LCD
-	Board::DisplayReset::setOutput(xpcc::Gpio::Low);
-	xpcc::delayMilliseconds(20);
+	Board::DisplayReset::setOutput(modm::Gpio::Low);
+	modm::delayMilliseconds(20);
 	Board::DisplayReset::set();
-	xpcc::delayMilliseconds(10);
+	modm::delayMilliseconds(10);
 
 	// initialize system clock and external SDRAM before accessing external memories
 	Board::systemClock::enable();

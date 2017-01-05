@@ -23,7 +23,7 @@ xpcc::DynamicPostman::DynamicPostman()
 
 // ----------------------------------------------------------------------------
 xpcc::DynamicPostman::DeliverInfo
-xpcc::DynamicPostman::deliverPacket(const Header &header, const SmartPointer& payload)
+xpcc::DynamicPostman::deliverPacket(const Header &header, const modm::SmartPointer& payload)
 {
 	if (header.destination == 0)
 	{
@@ -89,7 +89,7 @@ xpcc::DynamicPostman::EventListener::EventListener(EventCallbackSimple call) :
 void
 xpcc::DynamicPostman::EventListener::operator()(
 		const Header& header,
-		const SmartPointer& payload) const
+		const modm::SmartPointer& payload) const
 {
 	if (hasPayload > 0) {
 		call(header, *(payload.getPointer()));
@@ -117,7 +117,7 @@ xpcc::DynamicPostman::ActionHandler::ActionHandler(ActionCallbackSimple call) :
 void
 xpcc::DynamicPostman::ActionHandler::operator()(
 		const ResponseHandle& response,
-		const SmartPointer& payload) const
+		const modm::SmartPointer& payload) const
 {
 	if (hasPayload > 0) {
 		call(response, *(payload.getPointer()));

@@ -10,14 +10,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_GUI_NUMBERROCKER_HPP
-#define XPCC_GUI_NUMBERROCKER_HPP
+#ifndef MODM_GUI_NUMBERROCKER_HPP
+#define MODM_GUI_NUMBERROCKER_HPP
 
 #include "widget.hpp"
 #include "button.hpp"
 #include "numberfield.hpp"
 
-namespace xpcc
+namespace modm
 {
 
 namespace gui
@@ -42,9 +42,9 @@ public:
 		button_decrease.cb_activate = &decrease_cb;
 		button_increase.cb_activate = &increase_cb;
 
-		this->pack(&button_decrease, xpcc::glcd::Point(0,0));
-		this->pack(&button_increase, xpcc::glcd::Point(d.width - d.height,0));
-		this->pack(&num_field, xpcc::glcd::Point(d.height, 0));
+		this->pack(&button_decrease, modm::glcd::Point(0,0));
+		this->pack(&button_increase, modm::glcd::Point(d.width - d.height,0));
+		this->pack(&num_field, modm::glcd::Point(d.height, 0));
 	}
 
 	void
@@ -85,8 +85,8 @@ typedef NumberRocker<float> FloatRocker;
 
 }	// namespace gui
 
-}	// namespace xpcc
+}	// namespace modm
 
 #include "numberrocker_impl.hpp"
 
-#endif  // XPCC_GUI_NUMBERROCKER_HPP
+#endif  // MODM_GUI_NUMBERROCKER_HPP

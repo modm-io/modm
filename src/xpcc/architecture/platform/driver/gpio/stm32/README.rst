@@ -78,11 +78,11 @@ How To Use
 	GPIO__INPUT(Button, A, 0);
 
 	Button::setInput();
-	Button::setInput(xpcc::stm32::PULLUP);
-	Button::setInput(xpcc::stm32::PULLDOWN);
+	Button::setInput(modm::stm32::PULLUP);
+	Button::setInput(modm::stm32::PULLDOWN);
 	Button::setAnalogInput();
 	Button::setAlternateFunction();
-	Button::setAlternateFunction(xpcc::stm32::PULLDOWN);
+	Button::setAlternateFunction(modm::stm32::PULLDOWN);
 	if (Button::read()) {
 	    ...
 	}
@@ -92,14 +92,14 @@ How To Use
 	GPIO__OUTPUT(Led, C, 12);
 
 	Led::setOutput();
-	Led::setOutput(xpcc::stm32::PUSH_PULL);
-	Led::setOutput(xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_10MHZ);
-	Led::setOutput(xpcc::stm32::OPEN_DRAIN);
+	Led::setOutput(modm::stm32::PUSH_PULL);
+	Led::setOutput(modm::stm32::PUSH_PULL, modm::stm32::SPEED_10MHZ);
+	Led::setOutput(modm::stm32::OPEN_DRAIN);
 
 	Led::setAlternateFunction(); 
-	Led::setAlternateFunction(xpcc::stm32::PUSH_PULL); 
-	Led::setAlternateFunction(xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_50MHZ); 
-	Led::setAlternateFunction(xpcc::stm32::OPEN_DRAIN);
+	Led::setAlternateFunction(modm::stm32::PUSH_PULL); 
+	Led::setAlternateFunction(modm::stm32::PUSH_PULL, modm::stm32::SPEED_50MHZ); 
+	Led::setAlternateFunction(modm::stm32::OPEN_DRAIN);
 
 	Led::set();
 	Led::reset();

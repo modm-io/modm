@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_FLASH_READER_HPP
-#define	XPCC_FLASH_READER_HPP
+#ifndef	MODM_FLASH_READER_HPP
+#define	MODM_FLASH_READER_HPP
 
 #include <modm/architecture/utils.hpp>
 
@@ -38,7 +38,7 @@
 
 #else // !__DOXYGEN__
 
-	#ifdef XPCC_CPU_AVR
+	#ifdef MODM_CPU_AVR
 	
 		#include "flash_reader_avr_impl.hpp"
 	
@@ -60,12 +60,12 @@
 		#define	INLINE_FLASH_STORAGE_STRING(s)	((const char *)(s))
 		#define PSTR(s) ((const char *)(s))
 
-		namespace xpcc
+		namespace modm
 		{
 			template<typename T, std::size_t size>
 			struct FlashReader
 			{
-				xpcc_always_inline
+				modm_always_inline
 				static T
 				read(const T* p)
 				{
@@ -78,4 +78,4 @@
 
 #endif
 
-#endif	// XPCC_FLASH_READER_HPP
+#endif	// MODM_FLASH_READER_HPP

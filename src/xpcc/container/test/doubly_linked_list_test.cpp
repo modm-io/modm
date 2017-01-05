@@ -27,7 +27,7 @@ DoublyLinkedListTest::setUp()
 void
 DoublyLinkedListTest::testConstructor()
 {
-	xpcc::DoublyLinkedList< unittest::CountType > list;
+	modm::DoublyLinkedList< unittest::CountType > list;
 	
 	TEST_ASSERT_TRUE(list.isEmpty());
 	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDefaultConstructorCalls, 0U);
@@ -36,7 +36,7 @@ DoublyLinkedListTest::testConstructor()
 void
 DoublyLinkedListTest::testAppend()
 {
-	xpcc::DoublyLinkedList<int16_t> list;
+	modm::DoublyLinkedList<int16_t> list;
 	
 	list.append(1);
 	
@@ -58,7 +58,7 @@ DoublyLinkedListTest::testAppend()
 void
 DoublyLinkedListTest::testAppendCount()
 {
-	xpcc::DoublyLinkedList< unittest::CountType > list;
+	modm::DoublyLinkedList< unittest::CountType > list;
 	
 	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDefaultConstructorCalls, 0U);
 	TEST_ASSERT_EQUALS(unittest::CountType::numberOfCopyConstructorCalls, 0U);
@@ -82,7 +82,7 @@ DoublyLinkedListTest::testAppendCount()
 void
 DoublyLinkedListTest::testPrepend()
 {
-	xpcc::DoublyLinkedList<int16_t> list;
+	modm::DoublyLinkedList<int16_t> list;
 	
 	list.prepend(1);
 	
@@ -104,7 +104,7 @@ DoublyLinkedListTest::testPrepend()
 void
 DoublyLinkedListTest::testPrependCount()
 {
-	xpcc::DoublyLinkedList< unittest::CountType > list;
+	modm::DoublyLinkedList< unittest::CountType > list;
 	
 	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDefaultConstructorCalls, 0U);
 	TEST_ASSERT_EQUALS(unittest::CountType::numberOfCopyConstructorCalls, 0U);
@@ -128,7 +128,7 @@ DoublyLinkedListTest::testPrependCount()
 void
 DoublyLinkedListTest::testRemoveFront()
 {
-	xpcc::DoublyLinkedList<int16_t> list;
+	modm::DoublyLinkedList<int16_t> list;
 	
 	list.append(1);
 	list.append(2);
@@ -155,7 +155,7 @@ DoublyLinkedListTest::testRemoveFrontCount()
 {
 	unittest::CountType data;
 	
-	xpcc::DoublyLinkedList< unittest::CountType > list;
+	modm::DoublyLinkedList< unittest::CountType > list;
 	list.append(data);
 	list.append(data);
 	
@@ -171,7 +171,7 @@ DoublyLinkedListTest::testRemoveFrontCount()
 void
 DoublyLinkedListTest::testRemoveBack()
 {
-	xpcc::DoublyLinkedList<int16_t> list;
+	modm::DoublyLinkedList<int16_t> list;
 	
 	list.append(1);
 	list.append(2);
@@ -198,7 +198,7 @@ DoublyLinkedListTest::testRemoveBackCount()
 {
 	unittest::CountType data;
 	
-	xpcc::DoublyLinkedList< unittest::CountType > list;
+	modm::DoublyLinkedList< unittest::CountType > list;
 	list.append(data);
 	list.append(data);
 	
@@ -216,7 +216,7 @@ DoublyLinkedListTest::testDestructor()
 {
 	unittest::CountType data;
 	
-	xpcc::DoublyLinkedList< unittest::CountType >* list = new xpcc::DoublyLinkedList< unittest::CountType >;
+	modm::DoublyLinkedList< unittest::CountType >* list = new modm::DoublyLinkedList< unittest::CountType >;
 	
 	list->append(data);
 	list->append(data);
@@ -255,8 +255,8 @@ namespace
 void
 DoublyLinkedListTest::testConstIterator()
 {
-	xpcc::DoublyLinkedList<int16_t> writableList;
-	const xpcc::DoublyLinkedList<int16_t>& list = writableList;
+	modm::DoublyLinkedList<int16_t> writableList;
+	const modm::DoublyLinkedList<int16_t>& list = writableList;
 	
 	TEST_ASSERT_TRUE(list.begin() == list.end());
 	TEST_ASSERT_FALSE(list.begin() != list.end());
@@ -270,7 +270,7 @@ DoublyLinkedListTest::testConstIterator()
 	writableList.append(3);
 	
 	uint8_t i;
-	xpcc::DoublyLinkedList<int16_t>::const_iterator it;
+	modm::DoublyLinkedList<int16_t>::const_iterator it;
 	
 	it = list.begin();
 	TEST_ASSERT_TRUE(it == list.begin());
@@ -295,10 +295,10 @@ DoublyLinkedListTest::testConstIterator()
 void
 DoublyLinkedListTest::testConstIteratorAccess()
 {
-	xpcc::DoublyLinkedList<IteratorTestClass> list;
+	modm::DoublyLinkedList<IteratorTestClass> list;
 	list.append(IteratorTestClass(12, -1532));
 	
-	xpcc::DoublyLinkedList<IteratorTestClass>::const_iterator it = list.begin();
+	modm::DoublyLinkedList<IteratorTestClass>::const_iterator it = list.begin();
 	
 	TEST_ASSERT_EQUALS(it->a, 12);
 	TEST_ASSERT_EQUALS(it->b, -1532);
@@ -307,7 +307,7 @@ DoublyLinkedListTest::testConstIteratorAccess()
 void
 DoublyLinkedListTest::testIterator()
 {
-	xpcc::DoublyLinkedList<int16_t> list;
+	modm::DoublyLinkedList<int16_t> list;
 	
 	TEST_ASSERT_TRUE(list.begin() == list.end());
 	TEST_ASSERT_FALSE(list.begin() != list.end());
@@ -321,7 +321,7 @@ DoublyLinkedListTest::testIterator()
 	list.append(3);
 	
 	uint8_t i;
-	xpcc::DoublyLinkedList<int16_t>::iterator it;
+	modm::DoublyLinkedList<int16_t>::iterator it;
 	
 	it = list.begin();
 	TEST_ASSERT_TRUE(it == list.begin());
@@ -346,10 +346,10 @@ DoublyLinkedListTest::testIterator()
 void
 DoublyLinkedListTest::testIteratorAccess()
 {
-	xpcc::DoublyLinkedList<IteratorTestClass> list;
+	modm::DoublyLinkedList<IteratorTestClass> list;
 	list.append(IteratorTestClass(12, -1532));
 	
-	xpcc::DoublyLinkedList<IteratorTestClass>::iterator it = list.begin();
+	modm::DoublyLinkedList<IteratorTestClass>::iterator it = list.begin();
 	
 	TEST_ASSERT_EQUALS(it->a, 12);
 	TEST_ASSERT_EQUALS(it->b, -1532);

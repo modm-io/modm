@@ -12,7 +12,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-# path to the xpcc root directory
-xpccpath = '../../..'
+# path to the modm root directory
+modmpath = '../../..'
 # execute the common SConstruct file
-execfile(xpccpath + '/scons/SConstruct')
+execfile(modmpath + '/scons/SConstruct')

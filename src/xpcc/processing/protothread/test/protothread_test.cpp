@@ -15,7 +15,7 @@
 #include "protothread_test.hpp"
 
 // ----------------------------------------------------------------------------
-class TestingEmptyThread : public xpcc::pt::Protothread
+class TestingEmptyThread : public modm::pt::Protothread
 {
 public:
 	bool
@@ -44,7 +44,7 @@ ProtothreadTest::testClassMethods()
 }
 
 // ----------------------------------------------------------------------------
-class TestingChildThread : public xpcc::pt::Protothread
+class TestingChildThread : public modm::pt::Protothread
 {
 public:
 	TestingChildThread() :
@@ -70,7 +70,7 @@ public:
 	bool condition;
 };
 
-class TestingThread : public xpcc::pt::Protothread
+class TestingThread : public modm::pt::Protothread
 {
 public:
 	TestingThread() :
@@ -186,7 +186,7 @@ ProtothreadTest::testMacros()
 }
 
 // ----------------------------------------------------------------------------
-class TestingThreadRestart : public xpcc::pt::Protothread
+class TestingThreadRestart : public modm::pt::Protothread
 {
 public:
 	TestingThreadRestart() :

@@ -14,17 +14,17 @@
 
 // ----------------------------------------------------------------------------
 // Set the log level
-#undef	XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::INFO
+#undef	MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::INFO
 
 // Create an IODeviceWrapper around the Uart Peripheral we want to use
-xpcc::IODeviceWrapper< Usart1, xpcc::IOBuffer::BlockIfFull > loggerDevice;
+modm::IODeviceWrapper< Usart1, modm::IOBuffer::BlockIfFull > loggerDevice;
 
 // Set all four logger streams to use the UART
-xpcc::log::Logger xpcc::log::debug(loggerDevice);
-xpcc::log::Logger xpcc::log::info(loggerDevice);
-xpcc::log::Logger xpcc::log::warning(loggerDevice);
-xpcc::log::Logger xpcc::log::error(loggerDevice);
+modm::log::Logger modm::log::debug(loggerDevice);
+modm::log::Logger modm::log::info(loggerDevice);
+modm::log::Logger modm::log::warning(loggerDevice);
+modm::log::Logger modm::log::error(loggerDevice);
 
 
 int
@@ -32,11 +32,11 @@ main()
 {
 	Board::initialize();
 
-	// initialize Uart for XPCC_LOG
+	// initialize Uart for MODM_LOG
 	GpioOutputA9::connect(Usart1::Tx);
 	Usart1::initialize<Board::systemClock, 115200>(12);
 
-	XPCC_LOG_INFO << "Causing a Hardfault now!" << xpcc::endl;
+	MODM_LOG_INFO << "Causing a Hardfault now!" << modm::endl;
 
 	// simulate some stack usage
 	asm volatile ("push {r0-r7}");
@@ -68,7 +68,7 @@ main()
 
 	while (1)
 	{
-		xpcc::delayMilliseconds(1000);
+		modm::delayMilliseconds(1000);
 		Board::LedUp::toggle();
 	}
 

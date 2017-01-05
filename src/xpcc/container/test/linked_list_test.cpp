@@ -28,7 +28,7 @@ LinkedListTest::setUp()
 void
 LinkedListTest::testConstructor()
 {
-	xpcc::LinkedList< unittest::CountType > list;
+	modm::LinkedList< unittest::CountType > list;
 	
 	TEST_ASSERT_TRUE(list.isEmpty());
 	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDefaultConstructorCalls, 0U);
@@ -37,7 +37,7 @@ LinkedListTest::testConstructor()
 void
 LinkedListTest::testAppend()
 {
-	xpcc::LinkedList<int16_t> list;
+	modm::LinkedList<int16_t> list;
 	
 	list.append(1);
 	
@@ -59,7 +59,7 @@ LinkedListTest::testAppend()
 void
 LinkedListTest::testAppendCount()
 {
-	xpcc::LinkedList< unittest::CountType > list;
+	modm::LinkedList< unittest::CountType > list;
 	
 	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDefaultConstructorCalls, 0U);
 	TEST_ASSERT_EQUALS(unittest::CountType::numberOfCopyConstructorCalls, 0U);
@@ -83,7 +83,7 @@ LinkedListTest::testAppendCount()
 void
 LinkedListTest::testPrepend()
 {
-	xpcc::LinkedList<int16_t> list;
+	modm::LinkedList<int16_t> list;
 	
 	list.prepend(1);
 	
@@ -105,7 +105,7 @@ LinkedListTest::testPrepend()
 void
 LinkedListTest::testPrependCount()
 {
-	xpcc::LinkedList< unittest::CountType > list;
+	modm::LinkedList< unittest::CountType > list;
 	
 	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDefaultConstructorCalls, 0U);
 	TEST_ASSERT_EQUALS(unittest::CountType::numberOfCopyConstructorCalls, 0U);
@@ -129,7 +129,7 @@ LinkedListTest::testPrependCount()
 void
 LinkedListTest::testRemoveFront()
 {
-	xpcc::LinkedList<int16_t> list;
+	modm::LinkedList<int16_t> list;
 	
 	list.append(1);
 	list.append(2);
@@ -156,7 +156,7 @@ LinkedListTest::testRemoveFrontCount()
 {
 	unittest::CountType data;
 	
-	xpcc::LinkedList< unittest::CountType > list;
+	modm::LinkedList< unittest::CountType > list;
 	list.append(data);
 	list.append(data);
 	
@@ -175,7 +175,7 @@ LinkedListTest::testDestructor()
 	unittest::CountType data;
 	unittest::CountType::reset();
 	
-	xpcc::LinkedList< unittest::CountType >* list = new xpcc::LinkedList< unittest::CountType >;
+	modm::LinkedList< unittest::CountType >* list = new modm::LinkedList< unittest::CountType >;
 	
 	list->append(data);
 	list->append(data);
@@ -213,8 +213,8 @@ namespace
 void
 LinkedListTest::testConstIterator()
 {
-	xpcc::LinkedList<int16_t> writableList;
-	const xpcc::LinkedList<int16_t>& list = writableList;
+	modm::LinkedList<int16_t> writableList;
+	const modm::LinkedList<int16_t>& list = writableList;
 	
 	TEST_ASSERT_TRUE(list.begin() == list.end());
 	TEST_ASSERT_FALSE(list.begin() != list.end());
@@ -228,7 +228,7 @@ LinkedListTest::testConstIterator()
 	writableList.append(3);
 	
 	uint8_t i;
-	xpcc::LinkedList<int16_t>::const_iterator it;
+	modm::LinkedList<int16_t>::const_iterator it;
 	
 	it = list.begin();
 	TEST_ASSERT_TRUE(it == list.begin());
@@ -253,10 +253,10 @@ LinkedListTest::testConstIterator()
 void
 LinkedListTest::testConstIteratorAccess()
 {
-	xpcc::LinkedList<IteratorTestClass> list;
+	modm::LinkedList<IteratorTestClass> list;
 	list.append(IteratorTestClass(12, -1532));
 	
-	xpcc::LinkedList<IteratorTestClass>::const_iterator it = list.begin();
+	modm::LinkedList<IteratorTestClass>::const_iterator it = list.begin();
 	
 	TEST_ASSERT_EQUALS(it->a, 12);
 	TEST_ASSERT_EQUALS(it->b, -1532);
@@ -265,7 +265,7 @@ LinkedListTest::testConstIteratorAccess()
 void
 LinkedListTest::testIterator()
 {
-	xpcc::LinkedList<int16_t> list;
+	modm::LinkedList<int16_t> list;
 	
 	TEST_ASSERT_TRUE(list.begin() == list.end());
 	TEST_ASSERT_FALSE(list.begin() != list.end());
@@ -279,7 +279,7 @@ LinkedListTest::testIterator()
 	list.append(3);
 	
 	uint8_t i;
-	xpcc::LinkedList<int16_t>::iterator it;
+	modm::LinkedList<int16_t>::iterator it;
 	
 	it = list.begin();
 	TEST_ASSERT_TRUE(it == list.begin());
@@ -304,10 +304,10 @@ LinkedListTest::testIterator()
 void
 LinkedListTest::testIteratorAccess()
 {
-	xpcc::LinkedList<IteratorTestClass> list;
+	modm::LinkedList<IteratorTestClass> list;
 	list.append(IteratorTestClass(12, -1532));
 	
-	xpcc::LinkedList<IteratorTestClass>::iterator it = list.begin();
+	modm::LinkedList<IteratorTestClass>::iterator it = list.begin();
 	
 	TEST_ASSERT_EQUALS(it->a, 12);
 	TEST_ASSERT_EQUALS(it->b, -1532);
@@ -322,7 +322,7 @@ LinkedListTest::testIteratorAccess()
 void
 LinkedListTest::testSize()
 {
-	xpcc::LinkedList<int16_t> list;
+	modm::LinkedList<int16_t> list;
 	TEST_ASSERT_EQUALS(list.getSize(), 0U);
 	
 	list.append(1);
@@ -347,8 +347,8 @@ LinkedListTest::testSize()
 void
 LinkedListTest::testRemove()
 {
-	xpcc::LinkedList<int16_t> list;
-	xpcc::LinkedList<int16_t>::iterator it = list.begin();
+	modm::LinkedList<int16_t> list;
+	modm::LinkedList<int16_t>::iterator it = list.begin();
 	list.remove(it);
 	
 	TEST_ASSERT_TRUE(it == list.end());
@@ -391,8 +391,8 @@ LinkedListTest::testRemove()
 void
 LinkedListTest::testInsert()
 {
-	xpcc::LinkedList<int16_t> list;
-	xpcc::LinkedList<int16_t>::iterator it = list.begin();
+	modm::LinkedList<int16_t> list;
+	modm::LinkedList<int16_t>::iterator it = list.begin();
 	list.insert(it, 0);
 	TEST_ASSERT_FALSE(list.isEmpty());
 	list.insert(it, 2);

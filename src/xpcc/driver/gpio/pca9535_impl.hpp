@@ -9,21 +9,21 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PCA9535_HPP
+#ifndef MODM_PCA9535_HPP
 #	error "Don't include this file directly, use 'pca9535.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
-xpcc::Pca9535<I2cMaster>::Pca9535(uint8_t address)
+modm::Pca9535<I2cMaster>::Pca9535(uint8_t address)
 :	I2cDevice<I2cMaster,2>(address), memory()
 {
 }
 
 // MARK: - Tasks
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Pca9535<I2cMaster>::setOutput(Pins pins)
+modm::ResumableResult<bool>
+modm::Pca9535<I2cMaster>::setOutput(Pins pins)
 {
 	RF_BEGIN();
 
@@ -34,8 +34,8 @@ xpcc::Pca9535<I2cMaster>::setOutput(Pins pins)
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Pca9535<I2cMaster>::set(Pins pins)
+modm::ResumableResult<bool>
+modm::Pca9535<I2cMaster>::set(Pins pins)
 {
 	RF_BEGIN();
 
@@ -46,8 +46,8 @@ xpcc::Pca9535<I2cMaster>::set(Pins pins)
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Pca9535<I2cMaster>::reset(Pins pins)
+modm::ResumableResult<bool>
+modm::Pca9535<I2cMaster>::reset(Pins pins)
 {
 	RF_BEGIN();
 
@@ -58,8 +58,8 @@ xpcc::Pca9535<I2cMaster>::reset(Pins pins)
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Pca9535<I2cMaster>::toggle(Pins pins)
+modm::ResumableResult<bool>
+modm::Pca9535<I2cMaster>::toggle(Pins pins)
 {
 	RF_BEGIN();
 
@@ -70,8 +70,8 @@ xpcc::Pca9535<I2cMaster>::toggle(Pins pins)
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Pca9535<I2cMaster>::set(Pins pins, bool value)
+modm::ResumableResult<bool>
+modm::Pca9535<I2cMaster>::set(Pins pins, bool value)
 {
 	RF_BEGIN();
 
@@ -82,8 +82,8 @@ xpcc::Pca9535<I2cMaster>::set(Pins pins, bool value)
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Pca9535<I2cMaster>::setInput(Pins pins)
+modm::ResumableResult<bool>
+modm::Pca9535<I2cMaster>::setInput(Pins pins)
 {
 	RF_BEGIN();
 
@@ -94,8 +94,8 @@ xpcc::Pca9535<I2cMaster>::setInput(Pins pins)
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Pca9535<I2cMaster>::setInvertInput(Pins pins)
+modm::ResumableResult<bool>
+modm::Pca9535<I2cMaster>::setInvertInput(Pins pins)
 {
 	RF_BEGIN();
 
@@ -106,8 +106,8 @@ xpcc::Pca9535<I2cMaster>::setInvertInput(Pins pins)
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Pca9535<I2cMaster>::resetInvertInput(Pins pins)
+modm::ResumableResult<bool>
+modm::Pca9535<I2cMaster>::resetInvertInput(Pins pins)
 {
 	RF_BEGIN();
 
@@ -118,8 +118,8 @@ xpcc::Pca9535<I2cMaster>::resetInvertInput(Pins pins)
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Pca9535<I2cMaster>::writePort(uint16_t data)
+modm::ResumableResult<bool>
+modm::Pca9535<I2cMaster>::writePort(uint16_t data)
 {
 	RF_BEGIN();
 
@@ -130,8 +130,8 @@ xpcc::Pca9535<I2cMaster>::writePort(uint16_t data)
 }
 
 template < typename I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Pca9535<I2cMaster>::readPort(uint16_t &data)
+modm::ResumableResult<bool>
+modm::Pca9535<I2cMaster>::readPort(uint16_t &data)
 {
 	RF_BEGIN();
 
@@ -147,8 +147,8 @@ xpcc::Pca9535<I2cMaster>::readPort(uint16_t &data)
 
 // MARK: write multilength register
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Pca9535<I2cMaster>::writeMemory(Index index)
+modm::ResumableResult<bool>
+modm::Pca9535<I2cMaster>::writeMemory(Index index)
 {
 	RF_BEGIN();
 
@@ -159,8 +159,8 @@ xpcc::Pca9535<I2cMaster>::writeMemory(Index index)
 
 // MARK: read multilength register
 template < class I2cMaster >
-xpcc::ResumableResult<bool>
-xpcc::Pca9535<I2cMaster>::readMemory(Index index)
+modm::ResumableResult<bool>
+modm::Pca9535<I2cMaster>::readMemory(Index index)
 {
 	RF_BEGIN();
 
