@@ -224,10 +224,10 @@ public:
 	}
 	// connect: Hardware Gpio
 		%% for af in (gpio.af if "af" in gpio else []) | lbuild.listify
-			%% if af["id"] is not defined
+			%% if "id" not in af
 				%% set enableAlternateFunction = ""
 			%% else
-				%% set af_all = ("" ~ af["id"]) | split(",")
+				%% set af_all = ("" ~ af["id"]).split(",")
 				%% set afpos = af_all[0]
 				%% set afmask = af_all[1]
 				%% set afval = af_all[2]

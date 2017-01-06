@@ -146,7 +146,7 @@ def build(env):
     env.substitutions = properties
     env.outbasepath = "link"
 
-    for memory in driver["memory"]:
+    for memory in listify(driver["memory"]):
         if memory["name"] == "ccm":
             if "x" in memory["access"]:
                 if properties["vector_table_location"] == "fastest":
