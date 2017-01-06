@@ -28,6 +28,12 @@ class Instance(Module):
                 minimum=1,
                 maximum=2 ** 16 - 2,
                 default=8))
+
+        # FIXME STM32F7 have a different I2C peripherial
+        device = options[":target"]
+        if device.partname.startswith("stm32f7"):
+            return False
+
         return True
 
     def build(self, env):
