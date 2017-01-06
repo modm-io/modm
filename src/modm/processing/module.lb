@@ -14,13 +14,22 @@ def init(module):
     module.name = "processing"
 
 def prepare(module, options):
+    device = options[":target"]
+    if device.properties["core"].startswith("cortex-m4"):
+        module.add_option(
+            BooleanOption(
+                name="enable_freertos",
+                description="Add support for FreeRTOS",
+                default=False))
+
+        module.depends(":freertos")
+
     return True
 
 def build(env):
     env.outbasepath = "src/modm/processing"
 
-    device = env[":target"]
-    if device.properties["core"].startswith("cortex-m4"):
+    if env.get_option("::enable_freertos", False):
         env.copy(".", ignore=env.ignore_patterns("*.lb", "*/rtos/boost*"))
     else:
         env.copy(".", ignore=env.ignore_patterns("*.lb", "*/rtos/boost*", "*/rtos/freertos*"))

@@ -20,6 +20,7 @@ def prepare(module, options):
     if not device.identifier["platform"] == "stm32":
         return False
 
+    module.depends([":cmsis"])
     return True
 
 def build(env):

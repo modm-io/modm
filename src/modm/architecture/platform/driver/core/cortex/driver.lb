@@ -21,6 +21,8 @@ def prepare(module, options):
     if not options[":target"].has_driver("core:cortex"):
         return False
 
+    module.depends([":architecture", ":cmsis.device"])
+
     module.add_option(
         EnumerationOption(
             name="allocator",
