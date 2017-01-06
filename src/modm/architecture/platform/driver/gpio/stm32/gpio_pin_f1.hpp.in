@@ -25,7 +25,7 @@ namespace stm32
 {
 
 // Gpio Classes created from the XML Device File Gpio Description
-%% for gpio in driver.gpio
+%% for gpio in (driver.gpio) | lbuild.listify
 	%% set port = gpio["port"] | upper
 	%% set reg  = "GPIO" ~ port
 	%% set pin  = gpio["id"]
@@ -78,8 +78,8 @@ public:
 		if (type == InputType::PullUp) {{reg}}->BSRR = mask;
 		else {{reg}}->BRR = mask;
 	}
-		%% for af in (gpio.af if "af" in gpio else [])
-			%% if af["type"] == "analog"
+		%% for af in (gpio.af if "af" in gpio else []) | lbuild.listify
+			%% if "type" in af and af["type"] == "analog"
 	/// {{name}} connects to {{af["name"]}} of {{af["peripheral"]}}
 	//static const ::modm::stm32::{{af["peripheral"]}}::Channel
 	//{{af["peripheral"]}}Channel = ::modm::stm32::{{af["peripheral"]}}::Channel::{{ af["name"] }};
@@ -223,7 +223,7 @@ public:
 		{{reg}}->BRR = mask;
 	}
 	// connect: Hardware Gpio
-		%% for af in (gpio.af if "af" in gpio else [])
+		%% for af in (gpio.af if "af" in gpio else []) | lbuild.listify
 			%% if af["id"] is not defined
 				%% set enableAlternateFunction = ""
 			%% else

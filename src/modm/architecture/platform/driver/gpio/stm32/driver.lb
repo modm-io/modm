@@ -70,7 +70,10 @@ def build(env):
     properties["target"] = device.identifier
     properties["partname"] = device.partname
     properties["driver"] = driver
-    properties["adcs"] = device.get_driver("adc")["instance"]
+    if device.has_driver("adc"):
+        properties["adcs"] = device.get_driver("adc").get("instance", [])
+    else:
+        properties["adcs"] = []
     properties["ports"] = sorted(list(set([p["port"] for p in driver["gpio"]])))
 
     env.substitutions = properties
@@ -83,6 +86,9 @@ def build(env):
     for pin in driver["gpio"]:
         env.template(gpio_source, "gpio_{}{}.hpp".format(pin["port"], pin["id"]),
                     substitutions=properties.update({'gpio': pin}),
-                    filters={"portRanges": filter_port_ranges})
+                    filters={
+                        "portRanges": filter_port_ranges,
+                        "split": lambda x, y: x.split(y),
+                    })
     env.template("gpio_base.hpp.in", filters={"letterToNum": filter_letter_to_num})
     env.template("gpio_enable.cpp.in")

@@ -16,7 +16,8 @@ def init(module):
     module.parent = "platform"
 
 def prepare(module, options):
-    if not options[":target"].has_driver("fsmc:stm32"):
+    device = options[":target"]
+    if not device.has_driver("fsmc:stm32"):
         return False
 
     module.depends(":platform:core")

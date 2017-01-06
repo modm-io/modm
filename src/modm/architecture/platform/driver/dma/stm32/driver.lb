@@ -47,6 +47,10 @@ def prepare(module, options):
     if not device.has_driver("dma:stm32"):
         return False
 
+    # FIXME the driver is referenced in STM32F0 device files, but appears only to support STM32F3/4
+    if not (device.partname.startswith("stm32f3") or device.partname.startswith("stm32f4")):
+        return False
+
     module.depends(":platform:core")
 
     for instance in listify(device.get_driver("dma")["instance"]):

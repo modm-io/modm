@@ -207,8 +207,12 @@ modm::stm32::{{ name }}::isTransmitRegisterEmpty()
 void
 modm::stm32::{{ name }}::enableInterruptVector(bool enable, uint32_t priority)
 {
-%% if target["family"] == "f0" and id in [3,4]
-	%% set irq = "USART3_4"
+%% if target["family"] == "f0" and id in [3,4,5,6,7,8]
+	%% if target["name"] in ["091", "098"]
+		%% set irq = "USART3_8"
+	%% else
+		%% set irq = "USART3_4"
+	%% endif
 %% else
 	%% set irq = peripheral
 %% endif
@@ -251,11 +255,18 @@ modm::stm32::{{ name }}::acknowledgeInterruptFlags(InterruptFlag_t flags)
 {
 %% if target["family"] in ["f0", "f3", "f7"]
 	// Not all flags can be cleared by writing to this reg
+	%% if target["name"] in ["030", "070"]
+	const uint32_t mask = USART_ICR_PECF  | USART_ICR_FECF   |
+		USART_ICR_NCF   | USART_ICR_ORECF | USART_ICR_IDLECF |
+		USART_ICR_TCCF  | USART_ICR_CTSCF  |
+		USART_ICR_RTOCF | USART_ICR_CMCF;
+	%% else
 	const uint32_t mask = USART_ICR_PECF  | USART_ICR_FECF   |
 		USART_ICR_NCF   | USART_ICR_ORECF | USART_ICR_IDLECF |
 		USART_ICR_TCCF  | USART_ICR_LBDCF | USART_ICR_CTSCF  |
 		USART_ICR_RTOCF | USART_ICR_EOBCF | USART_ICR_CMCF   |
 		USART_ICR_WUCF;
+	%% endif
 	// Flags are cleared by writing a one to the flag position.
 	// Writing a zero is (hopefully) ignored.
 	{{ peripheral }}->ICR = (flags.value & mask);

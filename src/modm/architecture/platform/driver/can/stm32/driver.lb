@@ -34,8 +34,7 @@ class Instance(Module):
         module.description = "CAN {} instance".format(self.instance)
 
     def prepare(self, module, options):
-        module.depends(":platform:can")
-        module.depends(":debug")
+        module.depends([":platform:can", ":debug"])
 
         load_options(module)
         return True

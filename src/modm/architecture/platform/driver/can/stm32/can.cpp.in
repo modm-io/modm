@@ -463,7 +463,9 @@ modm::stm32::Can{{ id }}::enableStatusChangeInterrupt(
 %% if not target["family"] == "f0"
 	NVIC_SetPriority({{ reg }}_SCE_IRQn, interruptPriority);
 	nvicEnableInterrupt({{ reg }}_SCE_IRQn);
-
+%% else
+	(void) interruptPriority;	// Not used for STM32F0
 %% endif
+
 	{{ reg }}->IER = interruptEnable | ({{ reg }}->IER & 0x000000ff);
 }
