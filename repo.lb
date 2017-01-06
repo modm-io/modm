@@ -21,7 +21,8 @@ def init(repo):
     devices = {}
     try:
         parser = modm.parser.DeviceParser()
-        device_file_names = glob.glob(localpath("../modm-devices/devices/**/*.xml"))
+        device_file_names  = glob.glob(localpath("../modm-devices/devices/**/*.xml"))
+        device_file_names += glob.glob(localpath("devices/**/*.xml"))
         for device_file_name in device_file_names:
             device_file = parser.parse(device_file_name)
             for device in device_file.get_devices():

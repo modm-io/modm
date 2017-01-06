@@ -1,24 +1,25 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE rca SYSTEM "../devicefile.dtd">
-<rca version="1.0">
-	<device platform="lpc" family="11" name="15">
-		<naming-schema>{{ platform }}{{ family }}{{ name }}</naming-schema>
+<modm version="1.0">
+	<device platform="lpc" family="11" name="c24">
+		<naming-schema>{platform}{family}{name}</naming-schema>
 		<!-- Flash and RAM sizes -->
-		<flash device-name="15">65536</flash>
+		<flash device-name="c24">32768</flash>
 		<ram>8192</ram>
 		<!-- Core -->
 		<core>cortex-m0</core>
 		<!-- Number of pins -->
-		<pin-count device-name="15">48</pin-count>
+		<!--<pin-count device-name="c24">48</pin-count>-->
 		<!-- Headers to be included with the {{ include_device_headers }} substitution-->
-		<header>lpc11xx/cmsis/LPC11xx.h</header>
-		<header>lpc11xx/cmsis/core_cm0.h</header>
-		<header>lpc11xx/cmsis/system_LPC11xx.h</header>
+		<header>LPC11xx.h</header>
+		<!-- set to a value > 0 to enable software buffering of CAN messages -->
+		<define>LPC11C_CAN_TX_BUFFER_SIZE = 16</define>
+		<define>LPC11C_CAN_RX_BUFFER_SIZE = 16</define>
 		<!-- Core Driver -->
 		<driver type="core" compatible="cortex">
 			<parameter name="main_stack_size">1024</parameter>
 			<parameter name="allocator">block_allocator</parameter>
-			<memory access="rx" start="0x00000000" name="flash" size="64"/>
+			<memory access="rx" start="0x00000000" name="flash" size="32"/>
 			<memory access="rwx" start="0x10000100" name="sram1" size="8"/>
 			<vector position="0" name="WAKEUP0"/>
 			<vector position="1" name="WAKEUP1"/>
@@ -59,6 +60,9 @@
 		<driver type="uart" compatible="lpc">
 			<instance>1</instance>
 		</driver>
+		<driver type="can"  compatible="lpc">
+			<instance>1</instance>
+		</driver>
 		<driver type="gpio" compatible="lpc">
 			<!--<gpio port="0" id="0" func="Reset,Gpio" bits="mode,hys,od"/>-->
 			<gpio port="0" id="1"  func="Gpio,ClockOutput,Timer32_0" bits="mode,hys,od"/>
@@ -81,27 +85,26 @@
 			<gpio port="1" id="6"  func="Gpio,Uart,Timer32_0"         bits="mode,hys,od"/>
 			<gpio port="1" id="7"  func="Gpio,Uart,Timer32_0"         bits="mode,hys,od"/>
 			<gpio port="1" id="8"  func="Gpio,Timer16_1"              bits="mode,hys,od"/>
-			<gpio port="1" id="9"  func="Gpio,Spi1,Timer16_1"         bits="mode,hys,od"/>
-			<gpio port="1" id="10" func="Gpio,Spi1,Adc,Timer16_1"     bits="mode,hys,admode,od"/>
-			<gpio port="1" id="11" func="Gpio,Adc,Timer16_1"          bits="mode,hys,admode,od"/>
+			<gpio port="1" id="9"  func="Gpio,Timer16_1"              bits="mode,hys,od"/>
+			<gpio port="1" id="10" func="Gpio,Adc,Timer16_1"          bits="mode,hys,admode,od"/>
+			<gpio port="1" id="11" func="Gpio,Adc"                    bits="mode,hys,admode,od"/>
 			<gpio port="2" id="0"  func="Gpio,Uart,Spi1" bits="mode,hys,od"/>
 			<gpio port="2" id="1"  func="Gpio,Uart,Spi1" bits="mode,hys,od"/>
 			<gpio port="2" id="2"  func="Gpio,Uart,Spi1" bits="mode,hys,od"/>
 			<gpio port="2" id="3"  func="Gpio,Uart,Spi1" bits="mode,hys,od"/>
-			<gpio port="2" id="4"  func="Gpio,Spi1,Timer16_1"         bits="mode,hys,od"/>
-			<gpio port="2" id="5"  func="Gpio,Timer32_0"              bits="mode,hys,od"/>
-			<gpio port="2" id="6"  func="Gpio,Timer32_0"              bits="mode,hys,od"/>
-			<gpio port="2" id="7"  func="Gpio,Uart,Timer32_0"         bits="mode,hys,od"/>
-			<gpio port="2" id="8"  func="Gpio,Uart,Timer32_0"         bits="mode,hys,od"/>
-			<gpio port="2" id="9"  func="Gpio,Timer32_0"              bits="mode,hys,od"/>
+			<gpio port="2" id="4"  func="Gpio"           bits="mode,hys,od"/>
+			<gpio port="2" id="5"  func="Gpio"           bits="mode,hys,od"/>
+			<gpio port="2" id="6"  func="Gpio"           bits="mode,hys,od"/>
+			<gpio port="2" id="7"  func="Gpio"           bits="mode,hys,od"/>
+			<gpio port="2" id="8"  func="Gpio"           bits="mode,hys,od"/>
+			<gpio port="2" id="9"  func="Gpio"           bits="mode,hys,od"/>
 			<gpio port="2" id="10" func="Gpio"           bits="mode,hys,od"/>
-			<gpio port="2" id="11" func="Gpio,Spi1,Timer32_0"         bits="mode,hys,od"/>
-			<gpio port="3" id="0"  func="Gpio,Uart,Timer16_0"         bits="mode,hys,od"/>
-			<gpio port="3" id="1"  func="Gpio,Uart,Timer16_0"         bits="mode,hys,od"/>
-			<gpio port="3" id="2"  func="Gpio,Uart,Spi1,Timer16_0"    bits="mode,hys,od"/>
-			<gpio port="3" id="3"  func="Gpio,Uart,Timer16_0"         bits="mode,hys,od"/>
-			<gpio port="3" id="4"  func="Gpio,Uart,Timer16_0"         bits="mode,hys,od"/>
-			<gpio port="3" id="5"  func="Gpio,Uart,Timer16_0"         bits="mode,hys,od"/>
+			<gpio port="3" id="0"  func="Gpio,Uart"      bits="mode,hys,od"/>
+			<gpio port="3" id="1"  func="Gpio,Uart"      bits="mode,hys,od"/>
+			<gpio port="3" id="2"  func="Gpio,Uart"      bits="mode,hys,od"/>
+			<gpio port="3" id="3"  func="Gpio,Uart"      bits="mode,hys,od"/>
+			<gpio port="3" id="4"  func="Gpio"           bits="mode,hys,od"/>
+			<gpio port="3" id="5"  func="Gpio"           bits="mode,hys,od"/>
 		</driver>
 	</device>
-</rca>
+</modm>

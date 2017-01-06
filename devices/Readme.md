@@ -1,3 +1,7 @@
+
+FIXME: The following description is outdated. For more information see
+       https://github.com/modm-io/modm-devices
+
 # Device Files
 
 The device file describes the device metadata and peripheral tree in XML.
