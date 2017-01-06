@@ -1,0 +1,40 @@
+
+import os
+import sys
+import glob
+
+rootpath = localpath("..", "modm-devices", "tools", "device")
+sys.path.append(rootpath)
+
+import modm.pkg
+import modm.parser
+
+repo_description="""MODM HAL Library
+
+Requires the device files from https://github.com/modm-io/modm-devices to
+build the HAL source code.
+"""
+
+def init(repo):
+    repo.name = "modm"
+
+    devices = {}
+    try:
+        parser = modm.parser.DeviceParser()
+        device_file_names = glob.glob(localpath("../modm-devices/devices/**/*.xml"))
+        for device_file_name in device_file_names:
+            device_file = parser.parse(device_file_name)
+            for device in device_file.get_devices():
+                devices[device.partname] = device
+    except (modm.ParserException) as e:
+        print(e)
+        exit(1)
+
+    repo.add_option(
+        EnumerationOption(name="target",
+                          description=repo_description,
+                          enumeration=devices))
+
+def prepare(repo, options):
+    repo.find_modules_recursive("src/modm/architecture/platform/driver/", modulefile="driver.lb")
+    repo.find_modules_recursive(".", modulefile="module.lb")
