@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2012-2014, 2016, Niklas Hauser
+ * Copyright (c) 2017, Fabian Greif
  *
  * This file is part of the modm project.
  *
@@ -9,10 +10,11 @@
  */
 // ----------------------------------------------------------------------------
 
-{{ generation_block }}
+#include <avr/interrupt.h>
+
+#include "i2c_master_{{ id.lower() }}.hpp"
 
 #include <modm/architecture/driver/atomic/lock.hpp>
-#include "i2c_master_{{ id.lower() }}.hpp"
 
 // uncomment to debug your driver using simple uart
 /*
@@ -27,17 +29,17 @@ namespace
 {
 	// parameter advice
 	static modm::I2c::Operation nextOperation;
-	
+
 	// buffer management
 	static uint8_t *readPointer;
 	static const uint8_t *writePointer;
 	static std::size_t readBytesLeft;
 	static std::size_t writeBytesLeft;
-	
+
 	// delegating
 	static modm::I2cDelegate *delegate = 0;
 	static modm::I2cMaster::Error errorState(modm::I2cMaster::Error::NoError);
-	
+
 	// helper functions
 	static modm_always_inline void
 	initializeWrite(modm::I2cDelegate::Writing w) {
@@ -45,28 +47,28 @@ namespace
 		writeBytesLeft = w.size;
 		nextOperation = static_cast<modm::I2c::Operation>(w.next);
 	}
-	
+
 	static modm_always_inline void
 	initializeRead(modm::I2cDelegate::Reading r) {
 		readPointer = r.buffer;
 		readBytesLeft = r.size;
 		nextOperation = static_cast<modm::I2c::Operation>(r.next);
 	}
-	
+
 	static modm_always_inline void
 	initializeStopAfterAddress() {
 		//writePointer = ..;
 		writeBytesLeft = 0;
 		nextOperation = modm::I2c::Operation::Stop;
 	}
-	
+
 	static modm_always_inline void
 	initializeRestartAfterAddress() {
 		//writePointer = ..;
 		writeBytesLeft = 0;
 		nextOperation = modm::I2c::Operation::Restart;
 	}
-	
+
 	static void
 	callStarting()
 	{
@@ -82,18 +84,18 @@ namespace
 				address = (s.address & 0xfe) | modm::I2c::Read;
 				initializeRead(delegate->reading());
 				break;
-				
+
 			case modm::I2c::Operation::Write:
 				address = (s.address & 0xfe) | modm::I2c::Write;
 				initializeWrite(delegate->writing());
 				break;
-				
+
 			default:
 			case modm::I2c::Operation::Stop:
 				address = (s.address & 0xfe) | modm::I2c::Write;
 				initializeStopAfterAddress();
 				break;
-				
+
 			case modm::I2c::Operation::Restart:
 				address = (s.address & 0xfe) | modm::I2c::Write;
 				initializeRestartAfterAddress();
@@ -116,13 +118,13 @@ MODM_ISR(TWI{{ id }}_TWIM)
 			// chillax and get some coffee
 			DEBUG('i');
 			break;
-			
+
 		case TWI_MASTER_BUSSTATE_OWNER_gc:
 			// We are writing
 			if (TWI{{ id }}_MASTER_STATUS & TWI_MASTER_WIF_bm)
 			{
 				// Abitration and Bus Error is handled by the Busy state.
-				
+
 				// The Received Acknowledge flag must be checked for each data packet
 				// transmitted before the next data packet can be transferred. The master
 				// is not allowed to continue transmitting data if the slave signals a NACK.
@@ -137,7 +139,7 @@ MODM_ISR(TWI{{ id }}_TWIM)
 					TWI{{ id }}_MASTER_STATUS = TWI_MASTER_BUSSTATE_IDLE_gc;
 					break;
 				}
-				
+
 				// Data byte has been transmitted and ACK received
 				if (writeBytesLeft != 0)
 				{
@@ -162,13 +164,13 @@ MODM_ISR(TWI{{ id }}_TWIM)
 							--writeBytesLeft;
 							DEBUG('A');
 							break;
-							
+
 						case modm::I2c::Operation::Restart:
 							DEBUG('R');
 							TWI{{ id }}_MASTER_CTRLC = TWI_MASTER_CMD_REPSTART_gc;
 							callStarting();
 							break;
-							
+
 						default:
 							DEBUG('S');
 							TWI{{ id }}_MASTER_CTRLC = TWI_MASTER_ACKACT_bm | TWI_MASTER_CMD_STOP_gc;
@@ -186,7 +188,7 @@ MODM_ISR(TWI{{ id }}_TWIM)
 				*readPointer++ = TWI{{ id }}_MASTER_DATA;
 				//DEBUG('0' + readBytesLeft);
 				--readBytesLeft;
-				
+
 				// Indicating a NACK might not be successfully executed since arbitration
 				// can be lost during the transmission.
 				if (readBytesLeft > 0) {
@@ -203,7 +205,7 @@ MODM_ISR(TWI{{ id }}_TWIM)
 							TWI{{ id }}_MASTER_CTRLC = TWI_MASTER_ACKACT_bm | TWI_MASTER_CMD_REPSTART_gc;
 							callStarting();
 							break;
-							
+
 						default:
 						case modm::I2c::Operation::Stop:
 							DEBUG('S');
@@ -215,16 +217,16 @@ MODM_ISR(TWI{{ id }}_TWIM)
 				}
 			}
 			break;
-			
+
 		case TWI_MASTER_BUSSTATE_BUSY_gc:
 			// Arbitration Lost, or other master is using the bus
 			// wait until bus status returns to IDLE
 			// cancel all pending messages
 			DEBUG('E');
-			
+
 			errorState = modm::I2cMaster::Error::ArbitrationLost;
 			modm::xmega::I2cMaster{{ id }}::reset(modm::I2c::DetachCause::ErrorCondition);
-			
+
 		default:
 			TWI{{ id }}_MASTER_STATUS = TWI_MASTER_BUSSTATE_IDLE_gc;
 			break;
@@ -239,16 +241,16 @@ modm::xmega::I2cMaster{{ id }}::initializeWithBaud(uint8_t baud)
 	reset(modm::I2c::DetachCause::SoftwareReset);
 	// SDA Hold Time and External Driver Interface disabled
 	TWI{{ id }}_CTRL = 0;
-	
+
 	TWI{{ id }}_MASTER_BAUD = baud;
-	
+
 	// Enable the Master, and the interrupts
 	TWI{{ id }}_MASTER_CTRLA = TWI_MASTER_INTLVL_MED_gc | TWI_MASTER_ENABLE_bm;
 	// clear register b
 	TWI{{ id }}_MASTER_CTRLB = 0;
 	// clear register c
 	TWI{{ id }}_MASTER_CTRLC = 0;
-	
+
 	// Set the bus state to idle
 	TWI{{ id }}_MASTER_STATUS = TWI_MASTER_BUSSTATE_IDLE_gc;
 }
@@ -276,7 +278,7 @@ modm::xmega::I2cMaster{{ id }}::start(modm::I2cDelegate *delegate)
 	{
 		::delegate = delegate;
 		callStarting();
-		
+
 		return true;
 	}
 	return false;
@@ -289,10 +291,10 @@ modm::xmega::I2cMaster{{ id }}::startBlocking(modm::I2cDelegate *delegate)
 	{
 		::delegate = delegate;
 		callStarting();
-		
+
 		while (::delegate)
 			;
-		
+
 		return true;
 	}
 	return false;

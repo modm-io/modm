@@ -9,23 +9,23 @@
  */
 // ----------------------------------------------------------------------------
 
-{{ generation_block }}
+#ifndef MODM_AVR_I2C_HPP
+#define MODM_AVR_I2C_HPP
 
-#ifndef MODM_{{target["family"] | upper}}_I2C_HPP
-#define MODM_{{target["family"] | upper}}_I2C_HPP
+#include <avr/io.h>
 
 /**
- * @ingroup 	{{target.string}}
- * @defgroup	{{target.string}}_i2c I2C
+ * @ingroup 	{{partname}}
+ * @defgroup	{{partname}}_i2c I2C
  */
 
 namespace modm
 {
 
-namespace {{target["family"]}}
+namespace avr
 {
 
-/// @ingroup	{{target.string}}_i2c
+/// @ingroup	{{partname}}_i2c
 struct I2c
 {
 	enum class
@@ -38,8 +38,8 @@ struct I2c
 	};
 };
 
-} // namespace {{target["family"]}}
+} // namespace avr
 
 } // namespace modm
 
-#endif	// MODM_{{target["family"] | upper}}_I2C_HPP
+#endif	// MODM_AVR_I2C_HPP

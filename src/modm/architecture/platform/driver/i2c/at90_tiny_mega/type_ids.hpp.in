@@ -9,15 +9,13 @@
  */
 // ----------------------------------------------------------------------------
 
-{{ generation_block }}
-
-#ifndef MODM_{{target["family"] | upper}}_I2C_TYPE_IDS_HPP
-#define MODM_{{target["family"] | upper}}_I2C_TYPE_IDS_HPP
+#ifndef MODM_AVR_I2C_TYPE_IDS_HPP
+#define MODM_AVR_I2C_TYPE_IDS_HPP
 
 namespace modm
 {
 
-namespace {{target["family"]}}
+namespace avr
 {
 
 namespace TypeId
@@ -26,8 +24,8 @@ namespace TypeId
 	typedef struct{} I2cMasterScl;
 }
 
-} // namespace {{target["family"]}}
+} // namespace avr
 
 } // namespace modm
 
-#endif // MODM_{{target["family"] | upper}}_I2C_TYPE_IDS_HPP
+#endif // MODM_AVR_I2C_TYPE_IDS_HPP

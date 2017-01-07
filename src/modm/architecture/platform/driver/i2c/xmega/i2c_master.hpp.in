@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, 2016, Fabian Greif
+ * Copyright (c) 2011, 2016-2017, Fabian Greif
  * Copyright (c) 2011, Georgi Grinshpun
  * Copyright (c) 2011-2016, Niklas Hauser
  * Copyright (c) 2012, Sascha Schade
@@ -12,13 +12,12 @@
  */
 // ----------------------------------------------------------------------------
 
-{{ generation_block }}
-
 #ifndef MODM_ATXMEGA_I2C_MASTER_{{ id }}_HPP
 #define MODM_ATXMEGA_I2C_MASTER_{{ id }}_HPP
 
-#include "../device.hpp"
-#include <modm/architecture/interface/i2c.hpp>
+#include <avr/io.h>
+
+#include <modm/architecture/interface/i2c_master.hpp>
 #include "type_ids.hpp"
 
 namespace modm
@@ -35,7 +34,7 @@ namespace xmega
  * @author Niklas Hauser
  * @ingroup	xmega
  */
-class I2cMaster{{ id }} : ::modm::I2cMaster
+class I2cMaster{{ id }} : public ::modm::I2cMaster
 {
 public:
 	static const TypeId::I2cMaster{{ id }}Sda Sda;
@@ -48,7 +47,7 @@ public:
 	 * @param	baudrate
 	 *		`Standard` or `Fast`, `High` datarate is not supported by the Xmega
 	 */
-	template<class SystemClock, uint32_t baudrate=DataRate::Standard
+	template<class SystemClock, uint32_t baudrate=Baudrate::Standard,
 			uint16_t tolerance = modm::Tolerance::FivePercent >
 	static modm_always_inline void
 	initialize()

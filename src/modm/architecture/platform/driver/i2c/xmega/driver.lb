@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2017, Fabian Greif
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def get_properties(env):
+    device = env[":target"]
+    driver = device.get_driver("i2c:xmega")
+    properties = device.properties
+    properties["target"] = device.identifier
+    properties["partname"] = device.partname
+    properties["driver"] = driver
+    return properties
+
+class Instance(Module):
+    def __init__(self, instance):
+        self.instance = instance
+
+    def init(self, module):
+        module.name = str(self.instance)
+        module.description = "I2C {} instance".format(self.instance)
+
+    def prepare(self, module, options):
+        module.depends(":platform:i2c")
+        return True
+
+    def build(self, env):
+        properties = get_properties(env)
+        properties["id"] = self.instance
+
+        env.substitutions = properties
+        env.outbasepath = "src/modm/platform/i2c"
+
+        env.template("i2c_master.hpp.in", "i2c_master_{}.hpp".format(self.instance.lower()))
+        env.template("i2c_master.cpp.in", "i2c_master_{}.cpp".format(self.instance.lower()))
+
+def init(module):
+    module.name = "i2c"
+    module.parent = "platform"
+
+def prepare(module, options):
+    device = options[":target"]
+    if not device.has_driver("i2c:xmega"):
+        return False
+
+    # FIXME I2C Master Driver is currently broken
+    return False
+
+    driver = device.get_driver("i2c:xmega")
+    for instance in listify(driver["instance"]):
+        module.add_submodule(Instance(instance))
+
+    module.depends([":platform:core"])
+    return True
+
+def build(env):
+    properties = get_properties(env)
+    driver = properties["driver"]
+
+    env.substitutions = properties
+    env.outbasepath = "src/modm/platform/i2c"
+
+    env.template("type_ids.hpp")
