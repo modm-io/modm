@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2013-2014, Niklas Hauser
+ * Copyright (c) 2017, Fabian Greif
  *
  * This file is part of the modm project.
  *
@@ -9,14 +10,12 @@
  */
 // ----------------------------------------------------------------------------
 
-{{ generation_block }}
-
 #include <modm/architecture/driver/atomic/queue.hpp>
 #include <modm/architecture/driver/atomic/lock.hpp>
 
 #include "uart_{{ id.lower() }}.hpp"
 
-static modm::atomic::Queue<uint8_t, {{parameters.rx_buffer}}> rxBuffer;
+static modm::atomic::Queue<uint8_t, {{ options["buffer.rx"] }}> rxBuffer;
 static uint8_t error;
 
 // ----------------------------------------------------------------------------
@@ -35,16 +34,16 @@ void
 modm::xmega::Uart{{ id }}::initializeWithFractionalBaudrate(uint16_t bsel, uint8_t bscale)
 {
 	atomic::Lock lock;
-	
+
 	USART{{ id }}.BAUDCTRLA = static_cast<uint8_t>(bsel & 0xff);
 	USART{{ id }}.BAUDCTRLB = static_cast<uint8_t>((bscale << USART_BSCALE0_bp) | (bsel >> 8));
-		
+
 	// enable receive complete interrupt
 	USART{{ id }}.CTRLA = USART_RXCINTLVL_MED_gc;
-	
+
 	// setting the frame size to 8 bit
 	USART{{ id }}.CTRLC = USART_CHSIZE_8BIT_gc;
-	
+
 	// enable both, receiver and transmitter
 	USART{{ id }}.CTRLB |= USART_RXEN_bm | USART_TXEN_bm;
 }
@@ -55,10 +54,10 @@ modm::xmega::Uart{{ id }}::read(uint8_t& data)
 {
 	if (rxBuffer.isEmpty())
 		return false;
-	
+
 	data = rxBuffer.get();
 	rxBuffer.pop();
-	
+
 	return true;
 }
 
@@ -75,7 +74,7 @@ modm::xmega::Uart{{ id }}::read(uint8_t *buffer, std::size_t length)
 			rxBuffer.pop();
 		}
 	}
-	
+
 	return length;
 }
 
@@ -89,14 +88,14 @@ modm::xmega::Uart{{ id }}::discardReceiveBuffer()
 		rxBuffer.pop();
 		++i;
 	}
-	
+
 	uint8_t c;
 	while (USART{{ id }}_STATUS & USART_RXCIF_bm)
 	{
 		c = USART{{ id }}_DATA;
 		(void) c;
 	}
-	
+
 	return i;
 }
 

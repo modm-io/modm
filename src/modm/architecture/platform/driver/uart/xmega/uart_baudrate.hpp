@@ -12,7 +12,7 @@
 #ifndef MODM_ATXMEGA_UART_BAUDRATE_HPP
 #define MODM_ATXMEGA_UART_BAUDRATE_HPP
 
-#include "../../../device.hpp"
+//#include "../../../device.hpp"
 
 namespace modm
 {

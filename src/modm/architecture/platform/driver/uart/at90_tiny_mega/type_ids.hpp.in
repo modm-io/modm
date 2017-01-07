@@ -9,15 +9,13 @@
  */
 // ----------------------------------------------------------------------------
 
-{{ generation_block }}
-
-#ifndef MODM_{{target["family"] | upper}}_UART_TYPE_IDS_HPP
-#define MODM_{{target["family"] | upper}}_UART_TYPE_IDS_HPP
+#ifndef MODM_AVR_UART_TYPE_IDS_HPP
+#define MODM_AVR_UART_TYPE_IDS_HPP
 
 namespace modm
 {
 
-namespace {{target["family"]}}
+namespace avr
 {
 
 namespace TypeId
@@ -26,6 +24,9 @@ namespace TypeId
 	typedef struct{} UsiDi;
 	typedef struct{} UsiUsck;
 
+	typedef struct{} UartRxd;
+	typedef struct{} UartTxd;
+	typedef struct{} UartXck;
 
 	typedef struct{} Uart0Rxd;
 	typedef struct{} Uart0Txd;
@@ -44,8 +45,8 @@ namespace TypeId
 	typedef struct{} Uart3Xck;
 }
 
-} // namespace {{target["family"]}}
+} // namespace avr
 
 } // namespace modm
 
-#endif // MODM_{{target["family"] | upper}}_UART_TYPE_IDS_HPP
+#endif // MODM_AVR_UART_TYPE_IDS_HPP

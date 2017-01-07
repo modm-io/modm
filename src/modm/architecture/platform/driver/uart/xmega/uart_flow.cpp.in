@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013-2014, Niklas Hauser
- * Copyright (c) 2016, Fabian Greif
+ * Copyright (c) 2016-2017, Fabian Greif
  *
  * This file is part of the modm project.
  *
@@ -9,8 +9,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 // ----------------------------------------------------------------------------
-
-{{ generation_block }}
 
 #include <modm/architecture/platform/avr/xmega.hpp>
 
@@ -25,16 +23,16 @@
 #ifdef USART{{ id }}_RXC_vect
 
 #if UART{{ id }}_RTS_PIN >= 0
-// RTS_PIN = -1 deactivates flow control 
+// RTS_PIN = -1 deactivates flow control
 
 namespace
 {
 	static modm::atomic::Queue<uint8_t, UART{{ id }}_RX_BUFFER_SIZE> rxBuffer;
 	static modm::atomic::Queue<uint8_t, UART{{ id }}_TX_BUFFER_SIZE> txBuffer;
-	
+
 	GPIO_INPUT (RXD, {{ id[0] }}, {{ number * 4 + 2 }});
 	GPIO_OUTPUT(TXD, {{ id[0] }}, {{ number * 4 + 3 }});
-	
+
 	GPIO_INPUT (RTS, UART{{ id }}_RTS_PORT, UART{{ id }}_RTS_PIN);
 	GPIO_OUTPUT(CTS, UART{{ id }}_CTS_PORT, UART{{ id }}_CTS_PIN);
 
@@ -47,17 +45,17 @@ MODM_ISR(USART{{ id }}_RXC)
 {
 	// first save the errors
 	error |= USART{{ id }}_STATUS & (USART_FERR_bm | USART_BUFOVF_bm | USART_PERR_bm);
-	
+
 	// then read the buffer
 	uint8_t data = USART{{ id }}_DATA;
-	
+
 	if (!rxBuffer.push(data)) {
-		// TODO: Error handling if internal buffer is full.		
+		// TODO: Error handling if internal buffer is full.
 	}
-	 
-	// If the internal buffer is now nearly full set CTS to high to inhibit 
+
+	// If the internal buffer is now nearly full set CTS to high to inhibit
 	// remote from sending new data. As the remote may not stop instantenously
-	// it is important to stop before the buffer is completely full. 
+	// it is important to stop before the buffer is completely full.
 	if (rxBuffer.isNearlyFull()) {
 		CTS::set();
 	}
@@ -76,9 +74,9 @@ ISR(USART{{ id }}_DRE_vect)
 		// to accept data
 		if (RTS::read())
 		{
-			// RTS of remote device high: do not send new data. 
+			// RTS of remote device high: do not send new data.
 			// Disable DRE interrupt
-			// TODO: Setup interrupt for rising edge of RTS to resume sending. 
+			// TODO: Setup interrupt for rising edge of RTS to resume sending.
 			USART{{ id }}_CTRLA = USART_RXCINTLVL_MED_gc;
 		}
 		else
@@ -100,22 +98,22 @@ modm::xmega::BufferedUartFlow{{ id }}::initialize()
 {
 	TXD::set();
 	TXD::setOutput();
-	
+
 	RXD::setInput();
-	
+
 	// RTS and CTS pins, ready for reception in few cycles.
 	CTS::setOutput(modm::Gpio::Low);
 	RTS::setInput(modm::xmega::PULLUP);
-	
+
 	// interrupts should be disabled during initialisation
 	atomic::Lock lock;
-		
+
 	// enable receive complete interrupt
 	USART{{ id }}.CTRLA = USART_RXCINTLVL_MED_gc;
-	
+
 	// setting the frame size to 8 bit
 	USART{{ id }}.CTRLC = USART_CHSIZE_8BIT_gc;
-	
+
 	// enable both, receiver and transmitter
 	USART{{ id }}.CTRLB |= USART_RXEN_bm | USART_TXEN_bm;
 }
@@ -127,13 +125,13 @@ modm::xmega::BufferedUartFlow{{ id }}::write(uint8_t c)
 	while ( !txBuffer.push(c) ) {
 		// wait for a free slot in the buffer
 	}
-	
+
 	// Either a byte was enqueued to the buffer or it was not possible because
-	// the buffer was full. In both cases there is something to send now. 
-	
+	// the buffer was full. In both cases there is something to send now.
+
 	// disable interrupts
 	atomic::Lock lock;
-	
+
 	// enable DRE interrupt
 	USART{{ id }}_CTRLA = USART_RXCINTLVL_MED_gc | USART_DREINTLVL_MED_gc;
 }
@@ -153,18 +151,18 @@ modm::xmega::BufferedUartFlow{{ id }}::read(uint8_t& c)
 {
 	if (rxBuffer.isNearlyEmpty()) {
 		// When the buffer is nearly empty allow remote device to send again.
-		// This will create a continous flow of data.  
+		// This will create a continous flow of data.
 		CTS::reset();
 	}
-	
+
 	// Small hack: When the AVR stopped transmission due to a high RTS signal try to resume
-	// transmission now when RTS is low again and there is something to send. 
-	// TODO: can be removed if RTS interrupt is included. 
+	// transmission now when RTS is low again and there is something to send.
+	// TODO: can be removed if RTS interrupt is included.
 	if (!RTS::read() && !txBuffer.isEmpty()) {
 		// enable DRE interrupt to resume transmission
 		USART{{ id }}_CTRLA = USART_RXCINTLVL_MED_gc | USART_DREINTLVL_MED_gc;
 	}
-	
+
 	if (rxBuffer.isEmpty()) {
 		// no data in buffer anymore
 		CTS::reset();
@@ -191,15 +189,15 @@ modm::xmega::BufferedUartFlow{{ id }}::read(uint8_t *buffer, uint8_t n)
 		else {
 			*buffer++ = rxBuffer.get();
 			rxBuffer.pop();
-		
+
 			if (rxBuffer.isNearlyEmpty()) {
 				// When the buffer is nearly empty allow remote device to send again.
-				// This will create a continous flow of data.  
+				// This will create a continous flow of data.
 				CTS::reset();
 			}
 		}
 	}
-	
+
 	return i;
 }
 
@@ -225,12 +223,12 @@ modm::xmega::BufferedUartFlow{{ id }}::flushReceiveBuffer()
 		rxBuffer.pop();
 		++i;
 	}
-	
+
 	uint8_t c;
 	while (USART{{ id }}_STATUS & USART_RXCIF_bm) {
 		c = USART{{ id }}_DATA;
 	}
-	
+
 	return i;
 }
 
@@ -247,5 +245,5 @@ modm::xmega::BufferedUartFlow{{ id }}::flushReceiveBuffer()
 //}
 
 
-#endif	
+#endif
 #endif	// USART{{ id }}_RXC_vect

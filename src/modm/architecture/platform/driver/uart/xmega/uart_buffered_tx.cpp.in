@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2012, Fabian Greif
+ * Copyright (c) 2009-2012, 2017, Fabian Greif
  * Copyright (c) 2009, Martin Rosekeit
  * Copyright (c) 2010, Georgi Grinshpun
  * Copyright (c) 2011-2014, Niklas Hauser
@@ -12,14 +12,12 @@
  */
 // ----------------------------------------------------------------------------
 
-{{ generation_block }}
-
 #include <modm/architecture/driver/atomic/queue.hpp>
 #include <modm/architecture/driver/atomic/lock.hpp>
 
 #include "uart_{{ id.lower() }}.hpp"
 
-static modm::atomic::Queue<uint8_t, {{parameters.tx_buffer}}> txBuffer;
+static modm::atomic::Queue<uint8_t, {{ options["buffer.tx"] }}> txBuffer;
 
 // ----------------------------------------------------------------------------
 MODM_ISR(USART{{ id }}_DRE)
@@ -79,12 +77,12 @@ modm::xmega::Uart{{ id }}::write(uint8_t data)
 {
 	if (!txBuffer.push(data))
 		return false;
-	
+
 	::modm::atomic::Lock lock;
-	
+
 	// enable DRE interrupt
 	USART{{ id }}_CTRLA = USART_RXCINTLVL_MED_gc | USART_DREINTLVL_MED_gc;
-	
+
 	return true;
 }
 

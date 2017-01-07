@@ -18,7 +18,9 @@
 // To avoid to much conditional compiling we try to mimic the new names for
 // the old devices.
 
-#if defined (UDR) and not defined (UDR0)
+#if defined (UDR) and not defined (UDR00)
+// UDR0 is defined as bit 0 of the UDR register
+#   undef UDR0
 #	define UDR0		UDR
 #endif
 #if defined (UBRRL) and not defined (UBRR0L)

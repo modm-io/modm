@@ -10,15 +10,20 @@
  */
 // ----------------------------------------------------------------------------
 
-{{ generation_block }}
+// Avoid problems with poisoned defines from the the newer devices
+#define __AVR_LIBC_DEPRECATED_ENABLE__	1
+
+#include "uart{{ id }}.hpp"
+
+#include <avr/io.h>
+#include <avr/interrupt.h>
 
 #include <modm/architecture/driver/atomic/queue.hpp>
 #include <modm/architecture/driver/atomic/lock.hpp>
 
 #include "uart_defines.h"
-#include "uart{{ id }}.hpp"
 
-static modm::atomic::Queue<uint8_t, {{parameters.rx_buffer}}> rxBuffer;
+static modm::atomic::Queue<uint8_t, {{ options["buffer.rx"] }}> rxBuffer;
 static uint8_t error;
 
 // ----------------------------------------------------------------------------
@@ -34,12 +39,12 @@ MODM_ISR(USART{{ id }}_RX)
 
 // ----------------------------------------------------------------------------
 void
-modm::{{target["family"]}}::Uart{{ id }}::initialize(uint16_t ubrr)
+modm::avr::Uart{{ id }}::initialize(uint16_t ubrr)
 {
 	atomic::Lock lock;
 	// Set baud rate
 	if (ubrr & 0x8000) {
-		UCSR{{ id }}A = (1 << U2X{{ id }});  //Enable 2x speed 
+		UCSR{{ id }}A = (1 << U2X{{ id }});  //Enable 2x speed
 		ubrr &= ~0x8000;
 	}
 	else {
@@ -47,10 +52,10 @@ modm::{{target["family"]}}::Uart{{ id }}::initialize(uint16_t ubrr)
 	}
 	UBRR{{ id }}L = (uint8_t)  ubrr;
 	UBRR{{ id }}H = (uint8_t) (ubrr >> 8);
-	
+
 	// Enable USART receiver and transmitter and receive complete interrupt
 	UCSR{{ id }}B = (1 << RXCIE{{ id }}) | (1 << RXEN{{ id }}) | (1 << TXEN{{ id }});
-	
+
 	// Set frame format: asynchronous, 8data, no parity, 1stop bit
 #ifdef URSEL{{ id }}
 	UCSR{{ id }}C = (1 << UCSZ{{ id }}1) | (1 << UCSZ{{ id }}0) | (1 << URSEL{{ id }});
@@ -61,19 +66,19 @@ modm::{{target["family"]}}::Uart{{ id }}::initialize(uint16_t ubrr)
 
 // MARK: - read
 bool
-modm::{{target["family"]}}::Uart{{ id }}::read(uint8_t& data)
+modm::avr::Uart{{ id }}::read(uint8_t& data)
 {
 	if (rxBuffer.isEmpty())
 		return false;
-	
+
 	data = rxBuffer.get();
 	rxBuffer.pop();
-	
+
 	return true;
 }
 
 std::size_t
-modm::{{target["family"]}}::Uart{{ id }}::read(uint8_t *buffer, std::size_t length)
+modm::avr::Uart{{ id }}::read(uint8_t *buffer, std::size_t length)
 {
 	for (std::size_t i = 0; i < length; ++i)
 	{
@@ -85,13 +90,13 @@ modm::{{target["family"]}}::Uart{{ id }}::read(uint8_t *buffer, std::size_t leng
 			rxBuffer.pop();
 		}
 	}
-	
+
 	return length;
 }
 
 // MARK: - discard
 std::size_t
-modm::{{target["family"]}}::Uart{{ id }}::discardReceiveBuffer()
+modm::avr::Uart{{ id }}::discardReceiveBuffer()
 {
 	std::size_t i(0);
 	while(!rxBuffer.isEmpty())
@@ -99,7 +104,7 @@ modm::{{target["family"]}}::Uart{{ id }}::discardReceiveBuffer()
 		rxBuffer.pop();
 		++i;
 	}
-	
+
 #if defined (RXC{{ id }})
 	uint8_t c;
 	while (UCSR{{ id }}A & (1 << RXC{{ id }}))
@@ -108,19 +113,19 @@ modm::{{target["family"]}}::Uart{{ id }}::discardReceiveBuffer()
 		(void) c;
 	}
 #endif
-	
+
 	return i;
 }
 
 // MARK: - error
 uint8_t
-modm::{{target["family"]}}::Uart{{ id }}::getErrorFlags()
+modm::avr::Uart{{ id }}::getErrorFlags()
 {
 	return error;
 }
 
 void
-modm::{{target["family"]}}::Uart{{ id }}::acknowledgeErrorFlags()
+modm::avr::Uart{{ id }}::acknowledgeErrorFlags()
 {
 	error = 0;
 }
