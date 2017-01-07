@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010, 2016, Fabian Greif
+ * Copyright (c) 2009-2010, 2016-2017, Fabian Greif
  * Copyright (c) 2009-2010, Martin Rosekeit
  * Copyright (c) 2012, 2014-2016, Niklas Hauser
  *
@@ -12,15 +12,21 @@
 // ----------------------------------------------------------------------------
 
 #include "adc_interrupt.hpp"
-#include "../device.hpp"
+
+#include <avr/io.h>
+#include <avr/interrupt.h>
 
 // ----------------------------------------------------------------------------
-modm::{{ target["family"] }}::AdcInterrupt::Handler
-modm::{{ target["family"] }}::AdcInterrupt::handler(modm::dummy);
+modm::avr::AdcInterrupt::Handler
+modm::avr::AdcInterrupt::handler(modm::dummy);
 
 // ----------------------------------------------------------------------------
+%% if partname == "attiny20"
+MODM_ISR(ADC_ADC, modm_weak)
+%% else
 MODM_ISR(ADC, modm_weak)
+%% endif
 {
-	modm::{{ target["family"] }}::AdcInterrupt::handler();
+	modm::avr::AdcInterrupt::handler();
 }
 

@@ -11,15 +11,16 @@
 // ----------------------------------------------------------------------------
 
 /**
- * @ingroup 	{{target.string}}
- * @defgroup	{{target.string}}_adc ADC
+ * @ingroup 	{{partname}}
+ * @defgroup	{{partname}}_adc ADC
  */
 
 #ifndef MODM_ATTINY_ADC_HPP
 #define MODM_ATTINY_ADC_HPP
 
+#include <avr/io.h>
+
 #include <modm/architecture/interface/adc.hpp>
-#include "../device.hpp"
 
 {#- The ATtiny ADC module is also fragmented, these defines help a tiny bit -#}
 
@@ -43,14 +44,6 @@
 %% else
 	%% set has_ref = True
 %% endif
-
-%% if target["name"] in ['26']
-	%% set adfr = 1
-%% endif
-%% if target["name"] in ['261', '461', '861', '828']
-	%% set mux5 = 1
-%% endif
-
 
 %% if target["name"] in ['20', '40', '828', '1634', '24', '44', '84']
 	%% set adlar_reg = 'ADCSRB'
@@ -88,7 +81,7 @@
 namespace modm
 {
 
-namespace attiny
+namespace avr
 {
 
 /**
@@ -111,7 +104,7 @@ namespace attiny
  * needed the frequency can be higher.
  *
  * @author	Niklas Hauser
- * @ingroup	{{target.string}}_adc
+ * @ingroup	{{partname}}_adc
  */
 class Adc : public modm::Adc
 {
@@ -299,7 +292,6 @@ public:
 		disableAutoTrigger();
 %% endif
 	}
-
 
 	static inline void
 	setLeftAdjustResult()

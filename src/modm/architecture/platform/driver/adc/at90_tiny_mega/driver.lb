@@ -1,0 +1,92 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2017, Fabian Greif
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = "adc"
+    module.parent = "platform"
+
+def prepare(module, options):
+    device = options[":target"]
+    if not device.has_driver("adc:avr"):
+        return False
+
+    target = device.identifier
+    if target["type"] in ["hve2"]:
+        # The ATmega64hve2 is not supported by this driver.
+        return False
+
+    module.depends([":platform:core"])
+    return True
+
+def build(env):
+    device = env[":target"]
+    driver = device.get_driver("adc")
+
+    properties = device.properties
+    properties["target"] = target = device.identifier
+    properties["partname"] = device.partname
+    properties["driver"] = driver
+
+    properties["adfr"] = False
+    properties["mux5"] = False
+    properties["nomux4"] = False
+    properties["adhsm"] = False
+    properties["adcsrb"] = False
+    properties["vadc"] = False
+    properties["sfior"] = False
+
+    if target["family"] == "tiny":
+        if target["name"] in ['26']:
+            properties["adfr"] = True
+
+        if target["name"] in ['261', '461', '861', '828']:
+            properties["mux5"] = True
+
+    # The ATmega ADC module is incredibly fragmented, these defines
+    # help a tiny bit
+    if target["family"] == "mega":
+        if target["name"] in ['16', '32', '64'] and target["type"] in ['m1', 'c1']:
+            properties["adcsrb"] = 'AREFEN'
+        elif target["name"] in ['64', '128', '256', '644', '1284', '2564'] and target["type"] in ['rfa1', 'rfr2']:
+            properties["adcsrb"] = 'REFOK'
+
+        if target["name"] in ['8', '16', '32'] and target["type"] in ['hva', 'hvab', 'hvabrevb', 'hvb', 'hvbrevb']:
+            properties["vadc"] = True
+
+        if target["name"] in ['8', '128'] and target["type"] in ['a', '']:
+            properties["adfr"] = True
+
+        if (target["name"] in ['16', '32'] and target["type"] in ['u4']) or \
+                (target["name"] in ['640', '1280', '2560'] and target["type"] in ['']) or \
+                (target["name"] in ['64', '128', '256', '644', '1284', '2564'] and target["type"] in ['rfa1', 'rfr2']):
+            properties["mux5"] = True
+
+        if target["name"] in ['8', '48', '88', '168', '328'] and target["type"] in ['a', '', 'p', 'pa']:
+            properties["nomux4"] = True
+
+        if target["name"] in ['16', '32', '8535'] and target["type"] in ['a', '']:
+            properties["sfior"] = True
+
+        # ADC High Speed Mode has been removed from some chips
+        if target["name"] in ['8', '16', '32', '64'] and target["type"] in ['m1', 'u4', 'c1', 'u6']:
+            properties["adhsm"] = True
+
+    env.substitutions = properties
+    env.outbasepath = "src/modm/platform/adc"
+
+    env.template("adc_interrupt.hpp.in")
+    env.template("adc_interrupt.cpp.in")
+
+    if properties["family"] == "mega":
+        env.template("adc_mega.hpp.in", "adc.hpp")
+    elif properties["family"] == "tiny":
+        env.template("adc_tiny.hpp.in", "adc.hpp")

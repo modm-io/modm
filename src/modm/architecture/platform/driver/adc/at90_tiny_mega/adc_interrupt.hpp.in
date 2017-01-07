@@ -9,8 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_{{ target["family"] | upper }}_ADC_INTERRUPT_HPP
-#define MODM_{{ target["family"] | upper }}_ADC_INTERRUPT_HPP
+#ifndef MODM_AVR_ADC_INTERRUPT_HPP
+#define MODM_AVR_ADC_INTERRUPT_HPP
 
 #include <modm/utils/dummy.hpp>
 #include "adc.hpp"
@@ -20,15 +20,15 @@
 namespace modm
 {
 
-namespace {{ target["family"] }}
+namespace avr
 {
 
 /**
  * @author		Niklas Hauser
  *
- * @ingroup		{{target.string}}_adc
+ * @ingroup		{{partname}}_adc
  */
-class AdcInterrupt : public Adc, public modm::AdcInterrupt
+class AdcInterrupt : public modm::avr::Adc, public modm::AdcInterrupt
 {
 public:
 	static inline void
@@ -41,8 +41,8 @@ public:
 	static Handler handler;
 };
 
-}	// namespace {{ target["family"] }}
+}	// namespace avr
 
 }	// namespace modm
 
-#endif // MODM_{{ target["family"] | upper }}_ADC_INTERRUPT_HPP
+#endif // MODM_AVR_ADC_INTERRUPT_HPP

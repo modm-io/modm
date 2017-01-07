@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2015, Niklas Hauser
  * Copyright (c) 2016, Sascha Schade
- * Copyright (c) 2016, Fabian Greif
+ * Copyright (c) 2016-2017, Fabian Greif
  *
  * This file is part of the modm project.
  *
@@ -12,29 +12,24 @@
 // ----------------------------------------------------------------------------
 
 /**
- * @ingroup 	{{target.string}}
- * @defgroup	{{target.string}}_adc ADC
+ * @ingroup 	{{partname}}
+ * @defgroup	{{partname}}_adc ADC
  */
 
 #ifndef MODM_ATMEGA_ADC_HPP
 #define MODM_ATMEGA_ADC_HPP
 
 #include <modm/architecture/interface/adc.hpp>
-#include "../device.hpp"
+//#include "../device.hpp"
 
 #if defined (__AVR_ATmega64HVE__) || defined(__AVR_ATmega64HVE2__)
 #	error "The ATmega64HVE2 is not supported by this ADC class."
 #endif
 
-{#- The ATmega ADC module is incredibly fragmented, these defines help a tiny bit #}
-%% if target["name"] in ['16', '32', '64'] and target["type"] in ['m1', 'c1']
-	%% set adcsrb = 'AREFEN'
-%% elif target["name"] in ['64', '128', '256', '644', '1284', '2564'] and target["type"] in ['rfa1', 'rfr2']
-	%% set adcsrb = 'REFOK'
-%% endif
-%% if target["name"] in ['8', '16', '32'] and target["type"] in ['hva', 'hvab', 'hvabrevb']
-	%% set vadc = 1
+%% if vadc
 // sane register definitions
+#define ADC_vect	VADC_vect
+
 #define ADC		VADC
 #define ADCSRA	VADCSR
 
@@ -44,29 +39,13 @@
 #define ADIF	VADCCIF
 #define ADIE	VADCCIE
 %% endif
-%% if target["name"] in ['8', '128'] and target["type"] in ['a', None]
-	%% set adfr = 1
-%% endif
-%% if (target["name"] in ['16', '32'] and target["type"] in ['u4']) or (target["name"] in ['640', '1280', '2560'] and target["type"] in [None]) or (target["name"] in ['64', '128', '256', '644', '1284', '2564'] and target["type"] in ['rfa1', 'rfr2'])
-	%% set mux5 = 1
-%% endif
-%% if target["name"] in ['8', '48', '88', '168', '328'] and target["type"] in ['a', None, 'p', 'pa']
-	%% set nomux4 = 1
-%% endif
-%% if target["name"] in ['16', '32', '8535'] and target["type"] in ['a', None]
-	%% set sfior = 1
-%% endif
-{#- ADC High Speed Mode has been removed from some chips #}
-%% if target["name"] in ['8', '16', '32', '64'] and target["type"] in ['m1', 'u4', 'c1', 'u6', 'a']
-	%% set adhsm = 1
-%% endif
 
 %% set resolution = 10
 
 namespace modm
 {
 
-namespace atmega
+namespace avr
 {
 
 /**
@@ -89,7 +68,7 @@ namespace atmega
  * needed the frequency can be higher.
  *
  * @author	Niklas Hauser
- * @ingroup	{{target.string}}_adc
+ * @ingroup	{{partname}}_adc
  */
 class Adc : public modm::Adc
 {
@@ -101,13 +80,13 @@ public:
 	enum class
 	Reference : uint8_t
 	{
-	%% if adcsrb and adcsrb == 'AREFEN'
+	%% if adcsrb == 'AREFEN'
 		ExternalRef = 0x20,
 		InternalVcc = 0x60,
 		internalVccNoCapacitor = 0x40,
 		Internal2V56 = 0xe0,
 		Internal2V56NoCapacitor = 0xc0,
-	%% elif adcsrb and adcsrb == 'REFOK'
+	%% elif adcsrb == 'REFOK'
 		InternalRef = 0,
 		InternalVddNoCapacitor = 0x40,
 		Internal1V5NoCapacitor = 0x80,
@@ -227,7 +206,7 @@ public:
 	static inline bool
 	setChannel(Channel channel)
 	{
-%% if adcsrb and adcsrb == 'AREFEN'
+%% if adcsrb == 'AREFEN'
 		if (channel > 0x12) return false;
 %% elif mux5
 		if (channel > 0x3f) return false;
@@ -301,8 +280,6 @@ public:
 	}
 	// stop inherited documentation
 
-
-
 %% if not vadc
 	/**
 	 * voltage reference for the ADC
@@ -313,13 +290,12 @@ public:
 	static inline void
 	setReference(Reference reference)
 	{
-	%% if acdsrb and adcsrb == 'AREFEN'
+	%% if adcsrb == 'AREFEN'
 		ADCSRB = (ADCSRB & ~(1 << AREFEN)) | (uint8_t(reference) & (1 << AREFEN));
 	%% endif
 		ADMUX = (ADMUX & ~0xc0) | (uint8_t(reference) & 0xc0);
 	}
 %% endif
-
 
 	/// @return	`true` if the flag is set,
 	///			`false` otherwise
@@ -383,7 +359,7 @@ public:
 	static inline void
 	setAutoTriggerSource(uint8_t source)
 	{
-	%% if acdsrb and adcsrb == 'AREFEN'
+	%% if adcsrb == 'AREFEN'
 		if (source > 0x0d) return;
 	%% else
 		if (source > 0x07) return;
@@ -420,7 +396,7 @@ public:
 	}
 %% endif
 
-%% if acdsrb and adcsrb == 'AREFEN'
+%% if adcsrb and adcsrb == 'AREFEN'
 	/// Source a 100uA current to the AREF pin
 	static inline void
 	enableCurrentSource()
@@ -436,7 +412,7 @@ public:
 	}
 %% endif
 
-%% if acdsrb and adcsrb == 'REFOK'
+%% if adcsrb and adcsrb == 'REFOK'
 	/**
 	 * The analog functions of the ADC are powered from the AVDD domain.
 	 * AVDD is supplied from an internal voltage regulator.
