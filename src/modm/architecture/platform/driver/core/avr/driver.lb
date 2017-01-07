@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2017, Fabian Greif
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = "core"
+    module.parent = "platform"
+
+def prepare(module, options):
+    if not options[":target"].has_driver("core:avr"):
+        return False
+
+    module.depends([":architecture", ":stdc++"])
+
+    module.add_option(
+        EnumerationOption(
+            name="ram_block_length",
+            description="",
+            enumeration=["2", "4", "8", "16", "32", "64"],
+            default="16"))
+    module.add_option(
+        NumericOption(
+            name="ram_length",
+            description="",
+            minimum=64,
+            maximum=32768,
+            default=1024))
+
+    return True
+
+def build(env):
+    device = env[":target"]
+    driver = device.get_driver("core")
+
+    properties = device.properties
+    properties["target"] = target = device.identifier
+    properties["partname"] = device.partname
+    properties["driver"] = driver
+
+    env.substitutions = properties
+    env.outbasepath = "src/modm/platform/core"
+
+    env.copy("cxxabi.cpp")
+    env.copy("newdelete.cpp")
+    env.copy("ram.hpp")
+    env.copy("main.hpp")
+    env.copy("assert.cpp")
+
+    env.template("ram.cpp.in")
+    env.template("interrupts.hpp.in")
+
+    if properties["family"] == "xmega":
+        env.copy("utils.hpp")
+        env.copy("utils.cpp")

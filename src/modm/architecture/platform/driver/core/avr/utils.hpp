@@ -17,7 +17,7 @@
 
 #include <stddef.h>		// for offsetof()
 #include <modm/architecture/utils.hpp>
-#include "../../../device.hpp"
+//#include "../../../device.hpp"
 
 namespace modm
 {

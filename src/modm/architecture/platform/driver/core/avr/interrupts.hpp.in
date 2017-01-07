@@ -11,23 +11,21 @@
  */
 // ----------------------------------------------------------------------------
 
-{{ generation_block }}
-
 #ifndef MODM_AVR_INTERRUPTS_HPP
 #define MODM_AVR_INTERRUPTS_HPP
 
-#include "../device.hpp"
+//#include "../device.hpp"
 
 /**
- * @ingroup 	{{target.string}}
- * @defgroup	{{target.string}}_core Core
+ * @ingroup 	{{partname}}
+ * @defgroup	{{partname}}_core Core
  */
 
 namespace modm
 {
 
-/// @ingroup	{{target.string}}_core
-namespace {{ target["family"] }}
+/// @ingroup	{{partname}}_core
+namespace avr
 {
 
 /// enables global interrupts
@@ -112,7 +110,7 @@ disableInterruptLevel(InterruptControlLevel level)
 }
 %% endif
 
-}	// namespace {{ target["family"] }}
+}	// namespace avr
 
 }	// namespace modm
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2011, 2016, Fabian Greif
+ * Copyright (c) 2009-2011, 2016-2017, Fabian Greif
  * Copyright (c) 2010, Martin Rosekeit
  * Copyright (c) 2012-2016, Niklas Hauser
  * Copyright (c) 2013, Sascha Schade
@@ -19,16 +19,16 @@
 
 // ----------------------------------------------------------------------------
 // must be a power of two!
-#define	BLOCK_SIZE			{{parameters.ram_block_length}}
+#define	BLOCK_SIZE			{{ options["ram_block_length"] }}
 // maximal number of parts forming a memory field
-#define	MAX_BLOCK_PARTS		({{parameters.ram_length}} / {{parameters.ram_block_length}})
+#define	MAX_BLOCK_PARTS		({{ options["ram_length"] }} / {{ options["ram_block_length"] }})
 
 static_assert(MAX_BLOCK_PARTS <= 127, "Core: MAX_BLOCK_PARTS must be <= 127, you must increase block size!");
 
 #ifdef	__AVR__
 
 	// Needed for definition of AVR_STACK_POINTER_REG.
-	#include "../device.hpp"
+	//#include "../device.hpp"
 	#define STACK_POINTER() ((char *)AVR_STACK_POINTER_REG)
 
 	extern char	__heap_start;
