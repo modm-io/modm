@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013-2016, Niklas Hauser
- * Copyright (c) 2016, Fabian Greif
+ * Copyright (c) 2016-2017, Fabian Greif
  *
  * This file is part of the modm project.
  *
@@ -10,12 +10,10 @@
  */
 // ----------------------------------------------------------------------------
 
-{{ generation_block }}
+#ifndef MODM_AVR_GPIO_HPP
+#define MODM_AVR_GPIO_HPP
 
-#ifndef MODM_{{target["family"] | upper}}_GPIO_HPP
-#define MODM_{{target["family"] | upper}}_GPIO_HPP
-
-#include "../device.hpp"
+//#include "../device.hpp"
 #include "type_ids.hpp"
 #include "gpio_define.h"
 #include <modm/architecture/interface/gpio.hpp>
@@ -24,22 +22,22 @@
 
 /**
  * @ingroup 	platform
- * @defgroup	{{target.string}}
+ * @defgroup	{{partname}}
  */
 
 /**
- * @ingroup 	{{target.string}}
- * @defgroup	{{target.string}}_gpio GPIO
+ * @ingroup 	{{partname}}
+ * @defgroup	{{partname}}_gpio GPIO
  */
 
 
 namespace modm
 {
 
-namespace {{target["family"]}}
+namespace avr
 {
 
-/// @ingroup	{{target.string}}_gpio
+/// @ingroup	{{partname}}_gpio
 struct Gpio
 {
 	/// Each Input Pin can be configured in one of these states.
@@ -64,8 +62,8 @@ struct Gpio
 	enum class
 	Port
 	{
-%% for port in gpios | getPorts
-		{{ port.name | upper }},
+%% for port in ports
+		{{ port | upper }},
 %% endfor
 	};
 
@@ -84,7 +82,7 @@ protected:
  * You must use this class for `SoftwareI2cMaster`!
  *
  * @see ::modm::SoftwareI2cMaster
- * @ingroup	{{target.string}}_gpio
+ * @ingroup	{{partname}}_gpio
  * @{
  */
 %% for name in ['GpioOpenDrain', 'GpioOpenDrainWithPullUp']
@@ -151,7 +149,7 @@ public:
 		%% set superclass = "Gpio" ~ type
 
 /// {{type}} class for Pin {{port ~ pin}}
-/// @ingroup	{{target.string}}_gpio
+/// @ingroup	{{partname}}_gpio
 struct {{name}} : public Gpio, ::modm::{{superclass}}
 {
 public:
@@ -297,7 +295,7 @@ public:
 		setInput(InputType::Floating);
 		%% endif
 	}
-		%% for af in gpio.afs
+		%% for af in gpio.get("af", []) | lbuild.listify
 			%% if (	(af.type == 'in' and type == 'Input') or
 					(af.type == 'out' and type == 'Output') or
 					(af.type == 'io' or type == 'IO')	)
@@ -354,7 +352,7 @@ class GpioPortBase;
  *
  * @tparam	StartPin	a Gpio pin
  * @tparam	Width		required width of the port (up to 8)
- * @ingroup {{target.string}}_gpio
+ * @ingroup {{partname}}_gpio
  */
 template< class StartPin, uint8_t Width, ::modm::GpioPort::DataOrder PortOrder = GpioPort::DataOrder::Normal >
 class GpioPort : public ::modm::GpioPort, /** @cond */ public GpioPortBase< StartPin::port, StartPin::pin, Width, PortOrder > /** @endcond */
@@ -387,7 +385,7 @@ public:
 };
 
 /// @cond
-%% for port in gpios | getPorts
+%% for port in gpios | portRanges
 template< uint8_t StartPin, uint8_t Width, ::modm::GpioPort::DataOrder PortOrder >
 class GpioPortBase<Gpio::Port::{{port.name}}, StartPin, Width, PortOrder> : public Gpio
 {
@@ -527,7 +525,7 @@ public:
 %% endfor
 /// @endcond
 
-}	// namespace {{target["family"]}}
+}	// namespace avr
 
 }	// namespace modm
 

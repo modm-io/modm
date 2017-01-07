@@ -1,0 +1,91 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2017, Fabian Greif
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def filter_port_ranges(gpios):
+    """
+    This filter accepts a list of gpios as e.g. used by the stm32af driver
+    and tries to extract information about port which is returned as a list
+    of dictionaries with the following structure:
+    {'name': "C", 'startPin': 0, 'width': 16}
+    """
+    # collect information on available gpios
+    port_ids = {}
+    for gpio in gpios:
+        if not gpio['port'] in port_ids:
+            port_ids[gpio['port']] = [0] * 16
+        port_ids[gpio['port']][int(gpio['id'])] = 1
+    # create port list
+    ports = []
+    for name, ids in port_ids.items():
+        # if the port consists of at least one gpio pin
+        if 1 in ids:
+            port = {}
+            port['name'] = name
+            # find start pin as well as width
+            ii = ids.index(1)
+            port['startPin'] = ii
+            while ii < 16 and ids[ii] == 1:
+                ii = ii + 1
+            port['width'] = ii - port['startPin']
+            ports.append(port)
+    return ports
+
+def init(module):
+    module.name = "gpio"
+    module.parent = "platform"
+
+def prepare(module, options):
+    if not options[":target"].has_driver("gpio:avr"):
+        return False
+
+    module.depends([":platform:core"])
+    return True
+
+def build(env):
+    device = env[":target"]
+    driver = device.get_driver("gpio")
+
+    properties = device.properties
+    properties["target"] = target = device.identifier
+    properties["partname"] = device.partname
+    properties["driver"] = driver
+
+    properties["gpios"] = driver["gpio"]
+    properties["ports"] = sorted(list(set([p["port"] for p in driver["gpio"]])))
+
+    if (target["family"] == "mega" and target["name"] in ["8", "16", "32", "64", "128", "162", "8515", "8535"]) or \
+            (target["family"] == "tiny" and target["name"] in ["26"]):
+        properties["notoggle"] = True
+    else:
+        properties["notoggle"] = False
+
+    if target["family"] == "tiny" and target["name"] in ["4", "5", "9", "10", "20", "40", "828", "1634"]:
+        properties["pue"] = True
+    else:
+        properties["pue"] = False
+
+    if (target["family"] == "mega" and target["name"] in ["8", "16", "32", "162", "8515", "8535"]) or \
+            (target["family"] == "tiny" and target["name"] in ["13", "24", "25", "44", "45", "84", "85", "261", "461", "861"]):
+        properties["eicra"] = "MCUCR"
+
+    if target["family"] == "mega" and target["name"] in ["8", "16", "32", "8515", "8535"]:
+        properties["isc2"] = "MCUCSR"
+    if target["family"] == "mega" and target["name"] in ["162"]:
+        properties["isc2"] = "EMCUCR"
+
+    env.substitutions = properties
+    env.outbasepath = "src/modm/platform/gpio"
+
+    env.copy("gpio_define.h")
+    env.template("gpio.hpp.in", filters={
+                        "portRanges": filter_port_ranges,
+                    })
