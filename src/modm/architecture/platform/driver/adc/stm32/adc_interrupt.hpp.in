@@ -50,8 +50,8 @@ public:
 	static Handler handler;
 };
 
-}	// namespace {{ target["family"] }}
+}	// namespace stm32
 
 }	// namespace modm
 
-#endif // MODM_{{ target["family"] | upper }}_ADC_INTERRUPT_HPP
+#endif // MODM_STM32_ADC_INTERRUPT_HPP

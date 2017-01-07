@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2013, Kevin Laeufer
  * Copyright (c) 2014-2015, Niklas Hauser
+ * Copyright (c) 2017, Fabian Greif
  *
  * This file is part of the modm project.
  *
@@ -10,14 +11,12 @@
  */
 // ----------------------------------------------------------------------------
 
-{{ generation_block }}
-
 #ifndef MODM_STM32_COMP{{ id }}_HPP
 #define MODM_STM32_COMP{{ id }}_HPP
 
 /**
- * @ingroup 	{{target.string}}
- * @defgroup	{{target.string}}_comp Comparator
+ * @ingroup 	{{partname}}
+ * @defgroup	{{partname}}_comp Comparator
  */
 
 #if defined(STM32F3XX)
@@ -32,7 +31,7 @@ namespace modm
 		 * ST's STM32F3 microcontroller series.
 		 *
 		 * @internal
-		 * @ingroup		{{target.string}}_comp
+		 * @ingroup		{{partname}}_comp
 		 */
 		class Comp{{ id }}
 		{

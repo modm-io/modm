@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, Sascha Schade
- * Copyright (c) 2012, Fabian Greif
+ * Copyright (c) 2012, 2017, Fabian Greif
  * Copyright (c) 2012-2014, 2016, Niklas Hauser
  * Copyright (c) 2013, Kevin Laeufer
  *
@@ -11,8 +11,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 // ----------------------------------------------------------------------------
-
-{{ generation_block }}
 
 #ifndef MODM_LPC11_SPI_{{ id }}_HPP
 #define MODM_LPC11_SPI_{{ id }}_HPP
@@ -248,14 +246,14 @@ namespace modm
 			 * \brief	Write a single byte with the SPI.
 			 *
 			 * The data is put into the FIFO but it blocks until the data
-			 * was sent and data from the device is available.  
+			 * was sent and data from the device is available.
 			 */
 			static uint8_t
 			write(uint8_t data);
 
 			// static void
 			// write(uint8_t * data, uint8_t size);
-			
+
 			static bool
 			setBuffer(uint16_t length,
 					  uint8_t* transmit=0, uint8_t* receive=0,
@@ -263,10 +261,10 @@ namespace modm
 
 			static bool
 			transfer(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
-			
+
 			static modm_always_inline bool
 			transferSync(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
-			
+
 			static bool
 			isFinished();
 
