@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2013-2016, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
+ * Copyright (c) 2017, Fabian Greif
  *
  * This file is part of the modm project.
  *
@@ -10,42 +11,64 @@
  */
 // ----------------------------------------------------------------------------
 
+%% if id == ""
+#include "uart_spi_master.hpp"
+%% else
 #include "uart_spi_master_{{ id }}.hpp"
+%% endif
+
 #include <modm/architecture/driver/atomic.hpp>
 #include <modm/math/utils/bit_operation.hpp>
 #include <modm/architecture/interface/register.hpp>
 
-%% if extended is not defined
-modm::{{target["family"]}}::UartSpiMaster{{id}}::DataOrder
-modm::{{target["family"]}}::UartSpiMaster{{id}}::dataOrder = DataOrder::MsbFirst;
+%% if not extended
+modm::avr::UartSpiMaster{{id}}::DataOrder
+modm::avr::UartSpiMaster{{id}}::dataOrder = DataOrder::MsbFirst;
 %% endif
 
 // bit 7 (0x80) is used for transfer 1 byte
 // bit 6 (0x40) is used for transfer multiple byte
 // bit 5-0 (0x3f) are used to store the acquire count
 uint8_t
-modm::{{target["family"]}}::UartSpiMaster{{id}}::state(0);
+modm::avr::UartSpiMaster{{id}}::state(0);
 
 void *
-modm::{{target["family"]}}::UartSpiMaster{{id}}::context(nullptr);
+modm::avr::UartSpiMaster{{id}}::context(nullptr);
 
 modm::Spi::ConfigurationHandler
-modm::{{target["family"]}}::UartSpiMaster{{id}}::configuration(nullptr);
+modm::avr::UartSpiMaster{{id}}::configuration(nullptr);
 // ----------------------------------------------------------------------------
 
 void
-modm::{{target["family"]}}::UartSpiMaster{{id}}::initialize(uint16_t prescaler)
+modm::avr::UartSpiMaster{{id}}::initialize(uint16_t prescaler)
 {
 	modm::atomic::Lock lock;
 
+#if defined(UBRR{{ id }})
 	UBRR{{ id }} = 0;
+#else
+	UBRRL = 0;
+	UBRRH = 0;
+#endif
+
+#if defined(UMSEL)
+	UCSRC = (1 << UMSEL);
+#else
 	// set MSPI mode of operation and SPI data mode
 	UCSR{{ id }}C = (1 << UMSEL{{id}}1) | (1 << UMSEL{{id}}0);
+#endif
+
 	// enable receiver and transmitter
 	UCSR{{ id }}B = (1 << RXEN{{id}}) | (1 << TXEN{{id}});
 	// set baudrate _after_ enabling transmitter
+#if defined(UBRR{{ id }})
 	UBRR{{ id }} = prescaler;
-%% if extended is not defined
+#else
+	UBRRH = (prescaler >> 8) & 0xFF;
+	UBRRL =  prescaler & 0xFF;
+#endif
+
+%% if not extended
 	dataOrder = DataOrder::MsbFirst;
 %% endif
 	state &= 0x3f;
@@ -53,7 +76,7 @@ modm::{{target["family"]}}::UartSpiMaster{{id}}::initialize(uint16_t prescaler)
 // ----------------------------------------------------------------------------
 
 uint8_t
-modm::{{target["family"]}}::UartSpiMaster{{id}}::acquire(void *ctx, ConfigurationHandler handler)
+modm::avr::UartSpiMaster{{id}}::acquire(void *ctx, ConfigurationHandler handler)
 {
 	if (context == nullptr)
 	{
@@ -74,7 +97,7 @@ modm::{{target["family"]}}::UartSpiMaster{{id}}::acquire(void *ctx, Configuratio
 }
 
 uint8_t
-modm::{{target["family"]}}::UartSpiMaster{{id}}::release(void *ctx)
+modm::avr::UartSpiMaster{{id}}::release(void *ctx)
 {
 	if (ctx == context)
 	{
@@ -86,7 +109,7 @@ modm::{{target["family"]}}::UartSpiMaster{{id}}::release(void *ctx)
 // ----------------------------------------------------------------------------
 
 modm::ResumableResult<uint8_t>
-modm::{{target["family"]}}::UartSpiMaster{{id}}::transfer(uint8_t data)
+modm::avr::UartSpiMaster{{id}}::transfer(uint8_t data)
 {
 	// this is a manually implemented "fast resumable function"
 	// there is no context or nesting protection, since we don't need it.
@@ -101,7 +124,7 @@ modm::{{target["family"]}}::UartSpiMaster{{id}}::transfer(uint8_t data)
 		if (!((UCSR{{id}}A & (1 << UDRE{{id}}))))
 			return {modm::rf::Running};
 
-%% if extended is not defined
+%% if not extended
 		if(dataOrder == DataOrder::MsbFirst) {
 			data = ::modm::bitReverse(data);
 		}
@@ -117,7 +140,7 @@ modm::{{target["family"]}}::UartSpiMaster{{id}}::transfer(uint8_t data)
 		return {modm::rf::Running};
 
 	data = UDR{{id}};
-%% if extended is not defined
+%% if not extended
 	if(dataOrder == DataOrder::MsbFirst) {
 		data = ::modm::bitReverse(data);
 	}
@@ -128,7 +151,7 @@ modm::{{target["family"]}}::UartSpiMaster{{id}}::transfer(uint8_t data)
 }
 
 modm::ResumableResult<void>
-modm::{{target["family"]}}::UartSpiMaster{{id}}::transfer(
+modm::avr::UartSpiMaster{{id}}::transfer(
 		uint8_t *tx, uint8_t *rx, std::size_t length)
 {
 	// this is a manually implemented "fast resumable function"

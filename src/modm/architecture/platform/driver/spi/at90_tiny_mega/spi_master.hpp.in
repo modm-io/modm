@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2013-2016, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
+ * Copyright (c) 2017, Fabian Greif
  *
  * This file is part of the modm project.
  *
@@ -10,19 +11,20 @@
  */
 // ----------------------------------------------------------------------------
 
-{{ generation_block }}
+#ifndef MODM_AVR_SPI_MASTER{{ id }}_HPP
+#define MODM_AVR_SPI_MASTER{{ id }}_HPP
 
-#ifndef MODM_{{target["family"] | upper}}_SPI_MASTER_HPP
-#define MODM_{{target["family"] | upper}}_SPI_MASTER_HPP
+#include <avr/io.h>
 
 #include <modm/architecture/interface/spi_master.hpp>
+
 #include "type_ids.hpp"
-#include "spi.hpp"
+#include "spi{{ id }}.hpp"
 
 namespace modm
 {
 
-namespace {{target["family"]}}
+namespace avr
 {
 
 /**
@@ -38,28 +40,28 @@ namespace {{target["family"]}}
  *			hardware will switch into SPI slave mode. It is therefore necessary
  *			to configure the pin either in output mode or to pull it high.
  *
- * @ingroup		{{target.string}}_spi
+ * @ingroup		{{partname}}_spi
  * @author		Niklas Hauser
  */
-class SpiMaster : public ::modm::SpiMaster, private Spi
+class SpiMaster{{ id }} : public ::modm::SpiMaster, private Spi
 {
 	static uint8_t state;
 	static void *context;
 	static ConfigurationHandler configuration;
 public:
-	static const TypeId::SpiMasterMosi Mosi;
-	static const TypeId::SpiMasterMiso Miso;
-	static const TypeId::SpiMasterSck  Sck;
-	static const TypeId::SpiMasterSs   Ss;
+	static const TypeId::SpiMaster{{ id }}Mosi Mosi;
+	static const TypeId::SpiMaster{{ id }}Miso Miso;
+	static const TypeId::SpiMaster{{ id }}Sck  Sck;
+	static const TypeId::SpiMaster{{ id }}Ss   Ss;
 
 	/// Spi Data Mode, Mode0 is the most common mode
 	enum class
 	DataMode : uint8_t
 	{
 		Mode0 = 0,	///< clock normal,   sample on rising  edge
-		Mode1 = (1 << CPOL),	///< clock normal,   sample on falling edge
-		Mode2 = (1 << CPHA),	///< clock inverted, sample on rising  edge
-		Mode3 = (1 << CPOL) | (1 << CPHA),	///< clock inverted, sample on falling edge
+		Mode1 = (1 << CPOL{{ id }}),	///< clock normal,   sample on falling edge
+		Mode2 = (1 << CPHA{{ id }}),	///< clock inverted, sample on rising  edge
+		Mode3 = (1 << CPOL{{ id }}) | (1 << CPHA{{ id }}),	///< clock inverted, sample on falling edge
 	};
 
 public:
@@ -105,16 +107,16 @@ public:
 	static void
 	setDataMode(DataMode mode)
 	{
-		SPCR = (SPCR & ~((1 << CPOL) | (1 << CPHA))) | static_cast<uint8_t>(mode);
+		SPCR{{ id }} = (SPCR{{ id }} & ~((1 << CPOL{{ id }}) | (1 << CPHA{{ id }}))) | static_cast<uint8_t>(mode);
 	}
 
 	static void
 	setDataOrder(DataOrder order)
 	{
 		if (order == DataOrder::LsbFirst) {
-			SPCR |= (1 << DORD);
+			SPCR{{ id }} |= (1 << DORD{{ id }});
 		} else {
-			SPCR &= ~(1 << DORD);
+			SPCR{{ id }} &= ~(1 << DORD{{ id }});
 		}
 	}
 
@@ -129,7 +131,7 @@ public:
 	static uint8_t
 	transferBlocking(uint8_t data)
 	{
-%% if parameters.busywait
+%% if options["busywait"]
 		return transfer(data).getResult();
 %% else
 		return RF_CALL_BLOCKING(transfer(data));
@@ -139,7 +141,7 @@ public:
 	static void
 	transferBlocking(uint8_t *tx, uint8_t *rx, std::size_t length)
 	{
-%% if parameters.busywait
+%% if options["busywait"]
 		transfer(tx, rx, length);
 %% else
 		RF_CALL_BLOCKING(transfer(tx, rx, length));
@@ -159,8 +161,8 @@ protected:
 	initialize(Prescaler prescaler);
 };
 
-} // namespace {{target["family"]}}
+} // namespace avr
 
 } // namespace modm
 
-#endif // MODM_{{target["family"] | upper}}_SPI_MASTER_HPP
+#endif // MODM_AVR_SPI_MASTER_HPP

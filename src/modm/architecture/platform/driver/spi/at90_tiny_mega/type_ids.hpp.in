@@ -9,15 +9,13 @@
  */
 // ----------------------------------------------------------------------------
 
-{{ generation_block }}
-
-#ifndef MODM_{{target["family"] | upper}}_SPI_TYPE_IDS_HPP
-#define MODM_{{target["family"] | upper}}_SPI_TYPE_IDS_HPP
+#ifndef MODM_AVR_SPI_TYPE_IDS_HPP
+#define MODM_AVR_SPI_TYPE_IDS_HPP
 
 namespace modm
 {
 
-namespace {{target["family"]}}
+namespace avr
 {
 
 namespace TypeId
@@ -27,14 +25,19 @@ namespace TypeId
 	typedef struct{} SpiMasterSck;
 	typedef struct{} SpiMasterSs;
 
+	typedef struct{} SpiMaster0Mosi;
+	typedef struct{} SpiMaster0Miso;
+	typedef struct{} SpiMaster0Sck;
+	typedef struct{} SpiMaster0Ss;
+
 	typedef struct{} SpiSlaveSimo;
 	typedef struct{} SpiSlaveSomi;
 	typedef struct{} SpiSlaveSck;
 	typedef struct{} SpiSlaveSs;
 }
 
-} // namespace {{target["family"]}}
+} // namespace avr
 
 } // namespace modm
 
-#endif // MODM_{{target["family"] | upper}}_SPI_TYPE_IDS_HPP
+#endif // MODM_AVR_SPI_TYPE_IDS_HPP

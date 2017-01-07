@@ -9,23 +9,40 @@
  */
 // ----------------------------------------------------------------------------
 
-{{ generation_block }}
+#ifndef MODM_AVR_SPI_HPP
+#define MODM_AVR_SPI_HPP
 
-#ifndef MODM_{{target["family"] | upper}}_SPI_HPP
-#define MODM_{{target["family"] | upper}}_SPI_HPP
+#include <avr/io.h>
+
+%% if partname in ["attiny40"]
+%# The avr-libc Header files for the ATtiny40 is missing the following
+%# defines although they are meantioned in the datasheet.
+#define SPR0    0
+#define SPR1    1
+#define CPHA    2
+#define CPOL    3
+#define MSTR    4
+#define DORD    5
+#define SPE     6
+#define SPIE    7
+
+#define SPI2X   0
+#define WCOL    6
+#define SPIF    7
+%% endif
 
 /**
- * @ingroup 	{{target.string}}
- * @defgroup	{{target.string}}_spi SPI
+ * @ingroup 	{{partname}}
+ * @defgroup	{{partname}}_spi SPI
  */
 
 namespace modm
 {
 
-namespace {{target["family"]}}
+namespace avr
 {
 
-/// @ingroup	{{target.string}}_spi
+/// @ingroup	{{partname}}_spi
 struct Spi
 {
 	enum class
@@ -33,16 +50,16 @@ struct Spi
 	{
 		Div2 = 0x80 | 0,
 		Div4 = 0,
-		Div8 = 0x80 | (1 << SPR0),
-		Div16 = (1 << SPR0),
-		Div32 = 0x80 | (1 << SPR1),
-		Div64 = (1 << SPR1),
-		Div128 = (1 << SPR1) | (1 << SPR0),
+		Div8 = 0x80 | (1 << SPR0{{ id }}),
+		Div16 = (1 << SPR0{{ id }}),
+		Div32 = 0x80 | (1 << SPR1{{ id }}),
+		Div64 = (1 << SPR1{{ id }}),
+		Div128 = (1 << SPR1{{ id }}) | (1 << SPR0{{ id }}),
 	};
 };
 
-} // namespace {{target["family"]}}
+} // namespace avr
 
 } // namespace modm
 
-#endif	// MODM_{{target["family"] | upper}}_SPI_HPP
+#endif	// MODM_AVR_SPI_HPP

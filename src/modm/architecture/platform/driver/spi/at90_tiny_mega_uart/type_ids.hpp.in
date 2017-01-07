@@ -9,28 +9,26 @@
  */
 // ----------------------------------------------------------------------------
 
-{{ generation_block }}
-
-#ifndef MODM_{{target["family"] | upper}}_UART_SPI_TYPE_IDS_HPP
-#define MODM_{{target["family"] | upper}}_UART_SPI_TYPE_IDS_HPP
+#ifndef MODM_AVR_UART_SPI_TYPE_IDS_HPP
+#define MODM_AVR_UART_SPI_TYPE_IDS_HPP
 
 namespace modm
 {
 
-namespace {{target["family"]}}
+namespace avr
 {
 
 namespace TypeId
 {
-%% for id in [0,1,2,3]
+%% for id in ["", 0,1,2,3]
 	typedef struct{} UartSpiMaster{{ id }}Mosi;
 	typedef struct{} UartSpiMaster{{ id }}Miso;
 	typedef struct{} UartSpiMaster{{ id }}Sck;
 %% endfor
 }
 
-} // namespace {{target["family"]}}
+} // namespace avr
 
 } // namespace modm
 
-#endif // MODM_{{target["family"] | upper}}_UART_SPI_TYPE_IDS_HPP
+#endif // MODM_AVR_UART_SPI_TYPE_IDS_HPP
