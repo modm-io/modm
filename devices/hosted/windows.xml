@@ -4,6 +4,8 @@
   <device platform="hosted" family="windows">
     <naming-schema>{platform}-{family}</naming-schema>
 
+    <core value="x86"/>
+
     <driver type="graphics" compatible="hosted"/>
     <driver type="uart" compatible="hosted"/>
   </device>

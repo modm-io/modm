@@ -4,6 +4,8 @@
   <device platform="hosted" family="linux">
     <naming-schema>{platform}-{family}</naming-schema>
 
+    <core value="x86"/>
+
     <driver type="can" compatible="socketcan"/>
     <driver type="can" compatible="canusb"/>
     <driver type="core" compatible="hosted"/>
