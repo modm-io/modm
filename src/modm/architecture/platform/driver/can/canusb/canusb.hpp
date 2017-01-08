@@ -20,7 +20,7 @@
 #include <string>
 
 // FIXME: remove this dependency!
-#include "../../uart/hosted/serial_interface.hpp"
+#include "../uart/serial_interface.hpp"
 #include <modm/architecture/interface/can.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread.hpp>

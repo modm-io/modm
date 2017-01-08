@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2017, Fabian Greif
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = "core"
+    module.parent = "platform"
+
+def prepare(module, options):
+    device = options[":target"]
+    target = device.identifier
+    if target["platform"] != "hosted":
+        return False
+
+    module.depends([":architecture", ":debug"])
+
+    return True
+
+def build(env):
+    device = env[":target"]
+    properties = device.properties
+    properties["target"] = target = device.identifier
+    properties["partname"] = device.partname
+    properties["driver"] = device.get_driver("core")
+
+    env.substitutions = properties
+    env.outbasepath = "src/modm/platform/core"
+
+    env.copy("assert.cpp")
