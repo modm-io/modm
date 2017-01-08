@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "../generic/common_clock.hpp"
+#include "common_clock.hpp"
 
 #include <modm/architecture/detect.hpp>
 

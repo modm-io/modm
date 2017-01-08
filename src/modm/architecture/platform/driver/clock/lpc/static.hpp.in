@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-%%	import '../generic/static.macros' as static with context
+%%	import 'static.macros' as static with context
 
 #ifndef MODM_LPC_STATIC_HPP
 #define MODM_LPC_STATIC_HPP

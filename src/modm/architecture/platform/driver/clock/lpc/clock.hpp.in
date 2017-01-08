@@ -15,8 +15,8 @@
 #define MODM_LPC_CLOCK_HPP
 
 #include <stdint.h>
-#include "../common_clock.hpp"
-#include "../device.hpp"
+#include "common_clock.hpp"
+#include <modm/platform/device.hpp>
 // #include "static.hpp"
 
 using namespace modm::clock;

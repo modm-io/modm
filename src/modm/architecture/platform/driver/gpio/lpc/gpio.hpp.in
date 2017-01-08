@@ -15,7 +15,9 @@
 #define MODM_LPC_GPIO_HPP
 
 #include "../device.hpp"
-#include "type_ids.hpp"
+
+#include <modm/platform/spi/software_type_ids.hpp>
+#include <modm/platform/i2c/software_type_ids.hpp>
 
 // TODO: Move to common file
 #define SYSAHBCLKCTRL_GPIO		(1<<6)
@@ -108,11 +110,11 @@ public:
 /**
  * Gpio Classes created from the XML Device File Gpio Description
  */
-%% for gpio in gpios
-	%% set functions = gpio.func|split(',')
-	%% set bits      = gpio.bits|split(',')
+%% for gpio in driver.gpio
+	%% set functions = gpio.func.split(',')
+	%% set bits      = gpio.bits.split(',')
 	%% set pin  = gpio.id
-	%% if gpio.define
+	%% if "define" in gpio
 		%% set conf_reg  = "LPC_IOCON->" ~ gpio.define
 	%% elif functions[0]|lower == 'reserved'
 		%% set conf_reg  = "LPC_IOCON->R_PIO" ~ gpio.port ~ "_" ~ pin

@@ -15,7 +15,9 @@
 // ----------------------------------------------------------------------------
 
 #include "c_can_filter.hpp"
-#include "../../../device.hpp"
+
+#include <modm/platform/device.hpp>
+
 // ----------------------------------------------------------------------------
 void
 modm::lpc::CanFilter::setFilter(

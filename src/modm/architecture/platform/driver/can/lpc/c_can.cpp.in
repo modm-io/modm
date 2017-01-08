@@ -2,7 +2,7 @@
  * Copyright (c) 2012, 2016, Sascha Schade
  * Copyright (c) 2013-2014, Kevin Laeufer
  * Copyright (c) 2014, 2016, Niklas Hauser
- * Copyright (c) 2016, Fabian Greif
+ * Copyright (c) 2016-2017, Fabian Greif
  *
  * This file is part of the modm project.
  *
@@ -27,12 +27,12 @@ namespace modm
 {
 namespace lpc
 {
-#if LPC11C_CAN_TX_BUFFER_SIZE > 0
-modm::atomic::Queue<modm::can::Message, LPC11C_CAN_TX_BUFFER_SIZE> txQueue;
-#endif
-#if LPC11C_CAN_RX_BUFFER_SIZE > 0
-modm::atomic::Queue<modm::can::Message, LPC11C_CAN_RX_BUFFER_SIZE> rxQueue;
-#endif
+%% if options["buffer.tx"] > 0
+modm::atomic::Queue<modm::can::Message, {{ options["buffer.tx"] }}> txQueue;
+%% endif
+%% if options["buffer.rx"] > 0
+modm::atomic::Queue<modm::can::Message, {{ options["buffer.rx"] }}> rxQueue;
+%% endif
 }
 }
 
@@ -154,7 +154,7 @@ modm::lpc::Can::getBusState()
 void
 modm::lpc::Can::CAN_tx(uint8_t /* msg_obj_num */)
 {
-#if LPC11C_CAN_TX_BUFFER_SIZE > 0
+%% if options["buffer.tx"] > 0
 	// Send next from queue, if available
 
 	// MOBs 16 to 32 are in TXREQ2, at the *lower* bits
@@ -191,7 +191,7 @@ modm::lpc::Can::CAN_tx(uint8_t /* msg_obj_num */)
 			}
 		}
 	}
-#endif
+%% endif
 }
 
 // ----------------------------------------------------------------------------
@@ -202,7 +202,7 @@ modm::lpc::Can::CAN_tx(uint8_t /* msg_obj_num */)
  * Called on the interrupt level by the CAN interrupt handler when
  * a new message has been successfully received.
  */
-#if LPC11C_CAN_RX_BUFFER_SIZE > 0
+%% if options["buffer.rx"] > 0
 void
 modm::lpc::Can::CAN_rx(uint8_t msg_obj_num)
 {
@@ -228,12 +228,12 @@ modm::lpc::Can::CAN_rx(uint8_t msg_obj_num)
 	}
 
 }
-#else
+%% else
 void
 modm::lpc::Can::CAN_rx(uint8_t /* msg_obj_num */)
 {
 }
-#endif
+%% endif
 
 // ----------------------------------------------------------------------------
 
@@ -270,7 +270,7 @@ modm::lpc::Can::sendMessage(const can::Message & message)
 	{
 		/* All Message Objects used for sending (17 to 32) are pending
 		 * at the moment. */
-#if LPC11C_CAN_TX_BUFFER_SIZE > 0
+%% if options["buffer.tx"] > 0
 		if (!txQueue.push(message)) {
 			modm::ErrorReport::report(modm::lpc::CAN_TX_OVERFLOW);
 			// All Message Objects are full and no space left in software buffer.
@@ -278,10 +278,10 @@ modm::lpc::Can::sendMessage(const can::Message & message)
 		}
 		// All Message Objects are full but message was stored in software buffer.
 		return true;
-#else
+%% else
 		// All Message Objects are full and no software buffers are available.
 		return false;
-#endif
+%% endif
 	}
 	else
 	{
@@ -304,7 +304,7 @@ modm::lpc::Can::sendMessage(const can::Message & message)
 bool
 modm::lpc::Can::getMessage(can::Message & message)
 {
-#if LPC11C_CAN_RX_BUFFER_SIZE > 0
+%% if options["buffer.rx"] > 0
 	if (rxQueue.isEmpty())
 	{
 		// no message in the receive buffer
@@ -328,7 +328,7 @@ modm::lpc::Can::getMessage(can::Message & message)
 		}
 		return true;
 	}
-#else
+%% else
 	// No interrupts, polling
 	if (LPC_CAN->ND1 & 0xffff)
 	{
@@ -340,7 +340,7 @@ modm::lpc::Can::getMessage(can::Message & message)
 		// No message available
 		return false;
 	}
-#endif
+%% endif
 }
 
 // ----------------------------------------------------------------------------
@@ -348,13 +348,13 @@ modm::lpc::Can::getMessage(can::Message & message)
 bool
 modm::lpc::Can::isMessageAvailable()
 {
-#if LPC11C_CAN_RX_BUFFER_SIZE > 0
+%% if options["buffer.rx"] > 0
 	return !rxQueue.isEmpty();
-#else
+%% else
 	/* Check if new data is available in the Message
 	 * Objects 1 to 16. */
 	return (LPC_CAN->ND1 & 0xffff);
-#endif
+%% endif
 }
 
 // ----------------------------------------------------------------------------
@@ -362,12 +362,12 @@ modm::lpc::Can::isMessageAvailable()
 bool
 modm::lpc::Can::isReadyToSend()
 {
-#if LPC11C_CAN_TX_BUFFER_SIZE > 0
+%% if options["buffer.tx"] > 0
 	return txQueue.isNotFull();
-#else
+%% else
 	/* Check if at least one Message Object 17 to 32
 	 * is not pending. If not all are pending at least
 	 * one is free. */
 	return ( (LPC_CAN->TXREQ2 & 0xffff) != 0xffff );
-#endif
+%% endif
 }

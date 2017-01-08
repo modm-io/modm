@@ -1,0 +1,49 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2017, Fabian Greif
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+import os
+
+def init(module):
+    module.name = "cmsis.device"
+
+def prepare(module, options):
+    device = options[":target"]
+    if not device.identifier["platform"] == "lpc":
+        return False
+
+    module.depends([":cmsis"])
+    return True
+
+def build(env):
+    device = env[":target"]
+
+    env.outbasepath = "ext/cmsis_device"
+
+    defines = []
+    headers = []
+
+    folder = "lpc{}xx".format(device.identifier["family"])
+    for header in listify(device.properties["header"]):
+        env.copy(os.path.join(folder, "Include", header), header)
+        headers.append(header)
+    defines = listify(device.properties.get("define", []))
+
+    env.copy(os.path.join(folder, "Include"))
+    env.copy(os.path.join(folder, "driver/rom_drivers.h"), "nxp/lpc11xx/driver/rom_drivers.h")
+    env.copy(os.path.join(folder, "driver/rom_driver_CAN.h"), "nxp/lpc11xx/driver/rom_driver_CAN.h")
+
+    env.substitutions = {
+        'headers': headers,
+        'defines': defines,
+    }
+    env.outbasepath = "src/modm/platform"
+    env.template("device.hpp.in")

@@ -1,8 +1,0 @@
-<?xml version='1.0' encoding='UTF-8' ?>
-<!DOCTYPE rca SYSTEM "../../xml/driver.dtd">
-<rca version="1.0">
-	<driver type="gpio" name="lpc">
-		<template>gpio.hpp.in</template>
-		<static>gpio_enable.cpp</static>
-	</driver>
-</rca>

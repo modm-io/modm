@@ -2,7 +2,7 @@
  * Copyright (c) 2012, 2016, Sascha Schade
  * Copyright (c) 2013-2016, Niklas Hauser
  * Copyright (c) 2013-2014, Kevin Laeufer
- * Copyright (c) 2016, Fabian Greif
+ * Copyright (c) 2016-2017, Fabian Greif
  *
  * This file is part of the modm project.
  *
@@ -15,7 +15,7 @@
 #include <modm/architecture/driver/atomic.hpp>
 
 #include "../device.hpp"
-#include "../clock/lpc/clock.hpp"
+#include "../clock/clock.hpp"
 
 #include "uart_1.hpp"
 #include "lpc11_uart_registers.hpp"
@@ -26,11 +26,11 @@ namespace
 {
 // If requested buffer size is larger than hardware buffer size create a
 // software queue for the remaining bytes.
-%% if parameters.rx_buffer > 16
-	static modm::atomic::Queue<uint8_t, {{ parameters.rx_buffer }} - 16> rxBuffer;
+%% if options["buffer.rx"] > 16
+	static modm::atomic::Queue<uint8_t, {{ options["buffer.rx"] }} - 16> rxBuffer;
 %% endif
-%% if parameters.tx_buffer > 16
-	static modm::atomic::Queue<uint8_t, {{ parameters.tx_buffer }} - 16> txBuffer;
+%% if options["buffer.tx"] > 16
+	static modm::atomic::Queue<uint8_t, {{ options["buffer.tx"] }} - 16> txBuffer;
 %% endif
 
 	/**
@@ -82,13 +82,13 @@ modm::lpc::Uart1::initialize(uint32_t baudrate)
 		regVal = LPC_UART->RBR;	/* Dump data from RX FIFO */
 	}
 
-%% if parameters.rx_buffer > 16
+%% if options["buffer.rx"] > 16
 	/* If RX buffering with more than 16 bytes is requested a software queue
 	 * must be used for receiving. This involves the Rx Interrupt only. */
 	LPC_UART->IER = IER_RBRIE;
 %% endif
 
-%% if parameters.tx_buffer > 16 or parameters.rx_buffer > 16
+%% if options["buffer.tx"] > 16 or options["buffer.rx"] > 16
 	/* Enable the UART Interrupt */
 	NVIC_EnableIRQ(UART_IRQn);
 %% endif
@@ -122,7 +122,7 @@ modm::lpc::Uart1::flushWriteBuffer()
 bool
 modm::lpc::Uart1::write(uint8_t data)
 {
-%% if parameters.tx_buffer <= 16
+%% if options["buffer.tx"] <= 16
 	// No software buffer necessary, use hardware buffer only.
 	if (LPC_UART->LSR & LSR_THRE)
 	{
@@ -173,7 +173,7 @@ modm::lpc::Uart1::write(const uint8_t *buffer, std::size_t length)
 {
 	std::size_t written(0);
 
-%% if parameters.tx_buffer <= 16
+%% if options["buffer.tx"] <= 16
 	// No software buffer necessary, use hardware buffer only.
 	if (LPC_UART->LSR & LSR_THRE)
 	{
@@ -221,7 +221,7 @@ modm::lpc::Uart1::write(const uint8_t *buffer, std::size_t length)
 bool
 modm::lpc::Uart1::isWriteFinished()
 {
-%% if parameters.tx_buffer > 16
+%% if options["buffer.tx"] > 16
 	return txBuffer.isEmpty() and (LPC_UART->LSR & LSR_THRE);
 %% else
 	return (LPC_UART->LSR & LSR_THRE);
@@ -231,7 +231,7 @@ modm::lpc::Uart1::isWriteFinished()
 std::size_t
 modm::lpc::Uart1::discardTransmitBuffer()
 {
-%% if parameters.tx_buffer > 16
+%% if options["buffer.tx"] > 16
 	atomic::Lock lock;
 	std::size_t count(0);
 	// disable interrupt since buffer will be cleared
@@ -250,7 +250,7 @@ modm::lpc::Uart1::discardTransmitBuffer()
 bool
 modm::lpc::Uart1::read(uint8_t& data)
 {
-%% if parameters.rx_buffer > 16
+%% if options["buffer.rx"] > 16
 	if (not rxBuffer.isEmpty())
 	{
 		data = rxBuffer.get();
@@ -296,7 +296,7 @@ std::size_t
 modm::lpc::Uart1::discardReceiveBuffer()
 {
 	std::size_t count(0);
-%% if parameters.rx_buffer > 16
+%% if options["buffer.rx"] > 16
 	while(!rxBuffer.isEmpty())
 	{
 		++count;
@@ -320,7 +320,7 @@ MODM_ISR(UART)
 	switch (IIRValue)
 	{
 	case IIR_INTID_RDA:
-%% if parameters.rx_buffer > 16
+%% if options["buffer.rx"] > 16
 		// Receive data available: Move data to queue.
 		// As the Rx Interrupt is disabled when the rxBuffer is full it should
 		// never happen that this is called with rxBuffer full.
@@ -334,7 +334,7 @@ MODM_ISR(UART)
 %% endif
 		break;
 	case IIR_INTID_THRE:
-%% if parameters.tx_buffer > 16
+%% if options["buffer.tx"] > 16
 		// Transmit Holding Register Empty == FIFO completly empty.
 		// Write up to 16 bytes to FIFO.
 		charsLeft = 16;

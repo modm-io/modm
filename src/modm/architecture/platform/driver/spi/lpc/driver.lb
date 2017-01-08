@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2017, Fabian Greif
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = "spi"
+    module.parent = "platform"
+
+def prepare(module, options):
+    if not options[":target"].has_driver("spi:lpc"):
+        return False
+
+    module.depends([":platform:core"])
+    return True
+
+def build(env):
+    device = env[":target"]
+    driver = device.get_driver("spi")
+
+    properties = device.properties
+    properties["target"] = target = device.identifier
+    properties["partname"] = device.partname
+    properties["driver"] = driver
+
+    env.substitutions = properties
+    env.outbasepath = "src/modm/platform/spi"
+
+    env.copy(".", ignore=env.ignore_files("*.lb"))

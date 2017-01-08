@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, Sascha Schade
- * Copyright (c) 2012, Fabian Greif
+ * Copyright (c) 2012, 2017, Fabian Greif
  * Copyright (c) 2012-2016, Niklas Hauser
  * Copyright (c) 2013-2014, Kevin Laeufer
  *
@@ -23,10 +23,7 @@
 
 #include <nxp/lpc11xx/driver/rom_drivers.h>
 
-#include "../../clock/generic/common_clock.hpp"
-
-// at least one queue, so activate interrupts
-#define LPC11C_USING_CAN_INTERRUPTS ((LPC11C_CAN_TX_BUFFER_SIZE > 0) || (LPC11C_CAN_RX_BUFFER_SIZE > 0))
+#include <modm/platform/clock/common_clock.hpp>
 
 #define LPC11C_ROM_CAN (*((ROM **)0x1fff1ff8))
 
@@ -106,14 +103,13 @@ public:
 				0x00004500UL | prescaler  // CANBT: bit timing register:
 		};
 
-	// FIXME: turn into parameter
-	#if LPC11C_USING_CAN_INTERRUPTS
+%% if options["buffer.rx"] > 0 or options["buffer.tx"] > 0
 		/* Interrupts enabled */
 		LPC11C_ROM_CAN->pCAND->init_can(&ClkInitTable[0], true);
-	#else
+%% else
 		/* Interrupts disabled */
 		LPC11C_ROM_CAN->pCAND->init_can(&ClkInitTable[0], false);
-	#endif
+%% endif
 
 		/* Configure the CAN callback functions */
 		CAN_CALLBACKS callbacks = {
