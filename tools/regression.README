@@ -1,8 +1,0 @@
-
-Usage
-=====
-
-$ cd modm/tools
-$ python2 regression.py -u
-... change compiler-options in avr.py or arm.py ...
-$ python2 regression.py -v
