@@ -37,5 +37,4 @@ def init(repo):
                           enumeration=devices))
 
 def prepare(repo, options):
-    repo.find_modules_recursive("src/modm/platform/", modulefile="driver.lb")
     repo.find_modules_recursive(".", modulefile="module.lb")
