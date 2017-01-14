@@ -3,10 +3,10 @@
   <device platform="lpc" family="11" name="c24">
     <naming-schema>{platform}{family}{name}</naming-schema>
     <!-- Flash and RAM sizes -->
-    <flash device-name="c24" value="32768"/>
-    <ram value="8192"/>
+    <attribute-flash device-name="c24" value="32768"/>
+    <attribute-ram value="8192"/>
     <!-- Core -->
-    <core value="cortex-m0"/>
+    <attribute-core value="cortex-m0"/>
     <!-- Number of pins -->
     <!--<pin-count device-name="c24">48</pin-count>-->
     <!-- Headers to be included with the {{ include_device_headers }} substitution-->

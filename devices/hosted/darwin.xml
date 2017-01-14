@@ -4,7 +4,7 @@
   <device platform="hosted" family="darwin">
     <naming-schema>{platform}-{family}</naming-schema>
 
-    <core value="x86"/>
+    <attribute-core value="x86"/>
 
     <driver type="can" compatible="hosted"/>
     <driver type="can" compatible="canusb"/>
