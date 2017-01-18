@@ -19,6 +19,7 @@
 #define	XPCC_LOG_LEVEL xpcc::log::ERROR
 
 #include "../backend_interface.hpp"
+#include "reader.hpp"
 
 namespace xpcc
 {
@@ -38,7 +39,7 @@ public:
 	ZeroMQConnector(std::string endpointIn, std::string endpointOut, Mode mode = Mode::SubPush) :
 		socketIn (context, (mode == Mode::SubPush ? zmqpp::socket_type::sub  : zmqpp::socket_type::pull)),
 		socketOut(context, (mode == Mode::SubPush ? zmqpp::socket_type::push : zmqpp::socket_type::pub)),
-		isAvailable(false)
+		reader(socketIn)
 	{
 		switch(mode)
 		{
@@ -56,10 +57,14 @@ public:
 				this->socketOut.bind(endpointOut);
 			break;
 		}
+
+		this->reader.start();
 	}
 
 	virtual
-	~ZeroMQConnector() {
+	~ZeroMQConnector()
+	{
+		this->reader.stop();
 		this->socketIn.unsubscribe("");
 		this->socketOut.unsubscribe("");
 		this->socketIn.close();
@@ -104,88 +109,40 @@ public:
 	}
 
 	virtual bool
-	isPacketAvailable() const {
-		return isAvailable;
+	isPacketAvailable() const
+	{
+		return this->reader.isPacketAvailable();
 	}
 
 	virtual const Header&
-	getPacketHeader() const { return receiveItem->header; };
+	getPacketHeader() const
+	{
+		return this->reader.getPacket().header;
+	};
 
 	virtual const xpcc::SmartPointer
-	getPacketPayload() const { return receiveItem->payload; };
+	getPacketPayload() const
+	{
+		return this->reader.getPacket().payload;
+	};
 
 	virtual void
 	dropPacket()
 	{
-		isAvailable = false;
-		delete receiveItem;
-
-#		if ZMQPP_VERSION_MAJOR < 4
-		// swap and discard old message as in zmqpp 3
-		// "receiving can only be done to empty messages"
-		zmqpp::message local;
-		std::swap(local, message);
-#		endif
+		this->reader.dropPacket();
 	}
-
 
 	virtual void
 	update()
 	{
-		if (not this->isAvailable) {
-			if (this->socketIn.receive(this->message, /* no_block = */ true)) {
-				this->isAvailable = true;
-
-				// Parse the data
-				uint16_t size = this->message.size(0);
-
-				if (size >= 5)
-				{
-					uint8_t *buf = (uint8_t *)this->message.raw_data();
-					xpcc::Header header = xpcc::Header(
-						/* type = */ xpcc::Header::Type(buf[0]),
-						/* ack  = */ buf[1],
-						/* dest = */ buf[2],
-						/* src  = */ buf[3],
-						/* id   = */ buf[4]);
-
-					receiveItem = new ReceiveItem(size, header);
-
-					// The XPCC Header is five bytes long.
-					// The XPCC payload begins after the XPCC Header
-					// The XPCC payload is five bytes shorter than the zeromq message.
-					std::memcpy(receiveItem->payload.getPointer(), buf + 5, size - 5);
-				}
-				else
-				{
-					XPCC_LOG_ERROR << XPCC_FILE_INFO;
-					XPCC_LOG_ERROR << "Message length is " << size << " which is smaller than expected size of 5+" << xpcc::endl;
-				}
-			}
-		}
+		// Nothing to do here
 	}
-
 protected:
 	zmqpp::context context;
 	zmqpp::socket socketIn;
 	zmqpp::socket socketOut;
 
-	/// Store one zmqpp message in backend
-	zmqpp::message message;
-	bool isAvailable;
-
-	class ReceiveItem
-	{
-	public:
-		ReceiveItem(uint8_t size, const Header& inHeader) :
-			header(inHeader), payload(size) {}
-
-	public:
-		xpcc::Header header;
-		xpcc::SmartPointer payload;
-	};
-
-	ReceiveItem *receiveItem;
+	ZeroMQReader reader;
 };
 
 } // xpcc namespace
