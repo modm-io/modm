@@ -7,6 +7,10 @@
  */
 // ----------------------------------------------------------------------------
 
+#ifndef XPCC_CAN_USB_HPP
+#error "Do not include this file directly. Include canusb.hpp"
+#endif
+
 #include <iostream>
 #include <xpcc/debug/logger.hpp>
 
@@ -19,12 +23,14 @@
 #undef  XPCC_LOG_LEVEL
 #define XPCC_LOG_LEVEL xpcc::log::INFO
 
-xpcc::hosted::CanUsb::CanUsb()
-:	active(false), busState(BusState::Off)
+template <typename SerialPort>
+xpcc::hosted::CanUsb<SerialPort>::CanUsb(SerialPort& serialPort)
+:	active(false), busState(BusState::Off), serialPort(serialPort)
 {
 }
 
-xpcc::hosted::CanUsb::~CanUsb()
+template <typename SerialPort>
+xpcc::hosted::CanUsb<SerialPort>::~CanUsb()
 {
 	if (this->active)
 	{
@@ -36,27 +42,12 @@ xpcc::hosted::CanUsb::~CanUsb()
 		delete this->thread;
 		this->thread = 0;
 	}
-	this->serialPort.close();
-	while (this->serialPort.isOpen())
-	{
-		//wait for port to close;
-	}
 }
 
+template <typename SerialPort>
 bool
-xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int serialBaudRate, xpcc::Can::Bitrate canBitrate)
+xpcc::hosted::CanUsb<SerialPort>::open(xpcc::Can::Bitrate canBitrate)
 {
-	if (this->serialPort.isOpen())
-		this->serialPort.close();
-
-	while (this->serialPort.isOpen())
-	{
-		// wait for port to close;
-	}
-
-	this->serialPort.setDeviceName(deviceName);
-	this->serialPort.setBaudRate(serialBaudRate);
-
 	if (this->serialPort.open())
 	{
 		XPCC_LOG_DEBUG << XPCC_FILE_INFO << "SerialPort opened in canusb" << xpcc::endl;
@@ -65,7 +56,7 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int serialBaudRate, 
 
 		xpcc::ShortTimeout timeout;
 		timeout.restart(500);
-		while (!timeout.isExpired())
+		while (not timeout.isExpired())
 		{
 		}
 
@@ -106,27 +97,17 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int serialBaudRate, 
 		
 
 		timeout.restart(500);
-		while (!this->serialPort.read(a))
+		while (not this->serialPort.read(a))
 		{
 			if (timeout.isExpired())
 			{
 				XPCC_LOG_DEBUG << XPCC_FILE_INFO << "Timer expired" << xpcc::endl;
-				this->serialPort.close();
-				while (this->serialPort.isOpen())
-				{
-					// wait for port to close;
-				}
 				return false;
 			}
 		}
 		if (a != '\r')
 		{
 			XPCC_LOG_ERROR << XPCC_FILE_INFO << "Wrong answer on set CAN bitrate: " << xpcc::hex << (int) a	<< xpcc::endl;
-			this->serialPort.close();
-			while (this->serialPort.isOpen())
-			{
-				// wait for port to close;
-			}
 			return false;
 		}
 		
@@ -134,16 +115,11 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int serialBaudRate, 
 		this->serialPort.write("O\r");
 		XPCC_LOG_DEBUG << XPCC_FILE_INFO << "written 'O'" << xpcc::endl;
 		timeout.restart(500);
-		while (!this->serialPort.read(a))
+		while (not this->serialPort.read(a))
 		{
 			if (timeout.isExpired())
 			{
 				XPCC_LOG_DEBUG << XPCC_FILE_INFO << "Timer expired" << xpcc::endl;
-				this->serialPort.close();
-				while (this->serialPort.isOpen())
-				{
-					// wait for port to close;
-				}
 				return false;
 			}
 		}
@@ -151,11 +127,6 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int serialBaudRate, 
 		if (a != '\r')
 		{
 			XPCC_LOG_ERROR << XPCC_FILE_INFO << "Wrong answer on O: " << xpcc::hex << (int) a << xpcc::endl;
-			this->serialPort.close();
-			while (this->serialPort.isOpen())
-			{
-				// wait for port to close;
-			}
 			return false;
 		}
 
@@ -164,7 +135,7 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int serialBaudRate, 
 			this->active = true;
 		}
 		this->thread = new boost::thread(
-				boost::bind(&xpcc::hosted::CanUsb::update, this));
+				boost::bind(&xpcc::hosted::CanUsb<SerialPort>::update, this));
 
 		busState = BusState::Connected;
 		this->tmpRead.clear();
@@ -178,8 +149,9 @@ xpcc::hosted::CanUsb::open(std::string deviceName, unsigned int serialBaudRate, 
 	}
 }
 
+template <typename SerialPort>
 void
-xpcc::hosted::CanUsb::close()
+xpcc::hosted::CanUsb<SerialPort>::close()
 {
 	this->serialPort.write("C\r");
 	{
@@ -190,20 +162,21 @@ xpcc::hosted::CanUsb::close()
 	this->thread->join();
 	delete this->thread;
 	this->thread = 0;
-	this->serialPort.close();
 	busState = BusState::Off;
 }
 
+template <typename SerialPort>
 xpcc::Can::BusState
-xpcc::hosted::CanUsb::getBusState()
+xpcc::hosted::CanUsb<SerialPort>::getBusState()
 {
 	return busState;
 }
 
+template <typename SerialPort>
 bool
-xpcc::hosted::CanUsb::getMessage(can::Message& message)
+xpcc::hosted::CanUsb<SerialPort>::getMessage(can::Message& message)
 {
-	if (!this->readBuffer.empty())
+	if (not this->readBuffer.empty())
 	{
 		message = this->readBuffer.front();
 		this->readBuffer.pop();
@@ -215,8 +188,9 @@ xpcc::hosted::CanUsb::getMessage(can::Message& message)
 	}
 }
 
+template <typename SerialPort>
 bool
-xpcc::hosted::CanUsb::sendMessage(const can::Message& message)
+xpcc::hosted::CanUsb<SerialPort>::sendMessage(const can::Message& message)
 {
 	char str[128];
 	xpcc::CanLawicelFormatter::convertToString(message, str);
@@ -231,10 +205,11 @@ xpcc::hosted::CanUsb::sendMessage(const can::Message& message)
 	return true;
 }
 
+template <typename SerialPort>
 void
-xpcc::hosted::CanUsb::update()
+xpcc::hosted::CanUsb<SerialPort>::update()
 {
-	while (1)
+	while (true)
 	{
 		char a;
 		if (this->serialPort.read(a))
@@ -253,7 +228,8 @@ xpcc::hosted::CanUsb::update()
 				this->readBuffer.push(message);
 			}
 		}
-		if (!this->active)
+		if (not this->active) {
 			break;
+		}
 	}
 }

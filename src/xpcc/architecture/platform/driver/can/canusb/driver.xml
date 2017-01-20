@@ -3,6 +3,6 @@
 <rca version="1.0">
 	<driver type="can" name="canusb">
 		<static>canusb.hpp</static>
-		<static>canusb.cpp</static>
+		<static>canusb_impl.hpp</static>
 	</driver>
 </rca>
