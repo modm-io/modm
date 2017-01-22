@@ -33,7 +33,7 @@ public:
 
 	struct Packet
 	{
-		Packet(uint8_t size, const Header& inHeader) :
+		Packet(uint16_t size, const Header& inHeader) :
 			header(inHeader), payload(size) {}
 
 		xpcc::Header header;
