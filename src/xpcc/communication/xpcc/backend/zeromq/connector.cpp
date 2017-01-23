@@ -64,8 +64,20 @@ ZeroMQConnector::sendPacket(const Header &header, SmartPointer payload)
 	// The mapping of type, ack, dest, src and id into a uint32_t from
 	// CanConnectorBase is used.
 
-	// 5 bytes for header
-	uint16_t buf_size = 5 + payload.getSize();
+	constexpr uint16_t headerSize = 5;
+
+	// Maximum valid size of xpcc::SmartPointer
+	constexpr uint16_t maxPayloadSize = 65529;
+
+	if(payload.getSize() > maxPayloadSize) {
+		XPCC_LOG_ERROR << XPCC_FILE_INFO;
+		XPCC_LOG_ERROR << "Trying to send message with invalid size: ";
+		XPCC_LOG_ERROR << payload.getSize() << xpcc::endl;
+
+		return;
+	}
+
+	const std::size_t buf_size = headerSize + payload.getSize();
 	uint8_t buf[buf_size];
 
 	buf[0] = static_cast<uint8_t>(header.type);
@@ -74,7 +86,7 @@ ZeroMQConnector::sendPacket(const Header &header, SmartPointer payload)
 	buf[3] = header.source;
 	buf[4] = header.packetIdentifier;
 
-	memcpy(buf + 5, payload.getPointer(), payload.getSize());
+	memcpy(buf + headerSize, payload.getPointer(), payload.getSize());
 
 #	if ZMQPP_VERSION_MAJOR >= 4
 	/**
