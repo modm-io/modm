@@ -1,5 +1,6 @@
 // coding: utf-8
-/* Copyright (c) 2017, Roboterclub Aachen e. V.
+/* Copyright (c) 2016, Sascha Schade
+ * Copyright (c) 2017, Christopher Durand
  * All Rights Reserved.
  *
  * The file is part of the xpcc library and is released under the 3-clause BSD
@@ -26,6 +27,14 @@
 namespace xpcc
 {
 
+/**
+ * @brief	Reads packets from a zmqpp socket in a background thread
+ *
+ * @ingroup	backend
+ *
+ * @author	Christopher Durand <christopher.durand@rwth-aachen.de>
+ * @author	strongly-typed
+ */
 class ZeroMQReader
 {
 public:

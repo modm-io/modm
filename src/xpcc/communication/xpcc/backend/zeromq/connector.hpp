@@ -1,5 +1,6 @@
 // coding: utf-8
-/* Copyright (c) 2016, Roboterclub Aachen e. V.
+/* Copyright (c) 2016, Sascha Schade
+ * Copyright (c) 2017, Christopher Durand
  * All Rights Reserved.
  *
  * The file is part of the xpcc library and is released under the 3-clause BSD
@@ -33,6 +34,14 @@ public:
 	};
 };
 
+/**
+ * @brief	ZeroMQ communication backend for hosted
+ *
+ * @ingroup	backend
+ *
+ * @author	strongly-typed
+ * @author	Christopher Durand <christopher.durand@rwth-aachen.de>
+ */
 class ZeroMQConnector : public ZeroMQConnectorBase, public BackendInterface
 {
 public:
