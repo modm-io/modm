@@ -22,7 +22,10 @@ ZeroMQConnector::ZeroMQConnector(std::string endpointIn, std::string endpointOut
 		case
 		Mode::SubPush:
 			this->socketIn.connect(endpointIn);
-			this->socketIn.subscribe("");
+
+			if(this->socketIn.type() == zmqpp::socket_type::sub) {
+				this->socketIn.subscribe("");
+			}
 
 			this->socketOut.connect(endpointOut);
 		break;
@@ -41,8 +44,11 @@ ZeroMQConnector::ZeroMQConnector(std::string endpointIn, std::string endpointOut
 ZeroMQConnector::~ZeroMQConnector()
 {
 	this->reader.stop();
-	this->socketIn.unsubscribe("");
-	this->socketOut.unsubscribe("");
+
+	if(this->socketIn.type() == zmqpp::socket_type::sub) {
+		this->socketIn.unsubscribe("");
+	}
+
 	this->socketIn.close();
 	this->socketOut.close();
 }
