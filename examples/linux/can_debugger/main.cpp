@@ -5,8 +5,6 @@
 #include <xpcc/architecture/interface/can.hpp>
 #include <xpcc/architecture/platform/driver/can/canusb/canusb.hpp>
 
-#include <cstdlib>
-
 /**
  * Simple example that listens to a CAN bus connected by a CAN2USB.
  *
@@ -22,15 +20,16 @@
  * - All CAN messages on the bus should appear on the screen.
  */
 
-static constexpr uint32_t canBusBaudRate = 125000;
+static constexpr xpcc::Can::Bitrate canBusBitRate = xpcc::Can::kBps125;
 
-xpcc::hosted::CanUsb canUsb;
+xpcc::hosted::SerialInterface port("/dev/ttyUSB0", 115200);
+xpcc::hosted::CanUsb<xpcc::hosted::SerialInterface> canUsb(port);
 
 int
 main()
 {
-	if (not canUsb.open("/dev/ttyUSB0", canBusBaudRate)) {
-		XPCC_LOG_ERROR << "Could not open port" << xpcc::endl;
+	if (not canUsb.open(canBusBitRate)) {
+		XPCC_LOG_ERROR << "Could not connect to CAN2USB port" << xpcc::endl;
 		exit(EXIT_FAILURE);
 	}
 

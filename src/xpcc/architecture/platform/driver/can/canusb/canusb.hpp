@@ -7,14 +7,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_HOSTED_CAN_USB_HPP
-#define XPCC_HOSTED_CAN_USB_HPP
+#ifndef XPCC_CAN_USB_HPP
+#define XPCC_CAN_USB_HPP
 
 #include <queue>
 #include <string>
 
-// FIXME: remove this dependency!
-#include "../../uart/hosted/serial_interface.hpp"
 #include <xpcc/architecture/interface/can.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread.hpp>
@@ -32,15 +30,16 @@ namespace hosted
  * @see		http://www.can232.com/
  * @ingroup	hosted
  */
+template <typename SerialPort>
 class CanUsb : public ::xpcc::Can
 {
 public:
-	CanUsb();
+	CanUsb(SerialPort& serialPort);
 
 	~CanUsb();
 
 	bool
-	open(std::string deviceName, unsigned int serialBaudRate, xpcc::Can::Bitrate canBitrate = xpcc::Can::kBps125);
+	open(xpcc::Can::Bitrate canBitrate = xpcc::Can::kBps125);
 
 	void
 	close();
@@ -93,7 +92,7 @@ private:
 
 	BusState busState;
 
-	xpcc::hosted::SerialInterface serialPort;
+	SerialPort& serialPort;
 
 	std::string tmpRead;
 	std::queue<can::Message> readBuffer;
@@ -105,4 +104,6 @@ private:
 
 }	// namespace xpcc
 
-#endif // XPCC_HOSTED_CAN_USB_HPP
+#include "canusb_impl.hpp"
+
+#endif // XPCC_CAN_USB_HPP
