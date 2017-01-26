@@ -46,10 +46,10 @@ def find_includes(env, file, include_path):
 			filename = match.group(1)
 			relative_to_file = os.path.join(os.path.dirname(os.path.abspath(file)), filename)
 			relative_to_include_path = os.path.join(include_path, filename)
-			# 1.) include file name can be absolut
+			# 1.) include file name can be absolute
 			if os.path.isabs(filename):
 				files.append(filename)
-			# 2.) it could be a path relative to the files path
+			# 2.) it could be a path relative to the file's path
 			#     this works just like #include "{filename}" in C/C++
 			elif os.path.isfile(relative_to_file):
 				files.append(relative_to_file)

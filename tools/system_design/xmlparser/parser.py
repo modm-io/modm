@@ -203,13 +203,13 @@ class Parser(object):
 
 	@staticmethod
 	def find_include_file(filename, include_file, include_paths, line_count=""):
-		""" Tries to find the include file and return it's absolute path """
+		""" Tries to find the include file and return its absolute path """
 		
-		# 1.) include file name can be absolut
+		# 1.) include file name can be absolute
 		if os.path.isabs(filename):
 			return filename
 		
-		# 2.) it could be a path relative to the files path
+		# 2.) it could be a path relative to the file's path
 		#     this works just like #include "{filename}" in C/C++
 		relative_to_file = os.path.abspath(os.path.join(os.path.dirname(include_file), filename))
 		if os.path.isfile(relative_to_file):
