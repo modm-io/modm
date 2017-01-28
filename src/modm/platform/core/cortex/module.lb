@@ -30,11 +30,6 @@ def prepare(module, options):
             enumeration=["newlib", "block_allocator", "tlsf"],
             default="newlib"))
     module.add_option(
-        BooleanOption(
-            name="enable_gpio",
-            description="Enable clock for GPIO during startup",
-            default=True))
-    module.add_option(
         EnumerationOption(
             name="vector_table_location",
             description=FileReader("option/vector_table_location.md"),

@@ -12,7 +12,6 @@
 
 #include "../device.hpp"
 
-extern "C"
 void
 modm_gpio_enable(void)
 {
@@ -58,3 +57,9 @@ modm_gpio_enable(void)
 %%	endif
 %% endfor
 }
+
+
+// A000100_ prefix since .hardware_init is sorted alphabetically and
+// this should be executed before application inits. Totally not a hack.
+__attribute__((section(".hardware_init"), used))
+static const uint32_t A000100_modm_gpio_enable_ptr = (uint32_t) &modm_gpio_enable;

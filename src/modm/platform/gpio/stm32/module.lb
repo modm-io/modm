@@ -56,6 +56,12 @@ def prepare(module, options):
     if not options[":target"].has_driver("gpio", type=["stm32", "stm32f1"]):
         return False
 
+    module.add_option(
+        BooleanOption(
+            name="enable_gpio",
+            description="Enable clock for GPIO during startup",
+            default=True))
+
     module.depends(":platform:core", ":platform:gpio.generic")
     return True
 
@@ -87,4 +93,5 @@ def build(env):
                         "portRanges": filter_port_ranges,
                     })
     env.template("gpio_base.hpp.in", filters={"letterToNum": filter_letter_to_num})
-    env.template("gpio_enable.cpp.in")
+    if env[":::enable_gpio"]:
+        env.template("gpio_enable.cpp.in")

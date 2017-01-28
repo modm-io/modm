@@ -313,6 +313,15 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 	} >{{memory}}
 	 */
 
+	/* Hardware init table */
+	.hardware_init : ALIGN(4)
+	{
+		__hardware_init_start = .;
+		/* Table symbols are alphabetically sorted! */
+		KEEP(*(SORT(.hardware_init*)))
+		__hardware_init_end = .;
+	} >{{memory}}
+
 	/* Assertion handler table */
 	.assertion : ALIGN(4)
 	{

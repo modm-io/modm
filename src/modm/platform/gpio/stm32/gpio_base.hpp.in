@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Niklas Hauser
+ * Copyright (c) 2016-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -16,8 +16,6 @@
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/architecture/interface/i2c.hpp>
 #include <modm/math/utils/bit_operation.hpp>
-
-extern void modm_gpio_enable(void);
 
 /**
  * @ingroup 	platform
@@ -99,18 +97,6 @@ struct Gpio
 		{{ port | upper }} = {{ port | letterToNum }},
 %% endfor
 	};
-
-	static void
-	enable()
-	{
-		modm_gpio_enable();
-	}
-
-	static void
-	disable()
-	{
-		// FIXME: Implement
-	}
 
 protected:
 	/// @cond
