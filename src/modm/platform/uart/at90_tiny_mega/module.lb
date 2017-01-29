@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2017, Fabian Greif
+# Copyright (c) 2017, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -75,12 +76,12 @@ def init(module):
 
 def prepare(module, options):
     device = options[":target"]
-    if not device.has_driver("uart:avr"):
+    if not device.has_driver("usart:avr"):
         return False
 
     module.depends(":platform:core")
 
-    driver = device.get_driver("uart")
+    driver = device.get_driver("usart")
     if "instance" in driver:
         for instance in listify(driver["instance"]):
             module.add_submodule(Instance(int(instance)))

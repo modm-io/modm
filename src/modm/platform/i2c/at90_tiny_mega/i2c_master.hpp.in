@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011, Georgi Grinshpun
- * Copyright (c) 2011-2016, Niklas Hauser
  * Copyright (c) 2011, 2017, Fabian Greif
+ * Copyright (c) 2011-2017, Niklas Hauser
  * Copyright (c) 2012, Sascha Schade
  *
  * This file is part of the modm project.
@@ -15,10 +15,9 @@
 #ifndef MODM_AVR_I2C_MASTER_HPP
 #define MODM_AVR_I2C_MASTER_HPP
 
-//#include "../device.hpp"
-#include <modm/architecture/interface/i2c_master.hpp>
 #include "type_ids.hpp"
 #include "i2c.hpp"
+#include <modm/architecture/interface/i2c_master.hpp>
 
 namespace modm
 {

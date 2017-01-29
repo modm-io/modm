@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013, Kevin Läufer
- * Copyright (c) 2014-2016, Niklas Hauser
+ * Copyright (c) 2014-2017, Niklas Hauser
  * Copyright (c) 2016, Fabian Greif
  *
  * This file is part of the modm project.
@@ -66,7 +66,7 @@ public:
 		SetComgOrRisingTrigEdge = TIM_CR2_CCUS
 	};
 
-%% if (target["family"] == "f3" and target["name"] != "373") or target["family"] == "f7"
+%% if (target["family"] == "f3" and target["name"] not in ["73", "78"]) or target["family"] == "f7"
 	enum class MasterMode2 : uint32_t
 	{
 		Reset			= 0,							//0b0000
@@ -140,7 +140,7 @@ public:
 
 	enum class Event : uint32_t
 	{
-%% if (target["family"] == "f3" and target["name"] != "373") or target["family"] == "f7"
+%% if (target["family"] == "f3" and target["name"] not in ["73", "78"]) or target["family"] == "f7"
 		Break2 						= TIM_EGR_B2G,
 %% endif
 		Break 						= TIM_EGR_BG,

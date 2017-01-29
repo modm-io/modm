@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015, Niklas Hauser
+ * Copyright (c) 2013-2015, 2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -13,7 +13,7 @@
 #define MODM_AVR_CLOCK_HPP
 
 #include <stdint.h>
-#include "../generic/common_clock.hpp"
+#include "common_clock.hpp"
 
 using namespace modm::clock;
 

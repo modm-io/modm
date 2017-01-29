@@ -2,7 +2,7 @@
  * Copyright (c) 2009-2012, Fabian Greif
  * Copyright (c) 2010, Georgi Grinshpun
  * Copyright (c) 2010, Thorsten Lajewski
- * Copyright (c) 2012-2016, Niklas Hauser
+ * Copyright (c) 2012-2017, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
  *
  * This file is part of the modm project.
@@ -19,8 +19,8 @@
 #include <stdint.h>
 #include <modm/architecture/interface/spi_master.hpp>
 #include <modm/architecture/driver/delay.hpp>
-#include "../../gpio/generic/gpio.hpp"
 #include "type_ids.hpp"
+#include "../gpio/software_gpio.hpp"
 
 namespace modm
 {
@@ -97,6 +97,6 @@ private:
 
 } // namespace modm
 
-#include "spi_master_impl.hpp"
+#include "software_spi_master_impl.hpp"
 
 #endif // MODM_SOFTWARE_SPI_MASTER_HPP

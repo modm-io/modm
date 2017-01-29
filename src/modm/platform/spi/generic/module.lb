@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2016, Niklas Hauser
+# Copyright (c) 2016-2017, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -15,7 +15,7 @@ def init(module):
     module.parent = "platform"
 
 def prepare(module, options):
-    module.depends(":platform:core")
+    module.depends(":platform:core", ":platform:gpio.generic")
 
     return True
 

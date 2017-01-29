@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2016, Niklas Hauser
+# Copyright (c) 2016-2017, Niklas Hauser
 # Copyright (c) 2017, Fabian Greif
 #
 # This file is part of the modm project.
@@ -18,10 +18,10 @@ def init(module):
     module.parent = "platform"
 
 def prepare(module, options):
-    if not options[":target"].has_driver("core:cortex"):
+    if not options[":target"].has_driver("core:cortex-m*"):
         return False
 
-    module.depends([":architecture", ":cmsis.device"])
+    module.depends(":architecture", ":cmsis.device", ":platform:clock", ":platform:clock.generic")
 
     module.add_option(
         EnumerationOption(
@@ -44,9 +44,9 @@ def prepare(module, options):
         NumericOption(
             name="main_stack_size",
             description=FileReader("option/main_stack_size.md"),
-            minimum=2**8,
-            maximum=2**16,
-            default=2**10 * 3 - 32))
+            minimum=2 ** 8,
+            maximum=2 ** 16,
+            default=2 ** 10 * 3 - 32))
 
     uarts = options[":target"].get_driver("uart")["instance"]
     module.add_option(
@@ -62,7 +62,7 @@ def prepare(module, options):
             enumeration=uarts,
             default=uarts[0]))
 
-    pins = [p["port"] + p["id"] for p in options[":target"].get_driver("gpio")["gpio"]]
+    pins = [p["port"].upper() + p["pin"] for p in options[":target"].get_driver("gpio")["gpio"]]
     module.add_option(
         EnumerationOption(
             name="hardfault.led",
@@ -119,7 +119,8 @@ def build(env):
     properties["target"] = target = device.identifier
     properties["partname"] = device.partname
     properties["driver"] = driver
-    properties["vector_table_location"] = env["::vector_table_location"]
+    properties["vector_table_location"] = env[":::vector_table_location"]
+    properties["core"] = driver["type"]
 
     # Add ARM Cortex-M exceptions
     interrupts = {
@@ -184,11 +185,11 @@ def build(env):
 
     # everything to do with dynamic memory
     env.copy("heap_table.c")
-    if env["::allocator"] == "newlib":
+    if env[":::allocator"] == "newlib":
         env.template("heap_newlib.c.in")
-    if env["::allocator"] == "tlsf":
+    if env[":::allocator"] == "tlsf":
         env.template("heap_tlsf.c.in")
-    if env["::allocator"] == "block_allocator":
+    if env[":::allocator"] == "block_allocator":
         env.template("heap_block_allocator.cpp.in")
 
     env.template("delay.cpp.in")

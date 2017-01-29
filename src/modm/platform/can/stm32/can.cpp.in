@@ -3,7 +3,7 @@
  * Copyright (c) 2012-2014, 2016, Sascha Schade
  * Copyright (c) 2013-2014, 2016, Kevin Läufer
  * Copyright (c) 2014, Georgi Grinshpun
- * Copyright (c) 2014, 2016, Niklas Hauser
+ * Copyright (c) 2014, 2016-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -22,12 +22,6 @@
 #include "can.hpp"
 %% else
 #include "can_{{ id }}.hpp"
-%% endif
-
-%% if id == "" or target["family"] in ["f0", "f3"]
-	%% set reg = 'CAN'
-%% else
-	%% set reg = 'CAN' ~ id
 %% endif
 
 // ----------------------------------------------------------------------------
@@ -98,7 +92,7 @@ modm::stm32::Can{{ id }}::initializeWithPrescaler(
 		// The CAN hardware waits until the current CAN activity (transmission
 		// or reception) is completed before entering the initialization mode.
 	}
-	modm_assert(deadlockPreventer > 0, "can", "init", "timeout", {{ id }});
+	modm_assert(deadlockPreventer > 0, "can", "init", "timeout", {{ 0 if id == '' else id }});
 
 	// Enable Interrupts:
 	// FIFO1 Overrun, FIFO0 Overrun
@@ -148,7 +142,7 @@ modm::stm32::Can{{ id }}::initializeWithPrescaler(
 	while ((({{ reg }}->MSR & CAN_MSR_INAK) == CAN_MSR_INAK) and (deadlockPreventer-- > 0))  {
 		// wait for the normal mode
 	}
-	modm_assert(deadlockPreventer > 0, "can", "init", "timeout", {{ id }});
+	modm_assert(deadlockPreventer > 0, "can", "init", "timeout", {{ 0 if id == '' else id }});
 }
 
 // ----------------------------------------------------------------------------

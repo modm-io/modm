@@ -42,6 +42,7 @@ class Instance(Module):
         properties["target"] = target = device.identifier
         properties["partname"] = device.partname
         properties["id"] = self.instance
+        properties["aid"] = "2" if self.instance == 4 else "1"
 
         env.substitutions = properties
         env.outbasepath = "src/modm/platform/i2c"

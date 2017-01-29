@@ -15,6 +15,8 @@
 	#error	"Don't include this file directly, use 'st7036.hpp' instead!"
 #endif
 
+#include <modm/architecture/interface/delay.hpp>
+
 // ----------------------------------------------------------------------------
 
 namespace modm {

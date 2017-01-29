@@ -1,5 +1,5 @@
 %# Copyright (c) 2011-2012, Fabian Greif
-%# Copyright (c) 2012, 2015-2016, Niklas Hauser
+%# Copyright (c) 2012, 2015-2017, Niklas Hauser
 %# Copyright (c) 2013, Sascha Schade
 %# Copyright (c) 2013, 2015, Kevin Läufer
 %#
@@ -20,7 +20,7 @@
 MEMORY
 {
 %% for memory in driver["memory"]
-	{{ memory["name"] | upper }} ({{ memory["access"] }}) : ORIGIN = {{ memory["start"] }}, LENGTH = {{ memory["size"] }}k
+	{{ memory["name"] | upper }} ({{ memory["access"] }}) : ORIGIN = {{ memory["start"] }}, LENGTH = {{ memory["size"] }}
 	%% do regions.append(memory["name"])
 	%% if 'sram1' == memory["name"]
 		%% do ram_origin.append(memory["start"])
@@ -29,7 +29,7 @@ MEMORY
 		%% do ram_sizes.append(memory["size"] | int)
 	%% endif
 %% endfor
-	RAM (rwx) : ORIGIN = {{ ram_origin[0] }}, LENGTH = {{ ram_sizes | sum }}k
+	RAM (rwx) : ORIGIN = {{ ram_origin[0] }}, LENGTH = {{ ram_sizes | sum }}
 	{{ options["linkerscript.memory"] }}
 }
 

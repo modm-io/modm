@@ -6,10 +6,10 @@
 
     <attribute-core value="x86"/>
 
-    <driver type="can" compatible="hosted"/>
-    <driver type="can" compatible="canusb"/>
-    <driver type="core" compatible="hosted"/>
-    <driver type="uart" compatible="hosted"/>
-    <driver type="uart" compatible="posix"/>
+    <driver name="can" type="hosted"/>
+    <driver name="can" type="canusb"/>
+    <driver name="core" type="hosted"/>
+    <driver name="uart" type="hosted"/>
+    <driver name="uart" type="posix"/>
   </device>
 </modm>

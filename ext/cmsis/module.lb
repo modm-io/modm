@@ -15,7 +15,8 @@ def init(module):
 
 def prepare(module, options):
     device = options[":target"]
-    if not device.properties["core"].startswith("cortex"):
+    core = device.get_driver("core")
+    if not core or not core["type"].startswith("cortex"):
         return False
 
     return True

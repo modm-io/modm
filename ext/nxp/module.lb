@@ -20,7 +20,7 @@ def prepare(module, options):
     if not device.identifier["platform"] == "lpc":
         return False
 
-    module.depends([":cmsis"])
+    module.depends(":cmsis")
     return True
 
 def build(env):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2016, Niklas Hauser
+# Copyright (c) 2016-2017, Niklas Hauser
 # Copyright (c) 2017, Fabian Greif
 #
 # This file is part of the modm project.
@@ -16,20 +16,21 @@ def init(module):
     module.parent = "platform"
 
 def prepare(module, options):
-    if not options[":target"].has_driver("clock:stm32"):
+    if not options[":target"].has_driver("rcc:stm32*"):
         return False
 
-    module.depends([":platform:core", ":platform:clock.generic"])
+    module.depends(":platform:core", ":platform:clock.generic")
     return True
 
 def build(env):
     device = env[":target"]
-    driver = device.get_driver("clock")
+    driver = device.get_driver("rcc")
 
     properties = device.properties
     properties["target"] = target = device.identifier
     properties["partname"] = device.partname
     properties["driver"] = driver
+    properties["core"] = device.get_driver("core")["type"]
 
     if target["family"] in ["f1", "f3", "f4"]:
         properties["hsi_frequency"] = 8
@@ -39,14 +40,16 @@ def build(env):
         properties["lsi_frequency"] = 32
 
     # TODO: Move this data into the device files
-    properties["usbprescaler"] = \
-        (target["name"] in ["042", "048", "070", "072", "078", "102", "103", "302", "373"] or
-        (target["name"] in ["303"] and target["size"] in ["b", "c", "d", "e"]))
+    properties["usbprescaler"] = (
+        (target["family"] == "f0" and target["name"] in ["42", "48", "70", "72", "78"]) or
+        (target["family"] == "f1" and target["name"] in ["02", "03"]) or
+        (target["family"] == "f3" and (target["name"] in ["02", "73"] or
+            (target["name"] in ["03"] and target["size"] in ["b", "c", "d", "e"]))))
     properties["pllprediv"] = \
-        (target["family"] in ["f0", "f3"] or target["name"] in ["100", "105", "107"])
+        (target["family"] in ["f0", "f3"] or (target["family"] == "f1" and target["name"] in ["00", "05", "07"]))
     properties["pllprediv2"] = False    # FIXME: not sure what value this should have
     properties["hsi48"] = \
-        target["name"] in ["042", "048", "071", "072", "078", "091", "098"]
+        target["family"] == "f0" and target["name"] in ["42", "48", "71", "72", "78", "91", "98"]
 
     env.substitutions = properties
     env.outbasepath = "src/modm/platform/clock"

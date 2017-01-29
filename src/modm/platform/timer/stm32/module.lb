@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2016, Niklas Hauser
+# Copyright (c) 2016-2017, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -12,7 +12,7 @@
 
 def get_properties(env):
     device = env[":target"]
-    driver = device.get_driver("timer")
+    driver = device.get_driver("tim")
     properties = device.properties
     properties["target"] = device.identifier
     properties["partname"] = device.partname
@@ -35,8 +35,9 @@ def get_connectors(instance):
     return []
 
 class Instance(Module):
-    def __init__(self, instance):
-        self.instance = instance
+    def __init__(self, driver, instance):
+        self.driver = driver
+        self.instance = int(instance)
 
     def init(self, module):
         module.name = str(self.instance)
@@ -72,13 +73,14 @@ def init(module):
 
 def prepare(module, options):
     device = options[":target"]
-    if not device.has_driver("timer:stm32"):
+    if not device.has_driver("tim:stm32*"):
         return False
 
     module.depends(":platform:core")
 
-    for instance in listify(device.get_driver("timer")["instance"]):
-        module.add_submodule(Instance(int(instance)))
+    for driver in device.get_all_drivers("tim"):
+        for instance in driver["instance"]:
+            module.add_submodule(Instance(driver, instance))
 
     return True
 

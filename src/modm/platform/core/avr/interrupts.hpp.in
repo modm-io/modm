@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2009, Martin Rosekeit
  * Copyright (c) 2009-2011, 2017, Fabian Greif
- * Copyright (c) 2011-2016, Niklas Hauser
+ * Copyright (c) 2011-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -14,7 +14,7 @@
 #ifndef MODM_AVR_INTERRUPTS_HPP
 #define MODM_AVR_INTERRUPTS_HPP
 
-//#include "../device.hpp"
+#include <avr/interrupt.h>
 
 /**
  * @ingroup 	{{partname}}
@@ -42,7 +42,7 @@ disableInterrupts()
 	cli();
 }
 
-%% if target["family"] == 'xmega'
+%% if "xmega" in driver["type"]
 /// Used to set the interrupt level of all modules.
 /// @ingroup	xmega
 enum class

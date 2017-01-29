@@ -1,7 +1,7 @@
 %# coding: utf-8
-%# Copyright (c) 2016, Niklas Hauser
 %# Copyright (c) 2016, Sascha Schade
 %# Copyright (c) 2016-2017, Fabian Greif
+%# Copyright (c) 2016-2017, Niklas Hauser
 %#
 %# This file is part of the modm project.
 %#
@@ -41,10 +41,10 @@
 %% if partname.startswith("stm32f3")
 	// enable clock
 	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
-%% if target["name"] in ["302"] or (target["name"] in ["303"] and target["size"] in ["c", "e"])
+	%% if target["name"] in ["02"] or (target["name"] in ["03"] and target["size"] in ["c", "e"])
 	// Remap USB Interrupts
 	SYSCFG->CFGR1 |= SYSCFG_CFGR1_USB_IT_RMP;
-%%   endif
+	%% endif
 %% elif partname.startswith("stm32f4")
 // Only the more powerful F4 targets have CCM or Backup SRAM
 #ifdef RCC_AHB1ENR_CCMDATARAMEN

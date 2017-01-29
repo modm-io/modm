@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2013-2014, Kevin Läufer
  * Copyright (c) 2014, Sascha Schade
- * Copyright (c) 2014, 2016, Niklas Hauser
+ * Copyright (c) 2014, 2016-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -14,25 +14,6 @@
 #ifndef MODM_STM32F3_ADC{{ id }}_HPP
 #	error 	"Don't include this file directly, use 'adc_{{ id }}.hpp' instead!"
 #endif
-%#
-%% if target["family"] in ["f3"]
-%% if id in [1,2]
-	%% set id_common = '12'
-	%% set id_common_u = '1_2_COMMON'
-%% elif id in [3,4]
-	%% set id_common = '34'
-	%% set id_common_u = '3_4_COMMON'
-%% endif
-%% elif target["family"] in ["l4"]
-	%% set id_common = '123'
-	%% set id_common_u = '123_COMMON'
-%% endif
-%% if target["family"] in ["f3"]
-	%% set adc_ccr = 'ADC12_CCR'
-%% elif target["family"] in ["l4"]
-	%% set adc_ccr = 'ADC_CCR'
-%% endif
-%#
 
 #include <modm/architecture/driver/delay.hpp>	// modm::delayMicroseconds
 

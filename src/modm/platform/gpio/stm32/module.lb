@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2016, Niklas Hauser
+# Copyright (c) 2016-2017, Niklas Hauser
 # Copyright (c) 2017, Fabian Greif
 #
 # This file is part of the modm project.
@@ -53,13 +53,10 @@ def init(module):
     module.parent = "platform"
 
 def prepare(module, options):
-    if not options[":target"].has_driver("gpio", compatible=["stm32", "stm32f1"]):
+    if not options[":target"].has_driver("gpio", type=["stm32", "stm32f1"]):
         return False
 
-    # FIXME: All these depencies come from TypeIds
-    #module.depends([":platform:core", ":platform:gpio.generic",
-    #                ":platform:adc", ":platform:can", ":platform:clock", ":platform:fsmc", ":platform:i2c",
-    #                ":platform:spi", ":platform:timer", ":platform:uart", ":platform:usb"])
+    module.depends(":platform:core", ":platform:gpio.generic")
     return True
 
 def build(env):
@@ -80,11 +77,11 @@ def build(env):
     env.outbasepath = "src/modm/platform/gpio"
 
     gpio_source = "gpio_pin.hpp.in"
-    if driver["compatible"] == "stm32f1":
+    if driver["type"] == "stm32f1":
        gpio_source = "gpio_pin_f1.hpp.in"
 
     for pin in driver["gpio"]:
-        env.template(gpio_source, "gpio_{}{}.hpp".format(pin["port"], pin["id"]),
+        env.template(gpio_source, "gpio_{}{}.hpp".format(pin["port"], pin["pin"]),
                     substitutions=properties.update({'gpio': pin}),
                     filters={
                         "portRanges": filter_port_ranges,

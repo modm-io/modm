@@ -2,7 +2,7 @@
  * Copyright (c) 2009, 2011-2012, Georgi Grinshpun
  * Copyright (c) 2009-2012, 2016-2017, Fabian Greif
  * Copyright (c) 2010, Martin Rosekeit
- * Copyright (c) 2011, 2013-2016, Niklas Hauser
+ * Copyright (c) 2011, 2013-2017, Niklas Hauser
  * Copyright (c) 2013-2014, 2016, Kevin Läufer
  * Copyright (c) 2014, Sascha Schade
  *
@@ -107,7 +107,7 @@ public:
 		Trigger	= TIM_SMCR_SMS_2 | TIM_SMCR_SMS_1,
 		/// Rising edges of the selected trigger (TRGI) clock the counter.
 		ExternalClock = TIM_SMCR_SMS_2 | TIM_SMCR_SMS_1 | TIM_SMCR_SMS_0,
-	%% if (target["family"] == "f3" and target["name"] not in ["358", "373", "378", "398"]) or target["family"] == "f7" and (id >= 2 and id <= 4)
+	%% if (target["family"] == "f3" and target["name"] not in ["58", "73", "78", "98"]) or target["family"] == "f7" and (id >= 2 and id <= 4)
 		/// reinitialize and start counter
 		SLAVE_RESET_TRIGGER	= TIM_SMCR_SMS_3,
 	%% endif

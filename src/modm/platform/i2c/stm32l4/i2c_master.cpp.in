@@ -1,5 +1,6 @@
 // coding: utf-8
 /*
+ * Copyright (c) 2017, Niklas Hauser
  * Copyright (c) 2017, Sascha Schade
  *
  * This file is part of the modm project.
@@ -339,11 +340,11 @@ void
 modm::stm32::I2cMaster{{ id }}::initializeWithPrescaler(/* uint8_t peripheralFrequency, uint8_t riseTime, uint16_t prescaler */)
 {
 	// Enable clock
-	RCC->APB1ENR1 |= RCC_APB1ENR1_I2C{{ id }}EN;
+	RCC->APB1ENR{{aid}} |= RCC_APB1ENR{{aid}}_I2C{{ id }}EN;
 
 	// reset module
-	RCC->APB1RSTR1 |=  RCC_APB1RSTR1_I2C{{ id }}RST;
-	RCC->APB1RSTR1 &= ~RCC_APB1RSTR1_I2C{{ id }}RST;
+	RCC->APB1RSTR{{aid}} |=  RCC_APB1RSTR{{aid}}_I2C{{ id }}RST;
+	RCC->APB1RSTR{{aid}} &= ~RCC_APB1RSTR{{aid}}_I2C{{ id }}RST;
 
 	// Disable the I2C peripheral which causes a software reset
 	I2C{{ id }}->CR1 &= ~I2C_CR1_PE;

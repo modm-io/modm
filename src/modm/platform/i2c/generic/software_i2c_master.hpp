@@ -3,7 +3,7 @@
  * Copyright (c) 2010, Thorsten Lajewski
  * Copyright (c) 2010-2011, Georgi Grinshpun
  * Copyright (c) 2012, Sascha Schade
- * Copyright (c) 2012-2016, Niklas Hauser
+ * Copyright (c) 2012-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -148,6 +148,6 @@ private:
 
 } // namespace modm
 
-#include "i2c_master_impl.hpp"
+#include "software_i2c_master_impl.hpp"
 
 #endif // MODM_SOFTWARE_I2C_HPP

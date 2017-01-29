@@ -10,8 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/driver.hpp>
-#include "st7036.hpp"
+#include <modm/architecture/interface/accessor.hpp>
 
 namespace modm
 {

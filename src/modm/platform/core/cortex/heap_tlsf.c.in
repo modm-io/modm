@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Niklas Hauser
+ * Copyright (c) 2016-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -22,7 +22,7 @@
 #include <modm/architecture/interface/assert.h>
 
 // ----------------------------------------------------------------------------
-#include <tlsf.h>
+#include <tlsf/tlsf.h>
 
 #ifndef MODM_TLSF_MAX_MEM_POOL_COUNT
 #define MODM_TLSF_MAX_MEM_POOL_COUNT 6

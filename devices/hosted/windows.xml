@@ -6,7 +6,7 @@
 
     <attribute-core value="x86"/>
 
-    <driver type="graphics" compatible="hosted"/>
-    <driver type="uart" compatible="hosted"/>
+    <driver name="graphics" type="hosted"/>
+    <driver name="uart" type="hosted"/>
   </device>
 </modm>

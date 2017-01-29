@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Niklas Hauser
+ * Copyright (c) 2016-2017, Niklas Hauser
  * Copyright (c) 2017, Fabian Greif
  *
  * This file is part of the modm project.
@@ -32,7 +32,7 @@ PCLK2 48 MHz and PCLK1 48 MHz. The maximum frequency should be adapted according
 */
 	%% set table = {3600: [24, 48]}
 %% elif target["family"] in ["f1", "f3"]
-	%% if target["name"] in ["100"]
+	%% if target["family"] == "f1" and target["name"] in ["00"]
 /*
 For the stm32f100 devices, the maximum frequency of the SYSCLK and HCLK is 24 MHz,
 PCLK2 24 MHz and PCLK1 24 MHz.
@@ -96,7 +96,7 @@ frequency should be adapted accordingly:
 		2100: [16, 32, 48, 64, 80, 96, 112, 120] }
 	%}
 %% elif target["family"] == "f4"
-	%% if target["name"] in ["410", "411", "412"]
+	%% if target["name"] in ["10", "11", "12", "13", "23"]
 /*
 For the 410, 411 & 412 devices, the maximum frequency of the SYSCLK and HCLK is 100 MHz,
 PCLK2 100 MHz and PCLK1 50 MHz. Depending on the device voltage range, the maximum
@@ -128,7 +128,7 @@ frequency should be adapted accordingly:
 			2400: [18, 36, 54, 72, 90, 100],
 			2100: [16, 32, 48, 64, 80, 96, 100] }
 		%}
-	%% elif target["name"] in ["401"]
+	%% elif target["name"] in ["01"]
 /*
 For the 401 devices, the maximum frequency of the SYSCLK and HCLK is 84 MHz,
 PCLK2 84 MHz and PCLK1 42 MHz. Depending on the device voltage range, the maximum
@@ -158,7 +158,7 @@ frequency should be adapted accordingly:
 			2400: [18, 36, 54, 72, 84],
 			2100: [16, 32, 48, 64, 80, 84] }
 		%}
-	%% elif target["name"] in ["405", "407", "415", "417"]
+	%% elif target["name"] in ["05", "07", "15", "17"]
 /*
 For the 405, 407, 415, 417 devices, the maximum frequency of the SYSCLK and HCLK is
 168 MHz, PCLK2 84 MHz and PCLK1 42 MHz. Depending on the device voltage range, the
@@ -192,7 +192,7 @@ maximum frequency should be adapted accordingly:
 			2400: [22, 44, 66, 88, 110, 132, 154, 168],
 			2100: [20, 40, 60, 80, 100, 120, 140, 160] }
 		%}
-	%% elif target["name"] in ["427", "429", "437", "439", "446", "469", "479"]
+	%% elif target["name"] in ["27", "29", "37", "39", "46", "69", "79"]
 /*
 For the 427, 429, 437, 439, 446, 469, 479 devices, the maximum frequency of the
 SYSCLK and HCLK is 180 MHz, PCLK2 90 MHz and PCLK1 45 MHz. Depending on the device
@@ -310,7 +310,11 @@ flash_latency_{{ mV }}[] =
 uint32_t
 modm::stm32::ClockControl::setFlashLatency(const uint32_t CPU_Frequency, const uint16_t mV)
 {
-%% if target["name"] != "100"
+%% if target["family"] == "f1" and target["name"] == "00"
+	(void) CPU_Frequency;
+	(void) mV;
+	uint32_t max_freq(MHz24);
+%% else
 	const uint32_t *lut(flash_latency_{{ (table|sort)[-1] }});
 	uint8_t lut_size(sizeof(flash_latency_{{ (table|sort)[-1] }}) / sizeof(uint32_t));
 	%% if table|length > 1
@@ -351,10 +355,6 @@ modm::stm32::ClockControl::setFlashLatency(const uint32_t CPU_Frequency, const u
 	%% endif
 		FLASH->ACR = acr;
 	}
-%% else
-	(void) CPU_Frequency;
-	(void) mV;
-	uint32_t max_freq(MHz24);
 %% endif
 
 	return max_freq;

@@ -129,6 +129,7 @@ class modm_packed
 Data : public DataBase
 {
 public:
+	inline
 	Data();
 
 	/**
@@ -200,6 +201,7 @@ class modm_packed
 DataDouble : public DataBase
 {
 public:
+	inline
 	DataDouble();
 
 	int32_t inline

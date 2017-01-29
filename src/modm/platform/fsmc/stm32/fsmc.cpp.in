@@ -2,7 +2,7 @@
  * Copyright (c) 2009, Martin Rosekeit
  * Copyright (c) 2009-2013, 2016-2017, Fabian Greif
  * Copyright (c) 2013, Kevin Läufer
- * Copyright (c) 2014, 2016, Niklas Hauser
+ * Copyright (c) 2014, 2016-2017, Niklas Hauser
  * Copyright (c) 2016, Sascha Schade
  *
  * This file is part of the modm project.
@@ -14,14 +14,6 @@
 // ----------------------------------------------------------------------------
 
 #include "fsmc.hpp"
-
-%% if target["family"] in ["f2", "f3", "f4", "f7"]
-%%  set BCRx = "BCR1"
-%%  set BTRx = "BTR1"
-%% elif target["family"] == "f1"
-%%  set BCRx = "BCRx"
-%%  set BTRx = "BTRx"
-%% endif
 
 // ----------------------------------------------------------------------------
 /*

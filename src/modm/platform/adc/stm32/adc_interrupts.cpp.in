@@ -14,7 +14,7 @@
 #include "../device.hpp"
 
 // this should be able to be generated instead of using Macros for this.
-%% for id in driver.instance
+%% for id in instances
 #include "adc_interrupt_{{ id }}.hpp"
 %% endfor
 
@@ -22,7 +22,7 @@ extern "C" void
 ADC_IRQHandler(void)
 {
 
-%% for id in driver.instance
+%% for id in instances
 	if (modm::stm32::AdcInterrupt{{ id }}::getInterruptFlags()) {
 		modm::stm32::AdcInterrupt{{ id }}::handler();
 	}

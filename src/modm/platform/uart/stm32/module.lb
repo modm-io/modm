@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2016, Niklas Hauser
+# Copyright (c) 2016-2017, Niklas Hauser
 # Copyright (c) 2017, Fabian Greif
 #
 # This file is part of the modm project.
@@ -11,19 +11,11 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-def get_properties(env):
-    device = env[":target"]
-    driver = device.get_driver("uart")
-    properties = device.properties
-    properties["target"] = device.identifier
-    properties["partname"] = device.partname
-    properties["driver"] = driver
-    return properties
-
 
 class Instance(Module):
-    def __init__(self, instance):
-        self.instance = instance
+    def __init__(self, driver, instance):
+        self.driver = driver
+        self.instance = int(instance)
 
     def init(self, module):
         module.name = str(self.instance)
@@ -53,19 +45,20 @@ class Instance(Module):
         return True
 
     def build(self, env):
-        properties = get_properties(env)
+        device = env[":target"]
+        properties = device.properties
+        properties["target"] = device.identifier
+        properties["partname"] = device.partname
         properties["id"] = self.instance
+        properties["driver"] = self.driver
 
         if properties["target"]["family"] == "f0":
             properties["apb"] = "2" if self.instance in [1, 6, 7, 8] else "1"
         else:
-            properties["apb"] = "2" if self.instance in [1, 6] else "1"
-        properties["apb_post"] = "1" if properties["target"]["family"] in ["l4"] else ""
+            properties["apb"] = "2" if self.instance in [1, 6, 9, 10] else "1"
+        properties["apb_post"] = "1" if properties["target"]["family"] in ["l4"] and self.instance != 1 else ""
 
-        if self.instance in [1, 2, 3, 6] or properties["target"]["family"] == "f0":
-            properties["uart_name"] = "Usart"
-        else:
-            properties["uart_name"] = "Uart"
+        properties["uart_name"] = self.driver["name"].capitalize()
 
         env.substitutions = properties
         env.outbasepath = "src/modm/platform/uart"
@@ -82,20 +75,29 @@ def init(module):
 
 def prepare(module, options):
     device = options[":target"]
-    if not device.has_driver("uart:stm32"):
+    if not (device.has_driver("uart:stm32*") or device.has_driver("usart:stm32*")):
         return False
 
     module.depends(":platform:core")
 
-    for instance in listify(device.get_driver("uart")["instance"]):
-        module.add_submodule(Instance(int(instance)))
+    for driver in (device.get_all_drivers("uart") + device.get_all_drivers("usart")):
+        for instance in driver["instance"]:
+            module.add_submodule(Instance(driver, instance))
 
     return True
 
 def build(env):
-    env.substitutions = get_properties(env)
-    env.outbasepath = "src/modm/platform/uart"
+    device = env[":target"]
+    properties = device.properties
+    properties["target"] = device.identifier
+    properties["partname"] = device.partname
 
+    drivers = (device.get_all_drivers("usart") + device.get_all_drivers("uart"))
+    properties["extended_driver"] = ("extended" in drivers[0]["type"])
+    properties["over8_sampling"] = ("feature" in drivers[0]) and ("over8" in drivers[0]["feature"])
+
+    env.substitutions = properties
+    env.outbasepath = "src/modm/platform/uart"
     env.template("uart_base.hpp.in")
     env.template("type_ids.hpp.in")
     env.template("uart_baudrate.hpp.in")

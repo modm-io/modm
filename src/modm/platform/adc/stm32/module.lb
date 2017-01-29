@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2016, Niklas Hauser
+# Copyright (c) 2016-2017, Niklas Hauser
 # Copyright (c) 2017, Fabian Greif
 #
 # This file is part of the modm project.
@@ -10,6 +10,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
+
+instances = []
 
 class Instance(Module):
     def __init__(self, instance):
@@ -22,6 +24,9 @@ class Instance(Module):
     def prepare(self, module, options):
         module.depends(":platform:adc")
         return True
+
+    def pre_build(self, env):
+        instances.append(self.instance)
 
     def build(self, env):
         device = env[":target"]
@@ -66,7 +71,7 @@ def prepare(module, options):
     if not device.has_driver("adc:stm32"):
         return False
 
-    module.depends([":platform:core", ":utils"])
+    module.depends(":platform:core", ":utils")
 
     for instance in listify(device.get_driver("adc")["instance"]):
         module.add_submodule(Instance(int(instance)))
@@ -81,8 +86,10 @@ def build(env):
     properties["target"] = device.identifier
     properties["partname"] = device.partname
     properties["driver"] = driver
+    properties["instances"] = instances
 
     env.substitutions = properties
     env.outbasepath = "src/modm/platform/adc"
 
     env.template("type_ids.hpp.in")
+    env.template("adc_interrupts.cpp.in")

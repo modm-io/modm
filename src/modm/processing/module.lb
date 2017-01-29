@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2016, Niklas Hauser
+# Copyright (c) 2016-2017, Niklas Hauser
 # Copyright (c) 2017, Fabian Greif
 #
 # This file is part of the modm project.
@@ -16,7 +16,8 @@ def init(module):
 
 def prepare(module, options):
     device = options[":target"]
-    if device.properties["core"].startswith("cortex-m4"):
+    core = device.get_driver("core")
+    if core and core["type"].startswith("cortex-m4"):
         module.add_option(
             BooleanOption(
                 name="enable_freertos",

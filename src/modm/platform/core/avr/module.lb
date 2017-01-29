@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2017, Fabian Greif
+# Copyright (c) 2017, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -15,10 +16,10 @@ def init(module):
     module.parent = "platform"
 
 def prepare(module, options):
-    if not options[":target"].has_driver("core:avr"):
+    if not options[":target"].has_driver("core:avr*"):
         return False
 
-    module.depends([":architecture", ":stdc++"])
+    module.depends(":architecture", ":stdc++")
 
     module.add_option(
         EnumerationOption(
@@ -45,6 +46,9 @@ def build(env):
     properties["partname"] = device.partname
     properties["driver"] = driver
 
+    env.outbasepath = "link"
+    env.copy("linkerscript/linkerscript.ld", "linkerscript.ld")
+
     env.substitutions = properties
     env.outbasepath = "src/modm/platform/core"
 
@@ -57,6 +61,6 @@ def build(env):
     env.template("ram.cpp.in")
     env.template("interrupts.hpp.in")
 
-    if properties["family"] == "xmega":
+    if "xmega" in driver["type"]:
         env.copy("utils.hpp")
         env.copy("utils.cpp")

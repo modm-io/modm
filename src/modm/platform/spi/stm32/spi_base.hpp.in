@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013, Kevin Läufer
- * Copyright (c) 2013-2016, Niklas Hauser
+ * Copyright (c) 2013-2017, Niklas Hauser
  * Copyright (c) 2014, Daniel Krebs
  *
  * This file is part of the modm project.
@@ -61,7 +61,7 @@ public:
 %% if target["family"] != "f1"
 		FrameFormatError	= SPI_SR_FRE,
 %% endif
-%% if target["family"] in ["f0", "f3", "f7"]
+%% if "fifo" in features
 		FifoRxLevel			= SPI_SR_FRLVL,
 		FifoTxLevel			= SPI_SR_FTLVL,
 %% endif
@@ -98,7 +98,7 @@ public:
 	enum class
 	DataSize : uint32_t
 	{
-%% if target["family"] in ["f0", "f3", "f7", "l4"]
+%% if "data-size" in features
 		Bit4  = SPI_CR2_DS_1 | SPI_CR2_DS_0,				///< 0b0011
 		Bit5  = SPI_CR2_DS_2,								///< 0b0100
 		Bit6  = SPI_CR2_DS_2 | SPI_CR2_DS_0,				///< 0b0101

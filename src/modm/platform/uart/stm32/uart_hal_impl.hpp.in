@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013-2014, 2016, Kevin Läufer
- * Copyright (c) 2013-2016, Niklas Hauser
+ * Copyright (c) 2013-2017, Niklas Hauser
  * Copyright (c) 2017, Fabian Greif
  *
  * This file is part of the modm project.
@@ -147,7 +147,7 @@ modm::stm32::{{ name }}::setLastBitClockPulse(LastBitClockPulse pulse)
 void
 modm::stm32::{{ name }}::write(uint8_t data)
 {
-%% if target["family"] in ["f0", "f3", "f7", "l4"]
+%% if "extended" in driver["type"]
 	{{ peripheral }}->TDR = data;
 %% else
 	{{ peripheral }}->DR = data;
@@ -157,7 +157,7 @@ modm::stm32::{{ name }}::write(uint8_t data)
 void
 modm::stm32::{{ name }}::read(uint8_t &data)
 {
-%% if target["family"] in ["f0", "f3", "f7", "l4"]
+%% if "extended" in driver["type"]
 	data = {{ peripheral }}->RDR;
 %% else
 	data = {{ peripheral }}->DR;
@@ -187,7 +187,7 @@ modm::stm32::{{ name }}::setReceiverEnable(bool enable)
 bool
 modm::stm32::{{ name }}::isReceiveRegisterNotEmpty()
 {
-%% if target["family"] in ["f0", "f3", "f7", "l4"]
+%% if "extended" in driver["type"]
 	return {{ peripheral }}->ISR & USART_ISR_RXNE;
 %% else
 	return {{ peripheral }}->SR & USART_SR_RXNE;
@@ -197,7 +197,7 @@ modm::stm32::{{ name }}::isReceiveRegisterNotEmpty()
 bool
 modm::stm32::{{ name }}::isTransmitRegisterEmpty()
 {
-%% if target["family"] in ["f0", "f3", "f7", "l4"]
+%% if "extended" in driver["type"]
 	return {{ peripheral }}->ISR & USART_ISR_TXE;
 %% else
 	return {{ peripheral }}->SR & USART_SR_TXE;
@@ -208,7 +208,7 @@ void
 modm::stm32::{{ name }}::enableInterruptVector(bool enable, uint32_t priority)
 {
 %% if target["family"] == "f0" and id in [3,4,5,6,7,8]
-	%% if target["name"] in ["091", "098"]
+	%% if target["name"] in ["91", "98"]
 		%% set irq = "USART3_8"
 	%% else
 		%% set irq = "USART3_4"
@@ -243,7 +243,7 @@ modm::stm32::{{ name }}::disableInterrupt(Interrupt_t interrupt)
 modm::stm32::{{ name }}::InterruptFlag_t
 modm::stm32::{{ name }}::getInterruptFlags()
 {
-%% if target["family"] in ["f0", "f3", "f7", "l4"]
+%% if "extended" in driver["type"]
 	return InterruptFlag_t( {{ peripheral }}->ISR );
 %% else
 	return InterruptFlag_t( {{ peripheral }}->SR );
@@ -253,9 +253,9 @@ modm::stm32::{{ name }}::getInterruptFlags()
 void
 modm::stm32::{{ name }}::acknowledgeInterruptFlags(InterruptFlag_t flags)
 {
-%% if target["family"] in ["f0", "f3", "f7", "l4"]
+%% if "extended" in driver["type"]
 	// Not all flags can be cleared by writing to this reg
-	%% if target["name"] in ["030", "070"]
+	%% if target["family"] == "f0" and target["name"] in ["30", "70"]
 	const uint32_t mask = USART_ICR_PECF  | USART_ICR_FECF   |
 		USART_ICR_NCF   | USART_ICR_ORECF | USART_ICR_IDLECF |
 		USART_ICR_TCCF  | USART_ICR_CTSCF  |

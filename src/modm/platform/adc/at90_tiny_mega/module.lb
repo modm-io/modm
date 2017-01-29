@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2017, Fabian Greif
+# Copyright (c) 2017, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -16,7 +17,7 @@ def init(module):
 
 def prepare(module, options):
     device = options[":target"]
-    if not device.has_driver("adc:avr"):
+    if not device.has_driver("adc:avr") or device.identifier["family"] not in ["tiny", "mega"]:
         return False
 
     target = device.identifier
@@ -24,7 +25,7 @@ def prepare(module, options):
         # The ATmega64hve2 is not supported by this driver.
         return False
 
-    module.depends([":platform:core"])
+    module.depends(":platform:core")
     return True
 
 def build(env):
@@ -86,7 +87,7 @@ def build(env):
     env.template("adc_interrupt.hpp.in")
     env.template("adc_interrupt.cpp.in")
 
-    if properties["family"] == "mega":
+    if target["family"] == "mega":
         env.template("adc_mega.hpp.in", "adc.hpp")
-    elif properties["family"] == "tiny":
+    elif target["family"] == "tiny":
         env.template("adc_tiny.hpp.in", "adc.hpp")

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2017, Fabian Greif
+# Copyright (c) 2017, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -33,7 +34,7 @@ def prepare(module, options):
             maximum=256,	# FIXME
             default=16))
 
-    module.depends([":platform:core", ":debug", ":platform:clock.generic"])
+    module.depends(":platform:core", ":debug", ":platform:clock.generic")
     return True
 
 def build(env):

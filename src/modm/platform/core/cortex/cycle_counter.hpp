@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2015, Kevin Läufer
+ * Copyright (c) 2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -12,7 +13,7 @@
 #ifndef MODM_CORTEX_CYCLE_COUNTER_HPP
 #define MODM_CORTEX_CYCLE_COUNTER_HPP
 
-#include "../../../device.hpp"
+#include "../device.hpp"
 
 namespace modm
 {
