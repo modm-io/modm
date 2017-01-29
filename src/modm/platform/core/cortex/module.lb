@@ -97,19 +97,6 @@ def prepare(module, options):
             description="",
             default=""))
 
-    module.add_option(
-        BooleanOption(
-            name="free_rtos.support",
-            description="",
-            default=False))
-    module.add_option(
-        NumericOption(
-            name="free_rtos.frequency",
-            description="",
-            minimum=1000,
-            maximum=10000,
-            default=1000))
-
     return True
 
 def build(env):
@@ -123,6 +110,8 @@ def build(env):
     # Cortex-M0 does not have remappable vector table, so it will remain in Flash
     properties["vector_table_location"] = env.get_option(":::vector_table_location", "rom")
     properties["core"] = driver["type"]
+    properties["systick_frequency"] = int(env.get_option(":freertos:frequency", 1000))
+    assert(properties["systick_frequency"] % 1000 == 0)
 
     # Add ARM Cortex-M exceptions
     interrupts = {

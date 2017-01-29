@@ -20,9 +20,16 @@ def prepare(module, options):
     if not core or not core["type"].startswith("cortex-m4"):
         return False
 
+    module.add_option(
+        EnumerationOption(
+            name="frequency",
+            description="Context switch frequency in Hz",
+            enumeration=range(1000, 10001, 1000),
+            default=1000))
+
     return True
 
 def build(env):
     env.outbasepath = "ext/freertos"
-
-    env.copy(".", ignore=env.ignore_files("*.lb"))
+    env.copy(".", ignore=env.ignore_files("*.lb", "*.in"))
+    env.template("portable/FreeRTOSConfig.h.in", "portable/FreeRTOSConfig.h")

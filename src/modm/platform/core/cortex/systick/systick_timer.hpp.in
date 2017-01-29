@@ -52,13 +52,7 @@ public:
 	static void
 	initialize()
 	{
-%% if options["free_rtos.support"]
-		static_assert({{ options["free_rtos.frequency"] }} % 1000 == 0,
-				"FreeRTOS switching frequency must be a multiple of 1000Hz!");
-		constexpr float desired = float(SystemClock::Frequency) / {{ options["free_rtos.frequency"] }};
-%% else
-		constexpr float desired = float(SystemClock::Frequency) / 1000;
-%% endif
+		constexpr float desired = float(SystemClock::Frequency) / {{ systick_frequency }};
 
 		// calculate the possible rates above and below the requested rate
 		constexpr uint32_t rate_lower = SystemClock::Frequency / std::ceil(desired);
@@ -73,11 +67,7 @@ public:
 		constexpr uint32_t generated_rate = SystemClock::Frequency / reload;
 		PeripheralDriver::assertBaudrateInTolerance<
 				/* nearest possible value */ generated_rate,
-%% if options["free_rtos.support"]
-				/* desired = */ {{ options["free_rtos.frequency"] }},
-%% else
-				/* desired = */ 1000,
-%% endif
+				/* desired = */ {{ systick_frequency }},
 				tolerance >();
 
 		enable(reload - 1);

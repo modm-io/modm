@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013, Kevin Läufer
- * Copyright (c) 2014-2016, Niklas Hauser
+ * Copyright (c) 2014-2017, Niklas Hauser
  * Copyright (c) 2017, Fabian Greif
  *
  * This file is part of the modm project.
@@ -19,19 +19,18 @@
 #include "systick_timer.hpp"
 
 static modm::cortex::InterruptHandler sysTickHandler(nullptr);
-%% if options["free_rtos.support"]
-static uint16_t counter(1);
-static uint16_t counterReload(1);
+%% if systick_frequency > 1000
+static uint8_t counter;
 %% endif
 
 extern "C" void
 SysTick_Handler(void)
 {
-%% if options["free_rtos.support"]
+%% if systick_frequency > 1000
 	if (--counter == 0)
 	{
 		modm::Clock::increment();
-		counter = counterReload;
+		counter = {{ systick_frequency // 1000 }};
 	}
 %% else
 	modm::Clock::increment();
@@ -43,9 +42,8 @@ SysTick_Handler(void)
 void
 modm::cortex::SysTickTimer::enable(uint32_t reload)
 {
-%% if options["free_rtos.support"]
-	counterReload = {{ options["free_rtos.frequency"] }} / 1000;
-	counter = counterReload;
+%% if systick_frequency > 1000
+	counter = {{ systick_frequency // 1000 }};
 %% endif
 
 	SysTick->LOAD = reload;

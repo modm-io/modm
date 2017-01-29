@@ -58,11 +58,6 @@
 
 #define GCC_ARMCM3
 
-// MUST be multiples of 1000 !!!
-#ifndef MODM_CORTEX_SYSTICK_HZ
-#define MODM_CORTEX_SYSTICK_HZ 1000
-#endif
-
 /*-----------------------------------------------------------
  * Application specific definitions.
  *
@@ -76,8 +71,8 @@
  *----------------------------------------------------------*/
 
 #define configUSE_PREEMPTION			1
-#define configCPU_CLOCK_HZ				F_CPU	// set by modm
-#define configTICK_RATE_HZ				MODM_CORTEX_SYSTICK_HZ
+#define configCPU_CLOCK_HZ				0	// never evaluated in our port
+#define configTICK_RATE_HZ				{{ options["::frequency"] }}
 #define configMAX_PRIORITIES			255
 #define configMINIMAL_STACK_SIZE		128
 #define configTOTAL_HEAP_SIZE			( ( size_t ) ( 8 * 1024 ) )
@@ -127,4 +122,3 @@ NVIC value of 255. */
 //#define configLIBRARY_KERNEL_INTERRUPT_PRIORITY	15
 
 #endif /* FREERTOS_CONFIG_H */
-
