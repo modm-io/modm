@@ -43,19 +43,24 @@ def prepare(module, options):
             maximum=2 ** 16,
             default=2 ** 10 * 3 - 32))
 
-    uarts = options[":target"].get_driver("uart")["instance"]
+    uarts = []
+    for u in [u["instance"] for u in (options[":target"].get_all_drivers("uart") +
+                                      options[":target"].get_all_drivers("usart"))]:
+        uarts.extend(u);
+    if len(uarts):
+        uarts.sort()
+        module.add_option(
+            EnumerationOption(
+                name="hardfault.log.uart",
+                description="",
+                enumeration=uarts,
+                default=uarts[0]))
     module.add_option(
         EnumerationOption(
             name="hardfault.log",
             description="",
             enumeration=["disabled", "basic", "full"],
             default="disabled"))
-    module.add_option(
-        EnumerationOption(
-            name="hardfault.log.uart",
-            description="",
-            enumeration=uarts,
-            default=uarts[0]))
 
     pins = [p["port"].upper() + p["pin"] for p in options[":target"].get_driver("gpio")["gpio"]]
     module.add_option(
