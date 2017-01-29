@@ -1,0 +1,299 @@
+/*
+ * Copyright (c) 2016, Fabian Greif
+ * Copyright (c) 2016-2017, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+%% set port = gpio["port"] | upper
+%% set reg  = "GPIO" ~ port
+%% set pin  = gpio["pin"]
+
+#ifndef MODM_STM32_GPIO_PIN_{{ port ~ pin }}_HPP
+#define MODM_STM32_GPIO_PIN_{{ port ~ pin }}_HPP
+
+#include "../device.hpp"
+#include "base.hpp"
+
+namespace modm
+{
+
+namespace platform
+{
+
+/// @cond
+// Forward declarations
+class GpioOutput{{ port ~ pin }};
+class GpioInput{{ port ~ pin }};
+class Gpio{{ port ~ pin }};
+/// @endcond
+
+%% for type in ["IO", "Output", "Input"]
+	%% set gname = "Gpio" ~  (type if type != "IO" else "") ~ port ~ pin
+	%% set superclass = "Gpio" ~ type
+
+/// {{type}} class for Pin {{port ~ pin}}
+/// @ingroup	{{partname}}_gpio
+class {{gname}} : public Gpio, ::modm::{{superclass}}
+{
+public:
+	using Output = GpioOutput{{ port ~ pin }};
+	using Input = GpioInput{{ port ~ pin }};
+	using IO = Gpio{{ port ~ pin }};
+	using Type = Gpio{{ port ~ pin }};
+	/// Port name.
+	static constexpr Port port = Port::{{port}};
+	/// Pin Number.
+	static constexpr uint8_t pin = {{pin}};
+	/// Bitmask for registers that contain a 1bit value for every pin.
+	static constexpr uint16_t mask  = 0x1 << pin;
+	/// Bitmask for registers that contain a 2bit value for every pin.
+	static constexpr uint32_t mask2 = 0x3 << (pin * 2);
+
+protected:
+	/// Port Number.
+	static constexpr uint8_t port_nr = uint8_t(port);
+	/// Alternate Function register id. 0 for pin 0-7. 1 for pin 8-15.
+	static constexpr uint8_t af_id  = pin / 8;
+	/// Alternate Function offset.
+	static constexpr uint8_t af_offset = (pin * 4) % 16;
+	/// Alternate Function register mask.
+	static constexpr uint32_t af_mask  = 0xf << af_offset;
+	/// ExternalInterruptIRQ
+	static constexpr IRQn_Type ExternalInterruptIRQ = EXTI{{ exti_irqn }}_IRQn;
+
+protected:
+	inline static void
+	setAlternateFunction(uint8_t af) {
+		{{reg}}->AFR[af_id] = ({{reg}}->AFR[af_id] & ~af_mask) | ((af & 0xf) << af_offset);
+		{{reg}}->MODER = ({{reg}}->MODER & ~mask2) | (i(Mode::AlternateFunction) << (pin * 2));
+	}
+
+	/// Enable Analog Mode which is needed to use this pin as an ADC input.
+	inline static void
+	setAnalogInput() {
+		{{reg}}->MODER |= i(Mode::Analog) << (pin * 2);
+		%% if target["family"] in ["l4"]
+			%% if target["name"] in ["71", "75", "76", "85", "86"]
+		{{reg}}->ASCR |= (1 << pin);
+			%% endif
+		%% endif
+	}
+
+public:
+	%% if type in ["IO" , "Output"]
+	// GpioOutput
+	// start documentation inherited
+	inline static void setOutput() {
+		{{reg}}->MODER = ({{reg}}->MODER & ~mask2) | (i(Mode::Output)<< pin * 2);
+	}
+	modm_always_inline static void setOutput(bool status) {
+		set(status);
+		setOutput();
+	}
+	modm_always_inline static void set() {
+		{{reg}}->BSRR = mask;
+	}
+	modm_always_inline static void set(bool status) {
+		if (status) set();
+		else        reset();
+	}
+	modm_always_inline static void reset() {
+		{{reg}}->BSRR = (uint32_t(mask) << 16);
+	}
+	modm_always_inline static void toggle() {
+		if (isSet()) reset();
+		else         set();
+	}
+	modm_always_inline static bool isSet() {
+		return ({{reg}}->ODR & mask);
+	}
+	// stop documentation inherited
+	inline static void
+	configure(OutputType type, OutputSpeed speed = OutputSpeed::MHz50) {
+		{{reg}}->OTYPER  = ({{reg}}->OTYPER  & ~mask)  | (i(type) << pin);
+		{{reg}}->OSPEEDR = ({{reg}}->OSPEEDR & ~mask2) | (i(speed) << (pin * 2));
+	}
+	modm_always_inline static void
+	setOutput(OutputType type, OutputSpeed speed = OutputSpeed::MHz50) {
+		configure(type, speed);
+		setOutput();
+	}
+	%% endif
+	%% if type in ["IO", "Input"]
+	// GpioInput
+	// start documentation inherited
+	inline static void
+	setInput() {
+		{{reg}}->MODER   &= ~mask2;
+		{{reg}}->OTYPER  &= ~mask;
+		{{reg}}->OSPEEDR &= ~mask2;
+	}
+	modm_always_inline static bool read() {
+		return ({{reg}}->IDR & mask);
+	}
+	// end documentation inherited
+	inline static void configure(InputType type) {
+		{{reg}}->PUPDR = ({{reg}}->PUPDR & ~mask2) | (i(type) << (pin * 2));
+	}
+	modm_always_inline static void setInput(InputType type) {
+		configure(type);
+		setInput();
+	}
+	// External Interrupts
+	inline static void
+	enableExternalInterrupt()
+	{
+		// PA[x], x =  0 ..  3 maps to EXTICR[0]
+		// PA[x], x =  4 ..  7 maps to EXTICR[1]
+		// PA[x], x =  8 .. 11 maps to EXTICR[2]
+		// PA[x], x = 12 .. 15 maps to EXTICR[3]
+		// => bit3 and bit2 (mask 0x0c) specify the register
+		// => bit1 and bit0 (mask 0x03) specify the bit position
+		constexpr uint8_t index = (pin & 0x0c) >> 2;
+		constexpr uint8_t bit_pos = (pin & 0x03) << 2;
+		constexpr uint16_t syscfg_mask = (0x0f) << bit_pos;
+		constexpr uint16_t syscfg_value = (port_nr & (0x0f)) << bit_pos;
+		// Enable SYSCFG
+		RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+		SYSCFG->EXTICR[index] = (SYSCFG->EXTICR[index] & ~syscfg_mask) | syscfg_value;
+		EXTI->IMR{{pf}} |= mask;
+	}
+	modm_always_inline static void
+	disableExternalInterrupt()
+	{
+		EXTI->IMR{{pf}} &= ~mask;
+	}
+	modm_always_inline static void
+	enableExternalInterruptVector(const uint32_t priority)
+	{
+		NVIC_SetPriority(ExternalInterruptIRQ, priority);
+		NVIC_EnableIRQ(ExternalInterruptIRQ);
+	}
+	modm_always_inline static void
+	disableExternalInterruptVector()
+	{
+		NVIC_DisableIRQ(ExternalInterruptIRQ);
+	}
+	inline static void
+	setInputTrigger(const InputTrigger trigger)
+	{
+		switch (trigger)
+		{
+		case InputTrigger::RisingEdge:
+			EXTI->RTSR{{pf}} |=  mask;
+			EXTI->FTSR{{pf}} &= ~mask;
+			break;
+		case InputTrigger::FallingEdge:
+			EXTI->RTSR{{pf}} &= ~mask;
+			EXTI->FTSR{{pf}} |=  mask;
+			break;
+		case InputTrigger::BothEdges:
+			EXTI->RTSR{{pf}} |=  mask;
+			EXTI->FTSR{{pf}} |=  mask;
+			break;
+		}
+	}
+	modm_always_inline static bool
+	getExternalInterruptFlag()
+	{
+		return (EXTI->PR{{pf}} & mask);
+	}
+	/**	\brief	Reset the interrupt flag in the interrupt routine. */
+	modm_always_inline static void
+	acknowledgeExternalInterruptFlag()
+	{
+		// Flags are cleared by writing a one to the flag position.
+		EXTI->PR{{pf}} |= mask;
+	}
+	%% endif
+	// GpioIO
+	// start documentation inherited
+	inline static Direction getDirection() {
+		uint32_t mode = ({{reg}}->MODER & mask2);
+		if (mode == (i(Mode::Input) << pin * 2))
+			return Direction::In;
+		if (mode == (i(Mode::Output) << pin * 2))
+			return Direction::Out;
+		return Direction::Special;
+	}
+	// end documentation inherited
+	inline static void lock() {
+		{{reg}}->LCKR = 0x10000 | mask;
+		{{reg}}->LCKR = 0x00000 | mask;
+		{{reg}}->LCKR = 0x10000 | mask;
+		(void) {{reg}}->LCKR;
+	}
+	modm_always_inline static void
+	disconnect() {
+		{{reg}}->AFR[af_id] = ({{reg}}->AFR[af_id] & ~af_mask);
+	}
+
+public:
+	%% if type == "IO"
+	template< Peripheral peripheral >
+	struct BitBang { static void connect();
+		static_assert(
+			(peripheral == Peripheral::BitBang),
+			"Gpio{{ port ~ pin }}::BitBang only connects to software drivers!");
+	};
+		%% for signal_name, signal_group in signals.items()
+	template< Peripheral peripheral >
+	struct {{ signal_name }} { static void connect();
+		static_assert(
+			%% for signal in signal_group
+			(peripheral == Peripheral::{{ signal.driver }}){% if loop.last %},{% else %} ||{% endif %}
+			%% endfor
+			"Gpio{{ port ~ pin }}::{{ signal_name }} only connects to {% for signal in signal_group %}{{signal.driver}}{% if not loop.last %} or {% endif %}{% endfor %}!");
+	};
+		%% endfor
+	%% else
+	template< Peripheral peripheral >
+	using BitBang = IO::BitBang<peripheral>;
+		%% for signal_name in signals
+	template< Peripheral peripheral >
+	using {{ signal_name }} = IO::{{ signal_name }}<peripheral>;
+		%% endfor
+	%% endif
+};
+
+%% endfor
+
+template<>
+struct Gpio{{ port ~ pin }}::BitBang<Peripheral::BitBang>
+{
+	using Gpio = Gpio{{ port ~ pin }};
+	static constexpr Gpio::Signal Signal = Gpio::Signal::BitBang;
+	inline static void connect() {}
+};
+%% for signal_group in signals.values()
+	%% for signal in signal_group
+template<>
+struct Gpio{{ port ~ pin }}::{{ signal.name }}<Peripheral::{{ signal.driver }}>
+{
+	using Gpio = Gpio{{ port ~ pin }};
+	static constexpr Gpio::Signal Signal = Gpio::Signal::{{ signal.name }};
+	inline static void
+	connect()
+	{
+		%% if signal.af | length
+		setAlternateFunction({{ signal.af[0] }});
+		%% elif signal.driver.startswith("Adc")
+		disconnect();
+		setAnalogInput();
+		%% endif
+	}
+};
+	%% endfor
+%% endfor
+
+} // namespace platform
+
+} // namespace modm
+
+#endif // MODM_STM32_GPIO_PIN_{{ port ~ pin }}_HPP

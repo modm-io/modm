@@ -11,49 +11,120 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-def filter_port_ranges(gpios):
-    """
-    This filter accepts a list of gpios as e.g. used by the stm32af driver
-    and tries to extract information about port which is returned as a list
-    of dictionaries with the following structure:
-    {'name': "C", 'startPin': 0, 'width': 16}
-    """
-    # collect information on available gpios
-    port_ids = {}
+import copy
+from collections import defaultdict
+
+def port_ranges(gpios):
+    ports = {p: (32, 0) for p in set(p["port"] for p in gpios)}
     for gpio in gpios:
-        if not gpio['port'] in port_ids:
-            port_ids[gpio['port']] = [0] * 16
-        port_ids[gpio['port']][int(gpio['id'])] = 1
-    # create port list
-    ports = []
-    for name, ids in port_ids.items():
-        # if the port consists of at least one gpio pin
-        if 1 in ids:
-            port = {}
-            port['name'] = name
-            # find start pin as well as width
-            ii = ids.index(1)
-            port['startPin'] = ii
-            while ii < 16 and ids[ii] == 1:
-                ii = ii + 1
-            port['width'] = ii - port['startPin']
-            ports.append(port)
+        pin = int(gpio["pin"])
+        pmin, pmax = ports[gpio["port"]]
+        ports[gpio["port"]] = (min(pin, pmin), max(pin, pmax))
+
+    ports = [{"name": k.upper(), "start": v[0], "width": v[1] - v[0] + 1} for k,v in ports.items()]
     return ports
 
-def filter_letter_to_num(letter):
-    """
-    This filter turns one letter into a number.
-    A is 0, B is 1, etc. This is not case sensitive.
-    """
-    letter = letter[0].lower()
-    return ord(letter) - ord('a')
+def letter_to_num(letter):
+    return ord(letter[0].lower()) - ord("a")
 
+def get_driver(s):
+    name = s["driver"].capitalize()
+    if "instance" in s: name += s["instance"].capitalize();
+    return name
+
+def get_name(s):
+    return s["name"].capitalize()
+
+def extract_signals(signals):
+    afs = {}
+    for s in signals:
+        driver = get_driver(s)
+        name = get_name(s)
+        key = driver + name
+        afs[key] = {"driver": driver, "name": name, "af": s["af"]}
+    return afs
+
+def print_remap_group_table(signal_map, peripheral):
+    per_signal_map = defaultdict(lambda : defaultdict(list))
+    afs = []
+    for key, signals in signal_map.items():
+        for signal in signals:
+            if get_driver(signal) == peripheral:
+                for af in signal["af"]:
+                    per_signal_map[key][af].append(get_name(signal))
+                afs.extend(signal["af"])
+    afs = sorted(list(set(afs)))
+
+    array = [[peripheral] + afs]
+    lengths = [len(s) for s in array[0]]
+    for gpio in sorted(per_signal_map, key=lambda p: (p[0], int(p[1:]))):
+        blub = [gpio.upper()] + [[] for _ in afs]
+        for af, names in per_signal_map[gpio].items():
+            for name in names:
+                blub[array[0].index(af)].append(name)
+        blub = [",".join(b) if isinstance(b, list) else b for b in blub]
+        lengths = [max(l, len(b)) for l, b in zip(lengths, blub)]
+        array.append(blub)
+
+    lines = []
+    for i, vals in enumerate(array):
+        line = []
+        for j, text in enumerate(vals):
+            line.append(text.center(lengths[j]+2))
+        lines.append("|".join(line))
+        if i == 0:
+            lines.append("|".join(["-" * (lengths[j]+2) for j in range(len(array[0]))]))
+
+    return lines
+
+
+def validate_alternate_functions(driver, env):
+    """
+    For the STM32F1/L1 series
+    -------------------------
+    These chips can only remap functions in groups, some of them with overlapping
+    pins. A unique map must exist for (Signal.driver + Signal.instance + ordered_set(Pins)) -> Remap
+    So the combination of Signal driver plus instance and an ordered set of Pins must not map to
+    different Remap Groups, otherwise our HAL assumptions are broken.
+    """
+    success = True
+
+    if "f1" in driver["type"]:
+        for remap in driver["remap"]:
+            af_map = defaultdict(list)
+            for group in remap["group"]:
+                for signal in group["signal"]:
+                    af_map[signal["port"] + signal["pin"]].append((group["id"], signal["name"]))
+            for pin, afs in af_map.items():
+                per = remap["driver"]
+                if "instance" in remap: per += remap["instance"];
+                gafs = sorted(list(set([a[0] for a in afs])))
+                nafs = sorted(list(set([a[1] for a in afs])))
+                if len(afs) > 1:
+                    env.log.debug("P%s: Duplicate groups %s for signal '%s': %s" % (pin.upper(), gafs, per, nafs))
+                    success = False
+    else:
+        for gpio in driver["gpio"]:
+            if "signal" not in gpio: continue;
+            af_map = defaultdict(list)
+            for signal in gpio["signal"]:
+                if "af" not in signal: continue;
+                af_map[get_driver(signal)].append((signal["af"], signal["name"]))
+            for per, afs in af_map.items():
+                nafs = sorted(list(set([a[0] for a in afs])))
+                if len(nafs) > 1:
+                    env.log.debug("P%s: Duplicate AFs %s for signal '%s': %s" % (gpio["port"].upper() + gpio["pin"], nafs, per, [a[1] for a in afs if a[0] in nafs]))
+                    success = False
+    if not success:
+        env.log.debug("Gpio signal validation failed!")
+
+# -----------------------------------------------------------------------------
 def init(module):
     module.name = "gpio"
     module.parent = "platform"
 
 def prepare(module, options):
-    if not options[":target"].has_driver("gpio", type=["stm32", "stm32f1"]):
+    if not options[":target"].has_driver("gpio:stm32*"):
         return False
 
     module.add_option(
@@ -62,36 +133,123 @@ def prepare(module, options):
             description="Enable clock for GPIO during startup",
             default=True))
 
-    module.depends(":platform:core", ":platform:gpio.generic")
+    module.depends(":platform:core", ":platform:gpio.common")
+    return True
+
+bprops = {}
+def pre_build(env):
+    device = env[":target"]
+    driver = device.get_driver("gpio")
+    # Not an issue anymore, but kept here for future issues
+    # validate_alternate_functions(driver, env)
+
+    signal_map = defaultdict(list)
+    if "f1" in driver["type"]:
+        # map all remaps onto pins
+        for remap in driver["remap"]:
+            # smap = defaultdict(list)
+            for group in remap["group"]:
+                for signal in group["signal"]:
+                    key = signal["port"] + signal["pin"]
+                    for sig in signal_map[key]:
+                        if (get_driver(sig) == get_driver(remap) and
+                            get_name(sig) == get_name(signal)):
+                            sig["af"].append(group["id"])
+                            break
+                    else:
+                        sig = copy.deepcopy(signal)
+                        sig["driver"] = remap["driver"]
+                        sig["af"] = [group["id"]]
+                        if "instance" in remap:
+                            sig["instance"] = remap["instance"]
+                        signal_map[key].append(sig)
+        bprops["group_map"] = signal_map
+
+    # These are all exti possible vectors: 0, 0_1, 1, 15_10, 2, 2_3, 2_TSC, 3, 4, 4_15, 9_5
+    all_exti = {
+        "0": [0], "1": [1], "2": [2], "3": [3], "4": [4],
+        "0_1": [0,1],
+        "2_TSC": [2],
+        "2_3": [2,3],
+        "4_15": [4,5,6,7,8,9,10,11,12,13,14,15],
+        "9_5": [5,6,7,8,9],
+        "15_10": [10,11,12,13,14,15],
+    }
+    extimap = {}
+    for vec in [v["name"][4:] for v in device.get_driver("core")["vector"] if "EXTI" in v["name"]]:
+        if vec not in all_exti:
+            raise PreBuildException("Unknown EXTI vector: '{}'".format(vec))
+        for num in all_exti[vec]:
+            if str(num) in extimap:
+                raise PreBuildException("Pin '{}' already in EXTI map!".format(str(num)))
+            extimap[str(num)] = vec
+
+    all_signals = {}
+    for gpio in driver["gpio"]:
+        key = gpio["port"] + gpio["pin"]
+        raw_signals = gpio["signal"] if "signal" in gpio else []
+        for signal in raw_signals:
+            if "af" in signal:
+                signal["af"] = [signal["af"]]
+            else:
+                signal["af"] = []
+        if key in signal_map:
+            raw_signals.extend(signal_map[key])
+        gpio["signal"] = raw_signals
+        extracted_signals = extract_signals(raw_signals)
+        all_signals.update(extracted_signals)
+        signal_names = set(s["name"] for s in extracted_signals.values())
+        extracted_signals = {name: [s for s in extracted_signals.values() if s["name"] == name] for name in signal_names}
+        bprops[key] = {
+            "gpio": gpio,
+            "exti_irqn": extimap[gpio["pin"]],
+            "signals": extracted_signals,
+            "pf": "1" if device.identifier["family"] in ["l4"] else ""
+        }
+
+    all_peripherals = [s["driver"] for s in all_signals.values()]
+    # Signals are not enough, since there are peripherals that don't have signals.
+    # Example: STM32F401RE < 64pins: SPI4 cannot be connected to any pins.
+    # FIXME: Allow accessing device file more freely
+    all_drivers = [d for d in device._properties["driver"] if d["name"] not in ["gpio", "core"]]
+    for d in all_drivers:
+        dname = d["name"].capitalize()
+        if "instance" in d:
+            all_peripherals.extend([dname + i.capitalize() for i in d["instance"]])
+        else:
+            all_peripherals.append(dname)
+    if "remap" in driver:
+        all_peripherals.extend([get_driver(r) for r in driver["remap"]])
+    bprops["all_peripherals"] = sorted(list(set(all_peripherals)))
+    bprops["all_signals"] = sorted(list(set(s["name"] for s in all_signals.values())))
+    bprops["ranges"] = port_ranges(driver["gpio"])
+    bprops["ports"] = sorted([p["name"] for p in bprops["ranges"]])
+
     return True
 
 def build(env):
     device = env[":target"]
     driver = device.get_driver("gpio")
-
     properties = device.properties
     properties["target"] = device.identifier
     properties["partname"] = device.partname
     properties["driver"] = driver
-    if device.has_driver("adc"):
-        properties["adcs"] = device.get_driver("adc").get("instance", [])
-    else:
-        properties["adcs"] = []
-    properties["ports"] = sorted(list(set([p["port"] for p in driver["gpio"]])))
+    properties.update(bprops)
 
     env.substitutions = properties
     env.outbasepath = "src/modm/platform/gpio"
+    gpio_source = "pin_f1.hpp.in" if "f1" in driver["type"] else "pin.hpp.in"
 
-    gpio_source = "gpio_pin.hpp.in"
-    if driver["type"] == "stm32f1":
-       gpio_source = "gpio_pin_f1.hpp.in"
+    for gpio in driver["gpio"]:
+        po, pi = gpio["port"], gpio["pin"]
+        properties.update(bprops[po + pi])
+        header_name = "gpio_{}{}.hpp".format(po.upper(), pi)
+        env.template(gpio_source, header_name)
 
-    for pin in driver["gpio"]:
-        env.template(gpio_source, "gpio_{}{}.hpp".format(pin["port"], pin["pin"]),
-                    substitutions=properties.update({'gpio': pin}),
-                    filters={
-                        "portRanges": filter_port_ranges,
-                    })
-    env.template("gpio_base.hpp.in", filters={"letterToNum": filter_letter_to_num})
+    env.template("port.hpp.in")
+    if "f1" in driver["type"]:
+        env.template("connector_specialized.hpp.in", filters={"formatPeripheral": get_driver, "printSignalMap": print_remap_group_table})
+    env.template("base.hpp.in", filters={"letterToNum": letter_to_num})
+    env.template("unused.hpp.in")
     if env[":::enable_gpio"]:
-        env.template("gpio_enable.cpp.in")
+        env.template("enable.cpp.in")

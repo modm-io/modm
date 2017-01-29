@@ -11,34 +11,36 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-def filter_port_ranges(gpios):
-    """
-    This filter accepts a list of gpios as e.g. used by the stm32af driver
-    and tries to extract information about port which is returned as a list
-    of dictionaries with the following structure:
-    {'name': "C", 'startPin': 0, 'width': 16}
-    """
-    # collect information on available gpios
-    port_ids = {}
+def port_ranges(gpios):
+    ports = {p: (8, 0) for p in set([p["port"] for p in gpios])}
     for gpio in gpios:
-        if not gpio['port'] in port_ids:
-            port_ids[gpio['port']] = [0] * 16
-        port_ids[gpio['port']][int(gpio['id'])] = 1
-    # create port list
-    ports = []
-    for name, ids in port_ids.items():
-        # if the port consists of at least one gpio pin
-        if 1 in ids:
-            port = {}
-            port['name'] = name
-            # find start pin as well as width
-            ii = ids.index(1)
-            port['startPin'] = ii
-            while ii < 16 and ids[ii] == 1:
-                ii = ii + 1
-            port['width'] = ii - port['startPin']
-            ports.append(port)
+        pin = int(gpio["pin"])
+        pmin, pmax = ports[gpio["port"]]
+        ports[gpio["port"]] = (min(pin, pmin), max(pin, pmax))
+
+    ports = [{"name": k.upper(), "start": v[0], "width": v[1] - v[0] + 1} for k,v in ports.items()]
     return ports
+
+def get_driver(s):
+    name = s["driver"].capitalize()
+    if "instance" in s: name += s["instance"].capitalize();
+    return name
+
+def get_name(s):
+    return s["name"].capitalize()
+
+def extract_signals(signals):
+    afs = {}
+    for s in signals:
+        driver = get_driver(s)
+        if "Exint" in driver: continue;
+        name = get_name(s)
+        if name.isdigit():
+            if "Adc" in driver:
+                name = "In" + name
+        key = driver + name
+        afs[key] = {"driver": driver, "name": name}
+    return afs
 
 def init(module):
     module.name = "gpio"
@@ -48,20 +50,70 @@ def prepare(module, options):
     if not options[":target"].has_driver("gpio:avr"):
         return False
 
-    module.depends(":platform:core")
+    # port.hpp depends on modm::bitReverse()!
+    module.depends(":platform:core", ":platform:gpio.common", ":math")
     return True
+
+bprops = {}
+def pre_build(env):
+    device = env[":target"]
+    driver = device.get_driver("gpio")
+
+    all_signals = {}
+    for gpio in driver["gpio"]:
+        key = gpio["port"] + gpio["pin"]
+        # deal with all signals
+        signals = gpio["signal"] if "signal" in gpio else []
+        extracted_signals = extract_signals(signals)
+        all_signals.update(extracted_signals)
+        signal_names = set(s["name"] for s in extracted_signals.values())
+        extracted_signals = {name: [s for s in extracted_signals.values() if s["name"] == name] for name in signal_names}
+        # extract information on external interrupts
+        exints = list(filter(lambda p: p["driver"] == "exint", signals))
+        pcint = list(filter(lambda p: p["name"].startswith("pcint"), exints))
+        extint = list(filter(lambda p: not p["name"].startswith("pcint"), exints))
+        if len(pcint) > 1: raise PreBuildException("More than one Pin Change interrupt on pin '{}'!".format(key.upper()));
+        if len(extint) > 1: raise PreBuildException("More than one External interrupt on pin '{}'!".format(key.upper()));
+        bprops[key] = {
+            "gpio": gpio,
+            "pcint": int(pcint[0]["name"].replace("pcint", "")) if len(pcint) else -1,
+            "extint": int(extint[0]["name"]) if len(extint) else -1,
+            "signals": extracted_signals
+        }
+
+    if not len(all_signals):
+        raise PreBuildException("The device file for '{}' does not contain any signals!".format(device.partname))
+
+    # check if any signal names start with a digit
+    faults = [(af["driver"], af["name"]) for af in all_signals.values() if af["name"].isdigit()]
+    if len(faults):
+        raise PreBuildException("These signal names are starting with a digit!\n{}".format(
+                ", ".join(["{}::{}".format(d, n) for (d, n) in faults])))
+
+    all_peripherals = [s["driver"] for s in all_signals.values()]
+    # Signals are not enough, since there are peripherals that don't have signals.
+    # Example: STM32F401RE < 64pins: SPI4 cannot be connected to any pins.
+    # FIXME: Allow accessing device file more freely
+    all_drivers = [d for d in device._properties["driver"] if d["name"] not in ["gpio", "core"]]
+    for d in all_drivers:
+        dname = d["name"].capitalize()
+        if "instance" in d:
+            all_peripherals.extend([dname + i.capitalize() for i in d["instance"]])
+        else:
+            all_peripherals.append(dname)
+    bprops["all_peripherals"] = sorted(list(set(all_peripherals)))
+    bprops["all_signals"] = sorted(list(set(s["name"] for s in all_signals.values())))
+    bprops["ranges"] = port_ranges(driver["gpio"])
+    bprops["ports"] = sorted([p["name"] for p in bprops["ranges"]])
 
 def build(env):
     device = env[":target"]
     driver = device.get_driver("gpio")
-
     properties = device.properties
     properties["target"] = target = device.identifier
     properties["partname"] = device.partname
     properties["driver"] = driver
-
-    properties["gpios"] = driver["gpio"]
-    properties["ports"] = sorted(list(set([p["port"] for p in driver["gpio"]])))
+    properties.update(bprops)
 
     if (target["family"] == "mega" and target["name"] in ["8", "16", "32", "64", "128", "162", "8515", "8535"]) or \
             (target["family"] == "tiny" and target["name"] in ["26"]):
@@ -77,6 +129,8 @@ def build(env):
     if (target["family"] == "mega" and target["name"] in ["8", "16", "32", "162", "8515", "8535"]) or \
             (target["family"] == "tiny" and target["name"] in ["13", "24", "25", "44", "45", "84", "85", "261", "461", "861"]):
         properties["eicra"] = "MCUCR"
+    else:
+        properties["eicra"] = "EICRA"
 
     if target["family"] == "mega" and target["name"] in ["8", "16", "32", "8515", "8535"]:
         properties["isc2"] = "MCUCSR"
@@ -86,7 +140,13 @@ def build(env):
     env.substitutions = properties
     env.outbasepath = "src/modm/platform/gpio"
 
-    env.copy("gpio_define.h")
-    env.template("gpio.hpp.in", filters={
-                        "portRanges": filter_port_ranges,
-                    })
+    for gpio in driver["gpio"]:
+        po, pi = gpio["port"], gpio["pin"]
+        properties.update(bprops[po + pi])
+        header_name = "gpio_{}{}.hpp".format(po.upper(), pi)
+        env.template("pin.hpp.in", header_name)
+
+    env.copy("define.h")
+    env.template("base.hpp.in")
+    env.template("port.hpp.in")
+    env.template("unused.hpp.in")

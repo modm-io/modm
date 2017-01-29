@@ -1,0 +1,122 @@
+/*
+ * Copyright (c) 2017, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32_GPIO_PIN_UNUSED_HPP
+#define MODM_STM32_GPIO_PIN_UNUSED_HPP
+
+#include "base.hpp"
+#include <modm/architecture/interface/gpio.hpp>
+
+namespace modm
+{
+
+namespace platform
+{
+
+/**
+ * Dummy implementation of an I/O pin.
+ *
+ * This class can be used when a pin is not required. All functions
+ * are dummy functions which do nothing. `read()` will always
+ * return `false`.
+ *
+ * For example when creating a software SPI with the modm::SoftwareSimpleSpi
+ * class and the return channel (MISO - Master In Slave Out) is not needed,
+ * a good way is to use this class as a parameter when defining the
+ * SPI class.
+ *
+ * Example:
+ * @code
+ * #include <modm/architecture/platform.hpp>
+ *
+ * namespace pin
+ * {
+ *     typedef GpioOutputD7 Clk;
+ *     typedef GpioOutputD5 Mosi;
+ * }
+ *
+ * modm::SoftwareSpiMaster< pin::Clk, pin::Mosi, GpioUnused > Spi;
+ *
+ * ...
+ * Spi::write(0xaa);
+ * @endcode
+ *
+ * @author	Fabian Greif
+ * @author	Niklas Hauser
+ * @ingroup	{{partname}}_gpio
+ */
+class GpioUnused : public Gpio, public ::modm::GpioIO
+{
+public:
+	using Output = GpioUnused;
+	using Input = GpioUnused;
+	using IO = GpioUnused;
+	using Type = GpioUnused;
+
+protected:
+	static void setAlternateFunction(uint8_t) {}
+	static void setAnalogInput() {}
+
+public:
+	// GpioOutput
+	// start documentation inherited
+	static void setOutput() {}
+	static void setOutput(bool) {}
+	static void set() {}
+	static void set(bool) {}
+	static void reset() {}
+	static void toggle() {}
+	static bool isSet() { return false; }
+	// stop documentation inherited
+	static void configure(OutputType, OutputSpeed = OutputSpeed::MHz50) {}
+	static void setOutput(OutputType, OutputSpeed = OutputSpeed::MHz50) {}
+
+	// GpioInput
+	// start documentation inherited
+	static void setInput() {}
+	static bool read() { return false; }
+	// end documentation inherited
+	static void configure(InputType) {}
+	static void setInput(InputType) {}
+	// External Interrupts
+	static void enableExternalInterrupt() {}
+	static void disableExternalInterrupt() {}
+	static void enableExternalInterruptVector(const uint32_t) {}
+	static void disableExternalInterruptVector() {}
+	static void setInputTrigger(const InputTrigger) {}
+	static bool getExternalInterruptFlag() { return false; }
+	/// Reset the interrupt flag in the interrupt routine.
+	static void acknowledgeExternalInterruptFlag() {}
+
+	// GpioIO
+	// start documentation inherited
+	static Direction getDirection() { return Direction::Special; }
+	// end documentation inherited
+	static void lock() {}
+	static void disconnect() {}
+
+public:
+%% for name in all_signals
+	template< Peripheral _ >
+	struct {{ name }}
+	{
+		using Gpio = GpioUnused;
+		static constexpr Gpio::Signal Signal = Gpio::Signal::{{ name }};
+		static void connect() {}
+	};
+%% endfor
+};
+
+} // namespace platform
+
+} // namespace modm
+
+#endif // MODM_STM32_GPIO_PIN_UNUSED_HPP

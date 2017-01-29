@@ -1,0 +1,168 @@
+/*
+ * Copyright (c) 2017, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_AVR_GPIO_BASE_HPP
+#define MODM_AVR_GPIO_BASE_HPP
+
+#include "define.h"
+#include <modm/architecture/interface/gpio.hpp>
+
+/**
+ * @ingroup 	platform
+ * @defgroup	{{partname}}
+ */
+
+/**
+ * @ingroup 	{{partname}}
+ * @defgroup	{{partname}}_gpio GPIO
+ */
+
+
+namespace modm
+{
+
+namespace platform
+{
+
+/// @ingroup {{partname}}_gpio
+enum class
+Peripheral
+{
+	BitBang,
+%% for per in all_peripherals
+	{{ per }},
+%% endfor
+};
+
+/// @ingroup	{{partname}}_gpio
+struct Gpio
+{
+	/// Each Input Pin can be configured in one of these states.
+	enum class
+	InputType : uint8_t
+	{
+		Floating,	///< The input pin is left floating
+		PullUp,		///< The input pin is pulled to Vcc
+	};
+
+	enum class
+	OutputType : uint8_t
+	{
+		PushPull	///< push-pull on output
+	};
+
+	/// Each External Interrupt can be configured to trigger on these conditions.
+	enum class
+	InputTrigger : uint8_t
+	{
+		LowLevel = 0b00,	///< triggers **continuously** during low level
+		BothEdges = 0b01,	///< triggers on both rising and falling edge
+		FallingEdge = 0b10,	///< triggers on falling edge
+		RisingEdge = 0b11,	///< triggers on rising edge
+	};
+
+	/// Available ports on this device.
+	enum class
+	Port
+	{
+%% for port in ports
+		{{ port | upper }},
+%% endfor
+	};
+
+	enum class
+	Signal
+	{
+		BitBang,
+%% for signal in all_signals
+		{{ signal }},
+%% endfor
+	};
+
+protected:
+	/// @cond
+	static constexpr uint8_t
+	i(InputType config) { return uint8_t(config); }
+	static constexpr uint8_t
+	i(InputTrigger trigger) { return uint8_t(trigger); }
+	/// @endcond
+};
+
+/**
+ * Gpio OpenDrain template, which remaps the behavior of the Gpio pin to
+ * simulate an open-drain output (with internal pullups if needed).
+ *
+ * @see BitBangI2cMaster
+ * @ingroup	{{partname}}_gpio
+ * @{
+ */
+template< class Pin >
+class GpioOpenDrain : public Pin
+{
+	static Gpio::InputType inputType;
+	static_assert(Pin::direction == modm::Gpio::Direction::InOut, "Pin must inherit from modm::GpioIO");
+public:
+	using Output = GpioOpenDrain<typename Pin::IO>;
+	using Input = GpioOpenDrain<typename Pin::IO>;
+	using IO = GpioOpenDrain<typename Pin::IO>;
+	using Type = typename Pin::Type;
+
+	static constexpr modm::Gpio::Direction direction = modm::Gpio::Direction::Out;
+
+	enum class
+	OutputType
+	{
+		PushPull,
+		OpenDrain,
+	};
+
+public:
+	inline static void configure(Gpio::InputType type)
+	{ inputType = type; }
+	modm_always_inline static void setInput() {}
+	inline static void setInput(Gpio::InputType type)
+	{ inputType = type; }
+	modm_always_inline static void setOutput() {}
+	modm_always_inline static void setOutput(OutputType) {}
+	modm_always_inline static void setOutput(bool status) {
+		set(status);
+	}
+	/// maps to `setInput(InputType::Floating)` or `setInput(InputType::PullUp)`
+	inline static void set() {
+		Pin::setInput(inputType);
+	}
+	/// maps to `setOutput(::modm::Gpio::Low)`
+	modm_always_inline static void reset() {
+		Pin::setOutput(::modm::Gpio::Low);
+	}
+	inline static void set(bool status) {
+		if (status) { set(); }
+		else { reset(); }
+	}
+	inline static bool isSet() {
+		return (Pin::getDirection() == modm::Gpio::Direction::In);
+	}
+	modm_always_inline static modm::Gpio::Direction getDirection() {
+		return modm::Gpio::Direction::Out;
+	}
+};
+
+/// @}
+
+}	// namespace platform
+
+}	// namespace modm
+
+template< class Pin >
+modm::platform::Gpio::InputType
+modm::platform::GpioOpenDrain<Pin>::inputType(modm::platform::Gpio::InputType::Floating);
+
+#endif	// MODM_AVR_GPIO_BASE_HPP

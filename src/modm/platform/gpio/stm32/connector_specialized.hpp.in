@@ -1,0 +1,77 @@
+/*
+ * Copyright (c) 2017, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32_GPIO_CONNECTOR_HPP
+#define MODM_STM32_GPIO_CONNECTOR_HPP
+
+#include "base.hpp"
+#include "connector.hpp"
+
+namespace modm
+{
+
+namespace platform
+{
+
+/// @cond
+namespace detail_gpio_connector
+{
+/* FIXME: literally copied from <math/utils/bit_operations.hpp>! */
+static constexpr uint8_t lmbH(uint32_t value)
+{ return (value == 0)?  0  :  (1 + lmbH(value >> 1)); }
+static constexpr uint8_t lmb(uint32_t value)
+{ return lmbH(value) - 1; }
+
+} // namespace detail
+
+// specializations
+%% for remap in driver.remap
+	%% set reg = "MAPR" if (remap["position"] | int) < 32 else "MAPR2"
+	%% set per = remap | formatPeripheral
+template< template<Peripheral _> class... Signals >
+struct GpioConnector<Peripheral::{{ per }}, Signals...>
+{
+	template< class GpioQuery >
+	static constexpr bool Contains = detail::GpioContains<Peripheral::{{ per }}, GpioQuery, Signals...>::value;
+	template< class GpioQuery >
+	static constexpr bool IsValid = not tmp::SameType<typename GpioQuery::Type, GpioUnused>::value;
+	template< Gpio::Signal signal >
+	using GetSignal = typename detail::GpioGetSignal<Peripheral::{{ per }}, signal, Signals...>::Gpio;
+
+	inline static void connect()
+	{
+		using namespace detail_gpio_connector;
+		static constexpr uint32_t id = detail::GpioSignalConnect<Peripheral::{{ per }}, Signals...>::id;
+		static_assert((id == uint32_t(-1)) || {% for group in remap.group %}(lmb(id) == {{group.id}}UL){% if not loop.last %} || {% else %},{% endif %}{% endfor %}
+					  "This pin set contains conflicting remap groups!\nAvailable groups for {{per}} are:\n"
+	%% for line in group_map | printSignalMap(per)
+					  "{{line}}\n"
+	%% endfor
+			);
+		if (id != uint32_t(-1)) {
+			AFIO->{{reg}} = (AFIO->{{reg}} & ~({{ remap["mask"] }}UL << {{ (remap["position"] | int) % 32 }})) | (lmb(id) << {{ (remap["position"] | int) % 32 }});
+		}
+		detail::GpioSignalConnect<Peripheral::{{ per }}, Signals...>::connect();
+	}
+	inline static void
+	disconnect()
+	{
+		detail::GpioSignalConnect<Peripheral::{{ per }}, Signals...>::disconnect();
+	}
+};
+%% endfor
+/// @endcond
+
+} // namespace platform
+
+} // namespace modm
+
+#endif // MODM_STM32_GPIO_CONNECTOR_HPP

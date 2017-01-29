@@ -9,8 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_SOFTWARE_GPIO_HPP
-#define MODM_SOFTWARE_GPIO_HPP
+#ifndef MODM_SOFTWARE_GPIO_PORT_HPP
+#define MODM_SOFTWARE_GPIO_PORT_HPP
 
 #include <modm/architecture/utils.hpp>
 #include <modm/architecture/interface/gpio.hpp>
@@ -21,145 +21,6 @@ namespace modm
 
 namespace platform
 {
-
-/**
- * Dummy implementation of an I/O pin.
- *
- * This class can be used when a pin is not required. All functions
- * are dummy functions which do nothing. `read()` will always
- * return `false`.
- *
- * For example when creating a software SPI with the modm::SoftwareSimpleSpi
- * class and the return channel (MISO - Master In Slave Out) is not needed,
- * a good way is to use this class as a parameter when defining the
- * SPI class.
- *
- * Example:
- * @code
- * #include <modm/architecture/platform.hpp>
- *
- * namespace pin
- * {
- *     typedef GpioOutputD7 Clk;
- *     typedef GpioOutputD5 Mosi;
- * }
- *
- * BitBangSpiMaster< pin::Clk, pin::Mosi, GpioUnused > Spi;
- *
- * ...
- * Spi::write(0xaa);
- * @endcode
- *
- * @author	Fabian Greif
- * @ingroup	gpio
- */
-class GpioUnused : GpioIO
-{
-public:
-	modm_always_inline static void
-	setOutput()
-	{
-	}
-
-	modm_always_inline static void
-	setOutput(bool)
-	{
-	}
-
-	modm_always_inline static void
-	setInput()
-	{
-	}
-
-	modm_always_inline static void
-	set()
-	{
-	}
-
-	modm_always_inline static void
-	set(bool)
-	{
-	}
-
-	modm_always_inline static void
-	reset()
-	{
-	}
-
-	modm_always_inline static void
-	toggle()
-	{
-	}
-
-	/// Always returns `false`
-	modm_always_inline static bool
-	read()
-	{
-		return false;
-	}
-};
-
-/**
- * Invert a pin in software.
- *
- * This template can be used the invert the logic level of a normal
- * pin template.
- *
- * Example:
- * @code
- * #include <modm/architecture/platform.hpp>
- *
- * typedef GpioInverted< GpioOutputB0 > Led;
- *
- * ...
- * Led::setOutput();
- * Led::reset();
- * @endcode
- *
- * @author	Fabian Greif
- * @ingroup	gpio
- */
-template < class Pin >
-class GpioInverted : public Pin
-{
-public:
-	modm_always_inline static void
-	setOutput()
-	{
-		Pin::setOutput();
-	}
-
-	modm_always_inline static void
-	setOutput(bool value)
-	{
-		Pin::setOutput(!value);
-	}
-
-	modm_always_inline static void
-	set()
-	{
-		Pin::reset();
-	}
-
-	modm_always_inline static void
-	set(bool value)
-	{
-		Pin::set(!value);
-	}
-
-	modm_always_inline static void
-	reset()
-	{
-		Pin::set();
-	}
-
-	modm_always_inline static bool
-	read()
-	{
-		return !Pin::read();
-	}
-};
-
 
 /**
  * Create an up to 16-bit port from arbitrary pins.
@@ -218,7 +79,7 @@ template<typename Gpio, typename... Gpios>
 class SoftwareGpioPort<Gpio, Gpios...> : private SoftwareGpioPort<Gpios...>
 {
 public:
-	static constexpr uint8_t width = 1 + SoftwareGpioPort<Gpios...>::width;
+	static constexpr uint8_t width = 1 + sizeof...(Gpios);
 
 	static constexpr ::modm::GpioPort::DataOrder
 	getDataOrder()
@@ -272,8 +133,6 @@ template<>
 class SoftwareGpioPort<>
 {
 public:
-	static constexpr uint8_t width = 0;
-
 	static void
 	setOutput() {}
 
@@ -295,4 +154,4 @@ public:
 
 }	// namespace modm
 
-#endif // MODM_SOFTWARE_GPIO_HPP
+#endif // MODM_SOFTWARE_GPIO_PORT_HPP

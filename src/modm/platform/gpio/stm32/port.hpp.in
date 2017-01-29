@@ -13,7 +13,7 @@
 #define MODM_STM32_GPIO_HPP
 
 #include "../device.hpp"
-#include "gpio_base.hpp"
+#include "base.hpp"
 
 namespace modm
 {
@@ -67,18 +67,18 @@ public:
 /// @cond
 // there is no extra optimized specialization for Width=16 or DataOrder::Reversed, since using
 // a 16bit port is relatively rare and the optimizer will optimize the heck out of it anyway.
-%% for port in driver.gpio | getPorts
+%% for port in ranges
 template< uint8_t StartPin, uint8_t Width, ::modm::GpioPort::DataOrder PortOrder >
 class GpioPortBase<Gpio::Port::{{port["name"]}}, StartPin, Width, PortOrder> : public Gpio
 {
-	static_assert(StartPin < {{port["startPin"] + port["width"]}},
-			"Port StartPin too large, maximum {{port["startPin"] + port["width"]}}.");
+	static_assert(StartPin < {{port["start"] + port["width"]}},
+			"Port StartPin too large, maximum {{port["start"] + port["width"]}}.");
 	static_assert(Width <= {{port["width"]}},
 			"Port Width too large, maximum {{port["width"]}}.");
 	static_assert(Width > 0,
 			"Port Width should be at least 1.");
-	static_assert(StartPin + Width <= {{port["startPin"] + port["width"]}},
-			"Port StartPin + Width too large, maximum {{port["startPin"] + port["width"]}}.");
+	static_assert(StartPin + Width <= {{port["start"] + port["width"]}},
+			"Port StartPin + Width too large, maximum {{port["start"] + port["width"]}}.");
 
 	static constexpr uint8_t StartPinReversed = (8 - StartPin - Width) + 8;
 	static constexpr uint16_t dataMask = (1 << Width) - 1;

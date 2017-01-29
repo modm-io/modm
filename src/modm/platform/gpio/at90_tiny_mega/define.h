@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2009, Martin Rosekeit
  * Copyright (c) 2009-2010, 2013, Fabian Greif
- * Copyright (c) 2012-2015, Niklas Hauser
+ * Copyright (c) 2012-2015, 2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -13,6 +13,8 @@
 
 #ifndef	MODM_AT90_ATTINY_ATMEGA_GPIO_DEFINES_H
 #define	MODM_AT90_ATTINY_ATMEGA_GPIO_DEFINES_H
+
+#include <avr/io.h>
 
 // Atmel made a mess with the register names for GPIO between the "old" devices.
 // To avoid to much conditional compiling we try to mimic the new names for
@@ -70,4 +72,3 @@
 #endif
 
 #endif	// MODM_AT90_ATTINY_ATMEGA_GPIO_DEFINES_H
-

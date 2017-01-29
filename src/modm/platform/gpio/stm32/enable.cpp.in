@@ -24,6 +24,7 @@ modm_gpio_enable(void)
 %% elif target["family"] in ["f1"]
 %%	set clock_tree = "APB2"
 %%	set prefix = "IOP"
+	RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
 %% elif target["family"] in ["l4"]
 %%  set clock_tree = 'AHB2'
 %% endif
@@ -32,9 +33,9 @@ modm_gpio_enable(void)
 	RCC->{{ clock_tree }}ENR  |=
 %% for port in ports
 %%	if not loop.last
-		RCC_{{ clock_tree }}ENR_{{ prefix }}{{ port }}EN |
+		RCC_{{ clock_tree }}ENR_{{ prefix }}{{ port | upper }}EN |
 %%	else
-		RCC_{{ clock_tree }}ENR_{{ prefix }}{{ port }}EN;
+		RCC_{{ clock_tree }}ENR_{{ prefix }}{{ port | upper }}EN;
 %%	endif
 %% endfor
 
@@ -42,24 +43,24 @@ modm_gpio_enable(void)
 	RCC->{{ clock_tree }}RSTR |=
 %% for port in ports
 %%	if not loop.last
-		RCC_{{ clock_tree }}RSTR_{{ prefix }}{{ port }}RST |
+		RCC_{{ clock_tree }}RSTR_{{ prefix }}{{ port | upper }}RST |
 %%	else
-		RCC_{{ clock_tree }}RSTR_{{ prefix }}{{ port }}RST;
+		RCC_{{ clock_tree }}RSTR_{{ prefix }}{{ port | upper }}RST;
 %%	endif
 %% endfor
 
 	RCC->{{ clock_tree }}RSTR &= ~(
 %% for port in ports
 %%	if not loop.last
-		RCC_{{ clock_tree }}RSTR_{{ prefix }}{{ port }}RST |
+		RCC_{{ clock_tree }}RSTR_{{ prefix }}{{ port | upper }}RST |
 %%	else
-		RCC_{{ clock_tree }}RSTR_{{ prefix }}{{ port }}RST);
+		RCC_{{ clock_tree }}RSTR_{{ prefix }}{{ port | upper }}RST);
 %%	endif
 %% endfor
 }
 
 
-// A000100_ prefix since .hardware_init is sorted alphabetically and
+// .A000100 postfix since .hardware_init is sorted alphabetically and
 // this should be executed before application inits. Totally not a hack.
-__attribute__((section(".hardware_init"), used))
-static const uint32_t A000100_modm_gpio_enable_ptr = (uint32_t) &modm_gpio_enable;
+modm_section(".hardware_init.A000100_modm_gpio_enable")
+uint32_t modm_gpio_enable_ptr = (uint32_t) &modm_gpio_enable;
