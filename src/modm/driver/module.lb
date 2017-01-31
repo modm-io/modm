@@ -37,7 +37,7 @@ def build(env):
     env.outbasepath = "src/modm/driver"
 
     # Copy all files except for the templates and the module file.
-    env.copy(".", ignore=env.ignore_files("*.lb", "*.in"))
+    env.copy(".", ignore=env.ignore_files("*.lb", "*.in", "fat*"))
 
     env.template("can/mcp2515.cpp.in")
     env.template("display/st7036.cpp.in")
