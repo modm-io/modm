@@ -29,12 +29,13 @@ def prepare(module, options):
             description=FileReader("option/allocator.md"),
             enumeration=["newlib", "block_allocator", "tlsf"],
             default="newlib"))
-    module.add_option(
-        EnumerationOption(
-            name="vector_table_location",
-            description=FileReader("option/vector_table_location.md"),
-            enumeration=["rom", "ram", "fastest"],
-            default="fastest"))
+    if not options[":target"].has_driver("core:cortex-m0*"):
+        module.add_option(
+            EnumerationOption(
+                name="vector_table_location",
+                description=FileReader("option/vector_table_location.md"),
+                enumeration=["rom", "ram", "fastest"],
+                default="fastest"))
     module.add_option(
         NumericOption(
             name="main_stack_size",
@@ -119,7 +120,8 @@ def build(env):
     properties["target"] = target = device.identifier
     properties["partname"] = device.partname
     properties["driver"] = driver
-    properties["vector_table_location"] = env[":::vector_table_location"]
+    # Cortex-M0 does not have remappable vector table, so it will remain in Flash
+    properties["vector_table_location"] = env.get_option(":::vector_table_location", "rom")
     properties["core"] = driver["type"]
 
     # Add ARM Cortex-M exceptions

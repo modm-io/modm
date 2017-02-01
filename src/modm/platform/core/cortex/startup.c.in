@@ -227,11 +227,6 @@ Reset_Handler(void)
 			SCB_SHCSR_BUSFAULTENA_Msk |
 			SCB_SHCSR_USGFAULTENA_Msk |
 			SCB_SHCSR_MEMFAULTENA_Msk;*/
-%% else
-	%% if vector_table_location == "ram"
-	// cortex-m0 does not provide the SCB->VTOR register
-	#error "Placing the vector table in RAM is not supported on Cortex-M0 targets."
-	%% endif
 %% endif
 
 	// Call all hardware initialize hooks.
