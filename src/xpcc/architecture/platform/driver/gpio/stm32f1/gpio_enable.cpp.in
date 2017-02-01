@@ -23,6 +23,9 @@ xpcc_gpio_enable(void)
 %%	endif
 %% endfor
 
+	// Enable Alternative Function clock
+	RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
+
 	// Reset GPIO peripheral
 	RCC->APB2RSTR |=
 %% for port in gpios|xpcc.values('port')|sort

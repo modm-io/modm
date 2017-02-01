@@ -231,7 +231,6 @@ public:
 		constexpr uint16_t syscfg_mask = (0x0f) << bit_pos;
 		constexpr uint16_t syscfg_value = (port_nr & (0x0f)) << bit_pos;
 		// Enable AFIO
-		RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
 		AFIO->EXTICR[index] = (AFIO->EXTICR[index] & ~syscfg_mask) | syscfg_value;
 		EXTI->IMR |= mask;
 	}
