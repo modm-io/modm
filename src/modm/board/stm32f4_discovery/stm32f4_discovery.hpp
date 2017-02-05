@@ -13,13 +13,13 @@
 //
 // STM32F4DISCOVERY
 // Discovery kit for STM32F407/417 lines
-// http://www.st.com/web/en/catalog/tools/FM116/SC959/SS1532/PF252419
+// http://www.st.com/en/evaluation-tools/stm32f4discovery.html
 //
 
 #ifndef MODM_STM32_F4_DISCOVERY_HPP
 #define MODM_STM32_F4_DISCOVERY_HPP
 
-#include <modm/architecture/platform.hpp>
+#include <modm/platform/platform.hpp>
 #include <modm/driver/inertial/lis3dsh.hpp>
 
 using namespace modm::platform;
@@ -161,7 +161,7 @@ namespace mp45
 {
 using Clk = GpioOutputB10;	// CLK_IN: I2S2_CK
 using Dout = GpioInputC3;	// PDM_OUT: I2S2_SD
-//using  = I2sMaster2 I2sMaster;
+//using I2sMaster = I2sMaster2;
 }
 
 
@@ -205,10 +205,7 @@ initializeLis3()
 
 	lis3::Cs::setOutput(modm::Gpio::High);
 
-	lis3::Sck::connect(lis3::SpiMaster::Sck);
-	lis3::Mosi::connect(lis3::SpiMaster::Mosi);
-	lis3::Miso::connect(lis3::SpiMaster::Miso);
-
+	lis3::SpiMaster::connect<lis3::Sck::Sck, lis3::Mosi::Mosi, lis3::Miso::Miso>();
 	lis3::SpiMaster::initialize<systemClock, MHz10>();
 	lis3::SpiMaster::setDataMode(lis3::SpiMaster::DataMode::Mode3);
 }
@@ -224,8 +221,7 @@ initializeCs43()
 
 	cs43::Reset::setOutput(modm::Gpio::High);
 
-	cs43::Scl::connect(cs43::I2cMaster::Scl);
-	cs43::Sda::connect(cs43::I2cMaster::Sda);
+	cs43::I2cMaster::connect<cs43::Scl::Scl, cs43::Sda::Sda>();
 	cs43::I2cMaster::initialize<systemClock, cs43::I2cMaster::Baudrate::Standard>();
 }
 

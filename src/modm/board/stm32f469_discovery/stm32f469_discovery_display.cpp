@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Niklas Hauser
+ * Copyright (c) 2016-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -8,12 +8,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 // ----------------------------------------------------------------------------
-
-//
-// STM32F469I-DISCO
-// Discovery kit for STM32F469 line
-// http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF262395
-//
 
 #include "stm32f469_discovery.hpp"
 

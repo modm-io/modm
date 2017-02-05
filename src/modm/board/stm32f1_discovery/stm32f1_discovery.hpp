@@ -12,13 +12,13 @@
 //
 // STM32F1DISCOVERY
 // Discovery kit for STM32 F1 series
-// http://www.st.com/web/en/catalog/tools/FM116/SC959/SS1532/PF250863
+// http://www.st.com/en/evaluation-tools/stm32vldiscovery.html
 //
 
 #ifndef MODM_STM32_F1_DISCOVERY_HPP
 #define MODM_STM32_F1_DISCOVERY_HPP
 
-#include <modm/architecture/platform.hpp>
+#include <modm/platform/platform.hpp>
 
 using namespace modm::platform;
 

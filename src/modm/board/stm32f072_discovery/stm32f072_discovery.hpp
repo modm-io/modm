@@ -14,13 +14,13 @@
 //
 // 32F072DISCOVERY
 // Discovery kit for STM32F072 series
-// http://www.st.com/web/en/catalog/tools/FM116/SC959/SS1532/PF259724
+// http://www.st.com/en/evaluation-tools/32f072bdiscovery.html
 //
 
 #ifndef MODM_STM32_F072_DISCOVERY_HPP
 #define MODM_STM32_F072_DISCOVERY_HPP
 
-#include <modm/architecture/platform.hpp>
+#include <modm/platform/platform.hpp>
 #include <modm/driver/inertial/l3gd20.hpp>
 
 using namespace modm::platform;
@@ -37,7 +37,7 @@ struct systemClock
 {
 	static constexpr int Frequency = MHz48;
 	static constexpr int Usart1 = Frequency;
-	static constexpr int Can1 = Frequency;
+	static constexpr int Can = Frequency;
 	static constexpr int Spi2 = Frequency;
 
 	static bool inline
@@ -75,7 +75,7 @@ namespace l3g
 using Int1 = GpioInputC1;	// MEMS_INT1 [L3GD20_INT1]: GPXTI0
 using Int2 = GpioInputC2;	// MEMS_INT2 [L3GD20_DRDY/INT2]: GPXTI1
 
-using Cs   = GpioOutputC0;		// CS_I2C/SPI [L3GD20_CS_I2C/SPI]
+using Cs   = GpioOutputC0;	// CS_I2C/SPI [L3GD20_CS_I2C/SPI]
 using Sck  = GpioOutputB13;	// SPI2_SCK [L3GD20_SCL/SPC]
 using Mosi = GpioOutputB15;	// SPI2_MISO [L3GD20_SDA/SDI/SDO]
 using Miso = GpioInputB14;	// SPI2_MISO [L3GD20_SA0/SDO]
@@ -119,10 +119,7 @@ initializeL3g()
 
 	l3g::Cs::setOutput(modm::Gpio::High);
 
-	l3g::Sck::connect(l3g::SpiMaster::Sck);
-	l3g::Mosi::connect(l3g::SpiMaster::Mosi);
-	l3g::Miso::connect(l3g::SpiMaster::Miso);
-
+	l3g::SpiMaster::connect<l3g::Sck::Sck, l3g::Mosi::Mosi, l3g::Miso::Miso>();
 	l3g::SpiMaster::initialize<systemClock, 3000000>();
 	l3g::SpiMaster::setDataMode(l3g::SpiMaster::DataMode::Mode3);
 }

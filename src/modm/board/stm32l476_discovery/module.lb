@@ -1,0 +1,27 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2016-2017, Niklas Hauser
+# Copyright (c) 2017, Fabian Greif
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = "board.disco-l476vg"
+
+def prepare(module, options):
+    if options[":target"].partname != "stm32l476vgt":
+        return False
+
+    module.depends(":platform:core", ":platform:gpio", ":platform:clock", ":driver")
+    return True
+
+def build(env):
+    env.outbasepath = "src/modm/board"
+    env.copy('.', ignore=env.ignore_patterns("*.lb", "*.cfg", "*.xml"))
+    env.append_metadata_unique("openocd.configfile", "board/stm32l4discovery.cfg");

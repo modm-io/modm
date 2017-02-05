@@ -22,7 +22,7 @@
 #ifndef MODM_STM32_F103C8T6_BLUE_PILL_HPP
 #define MODM_STM32_F103C8T6_BLUE_PILL_HPP
 
-#include <modm/architecture/platform.hpp>
+#include <modm/platform/platform.hpp>
 
 using namespace modm::platform;
 
@@ -52,8 +52,7 @@ struct systemClock {
 	static constexpr uint32_t Uart4  = Apb1;
 	static constexpr uint32_t Uart5  = Apb1;
 
-	static constexpr uint32_t Can1   = Apb1;
-	static constexpr uint32_t Can2   = Apb1;
+	static constexpr uint32_t Can    = Apb1;
 
 	static constexpr uint32_t I2c1   = Apb1;
 	static constexpr uint32_t I2c2   = Apb1;

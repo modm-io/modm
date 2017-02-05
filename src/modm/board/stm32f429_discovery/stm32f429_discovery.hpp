@@ -12,13 +12,13 @@
 //
 // STM32F429IDISCOVERY
 // Discovery kit for STM32F429 line
-// http://www.st.com/web/catalog/tools/FM116/SC959/SS1532/PF259090
+// http://www.st.com/en/evaluation-tools/32f429idiscovery.html
 //
 
 #ifndef MODM_STM32_F429_DISCOVERY_HPP
 #define MODM_STM32_F429_DISCOVERY_HPP
 
-#include <modm/architecture/platform.hpp>
+#include <modm/platform/platform.hpp>
 
 using namespace modm::platform;
 
@@ -253,10 +253,7 @@ initializeL3g()
 
 	l3g::Cs::setOutput(modm::Gpio::High);
 
-	l3g::Sck::connect(l3g::SpiMaster::Sck);
-	l3g::Mosi::connect(l3g::SpiMaster::Mosi);
-	l3g::Miso::connect(l3g::SpiMaster::Miso);
-
+	l3g::SpiMaster::connect<l3g::Sck::Sck, l3g::Mosi::Mosi, l3g::Miso::Miso>();
 	l3g::SpiMaster::initialize<systemClock, 11250000ul>();
 	l3g::SpiMaster::setDataMode(l3g::SpiMaster::DataMode::Mode3);
 }

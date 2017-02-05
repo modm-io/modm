@@ -16,7 +16,7 @@
 #ifndef MODM_ARDUINO_UNO_HPP
 #define MODM_ARDUINO_UNO_HPP
 
-#include <modm/architecture/platform.hpp>
+#include <modm/platform/platform.hpp>
 #include <modm/debug/logger.hpp>
 #define MODM_BOARD_HAS_LOGGER
 
@@ -62,8 +62,7 @@ initialize()
 	systemClock::enable();
 
 	// Uart0 is connected to onboard USB bridge
-	D0::connect(Uart0::Rx);
-	D1::connect(Uart0::Tx);
+	Uart0::connect<D1::Txd, D0::Rxd>();
 	Uart0::initialize<systemClock, 9600>();
 
 	// modm::Clock initialization

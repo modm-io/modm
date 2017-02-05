@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance"
+         xsd:noNamespaceSchemaLocation="https://github.com/dergraaf/library-builder/lbuild/resources/configuration.xsd">
+  <repositories>
+    <repository>
+      <path>../../../../repo.lb</path>
+    </repository>
+    <cache>.lbuild_cache</cache>
+  </repositories>
+
+  <options>
+    <option name=":target">stm32f103c8t</option>
+
+    <option name=":platform:core:hardfault.led">C13</option>
+  </options>
+  <modules>
+    <module>modm:board.blue-pill</module>
+  </modules>
+</library>

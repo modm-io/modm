@@ -16,8 +16,8 @@
 #ifndef MODM_AL_AVREB_CAN_HPP
 #define MODM_AL_AVREB_CAN_HPP
 
-#include <modm/architecture/platform.hpp>
-#include <modm/debug/logger.hpp>
+#include <modm/platform/platform.hpp>
+#include <modm/io/iostream.hpp>
 
 using namespace modm::platform;
 
@@ -41,8 +41,7 @@ initialize()
 {
 	systemClock::enable();
 
-	GpioD2::connect(Uart1::Rx);
-	GpioD3::connect(Uart1::Tx);
+	Uart1::connect<GpioD3::Txd, GpioD2::Rxd>();
 	Uart1::initialize<systemClock, 38400>();
 
 	// modm::Clock initialization

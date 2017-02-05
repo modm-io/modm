@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, Niklas Hauser
+ * Copyright (c) 2015-2017, Niklas Hauser
  * Copyright (c) 2016, Sascha Schade
  *
  * This file is part of the modm project.
@@ -9,12 +9,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 // ----------------------------------------------------------------------------
-
-//
-// STM32F769I-DISCOVERY (MB1225B)
-// Discovery kit for STM32F769 line
-// http://www.st.com/content/st_com/en/products/evaluation-tools/product-evaluation-tools/mcu-eval-tools/stm32-mcu-eval-tools/stm32-mcu-discovery-kits/32f769idiscovery.html
-//
 
 #include "stm32f769i_discovery.hpp"
 

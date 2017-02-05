@@ -14,13 +14,13 @@
 //
 // STM32F7DISCOVERY
 // Discovery kit for STM32F746 line
-// http://www.st.com/content/st_com/en/products/evaluation-tools/product-evaluation-tools/mcu-eval-tools/stm32-mcu-eval-tools/stm32-mcu-discovery-kits/32f746gdiscovery.html
+// http://www.st.com/en/evaluation-tools/32f746gdiscovery.html
 //
 
 #ifndef MODM_STM32_F746G_DISCOVERY_HPP
 #define MODM_STM32_F746G_DISCOVERY_HPP
 
-#include <modm/architecture/platform.hpp>
+#include <modm/platform/platform.hpp>
 #include <modm/debug/logger.hpp>
 #define MODM_BOARD_HAS_LOGGER
 
@@ -125,9 +125,8 @@ initialize()
 	systemClock::enable();
 	modm::cortex::SysTickTimer::initialize<systemClock>();
 
-	stlink::Tx::connect(stlink::Uart::Tx);
-	stlink::Rx::connect(stlink::Uart::Rx, Gpio::InputType::PullUp);
-	stlink::Uart::initialize<systemClock, 115200>(12);
+	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
+	stlink::Uart::initialize<systemClock, 115200>();
 
 	Button::setInput();
 	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);

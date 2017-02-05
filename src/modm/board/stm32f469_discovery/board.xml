@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance"
+         xsd:noNamespaceSchemaLocation="https://github.com/dergraaf/library-builder/lbuild/resources/configuration.xsd">
+  <repositories>
+    <repository>
+      <path>../../../../repo.lb</path>
+    </repository>
+    <cache>.lbuild_cache</cache>
+  </repositories>
+
+  <options>
+    <option name=":target">stm32f469nih</option>
+
+    <option name=":platform:uart:3:buffer.tx">2048</option>
+    <option name=":platform:core:hardfault.led">K3</option>
+    <option name=":platform:core:allocator">tlsf</option>
+    <option name=":tlsf:minimum_pool_size">16777216</option>
+
+    <option name=":platform:core:linkerscript.memory">
+        SDRAM (rwx) : ORIGIN = 0xC0000000, LENGTH = 16M
+    </option>
+    <option name=":platform:core:linkerscript.sections">
+        .sdramdata :
+        {
+            __sdramdata_load = LOADADDR (.sdramdata);   /* address in FLASH */
+            __sdramdata_start = .;                      /* address in RAM */
+
+            KEEP(*(.sdramdata))
+
+            . = ALIGN(4);
+            __sdramdata_end = .;
+        } >SDRAM AT >FLASH
+
+        .heap_extern (NOLOAD) : ALIGN(4)
+        {
+            __heap_extern_start = .;
+            . = ORIGIN(SDRAM) + LENGTH(SDRAM);
+            __heap_extern_end = .;
+        } >SDRAM
+    </option>
+    <option name=":platform:core:linkerscript.table_extern.copy">
+        LONG (__sdramdata_load)
+        LONG (__sdramdata_start)
+        LONG (__sdramdata_end)
+    </option>
+    <option name=":platform:core:linkerscript.table_extern.heap">
+        LONG (0x801f)
+        LONG (__heap_extern_start)
+        LONG (__heap_extern_end)
+    </option>
+  </options>
+  <modules>
+    <module>modm:board.disco-f469ni</module>
+  </modules>
+</library>

@@ -13,13 +13,13 @@
 //
 // STM32F3DISCOVERY
 // Discovery kit for STM32 F3 series
-// http://www.st.com/web/en/catalog/tools/FM116/SC959/SS1532/PF254044
+// http://www.st.com/en/evaluation-tools/stm32f3discovery.html
 //
 
 #ifndef MODM_STM32_F3_DISCOVERY_HPP
 #define MODM_STM32_F3_DISCOVERY_HPP
 
-#include <modm/architecture/platform.hpp>
+#include <modm/platform/platform.hpp>
 #include <modm/driver/inertial/l3gd20.hpp>
 #include <modm/driver/inertial/lsm303a.hpp>
 
@@ -49,8 +49,7 @@ struct systemClock {
 	static constexpr uint32_t Adc3   = Apb2;
 	static constexpr uint32_t Adc4   = Apb2;
 
-	static constexpr uint32_t Can1   = Apb1;
-	static constexpr uint32_t Can2   = Apb1;
+	static constexpr uint32_t Can    = Apb1;
 
 	static constexpr uint32_t Spi1   = Apb2;
 	static constexpr uint32_t Spi2   = Apb1;
@@ -163,7 +162,7 @@ using Sda = GpioB7;	// I2C1_SDA [LSM303DLHC_SDA]: I2C1_SDA
 
 // Hardware I2C not yet implemented for F3!
 //using I2cMaster = I2cMaster1;
-using I2cMaster = BitBangI2cMaster<GpioB6, GpioB7>;
+using I2cMaster = BitBangI2cMaster<Scl, Sda>;
 using Accelerometer = modm::Lsm303a< I2cMaster >;
 }
 
@@ -213,10 +212,7 @@ initializeL3g()
 
 	l3g::Cs::setOutput(modm::Gpio::High);
 
-	l3g::Sck::connect(l3g::SpiMaster::Sck);
-	l3g::Mosi::connect(l3g::SpiMaster::Mosi);
-	l3g::Miso::connect(l3g::SpiMaster::Miso);
-
+	l3g::SpiMaster::connect<l3g::Sck::Sck, l3g::Mosi::Mosi, l3g::Miso::Miso>();
 	l3g::SpiMaster::initialize<systemClock, 9000000>();
 	l3g::SpiMaster::setDataMode(l3g::SpiMaster::DataMode::Mode3);
 }
@@ -240,8 +236,7 @@ initializeLsm3()
 	lsm3::Drdy::enableExternalInterrupt();
 //	lsm3::Drdy::enableExternalInterruptVector(12);
 
-	lsm3::Scl::connect(lsm3::I2cMaster::Scl);
-	lsm3::Sda::connect(lsm3::I2cMaster::Sda);
+	lsm3::I2cMaster::connect<lsm3::Scl::BitBang, lsm3::Sda::BitBang>();
 	lsm3::I2cMaster::initialize<systemClock, 400000>();
 }
 

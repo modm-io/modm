@@ -12,13 +12,13 @@
 //
 // STM32F469I-DISCO
 // Discovery kit for STM32F469 line
-// http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF262395
+// http://www.st.com/en/evaluation-tools/32f469idiscovery.html
 //
 
 #ifndef MODM_STM32_F469_DISCOVERY_HPP
 #define MODM_STM32_F469_DISCOVERY_HPP
 
-#include <modm/architecture/platform.hpp>
+#include <modm/platform/platform.hpp>
 #include <modm/ui/display/graphic_display.hpp>
 #include <modm/driver/touch/ft6x06.hpp>
 #include <modm/debug/logger.hpp>
@@ -169,8 +169,7 @@ initializeTouchscreen()
 	ft6::Int::enableExternalInterrupt();
 //	ft6::Int::enableExternalInterruptVector(12);
 
-	ft6::Scl::connect(ft6::I2cMaster::Scl);
-	ft6::Sda::connect(ft6::I2cMaster::Sda);
+	ft6::I2cMaster::connect<ft6::Scl::Scl, ft6::Sda::Sda>();
 	ft6::I2cMaster::initialize<systemClock, 360000>();
 }
 
@@ -189,13 +188,12 @@ getDisplay();
 inline void
 initialize()
 {
-	// initialized in `modm_hook_hardware_init()`
+	// initialized in `modm_board_init()`
 	// systemClock::enable();
 	modm::cortex::SysTickTimer::initialize<systemClock>();
 
-	stlink::Tx::connect(stlink::Uart::Tx);
-	stlink::Rx::connect(stlink::Uart::Rx, Gpio::InputType::PullUp);
-	stlink::Uart::initialize<systemClock, 115200>(12);
+	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
+	stlink::Uart::initialize<systemClock, 115200>();
 
 	LedGreen::setOutput(modm::Gpio::Low);
 	LedRed::setOutput(modm::Gpio::Low);

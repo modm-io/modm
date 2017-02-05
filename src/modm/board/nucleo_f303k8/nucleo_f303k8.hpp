@@ -12,12 +12,13 @@
 //
 // NUCLEO-F303K8
 // Nucleo kit for STM32F303K8
+// http://www.st.com/en/evaluation-tools/nucleo-f303k8.html
 //
 
 #ifndef MODM_STM32_NUCLEO_F303K8_HPP
 #define MODM_STM32_NUCLEO_F303K8_HPP
 
-#include <modm/architecture/platform.hpp>
+#include <modm/platform/platform.hpp>
 #include <modm/debug/logger.hpp>
 #define MODM_BOARD_HAS_LOGGER
 
@@ -83,30 +84,8 @@ struct systemClock {
 	}
 };
 
-// Arduino Footprint
-using A0 = GpioA0;
-using A1 = GpioA1;
-using A2 = GpioA3;
-using A3 = GpioA4;
-using A4 = GpioA5;
-using A5 = GpioA6;
-using A6 = GpioA7;
-using A7 = GpioA2;
-
-using D0  = GpioA10;
-using D1  = GpioA9;
-using D2  = GpioA12;
-using D3  = GpioB0;
-using D4  = GpioB7;
-using D5  = GpioB6;
-using D6  = GpioB1;
-using D7  = GpioF0;
-using D8  = GpioF1;
-using D9  = GpioA8;
-using D10 = GpioA11;
-using D11 = GpioB5;
-using D12 = GpioB4;
-using D13 = GpioB3;
+// Arduino Nano Footprint
+#include "nucleo32_arduino.hpp"
 
 using Button = GpioUnused;
 using LedD13 = D13;
@@ -128,9 +107,8 @@ initialize()
 	systemClock::enable();
 	modm::cortex::SysTickTimer::initialize<systemClock>();
 
-	stlink::Tx::connect(stlink::Uart::Tx);
-	stlink::Rx::connect(stlink::Uart::Rx, Gpio::InputType::PullUp);
-	stlink::Uart::initialize<systemClock, 115200>(12);
+	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
+	stlink::Uart::initialize<systemClock, 115200>();
 }
 
 }

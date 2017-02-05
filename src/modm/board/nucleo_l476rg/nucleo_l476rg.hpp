@@ -20,7 +20,7 @@
 #ifndef MODM_STM32_NUCLEO_L476RG_HPP
 #define MODM_STM32_NUCLEO_L476RG_HPP
 
-#include <modm/architecture/platform.hpp>
+#include <modm/platform/platform.hpp>
 #include <modm/debug/logger.hpp>
 #define MODM_BOARD_HAS_LOGGER
 
@@ -75,7 +75,7 @@ struct systemClock {
 };
 
 // Arduino Footprint
-#include "../nucleo64_arduino.hpp"
+#include "nucleo64_arduino.hpp"
 
 // Button connects to GND
 using Button = GpioInverted<GpioInputC13>;
@@ -97,9 +97,8 @@ initialize()
 	systemClock::enable();
 	modm::cortex::SysTickTimer::initialize<systemClock>();
 
-	stlink::Tx::connect(stlink::Uart::Tx);
-	stlink::Rx::connect(stlink::Uart::Rx, Gpio::InputType::PullUp);
-	stlink::Uart::initialize<systemClock, 115200>(12);
+	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
+	stlink::Uart::initialize<systemClock, 115200>();
 
 	LedGreen::setOutput(modm::Gpio::Low);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, Niklas Hauser
+ * Copyright (c) 2015-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -8,12 +8,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 // ----------------------------------------------------------------------------
-
-//
-// STM32F469I-DISCO
-// Discovery kit for STM32F469 line
-// http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF262395
-//
 
 #include "stm32f469_discovery.hpp"
 #include <modm/utils/bit_constants.hpp>
@@ -27,14 +21,11 @@ modm::log::Logger modm::log::info(loggerDevice);
 modm::log::Logger modm::log::warning(loggerDevice);
 modm::log::Logger modm::log::error(loggerDevice);
 
-extern "C" void
-modm_hook_hardware_init(void);
-
 extern void
 board_initialize_sdram();
 
-void
-modm_hook_hardware_init(void)
+static void
+modm_board_init(void)
 {
 	// Reset LCD
 	Board::DisplayReset::setOutput(modm::Gpio::Low);
@@ -46,6 +37,9 @@ modm_hook_hardware_init(void)
 	Board::systemClock::enable();
 	board_initialize_sdram();
 }
+
+__attribute__((section(".hardware_init"), used))
+static const uint32_t modm_board_init_ptr = (uint32_t) &modm_board_init;
 
 modm_extern_c void
 modm_abandon(const char * module,

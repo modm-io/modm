@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2017, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = "board.al-avreb-can"
+
+def prepare(module, options):
+    if options[":target"].partname != "at90can128":
+        return False
+
+    module.depends(":platform:core", ":platform:gpio", ":platform:clock",
+                   ":platform:uart:1", ":io")
+    return True
+
+def build(env):
+    env.outbasepath = "src/modm/board"
+    env.copy('.', ignore=env.ignore_patterns("*.lb", "*.cfg", "*.xml"))
+    env.append_metadata_unique("avrdude.port", "usb");
+    env.append_metadata_unique("avrdude.programmer", "avrispmkII");
+    env.append_metadata_unique("avrdude.efuse", "0xff");
+    env.append_metadata_unique("avrdude.hfuse", "0xd9");
+    env.append_metadata_unique("avrdude.lfuse", "0xfe");
