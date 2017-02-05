@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013-2014, Kevin Läufer
- * Copyright (c) 2013-2014, 2016, Niklas Hauser
+ * Copyright (c) 2013-2014, 2016-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -9,10 +9,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 // ----------------------------------------------------------------------------
-
-#include <modm/architecture/detect.hpp>
-
-#ifdef MODM_OS_HOSTED
 
 #include <modm/architecture/interface/memory.hpp>
 #include <stdlib.h>
@@ -28,5 +24,3 @@ operator new[](size_t size, modm::MemoryTraits)
 {
 	return ::operator new[](size);
 }
-
-#endif

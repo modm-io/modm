@@ -36,3 +36,4 @@ def build(env):
     env.outbasepath = "src/modm/platform/core"
 
     env.copy("assert.cpp")
+    env.copy("memory.cpp")
