@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2016-2017, Niklas Hauser
+# Copyright (c) 2017, Fabian Greif
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+from os.path import join
+
+def init(module):
+    module.name = "platform"
+
+def prepare(module, options):
+    return True
+
+def build(env):
+    env.outbasepath = "src/modm/platform"
+    headers = env.get_generated_local_files(filterfunc=lambda path: ".h" in path and not "_impl.h" in path)
+    env.template("platform.hpp.in", substitutions={"headers": sorted(headers)})
