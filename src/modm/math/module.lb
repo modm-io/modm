@@ -20,4 +20,9 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "src/modm/math"
-    env.copy('.')
+    ignore = ["*.lb"]
+    if "avr" not in env[":target"].identifier["platform"]:
+        ignore.append("*utils/avr")
+    if "hosted" not in env[":target"].identifier["platform"]:
+        ignore.append("*utils/pc")
+    env.copy('.', ignore=env.ignore_patterns(*ignore))
