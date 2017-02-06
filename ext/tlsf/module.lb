@@ -1,0 +1,49 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2017, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+import math
+
+def init(module):
+    module.name = "tlsf"
+
+def prepare(module, options):
+    device = options[":target"]
+    core = device.get_driver("core")
+    if not core or not core["type"].startswith("cortex"):
+        return False
+
+    # 4 or 5 are acceptable values (ie. 16 or 32 subdivisions)
+    module.add_option(
+        EnumerationOption(
+            name="subdivisions",
+            description="Number of subdivisions per memory pool",
+            enumeration=[16, 32],
+            default=16))
+    # 512kB covers all internal SRAM of any STM32 device
+    # 512MB is an architecture limit of ARM Cortex-M
+    module.add_option(
+        NumericOption(
+            name="minimum_pool_size",
+            description="Minimum pool size in byte",
+            minimum=2**12,
+            maximum=2**29,
+            default=2**19))
+
+    return True
+
+def build(env):
+    env.outbasepath = "ext/tlsf"
+    env.copy("tlsf.h")
+    env.template("tlsf.c.in", substitutions={
+        "sl_index_count_log2": math.ceil(math.log2(env["::subdivisions"])),
+        "fl_index_max": math.ceil(math.log2(env["::minimum_pool_size"]))
+        })

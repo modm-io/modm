@@ -12,15 +12,8 @@
 #	define _DEBUG 0
 #endif
 
-#ifndef MODM_TLFS_SL_INDEX_COUNT_LOG2
-// 4 or 5 are acceptable values (ie. 16 or 32 subdivisions)
-#	define MODM_TLFS_SL_INDEX_COUNT_LOG2 4
-#endif
-
-#ifndef MODM_TLFS_FL_INDEX_MAX
-// 512kB covers all internal SRAM of any STM32 device
-#	define MODM_TLFS_FL_INDEX_MAX 19
-#endif
+#define MODM_TLFS_SL_INDEX_COUNT_LOG2 {{ sl_index_count_log2 }}
+#define MODM_TLFS_FL_INDEX_MAX {{ fl_index_max }}
 
 /*
 ** This prevents the usage of newlib's `assert` and `printf` functions,
@@ -28,7 +21,7 @@
 ** since modm does not use newlib's printf.
 */
 #define tlsf_assert (void)
-static void silent_printf(char* fmt, ...) { (void)fmt; }
+static void silent_printf(const char* fmt, ...) { (void)fmt; }
 #define printf silent_printf
 
 
@@ -361,7 +354,7 @@ static const size_t block_start_offset =
 ** the prev_phys_block field, and no larger than the number of addressable
 ** bits for FL_INDEX.
 */
-static const size_t block_size_min = 
+static const size_t block_size_min =
 	sizeof(block_header_t) - sizeof(block_header_t*);
 static const size_t block_size_max = tlsf_cast(size_t, 1) << FL_INDEX_MAX;
 
@@ -1005,11 +998,11 @@ pool_t tlsf_add_pool(tlsf_t tlsf, void* mem, size_t bytes)
 	if (pool_bytes < block_size_min || pool_bytes > block_size_max)
 	{
 #if defined (TLSF_64BIT)
-		printf("tlsf_add_pool: Memory size must be between 0x%x and 0x%x00 bytes.\n", 
+		printf("tlsf_add_pool: Memory size must be between 0x%x and 0x%x00 bytes.\n",
 			(unsigned int)(pool_overhead + block_size_min),
 			(unsigned int)((pool_overhead + block_size_max) / 256));
 #else
-		printf("tlsf_add_pool: Memory size must be between %u and %u bytes.\n", 
+		printf("tlsf_add_pool: Memory size must be between %u and %u bytes.\n",
 			(unsigned int)(pool_overhead + block_size_min),
 			(unsigned int)(pool_overhead + block_size_max));
 #endif
