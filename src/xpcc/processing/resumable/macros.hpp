@@ -11,6 +11,7 @@
 #define XPCC_RF_MACROS_HPP
 
 #include <xpcc/utils/arithmetic_traits.hpp>
+#include <xpcc/architecture/interface/assert.hpp>
 
 #ifdef __DOXYGEN__
 /**
@@ -222,7 +223,10 @@
 	constexpr uint16_t rfCounter = __COUNTER__; \
 	this->template checkRfType<true>(); \
 	constexpr uint8_t rfIndex = 0; \
-	if (!this->nestingOkRf()) return {xpcc::rf::NestingError}; \
+	if (!this->nestingOkRf()) { \
+		xpcc_assert(false, XPCC_RESUMABLE_MODULE_NAME, "begin", "nesting"); \
+		return {xpcc::rf::NestingError}; \
+	} \
 	switch (this->pushRf(0)) { \
 		case (::xpcc::rf::Stopped): \
 			RF_INTERNAL_SET_CASE(__COUNTER__);

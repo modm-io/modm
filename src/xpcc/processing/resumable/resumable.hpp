@@ -15,6 +15,9 @@
 #include <stdint.h>
 #include <initializer_list>
 
+/// @ingroup	resumable
+#define XPCC_RESUMABLE_MODULE_NAME "resumable"
+
 namespace xpcc
 {
 

@@ -341,6 +341,23 @@ public:
 };
 //*/
 
+static bool testing_nesting_assertion(false);
+
+xpcc::Abandonment
+resumable_test_nesting_handler(const char * module,
+							   const char * location,
+							   const char * function)
+{
+	if (testing_nesting_assertion) {
+		TEST_ASSERT_EQUALS_STRING(module, XPCC_RESUMABLE_MODULE_NAME);
+		TEST_ASSERT_EQUALS_STRING(location, "begin");
+		TEST_ASSERT_EQUALS_STRING(function, "nesting");
+		return xpcc::Abandonment::Ignore;
+	}
+	return xpcc::Abandonment::DontCare;
+}
+XPCC_ASSERTION_HANDLER(resumable_test_nesting_handler);
+
 void
 ResumableTest::testNesting()
 {
@@ -408,6 +425,7 @@ ResumableTest::testNesting()
 
 	// lets release start condition 3
 	thread.condition3 = true;
+	testing_nesting_assertion = true;
 	// task3 will progress to first yield
 	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::rf::Running);
 	TEST_ASSERT_EQUALS(thread.callResult1.getState(), xpcc::rf::Running);
@@ -419,6 +437,7 @@ ResumableTest::testNesting()
 	TEST_ASSERT_EQUALS(thread.depth3, 2);
 	// we have exhausted the nesting capabilities
 	TEST_ASSERT_EQUALS(thread.callResult3.getState(), xpcc::rf::NestingError);
+	testing_nesting_assertion = false;
 
 	// now we will begin to strip down the nestings
 	TEST_ASSERT_EQUALS(thread.task1().getState(), xpcc::rf::Running);
