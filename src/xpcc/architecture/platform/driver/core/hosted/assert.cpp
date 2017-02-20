@@ -25,27 +25,24 @@ extern AssertionHandler __assertion_table_end __asm("__stop_xpcc_assertion");
 extern "C"
 {
 
-void xpcc_assert_evaluate(bool condition, const char * identifier)
+void xpcc_assert_fail(const char * identifier)
 {
-	if (!condition)
+	uint8_t state((uint8_t) Abandonment::DontCare);
+	const char * module = identifier;
+	const char * location = module + strlen(module) + 1;
+	const char * failure = location + strlen(location) + 1;
+
+	AssertionHandler * handler = &__assertion_table_start;
+	for (; handler < &__assertion_table_end; handler++)
 	{
-		uint8_t state((uint8_t) Abandonment::DontCare);
-		const char * module = identifier;
-		const char * location = module + strlen(module) + 1;
-		const char * failure = location + strlen(location) + 1;
+		state |= (uint8_t) (*handler)(module, location, failure);
+	}
 
-		AssertionHandler * handler = &__assertion_table_start;
-		for (; handler < &__assertion_table_end; handler++)
-		{
-			state |= (uint8_t) (*handler)(module, location, failure);
-		}
-
-		if (state == (uint8_t) Abandonment::DontCare or
-			state & (uint8_t) Abandonment::Fail)
-		{
-			xpcc_abandon(module, location, failure);
-			exit(1);
-		}
+	if (state == (uint8_t) Abandonment::DontCare or
+		state & (uint8_t) Abandonment::Fail)
+	{
+		xpcc_abandon(module, location, failure);
+		exit(1);
 	}
 }
 

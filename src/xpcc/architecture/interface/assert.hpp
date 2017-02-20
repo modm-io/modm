@@ -155,7 +155,8 @@ xpcc_abandon(const char * module,
 #endif
 
 #define xpcc_assert(condition, module, location, failure) \
-	xpcc_assert_evaluate((condition), INLINE_FLASH_STORAGE_STRING(module "\0" location "\0" failure));
+	if ((bool)(condition)) {} else { \
+		xpcc_assert_fail(INLINE_FLASH_STORAGE_STRING(module "\0" location "\0" failure)); }
 
 #ifndef NDEBUG
 #	define xpcc_assert_debug(condition, module, location, failure) \
@@ -169,7 +170,7 @@ xpcc_abandon(const char * module,
 
 extern "C" {
 
-void xpcc_assert_evaluate(bool condition, const char * identifier);
+void xpcc_assert_fail(const char * identifier);
 
 void xpcc_abandon(const char * module, const char * location, const char * failure);
 
