@@ -22,6 +22,17 @@ extern AssertionHandler __assertion_table_start __asm("__start_xpcc_assertion");
 extern AssertionHandler __assertion_table_end __asm("__stop_xpcc_assertion");
 #endif
 
+// Since we use the default linker script on hosted, the above linker section are
+// only included if something is put into these sections. Therefore we are placing
+// an empty assertion handler here, which does not influence assertion handling.
+
+Abandonment
+empty_assertion_handler(const char *, const char *, const char *)
+{
+	return Abandonment::DontCare;
+}
+XPCC_ASSERTION_HANDLER(empty_assertion_handler);
+
 extern "C"
 {
 
