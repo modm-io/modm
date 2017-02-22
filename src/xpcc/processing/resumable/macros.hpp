@@ -224,7 +224,7 @@
 	this->template checkRfType<true>(); \
 	constexpr uint8_t rfIndex = 0; \
 	if (!this->nestingOkRf()) { \
-		xpcc_assert(false, XPCC_RESUMABLE_MODULE_NAME, "begin", "nesting"); \
+		xpcc_assert(false, XPCC_RESUMABLE_MODULE_NAME, "begin", "nesting", this); \
 		return {xpcc::rf::NestingError}; \
 	} \
 	switch (this->pushRf(0)) { \
