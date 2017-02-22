@@ -346,7 +346,8 @@ static bool testing_nesting_assertion(false);
 xpcc::Abandonment
 resumable_test_nesting_handler(const char * module,
 							   const char * location,
-							   const char * function)
+							   const char * function,
+							   uintptr_t)
 {
 	if (testing_nesting_assertion) {
 		TEST_ASSERT_EQUALS_STRING(module, XPCC_RESUMABLE_MODULE_NAME);

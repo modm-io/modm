@@ -27,7 +27,7 @@ extern AssertionHandler __assertion_table_end __asm("__stop_xpcc_assertion");
 // an empty assertion handler here, which does not influence assertion handling.
 
 Abandonment
-empty_assertion_handler(const char *, const char *, const char *)
+empty_assertion_handler(const char *, const char *, const char *, uintptr_t)
 {
 	return Abandonment::DontCare;
 }
@@ -36,7 +36,7 @@ XPCC_ASSERTION_HANDLER(empty_assertion_handler);
 extern "C"
 {
 
-void xpcc_assert_fail(const char * identifier)
+void xpcc_assert_fail(const char * identifier, uintptr_t context)
 {
 	uint8_t state((uint8_t) Abandonment::DontCare);
 	const char * module = identifier;
@@ -46,23 +46,24 @@ void xpcc_assert_fail(const char * identifier)
 	AssertionHandler * handler = &__assertion_table_start;
 	for (; handler < &__assertion_table_end; handler++)
 	{
-		state |= (uint8_t) (*handler)(module, location, failure);
+		state |= (uint8_t) (*handler)(module, location, failure, context);
 	}
 
 	if (state == (uint8_t) Abandonment::DontCare or
 		state & (uint8_t) Abandonment::Fail)
 	{
-		xpcc_abandon(module, location, failure);
+		xpcc_abandon(module, location, failure, context);
 		exit(1);
 	}
 }
 
-void xpcc_abandon(const char * module, const char * location, const char * failure) __attribute__((weak));
-void xpcc_abandon(const char * module, const char * location, const char * failure)
+xpcc_weak
+void xpcc_abandon(const char * module, const char * location, const char * failure, uintptr_t context)
 {
 	XPCC_LOG_ERROR << "Assertion '"
 			<< module << "." << location << "." << failure
-			<< "' failed! Abandoning." << xpcc::endl;
+			<< "' @ " << (void *) context
+			<< " failed! Abandoning..." << xpcc::endl;
 }
 
 }

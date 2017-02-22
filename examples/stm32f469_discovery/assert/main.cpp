@@ -8,11 +8,13 @@ using namespace Board;
 
 extern "C" void xpcc_abandon(const char * module,
 							 const char * location,
-							 const char * failure)
+							 const char * failure,
+							 uintptr_t context)
 {
 	XPCC_LOG_ERROR << "Assertion '"
 			<< module << "." << location << "." << failure
-			<< "' failed! Abandoning." << xpcc::endl;
+			<< "' @ " << (void *) context
+			<< " failed! Abandoning..." << xpcc::endl;
 
 	LedGreen::setOutput();
 	while(1) {
@@ -26,7 +28,8 @@ extern "C" void xpcc_abandon(const char * module,
 static xpcc::Abandonment
 test_assertion_handler(const char * module,
 					   const char * /* location */,
-					   const char * /* failure */)
+					   const char * /* failure */,
+					   uintptr_t /* context */)
 {
 	if (strcmp(module, XPCC_IOBUFFER_MODULE_NAME) == 0)
 		return xpcc::Abandonment::Ignore;

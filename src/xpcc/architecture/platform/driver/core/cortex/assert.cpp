@@ -20,7 +20,7 @@ extern AssertionHandler __assertion_table_end;
 extern "C"
 {
 
-void xpcc_assert_fail(const char * identifier)
+void xpcc_assert_fail(const char * identifier, uintptr_t context)
 {
 	uint8_t state(uint8_t(Abandonment::DontCare));
 	const char * module = identifier;
@@ -30,18 +30,18 @@ void xpcc_assert_fail(const char * identifier)
 	AssertionHandler * handler = &__assertion_table_start;
 	for (; handler < &__assertion_table_end; handler++)
 	{
-		state |= (uint8_t) (*handler)(module, location, failure);
+		state |= (uint8_t) (*handler)(module, location, failure, context);
 	}
 
 	if (state == (uint8_t) Abandonment::DontCare or
 		state & (uint8_t) Abandonment::Fail)
 	{
-		xpcc_abandon(module, location, failure);
+		xpcc_abandon(module, location, failure, context);
 		exit(1);
 	}
 }
 
-void xpcc_abandon(const char *, const char *, const char *) __attribute__((weak));
-void xpcc_abandon(const char *, const char *, const char *) {}
+xpcc_weak
+void xpcc_abandon(const char *, const char *, const char *, uintptr_t) {}
 
 }

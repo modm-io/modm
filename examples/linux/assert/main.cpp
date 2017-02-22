@@ -6,8 +6,9 @@
 
 static xpcc::Abandonment
 test_assertion_handler(const char * module,
-					   const char * location,
-					   const char * failure)
+					   const char * /* location */,
+					   const char * /* failure */,
+					   uintptr_t /* context */)
 {
 	if (strcmp(module, XPCC_IOBUFFER_MODULE_NAME) == 0)
 		return xpcc::Abandonment::Ignore;

@@ -22,13 +22,15 @@ using xpcc::accessor::asFlash;
 extern "C" void
 xpcc_abandon(const char * module,
 			 const char * location,
-			 const char * failure)
+			 const char * failure,
+			 uintptr_t context)
 {
 	serialStream << IFS("Assertion '")
 			<< asFlash(module) << '.'
 			<< asFlash(location) << '.'
 			<< asFlash(failure)
-			<< IFS("' failed! Abandoning.") << xpcc::endl;
+			<< IFS("' @ ") << (void *) context
+			<< IFS(" failed! Abandoning.") << xpcc::endl;
 
 	Leds::setOutput();
 	while(1) {
@@ -42,7 +44,8 @@ xpcc_abandon(const char * module,
 static xpcc::Abandonment
 test_assertion_handler(const char * module,
 					   const char * /* location */,
-					   const char * /* failure */)
+					   const char * /* failure */,
+					   uintptr_t /* context */)
 {
 	serialStream << IFS("#1: '") << asFlash(module) << IFS("'!") << xpcc::endl;
 	// The strings are located in FLASH!!!
@@ -55,7 +58,8 @@ XPCC_ASSERTION_HANDLER(test_assertion_handler);
 static xpcc::Abandonment
 test_assertion_handler2(const char * /* module */,
 						const char * location,
-						const char * /* failure */)
+						const char * /* failure */,
+						uintptr_t /* context */)
 {
 	serialStream << IFS("#2: '") << asFlash(location) << IFS("'!") << xpcc::endl;
 	return xpcc::Abandonment::DontCare;
@@ -65,7 +69,8 @@ XPCC_ASSERTION_HANDLER(test_assertion_handler2);
 static xpcc::Abandonment
 test_assertion_handler3(const char * /* module */,
 						const char * /* location */,
-						const char * failure)
+						const char * failure,
+						uintptr_t /* context */)
 {
 	serialStream << IFS("#3: '") << asFlash(failure) << IFS("'!") << xpcc::endl;
 	return xpcc::Abandonment::DontCare;

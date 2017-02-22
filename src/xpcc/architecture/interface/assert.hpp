@@ -82,7 +82,8 @@ Abandonment : uint8_t
 /// @ingroup assert
 using AssertionHandler = Abandonment (*)(const char * module,
 										 const char * location,
-					 					 const char * failure);
+										 const char * failure,
+										 uintptr_t context);
 
 } // namespace xpcc
 
@@ -113,6 +114,16 @@ using AssertionHandler = Abandonment (*)(const char * module,
 #define xpcc_assert(condition, module, location, failure)
 
 /**
+ * Assert a condition to be true with failure identifier and context.
+ * This assert is always included in the source code.
+ *
+ * @note On AVR targets the failure identifier string is placed in Flash memory!
+ *
+ * @ingroup assert
+ */
+#define xpcc_assert(condition, module, location, failure, context)
+
+/**
  * Assert a condition to be true with failure identifier.
  * This assert is only included in the source code on debug builds!
  *
@@ -121,6 +132,16 @@ using AssertionHandler = Abandonment (*)(const char * module,
  * @ingroup assert
  */
 #define xpcc_assert_debug(condition, module, location, failure)
+
+/**
+ * Assert a condition to be true with failure identifier and context.
+ * This assert is only included in the source code on debug builds!
+ *
+ * @note On AVR targets the strings are placed in Flash memory!
+ *
+ * @ingroup assert
+ */
+#define xpcc_assert_debug(condition, module, location, failure, context)
 
 /**
  * Overwriteable abandonment handler for all targets.
@@ -133,7 +154,8 @@ using AssertionHandler = Abandonment (*)(const char * module,
 extern "C" void
 xpcc_abandon(const char * module,
 			 const char * location,
-			 const char * failure) xpcc_weak;
+			 const char * failure,
+			 uintptr_t context) xpcc_weak;
 
 #else
 
@@ -154,25 +176,32 @@ xpcc_abandon(const char * module,
 #	define XPCC_ASSERTION_HANDLER(handler)
 #endif
 
-#define xpcc_assert(condition, module, location, failure) \
-	if ((bool)(condition)) {} else { \
-		xpcc_assert_fail(INLINE_FLASH_STORAGE_STRING(module "\0" location "\0" failure)); }
+#define xpcc_assert4(condition, module, location, failure) \
+	xpcc_assert5(condition, module, location, failure, 0)
+
+#define xpcc_assert5(condition, module, location, failure, context) \
+	if ((bool) (condition)) {} else { \
+		xpcc_assert_fail(INLINE_FLASH_STORAGE_STRING(module "\0" location "\0" failure), (uintptr_t) context); }
+
+#define xpcc_assert_get_macro(_1,_2,_3,_4,_5,foo,...) foo
+#define xpcc_assert(...) \
+	xpcc_assert_get_macro(__VA_ARGS__, xpcc_assert5, xpcc_assert4)(__VA_ARGS__)
 
 #ifndef NDEBUG
-#	define xpcc_assert_debug(condition, module, location, failure) \
-		xpcc_assert(condition, module, location, failure)
+#define xpcc_assert_debug(...) \
+	xpcc_assert_get_macro(__VA_ARGS__, xpcc_assert5, xpcc_assert4)(__VA_ARGS__)
 #	define XPCC_ASSERTION_HANDLER_DEBUG(handler) \
 		XPCC_ASSERTION_HANDLER(handler)
 #else
-#	define xpcc_assert_debug(condition, module, location, failure)
+#	define xpcc_assert_debug(...)
 #	define XPCC_ASSERTION_HANDLER_DEBUG(handler)
 #endif
 
 extern "C" {
 
-void xpcc_assert_fail(const char * identifier);
+void xpcc_assert_fail(const char * identifier, uintptr_t context);
 
-void xpcc_abandon(const char * module, const char * location, const char * failure);
+void xpcc_abandon(const char * module, const char * location, const char * failure, uintptr_t context);
 
 }
 
