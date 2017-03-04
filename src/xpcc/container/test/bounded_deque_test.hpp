@@ -51,4 +51,8 @@ public:
 	// Test if append() fails when the queue is full
 	void
 	testFull();
+
+	// Test if queue of length one is handled properly
+	void
+	testOneElementQueue();
 };

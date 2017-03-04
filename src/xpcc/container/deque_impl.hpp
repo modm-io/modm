@@ -36,7 +36,7 @@
 
 template<typename T, std::size_t N>
 xpcc::BoundedDeque<T, N>::BoundedDeque() : 
-	head(0), tail(1), size(0)
+	head(0), tail(N == 1 ? 0 : 1), size(0)
 {
 	static_assert(N > 0, "size = 0 is not allowed");
 }
@@ -78,7 +78,7 @@ void
 xpcc::BoundedDeque<T, N>::clear()
 {
 	this->head = 0;
-	this->tail = 1;
+	this->tail = (N == 1 ? 0 : 1);
 	this->size = 0;
 }
 

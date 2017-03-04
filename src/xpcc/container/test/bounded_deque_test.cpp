@@ -239,3 +239,29 @@ BoundedDequeTest::testFull()
 	TEST_ASSERT_TRUE(deque.append(5));
 	TEST_ASSERT_FALSE(deque.append(6));
 }
+
+void
+BoundedDequeTest::testOneElementQueue()
+{
+	xpcc::BoundedDeque<int16_t, 1> deque;
+
+	TEST_ASSERT_EQUALS(deque.getSize(), 0);
+	TEST_ASSERT_EQUALS(deque.getMaxSize(), 1);
+
+	TEST_ASSERT_TRUE(deque.isEmpty());
+	TEST_ASSERT_FALSE(deque.isFull());
+
+	TEST_ASSERT_TRUE(deque.append(123));
+	TEST_ASSERT_EQUALS(deque.getSize(), 1);
+
+	TEST_ASSERT_FALSE(deque.isEmpty());
+	TEST_ASSERT_TRUE(deque.isFull());
+
+	TEST_ASSERT_FALSE(deque.append(2));
+
+	TEST_ASSERT_EQUALS(deque.getFront(), 123);
+	TEST_ASSERT_EQUALS(deque.getBack(), deque.getFront());
+
+	deque.removeBack();
+	TEST_ASSERT_TRUE(deque.isEmpty());
+}
