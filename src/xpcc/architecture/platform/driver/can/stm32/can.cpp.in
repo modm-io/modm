@@ -10,6 +10,7 @@
 #include <xpcc/debug/error_report.hpp>
 #include <xpcc/architecture/driver/atomic/queue.hpp>
 #include <xpcc/utils.hpp>
+#include <xpcc/architecture/interface/assert.hpp>
 
 #include "can_{{ id }}.hpp"
 #include <xpcc_config.hpp>
@@ -88,11 +89,14 @@ xpcc::stm32::Can{{ id }}::initializeWithPrescaler(
 
 	// Request initialization
 	{{ reg }}->MCR |= CAN_MCR_INRQ;
-	while (({{ reg }}->MSR & CAN_MSR_INAK) == 0) {
+	int deadlockPreventer = 10000; // max ~10ms
+	while ((({{ reg }}->MSR & CAN_MSR_INAK) == 0) and (deadlockPreventer-- > 0)) {
+		xpcc::delayMicroseconds(1);
 		// Wait until the initialization mode is entered.
 		// The CAN hardware waits until the current CAN activity (transmission
 		// or reception) is completed before entering the initialization mode.
 	}
+	xpcc_assert(deadlockPreventer > 0, "can", "init", "timeout", {{ id }});
 
 	// Enable Interrupts:
 	// FIFO1 Overrun, FIFO0 Overrun
@@ -138,11 +142,11 @@ xpcc::stm32::Can{{ id }}::initializeWithPrescaler(
 
 	// Request leave initialization
 	{{ reg }}->MCR &= ~(uint32_t)CAN_MCR_INRQ;
-	while (({{ reg }}->MSR & CAN_MSR_INAK) == CAN_MSR_INAK) {
+	deadlockPreventer = 10000; // max ~10ms
+	while ((({{ reg }}->MSR & CAN_MSR_INAK) == CAN_MSR_INAK) and (deadlockPreventer-- > 0))  {
 		// wait for the normal mode
 	}
-
-	return;
+	xpcc_assert(deadlockPreventer > 0, "can", "init", "timeout", {{ id }});
 }
 
 // ----------------------------------------------------------------------------
