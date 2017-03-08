@@ -265,3 +265,121 @@ BoundedDequeTest::testOneElementQueue()
 	deque.removeBack();
 	TEST_ASSERT_TRUE(deque.isEmpty());
 }
+
+void
+BoundedDequeTest::testOverwrite()
+{
+	xpcc::BoundedDeque<int16_t, 3> deque;
+	
+	TEST_ASSERT_TRUE(deque.isEmpty());
+	
+	deque.appendOverwrite(1);
+	TEST_ASSERT_EQUALS(deque.getSize(), 1U);
+	TEST_ASSERT_TRUE(deque.append(2));
+	TEST_ASSERT_EQUALS(deque.getSize(), 2U);
+	deque.appendOverwrite(3);
+	TEST_ASSERT_EQUALS(deque.getSize(), 3U);
+	
+	TEST_ASSERT_FALSE(deque.append(4));
+	TEST_ASSERT_EQUALS(deque.getSize(), 3U);
+	TEST_ASSERT_EQUALS(deque.getFront(), 1);
+	TEST_ASSERT_EQUALS(deque.getBack(), 3);
+	TEST_ASSERT_TRUE(deque.isFull());
+	
+	deque.appendOverwrite(4);
+	TEST_ASSERT_EQUALS(deque.getSize(), 3U);
+	TEST_ASSERT_EQUALS(deque.getFront(), 2);
+	TEST_ASSERT_EQUALS(deque.getBack(), 4);
+	TEST_ASSERT_TRUE(deque.isFull());
+	
+	deque.appendOverwrite(5);
+	deque.appendOverwrite(6);
+	TEST_ASSERT_EQUALS(deque.getSize(), 3U);
+	TEST_ASSERT_EQUALS(deque.getFront(), 4);
+	TEST_ASSERT_EQUALS(deque.getBack(), 6);
+	TEST_ASSERT_TRUE(deque.isFull());
+	
+	deque.removeBack();
+	deque.removeFront();
+	TEST_ASSERT_EQUALS(deque.getFront(), 5);
+	TEST_ASSERT_EQUALS(deque.getBack(), 5);
+	deque.removeFront();
+	
+	
+	TEST_ASSERT_TRUE(deque.isEmpty());
+	
+	deque.prependOverwrite(1);
+	TEST_ASSERT_EQUALS(deque.getSize(), 1U);
+	TEST_ASSERT_TRUE(deque.prepend(2));
+	TEST_ASSERT_EQUALS(deque.getSize(), 2U);
+	deque.prependOverwrite(3);
+	TEST_ASSERT_EQUALS(deque.getSize(), 3U);
+	
+	TEST_ASSERT_FALSE(deque.prepend(4));
+	TEST_ASSERT_EQUALS(deque.getSize(), 3U);
+	TEST_ASSERT_EQUALS(deque.getBack(), 1);
+	TEST_ASSERT_EQUALS(deque.getFront(), 3);
+	TEST_ASSERT_TRUE(deque.isFull());
+	
+	deque.prependOverwrite(4);
+	TEST_ASSERT_EQUALS(deque.getSize(), 3U);
+	TEST_ASSERT_EQUALS(deque.getBack(), 2);
+	TEST_ASSERT_EQUALS(deque.getFront(), 4);
+	TEST_ASSERT_TRUE(deque.isFull());
+	
+	deque.prependOverwrite(5);
+	deque.prependOverwrite(6);
+	TEST_ASSERT_EQUALS(deque.getSize(), 3U);
+	TEST_ASSERT_EQUALS(deque.getBack(), 4);
+	TEST_ASSERT_EQUALS(deque.getFront(), 6);
+	TEST_ASSERT_TRUE(deque.isFull());
+}
+
+void
+BoundedDequeTest::testElementAccess()
+{
+	xpcc::BoundedDeque<int16_t, 4> deque;
+	
+	// Fill deque, but assure a wrap around
+	deque.append(0);
+	deque.append(0);
+	deque.append(1);
+	deque.append(2);
+	TEST_ASSERT_TRUE(deque.isFull());
+	deque.removeFront();
+	deque.removeFront();
+	deque.append(3);
+	deque.append(4);
+	TEST_ASSERT_TRUE(deque.isFull());
+	
+	// Test const getter
+	TEST_ASSERT_EQUALS(deque.get(0), 1);
+	TEST_ASSERT_EQUALS(deque.get(1), 2);
+	TEST_ASSERT_EQUALS(deque.get(2), 3);
+	TEST_ASSERT_EQUALS(deque.get(3), 4);
+	TEST_ASSERT_EQUALS(deque[0], 1);
+	TEST_ASSERT_EQUALS(deque[1], 2);
+	TEST_ASSERT_EQUALS(deque[2], 3);
+	TEST_ASSERT_EQUALS(deque[3], 4);
+	TEST_ASSERT_EQUALS(deque.rget(0), 4);
+	TEST_ASSERT_EQUALS(deque.rget(1), 3);
+	TEST_ASSERT_EQUALS(deque.rget(2), 2);
+	TEST_ASSERT_EQUALS(deque.rget(3), 1);
+	
+	// Test const getter
+	const auto& constDeque = deque;
+	TEST_ASSERT_EQUALS(constDeque[1], 2);
+	TEST_ASSERT_EQUALS(constDeque[3], 4);
+	TEST_ASSERT_EQUALS(constDeque.get(0), 1);
+	TEST_ASSERT_EQUALS(constDeque.rget(2), 2);
+	
+	// Test non-full deque
+	deque.removeFront();
+	TEST_ASSERT_EQUALS(deque.get(0), 2);
+	TEST_ASSERT_EQUALS(deque.get(1), 3);
+	TEST_ASSERT_EQUALS(deque.get(2), 4);
+	TEST_ASSERT_EQUALS(deque.rget(0), 4);
+	TEST_ASSERT_EQUALS(deque.rget(1), 3);
+	TEST_ASSERT_EQUALS(deque.rget(2), 2);
+	
+}

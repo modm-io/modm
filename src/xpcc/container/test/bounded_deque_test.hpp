@@ -55,4 +55,10 @@ public:
 	// Test if queue of length one is handled properly
 	void
 	testOneElementQueue();
+	
+	void
+	testOverwrite();
+	
+	void
+	testElementAccess();
 };
