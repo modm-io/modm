@@ -175,6 +175,12 @@ initializeTouchscreen()
 void
 initializeDisplay();
 
+void
+setDisplayBuffer(void * buffer);
+
+void *
+getDisplayBuffer();
+
 xpcc::GraphicDisplay&
 getDisplay();
 
