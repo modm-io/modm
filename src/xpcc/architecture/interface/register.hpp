@@ -598,9 +598,10 @@ struct FlagsGroup<T, Ts...> : public FlagsGroup<Ts...>
 	// enum class
 	constexpr FlagsGroup(typename T::EnumType value)
 	:	FlagsGroup<Ts...>(typename T::UnderlyingType(value)) {}
-	// Flags class
-	constexpr FlagsGroup(T value)
+	/// Flags operators and Flags constructor
+	constexpr FlagsGroup(::xpcc::FlagsOperators<typename T::EnumType, typename T::UnderlyingType> value)
 	:	FlagsGroup<Ts...>(value.value) {}
+
 } xpcc_packed;
 /// @endcond
 
@@ -656,9 +657,10 @@ struct FlagsGroup<T> : public Register<typename T::UnderlyingType>
 	/// enum type constructor
 	constexpr FlagsGroup(typename T::EnumType value)
 	:	Register<typename T::UnderlyingType>(typename T::UnderlyingType(value)) {}
-	/// Flags type constructor
-	constexpr FlagsGroup(T value)
+	/// Flags operators and Flags constructor
+	constexpr FlagsGroup(::xpcc::FlagsOperators<typename T::EnumType, typename T::UnderlyingType> value)
 	:	Register<typename T::UnderlyingType>(value.value) {}
+
 } xpcc_packed;
 
 /**
