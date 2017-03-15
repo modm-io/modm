@@ -20,6 +20,8 @@ Including unit tests is very welcomed and highly recommended. xpcc has its own s
 
 ## When in doubt, ask
 
+The dedicated maintainer of xpcc is [@salkinium](https://github.com/salkinium) and you can always ping him.
+
 If you want to add a new platform, or other significant functionality, we [ask you to discuss that on the mailing list first](http://mailman.rwth-aachen.de/mailman/listinfo/xpcc-dev). We are very open to new suggestions, however, we might have different plans for a particular feature.
 
 Communication is cheap, implementation is expensive and we don't want to frustrate you.
