@@ -1,0 +1,5 @@
+language: python
+python:
+    - "3.5"
+
+script: "python check_for_updates.py"
