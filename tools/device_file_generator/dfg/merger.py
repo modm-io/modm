@@ -133,20 +133,38 @@ class DeviceMerger:
 			categories = [	['301'],
 							['302'],
 							['303'],
-			                ['334'],
-			                ['318', '328', '358', '378', '398'],
+							['334'],
+							['318', '328', '358', '378', '398'],
 							['373']  ]
 		elif family == 'f4':
 			categories = [	['401', '411'],
 							['410'],
 							['412'],
+							['413', '423'],
 							['405', '415', '407', '417'],
 							['427', '437', '429', '439'],
 							['446'],
 							['469', '479']  ]
 		elif family == 'f7':
-			categories = [	['745', '746', '756'],
+			categories = [	['722', '732', '723', '733'],
+							['745', '746', '756'],
 							['765', '767', '768', '769', '777', '778', '779']  ]
+		elif family == 'l0':
+			categories = [	['011', '021'],
+							['031', '041'],
+							['051', '052', '062', '053', '063'],
+							['071', '081', '072', '082', '073', '083']]
+		elif family == 'l1':
+			categories = [	['100'],
+							['151', '152'],
+							['162']]
+		elif family == 'l4':
+			categories = [	['451', '471'],
+							['432', '442'],
+							['452', '462'],
+							['431', '433', '443'],
+							['475', '485'],
+							['476', '486']]
 
 		# make sure that only one category is used!
 		for cat in categories:
@@ -402,13 +420,21 @@ class DeviceMerger:
 				categories = [['8', 'b', 'c']]
 		elif family == 'f4':
 			categories = [	['8', 'b', 'c', 'd'],
-							['e', 'g', 'i']  ]
+							['e', 'g', 'i'], ['h']  ]
 			if name in ['401']:
 				categories = [	['b', 'c', 'd', 'e'] ]
 			if name in ['411', '412', '446']:
 					categories = [['c', 'e', 'g']]
+			if name in ['413', '423']:
+					categories = [['h', 'e', 'g']]
 		elif family == 'f7':
-			categories = [['e', 'g', 'i']]
+			categories = [['c', 'e', 'g', 'i']]
+		elif family == 'l0':
+			categories = [['3', '4', '6', '8', 'b', 'z']]
+		elif family == 'l1':
+			categories = [['4', '6', '8', 'b', 'c', 'd', 'e', 'f', 'g']]
+		elif family == 'l4':
+			categories = [['4', '6', '8', 'b', 'c', 'd', 'e', 'f', 'g']]
 
 		# make sure that only one category is used!
 		for cat in categories:

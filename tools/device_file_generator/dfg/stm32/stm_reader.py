@@ -16,7 +16,7 @@ from device_identifier import DeviceIdentifier
 
 from ..reader import XMLDeviceReader
 
-from .stm import stm32_defines
+import stm
 from .stm import stm32f1_remaps
 from .stm import stm32_memory
 
@@ -63,7 +63,7 @@ class STMDeviceReader(XMLDeviceReader):
 			logger.info("STMDeviceReader: Parsing '{}'".format(self.id.string))
 
 		# information about the core and architecture
-		coreLut = {'m0': 'v6m', 'm3': 'v7m', 'm4': 'v7em', 'm7': 'v7em'}
+		coreLut = {'m0': 'v6m', 'm0+': 'v6m', 'm3': 'v7m', 'm4': 'v7em', 'm7': 'v7em'}
 		core = self.query('//Core')[0].text.replace('ARM ', '').lower()
 		self.addProperty('architecture', coreLut[core.replace('cortex-', '')])
 		if core.endswith('m4') or core.endswith('m7'):
@@ -94,63 +94,51 @@ class STMDeviceReader(XMLDeviceReader):
 		if len(flashs) <= sizeIndexFlash:
 			sizeIndexFlash = 0
 
-		mem_fam = stm32_memory[self.id.family]
-		mem_model = None
-		for model in mem_fam['model']:
-			if any(name.startswith(self.id.name) for name in model['names']):
-				if self.id.name in model['names']:
-					mem_model = model
-					break
-				elif "{}x{}".format(self.id.name, self.id.size_id) in model['names']:
-					mem_model = model
-					break
-		if mem_model == None:
-			self.log.error("STMDeviceReader: Memory model not found for device '{}'".format(self.id.string))
-
-		total_ram = ram = int(rams[sizeIndexRam].text) + mem_model['memories']['sram1']
-		flash = int(flashs[sizeIndexFlash].text) + mem_model['memories']['flash']
-		if 'ccm' in mem_model['memories']:
-			total_ram += mem_model['memories']['ccm']
-		if 'backup' in mem_model['memories']:
-			total_ram += mem_model['memories']['backup']
-		if 'itcm' in mem_model['memories']:
-			total_ram += mem_model['memories']['itcm']
-			total_ram += mem_model['memories']['dtcm']
+		mem_start, mem_model = stm.getMemoryForDevice(self.id)
+		total_ram = ram = int(rams[sizeIndexRam].text) + mem_model['sram1']
+		flash = int(flashs[sizeIndexFlash].text) + mem_model['flash']
+		if 'ccm' in mem_model:
+			total_ram += mem_model['ccm']
+		if 'backup' in mem_model:
+			total_ram += mem_model['backup']
+		if 'itcm' in mem_model:
+			total_ram += mem_model['itcm']
+			total_ram += mem_model['dtcm']
 		self.addProperty('ram', total_ram * 1024)
 		self.addProperty('flash', flash * 1024)
 
 		memories = []
 		# first get the real SRAM1 size
-		for mem, val in mem_model['memories'].items():
+		for mem, val in mem_model.items():
 			if any(s in mem for s in ['2', '3', 'dtcm']):
 				ram -= val
 
 		# add all memories
-		for mem, val in mem_model['memories'].items():
+		for mem, val in mem_model.items():
 			if '1' in mem:
 				memories.append({'name': 'sram1',
 								 'access' : 'rwx',
-								 'start': "0x{:02X}".format(mem_fam['start']['sram']),
+								 'start': "0x{:02X}".format(mem_start['sram' if 'sram' in mem_start else 'sram1']),
 								 'size': str(ram)})
 			elif '2' in mem:
 				memories.append({'name': 'sram2',
 								 'access' : 'rwx',
-								 'start': "0x{:02X}".format(mem_fam['start']['sram'] + ram * 1024),
+								 'start': "0x{:02X}".format((mem_start['sram'] + ram * 1024) if 'sram' in mem_start else mem_start['sram2']),
 								 'size': str(val)})
 			elif '3' in mem:
 				memories.append({'name': 'sram3',
 								 'access': 'rwx',
-								 'start': "0x{:02X}".format(mem_fam['start']['sram'] + ram * 1024 + mem_model['memories']['sram2'] * 1024),
+								 'start': "0x{:02X}".format(mem_start['sram'] + ram * 1024 + mem_model['sram2'] * 1024),
 								 'size': str(val)})
 			elif 'flash' in mem:
 				memories.append({'name': 'flash',
 								 'access': 'rx',
-								 'start': "0x{:02X}".format(mem_fam['start']['flash']),
+								 'start': "0x{:02X}".format(mem_start['flash']),
 								 'size': str(flash)})
 			else:
 				memories.append({'name': mem,
-				                 'access': 'rw' if self.id.family == 'f4' and mem == 'ccm' else 'rwx',
-								 'start': "0x{:02X}".format(mem_fam['start'][mem]),
+								 'access': 'rw' if self.id.family == 'f4' and mem == 'ccm' else 'rwx',
+								 'start': "0x{:02X}".format(mem_start[mem]),
 								 'size': str(val)})
 
 		self.addProperty('memories', memories)
@@ -161,7 +149,8 @@ class STMDeviceReader(XMLDeviceReader):
 		self.addProperty('package', re.findall('[A-Za-z\.]+', package)[0])
 
 		# device header
-		self.addProperty('header', 'stm32' + self.id.family + 'xx.h')
+		family_header = "stm32{}xx.h".format(self.id.family)
+		self.addProperty('header', family_header)
 
 		# device defines
 		defines = []
@@ -169,14 +158,19 @@ class STMDeviceReader(XMLDeviceReader):
 			# required for our FreeRTOS
 			defines.append('STM32F4XX')
 
-		dev_def = self._getDeviceDefine()
+		cmsis_folder = os.path.join('..', '..', 'ext', 'st', "stm32{}xx".format(self.id.family), "Include")
+		dev_def = None
+
+		with open(os.path.join(cmsis_folder, family_header), 'r') as headerFile:
+			match = re.findall("if defined\((?P<define>STM32[F|L].....)\)", headerFile.read())
+			if match:
+				dev_def = stm.getDefineForDevice(self.id, match)
 		if dev_def is None:
 			logger.error("STMDeviceReader: Define not found for device '{}'".format(self.id.string))
 		else:
 			defines.append(dev_def)
 
 		self.addProperty('define', defines)
-
 
 		gpios = []
 		self.addProperty('gpios', gpios)
