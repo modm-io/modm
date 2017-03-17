@@ -517,7 +517,7 @@
         <af id="7" peripheral="Uart5" name="Rts" type="out"/>
         <af id="8" peripheral="Uart6" name="Ck" type="out"/>
         <af id="8" peripheral="UartSpiMaster6" name="Sck" type="out"/>
-        <af id="9" peripheral="Fsmc" name="Nce3"/>
+        <af id="9" peripheral="Fsmc" name="Nce"/>
         <af id="9" peripheral="Fsmc" name="Ne2"/>
       </gpio>
       <gpio port="C" id="9">
@@ -804,7 +804,7 @@
       <gpio device-pin-id="a|b|i|n|z" port="G" id="7">
         <af id="8" peripheral="Uart6" name="Ck" type="out"/>
         <af id="8" peripheral="UartSpiMaster6" name="Sck" type="out"/>
-        <af id="12" peripheral="Fsmc" name="Int3"/>
+        <af id="12" peripheral="Fsmc" name="Int"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n|z" port="G" id="8">
         <af id="5" peripheral="SpiMaster6" name="Nss"/>
@@ -816,7 +816,7 @@
         <af id="5" peripheral="SpiMaster1" name="Miso" type="in"/>
         <af id="8" peripheral="Uart6" name="Rx" type="in"/>
         <af id="8" peripheral="UartSpiMaster6" name="Miso" type="in"/>
-        <af id="12" peripheral="Fsmc" name="Nce3"/>
+        <af id="12" peripheral="Fsmc" name="Nce"/>
         <af id="12" peripheral="Fsmc" name="Ne2"/>
       </gpio>
       <gpio device-pin-id="a|b|i|n|z" port="G" id="10">
