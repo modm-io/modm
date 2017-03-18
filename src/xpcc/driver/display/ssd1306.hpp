@@ -113,6 +113,7 @@ protected:
 	i(ScrollStep step) { return uint8_t(step); }
 
 public:
+	template < uint8_t Height >
 	class DataTransmissionAdapter : public xpcc::I2cWriteTransaction
 	{
 	public:
@@ -123,7 +124,7 @@ public:
 		{ commands = buffer; }
 
 		bool
-		configureDisplayWrite(uint8_t (*buffer)[8], std::size_t size);
+		configureDisplayWrite(uint8_t (*buffer)[(Height / 8)], std::size_t size);
 
 	protected:
 		virtual Writing
@@ -148,10 +149,12 @@ public:
  * @author	Niklas Hauser
  * @ingroup	driver_display
  */
-template < class I2cMaster >
-class Ssd1306 : public ssd1306, public BufferedGraphicDisplay<128, 64>,
-				public I2cDevice<I2cMaster, 2, ssd1306::DataTransmissionAdapter>
+template < class I2cMaster, uint8_t Height = 64 >
+class Ssd1306 : public ssd1306, public BufferedGraphicDisplay<128, Height>,
+				public I2cDevice<I2cMaster, 2, ssd1306::DataTransmissionAdapter<Height>>
 {
+	static_assert((Height == 64) or (Height == 32), "Display height must be either 32 or 64 pixel!");
+
 public:
 	Ssd1306(uint8_t address = 0x3C);
 
@@ -246,5 +249,7 @@ private:
 } // namespace xpcc
 
 #include "ssd1306_impl.hpp"
+
+#include "ssd1306_transmission_impl.hpp"
 
 #endif // XPCC_SSD1306_HPP

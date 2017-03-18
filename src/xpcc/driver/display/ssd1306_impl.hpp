@@ -11,9 +11,9 @@
 #	error	"Don't include this file directly, use 'ssd1306.hpp' instead!"
 #endif
 
-template < class I2cMaster >
-xpcc::Ssd1306<I2cMaster>::Ssd1306(uint8_t address)
-:	I2cDevice<I2cMaster, 2, ssd1306::DataTransmissionAdapter>(address),
+template < class I2cMaster, uint8_t Height >
+xpcc::Ssd1306<I2cMaster, Height>::Ssd1306(uint8_t address)
+:	I2cDevice<I2cMaster, 2, ssd1306::DataTransmissionAdapter<Height>>(address),
 	commandBuffer{0x80, 0, 0x80, 0, 0x80, 0, 0x80, 0, 0x80, 0, 0x80, 0, 0x80, 0}
 {
 	this->transaction.setCommandBuffer(commandBuffer);
@@ -21,9 +21,9 @@ xpcc::Ssd1306<I2cMaster>::Ssd1306(uint8_t address)
 
 // ----------------------------------------------------------------------------
 // MARK: - Tasks
-template < class I2cMaster >
+template < class I2cMaster, uint8_t Height >
 xpcc::ResumableResult<bool>
-xpcc::Ssd1306<I2cMaster>::initialize()
+xpcc::Ssd1306<I2cMaster, Height>::initialize()
 {
 	RF_BEGIN();
 
@@ -37,7 +37,7 @@ xpcc::Ssd1306<I2cMaster>::initialize()
 	commandBuffer[11] &= RF_CALL(writeCommand(Command::SetMemoryMode, 0x01));
 	commandBuffer[11] &= RF_CALL(writeCommand(Command::SetSegmentRemap127));
 	commandBuffer[11] &= RF_CALL(writeCommand(Command::SetComOutputScanDirectionDecrement));
-	commandBuffer[11] &= RF_CALL(writeCommand(Command::SetComPins, 0x12));
+	commandBuffer[11] &= RF_CALL(writeCommand(Command::SetComPins, ((Height == 64) ? 0x12 : 0x02)));
 	commandBuffer[11] &= RF_CALL(writeCommand(Command::SetContrastControl, 0xCE));
 	commandBuffer[11] &= RF_CALL(writeCommand(Command::SetPreChargePeriod, 0xF1));
 	commandBuffer[11] &= RF_CALL(writeCommand(Command::SetV_DeselectLevel, 0x40));
@@ -51,20 +51,20 @@ xpcc::Ssd1306<I2cMaster>::initialize()
 }
 
 // ----------------------------------------------------------------------------
-template < class I2cMaster >
+template < class I2cMaster, uint8_t Height >
 xpcc::ResumableResult<void>
-xpcc::Ssd1306<I2cMaster>::startWriteDisplay()
+xpcc::Ssd1306<I2cMaster, Height>::startWriteDisplay()
 {
 	RF_BEGIN();
 
-	RF_WAIT_UNTIL( this->transaction.configureDisplayWrite(this->display_buffer, 512) and this->startTransaction() );
+	RF_WAIT_UNTIL( this->transaction.configureDisplayWrite(this->display_buffer, (16 * Height)) and this->startTransaction() );
 
 	RF_END();
 }
 
-template < class I2cMaster >
+template < class I2cMaster, uint8_t Height >
 xpcc::ResumableResult<bool>
-xpcc::Ssd1306<I2cMaster>::writeDisplay()
+xpcc::Ssd1306<I2cMaster, Height>::writeDisplay()
 {
 	RF_BEGIN();
 
@@ -75,9 +75,9 @@ xpcc::Ssd1306<I2cMaster>::writeDisplay()
 	RF_END_RETURN(this->wasTransactionSuccessful());
 }
 
-template < class I2cMaster >
+template < class I2cMaster, uint8_t Height >
 xpcc::ResumableResult<bool>
-xpcc::Ssd1306<I2cMaster>::setRotation(Rotation rotation)
+xpcc::Ssd1306<I2cMaster, Height>::setRotation(Rotation rotation)
 {
 	RF_BEGIN();
 
@@ -91,9 +91,9 @@ xpcc::Ssd1306<I2cMaster>::setRotation(Rotation rotation)
 	RF_END_RETURN(false);
 }
 
-template < class I2cMaster >
+template < class I2cMaster, uint8_t Height >
 xpcc::ResumableResult<bool>
-xpcc::Ssd1306<I2cMaster>::configureScroll(uint8_t origin, uint8_t size,
+xpcc::Ssd1306<I2cMaster, Height>::configureScroll(uint8_t origin, uint8_t size,
 		ScrollDirection direction, ScrollStep steps)
 {
 	RF_BEGIN();
@@ -125,9 +125,9 @@ xpcc::Ssd1306<I2cMaster>::configureScroll(uint8_t origin, uint8_t size,
 
 // ----------------------------------------------------------------------------
 // MARK: write command
-template < class I2cMaster >
+template < class I2cMaster, uint8_t Height >
 xpcc::ResumableResult<bool>
-xpcc::Ssd1306<I2cMaster>::writeCommand(uint8_t command)
+xpcc::Ssd1306<I2cMaster, Height>::writeCommand(uint8_t command)
 {
 	RF_BEGIN();
 
@@ -139,9 +139,9 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(uint8_t command)
 	RF_END_RETURN( this->wasTransactionSuccessful() );
 }
 
-template < class I2cMaster >
+template < class I2cMaster, uint8_t Height >
 xpcc::ResumableResult<bool>
-xpcc::Ssd1306<I2cMaster>::writeCommand(uint8_t command, uint8_t data)
+xpcc::Ssd1306<I2cMaster, Height>::writeCommand(uint8_t command, uint8_t data)
 {
 	RF_BEGIN();
 
@@ -154,9 +154,9 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(uint8_t command, uint8_t data)
 	RF_END_RETURN( this->wasTransactionSuccessful() );
 }
 
-template < class I2cMaster >
+template < class I2cMaster, uint8_t Height >
 xpcc::ResumableResult<bool>
-xpcc::Ssd1306<I2cMaster>::writeCommand(uint8_t command, uint8_t data1, uint8_t data2)
+xpcc::Ssd1306<I2cMaster, Height>::writeCommand(uint8_t command, uint8_t data1, uint8_t data2)
 {
 	RF_BEGIN();
 
@@ -171,9 +171,9 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(uint8_t command, uint8_t data1, uint8_t d
 }
 
 // ----------------------------------------------------------------------------
-template < class I2cMaster >
+template < class I2cMaster, uint8_t Height >
 bool
-xpcc::Ssd1306<I2cMaster>::startTransactionWithLength(uint8_t length)
+xpcc::Ssd1306<I2cMaster, Height>::startTransactionWithLength(uint8_t length)
 {
 	return this->startWrite(commandBuffer, length);
 }

@@ -7,15 +7,19 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "ssd1306.hpp"
+#ifndef XPCC_SSD1306_HPP
+#	error	"Don't include this file directly, use 'ssd1306.hpp' instead!"
+#endif
 
 // ----------------------------------------------------------------------------
-xpcc::ssd1306::DataTransmissionAdapter::DataTransmissionAdapter(uint8_t address) :
+template < uint8_t Height >
+xpcc::ssd1306::DataTransmissionAdapter<Height>::DataTransmissionAdapter(uint8_t address) :
 	I2cWriteTransaction(address), writeable(true)
 {}
 
+template < uint8_t Height >
 bool
-xpcc::ssd1306::DataTransmissionAdapter::configureDisplayWrite(uint8_t (*buffer)[8], std::size_t size)
+xpcc::ssd1306::DataTransmissionAdapter<Height>::configureDisplayWrite(uint8_t (*buffer)[(Height / 8)], std::size_t size)
 {
 	if (I2cWriteTransaction::configureWrite(&buffer[0][0], size))
 	{
@@ -26,8 +30,9 @@ xpcc::ssd1306::DataTransmissionAdapter::configureDisplayWrite(uint8_t (*buffer)[
 	return false;
 }
 
+template < uint8_t Height >
 xpcc::I2cTransaction::Writing
-xpcc::ssd1306::DataTransmissionAdapter::writing()
+xpcc::ssd1306::DataTransmissionAdapter<Height>::writing()
 {
 	// we first tell the display the column address again
 	if (commands[13] == 0xfe)
@@ -42,7 +47,7 @@ xpcc::ssd1306::DataTransmissionAdapter::writing()
 	if (commands[13] == 0xfd)
 	{
 		commands[1] = Command::SetPageAddress;
-		commands[3] = 0;
+		commands[3] = (Height == 64 ? 0 : 4);
 		commands[5] = 7;
 		commands[13] = 0xfc;
 		return Writing(commands, 6, OperationAfterWrite::Restart);
@@ -58,11 +63,12 @@ xpcc::ssd1306::DataTransmissionAdapter::writing()
 	return Writing(buffer, size, OperationAfterWrite::Stop);
 }
 
+template < uint8_t Height >
 void
-xpcc::ssd1306::DataTransmissionAdapter::detaching(xpcc::I2c::DetachCause cause)
+xpcc::ssd1306::DataTransmissionAdapter<Height>::detaching(xpcc::I2c::DetachCause cause)
 {
 	I2cWriteTransaction::detaching(cause);
-	if (commands[13] == 0x40 or cause != xpcc::I2c::DetachCause::NormalStop)
+	if ((commands[13] == 0x40) or (cause != xpcc::I2c::DetachCause::NormalStop))
 	{
 		commands[13] = 0;
 		writeable = true;
