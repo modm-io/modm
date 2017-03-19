@@ -4,7 +4,7 @@
 
 #include <xpcc/architecture/interface/can.hpp>
 #include <xpcc/architecture/platform/driver/can/canusb/canusb.hpp>
-#include <xpcc/architecture/platform/driver/can/socketcan/socketcan.hpp>
+// #include <xpcc/architecture/platform/driver/can/socketcan/socketcan.hpp>
 
 #include <xpcc/communication.hpp>
 #include <xpcc/communication/xpcc/backend/can.hpp>
@@ -27,8 +27,8 @@
  * - All xpcc messages will be published on port 8211 by zeromq
  */
 
-// Default baud rate
-static constexpr uint32_t canBusBaudRate = 125000;
+// Default CAN bitrate
+static constexpr xpcc::Can::Bitrate canBusBitRate = xpcc::Can::kBps125;
 
 /* Either use an USB CAN2USB adaptor with xpcc Lawicel interpreter
    or use a CAN controller supported by Linux' SocketCAN.
@@ -36,11 +36,13 @@ static constexpr uint32_t canBusBaudRate = 125000;
    With SocketCAN the baudrate must be set with the operating system.
    $ ip link set can0 type can bitrate
 */
-// static xpcc::hosted::CanUsb canUsb;
-static xpcc::hosted::SocketCan canSocket;
+xpcc::hosted::SerialInterface port("/dev/ttyUSB0", 115200);
+using CanUsb = xpcc::hosted::CanUsb<xpcc::hosted::SerialInterface>;
+CanUsb canUsb(port);
+// static xpcc::hosted::SocketCan canSocket;
 
-// static xpcc::CanConnector< xpcc::hosted::CanUsb > canConnector(&canUsb);
-static xpcc::CanConnector< xpcc::hosted::SocketCan > canConnector(&canSocket);
+static xpcc::CanConnector< CanUsb > canConnector(&canUsb);
+// static xpcc::CanConnector< xpcc::hosted::SocketCan > canConnector(&canSocket);
 
 #undef XPCC_LOG_LEVEL
 #define	XPCC_LOG_LEVEL xpcc::log::DEBUG
@@ -50,8 +52,8 @@ main()
 {
 	XPCC_LOG_DEBUG << "ZeroMQ SocketCAN XPCC bridge" << xpcc::endl;
 
-	// if (not canUsb.open("/dev/ttyUSB0", canBusBaudRate)) {
-	if (not canSocket.open("can0" /*, canBusBaudRate */)) {
+	if (not canUsb.open(canBusBitRate)) {
+	// if (not canSocket.open("can0" /*, canBusBitRate */)) {
 		XPCC_LOG_ERROR << "Could not open port" << xpcc::endl;
 		exit(EXIT_FAILURE);
 	}
@@ -95,6 +97,6 @@ main()
 		xpcc::delayMilliseconds(10);
 	}
 
-	// canUsb.close();
-	canSocket.close();
+	canUsb.close();
+	// canSocket.close();
 }
