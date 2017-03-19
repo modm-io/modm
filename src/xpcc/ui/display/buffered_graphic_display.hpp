@@ -104,7 +104,7 @@ namespace xpcc
 		virtual bool
 		getPixel(int16_t x, int16_t y);
 
-		uint8_t buffer[Width][Height / 8];
+		uint8_t display_buffer[Width][Height / 8];
 	};
 }
 

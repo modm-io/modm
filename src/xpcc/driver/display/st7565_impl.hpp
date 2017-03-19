@@ -57,7 +57,7 @@ xpcc::St7565<SPI, CS, A0, Reset, Width, Height, TopView>::update()
 		// switch to data mode
 		a0.set();
 		for(uint8_t x = 0; x < Width; ++x) {
-			spi.transferBlocking(this->buffer[x][y]);
+			spi.transferBlocking(this->display_buffer[x][y]);
 		}
 	}
 	cs.set();

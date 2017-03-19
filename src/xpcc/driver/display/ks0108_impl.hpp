@@ -122,11 +122,11 @@ xpcc::Ks0108<E, RW, RS, PIN_CS1, PIN_CS2, PORT>::update()
 		{
 			this->selectLeftChip();
 			this->waitBusy();
-			this->writeData(this->buffer[i][page]);
+			this->writeData(this->display_buffer[i][page]);
 			
 			this->selectRightChip();
 			this->waitBusy();
-			this->writeData(this->buffer[i + 64][page]);
+			this->writeData(this->display_buffer[i + 64][page]);
 		}
 	}
 }

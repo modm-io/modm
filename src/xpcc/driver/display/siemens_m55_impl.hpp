@@ -182,7 +182,7 @@ xpcc::SiemensM55<SPI, CS, RS, Reset>::update() {
 		for (uint8_t x = 0; x < 101; ++x)
 		{
 			// group of 8 black-and-white pixels
-			uint8_t group = this->buffer[x][y/8];
+			uint8_t group = this->display_buffer[x][y/8];
 
 			if (group & (1 << (y % 8)))
 			{

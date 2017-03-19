@@ -57,7 +57,7 @@ xpcc::Ssd1306<I2cMaster>::startWriteDisplay()
 {
 	RF_BEGIN();
 
-	RF_WAIT_UNTIL( this->transaction.configureDisplayWrite(buffer, 1024) and this->startTransaction() );
+	RF_WAIT_UNTIL( this->transaction.configureDisplayWrite(this->display_buffer, 512) and this->startTransaction() );
 
 	RF_END();
 }
