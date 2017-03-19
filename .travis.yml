@@ -62,6 +62,7 @@ env:
  - TEST_SUITE="check=examples examples=stm32f746g_discovery"
  - TEST_SUITE="check=examples examples=stm32f4_loa_v2b"
  - TEST_SUITE="check=examples examples=stm32f469_discovery"
+ - TEST_SUITE="check=examples examples=nucleo_f031k6"
  - TEST_SUITE="check=examples examples=nucleo_f103rb"
  - TEST_SUITE="check=examples examples=nucleo_f303k8"
  - TEST_SUITE="check=examples examples=nucleo_f411re"
