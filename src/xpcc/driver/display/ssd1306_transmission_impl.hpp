@@ -19,7 +19,7 @@ xpcc::ssd1306::DataTransmissionAdapter<Height>::DataTransmissionAdapter(uint8_t 
 
 template < uint8_t Height >
 bool
-xpcc::ssd1306::DataTransmissionAdapter<Height>::configureDisplayWrite(uint8_t (*buffer)[(Height / 8)], std::size_t size)
+xpcc::ssd1306::DataTransmissionAdapter<Height>::configureDisplayWrite(uint8_t (*buffer)[Height / 8], std::size_t size)
 {
 	if (I2cWriteTransaction::configureWrite(&buffer[0][0], size))
 	{

@@ -124,7 +124,7 @@ public:
 		{ commands = buffer; }
 
 		bool
-		configureDisplayWrite(uint8_t (*buffer)[(Height / 8)], std::size_t size);
+		configureDisplayWrite(uint8_t (*buffer)[Height / 8], std::size_t size);
 
 	protected:
 		virtual Writing

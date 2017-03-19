@@ -55,6 +55,10 @@ namespace xpcc
 		static_assert((Height % 8) == 0, "height must be a multiple of 8");
 
 	public:
+		static constexpr uint16_t DisplayBufferWidth = Width;
+		static constexpr uint16_t DisplayBufferHeight = Height / 8;
+
+	public:
 		virtual
 		~BufferedGraphicDisplay()
 		{
@@ -104,7 +108,7 @@ namespace xpcc
 		virtual bool
 		getPixel(int16_t x, int16_t y);
 
-		uint8_t display_buffer[Width][Height / 8];
+		uint8_t display_buffer[DisplayBufferWidth][DisplayBufferHeight];
 	};
 }
 
