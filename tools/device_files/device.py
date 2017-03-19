@@ -126,13 +126,13 @@ class DeviceFile:
 		# Checks for all Platforms
 
 		# Check Core
-		cores = ['cortex-m0', 'cortex-m3', 'cortex-m4', 'cortex-m4f', 'cortex-m7', 'cortex-m7f', 'avr8', 'avr8l']
+		cores = ['cortex-m0', 'cortex-m0+', 'cortex-m3', 'cortex-m4', 'cortex-m4f', 'cortex-m7', 'cortex-m7f', 'avr8', 'avr8l']
 		if 'core' in self.properties and self.core not in cores:
 			self.log.error("Unknown core '%s'. Supported cores are %s"
 				% (self.core, cores))
 		# Checks for STM32 Platform
 		if self.platform == 'stm32':
-			families = ['f0', 'f1', 'f2', 'f3', 'f4', 'f7']
+			families = ['f0', 'f1', 'f2', 'f3', 'f4', 'f7', 'l0', 'l1', 'l4']
 			if self.family not in families:
 				self.log.error("Unknown family '%s' for platform %s."
 				" Valid families for this platform are: %s" %

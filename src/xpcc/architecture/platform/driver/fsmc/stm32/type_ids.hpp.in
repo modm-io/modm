@@ -35,8 +35,10 @@ namespace TypeId
 	typedef struct{} FsmcCle;
 	typedef struct{} FsmcAle;
 	typedef struct{} FsmcIntr;
+	typedef struct{} FsmcInt;
 	typedef struct{} FsmcInt2;
 	typedef struct{} FsmcInt3;
+	typedef struct{} FsmcNce;
 	typedef struct{} FsmcNce2;
 	typedef struct{} FsmcNce3;
 	typedef struct{} FsmcNce4;

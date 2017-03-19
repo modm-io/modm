@@ -2,9 +2,9 @@
   ******************************************************************************
   * @file    system_stm32f0xx.h
   * @author  MCD Application Team
-  * @version V2.3.0
-  * @date    27-May-2016
-  * @brief   CMSIS Cortex-M0 Device System Source File for STM32F0xx devices.  
+  * @version V2.3.1
+  * @date    04-November-2016
+  * @brief   CMSIS Cortex-M0 Device System Source File for STM32F0xx devices.
   ******************************************************************************
   * @attention
   *
@@ -41,8 +41,8 @@
 
 /** @addtogroup stm32f0xx_system
   * @{
-  */  
-  
+  */
+
 /**
   * @brief Define to prevent recursive inclusion
   */
@@ -51,7 +51,7 @@
 
 #ifdef __cplusplus
  extern "C" {
-#endif 
+#endif
 
 /** @addtogroup STM32F0xx_System_Includes
   * @{
@@ -100,7 +100,7 @@ extern const uint8_t APBPrescTable[8];    /*!< APB prescalers table values */
 /** @addtogroup STM32F0xx_System_Exported_Functions
   * @{
   */
-  
+
 extern void SystemInit(void);
 extern void SystemCoreClockUpdate(void);
 /**
@@ -116,8 +116,8 @@ extern void SystemCoreClockUpdate(void);
 /**
   * @}
   */
-  
+
 /**
   * @}
-  */  
+  */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

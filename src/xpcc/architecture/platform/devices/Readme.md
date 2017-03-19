@@ -3,6 +3,11 @@
 The device file describes the device metadata and peripheral tree in XML.
 Information from one device can be extracted by providing the device identifier.
 
+**Before adding a device file _manually_, open an issue and contact [@salkinium](https://github.com/salkinium).
+We can generate the files, there is no need for manual work!!!**
+
+Note that this device file format is no longer actively maintained. Any new requirements to this data should be raised in [modm-devices](https://github.com/modm-io/modm-devices). Ping [@salkinium](https://github.com/salkinium) if you need anything specific.
+
 ## Device Identifier
 
 The device identifier is the canonical representation of the device name within the device file.

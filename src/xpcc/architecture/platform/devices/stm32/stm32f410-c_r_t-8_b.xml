@@ -207,7 +207,7 @@
         <af id="4" peripheral="I2cMaster1" name="Scl" type="out"/>
         <af device-pin-id="c|r" id="6" peripheral="SpiMaster5" name="Mosi" type="out"/>
       </gpio>
-      <gpio device-pin-id="c|r" port="B" id="9">
+      <gpio device-pin-id="r" port="B" id="9">
         <af id="3" peripheral="Timer11" name="Channel1"/>
         <af id="4" peripheral="I2cMaster1" name="Sda"/>
         <af id="5" peripheral="SpiMaster2" name="Nss"/>

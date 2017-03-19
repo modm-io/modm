@@ -2,9 +2,9 @@
   ******************************************************************************
   * @file    system_stm32f3xx.h
   * @author  MCD Application Team
-  * @version V2.3.0
-  * @date    29-April-2015
-  * @brief   CMSIS Cortex-M4 Device System Source File for STM32F3xx devices.  
+  * @version V2.3.1
+  * @date    16-December-2016
+  * @brief   CMSIS Cortex-M4 Device System Source File for STM32F3xx devices.
   ******************************************************************************
   * @attention
   *
@@ -33,7 +33,7 @@
   * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   *
   ******************************************************************************
-  */ 
+  */
 
 /** @addtogroup CMSIS
   * @{
@@ -41,8 +41,8 @@
 
 /** @addtogroup stm32f3xx_system
   * @{
-  */  
-  
+  */
+
 /**
   * @brief Define to prevent recursive inclusion
   */
@@ -51,7 +51,7 @@
 
 #ifdef __cplusplus
  extern "C" {
-#endif 
+#endif
 
 /** @addtogroup STM32F3xx_System_Includes
   * @{
@@ -101,7 +101,7 @@ extern const uint8_t APBPrescTable[8];    /*!< APB prescalers table values */
 /** @addtogroup STM32F3xx_System_Exported_Functions
   * @{
   */
-  
+
 extern void SystemInit(void);
 extern void SystemCoreClockUpdate(void);
 /**
@@ -117,8 +117,8 @@ extern void SystemCoreClockUpdate(void);
 /**
   * @}
   */
-  
+
 /**
   * @}
-  */  
+  */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

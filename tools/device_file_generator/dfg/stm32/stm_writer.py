@@ -51,7 +51,10 @@ class STMDeviceWriter(XMLDeviceWriter):
 				   'f2': 'stm32f2',
 				   'f3': 'stm32f3',
 				   'f4': 'stm32',
-				   'f7': 'stm32'}
+				   'f7': 'stm32',
+				   'l0': 'stm32l0',
+				   'l1': 'stm32l1',
+				   'l4': 'stm32l4'}
 		# ADC
 		if self.device.id.family == 'f3' and self.device.id.name == '373':
 			self.addModuleAttributesToNode(self.root, 'ADC', 'adc', 'stm32')
@@ -230,7 +233,8 @@ class STMDeviceWriter(XMLDeviceWriter):
 		return device_dict
 
 	def _addNamingSchema(self):
-		identifiers = list(itertools.product(("stm32f",),
+		family = self.device.ids.getAttribute("family")[0]
+		identifiers = list(itertools.product(("stm32{}".format(family[0]),),
 											 self.device.ids.getAttribute('name'),
 											 self.device.ids.getAttribute('pin_id'),
 											 self.device.ids.getAttribute('size_id')))
@@ -253,7 +257,8 @@ class STMDeviceWriter(XMLDeviceWriter):
 	def write(self, folder):
 		self._addNamingSchema()
 
-		file_name = 'stm32f' + '_'.join(self.device.ids.getAttribute('name'))
+		family = self.device.ids.getAttribute("family")[0]
+		file_name = 'stm32' + family[0] + '_'.join(self.device.ids.getAttribute('name'))
 		file_name += '-' + '_'.join(self.device.ids.getAttribute('pin_id'))
 		file_name += '-' + '_'.join(self.device.ids.getAttribute('size_id'))
 		self.writeToFolder(folder, file_name + '.xml')
