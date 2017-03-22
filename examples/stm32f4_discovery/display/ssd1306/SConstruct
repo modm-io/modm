@@ -1,4 +1,4 @@
 # path to the xpcc root directory
-xpccpath = '../../..'
+xpccpath = '../../../..'
 # execute the common SConstruct file
 execfile(xpccpath + '/scons/SConstruct')
