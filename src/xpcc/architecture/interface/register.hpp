@@ -229,13 +229,16 @@ struct Register
 	:	value(0) {}
 
 	/// @{
-	// The safe-bool idiom is not required here, since we are not
-	// dealing with complex objects, but with one integral value.
-	// So there is not need for it.
-	/* explicit */
-
-	/// Returns `true` if `value` is non-zero
-	constexpr operator bool() const
+	/**
+	 * Returns `true` if `value` is non-zero
+	 *
+	 * The compiler will allow implicit conversions to bool in the following contexts:
+	 * - conditions of if, while, for, do-while statements
+	 * - logical operators (&&, ||)
+	 * - negation (operator !)
+	 * - static_assert
+	 */
+	explicit constexpr operator bool() const
 	{ return bool(value); }
 
 	/// Returns `true` if `value` is zero
@@ -252,28 +255,6 @@ protected:
 	/// This class is meant to be subclassed
 	constexpr Register(UnderlyingType value)
 	:	value(value) {}
-
-#ifndef __DOXYGEN__
-public:
-	// do NOT cast to anything else
-	/// all other conversion operators are deleted and must be explicitly implemented
-	constexpr operator      char16_t() const = delete;
-	constexpr operator      char32_t() const = delete;
-	constexpr operator       wchar_t() const = delete;
-	constexpr operator   signed char() const = delete;
-	constexpr operator unsigned char() const = delete;
-	constexpr operator   signed short int() const = delete;
-	constexpr operator unsigned short int() const = delete;
-	constexpr operator   signed int() const = delete;
-	constexpr operator unsigned int() const = delete;
-	constexpr operator   signed long int() const = delete;
-	constexpr operator unsigned long int() const = delete;
-	constexpr operator   signed long long int() const = delete;
-	constexpr operator unsigned long long int() const = delete;
-	constexpr operator       float() const = delete;
-	constexpr operator      double() const = delete;
-	constexpr operator long double() const = delete;
-#endif
 };
 
 /// @ingroup	register
@@ -547,10 +528,10 @@ struct Flags : public ::xpcc::FlagsOperators<Enum, T>
 
 	/// Returns `true` if bit is set
 	constexpr bool all(Enum const &flag) const
-	{ return (*this & flag); }
+	{ return bool(*this & flag); }
 	/// Returns `true` if bit is set
 	constexpr bool any(Enum const &flag) const
-	{ return (*this & flag); }
+	{ return bool(*this & flag); }
 	/// Returns `true` if bit is **not** set
 	constexpr bool none(Enum const &flag) const
 	{ return !(*this & flag); }
@@ -563,7 +544,7 @@ struct Flags : public ::xpcc::FlagsOperators<Enum, T>
 	{ return (*this & o) == o; }
 	/// Returns `true` if **any** of the passed bits are set
 	constexpr bool any(Flags const &o) const
-	{ return *this & o; }
+	{ return bool(*this & o); }
 	/// Returns `true` if **none** of the passed bits are set
 	constexpr bool none(Flags const &o) const
 	{ return (*this & o).value == 0; }

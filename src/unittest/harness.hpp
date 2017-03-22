@@ -262,7 +262,7 @@ namespace unittest
 }
 
 #define	TEST_ASSERT_TRUE(expr)	\
-	TEST_RETURN__(::unittest::checkExpression((expr), __LINE__))
+	TEST_RETURN__(::unittest::checkExpression(static_cast<bool>(expr), __LINE__))
 
 #define	TEST_ASSERT_FALSE(expr)	\
 	TEST_RETURN__(::unittest::checkExpression(!static_cast<bool>(expr), __LINE__))

@@ -111,13 +111,13 @@ xpcc::stm32::SpiHal{{ id }}::setMasterSelection(MasterSelection masterSelection)
 inline bool
 xpcc::stm32::SpiHal{{ id }}::isReceiveRegisterNotEmpty()
 {
-	return getInterruptFlags() & InterruptFlag::RxBufferNotEmpty;
+	return static_cast<bool>(getInterruptFlags() & InterruptFlag::RxBufferNotEmpty);
 }
 
 inline bool
 xpcc::stm32::SpiHal{{ id }}::isTransmitRegisterEmpty()
 {
-	return getInterruptFlags() & InterruptFlag::TxBufferEmpty;
+	return static_cast<bool>(getInterruptFlags() & InterruptFlag::TxBufferEmpty);
 }
 
 void inline
