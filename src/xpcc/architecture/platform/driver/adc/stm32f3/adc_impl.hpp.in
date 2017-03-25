@@ -87,7 +87,7 @@ xpcc::stm32::Adc{{ id }}::setPrescaler(const Prescaler pre)
 bool
 xpcc::stm32::Adc{{ id }}::isReady()
 {
-	return (getInterruptFlags() & InterruptFlag::Ready);
+	return static_cast<bool>(getInterruptFlags() & InterruptFlag::Ready);
 }
 
 void
@@ -162,7 +162,7 @@ xpcc::stm32::Adc{{ id }}::startConversion(void)
 bool
 xpcc::stm32::Adc{{ id }}::isConversionFinished(void)
 {
-	return (getInterruptFlags() & InterruptFlag::EndOfSampling);
+	return static_cast<bool>(getInterruptFlags() & InterruptFlag::EndOfSampling);
 }
 
 // ----------------------------------------------------------------------------
