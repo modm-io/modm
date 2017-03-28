@@ -7,7 +7,7 @@ We recommend prefixing your branch with
 - `feature/` for new functionality, or
 - `fix/` for a bug fix.
 
-Please remember to have a look at [our coding conventions](https://github.com/roboterclubaachen/xpcc/blob/develop/doc/coding_conventions.md).
+Please remember to have a look at [our coding conventions](https://github.com/roboterclubaachen/xpcc/blob/develop/doc/coding_convention.md).
 
 Once you [open the pull request](https://github.com/roboterclubaachen/xpcc/pulls), we will review it and might ask you for changes.
 Remember that you can continue to push to your `feature/*` or `fix/*` branches to update the corresponding pull requests!
