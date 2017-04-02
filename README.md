@@ -60,13 +60,15 @@ Here is a list of supported **and tested** microcontrollers and development boar
 | ATtiny44a  | custom                  | &#9733;&#9733;&#9733;               |
 | ATtiny85   | custom                  | &#9733;&#9733;&#9733;               |
 | ATmega328p | [Arduino Uno][]         | &#9733;&#9733;&#9733;               |
+| STM32F031  | [Nucleo F031K6][]       | &#9733;&#9733;&#9733;&#9733;        |
 | STM32F072  | [STM32F072 Discovery][] | &#9733;&#9733;&#9733;&#9733;        |
-| STM32F100  | [STM32F1 Discovery][]   | &#9733;&#9733;&#9733;&#9733;        |
-| STM32F103  | [Nucleo F103RB][]       | &#9733;&#9733;&#9733;&#9733;        |
-| STM32F103  | [STM32F1 Blue Pill][]   | &#9733;&#9733;&#9733;&#9733;        |
+| STM32F100  | [STM32F1 Discovery][]   | &#9733;&#9733;&#9733;               |
+| STM32F103  | [Nucleo F103RB][]       | &#9733;&#9733;&#9733;               |
+| STM32F103  | [STM32F1 Blue Pill][]   | &#9733;&#9733;&#9733;               |
 | STM32F303  | [STM32F3 Discovery][]   | &#9733;&#9733;&#9733;&#9733;&#9733; |
 | STM32F303  | [Nucleo F303K8][]       | &#9733;&#9733;&#9733;&#9733;        |
 | STM32F407  | [STM32F4 Discovery][]   | &#9733;&#9733;&#9733;&#9733;&#9733; |
+| STM32F401  | [Nucleo F401RE][]       | &#9733;&#9733;&#9733;&#9733;        |
 | STM32F411  | [Nucleo F411RE][]       | &#9733;&#9733;&#9733;&#9733;        |
 | STM32F429  | [STM32F429 Discovery][] | &#9733;&#9733;&#9733;&#9733;&#9733; |
 | STM32F429  | [Nucleo F429ZI][]       | &#9733;&#9733;&#9733;&#9733;        |
@@ -214,17 +216,19 @@ Daniel Krebs ([@daniel-k](https://github.com/daniel-k)),
 [rca]: http://www.roboterclub.rwth-aachen.de
 
 [Arduino Uno]: https://www.arduino.cc/en/Main/ArduinoBoardUno
-[STM32F072 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF259724
-[STM32F1 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF250863
-[Nucleo F103RB]: http://www.st.com/web/catalog/tools/FM116/SC959/SS1532/LN1847/PF259875
+[Nucleo F031K6]: http://www.st.com/en/evaluation-tools/nucleo-f031k6.html
+[STM32F072 Discovery]: http://www.st.com/en/evaluation-tools/32f072bdiscovery.html
+[STM32F1 Discovery]: http://www.st.com/en/evaluation-tools/stm32vldiscovery.html
+[Nucleo F103RB]: http://www.st.com/en/evaluation-tools/nucleo-f103rb.html
 [STM32F1 Blue Pill]: http://wiki.stm32duino.com/index.php?title=Blue_Pill
-[STM32F3 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF254044
+[STM32F3 Discovery]: http://www.st.com/en/evaluation-tools/stm32f3discovery.html
 [Nucleo F303K8]: http://www.st.com/en/evaluation-tools/nucleo-f303k8.html
-[STM32F4 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF252419
-[Nucleo F411RE]: http://www.st.com/web/catalog/tools/FM116/SC959/SS1532/LN1847/PF260320
-[STM32F429 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF259090
-[Nucleo F429ZI]: http://www.st.com/web/en/catalog/tools/PF262637
-[STM32F469 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF262395
-[STM32F746 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF261641
-[STM32F769 Discovery]: http://www.st.com/content/st_com/en/products/evaluation-tools/product-evaluation-tools/mcu-eval-tools/stm32-mcu-eval-tools/stm32-mcu-discovery-kits/32f769idiscovery.html
+[STM32F4 Discovery]: http://www.st.com/en/evaluation-tools/stm32f4discovery.html
+[Nucleo F401RE]: http://www.st.com/en/evaluation-tools/nucleo-f401re.html
+[Nucleo F411RE]: http://www.st.com/en/evaluation-tools/nucleo-f411re.html
+[STM32F429 Discovery]: http://www.st.com/en/evaluation-tools/32f429idiscovery.html
+[Nucleo F429ZI]: http://www.st.com/en/evaluation-tools/nucleo-f429zi.html
+[STM32F469 Discovery]: http://www.st.com/en/evaluation-tools/32f469idiscovery.html
+[STM32F746 Discovery]: http://www.st.com/en/evaluation-tools/32f746gdiscovery.html
+[STM32F769 Discovery]: http://www.st.com/en/evaluation-tools/32f769idiscovery.html
 [LPCxpresso]: https://www.lpcware.com/LPCXpressoV1Boards
