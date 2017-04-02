@@ -15,6 +15,7 @@ culmination of many years worth of effort, experience and improvements.
 - [This project has a homepage](http://xpcc.io) with [install instructions][install] and a [getting started guide][guide].
 - [Feast your eyes on lots of working examples][examples].
 - [API reference is available here][reference].
+- [Check out our latest quarterly release][releases] with a [beautiful changelog](CHANGELOG.md).
 - [We have continuous integration as well][travis_ci].
 - [And we care a lot about testing](TESTING.md).
 
@@ -117,7 +118,7 @@ If you want to have up-to-date documentation of the develop branch, execute `sco
 in the xpcc root directory and the current development documentation will be available
 in `xpcc/doc/build/api/index.html`.
 
-xpcc also has [a blog for in-depth write ups](http://blog.xpcc.io) of the programming techniques used.
+xpcc also has [a blog for in-depth write ups][blog] of the programming techniques used.
 
 ## How can I contribute?
 
@@ -134,12 +135,13 @@ During the last decade the [Roboterclub Aachen e.V.][rca_ev] has developed a sof
 In 2009, xpcc became a separate project and since then focussed on a new approach to cross target microcontroller libraries. Over the years xpcc grew from a communication library to a general purpose framework suitable for all kinds of embedded applications.
 
 The xpcc project is maintained by
-Niklas Hauser ([@salkinium](https://github.com/salkinium)) and
-Kevin Läufer ([@ekiwi](https://github.com/ekiwi)) with significant contributions from
+Niklas Hauser ([@salkinium](https://github.com/salkinium)) with significant contributions from
+Sascha Schade ([@strongly-typed](https://github.com/strongly-typed)),
+Kevin Läufer ([@ekiwi](https://github.com/ekiwi)),
 Fabian Greif ([@dergraaf](https://github.com/dergraaf)),
-Daniel Krebs ([@daniel-k](https://github.com/daniel-k)),
-[@strongly-typed](https://github.com/strongly-typed), [@georgi-g](https://github.com/georgi-g) and
-[@thundernail](https://github.com/thundernail).
+Martin Rosekeit ([@thundernail](https://github.com/thundernail)),
+Daniel Krebs ([@daniel-k](https://github.com/daniel-k)) and
+Georgi Grinshpun ([@georgi-g](https://github.com/georgi-g)).
 
 ## Folder structure
 
@@ -202,6 +204,7 @@ Daniel Krebs ([@daniel-k](https://github.com/daniel-k)),
 [contributing]: https://github.com/roboterclubaachen/xpcc/tree/develop/CONTRIBUTING.md
 [porting]: https://github.com/roboterclubaachen/xpcc/blob/develop/PORTING.md
 [issues]: https://github.com/roboterclubaachen/xpcc/issues
+[releases]: https://github.com/roboterclubaachen/xpcc/releases
 [rca_ev]: http://www.roboterclub.rwth-aachen.de/
 [eurobot]: http://www.eurobot.org/
 [travis_ci]: https://travis-ci.org/roboterclubaachen/xpcc
