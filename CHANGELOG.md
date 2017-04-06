@@ -98,9 +98,9 @@ New development board targets:
 - NUCLEO-F401RE as `nucleo_f401re`
 - NUCLEO-F411RE as `nucleo_f411re`
 - NUCLEO-F429ZI as `nucleo_f429zi`
-- STM32F769I-DISCO as `stm32f769_discovery`
+- STM32F769I-DISCO as `stm32f769i_discovery`
 - STM32F469I-DISCO as `stm32f469_discovery`
-- STM32F103 board "Blue Pill" `blue_pill`
+- STM32F103 board "Blue Pill" as `stm32f103c8t6_blue_pill`
 
 New device drivers:
 
