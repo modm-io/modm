@@ -76,6 +76,8 @@ Here is a list of supported **and tested** microcontrollers and development boar
 | STM32F469  | [STM32F469 Discovery][] | &#9733;&#9733;&#9733;&#9733;        |
 | STM32F746  | [STM32F746 Discovery][] | &#9733;&#9733;&#9733;&#9733;        |
 | STM32F769  | [STM32F769 Discovery][] | &#9733;&#9733;&#9733;&#9733;        |
+| STM32L476  | [STM32L476 Discovery][] | &#9733;&#9733;                      |
+| STM32L476  | [Nucleo L476RG][]       | &#9733;&#9733;                      |
 | LPC11C24   | [LPCxpresso][]          | &#9733;&#9733;                      |
 
 All of these targets are compiling and booting correctly
@@ -235,3 +237,6 @@ Georgi Grinshpun ([@georgi-g](https://github.com/georgi-g)).
 [STM32F746 Discovery]: http://www.st.com/en/evaluation-tools/32f746gdiscovery.html
 [STM32F769 Discovery]: http://www.st.com/en/evaluation-tools/32f769idiscovery.html
 [LPCxpresso]: https://www.lpcware.com/LPCXpressoV1Boards
+[STM32L476 Discovery]: http://www.st.com/en/evaluation-tools/32l476gdiscovery.html
+[Nucleo L476RG]: http://www.st.com/en/evaluation-tools/nucleo-l476rg.html
+
