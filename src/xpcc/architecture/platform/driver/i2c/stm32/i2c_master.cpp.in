@@ -169,14 +169,15 @@ namespace
 {
 	// parameter advice
 	static xpcc::I2c::Operation nextOperation;
-	static enum CheckNextOperation
+	enum class CheckNextOperation : uint8_t
 	{
-		CHECK_NEXT_OPERATION_NO,
-		CHECK_NEXT_OPERATION_NO_WAIT_FOR_BTF,
-		CHECK_NEXT_OPERATION_YES,
-		CHECK_NEXT_OPERATION_YES_NO_STOP_BIT,
+		NO,
+		NO_WAIT_FOR_BTF, ///< Do not wait for Byte Transfer Finished
+		YES,
+		YES_NO_STOP_BIT,
+	};
 
-	} checkNextOperation = CHECK_NEXT_OPERATION_NO;
+	static CheckNextOperation checkNextOperation = CheckNextOperation::NO;
 
 	// transaction queue management
 	struct ConfiguredTransaction
@@ -232,7 +233,7 @@ namespace
 		}
 
 		DEBUG_STREAM("callStarting");
-		checkNextOperation = CHECK_NEXT_OPERATION_NO;
+		checkNextOperation = CheckNextOperation::NO;
 		error = xpcc::I2cMaster::Error::NoError;
 
 		I2C{{ id }}->CR1 &= ~I2C_CR1_POS;
@@ -251,7 +252,7 @@ namespace
 	static inline void
 	callNextTransaction()
 	{
-		if (!queue.isEmpty())
+		if (queue.isNotEmpty())
 		{
 			// wait until the stop condition has been generated
 			uint_fast32_t deadlockPreventer = 100000;
@@ -283,6 +284,7 @@ XPCC_ISR(I2C{{ id }}_EV)
 
 	if (sr1 & I2C_SR1_SB)
 	{
+		// Start condition generated.
 		// EV5: SB=1, cleared by reading SR1 register followed by writing DR register with Address.
 		DEBUG_STREAM("startbit set");
 
@@ -338,6 +340,7 @@ XPCC_ISR(I2C{{ id }}_EV)
 
 	else if (sr1 & I2C_SR1_ADDR)
 	{
+		// End of address transmission
 		xpcc::atomic::Lock lock;
 		starting.address = 0;
 		// EV6: ADDR=1, cleared by reading SR1 register followed by reading SR2.
@@ -345,14 +348,14 @@ XPCC_ISR(I2C{{ id }}_EV)
 		DEBUG_STREAM("writing.length=" << writing.length);
 		DEBUG_STREAM("reading.length=" << reading.length);
 
-		if (writing.length > 0 || reading.length > 3)
+		if ((writing.length > 0) or (reading.length > 3))
 		{
 			DEBUG_STREAM("enable buffers");
 			I2C{{ id }}->CR2 |= I2C_CR2_ITBUFEN;
 		}
-		if (!reading.length && !writing.length)
+		if ((!reading.length) and (!writing.length))
 		{
-			checkNextOperation = CHECK_NEXT_OPERATION_YES;
+			checkNextOperation = CheckNextOperation::YES;
 		}
 
 
@@ -375,7 +378,7 @@ XPCC_ISR(I2C{{ id }}_EV)
 			uint16_t dr = I2C{{ id }}->DR;
 			*reading.buffer++ = dr & 0xff;
 			reading.length = 0;
-			checkNextOperation = CHECK_NEXT_OPERATION_YES_NO_STOP_BIT;
+			checkNextOperation = CheckNextOperation::YES_NO_STOP_BIT;
 		}
 		else if (reading.length == 2)
 		{
@@ -398,7 +401,7 @@ XPCC_ISR(I2C{{ id }}_EV)
 
 			DEBUG_STREAM("TXE: writing.length=" << writing.length);
 
-			checkNextOperation = CHECK_NEXT_OPERATION_NO_WAIT_FOR_BTF;
+			checkNextOperation = CheckNextOperation::NO_WAIT_FOR_BTF;
 		}
 		// no else!
 		if (writing.length == 0)
@@ -413,6 +416,7 @@ XPCC_ISR(I2C{{ id }}_EV)
 
 	else if (sr1 & I2C_SR1_RXNE)
 	{
+		// Data register not empty.
 		if (reading.length > 3)
 		{
 			// EV7: RxNE=1, cleared by reading DR register
@@ -459,7 +463,7 @@ XPCC_ISR(I2C{{ id }}_EV)
 			*reading.buffer++ = dr & 0xff;
 
 			reading.length = 0;
-			checkNextOperation = CHECK_NEXT_OPERATION_YES_NO_STOP_BIT;
+			checkNextOperation = CheckNextOperation::YES_NO_STOP_BIT;
 		}
 
 		if (reading.length == 3)
@@ -475,24 +479,24 @@ XPCC_ISR(I2C{{ id }}_EV)
 			DEBUG_STREAM("BTF: reading.length=2");
 		}
 
-		if (checkNextOperation == CHECK_NEXT_OPERATION_NO_WAIT_FOR_BTF
+		if (checkNextOperation == CheckNextOperation::NO_WAIT_FOR_BTF
 			&& writing.length == 0)
 		{
 			// EV8_2: TxE=1, BTF = 1, Program Stop request.
 			// TxE and BTF are cleared by hardware by the Stop condition
 			DEBUG_STREAM("BTF, write=0");
-			checkNextOperation = CHECK_NEXT_OPERATION_YES;
+			checkNextOperation = CheckNextOperation::YES;
 		}
 	}
 
 
 
-	if (checkNextOperation >= CHECK_NEXT_OPERATION_YES)
+	if (checkNextOperation >= CheckNextOperation::YES)
 	{
 		switch (nextOperation)
 		{
 			case xpcc::I2c::Operation::Write:
-				if (checkNextOperation != CHECK_NEXT_OPERATION_YES_NO_STOP_BIT)
+				if (checkNextOperation != CheckNextOperation::YES_NO_STOP_BIT)
 				{
 					writing = transaction->writing();
 					nextOperation = static_cast<xpcc::I2c::Operation>(writing.next);
@@ -508,7 +512,7 @@ XPCC_ISR(I2C{{ id }}_EV)
 				break;
 
 			default:
-				if (checkNextOperation != CHECK_NEXT_OPERATION_YES_NO_STOP_BIT)
+				if (checkNextOperation != CheckNextOperation::YES_NO_STOP_BIT)
 				{
 					I2C{{ id }}->CR1 |= I2C_CR1_STOP;
 					DEBUG_STREAM("STOP");
@@ -522,7 +526,7 @@ XPCC_ISR(I2C{{ id }}_EV)
 				callNextTransaction();
 				break;
 		}
-		checkNextOperation = CHECK_NEXT_OPERATION_NO;
+		checkNextOperation = CheckNextOperation::NO;
 	}
 }
 
@@ -567,7 +571,7 @@ XPCC_ISR(I2C{{ id }}_ER)
 	I2C{{ id }}->SR2 = 0;
 	writing.length = 0;
 	reading.length = 0;
-	checkNextOperation = CHECK_NEXT_OPERATION_NO;
+	checkNextOperation = CheckNextOperation::NO;
 
 	DEBUG_STREAM("disable interrupts");
 	I2C{{ id }}->CR2 &= ~(I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN);

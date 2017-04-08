@@ -31,7 +31,7 @@ namespace TypeId
 	typedef struct{} I2cMaster4Scl;
 }
 
-} // namespace xmega
+} // namespace stm32
 
 } // namespace xpcc
 
