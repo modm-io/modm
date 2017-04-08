@@ -128,15 +128,15 @@
  *
  * Please read the documentation of the driver before you attempt to fix this
  * driver. I strongly recommend the use of an logic analyzer or oscilloscope,
- * to confirm the drivers behavior.
+ * to confirm the driver's behavior.
  * The event states are labeled as 'EVn_m' in reference to the manual.
  */
 
 /* To debug the internal state of the driver, you can instantiate a
- * xpcc::IOStream in your main souce file, which will then be used to dump
+ * xpcc::IOStream in your main source file, which will then be used to dump
  * state data of the operations via the serial port, e.g.
  *   #include <xpcc/io/iostream.hpp>
- *   xpcc::IODeviceWrapper< Uart5, * xpcc::IOBuffer::BlockIfFull > device;
+ *   xpcc::IODeviceWrapper< Uart5, xpcc::IOBuffer::BlockIfFull > device;
  *   xpcc::IOStream stream(device);
 
  * Be advised, that a typical I2C read/write operation can take 10 to 100 longer

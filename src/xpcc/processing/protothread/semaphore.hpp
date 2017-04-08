@@ -52,10 +52,10 @@ namespace xpcc
 		 * semaphore that is signalled, the blocked thread will become
 		 * runnable again.
 		 * 
-		 * This class can for example be used for resouce limiting or credit
+		 * This class can for example be used for resource limiting or credit
 		 * tracking:
 		 * 
-		 * Resouce limit:
+		 * Resource limit:
 		 * - \p initial = number of resources
 		 * - acquire() to gain access to a resource
 		 * - release() to release the resource
