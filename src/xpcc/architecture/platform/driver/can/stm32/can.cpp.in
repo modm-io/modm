@@ -21,6 +21,14 @@
 	%% set reg = 'CAN' ~ id
 %% endif
 
+%% if target is stm32l4
+	%% set APB1ENR  = 'APB1ENR1'
+	%% set APB1RSTR = 'APB1RSTR1'
+%% else
+	%% set APB1ENR  = 'APB1ENR'
+	%% set APB1RSTR = 'APB1RSTR'
+%% endif
+
 // ----------------------------------------------------------------------------
 // CAN bit timing register (CAN_BTR)
 #define CAN_BTR_SJW_POS		24
@@ -60,11 +68,11 @@ xpcc::stm32::Can{{ id }}::initializeWithPrescaler(
 		uint32_t interruptPriority, Mode startupMode, bool overwriteOnOverrun)
 {
 	// enable clock
-	RCC->APB1ENR  |=  RCC_APB1ENR_{{ reg }}EN;
+	RCC->{{ APB1ENR }}  |=  RCC_{{ APB1ENR }}_{{ reg }}EN;
 
 	// reset controller
-	RCC->APB1RSTR |=  RCC_APB1RSTR_{{ reg }}RST;
-	RCC->APB1RSTR &= ~RCC_APB1RSTR_{{ reg }}RST;
+	RCC->{{ APB1RSTR }} |=  RCC_{{ APB1RSTR }}_{{ reg }}RST;
+	RCC->{{ APB1RSTR }} &= ~RCC_{{ APB1RSTR }}_{{ reg }}RST;
 
 	// CAN Master Reset
 	// FMP bits and CAN_MCR register are initialized to the reset values
