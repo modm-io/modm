@@ -84,6 +84,9 @@ namespace xpcc
 		
 		inline bool
 		isEmpty() const;
+
+		inline bool
+		isNotEmpty() const { return not isEmpty(); };
 		
 		inline bool
 		isFull() const;
