@@ -12,6 +12,7 @@
 
 #include <xpcc/architecture/interface.hpp>
 #include <xpcc/architecture/driver/delay.hpp>
+#include <xpcc/io/iostream.hpp>
 
 /**
  * @ingroup		interface
@@ -125,7 +126,20 @@ struct I2c
 			xpcc::delayMicroseconds(5);
 		}
 	}
+
 };
+
+xpcc::IOStream&
+operator << (xpcc::IOStream& s, const xpcc::I2c::Operation op);
+
+xpcc::IOStream&
+operator << (xpcc::IOStream& s, const xpcc::I2c::OperationAfterStart op);
+
+xpcc::IOStream&
+operator << (xpcc::IOStream& s, const xpcc::I2c::OperationAfterRead op);
+
+xpcc::IOStream&
+operator << (xpcc::IOStream& s, const xpcc::I2c::OperationAfterWrite op);
 
 }	// namespace xpcc
 
