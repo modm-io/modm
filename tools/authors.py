@@ -11,19 +11,6 @@ import subprocess
 from collections import defaultdict
 import argparse
 
-# some authors have aliases cos estupido
-author_alias = {
-    "Sascha Schade": ["strongly-typed", "Webb"],
-    "Kevin Läufer": ["Laeufer", "Kiwi", "Kevin"],
-    "Daniel Krebs": ["daniel"],
-    "Niclas Rohrer": ["Niclas"],
-    "Martin Rosekeit": ["martin", "thundernail"],
-    "Georgi Grinshpun": ["Georgi"],
-    "Thorsten Lajewski": ["thorsten"],
-    "Hans Schily": ["hans"],
-    "Christoph Rüdi": ["Ruedi"]
-}
-
 author_handles = {
     "Niklas Hauser": "salkinium",
     "Antal Szabó": "Sh4rK",
@@ -58,25 +45,13 @@ def get_author_log(since = None, until = None, handles = True, count = False):
     # get the shortlog summary
     output = subprocess.Popen(sl_command, shell=True, stdout=subprocess.PIPE).stdout.read()
     # parse the shortlog
-    shortlog = {}
+    shortlog = defaultdict(int)
     for line in output.splitlines():
         commits, author = line.split("\t")
-        shortlog[author] = int(commits)
-
-    # cleaned up dictionary
-    commit_count = defaultdict(int)
-    # merge authors
-    for slauthor in shortlog.keys():
-        for author, aliases in author_alias.items():
-            if any(name in slauthor for name in aliases):
-                commit_count[author] += shortlog[slauthor]
-                break;
-        else:
-            commit_count[slauthor] += shortlog[slauthor]
-            # print slauthor, "not in aliases"
+        shortlog[author] += int(commits)
 
     # convert to list of tuples for sorting
-    commit_tuples = [(c, a) for a, c in commit_count.items()]
+    commit_tuples = [(c, a) for a, c in shortlog.items()]
     if count:
         # sort by number of commits, then alphabetically by author
         commit_tuples.sort(key=lambda a: (-a[0], a[1]))
