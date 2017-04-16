@@ -18,6 +18,8 @@ xpcc_gpio_enable(void)
 %%	set clock_tree = 'AHB1'
 %% elif target is stm32f0 or target is stm32f3
 %%	set clock_tree = 'AHB'
+%% elif target is stm32l4
+%%  set clock_tree = 'AHB2'
 %% endif
 
 	// Enable GPIO clock

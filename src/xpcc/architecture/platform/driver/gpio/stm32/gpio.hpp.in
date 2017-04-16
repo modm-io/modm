@@ -21,6 +21,8 @@
 %% for instance in gpios | getAdcs
 	%% if (target is stm32f3 and target.name != "373")
 #include "../../adc/stm32f3/adc_{{instance}}.hpp"
+	%% elif (target is stm32l4)
+#include "../../adc/stm32l4/adc_{{instance}}.hpp"
 	%% else
 #include "../../adc/stm32/adc_{{instance}}.hpp"
 	%% endif
@@ -67,7 +69,7 @@ struct Gpio
 	OutputSpeed
 	{
 		MHz2 = 0,		///< Low speed
-		%% if target is stm32f2 or target is stm32f4 or target is stm32f7
+		%% if target is stm32f2 or target is stm32f4 or target is stm32f7 or target is stm32l4
 		MHz25 = 0x1,	///< Medium speed
 		MHz50 = 0x2,	///< Fast speed
 		MHz100 = 0x3,	///< High speed on 30 pF (80 MHz Output max speed on 15 pF)
@@ -319,12 +321,20 @@ public:
 		// Enable SYSCFG
 		RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
 		SYSCFG->EXTICR[index] = (SYSCFG->EXTICR[index] & ~syscfg_mask) | syscfg_value;
+		%%if target is stm32l4
+		EXTI->IMR1 |= mask;
+		%%else
 		EXTI->IMR |= mask;
+		%%endif
 	}
 	xpcc_always_inline static void
 	disableExternalInterrupt()
 	{
+		%%if target is stm32l4
+		EXTI->IMR1 &= ~mask;
+		%%else
 		EXTI->IMR &= ~mask;
+		%%endif
 	}
 	xpcc_always_inline static void
 	enableExternalInterruptVector(const uint32_t priority)
@@ -342,6 +352,21 @@ public:
 	{
 		switch (trigger)
 		{
+		%%if target is stm32l4
+		case InputTrigger::RisingEdge:
+			EXTI->RTSR1 |=  (mask);
+			EXTI->FTSR1 &= ~(mask);
+			break;
+		case InputTrigger::FallingEdge:
+			EXTI->RTSR1 &= ~(mask);
+			EXTI->FTSR1 |=  (mask);
+			break;
+		case InputTrigger::BothEdges:
+			EXTI->RTSR1 |=  (mask);
+			EXTI->FTSR1 |=  (mask);
+			break;
+		}
+		%%else
 		case InputTrigger::RisingEdge:
 			EXTI->RTSR |=  (mask);
 			EXTI->FTSR &= ~(mask);
@@ -355,18 +380,27 @@ public:
 			EXTI->FTSR |=  (mask);
 			break;
 		}
+		%%endif
 	}
 	xpcc_always_inline static bool
 	getExternalInterruptFlag()
 	{
+		%%if target is stm32l4
+		return (EXTI->PR1 & mask);
+		%%else
 		return (EXTI->PR & mask);
+		%%endif
 	}
 	/**	\brief	Reset the interrupt flag in the interrupt routine. */
 	xpcc_always_inline static void
 	acknowledgeExternalInterruptFlag()
 	{
 		// Flags are cleared by writing a one to the flag position.
+		%%if target is stm32l4
+		EXTI->PR1 |= mask;
+		%%else
 		EXTI->PR |= mask;
+		%%endif
 	}
 		%% endif
 	// GpioIO
