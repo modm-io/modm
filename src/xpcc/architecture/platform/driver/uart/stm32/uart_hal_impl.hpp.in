@@ -269,8 +269,14 @@ xpcc::stm32::{{ name }}::acknowledgeInterruptFlags(InterruptFlag_t flags)
 	// Not all flags can be cleared by writing to this reg
 	const uint32_t mask = USART_ICR_PECF  | USART_ICR_FECF   |
 		USART_ICR_NCF   | USART_ICR_ORECF | USART_ICR_IDLECF |
-		USART_ICR_TCCF  | USART_ICR_LBDCF | USART_ICR_CTSCF  |
-		USART_ICR_RTOCF | USART_ICR_EOBCF | USART_ICR_CMCF
+		USART_ICR_TCCF  | USART_ICR_CTSCF | USART_ICR_RTOCF  |
+		USART_ICR_CMCF
+#ifdef USART_ICR_LBDCF // F0x0 do not have LIN mode!
+		| USART_ICR_LBDCF
+#endif
+#ifdef USART_ICR_EOBCF // F0x0 do not have Smartcard mode!
+		| USART_ICR_EOBCF
+#endif
 #ifdef USART_ICR_WUCF
 		| USART_ICR_WUCF
 #endif
