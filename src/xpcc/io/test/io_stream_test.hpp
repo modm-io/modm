@@ -130,6 +130,9 @@ public:
 	void
 	testFp();
 
+	void
+	testPointer();
+
 private:
 	xpcc::IOStream *stream;
 };

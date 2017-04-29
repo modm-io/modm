@@ -534,5 +534,27 @@ IoStreamTest::testFp()
 	TEST_ASSERT_EQUALS(myFuncPtr1, myFuncPtr1);
 	TEST_ASSERT_EQUALS(myFuncPtr1, myFuncPtr3);
 	TEST_ASSERT_DIFFERS(myFuncPtr1, myFuncPtr2);
+}
 
+void
+IoStreamTest::testPointer()
+{
+#if XPCC__SIZEOF_POINTER == 2
+	char string[] = "0x0123";
+	void * p = (void *) 0x0123;
+	const size_t bytesWritten = 6;
+#elif XPCC__SIZEOF_POINTER == 4
+	char string[] = "0x01234567";
+	void * p = (void *) 0x01234567;
+	const size_t bytesWritten = 10;
+#else
+	char string[] = "0x0123456789ABCDEF";
+	void * p = (void *) 0x0123456789ABCDEF;
+	const size_t bytesWritten = 18;
+#endif
+
+	(*stream).printf("%p", p);
+
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, bytesWritten);
+	TEST_ASSERT_EQUALS(device.bytesWritten, bytesWritten);
 }

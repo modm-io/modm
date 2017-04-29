@@ -113,6 +113,14 @@ xpcc::IOStream::vprintf(const char *fmt, va_list ap)
 				base = 10;
 				break;
 
+			case 'p':
+				this->device->write('0');
+				this->device->write('x');
+				fill = '0';
+				width = (XPCC__SIZEOF_POINTER * 2);
+				isLong = (XPCC__SIZEOF_POINTER == 4);
+				isLongLong = (XPCC__SIZEOF_POINTER == 8);
+				/* no break */
 			case 'x':
 				base = 16;
 				break;
