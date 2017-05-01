@@ -33,7 +33,9 @@
 // ----------------------------------------------------------------------------
 
 #include <stdlib.h>                   // for prototypes of malloc() and free()
+#include <new>
 #include <xpcc/architecture/interface/memory.hpp>
+#include <xpcc/architecture/interface/assert.hpp>
 
 extern "C"
 {
@@ -80,35 +82,67 @@ extern "C"
 void *
 operator new(size_t size) throw ()
 {
-	return malloc(size);
+	void * ptr = malloc(size);
+	xpcc_assert(ptr, "core", "heap", "new", size);
+	return ptr;
 }
 
 void *
 operator new[](size_t size) throw ()
 {
+	void * ptr = malloc(size);
+	xpcc_assert(ptr, "core", "heap", "new", size);
+	return ptr;
+}
+
+void *
+operator new(size_t size, std::nothrow_t) noexcept
+{
 	return malloc(size);
 }
 
 void *
-operator new(size_t size, xpcc::MemoryTraits traits)
+operator new[](size_t size, std::nothrow_t) noexcept
 {
-	return malloc_tr(size, traits.value);
+	return malloc(size);
 }
 
 void *
-operator new[](size_t size, xpcc::MemoryTraits traits)
+operator new(size_t size, xpcc::MemoryTraits traits) noexcept
 {
-	return malloc_tr(size, traits.value);
+	void * ptr = malloc_tr(size, traits.value);
+	xpcc_assert(ptr, "core", "heap", "new", size);
+	return ptr;
+}
+
+void *
+operator new[](size_t size, xpcc::MemoryTraits traits) noexcept
+{
+	void * ptr = malloc_tr(size, traits.value);
+	xpcc_assert(ptr, "core", "heap", "new", size);
+	return ptr;
 }
 
 void
-operator delete(void *p) throw ()
+operator delete(void *ptr) noexcept
 {
-	free(p);
+	free(ptr);
 }
 
 void
-operator delete[](void* p) throw ()
+operator delete(void* ptr, size_t) noexcept
 {
-	free(p);
+	free(ptr);
+}
+
+void
+operator delete[](void* ptr) noexcept
+{
+	free(ptr);
+}
+
+void
+operator delete[](void* ptr, size_t) noexcept
+{
+	free(ptr);
 }

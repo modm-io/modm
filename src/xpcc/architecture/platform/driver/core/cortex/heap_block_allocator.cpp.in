@@ -16,6 +16,7 @@
 #include <string.h>
 #include <reent.h>
 #include <errno.h>
+#include <xpcc/architecture/interface/assert.hpp>
 
 // ----------------------------------------------------------------------------
 %% if parameters.allocator == "block_allocator"
@@ -45,7 +46,7 @@ void __xpcc_initialize_memory(void)
 	uint32_t *heap_start, *heap_end;
 	// find the largest heap that is DMA-able and S-Bus accessible
 	xpcc_heap_table_find_largest(0x9, &heap_start, &heap_end);
-	if (!heap_start) exit(ENOMEM);
+	xpcc_assert(heap_start, "core", "heap", "init");
 	// clamp the heap size to the maximum
 	if ((size_t) heap_end - (size_t) heap_start > max_heap_size) {
 		heap_end = (uint32_t *) ((char *) heap_start + max_heap_size);
@@ -57,16 +58,18 @@ void __xpcc_initialize_memory(void)
 void *__wrap__malloc_r(struct _reent *r, size_t size)
 {
 	(void) r;
-	void *p = allocator.allocate(size);
-	if (!p) exit(ENOMEM);
-	return p;
+	void *ptr = allocator.allocate(size);
+	xpcc_assert_debug(ptr, "core", "heap", "malloc", size);
+	return ptr;
 }
 
 void *__wrap__calloc_r(struct _reent *r, size_t size)
 {
-	void *p = __wrap__malloc_r(r, size);
-	if (p) memset(p, 0, size);
-	return p;
+	void *ptr = __wrap__malloc_r(r, size);
+	if (xpcc_assert_debug(ptr, "core", "heap", "calloc", size)) {
+		memset(ptr, 0, size);
+	}
+	return ptr;
 }
 
 void *__wrap__realloc_r(struct _reent *r, void *p, size_t size)
@@ -75,7 +78,7 @@ void *__wrap__realloc_r(struct _reent *r, void *p, size_t size)
 	(void) p;
 	(void) size;
 	// NOT IMPLEMENTED!
-	exit(ENOSYS);
+	xpcc_assert_debug(0, "core", "heap", "realloc", size);
 	return NULL;
 }
 
@@ -91,7 +94,7 @@ _sbrk_r(struct _reent *r,  ptrdiff_t size)
 {
 	(void) r;
 	(void) size;
-	return 0;
+	return NULL;
 }
 
 // memory traits are ignored for newlib allocator

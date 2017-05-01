@@ -8,30 +8,40 @@
 // ----------------------------------------------------------------------------
 
 #include "ram.hpp"
+#include <new>
 #include <xpcc/architecture/interface/memory.hpp>
+#include <xpcc/architecture/interface/assert.hpp>
 
 void *
 operator new(size_t size)
 {
-	return xpcc::avr::allocateMemory(size);
+	void * ptr = xpcc::avr::allocateMemory(size);
+	xpcc_assert(ptr, "core", "heap", "new", size);
+	return ptr;
 }
 
 void *
 operator new[](size_t size)
 {
-	return xpcc::avr::allocateMemory(size);
+	void * ptr = xpcc::avr::allocateMemory(size);
+	xpcc_assert(ptr, "core", "heap", "new", size);
+	return ptr;
 }
 
 void *
 operator new(size_t size, xpcc::MemoryTraits)
 {
-	return xpcc::avr::allocateMemory(size);
+	void * ptr = xpcc::avr::allocateMemory(size);
+	xpcc_assert(ptr, "core", "heap", "new", size);
+	return ptr;
 }
 
 void *
 operator new[](size_t size, xpcc::MemoryTraits)
 {
-	return xpcc::avr::allocateMemory(size);
+	void * ptr = xpcc::avr::allocateMemory(size);
+	xpcc_assert(ptr, "core", "heap", "new", size);
+	return ptr;
 }
 
 void
@@ -41,7 +51,7 @@ operator delete(void* ptr)
 }
 
 void
-operator delete(void* ptr, size_t size __attribute__((unused)))
+operator delete(void* ptr, size_t)
 {
 	xpcc::avr::freeMemory(ptr);
 }
@@ -53,7 +63,7 @@ operator delete[](void* ptr)
 }
 
 void
-operator delete[](void* ptr, size_t size __attribute__((unused)))
+operator delete[](void* ptr, size_t)
 {
 	xpcc::avr::freeMemory(ptr);
 }
