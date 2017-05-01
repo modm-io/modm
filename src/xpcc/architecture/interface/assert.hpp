@@ -1,5 +1,5 @@
 // coding: utf-8
-/* Copyright (c) 2016, Roboterclub Aachen e.V.
+/* Copyright (c) 2016-2017, Niklas Hauser
  * All Rights Reserved.
  *
  * The file is part of the xpcc library and is released under the 3-clause BSD
@@ -13,7 +13,6 @@
 #include <stdint.h>
 #include <xpcc/architecture/utils.hpp>
 #include <xpcc/utils/bit_constants.hpp>
-#include <xpcc/architecture/driver/accessor/flash.hpp>
 
 /**
  * @ingroup		interface
@@ -106,42 +105,50 @@ using AssertionHandler = Abandonment (*)(const char * module,
 /**
  * Assert a condition to be true with failure identifier.
  * This assert is always included in the source code.
+ * @returns result of condition evaluation
  *
  * @note On AVR targets the failure identifier string is placed in Flash memory!
  *
  * @ingroup assert
  */
-#define xpcc_assert(condition, module, location, failure)
+xpcc_extern_c bool
+xpcc_assert(bool condition, const char * module, const char * location, const char * failure);
 
 /**
  * Assert a condition to be true with failure identifier and context.
  * This assert is always included in the source code.
+ * @returns result of condition evaluation
  *
  * @note On AVR targets the failure identifier string is placed in Flash memory!
  *
  * @ingroup assert
  */
-#define xpcc_assert(condition, module, location, failure, context)
+xpcc_extern_c bool
+xpcc_assert(bool condition, const char * module, const char * location, const char * failure, uintptr_t context);
 
 /**
  * Assert a condition to be true with failure identifier.
- * This assert is only included in the source code on debug builds!
+ * This assert is only triggered in the source code on debug builds!
+ * @returns result of condition evaluation
  *
  * @note On AVR targets the strings are placed in Flash memory!
  *
  * @ingroup assert
  */
-#define xpcc_assert_debug(condition, module, location, failure)
+xpcc_extern_c bool
+xpcc_assert_debug(bool condition, const char * module, const char * location, const char * failure);
 
 /**
  * Assert a condition to be true with failure identifier and context.
- * This assert is only included in the source code on debug builds!
+ * This assert is only triggered in the source code on debug builds!
+ * @returns result of condition evaluation
  *
  * @note On AVR targets the strings are placed in Flash memory!
  *
  * @ingroup assert
  */
-#define xpcc_assert_debug(condition, module, location, failure, context)
+xpcc_extern_c bool
+xpcc_assert_debug(bool condition, const char * module, const char * location, const char * failure, uintptr_t context);
 
 /**
  * Overwriteable abandonment handler for all targets.
@@ -151,7 +158,7 @@ using AssertionHandler = Abandonment (*)(const char * module,
  *
  * @ingroup assert
  */
-extern "C" void
+xpcc_extern_c void
 xpcc_abandon(const char * module,
 			 const char * location,
 			 const char * failure,
@@ -173,37 +180,18 @@ xpcc_abandon(const char * module,
 		const xpcc::AssertionHandler \
 		handler ## _assertion_handler_ptr = handler
 #else
+#	warning "XPCC_ASSERTION_HANDLER(handler) ignored, due to missing linker section definition!"
 #	define XPCC_ASSERTION_HANDLER(handler)
 #endif
 
-#define xpcc_assert4(condition, module, location, failure) \
-	xpcc_assert5(condition, module, location, failure, 0)
-
-#define xpcc_assert5(condition, module, location, failure, context) \
-	if ((bool) (condition)) {} else { \
-		xpcc_assert_fail(INLINE_FLASH_STORAGE_STRING(module "\0" location "\0" failure), (uintptr_t) context); }
-
-#define xpcc_assert_get_macro(_1,_2,_3,_4,_5,foo,...) foo
-#define xpcc_assert(...) \
-	xpcc_assert_get_macro(__VA_ARGS__, xpcc_assert5, xpcc_assert4)(__VA_ARGS__)
-
-#ifndef NDEBUG
-#define xpcc_assert_debug(...) \
-	xpcc_assert_get_macro(__VA_ARGS__, xpcc_assert5, xpcc_assert4)(__VA_ARGS__)
+#ifdef XPCC_DEBUG_BUILD
 #	define XPCC_ASSERTION_HANDLER_DEBUG(handler) \
 		XPCC_ASSERTION_HANDLER(handler)
 #else
-#	define xpcc_assert_debug(...)
 #	define XPCC_ASSERTION_HANDLER_DEBUG(handler)
 #endif
 
-extern "C" {
-
-void xpcc_assert_fail(const char * identifier, uintptr_t context);
-
-void xpcc_abandon(const char * module, const char * location, const char * failure, uintptr_t context);
-
-}
+#include "assert.h"
 
 #endif // __DOXYGEN__
 
