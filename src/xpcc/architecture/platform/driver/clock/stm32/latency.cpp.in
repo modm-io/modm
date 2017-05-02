@@ -259,6 +259,34 @@ voltage range, the maximum frequency should be adapted accordingly:
 			2400: [22, 44, 66, 88, 110, 132, 154, 176, 198, 216],
 			2100: [20, 40, 60, 80, 100, 120, 140, 160, 180] }
 		%}
+%% elif target is stm32l4
+/*
+For the stm32l4xx devices, the maximum frequency of the SYSCLK and HCLK is 80 MHz,
+PCLK2 40 MHz and PCLK1 20 MHz. Depending on the device voltage range, the maximum
+frequency should be adapted accordingly:
++---------------+-------------------------------+
+| Latency       |   HCLK clock frequency (MHz)  |
+|               |-------------------------------|
+|               | voltage range | voltage range |
+|               | 2.7 V - 3.6 V | 2.4 V - 2.7 V |
+|---------------|---------------|---------------|
+|0WS(1CPU cycle)| 0 < HCLK <= 16| 0 < HCLK <=  6|
+|---------------|---------------|---------------|
+|1WS(2CPU cycle)|16 < HCLK <= 32| 6 < HCLK <= 12|
+|---------------|---------------|---------------|
+|2WS(3CPU cycle)|32 < HCLK <= 48|12 < HCLK <= 18|
+|---------------|---------------|---------------|
+|3WS(4CPU cycle)|48 < HCLK <= 64|18 < HCLK <= 26|
+|---------------|---------------|---------------|
+|4WS(5CPU cycle)|64 < HCLK <= 80|      NA       |
++---------------+---------------+---------------+
+*/
+	{% set table = {
+		1200: [16, 32, 48, 64, 80],
+		1000: [6, 12, 18, 26] }
+	%}
+%% else
+#error "No flash latencies set. Please add them."
 %% endif
 
 %% for mV, table_MHz in table.items()|sort
@@ -275,8 +303,8 @@ uint32_t
 xpcc::stm32::ClockControl::setFlashLatency(const uint32_t CPU_Frequency, const uint16_t mV)
 {
 %% if target.name != "100"
-	const uint32_t *lut(flash_latency_3600);
-	uint8_t lut_size(sizeof(flash_latency_3600) / sizeof(uint32_t));
+	const uint32_t *lut(flash_latency_{{ (table|sort)[-1] }});
+	uint8_t lut_size(sizeof(flash_latency_{{ (table|sort)[-1] }}) / sizeof(uint32_t));
 	%% if table|length > 1
 	// find the right table for the voltage
 		%% for mV in (table|sort)[:-1]
@@ -303,7 +331,7 @@ xpcc::stm32::ClockControl::setFlashLatency(const uint32_t CPU_Frequency, const u
 		uint32_t acr = FLASH->ACR & ~FLASH_ACR_LATENCY;
 		// set flash latency
 		acr |= latency;
-	%% if target is stm32f2 or target is stm32f4
+	%% if target is stm32f2 or target is stm32f4 or target is stm32l4
 		// enable flash prefetch and data and instruction cache
 		acr |= FLASH_ACR_PRFTEN | FLASH_ACR_DCEN | FLASH_ACR_ICEN;
 	%% elif target is stm32f7

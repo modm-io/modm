@@ -177,7 +177,7 @@
         <af id="7" peripheral="Uart1" name="Cts" type="in"/>
         <af device-name="328" device-pin-id="c" id="9" peripheral="Can1" name="Rx" type="in"/>
         <af id="11" peripheral="Timer1" name="Channel4"/>
-        <af id="12" peripheral="Timer1" name="BreakIn" type="in"/>
+        <af id="12" peripheral="Timer1" name="BreakIn2" type="in"/>
       </gpio>
       <gpio port="A" id="12">
         <af id="1" peripheral="Timer16" name="Channel1"/>

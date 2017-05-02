@@ -213,8 +213,17 @@ class STMDeviceReader(XMLDeviceReader):
 		self.log.debug("STMDeviceReader: Found interrupt vectors:\n" + "\n".join(["{}: {}".format(v['position'], v['name']) for v in ivectors]))
 		self.addProperty('interrupts', ivectors)
 
+		our_instances = ['TIM', 'UART', 'USART', 'ADC', 'CAN', 'SPI', 'I2C', 'FSMC', 'FMC', 'RNG', 'RCC', 'USB']
+		if self.id.family in ['l4']:
+			# L4 doesn't support these
+			our_instances.remove('FSMC')
+			our_instances.remove('FMC')
+		if self.id.family in ['f3', 'f4']:
+			# Only F3, F4 supports DMA
+			our_instances.append('DMA')
+
 		for m in self.modules:
-			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'CAN', 'SPI', 'I2C', 'FSMC', 'FMC', 'RNG', 'RCC', 'USB']):
+			if any(m.startswith(per) for per in our_instances):
 				modules.append(m)
 
 		if 'CAN' in modules:
@@ -224,7 +233,7 @@ class STMDeviceReader(XMLDeviceReader):
 			modules.append('ID')
 
 		self.dmaFile = None
-		if 'DMA' in self.modules:
+		if 'DMA' in modules:
 			# lets load additional information about the DMA
 			dma_file = self.query("//IP[@Name='DMA']")[0].get('Version')
 			dma_file = os.path.join(self.rootpath, 'IP', 'DMA-' + dma_file + '_Modes.xml')
@@ -375,7 +384,8 @@ class STMDeviceReader(XMLDeviceReader):
 							nice_name = tname.replace('CH', 'Channel')
 							output_type = None
 						elif 'BKIN' in tname:
-							nice_name = 'BreakIn'
+							nice_name = ''.join(raw_names[1:])
+							nice_name = nice_name.replace('BKIN', 'BreakIn').replace('COMP', 'Comp')
 						af = {'peripheral' : 'Timer' + tinstance,
 							  'name': nice_name}
 						if output_type:
@@ -457,7 +467,7 @@ class STMDeviceReader(XMLDeviceReader):
 		# get the defines for this device family
 		familyDefines = stm32_defines[self.id.family]
 		# get all defines for this device name
-		devName = 'STM32F{}'.format(self.id.name)
+		devName = 'STM32{}{}'.format(self.id.family[0].upper(), self.id.name)
 
 		# Map STM32F7x8 -> STM32F7x7
 		if self.id.family == 'f7' and devName[8] == '8':

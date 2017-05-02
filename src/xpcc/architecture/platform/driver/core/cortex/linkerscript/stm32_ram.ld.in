@@ -124,7 +124,7 @@ SECTIONS
 
 	{{ linker.section_heap("SRAM1", "heap1") }}
 
-%% if 'sram2' in regions
+%% if 'sram2' in regions and not target is stm32l4
 	{{ linker.section_heap("SRAM2", "heap2") }}
 %% endif
 
@@ -142,7 +142,7 @@ SECTIONS
 	{{ linker.section_table_extern() }}
 
 %% set heap_table = [{'name': 'heap1', 'prop': '0x000f'}]
-%% if 'sram2' in regions
+%% if 'sram2' in regions and not target is stm32l4
 	%% do heap_table.append({'name': 'heap2', 'prop': '0x000f'})
 %% endif
 	{{ linker.section_table_heap(heap_table) }}

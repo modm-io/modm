@@ -67,7 +67,7 @@ class STMDeviceWriter(XMLDeviceWriter):
 		clock_child.setAttributes({'type': 'clock', 'name': 'stm32'})
 		# DAC
 		# self.addModuleAttributesToNode(self.root, 'DAC', 'dac')
-		if (self.device.id.family in ['f3', 'f4']):
+		if (self.device.id.family in ['f0', 'f3', 'f4', 'l4']):
 			# DMA
 			self.addModuleAttributesToNode(self.root, 'DMA', 'dma')
 		# FSMC
@@ -257,8 +257,7 @@ class STMDeviceWriter(XMLDeviceWriter):
 	def write(self, folder):
 		self._addNamingSchema()
 
-		family = self.device.ids.getAttribute("family")[0]
-		file_name = 'stm32' + family[0] + '_'.join(self.device.ids.getAttribute('name'))
+		file_name = 'stm32' + self.device.ids.getAttribute('family')[0][0] + '_'.join(self.device.ids.getAttribute('name'))
 		file_name += '-' + '_'.join(self.device.ids.getAttribute('pin_id'))
 		file_name += '-' + '_'.join(self.device.ids.getAttribute('size_id'))
 		self.writeToFolder(folder, file_name + '.xml')

@@ -26,10 +26,12 @@ examples:
     - scons check=examples examples=stm32f746g_discovery
     - scons check=examples examples=stm32f4_loa_v2b
     - scons check=examples examples=stm32f469_discovery
+    - scons check=examples examples=stm32l476_discovery
     - scons check=examples examples=nucleo_f103rb
     - scons check=examples examples=nucleo_f303k8
     - scons check=examples examples=nucleo_f411re
     - scons check=examples examples=nucleo_f429zi
+    - scons check=examples examples=nucleo_l476rg
     - scons check=examples examples=unittest
     - scons check=examples examples=zmq
 

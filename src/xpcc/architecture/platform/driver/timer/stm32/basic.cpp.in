@@ -10,21 +10,29 @@
 #include <xpcc_config.hpp>
 #include "timer_{{ id }}.hpp"
 
+%% if target is stm32l4
+%%   set enr  = "ENR1"
+%%   set rstr = "RSTR1"
+%% else
+%%   set enr  = "ENR"
+%%   set rstr = "RSTR"
+%% endif
+
 void
 xpcc::stm32::Timer{{ id }}::enable()
 {
 	// enable clock
-	RCC->APB1ENR  |=  RCC_APB1ENR_TIM{{ id }}EN;
+	RCC->APB1{{ enr }}  |=  RCC_APB1{{ enr }}_TIM{{ id }}EN;
 	// reset timer
-	RCC->APB1RSTR |=  RCC_APB1RSTR_TIM{{ id }}RST;
-	RCC->APB1RSTR &= ~RCC_APB1RSTR_TIM{{ id }}RST;
+	RCC->APB1{{ rstr }} |=  RCC_APB1{{ rstr }}_TIM{{ id }}RST;
+	RCC->APB1{{ rstr }} &= ~RCC_APB1{{ rstr }}_TIM{{ id }}RST;
 }
 
 void
 xpcc::stm32::Timer{{ id }}::disable()
 {
 	// disable clock
-	RCC->APB1ENR &= ~RCC_APB1ENR_TIM{{ id }}EN;
+	RCC->APB1{{ enr }} &= ~RCC_APB1{{ enr }}_TIM{{ id }}EN;
 
 	TIM{{ id }}->CR1 = 0;
 	TIM{{ id }}->DIER = 0;
@@ -38,7 +46,7 @@ xpcc::stm32::Timer{{ id }}::setMode(Mode mode)
 	TIM{{ id }}->CR2 = 0;
 }
 
-%% if (id == 6) and (target is stm32f2 or target is stm32f3 or target is stm32f4 or target is stm32f7)
+%% if (id == 6) and (target is stm32f2 or target is stm32f3 or target is stm32f4 or target is stm32l4 or target is stm32f7)
 %%   set interrupt_vector = "TIM6_DAC_IRQn"
 %% elif (id == 7) and ((target.name in ["328", "334"]) or (target.name in ["303"] and target.size_id in ["8"]))
 %%   set interrupt_vector = "TIM7_DAC2_IRQn"

@@ -154,7 +154,7 @@
         <af id="2" peripheral="Timer3" name="Channel1"/>
         <af id="5" peripheral="SpiMaster1" name="Miso" type="in"/>
         <af id="7" peripheral="Uart3" name="Cts" type="in"/>
-        <af id="12" peripheral="Timer1" name="BreakIn" type="in"/>
+        <af id="12" peripheral="Timer1" name="BreakInComp2" type="in"/>
         <af id="12" peripheral="Timer1" name="ExternalTrigger" type="in"/>
         <af id="14" peripheral="Timer16" name="Channel1"/>
         <af peripheral="Adc1" name="Channel11" type="analog"/>
@@ -187,12 +187,12 @@
       </gpio>
       <gpio port="A" id="11">
         <af id="1" peripheral="Timer1" name="Channel4"/>
-        <af id="2" peripheral="Timer1" name="BreakIn" type="in"/>
+        <af id="2" peripheral="Timer1" name="BreakIn2" type="in"/>
         <af id="5" peripheral="SpiMaster1" name="Miso" type="in"/>
         <af id="7" peripheral="Uart1" name="Cts" type="in"/>
         <af id="9" peripheral="Can1" name="Rx" type="in"/>
         <af id="10" peripheral="Usb" name="Dm"/>
-        <af id="12" peripheral="Timer1" name="BreakIn" type="in"/>
+        <af id="12" peripheral="Timer1" name="BreakIn2Comp1" type="in"/>
         <af id="12" peripheral="Timer1" name="ExternalTrigger" type="in"/>
       </gpio>
       <gpio port="A" id="12">
@@ -298,7 +298,7 @@
       </gpio>
       <gpio port="B" id="12">
         <af id="1" peripheral="Timer1" name="BreakIn" type="in"/>
-        <af id="3" peripheral="Timer1" name="BreakIn" type="in"/>
+        <af id="3" peripheral="Timer1" name="BreakInComp2" type="in"/>
         <af id="3" peripheral="Timer1" name="ExternalTrigger" type="in"/>
         <af id="5" peripheral="SpiMaster2" name="Nss"/>
         <af id="7" peripheral="Uart3" name="Ck" type="out"/>
@@ -490,14 +490,14 @@
       </gpio>
       <gpio device-pin-id="v" port="E" id="14">
         <af id="1" peripheral="Timer1" name="Channel4"/>
-        <af id="2" peripheral="Timer1" name="BreakIn" type="in"/>
-        <af id="3" peripheral="Timer1" name="BreakIn" type="in"/>
+        <af id="2" peripheral="Timer1" name="BreakIn2" type="in"/>
+        <af id="3" peripheral="Timer1" name="BreakIn2Comp2" type="in"/>
         <af id="3" peripheral="Timer1" name="ExternalTrigger" type="in"/>
         <af id="5" peripheral="SpiMaster1" name="Miso" type="in"/>
       </gpio>
       <gpio device-pin-id="v" port="E" id="15">
         <af id="1" peripheral="Timer1" name="BreakIn" type="in"/>
-        <af id="3" peripheral="Timer1" name="BreakIn" type="in"/>
+        <af id="3" peripheral="Timer1" name="BreakInComp1" type="in"/>
         <af id="3" peripheral="Timer1" name="ExternalTrigger" type="in"/>
         <af id="5" peripheral="SpiMaster1" name="Mosi" type="out"/>
       </gpio>

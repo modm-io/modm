@@ -1,0 +1,73 @@
+// coding: utf-8
+/* Copyright (c) 2017, Sascha Schade (strongly-tyepd)
+* All Rights Reserved.
+*
+* The file is part of the xpcc library and is released under the 3-clause BSD
+* license. See the file `LICENSE` for the full license governing this code.
+*/
+// ----------------------------------------------------------------------------
+%#
+%#
+%% if id == 1
+	/// ADC1 is connected to 16 external channels + 3 internal channels
+	%% set channels = range(1,17)
+%% elif id == 2
+	/// ADC2 is connected to 16 external channels + 2 internal channels
+	%% set channels = range(1,17)
+%% elif id == 3
+	/// ADC3 is connected to 12 external channels + 4 internal channels
+	%% set channels = [1,2,3,4,6,7,8,9,10,11,12,13]
+%% else
+#error "Nobody thought about using this code for an STM with 4 ADCs."
+%% endif
+%#
+
+#ifndef XPCC_STM32L4_ADC{{ id }}_HPP
+#define XPCC_STM32L4_ADC{{ id }}_HPP
+
+#include <stdint.h>
+#include "../../../type_ids.hpp"
+#include "../../../device.hpp"
+
+namespace xpcc
+{
+namespace stm32
+{
+/**
+ * Analog/Digital-Converter module (ADC{{ id }}).
+ *
+ * \author	Sascha Schade (strongly-typed)
+ * \ingroup	stm32
+ */
+class Adc{{ id }}
+{
+public:
+%% for channel in channels
+	/// TypeId used to connect GPIO pins to this adc's Channel{{ channel }}.
+	static const TypeId::Adc{{ id }}Channel{{ channel }} Channel{{ channel }};
+%% endfor
+
+public:
+	/// Channels, which can be used with this ADC.
+	enum class Channel : uint8_t	// TODO: What is the best type?
+	{
+		/// External channels
+%% for channel in channels
+		Channel{{ channel }} = {{ channel }},
+%% endfor
+%#
+		/// Internal channels
+%% if id == 1
+%% elif id == 2
+%% elif id == 3
+%% endif
+	};
+};
+
+} // stm32 namespace
+
+} // xpcc namespace
+
+// #include "adc_{{ id }}_impl.hpp"
+
+#endif	// XPCC_STM32L4_ADC{{ id }}_HPP
