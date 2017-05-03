@@ -45,7 +45,7 @@ extern "C"
 	void
 	__cxa_pure_virtual()
 	{
-		// put error handling here
+		xpcc_assert_debug(0, "core", "cxa", "purevirtual");
 	}
 	
 	// ------------------------------------------------------------------------
