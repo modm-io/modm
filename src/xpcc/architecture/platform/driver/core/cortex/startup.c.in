@@ -76,11 +76,11 @@ extern uint32_t __process_stack_top[];
 
 %% if parameters.vector_table_in_ram
 // reserve space for the remapped vector table in RAM
-__attribute__(( section(".vectors") ))
+xpcc_section(".vectors")
 FunctionPointer ramVectors[{{number_of_interrupts + 16}}];
 %% endif
 // Define the vector table
-__attribute__(( section(".reset") ))
+xpcc_section(".reset")
 FunctionPointer flashVectors[] =
 {
 	(FunctionPointer)__main_stack_top,		// -16: stack pointer
@@ -122,24 +122,23 @@ extern uint32_t __vector_table_rom_start[];
 extern uint32_t __vector_table_ram_start[];
 
 // Application's main function
-int
+int __attribute__((noreturn))
 main(void);
 
 // calls CTORS of static objects
 void
 __libc_init_array(void);
 
-extern void
-exit(int) __attribute__ ((noreturn, weak));
-
 // default implementation is empty and does nothing
-void xpcc_hook_hardware_init(void) __attribute__(( weak ));
-void xpcc_hook_hardware_init(void) {}
+xpcc_weak void
+xpcc_hook_hardware_init(void) {}
 
-extern void __xpcc_initialize_memory(void);
+extern void
+__xpcc_initialize_memory(void);
 
 %% if parameters.enable_gpio
-extern void xpcc_gpio_enable(void);
+extern void
+xpcc_gpio_enable(void);
 %% endif
 
 static void
@@ -291,9 +290,6 @@ Reset_Handler(void)
 	// Call the application's entry point
 	main();
 
-	exit(1);
-
-	while (1)
-	{
-	}
+	xpcc_assert_debug(0, "core", "main", "exit");
+	while(1) ;
 }
