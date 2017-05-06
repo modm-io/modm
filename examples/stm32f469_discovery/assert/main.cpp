@@ -6,25 +6,6 @@
 
 using namespace Board;
 
-extern "C" void xpcc_abandon(const char * module,
-							 const char * location,
-							 const char * failure,
-							 uintptr_t context)
-{
-	XPCC_LOG_ERROR << "Assertion '"
-			<< module << "." << location << "." << failure
-			<< "' @ " << (void *) context
-			<< " failed! Abandoning..." << xpcc::endl;
-
-	LedGreen::setOutput();
-	while(1) {
-		LedBlue::set();
-		xpcc::delayMilliseconds(20);
-		LedBlue::reset();
-		xpcc::delayMilliseconds(180);
-	}
-}
-
 static xpcc::Abandonment
 test_assertion_handler(const char * module,
 					   const char * /* location */,
