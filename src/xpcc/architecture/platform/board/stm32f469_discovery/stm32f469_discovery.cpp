@@ -44,3 +44,22 @@ xpcc_hook_hardware_init(void)
 	Board::systemClock::enable();
 	board_initialize_sdram();
 }
+
+xpcc_extern_c void
+xpcc_abandon(const char * module,
+			 const char * location,
+			 const char * failure,
+			 uintptr_t context)
+{
+	XPCC_LOG_ERROR << "Assertion '" << module << "." << location << "." << failure << "'";
+	if (context) { XPCC_LOG_ERROR << " @ " << (void *) context << " (" << (uint32_t) context << ")"; }
+	XPCC_LOG_ERROR << " failed! Abandoning..." << xpcc::endl;
+
+	Board::LedBlue::setOutput();
+	while(1) {
+		Board::LedBlue::set();
+		xpcc::delayMilliseconds(20);
+		Board::LedBlue::reset();
+		xpcc::delayMilliseconds(180);
+	}
+}

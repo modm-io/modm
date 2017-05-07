@@ -31,23 +31,28 @@
 
 #include <stdint.h>
 #include <xpcc/architecture/utils.hpp>
+#include <xpcc/architecture/interface/assert.h>
 #include "../../../device.hpp"
 #include "xpcc_config.hpp"
 
 {{ platform.defines() }}
 
 // ----------------------------------------------------------------------------
-/*
- * Provide weak aliases for each Exception handler to defaultHandler.
+void Undefined_Handler(void)
+{
+	uint32_t irqn;
+	asm volatile("mrs %[irqn], ipsr" :[irqn] "=r" (irqn));
+	xpcc_assert(0, "core", "nvic", "undefined", irqn);
+}
+/* Provide weak aliases for each Exception handler to Undefined_Handler.
  * As they are weak aliases, any function with the same name will override
- * this definition.
- */
+ * this definition. */
 void Reset_Handler(void)				__attribute__((noreturn));
-void NMI_Handler(void)					__attribute__ ((weak, alias("defaultHandler")));
+void NMI_Handler(void)					__attribute__((weak, alias("Undefined_Handler")));
 %% if target is stm32
 void HardFault_Handler(void);
 %% else
-void HardFault_Handler(void)			__attribute__ ((weak, alias("defaultHandler")));
+void HardFault_Handler(void)			__attribute__((weak, alias("Undefined_Handler")));
 %% endif
 %# Remember declarations to avoid redeclarations
 %% set declarations = []
@@ -58,7 +63,7 @@ void HardFault_Handler(void)			__attribute__ ((weak, alias("defaultHandler")));
 %%		if addr < 0
 %%			set suffix = ""
 %%		endif
-{{ ("void " + interrupt[0] + suffix + "(void)") | xpcc.pad(36)}}__attribute__ ((weak, alias("defaultHandler")));
+{{ ("void " + interrupt[0] + suffix + "(void)") | xpcc.pad(36)}}__attribute__((weak, alias("Undefined_Handler")));
 %%	endif
 %% endfor
 // ----------------------------------------------------------------------------
@@ -71,11 +76,11 @@ extern uint32_t __process_stack_top[];
 
 %% if parameters.vector_table_in_ram
 // reserve space for the remapped vector table in RAM
-__attribute__(( section(".vectors") ))
+xpcc_section(".vectors")
 FunctionPointer ramVectors[{{number_of_interrupts + 16}}];
 %% endif
 // Define the vector table
-__attribute__(( section(".reset") ))
+xpcc_section(".reset")
 FunctionPointer flashVectors[] =
 {
 	(FunctionPointer)__main_stack_top,		// -16: stack pointer
@@ -90,7 +95,7 @@ FunctionPointer flashVectors[] =
 %%		endif
 	{{ (i[addr][0] + suffix + ",") | xpcc.pad(36) }}// {{ (addr|string).rjust(3) }}
 %% 	else
-	0,										// {{ (addr|string).rjust(3) }}
+	Undefined_Handler,						// {{ (addr|string).rjust(3) }}
 %% 	endif
 %% endfor
 };
@@ -117,24 +122,23 @@ extern uint32_t __vector_table_rom_start[];
 extern uint32_t __vector_table_ram_start[];
 
 // Application's main function
-int
+int __attribute__((noreturn))
 main(void);
 
 // calls CTORS of static objects
 void
 __libc_init_array(void);
 
-extern void
-exit(int) __attribute__ ((noreturn, weak));
-
 // default implementation is empty and does nothing
-void xpcc_hook_hardware_init(void) __attribute__(( weak ));
-void xpcc_hook_hardware_init(void) {}
+xpcc_weak void
+xpcc_hook_hardware_init(void) {}
 
-extern void __xpcc_initialize_memory(void);
+extern void
+__xpcc_initialize_memory(void);
 
 %% if parameters.enable_gpio
-extern void xpcc_gpio_enable(void);
+extern void
+xpcc_gpio_enable(void);
 %% endif
 
 static void
@@ -286,25 +290,6 @@ Reset_Handler(void)
 	// Call the application's entry point
 	main();
 
-	exit(1);
-
-	while (1)
-	{
-	}
-}
-
-// ----------------------------------------------------------------------------
-/**
- * @brief	Default interrupt handler
- *
- * This functions gets called if an interrupt handler is not defined. It just
- * enters an infinite loop leaving the processor state intact for a debugger
- * to be examined.
-*/
-void
-defaultHandler(void)
-{
-	while (1)
-	{
-	}
+	xpcc_assert_debug(0, "core", "main", "exit");
+	while(1) ;
 }

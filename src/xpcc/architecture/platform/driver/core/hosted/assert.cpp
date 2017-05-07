@@ -36,7 +36,14 @@ XPCC_ASSERTION_HANDLER(empty_assertion_handler);
 extern "C"
 {
 
-void xpcc_assert_fail(const char * identifier, uintptr_t context)
+void
+xpcc_assert_fail(const char * identifier)
+{
+	// just forward this call
+	xpcc_assert_fail_context(identifier, 0);
+}
+
+void xpcc_assert_fail_context(const char * identifier, uintptr_t context)
 {
 	uint8_t state((uint8_t) Abandonment::DontCare);
 	const char * module = identifier;
@@ -60,10 +67,9 @@ void xpcc_assert_fail(const char * identifier, uintptr_t context)
 xpcc_weak
 void xpcc_abandon(const char * module, const char * location, const char * failure, uintptr_t context)
 {
-	XPCC_LOG_ERROR << "Assertion '"
-			<< module << "." << location << "." << failure
-			<< "' @ " << (void *) context
-			<< " failed! Abandoning..." << xpcc::endl;
+	XPCC_LOG_ERROR.printf("Assertion '%s.%s.%s'", module, location, failure);
+	if (context) { XPCC_LOG_ERROR.printf(" @ %p (%d)", (void *) context, context); }
+	XPCC_LOG_ERROR.printf(" failed! Abandoning...\n");
 }
 
 }

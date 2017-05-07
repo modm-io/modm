@@ -7,9 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
+#include <string.h>
 #include <xpcc/architecture/interface/assert.hpp>
-
-extern "C" void exit(int);
 
 using xpcc::AssertionHandler;
 using xpcc::Abandonment;
@@ -20,7 +19,14 @@ extern AssertionHandler __assertion_table_end;
 extern "C"
 {
 
-void xpcc_assert_fail(const char * identifier, uintptr_t context)
+void
+xpcc_assert_fail(const char * identifier)
+{
+	// just forward this call
+	xpcc_assert_fail_context(identifier, 0);
+}
+
+void xpcc_assert_fail_context(const char * identifier, uintptr_t context)
 {
 	uint8_t state(uint8_t(Abandonment::DontCare));
 	const char * module = identifier;
@@ -37,7 +43,7 @@ void xpcc_assert_fail(const char * identifier, uintptr_t context)
 		state & (uint8_t) Abandonment::Fail)
 	{
 		xpcc_abandon(module, location, failure, context);
-		exit(1);
+		while(1) ;
 	}
 }
 

@@ -1,29 +1,6 @@
 #include <xpcc/architecture/platform.hpp>
 
-#define XPCC_CAN_MODULE_NAME "can"
-#define XPCC_IOBUFFER_MODULE_NAME "iobuffer"
-#define XPCC_UART_MODULE_NAME "uart"
-
 using namespace Board;
-
-extern "C" void xpcc_abandon(const char * module,
-							 const char * location,
-							 const char * failure,
-							 uintptr_t context)
-{
-	XPCC_LOG_ERROR << "Assertion '"
-			<< module << "." << location << "." << failure
-			<< "' @ " << (void *) context
-			<< " failed! Abandoning..." << xpcc::endl;
-
-	LedGreen::setOutput();
-	while(1) {
-		LedBlue::set();
-		xpcc::delayMilliseconds(20);
-		LedBlue::reset();
-		xpcc::delayMilliseconds(180);
-	}
-}
 
 static xpcc::Abandonment
 test_assertion_handler(const char * module,
@@ -31,11 +8,31 @@ test_assertion_handler(const char * module,
 					   const char * /* failure */,
 					   uintptr_t /* context */)
 {
-	if (strcmp(module, XPCC_IOBUFFER_MODULE_NAME) == 0)
+	if (!strcmp(module, "iobuffer")) {
+		XPCC_LOG_ERROR << "Ignoring iobuffer full!" << xpcc::endl;
 		return xpcc::Abandonment::Ignore;
+	}
 	return xpcc::Abandonment::DontCare;
 }
 XPCC_ASSERTION_HANDLER(test_assertion_handler);
+
+static xpcc::Abandonment
+core_assertion_handler(const char * module,
+					   const char * /* location */,
+					   const char * failure,
+					   uintptr_t context)
+{
+	if (!memcmp(module, "core\0nvic\0undefined", 19)) {
+		XPCC_LOG_ERROR.printf("Ignoring undefined IRQ handler %d!\n", context);
+		return xpcc::Abandonment::Ignore;
+	}
+	if (!memcmp(module, "core\0heap", 9)) {
+		XPCC_LOG_ERROR.printf("Ignoring 'core.heap.%s' of size 0x%x!\n", failure, context);
+		return xpcc::Abandonment::Ignore;
+	}
+	return xpcc::Abandonment::DontCare;
+}
+XPCC_ASSERTION_HANDLER(core_assertion_handler);
 
 // ----------------------------------------------------------------------------
 int
@@ -43,17 +40,29 @@ main()
 {
 	Board::initialize();
 
-	xpcc_assert(true, XPCC_CAN_MODULE_NAME, "init", "timeout");
+	// trigger an IRQ with undefined handler
+	NVIC_EnableIRQ(RTC_Alarm_IRQn);
+	NVIC_SetPendingIRQ(RTC_Alarm_IRQn);
 
-	xpcc_assert_debug(false, XPCC_IOBUFFER_MODULE_NAME, "tx", "full");
+	// trigger an out of memory
+	// we definitely don't have 32MB RAM on this board
+	// returns NULL, asserts in debug mode
+	volatile void * ptr = malloc(1 << 25);
+	// returns NULL, asserts in debug mode
+	ptr = new (std::nothrow) uint8_t[1 << 25];
+	// always asserts
+	ptr = new uint8_t[1 << 25];
+	(void) ptr;
 
-	xpcc_assert(false, XPCC_UART_MODULE_NAME, "init", "mode");
+	// does not fail, should not be optimized away
+	volatile bool true_condition = true;
+	xpcc_assert(true_condition, "can", "init", "timeout");
 
-	while(1)
-	{
-		LedRed::toggle();
-		xpcc::delayMilliseconds(500);
-	}
+	// only fails for debug builds, but is ignored anyways
+	xpcc_assert_debug(false, "iobuffer", "tx", "full");
 
-	return 0;
+	// "accidentally" return from main, without even returning properly!
+	// This should be cought by the debug assert core.main.exit!
+	// while(1) ;
+	// return 0;
 }
