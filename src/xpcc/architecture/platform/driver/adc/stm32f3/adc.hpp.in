@@ -38,12 +38,20 @@
 	%# 14-16 reserved
 	%% set channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,17,18]
 %% endif
+
+%% if target is stm32f3
 %% if id in [1,2]
 	%% set adc_pre = 'ADCPRE12'
 %% elif id in [3,4]
 	%% set adc_pre = 'ADCPRE34'
 %% endif
+%% endif
+
+%% if target is stm32f3
 	%% set adc_ccr = 'ADC12_CCR'
+%% elif target is stm32l4
+	%% set adc_ccr = 'ADC_CCR'
+%% endif
 %#
 
 #ifndef XPCC_STM32F3_ADC{{ id }}_HPP
@@ -128,18 +136,31 @@ public:
 
 	enum class ClockMode : uint32_t
 	{
-		Asynchronous = 0,	// clocked by ADC_CK12 / ADC_CK34
-		// In synchronous mode ADC is clocked by the AHB clock
 		DoNotChange = 0xff,// if you do not want to change the clock mode
+		Asynchronous = 0,	// clocked by ADC_CK12 / ADC_CK34 / ADC123_CK
+		// In synchronous mode ADC is clocked by the AHB clock (stm32f3) or
+		// by HCLK (stm32l4)
 		SynchronousPrescaler1 = {{ adc_ccr }}_CKMODE_0,
 		SynchronousPrescaler2 = {{ adc_ccr }}_CKMODE_1,
 		SynchronousPrescaler4 = {{ adc_ccr }}_CKMODE_1 | {{ adc_ccr }}_CKMODE_0,
 	};
 
+%% if target is stm32l4
+	// ADCs clock source selection
+	enum class ClockSource : uint32_t
+	{
+		NoClock = 0, // No clock selected.
+		PllSai1 = RCC_CCIPR_ADCSEL_0, // PLLSAI1 "R" clock (PLLADC1CLK) selected as ADCs clock
+		PllSai2 = RCC_CCIPR_ADCSEL_1, // PLLSAI2 "R" clock (PLLADC2CLK) selected as ADCs clock
+		SystemClock = RCC_CCIPR_ADCSEL_1 | RCC_CCIPR_ADCSEL_0, // System clock selected as ADCs clock
+	};
+%% endif
+
 	// Prescaler of the Asynchronous ADC clock
 	enum class Prescaler : uint32_t
 	{
 		Disabled 			= 0,
+%% if target is stm32f3
 		Div1 				= RCC_CFGR2_{{ adc_pre }}_DIV1,
 		Div2 				= RCC_CFGR2_{{ adc_pre }}_DIV2,
 		Div4 				= RCC_CFGR2_{{ adc_pre }}_DIV4,
@@ -153,6 +174,20 @@ public:
 		Div128 				= RCC_CFGR2_{{ adc_pre }}_DIV128,
 		Div256 				= RCC_CFGR2_{{ adc_pre }}_DIV256,
 		Div256AllBits 		= RCC_CFGR2_{{ adc_pre }},	// for bit clear
+%% elif target is stm32l4
+		Div1 				= 0,
+		Div2 				= ADC_CCR_PRESC_0,
+		Div4 				= ADC_CCR_PRESC_1,
+		Div6 				= ADC_CCR_PRESC_1 | ADC_CCR_PRESC_0,
+		Div8 				= ADC_CCR_PRESC_2,
+		Div10 				= ADC_CCR_PRESC_2 | ADC_CCR_PRESC_0,
+		Div12 				= ADC_CCR_PRESC_2 | ADC_CCR_PRESC_1,
+		Div16 				= ADC_CCR_PRESC_2 | ADC_CCR_PRESC_1 | ADC_CCR_PRESC_0,
+		Div32 				= ADC_CCR_PRESC_3,
+		Div64 				= ADC_CCR_PRESC_3 | ADC_CCR_PRESC_0,
+		Div128 				= ADC_CCR_PRESC_3 | ADC_CCR_PRESC_1,
+		Div256 				= ADC_CCR_PRESC_3 | ADC_CCR_PRESC_1 | ADC_CCR_PRESC_0,
+		Div256AllBits 		= ADC_CCR_PRESC_3 | ADC_CCR_PRESC_2 | ADC_CCR_PRESC_1 | ADC_CCR_PRESC_0,	// for bit clear
 %% endif
 	};
 
@@ -177,11 +212,15 @@ public:
 
 	enum class VoltageRegulatorState : uint32_t
 	{
+%% if target is stm32l4
+		Enabled 		= ADC_CR_ADVREGEN,
+%% elif target is stm32f3
 		// Intermediate state is needed to move from enabled to disabled
 		// state and vice versa
 		Intermediate 	= 0,
 		Enabled 		= ADC_CR_ADVREGEN_0,
 		Disables		= ADC_CR_ADVREGEN_1,
+%% endif
 	};
 
 	enum class Interrupt : uint32_t
@@ -237,6 +276,9 @@ public:
 	 */
 	static inline void
 	initialize(	const ClockMode clk = ClockMode::DoNotChange,
+%% if target is stm32l4
+				const ClockSource clk_src = ClockSource::SystemClock,
+%% endif
 				const Prescaler pre = Prescaler::Disabled,
 				const CalibrationMode cal = CalibrationMode::DoNotCalibrate,
 				const bool blocking = true);
