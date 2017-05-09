@@ -38,6 +38,12 @@
 	%# 14-16 reserved
 	%% set channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,17,18]
 %% endif
+%% if id in [1,2]
+	%% set adc_pre = 'ADCPRE12'
+%% elif id in [3,4]
+	%% set adc_pre = 'ADCPRE34'
+%% endif
+	%% set adc_ccr = 'ADC12_CCR'
 %#
 
 #ifndef XPCC_STM32F3_ADC{{ id }}_HPP
@@ -124,44 +130,29 @@ public:
 	{
 		Asynchronous = 0,	// clocked by ADC_CK12 / ADC_CK34
 		// In synchronous mode ADC is clocked by the AHB clock
-		SynchronousPrescaler1 = ADC12_CCR_CKMODE_0,
-		SynchronousPrescaler2 = ADC12_CCR_CKMODE_1,
-		SynchronousPrescaler4 = ADC12_CCR_CKMODE_1 | ADC12_CCR_CKMODE_0,
 		DoNotChange = 0xff,// if you do not want to change the clock mode
+		SynchronousPrescaler1 = {{ adc_ccr }}_CKMODE_0,
+		SynchronousPrescaler2 = {{ adc_ccr }}_CKMODE_1,
+		SynchronousPrescaler4 = {{ adc_ccr }}_CKMODE_1 | {{ adc_ccr }}_CKMODE_0,
 	};
 
 	// Prescaler of the Asynchronous ADC clock
 	enum class Prescaler : uint32_t
 	{
 		Disabled 			= 0,
-%% if id in [1, 2]
-		Div1 				= RCC_CFGR2_ADCPRE12_DIV1,
-		Div2 				= RCC_CFGR2_ADCPRE12_DIV2,
-		Div4 				= RCC_CFGR2_ADCPRE12_DIV4,
-		Div6 				= RCC_CFGR2_ADCPRE12_DIV6,
-		Div8 				= RCC_CFGR2_ADCPRE12_DIV8,
-		Div10 				= RCC_CFGR2_ADCPRE12_DIV10,
-		Div12 				= RCC_CFGR2_ADCPRE12_DIV12,
-		Div16 				= RCC_CFGR2_ADCPRE12_DIV16,
-		Div32 				= RCC_CFGR2_ADCPRE12_DIV32,
-		Div64 				= RCC_CFGR2_ADCPRE12_DIV64,
-		Div128 				= RCC_CFGR2_ADCPRE12_DIV128,
-		Div256 				= RCC_CFGR2_ADCPRE12_DIV256,
-		Div256AllBits 		= RCC_CFGR2_ADCPRE12,	// for bit clear
-%% elif id in [3, 4]
-		Div1 				= RCC_CFGR2_ADCPRE34_DIV1,
-		Div2 				= RCC_CFGR2_ADCPRE34_DIV2,
-		Div4 				= RCC_CFGR2_ADCPRE34_DIV4,
-		Div6 				= RCC_CFGR2_ADCPRE34_DIV6,
-		Div8 				= RCC_CFGR2_ADCPRE34_DIV8,
-		Div10 				= RCC_CFGR2_ADCPRE34_DIV10,
-		Div12 				= RCC_CFGR2_ADCPRE34_DIV12,
-		Div16 				= RCC_CFGR2_ADCPRE34_DIV16,
-		Div32 				= RCC_CFGR2_ADCPRE34_DIV32,
-		Div64 				= RCC_CFGR2_ADCPRE34_DIV64,
-		Div128 				= RCC_CFGR2_ADCPRE34_DIV128,
-		Div256 				= RCC_CFGR2_ADCPRE34_DIV256,
-		Div256AllBits 		= RCC_CFGR2_ADCPRE34,	// for bit clear
+		Div1 				= RCC_CFGR2_{{ adc_pre }}_DIV1,
+		Div2 				= RCC_CFGR2_{{ adc_pre }}_DIV2,
+		Div4 				= RCC_CFGR2_{{ adc_pre }}_DIV4,
+		Div6 				= RCC_CFGR2_{{ adc_pre }}_DIV6,
+		Div8 				= RCC_CFGR2_{{ adc_pre }}_DIV8,
+		Div10 				= RCC_CFGR2_{{ adc_pre }}_DIV10,
+		Div12 				= RCC_CFGR2_{{ adc_pre }}_DIV12,
+		Div16 				= RCC_CFGR2_{{ adc_pre }}_DIV16,
+		Div32 				= RCC_CFGR2_{{ adc_pre }}_DIV32,
+		Div64 				= RCC_CFGR2_{{ adc_pre }}_DIV64,
+		Div128 				= RCC_CFGR2_{{ adc_pre }}_DIV128,
+		Div256 				= RCC_CFGR2_{{ adc_pre }}_DIV256,
+		Div256AllBits 		= RCC_CFGR2_{{ adc_pre }},	// for bit clear
 %% endif
 	};
 

@@ -18,6 +18,7 @@
 	%% set id_common = '34'
 	%% set id_common_u = '3_4_COMMON'
 %% endif
+	%% set adc_ccr = 'ADC12_CCR'
 %#
 
 #include <xpcc/architecture/driver/delay.hpp>	// xpcc::delayMicroseconds
@@ -43,7 +44,7 @@ xpcc::stm32::Adc{{ id }}::initialize(const ClockMode clk, const Prescaler pre,
 			setPrescaler(pre);
 		}
 		tmp  =  ADC{{ id_common_u }}->CCR;
-		tmp &= ~ADC12_CCR_CKMODE;
+		tmp &= ~{{ adc_ccr }}_CKMODE;
 		tmp |=  static_cast<uint32_t>(clk);
 		ADC{{ id_common_u }}->CCR = tmp;
 	}
