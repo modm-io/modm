@@ -54,11 +54,14 @@ xpcc::stm32::Adc{{ id }}::initialize(const ClockMode clk, const Prescaler pre,
 	ADC{{ id }}->CR |= static_cast<uint32_t>(VoltageRegulatorState::Enabled);
 	xpcc::delayMicroseconds(10);	// FIXME: this is ugly -> find better solution
 
+	// Clear ready flag
+	ADC{{ id }}->ISR |= ADC_ISR_ADRDY;
+
 	calibrate(cal, true);	// blocking calibration
 
 	ADC{{ id }}->CR |= ADC_CR_ADEN;
 	if (blocking) {
-		while(!isReady());
+		while(not isReady());
 		acknowledgeInterruptFlag(InterruptFlag::Ready);
 	}
 }
