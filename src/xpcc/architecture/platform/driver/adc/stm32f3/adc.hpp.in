@@ -195,7 +195,7 @@ public:
 
 	enum class Interrupt : uint32_t
 	{
-		Ready 								= ADC_IER_RDY,
+		Ready 								= ADC_IER_ADRDYIE,
 		EndOfSampling 						= ADC_IER_EOSMP,
 		EndOfRegularConversion 				= ADC_IER_EOC,
 		EndOfRegularSequenceOfConversions 	= ADC_IER_EOS,
@@ -211,7 +211,7 @@ public:
 
 	enum class InterruptFlag : uint32_t
 	{
-		Ready 								= ADC_ISR_ADRD,
+		Ready 								= ADC_ISR_ADRDY,
 		EndOfSampling 						= ADC_ISR_EOSMP,
 		EndOfRegularConversion 				= ADC_ISR_EOC,
 		EndOfRegularSequenceOfConversions 	= ADC_ISR_EOS,
