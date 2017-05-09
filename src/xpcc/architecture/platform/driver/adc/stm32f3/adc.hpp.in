@@ -12,15 +12,28 @@
 	%% if target is stm32f3
 		%# 13-14 reserved
 		%% set channels = [1,2,3,4,5,6,7,8,9,10,11,12,15,16,17,18]
+	%% elif target is stm32l4
+		/// ADC1 is connected to 16 external channels + 3 internal channels
+		%% set channels = range(1,17)
 	%% else
 		%# 11-14 reserved
 		%% set channels = [1,2,3,4,5,6,7,8,9,10,15,16,17,18]
 	%% endif
 %% elif id == 2
-	%# 13-16 reserved
-	%% set channels = [1,2,3,4,5,6,7,8,9,10,11,12,17,18]
+	%% if target is stm32f3
+		%# 13-16 reserved
+		%% set channels = [1,2,3,4,5,6,7,8,9,10,11,12,17,18]
+	%% elif target is stm32l4
+		/// ADC2 is connected to 16 external channels + 2 internal channels
+		%% set channels = range(1,17)
+	%% endif
 %% elif id == 3
-	%% set channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
+	%% if target is stm32f3
+		%% set channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
+	%% elif target is stm32l4
+		/// ADC3 is connected to 12 external channels + 4 internal channels
+		%% set channels = [1,2,3,4,6,7,8,9,10,11,12,13]
+	%% endif
 %% elif id == 4
 	%# 14-16 reserved
 	%% set channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,17,18]
@@ -51,6 +64,7 @@ namespace stm32
  * This API is designed for the internal ADCs of STM32F30X/STM32F31X
  *
  * \author	Kevin Laeufer
+ * \author	Sascha Schade (strongly-typed)
  * \ingroup	stm32
  */
 class Adc{{ id }}
@@ -70,18 +84,36 @@ public:
 %% endfor
 %#
 %% if id == 1
+%% if target is stm32f3
 		Opamp1    = 15,
 		VTS       = 16,
 		BatDiv2   = 17,
 		InternalReference = 18,
 		// TODO: Add internal connections
+%% elif target is stm32l4
+		Temperature = 17,
+		BatDiv3     = 18,
+%% endif
 %% elif id == 2
+%% if target is stm32f3
 		Opamp2 = 17,
 		InternalReference = 18,
+%% elif target is stm32l4
+		Dac1 = 17,
+		Dac2 = 18,
+%% endif
 %% elif id == 3
+%% if target is stm32f3
 		Vss    =  4,	// ADC3_IN4 not bonded and connected to VSS
 		Opamp3 = 17,
 		InternalReference = 18,
+%% elif target is stm32l4
+		Dac1 = 14,
+		Dac2 = 15,
+		Vss  = 16,
+		Temperature = 17,
+		BatDiv3 = 18,
+%% endif
 %% elif id == 4
 		Opamp3 = 17,
 		InternalReference = 18,
