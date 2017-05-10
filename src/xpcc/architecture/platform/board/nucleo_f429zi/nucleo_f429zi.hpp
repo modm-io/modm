@@ -15,6 +15,7 @@
 
 #include <xpcc/architecture/platform.hpp>
 #include <xpcc/debug/logger.hpp>
+#define XPCC_BOARD_HAS_LOGGER
 
 using namespace xpcc::stm32;
 
