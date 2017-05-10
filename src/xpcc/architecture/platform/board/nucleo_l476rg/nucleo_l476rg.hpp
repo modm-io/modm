@@ -70,6 +70,9 @@ struct systemClock {
 	}
 };
 
+// Arduino Footprint
+#include "../nucleo64_arduino.hpp"
+
 // Button connects to GND
 using Button = xpcc::GpioInverted<GpioInputC13>;
 
