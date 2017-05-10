@@ -12,3 +12,4 @@ https://github.com/roboterclubaachen/getting-started-with-xpcc
 | Example            | External Hardware       | Nucleo L476RG    | Arduino Uno |
 |:-------------------|:------------------------|:-----------------|:------------|
 | Blinky( + Logger)  | None                    | &#9989;          | &#9989;     |
+| RTC DS1302         | RTC Module DS1302       | &#9989;          | &#9989;     |
