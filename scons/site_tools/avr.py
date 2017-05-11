@@ -136,6 +136,11 @@ def generate(env, **kw):
 		"-Wall",
 		"-Wextra",
 		"-Wundef",
+#		If we had a newer avr-g++ :-(
+#		"-Werror=shift-count-negative",
+#		"-Werror=shift-count-overflow",
+#		"-Werror=shift-negative-value",
+#		"-Werror=shift-overflow",
 #		"-Winline",
 		"-Wa,-adhlns=${TARGET.base}.lst",
 		"-DBASENAME=${SOURCE.file}",
