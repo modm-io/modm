@@ -166,7 +166,7 @@ DispatcherTest::testEventTransmission()
 	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::EVENT);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x21);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 2);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().payload.getSize(), 4);
+	TEST_ASSERT_EQUALS(timeline->events.getFront().payload.getSize(), 4U);
 	
 	// Event was also send to the backend (broadcast)
 	TEST_ASSERT_EQUALS(backend->messagesSend.getSize(), 1U);

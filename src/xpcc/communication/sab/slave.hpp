@@ -49,6 +49,9 @@ namespace xpcc
 		class Transmitter
 		{
 		public:
+			virtual ~Transmitter()
+				{};
+
 			virtual void
 			send(bool acknowledge, const void *payload, std::size_t payloadLength) = 0;
 		};
