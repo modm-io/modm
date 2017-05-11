@@ -28,7 +28,7 @@ namespace bme280data {
 void
 Data::calculateCalibratedTemperature()
 {
-	int32_t adc = ((raw[3] << 16) | (raw[4] << 8) | (raw[5] << 0));
+	int32_t adc = (((int32_t(raw[3])) << 16) | (raw[4] << 8) | (raw[5] << 0));
 	adc >>= 4;
 
 	XPCC_LOG_DEBUG.printf("adc = 0x%05x\n", adc);
@@ -61,7 +61,7 @@ Data::calculateCalibratedPressure()
 		calculateCalibratedTemperature();
 	}
 
-	int32_t adc = ((raw[0] << 16) | (raw[1] << 8) | (raw[2] << 0));
+	int32_t adc = (((int32_t(raw[0])) << 16) | (raw[1] << 8) | (raw[2] << 0));
 	adc >>= 4;
 
 	int64_t P1 = calibration.P1;
