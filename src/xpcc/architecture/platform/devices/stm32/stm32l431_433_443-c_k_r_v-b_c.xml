@@ -103,8 +103,8 @@
     <driver type="adc" name="stm32l4" instances="1"/>
     <driver type="can" name="stm32" instances="1"/>
     <driver type="clock" name="stm32"/>
-    <driver type="i2c" name="stm32" instances="1,3"/>
-    <driver device-pin-id="c|r|v" type="i2c" name="stm32" instances="2"/>
+    <driver type="i2c" name="stm32l4" instances="1,3"/>
+    <driver device-pin-id="c|r|v" type="i2c" name="stm32l4" instances="2"/>
     <driver type="random" name="stm32"/>
     <driver type="spi" name="stm32" instances="1,3"/>
     <driver device-pin-id="c|r|v" type="spi" name="stm32" instances="2"/>
