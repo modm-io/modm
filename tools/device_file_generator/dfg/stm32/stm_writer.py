@@ -54,7 +54,7 @@ class STMDeviceWriter(XMLDeviceWriter):
 				   'f7': 'stm32',
 				   'l0': 'stm32l0',
 				   'l1': 'stm32l1',
-				   'l4': 'stm32l4'}
+				   'l4': 'stm32f3'}
 		# ADC
 		if self.device.id.family == 'f3' and self.device.id.name == '373':
 			self.addModuleAttributesToNode(self.root, 'ADC', 'adc', 'stm32')
