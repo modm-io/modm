@@ -74,7 +74,10 @@ class STMDeviceWriter(XMLDeviceWriter):
 		self.addModuleAttributesToNode(self.root, 'FSMC', 'fsmc')
 		self.addModuleAttributesToNode(self.root, 'FMC', 'fsmc')
 		# I2C
-		self.addModuleAttributesToNode(self.root, 'I2C', 'i2c')
+		if (self.device.id.family in ['l0', 'l4']):
+			self.addModuleAttributesToNode(self.root, 'I2C', 'i2c', 'stm32l4')
+		else:
+			self.addModuleAttributesToNode(self.root, 'I2C', 'i2c')
 		# ID
 		self.addModuleAttributesToNode(self.root, 'ID', 'id')
 		# Random
