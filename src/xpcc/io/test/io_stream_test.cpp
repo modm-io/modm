@@ -477,6 +477,8 @@ IoStreamTest::testPrintf1()
 void
 IoStreamTest::testPrintf2()
 {
+#ifdef XPCC__OS_HOSTED
+	// Only run on hosted because glibc needs so many flash and RAM may crash.
 	// Compare xpcc's formatter with glibc's formatter
 
 	float ff_testvector[] = {
@@ -515,6 +517,7 @@ IoStreamTest::testPrintf2()
 			}
 		}
 	}
+#endif
 }
 
 int myFunc1(void) { return -1; };
