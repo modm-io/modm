@@ -19,10 +19,8 @@
 // TODO: Include F0 ADC driver here when implemented.
 %% else
 %% for instance in gpios | getAdcs
-	%% if (target is stm32f3 and target.name != "373")
+	%% if (target is stm32f3 and target.name != "373") or (target is stm32l4)
 #include "../../adc/stm32f3/adc_{{instance}}.hpp"
-	%% elif (target is stm32l4)
-#include "../../adc/stm32l4/adc_{{instance}}.hpp"
 	%% else
 #include "../../adc/stm32/adc_{{instance}}.hpp"
 	%% endif
@@ -226,6 +224,9 @@ private:
 	xpcc_always_inline static void
 	setAnalogInput() {
 		{{reg}}->MODER |= i(Mode::Analog) << (pin * 2);
+		%% if target is stm32l4
+		{{reg}}->ASCR |= (1 << pin);
+		%% endif
 	}
 
 public:

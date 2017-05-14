@@ -128,8 +128,8 @@
       <vector device-name="451" position="83" name="I2C4_EV"/>
       <vector device-name="451" position="84" name="I2C4_ER"/>
     </driver>
-    <driver type="adc" name="stm32l4" instances="1"/>
-    <driver device-name="471" type="adc" name="stm32l4" instances="2,3"/>
+    <driver type="adc" name="stm32f3" instances="1"/>
+    <driver device-name="471" type="adc" name="stm32f3" instances="2,3"/>
     <driver type="can" name="stm32" instances="1"/>
     <driver type="clock" name="stm32"/>
     <driver type="i2c" name="stm32l4" instances="1,2,3"/>

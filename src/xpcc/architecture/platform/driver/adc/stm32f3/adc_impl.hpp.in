@@ -11,6 +11,7 @@
 #	error 	"Don't include this file directly, use 'adc_{{ id }}.hpp' instead!"
 #endif
 %#
+%% if target is stm32f3
 %% if id in [1,2]
 	%% set id_common = '12'
 	%% set id_common_u = '1_2_COMMON'
@@ -18,18 +19,40 @@
 	%% set id_common = '34'
 	%% set id_common_u = '3_4_COMMON'
 %% endif
+%% elif target is stm32l4
+	%% set id_common = '123'
+	%% set id_common_u = '123_COMMON'
+%% endif
+%% if target is stm32f3
+	%% set adc_ccr = 'ADC12_CCR'
+%% elif target is stm32l4
+	%% set adc_ccr = 'ADC_CCR'
+%% endif
 %#
 
 #include <xpcc/architecture/driver/delay.hpp>	// xpcc::delayMicroseconds
 
 void
-xpcc::stm32::Adc{{ id }}::initialize(const ClockMode clk, const Prescaler pre,
+xpcc::stm32::Adc{{ id }}::initialize(const ClockMode clk,
+%% if target is stm32l4
+		const ClockSource clk_src,
+%% endif
+		const Prescaler pre,
 		const CalibrationMode cal, const bool blocking)
 {
 	uint32_t tmp = 0;
 
+%% if target is stm32f3
 	// enable clock
 	RCC->AHBENR |= RCC_AHBENR_ADC{{ id_common }}EN;
+%% elif target is stm32l4
+	// enable and select clock
+	RCC->AHB2ENR |= RCC_AHB2ENR_ADCEN;
+	RCC->CCIPR |= static_cast<uint32_t>(clk_src);
+
+	// Disable deep power down
+	ADC{{ id }}->CR &= ~ADC_CR_DEEPPWD;
+%% endif
 
 	// reset ADC
 	// FIXME: not a good idea since you can only reset both
@@ -43,7 +66,7 @@ xpcc::stm32::Adc{{ id }}::initialize(const ClockMode clk, const Prescaler pre,
 			setPrescaler(pre);
 		}
 		tmp  =  ADC{{ id_common_u }}->CCR;
-		tmp &= ~ADC12_CCR_CKMODE;
+		tmp &= ~{{ adc_ccr }}_CKMODE;
 		tmp |=  static_cast<uint32_t>(clk);
 		ADC{{ id_common_u }}->CCR = tmp;
 	}
@@ -53,11 +76,14 @@ xpcc::stm32::Adc{{ id }}::initialize(const ClockMode clk, const Prescaler pre,
 	ADC{{ id }}->CR |= static_cast<uint32_t>(VoltageRegulatorState::Enabled);
 	xpcc::delayMicroseconds(10);	// FIXME: this is ugly -> find better solution
 
+	// Clear ready flag
+	ADC{{ id }}->ISR |= ADC_ISR_ADRDY;
+
 	calibrate(cal, true);	// blocking calibration
 
 	ADC{{ id }}->CR |= ADC_CR_ADEN;
 	if (blocking) {
-		while(!isReady());
+		while(not isReady());
 		acknowledgeInterruptFlag(InterruptFlag::Ready);
 	}
 }
@@ -71,17 +97,28 @@ xpcc::stm32::Adc{{ id }}::disable(const bool blocking)
 		while(ADC{{ id }}->CR & ADC_CR_ADDIS);
 	}
 	// disable clock
+%% if target is stm32f3
 	RCC->AHBENR &= ~RCC_AHBENR_ADC{{ id_common }}EN;
+%% elif target is stm32l4
+	RCC->AHB2ENR &= ~RCC_AHB2ENR_ADCEN;
+%% endif
 }
 
 void
 xpcc::stm32::Adc{{ id }}::setPrescaler(const Prescaler pre)
 {
 	uint32_t tmp;
+%% if target is stm32f3
 	tmp  = RCC->CFGR2;
 	tmp &= ~static_cast<uint32_t>(Prescaler::Div256AllBits);
 	tmp |=  static_cast<uint32_t>(pre);
 	RCC->CFGR2 = tmp;
+%% elif target is stm32l4
+	tmp  = ADC{{ id_common_u }}->CCR;
+	tmp &= ~static_cast<uint32_t>(Prescaler::Div256AllBits);
+	tmp |=  static_cast<uint32_t>(pre);
+	ADC{{ id_common_u }}->CCR = tmp;
+%% endif
 }
 
 bool
