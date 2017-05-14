@@ -193,7 +193,7 @@ Bmp085Test::testConversion()
 		XPCC_LOG_DEBUG.printf(" max = %d\n", max_error);
 		XPCC_LOG_DEBUG.printf(" sum = %d\n", total_error);
 
-		TEST_ASSERT_TRUE(total_error <= 1541);
-		TEST_ASSERT_TRUE(max_error <= 71);
+		TEST_ASSERT_EQUALS_RANGE(total_error, 0, 1541);
+		TEST_ASSERT_EQUALS_RANGE(max_error,   0,   71);
 	}
 }
