@@ -76,8 +76,8 @@
     </driver>
     <driver type="adc" name="stm32l0"/>
     <driver type="clock" name="stm32"/>
-    <driver type="i2c" name="stm32" instances="1"/>
-    <driver device-name="051|052|053|063" device-pin-id="c|r|t" type="i2c" name="stm32" instances="2"/>
+    <driver type="i2c" name="stm32l4" instances="1"/>
+    <driver device-name="051|052|053|063" device-pin-id="c|r|t" type="i2c" name="stm32l4" instances="2"/>
     <driver device-name="052|053|062|063" type="random" name="stm32"/>
     <driver type="spi" name="stm32" instances="1"/>
     <driver device-name="051|052|053|063" device-pin-id="c|r" type="spi" name="stm32" instances="2"/>

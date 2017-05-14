@@ -101,8 +101,8 @@
     </driver>
     <driver type="adc" name="stm32l0"/>
     <driver type="clock" name="stm32"/>
-    <driver type="i2c" name="stm32" instances="1,3"/>
-    <driver device-name="071|072|073|081|083" device-pin-id="c|r|v" type="i2c" name="stm32" instances="2"/>
+    <driver type="i2c" name="stm32l4" instances="1,3"/>
+    <driver device-name="071|072|073|081|083" device-pin-id="c|r|v" type="i2c" name="stm32l4" instances="2"/>
     <driver device-name="072|073|082|083" type="random" name="stm32"/>
     <driver type="spi" name="stm32" instances="1"/>
     <driver device-name="071|072|073|081|083" device-pin-id="c|r|v" type="spi" name="stm32" instances="2"/>
