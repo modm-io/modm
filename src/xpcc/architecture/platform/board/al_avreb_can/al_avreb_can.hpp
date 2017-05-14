@@ -31,6 +31,8 @@ using Led3 = xpcc::GpioInverted<GpioOutputF3>;
 using Button = xpcc::GpioUnused;
 using Leds = xpcc::SoftwareGpioPort< Led3, Led2, Led1, Led0 >;
 
+// Create an IODeviceWrapper around the Uart Peripheral we want to use
+using LoggerDevice = xpcc::IODeviceWrapper< Uart1, xpcc::IOBuffer::BlockIfFull >;
 
 inline void
 initialize()

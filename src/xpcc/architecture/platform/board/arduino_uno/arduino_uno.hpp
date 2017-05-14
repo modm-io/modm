@@ -53,6 +53,8 @@ using LedD13 = D13;
 
 using Leds = xpcc::SoftwareGpioPort< LedD13 >;
 
+// Create an IODeviceWrapper around the Uart Peripheral we want to use
+using LoggerDevice = xpcc::IODeviceWrapper< Uart0, xpcc::IOBuffer::BlockIfFull >;
 
 inline void
 initialize()

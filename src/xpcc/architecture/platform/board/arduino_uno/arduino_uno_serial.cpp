@@ -7,7 +7,7 @@
 #include "arduino_uno.hpp"
 
 // Create an IODeviceWrapper around the Uart Peripheral we want to use
-xpcc::IODeviceWrapper< Uart0, xpcc::IOBuffer::BlockIfFull > loggerDevice;
+Board::LoggerDevice loggerDevice;
 
 // Set all four logger streams to use the UART
 xpcc::IOStream serialStream(loggerDevice);
