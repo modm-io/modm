@@ -901,7 +901,7 @@ ResumableTest::testReturnVoidClass()
 	auto result = thread.resumable();
 	TEST_ASSERT_EQUALS(result.getState(), xpcc::rf::Stop);
 	TEST_ASSERT_EQUALS(result.getResult(), xpcc::rf::Stop);
-	TEST_ASSERT_TRUE(sizeof(result) == 1);
+	TEST_ASSERT_EQUALS(sizeof(result), 1U);
 
 	// this now returns the state
 	auto result2 = RF_CALL_BLOCKING(thread.resumable());
