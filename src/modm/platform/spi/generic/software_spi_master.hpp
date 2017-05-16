@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2009-2012, Fabian Greif
- * Copyright (c) 2010, Thorsten Lajewski
  * Copyright (c) 2010, Georgi Grinshpun
+ * Copyright (c) 2010, Thorsten Lajewski
  * Copyright (c) 2012-2016, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
  *

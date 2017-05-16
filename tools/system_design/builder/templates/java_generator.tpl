@@ -1,5 +1,5 @@
-%# Copyright (c) 2011, Georgi Grinshpun
 %# Copyright (c) 2011, Fabian Greif
+%# Copyright (c) 2011, Georgi Grinshpun
 %# Copyright (c) 2015, Sascha Schade
 %#
 %# This file is part of the modm project.

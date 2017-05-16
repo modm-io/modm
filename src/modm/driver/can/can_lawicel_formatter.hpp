@@ -1,9 +1,9 @@
 /*
  * Copyright (c) 2010, Thorsten Lajewski
  * Copyright (c) 2011, Fabian Greif
- * Copyright (c) 2012, Dave Webb
+ * Copyright (c) 2012, Sascha Schade
  * Copyright (c) 2012-2015, Niklas Hauser
- * Copyright (c) 2015, Kevin Laeufer
+ * Copyright (c) 2015, Kevin Läufer
  *
  * This file is part of the modm project.
  *

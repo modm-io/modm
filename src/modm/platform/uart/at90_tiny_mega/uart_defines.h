@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2011, Fabian Greif
+ * Copyright (c) 2009-2011, 2017, Fabian Greif
  * Copyright (c) 2012-2014, Niklas Hauser
  * Copyright (c) 2013, 2015, Sascha Schade
  *

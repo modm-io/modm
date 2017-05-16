@@ -4,6 +4,7 @@
  * Copyright (c) 2011-2012, 2014-2015, Niklas Hauser
  * Copyright (c) 2012, 2015, Sascha Schade
  * Copyright (c) 2015, Daniel Krebs
+ * Copyright (c) 2016, Tarik TIRE
  *
  * This file is part of the modm project.
  *

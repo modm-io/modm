@@ -1,13 +1,13 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2013-2015, Kevin Laeufer
 # Copyright (c) 2013, Martin Rosekeit
+# Copyright (c) 2013-2015, Kevin Läufer
 # Copyright (c) 2013-2016, Niklas Hauser
 # Copyright (c) 2014, 2016, Sascha Schade
 # Copyright (c) 2015, Georgi Grinshpun
-# Copyright (c) 2016, Fabian Greif
 # Copyright (c) 2016, Daniel Krebs
+# Copyright (c) 2016, Fabian Greif
 #
 # This file is part of the modm project.
 #

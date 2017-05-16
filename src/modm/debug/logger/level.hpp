@@ -2,6 +2,7 @@
  * Copyright (c) 2009, Martin Rosekeit
  * Copyright (c) 2009-2012, Fabian Greif
  * Copyright (c) 2012, Niklas Hauser
+ * Copyright (c) 2016, Tarik TIRE
  *
  * This file is part of the modm project.
  *

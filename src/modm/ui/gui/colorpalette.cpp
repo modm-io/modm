@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2014, Daniel Krebs
- * Copyright (c) 2014, Kevin Laeufer
+ * Copyright (c) 2014, Kevin Läufer
  * Copyright (c) 2014, Niklas Hauser
- * Copyright (c) 2015, None
+ * Copyright (c) 2015, Niclas Rohrer
  *
  * This file is part of the modm project.
  *

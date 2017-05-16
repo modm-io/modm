@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Niklas Hauser
- * Copyright (c) 2015, None
- * Copyright (c) 2015, Kevin Laeufer
+ * Copyright (c) 2015, Kevin Läufer
+ * Copyright (c) 2015, Martin Esser
  *
  * This file is part of the modm project.
  *

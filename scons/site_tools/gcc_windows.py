@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2011-2012, Georgi Grinshpun
-# Copyright (c) 2012, Sascha Schade
 # Copyright (c) 2012, Fabian Greif
-# Copyright (c) 2015, Kevin Laeufer
+# Copyright (c) 2012, Sascha Schade
+# Copyright (c) 2015, Kevin Läufer
 # Copyright (c) 2016, Daniel Krebs
 #
 # This file is part of the modm project.

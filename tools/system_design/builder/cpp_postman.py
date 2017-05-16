@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2010-2011, Fabian Greif
-# Copyright (c) 2012, 2014, Sascha Schade
+# Copyright (c) 2012, 2014, 2016, Sascha Schade
 # Copyright (c) 2015, Niklas Hauser
 # Copyright (c) 2016, Daniel Krebs
 #

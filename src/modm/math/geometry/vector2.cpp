@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2010, 2012, Martin Rosekeit
  * Copyright (c) 2010-2012, Fabian Greif
+ * Copyright (c) 2010, 2012, Martin Rosekeit
  * Copyright (c) 2012, Georgi Grinshpun
  * Copyright (c) 2012, Niklas Hauser
  *

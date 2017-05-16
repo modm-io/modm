@@ -3,8 +3,8 @@
 #
 # Copyright (c) 2011, Fabian Greif
 # Copyright (c) 2011, Georgi Grinshpun
-# Copyright (c) 2015, Sascha Schade
 # Copyright (c) 2015, Niklas Hauser
+# Copyright (c) 2015, Sascha Schade
 # Copyright (c) 2016, Daniel Krebs
 #
 # This file is part of the modm project.

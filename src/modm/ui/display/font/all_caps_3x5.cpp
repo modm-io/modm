@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Fabian Greif
  * Copyright (c) 2012-2013, Niklas Hauser
- * Copyright (c) 2013, Kevin Laeufer
+ * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2013, 2015, Sascha Schade
  * Copyright (c) 2014, Daniel Krebs
  *

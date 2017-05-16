@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2013, Kevin Laeufer
+# Copyright (c) 2013, Kevin Läufer
 # Copyright (c) 2013, Niklas Hauser
 # Copyright (c) 2016, Daniel Krebs
 #

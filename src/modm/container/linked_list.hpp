@@ -3,7 +3,7 @@
  * Copyright (c) 2011, Thorsten Lajewski
  * Copyright (c) 2012, Niklas Hauser
  * Copyright (c) 2013-2014, Sascha Schade
- * Copyright (c) 2015, Kevin Laeufer
+ * Copyright (c) 2015, Kevin Läufer
  *
  * This file is part of the modm project.
  *

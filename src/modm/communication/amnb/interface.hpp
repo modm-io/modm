@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2009-2011, Fabian Greif
  * Copyright (c) 2009, Georgi Grinshpun
+ * Copyright (c) 2009-2011, Fabian Greif
  * Copyright (c) 2011-2013, 2015-2016, Niklas Hauser
  * Copyright (c) 2013, Sascha Schade
  *

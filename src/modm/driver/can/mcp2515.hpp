@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2009-2011, Fabian Greif
- * Copyright (c) 2010, Thorsten Lajewski
  * Copyright (c) 2010, Martin Rosekeit
+ * Copyright (c) 2010, Thorsten Lajewski
  * Copyright (c) 2012-2015, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
  *

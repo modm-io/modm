@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2013, Fabian Greif
  * Copyright (c) 2013, Daniel Krebs
+ * Copyright (c) 2013, Fabian Greif
  * Copyright (c) 2013, Sascha Schade
  * Copyright (c) 2014, Niklas Hauser
  *

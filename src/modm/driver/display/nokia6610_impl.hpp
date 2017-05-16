@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011, Georgi Grinshpun
- * Copyright (c) 2012, 2014, Sascha Schade
  * Copyright (c) 2012-2013, Niklas Hauser
+ * Copyright (c) 2012, 2014, Sascha Schade
  *
  * This file is part of the modm project.
  *

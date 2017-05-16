@@ -2,11 +2,13 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2010-2013, Fabian Greif
-# Copyright (c) 2012-2014, 2016, Sascha Schade
 # Copyright (c) 2012, 2014-2015, Georgi Grinshpun
-# Copyright (c) 2012-2016, Niklas Hauser
-# Copyright (c) 2013-2016, Kevin Laeufer
+# Copyright (c) 2012-2014, 2016, Sascha Schade
+# Copyright (c) 2012-2017, Niklas Hauser
+# Copyright (c) 2013-2016, Kevin Läufer
 # Copyright (c) 2015-2016, Daniel Krebs
+# Copyright (c) 2016, Raphael Lehmann
+# Copyright (c) 2016, Tarik TIRE
 #
 # This file is part of the modm project.
 #

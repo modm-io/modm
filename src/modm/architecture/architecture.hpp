@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009, Martin Rosekeit
- * Copyright (c) 2009-2011, 2016, Fabian Greif
+ * Copyright (c) 2009-2011, Fabian Greif
  * Copyright (c) 2012, 2015, Niklas Hauser
  * Copyright (c) 2015, Georgi Grinshpun
  *

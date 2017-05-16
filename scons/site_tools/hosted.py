@@ -6,8 +6,10 @@
 # Copyright (c) 2010, Georgi Grinshpun
 # Copyright (c) 2011-2015, Niklas Hauser
 # Copyright (c) 2012-2013, 2015, Sascha Schade
-# Copyright (c) 2013-2015, Kevin Laeufer
+# Copyright (c) 2013-2015, Kevin Läufer
 # Copyright (c) 2016, Daniel Krebs
+# Copyright (c) 2016, Raphael Lehmann
+# Copyright (c) 2016, Tarik TIRE
 #
 # This file is part of the modm project.
 #

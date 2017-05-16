@@ -1,6 +1,6 @@
 %# Copyright (c) 2013, Georgi Grinshpun
-%# Copyright (c) 2015, Sascha Schade
 %# Copyright (c) 2015, Niklas Hauser
+%# Copyright (c) 2015, Sascha Schade
 %#
 %# This file is part of the modm project.
 %#

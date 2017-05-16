@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2012, 2015, Sascha Schade
+# Copyright (c) 2012, 2015-2016, Sascha Schade
 # Copyright (c) 2016, Daniel Krebs
 #
 # This file is part of the modm project.

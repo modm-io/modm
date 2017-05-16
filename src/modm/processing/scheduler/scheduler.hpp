@@ -2,7 +2,7 @@
  * Copyright (c) 2009-2011, Fabian Greif
  * Copyright (c) 2010, Martin Rosekeit
  * Copyright (c) 2012, 2015-2016, Niklas Hauser
- * Copyright (c) 2013, Kevin Laeufer
+ * Copyright (c) 2013, Kevin Läufer
  *
  * This file is part of the modm project.
  *

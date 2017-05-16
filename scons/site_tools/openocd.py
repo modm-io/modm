@@ -7,6 +7,7 @@
 # Copyright (c) 2012, Sascha Schade
 # Copyright (c) 2012, 2016, Niklas Hauser
 # Copyright (c) 2016, Daniel Krebs
+# Copyright (c) 2016, Tarik TIRE
 #
 # This file is part of the modm project.
 #

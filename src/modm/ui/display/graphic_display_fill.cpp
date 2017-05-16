@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2010-2011, 2013, Fabian Greif
  * Copyright (c) 2012-2013, Niklas Hauser
+ * Copyright (c) 2013, Hans Schily
  * Copyright (c) 2013, Thorsten Lajewski
- * Copyright (c) 2013, None
  *
  * This file is part of the modm project.
  *

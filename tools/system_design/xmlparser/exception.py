@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2010-2011, Fabian Greif
 # Copyright (c) 2010, Georgi Grinshpun
+# Copyright (c) 2010-2011, Fabian Greif
 # Copyright (c) 2016, Daniel Krebs
 #
 # This file is part of the modm project.

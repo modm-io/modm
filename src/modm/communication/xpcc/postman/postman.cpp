@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Fabian Greif
+ * Copyright (c) 2010, Fabian Greif
  *
  * This file is part of the modm project.
  *

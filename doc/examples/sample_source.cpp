@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2009-2010, Fabian Greif
  * Copyright (c) 2009, Martin Rosekeit
+ * Copyright (c) 2009-2010, Fabian Greif
  * Copyright (c) 2012, Sascha Schade
  *
  * This file is part of the modm project.

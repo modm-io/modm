@@ -1,10 +1,11 @@
 /*
- * Copyright (c) 2011-2012, Fabian Greif
- * Copyright (c) 2011, Martin Rosekeit
  * Copyright (c) 2011, Georgi Grinshpun
+ * Copyright (c) 2011, Martin Rosekeit
+ * Copyright (c) 2011-2012, Fabian Greif
  * Copyright (c) 2012, 2014-2016, Niklas Hauser
- * Copyright (c) 2013, Kevin Laeufer
+ * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2015, Sascha Schade
+ * Copyright (c) 2016, Tarik TIRE
  *
  * This file is part of the modm project.
  *

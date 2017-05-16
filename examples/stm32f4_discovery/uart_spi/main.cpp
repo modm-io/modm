@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Kevin Laeufer
+ * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2013-2016, Niklas Hauser
  *
  * This file is part of the modm project.
