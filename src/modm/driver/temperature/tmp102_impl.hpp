@@ -145,7 +145,7 @@ modm::Tmp102<I2cMaster>::readComparatorMode(bool &result)
 	if (RF_CALL( this->runTransaction() ))
 	{
 		reinterpret_cast<Config1_t&>(this->config_msb) = Config1_t(this->buffer[0]) & ~Resolution_t::mask();
-		result =     Config2_t(this->buffer[1]) &  Config2::Alert;
+		result = static_cast<bool>(Config2_t(this->buffer[1]) & Config2::Alert);
 		config_lsb = Config2_t(this->buffer[1]) & ~Config2::Alert;
 		RF_RETURN(true);
 	}

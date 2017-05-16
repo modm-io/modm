@@ -65,7 +65,7 @@ modm::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::update()
 		for (int_fast16_t y = 0; y < height; ++y)
 		{
 			// group of 8 black-and-white pixels
-			uint_fast8_t group = this->buffer[x][y];
+			uint_fast8_t group = this->display_buffer[x][y];
 			uint16_t PortBuffer[8];
 			uint_fast8_t PortIdx = 0;
 

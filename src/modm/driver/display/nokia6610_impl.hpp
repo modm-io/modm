@@ -195,7 +195,7 @@ modm::Nokia6610<SPI, CS, Reset, GE12>::update() {
 	for(uint8_t x = 0; x < this->getWidth(); ++x)
 	{
 		for(uint8_t y = 0; y < this->getHeight()/8; ++y) {
-			uint8_t group = this->buffer[x][y];
+			uint8_t group = this->display_buffer[x][y];
 			for (uint8_t pix = 0; pix < 8; pix+=2, group>>=2){
 				uint32_t data =
 						((group&1)?mask1Filled:mask1Blank)|

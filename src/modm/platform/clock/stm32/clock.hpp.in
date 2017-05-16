@@ -49,7 +49,7 @@ public:
 	enum class
 	PllSource : uint32_t
 	{
-%% if target["family"] in ["f2", "f4", "f7"]
+%% if target["family"] in ["f2", "f4", "f7", "l4"]
 		/// High speed internal clock (16 MHz)
 		Hsi = RCC_PLLCFGR_PLLSRC_HSI,
 		/// High speed external clock (see HseConfig)
@@ -73,6 +73,10 @@ public:
 		/// High speed internal clock (48 MHz)
 		Hsi48 = RCC_CFGR_PLLSRC_HSI48_PREDIV,
 		InternalClockMHz48 = Hsi48,
+%% endif
+%% if target["family"] in ["l4"]
+		Msi = RCC_PLLCFGR_PLLSRC_MSI,
+		MultiSpeedInternalClock = Msi,
 %% endif
 
 		InternalClock = Hsi,
@@ -182,6 +186,20 @@ public:
 		Pll = RCC_CFGR_MCO2_1 | RCC_CFGR_MCO2_0,
 	};
 	%% endif
+%% elif target["family"] in ["l4"]
+	enum class
+	ClockOutputSource : uint32_t
+	{
+		Disable = 0,
+		SystemClock = RCC_CFGR_MCOSEL_0, // SYSCLK
+		MultiSpeedInternalClock = RCC_CFGR_MCOSEL_1, // MSI
+		InternalClock = RCC_CFGR_MCOSEL_1 | RCC_CFGR_MCOSEL_0, // HSI16
+		ExternalClock = RCC_CFGR_MCOSEL_2, // HSE
+		ExternalCrystal = RCC_CFGR_MCOSEL_2, // HSE
+		Pll = RCC_CFGR_MCOSEL_2 | RCC_CFGR_MCOSEL_0, // Main PLL
+		// LSI
+		// LSE
+	};
 %% else
 	enum class
 	ClockOutputSource : uint32_t
@@ -226,6 +244,28 @@ public:
 	enableInternalClockMHz48(uint32_t waitCycles = 2048);
 %% endif
 
+%% if target["family"] in ["l4"]
+	enum class
+	MsiFrequency : uint32_t
+	{
+		kHz100 = RCC_CR_MSIRANGE_0,
+		kHz200 = RCC_CR_MSIRANGE_1,
+		kHz400 = RCC_CR_MSIRANGE_2,
+		kHz800 = RCC_CR_MSIRANGE_3,
+		MHz1   = RCC_CR_MSIRANGE_4,
+		MHz2   = RCC_CR_MSIRANGE_5,
+		MHz4   = RCC_CR_MSIRANGE_6,
+		MHz8   = RCC_CR_MSIRANGE_7,
+		MHz16  = RCC_CR_MSIRANGE_8,
+		MHz24  = RCC_CR_MSIRANGE_9,
+		MHz32  = RCC_CR_MSIRANGE_10,
+		MHz48  = RCC_CR_MSIRANGE_11,
+	};
+
+	static bool
+	enableMultiSpeedInternalClock(MsiFrequency msi_frequency = MsiFrequency::MHz4, uint32_t waitCycles = 2048);
+%% endif
+
 	static bool
 	enableExternalClock(uint32_t waitCycles = 2048);
 
@@ -242,7 +282,7 @@ public:
 	enableLowSpeedExternalCrystal(uint32_t waitCycles = 2048);
 
 	// plls
-%% if target["family"] in ["f2", "f4", "f7"]
+%% if target["family"] in ["f2", "f4", "f7", "l4"]
 	/**
 	 * Enable PLL.
 	 *
@@ -325,11 +365,28 @@ public:
 		return true;
 	}
 	%% endif
+%% elif target["family"] in ["l4"]
+	enum class
+	ClockOutputSourcePrescaler
+	{
+		Div1  = RCC_CFGR_MCOPRE_DIV1,
+		Div2  = RCC_CFGR_MCOPRE_DIV2,
+		Div4  = RCC_CFGR_MCOPRE_DIV4,
+		Div8  = RCC_CFGR_MCOPRE_DIV8,
+		Div16 = RCC_CFGR_MCOPRE_DIV16,
+	};
+
+	static inline bool
+	enableClockOutput(ClockOutputSource src, ClockOutputSourcePrescaler div = ClockOutputSourcePrescaler::Div1)
+	{
+		RCC->CFGR = (RCC->CFGR & ~(RCC_CFGR_MCOSEL)) | uint32_t(src) | uint32_t(div);
+		return true;
+	}
 %% else
 	static inline bool
 	enableClockOutput(ClockOutputSource src)
 	{
-		RCC->CFGR = (RCC->CFGR & ~(RCC_CFGR_MCO))| uint32_t(src);
+		RCC->CFGR = (RCC->CFGR & ~(RCC_CFGR_MCO)) | uint32_t(src);
 		return true;
 	}
 %% endif

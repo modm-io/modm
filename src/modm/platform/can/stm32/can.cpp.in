@@ -16,6 +16,7 @@
 #include <modm/debug/error_report.hpp>
 #include <modm/architecture/driver/atomic/queue.hpp>
 #include <modm/utils/utils.hpp>
+#include <modm/architecture/interface/assert.hpp>
 
 %% if id == ""
 #include "can.hpp"
@@ -61,11 +62,11 @@ modm::stm32::Can{{ id }}::initializeWithPrescaler(
 		uint32_t interruptPriority, Mode startupMode, bool overwriteOnOverrun)
 {
 	// enable clock
-	RCC->APB1ENR  |=  RCC_APB1ENR_{{ reg }}EN;
+	RCC->APB1ENR{{ apb_post }}  |=  RCC_APB1ENR{{ apb_post }}_{{ reg }}EN;
 
 	// reset controller
-	RCC->APB1RSTR |=  RCC_APB1RSTR_{{ reg }}RST;
-	RCC->APB1RSTR &= ~RCC_APB1RSTR_{{ reg }}RST;
+	RCC->APB1RSTR{{ apb_post }} |=  RCC_APB1RSTR{{ apb_post }}_{{ reg }}RST;
+	RCC->APB1RSTR{{ apb_post }} &= ~RCC_APB1RSTR{{ apb_post }}_{{ reg }}RST;
 
 	// CAN Master Reset
 	// FMP bits and CAN_MCR register are initialized to the reset values
@@ -90,11 +91,14 @@ modm::stm32::Can{{ id }}::initializeWithPrescaler(
 
 	// Request initialization
 	{{ reg }}->MCR |= CAN_MCR_INRQ;
-	while (({{ reg }}->MSR & CAN_MSR_INAK) == 0) {
+	int deadlockPreventer = 10000; // max ~10ms
+	while ((({{ reg }}->MSR & CAN_MSR_INAK) == 0) and (deadlockPreventer-- > 0)) {
+		modm::delayMicroseconds(1);
 		// Wait until the initialization mode is entered.
 		// The CAN hardware waits until the current CAN activity (transmission
 		// or reception) is completed before entering the initialization mode.
 	}
+	modm_assert(deadlockPreventer > 0, "can", "init", "timeout", {{ id }});
 
 	// Enable Interrupts:
 	// FIFO1 Overrun, FIFO0 Overrun
@@ -140,11 +144,11 @@ modm::stm32::Can{{ id }}::initializeWithPrescaler(
 
 	// Request leave initialization
 	{{ reg }}->MCR &= ~(uint32_t)CAN_MCR_INRQ;
-	while (({{ reg }}->MSR & CAN_MSR_INAK) == CAN_MSR_INAK) {
+	deadlockPreventer = 10000; // max ~10ms
+	while ((({{ reg }}->MSR & CAN_MSR_INAK) == CAN_MSR_INAK) and (deadlockPreventer-- > 0))  {
 		// wait for the normal mode
 	}
-
-	return;
+	modm_assert(deadlockPreventer > 0, "can", "init", "timeout", {{ id }});
 }
 
 // ----------------------------------------------------------------------------

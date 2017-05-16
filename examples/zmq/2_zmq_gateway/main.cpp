@@ -14,7 +14,7 @@
 
 #include <modm/architecture/interface/can.hpp>
 #include <modm/architecture/platform/driver/can/canusb/canusb.hpp>
-#include <modm/architecture/platform/driver/can/socketcan/socketcan.hpp>
+// #include <modm/architecture/platform/driver/can/socketcan/socketcan.hpp>
 
 #include <modm/communication/communication.hpp>
 #include <modm/communication/modm/backend/can.hpp>
@@ -37,8 +37,8 @@
  * - All modm messages will be published on port 8211 by zeromq
  */
 
-// Default baud rate
-static constexpr uint32_t canBusBaudRate = 125000;
+// Default CAN bitrate
+static constexpr modm::Can::Bitrate canBusBitRate = modm::Can::kBps125;
 
 /* Either use an USB CAN2USB adaptor with modm Lawicel interpreter
    or use a CAN controller supported by Linux' SocketCAN.
@@ -46,11 +46,13 @@ static constexpr uint32_t canBusBaudRate = 125000;
    With SocketCAN the baudrate must be set with the operating system.
    $ ip link set can0 type can bitrate
 */
-// static modm::hosted::CanUsb canUsb;
-static modm::hosted::SocketCan canSocket;
+modm::hosted::SerialInterface port("/dev/ttyUSB0", 115200);
+using CanUsb = modm::hosted::CanUsb<modm::hosted::SerialInterface>;
+CanUsb canUsb(port);
+// static modm::hosted::SocketCan canSocket;
 
-// static modm::CanConnector< modm::hosted::CanUsb > canConnector(&canUsb);
-static modm::CanConnector< modm::hosted::SocketCan > canConnector(&canSocket);
+static modm::CanConnector< CanUsb > canConnector(&canUsb);
+// static modm::CanConnector< modm::hosted::SocketCan > canConnector(&canSocket);
 
 #undef MODM_LOG_LEVEL
 #define	MODM_LOG_LEVEL modm::log::DEBUG
@@ -60,8 +62,8 @@ main()
 {
 	MODM_LOG_DEBUG << "ZeroMQ SocketCAN MODM bridge" << modm::endl;
 
-	// if (not canUsb.open("/dev/ttyUSB0", canBusBaudRate)) {
-	if (not canSocket.open("can0" /*, canBusBaudRate */)) {
+	if (not canUsb.open(canBusBitRate)) {
+	// if (not canSocket.open("can0" /*, canBusBitRate */)) {
 		MODM_LOG_ERROR << "Could not open port" << modm::endl;
 		exit(EXIT_FAILURE);
 	}
@@ -105,6 +107,6 @@ main()
 		modm::delayMilliseconds(10);
 	}
 
-	// canUsb.close();
-	canSocket.close();
+	canUsb.close();
+	// canSocket.close();
 }

@@ -14,6 +14,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <modm/architecture/interface/assert.hpp>
 
 #include "ram.hpp"
 
@@ -81,11 +82,9 @@ initializeMemory(void)
 void *
 modm::avr::allocateMemory(std::size_t requestedSize)
 {
-	if (requestedSize == 0 ||
-		requestedSize > MAX_BLOCK_PARTS * BLOCK_SIZE)
-	{
+	if (!modm_assert_debug(requestedSize > 0 && requestedSize <= MAX_BLOCK_PARTS * BLOCK_SIZE,
+						   "core", "heap", "malloc", requestedSize))
 		return 0;
-	}
 
 	requestedSize += 2;	// bytes needed for the mangement
 	uint8_t neededSlots = requestedSize / BLOCK_SIZE;
@@ -144,9 +143,8 @@ modm::avr::allocateMemory(std::size_t requestedSize)
 	avail = cp - __brkval;
 	*/
 
-	if (slotsAvailable < neededSlots) {
+	if (!modm_assert_debug(slotsAvailable >= neededSlots, "core", "heap", "malloc", requestedSize))
 		return 0;
-	}
 
 	*p = neededSlots;
 	*(p + neededSlots * BLOCK_SIZE - 1) = neededSlots;

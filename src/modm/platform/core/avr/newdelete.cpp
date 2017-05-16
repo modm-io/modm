@@ -13,30 +13,40 @@
 // ----------------------------------------------------------------------------
 
 #include "ram.hpp"
+#include <new>
 #include <modm/architecture/interface/memory.hpp>
+#include <modm/architecture/interface/assert.hpp>
 
 void *
 operator new(size_t size)
 {
-	return modm::avr::allocateMemory(size);
+	void * ptr = modm::avr::allocateMemory(size);
+	modm_assert(ptr, "core", "heap", "new", size);
+	return ptr;
 }
 
 void *
 operator new[](size_t size)
 {
-	return modm::avr::allocateMemory(size);
+	void * ptr = modm::avr::allocateMemory(size);
+	modm_assert(ptr, "core", "heap", "new", size);
+	return ptr;
 }
 
 void *
 operator new(size_t size, modm::MemoryTraits)
 {
-	return modm::avr::allocateMemory(size);
+	void * ptr = modm::avr::allocateMemory(size);
+	modm_assert(ptr, "core", "heap", "new", size);
+	return ptr;
 }
 
 void *
 operator new[](size_t size, modm::MemoryTraits)
 {
-	return modm::avr::allocateMemory(size);
+	void * ptr = modm::avr::allocateMemory(size);
+	modm_assert(ptr, "core", "heap", "new", size);
+	return ptr;
 }
 
 void
@@ -46,7 +56,7 @@ operator delete(void* ptr)
 }
 
 void
-operator delete(void* ptr, size_t size __attribute__((unused)))
+operator delete(void* ptr, size_t)
 {
 	modm::avr::freeMemory(ptr);
 }
@@ -58,7 +68,7 @@ operator delete[](void* ptr)
 }
 
 void
-operator delete[](void* ptr, size_t size __attribute__((unused)))
+operator delete[](void* ptr, size_t)
 {
 	modm::avr::freeMemory(ptr);
 }

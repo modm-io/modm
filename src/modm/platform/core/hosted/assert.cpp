@@ -24,39 +24,54 @@ extern AssertionHandler __assertion_table_start __asm("__start_modm_assertion");
 extern AssertionHandler __assertion_table_end __asm("__stop_modm_assertion");
 #endif
 
+// Since we use the default linker script on hosted, the above linker section are
+// only included if something is put into these sections. Therefore we are placing
+// an empty assertion handler here, which does not influence assertion handling.
+
+Abandonment
+empty_assertion_handler(const char *, const char *, const char *, uintptr_t)
+{
+	return Abandonment::DontCare;
+}
+MODM_ASSERTION_HANDLER(empty_assertion_handler);
+
 extern "C"
 {
 
-void modm_assert_evaluate(bool condition, const char * identifier)
+void
+modm_assert_fail(const char * identifier)
 {
-	if (!condition)
+	// just forward this call
+	modm_assert_fail_context(identifier, 0);
+}
+
+void modm_assert_fail_context(const char * identifier, uintptr_t context)
+{
+	uint8_t state((uint8_t) Abandonment::DontCare);
+	const char * module = identifier;
+	const char * location = module + strlen(module) + 1;
+	const char * failure = location + strlen(location) + 1;
+
+	AssertionHandler * handler = &__assertion_table_start;
+	for (; handler < &__assertion_table_end; handler++)
 	{
-		uint8_t state((uint8_t) Abandonment::DontCare);
-		const char * module = identifier;
-		const char * location = module + strlen(module) + 1;
-		const char * failure = location + strlen(location) + 1;
+		state |= (uint8_t) (*handler)(module, location, failure, context);
+	}
 
-		AssertionHandler * handler = &__assertion_table_start;
-		for (; handler < &__assertion_table_end; handler++)
-		{
-			state |= (uint8_t) (*handler)(module, location, failure);
-		}
-
-		if (state == (uint8_t) Abandonment::DontCare or
-			state & (uint8_t) Abandonment::Fail)
-		{
-			modm_abandon(module, location, failure);
-			exit(1);
-		}
+	if (state == (uint8_t) Abandonment::DontCare or
+		state & (uint8_t) Abandonment::Fail)
+	{
+		modm_abandon(module, location, failure, context);
+		exit(1);
 	}
 }
 
-void modm_abandon(const char * module, const char * location, const char * failure) __attribute__((weak));
-void modm_abandon(const char * module, const char * location, const char * failure)
+modm_weak
+void modm_abandon(const char * module, const char * location, const char * failure, uintptr_t context)
 {
-	MODM_LOG_ERROR << "Assertion '"
-			<< module << "." << location << "." << failure
-			<< "' failed! Abandoning." << modm::endl;
+	MODM_LOG_ERROR.printf("Assertion '%s.%s.%s'", module, location, failure);
+	if (context) { MODM_LOG_ERROR.printf(" @ %p (%d)", (void *) context, context); }
+	MODM_LOG_ERROR.printf(" failed! Abandoning...\n");
 }
 
 }

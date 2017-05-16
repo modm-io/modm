@@ -20,10 +20,10 @@ void inline
 modm::stm32::SpiHal{{ id }}::enable()
 {
 	// enable clock
-	RCC->APB{{ apb }}ENR |= RCC_APB{{ apb }}ENR_SPI{{ id }}EN;
+	RCC->APB{{ apb }}ENR{{ apb_post }} |= RCC_APB{{ apb }}ENR{{ apb_post }}_SPI{{ id }}EN;
 	// reset spi
-	RCC->APB{{ apb }}RSTR |=  RCC_APB{{ apb }}RSTR_SPI{{ id }}RST;
-	RCC->APB{{ apb }}RSTR &= ~RCC_APB{{ apb }}RSTR_SPI{{ id }}RST;
+	RCC->APB{{ apb }}RSTR{{ apb_post }} |=  RCC_APB{{ apb }}RSTR{{ apb_post }}_SPI{{ id }}RST;
+	RCC->APB{{ apb }}RSTR{{ apb_post }} &= ~RCC_APB{{ apb }}RSTR{{ apb_post }}_SPI{{ id }}RST;
 	SPI{{ id }}->CR1 |= SPI_CR1_SPE;		// SPI Enable
 }
 
@@ -31,7 +31,7 @@ void inline
 modm::stm32::SpiHal{{ id }}::disable()
 {
 	// disable clock
-	RCC->APB{{ apb }}ENR &= ~RCC_APB{{ apb }}ENR_SPI{{ id }}EN;
+	RCC->APB{{ apb }}ENR{{ apb_post }} &= ~RCC_APB{{ apb }}ENR{{ apb_post }}_SPI{{ id }}EN;
 }
 
 void inline
@@ -49,7 +49,7 @@ modm::stm32::SpiHal{{ id }}::initialize(Prescaler prescaler,
 						| static_cast<uint32_t>(prescaler)
 %% if target["family"] in ["f1", "f2", "f4"]
 						| static_cast<uint32_t>(dataSize);
-%% elif target["family"] in ["f0", "f3", "f7"]
+%% elif target["family"] in ["f0", "f3", "f7", "l4"]
 						;
 	SPI{{ id }}->CR2 = static_cast<uint32_t>(dataSize);
 
@@ -83,7 +83,7 @@ modm::stm32::SpiHal{{ id }}::setDataOrder(DataOrder dataOrder)
 void inline
 modm::stm32::SpiHal{{ id }}::setDataSize(DataSize dataSize)
 {
-%% if target["family"] in ["f0", "f3", "f7"]
+%% if target["family"] in ["f0", "f3", "f7", "l4"]
 	SPI{{ id }}->CR2 = (SPI{{ id }}->CR2 & ~static_cast<uint32_t>(DataSize::All))
 										 | static_cast<uint32_t>(dataSize);
 %% elif target["family"] in ["f1", "f2", "f4"]
@@ -104,13 +104,13 @@ modm::stm32::SpiHal{{ id }}::setMasterSelection(MasterSelection masterSelection)
 inline bool
 modm::stm32::SpiHal{{ id }}::isReceiveRegisterNotEmpty()
 {
-	return getInterruptFlags() & InterruptFlag::RxBufferNotEmpty;
+	return static_cast<bool>(getInterruptFlags() & InterruptFlag::RxBufferNotEmpty);
 }
 
 inline bool
 modm::stm32::SpiHal{{ id }}::isTransmitRegisterEmpty()
 {
-	return getInterruptFlags() & InterruptFlag::TxBufferEmpty;
+	return static_cast<bool>(getInterruptFlags() & InterruptFlag::TxBufferEmpty);
 }
 
 void inline
@@ -122,7 +122,7 @@ modm::stm32::SpiHal{{ id }}::write(uint16_t data)
 void inline
 modm::stm32::SpiHal{{ id }}::write(uint8_t data)
 {
-%% if target["family"] in ["f0", "f3", "f7"]
+%% if target["family"] in ["f0", "f3", "f7", "l4"]
 	*((__IO uint8_t *) &SPI{{ id}}->DR) = data;
 %% elif target["family"] in ["f1", "f2", "f4"]
 	write(static_cast<uint16_t>(data));

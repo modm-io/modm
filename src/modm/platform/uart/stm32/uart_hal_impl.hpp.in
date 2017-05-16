@@ -39,10 +39,10 @@ modm::stm32::{{ name }}::enable()
 	//        the necessary RCC_APB1ENR_UART5EN define and probably defines
 	//        RCC_APB1ENR_UART4EN incorrectly (0x00100000 instead of 0x00080000)
 	// enable clock
-	RCC->APB{{ apb }}ENR |= RCC_APB{{ apb }}ENR_{{ peripheral }}EN;
+	RCC->APB{{ apb }}ENR{{ apb_post }} |= RCC_APB{{ apb }}ENR{{ apb_post }}_{{ peripheral }}EN;
 	// reset uart
-	RCC->APB{{ apb }}RSTR |=  RCC_APB{{ apb }}RSTR_{{ peripheral }}RST;
-	RCC->APB{{ apb }}RSTR &= ~RCC_APB{{ apb }}RSTR_{{ peripheral }}RST;
+	RCC->APB{{ apb }}RSTR{{ apb_post }} |=  RCC_APB{{ apb }}RSTR{{ apb_post }}_{{ peripheral }}RST;
+	RCC->APB{{ apb }}RSTR{{ apb_post }} &= ~RCC_APB{{ apb }}RSTR{{ apb_post }}_{{ peripheral }}RST;
 	{{ peripheral }}->CR1 |= USART_CR1_UE;		// Uart Enable
 }
 
@@ -55,7 +55,7 @@ modm::stm32::{{ name }}::disable()
 	//        the necessary RCC_APB1ENR_UART5EN define and probably defines
 	//        RCC_APB1ENR_UART4EN incorrectly (0x00100000 instead of 0x00080000)
 	// disable clock
-	RCC->APB{{ apb }}ENR &= ~RCC_APB{{ apb }}ENR_{{ peripheral }}EN;
+	RCC->APB{{ apb }}ENR{{ apb_post }} &= ~RCC_APB{{ apb }}ENR{{ apb_post }}_{{ peripheral }}EN;
 }
 %% if target["family"] != "f1"
 template<class SystemClock, uint32_t baudrate,
@@ -147,7 +147,7 @@ modm::stm32::{{ name }}::setLastBitClockPulse(LastBitClockPulse pulse)
 void
 modm::stm32::{{ name }}::write(uint8_t data)
 {
-%% if target["family"] in ["f0", "f3", "f7"]
+%% if target["family"] in ["f0", "f3", "f7", "l4"]
 	{{ peripheral }}->TDR = data;
 %% else
 	{{ peripheral }}->DR = data;
@@ -157,7 +157,7 @@ modm::stm32::{{ name }}::write(uint8_t data)
 void
 modm::stm32::{{ name }}::read(uint8_t &data)
 {
-%% if target["family"] in ["f0", "f3", "f7"]
+%% if target["family"] in ["f0", "f3", "f7", "l4"]
 	data = {{ peripheral }}->RDR;
 %% else
 	data = {{ peripheral }}->DR;
@@ -187,7 +187,7 @@ modm::stm32::{{ name }}::setReceiverEnable(bool enable)
 bool
 modm::stm32::{{ name }}::isReceiveRegisterNotEmpty()
 {
-%% if target["family"] in ["f0", "f3", "f7"]
+%% if target["family"] in ["f0", "f3", "f7", "l4"]
 	return {{ peripheral }}->ISR & USART_ISR_RXNE;
 %% else
 	return {{ peripheral }}->SR & USART_SR_RXNE;
@@ -197,7 +197,7 @@ modm::stm32::{{ name }}::isReceiveRegisterNotEmpty()
 bool
 modm::stm32::{{ name }}::isTransmitRegisterEmpty()
 {
-%% if target["family"] in ["f0", "f3", "f7"]
+%% if target["family"] in ["f0", "f3", "f7", "l4"]
 	return {{ peripheral }}->ISR & USART_ISR_TXE;
 %% else
 	return {{ peripheral }}->SR & USART_SR_TXE;
@@ -243,7 +243,7 @@ modm::stm32::{{ name }}::disableInterrupt(Interrupt_t interrupt)
 modm::stm32::{{ name }}::InterruptFlag_t
 modm::stm32::{{ name }}::getInterruptFlags()
 {
-%% if target["family"] in ["f0", "f3", "f7"]
+%% if target["family"] in ["f0", "f3", "f7", "l4"]
 	return InterruptFlag_t( {{ peripheral }}->ISR );
 %% else
 	return InterruptFlag_t( {{ peripheral }}->SR );
@@ -253,7 +253,7 @@ modm::stm32::{{ name }}::getInterruptFlags()
 void
 modm::stm32::{{ name }}::acknowledgeInterruptFlags(InterruptFlag_t flags)
 {
-%% if target["family"] in ["f0", "f3", "f7"]
+%% if target["family"] in ["f0", "f3", "f7", "l4"]
 	// Not all flags can be cleared by writing to this reg
 	%% if target["name"] in ["030", "070"]
 	const uint32_t mask = USART_ICR_PECF  | USART_ICR_FECF   |
@@ -263,9 +263,18 @@ modm::stm32::{{ name }}::acknowledgeInterruptFlags(InterruptFlag_t flags)
 	%% else
 	const uint32_t mask = USART_ICR_PECF  | USART_ICR_FECF   |
 		USART_ICR_NCF   | USART_ICR_ORECF | USART_ICR_IDLECF |
-		USART_ICR_TCCF  | USART_ICR_LBDCF | USART_ICR_CTSCF  |
-		USART_ICR_RTOCF | USART_ICR_EOBCF | USART_ICR_CMCF   |
-		USART_ICR_WUCF;
+		USART_ICR_TCCF  | USART_ICR_CTSCF | USART_ICR_RTOCF  |
+		USART_ICR_CMCF
+#ifdef USART_ICR_LBDCF // F0x0 do not have LIN mode!
+		| USART_ICR_LBDCF
+#endif
+#ifdef USART_ICR_EOBCF // F0x0 do not have Smartcard mode!
+		| USART_ICR_EOBCF
+#endif
+#ifdef USART_ICR_WUCF
+		| USART_ICR_WUCF
+#endif
+		;
 	%% endif
 	// Flags are cleared by writing a one to the flag position.
 	// Writing a zero is (hopefully) ignored.

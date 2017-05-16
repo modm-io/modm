@@ -65,7 +65,7 @@ public:
 
 	enum class InterruptFlag : uint32_t
 	{
-%% if target["family"] in ["f0", "f3", "f7"]
+%% if target["family"] in ["f0", "f3", "f7", "l4"]
 %%	set reg = "ISR"
 		/// Set if match character is received.
 		CharacterMatch	= USART_{{reg}}_CMF,

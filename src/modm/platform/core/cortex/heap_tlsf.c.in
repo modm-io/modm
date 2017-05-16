@@ -20,6 +20,7 @@
 #include <string.h>
 #include <reent.h>
 #include <errno.h>
+#include <modm/architecture/interface/assert.h>
 
 // ----------------------------------------------------------------------------
 #include <tlsf.h>
@@ -49,7 +50,7 @@ __modm_initialize_memory(void)
 		uint32_t traits;
 		uint32_t * start;
 		uint32_t * end;
-	} __attribute__((packed)) table_pool_t;
+	} modm_packed table_pool_t;
 
 	uint32_t current_traits = 0;
 	mem_pool_t *current_pool = mem_pools;
@@ -93,6 +94,7 @@ get_tlsf_for_ptr(void *p)
 			return pool->tlsf;
 		}
 	}
+	modm_assert_debug(0, "core", "heap", "pool");
 	return NULL;
 }
 
@@ -123,8 +125,7 @@ try_again:
 		goto try_again;
 	}
 	// there is no memory left even after fallback.
-
-	exit(ENOMEM);
+	modm_assert_debug(0, "core", "heap", "malloc", size);
 	return NULL;
 }
 
@@ -138,9 +139,9 @@ void *__wrap__malloc_r(struct _reent *r, size_t size)
 void *__wrap__calloc_r(struct _reent *r, size_t size)
 {
 	(void) r;
-	void *p = __wrap__malloc_r(r, size);
-	if (p) memset(p, 0, size);
-	return p;
+	void *ptr = __wrap__malloc_r(r, size);
+	if (ptr) memset(ptr, 0, size);
+	return ptr;
 }
 
 void *__wrap__realloc_r(struct _reent *r, void *p, size_t size)
@@ -148,14 +149,10 @@ void *__wrap__realloc_r(struct _reent *r, void *p, size_t size)
 	(void) r;
 	tlsf_t pool = get_tlsf_for_ptr(p);
 	// if pointer belongs to no pool, exit.
-	if (!pool) {
-		exit(EINVAL);
-		return NULL;
-	}
+	if (!pool) return NULL;
 
 	void *ptr = tlsf_realloc(pool, p, size);
-
-	if (!ptr) exit(ENOMEM);
+	modm_assert_debug(p, "core", "heap", "realloc", size);
 	return ptr;
 }
 
@@ -164,10 +161,7 @@ void __wrap__free_r(struct _reent *r, void *p)
 	(void) r;
 	tlsf_t pool = get_tlsf_for_ptr(p);
 	// if pointer belongs to no pool, exit.
-	if (!pool) {
-		exit(EINVAL);
-		return;
-	}
+	if (!pool) return;
 	tlsf_free(pool, p);
 }
 

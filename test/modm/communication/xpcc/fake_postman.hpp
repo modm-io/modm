@@ -30,6 +30,9 @@
 class FakePostman : public xpcc::Postman
 {
 public:
+	virtual ~FakePostman()
+		{};
+
 	virtual DeliverInfo
 	deliverPacket(const xpcc::Header& header,
 			const modm::SmartPointer& payload);

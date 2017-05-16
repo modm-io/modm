@@ -35,6 +35,7 @@ namespace stm32
  * This API is designed for the internal ADCs of STM32F30X/STM32F31X
  *
  * \author	Kevin Laeufer
+ * \author	Sascha Schade (strongly-typed)
  * \ingroup	stm32
  */
 class Adc{{ id }}
@@ -54,18 +55,36 @@ public:
 %% endfor
 %#
 %% if id == 1
+%% if target["family"] in ["f3"]
 		Opamp1    = 15,
 		VTS       = 16,
 		BatDiv2   = 17,
 		InternalReference = 18,
 		// TODO: Add internal connections
+%% elif target["family"] in ["l4"]
+		Temperature = 17,
+		BatDiv3     = 18,
+%% endif
 %% elif id == 2
+%% if target["family"] in ["f3"]
 		Opamp2 = 17,
 		InternalReference = 18,
+%% elif target["family"] in ["l4"]
+		Dac1 = 17,
+		Dac2 = 18,
+%% endif
 %% elif id == 3
+%% if target["family"] in ["f3"]
 		Vss    =  4,	// ADC3_IN4 not bonded and connected to VSS
 		Opamp3 = 17,
 		InternalReference = 18,
+%% elif target["family"] in ["l4"]
+		Dac1 = 14,
+		Dac2 = 15,
+		Vss  = 16,
+		Temperature = 17,
+		BatDiv3 = 18,
+%% endif
 %% elif id == 4
 		Opamp3 = 17,
 		InternalReference = 18,
@@ -74,46 +93,58 @@ public:
 
 	enum class ClockMode : uint32_t
 	{
-		Asynchronous = 0,	// clocked by ADC_CK12 / ADC_CK34
-		// In synchronous mode ADC is clocked by the AHB clock
-		SynchronousPrescaler1 = ADC12_CCR_CKMODE_0,
-		SynchronousPrescaler2 = ADC12_CCR_CKMODE_1,
-		SynchronousPrescaler4 = ADC12_CCR_CKMODE_1 | ADC12_CCR_CKMODE_0,
 		DoNotChange = 0xff,// if you do not want to change the clock mode
+		Asynchronous = 0,	// clocked by ADC_CK12 / ADC_CK34 / ADC123_CK
+		// In synchronous mode ADC is clocked by the AHB clock (stm32f3) or
+		// by HCLK (stm32l4)
+		SynchronousPrescaler1 = {{ adc_ccr }}_CKMODE_0,
+		SynchronousPrescaler2 = {{ adc_ccr }}_CKMODE_1,
+		SynchronousPrescaler4 = {{ adc_ccr }}_CKMODE_1 | {{ adc_ccr }}_CKMODE_0,
 	};
+
+%% if target["family"] in ["l4"]
+	// ADCs clock source selection
+	enum class ClockSource : uint32_t
+	{
+		NoClock = 0, // No clock selected.
+		PllSai1 = RCC_CCIPR_ADCSEL_0, // PLLSAI1 "R" clock (PLLADC1CLK) selected as ADCs clock
+		PllSai2 = RCC_CCIPR_ADCSEL_1, // PLLSAI2 "R" clock (PLLADC2CLK) selected as ADCs clock
+		SystemClock = RCC_CCIPR_ADCSEL_1 | RCC_CCIPR_ADCSEL_0, // System clock selected as ADCs clock
+	};
+%% endif
 
 	// Prescaler of the Asynchronous ADC clock
 	enum class Prescaler : uint32_t
 	{
 		Disabled 			= 0,
-%% if id in [1, 2]
-		Div1 				= RCC_CFGR2_ADCPRE12_DIV1,
-		Div2 				= RCC_CFGR2_ADCPRE12_DIV2,
-		Div4 				= RCC_CFGR2_ADCPRE12_DIV4,
-		Div6 				= RCC_CFGR2_ADCPRE12_DIV6,
-		Div8 				= RCC_CFGR2_ADCPRE12_DIV8,
-		Div10 				= RCC_CFGR2_ADCPRE12_DIV10,
-		Div12 				= RCC_CFGR2_ADCPRE12_DIV12,
-		Div16 				= RCC_CFGR2_ADCPRE12_DIV16,
-		Div32 				= RCC_CFGR2_ADCPRE12_DIV32,
-		Div64 				= RCC_CFGR2_ADCPRE12_DIV64,
-		Div128 				= RCC_CFGR2_ADCPRE12_DIV128,
-		Div256 				= RCC_CFGR2_ADCPRE12_DIV256,
-		Div256AllBits 		= RCC_CFGR2_ADCPRE12,	// for bit clear
-%% elif id in [3, 4]
-		Div1 				= RCC_CFGR2_ADCPRE34_DIV1,
-		Div2 				= RCC_CFGR2_ADCPRE34_DIV2,
-		Div4 				= RCC_CFGR2_ADCPRE34_DIV4,
-		Div6 				= RCC_CFGR2_ADCPRE34_DIV6,
-		Div8 				= RCC_CFGR2_ADCPRE34_DIV8,
-		Div10 				= RCC_CFGR2_ADCPRE34_DIV10,
-		Div12 				= RCC_CFGR2_ADCPRE34_DIV12,
-		Div16 				= RCC_CFGR2_ADCPRE34_DIV16,
-		Div32 				= RCC_CFGR2_ADCPRE34_DIV32,
-		Div64 				= RCC_CFGR2_ADCPRE34_DIV64,
-		Div128 				= RCC_CFGR2_ADCPRE34_DIV128,
-		Div256 				= RCC_CFGR2_ADCPRE34_DIV256,
-		Div256AllBits 		= RCC_CFGR2_ADCPRE34,	// for bit clear
+%% if target["family"] in ["f3"]
+		Div1 				= RCC_CFGR2_{{ adc_pre }}_DIV1,
+		Div2 				= RCC_CFGR2_{{ adc_pre }}_DIV2,
+		Div4 				= RCC_CFGR2_{{ adc_pre }}_DIV4,
+		Div6 				= RCC_CFGR2_{{ adc_pre }}_DIV6,
+		Div8 				= RCC_CFGR2_{{ adc_pre }}_DIV8,
+		Div10 				= RCC_CFGR2_{{ adc_pre }}_DIV10,
+		Div12 				= RCC_CFGR2_{{ adc_pre }}_DIV12,
+		Div16 				= RCC_CFGR2_{{ adc_pre }}_DIV16,
+		Div32 				= RCC_CFGR2_{{ adc_pre }}_DIV32,
+		Div64 				= RCC_CFGR2_{{ adc_pre }}_DIV64,
+		Div128 				= RCC_CFGR2_{{ adc_pre }}_DIV128,
+		Div256 				= RCC_CFGR2_{{ adc_pre }}_DIV256,
+		Div256AllBits 		= RCC_CFGR2_{{ adc_pre }},	// for bit clear
+%% elif target["family"] in ["l4"]
+		Div1 				= 0,
+		Div2 				= ADC_CCR_PRESC_0,
+		Div4 				= ADC_CCR_PRESC_1,
+		Div6 				= ADC_CCR_PRESC_1 | ADC_CCR_PRESC_0,
+		Div8 				= ADC_CCR_PRESC_2,
+		Div10 				= ADC_CCR_PRESC_2 | ADC_CCR_PRESC_0,
+		Div12 				= ADC_CCR_PRESC_2 | ADC_CCR_PRESC_1,
+		Div16 				= ADC_CCR_PRESC_2 | ADC_CCR_PRESC_1 | ADC_CCR_PRESC_0,
+		Div32 				= ADC_CCR_PRESC_3,
+		Div64 				= ADC_CCR_PRESC_3 | ADC_CCR_PRESC_0,
+		Div128 				= ADC_CCR_PRESC_3 | ADC_CCR_PRESC_1,
+		Div256 				= ADC_CCR_PRESC_3 | ADC_CCR_PRESC_1 | ADC_CCR_PRESC_0,
+		Div256AllBits 		= ADC_CCR_PRESC_3 | ADC_CCR_PRESC_2 | ADC_CCR_PRESC_1 | ADC_CCR_PRESC_0,	// for bit clear
 %% endif
 	};
 
@@ -138,16 +169,20 @@ public:
 
 	enum class VoltageRegulatorState : uint32_t
 	{
+%% if target["family"] in ["l4"]
+		Enabled 		= ADC_CR_ADVREGEN,
+%% elif target["family"] in ["f3"]
 		// Intermediate state is needed to move from enabled to disabled
 		// state and vice versa
 		Intermediate 	= 0,
 		Enabled 		= ADC_CR_ADVREGEN_0,
 		Disables		= ADC_CR_ADVREGEN_1,
+%% endif
 	};
 
 	enum class Interrupt : uint32_t
 	{
-		Ready 								= ADC_IER_RDY,
+		Ready 								= ADC_IER_ADRDYIE,
 		EndOfSampling 						= ADC_IER_EOSMP,
 		EndOfRegularConversion 				= ADC_IER_EOC,
 		EndOfRegularSequenceOfConversions 	= ADC_IER_EOS,
@@ -163,7 +198,7 @@ public:
 
 	enum class InterruptFlag : uint32_t
 	{
-		Ready 								= ADC_ISR_ADRD,
+		Ready 								= ADC_ISR_ADRDY,
 		EndOfSampling 						= ADC_ISR_EOSMP,
 		EndOfRegularConversion 				= ADC_ISR_EOC,
 		EndOfRegularSequenceOfConversions 	= ADC_ISR_EOS,
@@ -198,6 +233,9 @@ public:
 	 */
 	static inline void
 	initialize(	const ClockMode clk = ClockMode::DoNotChange,
+%% if target["family"] in ["l4"]
+				const ClockSource clk_src = ClockSource::SystemClock,
+%% endif
 				const Prescaler pre = Prescaler::Disabled,
 				const CalibrationMode cal = CalibrationMode::DoNotCalibrate,
 				const bool blocking = true);

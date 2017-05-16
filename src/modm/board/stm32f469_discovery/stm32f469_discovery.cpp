@@ -46,3 +46,22 @@ modm_hook_hardware_init(void)
 	Board::systemClock::enable();
 	board_initialize_sdram();
 }
+
+modm_extern_c void
+modm_abandon(const char * module,
+			 const char * location,
+			 const char * failure,
+			 uintptr_t context)
+{
+	MODM_LOG_ERROR << "Assertion '" << module << "." << location << "." << failure << "'";
+	if (context) { MODM_LOG_ERROR << " @ " << (void *) context << " (" << (uint32_t) context << ")"; }
+	MODM_LOG_ERROR << " failed! Abandoning..." << modm::endl;
+
+	Board::LedBlue::setOutput();
+	while(1) {
+		Board::LedBlue::set();
+		modm::delayMilliseconds(20);
+		Board::LedBlue::reset();
+		modm::delayMilliseconds(180);
+	}
+}

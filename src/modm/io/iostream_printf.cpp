@@ -118,6 +118,14 @@ modm::IOStream::vprintf(const char *fmt, va_list ap)
 				base = 10;
 				break;
 
+			case 'p':
+				this->device->write('0');
+				this->device->write('x');
+				fill = '0';
+				width = (MODM_SIZEOF_POINTER * 2);
+				isLong = (MODM_SIZEOF_POINTER == 4);
+				isLongLong = (MODM_SIZEOF_POINTER == 8);
+				/* no break */
 			case 'x':
 				base = 16;
 				break;

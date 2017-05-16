@@ -18,6 +18,7 @@
 
 #include <modm/architecture/platform.hpp>
 #include <modm/debug/logger.hpp>
+#define MODM_BOARD_HAS_LOGGER
 
 using namespace modm::atmega;
 
@@ -60,6 +61,7 @@ initialize()
 {
 	systemClock::enable();
 
+	// Uart0 is connected to onboard USB bridge
 	D0::connect(Uart0::Rx);
 	D1::connect(Uart0::Tx);
 	Uart0::initialize<systemClock, 9600>();

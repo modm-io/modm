@@ -18,7 +18,7 @@
 
 template<typename T, std::size_t N>
 modm::BoundedDeque<T, N>::BoundedDeque() : 
-	head(0), tail(1), size(0)
+	head(0), tail(N == 1 ? 0 : 1), size(0)
 {
 	static_assert(N > 0, "size = 0 is not allowed");
 }
@@ -60,7 +60,7 @@ void
 modm::BoundedDeque<T, N>::clear()
 {
 	this->head = 0;
-	this->tail = 1;
+	this->tail = (N == 1 ? 0 : 1);
 	this->size = 0;
 }
 
@@ -100,6 +100,68 @@ modm::BoundedDeque<T, N>::getBack() const
 // ----------------------------------------------------------------------------
 
 template<typename T, std::size_t N>
+T&
+modm::BoundedDeque<T, N>::get(Index n)
+{
+	// From http://stackoverflow.com/a/856839
+	// as we want to provide a const and non-const getter without having duplicate logic
+	return const_cast<T&>(static_cast<const BoundedDeque*>(this)->get(n));
+}
+
+template<typename T, std::size_t N>
+const T&
+modm::BoundedDeque<T, N>::get(Index n) const
+{
+	if (this->tail + n > N-1) {
+		return this->buffer[this->tail + n - N];
+	}
+	else {
+		return this->buffer[this->tail + n];
+	}
+}
+
+template<typename T, std::size_t N>
+T&
+modm::BoundedDeque<T, N>::operator[](Index n)
+{
+	return this->get(n);
+}
+
+template<typename T, std::size_t N>
+const T&
+modm::BoundedDeque<T, N>::operator[](Index n) const
+{
+	return this->get(n);
+}
+
+
+// ----------------------------------------------------------------------------
+
+template<typename T, std::size_t N>
+T&
+modm::BoundedDeque<T, N>::rget(Index n)
+{
+	// From http://stackoverflow.com/a/856839
+	// as we want to provide a const and non-const getter without having duplicate logic
+	return const_cast<T&>(static_cast<const BoundedDeque*>(this)->rget(n));
+}
+
+template<typename T, std::size_t N>
+const T&
+modm::BoundedDeque<T, N>::rget(Index n) const
+{
+	if (this->head < n) {
+		return this->buffer[N - (n - this->head)];
+	}
+	else {
+		return this->buffer[this->head - n];
+	}
+}
+
+
+// ----------------------------------------------------------------------------
+
+template<typename T, std::size_t N>
 bool
 modm::BoundedDeque<T, N>::append(const T& value)
 {
@@ -118,6 +180,35 @@ modm::BoundedDeque<T, N>::append(const T& value)
 	this->size++;
 	return true;
 }
+
+template<typename T, std::size_t N>
+void
+modm::BoundedDeque<T, N>::appendOverwrite(const T& value)
+{
+	if (this->isFull()) {
+		if (this->tail >= (N - 1)) {
+			this->tail = 0;
+		}
+		else {
+			this->tail++;
+		}
+	}
+	else {
+		this->size++;
+	}
+	
+	if (this->head >= (N - 1)) {
+		this->head = 0;
+	}
+	else {
+		this->head++;
+	}
+	
+	this->buffer[this->head] = value;
+	return;
+}
+
+// ----------------------------------------------------------------------------
 
 template<typename T, std::size_t N>
 void
@@ -153,6 +244,35 @@ modm::BoundedDeque<T, N>::prepend(const T& value)
 	this->size++;
 	return true;
 }
+
+template<typename T, std::size_t N>
+void
+modm::BoundedDeque<T, N>::prependOverwrite(const T& value)
+{
+	if (this->isFull()) {
+		if (this->head == 0) {
+			this->head = N - 1;
+		}
+		else {
+			this->head--;
+		}
+	}
+	else {
+		this->size++;
+	}
+	
+	if (this->tail == 0) {
+		this->tail = N - 1;
+	}
+	else {
+		this->tail--;
+	}
+	
+	this->buffer[this->tail] = value;
+	return;
+}
+
+// ----------------------------------------------------------------------------
 
 template<typename T, std::size_t N>
 void

@@ -1,5 +1,4 @@
-/*
- * Copyright (c) 2016, Niklas Hauser
+/* Copyright (c) 2016-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -15,7 +14,6 @@
 #include <stdint.h>
 #include <modm/architecture/utils.hpp>
 #include <modm/utils/bit_constants.hpp>
-#include <modm/architecture/driver/accessor/flash.hpp>
 
 /**
  * @ingroup		interface
@@ -84,7 +82,8 @@ Abandonment : uint8_t
 /// @ingroup assert
 using AssertionHandler = Abandonment (*)(const char * module,
 										 const char * location,
-					 					 const char * failure);
+										 const char * failure,
+										 uintptr_t context);
 
 } // namespace modm
 
@@ -107,22 +106,50 @@ using AssertionHandler = Abandonment (*)(const char * module,
 /**
  * Assert a condition to be true with failure identifier.
  * This assert is always included in the source code.
+ * @returns result of condition evaluation
  *
  * @note On AVR targets the failure identifier string is placed in Flash memory!
  *
  * @ingroup assert
  */
-#define modm_assert(condition, module, location, failure)
+modm_extern_c bool
+modm_assert(bool condition, const char * module, const char * location, const char * failure);
+
+/**
+ * Assert a condition to be true with failure identifier and context.
+ * This assert is always included in the source code.
+ * @returns result of condition evaluation
+ *
+ * @note On AVR targets the failure identifier string is placed in Flash memory!
+ *
+ * @ingroup assert
+ */
+modm_extern_c bool
+modm_assert(bool condition, const char * module, const char * location, const char * failure, uintptr_t context);
 
 /**
  * Assert a condition to be true with failure identifier.
- * This assert is only included in the source code on debug builds!
+ * This assert is only triggered in the source code on debug builds!
+ * @returns result of condition evaluation
  *
  * @note On AVR targets the strings are placed in Flash memory!
  *
  * @ingroup assert
  */
-#define modm_assert_debug(condition, module, location, failure)
+modm_extern_c bool
+modm_assert_debug(bool condition, const char * module, const char * location, const char * failure);
+
+/**
+ * Assert a condition to be true with failure identifier and context.
+ * This assert is only triggered in the source code on debug builds!
+ * @returns result of condition evaluation
+ *
+ * @note On AVR targets the strings are placed in Flash memory!
+ *
+ * @ingroup assert
+ */
+modm_extern_c bool
+modm_assert_debug(bool condition, const char * module, const char * location, const char * failure, uintptr_t context);
 
 /**
  * Overwriteable abandonment handler for all targets.
@@ -132,10 +159,11 @@ using AssertionHandler = Abandonment (*)(const char * module,
  *
  * @ingroup assert
  */
-extern "C" void
+modm_extern_c void
 modm_abandon(const char * module,
 			 const char * location,
-			 const char * failure) modm_weak;
+			 const char * failure,
+			 uintptr_t context) modm_weak;
 
 #else
 
@@ -153,29 +181,18 @@ modm_abandon(const char * module,
 		const modm::AssertionHandler \
 		handler ## _assertion_handler_ptr = handler
 #else
+#	warning "MODM_ASSERTION_HANDLER(handler) ignored, due to missing linker section definition!"
 #	define MODM_ASSERTION_HANDLER(handler)
 #endif
 
-#define modm_assert(condition, module, location, failure) \
-	modm_assert_evaluate((condition), INLINE_FLASH_STORAGE_STRING(module "\0" location "\0" failure));
-
-#ifndef NDEBUG
-#	define modm_assert_debug(condition, module, location, failure) \
-		modm_assert(condition, module, location, failure)
+#ifdef MODM_DEBUG_BUILD
 #	define MODM_ASSERTION_HANDLER_DEBUG(handler) \
 		MODM_ASSERTION_HANDLER(handler)
 #else
-#	define modm_assert_debug(condition, module, location, failure)
 #	define MODM_ASSERTION_HANDLER_DEBUG(handler)
 #endif
 
-extern "C" {
-
-void modm_assert_evaluate(bool condition, const char * identifier);
-
-void modm_abandon(const char * module, const char * location, const char * failure);
-
-}
+#include "assert.h"
 
 #endif // __DOXYGEN__
 

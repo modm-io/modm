@@ -99,7 +99,7 @@ struct systemClock
 		modm::clock::fcpu     = Frequency;
 		modm::clock::fcpu_kHz = Frequency / 1000;
 		modm::clock::fcpu_MHz = Frequency / 1000000;
-		modm::clock::ns_per_loop = ::round(1000 / (Frequency / 1000000));
+		modm::clock::ns_per_loop = ::round(1000.f / (Frequency / 1000000));
 
 		return true;
 	}
@@ -120,6 +120,32 @@ namespace stlink
 using Tx = GpioOutputA9;
 using Rx = GpioInputA10;
 using Uart = Usart1;
+}
+
+// Onboard MicroSD card slot
+namespace usd
+{
+
+// SDIO interface
+namespace sdio
+{
+using Cmd = GpioOutputD7;
+using Clk = GpioOutputD7;
+using D3  = GpioB4;
+using D2  = GpioB3;
+using D1  = GpioG10;
+using D0  = GpioG9;
+}
+
+// SPI interface
+namespace spi
+{
+using Mosi = sdio::Cmd;
+using Clk  = sdio::Clk;
+using Cs   = sdio::D3;
+using Irq  = sdio::D1;
+using Miso = sdio::D0;
+}
 }
 
 inline void

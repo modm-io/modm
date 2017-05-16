@@ -15,8 +15,6 @@
 #include <modm/architecture/interface/can.hpp>
 #include <modm/architecture/platform/driver/can/canusb/canusb.hpp>
 
-#include <cstdlib>
-
 /**
  * Simple example that listens to a CAN bus connected by a CAN2USB.
  *
@@ -32,15 +30,16 @@
  * - All CAN messages on the bus should appear on the screen.
  */
 
-static constexpr uint32_t canBusBaudRate = 125000;
+static constexpr modm::Can::Bitrate canBusBitRate = modm::Can::kBps125;
 
-modm::hosted::CanUsb canUsb;
+modm::hosted::SerialInterface port("/dev/ttyUSB0", 115200);
+modm::hosted::CanUsb<modm::hosted::SerialInterface> canUsb(port);
 
 int
 main()
 {
-	if (not canUsb.open("/dev/ttyUSB0", canBusBaudRate)) {
-		MODM_LOG_ERROR << "Could not open port" << modm::endl;
+	if (not canUsb.open(canBusBitRate)) {
+		MODM_LOG_ERROR << "Could not connect to CAN2USB port" << modm::endl;
 		exit(EXIT_FAILURE);
 	}
 

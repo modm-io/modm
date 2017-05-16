@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2016, Fabian Greif
+# Copyright (c) 2016, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+class Instance(Module):
+    def __init__(self, instance):
+        self.instance = instance
+
+    def init(self, module):
+        module.name = str(self.instance)
+        module.description = "I2C {} instance".format(self.instance)
+
+    def prepare(self, module, options):
+        module.depends(":platform:i2c")
+        module.add_option(
+            NumericOption(
+                name="buffer.transaction",
+                description="",
+                minimum=1,
+                maximum=2 ** 16 - 2,
+                default=8))
+
+        # FIXME STM32F7 have a different I2C peripherial
+        device = options[":target"]
+        if device.partname.startswith("stm32f7"):
+            return False
+
+        return True
+
+    def build(self, env):
+        device = env[":target"]
+        driver = device.get_driver("i2c")
+
+        properties = device.properties
+        properties["target"] = target = device.identifier
+        properties["partname"] = device.partname
+        properties["id"] = self.instance
+
+        env.substitutions = properties
+        env.outbasepath = "src/modm/platform/i2c"
+
+        env.template("i2c_master.cpp.in", "i2c_master_{}.cpp".format(self.instance))
+        env.template("i2c_master.hpp.in", "i2c_master_{}.hpp".format(self.instance))
+
+
+def init(module):
+    module.name = "i2c"
+    module.parent = "platform"
+
+def prepare(module, options):
+    device = options[":target"]
+    if not device.has_driver("i2c:stm32l4"):
+        return False
+
+    module.depends(":platform:core")
+
+    for instance in listify(device.get_driver("i2c")["instance"]):
+        module.add_submodule(Instance(int(instance)))
+
+    return True
+
+def build(env):
+    pass

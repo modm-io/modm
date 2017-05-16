@@ -84,36 +84,14 @@ struct systemClock {
 		modm::clock::fcpu     = Frequency;
 		modm::clock::fcpu_kHz = Frequency / 1000;
 		modm::clock::fcpu_MHz = Frequency / 1000000;
-		modm::clock::ns_per_loop = ::round(3000 / (Frequency / 1000000));
+		modm::clock::ns_per_loop = ::round(3000.f / (Frequency / 1000000));
 
 		return true;
 	}
 };
 
 // Arduino Footprint
-using A0 = GpioA0;
-using A1 = GpioA1;
-using A2 = GpioA4;
-using A3 = GpioB0;
-using A4 = GpioC1;
-using A5 = GpioC0;
-
-using D0  = GpioA3;
-using D1  = GpioA2;
-using D2  = GpioA10;
-using D3  = GpioB3;
-using D4  = GpioB5;
-using D5  = GpioB4;
-using D6  = GpioB10;
-using D7  = GpioA8;
-using D8  = GpioA9;
-using D9  = GpioC7;
-using D10 = GpioB6;
-using D11 = GpioA7;
-using D12 = GpioA6;
-using D13 = GpioA5;
-using D14 = GpioB9;
-using D15 = GpioB8;
+#include "../nucleo64_arduino.hpp"
 
 using Button = modm::GpioInverted<GpioInputC13>;
 using LedD13 = D13;

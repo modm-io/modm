@@ -14,6 +14,7 @@
 #define MODM_RF_MACROS_HPP
 
 #include <modm/utils/arithmetic_traits.hpp>
+#include <modm/architecture/interface/assert.hpp>
 
 #ifdef __DOXYGEN__
 /**
@@ -225,7 +226,10 @@
 	constexpr uint16_t rfCounter = __COUNTER__; \
 	this->template checkRfType<true>(); \
 	constexpr uint8_t rfIndex = 0; \
-	if (!this->nestingOkRf()) return {modm::rf::NestingError}; \
+	if (!this->nestingOkRf()) { \
+		modm_assert(false, MODM_RESUMABLE_MODULE_NAME, "begin", "nesting", this); \
+		return {modm::rf::NestingError}; \
+	} \
 	switch (this->pushRf(0)) { \
 		case (::modm::rf::Stopped): \
 			RF_INTERNAL_SET_CASE(__COUNTER__);

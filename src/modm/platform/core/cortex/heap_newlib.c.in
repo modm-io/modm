@@ -20,6 +20,7 @@
 #include <string.h>
 #include <reent.h>
 #include <errno.h>
+#include <modm/architecture/interface/assert.h>
 
 // ----------------------------------------------------------------------------
 extern void modm_heap_table_find_largest(const uint32_t, uint32_t **, uint32_t **);
@@ -31,7 +32,7 @@ void __modm_initialize_memory(void)
 {
 	// find the largest heap that is DMA-able and S-Bus accessible
 	modm_heap_table_find_largest(0x9, (uint32_t **) &__brkval, (uint32_t **) &heap_end);
-	if (!__brkval) exit(ENOMEM);
+	modm_assert(__brkval, "core", "heap", "init");
 }
 
 /* Support function. Adjusts end of heap to provide more memory to
@@ -55,27 +56,28 @@ _sbrk_r(struct _reent *r,  ptrdiff_t size)
 	uint8_t *heap = __brkval;
 	__brkval += size;
 
-	if (__brkval >= heap_end) {
-		// ERROR: out of memory!
-		exit(ENOMEM);
-	}
+	modm_assert(__brkval < heap_end, "core", "heap", "sbrk", size);
 
 	//  Return pointer to start of new heap area.
 	return heap;
 }
-
-// FIXME: "Unwrap" the malloc for newlib allocator
 void *__real__malloc_r(struct _reent *r, size_t size);
 void *__wrap__malloc_r(struct _reent *r, size_t size) {
-	return __real__malloc_r(r, size);
+	void * ptr = __real__malloc_r(r, size);
+	modm_assert_debug(ptr, "core", "heap", "malloc", size);
+	return ptr;
 }
 void *__real__calloc_r(struct _reent *r, size_t size);
 void *__wrap__calloc_r(struct _reent *r, size_t size) {
-	return __real__calloc_r(r, size);
+	void * ptr = __real__calloc_r(r, size);
+	modm_assert_debug(ptr, "core", "heap", "calloc", size);
+	return ptr;
 }
 void *__real__realloc_r(struct _reent *r, void *p, size_t size);
 void *__wrap__realloc_r(struct _reent *r, void *p, size_t size) {
-	return __real__realloc_r(r, p, size);
+	void * ptr = __real__realloc_r(r, p, size);
+	modm_assert_debug(ptr, "core", "heap", "realloc", size);
+	return ptr;
 }
 void __real__free_r(struct _reent *r, void *p);
 void __wrap__free_r(struct _reent *r, void *p) {

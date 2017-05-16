@@ -23,6 +23,9 @@ class TestingComponent1 : public xpcc::AbstractComponent
 public:
 	TestingComponent1(xpcc::Dispatcher &communication, Timeline *timeline);
 
+	virtual ~TestingComponent1()
+		{};
+
 	void
 	update();
 

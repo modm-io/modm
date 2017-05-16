@@ -24,7 +24,7 @@
 #include "error_code.hpp"
 #include "can_filter.hpp"
 
-%% if id == "" or target["family"] in ["f0", "f3"]
+%% if id == "" or target["family"] in ["f0", "f3", "l4"]
 	%% set reg = 'CAN'
 %% else
 	%% set reg = 'CAN' ~ id
@@ -216,4 +216,3 @@ public:
 }	// namespace modm
 
 #endif	//  MODM_STM32_CAN{{ id }}_HPP
-

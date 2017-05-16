@@ -36,6 +36,7 @@ class Instance(Module):
         properties = get_properties(env)
         properties["id"] = self.instance
         properties["apb"] = "2" if self.instance in [1, 4, 5, 6] else "1"
+        properties["apb_post"] = "1" if properties["target"]["family"] in ["l4"] and self.instance != 1 else ""
 
         env.substitutions = properties
         env.outbasepath = "src/modm/platform/spi"

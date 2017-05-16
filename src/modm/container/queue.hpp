@@ -47,6 +47,9 @@ namespace modm
 		{
 			return c.isEmpty();
 		}
+
+		inline bool
+		isNotEmpty() const { return not isEmpty(); };
 		
 		inline bool
 		isFull() const

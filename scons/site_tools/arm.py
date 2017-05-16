@@ -196,6 +196,7 @@ def generate(env, **kw):
 		"-Wl,-wrap,_calloc_r",
 		"-Wl,-wrap,_realloc_r",
 		"-Wl,-wrap,_free_r",
+		"--specs=nosys.specs",
 		"--specs=nano.specs",
 		"-nostartfiles",
 		"-L$LINKPATH",

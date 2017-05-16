@@ -17,6 +17,7 @@
 
 #include <modm/architecture/interface.hpp>
 #include <modm/architecture/driver/delay.hpp>
+#include <modm/io/iostream.hpp>
 
 /**
  * @ingroup		interface
@@ -130,7 +131,20 @@ struct I2c
 			modm::delayMicroseconds(5);
 		}
 	}
+
 };
+
+modm::IOStream&
+operator << (modm::IOStream& s, const modm::I2c::Operation op);
+
+modm::IOStream&
+operator << (modm::IOStream& s, const modm::I2c::OperationAfterStart op);
+
+modm::IOStream&
+operator << (modm::IOStream& s, const modm::I2c::OperationAfterRead op);
+
+modm::IOStream&
+operator << (modm::IOStream& s, const modm::I2c::OperationAfterWrite op);
 
 }	// namespace modm
 

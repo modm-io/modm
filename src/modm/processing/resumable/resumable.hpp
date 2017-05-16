@@ -18,6 +18,9 @@
 #include <stdint.h>
 #include <initializer_list>
 
+/// @ingroup	resumable
+#define MODM_RESUMABLE_MODULE_NAME "resumable"
+
 namespace modm
 {
 

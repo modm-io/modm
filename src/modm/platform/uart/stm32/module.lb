@@ -60,6 +60,7 @@ class Instance(Module):
             properties["apb"] = "2" if self.instance in [1, 6, 7, 8] else "1"
         else:
             properties["apb"] = "2" if self.instance in [1, 6] else "1"
+        properties["apb_post"] = "1" if properties["target"]["family"] in ["l4"] else ""
 
         if self.instance in [1, 2, 3, 6] or properties["target"]["family"] == "f0":
             properties["uart_name"] = "Usart"

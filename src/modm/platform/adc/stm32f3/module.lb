@@ -37,18 +37,38 @@ class Instance(Module):
             if target["family"] == "f3":
                 # 13-14 reserved
                 channels = [1,2,3,4,5,6,7,8,9,10,11,12,15,16,17,18]
+            elif target["family"] == "l4":
+                # ADC1 is connected to 16 external channels + 3 internal channels
+                channels = range(1,17)
             else:
                 # 11-14 reserved
                 channels = [1,2,3,4,5,6,7,8,9,10,15,16,17,18]
         elif instance_id == 2:
-            # 13-16 reserved
-            channels = [1,2,3,4,5,6,7,8,9,10,11,12,17,18]
+            if target["family"] == "f3":
+                # 13-16 reserved
+                channels = [1,2,3,4,5,6,7,8,9,10,11,12,17,18]
+            else:
+                # ADC2 is connected to 16 external channels + 2 internal channels
+                channels = range(1,17)
         elif instance_id == 3:
-            channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
+            if target["family"] == "f3":
+                channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
+            else:
+                # ADC3 is connected to 12 external channels + 4 internal channels
+                channels = [1,2,3,4,6,7,8,9,10,11,12,13]
         elif instance_id == 4:
             # 14-16 reserved
             channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,17,18]
         properties["channels"] = sorted(channels)
+
+        if target["family"] == "f3":
+            properties["adc_ccr"] = "ADC12_CCR"
+            if id in [1,2]:
+                properties["adc_pre"] = "ADCPRE12"
+            elif id in [3,4]:
+                properties["adc_pre"] = "ADCPRE34"
+        else:
+            properties["adc_ccr"] = "ADC_CCR"
 
         env.substitutions = properties
         env.outbasepath = "src/modm/platform/adc"

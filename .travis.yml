@@ -25,10 +25,10 @@ before_install:
  - export LD_LIBRARY_PATH="$HOME/cache/boost/lib:$LD_LIBRARY_PATH"
  - export CXXFLAGS="-isystem$HOME/cache/boost/include"
  - export LDFLAGS="-L$HOME/cache/boost/lib"
- - export PATH="$HOME/cache/avr8-gnu-toolchain-linux_x86/bin:$HOME/cache/gcc-arm-none-eabi-4_9-2015q3/bin:$PATH"
+ - export PATH="$HOME/cache/avr8-gnu-toolchain-linux_x86/bin:$HOME/cache/gcc-arm-none-eabi-6-2017-q1-update/bin:$PATH"
  - echo $PATH
  - ls -l $HOME/cache/avr8-gnu-toolchain-linux_x86/bin
- - ls -l $HOME/cache/gcc-arm-none-eabi-4_9-2015q3/bin
+ - ls -l $HOME/cache/gcc-arm-none-eabi-6-2017-q1-update/bin
  - ls -l $HOME/cache/boost
  - which avr-g++
  - avr-g++ --version
@@ -62,10 +62,14 @@ env:
  - TEST_SUITE="check=examples examples=stm32f746g_discovery"
  - TEST_SUITE="check=examples examples=stm32f4_loa_v2b"
  - TEST_SUITE="check=examples examples=stm32f469_discovery"
+ - TEST_SUITE="check=examples examples=stm32l476_discovery"
+ - TEST_SUITE="check=examples examples=nucleo_f031k6"
  - TEST_SUITE="check=examples examples=nucleo_f103rb"
  - TEST_SUITE="check=examples examples=nucleo_f303k8"
+ - TEST_SUITE="check=examples examples=nucleo_f401re"
  - TEST_SUITE="check=examples examples=nucleo_f411re"
  - TEST_SUITE="check=examples examples=nucleo_f429zi"
+ - TEST_SUITE="check=examples examples=nucleo_l476rg"
  - TEST_SUITE="check=examples examples=unittest"
  - TEST_SUITE="check=examples examples=zmq"
 

@@ -62,6 +62,7 @@ enum Frequency
 	MHz42       =   42 * MHz1,
 	MHz48       =   48 * MHz1,
 	MHz50       =   50 * MHz1,
+	MHz80       =   80 * MHz1,
 	MHz64       =   64 * MHz1,
 	MHz72       =   72 * MHz1,
 	MHz84       =   84 * MHz1,

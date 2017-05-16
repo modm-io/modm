@@ -71,6 +71,18 @@ modm::stm32::ClockControl::enableInternalClock(uint32_t waitCycles)
 	return retval;
 }
 
+%% if target["family"] in ["l4"]
+bool
+modm::stm32::ClockControl::enableMultiSpeedInternalClock(MsiFrequency msi_frequency, uint32_t waitCycles)
+{
+	bool retval;
+	RCC->CR = (RCC->CR & ~RCC_CR_MSIRANGE) | static_cast<uint32_t>(msi_frequency) | RCC_CR_MSIRGSEL | RCC_CR_MSION;
+	while (not (retval = (RCC->CR & RCC_CR_MSIRDY)) and --waitCycles)
+		;
+	return retval;
+}
+%% endif
+
 bool
 modm::stm32::ClockControl::enableExternalClock(uint32_t waitCycles)
 {
@@ -121,7 +133,7 @@ modm::stm32::ClockControl::enableLowSpeedExternalCrystal(uint32_t waitCycles)
 	return retval;
 }
 
-%% if target["family"] in ["f2", "f4", "f7"]
+%% if target["family"] in ["f2", "f4", "f7", "l4"]
 // ----------------------------------------------------------------------------
 bool
 modm::stm32::ClockControl::enablePll(PllSource source, uint8_t pllM,

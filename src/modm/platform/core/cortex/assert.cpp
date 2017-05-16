@@ -9,9 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
+#include <string.h>
 #include <modm/architecture/interface/assert.hpp>
-
-extern "C" void exit(int);
 
 using modm::AssertionHandler;
 using modm::Abandonment;
@@ -22,31 +21,35 @@ extern AssertionHandler __assertion_table_end;
 extern "C"
 {
 
-void modm_assert_evaluate(bool condition, const char * identifier)
+void
+modm_assert_fail(const char * identifier)
 {
-	if (!condition)
+	// just forward this call
+	modm_assert_fail_context(identifier, 0);
+}
+
+void modm_assert_fail_context(const char * identifier, uintptr_t context)
+{
+	uint8_t state(uint8_t(Abandonment::DontCare));
+	const char * module = identifier;
+	const char * location = module + strlen(module) + 1;
+	const char * failure = location + strlen(location) + 1;
+
+	AssertionHandler * handler = &__assertion_table_start;
+	for (; handler < &__assertion_table_end; handler++)
 	{
-		uint8_t state(uint8_t(Abandonment::DontCare));
-		const char * module = identifier;
-		const char * location = module + strlen(module) + 1;
-		const char * failure = location + strlen(location) + 1;
+		state |= (uint8_t) (*handler)(module, location, failure, context);
+	}
 
-		AssertionHandler * handler = &__assertion_table_start;
-		for (; handler < &__assertion_table_end; handler++)
-		{
-			state |= (uint8_t) (*handler)(module, location, failure);
-		}
-
-		if (state == (uint8_t) Abandonment::DontCare or
-			state & (uint8_t) Abandonment::Fail)
-		{
-			modm_abandon(module, location, failure);
-			exit(1);
-		}
+	if (state == (uint8_t) Abandonment::DontCare or
+		state & (uint8_t) Abandonment::Fail)
+	{
+		modm_abandon(module, location, failure, context);
+		while(1) ;
 	}
 }
 
-void modm_abandon(const char *, const char *, const char *) __attribute__((weak));
-void modm_abandon(const char *, const char *, const char *) {}
+modm_weak
+void modm_abandon(const char *, const char *, const char *, uintptr_t) {}
 
 }

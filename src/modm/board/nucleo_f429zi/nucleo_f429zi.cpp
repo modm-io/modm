@@ -19,3 +19,22 @@ modm::log::Logger modm::log::debug(loggerDevice);
 modm::log::Logger modm::log::info(loggerDevice);
 modm::log::Logger modm::log::warning(loggerDevice);
 modm::log::Logger modm::log::error(loggerDevice);
+
+modm_extern_c void
+modm_abandon(const char * module,
+			 const char * location,
+			 const char * failure,
+			 uintptr_t context)
+{
+	MODM_LOG_ERROR << "Assertion '" << module << "." << location << "." << failure << "'";
+	if (context) { MODM_LOG_ERROR << " @ " << (void *) context << " (" << (uint32_t) context << ")"; }
+	MODM_LOG_ERROR << " failed! Abandoning..." << modm::endl;
+
+	Board::LedBlue::setOutput();
+	while(1) {
+		Board::LedBlue::set();
+		modm::delayMilliseconds(20);
+		Board::LedBlue::reset();
+		modm::delayMilliseconds(180);
+	}
+}

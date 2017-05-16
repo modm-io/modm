@@ -63,7 +63,7 @@ public:
 
 	static constexpr std::size_t buffer_length = 100;
 	char buffer[buffer_length];
-	int bytesWritten;
+	size_t bytesWritten;
 };
 
 // ----------------------------------------------------------------------------
@@ -91,7 +91,7 @@ IoStreamTest::testString()
 	(*stream) << string;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 6);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 6);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 6U);
 }
 
 FLASH_STORAGE_STRING(flashString) = "abc";
@@ -104,7 +104,7 @@ IoStreamTest::testFlashString()
 	(*stream) << modm::accessor::asFlash(flashString);
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 3);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 3);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 3U);
 }
 
 // ----------------------------------------------------------------------------
@@ -116,7 +116,7 @@ IoStreamTest::testStreamUint8()
 	(*stream) << static_cast<uint8_t>(244);
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 3);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 3);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 3U);
 }
 
 void
@@ -127,7 +127,7 @@ IoStreamTest::testStreamInt8()
 	(*stream) << static_cast<int8_t>(-123);
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 4);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 4);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 4U);
 }
 
 // ----------------------------------------------------------------------------
@@ -139,7 +139,7 @@ IoStreamTest::testStreamUint16()
 	(*stream) << static_cast<uint16_t>(62412);
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 5);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 5);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 5U);
 }
 
 void
@@ -150,7 +150,7 @@ IoStreamTest::testStreamUint16_2()
 	(*stream) << static_cast<uint16_t>(0xffff);
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 5);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 5);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 5U);
 }
 
 // ----------------------------------------------------------------------------
@@ -162,7 +162,7 @@ IoStreamTest::testStreamInt16()
 	(*stream) << static_cast<int16_t>(-12345);
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 6);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 6);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 6U);
 }
 
 void
@@ -173,7 +173,7 @@ IoStreamTest::testStreamInt16_2()
 	(*stream) << static_cast<int16_t>(-32768);
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 6);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 6);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 6U);
 }
 
 // ----------------------------------------------------------------------------
@@ -185,7 +185,7 @@ IoStreamTest::testStreamUint32()
 	(*stream) << static_cast<uint32_t>(123);
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 3);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 3);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 3U);
 }
 
 void
@@ -196,7 +196,7 @@ IoStreamTest::testStreamUint32_2()
 	(*stream) << static_cast<uint32_t>(0xffffffff);
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 10);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 10);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 10U);
 }
 
 // ----------------------------------------------------------------------------
@@ -208,7 +208,7 @@ IoStreamTest::testStreamInt32()
 	(*stream) << static_cast<int32_t>(-12345678);
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 9);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 9);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 9U);
 }
 
 void
@@ -220,7 +220,7 @@ IoStreamTest::testStreamInt32_2()
 	(*stream) << static_cast<int32_t>(-2147483647 - 1);
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 11);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 11);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 11U);
 }
 
 void
@@ -231,7 +231,7 @@ IoStreamTest::testStreamInt32_3()
 	(*stream) << static_cast<int32_t>(0);
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 1);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 1);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 1U);
 }
 
 // ----------------------------------------------------------------------------
@@ -244,7 +244,7 @@ IoStreamTest::testStreamUint64()
 	(*stream) << static_cast<uint64_t>(12345678901234ULL);
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 14);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 14);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 14U);
 #endif
 }
 
@@ -257,7 +257,7 @@ IoStreamTest::testStreamInt64()
 	(*stream) << static_cast<int64_t>(-12345678901234LL);
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 15);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 15);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 15U);
 #endif
 }
 
@@ -270,7 +270,7 @@ IoStreamTest::testFloat()
 	(*stream) << 1.23f;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 11);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 11);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 11U);
 }
 
 void
@@ -281,7 +281,7 @@ IoStreamTest::testFloat2()
 	(*stream) << 457.0f;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 11);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 11);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 11U);
 }
 
 void
@@ -292,7 +292,7 @@ IoStreamTest::testFloat3()
 	(*stream) << -51231400.0f;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 12);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 12);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 12U);
 }
 
 void
@@ -303,7 +303,7 @@ IoStreamTest::testFloat4()
 	(*stream) << -0.0007234f;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 12);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 12);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 12U);
 }
 
 void
@@ -316,7 +316,7 @@ IoStreamTest::testBool1()
 	(*stream) << boo;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 4);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 4);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 4U);
 }
 
 void
@@ -329,7 +329,7 @@ IoStreamTest::testBool2()
 	(*stream) << boo;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 5);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 5);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 5U);
 }
 
 // ----------------------------------------------------------------------------
@@ -343,7 +343,7 @@ IoStreamTest::testHex1()
 	(*stream) << modm::hex << c;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 2);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 2);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 2U);
 }
 
 void
@@ -356,7 +356,7 @@ IoStreamTest::testHex2()
 	(*stream) << modm::hex << s;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 10);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 10);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 10U);
 }
 
 void
@@ -369,7 +369,7 @@ IoStreamTest::testHex3()
 	(*stream) << modm::hex << i;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 4);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 4);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 4U);
 }
 
 void
@@ -382,7 +382,7 @@ IoStreamTest::testHex4()
 	(*stream) << modm::hex << i;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 8);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 8);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 8U);
 }
 
 void
@@ -398,7 +398,7 @@ IoStreamTest::testHex5()
 	(*stream) << modm::hex << boo;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 4);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 4);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 4U);
 }
 
 // ----------------------------------------------------------------------------
@@ -412,7 +412,7 @@ IoStreamTest::testBin1()
 	(*stream) << modm::bin << c;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 8);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 8);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 8U);
 }
 
 void
@@ -425,7 +425,7 @@ IoStreamTest::testBin2()
 	(*stream) << modm::bin << s;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 40);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 40);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 40U);
 }
 
 void
@@ -438,7 +438,7 @@ IoStreamTest::testBin3()
 	(*stream) << modm::bin << i;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 16);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 16);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 16U);
 }
 
 void
@@ -451,7 +451,7 @@ IoStreamTest::testBin4()
 	(*stream) << modm::bin << i;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 32);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 32);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 32U);
 }
 
 void
@@ -467,7 +467,7 @@ IoStreamTest::testBin5()
 	(*stream) << modm::bin << boo;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 16);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 16);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 16U);
 }
 
 void
@@ -477,7 +477,7 @@ IoStreamTest::testPrintf1()
 	(*stream).printf("Lala");
 
 	TEST_ASSERT_EQUALS_ARRAY("Lala", device.buffer, 4);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 4);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 4U);
 }
 
 void
@@ -511,7 +511,7 @@ IoStreamTest::testPrintf2()
 
 				char glibc[device.buffer_length];
 
-				int len = snprintf(glibc, device.buffer_length, fmt_str, ff);
+				size_t len = snprintf(glibc, device.buffer_length, fmt_str, ff);
 
 				(*stream).printf(fmt_str, ff);
 
@@ -540,5 +540,27 @@ IoStreamTest::testFp()
 	TEST_ASSERT_EQUALS(myFuncPtr1, myFuncPtr1);
 	TEST_ASSERT_EQUALS(myFuncPtr1, myFuncPtr3);
 	TEST_ASSERT_DIFFERS(myFuncPtr1, myFuncPtr2);
+}
 
+void
+IoStreamTest::testPointer()
+{
+#if MODM_SIZEOF_POINTER == 2
+	char string[] = "0x0123";
+	void * p = (void *) 0x0123;
+	const size_t bytesWritten = 6;
+#elif MODM_SIZEOF_POINTER == 4
+	char string[] = "0x01234567";
+	void * p = (void *) 0x01234567;
+	const size_t bytesWritten = 10;
+#else
+	char string[] = "0x0123456789ABCDEF";
+	void * p = (void *) 0x0123456789ABCDEF;
+	const size_t bytesWritten = 18;
+#endif
+
+	(*stream).printf("%p", p);
+
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, bytesWritten);
+	TEST_ASSERT_EQUALS(device.bytesWritten, bytesWritten);
 }

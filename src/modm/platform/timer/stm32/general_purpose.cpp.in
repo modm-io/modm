@@ -14,10 +14,24 @@
  */
 // ----------------------------------------------------------------------------
 
-%% if id in range(9,12) or id in range(15,21)
-%%   set apb = "APB2"
+%% if target["family"] in ["l4"]
+%%   if id in range(2,8)
+%%     set apb  = "APB1"
+%%     set apb_post = "1"
+%%   elif id in [1,8] or id in [15,16,17]
+%%     set apb = "APB2"
+%%     set apb_post = ""
+%%   else
+       #error "Don't know on which APB this timer {{ id }} is."
+%%   endif
 %% else
-%%   set apb = "APB1"
+%%   if id in range(9,12) or id in range(15,21)
+%%     set apb = "APB2"
+%%   elif id in range(1,9) or id in range (12,15)
+%%     set apb = "APB1"
+%%   else
+       #error "Don't know on which APB this timer {{ id }} is."
+%%   endif
 %% endif
 
 %% if (target["family"] == "f3" and target["name"] in ["373", "378"]) or target["family"] == "f0"
@@ -55,25 +69,25 @@ void
 modm::stm32::Timer{{ id }}::clockEnable()
 {
 	// enable clock
-	RCC->{{ apb }}ENR  |=  RCC_{{ apb }}ENR_TIM{{ id }}EN;
+	RCC->{{ apb }}ENR{{ apb_post }}  |=  RCC_{{ apb }}ENR{{ apb_post }}_TIM{{ id }}EN;
 }
 
 void
 modm::stm32::Timer{{ id }}::enable()
 {
 	// enable clock
-	RCC->{{ apb }}ENR  |=  RCC_{{ apb }}ENR_TIM{{ id }}EN;
+	RCC->{{ apb }}ENR{{ apb_post }}  |=  RCC_{{ apb }}ENR{{ apb_post }}_TIM{{ id }}EN;
 
 	// reset timer
-	RCC->{{ apb }}RSTR |=  RCC_{{ apb }}RSTR_TIM{{ id }}RST;
-	RCC->{{ apb }}RSTR &= ~RCC_{{ apb }}RSTR_TIM{{ id }}RST;
+	RCC->{{ apb }}RSTR{{ apb_post }} |=  RCC_{{ apb }}RSTR{{ apb_post }}_TIM{{ id }}RST;
+	RCC->{{ apb }}RSTR{{ apb_post }} &= ~RCC_{{ apb }}RSTR{{ apb_post }}_TIM{{ id }}RST;
 }
 
 void
 modm::stm32::Timer{{ id }}::disable()
 {
 	// disable clock
-	RCC->{{ apb }}ENR &= ~RCC_{{ apb }}ENR_TIM{{ id }}EN;
+	RCC->{{ apb }}ENR{{ apb_post }} &= ~RCC_{{ apb }}ENR{{ apb_post }}_TIM{{ id }}EN;
 
 	TIM{{ id }}->CR1 = 0;
 	TIM{{ id }}->DIER = 0;

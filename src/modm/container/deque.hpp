@@ -68,6 +68,9 @@ namespace modm
 		
 		inline bool
 		isEmpty() const;
+
+		inline bool
+		isNotEmpty() const { return not isEmpty(); };
 		
 		inline bool
 		isFull() const;
@@ -96,18 +99,84 @@ namespace modm
 		inline const T&
 		getFront() const;
 		
+		/**
+		 * \brief	Get item at specified index
+		 * 
+		 * Returns a reference to the item at index `n`, counting 0-indexed
+		 * from Front to Back, which is the same order in that the items were
+		 * appended and the iterator addresses them.
+		 * 
+		 * \warning Please make sure `n` is a valid index: 0 <= *n* < *size*.
+		 * 			Other indexes will cause undefined behaviour.
+		 */
+		inline T&
+		get(Index n);
+		
+		inline const T&
+		get(Index n) const;
+		
+		/**
+		 * \brief	Get item at specified index
+		 * 
+		 * Returns a reference to the item at index `n`, counting 0-indexed
+		 * from Front to Back.
+		 * 
+		 * \warning Please make sure `n` is a valid index: 0 <= *n* < *size*.
+		 * 			Other indexes will cause undefined behaviour.
+		 */
+		inline T&
+		operator[](Index n);
+		
+		inline const T&
+		operator[](Index n) const;
+		
+		/**
+		 * \brief	Get item at specified index
+		 * 
+		 * Returns a reference to the item at index `n`. The items are indexed
+		 * in reverse (Back to Front), which is their order when they have been
+		 * prepended.
+		 * 
+		 * \warning Please make sure `n` is a valid index: 0 <= *n* < *size*.
+		 * 			Other indexes will cause undefined behaviour.
+		 */
+		inline T&
+		rget(Index n);
+		
+		inline const T&
+		rget(Index n) const;
+		
 		inline T&
 		getBack();
 		
 		inline const T&
 		getBack() const;
 		
-		
 		bool
 		append(const T& value);
 		
+		/**
+		 * \brief	Append an item to the back of the deque overwriting existing items
+		 * 
+		 * This method, in contrast to `append()`, overwrites existing items in the deque
+		 * if it is full. When an item is appended to the already full deque, the front
+		 * item is removed to use its space for the new item, which is inserted after back.
+		 */
+		void
+		appendOverwrite(const T& value);
+		
 		bool
 		prepend(const T& value);
+		
+		/**
+		 * \brief	Prepend an item to the front of the deque overwriting existing items
+		 * 
+		 * This method, in contrast to `prepend()`, overwrites existing items in the deque
+		 * if it is full. When an item is prepended to the already full deque, the back
+		 * item is removed to use its space for the new item, which is inserted at front.
+		 */
+		void
+		prependOverwrite(const T& value);
 		
 		void
 		removeBack();

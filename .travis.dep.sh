@@ -37,9 +37,9 @@ if [ ! -d "$HOME/cache/avr8-gnu-toolchain-linux_x86" ]; then
 	tar -xzf avr8.tar.gz
 	rm avr8.tar.gz
 fi
-if [ ! -d "$HOME/cache/gcc-arm-none-eabi-4_9-2015q3" ]; then
+if [ ! -d "$HOME/cache/gcc-arm-none-eabi-6-2017-q1-update" ]; then
 	echo "Downloading Cortex-M toolchain..."
-	wget https://launchpad.net/gcc-arm-embedded/4.9/4.9-2015-q3-update/+download/gcc-arm-none-eabi-4_9-2015q3-20150921-linux.tar.bz2 -O cortex_m.tar.bz2
+	wget https://developer.arm.com/-/media/Files/downloads/gnu-rm/6_1-2017q1/gcc-arm-none-eabi-6-2017-q1-update-linux.tar.bz2 -O cortex_m.tar.bz2
 	tar -xjf cortex_m.tar.bz2
 	rm cortex_m.tar.bz2
 fi

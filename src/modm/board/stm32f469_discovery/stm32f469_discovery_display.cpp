@@ -26,14 +26,7 @@ class DsiDisplay : public modm::GraphicDisplay
 public:
 	DsiDisplay() : buffer(new (modm::MemoryExternal) uint16_t[800*480])
 	{
-		// ColorCoding: 0 = ARGB8888, 2 = RGB565
-		board_initialize_display(2);
-		// Configures the color frame buffer start address
-		LTDC_Layer1->CFBAR = uint32_t(buffer);
-		// Enable LTDC_Layer by setting LEN bit
-		LTDC_Layer1->CR = LTDC_LxCR_LEN;
-		// Sets the Reload type
-		LTDC->SRCR = LTDC_SRCR_IMR;
+		Board::setDisplayBuffer((void *) buffer);
 	}
 
 	uint16_t
@@ -88,6 +81,25 @@ void
 Board::initializeDisplay()
 {
 	board_initialize_display(2);
+}
+
+void
+Board::setDisplayBuffer(void * buffer)
+{
+	// ColorCoding: 0 = ARGB8888, 2 = RGB565
+	board_initialize_display(2);
+	// Configures the color frame buffer start address
+	LTDC_Layer1->CFBAR = uint32_t(buffer);
+	// Enable LTDC_Layer by setting LEN bit
+	LTDC_Layer1->CR = LTDC_LxCR_LEN;
+	// Sets the Reload type
+	LTDC->SRCR = LTDC_SRCR_IMR;
+}
+
+void *
+Board::getDisplayBuffer()
+{
+	return (void *) LTDC_Layer1->CFBAR;
 }
 
 modm::GraphicDisplay&

@@ -1,0 +1,470 @@
+// coding: utf-8
+/* Copyright (c) 2017 Roboterclub Aachen e. V.
+ * All Rights Reserved.
+ *
+ * The file is part of the modm library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+
+/* To debug the internal state of the driver, you can instantiate a
+ * modm::IOStream in your main source file, which will then be used to dump
+ * state data of the operations via the serial port, e.g.
+ *   #include <modm/io/iostream.hpp>
+ *   modm::IODeviceWrapper< Uart5, modm::IOBuffer::BlockIfFull > device;
+ *   modm::IOStream stream(device);
+
+ * Be advised, that a typical I2C read/write operation can take 10 to 100 longer
+ * because the strings have to be copied during the interrupt!
+ *
+ * You can enable serial debugging with this define by changing 0 to 1.
+ */
+#define SERIAL_DEBUGGING 0
+
+#if SERIAL_DEBUGGING
+#	include "../../uart/stm32/uart_2.hpp"
+	using DebugUart = modm::stm32::Usart2;
+#	include <modm/io/iostream.hpp>
+	extern modm::IOStream stream;
+#	define DEBUG_STREAM(x) stream << x << "\n"
+#	define DEBUG(x) modm::stm32::Usart2::write(x)
+#else
+#	define DEBUG_STREAM(x)
+#	define DEBUG(x)
+#endif
+
+#include "i2c_master_{{ id }}.hpp"
+#include <modm/architecture/driver/accessor.hpp>
+#include <modm/architecture/driver/atomic.hpp>
+#include <modm/container/container.hpp>
+
+MODM_ISR_DECL(I2C{{ id }}_ER);
+
+namespace
+{
+	static modm::I2c::Operation nextOperation;
+
+	// transaction queue management
+	struct ConfiguredTransaction
+	{
+		ConfiguredTransaction()
+		:	transaction(nullptr), configuration(nullptr) {}
+
+		ConfiguredTransaction(modm::I2cTransaction *transaction, modm::I2c::ConfigurationHandler configuration)
+		:	transaction(transaction), configuration(configuration) {}
+
+		modm::I2cTransaction *transaction;
+		modm::I2c::ConfigurationHandler configuration;
+	};
+
+	static modm::BoundedQueue<ConfiguredTransaction, {{ options["buffer.transaction"] }}> queue;
+	static modm::I2c::ConfigurationHandler configuration(nullptr);
+
+	// delegating
+	static modm::I2cTransaction *transaction(nullptr);
+	static modm::I2cMaster::Error error(modm::I2cMaster::Error::NoError);
+
+	// buffer management
+	static modm::I2cTransaction::Starting starting(0, modm::I2c::OperationAfterStart::Stop);
+	static modm::I2cTransaction::Writing writing(nullptr, 0, modm::I2c::OperationAfterWrite::Stop);
+	static modm::I2cTransaction::Reading reading(nullptr, 0, modm::I2c::OperationAfterRead::Stop);
+
+	// helper functions
+	static inline void
+	callStarting()
+	{
+		starting = transaction->starting();
+		switch (starting.next)
+		{
+			case modm::I2c::OperationAfterStart::Read:
+				reading = transaction->reading();
+				nextOperation = static_cast<modm::I2c::Operation>(reading.next);
+
+				DEBUG_STREAM("read op: reading=" << reading.length);
+				DEBUG_STREAM("nextOperation =" << nextOperation);
+
+				I2C{{ id }}->CR2 = I2C_CR2_AUTOEND | (reading.length << 16) | \
+								   I2C_CR2_START   | I2C_CR2_RD_WRN | (starting.address & 0xfe);
+
+				DEBUG_STREAM("Wait for RXIE IRQ");
+				I2C{{ id }}->CR1 &= ~(I2C_CR1_STOPIE | I2C_CR1_TCIE | I2C_CR1_RXIE | I2C_CR1_TXIE);
+				I2C{{ id }}->CR1 |= I2C_CR1_RXIE;
+
+				break;
+
+			case modm::I2c::OperationAfterStart::Write:
+				writing = transaction->writing();
+				nextOperation = static_cast<modm::I2c::Operation>(writing.next);
+				DEBUG_STREAM("nextOperation =" << nextOperation);
+
+				DEBUG_STREAM("write op: writing=" << writing.length);
+
+				// Write first data byte to TXDR
+				if ((writing.length > 0) and (writing.buffer != nullptr)) {
+					I2C{{ id }}->TXDR = *writing.buffer++;
+				}
+
+				// Do not AUTOEND if Restart required
+				I2C{{ id }}->CR2 = ((nextOperation != modm::I2c::Operation::Restart) ? I2C_CR2_AUTOEND : 0 ) |\
+									(writing.length << 16) | \
+								   I2C_CR2_START   | (starting.address & 0xfe);
+
+				if (writing.length > 0) {
+					--writing.length;
+				}
+
+				I2C{{ id }}->CR1 &= ~(I2C_CR1_STOPIE | I2C_CR1_TCIE | I2C_CR1_RXIE | I2C_CR1_TXIE);
+				if (writing.length == 0)
+				{
+					// All (1 byte) written. Waiting for the end of the transfer.
+					DEBUG_STREAM("Wait for TC IRQ");
+					I2C{{ id }}->CR1 |= I2C_CR1_TCIE;
+				} else {
+					// More to write
+					DEBUG_STREAM("Wait for TXIE IRQ");
+					I2C{{ id }}->CR1 |= I2C_CR1_TXIE;
+				}
+
+				break;
+
+			case modm::I2c::OperationAfterStart::Stop:
+				writing.length = 0;
+				reading.length = 0;
+				nextOperation = modm::I2c::Operation::Stop;
+
+				DEBUG_STREAM("S AW P");
+
+				I2C{{ id }}->CR2 = I2C_CR2_AUTOEND | (reading.length << 16) | \
+								   I2C_CR2_START   | (starting.address & 0xfe);
+
+				// Only wait for STOPF Interrupt
+				DEBUG_STREAM("Wait for STOP IRQ");
+				I2C{{ id }}->CR1 &= ~(I2C_CR1_STOPIE | I2C_CR1_TCIE | I2C_CR1_RXIE | I2C_CR1_TXIE);
+				I2C{{ id }}->CR1 |= I2C_CR1_STOPIE;
+
+				break;
+		}
+
+		error = modm::I2cMaster::Error::NoError;
+	}
+
+	static inline void
+	callNextTransaction()
+	{
+		if (queue.isNotEmpty())
+		{
+			// wait until the stop condition has been generated
+			uint_fast32_t deadlockPreventer = 100000;
+			while ((I2C{{ id }}->ISR & I2C_ISR_STOPF) and (deadlockPreventer-- > 0))
+				{};
+
+			ConfiguredTransaction next = queue.get();
+			queue.pop();
+			// configure the peripheral
+			if (next.configuration and (configuration != next.configuration)) {
+				configuration = next.configuration;
+				configuration();
+			}
+
+			DEBUG_STREAM("\n###\n");
+			::transaction = next.transaction;
+			// start the transaction
+			callStarting();
+		}
+	}
+}
+
+// ----------------------------------------------------------------------------
+MODM_ISR(I2C{{ id }}_EV)
+{
+	DEBUG_STREAM("\n--- IRQ ---");
+	uint16_t isr = I2C{{ id }}->ISR;
+
+	I2C{{ id }}->CR1 &= ~(I2C_CR1_STOPIE | I2C_CR1_TCIE | I2C_CR1_RXIE | I2C_CR1_TXIE);
+
+	I2C{{ id }}->ICR |= I2C_ICR_STOPCF;
+
+#if SERIAL_DEBUGGING
+	if (isr & I2C_ISR_BUSY)  { DEBUG_STREAM("BUSY" ); } else { DEBUG_STREAM("busy" ); }
+	if (isr & I2C_ISR_ARLO)  { DEBUG_STREAM("ARLO" ); } else { DEBUG_STREAM("arlo" ); }
+	if (isr & I2C_ISR_BERR)  { DEBUG_STREAM("BERR" ); } else { DEBUG_STREAM("berr" ); }
+	if (isr & I2C_ISR_TCR)   { DEBUG_STREAM("TCR"  ); } else { DEBUG_STREAM("tcr"  ); }
+	if (isr & I2C_ISR_TC)    { DEBUG_STREAM("TC"   ); } else { DEBUG_STREAM("tc"   ); }
+	if (isr & I2C_ISR_STOPF) { DEBUG_STREAM("STOPF"); } else { DEBUG_STREAM("stopf"); }
+	if (isr & I2C_ISR_NACKF) { DEBUG_STREAM("NACKF"); } else { DEBUG_STREAM("nackf"); }
+	if (isr & I2C_ISR_RXNE)  { DEBUG_STREAM("RXNE" ); } else { DEBUG_STREAM("rxne" ); }
+	if (isr & I2C_ISR_TXIS)  { DEBUG_STREAM("TXIS" ); } else { DEBUG_STREAM("txis" ); }
+	if (isr & I2C_ISR_TXE)   { DEBUG_STREAM("TXE"  ); } else { DEBUG_STREAM("txe"  ); }
+#endif
+
+	// First read from RXDR before checking STOP
+	if (isr & I2C_ISR_RXNE)
+	{
+		*reading.buffer++ = I2C{{ id }}->RXDR & 0xff;
+		--reading.length;
+
+		if (reading.length > 0) {
+			// Wait for next RXIE interrupt
+			DEBUG_STREAM("Wait for RXIE IRQ. rx.len = " << reading.length);
+			I2C{{ id }}->CR1 |= I2C_CR1_RXIE;
+		} else {
+			DEBUG_STREAM("RXNE: nextOperation = " << nextOperation);
+			if (nextOperation == modm::I2c::Operation::Stop)
+			{
+				if (not (isr & I2C_ISR_STOPF))
+				{
+					// Stop was not yet generated.
+					DEBUG_STREAM("Wait for STOP IRQ");
+					I2C{{ id }}->CR1 |= I2C_CR1_STOPIE;
+				} else {
+					// Process STOP condition below.
+				}
+			}
+		}
+	}
+
+	if (isr & I2C_ISR_STOPF)
+	{
+		// Stop condition was generated
+		if (nextOperation == modm::I2c::Operation::Stop)
+		{
+			if (transaction) {
+				if (isr & I2C_ISR_NACKF) {
+					DEBUG_STREAM("ACK FAIL");
+					I2C{{ id }}->ICR |= I2C_ICR_NACKCF;
+					transaction->detaching(modm::I2c::DetachCause::ErrorCondition);
+				} else {
+					transaction->detaching(modm::I2c::DetachCause::NormalStop);
+				}
+			}
+			transaction = nullptr;
+			DEBUG_STREAM("transaction finished");
+			callNextTransaction();
+		}
+	}
+
+	if (isr & I2C_ISR_TXIS)
+	{
+		// Transmit Interrupt Status (transmitters)
+
+		// Write another data byte to TXDR
+		if ((writing.length > 0) and (writing.buffer != nullptr)) {
+			I2C{{ id }}->TXDR = *writing.buffer++;
+		}
+
+		if (writing.length > 0) {
+			--writing.length;
+		}
+
+		if (writing.length == 0)
+		{
+			// All (1 byte) written. Waiting for the end of the transfer.
+			DEBUG_STREAM("Wait for STOP IRQ");
+			I2C{{ id }}->CR1 |= I2C_CR1_STOPIE;
+		} else {
+			// More to write
+			DEBUG_STREAM("Wait for TXIE IRQ");
+			I2C{{ id }}->CR1 |= I2C_CR1_TXIE;
+		}
+	}
+
+	if (isr & I2C_ISR_TC)
+	{
+		// Transfer Complete (master mode)
+		if (nextOperation == modm::I2c::Operation::Restart)
+		{
+			callStarting();
+			DEBUG_STREAM("restart op");
+		}
+	}
+}
+
+// ----------------------------------------------------------------------------
+MODM_ISR(I2C{{ id }}_ER)
+{
+	DEBUG_STREAM("ERROR!");
+	uint16_t sr1 = I2C{{ id }}->ISR;
+
+	if (sr1 & I2C_ISR_BERR)
+	{
+		DEBUG_STREAM("BUS ERROR");
+		I2C{{ id }}->ICR |= I2C_ICR_BERRCF;
+		error = modm::I2cMaster::Error::BusCondition;
+	}
+	else if (sr1 & I2C_ISR_NACKF)
+	{	// acknowledge fail
+		I2C{{ id }}->ICR |= I2C_ICR_NACKCF;
+		DEBUG_STREAM("ACK FAIL");
+		// may also be ADDRESS_NACK
+		error = starting.address ? modm::I2cMaster::Error::AddressNack : modm::I2cMaster::Error::DataNack;
+	}
+	else if (sr1 & I2C_ISR_ARLO)
+	{	// arbitration lost
+		I2C{{ id }}->ISR |= I2C_ICR_ARLOCF;
+		DEBUG_STREAM("ARBITRATION LOST");
+		error = modm::I2cMaster::Error::ArbitrationLost;
+	}
+	else if (error == modm::I2cMaster::Error::NoError)
+	{
+		DEBUG_STREAM("UNKNOWN");
+		error = modm::I2cMaster::Error::Unknown;
+	}
+
+	if (transaction) transaction->detaching(modm::I2c::DetachCause::ErrorCondition);
+	transaction = nullptr;
+
+	// Overrun error is not handled here separately
+
+	// Clear flags and interrupts
+	writing.length = 0;
+	reading.length = 0;
+
+	DEBUG_STREAM("disable interrupts");
+	I2C{{ id }}->CR1 &= ~(
+		I2C_CR1_STOPIE |
+		I2C_CR1_TCIE   |
+		I2C_CR1_RXIE   |
+		I2C_CR1_TXIE   |
+		I2C_CR1_RXIE);
+
+	callNextTransaction();
+}
+
+// ----------------------------------------------------------------------------
+
+void
+modm::stm32::I2cMaster{{ id }}::initializeWithPrescaler(/* uint8_t peripheralFrequency, uint8_t riseTime, uint16_t prescaler */)
+{
+	// Enable clock
+	RCC->APB1ENR1 |= RCC_APB1ENR1_I2C{{ id }}EN;
+
+	// reset module
+	RCC->APB1RSTR1 |=  RCC_APB1RSTR1_I2C{{ id }}RST;
+	RCC->APB1RSTR1 &= ~RCC_APB1RSTR1_I2C{{ id }}RST;
+
+	// Disable the I2C peripheral which causes a software reset
+	I2C{{ id }}->CR1 &= ~I2C_CR1_PE;
+
+	// Configure I2Cx: Frequency range
+	// 39.4.8: Before enabling the peripheral, the I2C master clock must be configured by setting the
+	// SCLH and SCLL bits in the I2C_TIMINGR register.
+
+	// PRESC  = 0x02 // 48 MHz / 3 = 16 MHz 62.5 nsec
+	// SCLDEL = 0x03 // Data setup time   ( 3 + 1) * 62.5 nsec =    250 nsec
+	// SDADEL = 0x00 // Data hold time  = ( 0 + 1) * 62.5 nsec =    625 nsec
+	// SCLH   = 0x3e // SCL high period = (62 + 1) * 62.5 nsec = 3.9375 msec
+	// SCLL   = 0x5d // SCL low period  = (93 + 1) * 62.5 nsec = 5.8750 msec
+	//                                                         = 9.8125 msec
+	// FIXME Hard-coded values for 100 kHz at 48 MHz
+	static constexpr uint32_t timing = 0x20303E5D;
+	static constexpr uint32_t TIMING_CLEAR_MASK = 0xF0FFFFFF;
+	I2C{{ id }}->TIMINGR = timing & TIMING_CLEAR_MASK;
+
+	// Disable Own Address1 before set the Own Address1 configuration
+	I2C{{ id }}->OAR1 &= ~I2C_OAR1_OA1EN;
+
+	// Configure I2Cx: Own Address1 and ack own address1 mode
+	static constexpr uint32_t own_address = 0;
+	enum class AddressingMode
+	{
+		Bit7,
+		Bit10,
+	};
+
+	static constexpr AddressingMode addressingMode = AddressingMode::Bit7;
+
+	// Configure Addressing Master mode
+	switch (addressingMode)
+	{
+		case AddressingMode::Bit7:
+			I2C{{ id }}->OAR1 = (I2C_OAR1_OA1EN | own_address);
+			break;
+		case AddressingMode::Bit10:
+			I2C{{ id }}->OAR1 = (I2C_OAR1_OA1EN | I2C_OAR1_OA1MODE | own_address);
+			I2C{{ id }}->CR2  = (I2C_CR2_ADD10);
+			break;
+	}
+
+	// Disable Own Address 2
+	I2C{{ id }}->OAR2 = 0;
+
+	// Configure Generalcall and NoStretch mode
+	I2C{{ id }}->CR1 = (0 | I2C_CR1_NOSTRETCH);
+
+	// Enable Error Interrupt
+	NVIC_SetPriority(I2C{{ id }}_ER_IRQn, 10);
+	NVIC_EnableIRQ(I2C{{ id }}_ER_IRQn);
+
+	// Enable Event Interrupt
+	NVIC_SetPriority(I2C{{ id }}_EV_IRQn, 10);
+	NVIC_EnableIRQ(I2C{{ id }}_EV_IRQn);
+
+	// Enable peripheral
+	I2C{{ id }}->CR1 |= I2C_CR1_PE;
+}
+
+void
+modm::stm32::I2cMaster{{ id }}::reset()
+{
+	reading.length = 0;
+	writing.length = 0;
+	error = Error::SoftwareReset;
+	if (transaction) transaction->detaching(DetachCause::ErrorCondition);
+	transaction = nullptr;
+	// remove all queued transactions
+	while (queue.isNotEmpty())
+	{
+		ConfiguredTransaction next = queue.get();
+		if (next.transaction) { next.transaction->detaching(DetachCause::ErrorCondition); }
+		queue.pop();
+	}
+}
+
+bool
+modm::stm32::I2cMaster{{ id }}::start(I2cTransaction *transaction, ConfigurationHandler handler)
+{
+	DEBUG_STREAM("\n$$$\n");
+	starting = transaction->starting();
+	// stream.printf("starting.address = %02x\n", starting.address >> 1);
+	DEBUG_STREAM("starting.next    = " << starting.next);
+
+	modm::atomic::Lock lock;
+	// if we have a place in the queue and the transaction object is valid
+	if (queue.isNotFull() && transaction)
+	{
+		// if the transaction object wants to attach to the queue
+		if (transaction->attaching())
+		{
+			// if no current transaction is taking place
+			if (!modm::accessor::asVolatile(::transaction))
+			{
+				// configure the peripheral
+				if (handler and configuration != handler) {
+					configuration = handler;
+					configuration();
+				}
+
+				DEBUG_STREAM("\n###\n");
+				::transaction = transaction;
+				// start the transaction
+				callStarting();
+			}
+			else
+			{
+				// queue the transaction for later execution
+				queue.push(ConfiguredTransaction(transaction, configuration));
+			}
+			return true;
+		}
+		else {
+			transaction->detaching(modm::I2c::DetachCause::FailedToAttach);
+		}
+	}
+	return false;
+}
+
+modm::I2cMaster::Error
+modm::stm32::I2cMaster{{ id }}::getErrorState()
+{
+	return error;
+}

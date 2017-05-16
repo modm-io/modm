@@ -51,6 +51,11 @@ RegisterTest::testAssignments()
 	a0 = translateCommonArgument(c3);
 	TEST_ASSERT_EQUALS(a0, 0x42);
 
+	// flags operators to common struct
+	v0 = Test::A;
+	c0 = v0 | Test::C;
+	TEST_ASSERT_EQUALS(c0.value, 0b101);
+
 	// to register
 
 	// these are not possible!

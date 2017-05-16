@@ -260,6 +260,15 @@ nvicDisableInterrupt(IRQn_Type IRQn)
 #	define TIM8_UP_IRQn			TIM8_UP_TIM13_IRQn
 #	define TIM8_TRG_COM_IRQn	TIM8_TRG_COM_TIM14_IRQn
 	%% endif
+%% elif target["family"] in ["l4"]
+	%% if id == 1
+#	define TIM1_BRK_IRQn		TIM1_BRK_TIM15_IRQn
+#	define TIM1_UP_IRQn			TIM1_UP_TIM16_IRQn
+	%% elif id == 8
+#	define TIM8_BRK_IRQn		TIM8_BRK_IRQn
+#	define TIM8_UP_IRQn			TIM8_UP_IRQn
+#	define TIM8_TRG_COM_IRQn	TIM8_TRG_COM_IRQn
+	%% endif
 %% elif target["family"] == "f3"
 	%% if id == 1
 #	define TIM1_BRK_IRQn		TIM1_BRK_TIM15_IRQn

@@ -56,11 +56,11 @@ namespace modm
 		 *
 		 *         while (true)
 		 *         {
-		 *             timeout.start(100);
+		 *             timeout.restart(100);
 		 *             Led::set();
 		 *             PT_WAIT_UNTIL(timeout.isExpired());
 		 *
-		 *             timeout.start(200);
+		 *             timeout.restart(200);
 		 *             Led::reset();
 		 *             PT_WAIT_UNTIL(timeout.isExpired());
 		 *         }

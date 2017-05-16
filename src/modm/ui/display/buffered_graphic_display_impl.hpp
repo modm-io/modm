@@ -23,7 +23,7 @@ modm::BufferedGraphicDisplay<Width, Height>::clear()
 {
 	for (uint_fast16_t y = 0; y < Height / 8; ++y) {
 		for (uint_fast16_t x = 0; x < Width; ++x) {
-			this->buffer[x][y] = 0;
+			this->display_buffer[x][y] = 0;
 		}
 	}
 
@@ -45,7 +45,7 @@ modm::BufferedGraphicDisplay<Width, Height>::drawHorizontalLine(
 		const uint8_t mask = 1 << (start.getY() & 0x07);
 		for (uint_fast16_t x = start.getX(); x < static_cast<uint16_t>(start.getX() + length); ++x) {
 			if( x < Width && y < Height ) {
-				this->buffer[x][y] |= mask;
+				this->display_buffer[x][y] |= mask;
 			}
 		}
 	}
@@ -53,7 +53,7 @@ modm::BufferedGraphicDisplay<Width, Height>::drawHorizontalLine(
 		const uint8_t mask = ~(1 << (start.getY() & 0x07));
 		for (uint_fast16_t x = start.getX(); x < static_cast<uint16_t>(start.getX() + length); ++x) {
 			if( x < Width && y < Height ) {
-				this->buffer[x][y] &= mask;
+				this->display_buffer[x][y] &= mask;
 			}
 		}
 	}
@@ -81,7 +81,7 @@ modm::BufferedGraphicDisplay<Width, Height>::drawImageRaw(glcd::Point upperLeft,
 					uint16_t y = k + row;
 
 					if( x < Width && y < Height ) {
-						this->buffer[x][y] = data[i + k * width];
+						this->display_buffer[x][y] = data[i + k * width];
 					}
 				}
 			}
@@ -98,7 +98,7 @@ void
 modm::BufferedGraphicDisplay<Width, Height>::setPixel(int16_t x, int16_t y)
 {
 	if (static_cast<uint16_t>(x) < Width && static_cast<uint16_t>(y) < Height) {
-		this->buffer[x][y / 8] |= (1 << (y & 0x07));
+		this->display_buffer[x][y / 8] |= (1 << (y & 0x07));
 	}
 }
 
@@ -107,7 +107,7 @@ void
 modm::BufferedGraphicDisplay<Width, Height>::clearPixel(int16_t x, int16_t y)
 {
 	if (static_cast<uint16_t>(x) < Width && static_cast<uint16_t>(y) < Height) {
-		this->buffer[x][y / 8] &= ~(1 << (y & 0x07));
+		this->display_buffer[x][y / 8] &= ~(1 << (y & 0x07));
 	}
 }
 
@@ -116,7 +116,7 @@ bool
 modm::BufferedGraphicDisplay<Width, Height>::getPixel(int16_t x, int16_t y)
 {
 	if (static_cast<uint16_t>(x) < Width && static_cast<uint16_t>(y) < Height) {
-		return (this->buffer[x][y / 8] & (1 << (y & 0x07)));
+		return (this->display_buffer[x][y / 8] & (1 << (y & 0x07)));
 	}
 	else {
 		return false;

@@ -12,6 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
+#include <modm/architecture/interface/assert.hpp>
+
 extern "C"
 {
 	/**
@@ -23,7 +25,7 @@ extern "C"
 	void
 	__cxa_pure_virtual()
 	{
-		// put error handling here
+		modm_assert_debug(0, "core", "cxa", "purevirtual");
 	}
 
 	__extension__ typedef int __guard __attribute__((mode (__DI__)));

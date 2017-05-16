@@ -13,14 +13,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_HOSTED_CAN_USB_HPP
-#define MODM_HOSTED_CAN_USB_HPP
+#ifndef MODM_CAN_USB_HPP
+#define MODM_CAN_USB_HPP
 
 #include <queue>
 #include <string>
 
-// FIXME: remove this dependency!
-#include "../uart/serial_interface.hpp"
 #include <modm/architecture/interface/can.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread.hpp>
@@ -38,15 +36,16 @@ namespace hosted
  * @see		http://www.can232.com/
  * @ingroup	hosted
  */
+template <typename SerialPort>
 class CanUsb : public ::modm::Can
 {
 public:
-	CanUsb();
+	CanUsb(SerialPort& serialPort);
 
 	~CanUsb();
 
 	bool
-	open(std::string deviceName, unsigned int serialBaudRate, modm::Can::Bitrate canBitrate = modm::Can::kBps125);
+	open(modm::Can::Bitrate canBitrate = modm::Can::kBps125);
 
 	void
 	close();
@@ -99,7 +98,7 @@ private:
 
 	BusState busState;
 
-	modm::hosted::SerialInterface serialPort;
+	SerialPort& serialPort;
 
 	std::string tmpRead;
 	std::queue<can::Message> readBuffer;
@@ -111,4 +110,6 @@ private:
 
 }	// namespace modm
 
-#endif // MODM_HOSTED_CAN_USB_HPP
+#include "canusb_impl.hpp"
+
+#endif // MODM_CAN_USB_HPP

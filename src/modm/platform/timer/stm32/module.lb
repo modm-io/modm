@@ -52,6 +52,7 @@ class Instance(Module):
         properties["id"] = int(self.instance)
 
         properties["connectors"] = get_connectors(self.instance)
+        properties["apb_post"] = "1" if properties["target"]["family"] in ["l4"] else ""
 
         env.substitutions = properties
         env.outbasepath = "src/modm/platform/timer"

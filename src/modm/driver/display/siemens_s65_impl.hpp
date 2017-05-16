@@ -232,7 +232,7 @@ modm::SiemensS65Portrait<SPI, CS, RS, Reset>::update() {
 		for (uint8_t y = 0; y < height; ++y)
 		{
 			// group of 8 black-and-white pixels
-			uint8_t group = this->buffer[x][y];
+			uint8_t group = this->display_buffer[x][y];
 
 			// 8 pixels of 16 bits fit in the Tx FIFO if it is empty.
 			while (!(LPC_SSP0->SR & SPI_SRn_TFE));
@@ -261,7 +261,7 @@ modm::SiemensS65Portrait<SPI, CS, RS, Reset>::update() {
 		for (uint8_t y = 0; y < height; ++y)
 		{
 			// group of 8 black-and-white pixels
-			uint8_t group = this->buffer[x][y];
+			uint8_t group = this->display_buffer[x][y];
 			uint8_t spiBuffer[16];
 			uint8_t spiIdx = 0;
 
@@ -319,7 +319,7 @@ modm::SiemensS65Landscape<SPI, CS, RS, Reset>::update() {
 		for (uint8_t y = 0; y < height; ++y)
 		{
 			// group of 8 black-and-white pixels
-			uint8_t group = this->buffer[x][y];
+			uint8_t group = this->display_buffer[x][y];
 
 			// 8 pixels of 16 bits fit in the Tx FIFO if it is empty.
 			while (!(LPC_SSP0->SR & SPI_SRn_TFE));
@@ -351,7 +351,7 @@ modm::SiemensS65Landscape<SPI, CS, RS, Reset>::update() {
 		for (uint8_t y = 0; y < height; ++y)
 		{
 			// group of 8 black-and-white pixels
-			uint8_t group = this->buffer[x][y];
+			uint8_t group = this->display_buffer[x][y];
 
 			uint8_t spiBuffer[16];
 			uint8_t bufSize = 16;

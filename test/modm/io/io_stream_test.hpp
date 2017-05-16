@@ -135,6 +135,9 @@ public:
 	void
 	testFp();
 
+	void
+	testPointer();
+
 private:
 	modm::IOStream *stream;
 };

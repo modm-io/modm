@@ -74,7 +74,6 @@ bool
 modm::hosted::SerialInterface::setBaudRate(unsigned int rate)
 {
 	struct termios configuration;
-	int result1, result2, result3;
 
 	// Read current configuration structure
 	tcgetattr(this->fileDescriptor, &configuration);
@@ -93,11 +92,11 @@ modm::hosted::SerialInterface::setBaudRate(unsigned int rate)
 		(rate == 115200) ? B115200 : B0;
 
 	// Change the configuration structure
-	result1 = cfsetispeed(&configuration, baudRateConstant);
-	result2 = cfsetospeed(&configuration, baudRateConstant);
+	int result1 = cfsetispeed(&configuration, baudRateConstant);
+	int result2 = cfsetospeed(&configuration, baudRateConstant);
 
 	// Set the modified configuration structure
-	result3 = tcsetattr(this->fileDescriptor, TCSANOW, &configuration);
+	int result3 = tcsetattr(this->fileDescriptor, TCSANOW, &configuration);
 
 	if (result1 < 0 || result2 < 0 || result3 < 0)
 	{

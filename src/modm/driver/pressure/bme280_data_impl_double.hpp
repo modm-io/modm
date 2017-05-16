@@ -69,7 +69,7 @@ DataDouble::calculateCalibratedPressure()
 		calculateCalibratedTemperature();
 	}
 
-	int32_t adc = ((raw[0] << 16) | (raw[1] << 8) | (raw[2] << 0));
+	int32_t adc = (((int32_t(raw[0])) << 16) | (raw[1] << 8) | (raw[2] << 0));
 	adc >>= 4;
 
 	double P1 = double(calibration.P1);

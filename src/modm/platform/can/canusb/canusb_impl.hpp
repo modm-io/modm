@@ -1,17 +1,15 @@
-/*
- * Copyright (c) 2010-2011, Thorsten Lajewski
- * Copyright (c) 2010-2011, Fabian Greif
- * Copyright (c) 2012, Dave Webb
- * Copyright (c) 2012-2015, Niklas Hauser
- * Copyright (c) 2015, Sascha Schade
+// coding: utf-8
+/* Copyright (c) 2009, Roboterclub Aachen e.V.
+ * All Rights Reserved.
  *
- * This file is part of the modm project.
- *
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * The file is part of the modm library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
+
+#ifndef MODM_CAN_USB_HPP
+#error "Do not include this file directly. Include canusb.hpp"
+#endif
 
 #include <iostream>
 #include <modm/debug/logger.hpp>
@@ -25,12 +23,14 @@
 #undef  MODM_LOG_LEVEL
 #define MODM_LOG_LEVEL modm::log::INFO
 
-modm::hosted::CanUsb::CanUsb()
-:	active(false), busState(BusState::Off)
+template <typename SerialPort>
+modm::hosted::CanUsb<SerialPort>::CanUsb(SerialPort& serialPort)
+:	active(false), busState(BusState::Off), serialPort(serialPort)
 {
 }
 
-modm::hosted::CanUsb::~CanUsb()
+template <typename SerialPort>
+modm::hosted::CanUsb<SerialPort>::~CanUsb()
 {
 	if (this->active)
 	{
@@ -42,27 +42,12 @@ modm::hosted::CanUsb::~CanUsb()
 		delete this->thread;
 		this->thread = 0;
 	}
-	this->serialPort.close();
-	while (this->serialPort.isOpen())
-	{
-		//wait for port to close;
-	}
 }
 
+template <typename SerialPort>
 bool
-modm::hosted::CanUsb::open(std::string deviceName, unsigned int serialBaudRate, modm::Can::Bitrate canBitrate)
+modm::hosted::CanUsb<SerialPort>::open(modm::Can::Bitrate canBitrate)
 {
-	if (this->serialPort.isOpen())
-		this->serialPort.close();
-
-	while (this->serialPort.isOpen())
-	{
-		// wait for port to close;
-	}
-
-	this->serialPort.setDeviceName(deviceName);
-	this->serialPort.setBaudRate(serialBaudRate);
-
 	if (this->serialPort.open())
 	{
 		MODM_LOG_DEBUG << MODM_FILE_INFO << "SerialPort opened in canusb" << modm::endl;
@@ -71,7 +56,7 @@ modm::hosted::CanUsb::open(std::string deviceName, unsigned int serialBaudRate, 
 
 		modm::ShortTimeout timeout;
 		timeout.restart(500);
-		while (!timeout.isExpired())
+		while (not timeout.isExpired())
 		{
 		}
 
@@ -112,27 +97,17 @@ modm::hosted::CanUsb::open(std::string deviceName, unsigned int serialBaudRate, 
 		
 
 		timeout.restart(500);
-		while (!this->serialPort.read(a))
+		while (not this->serialPort.read(a))
 		{
 			if (timeout.isExpired())
 			{
 				MODM_LOG_DEBUG << MODM_FILE_INFO << "Timer expired" << modm::endl;
-				this->serialPort.close();
-				while (this->serialPort.isOpen())
-				{
-					// wait for port to close;
-				}
 				return false;
 			}
 		}
 		if (a != '\r')
 		{
 			MODM_LOG_ERROR << MODM_FILE_INFO << "Wrong answer on set CAN bitrate: " << modm::hex << (int) a	<< modm::endl;
-			this->serialPort.close();
-			while (this->serialPort.isOpen())
-			{
-				// wait for port to close;
-			}
 			return false;
 		}
 		
@@ -140,16 +115,11 @@ modm::hosted::CanUsb::open(std::string deviceName, unsigned int serialBaudRate, 
 		this->serialPort.write("O\r");
 		MODM_LOG_DEBUG << MODM_FILE_INFO << "written 'O'" << modm::endl;
 		timeout.restart(500);
-		while (!this->serialPort.read(a))
+		while (not this->serialPort.read(a))
 		{
 			if (timeout.isExpired())
 			{
 				MODM_LOG_DEBUG << MODM_FILE_INFO << "Timer expired" << modm::endl;
-				this->serialPort.close();
-				while (this->serialPort.isOpen())
-				{
-					// wait for port to close;
-				}
 				return false;
 			}
 		}
@@ -157,11 +127,6 @@ modm::hosted::CanUsb::open(std::string deviceName, unsigned int serialBaudRate, 
 		if (a != '\r')
 		{
 			MODM_LOG_ERROR << MODM_FILE_INFO << "Wrong answer on O: " << modm::hex << (int) a << modm::endl;
-			this->serialPort.close();
-			while (this->serialPort.isOpen())
-			{
-				// wait for port to close;
-			}
 			return false;
 		}
 
@@ -170,7 +135,7 @@ modm::hosted::CanUsb::open(std::string deviceName, unsigned int serialBaudRate, 
 			this->active = true;
 		}
 		this->thread = new boost::thread(
-				boost::bind(&modm::hosted::CanUsb::update, this));
+				boost::bind(&modm::hosted::CanUsb<SerialPort>::update, this));
 
 		busState = BusState::Connected;
 		this->tmpRead.clear();
@@ -184,8 +149,9 @@ modm::hosted::CanUsb::open(std::string deviceName, unsigned int serialBaudRate, 
 	}
 }
 
+template <typename SerialPort>
 void
-modm::hosted::CanUsb::close()
+modm::hosted::CanUsb<SerialPort>::close()
 {
 	this->serialPort.write("C\r");
 	{
@@ -196,20 +162,21 @@ modm::hosted::CanUsb::close()
 	this->thread->join();
 	delete this->thread;
 	this->thread = 0;
-	this->serialPort.close();
 	busState = BusState::Off;
 }
 
+template <typename SerialPort>
 modm::Can::BusState
-modm::hosted::CanUsb::getBusState()
+modm::hosted::CanUsb<SerialPort>::getBusState()
 {
 	return busState;
 }
 
+template <typename SerialPort>
 bool
-modm::hosted::CanUsb::getMessage(can::Message& message)
+modm::hosted::CanUsb<SerialPort>::getMessage(can::Message& message)
 {
-	if (!this->readBuffer.empty())
+	if (not this->readBuffer.empty())
 	{
 		message = this->readBuffer.front();
 		this->readBuffer.pop();
@@ -221,8 +188,9 @@ modm::hosted::CanUsb::getMessage(can::Message& message)
 	}
 }
 
+template <typename SerialPort>
 bool
-modm::hosted::CanUsb::sendMessage(const can::Message& message)
+modm::hosted::CanUsb<SerialPort>::sendMessage(const can::Message& message)
 {
 	char str[128];
 	modm::CanLawicelFormatter::convertToString(message, str);
@@ -237,10 +205,11 @@ modm::hosted::CanUsb::sendMessage(const can::Message& message)
 	return true;
 }
 
+template <typename SerialPort>
 void
-modm::hosted::CanUsb::update()
+modm::hosted::CanUsb<SerialPort>::update()
 {
-	while (1)
+	while (true)
 	{
 		char a;
 		if (this->serialPort.read(a))
@@ -259,7 +228,8 @@ modm::hosted::CanUsb::update()
 				this->readBuffer.push(message);
 			}
 		}
-		if (!this->active)
+		if (not this->active) {
 			break;
+		}
 	}
 }

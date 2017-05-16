@@ -24,13 +24,15 @@ using modm::accessor::asFlash;
 extern "C" void
 modm_abandon(const char * module,
 			 const char * location,
-			 const char * failure)
+			 const char * failure,
+			 uintptr_t context)
 {
 	serialStream << IFS("Assertion '")
 			<< asFlash(module) << '.'
 			<< asFlash(location) << '.'
 			<< asFlash(failure)
-			<< IFS("' failed! Abandoning.") << modm::endl;
+			<< IFS("' @ ") << (void *) context
+			<< IFS(" failed! Abandoning.") << modm::endl;
 
 	Leds::setOutput();
 	while(1) {
@@ -44,7 +46,8 @@ modm_abandon(const char * module,
 static modm::Abandonment
 test_assertion_handler(const char * module,
 					   const char * /* location */,
-					   const char * /* failure */)
+					   const char * /* failure */,
+					   uintptr_t /* context */)
 {
 	serialStream << IFS("#1: '") << asFlash(module) << IFS("'!") << modm::endl;
 	// The strings are located in FLASH!!!
@@ -57,7 +60,8 @@ MODM_ASSERTION_HANDLER(test_assertion_handler);
 static modm::Abandonment
 test_assertion_handler2(const char * /* module */,
 						const char * location,
-						const char * /* failure */)
+						const char * /* failure */,
+						uintptr_t /* context */)
 {
 	serialStream << IFS("#2: '") << asFlash(location) << IFS("'!") << modm::endl;
 	return modm::Abandonment::DontCare;
@@ -67,7 +71,8 @@ MODM_ASSERTION_HANDLER(test_assertion_handler2);
 static modm::Abandonment
 test_assertion_handler3(const char * /* module */,
 						const char * /* location */,
-						const char * failure)
+						const char * failure,
+						uintptr_t /* context */)
 {
 	serialStream << IFS("#3: '") << asFlash(failure) << IFS("'!") << modm::endl;
 	return modm::Abandonment::DontCare;

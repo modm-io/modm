@@ -132,15 +132,15 @@
  *
  * Please read the documentation of the driver before you attempt to fix this
  * driver. I strongly recommend the use of an logic analyzer or oscilloscope,
- * to confirm the drivers behavior.
+ * to confirm the driver's behavior.
  * The event states are labeled as 'EVn_m' in reference to the manual.
  */
 
 /* To debug the internal state of the driver, you can instantiate a
- * modm::IOStream in your main souce file, which will then be used to dump
+ * modm::IOStream in your main source file, which will then be used to dump
  * state data of the operations via the serial port, e.g.
  *   #include <modm/io/iostream.hpp>
- *   modm::IODeviceWrapper< Uart5, * modm::IOBuffer::BlockIfFull > device;
+ *   modm::IODeviceWrapper< Uart5, modm::IOBuffer::BlockIfFull > device;
  *   modm::IOStream stream(device);
 
  * Be advised, that a typical I2C read/write operation can take 10 to 100 longer
@@ -173,14 +173,15 @@ namespace
 {
 	// parameter advice
 	static modm::I2c::Operation nextOperation;
-	static enum CheckNextOperation
+	enum class CheckNextOperation : uint8_t
 	{
-		CHECK_NEXT_OPERATION_NO,
-		CHECK_NEXT_OPERATION_NO_WAIT_FOR_BTF,
-		CHECK_NEXT_OPERATION_YES,
-		CHECK_NEXT_OPERATION_YES_NO_STOP_BIT,
+		NO,
+		NO_WAIT_FOR_BTF, ///< Do not wait for Byte Transfer Finished
+		YES,
+		YES_NO_STOP_BIT,
+	};
 
-	} checkNextOperation = CHECK_NEXT_OPERATION_NO;
+	static CheckNextOperation checkNextOperation = CheckNextOperation::NO;
 
 	// transaction queue management
 	struct ConfiguredTransaction
@@ -236,7 +237,7 @@ namespace
 		}
 
 		DEBUG_STREAM("callStarting");
-		checkNextOperation = CHECK_NEXT_OPERATION_NO;
+		checkNextOperation = CheckNextOperation::NO;
 		error = modm::I2cMaster::Error::NoError;
 
 		I2C{{ id }}->CR1 &= ~I2C_CR1_POS;
@@ -255,7 +256,7 @@ namespace
 	static inline void
 	callNextTransaction()
 	{
-		if (!queue.isEmpty())
+		if (queue.isNotEmpty())
 		{
 			// wait until the stop condition has been generated
 			uint_fast32_t deadlockPreventer = 100000;
@@ -287,6 +288,7 @@ MODM_ISR(I2C{{ id }}_EV)
 
 	if (sr1 & I2C_SR1_SB)
 	{
+		// Start condition generated.
 		// EV5: SB=1, cleared by reading SR1 register followed by writing DR register with Address.
 		DEBUG_STREAM("startbit set");
 
@@ -342,6 +344,7 @@ MODM_ISR(I2C{{ id }}_EV)
 
 	else if (sr1 & I2C_SR1_ADDR)
 	{
+		// End of address transmission
 		modm::atomic::Lock lock;
 		starting.address = 0;
 		// EV6: ADDR=1, cleared by reading SR1 register followed by reading SR2.
@@ -349,14 +352,14 @@ MODM_ISR(I2C{{ id }}_EV)
 		DEBUG_STREAM("writing.length=" << writing.length);
 		DEBUG_STREAM("reading.length=" << reading.length);
 
-		if (writing.length > 0 || reading.length > 3)
+		if ((writing.length > 0) or (reading.length > 3))
 		{
 			DEBUG_STREAM("enable buffers");
 			I2C{{ id }}->CR2 |= I2C_CR2_ITBUFEN;
 		}
-		if (!reading.length && !writing.length)
+		if ((!reading.length) and (!writing.length))
 		{
-			checkNextOperation = CHECK_NEXT_OPERATION_YES;
+			checkNextOperation = CheckNextOperation::YES;
 		}
 
 
@@ -379,7 +382,7 @@ MODM_ISR(I2C{{ id }}_EV)
 			uint16_t dr = I2C{{ id }}->DR;
 			*reading.buffer++ = dr & 0xff;
 			reading.length = 0;
-			checkNextOperation = CHECK_NEXT_OPERATION_YES_NO_STOP_BIT;
+			checkNextOperation = CheckNextOperation::YES_NO_STOP_BIT;
 		}
 		else if (reading.length == 2)
 		{
@@ -402,7 +405,7 @@ MODM_ISR(I2C{{ id }}_EV)
 
 			DEBUG_STREAM("TXE: writing.length=" << writing.length);
 
-			checkNextOperation = CHECK_NEXT_OPERATION_NO_WAIT_FOR_BTF;
+			checkNextOperation = CheckNextOperation::NO_WAIT_FOR_BTF;
 		}
 		// no else!
 		if (writing.length == 0)
@@ -417,6 +420,7 @@ MODM_ISR(I2C{{ id }}_EV)
 
 	else if (sr1 & I2C_SR1_RXNE)
 	{
+		// Data register not empty.
 		if (reading.length > 3)
 		{
 			// EV7: RxNE=1, cleared by reading DR register
@@ -463,7 +467,7 @@ MODM_ISR(I2C{{ id }}_EV)
 			*reading.buffer++ = dr & 0xff;
 
 			reading.length = 0;
-			checkNextOperation = CHECK_NEXT_OPERATION_YES_NO_STOP_BIT;
+			checkNextOperation = CheckNextOperation::YES_NO_STOP_BIT;
 		}
 
 		if (reading.length == 3)
@@ -479,24 +483,24 @@ MODM_ISR(I2C{{ id }}_EV)
 			DEBUG_STREAM("BTF: reading.length=2");
 		}
 
-		if (checkNextOperation == CHECK_NEXT_OPERATION_NO_WAIT_FOR_BTF
+		if (checkNextOperation == CheckNextOperation::NO_WAIT_FOR_BTF
 			&& writing.length == 0)
 		{
 			// EV8_2: TxE=1, BTF = 1, Program Stop request.
 			// TxE and BTF are cleared by hardware by the Stop condition
 			DEBUG_STREAM("BTF, write=0");
-			checkNextOperation = CHECK_NEXT_OPERATION_YES;
+			checkNextOperation = CheckNextOperation::YES;
 		}
 	}
 
 
 
-	if (checkNextOperation >= CHECK_NEXT_OPERATION_YES)
+	if (checkNextOperation >= CheckNextOperation::YES)
 	{
 		switch (nextOperation)
 		{
 			case modm::I2c::Operation::Write:
-				if (checkNextOperation != CHECK_NEXT_OPERATION_YES_NO_STOP_BIT)
+				if (checkNextOperation != CheckNextOperation::YES_NO_STOP_BIT)
 				{
 					writing = transaction->writing();
 					nextOperation = static_cast<modm::I2c::Operation>(writing.next);
@@ -512,7 +516,7 @@ MODM_ISR(I2C{{ id }}_EV)
 				break;
 
 			default:
-				if (checkNextOperation != CHECK_NEXT_OPERATION_YES_NO_STOP_BIT)
+				if (checkNextOperation != CheckNextOperation::YES_NO_STOP_BIT)
 				{
 					I2C{{ id }}->CR1 |= I2C_CR1_STOP;
 					DEBUG_STREAM("STOP");
@@ -526,7 +530,7 @@ MODM_ISR(I2C{{ id }}_EV)
 				callNextTransaction();
 				break;
 		}
-		checkNextOperation = CHECK_NEXT_OPERATION_NO;
+		checkNextOperation = CheckNextOperation::NO;
 	}
 }
 
@@ -571,7 +575,7 @@ MODM_ISR(I2C{{ id }}_ER)
 	I2C{{ id }}->SR2 = 0;
 	writing.length = 0;
 	reading.length = 0;
-	checkNextOperation = CHECK_NEXT_OPERATION_NO;
+	checkNextOperation = CheckNextOperation::NO;
 
 	DEBUG_STREAM("disable interrupts");
 	I2C{{ id }}->CR2 &= ~(I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN);
@@ -599,10 +603,10 @@ modm::stm32::I2cMaster{{ id }}::initializeWithPrescaler(uint8_t peripheralFreque
 	I2C{{ id }}->CR2 = peripheralFrequency;
 	I2C{{ id }}->CCR = prescaler;
 	I2C{{ id }}->TRISE = riseTime;
-%% if target["family"] in ["f2", "f4"]
+#ifdef I2C_FLTR_ANOFF_Msk
 	// analog filter on, digital filter = 2
-	I2C{{ id }}->FLTR = (1 << 4) | 4;
-%% endif
+	I2C{{ id }}->FLTR = I2C_FLTR_ANOFF_Msk | 4;
+# endif
 
 	I2C{{ id }}->CR1 |= I2C_CR1_PE; // Enable peripheral
 }

@@ -45,6 +45,8 @@ Don't forget to add the include path of the device files to the [`ext/SConstruct
 
 ### Adding device files
 
+**Please don't manually create device files for STM32 devices.** We generate these files from raw vendor data. Please ping [@salkinium](https://github.com/salkinium) if a device file for your STM32 is missing.
+
 The [modm device files](https://github.com/roboterclubaachen/modm/tree/develop/src/modm/architecture/platform/devices) contain the information that is used to generate the HAL. For AVR and STM32 devices these files are generated from another (vendor specific) data source.
 However, for a new vendor such machine readable data might not be available and if it is, it will require some work to create the necessary parser to automatically generate device files.
 We recommend building a minimal proof-of-concept port for one device first.

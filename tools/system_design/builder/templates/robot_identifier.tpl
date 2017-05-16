@@ -19,6 +19,8 @@
 #ifndef	{{ namespace | upper }}_IDENTIFIER_HPP
 #define	{{ namespace | upper }}_IDENTIFIER_HPP
 
+#include <stdint.h>
+
 namespace {{ namespace }}
 {
 	namespace domain

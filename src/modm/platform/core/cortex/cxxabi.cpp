@@ -20,7 +20,9 @@
 // ----------------------------------------------------------------------------
 
 #include <stdlib.h>                   // for prototypes of malloc() and free()
+#include <new>
 #include <modm/architecture/interface/memory.hpp>
+#include <modm/architecture/interface/assert.hpp>
 
 extern "C"
 {
@@ -30,7 +32,7 @@ extern "C"
 	void
 	__cxa_pure_virtual()
 	{
-		// put error handling here
+		modm_assert_debug(0, "core", "cxa", "purevirtual");
 	}
 	
 	// ------------------------------------------------------------------------
@@ -67,35 +69,67 @@ extern "C"
 void *
 operator new(size_t size) throw ()
 {
-	return malloc(size);
+	void * ptr = malloc(size);
+	modm_assert(ptr, "core", "heap", "new", size);
+	return ptr;
 }
 
 void *
 operator new[](size_t size) throw ()
 {
+	void * ptr = malloc(size);
+	modm_assert(ptr, "core", "heap", "new", size);
+	return ptr;
+}
+
+void *
+operator new(size_t size, std::nothrow_t) noexcept
+{
 	return malloc(size);
 }
 
 void *
-operator new(size_t size, modm::MemoryTraits traits)
+operator new[](size_t size, std::nothrow_t) noexcept
 {
-	return malloc_tr(size, traits.value);
+	return malloc(size);
 }
 
 void *
-operator new[](size_t size, modm::MemoryTraits traits)
+operator new(size_t size, modm::MemoryTraits traits) noexcept
 {
-	return malloc_tr(size, traits.value);
+	void * ptr = malloc_tr(size, traits.value);
+	modm_assert(ptr, "core", "heap", "new", size);
+	return ptr;
+}
+
+void *
+operator new[](size_t size, modm::MemoryTraits traits) noexcept
+{
+	void * ptr = malloc_tr(size, traits.value);
+	modm_assert(ptr, "core", "heap", "new", size);
+	return ptr;
 }
 
 void
-operator delete(void *p) throw ()
+operator delete(void *ptr) noexcept
 {
-	free(p);
+	free(ptr);
 }
 
 void
-operator delete[](void* p) throw ()
+operator delete(void* ptr, size_t) noexcept
 {
-	free(p);
+	free(ptr);
+}
+
+void
+operator delete[](void* ptr) noexcept
+{
+	free(ptr);
+}
+
+void
+operator delete[](void* ptr, size_t) noexcept
+{
+	free(ptr);
 }

@@ -9,11 +9,14 @@
  */
 // ----------------------------------------------------------------------------
 
-//
-// Arduino UNO
-//
-
 #include "arduino_uno.hpp"
 
-modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > serialDevice;
-modm::IOStream serialStream(serialDevice);
+// Create an IODeviceWrapper around the Uart Peripheral we want to use
+modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > loggerDevice;
+
+// Set all four logger streams to use the UART
+modm::IOStream serialStream(loggerDevice);
+modm::log::Logger modm::log::debug(loggerDevice);
+modm::log::Logger modm::log::info(loggerDevice);
+modm::log::Logger modm::log::warning(loggerDevice);
+modm::log::Logger modm::log::error(loggerDevice);

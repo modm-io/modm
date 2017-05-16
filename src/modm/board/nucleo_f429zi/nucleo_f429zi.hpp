@@ -19,6 +19,7 @@
 
 #include <modm/architecture/platform.hpp>
 #include <modm/debug/logger.hpp>
+#define MODM_BOARD_HAS_LOGGER
 
 using namespace modm::stm32;
 
@@ -93,7 +94,7 @@ struct systemClock
 		modm::clock::fcpu     = Frequency;
 		modm::clock::fcpu_kHz = Frequency / 1000;
 		modm::clock::fcpu_MHz = Frequency / 1000000;
-		modm::clock::ns_per_loop = ::round(3000 / (Frequency / 1000000));
+		modm::clock::ns_per_loop = ::round(3000.f / (Frequency / 1000000));
 
 		return true;
 	}

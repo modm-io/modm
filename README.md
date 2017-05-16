@@ -15,6 +15,7 @@ culmination of many years worth of effort, experience and improvements.
 - [This project has a homepage](http://modm.io) with [install instructions][install] and a [getting started guide][guide].
 - [Feast your eyes on lots of working examples][examples].
 - [API reference is available here][reference].
+- [Check out our latest quarterly release][releases] with a [beautiful changelog](CHANGELOG.md).
 - [We have continuous integration as well][travis_ci].
 - [And we care a lot about testing](TESTING.md).
 
@@ -60,19 +61,23 @@ Here is a list of supported **and tested** microcontrollers and development boar
 | ATtiny44a  | custom                  | &#9733;&#9733;&#9733;               |
 | ATtiny85   | custom                  | &#9733;&#9733;&#9733;               |
 | ATmega328p | [Arduino Uno][]         | &#9733;&#9733;&#9733;               |
+| STM32F031  | [Nucleo F031K6][]       | &#9733;&#9733;&#9733;&#9733;        |
 | STM32F072  | [STM32F072 Discovery][] | &#9733;&#9733;&#9733;&#9733;        |
-| STM32F100  | [STM32F1 Discovery][]   | &#9733;&#9733;&#9733;&#9733;        |
-| STM32F103  | [Nucleo F103RB][]       | &#9733;&#9733;&#9733;&#9733;        |
-| STM32F103  | [STM32F1 Blue Pill][]   | &#9733;&#9733;&#9733;&#9733;        |
+| STM32F100  | [STM32F1 Discovery][]   | &#9733;&#9733;&#9733;               |
+| STM32F103  | [Nucleo F103RB][]       | &#9733;&#9733;&#9733;               |
+| STM32F103  | [STM32F1 Blue Pill][]   | &#9733;&#9733;&#9733;               |
 | STM32F303  | [STM32F3 Discovery][]   | &#9733;&#9733;&#9733;&#9733;&#9733; |
 | STM32F303  | [Nucleo F303K8][]       | &#9733;&#9733;&#9733;&#9733;        |
 | STM32F407  | [STM32F4 Discovery][]   | &#9733;&#9733;&#9733;&#9733;&#9733; |
+| STM32F401  | [Nucleo F401RE][]       | &#9733;&#9733;&#9733;&#9733;        |
 | STM32F411  | [Nucleo F411RE][]       | &#9733;&#9733;&#9733;&#9733;        |
 | STM32F429  | [STM32F429 Discovery][] | &#9733;&#9733;&#9733;&#9733;&#9733; |
 | STM32F429  | [Nucleo F429ZI][]       | &#9733;&#9733;&#9733;&#9733;        |
 | STM32F469  | [STM32F469 Discovery][] | &#9733;&#9733;&#9733;&#9733;        |
 | STM32F746  | [STM32F746 Discovery][] | &#9733;&#9733;&#9733;&#9733;        |
 | STM32F769  | [STM32F769 Discovery][] | &#9733;&#9733;&#9733;&#9733;        |
+| STM32L476  | [STM32L476 Discovery][] | &#9733;&#9733;                      |
+| STM32L476  | [Nucleo L476RG][]       | &#9733;&#9733;                      |
 | LPC11C24   | [LPCxpresso][]          | &#9733;&#9733;                      |
 
 All of these targets are compiling and booting correctly
@@ -115,7 +120,7 @@ If you want to have up-to-date documentation of the develop branch, execute `sco
 in the modm root directory and the current development documentation will be available
 in `modm/doc/build/api/index.html`.
 
-modm also has [a blog for in-depth write ups](http://blog.modm.io) of the programming techniques used.
+modm also has [a blog for in-depth write ups][blog] of the programming techniques used.
 
 ## How can I contribute?
 
@@ -132,12 +137,13 @@ During the last decade the [Roboterclub Aachen e.V.][rca_ev] has developed a sof
 In 2009, modm became a separate project and since then focussed on a new approach to cross target microcontroller libraries. Over the years modm grew from a communication library to a general purpose framework suitable for all kinds of embedded applications.
 
 The modm project is maintained by
-Niklas Hauser ([@salkinium](https://github.com/salkinium)) and
-Kevin Läufer ([@ekiwi](https://github.com/ekiwi)) with significant contributions from
+Niklas Hauser ([@salkinium](https://github.com/salkinium)) with significant contributions from
+Sascha Schade ([@strongly-typed](https://github.com/strongly-typed)),
+Kevin Läufer ([@ekiwi](https://github.com/ekiwi)),
 Fabian Greif ([@dergraaf](https://github.com/dergraaf)),
-Daniel Krebs ([@daniel-k](https://github.com/daniel-k)),
-Sascha Schade [@strongly-typed](https://github.com/strongly-typed), [@georgi-g](https://github.com/georgi-g) and
-[@thundernail](https://github.com/thundernail).
+Martin Rosekeit ([@thundernail](https://github.com/thundernail)),
+Daniel Krebs ([@daniel-k](https://github.com/daniel-k)) and
+Georgi Grinshpun ([@georgi-g](https://github.com/georgi-g)).
 
 ## Folder structure
 
@@ -200,6 +206,7 @@ Sascha Schade [@strongly-typed](https://github.com/strongly-typed), [@georgi-g](
 [contributing]: https://github.com/roboterclubaachen/modm/tree/develop/CONTRIBUTING.md
 [porting]: https://github.com/roboterclubaachen/modm/blob/develop/PORTING.md
 [issues]: https://github.com/roboterclubaachen/modm/issues
+[releases]: https://github.com/roboterclubaachen/modm/releases
 [rca_ev]: http://www.roboterclub.rwth-aachen.de/
 [eurobot]: http://www.eurobot.org/
 [travis_ci]: https://travis-ci.org/roboterclubaachen/modm
@@ -214,17 +221,21 @@ Sascha Schade [@strongly-typed](https://github.com/strongly-typed), [@georgi-g](
 [rca]: http://www.roboterclub.rwth-aachen.de
 
 [Arduino Uno]: https://www.arduino.cc/en/Main/ArduinoBoardUno
-[STM32F072 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF259724
-[STM32F1 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF250863
-[Nucleo F103RB]: http://www.st.com/web/catalog/tools/FM116/SC959/SS1532/LN1847/PF259875
+[Nucleo F031K6]: http://www.st.com/en/evaluation-tools/nucleo-f031k6.html
+[STM32F072 Discovery]: http://www.st.com/en/evaluation-tools/32f072bdiscovery.html
+[STM32F1 Discovery]: http://www.st.com/en/evaluation-tools/stm32vldiscovery.html
+[Nucleo F103RB]: http://www.st.com/en/evaluation-tools/nucleo-f103rb.html
 [STM32F1 Blue Pill]: http://wiki.stm32duino.com/index.php?title=Blue_Pill
-[STM32F3 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF254044
+[STM32F3 Discovery]: http://www.st.com/en/evaluation-tools/stm32f3discovery.html
 [Nucleo F303K8]: http://www.st.com/en/evaluation-tools/nucleo-f303k8.html
-[STM32F4 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF252419
-[Nucleo F411RE]: http://www.st.com/web/catalog/tools/FM116/SC959/SS1532/LN1847/PF260320
-[STM32F429 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF259090
-[Nucleo F429ZI]: http://www.st.com/web/en/catalog/tools/PF262637
-[STM32F469 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF262395
-[STM32F746 Discovery]: http://www.st.com/web/catalog/tools/FM116/CL1620/SC959/SS1532/LN1848/PF261641
-[STM32F769 Discovery]: http://www.st.com/content/st_com/en/products/evaluation-tools/product-evaluation-tools/mcu-eval-tools/stm32-mcu-eval-tools/stm32-mcu-discovery-kits/32f769idiscovery.html
+[STM32F4 Discovery]: http://www.st.com/en/evaluation-tools/stm32f4discovery.html
+[Nucleo F401RE]: http://www.st.com/en/evaluation-tools/nucleo-f401re.html
+[Nucleo F411RE]: http://www.st.com/en/evaluation-tools/nucleo-f411re.html
+[STM32F429 Discovery]: http://www.st.com/en/evaluation-tools/32f429idiscovery.html
+[Nucleo F429ZI]: http://www.st.com/en/evaluation-tools/nucleo-f429zi.html
+[STM32F469 Discovery]: http://www.st.com/en/evaluation-tools/32f469idiscovery.html
+[STM32F746 Discovery]: http://www.st.com/en/evaluation-tools/32f746gdiscovery.html
+[STM32F769 Discovery]: http://www.st.com/en/evaluation-tools/32f769idiscovery.html
 [LPCxpresso]: https://www.lpcware.com/LPCXpressoV1Boards
+[STM32L476 Discovery]: http://www.st.com/en/evaluation-tools/32l476gdiscovery.html
+[Nucleo L476RG]: http://www.st.com/en/evaluation-tools/nucleo-l476rg.html

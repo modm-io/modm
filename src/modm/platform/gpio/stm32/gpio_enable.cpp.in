@@ -26,6 +26,8 @@ modm_gpio_enable(void)
 %% elif target["family"] in ["f1"]
 %%	set clock_tree = "APB2"
 %%	set prefix = "IOP"
+%% elif target["family"] in ["l4"]
+%%  set clock_tree = 'AHB2'
 %% endif
 
 	// Enable GPIO clock

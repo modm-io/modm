@@ -1,0 +1,81 @@
+// coding: utf-8
+/* Copyright (c) 2017 Roboterclub Aachen e. V.
+ * All Rights Reserved.
+ *
+ * The file is part of the modm library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32_I2C_{{ id }}_HPP
+#define MODM_STM32_I2C_{{ id }}_HPP
+
+#include <modm/architecture/interface/i2c_master.hpp>
+#include <modm/platform/clock/common_clock.hpp>
+
+/**
+ * @ingroup 	{{partname}}
+ * @defgroup	{{partname}}_i2c I2C
+ */
+
+namespace modm
+{
+
+namespace stm32
+{
+
+/**
+ * I2cMaster implementation of I2C{{ id }} module.
+ *
+ * Interrupts must be enabled.
+ *
+ * @author		Georgi Grinshpun
+ * @author		Niklas Hauser
+ * @author		Sascha Schade (strongly-typed)
+ * @ingroup		{{partname}}_i2c
+ */
+class I2cMaster{{ id }} : public ::modm::I2cMaster
+{
+public:
+	static const TypeId::I2cMaster{{ id }}Sda Sda;
+	static const TypeId::I2cMaster{{ id }}Scl Scl;
+
+public:
+	/**
+	 * Set up the I2C module for master operation.
+	 *
+	 * @param	rate
+	 *		`Standard` or `Fast`, `High` datarate is not supported
+	 */
+	template<class SystemClock, uint32_t baudrate=Baudrate::Standard,
+			uint16_t tolerance = modm::Tolerance::FivePercent >
+	static modm_always_inline void
+	initialize()
+	{
+		// FIXME: Hard coded to 100 kHz at 48 MHz CPU
+		static_assert(baudrate == Baudrate::Standard, "FIXME: Hard coded to 100 kHz at 48 MHz CPU.");
+		static_assert(SystemClock::I2c{{ id }} == modm::clock::MHz48, "FIXME: Hard coded to 100 kHz at 48 MHz CPU.");
+		initializeWithPrescaler(/* freq, trise, prescaler */);
+	}
+
+	// start documentation inherited
+	static bool
+	start(I2cTransaction *transaction, ConfigurationHandler handler = nullptr);
+
+	static Error
+	getErrorState();
+
+	static void
+	reset();
+	// end documentation inherited
+
+private:
+	static void
+	initializeWithPrescaler(/* uint8_t peripheralFrequency, uint8_t riseTime, uint16_t prescaler */);
+};
+
+} // namespace stm32
+
+} // namespace modm
+
+#endif // MODM_STM32_I2C_{{ id }}_HPP
