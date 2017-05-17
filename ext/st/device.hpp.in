@@ -16,7 +16,7 @@
 #ifndef MODM_DEVICE_HPP
 #define MODM_DEVICE_HPP
 
-%% for define in defines:
+%% for define in defines
 #define {{ define }} 1
 %% endfor
 

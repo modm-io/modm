@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2016, Fabian Greif
+# Copyright (c) 2017, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -11,40 +12,68 @@
 # -----------------------------------------------------------------------------
 
 import os
+import re
+
+def getDefineForDevice(device_id, familyDefines):
+    # get all defines for this device name
+    devName = "STM32{}{}".format(device_id["family"].upper(), device_id["name"].upper())
+
+    # Map STM32F7x8 -> STM32F7x7
+    if device_id["family"] == "f7" and devName[8] == "8":
+        devName = devName[:8] + "7"
+
+    deviceDefines = sorted([define for define in familyDefines if define.startswith(devName)])
+    # if there is only one define thats the one
+    if len(deviceDefines) == 1:
+        return deviceDefines[0]
+
+    # now we match for the size-id.
+    devNameMatch = devName + "x{}".format(device_id["size"].upper())
+    for define in deviceDefines:
+        if devNameMatch <= define:
+            return define
+
+    # now we match for the pin-id.
+    devNameMatch = devName + "{}x".format(device_id["pin"].upper())
+    for define in deviceDefines:
+        if devNameMatch <= define:
+            return define
+
+    return None
+
 
 def init(module):
     module.name = "cmsis.device"
 
 def prepare(module, options):
     device = options[":target"]
-    if not device.identifier["platform"] == "stm32":
+    if device.identifier["platform"] != "stm32":
         return False
 
-    module.depends([":cmsis"])
+    module.depends(":cmsis")
     return True
 
 def build(env):
     device = env[":target"]
 
-    env.outbasepath = "ext/cmsis_device"
-
-    defines = []
-    headers = []
-
     folder = "stm32{}xx".format(device.identifier["family"])
-    for define in listify(device.properties["define"]):
-        filename = "{}.h".format(define.lower())
-        env.copy(os.path.join(folder, "Include", filename), filename)
+    family_header = folder + ".h"
+    define = None
 
-        defines.append(define)
-        headers.append(filename)
+    with open(localpath("stm32", folder, "Include", family_header), "r", errors="replace") as headerFile:
+        match = re.findall("if defined\((?P<define>STM32[F|L].....)\)", headerFile.read())
+        if match:
+            define = getDefineForDevice(device.identifier, match)
+    if define is None:
+        print("No device define found!")
+        return False
 
-    system_header = "system_{}.h".format(folder)
-    env.copy(os.path.join(folder, "Include", system_header), system_header)
+    device_header = define.lower() + ".h"
+    system_header = "system_" + family_header
+    env.outbasepath = "ext/cmsis_device"
+    env.copy(localpath("stm32", folder, "Include", device_header), device_header)
+    env.copy(localpath("stm32", folder, "Include", system_header), system_header)
 
-    env.substitutions = {
-        'headers': headers,
-        'defines': defines,
-    }
     env.outbasepath = "src/modm/platform"
+    env.substitutions = {"headers": [device_header, system_header], "defines": [define]}
     env.template("device.hpp.in")
