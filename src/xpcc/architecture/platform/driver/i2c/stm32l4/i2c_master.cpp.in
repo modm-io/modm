@@ -139,7 +139,7 @@ namespace
 
 				DEBUG_STREAM("S AW P");
 
-				I2C{{ id }}->CR2 = I2C_CR2_AUTOEND | (reading.length << 16) | \
+				I2C{{ id }}->CR2 = I2C_CR2_AUTOEND | (0 << 16) | \
 								   I2C_CR2_START   | (starting.address & 0xfe);
 
 				// Only wait for STOPF Interrupt
