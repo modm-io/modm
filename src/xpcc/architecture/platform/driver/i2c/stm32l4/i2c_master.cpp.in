@@ -76,6 +76,54 @@ namespace
 
 	// helper functions
 	static inline void
+	callWriteOperation(bool startCondition)
+	{
+		DEBUG_STREAM("write op: writing=" << writing.length);
+		DEBUG_STREAM("nextOperation=" << nextOperation);
+
+		// Write first data byte to TXDR
+		if ((writing.length > 0) and (writing.buffer != nullptr)) {
+			I2C{{ id }}->TXDR = *writing.buffer++;
+		}
+
+		// Only 255 bytes can be written at once.
+		bool autoend = false;
+		bool reload  = false;
+		uint8_t nbytes = (writing.length > 255) ? 255 : writing.length;
+
+		if ((nextOperation == xpcc::I2c::Operation::Write) or (writing.length > 255)) {
+			// RELOAD if the operation continues
+			reload = true;
+		} else if ((nextOperation == xpcc::I2c::Operation::Stop) /* and (writing.length <= 0xff) */) {
+			// AUTOEND has no effect if RELOAD is set.
+			autoend = true;
+		}
+
+		DEBUG_STREAM("autoend=" << autoend << ", reload=" << reload << ", nbytes=" << nbytes);
+
+		I2C{{ id }}->CR2 = (autoend ? I2C_CR2_AUTOEND : 0 ) |\
+						   (reload  ? I2C_CR2_RELOAD  : 0 ) |\
+						   (nbytes << 16) | \
+						   (startCondition ? (I2C_CR2_START   | (starting.address & 0xfe)) : 0 );
+
+		if (writing.length > 0) {
+			--writing.length;
+		}
+
+		I2C{{ id }}->CR1 &= ~(I2C_CR1_STOPIE | I2C_CR1_TCIE | I2C_CR1_RXIE | I2C_CR1_TXIE);
+		if (writing.length == 0)
+		{
+			// All (1 byte) written. Waiting for the end of the transfer.
+			DEBUG_STREAM("Wait for TC IRQ");
+			I2C{{ id }}->CR1 |= I2C_CR1_TCIE;
+		} else {
+			// More to write
+			DEBUG_STREAM("Wait for TXIE IRQ 1");
+			I2C{{ id }}->CR1 |= I2C_CR1_TXIE | I2C_CR1_TCIE;
+		}
+	}
+
+	static inline void
 	callStarting()
 	{
 		starting = transaction->starting();
@@ -98,38 +146,11 @@ namespace
 				break;
 
 			case xpcc::I2c::OperationAfterStart::Write:
+				// Advance transaction
 				writing = transaction->writing();
 				nextOperation = static_cast<xpcc::I2c::Operation>(writing.next);
-				DEBUG_STREAM("nextOperation =" << nextOperation);
 
-				DEBUG_STREAM("write op: writing=" << writing.length);
-
-				// Write first data byte to TXDR
-				if ((writing.length > 0) and (writing.buffer != nullptr)) {
-					I2C{{ id }}->TXDR = *writing.buffer++;
-				}
-
-				// Do not AUTOEND if Restart required
-				I2C{{ id }}->CR2 = ((nextOperation != xpcc::I2c::Operation::Restart) ? I2C_CR2_AUTOEND : 0 ) |\
-									(writing.length << 16) | \
-								   I2C_CR2_START   | (starting.address & 0xfe);
-
-				if (writing.length > 0) {
-					--writing.length;
-				}
-
-				I2C{{ id }}->CR1 &= ~(I2C_CR1_STOPIE | I2C_CR1_TCIE | I2C_CR1_RXIE | I2C_CR1_TXIE);
-				if (writing.length == 0)
-				{
-					// All (1 byte) written. Waiting for the end of the transfer.
-					DEBUG_STREAM("Wait for TC IRQ");
-					I2C{{ id }}->CR1 |= I2C_CR1_TCIE;
-				} else {
-					// More to write
-					DEBUG_STREAM("Wait for TXIE IRQ");
-					I2C{{ id }}->CR1 |= I2C_CR1_TXIE;
-				}
-
+				callWriteOperation(/* startCondition = */ true);
 				break;
 
 			case xpcc::I2c::OperationAfterStart::Stop:
@@ -263,13 +284,19 @@ XPCC_ISR(I2C{{ id }}_EV)
 
 		if (writing.length == 0)
 		{
-			// All (1 byte) written. Waiting for the end of the transfer.
-			DEBUG_STREAM("Wait for STOP IRQ");
-			I2C{{ id }}->CR1 |= I2C_CR1_STOPIE;
+			if (nextOperation == xpcc::I2c::Operation::Restart)
+			{
+				DEBUG_STREAM("Wait for TC IRQ");
+				I2C{{ id }}->CR1 |= I2C_CR1_TCIE;
+			} else {
+				// All (1 byte) written. Waiting for the end of the transfer.
+				DEBUG_STREAM("Wait for STOP IRQ");
+				I2C{{ id }}->CR1 |= I2C_CR1_STOPIE;
+			}
 		} else {
 			// More to write
 			DEBUG_STREAM("Wait for TXIE IRQ");
-			I2C{{ id }}->CR1 |= I2C_CR1_TXIE;
+			I2C{{ id }}->CR1 |= I2C_CR1_TXIE | I2C_CR1_TCIE;
 		}
 	}
 
@@ -284,6 +311,26 @@ XPCC_ISR(I2C{{ id }}_EV)
 			callStarting();
 		}
 	}
+
+	if (isr & I2C_ISR_TCR)
+	{
+		DEBUG_STREAM("--- TCR ---");
+
+		if (writing.length > 0)
+		{
+			// RELOAD called, more to write
+			callWriteOperation(/* startCondition = */ false);
+		}
+		else if (nextOperation == xpcc::I2c::Operation::Write)
+		{
+			// Advance transaction
+			writing = transaction->writing();
+			nextOperation = static_cast<xpcc::I2c::Operation>(writing.next);
+
+			callWriteOperation(/* startCondition = */ false);
+		}
+	}
+
 }
 
 // ----------------------------------------------------------------------------
