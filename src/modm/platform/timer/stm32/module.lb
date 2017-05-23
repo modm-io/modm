@@ -88,7 +88,6 @@ def build(env):
     env.substitutions = get_properties(env)
     env.outbasepath = "src/modm/platform/timer"
 
-    env.template("type_ids.hpp.in", filters={"getConnectors": get_connectors})
     env.template("basic_base.hpp.in")
     env.template("general_purpose_base.hpp.in")
     env.template("advanced_base.hpp.in")

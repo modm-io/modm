@@ -14,7 +14,6 @@
 #define MODM_STM32_DMA{{ id }}_HPP
 
 #include <stdint.h>
-#include "type_ids.hpp"
 #include "../device.hpp"
 #include "dma_base.hpp"
 
@@ -144,4 +143,3 @@ public:
 #include "dma_{{ id }}_impl.hpp"
 
 #endif	// MODM_STM32_DMA{{ id }}_HPP
-

@@ -67,5 +67,4 @@ def build(env):
     env.substitutions = properties
     env.outbasepath = "src/modm/platform/dma"
 
-    env.copy("type_ids.hpp")
     env.template("dma_base.hpp.in")

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013, Kevin Läufer
- * Copyright (c) 2013-2016, Niklas Hauser
+ * Copyright (c) 2013-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -14,7 +14,6 @@
 #define MODM_STM32_I2C_{{ id }}_HPP
 
 #include "../device.hpp"
-#include "type_ids.hpp"
 #include <modm/architecture/interface/i2c_master.hpp>
 
 /**
@@ -39,10 +38,6 @@ namespace stm32
  */
 class I2cMaster{{ id }} : public ::modm::I2cMaster
 {
-public:
-	static const TypeId::I2cMaster{{ id }}Sda Sda;
-	static const TypeId::I2cMaster{{ id }}Scl Scl;
-
 public:
 	/**
 	 * Set up the I2C module for master operation.

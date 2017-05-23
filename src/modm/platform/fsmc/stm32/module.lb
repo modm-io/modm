@@ -48,4 +48,3 @@ def build(env):
 
     env.template("fsmc.hpp.in")
     env.template("fsmc.cpp.in")
-    env.template("type_ids.hpp.in")

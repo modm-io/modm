@@ -2,7 +2,7 @@
  * Copyright (c) 2012, Fabian Greif
  * Copyright (c) 2012, Sascha Schade
  * Copyright (c) 2013-2014, Kevin Läufer
- * Copyright (c) 2014-2016, Niklas Hauser
+ * Copyright (c) 2014-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -16,7 +16,7 @@
 #define MODM_LPC11_UART_1_HPP
 
 #include <modm/architecture/interface/uart.hpp>
-#include "type_ids.hpp"
+
 
 namespace modm
 {
@@ -54,12 +54,6 @@ class Uart1 : public modm::Uart
 {
 	static void
 	initialize(uint32_t baudrate);
-
-public:
-	/// TypeId used to connect GPIO pins to this peripheral's rx.
-	static const TypeId::Uart1Rx Rx;
-	/// TypeId used to connect GPIO pins to this peripheral's tx.
-	static const TypeId::Uart1Tx Tx;
 
 public:
 	template< class SystemClock, uint32_t baudrate,

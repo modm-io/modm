@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011, Georgi Grinshpun
- * Copyright (c) 2011-2016, Niklas Hauser
  * Copyright (c) 2011, 2017, Fabian Greif
+ * Copyright (c) 2011-2017, Niklas Hauser
  * Copyright (c) 2012, Sascha Schade
  *
  * This file is part of the modm project.
@@ -18,7 +18,7 @@
 #include <avr/io.h>
 
 #include <modm/architecture/interface/i2c_master.hpp>
-#include "type_ids.hpp"
+
 
 namespace modm
 {
@@ -36,10 +36,6 @@ namespace xmega
  */
 class I2cMaster{{ id }} : public ::modm::I2cMaster
 {
-public:
-	static const TypeId::I2cMaster{{ id }}Sda Sda;
-	static const TypeId::I2cMaster{{ id }}Scl Scl;
-
 public:
 	/**
 	 * Set up the I2C module for master operation.

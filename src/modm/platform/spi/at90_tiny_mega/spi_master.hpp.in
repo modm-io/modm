@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2016, Niklas Hauser
+ * Copyright (c) 2013-2017, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
  * Copyright (c) 2017, Fabian Greif
  *
@@ -18,7 +18,7 @@
 
 #include <modm/architecture/interface/spi_master.hpp>
 
-#include "type_ids.hpp"
+
 #include "spi{{ id }}.hpp"
 
 namespace modm
@@ -49,11 +49,6 @@ class SpiMaster{{ id }} : public ::modm::SpiMaster, private Spi
 	static void *context;
 	static ConfigurationHandler configuration;
 public:
-	static const TypeId::SpiMaster{{ id }}Mosi Mosi;
-	static const TypeId::SpiMaster{{ id }}Miso Miso;
-	static const TypeId::SpiMaster{{ id }}Sck  Sck;
-	static const TypeId::SpiMaster{{ id }}Ss   Ss;
-
 	/// Spi Data Mode, Mode0 is the most common mode
 	enum class
 	DataMode : uint8_t

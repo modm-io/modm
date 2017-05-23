@@ -24,4 +24,3 @@ def build(env):
 
     env.copy("software_spi_master_impl.hpp")
     env.copy("software_spi_master.hpp")
-    env.copy("software_type_ids.hpp")

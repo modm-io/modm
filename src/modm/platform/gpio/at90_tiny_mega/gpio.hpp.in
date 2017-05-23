@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2016, Niklas Hauser
+ * Copyright (c) 2013-2017, Niklas Hauser
  * Copyright (c) 2017, Fabian Greif
  *
  * This file is part of the modm project.
@@ -14,7 +14,6 @@
 #define MODM_AVR_GPIO_HPP
 
 //#include "../device.hpp"
-#include "type_ids.hpp"
 #include "gpio_define.h"
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/architecture/interface/i2c.hpp>

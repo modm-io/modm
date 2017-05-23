@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Kevin Läufer
- * Copyright (c) 2014-2016, Niklas Hauser
+ * Copyright (c) 2014-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -14,7 +14,6 @@
 #define MODM_STM32F3_DMA_BASE_HPP
 
 #include <stdint.h>
-#include "type_ids.hpp"
 #include "../device.hpp"
 
 %% if target["family"] == "f4"
@@ -190,4 +189,3 @@ protected:
 }	// namespace modm
 
 #endif	// MODM_STM32F3_DMA_BASE_HPP
-

@@ -42,4 +42,3 @@ def build(env):
     env.template("i2c.hpp.in")
     env.template("i2c_master.hpp.in")
     env.template("i2c_master.cpp.in")
-    env.template("type_ids.hpp.in")

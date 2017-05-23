@@ -19,7 +19,6 @@
 #include <stdint.h>
 #include <modm/architecture/interface/spi_master.hpp>
 #include <modm/architecture/driver/delay.hpp>
-#include "type_ids.hpp"
 #include "../gpio/software_gpio.hpp"
 
 namespace modm
@@ -41,11 +40,6 @@ template< typename SCK,
 		  typename MISO = GpioUnused >
 class SoftwareSpiMaster : public ::modm::SpiMaster
 {
-public:
-	static const TypeId::SoftwareSpiMasterMosi Mosi;
-	static const TypeId::SoftwareSpiMasterMiso Miso;
-	static const TypeId::SoftwareSpiMasterSck  Sck;
-
 public:
 	// start documentation inherited
 	/// Baudrate is limited to 500kbps.

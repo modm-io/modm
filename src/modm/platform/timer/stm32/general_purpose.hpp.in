@@ -17,7 +17,6 @@
 #ifndef MODM_STM32_TIMER_{{ id }}_HPP
 #define MODM_STM32_TIMER_{{ id }}_HPP
 
-#include "type_ids.hpp"
 #include "general_purpose_base.hpp"
 
 namespace modm
@@ -46,12 +45,6 @@ namespace stm32
  */
 class Timer{{ id }} : public GeneralPurposeTimer
 {
-public:
-%% for c in connectors
-	/// TypeId used to connect GPIO pins to this peripheral's {{ c }}.
-	static const TypeId::Timer{{ id ~ c}} {{ c }};
-%% endfor
-
 public:
 	enum class MasterMode : uint32_t
 	{

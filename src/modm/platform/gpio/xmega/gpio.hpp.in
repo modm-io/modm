@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014, 2016, Niklas Hauser
+ * Copyright (c) 2013-2014, 2016-2017, Niklas Hauser
  * Copyright (c) 2017, Fabian Greif
  *
  * This file is part of the modm project.
@@ -16,7 +16,7 @@
 //#include "../device.hpp"
 #include "../../../core/avr/interrupts.hpp"
 #include <modm/architecture/interface/gpio.hpp>
-#include "type_ids.hpp"
+
 
 namespace modm
 {
@@ -291,98 +291,7 @@ public:
 	}
 			%% endif
 		%% endif
-	// connect: Hardware Gpio
-		%% for af in gpio.afs
-			%% if (	(af.type == 'in' and type == 'Input') or
-					(af.type == 'out' and type == 'Output') or
-					(af.type == 'io' or type == "")	)
-	/// Connect `{{port~pin}}` as `{{af.name}}` to `{{af.peripheral}}`.
-				%% if 'remap' in af
-					%% if af.peripheral.startswith('Spi')
-	/// This method remaps the following SpiMaster connections:
-						%% if af.remap == 'True'
-	/// Mosi to pin 7 to and Sck to pin 5.
-						%% else
-	/// Mosi to pin 5 to and Sck to pin 7.
-						%% endif
-					%% elif af.peripheral.startswith('UartSpi')
-	/// This method remaps the following UartSpiMaster 0 connections:
-						%% if af.remap == 'True'
-	/// Sck to pin 5, Miso/Somi to pin 6 and Mosi/Simo to pin 7.
-						%% else
-	/// Sck to pin 1, Miso/Somi to pin 2 and Mosi/Simo to pin 3.
-						%% endif
-					%% elif af.peripheral.startswith('TimerCounter')
-						%% set inst = af.name[2:]|upper
-						%% if af.remap == 'True' and inst in ['A', 'B']
-	/// This method remaps the Output Compare {{inst}} of TimerCounter 0
-	/// onto the Output Compare {{inst}} of TimerCounter 1.
-	/// The resulting PWM will be an OR-modulation between the two PWM outputs.
-						%% endif
-					%% endif
-				%% endif
-	modm_always_inline static void
-	connect(TypeId::{{ af.peripheral }}{{ af.name }}) {
-				%% if 'remap' in af
-					%% if af.peripheral.startswith('Spi')
-						%% set bitmask = 'PORT_SPI_bm'
-					%% elif af.peripheral.startswith('Uart')
-						%% set bitmask = 'PORT_USART0_bm'
-					%% elif af.peripheral.startswith('TimerCounter')
-						%% set bitmask = 'PORT_TC'+af.peripheral[-1:]+af.name[2:].upper()+"_bm"
-					%% endif
-					%% if af.remap == 'True'
-		PORT{{port}}_REMAP |= {{bitmask}};
-					%% else
-		PORT{{port}}_REMAP &= ~{{bitmask}};
-					%% endif
-				%% endif
-				%% if af.name == "Txd"
-		set();
-				%% endif
-				%% if af.type == "out"
-		setOutput();
-				%% elif af.type== "in"
-		setInput();
-				%% endif
-	}
-			%% endif
-		%% endfor
-	// connect: Software Gpio
-		%% if type in ['', 'Output']
-			%% for peripheral in   ['SoftwareSpiMasterMosi',
-									'SoftwareSpiMasterSck']
-	/// Connect to `{{peripheral}}`.
-	modm_always_inline static void
-	connect(::modm::TypeId::{{ peripheral }}) {
-		configure(Configuration::Floating);
-		setOutput();
-		set();
-	}
-			%% endfor
-			%% for peripheral in   ['SoftwareI2cMasterSda',
-									'SoftwareI2cMasterScl']
-	/// Connect to `{{peripheral}}`.
-	modm_always_inline static void
-	connect(::modm::TypeId::{{ peripheral }}) {
-		configure(Configuration::OpenDrain);
-		setOutput();
-		set();
-	}
-			%% endfor
-		%% endif
-		%% if type in ['', 'Input']
-			%% for peripheral in ['SoftwareSpiMasterMiso']
-	/// Connect to `{{peripheral}}`.
-	modm_always_inline static void
-	connect(::modm::TypeId::{{ peripheral }}) {
-		configure(Configuration::Floating);
-		setInput();
-	}
-			%% endfor
-		%% endif
 };
-
 	%% endfor
 %% endfor
 
@@ -434,4 +343,3 @@ public:
 }	// namespace modm
 
 #endif
-

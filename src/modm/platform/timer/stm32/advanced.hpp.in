@@ -2,7 +2,7 @@
  * Copyright (c) 2009-2012, Fabian Greif
  * Copyright (c) 2009, 2011-2012, Georgi Grinshpun
  * Copyright (c) 2010, Martin Rosekeit
- * Copyright (c) 2011, 2013-2016, Niklas Hauser
+ * Copyright (c) 2011, 2013-2017, Niklas Hauser
  * Copyright (c) 2013, 2015, Sascha Schade
  * Copyright (c) 2013, 2016, Kevin Läufer
  *
@@ -17,7 +17,6 @@
 #ifndef MODM_STM32_TIMER_{{ id }}_HPP
 #define MODM_STM32_TIMER_{{ id }}_HPP
 
-#include "type_ids.hpp"
 #include "advanced_base.hpp"
 
 namespace modm
@@ -75,12 +74,6 @@ namespace stm32
  */
 class Timer{{ id }} : public AdvancedControlTimer
 {
-public:
-%% for c in connectors
-	/// TypeId used to connect GPIO pins to this peripheral's {{ c }}.
-	static const TypeId::Timer{{ id ~ c}} {{ c }};
-%% endfor
-
 public:
 	static void
 	enable();

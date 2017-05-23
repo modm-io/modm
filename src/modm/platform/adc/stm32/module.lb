@@ -91,5 +91,4 @@ def build(env):
     env.substitutions = properties
     env.outbasepath = "src/modm/platform/adc"
 
-    env.template("type_ids.hpp.in")
     env.template("adc_interrupts.cpp.in")

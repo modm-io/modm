@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2016, Niklas Hauser
+ * Copyright (c) 2013-2017, Niklas Hauser
  * Copyright (c) 2017, Fabian Greif
  *
  * This file is part of the modm project.
@@ -17,7 +17,7 @@
 
 #include <modm/platform/uart/uart_defines.h>
 #include <modm/architecture/interface/spi_master.hpp>
-#include "type_ids.hpp"
+
 
 namespace modm
 {
@@ -37,10 +37,6 @@ class UartSpiMaster{{ id }} : public ::modm::SpiMaster
 	static void *context;
 	static ConfigurationHandler configuration;
 public:
-	static const TypeId::UartSpiMaster{{ id }}Mosi Mosi;
-	static const TypeId::UartSpiMaster{{ id }}Miso Miso;
-	static const TypeId::UartSpiMaster{{ id }}Sck  Sck;
-
 	/// Spi Data Mode, Mode0 is the most common mode
 %% if not extended
 	/// @warning 	Only Mode 0 and 2 are available, Mode 1 and 3 are not

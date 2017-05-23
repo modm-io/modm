@@ -60,7 +60,4 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.substitutions = get_properties(env)
-    env.outbasepath = "src/modm/platform/spi"
-
-    env.template("uart_spi_type_ids.hpp.in")
+    pass

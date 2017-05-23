@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009-2012, 2017, Fabian Greif
- * Copyright (c) 2011-2016, Niklas Hauser
+ * Copyright (c) 2011-2017, Niklas Hauser
  * Copyright (c) 2012, Sascha Schade
  *
  * This file is part of the modm project.
@@ -21,7 +21,7 @@
 
 //#include "../device.hpp"
 #include <modm/architecture/interface/uart.hpp>
-#include "type_ids.hpp"
+
 
 namespace modm
 {
@@ -52,10 +52,6 @@ namespace avr
  */
 class Uart{{ id }} : public ::modm::Uart
 {
-public:
-	static const TypeId::Uart{{ id }}Txd Tx;
-	static const TypeId::Uart{{ id }}Rxd Rx;
-
 public:
 	// start documentation inherited
 	template< class SystemClock, uint32_t baudrate,

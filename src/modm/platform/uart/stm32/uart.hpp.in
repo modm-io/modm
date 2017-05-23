@@ -21,7 +21,6 @@
 #define MODM_STM32_UART_{{ id }}_HPP
 
 #include <modm/architecture/interface/uart.hpp>
-#include "type_ids.hpp"
 #include "uart_base.hpp"
 #include "uart_baudrate.hpp"
 #include "uart_hal_{{ id }}.hpp"
@@ -41,12 +40,6 @@ namespace stm32
  */
 class {{ name }} : public UartBase, public ::modm::Uart
 {
-public:
-	/// TypeId used to connect GPIO pins to this peripheral's rx.
-	static const TypeId::Uart{{ id }}Rx Rx;
-	/// TypeId used to connect GPIO pins to this peripheral's tx.
-	static const TypeId::Uart{{ id }}Tx Tx;
-
 %% if options["buffered"]
 private:
 	/// Second stage initialize for buffered uart

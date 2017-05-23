@@ -1,5 +1,6 @@
 %#/*
  * Copyright (c) 2017, Fabian Greif
+ * Copyright (c) 2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -40,8 +41,6 @@ private:
 {{ assertFrequency("InputFrequency", "min", s.minFrequency, None) }}
 {{ assertFrequency("InputFrequency", "max", s.maxFrequency, None) }}
 public:
-	static const ::{{type_id_namespace}}::TypeId::{{ s.name }} Id;
-
 	static StartupError
 	enable(const uint32_t waitCycles = 1500)
 	{
@@ -98,8 +97,6 @@ class
 Pll<{{ src.name }}<InputFrequency>, OutputFrequency{{ template }}>
 {
 public:
-	static const ::{{type_id_namespace}}::TypeId::{{ p.name }} Id;
-
 	static StartupError
 	enable(const uint32_t waitCycles = 1500)
 	{
@@ -162,9 +159,6 @@ private:
 {{ assertFrequency(s.name, "OutputFrequency", "min", s.minFrequency) }}
 {{ assertFrequency(s.name, "OutputFrequency", "max", s.maxFrequency) }}
 public:
-	/// TypeId to connect an Output to {{ s.name }}
-	static const ::{{type_id_namespace}}::TypeId::{{ s.name }} Id;
-
 	// Frequencies
 	static constexpr int Frequency = OutputFrequency;
 	%% for subsink in s.sinks
@@ -190,8 +184,6 @@ public:
 class {{ o.name }}
 {
 public:
-	static const ::{{type_id_namespace}}::TypeId::{{ o.name }} Id;
-
 %% if o.divisions|length > 0
 	enum class Division
 	{
@@ -206,20 +198,5 @@ public:
 		//ClockControl::enable{{ o.name }}(static_cast<int>(d));
 	}
 %% endif
-	// Connect Functions
-%% for src in o.sources
-	static xpcc_always_inline void
-%% if target["platform"] == "stm32" and target["family"] in ["f2", "f4"]
-	connect(::{{type_id_namespace}}::TypeId::{{ src.name }} /* t */, uint8_t div = 1)
-	{
-		ClockControl::enable{{ o.name }}(ClockControl::{{ o.name }}Source::{{ src.name }}, div);
-	}
-%% else
-	connect(::{{type_id_namespace}}::TypeId::{{ src.name }} /* t */)
-	{
-		ClockControl::enable{{ o.name }}(ClockControl::{{ o.name }}Source::{{ src.name }});
-	}
-%% endif
-%% endfor
 };
 %% endmacro

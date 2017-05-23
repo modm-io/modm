@@ -98,4 +98,3 @@ def build(env):
     env.outbasepath = "src/modm/platform/uart"
 
     env.template("uart_defines.h")
-    env.template("type_ids.hpp.in")

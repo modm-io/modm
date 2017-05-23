@@ -71,4 +71,3 @@ def build(env):
     env.outbasepath = "src/modm/platform/spi"
 
     env.template("spi_base.hpp.in")
-    env.template("type_ids.hpp.in")

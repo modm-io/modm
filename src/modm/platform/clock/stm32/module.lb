@@ -57,4 +57,3 @@ def build(env):
     env.template("latency.cpp.in")
     env.template("clock.cpp.in")
     env.template("clock.hpp.in")
-    env.copy("type_ids.hpp")

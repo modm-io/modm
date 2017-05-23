@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2013, Sascha Schade
  * Copyright (c) 2013-2014, 2016, Kevin Läufer
- * Copyright (c) 2013-2016, Niklas Hauser
+ * Copyright (c) 2013-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -15,7 +15,6 @@
 #define MODM_STM32_UARTHAL_{{ id }}_HPP
 
 #include <stdint.h>
-#include "type_ids.hpp"
 #include "../device.hpp"
 #include "uart_base.hpp"
 #include "uart_baudrate.hpp"
@@ -49,12 +48,6 @@ private:
 	 */
 	static inline void
 	setParity(const Parity parity);
-
-public:
-	/// TypeId used to connect GPIO pins to this peripheral's rx.
-	static const TypeId::Uart{{ id }}Rx Rx;
-	/// TypeId used to connect GPIO pins to this peripheral's tx.
-	static const TypeId::Uart{{ id }}Tx Tx;
 
 public:
 	/// Enables the clock, resets the hardware and sets the UE bit

@@ -40,5 +40,3 @@ def build(env):
 
     env.copy("pll_calculator.hpp")
     env.copy("common_clock.cpp")
-    env.copy("type_ids.hpp")
-

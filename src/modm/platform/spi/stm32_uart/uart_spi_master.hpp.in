@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013, 2016, Kevin Läufer
- * Copyright (c) 2013-2016, Niklas Hauser
+ * Copyright (c) 2013-2017, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
  *
  * This file is part of the modm project.
@@ -16,9 +16,6 @@
 
 #include <modm/architecture/interface/spi_master.hpp>
 #include "../uart/uart_hal_{{ id }}.hpp"
-#include "../uart/type_ids.hpp"
-#include "uart_spi_type_ids.hpp"
-#include "type_ids.hpp"
 
 namespace modm
 {
@@ -42,11 +39,6 @@ class UartSpiMaster{{ id }} : public modm::SpiMaster, public UartBase
 	static uint8_t count;
 	static void *context;
 	static ConfigurationHandler configuration;
-public:
-	static const TypeId::UartSpiMaster{{ id }}Sck  Sck;
-	static const TypeId::UartSpiMaster{{ id }}Miso Miso;
-	static const TypeId::UartSpiMaster{{ id }}Mosi Mosi;
-
 public:
 	enum class
 	DataMode : uint32_t

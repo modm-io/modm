@@ -15,7 +15,6 @@
 #ifndef MODM_AVR_I2C_MASTER_HPP
 #define MODM_AVR_I2C_MASTER_HPP
 
-#include "type_ids.hpp"
 #include "i2c.hpp"
 #include <modm/architecture/interface/i2c_master.hpp>
 
@@ -36,9 +35,6 @@ namespace avr
 class I2cMaster : public ::modm::I2cMaster, I2c
 {
 public:
-	static const TypeId::I2cMasterSda Sda;
-	static const TypeId::I2cMasterScl Scl;
-
 	template< class SystemClock, uint32_t baudrate=Baudrate::Standard,
 			uint16_t tolerance = modm::Tolerance::FivePercent >
 	static modm_always_inline void

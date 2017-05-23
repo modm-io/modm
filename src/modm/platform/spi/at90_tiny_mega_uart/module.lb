@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2016, Niklas Hauser
+# Copyright (c) 2016-2017, Niklas Hauser
 # Copyright (c) 2017, Fabian Greif
 #
 # This file is part of the modm project.
@@ -100,5 +100,3 @@ def prepare(module, options):
 def build(env):
     env.substitutions = get_properties(env)
     env.outbasepath = "src/modm/platform/spi_uart"
-
-    env.template("type_ids.hpp.in")

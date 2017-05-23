@@ -130,7 +130,6 @@ def build(env):
     env.template("can_filter.hpp.in")
     env.template("can_filter.cpp.in")
     env.copy("error_code.hpp")
-    env.copy("type_ids.hpp")
 
     if "instance" not in driver:
         env.template("can.hpp.in")

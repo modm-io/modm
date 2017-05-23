@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013-2014, Kevin Läufer
- * Copyright (c) 2014-2016, Niklas Hauser
+ * Copyright (c) 2014-2017, Niklas Hauser
  * Copyright (c) 2017, Fabian Greif
  *
  * This file is part of the modm project.
@@ -15,9 +15,6 @@
 #define MODM_LPC_GPIO_HPP
 
 #include "../device.hpp"
-
-#include <modm/platform/spi/software_type_ids.hpp>
-#include <modm/platform/i2c/software_type_ids.hpp>
 
 // TODO: Move to common file
 #define SYSAHBCLKCTRL_GPIO		(1<<6)
@@ -93,16 +90,6 @@ public:
 		bool read = IO::read();
 		IO::setOutput(lastOutput);
 		return read;
-	}
-	modm_always_inline static void
-	connect(::modm::TypeId::SoftwareI2cMasterSda) {
-		IO::setOutput();
-		IO::set();
-	}
-	modm_always_inline static void
-	connect(::modm::TypeId::SoftwareI2cMasterScl) {
-		IO::setOutput();
-		IO::set();
 	}
 };
 /// @}
@@ -271,37 +258,6 @@ public:
 			%% endif
 
 		%% endif
-
-	// connect: Software Gpio
-		%% if type in ['', 'Output']
-			%% for peripheral in   ['SoftwareSpiMasterMosi',
-									'SoftwareSpiMasterSck']
-	/// Connect to `{{peripheral}}`.
-	modm_always_inline static void
-	connect(::modm::TypeId::{{ peripheral }}) {
-				%% if "mode" in bits
-		configure(OutputType::PushPull);
-				%% elif "i2c_mode" in bits
-		configure(I2cMode::StandardIO);	// still open drain, but best be can do
-				%% endif
-		setOutput();
-		set();
-	}
-			%% endfor
-		%% endif
-		%% if type in ['', 'Input']
-			%% for peripheral in ['SoftwareSpiMasterMiso']
-	/// Connect to `{{peripheral}}`.
-	modm_always_inline static void
-	connect(::modm::TypeId::{{ peripheral }}) {
-				%% if "mode" in bits
-		configure(InputType::Floating);
-				%% endif
-		setInput();
-	}
-			%% endfor
-		%% endif
-
 };
 		%% endfor
 %% endfor

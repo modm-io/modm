@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013-2014, Kevin Läufer
- * Copyright (c) 2013-2016, Niklas Hauser
+ * Copyright (c) 2013-2017, Niklas Hauser
  * Copyright (c) 2016, Fabian Greif
  *
  * This file is part of the modm project.
@@ -15,7 +15,6 @@
 #define MODM_STM32_ADC{{ id }}_HPP
 
 #include <stdint.h>
-#include "type_ids.hpp"
 #include "../device.hpp"
 #include <modm/architecture/interface/adc.hpp>
 #include <modm/architecture/interface/register.hpp>
@@ -48,11 +47,6 @@ namespace stm32
 class Adc{{ id }} : public modm::Adc
 {
 public:
-%% for channel in channels
-	/// TypeId used to connect GPIO pins to this adc's Channel{{ channel }}.
-	static const TypeId::Adc{{ id }}Channel{{ channel }} Channel{{ channel }};
-%% endfor
-
 	static constexpr uint8_t Resolution = {{ resolution }};
 
 public:

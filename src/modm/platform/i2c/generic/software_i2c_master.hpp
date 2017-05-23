@@ -19,7 +19,6 @@
 #include <modm/architecture/driver/delay.hpp>
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/architecture/interface/i2c_master.hpp>
-#include "type_ids.hpp"
 
 namespace modm
 {
@@ -38,10 +37,6 @@ template< class SCL,
 		  class SDA >
 class SoftwareI2cMaster : public modm::I2cMaster
 {
-public:
-	static const TypeId::SoftwareI2cMasterSda Sda;
-	static const TypeId::SoftwareI2cMasterScl Scl;
-
 public:
 	/// Initializes the hardware, with the baudrate limited to about 250kbps.
 	template< class SystemClock, uint32_t baudrate=Baudrate::Standard,

@@ -33,5 +33,3 @@ def build(env):
 
     env.substitutions = properties
     env.outbasepath = "src/modm/platform/timer"
-
-    env.template("type_ids.hpp.in")
