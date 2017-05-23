@@ -53,6 +53,7 @@ void
 xpcc::SCurveController<T>::setParameter(const Parameter& parameter)
 {
 	this->parameter = parameter;
+	this->additionalDistanceToStop = (parameter.speedTarget * parameter.speedTarget) / parameter.decreaseFactor / 2 ;
 }
 
 // ----------------------------------------------------------------------------
@@ -85,6 +86,7 @@ inline void
 xpcc::SCurveController<T>::setSpeedTarget( const T& speed )
 {
 	this->parameter.speedTarget = speed;
+	this->additionalDistanceToStop = (speed * speed) / parameter.decreaseFactor / 2;
 }
 
 // ----------------------------------------------------------------------------
@@ -112,15 +114,16 @@ xpcc::SCurveController<T>::update(T error, const T& speed)
 	
 	T outputIncrement = currentValue + parameter.increment;
 	T outputDecrement;
+
+	targetReached = (error <= parameter.targetArea);
+	error += this->additionalDistanceToStop;
+
 	if (error <= parameter.targetArea)
 	{
-		targetReached = true;
-		outputDecrement = error * parameter.kp + parameter.speedTarget;
+		outputDecrement = error * parameter.kp;
 	}
 	else {
-		targetReached = false;
-		outputDecrement = std::sqrt((error) *
-			parameter.decreaseFactor * 2) + parameter.speedTarget;
+		outputDecrement = std::sqrt(error * parameter.decreaseFactor * 2);
 	}
 	
 	output = xpcc::min(outputIncrement, outputDecrement);

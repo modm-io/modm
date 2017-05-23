@@ -118,6 +118,9 @@ namespace xpcc
 		bool targetReached;
 		
 		Parameter parameter;
+		/// distance to add to the current error for speed calculation. This is automatically calculated from
+		/// speedtarget parameter.
+		T additionalDistanceToStop;
 	};
 }
 
