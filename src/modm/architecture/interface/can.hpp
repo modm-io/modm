@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013, Kevin Läufer
- * Copyright (c) 2013-2015, Niklas Hauser
+ * Copyright (c) 2013-2015, 2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -34,7 +34,7 @@ namespace modm
 {
 
 /// @ingroup can
-class Can : public ::modm::Peripheral
+class Can : public ::modm::PeripheralDriver
 {
 public:
 	/// Possible modes of the CAN controller

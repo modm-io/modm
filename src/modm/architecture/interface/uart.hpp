@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2009-2013, Fabian Greif
  * Copyright (c) 2010, Martin Rosekeit
- * Copyright (c) 2012-2015, Niklas Hauser
+ * Copyright (c) 2012-2015, 2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -32,7 +32,7 @@ namespace modm
  * @author	Niklas Hauser
  * @ingroup	uart
  */
-class Uart : public ::modm::Peripheral
+class Uart : public ::modm::PeripheralDriver
 {
 public:
 	/**

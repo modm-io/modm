@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2015, Niklas Hauser
+ * Copyright (c) 2014-2015, 2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -29,7 +29,7 @@ namespace modm
  * @author	Niklas Hauser
  * @ingroup i2c
  */
-class I2cMaster : public ::modm::Peripheral, public ::modm::I2c
+class I2cMaster : public ::modm::PeripheralDriver, public ::modm::I2c
 {
 public:
 	/// Errors that can happen during master operation

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Niklas Hauser
+ * Copyright (c) 2015, 2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -53,7 +53,7 @@ namespace modm
  * @author	Niklas Hauser
  * @ingroup adc
  */
-class Adc : public ::modm::Peripheral
+class Adc : public ::modm::PeripheralDriver
 {
 #ifdef __DOXYGEN__
 public:

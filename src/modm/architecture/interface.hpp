@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2009, Martin Rosekeit
  * Copyright (c) 2009-2011, 2013, Fabian Greif
- * Copyright (c) 2012-2016, Niklas Hauser
+ * Copyright (c) 2012-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -49,7 +49,7 @@ namespace modm
  * @ingroup peripheral
  * @author	Niklas Hauser
  */
-class Peripheral
+class PeripheralDriver
 {
 #ifdef __DOXYGEN__
 	/// @cond
