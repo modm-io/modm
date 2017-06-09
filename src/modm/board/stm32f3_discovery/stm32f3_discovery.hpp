@@ -163,7 +163,7 @@ using Sda = GpioB7;	// I2C1_SDA [LSM303DLHC_SDA]: I2C1_SDA
 
 // Hardware I2C not yet implemented for F3!
 //using I2cMaster = I2cMaster1;
-using I2cMaster = modm::SoftwareI2cMaster<GpioB6, GpioB7>;
+using I2cMaster = BitBangI2cMaster<GpioB6, GpioB7>;
 using Accelerometer = modm::Lsm303a< I2cMaster >;
 }
 

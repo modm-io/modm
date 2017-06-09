@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2016, Niklas Hauser
+ * Copyright (c) 2014-2017, Niklas Hauser
  * Copyright (c) 2015, Kevin Läufer
  * Copyright (c) 2015, Martin Esser
  *
@@ -32,7 +32,7 @@ namespace lis
 // I2c Transport Layer
 typedef GpioA5 Scl;
 typedef GpioA7 Sda;
-typedef modm::SoftwareI2cMaster<Scl, Sda> I2cMaster;
+typedef BitBangI2cMaster<Scl, Sda> I2cMaster;
 
 typedef modm::Lis3TransportI2c< I2cMaster > Transport;
 #else

@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2015-2016, Niklas Hauser
  * Copyright (c) 2015-2016, Sascha Schade
+ * Copyright (c) 2015-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -47,7 +47,7 @@ modm::log::Logger modm::log::error(device);
 using namespace Board;
 
 typedef I2cMaster2 MyI2cMaster;
-// typedef modm::SoftwareI2cMaster<GpioB10, GpioB11> MyI2cMaster;
+// typedef BitBangI2cMaster<GpioB10, GpioB11> MyI2cMaster;
 
 // define the pins used by the LCD when not using a port expander
 namespace lcd

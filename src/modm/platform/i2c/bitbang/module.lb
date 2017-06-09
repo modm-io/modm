@@ -11,16 +11,17 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "i2c.generic"
+    module.name = "i2c.bitbang"
     module.parent = "platform"
 
 def prepare(module, options):
-    module.depends(":platform:core")
+    module.depends(":platform:core", ":platform:gpio")
 
     return True
 
 def build(env):
+    env.substitutions = {"target": env[":target"].identifier}
     env.outbasepath = "src/modm/platform/i2c"
 
-    env.copy("software_i2c_master_impl.hpp")
-    env.copy("software_i2c_master.hpp")
+    env.template("bitbang_i2c_master.hpp.in")
+    env.copy("bitbang_i2c_master_impl.hpp")

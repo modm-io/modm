@@ -14,8 +14,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_SOFTWARE_I2C_HPP
-#	error	"Don't include this file directly, use 'i2c_master.hpp' instead!"
+#ifndef MODM_SOFTWARE_BITBANG_I2C_HPP
+#	error	"Don't include this file directly, use 'bitbang_i2c_master.hpp' instead!"
 #endif
 
 // debugging for serious dummies
@@ -26,28 +26,28 @@
 #define DEBUG_SW_I2C(x)
 //*/
 
-template <class SCL, class SDA>
-uint16_t modm::SoftwareI2cMaster<SCL, SDA>::delayTime(3);
+template <class Scl, class Sda>
+uint16_t modm::platform::BitBangI2cMaster<Scl, Sda>::delayTime(3);
 
-template <class SCL, class SDA>
-modm::I2c::Operation modm::SoftwareI2cMaster<SCL, SDA>::nextOperation;
-template <class SCL, class SDA>
-modm::I2cTransaction *modm::SoftwareI2cMaster<SCL, SDA>::transactionObject(nullptr);
-template <class SCL, class SDA>
-modm::I2cMaster::Error modm::SoftwareI2cMaster<SCL, SDA>::errorState(modm::I2cMaster::Error::NoError);
-template <class SCL, class SDA>
-modm::I2c::ConfigurationHandler modm::SoftwareI2cMaster<SCL, SDA>::configuration(nullptr);
+template <class Scl, class Sda>
+modm::I2c::Operation modm::platform::BitBangI2cMaster<Scl, Sda>::nextOperation;
+template <class Scl, class Sda>
+modm::I2cTransaction *modm::platform::BitBangI2cMaster<Scl, Sda>::transactionObject(nullptr);
+template <class Scl, class Sda>
+modm::I2cMaster::Error modm::platform::BitBangI2cMaster<Scl, Sda>::errorState(modm::I2cMaster::Error::NoError);
+template <class Scl, class Sda>
+modm::I2c::ConfigurationHandler modm::platform::BitBangI2cMaster<Scl, Sda>::configuration(nullptr);
 
-template <class SCL, class SDA>
-modm::I2cTransaction::Starting modm::SoftwareI2cMaster<SCL, SDA>::starting(0, modm::I2c::OperationAfterStart::Stop);
-template <class SCL, class SDA>
-modm::I2cTransaction::Writing modm::SoftwareI2cMaster<SCL, SDA>::writing(nullptr, 0, modm::I2c::OperationAfterWrite::Stop);
-template <class SCL, class SDA>
-modm::I2cTransaction::Reading modm::SoftwareI2cMaster<SCL, SDA>::reading(nullptr, 0, modm::I2c::OperationAfterRead::Stop);
+template <class Scl, class Sda>
+modm::I2cTransaction::Starting modm::platform::BitBangI2cMaster<Scl, Sda>::starting(0, modm::I2c::OperationAfterStart::Stop);
+template <class Scl, class Sda>
+modm::I2cTransaction::Writing modm::platform::BitBangI2cMaster<Scl, Sda>::writing(nullptr, 0, modm::I2c::OperationAfterWrite::Stop);
+template <class Scl, class Sda>
+modm::I2cTransaction::Reading modm::platform::BitBangI2cMaster<Scl, Sda>::reading(nullptr, 0, modm::I2c::OperationAfterRead::Stop);
 
-template <class SCL, class SDA>
+template <class Scl, class Sda>
 bool
-modm::SoftwareI2cMaster<SCL, SDA>::start(modm::I2cTransaction *transaction, ConfigurationHandler handler)
+modm::platform::BitBangI2cMaster<Scl, Sda>::start(modm::I2cTransaction *transaction, ConfigurationHandler handler)
 {
 	if (!transactionObject and transaction)
 	{
@@ -140,9 +140,9 @@ modm::SoftwareI2cMaster<SCL, SDA>::start(modm::I2cTransaction *transaction, Conf
 }
 
 // ----------------------------------------------------------------------------
-template <class SCL, class SDA>
+template <class Scl, class Sda>
 void
-modm::SoftwareI2cMaster<SCL, SDA>::reset()
+modm::platform::BitBangI2cMaster<Scl, Sda>::reset()
 {
 	DEBUG_SW_I2C('E');
 	DEBUG_SW_I2C('0' + static_cast<uint8_t>(Error::SoftwareReset));
@@ -153,9 +153,9 @@ modm::SoftwareI2cMaster<SCL, SDA>::reset()
 
 // ----------------------------------------------------------------------------
 // MARK: - error handling
-template <class SCL, class SDA>
+template <class Scl, class Sda>
 void
-modm::SoftwareI2cMaster<SCL, SDA>::error(Error error)
+modm::platform::BitBangI2cMaster<Scl, Sda>::error(Error error)
 {
 	DEBUG_SW_I2C('E');
 	DEBUG_SW_I2C('0' + static_cast<uint8_t>(error));
@@ -181,9 +181,9 @@ modm::SoftwareI2cMaster<SCL, SDA>::error(Error error)
 
 // ----------------------------------------------------------------------------
 // MARK: - bus condition operations
-template <class SCL, class SDA>
+template <class Scl, class Sda>
 bool
-modm::SoftwareI2cMaster<SCL, SDA>::startCondition()
+modm::platform::BitBangI2cMaster<Scl, Sda>::startCondition()
 {
 	DEBUG_SW_I2C('\n');
 	DEBUG_SW_I2C('s');
@@ -220,9 +220,9 @@ modm::SoftwareI2cMaster<SCL, SDA>::startCondition()
 	return true;
 }
 
-template <class SCL, class SDA>
+template <class Scl, class Sda>
 bool
-modm::SoftwareI2cMaster<SCL, SDA>::stopCondition()
+modm::platform::BitBangI2cMaster<Scl, Sda>::stopCondition()
 {
 	DEBUG_SW_I2C('S');
 	// pull down both lines
@@ -254,9 +254,9 @@ modm::SoftwareI2cMaster<SCL, SDA>::stopCondition()
 	return true;
 }
 
-template <class SCL, class SDA>
+template <class Scl, class Sda>
 bool
-modm::SoftwareI2cMaster<SCL, SDA>::sclSetAndWait()
+modm::platform::BitBangI2cMaster<Scl, Sda>::sclSetAndWait()
 {
 	SCL::set();
 	// wait for clock stretching by slave
@@ -276,9 +276,9 @@ modm::SoftwareI2cMaster<SCL, SDA>::sclSetAndWait()
 
 // ----------------------------------------------------------------------------
 // MARK: - byte operations
-template <class SCL, class SDA>
+template <class Scl, class Sda>
 bool
-modm::SoftwareI2cMaster<SCL, SDA>::write(uint8_t data)
+modm::platform::BitBangI2cMaster<Scl, Sda>::write(uint8_t data)
 {
 	DEBUG_SW_I2C('W');
 	// shift through all 8 bits
@@ -321,9 +321,9 @@ modm::SoftwareI2cMaster<SCL, SDA>::write(uint8_t data)
 	return true;
 }
 
-template <class SCL, class SDA>
+template <class Scl, class Sda>
 bool
-modm::SoftwareI2cMaster<SCL, SDA>::read(uint8_t &data, bool ack)
+modm::platform::BitBangI2cMaster<Scl, Sda>::read(uint8_t &data, bool ack)
 {
 	DEBUG_SW_I2C('R');
 	// release data line
@@ -358,9 +358,9 @@ modm::SoftwareI2cMaster<SCL, SDA>::read(uint8_t &data, bool ack)
 
 // ----------------------------------------------------------------------------
 // MARK: - bit operations
-template <class SCL, class SDA>
+template <class Scl, class Sda>
 bool
-modm::SoftwareI2cMaster<SCL, SDA>::writeBit(bool bit)
+modm::platform::BitBangI2cMaster<Scl, Sda>::writeBit(bool bit)
 {
 	// set the data pin
 	SDA::set(bit);
@@ -379,9 +379,9 @@ modm::SoftwareI2cMaster<SCL, SDA>::writeBit(bool bit)
 	return false;
 }
 
-template <class SCL, class SDA>
+template <class Scl, class Sda>
 bool
-modm::SoftwareI2cMaster<SCL, SDA>::readBit(uint8_t &data)
+modm::platform::BitBangI2cMaster<Scl, Sda>::readBit(uint8_t &data)
 {
 	// slave sets data line
 	delay2();

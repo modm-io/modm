@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2015, Sascha Schade
- * Copyright (c) 2014-2016, Niklas Hauser
+ * Copyright (c) 2014-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -41,7 +41,7 @@ modm::log::Logger modm::log::error(device);
  */
 
 typedef I2cMaster2 MyI2cMaster;
-// typedef modm::SoftwareI2cMaster<GpioB10, GpioB11> MyI2cMaster;
+// typedef BitBangI2cMaster<GpioB10, GpioB11> MyI2cMaster;
 
 modm::vl6180::Data data;
 modm::Vl6180<MyI2cMaster> distance(data);

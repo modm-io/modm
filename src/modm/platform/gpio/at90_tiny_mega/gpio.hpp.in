@@ -80,7 +80,7 @@ protected:
  * simulate an open-drain output (with internal pullups if needed).
  * You must use this class for `SoftwareI2cMaster`!
  *
- * @see ::modm::SoftwareI2cMaster
+ * @see BitBangI2cMaster
  * @ingroup	{{partname}}_gpio
  * @{
  */

@@ -64,7 +64,7 @@ struct Gpio
  * simulate an open-drain Output (with internal pullups if needed).
  * You must use this class for `SoftwareI2cMaster`!
  *
- * @see ::modm::SoftwareI2cMaster
+ * @see BitBangI2cMaster
  * @ingroup	avr
  * @{
  */
