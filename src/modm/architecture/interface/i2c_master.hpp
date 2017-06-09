@@ -57,14 +57,46 @@ public:
 		High     = 3400000	///< Super datarate of 3.4MHz (rarely supported)
 	};
 
+	enum class
+	PullUps
+	{
+		External,	///< External pull-ups exists in SDA and SCL
+		Internal	///< Use weak internal pull-ups on SDA and SCL
+	};
+
+	enum class
+	ResetDevices : uint32_t
+	{
+		NoReset  =       0,	///< Do not reset devices
+		LowSpeed =   10000,	///< Low-Speed datarate of 10kHz
+		Standard =  100000,	///< Standard datarate of 100kHz
+		Fast     =  400000,	///< Fast datarate of 400kHz
+	};
+
 #ifdef __DOXYGEN__
 public:
 	/**
-	 * Initializes the hardware and sets the datarate.
+	 * Configures the Scl and Sda signals and connects them.
 	 *
-	 * It is strongly recommended to reset the slave devices on the bus
-	 * after a master reset.
-	 * This is usually done in the Gpio Scl connect method.
+	 * This configures the Scl and Sda signals as open-drain outputs with optional
+	 * weak internal pullups and optionally resets all slave devices on the bus.
+	 *
+	 * @warning Using weak internal pullups is not recommended and will require
+	 *			a slow baudrate. You must use external pullups for a reliable bus.
+	 *
+	 * @tparam	Signals
+	 *		One Scl and one Sda signal are required and can be passed out-of-order.
+	 * @tparam	reset
+	 * 		Choose a speed to reset the I2C devices with. Can be disabled with `ResetDevices::NoReset`.
+	 * @param	pullups
+	 * 		Use external or weak internal pullups.
+	 */
+	template< class... Signals, ResetDevices reset = ResetDevices::Standard >
+	static void
+	connect(PullUps pullups = PullUps::External);
+
+	/**
+	 * Initializes the hardware and sets the datarate.
 	 *
 	 * @tparam	SystemClock
 	 * 		the currently active system clock
@@ -73,7 +105,7 @@ public:
 	 * @tparam	tolerance
 	 * 		the allowed absolute tolerance for the resulting baudrate
 	 */
-	template< class SystemClock, uint32_t baudrate=Baudrate::Standard,
+	template< class SystemClock, uint32_t baudrate = Baudrate::Standard,
 			uint16_t tolerance = Tolerance::FivePercent >
 	static void
 	initialize();
@@ -92,7 +124,10 @@ public:
 
 	/**
 	 * Perform a software reset of the driver in case of an error and detach
-     * the transaction object.
+	 * the transaction object.
+	 *
+	 * It is strongly recommended to reset the slave devices on the bus
+	 * after a master reset. You can use the connect() method for that.
 	 */
 	static void
 	reset();

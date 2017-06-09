@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2009-2010, Martin Rosekeit
  * Copyright (c) 2009-2011, Fabian Greif
- * Copyright (c) 2011-2015, Niklas Hauser
+ * Copyright (c) 2011-2015, 2017, Niklas Hauser
  * Copyright (c) 2013, Sascha Schade
  *
  * This file is part of the modm project.
@@ -114,21 +114,22 @@ struct I2c
 	 * @see	Application Note AN572 by Microchip
 	 *
 	 * @warning	Must be called **before** connecting SDA and SCL to I2cMaster!
-	 * @warning	The clock frequency is hardcoded to 100kHz, so this function blocks for 90µs.
 	 *
 	 * @tparam	Scl		The clock pin of the bus to be reset.
  	 */
-	template< class Scl >
+	template< class Scl, uint32_t baudrate = 100000 >
 	static void
 	resetDevices()
 	{
+		static_assert(baudrate <= 500000, "I2c::resetDevices() can only do max. 500kHz!");
+		constexpr uint32_t delay = 500000 / baudrate;
 		Scl::setInput();
 
 		for (uint_fast8_t ii = 0; ii < 9; ++ii) {
 			Scl::setOutput(modm::Gpio::Low);
-			modm::delayMicroseconds(5);
+			modm::delayMicroseconds(delay);
 			Scl::setInput();
-			modm::delayMicroseconds(5);
+			modm::delayMicroseconds(delay);
 		}
 	}
 

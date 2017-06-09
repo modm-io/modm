@@ -78,6 +78,16 @@ public:
 #ifdef __DOXYGEN__
 public:
 	/**
+	 * Configures the Tx and Rx signals and connects them.
+	 *
+	 * @tparam	Signals
+	 *		One Tx and one Rx signal are required and can be passed out-of-order.
+	 */
+	template< class... Signals >
+	static void
+	connect();
+
+	/**
 	 * Initializes the hardware and sets the baudrate.
 	 *
 	 * @tparam SystemClock

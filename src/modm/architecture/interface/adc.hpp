@@ -65,6 +65,16 @@ public:
 
 public:
 	/**
+	 * Configures the input signals and connects them.
+	 *
+	 * @tparam	Signals
+	 *		At least one input signal is required and can be passed out-of-order.
+	 */
+	template< class... Signals >
+	static void
+	connect();
+
+	/**
 	 * Initializes the hardware and sets the datarate.
 	 *
 	 * @tparam	SystemClock

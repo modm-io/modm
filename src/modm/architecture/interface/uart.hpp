@@ -68,6 +68,18 @@ public:
 #ifdef __DOXYGEN__
 public:
 	/**
+	 * Connect GPIOs to the peripheral and configure them.
+	 *
+	 * This configures the Tx and Rx signals as output and input and connects them.
+	 *
+	 * @tparam	Signals
+	 *		One Tx and one Rx signal are required and can be passed out-of-order.
+	 */
+	template< class... Signals >
+	static void
+	connect();
+
+	/**
 	 * Initializes the hardware and sets the baudrate.
 	 *
 	 * @tparam	SystemClock

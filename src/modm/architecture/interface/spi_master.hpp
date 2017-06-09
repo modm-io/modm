@@ -33,6 +33,19 @@ class SpiMaster : public ::modm::PeripheralDriver, public Spi
 #ifdef __DOXYGEN__
 public:
 	/**
+	 * Connect GPIOs to the peripheral and configure them.
+	 *
+	 * This configures the Sck, Mosi and Miso signals and connects them.
+	 *
+	 * @tparam	Signals
+	 *		One Scl and one Mosi signal are required (one Miso signal is
+	 *		optional) and can be passed out-of-order.
+	 */
+	template< class... Signals >
+	static void
+	connect();
+
+	/**
 	 * Initializes the hardware and sets the baudrate.
 	 *
 	 * @tparam	SystemClock
