@@ -18,6 +18,7 @@
 #include "../device.hpp"
 #include <modm/architecture/interface/adc.hpp>
 #include <modm/architecture/interface/register.hpp>
+#include <modm/platform/gpio/connector.hpp>
 
 /**
  * @ingroup 	{{partname}}
@@ -180,7 +181,15 @@ public:
 	MODM_FLAGS32(InterruptFlag);
 
 public:
-	// start documentation inherited
+	// start inherited documentation
+	template< template<Peripheral _> class... Signals >
+	static void
+	connect()
+	{
+		using Connector = GpioConnector<Peripheral::Adc{{ id }}, Signals...>;
+		Connector::connect();
+	}
+
 	/**
 	 * Initialize and enable the A/D converter.
 	 *

@@ -38,6 +38,28 @@ modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::configuration(nullptr);
 // ----------------------------------------------------------------------------
 
 template <typename Sck, typename Mosi, typename Miso>
+template< template<modm::platform::Peripheral _> class... Signals >
+void
+modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::connect()
+{
+	using Connector = GpioConnector<Peripheral::BitBang, Signals...>;
+	static constexpr bool ContainsSck = Connector::template Contains<Sck>;
+	static constexpr bool ContainsMosi = Connector::template Contains<Mosi>;
+	static constexpr bool ContainsMiso = Connector::template Contains<Miso>;
+	static_assert(ContainsSck and ContainsMosi and
+				  ((not Connector::template IsValid<Miso> and sizeof...(Signals) == 2) or
+				   (    Connector::template IsValid<Miso> and sizeof...(Signals) == 3 and ContainsMiso)),
+				  "BitBangSpiMaster<Sck, Mosi, Miso> can only connect to the same Sck, Mosi and Miso signals of the declaration!");
+
+	// Connector::disconnect();
+	Sck::setOutput(Gpio::OutputType::PushPull);
+	Mosi::setOutput(Gpio::OutputType::PushPull);
+	Miso::setInput(Gpio::InputType::Floating);
+	Connector::connect();
+}
+
+
+template <typename Sck, typename Mosi, typename Miso>
 template< class SystemClock, uint32_t baudrate, uint16_t tolerance >
 void
 modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::initialize()

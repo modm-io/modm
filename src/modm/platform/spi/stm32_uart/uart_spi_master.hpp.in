@@ -15,6 +15,7 @@
 #define MODM_STM32_UART_SPI_MASTER{{ id }}_HPP
 
 #include <modm/architecture/interface/spi_master.hpp>
+#include <modm/platform/gpio/connector.hpp>
 #include "../uart/uart_hal_{{ id }}.hpp"
 
 namespace modm
@@ -51,6 +52,26 @@ public:
 	};
 
 public:
+	template< template<Peripheral _> class... Signals >
+	static void
+	connect()
+	{
+		using Connector = GpioConnector<Peripheral::Spi{{ id }}, Signals...>;
+		using Sck = typename Connector::template GetSignal<Gpio::Signal::Sck>;
+		using Mosi = typename Connector::template GetSignal<Gpio::Signal::Mosi>;
+		using Miso = typename Connector::template GetSignal<Gpio::Signal::Miso>;
+		static_assert(Connector::template IsValid<Sck> and Connector::template IsValid<Mosi> and
+					  ((not Connector::template IsValid<Miso> and sizeof...(Signals) == 2) or
+					   (    Connector::template IsValid<Miso> and sizeof...(Signals) == 3)),
+					  "SpiMaster{{id}}::connect() requires one Sck and one Mosi and optionally one Miso signal!");
+
+		// Connector::disconnect();
+		Sck::setOutput(Gpio::OutputType::PushPull);
+		Mosi::setOutput(Gpio::OutputType::PushPull);
+		Miso::setInput(Gpio::InputType::Floating);
+		Connector::connect();
+	}
+
 	template< 	class SystemClock, uint32_t baudrate,
 				uint16_t tolerance = modm::Tolerance::FivePercent >
 	static void

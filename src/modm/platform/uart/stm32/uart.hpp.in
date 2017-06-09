@@ -21,6 +21,7 @@
 #define MODM_STM32_UART_{{ id }}_HPP
 
 #include <modm/architecture/interface/uart.hpp>
+#include <modm/platform/gpio/connector.hpp>
 #include "uart_base.hpp"
 #include "uart_baudrate.hpp"
 #include "uart_hal_{{ id }}.hpp"
@@ -49,7 +50,24 @@ private:
 %% endif
 
 public:
-template< 	class SystemClock, uint32_t baudrate,
+	template< template<Peripheral _> class... Signals >
+	static void
+	connect(Gpio::InputType InputTypeRx = Gpio::InputType::PullUp)
+	{
+		using Connector = GpioConnector<Peripheral::{{ name }}, Signals...>;
+		using Tx = typename Connector::template GetSignal< Gpio::Signal::Tx >;
+		using Rx = typename Connector::template GetSignal< Gpio::Signal::Rx >;
+		static_assert(((Connector::template IsValid<Tx> and Connector::template IsValid<Rx>) and sizeof...(Signals) == 2) or
+					  ((Connector::template IsValid<Tx> or  Connector::template IsValid<Rx>) and sizeof...(Signals) == 1),
+					  "{{ name }}::connect() requires one Tx and/or one Rx signal!");
+
+		// Connector::disconnect();
+		Tx::setOutput(Gpio::OutputType::PushPull);
+		Rx::setInput(InputTypeRx);
+		Connector::connect();
+	}
+
+	template< class SystemClock, uint32_t baudrate,
 		uint16_t tolerance = modm::Tolerance::OnePercent >
 	static void modm_always_inline
 %% if options["buffered"]

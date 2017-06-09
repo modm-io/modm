@@ -21,6 +21,7 @@
 #include <avr/io.h>
 
 #include <modm/architecture/interface/adc.hpp>
+#include <modm/platform/gpio/connector.hpp>
 
 {#- The ATtiny ADC module is also fragmented, these defines help a tiny bit -#}
 
@@ -161,6 +162,14 @@ private:
 
 public:
 	// start inherited documentation
+	template< template<Peripheral _> class... Signals >
+	static void
+	connect()
+	{
+		using Connector = GpioConnector<Peripheral::Adc, Signals...>;
+		Connector::connect();
+	}
+
 	template< class SystemClock, uint32_t frequency=100000,
 			uint16_t tolerance = modm::Tolerance::TenPercent >
 	static void

@@ -19,7 +19,7 @@
 #include <stdint.h>
 #include <modm/architecture/interface/spi_master.hpp>
 #include <modm/architecture/driver/delay.hpp>
-#include "../gpio/software_gpio.hpp"
+#include <modm/platform/gpio/connector.hpp>
 
 namespace modm
 {
@@ -45,12 +45,15 @@ class BitBangSpiMaster : public ::modm::SpiMaster
 {
 public:
 	// start documentation inherited
+	template< template<Peripheral _> class... Signals >
+	static void
+	connect();
+
 	/// Baudrate is limited to 500kbps.
 	template< class SystemClock, uint32_t baudrate,
 			uint16_t tolerance = Tolerance::FivePercent >
 	static void
 	initialize();
-
 
 	static void
 	setDataMode(DataMode mode);

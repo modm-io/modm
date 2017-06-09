@@ -78,7 +78,7 @@ def prepare(module, options):
     if not (device.has_driver("uart:stm32*") or device.has_driver("usart:stm32*")):
         return False
 
-    module.depends(":platform:core")
+    module.depends(":platform:core", ":platform:gpio")
 
     for driver in (device.get_all_drivers("uart") + device.get_all_drivers("usart")):
         for instance in driver["instance"]:

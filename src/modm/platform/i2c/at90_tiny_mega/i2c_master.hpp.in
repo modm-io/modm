@@ -17,6 +17,7 @@
 
 #include "i2c.hpp"
 #include <modm/architecture/interface/i2c_master.hpp>
+#include <modm/platform/gpio/connector.hpp>
 
 namespace modm
 {
@@ -35,6 +36,30 @@ namespace platform
 class I2cMaster : public ::modm::I2cMaster, I2c
 {
 public:
+	template< template<Peripheral _> class... Signals, ResetDevices reset = ResetDevices::Standard>
+	static void
+	connect(PullUps pullups = PullUps::External)
+	{
+		using Connector = GpioConnector<Peripheral::Twi, Signals...>;
+		using Scl = typename Connector::template GetSignal<Gpio::Signal::Scl>;
+		using Sda = typename Connector::template GetSignal<Gpio::Signal::Sda>;
+		static_assert(sizeof...(Signals) == 2 and
+					  Connector::template IsValid<Scl> and Connector::template IsValid<Sda>,
+					  "I2cMaster::connect() requires one Scl and one Sda signal!");
+		const Gpio::InputType input =
+			(pullups == PullUps::Internal) ? Gpio::InputType::PullUp : Gpio::InputType::Floating;
+
+		Connector::disconnect();
+		using SCL = GpioOpenDrain<Scl>;
+		using SDA = GpioOpenDrain<Sda>;
+		SCL::configure(input);
+		SDA::configure(input);
+		SCL::setOutput();
+		SDA::setOutput();
+		if (reset != ResetDevices::NoReset) resetDevices<SCL, uint32_t(reset)>();
+		Connector::connect();
+	}
+
 	template< class SystemClock, uint32_t baudrate=Baudrate::Standard,
 			uint16_t tolerance = modm::Tolerance::FivePercent >
 	static modm_always_inline void

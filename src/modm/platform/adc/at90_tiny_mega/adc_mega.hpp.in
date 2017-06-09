@@ -20,6 +20,7 @@
 #define MODM_ATMEGA_ADC_HPP
 
 #include <modm/architecture/interface/adc.hpp>
+#include <modm/platform/gpio/connector.hpp>
 //#include "../device.hpp"
 
 #if defined (__AVR_ATmega64HVE__) || defined(__AVR_ATmega64HVE2__)
@@ -115,6 +116,14 @@ private:
 
 public:
 	// start inherited documentation
+	template< template<Peripheral _> class... Signals >
+	static void
+	connect()
+	{
+		using Connector = GpioConnector<Peripheral::Adc, Signals...>;
+		Connector::connect();
+	}
+
 	template< class SystemClock, uint32_t frequency=100000,
 			uint16_t tolerance = modm::Tolerance::TenPercent >
 	static void

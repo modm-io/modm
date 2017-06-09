@@ -16,6 +16,7 @@
 #define MODM_STM32_CAN{{ id }}_HPP
 
 #include <modm/architecture/interface/can.hpp>
+#include <modm/platform/gpio/connector.hpp>
 #include "../device.hpp"
 
 #include "../clock/common_clock.hpp"
@@ -76,6 +77,22 @@ private:
 	initializeWithPrescaler(uint16_t prescaler, uint8_t bs1, uint8_t bs2,
 			uint32_t interruptPriority, Mode startupMode, bool overwriteOnOverrun);
 public:
+	template< template<Peripheral _> class... Signals >
+	static void
+	connect(Gpio::InputType inputType = Gpio::InputType::Floating)
+	{
+		using Connector = GpioConnector<Peripheral::Can{{ id }}, Signals...>;
+		using Tx = typename Connector::template GetSignal< Gpio::Signal::Tx >;
+		using Rx = typename Connector::template GetSignal< Gpio::Signal::Rx >;
+		static_assert(Connector::template IsValid<Tx> and Connector::template IsValid<Rx> and sizeof...(Signals) == 2,
+					  "Can{{ id }}::connect() requires one Tx and one Rx signal!");
+
+		// Connector::disconnect();
+		Tx::setOutput(Gpio::OutputType::PushPull);
+		Rx::setInput(inputType);
+		Connector::connect();
+	}
+
 	/**
 	 * Enables the clock for the CAN controller and resets all settings
 	 *

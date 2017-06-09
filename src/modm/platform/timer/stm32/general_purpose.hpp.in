@@ -18,6 +18,7 @@
 #define MODM_STM32_TIMER_{{ id }}_HPP
 
 #include "general_purpose_base.hpp"
+#include <modm/platform/gpio/connector.hpp>
 
 namespace modm
 {
@@ -116,6 +117,14 @@ public:
 	typedef uint16_t Value;
 
 %% endif
+	template< template<Peripheral _> class... Signals >
+	static void
+	connect()
+	{
+		using Connector = GpioConnector<Peripheral::Tim{{ id }}, Signals...>;
+		Connector::connect();
+	}
+
 	// Just enable the clock of the peripheral
 	static void
 	clockEnable();

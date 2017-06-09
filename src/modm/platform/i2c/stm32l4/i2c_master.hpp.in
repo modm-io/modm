@@ -16,6 +16,7 @@
 
 #include <modm/architecture/interface/i2c_master.hpp>
 #include <modm/platform/clock/common_clock.hpp>
+#include <modm/platform/gpio/connector.hpp>
 
 /**
  * @ingroup 	{{partname}}
@@ -45,6 +46,28 @@ public:
 	static const TypeId::I2cMaster{{ id }}Scl Scl;
 
 public:
+	template< template<Peripheral _> class... Signals, ResetDevices reset = ResetDevices::Standard>
+	static void
+	connect(PullUps pullups = PullUps::External)
+	{
+		using Connector = GpioConnector<Peripheral::I2c{{ id }}, Signals...>;
+		using Scl = typename Connector::template GetSignal<Gpio::Signal::Scl>;
+		using Sda = typename Connector::template GetSignal<Gpio::Signal::Sda>;
+		static_assert(sizeof...(Signals) == 2 and
+					  Connector::template IsValid<Scl> and Connector::template IsValid<Sda>,
+					  "I2cMaster{{id}}::connect() requires one Scl and one Sda signal!");
+		const Gpio::InputType input =
+			(pullups == PullUps::Internal) ? Gpio::InputType::PullUp : Gpio::InputType::Floating;
+
+		Connector::disconnect();
+		Scl::configure(input);
+		Sda::configure(input);
+		Scl::setOutput(Gpio::OutputType::OpenDrain);
+		Sda::setOutput(Gpio::OutputType::OpenDrain);
+		if (reset != ResetDevices::NoReset) resetDevices<Scl, uint32_t(reset)>();
+		Connector::connect();
+	}
+
 	/**
 	 * Set up the I2C module for master operation.
 	 *

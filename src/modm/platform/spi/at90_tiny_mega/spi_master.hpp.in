@@ -17,6 +17,7 @@
 #include <avr/io.h>
 
 #include <modm/architecture/interface/spi_master.hpp>
+#include <modm/platform/gpio/connector.hpp>
 
 
 #include "spi{{ id }}.hpp"
@@ -28,7 +29,7 @@ namespace platform
 {
 
 /**
- * Implementation of the SimpleSpi.
+ * Implementation of the SpiMaster.
  *
  * The fast SPI clock speeds make it unreasonable to use an interrupt
  * based approach to shifting out each byte of the data, since the interrupt
@@ -61,6 +62,26 @@ public:
 
 public:
 	// start documentation inherited
+	template< template<Peripheral _> class... Signals >
+	static void
+	connect()
+	{
+		using Connector = GpioConnector<Peripheral::Spi{{ id }}, Signals...>;
+		using Sck = typename Connector::template GetSignal<Gpio::Signal::Sck>;
+		using Mosi = typename Connector::template GetSignal<Gpio::Signal::Mosi>;
+		using Miso = typename Connector::template GetSignal<Gpio::Signal::Miso>;
+		static_assert(Connector::template IsValid<Sck> and Connector::template IsValid<Mosi> and
+					  ((not Connector::template IsValid<Miso> and sizeof...(Signals) == 2) or
+					   (    Connector::template IsValid<Miso> and sizeof...(Signals) == 3)),
+					  "UartSpiMaster{{id}}::connect() requires one Sck and one Mosi and optionally one Miso signal!");
+
+		// Connector::disconnect();
+		Sck::setOutput(Gpio::OutputType::PushPull);
+		Mosi::setOutput(Gpio::OutputType::PushPull);
+		Miso::setInput(Gpio::InputType::Floating);
+		Connector::connect();
+	}
+
 	template< class SystemClock, uint32_t baudrate,
 			uint16_t tolerance = modm::Tolerance::FivePercent >
 	static inline void

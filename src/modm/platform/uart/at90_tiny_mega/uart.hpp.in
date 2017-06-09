@@ -21,6 +21,7 @@
 
 //#include "../device.hpp"
 #include <modm/architecture/interface/uart.hpp>
+#include <modm/platform/gpio/connector.hpp>
 
 
 namespace modm
@@ -53,6 +54,22 @@ namespace platform
 class Uart{{ id }} : public ::modm::Uart
 {
 public:
+	template< template<Peripheral _> class... Signals >
+	static void
+	connect(Gpio::InputType InputTypeRx = Gpio::InputType::PullUp)
+	{
+		using Connector = GpioConnector<Peripheral::Usart{{ id }}, Signals...>;
+		using Tx = typename Connector::template GetSignal< Gpio::Signal::Txd >;
+		using Rx = typename Connector::template GetSignal< Gpio::Signal::Rxd >;
+		static_assert(((Connector::template IsValid<Tx> and Connector::template IsValid<Rx>) and sizeof...(Signals) == 2),
+					  "Uart{{ id }}::connect() requires one Tx and one Rx signal!");
+
+		// Connector::disconnect();
+		Tx::setOutput();
+		Rx::setInput(InputTypeRx);
+		Connector::connect();
+	}
+
 	// start documentation inherited
 	template< class SystemClock, uint32_t baudrate,
 			uint16_t tolerance = modm::Tolerance::TwoPercent >

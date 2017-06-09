@@ -17,6 +17,7 @@
 #define MODM_STM32_TIMER_{{ id }}_HPP
 
 #include "basic_base.hpp"
+#include <modm/platform/gpio/connector.hpp>
 
 namespace modm
 {
@@ -55,6 +56,14 @@ namespace platform
 class Timer{{ id }} : public BasicTimer
 {
 public:
+	template< template<Peripheral _> class... Signals >
+	static void
+	connect()
+	{
+		using Connector = GpioConnector<Peripheral::Tim{{ id }}, Signals...>;
+		Connector::connect();
+	}
+
 	static void
 	enable();
 

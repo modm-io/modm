@@ -46,6 +46,39 @@ template <class Scl, class Sda>
 modm::I2cTransaction::Reading modm::platform::BitBangI2cMaster<Scl, Sda>::reading(nullptr, 0, modm::I2c::OperationAfterRead::Stop);
 
 template <class Scl, class Sda>
+template< class SystemClock, uint32_t baudrate, uint16_t tolerance >
+void
+modm::platform::BitBangI2cMaster<Scl, Sda>::initialize()
+{
+	delayTime = uint32_t(250000000) / baudrate;
+	if (delayTime == 0) delayTime = 1;
+
+	SCL::set();
+	SDA::set();
+}
+
+template <class Scl, class Sda>
+template< template<modm::platform::Peripheral _> class... Signals, modm::I2cMaster::ResetDevices reset >
+void
+modm::platform::BitBangI2cMaster<Scl, Sda>::connect(PullUps pullups)
+{
+	using Connector = GpioConnector<Peripheral::BitBang, Signals...>;
+	static_assert(sizeof...(Signals) == 2, "BitBangI2cMaster<Scl, Sda>::connect() requires one Scl and one Sda signal!");
+	static_assert(Connector::template Contains<SCL> and Connector::template Contains<SDA>,
+				  "BitBangI2cMaster<Scl, Sda> can only connect to the same Scl and Sda signals of the declaration!");
+	const Gpio::InputType input =
+		(pullups == PullUps::Internal) ? Gpio::InputType::PullUp : Gpio::InputType::Floating;
+
+	Connector::disconnect();
+	SCL::configure(input);
+	SDA::configure(input);
+	SCL::setOutput(SCL::OutputType::OpenDrain);
+	SDA::setOutput(SDA::OutputType::OpenDrain);
+	if (reset != ResetDevices::NoReset) resetDevices<SCL, uint32_t(reset)>();
+	Connector::connect();
+}
+
+template <class Scl, class Sda>
 bool
 modm::platform::BitBangI2cMaster<Scl, Sda>::start(modm::I2cTransaction *transaction, ConfigurationHandler handler)
 {
