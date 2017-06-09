@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013, Sascha Schade
- * Copyright (c) 2014, Niklas Hauser
+ * Copyright (c) 2014, 2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -51,8 +51,8 @@ template <	typename Cclk,			///< Clock output to FPGA
 			typename InitB,			///< InitB input from FPGA
 			typename Done,			///< Done  input from FPGA. FPGA signalises end of configuration.
 			typename DataSource,	///< Source of configuration data, e.g. serial external flash.
-			typename Led0 = modm::GpioUnused,
-			typename Led1 = modm::GpioUnused >
+			typename Led0 = modm::platform::GpioUnused,
+			typename Led1 = modm::platform::GpioUnused >
 class XilinxSpartan6Parallel : public Xilinx
 {
 public:

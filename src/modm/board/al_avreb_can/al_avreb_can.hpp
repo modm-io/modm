@@ -27,13 +27,13 @@ namespace Board
 using systemClock = modm::platform::SystemClock;
 
 // Arduino Footprint
-using Led0 = modm::GpioInverted<GpioOutputF0>;
-using Led1 = modm::GpioInverted<GpioOutputF1>;
-using Led2 = modm::GpioInverted<GpioOutputF2>;
-using Led3 = modm::GpioInverted<GpioOutputF3>;
+using Led0 = GpioInverted<GpioOutputF0>;
+using Led1 = GpioInverted<GpioOutputF1>;
+using Led2 = GpioInverted<GpioOutputF2>;
+using Led3 = GpioInverted<GpioOutputF3>;
 
-using Button = modm::GpioUnused;
-using Leds = modm::SoftwareGpioPort< Led3, Led2, Led1, Led0 >;
+using Button = GpioUnused;
+using Leds = SoftwareGpioPort< Led3, Led2, Led1, Led0 >;
 
 
 inline void

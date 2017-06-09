@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015, Kevin Läufer
- * Copyright (c) 2015-2016, Niklas Hauser
+ * Copyright (c) 2015-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -17,7 +17,7 @@
 using namespace Board;
 
 // maps arbitrary gpios to a bit
-using LedRingLeft = modm::SoftwareGpioPort<
+using LedRingLeft = SoftwareGpioPort<
 	Board::LedSouth,		// 4
 	Board::LedSouthWest,	// 3
 	Board::LedWest,			// 2
@@ -25,7 +25,7 @@ using LedRingLeft = modm::SoftwareGpioPort<
 	Board::LedNorth			// 0
 	>;
 // Symmetry \o/
-using LedRingRight = modm::SoftwareGpioPort<
+using LedRingRight = SoftwareGpioPort<
 	Board::LedSouth,		// 4
 	Board::LedSouthEast,	// 3
 	Board::LedEast,			// 2

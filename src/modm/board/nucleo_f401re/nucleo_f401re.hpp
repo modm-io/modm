@@ -94,10 +94,10 @@ struct systemClock {
 // Arduino Footprint
 #include "../nucleo64_arduino.hpp"
 
-using Button = modm::GpioInverted<GpioInputC13>;
+using Button = GpioInverted<GpioInputC13>;
 using LedD13 = D13;
 
-using Leds = modm::SoftwareGpioPort< LedD13 >;
+using Leds = SoftwareGpioPort< LedD13 >;
 
 
 namespace stlink

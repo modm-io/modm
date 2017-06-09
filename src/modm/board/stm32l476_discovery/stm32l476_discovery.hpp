@@ -90,7 +90,7 @@ namespace Joystick
 using LedRed   = GpioOutputB2;	// User LED 4
 using LedGreen = GpioOutputE8;	// User LED 5
 
-using Leds = modm::SoftwareGpioPort< LedRed, LedGreen >;
+using Leds = SoftwareGpioPort< LedRed, LedGreen >;
 
 
 inline void

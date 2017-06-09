@@ -30,7 +30,7 @@ typedef GpioOutputC12 LedStatInverted;	// inverted, 0=on, 1=off
 typedef GpioOutputA1  Led1;
 typedef GpioOutputA8  Led2;
 
-typedef modm::GpioInverted<LedStatInverted> LedStat;
+typedef GpioInverted<LedStatInverted> LedStat;
 
 typedef GpioInputA0 ButtonWakeUp;		// 1=pressed, 0=not pressed
 

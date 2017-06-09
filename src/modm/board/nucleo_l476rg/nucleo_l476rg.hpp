@@ -78,11 +78,11 @@ struct systemClock {
 #include "../nucleo64_arduino.hpp"
 
 // Button connects to GND
-using Button = modm::GpioInverted<GpioInputC13>;
+using Button = GpioInverted<GpioInputC13>;
 
 // User LD2
 using LedGreen = GpioOutputA5;
-using Leds = modm::SoftwareGpioPort< LedGreen >;
+using Leds = SoftwareGpioPort< LedGreen >;
 
 namespace stlink
 {

@@ -19,6 +19,9 @@
 namespace modm
 {
 
+namespace platform
+{
+
 /**
  * Dummy implementation of an I/O pin.
  *
@@ -41,7 +44,7 @@ namespace modm
  *     typedef GpioOutputD5 Mosi;
  * }
  *
- * BitBangSpiMaster< pin::Clk, pin::Mosi, modm::GpioUnused > Spi;
+ * BitBangSpiMaster< pin::Clk, pin::Mosi, GpioUnused > Spi;
  *
  * ...
  * Spi::write(0xaa);
@@ -106,7 +109,7 @@ public:
  * @code
  * #include <modm/architecture/platform.hpp>
  *
- * typedef modm::GpioInverted< GpioOutputB0 > Led;
+ * typedef GpioInverted< GpioOutputB0 > Led;
  *
  * ...
  * Led::setOutput();
@@ -184,7 +187,7 @@ public:
  * @ingroup	gpio
  */
 template<typename... Gpios>
-class SoftwareGpioPort : public GpioPort
+class SoftwareGpioPort : public ::modm::GpioPort
 {
 #ifdef __DOXYGEN__
 public:
@@ -217,9 +220,9 @@ class SoftwareGpioPort<Gpio, Gpios...> : private SoftwareGpioPort<Gpios...>
 public:
 	static constexpr uint8_t width = 1 + SoftwareGpioPort<Gpios...>::width;
 
-	static constexpr GpioPort::DataOrder
+	static constexpr ::modm::GpioPort::DataOrder
 	getDataOrder()
-	{ return GpioPort::DataOrder::Normal; }
+	{ return ::modm::GpioPort::DataOrder::Normal; }
 private:
 	typedef typename modm::tmp::Select< (width > 8),
 										uint16_t,
@@ -287,6 +290,8 @@ public:
 	toggle() {}
 };
 /// @endcond
+
+}	// namespace platform
 
 }	// namespace modm
 

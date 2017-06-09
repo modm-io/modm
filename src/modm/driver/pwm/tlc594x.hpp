@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016, Niklas Hauser
+ * Copyright (c) 2012-2017, Niklas Hauser
  * Copyright (c) 2015, Sascha Schade
  *
  * This file is part of the modm project.
@@ -53,8 +53,8 @@ namespace modm
  * @tparam CHANNELS	Number of channels must be multiples of 4, adjust for daisy-chained chips
  * @tparam	Spi		Spi interface
  * @tparam	Xlat	Level triggered latch pin
- * @tparam	Vprog	Vprog pin, use modm::GpioUnused if not connected
- * @tparam	Xerr	Error pin, use modm::GpioUnused if not connected
+ * @tparam	Vprog	Vprog pin, use modm::platform::GpioUnused if not connected
+ * @tparam	Xerr	Error pin, use modm::platform::GpioUnused if not connected
  *
  * @author	Niklas Hauser
  * @ingroup	driver_pwm
@@ -63,8 +63,8 @@ template<
 	uint16_t CHANNELS,
 	typename Spi,
 	typename Xlat,
-	typename Vprog=modm::GpioUnused,
-	typename Xerr=modm::GpioUnused >
+	typename Vprog=modm::platform::GpioUnused,
+	typename Xerr=modm::platform::GpioUnused >
 class TLC594X
 {
 public:

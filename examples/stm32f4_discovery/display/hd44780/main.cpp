@@ -84,7 +84,7 @@ namespace expander
 			GpioExpander::Pin::P4, 4 > Data4BitGpio;
 	// You can also use SoftwareGpioPort, note however, that every pin is set separately,
 	// so this requires four times as many bus accesses as the optimized version above.
-//	typedef modm::SoftwareGpioPort<Pin7, Pin6, Pin5, Pin4> Data4BitGpio;
+//	typedef SoftwareGpioPort<Pin7, Pin6, Pin5, Pin4> Data4BitGpio;
 }
 
 // You can choose either port width simply by using it.

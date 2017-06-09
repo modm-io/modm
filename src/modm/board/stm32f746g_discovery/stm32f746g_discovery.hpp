@@ -109,7 +109,7 @@ struct systemClock
 using Button = GpioInputI11;	// User Button
 using LedD13 = GpioOutputI1;	// User LED 1 (Arduino D13)
 
-using Leds = modm::SoftwareGpioPort< LedD13 >;
+using Leds = SoftwareGpioPort< LedD13 >;
 
 
 namespace stlink

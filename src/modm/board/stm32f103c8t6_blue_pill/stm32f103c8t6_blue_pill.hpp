@@ -98,10 +98,10 @@ struct systemClock {
 // using systemClock = SystemClock<Pll<ExternalCrystal<MHz8>, MHz72> >;
 
 // User LED (inverted, because connected to 3V3)
-using LedGreen = modm::GpioInverted< GpioOutputC13 >;
-using Leds = modm::SoftwareGpioPort< LedGreen >;
+using LedGreen = GpioInverted< GpioOutputC13 >;
+using Leds = SoftwareGpioPort< LedGreen >;
 
-using Button = modm::GpioUnused;
+using Button = GpioUnused;
 
 inline void
 initialize()

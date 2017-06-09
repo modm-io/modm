@@ -17,7 +17,7 @@ using namespace modm::platform;
 
 typedef GpioOutputB0 Led;
 // create a wrapper for a output pin
-typedef modm::GpioInverted< GpioOutputB1 > LedInverted;
+typedef GpioInverted< GpioOutputB1 > LedInverted;
 
 int
 main()

@@ -110,7 +110,7 @@ using Button = GpioInputA0;	// Blue PushButton
 using LedGreen = GpioOutputC9;		// User LED 3
 using LedBlue  = GpioOutputC8;		// User LED 4
 
-using Leds = modm::SoftwareGpioPort< LedBlue, LedGreen >;
+using Leds = SoftwareGpioPort< LedBlue, LedGreen >;
 
 
 inline void

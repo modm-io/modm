@@ -56,7 +56,7 @@ typedef GpioInputE6  Txe;
 typedef GpioOutputG1 Rd;
 typedef GpioOutputG0  WrInverted;
 
-typedef modm::GpioInverted<WrInverted> Wr;
+typedef GpioInverted<WrInverted> Wr;
 
 
 typedef modm::Ft245<myPort, Rd, Wr, Rxf, Txe> MyFt;

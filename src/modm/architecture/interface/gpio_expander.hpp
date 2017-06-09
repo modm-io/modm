@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Niklas Hauser
+ * Copyright (c) 2015, 2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -283,7 +283,7 @@ public:
  * @note For every port access a blocking bus transfer is performed, therefore
  *       do not expect these ports to be fast!
  *
- * @warning You can also use `modm::SoftwareGpioPort` to create a port out of individual
+ * @warning You can also use `SoftwareGpioPort` to create a port out of individual
  *          `GpioExpanderPin` classes, however, since each pin is individually accessed,
  *          this means more bus traffic and a non-atomic write and read of port data!
  *          It is strongly recommended to use this optimized class instead!

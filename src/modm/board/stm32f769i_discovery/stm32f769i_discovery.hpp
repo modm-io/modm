@@ -110,9 +110,9 @@ using Button = GpioInputA0;	// User Button
 using LedJ13 = GpioOutputJ13;	// User LED 1 (red)
 using LedJ5  = GpioOutputJ5;	// User LED 2 (green)
 using LedA12 = GpioOutputA12;	// User LED 3 (green)
-using LedD4  = modm::GpioInverted<GpioOutputD4>;	// User Led 4 (red)
+using LedD4  = GpioInverted<GpioOutputD4>;	// User Led 4 (red)
 
-using Leds = modm::SoftwareGpioPort< LedJ13, LedJ5, LedA12, LedD4 >;
+using Leds = SoftwareGpioPort< LedJ13, LedJ5, LedA12, LedD4 >;
 
 
 namespace stlink

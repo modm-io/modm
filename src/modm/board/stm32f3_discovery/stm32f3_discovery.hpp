@@ -133,7 +133,7 @@ using LedSouthWest = GpioOutputE14;		// User LED 8: Orange
 using LedWest      = GpioOutputE15;		// User LED 6: Green
 using LedNorthWest = GpioOutputE8;		// User LED 4: Blue
 
-using Leds = modm::SoftwareGpioPort< LedNorthWest, LedWest, LedSouthWest, LedSouth, LedSouthEast, LedEast, LedNorthEast, LedNorth >;
+using Leds = SoftwareGpioPort< LedNorthWest, LedWest, LedSouthWest, LedSouth, LedSouthEast, LedEast, LedNorthEast, LedNorth >;
 
 
 namespace l3g

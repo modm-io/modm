@@ -187,14 +187,14 @@ using D68 = GpioF0;
 using D69 = GpioF1;
 using D70 = GpioF2;
 using D71 = GpioA7;
-using D72 = modm::GpioUnused;
+using D72 = GpioUnused;
 
 using Button = GpioInputC13;
 
 using LedGreen = GpioOutputB0;	// LED1 [Green]
 using LedBlue = GpioOutputB7;	// LED2 [Blue]
 using LedRed = GpioOutputB14;	// LED3 [Red]
-using Leds = modm::SoftwareGpioPort< LedRed, LedBlue, LedGreen >;
+using Leds = SoftwareGpioPort< LedRed, LedBlue, LedGreen >;
 
 namespace stlink
 {

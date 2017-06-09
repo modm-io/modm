@@ -98,10 +98,10 @@ using D11 = GpioB5;
 using D12 = GpioB4;
 using D13 = GpioB3;
 
-using Button = modm::GpioUnused;
+using Button = GpioUnused;
 using LedD13 = D13;
 
-using Leds = modm::SoftwareGpioPort< LedD13 >;
+using Leds = SoftwareGpioPort< LedD13 >;
 
 
 namespace stlink

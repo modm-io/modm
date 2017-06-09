@@ -134,14 +134,14 @@ using D15 = GpioB8;
 
 using Button = GpioInputA0;
 
-using LedGreen  = modm::GpioInverted<GpioOutputG6>;		// LED1 [Green]
-using LedOrange = modm::GpioInverted<GpioOutputD4>;		// LED2 [Orange]
-using LedRed    = modm::GpioInverted<GpioOutputD5>;		// LED3 [Red]
-using LedBlue   = modm::GpioInverted<GpioOutputK3>;		// LED4 [Blue]
-using LedUsb    = modm::GpioInverted<GpioOutputB7>;		// LED5 [Red] USB Overcurrent
+using LedGreen  = GpioInverted<GpioOutputG6>;		// LED1 [Green]
+using LedOrange = GpioInverted<GpioOutputD4>;		// LED2 [Orange]
+using LedRed    = GpioInverted<GpioOutputD5>;		// LED3 [Red]
+using LedBlue   = GpioInverted<GpioOutputK3>;		// LED4 [Blue]
+using LedUsb    = GpioInverted<GpioOutputB7>;		// LED5 [Red] USB Overcurrent
 using LedD13    = GpioOutputD3;							// LED7 [Green]
 
-using Leds = modm::SoftwareGpioPort< LedBlue, LedRed, LedOrange, LedGreen >;
+using Leds = SoftwareGpioPort< LedBlue, LedRed, LedOrange, LedGreen >;
 
 using DisplayReset = GpioOutputH7;
 
