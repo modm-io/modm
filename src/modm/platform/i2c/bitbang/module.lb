@@ -15,8 +15,10 @@ def init(module):
     module.parent = "platform"
 
 def prepare(module, options):
-    module.depends(":platform:core", ":platform:gpio")
+    if not options[":target"].has_driver("gpio"):
+        return False
 
+    module.depends(":platform:core", ":platform:gpio")
     return True
 
 def build(env):

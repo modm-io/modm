@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2016, Niklas Hauser
+ * Copyright (c) 2013-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -41,7 +41,7 @@ namespace modm
  *     typedef GpioOutputD5 Mosi;
  * }
  *
- * modm::SoftwareSpiMaster< pin::Clk, pin::Mosi, modm::GpioUnused > Spi;
+ * BitBangSpiMaster< pin::Clk, pin::Mosi, modm::GpioUnused > Spi;
  *
  * ...
  * Spi::write(0xaa);

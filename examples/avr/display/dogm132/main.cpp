@@ -22,7 +22,7 @@ typedef GpioOutputD2 Cs;
 typedef GpioOutputB6 Mosi;
 typedef GpioOutputB7 Sck;
 
-typedef modm::SoftwareSpiMaster<Sck, Mosi, modm::GpioUnused> SPI;
+typedef BitBangSpiMaster<Sck, Mosi, modm::GpioUnused> SPI;
 
 typedef GpioOutputD3 A0;
 typedef GpioOutputD4 Reset;

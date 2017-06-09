@@ -29,7 +29,7 @@ typedef GpioOutputB7 Sclk;
 typedef GpioOutputB5 Mosi;
 typedef GpioInputB6 Miso;
 
-typedef modm::SoftwareSpiMaster<Sclk, Mosi, Miso> SPI;
+typedef BitBangSpiMaster<Sclk, Mosi, Miso> SPI;
 
 modm::Mcp2515<SPI, Cs, Int> mcp2515;
 

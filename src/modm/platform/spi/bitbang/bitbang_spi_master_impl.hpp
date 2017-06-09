@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2009-2010, Fabian Greif
  * Copyright (c) 2009-2010, Martin Rosekeit
- * Copyright (c) 2012-2016, Niklas Hauser
+ * Copyright (c) 2012-2017, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
  *
  * This file is part of the modm project.
@@ -12,54 +12,54 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_SOFTWARE_SPI_MASTER_HPP
-#	error	"Don't include this file directly, use 'simple_spi.hpp' instead!"
+#ifndef MODM_SOFTWARE_BITBANG_SPI_MASTER_HPP
+#	error	"Don't include this file directly, use 'bitbang_spi_master.hpp' instead!"
 #endif
 
-template <typename SCK, typename MOSI, typename MISO>
+template <typename Sck, typename Mosi, typename Miso>
 uint16_t
-modm::SoftwareSpiMaster<SCK, MOSI, MISO>::delayTime(1);
+modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::delayTime(1);
 
-template <typename SCK, typename MOSI, typename MISO>
+template <typename Sck, typename Mosi, typename Miso>
 uint8_t
-modm::SoftwareSpiMaster<SCK, MOSI, MISO>::operationMode(0);
+modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::operationMode(0);
 
-template <typename SCK, typename MOSI, typename MISO>
+template <typename Sck, typename Mosi, typename Miso>
 uint8_t
-modm::SoftwareSpiMaster<SCK, MOSI, MISO>::count(0);
+modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::count(0);
 
-template <typename SCK, typename MOSI, typename MISO>
+template <typename Sck, typename Mosi, typename Miso>
 void *
-modm::SoftwareSpiMaster<SCK, MOSI, MISO>::context(nullptr);
+modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::context(nullptr);
 
-template <typename SCK, typename MOSI, typename MISO>
+template <typename Sck, typename Mosi, typename Miso>
 modm::Spi::ConfigurationHandler
-modm::SoftwareSpiMaster<SCK, MOSI, MISO>::configuration(nullptr);
+modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::configuration(nullptr);
 // ----------------------------------------------------------------------------
 
-template <typename SCK, typename MOSI, typename MISO>
+template <typename Sck, typename Mosi, typename Miso>
 template< class SystemClock, uint32_t baudrate, uint16_t tolerance >
 void
-modm::SoftwareSpiMaster<SCK, MOSI, MISO>::initialize()
+modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::initialize()
 {
 	delayTime = 500000000 / baudrate;
 	if (delayTime == 0) delayTime = 1;
 
-	SCK::reset();
-	MOSI::reset();
+	Sck::reset();
+	Mosi::reset();
 }
 
-template <typename SCK, typename MOSI, typename MISO>
+template <typename Sck, typename Mosi, typename Miso>
 void
-modm::SoftwareSpiMaster<SCK, MOSI, MISO>::setDataMode(DataMode mode)
+modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::setDataMode(DataMode mode)
 {
 	operationMode = (operationMode & ~0b11) | static_cast<uint8_t>(mode);
-	SCK::set(operationMode & 0b10);
+	Sck::set(operationMode & 0b10);
 }
 
-template <typename SCK, typename MOSI, typename MISO>
+template <typename Sck, typename Mosi, typename Miso>
 void
-modm::SoftwareSpiMaster<SCK, MOSI, MISO>::setDataOrder(DataOrder order)
+modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::setDataOrder(DataOrder order)
 {
 	if (order == DataOrder::LsbFirst)
 		operationMode |= 0b100;
@@ -68,9 +68,9 @@ modm::SoftwareSpiMaster<SCK, MOSI, MISO>::setDataOrder(DataOrder order)
 }
 // ----------------------------------------------------------------------------
 
-template <typename SCK, typename MOSI, typename MISO>
+template <typename Sck, typename Mosi, typename Miso>
 uint8_t
-modm::SoftwareSpiMaster<SCK, MOSI, MISO>::acquire(void *ctx, ConfigurationHandler handler)
+modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::acquire(void *ctx, ConfigurationHandler handler)
 {
 	if (ctx == nullptr)
 	{
@@ -90,9 +90,9 @@ modm::SoftwareSpiMaster<SCK, MOSI, MISO>::acquire(void *ctx, ConfigurationHandle
 	return 0;
 }
 
-template <typename SCK, typename MOSI, typename MISO>
+template <typename Sck, typename Mosi, typename Miso>
 uint8_t
-modm::SoftwareSpiMaster<SCK, MOSI, MISO>::release(void *ctx)
+modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::release(void *ctx)
 {
 	if (ctx == context)
 	{
@@ -103,9 +103,9 @@ modm::SoftwareSpiMaster<SCK, MOSI, MISO>::release(void *ctx)
 }
 // ----------------------------------------------------------------------------
 
-template <typename SCK, typename MOSI, typename MISO>
+template <typename Sck, typename Mosi, typename Miso>
 uint8_t
-modm::SoftwareSpiMaster<SCK, MOSI, MISO>::transferBlocking(uint8_t data)
+modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::transferBlocking(uint8_t data)
 {
 	for (uint_fast8_t ii = 0; ii < 8; ++ii)
 	{
@@ -115,11 +115,11 @@ modm::SoftwareSpiMaster<SCK, MOSI, MISO>::transferBlocking(uint8_t data)
 
 		// if LSB first
 		if (operationMode & 0b100) {
-			MOSI::set(data & 0x01);
+			Mosi::set(data & 0x01);
 			data >>= 1;
 		}
 		else {
-			MOSI::set(data & 0x80);
+			Mosi::set(data & 0x80);
 			data <<= 1;
 		}
 
@@ -128,7 +128,7 @@ modm::SoftwareSpiMaster<SCK, MOSI, MISO>::transferBlocking(uint8_t data)
 			delay();
 
 		// CPOL=0 -> High, CPOL=1 -> Low
-		SCK::set(not (operationMode & 0b10));
+		Sck::set(not (operationMode & 0b10));
 
 		// CPHA=1, sample on falling edge
 		if (operationMode & 0b01)
@@ -136,10 +136,10 @@ modm::SoftwareSpiMaster<SCK, MOSI, MISO>::transferBlocking(uint8_t data)
 
 		// if LSB first
 		if (operationMode & 0b100) {
-			if (MISO::read()) data |= 0x80;
+			if (Miso::read()) data |= 0x80;
 		}
 		else {
-			if (MISO::read()) data |= 0x01;
+			if (Miso::read()) data |= 0x01;
 		}
 
 		// CPHA=0, sample on rising edge
@@ -147,15 +147,15 @@ modm::SoftwareSpiMaster<SCK, MOSI, MISO>::transferBlocking(uint8_t data)
 			delay();
 
 		// CPOL=0 -> Low, CPOL=1 -> High
-		SCK::set(operationMode & 0b10);
+		Sck::set(operationMode & 0b10);
 	}
 
 	return data;
 }
 
-template <typename SCK, typename MOSI, typename MISO>
+template <typename Sck, typename Mosi, typename Miso>
 void
-modm::SoftwareSpiMaster<SCK, MOSI, MISO>::transferBlocking(
+modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::transferBlocking(
 		uint8_t *tx, uint8_t *rx, std::size_t length)
 {
 	uint8_t tx_byte = 0xff;
@@ -171,17 +171,17 @@ modm::SoftwareSpiMaster<SCK, MOSI, MISO>::transferBlocking(
 	}
 }
 
-template <typename SCK, typename MOSI, typename MISO>
+template <typename Sck, typename Mosi, typename Miso>
 modm::ResumableResult<uint8_t>
-modm::SoftwareSpiMaster<SCK, MOSI, MISO>::transfer(uint8_t data)
+modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::transfer(uint8_t data)
 {
 	data = transferBlocking(data);
 	return {modm::rf::Stop, data};
 }
 
-template <typename SCK, typename MOSI, typename MISO>
+template <typename Sck, typename Mosi, typename Miso>
 modm::ResumableResult<void>
-modm::SoftwareSpiMaster<SCK, MOSI, MISO>::transfer(
+modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::transfer(
 		uint8_t *tx, uint8_t *rx, std::size_t length)
 {
 	transferBlocking(tx, rx, length);
@@ -190,9 +190,9 @@ modm::SoftwareSpiMaster<SCK, MOSI, MISO>::transfer(
 
 // ----------------------------------------------------------------------------
 
-template <typename SCK, typename MOSI, typename MISO>
+template <typename Sck, typename Mosi, typename Miso>
 void modm_always_inline
-modm::SoftwareSpiMaster<SCK, MOSI, MISO>::delay()
+modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::delay()
 {
 	modm::delayNanoseconds(delayTime);
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Sascha Schade
- * Copyright (c) 2014-2016, Niklas Hauser
+ * Copyright (c) 2014-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -39,7 +39,7 @@ typedef GpioOutputE1 Data;
 typedef GpioOutputE3 Cs;
 typedef GpioOutputE5 Clk;
 
-typedef modm::SoftwareSpiMaster< Clk, Data > Spi;
+typedef BitBangSpiMaster< Clk, Data > Spi;
 
 // The array of 3 modules which all are placed horizontally
 modm::Max7219matrix<Spi, Cs, 3, 1> ledMatrixDisplay;

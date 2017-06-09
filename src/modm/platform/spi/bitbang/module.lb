@@ -11,16 +11,18 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "spi.generic"
+    module.name = "spi.bitbang"
     module.parent = "platform"
 
 def prepare(module, options):
-    module.depends(":platform:core", ":platform:gpio.generic")
+    if not options[":target"].has_driver("gpio"):
+        return False
 
+    module.depends(":platform:core", ":platform:gpio")
     return True
 
 def build(env):
     env.outbasepath = "src/modm/platform/spi"
 
-    env.copy("software_spi_master_impl.hpp")
-    env.copy("software_spi_master.hpp")
+    env.copy("bitbang_spi_master_impl.hpp")
+    env.copy("bitbang_spi_master.hpp")

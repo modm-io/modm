@@ -38,7 +38,7 @@ namespace lcd
 	typedef GpioOutputD4 Reset;
 }
 
-typedef modm::SoftwareSpiMaster< lcd::Scl, lcd::Mosi, lcd::Miso > SPI;
+typedef BitBangSpiMaster< lcd::Scl, lcd::Mosi, lcd::Miso > SPI;
 
 modm::DogM128< SPI, lcd::Cs, lcd::A0, lcd::Reset, true > display;
 

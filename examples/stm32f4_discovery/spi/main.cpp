@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013, Kevin Läufer
- * Copyright (c) 2013-2016, Niklas Hauser
+ * Copyright (c) 2013-2017, Niklas Hauser
  * Copyright (c) 2016, Raphael Lehmann
  *
  * This file is part of the modm project.
@@ -20,7 +20,7 @@ using Mosi = GpioOutputB15;
 using Miso = GpioInputB14;
 using SpiMaster = SpiMaster2;
 // Note that you can also use a bit-banged SPI driver as a drop-in replacement
-// using SpiMaster = modm::SoftwareSpiMaster<Sck, Mosi, Miso>;
+// using SpiMaster = BitBangSpiMaster<Sck, Mosi, Miso>;
 
 int
 main()

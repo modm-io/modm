@@ -29,7 +29,7 @@ namespace lcd
 	typedef GpioOutputD3 Rs;
 }
 
-typedef modm::SoftwareSpiMaster< lcd::Scl, lcd::Mosi, lcd::Miso > SPI;
+typedef BitBangSpiMaster< lcd::Scl, lcd::Mosi, lcd::Miso > SPI;
 
 modm::DogM163< SPI, lcd::Cs, lcd::Rs > display;
 

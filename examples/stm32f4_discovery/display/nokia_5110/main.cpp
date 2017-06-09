@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2016, Niklas Hauser
  * Copyright (c) 2016, Sascha Schade
+ * Copyright (c) 2016-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -53,7 +53,7 @@ namespace lcd
 }
 
 // Select if hardware or software SPI Master shall be used
-// typedef modm::SoftwareSpiMaster< lcd::Clk, lcd::Din> mySpiMaster;
+// typedef BitBangSpiMaster< lcd::Clk, lcd::Din> mySpiMaster;
 typedef SpiMaster2 mySpiMaster;
 
 // create a LCD object

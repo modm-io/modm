@@ -13,8 +13,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_SOFTWARE_SPI_MASTER_HPP
-#define MODM_SOFTWARE_SPI_MASTER_HPP
+#ifndef MODM_SOFTWARE_BITBANG_SPI_MASTER_HPP
+#define MODM_SOFTWARE_BITBANG_SPI_MASTER_HPP
 
 #include <stdint.h>
 #include <modm/architecture/interface/spi_master.hpp>
@@ -24,21 +24,24 @@
 namespace modm
 {
 
+namespace platform
+{
+
 /**
  * Software emulation of a Simple Spi.
  *
- * @tparam	SCK			clock pin [output]
- * @tparam	MOSI		master out slave in pin [output]
- * @tparam	MISO		master in slave out pin [input]
+ * @tparam	Sck			clock pin [output]
+ * @tparam	Mosi		master out slave in pin [output]
+ * @tparam	Miso		master in slave out pin [input]
  *
  * @ingroup	spi
  * @author	Niklas Hauser
  * @see		gpio
  */
-template< typename SCK,
-		  typename MOSI,
-		  typename MISO = GpioUnused >
-class SoftwareSpiMaster : public ::modm::SpiMaster
+template< typename Sck,
+		  typename Mosi,
+		  typename Miso = GpioUnused >
+class BitBangSpiMaster : public ::modm::SpiMaster
 {
 public:
 	// start documentation inherited
@@ -89,8 +92,10 @@ private:
 	static ConfigurationHandler configuration;
 };
 
+} // namespace platform
+
 } // namespace modm
 
-#include "software_spi_master_impl.hpp"
+#include "bitbang_spi_master_impl.hpp"
 
-#endif // MODM_SOFTWARE_SPI_MASTER_HPP
+#endif // MODM_SOFTWARE_BITBANG_SPI_MASTER_HPP
