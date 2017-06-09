@@ -20,7 +20,7 @@ using namespace modm::clock;
 namespace modm
 {
 
-namespace avr
+namespace platform
 {
 
 /// @ingroup avr
@@ -56,7 +56,7 @@ public:
 
 };
 
-} // namespace avr
+} // namespace platform
 
 } // namespace modm
 

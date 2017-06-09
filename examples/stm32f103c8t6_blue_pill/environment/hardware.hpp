@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016, Sascha Schade
+ * Copyright (c) 2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -17,7 +18,7 @@
 // ----------------------------------------------------------------------------
 // Sensors at I2C
 
-using SensorsAI2cMaster = modm::stm32::I2cMaster1;
-using SensorsBI2cMaster = modm::stm32::I2cMaster2;
+using SensorsAI2cMaster = modm::platform::I2cMaster1;
+using SensorsBI2cMaster = modm::platform::I2cMaster2;
 
 #endif // ENVIRONMENT_HARDWARE_HPP

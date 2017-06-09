@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2010, Thorsten Lajewski
  * Copyright (c) 2010-2011, 2017, Fabian Greif
- * Copyright (c) 2012-2014, Niklas Hauser
+ * Copyright (c) 2012-2014, 2017, Niklas Hauser
  * Copyright (c) 2013, Martin Rosekeit
  * Copyright (c) 2015-2016, Sascha Schade
  *
@@ -26,7 +26,7 @@
 namespace modm
 {
 
-namespace hosted
+namespace platform
 {
 
 /**
@@ -106,7 +106,7 @@ private:
 	boost::thread* thread;
 };
 
-}	// namespace hosted
+}	// namespace platform
 
 }	// namespace modm
 

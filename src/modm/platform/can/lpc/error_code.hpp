@@ -2,7 +2,7 @@
  * Copyright (c) 2009, Georgi Grinshpun
  * Copyright (c) 2009-2011, Fabian Greif
  * Copyright (c) 2010, Martin Rosekeit
- * Copyright (c) 2011-2012, 2014, Niklas Hauser
+ * Copyright (c) 2011-2012, 2014, 2017, Niklas Hauser
  * Copyright (c) 2012, Sascha Schade
  * Copyright (c) 2013-2014, Kevin Läufer
  *
@@ -19,7 +19,7 @@
 
 namespace modm
 {
-	namespace lpc
+	namespace platform
 	{
 		enum ErrorCode
 		{

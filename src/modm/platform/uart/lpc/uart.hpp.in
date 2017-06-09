@@ -21,7 +21,7 @@
 namespace modm
 {
 
-namespace lpc
+namespace platform
 {
 
 /**
@@ -95,7 +95,7 @@ public:
 	discardReceiveBuffer();
 };
 
-}	// lpc namespace
+}	// namespace platform
 
 }	// modm namespace
 

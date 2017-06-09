@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2015-2017, Sascha Schade
+ * Copyright (c) 2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -32,8 +33,8 @@
 
 static constexpr modm::Can::Bitrate canBusBitRate = modm::Can::kBps125;
 
-modm::hosted::SerialInterface port("/dev/ttyUSB0", 115200);
-modm::hosted::CanUsb<modm::hosted::SerialInterface> canUsb(port);
+modm::platform::SerialInterface port("/dev/ttyUSB0", 115200);
+modm::platform::CanUsb<modm::platform::SerialInterface> canUsb(port);
 
 int
 main()

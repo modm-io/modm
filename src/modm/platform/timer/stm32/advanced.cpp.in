@@ -3,7 +3,7 @@
  * Copyright (c) 2009-2012, 2017, Fabian Greif
  * Copyright (c) 2011, 2014, Georgi Grinshpun
  * Copyright (c) 2013, 2016, Kevin Läufer
- * Copyright (c) 2014-2016, Niklas Hauser
+ * Copyright (c) 2014-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -17,7 +17,7 @@
 
 // ----------------------------------------------------------------------------
 void
-modm::stm32::Timer{{ id }}::enable()
+modm::platform::Timer{{ id }}::enable()
 {
 	// enable clock
 	RCC->APB2ENR  |=  RCC_APB2ENR_TIM{{ id }}EN;
@@ -28,7 +28,7 @@ modm::stm32::Timer{{ id }}::enable()
 }
 
 void
-modm::stm32::Timer{{ id }}::disable()
+modm::platform::Timer{{ id }}::disable()
 {
 	// disable clock
 	RCC->APB2ENR &= ~RCC_APB2ENR_TIM{{ id }}EN;
@@ -40,7 +40,7 @@ modm::stm32::Timer{{ id }}::disable()
 
 // ----------------------------------------------------------------------------
 void
-modm::stm32::Timer{{ id }}::setMode(Mode mode, SlaveMode slaveMode,
+modm::platform::Timer{{ id }}::setMode(Mode mode, SlaveMode slaveMode,
 		SlaveModeTrigger slaveModeTrigger, MasterMode masterMode
 %% if target["family"] in ["f3", "f7"]
 		, MasterMode2 masterMode2
@@ -72,7 +72,7 @@ modm::stm32::Timer{{ id }}::setMode(Mode mode, SlaveMode slaveMode,
 
 // ----------------------------------------------------------------------------
 void
-modm::stm32::Timer{{ id }}::configureInputChannel(uint32_t channel,
+modm::platform::Timer{{ id }}::configureInputChannel(uint32_t channel,
 		InputCaptureMapping input, InputCapturePrescaler prescaler,
 		InputCapturePolarity polarity, uint8_t filter,
 		bool xor_ch1_3)
@@ -116,7 +116,7 @@ modm::stm32::Timer{{ id }}::configureInputChannel(uint32_t channel,
 
 // ----------------------------------------------------------------------------
 void
-modm::stm32::Timer{{ id }}::configureOutputChannel(uint32_t channel,
+modm::platform::Timer{{ id }}::configureOutputChannel(uint32_t channel,
 		OutputCompareMode mode, uint16_t compareValue)
 {
 	channel -= 1;	// 1..4 -> 0..3
@@ -156,7 +156,7 @@ modm::stm32::Timer{{ id }}::configureOutputChannel(uint32_t channel,
 }
 
 void
-modm::stm32::Timer{{ id }}::configureOutputChannel(uint32_t channel,
+modm::platform::Timer{{ id }}::configureOutputChannel(uint32_t channel,
 OutputCompareMode mode,
 PinState out, OutputComparePolarity polarity,
 PinState out_n, OutputComparePolarity polarity_n,
@@ -199,7 +199,7 @@ OutputComparePreload preload)
 }
 
 void
-modm::stm32::Timer{{ id }}::configureOutputChannel(uint32_t channel,
+modm::platform::Timer{{ id }}::configureOutputChannel(uint32_t channel,
 uint32_t modeOutputPorts)
 {
 	channel -= 1;	// 1..4 -> 0..3
@@ -279,7 +279,7 @@ nvicDisableInterrupt(IRQn_Type IRQn)
 
 // ----------------------------------------------------------------------------
 void
-modm::stm32::Timer{{ id }}::enableInterruptVector(Interrupt interrupt, bool enable, uint32_t priority)
+modm::platform::Timer{{ id }}::enableInterruptVector(Interrupt interrupt, bool enable, uint32_t priority)
 {
 	if (enable)
 	{

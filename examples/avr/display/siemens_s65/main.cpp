@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011, Fabian Greif
  * Copyright (c) 2012, 2014, Sascha Schade
- * Copyright (c) 2012-2016, Niklas Hauser
+ * Copyright (c) 2012-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -15,7 +15,7 @@
 #include <modm/driver/display.hpp>
 #include <modm/ui/button_group.hpp>
 
-using namespace modm::atmega;
+using namespace modm::platform;
 
 typedef GpioOutputA0 Mosi;
 typedef GpioOutputA1 Sck;

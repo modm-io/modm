@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, Niklas Hauser
+ * Copyright (c) 2015-2017, Niklas Hauser
  * Copyright (c) 2017, Fabian Greif
  *
  * This file is part of the modm project.
@@ -81,7 +81,7 @@
 namespace modm
 {
 
-namespace avr
+namespace platform
 {
 
 /**
@@ -416,7 +416,7 @@ private:
 	}
 };
 
-}	// namespace attiny
+}	// namespace platform
 
 }	// namespace modm
 

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013-2014, Kevin Läufer
- * Copyright (c) 2014-2016, Niklas Hauser
+ * Copyright (c) 2014-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -41,13 +41,13 @@
 
 // ----------------------------------------------------------------------------
 bool
-modm::lpc::ClockControl::enableInternalClock(uint32_t, uint32_t)
+modm::platform::ClockControl::enableInternalClock(uint32_t, uint32_t)
 {
 	return true;
 }
 
 bool
-modm::lpc::ClockControl::enableExternalClock(uint32_t, uint32_t)
+modm::platform::ClockControl::enableExternalClock(uint32_t, uint32_t)
 {
 	LPC_SYSCON->PDRUNCFG &= ~PDRUNCFG_SYSOSC_PD;	// powerup
 	LPC_SYSCON->SYSOSCCTRL |= SYSOSCCTRL_BYPASS;	// enable bypass
@@ -55,7 +55,7 @@ modm::lpc::ClockControl::enableExternalClock(uint32_t, uint32_t)
 }
 
 bool
-modm::lpc::ClockControl::enableExternalCrystal(uint32_t f_kHz, uint32_t)
+modm::platform::ClockControl::enableExternalCrystal(uint32_t f_kHz, uint32_t)
 {
 	LPC_SYSCON->PDRUNCFG &= ~PDRUNCFG_SYSOSC_PD;	// powerup
 	LPC_SYSCON->SYSOSCCTRL &= ~SYSOSCCTRL_BYPASS;	// do not bypass
@@ -71,7 +71,7 @@ modm::lpc::ClockControl::enableExternalCrystal(uint32_t f_kHz, uint32_t)
 
 // ----------------------------------------------------------------------------
 bool
-modm::lpc::ClockControl::enablePll(PllSource source, uint8_t pllM, uint8_t pllP)
+modm::platform::ClockControl::enablePll(PllSource source, uint8_t pllM, uint8_t pllP)
 {
 	// SYSPLLCLKSEL
 	LPC_SYSCON->SYSPLLCLKSEL = (LPC_SYSCON->SYSPLLCLKSEL & 0b11)
@@ -88,7 +88,7 @@ modm::lpc::ClockControl::enablePll(PllSource source, uint8_t pllM, uint8_t pllP)
 
 // ----------------------------------------------------------------------------
 bool
-modm::lpc::ClockControl::enableSystemClock(SystemClockSource src, uint32_t /*waitCycles*/)
+modm::platform::ClockControl::enableSystemClock(SystemClockSource src, uint32_t /*waitCycles*/)
 {
 	LPC_SYSCON->MAINCLKSEL = static_cast<uint32_t>(src);
 	LPC_SYSCON->MAINCLKUEN = 0x01;	// toggle update enable register

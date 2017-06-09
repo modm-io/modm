@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2014, Kevin Läufer
+ * Copyright (c) 2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -17,7 +18,7 @@
 #ifndef MODM_LPC_XPRESSO_11C24_HPP
 #define MODM_LPC_XPRESSO_11C24_HPP
 
-using namespace modm::lpc;
+using namespace modm::platform;
 using namespace modm::cortex;
 
 typedef GpioOutput0_7 Led;

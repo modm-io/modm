@@ -33,7 +33,7 @@ using namespace modm::clock; // for MHzxx
 namespace modm
 {
 
-namespace stm32
+namespace platform
 {
 
 /**
@@ -199,7 +199,7 @@ public:
 			uint32_t interruptPriority);
 };
 
-}	// namespace stm32
+}	// namespace platform
 
 }	// namespace modm
 

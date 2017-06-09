@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2010-2011, Fabian Greif
- * Copyright (c) 2013-2016, Niklas Hauser
+ * Copyright (c) 2013-2017, Niklas Hauser
  * Copyright (c) 2014-2015, Sascha Schade
  *
  * This file is part of the modm project.
@@ -28,7 +28,7 @@
 #include <modm/driver/usb/ft245.hpp>
 #include <modm/debug/logger.hpp>
 
-using namespace modm::at90;
+using namespace modm::platform;
 
 // LED1 Status
 typedef GpioOutputD7 LedStatus;

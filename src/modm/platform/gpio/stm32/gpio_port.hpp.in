@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Niklas Hauser
+ * Copyright (c) 2016-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -18,7 +18,7 @@
 namespace modm
 {
 
-namespace stm32
+namespace platform
 {
 
 
@@ -206,7 +206,7 @@ public:
 %% endfor
 /// @endcond
 
-} // namespace stm32
+} // namespace platform
 
 } // namespace modm
 

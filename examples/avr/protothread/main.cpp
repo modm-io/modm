@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2010-2011, Fabian Greif
- * Copyright (c) 2012-2013, 2015-2016, Niklas Hauser
+ * Copyright (c) 2012-2013, 2015-2017, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
  *
  * This file is part of the modm project.
@@ -15,7 +15,7 @@
 #include <modm/processing/protothread.hpp>
 #include <modm/processing/timer.hpp>
 
-using namespace modm::atmega;
+using namespace modm::platform;
 
 typedef GpioOutputB0 LedGreen;
 typedef GpioOutputB1 LedRed;

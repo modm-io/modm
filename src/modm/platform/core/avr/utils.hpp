@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2009, Martin Rosekeit
  * Copyright (c) 2009-2011, 2017, Fabian Greif
- * Copyright (c) 2012-2014, 2016, Niklas Hauser
+ * Copyright (c) 2012-2014, 2016-2017, Niklas Hauser
  * Copyright (c) 2013, Sascha Schade
  *
  * This file is part of the modm project.
@@ -22,7 +22,7 @@
 namespace modm
 {
 
-namespace xmega
+namespace platform
 {
 
 /**
@@ -80,7 +80,7 @@ softwareReset()
 	changeProtectedRegister(&RST_CTRL, RST_SWRST_bm);
 }
 
-}	// namespace xmega
+}	// namespace platform
 
 }	// namespace modm
 

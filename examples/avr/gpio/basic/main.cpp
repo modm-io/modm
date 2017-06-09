@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2010-2011, Fabian Greif
- * Copyright (c) 2013-2016, Niklas Hauser
+ * Copyright (c) 2013-2017, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
  *
  * This file is part of the modm project.
@@ -13,7 +13,7 @@
 
 #include <modm/architecture/platform.hpp>
 
-using namespace modm::attiny;
+using namespace modm::platform;
 
 typedef GpioOutputB0 Led;
 // create a wrapper for a output pin

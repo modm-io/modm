@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015, Sascha Schade
- * Copyright (c) 2015-2016, Niklas Hauser
+ * Copyright (c) 2015-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -29,11 +29,11 @@ main()
 {
 	Board::initialize();
 
-	typedef modm::stm32::GpioPort<modm::stm32::GpioD0, 8> myPort;
-	typedef modm::stm32::GpioInputC11  Rxf;
-	typedef modm::stm32::GpioInputC10  Txe;
-	typedef modm::stm32::GpioOutputA15 Rd;
-	typedef modm::stm32::GpioOutputA9  Wr;
+	typedef modm::platform::GpioPort<modm::platform::GpioD0, 8> myPort;
+	typedef modm::platform::GpioInputC11  Rxf;
+	typedef modm::platform::GpioInputC10  Txe;
+	typedef modm::platform::GpioOutputA15 Rd;
+	typedef modm::platform::GpioOutputA9  Wr;
 
 	Rd::setOutput(modm::Gpio::High);
 	Wr::setOutput(modm::Gpio::Low);

@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2016, Fabian Greif
  * Copyright (c) 2016, Kevin Läufer
- * Copyright (c) 2016, Niklas Hauser
+ * Copyright (c) 2016-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -23,7 +23,7 @@
 #include <modm/architecture/platform.hpp>
 #include <modm/driver/inertial/l3gd20.hpp>
 
-using namespace modm::stm32;
+using namespace modm::platform;
 
 
 namespace Board

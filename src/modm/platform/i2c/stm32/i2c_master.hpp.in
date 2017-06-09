@@ -24,7 +24,7 @@
 namespace modm
 {
 
-namespace stm32
+namespace platform
 {
 
 /**
@@ -112,7 +112,7 @@ private:
 	initializeWithPrescaler(uint8_t peripheralFrequency, uint8_t riseTime, uint16_t prescaler);
 };
 
-} // namespace stm32
+} // namespace platform
 
 } // namespace modm
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Niklas Hauser
+ * Copyright (c) 2016-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -20,12 +20,12 @@
 #include <modm/debug/logger.hpp>
 #define MODM_BOARD_HAS_LOGGER
 
-using namespace modm::atmega;
+using namespace modm::platform;
 
 namespace Board
 {
 
-using systemClock = modm::avr::SystemClock;
+using systemClock = modm::platform::SystemClock;
 
 // Arduino Footprint
 using A0 = GpioC0;

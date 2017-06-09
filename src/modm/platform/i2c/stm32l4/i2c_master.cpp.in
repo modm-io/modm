@@ -27,11 +27,11 @@
 
 #if SERIAL_DEBUGGING
 #	include "../../uart/stm32/uart_2.hpp"
-	using DebugUart = modm::stm32::Usart2;
+	using DebugUart = modm::platform::Usart2;
 #	include <modm/io/iostream.hpp>
 	extern modm::IOStream stream;
 #	define DEBUG_STREAM(x) stream << x << "\n"
-#	define DEBUG(x) modm::stm32::Usart2::write(x)
+#	define DEBUG(x) modm::platform::Usart2::write(x)
 #else
 #	define DEBUG_STREAM(x)
 #	define DEBUG(x)
@@ -337,7 +337,7 @@ MODM_ISR(I2C{{ id }}_ER)
 // ----------------------------------------------------------------------------
 
 void
-modm::stm32::I2cMaster{{ id }}::initializeWithPrescaler(/* uint8_t peripheralFrequency, uint8_t riseTime, uint16_t prescaler */)
+modm::platform::I2cMaster{{ id }}::initializeWithPrescaler(/* uint8_t peripheralFrequency, uint8_t riseTime, uint16_t prescaler */)
 {
 	// Enable clock
 	RCC->APB1ENR{{aid}} |= RCC_APB1ENR{{aid}}_I2C{{ id }}EN;
@@ -408,7 +408,7 @@ modm::stm32::I2cMaster{{ id }}::initializeWithPrescaler(/* uint8_t peripheralFre
 }
 
 void
-modm::stm32::I2cMaster{{ id }}::reset()
+modm::platform::I2cMaster{{ id }}::reset()
 {
 	reading.length = 0;
 	writing.length = 0;
@@ -425,7 +425,7 @@ modm::stm32::I2cMaster{{ id }}::reset()
 }
 
 bool
-modm::stm32::I2cMaster{{ id }}::start(I2cTransaction *transaction, ConfigurationHandler handler)
+modm::platform::I2cMaster{{ id }}::start(I2cTransaction *transaction, ConfigurationHandler handler)
 {
 	DEBUG_STREAM("\n$$$\n");
 	starting = transaction->starting();
@@ -468,7 +468,7 @@ modm::stm32::I2cMaster{{ id }}::start(I2cTransaction *transaction, Configuration
 }
 
 modm::I2cMaster::Error
-modm::stm32::I2cMaster{{ id }}::getErrorState()
+modm::platform::I2cMaster{{ id }}::getErrorState()
 {
 	return error;
 }

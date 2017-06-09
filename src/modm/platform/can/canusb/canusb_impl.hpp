@@ -2,7 +2,7 @@
 /*
  * Copyright (c) 2010-2011, Fabian Greif
  * Copyright (c) 2010-2011, Thorsten Lajewski
- * Copyright (c) 2012-2015, Niklas Hauser
+ * Copyright (c) 2012-2015, 2017, Niklas Hauser
  * Copyright (c) 2012, 2015-2017, Sascha Schade
  *
  * This file is part of the modm project.
@@ -30,13 +30,13 @@
 #define MODM_LOG_LEVEL modm::log::INFO
 
 template <typename SerialPort>
-modm::hosted::CanUsb<SerialPort>::CanUsb(SerialPort& serialPort)
+modm::platform::CanUsb<SerialPort>::CanUsb(SerialPort& serialPort)
 :	active(false), busState(BusState::Off), serialPort(serialPort)
 {
 }
 
 template <typename SerialPort>
-modm::hosted::CanUsb<SerialPort>::~CanUsb()
+modm::platform::CanUsb<SerialPort>::~CanUsb()
 {
 	if (this->active)
 	{
@@ -52,7 +52,7 @@ modm::hosted::CanUsb<SerialPort>::~CanUsb()
 
 template <typename SerialPort>
 bool
-modm::hosted::CanUsb<SerialPort>::open(modm::Can::Bitrate canBitrate)
+modm::platform::CanUsb<SerialPort>::open(modm::Can::Bitrate canBitrate)
 {
 	if (this->serialPort.open())
 	{
@@ -141,7 +141,7 @@ modm::hosted::CanUsb<SerialPort>::open(modm::Can::Bitrate canBitrate)
 			this->active = true;
 		}
 		this->thread = new boost::thread(
-				boost::bind(&modm::hosted::CanUsb<SerialPort>::update, this));
+				boost::bind(&modm::platform::CanUsb<SerialPort>::update, this));
 
 		busState = BusState::Connected;
 		this->tmpRead.clear();
@@ -157,7 +157,7 @@ modm::hosted::CanUsb<SerialPort>::open(modm::Can::Bitrate canBitrate)
 
 template <typename SerialPort>
 void
-modm::hosted::CanUsb<SerialPort>::close()
+modm::platform::CanUsb<SerialPort>::close()
 {
 	this->serialPort.write("C\r");
 	{
@@ -173,14 +173,14 @@ modm::hosted::CanUsb<SerialPort>::close()
 
 template <typename SerialPort>
 modm::Can::BusState
-modm::hosted::CanUsb<SerialPort>::getBusState()
+modm::platform::CanUsb<SerialPort>::getBusState()
 {
 	return busState;
 }
 
 template <typename SerialPort>
 bool
-modm::hosted::CanUsb<SerialPort>::getMessage(can::Message& message)
+modm::platform::CanUsb<SerialPort>::getMessage(can::Message& message)
 {
 	if (not this->readBuffer.empty())
 	{
@@ -196,7 +196,7 @@ modm::hosted::CanUsb<SerialPort>::getMessage(can::Message& message)
 
 template <typename SerialPort>
 bool
-modm::hosted::CanUsb<SerialPort>::sendMessage(const can::Message& message)
+modm::platform::CanUsb<SerialPort>::sendMessage(const can::Message& message)
 {
 	char str[128];
 	modm::CanLawicelFormatter::convertToString(message, str);
@@ -213,7 +213,7 @@ modm::hosted::CanUsb<SerialPort>::sendMessage(const can::Message& message)
 
 template <typename SerialPort>
 void
-modm::hosted::CanUsb<SerialPort>::update()
+modm::platform::CanUsb<SerialPort>::update()
 {
 	while (true)
 	{

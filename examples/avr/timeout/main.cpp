@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2010-2011, Fabian Greif
- * Copyright (c) 2012-2013, 2015-2016, Niklas Hauser
+ * Copyright (c) 2012-2013, 2015-2017, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
  *
  * This file is part of the modm project.
@@ -14,7 +14,7 @@
 #include <modm/architecture/platform.hpp>
 #include <modm/processing/timer.hpp>
 
-using namespace modm::atmega;
+using namespace modm::platform;
 
 // create a output device for the led
 typedef GpioOutputB0 Led;

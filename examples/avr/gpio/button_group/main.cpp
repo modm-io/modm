@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2010-2011, Fabian Greif
- * Copyright (c) 2013-2014, 2016, Niklas Hauser
+ * Copyright (c) 2013-2014, 2016-2017, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
  *
  * This file is part of the modm project.
@@ -16,7 +16,7 @@
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/ui/button_group.hpp>
 
-using namespace modm::atmega;
+using namespace modm::platform;
 
 static modm::ButtonGroup<> buttons(0);
 enum

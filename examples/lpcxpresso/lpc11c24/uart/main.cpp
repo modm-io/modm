@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2012, 2014, Sascha Schade
  * Copyright (c) 2013-2014, Kevin Läufer
- * Copyright (c) 2014-2016, Niklas Hauser
+ * Copyright (c) 2014-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -21,7 +21,7 @@
 
 #include <modm/debug/logger.hpp>
 
-using namespace modm::lpc;
+using namespace modm::platform;
 
 typedef GpioOutput0_7 Led;
 typedef GpioOutput3_1 WriteInd;

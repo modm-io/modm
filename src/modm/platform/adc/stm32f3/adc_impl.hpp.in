@@ -18,7 +18,7 @@
 #include <modm/architecture/driver/delay.hpp>	// modm::delayMicroseconds
 
 void
-modm::stm32::Adc{{ id }}::initialize(const ClockMode clk,
+modm::platform::Adc{{ id }}::initialize(const ClockMode clk,
 %% if target["family"] in ["l4"]
 		const ClockSource clk_src,
 %% endif
@@ -74,7 +74,7 @@ modm::stm32::Adc{{ id }}::initialize(const ClockMode clk,
 }
 
 void
-modm::stm32::Adc{{ id }}::disable(const bool blocking)
+modm::platform::Adc{{ id }}::disable(const bool blocking)
 {
 	ADC{{ id }}->CR |= ADC_CR_ADDIS;
 	if (blocking) {
@@ -90,7 +90,7 @@ modm::stm32::Adc{{ id }}::disable(const bool blocking)
 }
 
 void
-modm::stm32::Adc{{ id }}::setPrescaler(const Prescaler pre)
+modm::platform::Adc{{ id }}::setPrescaler(const Prescaler pre)
 {
 	uint32_t tmp;
 %% if target["family"] in ["f3"]
@@ -107,13 +107,13 @@ modm::stm32::Adc{{ id }}::setPrescaler(const Prescaler pre)
 }
 
 bool
-modm::stm32::Adc{{ id }}::isReady()
+modm::platform::Adc{{ id }}::isReady()
 {
 	return static_cast<bool>(getInterruptFlags() & InterruptFlag::Ready);
 }
 
 void
-modm::stm32::Adc{{ id }}::calibrate(const CalibrationMode mode,
+modm::platform::Adc{{ id }}::calibrate(const CalibrationMode mode,
 									const bool blocking)
 {
 	if (mode != CalibrationMode::DoNotCalibrate) {
@@ -127,7 +127,7 @@ modm::stm32::Adc{{ id }}::calibrate(const CalibrationMode mode,
 }
 
 void
-modm::stm32::Adc{{ id }}::setLeftAdjustResult(const bool enable)
+modm::platform::Adc{{ id }}::setLeftAdjustResult(const bool enable)
 {
 	if (enable) {
 		ADC{{ id }}->CFGR |= ADC_CFGR_ALIGN;
@@ -138,7 +138,7 @@ modm::stm32::Adc{{ id }}::setLeftAdjustResult(const bool enable)
 }
 
 void
-modm::stm32::Adc{{ id }}::setChannel(	const Channel channel,
+modm::platform::Adc{{ id }}::setChannel(	const Channel channel,
 										const SampleTime sampleTime)
 {
 	uint32_t tmpreg;
@@ -162,7 +162,7 @@ modm::stm32::Adc{{ id }}::setChannel(	const Channel channel,
 }
 
 void
-modm::stm32::Adc{{ id }}::setFreeRunningMode(const bool enable)
+modm::platform::Adc{{ id }}::setFreeRunningMode(const bool enable)
 {
 	if (enable) {
 		ADC{{ id }}->CFGR |=  ADC_CFGR_CONT; // set to continuous mode
@@ -173,7 +173,7 @@ modm::stm32::Adc{{ id }}::setFreeRunningMode(const bool enable)
 
 
 void
-modm::stm32::Adc{{ id }}::startConversion(void)
+modm::platform::Adc{{ id }}::startConversion(void)
 {
 	// TODO: maybe add more interrupt flags
 	acknowledgeInterruptFlag(InterruptFlag::EndOfSampling | InterruptFlag::Overrun);
@@ -182,7 +182,7 @@ modm::stm32::Adc{{ id }}::startConversion(void)
 }
 
 bool
-modm::stm32::Adc{{ id }}::isConversionFinished(void)
+modm::platform::Adc{{ id }}::isConversionFinished(void)
 {
 	return static_cast<bool>(getInterruptFlags() & InterruptFlag::EndOfSampling);
 }
@@ -212,7 +212,7 @@ nvicDisableInterrupt(IRQn_Type IRQn)
 #endif // MODM_CUSTOM_NVIC_FUNCTIONS
 
 void
-modm::stm32::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
+modm::platform::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
 												const bool enable)
 {
 %% if id < 3
@@ -230,25 +230,25 @@ modm::stm32::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
 }
 
 void
-modm::stm32::Adc{{ id }}::enableInterrupt(const Interrupt_t interrupt)
+modm::platform::Adc{{ id }}::enableInterrupt(const Interrupt_t interrupt)
 {
 	ADC{{ id }}->IER |= interrupt.value;
 }
 
 void
-modm::stm32::Adc{{ id }}::disableInterrupt(const Interrupt_t interrupt)
+modm::platform::Adc{{ id }}::disableInterrupt(const Interrupt_t interrupt)
 {
 	ADC{{ id }}->IER &= ~interrupt.value;
 }
 
-modm::stm32::Adc{{ id }}::InterruptFlag_t
-modm::stm32::Adc{{ id }}::getInterruptFlags()
+modm::platform::Adc{{ id }}::InterruptFlag_t
+modm::platform::Adc{{ id }}::getInterruptFlags()
 {
 	return InterruptFlag_t(ADC{{ id }}->ISR);
 }
 
 void
-modm::stm32::Adc{{ id }}::acknowledgeInterruptFlag(const InterruptFlag_t flags)
+modm::platform::Adc{{ id }}::acknowledgeInterruptFlag(const InterruptFlag_t flags)
 {
 	// Flags are cleared by writing a one to the flag position.
 	// Writing a zero is ignored.

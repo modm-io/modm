@@ -1,5 +1,6 @@
 // coding: utf-8
 /*
+ * Copyright (c) 2017, Niklas Hauser
  * Copyright (c) 2017, Sascha Schade
  *
  * This file is part of the modm project.
@@ -22,7 +23,7 @@
 #include <modm/architecture/platform.hpp>
 // #include <modm/driver/inertial/lis3dsh.hpp>
 
-using namespace modm::stm32;
+using namespace modm::platform;
 
 
 namespace Board

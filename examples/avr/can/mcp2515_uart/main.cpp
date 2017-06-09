@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011, Fabian Greif
- * Copyright (c) 2012-2016, Niklas Hauser
+ * Copyright (c) 2012-2017, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
  *
  * This file is part of the modm project.
@@ -16,8 +16,8 @@
 #include <modm/driver/can/mcp2515.hpp>
 #include <modm/processing/timer.hpp>
 
-using namespace modm::atmega;
-typedef modm::avr::SystemClock clock;
+using namespace modm::platform;
+typedef modm::platform::SystemClock clock;
 
 typedef GpioOutputB0 LedGreen;
 typedef GpioOutputB1 LedRed;

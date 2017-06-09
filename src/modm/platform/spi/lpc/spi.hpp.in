@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2012, Sascha Schade
- * Copyright (c) 2012-2014, 2016, Niklas Hauser
  * Copyright (c) 2012, 2017, Fabian Greif
+ * Copyright (c) 2012-2014, 2016-2017, Niklas Hauser
  * Copyright (c) 2013, Kevin Läufer
  *
  * This file is part of the modm project.
@@ -21,7 +21,7 @@
 #include "spi_registers.h"
 namespace modm
 {
-	namespace lpc
+	namespace platform
 	{
 		/**
 		 * \brief	Serial peripheral interface (SPI{{ id }})
@@ -224,9 +224,9 @@ namespace modm
 			static void
 			configurePins(
 					{% if id == 0 -%}
-						MappingSck mapping = modm::lpc::SpiMaster{{ id }}::MappingSck::PIO0_6,
+						MappingSck mapping = modm::platform::SpiMaster{{ id }}::MappingSck::PIO0_6,
 					{%- else -%}
-						MappingSck mapping = modm::lpc::SpiMaster{{ id }}::MappingSck::PIO2_1,
+						MappingSck mapping = modm::platform::SpiMaster{{ id }}::MappingSck::PIO2_1,
 					{%- endif %}
 					bool useSsel = false);
 
@@ -272,6 +272,6 @@ namespace modm
 			static constexpr uint8_t
 			fifoSize = 8;
 		};
-	} // lpc namespace
+	} // namespace platform
 } // modm namespace
 #endif // MODM_LPC11_SPI_{{ id }}_HPP

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2010-2011, Fabian Greif
- * Copyright (c) 2013, 2016, Niklas Hauser
+ * Copyright (c) 2013, 2016-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -13,7 +13,7 @@
 #include <modm/architecture/platform.hpp>
 #include <modm/communication/sab/interface.hpp>
 
-using namespace modm::atmega;
+using namespace modm::platform;
 
 int 
 main()

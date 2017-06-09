@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013, Kevin Läufer
- * Copyright (c) 2014, Niklas Hauser
+ * Copyright (c) 2014, 2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -19,7 +19,7 @@ using namespace modm::clock;
 
 namespace modm
 {
-	namespace lpc
+	namespace platform
 	{
 
 		template<int64_t InputFrequency, int64_t SystemFrequency>

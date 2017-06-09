@@ -23,7 +23,7 @@
  * - In synchronous mode the output data changes on the falling edge of CLK
  */
 void
-modm::stm32::Fsmc::initialize()
+modm::platform::Fsmc::initialize()
 {
 	//RCC->AHB3RSTR |= RCC_AHB3RSTR_FSMCRST;
 
@@ -32,7 +32,7 @@ modm::stm32::Fsmc::initialize()
 
 // ----------------------------------------------------------------------------
 void
-modm::stm32::fsmc::NorSram::resetRegion(Region region)
+modm::platform::fsmc::NorSram::resetRegion(Region region)
 {
 	if (region == CHIP_SELECT_1)
 	{
@@ -50,7 +50,7 @@ modm::stm32::fsmc::NorSram::resetRegion(Region region)
 }
 
 void
-modm::stm32::fsmc::NorSram::configureSynchronousRegion(Region region,
+modm::platform::fsmc::NorSram::configureSynchronousRegion(Region region,
 		BusType multiplex, MemoryType memoryType, SynchronousTiming timing)
 {
 	// NOR/PSRAM chip-select control register (BCR)
@@ -101,7 +101,7 @@ modm::stm32::fsmc::NorSram::configureSynchronousRegion(Region region,
 }
 
 void
-modm::stm32::fsmc::NorSram::configureAsynchronousRegion(Region region,
+modm::platform::fsmc::NorSram::configureAsynchronousRegion(Region region,
 		BusType busType, MemoryType memoryType, AccessMode accessMode,
 		AsynchronousTiming timing, ExtendedMode extended)
 {

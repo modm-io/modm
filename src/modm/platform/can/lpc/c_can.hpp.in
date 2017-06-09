@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2012, Sascha Schade
- * Copyright (c) 2012-2016, Niklas Hauser
  * Copyright (c) 2012, 2017, Fabian Greif
+ * Copyright (c) 2012-2017, Niklas Hauser
  * Copyright (c) 2013-2014, Kevin Läufer
  *
  * This file is part of the modm project.
@@ -29,7 +29,7 @@
 
 namespace modm
 {
-namespace lpc
+namespace platform
 {
 /**
  * \brief	The CAN bus driver for LPC11Cxx devices.
@@ -198,7 +198,7 @@ protected:
 	CAN_error(uint32_t error_info);
 };
 
-} // lpc namespace
+} // namespace platform
 } // modm namespace
 
 #endif // MODM_LPC11C_C_CAN_HPP

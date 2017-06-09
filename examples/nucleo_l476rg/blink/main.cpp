@@ -14,7 +14,7 @@ main()
 		ClockControl::ClockOutputSource::MultiSpeedInternalClock,
 		ClockControl::ClockOutputSourcePrescaler::Div16);
 
-	modm::stm32::GpioA8::connect(modm::stm32::ClockControl::ClockOutput);
+	modm::platform::GpioA8::connect(modm::platform::ClockControl::ClockOutput);
 
 	LedGreen::set();
 

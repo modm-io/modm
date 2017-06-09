@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Niklas Hauser
+ * Copyright (c) 2016-2017, Niklas Hauser
  * Copyright (c) 2017, Nick Sarten
  * Copyright (c) 2017, Sascha Schade
  *
@@ -23,7 +23,7 @@
 #include <modm/debug/logger.hpp>
 #define MODM_BOARD_HAS_LOGGER
 
-using namespace modm::stm32;
+using namespace modm::platform;
 
 
 namespace Board

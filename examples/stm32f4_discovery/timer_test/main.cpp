@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Sascha Schade
- * Copyright (c) 2015-2016, Niklas Hauser
+ * Copyright (c) 2015-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -249,37 +249,37 @@ main()
 
 MODM_ISR(TIM2)
 {
-    modm::stm32::Timer2::acknowledgeInterruptFlags(modm::stm32::Timer2::InterruptFlag::Update);
+    modm::platform::Timer2::acknowledgeInterruptFlags(modm::platform::Timer2::InterruptFlag::Update);
     LedGreen::toggle();
 }
 
 MODM_ISR(TIM3)
 {
-    modm::stm32::Timer3::acknowledgeInterruptFlags(modm::stm32::Timer3::InterruptFlag::Update);
+    modm::platform::Timer3::acknowledgeInterruptFlags(modm::platform::Timer3::InterruptFlag::Update);
     LedRed::toggle();
 }
 
 MODM_ISR(TIM4)
 {
-    modm::stm32::Timer4::acknowledgeInterruptFlags(modm::stm32::Timer4::InterruptFlag::Update);
+    modm::platform::Timer4::acknowledgeInterruptFlags(modm::platform::Timer4::InterruptFlag::Update);
     LedGreen::toggle();
 }
 
 MODM_ISR(TIM5)
 {
-    modm::stm32::Timer5::acknowledgeInterruptFlags(modm::stm32::Timer5::InterruptFlag::Update);
+    modm::platform::Timer5::acknowledgeInterruptFlags(modm::platform::Timer5::InterruptFlag::Update);
     LedRed::toggle();
 }
 
 MODM_ISR(TIM6_DAC)
 {
-    modm::stm32::Timer6::acknowledgeInterruptFlags(modm::stm32::Timer6::InterruptFlag::Update);
+    modm::platform::Timer6::acknowledgeInterruptFlags(modm::platform::Timer6::InterruptFlag::Update);
     LedGreen::toggle();
 }
 
 MODM_ISR(TIM7)
 {
-    modm::stm32::Timer7::acknowledgeInterruptFlags(modm::stm32::Timer7::InterruptFlag::Update);
+    modm::platform::Timer7::acknowledgeInterruptFlags(modm::platform::Timer7::InterruptFlag::Update);
     LedRed::toggle();
 }
 
@@ -287,39 +287,39 @@ MODM_ISR(TIM7)
 
 MODM_ISR(TIM1_BRK_TIM9)
 {
-    modm::stm32::Timer9::acknowledgeInterruptFlags(modm::stm32::Timer9::InterruptFlag::Update);
+    modm::platform::Timer9::acknowledgeInterruptFlags(modm::platform::Timer9::InterruptFlag::Update);
     LedGreen::toggle();
 }
 
 // Timer 1 and 10
 MODM_ISR(TIM1_UP_TIM10)
 {
-    modm::stm32::Timer1::acknowledgeInterruptFlags(modm::stm32::Timer1::InterruptFlag::Update);
-    modm::stm32::Timer10::acknowledgeInterruptFlags(modm::stm32::Timer10::InterruptFlag::Update);
+    modm::platform::Timer1::acknowledgeInterruptFlags(modm::platform::Timer1::InterruptFlag::Update);
+    modm::platform::Timer10::acknowledgeInterruptFlags(modm::platform::Timer10::InterruptFlag::Update);
     LedRed::toggle();
 }
 
 MODM_ISR(TIM1_TRG_COM_TIM11)
 {
-    modm::stm32::Timer11::acknowledgeInterruptFlags(modm::stm32::Timer11::InterruptFlag::Update);
+    modm::platform::Timer11::acknowledgeInterruptFlags(modm::platform::Timer11::InterruptFlag::Update);
     LedGreen::toggle();
 }
 
 MODM_ISR(TIM8_BRK_TIM12)
 {
-    modm::stm32::Timer12::acknowledgeInterruptFlags(modm::stm32::Timer12::InterruptFlag::Update);
+    modm::platform::Timer12::acknowledgeInterruptFlags(modm::platform::Timer12::InterruptFlag::Update);
     LedRed::toggle();
 }
 
 MODM_ISR(TIM8_UP_TIM13)
 {
-    modm::stm32::Timer8::acknowledgeInterruptFlags(modm::stm32::Timer8::InterruptFlag::Update);
-    modm::stm32::Timer13::acknowledgeInterruptFlags(modm::stm32::Timer13::InterruptFlag::Update);
+    modm::platform::Timer8::acknowledgeInterruptFlags(modm::platform::Timer8::InterruptFlag::Update);
+    modm::platform::Timer13::acknowledgeInterruptFlags(modm::platform::Timer13::InterruptFlag::Update);
     LedGreen::toggle();
 }
 
 MODM_ISR(TIM8_TRG_COM_TIM14)
 {
-    modm::stm32::Timer14::acknowledgeInterruptFlags(modm::stm32::Timer14::InterruptFlag::Update);
+    modm::platform::Timer14::acknowledgeInterruptFlags(modm::platform::Timer14::InterruptFlag::Update);
     LedRed::toggle();
 }

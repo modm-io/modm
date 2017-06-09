@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011, Fabian Greif
  * Copyright (c) 2013, Kevin Läufer
- * Copyright (c) 2013-2016, Niklas Hauser
+ * Copyright (c) 2013-2017, Niklas Hauser
  * Copyright (c) 2014, 2016, Sascha Schade
  *
  * This file is part of the modm project.
@@ -85,11 +85,11 @@ public:
 
 		Cs::setOutput(modm::Gpio::High);
 
-		modm::stm32::GpioOutputA7::connect(modm::stm32::SpiMaster1::Mosi);
-		modm::stm32::GpioOutputA5::connect(modm::stm32::SpiMaster1::Sck);
-		modm::stm32::GpioInputA6::connect(modm::stm32::SpiMaster1::Miso);
-		modm::stm32::SpiMaster1::initialize<Board::systemClock, 2250000ul>();
-		modm::stm32::SpiMaster1::setDataMode(modm::stm32::SpiMaster1::DataMode::Mode3);
+		modm::platform::GpioOutputA7::connect(modm::platform::SpiMaster1::Mosi);
+		modm::platform::GpioOutputA5::connect(modm::platform::SpiMaster1::Sck);
+		modm::platform::GpioInputA6::connect(modm::platform::SpiMaster1::Miso);
+		modm::platform::SpiMaster1::initialize<Board::systemClock, 2250000ul>();
+		modm::platform::SpiMaster1::setDataMode(modm::platform::SpiMaster1::DataMode::Mode3);
 
 		adns9800::initialise();
 
@@ -114,10 +114,10 @@ private:
 	modm::ShortPeriodicTimer timer;
 	int32_t x, y;
 
-	using Cs = modm::stm32::GpioOutputA4;
+	using Cs = modm::platform::GpioOutputA4;
 
 	using adns9800 = modm::Adns9800< 
-		/* Spi = */ modm::stm32::SpiMaster1, 
+		/* Spi = */ modm::platform::SpiMaster1, 
 		/* Ncs = */ Cs >;
 };
 

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013, Kevin Läufer
- * Copyright (c) 2013-2016, Niklas Hauser
+ * Copyright (c) 2013-2017, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
  *
  * This file is part of the modm project.
@@ -15,27 +15,27 @@
 #include <modm/math/utils/bit_operation.hpp>
 #include <modm/architecture/interface/register.hpp>
 
-modm::stm32::UartSpiMaster{{ id }}::DataOrder
-	modm::stm32::UartSpiMaster{{ id }}::dataOrder =
-	modm::stm32::UartSpiMaster{{ id }}::DataOrder::MsbFirst;
+modm::platform::UartSpiMaster{{ id }}::DataOrder
+	modm::platform::UartSpiMaster{{ id }}::dataOrder =
+	modm::platform::UartSpiMaster{{ id }}::DataOrder::MsbFirst;
 
 // Bit0: single transfer state
 // Bit1: block transfer state
 uint8_t
-modm::stm32::UartSpiMaster{{ id }}::state(0);
+modm::platform::UartSpiMaster{{ id }}::state(0);
 
 uint8_t
-modm::stm32::UartSpiMaster{{ id }}::count(0);
+modm::platform::UartSpiMaster{{ id }}::count(0);
 
 void *
-modm::stm32::UartSpiMaster{{ id }}::context(nullptr);
+modm::platform::UartSpiMaster{{ id }}::context(nullptr);
 
 modm::Spi::ConfigurationHandler
-modm::stm32::UartSpiMaster{{ id }}::configuration(nullptr);
+modm::platform::UartSpiMaster{{ id }}::configuration(nullptr);
 // ----------------------------------------------------------------------------
 
 uint8_t
-modm::stm32::UartSpiMaster{{ id }}::acquire(void *ctx, ConfigurationHandler handler)
+modm::platform::UartSpiMaster{{ id }}::acquire(void *ctx, ConfigurationHandler handler)
 {
 	if (context == nullptr)
 	{
@@ -56,7 +56,7 @@ modm::stm32::UartSpiMaster{{ id }}::acquire(void *ctx, ConfigurationHandler hand
 }
 
 uint8_t
-modm::stm32::UartSpiMaster{{ id }}::release(void *ctx)
+modm::platform::UartSpiMaster{{ id }}::release(void *ctx)
 {
 	if (ctx == context)
 	{
@@ -68,7 +68,7 @@ modm::stm32::UartSpiMaster{{ id }}::release(void *ctx)
 // ----------------------------------------------------------------------------
 
 modm::ResumableResult<uint8_t>
-modm::stm32::UartSpiMaster{{ id }}::transfer(uint8_t data)
+modm::platform::UartSpiMaster{{ id }}::transfer(uint8_t data)
 {
 	// this is a manually implemented "fast resumable function"
 	// there is no context or nesting protection, since we don't need it.
@@ -108,7 +108,7 @@ modm::stm32::UartSpiMaster{{ id }}::transfer(uint8_t data)
 }
 
 modm::ResumableResult<void>
-modm::stm32::UartSpiMaster{{ id }}::transfer(
+modm::platform::UartSpiMaster{{ id }}::transfer(
 		uint8_t * tx, uint8_t * rx, std::size_t length)
 {
 	// this is a manually implemented "fast resumable function"

@@ -22,7 +22,7 @@
 namespace modm
 {
 
-namespace stm32
+namespace platform
 {
 
 /**
@@ -168,7 +168,7 @@ public:
 	acknowledgeInterruptFlags(InterruptFlag_t flags);
 };
 
-}	// namespace stm32
+}	// namespace platform
 
 }	// namespace modm
 

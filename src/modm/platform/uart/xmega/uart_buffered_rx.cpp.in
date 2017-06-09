@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014, 2016, Niklas Hauser
+ * Copyright (c) 2013-2014, 2016-2017, Niklas Hauser
  * Copyright (c) 2017, Fabian Greif
  *
  * This file is part of the modm project.
@@ -31,7 +31,7 @@ MODM_ISR(USART{{ id }}_RXC)
 
 // ----------------------------------------------------------------------------
 void
-modm::xmega::Uart{{ id }}::initializeWithFractionalBaudrate(uint16_t bsel, uint8_t bscale)
+modm::platform::Uart{{ id }}::initializeWithFractionalBaudrate(uint16_t bsel, uint8_t bscale)
 {
 	atomic::Lock lock;
 
@@ -50,7 +50,7 @@ modm::xmega::Uart{{ id }}::initializeWithFractionalBaudrate(uint16_t bsel, uint8
 
 // MARK: - read
 bool
-modm::xmega::Uart{{ id }}::read(uint8_t& data)
+modm::platform::Uart{{ id }}::read(uint8_t& data)
 {
 	if (rxBuffer.isEmpty())
 		return false;
@@ -62,7 +62,7 @@ modm::xmega::Uart{{ id }}::read(uint8_t& data)
 }
 
 std::size_t
-modm::xmega::Uart{{ id }}::read(uint8_t *buffer, std::size_t length)
+modm::platform::Uart{{ id }}::read(uint8_t *buffer, std::size_t length)
 {
 	for (std::size_t i = 0; i < length; ++i)
 	{
@@ -80,7 +80,7 @@ modm::xmega::Uart{{ id }}::read(uint8_t *buffer, std::size_t length)
 
 // MARK: - discard
 std::size_t
-modm::xmega::Uart{{ id }}::discardReceiveBuffer()
+modm::platform::Uart{{ id }}::discardReceiveBuffer()
 {
 	std::size_t i(0);
 	while(!rxBuffer.isEmpty())
@@ -101,13 +101,13 @@ modm::xmega::Uart{{ id }}::discardReceiveBuffer()
 
 // MARK: - error
 uint8_t
-modm::xmega::Uart{{ id }}::getErrorFlags()
+modm::platform::Uart{{ id }}::getErrorFlags()
 {
 	return error;
 }
 
 void
-modm::xmega::Uart{{ id }}::acknowledgeErrorFlags()
+modm::platform::Uart{{ id }}::acknowledgeErrorFlags()
 {
 	error = 0;
 }

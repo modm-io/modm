@@ -4,7 +4,7 @@
  * Copyright (c) 2010-2011, 2013, Georgi Grinshpun
  * Copyright (c) 2013-2014, Sascha Schade
  * Copyright (c) 2013, 2016, Kevin Läufer
- * Copyright (c) 2013-2016, Niklas Hauser
+ * Copyright (c) 2013-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -33,7 +33,7 @@ namespace
 
 %% if options["buffered"]
 void
-modm::stm32::{{ name }}::initializeBuffered(uint32_t interruptPriority)
+modm::platform::{{ name }}::initializeBuffered(uint32_t interruptPriority)
 {
 	{{ hal }}::enableInterruptVector(true, interruptPriority);
 	{{ hal }}::enableInterrupt(Interrupt::RxNotEmpty);
@@ -41,14 +41,14 @@ modm::stm32::{{ name }}::initializeBuffered(uint32_t interruptPriority)
 %% endif
 
 void
-modm::stm32::{{ name }}::writeBlocking(uint8_t data)
+modm::platform::{{ name }}::writeBlocking(uint8_t data)
 {
 	while(!{{ hal }}::isTransmitRegisterEmpty());
 	{{ hal }}::write(data);
 }
 
 void
-modm::stm32::{{ name }}::writeBlocking(const uint8_t *data, std::size_t length)
+modm::platform::{{ name }}::writeBlocking(const uint8_t *data, std::size_t length)
 {
 	while (length-- != 0) {
 		writeBlocking(*data++);
@@ -56,7 +56,7 @@ modm::stm32::{{ name }}::writeBlocking(const uint8_t *data, std::size_t length)
 }
 
 void
-modm::stm32::{{ name }}::flushWriteBuffer()
+modm::platform::{{ name }}::flushWriteBuffer()
 {
 %% if options["buffered"]
 	while(!isWriteFinished());
@@ -66,7 +66,7 @@ modm::stm32::{{ name }}::flushWriteBuffer()
 }
 
 bool
-modm::stm32::{{ name }}::write(uint8_t data)
+modm::platform::{{ name }}::write(uint8_t data)
 {
 %% if options["buffered"]
 	if(txBuffer.isEmpty() && {{ hal }}::isTransmitRegisterEmpty()) {
@@ -91,7 +91,7 @@ modm::stm32::{{ name }}::write(uint8_t data)
 }
 
 std::size_t
-modm::stm32::{{ name }}::write(const uint8_t *data, std::size_t length)
+modm::platform::{{ name }}::write(const uint8_t *data, std::size_t length)
 {
 	uint32_t i = 0;
 	for (; i < length; ++i)
@@ -104,7 +104,7 @@ modm::stm32::{{ name }}::write(const uint8_t *data, std::size_t length)
 }
 
 bool
-modm::stm32::{{ name }}::isWriteFinished()
+modm::platform::{{ name }}::isWriteFinished()
 {
 %% if options["buffered"]
 	return txBuffer.isEmpty() && {{ hal }}::isTransmitRegisterEmpty();
@@ -114,7 +114,7 @@ modm::stm32::{{ name }}::isWriteFinished()
 }
 
 std::size_t
-modm::stm32::{{ name }}::discardTransmitBuffer()
+modm::platform::{{ name }}::discardTransmitBuffer()
 {
 %% if options["buffered"]
 	std::size_t count = 0;
@@ -131,7 +131,7 @@ modm::stm32::{{ name }}::discardTransmitBuffer()
 }
 
 bool
-modm::stm32::{{ name }}::read(uint8_t &data)
+modm::platform::{{ name }}::read(uint8_t &data)
 {
 %% if options["buffered"]
 	if (rxBuffer.isEmpty()) {
@@ -152,7 +152,7 @@ modm::stm32::{{ name }}::read(uint8_t &data)
 }
 
 std::size_t
-modm::stm32::{{ name }}::read(uint8_t *data, std::size_t length)
+modm::platform::{{ name }}::read(uint8_t *data, std::size_t length)
 {
 %% if options["buffered"]
 	uint32_t i = 0;
@@ -177,7 +177,7 @@ modm::stm32::{{ name }}::read(uint8_t *data, std::size_t length)
 }
 
 std::size_t
-modm::stm32::{{ name }}::discardReceiveBuffer()
+modm::platform::{{ name }}::discardReceiveBuffer()
 {
 %% if options["buffered"]
 	std::size_t count = 0;
@@ -193,7 +193,7 @@ modm::stm32::{{ name }}::discardReceiveBuffer()
 
 
 %% if options["buffered"]
-%% set hal = "modm::stm32::" ~ hal
+%% set hal = "modm::platform::" ~ hal
 MODM_ISR({{ name | upper }})
 {
 	if ({{ hal }}::isReceiveRegisterNotEmpty()) {

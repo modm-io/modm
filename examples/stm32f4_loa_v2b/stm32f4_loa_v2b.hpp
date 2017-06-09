@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013, Kevin Läufer
- * Copyright (c) 2014, Niklas Hauser
+ * Copyright (c) 2014, 2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -19,7 +19,7 @@
 #ifndef MODM_STM32_F4_LOA_V2B_HPP
 #define MODM_STM32_F4_LOA_V2B_HPP
 
-using namespace modm::stm32;
+using namespace modm::platform;
 
 typedef GpioOutputE5 LedWhite;
 typedef GpioOutputE6 LedGreen;

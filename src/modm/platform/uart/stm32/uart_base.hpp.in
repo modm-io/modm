@@ -30,7 +30,7 @@
 
 namespace modm
 {
-namespace stm32
+namespace platform
 {
 /**
  * Base class for the UART classes
@@ -128,7 +128,7 @@ public:
 
 };
 
-}	// namespace stm32
+}	// namespace platform
 
 }	// namespace modm
 

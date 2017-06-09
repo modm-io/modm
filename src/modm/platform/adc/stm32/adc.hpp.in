@@ -27,7 +27,7 @@
 namespace modm
 {
 
-namespace stm32
+namespace platform
 {
 
 /**
@@ -361,7 +361,7 @@ private:
 	setPrescaler(const Prescaler prescaler = Prescaler::Div8);
 };
 
-} // namespace stm32
+} // namespace platform
 
 } // namespace modm
 

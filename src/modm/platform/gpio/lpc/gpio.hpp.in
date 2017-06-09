@@ -25,7 +25,7 @@
 namespace modm
 {
 
-namespace lpc
+namespace platform
 {
 
 struct Gpio
@@ -262,7 +262,7 @@ public:
 		%% endfor
 %% endfor
 
-}	// namespace lpc
+}	// namespace platform
 
 }	// namespace modm
 

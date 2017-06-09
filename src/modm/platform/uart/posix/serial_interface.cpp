@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2010-2011, 2013, Fabian Greif
  * Copyright (c) 2012, Sascha Schade
- * Copyright (c) 2012, 2014, Niklas Hauser
+ * Copyright (c) 2012, 2014, 2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -32,7 +32,7 @@
 #define MODM_LOG_LEVEL 	modm::log::ERROR
 
 // ----------------------------------------------------------------------------
-modm::hosted::SerialInterface::SerialInterface() :
+modm::platform::SerialInterface::SerialInterface() :
 	isConnected(false),
 	deviceName("unknown"),
 	baudRate(0),
@@ -40,7 +40,7 @@ modm::hosted::SerialInterface::SerialInterface() :
 {
 }
 
-modm::hosted::SerialInterface::SerialInterface(
+modm::platform::SerialInterface::SerialInterface(
 		const std::string& device, unsigned int baudRate) :
 	isConnected(false),
 	deviceName(device),
@@ -50,28 +50,28 @@ modm::hosted::SerialInterface::SerialInterface(
 }
 
 // ----------------------------------------------------------------------------
-modm::hosted::SerialInterface::~SerialInterface()
+modm::platform::SerialInterface::~SerialInterface()
 {
 	this->close();
 }
 
 // ----------------------------------------------------------------------------
 void
-modm::hosted::SerialInterface::setDeviceName(const std::string& name)
+modm::platform::SerialInterface::setDeviceName(const std::string& name)
 {
 	this->deviceName = name;
 }
 
 // ----------------------------------------------------------------------------
 const std::string&
-modm::hosted::SerialInterface::getDeviceName() const
+modm::platform::SerialInterface::getDeviceName() const
 {
 	return this->deviceName;
 }
 
 // ----------------------------------------------------------------------------
 bool
-modm::hosted::SerialInterface::setBaudRate(unsigned int rate)
+modm::platform::SerialInterface::setBaudRate(unsigned int rate)
 {
 	struct termios configuration;
 
@@ -110,14 +110,14 @@ modm::hosted::SerialInterface::setBaudRate(unsigned int rate)
 
 // ----------------------------------------------------------------------------
 unsigned int
-modm::hosted::SerialInterface::getBaudRate() const
+modm::platform::SerialInterface::getBaudRate() const
 {
 	return this->baudRate;
 }
 
 // ----------------------------------------------------------------------------
 bool
-modm::hosted::SerialInterface::open()
+modm::platform::SerialInterface::open()
 {
 	MODM_LOG_INFO
 		<< MODM_FILE_INFO
@@ -160,7 +160,7 @@ modm::hosted::SerialInterface::open()
 
 // ----------------------------------------------------------------------------
 void
-modm::hosted::SerialInterface::initSerial()
+modm::platform::SerialInterface::initSerial()
 {
 	struct termios configuration;
 
@@ -214,7 +214,7 @@ modm::hosted::SerialInterface::initSerial()
 
 // ----------------------------------------------------------------------------
 void
-modm::hosted::SerialInterface::close()
+modm::platform::SerialInterface::close()
 {
 	if (this->isConnected) {
 		MODM_LOG_INFO << "Closing port!!" << modm::endl;
@@ -228,14 +228,14 @@ modm::hosted::SerialInterface::close()
 
 // ----------------------------------------------------------------------------
 bool
-modm::hosted::SerialInterface::isOpen()
+modm::platform::SerialInterface::isOpen()
 {
 	return this->isConnected;
 }
 
 // ----------------------------------------------------------------------------
 bool
-modm::hosted::SerialInterface::read(char& c)
+modm::platform::SerialInterface::read(char& c)
 {
 	if (::read(this->fileDescriptor, &c, 1) > 0)
 	{
@@ -248,7 +248,7 @@ modm::hosted::SerialInterface::read(char& c)
 
 // ----------------------------------------------------------------------------
 void
-modm::hosted::SerialInterface::readBytes(uint8_t* data, std::size_t length)
+modm::platform::SerialInterface::readBytes(uint8_t* data, std::size_t length)
 {
 	int delta = length;
 	int result = 0 ;
@@ -270,7 +270,7 @@ modm::hosted::SerialInterface::readBytes(uint8_t* data, std::size_t length)
 
 // ----------------------------------------------------------------------------
 void
-modm::hosted::SerialInterface::write(char c)
+modm::platform::SerialInterface::write(char c)
 {
 /*	SUB_LOGGER_LOG(logger, Logger::ERROR, "writeByte")
 		<< "0x" << std::hex << (int)data << "; ";
@@ -285,7 +285,7 @@ modm::hosted::SerialInterface::write(char c)
 
 // ----------------------------------------------------------------------------
 void
-modm::hosted::SerialInterface::write(const char* str)
+modm::platform::SerialInterface::write(const char* str)
 {
 	char c;
 	while ((c = *str++)) {
@@ -295,7 +295,7 @@ modm::hosted::SerialInterface::write(const char* str)
 
 // ----------------------------------------------------------------------------
 void
-modm::hosted::SerialInterface::writeBytes(const uint8_t* data, std::size_t length)
+modm::platform::SerialInterface::writeBytes(const uint8_t* data, std::size_t length)
 {
 	for (std::size_t i = 0; i < length; ++i) {
 		this->write(static_cast<char>(*data++));
@@ -304,7 +304,7 @@ modm::hosted::SerialInterface::writeBytes(const uint8_t* data, std::size_t lengt
 
 // ----------------------------------------------------------------------------
 void
-modm::hosted::SerialInterface::dumpErrorMessage()
+modm::platform::SerialInterface::dumpErrorMessage()
 {
 	switch(errno)
 	{
@@ -348,7 +348,7 @@ modm::hosted::SerialInterface::dumpErrorMessage()
 }
 // ----------------------------------------------------------------------------
 std::size_t
-modm::hosted::SerialInterface::bytesAvailable() const
+modm::platform::SerialInterface::bytesAvailable() const
 {
 	std::size_t bytesAvailable;
 
@@ -359,14 +359,14 @@ modm::hosted::SerialInterface::bytesAvailable() const
 
 // ----------------------------------------------------------------------------
 void
-modm::hosted::SerialInterface::flush()
+modm::platform::SerialInterface::flush()
 {
 	// TODO flush buffers
 }
 
 // ----------------------------------------------------------------------------
 void
-modm::hosted::SerialInterface::dump()
+modm::platform::SerialInterface::dump()
 {
 	if (!this->isConnected) {
 		MODM_LOG_DEBUG	<< "Port is not connected device!!" << modm::endl;
@@ -389,7 +389,7 @@ modm::hosted::SerialInterface::dump()
 
 // ----------------------------------------------------------------------------
 /*std::ostream&
-operator << (std::ostream& os, const modm::hosted::SerialInterface& c)
+operator << (std::ostream& os, const modm::platform::SerialInterface& c)
 {
 	os << "\nPort-Identifier: " << c.portIdentifier_;
 	os << "\nBaud-Rate:       "	<< ::std::dec << c.baudRate_;

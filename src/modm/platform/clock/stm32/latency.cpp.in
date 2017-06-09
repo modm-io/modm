@@ -308,7 +308,7 @@ flash_latency_{{ mV }}[] =
 %% endfor
 
 uint32_t
-modm::stm32::ClockControl::setFlashLatency(const uint32_t CPU_Frequency, const uint16_t mV)
+modm::platform::ClockControl::setFlashLatency(const uint32_t CPU_Frequency, const uint16_t mV)
 {
 %% if target["family"] == "f1" and target["name"] == "00"
 	(void) CPU_Frequency;

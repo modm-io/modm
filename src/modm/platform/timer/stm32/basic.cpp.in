@@ -17,7 +17,7 @@
 #include "timer_{{ id }}.hpp"
 
 void
-modm::stm32::Timer{{ id }}::enable()
+modm::platform::Timer{{ id }}::enable()
 {
 	// enable clock
 	RCC->APB1ENR{{ apb_post }}  |=  RCC_APB1ENR{{ apb_post }}_TIM{{ id }}EN;
@@ -27,7 +27,7 @@ modm::stm32::Timer{{ id }}::enable()
 }
 
 void
-modm::stm32::Timer{{ id }}::disable()
+modm::platform::Timer{{ id }}::disable()
 {
 	// disable clock
 	RCC->APB1ENR{{ apb_post }} &= ~RCC_APB1ENR{{ apb_post }}_TIM{{ id }}EN;
@@ -37,7 +37,7 @@ modm::stm32::Timer{{ id }}::disable()
 }
 
 void
-modm::stm32::Timer{{ id }}::setMode(Mode mode)
+modm::platform::Timer{{ id }}::setMode(Mode mode)
 {
 	// ARR Register is buffered, only Under/Overflow generates update interrupt
 	TIM{{ id }}->CR1 = TIM_CR1_ARPE | TIM_CR1_URS | static_cast<uint32_t>(mode);
@@ -54,7 +54,7 @@ modm::stm32::Timer{{ id }}::setMode(Mode mode)
 %%   set interrupt_vector = "TIM" ~ id ~ "_IRQn"
 %% endif
 void
-modm::stm32::Timer{{ id }}::enableInterruptVector(bool enable, uint32_t priority)
+modm::platform::Timer{{ id }}::enableInterruptVector(bool enable, uint32_t priority)
 {
 	if (enable) {
 		// Set vector priority

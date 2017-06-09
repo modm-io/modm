@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016, Sascha Schade
+ * Copyright (c) 2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -39,7 +40,7 @@ component::Odometry::update()
 	{
 		MODM_LOG_INFO << MODM_FILE_INFO << "Odometry update" << modm::endl;
 
-		robot::packet::Location location(modm::stm32::Timer1::getValue(), 11, 0.5);
+		robot::packet::Location location(modm::platform::Timer1::getValue(), 11, 0.5);
 
 		robot::EventPublisher::robotLocation(getCommunicator(), location);
 	}
@@ -50,6 +51,6 @@ component::Odometry::actionSetLedRed(
 	const modm::ResponseHandle& responseHandle,
 	const robot::packet::Bool *payload)
 {
-	modm::stm32::GpioOutputB14::set(*payload);
+	modm::platform::GpioOutputB14::set(*payload);
 	sendResponse(responseHandle);
 }

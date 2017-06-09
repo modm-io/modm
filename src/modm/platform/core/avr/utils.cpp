@@ -2,7 +2,7 @@
  * Copyright (c) 2009, Georgi Grinshpun
  * Copyright (c) 2009-2011, Fabian Greif
  * Copyright (c) 2010, Martin Rosekeit
- * Copyright (c) 2011-2014, Niklas Hauser
+ * Copyright (c) 2011-2014, 2017, Niklas Hauser
  * Copyright (c) 2013, Sascha Schade
  *
  * This file is part of the modm project.
@@ -18,7 +18,7 @@
 #include "utils.hpp"
 
 uint8_t
-modm::xmega::readCalibrationByte(uint8_t index)
+modm::platform::readCalibrationByte(uint8_t index)
 {
 	// Load the NVM Command register to read the calibration row.
 	NVM_CMD = NVM_CMD_READ_CALIB_ROW_gc;

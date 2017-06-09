@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014, 2016, Niklas Hauser
+ * Copyright (c) 2013-2014, 2016-2017, Niklas Hauser
  * Copyright (c) 2017, Fabian Greif
  *
  * This file is part of the modm project.
@@ -94,7 +94,7 @@ ISR(USART{{ id }}_DRE_vect)
 
 // ----------------------------------------------------------------------------
 void
-modm::xmega::BufferedUartFlow{{ id }}::initialize()
+modm::platform::BufferedUartFlow{{ id }}::initialize()
 {
 	TXD::set();
 	TXD::setOutput();
@@ -103,7 +103,7 @@ modm::xmega::BufferedUartFlow{{ id }}::initialize()
 
 	// RTS and CTS pins, ready for reception in few cycles.
 	CTS::setOutput(modm::Gpio::Low);
-	RTS::setInput(modm::xmega::PULLUP);
+	RTS::setInput(modm::platform::PULLUP);
 
 	// interrupts should be disabled during initialisation
 	atomic::Lock lock;
@@ -120,7 +120,7 @@ modm::xmega::BufferedUartFlow{{ id }}::initialize()
 
 // ----------------------------------------------------------------------------
 void
-modm::xmega::BufferedUartFlow{{ id }}::write(uint8_t c)
+modm::platform::BufferedUartFlow{{ id }}::write(uint8_t c)
 {
 	while ( !txBuffer.push(c) ) {
 		// wait for a free slot in the buffer
@@ -138,7 +138,7 @@ modm::xmega::BufferedUartFlow{{ id }}::write(uint8_t c)
 
 // ----------------------------------------------------------------------------
 void
-modm::xmega::BufferedUartFlow{{ id }}::write(const uint8_t *s, uint8_t n)
+modm::platform::BufferedUartFlow{{ id }}::write(const uint8_t *s, uint8_t n)
 {
 	while (n-- != 0) {
 		BufferedUartFlow{{ id }}::write(*s++);
@@ -147,7 +147,7 @@ modm::xmega::BufferedUartFlow{{ id }}::write(const uint8_t *s, uint8_t n)
 
 // ----------------------------------------------------------------------------
 bool
-modm::xmega::BufferedUartFlow{{ id }}::read(uint8_t& c)
+modm::platform::BufferedUartFlow{{ id }}::read(uint8_t& c)
 {
 	if (rxBuffer.isNearlyEmpty()) {
 		// When the buffer is nearly empty allow remote device to send again.
@@ -177,7 +177,7 @@ modm::xmega::BufferedUartFlow{{ id }}::read(uint8_t& c)
 
 // ----------------------------------------------------------------------------
 uint8_t
-modm::xmega::BufferedUartFlow{{ id }}::read(uint8_t *buffer, uint8_t n)
+modm::platform::BufferedUartFlow{{ id }}::read(uint8_t *buffer, uint8_t n)
 {
 	uint8_t i;
 	for (i = 0; i < n; ++i)
@@ -203,20 +203,20 @@ modm::xmega::BufferedUartFlow{{ id }}::read(uint8_t *buffer, uint8_t n)
 
 // ----------------------------------------------------------------------------
 uint8_t
-modm::xmega::BufferedUartFlow{{ id }}::readErrorFlags()
+modm::platform::BufferedUartFlow{{ id }}::readErrorFlags()
 {
 	return error;
 }
 
 void
-modm::xmega::BufferedUartFlow{{ id }}::resetErrorFlags()
+modm::platform::BufferedUartFlow{{ id }}::resetErrorFlags()
 {
 	error = 0;
 }
 
 // ----------------------------------------------------------------------------
 uint8_t
-modm::xmega::BufferedUartFlow{{ id }}::flushReceiveBuffer()
+modm::platform::BufferedUartFlow{{ id }}::flushReceiveBuffer()
 {
 	uint8_t i = 0;
 	while(!rxBuffer.isEmpty()) {
@@ -233,7 +233,7 @@ modm::xmega::BufferedUartFlow{{ id }}::flushReceiveBuffer()
 }
 
 //uint8_t
-//modm::xmega::BufferedUartFlow{{ id }}::flushTransmitBuffer()
+//modm::platform::BufferedUartFlow{{ id }}::flushTransmitBuffer()
 //{
 //	uint8_t i(0);
 //	while(!txBuffer.isEmpty()) {

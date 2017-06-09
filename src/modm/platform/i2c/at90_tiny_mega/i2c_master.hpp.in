@@ -21,7 +21,7 @@
 namespace modm
 {
 
-namespace avr
+namespace platform
 {
 
 /**
@@ -101,7 +101,7 @@ private:
 	initialize(uint8_t twbr, Prescaler prescaler=Prescaler::Div1);
 };
 
-} // namespace avr
+} // namespace platform
 
 } // namespace modm
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015, Niklas Hauser
+ * Copyright (c) 2013-2015, 2017, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
  *
  * This file is part of the modm project.
@@ -13,10 +13,10 @@
 #include <modm/architecture/architecture.hpp>
 #include <modm/processing/processing.hpp>
 
-using namespace modm::atmega;
+using namespace modm::platform;
 
 // Create a new UART object
-typedef modm::avr::SystemClock clock;
+typedef modm::platform::SystemClock clock;
 
 #include <modm/io/iostream.hpp>
 // Create a IOStream for complex formatting tasks

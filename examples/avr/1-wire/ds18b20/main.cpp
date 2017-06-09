@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2010-2012, Fabian Greif
- * Copyright (c) 2013-2014, Niklas Hauser
+ * Copyright (c) 2013-2014, 2017, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
  *
  * This file is part of the modm project.
@@ -16,7 +16,7 @@
 
 #include <modm/io/iostream.hpp>
 
-using namespace modm::atmega;
+using namespace modm::platform;
 
 typedef GpioC2 OneWirePin;
 modm::SoftwareOneWireMaster<OneWirePin> ow;
@@ -24,7 +24,7 @@ modm::SoftwareOneWireMaster<OneWirePin> ow;
 int
 main()
 {
-	typedef modm::avr::SystemClock c;
+	typedef modm::platform::SystemClock c;
 	Uart0::initialize<c, 9600>();
 
 	// Enable interrupts, this is needed for every buffered UART

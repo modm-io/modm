@@ -35,7 +35,7 @@
 namespace modm
 {
 
-namespace stm32
+namespace platform
 {
 
 /**
@@ -136,7 +136,7 @@ public:
 %% endfor
 };
 
-}	// namespace stm32
+}	// namespace platform
 
 }	// namespace modm
 

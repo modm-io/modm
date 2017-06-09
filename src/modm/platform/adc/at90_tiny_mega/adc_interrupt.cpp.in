@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2009-2010, Martin Rosekeit
  * Copyright (c) 2009-2010, 2017, Fabian Greif
- * Copyright (c) 2012, 2014-2016, Niklas Hauser
+ * Copyright (c) 2012, 2014-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -17,8 +17,8 @@
 #include <avr/interrupt.h>
 
 // ----------------------------------------------------------------------------
-modm::avr::AdcInterrupt::Handler
-modm::avr::AdcInterrupt::handler(modm::dummy);
+modm::platform::AdcInterrupt::Handler
+modm::platform::AdcInterrupt::handler(modm::dummy);
 
 // ----------------------------------------------------------------------------
 %% if partname == "attiny20"
@@ -27,6 +27,6 @@ MODM_ISR(ADC_ADC, modm_weak)
 MODM_ISR(ADC, modm_weak)
 %% endif
 {
-	modm::avr::AdcInterrupt::handler();
+	modm::platform::AdcInterrupt::handler();
 }
 

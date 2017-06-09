@@ -22,7 +22,7 @@
 namespace modm
 {
 
-namespace avr
+namespace platform
 {
 
 /**
@@ -167,7 +167,7 @@ private:
 %% endif
 };
 
-} // namespace avr
+} // namespace platform
 
 } // namespace modm
 

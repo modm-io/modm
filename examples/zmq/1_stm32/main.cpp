@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016, Sascha Schade
+ * Copyright (c) 2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -76,7 +77,7 @@ main()
 	// Led::G::setOutput();
 	// Led::B::setOutput();
 
-	using Timer = modm::stm32::Timer1;
+	using Timer = modm::platform::Timer1;
 	using ChannelA = GpioInputE9;
 	using ChannelB = GpioInputE11;
 	auto ChannelAInputType = Gpio::InputType::PullUp;

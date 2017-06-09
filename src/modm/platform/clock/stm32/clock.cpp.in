@@ -3,7 +3,7 @@
  * Copyright (c) 2009-2012, Fabian Greif
  * Copyright (c) 2011, Georgi Grinshpun
  * Copyright (c) 2012, Sascha Schade
- * Copyright (c) 2012, 2014-2016, Niklas Hauser
+ * Copyright (c) 2012, 2014-2017, Niklas Hauser
  * Copyright (c) 2013-2014, Kevin Läufer
  *
  * This file is part of the modm project.
@@ -39,7 +39,7 @@ uint16_t modm_fastdata ns_per_loop({{ loops / hsi_frequency|int}});
 // ----------------------------------------------------------------------------
 %% if target["family"] == "f0"
 bool
-modm::stm32::ClockControl::enableInternalClockMHz14(uint32_t waitCycles)
+modm::platform::ClockControl::enableInternalClockMHz14(uint32_t waitCycles)
 {
 	bool retval;
 	RCC->CR2 |= RCC_CR2_HSI14ON;
@@ -51,7 +51,7 @@ modm::stm32::ClockControl::enableInternalClockMHz14(uint32_t waitCycles)
 
 %% if hsi48
 bool
-modm::stm32::ClockControl::enableInternalClockMHz48(uint32_t waitCycles)
+modm::platform::ClockControl::enableInternalClockMHz48(uint32_t waitCycles)
 {
 	bool retval;
 	RCC->CR2 |= RCC_CR2_HSI48ON;
@@ -62,7 +62,7 @@ modm::stm32::ClockControl::enableInternalClockMHz48(uint32_t waitCycles)
 %% endif
 
 bool
-modm::stm32::ClockControl::enableInternalClock(uint32_t waitCycles)
+modm::platform::ClockControl::enableInternalClock(uint32_t waitCycles)
 {
 	bool retval;
 	RCC->CR |= RCC_CR_HSION;
@@ -73,7 +73,7 @@ modm::stm32::ClockControl::enableInternalClock(uint32_t waitCycles)
 
 %% if target["family"] in ["l4"]
 bool
-modm::stm32::ClockControl::enableMultiSpeedInternalClock(MsiFrequency msi_frequency, uint32_t waitCycles)
+modm::platform::ClockControl::enableMultiSpeedInternalClock(MsiFrequency msi_frequency, uint32_t waitCycles)
 {
 	bool retval;
 	RCC->CR = (RCC->CR & ~RCC_CR_MSIRANGE) | static_cast<uint32_t>(msi_frequency) | RCC_CR_MSIRGSEL | RCC_CR_MSION;
@@ -84,7 +84,7 @@ modm::stm32::ClockControl::enableMultiSpeedInternalClock(MsiFrequency msi_freque
 %% endif
 
 bool
-modm::stm32::ClockControl::enableExternalClock(uint32_t waitCycles)
+modm::platform::ClockControl::enableExternalClock(uint32_t waitCycles)
 {
 	bool retval;
 	RCC->CR |= RCC_CR_HSEBYP | RCC_CR_HSEON;
@@ -94,7 +94,7 @@ modm::stm32::ClockControl::enableExternalClock(uint32_t waitCycles)
 }
 
 bool
-modm::stm32::ClockControl::enableExternalCrystal(uint32_t waitCycles)
+modm::platform::ClockControl::enableExternalCrystal(uint32_t waitCycles)
 {
 	bool retval;
 	RCC->CR = (RCC->CR & ~RCC_CR_HSEBYP) | RCC_CR_HSEON;
@@ -104,7 +104,7 @@ modm::stm32::ClockControl::enableExternalCrystal(uint32_t waitCycles)
 }
 
 bool
-modm::stm32::ClockControl::enableLowSpeedInternalClock(uint32_t waitCycles)
+modm::platform::ClockControl::enableLowSpeedInternalClock(uint32_t waitCycles)
 {
 	bool retval;
 	RCC->CSR |= RCC_CSR_LSION;
@@ -114,7 +114,7 @@ modm::stm32::ClockControl::enableLowSpeedInternalClock(uint32_t waitCycles)
 }
 
 bool
-modm::stm32::ClockControl::enableLowSpeedExternalClock(uint32_t waitCycles)
+modm::platform::ClockControl::enableLowSpeedExternalClock(uint32_t waitCycles)
 {
 	bool retval;
 	RCC->BDCR |= RCC_BDCR_LSEBYP | RCC_BDCR_LSEON;
@@ -124,7 +124,7 @@ modm::stm32::ClockControl::enableLowSpeedExternalClock(uint32_t waitCycles)
 }
 
 bool
-modm::stm32::ClockControl::enableLowSpeedExternalCrystal(uint32_t waitCycles)
+modm::platform::ClockControl::enableLowSpeedExternalCrystal(uint32_t waitCycles)
 {
 	bool retval;
 	RCC->BDCR = (RCC->BDCR & ~RCC_BDCR_LSEBYP) | RCC_BDCR_LSEON;
@@ -136,7 +136,7 @@ modm::stm32::ClockControl::enableLowSpeedExternalCrystal(uint32_t waitCycles)
 %% if target["family"] in ["f2", "f4", "f7", "l4"]
 // ----------------------------------------------------------------------------
 bool
-modm::stm32::ClockControl::enablePll(PllSource source, uint8_t pllM,
+modm::platform::ClockControl::enablePll(PllSource source, uint8_t pllM,
 	uint16_t pllN, uint8_t pllP, uint8_t pllQ, uint32_t waitCycles)
 {
 	uint32_t tmp = 0;
@@ -174,7 +174,7 @@ modm::stm32::ClockControl::enablePll(PllSource source, uint8_t pllM,
 %% else
 // ----------------------------------------------------------------------------
 bool
-modm::stm32::ClockControl::enablePll(PllSource source,
+modm::platform::ClockControl::enablePll(PllSource source,
 %% if usbprescaler
 			UsbPrescaler usb,
 %% endif
@@ -228,7 +228,7 @@ modm::stm32::ClockControl::enablePll(PllSource source,
 
 // ----------------------------------------------------------------------------
 bool
-modm::stm32::ClockControl::enableSystemClock(SystemClockSource src, uint32_t waitCycles)
+modm::platform::ClockControl::enableSystemClock(SystemClockSource src, uint32_t waitCycles)
 {
 	RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_SW) | uint32_t(src);
 

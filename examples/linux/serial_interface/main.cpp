@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011, Fabian Greif
  * Copyright (c) 2014, Kevin Läufer
- * Copyright (c) 2014, Niklas Hauser
+ * Copyright (c) 2014, 2017, Niklas Hauser
  * Copyright (c) 2016, Sascha Schade
  *
  * This file is part of the modm project.
@@ -20,7 +20,7 @@
 int
 main()
 {
-	modm::hosted::SerialInterface port("/dev/ttyUSB0", 115200);
+	modm::platform::SerialInterface port("/dev/ttyUSB0", 115200);
 	
 	if (not port.open()) {
 		MODM_LOG_ERROR << "Could not open port: " << port.getDeviceName().c_str() << modm::endl;

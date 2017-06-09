@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013, Fabian Greif
- * Copyright (c) 2014, Niklas Hauser
+ * Copyright (c) 2014, 2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -17,13 +17,13 @@
 #include "static_serial_interface.hpp"
 
 template<int N>
-modm::hosted::SerialInterface*
-modm::hosted::StaticSerialInterface<N>::backend = 0;
+modm::platform::SerialInterface*
+modm::platform::StaticSerialInterface<N>::backend = 0;
 
 template<int N>
 template<uint32_t baudrate>
 bool
-modm::hosted::StaticSerialInterface<N>::initialize(SerialInterface& interface)
+modm::platform::StaticSerialInterface<N>::initialize(SerialInterface& interface)
 {
 	backend = &interface;
 
@@ -33,49 +33,49 @@ modm::hosted::StaticSerialInterface<N>::initialize(SerialInterface& interface)
 
 template<int N>
 void
-modm::hosted::StaticSerialInterface<N>::writeBlocking(uint8_t data)
+modm::platform::StaticSerialInterface<N>::writeBlocking(uint8_t data)
 {
 	backend->write(data);
 }
 
 template<int N>
 void
-modm::hosted::StaticSerialInterface<N>::writeBlocking(const uint8_t *data, std::size_t length)
+modm::platform::StaticSerialInterface<N>::writeBlocking(const uint8_t *data, std::size_t length)
 {
 	backend->writeBytes(data, length);
 }
 
 template<int N>
 void
-modm::hosted::StaticSerialInterface<N>::flushWriteBuffer()
+modm::platform::StaticSerialInterface<N>::flushWriteBuffer()
 {
 	backend->flush();
 }
 
 template<int N>
 bool
-modm::hosted::StaticSerialInterface<N>::write(uint8_t data)
+modm::platform::StaticSerialInterface<N>::write(uint8_t data)
 {
 	backend->write(data);
 }
 
 template<int N>
 std::size_t
-modm::hosted::StaticSerialInterface<N>::write(const uint8_t *data, std::size_t length)
+modm::platform::StaticSerialInterface<N>::write(const uint8_t *data, std::size_t length)
 {
 	backend->writeBytes(data, length);
 }
 
 template<int N>
 bool
-modm::hosted::StaticSerialInterface<N>::isWriteFinished()
+modm::platform::StaticSerialInterface<N>::isWriteFinished()
 {
 	return true;
 }
 
 template<int N>
 bool
-modm::hosted::StaticSerialInterface<N>::read(uint8_t &data)
+modm::platform::StaticSerialInterface<N>::read(uint8_t &data)
 {
 	char c;
 	if (backend->read(c)) {
@@ -88,7 +88,7 @@ modm::hosted::StaticSerialInterface<N>::read(uint8_t &data)
 
 template<int N>
 std::size_t
-modm::hosted::StaticSerialInterface<N>::read(uint8_t *data, std::size_t length)
+modm::platform::StaticSerialInterface<N>::read(uint8_t *data, std::size_t length)
 {
 	// Check how many bytes are available before reading to
 	// avoid a blocking access.
@@ -104,14 +104,14 @@ modm::hosted::StaticSerialInterface<N>::read(uint8_t *data, std::size_t length)
 
 template<int N>
 std::size_t
-modm::hosted::StaticSerialInterface<N>::discardReceiveBuffer()
+modm::platform::StaticSerialInterface<N>::discardReceiveBuffer()
 {
 	return 0;
 }
 
 template<int N>
 std::size_t
-modm::hosted::StaticSerialInterface<N>::discardTransmitBuffer()
+modm::platform::StaticSerialInterface<N>::discardTransmitBuffer()
 {
 	return 0;
 }

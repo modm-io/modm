@@ -23,7 +23,7 @@
 namespace modm
 {
 
-namespace stm32
+namespace platform
 {
 
 /**
@@ -145,7 +145,7 @@ public:
 	// end documentation inherited
 };
 
-} // namespace stm32
+} // namespace platform
 
 } // namespace modm
 

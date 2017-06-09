@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2010-2011, Fabian Greif
- * Copyright (c) 2013-2015, Niklas Hauser
+ * Copyright (c) 2013-2015, 2017, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
  *
  * This file is part of the modm project.
@@ -15,9 +15,9 @@
 
 #include <modm/io/iostream.hpp>
 
-using namespace modm::atmega;
-typedef modm::avr::SystemClock clock;
-modm::atmega::Uart0 uart;
+using namespace modm::platform;
+typedef modm::platform::SystemClock clock;
+modm::platform::Uart0 uart;
 
 
 int

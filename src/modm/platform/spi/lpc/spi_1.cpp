@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2012, Sascha Schade
  * Copyright (c) 2013, Kevin Läufer
- * Copyright (c) 2014, Niklas Hauser
+ * Copyright (c) 2014, 2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -38,7 +38,7 @@ namespace
 }
 
 void
-modm::lpc::SpiMaster1::configurePins(MappingSck mapping, bool useSsel)
+modm::platform::SpiMaster1::configurePins(MappingSck mapping, bool useSsel)
 {
 	// Deassert Reset
 	LPC_SYSCON->PRESETCTRL 		|= PRESETCTRL_SSP1_RST_N;
@@ -68,7 +68,7 @@ modm::lpc::SpiMaster1::configurePins(MappingSck mapping, bool useSsel)
 }
 
 void
-modm::lpc::SpiMaster1::initialize(
+modm::platform::SpiMaster1::initialize(
 		Mode mode,
 		Presacler prescaler,
 		uint8_t serialClockRate,
@@ -98,7 +98,7 @@ modm::lpc::SpiMaster1::initialize(
 
 // ----------------------------------------------------------------------------
 bool
-modm::lpc::SpiMaster1::setBuffer(uint16_t length, uint8_t* transmit, uint8_t* receive, BufferIncrease bufferIncrease)
+modm::platform::SpiMaster1::setBuffer(uint16_t length, uint8_t* transmit, uint8_t* receive, BufferIncrease bufferIncrease)
 {
 	if (!isFinished()) {
 		return false;
@@ -115,7 +115,7 @@ modm::lpc::SpiMaster1::setBuffer(uint16_t length, uint8_t* transmit, uint8_t* re
 }
 
 bool
-modm::lpc::SpiMaster1::transfer(TransferOptions options)
+modm::platform::SpiMaster1::transfer(TransferOptions options)
 {
 	if (status & BUFFER_IS_BUSY_SYNC_bm) {
 		return false;
@@ -189,20 +189,20 @@ modm::lpc::SpiMaster1::transfer(TransferOptions options)
 }
 
 bool
-modm::lpc::SpiMaster1::transferSync(TransferOptions options)
+modm::platform::SpiMaster1::transferSync(TransferOptions options)
 {
 	return transfer(options);
 }
 
 bool
-modm::lpc::SpiMaster1::isFinished()
+modm::platform::SpiMaster1::isFinished()
 {
 	return !(status & BUFFER_IS_BUSY_SYNC_bm);
 }
 
 // ----------------------------------------------------------------------------
 uint8_t
-modm::lpc::SpiMaster1::write(uint8_t data)
+modm::platform::SpiMaster1::write(uint8_t data)
 {
 	/* Move on only if TX FIFO not full. */
 	while (!(LPC_SSP1->SR & SPI_SRn_TNF));

@@ -28,13 +28,13 @@
 extern "C" void _initHardFaultHandlerLed() __attribute__((optimize("Os")));
 extern "C" void _initHardFaultHandlerLed()
 {
-	modm::stm32::Gpio{{ options["hardfault.led"] }}::setOutput();
+	modm::platform::Gpio{{ options["hardfault.led"] }}::setOutput();
 }
 
 extern "C" void _toggleHardFaultHandlerLed() __attribute__((optimize("Os")));
 extern "C" void _toggleHardFaultHandlerLed()
 {
-	modm::stm32::Gpio{{ options["hardfault.led"] }}::toggle();
+	modm::platform::Gpio{{ options["hardfault.led"] }}::toggle();
 }
 
 %% endif
@@ -58,9 +58,9 @@ MODM_ISR_DECL({{ uart | upper ~ id }});
 extern "C"
 void flushUart()
 {
-	while(not modm::stm32::{{ uart ~ id }}::isWriteFinished())
+	while(not modm::platform::{{ uart ~ id }}::isWriteFinished())
 	{
-		if (modm::stm32::{{ uart }}Hal{{ id }}::isTransmitRegisterEmpty())
+		if (modm::platform::{{ uart }}Hal{{ id }}::isTransmitRegisterEmpty())
 		{
 			MODM_ISR_CALL({{ uart | upper ~ id }});
 		}
@@ -196,7 +196,7 @@ extern "C" void _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 	const uint32_t& stacked_r7  = ctx[22];
 	%% endif
 
-	modm::stm32::{{ uart ~ id }}::discardTransmitBuffer();
+	modm::platform::{{ uart ~ id }}::discardTransmitBuffer();
 
 	// Infinite loop
 	%% if options["hardfault.led"] != "disabled"

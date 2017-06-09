@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2014, Fabian Greif
- * Copyright (c) 2014-2016, Niklas Hauser
+ * Copyright (c) 2014-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -19,7 +19,7 @@
 namespace modm
 {
 
-namespace stm32
+namespace platform
 {
 
 /// @ingroup	{{partname}}_timer
@@ -241,7 +241,7 @@ public:
 	getCompareValue(uint32_t channel);
 };
 
-} // namespace stm32
+} // namespace platform
 
 } // namespace modm
 

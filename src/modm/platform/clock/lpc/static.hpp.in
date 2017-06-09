@@ -27,7 +27,7 @@ using namespace modm::clock;
 
 namespace modm
 {
-	namespace lpc
+	namespace platform
 	{
 		/*
 		 * Used to setup pll with constants
@@ -74,17 +74,17 @@ namespace modm
 										 externalCrystal, systemClock] }
 
 	// Static Clocks/Plls/Osciallators
-{{ static.source(internalClock, "modm::lpc") }}
+{{ static.source(internalClock, "modm::platform") }}
 
-{{ static.source(externalClock, "modm::lpc") }}
+{{ static.source(externalClock, "modm::platform") }}
 
-{{ static.source(externalCrystal, "modm::lpc") }}
+{{ static.source(externalCrystal, "modm::platform") }}
 
-{{ static.pll(pll, "modm::lpc") }}
+{{ static.pll(pll, "modm::platform") }}
 
-{{ static.sink(systemClock, "modm::lpc")}}
+{{ static.sink(systemClock, "modm::platform")}}
 
-{{ static.output(clockOut, "modm::lpc")}}
+{{ static.output(clockOut, "modm::platform")}}
 
 	}
 }

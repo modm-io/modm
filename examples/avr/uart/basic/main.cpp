@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2010-2013, Fabian Greif
- * Copyright (c) 2012-2013, Niklas Hauser
+ * Copyright (c) 2012-2013, 2017, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
  *
  * This file is part of the modm project.
@@ -13,8 +13,8 @@
 
 #include <modm/architecture/platform.hpp>
 
-using namespace modm::atmega;
-typedef modm::avr::SystemClock clock;
+using namespace modm::platform;
+typedef modm::platform::SystemClock clock;
 
 // Create a new UART object and configure it to a baudrate of 115200
 typedef Uart0 uart;

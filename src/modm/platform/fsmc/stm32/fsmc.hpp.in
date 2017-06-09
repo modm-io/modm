@@ -28,7 +28,7 @@
 
 namespace modm
 {
-	namespace stm32
+	namespace platform
 	{
 		namespace fsmc
 		{

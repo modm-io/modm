@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013-2014, Kevin Läufer
- * Copyright (c) 2014-2016, Niklas Hauser
+ * Copyright (c) 2014-2017, Niklas Hauser
  * Copyright (c) 2016, Fabian Greif
  *
  * This file is part of the modm project.
@@ -17,7 +17,7 @@
 
 template< class SystemClock, uint32_t frequency, uint16_t tolerance >
 void
-modm::stm32::Adc{{ id }}::initialize()
+modm::platform::Adc{{ id }}::initialize()
 {
 	constexpr float desired = float(SystemClock::Adc) / (frequency > {{ max_frequency }} ? {{ max_frequency }} : frequency);
 
@@ -66,7 +66,7 @@ modm::stm32::Adc{{ id }}::initialize()
 }
 
 void
-modm::stm32::Adc{{ id }}::setPrescaler(const Prescaler prescaler)
+modm::platform::Adc{{ id }}::setPrescaler(const Prescaler prescaler)
 {
 %% if target["family"] in ["f2", "f4", "f7"]
 	ADC->CCR = (ADC->CCR & ~(0b11 << 17)) | (uint32_t(prescaler) << 17);
@@ -77,7 +77,7 @@ modm::stm32::Adc{{ id }}::setPrescaler(const Prescaler prescaler)
 
 %% if temperature_available
 void
-modm::stm32::Adc{{ id }}::enableTemperatureRefVMeasurement()
+modm::platform::Adc{{ id }}::enableTemperatureRefVMeasurement()
 {
 	%% if target["family"] in ["f2", "f4", "f7"]
 	ADC->CCR |= ADC_CCR_TSVREFE;
@@ -87,7 +87,7 @@ modm::stm32::Adc{{ id }}::enableTemperatureRefVMeasurement()
 }
 
 void
-modm::stm32::Adc{{ id }}::disableTemperatureRefVMeasurement()
+modm::platform::Adc{{ id }}::disableTemperatureRefVMeasurement()
 {
 	%% if target["family"] in ["f2", "f4", "f7"]
 	ADC->CCR &= ~ADC_CCR_TSVREFE;
@@ -98,19 +98,19 @@ modm::stm32::Adc{{ id }}::disableTemperatureRefVMeasurement()
 %% endif
 
 void
-modm::stm32::Adc{{ id }}::setLeftAdjustResult()
+modm::platform::Adc{{ id }}::setLeftAdjustResult()
 {
 	ADC{{ id }}->CR2 |= ADC_CR2_ALIGN;
 }
 
 void
-modm::stm32::Adc{{ id }}::setRightAdjustResult()
+modm::platform::Adc{{ id }}::setRightAdjustResult()
 {
 	ADC{{ id }}->CR2 &= ~ADC_CR2_ALIGN;
 }
 
 bool
-modm::stm32::Adc{{ id }}::setChannel(const Channel channel,
+modm::platform::Adc{{ id }}::setChannel(const Channel channel,
 									 const SampleTime sampleTime)
 {
 	if (uint32_t(channel) >= 18) return false;
@@ -124,14 +124,14 @@ modm::stm32::Adc{{ id }}::setChannel(const Channel channel,
 	return true;
 }
 
-modm::stm32::Adc{{ id }}::Channel
-modm::stm32::Adc{{ id }}::getChannel()
+modm::platform::Adc{{ id }}::Channel
+modm::platform::Adc{{ id }}::getChannel()
 {
 	return Channel(ADC{{ id }}->SQR3 & 0x1f);
 }
 
 bool
-modm::stm32::Adc{{ id }}::addChannel(const Channel channel,
+modm::platform::Adc{{ id }}::addChannel(const Channel channel,
 									const SampleTime sampleTime)
 {
 	// read channel count
@@ -157,7 +157,7 @@ modm::stm32::Adc{{ id }}::addChannel(const Channel channel,
 }
 
 void
-modm::stm32::Adc{{ id }}::setSampleTime(const Channel channel,
+modm::platform::Adc{{ id }}::setSampleTime(const Channel channel,
 										const SampleTime sampleTime)
 {
 	if (uint32_t(channel) < 10) {
@@ -171,26 +171,26 @@ modm::stm32::Adc{{ id }}::setSampleTime(const Channel channel,
 }
 
 void
-modm::stm32::Adc{{ id }}::enableFreeRunningMode()
+modm::platform::Adc{{ id }}::enableFreeRunningMode()
 {
 	ADC{{ id }}->CR2 |= ADC_CR2_CONT;	// set to continuous mode
 }
 
 void
-modm::stm32::Adc{{ id }}::disableFreeRunningMode()
+modm::platform::Adc{{ id }}::disableFreeRunningMode()
 {
 	ADC{{ id }}->CR2 &= ~ADC_CR2_CONT;		// set to single mode
 }
 
 void
-modm::stm32::Adc{{ id }}::disable()
+modm::platform::Adc{{ id }}::disable()
 {
 	ADC{{ id }}->CR2 &= ~(ADC_CR2_ADON);		// switch off ADC
 	RCC->APB2ENR &= ~RCC_APB2ENR_ADC{{ id }}EN; // stop ADC Clock
 }
 
 void
-modm::stm32::Adc{{ id }}::startConversion()
+modm::platform::Adc{{ id }}::startConversion()
 {
 	acknowledgeInterruptFlags(InterruptFlag::All);
 %% if target["family"] == "f1"
@@ -203,20 +203,20 @@ modm::stm32::Adc{{ id }}::startConversion()
 }
 
 bool
-modm::stm32::Adc{{ id }}::isConversionFinished()
+modm::platform::Adc{{ id }}::isConversionFinished()
 {
 	return (ADC{{ id }}->SR & ADC_SR_EOC);
 }
 
 uint16_t
-modm::stm32::Adc{{ id }}::getValue()
+modm::platform::Adc{{ id }}::getValue()
 {
 	return ADC{{ id }}->DR;
 }
 
 
 uint16_t
-modm::stm32::Adc{{ id }}::readChannel(Channel channel)
+modm::platform::Adc{{ id }}::readChannel(Channel channel)
 {
 	if (!setChannel(channel)) return 0;
 
@@ -252,7 +252,7 @@ nvicDisableInterrupt(IRQn_Type IRQn)
 #endif // MODM_CUSTOM_NVIC_FUNCTIONS
 
 void
-modm::stm32::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
+modm::platform::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
 												const bool enable)
 {
 %% if target["family"] in ["f2", "f4", "f7"]
@@ -274,25 +274,25 @@ modm::stm32::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
 }
 
 void
-modm::stm32::Adc{{ id }}::enableInterrupt(const Interrupt_t interrupt)
+modm::platform::Adc{{ id }}::enableInterrupt(const Interrupt_t interrupt)
 {
 	ADC{{ id }}->CR1 |= interrupt.value;
 }
 
 void
-modm::stm32::Adc{{ id }}::disableInterrupt(const Interrupt_t interrupt)
+modm::platform::Adc{{ id }}::disableInterrupt(const Interrupt_t interrupt)
 {
 	ADC{{ id }}->CR1 &= ~interrupt.value;
 }
 
-modm::stm32::Adc{{ id }}::InterruptFlag_t
-modm::stm32::Adc{{ id }}::getInterruptFlags()
+modm::platform::Adc{{ id }}::InterruptFlag_t
+modm::platform::Adc{{ id }}::getInterruptFlags()
 {
 	return InterruptFlag_t(ADC{{ id }}->SR);
 }
 
 void
-modm::stm32::Adc{{ id }}::acknowledgeInterruptFlags(const InterruptFlag_t flags)
+modm::platform::Adc{{ id }}::acknowledgeInterruptFlags(const InterruptFlag_t flags)
 {
 	// Flags are cleared by writing a one to the flag position.
 	// Writing a zero is ignored.

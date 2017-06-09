@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2012-2013, Fabian Greif
  * Copyright (c) 2012-2014, Sascha Schade
- * Copyright (c) 2013-2014, 2016, Niklas Hauser
+ * Copyright (c) 2013-2014, 2016-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -56,8 +56,8 @@
 #include <modm/driver/display/siemens_s75.hpp>
 
 // ----------------------------------------------------------------------------
-using namespace modm::stm32;
-using namespace modm::stm32::fsmc;
+using namespace modm::platform;
+using namespace modm::platform::fsmc;
 
 typedef GpioOutputA8 Led;
 
@@ -124,28 +124,28 @@ main()
 	//------------------------------------------------------
 
 	// FSMC
-	modm::stm32::Fsmc::initialize();
+	modm::platform::Fsmc::initialize();
 
 	// A23
-    lcd::Cd::connect(Fsmc::A23, modm::stm32::Gpio::OutputType::PushPull, modm::stm32::Gpio::OutputSpeed::MHz100);
+    lcd::Cd::connect(Fsmc::A23, modm::platform::Gpio::OutputType::PushPull, modm::platform::Gpio::OutputSpeed::MHz100);
 
 	// FSMC_NE1
-    lcd::Cs::connect(Fsmc::Ne1, modm::stm32::Gpio::OutputType::PushPull, modm::stm32::Gpio::OutputSpeed::MHz100);
+    lcd::Cs::connect(Fsmc::Ne1, modm::platform::Gpio::OutputType::PushPull, modm::platform::Gpio::OutputSpeed::MHz100);
 
 	// FSMC_NWE
-	lcd::Wr::connect(Fsmc::Nwe, modm::stm32::Gpio::OutputType::PushPull, modm::stm32::Gpio::OutputSpeed::MHz100);
+	lcd::Wr::connect(Fsmc::Nwe, modm::platform::Gpio::OutputType::PushPull, modm::platform::Gpio::OutputSpeed::MHz100);
 
-    lcd::D0::connect(Fsmc::D0, modm::stm32::Gpio::OutputType::PushPull, modm::stm32::Gpio::OutputSpeed::MHz100);
-    lcd::D1::connect(Fsmc::D1, modm::stm32::Gpio::OutputType::PushPull, modm::stm32::Gpio::OutputSpeed::MHz100);
-    lcd::D2::connect(Fsmc::D2, modm::stm32::Gpio::OutputType::PushPull, modm::stm32::Gpio::OutputSpeed::MHz100);
-    lcd::D3::connect(Fsmc::D3, modm::stm32::Gpio::OutputType::PushPull, modm::stm32::Gpio::OutputSpeed::MHz100);
-    lcd::D4::connect(Fsmc::D4, modm::stm32::Gpio::OutputType::PushPull, modm::stm32::Gpio::OutputSpeed::MHz100);
-    lcd::D5::connect(Fsmc::D5, modm::stm32::Gpio::OutputType::PushPull, modm::stm32::Gpio::OutputSpeed::MHz100);
-    lcd::D6::connect(Fsmc::D6, modm::stm32::Gpio::OutputType::PushPull, modm::stm32::Gpio::OutputSpeed::MHz100);
-    lcd::D7::connect(Fsmc::D7, modm::stm32::Gpio::OutputType::PushPull, modm::stm32::Gpio::OutputSpeed::MHz100);
+    lcd::D0::connect(Fsmc::D0, modm::platform::Gpio::OutputType::PushPull, modm::platform::Gpio::OutputSpeed::MHz100);
+    lcd::D1::connect(Fsmc::D1, modm::platform::Gpio::OutputType::PushPull, modm::platform::Gpio::OutputSpeed::MHz100);
+    lcd::D2::connect(Fsmc::D2, modm::platform::Gpio::OutputType::PushPull, modm::platform::Gpio::OutputSpeed::MHz100);
+    lcd::D3::connect(Fsmc::D3, modm::platform::Gpio::OutputType::PushPull, modm::platform::Gpio::OutputSpeed::MHz100);
+    lcd::D4::connect(Fsmc::D4, modm::platform::Gpio::OutputType::PushPull, modm::platform::Gpio::OutputSpeed::MHz100);
+    lcd::D5::connect(Fsmc::D5, modm::platform::Gpio::OutputType::PushPull, modm::platform::Gpio::OutputSpeed::MHz100);
+    lcd::D6::connect(Fsmc::D6, modm::platform::Gpio::OutputType::PushPull, modm::platform::Gpio::OutputSpeed::MHz100);
+    lcd::D7::connect(Fsmc::D7, modm::platform::Gpio::OutputType::PushPull, modm::platform::Gpio::OutputSpeed::MHz100);
 
 
-	modm::stm32::fsmc::NorSram::AsynchronousTiming timing = {
+	modm::platform::fsmc::NorSram::AsynchronousTiming timing = {
 		// read
 		0,	// readAddressSetup
 		15,	// readAddressHold
@@ -160,14 +160,14 @@ main()
 		0
 	};
 
-	modm::stm32::fsmc::NorSram::configureAsynchronousRegion(
-			modm::stm32::fsmc::NorSram::CHIP_SELECT_1, /* NE1 */
-			modm::stm32::fsmc::NorSram::NO_MULTIPLEX_8BIT,
-			modm::stm32::fsmc::NorSram::SRAM_ROM,
-			modm::stm32::fsmc::NorSram::MODE_A,
+	modm::platform::fsmc::NorSram::configureAsynchronousRegion(
+			modm::platform::fsmc::NorSram::CHIP_SELECT_1, /* NE1 */
+			modm::platform::fsmc::NorSram::NO_MULTIPLEX_8BIT,
+			modm::platform::fsmc::NorSram::SRAM_ROM,
+			modm::platform::fsmc::NorSram::MODE_A,
 			timing);
 
-	modm::stm32::fsmc::NorSram::enableRegion(modm::stm32::fsmc::NorSram::CHIP_SELECT_1);
+	modm::platform::fsmc::NorSram::enableRegion(modm::platform::fsmc::NorSram::CHIP_SELECT_1);
 
 	//------------------------------------------------------
 

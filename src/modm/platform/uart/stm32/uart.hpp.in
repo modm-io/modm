@@ -28,7 +28,7 @@
 namespace modm
 {
 
-namespace stm32
+namespace platform
 {
 
 /**
@@ -109,7 +109,7 @@ template< 	class SystemClock, uint32_t baudrate,
 	discardReceiveBuffer();
 };
 
-}	// namespace stm32
+}	// namespace platform
 
 }	// namespace modm
 

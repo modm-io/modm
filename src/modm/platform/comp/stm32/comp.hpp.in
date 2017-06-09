@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013, Kevin Läufer
- * Copyright (c) 2014-2015, Niklas Hauser
+ * Copyright (c) 2014-2015, 2017, Niklas Hauser
  * Copyright (c) 2017, Fabian Greif
  *
  * This file is part of the modm project.
@@ -22,7 +22,7 @@
 #if defined(STM32F3XX)
 namespace modm
 {
-	namespace stm32
+	namespace platform
 	{
 		/**
 		 * @brief		Comparator Class for STM32F3 series

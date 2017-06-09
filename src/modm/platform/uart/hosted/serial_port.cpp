@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2010-2011, Thorsten Lajewski
  * Copyright (c) 2010-2011, 2013, Fabian Greif
- * Copyright (c) 2014, Niklas Hauser
+ * Copyright (c) 2014, 2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -14,41 +14,41 @@
 #include "serial_port.hpp"
 #include <iostream>
 
-modm::hosted::SerialPort::SerialPort():
+modm::platform::SerialPort::SerialPort():
 	shutdown(true),
 	port(io_service)
 {
 }
 
-modm::hosted::SerialPort::~SerialPort()
+modm::platform::SerialPort::~SerialPort()
 {
 	this->close();
 }
 
 void
-modm::hosted::SerialPort::write(char c)
+modm::platform::SerialPort::write(char c)
 {
-	this->io_service.post(boost::bind(&modm::hosted::SerialPort::doWrite, this, c));
+	this->io_service.post(boost::bind(&modm::platform::SerialPort::doWrite, this, c));
 }
 
 
 void
-modm::hosted::SerialPort::flush()
+modm::platform::SerialPort::flush()
 {
 }
 
 void
-modm::hosted::SerialPort::readStart()
+modm::platform::SerialPort::readStart()
 {
 	port.async_read_some(boost::asio::buffer(&this->tmpRead, sizeof(this->tmpRead)),
-			boost::bind(&modm::hosted::SerialPort::readComplete,
+			boost::bind(&modm::platform::SerialPort::readComplete,
 					this,
 					boost::asio::placeholders::error,
 					boost::asio::placeholders::bytes_transferred));
 }
 
 bool
-modm::hosted::SerialPort::read(char& value)
+modm::platform::SerialPort::read(char& value)
 {
 	if(this->readBuffer.empty())
 		return false;
@@ -62,7 +62,7 @@ modm::hosted::SerialPort::read(char& value)
 }
 
 bool
-modm::hosted::SerialPort::open(std::string deviceName, unsigned int baudRate)
+modm::platform::SerialPort::open(std::string deviceName, unsigned int baudRate)
 {
 	if (!this->isOpen())
 	{
@@ -97,19 +97,19 @@ modm::hosted::SerialPort::open(std::string deviceName, unsigned int baudRate)
 
 
 bool
-modm::hosted::SerialPort::isOpen()
+modm::platform::SerialPort::isOpen()
 {
 	return this->port.is_open() && !this->shutdown;
 }
 
 void
-modm::hosted::SerialPort::close()
+modm::platform::SerialPort::close()
 {
 	if (!this->isOpen())
 		return;
 
 	this->io_service.post(boost::bind(
-			&modm::hosted::SerialPort::doClose,
+			&modm::platform::SerialPort::doClose,
 			this,
 			boost::system::error_code()));
 
@@ -119,13 +119,13 @@ modm::hosted::SerialPort::close()
 }
 
 void
-modm::hosted::SerialPort::kill()
+modm::platform::SerialPort::kill()
 {
 	if (!this->isOpen())
 		return;
 
 	this->io_service.post(boost::bind(
-				&modm::hosted::SerialPort::doAbort,
+				&modm::platform::SerialPort::doAbort,
 				this,
 				boost::system::error_code()));
 	this->shutdown = true;
@@ -135,7 +135,7 @@ modm::hosted::SerialPort::kill()
 }
 
 void
-modm::hosted::SerialPort::doAbort(const boost::system::error_code& error)
+modm::platform::SerialPort::doAbort(const boost::system::error_code& error)
 {
 
 	if (error)
@@ -146,7 +146,7 @@ modm::hosted::SerialPort::doAbort(const boost::system::error_code& error)
 }
 
 void
-modm::hosted::SerialPort::doClose(const boost::system::error_code& error)
+modm::platform::SerialPort::doClose(const boost::system::error_code& error)
 {
 	if( this->writeBuffer.empty() ) {
 		this->doAbort(error);
@@ -155,7 +155,7 @@ modm::hosted::SerialPort::doClose(const boost::system::error_code& error)
 }
 
 void
-modm::hosted::SerialPort::doWrite(const char c) {
+modm::platform::SerialPort::doWrite(const char c) {
 	if (!this->shutdown)
 	{
 		std::cout<<"get 0x"<< std::hex << (int) c << std::dec
@@ -172,16 +172,16 @@ modm::hosted::SerialPort::doWrite(const char c) {
 }
 
 void
-modm::hosted::SerialPort::writeStart(void)
+modm::platform::SerialPort::writeStart(void)
 {
 	boost::asio::async_write(this->port,
 			boost::asio::buffer(&this->writeBuffer.front(), 1),
-			boost::bind(&modm::hosted::SerialPort::writeComplete, this,
+			boost::bind(&modm::platform::SerialPort::writeComplete, this,
 					boost::asio::placeholders::error));
 }
 
 void
-modm::hosted::SerialPort::writeComplete(const boost::system::error_code& error)
+modm::platform::SerialPort::writeComplete(const boost::system::error_code& error)
 {
 	if (!error) {
 		MutexGuard mutex(this->writeMutex);
@@ -201,7 +201,7 @@ modm::hosted::SerialPort::writeComplete(const boost::system::error_code& error)
 }
 
 void
-modm::hosted::SerialPort::readComplete(const boost::system::error_code& error, size_t bytes_transferred)
+modm::platform::SerialPort::readComplete(const boost::system::error_code& error, size_t bytes_transferred)
 {
     if (!error)
     {
@@ -223,7 +223,7 @@ modm::hosted::SerialPort::readComplete(const boost::system::error_code& error, s
 }
 
 void
-modm::hosted::SerialPort::clearReadBuffer()
+modm::platform::SerialPort::clearReadBuffer()
 {
 	MutexGuard queueGuard( this->readMutex);
 	while(!this->readBuffer.empty()) {
@@ -232,7 +232,7 @@ modm::hosted::SerialPort::clearReadBuffer()
 }
 
 void
-modm::hosted::SerialPort::clearWriteBuffer()
+modm::platform::SerialPort::clearWriteBuffer()
 {
 	while(!this->writeBuffer.empty()) {
 		this->writeBuffer.pop();

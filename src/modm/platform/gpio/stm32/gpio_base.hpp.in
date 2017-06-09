@@ -30,7 +30,7 @@
 namespace modm
 {
 
-namespace stm32
+namespace platform
 {
 
 /// @ingroup {{partname}}_gpio
@@ -150,7 +150,7 @@ protected:
 	/// @endcond
 };
 
-} // namespace stm32
+} // namespace platform
 
 } // namespace modm
 

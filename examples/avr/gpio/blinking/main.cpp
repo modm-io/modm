@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2010-2011, Fabian Greif
- * Copyright (c) 2013-2014, 2016, Niklas Hauser
+ * Copyright (c) 2013-2014, 2016-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -12,7 +12,7 @@
 
 #include <modm/architecture/architecture.hpp>
 
-using namespace modm::atmega;
+using namespace modm::platform;
 
 typedef GpioOutputB0 Led;
 

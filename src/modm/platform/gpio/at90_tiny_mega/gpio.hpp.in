@@ -33,7 +33,7 @@
 namespace modm
 {
 
-namespace avr
+namespace platform
 {
 
 /// @ingroup	{{partname}}_gpio
@@ -524,7 +524,7 @@ public:
 %% endfor
 /// @endcond
 
-}	// namespace avr
+}	// namespace platform
 
 }	// namespace modm
 

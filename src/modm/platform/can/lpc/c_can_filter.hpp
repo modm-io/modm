@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2012, Fabian Greif
  * Copyright (c) 2012, Sascha Schade
- * Copyright (c) 2012-2014, 2016, Niklas Hauser
+ * Copyright (c) 2012-2014, 2016-2017, Niklas Hauser
  * Copyright (c) 2013-2014, Kevin Läufer
  *
  * This file is part of the modm project.
@@ -21,7 +21,7 @@
 
 namespace modm
 {
-	namespace lpc
+	namespace platform
 	{
 		/**
 		 * \brief		Reception Filters for the C_CAN module in LPC11C00 Series.
@@ -132,7 +132,7 @@ namespace modm
 
 
 		}; // CanFilter class
-	} // lpc namespace
+	} // namespace platform
 } // modm namespace
 
 #endif // MODM_LPC11C_CAN_FILTER_HPP

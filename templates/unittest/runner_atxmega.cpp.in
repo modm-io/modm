@@ -28,8 +28,8 @@ int
 main()
 {
 	// initialize output device
-	modm::atxmega::BufferedUartE0 uart(115200);
-	modm::IODeviceWrapper<modm::atxmega::BufferedUartE0> device(uart);
+	modm::platform::BufferedUartE0 uart(115200);
+	modm::IODeviceWrapper<modm::platform::BufferedUartE0> device(uart);
 	
 	sei();
 	

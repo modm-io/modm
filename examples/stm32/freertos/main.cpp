@@ -2,7 +2,7 @@
  * Copyright (c) 2011, Georgi Grinshpun
  * Copyright (c) 2011-2012, Fabian Greif
  * Copyright (c) 2012, 2014, Sascha Schade
- * Copyright (c) 2012-2016, Niklas Hauser
+ * Copyright (c) 2012-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -21,7 +21,7 @@
 
 #include <modm/processing/rtos.hpp>
 
-using namespace modm::stm32;
+using namespace modm::platform;
 
 // ----------------------------------------------------------------------------
 typedef SystemClock<Pll<ExternalCrystal<MHz8>, MHz168, MHz48> > defaultSystemClock;
@@ -42,7 +42,7 @@ namespace lcd
 }
 
 // Graphic LCD
-modm::DogS102< modm::stm32::SpiMaster1, lcd::CS, lcd::A0, lcd::Reset, false > display;
+modm::DogS102< modm::platform::SpiMaster1, lcd::CS, lcd::A0, lcd::Reset, false > display;
 
 // ----------------------------------------------------------------------------
 modm::rtos::BinarySemaphore event;

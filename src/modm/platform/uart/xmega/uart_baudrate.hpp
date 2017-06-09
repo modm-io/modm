@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014, Niklas Hauser
+ * Copyright (c) 2013-2014, 2017, Niklas Hauser
  * Copyright (c) 2017, Fabian Greif
  *
  * This file is part of the modm project.
@@ -18,7 +18,7 @@
 namespace modm
 {
 
-namespace xmega
+namespace platform
 {
 
 /**
@@ -115,7 +115,7 @@ private:
 	}
 };
 
-} // xmega namespace
+} // namespace platform
 
 } // modm namespace
 

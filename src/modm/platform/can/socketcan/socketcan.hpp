@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016, Sascha Schade
+ * Copyright (c) 2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -19,7 +20,7 @@
 namespace modm
 {
 
-namespace hosted
+namespace platform
 {
 
 class SocketCan : public ::modm::Can
@@ -54,7 +55,7 @@ private:
 	int skt;
 };
 
-} // hosted namespace
+} // namespace platform
 } // modm namespace
 
 #endif // MODM_HOSTED_SOCKETCAN_HPP

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011, Fabian Greif
- * Copyright (c) 2012-2014, 2016, Niklas Hauser
+ * Copyright (c) 2012-2014, 2016-2017, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
  *
  * This file is part of the modm project.
@@ -15,8 +15,8 @@
 #include <modm/driver/display.hpp>
 #include <modm/ui/button_group.hpp>
 
-using namespace modm::atmega;
-typedef modm::avr::SystemClock clock;
+using namespace modm::platform;
+typedef modm::platform::SystemClock clock;
 
 typedef GpioOutputD2 Cs;
 typedef GpioOutputB6 Mosi;

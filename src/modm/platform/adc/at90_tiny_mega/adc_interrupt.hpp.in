@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Niklas Hauser
+ * Copyright (c) 2015, 2017, Niklas Hauser
  * Copyright (c) 2017, Fabian Greif
  *
  * This file is part of the modm project.
@@ -21,7 +21,7 @@
 namespace modm
 {
 
-namespace avr
+namespace platform
 {
 
 /**
@@ -29,7 +29,7 @@ namespace avr
  *
  * @ingroup		{{partname}}_adc
  */
-class AdcInterrupt : public modm::avr::Adc, public modm::AdcInterrupt
+class AdcInterrupt : public modm::platform::Adc, public modm::AdcInterrupt
 {
 public:
 	static inline void
@@ -42,7 +42,7 @@ public:
 	static Handler handler;
 };
 
-}	// namespace avr
+}	// namespace platform
 
 }	// namespace modm
 

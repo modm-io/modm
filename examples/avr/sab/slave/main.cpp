@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2010-2011, Fabian Greif
- * Copyright (c) 2013, 2015-2016, Niklas Hauser
+ * Copyright (c) 2013, 2015-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -20,8 +20,8 @@
 #include <modm/architecture/platform.hpp>
 #include <modm/communication/sab/slave.hpp>
 
-using namespace modm::atmega;
-typedef modm::avr::SystemClock clock;
+using namespace modm::platform;
+typedef modm::platform::SystemClock clock;
 
 // ----------------------------------------------------------------------------
 // wrapper class for the A/D converter

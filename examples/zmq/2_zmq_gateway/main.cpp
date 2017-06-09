@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016-2017, Sascha Schade
+ * Copyright (c) 2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -46,13 +47,13 @@ static constexpr modm::Can::Bitrate canBusBitRate = modm::Can::kBps125;
    With SocketCAN the baudrate must be set with the operating system.
    $ ip link set can0 type can bitrate
 */
-modm::hosted::SerialInterface port("/dev/ttyUSB0", 115200);
-using CanUsb = modm::hosted::CanUsb<modm::hosted::SerialInterface>;
+modm::platform::SerialInterface port("/dev/ttyUSB0", 115200);
+using CanUsb = modm::platform::CanUsb<modm::platform::SerialInterface>;
 CanUsb canUsb(port);
-// static modm::hosted::SocketCan canSocket;
+// static modm::platform::SocketCan canSocket;
 
 static modm::CanConnector< CanUsb > canConnector(&canUsb);
-// static modm::CanConnector< modm::hosted::SocketCan > canConnector(&canSocket);
+// static modm::CanConnector< modm::platform::SocketCan > canConnector(&canSocket);
 
 #undef MODM_LOG_LEVEL
 #define	MODM_LOG_LEVEL modm::log::DEBUG

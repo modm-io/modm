@@ -24,7 +24,7 @@
 namespace modm
 {
 
-namespace avr
+namespace platform
 {
 
 /**
@@ -156,7 +156,7 @@ protected:
 	initialize(Prescaler prescaler);
 };
 
-} // namespace avr
+} // namespace platform
 
 } // namespace modm
 

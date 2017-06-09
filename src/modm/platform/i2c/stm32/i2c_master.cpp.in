@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016, Niklas Hauser
+ * Copyright (c) 2012-2017, Niklas Hauser
  * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2014-2016, Sascha Schade
  *
@@ -151,11 +151,11 @@
 
 #if SERIAL_DEBUGGING
 #	include "../../uart/stm32/uart_5.hpp"
-	typedef modm::stm32::Uart5 DebugUart;
+	typedef modm::platform::Uart5 DebugUart;
 #	include <modm/io/iostream.hpp>
 	extern modm::IOStream stream;
 #	define DEBUG_STREAM(x) stream << x << "\n"
-#	define DEBUG(x) modm::stm32::Uart5::write(x)
+#	define DEBUG(x) modm::platform::Uart5::write(x)
 #else
 #	define DEBUG_STREAM(x)
 #	define DEBUG(x)
@@ -584,7 +584,7 @@ MODM_ISR(I2C{{ id }}_ER)
 // ----------------------------------------------------------------------------
 
 void
-modm::stm32::I2cMaster{{ id }}::initializeWithPrescaler(uint8_t peripheralFrequency, uint8_t riseTime, uint16_t prescaler)
+modm::platform::I2cMaster{{ id }}::initializeWithPrescaler(uint8_t peripheralFrequency, uint8_t riseTime, uint16_t prescaler)
 {
 	// no reset, since we want to keep the transaction attached!
 
@@ -611,7 +611,7 @@ modm::stm32::I2cMaster{{ id }}::initializeWithPrescaler(uint8_t peripheralFreque
 }
 
 void
-modm::stm32::I2cMaster{{ id }}::reset()
+modm::platform::I2cMaster{{ id }}::reset()
 {
 	reading.length = 0;
 	writing.length = 0;
@@ -629,7 +629,7 @@ modm::stm32::I2cMaster{{ id }}::reset()
 
 // MARK: - ownership
 bool
-modm::stm32::I2cMaster{{ id }}::start(I2cTransaction *transaction, ConfigurationHandler handler)
+modm::platform::I2cMaster{{ id }}::start(I2cTransaction *transaction, ConfigurationHandler handler)
 {
 	modm::atomic::Lock lock;
 	// if we have a place in the queue and the transaction object is valid
@@ -667,7 +667,7 @@ modm::stm32::I2cMaster{{ id }}::start(I2cTransaction *transaction, Configuration
 }
 
 modm::I2cMaster::Error
-modm::stm32::I2cMaster{{ id }}::getErrorState()
+modm::platform::I2cMaster{{ id }}::getErrorState()
 {
 	return error;
 }

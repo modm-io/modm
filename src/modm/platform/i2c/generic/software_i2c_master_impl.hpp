@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2010-2012, Fabian Greif
  * Copyright (c) 2011, Georgi Grinshpun
- * Copyright (c) 2012-2016, Niklas Hauser
+ * Copyright (c) 2012-2017, Niklas Hauser
  * Copyright (c) 2013, David Hebbeker
  * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2014, Sascha Schade
@@ -21,7 +21,7 @@
 // debugging for serious dummies
 /*
 #include "../../uart/stm32/usart_2.hpp"
-#define DEBUG_SW_I2C(x) modm::stm32::Usart2::write(x)
+#define DEBUG_SW_I2C(x) modm::platform::Usart2::write(x)
 /*/
 #define DEBUG_SW_I2C(x)
 //*/

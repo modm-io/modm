@@ -2,7 +2,7 @@
  * Copyright (c) 2012, Fabian Greif
  * Copyright (c) 2013-2015, Kevin Läufer
  * Copyright (c) 2014, Sascha Schade
- * Copyright (c) 2016, Niklas Hauser
+ * Copyright (c) 2016-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -15,7 +15,7 @@
 #include <modm/architecture/architecture.hpp>
 
 // ----------------------------------------------------------------------------
-using namespace modm::lpc;
+using namespace modm::platform;
 
 typedef GpioOutput0_7 Led;
 

@@ -66,14 +66,14 @@
 
 // ----------------------------------------------------------------------------
 void
-modm::stm32::Timer{{ id }}::clockEnable()
+modm::platform::Timer{{ id }}::clockEnable()
 {
 	// enable clock
 	RCC->{{ apb }}ENR{{ apb_post }}  |=  RCC_{{ apb }}ENR{{ apb_post }}_TIM{{ id }}EN;
 }
 
 void
-modm::stm32::Timer{{ id }}::enable()
+modm::platform::Timer{{ id }}::enable()
 {
 	// enable clock
 	RCC->{{ apb }}ENR{{ apb_post }}  |=  RCC_{{ apb }}ENR{{ apb_post }}_TIM{{ id }}EN;
@@ -84,7 +84,7 @@ modm::stm32::Timer{{ id }}::enable()
 }
 
 void
-modm::stm32::Timer{{ id }}::disable()
+modm::platform::Timer{{ id }}::disable()
 {
 	// disable clock
 	RCC->{{ apb }}ENR{{ apb_post }} &= ~RCC_{{ apb }}ENR{{ apb_post }}_TIM{{ id }}EN;
@@ -96,7 +96,7 @@ modm::stm32::Timer{{ id }}::disable()
 
 // ----------------------------------------------------------------------------
 void
-modm::stm32::Timer{{ id }}::setMode(Mode mode, SlaveMode slaveMode,
+modm::platform::Timer{{ id }}::setMode(Mode mode, SlaveMode slaveMode,
 		SlaveModeTrigger slaveModeTrigger, MasterMode masterMode,
 		bool enableOnePulseMode)
 {
@@ -129,7 +129,7 @@ modm::stm32::Timer{{ id }}::setMode(Mode mode, SlaveMode slaveMode,
 
 // ----------------------------------------------------------------------------
 void
-modm::stm32::Timer{{ id }}::configureInputChannel(uint32_t channel,
+modm::platform::Timer{{ id }}::configureInputChannel(uint32_t channel,
 		InputCaptureMapping input, InputCapturePrescaler prescaler,
 		InputCapturePolarity polarity, uint8_t filter,
 		bool xor_ch1_3)
@@ -174,7 +174,7 @@ modm::stm32::Timer{{ id }}::configureInputChannel(uint32_t channel,
 
 // ----------------------------------------------------------------------------
 void
-modm::stm32::Timer{{ id }}::configureOutputChannel(uint32_t channel,
+modm::platform::Timer{{ id }}::configureOutputChannel(uint32_t channel,
 		OutputCompareMode_t mode, Value compareValue, PinState out)
 {
 	channel -= 1;	// 1..4 -> 0..3
@@ -212,7 +212,7 @@ modm::stm32::Timer{{ id }}::configureOutputChannel(uint32_t channel,
 
 // ----------------------------------------------------------------------------
 void
-modm::stm32::Timer{{ id }}::enableInterruptVector(bool enable, uint32_t priority)
+modm::platform::Timer{{ id }}::enableInterruptVector(bool enable, uint32_t priority)
 {
 	if (enable) {
 		// Set priority for the interrupt vector

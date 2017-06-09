@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Kevin Läufer
- * Copyright (c) 2014, 2016, Niklas Hauser
+ * Copyright (c) 2014, 2016-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -25,7 +25,7 @@
 %% endif
 
 void
-modm::stm32::Dma{{ id }}::enable()
+modm::platform::Dma{{ id }}::enable()
 {
 %% if target["family"] == "f4"
 	RCC->AHB1ENR  |= RCC_AHB1ENR_DMA{{ id }}EN;
@@ -37,7 +37,7 @@ modm::stm32::Dma{{ id }}::enable()
 }
 
 void
-modm::stm32::Dma{{ id }}::disable()
+modm::platform::Dma{{ id }}::disable()
 {
 %% if target["family"] == "f4"
 	RCC->AHB1ENR &= ~RCC_AHB1ENR_DMA{{ id }}EN;
@@ -69,7 +69,7 @@ modm::stm32::Dma{{ id }}::disable()
 %% set pointer_types = [8, 16, 32]
 %% for type in pointer_types
 void
-modm::stm32::Dma{{ id }}::Stream{{ stream_id }}::setMemorySource(uint{{type}}_t* address,
+modm::platform::Dma{{ id }}::Stream{{ stream_id }}::setMemorySource(uint{{type}}_t* address,
 	MemoryIncrementMode inc
 %% if target["family"] == "f4"
 , MemoryBurstTransfer transfer)
@@ -101,7 +101,7 @@ modm::stm32::Dma{{ id }}::Stream{{ stream_id }}::setMemorySource(uint{{type}}_t*
 }
 
 void
-modm::stm32::Dma{{ id }}::Stream{{ stream_id }}::setPeripheralSource(uint{{type}}_t* address,
+modm::platform::Dma{{ id }}::Stream{{ stream_id }}::setPeripheralSource(uint{{type}}_t* address,
 	PeripheralIncrementMode inc
 %% if target["family"] == "f4"
 , PeripheralBurstTransfer transfer)
@@ -126,7 +126,7 @@ modm::stm32::Dma{{ id }}::Stream{{ stream_id }}::setPeripheralSource(uint{{type}
 %% for type in pointer_types
 
 void
-modm::stm32::Dma{{ id }}::Stream{{ stream_id }}::setMemoryDestination(uint{{type}}_t* address,
+modm::platform::Dma{{ id }}::Stream{{ stream_id }}::setMemoryDestination(uint{{type}}_t* address,
 	MemoryIncrementMode inc
 %% if target["family"] == "f4"
 , MemoryBurstTransfer transfer)
@@ -158,7 +158,7 @@ modm::stm32::Dma{{ id }}::Stream{{ stream_id }}::setMemoryDestination(uint{{type
 
 
 void
-modm::stm32::Dma{{ id }}::Stream{{ stream_id }}::setPeripheralDestination(uint{{type}}_t* address,
+modm::platform::Dma{{ id }}::Stream{{ stream_id }}::setPeripheralDestination(uint{{type}}_t* address,
 	PeripheralIncrementMode inc
 %% if target["family"] == "f4"
 , PeripheralBurstTransfer transfer)
@@ -188,7 +188,7 @@ modm::stm32::Dma{{ id }}::Stream{{ stream_id }}::setPeripheralDestination(uint{{
 %% endfor
 
 void
-modm::stm32::Dma{{ id }}::Stream{{ stream_id }}::stop()
+modm::platform::Dma{{ id }}::Stream{{ stream_id }}::stop()
 {
 %% if target["family"] == "f4"
 	{{ reg }} &= ~DMA_SxCR_EN;
@@ -200,7 +200,7 @@ modm::stm32::Dma{{ id }}::Stream{{ stream_id }}::stop()
 }
 
 void
-modm::stm32::Dma{{ id }}::Stream{{ stream_id }}::configure(
+modm::platform::Dma{{ id }}::Stream{{ stream_id }}::configure(
 %% if target["family"] == "f4"
 	Channel channel,
 %% endif
@@ -223,7 +223,7 @@ modm::stm32::Dma{{ id }}::Stream{{ stream_id }}::configure(
 }
 
 void
-modm::stm32::Dma{{ id }}::Stream{{ stream_id }}::start()
+modm::platform::Dma{{ id }}::Stream{{ stream_id }}::start()
 {
 %% if target["family"] == "f4"
 	{{ reg }} |= DMA_SxCR_EN;
@@ -238,7 +238,7 @@ modm::stm32::Dma{{ id }}::Stream{{ stream_id }}::start()
 }
 
 bool
-modm::stm32::Dma{{ id }}::Stream{{ stream_id }}::isFinished()
+modm::platform::Dma{{ id }}::Stream{{ stream_id }}::isFinished()
 {
 %% if target["family"] == "f4"
 	return !({{ reg }} & DMA_SxCR_EN);
@@ -247,8 +247,8 @@ modm::stm32::Dma{{ id }}::Stream{{ stream_id }}::isFinished()
 %% endif
 }
 
-modm::stm32::Dma{{ id }}::Stream{{ stream_id }}::DataTransferDirection
-modm::stm32::Dma{{ id }}::Stream{{ stream_id }}::getDataTransferDirection()
+modm::platform::Dma{{ id }}::Stream{{ stream_id }}::DataTransferDirection
+modm::platform::Dma{{ id }}::Stream{{ stream_id }}::getDataTransferDirection()
 {
 	return static_cast<DataTransferDirection>(
 %% if target["family"] == "f4"

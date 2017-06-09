@@ -25,7 +25,7 @@ ${includes}
 
 ${names}
 
-using namespace modm::stm32;
+using namespace modm::platform;
 
 // Create an IODeviceWrapper around the Uart Peripheral we want to use
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;

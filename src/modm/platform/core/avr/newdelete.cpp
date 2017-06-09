@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2009-2011, Fabian Greif
  * Copyright (c) 2010, Martin Rosekeit
- * Copyright (c) 2012-2014, 2016, Niklas Hauser
+ * Copyright (c) 2012-2014, 2016-2017, Niklas Hauser
  * Copyright (c) 2015, Christian Menard
  *
  * This file is part of the modm project.
@@ -20,7 +20,7 @@
 void *
 operator new(size_t size)
 {
-	void * ptr = modm::avr::allocateMemory(size);
+	void * ptr = modm::platform::allocateMemory(size);
 	modm_assert(ptr, "core", "heap", "new", size);
 	return ptr;
 }
@@ -28,7 +28,7 @@ operator new(size_t size)
 void *
 operator new[](size_t size)
 {
-	void * ptr = modm::avr::allocateMemory(size);
+	void * ptr = modm::platform::allocateMemory(size);
 	modm_assert(ptr, "core", "heap", "new", size);
 	return ptr;
 }
@@ -36,7 +36,7 @@ operator new[](size_t size)
 void *
 operator new(size_t size, modm::MemoryTraits)
 {
-	void * ptr = modm::avr::allocateMemory(size);
+	void * ptr = modm::platform::allocateMemory(size);
 	modm_assert(ptr, "core", "heap", "new", size);
 	return ptr;
 }
@@ -44,7 +44,7 @@ operator new(size_t size, modm::MemoryTraits)
 void *
 operator new[](size_t size, modm::MemoryTraits)
 {
-	void * ptr = modm::avr::allocateMemory(size);
+	void * ptr = modm::platform::allocateMemory(size);
 	modm_assert(ptr, "core", "heap", "new", size);
 	return ptr;
 }
@@ -52,23 +52,23 @@ operator new[](size_t size, modm::MemoryTraits)
 void
 operator delete(void* ptr)
 {
-	modm::avr::freeMemory(ptr);
+	modm::platform::freeMemory(ptr);
 }
 
 void
 operator delete(void* ptr, size_t)
 {
-	modm::avr::freeMemory(ptr);
+	modm::platform::freeMemory(ptr);
 }
 
 void
 operator delete[](void* ptr)
 {
-	modm::avr::freeMemory(ptr);
+	modm::platform::freeMemory(ptr);
 }
 
 void
 operator delete[](void* ptr, size_t)
 {
-	modm::avr::freeMemory(ptr);
+	modm::platform::freeMemory(ptr);
 }

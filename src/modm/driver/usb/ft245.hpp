@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Fabian Greif
  * Copyright (c) 2012, 2015, Sascha Schade
- * Copyright (c) 2012-2014, 2016, Niklas Hauser
+ * Copyright (c) 2012-2014, 2016-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -34,11 +34,11 @@ namespace modm
 	 * #include <modm/architecture/architecture.hpp>
 	 * #include <modm/driver/usb/ft245.hpp>
 	 *
-	 * typedef modm::stm32::GpioPort<modm::stm32::GpioD0, 8> myPort;
-	 * typedef modm::stm32::GpioInputC11  Rxf;
-	 * typedef modm::stm32::GpioInputC10  Txe;
-	 * typedef modm::stm32::GpioOutputA15 Rd;
-	 * typedef modm::stm32::GpioOutputA9  Wr;
+	 * typedef modm::platform::GpioPort<modm::platform::GpioD0, 8> myPort;
+	 * typedef modm::platform::GpioInputC11  Rxf;
+	 * typedef modm::platform::GpioInputC10  Txe;
+	 * typedef modm::platform::GpioOutputA15 Rd;
+	 * typedef modm::platform::GpioOutputA9  Wr;
 	 *
 	 * typedef modm::Ft245<myPort, Rd, Wr, Rxf, Txe> myFt;
 	 *

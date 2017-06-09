@@ -21,7 +21,7 @@
 
 namespace modm
 {
-namespace stm32
+namespace platform
 {
 /**
  * General Purpose Timer {{ id }}
@@ -403,7 +403,7 @@ public:
 	}
 };
 
-}	// namespace stm32
+}	// namespace platform
 
 }	// namespace modm
 

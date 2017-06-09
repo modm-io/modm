@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2016, Niklas Hauser
+ * Copyright (c) 2013-2017, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
  * Copyright (c) 2017, Fabian Greif
  *
@@ -23,17 +23,17 @@
 // bit 6 (0x40) is used for transfer multiple byte
 // bit 5-0 (0x3f) are used to store the acquire count
 uint8_t
-modm::avr::SpiMaster{{ id }}::state(0);
+modm::platform::SpiMaster{{ id }}::state(0);
 
 void *
-modm::avr::SpiMaster{{ id }}::context(nullptr);
+modm::platform::SpiMaster{{ id }}::context(nullptr);
 
 modm::Spi::ConfigurationHandler
-modm::avr::SpiMaster{{ id }}::configuration(nullptr);
+modm::platform::SpiMaster{{ id }}::configuration(nullptr);
 // ----------------------------------------------------------------------------
 
 void
-modm::avr::SpiMaster{{ id }}::initialize(Prescaler prescaler)
+modm::platform::SpiMaster{{ id }}::initialize(Prescaler prescaler)
 {
 	modm::atomic::Lock lock;
 
@@ -44,7 +44,7 @@ modm::avr::SpiMaster{{ id }}::initialize(Prescaler prescaler)
 // ----------------------------------------------------------------------------
 
 uint8_t
-modm::avr::SpiMaster{{ id }}::acquire(void *ctx, ConfigurationHandler handler)
+modm::platform::SpiMaster{{ id }}::acquire(void *ctx, ConfigurationHandler handler)
 {
 	if (context == nullptr)
 	{
@@ -65,7 +65,7 @@ modm::avr::SpiMaster{{ id }}::acquire(void *ctx, ConfigurationHandler handler)
 }
 
 uint8_t
-modm::avr::SpiMaster{{ id }}::release(void *ctx)
+modm::platform::SpiMaster{{ id }}::release(void *ctx)
 {
 	if (ctx == context)
 	{
@@ -77,7 +77,7 @@ modm::avr::SpiMaster{{ id }}::release(void *ctx)
 // ----------------------------------------------------------------------------
 
 modm::ResumableResult<uint8_t>
-modm::avr::SpiMaster{{ id }}::transfer(uint8_t data)
+modm::platform::SpiMaster{{ id }}::transfer(uint8_t data)
 {
 %% if options["busywait"]
 	SPDR{{ id }} = data;
@@ -116,7 +116,7 @@ modm::avr::SpiMaster{{ id }}::transfer(uint8_t data)
 }
 
 modm::ResumableResult<void>
-modm::avr::SpiMaster{{ id }}::transfer(uint8_t *tx, uint8_t *rx, std::size_t length)
+modm::platform::SpiMaster{{ id }}::transfer(uint8_t *tx, uint8_t *rx, std::size_t length)
 {
 %% if options["busywait"]
 	for (std::size_t index = 0; index < length; index++)

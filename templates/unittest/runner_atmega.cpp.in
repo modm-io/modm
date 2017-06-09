@@ -21,8 +21,8 @@
 
 #include <modm/architecture/platform.hpp>
 
-using namespace modm::atmega;
-typedef modm::avr::SystemClock clock;
+using namespace modm::platform;
+typedef modm::platform::SystemClock clock;
 
 ${includes}
 

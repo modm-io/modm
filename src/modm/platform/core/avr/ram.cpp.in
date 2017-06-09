@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2009-2011, 2017, Fabian Greif
  * Copyright (c) 2010, Martin Rosekeit
- * Copyright (c) 2012-2016, Niklas Hauser
+ * Copyright (c) 2012-2017, Niklas Hauser
  * Copyright (c) 2013, Sascha Schade
  *
  * This file is part of the modm project.
@@ -80,7 +80,7 @@ initializeMemory(void)
  * TODO description
  */
 void *
-modm::avr::allocateMemory(std::size_t requestedSize)
+modm::platform::allocateMemory(std::size_t requestedSize)
 {
 	if (!modm_assert_debug(requestedSize > 0 && requestedSize <= MAX_BLOCK_PARTS * BLOCK_SIZE,
 						   "core", "heap", "malloc", requestedSize))
@@ -156,7 +156,7 @@ modm::avr::allocateMemory(std::size_t requestedSize)
 
 // ----------------------------------------------------------------------------
 void
-modm::avr::freeMemory(void *ptr)
+modm::platform::freeMemory(void *ptr)
 {
 	if (ptr == 0) {
 		return;
@@ -239,13 +239,13 @@ printMemoryLayout(void)
 void *
 allocate(size_t size)
 {
-	return modm::avr::allocateMemory(size);
+	return modm::platform::allocateMemory(size);
 }
 
 void
 release(void *p)
 {
-	modm::avr::freeMemory(p);
+	modm::platform::freeMemory(p);
 }
 
 int

@@ -2,7 +2,7 @@
  * Copyright (c) 2009, Martin Rosekeit
  * Copyright (c) 2009-2012, Fabian Greif
  * Copyright (c) 2010, Georgi Grinshpun
- * Copyright (c) 2012-2016, Niklas Hauser
+ * Copyright (c) 2012-2017, Niklas Hauser
  * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2014, Sascha Schade
  *
@@ -20,20 +20,20 @@
 // Bit0: single transfer state
 // Bit1: block transfer state
 uint8_t
-modm::stm32::SpiMaster{{ id }}::state(0);
+modm::platform::SpiMaster{{ id }}::state(0);
 
 uint8_t
-modm::stm32::SpiMaster{{ id }}::count(0);
+modm::platform::SpiMaster{{ id }}::count(0);
 
 void *
-modm::stm32::SpiMaster{{ id }}::context(nullptr);
+modm::platform::SpiMaster{{ id }}::context(nullptr);
 
 modm::Spi::ConfigurationHandler
-modm::stm32::SpiMaster{{ id }}::configuration(nullptr);
+modm::platform::SpiMaster{{ id }}::configuration(nullptr);
 // ----------------------------------------------------------------------------
 
 uint8_t
-modm::stm32::SpiMaster{{ id }}::acquire(void *ctx, ConfigurationHandler handler)
+modm::platform::SpiMaster{{ id }}::acquire(void *ctx, ConfigurationHandler handler)
 {
 	if (context == nullptr)
 	{
@@ -54,7 +54,7 @@ modm::stm32::SpiMaster{{ id }}::acquire(void *ctx, ConfigurationHandler handler)
 }
 
 uint8_t
-modm::stm32::SpiMaster{{ id }}::release(void *ctx)
+modm::platform::SpiMaster{{ id }}::release(void *ctx)
 {
 	if (ctx == context)
 	{
@@ -66,7 +66,7 @@ modm::stm32::SpiMaster{{ id }}::release(void *ctx)
 // ----------------------------------------------------------------------------
 
 modm::ResumableResult<uint8_t>
-modm::stm32::SpiMaster{{ id }}::transfer(uint8_t data)
+modm::platform::SpiMaster{{ id }}::transfer(uint8_t data)
 {
 	// this is a manually implemented "fast resumable function"
 	// there is no context or nesting protection, since we don't need it.
@@ -99,7 +99,7 @@ modm::stm32::SpiMaster{{ id }}::transfer(uint8_t data)
 }
 
 modm::ResumableResult<void>
-modm::stm32::SpiMaster{{ id }}::transfer(
+modm::platform::SpiMaster{{ id }}::transfer(
 		uint8_t * tx, uint8_t * rx, std::size_t length)
 {
 	// this is a manually implemented "fast resumable function"

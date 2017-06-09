@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2012, 2016, Sascha Schade
  * Copyright (c) 2013-2014, Kevin Läufer
- * Copyright (c) 2014, 2016, Niklas Hauser
+ * Copyright (c) 2014, 2016-2017, Niklas Hauser
  * Copyright (c) 2017, Fabian Greif
  *
  * This file is part of the modm project.
@@ -25,7 +25,7 @@
 // ----------------------------------------------------------------------------
 namespace modm
 {
-namespace lpc
+namespace platform
 {
 %% if options["buffer.tx"] > 0
 modm::atomic::Queue<modm::can::Message, {{ options["buffer.tx"] }}> txQueue;
@@ -125,8 +125,8 @@ readMessageObject(modm::can::Message & message, uint8_t messageObjectId)
 #define STAT_EWARN		(1 << 6)
 #define STAT_BOFF		(1 << 7)
 
-modm::lpc::Can::BusState
-modm::lpc::Can::getBusState()
+modm::platform::Can::BusState
+modm::platform::Can::getBusState()
 {
 	if (LPC_CAN->STAT & STAT_BOFF) {
 		return BusState::Off;
@@ -152,7 +152,7 @@ modm::lpc::Can::getBusState()
  *
  */
 void
-modm::lpc::Can::CAN_tx(uint8_t /* msg_obj_num */)
+modm::platform::Can::CAN_tx(uint8_t /* msg_obj_num */)
 {
 %% if options["buffer.tx"] > 0
 	// Send next from queue, if available
@@ -204,7 +204,7 @@ modm::lpc::Can::CAN_tx(uint8_t /* msg_obj_num */)
  */
 %% if options["buffer.rx"] > 0
 void
-modm::lpc::Can::CAN_rx(uint8_t msg_obj_num)
+modm::platform::Can::CAN_rx(uint8_t msg_obj_num)
 {
 	// Move received message to queue if possible
 
@@ -212,7 +212,7 @@ modm::lpc::Can::CAN_rx(uint8_t msg_obj_num)
 		modm::can::Message message;
 		readMessageObject(message, msg_obj_num);
 		if (!rxQueue.push(message)) {
-			modm::ErrorReport::report(modm::lpc::CAN_RX_OVERFLOW);
+			modm::ErrorReport::report(modm::platform::CAN_RX_OVERFLOW);
 		}
 	}
 	else {
@@ -230,7 +230,7 @@ modm::lpc::Can::CAN_rx(uint8_t msg_obj_num)
 }
 %% else
 void
-modm::lpc::Can::CAN_rx(uint8_t /* msg_obj_num */)
+modm::platform::Can::CAN_rx(uint8_t /* msg_obj_num */)
 {
 }
 %% endif
@@ -238,7 +238,7 @@ modm::lpc::Can::CAN_rx(uint8_t /* msg_obj_num */)
 // ----------------------------------------------------------------------------
 
 void
-modm::lpc::Can::CAN_error(uint32_t /* error_info */)
+modm::platform::Can::CAN_error(uint32_t /* error_info */)
 {
 	// TODO Do some error handling, use ErrorReporter.
 }
@@ -255,7 +255,7 @@ MODM_ISR(CAN) {
 // ----------------------------------------------------------------------------
 
 bool
-modm::lpc::Can::sendMessage(const can::Message & message)
+modm::platform::Can::sendMessage(const can::Message & message)
 {
 	// This function is not reentrant. If one of the mailboxes is empty it
 	// means that the software buffer is empty too. Therefore the mailbox
@@ -272,7 +272,7 @@ modm::lpc::Can::sendMessage(const can::Message & message)
 		 * at the moment. */
 %% if options["buffer.tx"] > 0
 		if (!txQueue.push(message)) {
-			modm::ErrorReport::report(modm::lpc::CAN_TX_OVERFLOW);
+			modm::ErrorReport::report(modm::platform::CAN_TX_OVERFLOW);
 			// All Message Objects are full and no space left in software buffer.
 			return false;
 		}
@@ -302,7 +302,7 @@ modm::lpc::Can::sendMessage(const can::Message & message)
 // ----------------------------------------------------------------------------
 
 bool
-modm::lpc::Can::getMessage(can::Message & message)
+modm::platform::Can::getMessage(can::Message & message)
 {
 %% if options["buffer.rx"] > 0
 	if (rxQueue.isEmpty())
@@ -323,7 +323,7 @@ modm::lpc::Can::getMessage(can::Message & message)
 			modm::can::Message newMessage;
 			readMessageObject(newMessage, messageObjectId);
 			if (!rxQueue.push(newMessage)) {
-				modm::ErrorReport::report(modm::lpc::CAN_RX_OVERFLOW);
+				modm::ErrorReport::report(modm::platform::CAN_RX_OVERFLOW);
 			}
 		}
 		return true;
@@ -346,7 +346,7 @@ modm::lpc::Can::getMessage(can::Message & message)
 // ----------------------------------------------------------------------------
 
 bool
-modm::lpc::Can::isMessageAvailable()
+modm::platform::Can::isMessageAvailable()
 {
 %% if options["buffer.rx"] > 0
 	return !rxQueue.isEmpty();
@@ -360,7 +360,7 @@ modm::lpc::Can::isMessageAvailable()
 // ----------------------------------------------------------------------------
 
 bool
-modm::lpc::Can::isReadyToSend()
+modm::platform::Can::isReadyToSend()
 {
 %% if options["buffer.tx"] > 0
 	return txQueue.isNotFull();

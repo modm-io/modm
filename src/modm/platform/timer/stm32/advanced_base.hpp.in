@@ -19,7 +19,7 @@
 namespace modm
 {
 
-namespace stm32
+namespace platform
 {
 
 /// @ingroup	{{partname}}_timer
@@ -160,7 +160,7 @@ public:
 	enableOutput();
 };
 
-}	// namespace stm32
+}	// namespace platform
 
 }	// namespace modm
 

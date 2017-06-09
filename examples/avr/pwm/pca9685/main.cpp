@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015, Christian Menard
- * Copyright (c) 2015-2016, Niklas Hauser
+ * Copyright (c) 2015-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -13,8 +13,8 @@
 #include <modm/architecture/platform.hpp>
 #include <modm/driver/pwm/pca9685.hpp>
 
-using namespace modm::atmega;
-typedef modm::avr::SystemClock systemClock;
+using namespace modm::platform;
+typedef modm::platform::SystemClock systemClock;
 
 int 
 main()

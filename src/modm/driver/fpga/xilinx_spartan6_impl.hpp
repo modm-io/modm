@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013-2014, Sascha Schade
- * Copyright (c) 2013, 2016, Niklas Hauser
+ * Copyright (c) 2013, 2016-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -42,12 +42,12 @@ modm::XilinxSpartan6Parallel<Cclk, DataLow, DataHigh, ProgB, InitB, Done, DataSo
 	Led1::setOutput();
 
 	// Reset FPGA
-	ProgB::setOutput(modm::stm32::Gpio::OutputType::OpenDrain, modm::stm32::Gpio::OutputSpeed::MHz50);
+	ProgB::setOutput(modm::platform::Gpio::OutputType::OpenDrain, modm::platform::Gpio::OutputSpeed::MHz50);
 	ProgB::reset();
 
 	// TODO what is about alternate function and how to restore?
-	InitB::setInput(modm::stm32::Gpio::InputType::PullDown);
-	Done::setInput(modm::stm32::Gpio::InputType::Floating);
+	InitB::setInput(modm::platform::Gpio::InputType::PullDown);
+	Done::setInput(modm::platform::Gpio::InputType::Floating);
 
 	{
 		// wait until InitB and Done go low
@@ -66,7 +66,7 @@ modm::XilinxSpartan6Parallel<Cclk, DataLow, DataHigh, ProgB, InitB, Done, DataSo
 	}
 
 	// Alternate function wird hiermit auch deaktiviert
-	Cclk::setOutput(modm::stm32::Gpio::OutputType::PushPull, modm::stm32::Gpio::OutputSpeed::MHz50);
+	Cclk::setOutput(modm::platform::Gpio::OutputType::PushPull, modm::platform::Gpio::OutputSpeed::MHz50);
 	Cclk::reset();
 
 	DataLow::setOutput();

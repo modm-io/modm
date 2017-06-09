@@ -2,7 +2,7 @@
  * Copyright (c) 2009, Martin Rosekeit
  * Copyright (c) 2009-2012, 2017, Fabian Greif
  * Copyright (c) 2010, Georgi Grinshpun
- * Copyright (c) 2011-2014, 2016, Niklas Hauser
+ * Copyright (c) 2011-2014, 2016-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -45,7 +45,7 @@ MODM_ISR(USART{{ id }}_UDRE)
 
 // MARK: - write blocking
 void
-modm::avr::Uart{{ id }}::writeBlocking(uint8_t data)
+modm::platform::Uart{{ id }}::writeBlocking(uint8_t data)
 {
 	// wait until there is some place in the buffer
 	while (!write(data))
@@ -57,7 +57,7 @@ modm::avr::Uart{{ id }}::writeBlocking(uint8_t data)
 }
 
 void
-modm::avr::Uart{{ id }}::writeBlocking(const uint8_t *data, std::size_t length)
+modm::platform::Uart{{ id }}::writeBlocking(const uint8_t *data, std::size_t length)
 {
 	// first push everything into the buffer
 	for (std::size_t i = 0; i < length; ++i)
@@ -72,7 +72,7 @@ modm::avr::Uart{{ id }}::writeBlocking(const uint8_t *data, std::size_t length)
 }
 
 void
-modm::avr::Uart{{ id }}::flushWriteBuffer()
+modm::platform::Uart{{ id }}::flushWriteBuffer()
 {
 	// just wait until the last byte has been sent
 	while (!isWriteFinished())
@@ -81,7 +81,7 @@ modm::avr::Uart{{ id }}::flushWriteBuffer()
 
 // MARK: - write
 bool
-modm::avr::Uart{{ id }}::write(uint8_t data)
+modm::platform::Uart{{ id }}::write(uint8_t data)
 {
 	if (!txBuffer.push(data))
 		return false;
@@ -95,7 +95,7 @@ modm::avr::Uart{{ id }}::write(uint8_t data)
 }
 
 std::size_t
-modm::avr::Uart{{ id }}::write(const uint8_t *data, std::size_t length)
+modm::platform::Uart{{ id }}::write(const uint8_t *data, std::size_t length)
 {
 	for (std::size_t i = 0; i < length; ++i)
 	{
@@ -109,14 +109,14 @@ modm::avr::Uart{{ id }}::write(const uint8_t *data, std::size_t length)
 }
 
 bool
-modm::avr::Uart{{ id }}::isWriteFinished()
+modm::platform::Uart{{ id }}::isWriteFinished()
 {
 	return (txBuffer.isEmpty() && !(UCSR{{ id }}B & (1 << UDRIE{{ id }})));
 }
 
 // MARK: - discard
 std::size_t
-modm::avr::Uart{{ id }}::discardTransmitBuffer()
+modm::platform::Uart{{ id }}::discardTransmitBuffer()
 {
 	{
 		::modm::atomic::Lock lock;

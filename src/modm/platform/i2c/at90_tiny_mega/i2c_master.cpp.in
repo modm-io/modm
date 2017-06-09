@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2012-2016, Niklas Hauser
  * Copyright (c) 2012, 2017, Fabian Greif
+ * Copyright (c) 2012-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -19,7 +19,7 @@
 // uncomment to debug your driver using simple uart
 /*
 #include "../../uart/at90_tiny_mega/uart0.hpp"
-#define DEBUG(x) modm::avr::Uart0::write(x)
+#define DEBUG(x) modm::platform::Uart0::write(x)
 /*/
 #define DEBUG(x)
 //*/
@@ -206,7 +206,7 @@ MODM_ISR(TWI)
 
 // ----------------------------------------------------------------------------
 void
-modm::avr::I2cMaster::initialize(uint8_t twbr, Prescaler prescaler)
+modm::platform::I2cMaster::initialize(uint8_t twbr, Prescaler prescaler)
 {
 	// no reset, since we want to keep the transaction attached!
 	TWBR = twbr;
@@ -219,7 +219,7 @@ modm::avr::I2cMaster::initialize(uint8_t twbr, Prescaler prescaler)
 }
 
 void
-modm::avr::I2cMaster::reset()
+modm::platform::I2cMaster::reset()
 {
 	DEBUG('T');
 	writing.length = 0;
@@ -230,13 +230,13 @@ modm::avr::I2cMaster::reset()
 }
 
 modm::I2cMaster::Error
-modm::avr::I2cMaster::getErrorState()
+modm::platform::I2cMaster::getErrorState()
 {
 	return errorState;
 }
 
 bool
-modm::avr::I2cMaster::start(I2cTransaction *transaction, ConfigurationHandler handler)
+modm::platform::I2cMaster::start(I2cTransaction *transaction, ConfigurationHandler handler)
 {
 	if (!modm::accessor::asVolatile(::transaction) && transaction)
 	{

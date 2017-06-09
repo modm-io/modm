@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2010-2011, Fabian Greif
- * Copyright (c) 2013, Niklas Hauser
+ * Copyright (c) 2013, 2017, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
  *
  * This file is part of the modm project.
@@ -14,7 +14,7 @@
 #include <modm/architecture/architecture.hpp>
 #include <modm/driver/display.hpp>
 
-using namespace modm::atmega;
+using namespace modm::platform;
 
 // define the pins used by the LCD
 namespace lcd

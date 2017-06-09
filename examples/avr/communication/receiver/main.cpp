@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011, Fabian Greif
- * Copyright (c) 2012-2014, 2016, Niklas Hauser
+ * Copyright (c) 2012-2014, 2016-2017, Niklas Hauser
  * Copyright (c) 2014, 2016, Sascha Schade
  *
  * This file is part of the modm project.
@@ -18,8 +18,8 @@
 
 #include <modm/driver/can/mcp2515.hpp>
 
-using namespace modm::atmega;
-typedef modm::avr::SystemClock clock;
+using namespace modm::platform;
+typedef modm::platform::SystemClock clock;
 
 // set new log level
 #undef MODM_LOG_LEVEL

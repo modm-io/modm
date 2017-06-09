@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Niklas Hauser
+ * Copyright (c) 2016-2017, Niklas Hauser
  * Copyright (c) 2017, Fabian Greif
  *
  * This file is part of the modm project.
@@ -19,7 +19,7 @@
 namespace modm
 {
 
-namespace stm32
+namespace platform
 {
 
 // Gpio Classes created from the XML Device File Gpio Description
@@ -79,8 +79,8 @@ public:
 		%% for af in (gpio.af if "af" in gpio else []) | lbuild.listify
 			%% if "type" in af and af["type"] == "analog"
 	/// {{name}} connects to {{af["name"]}} of {{af["peripheral"]}}
-	//static const ::modm::stm32::{{af["peripheral"]}}::Channel
-	//{{af["peripheral"]}}Channel = ::modm::stm32::{{af["peripheral"]}}::Channel::{{ af["name"] }};
+	//static const ::modm::platform::{{af["peripheral"]}}::Channel
+	//{{af["peripheral"]}}Channel = ::modm::platform::{{af["peripheral"]}}::Channel::{{ af["name"] }};
 			%% endif
 		%% endfor
 		%% if type in ["" , "Output"]
@@ -323,7 +323,7 @@ public:
 	%% endfor
 %% endfor
 
-} // namespace stm32
+} // namespace platform
 
 } // namespace modm
 

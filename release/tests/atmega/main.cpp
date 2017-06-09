@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Fabian Greif
  * Copyright (c) 2014-2016, Sascha Schade
- * Copyright (c) 2016, Niklas Hauser
+ * Copyright (c) 2016-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -14,12 +14,12 @@
 #include <modm/architecture/architecture.hpp>
 
 #if defined(__AVR_AT90CAN128__) || defined(__AVR_AT90CAN64__) || defined(__AVR_AT90CAN32__)
-using namespace modm::at90;
+using namespace modm::platform;
 #else
-using namespace modm::atmega;
+using namespace modm::platform;
 #endif
 
-typedef modm::avr::SystemClock clock;
+typedef modm::platform::SystemClock clock;
 
 typedef Uart0 uart;
 

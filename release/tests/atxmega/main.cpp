@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011-2012, Fabian Greif
- * Copyright (c) 2012, 2016, Niklas Hauser
+ * Copyright (c) 2012, 2016-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -12,7 +12,7 @@
 
 #include <modm/architecture/architecture.hpp>
 
-modm::xmega::BufferedUartD0 uart(9600);
+modm::platform::BufferedUartD0 uart(9600);
 
 GPIO_OUTPUT(Out, A, 0);
 GPIO_INPUT(In, A, 1);

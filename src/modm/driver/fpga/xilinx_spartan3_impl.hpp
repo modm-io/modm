@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2013, Niklas Hauser
  * Copyright (c) 2013-2014, Sascha Schade
+ * Copyright (c) 2013, 2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -34,19 +34,19 @@ void
 modm::XilinxSpartan3<Cclk, Din, ProgB, InitB, Done, DataSource>::configurePins()
 {
 	Cclk::setOutput(
-			modm::stm32::Gpio::OutputType::PushPull,
-			modm::stm32::Gpio::OutputSpeed::MHz50);
+			modm::platform::Gpio::OutputType::PushPull,
+			modm::platform::Gpio::OutputSpeed::MHz50);
 	Cclk::reset();
 
-	Done::setInput(modm::stm32::Gpio::InputType::Floating);
+	Done::setInput(modm::platform::Gpio::InputType::Floating);
 	ProgB::setOutput(
-			modm::stm32::Gpio::OutputType::OpenDrain,
-			modm::stm32::Gpio::OutputSpeed::MHz50);
+			modm::platform::Gpio::OutputType::OpenDrain,
+			modm::platform::Gpio::OutputSpeed::MHz50);
 
-	InitB::setInput(modm::stm32::Gpio::InputType::PullDown);
+	InitB::setInput(modm::platform::Gpio::InputType::PullDown);
 	Din::setOutput(
-			modm::stm32::Gpio::OutputType::PushPull,
-			modm::stm32::Gpio::OutputSpeed::MHz50);
+			modm::platform::Gpio::OutputType::PushPull,
+			modm::platform::Gpio::OutputSpeed::MHz50);
 }
 
 template <	typename Cclk,

@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2009-2011, Fabian Greif
  * Copyright (c) 2010, Martin Rosekeit
- * Copyright (c) 2012-2014, Niklas Hauser
+ * Copyright (c) 2012-2014, 2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -20,7 +20,7 @@
 namespace modm
 {
 
-namespace avr
+namespace platform
 {
 
 void *
@@ -31,7 +31,7 @@ freeMemory(void *ptr);
 
 // TODO functions to retrieve status informations about used memory
 
-}	// namespace avr
+}	// namespace platform
 
 }	// namespace modm
 

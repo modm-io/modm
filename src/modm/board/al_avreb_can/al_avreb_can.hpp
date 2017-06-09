@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Niklas Hauser
+ * Copyright (c) 2016-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -19,12 +19,12 @@
 #include <modm/architecture/platform.hpp>
 #include <modm/debug/logger.hpp>
 
-using namespace modm::at90;
+using namespace modm::platform;
 
 namespace Board
 {
 
-using systemClock = modm::avr::SystemClock;
+using systemClock = modm::platform::SystemClock;
 
 // Arduino Footprint
 using Led0 = modm::GpioInverted<GpioOutputF0>;

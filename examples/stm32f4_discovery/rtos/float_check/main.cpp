@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2014, Georgi Grinshpun
  * Copyright (c) 2014, Sascha Schade
- * Copyright (c) 2015-2016, Niklas Hauser
+ * Copyright (c) 2015-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -14,7 +14,7 @@
 #include <modm/architecture/platform.hpp>
 #include <modm/processing/rtos.hpp>
 
-using namespace modm::stm32;
+using namespace modm::platform;
 using namespace modm::cortex;
 
 /**
@@ -76,7 +76,7 @@ public:
 			sleep(SleepTime);
 
 			Gpio::toggle();
-			modm::stm32::Usart2::writeBlocking(i + c);
+			modm::platform::Usart2::writeBlocking(i + c);
 
 			i = (i+1)%10;
 
@@ -98,9 +98,9 @@ main()
 {
 	Board::initialize();
 
-	GpioA2::connect(modm::stm32::Usart2::Tx);
-	GpioA3::connect(modm::stm32::Usart2::Rx, Gpio::InputType::PullUp);
-	modm::stm32::Usart2::initialize<Board::systemClock, modm::stm32::Usart2::B115200>(6);
+	GpioA2::connect(modm::platform::Usart2::Tx);
+	GpioA3::connect(modm::platform::Usart2::Rx, Gpio::InputType::PullUp);
+	modm::platform::Usart2::initialize<Board::systemClock, modm::platform::Usart2::B115200>(6);
 
     while (1)
     {

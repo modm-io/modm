@@ -20,7 +20,7 @@
 
 // ----------------------------------------------------------------------------
 void
-modm::stm32::{{ name }}::setParity(const Parity parity)
+modm::platform::{{ name }}::setParity(const Parity parity)
 {
 	uint32_t flags = {{ peripheral }}->CR1;
 	flags &= ~(USART_CR1_PCE | USART_CR1_PS | USART_CR1_M);
@@ -33,7 +33,7 @@ modm::stm32::{{ name }}::setParity(const Parity parity)
 }
 
 void
-modm::stm32::{{ name }}::enable()
+modm::platform::{{ name }}::enable()
 {
 	// FIXME: there seems to be a bug in the stm32f3xxlib which does not provide
 	//        the necessary RCC_APB1ENR_UART5EN define and probably defines
@@ -47,7 +47,7 @@ modm::stm32::{{ name }}::enable()
 }
 
 void
-modm::stm32::{{ name }}::disable()
+modm::platform::{{ name }}::disable()
 {
 	// TX, RX, Uart, etc. Disable
 	{{ peripheral }}->CR1 = 0;
@@ -59,9 +59,9 @@ modm::stm32::{{ name }}::disable()
 }
 %% if target["family"] != "f1"
 template<class SystemClock, uint32_t baudrate,
-		modm::stm32::{{ name }}::OversamplingMode oversample>
+		modm::platform::{{ name }}::OversamplingMode oversample>
 void modm_always_inline
-modm::stm32::{{ name }}::initialize(Parity parity)
+modm::platform::{{ name }}::initialize(Parity parity)
 {
 	initializeWithBrr(UartBaudrate::getBrr<SystemClock::{{ uart_name ~ id }}, baudrate>(),
 			parity,
@@ -71,7 +71,7 @@ modm::stm32::{{ name }}::initialize(Parity parity)
 
 template<class SystemClock, uint32_t baudrate>
 void modm_always_inline
-modm::stm32::{{ name }}::initialize(Parity parity)
+modm::platform::{{ name }}::initialize(Parity parity)
 {
 %% if target["family"] == "f1"
 	initializeWithBrr(UartBaudrate::getBrr<SystemClock::{{ uart_name ~ id }}, baudrate>(), parity);
@@ -84,9 +84,9 @@ modm::stm32::{{ name }}::initialize(Parity parity)
 
 void inline
 %% if target["family"] != "f1"
-modm::stm32::{{ name }}::initializeWithBrr(uint16_t brr, Parity parity, OversamplingMode oversample)
+modm::platform::{{ name }}::initializeWithBrr(uint16_t brr, Parity parity, OversamplingMode oversample)
 %% else
-modm::stm32::{{ name }}::initializeWithBrr(uint16_t brr, Parity parity)
+modm::platform::{{ name }}::initializeWithBrr(uint16_t brr, Parity parity)
 %% endif
 {
 	enable();
@@ -104,7 +104,7 @@ modm::stm32::{{ name }}::initializeWithBrr(uint16_t brr, Parity parity)
 
 %% if target["family"] != "f1"
 void
-modm::stm32::{{ name }}::setOversamplingMode(OversamplingMode mode)
+modm::platform::{{ name }}::setOversamplingMode(OversamplingMode mode)
 {
 	if(mode == OversamplingMode::By16) {
 		{{ peripheral }}->CR1 &= ~static_cast<uint32_t>(OversamplingMode::By8);
@@ -116,7 +116,7 @@ modm::stm32::{{ name }}::setOversamplingMode(OversamplingMode mode)
 %% if uart_name == "Usart"
 
 void
-modm::stm32::{{ name }}::setSpiClock(SpiClock clk)
+modm::platform::{{ name }}::setSpiClock(SpiClock clk)
 {
 	if(clk == SpiClock::Disabled) {
 		{{ peripheral }}->CR2 &= ~static_cast<uint32_t>(SpiClock::Enabled);
@@ -126,7 +126,7 @@ modm::stm32::{{ name }}::setSpiClock(SpiClock clk)
 }
 
 void
-modm::stm32::{{ name }}::setSpiDataMode(SpiDataMode mode)
+modm::platform::{{ name }}::setSpiDataMode(SpiDataMode mode)
 {
 	{{ peripheral }}->CR2 =
 		({{ peripheral }}->CR2 & ~static_cast<uint32_t>(SpiDataMode::Mode3))
@@ -134,7 +134,7 @@ modm::stm32::{{ name }}::setSpiDataMode(SpiDataMode mode)
 }
 
 void
-modm::stm32::{{ name }}::setLastBitClockPulse(LastBitClockPulse pulse)
+modm::platform::{{ name }}::setLastBitClockPulse(LastBitClockPulse pulse)
 {
 	if(pulse == LastBitClockPulse::DoNotOutput) {
 		{{ peripheral }}->CR2 &= ~static_cast<uint32_t>(LastBitClockPulse::Output);
@@ -145,7 +145,7 @@ modm::stm32::{{ name }}::setLastBitClockPulse(LastBitClockPulse pulse)
 %% endif
 
 void
-modm::stm32::{{ name }}::write(uint8_t data)
+modm::platform::{{ name }}::write(uint8_t data)
 {
 %% if "extended" in driver["type"]
 	{{ peripheral }}->TDR = data;
@@ -155,7 +155,7 @@ modm::stm32::{{ name }}::write(uint8_t data)
 }
 
 void
-modm::stm32::{{ name }}::read(uint8_t &data)
+modm::platform::{{ name }}::read(uint8_t &data)
 {
 %% if "extended" in driver["type"]
 	data = {{ peripheral }}->RDR;
@@ -165,7 +165,7 @@ modm::stm32::{{ name }}::read(uint8_t &data)
 }
 
 void
-modm::stm32::{{ name }}::setTransmitterEnable(const bool enable)
+modm::platform::{{ name }}::setTransmitterEnable(const bool enable)
 {
 	if (enable) {
 		{{ peripheral }}->CR1 |=  USART_CR1_TE;
@@ -175,7 +175,7 @@ modm::stm32::{{ name }}::setTransmitterEnable(const bool enable)
 }
 
 void
-modm::stm32::{{ name }}::setReceiverEnable(bool enable)
+modm::platform::{{ name }}::setReceiverEnable(bool enable)
 {
 	if (enable) {
 		{{ peripheral }}->CR1 |=  USART_CR1_RE;
@@ -185,7 +185,7 @@ modm::stm32::{{ name }}::setReceiverEnable(bool enable)
 }
 
 bool
-modm::stm32::{{ name }}::isReceiveRegisterNotEmpty()
+modm::platform::{{ name }}::isReceiveRegisterNotEmpty()
 {
 %% if "extended" in driver["type"]
 	return {{ peripheral }}->ISR & USART_ISR_RXNE;
@@ -195,7 +195,7 @@ modm::stm32::{{ name }}::isReceiveRegisterNotEmpty()
 }
 
 bool
-modm::stm32::{{ name }}::isTransmitRegisterEmpty()
+modm::platform::{{ name }}::isTransmitRegisterEmpty()
 {
 %% if "extended" in driver["type"]
 	return {{ peripheral }}->ISR & USART_ISR_TXE;
@@ -205,7 +205,7 @@ modm::stm32::{{ name }}::isTransmitRegisterEmpty()
 }
 
 void
-modm::stm32::{{ name }}::enableInterruptVector(bool enable, uint32_t priority)
+modm::platform::{{ name }}::enableInterruptVector(bool enable, uint32_t priority)
 {
 %% if target["family"] == "f0" and id in [3,4,5,6,7,8]
 	%% if target["name"] in ["91", "98"]
@@ -229,19 +229,19 @@ modm::stm32::{{ name }}::enableInterruptVector(bool enable, uint32_t priority)
 }
 
 void
-modm::stm32::{{ name }}::enableInterrupt(Interrupt_t interrupt)
+modm::platform::{{ name }}::enableInterrupt(Interrupt_t interrupt)
 {
 	{{ peripheral }}->CR1 |= interrupt.value;
 }
 
 void
-modm::stm32::{{ name }}::disableInterrupt(Interrupt_t interrupt)
+modm::platform::{{ name }}::disableInterrupt(Interrupt_t interrupt)
 {
 	{{ peripheral }}->CR1 &= ~interrupt.value;
 }
 
-modm::stm32::{{ name }}::InterruptFlag_t
-modm::stm32::{{ name }}::getInterruptFlags()
+modm::platform::{{ name }}::InterruptFlag_t
+modm::platform::{{ name }}::getInterruptFlags()
 {
 %% if "extended" in driver["type"]
 	return InterruptFlag_t( {{ peripheral }}->ISR );
@@ -251,7 +251,7 @@ modm::stm32::{{ name }}::getInterruptFlags()
 }
 
 void
-modm::stm32::{{ name }}::acknowledgeInterruptFlags(InterruptFlag_t flags)
+modm::platform::{{ name }}::acknowledgeInterruptFlags(InterruptFlag_t flags)
 {
 %% if "extended" in driver["type"]
 	// Not all flags can be cleared by writing to this reg

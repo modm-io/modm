@@ -19,7 +19,7 @@
 
 namespace modm
 {
-namespace stm32
+namespace platform
 {
 /**
  * Analog/Digital-Converter module (ADC{{ id }}).

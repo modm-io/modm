@@ -23,7 +23,7 @@
 namespace modm
 {
 
-namespace xmega
+namespace platform
 {
 
 /**
@@ -80,7 +80,7 @@ private:
 	initializeWithBaud(uint8_t baud);
 };
 
-} // namespace xmega
+} // namespace platform
 
 } // namespace modm
 

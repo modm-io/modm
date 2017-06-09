@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Fabian Greif
  * Copyright (c) 2012, 2014, Sascha Schade
- * Copyright (c) 2016, Niklas Hauser
+ * Copyright (c) 2016-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -15,9 +15,9 @@
 
 #if !defined(STM32F3XX)
 // Not yet implemented for STM32 F3 series
-//modm::stm32::Usart1             uart1(115200);
-//modm::stm32::BufferedUsart2     uart2(115200, 15);
-//modm::stm32::BufferedFlowUsart3 uart3(115200, 15);
+//modm::platform::Usart1             uart1(115200);
+//modm::platform::BufferedUsart2     uart2(115200, 15);
+//modm::platform::BufferedFlowUsart3 uart3(115200, 15);
 #endif
 
 #if defined(STM32F10X_HD) || \
@@ -26,17 +26,17 @@
 	defined(STM32F2XX)    || \
 	defined(STM32F4XX)
 
-//modm::stm32::Uart4          uart4(115200);
-//modm::stm32::BufferedUart5  uart5(115200, 15);
+//modm::platform::Uart4          uart4(115200);
+//modm::platform::BufferedUart5  uart5(115200, 15);
 #endif
 
 #if defined(STM32F2XX) || defined(STM32F4XX)
-//modm::stm32::BufferedFlowUsart6 uart6(115200, 15);
+//modm::platform::BufferedFlowUsart6 uart6(115200, 15);
 #endif
 
-typedef modm::stm32::GpioOutputA0 Out;
-typedef modm::stm32::GpioInputA1  In;
-typedef modm::stm32::GpioA2       Io;
+typedef modm::platform::GpioOutputA0 Out;
+typedef modm::platform::GpioInputA1  In;
+typedef modm::platform::GpioA2       Io;
 
 int
 main()

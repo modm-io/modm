@@ -29,7 +29,7 @@ using namespace modm::clock;
 namespace modm
 {
 
-namespace stm32
+namespace platform
 {
 
 /**
@@ -454,7 +454,7 @@ public:
 	}
 };
 
-}   // namespace stm32
+}   // namespace platform
 
 }   // namespace modm
 

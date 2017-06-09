@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2012, Sascha Schade
  * Copyright (c) 2014-2015, Kevin Läufer
- * Copyright (c) 2015-2016, Niklas Hauser
+ * Copyright (c) 2015-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -46,16 +46,16 @@ main()
 /*
 	// Use all other defines once to verify that it is compilable
 	But::setInput();
-	But::setInput(modm::lpc::FLOATING);
-	But::setInput(modm::lpc::PULLUP);
-	But::setInput(modm::lpc::PULLDOWN);
-	But::setInput(modm::lpc::REPEATER);
+	But::setInput(modm::platform::FLOATING);
+	But::setInput(modm::platform::PULLUP);
+	But::setInput(modm::platform::PULLDOWN);
+	But::setInput(modm::platform::REPEATER);
 
 	Led::setOutput();
 	Led::setOutput(true);
 	Led::setOutput(false);
-	Led::setOutput(modm::lpc::PUSH_PULL);
-	Led::setOutput(modm::lpc::OPEN_DRAIN);
+	Led::setOutput(modm::platform::PUSH_PULL);
+	Led::setOutput(modm::platform::OPEN_DRAIN);
 	Led::set();
 	Led::reset();
 	Led::toggle();
@@ -64,13 +64,13 @@ main()
 	Io::setOutput();
 	Io::setOutput(true);
 	Io::setOutput(false);
-	Io::setOutput(modm::lpc::PUSH_PULL);
-	Io::setOutput(modm::lpc::OPEN_DRAIN);
+	Io::setOutput(modm::platform::PUSH_PULL);
+	Io::setOutput(modm::platform::OPEN_DRAIN);
 	Io::setInput();
-	Io::setInput(modm::lpc::FLOATING);
-	Io::setInput(modm::lpc::PULLUP);
-	Io::setInput(modm::lpc::PULLDOWN);
-	Io::setInput(modm::lpc::REPEATER);
+	Io::setInput(modm::platform::FLOATING);
+	Io::setInput(modm::platform::PULLUP);
+	Io::setInput(modm::platform::PULLDOWN);
+	Io::setInput(modm::platform::REPEATER);
 	Io::set();
 	Io::reset();
 	Io::toggle();

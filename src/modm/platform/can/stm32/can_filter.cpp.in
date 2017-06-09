@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013-2014, 2016, Kevin Läufer
- * Copyright (c) 2014-2016, Niklas Hauser
+ * Copyright (c) 2014-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -20,7 +20,7 @@
 
 // ----------------------------------------------------------------------------
 void
-modm::stm32::CanFilter::setFilterBase(uint8_t bank, uint32_t flags, uint32_t fr1, uint32_t fr2)
+modm::platform::CanFilter::setFilterBase(uint8_t bank, uint32_t flags, uint32_t fr1, uint32_t fr2)
 {
 	uint32_t mask = (1UL << bank);
 
@@ -62,7 +62,7 @@ modm::stm32::CanFilter::setFilterBase(uint8_t bank, uint32_t flags, uint32_t fr1
 }
 
 void
-modm::stm32::CanFilter::disableFilter(uint8_t id)
+modm::platform::CanFilter::disableFilter(uint8_t id)
 {
 	uint32_t mask = (1UL << id);
 
@@ -79,7 +79,7 @@ modm::stm32::CanFilter::disableFilter(uint8_t id)
 // ----------------------------------------------------------------------------
 %% if target["family"] in ["f1", "f2", "f4"]
 void
-modm::stm32::CanFilter::setStartFilterBankForCan2(uint8_t startBank)
+modm::platform::CanFilter::setStartFilterBankForCan2(uint8_t startBank)
 {
 	// Initialization mode for the filter
 	{{ reg }}->FMR |= CAN_FMR_FINIT;

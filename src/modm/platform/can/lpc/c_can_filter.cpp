@@ -3,7 +3,7 @@
  * Copyright (c) 2009-2011, 2017, Fabian Greif
  * Copyright (c) 2010, Georgi Grinshpun
  * Copyright (c) 2012, Sascha Schade
- * Copyright (c) 2012, 2014, Niklas Hauser
+ * Copyright (c) 2012, 2014, 2017, Niklas Hauser
  * Copyright (c) 2013-2014, Kevin Läufer
  *
  * This file is part of the modm project.
@@ -20,7 +20,7 @@
 
 // ----------------------------------------------------------------------------
 void
-modm::lpc::CanFilter::setFilter(
+modm::platform::CanFilter::setFilter(
 					ExtendedIdentifier id,
 					ExtendedFilterMask mask,
 					uint8_t firstMob,

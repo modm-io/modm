@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011, Fabian Greif
- * Copyright (c) 2011-2012, Niklas Hauser
+ * Copyright (c) 2011-2012, 2017, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
  *
  * This file is part of the modm project.
@@ -44,7 +44,7 @@ modm::Scp1000<Spi, Cs, Int>::initialize(scp1000::Operation opMode)
 	chipSelect.setOutput();
 	chipSelect.set();
 #if defined MODM_CPU_ATXMEGA
-	interruptPin.setInput(::modm::atxmega::PULLDOWN);
+	interruptPin.setInput(::modm::platform::PULLDOWN);
 #else
 	interruptPin.setInput();
 #endif

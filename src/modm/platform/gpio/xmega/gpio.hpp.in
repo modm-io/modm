@@ -21,7 +21,7 @@
 namespace modm
 {
 
-namespace xmega
+namespace platform
 {
 
 struct Gpio
@@ -257,11 +257,11 @@ public:
 	}
 	modm_always_inline static void enableExternalInterrupt0(InterruptLevel level) {
 		PORT{{port}}_INT0MASK |= mask;
-		PORT{{port}}_INTCTRL = (PORT{{port}}_INTCTRL & ~PORT_INT0LVL_gm) | (::modm::xmega::i(level) & PORT_INT0LVL_gm);
+		PORT{{port}}_INTCTRL = (PORT{{port}}_INTCTRL & ~PORT_INT0LVL_gm) | (::modm::platform::i(level) & PORT_INT0LVL_gm);
 	}
 	modm_always_inline static void enableExternalInterrupt1(InterruptLevel level) {
 		PORT{{port}}_INT1MASK |= mask;
-		PORT{{port}}_INTCTRL = (PORT{{port}}_INTCTRL & ~PORT_INT1LVL_gm) | ((::modm::xmega::i(level) << 2) & PORT_INT1LVL_gm);
+		PORT{{port}}_INTCTRL = (PORT{{port}}_INTCTRL & ~PORT_INT1LVL_gm) | ((::modm::platform::i(level) << 2) & PORT_INT1LVL_gm);
 	}
 	modm_always_inline static void disableExternalInterrupt0() {
 		PORT{{port}}_INT0MASK &= ~mask;
@@ -338,7 +338,7 @@ public:
 
 %% endfor
 
-}	// namespace xmega
+}	// namespace platform
 
 }	// namespace modm
 

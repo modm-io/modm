@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016, Sascha Schade
+ * Copyright (c) 2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -26,16 +27,16 @@
 #undef  MODM_LOG_LEVEL
 #define MODM_LOG_LEVEL modm::log::DEBUG
 
-modm::hosted::SocketCan::SocketCan()
+modm::platform::SocketCan::SocketCan()
 {
 }
 
-modm::hosted::SocketCan::~SocketCan()
+modm::platform::SocketCan::~SocketCan()
 {
 }
 
 bool
-modm::hosted::SocketCan::open(std::string deviceName /*, modm::Can::Bitrate canBitrate */)
+modm::platform::SocketCan::open(std::string deviceName /*, modm::Can::Bitrate canBitrate */)
 {
 	skt = socket(PF_CAN, SOCK_RAW, CAN_RAW);
 
@@ -64,18 +65,18 @@ modm::hosted::SocketCan::open(std::string deviceName /*, modm::Can::Bitrate canB
 }
 
 void
-modm::hosted::SocketCan::close()
+modm::platform::SocketCan::close()
 {
 }
 
 modm::Can::BusState
-modm::hosted::SocketCan::getBusState()
+modm::platform::SocketCan::getBusState()
 {
 	return BusState::Connected;
 }
 
 bool
-modm::hosted::SocketCan::isMessageAvailable()
+modm::platform::SocketCan::isMessageAvailable()
 {
 	struct can_frame frame;
 	int nbytes = recv(skt, &frame, sizeof(struct can_frame), MSG_DONTWAIT | MSG_PEEK);
@@ -91,7 +92,7 @@ modm::hosted::SocketCan::isMessageAvailable()
 }
 
 bool
-modm::hosted::SocketCan::getMessage(can::Message& message)
+modm::platform::SocketCan::getMessage(can::Message& message)
 {
 	struct can_frame frame;
 	int nbytes = recv(skt, &frame, sizeof(struct can_frame), MSG_DONTWAIT);
@@ -111,7 +112,7 @@ modm::hosted::SocketCan::getMessage(can::Message& message)
 }
 
 bool
-modm::hosted::SocketCan::sendMessage(const can::Message& message)
+modm::platform::SocketCan::sendMessage(const can::Message& message)
 {
 	struct can_frame frame;
 
