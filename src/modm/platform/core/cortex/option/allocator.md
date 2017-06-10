@@ -21,11 +21,11 @@ operates on one continuous memory region as heap.
 
 !!! warning
     For devices which contain separate memories laid out in a continuous way
-    (often called SRAM1, SRAM2, etc.) the `newlib` and `block_allocator`
-    strategies choose the largest continuous memory region, *even though*
-    unaligned accesses across memory regions may not be supported in hardware
-    and lead to a bus fault! Consider using the TLSF implementation, which does
-    not suffer from this issue.
+    (often called SRAM1, SRAM2, etc.) the `newlib` and `block` strategies choose
+    the largest continuous memory region, *even though* unaligned accesses
+    across memory regions may not be supported in hardware and lead to a bus
+    fault! Consider using the TLSF implementation, which does not suffer from
+    this issue.
 
 To use all non-statically allocated memory for heap, use the TLSF strategy,
 which natively supports multiple memory regions. Our implementation treats

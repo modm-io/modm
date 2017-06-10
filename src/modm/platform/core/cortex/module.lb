@@ -27,7 +27,7 @@ def prepare(module, options):
         EnumerationOption(
             name="allocator",
             description=FileReader("option/allocator.md"),
-            enumeration=["newlib", "block_allocator", "tlsf"],
+            enumeration=["newlib", "block", "tlsf"],
             default="newlib"))
     if not options[":target"].has_driver("core:cortex-m0*"):
         module.add_option(
@@ -191,7 +191,7 @@ def build(env):
         env.template("heap_newlib.c.in")
     if env[":::allocator"] == "tlsf":
         env.template("heap_tlsf.c.in")
-    if env[":::allocator"] == "block_allocator":
+    if env[":::allocator"] == "block":
         env.template("heap_block_allocator.cpp.in")
 
     env.template("delay.cpp.in")
