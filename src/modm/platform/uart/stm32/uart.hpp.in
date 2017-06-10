@@ -2,7 +2,7 @@
  * Copyright (c) 2009-2012, Fabian Greif
  * Copyright (c) 2010, Martin Rosekeit
  * Copyright (c) 2011, Georgi Grinshpun
- * Copyright (c) 2011, 2013-2016, Niklas Hauser
+ * Copyright (c) 2011, 2013-2017, Niklas Hauser
  * Copyright (c) 2012, Sascha Schade
  * Copyright (c) 2013, 2016, Kevin Läufer
  *
@@ -60,7 +60,7 @@ template< 	class SystemClock, uint32_t baudrate,
 		uint16_t tolerance = modm::Tolerance::OnePercent >
 	static void modm_always_inline
 %% if options["buffered"]
-	initialize(uint32_t interruptPriority, Parity parity = Parity::Disabled)
+	initialize(uint32_t interruptPriority = 12, Parity parity = Parity::Disabled)
 %% else
 	initialize(Parity parity = Parity::Disabled)
 %% endif
