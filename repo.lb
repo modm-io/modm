@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2016-2017, Niklas Hauser
-# Copyright (c) 2016-2017, Fabian Greif
+# Copyright (c) 2017, Fabian Greif
+# Copyright (c) 2017, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -29,6 +29,10 @@ def init(repo):
         parser = modm.parser.DeviceParser()
         device_file_names  = glob.glob(localpath("ext/modm-devices/devices/**/*.xml"))
         device_file_names += glob.glob(localpath("devices/**/*.xml"))
+        # roughly filter to supported devices
+        supported = ["stm32f0", "stm32f1", "stm32f2", "stm32f3", "stm32f4", "stm32f7",
+                     "stm32l4", "at90", "attiny", "atmega", "hosted"]
+        device_file_names = [dfn for dfn in device_file_names if any(s in dfn for s in supported)]
         for device_file_name in device_file_names:
             device_file = parser.parse(device_file_name)
             for device in device_file.get_devices():
