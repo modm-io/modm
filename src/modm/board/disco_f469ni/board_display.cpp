@@ -9,7 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "stm32f469_discovery.hpp"
+#include "board.hpp"
 
 extern void
 board_initialize_display(uint8_t);

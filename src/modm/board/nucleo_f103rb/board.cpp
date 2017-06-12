@@ -1,7 +1,5 @@
 /*
- * Copyright (c) 2016-2017, Niklas Hauser
- * Copyright (c) 2017, Nick Sarten
- * Copyright (c) 2017, Sascha Schade
+ * Copyright (c) 2016, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -9,8 +7,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+// ----------------------------------------------------------------------------
 
-#include "nucleo_f401re.hpp"
+#include "board.hpp"
 
 // Create an IODeviceWrapper around the Uart Peripheral we want to use
 modm::IODeviceWrapper< Board::stlink::Uart, modm::IOBuffer::BlockIfFull > loggerDevice;

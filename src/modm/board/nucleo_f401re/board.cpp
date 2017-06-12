@@ -1,6 +1,7 @@
 /*
- * Copyright (c) 2015-2017, Niklas Hauser
- * Copyright (c) 2016, Sascha Schade
+ * Copyright (c) 2016-2017, Niklas Hauser
+ * Copyright (c) 2017, Nick Sarten
+ * Copyright (c) 2017, Sascha Schade
  *
  * This file is part of the modm project.
  *
@@ -8,9 +9,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-// ----------------------------------------------------------------------------
 
-#include "stm32f769i_discovery.hpp"
+#include "board.hpp"
 
 // Create an IODeviceWrapper around the Uart Peripheral we want to use
 modm::IODeviceWrapper< Board::stlink::Uart, modm::IOBuffer::BlockIfFull > loggerDevice;
@@ -31,11 +31,15 @@ modm_abandon(const char * module,
 	if (context) { MODM_LOG_ERROR << " @ " << (void *) context << " (" << (uint32_t) context << ")"; }
 	MODM_LOG_ERROR << " failed! Abandoning..." << modm::endl;
 
-	Board::LedJ13::setOutput();
+	// Since LedD13 is also a GPIO pin, we don't force this pin to output,
+	// in case something sensitive is connected to this pin.
+	// The user must "enable" the use of this pin as an LED output, by
+	// explicitly setting the pin to output in the application.
+	// Board::LedD13::setOutput();
 	while(1) {
-		Board::LedJ13::set();
+		Board::LedD13::set();
 		modm::delayMilliseconds(20);
-		Board::LedJ13::reset();
+		Board::LedD13::reset();
 		modm::delayMilliseconds(180);
 	}
 }

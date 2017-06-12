@@ -9,7 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "stm32f469_discovery.hpp"
+#include "board.hpp"
 
 static void dsi_write_command(uint32_t count, uint8_t const * const p)
 {

@@ -9,7 +9,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "al_avreb_can.hpp"
+//
+// Arduino UNO
+//
 
-modm::IODeviceWrapper< Uart1, modm::IOBuffer::BlockIfFull > serialDevice;
-modm::IOStream serialStream(serialDevice);
+#include "board.hpp"
+#include <modm/architecture/interface/clock.hpp>
+#include <modm/architecture/interface/interrupt.hpp>
+
+MODM_ISR(TIMER0_COMPA)
+{
+	modm::Clock::increment();
+}

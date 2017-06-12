@@ -9,15 +9,10 @@
  */
 // ----------------------------------------------------------------------------
 
-//
-// Arduino UNO
-//
-
-#include "arduino_uno.hpp"
+#include "board.hpp"
 #include <modm/architecture/interface/clock.hpp>
-#include <modm/architecture/interface/interrupt.hpp>
 
-MODM_ISR(TIMER0_COMPA)
+ISR(TIMER0_COMP_vect)
 {
 	modm::Clock::increment();
 }

@@ -9,10 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "al_avreb_can.hpp"
-#include <modm/architecture/interface/clock.hpp>
+#include "board.hpp"
 
-ISR(TIMER0_COMP_vect)
-{
-	modm::Clock::increment();
-}
+modm::IODeviceWrapper< Uart1, modm::IOBuffer::BlockIfFull > serialDevice;
+modm::IOStream serialStream(serialDevice);

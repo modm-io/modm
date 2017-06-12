@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2015-2017, Niklas Hauser
+ * Copyright (c) 2016, Sascha Schade
  *
  * This file is part of the modm project.
  *
@@ -9,8 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "stm32f469_discovery.hpp"
-#include <modm/utils/bit_constants.hpp>
+#include "board.hpp"
 
 // Create an IODeviceWrapper around the Uart Peripheral we want to use
 modm::IODeviceWrapper< Board::stlink::Uart, modm::IOBuffer::BlockIfFull > loggerDevice;
@@ -21,25 +21,6 @@ modm::log::Logger modm::log::info(loggerDevice);
 modm::log::Logger modm::log::warning(loggerDevice);
 modm::log::Logger modm::log::error(loggerDevice);
 
-extern void
-board_initialize_sdram();
-
-static void
-modm_board_init(void)
-{
-	// Reset LCD
-	Board::DisplayReset::setOutput(modm::Gpio::Low);
-	modm::delayMilliseconds(20);
-	Board::DisplayReset::set();
-	modm::delayMilliseconds(10);
-
-	// initialize system clock and external SDRAM before accessing external memories
-	Board::systemClock::enable();
-	board_initialize_sdram();
-}
-
-__attribute__((section(".hardware_init"), used))
-static const uint32_t modm_board_init_ptr = (uint32_t) &modm_board_init;
 
 modm_extern_c void
 modm_abandon(const char * module,
@@ -51,11 +32,15 @@ modm_abandon(const char * module,
 	if (context) { MODM_LOG_ERROR << " @ " << (void *) context << " (" << (uint32_t) context << ")"; }
 	MODM_LOG_ERROR << " failed! Abandoning..." << modm::endl;
 
-	Board::LedBlue::setOutput();
+	// Since LedD13 is also a GPIO pin, we don't force this pin to output,
+	// in case something sensitive is connected to this pin.
+	// The user must "enable" the use of this pin as an LED output, by
+	// explicitly setting the pin to output in the application.
+	// Board::LedD13::setOutput();
 	while(1) {
-		Board::LedBlue::set();
+		Board::LedD13::set();
 		modm::delayMilliseconds(20);
-		Board::LedBlue::reset();
+		Board::LedD13::reset();
 		modm::delayMilliseconds(180);
 	}
 }

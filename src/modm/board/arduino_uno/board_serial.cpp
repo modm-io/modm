@@ -9,7 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "arduino_uno.hpp"
+#include "board.hpp"
 
 // Create an IODeviceWrapper around the Uart Peripheral we want to use
 modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > loggerDevice;

@@ -9,7 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "stm32f469_discovery.hpp"
+#include "board.hpp"
 
 extern void
 otm8009a_init(uint8_t);

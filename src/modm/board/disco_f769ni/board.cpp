@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2016, Niklas Hauser
+ * Copyright (c) 2015-2017, Niklas Hauser
+ * Copyright (c) 2016, Sascha Schade
  *
  * This file is part of the modm project.
  *
@@ -9,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "nucleo_f411re.hpp"
+#include "board.hpp"
 
 // Create an IODeviceWrapper around the Uart Peripheral we want to use
 modm::IODeviceWrapper< Board::stlink::Uart, modm::IOBuffer::BlockIfFull > loggerDevice;
@@ -30,15 +31,11 @@ modm_abandon(const char * module,
 	if (context) { MODM_LOG_ERROR << " @ " << (void *) context << " (" << (uint32_t) context << ")"; }
 	MODM_LOG_ERROR << " failed! Abandoning..." << modm::endl;
 
-	// Since LedD13 is also a GPIO pin, we don't force this pin to output,
-	// in case something sensitive is connected to this pin.
-	// The user must "enable" the use of this pin as an LED output, by
-	// explicitly setting the pin to output in the application.
-	// Board::LedD13::setOutput();
+	Board::LedJ13::setOutput();
 	while(1) {
-		Board::LedD13::set();
+		Board::LedJ13::set();
 		modm::delayMilliseconds(20);
-		Board::LedD13::reset();
+		Board::LedJ13::reset();
 		modm::delayMilliseconds(180);
 	}
 }
