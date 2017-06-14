@@ -23,5 +23,7 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "src/modm/board"
+    env.substitutions = {"board_has_logger": False}
+    env.template("../board.cpp.in", "board.cpp")
     env.copy('.', ignore=env.ignore_patterns("*.lb", "*.cfg", "*.xml"))
     env.append_metadata_unique("openocd.configfile", "board/stm32l4discovery.cfg");

@@ -119,6 +119,9 @@ using Rx = GpioInputB7;
 using Uart = Usart1;
 }
 
+using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
+
+
 inline void
 initialize()
 {

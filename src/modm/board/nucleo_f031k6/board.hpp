@@ -89,6 +89,8 @@ using Tx = GpioOutputA2;
 using Uart = Usart1;
 }
 
+using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
+
 
 inline void
 initialize()

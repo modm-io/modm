@@ -24,6 +24,8 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "src/modm/board"
+    env.substitutions = {"board_has_logger": True}
+    env.template("../board.cpp.in", "board.cpp")
     env.copy('.', ignore=env.ignore_patterns("*.lb", "*.cfg", "*.xml"))
     env.copy("../nucleo144_arduino.hpp", "nucleo144_arduino.hpp")
     env.append_metadata_unique("openocd.configfile", "board/st_nucleo_f4.cfg");

@@ -122,6 +122,8 @@ using Rx = GpioInputA10;
 using Uart = Usart1;
 }
 
+using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
+
 // Onboard MicroSD card slot
 namespace usd
 {

@@ -161,6 +161,8 @@ using Rx = GpioInputB11;		// STLK_TX [STLINK V2-1_U2_TX]: USART3_RX
 using Uart = Usart3;
 }
 
+using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
+
 inline void
 initializeTouchscreen()
 {
