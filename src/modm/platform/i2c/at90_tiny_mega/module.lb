@@ -20,7 +20,7 @@ def prepare(module, options):
     if not target.has_driver("twi:avr"):
         return False
 
-    if target.partname in ["attiny20", "attiny40", "attiny828", "attiny1634"]:
+    if target.partname in ["attiny20", "attiny40", "attiny828", "attiny1634", "attiny441", "attiny841"]:
         # These ATtiny only implement a TWI slave interface!
         return False
 

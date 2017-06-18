@@ -16,8 +16,8 @@
 #include <avr/io.h>
 
 %% if partname in ["attiny40"]
-%# The avr-libc Header files for the ATtiny40 is missing the following
-%# defines although they are meantioned in the datasheet.
+// The avr-libc Header files for the ATtiny40 is missing the following
+// defines although they are meantioned in the datasheet.
 #define SPR0    0
 #define SPR1    1
 #define CPHA    2
@@ -30,6 +30,23 @@
 #define SPI2X   0
 #define WCOL    6
 #define SPIF    7
+%% elif partname in ["atmega164pa", "atmega324pa"]
+// The avr-libc Header files for the ATmega{16,32}4pa are declaring the
+// following registers with a trailing zero. Why, Atmel, whyyyy?
+#define SPCR    SPCR0
+#define SPR0    SPR00
+#define SPR1    SPR10
+#define CPHA    CPHA0
+#define CPOL    CPOL0
+#define MSTR    MSTR0
+#define DORD    DORD0
+#define SPE     SPE0
+#define SPIE    SPIE0
+#define SPSR    SPSR0
+#define SPI2X   SPI2X0
+#define WCOL    WCOL0
+#define SPIF    SPIF0
+#define SPDR    SPDR0
 %% endif
 
 /**

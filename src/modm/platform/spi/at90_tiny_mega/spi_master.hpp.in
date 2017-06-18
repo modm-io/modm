@@ -19,6 +19,11 @@
 #include <modm/architecture/interface/spi_master.hpp>
 #include <modm/platform/gpio/connector.hpp>
 
+%% set sck = "Sck"
+%% if target["type"] in ["u2"]
+	%# Atmel has inconsistent naming schemes!
+	%% set sck = "Sclk"
+%% endif
 
 #include "spi{{ id }}.hpp"
 
@@ -67,7 +72,7 @@ public:
 	connect()
 	{
 		using Connector = GpioConnector<Peripheral::Spi{{ id }}, Signals...>;
-		using Sck = typename Connector::template GetSignal<Gpio::Signal::Sck>;
+		using Sck = typename Connector::template GetSignal<Gpio::Signal::{{sck}}>;
 		using Mosi = typename Connector::template GetSignal<Gpio::Signal::Mosi>;
 		using Miso = typename Connector::template GetSignal<Gpio::Signal::Miso>;
 		static_assert(Connector::template IsValid<Sck> and Connector::template IsValid<Mosi> and

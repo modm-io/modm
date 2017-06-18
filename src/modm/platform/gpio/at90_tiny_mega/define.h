@@ -29,6 +29,9 @@
 #if defined (PCIF) && not defined (PCIF0)
 #	define PCIF0	PCIF
 #endif
+#if defined (PCIF) && not defined (PCIF1)
+#	define PCIF1	PCIF
+#endif
 
 // Some more redefines because Atmel is weird
 #ifndef EIMSK

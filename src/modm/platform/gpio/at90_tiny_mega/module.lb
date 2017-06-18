@@ -127,12 +127,12 @@ def build(env):
         properties["pue"] = False
 
     if (target["family"] == "mega" and target["name"] in ["8", "16", "32", "162", "8515", "8535"]) or \
-            (target["family"] == "tiny" and target["name"] in ["13", "24", "25", "44", "45", "84", "85", "261", "461", "861"]):
+            (target["family"] == "tiny" and target["name"] in ["13", "24", "25", "40", "44", "45", "84", "85", "261", "461", "861", "441", "841"]):
         properties["eicra"] = "MCUCR"
     else:
         properties["eicra"] = "EICRA"
 
-    if target["family"] == "mega" and target["name"] in ["8", "16", "32", "8515", "8535"]:
+    if target["family"] == "mega" and target["name"] in ["8", "16", "32", "8515", "8535"] and target["type"] not in ["u2"]:
         properties["isc2"] = "MCUCSR"
     if target["family"] == "mega" and target["name"] in ["162"]:
         properties["isc2"] = "EMCUCR"

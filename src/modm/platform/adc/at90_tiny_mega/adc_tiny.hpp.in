@@ -46,13 +46,13 @@
 	%% set has_ref = True
 %% endif
 
-%% if target["name"] in ['20', '40', '828', '1634', '24', '44', '84']
+%% if target["name"] in ['20', '40', '828', '1634', '24', '44', '84', '441', '841']
 	%% set adlar_reg = 'ADCSRB'
 %% else
 	%% set adlar_reg = 'ADMUX'
 %% endif
 
-%% if target["name"] in ['828']
+%% if target["name"] in ['828', '441', '841']
 	%% set admuxb = 'ADMUXB'
 	%% set admuxa = 'ADMUXA'
 %% else
@@ -60,7 +60,7 @@
 	%% set admuxa = 'ADMUX'
 %% endif
 
-%% if target["name"] in ['261', '461', '861', '828']
+%% if target["name"] in ['261', '461', '861', '828', '441', '841']
 	%% set channels = 2**6
 	%% set mux_mask = '0b00011111'
 %% elif target["name"] in ['26', '87', '167']
@@ -333,7 +333,7 @@ public:
 	%% if target["name"] in ['87', '167']
 		AMISCR = (AMISCR & ~(1 << AREFEN)) | (uint8_t(reference) & (1 << AREFEN));
 		ADMUX = (ADMUX & ~0xc0) | (uint8_t(reference) & 0xc0);
-	%% elif target["name"] in ['828']
+	%% elif target["name"] in ['828', '241', '441', '841']
 		ADMUXB = (ADMUXB & ~0x20) | uint8_t(reference);
 	%% elif target["name"] in ['261', '461', '861']
 		ADCSRB = (ADCSRB & ~(1 << REFS2)) | (uint8_t(reference) & (1 << REFS2));
