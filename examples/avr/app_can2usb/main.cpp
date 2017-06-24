@@ -24,7 +24,7 @@
  *
  */
 
-#include <modm/architecture/platform.hpp>
+#include <modm/platform/platform.hpp>
 #include <modm/driver/usb/ft245.hpp>
 #include <modm/debug/logger.hpp>
 
@@ -60,9 +60,8 @@ typedef GpioInverted<WrInverted> Wr;
 
 
 typedef modm::Ft245<myPort, Rd, Wr, Rxf, Txe> MyFt;
-MyFt myFt;
 
-modm::IODeviceWrapper< MyFt, modm::IOBuffer::BlockIfFull > loggerDevice(myFt);
+modm::IODeviceWrapper< MyFt, modm::IOBuffer::BlockIfFull > loggerDevice;
 
 // Set all four logger streams to use the UART
 modm::log::Logger modm::log::debug(loggerDevice);
@@ -75,7 +74,7 @@ modm::log::Logger modm::log::error(loggerDevice);
 #define	MODM_LOG_LEVEL modm::log::DEBUG
 
 
-int 
+int
 main()
 {
 	LedStatus::setOutput();

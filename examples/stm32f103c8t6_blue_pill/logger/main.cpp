@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011, Fabian Greif
  * Copyright (c) 2013, Kevin Läufer
- * Copyright (c) 2013-2016, Niklas Hauser
+ * Copyright (c) 2013-2017, Niklas Hauser
  * Copyright (c) 2014, 2016, Sascha Schade
  *
  * This file is part of the modm project.
@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 #include <modm/debug/logger.hpp>
 #include <modm/processing/timer.hpp>
 #include <modm/processing/protothread.hpp>
@@ -78,9 +78,8 @@ main()
 	Board::initialize();
 
 	// initialize Uart2 for MODM_LOG_*
-	GpioOutputA2::connect(Usart2::Tx);
-	GpioInputA3::connect(Usart2::Rx, Gpio::InputType::PullUp);
-	Usart2::initialize<Board::systemClock, 115200>(12);
+	Usart2::connect<GpioOutputA2::Tx>();
+	Usart2::initialize<Board::systemClock, 115200>();
 
 	// Use the logging streams to print some messages.
 	// Change MODM_LOG_LEVEL above to enable or disable these messages

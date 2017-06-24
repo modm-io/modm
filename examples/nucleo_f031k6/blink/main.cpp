@@ -1,4 +1,4 @@
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 
 using namespace Board;
 

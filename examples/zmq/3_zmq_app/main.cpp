@@ -10,10 +10,10 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/debug/logger.hpp>
-#include <modm/architecture/architecture.hpp>
+#include <modm/platform/platform.hpp>
 
 #include <modm/communication/communication.hpp>
-#include <modm/communication/modm/backend/zeromq/connector.hpp>
+#include <modm/communication/xpcc/backend/zeromq/connector.hpp>
 
 #include "component_gui/gui.hpp"
 
@@ -32,12 +32,12 @@
 
 const std::string endpointIn  = "tcp://127.0.0.1:8211";
 const std::string endpointOut = "tcp://127.0.0.1:8212";
-static modm::ZeroMQConnector connector(endpointIn, endpointOut, modm::ZeroMQConnector::Mode::SubPush);
+static xpcc::ZeroMQConnector connector(endpointIn, endpointOut, xpcc::ZeroMQConnector::Mode::SubPush);
 
 // create an instance of the generated postman
 Postman postman;
 
-modm::Dispatcher dispatcher(&connector, &postman);
+xpcc::Dispatcher dispatcher(&connector, &postman);
 
 namespace component
 {

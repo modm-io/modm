@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/architecture.hpp>
+#include <modm/platform/platform.hpp>
 #include <modm/debug/logger.hpp>
 
 #include <modm/ui/display/image.hpp>
@@ -23,7 +23,7 @@
 #include "screens/overview.hpp"
 
 
-#include "sdl_display.hpp"
+#include <modm/driver/display/sdl_display.hpp>
 
 #include <stdlib.h>
 
@@ -52,8 +52,8 @@ void
 initSDL()
 {
 	SDL_Init( SDL_INIT_EVERYTHING );
-    /* Enable Unicode translation */
-    SDL_EnableUNICODE( 1 );
+	/* Enable Unicode translation */
+	SDL_EnableUNICODE( 1 );
 
 	display = new modm::SDLDisplay(320, 240);
 
@@ -310,4 +310,3 @@ main(int, char**)
 
 	return 0;
 }
-

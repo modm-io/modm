@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2013-2014, Sascha Schade
- * Copyright (c) 2013-2016, Niklas Hauser
+ * Copyright (c) 2013-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 #include <modm/processing/processing.hpp>
 #include <modm/debug/logger.hpp>
 
@@ -75,17 +75,15 @@ main()
 	Board::LedNorth::set();
 
 	// Initialize Usart
-	GpioOutputA2::connect(Usart2::Tx);
-	GpioInputA3::connect(Usart2::Rx, Gpio::InputType::PullUp);
-	Usart2::initialize<Board::systemClock, 115200>(10);
+	Usart2::connect<GpioOutputA2::Tx>();
+	Usart2::initialize<Board::systemClock, 115200>();
 
 	MODM_LOG_INFO << "CAN Test Program" << modm::endl;
 
 	MODM_LOG_INFO << "Initializing Can ..." << modm::endl;
 	// Initialize Can
-	GpioInputB8::connect(Can1::Rx, Gpio::InputType::PullUp);
-	GpioOutputB9::connect(Can1::Tx, Gpio::OutputType::PushPull);
-	Can1::initialize<Board::systemClock, Can1::Bitrate::kBps125>(9);
+	Can::connect<GpioInputB8::Rx, GpioOutputB9::Tx>(Gpio::InputType::PullUp);
+	Can::initialize<Board::systemClock, Can::Bitrate::kBps125>();
 
 	MODM_LOG_INFO << "Setting up Filter for Can ..." << modm::endl;
 	// Receive every message
@@ -98,17 +96,17 @@ main()
 	modm::can::Message msg1(1, 1);
 	msg1.setExtended(true);
 	msg1.data[0] = 0x11;
-	Can1::sendMessage(msg1);
+	Can::sendMessage(msg1);
 
 	modm::ShortPeriodicTimer pTimer(100);
 
 	while (1)
 	{
-		if (Can1::isMessageAvailable())
+		if (Can::isMessageAvailable())
 		{
 			MODM_LOG_INFO << "Can: Message is available..." << modm::endl;
 			modm::can::Message message;
-			Can1::getMessage(message);
+			Can::getMessage(message);
 			displayMessage(message);
 		}
 
@@ -119,7 +117,7 @@ main()
 			modm::can::Message msg1(1, 1);
 			msg1.setExtended(true);
 			msg1.data[0] = idx;
-			Can1::sendMessage(msg1);
+			Can::sendMessage(msg1);
 
 			++idx;
 		}

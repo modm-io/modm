@@ -1,4 +1,4 @@
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 
 using namespace Board;
 
@@ -14,7 +14,7 @@ main()
 		ClockControl::ClockOutputSource::MultiSpeedInternalClock,
 		ClockControl::ClockOutputSourcePrescaler::Div16);
 
-	modm::platform::GpioA8::connect(modm::platform::ClockControl::ClockOutput);
+	GpioConnector<Peripheral::Rcc, GpioA8::Mco>::connect();
 
 	LedGreen::set();
 

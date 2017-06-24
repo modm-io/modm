@@ -11,11 +11,11 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/architecture.hpp>
+#include <modm/platform/platform.hpp>
 
 #include <modm/communication/communication.hpp>
-// #include <modm/communication/modm/backend/tipc.hpp>
-#include <modm/communication/modm/backend/zeromq.hpp>
+// #include <modm/communication/xpcc/backend/tipc.hpp>
+#include <modm/communication/xpcc/backend/zeromq.hpp>
 
 #include <modm/debug/logger.hpp>
 
@@ -30,17 +30,17 @@
 #include "communication/identifier.hpp"
 
 // Use TIPC on Linux only
-// modm::TipcConnector connector;
+// xpcc::TipcConnector connector;
 
 // Use ZeroMQ on Linux and Darwin
 const std::string endpointIn  = "tcp://127.0.0.1:8211";
 const std::string endpointOut = "tcp://127.0.0.1:8212";
-static modm::ZeroMQConnector connector(endpointIn, endpointOut, modm::ZeroMQConnector::Mode::SubPush);
+static xpcc::ZeroMQConnector connector(endpointIn, endpointOut, xpcc::ZeroMQConnector::Mode::SubPush);
 
 // create an instance of the generated postman
 Postman postman;
 
-modm::Dispatcher dispatcher(&connector, &postman);
+xpcc::Dispatcher dispatcher(&connector, &postman);
 
 namespace component
 {

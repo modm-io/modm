@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013-2014, Kevin Läufer
- * Copyright (c) 2013, 2015-2016, Niklas Hauser
+ * Copyright (c) 2013, 2015-2017, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
  *
  * This file is part of the modm project.
@@ -11,8 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 
 /*
  * This example shows how to use the FSMC in "Muxed Mode"
@@ -27,27 +26,27 @@ main()
 
 	// Initialize FSMC
 	Fsmc::initialize();
-	GpioD14::connect(Fsmc::D0);
-	GpioD15::connect(Fsmc::D1);
-	GpioD0::connect(Fsmc::D2);
-	GpioD1::connect(Fsmc::D3);
-	GpioE7::connect(Fsmc::D4);
-	GpioE8::connect(Fsmc::D5);
-	GpioE9::connect(Fsmc::D6);
-	GpioE10::connect(Fsmc::D7);
-	GpioE11::connect(Fsmc::D8);
-	GpioE12::connect(Fsmc::D9);
-	GpioE13::connect(Fsmc::D10);
-	GpioE14::connect(Fsmc::D11);
-	GpioE15::connect(Fsmc::D12);
-	GpioD8::connect(Fsmc::D13);
-	GpioD9::connect(Fsmc::D14);
-	GpioD10::connect(Fsmc::D15);
-
-	GpioD4::connect(Fsmc::Noe);
-	GpioD5::connect(Fsmc::Nwe);
-	GpioB7::connect(Fsmc::Nl); // = Nadv
-	GpioD7::connect(Fsmc::Ne1);
+	GpioConnector<Peripheral::Fsmc,
+		GpioD14::D0,
+		GpioD15::D1,
+		GpioD0::D2,
+		GpioD1::D3,
+		GpioE7::D4,
+		GpioE8::D5,
+		GpioE9::D6,
+		GpioE10::D7,
+		GpioE11::D8,
+		GpioE12::D9,
+		GpioE13::D10,
+		GpioE14::D11,
+		GpioE15::D12,
+		GpioD8::D13,
+		GpioD9::D14,
+		GpioD10::D15,
+		GpioD4::Noe,
+		GpioD5::Nwe,
+		GpioB7::Nl,
+		GpioD7::Ne1>::connect();
 
 	fsmc::NorSram::AsynchronousTiming timing = {
 		15, 0, 15,	// Read:  ADDSET, ADDHLD, DATAST

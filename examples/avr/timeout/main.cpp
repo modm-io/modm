@@ -11,7 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/platform/platform.hpp>
+#include <modm/architecture/interface/interrupt.hpp>
 #include <modm/processing/timer.hpp>
 
 using namespace modm::platform;
@@ -30,17 +31,17 @@ main()
 {
 	Led::setOutput();
 	Led::reset();
-	
+
 	// timer initialization
 	// compare-match-interrupt every 1 ms at 14.7456 MHz
 	TCCR2A = (1 << WGM21);
 	TCCR2B = (1 << CS22);
 	TIMSK2 = (1 << OCIE2A);
 	OCR2A = 230;
-	
+
 	// enable interrupts
 	enableInterrupts();
-	
+
 	modm::ShortTimeout timeout(200);
 	while (1)
 	{

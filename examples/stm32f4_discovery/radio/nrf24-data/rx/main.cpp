@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2015, Daniel Krebs
  * Copyright (c) 2015, Sascha Schade
- * Copyright (c) 2015-2016, Niklas Hauser
+ * Copyright (c) 2015-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 #include <modm/debug/logger.hpp>
 #include <modm/processing/processing.hpp>
 
@@ -74,15 +74,12 @@ main()
 	Ce::setOutput(modm::Gpio::Low);
 
 	// Enable SPI 2
-	GpioOutputB15::connect(Spi::Mosi);
-	GpioInputB14::connect(Spi::Miso);
-	GpioOutputB13::connect(Spi::Sck);
+	Spi::connect<GpioB15::Mosi, GpioB14::Miso, GpioB13::Sck>();
 	Spi::initialize<Board::systemClock, MHz10>();
 
 	// Enable UART 2
-	GpioOutputA2::connect(Usart2::Tx);
-	GpioInputA3::connect(Usart2::Rx, Gpio::InputType::PullUp);
-	Usart2::initialize<Board::systemClock, 115200>(12);
+	Usart2::connect<GpioA2::Tx>();
+	Usart2::initialize<Board::systemClock, 115200>();
 
 	MODM_LOG_INFO << "Hello from nrf24-data-rx example" << modm::endl;
 

@@ -9,7 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/platform/platform.hpp>
+#include <modm/architecture/interface/assert.hpp>
 
 #define MODM_CAN_MODULE_NAME "can"
 #define MODM_IOBUFFER_MODULE_NAME "iobuffer"

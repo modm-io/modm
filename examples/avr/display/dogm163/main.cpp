@@ -11,12 +11,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/architecture.hpp>
+#include <modm/platform/platform.hpp>
 #include <modm/driver/display.hpp>
 #include <modm/ui/display/font.hpp>
 
 using namespace modm::platform;
-typedef modm::platform::SystemClock clock;
+using systemClock = SystemClock;
 
 // Graphic LCD
 namespace lcd
@@ -33,12 +33,13 @@ typedef BitBangSpiMaster< lcd::Scl, lcd::Mosi, lcd::Miso > SPI;
 
 modm::DogM163< SPI, lcd::Cs, lcd::Rs > display;
 
-int 
+int
 main()
 {
-    SPI::initialize<clock, 1000000>();
-    lcd::Cs::setOutput();
-    lcd::Rs::setOutput();
+	SPI::connect<lcd::Scl::BitBang, lcd::Mosi::BitBang, lcd::Miso::BitBang>();
+	SPI::initialize<systemClock, 1000000>();
+	lcd::Cs::setOutput();
+	lcd::Rs::setOutput();
 
 	display.initialize();
 

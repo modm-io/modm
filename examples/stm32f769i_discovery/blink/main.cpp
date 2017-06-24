@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, Niklas Hauser
+ * Copyright (c) 2015-2017, Niklas Hauser
  * Copyright (c) 2016, Sascha Schade
  *
  * This file is part of the modm project.
@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 #include "calc.hpp"
 
 using namespace Board;

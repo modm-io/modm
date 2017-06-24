@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 
 #include <modm/processing/processing.hpp>
 #include <modm/processing/protothread.hpp>
@@ -125,12 +125,10 @@ main()
 {
 	Board::initialize();
 
-	GpioOutputA2::connect(Usart2::Tx);
-	Usart2::initialize<Board::systemClock, modm::Uart::B115200>(10);
+	Usart2::connect<GpioA2::Tx>();
+	Usart2::initialize<Board::systemClock, modm::Uart::B115200>();
 
-	GpioB11::connect(I2cMaster2::Sda);
-	GpioB10::connect(I2cMaster2::Scl);
-
+	MyI2cMaster::connect<GpioB11::Sda, GpioB10::Scl>();
 	MyI2cMaster::initialize<Board::systemClock, 100000>();
 
 	stream << "\n\nWelcome to TCS3414 demo!\n\n";

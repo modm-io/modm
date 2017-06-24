@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, Niklas Hauser
+ * Copyright (c) 2015-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -9,7 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 #include <modm/debug/logger.hpp>
 #include <modm/processing/processing.hpp>
 
@@ -45,15 +45,12 @@ main()
 	Board::initialize();
 
 	// initialize Uart2 for MODM_LOG_INFO
-	GpioOutputA2::connect(Usart2::Tx);
-	GpioInputA3::connect(Usart2::Rx, Gpio::InputType::PullUp);
-	Usart2::initialize<Board::systemClock, 115200>(12);
+	Usart2::connect<GpioOutputA2::Tx>();
+	Usart2::initialize<Board::systemClock, 115200>();
 
 	// initialize Adc2
+	Adc2::connect<AdcIn0::In7, AdcIn1::In4, AdcIn2::In2>();
 	Adc2::initialize<Board::systemClock>();
-	AdcIn0::connect(Adc2::Channel7);
-	AdcIn1::connect(Adc2::Channel4);
-	AdcIn2::connect(Adc2::Channel2);
 
 	Adc2::enableInterruptVector(5);
 	Adc2::enableInterrupt(Adc2::Interrupt::EndOfRegularConversion);

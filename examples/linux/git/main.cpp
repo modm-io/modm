@@ -9,10 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/architecture.hpp>
+#include <modm/platform/platform.hpp>
 #include <modm/debug/logger.hpp>
-
-#include <modm_git_info.hpp>
 
 // Set the log level
 #undef	MODM_LOG_LEVEL

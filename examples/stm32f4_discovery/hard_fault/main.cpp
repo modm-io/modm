@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Niklas Hauser
+ * Copyright (c) 2016-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -9,7 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 #include <modm/debug/logger.hpp>
 
 /* This example showcases the hard fault handler LED blinking and UART logging.
@@ -53,8 +53,8 @@ main()
 	LedOrange::set();
 
 	// initialize Uart2 for MODM_LOG_
-	GpioOutputA2::connect(Usart2::Tx);
-	Usart2::initialize<Board::systemClock, 115200>(12);
+	Usart2::connect<GpioA2::Tx>();
+	Usart2::initialize<Board::systemClock, 115200>();
 
 	MODM_LOG_INFO << "Press Button to cause a Hardfault!" << modm::endl;
 

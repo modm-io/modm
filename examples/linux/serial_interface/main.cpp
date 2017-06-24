@@ -13,14 +13,16 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/debug/logger.hpp>
-#include <modm/architecture/architecture.hpp>
+#include <modm/platform/platform.hpp>
 
 #include <cstdlib>
+
+using namespace modm::platform;
 
 int
 main()
 {
-	modm::platform::SerialInterface port("/dev/ttyUSB0", 115200);
+	SerialInterface port("/dev/ttyUSB0", 115200);
 	
 	if (not port.open()) {
 		MODM_LOG_ERROR << "Could not open port: " << port.getDeviceName().c_str() << modm::endl;

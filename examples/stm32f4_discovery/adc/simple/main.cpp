@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2013-2014, Sascha Schade
- * Copyright (c) 2013-2016, Niklas Hauser
+ * Copyright (c) 2013-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 #include <modm/debug/logger.hpp>
 
 // ----------------------------------------------------------------------------
@@ -31,15 +31,13 @@ main()
 	Board::initialize();
 
 	// initialize Uart2 for MODM_LOG_INFO
-	GpioOutputA2::connect(Usart2::Tx);
-	GpioInputA3::connect(Usart2::Rx, Gpio::InputType::PullUp);
-	Usart2::initialize<Board::systemClock, 115200>(12);
+	Usart2::connect<GpioOutputA2::Tx>();
+	Usart2::initialize<Board::systemClock, 115200>();
 
 	// initialize Adc4
+	Adc2::connect<AdcIn::In7>();
 	Adc2::initialize<Board::systemClock>();
-	AdcIn::connect(Adc2::Channel7);
-
-	Adc2::setChannel(AdcIn::Adc2Channel);
+	Adc2::setChannel(Adc2::Channel::Channel7);
 
 	while (1)
 	{

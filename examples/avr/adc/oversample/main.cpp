@@ -10,13 +10,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/architecture.hpp>
+#include <modm/platform/platform.hpp>
+#include <modm/platform/platform.hpp>
 #include <modm/processing/processing.hpp>
 
 using namespace modm::platform;
 
 // Create a new UART object
-typedef modm::platform::SystemClock clock;
+using systemClock = SystemClock;
 
 #include <modm/io/iostream.hpp>
 // Create a IOStream for complex formatting tasks
@@ -37,14 +38,13 @@ modm::ShortTimeout timeout(100);
 int
 main()
 {
-    GpioOutputD1::connect(Uart0::Tx);
-    GpioInputD0::connect(Uart0::Rx);
-	Uart0::initialize<clock, 115200>();
+	Uart0::connect<GpioOutputD1::Txd, GpioInputD0::Rxd>();
+	Uart0::initialize<systemClock, 115200>();
 
 	// Initialize the analog to digital converter
 	// With the AVR running at 14.7456Mhz and a prescaler of 128 the
 	// ADC is running at 115kHz.
-	Adc::initialize<clock, 115000>();
+	Adc::initialize<systemClock, 115000>();
 	Adc::setReference(Adc::Reference::InternalVcc);
 	Adc::enableInterrupt();
 

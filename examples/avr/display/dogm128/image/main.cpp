@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/architecture.hpp>
+#include <modm/platform/platform.hpp>
 #include <modm/driver/display.hpp>
 
 #include "images/image_64x64_0.hpp"
@@ -26,6 +26,8 @@
 #include "images/image_64x64_9.hpp"
 
 using namespace modm::platform;
+
+using systemClock = SystemClock;
 
 namespace led
 {
@@ -206,6 +208,9 @@ main()
 	led::R::setOutput();
 	led::G::setOutput();
 	led::B::setOutput();
+
+	lcd::SPI::connect<lcd::Sck::BitBang, lcd::Mosi::BitBang>();
+	lcd::SPI::initialize<systemClock, MHz2>();
 
 	display.initialize();
 

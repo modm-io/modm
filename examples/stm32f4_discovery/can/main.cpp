@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013, Kevin Läufer
- * Copyright (c) 2013-2016, Niklas Hauser
+ * Copyright (c) 2013-2017, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
  *
  * This file is part of the modm project.
@@ -11,9 +11,9 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 #include <modm/debug/logger.hpp>
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
 modm::log::Logger modm::log::info(loggerDevice);
@@ -59,9 +59,8 @@ main()
 	Board::initialize();
 
 	// Initialize Usart
-	GpioOutputA2::connect(Usart2::Tx);
-	GpioInputA3::connect(Usart2::Rx, Gpio::InputType::PullUp);
-	Usart2::initialize<Board::systemClock, 115200>(10);
+	Usart2::connect<GpioA2::Tx>();
+	Usart2::initialize<Board::systemClock, 115200>();
 
 	MODM_LOG_INFO << "CAN Test Program" << modm::endl;
 
@@ -70,9 +69,8 @@ main()
 
 	MODM_LOG_INFO << "Initializing Can1..." << modm::endl;
 	// Initialize Can1
-	GpioInputB8::connect(Can1::Rx, Gpio::InputType::PullUp);
-	GpioOutputB9::connect(Can1::Tx, Gpio::OutputType::PushPull);
-	Can1::initialize<Board::systemClock, Can1::Bitrate::kBps125>(9);
+	Can1::connect<GpioB8::Rx, GpioB9::Tx>(Gpio::InputType::PullUp);
+	Can1::initialize<Board::systemClock, Can1::Bitrate::kBps125>();
 
 	MODM_LOG_INFO << "Setting up Filter for Can1..." << modm::endl;
 	// Receive every message
@@ -82,9 +80,8 @@ main()
 
 	MODM_LOG_INFO << "Initializing Can2..." << modm::endl;
 	// Initialize Can2
-	GpioInputB5::connect(Can2::Rx, Gpio::InputType::PullUp);
-	GpioOutputB6::connect(Can2::Tx, Gpio::OutputType::PushPull);
-	Can2::initialize<Board::systemClock, Can2::Bitrate::kBps125>(12);
+	Can2::connect<GpioB5::Rx, GpioB6::Tx>(Gpio::InputType::PullUp);
+	Can2::initialize<Board::systemClock, Can2::Bitrate::kBps125>();
 
 	MODM_LOG_INFO << "Setting up Filter for Can2..." << modm::endl;
 	// Receive every message

@@ -11,21 +11,23 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/architecture.hpp>
+#include <modm/platform/platform.hpp>
+#include <modm/platform/platform.hpp>
 #include <modm/driver/temperature/ds18b20.hpp>
 
 #include <modm/io/iostream.hpp>
 
 using namespace modm::platform;
 
-typedef GpioC2 OneWirePin;
-modm::SoftwareOneWireMaster<OneWirePin> ow;
+using OneWirePin = GpioC2;
+using OneWireMaster = BitBangOneWireMaster<OneWirePin>;
 
 int
 main()
 {
-	typedef modm::platform::SystemClock c;
-	Uart0::initialize<c, 9600>();
+	using systemClock = SystemClock;
+	Uart0::connect<GpioD1::Txd>();
+	Uart0::initialize<systemClock, 9600>();
 
 	// Enable interrupts, this is needed for every buffered UART
 	enableInterrupts();
@@ -37,9 +39,10 @@ main()
 	output << "Welcome" << modm::endl;
 	modm::delayMilliseconds(100);
 
-	ow.initialize();
+	OneWireMaster::connect<OneWirePin::BitBang>();
+	OneWireMaster::initialize<SystemClock>();
 
-	if (!ow.touchReset()) {
+	if (!OneWireMaster::touchReset()) {
 		output << "No devices found!" << modm::endl;
 		modm::delayMilliseconds(100);
 		while (1) {
@@ -48,10 +51,10 @@ main()
 	}
 
 	// search for connected DS18B20 devices
-	ow.resetSearch(0x28);
+	OneWireMaster::resetSearch(0x28);
 
 	uint8_t rom[8];
-	while (ow.searchNext(rom)) {
+	while (OneWireMaster::searchNext(rom)) {
 		output << "found: " << modm::hex;
 		for (uint8_t i = 0; i < 8; ++i) {
 			output << rom[i];
@@ -62,7 +65,7 @@ main()
 	output << "finished!" << modm::endl;
 
 	// read the temperature from a connected DS18B20
-	modm::Ds18b20< modm::SoftwareOneWireMaster<OneWirePin> > ds18b20(rom);
+	modm::Ds18b20< OneWireMaster > ds18b20(rom);
 
 	ds18b20.startConversion();
 
@@ -79,4 +82,3 @@ main()
 		}
 	}
 }
-

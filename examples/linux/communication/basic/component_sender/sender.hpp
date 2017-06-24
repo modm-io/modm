@@ -16,27 +16,27 @@
 #ifndef COMPONENT_SENDER_HPP
 #define COMPONENT_SENDER_HPP
 
-#include <modm/communication/modm/abstract_component.hpp>
+#include <modm/communication/xpcc/abstract_component.hpp>
 #include <modm/processing/timer.hpp>
 
 #include "communication/packets.hpp"
 
 namespace component
 {
-	class Sender : public modm::AbstractComponent
+	class Sender : public xpcc::AbstractComponent
 	{
 	public:
-		Sender(uint8_t id, modm::Dispatcher &communication);
+		Sender(uint8_t id, xpcc::Dispatcher &communication);
 		
 		void
 		update();
 		
 	private:
 		void
-		getPositionCallback(const modm::Header& header,
+		getPositionCallback(const xpcc::Header& header,
 				const robot::packet::Position *parameter);
 		
-		modm::ResponseCallback positionCallback;
+		xpcc::ResponseCallback positionCallback;
 		modm::ShortPeriodicTimer timer;
 	};
 }

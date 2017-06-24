@@ -11,12 +11,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/architecture.hpp>
+#include <modm/platform/platform.hpp>
 
 #include <modm/driver/display.hpp>
 #include <modm/ui/display/font.hpp>
 
 using namespace modm::platform;
+
+using systemClock = SystemClock;
 
 // LCD Backlight
 namespace led
@@ -42,7 +44,7 @@ typedef BitBangSpiMaster< lcd::Scl, lcd::Mosi, lcd::Miso > SPI;
 
 modm::DogM128< SPI, lcd::Cs, lcd::A0, lcd::Reset, true > display;
 
-int 
+int
 main()
 {
 	// Enable a yellow backlight
@@ -53,6 +55,9 @@ main()
 	led::R::setOutput();
 	led::G::setOutput();
 	led::B::setOutput();
+
+	SPI::connect< lcd::Scl::BitBang, lcd::Mosi::BitBang, lcd::Miso::BitBang >();
+	SPI::initialize<systemClock, MHz2>();
 
 	display.initialize();
 

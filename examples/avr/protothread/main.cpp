@@ -11,7 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/platform/platform.hpp>
+#include <modm/architecture/interface/interrupt.hpp>
 #include <modm/processing/protothread.hpp>
 #include <modm/processing/timer.hpp>
 
@@ -27,24 +28,24 @@ public:
 	run()
 	{
 		PT_BEGIN();
-		
+
 		// set everything up
 		LedGreen::setOutput();
 		LedGreen::set();
-		
+
 		while (true)
 		{
 			LedGreen::set();
-			
+
 			this->timeout.restart(100);
 			PT_WAIT_UNTIL(this->timeout.isExpired());
-			
+
 			LedGreen::reset();
-			
+
 			this->timeout.restart(600);
 			PT_WAIT_UNTIL(this->timeout.isExpired());
 		}
-		
+
 		PT_END();
 	}
 
@@ -59,34 +60,34 @@ public:
 	run()
 	{
 		PT_BEGIN();
-		
+
 		// set everything up
 		LedRed::setOutput();
 		LedRed::set();
-		
+
 		while (true)
 		{
 			LedRed::set();
-			
+
 			this->timeout.restart(200);
 			PT_WAIT_UNTIL(this->timeout.isExpired());
-			
+
 			LedRed::reset();
-			
+
 			this->timeout.restart(300);
 			PT_WAIT_UNTIL(this->timeout.isExpired());
-			
+
 			LedRed::set();
-			
+
 			this->timeout.restart(200);
 			PT_WAIT_UNTIL(this->timeout.isExpired());
-			
+
 			LedRed::reset();
-			
+
 			this->timeout.restart(1000);
 			PT_WAIT_UNTIL(this->timeout.isExpired());
 		}
-		
+
 		PT_END();
 	}
 
@@ -109,9 +110,9 @@ main()
 	TCCR2B = (1 << CS22);
 	TIMSK2 = (1 << OCIE2A);
 	OCR2A = 230;
-	
+
 	enableInterrupts();
-	
+
 	BlinkingLightGreen greenLight;
 	BlinkingLightRed redLight;
 	while (1)

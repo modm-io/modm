@@ -10,12 +10,12 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/debug/logger.hpp>
-#include <modm/architecture/architecture.hpp>
+#include <modm/platform/platform.hpp>
 
 #include <modm/processing/timer.hpp>
 
 #include <modm/communication/communication.hpp>
-#include <modm/communication/modm/backend/zeromq/connector.hpp>
+#include <modm/communication/xpcc/backend/zeromq/connector.hpp>
 
 modm::PeriodicTimer pt(2000);
 
@@ -25,8 +25,8 @@ main()
 	const std::string endpointOut = "tcp://127.0.0.1:8211";
 	const std::string endpointIn  = "tcp://127.0.0.1:8212";
 
-	modm::ZeroMQConnector zmqConnectorServer(endpointIn, endpointOut, modm::ZeroMQConnector::Mode::PubPull);
-	modm::ZeroMQConnector zmqConnectorClient(endpointOut, endpointIn, modm::ZeroMQConnector::Mode::SubPush);
+	xpcc::ZeroMQConnector zmqConnectorServer(endpointIn, endpointOut, xpcc::ZeroMQConnector::Mode::PubPull);
+	xpcc::ZeroMQConnector zmqConnectorClient(endpointOut, endpointIn, xpcc::ZeroMQConnector::Mode::SubPush);
 
 	while(true)
 	{
@@ -35,7 +35,7 @@ main()
 
 		if (zmqConnectorServer.isPacketAvailable())
 		{
-			modm::Header header = zmqConnectorServer.getPacketHeader();
+			xpcc::Header header = zmqConnectorServer.getPacketHeader();
 			modm::SmartPointer payload = zmqConnectorServer.getPacketPayload();
 
 			MODM_LOG_DEBUG << "Server Received Header is:       " << header << modm::endl;
@@ -49,7 +49,7 @@ main()
 
 		if (zmqConnectorClient.isPacketAvailable())
 		{
-			modm::Header header = zmqConnectorClient.getPacketHeader();
+			xpcc::Header header = zmqConnectorClient.getPacketHeader();
 			modm::SmartPointer payload = zmqConnectorClient.getPacketPayload();
 
 			MODM_LOG_DEBUG << "Client Received Header is:       " << header << modm::endl;
@@ -63,7 +63,7 @@ main()
 
 		if (pt.execute())
 		{
-			modm::Header header;
+			xpcc::Header header;
 
 			uint8_t buf[] = { 0xde, 0xad, 0xbe, 0xef};
 			modm::SmartPointer payload(&buf);

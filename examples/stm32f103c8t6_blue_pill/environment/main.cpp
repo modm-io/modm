@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016, Sascha Schade
+ * Copyright (c) 2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -9,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 #include <modm/debug/logger.hpp>
 
 #include <modm/processing/timer.hpp>
@@ -50,19 +51,16 @@ main()
 
 	// ------------------------------------------------------------------------
 	// I2C for sensors
-	GpioB6::connect(SensorsAI2cMaster::Scl);
-	GpioB7::connect(SensorsAI2cMaster::Sda);
+	SensorsAI2cMaster::connect<GpioB6::Scl, GpioB7::Sda>();
 	SensorsAI2cMaster::initialize<Board::systemClock, 10000>();
 
-	GpioB10::connect(SensorsBI2cMaster::Scl);
-	GpioB11::connect(SensorsBI2cMaster::Sda);
+	SensorsBI2cMaster::connect<GpioB10::Scl, GpioB11::Sda>();
 	SensorsBI2cMaster::initialize<Board::systemClock, 10000>();
 
 	// ------------------------------------------------------------------------
 	// initialize Uart2 for MODM_LOG_*
-	GpioOutputA2::connect(Usart2::Tx);
-	GpioInputA3::connect(Usart2::Rx, Gpio::InputType::PullUp);
-	Usart2::initialize<Board::systemClock, 115200>(12);
+	Usart2::connect<GpioOutputA2::Tx>();
+	Usart2::initialize<Board::systemClock, 115200>();
 
 	MODM_LOG_DEBUG << "Welcome to Environment Sensor Test" << modm::endl;
 

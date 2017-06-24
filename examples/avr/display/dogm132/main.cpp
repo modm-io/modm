@@ -11,18 +11,18 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/architecture.hpp>
+#include <modm/platform/platform.hpp>
 #include <modm/driver/display.hpp>
 #include <modm/ui/button_group.hpp>
 
 using namespace modm::platform;
-typedef modm::platform::SystemClock clock;
+using systemClock = SystemClock;
 
 typedef GpioOutputD2 Cs;
 typedef GpioOutputB6 Mosi;
 typedef GpioOutputB7 Sck;
 
-typedef BitBangSpiMaster<Sck, Mosi, GpioUnused> SPI;
+typedef BitBangSpiMaster<Sck, Mosi> SPI;
 
 typedef GpioOutputD3 A0;
 typedef GpioOutputD4 Reset;
@@ -31,7 +31,7 @@ typedef modm::DogM132<SPI, Cs, A0, Reset> Display;
 
 typedef GpioOutputD7 Backlight;
 
-int 
+int
 main()
 {
 	Display display;
@@ -39,7 +39,8 @@ main()
 	Backlight::setOutput();
 	Backlight::set();
 
-	SPI::initialize<clock, 1000000>();
+	SPI::connect<Sck::BitBang, Mosi::BitBang>();
+	SPI::initialize<systemClock, 1000000>();
 
 	display.initialize();
 	display.setFont(modm::font::Assertion);

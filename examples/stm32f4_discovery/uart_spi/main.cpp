@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013, Kevin Läufer
- * Copyright (c) 2013-2016, Niklas Hauser
+ * Copyright (c) 2013-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 
 
 int
@@ -19,9 +19,9 @@ main()
 	Board::initialize();
 
 	// Enable Uart SPI 2
-	GpioOutputA2::connect(UartSpiMaster2::Mosi);
-	GpioInputA3::connect(UartSpiMaster2::Miso);
-	GpioOutputA4::connect(UartSpiMaster2::Sck);
+	UartSpiMaster2::connect<GpioA2::Mosi>();
+	UartSpiMaster2::connect<GpioA3::Miso>();
+	UartSpiMaster2::connect<GpioA4::Sck>();
 	UartSpiMaster2::initialize<Board::systemClock, 5250000, modm::Tolerance::Exact>();
 
 	while (1)

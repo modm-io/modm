@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2014, Sascha Schade
- * Copyright (c) 2015-2016, Niklas Hauser
+ * Copyright (c) 2015-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 
 int
 main()
@@ -19,8 +19,8 @@ main()
 	Board::initialize();
 
 	// Initialize Usart Hal
-	GpioOutputA2::connect(UsartHal2::Tx);
-	GpioInputA3::connect(UsartHal2::Rx, Gpio::InputType::PullUp);
+	GpioInputA3::configure(Gpio::InputType::PullUp);
+	GpioConnector<Peripheral::Usart2, GpioOutputA2::Tx, GpioInputA3::Rx>::connect();
 //	UsartHal2::initialize<Board::systemClock, 115200>(UsartHal2::Parity::Odd);
 	UsartHal2::enableInterruptVector(true, 14);
 	UsartHal2::enableInterrupt(UsartHal2::Interrupt::TxEmpty);

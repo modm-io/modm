@@ -3,7 +3,7 @@
  * Copyright (c) 2011-2012, Fabian Greif
  * Copyright (c) 2012, 2014, Sascha Schade
  * Copyright (c) 2013, 2015, Kevin Läufer
- * Copyright (c) 2013, 2015-2016, Niklas Hauser
+ * Copyright (c) 2013, 2015-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -13,7 +13,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 
 // ----------------------------------------------------------------------------
 /**
@@ -29,9 +29,8 @@ main()
 	Board::LedUp::set();
 
 	// Enable USART 1
-	GpioOutputA9::connect(Usart1::Tx);
-	GpioInputA10::connect(Usart1::Rx, Gpio::InputType::PullUp);
-	Usart1::initialize<Board::systemClock, 9600>(12);
+	Usart1::connect<GpioOutputA9::Tx>();
+	Usart1::initialize<Board::systemClock, 9600>();
 
 	while (1)
 	{

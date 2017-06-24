@@ -19,14 +19,14 @@
 #include "receiver.hpp"
 
 // ----------------------------------------------------------------------------
-component::Receiver::Receiver(uint8_t id, modm::Dispatcher &communication) :
-	modm::AbstractComponent(id, communication)
+component::Receiver::Receiver(uint8_t id, xpcc::Dispatcher &communication) :
+	xpcc::AbstractComponent(id, communication)
 {
 }
 
 // ----------------------------------------------------------------------------
 void
-component::Receiver::actionSetPosition(const modm::ResponseHandle&,
+component::Receiver::actionSetPosition(const xpcc::ResponseHandle&,
 		const robot::packet::Position *parameter)
 {
 	MODM_LOG_INFO << MODM_FILE_INFO
@@ -38,7 +38,7 @@ component::Receiver::actionSetPosition(const modm::ResponseHandle&,
 
 // ----------------------------------------------------------------------------
 void
-component::Receiver::actionGetPosition(const modm::ResponseHandle& handle)
+component::Receiver::actionGetPosition(const xpcc::ResponseHandle& handle)
 {
 	MODM_LOG_INFO << MODM_FILE_INFO << "action get position" << modm::endl;
 	

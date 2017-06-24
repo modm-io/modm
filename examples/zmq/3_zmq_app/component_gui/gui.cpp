@@ -22,8 +22,8 @@
 #define	MODM_LOG_LEVEL modm::log::DEBUG
 
 // ----------------------------------------------------------------------------
-component::Gui::Gui(uint8_t id, modm::Dispatcher &communication) :
-	modm::AbstractComponent(id, communication)
+component::Gui::Gui(uint8_t id, xpcc::Dispatcher &communication) :
+	xpcc::AbstractComponent(id, communication)
 {
 }
 
@@ -36,7 +36,7 @@ component::Gui::update()
 
 // ----------------------------------------------------------------------------
 void
-component::Gui::eventRobotLocation(modm::Header /* header */, const robot::packet::Location * const location)
+component::Gui::eventRobotLocation(xpcc::Header /* header */, const robot::packet::Location * const location)
 {
 	MODM_LOG_DEBUG << MODM_FILE_INFO << *location << modm::endl;
 	// MODM_LOG_DEBUG.printf("Payload: x = %5d, y = %d, phi = %4.2f\n", location->x, location->y, location->phi);

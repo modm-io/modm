@@ -22,11 +22,11 @@
 
 #include "odometry.hpp"
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 
 // ----------------------------------------------------------------------------
-component::Odometry::Odometry(uint8_t id, modm::Dispatcher &communication) :
-	modm::AbstractComponent(id, communication),
+component::Odometry::Odometry(uint8_t id, xpcc::Dispatcher &communication) :
+	xpcc::AbstractComponent(id, communication),
 	timer(50)
 {
 }
@@ -40,7 +40,7 @@ component::Odometry::update()
 	{
 		MODM_LOG_INFO << MODM_FILE_INFO << "Odometry update" << modm::endl;
 
-		robot::packet::Location location(modm::platform::Timer1::getValue(), 11, 0.5);
+		robot::packet::Location location(Timer1::getValue(), 11, 0.5);
 
 		robot::EventPublisher::robotLocation(getCommunicator(), location);
 	}
@@ -48,9 +48,9 @@ component::Odometry::update()
 
 void
 component::Odometry::actionSetLedRed(
-	const modm::ResponseHandle& responseHandle,
+	const xpcc::ResponseHandle& responseHandle,
 	const robot::packet::Bool *payload)
 {
-	modm::platform::GpioOutputB14::set(*payload);
+	GpioOutputB14::set(*payload);
 	sendResponse(responseHandle);
 }

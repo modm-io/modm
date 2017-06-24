@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2015, Kevin Läufer
  * Copyright (c) 2015, Sascha Schade
- * Copyright (c) 2015-2016, Niklas Hauser
+ * Copyright (c) 2015-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -11,12 +11,11 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 #include <modm/debug/logger.hpp>
 #include <modm/processing/processing.hpp>
 
-Usart2 uart;
-modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice(uart);
+modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
 
 // Set all four logger streams to use the UART
 modm::log::Logger modm::log::debug(loggerDevice);
@@ -85,17 +84,16 @@ main()
 	Board::initialize();
 
 	// Enable USART 2: To / from PC
-	GpioOutputA2::connect(Usart2::Tx);
-	GpioInputA3::connect(Usart2::Rx, Gpio::InputType::PullUp);
-	Usart2::initialize<Board::systemClock, 115200>(12);
+	Usart2::connect<GpioOutputA2::Tx, GpioInputA3::Rx>();
+	Usart2::initialize<Board::systemClock, 115200>();
 
 	// Enable USART 1 Host To Node
-	GpioInputA10::connect(Usart1::Rx, Gpio::InputType::PullUp);
-	Usart1::initialize<Board::systemClock, 115200>(12);
+	Usart1::connect<GpioInputA10::Rx>();
+	Usart1::initialize<Board::systemClock, 115200>();
 
 	// Enable USART 3 Node to Host
-	GpioInputD9::connect(Usart3::Rx, Gpio::InputType::PullUp);
-	Usart3::initialize<Board::systemClock, 115200>(12);
+	Usart3::connect<GpioInputD9::Rx>();
+	Usart3::initialize<Board::systemClock, 115200>();
 
 	MODM_LOG_INFO.printf("\e[H\e[J\e[39m");
 	MODM_LOG_INFO.printf("Welcome to MODM Bidirectional UART Sniffer.\n\n");

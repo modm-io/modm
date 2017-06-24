@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Sascha Schade
- * Copyright (c) 2014-2016, Niklas Hauser
+ * Copyright (c) 2014-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 #include <modm/processing/processing.hpp>
 #include <modm/io/iostream.hpp>
 #include <modm/architecture/interface/gpio.hpp>
@@ -125,12 +125,11 @@ main()
 {
 	Board::initialize();
 
-	GpioOutputA2::connect(Usart2::Tx);
-	Usart2::initialize<Board::systemClock, modm::Uart::B115200>(10);
+	Usart2::connect<GpioA2::Tx>();
+	Usart2::initialize<Board::systemClock, modm::Uart::B115200>();
 
-	GpioB9::connect(MyI2cMaster::Sda);
-	GpioB8::connect(MyI2cMaster::Scl);
-    MyI2cMaster::initialize<Board::systemClock, MyI2cMaster::Baudrate::Standard>();
+	MyI2cMaster::connect<GpioB9::Sda, GpioB8::Scl>();
+	MyI2cMaster::initialize<Board::systemClock, MyI2cMaster::Baudrate::Standard>();
 
 	stream << "\n\nWelcome to BMP085 demo!\n\n";
 

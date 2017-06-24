@@ -10,12 +10,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 
 #include <modm/processing/timer/periodic_timer.hpp>
 
 #include <modm/communication/communication.hpp>
-#include <modm/communication/modm/backend/can.hpp>
+#include <modm/communication/xpcc/backend/can.hpp>
 
 #include "component_odometry/odometry.hpp"
 
@@ -53,13 +53,13 @@ namespace Led
 
 static Can1 device;
 
-// CanConnector does the fragmentation and defragmentation of modm messages to and from CAN frames.
-static modm::CanConnector< Can1 > connector(&device);
+// CanConnector does the fragmentation and defragmentation of xpcc messages to and from CAN frames.
+static xpcc::CanConnector< Can1 > connector(&device);
 
 // create an instance of the generated postman
 Postman postman;
 
-modm::Dispatcher dispatcher(&connector, &postman);
+xpcc::Dispatcher dispatcher(&connector, &postman);
 
 namespace component
 {
@@ -77,7 +77,7 @@ main()
 	// Led::G::setOutput();
 	// Led::B::setOutput();
 
-	using Timer = modm::platform::Timer1;
+	using Timer = Timer1;
 	using ChannelA = GpioInputE9;
 	using ChannelB = GpioInputE11;
 	auto ChannelAInputType = Gpio::InputType::PullUp;
@@ -88,17 +88,17 @@ main()
 	Timer::setMode(Timer::Mode::UpCounter, Timer::SlaveMode::Encoder3);
 	// Overflow must be 16bit because else a lot of our motor control code will break!
 	Timer::setOverflow(0xffff);
-	ChannelA::connect(Timer::Channel1, ChannelAInputType);
-	ChannelB::connect(Timer::Channel2, ChannelBInputType);
+	ChannelA::setInput(ChannelAInputType);
+	ChannelB::setInput(ChannelBInputType);
+	Timer::connect<ChannelA::Ch1, ChannelB::Ch2>();
 	Timer::start();
 
 	// Initialize Can1
-	GpioInputB8::connect(Can1::Rx, Gpio::InputType::PullUp);
-	GpioOutputB9::connect(Can1::Tx, Gpio::OutputType::PushPull);
-	Can1::initialize<Board::systemClock, Can1::Bitrate::kBps125>(9);
+	Can1::connect<GpioB8::Rx, GpioB9::Tx>(Gpio::InputType::PullUp);
+	Can1::initialize<Board::systemClock, Can1::Bitrate::kBps125>(10);
 	CanFilter::setFilter(0, CanFilter::FIFO0,
-                        CanFilter::ExtendedIdentifier(0),
-                        CanFilter::ExtendedFilterMask(0));
+						CanFilter::ExtendedIdentifier(0),
+						CanFilter::ExtendedFilterMask(0));
 
 
 	LedGreen::set();

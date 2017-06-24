@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 #include <modm/driver/usb/ft245.hpp>
 
 /**
@@ -29,11 +29,11 @@ main()
 {
 	Board::initialize();
 
-	typedef modm::platform::GpioPort<modm::platform::GpioD0, 8> myPort;
-	typedef modm::platform::GpioInputC11  Rxf;
-	typedef modm::platform::GpioInputC10  Txe;
-	typedef modm::platform::GpioOutputA15 Rd;
-	typedef modm::platform::GpioOutputA9  Wr;
+	typedef GpioPort<GpioD0, 8> myPort;
+	typedef GpioInputC11  Rxf;
+	typedef GpioInputC10  Txe;
+	typedef GpioOutputA15 Rd;
+	typedef GpioOutputA9  Wr;
 
 	Rd::setOutput(modm::Gpio::High);
 	Wr::setOutput(modm::Gpio::Low);

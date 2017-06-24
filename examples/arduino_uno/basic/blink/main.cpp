@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013-2014, Kevin Läufer
- * Copyright (c) 2013, 2016, Niklas Hauser
+ * Copyright (c) 2013, 2016-2017, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
  *
  * This file is part of the modm project.
@@ -13,7 +13,7 @@
 
 // Inspired by: http://arduino.cc/en/Tutorial/Blink
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 
 int
 main()

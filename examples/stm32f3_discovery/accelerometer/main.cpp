@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015, Kevin Läufer
- * Copyright (c) 2015-2016, Niklas Hauser
+ * Copyright (c) 2015-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 #include <modm/processing/processing.hpp>
 #include <modm/math/math.hpp>
 

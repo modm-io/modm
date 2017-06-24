@@ -11,10 +11,12 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/debug/logger.hpp>
-#include <modm/architecture/architecture.hpp>
+#include <modm/platform/platform.hpp>
 
 #include <modm/architecture/interface/can.hpp>
-#include <modm/architecture/platform/driver/can/canusb/canusb.hpp>
+#include <modm/platform/can/canusb.hpp>
+
+using namespace modm::platform;
 
 /**
  * Simple example that listens to a CAN bus connected by a CAN2USB.
@@ -33,8 +35,8 @@
 
 static constexpr modm::Can::Bitrate canBusBitRate = modm::Can::kBps125;
 
-modm::platform::SerialInterface port("/dev/ttyUSB0", 115200);
-modm::platform::CanUsb<modm::platform::SerialInterface> canUsb(port);
+SerialInterface port("/dev/ttyUSB0", 115200);
+CanUsb<SerialInterface> canUsb(port);
 
 int
 main()

@@ -11,11 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/architecture.hpp>
+#include <modm/platform/platform.hpp>
 #include <modm/driver/display.hpp>
 #include <modm/ui/button_group.hpp>
 
 using namespace modm::platform;
+
+using systemClock = SystemClock;
 
 typedef GpioOutputA0 Mosi;
 typedef GpioOutputA1 Sck;
@@ -28,14 +30,16 @@ typedef modm::SiemensS65Portrait<SPI, Cs, Rs, Reset> Display;
 
 typedef GpioOutputA5 Backlight;
 
-int 
+int
 main()
 {
-	Display display;
+	SPI::connect<Sck::BitBang, Mosi::BitBang>();
+	SPI::initialize<systemClock, 1000000>();
 
 	Backlight::setOutput();
 	Backlight::set();
 
+	Display display;
 	display.initialize();
 	display.setFont(modm::font::Assertion);
 

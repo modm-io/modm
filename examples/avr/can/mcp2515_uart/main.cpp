@@ -11,13 +11,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/architecture.hpp>
+#include <modm/platform/platform.hpp>
+#include <modm/architecture/interface/interrupt.hpp>
 
 #include <modm/driver/can/mcp2515.hpp>
 #include <modm/processing/timer.hpp>
 
 using namespace modm::platform;
-typedef modm::platform::SystemClock clock;
+using systemClock = SystemClock;
 
 typedef GpioOutputB0 LedGreen;
 typedef GpioOutputB1 LedRed;
@@ -48,9 +49,6 @@ FLASH_STORAGE(uint8_t canFilter[]) =
 	MCP2515_FILTER_EXTENDED(0),	// Mask 1
 };
 
-// Create a new UART object and configure it to a baudrate of 115200
-Uart0 uart;
-
 // timer interrupt routine
 MODM_ISR(TIMER2_COMPA)
 {
@@ -70,28 +68,28 @@ main()
 	TIMSK2 = (1 << OCIE2A);
 	OCR2A = 230;
 
-    GpioOutputD1::connect(Uart0::Tx);
-    GpioInputD0::connect(Uart0::Rx);
-    Uart0::initialize<clock, 115200>();
+	Uart0::connect<GpioOutputD1::Txd>();
+	Uart0::initialize<systemClock, 115200>();
 
 	// Create a IOStream for complex formatting tasks
-	modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > device(uart);
+	modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > device;
 	modm::IOStream stream(device);
 
 	// enable interrupts
-	sei();
+	enableInterrupts();
 
 	stream << "CAN Demo" << modm::endl;
 
 	// Initialize SPI interface and the other pins
 	// needed by the MCP2515
-	SPI::initialize<clock, 1000000>();
-    Cs::setOutput();
+	SPI::connect<Sclk::BitBang, Mosi::BitBang, Miso::BitBang>();
+	SPI::initialize<systemClock, 1000000>();
+	Cs::setOutput();
 	Int::setInput(Gpio::InputType::PullUp);
 
 	// Configure MCP2515 and set the filters
-    // Fixme: modm::Can::Bitrate is incompatitlbe with device driver
-//	mcp2515.initialize(modm::can::BITRATE_125_KBPS);
+	// Fixme: modm::Can::Bitrate is incompatitlbe with device driver
+	// mcp2515.initialize(modm::can::BITRATE_125_KBPS);
 	mcp2515.setFilter(modm::accessor::asFlash(canFilter));
 
 	// Create a new message

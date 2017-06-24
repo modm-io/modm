@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2016, Niklas Hauser
+ * Copyright (c) 2014-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -12,7 +12,7 @@
 #ifndef LEDS_HPP
 #define LEDS_HPP
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 #include <modm/ui/led.hpp>
 
 // create the leds with these lambda callbacks

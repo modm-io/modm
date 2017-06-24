@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2013-2014, Kevin Läufer
  * Copyright (c) 2013-2014, Sascha Schade
- * Copyright (c) 2013, 2015-2016, Niklas Hauser
+ * Copyright (c) 2013, 2015-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 
 int
 main()
@@ -28,8 +28,7 @@ main()
 	Timer1::applyAndReset();
 	Timer1::start();
 
-	Board::LedNorth::connect(Timer1::Channel1);
-	Board::LedNorthWest::connect(Timer1::Channel1N);
+	Timer1::connect<Board::LedNorth::Ch1, Board::LedNorthWest::Ch1n>();
 	Timer1::setCompareValue(1, 0);
 	Timer1::configureOutputChannel(1,
 			static_cast<uint32_t>(Timer1::OutputCompareMode::Pwm) | 0b0101);

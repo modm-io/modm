@@ -17,11 +17,11 @@
  * from extern.
  */
 
-#include <modm/architecture/platform.hpp>
+#include <modm/platform/platform.hpp>
 #include <modm/communication/sab/slave.hpp>
 
 using namespace modm::platform;
-typedef modm::platform::SystemClock clock;
+using systemClock = SystemClock;
 
 // ----------------------------------------------------------------------------
 // wrapper class for the A/D converter
@@ -31,7 +31,7 @@ public:
 	AnalogDigital()
 	{
 		// initialize the analog to digital converter
-		Adc::initialize<clock, 115000>();
+		Adc::initialize<systemClock, 115000>();
 		Adc::setReference(Adc::Reference::InternalVcc);
 	}
 
@@ -91,7 +91,7 @@ FLASH_STORAGE(modm::sab::Action actionList[]) =
 typedef modm::sab::Slave< modm::sab::Interface< Uart0 > > Slave;
 
 // ----------------------------------------------------------------------------
-int 
+int
 main()
 {
 	// initialize ABP interface, set baudrate etc.

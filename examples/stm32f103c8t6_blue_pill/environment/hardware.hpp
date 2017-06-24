@@ -13,12 +13,12 @@
 #ifndef ENVIRONMENT_HARDWARE_HPP
 #define ENVIRONMENT_HARDWARE_HPP
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 
 // ----------------------------------------------------------------------------
 // Sensors at I2C
 
-using SensorsAI2cMaster = modm::platform::I2cMaster1;
-using SensorsBI2cMaster = modm::platform::I2cMaster2;
+using SensorsAI2cMaster = I2cMaster1;
+using SensorsBI2cMaster = I2cMaster2;
 
 #endif // ENVIRONMENT_HARDWARE_HPP

@@ -1,5 +1,5 @@
-#include <modm/architecture/platform.hpp>
-#include <modm/processing.hpp>
+#include <modm/board/board.hpp>
+#include <modm/processing/processing.hpp>
 
 using namespace Board;
 using namespace modm::glcd;

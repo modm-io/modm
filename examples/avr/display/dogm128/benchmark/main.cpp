@@ -11,7 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/architecture.hpp>
+#include <modm/platform/platform.hpp>
+#include <modm/architecture/interface/interrupt.hpp>
 
 #include <modm/driver/display.hpp>
 #include <modm/ui/display.hpp>
@@ -20,6 +21,8 @@
 #include "images/rca_logo_128x64.hpp"
 
 using namespace modm::platform;
+
+using systemClock = SystemClock;
 
 namespace led
 {
@@ -62,6 +65,9 @@ setup()
 	led::G::setOutput();
 	led::B::setOutput();
 
+	lcd::SPI::connect<lcd::Sck::BitBang, lcd::Mosi::BitBang>();
+	lcd::SPI::initialize<systemClock, MHz2>();
+
 	// timer initialization
 	// compare-match-interrupt every 1 ms at 14.7456 MHz
 	TCCR2A = (1 << WGM21);
@@ -70,7 +76,7 @@ setup()
 	OCR2A = 230;
 
 	// enable interrupts
-	sei();
+	enableInterrupts();
 
 	display.initialize();
 }
@@ -151,7 +157,7 @@ drawSpinner(Point center, uint8_t pos)
 }
 
 
-int 
+int
 main()
 {
 	setup();

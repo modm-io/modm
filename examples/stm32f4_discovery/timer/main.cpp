@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2013, Fabian Greif
  * Copyright (c) 2013, Kevin Läufer
- * Copyright (c) 2014-2016, Niklas Hauser
+ * Copyright (c) 2014-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 #include <modm/processing/processing.hpp>
 #include "leds.hpp"
 #include "animations.hpp"
@@ -23,10 +23,11 @@ main()
 	Board::initialize();
 
 	// connect the Timer Channels to the LEDs
-	Board::LedGreen::connect(Timer4::Channel1);
-	Board::LedOrange::connect(Timer4::Channel2);
-	Board::LedRed::connect(Timer4::Channel3);
-	Board::LedBlue::connect(Timer4::Channel4);
+	Timer4::connect<
+		Board::LedGreen::Ch1,
+		Board::LedOrange::Ch2,
+		Board::LedRed::Ch3,
+		Board::LedBlue::Ch4>();
 
 	// set up the timer for 16bit PWM
 	Timer4::enable();
@@ -36,10 +37,10 @@ main()
 	Timer4::setPrescaler(1);
 	Timer4::setOverflow(65535);
 	// configure the output channels
-	Timer4::configureOutputChannel(1, Timer2::OutputCompareMode::Pwm, 0);
-	Timer4::configureOutputChannel(2, Timer2::OutputCompareMode::Pwm, 0);
-	Timer4::configureOutputChannel(3, Timer2::OutputCompareMode::Pwm, 0);
-	Timer4::configureOutputChannel(4, Timer2::OutputCompareMode::Pwm, 0);
+	Timer4::configureOutputChannel(1, Timer4::OutputCompareMode::Pwm, 0);
+	Timer4::configureOutputChannel(2, Timer4::OutputCompareMode::Pwm, 0);
+	Timer4::configureOutputChannel(3, Timer4::OutputCompareMode::Pwm, 0);
+	Timer4::configureOutputChannel(4, Timer4::OutputCompareMode::Pwm, 0);
 	Timer4::applyAndReset();
 	// start the timer
 	Timer4::start();

@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 #include <modm/processing/rtos.hpp>
 
 using namespace modm::platform;
@@ -76,7 +76,7 @@ public:
 			sleep(SleepTime);
 
 			Gpio::toggle();
-			modm::platform::Usart2::writeBlocking(i + c);
+			Usart2::writeBlocking(i + c);
 
 			i = (i+1)%10;
 
@@ -98,15 +98,14 @@ main()
 {
 	Board::initialize();
 
-	GpioA2::connect(modm::platform::Usart2::Tx);
-	GpioA3::connect(modm::platform::Usart2::Rx, Gpio::InputType::PullUp);
-	modm::platform::Usart2::initialize<Board::systemClock, modm::platform::Usart2::B115200>(6);
+	Usart2::connect<GpioA2::Tx>();
+	Usart2::initialize<Board::systemClock, Usart2::B115200>();
 
-    while (1)
-    {
-    	modm::rtos::Scheduler::schedule();
-    }
+	while (1)
+	{
+		modm::rtos::Scheduler::schedule();
+	}
 
-    // should not get here!
-    return 0;
+	// should not get here!
+	return 0;
 }

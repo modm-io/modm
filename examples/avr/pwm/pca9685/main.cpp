@@ -10,20 +10,20 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/platform/platform.hpp>
 #include <modm/driver/pwm/pca9685.hpp>
 
 using namespace modm::platform;
-typedef modm::platform::SystemClock systemClock;
+using systemClock = SystemClock;
 
-int 
+int
 main()
 {
 	// Set-up the I2C device as master and configure it to a baudrate of 100.000
 	I2cMaster::initialize<systemClock, 100000>();
 
 	// Enable interrupts
-	sei();
+	enableInterrupts();
 
 	// Create the PWM controller and set it up to use I2C address 0x50.
 	// The controller's address depends on the configuration of pins A0-A5 and

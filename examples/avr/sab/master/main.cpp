@@ -10,27 +10,27 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/platform/platform.hpp>
 #include <modm/communication/sab/interface.hpp>
 
 using namespace modm::platform;
 
-int 
+int
 main()
 {
 	modm::sab::Interface< Uart0 > interface;
-	
+
 	// set baudrate etc.
 	interface.initialize();
-	
+
 	// enable interrupts
-	sei();
-	
+	enableInterrupts();
+
 	while(1)
 	{
 		// decode received messages
 		interface.update();
-		
+
 		// ... TODO ...
 	}
 }

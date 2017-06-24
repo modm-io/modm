@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Sascha Schade
- * Copyright (c) 2014-2016, Niklas Hauser
+ * Copyright (c) 2014-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 
 #include <modm/processing/timer.hpp>
 #include <modm/processing/protothread.hpp>
@@ -95,7 +95,7 @@ public:
 private:
 	bool result;
 	modm::ShortTimeout timeout;
-    modm::tmp102::Data temperatureData;
+	modm::tmp102::Data temperatureData;
 	modm::Tmp102<MyI2cMaster> temp;
 };
 
@@ -107,11 +107,10 @@ main()
 {
 	Board::initialize();
 
-	GpioOutputA2::connect(Usart2::Tx);
-	Usart2::initialize<Board::systemClock, modm::Uart::B38400>(10);
+	Usart2::connect<GpioA2::Tx>();
+	Usart2::initialize<Board::systemClock, modm::Uart::B38400>();
 
-	GpioB7::connect(MyI2cMaster::Sda, Gpio::InputType::PullUp);
-	GpioB8::connect(MyI2cMaster::Scl, Gpio::InputType::PullUp);
+	MyI2cMaster::connect<GpioB7::Sda, GpioB8::Scl>(MyI2cMaster::PullUps::Internal);
 	MyI2cMaster::initialize<Board::systemClock, 100000>();
 
 	stream << "\n\nRESTART\n\n";

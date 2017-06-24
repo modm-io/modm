@@ -23,8 +23,8 @@
 #include "sender.hpp"
 
 // ----------------------------------------------------------------------------
-component::Sender::Sender(uint8_t id, modm::Dispatcher &communication) :
-	modm::AbstractComponent(id, communication),
+component::Sender::Sender(uint8_t id, xpcc::Dispatcher &communication) :
+	xpcc::AbstractComponent(id, communication),
 	positionCallback(this, &Sender::getPositionCallback),
 	timer(2000)
 {
@@ -32,7 +32,7 @@ component::Sender::Sender(uint8_t id, modm::Dispatcher &communication) :
 
 // ----------------------------------------------------------------------------
 void
-component::Sender::getPositionCallback(const modm::Header&,
+component::Sender::getPositionCallback(const xpcc::Header&,
 		const robot::packet::Position *parameter)
 {
 	MODM_LOG_INFO << MODM_FILE_INFO

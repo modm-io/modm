@@ -11,11 +11,11 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/architecture.hpp>
+#include <modm/platform/platform.hpp>
 #include <modm/driver/can/mcp2515.hpp>
 
 using namespace modm::platform;
-typedef modm::platform::SystemClock clock;
+using systemClock = SystemClock;
 
 typedef GpioOutputB4 Cs;
 typedef GpioInputB2 Int;
@@ -49,14 +49,15 @@ main()
 {
 	// Initialize SPI interface and the other pins
 	// needed by the MCP2515
-	SPI::initialize<clock, 921600>();
+	SPI::connect<Sclk::Sck, Mosi::Mosi, Miso::Miso>();
+	SPI::initialize<systemClock, 921600>();
 	Cs::setOutput();
 	Int::setInput(Gpio::InputType::PullUp);
 
 	// Configure MCP2515 and set the filters
-        // Fixme: modm::Can::Bitrate is incompatitlbe with device driver
-//  mcp2515.initialize(bitrate);
-//  mcp2515.setFilter(modm::accessor::asFlash(canFilter));
+	// Fixme: modm::Can::Bitrate is incompatitlbe with device driver
+	// mcp2515.initialize(bitrate);
+	// mcp2515.setFilter(modm::accessor::asFlash(canFilter));
 
 	// Create a new message
 	modm::can::Message message(0x123456);

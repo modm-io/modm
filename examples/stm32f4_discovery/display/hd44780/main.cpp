@@ -29,7 +29,7 @@
 #include <modm/driver/display/hd44780.hpp>
 #include <modm/driver/gpio/pca8574.hpp>
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
 modm::IOStream stream(device);
@@ -190,14 +190,12 @@ main()
 {
 	Board::initialize();
 
-	GpioOutputA2::connect(Usart2::Tx);
-	Usart2::initialize<Board::systemClock, modm::Uart::B115200>(10);
+	Usart2::connect<GpioA2::Tx>();
+	Usart2::initialize<Board::systemClock, modm::Uart::B115200>();
 
 	MODM_LOG_INFO << "\n\nWelcome to HD44780 I2C demo!\n\n";
 
-	GpioB11::connect(MyI2cMaster::Sda, Gpio::InputType::PullUp);
-	GpioB10::connect(MyI2cMaster::Scl, Gpio::InputType::PullUp);
-
+	MyI2cMaster::connect<GpioB11::Sda, GpioB10::Scl>(MyI2cMaster::PullUps::Internal);
 	MyI2cMaster::initialize<Board::systemClock, 100000>();
 
 	modm::ShortPeriodicTimer tmr(500);

@@ -12,23 +12,23 @@
 #ifndef COMPONENT_GUI_HPP
 #define COMPONENT_GUI_HPP
 
-#include <modm/communication/modm/abstract_component.hpp>
+#include <modm/communication/xpcc/abstract_component.hpp>
 #include <modm/processing/timer.hpp>
 
 #include "communication/packets.hpp"
 
 namespace component
 {
-	class Gui : public modm::AbstractComponent
+	class Gui : public xpcc::AbstractComponent
 	{
 	public:
-		Gui(uint8_t id, modm::Dispatcher &communication);
+		Gui(uint8_t id, xpcc::Dispatcher &communication);
 		
 		void
 		update();
 
 		void
-		eventRobotLocation(modm::Header header, const robot::packet::Location * const payload);
+		eventRobotLocation(xpcc::Header header, const robot::packet::Location * const payload);
 	};
 }
 

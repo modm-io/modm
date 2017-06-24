@@ -9,7 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
+#include <modm/architecture/interface/assert.hpp>
 #include <avr/pgmspace.h>
 
 using modm::accessor::asFlash;

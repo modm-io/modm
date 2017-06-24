@@ -11,32 +11,28 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/platform/platform.hpp>
 
 using namespace modm::platform;
-typedef modm::platform::SystemClock clock;
-
-// Create a new UART object and configure it to a baudrate of 115200
-typedef Uart0 uart;
+using systemClock = SystemClock;
 
 int
 main()
 {
-    GpioOutputD1::connect(Uart0::Tx);
-    GpioInputD0::connect(Uart0::Rx);
-    uart::initialize<clock, 115200>();
+	Uart0::connect<GpioOutputD1::Txd, GpioInputD0::Rxd>();
+	Uart0::initialize<systemClock, 115200>();
 
-    // Enable interrupts, this is needed for every buffered UART
-	sei();
-	
+	// Enable interrupts, this is needed for every buffered UART
+	enableInterrupts();
+
 	// Write some characters
-    uart::write('H');
-    uart::write('e');
-    uart::write('l');
-    uart::write('l');
-    uart::write('o');
-    uart::write('\n');
-	
+	Uart0::write('H');
+	Uart0::write('e');
+	Uart0::write('l');
+	Uart0::write('l');
+	Uart0::write('o');
+	Uart0::write('\n');
+
 	while (1)
 	{
 	}

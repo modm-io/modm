@@ -1,4 +1,4 @@
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 #include <modm/processing/timer.hpp>
 #include <modm/driver/rtc/ds1302/ds1302.hpp>
 

@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 #include <modm/driver/inertial/lis302dl.hpp>
 #include <modm/processing/processing.hpp>
 #include <modm/math/math.hpp>
@@ -116,10 +116,8 @@ main()
 	Board::lis3::Cs::setOutput(modm::Gpio::High);
 	Board::lis3::Mosi::setOutput(modm::Gpio::High);
 
-	lis::Scl::connect(lis::I2cMaster::Scl, Gpio::InputType::PullUp);
-	lis::Sda::connect(lis::I2cMaster::Sda, Gpio::InputType::PullUp);
-
-	lis::I2cMaster::initialize<systemClock, 400000>();
+	lis::I2cMaster::connect<lis::Scl::BitBang, lis::Sda::BitBang>(MyI2cMaster::PullUps::Internal);
+	lis::I2cMaster::initialize<Board::systemClock, 400000>();
 #else
 	Board::initializeLis3();
 #endif

@@ -1,4 +1,4 @@
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 
 using namespace Board;
 
@@ -14,7 +14,7 @@ main()
 		ClockControl::ClockOutputSource::MultiSpeedInternalClock,
 		ClockControl::ClockOutputSourcePrescaler::Div16);
 
-	modm::platform::GpioA8::connect(modm::platform::ClockControl::ClockOutput);
+	GpioConnector<Peripheral::Rcc, GpioA8::Mco>::connect();
 
 	LedGreen::set();
 
@@ -22,7 +22,7 @@ main()
 					Adc1::ClockSource::SystemClock,
 					Adc1::Prescaler::Disabled,
 					Adc1::CalibrationMode::SingleEndedInputsMode, true);
-	GpioInputA0::connect(Adc1::Channel5);
+	Adc1::connect<GpioInputA0::In5>();
 	Adc1::setChannel(Adc1::Channel::Channel5, Adc1::SampleTime::Cycles182);
 
 	int loop(0);

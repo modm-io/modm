@@ -1,6 +1,7 @@
 // coding: utf-8
 /*
  * Copyright (c) 2017, Christopher Durand
+ * Copyright (c) 2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -10,9 +11,9 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 
-#include <modm/processing.hpp>
+#include <modm/processing/processing.hpp>
 #include <modm/driver/position/vl53l0.hpp>
 #include <modm/debug/logger.hpp>
 
@@ -157,8 +158,7 @@ main()
 	Board::initialize();
 	LedD13::setOutput();
 
-	GpioB8::connect(MyI2cMaster::Scl);
-	GpioB9::connect(MyI2cMaster::Sda);
+	MyI2cMaster::connect<GpioB8::Scl, GpioB9::Sda>();
 	MyI2cMaster::initialize<systemClock, 400000>();
 
 	MODM_LOG_INFO << "\n\nWelcome to VL53L0X demo!\n\n";

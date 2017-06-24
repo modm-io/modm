@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2014, Daniel Krebs
  * Copyright (c) 2014, Sascha Schade
- * Copyright (c) 2014-2016, Niklas Hauser
+ * Copyright (c) 2014-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 #include <modm/driver/radio/nrf24/nrf24_phy.hpp>
 #include <modm/debug/logger.hpp>
 #include <modm/processing/processing.hpp>
@@ -99,26 +99,17 @@ main()
 	Ce1::setOutput(modm::Gpio::Low);
 	Ce2::setOutput(modm::Gpio::Low);
 
-
 	// Enable SPI 1
-	GpioOutputB5::connect(SpiMaster1::Mosi);
-	GpioInputB4::connect(SpiMaster1::Miso);
-	GpioOutputB3::connect(SpiMaster1::Sck);
+	SpiMaster1::connect<GpioB5::Mosi, GpioB4::Miso, GpioB3::Sck>();
 	SpiMaster1::initialize<Board::systemClock, 10500000, modm::Tolerance::Exact>();
 
 	// Enable SPI 2
-	GpioOutputB15::connect(SpiMaster2::Mosi);
-	GpioInputB14::connect(SpiMaster2::Miso);
-	GpioOutputB13::connect(SpiMaster2::Sck);
+	SpiMaster2::connect<GpioB15::Mosi, GpioB14::Miso, GpioB13::Sck>();
 	SpiMaster2::initialize<Board::systemClock, 10500000, modm::Tolerance::Exact>();
 
-
 	// Enable UART 2
-	GpioOutputA2::connect(Usart2::Tx);
-	GpioInputA3::connect(Usart2::Rx, Gpio::InputType::PullUp);
-	Usart2::initialize<Board::systemClock, 115200>(12);
-
-
+	Usart2::connect<GpioA2::Tx>();
+	Usart2::initialize<Board::systemClock, 115200>();
 
 	/* Configuration values for nRF24 */
 

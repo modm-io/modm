@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011, Fabian Greif
- * Copyright (c) 2016, Niklas Hauser
+ * Copyright (c) 2016-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
-#include <modm/architecture/interface/accessor_flash.hpp>
+#include <modm/platform/platform.hpp>
+#include <modm/architecture/interface/accessor.hpp>
 
 //extern const int a PROGMEM;
 //const int a = 12;

@@ -9,7 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 
 using namespace Board;
 
@@ -25,6 +25,7 @@ test_assertion_handler(const char * module,
 	}
 	return modm::Abandonment::DontCare;
 }
+MODM_ASSERTION_HANDLER(test_assertion_handler);
 
 static modm::Abandonment
 core_assertion_handler(const char * module,

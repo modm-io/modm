@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 
 /**
  * This is some testing of Timers 1 to 14 on a STM32 F4 Discovery Board.
@@ -35,50 +35,50 @@ template< typename TIMER >
 static void
 testTimerAdvancedStart()
 {
-    TIMER::enable();
-    TIMER::setMode(TIMER::Mode::UpCounter);
+	TIMER::enable();
+	TIMER::setMode(TIMER::Mode::UpCounter);
 
 	TIMER::template setPeriod<Board::systemClock>(250000);
-    TIMER::enableInterruptVector(TIMER::Interrupt::Update, true, 10);
-    TIMER::enableInterrupt(TIMER::Interrupt::Update);
+	TIMER::enableInterruptVector(TIMER::Interrupt::Update, true, 10);
+	TIMER::enableInterrupt(TIMER::Interrupt::Update);
 
-    TIMER::applyAndReset();
-    TIMER::start();
+	TIMER::applyAndReset();
+	TIMER::start();
 }
 
 template< typename TIMER >
 static void
 testTimerStart()
 {
-    TIMER::enable();
-    TIMER::setMode(TIMER::Mode::UpCounter);
+	TIMER::enable();
+	TIMER::setMode(TIMER::Mode::UpCounter);
 
 	TIMER::template setPeriod<Board::systemClock>(250000);
-    TIMER::enableInterruptVector(true, 10);
-    TIMER::enableInterrupt(TIMER::Interrupt::Update);
+	TIMER::enableInterruptVector(true, 10);
+	TIMER::enableInterrupt(TIMER::Interrupt::Update);
 
-    TIMER::applyAndReset();
-    TIMER::start();
+	TIMER::applyAndReset();
+	TIMER::start();
 }
 
 template< typename TIMER >
 static void
 testTimerAdvancedStop()
 {
-    TIMER::pause();
-    TIMER::disableInterrupt(TIMER::Interrupt::Update);
-    TIMER::enableInterruptVector(TIMER::Interrupt::Update, false, 10);
-    TIMER::disable();
+	TIMER::pause();
+	TIMER::disableInterrupt(TIMER::Interrupt::Update);
+	TIMER::enableInterruptVector(TIMER::Interrupt::Update, false, 10);
+	TIMER::disable();
 }
 
 template< typename TIMER >
 static void
 testTimerStop()
 {
-    TIMER::pause();
-    TIMER::disableInterrupt(TIMER::Interrupt::Update);
-    TIMER::enableInterruptVector(false, 10);
-    TIMER::disable();
+	TIMER::pause();
+	TIMER::disableInterrupt(TIMER::Interrupt::Update);
+	TIMER::enableInterruptVector(false, 10);
+	TIMER::disable();
 }
 
 using namespace Board;
@@ -87,239 +87,239 @@ using namespace Board;
 int
 main()
 {
-    Board::initialize();
+	Board::initialize();
 
-    uint16_t state = 0;
+	uint16_t state = 0;
 	bool restart = false;
 
-    while (1)
-    {
-        LedBlue::set();
-        modm::delayMilliseconds(20);
-        LedBlue::reset();
-        modm::delayMilliseconds(150);
+	while (1)
+	{
+		LedBlue::set();
+		modm::delayMilliseconds(20);
+		LedBlue::reset();
+		modm::delayMilliseconds(150);
 
 		if (restart) {
 			restart = false;
 			state = 0;
 		}
 
-        switch (state)
-        {
-        case 0:
-            testTimerAdvancedStart<Timer1>();
-            break;
+		switch (state)
+		{
+		case 0:
+			testTimerAdvancedStart<Timer1>();
+			break;
 
-        case 10:
-            testTimerAdvancedStop<Timer1>();
-            break;
-
-
-        case 12:
-            testTimerStart<Timer2>();
-            break;
-
-        case 22:
-            testTimerStop<Timer2>();
-            break;
+		case 10:
+			testTimerAdvancedStop<Timer1>();
+			break;
 
 
-        case 24:
-            testTimerStart<Timer3>();
-            break;
+		case 12:
+			testTimerStart<Timer2>();
+			break;
 
-        case 34:
-            testTimerStop<Timer3>();
-            break;
-
-
-        case 36:
-            testTimerStart<Timer4>();
-            break;
-
-        case 46:
-            testTimerStop<Timer4>();
-            break;
+		case 22:
+			testTimerStop<Timer2>();
+			break;
 
 
-        case 48:
-            testTimerStart<Timer5>();
-            break;
+		case 24:
+			testTimerStart<Timer3>();
+			break;
 
-        case 58:
-            testTimerStop<Timer5>();
-            break;
-
-
-        case 60:
-            testTimerStart<Timer6>();
-            break;
-
-        case 70:
-            testTimerStop<Timer6>();
-            break;
+		case 34:
+			testTimerStop<Timer3>();
+			break;
 
 
-        case 72:
-            testTimerStart<Timer7>();
-            break;
+		case 36:
+			testTimerStart<Timer4>();
+			break;
 
-        case 82:
-            testTimerStop<Timer7>();
-            break;
-
-
-        case 84:
-            testTimerAdvancedStart<Timer8>();
-            break;
-
-        case 94:
-            testTimerAdvancedStop<Timer8>();
-            break;
+		case 46:
+			testTimerStop<Timer4>();
+			break;
 
 
-        case 96:
-            testTimerStart<Timer9>();
-            break;
+		case 48:
+			testTimerStart<Timer5>();
+			break;
 
-        case 106:
-            testTimerStop<Timer9>();
-            break;
-
-
-        case 108:
-            testTimerStart<Timer10>();
-            break;
-
-        case 118:
-            testTimerStop<Timer10>();
-            break;
+		case 58:
+			testTimerStop<Timer5>();
+			break;
 
 
-        case 120:
-            testTimerStart<Timer11>();
-            break;
+		case 60:
+			testTimerStart<Timer6>();
+			break;
 
-        case 130:
-            testTimerStop<Timer11>();
-            break;
-
-
-        case 132:
-            testTimerStart<Timer12>();
-            break;
-
-        case 142:
-            testTimerStop<Timer12>();
-            break;
+		case 70:
+			testTimerStop<Timer6>();
+			break;
 
 
-        case 144:
-            testTimerStart<Timer13>();
-            break;
+		case 72:
+			testTimerStart<Timer7>();
+			break;
 
-        case 154:
-            testTimerStop<Timer13>();
-            break;
+		case 82:
+			testTimerStop<Timer7>();
+			break;
 
 
-        case 156:
-            testTimerStart<Timer14>();
-            break;
+		case 84:
+			testTimerAdvancedStart<Timer8>();
+			break;
 
-        case 166:
-            testTimerStop<Timer14>();
-            break;
+		case 94:
+			testTimerAdvancedStop<Timer8>();
+			break;
+
+
+		case 96:
+			testTimerStart<Timer9>();
+			break;
+
+		case 106:
+			testTimerStop<Timer9>();
+			break;
+
+
+		case 108:
+			testTimerStart<Timer10>();
+			break;
+
+		case 118:
+			testTimerStop<Timer10>();
+			break;
+
+
+		case 120:
+			testTimerStart<Timer11>();
+			break;
+
+		case 130:
+			testTimerStop<Timer11>();
+			break;
+
+
+		case 132:
+			testTimerStart<Timer12>();
+			break;
+
+		case 142:
+			testTimerStop<Timer12>();
+			break;
+
+
+		case 144:
+			testTimerStart<Timer13>();
+			break;
+
+		case 154:
+			testTimerStop<Timer13>();
+			break;
+
+
+		case 156:
+			testTimerStart<Timer14>();
+			break;
+
+		case 166:
+			testTimerStop<Timer14>();
+			break;
 
 		case 180:
 			restart = true;
 			break;
 
 
-        default:
-            break;
-        }
+		default:
+			break;
+		}
 
-        // Next state
-        ++state;
-    }
+		// Next state
+		++state;
+	}
 
-    return 0;
+	return 0;
 }
 
 MODM_ISR(TIM2)
 {
-    modm::platform::Timer2::acknowledgeInterruptFlags(modm::platform::Timer2::InterruptFlag::Update);
-    LedGreen::toggle();
+	Timer2::acknowledgeInterruptFlags(Timer2::InterruptFlag::Update);
+	LedGreen::toggle();
 }
 
 MODM_ISR(TIM3)
 {
-    modm::platform::Timer3::acknowledgeInterruptFlags(modm::platform::Timer3::InterruptFlag::Update);
-    LedRed::toggle();
+	Timer3::acknowledgeInterruptFlags(Timer3::InterruptFlag::Update);
+	LedRed::toggle();
 }
 
 MODM_ISR(TIM4)
 {
-    modm::platform::Timer4::acknowledgeInterruptFlags(modm::platform::Timer4::InterruptFlag::Update);
-    LedGreen::toggle();
+	Timer4::acknowledgeInterruptFlags(Timer4::InterruptFlag::Update);
+	LedGreen::toggle();
 }
 
 MODM_ISR(TIM5)
 {
-    modm::platform::Timer5::acknowledgeInterruptFlags(modm::platform::Timer5::InterruptFlag::Update);
-    LedRed::toggle();
+	Timer5::acknowledgeInterruptFlags(Timer5::InterruptFlag::Update);
+	LedRed::toggle();
 }
 
 MODM_ISR(TIM6_DAC)
 {
-    modm::platform::Timer6::acknowledgeInterruptFlags(modm::platform::Timer6::InterruptFlag::Update);
-    LedGreen::toggle();
+	Timer6::acknowledgeInterruptFlags(Timer6::InterruptFlag::Update);
+	LedGreen::toggle();
 }
 
 MODM_ISR(TIM7)
 {
-    modm::platform::Timer7::acknowledgeInterruptFlags(modm::platform::Timer7::InterruptFlag::Update);
-    LedRed::toggle();
+	Timer7::acknowledgeInterruptFlags(Timer7::InterruptFlag::Update);
+	LedRed::toggle();
 }
 
 // For TIM8 See TIM13
 
 MODM_ISR(TIM1_BRK_TIM9)
 {
-    modm::platform::Timer9::acknowledgeInterruptFlags(modm::platform::Timer9::InterruptFlag::Update);
-    LedGreen::toggle();
+	Timer9::acknowledgeInterruptFlags(Timer9::InterruptFlag::Update);
+	LedGreen::toggle();
 }
 
 // Timer 1 and 10
 MODM_ISR(TIM1_UP_TIM10)
 {
-    modm::platform::Timer1::acknowledgeInterruptFlags(modm::platform::Timer1::InterruptFlag::Update);
-    modm::platform::Timer10::acknowledgeInterruptFlags(modm::platform::Timer10::InterruptFlag::Update);
-    LedRed::toggle();
+	Timer1::acknowledgeInterruptFlags(Timer1::InterruptFlag::Update);
+	Timer10::acknowledgeInterruptFlags(Timer10::InterruptFlag::Update);
+	LedRed::toggle();
 }
 
 MODM_ISR(TIM1_TRG_COM_TIM11)
 {
-    modm::platform::Timer11::acknowledgeInterruptFlags(modm::platform::Timer11::InterruptFlag::Update);
-    LedGreen::toggle();
+	Timer11::acknowledgeInterruptFlags(Timer11::InterruptFlag::Update);
+	LedGreen::toggle();
 }
 
 MODM_ISR(TIM8_BRK_TIM12)
 {
-    modm::platform::Timer12::acknowledgeInterruptFlags(modm::platform::Timer12::InterruptFlag::Update);
-    LedRed::toggle();
+	Timer12::acknowledgeInterruptFlags(Timer12::InterruptFlag::Update);
+	LedRed::toggle();
 }
 
 MODM_ISR(TIM8_UP_TIM13)
 {
-    modm::platform::Timer8::acknowledgeInterruptFlags(modm::platform::Timer8::InterruptFlag::Update);
-    modm::platform::Timer13::acknowledgeInterruptFlags(modm::platform::Timer13::InterruptFlag::Update);
-    LedGreen::toggle();
+	Timer8::acknowledgeInterruptFlags(Timer8::InterruptFlag::Update);
+	Timer13::acknowledgeInterruptFlags(Timer13::InterruptFlag::Update);
+	LedGreen::toggle();
 }
 
 MODM_ISR(TIM8_TRG_COM_TIM14)
 {
-    modm::platform::Timer14::acknowledgeInterruptFlags(modm::platform::Timer14::InterruptFlag::Update);
-    LedRed::toggle();
+	Timer14::acknowledgeInterruptFlags(Timer14::InterruptFlag::Update);
+	LedRed::toggle();
 }

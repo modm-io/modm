@@ -11,12 +11,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/architecture.hpp>
+#include <modm/platform/platform.hpp>
 #include <modm/driver/display.hpp>
 #include <modm/io/iostream.hpp>
 
 using namespace modm::platform;
-typedef modm::platform::SystemClock clock;
+using systemClock = SystemClock;
 
 namespace touch
 {
@@ -25,8 +25,6 @@ namespace touch
 	typedef GpioA2 Top;
 	typedef GpioA3 Right;
 }
-
-Uart0 uart;
 
 namespace led
 {
@@ -63,15 +61,14 @@ drawCross(uint8_t x, uint8_t y)
 int
 main()
 {
-    GpioOutputD1::connect(Uart0::Tx);
-    GpioInputD0::connect(Uart0::Rx);
-    Uart0::initialize<clock, 115200>();
+	Uart0::connect<GpioOutputD1::Txd>();
+	Uart0::initialize<systemClock, 115200>();
 
 	// Enable interrupts, this is needed for every buffered UART
-	sei();
+	enableInterrupts();
 
 	// Create a IOStream for complex formatting tasks
-	modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > device(uart);
+	modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > device;
 	modm::IOStream output(device);
 
 	output << "Welcome" << modm::endl;
@@ -84,6 +81,9 @@ main()
 	led::G::setOutput();
 	led::B::setOutput();
 
+	lcd::SPI::connect<lcd::Scl::BitBang, lcd::Mosi::BitBang>();
+	lcd::SPI::initialize<systemClock, MHz2>();
+
 	display.initialize();
 
 	// draw some testpoints
@@ -95,7 +95,7 @@ main()
 
 	display.update();
 
-	Adc::initialize<clock, 115000>();
+	Adc::initialize<systemClock, 115000>();
 	Adc::setReference(Adc::Reference::Internal2V56);
 
 	touch::Bottom::setInput();

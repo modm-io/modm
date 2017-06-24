@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/architecture.hpp>
+#include <modm/platform/platform.hpp>
 #include <modm/communication/communication.hpp>
 #include <modm/communication/modm/backend/can.hpp>
 #include <modm/debug/logger.hpp>
@@ -19,7 +19,7 @@
 #include <modm/driver/can/mcp2515.hpp>
 
 using namespace modm::platform;
-typedef modm::platform::SystemClock clock;
+using systemClock = SystemClock;
 
 // set new log level
 #undef MODM_LOG_LEVEL
@@ -33,8 +33,7 @@ typedef modm::platform::SystemClock clock;
 // ----------------------------------------------------------------------------
 // Logging
 
-Uart0 loggerUart;
-modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > loggerDevice(loggerUart);
+modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > loggerDevice;
 
 modm::log::Logger modm::log::debug(loggerDevice);
 modm::log::Logger modm::log::info(loggerDevice);
@@ -83,26 +82,26 @@ namespace component
 }
 
 // ----------------------------------------------------------------------------
-int 
+int
 main()
 {
-    GpioOutputD1::connect(Uart0::Tx);
-    GpioInputD0::connect(Uart0::Rx);
-    Uart0::initialize<clock, 115200>();
+	GpioOutputD1::connect(Uart0::Tx);
+	GpioInputD0::connect(Uart0::Rx);
+	Uart0::initialize<systemClock, 115200>();
 
 	// Initialize SPI interface and the other pins
 	// needed by the MCP2515
-	SPI::initialize<clock, 1000000>();
+	SPI::initialize<systemClock, 1000000>();
 	Cs::setOutput();
 	Int::setInput(Gpio::InputType::PullUp);
 
 	// Configure MCP2515 and set the filters
-    // Fixme: modm::Can::Bitrate is incompatitlbe with device driver
-//	device.initialize(modm::can::BITRATE_125_KBPS);
+	// Fixme: modm::Can::Bitrate is incompatitlbe with device driver
+	// device.initialize(modm::can::BITRATE_125_KBPS);
 	device.setFilter(modm::accessor::asFlash(canFilter));
 
 	// Enable Interrupts
-	sei();
+	enableInterrupts();
 
 	MODM_LOG_INFO << "Welcome to the communication test!" << modm::endl;
 

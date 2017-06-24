@@ -11,17 +11,17 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/debug/logger.hpp>
-#include <modm/architecture/architecture.hpp>
+#include <modm/platform/platform.hpp>
 
 #include <modm/architecture/interface/can.hpp>
-#include <modm/architecture/platform/driver/can/canusb/canusb.hpp>
-// #include <modm/architecture/platform/driver/can/socketcan/socketcan.hpp>
+#include <modm/platform/can/canusb.hpp>
+// #include <modm/platform/can/socketcan.hpp>
 
 #include <modm/communication/communication.hpp>
-#include <modm/communication/modm/backend/can.hpp>
+#include <modm/communication/xpcc/backend/can.hpp>
 
-#include <modm/communication/modm/backend/can/connector.hpp>
-#include <modm/communication/modm/backend/zeromq/connector.hpp>
+#include <modm/communication/xpcc/backend/can/connector.hpp>
+#include <modm/communication/xpcc/backend/zeromq/connector.hpp>
 
 /**
  * Listens to a CAN bus connected by a CAN2USB and publishes modm messages with zeromq.
@@ -50,10 +50,10 @@ static constexpr modm::Can::Bitrate canBusBitRate = modm::Can::kBps125;
 modm::platform::SerialInterface port("/dev/ttyUSB0", 115200);
 using CanUsb = modm::platform::CanUsb<modm::platform::SerialInterface>;
 CanUsb canUsb(port);
-// static modm::platform::SocketCan canSocket;
+// static SocketCan canSocket;
 
-static modm::CanConnector< CanUsb > canConnector(&canUsb);
-// static modm::CanConnector< modm::platform::SocketCan > canConnector(&canSocket);
+static xpcc::CanConnector< CanUsb > canConnector(&canUsb);
+// static xpcc::CanConnector< SocketCan > canConnector(&canSocket);
 
 #undef MODM_LOG_LEVEL
 #define	MODM_LOG_LEVEL modm::log::DEBUG
@@ -72,7 +72,7 @@ main()
 	const std::string endpointOut = "tcp://*:8211";
 	const std::string endpointIn  = "tcp://*:8212";
 
-	modm::ZeroMQConnector zmqConnector(endpointIn, endpointOut, modm::ZeroMQConnector::Mode::PubPull);
+	xpcc::ZeroMQConnector zmqConnector(endpointIn, endpointOut, xpcc::ZeroMQConnector::Mode::PubPull);
 
 	MODM_LOG_DEBUG << "Entering main loop" << modm::endl;
 
@@ -83,7 +83,7 @@ main()
 
 		while (canConnector.isPacketAvailable())
 		{
-			modm::Header header = canConnector.getPacketHeader();
+			xpcc::Header header = canConnector.getPacketHeader();
 			modm::SmartPointer payload = canConnector.getPacketPayload();
 
 			MODM_LOG_DEBUG << "C->Z " << header << " " << payload.getSize() << " " << payload << modm::endl;
@@ -95,7 +95,7 @@ main()
 
 		while (zmqConnector.isPacketAvailable())
 		{
-			modm::Header header = zmqConnector.getPacketHeader();
+			xpcc::Header header = zmqConnector.getPacketHeader();
 			modm::SmartPointer payload = zmqConnector.getPacketPayload();
 
 			MODM_LOG_DEBUG << "Z->C " << header << " " << payload.getSize() << " " << payload << modm::endl;

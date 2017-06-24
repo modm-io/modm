@@ -11,9 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
-
-#include <modm/architecture/interface/gpio.hpp>
+#include <modm/platform/platform.hpp>
+#include <modm/architecture/interface/interrupt.hpp>
 #include <modm/ui/button_group.hpp>
 
 using namespace modm::platform;
@@ -32,7 +31,7 @@ MODM_ISR(TIMER2_COMPA)
 	buttons.update(Button::read() ? BUTTON_1 : 0);
 }
 
-int 
+int
 main()
 {
 	Led::setOutput();
@@ -46,7 +45,7 @@ main()
 	// set PB3 as input with pullup
 	Button::setInput(Gpio::InputType::PullUp);
 
-	sei();
+	enableInterrupts();
 
 	while (1)
 	{

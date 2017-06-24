@@ -1,4 +1,4 @@
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 #include <modm/driver/display/ssd1306.hpp>
 
 /**
@@ -21,8 +21,7 @@ main()
 {
 	Board::initialize();
 
-	Sda::connect(MyI2cMaster::Sda);
-	Scl::connect(MyI2cMaster::Scl);
+	MyI2cMaster::connect<Scl::Scl, Sda::Sda>();
 	MyI2cMaster::initialize<Board::systemClock, 420000>();
 
 	display.initializeBlocking();

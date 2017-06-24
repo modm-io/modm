@@ -10,12 +10,16 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/architecture.hpp>
+#include <modm/platform/platform.hpp>
 #include <modm/processing/rtos.hpp>
 #include <modm/debug/logger.hpp>
 
 // ----------------------------------------------------------------------------
 modm::rtos::BinarySemaphore event;
+
+// Set the log level
+#undef	XPCC_LOG_LEVEL
+#define	XPCC_LOG_LEVEL xpcc::log::INFO
 
 // ----------------------------------------------------------------------------
 class Thread1 : public modm::rtos::Thread
@@ -31,7 +35,7 @@ public:
 	{
 		while (1)
 		{
-			MODM_LOG_DEBUG << "ping" << modm::endl;
+			MODM_LOG_INFO << "ping" << modm::endl;
 			
 			// synchronize with Task2
 			event.release();
@@ -54,7 +58,7 @@ public:
 	{
 		while (1)
 		{
-			MODM_LOG_DEBUG << "pong" << modm::endl;
+			MODM_LOG_INFO << "pong" << modm::endl;
 			
 			// wait for the other task
 			event.acquire();

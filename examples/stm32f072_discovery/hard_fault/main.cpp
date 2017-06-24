@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Niklas Hauser
+ * Copyright (c) 2016-2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -9,7 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 #include <modm/debug/logger.hpp>
 
 // ----------------------------------------------------------------------------
@@ -33,8 +33,8 @@ main()
 	Board::initialize();
 
 	// initialize Uart for MODM_LOG
-	GpioOutputA9::connect(Usart1::Tx);
-	Usart1::initialize<Board::systemClock, 115200>(12);
+	Usart1::connect<GpioOutputA9::Tx>();
+	Usart1::initialize<Board::systemClock, 115200>();
 
 	MODM_LOG_INFO << "Causing a Hardfault now!" << modm::endl;
 

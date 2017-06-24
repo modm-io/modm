@@ -11,15 +11,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/platform/platform.hpp>
 #include <modm/debug/logger.hpp>
 
 using namespace modm::platform;
-typedef modm::platform::SystemClock clock;
+using systemClock = SystemClock;
 
 // Create a new UART object and configure it to a baudrate of 115200
-Uart0 uart;
-modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > loggerDevice(uart);
+modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > loggerDevice;
 
 // Set all four logger streams to use the UART
 modm::log::Logger modm::log::debug(loggerDevice);
@@ -34,12 +33,11 @@ modm::log::Logger modm::log::error(loggerDevice);
 int
 main()
 {
-    GpioOutputD1::connect(Uart0::Tx);
-    GpioInputD0::connect(Uart0::Rx);
-    Uart0::initialize<clock, 115200>();
+	Uart0::connect<GpioOutputD1::Txd>();
+	Uart0::initialize<systemClock, 115200>();
 
 	// Enable interrupts, this is needed for every buffered UART
-	sei();
+	enableInterrupts();
 
 	// Use the logging streams to print some messages.
 	// Change MODM_LOG_LEVEL above to enable or disable these messages

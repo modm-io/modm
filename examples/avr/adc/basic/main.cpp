@@ -11,28 +11,26 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/architecture.hpp>
+#include <modm/platform/platform.hpp>
+#include <modm/platform/platform.hpp>
 
 #include <modm/io/iostream.hpp>
 
 using namespace modm::platform;
-typedef modm::platform::SystemClock clock;
-modm::platform::Uart0 uart;
-
+using systemClock = SystemClock;
 
 int
 main()
 {
-    // Create a new UART object and configure it to a baudrate of 9600
-    GpioOutputD1::connect(Uart0::Tx);
-    GpioInputD0::connect(Uart0::Rx);
-    uart.initialize<clock, 115200>();
+	// Create a new UART object and configure it to a baudrate of 115200
+	Uart0::connect<GpioOutputD1::Txd, GpioInputD0::Rxd>();
+	Uart0::initialize<systemClock, 115200>();
 
-    // Enable interrupts, this is needed for every buffered UART
-	sei();
+	// Enable interrupts, this is needed for every buffered UART
+	enableInterrupts();
 
 	// Create a IOStream for complex formatting tasks
-	modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > device(uart);
+	modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > device;
 	modm::IOStream output(device);
 
 	output << "Welcome!" << modm::endl;
@@ -40,7 +38,7 @@ main()
 	// Initialize the analog to digital converter
 	// With the AVR running at 14.7456Mhz and a prescaler of 128 the
 	// ADC is running at 115kHz.
-	Adc::initialize<clock, 115000>();
+	Adc::initialize<systemClock, 115000>();
 	Adc::setReference(Adc::Reference::InternalVcc);
 
 	// read the value of channel 0 (=> ADC0 => PA0) and wait until

@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/board/board.hpp>
 #include <modm/processing/processing.hpp>
 #include <modm/driver/display/max7219matrix.hpp>
 
@@ -52,21 +52,22 @@ main()
 
 	Board::LedOrange::setOutput(modm::Gpio::High);
 
-    Data::setOutput();
-    Cs::setOutput();
-    Clk::setOutput();
+	Data::setOutput();
+	Cs::setOutput();
+	Clk::setOutput();
 
-    Spi::initialize< Board::systemClock, 10000000 >();
+	Spi::connect<Clk::BitBang, Data::BitBang>();
+	Spi::initialize< Board::systemClock, 10000000 >();
 
-    ledMatrixDisplay.initialize();
+	ledMatrixDisplay.initialize();
 
-    ledMatrixDisplay.setFont(modm::font::FixedWidth5x8);
+	ledMatrixDisplay.setFont(modm::font::FixedWidth5x8);
 	ledMatrixDisplay.setCursor(0, 0);
 
 	modm::ShortPeriodicTimer countdownTimer(100);
 
-    while (1)
-    {
+	while (1)
+	{
 		if (countdownTimer.execute())
 		{
 			for (int16_t sec = 9999; sec >= 0; --sec)
@@ -79,7 +80,7 @@ main()
 				Board::LedOrange::toggle();
 			}
 		}
-    }
+	}
 
-    return 0;
+	return 0;
 }
