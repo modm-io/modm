@@ -18,6 +18,8 @@ def prepare(module, options):
     return True
 
 def build(env):
+    env.append_metadata_unique("include_path", "src/stdc++")
+
     env.outbasepath = "src/stdc++"
 
     env.copy(".", ignore=env.ignore_files("*.lb"))

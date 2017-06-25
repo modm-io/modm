@@ -32,6 +32,8 @@ def build(env):
     properties["partname"] = device.partname
     properties["driver"] = device.get_driver("core")
 
+    env.append_metadata_unique("include_path", "src")
+
     env.substitutions = properties
     env.outbasepath = "src/modm/platform/core"
 

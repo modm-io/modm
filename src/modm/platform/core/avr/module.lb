@@ -46,6 +46,8 @@ def build(env):
     properties["partname"] = device.partname
     properties["driver"] = driver
 
+    env.append_metadata_unique("include_path", "src")
+
     env.outbasepath = "link"
     env.copy("linkerscript/linkerscript.ld", "linkerscript.ld")
 

@@ -22,6 +22,9 @@ def prepare(module, options):
     return True
 
 def build(env):
+    env.append_metadata_unique("include_path", "ext")
+    env.append_metadata_unique("include_path", "ext/cmsis")
+
     env.outbasepath = "ext"
 
     env.copy("Include/", "cmsis/")

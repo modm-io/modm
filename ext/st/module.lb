@@ -125,6 +125,9 @@ def pre_build(env):
     })
 
 def build(env):
+    env.append_metadata_unique("include_path", "ext")
+    env.append_metadata_unique("include_path", "ext/cmsis_device")
+
     env.outbasepath = "ext/cmsis_device"
     env.copy(localpath(bprops["folder"], bprops["device_header"]), bprops["device_header"])
     env.copy(localpath(bprops["folder"], bprops["system_header"]), bprops["system_header"])
