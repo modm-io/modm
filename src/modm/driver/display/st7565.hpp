@@ -15,7 +15,7 @@
 #define MODM_ST7565_HPP
 
 #include <modm/architecture/driver/accessor/flash.hpp>
-#include <modm/architecture/driver/delay.hpp>
+#include <modm/architecture/interface/delay.hpp>
 
 #include <modm/ui/display/buffered_graphic_display.hpp>
 

@@ -64,7 +64,7 @@
  * Creating a simple flashing light:
  * @code
  * #include <modm/architecture/platform.hpp>
- * #include <modm/architecture/driver/delay.hpp>
+ * #include <modm/architecture/interface/delay.hpp>
  *
  * typedef GpioOutputB0 Led;
  *

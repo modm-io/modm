@@ -18,7 +18,7 @@
 
 #include <stdint.h>
 #include <modm/architecture/interface/spi_master.hpp>
-#include <modm/architecture/driver/delay.hpp>
+#include <modm/architecture/interface/delay.hpp>
 #include <modm/platform/gpio/connector.hpp>
 
 namespace modm

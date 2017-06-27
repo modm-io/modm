@@ -15,7 +15,7 @@
 #	error 	"Don't include this file directly, use 'adc_{{ id }}.hpp' instead!"
 #endif
 
-#include <modm/architecture/driver/delay.hpp>	// modm::delayMicroseconds
+#include <modm/architecture/interface/delay.hpp>	// modm::delayMicroseconds
 
 void
 modm::platform::Adc{{ id }}::initialize(const ClockMode clk,

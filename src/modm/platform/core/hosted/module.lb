@@ -37,3 +37,7 @@ def build(env):
 
     env.copy("assert.cpp")
     env.copy("memory.cpp")
+
+    env.template("delay.hpp.in")
+    if target["family"] in ["windows"]:
+        env.log.warning("Delay functions are not implemented!")

@@ -57,6 +57,7 @@ def build(env):
     env.copy("ram.hpp")
     env.copy("main.hpp")
     env.copy("assert.cpp")
+    env.copy("delay.hpp")
 
     env.template("ram.cpp.in")
     env.template("interrupts.hpp.in")

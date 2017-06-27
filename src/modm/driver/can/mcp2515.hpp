@@ -18,7 +18,7 @@
 
 #include <stdint.h>
 #include <modm/architecture/driver/accessor.hpp>
-#include <modm/architecture/driver/delay.hpp>
+#include <modm/architecture/interface/delay.hpp>
 #include <modm/architecture/interface/can.hpp>
 
 #include "mcp2515_definitions.hpp"

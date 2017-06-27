@@ -14,7 +14,7 @@
 	#error	"Don't include this file directly, use 'hd44780_base.hpp' instead!"
 #endif
 
-#include <modm/architecture/driver/delay.hpp>
+#include <modm/architecture/interface/delay.hpp>
 
 // ----------------------------------------------------------------------------
 template <typename DATA, typename RW, typename RS, typename E>

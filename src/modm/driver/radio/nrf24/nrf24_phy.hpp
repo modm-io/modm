@@ -18,7 +18,7 @@
 #include <stdint.h>
 #include <modm/debug/logger.hpp>
 
-#include <modm/architecture/driver/delay.hpp>
+#include <modm/architecture/interface/delay.hpp>
 #include "nrf24_definitions.hpp"
 
 #undef  MODM_LOG_LEVEL

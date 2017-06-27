@@ -16,7 +16,7 @@
 #define MODM_INTERFACE_I2C_HPP
 
 #include <modm/architecture/interface.hpp>
-#include <modm/architecture/driver/delay.hpp>
+#include <modm/architecture/interface/delay.hpp>
 #include <modm/io/iostream.hpp>
 
 /**

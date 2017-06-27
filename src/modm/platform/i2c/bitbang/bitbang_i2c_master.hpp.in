@@ -17,7 +17,7 @@
 #define MODM_SOFTWARE_BITBANG_I2C_HPP
 
 #include <modm/platform/gpio/connector.hpp>
-#include <modm/architecture/driver/delay.hpp>
+#include <modm/architecture/interface/delay.hpp>
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/architecture/interface/i2c_master.hpp>
 

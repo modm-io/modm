@@ -15,7 +15,7 @@
 #ifndef MODM_SIEMENS_M55_HPP
 #define MODM_SIEMENS_M55_HPP
 
-#include <modm/architecture/driver/delay.hpp>
+#include <modm/architecture/interface/delay.hpp>
 
 #include <modm/ui/display/buffered_graphic_display.hpp>
 

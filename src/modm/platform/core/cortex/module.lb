@@ -184,6 +184,7 @@ def build(env):
         env.template("heap_block_allocator.cpp.in")
 
     env.template("delay.cpp.in")
+    env.copy("delay.hpp")
 
     if properties["core"] != "cortex-m0":
         env.copy("cycle_counter.hpp")

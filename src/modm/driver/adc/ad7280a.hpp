@@ -16,7 +16,7 @@
 #include <stdint.h>
 
 #include <modm/architecture/interface/gpio.hpp>
-#include <modm/architecture/driver/delay.hpp>
+#include <modm/architecture/interface/delay.hpp>
 
 #include <modm/io/iostream.hpp>
 

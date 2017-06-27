@@ -14,7 +14,7 @@
 #ifndef MODM_KS0108_HPP
 #define MODM_KS0108_HPP
 
-#include <modm/architecture/driver/delay.hpp>
+#include <modm/architecture/interface/delay.hpp>
 
 #include <modm/ui/display/buffered_graphic_display.hpp>
 

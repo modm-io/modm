@@ -19,5 +19,4 @@
 
 #include "driver/atomic.hpp"
 #include "driver/accessor.hpp"
-#include "driver/delay.hpp"
 #include "driver/clock.hpp"

@@ -19,7 +19,7 @@
 #include <stdint.h>
 #include <modm/architecture/utils.hpp>
 #include <modm/processing/timer.hpp>
-#include <modm/architecture/driver/delay.hpp>
+#include <modm/architecture/interface/delay.hpp>
 #include <stdlib.h>
 #include <modm/architecture/driver/clock.hpp>
 #include <modm/processing/timer/timestamp.hpp>

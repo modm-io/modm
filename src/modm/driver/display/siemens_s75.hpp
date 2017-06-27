@@ -15,7 +15,7 @@
 #ifndef MODM_SIEMENS_S75_HPP
 #define MODM_SIEMENS_S75_HPP
 
-#include <modm/architecture/driver/delay.hpp>
+#include <modm/architecture/interface/delay.hpp>
 #include <modm/driver/bus/bitbang_memory_interface.hpp>
 
 #include <modm/ui/display/buffered_graphic_display.hpp>
