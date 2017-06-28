@@ -25,10 +25,10 @@ before_install:
  - export LD_LIBRARY_PATH="$HOME/cache/boost/lib:$LD_LIBRARY_PATH"
  - export CXXFLAGS="-isystem$HOME/cache/boost/include"
  - export LDFLAGS="-L$HOME/cache/boost/lib"
- - export PATH="$HOME/cache/avr8-gnu-toolchain-linux_x86/bin:$HOME/cache/gcc-arm-none-eabi-6-2017-q1-update/bin:$PATH"
+ - export PATH="$HOME/cache/avr8-gnu-toolchain-linux_x86/bin:$HOME/cache/gcc-arm-none-eabi-6-2017-q2-update/bin:$PATH"
  - echo $PATH
  - ls -l $HOME/cache/avr8-gnu-toolchain-linux_x86/bin
- - ls -l $HOME/cache/gcc-arm-none-eabi-6-2017-q1-update/bin
+ - ls -l $HOME/cache/gcc-arm-none-eabi-6-2017-q2-update/bin
  - ls -l $HOME/cache/boost
  - which avr-g++
  - avr-g++ --version
