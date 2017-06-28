@@ -17,7 +17,7 @@
 #include <xpcc/utils/bit_constants.hpp>
 
 // Create an IODeviceWrapper around the Uart Peripheral we want to use
-xpcc::IODeviceWrapper< Board::stlink::Uart, xpcc::IOBuffer::BlockIfFull > loggerDevice;
+Board::LoggerDevice loggerDevice;
 
 // Set all four logger streams to use the UART
 xpcc::log::Logger xpcc::log::debug(loggerDevice);

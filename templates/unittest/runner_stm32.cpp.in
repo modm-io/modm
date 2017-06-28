@@ -3,6 +3,10 @@
 // ----------------------------------------------------------------------------
 
 #include <xpcc/architecture/platform.hpp>
+#include <xpcc/debug/logger.hpp>
+
+#include <xpcc_build_info.hpp>
+#include <xpcc_git_info.hpp>
 
 #include <unittest/reporter.hpp>
 #include <unittest/controller.hpp>
@@ -13,20 +17,65 @@ ${names}
 
 using namespace xpcc::stm32;
 
+#ifdef XPCC_BOARD_HAS_LOGGER
+// Reuse logger from board
+extern Board::LoggerDevice loggerDevice;
+#else
 // Create an IODeviceWrapper around the Uart Peripheral we want to use
-xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull > loggerDevice;
+// This requires additonal hardware.
+using LoggerDevice = xpcc::IODeviceWrapper< Usart2, xpcc::IOBuffer::BlockIfFull >;
+LoggerDevice loggerDevice;
+
+// Set all four logger streams to use the UART
+xpcc::log::Logger xpcc::log::debug(loggerDevice);
+xpcc::log::Logger xpcc::log::info(loggerDevice);
+xpcc::log::Logger xpcc::log::warning(loggerDevice);
+xpcc::log::Logger xpcc::log::error(loggerDevice);
+#endif
 
 int
 main()
 {
 	Board::initialize();
 
+#ifndef XPCC_BOARD_HAS_LOGGER
 	// initialize output device, enable USART 2
 	GpioOutputA2::connect(Usart2::Tx);
 	GpioInputA3::connect(Usart2::Rx, Gpio::InputType::PullUp);
 	Usart2::initialize<Board::systemClock, 115200>(12);
+#endif
 
 	loggerDevice.write("Unittests (" __DATE__ ", " __TIME__")\n");
+
+	XPCC_LOG_INFO << "Machine:  " << XPCC_BUILD_MACHINE  << xpcc::endl;
+	XPCC_LOG_INFO << "User:     " << XPCC_BUILD_USER     << xpcc::endl;
+	XPCC_LOG_INFO << "Os:       " << XPCC_BUILD_OS       << xpcc::endl;
+	XPCC_LOG_INFO << "Compiler: " << XPCC_BUILD_COMPILER << xpcc::endl;
+
+	XPCC_LOG_INFO << "Local Git User:" << xpcc::endl;
+	XPCC_LOG_INFO << "Name:  " << XPCC_GIT_CONFIG_USER_NAME      << xpcc::endl;
+	XPCC_LOG_INFO << "Email: " << XPCC_GIT_CONFIG_USER_EMAIL     << xpcc::endl;
+	XPCC_LOG_INFO << "Last Commit:" << xpcc::endl;
+	XPCC_LOG_INFO << "SHA:             " << XPCC_GIT_SHA      << xpcc::endl;
+	XPCC_LOG_INFO << "Abbreviated SHA: " << XPCC_GIT_SHA_ABBR << xpcc::endl;
+	XPCC_LOG_INFO << "Subject:         " << XPCC_GIT_SUBJECT  << xpcc::endl;
+	XPCC_LOG_INFO << xpcc::endl << "Author:" << xpcc::endl;
+	XPCC_LOG_INFO << "Name:      " << XPCC_GIT_AUTHOR                << xpcc::endl;
+	XPCC_LOG_INFO << "Email:     " << XPCC_GIT_AUTHOR_EMAIL          << xpcc::endl;
+	XPCC_LOG_INFO << "Date:      " << XPCC_GIT_AUTHOR_DATE           << xpcc::endl;
+	XPCC_LOG_INFO << "Timestamp: " << XPCC_GIT_AUTHOR_DATE_TIMESTAMP << xpcc::endl;
+	XPCC_LOG_INFO << xpcc::endl << "Committer:" << xpcc::endl;
+	XPCC_LOG_INFO << "Name:      " << XPCC_GIT_COMMITTER                << xpcc::endl;
+	XPCC_LOG_INFO << "Email:     " << XPCC_GIT_COMMITTER_EMAIL          << xpcc::endl;
+	XPCC_LOG_INFO << "Date:      " << XPCC_GIT_COMMITTER_DATE           << xpcc::endl;
+	XPCC_LOG_INFO << "Timestamp: " << XPCC_GIT_COMMITTER_DATE_TIMESTAMP << xpcc::endl;
+	XPCC_LOG_INFO << xpcc::endl << "File Status:" << xpcc::endl;
+	XPCC_LOG_INFO << "Modified:  " << XPCC_GIT_MODIFIED  << xpcc::endl;
+	XPCC_LOG_INFO << "Added:     " << XPCC_GIT_ADDED     << xpcc::endl;
+	XPCC_LOG_INFO << "Deleted:   " << XPCC_GIT_DELETED   << xpcc::endl;
+	XPCC_LOG_INFO << "Renamed:   " << XPCC_GIT_RENAMED   << xpcc::endl;
+	XPCC_LOG_INFO << "Copied:    " << XPCC_GIT_COPIED    << xpcc::endl;
+	XPCC_LOG_INFO << "Untracked: " << XPCC_GIT_UNTRACKED << xpcc::endl;
 
 	unittest::Reporter reporter(loggerDevice);
 	unittest::Controller::instance().setReporter(reporter);

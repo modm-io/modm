@@ -7,5 +7,5 @@
 
 #include "al_avreb_can.hpp"
 
-xpcc::IODeviceWrapper< Uart1, xpcc::IOBuffer::BlockIfFull > serialDevice;
+Board::LoggerDevice serialDevice;
 xpcc::IOStream serialStream(serialDevice);

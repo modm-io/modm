@@ -118,6 +118,12 @@ else:
 								template = template)
 	
 	sources = [runner] + files.sources
+
+	# build xpcc_build_info.hpp file
+	env.BuildInfoHeader()
+
+	# build xpcc_git_info.hpp file
+	env.GitInfoHeader()
 	
 	# build the program
 	program = env.Program(target = 'executable',

@@ -159,6 +159,9 @@ using Rx = GpioInputB11;		// STLK_TX [STLINK V2-1_U2_TX]: USART3_RX
 using Uart = Usart3;
 }
 
+// Create an IODeviceWrapper around the Uart Peripheral we want to use
+using LoggerDevice = xpcc::IODeviceWrapper< stlink::Uart, xpcc::IOBuffer::BlockIfFull >;
+
 inline void
 initializeTouchscreen()
 {
