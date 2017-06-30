@@ -114,13 +114,16 @@ check = 'all' if 'check' in BUILD_TARGETS else ARGUMENTS.get('check')
 
 # make it possible to only check the examples from one example directory
 if ARGUMENTS.get('examples'):
-	examples_dir = os.path.join('examples', ARGUMENTS.get('examples'))
-	if not os.path.isdir(examples_dir):
-		print("\033[0;33mWarning: invalid argument value: {} does not exist!\033[0m".format(examples_dir))
-		examples_dir = 'examples'
+	raw_dirs = [os.path.join('examples', d) for d in ARGUMENTS.get('examples').split(',')]
+	examples_dirs = [d for d in raw_dirs if os.path.isdir(d)]
+	for wrong_dir in [w for w in raw_dirs if w not in examples_dirs]:
+		print("\033[0;33mWarning: invalid argument value: {} does not exist!\033[0m".format(wrong_dir))
 else:
-	examples_dir = 'examples'
+	examples_dirs = ['examples']
 
+if not len(examples_dirs):
+	print("No examples folder selected!")
+	Exit(1)
 
 if check is not None:
 	result = []
@@ -141,17 +144,18 @@ if check is not None:
 	# examples is not checked!
 	if check in ['all', 'examples']:
 		result.append("Examples")
-		for path, directories, files in os.walk(examples_dir):
-			if 'SConstruct' in files:
-				exitStatus = os.system("scons -Q -C %s build" % path)
-				if exitStatus == 0:
-					result.append("check: %s -> Ok" % path)
-				else:
-					result.append(color_red + ("check: %s -> FAIL!" % path) + color_default)
-				
-				if exitStatus != 0:
-					everythingOk = False
-	
+		for examples_dir in examples_dirs:
+			for path, directories, files in os.walk(examples_dir):
+				if 'SConstruct' in files:
+					exitStatus = os.system("scons -Q -C %s build" % path)
+					if exitStatus == 0:
+						result.append("check: %s -> Ok" % path)
+					else:
+						result.append(color_red + ("check: %s -> FAIL!" % path) + color_default)
+
+					if exitStatus != 0:
+						everythingOk = False
+
 	# Check if the XPCC library compiles against different targets without errors. 
 	# The examples from xpcc/release/tests are compiled for all targets from the
 	# list 'devices' (at top of this file. 
