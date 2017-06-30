@@ -21,12 +21,14 @@ class SortedDictionary(dict):
 	def __iter__(self):
 		class Iterator:
 			def __init__(self, list):
-				self.list = list
-				self.list.sort()
+				self.list = sorted(list)
 			
 			def __iter__(self):
 				return self
-			
+
+			def __next__(self):
+				return self.next()
+
 			def next(self):
 				try:
 					item = self.list.pop(0)
@@ -48,7 +50,7 @@ class SingleAssignDictionary(SortedDictionary):
 		SortedDictionary.__init__(self)
 	
 	def __setitem__(self, key, item):
-		if not self.has_key(key):
+		if key not in self:
 			SortedDictionary.__setitem__(self, key, item)
 		else:
 			raise ParserException("%s '%s' defined twice!" % (self.name.capitalize(), key))

@@ -70,16 +70,27 @@ class BaseType(object):
 	def flattened(self):
 		""" Access the version with the flattened hierarchy """
 		return self
-	
+
 	def __cmp__(self, other):
+		return 1 - self.__eq__(other) - 2 * self.__lt__(other)
+
+	def __lt__(self, other):
 		""" Compare two types
-		
-		If types are sorted they are sorted first by level and then by name.
+
+		If types are sorted, they are sorted first by level and then by name.
 		"""
-		if isinstance(other, BaseType):
-			return cmp(self.level, other.level) or cmp(self.name, other.name)
-		else:
-			return 1
+		if not isinstance(other, BaseType):
+			return False
+		if self.level == other.level:
+			return self.name < other.name
+		if self.level is None:
+			return other.level is not None
+		return other.level is not None and self.level < other.level
+
+	def __eq__(self, other):
+		if not isinstance(other, BaseType):
+			return False
+		return self.level == other.level and self.name == other.name
 
 
 class BuiltIn(BaseType):

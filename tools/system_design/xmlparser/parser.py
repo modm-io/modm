@@ -177,7 +177,7 @@ class Parser(object):
 			# Add file information that is not available in the lower classes
 			# to exception. See:
 			# http://www.ianbicking.org/blog/2007/09/re-raising-exceptions.html
-			e.args = ("'%s': %s" % (xmldocument.docinfo.URL, e.message),) + e.args[1:0]
+			e.args = ("'%s': %s" % (xmldocument.docinfo.URL, str(e)),) + e.args[1:0]
 			raise
 		
 	def _evaluate_tree(self):

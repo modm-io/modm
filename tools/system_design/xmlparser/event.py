@@ -54,10 +54,20 @@ class Event(object):
 		The assert statement checks this, nothing else needs to be done.
 		"""
 		assert id(self) == id(other)
-		
+
 	def __cmp__(self, other):
-		return cmp(self.id, other.id) or cmp(self.name, other.name)
-	
+		return 1 - self.__eq__(other) - 2 * self.__lt__(other)
+
+	def __lt__(self, other):
+		if self.id == other.id:
+			return self.name < other.name
+		if self.id is None:
+			return other.id is not None
+		return other.id is not None and self.id < other.id
+
+	def __eq__(self, other):
+		return self.id == other.id and self.name == other.name
+
 	def __str__(self):
 		if self.type is None:
 			type = None

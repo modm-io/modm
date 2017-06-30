@@ -111,12 +111,14 @@ class ComponentDictionary(utils.SingleAssignDictionary):
 		"""
 		class ComponentIterator:
 			def __init__(self, list, abstract):
-				self.list = list
-				self.list.sort()
+				self.list = sorted(list)
 				self.abstract = abstract
 			
 			def __iter__(self):
 				return self
+
+			def __next__(self):
+				return self.next()
 			
 			def next(self):
 				try:
@@ -282,10 +284,20 @@ class Component(object):
 				raise ParserException("No id defined for the non abstract component '%s'!" % flat.name)
 		
 		self.__flattened = flat
-	
+
 	def __cmp__(self, other):
-		return cmp(self.id, other.id) or cmp(self.name, other.name)
-	
+		return 1 - self.__eq__(other) - 2 * self.__lt__(other)
+
+	def __lt__(self, other):
+		if self.id == other.id:
+			return self.name < other.name
+		if self.id is None:
+			return other.id is not None
+		return other.id is not None and self.id < other.id
+
+	def __eq__(self, other):
+		return self.id == other.id and self.name == other.name
+
 	def dump(self):
 		"""
 		Print a nice UML-like box of content of the component

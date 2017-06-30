@@ -98,7 +98,17 @@ class Container:
 		self.indexReady = True
 	
 	def __cmp__(self, other):
-		return cmp(self.name.lower(), other.name.lower()) or cmp(self.id, other.id)
+		return 1 - self.__eq__(other) - 2 * self.__lt__(other)
+
+	def __lt__(self, other):
+		if self.id == other.id:
+			return self.name < other.name
+		if self.id is None:
+			return other.id is not None
+		return other.id is not None and self.id < other.id
+
+	def __eq__(self, other):
+		return self.id == other.id and self.name == other.name
 	
 	def dump(self):
 		str = "%s : container\n" % self.__str__()
