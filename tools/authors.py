@@ -12,8 +12,8 @@ from collections import defaultdict
 import argparse
 
 author_handles = {
-    "Niklas Hauser": "salkinium",
     "Antal Szabó": "Sh4rK",
+    "Arjun Sarin": None,
     "Christian Menard": "chrism333",
     "Christoph Rüdi": None,
     "Christopher Durand": "chris-durand",
@@ -29,6 +29,7 @@ author_handles = {
     "Michael Thies": "mhthies",
     "Nick Sarten": "genbattle",
     "Niclas Rohrer": None,
+    "Niklas Hauser": "salkinium",
     "Raphael Lehmann": "rleh",
     "Sascha Schade": "strongly-typed",
     "Tarik TIRE": "7Kronos",
