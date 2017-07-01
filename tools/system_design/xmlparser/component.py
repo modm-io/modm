@@ -3,10 +3,10 @@
 
 import copy
 
-import utils
-import action
-import xml_utils
-from parser_exception import ParserException
+from . import utils
+from . import action
+from . import xml_utils
+from .parser_exception import ParserException
 
 class ComponentDictionary(utils.SingleAssignDictionary):
 	

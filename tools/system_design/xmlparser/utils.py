@@ -4,7 +4,7 @@
 import re
 import copy
 
-from parser_exception import ParserException
+from .parser_exception import ParserException
 
 def check_name(name):
 	""" Checks if a string comply with some rules for the notation

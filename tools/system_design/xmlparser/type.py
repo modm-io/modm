@@ -4,9 +4,9 @@
 import re
 import copy
 
-from parser_exception import ParserException
-import utils
-import xml_utils
+from .parser_exception import ParserException
+from . import utils
+from . import xml_utils
 
 VALID_UNDERLYING_TYPES_FOR_ENUMS = [
 	'int8_t', 'uint8_t', 'int16_t', 'uint16_t', 'int32_t', 'uint32_t', 'int64_t', 'uint64_t' ]

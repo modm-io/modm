@@ -1,11 +1,11 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 
-import utils
-import xml_utils
-from component import EventContainer
+from . import utils
+from . import xml_utils
+from .component import EventContainer
 
-from parser_exception import ParserException
+from .parser_exception import ParserException
 
 class Container:
 	""" Representation of a container which bundles components.

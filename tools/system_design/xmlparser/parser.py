@@ -6,13 +6,13 @@ import os
 import sys
 import logging
 
-from parser_exception import ParserException
-import utils
-import type
-import event
-import component
-import container
-import domain
+from .parser_exception import ParserException
+from . import utils
+from . import type
+from . import event
+from . import component
+from . import container
+from . import domain
 
 #logging.basicConfig(level=logging.DEBUG)
 logging.basicConfig(level=logging.WARNING)
