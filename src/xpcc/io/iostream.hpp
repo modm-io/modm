@@ -460,10 +460,10 @@ public:
 	 * @param	fmt		Format string
 	 */
 	IOStream&
-	printf(const char* fmt, ...);
+	printf(const char* fmt, ...)  __attribute__((format(printf, 2, 3)));
 
 	IOStream&
-	vprintf(const char *fmt, va_list vlist);
+	vprintf(const char *fmt, va_list vlist) __attribute__((format(printf, 2, 0)));
 
 protected:
 	void
