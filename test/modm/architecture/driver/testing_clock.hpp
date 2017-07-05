@@ -14,7 +14,7 @@
 #ifndef	TESTING_CLOCK_HPP
 #define	TESTING_CLOCK_HPP
 
-#include <modm/architecture/driver/clock.hpp>
+#include <modm/architecture/interface/clock.hpp>
 
 /**
  * Gain full access to modm::Clock

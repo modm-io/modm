@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	MODM_CLOCK_HPP
-#define	MODM_CLOCK_HPP
+#ifndef	MODM_INTERFACE_CLOCK_HPP
+#define	MODM_INTERFACE_CLOCK_HPP
 
 #include <modm/architecture/utils.hpp>
 #include <modm/processing/timer/timestamp.hpp>
@@ -21,16 +21,12 @@ namespace modm
 {
 
 /**
- * Internal system-tick timer
+ * @ingroup		interface
+ * @defgroup	clock		System-tick timer
+ * @brief 		Interface to the system wide tick timer.
  *
- * This class is implemented using `gettimeofday()` from <sys/time.h> for
- * any Unix-OS.
- *
- * For Cortex-M targets the user has to enable the `modm::SysTick` timer.
- *
- * For the AVRs targets the user has to use the increment() method to
- * generate a suitable timebase, preferably by incrementing the time
- * value inside a timer interrupt function.
+ * This class provides a 1ms timestamp that is used for lightweight scheduling.
+ * 
  *
  * Example:
  * @code
@@ -41,19 +37,16 @@ namespace modm
  * }
  * @endcode
  *
- * @ingroup	architecture
+ * @ingroup	clock
  */
 class Clock
 {
 public:
-	typedef uint32_t Type;
+	using Type = uint32_t;
 
 public:
-	/**
-	 * Get the current time, either as Timestamp or LongTimestamp.
-	 *
-	 * Provides an atomic access to the current time
-	 */
+	/// Get the current time, either as `Timestamp` or `LongTimestamp`.
+	/// Provides an atomic access to the current time
 	template< typename TimestampType = Timestamp >
 	static TimestampType
 	now();
@@ -64,14 +57,13 @@ public:
 		return now<ShortTimestamp>();
 	}
 
-#if !defined(MODM_OS_HOSTED)
-	/// Set the current time
+public:
+	/// Update the current time
 	static inline void
 	increment(uint_fast16_t step = 1)
 	{
 		time += step;
 	}
-#endif
 
 protected:
 	static Type time;
@@ -79,4 +71,4 @@ protected:
 
 }	// namespace modm
 
-#endif	// MODM_CLOCK_HPP
+#endif	// MODM_INTERFACE_CLOCK_HPP

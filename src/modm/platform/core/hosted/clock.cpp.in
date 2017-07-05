@@ -1,0 +1,47 @@
+/*
+ * Copyright (c) 2009-2011, Fabian Greif
+ * Copyright (c) 2010, Christoph Rüdi
+ * Copyright (c) 2010, Georgi Grinshpun
+ * Copyright (c) 2010, Martin Rosekeit
+ * Copyright (c) 2011-2012, 2014-2016, Niklas Hauser
+ * Copyright (c) 2012, Sascha Schade
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include <modm/architecture/interface/clock.hpp>
+%% if target["family"] in ["darwin", "linux"]
+#include <sys/time.h>
+
+template< typename TimestampType >
+TimestampType
+modm::Clock::now()
+{
+	struct timeval now;
+	gettimeofday(&now, 0);
+
+	return TimestampType( now.tv_sec*1000 + now.tv_usec/1000 );
+}
+
+%% elif target["family"] in ["windows"]
+#include <windows.h>
+
+template< typename TimestampType >
+TimestampType
+modm::Clock::now()
+{
+	SYSTEMTIME now;
+	GetSystemTime(&now);
+
+	return TimestampType( now.wMilliseconds + now.wSecond*1000 + now.wMinute*1000*60 );
+}
+%% endif
+
+// explicit declaration of what member function templates we need to generate
+template modm::ShortTimestamp modm::Clock::now();
+template modm::Timestamp modm::Clock::now();

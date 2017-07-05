@@ -16,7 +16,7 @@
 #ifndef MODM_TIMEOUT_HPP
 #define MODM_TIMEOUT_HPP
 
-#include <modm/architecture/driver/clock.hpp>
+#include <modm/architecture/interface/clock.hpp>
 
 #include "timestamp.hpp"
 

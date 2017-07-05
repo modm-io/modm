@@ -14,7 +14,7 @@
 //
 
 #include "arduino_uno.hpp"
-#include <modm/architecture/driver/clock.hpp>
+#include <modm/architecture/interface/clock.hpp>
 
 MODM_ISR(TIMER0_COMPA)
 {

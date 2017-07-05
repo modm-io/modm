@@ -16,7 +16,7 @@
 
 #include <stdint.h>
 #include <modm/processing/timer.hpp>
-#include <modm/architecture/driver/clock.hpp>
+#include <modm/architecture/interface/clock.hpp>
 #include <modm/ui/animation.hpp>
 
 namespace modm

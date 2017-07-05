@@ -13,7 +13,7 @@
 #define MODM_UI_LINEAR_ANIMATION_HPP
 
 #include <stdint.h>
-#include <modm/architecture/driver/clock.hpp>
+#include <modm/architecture/interface/clock.hpp>
 #include <modm/utils/arithmetic_traits.hpp>
 #include "interpolation.hpp"
 

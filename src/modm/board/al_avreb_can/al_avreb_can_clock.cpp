@@ -10,7 +10,7 @@
 // ----------------------------------------------------------------------------
 
 #include "al_avreb_can.hpp"
-#include <modm/architecture/driver/clock.hpp>
+#include <modm/architecture/interface/clock.hpp>
 
 ISR(TIMER0_COMP_vect)
 {

@@ -21,7 +21,7 @@
 #include <modm/processing/timer.hpp>
 #include <modm/architecture/interface/delay.hpp>
 #include <stdlib.h>
-#include <modm/architecture/driver/clock.hpp>
+#include <modm/architecture/interface/clock.hpp>
 #include <modm/processing/timer/timestamp.hpp>
 
 #include "constants.hpp"
