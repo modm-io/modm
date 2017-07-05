@@ -13,7 +13,7 @@
 #ifndef MODM_INTERFACE_CAN_HPP
 #define MODM_INTERFACE_CAN_HPP
 
-#include <modm/architecture/interface.hpp>
+#include <modm/architecture/interface/peripheral.hpp>
 #include "can_message.hpp"
 
 /**

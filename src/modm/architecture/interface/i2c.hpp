@@ -15,7 +15,7 @@
 #ifndef MODM_INTERFACE_I2C_HPP
 #define MODM_INTERFACE_I2C_HPP
 
-#include <modm/architecture/interface.hpp>
+#include <modm/architecture/interface/gpio.hpp>
 #include <modm/architecture/interface/delay.hpp>
 #include <modm/io/iostream.hpp>
 

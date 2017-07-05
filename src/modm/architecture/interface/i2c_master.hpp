@@ -14,6 +14,7 @@
 
 #include "i2c.hpp"
 #include "i2c_transaction.hpp"
+#include "peripheral.hpp"
 
 namespace modm
 {

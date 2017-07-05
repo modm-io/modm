@@ -32,7 +32,7 @@
 #define MODM_ONE_WIRE_HPP
 
 #include <modm/architecture/utils.hpp>
-#include <modm/architecture/interface.hpp>
+#include <modm/architecture/interface/peripheral.hpp>
 
 namespace modm
 {

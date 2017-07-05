@@ -12,7 +12,7 @@
 #ifndef MODM_INTERFACE_ADC_HPP
 #define MODM_INTERFACE_ADC_HPP
 
-#include <modm/architecture/interface.hpp>
+#include <modm/architecture/interface/peripheral.hpp>
 
 /**
  * @ingroup		interface

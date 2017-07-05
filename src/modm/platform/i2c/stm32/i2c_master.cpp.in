@@ -164,6 +164,7 @@
 #include "i2c_master_{{ id }}.hpp"
 #include <modm/architecture/driver/accessor.hpp>
 #include <modm/architecture/driver/atomic.hpp>
+#include <modm/architecture/interface/interrupt.hpp>
 #include <modm/container/container.hpp>
 
 MODM_ISR_DECL(I2C{{ id }}_ER);

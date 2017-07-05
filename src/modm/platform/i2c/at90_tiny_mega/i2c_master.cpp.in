@@ -15,6 +15,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/twi.h>
+#include <modm/architecture/interface/interrupt.hpp>
 
 // uncomment to debug your driver using simple uart
 /*

@@ -16,6 +16,7 @@
 
 #include <stdint.h>
 #include "../device.hpp"
+#include <modm/architecture/interface/register.hpp>
 
 /**
  * @ingroup 	{{partname}}

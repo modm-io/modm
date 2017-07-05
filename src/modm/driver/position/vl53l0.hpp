@@ -14,6 +14,7 @@
 #define MODM_VL53L0_HPP
 
 #include <modm/architecture/interface/i2c_device.hpp>
+#include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/driver/accessor.hpp>
 #include <modm/processing/processing.hpp>
 #include <modm/utils/arithmetic_traits.hpp>
