@@ -1,0 +1,23 @@
+/*
+ * Copyright (c) 2017, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+%% for define in defines
+#define {{ define }} 1
+%% endfor
+%% for header in headers
+#include "{{ header }}"
+%% endfor
+
+// Instantiate all peripherals
+%% for (name, type, _) in peripherals
+#undef {{name}}
+{{type}} {{name}};
+%% endfor

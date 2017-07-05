@@ -41,7 +41,7 @@ def getDefineForDevice(device_id, familyDefines):
 
     return None
 
-
+# -----------------------------------------------------------------------------
 def init(module):
     module.name = "cmsis.device"
 
@@ -53,27 +53,91 @@ def prepare(module, options):
     module.depends(":cmsis")
     return True
 
-def build(env):
+bprops = {}
+def pre_build(env):
     device = env[":target"]
+
+    core = {
+        "cortex-m0": "cm0",
+        "cortex-m0+": "cm0plus",
+        "cortex-m3": "cm3",
+        "cortex-m4": "cm4",
+        "cortex-m4f": "cm4",
+        "cortex-m7": "cm7",
+        "cortex-m7f": "cm7",
+        "cortex-m7fd": "cm7",
+    }[device.get_driver("core")["type"]]
+    core_header = "core_{}.h".format(core)
+    core_header = localpath("..", "cmsis", "Include", core_header)
 
     folder = "stm32{}xx".format(device.identifier["family"])
     family_header = folder + ".h"
+    folder = os.path.join("stm32", folder, "Include")
     define = None
 
-    with open(localpath("stm32", folder, "Include", family_header), "r", errors="replace") as headerFile:
+    with open(localpath(folder, family_header), "r", errors="replace") as headerFile:
         match = re.findall("if defined\((?P<define>STM32[F|L].....)\)", headerFile.read())
         if match:
             define = getDefineForDevice(device.identifier, match)
     if define is None:
-        print("No device define found!")
-        return False
+        raise PreBuildException("No device define found for '{}'!".format(device.partname))
 
     device_header = define.lower() + ".h"
-    system_header = "system_" + family_header
-    env.outbasepath = "ext/cmsis_device"
-    env.copy(localpath("stm32", folder, "Include", device_header), device_header)
-    env.copy(localpath("stm32", folder, "Include", system_header), system_header)
+    peripherals = []
+    core_features = {}
 
+    for header_path in [core_header, localpath(folder, device_header)]:
+        with open(header_path, "r", errors="replace") as deviceFile:
+            deviceFileContent = deviceFile.read()
+            # find mpu and fpu features
+            features = re.findall(r"#define +__([MF]PU)_PRESENT +([01])", deviceFileContent)
+            core_features.update({f[0]:bool(int(f[1])) for f in features})
+            # find all peripherals
+            mperipherals = re.findall(r"#define +(.*?) +\(\((.*?_Type(?:Def)?) *?\*\) *?([A-Z].*?_BASE)", deviceFileContent)
+            pnames = [p[0] for p in mperipherals]
+            # reduce search window to only Peripheral_memory_map section or CMSIS_core_base
+            memmapContent = re.search(r"(Peripheral_memory_map|CMSIS_core_base).*?@\}", deviceFileContent, re.DOTALL | re.MULTILINE).group()
+            # find all memory mappings
+            mall = re.findall(r"#define +(.*?) +\(?(?:\( *?uint32_t *?\))?(.*?)U?L?\)? *?(?:\n|/)", memmapContent)
+            symbols = {}
+            # resolve all symbols via simple find/replace
+            for (symbol, value) in [(m[0], m[1]) for m in mall]:
+                if symbol in pnames: continue;
+                values = value.split(" ")
+                for sym, val in symbols.items():
+                    values = [(val if v == sym else v) for v in values]
+                symbols[symbol] = " ".join(values)
+            # evaluate all symbol addresses
+            symbols = {s:eval(v) for s,v in symbols.items()}
+            # We only care about the absolute peripheral addresses
+            peripherals.extend([(p[0],p[1],symbols[p[2]]) for p in mperipherals])
+    # filter out MPU and/or FPU if required
+    peripherals = list(filter(lambda p: p[0] not in core_features or core_features[p[0]], peripherals))
+    # print("\n".join([s+" -> "+hex(k) for s,k in symbols.items()]))
+    # print("\n".join([s+" -> "+hex(k) for s,k in peripherals.items()]))
+
+    bprops.update({
+        "folder": folder,
+        "define": define,
+        "device_header": device_header,
+        "system_header": "system_" + family_header,
+        "peripherals": peripherals
+    })
+
+def build(env):
+    env.outbasepath = "ext/cmsis_device"
+    env.copy(localpath(bprops["folder"], bprops["device_header"]), bprops["device_header"])
+    env.copy(localpath(bprops["folder"], bprops["system_header"]), bprops["system_header"])
+
+    env.substitutions = {
+        "headers": [bprops["device_header"], bprops["system_header"]],
+        "defines": [bprops["define"]],
+        "peripherals": bprops["peripherals"],
+        "min_addr": min([a for (_, _,a) in bprops["peripherals"]]),
+        "max_addr": max([a for (_, _,a) in bprops["peripherals"]])
+    }
+    env.template("../peripherals.c.in", "peripherals.c")
+    env.outbasepath = "link"
+    env.template("../peripherals.ld.in", "peripherals.ld")
     env.outbasepath = "src/modm/platform"
-    env.substitutions = {"headers": [device_header, system_header], "defines": [define]}
     env.template("device.hpp.in")
