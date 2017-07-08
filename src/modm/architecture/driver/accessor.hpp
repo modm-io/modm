@@ -16,7 +16,6 @@
 
 #include "accessor/ram.hpp"
 #include "accessor/flash.hpp"
-#include "accessor/unaligned.hpp"
 
 namespace modm
 {

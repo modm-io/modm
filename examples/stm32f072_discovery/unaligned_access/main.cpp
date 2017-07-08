@@ -10,7 +10,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/architecture/platform.hpp>
-#include <modm/architecture/driver/accessor.hpp>
+#include <modm/architecture/interface/unaligned.hpp>
 #include <modm/container/smart_pointer.hpp>
 
 using namespace Board;

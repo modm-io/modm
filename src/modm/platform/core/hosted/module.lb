@@ -38,6 +38,7 @@ def build(env):
     env.copy("assert.cpp")
     env.copy("memory.cpp")
     env.copy("atomic_lock.hpp")
+    env.copy("../avr/unaligned.hpp", "unaligned.hpp")
 
     env.template("clock.cpp.in")
     env.template("delay.hpp.in")
