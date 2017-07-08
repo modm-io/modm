@@ -10,11 +10,6 @@
  */
 // ----------------------------------------------------------------------------
 
-/**
-\ingroup	architecture
-\defgroup	atomic	Atomic operations and container
-*/
-
 namespace modm
 {
 	/**
@@ -26,7 +21,6 @@ namespace modm
 	}
 }
 
-#include "atomic/lock.hpp"
 #include "atomic/flag.hpp"
 #include "atomic/container.hpp"
 #include "atomic/queue.hpp"

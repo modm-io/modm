@@ -13,7 +13,7 @@
 #include <modm/architecture/platform/avr/xmega.hpp>
 
 #include <modm/architecture/driver/atomic/queue.hpp>
-#include <modm/architecture/driver/atomic/lock.hpp>
+#include <modm/architecture/interface/atomic_lock.hpp>
 
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/architecture/platform/avr/xmega/gpio.hpp>

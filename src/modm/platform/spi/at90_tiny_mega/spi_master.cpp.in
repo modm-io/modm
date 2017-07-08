@@ -17,7 +17,7 @@
 #include <avr/interrupt.h>
 
 #include <modm/architecture/interface/register.hpp>
-#include <modm/architecture/driver/atomic.hpp>
+#include <modm/architecture/interface/atomic_lock.hpp>
 
 // bit 7 (0x80) is used for transfer 1 byte
 // bit 6 (0x40) is used for transfer multiple byte

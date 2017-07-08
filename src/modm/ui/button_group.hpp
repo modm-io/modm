@@ -19,7 +19,7 @@
 #include <stdint.h>
 
 #include <modm/architecture/utils.hpp>
-#include <modm/architecture/driver/atomic/lock.hpp>
+#include <modm/architecture/interface/atomic_lock.hpp>
 
 namespace modm
 {

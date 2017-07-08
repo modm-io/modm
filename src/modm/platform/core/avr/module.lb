@@ -59,6 +59,7 @@ def build(env):
     env.copy("assert.cpp")
     env.copy("delay.hpp")
     env.copy("clock.cpp")
+    env.copy("atomic_lock.hpp")
 
     env.template("ram.cpp.in")
     env.template("interrupts.hpp.in")

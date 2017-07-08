@@ -15,7 +15,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/architecture/interface/clock.hpp>
-#include <modm/architecture/driver/atomic/lock.hpp>
+#include <modm/architecture/interface/atomic_lock.hpp>
 
 modm::Clock::Type modm::Clock::time;
 

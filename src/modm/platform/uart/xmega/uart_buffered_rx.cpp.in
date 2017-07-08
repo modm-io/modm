@@ -11,7 +11,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/architecture/driver/atomic/queue.hpp>
-#include <modm/architecture/driver/atomic/lock.hpp>
+#include <modm/architecture/interface/atomic_lock.hpp>
 
 #include "uart_{{ id.lower() }}.hpp"
 

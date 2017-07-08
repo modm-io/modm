@@ -19,7 +19,7 @@
 
 #include <modm/architecture/utils.hpp>
 #include <modm/architecture/driver/accessor.hpp>
-#include <modm/architecture/driver/atomic/lock.hpp>		// for Scheduler::scheduleInterrupt()
+#include <modm/architecture/interface/atomic_lock.hpp>		// for Scheduler::scheduleInterrupt()
 
 namespace modm
 {

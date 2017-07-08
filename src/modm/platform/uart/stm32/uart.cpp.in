@@ -22,7 +22,8 @@
 #include "uart_{{ id }}.hpp"
 
 %% if options["buffered"]
-#include <modm/architecture/driver/atomic.hpp>
+#include <modm/architecture/interface/atomic_lock.hpp>
+#include <modm/architecture/driver/atomic/queue.hpp>
 
 namespace
 {

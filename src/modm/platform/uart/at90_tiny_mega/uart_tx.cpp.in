@@ -21,7 +21,7 @@
 #include <avr/interrupt.h>
 
 #include <modm/architecture/driver/atomic/queue.hpp>
-#include <modm/architecture/driver/atomic/lock.hpp>
+#include <modm/architecture/interface/atomic_lock.hpp>
 #include <modm/architecture/interface/interrupt.hpp>
 
 #include "uart_defines.h"

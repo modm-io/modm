@@ -17,7 +17,7 @@
 #include "uart_spi_master_{{ id }}.hpp"
 %% endif
 
-#include <modm/architecture/driver/atomic.hpp>
+#include <modm/architecture/interface/atomic_lock.hpp>
 #include <modm/math/utils/bit_operation.hpp>
 #include <modm/architecture/interface/register.hpp>
 

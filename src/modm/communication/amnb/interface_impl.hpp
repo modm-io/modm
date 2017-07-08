@@ -16,7 +16,7 @@
 #	error	"Don't include this file directly, use 'interface.hpp' instead!"
 #endif
 
-#include <modm/architecture/driver/atomic/lock.hpp>
+#include <modm/architecture/interface/atomic_lock.hpp>
 
 uint_fast16_t modm::amnb::Clock::time = 0;
 

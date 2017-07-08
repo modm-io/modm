@@ -14,7 +14,7 @@
 #ifndef	MODM_ATOMIC_FLAG_HPP
 #define	MODM_ATOMIC_FLAG_HPP
 
-#include "lock.hpp"
+#include <modm/architecture/interface/atomic_lock.hpp>
 
 namespace modm
 {

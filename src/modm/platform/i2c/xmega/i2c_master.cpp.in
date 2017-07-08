@@ -14,7 +14,7 @@
 
 #include "i2c_master_{{ id.lower() }}.hpp"
 
-#include <modm/architecture/driver/atomic/lock.hpp>
+#include <modm/architecture/interface/atomic_lock.hpp>
 
 // uncomment to debug your driver using simple uart
 /*

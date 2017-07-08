@@ -27,6 +27,7 @@
 #include "interface/adc.hpp"
 #include "interface/assert.hpp"
 #include "interface/assert.hpp"
+#include "interface/atomic_lock.hpp"
 #include "interface/can_message.hpp"
 #include "interface/can.hpp"
 #include "interface/clock.hpp"

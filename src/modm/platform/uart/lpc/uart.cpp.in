@@ -12,7 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/driver/atomic.hpp>
+#include <modm/architecture/driver/atomic/queue.hpp>
+#include <modm/architecture/interface/atomic_lock.hpp>
 
 #include "../device.hpp"
 #include "../clock/clock.hpp"

@@ -186,6 +186,7 @@ def build(env):
     env.template("delay.cpp.in")
     env.copy("delay.hpp")
     env.copy("clock.cpp")
+    env.copy("atomic_lock.hpp")
 
     if properties["core"] != "cortex-m0":
         env.copy("cycle_counter.hpp")
