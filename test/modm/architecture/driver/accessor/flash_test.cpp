@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/driver/accessor/flash.hpp>
+#include <modm/architecture/interface/accessor_flash.hpp>
 
 #include "flash_test.hpp"
 

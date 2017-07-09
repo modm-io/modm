@@ -38,7 +38,7 @@
 #endif
 
 #include "i2c_master_{{ id }}.hpp"
-#include <modm/architecture/driver/accessor.hpp>
+#include <modm/architecture/interface/accessor.hpp>
 #include <modm/architecture/driver/atomic/queue.hpp>
 #include <modm/architecture/interface/atomic_lock.hpp>
 #include <modm/architecture/interface/interrupt.hpp>

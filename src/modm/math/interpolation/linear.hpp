@@ -18,7 +18,7 @@
 
 #include <modm/utils/arithmetic_traits.hpp>
 #include <modm/container/pair.hpp>
-#include <modm/architecture/driver/accessor.hpp>
+#include <modm/architecture/interface/accessor.hpp>
 
 namespace modm
 {

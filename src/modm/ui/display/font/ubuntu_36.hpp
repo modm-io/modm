@@ -17,7 +17,7 @@
 #ifndef MODM_FONT_UBUNTU_36_HPP
 #define	MODM_FONT_UBUNTU_36_HPP
 
-#include <modm/architecture/driver/accessor.hpp>
+#include <modm/architecture/interface/accessor.hpp>
 
 namespace modm
 {

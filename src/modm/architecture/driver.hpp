@@ -18,4 +18,3 @@
  */
 
 #include "driver/atomic.hpp"
-#include "driver/accessor.hpp"

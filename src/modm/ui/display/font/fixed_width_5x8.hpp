@@ -17,7 +17,7 @@
 #ifndef MODM_FONT_FIXED_WIDTH_5X8_HPP
 #define	MODM_FONT_FIXED_WIDTH_5X8_HPP
 
-#include <modm/architecture/driver/accessor.hpp>
+#include <modm/architecture/interface/accessor.hpp>
 
 namespace modm
 {

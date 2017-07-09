@@ -12,7 +12,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/container/pair.hpp>
-#include <modm/architecture/driver/accessor/flash.hpp>
+#include <modm/architecture/interface/accessor_flash.hpp>
 
 #include "pair_test.hpp"
 

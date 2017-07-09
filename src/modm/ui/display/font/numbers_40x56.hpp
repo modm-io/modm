@@ -17,7 +17,7 @@
 #ifndef MODM_FONT_NUMBERS_40X56_HPP
 #define	MODM_FONT_NUMBERS_40X56_HPP
 
-#include <modm/architecture/driver/accessor.hpp>
+#include <modm/architecture/interface/accessor.hpp>
 
 namespace modm
 {

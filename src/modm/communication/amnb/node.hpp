@@ -15,7 +15,7 @@
 #define	MODM_AMNB_NODE_HPP
 
 #include <cstddef>
-#include <modm/architecture/driver/accessor/flash.hpp>
+#include <modm/architecture/interface/accessor_flash.hpp>
 #include <modm/processing/timer.hpp>
 
 #include "interface.hpp"

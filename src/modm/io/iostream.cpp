@@ -16,7 +16,7 @@
 #include <stdlib.h>
 
 #include <modm/utils/arithmetic_traits.hpp>
-#include <modm/architecture/driver/accessor/flash.hpp>
+#include <modm/architecture/interface/accessor_flash.hpp>
 
 #include "iostream.hpp"
 

@@ -16,7 +16,7 @@
 
 // created with FontCreator 3.0
 
-#include <modm/architecture/driver/accessor.hpp>
+#include <modm/architecture/interface/accessor.hpp>
 
 namespace modm
 {

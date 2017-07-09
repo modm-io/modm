@@ -18,7 +18,7 @@
 #ifndef MODM_GRAPHIC_DISPLAY_HPP
 #define MODM_GRAPHIC_DISPLAY_HPP
 
-#include <modm/architecture/driver/accessor.hpp>
+#include <modm/architecture/interface/accessor.hpp>
 #include <modm/math/geometry.hpp>
 
 #include <modm/io/iodevice.hpp>

@@ -61,6 +61,7 @@ def build(env):
     env.copy("clock.cpp")
     env.copy("atomic_lock.hpp")
     env.copy("unaligned.hpp")
+    env.copy("flash_reader.hpp")
 
     env.template("ram.cpp.in")
     env.template("interrupts.hpp.in")

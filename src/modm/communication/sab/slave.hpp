@@ -16,7 +16,7 @@
 #define	MODM_SAB_SLAVE_HPP
 
 #include <cstddef>
-#include <modm/architecture/driver/accessor/flash.hpp>
+#include <modm/architecture/interface/accessor_flash.hpp>
 
 #include "interface.hpp"
 

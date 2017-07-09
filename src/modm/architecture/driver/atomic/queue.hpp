@@ -18,7 +18,7 @@
 #include <cstddef>
 #include <stdint.h>
 #include <modm/architecture/utils.hpp>
-#include <modm/architecture/driver/accessor.hpp>
+#include <modm/architecture/interface/accessor.hpp>
 #include <modm/utils/template_metaprogramming.hpp>
 
 namespace modm

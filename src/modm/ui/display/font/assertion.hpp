@@ -17,7 +17,7 @@
 #ifndef MODM_FONT_ASSERTION_HPP
 #define	MODM_FONT_ASSERTION_HPP
 
-#include <modm/architecture/driver/accessor.hpp>
+#include <modm/architecture/interface/accessor.hpp>
 
 namespace modm
 {

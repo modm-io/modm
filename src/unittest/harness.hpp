@@ -83,7 +83,7 @@
 
 #else // !__DOXYGEN__
 
-#include <modm/architecture/driver/accessor/flash.hpp>
+#include <modm/architecture/interface/accessor_flash.hpp>
 
 namespace unittest
 {

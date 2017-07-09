@@ -23,6 +23,9 @@
  * All hardware peripherals with common interfaces.
  */
 
+#include "interface/accessor_flash.hpp"
+#include "interface/accessor_ram.hpp"
+#include "interface/accessor.hpp"
 #include "interface/adc_interrupt.hpp"
 #include "interface/adc.hpp"
 #include "interface/assert.hpp"

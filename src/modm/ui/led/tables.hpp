@@ -15,7 +15,7 @@
 #define MODM_PWM_LED_TABLE_HPP
 
 #include <stdint.h>
-#include <modm/architecture/driver/accessor/flash.hpp>
+#include <modm/architecture/interface/accessor_flash.hpp>
 
 namespace modm
 {

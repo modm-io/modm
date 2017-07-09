@@ -11,7 +11,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/architecture/platform.hpp>
-#include <modm/architecture/driver/accessor/flash.hpp>
+#include <modm/architecture/interface/accessor_flash.hpp>
 
 //extern const int a PROGMEM;
 //const int a = 12;

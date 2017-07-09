@@ -15,7 +15,7 @@
 #define	UNITTEST_CONTROLLER_HPP
 
 #include <modm/io/iostream.hpp>
-#include <modm/architecture/driver/accessor/flash.hpp>
+#include <modm/architecture/interface/accessor_flash.hpp>
 
 #include "reporter.hpp"
 

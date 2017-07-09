@@ -17,7 +17,7 @@
 #ifndef MODM_FONT_MATRIX_8X8_HPP
 #define	MODM_FONT_MATRIX_8X8_HPP
 
-#include <modm/architecture/driver/accessor.hpp>
+#include <modm/architecture/interface/accessor.hpp>
 
 namespace modm
 {

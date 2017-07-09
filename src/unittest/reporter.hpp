@@ -19,7 +19,7 @@
 #include <stdint.h>
 
 #include <modm/io/iostream.hpp>
-#include <modm/architecture/driver/accessor/flash.hpp>
+#include <modm/architecture/interface/accessor_flash.hpp>
 
 namespace unittest
 {

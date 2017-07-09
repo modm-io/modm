@@ -17,7 +17,7 @@
 #define MODM_MCP2515_HPP
 
 #include <stdint.h>
-#include <modm/architecture/driver/accessor.hpp>
+#include <modm/architecture/interface/accessor.hpp>
 #include <modm/architecture/interface/delay.hpp>
 #include <modm/architecture/interface/can.hpp>
 

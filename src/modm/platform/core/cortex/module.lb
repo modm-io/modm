@@ -188,6 +188,7 @@ def build(env):
     env.copy("clock.cpp")
     env.copy("atomic_lock.hpp")
     env.template("unaligned.hpp.in")
+    env.copy("flash_reader.hpp")
 
     if properties["core"] != "cortex-m0":
         env.copy("cycle_counter.hpp")

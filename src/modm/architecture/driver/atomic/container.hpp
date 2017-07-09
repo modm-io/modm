@@ -15,7 +15,7 @@
 #define	MODM_ATOMIC_CONTAINER_HPP
 
 #include <modm/architecture/interface/atomic_lock.hpp>
-#include <modm/architecture/driver/accessor.hpp>
+#include <modm/architecture/interface/accessor.hpp>
 
 namespace modm
 {
