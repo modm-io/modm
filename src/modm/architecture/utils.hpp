@@ -19,7 +19,6 @@
 #define MODM_UTILS_HPP
 
 #include "detect.hpp"
-#include "legacy_macros.hpp"
 
 #ifdef __DOXYGEN__
 	/// @ingroup	platform
