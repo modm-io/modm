@@ -97,7 +97,7 @@ devices = [
 #	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f103t4',	'clock':  72000000 },	# low density
 #	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f103rb',	'clock':  72000000 },	# medium density
 #	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f103ze',	'clock':  72000000 },	# high density
-#	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f103rg',	'clock':  72000000 },	# xl density
+	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f103rg',	'clock':  72000000 },	# xl density
 #	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f107vc',	'clock':  72000000 },	# connectivity
 #	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f205ve',	'clock': 120000000 },
 #	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f207ze',	'clock': 120000000 },

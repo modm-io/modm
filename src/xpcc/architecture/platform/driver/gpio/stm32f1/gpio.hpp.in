@@ -306,7 +306,8 @@ public:
 				%% set afpos = af_all[0]
 				%% set afmask = af_all[1]
 				%% set afval = af_all[2]
-				%% set enableAlternateFunction = "AFIO->MAPR = (AFIO->MAPR & ~(" ~ afmask ~ " << " ~ afpos ~ ")) | (" ~ afval ~ " << " ~ afpos ~ ");"
+				%% set reg = "MAPR" if (afpos | int) < 32 else "MAPR2"
+				%% set enableAlternateFunction = "AFIO->" ~ reg ~ " = (AFIO->" ~ reg ~ " & ~(" ~ afmask ~ " << " ~ (afpos | int) % 32 ~ ")) | (" ~ afval ~ " << " ~ (afpos | int) % 32 ~ ");"
 			%% endif
 
 			%% set use = not (	(af.type == "in"     and type == "Output") or
