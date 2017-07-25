@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <cmath>
+#include <inttypes.h>
 
 #include <xpcc/debug/logger/logger.hpp>
 
@@ -85,7 +86,7 @@ DataDouble::calculateCalibratedPressure()
 	XPCC_LOG_DEBUG.printf("raw[2:5] = %02x %02x %02x\n", raw[2], raw[3], raw[4]);
 
 	uint32_t up = ( (uint32_t(raw[2]) << 16) | (uint16_t(raw[3]) << 8) | raw[4] );
-	XPCC_LOG_DEBUG.printf("up = %9d\n", up);
+	XPCC_LOG_DEBUG.printf("up = %9" PRId32 "\n", up);
 
 	double pu = up / double(256.0);
 	XPCC_LOG_DEBUG.printf("pu = %9.5f\n", pu);

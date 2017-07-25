@@ -68,7 +68,7 @@ xpcc_weak
 void xpcc_abandon(const char * module, const char * location, const char * failure, uintptr_t context)
 {
 	XPCC_LOG_ERROR.printf("Assertion '%s.%s.%s'", module, location, failure);
-	if (context) { XPCC_LOG_ERROR.printf(" @ %p (%d)", (void *) context, context); }
+	if (context) { XPCC_LOG_ERROR.printf(" @ %p (%lu)", (void *) context, context); }
 	XPCC_LOG_ERROR.printf(" failed! Abandoning...\n");
 }
 

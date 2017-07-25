@@ -1,3 +1,5 @@
+#include <inttypes.h>
+
 #include <xpcc/architecture/platform.hpp>
 #include <xpcc/debug/logger.hpp>
 #include <xpcc/processing.hpp>
@@ -37,7 +39,7 @@ setDirection(Direction dir)
 
 		xpcc::Timestamp timestamp = xpcc::Clock::now();
 
-		XPCC_LOG_INFO.printf("\e[39m\n%04d %02d:%03d +%01d:%03d ",
+		XPCC_LOG_INFO.printf("\e[39m\n%04" PRId16 " %02" PRId32 ":%03" PRId32 " +%01" PRId32 ":%03" PRId32 " ",
 				counter,
 				timestamp.getTime() / 1000,
 				timestamp.getTime() % 1000,

@@ -1,3 +1,5 @@
+#include <inttypes.h>
+
 #include <xpcc/architecture/platform.hpp>
 #include <xpcc/driver/radio/nrf24/nrf24_phy.hpp>
 #include <xpcc/debug/logger.hpp>
@@ -148,7 +150,7 @@ main()
 			XPCC_LOG_INFO.printf("\033[2J");
 			XPCC_LOG_INFO.printf("\033[1;10H");
 			XPCC_LOG_INFO.printf("2.4GHz scanner");
-			XPCC_LOG_INFO.printf("   max: %d", max);
+			XPCC_LOG_INFO.printf("   max: %" PRId32, max);
 
 			for(i = 0; i < max_channel; i++)
 			{

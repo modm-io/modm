@@ -1,3 +1,5 @@
+#include <inttypes.h>
+
 #include <xpcc/architecture/platform.hpp>
 
 int main()
@@ -17,7 +19,7 @@ int main()
 		d[ii] = new (xpcc::MemoryFastData) uint8_t[size];
 
 		// print what size we requested and if it succeeded
-		XPCC_LOG_INFO.printf(" malloc(%3ukB) = ", size/1024);
+		XPCC_LOG_INFO.printf(" malloc(%3" PRId32 "kB) = ", size/1024);
 		if (d[ii]) XPCC_LOG_INFO << d[ii];
 		else   XPCC_LOG_INFO << "NO MEMORY ";
 

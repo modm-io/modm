@@ -8,6 +8,8 @@
 // ----------------------------------------------------------------------------
 
 #include <stdint.h>
+#include <inttypes.h>
+
 #include <xpcc/io/iostream.hpp>
 #include <xpcc/architecture/utils.hpp>
 #include <xpcc/architecture/interface/can_message.hpp>
@@ -21,7 +23,7 @@ namespace can
 xpcc::IOStream&
 operator << (xpcc::IOStream& s, const xpcc::can::Message m)
 {
-    s.printf("id = %04x, len = ", m.identifier);
+    s.printf("id = %04" PRIx32 ", len = ", m.identifier);
     s << m.length;
     s.printf(", flags = %c%c, data = ",
              m.flags.rtr ? 'R' : 'r',

@@ -179,7 +179,7 @@ Bmp085Test::testConversion()
 				}
 
 				int16_t error = pressFp - pressDp;
-				XPCC_LOG_DEBUG.printf("  adc_press = %04x  PressFp = %6d Pa\t PressDp = %6d Pa \t Diff = %3d Pa\n", adc_press, pressFp, pressDp, error);
+				XPCC_LOG_DEBUG.printf("  adc_press = %04" PRIx16 "  PressFp = %6" PRId32 " Pa\t PressDp = %6" PRId32 " Pa \t Diff = %3" PRId16 " Pa\n", adc_press, pressFp, pressDp, error);
 
 				uint16_t error_abs = std::abs(error);
 				total_error += error_abs;
@@ -193,7 +193,7 @@ Bmp085Test::testConversion()
 		XPCC_LOG_DEBUG.printf(" max = %d\n", max_error);
 		XPCC_LOG_DEBUG.printf(" sum = %d\n", total_error);
 
-		TEST_ASSERT_EQUALS_RANGE(total_error, 0, 1541);
-		TEST_ASSERT_EQUALS_RANGE(max_error,   0,   71);
+		TEST_ASSERT_EQUALS_RANGE(total_error, 0u, 1541u);
+		TEST_ASSERT_EQUALS_RANGE(max_error,   0u,   71u);
 	}
 }

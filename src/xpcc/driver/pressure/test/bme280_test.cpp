@@ -178,7 +178,7 @@ Bme280Test::testConversion()
 
 			int32_t error = tempDouble - temp;
 
-			XPCC_LOG_DEBUG.printf("%05x\t%5d\t%5d\t%2d\n", adc, tempDouble, temp, error);
+			XPCC_LOG_DEBUG.printf("%05" PRIx32 "\t%5" PRId32 "\t%5" PRId32 "\t%2" PRId32 "\n", adc, tempDouble, temp, error);
 
 			error = std::abs(error);
 			total_error += error;
@@ -188,8 +188,8 @@ Bme280Test::testConversion()
 		}
 
 		XPCC_LOG_DEBUG.printf("== Errors ==\n");
-		XPCC_LOG_DEBUG.printf(" max = %d\n", max_error);
-		XPCC_LOG_DEBUG.printf(" sum = %d\n", total_error);
+		XPCC_LOG_DEBUG.printf(" max = %" PRId32 "\n", max_error);
+		XPCC_LOG_DEBUG.printf(" sum = %" PRId32 "\n", total_error);
 
 		TEST_ASSERT_TRUE(total_error < 51000);
 		TEST_ASSERT_TRUE(max_error <= 1);
@@ -225,7 +225,7 @@ Bme280Test::testConversion()
 			double temp;
 			dataDouble->getTemperature(temp);
 
-			XPCC_LOG_DEBUG.printf("adc_temp = %05x, T = %f\n", adc_temp, temp);
+			XPCC_LOG_DEBUG.printf("adc_temp = %05" PRIx32 ", T = %f\n", adc_temp, temp);
 
 			uint32_t adc_press_span = adc_press_max[jj] - adc_press_min[jj];
 
@@ -257,7 +257,7 @@ Bme280Test::testConversion()
 				}
 
 				int32_t error = pressFp - pressDp;
-				XPCC_LOG_DEBUG.printf("  adc_press = %05x  PressFp = %9d Pa\t PressDp = %9d Pa \t Diff = %5d Pa\n", 
+				XPCC_LOG_DEBUG.printf("  adc_press = %05" PRIx32 "  PressFp = %9" PRId32 " Pa\t PressDp = %9" PRId32 " Pa \t Diff = %5" PRId32 " Pa\n", 
 					adc_press, pressFp, pressDp, error);
 
 				error = std::abs(error);
@@ -269,8 +269,8 @@ Bme280Test::testConversion()
 		}
 
 		XPCC_LOG_DEBUG.printf("== Errors ==\n");
-		XPCC_LOG_DEBUG.printf(" max = %d\n", max_error);
-		XPCC_LOG_DEBUG.printf(" sum = %d\n", total_error);
+		XPCC_LOG_DEBUG.printf(" max = %" PRId32 "\n", max_error);
+		XPCC_LOG_DEBUG.printf(" sum = %" PRId32 "\n", total_error);
 
 		TEST_ASSERT_TRUE(total_error <= 2455);
 		TEST_ASSERT_TRUE(max_error <= 50);

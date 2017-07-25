@@ -245,14 +245,14 @@ BoundedDequeTest::testOneElementQueue()
 {
 	xpcc::BoundedDeque<int16_t, 1> deque;
 
-	TEST_ASSERT_EQUALS(deque.getSize(), 0);
-	TEST_ASSERT_EQUALS(deque.getMaxSize(), 1);
+	TEST_ASSERT_EQUALS(deque.getSize(), 0U);
+	TEST_ASSERT_EQUALS(deque.getMaxSize(), 1U);
 
 	TEST_ASSERT_TRUE(deque.isEmpty());
 	TEST_ASSERT_FALSE(deque.isFull());
 
 	TEST_ASSERT_TRUE(deque.append(123));
-	TEST_ASSERT_EQUALS(deque.getSize(), 1);
+	TEST_ASSERT_EQUALS(deque.getSize(), 1U);
 
 	TEST_ASSERT_FALSE(deque.isEmpty());
 	TEST_ASSERT_TRUE(deque.isFull());
