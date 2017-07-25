@@ -35,13 +35,6 @@
 #define CAN_BTR_TS2_POS		20
 #define CAN_BTR_TS1_POS		16
 
-%% if target is stm32f3
-#	define	XPCC_ISR_NAME(CAN1_TX)		XPCC_ISR_NAME(USB_HP_CAN1_TX)
-#	define	XPCC_ISR_NAME(CAN1_RX0)		XPCC_ISR_NAME(USB_LP_CAN1_RX0)
-#	define	CAN1_TX_IRQn				USB_HP_CAN1_TX_IRQn
-#	define	CAN1_RX0_IRQn				USB_LP_CAN1_RX0_IRQn
-%% endif
-
 // ----------------------------------------------------------------------------
 %% if parameters.tx_buffer > 0
 static xpcc::atomic::Queue<xpcc::can::Message, {{ parameters.tx_buffer }}> txQueue;
