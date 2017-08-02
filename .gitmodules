@@ -4,3 +4,6 @@
 [submodule "ext/modm-devices"]
 	path = ext/modm-devices
 	url = https://github.com/modm-io/modm-devices.git
+[submodule "ext/dlr/scons-build-tools"]
+	path = ext/dlr/scons-build-tools
+	url = https://github.com/modm-io/scons-build-tools.git
