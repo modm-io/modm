@@ -152,6 +152,16 @@
 
 	#define XPCC_ARRAY_SIZE(x)	(sizeof(x) / sizeof(x[0]))
 
+	#ifdef __has_cpp_attribute
+		#if __has_cpp_attribute(fallthrough)
+		#	define XPCC_FALLTHROUGH [[fallthrough]]
+		#else
+		#	define XPCC_FALLTHROUGH
+		#endif
+	#else
+	#	define XPCC_FALLTHROUGH
+	#endif // __has_cpp_attribute
+
 #endif	// !__DOXYGEN__
 
 #endif	// XPCC__UTILS_HPP

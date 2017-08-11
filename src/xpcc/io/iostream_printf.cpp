@@ -87,8 +87,7 @@ xpcc::IOStream::vprintf(const char *fmt, va_list ap)
 		{
 			case 'c':
 				c = va_arg(ap, int); // char promoted to int
-				/* no break */
-
+				XPCC_FALLTHROUGH;
 			default:
 				this->device->write(c);
 				continue;
@@ -107,8 +106,7 @@ xpcc::IOStream::vprintf(const char *fmt, va_list ap)
 
 			case 'd':
 				isSigned = true;
-				/* no break */
-
+				XPCC_FALLTHROUGH;
 			case 'u':
 				base = 10;
 				break;
@@ -120,7 +118,7 @@ xpcc::IOStream::vprintf(const char *fmt, va_list ap)
 				width = (XPCC__SIZEOF_POINTER * 2);
 				isLong = (XPCC__SIZEOF_POINTER == 4);
 				isLongLong = (XPCC__SIZEOF_POINTER == 8);
-				/* no break */
+				XPCC_FALLTHROUGH;
 			case 'x':
 				base = 16;
 				break;

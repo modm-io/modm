@@ -79,6 +79,7 @@
 #define PT_WAIT_WHILE(condition) \
     do { \
 		this->ptState = __LINE__; \
+		XPCC_FALLTHROUGH; \
 		case __LINE__: \
 			if (condition) \
 				return true; \
@@ -124,6 +125,7 @@
 #define PT_CALL(resumable) \
 	({ \
 		this->ptState = __LINE__; \
+		XPCC_FALLTHROUGH; \
 		case __LINE__: \
 			auto rfResult = resumable; \
 			if (rfResult.getState() > xpcc::rf::NestingError) { \

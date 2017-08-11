@@ -195,6 +195,7 @@
 /// Required macro to set the same unique number twice
 #define RF_INTERNAL_SET_CASE(counter) \
 			this->setRf((counter % 255) + 1, rfIndex); \
+			XPCC_FALLTHROUGH; \
 		case ((counter % 255) + 1): ;
 
 /// Internal macro for yield
