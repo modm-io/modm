@@ -1,0 +1,64 @@
+#!/usr/bin/env python
+
+import os
+
+Import("env")
+
+env.Append(CPPPATH=[
+%% for path in metadata.include_path
+    os.path.abspath("{{ path }}"),
+%% endfor
+])
+
+files = [
+%% for file in files
+    env.File("{{ file }}"),
+%% endfor
+]
+
+library = env.StaticLibrary(target="modm", source=files)
+
+env.Append(LIBS=[
+    library,
+%% for library in metadata.required_library
+    "{{ library }}",
+%% endfor
+])
+env.AppendUnique(LIBPATH=[os.path.abspath(str(library[0].get_dir()))])
+
+# Device configuration
+env["CONFIG_DEVICE_NAME"] = "{{ partname }}"
+%% if memories | length
+env["CONFIG_DEVICE_MEMORY"] = [
+%% for memory in memories
+    {{ memory }},
+%% endfor
+]
+%% endif
+# Programming configuration
+%% if "openocd.configfile" in metadata
+env["CONFIG_OPENOCD_SEARCHDIRS"] = [
+    os.path.join(env["CONFIG_MODM_ROOTPATH"], "tools", "openocd")
+]
+env["CONFIG_OPENOCD_CONFIGFILES"] = [
+%% for configfile in metadata["openocd.configfile"]
+    "{{ configfile }}",
+%% endfor
+]
+env["CONFIG_OPENOCD_COMMANDS"] = [
+    "init",
+    "reset halt",
+    "flash write_image erase $SOURCE",
+    "reset halt",
+    "mww 0xE000EDF0 0xA05F0000",
+    "shutdown"
+]
+%% endif
+
+%% if ":platform:clock:f_cpu" in options
+env["CONFIG_CLOCK_F_CPU"] = "{{ options[":platform:clock:f_cpu"] }}"
+%% endif
+
+env['XPCC_SYSTEM_BUILDER'] = os.path.join(env["CONFIG_MODM_ROOTPATH"], "tools", "system_design", "builder")
+
+Return("library")

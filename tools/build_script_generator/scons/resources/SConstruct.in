@@ -1,0 +1,139 @@
+#!/usr/bin/env python
+
+import os
+
+rootpath = "."
+
+env = Environment(
+        toolpath=[os.path.join(rootpath, "scons", "site_tools"),
+                  os.path.join(rootpath, "ext", "dlr", "scons-build-tools", "site_tools")],
+%% if platform in ["stm32"]
+        tools=[
+            'compiler_arm_none_eabi_gcc',
+            'settings_buildpath',
+            'utils_buildformat',
+            'utils_buildsize',
+            'program_openocd',
+%% for tool in build_tools
+            '{{tool}}',
+%% endfor
+            ],
+        CPU="{{ core }}",
+        CFLAGS_language=['-std=gnu99'],
+        LINKFLAGS_optimize=[
+            "-Wl,--relax",
+            "-Wl,--gc-sections",
+            "-Wl,-wrap,_malloc_r",
+            "-Wl,-wrap,_calloc_r",
+            "-Wl,-wrap,_realloc_r",
+            "-Wl,-wrap,_free_r",
+            "--specs=nano.specs",
+            "--specs=nosys.specs",
+            "-nostartfiles",
+            ],
+        ENV=os.environ)
+
+#env.Append(CCFLAGS_warning=['-Werror'])
+env.Append(LINKFLAGS_other=['-Wl,--no-wchar-size-warning'])
+env.Append(LINKFLAGS_target=[
+    "-Llink",
+    "-Tlinkerscript.ld",
+    ])
+
+%% elif platform in ["avr"]
+        tools=[
+            'compiler_avr_gcc',
+            'settings_buildpath',
+            'utils_buildformat',
+            'utils_buildsize',
+            # 'program_avrdude',
+%% for tool in build_tools
+            '{{tool}}',
+%% endfor
+            ],
+        CCFLAGS_target=[
+            '-mmcu={{ partname }}',
+            '-DF_CPU=${CONFIG_CLOCK_F_CPU}'
+            ],
+        CFLAGS_language=['-std=gnu99'],
+        LINKFLAGS_other=[
+            "-Wl,--fatal-warnings",
+            ],
+        ENV=os.environ)
+
+env.Append(LINKFLAGS_target=[
+    "-Llink",
+    "-Tlinkerscript.ld",
+    ])
+%% elif platform in ["hosted"]
+        tools=[
+            'compiler_hosted_{{compiler}}',
+            'settings_buildpath',
+            'utils_buildformat',
+            'utils_buildsize',
+%% for tool in build_tools
+            '{{tool}}',
+%% endfor
+            ],
+        CXXFLAGS_language=[
+            '-std=c++14',
+            ],
+        ENV=os.environ)
+%% endif
+env["CONFIG_MODM_ROOTPATH"] = os.path.abspath(rootpath)
+
+env.RemoveFromList('CCFLAGS_warning', [
+    '-Wshadow',
+    '-Wcast-align',
+    '-Wmissing-declarations',
+    '-Wcast-qual',
+    '-Wredundant-decls',])
+env.RemoveFromList('CXXFLAGS_warning', [
+    '-Wold-style-cast',
+    '-Wnon-virtual-dtor'])
+
+# User Config Options
+env['BASEPATH']  = os.path.abspath(rootpath)
+env['BUILDPATH'] = os.path.abspath('{{ build_path }}')
+
+library = env.SConscript(os.path.join(rootpath, "SConscript"), exports="env")
+
+# FIXME: better globbing! (recursive?)
+files = env.Glob("*.cpp")
+files += env.Glob("*/*.cpp")
+# Needed for communication examples for generated postman include paths!
+env.Append(CPPPATH=["."])
+
+%% if image_source != ""
+for image in Glob(os.path.abspath(os.path.join("{{image_source}}", "*.pbm"))):
+    source, header = env.Bitmap(image)
+    files.append(source)
+%% endif
+%% if xpcc_source != ""
+files += env.XpccCommunication(
+    os.path.abspath("{{xpcc_source}}"),
+    "{{xpcc_container}}",
+    dtdPath=os.path.abspath(os.path.join(rootpath, "tools", "system_design", "xml", "dtd")),
+    path=os.path.abspath("{{xpcc_generate}}"),
+    namespace="{{xpcc_namespace}}")
+%% endif
+program = env.Program(target='project.elf', source=files)
+
+env.Alias('symbols', env.Symbols(program))
+%% if platform in ["hosted"]
+env.Alias('build', program)
+env.Alias('run', env.Run(program))
+env.Alias('all', ['build', 'run'])
+%% else
+env.Alias('size', env.Size(program))
+
+if "CONFIG_OPENOCD_COMMANDS" in env:
+    env.Alias('program', env.OpenOcd(program))
+
+hexfile = env.Hex(program)
+
+env.Alias('build', [hexfile, env.Listing(program)])
+env.Alias('all', ['build', 'size'])
+%% endif
+
+env.Default('all')
