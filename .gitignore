@@ -9,6 +9,9 @@ build/
 .idea/
 .vagrant/
 
+# Generated log files from lbuild
+project.xml.log
+
 # Directories containing device specific files generated from templates
 # xpcc_config.hpp is generated from a template file
 src/xpcc_config.hpp
@@ -21,3 +24,18 @@ src/libxpcc.a
 *.config
 *.includes
 *.files
+
+examples/*/*/src
+examples/*/*/ext
+examples/*/*/link
+examples/*/*/SConscript
+examples/*/*/SConstruct
+examples/*/*/scons
+examples/*/*/tools
+examples/*/*/*/src
+examples/*/*/*/ext
+examples/*/*/*/link
+examples/*/*/*/SConscript
+examples/*/*/*/SConstruct
+examples/*/*/*/scons
+examples/*/*/*/tools
