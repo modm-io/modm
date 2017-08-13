@@ -68,7 +68,7 @@ def prepare(module, options):
     else:
         load_options(module)
 
-    module.depends(":platform:core")
+    module.depends(":platform:core", ":platform:gpio")
     return True
 
 def build(env):

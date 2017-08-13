@@ -15,6 +15,7 @@ def init(module):
     module.name = "communication"
 
 def prepare(module, options):
+    module.depends(":debug")
     return True
 
 def build(env):

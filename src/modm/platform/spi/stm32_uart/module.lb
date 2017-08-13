@@ -52,7 +52,7 @@ def prepare(module, options):
     if not device.has_driver("usart:stm32"):
         return False
 
-    module.depends(":platform:core", ":platform:uart")
+    module.depends(":platform:core", ":platform:gpio", ":platform:uart")
 
     for instance in device.get_driver("usart:stm32")["instance"]:
         module.add_submodule(Instance(int(instance)))

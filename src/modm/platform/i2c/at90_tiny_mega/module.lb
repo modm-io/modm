@@ -24,7 +24,7 @@ def prepare(module, options):
         # These ATtiny only implement a TWI slave interface!
         return False
 
-    module.depends(":platform:core")
+    module.depends(":platform:core", ":platform:gpio")
     return True
 
 def build(env):

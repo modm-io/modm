@@ -90,7 +90,7 @@ def prepare(module, options):
     if not device.has_driver("spi:avr_uart"):
         return False
 
-    module.depends(":platform:core")
+    module.depends(":platform:core", ":platform:gpio")
 
     for instance in listify(device.get_driver("spi:avr_uart")["instance"]):
         module.add_submodule(Instance(int(instance)))

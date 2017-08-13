@@ -60,7 +60,7 @@ def prepare(module, options):
     if not device.has_driver("i2c:stm32l4"):
         return False
 
-    module.depends(":platform:core")
+    module.depends(":platform:core", ":platform:gpio")
 
     for instance in listify(device.get_driver("i2c")["instance"]):
         module.add_submodule(Instance(int(instance)))

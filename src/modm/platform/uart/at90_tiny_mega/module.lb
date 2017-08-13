@@ -79,7 +79,7 @@ def prepare(module, options):
     if not device.has_driver("usart:avr"):
         return False
 
-    module.depends(":platform:core")
+    module.depends(":platform:core", ":platform:gpio")
 
     driver = device.get_driver("usart")
     if "instance" in driver:
