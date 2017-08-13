@@ -1,4 +1,0 @@
-# path to the modm root directory
-modmpath = '../../..'
-# execute the common SConstruct file
-execfile(modmpath + '/scons/SConstruct')
