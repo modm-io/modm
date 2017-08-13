@@ -11,91 +11,81 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_SOFTWARE_ONE_WIRE_HPP
-	#error	"Don't include this file directly, use 'software_one_wire.hpp' instead!"
+#ifndef MODM_SOFTWARE_BITBANG_ONE_WIRE_HPP
+	#error	"Don't include this file directly, use 'bitbang_master.hpp' instead!"
 #endif
 
-#ifdef __AVR__
-#	include <util/crc16.h>
-#endif
+%% if target["platform"] == "avr"
+#include <util/crc16.h>
+%% endif
 
 // ----------------------------------------------------------------------------
-template <typename Pin> Pin modm::SoftwareOneWireMaster<Pin>::pin;
-
-template <typename Pin> uint8_t modm::SoftwareOneWireMaster<Pin>::lastDiscrepancy;
-template <typename Pin> uint8_t modm::SoftwareOneWireMaster<Pin>::lastFamilyDiscrepancy;
-template <typename Pin> bool    modm::SoftwareOneWireMaster<Pin>::lastDeviceFlag;
-template <typename Pin> uint8_t modm::SoftwareOneWireMaster<Pin>::crc8;
-template <typename Pin> uint8_t modm::SoftwareOneWireMaster<Pin>::romBuffer[8];
+template <typename Pin> uint8_t modm::platform::BitBangOneWireMaster<Pin>::lastDiscrepancy;
+template <typename Pin> uint8_t modm::platform::BitBangOneWireMaster<Pin>::lastFamilyDiscrepancy;
+template <typename Pin> bool    modm::platform::BitBangOneWireMaster<Pin>::lastDeviceFlag;
+template <typename Pin> uint8_t modm::platform::BitBangOneWireMaster<Pin>::crc8;
+template <typename Pin> uint8_t modm::platform::BitBangOneWireMaster<Pin>::romBuffer[8];
 
 // ----------------------------------------------------------------------------
-template <typename Pin>
-void
-modm::SoftwareOneWireMaster<Pin>::initialize()
-{
-	pin.setInput();
-	pin.reset();
-}
-
 template <typename Pin>
 bool
-modm::SoftwareOneWireMaster<Pin>::touchReset()
+modm::platform::BitBangOneWireMaster<Pin>::touchReset()
 {
 	delayMicroseconds(G);
-	pin.setOutput();	// drives the bus low
+	PIN::reset();	// drives the bus low
 	delayMicroseconds(H);
-	pin.setInput();		// releases the bus
+	PIN::set();		// releases the bus
 	delayMicroseconds(I);
-	
+
 	// sample for presence pulse from slave
-	bool result = !pin.read();
-	
+	bool result = !PIN::read();
+
 	delayMicroseconds(J);			// complete the reset sequence recovery
-	
+
 	return result;
 }
 
 template <typename Pin>
 void
-modm::SoftwareOneWireMaster<Pin>::writeBit(bool bit)
+modm::platform::BitBangOneWireMaster<Pin>::writeBit(bool bit)
 {
 	if (bit)
 	{
-		pin.setOutput();	// Drives bus low
+		PIN::reset();	// Drives bus low
 		delayMicroseconds(A);
-		pin.setInput();		// Releases the bus
+		PIN::set();		// Releases the bus
 		delayMicroseconds(B);		// Complete the time slot and 10us recovery
 	}
 	else
 	{
-		pin.setOutput();
+		PIN::reset();
 		delayMicroseconds(C);
-		pin.setInput();
+		PIN::set();
 		delayMicroseconds(D);
 	}
 }
 
 template <typename Pin>
 bool
-modm::SoftwareOneWireMaster<Pin>::readBit()
+modm::platform::BitBangOneWireMaster<Pin>::readBit()
 {
-	pin.setOutput();	// drives the bus low
+	PIN::reset();	// drives the bus low
 	delayMicroseconds(A);
-	pin.setInput();		// releases the bus
+	PIN::set();		// releases the bus
 	delayMicroseconds(E);
-	
+
 	// Sample the bit value from the slave
-	bool result = pin.read();
-	
+	bool result = PIN::read();
+
 	delayMicroseconds(F);			// complete the reset sequence recovery
-	
+
 	return result;
 }
 
 // ----------------------------------------------------------------------------
 template <typename Pin>
 void
-modm::SoftwareOneWireMaster<Pin>::writeByte(uint8_t data)
+modm::platform::BitBangOneWireMaster<Pin>::writeByte(uint8_t data)
 {
 	// Loop to write each bit in the byte, LS-bit first
 	for (uint8_t i = 0; i < 8; ++i)
@@ -107,7 +97,7 @@ modm::SoftwareOneWireMaster<Pin>::writeByte(uint8_t data)
 
 template <typename Pin>
 uint8_t
-modm::SoftwareOneWireMaster<Pin>::readByte()
+modm::platform::BitBangOneWireMaster<Pin>::readByte()
 {
 	uint8_t result = 0;
 	for (uint8_t i = 0; i < 8; ++i)
@@ -117,20 +107,20 @@ modm::SoftwareOneWireMaster<Pin>::readByte()
 			result |= 0x80;
 		}
 	}
-	
+
 	return result;
 }
 
 // ----------------------------------------------------------------------------
 template <typename Pin>
 uint8_t
-modm::SoftwareOneWireMaster<Pin>::touchByte(uint8_t data)
+modm::platform::BitBangOneWireMaster<Pin>::touchByte(uint8_t data)
 {
 	uint8_t result = 0;
 	for (uint8_t i = 0; i < 8; ++i)
 	{
 		result >>= 1;
-		
+
 		// If sending a '1' then read a bit else write a '0'
 		if (data & 0x01)
 		{
@@ -141,17 +131,17 @@ modm::SoftwareOneWireMaster<Pin>::touchByte(uint8_t data)
 		else {
 			writeBit(0);
 		}
-		
+
 		data >>= 1;
 	}
-	
+
 	return result;
 }
 
 // ----------------------------------------------------------------------------
 template <typename Pin>
 void
-modm::SoftwareOneWireMaster<Pin>::resetSearch()
+modm::platform::BitBangOneWireMaster<Pin>::resetSearch()
 {
 	// reset the search state
 	lastDiscrepancy = 0;
@@ -161,14 +151,14 @@ modm::SoftwareOneWireMaster<Pin>::resetSearch()
 
 template <typename Pin>
 void
-modm::SoftwareOneWireMaster<Pin>::resetSearch(uint8_t familyCode)
+modm::platform::BitBangOneWireMaster<Pin>::resetSearch(uint8_t familyCode)
 {
 	// set the search state to find family type devices
 	romBuffer[0] = familyCode;
 	for (uint8_t i = 1; i < 8; ++i) {
 		romBuffer[i] = 0;
 	}
-	
+
 	lastDiscrepancy = 64;
 	lastFamilyDiscrepancy = 0;
 	lastDeviceFlag = false;
@@ -176,7 +166,7 @@ modm::SoftwareOneWireMaster<Pin>::resetSearch(uint8_t familyCode)
 
 template <typename Pin>
 bool
-modm::SoftwareOneWireMaster<Pin>::searchNext(uint8_t *rom)
+modm::platform::BitBangOneWireMaster<Pin>::searchNext(uint8_t *rom)
 {
 	if (performSearch())
 	{
@@ -190,12 +180,12 @@ modm::SoftwareOneWireMaster<Pin>::searchNext(uint8_t *rom)
 
 template <typename Pin>
 void
-modm::SoftwareOneWireMaster<Pin>::searchSkipCurrentFamily()
+modm::platform::BitBangOneWireMaster<Pin>::searchSkipCurrentFamily()
 {
 	// set the Last discrepancy to last family discrepancy
 	lastDiscrepancy = lastFamilyDiscrepancy;
 	lastFamilyDiscrepancy = 0;
-	
+
 	// check for end of list
 	if (lastDiscrepancy == 0) {
 		lastDeviceFlag = true;
@@ -204,11 +194,11 @@ modm::SoftwareOneWireMaster<Pin>::searchSkipCurrentFamily()
 
 template <typename Pin>
 bool
-modm::SoftwareOneWireMaster<Pin>::verifyDevice(const uint8_t *rom)
+modm::platform::BitBangOneWireMaster<Pin>::verifyDevice(const uint8_t *rom)
 {
 	uint8_t romBufferBackup[8];
 	bool result;
-	
+
 	// keep a backup copy of the current state
 	for (uint8_t i = 0; i < 8; i++) {
 		romBufferBackup[i] = romBuffer[i];
@@ -216,8 +206,8 @@ modm::SoftwareOneWireMaster<Pin>::verifyDevice(const uint8_t *rom)
 	uint16_t ld_backup = lastDiscrepancy;
 	bool ldf_backup = lastDeviceFlag;
 	uint16_t lfd_backup = lastFamilyDiscrepancy;
-	
-	
+
+
 	// set search to find the same device
 	lastDiscrepancy = 64;
 	lastDeviceFlag = false;
@@ -237,7 +227,7 @@ modm::SoftwareOneWireMaster<Pin>::verifyDevice(const uint8_t *rom)
 	else {
 		result = false;
 	}
-	
+
 	// restore the search state
 	for (uint8_t i = 0; i < 8; i++) {
 		romBuffer[i] = romBufferBackup[i];
@@ -245,7 +235,7 @@ modm::SoftwareOneWireMaster<Pin>::verifyDevice(const uint8_t *rom)
 	lastDiscrepancy = ld_backup;
 	lastDeviceFlag = ldf_backup;
 	lastFamilyDiscrepancy = lfd_backup;
-	
+
 	// return the result of the verify
 	return result;
 }
@@ -253,7 +243,7 @@ modm::SoftwareOneWireMaster<Pin>::verifyDevice(const uint8_t *rom)
 // ----------------------------------------------------------------------------
 template <typename Pin>
 uint8_t
-modm::SoftwareOneWireMaster<Pin>::crcUpdate(uint8_t crc, uint8_t data)
+modm::platform::BitBangOneWireMaster<Pin>::crcUpdate(uint8_t crc, uint8_t data)
 {
 #ifdef __AVR__
 	return _crc_ibutton_update(crc, data);
@@ -275,10 +265,10 @@ modm::SoftwareOneWireMaster<Pin>::crcUpdate(uint8_t crc, uint8_t data)
 // ----------------------------------------------------------------------------
 template <typename Pin>
 bool
-modm::SoftwareOneWireMaster<Pin>::performSearch()
+modm::platform::BitBangOneWireMaster<Pin>::performSearch()
 {
 	bool searchResult = false;
-	
+
 	// if the last call was not the last one
 	if (!lastDeviceFlag)
 	{
@@ -291,26 +281,26 @@ modm::SoftwareOneWireMaster<Pin>::performSearch()
 			lastFamilyDiscrepancy = 0;
 			return false;
 		}
-		
+
 		// issue the search command
 		writeByte(0xF0);
-		
+
 		// initialize for search
 		uint8_t idBitNumber = 1;
 		uint8_t lastZeroBit = 0;
 		uint8_t romByteNumber = 0;
 		uint8_t romByteMask = 1;
 		bool searchDirection;
-		
+
 		crc8 = 0;
-		
+
 		// loop to do the search
 		do
 		{
 			// read a bit and its complement
 			bool idBit = readBit();
 			bool complementIdBit = readBit();
-			
+
 			// check for no devices on 1-wire
 			if ((idBit == true) && (complementIdBit == true)) {
 				break;
@@ -332,7 +322,7 @@ modm::SoftwareOneWireMaster<Pin>::performSearch()
 						// if equal to last pick 1, if not then pick 0
 						searchDirection = (idBitNumber == lastDiscrepancy);
 					}
-					
+
 					// if 0 was picked then record its position in LastZero
 					if (searchDirection == false)
 					{
@@ -342,7 +332,7 @@ modm::SoftwareOneWireMaster<Pin>::performSearch()
 							lastFamilyDiscrepancy = lastZeroBit;
 					}
 				}
-				
+
 				// set or clear the bit in the ROM byte rom_byte_number
 				// with mask rom_byte_mask
 				if (searchDirection == true) {
@@ -351,15 +341,15 @@ modm::SoftwareOneWireMaster<Pin>::performSearch()
 				else {
 					romBuffer[romByteNumber] &= ~romByteMask;
 				}
-				
+
 				// serial number search direction write bit
 				writeBit(searchDirection);
-				
+
 				// increment the byte counter id_bit_number
 				// and shift the mask rom_byte_mask
 				idBitNumber++;
 				romByteMask <<= 1;
-				
+
 				// if the mask is 0 then go to new SerialNum byte rom_byte_number and reset mask
 				if (romByteMask == 0)
 				{
@@ -383,7 +373,7 @@ modm::SoftwareOneWireMaster<Pin>::performSearch()
 			searchResult = true;
 		}
 	}
-	
+
 	// if no device found then reset counters so next 'search' will be like a first
 	if (!searchResult || !romBuffer[0])
 	{
@@ -392,6 +382,6 @@ modm::SoftwareOneWireMaster<Pin>::performSearch()
 		lastFamilyDiscrepancy = 0;
 		searchResult = false;
 	}
-	
+
 	return searchResult;
 }

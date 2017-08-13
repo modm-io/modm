@@ -1,0 +1,28 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2016-2017, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = "1-wire.bitbang"
+    module.parent = "platform"
+
+def prepare(module, options):
+    if not options[":target"].has_driver("gpio"):
+        return False
+
+    module.depends(":platform:gpio", ":platform:core")
+    return True
+
+def build(env):
+    env.substitutions = {"target": env[":target"].identifier}
+    env.outbasepath = "src/modm/platform/1-wire"
+    env.template("bitbang_master.hpp.in")
+    env.template("bitbang_master_impl.hpp.in")
