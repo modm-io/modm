@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance"
+         xsd:noNamespaceSchemaLocation="https://github.com/dergraaf/library-builder/lbuild/resources/configuration.xsd">
+  <repositories>
+    <repository>
+      <path>../../../../repo.lb</path>
+    </repository>
+    <cache>.lbuild_cache</cache>
+  </repositories>
+
+  <options>
+    <option name=":target">atmega168p</option>
+    <option name=":platform:clock:f_cpu">8000000</option>
+    <option name=":build.scons:build.path">../../../../build/avr/pwm/pca9685</option>
+  </options>
+  <modules>
+    <module>:driver</module>
+    <module>:platform:clock</module>
+    <module>:platform:i2c</module>
+    <module>:build.scons</module>
+  </modules>
+</library>

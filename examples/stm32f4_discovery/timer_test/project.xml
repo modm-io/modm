@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <extends>../../../src/modm/board/disco_f407vg/board.xml</extends>
+  <options>
+    <option name=":build.scons:build.path">../../../build/stm32f4_discovery/timer_test</option>
+  </options>
+  <modules>
+    <module>:platform:timer:1</module>
+    <module>:platform:timer:2</module>
+    <module>:platform:timer:3</module>
+    <module>:platform:timer:4</module>
+    <module>:platform:timer:5</module>
+    <module>:platform:timer:6</module>
+    <module>:platform:timer:7</module>
+    <module>:platform:timer:8</module>
+    <module>:platform:timer:9</module>
+    <module>:platform:timer:10</module>
+    <module>:platform:timer:11</module>
+    <module>:platform:timer:12</module>
+    <module>:platform:timer:13</module>
+    <module>:platform:timer:14</module>
+    <module>:build.scons</module>
+  </modules>
+</library>

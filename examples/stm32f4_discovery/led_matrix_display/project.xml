@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <extends>../../../src/modm/board/disco_f407vg/board.xml</extends>
+  <options>
+    <option name=":build.scons:build.path">../../../build/stm32f4_discovery/led_matrix_display</option>
+  </options>
+  <modules>
+    <module>:driver</module>
+    <module>:platform:gpio</module>
+    <module>:platform:spi.bitbang</module>
+    <module>:processing</module>
+    <module>:build.scons</module>
+  </modules>
+</library>

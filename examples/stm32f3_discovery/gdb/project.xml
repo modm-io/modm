@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <extends>../../../src/modm/board/disco_f303vc/board.xml</extends>
+  <options>
+    <option name=":build.scons:build.path">../../../build/stm32f3_discovery/gdb</option>
+  </options>
+  <modules>
+    <module>:platform:can</module>
+    <module>:build.scons</module>
+  </modules>
+</library>

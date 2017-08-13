@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance"
+         xsd:noNamespaceSchemaLocation="https://github.com/dergraaf/library-builder/lbuild/resources/configuration.xsd">
+  <repositories>
+    <repository>
+      <path>../../../repo.lb</path>
+    </repository>
+    <cache>.lbuild_cache</cache>
+  </repositories>
+
+  <options>
+    <option name=":target">hosted-windows</option>
+    <option name=":build.scons:build.path">../../../build/windows/build_info</option>
+  </options>
+  <modules>
+    <module>:debug</module>
+    <module>:platform:core</module>
+    <module>:build.scons</module>
+  </modules>
+</library>

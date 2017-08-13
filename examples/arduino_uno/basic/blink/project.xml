@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <extends>../../../../src/modm/board/arduino_uno/board.xml</extends>
+  <options>
+    <option name=":build.scons:build.path">../../../../build/arduino_uno/basic/blink</option>
+  </options>
+  <modules>
+    <module>:build.scons</module>
+  </modules>
+</library>

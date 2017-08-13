@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <extends>../../../src/modm/board/nucleo_f401re/board.xml</extends>
+  <options>
+    <option name=":build.scons:build.path">../../../build/nucleo_f401re/blink</option>
+  </options>
+  <modules>
+    <module>:build.scons</module>
+  </modules>
+</library>

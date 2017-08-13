@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <extends>../../../src/modm/board/nucleo_l476rg/board.xml</extends>
+  <options>
+    <option name=":build.scons:build.path">../../../build/generic/rtc_ds1302</option>
+  </options>
+  <modules>
+    <module>:driver</module>
+    <module>:processing</module>
+    <module>:build.scons</module>
+  </modules>
+</library>
