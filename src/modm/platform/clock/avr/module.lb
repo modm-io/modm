@@ -19,6 +19,13 @@ def prepare(module, options):
     if not options[":target"].has_driver("clock:avr"):
         return False
 
+    module.add_option(
+        NumericOption(
+            name="f_cpu",
+            description="CPU clock frequency",
+            minimum=1,
+            maximum=32000000))
+
     module.depends(":platform:core", ":platform:clock.generic")
     return True
 
