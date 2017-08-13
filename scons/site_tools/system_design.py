@@ -112,7 +112,7 @@ def communication_emitter(target, source, env):
 	
 	return (target, source)
 
-def modm_task_caller_emitter(target, source, env):
+def xpcc_task_caller_emitter(target, source, env):
 	try:
 		path = env['path']
 	except KeyError:
@@ -121,16 +121,36 @@ def modm_task_caller_emitter(target, source, env):
 	target = [os.path.join(path, "caller.hpp")]
 	return (target, source)
 
+def xpcc_communication_header(env, xmlfile, container, path='.', dtdPath=None, namespace='robot'):
+	files  = env.SystemCppPackets(xmlfile, path=path, dtdPath=dtdPath, namespace=namespace)
+	files += env.SystemCppIdentifier(xmlfile, path=path, dtdPath=dtdPath, namespace=namespace)
+	files += env.SystemCppCommunication(xmlfile, path=path, dtdPath=dtdPath, namespace=namespace)
+	files += env.SystemCppXpccTaskCaller(xmlfile, path=path, dtdPath=dtdPath, namespace=namespace)
+	files += env.SystemCppPostman(
+			target='postman',
+			source=xmlfile,
+			container=container,
+			path=path,
+			dtdPath=dtdPath,
+			namespace=namespace)
+
+	source = []
+	for file in files:
+		if file.name.endswith('.cpp'):
+			source.append(file)
+
+	return source
+
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
-	env.SetDefault(MODM_SYSTEM_DESIGN_SCANNERS = {})
-	env['MODM_SYSTEM_DESIGN_SCANNERS']['XML'] = SCons.Script.Scanner(
+	env.SetDefault(XPCC_SYSTEM_DESIGN_SCANNERS = {})
+	env['XPCC_SYSTEM_DESIGN_SCANNERS']['XML'] = SCons.Script.Scanner(
 					function = xml_include_scanner,
 					skeys = ['.xml'])
 	env['BUILDERS']['SystemCppPackets'] = \
 		SCons.Script.Builder(
 			action = SCons.Action.Action(
-				'python2 "${MODM_SYSTEM_BUILDER}/cpp_packets.py" ' \
+				'python2 "${XPCC_SYSTEM_BUILDER}/cpp_packets.py" ' \
 					'--source_path ${TARGETS[0].dir} ' \
 					'--header_path ${TARGETS[1].dir} ' \
 					'--dtdpath "${dtdPath}" ' \
@@ -138,7 +158,7 @@ def generate(env, **kw):
 					'$SOURCE',
 				cmdstr="$SYSTEM_CPP_PACKETS_COMSTR"),
 			emitter = packet_emitter,
-			source_scanner = env['MODM_SYSTEM_DESIGN_SCANNERS']['XML'],
+			source_scanner = env['XPCC_SYSTEM_DESIGN_SCANNERS']['XML'],
 			single_source = True,
 			target_factory = env.fs.Entry,
 			src_suffix = ".xml")
@@ -146,14 +166,14 @@ def generate(env, **kw):
 	env['BUILDERS']['SystemCppIdentifier'] = \
 		SCons.Script.Builder(
 			action = SCons.Action.Action(
-				'python2 "${MODM_SYSTEM_BUILDER}/cpp_identifier.py" ' \
+				'python2 "${XPCC_SYSTEM_BUILDER}/cpp_identifier.py" ' \
 					'--outpath ${TARGET.dir} ' \
 					'--dtdpath "${dtdPath}" ' \
 					'--namespace "${namespace}" ' \
 					'$SOURCE',
 				cmdstr="$SYSTEM_CPP_IDENTIFIER_COMSTR"),
 			emitter = identifier_emitter,
-			source_scanner = env['MODM_SYSTEM_DESIGN_SCANNERS']['XML'],
+			source_scanner = env['XPCC_SYSTEM_DESIGN_SCANNERS']['XML'],
 			single_source = True,
 			target_factory = env.fs.Entry,
 			src_suffix = ".xml")
@@ -161,7 +181,7 @@ def generate(env, **kw):
 	env['BUILDERS']['SystemCppPostman'] = \
 		SCons.Script.Builder(
 			action = SCons.Action.Action(
-				'python2 "${MODM_SYSTEM_BUILDER}/cpp_postman.py" ' \
+				'python2 "${XPCC_SYSTEM_BUILDER}/cpp_postman.py" ' \
 					'--container "${container}" ' \
 					'--outpath ${TARGET.dir} ' \
 					'--dtdpath "${dtdPath}" ' \
@@ -169,7 +189,7 @@ def generate(env, **kw):
 					'$SOURCE',
 				cmdstr="$SYSTEM_CPP_POSTMAN_COMSTR"),
 			emitter = postman_emitter,
-			source_scanner = env['MODM_SYSTEM_DESIGN_SCANNERS']['XML'],
+			source_scanner = env['XPCC_SYSTEM_DESIGN_SCANNERS']['XML'],
 			single_source = True,
 			target_factory = env.fs.Entry,
 			src_suffix = ".xml")
@@ -177,14 +197,14 @@ def generate(env, **kw):
 	env['BUILDERS']['SystemCppCommunication'] = \
 		SCons.Script.Builder(
 			action = SCons.Action.Action(
-				'python2 "${MODM_SYSTEM_BUILDER}/cpp_communication.py" ' \
+				'python2 "${XPCC_SYSTEM_BUILDER}/cpp_communication.py" ' \
 					'--outpath ${TARGET.dir} ' \
 					'--dtdpath "${dtdPath}" ' \
 					'--namespace "${namespace}" ' \
 					'$SOURCE',
 				cmdstr="$SYSTEM_CPP_COMMUNICATION_COMSTR"),
 			emitter = communication_emitter,
-			source_scanner = env['MODM_SYSTEM_DESIGN_SCANNERS']['XML'],
+			source_scanner = env['XPCC_SYSTEM_DESIGN_SCANNERS']['XML'],
 			single_source = True,
 			target_factory = env.fs.Entry,
 			src_suffix = ".xml")
@@ -192,14 +212,14 @@ def generate(env, **kw):
 	env['BUILDERS']['SystemCppXpccTaskCaller'] = \
 		SCons.Script.Builder(
 			action = SCons.Action.Action(
-				'python2 "${MODM_SYSTEM_BUILDER}/cpp_modm_task_caller.py" ' \
+				'python2 "${XPCC_SYSTEM_BUILDER}/cpp_xpcc_task_caller.py" ' \
 					'--outpath ${TARGET.dir} ' \
 					'--dtdpath "${dtdPath}" ' \
 					'--namespace "${namespace}" ' \
 					'$SOURCE',
-				cmdstr="$SYSTEM_CPP_MODM_TASK_CALLER_COMSTR"),
-			emitter = modm_task_caller_emitter,
-			source_scanner = env['MODM_SYSTEM_DESIGN_SCANNERS']['XML'],
+				cmdstr="$SYSTEM_CPP_XPCC_TASK_CALLER_COMSTR"),
+			emitter = xpcc_task_caller_emitter,
+			source_scanner = env['XPCC_SYSTEM_DESIGN_SCANNERS']['XML'],
 			single_source = True,
 			target_factory = env.fs.Entry,
 			src_suffix = ".xml")
@@ -209,7 +229,9 @@ def generate(env, **kw):
 		env['SYSTEM_CPP_IDENTIFIER_COMSTR'] = "Generate identifier from: $SOURCE"
 		env['SYSTEM_CPP_POSTMAN_COMSTR'] = "Generate postman from: $SOURCE"
 		env['SYSTEM_CPP_COMMUNICATION_COMSTR'] = "Generate communication stubs from: $SOURCE"
-		env['SYSTEM_CPP_MODM_TASK_CALLER_COMSTR'] = "Generate modm task callers from: $SOURCE"
+		env['SYSTEM_CPP_XPCC_TASK_CALLER_COMSTR'] = "Generate xpcc task callers from: $SOURCE"
+
+	env.AddMethod(xpcc_communication_header, 'XpccCommunication')
 
 def exists(env):
 	return True

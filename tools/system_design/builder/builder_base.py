@@ -203,6 +203,7 @@ class Builder(object):
 		environment = jinja2.Environment(
 				loader=jinja2.FileSystemLoader(path),
 				extensions=["jinja2.ext.loopcontrols"])
+		environment.line_comment_prefix = '%#'
 		environment.filters['modm.wordwrap'] = filter_wordwrap
 		environment.filters['modm.indent'] = filter_indent
 		if filter:
