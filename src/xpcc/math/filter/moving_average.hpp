@@ -128,7 +128,7 @@ template<typename T, std::size_t N>
 const T
 xpcc::filter::MovingAverage<T, N>::getValue() const
 {
-	return (sum / N);
+	return (sum / static_cast<T>(N));
 }
 
 
