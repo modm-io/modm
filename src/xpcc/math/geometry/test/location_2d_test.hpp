@@ -41,6 +41,9 @@ public:
 	
 	void
 	testAccessors();
+
+	void
+	testOperators();
 	
 	void
 	testMove();
