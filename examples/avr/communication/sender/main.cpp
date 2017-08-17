@@ -85,8 +85,7 @@ main()
 	Int::setInput(Gpio::InputType::PullUp);
 
 	// Configure MCP2515 and set the filters
-    // Fixme: xpcc::Can::Bitrate is incompatitlbe with device driver
-//	device.initialize(xpcc::can::BITRATE_125_KBPS);
+	device.initialize<xpcc::clock::MHz8, xpcc::Can::Bitrate::kBps125>();
 	device.setFilter(xpcc::accessor::asFlash(canFilter));
 
 	// Enable Interrupts
