@@ -1,3 +1,6 @@
 [submodule "ext/st/stm32"]
 	path = ext/st/stm32
 	url = https://github.com/modm-io/cmsis-header-stm32.git
+[submodule "ext/modm-devices"]
+	path = ext/modm-devices
+	url = https://github.com/modm-io/modm-devices.git
