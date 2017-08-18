@@ -90,7 +90,7 @@ main()
 	nrf24data::Address broadcast_address = 0xff;
 
 	// Now we define the addresses of our 2 endpoints in this example.
-	nrf24data::Address address_tx_side = 0x11;
+	// nrf24data::Address address_tx_side = 0x11;
 	nrf24data::Address address_rx_side = 0x33;
 
 	// Initialize data layer, this also rudimentary configures the physical
