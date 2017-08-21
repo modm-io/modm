@@ -62,7 +62,7 @@ main()
 	xpcc_assert_debug(false, "iobuffer", "tx", "full");
 
 	// "accidentally" return from main, without even returning properly!
-	// This should be cought by the debug assert core.main.exit!
+	// This should be caught by the debug assert core.main.exit!
 	// while(1) ;
 	// return 0;
 }
