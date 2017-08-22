@@ -224,13 +224,8 @@ xpcc::Mcp2515<SPI, CS, INT>::getMessage(can::Message& message)
 	}
 	chipSelect.set();
 
-	// clear interrupt flag
-	if (status & FLAG_RXB0_FULL) {
-		bitModify(CANINTF, RX0IF, 0);
-	}
-	else {
-		bitModify(CANINTF, RX1IF, 0);
-	}
+	// RX0IF or RX1IF respectivly were already cleared automatically by rising CS.
+	// See section 12.4 in datasheet.
 
 	return true;
 }
