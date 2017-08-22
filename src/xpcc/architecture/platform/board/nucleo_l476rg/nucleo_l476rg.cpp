@@ -14,3 +14,22 @@ xpcc::log::Logger xpcc::log::debug(loggerDevice);
 xpcc::log::Logger xpcc::log::info(loggerDevice);
 xpcc::log::Logger xpcc::log::warning(loggerDevice);
 xpcc::log::Logger xpcc::log::error(loggerDevice);
+
+xpcc_extern_c void
+xpcc_abandon(const char * module,
+			 const char * location,
+			 const char * failure,
+			 uintptr_t context)
+{
+	XPCC_LOG_ERROR << "Assertion '" << module << "." << location << "." << failure << "'";
+	if (context) { XPCC_LOG_ERROR << " @ " << (void *) context << " (" << (uint32_t) context << ")"; }
+	XPCC_LOG_ERROR << " failed! Abandoning..." << xpcc::endl;
+
+	Board::LedGreen::setOutput();
+	while(true) {
+		Board::LedGreen::set();
+		xpcc::delayMilliseconds(20);
+		Board::LedGreen::reset();
+		xpcc::delayMilliseconds(180);
+	}
+}
