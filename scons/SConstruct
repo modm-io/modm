@@ -89,6 +89,10 @@ else:
         env.Alias('debug', env.GdbDebug(program))
         env.Alias('bin', env.Bin(program))
 
+        # Most STM32's can be programmed by USB DFU if board allows
+        binfile = env.Bin(program)
+        env.Alias('dfu', env.DfuStm32Programmer(binfile))
+
     env.Alias('listing', env.Listing(program))
     env.Alias('build', hexfile)
     env.Alias('all', ['build', 'size'])
