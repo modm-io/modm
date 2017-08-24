@@ -39,8 +39,8 @@ struct systemClock
 	static bool inline
 	enable()
 	{
-		// Enable the interal 48MHz clock
 		ClockControl::enableInternalClockMHz48();
+		// Enable the internal 48MHz clock
 		// set flash latency for 48MHz
 		ClockControl::setFlashLatency(Frequency);
 		// Switch to the 48MHz clock
