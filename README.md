@@ -62,6 +62,7 @@ Here is a list of supported **and tested** microcontrollers and development boar
 | ATtiny85   | custom                  | &#9733;&#9733;&#9733;               |
 | ATmega328p | [Arduino Uno][]         | &#9733;&#9733;&#9733;               |
 | STM32F031  | [Nucleo F031K6][]       | &#9733;&#9733;&#9733;&#9733;        |
+| STM32F051  | [STM32F0 Discovery][]   | &#9733;&#9733;                      |
 | STM32F072  | [STM32F072 Discovery][] | &#9733;&#9733;&#9733;&#9733;        |
 | STM32F100  | [STM32F1 Discovery][]   | &#9733;&#9733;&#9733;               |
 | STM32F103  | [Nucleo F103RB][]       | &#9733;&#9733;&#9733;               |
