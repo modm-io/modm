@@ -37,7 +37,7 @@ before_install:
  - arm-none-eabi-g++ --version
  - pip install --upgrade pip wheel
  - pip install jinja2 lxml
- - pip install --egg SCons
+ - pip install scons==2.5.1
 
 cache:
  directories:
