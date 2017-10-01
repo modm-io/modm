@@ -7,15 +7,16 @@ The files are copied and modified by converting all line endings from Windows to
 
 Here is the list of the current device header version and release date as well as the Cube release version in braces:
 
-- [F0: v2.3.1 released 04-November-2016 (CubeF0 v1.7.0)](http://www.st.com/en/embedded-software/stm32cubef0.html)
-- [F1: v4.1.0 released 29-April-2016 (CubeF1 v1.4.0)](http://www.st.com/en/embedded-software/stm32cubef1.html)
-- [F2: v2.1.2 released 29-June-2016 (CubeF2 v1.4.0)](http://www.st.com/en/embedded-software/stm32cubef2.html)
-- [F3: v2.3.1 released 16-December-2016 (CubeF3 v1.7.0)](http://www.st.com/en/embedded-software/stm32cubef3.html)
-- [F4: v2.6.1 released 14-February-2017 (CubeF4 v1.15.0)](http://www.st.com/en/embedded-software/stm32cubef4.html)
-- [F7: v1.1.0 released 22-April-2016 (CubeF7 v1.6.0)](http://www.st.com/en/embedded-software/stm32cubef7.html)
-- [L0: v1.7.1 released 25-November-2016 (CubeL0 v1.8.0)](http://www.st.com/en/embedded-software/stm32cubel0.html)
-- [L1: v2.2.0 released 01-July-2016 (CubeL1 v1.6.0)](http://www.st.com/en/embedded-software/stm32cubel1.html)
-- [L4: v1.3.0 released 17-February-2017 (CubeL4 v1.7.0)](http://www.st.com/en/embedded-software/stm32cubel4.html)
+- [L0: v1.7.1 created 25-November-2016 (CubeL0 v1.10.0)](http://www.st.com/en/embedded-software/stm32cubel0.html)
+- [L1: v2.2.2 created 25-August-2017 (CubeL1 v1.8.0)](http://www.st.com/en/embedded-software/stm32cubel1.html)
+- [L4: v1.3.2 created 16-June-2017 (CubeL4 v1.9.0)](http://www.st.com/en/embedded-software/stm32cubel4.html)
+- [F0: v2.3.3 created 25-August-2017 (CubeF0 v1.9.0)](http://www.st.com/en/embedded-software/stm32cubef0.html)
+- [F1: v4.1.0 created 29-April-2016 (CubeF1 v1.6.0)](http://www.st.com/en/embedded-software/stm32cubef1.html)
+- [F2: v2.2.0 created 17-March-2017 (CubeF2 v1.6.0)](http://www.st.com/en/embedded-software/stm32cubef2.html)
+- [F3: v2.3.2 created 23-June-2017 (CubeF3 v1.9.0)](http://www.st.com/en/embedded-software/stm32cubef3.html)
+- [F4: v2.6.1 created 14-February-2017 (CubeF4 v1.16.0)](http://www.st.com/en/embedded-software/stm32cubef4.html)
+- [F7: v1.2.1 created 25-August-2017 (CubeF7 v1.8.0)](http://www.st.com/en/embedded-software/stm32cubef7.html)
+- [H7: v1.1.0 created 31-August-2017 (CubeH7 v1.1.0)](http://www.st.com/en/embedded-software/stm32cubeh7.html)
 
 The Travis CI integration checks these versions daily and will fail, if they need updating: [![](https://travis-ci.org/modm-io/cmsis-header-stm32.svg?branch=master)](https://travis-ci.org/modm-io/cmsis-header-stm32)
 

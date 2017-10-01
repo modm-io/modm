@@ -1,12 +1,14 @@
 /**
   ******************************************************************************
-  * @file    system_stm32f0xx.h
+  * @file    system_stm32h7xx.h
   * @author  MCD Application Team
-  * @brief   CMSIS Cortex-M0 Device System Source File for STM32F0xx devices.
+  * @version V1.1.0
+  * @date    31-August-2017
+  * @brief   CMSIS Cortex-Mx Device System Source File for STM32H7xx devices.
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2016 STMicroelectronics</center></h2>
+  * <h2><center>&copy; COPYRIGHT(c) 2017 STMicroelectronics</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -37,21 +39,21 @@
   * @{
   */
 
-/** @addtogroup stm32f0xx_system
+/** @addtogroup stm32h7xx_system
   * @{
   */
 
 /**
   * @brief Define to prevent recursive inclusion
   */
-#ifndef __SYSTEM_STM32F0XX_H
-#define __SYSTEM_STM32F0XX_H
+#ifndef __SYSTEM_STM32H7XX_H
+#define __SYSTEM_STM32H7XX_H
 
 #ifdef __cplusplus
  extern "C" {
 #endif
 
-/** @addtogroup STM32F0xx_System_Includes
+/** @addtogroup STM32H7xx_System_Includes
   * @{
   */
 
@@ -60,26 +62,26 @@
   */
 
 
-/** @addtogroup STM32F0xx_System_Exported_types
+/** @addtogroup STM32H7xx_System_Exported_types
   * @{
   */
   /* This variable is updated in three ways:
       1) by calling CMSIS function SystemCoreClockUpdate()
-      3) by calling HAL API function HAL_RCC_GetHCLKFreq()
-      3) by calling HAL API function HAL_RCC_ClockConfig()
+      2) by calling HAL API function HAL_RCC_GetSysClockFreq()
+      3) each time HAL_RCC_ClockConfig() is called to configure the system clock frequency
          Note: If you use this function to configure the system clock; then there
                is no need to call the 2 first functions listed above, since SystemCoreClock
                variable is updated automatically.
   */
-extern uint32_t SystemCoreClock;          /*!< System Clock Frequency (Core Clock) */
-extern const uint8_t AHBPrescTable[16];   /*!< AHB prescalers table values */
-extern const uint8_t APBPrescTable[8];    /*!< APB prescalers table values */
+extern uint32_t SystemCoreClock;             /*!< System Domain1 Clock Frequency  */
+extern uint32_t SystemD2Clock;               /*!< System Domain2 Clock Frequency  */
+extern const  uint8_t D1CorePrescTable[16] ; /*!< D1CorePrescTable prescalers table values */
 
 /**
   * @}
   */
 
-/** @addtogroup STM32F0xx_System_Exported_Constants
+/** @addtogroup STM32H7xx_System_Exported_Constants
   * @{
   */
 
@@ -87,7 +89,7 @@ extern const uint8_t APBPrescTable[8];    /*!< APB prescalers table values */
   * @}
   */
 
-/** @addtogroup STM32F0xx_System_Exported_Macros
+/** @addtogroup STM32H7xx_System_Exported_Macros
   * @{
   */
 
@@ -95,7 +97,7 @@ extern const uint8_t APBPrescTable[8];    /*!< APB prescalers table values */
   * @}
   */
 
-/** @addtogroup STM32F0xx_System_Exported_Functions
+/** @addtogroup STM32H7xx_System_Exported_Functions
   * @{
   */
 
@@ -109,7 +111,7 @@ extern void SystemCoreClockUpdate(void);
 }
 #endif
 
-#endif /*__SYSTEM_STM32F0XX_H */
+#endif /*__SYSTEM_STM32H7XX_H */
 
 /**
   * @}

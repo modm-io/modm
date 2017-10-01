@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    stm32l4a6xx.h
   * @author  MCD Application Team
-  * @version V1.3.0
-  * @date    17-February-2017
+  * @version V1.3.2
+  * @date    16-June-2017
   * @brief   CMSIS STM32L4A6xx Device Peripheral Access Layer Header File.
   *
   *          This file contains:
@@ -1286,7 +1286,6 @@ typedef struct
 #define FMC_R_BASE            ((uint32_t)0xA0000000U) /*!< FMC  control registers base address */
 #define QSPI_R_BASE           ((uint32_t)0xA0001000U) /*!< QUADSPI control registers base address */
 #define SRAM1_BB_BASE         ((uint32_t)0x22000000U) /*!< SRAM1(96 KB) base address in the bit-band region */
-#define SRAM2_BB_BASE         ((uint32_t)0x12000000U) /*!< SRAM2(32 KB) base address in the bit-band region */
 #define PERIPH_BB_BASE        ((uint32_t)0x42000000U) /*!< Peripheral base address in the bit-band region */
 
 /* Legacy defines */
@@ -8563,9 +8562,12 @@ typedef struct
 #define EXTI_EMR2_EM39_Pos       (7U)
 #define EXTI_EMR2_EM39_Msk       (0x1U << EXTI_EMR2_EM39_Pos)                  /*!< 0x00000080 */
 #define EXTI_EMR2_EM39           EXTI_EMR2_EM39_Msk                            /*!< Event Mask on line 39 */
-#define EXTI_EMR2_IM40_Pos       (8U)
-#define EXTI_EMR2_IM40_Msk       (0x1U << EXTI_EMR2_IM40_Pos)                  /*!< 0x00000100 */
-#define EXTI_EMR2_IM40           EXTI_EMR2_IM40_Msk                            /*!< Event Mask on line 40 */
+#define EXTI_EMR2_EM40_Pos       (8U)
+#define EXTI_EMR2_EM40_Msk       (0x1U << EXTI_EMR2_EM40_Pos)                  /*!< 0x00000100 */
+#define EXTI_EMR2_EM40           EXTI_EMR2_EM40_Msk                            /*!< Event Mask on line 40 */
+#define EXTI_EMR2_EM_Pos         (0U)
+#define EXTI_EMR2_EM_Msk         (0x1FFU << EXTI_EMR2_EM_Pos)                  /*!< 0x000001FF */
+#define EXTI_EMR2_EM             EXTI_EMR2_EM_Msk                              /*!< Interrupt Mask all        */
 
 /******************  Bit definition for EXTI_RTSR2 register  ******************/
 #define EXTI_RTSR2_RT35_Pos      (3U)
@@ -10668,10 +10670,10 @@ typedef struct
 #define FW_NVDSL_LENG_Msk    (0x3FFFU << FW_NVDSL_LENG_Pos)                    /*!< 0x003FFF00 */
 #define FW_NVDSL_LENG        FW_NVDSL_LENG_Msk                                 /*!< Non Volatile Data Segment Length */
 #define FW_VDSSA_ADD_Pos     (6U)
-#define FW_VDSSA_ADD_Msk     (0x7FFU << FW_VDSSA_ADD_Pos)                      /*!< 0x0001FFC0 */
+#define FW_VDSSA_ADD_Msk     (0xFFFU << FW_VDSSA_ADD_Pos)                      /*!< 0x0003FFC0 */
 #define FW_VDSSA_ADD         FW_VDSSA_ADD_Msk                                  /*!< Volatile Data Segment Start Address */
 #define FW_VDSL_LENG_Pos     (6U)
-#define FW_VDSL_LENG_Msk     (0x7FFU << FW_VDSL_LENG_Pos)                      /*!< 0x0001FFC0 */
+#define FW_VDSL_LENG_Msk     (0xFFFU << FW_VDSL_LENG_Pos)                      /*!< 0x0003FFC0 */
 #define FW_VDSL_LENG         FW_VDSL_LENG_Msk                                  /*!< Volatile Data Segment Length */
 
 /**************************Bit definition for CR register *********************/
@@ -15397,6 +15399,8 @@ typedef struct
 #define SYSCFG_SWPR_PAGE31_Pos          (31U)
 #define SYSCFG_SWPR_PAGE31_Msk          (0x1U << SYSCFG_SWPR_PAGE31_Pos)       /*!< 0x80000000 */
 #define SYSCFG_SWPR_PAGE31              SYSCFG_SWPR_PAGE31_Msk                 /*!< SRAM2 Write protection page 31*/
+
+/******************  Bit definition for SYSCFG_SWPR2 register  ***************/
 #define SYSCFG_SWPR2_PAGE32_Pos         (0U)
 #define SYSCFG_SWPR2_PAGE32_Msk         (0x1U << SYSCFG_SWPR2_PAGE32_Pos)      /*!< 0x00000001 */
 #define SYSCFG_SWPR2_PAGE32             SYSCFG_SWPR2_PAGE32_Msk                /*!< SRAM2 Write protection page 32*/
@@ -16383,10 +16387,11 @@ typedef struct
 
 /*******************  Bit definition for TIM16_OR1 register  ******************/
 #define TIM16_OR1_TI1_RMP_Pos      (0U)
-#define TIM16_OR1_TI1_RMP_Msk      (0x3U << TIM16_OR1_TI1_RMP_Pos)             /*!< 0x00000003 */
-#define TIM16_OR1_TI1_RMP          TIM16_OR1_TI1_RMP_Msk                       /*!<TI1_RMP[1:0] bits (TIM16 Input Capture 1 remap) */
+#define TIM16_OR1_TI1_RMP_Msk      (0x7U << TIM16_OR1_TI1_RMP_Pos)             /*!< 0x00000007 */
+#define TIM16_OR1_TI1_RMP          TIM16_OR1_TI1_RMP_Msk                       /*!<TI1_RMP[2:0] bits (TIM16 Input Capture 1 remap) */
 #define TIM16_OR1_TI1_RMP_0        (0x1U << TIM16_OR1_TI1_RMP_Pos)             /*!< 0x00000001 */
 #define TIM16_OR1_TI1_RMP_1        (0x2U << TIM16_OR1_TI1_RMP_Pos)             /*!< 0x00000002 */
+#define TIM16_OR1_TI1_RMP_2        (0x4U << TIM16_OR1_TI1_RMP_Pos)             /*!< 0x00000004 */
 
 /*******************  Bit definition for TIM16_OR2 register  ******************/
 #define TIM16_OR2_BKINE_Pos        (0U)
@@ -19901,7 +19906,8 @@ typedef struct
                                                          ((INSTANCE) == TIM2)   || \
                                                          ((INSTANCE) == TIM3)   || \
                                                          ((INSTANCE) == TIM4)   || \
-                                                         ((INSTANCE) == TIM5))
+                                                         ((INSTANCE) == TIM5)   || \
+                                                         ((INSTANCE) == TIM8))
 
 /**************** TIM Instances : external trigger input available ************/
 #define IS_TIM_ETR_INSTANCE(INSTANCE)      (((INSTANCE) == TIM1)  || \

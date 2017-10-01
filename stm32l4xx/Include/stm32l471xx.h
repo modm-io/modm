@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    stm32l471xx.h
   * @author  MCD Application Team
-  * @version V1.3.0
-  * @date    17-February-2017
+  * @version V1.3.2
+  * @date    16-June-2017
   * @brief   CMSIS STM32L471xx Device Peripheral Access Layer Header File.
   *
   *          This file contains:
@@ -1021,7 +1021,6 @@ typedef struct
 #define FMC_R_BASE            ((uint32_t)0xA0000000U) /*!< FMC  control registers base address */
 #define QSPI_R_BASE           ((uint32_t)0xA0001000U) /*!< QUADSPI control registers base address */
 #define SRAM1_BB_BASE         ((uint32_t)0x22000000U) /*!< SRAM1(96 KB) base address in the bit-band region */
-#define SRAM2_BB_BASE         ((uint32_t)0x12000000U) /*!< SRAM2(32 KB) base address in the bit-band region */
 #define PERIPH_BB_BASE        ((uint32_t)0x42000000U) /*!< Peripheral base address in the bit-band region */
 
 /* Legacy defines */
@@ -7294,11 +7293,8 @@ typedef struct
 #define EXTI_IMR2_IM38_Pos       (6U)
 #define EXTI_IMR2_IM38_Msk       (0x1U << EXTI_IMR2_IM38_Pos)                  /*!< 0x00000040 */
 #define EXTI_IMR2_IM38           EXTI_IMR2_IM38_Msk                            /*!< Interrupt Mask on line 38 */
-#define EXTI_IMR2_IM39_Pos       (7U)
-#define EXTI_IMR2_IM39_Msk       (0x1U << EXTI_IMR2_IM39_Pos)                  /*!< 0x00000080 */
-#define EXTI_IMR2_IM39           EXTI_IMR2_IM39_Msk                            /*!< Interrupt Mask on line 39 */
 #define EXTI_IMR2_IM_Pos         (0U)
-#define EXTI_IMR2_IM_Msk         (0xFFU << EXTI_IMR2_IM_Pos)                   /*!< 0x000000FF */
+#define EXTI_IMR2_IM_Msk         (0x7FU << EXTI_IMR2_IM_Pos)                   /*!< 0x0000007F */
 #define EXTI_IMR2_IM             EXTI_IMR2_IM_Msk                              /*!< Interrupt Mask all        */
 
 /*******************  Bit definition for EXTI_EMR2 register  ******************/
@@ -7323,9 +7319,9 @@ typedef struct
 #define EXTI_EMR2_EM38_Pos       (6U)
 #define EXTI_EMR2_EM38_Msk       (0x1U << EXTI_EMR2_EM38_Pos)                  /*!< 0x00000040 */
 #define EXTI_EMR2_EM38           EXTI_EMR2_EM38_Msk                            /*!< Event Mask on line 38 */
-#define EXTI_EMR2_EM39_Pos       (7U)
-#define EXTI_EMR2_EM39_Msk       (0x1U << EXTI_EMR2_EM39_Pos)                  /*!< 0x00000080 */
-#define EXTI_EMR2_EM39           EXTI_EMR2_EM39_Msk                            /*!< Event Mask on line 39 */
+#define EXTI_EMR2_EM_Pos         (0U)
+#define EXTI_EMR2_EM_Msk         (0x7FU << EXTI_EMR2_EM_Pos)                   /*!< 0x0000007F */
+#define EXTI_EMR2_EM             EXTI_EMR2_EM_Msk                              /*!< Interrupt Mask all        */
 
 /******************  Bit definition for EXTI_RTSR2 register  ******************/
 #define EXTI_RTSR2_RT35_Pos      (3U)
@@ -16648,7 +16644,8 @@ typedef struct
                                                          ((INSTANCE) == TIM2)   || \
                                                          ((INSTANCE) == TIM3)   || \
                                                          ((INSTANCE) == TIM4)   || \
-                                                         ((INSTANCE) == TIM5))
+                                                         ((INSTANCE) == TIM5)   || \
+                                                         ((INSTANCE) == TIM8))
 
 /**************** TIM Instances : external trigger input available ************/
 #define IS_TIM_ETR_INSTANCE(INSTANCE)      (((INSTANCE) == TIM1)  || \

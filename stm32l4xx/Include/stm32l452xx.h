@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    stm32l452xx.h
   * @author  MCD Application Team
-  * @version V1.3.0
-  * @date    17-February-2017
+  * @version V1.3.2
+  * @date    16-June-2017
   * @brief   CMSIS STM32L452xx Device Peripheral Access Layer Header File.
   *
   *          This file contains:
@@ -1004,7 +1004,6 @@ typedef struct
 
 #define QSPI_R_BASE           ((uint32_t)0xA0001000U) /*!< QUADSPI control registers base address */
 #define SRAM1_BB_BASE         ((uint32_t)0x22000000U) /*!< SRAM1(96 KB) base address in the bit-band region */
-#define SRAM2_BB_BASE         ((uint32_t)0x12000000U) /*!< SRAM2(32 KB) base address in the bit-band region */
 #define PERIPH_BB_BASE        ((uint32_t)0x42000000U) /*!< Peripheral base address in the bit-band region */
 
 /* Legacy defines */
@@ -7071,29 +7070,20 @@ typedef struct
 #define EXTI_IMR2_IM33_Pos       (1U)
 #define EXTI_IMR2_IM33_Msk       (0x1U << EXTI_IMR2_IM33_Pos)                  /*!< 0x00000002 */
 #define EXTI_IMR2_IM33           EXTI_IMR2_IM33_Msk                            /*!< Interrupt Mask on line 33 */
-#define EXTI_IMR2_IM34_Pos       (2U)
-#define EXTI_IMR2_IM34_Msk       (0x1U << EXTI_IMR2_IM34_Pos)                  /*!< 0x00000004 */
-#define EXTI_IMR2_IM34           EXTI_IMR2_IM34_Msk                            /*!< Interrupt Mask on line 34 */
 #define EXTI_IMR2_IM35_Pos       (3U)
 #define EXTI_IMR2_IM35_Msk       (0x1U << EXTI_IMR2_IM35_Pos)                  /*!< 0x00000008 */
 #define EXTI_IMR2_IM35           EXTI_IMR2_IM35_Msk                            /*!< Interrupt Mask on line 35 */
-#define EXTI_IMR2_IM36_Pos       (4U)
-#define EXTI_IMR2_IM36_Msk       (0x1U << EXTI_IMR2_IM36_Pos)                  /*!< 0x00000010 */
-#define EXTI_IMR2_IM36           EXTI_IMR2_IM36_Msk                            /*!< Interrupt Mask on line 36 */
 #define EXTI_IMR2_IM37_Pos       (5U)
 #define EXTI_IMR2_IM37_Msk       (0x1U << EXTI_IMR2_IM37_Pos)                  /*!< 0x00000020 */
 #define EXTI_IMR2_IM37           EXTI_IMR2_IM37_Msk                            /*!< Interrupt Mask on line 37 */
 #define EXTI_IMR2_IM38_Pos       (6U)
 #define EXTI_IMR2_IM38_Msk       (0x1U << EXTI_IMR2_IM38_Pos)                  /*!< 0x00000040 */
 #define EXTI_IMR2_IM38           EXTI_IMR2_IM38_Msk                            /*!< Interrupt Mask on line 38 */
-#define EXTI_IMR2_IM39_Pos       (7U)
-#define EXTI_IMR2_IM39_Msk       (0x1U << EXTI_IMR2_IM39_Pos)                  /*!< 0x00000080 */
-#define EXTI_IMR2_IM39           EXTI_IMR2_IM39_Msk                            /*!< Interrupt Mask on line 39 */
 #define EXTI_IMR2_IM40_Pos       (8U)
 #define EXTI_IMR2_IM40_Msk       (0x1U << EXTI_IMR2_IM40_Pos)                  /*!< 0x00000100 */
 #define EXTI_IMR2_IM40           EXTI_IMR2_IM40_Msk                            /*!< Interrupt Mask on line 40 */
 #define EXTI_IMR2_IM_Pos         (0U)
-#define EXTI_IMR2_IM_Msk         (0x1FFU << EXTI_IMR2_IM_Pos)                  /*!< 0x000001FF */
+#define EXTI_IMR2_IM_Msk         (0x16BU << EXTI_IMR2_IM_Pos)                  /*!< 0x0000016B */
 #define EXTI_IMR2_IM             EXTI_IMR2_IM_Msk                              /*!< Interrupt Mask all        */
 
 /*******************  Bit definition for EXTI_EMR2 register  ******************/
@@ -7103,27 +7093,21 @@ typedef struct
 #define EXTI_EMR2_EM33_Pos       (1U)
 #define EXTI_EMR2_EM33_Msk       (0x1U << EXTI_EMR2_EM33_Pos)                  /*!< 0x00000002 */
 #define EXTI_EMR2_EM33           EXTI_EMR2_EM33_Msk                            /*!< Event Mask on line 33 */
-#define EXTI_EMR2_EM34_Pos       (2U)
-#define EXTI_EMR2_EM34_Msk       (0x1U << EXTI_EMR2_EM34_Pos)                  /*!< 0x00000004 */
-#define EXTI_EMR2_EM34           EXTI_EMR2_EM34_Msk                            /*!< Event Mask on line 34 */
 #define EXTI_EMR2_EM35_Pos       (3U)
 #define EXTI_EMR2_EM35_Msk       (0x1U << EXTI_EMR2_EM35_Pos)                  /*!< 0x00000008 */
 #define EXTI_EMR2_EM35           EXTI_EMR2_EM35_Msk                            /*!< Event Mask on line 35 */
-#define EXTI_EMR2_EM36_Pos       (4U)
-#define EXTI_EMR2_EM36_Msk       (0x1U << EXTI_EMR2_EM36_Pos)                  /*!< 0x00000010 */
-#define EXTI_EMR2_EM36           EXTI_EMR2_EM36_Msk                            /*!< Event Mask on line 36 */
 #define EXTI_EMR2_EM37_Pos       (5U)
 #define EXTI_EMR2_EM37_Msk       (0x1U << EXTI_EMR2_EM37_Pos)                  /*!< 0x00000020 */
 #define EXTI_EMR2_EM37           EXTI_EMR2_EM37_Msk                            /*!< Event Mask on line 37 */
 #define EXTI_EMR2_EM38_Pos       (6U)
 #define EXTI_EMR2_EM38_Msk       (0x1U << EXTI_EMR2_EM38_Pos)                  /*!< 0x00000040 */
 #define EXTI_EMR2_EM38           EXTI_EMR2_EM38_Msk                            /*!< Event Mask on line 38 */
-#define EXTI_EMR2_EM39_Pos       (7U)
-#define EXTI_EMR2_EM39_Msk       (0x1U << EXTI_EMR2_EM39_Pos)                  /*!< 0x00000080 */
-#define EXTI_EMR2_EM39           EXTI_EMR2_EM39_Msk                            /*!< Event Mask on line 39 */
-#define EXTI_EMR2_IM40_Pos       (8U)
-#define EXTI_EMR2_IM40_Msk       (0x1U << EXTI_EMR2_IM40_Pos)                  /*!< 0x00000100 */
-#define EXTI_EMR2_IM40           EXTI_EMR2_IM40_Msk                            /*!< Event Mask on line 40 */
+#define EXTI_EMR2_EM40_Pos       (8U)
+#define EXTI_EMR2_EM40_Msk       (0x1U << EXTI_EMR2_EM40_Pos)                  /*!< 0x00000100 */
+#define EXTI_EMR2_EM40           EXTI_EMR2_EM40_Msk                            /*!< Event Mask on line 40 */
+#define EXTI_EMR2_EM_Pos         (0U)
+#define EXTI_EMR2_EM_Msk         (0x16BU << EXTI_EMR2_EM_Pos)                  /*!< 0x0000016B */
+#define EXTI_EMR2_EM             EXTI_EMR2_EM_Msk                              /*!< Interrupt Mask all        */
 
 /******************  Bit definition for EXTI_RTSR2 register  ******************/
 #define EXTI_RTSR2_RT35_Pos      (3U)
