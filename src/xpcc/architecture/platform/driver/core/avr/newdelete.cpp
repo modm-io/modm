@@ -50,11 +50,14 @@ operator delete(void* ptr)
 	xpcc::avr::freeMemory(ptr);
 }
 
+// FIXME: Temporary "fix" until we switch to C++14
+#ifdef __cpp_sized_deallocation
 void
 operator delete(void* ptr, size_t)
 {
 	xpcc::avr::freeMemory(ptr);
 }
+#endif
 
 void
 operator delete[](void* ptr)
@@ -62,8 +65,11 @@ operator delete[](void* ptr)
 	xpcc::avr::freeMemory(ptr);
 }
 
+// FIXME: Temporary "fix" until we switch to C++14
+#ifdef __cpp_sized_deallocation
 void
 operator delete[](void* ptr, size_t)
 {
 	xpcc::avr::freeMemory(ptr);
 }
+#endif
