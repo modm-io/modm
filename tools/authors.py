@@ -14,6 +14,7 @@ import argparse
 author_handles = {
     "Antal Szabó": "Sh4rK",
     "Arjun Sarin": None,
+    "Carl Treudler": "cajt",
     "Christian Menard": "chrism333",
     "Christoph Rüdi": None,
     "Christopher Durand": "chris-durand",
@@ -24,6 +25,7 @@ author_handles = {
     "Hans Schily": "RzwoDzwo",
     "Julia Gutheil": None,
     "Kevin Läufer": "ekiwi",
+    "Marten Junga": "Maju-Ketchup",
     "Martin Esser": "Scabber",
     "Martin Rosekeit": "thundernail",
     "Michael Thies": "mhthies",

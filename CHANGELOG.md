@@ -50,6 +50,139 @@ pay attention to. Medium impact changes are also worth looking at.
 
 </details>
 
+
+## 2017-10-01: 2017q3 release
+
+This release covers everything from the 2017q2 release on 2017-07-02 and has been
+tested with avr-gcc v5.4.0 from Atmel and arm-none-eabi-gcc 2017q2 from Arm. 
+Note, that Arm did not release 6-2017-q3-update for their toolchain this quarter.
+
+Breaking changes:
+
+- MCP2515 revival adds new `initialize` API
+
+Major features:
+
+- No major features
+
+Major fixes:
+
+- Fix pin remap access (MAPR2 register) for STM32F1 XL Density series
+- Fix moving average for negative averages
+- Fix printf format string type violations
+
+Known bugs:
+
+- xpcc may generate separate IRQ handlers for shared interrupts. See [#88][].
+- GPIO `connect` on STM32F1 is still broken. See [#178][] for discussion.
+  The API from MODM will not be backported to xpcc however.
+- STM32L0/L4 hardware I2C driver has limitations on restart behaviors. See [#255][].
+- STM32F107 does not compile due to the HAL trying to remap USB. See [#268][].
+- SCons build system emits multiple non-critical warnings. See [#286][].
+- SCons 3.0 was released, however, our build system is not fully compatible. See [#293][].
+
+New development board targets:
+
+- OLIMEXINO-STM32 as `olimexino_stm32`
+- STM32F051R-DISCO as `stm32f0_discovery`
+
+New device drivers:
+
+- AD79x8
+- LTC298x
+- AMSYS5915
+- MCP2515 (revived)
+
+Many thanks to all our contributors.
+A special shoutout to first timers (🎉🎊):
+
+- Carl Treudler ([@cajt][]) 🎉🎊
+- Christopher Durand ([@chris-durand][])
+- Daniel Krebs ([@daniel-k][])
+- Marten Junga ([@Maju-Ketchup][]) 🎉🎊
+- Michael Thies ([@mhthies][])
+- Niklas Hauser ([@salkinium][])
+- Raphael Lehmann ([@rleh][])
+- Sascha Schade ([@strongly-typed][])
+
+PR [#296][] -> [2017q3][].
+
+<details>
+<summary>Detailed changelog</summary>
+
+#### 2017-10-01: Update CMSIS headers for STM32
+
+PR [#295][] -> [e1f056a][] with **medium impact** on STM32 targets.  
+Tested in hardware by [@salkinium][].
+
+#### 2017-09-21: Add OLIMEXINO-STM32 board and example
+
+PR [#288][] -> [9d6620d][].  
+Tested in hardware by [@cajt][].
+
+#### 2017-08-24: Add DISCO-F051R8 board and example
+
+PR [#284][] -> [51491ad][].  
+Tested in hardware by [@strongly-typed][].
+
+#### 2017-08-22: Revive MCP2515 driver and add 8 MHz config
+
+Tested in hardware with 8 MHz external crystal for
+10, 20, 50, 100, 125, 250, 500 and 1000 kBps with
+STM32 bxCAN and oscilloscope with protocol decoder.
+
+PR [#278][] -> [b77294e][] with **high impact** on MCP2515 driver users.  
+Tested in hardware by [@strongly-typed][].
+
+#### 2017-08-14: Fix moving average for negative averages
+
+Since template parameter N is defined as `std::size_t` which is unsigned,
+the result of the average calculation will be implicitly casted and
+therefore negative averages gave wrong results.
+
+PR [#272][] -> [e14ba68][] with **medium impact** on filter algorithms.
+
+#### 2017-08-12: Add pressure sensor AMSYS5915 driver
+
+PR [#275][] -> [fc59fc0][].  
+Tested in hardware by [@rleh][].
+
+#### 2017-08-12: Add temperature sensor LTC298x driver
+
+PR [#273][] -> [a27ca5d][].  
+Tested in hardware by [@rleh][].
+
+#### 2017-08-11: Add ADC AD79x8 driver
+
+PR [#274][] -> [680c92a][].  
+Tested in hardware by [@chris-durand][].
+
+#### 2017-07-25: Fix printf format string warnings
+
+PR [#270][] -> [8cc5c78][] with low impact.
+
+#### 2017-07-19: Fix pin remap access for STM32F1
+
+Fix pin remap access (MAPR2 register) for STM32F1 XL Density series
+
+PR [#269][] -> [06b5af9][] with **medium impact** on STM32F1 targets.  
+Tested in hardware by [@strongly-typed][].
+
+#### 2017-07-08: Add Python 3 support to XPCC xml parser
+
+The XPCC (the protocol) tools now work with both Python2 and Python3.
+
+PR [#261][] -> [fc2f33b][] with low impact.
+
+#### 2017-07-04: Check arguments of printf format string
+
+Now the compiler checks the format string for any type violations.
+
+PR [#263][] -> [3f50e1d][] with low impact.
+
+</details>
+
+
 ## 2017-07-02: 2017q2 release
 
 This release covers everything from the 2017q1 release on 2017-04-05 and has been
@@ -71,8 +204,10 @@ Major fixes:
 
 Known bugs:
 
-GPIO `connect` on STM32F1 is still broken. See [#178][] for discussion.
-The API from MODM will not be backported to xpcc however.
+- xpcc may generate separate IRQ handlers for shared interrupts. See [#88][].
+- GPIO `connect` on STM32F1 is still broken. See [#178][] for discussion.
+  The API from MODM will not be backported to xpcc however.
+- STM32L0/L4 hardware I2C driver has limitations on restart behaviors. See [#255][].
 
 New development board targets:
 
@@ -160,6 +295,7 @@ PR [#243][] -> [7111cd3][].
 
 </details>
 
+
 ## 2017-04-05: 2017q1 release
 
 As this is our first official release it covers the last 12 months of
@@ -196,10 +332,11 @@ Major fixes:
 
 Known bugs:
 
-GPIO `connect` on STM32F1 is broken. They can be remapped only in groups,
-however, the API allows invalid remapping. This cannot be fixed without
-introducing a new API for that. See [#178][] for discussion.
-A solution has been tested for modm, but isn't ready for xpcc.
+- xpcc may generate separate IRQ handlers for shared interrupts. See [#88][].
+- GPIO `connect` on STM32F1 is broken. They can be remapped only in groups,
+  however, the API allows invalid remapping. This cannot be fixed without
+  introducing a new API for that. See [#178][] for discussion.
+  A solution has been tested for modm, but isn't ready for xpcc.
 
 New development board targets:
 
@@ -672,15 +809,18 @@ we have to do it manually. Hooray for technology.
 <!-- Releases -->
 [2017q1]: https://github.com/roboterclubaachen/xpcc/releases/tag/2017q1
 [2017q2]: https://github.com/roboterclubaachen/xpcc/releases/tag/2017q2
+[2017q3]: https://github.com/roboterclubaachen/xpcc/releases/tag/2017q3
 
 <!-- Contributors -->
 [@7Kronos]: https://github.com/7Kronos
+[@cajt]: https://github.com/cajt
 [@chris-durand]: https://github.com/chris-durand
 [@daniel-k]: https://github.com/daniel-k
 [@dergraaf]: https://github.com/dergraaf
 [@ekiwi]: https://github.com/ekiwi
 [@genbattle]: https://github.com/genbattle
 [@georgi-g]: https://github.com/georgi-g
+[@Maju-Ketchup]: https://github.com/Maju-Ketchup
 [@mhthies]: https://github.com/mhthies
 [@rleh]: https://github.com/rleh
 [@salkinium]: https://github.com/salkinium
@@ -689,6 +829,7 @@ we have to do it manually. Hooray for technology.
 [@tomchy]: https://github.com/tomchy
 
 <!-- Pull requests or Issues -->
+[#88]: https://github.com/roboterclubaachen/xpcc/pull/88
 [#115]: https://github.com/roboterclubaachen/xpcc/pull/115
 [#129]: https://github.com/roboterclubaachen/xpcc/pull/129
 [#137]: https://github.com/roboterclubaachen/xpcc/pull/137
@@ -708,6 +849,7 @@ we have to do it manually. Hooray for technology.
 [#173]: https://github.com/roboterclubaachen/xpcc/pull/173
 [#175]: https://github.com/roboterclubaachen/xpcc/pull/175
 [#176]: https://github.com/roboterclubaachen/xpcc/pull/176
+[#178]: https://github.com/roboterclubaachen/xpcc/pull/178
 [#178]: https://github.com/roboterclubaachen/xpcc/pull/178
 [#179]: https://github.com/roboterclubaachen/xpcc/pull/179
 [#180]: https://github.com/roboterclubaachen/xpcc/pull/180
@@ -745,10 +887,28 @@ we have to do it manually. Hooray for technology.
 [#251]: https://github.com/roboterclubaachen/xpcc/pull/251
 [#253]: https://github.com/roboterclubaachen/xpcc/pull/253
 [#254]: https://github.com/roboterclubaachen/xpcc/pull/254
+[#255]: https://github.com/roboterclubaachen/xpcc/pull/255
+[#261]: https://github.com/roboterclubaachen/xpcc/pull/261
 [#262]: https://github.com/roboterclubaachen/xpcc/pull/262
+[#263]: https://github.com/roboterclubaachen/xpcc/pull/263
+[#268]: https://github.com/roboterclubaachen/xpcc/pull/268
+[#269]: https://github.com/roboterclubaachen/xpcc/pull/269
+[#270]: https://github.com/roboterclubaachen/xpcc/pull/270
+[#272]: https://github.com/roboterclubaachen/xpcc/pull/272
+[#273]: https://github.com/roboterclubaachen/xpcc/pull/273
+[#274]: https://github.com/roboterclubaachen/xpcc/pull/274
+[#275]: https://github.com/roboterclubaachen/xpcc/pull/275
+[#278]: https://github.com/roboterclubaachen/xpcc/pull/278
+[#284]: https://github.com/roboterclubaachen/xpcc/pull/284
+[#286]: https://github.com/roboterclubaachen/xpcc/pull/286
+[#288]: https://github.com/roboterclubaachen/xpcc/pull/288
+[#293]: https://github.com/roboterclubaachen/xpcc/pull/293
+[#295]: https://github.com/roboterclubaachen/xpcc/pull/295
+[#296]: https://github.com/roboterclubaachen/xpcc/pull/296
 
 <!-- Commits -->
 [0118a13]: https://github.com/roboterclubaachen/xpcc/commit/0118a13
+[06b5af9]: https://github.com/roboterclubaachen/xpcc/commit/06b5af9
 [08784cd]: https://github.com/roboterclubaachen/xpcc/commit/08784cd
 [0dbf73c]: https://github.com/roboterclubaachen/xpcc/commit/0dbf73c
 [0dbf73c]: https://github.com/roboterclubaachen/xpcc/commit/0dbf73c
@@ -761,30 +921,37 @@ we have to do it manually. Hooray for technology.
 [29c8905]: https://github.com/roboterclubaachen/xpcc/commit/29c8905
 [3992534]: https://github.com/roboterclubaachen/xpcc/commit/3992534
 [3c7cd31]: https://github.com/roboterclubaachen/xpcc/commit/3c7cd31
+[3f50e1d]: https://github.com/roboterclubaachen/xpcc/commit/3f50e1d
 [408c309]: https://github.com/roboterclubaachen/xpcc/commit/408c309
 [40da657]: https://github.com/roboterclubaachen/xpcc/commit/40da657
 [41ab22a]: https://github.com/roboterclubaachen/xpcc/commit/41ab22a
 [51159ff]: https://github.com/roboterclubaachen/xpcc/commit/51159ff
+[51491ad]: https://github.com/roboterclubaachen/xpcc/commit/51491ad
 [553dceb]: https://github.com/roboterclubaachen/xpcc/commit/553dceb
 [5e547ab]: https://github.com/roboterclubaachen/xpcc/commit/5e547ab
 [5f5934a]: https://github.com/roboterclubaachen/xpcc/commit/5f5934a
 [637e074]: https://github.com/roboterclubaachen/xpcc/commit/637e074
 [63ad1d3]: https://github.com/roboterclubaachen/xpcc/commit/63ad1d3
+[680c92a]: https://github.com/roboterclubaachen/xpcc/commit/680c92a
 [68b904e]: https://github.com/roboterclubaachen/xpcc/commit/68b904e
 [6c1a111]: https://github.com/roboterclubaachen/xpcc/commit/6c1a111
 [7111cd3]: https://github.com/roboterclubaachen/xpcc/commit/7111cd3
 [7ab0132]: https://github.com/roboterclubaachen/xpcc/commit/7ab0132
 [84d5bd0]: https://github.com/roboterclubaachen/xpcc/commit/84d5bd0
+[8cc5c78]: https://github.com/roboterclubaachen/xpcc/commit/8cc5c78
 [8f9b154]: https://github.com/roboterclubaachen/xpcc/commit/8f9b154
 [9018741]: https://github.com/roboterclubaachen/xpcc/commit/9018741
 [967c0a9]: https://github.com/roboterclubaachen/xpcc/commit/967c0a9
 [9940a65]: https://github.com/roboterclubaachen/xpcc/commit/9940a65
+[9d6620d]: https://github.com/roboterclubaachen/xpcc/commit/9d6620d
 [a00d3cc]: https://github.com/roboterclubaachen/xpcc/commit/a00d3cc
+[a27ca5d]: https://github.com/roboterclubaachen/xpcc/commit/a27ca5d
 [a379e61]: https://github.com/roboterclubaachen/xpcc/commit/a379e61
 [a6519c3]: https://github.com/roboterclubaachen/xpcc/commit/a6519c3
 [a8a2322]: https://github.com/roboterclubaachen/xpcc/commit/a8a2322
 [a906c2d]: https://github.com/roboterclubaachen/xpcc/commit/a906c2d
 [b21f502]: https://github.com/roboterclubaachen/xpcc/commit/b21f502
+[b77294e]: https://github.com/roboterclubaachen/xpcc/commit/b77294e
 [bb3fa3a]: https://github.com/roboterclubaachen/xpcc/commit/bb3fa3a
 [c12a69b]: https://github.com/roboterclubaachen/xpcc/commit/c12a69b
 [c605416]: https://github.com/roboterclubaachen/xpcc/commit/c605416
@@ -793,13 +960,17 @@ we have to do it manually. Hooray for technology.
 [d949fee]: https://github.com/roboterclubaachen/xpcc/commit/d949fee
 [da784bd]: https://github.com/roboterclubaachen/xpcc/commit/da784bd
 [dd3639b]: https://github.com/roboterclubaachen/xpcc/commit/dd3639b
+[e14ba68]: https://github.com/roboterclubaachen/xpcc/commit/e14ba68
 [e1efaf4]: https://github.com/roboterclubaachen/xpcc/commit/e1efaf4
+[e1f056a]: https://github.com/roboterclubaachen/xpcc/commit/e1f056a
 [e2f9b4a]: https://github.com/roboterclubaachen/xpcc/commit/e2f9b4a
 [e346020]: https://github.com/roboterclubaachen/xpcc/commit/e346020
 [e9591d5]: https://github.com/roboterclubaachen/xpcc/commit/e9591d5
 [f2ac1a0]: https://github.com/roboterclubaachen/xpcc/commit/f2ac1a0
 [f472f7f]: https://github.com/roboterclubaachen/xpcc/commit/f472f7f
 [f780c2a]: https://github.com/roboterclubaachen/xpcc/commit/f780c2a
+[fc2f33b]: https://github.com/roboterclubaachen/xpcc/commit/fc2f33b
+[fc59fc0]: https://github.com/roboterclubaachen/xpcc/commit/fc59fc0
 [fcf27a1]: https://github.com/roboterclubaachen/xpcc/commit/fcf27a1
 [fd1b109]: https://github.com/roboterclubaachen/xpcc/commit/fd1b109
 [ffa4e1b]: https://github.com/roboterclubaachen/xpcc/commit/ffa4e1b
