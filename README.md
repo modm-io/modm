@@ -1,4 +1,4 @@
-# xpcc: C++ microcontroller framework <span style="float:right;"><a href="https://travis-ci.org/roboterclubaachen/xpcc" style="border-bottom:none">![Build Status](https://travis-ci.org/roboterclubaachen/xpcc.svg?branch=develop)</a></span>
+# xpcc: C++ microcontroller framework <span style="float:right;"><a href="https://travis-ci.org/roboterclubaachen/xpcc" style="border-bottom:none">![Build Status](https://travis-ci.org/roboterclubaachen/xpcc.svg?branch=develop)</a></span><span style="float:right;"><a href="https://circleci.com/gh/roboterclubaachen/workflows/xpcc/tree/develop" style="border-bottom:none">![Build Status](https://circleci.com/gh/roboterclubaachen/xpcc/tree/develop.svg?style=shield)</a></span>
 
 The xpcc framework consists of powerful hardware abstraction layers for many
 different microcontrollers, a set of drivers for various external targets and a general purpose toolbox for building hardware orientated applications.
