@@ -15,7 +15,7 @@
  *   xpcc::IODeviceWrapper< Uart5, xpcc::IOBuffer::BlockIfFull > device;
  *   xpcc::IOStream stream(device);
 
- * Be advised, that a typical I2C read/write operation can take 10 to 100 longer
+ * Be advised, that a typical I2C read/write operation can take 10 to 100 times longer
  * because the strings have to be copied during the interrupt!
  *
  * If you send too much debug information in the IRQs the program will hang.
@@ -107,10 +107,10 @@ namespace
 
 		DEBUG_STREAM("autoend=" << autoend << ", reload=" << reload << ", nbytes=" << nbytes);
 
-		I2C{{ id }}->CR2 = (autoend ? I2C_CR2_AUTOEND : 0 ) |\
-						   (reload  ? I2C_CR2_RELOAD  : 0 ) |\
-						   (nbytes << I2C_CR2_NBYTES_Pos)   |\
-						   (startCondition ? (I2C_CR2_START   | (starting.address & 0xfe)) : 0 );
+		I2C{{ id }}->CR2 = (autoend ? I2C_CR2_AUTOEND : 0 ) |
+						   (reload  ? I2C_CR2_RELOAD  : 0 ) |
+						   (nbytes << I2C_CR2_NBYTES_Pos)   |
+						   (startCondition ? (I2C_CR2_START | (starting.address & 0xfe)) : 0 );
 
 		if (writing.length > 0) {
 			--writing.length;
@@ -156,10 +156,10 @@ namespace
 
 		DEBUG_STREAM("autoend=" << autoend << ", reload=" << reload << ", nbytes=" << nbytes);
 
-		I2C{{ id }}->CR2 = (autoend ? I2C_CR2_AUTOEND : 0) |\
-						   (reload  ? I2C_CR2_RELOAD  : 0) |\
-						   (nbytes << I2C_CR2_NBYTES_Pos)  |\
-						   (I2C_CR2_RD_WRN)                |\
+		I2C{{ id }}->CR2 = (autoend ? I2C_CR2_AUTOEND : 0) |
+						   (reload  ? I2C_CR2_RELOAD  : 0) |
+						   (nbytes << I2C_CR2_NBYTES_Pos)  |
+						   (I2C_CR2_RD_WRN)                |
 						   (startCondition ? (I2C_CR2_START | (starting.address & 0xfe)) : 0);
 
 		I2C{{ id }}->CR1 &= ~(I2C_CR1_STOPIE | I2C_CR1_TCIE | I2C_CR1_RXIE | I2C_CR1_TXIE);
@@ -184,7 +184,6 @@ namespace
 			DEBUG_STREAM("Wait for RXNE IRQ");
 			I2C{{ id }}->CR1 |= I2C_CR1_RXIE | I2C_CR1_STOPIE | (reload ? I2C_CR1_TCIE : 0);
 		}
-		// ?? TCR Transfer complete Reload?
 	}
 
 	static inline void
