@@ -223,6 +223,7 @@ Georgi Grinshpun ([@georgi-g](https://github.com/georgi-g)).
 
 [Arduino Uno]: https://www.arduino.cc/en/Main/ArduinoBoardUno
 [Nucleo F031K6]: http://www.st.com/en/evaluation-tools/nucleo-f031k6.html
+[STM32F0 Discovery]: http://www.st.com/en/evaluation-tools/stm32f0discovery.html
 [STM32F072 Discovery]: http://www.st.com/en/evaluation-tools/32f072bdiscovery.html
 [STM32F1 Discovery]: http://www.st.com/en/evaluation-tools/stm32vldiscovery.html
 [Nucleo F103RB]: http://www.st.com/en/evaluation-tools/nucleo-f103rb.html
