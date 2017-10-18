@@ -66,24 +66,22 @@ struct ltc2984
 		float
 		getTemperatureFloat() const
 		{
-			float temp = static_cast<float>((this->data & 0x7fffff)) / 1024.f;
-			return ((this->data & 0x800000) == 0) ? temp : -temp;
+			return getTemperatureFixed() / 1024.f;
 		}
 
 		/// @return the temperature in the configured unit divided by 1024
 		int32_t
 		getTemperatureFixed() const
 		{
-			int32_t ret((this->data & 0x7fffff));
-			return (this->data & 0x800000) ? -ret : ret;
+			int32_t ret(this->data & 0xfffffful);
+			return (this->data & 0x800000) ? -(((~ret) + 1) & 0xffffff) : ret;
 		}
 
-		/// @return only the signed integer part of the temperature in the configured unit
+		/// @return the temperature rounded to nearest integer in the configured unit
 		int16_t
 		getTemperatureInteger() const
 		{
-			int16_t ret((this->data & 0x7fffff) >> 10);
-			return (this->data & 0x800000) ? -ret : ret;
+			return ((getTemperatureFixed() + (1ul << 9)) / 1024);
 		}
 
 	public:
