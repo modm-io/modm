@@ -100,7 +100,7 @@ struct ltc2984
 		//EepromStatus		= 0x0f9,
 		MuxConfigDelay		= 0x0f4,
 		ChannelConfig		= 0x200,
-		//CustomDataTable	= 0x250,
+		CustomDataTable		= 0x250,
 	};
 
 	enum class
@@ -350,6 +350,17 @@ public:
 	 * Sets used pins as output. SPI must be initialized by the user!
 	 */
 	Ltc2984();
+
+	/**
+	 * \brief	Ping the LTC298x device.
+	 * \warning Do not use ping() while any measurement is running.
+	 * The ping() function writes data to the Custom Sensor Table Data memory
+	 * region but restores the data before finishing the device available check.
+	 *
+	 * \return	config	True if the device is reachable.
+	 */
+	xpcc::ResumableResult<bool>
+	ping();
 
 	/**
 	 * \brief	Configure

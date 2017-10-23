@@ -74,7 +74,14 @@ public:
 	bool
 	update()
 	{
-		PT_BEGIN()
+		PT_BEGIN();
+
+		while(!PT_CALL(tempSensor.ping())) {
+			logger << "Device not reachable" << xpcc::endl;
+			this->timeout.restart(100);
+			PT_WAIT_UNTIL(this->timeout.isExpired());
+		}
+
 
 		// Configure the device
 		PT_CALL(tempSensor.configureChannel(xpcc::ltc2984::Channel::Ch2, xpcc::ltc2984::Configuration::rsense(

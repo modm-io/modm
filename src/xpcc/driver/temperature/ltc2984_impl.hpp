@@ -20,6 +20,21 @@ xpcc::Ltc2984<SpiMaster, Cs>::Ltc2984()
 }
 
 template < class SpiMaster, class Cs >
+xpcc::ResumableResult<bool>
+xpcc::Ltc2984<SpiMaster, Cs>::ping()
+{
+	RF_BEGIN();
+	// Store first byte of Custom Sensor Table Data into buffer[4]
+	RF_CALL(readByte(Register::CustomDataTable, buffer[4]));
+	buffer[5] = 0x42;
+	RF_CALL(writeData(Register::CustomDataTable, &buffer[5], 1));
+	RF_CALL(readByte(Register::CustomDataTable, buffer[6]));
+	// Restore first byte of Custom Sensor Table Data from buffer[4]
+	RF_CALL(writeData(Register::CustomDataTable, &buffer[4], 1));
+	RF_END_RETURN(buffer[5] == buffer[6]);
+}
+
+template < class SpiMaster, class Cs >
 xpcc::ResumableResult<void>
 xpcc::Ltc2984<SpiMaster, Cs>::configure(ltc2984::Configuration::Rejection rejection,
                                         ltc2984::Configuration::TemperatureUnit temperatureUnit,
