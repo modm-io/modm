@@ -81,6 +81,9 @@ namespace xpcc
 
 			xpcc_always_inline bool
 			isEmpty() const;
+
+			xpcc_always_inline bool
+			isNotEmpty() const { return not isEmpty(); }
 			
 			/**
 			 * Check if the queue is nearly empty.
