@@ -67,9 +67,9 @@ def get_author_log(since = None, until = None, handles = True, count = False):
     for (commits, author) in commit_tuples:
         out = author
         if handles and author in author_handles and author_handles[author] is not None:
-            out += " (@{})".format(author_handles[author])
+            out += u" (@{})".format(author_handles[author])
         if count:
-            out = "{:4}  {}".format(commits, out)
+            out = u"{:4}  {}".format(commits, out)
         output.append(out)
     return output
 
@@ -98,6 +98,6 @@ if __name__ == "__main__":
     authors = []
     for author in log_authors:
         if any(a in author for a in new_authors):
-            author += " 🎉🎊"
+            author += "" # " 🎉🎊"
         authors.append(author)
     print("\n".join(authors))

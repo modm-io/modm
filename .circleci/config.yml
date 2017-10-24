@@ -209,6 +209,34 @@ jobs:
           command: |
             scons check=devices
 
+  "scripts-python2.7":
+    docker:
+      - image: roboterclubaachen/xpcc-build:latest
+    environment:
+      - SCONS_LIB_DIR: "/usr/local/lib/python2.7/dist-packages/scons-2.5.1"
+      - SCONSFLAGS: "-j3"
+    steps:
+      - checkout
+      - run:
+          name: Check if tool scripts run with Python2
+          command: |
+            python2 tools/authors.py --handles --count --shoutout --since 2017-01-01
+            python2 tools/system_design/builder/system_layout.py examples/communication/xml/communication.xml -o /tmp
+
+  "scripts-python3":
+    docker:
+      - image: roboterclubaachen/xpcc-build:latest
+    environment:
+      - SCONS_LIB_DIR: "/usr/local/lib/python2.7/dist-packages/scons-2.5.1"
+      - SCONSFLAGS: "-j3"
+    steps:
+      - checkout
+      - run:
+          name: Check if tool scripts run with Python3
+          command: |
+            python3 tools/authors.py --handles --count --shoutout --since 2017-01-01
+            python3 tools/system_design/builder/system_layout.py examples/communication/xml/communication.xml -o /tmp
+
 workflows:
   version: 2
   build:
@@ -229,3 +257,5 @@ workflows:
       - "generic-examples"
       - "linux-examples"
       - "avr-examples"
+      - "scripts-python2.7"
+      - "scripts-python3"
