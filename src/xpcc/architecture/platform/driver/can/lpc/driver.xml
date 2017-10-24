@@ -2,11 +2,13 @@
 <!DOCTYPE rca SYSTEM "../../xml/driver.dtd">
 <rca version="1.0">
 	<driver type="can" name="lpc">
-		<static>c_can.cpp</static>
-		<static>c_can.hpp</static>
+		<template out="c_can.hpp">c_can.hpp.in</template>
+		<template out="c_can.hpp">c_can.cpp.in</template>
 		<static>c_can_filter.cpp</static>
 		<static>c_can_filter.hpp</static>
 		<static>c_can_registers.h</static>
 		<static>error_code.hpp</static>
+		<parameter name="tx_buffer" type="int" min="0" max="254">16</parameter>
+		<parameter name="rx_buffer" type="int" min="0" max="254">16</parameter>
 	</driver>
 </rca>

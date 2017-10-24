@@ -14,7 +14,7 @@
 #include "uart_defines.h"
 #include "uart{{ id }}.hpp"
 
-static xpcc::atomic::Queue<uint8_t, {{parameters.tx_buffer}}> txBuffer;
+static xpcc::atomic::Queue<uint8_t, xpcc::{{target.family}}::Uart{{ id }}::TxBufferSize> txBuffer;
 
 // ----------------------------------------------------------------------------
 XPCC_ISR(USART{{ id }}_UDRE)

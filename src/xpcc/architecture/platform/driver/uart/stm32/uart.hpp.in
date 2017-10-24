@@ -52,6 +52,11 @@ private:
 %% endif
 
 public:
+	// Expose jinja template parameters to be checked by e.g. drivers or application
+	static constexpr size_t RxBufferSize = {{ parameters.rx_buffer }};
+	static constexpr size_t TxBufferSize = {{ parameters.tx_buffer }};
+
+public:
 template< 	class SystemClock, uint32_t baudrate,
 		uint16_t tolerance = xpcc::Tolerance::OnePercent >
 	static void xpcc_always_inline

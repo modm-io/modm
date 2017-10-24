@@ -74,6 +74,13 @@ public:
 	};
 #ifdef __DOXYGEN__
 public:
+	/// Size of the receive buffer.
+	static constexpr size_t RxBufferSize = 16;
+
+	/// Size of the transmit buffer.
+	static constexpr size_t TxBufferSize = 16;
+
+public:
 	/**
 	 * Initializes the hardware and sets the baudrate.
 	 *

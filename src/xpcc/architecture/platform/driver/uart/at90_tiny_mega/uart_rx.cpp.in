@@ -14,7 +14,7 @@
 #include "uart_defines.h"
 #include "uart{{ id }}.hpp"
 
-static xpcc::atomic::Queue<uint8_t, {{parameters.rx_buffer}}> rxBuffer;
+static xpcc::atomic::Queue<uint8_t, xpcc::{{target.family}}::Uart{{ id }}::RxBufferSize> rxBuffer;
 static uint8_t error;
 
 // ----------------------------------------------------------------------------

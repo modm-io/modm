@@ -42,6 +42,9 @@ public:
 	static const TypeId::I2cMaster{{ id }}Scl Scl;
 
 public:
+	static constexpr size_t TransactionBufferSize = {{ parameters.transaction_buffer }};
+
+public:
 	/**
 	 * Set up the I2C module for master operation.
 	 *

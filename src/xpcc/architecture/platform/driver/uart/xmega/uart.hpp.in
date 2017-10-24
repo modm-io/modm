@@ -51,6 +51,11 @@ public:
 	static const TypeId::Uart{{ id }}Txd Tx;
 
 public:
+	// Expose jinja template parameters to be checked by e.g. drivers or application
+	static constexpr size_t RxBufferSize = {{ parameters.rx_buffer }};
+	static constexpr size_t TxBufferSize = {{ parameters.tx_buffer }};
+
+public:
 	/**
 	 * Sets the baudrate.
 	 *

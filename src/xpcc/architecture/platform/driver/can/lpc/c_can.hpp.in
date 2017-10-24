@@ -11,9 +11,6 @@
 
 #include "../../clock/generic/common_clock.hpp"
 
-// at least one queue, so activate interrupts
-#define LPC11C_USING_CAN_INTERRUPTS ((LPC11C_CAN_TX_BUFFER_SIZE > 0) || (LPC11C_CAN_RX_BUFFER_SIZE > 0))
-
 #define LPC11C_ROM_CAN (*((ROM **)0x1fff1ff8))
 
 namespace xpcc
@@ -49,7 +46,10 @@ namespace lpc
 class Can : public ::xpcc::Can
 {
 public:
+	static constexpr size_t RxBufferSize = {{ parameters.rx_buffer }};
+	static constexpr size_t TxBufferSize = {{ parameters.tx_buffer }};
 
+public:
 	template< class SystemClock, uint32_t bitrate = Bitrate::kBps125,
 			uint16_t tolerance = Tolerance::OnePercent >
 	static inline void
@@ -92,14 +92,13 @@ public:
 				0x00004500UL | prescaler  // CANBT: bit timing register:
 		};
 
-	// FIXME: turn into parameter
-	#if LPC11C_USING_CAN_INTERRUPTS
+	%% if parameters.rx_buffer > 0 or parameters.tx_buffer > 0
 		/* Interrupts enabled */
 		LPC11C_ROM_CAN->pCAND->init_can(&ClkInitTable[0], true);
-	#else
+	%% else
 		/* Interrupts disabled */
 		LPC11C_ROM_CAN->pCAND->init_can(&ClkInitTable[0], false);
-	#endif
+	%% endif
 
 		/* Configure the CAN callback functions */
 		CAN_CALLBACKS callbacks = {

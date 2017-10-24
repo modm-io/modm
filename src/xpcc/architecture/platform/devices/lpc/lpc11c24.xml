@@ -12,9 +12,6 @@
 		<pin-count device-name="c24">48</pin-count>
 		<!-- Headers to be included with the {{ include_device_headers }} substitution-->
 		<header>LPC11xx.h</header>
-		<!-- set to a value > 0 to enable software buffering of CAN messages -->
-		<define>LPC11C_CAN_TX_BUFFER_SIZE = 16</define>
-		<define>LPC11C_CAN_RX_BUFFER_SIZE = 16</define>
 		<!-- Core Driver -->
 		<driver type="core" name="cortex">
 			<parameter name="main_stack_size">1024</parameter>
