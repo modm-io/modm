@@ -4,25 +4,19 @@
 // ----------------------------------------------------------------------------
 using namespace xpcc::lpc;
 
-typedef GpioOutput0_7 Led;
-
 // ----------------------------------------------------------------------------
 int 
 main()
 {
-	// New Static Clock Setup ( => Static)
-	typedef Pll<ExternalCrystal<MHz12>, MHz48> clockSource;
-	// typedef ExternalOscillator<MHz12> clockSource;
-	SystemClock<clockSource>::enable();
+	Board::initialize();
 
+	// Clock output at Gpio0_1 with 1/100th of the CPU frequency. 48 kHz should be observed.
 	ClockControl::enableClockOutput(ClockControl::ClockOutputSource::SystemClock, 100);
 	Gpio0_1::selectFunction(Gpio0_1::Function::ClockOutput);	// TODO: replace with connect
 
-	Led::setOutput();
-
-	while (1)
+	while (true)
 	{
-		Led::toggle();
-		xpcc::delayMilliseconds(100);
+		Board::LedRed::toggle();
+		xpcc::delayMilliseconds(500);
 	}
 }

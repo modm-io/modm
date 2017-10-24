@@ -10,22 +10,21 @@
  */
 
 #include <xpcc/architecture.hpp>
-#include "../lpcxpresso11c24.hpp"
+
+using Button = GpioInput3_2;
 
 int
 main()
 {
-	defaultSystemClock::enable();
-	SysTickTimer::initialize<defaultSystemClock>();
+	Board::initialize();
 
 	// Set LED port pin to output
-	Led::setOutput();
 	Button::setInput(Gpio::InputType::PullUp);
 
-	while (1)
+	while (true)
 	{
 		// Each time we wake up...
-		Led::set(Button::read());
+		Board::LedRed::set(Button::read());
 		// Go to sleep to save power between timer interrupts
 		__WFI();
 	}
