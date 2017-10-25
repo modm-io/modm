@@ -22,7 +22,7 @@
 void inline
 xpcc::stm32::SpiHal{{ id }}::enable()
 {
-%% if id == 1
+%% if id in [1, 4, 5, 6]
 	// enable clock
 	RCC->APB2ENR |= RCC_APB2ENR_SPI{{ id }}EN;
 	// reset spi
@@ -42,7 +42,7 @@ void inline
 xpcc::stm32::SpiHal{{ id }}::disable()
 {
 	// disable clock
-%% if id == 1
+%% if id in [1, 4, 5, 6]
 	RCC->APB2ENR &= ~RCC_APB2ENR_SPI{{ id }}EN;
 %% elif id in [2, 3]
 	RCC->{{ APB1ENR }} &= ~RCC_{{ APB1ENR }}_SPI{{ id }}EN;
