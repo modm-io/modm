@@ -94,6 +94,8 @@ main()
 			xpcc::can::Message message;
 			Can1::getMessage(message);
 			displayMessage(message);
+
+			Board::LedGreen::toggle();
 		}
 	}
 
