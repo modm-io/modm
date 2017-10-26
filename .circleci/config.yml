@@ -169,6 +169,20 @@ jobs:
           command: |
             scons check=examples examples=lpcxpresso
 
+
+  "generic-examples":
+    docker:
+      - image: roboterclubaachen/xpcc-build:latest
+    environment:
+      - SCONS_LIB_DIR: "/usr/local/lib/python2.7/dist-packages/scons-2.5.1"
+      - SCONSFLAGS: "-j3"
+    steps:
+      - checkout
+      - run:
+          name: Examples from the generic folder (Mostly STM32 examples)
+          command: |
+            scons check=examples examples=generic
+
   "linux-examples":
     docker:
       - image: roboterclubaachen/xpcc-build:latest
@@ -212,5 +226,6 @@ workflows:
       - "stm32f7-examples"
       - "stm32l4-examples"
       - "lpcxpresso-examples"
+      - "generic-examples"
       - "linux-examples"
       - "avr-examples"
