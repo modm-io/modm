@@ -13,6 +13,7 @@
  */
 
 #include "communication/xpcc.hpp"
+#include "communication/ros.hpp"
 #include "communication/rpr.hpp"
 //#include "communication/amnb.hpp"
 #include "communication/sab.hpp"
