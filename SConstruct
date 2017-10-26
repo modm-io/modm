@@ -63,6 +63,7 @@ env = Environment(
 		tools = ['template', 'doxygen', 'configfile', 'helper', 'font', 'bitmap'],
 		ENV = os.environ)
 env['XPCC_LIBRARY_PATH'] = os.path.join('.')
+env['XPCC_ROOTPATH'] = os.path.join('.')
 
 class Generator:
 	def __init__(self, env, basepath):
