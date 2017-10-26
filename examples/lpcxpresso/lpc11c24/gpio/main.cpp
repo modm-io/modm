@@ -7,7 +7,8 @@
  *
  * Tested in hardware 2012-08-08 by strongly-typed.
  * Tested again 2014-08-01.
- */
+ * Tested again 2017-10-26.
+*/
 
 #include <xpcc/architecture.hpp>
 
