@@ -11,9 +11,7 @@
 		<!-- Number of pins -->
 		<pin-count device-name="15">48</pin-count>
 		<!-- Headers to be included with the {{ include_device_headers }} substitution-->
-		<header>lpc11xx/cmsis/LPC11xx.h</header>
-		<header>lpc11xx/cmsis/core_cm0.h</header>
-		<header>lpc11xx/cmsis/system_LPC11xx.h</header>
+		<header>LPC11xx.h</header>
 		<!-- Core Driver -->
 		<driver type="core" name="cortex">
 			<parameter name="main_stack_size">1024</parameter>
