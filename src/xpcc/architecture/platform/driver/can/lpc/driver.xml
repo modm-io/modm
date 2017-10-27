@@ -3,7 +3,7 @@
 <rca version="1.0">
 	<driver type="can" name="lpc">
 		<template out="c_can.hpp">c_can.hpp.in</template>
-		<template out="c_can.hpp">c_can.cpp.in</template>
+		<template out="c_can.cpp">c_can.cpp.in</template>
 		<static>c_can_filter.cpp</static>
 		<static>c_can_filter.hpp</static>
 		<static>c_can_registers.h</static>

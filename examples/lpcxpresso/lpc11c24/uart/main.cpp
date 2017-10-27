@@ -10,14 +10,11 @@
 
 using namespace xpcc::lpc;
 
-typedef GpioOutput0_7 Led;
-typedef GpioOutput3_1 WriteInd;
-
-typedef SystemClock<Pll<ExternalCrystal<MHz12>, MHz48>> systemClock;
+using WriteInd = GpioOutput3_1;
 
 // ----------------------------------------------------------------------------
 // Logging
-typedef Uart1 Uart;
+using Uart = Uart1;
 xpcc::IODeviceWrapper< Uart, xpcc::IOBuffer::BlockIfFull > loggerDevice;
 
 xpcc::log::Logger xpcc::log::debug(loggerDevice);
@@ -39,7 +36,7 @@ testXpccLogger(void);
 int
 main()
 {
-	systemClock::enable();
+	Board::initialize();
 
 	// Initialize 32-bit timer 0. TIME_INTERVAL is defined as 10mS
 	// You may also want to use the Cortex SysTick timer to do this
@@ -49,10 +46,7 @@ main()
 	// the TimeTick global each time timer 0 matches and resets.
 	// enable_timer32(0);
 
-	// Set LED port pin to output
-	Led::setOutput();
-
-	Uart::initialize<systemClock, 115200>();
+	Uart::initialize<Board::systemClock, 115200>();
 
 	xpcc::delayMilliseconds(100); // glitch ?
 
@@ -65,7 +59,7 @@ main()
 
 	testXpccLogger();
 
-	while(1);
+	while(true);
 
 		// Single byte reading and writing, loopback.
 //		uint8_t c;
@@ -83,9 +77,9 @@ main()
 void
 testWriteSingle(void)
 {
-	while (1)
+	while (true)
 	{
-		Led::toggle();
+		Board::LedRed::toggle();
 
 		// Multiple single byte writes in blocking mode
 		Uart::write('\n');
@@ -104,7 +98,7 @@ testWriteSingle(void)
 			burst = 0;
 			xpcc::delayMilliseconds(500);
 		}
-	} // while (1)
+	} // while (true)
 }
 
 void
@@ -116,9 +110,9 @@ testWriteBuffer(void)
 		buf[ii] = ii + 'A';
 	}
 
-	while (1)
+	while (true)
 	{
-		Led::toggle();
+		Board::LedRed::toggle();
 
 		WriteInd::setOutput(true);
 		Uart::write(buf, 40);
@@ -135,14 +129,15 @@ testWriteBuffer(void)
 			burst = 0;
 			xpcc::delayMilliseconds(5000);
 		}
-	} // while (1)
+	} // while (true)
 }
 
 void
 testXpccLogger(void)
 {
-	while (1)
+	while (true)
 	{
-		XPCC_LOG_DEBUG << "Hello world" << xpcc::endl;
+		XPCC_LOG_DEBUG << "Hello world. This is more than 16 chars." << xpcc::endl;
+		xpcc::delayMilliseconds(10);
 	}
 }

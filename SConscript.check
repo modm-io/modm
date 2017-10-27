@@ -90,8 +90,9 @@ devices = [
 #	{ 'path': 'release/tests/atxmega',	'arch': 'avr',			'device': 'atxmega32a4',	'clock':   1000000 },
 #	{ 'path': 'release/tests/lpc',		'arch': 'cortex-m0',	'device': 'lpc1112_301',	'clock':  12000000 },
 #	{ 'path': 'release/tests/lpc',		'arch': 'cortex-m0',	'device': 'lpc1114_301',	'clock':  12000000 },
+	{ 'path': 'release/tests/lpc',		'arch': 'cortex-m0',	'device': 'lpc1115_303',	'clock':  48000000 },
 #	{ 'path': 'release/tests/lpc',		'arch': 'cortex-m0',	'device': 'lpc11c22_301',	'clock':  48000000 },
-#	{ 'path': 'release/tests/lpc',		'arch': 'cortex-m0',	'device': 'lpc11c24_301',	'clock':  48000000 },
+	{ 'path': 'release/tests/lpc',		'arch': 'cortex-m0',	'device': 'lpc11c24_301',	'clock':  48000000 },
 #	{ 'path': 'release/tests/lpc',		'arch': 'cortex-m3',	'device': 'lpc1343',		'clock':  12000000 },
 #	{ 'path': 'release/tests/lpc',		'arch': 'cortex-m3',	'device': 'lpc1769',		'clock':   8000000 },
 #	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f103t4',	'clock':  72000000 },	# low density

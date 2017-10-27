@@ -132,6 +132,9 @@ public:
 #endif
 };
 
+xpcc::IOStream&
+operator << (xpcc::IOStream& stream, const Can::BusState state);
+
 } // namespace xpcc
 
 #endif // XPCC_INTERFACE_CAN_HPP

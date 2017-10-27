@@ -1,5 +1,5 @@
 // coding: utf-8
-/* Copyright (c) 2014, Roboterclub Aachen e.V.
+/* Copyright (c) 2017, Sascha Schade (strongly-typed)
 * All Rights Reserved.
 *
 * The file is part of the xpcc library and is released under the 3-clause BSD
@@ -18,10 +18,25 @@
 using namespace xpcc::lpc;
 using namespace xpcc::cortex;
 
-typedef GpioOutput0_7 Led;
-typedef GpioInput3_2 Button;
+namespace Board
+{
 
+using clockSource = Pll<ExternalCrystal<MHz12>, MHz48> ;
+using systemClock = SystemClock<clockSource>;
 
-typedef SystemClock<Pll<ExternalCrystal<MHz12>, MHz48> > defaultSystemClock;
+using LedRed = GpioOutput0_7;
+
+using Leds = xpcc::SoftwareGpioPort< LedRed >;
+
+inline void
+initialize()
+{
+	systemClock::enable();
+	xpcc::cortex::SysTickTimer::initialize<systemClock>();
+
+	LedRed::setOutput(xpcc::Gpio::Low);
+}
+
+} // Board namespace
 
 #endif	// XPCC_LPC_XPRESSO_11C24_HPP
