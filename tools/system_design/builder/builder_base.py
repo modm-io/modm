@@ -129,7 +129,7 @@ class Builder(object):
 			parser.parse(self.xmlfile, dtdPath=self.options.dtdPath, include_paths=self.include_paths)
 		except ParserException as e:
 			sys.stderr.write("Parsing Error: %s\n" % str(e))
-			print traceback.format_exc()
+			print(traceback.format_exc())
 			sys.exit(1)
 		
 		self.tree = parser.tree

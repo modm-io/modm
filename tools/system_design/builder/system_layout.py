@@ -174,7 +174,7 @@ class SystemLayoutBuilder(builder_base.Builder):
 
 		print("Analysing containers:")
 		for container in self.tree.containers:
-			print " * " + container.name
+			print(" * " + container.name)
 
 		print("Done. Creating graph")
 
@@ -405,7 +405,7 @@ class SystemLayoutBuilder(builder_base.Builder):
 			
 		c.writePDFfile(file)
 		
-		print "The system layout is shown in ", file
+		print("The system layout is shown in ", file)
 
 	def setup(self, optparser):
 		optparser.add_option(

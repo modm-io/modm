@@ -70,8 +70,7 @@ class JavaPacketsJaxbIndexBuilder(builder_base.Builder):
 		packets = self.tree.types
 		packets.remove('Bool')
 		
-		primitives = filter.PRIMITIVES.values()
-		primitives.sort()
+		primitives = sorted(filter.PRIMITIVES.values())
 		
 		substitutions = {
 			'package' : self.options.package,

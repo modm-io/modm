@@ -76,8 +76,7 @@ class JavaCommunicationBuilder(builder_base.Builder):
 		# and the only not numerical type
 		components = self.tree.components
 		
-		primitives = filter.PRIMITIVES.values()
-		primitives.sort()
+		primitives = sorted(filter.PRIMITIVES.values())
 		
 		substitutions = {
 			'package' : self.options.package,

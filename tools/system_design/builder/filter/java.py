@@ -40,10 +40,19 @@ class Primitive:
 		self.mask = mask
 	
 	def __cmp__(self, other):
+		return 1 - self.__eq__(other) - 2 * self.__lt__(other)
+
+	def __lt__(self, other):
 		if isinstance(other, str):
-			return cmp(self.name, other)
+			return self.name < other
 		else:
-			return cmp(self.name, other.name)
+			return self.name < other.name
+
+	def __eq__(self, other):
+		if isinstance(other, str):
+			return self.name == other
+		else:
+			return self.name == other.name
 
 PRIMITIVES = {
 	"int8_t":	Primitive("int8_t", 	"int",		"Int8",		1,	"byte",		"Byte",		"", 	None),
