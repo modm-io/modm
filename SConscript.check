@@ -180,13 +180,13 @@ if check is not None:
 			if exitStatus != 0:
 				everythingOk = False
 	
-	print "\nRESULTS:\n"
-	print '\n'.join(result)
+	print("\nRESULTS:\n")
+	print('\n'.join(result))
 	if everythingOk:
-		print "\nOK!"
+		print("\nOK!")
 		Exit(0)
 	else:
-		print "\nFAIL!"
+		print("\nFAIL!")
 		Exit(1)
 
 env.Alias('check', None)

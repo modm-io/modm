@@ -91,7 +91,7 @@ else:
 	elif target == 'hosted':
 		defaultConfigfile = 'unittest_hosted.cfg'
 	else:
-		print "Error: unknown target '%s'. Use 'hosted' (default), 'atmega', 'atxmega' or 'stm32'." % target
+		print("Error: unknown target '%s'. Use 'hosted' (default), 'atmega', 'atxmega' or 'stm32'." % target)
 		exit(1)
 
 # create the build environment

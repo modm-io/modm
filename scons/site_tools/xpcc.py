@@ -35,6 +35,7 @@ import configfile as configparser
 import textwrap
 import getpass, subprocess
 import glob
+import locale
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'tools', 'device_files'))
 from device_identifier import DeviceIdentifier
@@ -83,27 +84,26 @@ def check_architecture(env, architecture):
 
 def show_defines_action(target, source, env):
 	projectConfig = env['XPCC_CONFIG']['defines'].keys()
-	keys = env['XPCC_LIBRARY_DEFINES'].keys()
-	keys.sort()
+	keys = sorted(env['XPCC_LIBRARY_DEFINES'].keys())
 
-	print ""
-	print "XPCC:"
+	print("")
+	print("XPCC:")
 	for key in keys:
 		default = env['XPCC_LIBRARY_DEFAULT_DEFINES'][key]
 		if key in projectConfig:
 			value = env['XPCC_CONFIG']['defines'][key]
 			projectConfig.remove(key)
 			if value != default:
-				print "  %s => %s (default: %s)" % (key.upper(), value, default)
+				print("  %s => %s (default: %s)" % (key.upper(), value, default))
 				continue
 
-		print "  %s => %s" % (key.upper(), default)
+		print("  %s => %s" % (key.upper(), default))
 
 	if projectConfig:
-		print "\nOther:"
+		print("\nOther:")
 		for key in projectConfig:
-			print "  %s => %s" % (key.upper(), env['XPCC_CONFIG']['defines'][key])
-	print ""
+			print("  %s => %s" % (key.upper(), env['XPCC_CONFIG']['defines'][key]))
+	print("")
 
 def show_defines(env, alias="__show"):
 	action = Action(show_defines_action, cmdstr="Show Defines:")
@@ -132,12 +132,12 @@ def xpcc_library(env, buildpath=None):
 	# generate 'xpcc_config.hpp'
 	env['XPCC_LIBRARY_DEFINES'] = defines.copy()
 	env['XPCC_LIBRARY_DEFAULT_DEFINES'] = defines.copy()
-	for key in defines.iterkeys():
+	for key in defines:
 		if key in env['XPCC_CONFIG']['defines']:
 			env['XPCC_LIBRARY_DEFINES'][key] = env['XPCC_CONFIG']['defines'][key]
 
 	define_list = ["#define %s %s" % (key.upper(), value) \
-				for key, value in env['XPCC_LIBRARY_DEFINES'].iteritems()]
+				for key, value in env['XPCC_LIBRARY_DEFINES'].items()]
 	define_list.sort()
 
 	substitutions = {
@@ -184,7 +184,7 @@ def generate_defines(env, filename='defines.hpp'):
 	defines = env['XPCC_CONFIG']['defines']
 	substitutions = {
 		'defines': '\n'.join(["#define %s %s" % (key.upper(), value) \
-				for key, value in defines.iteritems()])
+				for key, value in defines.items()])
 	}
 	file = env.Template(
 			target = filename,
@@ -241,7 +241,7 @@ def define_header(env, defines, header, comment, template="define_template.hpp.i
 	#while len(comment) > 0:
 	#	c += "// " + comment[:70] + '\n'
 	#	comment = comment[70:]
-	define_list = ["#define %s %s" % (key.upper(), value) for key, value in defines.iteritems()]
+	define_list = ["#define %s %s" % (key.upper(), value) for key, value in defines.items()]
 	file = env.Template(
 		target = os.path.join(env['XPCC_BUILDPATH'], header),
 		source = os.path.join(env['XPCC_ROOTPATH'], 'templates', template),
@@ -266,8 +266,8 @@ def build_info_header(env):
 	defines['XPCC_BUILD_OS'] = env.CStringLiteral(os)
 	# This contains the version of the compiler that is used to build the project
 	try:
-		c = subprocess.check_output([env['CXX'], '--version']).split('\n', 1)[0]
-	except Exception, e:
+		c = subprocess.check_output([env['CXX'], '--version']).decode(locale.getpreferredencoding()).split('\n', 1)[0]
+	except Exception as e:
 		env.Error("[CXX] compiler " + env['CXX'] + " is not in path or could not be executed")
 		Exit(1)
 
@@ -402,7 +402,7 @@ def generate(env, **kw):
 				if m[1].lower() == 'include':
 					env['XPCC_ACTIVE_MODULES'].append(m[0].lower())
 
-	except configparser.ParserException, msg:
+	except configparser.ParserException as msg:
 		env.Error("Error parsing file configuration file '%s':\n%s" % (configfile, str(msg)))
 		Exit(1)
 
@@ -574,7 +574,7 @@ def generate(env, **kw):
 	# adding * to a key name will add a space before and append to existing values
 	# adding / to a key name will replace any existing value
 	# raw key name means it will append to existing env value without any adjustment
-	for key, value in configuration['environment'].iteritems():
+	for key, value in configuration['environment'].items():
 		replace = False
 		if '/' in key:
 			replace = True

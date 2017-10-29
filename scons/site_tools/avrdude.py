@@ -72,7 +72,7 @@ def avrdude_flash(env, source, eeprom_source='', alias='avrdude_program'):
 def avrdude_fuse(env, alias='avrdude_fuse'):
 	fusebits = []
 	for fusebit in env['AVR_FUSEBITS']:
-		key, value = fusebit.items()[0]
+		key, value = next(iter(fusebit.items()))
 		fusebits.append("-U %s:w:0x%02x:m" % (key, int(value, 0)))
 	actionString = "$AVRDUDE -p $AVRDUDE_DEVICE -c $AVRDUDE_PROGRAMMER -P $AVRDUDE_PORT $AVRDUDE_OPTIONS -u %s" % " ".join(fusebits)
 

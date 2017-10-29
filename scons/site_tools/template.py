@@ -33,6 +33,7 @@ import re
 from SCons.Script import *
 import posixpath
 import traceback
+from io import open
 
 generationBlockString = """/*
  * WARNING: This file is generated automatically, do not edit!
@@ -43,7 +44,7 @@ generationBlockString = """/*
 # -----------------------------------------------------------------------------
 def template_action(target, source, env):
 	if not env.has_key('substitutions'):
-		raise SCons.Errors.UserError, "Use 'Template(..., substitutions = ...)'"
+		raise SCons.Errors.UserError("Use 'Template(..., substitutions = ...)'")
 	
 	source = source[0].abspath
 	target = target[0].abspath
@@ -56,7 +57,7 @@ def template_action(target, source, env):
 # -----------------------------------------------------------------------------
 def jinja2_template_action(target, source, env):
 	if not env.has_key('substitutions'):
-		raise SCons.Errors.UserError, "Use 'Jinja2Template(..., substitutions = ...)'"
+		raise SCons.Errors.UserError("Use 'Jinja2Template(..., substitutions = ...)'")
 	
 	try:
 		import jinja2
@@ -78,7 +79,7 @@ def jinja2_template_action(target, source, env):
 
 	def filter_pad(value, min_width):
 		tab_width = 4
-		tab_count =  (min_width/tab_width - len(value)/tab_width) + 1
+		tab_count =  (min_width//tab_width - len(value)//tab_width) + 1
 		return value + ('\t' * tab_count)
 
 	def filter_split(value, delimiter):
@@ -115,16 +116,14 @@ def jinja2_template_action(target, source, env):
 	filename = os.path.relpath(source[0].path, path)
 	loader = RelEnvironment(loader = jinja2.FileSystemLoader(path), extensions=['jinja2.ext.do'])
 	if 'XPCC_JINJA2_FILTER' in env:
-		loader.filters = dict(loader.filters.items() +
-								env['XPCC_JINJA2_FILTER'].items())
+		loader.filters.update(env['XPCC_JINJA2_FILTER'])
 	loader.filters['xpcc.wordwrap'] = filter_wordwrap
 	loader.filters['xpcc.indent'] = filter_indent
 	loader.filters['xpcc.pad'] = filter_pad
 	loader.filters['xpcc.values'] = filter_values
 	loader.filters['split'] = filter_split	# not XPCC specific
 	if 'XPCC_JINJA2_TEST' in env:
-		loader.tests = dict(loader.tests.items() +
-								env['XPCC_JINJA2_TEST'].items())
+		loader.tests.update(env['XPCC_JINJA2_TEST'])
 	# Jinja2 Line Statements
 	loader.line_statement_prefix = '%%'
 	loader.line_comment_prefix = '%#'
@@ -143,8 +142,8 @@ def jinja2_template_action(target, source, env):
 		traceback.print_exc()
 		raise Exception('Failed to retrieve Template',e)
 
-	output = template.render(env['substitutions']).encode('utf-8')
-	open(target[0].path, 'w').write(output)
+	output = template.render(env['substitutions'])
+	open(target[0].path, 'w', encoding='utf-8').write(output)
 
 def template_emitter(target, source, env):
 	Depends(target, SCons.Node.Python.Value(env['substitutions']))

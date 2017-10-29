@@ -1,11 +1,11 @@
 #!/usr/bin/env python2
-# 
+#
 # Copyright (c) 2009, Roboterclub Aachen e.V.
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
+#
 #     * Redistributions of source code must retain the above copyright
 #       notice, this list of conditions and the following disclaimer.
 #     * Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
 #     * Neither the name of the Roboterclub Aachen e.V. nor the
 #       names of its contributors may be used to endorse or promote products
 #       derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
 # EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -75,7 +75,7 @@ def xml_include_scanner(node, env, path, arg=None):
 			if file not in dependencies:
 				stack.append(file)
 		dependencies.extend(files)
-	
+
 	dependencies.remove(targetFilename)
 	return dependencies
 
@@ -85,10 +85,10 @@ def packet_emitter(target, source, env):
 		path = env['path']
 	except KeyError:
 		path = '.'
-	
+
 	target = [os.path.join(path, "packets.cpp"),
 			  os.path.join(path, "packets.hpp")]
-	
+
 	return (target, source)
 
 def identifier_emitter(target, source, env):
@@ -96,9 +96,9 @@ def identifier_emitter(target, source, env):
 		path = env['path']
 	except KeyError:
 		path = '.'
-	
+
 	target = [os.path.join(path, "identifier.hpp")]
-	
+
 	return (target, source)
 
 def postman_emitter(target, source, env):
@@ -106,10 +106,10 @@ def postman_emitter(target, source, env):
 		path = env['path']
 	except KeyError:
 		path = '.'
-	
+
 	target = [os.path.join(path, "postman.cpp"),
 			  os.path.join(path, "postman.hpp")]
-	
+
 	return (target, source)
 
 def communication_emitter(target, source, env):
@@ -117,9 +117,9 @@ def communication_emitter(target, source, env):
 		path = env['path']
 	except KeyError:
 		path = '.'
-	
+
 	target = [os.path.join(path, "communication.hpp")]
-	
+
 	return (target, source)
 
 def xpcc_task_caller_emitter(target, source, env):
@@ -127,7 +127,7 @@ def xpcc_task_caller_emitter(target, source, env):
 		path = env['path']
 	except KeyError:
 		path = '.'
-	
+
 	target = [os.path.join(path, "caller.hpp")]
 	return (target, source)
 
@@ -152,7 +152,7 @@ def generate(env, **kw):
 			single_source = True,
 			target_factory = env.fs.Entry,
 			src_suffix = ".xml")
-	
+
 	env['BUILDERS']['SystemCppIdentifier'] = \
 		SCons.Script.Builder(
 			action = SCons.Action.Action(
@@ -167,7 +167,7 @@ def generate(env, **kw):
 			single_source = True,
 			target_factory = env.fs.Entry,
 			src_suffix = ".xml")
-	
+
 	env['BUILDERS']['SystemCppPostman'] = \
 		SCons.Script.Builder(
 			action = SCons.Action.Action(
@@ -183,7 +183,7 @@ def generate(env, **kw):
 			single_source = True,
 			target_factory = env.fs.Entry,
 			src_suffix = ".xml")
-	
+
 	env['BUILDERS']['SystemCppCommunication'] = \
 		SCons.Script.Builder(
 			action = SCons.Action.Action(
@@ -198,7 +198,7 @@ def generate(env, **kw):
 			single_source = True,
 			target_factory = env.fs.Entry,
 			src_suffix = ".xml")
-	
+
 	env['BUILDERS']['SystemCppXpccTaskCaller'] = \
 		SCons.Script.Builder(
 			action = SCons.Action.Action(
@@ -213,7 +213,7 @@ def generate(env, **kw):
 			single_source = True,
 			target_factory = env.fs.Entry,
 			src_suffix = ".xml")
-	
+
 	if SCons.Script.ARGUMENTS.get('verbose') != '1':
 		env['SYSTEM_CPP_PACKETS_COMSTR'] = "Generate packets from: $SOURCE"
 		env['SYSTEM_CPP_IDENTIFIER_COMSTR'] = "Generate identifier from: $SOURCE"

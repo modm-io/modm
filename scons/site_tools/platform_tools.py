@@ -271,7 +271,7 @@ def filter_get_ports(gpios):
 		port_ids[gpio['port']][int(gpio['id'])] = 1
 	# create port list
 	ports = []
-	for name, ids in port_ids.iteritems():
+	for name, ids in port_ids.items():
 		# if the port consists of at least one gpio pin
 		if 1 in ids:
 			port = {}
