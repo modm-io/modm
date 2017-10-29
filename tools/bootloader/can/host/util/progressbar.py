@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 import sys
 
@@ -92,5 +92,5 @@ if __name__ == '__main__':
 	for x in range(0,101):
 		time.sleep(0.10)
 		bar(x)
-	print ""
+	print("")
 

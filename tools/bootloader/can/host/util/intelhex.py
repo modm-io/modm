@@ -130,8 +130,8 @@ if __name__ == '__main__':
 	
 	try:
 		parser = IntelHexParser(filename)
-		print parser
-	except HexParserException, e:
+		print(parser)
+	except HexParserException as e:
 		# Fehlermeldungen ausgeben
-		print e
+		print(e)
 

@@ -365,7 +365,7 @@ class Driver(DeviceElementBase):
 			return substitutions
 		# Now this is were it gets interesting:
 		# parsing the inner nodes of the driver node recursively:
-		substitutions = dict(self._nodeToDict(self.node, device_id, properties).items() + substitutions.items())
+		substitutions.update(self._nodeToDict(self.node, device_id, properties))
 		self.log.debug("Found substitutions: " + str(substitutions))
 		return substitutions
 

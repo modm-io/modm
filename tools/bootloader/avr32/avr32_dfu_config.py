@@ -69,15 +69,15 @@ def process(low, pin):
     if (0 <= pin) and (pin <= 109):
         pass
     else:
-        print "Pin %d is an invalid pin." % pin
+        print("Pin %d is an invalid pin." % pin)
         return
     
-    print "The GPIO pin number to test during the boot process: %d" % pin
-    print "Active level of ISP_IO_COND_PIN                    :",
+    print("The GPIO pin number to test during the boot process: %d" % pin)
+    print("Active level of ISP_IO_COND_PIN                    :", end='')
     if low == True:
-        print "low level"
+        print("low level")
     else:
-        print "high level"  
+        print("high level"  )
     
     # create empty user-page, 128 words of 4 bytes
     userpage = np.zeros(128*4, np.uint8) 
@@ -97,7 +97,7 @@ def process(low, pin):
     userpage[-1] = crc.crc(userpage[-4:-1])
     
     # print config bytes:
-    print "Config bytes: ", hex(userpage[-4]), hex(userpage[-3]), hex(userpage[-2]), hex(userpage[-1])
+    print("Config bytes: ", hex(userpage[-4]), hex(userpage[-3]), hex(userpage[-2]), hex(userpage[-1]))
 
     # open file and write userpage.bin
     f = open('userpage.bin', 'w')
@@ -112,9 +112,9 @@ def main():
     # parse command line options
     try:
         opts, args = getopt.getopt(sys.argv[1:], "h", ["help","low","high"])
-    except getopt.error, msg:
-        print msg
-        print "for help use --help"
+    except getopt.error as msg:
+        print(msg)
+        print("for help use --help")
         sys.exit(2)
     
     low = True
@@ -122,7 +122,7 @@ def main():
     # process options
     for o, a in opts:
         if o in ("-h", "--help"):
-            print __doc__
+            print(__doc__)
             sys.exit(0)
         if o in ("--low"):
             low = True

@@ -193,7 +193,7 @@ class SerialPort:
 
 			tcsetattr(self.__handle, TCSANOW, self.__params)
 		
-		except error, e:
+		except error as e:
 			self.__handle = None
 			raise SerialPortException(e)
 

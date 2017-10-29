@@ -41,27 +41,27 @@ if __name__ == "__main__":
 
 	# Test Device File Class
 	dev = DeviceFile("../../src/xpcc/architecture/platform/xml/stm32f40.xml")
-	print "dev.getProperties('stm32f407vg'): %s" % dev.getProperties('stm32f407vg')
-	print "dev.getProperties('stm32f407ve'): %s" % dev.getProperties('stm32f407ve')
-	print "dev.getDriverList('stm32f407vg', a_dir):"
+	print("dev.getProperties('stm32f407vg'): %s" % dev.getProperties('stm32f407vg'))
+	print("dev.getProperties('stm32f407ve'): %s" % dev.getProperties('stm32f407ve'))
+	print("dev.getDriverList('stm32f407vg', a_dir):")
 	dList = dev.getDriverList('stm32f407vg', p_dir)
 	i = 1
 	for d in dList:
-		print "%s) %s/%s" % (i, d['type'], d['name'])
-		print "path:        %s" % (d['path'])
-		print "driver_file: %s" % (d['driver_file'])
-		print "instances:"
-		print str(d['instances'])
-		print "substitutions:"
-		print str(d['substitutions'])
-		print ""
+		print("%s) %s/%s" % (i, d['type'], d['name']))
+		print("path:        %s" % (d['path']))
+		print("driver_file: %s" % (d['driver_file']))
+		print("instances:")
+		print(str(d['instances']))
+		print("substitutions:")
+		print(str(d['substitutions']))
+		print("")
 		i += 1
 
 	# Test DriverFile Class
 	for d in dList:
 		df = DriverFile.fromDict(d)
-		print "df.getBuildList():"
-		print str(df.getBuildList(p_dir))
-		print ""
-		print ""
+		print("df.getBuildList():")
+		print(str(df.getBuildList(p_dir)))
+		print("")
+		print("")
 

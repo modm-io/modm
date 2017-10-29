@@ -84,5 +84,5 @@ if __name__ == '__main__':
 		filter2.check(msg)
 	end = time.time()
 	
-	print mid - start
-	print end - mid
+	print(mid - start)
+	print(end - mid)
