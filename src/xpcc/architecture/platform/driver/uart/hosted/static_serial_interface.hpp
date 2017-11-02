@@ -97,4 +97,7 @@ namespace xpcc
 	}
 }
 
+#include "static_serial_interface_impl.hpp"
+
+
 #endif	// XPCC_HOSTED_STATIC_SERIAL_INTERFACE_HPP

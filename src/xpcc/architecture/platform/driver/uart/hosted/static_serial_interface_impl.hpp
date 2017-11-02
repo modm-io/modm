@@ -54,6 +54,7 @@ bool
 xpcc::hosted::StaticSerialInterface<N>::write(uint8_t data)
 {
 	backend->write(data);
+	return true;
 }
 
 template<int N>
@@ -61,6 +62,7 @@ std::size_t
 xpcc::hosted::StaticSerialInterface<N>::write(const uint8_t *data, std::size_t length)
 {
 	backend->writeBytes(data, length);
+	return length;
 }
 
 template<int N>
