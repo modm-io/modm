@@ -271,9 +271,21 @@ xpcc::hosted::SerialInterface::write(char c)
 /*	SUB_LOGGER_LOG(logger, Logger::ERROR, "writeByte")
 		<< "0x" << std::hex << (int)data << "; ";
  */
-	int reply = ::write(this->fileDescriptor, &c, 1);
-	if (reply <= 0) {
-		this->dumpErrorMessage();
+	int reply;
+	// retry on EAGAIN, otherwise report error
+	// some linux rfcomm devices need this
+	while(1) {
+		reply = ::write(this->fileDescriptor, &c, 1);
+		if (reply <= 0) {
+			if (errno!=EAGAIN) {
+				this->dumpErrorMessage();
+				break;
+			}
+		}
+		else
+		{
+			break;
+		}
 	}
 //	SUB_LOGGER_LOG( logger, Logger::DEBUG, "writeByte" )
 //		<< "0x" << std::hex << data << " => " << reply << std::dec;
