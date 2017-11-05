@@ -920,15 +920,19 @@ constexpr ::xpcc::Flags<Enum> operator^(Enum const &a, Enum const &b) { return :
 	XPCC_INTERNAL_FLAGS(Parent, friend)
 
 #define XPCC_INTERNAL_FLAGS(Parent, scope) \
-	scope constexpr Parent operator compl (Parent::EnumType const &lhs) \
+	scope constexpr Parent operator compl (typename Parent::EnumType const &lhs) \
 	{ return compl Parent(lhs); } \
 	XPCC_INTERNAL_FLAGS_EOP(type, Parent, &, scope) \
 	XPCC_INTERNAL_FLAGS_EOP(type, Parent, |, scope) \
 	XPCC_INTERNAL_FLAGS_EOP(type, Parent, ^, scope)
 
 #define XPCC_INTERNAL_FLAGS_EOP(type, Parent, op, scope) \
-	scope constexpr Parent operator op (Parent::EnumType const &lhs, Parent::EnumType const &rhs) \
-	{ return Parent(Parent::EnumType(Parent::UnderlyingType(lhs) op Parent::UnderlyingType(rhs))); }
+	scope constexpr Parent operator op (typename Parent::EnumType const &lhs, typename Parent::EnumType const &rhs) \
+	{ \
+		using EnumType = typename Parent::EnumType; \
+		using UnderlyingType = typename Parent::UnderlyingType; \
+		return Parent(EnumType(UnderlyingType(lhs) op UnderlyingType(rhs))); \
+	}
 /// @endcond
 
 
