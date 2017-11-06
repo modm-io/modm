@@ -16,6 +16,7 @@
 namespace xpcc
 {
 
+template<typename T>
 struct testing
 {
 protected:
@@ -112,7 +113,7 @@ XPCC_TYPE_FLAGS(Test4_t)
 }
 
 // @author Niklas Hauser
-class RegisterTest : public unittest::TestSuite, public xpcc::testing
+class RegisterTest : public unittest::TestSuite, public xpcc::testing<void>
 {
 public:
 	void
