@@ -85,6 +85,10 @@ if 'stm32f' in env['XPCC_DEVICE'] and not env['XPCC_DEVICE'].startswith('stm32f0
 	sourcePath += ['freertos']		# FreeRTOS for STM32
 	sourcePath += ['fatfs']			# FatFS
 
+# -----------------------------------------------------------------------------
+# Add ros_lib
+globalIncludes += ['ros_lib/ros_lib']
+sourcePath += ['ros_lib/ros_lib']
 
 includes = buildIncludes + globalIncludes
 for path in includes:

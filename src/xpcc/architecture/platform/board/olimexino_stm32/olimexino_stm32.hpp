@@ -145,7 +145,7 @@ initialize()
 
 	uext::Tx::connect(uext::Uart::Tx);
 	uext::Rx::connect(uext::Uart::Rx, Gpio::InputType::PullUp);
-	uext::Uart::initialize<systemClock, 115200>(12);
+	uext::Uart::initialize<systemClock, xpcc::Uart::Baudrate::B115200>(12);
 
 }
 
