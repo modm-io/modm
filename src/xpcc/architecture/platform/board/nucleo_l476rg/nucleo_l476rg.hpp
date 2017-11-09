@@ -98,7 +98,7 @@ initialize()
 
 	stlink::Tx::connect(stlink::Uart::Tx);
 	stlink::Rx::connect(stlink::Uart::Rx, Gpio::InputType::PullUp);
-	stlink::Uart::initialize<systemClock, 115200>(12);
+	stlink::Uart::initialize<systemClock, xpcc::Uart::Baudrate::B115200>(12);
 
 	LedGreen::setOutput(xpcc::Gpio::Low);
 
