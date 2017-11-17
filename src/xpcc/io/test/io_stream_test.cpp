@@ -520,6 +520,23 @@ IoStreamTest::testPrintf2()
 #endif
 }
 
+void
+IoStreamTest::testPrintf3()
+{
+#if not defined(XPCC__CPU_AVR)
+	// Test for 64 bit uints and ints on printf
+	unsigned long long unsignedlonglong = 0xFEDCBA9876543210;
+	(*stream).printf("%llx", unsignedlonglong);
+	TEST_ASSERT_EQUALS_ARRAY("FEDCBA9876543210", device.buffer, 16);
+	(*stream).flush();
+
+	long long longlong = -9223372036854775806;
+	(*stream).printf("%lld", longlong);
+	TEST_ASSERT_EQUALS_ARRAY("-9223372036854775806", device.buffer, 20);
+	(*stream).flush();
+#endif
+}
+
 int myFunc1(void) { return -1; };
 int myFunc2(void) { return -1; };
 

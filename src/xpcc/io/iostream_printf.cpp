@@ -167,6 +167,21 @@ xpcc::IOStream::vprintf(const char *fmt, va_list ap)
 			// Print fractional part
 			writeUnsignedInteger((unsigned int)float_value, base, width_frac, '0', false);
 		}
+#if not defined(XPCC__CPU_AVR)
+		else if (isLongLong)
+		{
+			long long signedValue = va_arg(ap, long long);
+			if (isSigned)
+			{
+				if (signedValue < 0)
+				{
+					isNegative = true;
+				    signedValue = -signedValue; // make it positive
+				}
+			}
+			writeUnsignedLongLong((unsigned long long) signedValue, base, width, fill, isNegative);
+		}
+#endif
 		else
 		{
 			unsigned long unsignedValue;
@@ -247,3 +262,51 @@ xpcc::IOStream::writeUnsignedInteger(
 		this->device->write(ch);
 	}
 }
+
+#if not defined(XPCC__CPU_AVR)
+void
+xpcc::IOStream::writeUnsignedLongLong(
+	unsigned long long unsignedValue, uint_fast8_t base,
+	size_t width, char fill, bool isNegative)
+{
+	char scratch[26];
+
+	char *ptr = scratch + sizeof(scratch);
+	*--ptr = 0;
+	do
+	{
+		char ch = (unsignedValue % base) + '0';
+
+		if (ch > '9') {
+			ch += 'A' - '9' - 1;
+		}
+
+		*--ptr = ch;
+		unsignedValue /= base;
+
+		if (width) {
+			--width;
+		}
+	} while (unsignedValue);
+
+	// Insert minus sign if needed
+	if (isNegative)
+	{
+		*--ptr = '-';
+		if (width) {
+			--width;
+		}
+	}
+
+	// insert padding chars
+	while (width--) {
+		*--ptr = fill;
+	}
+
+	// output result
+	char ch;
+	while ((ch = *ptr++)) {
+		this->device->write(ch);
+	}
+}
+#endif
