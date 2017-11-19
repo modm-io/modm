@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # 
 # Copyright (c) 2009, Roboterclub Aachen e.V.
@@ -40,7 +40,7 @@ class JavaCommunicationBuilder(builder_base.Builder):
 	methods, which are corresponding to Actions of given Components.
 	
 	A common call would be like:
-	$python2 java_communication.py  --outpath source/rca/robot --package rca.robot robot.xml;
+	$python3 java_communication.py  --outpath source/rca/robot --package rca.robot robot.xml;
 	"""
 	
 	
