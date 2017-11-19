@@ -40,6 +40,7 @@ before_install:
  - pip install --upgrade pip wheel
  - pip install jinja2 lxml numpy
  - pip install scons==2.5.1
+ - pip install configparser future
  - pip install pyx==0.12.1
  - pip3 install wheel
  - pip3 install jinja2 lxml numpy scons pyx

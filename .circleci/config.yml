@@ -188,6 +188,7 @@ jobs:
     docker:
       - image: roboterclubaachen/xpcc-build:latest
     environment:
+      - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python2.7/dist-packages/scons-2.5.1"
       - SCONSFLAGS: "-j3"
     steps:
@@ -229,6 +230,7 @@ jobs:
     docker:
       - image: roboterclubaachen/xpcc-build:latest
     environment:
+      - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python2.7/dist-packages/scons-2.5.1"
       - SCONSFLAGS: "-j3"
     steps:
@@ -243,6 +245,7 @@ jobs:
     docker:
       - image: roboterclubaachen/xpcc-build:latest
     environment:
+      - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python2.7/dist-packages/scons-2.5.1"
       - SCONSFLAGS: "-j3"
     steps:
