@@ -170,7 +170,7 @@ drawCross(xpcc::GraphicDisplay& display, xpcc::glcd::Point center)
 	display.drawLine(center.x + 2, center.y, center.x + 15, center.y);
 	display.drawLine(center.x, center.y - 15, center.x, center.y - 2);
 	display.drawLine(center.x, center.y + 2, center.x, center.y + 15);
-	typedef void (*genericCallback)(void*);
+
 	display.setColor(xpcc::glcd::Color::white());
 	display.drawLine(center.x - 15, center.y + 15, center.x - 7, center.y + 15);
 	display.drawLine(center.x - 15, center.y + 7, center.x - 15, center.y + 15);
@@ -264,7 +264,7 @@ touchActive()
 }
 
 void
-resetTouchLock(void* data)
+resetTouchLock(void* /* data */)
 {
 	last_point = xpcc::glcd::Point(-400, -400);
 }
