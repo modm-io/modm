@@ -123,6 +123,7 @@ def generate(env, **kw):
 		"-mmcu=$AVR_DEVICE", 
 		"$OPTIMIZATION",
 		"-gdwarf-2", 
+		"-g3",
 		"-funsigned-char",
 		"-funsigned-bitfields", 
 		"-fshort-enums", 

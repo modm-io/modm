@@ -126,6 +126,7 @@ def generate(env, **kw):
 		"-mthumb-interwork",
 		"$OPTIMIZATION",
 		"-gdwarf-2",
+		"-g3",
 		"-funsigned-char",
 		"-funsigned-bitfields",
 		"-fshort-enums",
