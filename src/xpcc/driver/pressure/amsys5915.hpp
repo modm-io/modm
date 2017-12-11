@@ -84,7 +84,7 @@ struct amsys5915
  *
  * The device runs a cyclic program, which will store a corrected pressure value with
  * 12 bit resolution about every 500 μs within the output registers of the internal ASIC.
- * 
+ *
  * Datasheet: http://www.amsys.de/sheets/amsys.de.ams5915.pdf
  *
  * @ingroup driver_pressure
@@ -96,12 +96,9 @@ class Amsys5915 : public amsys5915, public xpcc::I2cDevice<I2cMaster, 1, I2cRead
 public:
 	/**
 	 * @param	data	a amsys5915::Data object
-	 * @bug The address of the sensor is by factory default set to 0x28.
-	 *      This means you cannot use two AMSYS 5915 sensors on the same bus!
-	 *      You have to use a MUX or two seperate I2C busses.
 	 */
-	Amsys5915(Data &data)
-	:	I2cDevice<I2cMaster,1,I2cReadTransaction>(0x28), data(data)
+	Amsys5915(Data &data, uint8_t i2cAddress = 0x28)
+	:	I2cDevice<I2cMaster,1,I2cReadTransaction>(i2cAddress), data(data)
 	{
 		this->transaction.configureRead(data.data, 4);
 	}
