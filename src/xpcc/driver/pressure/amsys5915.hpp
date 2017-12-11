@@ -44,10 +44,22 @@ struct amsys5915
 		{
 			// mask undefined bits
 			data[0] &= 0b00111111;
-			// Full scale span is 13107, with offset 1638
-			uint16_t *rData = reinterpret_cast<uint16_t*>(data);
-			uint16_t pressure = xpcc::fromBigEndian(*rData) - 1638;
-			return static_cast<float>(pressure) / 13107.f;
+
+			// Full scale span is typically 13107, with offset 1638
+			// Caution: sensors may output values slightly exceeding the expected range!
+			const uint16_t offset{1638};
+			const uint16_t span{13107};
+
+			auto rData = reinterpret_cast<const uint16_t*>(data);
+			const uint16_t pressureRaw{xpcc::fromBigEndian(*rData)};
+
+			if(pressureRaw <= offset) {
+				return 0.f;
+			} else if (pressureRaw >= offset + span) {
+				return 1.f;
+			}
+
+			return static_cast<float>(pressureRaw - offset) / span;
 		}
 
 		/**
