@@ -5,7 +5,7 @@ if [ ! -f "$HOME/cache/avr-gcc.tar.bz2" ]; then
 fi
 if [ ! -f "$HOME/cache/cortex-m.tar.bz2" ]; then
 	echo "Downloading Cortex-M toolchain..."
-	(cd $HOME/cache && wget -q https://developer.arm.com/-/media/Files/downloads/gnu-rm/6-2017q2/gcc-arm-none-eabi-6-2017-q2-update-linux.tar.bz2 -O cortex-m.tar.bz2) &
+	(cd $HOME/cache && wget -q https://developer.arm.com/-/media/Files/downloads/gnu-rm/7-2017q4/gcc-arm-none-eabi-7-2017-q4-major-linux.tar.bz2 -O cortex-m.tar.bz2) &
 fi
 if [ ! -f "$HOME/cache/boost.tar.bz2" ]; then
 	echo "Downloading libboost package..."
