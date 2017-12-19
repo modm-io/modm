@@ -14,12 +14,12 @@ addons:
    - libsdl1.2-dev
    - libsdl-image1.2-dev
    - libgtkmm-2.4-dev
-   - g++-4.8
+   - g++-7
    - libzmqpp-dev
 
 before_install:
- - export CC=gcc-4.8
- - export CXX=g++-4.8
+ - export CC=gcc-7
+ - export CXX=g++-7
  - ls -l $HOME/cache
  - bash .travis.dep.sh
  - export LD_LIBRARY_PATH="$HOME/toolchain/boost/lib:$LD_LIBRARY_PATH"
