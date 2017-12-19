@@ -150,8 +150,7 @@ def generate(env, **kw):
 	
 	# C++ flags
 	env['CXXFLAGS'] = [
-#		"-std=gnu++98",
-		"-std=gnu++0x",
+		"-std=c++14",
 		"-fno-exceptions", 
 		"-fno-rtti",
 		"-fno-threadsafe-statics",
