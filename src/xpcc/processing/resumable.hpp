@@ -108,7 +108,7 @@
  * @endcode
  *
  * For other examples take a look in the `examples` folder in the XPCC
- * root folder.
+ * root folder. The given example is in `examples/generic/resumable`.
  */
 
 #include "resumable/resumable.hpp"
