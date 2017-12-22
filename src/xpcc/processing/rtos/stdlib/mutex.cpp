@@ -28,85 +28,21 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_BOOST__QUEUE_HPP
-#define XPCC_BOOST__QUEUE_HPP
+#include "../mutex.hpp"
+#include <chrono>
 
-#ifndef XPCC_RTOS__QUEUE_HPP
-#	error "Don't include this file directly, use <xpcc/processing/rtos/queue.hpp>"
-#endif
-
-#include <stdint.h>
-#include <deque>
-
-#include <boost/thread/mutex.hpp>
-#include <xpcc/container/deque.hpp>
-
-namespace xpcc
+// ----------------------------------------------------------------------------
+xpcc::rtos::Mutex::Mutex()
 {
-	namespace rtos
-	{
-		/**
-		 * Thread-safe Queue.
-		 * 
-		 * \ingroup	rtos_boost
-		 */
-		template<typename T>
-		class Queue
-		{
-		public:
-			/**
-			 * Create a Queue.
-			 * 
-			 * \param length
-			 * 			The maximum number of items the queue can contain.
-			 */
-			Queue(uint32_t length);
-			
-			~Queue();
-			
-			/**
-			 * Get the number of items stored in the queue
-			 */
-			std::size_t
-			getSize() const;
-			
-			bool
-			append(const T& item, uint32_t timeout = -1);
-			
-			bool
-			prepend(const T& item, uint32_t timeout = -1);
-			
-			
-			bool
-			peek(T& item, uint32_t timeout = -1) const;
-			
-			bool
-			get(T& item, uint32_t timeout = -1);
-			
-			
-			inline bool
-			appendFromInterrupt(const T& item);
-			
-			inline bool
-			prependFromInterrupt(const T& item);
-			
-			inline bool
-			getFromInterrupt(T& item);
-			
-		private:
-			// disable copy constructor
-			Queue(const Queue& other);
-			
-			// disable assignment operator
-			Queue&
-			operator = (const Queue& other);
-			
-			mutable boost::timed_mutex mutex;
-			
-			uint32_t maxSize;
-			std::deque<T> deque;
-		};
-	}
 }
 
-#endif // XPCC_BOOST__QUEUE_HPP
+xpcc::rtos::Mutex::~Mutex()
+{
+}
+
+// ----------------------------------------------------------------------------
+bool
+xpcc::rtos::Mutex::acquire(uint32_t timeout)
+{
+	return mutex.try_lock_for(std::chrono::milliseconds(timeout));
+}

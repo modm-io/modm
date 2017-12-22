@@ -14,8 +14,8 @@
 #include <string>
 
 #include <xpcc/architecture/interface/can.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread.hpp>
+#include <mutex>
+#include <thread>
 
 namespace xpcc
 {
@@ -83,8 +83,8 @@ private:
 	update();
 
 private:
-	typedef boost::mutex				Mutex;
-	typedef boost::mutex::scoped_lock	MutexGuard;
+	typedef std::mutex				Mutex;
+	typedef std::lock_guard<Mutex>	MutexGuard;
 
 	Mutex stateLock;
 	Mutex readBufferLock;
@@ -97,7 +97,7 @@ private:
 	std::string tmpRead;
 	std::queue<can::Message> readBuffer;
 
-	boost::thread* thread;
+	std::thread* thread;
 };
 
 }	// namespace hosted

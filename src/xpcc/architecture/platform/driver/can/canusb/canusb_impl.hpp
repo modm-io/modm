@@ -134,8 +134,7 @@ xpcc::hosted::CanUsb<SerialPort>::open(xpcc::Can::Bitrate canBitrate)
 			MutexGuard stateGuard(this->stateLock);
 			this->active = true;
 		}
-		this->thread = new boost::thread(
-				boost::bind(&xpcc::hosted::CanUsb<SerialPort>::update, this));
+		this->thread = new std::thread(&xpcc::hosted::CanUsb<SerialPort>::update, this);
 
 		busState = BusState::Connected;
 		this->tmpRead.clear();

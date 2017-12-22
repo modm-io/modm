@@ -28,31 +28,40 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_RTOS_BOOST__SCHEDULER_HPP
-#define XPCC_RTOS_BOOST__SCHEDULER_HPP
+#include "../thread.hpp"
 
-#ifndef XPCC_RTOS__SCHEDULER_HPP
-#	error "Don't include this file directly, use <xpcc/processing/rtos/scheduler.hpp>"
-#endif
+xpcc::rtos::Thread* xpcc::rtos::Thread::head = 0;
 
-#include <boost/thread/thread.hpp>
-
-namespace xpcc
+// ----------------------------------------------------------------------------
+xpcc::rtos::Thread::Thread(uint32_t priority, uint16_t stackDepth, const char* name) :
+	next(0),
+	thread()
 {
-	namespace rtos
-	{
-		class Scheduler
-		{
-		public:
-			/**
-			 * \brief	Starts the real time kernel
-			 * 
-			 * \warning	This function will never return.
-			 */
-			static void
-			schedule();
-		};
+	// avoid compiler warnings
+	(void) priority;
+	(void) stackDepth;
+	(void) name;
+	
+	// create a list of all threads
+	if (head == 0) {
+		head = this;
+	}
+	else {
+		Thread *list = head;
+		while (list->next != 0) {
+			list = list->next;
+		}
+		list->next = this;
 	}
 }
 
-#endif // XPCC_RTOS_BOOST__SCHEDULER_HPP
+xpcc::rtos::Thread::~Thread()
+{
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::rtos::Thread::start()
+{
+	this->thread.reset(new std::thread(&Thread::run, this));
+}

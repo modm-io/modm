@@ -28,21 +28,23 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "../mutex.hpp"
+#include "../scheduler.hpp"
+#include "../thread.hpp"
 
-// ----------------------------------------------------------------------------
-xpcc::rtos::Mutex::Mutex()
+void
+xpcc::rtos::Scheduler::schedule()
 {
-}
-
-xpcc::rtos::Mutex::~Mutex()
-{
-}
-
-// ----------------------------------------------------------------------------
-bool
-xpcc::rtos::Mutex::acquire(uint32_t timeout)
-{
-	return mutex.timed_lock(
-			boost::posix_time::milliseconds(timeout));
+	// Start all threads
+	Thread* list = Thread::head;
+	while (list != 0) {
+		list->start();
+		list = list->next;
+	}
+	
+	while (1)
+	{
+		// Threads are started and will do all the work. Just
+		// sleep a bit here when there is nothing else to do. 
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+	}
 }

@@ -28,49 +28,85 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "../semaphore.hpp"
+#ifndef XPCC_BOOST__QUEUE_HPP
+#define XPCC_BOOST__QUEUE_HPP
 
-// ----------------------------------------------------------------------------
-xpcc::rtos::Semaphore::Semaphore(uint32_t max, uint32_t initial) :
-	count(initial), maxCount(max)
-{
-}
+#ifndef XPCC_RTOS__QUEUE_HPP
+#	error "Don't include this file directly, use <xpcc/processing/rtos/queue.hpp>"
+#endif
 
-// ----------------------------------------------------------------------------
-bool
-xpcc::rtos::Semaphore::acquire(uint32_t timeout)
+#include <stdint.h>
+#include <deque>
+
+#include <mutex>
+#include <xpcc/container/deque.hpp>
+
+namespace xpcc
 {
-	boost::unique_lock<boost::mutex> lock(mutex);
-	while (count == 0)
+	namespace rtos
 	{
-		 if (!condition.timed_wait(lock,
-				 boost::posix_time::milliseconds(timeout))) {
-			 return false;
-		 }
+		/**
+		 * Thread-safe Queue.
+		 * 
+		 * \ingroup	rtos_boost
+		 */
+		template<typename T>
+		class Queue
+		{
+		public:
+			/**
+			 * Create a Queue.
+			 * 
+			 * \param length
+			 * 			The maximum number of items the queue can contain.
+			 */
+			Queue(uint32_t length);
+			
+			~Queue();
+			
+			/**
+			 * Get the number of items stored in the queue
+			 */
+			std::size_t
+			getSize() const;
+			
+			bool
+			append(const T& item, uint32_t timeout = -1);
+			
+			bool
+			prepend(const T& item, uint32_t timeout = -1);
+			
+			
+			bool
+			peek(T& item, uint32_t timeout = -1) const;
+			
+			bool
+			get(T& item, uint32_t timeout = -1);
+			
+			
+			inline bool
+			appendFromInterrupt(const T& item);
+			
+			inline bool
+			prependFromInterrupt(const T& item);
+			
+			inline bool
+			getFromInterrupt(T& item);
+			
+		private:
+			// disable copy constructor
+			Queue(const Queue& other);
+			
+			// disable assignment operator
+			Queue&
+			operator = (const Queue& other);
+			
+			mutable std::timed_mutex mutex;
+			
+			uint32_t maxSize;
+			std::deque<T> deque;
+		};
 	}
-	--count;
-	
-	return true;
 }
 
-void
-xpcc::rtos::Semaphore::release()
-{
-	boost::unique_lock<boost::mutex> lock(mutex);
-	
-	if (count < maxCount) {
-		++count;
-		
-		// Wake up any waiting threads. 
-		// Always do this, even if count_ wasn't 0 on entry. Otherwise, we
-		// might not wake up enough waiting threads if we get a number of
-		// signal() calls in a row.
-		condition.notify_one();
-	}
-}
-
-// ----------------------------------------------------------------------------
-xpcc::rtos::BinarySemaphore::BinarySemaphore() :
-		Semaphore(1, 1)
-{
-}
+#endif // XPCC_BOOST__QUEUE_HPP

@@ -35,8 +35,9 @@
 #	error "Don't include this file directly, use <xpcc/processing/rtos/thread.hpp>"
 #endif
 
-#include <boost/scoped_ptr.hpp>
-#include <boost/thread/thread.hpp>
+#include <memory>
+#include <thread>
+#include <mutex>
 
 /**
  * \brief	Create a timed periodic loop
@@ -58,7 +59,7 @@
  * \see		MILLISECONDS
  * 
  * \hideinitializer
- * \ingroup	boost_rtos
+ * \ingroup	stdlib_rtos
  */
 /*#define	TIME_LOOP(frequency)										\
 		for(portTickType lastTime = xTaskGetTickCount() ;			\
@@ -75,7 +76,7 @@
  * \endcode
  * 
  * \hideinitializer
- * \ingroup	boost_rtos
+ * \ingroup	stdlib_rtos
  */
 #define	MILLISECONDS		1
 
@@ -89,7 +90,7 @@ namespace xpcc
 		/**
 		 * \brief	Thread
 		 * 
-		 * \ingroup	boost_rtos
+		 * \ingroup	stdlib_rtos
 		 */
 		class Thread
 		{
@@ -97,9 +98,9 @@ namespace xpcc
 			/**
 			 * \brief	Create a Thread
 			 * 
-			 * \param	priority	unused for boost::thread
-			 * \param	stackDepth	unused for boost::thread
-			 * \param	name		unused for boost::thread
+			 * \param	priority	unused for std::thread
+			 * \param	stackDepth	unused for std::thread
+			 * \param	name		unused for std::thread
 			 * 
 			 * \warning	Threads may not be created while the scheduler is running!
 			 * 			Create them be before calling Scheduler::schedule() or
@@ -122,7 +123,7 @@ namespace xpcc
 			/**
 			 * \brief	Set the priority of the thread
 			 * 
-			 * Does nothing for boost::thread.
+			 * Does nothing for std::thread.
 			 */
 			void
 			setPriority(uint_fast32_t priority)
@@ -137,9 +138,14 @@ namespace xpcc
 			 * for the thread that created them on construction, and restore
 			 * the interruption state to whatever it was before on destruction.
 			 * 
-			 * \see		boost::this_thread::disable_interruption
+			 * @warning std::thread cannot be interrupted, so this implementation is empty!
 			 */
-			typedef boost::this_thread::disable_interruption Lock;
+			class Lock
+			{
+			public:
+				inline Lock() {}
+				inline ~Lock() {}
+			};
 			
 		protected:
 			/**
@@ -148,7 +154,7 @@ namespace xpcc
 			static inline void
 			sleep(uint32_t ms)
 			{
-				boost::this_thread::sleep(boost::posix_time::milliseconds(ms));
+				std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 			}
 			
 			/**
@@ -159,7 +165,7 @@ namespace xpcc
 			static inline void
 			yield()
 			{
-				boost::this_thread::yield();
+				std::this_thread::yield();
 			}
 			
 			/**
@@ -180,8 +186,8 @@ namespace xpcc
 			Thread *next;
 			static Thread* head;
 			
-			boost::mutex mutex;
-			boost::scoped_ptr<boost::thread> thread;
+			std::mutex mutex;
+			std::unique_ptr<std::thread> thread;
 		};
 	}
 }

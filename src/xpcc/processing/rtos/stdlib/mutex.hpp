@@ -28,40 +28,83 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "../thread.hpp"
+#ifndef XPCC_BOOST__MUTEX_HPP
+#define XPCC_BOOST__MUTEX_HPP
 
-xpcc::rtos::Thread* xpcc::rtos::Thread::head = 0;
+#ifndef XPCC_RTOS__MUTEX_HPP
+#	error "Don't include this file directly, use <xpcc/processing/rtos/mutex.hpp>"
+#endif
 
-// ----------------------------------------------------------------------------
-xpcc::rtos::Thread::Thread(uint32_t priority, uint16_t stackDepth, const char* name) :
-	next(0),
-	thread()
+#include <mutex>
+
+namespace xpcc
 {
-	// avoid compiler warnings
-	(void) priority;
-	(void) stackDepth;
-	(void) name;
-	
-	// create a list of all threads
-	if (head == 0) {
-		head = this;
+	namespace rtos
+	{
+		// forward declaration
+		class MutexGuard;
+		
+		/**
+		 * \brief	Mutex
+		 * 
+		 * \ingroup	stdlib_rtos
+		 */
+		class Mutex
+		{
+			friend class MutexGuard;
+			
+		public:
+			Mutex();
+			
+			~Mutex();
+			
+			/**
+			 * \param	timeout		Timeout in Milliseconds
+			 */
+			bool
+			acquire(uint32_t timeout);
+			
+			inline void
+			acquire()
+			{
+				mutex.lock();
+			}
+			
+			inline void
+			release()
+			{
+				mutex.unlock();
+			}
+			
+		private:
+			// disable copy constructor
+			Mutex(const Mutex& other);
+			
+			// disable assignment operator
+			Mutex&
+			operator = (const Mutex& other);
+			
+			std::timed_mutex mutex;
+		};
+		
+		/**
+		 * Implements a RAII-style locking.
+		 * 
+		 * Locks the Mutex when created and unlocks it on destruction.
+		 */
+		class MutexGuard : std::lock_guard<std::timed_mutex>
+		{
+		public:
+			MutexGuard(Mutex& m) :
+				std::lock_guard<std::timed_mutex>(m.mutex)
+			{
+			}
+			
+			~MutexGuard()
+			{
+			}
+		};
 	}
-	else {
-		Thread *list = head;
-		while (list->next != 0) {
-			list = list->next;
-		}
-		list->next = this;
-	}
 }
 
-xpcc::rtos::Thread::~Thread()
-{
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::rtos::Thread::start()
-{
-	this->thread.reset(new boost::thread(boost::bind(&Thread::run, this)));
-}
+#endif // XPCC_BOOST__MUTEX_HPP

@@ -34,7 +34,7 @@
 #include <xpcc/architecture/utils.hpp>
 
 #ifdef XPCC__OS_HOSTED
-#	include "boost/semaphore.hpp"
+#	include "stdlib/semaphore.hpp"
 #elif defined(XPCC__CPU_CORTEX_M3) || defined(XPCC__CPU_CORTEX_M4)
 #	include "freertos/semaphore.hpp"
 #endif

@@ -34,7 +34,7 @@
 #include <xpcc/architecture/utils.hpp>
 
 #ifdef XPCC__OS_HOSTED
-#	include "boost/queue.hpp"
+#	include "stdlib/queue.hpp"
 #elif defined(XPCC__CPU_CORTEX_M3) || defined(XPCC__CPU_CORTEX_M4)
 #	include "freertos/queue.hpp"
 #endif

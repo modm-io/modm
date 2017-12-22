@@ -28,23 +28,49 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "../scheduler.hpp"
-#include "../thread.hpp"
+#include "../semaphore.hpp"
+#include <chrono>
+
+// ----------------------------------------------------------------------------
+xpcc::rtos::Semaphore::Semaphore(uint32_t max, uint32_t initial) :
+	count(initial), maxCount(max)
+{
+}
+
+// ----------------------------------------------------------------------------
+bool
+xpcc::rtos::Semaphore::acquire(uint32_t timeout)
+{
+	std::unique_lock<std::mutex> lock(mutex);
+	while (count == 0)
+	{
+		 if (condition.wait_for(lock, std::chrono::milliseconds(timeout)) == std::cv_status::timeout) {
+			 return false;
+		 }
+	}
+	--count;
+	
+	return true;
+}
 
 void
-xpcc::rtos::Scheduler::schedule()
+xpcc::rtos::Semaphore::release()
 {
-	// Start all threads
-	Thread* list = Thread::head;
-	while (list != 0) {
-		list->start();
-		list = list->next;
-	}
+	std::unique_lock<std::mutex> lock(mutex);
 	
-	while (1)
-	{
-		// Threads are started and will do all the work. Just
-		// sleep a bit here when there is nothing else to do. 
-		boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+	if (count < maxCount) {
+		++count;
+		
+		// Wake up any waiting threads. 
+		// Always do this, even if count_ wasn't 0 on entry. Otherwise, we
+		// might not wake up enough waiting threads if we get a number of
+		// signal() calls in a row.
+		condition.notify_one();
 	}
+}
+
+// ----------------------------------------------------------------------------
+xpcc::rtos::BinarySemaphore::BinarySemaphore() :
+		Semaphore(1, 1)
+{
 }

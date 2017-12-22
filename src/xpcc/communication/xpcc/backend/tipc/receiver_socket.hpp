@@ -32,7 +32,6 @@
 
 #include "header.hpp"
 
-#include <boost/scoped_array.hpp>
 #include <stdint.h>
 
 namespace xpcc {
