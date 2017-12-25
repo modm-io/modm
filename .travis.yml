@@ -39,7 +39,7 @@ before_install:
  - arm-none-eabi-g++ --version
  - pip install --upgrade pip wheel
  - pip install jinja2 lxml numpy
- - pip install scons==2.5.1
+ - pip install scons
  - pip install configparser future
  - pip install pyx==0.12.1
  - pip3 install wheel
