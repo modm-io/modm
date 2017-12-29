@@ -92,8 +92,7 @@ modm::IOStream::vprintf(const char *fmt, va_list ap)
 		{
 			case 'c':
 				c = va_arg(ap, int); // char promoted to int
-				/* no break */
-
+				// fall through
 			default:
 				this->device->write(c);
 				continue;
@@ -112,7 +111,7 @@ modm::IOStream::vprintf(const char *fmt, va_list ap)
 
 			case 'd':
 				isSigned = true;
-				/* no break */
+				// fall through
 
 			case 'u':
 				base = 10;
@@ -125,7 +124,7 @@ modm::IOStream::vprintf(const char *fmt, va_list ap)
 				width = (MODM_SIZEOF_POINTER * 2);
 				isLong = (MODM_SIZEOF_POINTER == 4);
 				isLongLong = (MODM_SIZEOF_POINTER == 8);
-				/* no break */
+				// fall through
 			case 'x':
 				base = 16;
 				break;
