@@ -11,11 +11,15 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
+
 def init(module):
     module.name = "container"
 
+
 def prepare(module, options):
+    module.depends(':architecture')
     return True
+
 
 def build(env):
     env.outbasepath = "src/modm/container"

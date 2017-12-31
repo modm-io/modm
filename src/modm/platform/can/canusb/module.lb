@@ -11,16 +11,19 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
+
 def init(module):
     module.name = "canusb"
     module.parent = "platform"
+
 
 def prepare(module, options):
     if not options[":target"].has_driver("can:canusb"):
         return False
 
-    module.depends(":platform:core", ":driver")   # FIXME requires driver/can
+    module.depends(":platform:core", ":driver")  # FIXME requires driver/can
     return True
+
 
 def build(env):
     device = env[":target"]
@@ -35,4 +38,4 @@ def build(env):
     env.outbasepath = "src/modm/platform/can"
 
     env.copy("canusb.hpp")
-    env.copy("canusb.cpp")
+    env.copy("canusb_impl.hpp")

@@ -11,9 +11,11 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
+
 def init(module):
     module.name = "uart"
     module.parent = "platform"
+
 
 def prepare(module, options):
     if not options[":target"].has_driver("uart:hosted"):
@@ -21,6 +23,7 @@ def prepare(module, options):
 
     module.depends(":platform:core")
     return True
+
 
 def build(env):
     device = env[":target"]
@@ -33,5 +36,8 @@ def build(env):
 
     env.substitutions = properties
     env.outbasepath = "src/modm/platform/uart"
+
+    env.append_metadata_unique("required_library", "boost_system")
+    env.append_metadata_unique("required_library", "boost_thread")
 
     env.copy(".", ignore=env.ignore_files("*.lb"))

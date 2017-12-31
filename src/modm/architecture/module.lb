@@ -11,12 +11,15 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
+
 def init(module):
     module.name = "architecture"
 
+
 def prepare(module, options):
-    module.depends(":processing", ":io")
+    module.depends(":processing", ":io", ":platform:core")
     return True
+
 
 def build(env):
     env.outbasepath = "src/modm/architecture"
