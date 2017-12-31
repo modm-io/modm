@@ -13,7 +13,7 @@
 
 #include <unittest/testsuite.hpp>
 
-#include "../slave.hpp"
+#include <modm/communication/sab/slave.hpp>
 #include "fake_io_device.hpp"
 
 class SlaveTest : public unittest::TestSuite

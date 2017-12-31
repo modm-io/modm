@@ -14,7 +14,7 @@
 
 #include "block_allocator_test.hpp"
 
-#include "../block_allocator.hpp"
+#include <modm/architecture/driver/heap/block_allocator.hpp>
 
 void
 BlockAllocatorTest::testAvailableSize()

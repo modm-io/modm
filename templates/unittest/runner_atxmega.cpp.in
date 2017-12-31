@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2011, Fabian Greif
+ * Copyright (c) 2009-2011, 2017, Fabian Greif
  * Copyright (c) 2010, Martin Rosekeit
  * Copyright (c) 2016, Niklas Hauser
  *
@@ -15,7 +15,7 @@
 // Please modify the corresponding 'runner_atxmega.cpp.in' file instead.
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/platform.hpp>
+#include <modm/platform/platform.hpp>
 
 #include <unittest/reporter.hpp>
 #include <unittest/controller.hpp>

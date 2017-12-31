@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "../interface.hpp"
+#include <modm/communication/sab/interface.hpp>
 
 #include "fake_io_device.hpp"
 #include "interface_test.hpp"

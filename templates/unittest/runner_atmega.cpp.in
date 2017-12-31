@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2011, Fabian Greif
+ * Copyright (c) 2009-2011, 2017, Fabian Greif
  * Copyright (c) 2010, Martin Rosekeit
  * Copyright (c) 2016, Sascha Schade
  * Copyright (c) 2016, Niklas Hauser
@@ -19,7 +19,7 @@
 #include <unittest/reporter.hpp>
 #include <unittest/controller.hpp>
 
-#include <modm/architecture/platform.hpp>
+#include <modm/platform/platform.hpp>
 
 using namespace modm::platform;
 typedef modm::platform::SystemClock clock;
