@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2017, Fabian Greif
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+
+def init(module):
+    module.name = "architecture"
+    module.parent = "test"
+
+
+def prepare(module, options):
+    return True
+
+
+def build(env):
+    env.outbasepath = "test/modm/architecture"
+
+    ignore_patterns = ["*.lb", "*.cfg", "*.xml"]
+    target = env[":target"].identifier
+    if target["platform"] == "hosted":
+        # Test does not work on hosted
+        ignore_patterns.append("*driver/clock_test.*")
+
+    env.copy('.', ignore=env.ignore_patterns(*ignore_patterns))
