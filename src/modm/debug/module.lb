@@ -11,14 +11,26 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
+
 def init(module):
     module.name = "debug"
 
+
 def prepare(module, options):
+    target = options[":target"].identifier
+    if target["platform"] == "hosted":
+        module.depends(":platform:uart")
+
     return True
+
 
 def build(env):
     env.outbasepath = "src/modm/debug"
 
-    # FIXME reenable default style if target is hosted
-    env.copy(".", ignore=env.ignore_patterns("*.lb", "*logger/hosted/*"))
+    ignore_patterns = ["*.lb"]
+    target = env[":target"].identifier
+    if target["platform"] != "hosted":
+        ignore_patterns.append("*logger/hosted/*")
+
+    env.copy(".", ignore=env.ignore_patterns(*ignore_patterns))
+

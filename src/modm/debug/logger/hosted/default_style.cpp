@@ -18,7 +18,7 @@
 #include "../style/std_colour.hpp"
 
 #include <modm/architecture/utils.hpp>
-#include <modm/architecture/platform/driver/uart/hosted/terminal.hpp>
+#include <modm/platform/uart/terminal.hpp>
 
 static modm::pc::Terminal device;
 
