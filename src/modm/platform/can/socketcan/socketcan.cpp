@@ -19,6 +19,7 @@
 #include <sys/ioctl.h>
 #include <net/if.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 #include <linux/can.h>
 #include <linux/can/raw.h>
