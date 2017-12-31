@@ -14,13 +14,13 @@
 #include <stdlib.h>
 
 void *
-operator new(size_t size, modm::MemoryTraits)
+operator new(size_t size, modm::MemoryTraits) noexcept
 {
 	return ::operator new(size);
 }
 
 void *
-operator new[](size_t size, modm::MemoryTraits)
+operator new[](size_t size, modm::MemoryTraits) noexcept
 {
 	return ::operator new[](size);
 }

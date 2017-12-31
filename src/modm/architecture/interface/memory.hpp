@@ -95,7 +95,7 @@ constexpr MemoryTraits MemoryDefault = MemoryDMA;
  * @ingroup memory_traits
  */
 void *
-operator new(size_t size, modm::MemoryTraits traits);
+operator new(size_t size, modm::MemoryTraits traits) noexcept;
 
 /** Request array memory with defined traits.
  * @code
@@ -106,6 +106,6 @@ operator new(size_t size, modm::MemoryTraits traits);
  * @ingroup memory_traits
  */
 void *
-operator new[](size_t size, modm::MemoryTraits traits);
+operator new[](size_t size, modm::MemoryTraits traits) noexcept;
 
 #endif // MODM_MEMORY_HPP
