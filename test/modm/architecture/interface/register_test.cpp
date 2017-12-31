@@ -183,7 +183,7 @@ RegisterTest::testOperators()
 
 	// bool conversion
 	v1 = Test::A;
-	TEST_ASSERT_TRUE(v1);
+	TEST_ASSERT_TRUE(static_cast<bool>(v1));
 	v1 = Test(0);
 	TEST_ASSERT_FALSE(v1);
 }
