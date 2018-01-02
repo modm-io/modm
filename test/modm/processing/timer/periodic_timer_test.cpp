@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010, Fabian Greif
+ * Copyright (c) 2009-2010, 2017, Fabian Greif
  * Copyright (c) 2010, Martin Rosekeit
  * Copyright (c) 2012, 2015, Niklas Hauser
  * Copyright (c) 2013, Sascha Schade
@@ -13,8 +13,8 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/processing/timer.hpp>
-#include <modm/architecture/driver/clock_dummy.hpp>
 
+#include "clock_dummy.hpp"
 #include "periodic_timer_test.hpp"
 
 void
