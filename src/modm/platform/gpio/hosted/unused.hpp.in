@@ -1,0 +1,92 @@
+/*
+ * Copyright (c) 2017, Fabian Greif
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_HOSTED_GPIO_PIN_UNUSED_HPP
+#define MODM_HOSTED_GPIO_PIN_UNUSED_HPP
+
+#include "base.hpp"
+#include <modm/architecture/interface/gpio.hpp>
+
+namespace modm
+{
+
+namespace platform
+{
+
+/**
+ * Dummy implementation of an I/O pin.
+ *
+ * This class can be used when a pin is not required. All functions
+ * are dummy functions which do nothing. `read()` will always
+ * return `false`.
+ *
+ * For example when creating a software SPI with the modm::SoftwareSimpleSpi
+ * class and the return channel (MISO - Master In Slave Out) is not needed,
+ * a good way is to use this class as a parameter when defining the
+ * SPI class.
+ *
+ * Example:
+ * @code
+ * #include <modm/architecture/platform.hpp>
+ *
+ * namespace pin
+ * {
+ *     typedef GpioOutputD7 Clk;
+ *     typedef GpioOutputD5 Mosi;
+ * }
+ *
+ * modm::SoftwareSpiMaster< pin::Clk, pin::Mosi, GpioUnused > Spi;
+ *
+ * ...partname
+ * Spi::write(0xaa);
+ * @endcode
+ *
+ * @author	Fabian Greif
+ * @author	Niklas Hauser
+ * @ingroup	{{target.family}}_gpio
+ */
+class GpioUnused : public Gpio, public ::modm::GpioIO
+{
+public:
+	using Output = GpioUnused;
+	using Input = GpioUnused;
+	using IO = GpioUnused;
+	using Type = GpioUnused;
+
+public:
+	// GpioOutput
+	// start documentation inherited
+	static void setOutput() {}
+	static void setOutput(bool) {}
+	static void set() {}
+	static void set(bool) {}
+	static void reset() {}
+	static void toggle() {}
+	static bool isSet() { return false; }
+	// stop documentation inherited
+	
+	// GpioInput
+	// start documentation inherited
+	static void setInput() {}
+	static bool read() { return false; }
+	// end documentation inherited
+	
+	// GpioIO
+	// start documentation inherited
+	static Direction getDirection() { return Direction::Special; }
+	// end documentation inherited
+};
+
+} // namespace platform
+
+} // namespace modm
+
+#endif

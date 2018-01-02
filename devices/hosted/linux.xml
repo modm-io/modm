@@ -10,6 +10,7 @@
     <driver name="can" type="canusb"/>
     <driver name="core" type="hosted"/>
     <driver name="graphics" type="hosted"/>
+    <driver name="gpio" type="hosted"/>
     <driver name="uart" type="hosted"/>
     <driver name="uart" type="posix"/>
   </device>
