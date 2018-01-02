@@ -11,8 +11,10 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
+
 def init(module):
     module.name = "driver"
+
 
 def prepare(module, options):
     module.add_option(
@@ -31,15 +33,16 @@ def prepare(module, options):
             default="3.3V"))
 
     module.depends(":ui", ":debug")
-    if options[":target"].identifier["platform"] != "avr":
-        module.depends(":fatfs")
     return True
+
 
 def build(env):
     env.outbasepath = "src/modm/driver"
 
     # Copy all files except for the templates and the module file.
-    env.copy(".", ignore=env.ignore_files("*.lb", "*.in", "fat*"))
+    # Excludes the storage module as well, because it is implemented as a
+    # separate module.
+    env.copy(".", ignore=env.ignore_files("*.lb", "*.in", "*storage"))
 
     env.template("can/mcp2515.cpp.in")
     env.template("display/st7036.cpp.in")
