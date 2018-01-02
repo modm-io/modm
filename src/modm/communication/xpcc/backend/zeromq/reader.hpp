@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	MOD_EROMQ_READER_HPP
-#define	MOD_EROMQ_READER_HPP
+#ifndef	XPCC_ZEROMQ_READER_HPP
+#define	XPCC_ZEROMQ_READER_HPP
 
 #include <thread>
 #include <mutex>
@@ -26,7 +26,7 @@
 #undef MODM_LOG_LEVEL
 #define	MODM_LOG_LEVEL modm::log::ERROR
 
-namespace modm
+namespace xpcc
 {
 
 /**
@@ -45,9 +45,11 @@ public:
 	struct Packet
 	{
 		Packet(uint16_t size, const Header& inHeader) :
-			header(inHeader), payload(size) {}
+			header(inHeader), payload(size)
+		{
+		}
 
-		modm::Header header;
+		xpcc::Header header;
 		modm::SmartPointer payload;
 	};
 
@@ -93,4 +95,4 @@ private:
 
 } // modm namespace
 
-#endif // MOD_EROMQ_CONNECTOR_HPP
+#endif // XPCC_ZEROMQ_READER_HPP

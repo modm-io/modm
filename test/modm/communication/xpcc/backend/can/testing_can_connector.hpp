@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009, Martin Rosekeit
- * Copyright (c) 2009-2010, Fabian Greif
+ * Copyright (c) 2009-2010, 2017, Fabian Greif
  * Copyright (c) 2012-2014, Niklas Hauser
  * Copyright (c) 2013, Kevin Läufer
  *
@@ -15,7 +15,8 @@
 #ifndef TESTING_CAN_CONNECTOR_HPP
 #define TESTING_CAN_CONNECTOR_HPP
 
-#include "../connector.hpp"
+#include <modm/communication/xpcc/backend/can/connector.hpp>
+
 #include "fake_can_driver.hpp"
 
 class TestingCanConnector : public xpcc::CanConnector<FakeCanDriver>

@@ -51,16 +51,22 @@ public:
 
 	~ZeroMQConnector() override;
 
-	sendPacket(const Header &header, SmartPointer payload) override;
+	virtual void
+	sendPacket(const Header &header, modm::SmartPointer payload) override;
 
+	virtual bool
 	isPacketAvailable() const override;
 
+	virtual const Header&
 	getPacketHeader() const override;
 
+	virtual const modm::SmartPointer
 	getPacketPayload() const override;
 
+	virtual void
 	dropPacket() override;
 
+	virtual void
 	update() override;
 
 protected:

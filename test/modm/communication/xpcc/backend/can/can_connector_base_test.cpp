@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, Fabian Greif
+ * Copyright (c) 2010, 2017 Fabian Greif
  * Copyright (c) 2012-2014, Niklas Hauser
  * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2016, Sascha Schade
@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "../connector.hpp"
+#include <modm/communication/xpcc/backend/can/connector.hpp>
 #include "can_connector_base_test.hpp"
 
 // ----------------------------------------------------------------------------

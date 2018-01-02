@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, Fabian Greif
+ * Copyright (c) 2010-2011, 2017, Fabian Greif
  * Copyright (c) 2012-2013, 2016, Niklas Hauser
  * Copyright (c) 2016, Sascha Schade
  *
@@ -14,7 +14,7 @@
 #define	UNITTEST_RETURN_ON_FAIL
 #include "dispatcher_test.hpp"
 
-#include <modm/architecture/driver/test/testing_clock.hpp>
+#include <modm/architecture/driver/testing_clock.hpp>
 
 // ----------------------------------------------------------------------------
 void

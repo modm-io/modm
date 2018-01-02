@@ -14,7 +14,7 @@
 
 #include <algorithm>
 
-namespace modm
+namespace xpcc
 {
 
 // ----------------------------------------------------------------------------
@@ -117,8 +117,8 @@ ZeroMQReader::readPacket(const zmqpp::message& message)
 		const uint8_t* const data = static_cast<const uint8_t*>(message.raw_data());
 		const auto payloadSize = size - headerSize;
 
-		modm::Header header = modm::Header(
-			/* type = */ modm::Header::Type(data[0]),
+		xpcc::Header header = xpcc::Header(
+			/* type = */ xpcc::Header::Type(data[0]),
 			/* ack  = */ data[1],
 			/* dest = */ data[2],
 			/* src  = */ data[3],

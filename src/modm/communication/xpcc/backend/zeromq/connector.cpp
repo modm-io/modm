@@ -12,7 +12,7 @@
 
 #include "connector.hpp"
 
-namespace modm
+namespace xpcc
 {
 
 ZeroMQConnector::ZeroMQConnector(std::string endpointIn, std::string endpointOut, Mode mode) :
@@ -58,7 +58,7 @@ ZeroMQConnector::~ZeroMQConnector()
 
 // ----------------------------------------------------------------------------
 void
-ZeroMQConnector::sendPacket(const Header &header, SmartPointer payload)
+ZeroMQConnector::sendPacket(const Header &header, modm::SmartPointer payload)
 {
 	// Publish the reassembled message with zeromq
 	zmqpp::message message;
@@ -72,7 +72,8 @@ ZeroMQConnector::sendPacket(const Header &header, SmartPointer payload)
 	// Maximum valid size of modm::SmartPointer
 	constexpr uint16_t maxPayloadSize = 65529;
 
-	if(payload.getSize() > maxPayloadSize) {
+	if (payload.getSize() > maxPayloadSize)
+	{
 		MODM_LOG_ERROR << MODM_FILE_INFO;
 		MODM_LOG_ERROR << "Trying to send message with invalid size: ";
 		MODM_LOG_ERROR << payload.getSize() << modm::endl;
