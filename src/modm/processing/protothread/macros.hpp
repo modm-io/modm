@@ -61,6 +61,7 @@
 #define PT_WAIT_WHILE(condition) \
     do { \
 		this->ptState = __LINE__; \
+		/* fall through */ \
 		case __LINE__: \
 			if (condition) \
 				return true; \

@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2014, Kevin Läufer
  * Copyright (c) 2014-2015, Niklas Hauser
+ * Copyright (c) 2017, Fabian Greif
  *
  * This file is part of the modm project.
  *
@@ -44,6 +45,7 @@
  */
 #define RF_END_RETURN(result) \
 			RF_RETURN(result); \
+			/* fall through */ \
 		default: \
 			this->popRf(); \
 			return {modm::rf::WrongState}; \
@@ -76,6 +78,7 @@
  */
 #define RF_END_RETURN_CALL(resumable) \
 			RF_RETURN_CALL(resumable); \
+			/* fall through */ \
 		default: \
 			this->popRf(); \
 			return {modm::rf::WrongState}; \
@@ -198,6 +201,7 @@
 /// Required macro to set the same unique number twice
 #define RF_INTERNAL_SET_CASE(counter) \
 			this->setRf((counter % 255) + 1, rfIndex); \
+			/* fall through */ \
 		case ((counter % 255) + 1): ;
 
 /// Internal macro for yield
