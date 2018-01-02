@@ -11,18 +11,27 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
+
 def init(module):
     module.name = "communication"
+
 
 def prepare(module, options):
     module.depends(":debug")
     return True
+
 
 def build(env):
     env.outbasepath = "src/modm/communication"
     ignore = ["*.lb", "*.in", "*communication/xpcc/backend/tipc*"]
     if env[":target"].identifier["platform"] == "avr":
         ignore.append("*communication/xpcc/postman/dynamic*")
+
     if env[":target"].identifier["platform"] != "hosted":
         ignore.append("*communication/xpcc/backend/zeromq*")
+    else:
+        env.append_metadata_unique("required_library", "zmqpp")
+        env.append_metadata_unique("required_library", "zmq")
+        env.append_metadata("required_library", "pthread")
+
     env.copy('.', ignore=env.ignore_patterns(*ignore))
