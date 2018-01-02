@@ -13,7 +13,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "../internal/algorithm_base.hpp"
+#include <stdc++/internal/algorithm_base.hpp>
 #include "algorithm_base_test.hpp"
 
 void
