@@ -11,15 +11,21 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
+
 def init(module):
     module.name = "stdc++"
 
+
 def prepare(module, options):
+    target = options[":target"].identifier
+    if target["platform"] != "avr":
+        return False
+
     return True
+
 
 def build(env):
     env.append_metadata_unique("include_path", "src/stdc++")
 
     env.outbasepath = "src/stdc++"
-
     env.copy(".", ignore=env.ignore_files("*.lb"))
