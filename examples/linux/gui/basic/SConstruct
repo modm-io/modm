@@ -2,4 +2,4 @@
 # path to the xpcc root directory
 xpccpath = '../../../..'
 # execute the xpcc basic
-execfile(xpccpath + '/scons/SConstruct')
+exec(compile(open(xpccpath + '/scons/SConstruct', "rb").read(), xpccpath + '/scons/SConstruct', 'exec'))

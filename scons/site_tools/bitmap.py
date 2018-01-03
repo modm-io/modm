@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #
 # Copyright (c) 2009, Roboterclub Aachen e.V.
 # All rights reserved.
@@ -108,7 +108,7 @@ def bitmap_action(target, source, env):
 		for x in range(width):
 			index = x + y * width
 			if input[index] == "1":
-				data[y / 8][x] |= 1 << (y % 8)
+				data[y // 8][x] |= 1 << (y % 8)
 
 	array = []
 	for y in range(rows):

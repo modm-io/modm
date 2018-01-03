@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 import threading
 import Queue
@@ -121,7 +121,7 @@ class SerialInterface:
 		# close serial port
 		try:
 			del self._interface
-		except serial.SerialPortException, e:
+		except serial.SerialPortException as e:
 			raise CanException(e)
 		
 		self.isConnected = False
@@ -129,7 +129,7 @@ class SerialInterface:
 	
 	def _debug(self, text):
 		if self.debugFlag:
-			print text
+			print(text)
 	
 	def _sendRaw(self, data):
 		self._interface.write(data)
@@ -335,7 +335,7 @@ class DebugInterface(SerialInterface, dispatcher.MessageDispatcher):
 		pass
 	
 	def send(self, message):
-		print message
+		print(message)
 	
 	def sendRaw(self, data):
 		pass

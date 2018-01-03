@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # 
 # Copyright (c) 2013, Roboterclub Aachen e.V.
 # All rights reserved.
@@ -100,14 +100,14 @@ class Logger:
 	def setLogLevel(self, new_level):
 		if isinstance(new_level, int):
 			self.log_level = new_level
-		elif isinstance(new_level, basestring):
+		elif isinstance(new_level, str):
 			new_level = new_level.lower()
 			if new_level in self.LOG_LEVEL:
 				self.log_level = self.LOG_LEVEL[new_level]
 
 	def isLogLevel(self, log_level):
 		# Try to Convert Log Level String to Int
-		if isinstance(log_level, basestring):
+		if isinstance(log_level, str):
 			log_level = log_level.lower()
 			if log_level in self.LOG_LEVEL:
 				log_level = self.LOG_LEVEL[log_level]

@@ -16,6 +16,8 @@ addons:
    - libgtkmm-2.4-dev
    - g++-7
    - libzmqpp-dev
+   - texlive-latex-base
+   - texlive-fonts-recommended
 
 before_install:
  - export CC=gcc-7
@@ -36,8 +38,12 @@ before_install:
  - which arm-none-eabi-g++
  - arm-none-eabi-g++ --version
  - pip install --upgrade pip wheel
- - pip install jinja2 lxml
- - pip install scons==2.5.1
+ - pip install jinja2 lxml numpy
+ - pip install scons
+ - pip install configparser future
+ - pip install pyx==0.12.1
+ - pip3 install wheel
+ - pip3 install jinja2 lxml numpy scons pyx
 
 cache:
  directories:
@@ -57,3 +63,13 @@ env:
  - TEST_SUITE="unittest target=atmega"
 
 script: "scons $TEST_SUITE"
+
+jobs:
+  include:
+    - stage: deploy
+      script:
+        - "python2 tools/authors.py --handles --count --shoutout --since 2017-01-01"
+        - "python3 tools/authors.py --handles --count --shoutout --since 2017-01-01"
+        - "python2 tools/system_design/builder/system_layout.py examples/communication/xml/communication.xml -o /tmp"
+        - "python3 tools/system_design/builder/system_layout.py examples/communication/xml/communication.xml -o /tmp"
+      env: TEST_SUITE=""

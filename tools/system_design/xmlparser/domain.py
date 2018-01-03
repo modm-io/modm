@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from . import utils
@@ -27,8 +27,15 @@ class Domain:
 		
 		self.description = xml_utils.get_description(node)
 				
+		
 	def __cmp__(self, other):
-		return cmp(self.name.lower(), other.name.lower())
+		return 1 - self.__eq__(other) - 2 * self.__lt__(other)
+
+	def __lt__(self, other):
+		return self.name.lower() < other.name.lower()
+
+	def __eq__(self, other):
+		return self.name.lower() == other.name.lower()
 	
 	def dump(self):
 		return "Domain %s\n" % self.name

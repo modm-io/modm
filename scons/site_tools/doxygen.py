@@ -76,17 +76,12 @@ def DoxyfileParse(file_contents):
 			append_data( data, key, new_data, '\\' )
 
 	# compress lists of len 1 into single strings
-	for (k, v) in data.items():
-		if len(v) == 0:
-			data.pop(k)
+	# items in the following list will be kept as lists and not converted to strings
+	no_convert = ["INPUT", "FILE_PATTERNS", "EXCLUDE_PATTERNS"]
 
-		# items in the following list will be kept as lists and not converted to strings
-		if k in ["INPUT", "FILE_PATTERNS", "EXCLUDE_PATTERNS"]:
-			continue
-
-		if len(v) == 1:
-			data[k] = v[0]
-
+	data = {k: v[0] if (len(v) == 1 and k in no_convert) else v
+			for k, v in data.items()
+			if len(v) != 0}
 	return data
 
 def DoxySourceScan(node, env, path):
@@ -107,7 +102,7 @@ def DoxySourceScan(node, env, path):
 
 	sources = []
 
-	data = DoxyfileParse(node.get_contents())
+	data = DoxyfileParse(node.get_contents().decode('UTF-8'))
 
 	if data.get("RECURSIVE", "NO") == "YES":
 		recursive = True
@@ -154,7 +149,7 @@ def DoxyEmitter(source, target, env):
 		"XML": ("NO", "xml"),
 	}
 
-	data = DoxyfileParse(source[0].get_contents())
+	data = DoxyfileParse(source[0].get_contents().decode('UTF-8'))
 
 	targets = []
 	out_dir = data.get("OUTPUT_DIRECTORY", ".")

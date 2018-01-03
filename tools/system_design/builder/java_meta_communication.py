@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # 
 # Copyright (c) 2009, Roboterclub Aachen e.V.
@@ -44,7 +44,7 @@ class JavaCommunicationBuilder(builder_base.Builder):
 	This is intended to be used in a generic user interface.
 	
 	A common call would be like:
-	$python2 java_meta_communication.py  --outpath source/rca/robot --package rca.robot robot.xml;
+	$python3 java_meta_communication.py  --outpath source/rca/robot --package rca.robot robot.xml;
 	"""
 	
 	
@@ -76,8 +76,7 @@ class JavaCommunicationBuilder(builder_base.Builder):
 		# and the only not numerical type
 		components = self.tree.components
 		
-		primitives = filter.PRIMITIVES.values()
-		primitives.sort()
+		primitives = sorted(filter.PRIMITIVES.values())
 		
 		substitutions = {
 			'package' : self.options.package,

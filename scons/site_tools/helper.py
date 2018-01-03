@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #
 # Copyright (c) 2009, Roboterclub Aachen e.V.
 # All rights reserved.
@@ -29,7 +29,7 @@
 from SCons.Script import *
 
 import re
-import subprocess
+import subprocess, locale
 
 # -----------------------------------------------------------------------------
 # Output of 'arm-none-eabi-size -A build/stm32_p103.elf':
@@ -78,7 +78,7 @@ def size_action(target, source, env):
 	stackSections = {}
 	heapSections = {}
 
-	for line in stdout.splitlines():
+	for line in stdout.decode(locale.getpreferredencoding()).splitlines():
 		match = filter.match(line)
 		if match:
 			section = match.group('section')
@@ -96,12 +96,10 @@ def size_action(target, source, env):
 				heapSections[section] = 1
 
 	# create lists of the used sections for Flash and RAM
-	flashSections = flashSections.keys()
-	flashSections.sort()
-	ramSections = ramSections.keys() + stackSections.keys()
+	flashSections = sorted(flashSections.keys())
+	ramSections = list(ramSections.keys()) + list(stackSections.keys())
 	ramSections.sort()
-	heapSections = heapSections.keys()
-	heapSections.sort()
+	heapSections = sorted(heapSections.keys())
 
 	flashPercentage = flashSize / float(env['DEVICE_SIZE']['flash']) * 100.0
 	ramPercentage = ramSize / float(env['DEVICE_SIZE']['ram']) * 100.0
@@ -110,7 +108,7 @@ def size_action(target, source, env):
 
 	device = env['ARM_DEVICE']
 
-	print """Memory Usage
+	print("""Memory Usage
 ------------
 Device: %s
 
@@ -124,7 +122,7 @@ Heap:    %7d bytes (%2.1f%% available)
 (%s)
 """ % (device, flashSize, flashPercentage, ' + '.join(flashSections),
 	   ramSize + stackSize, ramPercentage + stackPercentage, ramSize, ramPercentage, stackSize, stackPercentage, ' + '.join(ramSections),
-	   heapSize, heapPercentage, ' + '.join(heapSections))
+	   heapSize, heapPercentage, ' + '.join(heapSections)))
 
 # -----------------------------------------------------------------------------
 def show_size(env, source, alias='__size'):

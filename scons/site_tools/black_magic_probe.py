@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # Copyright (c) 2016, Roboterclub Aachen e. V.
 # All Rights Reserved.
 #

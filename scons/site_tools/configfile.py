@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #
 # Copyright (c) 2009, Roboterclub Aachen e.V.
 # All rights reserved.
@@ -29,7 +29,7 @@
 import re, os, sys
 import xml.etree.ElementTree as et
 import xml.parsers.expat
-import ConfigParser
+import configparser
 import SCons.Node
 import SCons.Errors
 
@@ -41,40 +41,40 @@ def listify(node):
 class ParserException(Exception):
 	pass
 
-class Parser(ConfigParser.RawConfigParser):
+class Parser(configparser.RawConfigParser):
 
-	def read(self, filename):
+	def read(self, filename, **kwargs):
 		try:
-			return ConfigParser.RawConfigParser.read(self, filename)
-		except ConfigParser.ParsingError as e:
+			return configparser.RawConfigParser.read(self, filename, **kwargs)
+		except configparser.ParsingError as e:
 			raise SCons.Errors.UserError(str(e) + '\n')
 
-	def get(self, section, option, default=None):
+	def get(self, section, option, default=None, **kwargs):
 		try:
-			return ConfigParser.RawConfigParser.get(self, section, option)
-		except (ConfigParser.NoOptionError,
-				ConfigParser.NoSectionError), e:
+			return configparser.RawConfigParser.get(self, section, option, **kwargs)
+		except (configparser.NoOptionError,
+				configparser.NoSectionError) as e:
 			if default != None:
 				return default
 			else:
 				raise ParserException(e)
 
-	def getboolean(self, section, option, default=None):
+	def getboolean(self, section, option, default=None, **kwargs):
 		try:
-			return ConfigParser.RawConfigParser.getboolean(self, section, option)
-		except (ConfigParser.NoOptionError,
-				ConfigParser.NoSectionError,
-				ParserException), e:
+			return configparser.RawConfigParser.getboolean(self, section, option, **kwargs)
+		except (configparser.NoOptionError,
+				configparser.NoSectionError,
+				ParserException) as e:
 			if default != None:
 				return default
 			else:
 				raise ParserException(e)
 
-	def items(self, section):
+	def items(self, section, **kwargs):
 		try:
-			return ConfigParser.RawConfigParser.items(self, section)
-		except (ConfigParser.NoOptionError,
-				ConfigParser.NoSectionError), e:
+			return configparser.RawConfigParser.items(self, section, **kwargs)
+		except (configparser.NoOptionError,
+				configparser.NoSectionError) as e:
 			raise ParserException(e)
 
 # -----------------------------------------------------------------------------

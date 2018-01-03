@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # 
 # Copyright (c) 2009, Roboterclub Aachen e.V.
 # All rights reserved.
@@ -93,7 +93,7 @@ def generateClassName(s):
 
 def unittest_action(target, source, env):
 	if not env.has_key('template'):
-		raise SCons.Errors.UserError, "Use 'UnittestRunner(..., template = ...)'"
+		raise SCons.Errors.UserError("Use 'UnittestRunner(..., template = ...)'")
 	
 	template = env['template']
 	header = source
@@ -116,7 +116,7 @@ def unittest_action(target, source, env):
 	includes = []
 	name_strings = []
 	tests_cases = []
-	for class_name, attr in tests.iteritems():
+	for class_name, attr in tests.items():
 		includes.append('#include "%s"' % attr['include_path'])
 		
 		instance_name = class_name[0].lower() + class_name[1:]

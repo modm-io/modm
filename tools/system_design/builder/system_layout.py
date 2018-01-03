@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # 
 # Copyright (c) 2012, Roboterclub Aachen e.V.
@@ -47,11 +47,11 @@ class SystemLayoutBuilder(builder_base.Builder):
 	A common call would be like:
 
 	# 2012
-	$ python2 system_layout.py ../../../../roboter/2012_captain/software/global/xml/robot.xml -o /tmp  -s simulator -s "drive simulation" -s "External"
+	$ python3 system_layout.py ../../../../roboter/2012_captain/software/global/xml/robot.xml -o /tmp  -s simulator -s "drive simulation" -s "External"
 
 	# 2015
-	$ python2 system_layout.py ../../../../season/common/robot.xml --dtdpath ../../../tools/system_design/xml/dtd -o /tmp
-	$ python2 system_layout.py ../../../../season/common/robot.xml --dtdpath ../../../tools/system_design/xml/dtd -o /tmp -s "drive big simulation" -s "drive little simulation" -s "External" -s "simulator" -s "drive big"
+	$ python3 system_layout.py ../../../../season/common/robot.xml --dtdpath ../../../tools/system_design/xml/dtd -o /tmp
+	$ python3 system_layout.py ../../../../season/common/robot.xml --dtdpath ../../../tools/system_design/xml/dtd -o /tmp -s "drive big simulation" -s "drive little simulation" -s "External" -s "simulator" -s "drive big"
 	
 	A PDF called system.pdf is generated in /tmp/system.pdf.
 	
@@ -174,7 +174,7 @@ class SystemLayoutBuilder(builder_base.Builder):
 
 		print("Analysing containers:")
 		for container in self.tree.containers:
-			print " * " + container.name
+			print(" * " + container.name)
 
 		print("Done. Creating graph")
 
@@ -405,7 +405,7 @@ class SystemLayoutBuilder(builder_base.Builder):
 			
 		c.writePDFfile(file)
 		
-		print "The system layout is shown in ", file
+		print("The system layout is shown in ", file)
 
 	def setup(self, optparser):
 		optparser.add_option(

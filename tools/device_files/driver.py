@@ -40,6 +40,9 @@ from device_identifier import DeviceIdentifier
 from device_element import DeviceElementBase
 from parameters import ParameterDB
 
+from past.builtins import basestring
+from builtins import str
+
 # add python module logger to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
 from logger import Logger

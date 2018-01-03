@@ -56,7 +56,7 @@ void HardFault_Handler(void)			__attribute__((weak, alias("Undefined_Handler")))
 %% endif
 %# Remember declarations to avoid redeclarations
 %% set declarations = []
-%% for addr, interrupt in i.iteritems()
+%% for addr, interrupt in i.items()
 %% 	if interrupt[0] not in declarations
 %%		do declarations.append(interrupt[0])
 %%		set suffix = "_IRQHandler"

@@ -41,7 +41,7 @@ for dir in ['tests', 'examples']:
 			
 			if not parser.getboolean('scons', 'regenerate', True):
 				if ARGUMENTS.get('verbose') == '1':
-					print "skip '%s'" % path
+					print("skip '%s'" % path)
 				continue
 			
 			rootpath = os.sep.join(['..' for x in range(len(path.split(os.sep)))])
