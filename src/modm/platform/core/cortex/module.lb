@@ -187,10 +187,12 @@ def build(env):
 
     env.template("delay.cpp.in")
     env.copy("delay.hpp")
-    env.copy("clock.cpp")
     env.copy("atomic_lock.hpp")
     env.template("unaligned.hpp.in")
     env.copy("flash_reader.hpp")
+
+    if not env.has_module(":test"):
+        env.copy("clock.cpp")
 
     if properties["core"] != "cortex-m0":
         env.copy("cycle_counter.hpp")

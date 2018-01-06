@@ -15,6 +15,9 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/architecture/interface/clock.hpp>
+
+modm::Clock::Type modm::Clock::time = 0;
+
 %% if target["family"] in ["darwin", "linux"]
 #include <sys/time.h>
 
@@ -25,7 +28,8 @@ modm::Clock::now()
 	struct timeval now;
 	gettimeofday(&now, 0);
 
-	return TimestampType( now.tv_sec*1000 + now.tv_usec/1000 );
+	time = typename TimestampType::Type( now.tv_sec*1000 + now.tv_usec/1000 );
+	return time;
 }
 
 %% elif target["family"] in ["windows"]
@@ -38,9 +42,16 @@ modm::Clock::now()
 	SYSTEMTIME now;
 	GetSystemTime(&now);
 
-	return TimestampType( now.wMilliseconds + now.wSecond*1000 + now.wMinute*1000*60 );
+	time = typename TimestampType::Type( now.wMilliseconds + now.wSecond*1000 + now.wMinute*1000*60 );
+	return time;
 }
 %% endif
+
+void
+modm::Clock::increment(uint_fast16_t step)
+{
+	time += step;
+}
 
 // explicit declaration of what member function templates we need to generate
 template modm::ShortTimestamp modm::Clock::now();

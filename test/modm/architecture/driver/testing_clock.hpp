@@ -17,10 +17,7 @@
 #include <modm/architecture/interface/clock.hpp>
 
 /**
- * Gain full access to modm::Clock
- *
- * This class is only useful if the define MODM_CLOCK_TESTMODE is set to 1.
- * Otherwise the `time` member will be ignored on any non AVR target.
+ * Gain full access to modm::Clock::time.
  */
 class TestingClock : public modm::Clock
 {

@@ -59,11 +59,8 @@ public:
 
 public:
 	/// Update the current time
-	static inline void
-	increment(uint_fast16_t step = 1)
-	{
-		time += step;
-	}
+	static void
+	increment(uint_fast16_t step = 1);
 
 protected:
 	static Type time;

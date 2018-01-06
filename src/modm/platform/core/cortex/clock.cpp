@@ -25,6 +25,12 @@ modm::Clock::now()
 	return typename TimestampType::Type(time);
 }
 
+void
+modm::Clock::increment(uint_fast16_t step)
+{
+	time += step;
+}
+
 // explicit declaration of what member function templates we need to generate
 template modm::ShortTimestamp modm::Clock::now();
 template modm::Timestamp modm::Clock::now();

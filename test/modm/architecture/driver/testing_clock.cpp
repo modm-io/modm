@@ -1,10 +1,7 @@
 /*
+ * Copyright (c) 2009, Martin Rosekeit
  * Copyright (c) 2009-2011, Fabian Greif
- * Copyright (c) 2010, Christoph Rüdi
- * Copyright (c) 2010, Georgi Grinshpun
- * Copyright (c) 2010, Martin Rosekeit
- * Copyright (c) 2011-2012, 2014-2016, Niklas Hauser
- * Copyright (c) 2012, Sascha Schade
+ * Copyright (c) 2012, 2015, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -15,28 +12,24 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/architecture/interface/clock.hpp>
-#include <modm/architecture/interface/atomic_lock.hpp>
 
-modm::Clock::Type modm::Clock::time;
+// This class is only generated on hosted targets!
+modm::Clock::Type modm::Clock::time = 0;
 
 template< typename TimestampType >
 TimestampType
 modm::Clock::now()
 {
-	typename TimestampType::Type tempTime;
-	{
-		atomic::Lock lock;
-		tempTime = typename TimestampType::Type(time);
-	}
-	return TimestampType(tempTime);
+	return TimestampType(time);
 }
 
 void
-modm::Clock::increment(uint_fast16_t step)
+modm::Clock::increment(uint_fast16_t /* step */)
 {
-	time += step;
+	/* tumbleweed */
 }
 
 // explicit declaration of what member function templates we need to generate
 template modm::ShortTimestamp modm::Clock::now();
 template modm::Timestamp modm::Clock::now();
+
