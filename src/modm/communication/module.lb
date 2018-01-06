@@ -32,6 +32,7 @@ def build(env):
     else:
         env.append_metadata_unique("required_library", "zmqpp")
         env.append_metadata_unique("required_library", "zmq")
-        env.append_metadata("required_library", "pthread")
+        if env[":target"].identifier["family"] == "linux":
+            env.append_metadata("required_library", "pthread")
 
     env.copy('.', ignore=env.ignore_patterns(*ignore))

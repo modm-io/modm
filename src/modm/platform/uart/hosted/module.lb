@@ -38,6 +38,8 @@ def build(env):
     env.outbasepath = "src/modm/platform/uart"
 
     env.append_metadata_unique("required_library", "boost_system")
-    env.append_metadata_unique("required_library", "boost_thread")
+    env.append_metadata_unique("required_library", 
+        "boost_thread" if env[":target"].identifier["family"] == "linux" else
+        "boost_thread-mt")
 
     env.copy(".", ignore=env.ignore_files("*.lb"))

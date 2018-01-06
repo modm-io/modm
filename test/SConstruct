@@ -12,6 +12,7 @@
 #!/usr/bin/env python
 
 import os
+import sys
 
 rootpath = ".."
 
@@ -19,7 +20,7 @@ env = Environment(
         toolpath=[os.path.join(rootpath, "scons", "site_tools"),
                   os.path.join(rootpath, "ext", "dlr", "scons-build-tools", "site_tools")],
         tools=[
-            'compiler_hosted_gcc',
+            'compiler_hosted_llvm' if sys.platform == "darwin" else 'compiler_hosted_gcc',
             'settings_buildpath',
             'utils_buildformat',
             'utils_buildsize',
