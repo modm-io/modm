@@ -12,6 +12,7 @@ from collections import defaultdict
 import argparse
 
 author_handles = {
+    "Andre Gilerson": "AndreGilerson",
     "Antal Szabó": "Sh4rK",
     "Arjun Sarin": None,
     "Carl Treudler": "cajt",
@@ -37,6 +38,7 @@ author_handles = {
     "Tarik TIRE": "7Kronos",
     "Thorsten Lajewski": "TheTh0r",
     "Tomasz Chyrowicz": "tomchy",
+    "Álan Crístoffer": "acristoffers",
 }
 
 def get_author_log(since = None, until = None, handles = True, count = False):
@@ -98,6 +100,6 @@ if __name__ == "__main__":
     authors = []
     for author in log_authors:
         if any(a in author for a in new_authors):
-            author += "" # " 🎉🎊"
+            author += u" 🎉🎊"
         authors.append(author)
     print("\n".join(authors))

@@ -50,6 +50,150 @@ pay attention to. Medium impact changes are also worth looking at.
 
 </details>
 
+## 2018-01-07: 2017q4 release
+
+This release covers everything from the 2017q3 release on 2017-10-01 and has been
+tested with avr-gcc v5.4.0 from Atmel and arm-none-eabi-gcc 2017q4 from Arm. 
+
+Breaking changes:
+
+- No breaking changes.
+
+Major features:
+
+- SCons 3 and Python 3 support for built tools
+- All targets build with C++14 by default
+- Rosserial support
+- LPC support (revival)
+
+Major fixes:
+
+- Fix the I2C driver on STM32L0/L4 for writes/reads > 255 bytes.
+- Fix matrix multiplication and LU decomposition
+- Fix `GpioPort` setOutput()/setInput()/configure() on STM32
+- Fix Hd44780 initialization for 4-bit bus
+- Fix GCC7-specific compile errors and warnings
+
+Known bugs:
+
+- xpcc may generate separate IRQ handlers for shared interrupts. See [#88][].
+- GPIO `connect` on STM32F1 is still broken. See [#178][] for discussion.
+  The API from MODM will not be backported to xpcc however.
+- STM32F107 does not compile due to the HAL trying to remap USB. See [#268][].
+- SCons build system emits multiple non-critical warnings. See [#286][].
+- avr-gcc 7 complains about dynamic initialization put into program memory area. See [#314][].
+
+New development board targets:
+
+- No new development board targets
+
+New device drivers:
+
+- No new device drivers
+
+Many thanks to all our contributors.
+A special shoutout to first timers (🎉🎊):
+
+- Álan Crístoffer ([@acristoffers][]) 🎉🎊
+- Andre Gilerson ([@AndreGilerson][]) 🎉🎊
+- Carl Treudler ([@cajt][])
+- Christopher Durand ([@chris-durand][])
+- Marten Junga ([@Maju-Ketchup][])
+- Michael Thies ([@mhthies][])
+- Niklas Hauser ([@salkinium][])
+- Raphael Lehmann ([@rleh][])
+- Sascha Schade ([@strongly-typed][])
+
+PR [#325][] -> [2017q4][].
+
+<details>
+<summary>Detailed changelog</summary>
+
+#### 2018-01-07: Fix HD44780 initialization for 4-bit bus
+
+Adds missing bitshift to write the correct nibble to enable 4-bit mode.
+
+PR [#326][] -> [42837c7][] with low impact on HD44780 driver.  
+Tested in hardware by [@acristoffers][].
+
+#### 2018-01-07: Fix GpioPort setOutput()/setInput()/configure() on STM32
+
+Fixes wrong offset of a port mask used to configure output, input and pullups.
+
+PR ? -> [6328b4a][] with low impact on STM32 targets.  
+Tested in hardware by [@salkinium][].
+
+#### 2018-01-07: Update CMSIS headers for STM32
+
+PR [#324][] -> [857e514][] with **medium impact** on STM32 targets.  
+Tested in hardware by [@salkinium][].
+
+#### 2018-01-03: Use C++ stdlib instead of boost for hosted RTOS
+
+Replaces the hosted implementation of our RTOS interface with the C++ stdlib to reduce our dependence on boost for threading.
+
+PR [#322][] -> [5ef8009][] with low impact on hosted targets.
+
+#### 2018-01-03: Python 3 support for SConscripts and related tools
+
+SCons 3.0 features support for both Python 3.5+ and Python 2.7.
+These changes make all build and tool scripts compatible with
+both versions and adapt the CI systems too.
+
+PR [#297][] -> [3b47fa5][] with low impact on all build tools.
+
+#### 2017-12-20: Enable C++14 for all targets by default
+
+This is possible since Atmel's offical avr-gcc is now >= v5.4.0.
+
+PR [#320][] -> [68e73b3][] with low impact on all targets.
+
+#### 2017-12-19: Fix matrix multiplication and LU-decomposition
+
+Matrix height and width parameters were switched.
+
+PR [#318][] -> [c4ed672][] with **medium impact** on matrix math.  
+Tested in hardware by [@Maju-Ketchup][].
+
+#### 2017-12-18: Fix printing of uint64_t in iostream
+
+Only the lower 32 bits of an uint64_t were shown in iostream.
+
+PR [#315][] -> [2c898ae][] with **medium impact** on printing 64-bit numbers.  
+Tested in hardware by [@Maju-Ketchup][].
+
+#### 2017-11-09: Add rosserial to communicate with ROS
+
+Allows using xpcc for embedded sensor aquisition and interacting with a ROS robot across a serial link via ROS messages.
+
+PR [#306][] -> [78c3ae2][].  
+Tested in hardware by [@strongly-typed][].
+
+#### 2017-10-27: Revive LPC11C24 with GPIO, UART and CAN
+
+"out of curiosity"
+
+PR [#305][] -> [48d60e2][] with **medium impact** on LPC targets.  
+Tested in hardware by [@strongly-typed][].
+
+#### 2017-10-24: Fix negative temperatures and round integer for LTC298x
+
+PR [#301][] -> [6aee411][] with **medium impact** on negative LTC298x data.  
+Tested in hardware by [@rleh][].
+
+#### 2017-10-15: Add CircleCI integration
+
+PR [#298][] -> [c5f8170][].
+
+#### 2017-10-12: Fix the I2C on STM32L4
+
+Correctly generates restart condition on writes > 255 bytes.
+
+PR [#299][] -> [3d9d80f][] with low impact on STM32L0/L4 targets.  
+Tested in hardware by [@strongly-typed][].
+
+</details>
+
 
 ## 2017-10-01: 2017q3 release
 
@@ -810,9 +954,12 @@ we have to do it manually. Hooray for technology.
 [2017q1]: https://github.com/roboterclubaachen/xpcc/releases/tag/2017q1
 [2017q2]: https://github.com/roboterclubaachen/xpcc/releases/tag/2017q2
 [2017q3]: https://github.com/roboterclubaachen/xpcc/releases/tag/2017q3
+[2017q4]: https://github.com/roboterclubaachen/xpcc/releases/tag/2017q4
 
 <!-- Contributors -->
 [@7Kronos]: https://github.com/7Kronos
+[@acristoffers]: https://github.com/acristoffers
+[@AndreGilerson]: https://github.com/AndreGilerson
 [@cajt]: https://github.com/cajt
 [@chris-durand]: https://github.com/chris-durand
 [@daniel-k]: https://github.com/daniel-k
@@ -840,29 +987,22 @@ we have to do it manually. Hooray for technology.
 [#147]: https://github.com/roboterclubaachen/xpcc/pull/147
 [#154]: https://github.com/roboterclubaachen/xpcc/pull/154
 [#155]: https://github.com/roboterclubaachen/xpcc/pull/155
-[#155]: https://github.com/roboterclubaachen/xpcc/pull/155
-[#155]: https://github.com/roboterclubaachen/xpcc/pull/155
 [#165]: https://github.com/roboterclubaachen/xpcc/pull/165
 [#167]: https://github.com/roboterclubaachen/xpcc/pull/167
 [#168]: https://github.com/roboterclubaachen/xpcc/pull/168
 [#173]: https://github.com/roboterclubaachen/xpcc/pull/173
-[#173]: https://github.com/roboterclubaachen/xpcc/pull/173
 [#175]: https://github.com/roboterclubaachen/xpcc/pull/175
 [#176]: https://github.com/roboterclubaachen/xpcc/pull/176
-[#178]: https://github.com/roboterclubaachen/xpcc/pull/178
 [#178]: https://github.com/roboterclubaachen/xpcc/pull/178
 [#179]: https://github.com/roboterclubaachen/xpcc/pull/179
 [#180]: https://github.com/roboterclubaachen/xpcc/pull/180
 [#182]: https://github.com/roboterclubaachen/xpcc/pull/182
 [#183]: https://github.com/roboterclubaachen/xpcc/pull/183
 [#185]: https://github.com/roboterclubaachen/xpcc/pull/185
-[#185]: https://github.com/roboterclubaachen/xpcc/pull/185
 [#186]: https://github.com/roboterclubaachen/xpcc/pull/186
 [#187]: https://github.com/roboterclubaachen/xpcc/pull/187
 [#188]: https://github.com/roboterclubaachen/xpcc/pull/188
 [#189]: https://github.com/roboterclubaachen/xpcc/pull/189
-[#194]: https://github.com/roboterclubaachen/xpcc/pull/194
-[#194]: https://github.com/roboterclubaachen/xpcc/pull/194
 [#194]: https://github.com/roboterclubaachen/xpcc/pull/194
 [#195]: https://github.com/roboterclubaachen/xpcc/pull/195
 [#196]: https://github.com/roboterclubaachen/xpcc/pull/196
@@ -905,6 +1045,20 @@ we have to do it manually. Hooray for technology.
 [#293]: https://github.com/roboterclubaachen/xpcc/pull/293
 [#295]: https://github.com/roboterclubaachen/xpcc/pull/295
 [#296]: https://github.com/roboterclubaachen/xpcc/pull/296
+[#297]: https://github.com/roboterclubaachen/xpcc/pull/297
+[#298]: https://github.com/roboterclubaachen/xpcc/pull/298
+[#299]: https://github.com/roboterclubaachen/xpcc/pull/299
+[#301]: https://github.com/roboterclubaachen/xpcc/pull/301
+[#305]: https://github.com/roboterclubaachen/xpcc/pull/305
+[#306]: https://github.com/roboterclubaachen/xpcc/pull/306
+[#314]: https://github.com/roboterclubaachen/xpcc/pull/314
+[#315]: https://github.com/roboterclubaachen/xpcc/pull/315
+[#318]: https://github.com/roboterclubaachen/xpcc/pull/318
+[#320]: https://github.com/roboterclubaachen/xpcc/pull/320
+[#322]: https://github.com/roboterclubaachen/xpcc/pull/322
+[#324]: https://github.com/roboterclubaachen/xpcc/pull/324
+[#325]: https://github.com/roboterclubaachen/xpcc/pull/325
+[#326]: https://github.com/roboterclubaachen/xpcc/pull/326
 
 <!-- Commits -->
 [0118a13]: https://github.com/roboterclubaachen/xpcc/commit/0118a13
@@ -919,25 +1073,36 @@ we have to do it manually. Hooray for technology.
 [2504682]: https://github.com/roboterclubaachen/xpcc/commit/2504682
 [26471ab]: https://github.com/roboterclubaachen/xpcc/commit/26471ab
 [29c8905]: https://github.com/roboterclubaachen/xpcc/commit/29c8905
+[2c898ae]: https://github.com/roboterclubaachen/xpcc/commit/2c898ae
 [3992534]: https://github.com/roboterclubaachen/xpcc/commit/3992534
+[3b47fa5]: https://github.com/roboterclubaachen/xpcc/commit/3b47fa5
 [3c7cd31]: https://github.com/roboterclubaachen/xpcc/commit/3c7cd31
+[3d9d80f]: https://github.com/roboterclubaachen/xpcc/commit/3d9d80f
 [3f50e1d]: https://github.com/roboterclubaachen/xpcc/commit/3f50e1d
 [408c309]: https://github.com/roboterclubaachen/xpcc/commit/408c309
 [40da657]: https://github.com/roboterclubaachen/xpcc/commit/40da657
 [41ab22a]: https://github.com/roboterclubaachen/xpcc/commit/41ab22a
+[42837c7]: https://github.com/roboterclubaachen/xpcc/commit/42837c7
+[48d60e2]: https://github.com/roboterclubaachen/xpcc/commit/48d60e2
 [51159ff]: https://github.com/roboterclubaachen/xpcc/commit/51159ff
 [51491ad]: https://github.com/roboterclubaachen/xpcc/commit/51491ad
 [553dceb]: https://github.com/roboterclubaachen/xpcc/commit/553dceb
 [5e547ab]: https://github.com/roboterclubaachen/xpcc/commit/5e547ab
+[5ef8009]: https://github.com/roboterclubaachen/xpcc/commit/5ef8009
 [5f5934a]: https://github.com/roboterclubaachen/xpcc/commit/5f5934a
+[6328b4a]: https://github.com/roboterclubaachen/xpcc/commit/6328b4a
 [637e074]: https://github.com/roboterclubaachen/xpcc/commit/637e074
 [63ad1d3]: https://github.com/roboterclubaachen/xpcc/commit/63ad1d3
 [680c92a]: https://github.com/roboterclubaachen/xpcc/commit/680c92a
 [68b904e]: https://github.com/roboterclubaachen/xpcc/commit/68b904e
+[68e73b3]: https://github.com/roboterclubaachen/xpcc/commit/68e73b3
+[6aee411]: https://github.com/roboterclubaachen/xpcc/commit/6aee411
 [6c1a111]: https://github.com/roboterclubaachen/xpcc/commit/6c1a111
 [7111cd3]: https://github.com/roboterclubaachen/xpcc/commit/7111cd3
+[78c3ae2]: https://github.com/roboterclubaachen/xpcc/commit/78c3ae2
 [7ab0132]: https://github.com/roboterclubaachen/xpcc/commit/7ab0132
 [84d5bd0]: https://github.com/roboterclubaachen/xpcc/commit/84d5bd0
+[857e514]: https://github.com/roboterclubaachen/xpcc/commit/857e514
 [8cc5c78]: https://github.com/roboterclubaachen/xpcc/commit/8cc5c78
 [8f9b154]: https://github.com/roboterclubaachen/xpcc/commit/8f9b154
 [9018741]: https://github.com/roboterclubaachen/xpcc/commit/9018741
@@ -954,6 +1119,8 @@ we have to do it manually. Hooray for technology.
 [b77294e]: https://github.com/roboterclubaachen/xpcc/commit/b77294e
 [bb3fa3a]: https://github.com/roboterclubaachen/xpcc/commit/bb3fa3a
 [c12a69b]: https://github.com/roboterclubaachen/xpcc/commit/c12a69b
+[c4ed672]: https://github.com/roboterclubaachen/xpcc/commit/c4ed672
+[c5f8170]: https://github.com/roboterclubaachen/xpcc/commit/c5f8170
 [c605416]: https://github.com/roboterclubaachen/xpcc/commit/c605416
 [c7adb48]: https://github.com/roboterclubaachen/xpcc/commit/c7adb48
 [cb0a11e]: https://github.com/roboterclubaachen/xpcc/commit/cb0a11e
