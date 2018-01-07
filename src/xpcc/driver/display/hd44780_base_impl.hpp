@@ -201,7 +201,7 @@ template <typename Data, typename Enable>
 void
 xpcc::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 4>::writeHighNibble(uint8_t data)
 {
-	Bus<DATA, E, 8>::write(data);
+	Bus<DATA, E, 8>::write(data >> 4);
 }
 
 template <typename DATA, typename RW, typename RS, typename E>
