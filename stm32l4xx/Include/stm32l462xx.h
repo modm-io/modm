@@ -2,8 +2,6 @@
   ******************************************************************************
   * @file    stm32l462xx.h
   * @author  MCD Application Team
-  * @version V1.3.2
-  * @date    16-June-2017
   * @brief   CMSIS STM32L462xx Device Peripheral Access Layer Header File.
   *
   *          This file contains:
@@ -1029,7 +1027,7 @@ typedef struct
 /** @addtogroup Peripheral_memory_map
   * @{
   */
-#define FLASH_BASE            ((uint32_t)0x08000000U) /*!< FLASH(up to 1 MB) base address */
+#define FLASH_BASE            ((uint32_t)0x08000000U) /*!< FLASH(up to 512 KB) base address */
 #define SRAM1_BASE            ((uint32_t)0x20000000U) /*!< SRAM1(up to 128 KB) base address */
 #define SRAM2_BASE            ((uint32_t)0x10000000U) /*!< SRAM2(32 KB) base address */
 #define PERIPH_BASE           ((uint32_t)0x40000000U) /*!< Peripheral base address */
@@ -7329,9 +7327,6 @@ typedef struct
 #define EXTI_RTSR2_RT35_Pos      (3U)
 #define EXTI_RTSR2_RT35_Msk      (0x1U << EXTI_RTSR2_RT35_Pos)                 /*!< 0x00000008 */
 #define EXTI_RTSR2_RT35          EXTI_RTSR2_RT35_Msk                           /*!< Rising trigger event configuration bit of line 35 */
-#define EXTI_RTSR2_RT36_Pos      (4U)
-#define EXTI_RTSR2_RT36_Msk      (0x1U << EXTI_RTSR2_RT36_Pos)                 /*!< 0x00000010 */
-#define EXTI_RTSR2_RT36          EXTI_RTSR2_RT36_Msk                           /*!< Rising trigger event configuration bit of line 36 */
 #define EXTI_RTSR2_RT37_Pos      (5U)
 #define EXTI_RTSR2_RT37_Msk      (0x1U << EXTI_RTSR2_RT37_Pos)                 /*!< 0x00000020 */
 #define EXTI_RTSR2_RT37          EXTI_RTSR2_RT37_Msk                           /*!< Rising trigger event configuration bit of line 37 */
@@ -7343,9 +7338,6 @@ typedef struct
 #define EXTI_FTSR2_FT35_Pos      (3U)
 #define EXTI_FTSR2_FT35_Msk      (0x1U << EXTI_FTSR2_FT35_Pos)                 /*!< 0x00000008 */
 #define EXTI_FTSR2_FT35          EXTI_FTSR2_FT35_Msk                           /*!< Falling trigger event configuration bit of line 35 */
-#define EXTI_FTSR2_FT36_Pos      (4U)
-#define EXTI_FTSR2_FT36_Msk      (0x1U << EXTI_FTSR2_FT36_Pos)                 /*!< 0x00000010 */
-#define EXTI_FTSR2_FT36          EXTI_FTSR2_FT36_Msk                           /*!< Falling trigger event configuration bit of line 36 */
 #define EXTI_FTSR2_FT37_Pos      (5U)
 #define EXTI_FTSR2_FT37_Msk      (0x1U << EXTI_FTSR2_FT37_Pos)                 /*!< 0x00000020 */
 #define EXTI_FTSR2_FT37          EXTI_FTSR2_FT37_Msk                           /*!< Falling trigger event configuration bit of line 37 */
@@ -7357,9 +7349,6 @@ typedef struct
 #define EXTI_SWIER2_SWI35_Pos    (3U)
 #define EXTI_SWIER2_SWI35_Msk    (0x1U << EXTI_SWIER2_SWI35_Pos)               /*!< 0x00000008 */
 #define EXTI_SWIER2_SWI35        EXTI_SWIER2_SWI35_Msk                         /*!< Software Interrupt on line 35 */
-#define EXTI_SWIER2_SWI36_Pos    (4U)
-#define EXTI_SWIER2_SWI36_Msk    (0x1U << EXTI_SWIER2_SWI36_Pos)               /*!< 0x00000010 */
-#define EXTI_SWIER2_SWI36        EXTI_SWIER2_SWI36_Msk                         /*!< Software Interrupt on line 36 */
 #define EXTI_SWIER2_SWI37_Pos    (5U)
 #define EXTI_SWIER2_SWI37_Msk    (0x1U << EXTI_SWIER2_SWI37_Pos)               /*!< 0x00000020 */
 #define EXTI_SWIER2_SWI37        EXTI_SWIER2_SWI37_Msk                         /*!< Software Interrupt on line 37 */
@@ -7371,9 +7360,6 @@ typedef struct
 #define EXTI_PR2_PIF35_Pos       (3U)
 #define EXTI_PR2_PIF35_Msk       (0x1U << EXTI_PR2_PIF35_Pos)                  /*!< 0x00000008 */
 #define EXTI_PR2_PIF35           EXTI_PR2_PIF35_Msk                            /*!< Pending bit for line 35 */
-#define EXTI_PR2_PIF36_Pos       (4U)
-#define EXTI_PR2_PIF36_Msk       (0x1U << EXTI_PR2_PIF36_Pos)                  /*!< 0x00000010 */
-#define EXTI_PR2_PIF36           EXTI_PR2_PIF36_Msk                            /*!< Pending bit for line 36 */
 #define EXTI_PR2_PIF37_Pos       (5U)
 #define EXTI_PR2_PIF37_Msk       (0x1U << EXTI_PR2_PIF37_Pos)                  /*!< 0x00000020 */
 #define EXTI_PR2_PIF37           EXTI_PR2_PIF37_Msk                            /*!< Pending bit for line 37 */
@@ -9071,9 +9057,9 @@ typedef struct
 #define PWR_CR2_PVDE                 PWR_CR2_PVDE_Msk                          /*!< Power Voltage Detector Enable */
 
 /********************  Bit definition for PWR_CR3 register  ********************/
-#define PWR_CR3_EIWF_Pos             (15U)
-#define PWR_CR3_EIWF_Msk             (0x1U << PWR_CR3_EIWF_Pos)                /*!< 0x00008000 */
-#define PWR_CR3_EIWF                 PWR_CR3_EIWF_Msk                          /*!< Enable Internal Wake-up line */
+#define PWR_CR3_EIWUL_Pos            (15U)
+#define PWR_CR3_EIWUL_Msk            (0x1U << PWR_CR3_EIWUL_Pos)               /*!< 0x00008000 */
+#define PWR_CR3_EIWUL                PWR_CR3_EIWUL_Msk                         /*!< Enable Internal Wake-up line */
 #define PWR_CR3_APC_Pos              (10U)
 #define PWR_CR3_APC_Msk              (0x1U << PWR_CR3_APC_Pos)                 /*!< 0x00000400 */
 #define PWR_CR3_APC                  PWR_CR3_APC_Msk                           /*!< Apply pull-up and pull-down configuration */
@@ -9098,6 +9084,12 @@ typedef struct
 #define PWR_CR3_EWUP_Pos             (0U)
 #define PWR_CR3_EWUP_Msk             (0x1FU << PWR_CR3_EWUP_Pos)               /*!< 0x0000001F */
 #define PWR_CR3_EWUP                 PWR_CR3_EWUP_Msk                          /*!< Enable Wake-Up Pins  */
+
+/* Legacy defines */
+#define PWR_CR3_EIWF_Pos             PWR_CR3_EIWUL_Pos
+#define PWR_CR3_EIWF_Msk             PWR_CR3_EIWUL_Msk
+#define PWR_CR3_EIWF                 PWR_CR3_EIWUL
+
 
 /********************  Bit definition for PWR_CR4 register  ********************/
 #define PWR_CR4_VBRS_Pos             (9U)
@@ -14888,7 +14880,7 @@ typedef struct
 #define USART_ISR_FE                  USART_ISR_FE_Msk                         /*!< Framing Error */
 #define USART_ISR_NE_Pos              (2U)
 #define USART_ISR_NE_Msk              (0x1U << USART_ISR_NE_Pos)               /*!< 0x00000004 */
-#define USART_ISR_NE                  USART_ISR_NE_Msk                         /*!< Noise detected Flag */
+#define USART_ISR_NE                  USART_ISR_NE_Msk                         /*!< Noise Error detected Flag */
 #define USART_ISR_ORE_Pos             (3U)
 #define USART_ISR_ORE_Msk             (0x1U << USART_ISR_ORE_Pos)              /*!< 0x00000008 */
 #define USART_ISR_ORE                 USART_ISR_ORE_Msk                        /*!< OverRun Error */
@@ -14957,9 +14949,9 @@ typedef struct
 #define USART_ICR_FECF_Pos            (1U)
 #define USART_ICR_FECF_Msk            (0x1U << USART_ICR_FECF_Pos)             /*!< 0x00000002 */
 #define USART_ICR_FECF                USART_ICR_FECF_Msk                       /*!< Framing Error Clear Flag */
-#define USART_ICR_NCF_Pos             (2U)
-#define USART_ICR_NCF_Msk             (0x1U << USART_ICR_NCF_Pos)              /*!< 0x00000004 */
-#define USART_ICR_NCF                 USART_ICR_NCF_Msk                        /*!< Noise detected Clear Flag */
+#define USART_ICR_NECF_Pos            (2U)
+#define USART_ICR_NECF_Msk            (0x1U << USART_ICR_NECF_Pos)             /*!< 0x00000004 */
+#define USART_ICR_NECF                USART_ICR_NECF_Msk                       /*!< Noise Error detected Clear Flag */
 #define USART_ICR_ORECF_Pos           (3U)
 #define USART_ICR_ORECF_Msk           (0x1U << USART_ICR_ORECF_Pos)            /*!< 0x00000008 */
 #define USART_ICR_ORECF               USART_ICR_ORECF_Msk                      /*!< OverRun Error Clear Flag */
@@ -14990,6 +14982,11 @@ typedef struct
 #define USART_ICR_WUCF_Pos            (20U)
 #define USART_ICR_WUCF_Msk            (0x1U << USART_ICR_WUCF_Pos)             /*!< 0x00100000 */
 #define USART_ICR_WUCF                USART_ICR_WUCF_Msk                       /*!< Wake Up from stop mode Clear Flag */
+
+/* Legacy defines */
+#define USART_ICR_NCF_Pos             USART_ICR_NECF_Pos
+#define USART_ICR_NCF_Msk             USART_ICR_NECF_Msk
+#define USART_ICR_NCF                 USART_ICR_NECF
 
 /*******************  Bit definition for USART_RDR register  ******************/
 #define USART_RDR_RDR_Pos             (0U)
@@ -15166,14 +15163,14 @@ typedef struct
 /*                         USB Device FS Endpoint registers                   */
 /*                                                                            */
 /******************************************************************************/
-#define USB_EP0R                             USB_BASE                    /*!< endpoint 0 register address */
-#define USB_EP1R                             (USB_BASE + 0x0x00000004)   /*!< endpoint 1 register address */
-#define USB_EP2R                             (USB_BASE + 0x0x00000008)   /*!< endpoint 2 register address */
-#define USB_EP3R                             (USB_BASE + 0x0x0000000C)   /*!< endpoint 3 register address */
-#define USB_EP4R                             (USB_BASE + 0x0x00000010)   /*!< endpoint 4 register address */
-#define USB_EP5R                             (USB_BASE + 0x0x00000014)   /*!< endpoint 5 register address */
-#define USB_EP6R                             (USB_BASE + 0x0x00000018)   /*!< endpoint 6 register address */
-#define USB_EP7R                             (USB_BASE + 0x0x0000001C)   /*!< endpoint 7 register address */
+#define USB_EP0R                                 USB_BASE                  /*!< endpoint 0 register address */
+#define USB_EP1R                                 (USB_BASE + 0x00000004)   /*!< endpoint 1 register address */
+#define USB_EP2R                                 (USB_BASE + 0x00000008)   /*!< endpoint 2 register address */
+#define USB_EP3R                                 (USB_BASE + 0x0000000C)   /*!< endpoint 3 register address */
+#define USB_EP4R                                 (USB_BASE + 0x00000010)   /*!< endpoint 4 register address */
+#define USB_EP5R                                 (USB_BASE + 0x00000014)   /*!< endpoint 5 register address */
+#define USB_EP6R                                 (USB_BASE + 0x00000018)   /*!< endpoint 6 register address */
+#define USB_EP7R                                 (USB_BASE + 0x0000001C)   /*!< endpoint 7 register address */
 
 /* bit positions */
 #define USB_EP_CTR_RX                            ((uint16_t)0x8000U)           /*!<  EndPoint Correct TRansfer RX */

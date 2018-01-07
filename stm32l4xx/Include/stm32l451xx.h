@@ -2,8 +2,6 @@
   ******************************************************************************
   * @file    stm32l451xx.h
   * @author  MCD Application Team
-  * @version V1.3.2
-  * @date    16-June-2017
   * @brief   CMSIS STM32L451xx Device Peripheral Access Layer Header File.
   *
   *          This file contains:
@@ -957,7 +955,7 @@ typedef struct
 /** @addtogroup Peripheral_memory_map
   * @{
   */
-#define FLASH_BASE            ((uint32_t)0x08000000U) /*!< FLASH(up to 1 MB) base address */
+#define FLASH_BASE            ((uint32_t)0x08000000U) /*!< FLASH(up to 512 KB) base address */
 #define SRAM1_BASE            ((uint32_t)0x20000000U) /*!< SRAM1(up to 128 KB) base address */
 #define SRAM2_BASE            ((uint32_t)0x10000000U) /*!< SRAM2(32 KB) base address */
 #define PERIPH_BASE           ((uint32_t)0x40000000U) /*!< Peripheral base address */
@@ -7028,12 +7026,6 @@ typedef struct
 #define EXTI_IMR2_IM33_Pos       (1U)
 #define EXTI_IMR2_IM33_Msk       (0x1U << EXTI_IMR2_IM33_Pos)                  /*!< 0x00000002 */
 #define EXTI_IMR2_IM33           EXTI_IMR2_IM33_Msk                            /*!< Interrupt Mask on line 33 */
-#define EXTI_IMR2_IM35_Pos       (3U)
-#define EXTI_IMR2_IM35_Msk       (0x1U << EXTI_IMR2_IM35_Pos)                  /*!< 0x00000008 */
-#define EXTI_IMR2_IM35           EXTI_IMR2_IM35_Msk                            /*!< Interrupt Mask on line 35 */
-#define EXTI_IMR2_IM36_Pos       (4U)
-#define EXTI_IMR2_IM36_Msk       (0x1U << EXTI_IMR2_IM36_Pos)                  /*!< 0x00000010 */
-#define EXTI_IMR2_IM36           EXTI_IMR2_IM36_Msk                            /*!< Interrupt Mask on line 36 */
 #define EXTI_IMR2_IM37_Pos       (5U)
 #define EXTI_IMR2_IM37_Msk       (0x1U << EXTI_IMR2_IM37_Pos)                  /*!< 0x00000020 */
 #define EXTI_IMR2_IM37           EXTI_IMR2_IM37_Msk                            /*!< Interrupt Mask on line 37 */
@@ -7044,7 +7036,7 @@ typedef struct
 #define EXTI_IMR2_IM40_Msk       (0x1U << EXTI_IMR2_IM40_Pos)                  /*!< 0x00000100 */
 #define EXTI_IMR2_IM40           EXTI_IMR2_IM40_Msk                            /*!< Interrupt Mask on line 40 */
 #define EXTI_IMR2_IM_Pos         (0U)
-#define EXTI_IMR2_IM_Msk         (0x16BU << EXTI_IMR2_IM_Pos)                  /*!< 0x0000016B */
+#define EXTI_IMR2_IM_Msk         (0x162U << EXTI_IMR2_IM_Pos)                  /*!< 0x00000162 */
 #define EXTI_IMR2_IM             EXTI_IMR2_IM_Msk                              /*!< Interrupt Mask all        */
 
 /*******************  Bit definition for EXTI_EMR2 register  ******************/
@@ -7054,12 +7046,6 @@ typedef struct
 #define EXTI_EMR2_EM33_Pos       (1U)
 #define EXTI_EMR2_EM33_Msk       (0x1U << EXTI_EMR2_EM33_Pos)                  /*!< 0x00000002 */
 #define EXTI_EMR2_EM33           EXTI_EMR2_EM33_Msk                            /*!< Event Mask on line 33 */
-#define EXTI_EMR2_EM35_Pos       (3U)
-#define EXTI_EMR2_EM35_Msk       (0x1U << EXTI_EMR2_EM35_Pos)                  /*!< 0x00000008 */
-#define EXTI_EMR2_EM35           EXTI_EMR2_EM35_Msk                            /*!< Event Mask on line 35 */
-#define EXTI_EMR2_EM36_Pos       (4U)
-#define EXTI_EMR2_EM36_Msk       (0x1U << EXTI_EMR2_EM36_Pos)                  /*!< 0x00000010 */
-#define EXTI_EMR2_EM36           EXTI_EMR2_EM36_Msk                            /*!< Event Mask on line 36 */
 #define EXTI_EMR2_EM37_Pos       (5U)
 #define EXTI_EMR2_EM37_Msk       (0x1U << EXTI_EMR2_EM37_Pos)                  /*!< 0x00000020 */
 #define EXTI_EMR2_EM37           EXTI_EMR2_EM37_Msk                            /*!< Event Mask on line 37 */
@@ -7070,16 +7056,10 @@ typedef struct
 #define EXTI_EMR2_EM40_Msk       (0x1U << EXTI_EMR2_EM40_Pos)                  /*!< 0x00000100 */
 #define EXTI_EMR2_EM40           EXTI_EMR2_EM40_Msk                            /*!< Event Mask on line 40 */
 #define EXTI_EMR2_EM_Pos         (0U)
-#define EXTI_EMR2_EM_Msk         (0x17BU << EXTI_EMR2_EM_Pos)                  /*!< 0x0000017B */
+#define EXTI_EMR2_EM_Msk         (0x162U << EXTI_EMR2_EM_Pos)                  /*!< 0x00000162 */
 #define EXTI_EMR2_EM             EXTI_EMR2_EM_Msk                              /*!< Interrupt Mask all        */
 
 /******************  Bit definition for EXTI_RTSR2 register  ******************/
-#define EXTI_RTSR2_RT35_Pos      (3U)
-#define EXTI_RTSR2_RT35_Msk      (0x1U << EXTI_RTSR2_RT35_Pos)                 /*!< 0x00000008 */
-#define EXTI_RTSR2_RT35          EXTI_RTSR2_RT35_Msk                           /*!< Rising trigger event configuration bit of line 35 */
-#define EXTI_RTSR2_RT36_Pos      (4U)
-#define EXTI_RTSR2_RT36_Msk      (0x1U << EXTI_RTSR2_RT36_Pos)                 /*!< 0x00000010 */
-#define EXTI_RTSR2_RT36          EXTI_RTSR2_RT36_Msk                           /*!< Rising trigger event configuration bit of line 36 */
 #define EXTI_RTSR2_RT37_Pos      (5U)
 #define EXTI_RTSR2_RT37_Msk      (0x1U << EXTI_RTSR2_RT37_Pos)                 /*!< 0x00000020 */
 #define EXTI_RTSR2_RT37          EXTI_RTSR2_RT37_Msk                           /*!< Rising trigger event configuration bit of line 37 */
@@ -7088,12 +7068,6 @@ typedef struct
 #define EXTI_RTSR2_RT38          EXTI_RTSR2_RT38_Msk                           /*!< Rising trigger event configuration bit of line 38 */
 
 /******************  Bit definition for EXTI_FTSR2 register  ******************/
-#define EXTI_FTSR2_FT35_Pos      (3U)
-#define EXTI_FTSR2_FT35_Msk      (0x1U << EXTI_FTSR2_FT35_Pos)                 /*!< 0x00000008 */
-#define EXTI_FTSR2_FT35          EXTI_FTSR2_FT35_Msk                           /*!< Falling trigger event configuration bit of line 35 */
-#define EXTI_FTSR2_FT36_Pos      (4U)
-#define EXTI_FTSR2_FT36_Msk      (0x1U << EXTI_FTSR2_FT36_Pos)                 /*!< 0x00000010 */
-#define EXTI_FTSR2_FT36          EXTI_FTSR2_FT36_Msk                           /*!< Falling trigger event configuration bit of line 36 */
 #define EXTI_FTSR2_FT37_Pos      (5U)
 #define EXTI_FTSR2_FT37_Msk      (0x1U << EXTI_FTSR2_FT37_Pos)                 /*!< 0x00000020 */
 #define EXTI_FTSR2_FT37          EXTI_FTSR2_FT37_Msk                           /*!< Falling trigger event configuration bit of line 37 */
@@ -7102,12 +7076,6 @@ typedef struct
 #define EXTI_FTSR2_FT38          EXTI_FTSR2_FT38_Msk                           /*!< Falling trigger event configuration bit of line 38 */
 
 /******************  Bit definition for EXTI_SWIER2 register  *****************/
-#define EXTI_SWIER2_SWI35_Pos    (3U)
-#define EXTI_SWIER2_SWI35_Msk    (0x1U << EXTI_SWIER2_SWI35_Pos)               /*!< 0x00000008 */
-#define EXTI_SWIER2_SWI35        EXTI_SWIER2_SWI35_Msk                         /*!< Software Interrupt on line 35 */
-#define EXTI_SWIER2_SWI36_Pos    (4U)
-#define EXTI_SWIER2_SWI36_Msk    (0x1U << EXTI_SWIER2_SWI36_Pos)               /*!< 0x00000010 */
-#define EXTI_SWIER2_SWI36        EXTI_SWIER2_SWI36_Msk                         /*!< Software Interrupt on line 36 */
 #define EXTI_SWIER2_SWI37_Pos    (5U)
 #define EXTI_SWIER2_SWI37_Msk    (0x1U << EXTI_SWIER2_SWI37_Pos)               /*!< 0x00000020 */
 #define EXTI_SWIER2_SWI37        EXTI_SWIER2_SWI37_Msk                         /*!< Software Interrupt on line 37 */
@@ -7116,12 +7084,6 @@ typedef struct
 #define EXTI_SWIER2_SWI38        EXTI_SWIER2_SWI38_Msk                         /*!< Software Interrupt on line 38 */
 
 /*******************  Bit definition for EXTI_PR2 register  *******************/
-#define EXTI_PR2_PIF35_Pos       (3U)
-#define EXTI_PR2_PIF35_Msk       (0x1U << EXTI_PR2_PIF35_Pos)                  /*!< 0x00000008 */
-#define EXTI_PR2_PIF35           EXTI_PR2_PIF35_Msk                            /*!< Pending bit for line 35 */
-#define EXTI_PR2_PIF36_Pos       (4U)
-#define EXTI_PR2_PIF36_Msk       (0x1U << EXTI_PR2_PIF36_Pos)                  /*!< 0x00000010 */
-#define EXTI_PR2_PIF36           EXTI_PR2_PIF36_Msk                            /*!< Pending bit for line 36 */
 #define EXTI_PR2_PIF37_Pos       (5U)
 #define EXTI_PR2_PIF37_Msk       (0x1U << EXTI_PR2_PIF37_Pos)                  /*!< 0x00000020 */
 #define EXTI_PR2_PIF37           EXTI_PR2_PIF37_Msk                            /*!< Pending bit for line 37 */
@@ -8813,9 +8775,9 @@ typedef struct
 #define PWR_CR2_PVDE                 PWR_CR2_PVDE_Msk                          /*!< Power Voltage Detector Enable */
 
 /********************  Bit definition for PWR_CR3 register  ********************/
-#define PWR_CR3_EIWF_Pos             (15U)
-#define PWR_CR3_EIWF_Msk             (0x1U << PWR_CR3_EIWF_Pos)                /*!< 0x00008000 */
-#define PWR_CR3_EIWF                 PWR_CR3_EIWF_Msk                          /*!< Enable Internal Wake-up line */
+#define PWR_CR3_EIWUL_Pos            (15U)
+#define PWR_CR3_EIWUL_Msk            (0x1U << PWR_CR3_EIWUL_Pos)               /*!< 0x00008000 */
+#define PWR_CR3_EIWUL                PWR_CR3_EIWUL_Msk                         /*!< Enable Internal Wake-up line */
 #define PWR_CR3_APC_Pos              (10U)
 #define PWR_CR3_APC_Msk              (0x1U << PWR_CR3_APC_Pos)                 /*!< 0x00000400 */
 #define PWR_CR3_APC                  PWR_CR3_APC_Msk                           /*!< Apply pull-up and pull-down configuration */
@@ -8840,6 +8802,12 @@ typedef struct
 #define PWR_CR3_EWUP_Pos             (0U)
 #define PWR_CR3_EWUP_Msk             (0x1FU << PWR_CR3_EWUP_Pos)               /*!< 0x0000001F */
 #define PWR_CR3_EWUP                 PWR_CR3_EWUP_Msk                          /*!< Enable Wake-Up Pins  */
+
+/* Legacy defines */
+#define PWR_CR3_EIWF_Pos             PWR_CR3_EIWUL_Pos
+#define PWR_CR3_EIWF_Msk             PWR_CR3_EIWUL_Msk
+#define PWR_CR3_EIWF                 PWR_CR3_EIWUL
+
 
 /********************  Bit definition for PWR_CR4 register  ********************/
 #define PWR_CR4_VBRS_Pos             (9U)
@@ -14609,7 +14577,7 @@ typedef struct
 #define USART_ISR_FE                  USART_ISR_FE_Msk                         /*!< Framing Error */
 #define USART_ISR_NE_Pos              (2U)
 #define USART_ISR_NE_Msk              (0x1U << USART_ISR_NE_Pos)               /*!< 0x00000004 */
-#define USART_ISR_NE                  USART_ISR_NE_Msk                         /*!< Noise detected Flag */
+#define USART_ISR_NE                  USART_ISR_NE_Msk                         /*!< Noise Error detected Flag */
 #define USART_ISR_ORE_Pos             (3U)
 #define USART_ISR_ORE_Msk             (0x1U << USART_ISR_ORE_Pos)              /*!< 0x00000008 */
 #define USART_ISR_ORE                 USART_ISR_ORE_Msk                        /*!< OverRun Error */
@@ -14678,9 +14646,9 @@ typedef struct
 #define USART_ICR_FECF_Pos            (1U)
 #define USART_ICR_FECF_Msk            (0x1U << USART_ICR_FECF_Pos)             /*!< 0x00000002 */
 #define USART_ICR_FECF                USART_ICR_FECF_Msk                       /*!< Framing Error Clear Flag */
-#define USART_ICR_NCF_Pos             (2U)
-#define USART_ICR_NCF_Msk             (0x1U << USART_ICR_NCF_Pos)              /*!< 0x00000004 */
-#define USART_ICR_NCF                 USART_ICR_NCF_Msk                        /*!< Noise detected Clear Flag */
+#define USART_ICR_NECF_Pos            (2U)
+#define USART_ICR_NECF_Msk            (0x1U << USART_ICR_NECF_Pos)             /*!< 0x00000004 */
+#define USART_ICR_NECF                USART_ICR_NECF_Msk                       /*!< Noise Error detected Clear Flag */
 #define USART_ICR_ORECF_Pos           (3U)
 #define USART_ICR_ORECF_Msk           (0x1U << USART_ICR_ORECF_Pos)            /*!< 0x00000008 */
 #define USART_ICR_ORECF               USART_ICR_ORECF_Msk                      /*!< OverRun Error Clear Flag */
@@ -14711,6 +14679,11 @@ typedef struct
 #define USART_ICR_WUCF_Pos            (20U)
 #define USART_ICR_WUCF_Msk            (0x1U << USART_ICR_WUCF_Pos)             /*!< 0x00100000 */
 #define USART_ICR_WUCF                USART_ICR_WUCF_Msk                       /*!< Wake Up from stop mode Clear Flag */
+
+/* Legacy defines */
+#define USART_ICR_NCF_Pos             USART_ICR_NECF_Pos
+#define USART_ICR_NCF_Msk             USART_ICR_NECF_Msk
+#define USART_ICR_NCF                 USART_ICR_NECF
 
 /*******************  Bit definition for USART_RDR register  ******************/
 #define USART_RDR_RDR_Pos             (0U)

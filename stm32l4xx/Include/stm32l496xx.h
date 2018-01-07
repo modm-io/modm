@@ -2,8 +2,6 @@
   ******************************************************************************
   * @file    stm32l496xx.h
   * @author  MCD Application Team
-  * @version V1.3.2
-  * @date    16-June-2017
   * @brief   CMSIS STM32L496xx Device Peripheral Access Layer Header File.
   *
   *          This file contains:
@@ -572,7 +570,7 @@ typedef struct
   __IO uint32_t PCROP1ER;         /*!< FLASH bank1 PCROP end address register,   Address offset: 0x28 */
   __IO uint32_t WRP1AR;           /*!< FLASH bank1 WRP area A address register,  Address offset: 0x2C */
   __IO uint32_t WRP1BR;           /*!< FLASH bank1 WRP area B address register,  Address offset: 0x30 */
-       uint32_t RESERVED2[4];     /*!< Reserved2,                                Address offset: 0x34 */
+       uint32_t RESERVED2[4];     /*!< Reserved2,                           Address offset: 0x34-0x40 */
   __IO uint32_t PCROP2SR;         /*!< FLASH bank2 PCROP start address register, Address offset: 0x44 */
   __IO uint32_t PCROP2ER;         /*!< FLASH bank2 PCROP end address register,   Address offset: 0x48 */
   __IO uint32_t WRP2AR;           /*!< FLASH bank2 WRP area A address register,  Address offset: 0x4C */
@@ -10456,9 +10454,9 @@ typedef struct
 #define PWR_CR2_PVDE                 PWR_CR2_PVDE_Msk                          /*!< Power Voltage Detector Enable */
 
 /********************  Bit definition for PWR_CR3 register  ********************/
-#define PWR_CR3_EIWF_Pos             (15U)
-#define PWR_CR3_EIWF_Msk             (0x1U << PWR_CR3_EIWF_Pos)                /*!< 0x00008000 */
-#define PWR_CR3_EIWF                 PWR_CR3_EIWF_Msk                          /*!< Enable Internal Wake-up line */
+#define PWR_CR3_EIWUL_Pos            (15U)
+#define PWR_CR3_EIWUL_Msk            (0x1U << PWR_CR3_EIWUL_Pos)               /*!< 0x00008000 */
+#define PWR_CR3_EIWUL                PWR_CR3_EIWUL_Msk                         /*!< Enable Internal Wake-up line */
 #define PWR_CR3_APC_Pos              (10U)
 #define PWR_CR3_APC_Msk              (0x1U << PWR_CR3_APC_Pos)                 /*!< 0x00000400 */
 #define PWR_CR3_APC                  PWR_CR3_APC_Msk                           /*!< Apply pull-up and pull-down configuration */
@@ -10483,6 +10481,12 @@ typedef struct
 #define PWR_CR3_EWUP_Pos             (0U)
 #define PWR_CR3_EWUP_Msk             (0x1FU << PWR_CR3_EWUP_Pos)               /*!< 0x0000001F */
 #define PWR_CR3_EWUP                 PWR_CR3_EWUP_Msk                          /*!< Enable Wake-Up Pins  */
+
+/* Legacy defines */
+#define PWR_CR3_EIWF_Pos             PWR_CR3_EIWUL_Pos
+#define PWR_CR3_EIWF_Msk             PWR_CR3_EIWUL_Msk
+#define PWR_CR3_EIWF                 PWR_CR3_EIWUL
+
 
 /********************  Bit definition for PWR_CR4 register  ********************/
 #define PWR_CR4_VBRS_Pos             (9U)
@@ -17329,7 +17333,7 @@ typedef struct
 #define USART_ISR_FE                  USART_ISR_FE_Msk                         /*!< Framing Error */
 #define USART_ISR_NE_Pos              (2U)
 #define USART_ISR_NE_Msk              (0x1U << USART_ISR_NE_Pos)               /*!< 0x00000004 */
-#define USART_ISR_NE                  USART_ISR_NE_Msk                         /*!< Noise detected Flag */
+#define USART_ISR_NE                  USART_ISR_NE_Msk                         /*!< Noise Error detected Flag */
 #define USART_ISR_ORE_Pos             (3U)
 #define USART_ISR_ORE_Msk             (0x1U << USART_ISR_ORE_Pos)              /*!< 0x00000008 */
 #define USART_ISR_ORE                 USART_ISR_ORE_Msk                        /*!< OverRun Error */
@@ -17398,9 +17402,9 @@ typedef struct
 #define USART_ICR_FECF_Pos            (1U)
 #define USART_ICR_FECF_Msk            (0x1U << USART_ICR_FECF_Pos)             /*!< 0x00000002 */
 #define USART_ICR_FECF                USART_ICR_FECF_Msk                       /*!< Framing Error Clear Flag */
-#define USART_ICR_NCF_Pos             (2U)
-#define USART_ICR_NCF_Msk             (0x1U << USART_ICR_NCF_Pos)              /*!< 0x00000004 */
-#define USART_ICR_NCF                 USART_ICR_NCF_Msk                        /*!< Noise detected Clear Flag */
+#define USART_ICR_NECF_Pos            (2U)
+#define USART_ICR_NECF_Msk            (0x1U << USART_ICR_NECF_Pos)             /*!< 0x00000004 */
+#define USART_ICR_NECF                USART_ICR_NECF_Msk                       /*!< Noise Error detected Clear Flag */
 #define USART_ICR_ORECF_Pos           (3U)
 #define USART_ICR_ORECF_Msk           (0x1U << USART_ICR_ORECF_Pos)            /*!< 0x00000008 */
 #define USART_ICR_ORECF               USART_ICR_ORECF_Msk                      /*!< OverRun Error Clear Flag */
@@ -17431,6 +17435,11 @@ typedef struct
 #define USART_ICR_WUCF_Pos            (20U)
 #define USART_ICR_WUCF_Msk            (0x1U << USART_ICR_WUCF_Pos)             /*!< 0x00100000 */
 #define USART_ICR_WUCF                USART_ICR_WUCF_Msk                       /*!< Wake Up from stop mode Clear Flag */
+
+/* Legacy defines */
+#define USART_ICR_NCF_Pos             USART_ICR_NECF_Pos
+#define USART_ICR_NCF_Msk             USART_ICR_NECF_Msk
+#define USART_ICR_NCF                 USART_ICR_NECF
 
 /*******************  Bit definition for USART_RDR register  ******************/
 #define USART_RDR_RDR_Pos             (0U)
