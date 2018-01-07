@@ -580,7 +580,7 @@ class GpioPortBase<Gpio::Port::{{port.name}}, StartPin, Width, PortOrder> : publ
 	static constexpr uint8_t StartPinReversed = (8 - StartPin - Width) + 8;
 	static constexpr uint16_t dataMask = (1 << Width) - 1;
 	static constexpr uint16_t portMask = dataMask << StartPin;
-	static constexpr uint32_t portMask2 = portMask | (portMask << Width);
+	static constexpr uint32_t portMask2 = (portMask | (portMask << Width)) << StartPin;
 	static constexpr uint32_t port01 = 0x55555555 & portMask2;
 	static constexpr uint32_t port10 = 0xAAAAAAAA & portMask2;
 
