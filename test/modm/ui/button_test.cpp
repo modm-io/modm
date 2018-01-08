@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "../button.hpp"
+#include <modm/ui/button.hpp>
 
 #include "button_test.hpp"
 

@@ -21,4 +21,7 @@ def prepare(module, options):
 def build(env):
     env.outbasepath = "test"
     env.copy('SConstruct')
+
+    env.append_metadata_unique("include_path", "test")
+
     env.copy(localpath("../templates/unittest/runner_hosted.cpp.in"), "runner.cpp.in")

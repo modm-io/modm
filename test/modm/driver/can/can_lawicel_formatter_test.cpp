@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009, Martin Rosekeit
- * Copyright (c) 2009-2011, Fabian Greif
+ * Copyright (c) 2009-2011, 2017 Fabian Greif
  * Copyright (c) 2010, Georgi Grinshpun
  * Copyright (c) 2010, Thorsten Lajewski
  * Copyright (c) 2012, Sascha Schade
@@ -17,7 +17,7 @@
 
 #include <cstring>
 
-#include "../can_lawicel_formatter.hpp"
+#include <modm/driver/can/can_lawicel_formatter.hpp>
 #include "can_lawicel_formatter_test.hpp"
 
 void

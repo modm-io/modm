@@ -14,7 +14,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/driver/adc/ad7280a.hpp>
-#include <modm/platform/gpio/software_gpio.hpp>
+#include <modm/platform/gpio/unused.hpp>
 
 #include "ad7280a_test.hpp"
 
