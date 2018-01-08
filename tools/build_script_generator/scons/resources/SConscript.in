@@ -61,4 +61,16 @@ env["CONFIG_CLOCK_F_CPU"] = "{{ options[":platform:clock:f_cpu"] }}"
 
 env['XPCC_SYSTEM_BUILDER'] = os.path.join(env["CONFIG_MODM_ROOTPATH"], "tools", "system_design", "builder")
 
+%% if platform not in ["hosted"]
+# We need to link libmodm.a with --whole-archive, so that all weak symbols are visible to the linker.
+# Functions placed in a linker section list (like modm_section(".hardware_init")) are typically not
+# referenced externally, so the linker will discard them when searching.
+# From https://sourceware.org/binutils/docs/ld/Options.html#Options:
+#     For each archive mentioned on the command line after the --whole-archive option, include every object
+#     file in the archive in the link, rather than searching the archive for the required object files.
+env["_LIBFLAGS"] = '-Wl,--whole-archive ' + env["_LIBFLAGS"] + ' -Wl,--no-whole-archive'
+# alternative workaround
+# env["LINKCOM"] = env["LINKCOM"].replace('$_LIBFLAGS', '-Wl,--whole-archive $_LIBFLAGS -Wl,--no-whole-archive')
+%% endif
+
 Return("library")
