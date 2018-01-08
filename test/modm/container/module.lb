@@ -9,13 +9,16 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#TMPDIR := $(shell mktemp -d)
-TMPDIR := /tmp/unittest
 
-LBUILD = python3 ../../library-builder/scripts/lbuild
+def init(module):
+    module.name = "container"
+    module.parent = "test"
 
-test:
-	#@$(RM) -r $(TMPDIR)/*
-	$(LBUILD) -c project.xml -p $(TMPDIR) -v build --module=:test:**
-	scons -C $(TMPDIR)/test
-	@$(TMPDIR)/build/test/unittest
+
+def prepare(module, options):
+    return True
+
+
+def build(env):
+    env.outbasepath = "test/modm/container"
+    env.copy('.', ignore=env.ignore_patterns("*.lb"))
