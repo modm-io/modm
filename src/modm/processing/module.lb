@@ -23,5 +23,7 @@ def build(env):
 
     if env.has_module(":freertos"):
         env.copy(".", ignore=env.ignore_patterns("*.lb", "*/rtos/boost*"))
+    elif env[":target"].identifier["platform"] in ["hosted"]:
+    	env.copy(".", ignore=env.ignore_patterns("*.lb", "*/rtos/freertos*"))
     else:
         env.copy(".", ignore=env.ignore_patterns("*.lb", "*/rtos/boost*", "*/rtos/freertos*"))
