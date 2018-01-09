@@ -12,6 +12,5 @@
     <driver name="graphics" type="hosted"/>
     <driver name="gpio" type="hosted"/>
     <driver name="uart" type="hosted"/>
-    <driver name="uart" type="posix"/>
   </device>
 </modm>
