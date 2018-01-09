@@ -98,6 +98,13 @@ env['BUILDPATH'] = os.path.abspath('{{ build_path }}')
 
 library = env.SConscript(os.path.join(rootpath, "SConscript"), exports="env")
 
+%% if info_git
+env.InfoGit()
+%% endif
+%% if info_build
+env.InfoBuild()
+%% endif
+
 # FIXME: better globbing! (recursive?)
 files = env.Glob("*.cpp")
 files += env.Glob("*/*.cpp")

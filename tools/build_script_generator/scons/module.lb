@@ -49,6 +49,13 @@ def prepare(module, options):
         StringOption(name="xpcc.namespace", default="robot",
                      description="Namespace of the generated XPCC communications"))
 
+    module.add_option(
+        BooleanOption(name="info.git", default=False,
+                      description="Generate CPP defines about the git repository state"))
+    module.add_option(
+        BooleanOption(name="info.build", default=False,
+                      description="Generate CPP defines about the build state"))
+
     if options[":target"].identifier["platform"] == "avr":
         # we need the clock:f_cpu option!
         module.depends(":platform:clock")
@@ -67,7 +74,7 @@ def post_build(env, buildlog):
     build_tools = []
     if len(env["xpcc.source"]): build_tools.append("system_design");
     if len(env["image.source"]): build_tools.append("bitmap");
-    if env["info.git"]: build_tools.append("git");
+    if env["info.git"] or env["info.build"]: build_tools.append("info");
 
     # Extract all source code files
     files_to_build = []
@@ -106,6 +113,8 @@ def post_build(env, buildlog):
         "metadata": buildlog.metadata,
         "memories": memories,
         "build_tools": build_tools,
+        "info_build": env["info.build"],
+        "info_git": env["info.git"],
         "build_path": env["build.path"],
         "image_source": env["image.source"],
         "xpcc_source": env["xpcc.source"],
