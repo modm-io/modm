@@ -25,6 +25,10 @@ env.Append(LIBS=[
 %% endfor
 ])
 env.AppendUnique(LIBPATH=[os.path.abspath(str(library[0].get_dir()))])
+%% if "required_pkg" in metadata
+env.ParseConfig("pkg-config --cflags --libs {{ metadata.required_pkg | join(" ") }}")
+%% endif
+
 
 # Device configuration
 env["CONFIG_DEVICE_NAME"] = "{{ partname }}"
