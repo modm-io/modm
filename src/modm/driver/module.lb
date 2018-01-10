@@ -42,7 +42,14 @@ def build(env):
     # Copy all files except for the templates and the module file.
     # Excludes the storage module as well, because it is implemented as a
     # separate module.
-    env.copy(".", ignore=env.ignore_files("*.lb", "*.in", "*storage"))
+    if env[":target"].identifier["platform"] in ["hosted"]:
+        ignore = env.ignore_files("*.lb", "*.in", "*storage")
+        env.append_metadata_unique("required_pkg", "gtkmm-2.4")
+        env.append_metadata_unique("required_pkg", "cairomm-1.0")
+        env.append_metadata_unique("required_pkg", "sdl")
+    else:
+        ignore = env.ignore_files("*.lb", "*.in", "*storage", "sdl_display*")
+    env.copy(".", ignore=ignore)
 
     env.template("can/mcp2515.cpp.in")
     env.template("display/st7036.cpp.in")
