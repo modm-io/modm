@@ -5,6 +5,7 @@
 # Copyright (c) 2010, 2013, Georgi Grinshpun
 # Copyright (c) 2012, Sascha Schade
 # Copyright (c) 2016, Daniel Krebs
+# Copyright (c) 2017, Michael Thies
 #
 # This file is part of the modm project.
 #

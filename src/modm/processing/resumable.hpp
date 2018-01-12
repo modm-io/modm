@@ -1,7 +1,9 @@
 /*
  * Copyright (c) 2009, Martin Rosekeit
  * Copyright (c) 2009-2011, Fabian Greif
- * Copyright (c) 2012, 2014-2015, Niklas Hauser
+ * Copyright (c) 2012-2015, Niklas Hauser
+ * Copyright (c) 2013, Kevin Läufer
+ * Copyright (c) 2017, Sascha Schade
  *
  * This file is part of the modm project.
  *

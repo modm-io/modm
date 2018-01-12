@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2016, Sascha Schade
+# Copyright (c) 2017, Michael Thies
 #
 # This file is part of the modm project.
 #

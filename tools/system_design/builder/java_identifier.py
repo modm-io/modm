@@ -7,6 +7,7 @@
 # Copyright (c) 2014, Martin Rosekeit
 # Copyright (c) 2015, Kevin Läufer
 # Copyright (c) 2016, Daniel Krebs
+# Copyright (c) 2017, Michael Thies
 #
 # This file is part of the modm project.
 #

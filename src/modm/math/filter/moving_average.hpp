@@ -5,6 +5,7 @@
  * Copyright (c) 2012, Niklas Hauser
  * Copyright (c) 2012, Sascha Schade
  * Copyright (c) 2015, Thorsten Lajewski
+ * Copyright (c) 2017, Daniel Krebs
  *
  * This file is part of the modm project.
  *

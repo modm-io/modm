@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2010, 2017 Fabian Greif
- * Copyright (c) 2012-2014, Niklas Hauser
+ * Copyright (c) 2010, 2018, Fabian Greif
+ * Copyright (c) 2012-2014, 2017, Niklas Hauser
  * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2016, Sascha Schade
  *

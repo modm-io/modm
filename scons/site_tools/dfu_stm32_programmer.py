@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2013, Sascha Schade
 # Copyright (c) 2014, 2016, Daniel Krebs
+# Copyright (c) 2017, Michael Thies
 #
 # This file is part of the modm project.
 #

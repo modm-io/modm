@@ -1,5 +1,8 @@
 /*
  * Copyright (c) 2016, Sascha Schade
+ * Copyright (c) 2017, Christopher Durand
+ * Copyright (c) 2017, Niklas Hauser
+ * Copyright (c) 2018, Fabian Greif
  *
  * This file is part of the modm project.
  *
