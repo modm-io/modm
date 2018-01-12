@@ -14,6 +14,7 @@
 #include <modm/board/board.hpp>
 #include <modm/debug/logger.hpp>
 #include <modm/processing/processing.hpp>
+#include <inttypes.h>
 
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
 
@@ -49,7 +50,7 @@ setDirection(Direction dir)
 
 		modm::Timestamp timestamp = modm::Clock::now();
 
-		MODM_LOG_INFO.printf("\e[39m\n%04d %02d:%03d +%01d:%03d ",
+		MODM_LOG_INFO.printf("\e[39m\n%04" PRId16 " %02" PRId32 ":%03" PRId32 " +%01" PRId32 ":%03" PRId32 " ",
 				counter,
 				timestamp.getTime() / 1000,
 				timestamp.getTime() % 1000,

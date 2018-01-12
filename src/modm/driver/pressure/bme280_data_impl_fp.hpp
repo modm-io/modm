@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 #include <cmath>
+#include <inttypes.h>
 
 #include <modm/debug/logger/logger.hpp>
 
@@ -41,7 +42,7 @@ Data::calculateCalibratedTemperature()
 	int32_t adc = (((int32_t(raw[3])) << 16) | (raw[4] << 8) | (raw[5] << 0));
 	adc >>= 4;
 
-	MODM_LOG_DEBUG.printf("adc = 0x%05x\n", adc);
+	MODM_LOG_DEBUG.printf("adc = 0x%05" PRIx32 "\n", adc);
 
 	int32_t T1 = calibration.T1;
 	int32_t T2 = calibration.T2;

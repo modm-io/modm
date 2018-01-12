@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2009, Martin Rosekeit
@@ -65,7 +65,7 @@ def xml_include_scanner(node, env, path, arg=None):
 			if file not in dependencies:
 				stack.append(file)
 		dependencies.extend(files)
-	
+
 	dependencies.remove(targetFilename)
 	return dependencies
 
@@ -75,10 +75,10 @@ def packet_emitter(target, source, env):
 		path = env['path']
 	except KeyError:
 		path = '.'
-	
+
 	target = [os.path.join(path, "packets.cpp"),
 			  os.path.join(path, "packets.hpp")]
-	
+
 	return (target, source)
 
 def identifier_emitter(target, source, env):
@@ -86,9 +86,9 @@ def identifier_emitter(target, source, env):
 		path = env['path']
 	except KeyError:
 		path = '.'
-	
+
 	target = [os.path.join(path, "identifier.hpp")]
-	
+
 	return (target, source)
 
 def postman_emitter(target, source, env):
@@ -96,10 +96,10 @@ def postman_emitter(target, source, env):
 		path = env['path']
 	except KeyError:
 		path = '.'
-	
+
 	target = [os.path.join(path, "postman.cpp"),
 			  os.path.join(path, "postman.hpp")]
-	
+
 	return (target, source)
 
 def communication_emitter(target, source, env):
@@ -107,9 +107,9 @@ def communication_emitter(target, source, env):
 		path = env['path']
 	except KeyError:
 		path = '.'
-	
+
 	target = [os.path.join(path, "communication.hpp")]
-	
+
 	return (target, source)
 
 def xpcc_task_caller_emitter(target, source, env):
@@ -117,7 +117,7 @@ def xpcc_task_caller_emitter(target, source, env):
 		path = env['path']
 	except KeyError:
 		path = '.'
-	
+
 	target = [os.path.join(path, "caller.hpp")]
 	return (target, source)
 
@@ -150,7 +150,7 @@ def generate(env, **kw):
 	env['BUILDERS']['SystemCppPackets'] = \
 		SCons.Script.Builder(
 			action = SCons.Action.Action(
-				'python2 "${XPCC_SYSTEM_BUILDER}/cpp_packets.py" ' \
+				'python3 "${XPCC_SYSTEM_BUILDER}/cpp_packets.py" ' \
 					'--source_path ${TARGETS[0].dir} ' \
 					'--header_path ${TARGETS[1].dir} ' \
 					'--dtdpath "${dtdPath}" ' \
@@ -162,11 +162,11 @@ def generate(env, **kw):
 			single_source = True,
 			target_factory = env.fs.Entry,
 			src_suffix = ".xml")
-	
+
 	env['BUILDERS']['SystemCppIdentifier'] = \
 		SCons.Script.Builder(
 			action = SCons.Action.Action(
-				'python2 "${XPCC_SYSTEM_BUILDER}/cpp_identifier.py" ' \
+				'python3 "${XPCC_SYSTEM_BUILDER}/cpp_identifier.py" ' \
 					'--outpath ${TARGET.dir} ' \
 					'--dtdpath "${dtdPath}" ' \
 					'--namespace "${namespace}" ' \
@@ -177,11 +177,11 @@ def generate(env, **kw):
 			single_source = True,
 			target_factory = env.fs.Entry,
 			src_suffix = ".xml")
-	
+
 	env['BUILDERS']['SystemCppPostman'] = \
 		SCons.Script.Builder(
 			action = SCons.Action.Action(
-				'python2 "${XPCC_SYSTEM_BUILDER}/cpp_postman.py" ' \
+				'python3 "${XPCC_SYSTEM_BUILDER}/cpp_postman.py" ' \
 					'--container "${container}" ' \
 					'--outpath ${TARGET.dir} ' \
 					'--dtdpath "${dtdPath}" ' \
@@ -193,11 +193,11 @@ def generate(env, **kw):
 			single_source = True,
 			target_factory = env.fs.Entry,
 			src_suffix = ".xml")
-	
+
 	env['BUILDERS']['SystemCppCommunication'] = \
 		SCons.Script.Builder(
 			action = SCons.Action.Action(
-				'python2 "${XPCC_SYSTEM_BUILDER}/cpp_communication.py" ' \
+				'python3 "${XPCC_SYSTEM_BUILDER}/cpp_communication.py" ' \
 					'--outpath ${TARGET.dir} ' \
 					'--dtdpath "${dtdPath}" ' \
 					'--namespace "${namespace}" ' \
@@ -208,11 +208,11 @@ def generate(env, **kw):
 			single_source = True,
 			target_factory = env.fs.Entry,
 			src_suffix = ".xml")
-	
+
 	env['BUILDERS']['SystemCppXpccTaskCaller'] = \
 		SCons.Script.Builder(
 			action = SCons.Action.Action(
-				'python2 "${XPCC_SYSTEM_BUILDER}/cpp_xpcc_task_caller.py" ' \
+				'python3 "${XPCC_SYSTEM_BUILDER}/cpp_xpcc_task_caller.py" ' \
 					'--outpath ${TARGET.dir} ' \
 					'--dtdpath "${dtdPath}" ' \
 					'--namespace "${namespace}" ' \
@@ -223,7 +223,7 @@ def generate(env, **kw):
 			single_source = True,
 			target_factory = env.fs.Entry,
 			src_suffix = ".xml")
-	
+
 	if SCons.Script.ARGUMENTS.get('verbose') != '1':
 		env['SYSTEM_CPP_PACKETS_COMSTR'] = "Generate packets from: $SOURCE"
 		env['SYSTEM_CPP_IDENTIFIER_COMSTR'] = "Generate identifier from: $SOURCE"

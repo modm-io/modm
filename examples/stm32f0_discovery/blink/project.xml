@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <extends>../../../src/modm/board/disco_f051r8/board.xml</extends>
+  <options>
+    <option name=":build.scons:build.path">../../../build/stm32f0_discovery/blink</option>
+  </options>
+  <modules>
+    <module>:build.scons</module>
+  </modules>
+</library>

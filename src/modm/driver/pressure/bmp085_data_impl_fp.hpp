@@ -10,6 +10,7 @@
 // ----------------------------------------------------------------------------
 
 #include <stdio.h>
+#include <inttypes.h>
 #include <cmath>
 
 #include <modm/debug/logger/logger.hpp>
@@ -32,19 +33,19 @@ Data::calculateCalibratedTemperature()
 {
 	int32_t x1, x2;
 	uint16_t ut = (uint16_t(raw[0]) << 8) | raw[1];
-	MODM_LOG_DEBUG.printf("ut = %d\n", ut);
+	MODM_LOG_DEBUG.printf("ut = %" PRId16 "\n", ut);
 
 	x1 = modm::math::mul( int16_t(ut - calibration.ac6), int16_t(calibration.ac5)) >> 15;
-	MODM_LOG_DEBUG.printf("x1 = %d\n", x1);
+	MODM_LOG_DEBUG.printf("x1 = %" PRId32 "\n", x1);
 
 	x2 = (int32_t(calibration.mc) << 11) / (x1 + calibration.md);
-	MODM_LOG_DEBUG.printf("x2 = %d\n", x2);
+	MODM_LOG_DEBUG.printf("x2 = %" PRId32 "\n", x2);
 
 	b5 = x1 + x2;
-	MODM_LOG_DEBUG.printf("b5 = %d\n", b5);
+	MODM_LOG_DEBUG.printf("b5 = %" PRId32 "\n", b5);
 
 	calibratedTemperature = int16_t((b5 + 8) >> 4);
-	MODM_LOG_DEBUG.printf("T = %d\n", calibratedTemperature);
+	MODM_LOG_DEBUG.printf("T = %" PRId16 "\n", calibratedTemperature);
 
 	meta |= TEMPERATURE_CALCULATED;
 }

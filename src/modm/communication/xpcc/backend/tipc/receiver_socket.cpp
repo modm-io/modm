@@ -17,8 +17,9 @@
 #include <linux/tipc.h>
 #include <errno.h>
 #include <cstring>
+#include <unistd.h>
 
-#include <boost/scoped_array.hpp>
+#include <memory>
 
 #include <iostream>
 
@@ -128,7 +129,8 @@ xpcc::tipc::ReceiverSocket::receivePayload(uint8_t* payloadPointer, size_t paylo
 	int result = 0;
 
 	// Allocate memory for the whole packet inclusive header
-	boost::scoped_array<uint8_t> packetPointer ( new uint8_t[ sizeof(Header) + payloadLength ] );
+
+	std::unique_ptr<uint8_t[]> packetPointer ( new uint8_t[ sizeof(Header) + payloadLength ] );
 
 	result = recv(	this->socketDescriptor_,
 					packetPointer.get(),

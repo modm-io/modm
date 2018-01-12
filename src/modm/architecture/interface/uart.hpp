@@ -60,12 +60,22 @@ public:
 		 B115200 =  115200,
 		 B230400 =  230400,
 		 B250000 =  250000,
+		 kBps250 =  250000,
 		 B500000 =  500000,
-		B1000000 = 1000000
+		 kBps500 =  500000,
+		B1000000 = 1000000,
+		   MBps1 = 1000000
 #endif
 	};
 
 #ifdef __DOXYGEN__
+public:
+	/// Size of the receive buffer.
+	static constexpr size_t RxBufferSize = 16;
+
+	/// Size of the transmit buffer.
+	static constexpr size_t TxBufferSize = 16;
+
 public:
 	/**
 	 * Connect GPIOs to the peripheral and configure them.

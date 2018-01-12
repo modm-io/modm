@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2014, Sascha Schade
@@ -26,7 +26,7 @@ def openocd_remote_run(env, source, alias='openocd_remote_run'):
 
 		def fail(target, source, env):
 			raise Exception("Not supported under windows")
-		
+
 		action = fail
 		return env.AlwaysBuild(env.Alias(alias, source, action))
 	else:
@@ -70,7 +70,7 @@ def gdb_remote_reset(env, alias='gdb_remote_reset'):
 
 		def fail(target, source, env):
 			raise Exception("Not supported under windows")
-		
+
 		action = fail
 		return env.AlwaysBuild(env.Alias(alias, '', action))
 	else:
@@ -89,7 +89,7 @@ def generate(env, **kw):
 	# build messages
 	if not ARGUMENTS.get('verbose'):
 		env['OPENOCD_COMSTR'] = "OpenOCD remote: program $SOURCE"
-	
+
 	env['OPENOCD'] = 'openocd'
 
 	env.AddMethod(openocd_remote_run,  'OpenOcdRemote')

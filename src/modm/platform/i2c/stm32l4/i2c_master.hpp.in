@@ -42,8 +42,7 @@ namespace platform
 class I2cMaster{{ id }} : public ::modm::I2cMaster
 {
 public:
-	static const TypeId::I2cMaster{{ id }}Sda Sda;
-	static const TypeId::I2cMaster{{ id }}Scl Scl;
+	static constexpr size_t TransactionBufferSize = {{ options["buffer.transaction"] }};
 
 public:
 	template< template<Peripheral _> class... Signals, ResetDevices reset = ResetDevices::Standard>

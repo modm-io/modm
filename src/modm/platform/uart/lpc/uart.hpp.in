@@ -56,6 +56,11 @@ class Uart1 : public modm::Uart
 	initialize(uint32_t baudrate);
 
 public:
+	// Expose jinja template parameters to be checked by e.g. drivers or application
+	static constexpr size_t RxBufferSize = {{ option["buffer.rx"] }};
+	static constexpr size_t TxBufferSize = {{ option["buffer.tx"] }};
+
+public:
 	template< class SystemClock, uint32_t baudrate,
 			uint16_t tolerance = modm::Tolerance::OnePercent >
 	static void modm_always_inline

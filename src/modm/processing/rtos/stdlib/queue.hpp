@@ -20,7 +20,7 @@
 #include <stdint.h>
 #include <deque>
 
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 #include <modm/container/deque.hpp>
 
 namespace modm
@@ -83,7 +83,7 @@ namespace modm
 			Queue&
 			operator = (const Queue& other);
 			
-			mutable boost::timed_mutex mutex;
+			mutable std::timed_mutex mutex;
 			
 			uint32_t maxSize;
 			std::deque<T> deque;

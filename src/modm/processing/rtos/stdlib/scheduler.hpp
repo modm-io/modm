@@ -19,7 +19,7 @@
 #	error "Don't include this file directly, use <modm/processing/rtos/scheduler.hpp>"
 #endif
 
-#include <boost/thread/thread.hpp>
+#include <thread>
 
 namespace modm
 {

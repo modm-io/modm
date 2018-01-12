@@ -32,7 +32,7 @@ def prepare(module, options):
             description="Select the supply voltage of the ST7036.",
             default="3.3V"))
 
-    module.depends(":ui", ":debug")
+    module.depends(":ui", ":debug", ":platform:clock.generic")
     return True
 
 

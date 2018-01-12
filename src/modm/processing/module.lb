@@ -22,8 +22,8 @@ def build(env):
     env.outbasepath = "src/modm/processing"
 
     if env.has_module(":freertos"):
-        env.copy(".", ignore=env.ignore_patterns("*.lb", "*/rtos/boost*"))
+        env.copy(".", ignore=env.ignore_patterns("*.lb", "*/rtos/stdlib*"))
     elif env[":target"].identifier["platform"] in ["hosted"]:
     	env.copy(".", ignore=env.ignore_patterns("*.lb", "*/rtos/freertos*"))
     else:
-        env.copy(".", ignore=env.ignore_patterns("*.lb", "*/rtos/boost*", "*/rtos/freertos*"))
+        env.copy(".", ignore=env.ignore_patterns("*.lb", "*/rtos/stdlib*", "*/rtos/freertos*"))

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2010-2011, Fabian Greif
@@ -25,7 +25,7 @@ class JavaPacketsBuilder(builder_base.Builder):
 	which contains as subclasses all the Packages.
 	
 	A common call would be like:
-	$python2 java_packets.py  --outpath source/rca/robot --package rca.robot robot.xml;
+	$python3 java_packets.py  --outpath source/rca/robot --package rca.robot robot.xml;
 	"""
 	
 	
@@ -59,8 +59,7 @@ class JavaPacketsBuilder(builder_base.Builder):
 		packets = self.tree.types
 		packets.remove('Bool')
 		
-		primitives = filter.PRIMITIVES.values()
-		primitives.sort()
+		primitives = sorted(filter.PRIMITIVES.values())
 		
 		substitutions = {
 			'package' : self.options.package,

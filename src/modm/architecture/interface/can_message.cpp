@@ -10,6 +10,8 @@
 // ----------------------------------------------------------------------------
 
 #include <stdint.h>
+#include <inttypes.h>
+
 #include <modm/io/iostream.hpp>
 #include <modm/architecture/utils.hpp>
 #include <modm/architecture/interface/can_message.hpp>
@@ -23,7 +25,7 @@ namespace can
 modm::IOStream&
 operator << (modm::IOStream& s, const modm::can::Message m)
 {
-    s.printf("id = %04x, len = ", m.identifier);
+    s.printf("id = %04" PRIx32 ", len = ", m.identifier);
     s << m.length;
     s.printf(", flags = %c%c, data = ",
              m.flags.rtr ? 'R' : 'r',

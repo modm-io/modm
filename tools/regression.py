@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2010-2011, Fabian Greif
@@ -17,6 +17,7 @@ import re
 import sys
 import subprocess
 import optparse
+import locale
 
 COLOR_GREEN = ";32"
 COLOR_RED = ";31"
@@ -40,21 +41,21 @@ def check_and_print_results(old, new):
 	
 	if (oldFlash < flash) or (oldRam < ram):
 		set_color(COLOR_RED)
-		print "WARNING: Regression at %s" % path
+		print("WARNING: Regression at %s" % path)
 		if oldFlash != flash:
-			print "  Flash : %i -> %i (%+i => %i%%)" % (oldFlash, flash, divFlash, percentFlash)
+			print("  Flash : %i -> %i (%+i => %i%%)" % (oldFlash, flash, divFlash, percentFlash))
 		if oldRam != ram:
-			print "  RAM   : %i -> %i (%+i => %i%%)" % (oldRam, ram, divRam, precentRam)
+			print("  RAM   : %i -> %i (%+i => %i%%)" % (oldRam, ram, divRam, precentRam))
 		set_color(COLOR_DEFAULT)
 		return True
 		
 	elif (oldFlash > flash) or (oldRam > ram):
 		set_color(COLOR_GREEN)
-		print "IMPROVEMENT at %s" % path
+		print("IMPROVEMENT at %s" % path)
 		if oldFlash != flash:
-			print "  Flash : %i -> %i (%+i => %i%%)" % (oldFlash, flash, divFlash, percentFlash)
+			print("  Flash : %i -> %i (%+i => %i%%)" % (oldFlash, flash, divFlash, percentFlash))
 		if oldRam != ram:
-			print "  RAM   : %i -> %i (%+i => %i%%)" % (oldRam, ram, divRam, precentRam)
+			print("  RAM   : %i -> %i (%+i => %i%%)" % (oldRam, ram, divRam, precentRam))
 		set_color(COLOR_DEFAULT)
 		return True
 	
@@ -101,26 +102,26 @@ def check_symbols(file_old_symbols, file_new_symbols):
 					
 					if old_size > size:
 						set_color(COLOR_GREEN)
-						print "    %c %4i -> %4i (%4i) %s" % (type, old_size, size, (size - old_size), name)
+						print("    %c %4i -> %4i (%4i) %s" % (type, old_size, size, (size - old_size), name))
 						set_color(COLOR_DEFAULT)
 						
 					elif old_size < size:
 						set_color(COLOR_RED)
-						print "    %c %4i -> %4i (%4i) %s" % (type, old_size, size, (size - old_size), name)
+						print("    %c %4i -> %4i (%4i) %s" % (type, old_size, size, (size - old_size), name))
 						set_color(COLOR_DEFAULT)
 				except KeyError:
 					# key was not found in the old symbol table => new symbol
 					set_color(COLOR_RED)
-					print "    %c %4i added          %s" % (type, size, name)
+					print("    %c %4i added          %s" % (type, size, name))
 					set_color(COLOR_DEFAULT)
 		
-		for name, values in old_symbols.iteritems():
+		for name, values in old_symbols.items():
 			# symbol was not removed => symbol is not in the new set
 			for value in values:
 				(type, size) = value
 				
 				set_color(COLOR_GREEN)
-				print "    %c %4i removed        %s" % (type, size, name)
+				print("    %c %4i removed        %s" % (type, size, name))
 				set_color(COLOR_DEFAULT)
 	except IOError:
 		pass
@@ -185,16 +186,17 @@ if __name__ == '__main__':
 			p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
 			stdout, stderr = p.communicate()
 			
-			print "check: %s" % path
+			print("check: %s" % path)
 			if stderr is not None:
 				set_color(COLOR_YELLOW)
-				print "ERROR: Failure when compiling '%s':" % path
-				print stderr
+				print("ERROR: Failure when compiling '%s':" % path)
+				print(stderr)
 				set_color(COLOR_DEFAULT)
 			else:
 				try:
-					flash = int(re.search("\nProgram:\s+(\d+)", stdout).group(1))
-					ram = int(re.search("\nData:\s+(\d+)", stdout).group(1))
+					result = stdout.decode(locale.getpreferredencoding())
+					flash = int(re.search("\nProgram:\s+(\d+)", result).group(1))
+					ram = int(re.search("\nData:\s+(\d+)", result).group(1))
 					
 					newData.append([path, flash, ram])
 					
@@ -209,10 +211,10 @@ if __name__ == '__main__':
 								# size differs, do detailed analysis
 								check_symbols(symbols_old, symbols_new)
 					except KeyError:
-						print "WARNING: not found in previous version!"
+						print("WARNING: not found in previous version!")
 				except AttributeError:
 					set_color(COLOR_YELLOW)
-					print "WARNING: could not determine size!"
+					print("WARNING: could not determine size!")
 					set_color(COLOR_DEFAULT)
 
 	file = open("regression.2.txt", "w")

@@ -76,6 +76,10 @@ public:
 
 #ifdef __DOXYGEN__
 public:
+	/// Number of transactions which can be queued in this driver.
+	static constexpr size_t TransactionBufferSize = 8;
+
+public:
 	/**
 	 * Configures the Scl and Sda signals and connects them.
 	 *

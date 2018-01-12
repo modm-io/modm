@@ -58,7 +58,7 @@ modm::gui::FloatField::render(View* view)
 	int afterComma = std::abs(static_cast<int>((this->getValue() - beforeComma) * 1000));
 
 	*out << beforeComma << ".";
-	out->printf("%03ld", afterComma);
+	out->printf("%03d", afterComma);
 
 //	*out << this->value;
 }

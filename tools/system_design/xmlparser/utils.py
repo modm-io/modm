@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2011, Fabian Greif
@@ -16,7 +16,7 @@
 import re
 import copy
 
-from parser_exception import ParserException
+from .parser_exception import ParserException
 
 def check_name(name):
 	""" Checks if a string comply with some rules for the notation
@@ -33,12 +33,14 @@ class SortedDictionary(dict):
 	def __iter__(self):
 		class Iterator:
 			def __init__(self, list):
-				self.list = list
-				self.list.sort()
-			
+				self.list = sorted(list)
+
 			def __iter__(self):
 				return self
-			
+
+			def __next__(self):
+				return self.next()
+
 			def next(self):
 				try:
 					item = self.list.pop(0)
@@ -60,7 +62,7 @@ class SingleAssignDictionary(SortedDictionary):
 		SortedDictionary.__init__(self)
 	
 	def __setitem__(self, key, item):
-		if not self.has_key(key):
+		if key not in self:
 			SortedDictionary.__setitem__(self, key, item)
 		else:
 			raise ParserException("%s '%s' defined twice!" % (self.name.capitalize(), key))

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2011, Fabian Greif
@@ -14,10 +14,10 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-import utils
-import xml_utils
+from . import utils
+from . import xml_utils
 
-from parser_exception import ParserException
+from .parser_exception import ParserException
 
 class Action(object):
 	
@@ -46,8 +46,18 @@ class Action(object):
 		return type
 	
 	def __cmp__(self, other):
-		return cmp(self.id, other.id) or cmp(self.name, other.name)
-	
+		return 1 - self.__eq__(other) - 2 * self.__lt__(other)
+
+	def __lt__(self, other):
+		if self.id == other.id:
+			return self.name < other.name
+		if self.id is None:
+			return other.id is not None
+		return other.id is not None and self.id < other.id
+
+	def __eq__(self, other):
+		return self.id == other.id and self.name == other.name
+
 	def update(self, top):
 		assert self.name == top.name
 		for key, value in self.__dict__.items():

@@ -13,9 +13,9 @@
 
 #include <modm/architecture/architecture.hpp>
 
-GPIO_OUTPUT(Out, 0, 0);
-GPIO_INPUT(In, 0, 1);
-GPIO_IO(Io, 0, 2);
+using Out = modm::lpc::GpioOutput0_1;
+using In  = modm::lpc::GpioInput0_2;
+using Io  = modm::lpc::Gpio0_3;
 
 int
 main()
@@ -34,7 +34,7 @@ main()
 	Io::setInput();
 	Io::read();
 
-	while (1)
+	while (true)
 	{
 	}
 }

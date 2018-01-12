@@ -50,6 +50,396 @@ pay attention to. Medium impact changes are also worth looking at.
 
 </details>
 
+## 2018-01-07: 2017q4 release
+
+This release covers everything from the 2017q3 release on 2017-10-01 and has been
+tested with avr-gcc v5.4.0 from Atmel and arm-none-eabi-gcc 2017q4 from Arm. 
+
+Breaking changes:
+
+- No breaking changes.
+
+Major features:
+
+- SCons 3 and Python 3 support for built tools
+- All targets build with C++14 by default
+- Rosserial support
+- LPC support (revival)
+
+Major fixes:
+
+- Fix the I2C driver on STM32L0/L4 for writes/reads > 255 bytes.
+- Fix matrix multiplication and LU decomposition
+- Fix `GpioPort` setOutput()/setInput()/configure() on STM32
+- Fix Hd44780 initialization for 4-bit bus
+- Fix GCC7-specific compile errors and warnings
+
+Known bugs:
+
+- modm may generate separate IRQ handlers for shared interrupts. See [#88][].
+- GPIO `connect` on STM32F1 is still broken. See [#178][] for discussion.
+  The API from MODM will not be backported to modm however.
+- STM32F107 does not compile due to the HAL trying to remap USB. See [#268][].
+- SCons build system emits multiple non-critical warnings. See [#286][].
+- avr-gcc 7 complains about dynamic initialization put into program memory area. See [#314][].
+
+New development board targets:
+
+- No new development board targets
+
+New device drivers:
+
+- No new device drivers
+
+Many thanks to all our contributors.
+A special shoutout to first timers (🎉🎊):
+
+- Álan Crístoffer ([@acristoffers][]) 🎉🎊
+- Andre Gilerson ([@AndreGilerson][]) 🎉🎊
+- Carl Treudler ([@cajt][])
+- Christopher Durand ([@chris-durand][])
+- Marten Junga ([@Maju-Ketchup][])
+- Michael Thies ([@mhthies][])
+- Niklas Hauser ([@salkinium][])
+- Raphael Lehmann ([@rleh][])
+- Sascha Schade ([@strongly-typed][])
+
+PR [#325][] -> [2017q4][].
+
+<details>
+<summary>Detailed changelog</summary>
+
+#### 2018-01-07: Fix HD44780 initialization for 4-bit bus
+
+Adds missing bitshift to write the correct nibble to enable 4-bit mode.
+
+PR [#326][] -> [42837c7][] with low impact on HD44780 driver.  
+Tested in hardware by [@acristoffers][].
+
+#### 2018-01-07: Fix GpioPort setOutput()/setInput()/configure() on STM32
+
+Fixes wrong offset of a port mask used to configure output, input and pullups.
+
+PR ? -> [6328b4a][] with low impact on STM32 targets.  
+Tested in hardware by [@salkinium][].
+
+#### 2018-01-07: Update CMSIS headers for STM32
+
+PR [#324][] -> [857e514][] with **medium impact** on STM32 targets.  
+Tested in hardware by [@salkinium][].
+
+#### 2018-01-03: Use C++ stdlib instead of boost for hosted RTOS
+
+Replaces the hosted implementation of our RTOS interface with the C++ stdlib to reduce our dependence on boost for threading.
+
+PR [#322][] -> [5ef8009][] with low impact on hosted targets.
+
+#### 2018-01-03: Python 3 support for SConscripts and related tools
+
+SCons 3.0 features support for both Python 3.5+ and Python 2.7.
+These changes make all build and tool scripts compatible with
+both versions and adapt the CI systems too.
+
+PR [#297][] -> [3b47fa5][] with low impact on all build tools.
+
+#### 2017-12-20: Enable C++14 for all targets by default
+
+This is possible since Atmel's offical avr-gcc is now >= v5.4.0.
+
+PR [#320][] -> [68e73b3][] with low impact on all targets.
+
+#### 2017-12-19: Fix matrix multiplication and LU-decomposition
+
+Matrix height and width parameters were switched.
+
+PR [#318][] -> [c4ed672][] with **medium impact** on matrix math.  
+Tested in hardware by [@Maju-Ketchup][].
+
+#### 2017-12-18: Fix printing of uint64_t in iostream
+
+Only the lower 32 bits of an uint64_t were shown in iostream.
+
+PR [#315][] -> [2c898ae][] with **medium impact** on printing 64-bit numbers.  
+Tested in hardware by [@Maju-Ketchup][].
+
+#### 2017-11-09: Add rosserial to communicate with ROS
+
+Allows using modm for embedded sensor aquisition and interacting with a ROS robot across a serial link via ROS messages.
+
+PR [#306][] -> [78c3ae2][].  
+Tested in hardware by [@strongly-typed][].
+
+#### 2017-10-27: Revive LPC11C24 with GPIO, UART and CAN
+
+"out of curiosity"
+
+PR [#305][] -> [48d60e2][] with **medium impact** on LPC targets.  
+Tested in hardware by [@strongly-typed][].
+
+#### 2017-10-24: Fix negative temperatures and round integer for LTC298x
+
+PR [#301][] -> [6aee411][] with **medium impact** on negative LTC298x data.  
+Tested in hardware by [@rleh][].
+
+#### 2017-10-15: Add CircleCI integration
+
+PR [#298][] -> [c5f8170][].
+
+#### 2017-10-12: Fix the I2C on STM32L4
+
+Correctly generates restart condition on writes > 255 bytes.
+
+PR [#299][] -> [3d9d80f][] with low impact on STM32L0/L4 targets.  
+Tested in hardware by [@strongly-typed][].
+
+</details>
+
+
+## 2017-10-01: 2017q3 release
+
+This release covers everything from the 2017q2 release on 2017-07-02 and has been
+tested with avr-gcc v5.4.0 from Atmel and arm-none-eabi-gcc 2017q2 from Arm. 
+Note, that Arm did not release 6-2017-q3-update for their toolchain this quarter.
+
+Breaking changes:
+
+- MCP2515 revival adds new `initialize` API
+
+Major features:
+
+- No major features
+
+Major fixes:
+
+- Fix pin remap access (MAPR2 register) for STM32F1 XL Density series
+- Fix moving average for negative averages
+- Fix printf format string type violations
+
+Known bugs:
+
+- modm may generate separate IRQ handlers for shared interrupts. See [#88][].
+- GPIO `connect` on STM32F1 is still broken. See [#178][] for discussion.
+  The API from MODM will not be backported to modm however.
+- STM32L0/L4 hardware I2C driver has limitations on restart behaviors. See [#255][].
+- STM32F107 does not compile due to the HAL trying to remap USB. See [#268][].
+- SCons build system emits multiple non-critical warnings. See [#286][].
+- SCons 3.0 was released, however, our build system is not fully compatible. See [#293][].
+
+New development board targets:
+
+- OLIMEXINO-STM32 as `olimexino_stm32`
+- STM32F051R-DISCO as `stm32f0_discovery`
+
+New device drivers:
+
+- AD79x8
+- LTC298x
+- AMSYS5915
+- MCP2515 (revived)
+
+Many thanks to all our contributors.
+A special shoutout to first timers (🎉🎊):
+
+- Carl Treudler ([@cajt][]) 🎉🎊
+- Christopher Durand ([@chris-durand][])
+- Daniel Krebs ([@daniel-k][])
+- Marten Junga ([@Maju-Ketchup][]) 🎉🎊
+- Michael Thies ([@mhthies][])
+- Niklas Hauser ([@salkinium][])
+- Raphael Lehmann ([@rleh][])
+- Sascha Schade ([@strongly-typed][])
+
+PR [#296][] -> [2017q3][].
+
+<details>
+<summary>Detailed changelog</summary>
+
+#### 2017-10-01: Update CMSIS headers for STM32
+
+PR [#295][] -> [e1f056a][] with **medium impact** on STM32 targets.  
+Tested in hardware by [@salkinium][].
+
+#### 2017-09-21: Add OLIMEXINO-STM32 board and example
+
+PR [#288][] -> [9d6620d][].  
+Tested in hardware by [@cajt][].
+
+#### 2017-08-24: Add DISCO-F051R8 board and example
+
+PR [#284][] -> [51491ad][].  
+Tested in hardware by [@strongly-typed][].
+
+#### 2017-08-22: Revive MCP2515 driver and add 8 MHz config
+
+Tested in hardware with 8 MHz external crystal for
+10, 20, 50, 100, 125, 250, 500 and 1000 kBps with
+STM32 bxCAN and oscilloscope with protocol decoder.
+
+PR [#278][] -> [b77294e][] with **high impact** on MCP2515 driver users.  
+Tested in hardware by [@strongly-typed][].
+
+#### 2017-08-14: Fix moving average for negative averages
+
+Since template parameter N is defined as `std::size_t` which is unsigned,
+the result of the average calculation will be implicitly casted and
+therefore negative averages gave wrong results.
+
+PR [#272][] -> [e14ba68][] with **medium impact** on filter algorithms.
+
+#### 2017-08-12: Add pressure sensor AMSYS5915 driver
+
+PR [#275][] -> [fc59fc0][].  
+Tested in hardware by [@rleh][].
+
+#### 2017-08-12: Add temperature sensor LTC298x driver
+
+PR [#273][] -> [a27ca5d][].  
+Tested in hardware by [@rleh][].
+
+#### 2017-08-11: Add ADC AD79x8 driver
+
+PR [#274][] -> [680c92a][].  
+Tested in hardware by [@chris-durand][].
+
+#### 2017-07-25: Fix printf format string warnings
+
+PR [#270][] -> [8cc5c78][] with low impact.
+
+#### 2017-07-19: Fix pin remap access for STM32F1
+
+Fix pin remap access (MAPR2 register) for STM32F1 XL Density series
+
+PR [#269][] -> [06b5af9][] with **medium impact** on STM32F1 targets.  
+Tested in hardware by [@strongly-typed][].
+
+#### 2017-07-08: Add Python 3 support to MODM xml parser
+
+The MODM (the protocol) tools now work with both Python2 and Python3.
+
+PR [#261][] -> [fc2f33b][] with low impact.
+
+#### 2017-07-04: Check arguments of printf format string
+
+Now the compiler checks the format string for any type violations.
+
+PR [#263][] -> [3f50e1d][] with low impact.
+
+</details>
+
+
+## 2017-07-02: 2017q2 release
+
+This release covers everything from the 2017q1 release on 2017-04-05 and has been
+tested with avr-gcc v5.4.0 from Atmel and arm-none-eabi-gcc 2017q2 from ARM.
+
+Breaking changes:
+
+- No breaking changes
+
+Major features:
+
+- STM32L4 target support and drivers
+- Improve assert implementation and make use of them
+
+Major fixes:
+
+- Fix issues and warnings in release tests
+- Fix wrong `ns_per_loop` rounding in board definitions
+
+Known bugs:
+
+- modm may generate separate IRQ handlers for shared interrupts. See [#88][].
+- GPIO `connect` on STM32F1 is still broken. See [#178][] for discussion.
+  The API from MODM will not be backported to modm however.
+- STM32L0/L4 hardware I2C driver has limitations on restart behaviors. See [#255][].
+
+New development board targets:
+
+- NUCLEO-L476RG as `nucleo_l476rg`
+- STM32L476G-DISCO as `stm32l476_discovery`
+
+New device drivers:
+
+- DS1302
+- TCS3472X
+
+Many thanks to all our contributors.
+A special shoutout to first timers (🎉🎊):
+
+- Arjun Sarin 🎉🎊
+- Michael Thies ([@mhthies][])
+- Niklas Hauser ([@salkinium][])
+- Sascha Schade ([@strongly-typed][])
+
+PR [#262][] -> [2017q2][].
+
+<details>
+<summary>Detailed changelog</summary>
+
+#### 2017-06-28: Fix and improve the release tests
+
+PR [#254][] -> [f2ac1a0][].  
+Tested in hardware by [@strongly-typed][].
+
+#### 2017-05-14: Add STM32L4 hardware ADC driver
+
+PR [#249][] -> [29c8905][].  
+Tested in hardware by [@strongly-typed][].
+
+#### 2017-05-14: Add STM32L0/L4 hardware I2C driver
+
+PR [#248][] -> [51159ff][].  
+Tested in hardware by [@strongly-typed][].
+
+#### 2017-05-13: Add RTC DS1302 driver
+
+PR [#251][] -> [40da657][].  
+Tested in hardware by [@strongly-typed][].
+
+#### 2017-05-11: Fix compiler warnings of AVR release tests
+
+PR [#253][] -> [9018741][].  
+
+#### 2017-05-07: Improve implementation, add asserts
+
+- Make header C-compatible so asserts can be called from C.
+- Specialize `assert_fail` function for context value.
+- Return condition from `modm_assert` for error handling.
+- Remove `exit()` calls from implementation.
+- Add assertions to core.
+- Update F469-DISCO assert example.
+
+PR [#247][] -> [3992534][] with low impact.  
+Tested in hardware by [@salkinium][].
+
+#### 2017-05-02: Add platform support for STM32L4 family
+
+- Updates the DFG and SCons for STM32L4 family.
+- Fixes AF issues with TimerN BreakIn signal.
+- Adds ports of drivers for STM32L4 family.
+- Adds BSPs for STM32L476 Nucleo and Discovery.
+- Adds examples for STM32L476 Nucleo and Discovery.
+
+PR [#240][] -> [e9591d5][] with **medium impact** on STM32 targets.  
+Tested in hardware by [@strongly-typed][].
+
+#### 2017-04-29: Implement %p in printf
+
+PR [#246][] -> [a906c2d][].
+
+#### 2017-04-27: Add TCS3472X color sensor driver
+
+PR [#244][] -> [68b904e][].
+
+#### 2017-04-27: Fix UART for F0x0 series.
+
+UART does not have LIN or Smartcard mode.
+
+PR [#243][] -> [7111cd3][].
+
+</details>
+
+
 ## 2017-04-05: 2017q1 release
 
 As this is our first official release it covers the last 12 months of
@@ -86,10 +476,11 @@ Major fixes:
 
 Known bugs:
 
-GPIO `connect` on STM32F1 is broken. They can be remapped only in groups,
-however, the API allows invalid remapping. This cannot be fixed without
-introducing a new API for that. See [#178][] for discussion.
-A solution has been tested for modm, but isn't ready for modm.
+- modm may generate separate IRQ handlers for shared interrupts. See [#88][].
+- GPIO `connect` on STM32F1 is broken. They can be remapped only in groups,
+  however, the API allows invalid remapping. This cannot be fixed without
+  introducing a new API for that. See [#178][] for discussion.
+  A solution has been tested for modm, but isn't ready for modm.
 
 New development board targets:
 
@@ -561,15 +952,22 @@ we have to do it manually. Hooray for technology.
 
 <!-- Releases -->
 [2017q1]: https://github.com/roboterclubaachen/modm/releases/tag/2017q1
+[2017q2]: https://github.com/roboterclubaachen/modm/releases/tag/2017q2
+[2017q3]: https://github.com/roboterclubaachen/modm/releases/tag/2017q3
+[2017q4]: https://github.com/roboterclubaachen/modm/releases/tag/2017q4
 
 <!-- Contributors -->
 [@7Kronos]: https://github.com/7Kronos
+[@acristoffers]: https://github.com/acristoffers
+[@AndreGilerson]: https://github.com/AndreGilerson
+[@cajt]: https://github.com/cajt
 [@chris-durand]: https://github.com/chris-durand
 [@daniel-k]: https://github.com/daniel-k
 [@dergraaf]: https://github.com/dergraaf
 [@ekiwi]: https://github.com/ekiwi
 [@genbattle]: https://github.com/genbattle
 [@georgi-g]: https://github.com/georgi-g
+[@Maju-Ketchup]: https://github.com/Maju-Ketchup
 [@mhthies]: https://github.com/mhthies
 [@rleh]: https://github.com/rleh
 [@salkinium]: https://github.com/salkinium
@@ -578,6 +976,7 @@ we have to do it manually. Hooray for technology.
 [@tomchy]: https://github.com/tomchy
 
 <!-- Pull requests or Issues -->
+[#88]: https://github.com/roboterclubaachen/modm/pull/88
 [#115]: https://github.com/roboterclubaachen/modm/pull/115
 [#129]: https://github.com/roboterclubaachen/modm/pull/129
 [#137]: https://github.com/roboterclubaachen/modm/pull/137
@@ -588,12 +987,9 @@ we have to do it manually. Hooray for technology.
 [#147]: https://github.com/roboterclubaachen/modm/pull/147
 [#154]: https://github.com/roboterclubaachen/modm/pull/154
 [#155]: https://github.com/roboterclubaachen/modm/pull/155
-[#155]: https://github.com/roboterclubaachen/modm/pull/155
-[#155]: https://github.com/roboterclubaachen/modm/pull/155
 [#165]: https://github.com/roboterclubaachen/modm/pull/165
 [#167]: https://github.com/roboterclubaachen/modm/pull/167
 [#168]: https://github.com/roboterclubaachen/modm/pull/168
-[#173]: https://github.com/roboterclubaachen/modm/pull/173
 [#173]: https://github.com/roboterclubaachen/modm/pull/173
 [#175]: https://github.com/roboterclubaachen/modm/pull/175
 [#176]: https://github.com/roboterclubaachen/modm/pull/176
@@ -603,13 +999,10 @@ we have to do it manually. Hooray for technology.
 [#182]: https://github.com/roboterclubaachen/modm/pull/182
 [#183]: https://github.com/roboterclubaachen/modm/pull/183
 [#185]: https://github.com/roboterclubaachen/modm/pull/185
-[#185]: https://github.com/roboterclubaachen/modm/pull/185
 [#186]: https://github.com/roboterclubaachen/modm/pull/186
 [#187]: https://github.com/roboterclubaachen/modm/pull/187
 [#188]: https://github.com/roboterclubaachen/modm/pull/188
 [#189]: https://github.com/roboterclubaachen/modm/pull/189
-[#194]: https://github.com/roboterclubaachen/modm/pull/194
-[#194]: https://github.com/roboterclubaachen/modm/pull/194
 [#194]: https://github.com/roboterclubaachen/modm/pull/194
 [#195]: https://github.com/roboterclubaachen/modm/pull/195
 [#196]: https://github.com/roboterclubaachen/modm/pull/196
@@ -624,9 +1017,52 @@ we have to do it manually. Hooray for technology.
 [#234]: https://github.com/roboterclubaachen/modm/pull/234
 [#235]: https://github.com/roboterclubaachen/modm/pull/235
 [#237]: https://github.com/roboterclubaachen/modm/pull/237
+[#240]: https://github.com/roboterclubaachen/modm/pull/240
+[#243]: https://github.com/roboterclubaachen/modm/pull/243
+[#244]: https://github.com/roboterclubaachen/modm/pull/244
+[#246]: https://github.com/roboterclubaachen/modm/pull/246
+[#247]: https://github.com/roboterclubaachen/modm/pull/247
+[#248]: https://github.com/roboterclubaachen/modm/pull/248
+[#249]: https://github.com/roboterclubaachen/modm/pull/249
+[#251]: https://github.com/roboterclubaachen/modm/pull/251
+[#253]: https://github.com/roboterclubaachen/modm/pull/253
+[#254]: https://github.com/roboterclubaachen/modm/pull/254
+[#255]: https://github.com/roboterclubaachen/modm/pull/255
+[#261]: https://github.com/roboterclubaachen/modm/pull/261
+[#262]: https://github.com/roboterclubaachen/modm/pull/262
+[#263]: https://github.com/roboterclubaachen/modm/pull/263
+[#268]: https://github.com/roboterclubaachen/modm/pull/268
+[#269]: https://github.com/roboterclubaachen/modm/pull/269
+[#270]: https://github.com/roboterclubaachen/modm/pull/270
+[#272]: https://github.com/roboterclubaachen/modm/pull/272
+[#273]: https://github.com/roboterclubaachen/modm/pull/273
+[#274]: https://github.com/roboterclubaachen/modm/pull/274
+[#275]: https://github.com/roboterclubaachen/modm/pull/275
+[#278]: https://github.com/roboterclubaachen/modm/pull/278
+[#284]: https://github.com/roboterclubaachen/modm/pull/284
+[#286]: https://github.com/roboterclubaachen/modm/pull/286
+[#288]: https://github.com/roboterclubaachen/modm/pull/288
+[#293]: https://github.com/roboterclubaachen/modm/pull/293
+[#295]: https://github.com/roboterclubaachen/modm/pull/295
+[#296]: https://github.com/roboterclubaachen/modm/pull/296
+[#297]: https://github.com/roboterclubaachen/modm/pull/297
+[#298]: https://github.com/roboterclubaachen/modm/pull/298
+[#299]: https://github.com/roboterclubaachen/modm/pull/299
+[#301]: https://github.com/roboterclubaachen/modm/pull/301
+[#305]: https://github.com/roboterclubaachen/modm/pull/305
+[#306]: https://github.com/roboterclubaachen/modm/pull/306
+[#314]: https://github.com/roboterclubaachen/modm/pull/314
+[#315]: https://github.com/roboterclubaachen/modm/pull/315
+[#318]: https://github.com/roboterclubaachen/modm/pull/318
+[#320]: https://github.com/roboterclubaachen/modm/pull/320
+[#322]: https://github.com/roboterclubaachen/modm/pull/322
+[#324]: https://github.com/roboterclubaachen/modm/pull/324
+[#325]: https://github.com/roboterclubaachen/modm/pull/325
+[#326]: https://github.com/roboterclubaachen/modm/pull/326
 
 <!-- Commits -->
 [0118a13]: https://github.com/roboterclubaachen/modm/commit/0118a13
+[06b5af9]: https://github.com/roboterclubaachen/modm/commit/06b5af9
 [08784cd]: https://github.com/roboterclubaachen/modm/commit/08784cd
 [0dbf73c]: https://github.com/roboterclubaachen/modm/commit/0dbf73c
 [0dbf73c]: https://github.com/roboterclubaachen/modm/commit/0dbf73c
@@ -636,38 +1072,72 @@ we have to do it manually. Hooray for technology.
 [170f53a]: https://github.com/roboterclubaachen/modm/commit/170f53a
 [2504682]: https://github.com/roboterclubaachen/modm/commit/2504682
 [26471ab]: https://github.com/roboterclubaachen/modm/commit/26471ab
+[29c8905]: https://github.com/roboterclubaachen/modm/commit/29c8905
+[2c898ae]: https://github.com/roboterclubaachen/modm/commit/2c898ae
+[3992534]: https://github.com/roboterclubaachen/modm/commit/3992534
+[3b47fa5]: https://github.com/roboterclubaachen/modm/commit/3b47fa5
 [3c7cd31]: https://github.com/roboterclubaachen/modm/commit/3c7cd31
+[3d9d80f]: https://github.com/roboterclubaachen/modm/commit/3d9d80f
+[3f50e1d]: https://github.com/roboterclubaachen/modm/commit/3f50e1d
 [408c309]: https://github.com/roboterclubaachen/modm/commit/408c309
+[40da657]: https://github.com/roboterclubaachen/modm/commit/40da657
 [41ab22a]: https://github.com/roboterclubaachen/modm/commit/41ab22a
+[42837c7]: https://github.com/roboterclubaachen/modm/commit/42837c7
+[48d60e2]: https://github.com/roboterclubaachen/modm/commit/48d60e2
+[51159ff]: https://github.com/roboterclubaachen/modm/commit/51159ff
+[51491ad]: https://github.com/roboterclubaachen/modm/commit/51491ad
 [553dceb]: https://github.com/roboterclubaachen/modm/commit/553dceb
 [5e547ab]: https://github.com/roboterclubaachen/modm/commit/5e547ab
+[5ef8009]: https://github.com/roboterclubaachen/modm/commit/5ef8009
 [5f5934a]: https://github.com/roboterclubaachen/modm/commit/5f5934a
+[6328b4a]: https://github.com/roboterclubaachen/modm/commit/6328b4a
 [637e074]: https://github.com/roboterclubaachen/modm/commit/637e074
 [63ad1d3]: https://github.com/roboterclubaachen/modm/commit/63ad1d3
+[680c92a]: https://github.com/roboterclubaachen/modm/commit/680c92a
+[68b904e]: https://github.com/roboterclubaachen/modm/commit/68b904e
+[68e73b3]: https://github.com/roboterclubaachen/modm/commit/68e73b3
+[6aee411]: https://github.com/roboterclubaachen/modm/commit/6aee411
 [6c1a111]: https://github.com/roboterclubaachen/modm/commit/6c1a111
+[7111cd3]: https://github.com/roboterclubaachen/modm/commit/7111cd3
+[78c3ae2]: https://github.com/roboterclubaachen/modm/commit/78c3ae2
 [7ab0132]: https://github.com/roboterclubaachen/modm/commit/7ab0132
 [84d5bd0]: https://github.com/roboterclubaachen/modm/commit/84d5bd0
+[857e514]: https://github.com/roboterclubaachen/modm/commit/857e514
+[8cc5c78]: https://github.com/roboterclubaachen/modm/commit/8cc5c78
 [8f9b154]: https://github.com/roboterclubaachen/modm/commit/8f9b154
+[9018741]: https://github.com/roboterclubaachen/modm/commit/9018741
 [967c0a9]: https://github.com/roboterclubaachen/modm/commit/967c0a9
 [9940a65]: https://github.com/roboterclubaachen/modm/commit/9940a65
+[9d6620d]: https://github.com/roboterclubaachen/modm/commit/9d6620d
 [a00d3cc]: https://github.com/roboterclubaachen/modm/commit/a00d3cc
+[a27ca5d]: https://github.com/roboterclubaachen/modm/commit/a27ca5d
 [a379e61]: https://github.com/roboterclubaachen/modm/commit/a379e61
 [a6519c3]: https://github.com/roboterclubaachen/modm/commit/a6519c3
 [a8a2322]: https://github.com/roboterclubaachen/modm/commit/a8a2322
+[a906c2d]: https://github.com/roboterclubaachen/modm/commit/a906c2d
 [b21f502]: https://github.com/roboterclubaachen/modm/commit/b21f502
+[b77294e]: https://github.com/roboterclubaachen/modm/commit/b77294e
 [bb3fa3a]: https://github.com/roboterclubaachen/modm/commit/bb3fa3a
 [c12a69b]: https://github.com/roboterclubaachen/modm/commit/c12a69b
+[c4ed672]: https://github.com/roboterclubaachen/modm/commit/c4ed672
+[c5f8170]: https://github.com/roboterclubaachen/modm/commit/c5f8170
 [c605416]: https://github.com/roboterclubaachen/modm/commit/c605416
 [c7adb48]: https://github.com/roboterclubaachen/modm/commit/c7adb48
 [cb0a11e]: https://github.com/roboterclubaachen/modm/commit/cb0a11e
 [d949fee]: https://github.com/roboterclubaachen/modm/commit/d949fee
 [da784bd]: https://github.com/roboterclubaachen/modm/commit/da784bd
 [dd3639b]: https://github.com/roboterclubaachen/modm/commit/dd3639b
+[e14ba68]: https://github.com/roboterclubaachen/modm/commit/e14ba68
 [e1efaf4]: https://github.com/roboterclubaachen/modm/commit/e1efaf4
+[e1f056a]: https://github.com/roboterclubaachen/modm/commit/e1f056a
 [e2f9b4a]: https://github.com/roboterclubaachen/modm/commit/e2f9b4a
 [e346020]: https://github.com/roboterclubaachen/modm/commit/e346020
+[e9591d5]: https://github.com/roboterclubaachen/modm/commit/e9591d5
+[f2ac1a0]: https://github.com/roboterclubaachen/modm/commit/f2ac1a0
 [f472f7f]: https://github.com/roboterclubaachen/modm/commit/f472f7f
 [f780c2a]: https://github.com/roboterclubaachen/modm/commit/f780c2a
+[fc2f33b]: https://github.com/roboterclubaachen/modm/commit/fc2f33b
+[fc59fc0]: https://github.com/roboterclubaachen/modm/commit/fc59fc0
 [fcf27a1]: https://github.com/roboterclubaachen/modm/commit/fcf27a1
 [fd1b109]: https://github.com/roboterclubaachen/modm/commit/fd1b109
 [ffa4e1b]: https://github.com/roboterclubaachen/modm/commit/ffa4e1b

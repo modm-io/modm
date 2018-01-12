@@ -92,7 +92,7 @@ modm::IOStream::vprintf(const char *fmt, va_list ap)
 		{
 			case 'c':
 				c = va_arg(ap, int); // char promoted to int
-				// fall through
+				MODM_FALLTHROUGH;
 			default:
 				this->device->write(c);
 				continue;
@@ -111,7 +111,7 @@ modm::IOStream::vprintf(const char *fmt, va_list ap)
 
 			case 'd':
 				isSigned = true;
-				// fall through
+				MODM_FALLTHROUGH;
 
 			case 'u':
 				base = 10;
@@ -124,7 +124,7 @@ modm::IOStream::vprintf(const char *fmt, va_list ap)
 				width = (MODM_SIZEOF_POINTER * 2);
 				isLong = (MODM_SIZEOF_POINTER == 4);
 				isLongLong = (MODM_SIZEOF_POINTER == 8);
-				// fall through
+				MODM_FALLTHROUGH;
 			case 'x':
 				base = 16;
 				break;
@@ -173,6 +173,21 @@ modm::IOStream::vprintf(const char *fmt, va_list ap)
 			// Print fractional part
 			writeUnsignedInteger((unsigned int)float_value, base, width_frac, '0', false);
 		}
+#if not defined(MODM_CPU_AVR)
+		else if (isLongLong)
+		{
+			long long signedValue = va_arg(ap, long long);
+			if (isSigned)
+			{
+				if (signedValue < 0)
+				{
+					isNegative = true;
+				    signedValue = -signedValue; // make it positive
+				}
+			}
+			writeUnsignedLongLong((unsigned long long) signedValue, base, width, fill, isNegative);
+		}
+#endif
 		else
 		{
 			unsigned long unsignedValue;
@@ -253,3 +268,51 @@ modm::IOStream::writeUnsignedInteger(
 		this->device->write(ch);
 	}
 }
+
+#if not defined(MODM_CPU_AVR)
+void
+modm::IOStream::writeUnsignedLongLong(
+	unsigned long long unsignedValue, uint_fast8_t base,
+	size_t width, char fill, bool isNegative)
+{
+	char scratch[26];
+
+	char *ptr = scratch + sizeof(scratch);
+	*--ptr = 0;
+	do
+	{
+		char ch = (unsignedValue % base) + '0';
+
+		if (ch > '9') {
+			ch += 'A' - '9' - 1;
+		}
+
+		*--ptr = ch;
+		unsignedValue /= base;
+
+		if (width) {
+			--width;
+		}
+	} while (unsignedValue);
+
+	// Insert minus sign if needed
+	if (isNegative)
+	{
+		*--ptr = '-';
+		if (width) {
+			--width;
+		}
+	}
+
+	// insert padding chars
+	while (width--) {
+		*--ptr = fill;
+	}
+
+	// output result
+	char ch;
+	while ((ch = *ptr++)) {
+		this->device->write(ch);
+	}
+}
+#endif

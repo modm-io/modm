@@ -11,40 +11,21 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "../thread.hpp"
-
-modm::rtos::Thread* modm::rtos::Thread::head = 0;
+#include "../mutex.hpp"
+#include <chrono>
 
 // ----------------------------------------------------------------------------
-modm::rtos::Thread::Thread(uint32_t priority, uint16_t stackDepth, const char* name) :
-	next(0),
-	thread()
+modm::rtos::Mutex::Mutex()
 {
-	// avoid compiler warnings
-	(void) priority;
-	(void) stackDepth;
-	(void) name;
-	
-	// create a list of all threads
-	if (head == 0) {
-		head = this;
-	}
-	else {
-		Thread *list = head;
-		while (list->next != 0) {
-			list = list->next;
-		}
-		list->next = this;
-	}
 }
 
-modm::rtos::Thread::~Thread()
+modm::rtos::Mutex::~Mutex()
 {
 }
 
 // ----------------------------------------------------------------------------
-void
-modm::rtos::Thread::start()
+bool
+modm::rtos::Mutex::acquire(uint32_t timeout)
 {
-	this->thread.reset(new boost::thread(boost::bind(&Thread::run, this)));
+	return mutex.try_lock_for(std::chrono::milliseconds(timeout));
 }

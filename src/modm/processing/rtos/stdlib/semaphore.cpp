@@ -11,6 +11,7 @@
 // ----------------------------------------------------------------------------
 
 #include "../semaphore.hpp"
+#include <chrono>
 
 // ----------------------------------------------------------------------------
 modm::rtos::Semaphore::Semaphore(uint32_t max, uint32_t initial) :
@@ -22,11 +23,10 @@ modm::rtos::Semaphore::Semaphore(uint32_t max, uint32_t initial) :
 bool
 modm::rtos::Semaphore::acquire(uint32_t timeout)
 {
-	boost::unique_lock<boost::mutex> lock(mutex);
+	std::unique_lock<std::mutex> lock(mutex);
 	while (count == 0)
 	{
-		 if (!condition.timed_wait(lock,
-				 boost::posix_time::milliseconds(timeout))) {
+		 if (condition.wait_for(lock, std::chrono::milliseconds(timeout)) == std::cv_status::timeout) {
 			 return false;
 		 }
 	}
@@ -38,7 +38,7 @@ modm::rtos::Semaphore::acquire(uint32_t timeout)
 void
 modm::rtos::Semaphore::release()
 {
-	boost::unique_lock<boost::mutex> lock(mutex);
+	std::unique_lock<std::mutex> lock(mutex);
 	
 	if (count < maxCount) {
 		++count;

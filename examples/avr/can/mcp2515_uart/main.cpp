@@ -88,8 +88,7 @@ main()
 	Int::setInput(Gpio::InputType::PullUp);
 
 	// Configure MCP2515 and set the filters
-	// Fixme: modm::Can::Bitrate is incompatitlbe with device driver
-	// mcp2515.initialize(modm::can::BITRATE_125_KBPS);
+	mcp2515.initialize<modm::clock::MHz8, modm::Can::Bitrate::kBps125>();
 	mcp2515.setFilter(modm::accessor::asFlash(canFilter));
 
 	// Create a new message

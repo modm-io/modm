@@ -140,8 +140,7 @@ modm::platform::CanUsb<SerialPort>::open(modm::Can::Bitrate canBitrate)
 			MutexGuard stateGuard(this->stateLock);
 			this->active = true;
 		}
-		this->thread = new boost::thread(
-				boost::bind(&modm::platform::CanUsb<SerialPort>::update, this));
+		this->thread = new std::thread(&modm::hosted::CanUsb<SerialPort>::update, this);
 
 		busState = BusState::Connected;
 		this->tmpRead.clear();

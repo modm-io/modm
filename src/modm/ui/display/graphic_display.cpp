@@ -15,7 +15,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <modm/math/utils/bit_operation.hpp>
 
 #include "font/fixed_width_5x8.hpp"

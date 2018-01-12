@@ -34,7 +34,7 @@ xpcc::tipc::Receiver::Receiver(
 	isAlive_(true)
 {
 	// The start of the thread has to be placed _after_ the initialization of isAlive_
-	this->receiverThread_.reset(new Thread(boost::bind(&Receiver::runReceiver, this)));
+	this->receiverThread_.reset(new Thread(&Receiver::runReceiver, this));
 }
 
 // ----------------------------------------------------------------------------

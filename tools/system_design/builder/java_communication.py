@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2010-2011, Fabian Greif
@@ -26,7 +26,7 @@ class JavaCommunicationBuilder(builder_base.Builder):
 	methods, which are corresponding to Actions of given Components.
 	
 	A common call would be like:
-	$python2 java_communication.py  --outpath source/rca/robot --package rca.robot robot.xml;
+	$python3 java_communication.py  --outpath source/rca/robot --package rca.robot robot.xml;
 	"""
 	
 	
@@ -57,8 +57,7 @@ class JavaCommunicationBuilder(builder_base.Builder):
 		# and the only not numerical type
 		components = self.tree.components
 		
-		primitives = filter.PRIMITIVES.values()
-		primitives.sort()
+		primitives = sorted(filter.PRIMITIVES.values())
 		
 		substitutions = {
 			'package' : self.options.package,

@@ -89,6 +89,8 @@ main()
 			modm::can::Message message;
 			Can::getMessage(message);
 			displayMessage(message);
+
+			Board::LedGreen::toggle();
 		}
 	}
 

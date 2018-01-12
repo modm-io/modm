@@ -18,7 +18,7 @@
 #include <modm/architecture/utils.hpp>
 
 #ifdef MODM_OS_HOSTED
-#	include "boost/scheduler.hpp"
+#	include "stdlib/scheduler.hpp"
 #elif defined(MODM_CPU_CORTEX_M3) || defined(MODM_CPU_CORTEX_M4)
 #	include "freertos/scheduler.hpp"
 #endif

@@ -100,4 +100,7 @@ namespace modm
 	}
 }
 
+#include "static_serial_interface_impl.hpp"
+
+
 #endif	// MODM_HOSTED_STATIC_SERIAL_INTERFACE_HPP

@@ -120,7 +120,7 @@ main()
 	constexpr const uint8_t payload_length = 4;
 
 	/* Address for ptx module. Not used here because ptx won't receive packets */
-	constexpr const uint64_t ptx_address = 0xB3B4B5B605;
+	// constexpr const uint64_t ptx_address = 0xB3B4B5B605;
 	constexpr const uint64_t prx_address = 0xB3B4B5B607;
 
 	/* Dummy payload */

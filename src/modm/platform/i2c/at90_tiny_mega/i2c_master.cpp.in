@@ -50,7 +50,7 @@ MODM_ISR(TWI)
 	{
 		case TW_START:
 			// START has been transmitted
-			// Fall through...
+			MODM_FALLTHROUGH;
 		case TW_REP_START:
 			{
 				DEBUG('s');
@@ -88,7 +88,7 @@ MODM_ISR(TWI)
 
 		case TW_MT_SLA_ACK:
 			// SLA+W has been transmitted and ACK received
-			// Fall through...
+			MODM_FALLTHROUGH;
 		case TW_MT_DATA_ACK:
 			// Data byte has been transmitted and ACK received
 			if (writing.length > 0)
@@ -133,7 +133,7 @@ MODM_ISR(TWI)
 			DEBUG('0' + reading.length);
 			--reading.length;
 
-			// Fall through...
+			MODM_FALLTHROUGH;
 		case TW_MR_SLA_ACK:
 			// SLA+R has been transmitted and ACK received
 			// See if last expected byte will be received ...
@@ -178,6 +178,8 @@ MODM_ISR(TWI)
 				errorState = modm::I2cMaster::Error::AddressNack;
 			}
 			DEBUG('A');
+
+			MODM_FALLTHROUGH;
 		case TW_MT_DATA_NACK:	// data transmitted, NACK received
 			if (errorState == modm::I2cMaster::Error::NoError) {
 				errorState = modm::I2cMaster::Error::DataNack;
@@ -185,12 +187,16 @@ MODM_ISR(TWI)
 			DEBUG('d');
 			// generate a stop condition
 			TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
+
+			MODM_FALLTHROUGH;
 		case TW_MT_ARB_LOST:	// arbitration lost in SLA+W or data
 //		case TW_MR_ARB_LOST:	// arbitration lost in SLA+R or NACK
 			if (errorState == modm::I2cMaster::Error::NoError) {
 				errorState = modm::I2cMaster::Error::ArbitrationLost;
 			}
 			DEBUG('d');
+
+			MODM_FALLTHROUGH;
 		default:
 			if (errorState == modm::I2cMaster::Error::NoError) {
 				errorState = modm::I2cMaster::Error::Unknown;

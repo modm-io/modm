@@ -15,6 +15,7 @@
 #include <modm/driver/radio/nrf24/nrf24_phy.hpp>
 #include <modm/debug/logger.hpp>
 #include <modm/processing/processing.hpp>
+#include <inttypes.h>
 
 /*
  * A simple 2.4GHz "spectrum analyzer". Please use a terminal
@@ -158,7 +159,7 @@ main()
 			MODM_LOG_INFO.printf("\033[2J");
 			MODM_LOG_INFO.printf("\033[1;10H");
 			MODM_LOG_INFO.printf("2.4GHz scanner");
-			MODM_LOG_INFO.printf("   max: %d", max);
+			MODM_LOG_INFO.printf("   max: %" PRId32, max);
 
 			for(i = 0; i < max_channel; i++)
 			{

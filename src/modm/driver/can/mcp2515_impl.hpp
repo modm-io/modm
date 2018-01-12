@@ -17,7 +17,12 @@
 	#error	"Don't include this file directly, use 'mcp2515.hpp' instead!"
 #endif
 
+#include "mcp2515_bit_timings.hpp"
 #include "mcp2515_definitions.hpp"
+
+
+#undef	MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::DISABLED
 
 // ----------------------------------------------------------------------------
 template <typename SPI, typename CS, typename INT>
@@ -30,19 +35,35 @@ template <typename SPI, typename CS, typename INT>
 INT modm::Mcp2515<SPI, CS, INT>::interruptPin;
 
 // ----------------------------------------------------------------------------
-namespace modm
-{
-	namespace mcp2515
-	{
-		EXTERN_FLASH_STORAGE(uint8_t configuration[24]);
-	}
-}
 
-// ----------------------------------------------------------------------------
 template <typename SPI, typename CS, typename INT>
 bool
-modm::Mcp2515<SPI, CS, INT>::initialize(uint32_t bitrate)
+modm::Mcp2515<SPI, CS, INT>::initializeWithPrescaler(
+	uint8_t prescaler /* 2 .. 128 */,
+	uint8_t sjw       /* in 1TQ .. 3TQ */,
+	uint8_t prop      /* in 1TQ .. 8TQ */,
+	uint8_t ps1       /* in 1TQ .. 8TQ */,
+	uint8_t ps2       /* in 2TQ .. 8TQ */)
 {
+	// Build CNF1 .. 3 from parameters
+	// Configuration is stored at increasing addresses in MCP2515,
+	// so prepare CNF3, CNF2 and CNF1 in that order.
+	uint8_t cnf[3] = {0};
+	static constexpr uint8_t CNF1_idx = 2;
+	static constexpr uint8_t CNF2_idx = 1;
+	static constexpr uint8_t CNF3_idx = 0;
+
+	MODM_LOG_DEBUG.printf("SJW: %d\nProp: %d\nPS1: %d\nPS2: %d\nprescaler: %d\n",
+		sjw, prop, ps1, ps2, prescaler);
+
+	cnf[CNF1_idx] = ((sjw - 1) << 6) | ((prescaler / 2 - 1) & 0x3f);
+
+	cnf[CNF2_idx] = (1 << 7) | ( (ps1 - 1) << 3) | ( (prop - 1) << 0);
+
+	cnf[CNF3_idx] = (ps2 - 1);
+
+	MODM_LOG_DEBUG.printf("CNF1 %02x, CNF2 %02x, CNF3 %02x\n", cnf[CNF1_idx], cnf[CNF2_idx], cnf[CNF3_idx]);
+
 	using namespace mcp2515;
 
 	// software reset for the mcp2515, after this the chip is back in the
@@ -59,12 +80,8 @@ modm::Mcp2515<SPI, CS, INT>::initialize(uint32_t bitrate)
 	spi.transferBlocking(WRITE);
 	spi.transferBlocking(CNF3);
 
-	accessor::Flash<uint8_t> cfgPtr(mcp2515::configuration);
-	for (uint8_t i = 0; i < 3; ++i)
-	{
-		// load CNF1..3
-		spi.transferBlocking(cfgPtr[static_cast<uint8_t>(bitrate) * 3 + i]);
-	}
+	// load CNF1..3
+	spi.transferBlocking(cnf, nullptr, 3);
 
 	// enable interrupts
 	spi.transferBlocking(RX1IE | RX0IE);
@@ -77,11 +94,9 @@ modm::Mcp2515<SPI, CS, INT>::initialize(uint32_t bitrate)
 	writeRegister(BFPCTRL, 0);
 
 	// check if we could read back some of the values
-	if (readRegister(CNF2) != cfgPtr[static_cast<uint8_t>(bitrate) * 3 + 1])
-	{
-		// we are not able to communicate with the MCP2515 => abort
-		return false;
-	}
+	uint8_t readback = readRegister(CNF2);
+
+	modm_assert(readback == cnf[CNF2_idx], "mcp2515", "init", "readback");
 
 	// reset device to normal mode and disable the clkout pin and
 	// wait until the new mode is active
@@ -91,6 +106,24 @@ modm::Mcp2515<SPI, CS, INT>::initialize(uint32_t bitrate)
 	}
 
 	return true;
+}
+
+
+template <typename SPI, typename CS, typename INT>
+template <int32_t externalClockFrequency,
+			uint32_t bitrate,
+			uint16_t tolerance>
+bool
+modm::Mcp2515<SPI, CS, INT>::initialize()
+{
+	using Timings = modm::CanBitTimingMcp2515<externalClockFrequency, bitrate>;
+
+	return initializeWithPrescaler(
+		Timings::getPrescaler(),
+		Timings::getSJW(),
+		Timings::getProp(),
+		Timings::getPS1(),
+		Timings::getPS2());
 }
 
 // ----------------------------------------------------------------------------
@@ -195,13 +228,8 @@ modm::Mcp2515<SPI, CS, INT>::getMessage(can::Message& message)
 	}
 	chipSelect.set();
 
-	// clear interrupt flag
-	if (status & FLAG_RXB0_FULL) {
-		bitModify(CANINTF, RX0IF, 0);
-	}
-	else {
-		bitModify(CANINTF, RX1IF, 0);
-	}
+	// RX0IF or RX1IF respectivly were already cleared automatically by rising CS.
+	// See section 12.4 in datasheet.
 
 	return true;
 }
@@ -246,7 +274,7 @@ modm::Mcp2515<SPI, CS, INT>::sendMessage(const can::Message& message)
 	}
 	else {
 		// all buffer are in use => could not send the message
-		return 0;
+		return false;
 	}
 
 	chipSelect.reset();

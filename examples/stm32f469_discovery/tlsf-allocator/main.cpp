@@ -10,6 +10,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board/board.hpp>
+#include <inttypes.h>
 
 int main()
 {
@@ -28,7 +29,7 @@ int main()
 		d[ii] = new (modm::MemoryFastData) uint8_t[size];
 
 		// print what size we requested and if it succeeded
-		MODM_LOG_INFO.printf(" malloc(%3ukB) = ", size/1024);
+		MODM_LOG_INFO.printf(" malloc(%3" PRId32 "kB) = ", size/1024);
 		if (d[ii]) MODM_LOG_INFO << d[ii];
 		else   MODM_LOG_INFO << "NO MEMORY ";
 

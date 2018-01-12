@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2010-2011, Fabian Greif
@@ -25,7 +25,7 @@ class JavaGeneratorBuilder(builder_base.Builder):
 	a typesafe manner based on xml communication definitions.
 	
 	A common call would be like:
-	$python2 java_generator.py --outpath source/rca/robot --package rca.robot robot.xml;
+	$python3 java_generator.py --outpath source/rca/robot --package rca.robot robot.xml;
 	"""
 
 	VERSION = "0.1"

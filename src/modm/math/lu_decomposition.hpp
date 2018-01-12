@@ -49,16 +49,30 @@ namespace modm
 		decompose(const Matrix<T, N, N> &matrix,
 				Matrix<T, N, N> *l,
 				Matrix<T, N, N> *u,
+				Matrix<T, N, N> *p);
+
+		template <typename T, uint8_t N>
+		static bool
+		decompose(const Matrix<T, N, N> &matrix,
+				Matrix<T, N, N> *l,
+				Matrix<T, N, N> *u,
 				Vector<int8_t, N> *p);
+
 
 		template <typename T, uint8_t N, uint8_t BXWIDTH>
 		static bool
 		solve(const Matrix<T, N, N> &l,
 				const Matrix<T, N, N> &u,
-				Matrix<T, BXWIDTH, N> *xb);
+				Matrix<T, N, BXWIDTH> *xb);
+
+		template <typename T, uint8_t N, uint8_t BXWIDTH>
+		static bool
+		solve(const Matrix<T, N, N> &A,
+				Matrix<T, N, BXWIDTH> *xb);
+
 		
 	private:
-		template<typename T, uint8_t OFFSET, uint8_t WIDTH, uint8_t HEIGHT>
+		template<typename T, uint8_t OFFSET, uint8_t HEIGHT, uint8_t WIDTH>
 		class LUSubDecomposition
 		{
 		public:
@@ -77,21 +91,21 @@ namespace modm
 			template<uint8_t BXWIDTH>
 			static bool
 			solveLyEqualsB(
-					Matrix<T, WIDTH, HEIGHT> *l,
-					Matrix<T, BXWIDTH, HEIGHT> *bx);
+					Matrix<T, HEIGHT, WIDTH> *l,
+					Matrix<T, HEIGHT, BXWIDTH> *bx);
 
 			template<uint8_t BXWIDTH>
 			static bool
 			solveUxEqualsY(
-					Matrix<T, WIDTH, HEIGHT> *u,
-					Matrix<T, BXWIDTH, HEIGHT> *bx);
+					Matrix<T, HEIGHT, WIDTH> *u,
+					Matrix<T, HEIGHT, BXWIDTH> *bx);
 
 			template<uint8_t BXWIDTH>
 			static bool
 			solve(
-					const Matrix<T, WIDTH, HEIGHT> &l, 
-					const Matrix<T, WIDTH, HEIGHT> &u,
-					Matrix<T, BXWIDTH, HEIGHT> *bx);
+					const Matrix<T, HEIGHT, WIDTH> &l,
+					const Matrix<T, HEIGHT, WIDTH> &u,
+					Matrix<T, HEIGHT, BXWIDTH> *bx);
 		};
 
 		template<typename T, uint8_t HEIGHT>
@@ -143,14 +157,14 @@ namespace modm
 			template<uint8_t BXWIDTH>
 			static bool
 			solveUxEqualsY(
-					Matrix<T, WIDTH, OFFSET> *u, 
-					Matrix<T, BXWIDTH, OFFSET> *bx);
+					Matrix<T, WIDTH, OFFSET> *u,
+					Matrix<T, OFFSET, BXWIDTH> *bx);
 			
 			template<uint8_t BXWIDTH>
 			static bool
 			solveLyEqualsB(
-					Matrix<T, WIDTH, OFFSET> *l, 
-					Matrix<T, BXWIDTH, OFFSET> *bx);
+					Matrix<T, WIDTH, OFFSET> *l,
+					Matrix<T, OFFSET, BXWIDTH> *bx);
 		};
 	};
 }

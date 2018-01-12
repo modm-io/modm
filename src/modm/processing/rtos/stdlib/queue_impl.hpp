@@ -15,6 +15,8 @@
 #	error "Don't use this file directly, use 'queue.hpp' instead!"
 #endif
 
+#include <chrono>
+
 template <typename T>
 modm::rtos::Queue<T>::Queue(uint32_t length) :
 	maxSize(length)
@@ -30,7 +32,7 @@ template <typename T>
 std::size_t
 modm::rtos::Queue<T>::getSize() const
 {
-	boost::lock_guard<boost::timed_mutex> lock(mutex);
+	std::lock_guard<std::timed_mutex> lock(mutex);
 	deque.size();
 }
 
@@ -38,7 +40,7 @@ template <typename T>
 bool
 modm::rtos::Queue<T>::append(const T& item, uint32_t timeout = -1)
 {
-	if (!mutex.timed_lock(boost::posix_time::milliseconds(timeout)) ||
+	if (!mutex.try_lock_for(std::chrono::milliseconds(timeout)) ||
 			deque.size() >= maxSize) {
 		return false;
 	}
@@ -51,7 +53,7 @@ template <typename T>
 bool
 modm::rtos::Queue<T>::prepend(const T& item, uint32_t timeout = -1)
 {
-	if (!mutex.timed_lock(boost::posix_time::milliseconds(timeout))) {
+	if (!mutex.try_lock_for(std::chrono::milliseconds(timeout))) {
 		return false;
 	}
 	
@@ -71,7 +73,7 @@ template <typename T>
 bool
 modm::rtos::Queue<T>::peek(T& item, uint32_t timeout = -1) const
 {
-	if (!mutex.timed_lock(boost::posix_time::milliseconds(timeout))) {
+	if (!mutex.try_lock_for(std::chrono::milliseconds(timeout))) {
 		return false;
 	}
 	
@@ -90,7 +92,7 @@ template <typename T>
 bool
 modm::rtos::Queue<T>::get(T& item, uint32_t timeout = -1)
 {
-	if (!mutex.timed_lock(boost::posix_time::milliseconds(timeout))) {
+	if (!mutex.try_lock_for(std::chrono::milliseconds(timeout))) {
 		return false;
 	}
 	

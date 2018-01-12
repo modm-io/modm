@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2011-2012, Fabian Greif
@@ -167,7 +167,7 @@ def read_font_file(filename):
 		elif line[0] == '#':
 			result = re.match("^#(\w+)[ \t]+:[ \t]+(.*)\n", line)
 			if not result:
-				print "Error in: ", line
+				print("Error in: ", line)
 				exit(1)
 			else:
 				key = result.group(1)
@@ -222,13 +222,13 @@ if __name__ == '__main__':
 			raise
 		outfile = os.sys.argv[2]
 	except:
-		print "usage: %s *.font outfile" % os.sys.argv[0]
+		print("usage: %s *.font outfile" % os.sys.argv[0])
 		exit(1)
 	
 	try:
 		font = read_font_file(filename)
 	except ParseException as e:
-		print "Error in line %i: " % e.line, e
+		print("Error in line %i: " % e.line, e)
 		exit(1)
 	
 	width_histogram = {}

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2009, Martin Rosekeit
@@ -32,10 +32,10 @@ def generate(env, **kw):
 	# build messages
 	if not ARGUMENTS.get('verbose'):
 		env['GDB_COMSTR'] = "GDB: debugging $SOURCE"
-	
+
 	env['GDB'] = "arm-none-eabi-gdb -tui"
 	env['GDB_PORT'] = '3333'
-	
+
 	env.AddMethod(gdb_debug, 'GdbDebug')
 
 def exists(env):

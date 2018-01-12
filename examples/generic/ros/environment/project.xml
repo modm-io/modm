@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <extends>../../../../src/modm/board/nucleo_l476rg/board.xml</extends>
+  <options>
+    <option name=":build.scons:build.path">../../../../build/generic/ros/environment</option>
+    <option name=":platform:uart:2:buffer.tx">512</option>
+    <option name=":platform:uart:2:buffer.rx">512</option>
+  </options>
+  <modules>
+    <module>:driver</module>
+    <module>:ros</module>
+    <module>:communication</module>
+    <module>:processing</module>
+    <module>:platform:i2c:1</module>
+    <module>:build.scons</module>
+  </modules>
+</library>

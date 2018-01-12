@@ -483,6 +483,8 @@ IoStreamTest::testPrintf1()
 void
 IoStreamTest::testPrintf2()
 {
+#ifdef MODM_OS_HOSTED
+	// Only run on hosted because glibc needs so many flash and RAM may crash.
 	// Compare modm's formatter with glibc's formatter
 
 	float ff_testvector[] = {
@@ -521,6 +523,24 @@ IoStreamTest::testPrintf2()
 			}
 		}
 	}
+#endif
+}
+
+void
+IoStreamTest::testPrintf3()
+{
+#if not defined(MODM_CPU_AVR)
+	// Test for 64 bit uints and ints on printf
+	unsigned long long unsignedlonglong = 0xFEDCBA9876543210;
+	(*stream).printf("%llx", unsignedlonglong);
+	TEST_ASSERT_EQUALS_ARRAY("FEDCBA9876543210", device.buffer, 16);
+	(*stream).flush();
+
+	long long longlong = -9223372036854775806;
+	(*stream).printf("%lld", longlong);
+	TEST_ASSERT_EQUALS_ARRAY("-9223372036854775806", device.buffer, 20);
+	(*stream).flush();
+#endif
 }
 
 int myFunc1(void) { return -1; };

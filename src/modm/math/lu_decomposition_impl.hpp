@@ -45,6 +45,23 @@ modm::LUDecomposition::decompose(
 	
 	return LUSubDecomposition<T, 0, SIZE, SIZE>::decomposeRecur(u->ptr(), l->ptr(), p->ptr());
 }
+// ----------------------------------------------------------------------------
+template<typename T, uint8_t SIZE>
+bool
+modm::LUDecomposition::decompose(
+		const modm::Matrix<T, SIZE, SIZE> &matrix,
+		modm::Matrix<T, SIZE, SIZE> *l,
+		modm::Matrix<T, SIZE, SIZE> *u,
+		modm::Matrix<T, SIZE, SIZE> *p)
+{
+	modm::Vector<int8_t, SIZE> pv;
+	if (not(decompose(matrix, l, u, &pv))){
+		return false;}
+	*p = modm::Matrix<T, SIZE, SIZE>::zeroMatrix();
+	for (int i=0; i<SIZE; i++){
+	(*p)[i][pv[i]] = 1;}
+	return true;
+}
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t SIZE, uint8_t BXWIDTH>
@@ -52,9 +69,28 @@ bool
 modm::LUDecomposition::solve(
 		const modm::Matrix<T, SIZE, SIZE> &l, 
 		const modm::Matrix<T, SIZE, SIZE> &u,
-		modm::Matrix<T, BXWIDTH, SIZE> *xb)
+		modm::Matrix<T, SIZE, BXWIDTH> *xb)
 {
 	return LUSubDecomposition<T, 0, SIZE, SIZE>::solve(l, u, xb);
+}
+
+// ----------------------------------------------------------------------------
+template<typename T, uint8_t SIZE, uint8_t BXWIDTH>
+bool
+modm::LUDecomposition::solve(
+		const modm::Matrix<T, SIZE, SIZE> &A,
+		modm::Matrix<T, SIZE, BXWIDTH> *xb)
+{
+	modm::Matrix<T, SIZE, SIZE> l;
+	modm::Matrix<T, SIZE, SIZE> u;
+	modm::Matrix<T, SIZE, SIZE> p;
+	if(not(decompose(A, &l, &u, &p))){
+		return false;
+	}
+	*xb = (p * (*xb));
+	if(not(solve(l, u, xb))){
+		return false;}
+	return true;
 }
 
 //=============================================================================
@@ -125,20 +161,20 @@ modm::LUDecomposition::RowOperation<T, 0>::swap(T * /* row1 */, T * /* row2 */)
 //=============================================================================
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t OFFSET, uint8_t WIDTH, uint8_t HEIGHT>
+template<typename T, uint8_t OFFSET, uint8_t HEIGHT, uint8_t WIDTH>
 bool
-modm::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, HEIGHT>::decomposeRecur(T * u, T * l)
+modm::LUDecomposition::LUSubDecomposition<T, OFFSET, HEIGHT, WIDTH>::decomposeRecur(T * u, T * l)
 {
 	if (!decompose(u, l))
 		return false;
 	
-	return LUSubDecomposition<T, OFFSET+1, WIDTH, HEIGHT>::decomposeRecur(u, l);
+	return LUSubDecomposition<T, OFFSET+1, HEIGHT, WIDTH>::decomposeRecur(u, l);
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t OFFSET, uint8_t WIDTH, uint8_t HEIGHT>
+template<typename T, uint8_t OFFSET, uint8_t HEIGHT, uint8_t WIDTH>
 bool
-modm::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, HEIGHT>::decompose(T * u, T * l)
+modm::LUDecomposition::LUSubDecomposition<T, OFFSET, HEIGHT, WIDTH>::decompose(T * u, T * l)
 {
 	const uint8_t width = WIDTH;
 	const uint8_t height = HEIGHT;
@@ -162,20 +198,20 @@ modm::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, HEIGHT>::decompose(T
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t OFFSET, uint8_t WIDTH, uint8_t HEIGHT>
+template<typename T, uint8_t OFFSET, uint8_t HEIGHT, uint8_t WIDTH>
 bool
-modm::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, HEIGHT>::decomposeRecur(T *u, T *l, int8_t *p)
+modm::LUDecomposition::LUSubDecomposition<T, OFFSET, HEIGHT, WIDTH>::decomposeRecur(T *u, T *l, int8_t *p)
 {
 	if (!decompose(u, l, p))
 		return false;
 
-	return LUSubDecomposition<T, OFFSET+1, WIDTH, HEIGHT>::decomposeRecur(u, l, p);
+	return LUSubDecomposition<T, OFFSET+1, HEIGHT, WIDTH>::decomposeRecur(u, l, p);
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t OFFSET, uint8_t WIDTH, uint8_t HEIGHT>
+template<typename T, uint8_t OFFSET, uint8_t HEIGHT, uint8_t WIDTH>
 bool
-modm::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, HEIGHT>::decompose(T *u, T *l, int8_t *p)
+modm::LUDecomposition::LUSubDecomposition<T, OFFSET, HEIGHT, WIDTH>::decompose(T *u, T *l, int8_t *p)
 {
 	const uint8_t width = WIDTH;
 	const uint8_t height = HEIGHT;
@@ -208,11 +244,11 @@ modm::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, HEIGHT>::decompose(T
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t OFFSET, uint8_t WIDTH, uint8_t HEIGHT> template<uint8_t BXWIDTH>
+template<typename T, uint8_t OFFSET, uint8_t HEIGHT, uint8_t WIDTH> template<uint8_t BXWIDTH>
 bool
-modm::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, HEIGHT>::solveLyEqualsB(
-		modm::Matrix<T, WIDTH, HEIGHT> *l,
-		modm::Matrix<T, BXWIDTH, HEIGHT> *bx)
+modm::LUDecomposition::LUSubDecomposition<T, OFFSET, HEIGHT, WIDTH>::solveLyEqualsB(
+		modm::Matrix<T, HEIGHT, WIDTH> *l,
+		modm::Matrix<T, HEIGHT, BXWIDTH> *bx)
 {
 	T factor = (*l)[OFFSET][OFFSET];
 	RowOperation<T, BXWIDTH>::multiply((*bx)[OFFSET], (*bx)[OFFSET], 1.0/factor);
@@ -230,17 +266,17 @@ modm::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, HEIGHT>::solveLyEqua
 		(*l)[j][OFFSET] = 0;
 	}
 	// solve the problem for SIZE-1
-	LUSubDecomposition<T, OFFSET+1, WIDTH, HEIGHT>::solveLyEqualsB(l, bx);
+	LUSubDecomposition<T, OFFSET+1, HEIGHT, WIDTH>::solveLyEqualsB(l, bx);
 
 	return true;
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t OFFSET, uint8_t WIDTH, uint8_t HEIGHT> template<uint8_t BXWIDTH>
+template<typename T, uint8_t OFFSET, uint8_t HEIGHT, uint8_t WIDTH> template<uint8_t BXWIDTH>
 bool
-modm::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, HEIGHT>::solveUxEqualsY(
-		modm::Matrix<T, WIDTH, HEIGHT> *u,
-		modm::Matrix<T, BXWIDTH, HEIGHT> *bx)
+modm::LUDecomposition::LUSubDecomposition<T, OFFSET, HEIGHT, WIDTH>::solveUxEqualsY(
+		modm::Matrix<T, HEIGHT, WIDTH> *u,
+		modm::Matrix<T, HEIGHT, BXWIDTH> *bx)
 {
 	// make sure there is a row under us
 	if (OFFSET >= HEIGHT-1)	{
@@ -248,7 +284,7 @@ modm::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, HEIGHT>::solveUxEqua
 	}
 	
 	// solve the problem for SIZE-1
-	LUSubDecomposition<T, OFFSET+1, WIDTH, HEIGHT>::solveUxEqualsY(u, bx);
+	LUSubDecomposition<T, OFFSET+1, HEIGHT, WIDTH>::solveUxEqualsY(u, bx);
 
 	// substract the row so that all upper rows have a 0 at OFFSET
 	for (uint8_t j = 0; j < OFFSET+1; ++j)
@@ -262,12 +298,12 @@ modm::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, HEIGHT>::solveUxEqua
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t OFFSET, uint8_t WIDTH, uint8_t HEIGHT> template<uint8_t BXWIDTH>
+template<typename T, uint8_t OFFSET, uint8_t HEIGHT, uint8_t WIDTH> template<uint8_t BXWIDTH>
 bool
-modm::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, HEIGHT>::solve(
-		const modm::Matrix<T, WIDTH, HEIGHT> &l, 
-		const modm::Matrix<T, WIDTH, HEIGHT> &u,
-		modm::Matrix<T, BXWIDTH, HEIGHT> *bx)
+modm::LUDecomposition::LUSubDecomposition<T, OFFSET, HEIGHT, WIDTH>::solve(
+		const modm::Matrix<T, HEIGHT, WIDTH> &l,
+		const modm::Matrix<T, HEIGHT, WIDTH> &u,
+		modm::Matrix<T, HEIGHT, BXWIDTH> *bx)
 {
 	// we want to solve Ax = b where A = LU
 	// we can write LUx = b
@@ -278,12 +314,12 @@ modm::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, HEIGHT>::solve(
 
 	// start solving Ly = b
 
-	modm::Matrix<T, WIDTH, HEIGHT> lCopy(l);
+	modm::Matrix<T, HEIGHT, WIDTH> lCopy(l);
 	if (!solveLyEqualsB(&lCopy, bx)) {
 		return false;
 	}
 
-	modm::Matrix<T, WIDTH, HEIGHT> uCopy(u);
+	modm::Matrix<T, HEIGHT, WIDTH> uCopy(u);
 	if (!solveUxEqualsY(&uCopy, bx)) {
 		return false;
 	}
@@ -312,7 +348,7 @@ template<typename T, uint8_t OFFSET, uint8_t WIDTH> template<uint8_t BXWIDTH>
 bool
 modm::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, OFFSET>::solveUxEqualsY(
 		modm::Matrix<T, WIDTH, OFFSET> * /* u */,
-		modm::Matrix<T, BXWIDTH, OFFSET> * /* bx */)
+		modm::Matrix<T, OFFSET, BXWIDTH> * /* bx */)
 {
 	return true;
 }
@@ -322,7 +358,7 @@ template<typename T, uint8_t OFFSET, uint8_t WIDTH> template<uint8_t BXWIDTH>
 bool
 modm::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, OFFSET>::solveLyEqualsB(
 		modm::Matrix<T, WIDTH, OFFSET> * /* l */,
-		modm::Matrix<T, BXWIDTH, OFFSET> * /* bx */)
+		modm::Matrix<T, OFFSET, BXWIDTH> * /* bx */)
 {	
 	return true;
 }

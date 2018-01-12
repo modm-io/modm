@@ -138,6 +138,17 @@
 
 	#define MODM_ARRAY_SIZE(x)	(sizeof(x) / sizeof(x[0]))
 
+	#ifdef __has_cpp_attribute
+		#if __has_cpp_attribute(fallthrough)
+		#	define MODM_FALLTHROUGH [[fallthrough]]
+		#else
+		#	define MODM_FALLTHROUGH
+		#endif
+	#else
+	#	define MODM_FALLTHROUGH
+	#endif // _has_cpp_attribute
+
+
 #endif	// !__DOXYGEN__
 
 #endif	// MODM_UTILS_HPP

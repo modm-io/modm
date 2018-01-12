@@ -26,7 +26,7 @@
 
 #include "uart_defines.h"
 
-static modm::atomic::Queue<uint8_t, {{ options["buffer.tx"] }}> txBuffer;
+static modm::atomic::Queue<uint8_t, modm::platform::Uart{{ id }}::TxBufferSize> txBuffer;
 
 // ----------------------------------------------------------------------------
 MODM_ISR(USART{{ id }}_UDRE)

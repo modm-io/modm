@@ -158,7 +158,7 @@ namespace modm
 		
 		/// Matrix multiplication with different size matrices
 		template<uint8_t RHSCOL>
-		Matrix<T, ROWS, ROWS>
+		Matrix<T, ROWS, RHSCOL>
 		operator * (const Matrix<T, COLUMNS, RHSCOL> &rhs) const;
 		
 		Matrix<T, COLUMNS, ROWS>

@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <extends>../../../src/modm/board/nucleo_l476rg/board.xml</extends>
+  <options>
+    <option name=":build.scons:build.path">../../../build/generic/resumable</option>
+  </options>
+  <modules>
+    <module>:build.scons</module>
+  </modules>
+</library>

@@ -13,6 +13,8 @@
 #include <modm/driver/pressure/bmp085.hpp>
 #include <modm/debug/logger/logger.hpp>
 
+#include <algorithm> // for std::max
+
 #include "bmp085_test.hpp"
 
 #undef  MODM_LOG_LEVEL
@@ -145,10 +147,11 @@ Bmp085Test::testConversion()
 
 		// Check pressure conversion at 10 different temperatures
 		uint16_t adc_temp_span = adc_temp_max[jj] - adc_temp_min[jj];
+		uint16_t adc_temp_inc  = std::max(adc_temp_span / 10U, 1U);
 
-		for (uint16_t adc_temp = adc_temp_min[jj]; 
-			 adc_temp < adc_temp_max[jj]; 
-			 adc_temp += adc_temp_span/10)
+		for (uint16_t adc_temp = adc_temp_min[jj];
+			 adc_temp < adc_temp_max[jj];
+			 adc_temp += adc_temp_inc)
 		{
 			data.raw[0] = adc_temp >> 8;
 			data.raw[1] = adc_temp & 0xff;
@@ -164,9 +167,10 @@ Bmp085Test::testConversion()
 			MODM_LOG_DEBUG.printf("adc_temp = %04x, T = %f\n", adc_temp, temp);
 
 			uint16_t adc_press_span = adc_press_max[jj] - adc_press_min[jj];
+			uint16_t adc_press_inc  = std::max(adc_press_span / 10U, 1U);
 			for (uint16_t adc_press = adc_press_min[jj];
 				 adc_press < adc_press_max[jj];
-				 adc_press += adc_press_span/10)
+				 adc_press += adc_press_inc)
 			{
 				data.raw[2] = adc_press >> 8;
 				data.raw[3] = adc_press & 0xff;
@@ -187,7 +191,7 @@ Bmp085Test::testConversion()
 				}
 
 				int16_t error = pressFp - pressDp;
-				MODM_LOG_DEBUG.printf("  adc_press = %04x  PressFp = %6d Pa\t PressDp = %6d Pa \t Diff = %3d Pa\n", adc_press, pressFp, pressDp, error);
+				MODM_LOG_DEBUG.printf("  adc_press = %04" PRIx16 "  PressFp = %6" PRId32 " Pa\t PressDp = %6" PRId32 " Pa \t Diff = %3" PRId16 " Pa\n", adc_press, pressFp, pressDp, error);
 
 				uint16_t error_abs = std::abs(error);
 				total_error += error_abs;
@@ -201,7 +205,7 @@ Bmp085Test::testConversion()
 		MODM_LOG_DEBUG.printf(" max = %d\n", max_error);
 		MODM_LOG_DEBUG.printf(" sum = %d\n", total_error);
 
-		TEST_ASSERT_TRUE(total_error <= 1541);
-		TEST_ASSERT_TRUE(max_error <= 71);
+		TEST_ASSERT_EQUALS_RANGE(total_error, 0u, 1541u);
+		TEST_ASSERT_EQUALS_RANGE(max_error,   0u,   71u);
 	}
 }

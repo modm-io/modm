@@ -307,7 +307,7 @@ public:
 
 // The 64-bit types on the AVR are extremely slow and are
 // therefore excluded here
-#if !defined(MODM_CPU_AVR)
+#if not defined(MODM_CPU_AVR)
 	modm_always_inline IOStream&
 	operator << (const uint64_t& v)
 	{
@@ -467,10 +467,10 @@ public:
 	 * @param	fmt		Format string
 	 */
 	IOStream&
-	printf(const char* fmt, ...);
+	printf(const char* fmt, ...)  __attribute__((format(printf, 2, 3)));
 
 	IOStream&
-	vprintf(const char *fmt, va_list vlist);
+	vprintf(const char *fmt, va_list vlist) __attribute__((format(printf, 2, 0)));
 
 protected:
 	void
@@ -509,13 +509,18 @@ protected:
 	void
 	writeFloat(const float& value);
 
-#if !defined(MODM_CPU_AVR)
+#if not defined(MODM_CPU_AVR)
 	void
 	writeDouble(const double& value);
 #endif
 
-	void
-	writeUnsignedInteger(unsigned long unsignedValue, uint_fast8_t base, size_t width, char fill, bool isNegative);
+        void
+        writeUnsignedInteger(unsigned long unsignedValue, uint_fast8_t base, size_t width, char fill, bool isNegative);
+#if not defined(MODM_CPU_AVR)
+        void
+        writeUnsignedLongLong(unsigned long long unsignedValue, uint_fast8_t base, size_t width, char fill, bool isNegative);
+#endif
+
 
 private:
 	enum class

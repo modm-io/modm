@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2009, Martin Rosekeit
@@ -27,10 +27,10 @@ def generate(env, **kw):
 	# build messages
 	if not ARGUMENTS.get('verbose'):
 		env['STLINK_COMSTR'] = "STLink: program $SOURCE"
-	
+
 #	if platform.system() == "Windows":
 	env['STLINK'] = 'ST-LINK_CLI'
-	
+
 	env.AddMethod(stlink_run, 'STLink')
 
 def exists(env):

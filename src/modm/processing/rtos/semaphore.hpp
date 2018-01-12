@@ -18,7 +18,7 @@
 #include <modm/architecture/utils.hpp>
 
 #ifdef MODM_OS_HOSTED
-#	include "boost/semaphore.hpp"
+#	include "stdlib/semaphore.hpp"
 #elif defined(MODM_CPU_CORTEX_M3) || defined(MODM_CPU_CORTEX_M4)
 #	include "freertos/semaphore.hpp"
 #endif

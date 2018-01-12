@@ -16,6 +16,7 @@
 
 #include <modm/utils/arithmetic_traits.hpp>
 #include <modm/architecture/interface/assert.hpp>
+#include <modm/architecture/utils.hpp>
 
 #ifdef __DOXYGEN__
 /**
@@ -45,7 +46,7 @@
  */
 #define RF_END_RETURN(result) \
 			RF_RETURN(result); \
-			/* fall through */ \
+			MODM_FALLTHROUGH; \
 		default: \
 			this->popRf(); \
 			return {modm::rf::WrongState}; \
@@ -78,7 +79,7 @@
  */
 #define RF_END_RETURN_CALL(resumable) \
 			RF_RETURN_CALL(resumable); \
-			/* fall through */ \
+			MODM_FALLTHROUGH; \
 		default: \
 			this->popRf(); \
 			return {modm::rf::WrongState}; \
@@ -201,7 +202,7 @@
 /// Required macro to set the same unique number twice
 #define RF_INTERNAL_SET_CASE(counter) \
 			this->setRf((counter % 255) + 1, rfIndex); \
-			/* fall through */ \
+			MODM_FALLTHROUGH; \
 		case ((counter % 255) + 1): ;
 
 /// Internal macro for yield

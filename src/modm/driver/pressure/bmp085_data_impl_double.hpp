@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <cmath>
+#include <inttypes.h>
 
 #include <modm/debug/logger/logger.hpp>
 
@@ -36,13 +37,13 @@ DataDouble::calculateCalibratedTemperature()
 		double c4 = ::pow(10, -3) * ::pow(2, -15) * calibration.ac4;
 		double b1 = ::pow(160, 2) * ::pow(2, -30) * calibration.b1;
 
-		c5 = (::pow(2, -15) / 160) * calibration.ac5;
+		c5 = (::pow(2, -15) / 160.0) * double(calibration.ac5);
 		c6 = calibration.ac6;
-		mc = (::pow(2, 11) / ::pow(160, 2)) * calibration.mc;
+		mc = (::pow(2, 11) / ::pow(160, 2)) * double(calibration.mc);
 		md = calibration.md / 160.0;
 		x0 = calibration.ac1;
-		x1 = double(160.0) * ::pow(2, -13) * calibration.ac2;
-		x2 = ::pow(160, 2) * ::pow(2, -25) * calibration.b2;
+		x1 = double(160.0) * ::pow(2, -13) * double(calibration.ac2);
+		x2 = ::pow(160, 2) * ::pow(2, -25) * double(calibration.b2);
 		y00 = c4 * ::pow(2, 15);
 		y11 = c4 * c3;
 		y2 = c4 * b1;
@@ -87,7 +88,7 @@ DataDouble::calculateCalibratedPressure()
 	MODM_LOG_DEBUG.printf("raw[2:5] = %02x %02x %02x\n", raw[2], raw[3], raw[4]);
 
 	uint32_t up = ( (uint32_t(raw[2]) << 16) | (uint16_t(raw[3]) << 8) | raw[4] );
-	MODM_LOG_DEBUG.printf("up = %9d\n", up);
+	MODM_LOG_DEBUG.printf("up = %9" PRId32 "\n", up);
 
 	double pu = up / double(256.0);
 	MODM_LOG_DEBUG.printf("pu = %9.5f\n", pu);
@@ -95,8 +96,8 @@ DataDouble::calculateCalibratedPressure()
 	calculateCalibratedTemperature();
 
 	double s = calibratedTemperatureDouble - double(25.0);
-	double x = (x2 * pow(s, 2)) + (x1 * s) + x0;
-	double y = (y2 * pow(s, 2)) + (y11 * s) + y00;
+	double x = (x2 * s * s) + ( x1 * s) + x0;
+	double y = (y2 * s * s) + (y11 * s) + y00;
 	double z = (pu - x) / y;
 
 	MODM_LOG_DEBUG.printf("s = %9.5f\n", s);

@@ -18,7 +18,7 @@
 #include <modm/architecture/utils.hpp>
 
 #ifdef MODM_OS_HOSTED
-#	include "boost/mutex.hpp"
+#	include "stdlib/mutex.hpp"
 #elif defined(MODM_CPU_CORTEX_M3) || defined(MODM_CPU_CORTEX_M4)
 #	include "freertos/mutex.hpp"
 #endif

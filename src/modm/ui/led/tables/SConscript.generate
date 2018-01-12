@@ -37,7 +37,7 @@ for gamma, bit, length in table:
 
 	for index in range(length):
 		# generate the value for the index
-		value = ( (2 ** bit - 1) / ((length - 1) ** gamma)) * (index ** gamma)
+		value = int(( (2 ** bit - 1) / ((length - 1) ** gamma)) * (index ** gamma))
 
 		# 0 only on index 0, otherwise at least 1
 		if index != 0 and index != length-1 and int(value) == 0:

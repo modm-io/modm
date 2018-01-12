@@ -227,7 +227,7 @@ MODM_ISR({{ reg }}_TX)
 		{{ reg }}->TSR = CAN_TSR_RQCP0;
 	}
 
-	if (!txQueue.isEmpty())
+	if (txQueue.isNotEmpty())
 	{
 		sendMailbox(txQueue.get(), mailbox);
 		txQueue.pop();
@@ -351,7 +351,7 @@ bool
 modm::platform::Can{{ id }}::isMessageAvailable()
 {
 %% if options["buffer.rx"] > 0
-	return !rxQueue.isEmpty();
+	return rxQueue.isNotEmpty();
 %% else
 	// Check if there are any messages pending in the receive registers
 	return (({{ reg }}->RF0R & CAN_RF0R_FMP0) > 0 || ({{ reg }}->RF1R & CAN_RF1R_FMP1) > 0);

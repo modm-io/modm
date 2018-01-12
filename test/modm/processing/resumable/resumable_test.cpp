@@ -905,7 +905,7 @@ ResumableTest::testReturnVoidClass()
 	auto result = thread.resumable();
 	TEST_ASSERT_EQUALS(result.getState(), modm::rf::Stop);
 	TEST_ASSERT_EQUALS(result.getResult(), modm::rf::Stop);
-	TEST_ASSERT_TRUE(sizeof(result) == 1);
+	TEST_ASSERT_EQUALS(sizeof(result), sizeof(uint_fast8_t));
 
 	// this now returns the state
 	auto result2 = RF_CALL_BLOCKING(thread.resumable());

@@ -17,8 +17,8 @@
 #	error "Don't include this file directly, use <modm/processing/rtos/semaphore.hpp>"
 #endif
 
-#include <boost/thread/mutex.hpp>    
-#include <boost/thread/condition_variable.hpp>
+#include <mutex>
+#include <condition_variable>
 
 namespace modm
 {
@@ -107,10 +107,10 @@ namespace modm
 			// 
 			// Any code that reads or writes the count_ data must hold a lock
 			// on the mutex.
-			mutable boost::mutex mutex;
+			mutable std::mutex mutex;
 			
 			// Code that increments count_ must notify the condition variable.
-			mutable boost::condition_variable condition;
+			mutable std::condition_variable condition;
 
 		};
 		

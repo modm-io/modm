@@ -155,9 +155,11 @@
 #	include <modm/io/iostream.hpp>
 	extern modm::IOStream stream;
 #	define DEBUG_STREAM(x) stream << x << "\n"
+#	define DEBUG_STREAM_N(x) stream << x;
 #	define DEBUG(x) modm::platform::Uart5::write(x)
 #else
 #	define DEBUG_STREAM(x)
+#	define DEBUG_STREAM_N(x)
 #	define DEBUG(x)
 #endif
 

@@ -19,8 +19,7 @@
 #	error "Don't include this file directly, use <modm/processing/rtos/mutex.hpp>"
 #endif
 
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/locks.hpp>
+#include <mutex>
 
 namespace modm
 {
@@ -32,7 +31,7 @@ namespace modm
 		/**
 		 * \brief	Mutex
 		 * 
-		 * \ingroup	boost_rtos
+		 * \ingroup	stdlib_rtos
 		 */
 		class Mutex
 		{
@@ -69,7 +68,7 @@ namespace modm
 			Mutex&
 			operator = (const Mutex& other);
 			
-			boost::timed_mutex mutex;
+			std::timed_mutex mutex;
 		};
 		
 		/**
@@ -77,11 +76,11 @@ namespace modm
 		 * 
 		 * Locks the Mutex when created and unlocks it on destruction.
 		 */
-		class MutexGuard : boost::lock_guard<boost::timed_mutex>
+		class MutexGuard : std::lock_guard<std::timed_mutex>
 		{
 		public:
 			MutexGuard(Mutex& m) :
-				boost::lock_guard<boost::timed_mutex>(m.mutex)
+				std::lock_guard<std::timed_mutex>(m.mutex)
 			{
 			}
 			

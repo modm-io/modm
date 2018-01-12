@@ -29,6 +29,6 @@ modm::rtos::Scheduler::schedule()
 	{
 		// Threads are started and will do all the work. Just
 		// sleep a bit here when there is nothing else to do. 
-		boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 	}
 }

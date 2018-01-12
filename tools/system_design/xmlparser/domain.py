@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2014, Martin Rosekeit
@@ -12,10 +12,10 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-import utils
-import xml_utils
+from . import utils
+from . import xml_utils
 
-from parser_exception import ParserException
+from .parser_exception import ParserException
 
 class Domain:
 	""" Representation of a domain ids.
@@ -39,8 +39,14 @@ class Domain:
 		self.description = xml_utils.get_description(node)
 				
 	def __cmp__(self, other):
-		return cmp(self.name.lower(), other.name.lower())
-	
+		return 1 - self.__eq__(other) - 2 * self.__lt__(other)
+
+	def __lt__(self, other):
+		return self.name.lower() < other.name.lower()
+
+	def __eq__(self, other):
+		return self.name.lower() == other.name.lower()
+
 	def dump(self):
 		return "Domain %s\n" % self.name
 	

@@ -16,9 +16,9 @@
 
 #include <queue>
 
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <mutex>
+#include <thread>
+#include <memory>
 
 #include <modm/container/smart_pointer.hpp>
 
@@ -78,10 +78,10 @@ namespace xpcc
 			dropPacket();
 
 		private:
-			typedef modm::SmartPointer			Payload;
-			typedef boost::mutex				Mutex;
-			typedef boost::mutex::scoped_lock	MutexGuard;
-			typedef	boost::thread				Thread;
+			typedef modm::SmartPointer		Payload;
+			typedef std::mutex				Mutex;
+			typedef std::lock_guard<Mutex>	MutexGuard;
+			typedef	std::thread				Thread;
 
 			bool
 			isAlive();
@@ -98,7 +98,7 @@ namespace xpcc
 
 			std::queue<Payload>	packetQueue_;
 
-			boost::scoped_ptr<Thread> receiverThread_;
+			std::unique_ptr<Thread> receiverThread_;
 			mutable Mutex receiverSocketLock_;
 			mutable Mutex packetQueueLock_;
 

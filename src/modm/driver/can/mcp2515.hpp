@@ -20,6 +20,8 @@
 #include <modm/architecture/interface/accessor.hpp>
 #include <modm/architecture/interface/delay.hpp>
 #include <modm/architecture/interface/can.hpp>
+#include <modm/debug/logger.hpp>
+#include <modm/platform/clock/common_clock.hpp>
 
 #include "mcp2515_definitions.hpp"
 
@@ -122,9 +124,22 @@ namespace modm
     class Mcp2515 : public ::modm::Can
 	{
 	public:
-		static bool
-		initialize(uint32_t bitrate);
+		template< int32_t ExternalClockFrequency,
+			   uint32_t bitrate = Bitrate::kBps125,
+			   uint16_t tolerance = Tolerance::OnePercent >
+		static inline bool
+		initialize();
 
+	private:
+		static inline bool
+		initializeWithPrescaler(
+			uint8_t prescaler,
+			uint8_t sjw,
+			uint8_t prop_seg,
+			uint8_t ps1,
+			uint8_t ps2);
+
+	public:
 		static void
 		setFilter(accessor::Flash<uint8_t> filter);
 

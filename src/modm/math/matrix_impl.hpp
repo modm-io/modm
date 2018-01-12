@@ -243,19 +243,19 @@ modm::Matrix<T, ROWS, COLUMNS>::operator -= (const modm::Matrix<T, ROWS, COLUMNS
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 template<uint8_t RHSCOL>
-modm::Matrix<T, ROWS, ROWS>
+modm::Matrix<T, ROWS, RHSCOL>
 modm::Matrix<T, ROWS, COLUMNS>::operator * (const Matrix<T, COLUMNS, RHSCOL> &rhs) const
 {
-	modm::Matrix<T, ROWS, ROWS> m;
+	modm::Matrix<T, ROWS, RHSCOL> m;
 	
 	for (uint_fast8_t i = 0; i < ROWS; ++i)
 	{
 		for (uint_fast8_t j = 0; j < RHSCOL; ++j)
 		{
-			m[j][i] = element[j * COLUMNS] * rhs[0][i];
+			m[i][j] = element[i * COLUMNS] * rhs[0][j];
 			for (uint_fast8_t x = 1; x < COLUMNS; ++x)
 			{
-				m[j][i] += element[j * COLUMNS + x] * rhs[x][i];
+				m[i][j] += element[i * COLUMNS + x] * rhs[x][j];
 			}
 		}
 	}

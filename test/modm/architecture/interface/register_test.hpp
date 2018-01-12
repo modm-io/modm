@@ -18,6 +18,7 @@
 namespace modm
 {
 
+template<typename T>
 struct testing
 {
 protected:
@@ -114,7 +115,7 @@ MODM_TYPE_FLAGS(Test4_t)
 }
 
 // @author Niklas Hauser
-class RegisterTest : public unittest::TestSuite, public modm::testing
+class RegisterTest : public unittest::TestSuite, public modm::testing<void>
 {
 public:
 	void

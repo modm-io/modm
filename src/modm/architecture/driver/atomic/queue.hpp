@@ -65,6 +65,9 @@ namespace modm
 
 			modm_always_inline bool
 			isEmpty() const;
+
+			modm_always_inline bool
+			isNotEmpty() const { return not isEmpty(); }
 			
 			/**
 			 * Check if the queue is nearly empty.

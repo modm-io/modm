@@ -156,8 +156,8 @@ MatrixTest::testAccess()
 	modm::Matrix<int16_t, 3, 1> b = a.getColumn(1);
 	
 	TEST_ASSERT_EQUALS(b[0][0], 2);
-	TEST_ASSERT_EQUALS(b[0][1], 5);
-	TEST_ASSERT_EQUALS(b[0][2], 8);
+	TEST_ASSERT_EQUALS(b[1][0], 5);
+	TEST_ASSERT_EQUALS(b[2][0], 8);
 	
 	modm::Matrix<int16_t, 1, 3> c = a.getRow(2);
 	
@@ -273,7 +273,7 @@ MatrixTest::testMatrixMultiplication()
 		3,
 	};
 	
-	modm::Matrix<int16_t, 3, 1> a(m);
+	const modm::Matrix<int16_t, 3, 1> a(m);
 	modm::Matrix<int16_t, 1, 3> b(m);
 	
 	modm::Matrix<int16_t, 3, 3> c = a * b;
@@ -319,6 +319,55 @@ MatrixTest::testMatrixMultiplication()
 	TEST_ASSERT_EQUALS(g[0][1], 28);
 	TEST_ASSERT_EQUALS(g[1][0], 49);
 	TEST_ASSERT_EQUALS(g[1][1], 64);
+
+
+	// Testing non-square matrices
+	// https://www.wolframalpha.com/input/?i=%7B%7B1,2,3%7D,%7B4,5,6%7D,%7B7,8,9%7D%7D*%7B%7B1%7D,%7B2%7D,%7B3%7D%7D
+	const int16_t o[] = {
+		1, 2, 3,
+		4, 5, 6,
+		7, 8, 9
+	};
+
+	modm::Matrix<int16_t, 3, 3> h(o);
+	modm::Matrix<int16_t, 3, 1> i = h * a;
+	TEST_ASSERT_EQUALS(i[0][0], 14);
+	TEST_ASSERT_EQUALS(i[1][0], 32);
+	TEST_ASSERT_EQUALS(i[2][0], 50);
+
+	// https://www.wolframalpha.com/input/?i=%7B%7B1,2,3%7D,%7B4,5,6%7D,%7B7,8,9%7D%7D*%7B%7B1,2%7D,%7B3,4%7D,%7B5,6%7D%7D
+	const int16_t p[] = {
+		1, 2,
+		3, 4,
+		5, 6,
+	};
+
+	modm::Matrix<int16_t, 3, 2> j(p);
+	modm::Matrix<int16_t, 3, 2> k = h * j;
+
+	TEST_ASSERT_EQUALS(k[0][0],  22);
+	TEST_ASSERT_EQUALS(k[0][1],  28);
+	TEST_ASSERT_EQUALS(k[1][0],  49);
+	TEST_ASSERT_EQUALS(k[1][1],  64);
+	TEST_ASSERT_EQUALS(k[2][0],  76);
+	TEST_ASSERT_EQUALS(k[2][1], 100);
+
+	// https://www.wolframalpha.com/input/?i=%7B%7B1,2,3,4,5%7D,%7B6,7,8,9,10%7D%7D*%7B%7B1,2,3%7D,%7B4,5,6%7D,%7B7,8,9%7D,%7B10,11,12%7D,%7B13,14,15%7D%7D
+	const int16_t q[] = {
+		 1,  2,  3,  4,  5,
+		 6,  7,  8,  9, 10,
+		11, 12, 13, 14, 15
+	};
+	modm::Matrix<int16_t, 2, 5> l(q);
+	modm::Matrix<int16_t, 5, 3> ll(q);
+	modm::Matrix<int16_t, 2, 3> aa = l * ll;
+
+	TEST_ASSERT_EQUALS(aa[0][0], 135);
+	TEST_ASSERT_EQUALS(aa[0][1], 150);
+	TEST_ASSERT_EQUALS(aa[0][2], 165);
+	TEST_ASSERT_EQUALS(aa[1][0], 310);
+	TEST_ASSERT_EQUALS(aa[1][1], 350);
+	TEST_ASSERT_EQUALS(aa[1][2], 390);
 }
 
 void

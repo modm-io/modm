@@ -73,7 +73,7 @@ Remaining:     +    |0|   +   |     -     |0|  +  | -|  + |0| +| -  |0|+| 0
  * exactly at the time of expiration, but some time after expiration, as
  * indicated in the above waveform graph.
  * If one or several periods are missed when polling `execute()`, these
- * code executions are discarded and will not be cought up.
+ * code executions are discarded and will not be caught up.
  * Instead, `execute()` returns `true` once and then reschedules itself
  * for the next period, without any period skewing.
  *

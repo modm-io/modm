@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2009, Martin Rosekeit
@@ -25,7 +25,7 @@ def font_action(target, source, env):
 	infile  = str(source[0])
 	outfile = os.path.splitext(str(target[0]))[0]
 
-	os.system('python2 "%s" "%s" "%s"' % (command, infile, outfile))
+	os.system('python3 "%s" "%s" "%s"' % (command, infile, outfile))
 
 def font_string(target, source, env):
 	return "Create Font: '%s'" % (str(source[0]))

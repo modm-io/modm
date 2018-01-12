@@ -14,6 +14,7 @@
 #include <modm/board/board.hpp>
 #include <modm/driver/radio/nrf24/nrf24_phy.hpp>
 #include <modm/debug/logger.hpp>
+#include <inttypes.h>
 
 /*
  * Test SPI communication by writing and reading out registers on the
@@ -86,16 +87,16 @@ main()
 		nrf24phy::setRxAddress(nrf24phy::Pipe::PIPE_0, 0xdeadb33f05);
 		addr = nrf24phy::getRxAddress(nrf24phy::Pipe::PIPE_0);
 		MODM_LOG_INFO.printf("Setting RX_P0 address to:  0xDEADB33F05\n");
-		MODM_LOG_INFO.printf("Reading RX_P0 address:     0x%x%x\n", static_cast<uint32_t>((addr >> 32) & 0xffffffff), static_cast<uint32_t>(addr & 0xffffffff));
+		MODM_LOG_INFO.printf("Reading RX_P0 address:     0x%" PRIx32 "%" PRIx32 "\n", static_cast<uint32_t>((addr >> 32) & 0xffffffff), static_cast<uint32_t>(addr & 0xffffffff));
 
 		nrf24phy::setTxAddress(0xabcdef55ff);
 		addr = nrf24phy::getTxAddress();
 		MODM_LOG_INFO.printf("Setting TX address to:     0xABCDEF55FF\n");
-		MODM_LOG_INFO.printf("Reading TX address:        0x%x%x\n", static_cast<uint32_t>((addr >> 32) & 0xffffffff), static_cast<uint32_t>(addr & 0xffffffff));
+		MODM_LOG_INFO.printf("Reading TX address:        0x%" PRIx32 "%" PRIx32 "\n", static_cast<uint32_t>((addr >> 32) & 0xffffffff), static_cast<uint32_t>(addr & 0xffffffff));
 
 		rf_ch = nrf24phy::readRegister(nrf24phy::NrfRegister::RF_CH);
 		MODM_LOG_INFO.printf("Expected output for RF_CH: 0x2\n");
-		MODM_LOG_INFO.printf("Reading RF_CH:             0x%x\n\n", rf_ch);
+		MODM_LOG_INFO.printf("Reading RF_CH:             0x%" PRIx8 "\n\n", rf_ch);
 
 		modm::delayMilliseconds(1000);
 	}

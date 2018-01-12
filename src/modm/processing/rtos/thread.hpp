@@ -18,7 +18,7 @@
 #include <modm/architecture/utils.hpp>
 
 #ifdef MODM_OS_HOSTED
-#	include "boost/thread.hpp"
+#	include "stdlib/thread.hpp"
 #elif defined(MODM_CPU_CORTEX_M3) || defined(MODM_CPU_CORTEX_M4)
 #	include "freertos/thread.hpp"
 #endif

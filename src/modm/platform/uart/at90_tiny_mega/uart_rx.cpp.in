@@ -24,7 +24,7 @@
 
 #include "uart_defines.h"
 
-static modm::atomic::Queue<uint8_t, {{ options["buffer.rx"] }}> rxBuffer;
+static modm::atomic::Queue<uint8_t, modm::platform::Uart{{ id }}::RxBufferSize> rxBuffer;
 static uint8_t error;
 
 // ----------------------------------------------------------------------------

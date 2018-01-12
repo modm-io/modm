@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2013, Sascha Schade
@@ -15,7 +15,7 @@
 # Add to your SConstruct file
 # binfile = env.Bin(program)
 # env.Alias('program', env.DfuStm32Programmer(binfile))
-# 
+#
 # Call
 #   scons program
 # from your command line
@@ -37,10 +37,10 @@ def generate(env, **kw):
 	# build messages
 	if ARGUMENTS.get('verbose') != '1':
 		env['DFU_STM32_PROGRAMMER_COMSTR']       = "dfu_stm32_programmer: program $SOURCE"
-	
+
 	# Name of the binary program to run
 	env['DFU_STM32_PROGRAMMER'] = 'dfu-util'
-	
+
 	env.AddMethod(dfu_stm32_programmer_flash, 'DfuStm32Programmer')
 
 def exists(env):

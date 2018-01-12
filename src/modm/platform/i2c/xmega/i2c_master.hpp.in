@@ -37,6 +37,9 @@ namespace platform
 class I2cMaster{{ id }} : public ::modm::I2cMaster
 {
 public:
+	static constexpr size_t TransactionBufferSize = {{ parameters.transaction_buffer }};
+
+public:
 	/**
 	 * Set up the I2C module for master operation.
 	 *

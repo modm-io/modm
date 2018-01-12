@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2011-2012, Fabian Greif
@@ -18,9 +18,9 @@
 import re
 import copy
 
-from parser_exception import ParserException
-import utils
-import xml_utils
+from .parser_exception import ParserException
+from . import utils
+from . import xml_utils
 
 VALID_UNDERLYING_TYPES_FOR_ENUMS = [
 	'int8_t', 'uint8_t', 'int16_t', 'uint16_t', 'int32_t', 'uint32_t', 'int64_t', 'uint64_t' ]
@@ -86,14 +86,25 @@ class BaseType(object):
 		return self
 	
 	def __cmp__(self, other):
+		return 1 - self.__eq__(other) - 2 * self.__lt__(other)
+
+	def __lt__(self, other):
 		""" Compare two types
-		
-		If types are sorted they are sorted first by level and then by name.
+
+		If types are sorted, they are sorted first by level and then by name.
 		"""
-		if isinstance(other, BaseType):
-			return cmp(self.level, other.level) or cmp(self.name, other.name)
-		else:
-			return 1
+		if not isinstance(other, BaseType):
+			return False
+		if self.level == other.level:
+			return self.name < other.name
+		if self.level is None:
+			return other.level is not None
+		return other.level is not None and self.level < other.level
+
+	def __eq__(self, other):
+		if not isinstance(other, BaseType):
+			return False
+		return self.level == other.level and self.name == other.name
 
 
 class BuiltIn(BaseType):

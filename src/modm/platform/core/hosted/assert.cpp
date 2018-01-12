@@ -70,7 +70,7 @@ modm_weak
 void modm_abandon(const char * module, const char * location, const char * failure, uintptr_t context)
 {
 	MODM_LOG_ERROR.printf("Assertion '%s.%s.%s'", module, location, failure);
-	if (context) { MODM_LOG_ERROR.printf(" @ %p (%d)", (void *) context, context); }
+	if (context) { MODM_LOG_ERROR.printf(" @ %p (%lu)", (void *) context, context); }
 	MODM_LOG_ERROR.printf(" failed! Abandoning...\n");
 }
 

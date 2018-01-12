@@ -17,6 +17,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/platform/platform.hpp>
+#include <modm/debug/logger.hpp>
 
 #include <unittest/reporter.hpp>
 #include <unittest/controller.hpp>
@@ -27,8 +28,22 @@ ${names}
 
 using namespace modm::platform;
 
+#ifdef MODM_BOARD_HAS_LOGGER
+// Reuse logger from board
+extern Board::LoggerDevice loggerDevice;
+#else
+
 // Create an IODeviceWrapper around the Uart Peripheral we want to use
-modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
+// This requires additonal hardware.
+using LoggerDevice = modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull >;
+LoggerDevice loggerDevice;
+
+// Set all four logger streams to use the UART
+modm::log::Logger modm::log::debug(loggerDevice);
+modm::log::Logger modm::log::info(loggerDevice);
+modm::log::Logger modm::log::warning(loggerDevice);
+modm::log::Logger modm::log::error(loggerDevice);
+#endif
 
 int
 main()
@@ -41,6 +56,36 @@ main()
 	Usart2::initialize<Board::systemClock, 115200>(12);
 
 	loggerDevice.write("Unittests (" __DATE__ ", " __TIME__")\n");
+
+	MODM_LOG_INFO << "Machine:  " << MODM_BUILD_MACHINE  << modm::endl;
+	MODM_LOG_INFO << "User:     " << MODM_BUILD_USER     << modm::endl;
+	MODM_LOG_INFO << "Os:       " << MODM_BUILD_OS       << modm::endl;
+	MODM_LOG_INFO << "Compiler: " << MODM_BUILD_COMPILER << modm::endl;
+
+	MODM_LOG_INFO << "Local Git User:" << modm::endl;
+	MODM_LOG_INFO << "Name:  " << MODM_GIT_CONFIG_USER_NAME      << modm::endl;
+	MODM_LOG_INFO << "Email: " << MODM_GIT_CONFIG_USER_EMAIL     << modm::endl;
+	MODM_LOG_INFO << "Last Commit:" << modm::endl;
+	MODM_LOG_INFO << "SHA:             " << MODM_GIT_SHA      << modm::endl;
+	MODM_LOG_INFO << "Abbreviated SHA: " << MODM_GIT_SHA_ABBR << modm::endl;
+	MODM_LOG_INFO << "Subject:         " << MODM_GIT_SUBJECT  << modm::endl;
+	MODM_LOG_INFO << modm::endl << "Author:" << modm::endl;
+	MODM_LOG_INFO << "Name:      " << MODM_GIT_AUTHOR                << modm::endl;
+	MODM_LOG_INFO << "Email:     " << MODM_GIT_AUTHOR_EMAIL          << modm::endl;
+	MODM_LOG_INFO << "Date:      " << MODM_GIT_AUTHOR_DATE           << modm::endl;
+	MODM_LOG_INFO << "Timestamp: " << MODM_GIT_AUTHOR_DATE_TIMESTAMP << modm::endl;
+	MODM_LOG_INFO << modm::endl << "Committer:" << modm::endl;
+	MODM_LOG_INFO << "Name:      " << MODM_GIT_COMMITTER                << modm::endl;
+	MODM_LOG_INFO << "Email:     " << MODM_GIT_COMMITTER_EMAIL          << modm::endl;
+	MODM_LOG_INFO << "Date:      " << MODM_GIT_COMMITTER_DATE           << modm::endl;
+	MODM_LOG_INFO << "Timestamp: " << MODM_GIT_COMMITTER_DATE_TIMESTAMP << modm::endl;
+	MODM_LOG_INFO << modm::endl << "File Status:" << modm::endl;
+	MODM_LOG_INFO << "Modified:  " << MODM_GIT_MODIFIED  << modm::endl;
+	MODM_LOG_INFO << "Added:     " << MODM_GIT_ADDED     << modm::endl;
+	MODM_LOG_INFO << "Deleted:   " << MODM_GIT_DELETED   << modm::endl;
+	MODM_LOG_INFO << "Renamed:   " << MODM_GIT_RENAMED   << modm::endl;
+	MODM_LOG_INFO << "Copied:    " << MODM_GIT_COPIED    << modm::endl;
+	MODM_LOG_INFO << "Untracked: " << MODM_GIT_UNTRACKED << modm::endl;
 
 	unittest::Reporter reporter(loggerDevice);
 	unittest::Controller::instance().setReporter(reporter);

@@ -77,6 +77,13 @@ public:
 	};
 #ifdef __DOXYGEN__
 public:
+	/// Size of the receive buffer.
+	static constexpr size_t RxBufferSize = 16;
+
+	/// Size of the transmit buffer.
+	static constexpr size_t TxBufferSize = 16;
+
+public:
 	/**
 	 * Configures the Tx and Rx signals and connects them.
 	 *
@@ -137,6 +144,9 @@ public:
 	getBusState();
 #endif
 };
+
+modm::IOStream&
+operator << (modm::IOStream& stream, const Can::BusState state);
 
 } // namespace modm
 

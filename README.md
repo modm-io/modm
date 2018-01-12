@@ -1,4 +1,4 @@
-# modm: C++ microcontroller framework <span style="float:right;"><a href="https://travis-ci.org/roboterclubaachen/modm" style="border-bottom:none">![Build Status](https://travis-ci.org/roboterclubaachen/modm.svg?branch=develop)</a></span>
+# modm: C++ microcontroller framework <span style="float:right;"><a href="https://travis-ci.org/roboterclubaachen/modm" style="border-bottom:none">![Build Status](https://travis-ci.org/roboterclubaachen/modm.svg?branch=develop)</a></span><span style="float:right;"><a href="https://circleci.com/gh/roboterclubaachen/workflows/modm/tree/develop" style="border-bottom:none">![Build Status](https://circleci.com/gh/roboterclubaachen/modm/tree/develop.svg?style=shield)</a></span>
 
 The modm framework consists of powerful hardware abstraction layers for many
 different microcontrollers, a set of drivers for various external targets and a general purpose toolbox for building hardware orientated applications.
@@ -62,6 +62,7 @@ Here is a list of supported **and tested** microcontrollers and development boar
 | ATtiny85   | custom                  | &#9733;&#9733;&#9733;               |
 | ATmega328p | [Arduino Uno][]         | &#9733;&#9733;&#9733;               |
 | STM32F031  | [Nucleo F031K6][]       | &#9733;&#9733;&#9733;&#9733;        |
+| STM32F051  | [STM32F0 Discovery][]   | &#9733;&#9733;                      |
 | STM32F072  | [STM32F072 Discovery][] | &#9733;&#9733;&#9733;&#9733;        |
 | STM32F100  | [STM32F1 Discovery][]   | &#9733;&#9733;&#9733;               |
 | STM32F103  | [Nucleo F103RB][]       | &#9733;&#9733;&#9733;               |
@@ -222,6 +223,7 @@ Georgi Grinshpun ([@georgi-g](https://github.com/georgi-g)).
 
 [Arduino Uno]: https://www.arduino.cc/en/Main/ArduinoBoardUno
 [Nucleo F031K6]: http://www.st.com/en/evaluation-tools/nucleo-f031k6.html
+[STM32F0 Discovery]: http://www.st.com/en/evaluation-tools/stm32f0discovery.html
 [STM32F072 Discovery]: http://www.st.com/en/evaluation-tools/32f072bdiscovery.html
 [STM32F1 Discovery]: http://www.st.com/en/evaluation-tools/stm32vldiscovery.html
 [Nucleo F103RB]: http://www.st.com/en/evaluation-tools/nucleo-f103rb.html

@@ -28,10 +28,10 @@ namespace
 // If requested buffer size is larger than hardware buffer size create a
 // software queue for the remaining bytes.
 %% if options["buffer.rx"] > 16
-	static modm::atomic::Queue<uint8_t, {{ options["buffer.rx"] }} - 16> rxBuffer;
+	static modm::atomic::Queue<uint8_t, modm::lpc::Uart1::RxBufferSize - 16> rxBuffer;
 %% endif
 %% if options["buffer.tx"] > 16
-	static modm::atomic::Queue<uint8_t, {{ options["buffer.tx"] }} - 16> txBuffer;
+	static modm::atomic::Queue<uint8_t, modm::lpc::Uart1::TxBufferSize - 16> txBuffer;
 %% endif
 
 	/**

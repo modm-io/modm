@@ -54,6 +54,11 @@ namespace platform
 class Uart{{ id }} : public ::modm::Uart
 {
 public:
+	// Expose jinja template parameters to be checked by e.g. drivers or application
+	static constexpr size_t RxBufferSize = {{ options["buffer.rx"] }};
+	static constexpr size_t TxBufferSize = {{ options["buffer.tx"] }};
+
+public:
 	template< template<Peripheral _> class... Signals >
 	static void
 	connect(Gpio::InputType InputTypeRx = Gpio::InputType::PullUp)
