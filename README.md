@@ -1,4 +1,4 @@
-# xpcc: C++ microcontroller framework <span style="float:right;"><a href="https://travis-ci.org/roboterclubaachen/xpcc" style="border-bottom:none">![Build Status](https://travis-ci.org/roboterclubaachen/xpcc.svg?branch=develop)</a></span><span style="float:right;"><a href="https://circleci.com/gh/roboterclubaachen/workflows/xpcc/tree/develop" style="border-bottom:none">![Build Status](https://circleci.com/gh/roboterclubaachen/xpcc/tree/develop.svg?style=shield)</a></span>
+# xpcc: C++ microcontroller framework <span style="float:right;"><a href="https://circleci.com/gh/roboterclubaachen/workflows/xpcc/tree/develop" style="border-bottom:none">![Build Status](https://circleci.com/gh/roboterclubaachen/xpcc/tree/develop.svg?style=shield)</a></span>
 
 The xpcc framework consists of powerful hardware abstraction layers for many
 different microcontrollers, a set of drivers for various external targets and a general purpose toolbox for building hardware orientated applications.
@@ -16,7 +16,7 @@ culmination of many years worth of effort, experience and improvements.
 - [Feast your eyes on lots of working examples][examples].
 - [API reference is available here][reference].
 - [Check out our latest quarterly release][releases] with a [beautiful changelog](CHANGELOG.md).
-- [We have continuous integration as well][travis_ci].
+- [We have continuous integration as well][circle_ci].
 - [And we care a lot about testing](TESTING.md).
 
 This project also has [guide for developers][guide] as well as a [technical blog][blog] to document larger design concepts.
@@ -34,7 +34,7 @@ That way everyone can profit.
 
 ## Features
 
-- Efficient and fast object-oriented C++11 API.
+- Efficient and fast object-oriented C++14 API.
 - Support of AVR and ARM Cortex-M based microcontrollers from Atmel, ST and NXP.
 - Build system based on SCons and extendable using Python.
 - Data-driven HAL generation using Jinja2 template engine.
@@ -210,7 +210,7 @@ Georgi Grinshpun ([@georgi-g](https://github.com/georgi-g)).
 [releases]: https://github.com/roboterclubaachen/xpcc/releases
 [rca_ev]: http://www.roboterclub.rwth-aachen.de/
 [eurobot]: http://www.eurobot.org/
-[travis_ci]: https://travis-ci.org/roboterclubaachen/xpcc
+[circle_ci]: https://circleci.com/gh/roboterclubaachen/workflows/xpcc
 [testing]: http://xpcc.io/guide/testing
 [mailing_archive]: https://www.mail-archive.com/xpcc-dev@lists.rwth-aachen.de
 [examples]: https://github.com/roboterclubaachen/xpcc/tree/develop/examples
