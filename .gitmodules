@@ -7,3 +7,6 @@
 [submodule "ext/dlr/scons-build-tools"]
 	path = ext/dlr/scons-build-tools
 	url = https://github.com/modm-io/scons-build-tools.git
+[submodule "ext/ros/ros_lib"]
+	path = ext/ros/ros_lib
+	url = https://github.com/modm-io/xpcc_ros_lib.git
