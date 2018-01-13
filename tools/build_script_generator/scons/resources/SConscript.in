@@ -38,6 +38,13 @@ env.AppendUnique(LIBPATH=[os.path.abspath(str(library[0].get_dir()))])
 env.ParseConfig("pkg-config --cflags --libs {{ metadata.required_pkg | join(" ") }}")
 %% endif
 
+%% if "cpp.define" in metadata
+env.Append(CPPDEFINES=[
+%% for define in metadata["cpp.define"]
+    "{{ define }}",
+%% endfor
+])
+%% endif
 
 # Device configuration
 env["CONFIG_DEVICE_NAME"] = "{{ partname }}"
