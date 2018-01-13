@@ -1,0 +1,61 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2016, Fabian Greif
+# Copyright (c) 2018, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.parent = "cmsis"
+    module.name = "dsp"
+
+def prepare(module, options):
+    device = options[":target"]
+    core = device.get_driver("core")
+    if not core or not core["type"].startswith("cortex"):
+        return False
+
+    if not core["type"].startswith("cortex-m0"):
+        module.add_option(
+            BooleanOption(
+                name="unaligned_data",
+                description="Allow unaligned data storage. This may reduce data size, but cost some speed.",
+                default=False))
+    module.add_option(
+        BooleanOption(
+            name="check_matrix_sizes",
+            description="Check the input and output sizes of matrices and return ARM_MATH_SIZE_MISMATCH on fail.",
+            default=True))
+    module.add_option(
+        BooleanOption(
+            name="round_float_inputs",
+            description="Rounds float inputs properly during all conversions.",
+            default=True))
+
+    return True
+
+def build(env):
+    core = env[":target"].get_driver("core")["type"]
+    core = core.replace("cortex-m", "CM").replace("+", "PLUS").replace("f", "").replace("d", "")
+    env.append_metadata_unique("cpp.define", "ARM_MATH_{}".format(core))
+
+    if env[":::check_matrix_sizes"]:
+        env.append_metadata_unique("cpp.define", "ARM_MATH_MATRIX_CHECK")
+
+    if env[":::round_float_inputs"]:
+        env.append_metadata_unique("cpp.define", "ARM_MATH_ROUNDING")
+
+    if not env.get_option(":::unaligned_data", False):
+        env.append_metadata_unique("cpp.define", "UNALIGNED_SUPPORT_DISABLE")
+
+    env.append_metadata_unique("include_path", "ext/cmsis/dsp")
+
+    env.outbasepath = "ext/cmsis/dsp"
+    env.copy("cmsis/CMSIS/DSP/Include", ".")
+    env.copy("cmsis/CMSIS/DSP/Source", ".")
