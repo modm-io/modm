@@ -68,7 +68,7 @@ def pre_build(env):
         "cortex-m7fd": "cm7",
     }[device.get_driver("core")["type"]]
     core_header = "core_{}.h".format(core)
-    core_header = localpath("..", "cmsis", "Include", core_header)
+    core_header = localpath("..", "arm", "cmsis", "CMSIS", "Core", "Include", core_header)
 
     folder = "stm32{}xx".format(device.identifier["family"])
     family_header = folder + ".h"
