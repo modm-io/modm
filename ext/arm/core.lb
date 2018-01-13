@@ -12,7 +12,8 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "cmsis"
+    module.parent = "cmsis"
+    module.name = "core"
 
 def prepare(module, options):
     device = options[":target"]
@@ -22,8 +23,7 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.append_metadata_unique("include_path", "ext/cmsis")
+    env.append_metadata_unique("include_path", "ext/cmsis/core")
 
-    env.outbasepath = "ext"
-    env.copy("cmsis/CMSIS/Core/Include", "cmsis")
-
+    env.outbasepath = "ext/cmsis"
+    env.copy("cmsis/CMSIS/Core/Include", "core")

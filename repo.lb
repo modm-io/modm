@@ -47,4 +47,4 @@ def init(repo):
                           enumeration=devices))
 
 def prepare(repo, options):
-    repo.find_modules_recursive(".", modulefile="module.lb")
+    repo.find_modules_recursive(".", modulefile="*.lb", ignore="repo.lb")

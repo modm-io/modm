@@ -13,14 +13,15 @@
 import os
 
 def init(module):
-    module.name = "cmsis.device"
+    module.parent = "cmsis"
+    module.name = "device"
 
 def prepare(module, options):
     device = options[":target"]
     if not device.identifier["platform"] == "lpc":
         return False
 
-    module.depends(":cmsis")
+    module.depends(":cmsis:core")
     return True
 
 def build(env):

@@ -21,7 +21,7 @@ def prepare(module, options):
     if not options[":target"].has_driver("core:cortex-m*"):
         return False
 
-    module.depends(":architecture", ":cmsis.device", ":platform:clock", ":platform:clock.generic")
+    module.depends(":architecture", ":cmsis:device", ":platform:clock", ":platform:clock.generic")
 
     module.add_option(
         EnumerationOption(
