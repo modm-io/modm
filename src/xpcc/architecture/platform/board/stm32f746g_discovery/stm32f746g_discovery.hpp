@@ -80,8 +80,8 @@ struct systemClock
 		ClockControl::enableExternalClock(); // 25 MHz
 		ClockControl::enablePll(
 			ClockControl::PllSource::ExternalClock,
-			25,		// 25MHz / N=25 -> 1MHz
-			432,	// 1MHz * M=432 -> 432MHz
+			25,		// 25MHz / M=25 -> 1MHz
+			432,	// 1MHz * N=432 -> 432MHz
 			2,		// 432MHz / P=2 -> 216MHz = F_cpu
 			9		// 432MHz / Q=9 -> 48MHz = F_usb
 		);

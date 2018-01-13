@@ -82,8 +82,8 @@ struct systemClock
 		ClockControl::enableExternalCrystal(); // 8 MHz
 		ClockControl::enablePll(
 		ClockControl::PllSource::ExternalCrystal,
-			8,      // 8MHz / N=8 -> 1MHz   !!! Must be 1 MHz for PLLSAI !!!
-			360,    // 1MHz * M=360 -> 360MHz
+			8,      // 8MHz / M=8 -> 1MHz   !!! Must be 1 MHz for PLLSAI !!!
+			360,    // 1MHz * N=360 -> 360MHz
 			2,      // 360MHz / P=2 -> 180MHz = F_cpu
 			7       // 360MHz / Q=7 -> ~51MHz (value ignored! PLLSAI generates 48MHz for F_usb)
 		);

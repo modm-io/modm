@@ -78,8 +78,8 @@ struct systemClock
 		ClockControl::enableExternalCrystal(); // 8 MHz
 		ClockControl::enablePll(
 			ClockControl::PllSource::ExternalCrystal,
-			4,      // 8MHz / N=4 -> 2MHz
-			180,    // 2MHz * M=180 -> 360MHz
+			4,      // 8MHz / M=4 -> 2MHz
+			180,    // 2MHz * N=180 -> 360MHz
 			2,      // 360MHz / P=2 -> 180MHz = F_cpu
 			7       // 360MHz / Q=7 -> ~51MHz = F_usb => bad for USB
 		);

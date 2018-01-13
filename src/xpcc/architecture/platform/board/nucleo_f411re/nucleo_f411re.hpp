@@ -64,8 +64,8 @@ struct systemClock {
 		ClockControl::enableInternalClock();	// 16MHz
 		ClockControl::enablePll(
 			ClockControl::PllSource::InternalClock,
-			4,	// 16MHz / N=4 -> 4MHz
-			96,	// 4MHz * M=96 -> 384MHz
+			4,	// 16MHz / M=4 -> 4MHz
+			96,	// 4MHz * N=96 -> 384MHz
 			4,	// 384MHz / P=4 -> 96MHz = F_cpu
 			8	// 384MHz / Q=8 -> 48MHz = F_usb
 		);

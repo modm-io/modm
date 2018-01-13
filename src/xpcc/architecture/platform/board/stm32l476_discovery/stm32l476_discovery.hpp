@@ -52,8 +52,8 @@ struct systemClock {
 
 		// ClockControl::enablePll(
 		// 	ClockControl::PllSource::MultiSpeedInternalClock,
-		// 	1,	// 4MHz / N=1 -> 4MHz
-		// 	16,	// 4MHz * M=16 -> 64MHz <= 344MHz = PLL VCO output max, >= 64 MHz = PLL VCO out min
+		// 	1,	// 4MHz / M=1 -> 4MHz
+		// 	16,	// 4MHz * N=16 -> 64MHz <= 344MHz = PLL VCO output max, >= 64 MHz = PLL VCO out min
 		// 	1,	// 64MHz / P=1 -> 64MHz = F_cpu
 		// 	2	// 64MHz / Q=2 -> 32MHz = F_usb
 		// );
