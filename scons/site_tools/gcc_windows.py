@@ -92,8 +92,8 @@ class TempFileMungeWindows(object):
         native_tmp = SCons.Util.get_native_path(os.path.normpath(tmp))
         
         args = list(map(SCons.Subst.quote_spaces, cmd[1:]))
-        output = " ".join(args).replace("\\", "\\\\")
-        os.write(fd, output + "\n")
+        output = " ".join(args).replace("\\", "\\\\") + "\n"
+        os.write(fd, bytearray(output, "utf-8"))
         os.close(fd)
         if SCons.Action.print_actions:
             print("TempFileMungeWindows: Using tempfile "+native_tmp+" for command line:\n"+
