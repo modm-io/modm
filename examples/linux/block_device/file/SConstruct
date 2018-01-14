@@ -1,0 +1,8 @@
+# path to the xpcc root directory
+xpccpath = '../../../..'
+
+# create empty `test.bin~` file (if it does not exist)
+open('test.bin~', 'a').close()
+
+# execute the common SConstruct file
+exec(compile(open(xpccpath + '/scons/SConstruct', "rb").read(), xpccpath + '/scons/SConstruct', 'exec'))
