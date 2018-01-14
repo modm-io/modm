@@ -40,8 +40,8 @@ from device_identifier import DeviceIdentifier
 from device_element import DeviceElementBase
 from parameters import ParameterDB
 
-from past.builtins import basestring
-from builtins import str
+if sys.version_info[0] >= 3:
+	basestring = (str, bytes)
 
 # add python module logger to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
@@ -104,7 +104,7 @@ class DriverFile:
 		Note: all file paths are relative to the platform path.
 		"""
 		# Turn Device String into Device Identifier
-		if isinstance(device_id, str):
+		if isinstance(device_id, basestring):
 			device_id = DeviceIdentifier(device_id)
 		# Initialize Return List
 		build = []
@@ -176,7 +176,7 @@ class DriverFile:
 				if f.appliesTo(device_id, self.properties):
 					self.log.debug("Found driver file substitution '%s' with value '%s'. In '%s/%s' driver xml" % (node.tag, node.text, self.type, self.name))
 					self.substitutions.update({node.tag: node.text})
-		
+
 		# Then parse needed static/template files
 		for node in driver_node:
 			# Skip PArameters:
@@ -187,7 +187,7 @@ class DriverFile:
 			if node.get('instances') != None and instance_id != None:
 				if instance_id not in node.get('instances').split(','):
 					continue
-			
+
 			if node.text == None or len(node.text) <= 0:
 				self.log.error("Empty '%s' node in '%s/%s' driver xml." % (node.tag, self.type, self.name))
 				raise ParserException("Error: Empty '%s' node in '%s/%s' driver xml." % (node.tag, self.type, self.name))
