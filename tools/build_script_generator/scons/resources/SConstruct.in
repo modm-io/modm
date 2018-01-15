@@ -18,17 +18,17 @@ env = Environment(
                   os.path.join(rootpath, "ext", "dlr", "scons-build-tools", "site_tools")],
 %% if platform in ["stm32"]
         tools=[
-            'compiler_arm_none_eabi_gcc',
-            'settings_buildpath',
-            'utils_buildformat',
-            'utils_buildsize',
-            'program_openocd',
+            "compiler_arm_none_eabi_gcc",
+            "settings_buildpath",
+            "utils_buildformat",
+            "utils_buildsize",
+            "program_openocd",
 %% for tool in build_tools
-            '{{tool}}',
+            "{{tool}}",
 %% endfor
             ],
         CPU="{{ core }}",
-        CFLAGS_language=['-std=gnu99'],
+        CFLAGS_language=["-std=gnu99"],
         LINKFLAGS_optimize=[
             "-Wl,--relax",
             "-Wl,--gc-sections",
@@ -42,8 +42,8 @@ env = Environment(
             ],
         ENV=os.environ)
 
-#env.Append(CCFLAGS_warning=['-Werror'])
-env.Append(LINKFLAGS_other=['-Wl,--no-wchar-size-warning'])
+#env.Append(CCFLAGS_warning=["-Werror"])
+env.Append(LINKFLAGS_other=["-Wl,--no-wchar-size-warning"])
 env.Append(LINKFLAGS_target=[
     "-Llink",
     "-Tlinkerscript.ld",
@@ -51,59 +51,63 @@ env.Append(LINKFLAGS_target=[
 
 %% elif platform in ["avr"]
         tools=[
-            'compiler_avr_gcc',
-            'settings_buildpath',
-            'utils_buildformat',
-            'utils_buildsize',
-            # 'program_avrdude',
+            "compiler_avr_gcc",
+            "settings_buildpath",
+            "utils_buildformat",
+            # "utils_buildsize",
+            # "program_avrdude",
 %% for tool in build_tools
-            '{{tool}}',
+            "{{tool}}",
 %% endfor
             ],
         CCFLAGS_target=[
-            '-mmcu={{ partname }}',
-            '-DF_CPU=${CONFIG_CLOCK_F_CPU}'
+            "-mmcu={{ partname }}",
+            "-DF_CPU=${CONFIG_CLOCK_F_CPU}"
             ],
-        CFLAGS_language=['-std=gnu99'],
+        CFLAGS_language=["-std=gnu99"],
         LINKFLAGS_other=[
             "-Wl,--fatal-warnings",
             ],
         ENV=os.environ)
 
+env.Append(ASFLAGS_target=[
+    "-mmcu={{ partname }}",
+    "-xassembler-with-cpp",
+    ])
 env.Append(LINKFLAGS_target=[
     "-Llink",
     "-Tlinkerscript.ld",
     ])
 %% elif platform in ["hosted"]
         tools=[
-            'compiler_hosted_{{compiler}}',
-            'settings_buildpath',
-            'utils_buildformat',
-            'utils_buildsize',
+            "compiler_hosted_{{compiler}}",
+            "settings_buildpath",
+            "utils_buildformat",
+            "utils_buildsize",
 %% for tool in build_tools
-            '{{tool}}',
+            "{{tool}}",
 %% endfor
             ],
         CXXFLAGS_language=[
-            '-std=c++14',
+            "-std=c++14",
             ],
         ENV=os.environ)
 %% endif
 env["CONFIG_MODM_ROOTPATH"] = os.path.abspath(rootpath)
 
-env.RemoveFromList('CCFLAGS_warning', [
-    '-Wshadow',
-    '-Wcast-align',
-    '-Wmissing-declarations',
-    '-Wcast-qual',
-    '-Wredundant-decls',])
-env.RemoveFromList('CXXFLAGS_warning', [
-    '-Wold-style-cast',
-    '-Wnon-virtual-dtor'])
+env.RemoveFromList("CCFLAGS_warning", [
+    "-Wshadow",
+    "-Wcast-align",
+    "-Wmissing-declarations",
+    "-Wcast-qual",
+    "-Wredundant-decls",])
+env.RemoveFromList("CXXFLAGS_warning", [
+    "-Wold-style-cast",
+    "-Wnon-virtual-dtor"])
 
 # User Config Options
-env['BASEPATH']  = os.path.abspath(rootpath)
-env['BUILDPATH'] = os.path.abspath('{{ build_path }}')
+env["BASEPATH"]  = os.path.abspath(rootpath)
+env["BUILDPATH"] = os.path.abspath("{{ build_path }}")
 
 library = env.SConscript(os.path.join(rootpath, "SConscript"), exports="env")
 
@@ -133,23 +137,28 @@ files += env.XpccCommunication(
     path=os.path.abspath("{{xpcc_generate}}"),
     namespace="{{xpcc_namespace}}")
 %% endif
-program = env.Program(target='project.elf', source=files)
+program = env.Program(target="project.elf", source=files)
 
-env.Alias('symbols', env.Symbols(program))
+env.Alias("symbols", env.Symbols(program))
 %% if platform in ["hosted"]
-env.Alias('build', program)
-env.Alias('run', env.Run(program))
-env.Alias('all', ['build', 'run'])
+env.Alias("build", program)
+env.Alias("run", env.Run(program))
+env.Alias("all", ["build", "run"])
 %% else
-env.Alias('size', env.Size(program))
-
+%% if platform in ["stm32"]
+env.Alias("size", env.Size(program))
 if "CONFIG_OPENOCD_COMMANDS" in env:
-    env.Alias('program', env.OpenOcd(program))
+    env.Alias("program", env.OpenOcd(program))
+%% endif
 
 hexfile = env.Hex(program)
 
-env.Alias('build', [hexfile, env.Listing(program)])
-env.Alias('all', ['build', 'size'])
+env.Alias("build", [hexfile, env.Listing(program)])
+%% if platform in ["stm32"]
+env.Alias("all", ["build", "size"])
+%% else
+env.Alias("all", ["build"])
+%% endif
 %% endif
 
-env.Default('all')
+env.Default("all")

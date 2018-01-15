@@ -11,8 +11,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/platform/platform.hpp>
-#include <modm/platform/platform.hpp>
-#include <modm/processing/processing.hpp>
+#include <modm/processing/timer.hpp>
 
 using namespace modm::platform;
 

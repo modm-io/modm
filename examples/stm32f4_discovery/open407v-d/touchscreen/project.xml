@@ -6,10 +6,13 @@
   </options>
   <modules>
     <module>:driver</module>
+    <module>:driver:ads7843</module>
+    <module>:driver:parallel_tft_display</module>
+    <module>:driver:memory_bus</module>
     <module>:platform:fsmc</module>
     <module>:platform:gpio</module>
     <module>:platform:spi:2</module>
-    <module>:ui</module>
+    <module>:ui:display</module>
     <module>:build.scons</module>
   </modules>
 </library>

@@ -12,7 +12,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board/board.hpp>
-#include <modm/processing/processing.hpp>
+#include <modm/processing/timer.hpp>
 #include <modm/debug/logger.hpp>
 
 /**
@@ -82,7 +82,7 @@ main()
 	MODM_LOG_INFO << "Initializing Can ..." << modm::endl;
 	// Initialize Can
 	Can::connect<GpioInputB8::Rx, GpioOutputB9::Tx>(Gpio::InputType::PullUp);
-	Can::initialize<Board::systemClock, Can::Bitrate::kBps125>();
+	Can::initialize<Board::systemClock, Can::Bitrate::kBps125>(9);
 
 	MODM_LOG_INFO << "Setting up Filter for Can ..." << modm::endl;
 	// Receive every message

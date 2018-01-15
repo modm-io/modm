@@ -11,6 +11,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board/board.hpp>
+#include <modm/architecture/interface/interrupt.hpp>
 
 /**
  * This is some testing of Timers 1 to 14 on a STM32 F4 Discovery Board.

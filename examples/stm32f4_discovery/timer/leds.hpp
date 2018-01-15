@@ -12,7 +12,6 @@
 #ifndef LEDS_HPP
 #define LEDS_HPP
 
-#include <modm/board/board.hpp>
 #include <modm/ui/led.hpp>
 
 // create the leds with these lambda callbacks

@@ -15,7 +15,7 @@
   <modules>
     <module>:platform:core</module>
     <module>:debug</module>
-    <module>:processing</module>
+    <module>:processing:rtos</module>
     <module>:build.scons</module>
   </modules>
 </library>

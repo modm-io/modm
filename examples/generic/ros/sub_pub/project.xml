@@ -7,10 +7,10 @@
     <option name=":platform:uart:2:buffer.rx">512</option>
   </options>
   <modules>
-    <module>:communication</module>
+    <module>:communication:ros</module>
     <module>:driver</module>
     <module>:platform:i2c:1</module>
-    <module>:processing</module>
+    <module>:processing:timer</module>
     <module>:ros</module>
     <module>:build.scons</module>
   </modules>

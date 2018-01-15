@@ -6,12 +6,14 @@
   </options>
   <modules>
     <module>:debug</module>
-    <module>:driver</module>
+    <module>:driver:pca8574</module>
+    <module>:driver:hd44780</module>
     <module>:platform:gpio</module>
     <module>:platform:i2c.bitbang</module>
     <module>:platform:i2c:2</module>
     <module>:platform:uart:2</module>
-    <module>:processing</module>
+    <module>:processing:protothread</module>
+    <module>:processing:timer</module>
     <module>:build.scons</module>
   </modules>
 </library>

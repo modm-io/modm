@@ -14,8 +14,9 @@
     <option name=":build.scons:build.path">../../../../build/avr/can/mcp2515</option>
   </options>
   <modules>
-    <module>:driver</module>
+    <module>:driver:mcp2515</module>
     <module>:platform:clock</module>
+    <module>:platform:core</module>
     <module>:platform:gpio</module>
     <module>:platform:spi</module>
     <module>:platform:spi.bitbang</module>

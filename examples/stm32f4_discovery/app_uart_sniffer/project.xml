@@ -10,7 +10,7 @@
     <module>:platform:uart:1</module>
     <module>:platform:uart:2</module>
     <module>:platform:uart:3</module>
-    <module>:processing</module>
+    <module>:processing:timer</module>
     <module>:build.scons</module>
   </modules>
 </library>

@@ -33,6 +33,7 @@ main()
 	return 0;
 }
 
+/* FIXME: Since --whole-archive option, the interrupt defined in libmodm.a conflicts
 // Interrupt Handler
 MODM_ISR(USART2)
 {
@@ -41,3 +42,4 @@ MODM_ISR(USART2)
 		UsartHal2::write('A');
 	}
 }
+*/

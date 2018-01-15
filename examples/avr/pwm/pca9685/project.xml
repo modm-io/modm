@@ -14,8 +14,9 @@
     <option name=":build.scons:build.path">../../../../build/avr/pwm/pca9685</option>
   </options>
   <modules>
-    <module>:driver</module>
+    <module>:driver:pca9685</module>
     <module>:platform:clock</module>
+    <module>:platform:core</module>
     <module>:platform:i2c</module>
     <module>:build.scons</module>
   </modules>

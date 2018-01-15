@@ -13,7 +13,7 @@
 
 #include <modm/board/board.hpp>
 #include <modm/debug/logger.hpp>
-#include <modm/processing/processing.hpp>
+#include <modm/processing/timer.hpp>
 #include <inttypes.h>
 
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;

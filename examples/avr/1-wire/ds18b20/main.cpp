@@ -12,9 +12,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/platform/platform.hpp>
-#include <modm/platform/platform.hpp>
 #include <modm/driver/temperature/ds18b20.hpp>
-
 #include <modm/io/iostream.hpp>
 
 using namespace modm::platform;
@@ -26,7 +24,7 @@ int
 main()
 {
 	using systemClock = SystemClock;
-	Uart0::connect<GpioD1::Txd>();
+	Uart0::connect<GpioD1::Txd, GpioD0::Rxd>();
 	Uart0::initialize<systemClock, 9600>();
 
 	// Enable interrupts, this is needed for every buffered UART

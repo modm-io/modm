@@ -14,8 +14,10 @@
     <option name=":build.scons:build.path">../../../../build/avr/gpio/button_group</option>
   </options>
   <modules>
+    <module>:architecture:interrupt</module>
+    <module>:platform:core</module>
     <module>:platform:gpio</module>
-    <module>:ui</module>
+    <module>:ui:button</module>
     <module>:build.scons</module>
   </modules>
 </library>

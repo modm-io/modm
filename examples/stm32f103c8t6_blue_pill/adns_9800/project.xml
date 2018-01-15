@@ -6,11 +6,12 @@
   </options>
   <modules>
     <module>:debug</module>
-    <module>:driver</module>
+    <module>:driver:adns9800</module>
     <module>:platform:gpio</module>
     <module>:platform:spi:1</module>
     <module>:platform:uart:2</module>
-    <module>:processing</module>
+    <module>:processing:protothread</module>
+    <module>:processing:timer</module>
     <module>:build.scons</module>
   </modules>
 </library>

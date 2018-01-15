@@ -6,7 +6,7 @@
   </options>
   <modules>
     <module>:debug</module>
-    <module>:driver</module>
+    <module>:driver:vl6180</module>
     <module>:io</module>
     <module>:platform:gpio</module>
     <module>:platform:i2c.bitbang</module>

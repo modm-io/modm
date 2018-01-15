@@ -5,6 +5,7 @@
     <option name=":build.scons:build.path">../../../build/stm32f4_discovery/timer_test</option>
   </options>
   <modules>
+    <module>:architecture:interrupt</module>
     <module>:platform:timer:1</module>
     <module>:platform:timer:2</module>
     <module>:platform:timer:3</module>

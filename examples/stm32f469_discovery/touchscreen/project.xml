@@ -5,7 +5,7 @@
     <option name=":build.scons:build.path">../../../build/stm32f469_discovery/touchscreen</option>
   </options>
   <modules>
-    <module>:processing</module>
+    <module>:processing:protothread</module>
     <module>:build.scons</module>
   </modules>
 </library>

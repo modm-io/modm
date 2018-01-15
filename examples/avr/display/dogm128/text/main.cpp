@@ -12,9 +12,9 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/platform/platform.hpp>
-
-#include <modm/driver/display.hpp>
+#include <modm/driver/display/ea_dog.hpp>
 #include <modm/ui/display/font.hpp>
+#include <modm/architecture/interface/clock.hpp>
 
 using namespace modm::platform;
 

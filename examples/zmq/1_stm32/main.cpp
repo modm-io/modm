@@ -12,9 +12,9 @@
 
 #include <modm/board/board.hpp>
 
-#include <modm/processing/timer/periodic_timer.hpp>
+#include <modm/processing/timer.hpp>
 
-#include <modm/communication/communication.hpp>
+#include <modm/communication/xpcc.hpp>
 #include <modm/communication/xpcc/backend/can.hpp>
 
 #include "component_odometry/odometry.hpp"

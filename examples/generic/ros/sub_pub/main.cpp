@@ -16,7 +16,7 @@
  */
 
 #include <modm/board/board.hpp>
-#include <modm/processing/processing.hpp>
+#include <modm/processing/timer.hpp>
 
 #include <std_msgs/Bool.h>
 
@@ -39,11 +39,11 @@ namespace ampel
 
 namespace ros
 {
-	using xpccHardware = XpccHardware<RosSerialUart>;
-	using XpccNodeHandle = NodeHandle_<xpccHardware>;
+	using modmHardware = ModmHardware<RosSerialUart>;
+	using ModmNodeHandle = NodeHandle_<modmHardware>;
 }
 
-ros::XpccNodeHandle nh;
+ros::ModmNodeHandle nh;
 
 // For publisher
 std_msgs::Bool button_msg;

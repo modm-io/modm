@@ -39,3 +39,10 @@ examples/*/*/*/SConscript
 examples/*/*/*/SConstruct
 examples/*/*/*/scons
 examples/*/*/*/tools
+examples/*/*/*/*/src
+examples/*/*/*/*/ext
+examples/*/*/*/*/link
+examples/*/*/*/*/SConscript
+examples/*/*/*/*/SConstruct
+examples/*/*/*/*/scons
+examples/*/*/*/*/tools

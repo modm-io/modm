@@ -6,14 +6,17 @@
     <option name=":build.scons:image.source">images</option>
   </options>
   <modules>
+    <module>:container</module>
     <module>:debug</module>
-    <module>:driver</module>
+    <module>:driver:ads7843</module>
+    <module>:driver:parallel_tft_display</module>
+    <module>:driver:memory_bus</module>
     <module>:platform:fsmc</module>
-    <module>:platform:gpio</module>
     <module>:platform:spi:2</module>
     <module>:platform:uart:2</module>
-    <module>:processing</module>
-    <module>:ui</module>
+    <module>:ui:display</module>
+    <module>:ui:gui</module>
+    <module>:utils</module>
     <module>:build.scons</module>
   </modules>
 </library>

@@ -5,6 +5,9 @@
     <option name=":build.scons:build.path">../../../build/generic/resumable</option>
   </options>
   <modules>
+    <module>:processing:protothread</module>
+    <module>:processing:resumable</module>
+    <module>:processing:timer</module>
     <module>:build.scons</module>
   </modules>
 </library>

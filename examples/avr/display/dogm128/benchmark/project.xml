@@ -15,12 +15,14 @@
     <option name=":build.scons:image.source">images</option>
   </options>
   <modules>
-    <module>:driver</module>
+    <module>:architecture:interrupt</module>
+    <module>:driver:ea_dog</module>
     <module>:platform:clock</module>
+    <module>:platform:core</module>
     <module>:platform:gpio</module>
     <module>:platform:spi.bitbang</module>
-    <module>:processing</module>
-    <module>:ui</module>
+    <module>:processing:timer</module>
+    <module>:ui:display</module>
     <module>:build.scons</module>
   </modules>
 </library>

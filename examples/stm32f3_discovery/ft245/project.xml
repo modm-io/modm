@@ -5,7 +5,7 @@
     <option name=":build.scons:build.path">../../../build/stm32f3_discovery/ft245</option>
   </options>
   <modules>
-    <module>:driver</module>
+    <module>:driver:ft245</module>
     <module>:platform:gpio</module>
     <module>:build.scons</module>
   </modules>

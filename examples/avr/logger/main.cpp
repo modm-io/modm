@@ -33,7 +33,7 @@ modm::log::Logger modm::log::error(loggerDevice);
 int
 main()
 {
-	Uart0::connect<GpioOutputD1::Txd>();
+	Uart0::connect<GpioD1::Txd, GpioD0::Rxd>();
 	Uart0::initialize<systemClock, 115200>();
 
 	// Enable interrupts, this is needed for every buffered UART
