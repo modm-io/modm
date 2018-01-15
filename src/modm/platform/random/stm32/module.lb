@@ -18,7 +18,7 @@ def prepare(module, options):
     if not options[":target"].has_driver("rng:stm32"):
         return False
 
-    module.depends(":platform:core")
+    module.depends(":cmsis:device")
     return True
 
 def build(env):

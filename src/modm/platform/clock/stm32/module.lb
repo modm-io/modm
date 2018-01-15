@@ -19,7 +19,9 @@ def prepare(module, options):
     if not options[":target"].has_driver("rcc:stm32*"):
         return False
 
-    module.depends(":platform:core", ":platform:clock.generic")
+    module.depends(":cmsis:device", ":utils")
+    if "stm32f100" in options[":target"].partname:
+        module.depends(":architecture:clock")
     return True
 
 def build(env):
@@ -57,3 +59,4 @@ def build(env):
     env.template("latency.cpp.in")
     env.template("clock.cpp.in")
     env.template("clock.hpp.in")
+    env.copy("../common/common_clock.hpp", "common_clock.hpp")

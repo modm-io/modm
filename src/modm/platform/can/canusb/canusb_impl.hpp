@@ -20,7 +20,6 @@
 #include <iostream>
 #include <modm/debug/logger.hpp>
 
-#include <modm/architecture/driver.hpp>
 #include <modm/processing/timer.hpp>
 
 #include <modm/driver/can/can_lawicel_formatter.hpp>
@@ -140,7 +139,7 @@ modm::platform::CanUsb<SerialPort>::open(modm::Can::Bitrate canBitrate)
 			MutexGuard stateGuard(this->stateLock);
 			this->active = true;
 		}
-		this->thread = new std::thread(&modm::hosted::CanUsb<SerialPort>::update, this);
+		this->thread = new std::thread(&CanUsb<SerialPort>::update, this);
 
 		busState = BusState::Connected;
 		this->tmpRead.clear();

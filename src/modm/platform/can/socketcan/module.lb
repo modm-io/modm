@@ -19,7 +19,7 @@ def prepare(module, options):
     if not options[":target"].has_driver("can:socketcan"):
         return False
 
-    module.depends(":platform:core")
+    module.depends(":architecture:can", ":debug")
     return True
 
 def build(env):

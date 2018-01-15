@@ -297,6 +297,10 @@ frequency should be adapted accordingly:
 #error "No flash latencies set. Please add them."
 %% endif
 
+%% if target["family"] == "f1" and target["name"] == "00"
+#include <modm/architecture/interface/clock.hpp>
+%% endif
+
 %% for mV, table_MHz in table.items()|sort
 static const uint32_t
 flash_latency_{{ mV }}[] =

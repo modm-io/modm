@@ -67,8 +67,6 @@ class Instance(Module):
         module.description = "CAN {} instance".format(self.instance)
 
     def prepare(self, module, options):
-        module.depends(":platform:can", ":debug")
-
         load_options(module)
         return True
 
@@ -98,7 +96,18 @@ def prepare(module, options):
     if not device.has_driver("can:stm32"):
         return False
 
-    module.depends(":platform:core", ":platform:clock.generic", ":platform:can.generic")
+    module.depends(
+        ":architecture:assert",
+        ":architecture:atomic",
+        ":architecture:can",
+        ":architecture:clock",
+        ":architecture:delay",
+        ":architecture:interrupt",
+        ":cmsis:device",
+        ":debug",
+        ":platform:can.common",
+        ":platform:gpio",
+        ":utils")
 
     driver = device.get_driver("can")
     # If there is only one instance of the peripheral it is not numbered and
@@ -107,7 +116,6 @@ def prepare(module, options):
         for instance in listify(driver["instance"]):
             module.add_submodule(Instance(int(instance)))
     else:
-        module.depends(":debug")
         load_options(module)
 
     return True

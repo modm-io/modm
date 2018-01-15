@@ -22,7 +22,7 @@
 //#include "../device.hpp"
 #include <modm/architecture/interface/uart.hpp>
 #include <modm/platform/gpio/connector.hpp>
-
+#include <cmath>
 
 namespace modm
 {

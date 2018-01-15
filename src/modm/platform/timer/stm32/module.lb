@@ -76,7 +76,10 @@ def prepare(module, options):
     if not device.has_driver("tim:stm32*"):
         return False
 
-    module.depends(":platform:core", ":platform:gpio")
+    module.depends(
+        ":architecture:register",
+        ":cmsis:device",
+        ":platform:gpio")
 
     for driver in device.get_all_drivers("tim"):
         for instance in driver["instance"]:

@@ -1,15 +1,7 @@
-# Copyright (c) 2016-2017, Niklas Hauser
-# Copyright (c) 2017, Fabian Greif
-#
-# This file is part of the modm project.
-#
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-#
+# Copyright (c) 2016-2017, Niklas Hauser
+# Copyright (c) 2017, Fabian Greif
 #
 # This file is part of the modm project.
 #
@@ -69,7 +61,15 @@ def prepare(module, options):
     if not device.has_driver("i2c:stm32l4"):
         return False
 
-    module.depends(":platform:core", ":platform:gpio")
+    module.depends(
+        ":architecture:accessor",
+        ":architecture:atomic",
+        ":architecture:clock",
+        ":architecture:i2c",
+        ":architecture:interrupt",
+        ":cmsis:device",
+        ":container",
+        ":platform:gpio")
 
     for instance in listify(device.get_driver("i2c")["instance"]):
         module.add_submodule(Instance(int(instance)))

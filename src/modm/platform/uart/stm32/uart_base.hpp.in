@@ -16,6 +16,7 @@
 #include <stdint.h>
 #include "../device.hpp"
 #include <modm/architecture/interface/register.hpp>
+#include <modm/architecture/interface/interrupt.hpp>
 
 %% if not extended_driver
 // STM has some weird ideas about continuity
