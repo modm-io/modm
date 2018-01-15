@@ -13,6 +13,9 @@
 #ifndef TFT_MEMORY_BUS_HPP_
 #define TFT_MEMORY_BUS_HPP_
 
+#include <modm/architecture/utils.hpp>
+#include <modm/architecture/interface/delay.hpp>
+
 namespace modm
 {
 /**

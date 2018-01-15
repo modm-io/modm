@@ -18,7 +18,7 @@ namespace mcp2515
 
 FLASH_STORAGE(uint8_t configuration[24]) =
 {
-%% if options["::MCP2515_clock"] == "16MHz"
+%% if options[":::MCP2515_clock"] == "16MHz"
 
 	// 10 kbps
 	0x04,		// CNF3
@@ -60,7 +60,7 @@ FLASH_STORAGE(uint8_t configuration[24]) =
 	BTLMODE | PHSEG11,
 	0,
 
-%% elif options["::MCP2515_clock"] == "20MHz"
+%% elif options[":::MCP2515_clock"] == "20MHz"
 
 	// 10 kbps
 	0x04,		// CNF3

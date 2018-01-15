@@ -21,7 +21,6 @@
 #include <modm/architecture/interface/delay.hpp>
 #include <modm/architecture/interface/can.hpp>
 #include <modm/debug/logger.hpp>
-#include <modm/platform/clock/common_clock.hpp>
 
 #include "mcp2515_definitions.hpp"
 

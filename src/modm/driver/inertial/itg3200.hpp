@@ -13,7 +13,7 @@
 #define MODM_ITG3200_HPP
 
 #include <modm/architecture/interface/i2c_device.hpp>
-#include <modm/math/geometry/angle.hpp>
+#include <modm/utils/bit_constants.hpp>
 
 namespace modm
 {

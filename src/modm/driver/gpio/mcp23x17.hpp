@@ -12,7 +12,6 @@
 #ifndef MODM_MCP23X17_HPP
 #define MODM_MCP23X17_HPP
 
-#include <modm/architecture/interface/gpio.hpp>
 #include <modm/architecture/interface/gpio_expander.hpp>
 #include <modm/architecture/interface/register.hpp>
 #include "mcp23_transport.hpp"

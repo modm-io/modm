@@ -13,8 +13,8 @@
 #ifndef MODM_MCP2515_CAN_BIT_TIMINGS_HPP
 #define MODM_MCP2515_CAN_BIT_TIMINGS_HPP
 
-#include <modm/architecture/interface.hpp>
-#include <modm/platform/clock/common_clock.hpp>
+#include <modm/architecture/interface/can.hpp>
+#include <modm/architecture/interface/clock.hpp>
 
 namespace modm
 {

@@ -1,6 +1,20 @@
+// coding: utf-8
+/*
+ * Copyright (c) 2017, Sascha Schade
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
 #ifndef MODM_DS1302_HPP
 #error "Do not include ds1302_impl.hpp. Only include ds1302.hpp"
 #endif
+
+#include <modm/architecture/interface/delay.hpp>
 
 template < class PinSet >
 void

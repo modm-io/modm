@@ -14,7 +14,8 @@
 
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/architecture/interface/gpio_expander.hpp>
-#include <modm/math/geometry/angle.hpp>
+#include <modm/architecture/interface/register.hpp>
+#include <modm/math/utils/bit_operation.hpp>
 
 namespace modm
 {

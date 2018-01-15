@@ -14,6 +14,8 @@
 #define MODM_HMC58X3_HPP
 
 #include <modm/architecture/interface/i2c_device.hpp>
+#include <modm/architecture/interface/register.hpp>
+#include <modm/math/utils/endianness.hpp>
 
 namespace modm
 {
