@@ -15,6 +15,7 @@ def init(module):
     module.name = "utils"
 
 def prepare(module, options):
+    module.depends(":architecture")
     return True
 
 def build(env):
