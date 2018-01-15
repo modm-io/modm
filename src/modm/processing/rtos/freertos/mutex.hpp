@@ -14,10 +14,6 @@
 #ifndef MODM_FREERTOS_MUTEX_HPP
 #define MODM_FREERTOS_MUTEX_HPP
 
-#ifndef MODM_RTOS_MUTEX_HPP
-#	error "Don't include this file directly, use <modm/processing/rtos/mutex.hpp>"
-#endif
-
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 

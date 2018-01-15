@@ -11,17 +11,15 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-import re
-
 def init(module):
-    module.name = "processing"
+    module.parent = "processing"
+    module.name = "protothread"
 
 def prepare(module, options):
+    module.depends(":architecture")
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/processing"
-    headers = env.get_generated_local_files(filterfunc=lambda path: re.match(r"[^/]+\.hpp", path))
-    env.template("processing.hpp.in", substitutions={"headers": sorted(headers)})
-
-    env.copy("task.hpp")
+    env.outbasepath = "src/modm/processing/protothread"
+    env.copy(".", ignore=env.ignore_patterns("*.lb"))
+    env.copy("../protothread.hpp")

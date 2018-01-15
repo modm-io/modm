@@ -10,18 +10,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_BOOST_QUEUE_HPP
-#define MODM_BOOST_QUEUE_HPP
-
-#ifndef MODM_RTOS_QUEUE_HPP
-#	error "Don't include this file directly, use <modm/processing/rtos/queue.hpp>"
-#endif
+#ifndef MODM_STDLIB_QUEUE_HPP
+#define MODM_STDLIB_QUEUE_HPP
 
 #include <stdint.h>
 #include <deque>
 
 #include <mutex>
-#include <modm/container/deque.hpp>
 
 namespace modm
 {
@@ -91,4 +86,4 @@ namespace modm
 	}
 }
 
-#endif // MODM_BOOST_QUEUE_HPP
+#endif // MODM_STDLIB_QUEUE_HPP
