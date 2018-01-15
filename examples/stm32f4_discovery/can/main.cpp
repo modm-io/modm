@@ -70,7 +70,7 @@ main()
 	MODM_LOG_INFO << "Initializing Can1..." << modm::endl;
 	// Initialize Can1
 	Can1::connect<GpioB8::Rx, GpioB9::Tx>(Gpio::InputType::PullUp);
-	Can1::initialize<Board::systemClock, Can1::Bitrate::kBps125>();
+	Can1::initialize<Board::systemClock, Can1::Bitrate::kBps125>(9);
 
 	MODM_LOG_INFO << "Setting up Filter for Can1..." << modm::endl;
 	// Receive every message
@@ -81,7 +81,7 @@ main()
 	MODM_LOG_INFO << "Initializing Can2..." << modm::endl;
 	// Initialize Can2
 	Can2::connect<GpioB5::Rx, GpioB6::Tx>(Gpio::InputType::PullUp);
-	Can2::initialize<Board::systemClock, Can2::Bitrate::kBps125>();
+	Can2::initialize<Board::systemClock, Can2::Bitrate::kBps125>(12);
 
 	MODM_LOG_INFO << "Setting up Filter for Can2..." << modm::endl;
 	// Receive every message

@@ -14,8 +14,9 @@
     <option name=":build.scons:build.path">../../../../build/avr/display/hd44780</option>
   </options>
   <modules>
-    <module>:driver</module>
+    <module>:driver:hd44780</module>
     <module>:platform:gpio</module>
+    <module>:platform:core</module>
     <module>:build.scons</module>
   </modules>
 </library>

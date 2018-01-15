@@ -9,7 +9,7 @@
     <module>:platform:can</module>
     <module>:platform:gpio</module>
     <module>:platform:uart:1</module>
-    <module>:processing</module>
+    <module>:processing:timer</module>
     <module>:build.scons</module>
   </modules>
 </library>

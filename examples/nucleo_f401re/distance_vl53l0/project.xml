@@ -6,10 +6,10 @@
   </options>
   <modules>
     <module>:debug</module>
-    <module>:driver</module>
+    <module>:driver:vl53l0</module>
     <module>:platform:gpio</module>
     <module>:platform:i2c:1</module>
-    <module>:processing</module>
+    <module>:processing:protothread</module>
     <module>:build.scons</module>
   </modules>
 </library>

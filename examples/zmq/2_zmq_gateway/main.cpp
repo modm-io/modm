@@ -17,7 +17,6 @@
 #include <modm/platform/can/canusb.hpp>
 // #include <modm/platform/can/socketcan.hpp>
 
-#include <modm/communication/communication.hpp>
 #include <modm/communication/xpcc/backend/can.hpp>
 
 #include <modm/communication/xpcc/backend/can/connector.hpp>

@@ -5,11 +5,13 @@
     <option name=":build.scons:build.path">../../../build/stm32f4_discovery/accelerometer</option>
   </options>
   <modules>
-    <module>:driver</module>
+    <module>:driver:lis302dl</module>
+    <module>:math:filter</module>
     <module>:platform:gpio</module>
     <module>:platform:i2c</module>
     <module>:platform:i2c.bitbang</module>
-    <module>:processing</module>
+    <module>:processing:timer</module>
+    <module>:processing:protothread</module>
     <module>:build.scons</module>
   </modules>
 </library>

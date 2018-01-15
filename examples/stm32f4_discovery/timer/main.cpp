@@ -12,7 +12,6 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board/board.hpp>
-#include <modm/processing/processing.hpp>
 #include "leds.hpp"
 #include "animations.hpp"
 

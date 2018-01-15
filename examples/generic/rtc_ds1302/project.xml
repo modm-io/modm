@@ -5,8 +5,8 @@
     <option name=":build.scons:build.path">../../../build/generic/rtc_ds1302</option>
   </options>
   <modules>
-    <module>:driver</module>
-    <module>:processing</module>
+    <module>:driver:ds1302</module>
+    <module>:processing:timer</module>
     <module>:build.scons</module>
   </modules>
 </library>

@@ -14,7 +14,7 @@
 #include <modm/board/board.hpp>
 #include <modm/driver/radio/nrf24/nrf24_phy.hpp>
 #include <modm/debug/logger.hpp>
-#include <modm/processing/processing.hpp>
+#include <modm/processing/timer.hpp>
 #include <inttypes.h>
 
 /*

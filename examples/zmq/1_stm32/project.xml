@@ -7,11 +7,11 @@
     <option name=":build.scons:xpcc.container">odometry</option>
   </options>
   <modules>
-    <module>:communication</module>
+    <module>:communication:xpcc</module>
     <module>:platform:can:1</module>
     <module>:platform:gpio</module>
     <module>:platform:timer:1</module>
-    <module>:processing</module>
+    <module>:processing:timer</module>
     <module>:build.scons</module>
   </modules>
 </library>

@@ -8,7 +8,8 @@
     <module>:debug</module>
     <module>:platform:gpio</module>
     <module>:platform:uart:2</module>
-    <module>:processing</module>
+    <module>:processing:timer</module>
+    <module>:processing:protothread</module>
     <module>:build.scons</module>
   </modules>
 </library>

@@ -9,13 +9,13 @@
   </repositories>
 
   <options>
-    <option name=":target">hosted-linux</option>
+    <option name=":target">hosted-darwin</option>
     <option name=":build.scons:build.path">../../../build/zmq/3_zmq_app</option>
     <option name=":build.scons:xpcc.source">../../communication/xml/communication.xml</option>
     <option name=":build.scons:xpcc.container">gui</option>
   </options>
   <modules>
-    <module>:communication</module>
+    <module>:communication:xpcc</module>
     <module>:debug</module>
     <module>:platform:core</module>
     <module>:build.scons</module>

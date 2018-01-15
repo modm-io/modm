@@ -14,11 +14,12 @@
     <option name=":build.scons:build.path">../../../../../build/avr/display/dogm128/text</option>
   </options>
   <modules>
-    <module>:driver</module>
+    <module>:driver:ea_dog</module>
     <module>:platform:clock</module>
+    <module>:platform:core</module>
     <module>:platform:gpio</module>
     <module>:platform:spi.bitbang</module>
-    <module>:ui</module>
+    <module>:ui:display</module>
     <module>:build.scons</module>
   </modules>
 </library>

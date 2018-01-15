@@ -11,7 +11,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board/board.hpp>
-#include <modm/processing/processing.hpp>
+#include <modm/processing/timer.hpp>
 #include <modm/driver/display/max7219matrix.hpp>
 
 /**

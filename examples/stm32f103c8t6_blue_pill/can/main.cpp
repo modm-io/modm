@@ -72,7 +72,7 @@ main()
 	} else {
 		Can::connect<GpioInputB8::Rx, GpioOutputB9::Tx>(Gpio::InputType::PullUp);
 	}
-	Can::initialize<Board::systemClock, Can::Bitrate::kBps125>();
+	Can::initialize<Board::systemClock, Can::Bitrate::kBps125>(9);
 
 	MODM_LOG_INFO << "Setting up Filter for Can1..." << modm::endl;
 	// Receive every message

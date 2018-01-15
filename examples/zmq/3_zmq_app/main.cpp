@@ -13,7 +13,6 @@
 #include <modm/debug/logger.hpp>
 #include <modm/platform/platform.hpp>
 
-#include <modm/communication/communication.hpp>
 #include <modm/communication/xpcc/backend/zeromq/connector.hpp>
 
 #include "component_gui/gui.hpp"

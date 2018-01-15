@@ -14,10 +14,11 @@
     <option name=":build.scons:build.path">../../../../build/avr/1-wire/ds18b20</option>
   </options>
   <modules>
-    <module>:driver</module>
+    <module>:driver:ds18b20</module>
     <module>:io</module>
     <module>:platform:1-wire.bitbang</module>
     <module>:platform:clock</module>
+    <module>:platform:core</module>
     <module>:platform:gpio</module>
     <module>:platform:uart:0</module>
     <module>:build.scons</module>

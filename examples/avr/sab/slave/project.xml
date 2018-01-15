@@ -14,9 +14,10 @@
     <option name=":build.scons:build.path">../../../../build/avr/sab/slave</option>
   </options>
   <modules>
-    <module>:communication</module>
+    <module>:communication:sab</module>
     <module>:platform:adc</module>
     <module>:platform:clock</module>
+    <module>:platform:core</module>
     <module>:platform:uart:0</module>
     <module>:build.scons</module>
   </modules>

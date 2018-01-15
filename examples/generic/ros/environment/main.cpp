@@ -39,11 +39,11 @@ using RosSerialUart = Board::stlink::Uart;
 
 namespace ros
 {
-	using xpccHardware = XpccHardware<RosSerialUart>;
-	using XpccNodeHandle = NodeHandle_<xpccHardware>;
+	using modmHardware = ModmHardware<RosSerialUart>;
+	using ModmNodeHandle = NodeHandle_<modmHardware>;
 }
 
-ros::XpccNodeHandle nh;
+ros::ModmNodeHandle nh;
 
 sensor_msgs::Temperature      temperature_msg;
 sensor_msgs::FluidPressure    pressure_msg;

@@ -68,7 +68,7 @@ main()
 	TIMSK2 = (1 << OCIE2A);
 	OCR2A = 230;
 
-	Uart0::connect<GpioOutputD1::Txd>();
+	Uart0::connect<GpioD1::Txd, GpioD0::Rxd>();
 	Uart0::initialize<systemClock, 115200>();
 
 	// Create a IOStream for complex formatting tasks

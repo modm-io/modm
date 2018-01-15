@@ -12,7 +12,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/platform/platform.hpp>
-#include <modm/driver/display.hpp>
+#include <modm/driver/display/ea_dog.hpp>
 #include <modm/ui/button_group.hpp>
 
 using namespace modm::platform;

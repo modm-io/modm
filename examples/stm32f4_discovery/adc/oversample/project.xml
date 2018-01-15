@@ -6,11 +6,11 @@
   </options>
   <modules>
     <module>:debug</module>
-    <module>:driver</module>
+    <module>:driver:adc_sampler</module>
     <module>:platform:adc:2</module>
     <module>:platform:gpio</module>
     <module>:platform:uart:2</module>
-    <module>:processing</module>
+    <module>:processing:timer</module>
     <module>:build.scons</module>
   </modules>
 </library>

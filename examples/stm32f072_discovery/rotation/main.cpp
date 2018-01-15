@@ -11,8 +11,9 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board/board.hpp>
-#include <modm/processing/processing.hpp>
-#include <modm/math/math.hpp>
+#include <modm/processing/protothread.hpp>
+#include <modm/processing/timer.hpp>
+#include <modm/math/filter.hpp>
 
 using namespace Board;
 
