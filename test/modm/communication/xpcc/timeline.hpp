@@ -14,7 +14,7 @@
 #ifndef TIMELINE_HPP
 #define TIMELINE_HPP
 
-#include <modm/communication/communication.hpp>
+#include <modm/communication/xpcc.hpp>
 #include <modm/container/linked_list.hpp>
 #include <modm/container/smart_pointer.hpp>
 

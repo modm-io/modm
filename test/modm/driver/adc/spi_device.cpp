@@ -155,11 +155,14 @@ test::SpiDevice::start(const Transmission* transmissions,
 		}
 	}
 	
-	if (rxBuffer != 0) {
+	if (rxBuffer != nullptr) {
 		delete rxBuffer;
+		rxBuffer = nullptr;
 	}
 	
-	rxBuffer = new uint8_t[maxSize];
+	if (maxSize) {
+		rxBuffer = new uint8_t[maxSize];
+	}
 }
 
 // ----------------------------------------------------------------------------

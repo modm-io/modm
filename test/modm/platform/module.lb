@@ -17,7 +17,10 @@ def init(module):
 
 
 def prepare(module, options):
-    module.depends(":platform:can.generic")
+    module.depends(
+        ":architecture:can",
+        ":architecture:clock",
+        ":platform:can.common")
     return True
 
 

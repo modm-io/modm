@@ -18,7 +18,7 @@
   </options>
   <modules>
     <module>:test</module>
-    <module>:unittest</module>
+    <module>:platform:core</module>
     <module>:build.scons</module>
   </modules>
 </library>

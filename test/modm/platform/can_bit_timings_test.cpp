@@ -13,7 +13,8 @@
 
 #include "can_bit_timings_test.hpp"
 
-#include <modm/platform/clock/common_clock.hpp>
+#include <modm/architecture/interface/clock.hpp>
+#include <modm/architecture/interface/can.hpp>
 #include <modm/platform/can/can_bit_timings.hpp>
 
 using namespace modm;
