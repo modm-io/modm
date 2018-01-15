@@ -12,6 +12,7 @@
 #include <modm/debug/logger/logger.hpp>
 
 #include "ltc2984_test.hpp"
+#include "math.h"
 
 #undef  MODM_LOG_LEVEL
 #define MODM_LOG_LEVEL modm::log::DISABLED

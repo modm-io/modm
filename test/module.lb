@@ -16,6 +16,7 @@ def init(module):
 
 
 def prepare(module, options):
+    module.depends(":unittest")
     return True
 
 

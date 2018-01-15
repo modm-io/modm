@@ -17,7 +17,16 @@ def init(module):
 
 
 def prepare(module, options):
-    module.depends(":driver", ":platform:gpio")
+    module.depends(
+        ":architecture:clock",
+        ":debug",
+        ":driver:ad7280a",
+        ":driver:bme280",
+        ":driver:bmp085",
+        ":driver:lawicel",
+        ":driver:ltc2984",
+        ":driver:mcp2515",
+        ":platform:gpio")
     return True
 
 

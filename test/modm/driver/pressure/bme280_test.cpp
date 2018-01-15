@@ -13,6 +13,7 @@
 
 #include <modm/driver/pressure/bme280.hpp>
 #include <modm/debug/logger/logger.hpp>
+#include <cmath>
 
 #include "bme280_test.hpp"
 
@@ -193,7 +194,7 @@ Bme280Test::testConversion()
 
 			MODM_LOG_DEBUG.printf("%05" PRIx32 "\t%5" PRId32 "\t%5" PRId32 "\t%2" PRId32 "\n", adc, tempDouble, temp, error);
 
-			error = std::abs(error);
+			if (error < 0) error = -error;
 			total_error += error;
 			if (uint32_t(error) > max_error) {
 				max_error = error;
@@ -273,7 +274,7 @@ Bme280Test::testConversion()
 				MODM_LOG_DEBUG.printf("  adc_press = %05" PRIx32 "  PressFp = %9" PRId32 " Pa\t PressDp = %9" PRId32 " Pa \t Diff = %5" PRId32 " Pa\n",
 					adc_press, pressFp, pressDp, error);
 
-				error = std::abs(error);
+				if (error < 0) error = -error;
 				total_error += error;
 				if (uint32_t(error) > max_error) {
 					max_error = error;

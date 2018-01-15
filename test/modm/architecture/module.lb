@@ -17,6 +17,13 @@ def init(module):
 
 
 def prepare(module, options):
+    module.depends(
+        ":architecture:accessor",
+        ":architecture:atomic",
+        ":architecture:can",
+        ":architecture:clock",
+        ":architecture:heap",
+        ":architecture:register")
     return True
 
 
