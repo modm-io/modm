@@ -169,7 +169,7 @@ Create an minimal example in `xpcc/examples/sam4/minimal`, containing:
 # path to the xpcc root directory
 xpccpath = '../../..'
 # execute the common SConstruct file
-execfile(xpccpath + '/scons/SConstruct')
+exec(compile(open(xpccpath + '/scons/SConstruct', "rb").read(), xpccpath + '/scons/SConstruct', 'exec'))
 ```
 
 - a minimal `main.cpp` file:

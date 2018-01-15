@@ -5,7 +5,7 @@ WARNING: THIS IS A GENERIC SCONSTRUCT FILE FOR ALL XPCC PROJECTS!
 # path to the xpcc root directory (modify as required!)
 xpccpath = '../xpcc'
 # execute the xpcc basic
-execfile(xpccpath + '/scons/SConstruct')
+exec(compile(open(xpccpath + '/scons/SConstruct', "rb").read(), xpccpath + '/scons/SConstruct', 'exec'))
 """
 
 # This variable MUST be defined externally
