@@ -15,7 +15,10 @@ def init(module):
     module.name = "io"
 
 def prepare(module, options):
-    module.depends(":utils", ":math")
+    module.depends(
+        ":architecture:accessor",
+        ":math:utils",
+        ":utils")
     return True
 
 def build(env):
