@@ -19,7 +19,7 @@ def prepare(module, options):
         return False
 
     module.depends(":platform:core", ":platform:gpio", ":platform:clock", ":platform:uart:1",
-                   ":platform:spi:2", ":debug")
+                   ":platform:spi:2", ":debug", ":architecture:clock")
     return True
 
 def build(env):

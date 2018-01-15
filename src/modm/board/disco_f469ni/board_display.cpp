@@ -10,6 +10,7 @@
 // ----------------------------------------------------------------------------
 
 #include "board.hpp"
+#include <modm/architecture/interface/memory.hpp>
 
 extern void
 board_initialize_display(uint8_t);

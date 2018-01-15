@@ -18,7 +18,7 @@ def prepare(module, options):
     if options[":target"].partname != "stm32l476vgt":
         return False
 
-    module.depends(":platform:core", ":platform:gpio", ":platform:clock", ":driver")
+    module.depends(":platform:core", ":platform:gpio", ":platform:clock", ":architecture:clock")
     return True
 
 def build(env):
