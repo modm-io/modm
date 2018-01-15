@@ -18,7 +18,11 @@ def prepare(module, options):
     if options[":target"].partname != "stm32f100rbt":
         return False
 
-    module.depends(":platform:core", ":platform:gpio", ":platform:clock")
+    module.depends(
+        ":architecture:clock",
+        ":platform:clock",
+        ":platform:core",
+        ":platform:gpio")
     return True
 
 def build(env):

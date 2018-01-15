@@ -18,8 +18,14 @@ def prepare(module, options):
     if options[":target"].partname != "stm32f303vct":
         return False
 
-    module.depends(":platform:core", ":platform:gpio", ":platform:clock",
-                   ":platform:spi:1", ":platform:i2c.bitbang", ":driver")
+    module.depends(
+        ":driver:l3gd20",
+        ":driver:lsm303a",
+        ":platform:clock",
+        ":platform:core",
+        ":platform:gpio",
+        ":platform:i2c.bitbang",
+        ":platform:spi:1")
     return True
 
 def build(env):

@@ -21,6 +21,7 @@
 #define MODM_STM32_NUCLEO_L476RG_HPP
 
 #include <modm/platform/platform.hpp>
+#include <modm/architecture/interface/clock.hpp>
 #include <modm/debug/logger.hpp>
 #define MODM_BOARD_HAS_LOGGER
 

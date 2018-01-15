@@ -18,8 +18,14 @@ def prepare(module, options):
     if options[":target"].partname != "atmega328p":
         return False
 
-    module.depends(":platform:core", ":platform:gpio", ":platform:clock",
-                   ":platform:uart:0", ":debug")
+    module.depends(
+        ":architecture:clock",
+        ":architecture:interrupt",
+        ":debug",
+        ":platform:clock",
+        ":platform:core",
+        ":platform:gpio",
+        ":platform:uart:0")
     return True
 
 def build(env):

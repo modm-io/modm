@@ -17,8 +17,13 @@ def prepare(module, options):
     if options[":target"].partname != "at90can128":
         return False
 
-    module.depends(":platform:core", ":platform:gpio", ":platform:clock",
-                   ":platform:uart:1", ":io")
+    module.depends(
+        ":architecture:clock",
+        ":io",
+        ":platform:clock",
+        ":platform:core",
+        ":platform:gpio",
+        ":platform:uart:1")
     return True
 
 def build(env):
