@@ -21,6 +21,7 @@
 #ifndef MODM_ARCHITECTURE_HPP
 #define MODM_ARCHITECTURE_HPP
 
-#include "driver.hpp"
+#include "interface.hpp"
+#include "utils.hpp"
 
 #endif	// MODM_ARCHITECTURE_HPP
