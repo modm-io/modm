@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "../thread.hpp"
+#include "thread.hpp"
 
 modm::rtos::Thread* modm::rtos::Thread::head = 0;
 
@@ -24,7 +24,7 @@ modm::rtos::Thread::Thread(uint32_t priority, uint16_t stackDepth, const char* n
 	(void) priority;
 	(void) stackDepth;
 	(void) name;
-	
+
 	// create a list of all threads
 	if (head == 0) {
 		head = this;

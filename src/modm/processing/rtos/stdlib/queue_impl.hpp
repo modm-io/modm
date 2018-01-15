@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_BOOST_QUEUE_HPP
+#ifndef MODM_STDLIB_QUEUE_HPP
 #	error "Don't use this file directly, use 'queue.hpp' instead!"
 #endif
 

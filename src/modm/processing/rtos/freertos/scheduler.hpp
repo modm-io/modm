@@ -15,10 +15,6 @@
 #ifndef MODM_FREERTOS_SCHEDULER_HPP
 #define MODM_FREERTOS_SCHEDULER_HPP
 
-#ifndef MODM_RTOS_SCHEDULER_HPP
-#	error "Don't include this file directly, use <modm/processing/rtos/scheduler.hpp>"
-#endif
-
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 

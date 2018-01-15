@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "../thread.hpp"
+#include "thread.hpp"
 
 /*
  * FreeRTOS is a C library. Therefore it doesn't know anything about objects

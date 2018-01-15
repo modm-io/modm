@@ -10,12 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_BOOST_SEMAPHORE_HPP
-#define MODM_BOOST_SEMAPHORE_HPP
-
-#ifndef MODM_RTOS_SEMAPHORE_HPP
-#	error "Don't include this file directly, use <modm/processing/rtos/semaphore.hpp>"
-#endif
+#ifndef MODM_STDLIB_SEMAPHORE_HPP
+#define MODM_STDLIB_SEMAPHORE_HPP
 
 #include <mutex>
 #include <condition_variable>
@@ -137,4 +133,4 @@ namespace modm
 	}
 }
 
-#endif // MODM_BOOST_SEMAPHORE_HPP
+#endif // MODM_STDLIB_SEMAPHORE_HPP

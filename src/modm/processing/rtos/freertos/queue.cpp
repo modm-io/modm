@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "../queue.hpp"
+#include "queue.hpp"
 
 // ----------------------------------------------------------------------------
 modm::rtos::QueueBase::QueueBase(unsigned portBASE_TYPE length,
@@ -55,11 +55,11 @@ modm::rtos::QueueBase::appendFromInterrupt(const void *item)
 {
 	portBASE_TYPE threadWoken = pdFALSE;
 	portBASE_TYPE result = xQueueSendToBackFromISR(this->handle, item, &threadWoken);
-	
+
 	// Request a context switch when the IRQ ends if a higher priorty has
 	// been woken.
 	portEND_SWITCHING_ISR(threadWoken);
-	
+
 	return (result == pdPASS);
 }
 
@@ -68,11 +68,11 @@ modm::rtos::QueueBase::prependFromInterrupt(const void *item)
 {
 	portBASE_TYPE threadWoken = pdFALSE;
 	portBASE_TYPE result = xQueueSendToFrontFromISR(this->handle, item, &threadWoken);
-	
+
 	// Request a context switch when the IRQ ends if a higher priorty has
 	// been woken.
 	portEND_SWITCHING_ISR(threadWoken);
-	
+
 	return (result == pdPASS);
 }
 
@@ -81,11 +81,11 @@ modm::rtos::QueueBase::getFromInterrupt(void *item)
 {
 	portBASE_TYPE threadWoken = pdFALSE;
 	portBASE_TYPE result = xQueueReceiveFromISR(this->handle, item, &threadWoken);
-	
+
 	// Request a context switch when the IRQ ends if a higher priorty has
 	// been woken.
 	portEND_SWITCHING_ISR(threadWoken);
-	
+
 	return (result == pdTRUE);
 }
 

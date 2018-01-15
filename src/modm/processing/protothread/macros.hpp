@@ -14,7 +14,7 @@
 #ifndef MODM_PT_MACROS_HPP
 #define MODM_PT_MACROS_HPP
 
-#include <modm/processing/resumable.hpp>
+#include <modm/architecture/utils.hpp>
 
 /**
  * Declare start of protothread

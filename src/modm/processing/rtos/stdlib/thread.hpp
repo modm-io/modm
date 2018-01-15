@@ -11,12 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_BOOST_THREAD_HPP
-#define MODM_BOOST_THREAD_HPP
-
-#ifndef MODM_RTOS_THREAD_HPP
-#	error "Don't include this file directly, use <modm/processing/rtos/thread.hpp>"
-#endif
+#ifndef MODM_STDLIB_THREAD_HPP
+#define MODM_STDLIB_THREAD_HPP
 
 #include <memory>
 #include <thread>
@@ -175,4 +171,4 @@ namespace modm
 	}
 }
 
-#endif // MODM_BOOST_THREAD_HPP
+#endif // MODM_STDLIB_THREAD_HPP

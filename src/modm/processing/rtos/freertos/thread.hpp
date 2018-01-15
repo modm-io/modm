@@ -15,10 +15,6 @@
 #ifndef MODM_FREERTOS_THREAD_HPP
 #define MODM_FREERTOS_THREAD_HPP
 
-#ifndef MODM_RTOS_THREAD_HPP
-#	error "Don't include this file directly, use <modm/processing/rtos/thread.hpp>"
-#endif
-
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 

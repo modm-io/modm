@@ -12,12 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_BOOST_MUTEX_HPP
-#define MODM_BOOST_MUTEX_HPP
-
-#ifndef MODM_RTOS_MUTEX_HPP
-#	error "Don't include this file directly, use <modm/processing/rtos/mutex.hpp>"
-#endif
+#ifndef MODM_STDLIB_MUTEX_HPP
+#define MODM_STDLIB_MUTEX_HPP
 
 #include <mutex>
 
@@ -91,4 +87,4 @@ namespace modm
 	}
 }
 
-#endif // MODM_BOOST_MUTEX_HPP
+#endif // MODM_STDLIB_MUTEX_HPP

@@ -15,7 +15,6 @@
 #ifndef MODM_RF_MACROS_HPP
 #define MODM_RF_MACROS_HPP
 
-#include <modm/utils/arithmetic_traits.hpp>
 #include <modm/architecture/interface/assert.hpp>
 #include <modm/architecture/utils.hpp>
 
