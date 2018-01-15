@@ -11,45 +11,12 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-
 def init(module):
     module.name = "driver"
 
-
 def prepare(module, options):
-    module.add_option(
-        EnumerationOption(
-            name="MCP2515_clock",
-            enumeration=["16MHz", "20MHz"],
-            description=
-                "Used clock for the MCP2515. The device configuration "
-                "is selected according to the clock speed.",
-            default="16MHz"))
-    module.add_option(
-        EnumerationOption(
-            name="ST7036_voltage",
-            enumeration=["3.3V", "5V"],
-            description="Select the supply voltage of the ST7036.",
-            default="3.3V"))
-
-    module.depends(":ui", ":debug", ":platform:clock.generic")
     return True
-
 
 def build(env):
     env.outbasepath = "src/modm/driver"
-
-    # Copy all files except for the templates and the module file.
-    # Excludes the storage module as well, because it is implemented as a
-    # separate module.
-    if env[":target"].identifier["platform"] in ["hosted"]:
-        ignore = env.ignore_files("*.lb", "*.in", "*storage")
-        env.append_metadata_unique("required_pkg", "gtkmm-2.4")
-        env.append_metadata_unique("required_pkg", "cairomm-1.0")
-        env.append_metadata_unique("required_pkg", "sdl")
-    else:
-        ignore = env.ignore_files("*.lb", "*.in", "*storage", "sdl_display*")
-    env.copy(".", ignore=ignore)
-
-    env.template("can/mcp2515.cpp.in")
-    env.template("display/st7036.cpp.in")
+    env.copy("driver.dox")

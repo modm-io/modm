@@ -19,7 +19,8 @@
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/architecture/interface/delay.hpp>
-#include <modm/processing/processing.hpp>
+#include <modm/processing/resumable.hpp>
+#include <modm/io/iostream.hpp>
 
 namespace modm
 {

@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2018, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.parent = "driver"
+    module.name = "ea_dog"
+
+def prepare(module, options):
+    module.add_option(
+        EnumerationOption(
+            name="ST7036_voltage",
+            enumeration=["3.3V", "5V"],
+            description="Select the supply voltage of the ST7036.",
+            default="3.3V"))
+
+    module.depends(
+        ":architecture:accessor",
+        ":architecture:delay",
+        ":ui:display")
+    return True
+
+def build(env):
+    env.outbasepath = "src/modm/driver/display"
+    env.copy("ea_dog.hpp")
+    env.copy("dogm132.cpp")
+    env.copy("dogs102.cpp")
+    env.copy("dogx128.cpp")
+    env.copy("st7036.hpp")
+    env.copy("st7036_impl.hpp")
+    env.template("st7036.cpp.in")
+    env.copy("st7565.hpp")
+    env.copy("st7565_impl.hpp")
+    env.copy("st7565_defines.hpp")

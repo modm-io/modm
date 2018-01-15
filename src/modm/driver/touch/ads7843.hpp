@@ -17,6 +17,7 @@
 
 #include <stdint.h>
 #include <modm/ui/display/graphic_display.hpp>
+#include <modm/architecture/interface/delay.hpp>
 
 namespace modm
 {

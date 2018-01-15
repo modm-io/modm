@@ -19,6 +19,7 @@
 
 #include "mcp2515_bit_timings.hpp"
 #include "mcp2515_definitions.hpp"
+#include <modm/architecture/interface/assert.hpp>
 
 
 #undef	MODM_LOG_LEVEL

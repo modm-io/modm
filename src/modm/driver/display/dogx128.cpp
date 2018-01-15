@@ -11,8 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/utils.hpp>
-#include <modm/architecture/driver.hpp>
+#include <modm/architecture/interface/accessor.hpp>
 
 #include "st7565_defines.hpp"
 

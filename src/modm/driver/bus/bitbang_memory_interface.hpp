@@ -13,6 +13,9 @@
 #ifndef MODM_BITBANG_MEMORY_INTERFACE_HPP
 #define MODM_BITBANG_MEMORY_INTERFACE_HPP
 
+#include <modm/architecture/utils.hpp>
+#include <modm/architecture/interface/delay.hpp>
+
 namespace modm
 {
 	/**

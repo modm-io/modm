@@ -15,6 +15,7 @@
 #endif
 #include <modm/math/utils/operator.hpp>
 #include <modm/math/utils/bit_operation.hpp>
+#include <modm/math/utils/endianness.hpp>
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >

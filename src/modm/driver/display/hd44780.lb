@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2016-2017, Niklas Hauser
-# Copyright (c) 2017-2018, Fabian Greif
+# Copyright (c) 2018, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -13,20 +12,19 @@
 
 
 def init(module):
-    module.name = "storage"
     module.parent = "driver"
-
+    module.name = "hd44780"
 
 def prepare(module, options):
-    module.depends(":ui", ":debug")
-    if options[":target"].identifier["platform"] != "avr":
-        module.depends(":fatfs")
+    module.depends(
+        ":architecture:delay",
+        ":architecture:gpio",
+        ":ui:display")
     return True
 
-
 def build(env):
-    env.outbasepath = "src/modm/driver/storage"
-
-    # Copy all files except for the templates and the module file.
-    env.copy(".", ignore=env.ignore_files("*.lb", "*.in"))
-
+    env.outbasepath = "src/modm/driver/display"
+    env.copy("hd44780_base.hpp")
+    env.copy("hd44780_base_impl.hpp")
+    env.copy("hd44780.hpp")
+    env.copy("hd44780_impl.hpp")

@@ -14,8 +14,9 @@
 #define MODM_PCA8574_HPP
 
 #include <modm/architecture/interface/i2c_device.hpp>
-#include <modm/processing/protothread.hpp>
+#include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/gpio_expander.hpp>
+#include <modm/processing/resumable.hpp>
 
 namespace modm
 {

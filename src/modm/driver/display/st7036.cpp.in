@@ -18,7 +18,7 @@ namespace modm
 	{
 		FLASH_STORAGE(uint8_t configuration[10]) =
 		{
-%% if options["::ST7036_voltage"] == "3.3V"
+%% if options[":::ST7036_voltage"] == "3.3V"
 
 			0x39,
 			0x14,
@@ -26,7 +26,7 @@ namespace modm
 			0x6d,
 			0x78,
 
-%% elif options["::ST7036_voltage"] == "5V"
+%% elif options[":::ST7036_voltage"] == "5V"
 
 			0x39,
 			0x1C,

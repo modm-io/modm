@@ -16,7 +16,9 @@
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/unaligned.hpp>
-#include <modm/processing/processing.hpp>
+#include <modm/architecture/interface/accessor.hpp>
+#include <modm/math/utils/endianness.hpp>
+#include <modm/processing/timer.hpp>
 
 namespace modm
 {

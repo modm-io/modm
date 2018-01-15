@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2018, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.parent = "driver"
+    module.name = "adns9800"
+
+def prepare(module, options):
+    module.add_option(
+        EnumerationOption(
+            name="firmware",
+            enumeration=["a4", "a4b", "a5", "a6"],
+            description="Select the firmware version to initialize the device with.",
+            default="a6"))
+
+    module.depends(
+        ":architecture:delay",
+        ":architecture:spi",
+        ":debug")
+    return True
+
+def build(env):
+    env.outbasepath = "src/modm/driver/motion"
+    env.copy("adns9800.hpp")
+    env.copy("adns9800_impl.hpp")
+    env.copy("adns9800_srom_{}.hpp".format(env[":::firmware"]), "adns9800_srom.hpp")

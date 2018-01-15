@@ -23,8 +23,6 @@
 #include <stdint.h>
 
 #include <modm/ui/color.hpp>
-#include <modm/processing/protothread.hpp>
-#include <modm/processing/resumable.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
 
 namespace modm

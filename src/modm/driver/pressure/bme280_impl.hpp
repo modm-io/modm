@@ -14,6 +14,7 @@
 #endif
 #include <modm/math/utils/operator.hpp>
 #include <modm/math/utils/bit_operation.hpp>
+#include <modm/math/utils/endianness.hpp>
 
 #undef  MODM_LOG_LEVEL
 #define MODM_LOG_LEVEL modm::log::DISABLED

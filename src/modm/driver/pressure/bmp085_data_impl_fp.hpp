@@ -13,7 +13,8 @@
 #include <inttypes.h>
 #include <cmath>
 
-#include <modm/debug/logger/logger.hpp>
+#include <modm/debug/logger.hpp>
+#include <modm/math/utils/operator.hpp>
 
 #ifndef MODM_BMP085_DATA_HPP
 #	error  "Don't include this file directly, use 'bmp180_data.hpp' instead!"

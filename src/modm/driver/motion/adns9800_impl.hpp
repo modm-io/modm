@@ -19,13 +19,10 @@
 #endif
 
 #include <modm/debug/logger.hpp>
+#include <modm/architecture/interface/delay.hpp>
 
 #include "adns9800.hpp"
-
-// #include "adns9800_srom_a4.hpp"
-// #include "adns9800_srom_a4b.hpp"
-// #include "adns9800_srom_a5.hpp"
-#include "adns9800_srom_a6.hpp"
+#include "adns9800_srom.hpp"
 
 // Set the log level
 #undef  MODM_LOG_LEVEL

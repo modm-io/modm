@@ -13,6 +13,11 @@
 #ifndef MODM_DS1302_HPP
 #define MODM_DS1302_HPP
 
+/**
+ * \ingroup		driver_rtc
+ * \defgroup	ds1302			DS1302
+ */
+
 namespace modm
 {
 struct ds1302
