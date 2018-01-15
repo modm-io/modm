@@ -12,12 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_RTOS_BOOST_SCHEDULER_HPP
-#define MODM_RTOS_BOOST_SCHEDULER_HPP
-
-#ifndef MODM_RTOS_SCHEDULER_HPP
-#	error "Don't include this file directly, use <modm/processing/rtos/scheduler.hpp>"
-#endif
+#ifndef MODM_RTOS_STDLIB_SCHEDULER_HPP
+#define MODM_RTOS_STDLIB_SCHEDULER_HPP
 
 #include <thread>
 
@@ -39,4 +35,4 @@ namespace modm
 	}
 }
 
-#endif // MODM_RTOS_BOOST_SCHEDULER_HPP
+#endif // MODM_RTOS_STDLIB_SCHEDULER_HPP

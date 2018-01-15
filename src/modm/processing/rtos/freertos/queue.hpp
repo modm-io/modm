@@ -13,10 +13,6 @@
 #ifndef MODM_FREERTOS_QUEUE_HPP
 #define MODM_FREERTOS_QUEUE_HPP
 
-#ifndef MODM_RTOS_QUEUE_HPP
-#	error "Don't include this file directly, use <modm/processing/rtos/queue.hpp>"
-#endif
-
 #include <cstddef>
 
 #include <freertos/FreeRTOS.h>

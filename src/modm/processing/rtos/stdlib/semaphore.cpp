@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "../semaphore.hpp"
+#include "semaphore.hpp"
 #include <chrono>
 
 // ----------------------------------------------------------------------------
@@ -31,7 +31,7 @@ modm::rtos::Semaphore::acquire(uint32_t timeout)
 		 }
 	}
 	--count;
-	
+
 	return true;
 }
 
@@ -39,11 +39,11 @@ void
 modm::rtos::Semaphore::release()
 {
 	std::unique_lock<std::mutex> lock(mutex);
-	
+
 	if (count < maxCount) {
 		++count;
-		
-		// Wake up any waiting threads. 
+
+		// Wake up any waiting threads.
 		// Always do this, even if count_ wasn't 0 on entry. Otherwise, we
 		// might not wake up enough waiting threads if we get a number of
 		// signal() calls in a row.

@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "../semaphore.hpp"
+#include "semaphore.hpp"
 
 // ----------------------------------------------------------------------------
 modm::rtos::SemaphoreBase::~SemaphoreBase()
@@ -24,7 +24,7 @@ modm::rtos::SemaphoreBase::~SemaphoreBase()
 bool
 modm::rtos::SemaphoreBase::acquire(portTickType timeout)
 {
-	
+
 	return (xSemaphoreTake(this->handle, timeout) == pdTRUE);
 }
 
@@ -38,9 +38,9 @@ void
 modm::rtos::SemaphoreBase::releaseFromInterrupt()
 {
 	portBASE_TYPE threadWoken = pdFALSE;
-	
+
 	xSemaphoreGiveFromISR(this->handle, &threadWoken);
-	
+
 	// Request a context switch when the IRQ ends if a higher priorty has
 	// been woken.
 	portEND_SWITCHING_ISR(threadWoken);

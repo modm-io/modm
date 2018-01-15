@@ -13,10 +13,6 @@
 #ifndef MODM_FREERTOS_SEMAPHORE_HPP
 #define MODM_FREERTOS_SEMAPHORE_HPP
 
-#ifndef MODM_RTOS_SEMAPHORE_HPP
-#	error "Don't include this file directly, use <modm/processing/rtos/semaphore.hpp>"
-#endif
-
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 

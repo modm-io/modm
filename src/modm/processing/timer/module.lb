@@ -11,17 +11,18 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-import re
-
 def init(module):
-    module.name = "processing"
+    module.parent = "processing"
+    module.name = "timer"
 
 def prepare(module, options):
+    module.depends(
+        ":architecture:clock",
+        ":io",
+        ":utils")
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/processing"
-    headers = env.get_generated_local_files(filterfunc=lambda path: re.match(r"[^/]+\.hpp", path))
-    env.template("processing.hpp.in", substitutions={"headers": sorted(headers)})
-
-    env.copy("task.hpp")
+    env.outbasepath = "src/modm/processing/timer"
+    env.copy(".", ignore=env.ignore_patterns("*.lb"))
+    env.copy("../timer.hpp")

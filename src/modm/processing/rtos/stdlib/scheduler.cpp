@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "../scheduler.hpp"
-#include "../thread.hpp"
+#include "scheduler.hpp"
+#include "thread.hpp"
 
 void
 modm::rtos::Scheduler::schedule()
@@ -24,11 +24,11 @@ modm::rtos::Scheduler::schedule()
 		list->start();
 		list = list->next;
 	}
-	
+
 	while (1)
 	{
 		// Threads are started and will do all the work. Just
-		// sleep a bit here when there is nothing else to do. 
+		// sleep a bit here when there is nothing else to do.
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 	}
 }
