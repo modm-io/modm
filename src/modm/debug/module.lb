@@ -19,8 +19,13 @@ def init(module):
 def prepare(module, options):
     target = options[":target"].identifier
     if target["platform"] == "hosted":
+        # FIXME: Move logger/hosted/default_style.cpp into platform
         module.depends(":platform:uart")
 
+    module.depends(
+        ":architecture",
+        ":io",
+        ":utils")
     return True
 
 
