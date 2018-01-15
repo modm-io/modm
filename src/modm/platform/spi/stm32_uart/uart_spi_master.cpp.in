@@ -13,7 +13,6 @@
 
 #include "uart_spi_master_{{id}}.hpp"
 #include <modm/math/utils/bit_operation.hpp>
-#include <modm/architecture/interface/register.hpp>
 
 modm::platform::UartSpiMaster{{ id }}::DataOrder
 	modm::platform::UartSpiMaster{{ id }}::dataOrder =

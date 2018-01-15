@@ -19,7 +19,7 @@
 
 #include <modm/architecture/interface/atomic_lock.hpp>
 #include <modm/math/utils/bit_operation.hpp>
-#include <modm/architecture/interface/register.hpp>
+#include <modm/utils/bit_constants.hpp>
 
 %% if not extended
 modm::platform::UartSpiMaster{{id}}::DataOrder

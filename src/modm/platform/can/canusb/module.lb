@@ -21,7 +21,11 @@ def prepare(module, options):
     if not options[":target"].has_driver("can:canusb"):
         return False
 
-    module.depends(":platform:core", ":driver")  # FIXME requires driver/can
+    module.depends(
+        ":architecture:can",
+        ":debug",
+        ":driver:lawicel",
+        ":processing:timer")
     return True
 
 
@@ -36,6 +40,9 @@ def build(env):
 
     env.substitutions = properties
     env.outbasepath = "src/modm/platform/can"
+
+    if env[":target"].partname == "hosted-linux":
+        env.append_metadata("required_library", "pthread")
 
     env.copy("canusb.hpp")
     env.copy("canusb_impl.hpp")

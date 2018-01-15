@@ -16,7 +16,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include <modm/architecture/interface/register.hpp>
+#include <modm/utils/bit_constants.hpp>
 #include <modm/architecture/interface/atomic_lock.hpp>
 
 // bit 7 (0x80) is used for transfer 1 byte

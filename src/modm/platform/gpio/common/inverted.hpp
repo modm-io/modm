@@ -28,7 +28,7 @@ namespace platform
  *
  * Example:
  * @code
- * #include <modm/architecture/platform.hpp>
+ * #include <modm/platform/platform.hpp>
  *
  * typedef GpioInverted< GpioOutputB0 > Led;
  *

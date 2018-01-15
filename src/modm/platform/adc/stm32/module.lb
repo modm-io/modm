@@ -71,7 +71,12 @@ def prepare(module, options):
     if not device.has_driver("adc:stm32"):
         return False
 
-    module.depends(":platform:core", ":utils")
+    module.depends(
+        ":architecture:adc",
+        ":architecture:register",
+        ":cmsis:device",
+        ":platform:gpio",
+        ":utils")
 
     for instance in listify(device.get_driver("adc")["instance"]):
         module.add_submodule(Instance(int(instance)))

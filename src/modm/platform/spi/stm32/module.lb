@@ -58,7 +58,11 @@ def prepare(module, options):
     if not device.has_driver("spi:stm32"):
         return False
 
-    module.depends(":platform:core", ":platform:gpio", ":platform:clock.generic")
+    module.depends(
+        ":architecture:register",
+        ":architecture:spi",
+        ":cmsis:device",
+        ":platform:gpio")
 
     for driver in device.get_all_drivers("spi:stm32"):
         for instance in driver["instance"]:

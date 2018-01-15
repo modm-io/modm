@@ -17,6 +17,8 @@ def init(module):
 def prepare(module, options):
     if not options[":target"].has_driver("gpio"):
         return False
+
+    module.depends(":architecture:gpio", ":utils")
     return True
 
 def build(env):

@@ -18,6 +18,7 @@
 #include "i2c.hpp"
 #include <modm/architecture/interface/i2c_master.hpp>
 #include <modm/platform/gpio/connector.hpp>
+#include <cmath>
 
 namespace modm
 {

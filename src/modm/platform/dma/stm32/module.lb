@@ -50,7 +50,7 @@ def prepare(module, options):
     if device.identifier["family"] not in ["f3", "f4"]:
         return False
 
-    module.depends(":platform:core")
+    module.depends(":cmsis:device")
 
     for instance in device.get_driver("dma")["instance"]:
         module.add_submodule(Instance(int(instance)))

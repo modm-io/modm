@@ -133,7 +133,11 @@ def prepare(module, options):
             description="Enable clock for GPIO during startup",
             default=True))
 
-    module.depends(":platform:core", ":platform:gpio.common")
+    module.depends(
+        ":architecture:gpio",
+        ":cmsis:device",
+        ":math:utils",
+        ":platform:gpio.common")
     return True
 
 bprops = {}

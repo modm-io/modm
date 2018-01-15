@@ -61,7 +61,7 @@ protected:
 	/// Alternate Function register id. 0 for pin 0-7. 1 for pin 8-15.
 	static constexpr uint8_t af_id  = pin / 8;
 	/// Alternate Function offset.
-	static constexpr uint8_t af_offset = (pin * 4) % 16;
+	static constexpr uint8_t af_offset = (pin * 4) % 32;
 	/// Alternate Function register mask.
 	static constexpr uint32_t af_mask  = 0xf << af_offset;
 	/// ExternalInterruptIRQ
