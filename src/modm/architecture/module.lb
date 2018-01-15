@@ -11,16 +11,315 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
+class Accessor(Module):
+    def init(self, module):
+        module.name = "accessor"
+
+    def prepare(self, module, options):
+        module.depends(":io")
+        # module.depends(":platform:core")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "src/modm/architecture"
+        env.copy("interface/accessor.hpp")
+        env.copy("interface/accessor_flash.hpp")
+        env.copy("interface/accessor_ram.hpp")
+
+# -----------------------------------------------------------------------------
+class Adc(Module):
+    def init(self, module):
+        module.name = "adc"
+
+    def prepare(self, module, options):
+        return True
+
+    def build(self, env):
+        env.outbasepath = "src/modm/architecture"
+        env.copy("interface/adc.hpp")
+        env.copy("interface/adc_interrupt.hpp")
+# -----------------------------------------------------------------------------
+
+class Assert(Module):
+    def init(self, module):
+        module.name = "assert"
+
+    def prepare(self, module, options):
+        module.depends(":utils", ":architecture:accessor")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "src/modm/architecture"
+        env.copy("interface/assert.hpp")
+        env.copy("interface/assert.h")
+# -----------------------------------------------------------------------------
+
+class Atomic(Module):
+    def init(self, module):
+        module.name = "atomic"
+
+    def prepare(self, module, options):
+        module.depends(":utils", ":architecture:accessor")
+        # module.depends(":platform:core")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "src/modm/architecture"
+        env.copy("interface/atomic_lock.hpp")
+        env.copy("driver/atomic")
+        env.copy("driver/atomic.hpp")
+# -----------------------------------------------------------------------------
+
+class Can(Module):
+    def init(self, module):
+        module.name = "can"
+
+    def prepare(self, module, options):
+        module.depends(":io")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "src/modm/architecture"
+        env.copy("interface/can.hpp")
+        env.copy("interface/can.cpp")
+        env.copy("interface/can_message.hpp")
+        env.copy("interface/can_message.cpp")
+# -----------------------------------------------------------------------------
+
+class Clock(Module):
+    def init(self, module):
+        module.name = "clock"
+
+    def prepare(self, module, options):
+        module.depends(":processing:timer")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "src/modm/architecture"
+        env.copy("interface/clock.hpp")
+# -----------------------------------------------------------------------------
+
+class Delay(Module):
+    def init(self, module):
+        module.name = "delay"
+
+    def prepare(self, module, options):
+        # module.depends(":platform:core")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "src/modm/architecture"
+        env.copy("interface/delay.hpp")
+# -----------------------------------------------------------------------------
+
+class Gpio(Module):
+    def init(self, module):
+        module.name = "gpio"
+
+    def prepare(self, module, options):
+        return True
+
+    def build(self, env):
+        env.outbasepath = "src/modm/architecture"
+        env.copy("interface/gpio.hpp")
+# -----------------------------------------------------------------------------
+
+class GpioExpander(Module):
+    def init(self, module):
+        module.name = "gpio.expander"
+
+    def prepare(self, module, options):
+        module.depends(":architecture:gpio", ":architecture:register", ":processing:resumable", ":math:utils")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "src/modm/architecture"
+        env.copy("interface/gpio_expander.hpp")
+# -----------------------------------------------------------------------------
+
+class Heap(Module):
+    def init(self, module):
+        module.name = "heap"
+
+    def prepare(self, module, options):
+        module.depends(":utils")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "src/modm/architecture"
+        env.copy("driver/heap/block_allocator.hpp")
+        env.copy("driver/heap/block_allocator_impl.hpp")
+# -----------------------------------------------------------------------------
+
+class I2c(Module):
+    def init(self, module):
+        module.name = "i2c"
+
+    def prepare(self, module, options):
+        module.depends(":architecture:gpio", ":architecture:delay", ":io")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "src/modm/architecture"
+        env.copy("interface/i2c.hpp")
+        env.copy("interface/i2c.cpp")
+        env.copy("interface/i2c_master.hpp")
+        env.copy("interface/i2c_transaction.hpp")
+# -----------------------------------------------------------------------------
+
+class I2cDevice(Module):
+    def init(self, module):
+        module.name = "i2c.device"
+
+    def prepare(self, module, options):
+        module.depends(":architecture:i2c", ":processing:resumable")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "src/modm/architecture"
+        env.copy("interface/i2c_device.hpp")
+# -----------------------------------------------------------------------------
+
+class Interrupt(Module):
+    def init(self, module):
+        module.name = "interrupt"
+
+    def prepare(self, module, options):
+        return True
+
+    def build(self, env):
+        env.outbasepath = "src/modm/architecture"
+        env.copy("interface/interrupt.hpp")
+# -----------------------------------------------------------------------------
+
+class Memory(Module):
+    def init(self, module):
+        module.name = "memory"
+
+    def prepare(self, module, options):
+        module.depends(":architecture:register")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "src/modm/architecture"
+        env.copy("interface/memory.hpp")
+# -----------------------------------------------------------------------------
+
+class OneWire(Module):
+    def init(self, module):
+        module.name = "1-wire"
+
+    def prepare(self, module, options):
+        return True
+
+    def build(self, env):
+        env.outbasepath = "src/modm/architecture"
+        env.copy("interface/one_wire.hpp")
+# -----------------------------------------------------------------------------
+
+class Register(Module):
+    def init(self, module):
+        module.name = "register"
+
+    def prepare(self, module, options):
+        module.depends(":io", ":math:utils")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "src/modm/architecture"
+        env.copy("interface/register.hpp")
+# -----------------------------------------------------------------------------
+
+class Spi(Module):
+    def init(self, module):
+        module.name = "spi"
+
+    def prepare(self, module, options):
+        module.depends(":architecture:spi", ":processing:resumable")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "src/modm/architecture"
+        env.copy("interface/spi.hpp")
+        env.copy("interface/spi_master.hpp")
+# -----------------------------------------------------------------------------
+
+class SpiDevice(Module):
+    def init(self, module):
+        module.name = "spi.device"
+
+    def prepare(self, module, options):
+        module.depends(":architecture:spi")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "src/modm/architecture"
+        env.copy("interface/spi_device.hpp")
+# -----------------------------------------------------------------------------
+
+class Uart(Module):
+    def init(self, module):
+        module.name = "uart"
+
+    def prepare(self, module, options):
+        return True
+
+    def build(self, env):
+        env.outbasepath = "src/modm/architecture"
+        env.copy("interface/uart.hpp")
+# -----------------------------------------------------------------------------
+
+class Unaligned(Module):
+    def init(self, module):
+        module.name = "unaligned"
+
+    def prepare(self, module, options):
+        # module.depends(":platform:core")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "src/modm/architecture"
+        env.copy("interface/unaligned.hpp")
+# -----------------------------------------------------------------------------
+
+import re
 
 def init(module):
     module.name = "architecture"
 
-
 def prepare(module, options):
-    module.depends(":processing", ":io", ":platform:core")
-    return True
+    module.depends(":math") # for tolerance.hpp
 
+    module.add_submodule(Accessor())
+    module.add_submodule(Adc())
+    module.add_submodule(Assert())
+    module.add_submodule(Atomic())
+    module.add_submodule(Can())
+    module.add_submodule(Clock())
+    module.add_submodule(Delay())
+    module.add_submodule(Gpio())
+    module.add_submodule(GpioExpander())
+    module.add_submodule(Heap())
+    module.add_submodule(I2c())
+    module.add_submodule(I2cDevice())
+    module.add_submodule(Interrupt())
+    module.add_submodule(Memory())
+    module.add_submodule(OneWire())
+    module.add_submodule(Register())
+    module.add_submodule(Spi())
+    module.add_submodule(SpiDevice())
+    module.add_submodule(Uart())
+    module.add_submodule(Unaligned())
+
+    return True
 
 def build(env):
     env.outbasepath = "src/modm/architecture"
-    env.copy('.', ignore=env.ignore_patterns("*.lb", "*.in", "*platform/*"))
+
+    headers = env.get_generated_local_files(filterfunc=lambda path: re.match(r"interface/.*\.hpp", path))
+    env.template("interface.hpp.in", substitutions={"headers": sorted(headers)})
+
+    env.copy("utils.hpp")
+    env.copy("detect.hpp")
+    env.copy("architecture.hpp")
+    env.copy("interface/peripheral.hpp")
