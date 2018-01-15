@@ -1,0 +1,46 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2018, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.parent = "communication"
+    module.name = "xpcc"
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:can",
+        ":container",
+        ":debug",
+        ":io", # from generated robot_packets.hpp
+        ":math:utils",
+        ":processing:resumable",
+        ":processing:timer")
+    return True
+
+def build(env):
+    env.outbasepath = "src/modm/communication/xpcc"
+
+    ignore = ["*.lb", "*.in", "*backend/tipc*"]
+
+    if env[":target"].identifier["platform"] in ["avr"]:
+        ignore.append("*postman/dynamic*")
+
+    if env[":target"].identifier["platform"] in ["hosted"]:
+        env.append_metadata_unique("required_library", "zmqpp")
+        env.append_metadata_unique("required_library", "zmq")
+
+        if env[":target"].identifier["family"] in ["linux"]:
+            env.append_metadata("required_library", "pthread")
+    else:
+        ignore.append("*backend/zeromq*")
+
+    env.copy(".", ignore=env.ignore_patterns(*ignore))
+    env.copy("../xpcc.hpp")

@@ -33,13 +33,13 @@
  *
  */
 template < class Uart >
-class XpccHardware
+class ModmHardware
 {
     static_assert(Uart::RxBufferSize >= 512, "UART RX Buffer of supplied UART not large enough. At least 512 bytes of receive buffer are recommended.");
     static_assert(Uart::TxBufferSize >=  64, "UART TX Buffer of supplied UART not large enough. At least 64 bytes of transmit buffer are recommended.");
 
 public:
-    XpccHardware() {
+    ModmHardware() {
     }
 
     void
