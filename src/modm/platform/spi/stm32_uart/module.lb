@@ -28,7 +28,6 @@ class Instance(Module):
         module.description = "SPI in UART mode {} instance".format(self.instance)
 
     def prepare(self, module, options):
-        module.depends(":platform:uart.spi")
         return True
 
     def build(self, env):
@@ -52,7 +51,11 @@ def prepare(module, options):
     if not device.has_driver("usart:stm32"):
         return False
 
-    module.depends(":platform:core", ":platform:gpio", ":platform:uart")
+    module.depends(
+        ":architecture:spi",
+        ":cmsis:device",
+        ":platform:gpio",
+        ":platform:uart")
 
     for instance in device.get_driver("usart:stm32")["instance"]:
         module.add_submodule(Instance(int(instance)))

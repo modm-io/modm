@@ -19,7 +19,17 @@ def prepare(module, options):
     if not options[":target"].has_driver("core:avr*"):
         return False
 
-    module.depends(":architecture", ":stdc++")
+    module.depends(
+        ":architecture:assert",
+        ":architecture:atomic",
+        ":architecture:clock",
+        ":architecture:memory",
+        ":architecture:delay",
+        ":architecture:accessor",
+        ":architecture:interrupt",
+        ":architecture:unaligned",
+        ":stdc++",
+        )
 
     module.add_option(
         EnumerationOption(

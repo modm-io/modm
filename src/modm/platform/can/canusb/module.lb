@@ -21,7 +21,11 @@ def prepare(module, options):
     if not options[":target"].has_driver("can:canusb"):
         return False
 
-    module.depends(":platform:core", ":driver")  # FIXME requires driver/can
+    module.depends(
+        ":architecture:can",
+        ":debug",
+        ":driver:lawicel",
+        ":processing:timer")
     return True
 
 

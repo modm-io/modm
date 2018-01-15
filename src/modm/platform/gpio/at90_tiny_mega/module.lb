@@ -51,7 +51,7 @@ def prepare(module, options):
         return False
 
     # port.hpp depends on modm::bitReverse()!
-    module.depends(":platform:core", ":platform:gpio.common", ":math")
+    module.depends(":architecture:gpio", ":platform:gpio.common", ":math:utils")
     return True
 
 bprops = {}

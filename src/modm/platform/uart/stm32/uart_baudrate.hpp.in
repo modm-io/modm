@@ -13,7 +13,8 @@
 #define MODM_STM32_UART_BAUDRATE_HPP
 
 #include "uart_base.hpp"
-#include <modm/architecture/interface.hpp>
+#include <modm/architecture/interface/peripheral.hpp>
+#include <cmath>
 
 namespace modm
 {

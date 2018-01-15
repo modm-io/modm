@@ -25,7 +25,11 @@ def prepare(module, options):
         # The ATmega64hve2 is not supported by this driver.
         return False
 
-    module.depends(":platform:core")
+    module.depends(
+        ":architecture:adc",
+        ":architecture:interrupt",
+        ":platform:gpio",
+        ":utils")
     return True
 
 def build(env):

@@ -16,14 +16,13 @@
 #define MODM_LPC11C_C_CAN_HPP
 
 #include <modm/architecture/interface/can.hpp>
+#include <modm/architecture/interface/clock.hpp>
 
 #define CONFIG_ENABLE_DRIVER_ROMCAN   1
 #define CONFIG_ENABLE_DRIVER_ROMUSB   0
 #define CONFIG_ENABLE_DRIVER_ROMPOWER 0
 
 #include <nxp/lpc11xx/driver/rom_drivers.h>
-
-#include <modm/platform/clock/common_clock.hpp>
 
 #define LPC11C_ROM_CAN (*((ROM **)0x1fff1ff8))
 

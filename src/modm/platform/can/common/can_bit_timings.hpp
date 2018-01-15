@@ -14,9 +14,7 @@
 #ifndef MODM_COMMON_CAN_BIT_TIMINGS_HPP
 #define MODM_COMMON_CAN_BIT_TIMINGS_HPP
 
-#include <modm/architecture/interface.hpp>
-
-#include "../clock/common_clock.hpp"
+#include <modm/architecture/interface/clock.hpp>
 
 namespace modm
 {

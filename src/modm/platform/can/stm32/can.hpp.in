@@ -19,7 +19,6 @@
 #include <modm/platform/gpio/connector.hpp>
 #include "../device.hpp"
 
-#include "../clock/common_clock.hpp"
 #include "can_bit_timings.hpp"
 #include "error_code.hpp"
 #include "can_filter.hpp"

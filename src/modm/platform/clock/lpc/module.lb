@@ -19,7 +19,7 @@ def prepare(module, options):
     if not options[":target"].has_driver("clock:lpc"):
         return False
 
-    module.depends(":platform:core", ":platform:clock.generic")
+    module.depends(":platform:core")
     return True
 
 def build(env):
@@ -40,3 +40,4 @@ def build(env):
 
     env.copy("pll_calculator.hpp")
     env.copy("common_clock.cpp")
+    env.copy("../common/common_clock.hpp", "common_clock.hpp")

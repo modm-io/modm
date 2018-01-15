@@ -21,7 +21,7 @@ def prepare(module, options):
     if not options[":target"].has_driver("gpio:hosted"):
         return False
 
-    module.depends(":platform:gpio.common")
+    module.depends(":architecture:gpio", ":platform:gpio.common")
     return True
 
 

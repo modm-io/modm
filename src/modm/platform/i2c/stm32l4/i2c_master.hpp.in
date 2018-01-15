@@ -15,7 +15,7 @@
 #define MODM_STM32_I2C_{{ id }}_HPP
 
 #include <modm/architecture/interface/i2c_master.hpp>
-#include <modm/platform/clock/common_clock.hpp>
+#include <modm/architecture/interface/clock.hpp>
 #include <modm/platform/gpio/connector.hpp>
 
 /**

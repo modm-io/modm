@@ -21,7 +21,22 @@ def prepare(module, options):
     if not options[":target"].has_driver("core:cortex-m*"):
         return False
 
-    module.depends(":architecture", ":cmsis:device", ":platform:clock", ":platform:clock.generic")
+    module.depends(
+        ":architecture:accessor",
+        ":architecture:assert",
+        ":architecture:atomic",
+        ":architecture:clock",
+        ":architecture:delay",
+        ":architecture:heap",
+        ":architecture:interrupt",
+        ":architecture:memory",
+        ":architecture:unaligned",
+        ":cmsis:device")
+
+        # FIXME: Move hardfault handler out of core
+        # ":platform:clock",
+        # ":platform:uart",
+        # ":platform:gpio",
 
     module.add_option(
         EnumerationOption(

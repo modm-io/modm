@@ -21,7 +21,10 @@ def prepare(module, options):
     if not options[":target"].has_driver("uart:hosted"):
         return False
 
-    module.depends(":platform:core")
+    module.depends(
+        ":architecture:uart",
+        ":debug",
+        ":io")
     return True
 
 
