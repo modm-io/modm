@@ -16,7 +16,7 @@
   </options>
   <modules>
     <module>:platform:core</module>
-    <module>:communication</module>
+    <module>:communication:xpcc</module>
     <module>:debug</module>
     <module>:build.scons</module>
   </modules>

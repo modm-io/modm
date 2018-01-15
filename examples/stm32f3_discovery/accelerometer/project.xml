@@ -5,7 +5,9 @@
     <option name=":build.scons:build.path">../../../build/stm32f3_discovery/accelerometer</option>
   </options>
   <modules>
-    <module>:processing</module>
+    <module>:math:filter</module>
+    <module>:processing:protothread</module>
+    <module>:processing:timer</module>
     <module>:build.scons</module>
   </modules>
 </library>

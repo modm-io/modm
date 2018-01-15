@@ -14,7 +14,8 @@
     <option name=":build.scons:build.path">../../../../build/avr/sab/master</option>
   </options>
   <modules>
-    <module>:communication</module>
+    <module>:communication:sab</module>
+    <module>:platform:core</module>
     <module>:platform:uart:0</module>
     <module>:build.scons</module>
   </modules>

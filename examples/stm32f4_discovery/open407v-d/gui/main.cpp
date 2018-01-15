@@ -17,10 +17,9 @@
 #include <modm/board/board.hpp>
 #include <modm/debug/logger.hpp>
 #include <modm/driver/display/parallel_tft.hpp>
-#include <modm/driver/bus//tft_memory_bus.hpp>
+#include <modm/driver/bus/tft_memory_bus.hpp>
 #include <modm/ui/display/image.hpp>
 #include <modm/driver/touch/ads7843.hpp>
-#include <modm/processing/processing.hpp>
 #include <modm/container/container.hpp>
 #include <modm/utils/allocator.hpp>
 

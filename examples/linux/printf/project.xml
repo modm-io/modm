@@ -15,6 +15,7 @@
   </options>
   <modules>
     <module>:debug</module>
+    <module>:platform:core</module>
     <module>:build.scons</module>
   </modules>
 </library>

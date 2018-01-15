@@ -12,8 +12,9 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/platform/platform.hpp>
-#include <modm/driver/display.hpp>
+#include <modm/driver/display/ea_dog.hpp>
 #include <modm/io/iostream.hpp>
+#include <modm/architecture/interface/clock.hpp>
 
 using namespace modm::platform;
 using systemClock = SystemClock;
@@ -61,7 +62,7 @@ drawCross(uint8_t x, uint8_t y)
 int
 main()
 {
-	Uart0::connect<GpioOutputD1::Txd>();
+	Uart0::connect<GpioOutputD1::Txd, GpioInputD0::Rxd>();
 	Uart0::initialize<systemClock, 115200>();
 
 	// Enable interrupts, this is needed for every buffered UART

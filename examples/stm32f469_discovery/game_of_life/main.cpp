@@ -10,6 +10,7 @@
 
 #include <modm/board/board.hpp>
 #include <modm/processing/processing.hpp>
+#include <modm/architecture/interface/memory.hpp>
 
 using namespace Board;
 using namespace modm::glcd;

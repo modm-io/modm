@@ -12,7 +12,8 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/platform/platform.hpp>
-#include <modm/driver/display.hpp>
+#include <modm/driver/display/ea_dog.hpp>
+#include <modm/architecture/interface/clock.hpp>
 
 #include "images/image_64x64_0.hpp"
 #include "images/image_64x64_1.hpp"

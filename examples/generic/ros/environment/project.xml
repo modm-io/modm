@@ -7,10 +7,12 @@
     <option name=":platform:uart:2:buffer.rx">512</option>
   </options>
   <modules>
-    <module>:driver</module>
+    <module>:driver:bme280</module>
+    <module>:driver:ssd1306</module>
     <module>:ros</module>
-    <module>:communication</module>
-    <module>:processing</module>
+    <module>:communication:ros</module>
+    <module>:processing:timer</module>
+    <module>:processing:protothread</module>
     <module>:platform:i2c:1</module>
     <module>:build.scons</module>
   </modules>

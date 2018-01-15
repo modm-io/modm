@@ -15,7 +15,7 @@
     <option name=":build.scons:xpcc.container">gui</option>
   </options>
   <modules>
-    <module>:communication</module>
+    <module>:communication:xpcc</module>
     <module>:debug</module>
     <module>:platform:core</module>
     <module>:build.scons</module>

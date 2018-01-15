@@ -12,7 +12,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/platform/platform.hpp>
-#include <modm/communication/communication.hpp>
+#include <modm/communication/xpcc.hpp>
 #include <modm/communication/xpcc/backend/can.hpp>
 #include <modm/debug/logger.hpp>
 
@@ -85,11 +85,12 @@ namespace component
 int
 main()
 {
-	Uart0::connect<GpioOutputD1::Txd>();
+	Uart0::connect<GpioOutputD1::Txd, GpioInputD0::Rxd>();
 	Uart0::initialize<systemClock, 115200>();
 
 	// Initialize SPI interface and the other pins
 	// needed by the MCP2515
+	SPI::connect<Sclk::BitBang, Mosi::BitBang, Miso::BitBang>();
 	SPI::initialize<systemClock, 1000000>();
 	Cs::setOutput();
 	Int::setInput(Gpio::InputType::PullUp);

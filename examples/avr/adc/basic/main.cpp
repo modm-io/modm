@@ -12,8 +12,6 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/platform/platform.hpp>
-#include <modm/platform/platform.hpp>
-
 #include <modm/io/iostream.hpp>
 
 using namespace modm::platform;

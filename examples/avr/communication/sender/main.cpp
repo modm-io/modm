@@ -12,8 +12,8 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/platform/platform.hpp>
-#include <modm/communication/communication.hpp>
-#include <modm/communication/modm/backend/can.hpp>
+#include <modm/communication/xpcc.hpp>
+#include <modm/communication/xpcc/backend/can.hpp>
 #include <modm/debug/logger.hpp>
 
 #include <modm/driver/can/mcp2515.hpp>
@@ -54,12 +54,12 @@ typedef BitBangSpiMaster< Sclk, Mosi, Miso > SPI;
 typedef modm::Mcp2515< SPI, Cs, Int > CanDevice;
 
 static CanDevice device;
-static modm::CanConnector< CanDevice > connector(&device);
+static xpcc::CanConnector< CanDevice > connector(&device);
 
 // create an instance of the generated postman
 Postman postman;
 
-modm::Dispatcher dispatcher(&connector, &postman);
+xpcc::Dispatcher dispatcher(&connector, &postman);
 
 // Default filters to receive any extended CAN frame
 FLASH_STORAGE(uint8_t canFilter[]) =
@@ -85,12 +85,12 @@ namespace component
 int
 main()
 {
-	GpioOutputD1::connect(Uart0::Tx);
-	GpioInputD0::connect(Uart0::Rx);
+	Uart0::connect<GpioOutputD1::Txd, GpioInputD0::Rxd>();
 	Uart0::initialize<systemClock, 115200>();
 
 	// Initialize SPI interface and the other pins
 	// needed by the MCP2515
+	SPI::connect<Sclk::BitBang, Mosi::BitBang, Miso::BitBang>();
 	SPI::initialize<systemClock, 1000000>();
 	Cs::setOutput();
 	Int::setInput(Gpio::InputType::PullUp);

@@ -12,10 +12,8 @@
 
 #include <modm/debug/logger.hpp>
 #include <modm/platform/platform.hpp>
-
 #include <modm/processing/timer.hpp>
 
-#include <modm/communication/communication.hpp>
 #include <modm/communication/xpcc/backend/zeromq/connector.hpp>
 
 modm::PeriodicTimer pt(2000);

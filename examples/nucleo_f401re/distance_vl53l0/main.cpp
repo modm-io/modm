@@ -13,7 +13,7 @@
 
 #include <modm/board/board.hpp>
 
-#include <modm/processing/processing.hpp>
+#include <modm/processing/protothread.hpp>
 #include <modm/driver/position/vl53l0.hpp>
 #include <modm/debug/logger.hpp>
 

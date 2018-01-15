@@ -13,9 +13,10 @@
     <option name=":build.scons:build.path">../../../build/zmq/2_zmq_gateway</option>
   </options>
   <modules>
-    <module>:communication</module>
+    <module>:communication:xpcc</module>
     <module>:debug</module>
     <module>:platform:canusb</module>
+    <module>:platform:core</module>
     <module>:platform:uart</module>
     <module>:build.scons</module>
   </modules>

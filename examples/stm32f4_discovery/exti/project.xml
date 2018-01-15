@@ -5,6 +5,7 @@
     <option name=":build.scons:build.path">../../../build/stm32f4_discovery/exti</option>
   </options>
   <modules>
+    <module>:architecture:interrupt</module>
     <module>:platform:gpio</module>
     <module>:build.scons</module>
   </modules>

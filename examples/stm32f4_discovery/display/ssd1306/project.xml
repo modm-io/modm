@@ -5,7 +5,7 @@
     <option name=":build.scons:build.path">../../../../build/stm32f4_discovery/display/ssd1306</option>
   </options>
   <modules>
-    <module>:driver</module>
+    <module>:driver:ssd1306</module>
     <module>:platform:gpio</module>
     <module>:platform:i2c:1</module>
     <module>:build.scons</module>

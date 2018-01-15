@@ -5,13 +5,15 @@
     <option name=":build.scons:build.path">../../../build/stm32f4_discovery/pressure_amsys5915</option>
   </options>
   <modules>
-    <module>:driver</module>
+    <module>:driver:amsys5915</module>
     <module>:io</module>
+    <module>:debug</module>
     <module>:platform:gpio</module>
     <module>:platform:i2c.bitbang</module>
     <module>:platform:i2c:2</module>
     <module>:platform:uart:2</module>
-    <module>:processing</module>
+    <module>:processing:protothread</module>
+    <module>:processing:timer</module>
     <module>:build.scons</module>
   </modules>
 </library>

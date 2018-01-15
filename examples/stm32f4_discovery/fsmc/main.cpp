@@ -73,10 +73,10 @@ main()
 
 	uint16_t data[0xff];
 
-	for(uint16_t offset = 0; offset <= 0xff; ++offset) {
+	for(uint16_t offset = 0; offset < 0xff; ++offset) {
 		// uncomment one
-		*(out + offset) = 0xff00 | offset;
-		// data[offset] = *(out + offset);
+		// *(out + offset) = 0xff00 | offset;
+		data[offset] = *(out + offset);
 	}
 
 	while (1)

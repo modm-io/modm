@@ -5,12 +5,13 @@
     <option name=":build.scons:build.path">../../../build/stm32f4_discovery/barometer_bmp085_bmp180</option>
   </options>
   <modules>
-    <module>:driver</module>
+    <module>:driver:bmp085</module>
     <module>:io</module>
     <module>:platform:gpio</module>
     <module>:platform:i2c:1</module>
     <module>:platform:uart:2</module>
-    <module>:processing</module>
+    <module>:processing:protothread</module>
+    <module>:processing:timer</module>
     <module>:build.scons</module>
   </modules>
 </library>

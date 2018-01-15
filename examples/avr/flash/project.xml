@@ -14,6 +14,7 @@
     <option name=":build.scons:build.path">../../../build/avr/flash</option>
   </options>
   <modules>
+    <module>:architecture:accessor</module>
     <module>:platform:core</module>
     <module>:build.scons</module>
   </modules>

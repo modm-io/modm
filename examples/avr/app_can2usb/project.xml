@@ -15,7 +15,8 @@
   </options>
   <modules>
     <module>:debug</module>
-    <module>:driver</module>
+    <module>:driver:ft245</module>
+    <module>:platform:core</module>
     <module>:platform:gpio</module>
     <module>:build.scons</module>
   </modules>

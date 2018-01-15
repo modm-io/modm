@@ -5,8 +5,10 @@
     <option name=":build.scons:build.path">../../../build/stm32f072_discovery/rotation</option>
   </options>
   <modules>
+    <module>:math:filter</module>
     <module>:platform:gpio</module>
-    <module>:processing</module>
+    <module>:processing:protothread</module>
+    <module>:processing:timer</module>
     <module>:build.scons</module>
   </modules>
 </library>

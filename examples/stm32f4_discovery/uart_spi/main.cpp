@@ -19,9 +19,7 @@ main()
 	Board::initialize();
 
 	// Enable Uart SPI 2
-	UartSpiMaster2::connect<GpioA2::Mosi>();
-	UartSpiMaster2::connect<GpioA3::Miso>();
-	UartSpiMaster2::connect<GpioA4::Sck>();
+	UartSpiMaster2::connect<GpioA4::Ck, GpioA2::Tx, GpioA3::Rx>();
 	UartSpiMaster2::initialize<Board::systemClock, 5250000, modm::Tolerance::Exact>();
 
 	while (1)

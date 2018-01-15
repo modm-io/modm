@@ -11,7 +11,7 @@
 
 #include <modm/board/board.hpp>
 #include <modm/processing/timer.hpp>
-#include <modm/driver/rtc/ds1302/ds1302.hpp>
+#include <modm/driver/rtc/ds1302.hpp>
 
 struct ds1302_config : public modm::ds1302::Config
 {

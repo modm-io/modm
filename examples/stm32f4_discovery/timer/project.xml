@@ -6,7 +6,8 @@
   </options>
   <modules>
     <module>:platform:timer:4</module>
-    <module>:processing</module>
+    <module>:ui:led</module>
+    <module>:ui:animation</module>
     <module>:build.scons</module>
   </modules>
 </library>

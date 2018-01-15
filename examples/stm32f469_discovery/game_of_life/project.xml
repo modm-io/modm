@@ -5,7 +5,9 @@
     <option name=":build.scons:build.path">../../../build/stm32f469_discovery/game_of_life</option>
   </options>
   <modules>
-    <module>:processing</module>
+    <module>:architecture:memory</module>
+    <module>:processing:timer</module>
+    <module>:processing:resumable</module>
     <module>:build.scons</module>
   </modules>
 </library>

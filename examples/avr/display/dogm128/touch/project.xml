@@ -14,10 +14,11 @@
     <option name=":build.scons:build.path">../../../../../build/avr/display/dogm128/touch</option>
   </options>
   <modules>
-    <module>:driver</module>
+    <module>:driver:ea_dog</module>
     <module>:io</module>
     <module>:platform:adc</module>
     <module>:platform:clock</module>
+    <module>:platform:core</module>
     <module>:platform:gpio</module>
     <module>:platform:spi.bitbang</module>
     <module>:platform:uart:0</module>

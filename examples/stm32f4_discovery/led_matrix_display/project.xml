@@ -5,10 +5,10 @@
     <option name=":build.scons:build.path">../../../build/stm32f4_discovery/led_matrix_display</option>
   </options>
   <modules>
-    <module>:driver</module>
+    <module>:driver:max7219</module>
     <module>:platform:gpio</module>
     <module>:platform:spi.bitbang</module>
-    <module>:processing</module>
+    <module>:processing:timer</module>
     <module>:build.scons</module>
   </modules>
 </library>

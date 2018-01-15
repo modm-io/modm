@@ -12,7 +12,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/platform/platform.hpp>
-#include <modm/driver/display.hpp>
+#include <modm/driver/display/hd44780.hpp>
 
 using namespace modm::platform;
 
