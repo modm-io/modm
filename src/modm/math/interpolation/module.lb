@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2016-2017, Niklas Hauser
-# Copyright (c) 2017, Fabian Greif
+# Copyright (c) 2018, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -12,17 +11,17 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "math"
+    module.parent = "math"
+    module.name = "interpolation"
 
 def prepare(module, options):
-    module.depends(":container")
+    module.depends(
+        ":architecture:accessor",
+        ":container",
+        ":utils")
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/math"
-    ignore = ["*.lb"]
-    if "avr" not in env[":target"].identifier["platform"]:
-        ignore.append("*utils/avr")
-    if "hosted" not in env[":target"].identifier["platform"]:
-        ignore.append("*utils/pc")
-    env.copy('.', ignore=env.ignore_patterns(*ignore))
+    env.outbasepath = "src/modm/math/interpolation"
+    env.copy(".", ignore=env.ignore_patterns("*.lb"))
+    env.copy("../interpolation.hpp")
