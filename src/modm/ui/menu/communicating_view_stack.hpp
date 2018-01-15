@@ -16,8 +16,8 @@
 #ifndef MODM_COMMUNICATING_VIEW_STACK_HPP
 #define MODM_COMMUNICATING_VIEW_STACK_HPP
 
-#include <modm/communication/modm/communicator.hpp>
-#include <modm/communication/modm/communicatable.hpp>
+#include <modm/communication/xpcc/communicator.hpp>
+#include <modm/communication/xpcc/communicatable.hpp>
 
 #include "view_stack.hpp"
 
@@ -26,20 +26,20 @@ namespace modm
 	class CommunicatingViewStack : public ViewStack
 	{
 	public:
-		CommunicatingViewStack(modm::GraphicDisplay* display, modm::Communicator* communicator) :
+		CommunicatingViewStack(modm::GraphicDisplay* display, xpcc::Communicator* communicator) :
 			ViewStack(display),
 			communicator(communicator)
 		{
 		}
 		
-		inline modm::Communicator*
+		inline xpcc::Communicator*
 		getCommunicator()
 		{
 			return communicator;
 		}
 		
 	protected:
-		modm::Communicator* communicator;
+		xpcc::Communicator* communicator;
 	};
 }
 

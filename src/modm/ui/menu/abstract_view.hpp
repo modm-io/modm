@@ -17,7 +17,7 @@
 #ifndef MODM_ABSTRACT_VIEW_HPP
 #define MODM_ABSTRACT_VIEW_HPP
 
-#include "../display/graphic_display.hpp"
+#include <modm/ui/display/graphic_display.hpp>
 
 #include "menu_buttons.hpp"
 

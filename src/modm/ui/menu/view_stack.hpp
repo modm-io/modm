@@ -16,9 +16,9 @@
 #ifndef MODM_VIEWSTACK_HPP
 #define MODM_VIEWSTACK_HPP
 
-#include "../display/graphic_display.hpp"
-#include "../../container/stack.hpp"
-#include "../../container/linked_list.hpp"
+#include <modm/ui/display/graphic_display.hpp>
+#include <modm/container/stack.hpp>
+#include <modm/container/linked_list.hpp>
 #include "menu_buttons.hpp"
 #include "abstract_view.hpp"
 

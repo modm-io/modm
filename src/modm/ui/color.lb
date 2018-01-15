@@ -1,0 +1,28 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2018, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.parent = "ui"
+    module.name = "color"
+
+def prepare(module, options):
+    module.depends(
+        ":io",
+        ":math:utils",
+        ":utils")
+    return True
+
+def build(env):
+    env.outbasepath = "src/modm/ui"
+    env.copy("color.hpp")
+    env.copy("color.cpp")
+    env.copy("color_impl.hpp")
