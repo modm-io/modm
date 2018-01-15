@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009-2010, Fabian Greif
- * Copyright (c) 2012, 2014, Niklas Hauser
+ * Copyright (c) 2012, 2014, 2018, Niklas Hauser
  * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2013, Thorsten Lajewski
  * Copyright (c) 2014, Daniel Krebs
@@ -17,10 +17,10 @@
 #ifndef MODM_GUI_VIEWSTACK_HPP
 #define MODM_GUI_VIEWSTACK_HPP
 
-#include "../display/graphic_display.hpp"
-#include "../../container/stack.hpp"
-#include "../../container/linked_list.hpp"
-#include "../menu/menu_buttons.hpp"
+#include <modm/ui/display/graphic_display.hpp>
+#include <modm/container/stack.hpp>
+#include <modm/container/linked_list.hpp>
+#include <modm/ui/menu/menu_buttons.hpp>
 #include "view.hpp"
 #include "types.hpp"
 
