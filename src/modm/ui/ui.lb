@@ -15,9 +15,8 @@ def init(module):
     module.name = "ui"
 
 def prepare(module, options):
-    module.depends(":debug")
     return True
 
 def build(env):
     env.outbasepath = "src/modm/ui"
-    env.copy(".", ignore=env.ignore_files("*.lb"))
+    pass

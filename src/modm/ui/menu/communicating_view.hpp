@@ -17,13 +17,13 @@
 #ifndef MODM_COMMUNICATING_VIEW_HPP
 #define MODM_COMMUNICATING_VIEW_HPP
 
-#include <modm/communication/modm/communicatable.hpp>
+#include <modm/communication/xpcc/communicatable.hpp>
 
 #include "communicating_view_stack.hpp"
 
 namespace modm
 {
-	class CommunicatingView : public modm::Communicatable
+	class CommunicatingView : public xpcc::Communicatable
 	{
 	public:
 		CommunicatingView(modm::CommunicatingViewStack* /*stack*/)

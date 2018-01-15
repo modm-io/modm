@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2009-2010, Fabian Greif
  * Copyright (c) 2009-2010, Martin Rosekeit
- * Copyright (c) 2012, 2014, Niklas Hauser
+ * Copyright (c) 2012, 2014, 2018, Niklas Hauser
  * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2013, Thorsten Lajewski
  * Copyright (c) 2014, Daniel Krebs
@@ -18,13 +18,13 @@
 #ifndef MODM_GUI_VIEW_HPP
 #define MODM_GUI_VIEW_HPP
 
-#include "../display/graphic_display.hpp"
+#include <modm/ui/display/graphic_display.hpp>
 
 #include "types.hpp"
 #include "widgets/widget.hpp"
 #include "colorpalette.hpp"
 
-#include "../menu/abstract_view.hpp"
+#include <modm/ui/menu/abstract_view.hpp>
 
 namespace modm
 {

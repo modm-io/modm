@@ -17,7 +17,7 @@
 
 #include <stdint.h>
 #include "led.hpp"
-#include "../color.hpp"
+#include <modm/ui/color.hpp>
 
 namespace modm
 {
