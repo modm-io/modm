@@ -18,8 +18,14 @@ def prepare(module, options):
     if options[":target"].partname != "stm32f407vgt":
         return False
 
-    module.depends(":platform:core", ":platform:gpio", ":platform:clock",
-                   ":platform:i2c:1", ":platform:spi:1", ":driver")
+    module.depends(
+        ":architecture:clock",
+        ":driver:lis3dsh",
+        ":platform:clock",
+        ":platform:core",
+        ":platform:gpio",
+        ":platform:i2c:1",
+        ":platform:spi:1")
     return True
 
 def build(env):

@@ -23,6 +23,7 @@
 #define MODM_STM32_F103C8T6_BLUE_PILL_HPP
 
 #include <modm/platform/platform.hpp>
+#include <modm/architecture/interface/clock.hpp>
 
 using namespace modm::platform;
 
