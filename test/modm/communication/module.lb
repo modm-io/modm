@@ -17,7 +17,7 @@ def init(module):
 
 
 def prepare(module, options):
-    module.depends(":communication")
+    module.depends(":communication:sab", ":communication:xpcc")
     return True
 
 

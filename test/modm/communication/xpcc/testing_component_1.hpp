@@ -15,7 +15,7 @@
 #ifndef	TESTING_COMPONENT_1_HPP
 #define	TESTING_COMPONENT_1_HPP
 
-#include <modm/communication/communication.hpp>
+#include <modm/communication/xpcc.hpp>
 
 #include "timeline.hpp"
 

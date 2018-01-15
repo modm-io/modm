@@ -16,6 +16,14 @@ def init(module):
 
 
 def prepare(module, options):
+    module.depends(
+        ":architecture",
+        ":math:utils",
+        ":processing:protothread",
+        ":processing:resumable",
+        ":processing:timer",
+        ":processing:scheduler",
+        ":utils")
     return True
 
 

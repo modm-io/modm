@@ -12,7 +12,7 @@
 
 #include "mcp2515_can_bit_timings_test.hpp"
 
-#include <modm/platform/clock/common_clock.hpp>
+#include <modm/architecture/interface/clock.hpp>
 #include <modm/driver/can/mcp2515_bit_timings.hpp>
 
 using namespace modm;

@@ -17,6 +17,9 @@ def init(module):
 
 
 def prepare(module, options):
+    module.depends(
+        ":ui:button",
+        ":ui:time")
     return True
 
 
