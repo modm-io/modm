@@ -13,7 +13,6 @@
 #define MODM_MATH_TOLERANCE_HPP
 
 #include <stdint.h>
-#include <modm/math/math.hpp>
 
 namespace modm
 {
