@@ -17,7 +17,7 @@ def init(module):
 def prepare(module, options):
     device = options[":target"]
     core = device.get_driver("core")
-    if not core or not core["type"].startswith("cortex-m4"):
+    if not core or not core["type"].startswith("cortex-m"):
         return False
 
     module.add_option(
