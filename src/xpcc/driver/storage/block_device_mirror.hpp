@@ -11,8 +11,8 @@
 #define XPCC_BLOCK_DEVICE_MIRROR_HPP
 
 #include <xpcc/architecture/interface/block_device.hpp>
-
 #include <xpcc/processing/resumable.hpp>
+#include <algorithm>
 
 namespace xpcc
 {
