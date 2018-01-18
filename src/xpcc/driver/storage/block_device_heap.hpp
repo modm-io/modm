@@ -29,7 +29,7 @@ namespace xpcc
  * \ingroup	driver_storage
  * \author	Raphael Lehmann
  */
-template <size_t DeviceSize, bool externalMemory = false>
+template <size_t DeviceSize_, bool externalMemory = false>
 class BdHeap : public xpcc::BlockDevice, protected xpcc::NestedResumable<3>
 {
 public:
@@ -94,6 +94,7 @@ public:
 	static constexpr bd_size_t BlockSizeRead = 1;
 	static constexpr bd_size_t BlockSizeWrite = 1;
 	static constexpr bd_size_t BlockSizeErase = 1;
+	static constexpr bd_size_t DeviceSize = DeviceSize_;
 
 public:
 	void

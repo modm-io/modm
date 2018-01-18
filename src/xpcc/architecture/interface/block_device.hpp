@@ -104,6 +104,7 @@ public:
 	static constexpr bd_size_t BlockSizeRead = 1;
 	static constexpr bd_size_t BlockSizeWrite = 1;
 	static constexpr bd_size_t BlockSizeErase = 1;
+	static constexpr bd_size_t BlockDevice = 1024;
 
 #endif
 };
