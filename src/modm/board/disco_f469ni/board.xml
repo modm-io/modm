@@ -12,7 +12,7 @@
     <option name=":target">stm32f469nih</option>
 
     <option name=":platform:uart:3:buffer.tx">2048</option>
-    <option name=":platform:core:hardfault.led">K3</option>
+    <option name=":platform:fault.cortex:led">K3</option>
     <option name=":platform:core:allocator">tlsf</option>
     <option name=":tlsf:minimum_pool_size">16777216</option>
 

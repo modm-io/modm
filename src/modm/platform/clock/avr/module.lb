@@ -19,6 +19,10 @@ def prepare(module, options):
     if not options[":target"].has_driver("clock:avr"):
         return False
 
+    module.depends(
+        ":architecture:atomic",
+        ":architecture:clock")
+
     module.add_option(
         NumericOption(
             name="f_cpu",
@@ -40,4 +44,7 @@ def build(env):
     env.outbasepath = "src/modm/platform/clock"
 
     env.copy("static.hpp")
+    env.copy("delay.hpp")
     env.copy("../common/common_clock.hpp", "common_clock.hpp")
+    if not env.has_module(":test"):
+        env.copy("clock.cpp")

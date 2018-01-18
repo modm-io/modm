@@ -1,0 +1,71 @@
+/*
+ * Copyright (c) 2013-2014, 2016, Kevin Läufer
+ * Copyright (c) 2013-2017, Niklas Hauser
+ * Copyright (c) 2016, Fabian Greif
+ * Copyright (c) 2016, Sascha Schade
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+%# Include Target Specific Files
+%% import 'platform.macros' as platform with context
+
+#include <stdint.h>
+#include <modm/architecture/utils.hpp>
+#include <modm/architecture/interface/assert.h>
+#include "../device.hpp"
+
+{{ platform.defines() }}
+
+// ----------------------------------------------------------------------------
+void Undefined_Handler(void)
+{
+	uint32_t irqn;
+	asm volatile("mrs %[irqn], ipsr" :[irqn] "=r" (irqn));
+	modm_assert(0, "core", "nvic", "undefined", irqn);
+}
+/* Provide weak aliases for each Exception handler to Undefined_Handler.
+ * As they are weak aliases, any function with the same name will override
+ * this definition. */
+void Reset_Handler(void)						__attribute__((noreturn));
+void NMI_Handler(void)							__attribute__((weak, alias("Undefined_Handler")));
+void HardFault_Handler(void)					__attribute__((weak, alias("Undefined_Handler")));
+%% for pos in range(4 - 16, number_of_interrupts + 1)
+%% 	if pos in interrupt_table
+{{ ("void " ~ interrupt_table[pos] ~ "(void)") | lbuild.pad(47)}}__attribute__((weak, alias("Undefined_Handler")));
+%%	endif
+%% endfor
+
+// ----------------------------------------------------------------------------
+typedef void (* const FunctionPointer)(void);
+
+// defined in the linkerscript
+extern uint32_t __main_stack_top[];
+extern uint32_t __process_stack_top[];
+
+// Define the vector table
+modm_section(".reset")
+FunctionPointer vectorsRom[] =
+{
+	(FunctionPointer)__main_stack_top,		// -16: stack pointer
+	Reset_Handler,							// -15: code entry point
+	NMI_Handler,							// -14: Non Maskable Interrupt handler
+	HardFault_Handler,						// -13: hard fault handler
+%% for pos in range(4 - 16, number_of_interrupts)
+%% 	if pos in interrupt_table
+	{{ (interrupt_table[pos] ~ ",") | lbuild.pad(39) }}// {{ (pos|string).rjust(3) }}
+%% 	else
+	Undefined_Handler,						// {{ (pos|string).rjust(3) }}
+%% 	endif
+%% endfor
+};
+%% if vector_table_location == "ram"
+// reserve space for the remapped vector table in RAM
+modm_section(".vectors")
+FunctionPointer vectorsRam[sizeof(vectorsRom) / sizeof(FunctionPointer)];
+%% endif

@@ -11,7 +11,7 @@
   <options>
     <option name=":target">stm32f072rbt</option>
 
-    <option name=":platform:core:hardfault.led">C7</option>
+    <option name=":platform:fault.cortex:led">C7</option>
   </options>
   <modules>
     <module>modm:board.disco-f072rb</module>
