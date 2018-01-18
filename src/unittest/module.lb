@@ -17,10 +17,12 @@ def init(module):
 
 
 def prepare(module, options):
-    module.depends(':io', ':utils')
+    module.depends(
+        ":architecture:accessor",
+        ":io")
     return True
 
 
 def build(env):
     env.outbasepath = "src/unittest"
-    env.copy('.')
+    env.copy(".", ignore=env.ignore_patterns("*.lb"))
