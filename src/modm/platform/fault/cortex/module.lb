@@ -1,0 +1,79 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2016-2018, Niklas Hauser
+# Copyright (c) 2017, Fabian Greif
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+import os
+
+def init(module):
+    module.parent = "platform"
+    module.name = "fault.cortex"
+
+def prepare(module, options):
+    if not options[":target"].has_driver("core:cortex-m*"):
+        return False
+
+    if options[":target"].identifier["platform"] not in ["stm32"]:
+        return False
+
+    module.depends(
+        ":architecture:assert",
+        ":architecture:clock",
+        ":architecture:delay",
+        ":platform:clock",
+        ":platform:uart",
+        ":platform:gpio",
+        ":cmsis:device")
+
+    uarts = []
+    for u in [u["instance"] for u in (options[":target"].get_all_drivers("uart") +
+                                      options[":target"].get_all_drivers("usart"))]:
+        uarts.extend(u);
+    if len(uarts):
+        uarts.sort()
+        module.add_option(
+            EnumerationOption(
+                name="log.uart",
+                description="",
+                enumeration=uarts,
+                default=uarts[0]))
+    module.add_option(
+        EnumerationOption(
+            name="log.level",
+            description="",
+            enumeration=["disabled", "basic", "full"],
+            default="disabled"))
+
+    pins = [p["port"].upper() + p["pin"] for p in options[":target"].get_driver("gpio")["gpio"]]
+    module.add_option(
+        EnumerationOption(
+            name="led",
+            description="",
+            enumeration=pins + ["disabled"],
+            default="disabled"))
+
+    return True
+
+def build(env):
+    device = env[":target"]
+    driver = device.get_driver("core")
+
+    properties = device.properties
+    properties["target"] = target = device.identifier
+    properties["partname"] = device.partname
+    properties["driver"] = driver
+    properties["core"] = driver["type"]
+
+    env.substitutions = properties
+    env.outbasepath = "src/modm/platform/core"
+
+    env.template("hard_fault_handler.cpp.in")
+    env.template("hard_fault.sx.in")

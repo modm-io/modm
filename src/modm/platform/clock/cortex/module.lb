@@ -11,50 +11,45 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
+import os
+
 def init(module):
-    module.name = "core"
     module.parent = "platform"
+    module.name = "clock.cortex"
 
 def prepare(module, options):
-    device = options[":target"]
-    target = device.identifier
-    if target["platform"] != "hosted":
+    if not options[":target"].has_driver("core:cortex-m*"):
         return False
 
     module.depends(
-        ":architecture:accessor",
-        ":architecture:assert",
-        ":architecture:atomic",
         ":architecture:clock",
         ":architecture:delay",
-        ":architecture:memory",
-        ":architecture:unaligned",
-        ":debug")
+        ":cmsis:device")
 
     return True
 
 def build(env):
     device = env[":target"]
+    driver = device.get_driver("core")
+
     properties = device.properties
     properties["target"] = target = device.identifier
     properties["partname"] = device.partname
-    properties["driver"] = device.get_driver("core")
-
-    env.append_metadata_unique("include_path", "src")
+    properties["driver"] = driver
+    properties["core"] = driver["type"]
+    properties["systick_frequency"] = int(env.get_option(":freertos:frequency", 1000))
+    if (properties["systick_frequency"] % 1000 != 0):
+        raise BuildException("SysTick frequency must be a multiple of 1000Hz!")
 
     env.substitutions = properties
-    env.outbasepath = "src/modm/platform/core"
-
-    env.copy("assert.cpp")
-    env.copy("memory.cpp")
-    env.copy("atomic_lock.hpp")
-    env.copy("../avr/unaligned.hpp", "unaligned.hpp")
-    env.copy("../cortex/flash_reader.hpp", "flash_reader.hpp")
-
     env.outbasepath = "src/modm/platform/clock"
-    if not env.has_module(":test"):
-        env.template("clock.cpp.in")
-    env.template("delay.hpp.in")
 
-    if target["family"] in ["windows"]:
-        env.log.warning("Delay functions are not implemented!")
+    env.template("delay.cpp.in")
+    env.copy("delay.hpp")
+
+    if not env.has_module(":test"):
+        env.copy("modm_clock.cpp")
+
+    # Systick Timer
+    env.template("systick_timer.hpp.in")
+    env.template("systick_timer.cpp.in")

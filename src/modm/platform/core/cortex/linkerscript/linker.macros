@@ -51,9 +51,9 @@ PROVIDE(__rom_start = ORIGIN(FLASH));
 PROVIDE(__rom_end   = ORIGIN(FLASH) + LENGTH(FLASH));
 
 /* the thread stack is used only for reporting hard fault conditions! It may therefore be small. */
-%% if (options["hardfault.led"] == "disabled") and (options["hardfault.log"] == "disabled")
+%% if (hardfault_led == "disabled") and (hardfault_log == "disabled")
 	%% set pss = 0
-%% elif options["hardfault.log"] == "disabled"
+%% elif hardfault_log == "disabled"
 	%% set pss = 32
 %% else
 	%% set pss = 512

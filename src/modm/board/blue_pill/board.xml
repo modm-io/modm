@@ -11,7 +11,7 @@
   <options>
     <option name=":target">stm32f103c8t</option>
 
-    <option name=":platform:core:hardfault.led">C13</option>
+    <option name=":platform:fault.cortex:led">C13</option>
   </options>
   <modules>
     <module>modm:board.blue-pill</module>

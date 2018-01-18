@@ -48,3 +48,6 @@ def init(repo):
 
 def prepare(repo, options):
     repo.find_modules_recursive(".", modulefile="*.lb", ignore="repo.lb")
+
+def build(env):
+    env.append_metadata_unique("include_path", "src")
