@@ -18,30 +18,30 @@
 
 #include "../device.hpp"
 
-%% if options["hardfault.led"] != "disabled" or (options["hardfault.log"] != "disabled")
+%% if options.led != "disabled" or (options["log.level"] != "disabled")
 #include "../clock/common_clock.hpp"
 %% endif
 
-%% if options["hardfault.led"] != "disabled"
-#include "../gpio/gpio_{{ options["hardfault.led"] }}.hpp"
+%% if options.led != "disabled"
+#include "../gpio/gpio_{{ options.led }}.hpp"
 
 extern "C" void _initHardFaultHandlerLed() __attribute__((optimize("Os")));
 extern "C" void _initHardFaultHandlerLed()
 {
-	modm::platform::Gpio{{ options["hardfault.led"] }}::setOutput();
+	modm::platform::Gpio{{ options.led }}::setOutput();
 }
 
 extern "C" void _toggleHardFaultHandlerLed() __attribute__((optimize("Os")));
 extern "C" void _toggleHardFaultHandlerLed()
 {
-	modm::platform::Gpio{{ options["hardfault.led"] }}::toggle();
+	modm::platform::Gpio{{ options.led }}::toggle();
 }
 
 %% endif
 
-%% if options["hardfault.log"] != "disabled"
+%% if options["log.level"] != "disabled"
 #include <modm/debug/logger.hpp>
-	%% set id = options["hardfault.log.uart"]
+	%% set id = options["log.uart"]
 
 	%% if id in [1, 2, 3, 6]
 		%%	set uart = "Usart"
@@ -49,7 +49,7 @@ extern "C" void _toggleHardFaultHandlerLed()
 		%%	set uart = "Uart"
 	%% endif
 
-#include "../../uart/stm32/uart_{{ id }}.hpp"
+#include <modm/platform/uart/uart_{{ id }}.hpp>
 
 MODM_ISR_DECL({{ uart | upper ~ id }});
 
@@ -80,7 +80,7 @@ constexpr uint8_t    bus_fault_mask = 0xbf;
 constexpr uint8_t    mem_fault_mask = 0xbb;
 %% endif
 
-%% if options["hardfault.log"] == "full" and not core.startswith("cortex-m0"):
+%% if options["log.level"] == "full" and not core.startswith("cortex-m0"):
 const char *mem_fault_bits[] = {
 	"MMARVALID",
 	"MLSPERR",
@@ -107,7 +107,7 @@ const char *usage_fault_bits[] = {
 	"UNDEFINSTR"
 };
 %% endif
-%% if options["hardfault.log"] != "disabled"
+%% if options["log.level"] != "disabled"
 const char *stack_frame_names[] = {
 	"R0",
 	"R1",
@@ -141,7 +141,7 @@ const char *stack_frame_names[] = {
 const char *exception_stack_frame = " ^-- exception stack frame\n";
 %% endif
 
-%% if options["hardfault.log"] != "disabled"
+%% if options["log.level"] != "disabled"
 // ----------------------------------------------------------------------------
 extern "C" void _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp) __attribute__((noreturn, optimize("Os")));
 extern "C" void _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
@@ -199,7 +199,7 @@ extern "C" void _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 	modm::platform::{{ uart ~ id }}::discardTransmitBuffer();
 
 	// Infinite loop
-	%% if options["hardfault.led"] != "disabled"
+	%% if options.led != "disabled"
 	volatile uint32_t ledCounter = 1;
 	_initHardFaultHandlerLed();
 	%% endif
@@ -208,7 +208,7 @@ extern "C" void _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 
 	while(1)
 	{
-	%% if options["hardfault.led"] != "disabled"
+	%% if options.led != "disabled"
 		if (--ledCounter == 0)
 		{
 			ledCounter = modm::clock::fcpu / 20;
@@ -299,7 +299,7 @@ extern "C" void _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 			MODM_LOG_ERROR.printf("MMAR  : 0x%08lx%s\n", mmar, is_mmar_valid ? valid : invalid); flushUart();
 			MODM_LOG_ERROR.printf("BFAR  : 0x%08lx%s\n", bfar, is_bfar_valid ? valid : invalid); flushUart();
 			MODM_LOG_ERROR.printf("AFSR  : 0x%08lx\n",   afsr);  flushUart();
-		%% if options["hardfault.log"] != "basic"
+		%% if options["log.level"] != "basic"
 			MODM_LOG_ERROR << '\n';
 			if (mem_fault)
 			{

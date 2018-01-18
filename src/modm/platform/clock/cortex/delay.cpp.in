@@ -10,7 +10,7 @@
 // ----------------------------------------------------------------------------
 
 #include "../device.hpp"
-#include "../clock/common_clock.hpp"
+#include "common_clock.hpp"
 
 %% if core.startswith("cortex-m0"):
 	%% set loop = 4
@@ -93,3 +93,20 @@ _delay_ms(uint16_t ms)
 }
 
 }
+
+%% if not (core.startswith("cortex-m0") or core.startswith("cortex-m7"))
+void
+modm_dwt_enable(void)
+{
+	// Enable Tracing Debug Unit
+	CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+	DWT->CYCCNT = 0;
+	// Enable CPU cycle counter
+	DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+}
+
+// .A000100 postfix since .hardware_init is sorted alphabetically and
+// this should be executed before application inits. Totally not a hack.
+modm_section(".hardware_init.A000100_modm_dwt_enable")
+uint32_t modm_dwt_enable_ptr = (uint32_t) &modm_dwt_enable;
+%% endif

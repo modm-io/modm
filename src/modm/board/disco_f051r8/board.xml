@@ -11,7 +11,7 @@
   <options>
     <option name=":target">stm32f051r8t</option>
 
-    <option name=":platform:core:hardfault.led">C8</option>
+    <option name=":platform:fault.cortex:led">C8</option>
   </options>
   <modules>
     <module>modm:board.disco-f051r8</module>

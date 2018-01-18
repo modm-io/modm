@@ -78,7 +78,7 @@ HardFault_Handler:
 no_debugger:
 %% endif
 
-%% if (options["hardfault.led"] == "disabled") and (options["hardfault.log"] == "disabled")
+%% if (options.led == "disabled") and (options["log.level"] == "disabled")
 	b HardFault_Handler					// busy wait in a loop forever
 %% else
 	// Save the current main stack pointer into the PSP register.
@@ -86,7 +86,7 @@ no_debugger:
 	mov r0, sp							// move SP into r0
 	msr psp, r0							// save SP into the process stack pointer (PSP)
 
-%% if options["hardfault.log"] == "disabled"
+%% if options["log.level"] == "disabled"
 	/* The LED blinking code consumes at most 32B of stack.
 	 * If there is >32B of space on the main stack, we do not switch the
 	 * stack pointer to the reserved hard fault handler stack.
@@ -106,7 +106,7 @@ no_debugger:
 use_main_stack:
 	mov r0, lr							// restore register 0 from the LR
 
-%% if options["hardfault.log"] == "disabled"
+%% if options["log.level"] == "disabled"
 	/* This sets up and toggles an LED.
 	 * The actual setup and toggle code is delegated to C++ world,
 	 * so that the modm GPIO API can be used.

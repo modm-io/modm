@@ -31,12 +31,9 @@ def prepare(module, options):
         ":architecture:interrupt",
         ":architecture:memory",
         ":architecture:unaligned",
-        ":cmsis:device")
-
-        # FIXME: Move hardfault handler out of core
-        # ":platform:clock",
-        # ":platform:uart",
-        # ":platform:gpio",
+        ":cmsis:device",
+        ":platform:clock.cortex",
+        ":platform:fault.cortex")
 
     module.add_option(
         EnumerationOption(
@@ -58,33 +55,6 @@ def prepare(module, options):
             minimum=2 ** 8,
             maximum=2 ** 16,
             default=2 ** 10 * 3 - 32))
-
-    uarts = []
-    for u in [u["instance"] for u in (options[":target"].get_all_drivers("uart") +
-                                      options[":target"].get_all_drivers("usart"))]:
-        uarts.extend(u);
-    if len(uarts):
-        uarts.sort()
-        module.add_option(
-            EnumerationOption(
-                name="hardfault.log.uart",
-                description="",
-                enumeration=uarts,
-                default=uarts[0]))
-    module.add_option(
-        EnumerationOption(
-            name="hardfault.log",
-            description="",
-            enumeration=["disabled", "basic", "full"],
-            default="disabled"))
-
-    pins = [p["port"].upper() + p["pin"] for p in options[":target"].get_driver("gpio")["gpio"]]
-    module.add_option(
-        EnumerationOption(
-            name="hardfault.led",
-            description="",
-            enumeration=pins + ["disabled"],
-            default="disabled"))
 
     module.add_option(
         StringOption(
@@ -125,8 +95,8 @@ def build(env):
     # Cortex-M0 does not have remappable vector table, so it will remain in Flash
     properties["vector_table_location"] = env.get_option(":::vector_table_location", "rom")
     properties["core"] = driver["type"]
-    properties["systick_frequency"] = int(env.get_option(":freertos:frequency", 1000))
-    assert(properties["systick_frequency"] % 1000 == 0)
+    properties["hardfault_led"] = env.get_option(":platform:fault.cortex:led", "disabled")
+    properties["hardfault_log"] = env.get_option(":platform:fault.cortex:log.level", "disabled")
 
     # Add ARM Cortex-M exceptions
     interrupts = {
@@ -148,9 +118,7 @@ def build(env):
     for vector in driver["vector"]:
         interrupts[int(vector["position"])] = vector["name"] + "_IRQHandler"
     properties["interrupt_table"] = interrupts
-    properties["number_of_interrupts"] = max(interrupts.keys())
-
-    env.append_metadata_unique("include_path", "src")
+    properties["number_of_interrupts"] = max(interrupts.keys()) + 1
 
     env.substitutions = properties
     env.outbasepath = "link"
@@ -189,6 +157,7 @@ def build(env):
 
     # startup script
     env.template("startup.c.in")
+    env.template("vectors.c.in")
     env.copy("default_handler.sx")
 
     # everything to do with dynamic memory
@@ -200,23 +169,7 @@ def build(env):
     if env[":::allocator"] == "block":
         env.template("heap_block_allocator.cpp.in")
 
-    env.template("delay.cpp.in")
-    env.copy("delay.hpp")
     env.copy("atomic_lock.hpp")
     env.template("unaligned.hpp.in")
     env.copy("flash_reader.hpp")
 
-    if not env.has_module(":test"):
-        env.copy("clock.cpp")
-
-    if properties["core"] != "cortex-m0":
-        env.copy("cycle_counter.hpp")
-
-    # Systick Timer
-    env.template("systick/systick_timer.hpp.in")
-    env.template("systick/systick_timer.cpp.in")
-
-    # Hard Fault Handler
-    if target["platform"] == "stm32":
-        env.template("hard_fault_handler.cpp.in")
-        env.template("hard_fault.sx.in")
