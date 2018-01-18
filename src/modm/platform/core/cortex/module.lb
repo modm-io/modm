@@ -96,7 +96,6 @@ def build(env):
     properties["vector_table_location"] = env.get_option(":::vector_table_location", "rom")
     properties["core"] = driver["type"]
     properties["hardfault_led"] = env.get_option(":platform:fault.cortex:led", "disabled")
-    properties["hardfault_log"] = env.get_option(":platform:fault.cortex:log.level", "disabled")
 
     # Add ARM Cortex-M exceptions
     interrupts = {
