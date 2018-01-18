@@ -78,7 +78,7 @@ HardFault_Handler:
 no_debugger:
 %% endif
 
-%% if (options.led == "disabled") and (options["log.level"] == "disabled")
+%% if (options.led == "disabled")
 	b HardFault_Handler					// busy wait in a loop forever
 %% else
 	// Save the current main stack pointer into the PSP register.
@@ -86,7 +86,6 @@ no_debugger:
 	mov r0, sp							// move SP into r0
 	msr psp, r0							// save SP into the process stack pointer (PSP)
 
-%% if options["log.level"] == "disabled"
 	/* The LED blinking code consumes at most 32B of stack.
 	 * If there is >32B of space on the main stack, we do not switch the
 	 * stack pointer to the reserved hard fault handler stack.
@@ -99,14 +98,12 @@ no_debugger:
 	add sp, #32							// undo the subtraction
 	bpl use_main_stack					// do not switch stack, if there is enough space left
 										// otherwise change SP to hard fault handler stack
-%% endif
 	ldr r0, =__process_stack_top		// load the PSP value into register 0
 	mov sp, r0							// write the current stack pointer to the new PSP value
 
 use_main_stack:
 	mov r0, lr							// restore register 0 from the LR
 
-%% if options["log.level"] == "disabled"
 	/* This sets up and toggles an LED.
 	 * The actual setup and toggle code is delegated to C++ world,
 	 * so that the modm GPIO API can be used.
@@ -128,70 +125,6 @@ loop:
 	ldr r0, =0xfffffff9					// ARMv6 cannot load directly into LR
 	mov lr, r0							// restore link register for GDB
 	b loop								// loop forever
-
-%% else
-	/* We are switching to the reserved hard fault handler stack, and stack
-	 * all 16 CPU registers and 7 fault registers (only on CM3 and up).
-	 *
-	 *  1. push the registers r0 through r7 onto the stack
-	 *  2. load the valid high registers r8-r12 into r0-r4
-	 *  3. push the registers r0 through r7 onto the stack (ie. r8-r15 with 3x placeholder)
-	 * (4. load fault registers into r1-r7)
-	 * (5. push the registers r1 through r7 onto the stack (ie. fault registers))
-	 *
-	 * Unfortunately the original LR, PC and PSR are (obviously) invalidated upon exception entry,
-	 * therefore we do not push these registers onto the stack, but only reserve space for them.
-	 * We opportunistically attempt to recover these register from the main stack frame that might have been
-	 * preserved during hard fault exception entry, however, a more thorough interpretation of the hard fault
-	 * reason and validation of plausibility of these recovered values is done in C code.
-	 *
-	 * Note: By pushing all these registers to the stack, GDB cannot correctly unwind it anymore!
-	 */
-	push {r0-r7}				// +8	// push registers r0 through r7 onto the stack
-	mov r0, r8							// copy the higher registers into the lower ones
-	mov r1, r9							// this is required since the Cortex-M0 cannot
-	mov r2, r10							// push the higher registers onto the stack
-	mov r3, r11
-	mov r4, r12
-//	mov r5, lr							// INVALID!
-//	mov r6, pc							// INVALID!
-//	mrs r7, psr							// INVALID!
-	push {r0-r7}				// +8	// push registers r8 through r12, lr, pc, psr onto the stack
-	mov r2, sp							// buffer the current PSP for later
-%% if not core.startswith("cortex-m0"):
-
-	// we now push all valuable information about the bus fault onto the stack
-	// this means loading a range or registers from SCB and preserving them
-	ldr r0, =0xE000ED24					// load address of SCB->SHCRS register
-	ldm r0, {r1,r2,r3,r4,r5,r6,r7}		// load SHCRS, CFSR, HFSR, DFSR, MMAR, BFAR, AFSR registers
-	push {r1-r7}				// +7	// push them onto the stack
-%% endif
-
-	// prepare the two arguments for the C hard fault handler function
-	mov r0, sp							// load the PSP (the exception stack frame)
-	mrs r1, psp							// load the MSP from the PSP register
-
-	// opportunistically copy LR, PC and PSR from main stack over to the process stack
-	// this doesn't cause a bus fault (which would result in core lockup) since we disabled that behavior.
-	ldr r3, [r1, #20]					// load  LR
-	str r3, [r2, #20]					// store LR
-	ldr r3, [r1, #24]					// load  PC
-	str r3, [r2, #24]					// store PC
-	ldr r3, [r1, #28]					// load  PSR
-	str r3, [r2, #28]					// store PSR
-
-%% if core.startswith("cortex-m0"):
-	// 16 registers have been pushed onto the stack, => 64 bytes of the process stack have already been used!
-%% else
-	// 23 registers have been pushed onto the stack, => 92 bytes of the process stack have already been used!
-%% endif
-	dsb
-
-	// call the C code handler
-	ldr r2, =_hardFaultHandler
-	bx r2
-
-%% endif
 %% endif
 	.size	HardFault_Handler, . - HardFault_Handler
 	.endfunc
