@@ -79,7 +79,8 @@ InOut inOut;
 
 // ----------------------------------------------------------------------------
 // create a list of all possible actions
-FLASH_STORAGE(modm::sab::Action actionList[]) =
+// FIXME: Use FLASH_STORAGE(modm::sab::Action actionList[])
+const modm::sab::Action actionList[] =
 {
 	SAB_ACTION( 'A', analogDigital,	AnalogDigital::readChannel,	1 ),
 	SAB_ACTION( 'D', inOut,			InOut::setDirection,		1 ),

@@ -16,6 +16,8 @@ rootpath = "."
 env = Environment(
         toolpath=[os.path.join(rootpath, "scons", "site_tools"),
                   os.path.join(rootpath, "ext", "dlr", "scons-build-tools", "site_tools")],
+
+%# ================================== STM32 ===================================
 %% if platform in ["stm32"]
         tools=[
             "compiler_arm_none_eabi_gcc",
@@ -49,6 +51,7 @@ env.Append(LINKFLAGS_target=[
     "-Tlinkerscript.ld",
     ])
 
+%# =================================== AVR ====================================
 %% elif platform in ["avr"]
         tools=[
             "compiler_avr_gcc",
@@ -78,6 +81,8 @@ env.Append(LINKFLAGS_target=[
     "-Llink",
     "-Tlinkerscript.ld",
     ])
+
+%# ================================== HOSTED ==================================
 %% elif platform in ["hosted"]
         tools=[
             "compiler_hosted_{{compiler}}",
@@ -93,7 +98,7 @@ env.Append(LINKFLAGS_target=[
             ],
         ENV=os.environ)
 %% endif
-env["CONFIG_MODM_ROOTPATH"] = os.path.abspath(rootpath)
+%# ============================================================================
 
 env.RemoveFromList("CCFLAGS_warning", [
     "-Wshadow",
@@ -118,11 +123,19 @@ env.InfoGit()
 env.InfoBuild()
 %% endif
 
+%% if options["::is_unittest"]
+headers = env.Glob("test/*.hpp")
+headers += env.Glob("test/*/*.hpp")
+headers += env.Glob("test/*/*/*.hpp")
+headers += env.Glob("test/*/*/*/*.hpp")
+files = env.UnittestRunner(target="main.cpp", source=headers, template="test/runner.cpp.in")
+%% else
 # FIXME: better globbing! (recursive?)
 files = env.Glob("*.cpp")
 files += env.Glob("*/*.cpp")
 # Needed for communication examples for generated postman include paths!
 env.Append(CPPPATH=["."])
+%% endif
 
 %% if image_source != ""
 for image in Glob(os.path.abspath(os.path.join("{{image_source}}", "*.pbm"))):

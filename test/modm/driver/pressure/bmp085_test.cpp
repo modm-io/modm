@@ -126,7 +126,8 @@ Bmp085Test::testConversion()
 
 			MODM_LOG_DEBUG.printf("%04x\t%5d\t%5d\t%2d\n", adc, tempDouble, temp, error);
 
-			uint16_t error_abs = std::abs(error);
+			uint16_t error_abs = error;
+			if (error < 0) error_abs = -error;
 			total_error += error_abs;
 			if (error_abs > max_error) {
 				max_error = error_abs;
@@ -193,7 +194,8 @@ Bmp085Test::testConversion()
 				int16_t error = pressFp - pressDp;
 				MODM_LOG_DEBUG.printf("  adc_press = %04" PRIx16 "  PressFp = %6" PRId32 " Pa\t PressDp = %6" PRId32 " Pa \t Diff = %3" PRId16 " Pa\n", adc_press, pressFp, pressDp, error);
 
-				uint16_t error_abs = std::abs(error);
+				uint16_t error_abs = error;
+				if (error < 0) error_abs = -error;
 				total_error += error_abs;
 				if (error_abs > max_error) {
 					max_error = error_abs;

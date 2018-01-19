@@ -1,7 +1,7 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2017, Fabian Greif
+# Copyright (c) 2018, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -9,13 +9,24 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#TMPDIR := $(shell mktemp -d)
-TMPDIR := /tmp/unittest
-
 LBUILD = python3 ../../library-builder/scripts/lbuild
 
-test:
-	#@$(RM) -r $(TMPDIR)/*
-	$(LBUILD) -c project.xml -p $(TMPDIR) -v build --module=:test:**
-	scons -C $(TMPDIR)/test
-	@$(TMPDIR)/build/test/unittest
+test-hosted-linux:
+	@$(RM) -r ../build/unittest/hosted
+	$(LBUILD) -c hosted.xml -D":target=hosted-linux" -p ../build/unittest/hosted -v build --no-log
+	scons -C ../build/unittest/hosted run
+
+test-hosted-darwin:
+	@$(RM) -r ../build/unittest/hosted
+	$(LBUILD) -c hosted.xml -D":target=hosted-darwin" -p ../build/unittest/hosted -v build --no-log
+	scons -C ../build/unittest/hosted run
+
+test-stm32:
+	@$(RM) -r ../build/unittest/stm32
+	$(LBUILD) -c stm32.xml -p ../build/unittest/stm32 -v build --no-log
+	scons -C ../build/unittest/stm32 size
+
+test-avr:
+	@$(RM) -r ../build/unittest/avr
+	$(LBUILD) -c avr.xml -p ../build/unittest/avr -v build --no-log
+	scons -C ../build/unittest/avr

@@ -78,7 +78,8 @@ namespace
 	
 	TestingObject testingObject;
 	
-	FLASH_STORAGE(modm::sab::Action actionList[]) =
+	// FIXME: Use FLASH_STORAGE
+	const modm::sab::Action actionList[] =
 	{
 		SAB_ACTION(0x01, testingObject, TestingObject::emptyFunction, 0),
 		SAB_ACTION(0x02, testingObject, TestingObject::responseFunction, 0),

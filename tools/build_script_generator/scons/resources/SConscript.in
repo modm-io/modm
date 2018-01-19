@@ -57,9 +57,7 @@ env["CONFIG_DEVICE_MEMORY"] = [
 %% endif
 # Programming configuration
 %% if "openocd.configfile" in metadata
-env["CONFIG_OPENOCD_SEARCHDIRS"] = [
-    os.path.join(env["CONFIG_MODM_ROOTPATH"], "tools", "openocd")
-]
+env["CONFIG_OPENOCD_SEARCHDIRS"] = []
 env["CONFIG_OPENOCD_CONFIGFILES"] = [
 %% for configfile in metadata["openocd.configfile"]
     "{{ configfile }}",
@@ -79,7 +77,7 @@ env["CONFIG_OPENOCD_COMMANDS"] = [
 env["CONFIG_CLOCK_F_CPU"] = "{{ options[":platform:clock:f_cpu"] }}"
 %% endif
 
-env['XPCC_SYSTEM_BUILDER'] = os.path.join(env["CONFIG_MODM_ROOTPATH"], "tools", "system_design", "builder")
+env['XPCC_SYSTEM_BUILDER'] = os.path.join("tools", "system_design", "builder")
 
 %% if platform not in ["hosted"]
 # We need to link libmodm.a with --whole-archive, so that all weak symbols are visible to the linker.

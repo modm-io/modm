@@ -18,6 +18,7 @@ import platform
 import getpass
 import locale
 import re
+from collections import defaultdict
 
 def is_git_available():
 	return (subprocess.call(['which', 'git'], stdout=open(os.devnull, 'wb')) is 0)
@@ -62,7 +63,7 @@ def git_info_defines(env):
 		defines['MODM_GIT_CONFIG_USER_EMAIL'] = git_config('user.email')
 		# Status
 		s = subprocess.check_output(['git', '--no-pager', 'status', '--porcelain']).split('\n')
-		f = { 'M': 0, 'A': 0, 'D': 0, 'R': 0, 'C': 0, 'U': 0, '?': 0}
+		f = defaultdict(int)
 		for line in s:
 			if len(line.strip()) > 0:
 				c = line.strip()[0]
