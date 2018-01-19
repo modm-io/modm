@@ -28,7 +28,7 @@ def init(repo):
     try:
         parser = modm.parser.DeviceParser()
         device_file_names  = glob.glob(localpath("ext/modm-devices/devices/**/*.xml"))
-        device_file_names += glob.glob(localpath("devices/**/*.xml"))
+        device_file_names += glob.glob(localpath("tools/devices/**/*.xml"))
         # roughly filter to supported devices
         supported = ["stm32f0", "stm32f1", "stm32f2", "stm32f3", "stm32f4", "stm32f7",
                      "stm32l4", "at90", "attiny", "atmega", "hosted"]
