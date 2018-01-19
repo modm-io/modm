@@ -29,6 +29,9 @@ def prepare(module, options):
     module.add_option(
         BooleanOption(name="include_sconstruct", default=True,
                       description="Generate modm specific SConstruct file."))
+    module.add_option(
+        BooleanOption(name="is_unittest", default=False,
+                      description="Generate SConstruct file for modm unittests."))
 
     module.add_option(
         StringOption(name="build.path", default="build",
@@ -75,6 +78,7 @@ def post_build(env, buildlog):
     if len(env["xpcc.source"]): build_tools.append("system_design");
     if len(env["image.source"]): build_tools.append("bitmap");
     if env["info.git"] or env["info.build"]: build_tools.append("info");
+    if env["is_unittest"]: build_tools.append("unittest")
 
     # Extract all source code files
     files_to_build = []

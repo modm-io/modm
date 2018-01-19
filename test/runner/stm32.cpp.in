@@ -16,7 +16,7 @@
 // Please modify the corresponding 'runner_stm32.cpp.in' file instead.
 // ----------------------------------------------------------------------------
 
-#include <modm/platform/platform.hpp>
+#include <modm/board/board.hpp>
 #include <modm/debug/logger.hpp>
 
 #include <unittest/reporter.hpp>
@@ -50,9 +50,11 @@ main()
 {
 	Board::initialize();
 
+#ifndef MODM_BOARD_HAS_LOGGER
 	// initialize output device, enable USART 2
 	Usart2::connect<GpioOutputA2::Tx, GpioInputA3::Rx>();
 	Usart2::initialize<Board::systemClock, 115200>(12);
+#endif
 
 	loggerDevice.write("Unittests (" __DATE__ ", " __TIME__")\n");
 
