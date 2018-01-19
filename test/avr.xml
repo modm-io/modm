@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance"
+         xsd:noNamespaceSchemaLocation="https://github.com/dergraaf/library-builder/lbuild/resources/configuration.xsd">
+  <repositories>
+    <repository>
+      <path>../repo.lb</path>
+    </repository>
+    <cache>.lbuild_cache</cache>
+  </repositories>
+
+  <options>
+    <option name=":target">atmega2560</option>
+    <option name=":platform:clock:f_cpu">14745600</option>
+    <option name=":build.scons:include_demo_project">False</option>
+    <option name=":build.scons:include_sconstruct">True</option>
+    <option name=":build.scons:is_unittest">True</option>
+    <option name=":build.scons:info.build">True</option>
+    <!-- <option name=":build.scons:info.git">True</option> -->
+  </options>
+
+  <modules>
+    <module>:platform:core</module>
+    <module>:platform:uart:0</module>
+    <module>:build.scons</module>
+    <module>:test:**</module>
+  </modules>
+</library>
