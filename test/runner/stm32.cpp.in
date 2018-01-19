@@ -51,8 +51,7 @@ main()
 	Board::initialize();
 
 	// initialize output device, enable USART 2
-	GpioOutputA2::connect(Usart2::Tx);
-	GpioInputA3::connect(Usart2::Rx, Gpio::InputType::PullUp);
+	Usart2::connect<GpioOutputA2::Tx, GpioInputA3::Rx>();
 	Usart2::initialize<Board::systemClock, 115200>(12);
 
 	loggerDevice.write("Unittests (" __DATE__ ", " __TIME__")\n");

@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2009-2011, 2017, Fabian Greif
  * Copyright (c) 2010, Martin Rosekeit
+ * Copyright (c) 2016, Sascha Schade
  * Copyright (c) 2016, Niklas Hauser
  *
  * This file is part of the modm project.
@@ -12,37 +13,56 @@
 // ----------------------------------------------------------------------------
 
 // WARNING: This file is generated automatically, do not edit!
-// Please modify the corresponding 'runner_atxmega.cpp.in' file instead.
+// Please modify the corresponding 'runner_atmega.cpp.in' file instead.
 // ----------------------------------------------------------------------------
-
-#include <modm/platform/platform.hpp>
 
 #include <unittest/reporter.hpp>
 #include <unittest/controller.hpp>
+
+#include <modm/platform/platform.hpp>
+
+using namespace modm::platform;
+typedef modm::platform::SystemClock clock;
 
 ${includes}
 
 ${names}
 
+using LedGreen = GpioOutputB0;
+using LedRed = GpioB1;
+
 int
 main()
 {
+	LedGreen::setOutput();
+	LedRed::setOutput();
+
+	LedGreen::reset();
+	LedRed::set();
+
 	// initialize output device
-	modm::platform::BufferedUartE0 uart(115200);
-	modm::IODeviceWrapper<modm::platform::BufferedUartE0> device(uart);
-	
+	Uart0::connect<GpioInputE0::Rx, GpioOutputE1::Tx>();
+	Uart0::initialize< clock, 115200, modm::Tolerance::TenPercent >();
+
+	Uart0 uart;
+	modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > loggerDevice(uart);
+
 	sei();
-	
-	device.write("Unittests (" __DATE__ ", " __TIME__")\n");
-	
-	unittest::Reporter reporter(device);
+
+	loggerDevice.write("Unittests (" __DATE__ ", " __TIME__")\n");
+
+	unittest::Reporter reporter(loggerDevice);
 	unittest::Controller::instance().setReporter(reporter);
-	
+
+	LedGreen::set();
+
 	// run tests
 ${tests}
-	
+
 	unittest::Controller::instance().getReporter().printSummary();
-	
+
+	LedRed::reset();
+
 	while (1)
 	{
 	}

@@ -26,4 +26,10 @@ def build(env):
 
     env.append_metadata_unique("include_path", "test")
 
-    env.copy(localpath("../templates/unittest/runner_hosted.cpp.in"), "runner.cpp.in")
+    platform = env[":target"].identifier["platform"]
+    if platform in ["hosted"]:
+        env.copy("runner/hosted.cpp.in", "runner.cpp.in")
+    elif platform in ["stm32"]:
+        env.copy("runner/stm32.cpp.in", "runner.cpp.in")
+    elif platform in ["avr"]:
+        env.copy("runner/avr.cpp.in", "runner.cpp.in")
