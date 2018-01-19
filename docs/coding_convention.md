@@ -6,14 +6,14 @@ amount of errors.
 
 ## General Recommendations
 
-- Any violation to the guide is allowed if it enhances readability.  
+- Any violation to the guide is allowed if it enhances readability.
   The main goal of this guidelines is to improve readability and thereby the
   understanding and the maintainability and general quality of the code. It is
   not possible to cover all the specific cases in a general guide.
-- **Keep it simple!**  
+- **Keep it simple!**
   Ease of understanding and use code is prefered about flexibility and
   complexity
-- **Devide**  
+- **Devide**
   Each class/methode has only one task.
 
 
@@ -23,7 +23,7 @@ amount of errors.
 - Documentation on how to use a class goes to the header file. Use
   [doxygen style](http://www.doxygen.org) therefore. Documentation about the
   internal structure goes to the source file.
-- Start writing the documentation before programming!  
+- Start writing the documentation before programming!
   Describe in a few sentences what the class should do. If you cannot describe
   the class well it maybe that the overall structure of the class is wrong.
 - Documentation and code are connected. So if you change the code remember to
@@ -31,10 +31,8 @@ amount of errors.
   Comments that contradict the code are worse than no comments.  Always make
   a priority of keeping the comments up-to-date when the code changes!
 
-For doxygen use `///` instead of `//!` for single line comments since:
-
-1. it is easier to read, and
-2. it is faster to write.
+For doxygen use `///` instead of `//!` for single line comments since it is
+easier to read, and faster to write.
 
 Please escape all doxygen keywords with `@` instead of `\\` .
 This helps the readability of C++ code, since `@` is not used in C++.
@@ -74,7 +72,7 @@ text (in ASCII) a lot more intuitive to read for the developers
 
   - Classes and types start with uppercase, variables and functions
     with lowercase
-  - Global constants and defines used internally by MODM must be all
+  - Global constants and defines used internally by modm must be all
     UPPERCASE using underscores to separate words.
   - Scoped constants, enums, structs must be Capitalized and **not**
     uppercased.
@@ -96,11 +94,13 @@ text (in ASCII) a lot more intuitive to read for the developers
 
 - **Never** use the `using namespace`-statement in a header file.
 - Type conversions must always be done explicitly. Never rely on implicit type
-  conversion.  
+  conversion.
   By this, the programmer indicates that he is aware of the different types
   involved and that the mix is intentional.
 - Variables should be declared in the smallest scope possible.
-
+- Be **very** careful what you `#define` inside a header file. It will influence
+  code you're not even aware of. If you absolutely have to, prefix it with a
+  reasonable namespace.
 
 ## Files
 
@@ -122,7 +122,7 @@ text (in ASCII) a lot more intuitive to read for the developers
 
 ## Layout
 
-- Limit all lines to a maximum of 79 characters.
+- Limit all lines to a maximum of 120 characters.
 - Use **real TAB** with width of 4 spaces (do not replace by spaces)
 - Whitespaces and empty lines are for free, so use them to structure your code
   and align the commands.
@@ -155,12 +155,15 @@ This is a list of expensive statements:
 Header file:
 
 ```c++
-/* Copyright (c) {year}, {your name}
- * All Rights Reserved.
+/*
+ * Copyright (c) {year}, {your name}
  *
- * The file is part of the modm library and is released under the 3-clause BSD
- * license. See the file `LICENSE` for the full license governing this code.
- * --------------------------------------------------------------------------*/
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 
 // do _not_ use double underscores "__", they are reserved by your **system**!
 #ifndef MODM_{MODULE}_{CLASSNAME}_HPP
@@ -169,9 +172,9 @@ Header file:
 #include "path_specific_file.hpp"
 #include <modm/modm_file.hpp>
 
-/// global constants used for MODM internal use are all CAPS
+/// global constants used for modm internal use are all CAPS
 static constexpr uint8_t MODM_INTERNAL_CONSTANT_IN_ALL_CAPS = 0x04;
-/// MODM defines are also all CAPS
+/// modm defines are also all CAPS
 #define MODM_DEFINE 0x2
 
 // this is almost always the top namespace!
@@ -306,12 +309,15 @@ public:
 Source file:
 
 ```c++
-/* Copyright (c) {year}, {your name}
- * All Rights Reserved.
+/*
+ * Copyright (c) {year}, {your name}
  *
- * The file is part of the modm library and is released under the 3-clause BSD
- * license. See the file `LICENSE` for the full license governing this code.
- * --------------------------------------------------------------------------*/
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 
 #include <modm/utils/misc.hpp>
 
