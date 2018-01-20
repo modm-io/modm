@@ -30,7 +30,7 @@ def git_show(format, ref='HEAD'):
 	r = subprocess.check_output(['git', '--no-pager', 'show', ref, '--quiet', '--pretty=format:"' + format + '"'])
 	# only use first line, because quiet does not seem to have the expected
 	# results for older git versions
-	return r.split('\n', 1)[0][1:-1]
+	return r.decode(locale.getpreferredencoding()).split('\n', 1)[0][1:-1]
 
 def git_config(key):
 	""" git_show
@@ -38,7 +38,7 @@ def git_config(key):
 		returns an empty string if the command fails
 	"""
 	try:
-		return subprocess.check_output(['git', 'config', key]).split('\n', 1)[0]
+		return subprocess.check_output(['git', 'config', key]).decode(locale.getpreferredencoding()).split('\n', 1)[0]
 	except subprocess.CalledProcessError:
 		return ""
 
@@ -61,7 +61,7 @@ def git_info_defines(env):
 		defines['MODM_GIT_CONFIG_USER_NAME']  = git_config('user.name')
 		defines['MODM_GIT_CONFIG_USER_EMAIL'] = git_config('user.email')
 		# Status
-		s = subprocess.check_output(['git', '--no-pager', 'status', '--porcelain']).split('\n')
+		s = subprocess.check_output(['git', '--no-pager', 'status', '--porcelain']).decode(locale.getpreferredencoding()).split('\n')
 		f = { 'M': 0, 'A': 0, 'D': 0, 'R': 0, 'C': 0, 'U': 0, '?': 0}
 		for line in s:
 			if len(line.strip()) > 0:
