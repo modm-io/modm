@@ -30,6 +30,18 @@ struct amsys5915
 		friend class Amsys5915;
 
 	public:
+		uint16_t
+		getPressureRaw()
+		{
+			// mask undefined bits
+			data[0] &= 0b00111111;
+
+			auto rData = reinterpret_cast<const uint16_t*>(data);
+			const uint16_t pressureRaw{xpcc::fromBigEndian(*rData)};
+
+			return pressureRaw;
+		}
+
 		/**
 		 * This method returns the pressure as a normalized float from 0-1.
 		 * You have to scale and offset this according to the specific sensor
@@ -42,16 +54,12 @@ struct amsys5915
 		float
 		getPressure()
 		{
-			// mask undefined bits
-			data[0] &= 0b00111111;
+			const uint16_t pressureRaw{getPressureRaw()};
 
 			// Full scale span is typically 13107, with offset 1638
 			// Caution: sensors may output values slightly exceeding the expected range!
 			const uint16_t offset{1638};
 			const uint16_t span{13107};
-
-			auto rData = reinterpret_cast<const uint16_t*>(data);
-			const uint16_t pressureRaw{xpcc::fromBigEndian(*rData)};
 
 			if(pressureRaw <= offset) {
 				return 0.f;
