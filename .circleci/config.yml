@@ -2,7 +2,7 @@ version: 2
 jobs:
   "hosted-unittests":
     docker:
-      - image: roboterclubaachen/xpcc-build:latest
+      - image: modm/modm-build:latest
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python2.7/dist-packages/scons-2.5.1"
@@ -31,7 +31,7 @@ jobs:
 
   "stm32-unittests":
     docker:
-      - image: roboterclubaachen/xpcc-build:latest
+      - image: modm/modm-build:latest
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python2.7/dist-packages/scons-2.5.1"
@@ -45,7 +45,7 @@ jobs:
 
   "atmega-unittests":
     docker:
-      - image: roboterclubaachen/xpcc-build:latest
+      - image: modm/modm-build:latest
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python2.7/dist-packages/scons-2.5.1"
@@ -59,7 +59,7 @@ jobs:
 
   "stm32f0-examples":
     docker:
-      - image: roboterclubaachen/xpcc-build:latest
+      - image: modm/modm-build:latest
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python2.7/dist-packages/scons-2.5.1"
@@ -73,7 +73,7 @@ jobs:
 
   "stm32f1-examples":
     docker:
-      - image: roboterclubaachen/xpcc-build:latest
+      - image: modm/modm-build:latest
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python2.7/dist-packages/scons-2.5.1"
@@ -87,7 +87,7 @@ jobs:
 
   "stm32f3-examples":
     docker:
-      - image: roboterclubaachen/xpcc-build:latest
+      - image: modm/modm-build:latest
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python2.7/dist-packages/scons-2.5.1"
@@ -101,7 +101,7 @@ jobs:
 
   "stm32f4_discovery-examples":
     docker:
-      - image: roboterclubaachen/xpcc-build:latest
+      - image: modm/modm-build:latest
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python2.7/dist-packages/scons-2.5.1"
@@ -115,7 +115,7 @@ jobs:
 
   "stm32f4-examples":
     docker:
-      - image: roboterclubaachen/xpcc-build:latest
+      - image: modm/modm-build:latest
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python2.7/dist-packages/scons-2.5.1"
@@ -129,7 +129,7 @@ jobs:
 
   "stm32f7-examples":
     docker:
-      - image: roboterclubaachen/xpcc-build:latest
+      - image: modm/modm-build:latest
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python2.7/dist-packages/scons-2.5.1"
@@ -143,7 +143,7 @@ jobs:
 
   "stm32l4-examples":
     docker:
-      - image: roboterclubaachen/xpcc-build:latest
+      - image: modm/modm-build:latest
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python2.7/dist-packages/scons-2.5.1"
@@ -157,7 +157,7 @@ jobs:
 
   "avr-examples":
     docker:
-      - image: roboterclubaachen/xpcc-build:latest
+      - image: modm/modm-build:latest
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python2.7/dist-packages/scons-2.5.1"
@@ -171,7 +171,7 @@ jobs:
 
   "lpcxpresso-examples":
     docker:
-      - image: roboterclubaachen/xpcc-build:latest
+      - image: modm/modm-build:latest
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python2.7/dist-packages/scons-2.5.1"
@@ -186,7 +186,7 @@ jobs:
 
   "generic-examples":
     docker:
-      - image: roboterclubaachen/xpcc-build:latest
+      - image: modm/modm-build:latest
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python2.7/dist-packages/scons-2.5.1"
@@ -200,7 +200,7 @@ jobs:
 
   "linux-examples":
     docker:
-      - image: roboterclubaachen/xpcc-build:latest
+      - image: modm/modm-build:latest
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python2.7/dist-packages/scons-2.5.1"
@@ -214,7 +214,7 @@ jobs:
 
   "devices":
     docker:
-      - image: roboterclubaachen/xpcc-build:latest
+      - image: modm/modm-build:latest
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python2.7/dist-packages/scons-2.5.1"
@@ -228,7 +228,7 @@ jobs:
 
   "scripts-python2.7":
     docker:
-      - image: roboterclubaachen/xpcc-build:latest
+      - image: modm/modm-build:latest
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python2.7/dist-packages/scons-2.5.1"
@@ -243,7 +243,7 @@ jobs:
 
   "scripts-python3":
     docker:
-      - image: roboterclubaachen/xpcc-build:latest
+      - image: modm/modm-build:latest
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python2.7/dist-packages/scons-2.5.1"
