@@ -67,7 +67,8 @@ InOut inOut;
 
 // ----------------------------------------------------------------------------
 // create a list of all possible actions
-FLASH_STORAGE(xpcc::sab::Action actionList[]) =
+// FIXME: FLASH_STORAGE()
+const xpcc::sab::Action actionList[] =
 {
 	SAB__ACTION( 'A', analogDigital,	AnalogDigital::readChannel,	1 ),
 	SAB__ACTION( 'D', inOut,			InOut::setDirection,		1 ),

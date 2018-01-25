@@ -95,8 +95,9 @@ namespace
 	};
 	
 	TestingObject testingObject;
-	
-	FLASH_STORAGE(xpcc::sab::Action actionList[]) =
+
+	// FIXME: FLASH_STORAGE for AVR
+	const xpcc::sab::Action actionList[] =
 	{
 		SAB__ACTION(0x01, testingObject, TestingObject::emptyFunction, 0),
 		SAB__ACTION(0x02, testingObject, TestingObject::responseFunction, 0),
