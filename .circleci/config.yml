@@ -130,6 +130,150 @@ jobs:
           command: |
             (cd examples && ../tools/scripts/examples_compile.sh linux zmq)
 
+  avr-compile-all:
+    docker:
+      - image: modm/modm-build:latest
+    environment:
+      - LANG: "en_US.UTF-8"
+      - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
+      - SCONSFLAGS: "-j3"
+    steps:
+      - checkout
+      - run: git submodule sync && git submodule update --init
+      - run:
+          name: Compile HAL for all AVRs
+          command: |
+            (cd test/all && python3 run_all.py at)
+      - store_artifacts:
+          path: test/all/log
+          destination: log
+
+  stm32f0-compile-all:
+    docker:
+      - image: modm/modm-build:latest
+    environment:
+      - LANG: "en_US.UTF-8"
+      - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
+      - SCONSFLAGS: "-j3"
+    steps:
+      - checkout
+      - run: git submodule sync && git submodule update --init
+      - run:
+          name: Compile HAL for all STM32F0
+          command: |
+            (cd test/all && python3 run_all.py stm32f0)
+      - store_artifacts:
+          path: test/all/log
+          destination: log
+
+  stm32f1-compile-all:
+    docker:
+      - image: modm/modm-build:latest
+    environment:
+      - LANG: "en_US.UTF-8"
+      - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
+      - SCONSFLAGS: "-j3"
+    steps:
+      - checkout
+      - run: git submodule sync && git submodule update --init
+      - run:
+          name: Compile HAL for all STM32F1
+          command: |
+            (cd test/all && python3 run_all.py stm32f1)
+      - store_artifacts:
+          path: test/all/log
+          destination: log
+
+  stm32f2-compile-all:
+    docker:
+      - image: modm/modm-build:latest
+    environment:
+      - LANG: "en_US.UTF-8"
+      - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
+      - SCONSFLAGS: "-j3"
+    steps:
+      - checkout
+      - run: git submodule sync && git submodule update --init
+      - run:
+          name: Compile HAL for all STM32F2
+          command: |
+            (cd test/all && python3 run_all.py stm32f2)
+      - store_artifacts:
+          path: test/all/log
+          destination: log
+
+  stm32f3-compile-all:
+    docker:
+      - image: modm/modm-build:latest
+    environment:
+      - LANG: "en_US.UTF-8"
+      - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
+      - SCONSFLAGS: "-j3"
+    steps:
+      - checkout
+      - run: git submodule sync && git submodule update --init
+      - run:
+          name: Compile HAL for all STM32F3
+          command: |
+            (cd test/all && python3 run_all.py stm32f3)
+      - store_artifacts:
+          path: test/all/log
+          destination: log
+
+  stm32f4-compile-all:
+    docker:
+      - image: modm/modm-build:latest
+    environment:
+      - LANG: "en_US.UTF-8"
+      - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
+      - SCONSFLAGS: "-j3"
+    steps:
+      - checkout
+      - run: git submodule sync && git submodule update --init
+      - run:
+          name: Compile HAL for all STM32F4
+          command: |
+            (cd test/all && python3 run_all.py stm32f4)
+      - store_artifacts:
+          path: test/all/log
+          destination: log
+
+  stm32f7-compile-all:
+    docker:
+      - image: modm/modm-build:latest
+    environment:
+      - LANG: "en_US.UTF-8"
+      - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
+      - SCONSFLAGS: "-j3"
+    steps:
+      - checkout
+      - run: git submodule sync && git submodule update --init
+      - run:
+          name: Compile HAL for all STM32F7
+          command: |
+            (cd test/all && python3 run_all.py stm32f7)
+      - store_artifacts:
+          path: test/all/log
+          destination: log
+
+  stm32l4-compile-all:
+    docker:
+      - image: modm/modm-build:latest
+    environment:
+      - LANG: "en_US.UTF-8"
+      - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
+      - SCONSFLAGS: "-j3"
+    steps:
+      - checkout
+      - run: git submodule sync && git submodule update --init
+      - run:
+          name: Compile HAL for all STM32L4
+          command: |
+            (cd test/all && python3 run_all.py stm32l4)
+      - store_artifacts:
+          path: test/all/log
+          destination: log
+
 workflows:
   version: 2
   build:
@@ -141,3 +285,35 @@ workflows:
       - avr-examples
       - stm32f0/f1-examples
       - generic-examples
+
+      - avr-compile-all:
+          requires:
+            - unittests
+            - avr-examples
+      - stm32f0-compile-all:
+          requires:
+            - unittests
+            - stm32f0/f1-examples
+      - stm32f1-compile-all:
+          requires:
+            - unittests
+            - stm32f0/f1-examples
+      - stm32f2-compile-all:
+          requires:
+            - unittests
+      - stm32f3-compile-all:
+          requires:
+            - unittests
+            - stm32f3/l4/f7-examples
+      - stm32f4-compile-all:
+          requires:
+            - unittests
+            - stm32f4-examples
+      - stm32f7-compile-all:
+          requires:
+            - unittests
+            - stm32f3/l4/f7-examples
+      - stm32l4-compile-all:
+          requires:
+            - unittests
+            - stm32f3/l4/f7-examples
