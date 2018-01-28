@@ -29,7 +29,10 @@
 import re, os, sys
 import xml.etree.ElementTree as et
 import xml.parsers.expat
-import configparser
+try:
+	import configparser
+except:
+	import ConfigParser as configparser
 import SCons.Node
 import SCons.Errors
 
