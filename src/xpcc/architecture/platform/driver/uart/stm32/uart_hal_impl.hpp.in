@@ -54,7 +54,7 @@ xpcc::stm32::{{ name }}::enable()
 	// reset timer
 	RCC->APB2RSTR |=  RCC_APB2RSTR_{{ peripheral }}RST;
 	RCC->APB2RSTR &= ~RCC_APB2RSTR_{{ peripheral }}RST;
-%% elif id in [2, 3, 4, 5]
+%% elif id in [2, 3, 4, 5, 7, 8]
 	// FIXME: there seems to be a bug in the stm32f3xxlib which does not provide
 	//        the necessary RCC_APB1ENR_UART5EN define and probably defines
 	//        RCC_APB1ENR_UART4EN incorrectly (0x00100000 instead of 0x00080000)
@@ -75,7 +75,7 @@ xpcc::stm32::{{ name }}::disable()
 %% if id in [1, 6]
 	// disable clock
 	RCC->APB2ENR &= ~RCC_APB2ENR_{{ peripheral }}EN;
-%% elif id in [2, 3, 4, 5]
+%% elif id in [2, 3, 4, 5, 7, 8]
 	// FIXME: there seems to be a bug in the stm32f3xxlib which does not provide
 	//        the necessary RCC_APB1ENR_UART5EN define and probably defines
 	//        RCC_APB1ENR_UART4EN incorrectly (0x00100000 instead of 0x00080000)
