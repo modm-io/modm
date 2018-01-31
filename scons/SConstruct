@@ -26,7 +26,13 @@ env.Defines()
 
 # find all source files
 env.Append(CPPPATH = ['.'])
-files = env.FindFiles('.')
+
+# Ignore source file in cmake-build-debug/ directory
+cmake_build_files = []
+for cmake_file in env.FindFiles('cmake-build-debug').sources:
+    cmake_build_files.append(str(cmake_file))
+
+files = env.FindFiles('.', ignore=cmake_build_files)
 
 # add manually specified sources as well
 if 'extrasources' in env['XPCC_CONFIG']['build']:
