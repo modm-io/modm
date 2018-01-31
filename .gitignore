@@ -21,3 +21,10 @@ src/libxpcc.a
 *.config
 *.includes
 *.files
+
+# CMake
+CMakeLists.txt
+**/cmake-build-debug/
+
+#Clion
+**/.idea/
