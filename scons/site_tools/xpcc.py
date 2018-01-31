@@ -442,6 +442,7 @@ def generate(env, **kw):
 
 	env.Tool('git')
 	env.Tool('qtcreator')
+	env.Tool('cmake_wrapper')
 
 	env.FindDeviceFile()
 

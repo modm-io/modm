@@ -68,6 +68,7 @@ env.Alias('size', env.Size(program))
 env.Alias('symbols', env.Symbols(program))
 env.Alias('defines', env.ShowDefines())
 env.Alias('qtcreator', env.QtCreatorProject(files))
+env.Alias('cmakewrapper', env.CMakeWrapper(files))
 
 if env.CheckArchitecture('hosted'):
     env.Alias('build', program)
