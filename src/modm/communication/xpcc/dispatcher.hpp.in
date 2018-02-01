@@ -50,7 +50,7 @@ namespace xpcc
 
 	private:
 		/// Does not handle requests which are not acknowledge.
-		void
+		bool
 		handlePacket(const Header& header, const modm::SmartPointer& payload);
 
 		/// Sends messages which are waiting in the list.

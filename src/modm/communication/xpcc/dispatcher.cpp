@@ -44,13 +44,12 @@ xpcc::Dispatcher::update()
 		}
 		else
 		{
-			this->handlePacket(header, payload);
+			const bool is_response = this->handlePacket(header, payload);
 			if (!header.isAcknowledge && header.destination != 0)
-			{
-				if (postman->isComponentAvailable(header.destination)) {
-					this->sendAcknowledge(header);
-				}
-			}
+            {
+            	if (is_response or postman->isComponentAvailable(header.destination))
+                    this->sendAcknowledge(header);
+            }
 		}
 
 		this->backend->dropPacket();
@@ -97,10 +96,11 @@ xpcc::Dispatcher::Entry::headerFits(const Header& inHeader) const
 			(inHeader.packetIdentifier == this->header.packetIdentifier));
 }
 
-void
+bool
 xpcc::Dispatcher::handlePacket(const Header& header,
 		const modm::SmartPointer& payload)
 {
+	bool ack = false;
 	auto entry = this->entries.begin();
 	while(entry != this->entries.end())
 	{
@@ -110,7 +110,7 @@ xpcc::Dispatcher::handlePacket(const Header& header,
 			if (entry->headerFits(header))
 			{
 				entry = this->entries.remove(entry);
-				return;
+				return ack;
 			}
 		}
 		else if (entry->type == Entry::Type::Callback)
@@ -134,17 +134,19 @@ xpcc::Dispatcher::handlePacket(const Header& header,
 					// response or negative response
 					if (!header.isAcknowledge) {
 						entry->callbackResponse(header, payload);
+						ack = true;
 					} else {
 						// cannot happen, since responses with callbacks are
 						// not possible
 					}
 					entry = this->entries.remove(entry);
 				}
-				return;
+				return ack;
 			}
 		}
 		++entry;
 	}
+	return ack;
 }
 
 xpcc::Dispatcher::EntryIterator
