@@ -29,34 +29,28 @@ namespace platform
 {
 
 /// @cond
-// Forward declarations
-class GpioOutput{{ port ~ pin }};
-class GpioInput{{ port ~ pin }};
 class Gpio{{ port ~ pin }};
+using GpioOutput{{ port ~ pin }} = Gpio{{ port ~ pin }};
+using GpioInput{{ port ~ pin }}  = Gpio{{ port ~ pin }};
 /// @endcond
 
-// Gpio Classes created from the XML Device File Gpio Description
-%% for type in ["IO", "Output", "Input"]
-	%% set gname = "Gpio" ~  (type if type != "IO" else "") ~ port ~ pin
-	%% set superclass = "Gpio" ~ type
-
-/// {{type}} class for Pin {{port ~ pin}}
+/// IO class for Pin {{port ~ pin}}
 /// @ingroup	{{partname}}_gpio
-struct {{gname}} : public Gpio, ::modm::{{superclass}}
+struct Gpio{{ port ~ pin }} : public Gpio, ::modm::GpioIO
 {
 public:
-	using Output = GpioOutput{{ port ~ pin }};
-	using Input = GpioInput{{ port ~ pin }};
+	using Output = Gpio{{ port ~ pin }};
+	using Input = Gpio{{ port ~ pin }};
 	using IO = Gpio{{ port ~ pin }};
 	using Type = Gpio{{ port ~ pin }};
 	/// Port name.
 	static constexpr Port port = Port::{{port}};
 	/// Pin Number.
 	static constexpr uint8_t pin = {{pin}};
-	/// Bitmask for registers that contain a 1bit value for every pin.
-	static constexpr uint16_t mask  = 0x1 << pin;
 
 protected:
+	/// Bitmask for registers that contain a 1bit value for every pin.
+	static constexpr uint16_t mask  = 0x1 << pin;
 	static constexpr uint8_t cr_pin = {{ pin }} % 8;
 	/// Bitmask for the configuration register with a 4bit mask.
 	static constexpr uint32_t mask4 = 0xf << (cr_pin * 4);
@@ -73,7 +67,6 @@ protected:
 	}
 
 public:
-	%% if type in ["IO" , "Output"]
 	// GpioOutput
 	// start documentation inherited
 	modm_always_inline static void setOutput() {
@@ -110,8 +103,6 @@ public:
 		configure(type, speed);
 		setOutput();
 	}
-	%% endif
-	%% if type in ["IO", "Input"]
 	// GpioInput
 	// start documentation inherited
 	modm_always_inline static void
@@ -193,7 +184,6 @@ public:
 		// Flags are cleared by writing a one to the flag position.
 		EXTI->PR |= mask;
 	}
-	%% endif
 	// GpioIO
 	// start documentation inherited
 	inline static Direction getDirection() {
@@ -220,34 +210,23 @@ public:
 	};
 
 public:
-	%% if type == "IO"
 	template< Peripheral peripheral >
 	struct BitBang { static void connect();
 		static_assert(
 			(peripheral == Peripheral::BitBang),
 			"Gpio{{ port ~ pin }}::BitBang only connects to software drivers!");
 	};
-		%% for signal_name, signal_group in signals.items()
+	%% for signal_name, signal_group in signals.items()
 	template< Peripheral peripheral >
 	struct {{ signal_name }} { static void connect();
 		static_assert(
-			%% for signal in signal_group
+		%% for signal in signal_group
 			(peripheral == Peripheral::{{ signal.driver }}){% if loop.last %},{% else %} ||{% endif %}
-			%% endfor
+		%% endfor
 			"Gpio{{ port ~ pin }}::{{ signal_name }} only connects to {% for signal in signal_group %}{{signal.driver}}{% if not loop.last %} or {% endif %}{% endfor %}!");
 	};
-		%% endfor
-	%% else
-	template< Peripheral peripheral >
-	using BitBang = IO::BitBang<peripheral>;
-		%% for signal_name in signals
-	template< Peripheral peripheral >
-	using {{ signal_name }} = IO::{{ signal_name }}<peripheral>;
-		%% endfor
-	%% endif
+	%% endfor
 };
-
-%% endfor
 
 template<>
 struct Gpio{{ port ~ pin }}::BitBang<Peripheral::BitBang>

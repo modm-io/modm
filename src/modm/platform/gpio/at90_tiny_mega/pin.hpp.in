@@ -35,19 +35,14 @@ namespace platform
 {
 
 /// @cond
-// Forward declarations
-class GpioOutput{{ port ~ pin }};
-class GpioInput{{ port ~ pin }};
 class Gpio{{ port ~ pin }};
+using GpioOutput{{ port ~ pin }} = Gpio{{ port ~ pin }};
+using GpioInput{{ port ~ pin }}  = Gpio{{ port ~ pin }};
 /// @endcond
 
-%% for type in ["IO", "Output", "Input"]
-	%% set gname = "Gpio" ~ (type if type != "IO" else "") ~ port ~ pin
-	%% set superclass = "Gpio" ~ type
-
-/// {{type}} class for Pin {{port ~ pin}}
+/// IO class for Pin {{port ~ pin}}
 /// @ingroup	{{partname}}_gpio
-class {{gname}} : public Gpio, public ::modm::{{superclass}}
+class Gpio{{ port ~ pin }} : public Gpio, public ::modm::GpioIO
 {
 public:
 	using Output = GpioOutput{{ port ~ pin }};
@@ -62,7 +57,7 @@ public:
 	static constexpr uint8_t mask = (1 << pin);
 
 public:
-	%% if type in ["IO", "Output"]
+	// GpioOutput
 	modm_always_inline static void setOutput(bool status) {
 		setOutput();
 		set(status);
@@ -96,8 +91,7 @@ public:
 	modm_always_inline static bool isSet() {
 		return (PORT{{port}} & mask);
 	}
-	%% endif
-	%% if type in ["IO", "Input"]
+	// GpioInput
 	modm_always_inline static void configure(InputType type) {
 		if (type == InputType::PullUp) {
 		%% if pue
@@ -180,7 +174,7 @@ public:
 		PCIFR |= (1 << PCIF{{af_reg}});
 	}
 		%% endif
-	%% endif
+	// GpioIO
 	modm_always_inline static Direction getDirection() {
 		return (DDR{{port}} & mask) ? Direction::Out : Direction::In;
 	}
@@ -195,34 +189,23 @@ public:
 	}
 
 public:
-	%% if type == "IO"
 	template< Peripheral peripheral >
 	struct BitBang { static void connect();
 		static_assert(
 			(peripheral == Peripheral::BitBang),
 			"Gpio{{ port ~ pin }}::BitBang only connects to bit-bang drivers!");
 	};
-		%% for signal_name, signal_group in signals.items()
+	%% for signal_name, signal_group in signals.items()
 	template< Peripheral peripheral >
 	struct {{ signal_name }} { static void connect();
 		static_assert(
-			%% for signal in signal_group
+		%% for signal in signal_group
 			(peripheral == Peripheral::{{ signal.driver }}){% if loop.last %},{% else %} ||{% endif %}
-			%% endfor
+		%% endfor
 			"Gpio{{ port ~ pin }}::{{ signal_name }} only connects to {% for signal in signal_group %}{{signal.driver}}{% if not loop.last %} or {% endif %}{% endfor %}!");
 	};
-		%% endfor
-	%% else
-	template< Peripheral peripheral >
-	using BitBang = IO::BitBang<peripheral>;
-		%% for signal_name in signals
-	template< Peripheral peripheral >
-	using {{ signal_name }} = IO::{{ signal_name }}<peripheral>;
-		%% endfor
-	%% endif
+	%% endfor
 };
-
-%% endfor
 
 template<>
 struct Gpio{{ port ~ pin }}::BitBang<Peripheral::BitBang>

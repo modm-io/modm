@@ -28,13 +28,9 @@ namespace platform
  *
  * Example:
  * @code
- * #include <modm/platform/platform.hpp>
- *
- * typedef GpioInverted< GpioOutputB0 > Led;
- *
- * ...
+ * using Led = GpioInverted<GpioOutputB0>;
  * Led::setOutput();
- * Led::reset();
+ * Led::reset(); // -> maps to GpioOutputB0::set()
  * @endcode
  *
  * @author	Fabian Greif
@@ -50,40 +46,46 @@ public:
 	using Type = typename Pin::Type;
 
 public:
-	modm_always_inline static void
-	setOutput()
-	{
-		Pin::setOutput();
-	}
+	using Pin::setOutput;
+	using Pin::set;
+	using Pin::reset;
+	using Pin::read;
+	using Pin::isSet;
 
-	modm_always_inline static void
+	inline static void
 	setOutput(bool value)
 	{
 		Pin::setOutput(!value);
 	}
 
-	modm_always_inline static void
+	inline static void
 	set()
 	{
 		Pin::reset();
 	}
 
-	modm_always_inline static void
+	inline static void
 	set(bool value)
 	{
 		Pin::set(!value);
 	}
 
-	modm_always_inline static void
+	inline static void
 	reset()
 	{
 		Pin::set();
 	}
 
-	modm_always_inline static bool
+	inline static bool
 	read()
 	{
 		return !Pin::read();
+	}
+
+	inline static bool
+	isSet()
+	{
+		return !Pin::isSet();
 	}
 };
 
