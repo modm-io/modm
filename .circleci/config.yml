@@ -29,6 +29,17 @@ jobs:
           command: |
             scons unittest
 
+      - run:
+          name: scons qtcreator and cmake wrapper generator
+          command: |
+            cd examples/stm32f4_discovery/blink
+            scons
+            scons qtcreator
+            scons cmakewrapper
+            cmake -Bcmake-build-debug/ -H.
+            cd cmake-build-debug/
+            make scons-all
+
   "stm32-unittests":
     docker:
       - image: modm/modm-build:latest
