@@ -248,7 +248,9 @@ xpcc::Dispatcher::handleWaitingMessages()
 			{
 				if (entry->tries >= 2)
 				{
-					// TODO do sth to notify the user
+                    Header header = entry->header;
+                    header.type = Header::Type::TIMEOUT;
+                    entry->callbackResponse(header, entry->payload);
 					entry = this->entries.remove(entry);
 					continue;
 				}

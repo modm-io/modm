@@ -36,6 +36,7 @@ namespace xpcc
 			REQUEST,
 			RESPONSE,
 			NEGATIVE_RESPONSE,
+			TIMEOUT,
 		};
 
 	public:

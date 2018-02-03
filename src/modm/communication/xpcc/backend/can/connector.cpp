@@ -37,6 +37,9 @@ xpcc::CanConnectorBase::convertToIdentifier(const Header & header,
 		case xpcc::Header::Type::NEGATIVE_RESPONSE:
 			identifier = 2;
 			break;
+		case xpcc::Header::Type::TIMEOUT:
+			identifier = 3;
+			break;
 	}
 
 	identifier = identifier << 1;
@@ -90,6 +93,9 @@ xpcc::CanConnectorBase::convertToHeader(const uint32_t & identifier,
 			break;
 		case 0x10:
 			header.type = xpcc::Header::Type::NEGATIVE_RESPONSE;
+			break;
+		case 0x18:
+			header.type = xpcc::Header::Type::TIMEOUT;
 			break;
 		default:
 			// unknown type

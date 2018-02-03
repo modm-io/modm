@@ -23,6 +23,21 @@ def prepare(module, options):
         ":math:utils",
         ":processing:resumable",
         ":processing:timer")
+
+    module.add_option(
+        NumericOption(
+            name="timeout.acknowledge",
+            description="Timeout in ms of an reception acknowledgement",
+            minimum=10, maximum=10000,
+            default=100))
+
+    module.add_option(
+        NumericOption(
+            name="timeout.response",
+            description="Timeout in ms of an request response",
+            minimum=10, maximum=10000,
+            default=200))
+
     return True
 
 def build(env):
@@ -44,3 +59,4 @@ def build(env):
 
     env.copy(".", ignore=env.ignore_patterns(*ignore))
     env.copy("../xpcc.hpp")
+    env.template("dispatcher.hpp.in")

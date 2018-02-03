@@ -39,8 +39,8 @@ namespace xpcc
 	class Dispatcher
 	{
 	public:
-		static const uint16_t acknowledgeTimeout = 500;
-		static const uint16_t responseTimeout = 100;
+		static const uint16_t acknowledgeTimeout = {{ options["timeout.acknowledge"] }};
+		static const uint16_t responseTimeout = {{ options["timeout.response"] }};
 
 	public:
 		Dispatcher(BackendInterface *backend, Postman* postman);
