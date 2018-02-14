@@ -214,6 +214,10 @@ private:
 
 	xpcc_always_inline static void
 	setAlternateFunction(AlternateFunction alt) {
+		%% if ascr_register is defined
+		{{reg}}->ASCR &= ~mask;
+		%% endif
+
 		{{reg}}->AFR[af_id] = ({{reg}}->AFR[af_id] & ~af_mask)
 								| (i(alt) << af_offset);
 		{{reg}}->MODER = ({{reg}}->MODER   & ~mask2)
@@ -224,8 +228,9 @@ private:
 	xpcc_always_inline static void
 	setAnalogInput() {
 		{{reg}}->MODER |= i(Mode::Analog) << (pin * 2);
-		%% if target is stm32l4
-		{{reg}}->ASCR |= (1 << pin);
+
+		%% if ascr_register is defined
+		{{reg}}->ASCR |= mask;
 		%% endif
 	}
 
@@ -250,6 +255,10 @@ public:
 	// GpioOutput
 	// start documentation inherited
 	xpcc_always_inline static void setOutput() {
+		%% if ascr_register is defined
+		{{reg}}->ASCR &= ~mask;
+		%% endif
+
 		{{reg}}->MODER   = ({{reg}}->MODER   & ~mask2) | (i(Mode::Output)<< pin * 2);
 	}
 	xpcc_always_inline static void setOutput(bool status) {
@@ -296,6 +305,9 @@ public:
 		// reset output type and speed
 		{{reg}}->OTYPER  &= ~mask;
 		{{reg}}->OSPEEDR &= ~mask2;
+		%% if ascr_register is defined
+		{{reg}}->ASCR &= ~mask;
+		%% endif
 	}
 	xpcc_always_inline static bool read() {
 		return ({{reg}}->IDR & mask);
@@ -422,6 +434,9 @@ public:
 		{{reg}}->OTYPER  &= ~mask;
 		{{reg}}->OSPEEDR &= ~mask2;
 		{{reg}}->PUPDR &= ~mask2;
+		%% if ascr_register is defined
+		{{reg}}->ASCR &= ~mask;
+		%% endif
 		%% else
 		setInput(InputType::Floating);
 		%% endif
@@ -586,9 +601,15 @@ class GpioPortBase<Gpio::Port::{{port.name}}, StartPin, Width, PortOrder> : publ
 
 public:
 	xpcc_always_inline static void setOutput() {
+		%% if ascr_register is defined
+		GPIO{{port.name}}->ASCR &= ~portMask;
+		%% endif
 		GPIO{{port.name}}->MODER = (GPIO{{port.name}}->MODER & ~portMask2) | port01;
 	}
 	xpcc_always_inline static void setInput() {
+		%% if ascr_register is defined
+		GPIO{{port.name}}->ASCR &= ~portMask;
+		%% endif
 		GPIO{{port.name}}->MODER &= ~portMask2;
 	}
 	inline static void

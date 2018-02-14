@@ -5,5 +5,7 @@
 		<!-- Template: file that needs to be turned into a source file -->
 		<template>gpio.hpp.in</template>
 		<template>gpio_enable.cpp.in</template>
+
+		<ascr_register device-family="l4" device-name="471|475|476|485|486">True</ascr_register>
 	</driver>
 </rca>
