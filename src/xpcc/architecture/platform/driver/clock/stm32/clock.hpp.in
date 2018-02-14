@@ -87,6 +87,10 @@ public:
 		Hsi48 = RCC_CFGR_SW_HSI48,
 		InternalClockMHz48 = Hsi48,
 %% endif
+%% if target is stm32l4
+		Msi = RCC_CFGR_SW_MSI,
+		MultiSpeedInternalClock = Msi,
+%% endif
 
 		InternalClock = Hsi,
 		ExternalClock = Hse,

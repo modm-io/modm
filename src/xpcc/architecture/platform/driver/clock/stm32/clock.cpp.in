@@ -126,7 +126,7 @@ xpcc::stm32::ClockControl::enableLowSpeedExternalCrystal(uint32_t waitCycles)
 	return retval;
 }
 
-%% if target is stm32f2 or target is stm32f4 or target is stm32f7 or target is stm32l4
+%% if target is stm32f2 or target is stm32f4 or target is stm32f7
 // ----------------------------------------------------------------------------
 bool
 xpcc::stm32::ClockControl::enablePll(PllSource source, uint8_t pllM,
@@ -153,6 +153,54 @@ xpcc::stm32::ClockControl::enablePll(PllSource source, uint8_t pllM,
 
 	// PLLQ (24) divider for USB frequency; (0-15)
 	tmp |= (((uint32_t) pllQ) << 24) & RCC_PLLCFGR_PLLQ;
+
+	RCC->PLLCFGR = tmp;
+
+	// enable pll
+	RCC->CR |= RCC_CR_PLLON;
+
+	while (not (tmp = (RCC->CR & RCC_CR_PLLRDY)) and --waitCycles)
+		;
+
+	return tmp;
+}
+%% elif target is stm32l4
+// ----------------------------------------------------------------------------
+bool
+xpcc::stm32::ClockControl::enablePll(PllSource source, uint8_t pllM,
+	uint16_t pllN, uint8_t pllR, uint8_t pllQ, uint32_t waitCycles)
+{
+	uint32_t tmp = 0;
+
+	// Read reserved values and clear all other values
+	tmp = RCC->PLLCFGR & ~(RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLM
+			| RCC_PLLCFGR_PLLN | RCC_PLLCFGR_PLLPEN | RCC_PLLCFGR_PLLP
+%% if sai2clkdiv is defined
+			| RCC_PLLCFGR_PLLPDIV
+%% endif
+			| RCC_PLLCFGR_PLLQEN | RCC_PLLCFGR_PLLQ
+			| RCC_PLLCFGR_PLLREN | RCC_PLLCFGR_PLLR);
+
+	// PLLSRC source for pll and for pllsai1
+	tmp |= static_cast<uint32_t>(source);
+
+	// PLLM (4) = factor is user defined VCO input frequency must be configured between 4MHz and 16Mhz
+	tmp |= ((uint32_t) (pllM - 1) << 4) & RCC_PLLCFGR_PLLM;
+
+	// PLLN (8) = factor is user defined
+	tmp |= (((uint32_t) pllN) << 8) & RCC_PLLCFGR_PLLN;
+
+	// PLLQ (21) divider for USB frequency; (00: PLLQ = 2, 01: PLLQ = 4, etc.)
+	tmp |= (((uint32_t) (pllQ / 2) - 1) << 21) & RCC_PLLCFGR_PLLQ;
+
+	// PLLR (25) divider for CPU frequency; (00: PLLR = 2, 01: PLLR = 4, etc.)
+	tmp |= (((uint32_t) (pllR / 2) - 1) << 25) & RCC_PLLCFGR_PLLR;
+
+	// enable pll CPU clock output
+	tmp |= RCC_PLLCFGR_PLLREN;
+
+	// enable pll USB clock output
+	tmp |= RCC_PLLCFGR_PLLQEN;
 
 	RCC->PLLCFGR = tmp;
 

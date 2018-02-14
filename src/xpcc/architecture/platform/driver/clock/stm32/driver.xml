@@ -15,6 +15,8 @@
 		<pllprediv device-family="f0|f3">True</pllprediv>
 		<pllprediv device-name="100|105|107">True</pllprediv>
 		<hsi48 device-name="042|048|071|072|078|091|098">True</hsi48>
+		<sai2clkdiv device-family="l4" device-name="431|432|433|442|443|451|452|462|496">True</sai2clkdiv>
+		<sai2clkdiv device-family="l4" device-name="4a6|4r5|4r7|4r9|4s5|4s7|4s9">True</sai2clkdiv>
 
 		<hsi_frequency device-family="f0|f1|f3">8</hsi_frequency>
 		<hsi_frequency device-family="f2|f4|l4|f7">16</hsi_frequency>
