@@ -20,8 +20,13 @@
 	%% set id_common_u = '3_4_COMMON'
 %% endif
 %% elif target is stm32l4
-	%% set id_common = '123'
-	%% set id_common_u = '123_COMMON'
+	%% if target.name in ['471','475','476','485','486', '496', '4a6']
+		%% set id_common = '123'
+		%% set id_common_u = '123_COMMON'
+	%% else
+		%% set id_common = '1'
+		%% set id_common_u = '1_COMMON'
+	%% endif
 %% endif
 %% if target is stm32f3
 	%% set adc_ccr = 'ADC12_CCR'
