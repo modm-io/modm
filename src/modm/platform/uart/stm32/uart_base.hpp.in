@@ -23,6 +23,12 @@
 #define	USART_BRR_DIV_MANTISSA	USART_BRR_DIV_Mantissa
 #define	USART_BRR_DIV_FRACTION	USART_BRR_DIV_Fraction
 %% endif
+%% if tcbgt
+#define USART_CR1_TXEIE   USART_CR1_TXEIE_TXFNFIE
+#define USART_CR1_RXNEIE  USART_CR1_RXNEIE_RXFNEIE
+#define USART_ISR_RXNE    USART_ISR_RXNE_RXFNE
+#define USART_ISR_TXE     USART_ISR_TXE_TXFNF
+%% endif
 
 /**
 * @ingroup 	{{partname}}

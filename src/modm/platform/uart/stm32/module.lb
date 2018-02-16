@@ -51,6 +51,7 @@ class Instance(Module):
         properties["partname"] = device.partname
         properties["id"] = self.instance
         properties["driver"] = self.driver
+        properties["features"] = self.driver["feature"] if "feature" in self.driver else []
 
         if properties["target"]["family"] == "f0":
             properties["apb"] = "2" if self.instance in [1, 6, 7, 8] else "1"
@@ -101,6 +102,7 @@ def build(env):
     drivers = (device.get_all_drivers("usart") + device.get_all_drivers("uart"))
     properties["extended_driver"] = ("extended" in drivers[0]["type"])
     properties["over8_sampling"] = ("feature" in drivers[0]) and ("over8" in drivers[0]["feature"])
+    properties["tcbgt"] = ("feature" in drivers[0]) and ("tcbgt" in drivers[0]["feature"])
 
     env.substitutions = properties
     env.outbasepath = "src/modm/platform/uart"
