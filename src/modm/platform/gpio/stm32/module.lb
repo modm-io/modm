@@ -27,13 +27,20 @@ def port_ranges(gpios):
 def letter_to_num(letter):
     return ord(letter[0].lower()) - ord("a")
 
+def translate(s):
+    name = ""
+    for part in s.split("_"):
+        name += part.capitalize()
+    return name
+
 def get_driver(s):
-    name = s["driver"].capitalize()
-    if "instance" in s: name += s["instance"].capitalize();
+    name = "None"
+    if "driver" in s: name = translate(s["driver"]);
+    if "instance" in s: name += translate(s["instance"]);
     return name
 
 def get_name(s):
-    return s["name"].capitalize()
+    return translate(s["name"])
 
 def extract_signals(signals):
     afs = {}
@@ -217,9 +224,9 @@ def pre_build(env):
     # FIXME: Allow accessing device file more freely
     all_drivers = [d for d in device._properties["driver"] if d["name"] not in ["gpio", "core"]]
     for d in all_drivers:
-        dname = d["name"].capitalize()
+        dname = translate(d["name"])
         if "instance" in d:
-            all_peripherals.extend([dname + i.capitalize() for i in d["instance"]])
+            all_peripherals.extend([dname + translate(i) for i in d["instance"]])
         else:
             all_peripherals.append(dname)
     if "remap" in driver:
