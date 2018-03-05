@@ -10,8 +10,6 @@
 
   <options>
     <option name=":target">stm32f100rbt</option>
-
-    <option name=":platform:fault.cortex:led">C8</option>
   </options>
   <modules>
     <module>modm:board.disco-f100rb</module>

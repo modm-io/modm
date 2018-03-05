@@ -12,7 +12,6 @@
     <option name=":target">stm32l476rgt</option>
 
     <option name=":platform:uart:2:buffer.tx">2048</option>
-    <option name=":platform:fault.cortex:led">A5</option>
   </options>
   <modules>
     <module>modm:board.nucleo-l476rg</module>

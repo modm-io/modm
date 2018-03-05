@@ -34,7 +34,7 @@ def prepare(module, options):
     module.add_option(
         EnumerationOption(
             name="led",
-            description="",
+            description="Toggle an LED on the specified pin",
             enumeration=pins + ["disabled"],
             default="disabled"))
 

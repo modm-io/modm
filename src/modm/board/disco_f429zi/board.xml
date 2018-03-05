@@ -10,8 +10,6 @@
 
   <options>
     <option name=":target">stm32f429zit</option>
-
-    <option name=":platform:fault.cortex:led">G14</option>
   </options>
   <modules>
     <module>modm:board.disco-f429zi</module>

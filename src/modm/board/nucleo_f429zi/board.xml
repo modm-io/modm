@@ -12,7 +12,6 @@
     <option name=":target">stm32f429zit</option>
 
     <option name=":platform:uart:3:buffer.tx">2048</option>
-    <option name=":platform:fault.cortex:led">B7</option>
   </options>
   <modules>
     <module>modm:board.nucleo-f429zi</module>

@@ -51,12 +51,7 @@ PROVIDE(__rom_start = ORIGIN(FLASH));
 PROVIDE(__rom_end   = ORIGIN(FLASH) + LENGTH(FLASH));
 
 /* the thread stack is used only for reporting hard fault conditions! It may therefore be small. */
-%% if hardfault_led == "disabled"
-	%% set pss = 0
-%% else
-	%% set pss = 32
-%% endif
-PROCESS_STACK_SIZE  = {{ pss }};
+PROCESS_STACK_SIZE  = {{ process_stack_size }};
 /* the handler stack is used for main program as well as interrupts */
 MAIN_STACK_SIZE     = {{ options.main_stack_size }};
 /* combined stack size */

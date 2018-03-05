@@ -12,7 +12,6 @@
     <option name=":target">stm32f031k6t</option>
 
     <option name=":platform:uart:1:buffer.tx">256</option>
-    <option name=":platform:fault.cortex:led">B3</option>
     <option name=":platform:core:main_stack_size">992</option>
     <option name=":platform:core:allocator">block</option>
   </options>

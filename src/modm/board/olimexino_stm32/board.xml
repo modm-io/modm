@@ -12,7 +12,6 @@
     <option name=":target">stm32f103rbt</option>
 
     <option name=":platform:uart:1:buffer.tx">2048</option>
-    <option name=":platform:fault.cortex:led">A5</option>
   </options>
   <modules>
     <module>modm:board.olimexino-stm32</module>

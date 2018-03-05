@@ -10,8 +10,6 @@
 
   <options>
     <option name=":target">stm32l476vgt</option>
-
-    <option name=":platform:fault.cortex:led">B2</option>
   </options>
   <modules>
     <module>modm:board.disco-l476vg</module>

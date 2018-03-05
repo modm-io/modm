@@ -32,8 +32,7 @@ def prepare(module, options):
         ":architecture:memory",
         ":architecture:unaligned",
         ":cmsis:device",
-        ":platform:clock.cortex",
-        ":platform:fault.cortex")
+        ":platform:clock.cortex")
 
     module.add_option(
         EnumerationOption(
@@ -95,7 +94,9 @@ def build(env):
     # Cortex-M0 does not have remappable vector table, so it will remain in Flash
     properties["vector_table_location"] = env.get_option(":::vector_table_location", "rom")
     properties["core"] = driver["type"]
-    properties["hardfault_led"] = env.get_option(":platform:fault.cortex:led", "disabled")
+    properties["process_stack_size"] = 0
+    if env.get_option(":platform:fault.cortex:led", None):
+        properties["process_stack_size"] = 32
 
     # Add ARM Cortex-M exceptions
     interrupts = {
