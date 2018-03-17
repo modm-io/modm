@@ -31,44 +31,64 @@ def filter_subtype(value):
 
 def filter_constructor(class_, default=True):
 	if default:
-		return "%s()" % filter.typeName(class_.name)
+		return "constexpr %s()" % filter.typeName(class_.name)
 	else:
 		parameter = []
+		is_constexpr = True
 		for item in class_.iter():
+			type = filter.typeName(item.subtype.name)
 			if item.subtype.isArray:
-				raise builder.BuilderException("Array handling is incomplete " \
-						"right now! Could not generate code for %s" % item)
-			else:
-				type = filter.typeName(item.subtype.name)
-				name = filter.variableName(item.name)
-				
-				parameter.append("%s %s" % (type, name))
-		
+				type += " *"
+				is_constexpr = False
+			name = filter.variableName(item.name)
+
+			parameter.append("%s %s" % (type, name))
+
 		if len(parameter) > 0:
-			return "%s(%s)" % (filter.typeName(class_.name), ", ".join(parameter))
+			return "%s%s(%s)" % ("constexpr " if is_constexpr else "", filter.typeName(class_.name), ", ".join(parameter))
 		else:
 			return ""
 
 def filter_initialization_list(class_, default=True):
 	initList = []
 	for item in class_.iter():
-		if item.subtype.isArray:
-			raise builder.BuilderException("Array handling is incomplete " \
-					"right now! Could not generate code for %s" % item)
+		type = filter.typeName(item.subtype.name)
+		name = filter.variableName(item.name)
+		if item.value is not None:
+			defaultValue = item.value
+		else :
+			defaultValue = ''
+
+		if default:
+			initList.append("%s(%s)" % (name, defaultValue))
 		else:
-			type = filter.typeName(item.subtype.name)
-			name = filter.variableName(item.name)
-			if item.value is not None:
-				defaultValue = item.value
-			else :
-				defaultValue = ''
-			
-			if default:
-				initList.append("%s(%s)" % (name, defaultValue))
-			else:
-				initList.append("%s(%s)" % (name, name))
-	
-	return ", ".join(initList)
+			if item.subtype.isArray: continue;
+			initList.append("%s(%s)" % (name, name))
+
+	if len(initList):
+		return ": " + ", ".join(initList)
+	return ""
+
+def filter_array_constructor(class_, default=True):
+	if default: return "";
+
+	memcpyList = []
+	for item in class_.iter():
+		if not item.subtype.isArray: continue;
+		name = filter.variableName(item.name)
+		type = filter.typeName(item.subtype.name)
+		count = item.subtype.count;
+
+		memcpyList.append("memcpy(this->%s, %s, %s * sizeof(%s));" % (name, name, count, type))
+
+	return " ".join(memcpyList)
+
+def filter_constexpr_constructor(class_, default=True):
+	if not default:
+		for item in class_.iter():
+			if item.subtype.isArray: return False;
+
+	return True
 
 # -----------------------------------------------------------------------------
 class TypeBuilder(builder_base.Builder):
@@ -132,7 +152,9 @@ class TypeBuilder(builder_base.Builder):
 			'typeName': filter.typeName,
 			'subtype': filter_subtype,
 			'generateConstructor': filter_constructor,
-			'generateInitializationList': filter_initialization_list
+			'generateArrayCopyCode': filter_array_constructor,
+			'generateInitializationList': filter_initialization_list,
+			'isConstexprConstructor': filter_constexpr_constructor
 		}
 		
 		template_header = self.template('templates/robot_packets.hpp.tpl', filter=cppFilter)

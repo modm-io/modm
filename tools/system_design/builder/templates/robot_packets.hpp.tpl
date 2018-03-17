@@ -21,6 +21,7 @@
 
 #include <stdint.h>
 #include <cstdlib>
+#include <cstring>
 #include <modm/io/iostream.hpp>
 #include <modm/container/smart_pointer.hpp>
 
@@ -90,12 +91,12 @@ namespace {{ namespace }}
 	{% elif packet.isStruct %}
 		struct {{ packet.name | typeName }}
 		{
-			constexpr {{ packet.flattened() | generateConstructor }}:
+			{{ packet.flattened() | generateConstructor }}
 				{{ packet.flattened() | generateInitializationList }} {}
 
 			{% if packet.flattened().size > 0 -%}
-			constexpr {{ packet.flattened() | generateConstructor(default=False) }} :
-				{{ packet.flattened() | generateInitializationList(default=False) }} {}
+			{{ packet.flattened() | generateConstructor(default=False) }}
+				{{ packet.flattened() | generateInitializationList(default=False) }} { {{ packet.flattened() | generateArrayCopyCode(default=False) }} }
 			{%- endif %}
 			{% for element in packet.flattened().iter() %}
 			{%- if element.description %}
