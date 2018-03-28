@@ -58,3 +58,4 @@ def build(env):
 
     if target["family"] in ["windows"]:
         env.log.warning("Delay functions are not implemented!")
+        env.log.warning("Assertions are not implemented!")

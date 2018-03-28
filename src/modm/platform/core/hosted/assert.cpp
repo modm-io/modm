@@ -48,10 +48,15 @@ modm_assert_fail(const char * identifier)
 
 void modm_assert_fail_context(const char * identifier, uintptr_t context)
 {
-	uint8_t state((uint8_t) Abandonment::DontCare);
 	const char * module = identifier;
 	const char * location = module + strlen(module) + 1;
 	const char * failure = location + strlen(location) + 1;
+#ifdef MODM_OS_WIN64
+	// __assertion_table is not implemented
+	modm_abandon(module, location, failure, context);
+	exit(1);
+#else
+	uint8_t state((uint8_t) Abandonment::DontCare);
 
 	AssertionHandler * handler = &__assertion_table_start;
 	for (; handler < &__assertion_table_end; handler++)
@@ -65,6 +70,7 @@ void modm_assert_fail_context(const char * identifier, uintptr_t context)
 		modm_abandon(module, location, failure, context);
 		exit(1);
 	}
+#endif
 }
 
 modm_weak
