@@ -339,7 +339,7 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 	} >{{memory}} AT >FLASH
 
 	/* uninitialized variables */
-	.bss :
+	.bss (NOLOAD) :
 	{
 		__bss_start = . ;
 		*(.bss .bss.* .gnu.linkonce.b.*)
