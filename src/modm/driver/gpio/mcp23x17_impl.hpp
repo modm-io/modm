@@ -20,6 +20,17 @@ modm::Mcp23x17<Transport>::Mcp23x17(uint8_t address) :
 {
 }
 
+template < class Transport >
+modm::ResumableResult<bool>
+modm::Mcp23x17<Transport>::initialize()
+{
+	RF_BEGIN();
+
+	RF_CALL(this->write(i(Register::IOCON), uint8_t(memory.controlA)));
+
+	RF_END_RETURN_CALL( Transport::read(i(Register::IODIR), buffer, sizeof(buffer)) );
+}
+
 // MARK: - Tasks
 template < class Transport >
 modm::ResumableResult<bool>

@@ -127,6 +127,9 @@ public:
 
 public:
 	modm::ResumableResult<bool>
+	initialize();
+
+	modm::ResumableResult<bool>
 	setOutput(Pins pins);
 
 	modm::ResumableResult<bool>
