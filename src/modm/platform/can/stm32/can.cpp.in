@@ -443,7 +443,7 @@ modm::platform::Can{{ id }}::getBusState()
 	if ({{ reg }}->ESR & CAN_ESR_BOFF) {
 		return BusState::Off;
 	}
-	else if ({{ reg }}->ESR & CAN_ESR_BOFF) {
+	else if ({{ reg }}->ESR & CAN_ESR_EPVF) {
 		return BusState::ErrorPassive;
 	}
 	else if ({{ reg }}->ESR & CAN_ESR_EWGF) {
