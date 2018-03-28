@@ -40,9 +40,14 @@ def build(env):
     env.substitutions = properties
     env.outbasepath = "src/modm/platform/uart"
 
+    # FIXME: Ignore serial_interface, serial_port for windows
+    ignore = ["*.lb"]
+    if env[":target"].identifier["family"] == "windows":
+        ignore.extend(["*/serial_interface*", "*/serial_port*"])
+
     env.append_metadata_unique("required_library", "boost_system")
-    env.append_metadata_unique("required_library", 
+    env.append_metadata_unique("required_library",
         "boost_thread" if env[":target"].identifier["family"] == "linux" else
         "boost_thread-mt")
 
-    env.copy(".", ignore=env.ignore_files("*.lb"))
+    env.copy(".", ignore=env.ignore_patterns(*ignore))
