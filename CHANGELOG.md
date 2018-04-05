@@ -50,10 +50,123 @@ pay attention to. Medium impact changes are also worth looking at.
 
 </details>
 
+## 2018-04-05: 2018q1 release
+
+This release covers everything from the 2017q4 release on 2018-01-07 and has been
+tested with avr-gcc v7.2.0 and arm-none-eabi-gcc 2017q4 from Arm.
+
+Breaking changes:
+
+- No breaking changes.
+
+Major features:
+
+- ADC implementation for STM32F0
+- Block device interface and implementations
+- CMake wrapper generator
+- STM32L4 PLL configuration
+
+Major fixes:
+
+- Better Python 2/3 compatibility
+- Fix HD44780 timing
+- Fix AMSYS5915 sensor readings computation
+
+Known bugs:
+
+- xpcc may generate separate IRQ handlers for shared interrupts. See [#88][].
+- GPIO `connect` on STM32F1 is still broken. See [#178][] for discussion.
+  The API from MODM will not be backported to xpcc however.
+- STM32F107 does not compile due to the HAL trying to remap USB. See [#268][].
+- SCons build system emits multiple non-critical warnings. See [#286][].
+- avr-gcc 7 complains about dynamic initialization put into program memory area. See [#314][].
+- Template encoding issues on Windows. See [#345][].
+
+New development board targets:
+
+- STM32F030F4P6 demo board as `stm32f030f4p6_demo_board`
+
+New device drivers:
+
+- SPI Flash SST block device
+- Memory block device
+- File block device (hosted)
+- Mirrored block device
+
+Many thanks to all our contributors:
+
+- Álan Crístoffer ([@acristoffers][])
+- Antal Szabó ([@Sh4rK][])
+- Christopher Durand ([@chris-durand][])
+- Niklas Hauser ([@salkinium][])
+- Raphael Lehmann ([@rleh][])
+
+PR [#347][] -> [2018q1][].
+
+<details>
+<summary>Detailed changelog</summary>
+
+#### 2018-04-05: Implement STM32L4 PLL configuration
+
+PR [#346][] -> [270d578][] with **medium-impact** on STM32L4 targets.  
+Tested in hardware by [@chris-durand][].
+
+#### 2018-01-30: CMake wrapper generator
+
+Basic support for generating CMake projects files.
+
+PR [#344][] -> [3490430][].
+
+#### 2018-01-28: Add STM32F030F4P6 demo board
+
+PR [#341][] -> [00ad2da][].  
+Tested in hardware by [@rleh][].
+
+#### 2018-01-28: Fix Uart7 and Uart8
+
+PR [#340][] -> [95233ba][] with low-impact on STM32 targets.  
+Tested in hardware by [@chris-durand][].
+
+#### 2018-01-28: Fixes for AMSYS5915 driver
+
+PR [#339][] -> [4656fd4][] with low-impact on AMSYS5915 driver.  
+Tested in hardware by [@chris-durand][].
+
+#### 2018-01-20: Fix timing in HD44780 driver
+
+PR [#336][] -> [0cedee1][].  
+Tested in hardware by [@Sh4rK][].
+
+#### 2018-01-16: Python2/3 compatibility improvements
+
+PR [#322][] -> [34ffb86][].
+
+#### 2018-01-14: Add a block device interface and several drivers
+
+Drivers to store data in a SPI SST flash `xpcc::BdSpiFlash`, to store data in a
+file (on hosted) `xpcc::BdFile` and to store data in RAM (for testing purposes)
+`xpcc::BdHeap` are included.
+Additionally, `xpcc::BdMirror` is a virtual block device that behaves like
+RAID1 devices.
+
+PR [#328][] -> [a945513][].  
+Tested in hardware by [@rleh][].
+
+#### 2018-01-13: Remove TravisCI in favour of CircleCI
+
+PR [#330][] -> [658cb81][].
+
+#### 2018-01-11: Adds ADC support for STM32 F0
+
+PR [#327][] -> [aad8d40][] with low impact on STM32F0 targets.  
+Tested in hardware by [@acristoffers][].
+
+</details>
+
 ## 2018-01-07: 2017q4 release
 
 This release covers everything from the 2017q3 release on 2017-10-01 and has been
-tested with avr-gcc v5.4.0 from Atmel and arm-none-eabi-gcc 2017q4 from Arm. 
+tested with avr-gcc v5.4.0 from Atmel and arm-none-eabi-gcc 2017q4 from Arm.
 
 Breaking changes:
 
@@ -955,6 +1068,7 @@ we have to do it manually. Hooray for technology.
 [2017q2]: https://github.com/roboterclubaachen/xpcc/releases/tag/2017q2
 [2017q3]: https://github.com/roboterclubaachen/xpcc/releases/tag/2017q3
 [2017q4]: https://github.com/roboterclubaachen/xpcc/releases/tag/2017q4
+[2018q1]: https://github.com/roboterclubaachen/xpcc/releases/tag/2018q1
 
 <!-- Contributors -->
 [@7Kronos]: https://github.com/7Kronos
@@ -1056,14 +1170,28 @@ we have to do it manually. Hooray for technology.
 [#318]: https://github.com/roboterclubaachen/xpcc/pull/318
 [#320]: https://github.com/roboterclubaachen/xpcc/pull/320
 [#322]: https://github.com/roboterclubaachen/xpcc/pull/322
+[#322]: https://github.com/roboterclubaachen/xpcc/pull/322
 [#324]: https://github.com/roboterclubaachen/xpcc/pull/324
 [#325]: https://github.com/roboterclubaachen/xpcc/pull/325
 [#326]: https://github.com/roboterclubaachen/xpcc/pull/326
+[#327]: https://github.com/roboterclubaachen/xpcc/pull/327
+[#328]: https://github.com/roboterclubaachen/xpcc/pull/328
+[#330]: https://github.com/roboterclubaachen/xpcc/pull/330
+[#336]: https://github.com/roboterclubaachen/xpcc/pull/336
+[#339]: https://github.com/roboterclubaachen/xpcc/pull/339
+[#340]: https://github.com/roboterclubaachen/xpcc/pull/340
+[#341]: https://github.com/roboterclubaachen/xpcc/pull/341
+[#344]: https://github.com/roboterclubaachen/xpcc/pull/344
+[#345]: https://github.com/roboterclubaachen/xpcc/pull/345
+[#346]: https://github.com/roboterclubaachen/xpcc/pull/346
+[#347]: https://github.com/roboterclubaachen/xpcc/pull/347
 
 <!-- Commits -->
+[00ad2da]: https://github.com/roboterclubaachen/xpcc/commit/00ad2da
 [0118a13]: https://github.com/roboterclubaachen/xpcc/commit/0118a13
 [06b5af9]: https://github.com/roboterclubaachen/xpcc/commit/06b5af9
 [08784cd]: https://github.com/roboterclubaachen/xpcc/commit/08784cd
+[0cedee1]: https://github.com/roboterclubaachen/xpcc/commit/0cedee1
 [0dbf73c]: https://github.com/roboterclubaachen/xpcc/commit/0dbf73c
 [0dbf73c]: https://github.com/roboterclubaachen/xpcc/commit/0dbf73c
 [0e7e57f]: https://github.com/roboterclubaachen/xpcc/commit/0e7e57f
@@ -1072,8 +1200,11 @@ we have to do it manually. Hooray for technology.
 [170f53a]: https://github.com/roboterclubaachen/xpcc/commit/170f53a
 [2504682]: https://github.com/roboterclubaachen/xpcc/commit/2504682
 [26471ab]: https://github.com/roboterclubaachen/xpcc/commit/26471ab
+[270d578]: https://github.com/roboterclubaachen/xpcc/commit/270d578
 [29c8905]: https://github.com/roboterclubaachen/xpcc/commit/29c8905
 [2c898ae]: https://github.com/roboterclubaachen/xpcc/commit/2c898ae
+[3490430]: https://github.com/roboterclubaachen/xpcc/commit/3490430
+[34ffb86]: https://github.com/roboterclubaachen/xpcc/commit/34ffb86
 [3992534]: https://github.com/roboterclubaachen/xpcc/commit/3992534
 [3b47fa5]: https://github.com/roboterclubaachen/xpcc/commit/3b47fa5
 [3c7cd31]: https://github.com/roboterclubaachen/xpcc/commit/3c7cd31
@@ -1083,6 +1214,7 @@ we have to do it manually. Hooray for technology.
 [40da657]: https://github.com/roboterclubaachen/xpcc/commit/40da657
 [41ab22a]: https://github.com/roboterclubaachen/xpcc/commit/41ab22a
 [42837c7]: https://github.com/roboterclubaachen/xpcc/commit/42837c7
+[4656fd4]: https://github.com/roboterclubaachen/xpcc/commit/4656fd4
 [48d60e2]: https://github.com/roboterclubaachen/xpcc/commit/48d60e2
 [51159ff]: https://github.com/roboterclubaachen/xpcc/commit/51159ff
 [51491ad]: https://github.com/roboterclubaachen/xpcc/commit/51491ad
@@ -1093,6 +1225,7 @@ we have to do it manually. Hooray for technology.
 [6328b4a]: https://github.com/roboterclubaachen/xpcc/commit/6328b4a
 [637e074]: https://github.com/roboterclubaachen/xpcc/commit/637e074
 [63ad1d3]: https://github.com/roboterclubaachen/xpcc/commit/63ad1d3
+[658cb81]: https://github.com/roboterclubaachen/xpcc/commit/658cb81
 [680c92a]: https://github.com/roboterclubaachen/xpcc/commit/680c92a
 [68b904e]: https://github.com/roboterclubaachen/xpcc/commit/68b904e
 [68e73b3]: https://github.com/roboterclubaachen/xpcc/commit/68e73b3
@@ -1106,6 +1239,7 @@ we have to do it manually. Hooray for technology.
 [8cc5c78]: https://github.com/roboterclubaachen/xpcc/commit/8cc5c78
 [8f9b154]: https://github.com/roboterclubaachen/xpcc/commit/8f9b154
 [9018741]: https://github.com/roboterclubaachen/xpcc/commit/9018741
+[95233ba]: https://github.com/roboterclubaachen/xpcc/commit/95233ba
 [967c0a9]: https://github.com/roboterclubaachen/xpcc/commit/967c0a9
 [9940a65]: https://github.com/roboterclubaachen/xpcc/commit/9940a65
 [9d6620d]: https://github.com/roboterclubaachen/xpcc/commit/9d6620d
@@ -1115,6 +1249,8 @@ we have to do it manually. Hooray for technology.
 [a6519c3]: https://github.com/roboterclubaachen/xpcc/commit/a6519c3
 [a8a2322]: https://github.com/roboterclubaachen/xpcc/commit/a8a2322
 [a906c2d]: https://github.com/roboterclubaachen/xpcc/commit/a906c2d
+[a945513]: https://github.com/roboterclubaachen/xpcc/commit/a945513
+[aad8d40]: https://github.com/roboterclubaachen/xpcc/commit/aad8d40
 [b21f502]: https://github.com/roboterclubaachen/xpcc/commit/b21f502
 [b77294e]: https://github.com/roboterclubaachen/xpcc/commit/b77294e
 [bb3fa3a]: https://github.com/roboterclubaachen/xpcc/commit/bb3fa3a
