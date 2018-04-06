@@ -70,8 +70,8 @@ modm::atomic::Queue<T, N>::isNearlyEmpty() const
 {
 	static_assert(N > 3, "Not possible the check for 'nearly empty' of such a small queue. ");
 
-	uint8_t tmphead = modm::accessor::asVolatile(this->head);
-	uint8_t tmptail = modm::accessor::asVolatile(this->tail);
+	Index tmphead = modm::accessor::asVolatile(this->head);
+	Index tmptail = modm::accessor::asVolatile(this->tail);
 
 	Index stored;
 	if (tmphead >= tmptail) {
