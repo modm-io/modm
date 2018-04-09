@@ -31,12 +31,28 @@ path_mapping = [
     (r"tools/device_file_generator/", None),
     (r".*?/build\.cfg", None),
     (r"src/unittest_.*?\.cfg", None),
+    (r"templates/cmake/", r"tools/build_script_generator/cmake/"),
+    (r"scons/", None),
+    (r".*?/project.cfg", None),
+    (r"README\.md", None),
+    (r"PORTING\.md", None),
+    (r"CHANGELOG\.md", r"docs/CHANGELOG.md"),
+    (r".travis.*?", None),
+    (r".circleci/", None),
 ]
 
 diff_mapping = [
     (r"xpcc", r"modm"),
     (r"XPCC", r"MODM"),
-    (r"__", r"_"),
+    (r"(\w)__(\w)", r"\1_\2"),
+    (r"modm::SoftwareGpioPort", r"SoftwareGpioPort"),
+    (r"modm::GpioUnused", "GpioUnused"),
+    (r"modm::stm32", "modm::platform"),
+    (r"modm::atmega", "modm::platform"),
+    (r"modm::attiny", "modm::platform"),
+    (r"modm::avr", "modm::platform"),
+    (r"modm::at90", "modm::platform"),
+    (r"/roboterclubaachen/modm/", "/roboterclubaachen/xpcc/"),
 ]
 
 def map_path(path):
@@ -63,8 +79,8 @@ def map_diff(content, headerline):
         diff = re.sub(inp, out, diff)
     return content[:headerline] + diff.split("#newline#")
 
-with open(sys.argv[1], "r") as patchfile:
-    content = patchfile.read().decode("utf-8", errors="replace")
+with open(sys.argv[1], "r", errors="replace") as patchfile:
+    content = patchfile.read()
 
 files = [f.splitlines() for f in content.split("diff --git ")[1:]]
 files = [(f[0].split(" b")[0][1:], f[0].split(" b")[1], f[1:]) for f in files]
@@ -104,15 +120,16 @@ for src, dst, diff in files:
     else:
         if (msrc is None or mdst is None):
             continue
-        print("\n".join(mdiff).encode("utf-8"))
+        print("\n".join(mdiff))
 
 
 
 """
-1. git diff erstellen: git diff 29c8905 xpcc/develop -- . ':!ext' > xpcc-develop.diff
-2. git diff mit tools/xpcc_merge.py umschreiben: python tools/xpcc_merge.py xpcc-develop.diff > modm-develop.diff
+0. work on the modm develop branch
+1. git diff erstellen: git diff sha-since-last-merge xpcc/develop -- . ':!ext' > xpcc-develop.diff
+2. git diff mit tools/xpcc_merge.py umschreiben: python tools/scripts/xpcc_merge.py xpcc-develop.diff > modm-develop.diff
 3. work on the xpcc/develop branch: git checkout -b xpcc/develop
-4. alle neuen files aus xpcc/develop verschieben: python tools/xpcc_merge.py xpcc-develop.diff -d | zsh
+4. alle neuen files aus xpcc/develop verschieben: python tools/scripts/xpcc_merge.py xpcc-develop.diff -d | zsh
 5. git commit
 6. git checkout origin/develop
 7. git merge --no-ff xpcc/develop
@@ -120,5 +137,5 @@ for src, dst, diff in files:
 9. umgeschriebenen git diff anwenden: git apply --reject -v --recount modm-develop.diff
 10. alle diff rejects manuell auflösen (ist sehr viel Arbeit)
 11. git merge fertig machen
-12. copyright fixen: python3 tools/copyright.py -a -r sha > copyright_authors.txt
+12. copyright fixen: python3 tools/scripts/copyright.py -a -r sha-since-last-copyright-update > copyright_files.txt
 """
