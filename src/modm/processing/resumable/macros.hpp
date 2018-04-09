@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Kevin Läufer
- * Copyright (c) 2014-2015, 2017, Niklas Hauser
+ * Copyright (c) 2014-2015, 2017-2018, Niklas Hauser
  * Copyright (c) 2017, Raphael Lehmann
  * Copyright (c) 2018, Fabian Greif
  *

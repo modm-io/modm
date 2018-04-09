@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011, Fabian Greif
  * Copyright (c) 2012, 2014, Sascha Schade
- * Copyright (c) 2012-2017, Niklas Hauser
+ * Copyright (c) 2012-2018, Niklas Hauser
  *
  * This file is part of the modm project.
  *

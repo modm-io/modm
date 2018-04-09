@@ -2,6 +2,7 @@
 // ----------------------------------------------------------------------------
 /*
  * Copyright (c) 2017, Christopher Durand
+ * Copyright (c) 2018, Niklas Hauser
  *
  * This file is part of the modm project.
  *

@@ -1,7 +1,8 @@
 /*
- * Copyright (c) 2015-2017, Niklas Hauser
+ * Copyright (c) 2015-2018, Niklas Hauser
  * Copyright (c) 2016, Fabian Greif
- * Copyright (c) 2016, Sascha Schade
+ * Copyright (c) 2016-2017, Sascha Schade
+ * Copyright (c) 2018, Antal Szabó
  *
  * This file is part of the modm project.
  *

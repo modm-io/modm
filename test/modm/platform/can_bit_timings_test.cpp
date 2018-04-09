@@ -2,6 +2,7 @@
  * Copyright (c) 2016, Antal Szabó
  * Copyright (c) 2016, Kevin Läufer
  * Copyright (c) 2017, Fabian Greif
+ * Copyright (c) 2018, Niklas Hauser
  *
  * This file is part of the modm project.
  *

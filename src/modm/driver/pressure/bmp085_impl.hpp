@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2015, Niklas Hauser
+ * Copyright (c) 2012-2015, 2018, Niklas Hauser
  * Copyright (c) 2014, 2016, Sascha Schade
  *
  * This file is part of the modm project.

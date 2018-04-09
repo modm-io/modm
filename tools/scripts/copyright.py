@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Copyright (c) 2017, Niklas Hauser
-# Copyright (c) 2017, Fabian Greif
+# Copyright (c) 2018, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -37,6 +36,7 @@ comment_styles = {
     ".py": "#",
     ".cfg": ".py",
     ".lb": ".py",
+    ".sh": ".py",
     "SConstruct": ".py",
     "SConscript": ".py",
     "SConstruct.in": ".py",
@@ -67,7 +67,7 @@ def resolve_comment_style(style_or_filename):
             if isinstance(style, tuple): return style;
             if style not in comment_styles: break;
     print("Error: Unknown style or filename '{}'!".format(style_or_filename))
-    exit(1)
+    # exit(1)
     return None
 
 ignored_endings = [
@@ -87,6 +87,9 @@ ignored_endings = [
     ".pbm",
     ".font",
     ".xml",
+    ".txt",
+    ".txt.in",
+    "doxyfile",
 
     "README",
     "TODO",
@@ -122,6 +125,7 @@ copyright_format = "Copyright (c) {years}, {author}"
 
 # some commits contaminate the history by doing large scale file moves or changes
 ignored_shas = {
+    "9abe715": [], # Update copyright headers.
     # "2814009": ["Fabian Greif"], # Merge changes from xpcc 'develop' into modm
     "b791589": [], # Move all new files since to modm paths.
     "8e4a47f": [], # Add 'ext/ros_lib/'
@@ -283,6 +287,7 @@ def compactify_years(years):
     return years
 
 def format_copyright_header(authors, style):
+    if style is None: return "";
     lines = []
     # sort names by start of copyright date, then alphabetically
     for author in sorted(authors.keys(), key=lambda a: (min(authors[a]), max(authors[a]), a)):

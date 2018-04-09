@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, Niklas Hauser
+ * Copyright (c) 2016-2018, Niklas Hauser
  * Copyright (c) 2017, Nick Sarten
  * Copyright (c) 2017, Sascha Schade
  *

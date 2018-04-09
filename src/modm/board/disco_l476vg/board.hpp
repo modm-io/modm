@@ -1,7 +1,8 @@
 // coding: utf-8
 /*
- * Copyright (c) 2017, Niklas Hauser
  * Copyright (c) 2017, Sascha Schade
+ * Copyright (c) 2017-2018, Niklas Hauser
+ * Copyright (c) 2018, Antal Szabó
  *
  * This file is part of the modm project.
  *

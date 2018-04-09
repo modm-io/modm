@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017, Niklas Hauser
+ * Copyright (c) 2014-2018, Niklas Hauser
  * Copyright (c) 2015, Kevin Läufer
  * Copyright (c) 2015, Martin Esser
  *
