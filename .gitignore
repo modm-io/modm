@@ -25,6 +25,14 @@ src/libxpcc.a
 *.includes
 *.files
 
+# CMake
+CMakeLists.txt
+**/cmake-build-debug/
+
+#Clion
+**/.idea/
+
+# ignore generated code in the example folder
 examples/*/*/src
 examples/*/*/ext
 examples/*/*/link

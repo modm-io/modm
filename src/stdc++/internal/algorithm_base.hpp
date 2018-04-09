@@ -27,7 +27,7 @@ namespace std
 	 * preprocessor macro.
 	 */
 	template<typename T>
-	inline const T&
+	constexpr inline const T&
 	min(const T& a, const T& b)
 	{
 		if (b < a)
@@ -48,7 +48,7 @@ namespace std
 	 * preprocessor macro.
 	 */
 	template<typename T>
-	inline const T&
+	constexpr inline const T&
 	max(const T& a, const T& b)
 	{
 		if (a < b)
@@ -69,7 +69,7 @@ namespace std
 	 * once, unlike a preprocessor macro.
 	 */
 	template<typename T, typename Compare>
-	inline const T&
+	constexpr inline const T&
 	min(const T& a, const T& b, Compare compare)
 	{
 		if (compare(b, a))
@@ -90,7 +90,7 @@ namespace std
 	 * once, unlike a preprocessor macro.
 	 */
 	template<typename T, typename Compare>
-	inline const T&
+	constexpr inline const T&
 	max(const T& a, const T& b, Compare compare)
 	{
 		if (compare(a, b))

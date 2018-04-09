@@ -70,6 +70,19 @@ class Atomic(Module):
         env.copy("driver/atomic.hpp")
 # -----------------------------------------------------------------------------
 
+class BlockDevice(Module):
+    def init(self, module):
+        module.name = "block.device"
+
+    def prepare(self, module, options):
+        module.depends(":processing:resumable")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "src/modm/architecture"
+        env.copy("interface/block_device.hpp")
+# -----------------------------------------------------------------------------
+
 class Can(Module):
     def init(self, module):
         module.name = "can"
@@ -294,6 +307,7 @@ def prepare(module, options):
     module.add_submodule(Adc())
     module.add_submodule(Assert())
     module.add_submodule(Atomic())
+    module.add_submodule(BlockDevice())
     module.add_submodule(Can())
     module.add_submodule(Clock())
     module.add_submodule(Delay())

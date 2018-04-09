@@ -192,12 +192,14 @@ modm::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 4>::write(uint8_t data)
 	E::set();
 	modm::delayMicroseconds(1);
 	E::reset();
+	modm::delayNanoseconds(10);
 
 	DATA::write(data);
 
 	E::set();
 	modm::delayMicroseconds(1);
 	E::reset();
+	modm::delayNanoseconds(10);
 }
 
 template <typename DATA, typename RW, typename RS, typename E>
@@ -220,6 +222,7 @@ modm::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 4>::read()
 	modm::delayMicroseconds(1);
 	data = DATA::read();
 	E::reset();
+	modm::delayNanoseconds(10);
 
 	data <<= 4;
 
@@ -227,6 +230,7 @@ modm::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 4>::read()
 	modm::delayMicroseconds(1);
 	data |= DATA::read();
 	E::reset();
+	modm::delayNanoseconds(10);
 
 	return data;
 }
@@ -243,6 +247,7 @@ modm::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 8>::write(uint8_t data)
 	E::set();
 	modm::delayMicroseconds(1);
 	E::reset();
+	modm::delayNanoseconds(500);
 }
 
 template <typename DATA, typename RW, typename RS, typename E>
@@ -265,6 +270,7 @@ modm::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 8>::read()
 	modm::delayMicroseconds(1);
 	data = DATA::read();
 	E::reset();
+	modm::delayNanoseconds(500);
 
 	return data;
 }

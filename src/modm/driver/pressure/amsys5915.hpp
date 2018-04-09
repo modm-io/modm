@@ -32,6 +32,18 @@ struct amsys5915
 		friend class Amsys5915;
 
 	public:
+		uint16_t
+		getPressureRaw()
+		{
+			// mask undefined bits
+			data[0] &= 0b00111111;
+
+			auto rData = reinterpret_cast<const uint16_t*>(data);
+			const uint16_t pressureRaw{modm::fromBigEndian(*rData)};
+
+			return pressureRaw;
+		}
+
 		/**
 		 * This method returns the pressure as a normalized float from 0-1.
 		 * You have to scale and offset this according to the specific sensor
@@ -44,12 +56,20 @@ struct amsys5915
 		float
 		getPressure()
 		{
-			// mask undefined bits
-			data[0] &= 0b00111111;
-			// Full scale span is 13107, with offset 1638
-			uint16_t *rData = reinterpret_cast<uint16_t*>(data);
-			uint16_t pressure = modm::fromBigEndian(*rData) - 1638;
-			return static_cast<float>(pressure) / 13107.f;
+			const uint16_t pressureRaw{getPressureRaw()};
+
+			// Full scale span is typically 13107, with offset 1638
+			// Caution: sensors may output values slightly exceeding the expected range!
+			const uint16_t offset{1638};
+			const uint16_t span{13107};
+
+			if(pressureRaw <= offset) {
+				return 0.f;
+			} else if (pressureRaw >= offset + span) {
+				return 1.f;
+			}
+
+			return static_cast<float>(pressureRaw - offset) / span;
 		}
 
 		/**
@@ -74,7 +94,7 @@ struct amsys5915
  *
  * The device runs a cyclic program, which will store a corrected pressure value with
  * 12 bit resolution about every 500 μs within the output registers of the internal ASIC.
- * 
+ *
  * Datasheet: http://www.amsys.de/sheets/amsys.de.ams5915.pdf
  *
  * @ingroup driver_pressure
@@ -86,12 +106,9 @@ class Amsys5915 : public amsys5915, public modm::I2cDevice<I2cMaster, 1, I2cRead
 public:
 	/**
 	 * @param	data	a amsys5915::Data object
-	 * @bug The address of the sensor is by factory default set to 0x28.
-	 *      This means you cannot use two AMSYS 5915 sensors on the same bus!
-	 *      You have to use a MUX or two seperate I2C busses.
 	 */
-	Amsys5915(Data &data)
-	:	I2cDevice<I2cMaster,1,I2cReadTransaction>(0x28), data(data)
+	Amsys5915(Data &data, uint8_t i2cAddress = 0x28)
+	:	I2cDevice<I2cMaster,1,I2cReadTransaction>(i2cAddress), data(data)
 	{
 		this->transaction.configureRead(data.data, 4);
 	}

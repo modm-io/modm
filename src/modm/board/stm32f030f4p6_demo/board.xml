@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance"
+         xsd:noNamespaceSchemaLocation="https://github.com/dergraaf/library-builder/lbuild/resources/configuration.xsd">
+  <repositories>
+    <repository>
+      <path>../../../../repo.lb</path>
+    </repository>
+    <cache>.lbuild_cache</cache>
+  </repositories>
+
+  <options>
+    <option name=":target">stm32f030f4p</option>
+  </options>
+  <modules>
+    <module>modm:board.stm32f030_demo</module>
+  </modules>
+</library>

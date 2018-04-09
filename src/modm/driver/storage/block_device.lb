@@ -1,0 +1,81 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2018, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+class BlockDeviceFile(Module):
+    def init(self, module):
+        module.name = "file"
+
+    def prepare(self, module, options):
+        module.depends(":architecture:block.device")
+        return (options[":target"].identifier["platform"] == "hosted")
+
+    def build(self, env):
+        env.outbasepath = "src/modm/driver/storage"
+        env.copy("block_device_file.hpp")
+        env.copy("block_device_file_impl.hpp")
+# -----------------------------------------------------------------------------
+
+class BlockDeviceHeap(Module):
+    def init(self, module):
+        module.name = "heap"
+
+    def prepare(self, module, options):
+        module.depends(":architecture:block.device", ":utils")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "src/modm/driver/storage"
+        env.copy("block_device_heap.hpp")
+        env.copy("block_device_heap_impl.hpp")
+# -----------------------------------------------------------------------------
+
+class BlockDeviceMirror(Module):
+    def init(self, module):
+        module.name = "mirror"
+
+    def prepare(self, module, options):
+        module.depends(":architecture:block.device")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "src/modm/driver/storage"
+        env.copy("block_device_mirror.hpp")
+        env.copy("block_device_mirror_impl.hpp")
+# -----------------------------------------------------------------------------
+
+class BlockDeviceSpiFlash(Module):
+    def init(self, module):
+        module.name = "spi.flash"
+
+    def prepare(self, module, options):
+        module.depends(":architecture:block.device", ":architecture:spi.device", ":architecture:register")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "src/modm/driver/storage"
+        env.copy("block_device_spiflash.hpp")
+        env.copy("block_device_spiflash_impl.hpp")
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.parent = "driver"
+    module.name = "block.device"
+
+def prepare(module, options):
+    module.add_submodule(BlockDeviceFile())
+    module.add_submodule(BlockDeviceHeap())
+    module.add_submodule(BlockDeviceMirror())
+    module.add_submodule(BlockDeviceSpiFlash())
+    return True
+
+def build(env):
+    pass

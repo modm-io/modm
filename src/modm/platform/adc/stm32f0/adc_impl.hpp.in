@@ -108,10 +108,6 @@ modm::stm32::Adc::setChannel(const Channel channel,
         ADC1_COMMON->CCR |= ADC_CCR_VREFEN;
     } else if (channel == Channel::Temperature) {
         ADC1_COMMON->CCR |= ADC_CCR_TSEN;
-    } else {
-        const uint32_t tbc = 0x3 << (2 * static_cast<uint32_t>(channel));
-        GPIOA->MODER |= tbc;
-        GPIOA->PUPDR &= ~tbc;
     }
 }
 
