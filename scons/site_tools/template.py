@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-# 
+#
 # Copyright (c) 2009, Roboterclub Aachen e.V.
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
+#
 #     * Redistributions of source code must retain the above copyright
 #       notice, this list of conditions and the following disclaimer.
 #     * Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
 #     * Neither the name of the Roboterclub Aachen e.V. nor the
 #       names of its contributors may be used to endorse or promote products
 #       derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
 # EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -45,20 +45,20 @@ generationBlockString = """/*
 def template_action(target, source, env):
 	if not env.has_key('substitutions'):
 		raise SCons.Errors.UserError("Use 'Template(..., substitutions = ...)'")
-	
+
 	source = source[0].abspath
 	target = target[0].abspath
-	
-	output = string.Template(open(source, 'r').read()).safe_substitute(env['substitutions'])
-	
-	open(target, 'w').write(output)
+
+	output = string.Template(open(source, 'r', encoding='utf-8').read()).safe_substitute(env['substitutions'])
+
+	open(target, 'w', encoding='utf-8').write(output)
 	return 0
 
 # -----------------------------------------------------------------------------
 def jinja2_template_action(target, source, env):
 	if not env.has_key('substitutions'):
 		raise SCons.Errors.UserError("Use 'Jinja2Template(..., substitutions = ...)'")
-	
+
 	try:
 		import jinja2
 	except ImportError:
@@ -70,7 +70,7 @@ def jinja2_template_action(target, source, env):
 		'match': re.match,
 		'generation_block': generationBlockString,
 	}
-	
+
 	def filter_wordwrap(value, width=79):
 		return '\n\n'.join([textwrap.fill(str, width) for str in value.split('\n\n')])
 
@@ -168,7 +168,7 @@ includeExpression = re.compile(r"(\{%|%%)\s+(import|include)\s+'(?P<file>\S+)'")
 def find_includes(file):
 	""" Find include directives in an .in file """
 	files = []
-	for line in open(file).readlines():
+	for line in open(file, encoding='utf-8').readlines():
 		match = includeExpression.search(line)
 		if match:
 			filename = match.group('file')
@@ -209,7 +209,7 @@ def generate(env, **kw):
 					skeys = ['.in']),
 			single_source = True
 		),
-		
+
 		'Jinja2Template':  env.Builder(
 			action = env.Action(jinja2_template_action, template_string),
 			emitter = template_emitter,
