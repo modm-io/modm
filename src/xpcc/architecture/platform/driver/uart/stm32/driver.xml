@@ -15,5 +15,18 @@
 		<parameter name="flow" type="bool">false</parameter>
 		<parameter name="tx_buffer" type="int" min="1" max="65534">250</parameter>
 		<parameter name="rx_buffer" type="int" min="1" max="65534">16</parameter>
+		<!-- shared Uart interrupt -->
+		<shared_irq device-family="f0" device-name="030" device-size-id="c">USART3_6</shared_irq>
+		<shared_irq device-family="f0" device-name="070|071|072" device-size-id="b">USART3_4</shared_irq>
+		<shared_irq device-family="f0" device-name="078">USART3_4</shared_irq>
+		<shared_irq device-family="f0" device-name="091" device-size-id="c">USART3_8</shared_irq>
+		<shared_irq device-family="f0" device-name="098">USART3_8</shared_irq>
+		<shared_irq device-family="l0">USART4_5</shared_irq>
+		<shared_irq_ids device-family="f0" device-name="030" device-size-id="c">3 4 5 6</shared_irq_ids>
+		<shared_irq_ids device-family="f0" device-name="070|071|072" device-size-id="b">3 4</shared_irq_ids>
+		<shared_irq_ids device-family="f0" device-name="078">3 4</shared_irq_ids>
+		<shared_irq_ids device-family="f0" device-name="091" device-size-id="c">3 4 5 6 7 8</shared_irq_ids>
+		<shared_irq_ids device-family="f0" device-name="098" >3 4 5 6 7 8</shared_irq_ids>
+		<shared_irq_ids device-family="l0">4 5</shared_irq_ids>
 	</driver>
 </rca>

@@ -12,6 +12,12 @@
 %%	set uart = "Uart"
 %% endif
 %% set hal = uart ~ "Hal" ~ id
+%#
+%% if shared_irq_ids is defined
+%%  set shared_irq_ids = shared_irq_ids.split(" ")
+%% else
+%%  set shared_irq_ids = []
+%% endif
 
 #ifndef XPCC_STM32_UART_{{ id }}_HPP
 #define XPCC_STM32_UART_{{ id }}_HPP
@@ -115,6 +121,11 @@ template< 	class SystemClock, uint32_t baudrate,
 
 	static std::size_t
 	discardReceiveBuffer();
+
+%% if id | string in shared_irq_ids
+	static void
+	irq();
+%% endif
 };
 
 }	// namespace stm32

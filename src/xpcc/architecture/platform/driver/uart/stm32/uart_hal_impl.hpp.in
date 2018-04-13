@@ -25,6 +25,12 @@
 %%  set enr  = "ENR"
 %%  set rstr = "RSTR"
 %% endif
+%#
+%% if shared_irq_ids is defined
+%%  set shared_irq_ids = shared_irq_ids.split(" ")
+%% else
+%%  set shared_irq_ids = []
+%% endif
 
 #ifndef XPCC_STM32_UARTHAL_{{ id }}_HPP
 #	error 	"Don't include this file directly, use" \
@@ -233,8 +239,8 @@ xpcc::stm32::{{ name }}::isTransmitRegisterEmpty()
 void
 xpcc::stm32::{{ name }}::enableInterruptVector(bool enable, uint32_t priority)
 {
-%% if target is stm32f0 and id in [3,4]
-	%%set irq = "USART3_4"
+%% if id | string in shared_irq_ids
+	%%set irq = shared_irq
 %% else
 	%% set irq = peripheral
 %% endif

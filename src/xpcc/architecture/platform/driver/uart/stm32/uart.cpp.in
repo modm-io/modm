@@ -14,10 +14,22 @@
 %#
 %% set name = uart ~ id
 %% set hal = uart ~ "Hal" ~ id
+%#
+%% if shared_irq_ids is defined
+%%  set shared_irq_ids = shared_irq_ids.split(" ")
+%% else
+%%  set shared_irq_ids = []
+%% endif
 
 #include "../../../device.hpp"
 #include "uart_hal_{{ id }}.hpp"
 #include "uart_{{ id }}.hpp"
+
+%% if id == 4
+%% for s in shared_irq_ids
+#include "uart_{{ s }}.hpp"
+%% endfor
+%% endif
 
 %% if parameters.buffered
 #include <xpcc/architecture/driver/atomic.hpp>
@@ -192,7 +204,12 @@ xpcc::stm32::{{ name }}::discardReceiveBuffer()
 
 %% if parameters.buffered
 %% set hal = "xpcc::stm32::" ~ hal
+%% if id | string in shared_irq_ids
+void
+xpcc::stm32::{{ name }}::irq()
+%% else
 XPCC_ISR({{ uart | upper ~ id }})
+%% endif
 {
 	if ({{ hal }}::isReceiveRegisterNotEmpty()) {
 		// TODO: save the errors
@@ -210,5 +227,14 @@ XPCC_ISR({{ uart | upper ~ id }})
 			txBuffer.pop();
 		}
 	}
+}
+%% endif
+
+%% if id == 4
+XPCC_ISR({{ shared_irq }})
+{
+%% for s in shared_irq_ids
+    xpcc::stm32::Usart{{ s }}::irq();
+%% endfor
 }
 %% endif
