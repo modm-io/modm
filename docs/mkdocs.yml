@@ -1,0 +1,86 @@
+site_name: 'modm barebone embedded library'
+site_description: 'A modular C++14 library for barebone programming'
+site_author: 'Niklas Hauser'
+site_url: 'http://modm.io'
+
+# Repository
+repo_name: modm-io/modm
+repo_url: 'https://github.com/modm-io/modm'
+edit_uri: ""
+# dev_addr: 192.168.1.2:8000
+
+copyright: 'Copyright &copy 2018 Niklas Hauser & modm authors'
+
+# Turn around for GitHub Hosting in /docs
+docs_dir: 'src'
+site_dir: '../../modm.io/docs'
+extra_css: [extra.css]
+
+theme:
+  name: 'material'
+  include_search_page: false
+  search_index_only: true
+  palette:
+    primary: 'indigo'
+    accent: 'cyan'
+  # logo: '../images/logo.svg'
+  font:
+    text: 'Ubuntu'
+    code: 'Ubuntu Mono'
+  language: en
+  feature:
+    tabs: true
+
+extra:
+  social:
+    - type: github-alt
+      link: https://github.com/modm-io
+    - type: twitter
+      link: https://twitter.com/RCA_eV
+
+markdown_extensions:
+  - markdown.extensions.admonition
+  - markdown.extensions.codehilite:
+      guess_lang: false
+  - markdown.extensions.def_list
+  - markdown.extensions.footnotes
+  - markdown.extensions.meta
+  - markdown.extensions.toc:
+      permalink: true
+  - pymdownx.arithmatex
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_generator: !!python/name:pymdownx.emoji.to_svg
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+pages:
+  - Home:
+    - Introduction: index.md
+    - How modm works: how-modm-works.md
+    - Who we are: who-we-are.md
+  - Guide:
+    - Getting Started: guide/getting-started.md
+    - Installation: guide/installation.md
+    # - Qt Creator: guide/qtcreator.md
+    - Cookbook: guide/cookbook.md
+    - Testing: guide/testing.md
+  - Reference:
+    - Build Systems: reference/build-systems.md
+    # - Overview: reference/overview.md
+    # - Concepts: reference/concepts.md
+    - Modules:
+# moduletable
+    # - module: module.md
+# /moduletable

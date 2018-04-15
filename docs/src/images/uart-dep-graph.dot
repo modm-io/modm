@@ -1,0 +1,52 @@
+digraph dependencies
+{
+	subgraph modm
+	{
+		label = "modm";
+		node [style=filled, shape=box];
+
+		modm_architecture [label="modm:\narchitecture", style="filled,solid"];
+		modm_architecture_accessor [label="modm:\narchitecture:\naccessor", style="filled,solid"];
+		modm_architecture_atomic [label="modm:\narchitecture:\natomic", style="filled,solid"];
+		modm_architecture_gpio [label="modm:\narchitecture:\ngpio", style="filled,solid"];
+		modm_architecture_interrupt [label="modm:\narchitecture:\ninterrupt", style="filled,solid"];
+		modm_architecture_register [label="modm:\narchitecture:\nregister", style="filled,solid"];
+		modm_architecture_uart [label="modm:\narchitecture:\nuart", style="filled,solid"];
+		modm_io [label="modm:\nio", style="filled,solid"];
+		modm_math_utils [label="modm:\nmath:\nutils", style="filled,solid"];
+		modm_platform [label="modm:\nplatform", style="filled,solid"];
+		modm_platform_gpio [label="modm:\nplatform:\ngpio", style="filled,solid"];
+		modm_platform_gpio_common [label="modm:\nplatform:\ngpio.common", style="filled,solid"];
+		modm_platform_uart [label="modm:\nplatform:\nuart", style="filled,bold"];
+		modm_utils [label="modm:\nutils", style="filled,solid"];
+	}
+	modm_architecture_accessor -> modm_architecture;
+	modm_architecture_accessor -> modm_io;
+	modm_architecture_atomic -> modm_architecture;
+	modm_architecture_atomic -> modm_architecture_accessor;
+	modm_architecture_atomic -> modm_utils;
+	modm_architecture_gpio -> modm_architecture;
+	modm_architecture_interrupt -> modm_architecture;
+	modm_architecture_register -> modm_architecture;
+	modm_architecture_register -> modm_io;
+	modm_architecture_register -> modm_math_utils;
+	modm_architecture_uart -> modm_architecture;
+	modm_io -> modm_architecture_accessor;
+	modm_io -> modm_math_utils;
+	modm_io -> modm_utils;
+	modm_math_utils -> modm_architecture;
+	modm_platform_gpio -> modm_architecture_gpio;
+	modm_platform_gpio -> modm_math_utils;
+	modm_platform_gpio -> modm_platform;
+	modm_platform_gpio -> modm_platform_gpio_common;
+	modm_platform_gpio_common -> modm_architecture_gpio;
+	modm_platform_gpio_common -> modm_platform;
+	modm_platform_gpio_common -> modm_utils;
+	modm_platform_uart -> modm_architecture_atomic;
+	modm_platform_uart -> modm_architecture_interrupt;
+	modm_platform_uart -> modm_architecture_register;
+	modm_platform_uart -> modm_architecture_uart;
+	modm_platform_uart -> modm_platform;
+	modm_platform_uart -> modm_platform_gpio;
+	modm_utils -> modm_architecture;
+}

@@ -5,7 +5,7 @@
 </p>
 <!--/webignore-->
 
-modm (Modular Object-oriented Development for Microcontrollers) is a toolbox for
+modm (pronounced like dial-up "modem") is a toolbox for
 building custom C++17 libraries tailored to your embedded device.
 modm generates startup code, HALs and their implementations, communication
 protocols, drivers for external devices, BSPs, etc… in a modular, customizable
@@ -40,7 +40,7 @@ The only thing we ask of you is to contribute your changes back so everyone bene
 Please clone modm recursively, you will need all the submodules.
 
 ```sh
-git clone --recursive https://github.com/modm-io/modm.git
+git clone --recurse-submodules https://github.com/modm-io/modm.git
 ```
 
 ## Features
@@ -66,9 +66,7 @@ git clone --recursive https://github.com/modm-io/modm.git
 
 ## Targets
 
-modm can generate code for <!--avrcount-->76<!--/avrcount--> AVR  and
-<!--stmcount-->858<!--/stmcount--> STM32 devices, however,
-there are different levels of support and testing.
+modm can generate code for <!--avrcount-->76<!--/avrcount--> AVR and <!--stmcount-->865<!--/stmcount--> STM32 devices, however, there are different levels of support and testing.
 
 <center>
 
@@ -109,30 +107,34 @@ documentation.
 <tr>
 <td align="center">AL-AVREB-CAN</td>
 <td align="center">Arduino Uno</td>
+<td align="center">Black Pill</td>
 <td align="center">Blue Pill</td>
-<td align="center">DISCO-F051R8</td>
 </tr><tr>
+<td align="center">DISCO-F051R8</td>
 <td align="center">DISCO-F072RB</td>
 <td align="center">DISCO-F100RB</td>
 <td align="center">DISCO-F303VC</td>
-<td align="center">DISCO-F407VG</td>
 </tr><tr>
+<td align="center">DISCO-F407VG</td>
 <td align="center">DISCO-F429ZI</td>
 <td align="center">DISCO-F469NI</td>
 <td align="center">DISCO-F746NG</td>
-<td align="center">DISCO-F769NI</td>
 </tr><tr>
+<td align="center">DISCO-F769NI</td>
 <td align="center">DISCO-L476VG</td>
 <td align="center">NUCLEO-F031K6</td>
+<td align="center">NUCLEO-F042K6</td>
+</tr><tr>
 <td align="center">NUCLEO-F103RB</td>
 <td align="center">NUCLEO-F303K8</td>
-</tr><tr>
 <td align="center">NUCLEO-F401RE</td>
 <td align="center">NUCLEO-F411RE</td>
-<td align="center">NUCLEO-F429ZI</td>
-<td align="center">NUCLEO-L476RG</td>
 </tr><tr>
+<td align="center">NUCLEO-F429ZI</td>
+<td align="center">NUCLEO-L432KC</td>
+<td align="center">NUCLEO-L476RG</td>
 <td align="center">OLIMEXINO-STM32</td>
+</tr><tr>
 <td align="center">STM32F030F4P6-DEMO</td>
 </tr>
 </table>
@@ -160,46 +162,47 @@ can easily configure them for you specific needs.
 </tr><tr>
 <td align="center">BME280</td>
 <td align="center">BMP085</td>
+<td align="center">DRV832X</td>
 <td align="center">DS1302</td>
 <td align="center">DS1631</td>
 <td align="center">DS18B20</td>
-<td align="center">EA-DOG</td>
 </tr><tr>
+<td align="center">EA-DOG</td>
 <td align="center">FT245</td>
 <td align="center">FT6X06</td>
 <td align="center">HCLAx</td>
 <td align="center">HD44780</td>
 <td align="center">HMC58x</td>
-<td align="center">HMC6343</td>
 </tr><tr>
+<td align="center">HMC6343</td>
 <td align="center">I2C-EEPROM</td>
 <td align="center">ITG3200</td>
 <td align="center">L3GD20</td>
 <td align="center">LAWICEL</td>
 <td align="center">LIS302DL</td>
-<td align="center">LIS3DSH</td>
 </tr><tr>
+<td align="center">LIS3DSH</td>
 <td align="center">LM75</td>
 <td align="center">LSM303A</td>
 <td align="center">LTC2984</td>
 <td align="center">MAX6966</td>
 <td align="center">MAX7219</td>
-<td align="center">MCP23X17</td>
 </tr><tr>
+<td align="center">MCP23X17</td>
 <td align="center">MCP2515</td>
 <td align="center">NOKIA5110</td>
 <td align="center">NRF24</td>
 <td align="center">TFT-DISPLAY</td>
 <td align="center">PCA8574</td>
-<td align="center">PCA9535</td>
 </tr><tr>
+<td align="center">PCA9535</td>
 <td align="center">PCA9685</td>
 <td align="center">SIEMENS-S65</td>
 <td align="center">SIEMENS-S75</td>
 <td align="center">SSD1306</td>
 <td align="center">TCS3414</td>
-<td align="center">TCS3472</td>
 </tr><tr>
+<td align="center">TCS3472</td>
 <td align="center">TMP102</td>
 <td align="center">TMP175</td>
 <td align="center">VL53L0</td>
