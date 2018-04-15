@@ -1,19 +1,15 @@
 [submodule "ext/st/stm32"]
 	path = ext/st/stm32
 	url = https://github.com/modm-io/cmsis-header-stm32.git
-	shallow = true
 [submodule "ext/modm-devices"]
 	path = ext/modm-devices
 	url = https://github.com/modm-io/modm-devices.git
-	shallow = true
 [submodule "ext/dlr/scons-build-tools"]
 	path = ext/dlr/scons-build-tools
 	url = https://github.com/modm-io/scons-build-tools.git
-	shallow = true
 [submodule "ext/ros/ros_lib"]
 	path = ext/ros/ros_lib
 	url = https://github.com/modm-io/xpcc_ros_lib.git
-	shallow = true
 [submodule "ext/arm/cmsis"]
 	path = ext/arm/cmsis
 	url = https://github.com/modm-io/CMSIS_5.git
