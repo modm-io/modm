@@ -1,4 +1,4 @@
-Minimum size of the application main stack
+# Minimum size of the application main stack
 
 The ARM Cortex-M uses a descending stack mechanism which is placed so that it
 grows towards the beginning of RAM. In case of a stack overflow the hardware
@@ -17,6 +17,27 @@ to the next highest power-of-two word depending on the total number of device
 interrupts. On devices where the table is relocated into the same memory as the
 main stack, an alignment buffer up to 1kB is added to the main stack.
 
+```
+|              ...                |
+|---------------------------------|
+|    Interrupt Vectors (in RAM)   |
+|        (if re-mapped)           | <-- vector table origin
+|---------------------------------| <-- HardFault stack top
+|        HardFault Stack          |
+|       (grows downwards)         |
+|               |                 |
+|               v                 |
+|---------------------------------| <-- main stack top
+|           Main Stack            |
+|       (grows downwards)         |
+|               |                 |
+|               v                 |
+|---------------------------------|
+|  Alignment buffer for vectors   |
+|   (overwritten by main stack!)  |
+'---------------------------------' <-- RAM origin
+```
+
 !!! warning
     The main stack size you provide is a minimum and may be enlarged to satisfy
     alignment requirements. Be aware that these requirements operate on the sum
@@ -28,22 +49,3 @@ main stack, an alignment buffer up to 1kB is added to the main stack.
 !!! note
     The main stack is watermarked and you can get the maximum stack usage using
     the `uint32_t modm::cortex::getMaximumStackUsage()` function.
-
-    |              ...                |
-    |---------------------------------|
-    |    Interrupt Vectors (in RAM)   |
-    |        (if re-mapped)           | <-- vector table origin
-    |---------------------------------| <-- HardFault stack top
-    |        HardFault Stack          |
-    |       (grows downwards)         |
-    |               |                 |
-    |               v                 |
-    |---------------------------------| <-- main stack top
-    |           Main Stack            |
-    |       (grows downwards)         |
-    |               |                 |
-    |               v                 |
-    |---------------------------------|
-    |  Alignment buffer for vectors   |
-    |   (overwritten by main stack!)  |
-    '---------------------------------' <-- RAM origin

@@ -18,7 +18,7 @@ exec(open(localpath("../common.py")).read())
 def init(module):
     module.parent = "build"
     module.name = "cmake"
-    module.description = "CMake Build Script Generator"
+    module.description = FileReader("module.md")
 
 
 def prepare(module, options):
@@ -27,7 +27,7 @@ def prepare(module, options):
 
     module.add_option(
         BooleanOption(name="include_makefile", default=True,
-                      description="Generate a wrapper Makefile"))
+                      description=descr_include_makefile))
 
     return True
 
@@ -78,3 +78,9 @@ def post_build(env, buildlog):
     env.template("resources/CMakeLists.txt.in", "CMakeLists.txt")
     if env[":::include_makefile"]:
         env.template("resources/Makefile.in", "Makefile")
+
+# ============================ Option Descriptions ============================
+globals()["descr_include_makefile"] = """# Generate a wrapper Makefile
+
+!!! warning "This overwrites any top-level `Makefile` file!"
+"""

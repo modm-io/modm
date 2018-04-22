@@ -1,4 +1,4 @@
-Dynamic memory allocation strategy
+# Dynamic memory allocation strategy
 
 By default, the arm-none-eabi toolchain ships with the `newlib` libc, which uses
 `dlmalloc` as the underlying allocator algorithm and only requires the

@@ -17,23 +17,23 @@ exec(open(localpath("../common.py")).read())
 def init(module):
     module.parent = "build"
     module.name = "scons"
-    module.description = "SCons Build Script Generator"
+    module.description = FileReader("module.md")
 
 
 def prepare(module, options):
     module.add_option(
         BooleanOption(name="include_sconstruct", default=True,
-                      description="Generate modm specific SConstruct file."))
+                      description=descr_include_sconstruct))
     module.add_option(
         StringOption(name="image.source", default="",
-                     description="Path to the image folder"))
+                     description=descr_image_source))
     module.add_option(
         EnumerationOption(name="info.git", default="Disabled",
                           enumeration=["Disabled", "Info", "Info+Status"],
-                          description="Generate CPP defines about the git repository state"))
+                          description=descr_info_git))
     module.add_option(
         BooleanOption(name="info.build", default=False,
-                      description="Generate CPP defines about the build state"))
+                      description=descr_info_build))
 
     return True
 
@@ -134,3 +134,20 @@ def post_build(env, buildlog):
     env.outbasepath = "."
     if env["include_sconstruct"]:
         env.template("resources/SConstruct.in", "SConstruct")
+
+
+# ============================ Option Descriptions ============================
+globals()["descr_include_sconstruct"] = """# Generate a SConstruct file
+
+!!! warning "This overwrites any top-level `SConstruct` file!"
+"""
+
+globals()["descr_image_source"] = """# Path to directory containing .pbm files"""
+
+globals()["descr_info_git"] = """# Generate git repository state information
+
+- `Info`: generates information about the last commit.
+- `Info+Status`: like `Info` plus git file status.
+"""
+
+globals()["descr_info_build"] = """# Generate build state information"""

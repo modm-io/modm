@@ -102,38 +102,6 @@ private:
 /// @endcond
 
 /**
- * Resumable base class.
- *
- * This is the base class which must be inherited from for using
- * resumable functions in your class.
- * You need to declare the number of resumable functions in your class!
- *
- * You must begin each resumable function using `RF_BEGIN(index)` where `index` is
- * the unique index of your resumable function starting at zero.
- * You may exit and return a value by using `RF_RETURN(value)` or
- * return the result of another resumable function using `RF_RETURN_CALL(resumable())`.
- * This return value is wrapped in a `modm::ResumableResult<Type>` struct
- * and transparently returned by the `RF_CALL` macro so it can be used
- * to influence your program flow.
- * If the resumable function reaches `RF_END()` it will exit automatically,
- * with the result of `0` cast to the return type.
- * Should you wish to return a value at the end, you may use
- * `RF_END_RETURN(value)`.
- * You may also return the result of another resumable function using
- * `RF_END_RETURN_CALL(resumable())`.
- *
- * Be aware that this class keeps a seperate state for each of your resumable functions.
- * This allows each resumable function to be run at the same time.
- * This might require the use of an internal Semaphore or Mutex if such
- * dependencies exist in your use case.
- * Take a look at the `NestedResumable` class for mutually exclusive resumable functions,
- * which also require a little less memory.
- *
- * @warning	**Resumable functions are not thread-safe!** If two threads access the
- * 			same resumable function, you must use a Mutex to regulate access to it.
- *
- * @see NestedResumable
- *
  * @ingroup	resumable
  * @author	Niklas Hauser
  * @tparam	Functions	the number of resumable functions that are available in this class. Must be non-zero!

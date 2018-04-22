@@ -1,4 +1,4 @@
-Vector table location in ROM or RAM
+# Vector table location in ROM or RAM
 
 The vector table is always stored in ROM and copied to RAM by the startup script
 if required. You can modify the RAM vector table using the CMSIS NVIC functions:

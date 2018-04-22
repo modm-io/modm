@@ -23,12 +23,10 @@ namespace modm
 {
 
 /**
- * @ingroup		interface
- * @defgroup	clock		System-tick timer
- * @brief 		Interface to the system wide tick timer.
+ * Interface to the system wide tick timer.
  *
- * This class provides a 1ms timestamp that is used for lightweight scheduling.
- * 
+ * This class maintains a 32-bit counter which is incremented every 1ms.
+ * This
  *
  * Example:
  * @code
@@ -38,8 +36,6 @@ namespace modm
  *     modm::Clock::increment();
  * }
  * @endcode
- *
- * @ingroup	clock
  */
 class Clock
 {

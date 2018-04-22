@@ -16,6 +16,7 @@ import os
 def init(module):
     module.name = "core"
     module.parent = "platform"
+    module.description = FileReader("module.md")
 
 def prepare(module, options):
     if not options[":target"].has_driver("core:cortex-m*"):

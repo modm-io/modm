@@ -15,6 +15,7 @@ import itertools, math
 def init(module):
     module.parent = "ui"
     module.name = "led"
+    module.description = FileReader("module.md")
 
 def prepare(module, options):
 

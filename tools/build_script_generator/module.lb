@@ -25,6 +25,7 @@ def windowsify(path):
 
 def init(module):
     module.name = "build"
+    module.description = FileReader("module.md")
 
 
 def prepare(module, options):
@@ -34,10 +35,10 @@ def prepare(module, options):
 
     module.add_option(
         StringOption(name="project.name", default=default_project_name,
-                     description="Project name for executable"))
+                     description=descr_project_name))
     module.add_option(
         StringOption(name="build.path", default="build/"+default_project_name,
-                     description="Path to the build folder"))
+                     description=descr_build_path))
 
     if platform in ["avr"]:
         # we need the clock:f_cpu option!
@@ -58,7 +59,7 @@ def prepare(module, options):
     if options[":target"].has_driver("core:cortex-m*"):
         module.add_option(
             StringOption(name="openocd.cfg", default="",
-                         description="Path to a custom OpenOCD configuration file"))
+                         description=descr_openocd_cfg))
 
     return True
 
@@ -87,3 +88,39 @@ def post_build(env, buildlog):
     if env[":target"].has_driver("core:cortex-m*"):
         env.template("openocd.cfg.in", filters={"windowsify": windowsify})
         env.template("gdbinit.in", filters={"windowsify": windowsify})
+
+
+# ============================ Option Descriptions ============================
+globals()["descr_project_name"] = """# Project Name
+
+The project name defaults to the folder name you're calling lbuild from.
+
+It's used by your build system to name the executable and it may also be passed
+to your application via a string constant or CPP define.
+"""
+
+globals()["descr_build_path"] = """# Build Path
+
+The build path is defaulted to `build/{modm:build:project.name}`.
+
+If you have a lot of embedded projects, you may want to change the build path
+to a *common* directory so that you don't have `build/` folders everywhere.
+Remember to add your build path to your `.gitignore`.
+
+You should use a relative path instead of an absolute one, so that this option
+still works for other developers.
+"""
+
+globals()["descr_openocd_cfg"] = """# Path to a custom OpenOCD configuration file
+
+If you have a custom configuration file for your target, it will get included
+by the generated `modm/openocd.cfg`.
+
+This is useful for not having to duplicate your config if you have several
+projects using the same target (like small bring-up and test projects).
+
+!!! tip "Do not execute commands by default"
+    When providing your own config file, wrap your specific commands into functions
+    and do not execute them by default. A stray `init` or similar in your script
+    will mess with modm's ability to program and debug a device correctly.
+"""

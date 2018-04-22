@@ -14,6 +14,7 @@
 def init(module):
     module.parent = "cmsis"
     module.name = "dsp"
+    module.description = FileReader("dsp.md")
 
 def prepare(module, options):
     device = options[":target"]
@@ -24,17 +25,17 @@ def prepare(module, options):
         module.add_option(
             BooleanOption(
                 name="unaligned_data",
-                description="Allow unaligned data storage. This may reduce data size, but cost some speed.",
+                description=descr_unaligned_data,
                 default=False))
     module.add_option(
         BooleanOption(
             name="check_matrix_sizes",
-            description="Check the input and output sizes of matrices and return ARM_MATH_SIZE_MISMATCH on fail.",
+            description=descr_matrix_sizes,
             default=False))
     module.add_option(
         BooleanOption(
             name="round_float_inputs",
-            description="Rounds float inputs properly during all conversions.",
+            description=descr_round_floats,
             default=True))
 
     return True
@@ -60,3 +61,22 @@ def build(env):
     env.outbasepath = "modm/ext/cmsis/dsp"
     env.copy("cmsis/CMSIS/DSP/Include", ".")
     env.copy("cmsis/CMSIS/DSP/Source", ".")
+
+
+# ============================ Option Descriptions ============================
+globals()["descr_unaligned_data"] = """# Allow unaligned data storage
+
+If the core supports it, this options enables storing data in unaligned memory.
+This may reduce data size, but cost some speed.
+"""
+
+globals()["descr_matrix_sizes"] = """# Check input/output matrix size
+
+Check the input and output sizes of matrices and return
+`ARM_MATH_SIZE_MISMATCH` on failure.
+"""
+
+globals()["descr_round_floats"] = """# Round float inputs
+
+Rounds float inputs properly during all conversions.
+"""

@@ -128,6 +128,7 @@ class Delay(Module):
 class Gpio(Module):
     def init(self, module):
         module.name = "gpio"
+        module.description = FileReader("interface/gpio.md")
 
     def prepare(self, module, options):
         return True
@@ -248,7 +249,7 @@ class Spi(Module):
         module.name = "spi"
 
     def prepare(self, module, options):
-        module.depends(":architecture:spi", ":processing:resumable")
+        module.depends(":processing:resumable")
         return True
 
     def build(self, env):
