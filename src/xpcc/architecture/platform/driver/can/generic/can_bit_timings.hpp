@@ -96,6 +96,13 @@ public:
 	static constexpr uint8_t getSJW() { return BestConfig.sjw; }
 	static constexpr uint8_t getPrescaler() { return BestConfig.prescaler; }
 
+	template<uint16_t tolerance>
+	static constexpr void assertBitrateInTolerance()
+	{
+		static_assert(tolerance >= static_cast<uint16_t>(BestConfig.minError * 1000.f),
+			"The closest available bitrate exceeds the specified maximum tolerance!");
+	}
+
 private:
 	// check assertions
 	static_assert(getPrescaler() > 0, "CAN bitrate is too high for standard bit timings!");
