@@ -1,5 +1,7 @@
 // coding: utf-8
 /* Copyright (c) 2016, Roboterclub Aachen e.V.
+ * Copyright (c) 2018, Christopher Durand
+ * Copyright (c) 2018, Raphael Lehmann
  * All Rights Reserved.
  *
  * The file is part of the xpcc library and is released under the 3-clause BSD
@@ -43,40 +45,50 @@ template<int32_t Clk, int32_t Bitrate>
 class CanBitTiming
 {
 private:
-	static constexpr uint16_t calculatePrescaler(uint8_t bs1, uint8_t bs2) {
-		return Clk / (Bitrate * (1 + bs1 + bs2));
-	}
-
-	struct CanBitTimingConfguration {
+	struct CanBitTimingConfiguration {
 		uint8_t bs1;	// 1-16
 		uint8_t bs2;	// 1-8
 		uint8_t sjw;
 		uint16_t prescaler;
+		float minError;
 	};
 
-	static constexpr uint8_t calcBS1() {
-		return (Clk ==  xpcc::clock::MHz8)? 11 :
-		       (Clk == xpcc::clock::MHz48)? 11 :
-		       (Clk == xpcc::clock::MHz30)? 10 :
-		       (Clk == xpcc::clock::MHz36)? 12 :
-		       (Clk == xpcc::clock::MHz42)? 14 :
-		       (Clk == xpcc::clock::MHz32)? 11 : 0;
+	static constexpr uint32_t round_uint32(float f)
+	{
+		uint32_t f_int = (uint32_t) f;
+		if(f - f_int > 0.5)
+			return f_int + 1;
+		else
+			return f_int;
 	}
 
-	static constexpr uint8_t calcBS2() {
-		return (Clk ==  xpcc::clock::MHz8)?  4 :
-		       (Clk == xpcc::clock::MHz48)?  4 :
-		       (Clk == xpcc::clock::MHz30)?  4 :
-		       (Clk == xpcc::clock::MHz36)?  5 :
-		       (Clk == xpcc::clock::MHz42)?  6 :
-		       (Clk == xpcc::clock::MHz32)?  4 : 0;
+	static constexpr CanBitTimingConfiguration calculateBestConfig()
+	{
+		constexpr uint8_t minBs1Bs2 = 14;
+		constexpr uint8_t maxBs1Bs2 = 20;
+
+		float minError = 10000;
+		uint16_t bestPrescaler = 0;
+		uint8_t bestBs1Bs2 = 0;
+
+		for(uint8_t bs1Bs2 = minBs1Bs2; bs1Bs2 <= maxBs1Bs2; ++bs1Bs2) {
+			float idealPrescaler = float(Clk) / (Bitrate * (1 + bs1Bs2));
+			uint32_t intPrescaler = round_uint32(idealPrescaler);
+			float error = fabs(1 - intPrescaler/idealPrescaler);
+			if(error <= minError) {
+				bestPrescaler = intPrescaler;
+				minError = error;
+				bestBs1Bs2 = bs1Bs2;
+			}
+		}
+
+		uint8_t bs2 = round_uint32(0.275f * (bestBs1Bs2 + 1));
+		uint8_t bs1 = bestBs1Bs2 - bs2;
+
+		return CanBitTimingConfiguration{bs1, bs2, 1, bestPrescaler, minError};
 	}
 
-	static constexpr CanBitTimingConfguration calculateBestConfig() {
-		return { calcBS1(), calcBS2(), 1, calculatePrescaler(calcBS1(), calcBS2()) };
-	}
-
-	static constexpr CanBitTimingConfguration BestConfig = calculateBestConfig();
+	static constexpr CanBitTimingConfiguration BestConfig = calculateBestConfig();
 
 public:
 	static constexpr uint8_t getBS1() { return BestConfig.bs1; }
@@ -84,12 +96,17 @@ public:
 	static constexpr uint8_t getSJW() { return BestConfig.sjw; }
 	static constexpr uint8_t getPrescaler() { return BestConfig.prescaler; }
 
+	template<uint16_t tolerance>
+	static constexpr void assertBitrateInTolerance()
+	{
+		static_assert(tolerance >= static_cast<uint16_t>(BestConfig.minError * 1000.f),
+			"The closest available bitrate exceeds the specified maximum tolerance!");
+	}
+
 private:
 	// check assertions
-	static_assert(getBS1() > 0 and getBS2() > 0,
-		"Unsupported frequency for Can peripheral. "
-		"Only 8MHz, 30 Mhz, 36 MHz, 42 MHz and 48 MHz are supported at the moment.");
 	static_assert(getPrescaler() > 0, "CAN bitrate is too high for standard bit timings!");
+	static_assert(getPrescaler() < ((1 << 10) - 1), "Prescaler value too large"); // 10 bit prescaler on STM32
 };
 
 }	// namespace xpcc
