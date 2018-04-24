@@ -1,75 +1,85 @@
-# modm: a modular C++14 library for barebone programming
+<!--webignore-->
+# modm: a barebone embedded library generator
+<p align="center">
+<a href="http://modm.io"><img src="https://raw.githubusercontent.com/modm-io/modm/develop/docs/src/images/logo.svg?sanitize=true" style="max-width:100%;"></a>
+</p>
+<!--/webignore-->
 
-modm (Modular Object-oriented Development for Microcontrollers) is a toolbox for building custom libraries tailored to your embedded device.
-modm generates startup code, HALs and their implementations, communication protocols, drivers for external devices, BSPs, etc… in a modular, customizable process that you can fine-tune for your needs.
+modm (Modular Object-oriented Development for Microcontrollers) is a toolbox for
+building custom C++14 libraries tailored to your embedded device.
+modm generates startup code, HALs and their implementations, communication
+protocols, drivers for external devices, BSPs, etc… in a modular, customizable
+process that you can fine-tune to your needs.
 
-- [This project has a homepage](http://modm.io) with [install instructions][install] and a [getting started guide][guide].
-- [Feast your eyes on lots of working examples][examples].
-- [API reference is available here][reference].
-- [Check out our latest quarterly release][releases] with a [beautiful changelog](CHANGELOG.md).
-- [We have continuous integration as well][circle_ci].
-- [And we care a lot about testing](TESTING.md).
+<!--webignore-->
+- [This project has a homepage](http://modm.io).<!--/webignore-->
+- Check out our [install instructions][install] and our [getting started guide][guide].
+- Feast your eyes on [lots of working examples][examples].
+<!-- - [API reference is available here][reference]. -->
+<!-- - [Check out our latest quarterly release][releases] with a [beautiful changelog][changelog]. -->
+- Our CI checks every contribution for regressions: <a href="https://circleci.com/gh/modm-io/workflows/modm/tree/develop" style="border-bottom:none">![Build Status](https://circleci.com/gh/modm-io/modm/tree/develop.svg?style=shield)</a>
+- We care [about testing modm][testing].
 
-This project also has [guide for developers][guide] as well as a [technical blog][blog] to document larger design concepts.
+This project also has a [technical blog][blog] to document larger design concepts.
 
 - You found a bug? [Open up an issue, we don't bite][issues].
-- You want to contribute? [Read the contribution guidelines][contributing] and [open a pull request so we can merge it][prs].
-- You want to port modm? [Read our porting guide][porting].
+- You want to contribute? [Read the contribution guidelines][contributing] and [open a pull request][prs].
+<!-- - You want to port modm? [Read our porting guide][porting]. -->
+
+modm is optimized for the harsh requirements of the [Eurobot competition][eurobot],
+where our robots need to run reliably and completely autonomously for the game's
+100 second duration. Our robots contain a lot of different microcontrollers, some
+without a lot of resources, so modm needs to fulfill a diverse set of objectives,
+like small code size with small memory consumption, predictable program flow,
+extreme portability.
 
 The source code is freely available under the MPLv2 license, so feel
 free to fork this project and adapt it to your needs.
-The only thing we ask of you is to contribute your changes back.
-That way everyone can profit.
+The only thing we ask of you is to contribute your changes back so everyone benefits.
 
-<a href="https://circleci.com/gh/modm-io/workflows/modm/tree/develop" style="border-bottom:none">![Build Status](https://circleci.com/gh/modm-io/modm/tree/develop.svg?style=shield)</a>
+Please clone modm recursively, you will need all the submodules.
+
+```sh
+git clone --recursive https://github.com/modm-io/modm.git
+```
 
 ## Features
 
 - Efficient and fast object-oriented C++14 API.
 - Support for hundreds of AVR and ARM Cortex-M microcontrollers from Atmel and ST.
 - Build system agnostic: We use SCons by default, but you don't have to.
-- [Data-driven][modm-devices] HAL generation using the [library-builder engine][library-builder].
+- Data-driven HAL generation using the library-builder engine.
 - No memory allocations in HAL with very low overall RAM consumption.
+- Highly-configurable modules with sensible defaults and lots of documentation.
 - Cross platform peripheral interfaces incl. bit banging:
-    - GPIO & GPIO expanders
-    - ADC
-    - UART, I2C, SPI
-    - CAN
-- Interfaces for external I2C and SPI device drivers.
+    - GPIO and GPIO expanders.
+    - ADC and Analog.
+    - UART, I<sup>2</sup>C, SPI, CAN.
+- Interfaces and drivers for many external I2C and SPI sensors and devices.
 - Debug/logging system with IOStream interface.
 - Lightweight, stackless threads and resumable functions using cooperative multitasking.
-- Useful mathematical and geometric algorithms optimized for microcontrollers.
+- Useful filter, interpolation and geometric algorithms.
 - Lightweight unit testing system (suitable for AVRs).
-- Graphical user interface for small binary displays.
+- Graphical user interface for small binary and color displays.
+- Hundreds of tests to ensure correct functionality.
 
-## Supported hardware
 
-Here is a list of supported **and tested** microcontrollers and development boards:
+## Targets
 
-| Controller | Development Board       | Support                             |
-|:-----------|:------------------------|:------------------------------------|
-| AT90can    | custom                  | &#9733;&#9733;&#9733;               |
-| ATtiny44a  | custom                  | &#9733;&#9733;&#9733;               |
-| ATtiny85   | custom                  | &#9733;&#9733;&#9733;               |
-| ATmega328p | [Arduino Uno][]         | &#9733;&#9733;&#9733;               |
-| STM32F031  | [Nucleo F031K6][]       | &#9733;&#9733;&#9733;&#9733;        |
-| STM32F051  | [STM32F0 Discovery][]   | &#9733;&#9733;                      |
-| STM32F072  | [STM32F072 Discovery][] | &#9733;&#9733;&#9733;&#9733;        |
-| STM32F100  | [STM32F1 Discovery][]   | &#9733;&#9733;&#9733;               |
-| STM32F103  | [Nucleo F103RB][]       | &#9733;&#9733;&#9733;               |
-| STM32F103  | [STM32F1 Blue Pill][]   | &#9733;&#9733;&#9733;               |
-| STM32F303  | [STM32F3 Discovery][]   | &#9733;&#9733;&#9733;&#9733;&#9733; |
-| STM32F303  | [Nucleo F303K8][]       | &#9733;&#9733;&#9733;&#9733;        |
-| STM32F407  | [STM32F4 Discovery][]   | &#9733;&#9733;&#9733;&#9733;&#9733; |
-| STM32F401  | [Nucleo F401RE][]       | &#9733;&#9733;&#9733;&#9733;        |
-| STM32F411  | [Nucleo F411RE][]       | &#9733;&#9733;&#9733;&#9733;        |
-| STM32F429  | [STM32F429 Discovery][] | &#9733;&#9733;&#9733;&#9733;&#9733; |
-| STM32F429  | [Nucleo F429ZI][]       | &#9733;&#9733;&#9733;&#9733;        |
-| STM32F469  | [STM32F469 Discovery][] | &#9733;&#9733;&#9733;&#9733;        |
-| STM32F746  | [STM32F746 Discovery][] | &#9733;&#9733;&#9733;&#9733;        |
-| STM32F769  | [STM32F769 Discovery][] | &#9733;&#9733;&#9733;&#9733;        |
-| STM32L476  | [STM32L476 Discovery][] | &#9733;&#9733;                      |
-| STM32L476  | [Nucleo L476RG][]       | &#9733;&#9733;                      |
+modm can generate code for <!--avrcount-->76<!--/avrcount--> AVR  and
+<!--stmcount-->858<!--/stmcount--> STM32 devices, however,
+there are different levels of support and testing.
+
+<center>
+
+| Device Family | Support                             | Device Family | Support                             |
+|:--------------|:------------------------------------|:--------------|:------------------------------------|
+| AVR           | &#9733;&#9733;&#9733;               | STM32F3       | &#9733;&#9733;&#9733;&#9733;&#9733; |
+| STM32F0       | &#9733;&#9733;&#9733;&#9733;        | STM32F4       | &#9733;&#9733;&#9733;&#9733;&#9733; |
+| STM32F1       | &#9733;&#9733;&#9733;&#9733;        | STM32F7       | &#9733;&#9733;&#9733;&#9733;        |
+| STM32F2       | &#9733;&#9733;&#9733;               | STM32L4       | &#9733;&#9733;&#9733;&#9733;        |
+
+</center>
 
 All of these targets are compiling and booting correctly
 (&#9733;)
@@ -82,49 +92,146 @@ as well as complicated peripherals, like Timers, CAN and external memory
 We also use a few targets in everyday development, which are very well tested
 (&#9733;&#9733;&#9733;&#9733;&#9733;).
 
-Please see [our examples for a complete list][examples] of tested projects.
+We are only a small team of developers and are limited in the amount of targets
+we can support and test in hardware. We have prepared, but currently not finished
+support for STM32F2, STM32L0 and STM32L1. [Open an issue][issues] to ask if your
+specific target is supported out-of-the-box and what you can do if it's not.
 
-### Your target
 
-While the modm API is designed to be portable, we are only a small team of developers and are limited in the amount of platforms we can support and test in hardware.
-The following microcontrollers should be able to compile, but *have not been tested extensively* in hardware:
+### Boards
 
-- All STM32F targets.
-- Most AVR targets, except Xmega.
-- Some STM32L targets.
+We have out-of-box support for [several development boards][devboards] including
+documentation.
 
-There are more platforms which we have prepared, but currently not finished support for (Xmega, STM32F2, STM32L).
-[Open an issue][issues] to ask if your specific target is supported out-of-the-box and what you can do if it's not.
+<center>
+<!--bsptable-->
+<table>
+<tr>
+<td align="center">AL-AVREB-CAN</td>
+<td align="center">Arduino Uno</td>
+<td align="center">Blue Pill</td>
+<td align="center">DISCO-F051R8</td>
+</tr><tr>
+<td align="center">DISCO-F072RB</td>
+<td align="center">DISCO-F100RB</td>
+<td align="center">DISCO-F303VC</td>
+<td align="center">DISCO-F407VG</td>
+</tr><tr>
+<td align="center">DISCO-F429ZI</td>
+<td align="center">DISCO-F469NI</td>
+<td align="center">DISCO-F746NG</td>
+<td align="center">DISCO-F769NI</td>
+</tr><tr>
+<td align="center">DISCO-L476VG</td>
+<td align="center">NUCLEO-F031K6</td>
+<td align="center">NUCLEO-F103RB</td>
+<td align="center">NUCLEO-F303K8</td>
+</tr><tr>
+<td align="center">NUCLEO-F401RE</td>
+<td align="center">NUCLEO-F411RE</td>
+<td align="center">NUCLEO-F429ZI</td>
+<td align="center">NUCLEO-L476RG</td>
+</tr><tr>
+<td align="center">OLIMEXINO-STM32</td>
+<td align="center">STM32F030F4P6-DEMO</td>
+</tr>
+</table>
+<!--/bsptable-->
+</center>
 
-## Documentation
 
-The project homepage is located at [modm.io](http://modm.io).
-Complete installation instructions for our build system and toolchains can [be found here][install].
+### Drivers
 
-To get source-code documentation, include the `:docs` module (or execute `lbuild build --module ":docs"`), then call `doxygen doxyfile` inside the generated `docs` folder. The documentation for your target and configuration will then be available in `docs/api/index.html`.
+We also have a number of completely target-independent [drivers for external 
+devices][drivers] connected via I<sup>2</sup>C, SPI, UART, BitBang, etc.
+Most of these also give you access to the entire device so you 
+can easily configure them for you specific needs.
+
+<center>
+<!--drivertable-->
+<table>
+<tr>
+<td align="center">AD7280A</td>
+<td align="center">AD7928</td>
+<td align="center">ADNS9800</td>
+<td align="center">ADS7843</td>
+<td align="center">AMSYS5915</td>
+<td align="center">SPI-FLASH</td>
+</tr><tr>
+<td align="center">BME280</td>
+<td align="center">BMP085</td>
+<td align="center">DS1302</td>
+<td align="center">DS1631</td>
+<td align="center">DS18B20</td>
+<td align="center">EA-DOG</td>
+</tr><tr>
+<td align="center">FT245</td>
+<td align="center">FT6X06</td>
+<td align="center">HCLAx</td>
+<td align="center">HD44780</td>
+<td align="center">HMC58x</td>
+<td align="center">HMC6343</td>
+</tr><tr>
+<td align="center">I2C-EEPROM</td>
+<td align="center">ITG3200</td>
+<td align="center">L3GD20</td>
+<td align="center">LAWICEL</td>
+<td align="center">LIS302DL</td>
+<td align="center">LIS3DSH</td>
+</tr><tr>
+<td align="center">LM75</td>
+<td align="center">LSM303A</td>
+<td align="center">LTC2984</td>
+<td align="center">MAX6966</td>
+<td align="center">MAX7219</td>
+<td align="center">MCP23X17</td>
+</tr><tr>
+<td align="center">MCP2515</td>
+<td align="center">NOKIA5110</td>
+<td align="center">NRF24</td>
+<td align="center">TFT-DISPLAY</td>
+<td align="center">PCA8574</td>
+<td align="center">PCA9535</td>
+</tr><tr>
+<td align="center">PCA9685</td>
+<td align="center">SIEMENS-S65</td>
+<td align="center">SIEMENS-S75</td>
+<td align="center">SSD1306</td>
+<td align="center">TCS3414</td>
+<td align="center">TCS3472</td>
+</tr><tr>
+<td align="center">TMP102</td>
+<td align="center">TMP175</td>
+<td align="center">VL53L0</td>
+<td align="center">VL6180</td>
+</tr>
+</table>
+<!--/drivertable-->
+</center>
+
+<!--webignore-->
+Please see [our examples for a complete list][examples] of tested targets and drivers.
+
 
 ## How can I contribute?
 
-The easiest way for you and the best way for us to see if something is unclear or missing, is if you use the library and give us some feedback by [filing a bug report][issues] or if you have a fix already, [opening a pull request][prs].
+The easiest way for you and the best way for us to see if something is unclear 
+or missing, is if you use the library and give us some feedback by 
+[filing a bug report][issues] or if you have a fix already, [opening a pull request][prs].
 
-See [CONTRIBUTING.md][contributing] for our contributing guidelines.
+See [CONTRIBUTING.md][contributing] for our contribution guidelines.
 
-## Who we are
-
-During the last decade the [Roboterclub Aachen e.V.][rca_ev] has developed a software library for communication among components that are distributed on PCs and microcontrollers. This library was used in autonomous robots for the [Eurobot competition][eurobot].
-
-In 2009, xpcc became a separate project and since then focussed on a new approach to cross target microcontroller libraries. Over the years xpcc grew from a communication library to a general purpose framework suitable for all kinds of embedded applications.
-
-In 2016-2018, Niklas and Fabian refactored xpcc into modm and relicensed it from BSD to MPLv2.
-
+<!--authors-->
 The modm project is maintained by
 Niklas Hauser ([@salkinium](https://github.com/salkinium)) with significant contributions from
 Sascha Schade ([@strongly-typed](https://github.com/strongly-typed)),
-Kevin Läufer ([@ekiwi](https://github.com/ekiwi)),
 Fabian Greif ([@dergraaf](https://github.com/dergraaf)),
+Kevin Läufer ([@ekiwi](https://github.com/ekiwi)),
 Martin Rosekeit ([@thundernail](https://github.com/thundernail)),
-Daniel Krebs ([@daniel-k](https://github.com/daniel-k)) and
-Georgi Grinshpun ([@georgi-g](https://github.com/georgi-g)).
+Daniel Krebs ([@daniel-k](https://github.com/daniel-k)),
+Georgi Grinshpun ([@georgi-g](https://github.com/georgi-g)) and 
+[<!--authorcount-->20<!--/authorcount--> more contributors](https://github.com/modm-io/modm/blob/develop/AUTHORS).
+<!--/authors-->
 
 ## Folder structure
 
@@ -159,40 +266,26 @@ Georgi Grinshpun ([@georgi-g](https://github.com/georgi-g)).
 <dd>
   Support tools, scripts and files.
 </dl>
+<!--/webignore-->
 
-[blog]: http://blog.salkinium.com
-[contributing]: CONTRIBUTING.md
-[eurobot]: http://www.eurobot.org/
-[examples]: https://github.com/modm-io/modm/tree/develop/examples
-[guide]: http://modm.io/guide/getting-started
-[install]: http://modm.io/installation
-[issues]: https://github.com/modm-io/modm/issues
-[porting]: docs/PORTING.md
-[prs]: https://github.com/modm-io/modm/pulls
-[rca_ev]: http://www.roboterclub.rwth-aachen.de/
-[reference]: http://modm.io/reference/api
-[releases]: https://github.com/modm-io/modm/releases
-[testing]: docs/TESTING.md
-[circle_ci]: https://circleci.com/gh/modm-io/workflows/modm
-[modm-devices]: https://github.com/modm-io/modm-devices
+<!--links-->
+[blog]:            http://blog.salkinium.com
+[changelog]:       https://github.com/modm-io/modm/tree/develop/docs/CHANGELOG.md
+[circle_ci]:       https://circleci.com/gh/modm-io/workflows/modm/tree/develop
+[contributing]:    https://github.com/modm-io/modm/tree/develop/CONTRIBUTING.md
+[devboards]:       https://github.com/modm-io/modm/tree/develop/src/modm/board
+[drivers]:         https://github.com/modm-io/modm/tree/develop/src/modm/driver
+[eurobot]:         http://www.eurobot.org/
+[examples]:        https://github.com/modm-io/modm/tree/develop/examples
+[guide]:           http://modm.io/guide/getting-started
+[install]:         http://modm.io/guide/installation
+[issues]:          https://github.com/modm-io/modm/issues
 [library-builder]: https://github.com/dergraaf/library-builder
-
-[Arduino Uno]: https://www.arduino.cc/en/Main/ArduinoBoardUno
-[STM32F1 Blue Pill]: http://wiki.stm32duino.com/index.php?title=Blue_Pill
-[Nucleo F031K6]: http://www.st.com/en/evaluation-tools/nucleo-f031k6.html
-[Nucleo F103RB]: http://www.st.com/en/evaluation-tools/nucleo-f103rb.html
-[Nucleo F303K8]: http://www.st.com/en/evaluation-tools/nucleo-f303k8.html
-[Nucleo F401RE]: http://www.st.com/en/evaluation-tools/nucleo-f401re.html
-[Nucleo F411RE]: http://www.st.com/en/evaluation-tools/nucleo-f411re.html
-[Nucleo F429ZI]: http://www.st.com/en/evaluation-tools/nucleo-f429zi.html
-[Nucleo L476RG]: http://www.st.com/en/evaluation-tools/nucleo-l476rg.html
-[STM32F0 Discovery]: http://www.st.com/en/evaluation-tools/stm32f0discovery.html
-[STM32F072 Discovery]: http://www.st.com/en/evaluation-tools/32f072bdiscovery.html
-[STM32F1 Discovery]: http://www.st.com/en/evaluation-tools/stm32vldiscovery.html
-[STM32F3 Discovery]: http://www.st.com/en/evaluation-tools/stm32f3discovery.html
-[STM32F4 Discovery]: http://www.st.com/en/evaluation-tools/stm32f4discovery.html
-[STM32F429 Discovery]: http://www.st.com/en/evaluation-tools/32f429idiscovery.html
-[STM32F469 Discovery]: http://www.st.com/en/evaluation-tools/32f469idiscovery.html
-[STM32F746 Discovery]: http://www.st.com/en/evaluation-tools/32f746gdiscovery.html
-[STM32F769 Discovery]: http://www.st.com/en/evaluation-tools/32f769idiscovery.html
-[STM32L476 Discovery]: http://www.st.com/en/evaluation-tools/32l476gdiscovery.html
+[modm-devices]:    https://github.com/modm-io/modm-devices
+[porting]:         https://github.com/modm-io/modm/tree/develop/docs/PORTING.md
+[prs]:             https://github.com/modm-io/modm/pulls
+[rca_ev]:          http://www.roboterclub.rwth-aachen.de/
+[reference]:       http://modm.io/reference/api
+[releases]:        https://github.com/modm-io/modm/releases
+[testing]:         http://modm.io/guide/testing
+<!--/links-->
