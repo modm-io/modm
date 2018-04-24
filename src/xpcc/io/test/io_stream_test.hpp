@@ -82,6 +82,12 @@ public:
 	void
 	testFloat4();
 
+	void
+	testFloat5();
+
+	void
+	testFloat6();
+
 	// bool
 	void
 	testBool1();

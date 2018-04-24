@@ -9,6 +9,7 @@
 
 #include <stdio.h>		// snprintf()
 #include <stdlib.h>
+#include <cmath>
 
 #include <xpcc/utils/arithmetic_traits.hpp>
 #include <xpcc/utils/template_metaprogramming.hpp>
@@ -20,6 +21,29 @@ xpcc::IOStream::writeFloat(const float& value)
 {
 	// hard coded for -2.22507e-308
 	char str[13 + 1]; // +1 for '\0'
+
+	if(!std::isfinite(value)) {
+		char *ptr = &str[0];
+		if(std::isinf(value)) {
+			if (value < 0) {
+				*ptr++ = '-';
+			}
+			*ptr++ = 'i';
+			*ptr++ = 'n';
+			*ptr++ = 'f';
+			*ptr++ = '\0';	// End of string
+			this->device->write(str);
+			return;
+		}
+		else {
+			*ptr++ = 'n';
+			*ptr++ = 'a';
+			*ptr++ = 'n';
+			*ptr++ = '\0';	// End of string
+			this->device->write(str);
+			return;
+		}
+	}
 
 #if defined(XPCC__CPU_AVR)
 	dtostre(value, str, 5, 0);

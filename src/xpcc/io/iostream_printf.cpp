@@ -135,6 +135,24 @@ xpcc::IOStream::vprintf(const char *fmt, va_list ap)
 			// va_arg(ap, float) not allowed
 			float float_value = va_arg(ap, double);
 
+			if(!std::isfinite(float_value)) {
+				if(std::isinf(float_value)) {
+					if (float_value < 0) {
+						this->device->write('-');
+					}
+					this->device->write('i');
+					this->device->write('n');
+					this->device->write('f');
+					return *this;
+				}
+				else {
+					this->device->write('n');
+					this->device->write('a');
+					this->device->write('n');
+					return *this;
+				}
+			}
+
 			if (float_value < 0)
 			{
 				float_value = -float_value; // make it positive
