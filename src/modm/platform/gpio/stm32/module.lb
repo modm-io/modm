@@ -125,20 +125,27 @@ def validate_alternate_functions(driver, env):
     if not success:
         env.log.debug("Gpio signal validation failed!")
 
+bprops = {}
+
 # -----------------------------------------------------------------------------
 def init(module):
     module.name = "gpio"
     module.parent = "platform"
 
 def prepare(module, options):
-    if not options[":target"].has_driver("gpio:stm32*"):
+    device = options[":target"]
+    if not device.has_driver("gpio:stm32*"):
         return False
 
+    bprops["ranges"] = port_ranges(device.get_driver("gpio")["gpio"])
+    bprops["ports"] = sorted([p["name"] for p in bprops["ranges"]])
+
     module.add_option(
-        BooleanOption(
-            name="enable_gpio",
-            description="Enable clock for GPIO during startup",
-            default=True))
+        SetOption(
+            name="enable_ports",
+            description="Enable clock for these GPIO ports during startup",
+            enumeration=bprops["ports"],
+            default=bprops["ports"]))
 
     module.depends(
         ":architecture:gpio",
@@ -147,7 +154,6 @@ def prepare(module, options):
         ":platform:gpio.common")
     return True
 
-bprops = {}
 def pre_build(env):
     device = env[":target"]
     driver = device.get_driver("gpio")
@@ -233,8 +239,6 @@ def pre_build(env):
         all_peripherals.extend([get_driver(r) for r in driver["remap"]])
     bprops["all_peripherals"] = sorted(list(set(all_peripherals)))
     bprops["all_signals"] = sorted(list(set(s["name"] for s in all_signals.values())))
-    bprops["ranges"] = port_ranges(driver["gpio"])
-    bprops["ports"] = sorted([p["name"] for p in bprops["ranges"]])
 
     return True
 
@@ -262,5 +266,5 @@ def build(env):
         env.template("connector_specialized.hpp.in", filters={"formatPeripheral": get_driver, "printSignalMap": print_remap_group_table})
     env.template("base.hpp.in", filters={"letterToNum": letter_to_num})
     env.template("unused.hpp.in")
-    if env[":::enable_gpio"]:
+    if len(env[":::enable_ports"]):
         env.template("enable.cpp.in")

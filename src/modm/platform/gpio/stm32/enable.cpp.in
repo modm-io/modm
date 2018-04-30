@@ -16,7 +16,6 @@ void
 modm_gpio_enable(void)
 {
 %%	set prefix = "GPIO"
-	// FIXME: add possibility to switch individual clocks on and off
 %% if target["family"] in ["f2", "f4", "f7"]
 %%	set clock_tree = "AHB1"
 %% elif target["family"] in ["f0", "f3"]
@@ -31,7 +30,7 @@ modm_gpio_enable(void)
 
 	// Enable GPIO clock
 	RCC->{{ clock_tree }}ENR  |=
-%% for port in ports
+%% for port in options[":::enable_ports"]
 %%	if not loop.last
 		RCC_{{ clock_tree }}ENR_{{ prefix }}{{ port | upper }}EN |
 %%	else
@@ -41,7 +40,7 @@ modm_gpio_enable(void)
 
 	// Reset GPIO peripheral
 	RCC->{{ clock_tree }}RSTR |=
-%% for port in ports
+%% for port in options[":::enable_ports"]
 %%	if not loop.last
 		RCC_{{ clock_tree }}RSTR_{{ prefix }}{{ port | upper }}RST |
 %%	else
@@ -50,7 +49,7 @@ modm_gpio_enable(void)
 %% endfor
 
 	RCC->{{ clock_tree }}RSTR &= ~(
-%% for port in ports
+%% for port in options[":::enable_ports"]
 %%	if not loop.last
 		RCC_{{ clock_tree }}RSTR_{{ prefix }}{{ port | upper }}RST |
 %%	else
