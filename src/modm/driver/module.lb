@@ -18,5 +18,5 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/driver"
+    env.outbasepath = "modm/src/modm/driver"
     env.copy("driver.dox")

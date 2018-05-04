@@ -24,6 +24,6 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/driver/temperature"
+    env.outbasepath = "modm/src/modm/driver/temperature"
     env.copy("ds1631.hpp")
     env.copy("ds1631_impl.hpp")

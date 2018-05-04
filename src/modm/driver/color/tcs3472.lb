@@ -23,6 +23,6 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/driver/color"
+    env.outbasepath = "modm/src/modm/driver/color"
     env.copy("tcs3472.hpp")
     env.copy("tcs3472_impl.hpp")

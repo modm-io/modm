@@ -27,7 +27,7 @@ def prepare(module, options):
 
 def build(env):
     env.substitutions = {"target": env[":target"].identifier}
-    env.outbasepath = "src/modm/platform/i2c"
+    env.outbasepath = "modm/src/modm/platform/i2c"
 
     env.template("bitbang_i2c_master.hpp.in")
     env.copy("bitbang_i2c_master_impl.hpp")

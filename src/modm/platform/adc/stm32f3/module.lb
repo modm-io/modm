@@ -88,7 +88,7 @@ class Instance(Module):
 
 
         env.substitutions = properties
-        env.outbasepath = "src/modm/platform/adc"
+        env.outbasepath = "modm/src/modm/platform/adc"
 
         env.template("adc.hpp.in", "adc_{}.hpp".format(self.instance))
         env.template("adc_impl.hpp.in", "adc_{}_impl.hpp".format(self.instance))
@@ -124,4 +124,4 @@ def build(env):
     properties["driver"] = driver
 
     env.substitutions = properties
-    env.outbasepath = "src/modm/platform/adc"
+    env.outbasepath = "modm/src/modm/platform/adc"

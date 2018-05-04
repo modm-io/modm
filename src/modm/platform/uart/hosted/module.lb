@@ -38,7 +38,7 @@ def build(env):
     properties["driver"] = driver
 
     env.substitutions = properties
-    env.outbasepath = "src/modm/platform/uart"
+    env.outbasepath = "modm/src/modm/platform/uart"
 
     # FIXME: Ignore serial_interface, serial_port for windows
     ignore = ["*.lb"]

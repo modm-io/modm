@@ -28,7 +28,7 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/driver/adc"
+    env.outbasepath = "modm/src/modm/driver/adc"
     env.copy("ad7928.hpp")
     env.copy("ad7928.cpp")
     env.copy("ad7928_impl.hpp")

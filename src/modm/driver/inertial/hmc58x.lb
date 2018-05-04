@@ -23,7 +23,7 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/driver/inertial"
+    env.outbasepath = "modm/src/modm/driver/inertial"
     env.copy("hmc5843.hpp")
     env.copy("hmc5883l.hpp")
     env.copy("hmc58x3.hpp")

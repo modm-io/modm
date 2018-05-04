@@ -81,7 +81,7 @@ class Instance(Module):
         properties.update(get_substitutions(self.instance, properties["target"], env))
 
         env.substitutions = properties
-        env.outbasepath = "src/modm/platform/can"
+        env.outbasepath = "modm/src/modm/platform/can"
 
         env.template("can.hpp.in", "can_{}.hpp".format(self.instance))
         env.template("can.cpp.in", "can_{}.cpp".format(self.instance))
@@ -133,7 +133,7 @@ def build(env):
         properties.update(get_substitutions(0, properties["target"], env))
 
     env.substitutions = properties
-    env.outbasepath = "src/modm/platform/can"
+    env.outbasepath = "modm/src/modm/platform/can"
 
     env.template("can_filter.hpp.in")
     env.template("can_filter.cpp.in")

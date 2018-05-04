@@ -22,5 +22,5 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/driver/pressure"
+    env.outbasepath = "modm/src/modm/driver/pressure"
     env.copy("amsys5915.hpp")

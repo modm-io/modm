@@ -52,7 +52,7 @@ class Instance(Module):
         properties["id"] = self.instance
 
         env.substitutions = properties
-        env.outbasepath = "src/modm/platform/uart"
+        env.outbasepath = "modm/src/modm/platform/uart"
 
         env.template("uart.hpp.in", "uart_{}.hpp".format(self.instance))
         env.template("uart.cpp.in", "uart_{}.cpp".format(self.instance))
@@ -76,6 +76,6 @@ def prepare(module, options):
 
 def build(env):
     env.substitutions = get_properties(env)
-    env.outbasepath = "src/modm/platform/uart"
+    env.outbasepath = "modm/src/modm/platform/uart"
 
     env.copy("lpc11_uart_registers.hpp")

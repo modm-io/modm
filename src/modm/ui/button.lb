@@ -19,7 +19,7 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/ui"
+    env.outbasepath = "modm/src/modm/ui"
     env.copy("button.hpp")
     env.copy("button_impl.hpp")
     env.copy("button_group.hpp")

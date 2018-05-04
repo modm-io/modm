@@ -26,6 +26,6 @@ def prepare(module, options):
 
 def build(env):
     env.substitutions = {"target": env[":target"].identifier}
-    env.outbasepath = "src/modm/platform/1-wire"
+    env.outbasepath = "modm/src/modm/platform/1-wire"
     env.template("bitbang_master.hpp.in")
     env.template("bitbang_master_impl.hpp.in")

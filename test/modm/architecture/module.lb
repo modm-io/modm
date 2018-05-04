@@ -28,7 +28,7 @@ def prepare(module, options):
 
 
 def build(env):
-    env.outbasepath = "test/modm/architecture"
+    env.outbasepath = "modm/test/modm/architecture"
 
     ignore_patterns = ["*.lb", "*.cfg", "*.xml"]
     target = env[":target"].identifier

@@ -71,7 +71,7 @@ class Instance(Module):
         properties["id"] = instance
 
         env.substitutions = properties
-        env.outbasepath = "src/modm/platform/spi_uart"
+        env.outbasepath = "modm/src/modm/platform/spi_uart"
 
         if instance == "":
             env.template("uart_spi_master.hpp.in")
@@ -105,4 +105,4 @@ def prepare(module, options):
 
 def build(env):
     env.substitutions = get_properties(env)
-    env.outbasepath = "src/modm/platform/spi_uart"
+    env.outbasepath = "modm/src/modm/platform/spi_uart"

@@ -30,6 +30,6 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "ext/freertos"
+    env.outbasepath = "modm/ext/freertos"
     env.copy(".", ignore=env.ignore_files("*.lb", "*.in"))
     env.template("portable/FreeRTOSConfig.h.in", "portable/FreeRTOSConfig.h")

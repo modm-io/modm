@@ -22,6 +22,6 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/driver/display"
+    env.outbasepath = "modm/src/modm/driver/display"
     env.copy("parallel_tft.hpp")
     env.copy("parallel_tft_impl.hpp")

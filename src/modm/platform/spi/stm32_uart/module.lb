@@ -36,7 +36,7 @@ class Instance(Module):
         properties["id"] = self.instance
 
         env.substitutions = properties
-        env.outbasepath = "src/modm/platform/spi"
+        env.outbasepath = "modm/src/modm/platform/spi"
 
         env.template("uart_spi_master.hpp.in", "uart_spi_master_{}.hpp".format(self.instance))
         env.template("uart_spi_master.cpp.in", "uart_spi_master_{}.cpp".format(self.instance))

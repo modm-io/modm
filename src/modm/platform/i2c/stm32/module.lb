@@ -46,7 +46,7 @@ class Instance(Module):
         properties["id"] = self.instance
 
         env.substitutions = properties
-        env.outbasepath = "src/modm/platform/i2c"
+        env.outbasepath = "modm/src/modm/platform/i2c"
 
         env.template("i2c_master.cpp.in", "i2c_master_{}.cpp".format(self.instance))
         env.template("i2c_master.hpp.in", "i2c_master_{}.hpp".format(self.instance))

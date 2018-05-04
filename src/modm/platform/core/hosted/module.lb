@@ -40,10 +40,8 @@ def build(env):
     properties["partname"] = device.partname
     properties["driver"] = device.get_driver("core")
 
-    env.append_metadata_unique("include_path", "src")
-
     env.substitutions = properties
-    env.outbasepath = "src/modm/platform/core"
+    env.outbasepath = "modm/src/modm/platform/core"
 
     env.copy("assert.cpp")
     env.copy("memory.cpp")
@@ -51,7 +49,7 @@ def build(env):
     env.copy("../avr/unaligned.hpp", "unaligned.hpp")
     env.copy("../cortex/flash_reader.hpp", "flash_reader.hpp")
 
-    env.outbasepath = "src/modm/platform/clock"
+    env.outbasepath = "modm/src/modm/platform/clock"
     if not env.has_module(":test"):
         env.template("clock.cpp.in")
     env.template("delay.hpp.in")

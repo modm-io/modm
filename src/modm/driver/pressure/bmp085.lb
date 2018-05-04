@@ -25,7 +25,7 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/driver/pressure"
+    env.outbasepath = "modm/src/modm/driver/pressure"
     env.copy("bmp085.hpp")
     env.copy("bmp085_impl.hpp")
     env.copy("bmp085_data.hpp")

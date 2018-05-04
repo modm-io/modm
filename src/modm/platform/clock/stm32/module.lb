@@ -54,7 +54,7 @@ def build(env):
         target["family"] == "f0" and target["name"] in ["42", "48", "71", "72", "78", "91", "98"]
 
     env.substitutions = properties
-    env.outbasepath = "src/modm/platform/clock"
+    env.outbasepath = "modm/src/modm/platform/clock"
 
     env.template("latency.cpp.in")
     env.template("clock.cpp.in")

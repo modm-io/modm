@@ -39,7 +39,7 @@ def build(env):
     properties["driver"] = driver
 
     env.substitutions = properties
-    env.outbasepath = "src/modm/platform/can"
+    env.outbasepath = "modm/src/modm/platform/can"
 
     if env[":target"].partname == "hosted-linux":
         env.append_metadata("required_library", "pthread")

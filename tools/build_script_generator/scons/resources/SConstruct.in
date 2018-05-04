@@ -10,12 +10,13 @@
 #!/usr/bin/env python
 
 import os
+from os.path import join, abspath
 
-rootpath = "."
+rootpath = "modm"
 
 env = Environment(
-        toolpath=[os.path.join(rootpath, "scons", "site_tools"),
-                  os.path.join(rootpath, "ext", "dlr", "scons-build-tools", "site_tools")],
+        toolpath=[join(rootpath, "scons", "site_tools"),
+                  join(rootpath, "ext", "dlr", "scons-build-tools", "site_tools")],
 
 %# ================================== STM32 ===================================
 %% if platform in ["stm32"]
@@ -47,7 +48,7 @@ env = Environment(
 #env.Append(CCFLAGS_warning=["-Werror"])
 env.Append(LINKFLAGS_other=["-Wl,--no-wchar-size-warning"])
 env.Append(LINKFLAGS_target=[
-    "-Llink",
+    "-Lmodm/link",
     "-Tlinkerscript.ld",
     ])
 
@@ -78,7 +79,7 @@ env.Append(ASFLAGS_target=[
     "-xassembler-with-cpp",
     ])
 env.Append(LINKFLAGS_target=[
-    "-Llink",
+    "-Lmodm/link",
     "-Tlinkerscript.ld",
     ])
 
@@ -111,10 +112,10 @@ env.RemoveFromList("CXXFLAGS_warning", [
     "-Wnon-virtual-dtor"])
 
 # User Config Options
-env["BASEPATH"]  = os.path.abspath(rootpath)
-env["BUILDPATH"] = os.path.abspath("{{ build_path }}")
+env["BASEPATH"]  = abspath(rootpath)
+env["BUILDPATH"] = abspath("{{ build_path }}")
 
-library = env.SConscript(os.path.join(rootpath, "SConscript"), exports="env")
+library = env.SConscript(join(rootpath, "SConscript"), exports="env")
 
 %% if info_git
 env.InfoGit()
@@ -124,11 +125,11 @@ env.InfoBuild()
 %% endif
 
 %% if options["::is_unittest"]
-headers = env.Glob("test/*.hpp")
-headers += env.Glob("test/*/*.hpp")
-headers += env.Glob("test/*/*/*.hpp")
-headers += env.Glob("test/*/*/*/*.hpp")
-files = env.UnittestRunner(target="main.cpp", source=headers, template="test/runner.cpp.in")
+headers = env.Glob("modm/test/*.hpp")
+headers += env.Glob("modm/test/*/*.hpp")
+headers += env.Glob("modm/test/*/*/*.hpp")
+headers += env.Glob("modm/test/*/*/*/*.hpp")
+files = env.UnittestRunner(target="main.cpp", source=headers, template="modm/test/runner.cpp.in")
 %% else
 # FIXME: better globbing! (recursive?)
 files = env.Glob("*.cpp")
@@ -138,16 +139,16 @@ env.Append(CPPPATH=["."])
 %% endif
 
 %% if image_source != ""
-for image in Glob(os.path.abspath(os.path.join("{{image_source}}", "*.pbm"))):
+for image in Glob(abspath(join("{{image_source}}", "*.pbm"))):
     source, header = env.Bitmap(image)
     files.append(source)
 %% endif
 %% if xpcc_source != ""
 files += env.XpccCommunication(
-    os.path.abspath("{{xpcc_source}}"),
+    abspath("{{xpcc_source}}"),
     "{{xpcc_container}}",
-    dtdPath=os.path.abspath(os.path.join(rootpath, "tools", "system_design", "xml", "dtd")),
-    path=os.path.abspath("{{xpcc_generate}}"),
+    dtdPath=abspath(join(rootpath, "tools", "system_design", "xml", "dtd")),
+    path=abspath("{{xpcc_generate}}"),
     namespace="{{xpcc_namespace}}")
 %% endif
 program = env.Program(target="project.elf", source=files)

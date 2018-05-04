@@ -41,7 +41,7 @@ class Instance(Module):
         properties["apb_post"] = "1" if properties["target"]["family"] in ["l4"] and self.instance != 1 else ""
 
         env.substitutions = properties
-        env.outbasepath = "src/modm/platform/spi"
+        env.outbasepath = "modm/src/modm/platform/spi"
 
         env.template("spi_hal.hpp.in", "spi_hal_{}.hpp".format(self.instance))
         env.template("spi_hal_impl.hpp.in", "spi_hal_{}_impl.hpp".format(self.instance))
@@ -72,6 +72,6 @@ def prepare(module, options):
 
 def build(env):
     env.substitutions = get_properties(env)
-    env.outbasepath = "src/modm/platform/spi"
+    env.outbasepath = "modm/src/modm/platform/spi"
 
     env.template("spi_base.hpp.in")

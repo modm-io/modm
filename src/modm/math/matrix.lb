@@ -22,7 +22,7 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/math"
+    env.outbasepath = "modm/src/modm/math"
     env.copy("matrix.hpp")
     env.copy("matrix_impl.hpp")
     env.copy("lu_decomposition.hpp")

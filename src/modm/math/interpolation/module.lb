@@ -22,6 +22,6 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/math/interpolation"
+    env.outbasepath = "modm/src/modm/math/interpolation"
     env.copy(".", ignore=env.ignore_patterns("*.lb"))
     env.copy("../interpolation.hpp")

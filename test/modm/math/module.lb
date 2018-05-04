@@ -28,5 +28,5 @@ def prepare(module, options):
 
 
 def build(env):
-    env.outbasepath = "test/modm/math"
+    env.outbasepath = "modm/test/modm/math"
     env.copy('.', ignore=env.ignore_patterns("*.lb"))

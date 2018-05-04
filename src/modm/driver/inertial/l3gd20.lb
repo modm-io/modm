@@ -24,6 +24,6 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/driver/inertial"
+    env.outbasepath = "modm/src/modm/driver/inertial"
     env.copy("l3gd20.hpp")
     env.copy("l3gd20_impl.hpp")

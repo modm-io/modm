@@ -27,6 +27,6 @@ def build(env):
     env.append_metadata_unique("required_pkg", "cairomm-1.0")
     env.append_metadata_unique("required_pkg", "sdl")
 
-    env.outbasepath = "src/modm/driver/display"
+    env.outbasepath = "modm/src/modm/driver/display"
     env.copy("sdl_display.hpp")
     env.copy("sdl_display.cpp")

@@ -21,7 +21,7 @@ class Accessor(Module):
         return True
 
     def build(self, env):
-        env.outbasepath = "src/modm/architecture"
+        env.outbasepath = "modm/src/modm/architecture"
         env.copy("interface/accessor.hpp")
         env.copy("interface/accessor_flash.hpp")
         env.copy("interface/accessor_ram.hpp")
@@ -35,7 +35,7 @@ class Adc(Module):
         return True
 
     def build(self, env):
-        env.outbasepath = "src/modm/architecture"
+        env.outbasepath = "modm/src/modm/architecture"
         env.copy("interface/adc.hpp")
         env.copy("interface/adc_interrupt.hpp")
 # -----------------------------------------------------------------------------
@@ -49,7 +49,7 @@ class Assert(Module):
         return True
 
     def build(self, env):
-        env.outbasepath = "src/modm/architecture"
+        env.outbasepath = "modm/src/modm/architecture"
         env.copy("interface/assert.hpp")
         env.copy("interface/assert.h")
 # -----------------------------------------------------------------------------
@@ -64,7 +64,7 @@ class Atomic(Module):
         return True
 
     def build(self, env):
-        env.outbasepath = "src/modm/architecture"
+        env.outbasepath = "modm/src/modm/architecture"
         env.copy("interface/atomic_lock.hpp")
         env.copy("driver/atomic")
         env.copy("driver/atomic.hpp")
@@ -79,7 +79,7 @@ class BlockDevice(Module):
         return True
 
     def build(self, env):
-        env.outbasepath = "src/modm/architecture"
+        env.outbasepath = "modm/src/modm/architecture"
         env.copy("interface/block_device.hpp")
 # -----------------------------------------------------------------------------
 
@@ -92,7 +92,7 @@ class Can(Module):
         return True
 
     def build(self, env):
-        env.outbasepath = "src/modm/architecture"
+        env.outbasepath = "modm/src/modm/architecture"
         env.copy("interface/can.hpp")
         env.copy("interface/can.cpp")
         env.copy("interface/can_message.hpp")
@@ -108,7 +108,7 @@ class Clock(Module):
         return True
 
     def build(self, env):
-        env.outbasepath = "src/modm/architecture"
+        env.outbasepath = "modm/src/modm/architecture"
         env.copy("interface/clock.hpp")
 # -----------------------------------------------------------------------------
 
@@ -121,7 +121,7 @@ class Delay(Module):
         return True
 
     def build(self, env):
-        env.outbasepath = "src/modm/architecture"
+        env.outbasepath = "modm/src/modm/architecture"
         env.copy("interface/delay.hpp")
 # -----------------------------------------------------------------------------
 
@@ -133,7 +133,7 @@ class Gpio(Module):
         return True
 
     def build(self, env):
-        env.outbasepath = "src/modm/architecture"
+        env.outbasepath = "modm/src/modm/architecture"
         env.copy("interface/gpio.hpp")
 # -----------------------------------------------------------------------------
 
@@ -146,7 +146,7 @@ class GpioExpander(Module):
         return True
 
     def build(self, env):
-        env.outbasepath = "src/modm/architecture"
+        env.outbasepath = "modm/src/modm/architecture"
         env.copy("interface/gpio_expander.hpp")
 # -----------------------------------------------------------------------------
 
@@ -159,7 +159,7 @@ class Heap(Module):
         return True
 
     def build(self, env):
-        env.outbasepath = "src/modm/architecture"
+        env.outbasepath = "modm/src/modm/architecture"
         env.copy("driver/heap/block_allocator.hpp")
         env.copy("driver/heap/block_allocator_impl.hpp")
 # -----------------------------------------------------------------------------
@@ -173,7 +173,7 @@ class I2c(Module):
         return True
 
     def build(self, env):
-        env.outbasepath = "src/modm/architecture"
+        env.outbasepath = "modm/src/modm/architecture"
         env.copy("interface/i2c.hpp")
         env.copy("interface/i2c.cpp")
         env.copy("interface/i2c_master.hpp")
@@ -189,7 +189,7 @@ class I2cDevice(Module):
         return True
 
     def build(self, env):
-        env.outbasepath = "src/modm/architecture"
+        env.outbasepath = "modm/src/modm/architecture"
         env.copy("interface/i2c_device.hpp")
 # -----------------------------------------------------------------------------
 
@@ -201,7 +201,7 @@ class Interrupt(Module):
         return True
 
     def build(self, env):
-        env.outbasepath = "src/modm/architecture"
+        env.outbasepath = "modm/src/modm/architecture"
         env.copy("interface/interrupt.hpp")
 # -----------------------------------------------------------------------------
 
@@ -214,7 +214,7 @@ class Memory(Module):
         return True
 
     def build(self, env):
-        env.outbasepath = "src/modm/architecture"
+        env.outbasepath = "modm/src/modm/architecture"
         env.copy("interface/memory.hpp")
 # -----------------------------------------------------------------------------
 
@@ -226,7 +226,7 @@ class OneWire(Module):
         return True
 
     def build(self, env):
-        env.outbasepath = "src/modm/architecture"
+        env.outbasepath = "modm/src/modm/architecture"
         env.copy("interface/one_wire.hpp")
 # -----------------------------------------------------------------------------
 
@@ -239,7 +239,7 @@ class Register(Module):
         return True
 
     def build(self, env):
-        env.outbasepath = "src/modm/architecture"
+        env.outbasepath = "modm/src/modm/architecture"
         env.copy("interface/register.hpp")
 # -----------------------------------------------------------------------------
 
@@ -252,7 +252,7 @@ class Spi(Module):
         return True
 
     def build(self, env):
-        env.outbasepath = "src/modm/architecture"
+        env.outbasepath = "modm/src/modm/architecture"
         env.copy("interface/spi.hpp")
         env.copy("interface/spi_master.hpp")
 # -----------------------------------------------------------------------------
@@ -266,7 +266,7 @@ class SpiDevice(Module):
         return True
 
     def build(self, env):
-        env.outbasepath = "src/modm/architecture"
+        env.outbasepath = "modm/src/modm/architecture"
         env.copy("interface/spi_device.hpp")
 # -----------------------------------------------------------------------------
 
@@ -278,7 +278,7 @@ class Uart(Module):
         return True
 
     def build(self, env):
-        env.outbasepath = "src/modm/architecture"
+        env.outbasepath = "modm/src/modm/architecture"
         env.copy("interface/uart.hpp")
 # -----------------------------------------------------------------------------
 
@@ -291,7 +291,7 @@ class Unaligned(Module):
         return True
 
     def build(self, env):
-        env.outbasepath = "src/modm/architecture"
+        env.outbasepath = "modm/src/modm/architecture"
         env.copy("interface/unaligned.hpp")
 # -----------------------------------------------------------------------------
 
@@ -328,7 +328,7 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/architecture"
+    env.outbasepath = "modm/src/modm/architecture"
 
     headers = env.get_generated_local_files(filterfunc=lambda path: re.match(r"interface/.*\.hpp", path))
     env.template("interface.hpp.in", substitutions={"headers": sorted(headers)})

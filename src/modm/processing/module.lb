@@ -20,7 +20,7 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/processing"
+    env.outbasepath = "modm/src/modm/processing"
     headers = env.get_generated_local_files(filterfunc=lambda path: re.match(r"[^/]+\.hpp", path))
     env.template("processing.hpp.in", substitutions={"headers": sorted(headers)})
 

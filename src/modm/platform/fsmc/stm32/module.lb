@@ -44,7 +44,7 @@ def build(env):
         properties["BTRx"] = "BTRx"
 
     env.substitutions = properties
-    env.outbasepath = "src/modm/platform/fsmc"
+    env.outbasepath = "modm/src/modm/platform/fsmc"
 
     env.template("fsmc.hpp.in")
     env.template("fsmc.cpp.in")

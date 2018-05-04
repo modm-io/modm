@@ -16,7 +16,7 @@ class BlockDeviceFile(Module):
         return (options[":target"].identifier["platform"] == "hosted")
 
     def build(self, env):
-        env.outbasepath = "src/modm/driver/storage"
+        env.outbasepath = "modm/src/modm/driver/storage"
         env.copy("block_device_file.hpp")
         env.copy("block_device_file_impl.hpp")
 # -----------------------------------------------------------------------------
@@ -30,7 +30,7 @@ class BlockDeviceHeap(Module):
         return True
 
     def build(self, env):
-        env.outbasepath = "src/modm/driver/storage"
+        env.outbasepath = "modm/src/modm/driver/storage"
         env.copy("block_device_heap.hpp")
         env.copy("block_device_heap_impl.hpp")
 # -----------------------------------------------------------------------------
@@ -44,7 +44,7 @@ class BlockDeviceMirror(Module):
         return True
 
     def build(self, env):
-        env.outbasepath = "src/modm/driver/storage"
+        env.outbasepath = "modm/src/modm/driver/storage"
         env.copy("block_device_mirror.hpp")
         env.copy("block_device_mirror_impl.hpp")
 # -----------------------------------------------------------------------------
@@ -58,7 +58,7 @@ class BlockDeviceSpiFlash(Module):
         return True
 
     def build(self, env):
-        env.outbasepath = "src/modm/driver/storage"
+        env.outbasepath = "modm/src/modm/driver/storage"
         env.copy("block_device_spiflash.hpp")
         env.copy("block_device_spiflash_impl.hpp")
 # -----------------------------------------------------------------------------

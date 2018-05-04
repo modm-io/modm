@@ -22,7 +22,7 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/ui"
+    env.outbasepath = "modm/src/modm/ui"
     env.copy("color.hpp")
     env.copy("color.cpp")
     env.copy("color_impl.hpp")

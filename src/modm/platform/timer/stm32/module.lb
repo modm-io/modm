@@ -55,7 +55,7 @@ class Instance(Module):
         properties["apb_post"] = "1" if properties["target"]["family"] in ["l4"] else ""
 
         env.substitutions = properties
-        env.outbasepath = "src/modm/platform/timer"
+        env.outbasepath = "modm/src/modm/platform/timer"
 
         source_timer = "general_purpose"
         if self.instance in [1, 8]:
@@ -89,7 +89,7 @@ def prepare(module, options):
 
 def build(env):
     env.substitutions = get_properties(env)
-    env.outbasepath = "src/modm/platform/timer"
+    env.outbasepath = "modm/src/modm/platform/timer"
 
     env.template("basic_base.hpp.in")
     env.template("general_purpose_base.hpp.in")

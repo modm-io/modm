@@ -29,7 +29,7 @@ def build(env):
 
     device = env[":target"]
 
-    env.outbasepath = "ext/cmsis_device"
+    env.outbasepath = "modm/ext/cmsis_device"
 
     defines = []
     headers = []
@@ -48,5 +48,5 @@ def build(env):
         'headers': headers,
         'defines': defines,
     }
-    env.outbasepath = "src/modm/platform"
+    env.outbasepath = "modm/src/modm/platform"
     env.template("device.hpp.in")

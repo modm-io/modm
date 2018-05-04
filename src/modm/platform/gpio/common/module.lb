@@ -23,7 +23,7 @@ def prepare(module, options):
 
 def build(env):
     env.substitutions = {"target": env[":target"].identifier}
-    env.outbasepath = "src/modm/platform/gpio"
+    env.outbasepath = "modm/src/modm/platform/gpio"
 
     env.template("connector_detail.hpp.in")
     env.copy("connector.hpp")

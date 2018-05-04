@@ -21,6 +21,6 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/driver/pwm"
+    env.outbasepath = "modm/src/modm/driver/pwm"
     env.copy("pca9685.hpp")
     env.copy("pca9685_impl.hpp")

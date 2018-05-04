@@ -31,5 +31,5 @@ def prepare(module, options):
 
 
 def build(env):
-    env.outbasepath = "test/modm/driver"
+    env.outbasepath = "modm/test/modm/driver"
     env.copy('.', ignore=env.ignore_patterns("*.lb"))

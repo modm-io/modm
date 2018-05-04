@@ -23,6 +23,6 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/processing/timer"
+    env.outbasepath = "modm/src/modm/processing/timer"
     env.copy(".", ignore=env.ignore_patterns("*.lb"))
     env.copy("../timer.hpp")
