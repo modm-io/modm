@@ -19,6 +19,6 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/ui/animation"
+    env.outbasepath = "modm/src/modm/ui/animation"
     env.copy(".", ignore=env.ignore_patterns("*.lb"))
     env.copy("../animation.hpp")

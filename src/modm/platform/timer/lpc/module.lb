@@ -38,7 +38,7 @@ class Instance(Module):
         properties["id"] = self.instance
 
         env.substitutions = properties
-        env.outbasepath = "src/modm/platform/timer"
+        env.outbasepath = "modm/src/modm/platform/timer"
 
         env.template("timer.hpp.in", "timer_{}.hpp".format(self.instance))
 
@@ -61,6 +61,6 @@ def prepare(module, options):
 
 def build(env):
     env.substitutions = get_properties(env)
-    env.outbasepath = "src/modm/platform/timer"
+    env.outbasepath = "modm/src/modm/platform/timer"
 
     env.copy("timer_registers.hpp")

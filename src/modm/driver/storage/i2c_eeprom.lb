@@ -20,7 +20,7 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/driver/storage"
+    env.outbasepath = "modm/src/modm/driver/storage"
     env.copy("i2c_eeprom.hpp")
     env.copy("i2c_eeprom.cpp")
     env.copy("i2c_eeprom_impl.hpp")

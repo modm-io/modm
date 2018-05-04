@@ -56,6 +56,6 @@ def build(env):
 
     env.append_metadata_unique("include_path", "ext/cmsis/dsp")
 
-    env.outbasepath = "ext/cmsis/dsp"
+    env.outbasepath = "modm/ext/cmsis/dsp"
     env.copy("cmsis/CMSIS/DSP/Include", ".")
     env.copy("cmsis/CMSIS/DSP/Source", ".")

@@ -22,6 +22,6 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/driver/rtc"
+    env.outbasepath = "modm/src/modm/driver/rtc"
     env.copy("ds1302.hpp")
     env.copy("ds1302_impl.hpp")

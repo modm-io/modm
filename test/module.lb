@@ -21,7 +21,7 @@ def prepare(module, options):
 
 
 def build(env):
-    env.outbasepath = "test"
+    env.outbasepath = "modm/test"
 
     env.append_metadata_unique("include_path", "test")
 

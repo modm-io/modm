@@ -30,7 +30,7 @@ def prepare(module, options):
 
 
 def build(env):
-    env.outbasepath = "src/modm/debug"
+    env.outbasepath = "modm/src/modm/debug"
 
     ignore_patterns = ["*.lb"]
     target = env[":target"].identifier

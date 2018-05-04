@@ -32,7 +32,7 @@ def build(env):
     properties["driver"] = driver
 
     env.substitutions = properties
-    env.outbasepath = "src/modm/platform/gpio"
+    env.outbasepath = "modm/src/modm/platform/gpio"
 
     env.template("gpio.hpp.in")
     env.copy("gpio_enable.cpp")

@@ -41,7 +41,7 @@ def build(env):
     properties["driver"] = driver
 
     env.substitutions = properties
-    env.outbasepath = "src/modm/platform/i2c"
+    env.outbasepath = "modm/src/modm/platform/i2c"
 
     env.template("i2c.hpp.in")
     env.template("i2c_master.hpp.in")

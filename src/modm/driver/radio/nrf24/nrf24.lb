@@ -26,5 +26,5 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/driver/radio/nrf24"
+    env.outbasepath = "modm/src/modm/driver/radio/nrf24"
     env.copy(".", ignore=env.ignore_patterns("*.lb"))

@@ -121,7 +121,7 @@ def build(env):
     properties["number_of_interrupts"] = max(interrupts.keys()) + 1
 
     env.substitutions = properties
-    env.outbasepath = "link"
+    env.outbasepath = "modm/link"
 
     for memory in listify(driver["memory"]):
         if memory["name"] == "ccm":
@@ -144,7 +144,7 @@ def build(env):
     else:
         env.template("linkerscript/stm32_ram.ld.in", "linkerscript.ld")
 
-    env.outbasepath = "src/modm/platform/core"
+    env.outbasepath = "modm/src/modm/platform/core"
 
     # dealing with runtime assertions
     env.copy("assert.cpp")

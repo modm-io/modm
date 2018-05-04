@@ -25,7 +25,7 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/driver/gpio"
+    env.outbasepath = "modm/src/modm/driver/gpio"
     env.copy("mcp23x17.hpp")
     env.copy("mcp23x17_impl.hpp")
     env.copy("mcp23_transport.hpp")

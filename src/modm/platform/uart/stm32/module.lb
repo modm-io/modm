@@ -62,7 +62,7 @@ class Instance(Module):
         properties["uart_name"] = self.driver["name"].capitalize()
 
         env.substitutions = properties
-        env.outbasepath = "src/modm/platform/uart"
+        env.outbasepath = "modm/src/modm/platform/uart"
 
         env.template("uart_hal.hpp.in", "uart_hal_{}.hpp".format(self.instance))
         env.template("uart_hal_impl.hpp.in", "uart_hal_{}_impl.hpp".format(self.instance))
@@ -105,6 +105,6 @@ def build(env):
     properties["tcbgt"] = ("feature" in drivers[0]) and ("tcbgt" in drivers[0]["feature"])
 
     env.substitutions = properties
-    env.outbasepath = "src/modm/platform/uart"
+    env.outbasepath = "modm/src/modm/platform/uart"
     env.template("uart_base.hpp.in")
     env.template("uart_baudrate.hpp.in")

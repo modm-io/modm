@@ -24,7 +24,7 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/driver/display"
+    env.outbasepath = "modm/src/modm/driver/display"
     env.copy("hd44780_base.hpp")
     env.copy("hd44780_base_impl.hpp")
     env.copy("hd44780.hpp")

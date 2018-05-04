@@ -57,7 +57,7 @@ class Instance(Module):
         properties["id"] = self.instance
 
         env.substitutions = properties
-        env.outbasepath = "src/modm/platform/uart"
+        env.outbasepath = "modm/src/modm/platform/uart"
 
         env.template("uart.hpp.in", "uart_{}.hpp".format(self.instance.lower()))
         env.template("uart_buffered_tx.cpp.in", "uart_{}_buffered_tx.cpp".format(self.instance.lower()))
@@ -86,6 +86,6 @@ def prepare(module, options):
 
 def build(env):
     env.substitutions = get_properties(env)
-    env.outbasepath = "src/modm/platform/uart"
+    env.outbasepath = "modm/src/modm/platform/uart"
 
     env.copy("uart_baudrate.hpp")

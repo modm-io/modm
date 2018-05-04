@@ -25,5 +25,5 @@ def prepare(module, options):
 
 
 def build(env):
-    env.outbasepath = "src/modm/container"
+    env.outbasepath = "modm/src/modm/container"
     env.copy(".", ignore=env.ignore_files("*.lb"))

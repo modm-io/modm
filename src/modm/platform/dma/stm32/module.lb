@@ -32,7 +32,7 @@ class Instance(Module):
         properties["id"] = self.instance
 
         env.substitutions = properties
-        env.outbasepath = "src/modm/platform/dma"
+        env.outbasepath = "modm/src/modm/platform/dma"
 
         env.template("dma.hpp.in", "dma_{}.hpp".format(self.instance))
         env.template("dma_impl.hpp.in", "dma_{}_impl.hpp".format(self.instance))
@@ -65,6 +65,6 @@ def build(env):
     properties["partname"] = device.partname
 
     env.substitutions = properties
-    env.outbasepath = "src/modm/platform/dma"
+    env.outbasepath = "modm/src/modm/platform/dma"
 
     env.template("dma_base.hpp.in")

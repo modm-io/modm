@@ -129,7 +129,7 @@ def build(env):
     env.append_metadata_unique("include_path", "ext")
     env.append_metadata_unique("include_path", "ext/cmsis/device")
 
-    env.outbasepath = "ext/cmsis/device"
+    env.outbasepath = "modm/ext/cmsis/device"
     env.copy(localpath(bprops["folder"], bprops["device_header"]), bprops["device_header"])
     env.copy(localpath(bprops["folder"], bprops["system_header"]), bprops["system_header"])
 
@@ -141,7 +141,7 @@ def build(env):
         "max_addr": max([a for (_, _,a) in bprops["peripherals"]])
     }
     env.template("../peripherals.c.in", "peripherals.c")
-    env.outbasepath = "link"
+    env.outbasepath = "modm/link"
     env.template("../peripherals.ld.in", "peripherals.ld")
-    env.outbasepath = "src/modm/platform"
+    env.outbasepath = "modm/src/modm/platform"
     env.template("device.hpp.in")

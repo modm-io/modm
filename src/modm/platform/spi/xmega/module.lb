@@ -33,4 +33,4 @@ def build(env):
     properties["driver"] = driver
 
     env.substitutions = properties
-    env.outbasepath = "src/modm/platform/spi"
+    env.outbasepath = "modm/src/modm/platform/spi"

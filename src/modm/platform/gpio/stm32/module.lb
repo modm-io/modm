@@ -252,7 +252,7 @@ def build(env):
     properties.update(bprops)
 
     env.substitutions = properties
-    env.outbasepath = "src/modm/platform/gpio"
+    env.outbasepath = "modm/src/modm/platform/gpio"
     gpio_source = "pin_f1.hpp.in" if "f1" in driver["type"] else "pin.hpp.in"
 
     for gpio in driver["gpio"]:

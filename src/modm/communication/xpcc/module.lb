@@ -41,7 +41,7 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/communication/xpcc"
+    env.outbasepath = "modm/src/modm/communication/xpcc"
 
     ignore = ["*.lb", "*.in", "*backend/tipc*"]
 

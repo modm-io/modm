@@ -32,4 +32,4 @@ def build(env):
     properties["driver"] = driver
 
     env.substitutions = properties
-    env.outbasepath = "src/modm/platform/timer"
+    env.outbasepath = "modm/src/modm/platform/timer"

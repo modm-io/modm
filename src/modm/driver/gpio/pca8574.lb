@@ -24,6 +24,6 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/driver/gpio"
+    env.outbasepath = "modm/src/modm/driver/gpio"
     env.copy("pca8574.hpp")
     env.copy("pca8574_impl.hpp")

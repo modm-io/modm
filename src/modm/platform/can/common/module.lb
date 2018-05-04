@@ -20,5 +20,5 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/platform/can"
+    env.outbasepath = "modm/src/modm/platform/can"
     env.copy("can_bit_timings.hpp")

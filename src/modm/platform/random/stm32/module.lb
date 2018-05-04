@@ -29,6 +29,6 @@ def build(env):
     properties["partname"] = device.partname
 
     env.substitutions = properties
-    env.outbasepath = "src/modm/platform/random"
+    env.outbasepath = "modm/src/modm/platform/random"
 
     env.template("random_number_generator.hpp.in")

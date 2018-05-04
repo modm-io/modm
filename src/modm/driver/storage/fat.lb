@@ -22,6 +22,6 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/driver/storage"
+    env.outbasepath = "modm/src/modm/driver/storage"
     env.copy("fat.hpp")
     env.copy("fat.cpp")

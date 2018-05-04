@@ -23,6 +23,6 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/driver/pwm"
+    env.outbasepath = "modm/src/modm/driver/pwm"
     env.copy("max6966.hpp")
     env.copy("max6966_impl.hpp")

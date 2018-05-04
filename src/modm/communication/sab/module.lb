@@ -22,6 +22,6 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/communication/sab"
+    env.outbasepath = "modm/src/modm/communication/sab"
     env.copy(".", ignore=env.ignore_patterns("*.lb"))
     env.copy("../sab.hpp")

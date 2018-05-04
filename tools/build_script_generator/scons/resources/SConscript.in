@@ -77,7 +77,7 @@ env["CONFIG_OPENOCD_COMMANDS"] = [
 env["CONFIG_CLOCK_F_CPU"] = "{{ options[":platform:clock:f_cpu"] }}"
 %% endif
 
-env['XPCC_SYSTEM_BUILDER'] = os.path.join("tools", "system_design", "builder")
+env['XPCC_SYSTEM_BUILDER'] = os.path.join("modm", "tools", "system_design", "builder")
 
 %% if platform not in ["hosted"]
 # We need to link libmodm.a with --whole-archive, so that all weak symbols are visible to the linker.

@@ -22,5 +22,5 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/processing/scheduler"
+    env.outbasepath = "modm/src/modm/processing/scheduler"
     env.copy(".", ignore=env.ignore_patterns("*.lb"))

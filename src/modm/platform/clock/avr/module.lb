@@ -41,7 +41,7 @@ def build(env):
     properties["driver"] = driver
 
     env.substitutions = properties
-    env.outbasepath = "src/modm/platform/clock"
+    env.outbasepath = "modm/src/modm/platform/clock"
 
     env.copy("static.hpp")
     env.copy("delay.hpp")

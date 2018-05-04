@@ -81,6 +81,7 @@ def post_build(env, buildlog):
     if env["is_unittest"]: build_tools.append("unittest")
 
     # Extract all source code files
+    env.outbasepath = "modm"
     files_to_build = []
     outpath = env.outpath(".")
     for operations in buildlog:
@@ -130,13 +131,15 @@ def post_build(env, buildlog):
     env.append_metadata_unique('include_path', 'src')
     env.template("resources/SConscript.in", "SConscript")
 
-    if env["include_demo_project"] or env["include_sconstruct"]:
-        env.template("resources/SConstruct.in", "SConstruct")
-    if env["include_demo_project"]:
-        env.template("resources/main.cpp.in", "main.cpp")
-
     # Copy the scons-build-tools
     env.copy(localpath("../../../ext/dlr/scons-build-tools"), "ext/dlr/scons-build-tools")
     env.copy("site_tools", "scons/site_tools")
     if "system_design" in build_tools:
         env.copy(localpath("../../../tools/system_design"), "tools/system_design")
+
+    # these are the ONLY files that are allowed to NOT be namespaced with modm!
+    env.outbasepath = "."
+    if env["include_demo_project"]:
+        env.template("resources/main.cpp.in", "main.cpp")
+    if env["include_demo_project"] or env["include_sconstruct"]:
+        env.template("resources/SConstruct.in", "SConstruct")

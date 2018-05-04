@@ -46,7 +46,7 @@ class Instance(Module):
         properties["id"] = self.instance
 
         env.substitutions = properties
-        env.outbasepath = "src/modm/platform/spi"
+        env.outbasepath = "modm/src/modm/platform/spi"
 
         env.template("spi.hpp.in", "spi{}.hpp".format(self.instance))
         env.template("spi_master.hpp.in", "spi_master{}.hpp".format(self.instance))
@@ -83,7 +83,7 @@ def build(env):
         properties["id"] = ""
 
     env.substitutions = properties
-    env.outbasepath = "src/modm/platform/spi"
+    env.outbasepath = "modm/src/modm/platform/spi"
 
     if "instance" not in driver:
         env.template("spi_master.hpp.in")

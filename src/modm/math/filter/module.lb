@@ -22,6 +22,6 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/math/filter"
+    env.outbasepath = "modm/src/modm/math/filter"
     env.copy(".", ignore=env.ignore_patterns("*.lb"))
     env.copy("../filter.hpp")

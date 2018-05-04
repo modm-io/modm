@@ -41,7 +41,7 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "ext/tlsf"
+    env.outbasepath = "modm/ext/tlsf"
     env.copy("tlsf.h")
     env.template("tlsf.c.in", substitutions={
         "sl_index_count_log2": math.ceil(math.log2(env["::subdivisions"])),

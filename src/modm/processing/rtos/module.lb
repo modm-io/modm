@@ -25,7 +25,7 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/processing/"
+    env.outbasepath = "modm/src/modm/processing/"
     if env.has_module(":freertos"):
         env.copy("freertos", "rtos")
     elif env[":target"].identifier["platform"] in ["hosted"]:

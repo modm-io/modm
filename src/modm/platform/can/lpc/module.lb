@@ -47,7 +47,7 @@ def build(env):
     properties["driver"] = driver
 
     env.substitutions = properties
-    env.outbasepath = "src/modm/platform/can"
+    env.outbasepath = "modm/src/modm/platform/can"
 
     env.template("c_can.cpp.in")
     env.template("c_can.hpp.in")

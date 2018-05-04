@@ -18,5 +18,5 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/ui"
+    env.outbasepath = "modm/src/modm/ui"
     pass

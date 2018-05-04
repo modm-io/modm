@@ -28,7 +28,7 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/driver/position"
+    env.outbasepath = "modm/src/modm/driver/position"
     env.copy("vl6180.hpp")
     env.copy("vl6180_impl.hpp")
     env.copy("vl6180.cpp")

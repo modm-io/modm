@@ -34,6 +34,6 @@ def build(env):
         properties["address"] = "0x1FFFF7E8"
 
     env.substitutions = properties
-    env.outbasepath = "src/modm/platform/id"
+    env.outbasepath = "modm/src/modm/platform/id"
 
     env.template("id.hpp.in")

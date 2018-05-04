@@ -30,7 +30,7 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/driver/motion"
+    env.outbasepath = "modm/src/modm/driver/motion"
     env.copy("adns9800.hpp")
     env.copy("adns9800_impl.hpp")
     env.copy("adns9800_srom_{}.hpp".format(env[":::firmware"]), "adns9800_srom.hpp")

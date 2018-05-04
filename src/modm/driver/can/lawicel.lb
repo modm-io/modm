@@ -21,6 +21,6 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/driver/can"
+    env.outbasepath = "modm/src/modm/driver/can"
     env.copy("can_lawicel_formatter.hpp")
     env.copy("can_lawicel_formatter.cpp")

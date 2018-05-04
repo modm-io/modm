@@ -19,7 +19,7 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/math/utils"
+    env.outbasepath = "modm/src/modm/math/utils"
 
     ignore = ["*.lb", "*operator_*"]
     if "avr" in env[":target"].identifier["platform"]:

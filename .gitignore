@@ -33,24 +33,9 @@ CMakeLists.txt
 **/.idea/
 
 # ignore generated code in the example folder
-examples/*/*/src
-examples/*/*/ext
-examples/*/*/link
-examples/*/*/SConscript
+examples/*/*/modm
 examples/*/*/SConstruct
-examples/*/*/scons
-examples/*/*/tools
-examples/*/*/*/src
-examples/*/*/*/ext
-examples/*/*/*/link
-examples/*/*/*/SConscript
+examples/*/*/*/modm
 examples/*/*/*/SConstruct
-examples/*/*/*/scons
-examples/*/*/*/tools
-examples/*/*/*/*/src
-examples/*/*/*/*/ext
-examples/*/*/*/*/link
-examples/*/*/*/*/SConscript
+examples/*/*/*/*/modm
 examples/*/*/*/*/SConstruct
-examples/*/*/*/*/scons
-examples/*/*/*/*/tools

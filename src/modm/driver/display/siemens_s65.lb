@@ -23,6 +23,6 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/driver/display"
+    env.outbasepath = "modm/src/modm/driver/display"
     env.copy("siemens_s65.hpp")
     env.copy("siemens_s65_impl.hpp")

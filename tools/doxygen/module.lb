@@ -18,7 +18,7 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "docs"
+    env.outbasepath = "modm/docs"
     env.copy("doxyfile")
     env.copy("doxygen")
     env.copy("doxygen_favicon.png")

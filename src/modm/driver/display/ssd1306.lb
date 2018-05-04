@@ -23,7 +23,7 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "src/modm/driver/display"
+    env.outbasepath = "modm/src/modm/driver/display"
     env.copy("ssd1306.hpp")
     env.copy("ssd1306_impl.hpp")
     env.copy("ssd1306_transmission_impl.hpp")
