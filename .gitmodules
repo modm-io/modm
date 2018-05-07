@@ -12,5 +12,4 @@
 	url = https://github.com/modm-io/xpcc_ros_lib.git
 [submodule "ext/arm/cmsis"]
 	path = ext/arm/cmsis
-	url = https://github.com/modm-io/CMSIS_5.git
-	shallow = true
+	url = https://github.com/modm-io/cmsis-5-partial.git
