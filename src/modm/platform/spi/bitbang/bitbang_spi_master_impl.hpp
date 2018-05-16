@@ -94,7 +94,7 @@ template <typename Sck, typename Mosi, typename Miso>
 uint8_t
 modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::acquire(void *ctx, ConfigurationHandler handler)
 {
-	if (ctx == nullptr)
+	if (context == nullptr)
 	{
 		context = ctx;
 		count = 1;
