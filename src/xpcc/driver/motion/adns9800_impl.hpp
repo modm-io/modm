@@ -160,6 +160,8 @@ xpcc::Adns9800< Spi, Cs >::initialise()
 	// Read Product ID
 	uint8_t id = readReg(Register::Product_ID);
 	static constexpr uint8_t id_expected = 0x33;
+	static constexpr uint8_t id_inverse = ~id_expected;
+
 	if (id != id_expected)
 	{
 		XPCC_LOG_ERROR.printf("Product Id = %02x. Expected %02x\n", id, id_expected);
@@ -175,7 +177,7 @@ xpcc::Adns9800< Spi, Cs >::initialise()
 	}
 
 	id = readReg(Register::Inverse_Product_ID);
-	if (id != ~id_expected)
+	if (id != id_inverse)
 	{
 		XPCC_LOG_DEBUG.printf("Inverse Product Id = %02x. Expected %02x\n", id, ~id_expected);
 		success = false;
