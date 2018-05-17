@@ -57,7 +57,9 @@ env["CONFIG_DEVICE_MEMORY"] = [
 %% endif
 # Programming configuration
 %% if "openocd.configfile" in metadata
-env["CONFIG_OPENOCD_SEARCHDIRS"] = []
+env["CONFIG_OPENOCD_SEARCHDIRS"] = [
+    os.path.abspath("openocd")
+]
 env["CONFIG_OPENOCD_CONFIGFILES"] = [
 %% for configfile in metadata["openocd.configfile"]
     "{{ configfile }}",

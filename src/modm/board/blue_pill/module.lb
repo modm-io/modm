@@ -30,4 +30,7 @@ def build(env):
     env.substitutions = {"board_has_logger": False}
     env.template("../board.cpp.in", "board.cpp")
     env.copy('.', ignore=env.ignore_patterns("*.lb", "*.cfg", "*.xml"))
-    env.append_metadata_unique("openocd.configfile", "modm/stm32f103_blue_pill.cfg");
+
+    env.outbasepath = "modm/openocd/modm/board/"
+    env.copy(repopath("tools/openocd/modm/stm32f103_blue_pill.cfg"), "stm32f103_blue_pill.cfg")
+    env.append_metadata_unique("openocd.configfile", "modm/board/stm32f103_blue_pill.cfg");

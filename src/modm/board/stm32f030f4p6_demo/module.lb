@@ -29,4 +29,7 @@ def prepare(module, options):
 def build(env):
     env.outbasepath = "modm/src/modm/board"
     env.copy('.', ignore=env.ignore_patterns("*.lb", "*.cfg", "*.xml"))
-    env.append_metadata_unique("openocd.configfile", "modm/stm32f030_demo_board.cfg");
+
+    env.outbasepath = "modm/openocd/modm/board/"
+    env.copy(repopath("tools/openocd/modm/stm32f030_demo_board.cfg"), "stm32f030_demo_board.cfg")
+    env.append_metadata_unique("openocd.configfile", "modm/board/stm32f030_demo_board.cfg");
