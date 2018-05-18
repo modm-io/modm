@@ -135,9 +135,12 @@ def generate(env, **kw):
 		"-finline-limit=10000",
 		"-fverbose-asm",	# TODO check this
 		"-Wall",
+		"-Werror=maybe-uninitialized",
+		"-Werror=format",
 		"-Wextra",
 		"-Wundef",
 #		If we had a newer avr-g++ :-(
+		"-Werror=overflow",
 #		"-Werror=shift-count-negative",
 #		"-Werror=shift-count-overflow",
 #		"-Werror=shift-negative-value",
