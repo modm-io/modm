@@ -1,0 +1,77 @@
+/*
+ * Copyright (c) 2018, Sascha Schade (strongly-typed)
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32_GPIO_GROUP_HPP
+#define MODM_STM32_GPIO_GROUP_HPP
+
+#include "../device.hpp"
+#include "base.hpp"
+
+namespace modm
+{
+
+namespace platform
+{
+
+/// @cond
+template< Gpio::Port Port, uint8_t Pin0, uint8_t Pin1, uint8_t Pin2 >
+class GpioGroupBase;
+/// @endcond
+
+/**
+ * Creates a hardware port composed of three pins of the same port for atomic reading.
+ * Pins can be in arbitrary order. They are always read together by accessing the port.
+ * This is for example convenient for Hall sensors which must be read simultanously.
+ *
+ * @param  Pin0    first pin
+ * @param  Pin1    second pin
+ * @param  Pin2    third pin
+ * @ingroup {{partname}}_gpio
+ */
+template < typename Pin0, typename Pin1, typename Pin2 >
+class GpioGroup : public ::modm::GpioPort, Gpio
+{
+	static_assert(
+		((Pin0::port == Pin1::port) and (Pin0::port == Pin2::port)), 
+		"Pins must be of the same port for atomic reading of group.");
+
+	using group = GpioGroupBase<Pin0::port, Pin0::pin, Pin1::pin, Pin2::pin>;
+
+public:
+	static uint8_t
+	read() {
+		return group::read();
+	}
+};
+
+/// @cond
+%% for port in ranges
+template< uint8_t Pin0, uint8_t Pin1, uint8_t Pin2 >
+class GpioGroupBase<Gpio::Port::{{port["name"]}}, Pin0, Pin1, Pin2> : public Gpio
+{
+public:
+	static uint16_t
+	read() {
+		uint16_t data = GPIO{{port["name"]}}->IDR;
+
+		bool pin0 = (data & (1 << Pin0)) >> Pin0;
+		bool pin1 = (data & (1 << Pin1)) >> Pin1;
+		bool pin2 = (data & (1 << Pin2)) >> Pin2;
+		return ((pin2 << 2) | (pin1 << 1) | (pin0 << 0));
+	}
+};
+
+%% endfor
+
+} // namespace platform
+} // namespace modm
+
+#endif // MODM_STM32_GPIO_GROUP_HPP

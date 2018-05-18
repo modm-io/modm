@@ -251,7 +251,7 @@ public:
 /**
  * Input/output interface of a set of up to 16 I/O pins.
  *
- * This class provides the interface for up to 16 parallel IOs.
+ * This class provides the interface for up to 16 parallel, consecutive IOs.
  * Be aware that the interface is the same regardless of the actual
  * mapping of the IOs.
  * For example, when a high octet `0xf400` is physically configured, the
@@ -306,6 +306,21 @@ public:
 	/// Toggle the output states of all pins
 	static void
 	toggle();
+#endif
+};
+
+/**
+ * Input interface for a set of three Input pins for atomic read.
+ *
+ * This class provides the interface to a group of three pins from one port.
+ * @ingroup gpio
+ */
+class GpioTripleGroup
+{
+#ifdef __DOXYGEN__
+public:
+	static uint8_t
+	read();
 #endif
 };
 

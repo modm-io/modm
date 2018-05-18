@@ -262,6 +262,7 @@ def build(env):
         env.template(gpio_source, header_name)
 
     env.template("port.hpp.in")
+    env.template("group.hpp.in")
     if "f1" in driver["type"]:
         env.template("connector_specialized.hpp.in", filters={"formatPeripheral": get_driver, "printSignalMap": print_remap_group_table})
     env.template("base.hpp.in", filters={"letterToNum": letter_to_num})
