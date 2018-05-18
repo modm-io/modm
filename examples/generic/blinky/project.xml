@@ -1,6 +1,27 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <library>
+  <!-- <extends>../../../src/modm/board/al_avreb_can/board.xml</extends> -->
+  <!-- <extends>../../../src/modm/board/arduino_uno/board.xml</extends> -->
+  <!-- <extends>../../../src/modm/board/blue_pill/board.xml</extends> -->
+  <!-- <extends>../../../src/modm/board/disco_f051r8/board.xml</extends> -->
+  <!-- <extends>../../../src/modm/board/disco_f072rb/board.xml</extends> -->
+  <!-- <extends>../../../src/modm/board/disco_f100rb/board.xml</extends> -->
+  <!-- <extends>../../../src/modm/board/disco_f303vc/board.xml</extends> -->
+  <!-- <extends>../../../src/modm/board/disco_f407vg/board.xml</extends> -->
+  <!-- <extends>../../../src/modm/board/disco_f429zi/board.xml</extends> -->
+  <!-- <extends>../../../src/modm/board/disco_f469ni/board.xml</extends> -->
+  <!-- <extends>../../../src/modm/board/disco_f746ng/board.xml</extends> -->
+  <!-- <extends>../../../src/modm/board/disco_f769ni/board.xml</extends> -->
+  <!-- <extends>../../../src/modm/board/disco_l476vg/board.xml</extends> -->
+  <!-- <extends>../../../src/modm/board/nucleo_f031k6/board.xml</extends> -->
+  <!-- <extends>../../../src/modm/board/nucleo_f103rb/board.xml</extends> -->
+  <!-- <extends>../../../src/modm/board/nucleo_f303k8/board.xml</extends> -->
+  <!-- <extends>../../../src/modm/board/nucleo_f401re/board.xml</extends> -->
+  <!-- <extends>../../../src/modm/board/nucleo_f411re/board.xml</extends> -->
+  <!-- <extends>../../../src/modm/board/nucleo_f429zi/board.xml</extends> -->
   <extends>../../../src/modm/board/nucleo_l476rg/board.xml</extends>
+  <!-- <extends>../../../src/modm/board/olimexino_stm32/board.xml</extends> -->
+  <!-- <extends>../../../src/modm/board/stm32f030f4p6_demo/board.xml</extends> -->
   <options>
     <option name=":build.scons:build.path">../../../build/generic/blinky</option>
   </options>
