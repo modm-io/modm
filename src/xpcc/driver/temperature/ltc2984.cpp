@@ -13,7 +13,7 @@
 xpcc::IOStream&
 xpcc::operator << (xpcc::IOStream& s, const ltc2984::Data& c)
 {
-	s.printf("%.3f", c.getTemperatureFloat());
+	s.printf("%.3f", (double)c.getTemperatureFloat());
 	s << " C " << c.getStatus();
 	return s;
 }

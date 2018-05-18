@@ -113,7 +113,7 @@ Bmp180Thread::update()
 			XPCC_LOG_DEBUG << XPCC_FILE_INFO;
 			XPCC_LOG_DEBUG.printf("BMP180: Calibrated temperature in 0.1 degree Celsius is : %d\n", temp  );
 			XPCC_LOG_DEBUG << XPCC_FILE_INFO;
-			XPCC_LOG_DEBUG.printf("BMP180: Calibrated pressure in Pa is                    : %d\n", press );
+			XPCC_LOG_DEBUG.printf("BMP180: Calibrated pressure in Pa is                    : %" PRId32 "\n", press );
 		}
 
 		start_measurement = false;

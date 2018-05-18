@@ -95,11 +95,11 @@ Bme280Thread::update()
 			int32_t press = data.getPressure();
 			int32_t hum = data.getHumidity();
 			XPCC_LOG_DEBUG << XPCC_FILE_INFO;
-			XPCC_LOG_DEBUG.printf("BME280: Calibrated temperature in 0.01 degree Celsius is: %d\n", temp  );
+			XPCC_LOG_DEBUG.printf("BME280: Calibrated temperature in 0.01 degree Celsius is: %" PRId32 "\n", temp  );
 			XPCC_LOG_DEBUG << XPCC_FILE_INFO;
-			XPCC_LOG_DEBUG.printf("BME280: Calibrated pressure in mPa is                   : %d\n", press );
+			XPCC_LOG_DEBUG.printf("BME280: Calibrated pressure in mPa is                   : %" PRId32 "\n", press );
 			XPCC_LOG_DEBUG << XPCC_FILE_INFO;
-			XPCC_LOG_DEBUG.printf("BME280: Calibrated humidity in 0.001 %% is               : %d\n", hum );
+			XPCC_LOG_DEBUG.printf("BME280: Calibrated humidity in 0.001 %% is               : %" PRId32 "\n", hum );
 		}
 
 		start_measurement = false;

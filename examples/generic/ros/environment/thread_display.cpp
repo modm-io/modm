@@ -1,3 +1,5 @@
+#include <inttypes.h>
+
 #include <xpcc/architecture/platform.hpp>
 #include <xpcc/debug/logger.hpp>
 
@@ -35,10 +37,10 @@ DisplayThread::update()
 
 		display.clear();
 
-		display.printf("T=%2d.%02d C\n", (_temp/100),  (_temp%100));
-		display.printf("P=%6d.%03d Pa\n", (_pres/1000), (_pres%1000));
-		display.printf("H=%3d.%04d %%\n", (_humi/1000), (_pres%1000));
-		display.printf("t=%d sec", _seq);
+		display.printf("T=%2" PRId32 ".%02" PRId32 " C\n", (_temp/100),  (_temp%100));
+		display.printf("P=%6" PRId32 ".%03" PRId32 " Pa\n", (_pres/1000), (_pres%1000));
+		display.printf("H=%3" PRId32 ".%04" PRId32 " %%\n", (_humi/1000), (_pres%1000));
+		display.printf("t=%" PRId32 " sec", _seq);
 		display.update();
 
 		_dirty = false;

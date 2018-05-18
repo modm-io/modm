@@ -5,6 +5,8 @@
 
 #include <xpcc/driver/motion/adns9800.hpp>
 
+#include <inttypes.h>
+
 // ----------------------------------------------------------------------------
 // Set the log level
 #undef	XPCC_LOG_LEVEL
@@ -86,7 +88,7 @@ public:
 			{
 				int16_t delta_x, delta_y;
 				adns9800::getDeltaXY(delta_x, delta_y);
-				XPCC_LOG_INFO.printf("dx = %5d, dy = %5d; x = %9d, y=%9d\n", delta_x, delta_y, x, y);
+				XPCC_LOG_INFO.printf("dx = %5" PRId16 ", dy = %5" PRId16"; x = %9" PRId32", y=%9" PRId32 "\n", delta_x, delta_y, x, y);
 
 				x += delta_x;
 				y += delta_y;

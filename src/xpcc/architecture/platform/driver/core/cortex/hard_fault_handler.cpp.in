@@ -295,7 +295,7 @@ extern "C" void _hardFaultHandler(const uint32_t *ctx, const uint32_t *msp)
 			}
 			if (sp == msp - 1) { XPCC_LOG_ERROR << "                           "; XPCC_LOG_ERROR << exception_stack_frame; }
 			*/
-			XPCC_LOG_ERROR.printf("Main Stack Pointer: 0x%08lx\n", msp + 8); flushUart();
+			XPCC_LOG_ERROR.printf("Main Stack Pointer: %p\n", msp + 8); flushUart();
 			XPCC_LOG_ERROR.printf("Maximum Stack Usage: %u Bytes\n", (&__main_stack_top - main_stack_end)*4); flushUart();
 
 			XPCC_LOG_ERROR << '\n';
