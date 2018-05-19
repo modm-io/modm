@@ -1,0 +1,50 @@
+### CMake
+CMAKE_BUILD_TYPE = Debug
+BUILD_DIR = {{ build_path }}
+
+OPENOCD_CONFIG = {{ openocd_config }}
+OPENOCD_INCLUDE = modm/openocd
+
+CMAKE_GENERATOR = Unix Makefiles
+CMAKE_FLAGS = -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON -DCMAKE_RULE_MESSAGES:BOOL=ON -DCMAKE_VERBOSE_MAKEFILE:BOOL=OFF
+
+.PHONY: build-release build-debug cmake clean cleanall upload-debug upload-release gdb
+
+.DEFAULT_GOAL := all
+
+### Targets
+
+all: cmake build-release
+
+cmake:
+	@cmake -E make_directory $(BUILD_DIR)/cmake-build-debug
+	@cmake -E make_directory $(BUILD_DIR)/cmake-build-release
+	@cd $(BUILD_DIR)/cmake-build-debug && cmake $(CMAKE_FLAGS) -DCMAKE_BUILD_TYPE=Debug -G "$(CMAKE_GENERATOR)" {{ project_path }}
+	@cd $(BUILD_DIR)/cmake-build-release && cmake $(CMAKE_FLAGS) -DCMAKE_BUILD_TYPE=Release -G "$(CMAKE_GENERATOR)" {{ project_path }}
+
+build-release:
+	@cmake --build $(BUILD_DIR)/cmake-build-release
+
+build-debug:
+	@cmake --build $(BUILD_DIR)/cmake-build-debug
+
+clean:
+	@cmake --build $(BUILD_DIR)/cmake-build-release --target clean
+	@cmake --build $(BUILD_DIR)/cmake-build-debug --target clean
+
+cleanall:
+	@rm -rf $(BUILD_DIR)/cmake-build-release
+	@rm -rf $(BUILD_DIR)/cmake-build-debug
+
+upload-debug: build-debug
+	@openocd -s $(OPENOCD_INCLUDE) -f $(OPENOCD_CONFIG) -c "program $(BUILD_DIR)/cmake-build-debug/{{ project_name }}.elf verify reset exit"
+
+upload-release: build-release
+	@openocd -s $(OPENOCD_INCLUDE) -f $(OPENOCD_CONFIG) -c "program $(BUILD_DIR)/cmake-build-release/{{ project_name }}.elf verify reset exit"
+
+gdb: build-debug
+	@arm-none-eabi-gdb --command=$(GDB_INIT)  $(EXECUTABLE_PATH)
+	@killall openocd || true
+
+killopenocd:
+	@killall openocd || true

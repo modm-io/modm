@@ -1,0 +1,98 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2017-2018, Fabian Greif
+# Copyright (c) 2017-2018, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+import os
+
+
+def init(module):
+    module.name = "build.cmake"
+    module.description = """CMake Build Script Generator
+
+Generates a CMakeLists.txt file to build the modm library.
+"""
+
+
+def prepare(module, options):
+    _, default_project_name = os.path.split(os.getcwd())
+
+    module.add_option(
+        StringOption(name="build.path", default=".",
+                     description="Path to the build folder"))
+    module.add_option(
+        StringOption(name="project.name", default=default_project_name.replace('.', '_'),
+                     description="Project name (required)"))
+
+    if options[":target"].identifier["platform"] == "stm32":
+        return True
+    return False
+
+
+def build(env):
+    pass
+
+
+def post_build(env, buildlog):
+    target = env["modm:target"]
+    platform = target.identifier["platform"]
+    family = target.identifier["family"]
+
+    # Extract all source code files
+    files_to_build = []
+    outpath = env.outpath(".")
+    for operations in buildlog:
+        filename = os.path.relpath(operations.filename_out, outpath)
+        _, extension = os.path.splitext(filename)
+
+        if extension in [".c", ".cpp", ".cc", ".sx", ".S"]:
+            files_to_build.append(os.path.normpath(filename))
+    files_to_build.sort()
+
+    core_driver = target.get_driver("core")
+    core = core_driver["type"]
+    if core.startswith("cortex-m4"):
+        core = "cortex-m4"
+    elif core.startswith("cortex-m7"):
+        core = "cortex-m7"
+
+    memories = []
+    if "memory" in core_driver:
+        memories.extend([
+            {
+                k:(int(v) if v.isdigit() else (int(v, 16) if v.startswith("0x") else v))
+                for k, v in memory.items()
+            }
+            for memory in core_driver["memory"]
+        ])
+
+    config_file = buildlog.metadata["openocd.configfile"][0]
+
+    env.substitutions = {
+        "partname": target.partname,
+        "target": target,
+        "family": family,
+        "platform": platform,
+        "project_path": os.getcwd(),
+        "compiler": "llvm" if family == "darwin" else "gcc",
+        "core": core,
+        "files": files_to_build,
+        "metadata": buildlog.metadata,
+        "openocd_config" : config_file,
+        "memories": memories,
+        "build_path": env["build.path"],
+        "project_name": env["project.name"],
+    }
+
+    env.append_metadata_unique('include_path', 'src')
+    env.template("resources/CMakeLists.txt.in", "CMakeLists.txt")
+    env.template("resources/Makefile.in", "Makefile")
+    env.copy("cmake_scripts", "cmake")

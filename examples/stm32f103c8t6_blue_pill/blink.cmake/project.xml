@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <extends>../../../src/modm/board/blue_pill/board.xml</extends>
+  <options>
+    <option name=":build.cmake:project.name">blink.cmake</option>
+    <option name=":build.cmake:build.path">../../../build/stm32f103c8t6_blue_pill/blink.cmake</option>
+  </options>
+  <modules>
+    <module>:build.cmake</module>
+  </modules>
+</library>
