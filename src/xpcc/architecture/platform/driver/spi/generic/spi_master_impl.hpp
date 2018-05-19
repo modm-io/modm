@@ -67,7 +67,7 @@ template <typename SCK, typename MOSI, typename MISO>
 uint8_t
 xpcc::SoftwareSpiMaster<SCK, MOSI, MISO>::acquire(void *ctx, ConfigurationHandler handler)
 {
-	if (ctx == nullptr)
+	if (context == nullptr)
 	{
 		context = ctx;
 		count = 1;
