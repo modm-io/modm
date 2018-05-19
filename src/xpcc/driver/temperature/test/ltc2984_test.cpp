@@ -10,8 +10,8 @@ void
 Ltc2984Test::testDataStatus()
 {
 	// Test valid bit
-	TEST_ASSERT_TRUE(xpcc::ltc2984::Data(0x01 << 24).isValid());
-	TEST_ASSERT_TRUE(xpcc::ltc2984::Data(0xff << 24).isValid());
+	TEST_ASSERT_TRUE(xpcc::ltc2984::Data(0x01ul << 24).isValid());
+	TEST_ASSERT_TRUE(xpcc::ltc2984::Data(0xfful << 24).isValid());
 	TEST_ASSERT_FALSE(xpcc::ltc2984::Data(0ul).isValid());
 
 	// Test other status bits
@@ -39,7 +39,7 @@ Ltc2984Test::testDataTemperature()
 	// 1024°C
 	dataTable[1] = 0b00000001000100000000000000000000;
 	temperatureTableFloat[1] = 1024;
-	temperatureTableFixed[1] = 1024 * 1024;
+	temperatureTableFixed[1] = 1048576ul;
 	temperatureTableInteger[1] = 1024;
 
 	// 1°C

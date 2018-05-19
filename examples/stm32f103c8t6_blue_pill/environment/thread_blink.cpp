@@ -48,7 +48,7 @@ BlinkThread::update()
 		int32_t bme280_b_press = bme280Thread.getPressureB();
 		int32_t bme280_b_humid = bme280Thread.getHumidityB();
 
-		XPCC_LOG_INFO.printf("%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n",
+		XPCC_LOG_INFO.printf("%" PRId32 ",%d,%" PRId32 ",%d,%" PRId32 ",%" PRId32 ",%" PRId32 ",%" PRId32 ",%" PRId32 ",% " PRId32 " ,%" PRId32 "\n",
 			uptime,
 			bmp180_a_temp, bmp180_a_press,
 			bmp180_b_temp, bmp180_b_press,

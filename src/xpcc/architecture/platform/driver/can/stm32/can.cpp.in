@@ -461,7 +461,12 @@ xpcc::stm32::Can{{ id }}::getBusState()
 void
 xpcc::stm32::Can{{ id }}::enableStatusChangeInterrupt(
 		uint32_t interruptEnable,
-		uint32_t interruptPriority)
+%% if not target is stm32f0
+		uint32_t interruptPriority
+%% else
+		uint32_t
+%% endif
+)
 {
 %% if not target is stm32f0
 	NVIC_SetPriority({{ reg }}_SCE_IRQn, interruptPriority);

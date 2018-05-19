@@ -140,7 +140,8 @@ def generate(env, **kw):
 		"-mlong-calls",		# when using ".fastcode" without longcall
 		"-Wall",
 		"-Werror=maybe-uninitialized",
-		"-Wformat",
+		"-Werror=format",
+		"-Werror=sign-compare",
 		"-Wextra",
 		"-Wundef",
 		"-Winit-self",
