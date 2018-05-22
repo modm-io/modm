@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Niklas Hauser
+ * Copyright (c) 2018, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -13,18 +13,9 @@
 #define MODM_AVR_GPIO_PORT_HPP
 
 #include "base.hpp"
+#include "set.hpp"
+#include <modm/utils/template_metaprogramming.hpp>
 #include <modm/math/utils/bit_operation.hpp>
-
-/**
- * @ingroup 	platform
- * @defgroup	{{partname}}
- */
-
-/**
- * @ingroup 	{{partname}}
- * @defgroup	{{partname}}_gpio GPIO
- */
-
 
 namespace modm
 {
@@ -32,192 +23,117 @@ namespace modm
 namespace platform
 {
 
-/// @cond
-// forward declaration for GpioPort
-template< Gpio::Port Port, uint8_t StartPin, uint8_t Width, GpioPort::DataOrder PortOrder >
-class GpioPortBase;
-/// @endcond
-
-/**
- * Creates a hardware port with StartPin as LSB and with Width.
- *
- * @tparam	StartPin	a Gpio pin
- * @tparam	Width		required width of the port (up to 8)
- * @ingroup {{partname}}_gpio
- */
-template< class StartPin, uint8_t Width, ::modm::GpioPort::DataOrder PortOrder = GpioPort::DataOrder::Normal >
-class GpioPort : public ::modm::GpioPort, /** @cond */ public GpioPortBase< StartPin::port, StartPin::pin, Width, PortOrder > /** @endcond */
+template< Gpio::Port port >
+struct GpioPortInfo;
+template< class StartGpio, int8_t Width >
+struct GpioSetShim
 {
+	static typename GpioPortInfo<StartGpio::port>::template check<StartGpio::pin, Width> check;
+};
+
+template< class StartGpio, int8_t Width >
+class GpioPort : public ::modm::GpioPort, public GpioSetShim<StartGpio, Width>
+{
+	using PinSet = GpioSetShim<StartGpio, Width>;
 public:
-	static constexpr uint8_t width = Width;
-
-	static constexpr DataOrder
-	getDataOrder()
-	{ return PortOrder; }
-
+	using PinSet::width;
+	static_assert(width <= 8, "Only a maximum of 8 pins are supported by GpioPort!");
 	using PortType = uint8_t;
 
-#ifdef __DOXYGEN__
-	static void
-	setOutput();
-
-	static void
-	setInput();
-
-	static PortType
-	read();
-
-	static void
-	write(PortType data);
-
-	static void
-	toggle();
-#endif
-};
-
-/// @cond
-%% for port in ranges
-template< uint8_t StartPin, uint8_t Width, ::modm::GpioPort::DataOrder PortOrder >
-class GpioPortBase<Gpio::Port::{{port["name"]}}, StartPin, Width, PortOrder> : public Gpio
-{
-	static_assert(StartPin < {{port["start"] + port["width"]}},
-			"StartPin too large, maximum {{port["start"] + port["width"] - 1}}.");
-	static_assert(Width <= {{port["width"]}},
-			"Width too large, maximum {{port["width"]}}.");
-	static_assert(Width > 0,
-			"Width should be at least 1.");
-	static_assert(StartPin + Width <= {{port["start"] + port["width"]}},
-			"StartPin + Width too large, maximum {{port["start"] + port["width"]}}.");
-
-	static constexpr uint8_t dataMask = (1 << Width) - 1;
-	static constexpr uint8_t portMask = dataMask << StartPin;
+protected:
+	using PinSet::mask;
+	using PinSet::inverted;
+	static constexpr uint8_t StartPin = Width > 0 ? StartGpio::pin : StartGpio::pin - width + 1;
+	static constexpr uint8_t StartPinReversed = (4 - StartPin - width) + 4;
 
 public:
-	modm_always_inline static void setOutput() {
-		DDR{{port["name"]}} |= portMask;
-	}
-	modm_always_inline static void setInput() {
-		DDR{{port["name"]}} &= ~portMask;
-	}
-	inline static uint8_t read() {
-		uint8_t data = PIN{{port["name"]}} & portMask;
-		return (data >> StartPin);
-	}
-	inline static void write(uint8_t data) {
-		data <<= StartPin;
-		PORT{{port["name"]}} = (PORT{{port["name"]}} & ~portMask) | (data & portMask);
-	}
-	modm_always_inline static void toggle() {
-	%% if notoggle
-		PORT{{port["name"]}} ^= portMask;
-	%% else
-		PIN{{port["name"]}} = portMask;
-	%% endif
-	}
-};
-// another specialization for DataOrder::Reversed
-template< uint8_t StartPin, uint8_t Width >
-class GpioPortBase<Gpio::Port::{{port["name"]}}, StartPin, Width, ::modm::GpioPort::DataOrder::Reversed> : public Gpio
-{
-	static_assert(StartPin < {{port["start"] + port["width"]}},
-			"StartPin too large, maximum {{port["start"] + port["width"] - 1}}.");
-	static_assert(Width <= {{port["width"]}},
-			"Width too large, maximum {{port["width"]}}.");
-	static_assert(Width > 0,
-			"Width should be at least 1.");
-	static_assert(StartPin + Width <= {{port["start"] + port["width"]}},
-			"StartPin + Width too large, maximum {{port["start"] + port["width"]}}.");
-
-	static constexpr uint8_t StartPinReversed = (4 - StartPin - Width) + 4;
-	static constexpr uint8_t dataMask = (1 << Width) - 1;
-	static constexpr uint8_t portMask = dataMask << StartPin;
-
-public:
-	modm_always_inline static void setOutput() {
-		DDR{{port["name"]}} |= portMask;
-	}
-	modm_always_inline static void setInput() {
-		DDR{{port["name"]}} &= ~portMask;
-	}
-	inline static uint8_t read() {
-		uint8_t data = modm::bitReverse(uint8_t(PIN{{port["name"]}} & portMask));
-		return (data >> StartPinReversed);
-	}
-	inline static void write(uint8_t data) {
-		data = modm::bitReverse(uint8_t(data << StartPinReversed));
-		PORT{{port["name"]}} = (PORT{{port["name"]}} & ~portMask) | (data & portMask);
-	}
-	modm_always_inline static void toggle() {
-	%% if notoggle
-		PORT{{port["name"]}} ^= portMask;
-	%% else
-		PIN{{port["name"]}} = portMask;
-	%% endif
-	}
-};
-	%% if port["start"] == 0 and port["width"] == 8
-template< ::modm::GpioPort::DataOrder DataOrder >
-class GpioPortBase<Gpio::Port::{{port["name"]}}, 0, 8, DataOrder > : public Gpio
-{
-public:
-	static constexpr uint8_t width = 8;
-
-public:
-	modm_always_inline static void setOutput() {
-		DDR{{port["name"]}} = 0xff;
-	}
-	modm_always_inline static void setInput() {
-		DDR{{port["name"]}} = 0;
-	}
-	modm_always_inline static uint8_t read() {
-		return PIN{{port["name"]}};
-	}
-	modm_always_inline static void write(uint8_t data) {
-		PORT{{port["name"]}} = data;
-	}
-	modm_always_inline static void toggle() {
-		%% if notoggle
-		PORT{{port["name"]}} ^= 0xff;
-		%% else
-		PIN{{port["name"]}} = 0xff;
-		%% endif
-	}
-};
-// another specialization for DataOrder::Reversed
-template<>
-class GpioPortBase<Gpio::Port::{{port["name"]}}, 0, 8, ::modm::GpioPort::DataOrder::Reversed > : public Gpio
-{
-public:
-	static constexpr uint8_t width = 8;
-
-public:
-	modm_always_inline static void setOutput() {
-		DDR{{port["name"]}} = 0xff;
-	}
-	modm_always_inline static void setInput() {
-		DDR{{port["name"]}} = 0;
-	}
-	modm_always_inline static uint8_t read() {
-		return modm::bitReverse(uint8_t(PIN{{port["name"]}}));
-	}
-	modm_always_inline static void write(uint8_t data) {
-		PORT{{port["name"]}} = modm::bitReverse(data);
-	}
-	modm_always_inline static void toggle() {
-		%% if notoggle
-		PORT{{port["name"]}} ^= 0xff;
-		%% else
-		PIN{{port["name"]}} = 0xff;
-		%% endif
-	}
-};
-	%% endif
-
+	static PortType isSet()
+	{
+		uint8_t r{0};
+%% for port, id in ports.items()
+		if constexpr (mask({{id}})) r = (PORT{{port}} & mask({{id}})) ^ inverted({{id}});
 %% endfor
-/// @endcond
+		if constexpr (Width < 0)
+			 return bitReverse(r) >> StartPinReversed;
+		else return            r  >> StartPin;
+	}
 
-}	// namespace platform
+	static PortType read()
+	{
+		uint8_t r{0};
+%% for port, id in ports.items()
+		if constexpr (mask({{id}})) r = (PIN{{port}} & mask({{id}})) ^ inverted({{id}});
+%% endfor
+		if constexpr (Width < 0)
+			 return bitReverse(r) >> StartPinReversed;
+		else return            r  >> StartPin;
+	}
 
-}	// namespace modm
+	static void write(PortType data)
+	{
+		uint8_t p;
+		if constexpr (Width < 0)
+			 p = bitReverse(uint8_t(data << StartPinReversed));
+		else p =            uint8_t(data << StartPin);
+%% for port, id in ports.items()
+		if constexpr (mask({{id}})) PORT{{port}} = (PORT{{port}} & ~mask({{id}})) | ((p & mask({{id}})) ^ inverted({{id}}));
+%% endfor
+	}
+};
 
-#endif	// MODM_AVR_GPIO_PORT_HPP
+// ------ Port Width Information ------
+%% for port in ranges
+template<>
+struct GpioPortInfo<Gpio::Port::{{port["name"]}}>
+{
+	static constexpr int8_t Width = {{port["width"]}};
+	static constexpr int8_t StartPin = {{port["start"]}};
+	static constexpr int8_t EndPin = StartPin + Width;
+
+	template< uint8_t QueryStartPin, int8_t QueryWidth >
+	struct check
+	{
+		static constexpr bool isNormal = QueryWidth > 0;
+		static constexpr bool isReversed = QueryWidth < 0;
+		static constexpr int8_t width = isNormal ? QueryWidth : -QueryWidth;
+		static_assert(isReversed or width <= Width,
+			"GpioPort Width out of bounds! Maximum is {{port["width"]}}.");
+
+		static_assert(isReversed or (QueryStartPin + QueryWidth <= EndPin),
+			"GpioPort StartPin + Width out of bounds! Maximum is {{port["start"] + port["width"] - 1}}.");
+		static_assert(isNormal or (StartPin <= QueryStartPin + QueryWidth + 1),
+			"GpioPort StartPin - Width out of bounds! Minimum is {{port["start"]}}.");
+	};
+};
+%% endfor
+
+// ------ Translator classes from Gpio + Width -> GpioSet ------
+template< class StartGpio, int8_t offset >
+struct GpioShim
+{
+	static constexpr typename StartGpio::Port port = StartGpio::port;
+	static constexpr uint8_t mask = (1ul << (StartGpio::pin + offset));
+	static constexpr bool isInverted = StartGpio::isInverted;
+};
+%% for width in range(-8, 0)
+template< class StartGpio >
+struct GpioSetShim<StartGpio, {{width}}> : public GpioSet<
+	%% for offset in (range(width + 1, 1) | reverse)
+		GpioShim<StartGpio, {{offset}}>{% if not loop.last %},{% endif %}
+	%% endfor
+		> { static typename GpioPortInfo<StartGpio::port>::template check<StartGpio::pin, {{width}}> check; };
+%% endfor
+%% for width in range(0, 9)
+template< class StartGpio >
+struct GpioSetShim<StartGpio, {{width}}> : public GpioSet<
+	%% for offset in (range(width) | reverse)
+		GpioShim<StartGpio, {{offset}}>{% if not loop.last %},{% endif %}
+	%% endfor
+		> { static typename GpioPortInfo<StartGpio::port>::template check<StartGpio::pin, {{width}}> check; };
+%% endfor
+
+} // namespace platform
+
+} // namespace modm
+
+#endif // MODM_AVR_GPIO_PORT_HPP

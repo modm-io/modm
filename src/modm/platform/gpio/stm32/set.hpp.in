@@ -1,0 +1,222 @@
+/*
+ * Copyright (c) 2018, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32_GPIO_SET_HPP
+#define MODM_STM32_GPIO_SET_HPP
+
+#include "../device.hpp"
+#include "base.hpp"
+
+namespace modm
+{
+
+namespace platform
+{
+
+template< class... Gpios >
+class GpioSet : public Gpio
+{
+protected:
+	static constexpr uint16_t inverteds[{{ ports | length }}] = {
+%% for port in ports
+		(((Gpios::port == Port::{{port}} and Gpios::isInverted) ? Gpios::mask : 0) | ...),
+%% endfor
+	};
+	static constexpr uint16_t inverted(uint8_t id) { return inverteds[id]; }
+
+	static constexpr uint16_t masks[{{ ports | length }}] = {
+%% for port in ports
+		(((Gpios::port == Port::{{port}}) ? Gpios::mask : 0) | ...),
+%% endfor
+	};
+	static constexpr uint16_t mask(uint8_t id) { return masks[id]; }
+	static constexpr uint32_t mask2(uint8_t id, uint8_t value = 0b11) {
+		uint32_t r{0};
+		for (int ii=0; ii<16; ii++)
+			if (masks[id] & (1 << ii)) r |= (uint32_t(value) << (ii * 2));
+		return r;
+	}
+%% if target["family"] in ["f1"]
+	static constexpr uint64_t mask4(uint8_t id, uint8_t value = 0b1111) {
+		uint64_t r{0};
+		for (int ii=0; ii<16; ii++)
+			if (masks[id] & (1 << ii)) r |= (uint64_t(value) << (ii * 4));
+		return r;
+	}
+	static constexpr uint32_t crh(uint8_t id, uint8_t value = 0b1111) {
+		return mask4(id, value) >> 32;
+	}
+	static constexpr uint32_t crl(uint8_t id, uint8_t value = 0b1111) {
+		return mask4(id, value);
+	}
+%% endif
+	static constexpr uint8_t numberOfPorts() {
+		uint8_t r{0};
+		for (const auto &m: masks) r += (m) ? 1 : 0;
+		return r;
+	}
+public:
+	static constexpr uint8_t width = sizeof...(Gpios);
+	static constexpr uint8_t number_of_ports = numberOfPorts();
+public:
+	static void setOutput()
+	{
+%% if target["family"] in ["f1"]
+		configure(OutputType::PushPull);
+%% else
+	%% for port, id in ports.items()
+		if constexpr (mask({{id}})) GPIO{{port}}->MODER = (GPIO{{port}}->MODER & ~mask2({{id}})) | mask2({{id}}, i(Mode::Output));
+	%% endfor
+%% endif
+	}
+
+	static void setOutput(bool status)
+	{
+		set(status);
+		setOutput();
+	}
+
+	static void setOutput(OutputType type, OutputSpeed speed = OutputSpeed::MHz50)
+	{
+		configure(type, speed);
+%% if target["family"] not in ["f1"]
+		setOutput();
+%% endif
+	}
+
+	static void configure(OutputType type, OutputSpeed speed = OutputSpeed::MHz50)
+	{
+%% if target["family"] in ["f1"]
+	%% for port, id in ports.items()
+		if constexpr (crl({{id}})) GPIO{{port}}->CRL = (GPIO{{port}}->CRL & ~crl({{id}})) | ((i(type) | i(speed)) * crl({{id}}, 0b0001));
+		if constexpr (crh({{id}})) GPIO{{port}}->CRH = (GPIO{{port}}->CRH & ~crh({{id}})) | ((i(type) | i(speed)) * crh({{id}}, 0b0001));
+	%% endfor
+%% else
+	%% for port, id in ports.items()
+		if constexpr (mask({{id}})) {
+			GPIO{{port}}->OSPEEDR = (GPIO{{port}}->OSPEEDR & ~mask2({{id}})) | (i(speed) * mask2({{id}}, 0b01));
+			GPIO{{port}}->OTYPER  = (GPIO{{port}}->OTYPER  & ~mask({{id}}))  | (i(type) ? mask({{id}}) : 0);
+		}
+	%% endfor
+%% endif
+	}
+
+	static void setInput()
+	{
+%% if target["family"] in ["f1"]
+		configure(InputType::Floating);
+%% else
+	%% for port, id in ports.items()
+		if constexpr (mask({{id}})) {
+			GPIO{{port}}->MODER &= ~mask2({{id}});
+			GPIO{{port}}->OTYPER &= ~mask({{id}});
+			GPIO{{port}}->OSPEEDR &= ~mask2({{id}});
+		}
+	%% endfor
+%% endif
+	}
+
+	static void setInput(InputType type)
+	{
+		configure(type);
+%% if target["family"] not in ["f1"]
+		setInput();
+%% endif
+	}
+
+	static void setAnalogInput()
+	{
+%% if target["family"] in ["f1"]
+	%% for port, id in ports.items()
+		if constexpr (crl({{id}})) GPIO{{port}}->CRL &= ~crl({{id}});
+		if constexpr (crh({{id}})) GPIO{{port}}->CRH &= ~crh({{id}});
+	%% endfor
+%% else
+	%% for port, id in ports.items()
+		if constexpr (mask({{id}})) GPIO{{port}}->MODER |= mask2({{id}}, i(Mode::Analog));
+		%% if target["family"] in ["l4"] and target["name"] in ["71", "75", "76", "85", "86"]
+		if constexpr (mask({{id}})) GPIO{{port}}->ASCR |= mask({{id}});
+		%% endif
+	%% endfor
+%% endif
+	}
+
+	static void configure(InputType type)
+	{
+%% if target["family"] in ["f1"]
+	%% for port, id in ports.items()
+		if constexpr (crl({{id}})) GPIO{{port}}->CRL = (GPIO{{port}}->CRL & ~crl({{id}})) | ((i(type) & 0xc) * crl({{id}}, 0b0001));
+		if constexpr (crh({{id}})) GPIO{{port}}->CRH = (GPIO{{port}}->CRH & ~crh({{id}})) | ((i(type) & 0xc) * crh({{id}}, 0b0001));
+		if constexpr (mask({{id}})) GPIO{{port}}->BSRR = mask({{id}}) << ((type == InputType::PullUp) ? 0 : 16);
+	%% endfor
+%% else
+	%% for port, id in ports.items()
+		if constexpr (mask({{id}})) {
+			GPIO{{port}}->PUPDR = (GPIO{{port}}->PUPDR & ~mask2({{id}})) | (i(type) * mask2({{id}}, 0b01));
+		}
+	%% endfor
+%% endif
+	}
+
+	static void set()
+	{
+%% for port, id in ports.items()
+		if constexpr (mask({{id}})) GPIO{{port}}->BSRR = (inverted({{id}}) << 16) | (mask({{id}}) & ~inverted({{id}}));
+%% endfor
+	}
+
+	static void set(bool status)
+	{
+		if (status) set();
+		else        reset();
+	}
+
+	static void reset()
+	{
+%% for port, id in ports.items()
+		if constexpr (mask({{id}})) GPIO{{port}}->BSRR = ((uint32_t(mask({{id}})) & ~inverted({{id}})) << 16) | inverted({{id}});
+%% endfor
+	}
+
+	static void toggle()
+	{
+%% for port, id in ports.items()
+		if constexpr (mask({{id}})) {
+			uint32_t are_set = (GPIO{{port}}->ODR & mask({{id}}));
+			uint32_t are_reset = mask({{id}}) ^ are_set;
+			GPIO{{port}}->BSRR = (are_set << 16) | are_reset;
+		}
+%% endfor
+	}
+
+	static void lock()
+	{
+%% for port, id in ports.items()
+		if constexpr (mask({{id}})) {
+			GPIO{{port}}->LCKR = 0x10000 | mask({{id}});
+			GPIO{{port}}->LCKR = 0x00000 | mask({{id}});
+			GPIO{{port}}->LCKR = 0x10000 | mask({{id}});
+			(void) GPIO{{port}}->LCKR;
+		}
+%% endfor
+	}
+
+	static void disconnect()
+	{
+		(Gpios::disconnect(), ...);
+	}
+};
+
+} // namespace platform
+
+} // namespace modm
+
+#endif // MODM_STM32_GPIO_SET_HPP

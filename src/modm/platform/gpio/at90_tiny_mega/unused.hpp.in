@@ -60,11 +60,16 @@ public:
 	using Input = GpioUnused;
 	using IO = GpioUnused;
 	using Type = GpioUnused;
+	static constexpr bool isInverted = false;
+	static constexpr Port port = Port(-1);
+	static constexpr uint8_t pin = uint8_t(-1);
+	static constexpr uint8_t mask = 0;
 
 public:
 	static void setOutput(bool) {}
 	static void setOutput(OutputType) {}
 	static void setOutput() {}
+	static void configure(OutputType) {}
 	static void set() {}
 	static void set(bool) {}
 	static void reset() {}

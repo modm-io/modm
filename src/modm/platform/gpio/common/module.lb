@@ -28,4 +28,3 @@ def build(env):
     env.template("connector_detail.hpp.in")
     env.copy("connector.hpp")
     env.copy("inverted.hpp")
-    env.copy("software_port.hpp")
