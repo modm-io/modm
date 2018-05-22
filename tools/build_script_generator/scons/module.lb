@@ -112,6 +112,7 @@ def post_build(env, buildlog):
     env.substitutions = {
         "partname": target.partname,
         "platform": platform,
+        "family": family,
         "compiler": "llvm" if family == "darwin" else "gcc",
         "core": core,
         "files": files_to_build,

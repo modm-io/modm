@@ -31,7 +31,8 @@ env = Environment(
 %% endfor
             ],
         CPU="{{ core }}",
-        CFLAGS_language=["-std=gnu99"],
+        CFLAGS_language=["-std=gnu11"],
+        CXXFLAGS_language=["-std=c++17", "-fno-exceptions", "-fno-rtti"],
         LINKFLAGS_optimize=[
             "-Wl,--relax",
             "-Wl,--gc-sections",
@@ -68,7 +69,8 @@ env.Append(LINKFLAGS_target=[
             "-mmcu={{ partname }}",
             "-DF_CPU=${CONFIG_CLOCK_F_CPU}"
             ],
-        CFLAGS_language=["-std=gnu99"],
+        CFLAGS_language=["-std=gnu11"],
+        CXXFLAGS_language=["-std=c++17", "-fno-exceptions", "-fno-rtti"],
         LINKFLAGS_other=[
             "-Wl,--fatal-warnings",
             ],
@@ -94,9 +96,12 @@ env.Append(LINKFLAGS_target=[
             "{{tool}}",
 %% endfor
             ],
-        CXXFLAGS_language=[
-            "-std=c++14",
-            ],
+        CFLAGS_language=["-std=gnu11"],
+%% if family in ["darwin"]
+        CXXFLAGS_language=["-std=c++1z"], # for clang 4 or earlier
+%% else
+        CXXFLAGS_language=["-std=c++17"],
+%% endif
         ENV=os.environ)
 %% endif
 %# ============================================================================

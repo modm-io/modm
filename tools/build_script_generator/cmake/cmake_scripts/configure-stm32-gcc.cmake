@@ -102,7 +102,7 @@ SET(CXX_LANG_FLAGS "\
     -fno-threadsafe-statics \
     -fuse-cxa-atexit \
     -Woverloaded-virtual \
-    -std=c++14")
+    -std=c++17")
 
 SET(LINK_FLAGS "\
     -Llink \
