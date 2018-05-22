@@ -49,11 +49,11 @@ jobs:
       - run:
           name: Examples STM32F0 Series
           command: |
-            (cd examples && ../tools/scripts/examples_compile.sh stm32f0_discovery stm32f072_discovery nucleo_f031k6 stm32f030f4p6_demo_board)
+            (cd examples && ../tools/scripts/examples_compile.py stm32f0_discovery stm32f072_discovery nucleo_f031k6 stm32f030f4p6_demo_board)
       - run:
           name: Examples STM32F1 Series
           command: |
-            (cd examples && ../tools/scripts/examples_compile.sh stm32f1_discovery nucleo_f103rb olimexino_stm32)
+            (cd examples && ../tools/scripts/examples_compile.py stm32f1_discovery nucleo_f103rb olimexino_stm32 stm32f103c8t6_blue_pill)
 
   stm32f3-l4-f7-examples:
     docker:
@@ -68,15 +68,15 @@ jobs:
       - run:
           name: Examples STM32F3 Series
           command: |
-            (cd examples && ../tools/scripts/examples_compile.sh stm32f3_discovery nucleo_f303k8)
+            (cd examples && ../tools/scripts/examples_compile.py stm32f3_discovery nucleo_f303k8)
       - run:
           name: Examples STM32F7 Series
           command: |
-            (cd examples && ../tools/scripts/examples_compile.sh stm32f746g_discovery)
+            (cd examples && ../tools/scripts/examples_compile.py stm32f746g_discovery)
       - run:
           name: Examples STM32L4 Series
           command: |
-            (cd examples && ../tools/scripts/examples_compile.sh stm32l476_discovery nucleo_l476rg)
+            (cd examples && ../tools/scripts/examples_compile.py stm32l476_discovery nucleo_l476rg)
 
   stm32f4-examples:
     docker:
@@ -91,8 +91,8 @@ jobs:
       - run:
           name: Examples STM32F4 Series (except STM32F4 Discovery Board)
           command: |
-            (cd examples && ../tools/scripts/examples_compile.sh stm32f4_discovery)
-            (cd examples && ../tools/scripts/examples_compile.sh stm32f429_discovery stm32f469_discovery nucleo_f401re nucleo_f411re nucleo_f429zi)
+            (cd examples && ../tools/scripts/examples_compile.py stm32f4_discovery)
+            (cd examples && ../tools/scripts/examples_compile.py stm32f429_discovery stm32f469_discovery nucleo_f401re nucleo_f411re nucleo_f429zi)
 
   avr-examples:
     docker:
@@ -107,7 +107,7 @@ jobs:
       - run:
           name: Examples AVR Series
           command: |
-            (cd examples && ../tools/scripts/examples_compile.sh avr arduino_uno)
+            (cd examples && ../tools/scripts/examples_compile.py avr arduino_uno)
 
   generic-examples:
     docker:
@@ -122,7 +122,7 @@ jobs:
       - run:
           name: Examples from the generic folder (Mostly STM32 examples)
           command: |
-            (cd examples && ../tools/scripts/examples_compile.sh generic)
+            (cd examples && ../tools/scripts/examples_compile.py generic)
 
   linux-examples:
     docker:
@@ -137,7 +137,7 @@ jobs:
       - run:
           name: Examples Linux
           command: |
-            (cd examples && ../tools/scripts/examples_compile.sh linux zmq)
+            (cd examples && ../tools/scripts/examples_compile.py linux zmq)
 
   avr-compile-all:
     docker:
