@@ -56,6 +56,15 @@ env["CONFIG_DEVICE_MEMORY"] = [
 ]
 %% endif
 # Programming configuration
+%% if platform in ["avr"]
+env["CONFIG_AVRDUDE_DEVICE"] = "{{avrdude_mcu}}"
+env["CONFIG_AVRDUDE_PROGRAMMER"] = "{{options["::avrdude.programmer"]}}"
+env["CONFIG_AVRDUDE_PORT"] = "{{options["::avrdude.port"]}}"
+env["CONFIG_AVRDUDE_OPTIONS"] = "{{options["::avrdude.options"]}}"
+%% if options["::avrdude.baudrate"] > 0
+env["CONFIG_AVRDUDE_BAUDRATE"] = "{{options["::avrdude.baudrate"]}}"
+%% endif
+%% endif
 %% if "openocd.configfile" in metadata
 env["CONFIG_OPENOCD_SEARCHDIRS"] = [
     os.path.abspath("openocd")

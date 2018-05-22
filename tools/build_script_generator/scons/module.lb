@@ -16,10 +16,7 @@ import os
 
 def init(module):
     module.name = "build.scons"
-    module.description = """SCons Build Script Generator
-
-Generates a SConstruct file to build the modm library.
-"""
+    module.description = "SCons Build Script Generator"
 
 
 def prepare(module, options):
@@ -62,6 +59,18 @@ def prepare(module, options):
     if options[":target"].identifier["platform"] == "avr":
         # we need the clock:f_cpu option!
         module.depends(":platform:clock")
+        module.add_option(
+            StringOption(name="avrdude.programmer", default="avrispmkII",
+                         description="AvrDude programmer"))
+        module.add_option(
+            StringOption(name="avrdude.port", default="usb",
+                         description="AvrDude programmer port"))
+        module.add_option(
+            NumericOption(name="avrdude.baudrate", default=-1,
+                          description="AvrDude programmer baudrate"))
+        module.add_option(
+            StringOption(name="avrdude.options", default="",
+                         description="AvrDude programmer options"))
     return True
 
 
@@ -70,6 +79,7 @@ def build(env):
 
 
 def post_build(env, buildlog):
+    _, default_project_name = os.path.split(os.getcwd())
     target = env["modm:target"]
     platform = target.identifier["platform"]
     family = target.identifier["family"]
@@ -98,6 +108,7 @@ def post_build(env, buildlog):
         core = "cortex-m4"
     elif core.startswith("cortex-m7"):
         core = "cortex-m7"
+    avrdude_mcu = target._properties["mcu"] if "mcu" in target._properties else ""
 
     memories = []
     if "memory" in core_driver:
@@ -110,11 +121,13 @@ def post_build(env, buildlog):
         ])
 
     env.substitutions = {
+        "project_name": default_project_name,
         "partname": target.partname,
         "platform": platform,
         "family": family,
         "compiler": "llvm" if family == "darwin" else "gcc",
         "core": core,
+        "avrdude_mcu": avrdude_mcu,
         "files": files_to_build,
         "metadata": buildlog.metadata,
         "memories": memories,

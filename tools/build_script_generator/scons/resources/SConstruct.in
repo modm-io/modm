@@ -60,7 +60,7 @@ env.Append(LINKFLAGS_target=[
             "settings_buildpath",
             "utils_buildformat",
             # "utils_buildsize",
-            # "program_avrdude",
+            "program_avrdude",
 %% for tool in build_tools
             "{{tool}}",
 %% endfor
@@ -156,9 +156,11 @@ files += env.XpccCommunication(
     path=abspath("{{xpcc_generate}}"),
     namespace="{{xpcc_namespace}}")
 %% endif
-program = env.Program(target="project.elf", source=files)
+program = env.Program(target="{{project_name}}.elf", source=files)
 
 env.Alias("symbols", env.Symbols(program))
+env.Alias("listing", env.Listing(program))
+env.Alias("bin", env.Bin(program))
 %% if platform in ["hosted"]
 env.Alias("build", program)
 env.Alias("run", env.Run(program))
@@ -169,10 +171,13 @@ env.Alias("size", env.Size(program))
 if "CONFIG_OPENOCD_COMMANDS" in env:
     env.Alias("program", env.OpenOcd(program))
 %% endif
+%% if platform in ["avr"]
+env.Alias("program", env.Avrdude(program))
+%% endif
 
 hexfile = env.Hex(program)
 
-env.Alias("build", [hexfile, env.Listing(program)])
+env.Alias("build", [hexfile, "listing"])
 %% if platform in ["stm32"]
 env.Alias("all", ["build", "size"])
 %% else
