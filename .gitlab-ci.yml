@@ -68,66 +68,50 @@ build:linux-examples:
     - (cd examples && ../tools/scripts/examples_compile.py linux zmq)
 
 
-build:avr-compile-all:
+.build:compile-all: &job_definition
   stage: build
   script:
-    - (cd test/all && python3 run_all.py at)
+    - (cd test/all && python3 run_all.py $SERIES)
   artifacts:
     paths:
       - test/all/log
+
+build:avr-compile-all:
+  variables:
+    SERIES: at
+  <<: *job_definition
 
 build:stm32f0-compile-all:
-  stage: build
-  script:
-    - (cd test/all && python3 run_all.py stm32f0)
-  artifacts:
-    paths:
-      - test/all/log
+  variables:
+    SERIES: stm32f0
+  <<: *job_definition
 
 build:stm32f1-compile-all:
-  stage: build
-  script:
-    - (cd test/all && python3 run_all.py stm32f1)
-  artifacts:
-    paths:
-      - test/all/log
+  variables:
+    SERIES: stm32f1
+  <<: *job_definition
 
 build:stm32f2-compile-all:
-  stage: build
-  script:
-    - (cd test/all && python3 run_all.py stm32f2)
-  artifacts:
-    paths:
-      - test/all/log
+  variables:
+    SERIES: stm32f2
+  <<: *job_definition
 
 build:stm32f3-compile-all:
-  stage: build
-  script:
-    - (cd test/all && python3 run_all.py stm32f3)
-  artifacts:
-    paths:
-      - test/all/log
+  variables:
+    SERIES: stm32f3
+  <<: *job_definition
 
 build:stm32f4-compile-all:
-  stage: build
-  script:
-    - (cd test/all && python3 run_all.py stm32f4)
-  artifacts:
-    paths:
-      - test/all/log
+  variables:
+    SERIES: stm32f4
+  <<: *job_definition
 
 build:stm32f7-compile-all:
-  stage: build
-  script:
-    - (cd test/all && python3 run_all.py stm32f7)
-  artifacts:
-    paths:
-      - test/all/log
+  variables:
+    SERIES: stm32f7
+  <<: *job_definition
 
 build:stm32l4-compile-all:
-  stage: build
-  script:
-    - (cd test/all && python3 run_all.py stm32l4)
-  artifacts:
-    paths:
-      - test/all/log
+  variables:
+    SERIES: stm32l4
+  <<: *job_definition
