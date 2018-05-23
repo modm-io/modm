@@ -1,0 +1,128 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2018, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+from collections import defaultdict, OrderedDict
+
+# These tests have been hardcoded for the Nucleo-64 boards due to
+# lack of some data-driven method for now.
+# According to the schematic, the following pins are safe to use as IO and are
+# not connected to anything else _on_ the board:
+test_io_nucleo_64 = sorted([
+    ("A", 0), # A0
+    ("A", 1), # A1
+    ("A", 4), # A2
+    ("B", 0), # A3
+    ("C", 1), # A4
+    ("C", 0), # A5
+    # ("A", 3), # D0 UART
+    # ("A", 2), # D1 UART
+    ("A", 10), # D2
+    # ("B", 3), # D3 SWO
+    ("B", 5), # D4
+    # ("B", 4), # D5 ???
+    ("B", 10), # D6
+    ("A", 8), # D7
+    ("A", 9), # D8
+    ("C", 7), # D9
+    ("B", 6), # D10
+    ("A", 7), # D11
+    ("A", 6), # D12
+    # ("A", 5), # D13 LED!
+    ("B", 9), # D14
+    ("B", 8), # D15
+])
+test_io_al_avrev_can = sorted([
+    ("A", 0),
+    ("A", 1),
+    ("A", 4),
+    ("B", 0),
+    ("B", 4),
+    ("B", 5),
+    ("C", 1),
+    ("C", 7),
+    ("D", 0),
+    ("D", 6),
+    ("E", 2),
+    ("E", 7),
+])
+
+def translate(s):
+    name = ""
+    for part in s.split("_"):
+        name += part.capitalize()
+    return name
+
+def get_driver(s):
+    name = "None"
+    if "driver" in s: name = translate(s["driver"]);
+    if "instance" in s: name += translate(s["instance"]);
+    return name
+
+def get_name(s):
+    return translate(s["name"])
+
+def get_af(s):
+    af = None
+    if "af" in s: af = int(s["af"]);
+    return af
+
+
+def init(module):
+    module.name = "gpio"
+    module.parent = "test:platform"
+
+def prepare(module, options):
+    target = options[":target"].identifier
+    if target["platform"] in ["stm32"]:
+        module.add_option(
+            BooleanOption(
+                name="test_gpio_lock",
+                description="Test locking the GPIOs. This will make the GPIOs unusable until the next reboot!",
+                default=False))
+
+    module.depends(":architecture:delay", ":platform:gpio")
+    return True
+
+def build(env):
+    if not (env.has_module(":board.nucleo-*") or env.has_module(":board.al-avr*")):
+        env.log.warn("GPIO test has been hardcoded to a Nucleo-64 board. "
+                     "When porting make sure this test does not damage your board!")
+        return
+
+    device = env[":target"]
+    identifier = device.identifier
+    test_io = test_io_nucleo_64 if identifier["platform"] == "stm32" else test_io_al_avrev_can
+
+    driver = device.get_driver("gpio")
+    gpios = [g for g in driver["gpio"] if (g["port"].upper(), int(g["pin"])) in test_io]
+    peripherals = sorted([get_driver(s) for g in gpios for s in (g["signal"] if "signal" in g else [])])
+    connections = OrderedDict()
+    for k in peripherals:
+        rconns = [(g["port"].upper(), int(g["pin"]), get_name(s), get_af(s)) for g in gpios for s in (g["signal"] if "signal" in g else []) if get_driver(s) == k]
+        # we need to remove duplicate GPIOs from this list
+        # since we cannot set the same GPIO to multiple different AFs!
+        conns = []
+        for r in rconns:
+            if any(r[0] == t[0] and r[1] == t[1] for t in conns):
+                continue
+            conns.append(r)
+        connections[k] = conns
+
+    properties = {
+        "target": identifier,
+        "test_io": test_io,
+        "test_connections": connections
+    }
+
+    env.substitutions = properties
+    env.outbasepath = "modm/test/modm/platform/gpio"
+    env.copy("platform_gpio_test.hpp")
+    env.template("platform_gpio_test_{}.cpp.in".format(identifier["platform"]))
