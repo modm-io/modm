@@ -10,24 +10,37 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 # LBUILD = python3 ../../library-builder/scripts/lbuild
-LBUILD = "lbuild"
+LBUILD = lbuild
 
-test-hosted-linux:
-	@$(RM) -r ../build/unittest/hosted
-	$(LBUILD) -c hosted.xml -D":target=hosted-linux" -p ../build/unittest/hosted -v build --no-log
-	scons -C ../build/unittest/hosted run
+define compile-test
+	@$(RM) -r ../build/unittest/$(1)/modm
+	$(LBUILD) -c $(1).xml $(3) -p ../build/unittest/$(1) build --no-log
+	scons -C ../build/unittest/$(1) $(2)
+endef
+define run-test
+	$(call compile-test,$(1),$(2) program,$(3))
+endef
 
-test-hosted-darwin:
-	@$(RM) -r ../build/unittest/hosted
-	$(LBUILD) -c hosted.xml -D":target=hosted-darwin" -p ../build/unittest/hosted -v build --no-log
-	scons -C ../build/unittest/hosted run
 
-test-stm32:
-	@$(RM) -r ../build/unittest/stm32
-	$(LBUILD) -c stm32.xml -p ../build/unittest/stm32 -v build --no-log
-	scons -C ../build/unittest/stm32 size
+run-hosted-linux:
+	$(call compile-test,hosted,run,-D":target=hosted-linux")
+run-hosted-darwin:
+	$(call compile-test,hosted,run,-D":target=hosted-darwin")
 
-test-avr:
-	@$(RM) -r ../build/unittest/avr
-	$(LBUILD) -c avr.xml -p ../build/unittest/avr -v build --no-log
-	scons -C ../build/unittest/avr
+
+compile-nucleo-f411:
+	$(call compile-test,nucleo-f411,size)
+run-nucleo-f411:
+	$(call run-test,nucleo-f411,size)
+
+
+compile-nucleo-f103:
+	$(call compile-test,nucleo-f103,size)
+run-nucleo-f103:
+	$(call run-test,nucleo-f103,size)
+
+
+compile-al-avreb-can:
+	$(call compile-test,al-avreb-can)
+run-al-avreb-can:
+	$(call run-test,al-avreb-can)

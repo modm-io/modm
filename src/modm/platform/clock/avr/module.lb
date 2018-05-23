@@ -46,5 +46,5 @@ def build(env):
     env.copy("static.hpp")
     env.copy("delay.hpp")
     env.copy("../common/common_clock.hpp", "common_clock.hpp")
-    if not env.has_module(":test"):
+    if not env.has_module(":test:architecture"):
         env.copy("clock.cpp")

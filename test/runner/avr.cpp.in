@@ -2,7 +2,7 @@
  * Copyright (c) 2009-2011, 2017, Fabian Greif
  * Copyright (c) 2010, Martin Rosekeit
  * Copyright (c) 2016, Sascha Schade
- * Copyright (c) 2016, Niklas Hauser
+ * Copyright (c) 2016, 2018, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -12,57 +12,38 @@
  */
 // ----------------------------------------------------------------------------
 
-// WARNING: This file is generated automatically, do not edit!
-// Please modify the corresponding 'runner/avr.cpp.in' file instead.
-// ----------------------------------------------------------------------------
+#include <modm/board/board.hpp>
 
 #include <unittest/reporter.hpp>
 #include <unittest/controller.hpp>
 
-#include <modm/platform/platform.hpp>
-
 using namespace modm::platform;
-using clock = SystemClock;
 
 ${includes}
 
 ${names}
 
-using LedGreen = GpioOutputB0;
-using LedRed = GpioB1;
-
-modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > loggerDevice;
+extern Board::LoggerDevice loggerDevice;
 
 int
 main()
 {
-	LedGreen::setOutput();
-	LedRed::setOutput();
-
-	LedGreen::reset();
-	LedRed::set();
-
-	// initialize output device
-	Uart0::connect<GpioInputE0::Rxd, GpioOutputE1::Txd>();
-	Uart0::initialize<clock, 115200>();
-
-	enableInterrupts();
+	Board::initialize();
+	Board::Leds::setOutput(modm::Gpio::Low);
+	Board::Leds::write(0b100);
 
 	loggerDevice.write("Unittests (" __DATE__ ", " __TIME__")\n");
 
 	unittest::Reporter reporter(loggerDevice);
 	unittest::Controller::instance().setReporter(reporter);
 
-	LedGreen::set();
+	Board::Leds::write(0b110);
 
 	// run tests
 ${tests}
 
 	unittest::Controller::instance().getReporter().printSummary();
 
-	LedRed::reset();
-
-	while (1)
-	{
-	}
+	Board::Leds::write(0b111);
+	while (1) ;
 }

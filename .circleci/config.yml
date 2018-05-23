@@ -24,13 +24,22 @@ jobs:
             avr-g++ --version
             which arm-none-eabi-g++
             arm-none-eabi-g++ --version
-
       - run:
-          name: Unittests
+          name: Hosted Unittests
           command: |
-            (cd test && make test-hosted-linux)
-            (cd test && make test-stm32)
-            (cd test && make test-avr)
+            (cd test && make run-hosted-linux)
+      - run:
+          name: Compile STM32 Unittests
+          command: |
+            (cd test && make compile-nucleo-f411)
+            (cd test && make compile-nucleo-f103)
+      - run:
+          name: Compile AVR Unittests
+          command: |
+            (cd test && make compile-al-avreb-can)
+      - run:
+          name: Execute Python Scripts
+          command: |
             python2 tools/scripts/authors.py --handles --count --shoutout --since 2017-01-01
             python3 tools/scripts/authors.py --handles --count --shoutout --since 2017-01-01
             python2 tools/system_design/builder/system_layout.py examples/communication/xml/communication.xml -o /tmp
