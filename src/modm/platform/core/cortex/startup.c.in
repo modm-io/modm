@@ -104,6 +104,7 @@ Reset_Handler(void)
 %# Enables all required internal memories
 {{ platform.enableInternalMemory() }}
 
+%% if options[":::stack_execution_guard"]
 	// fill the stack with relative branches to __stack_start
 	// where the undefined instruction is waiting to trigger the hard fault
 	asm volatile (
@@ -126,7 +127,7 @@ Reset_Handler(void)
 	"2:  cmp   r0, r1"                  "\n\t" // compare pointer with end of stack address
 		"bne   1b"                      "\n\t" // continue loop if not equal
 	);
-
+%% endif
 	// copy all internal memory declared in linkerscript table
 	table_copy(	(uint32_t**)__table_copy_intern_start,
 				(uint32_t**)__table_copy_intern_end);

@@ -35,6 +35,11 @@ def prepare(module, options):
         ":platform:clock.cortex")
 
     module.add_option(
+        BooleanOption(
+            name="stack_execution_guard",
+            description="Fill the stack with relative jumps to fault handler to prevent accidental execution.",
+            default=False))
+    module.add_option(
         EnumerationOption(
             name="allocator",
             description=FileReader("option/allocator.md"),
