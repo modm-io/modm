@@ -17,7 +17,7 @@ process that you can fine-tune to your needs.
 - Feast your eyes on [lots of working examples][examples].
 <!-- - [API reference is available here][reference]. -->
 <!-- - [Check out our latest quarterly release][releases] with a [beautiful changelog][changelog]. -->
-- Our CI checks every contribution for regressions: <a href="https://circleci.com/gh/modm-io/workflows/modm/tree/develop" style="border-bottom:none">![Build Status](https://circleci.com/gh/modm-io/modm/tree/develop.svg?style=shield)</a>
+- Our CIs check every contribution for regressions: <a href="https://circleci.com/gh/modm-io/workflows/modm/tree/develop" style="border-bottom:none">![Build Status](https://circleci.com/gh/modm-io/modm/tree/develop.svg?style=shield)</a> <a href="https://gitlab.com/modm-io/modm/pipelines">![Build Status](https://gitlab.com/modm-io/modm/badges/develop/build.svg)> </a>
 - We care [about testing modm][testing].
 
 This project also has a [technical blog][blog] to document larger design concepts.
