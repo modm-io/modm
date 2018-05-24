@@ -121,6 +121,9 @@ public:
 		configure(type);
 	}
 	// External Interrupts
+	// Warning: This will disable any previously enabled interrupt which is
+	// routed to the same interupt line, e.g. PA3 will disable PB3.
+	// This is a hardware limitation by the STM32 EXTI.
 	modm_always_inline static void
 	enableExternalInterrupt()
 	{
@@ -128,12 +131,12 @@ public:
 		// PA[x], x =  4 ..  7 maps to EXTICR[1]
 		// PA[x], x =  8 .. 11 maps to EXTICR[2]
 		// PA[x], x = 12 .. 15 maps to EXTICR[3]
-		// => bit3 and bit2 (mask 0x0c) specify the register
-		// => bit1 and bit0 (mask 0x03) specify the bit position
-		constexpr uint8_t index = (pin & 0x0c) >> 2;
-		constexpr uint8_t bit_pos = (pin & 0x03) << 2;
-		constexpr uint16_t syscfg_mask = (0x0f) << bit_pos;
-		constexpr uint16_t syscfg_value = (port_nr & (0x0f)) << bit_pos;
+		// => bit3 and bit2 (mask 0b1100) specify the register
+		// => bit1 and bit0 (mask 0b0011) specify the bit position
+		constexpr uint8_t index   = (pin & 0b1100) >> 2;
+		constexpr uint8_t bit_pos = (pin & 0b0011) << 2;
+		constexpr uint16_t syscfg_mask = (0b1111) << bit_pos;
+		constexpr uint16_t syscfg_value = (port_nr & (0b1111)) << bit_pos;
 		AFIO->EXTICR[index] = (AFIO->EXTICR[index] & ~syscfg_mask) | syscfg_value;
 		EXTI->IMR |= mask;
 	}
