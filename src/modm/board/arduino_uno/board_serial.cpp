@@ -12,7 +12,7 @@
 #include "board.hpp"
 
 // Create an IODeviceWrapper around the Uart Peripheral we want to use
-modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > loggerDevice;
+Board::LoggerDevice loggerDevice;
 
 // Set all four logger streams to use the UART
 modm::IOStream serialStream(loggerDevice);

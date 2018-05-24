@@ -55,6 +55,7 @@ using LedD13 = D13;
 
 using Leds = SoftwareGpioPort< LedD13 >;
 
+using LoggerDevice = modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull >;
 
 inline void
 initialize()

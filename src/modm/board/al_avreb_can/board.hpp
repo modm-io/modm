@@ -35,6 +35,7 @@ using Led3 = GpioInverted<GpioOutputF3>;
 using Button = GpioUnused;
 using Leds = SoftwareGpioPort< Led3, Led2, Led1, Led0 >;
 
+using LoggerDevice = modm::IODeviceWrapper< Uart1, modm::IOBuffer::BlockIfFull >;
 
 inline void
 initialize()

@@ -11,5 +11,5 @@
 
 #include "board.hpp"
 
-modm::IODeviceWrapper< Uart1, modm::IOBuffer::BlockIfFull > serialDevice;
-modm::IOStream serialStream(serialDevice);
+Board::LoggerDevice loggerDevice;
+modm::IOStream serialStream(loggerDevice);
