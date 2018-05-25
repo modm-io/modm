@@ -44,6 +44,7 @@ public:
 	using Input = GpioInverted<typename Pin::Input>;
 	using IO = GpioInverted<typename Pin::IO>;
 	using Type = typename Pin::Type;
+	static constexpr bool isInverted = Pin::isInverted ^ true;
 
 public:
 	using Pin::setOutput;

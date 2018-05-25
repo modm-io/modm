@@ -74,18 +74,28 @@ struct Gpio
 	OutputSpeed
 	{
 %% if target["family"] in ["f2", "f4", "f7", "l4"]
-		MHz2 = 0,		///< Low speed
-		MHz25 = 0x1,	///< Medium speed
-		MHz50 = 0x2,	///< Fast speed
-		MHz100 = 0x3,	///< High speed on 30 pF (80 MHz Output max speed on 15 pF)
+		Low      = 0,
+		Medium   = 0x1,
+		High     = 0x2,
+		VeryHigh = 0x3,		///< 30 pF (80 MHz Output max speed on 15 pF)
+		MHz2     = Low,
+		MHz25    = Medium,
+		MHz50    = High,
+		MHz100   = VeryHigh,
 %% elif target["family"] in ["f0", "f3"]
-		MHz2 = 0,		///< Low speed
-		MHz10 = 0x1,	///< Medium speed
-		MHz50 = 0x3,	///< Fast speed
+		Low    = 0,
+		Medium = 0x1,
+		High   = 0x3,
+		MHz2   = Low,
+		MHz10  = Medium,
+		MHz50  = High,
 %% elif target["family"] in ["f1"]
-		MHz2  = 0x2,	///< Low speed
-		MHz10 = 0x1,	///< Medium speed
-		MHz50 = 0x3,	///< Fast speed
+		Low    = 0x2,
+		Medium = 0x1,
+		High   = 0x3,
+		MHz2   = Low,
+		MHz10  = Medium,
+		MHz50  = High,
 %% endif
 	};
 

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <library xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance"
          xsd:noNamespaceSchemaLocation="https://github.com/dergraaf/library-builder/lbuild/resources/configuration.xsd">
-  <extends>../src/modm/board/disco_f469ni/board.xml</extends>
+  <extends>../src/modm/board/nucleo_f103rb/board.xml</extends>
   <options>
     <option name=":build.scons:include_demo_project">False</option>
     <option name=":build.scons:include_sconstruct">True</option>
@@ -10,8 +10,17 @@
     <option name=":build.scons:info.git">True</option>
   </options>
   <modules>
-    <module>:platform:core</module>
     <module>:build.scons</module>
-    <module>:test:**</module>
+    <!-- Not everything fits -->
+    <!-- <module>:test:architecture</module>
+    <module>:test:communication</module>
+    <module>:test:container</module>
+    <module>:test:driver</module> -->
+
+    <module>:test:io</module>
+    <module>:test:platform:**</module>
+    <module>:test:processing</module>
+    <module>:test:ui</module>
+    <module>:test:math</module>
   </modules>
 </library>

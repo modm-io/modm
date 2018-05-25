@@ -1,0 +1,132 @@
+/*
+ * Copyright (c) 2018, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_AVR_GPIO_SET_HPP
+#define MODM_AVR_GPIO_SET_HPP
+
+#include "base.hpp"
+
+namespace modm
+{
+
+namespace platform
+{
+
+template< class... Gpios >
+class GpioSet : public Gpio
+{
+protected:
+	static constexpr uint8_t inverteds[{{ ports | length }}] = {
+%% for port in ports
+		(((Gpios::port == Port::{{port}} and Gpios::isInverted) ? Gpios::mask : 0) | ...),
+%% endfor
+	};
+	static constexpr uint8_t inverted(uint8_t id) { return inverteds[id]; }
+
+	static constexpr uint8_t masks[{{ ports | length }}] = {
+%% for port in ports
+		(((Gpios::port == Port::{{port}}) ? Gpios::mask : 0) | ...),
+%% endfor
+	};
+	static constexpr uint8_t mask(uint8_t id) { return masks[id]; }
+	static constexpr uint8_t numberOfPorts() {
+		uint8_t r{0};
+		for (const auto &m: masks) r += (m) ? 1 : 0;
+		return r;
+	}
+
+public:
+	static constexpr uint8_t width = sizeof...(Gpios);
+	static constexpr uint8_t number_of_ports = numberOfPorts();
+
+public:
+	static void setOutput()
+	{
+%% for port, id in ports.items()
+		if constexpr (mask({{id}})) { {% if pue %}PUE{{port}} &= ~mask({{id}}); {% endif %}DDR{{port}} |= mask({{id}}); }
+%% endfor
+	}
+
+	static void setOutput(bool status)
+	{
+		set(status);
+		setOutput();
+	}
+
+	static void setOutput(OutputType)
+	{
+		setOutput();
+	}
+
+	static void configure(OutputType)
+	{
+		setOutput();
+	}
+
+	static void setInput()
+	{
+%% for port, id in ports.items()
+		if constexpr (mask({{id}})) DDR{{port}} &= ~mask({{id}});
+%% endfor
+	}
+
+	static void setInput(InputType type)
+	{
+		setInput();
+		configure(type);
+	}
+
+	static void configure(InputType type)
+	{
+		if (type == InputType::PullUp) {
+%% for port, id in ports.items()
+			if constexpr (mask({{id}})) {{ ("PUE" if pue else "PORT") ~ port}} |= mask({{id}});
+%% endfor
+		} else {
+%% for port, id in ports.items()
+			if constexpr (mask({{id}})) {{ ("PUE" if pue else "PORT") ~ port}} &= ~mask({{id}});
+%% endfor
+		}
+	}
+
+	static void set()
+	{
+%% for port, id in ports.items()
+		if constexpr (mask({{id}})) PORT{{port}} = (PORT{{port}} & ~mask({{id}})) | (mask({{id}}) ^ inverted({{id}}));
+%% endfor
+	}
+
+	static void set(bool status)
+	{
+		if (status) set();
+		else        reset();
+	}
+
+	static void reset()
+	{
+%% for port, id in ports.items()
+		if constexpr (mask({{id}})) PORT{{port}} = (PORT{{port}} & ~mask({{id}})) | inverted({{id}});
+%% endfor
+	}
+
+	static void toggle()
+	{
+%% for port, id in ports.items()
+		if constexpr (mask({{id}})) {% if notoggle %}PORT{{port}} ^{% else %}PIN{{port}} {% endif %}= mask({{id}});
+%% endfor
+	}
+};
+
+} // namespace platform
+
+} // namespace modm
+
+#endif // MODM_AVR_GPIO_SET_HPP

@@ -16,6 +16,7 @@
 #define MODM_AVR_GPIO_PIN_{{ port ~ pin }}_HPP
 
 #include "base.hpp"
+#include "set.hpp"
 
 /**
  * @ingroup 	platform
@@ -44,83 +45,44 @@ using GpioInput{{ port ~ pin }}  = Gpio{{ port ~ pin }};
 /// @ingroup	{{partname}}_gpio
 class Gpio{{ port ~ pin }} : public Gpio, public ::modm::GpioIO
 {
+	template< class... Gpios >
+	friend class GpioSet;
+	using PinSet = GpioSet<Gpio{{ port ~ pin }}>;
+
 public:
 	using Output = GpioOutput{{ port ~ pin }};
 	using Input = GpioInput{{ port ~ pin }};
 	using IO = Gpio{{ port ~ pin }};
 	using Type = Gpio{{ port ~ pin }};
-	/// Port name.
+	static constexpr bool isInverted = false;
 	static constexpr Port port = Port::{{port}};
-	/// Pin Number.
 	static constexpr uint8_t pin = {{pin}};
-	/// Bitmask for registers that contain a 1bit value for every pin.
+
+protected:
 	static constexpr uint8_t mask = (1 << pin);
 
 public:
 	// GpioOutput
-	modm_always_inline static void setOutput(bool status) {
-		setOutput();
-		set(status);
-	}
-	modm_always_inline static void setOutput(OutputType) {
-		setOutput();
-	}
-	modm_always_inline static void setOutput() {
-		%% if pue
-		PUE{{port}} &= ~mask;
-		%% endif
-		DDR{{port}} |= mask;
-	}
-	modm_always_inline static void set() {
-		PORT{{port}} |= mask;
-	}
-	modm_always_inline static void set(bool status) {
-		if (status) { set(); }
-		else { reset(); }
-	}
-	modm_always_inline static void reset() {
-		PORT{{port}} &= ~mask;
-	}
-	modm_always_inline static void toggle() {
-		%% if notoggle
-		PORT{{port}} ^= mask;
-		%% else
-		PIN{{port}} = mask;
-		%% endif
-	}
-	modm_always_inline static bool isSet() {
+	inline static void setOutput(bool status) { PinSet::setOutput(status); }
+	inline static void setOutput(OutputType type) { PinSet::setOutput(type); }
+	inline static void setOutput() { PinSet::setOutput(); }
+	inline static void configure(OutputType type) { PinSet::configure(type); }
+	inline static void set() { PinSet::set(); }
+	inline static void set(bool status) { PinSet::set(status); }
+	inline static void reset() { PinSet::reset(); }
+	inline static void toggle() { PinSet::toggle(); }
+	inline static bool isSet() {
 		return (PORT{{port}} & mask);
 	}
 	// GpioInput
-	modm_always_inline static void configure(InputType type) {
-		if (type == InputType::PullUp) {
-		%% if pue
-			PUE{{port}} |= mask;
-		%% else
-			PORT{{port}} |= mask;
-		%% endif
-		}
-		else {
-		%% if pue
-			PUE{{port}} &= ~mask;
-		%% else
-			PORT{{port}} &= ~mask;
-		%% endif
-		}
-	}
-	modm_always_inline static void
-	setInput(InputType type) {
-		setInput();
-		configure(type);
-	}
-	modm_always_inline static void setInput() {
-		DDR{{port}} &= ~mask;
-	}
-	modm_always_inline static bool read() {
+	inline static void configure(InputType type) { PinSet::configure(type); }
+	inline static void setInput(InputType type) { PinSet::setInput(type); }
+	inline static void setInput() { PinSet::setInput(); }
+	inline static bool read() {
 		return (PIN{{port}} & mask);
 	}
 		%% if extint >= 0
-	modm_always_inline static void setInputTrigger(InputTrigger trigger) {
+	inline static void setInputTrigger(InputTrigger trigger) {
 			%% if extint < 4
 				%% if isc2 is defined and extint == 2
 		{{isc2}} = ({{isc2}} & ~(1 << ISC2)) | ((i(trigger) & 0b01) << ISC2);
@@ -131,16 +93,16 @@ public:
 		EICRB = (EICRB & ~(0b11 << 2*{{extint - 4}})) | (i(trigger) << 2*{{extint - 4}});
 			%% endif
 	}
-	modm_always_inline static void enableExternalInterrupt() {
+	inline static void enableExternalInterrupt() {
 		EIMSK |= (1 << INT{{extint}});
 	}
-	modm_always_inline static void disableExternalInterrupt() {
+	inline static void disableExternalInterrupt() {
 		EIMSK &= ~(1 << INT{{extint}});
 	}
-	modm_always_inline static bool getExternalInterruptFlag() {
+	inline static bool getExternalInterruptFlag() {
 		return (EIFR & (1 << INTF{{extint}}));
 	}
-	modm_always_inline static void acknowledgeExternalInterruptFlag() {
+	inline static void acknowledgeExternalInterruptFlag() {
 		EIFR |= (1 << INTF{{extint}});
 	}
 		%% endif
@@ -156,29 +118,29 @@ public:
 					%% set af_reg = ""
 				%% endif
 			%% endif
-	modm_always_inline static void enablePcInterrupt() {
+	inline static void enablePcInterrupt() {
 		PCMSK{{af_reg}} |= (1 << PCINT{{af_id}});
 		PCICR |= (1 << PCIE{{af_reg}});
 	}
-	modm_always_inline static void disablePcInterrupt() {
+	inline static void disablePcInterrupt() {
 		uint8_t pcmsk = PCMSK{{af_reg}} & ~(1 << PCINT{{af_id}});
 		PCMSK{{af_reg}} = pcmsk;
 		if (!pcmsk) {
 			PCICR &= ~(1 << PCIE{{af_reg}});
 		}
 	}
-	modm_always_inline static bool readPcInterruptFlag() {
+	inline static bool readPcInterruptFlag() {
 		return (PCIFR & (1 << PCIF{{af_reg}}));
 	}
-	modm_always_inline static void acknowledgePcInterruptFlag() {
+	inline static void acknowledgePcInterruptFlag() {
 		PCIFR |= (1 << PCIF{{af_reg}});
 	}
 		%% endif
 	// GpioIO
-	modm_always_inline static Direction getDirection() {
+	inline static Direction getDirection() {
 		return (DDR{{port}} & mask) ? Direction::Out : Direction::In;
 	}
-	modm_always_inline static void
+	inline static void
 	disconnect() {
 		DDR{{port}} &= ~mask;
 		%% if pue

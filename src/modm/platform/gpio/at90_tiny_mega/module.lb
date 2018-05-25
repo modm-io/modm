@@ -11,6 +11,8 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
+from collections import OrderedDict
+
 def port_ranges(gpios):
     ports = {p: (8, 0) for p in set([p["port"] for p in gpios])}
     for gpio in gpios:
@@ -19,6 +21,7 @@ def port_ranges(gpios):
         ports[gpio["port"]] = (min(pin, pmin), max(pin, pmax))
 
     ports = [{"name": k.upper(), "start": v[0], "width": v[1] - v[0] + 1} for k,v in ports.items()]
+    ports.sort(key=lambda p: p["name"])
     return ports
 
 def get_driver(s):
@@ -66,8 +69,8 @@ def pre_build(env):
         signals = gpio["signal"] if "signal" in gpio else []
         extracted_signals = extract_signals(signals)
         all_signals.update(extracted_signals)
-        signal_names = set(s["name"] for s in extracted_signals.values())
-        extracted_signals = {name: [s for s in extracted_signals.values() if s["name"] == name] for name in signal_names}
+        signal_names = sorted(list(set(s["name"] for s in extracted_signals.values())))
+        extracted_signals = OrderedDict([(name, sorted([s for s in extracted_signals.values() if s["name"] == name], key=lambda si:si["name"])) for name in signal_names])
         # extract information on external interrupts
         exints = list(filter(lambda p: p["driver"] == "exint", signals))
         pcint = list(filter(lambda p: p["name"].startswith("pcint"), exints))
@@ -104,7 +107,7 @@ def pre_build(env):
     bprops["all_peripherals"] = sorted(list(set(all_peripherals)))
     bprops["all_signals"] = sorted(list(set(s["name"] for s in all_signals.values())))
     bprops["ranges"] = port_ranges(driver["gpio"])
-    bprops["ports"] = sorted([p["name"] for p in bprops["ranges"]])
+    bprops["ports"] = {k:i for i, k in enumerate([p["name"] for p in bprops["ranges"]])}
 
 def build(env):
     device = env[":target"]
@@ -149,4 +152,6 @@ def build(env):
     env.copy("define.h")
     env.template("base.hpp.in")
     env.template("port.hpp.in")
+    env.template("software_port.hpp.in")
+    env.template("set.hpp.in")
     env.template("unused.hpp.in")

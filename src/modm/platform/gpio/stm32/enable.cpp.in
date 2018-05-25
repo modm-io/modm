@@ -28,6 +28,16 @@ modm_gpio_enable(void)
 %%  set clock_tree = 'AHB2'
 %% endif
 
+%% if target["family"] not in ["f1"]
+	// Enable SYSCFG
+	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+%% endif
+
+%% if target["family"] in ["f2", "f4", "f7"]
+	// Enable I/O compensation cell
+	SYSCFG->CMPCR = SYSCFG_CMPCR_CMP_PD;
+%% endif
+
 	// Enable GPIO clock
 	RCC->{{ clock_tree }}ENR  |=
 %% for port in options[":::enable_ports"]

@@ -1,0 +1,104 @@
+/*
+ * Copyright (c) 2016, Antal Szabó
+ * Copyright (c) 2016, Kevin Läufer
+ * Copyright (c) 2017, Fabian Greif
+ * Copyright (c) 2018, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include "platform_gpio_test.hpp"
+
+#include <modm/platform/platform.hpp>
+
+using namespace modm::platform;
+
+void
+PlatformGpioTest::setUp()
+{
+}
+
+void
+PlatformGpioTest::testEnabled()
+{
+}
+
+void
+PlatformGpioTest::testSetOutput()
+{
+%% for (port, pin) in test_io
+	Gpio{{port ~ pin}}::setOutput(Gpio::OutputType::PushPull);
+		TEST_ASSERT_TRUE((DDR{{port}} & (1ul << {{pin}})) == (1ul << {{pin}}));
+%% endfor
+	// configure() and setOutput() method are already tested in the above code paths
+}
+
+void
+PlatformGpioTest::testSetInput()
+{
+%% for (port, pin) in test_io
+	Gpio{{port ~ pin}}::setInput(Gpio::InputType::Floating);
+		TEST_ASSERT_TRUE((DDR{{port}} & (1ul << {{pin}})) == 0ul);
+		TEST_ASSERT_TRUE((PORT{{port}} & (1ul << {{pin}})) == 0ul);
+%% endfor
+
+%% for (port, pin) in test_io
+	Gpio{{port ~ pin}}::setInput(Gpio::InputType::PullUp);
+		TEST_ASSERT_TRUE((DDR{{port}} & (1ul << {{pin}})) == 0ul);
+		TEST_ASSERT_TRUE((PORT{{port}} & (1ul << {{pin}})) == (1ul << {{pin}}));
+%% endfor
+}
+
+void
+PlatformGpioTest::testOutput()
+{
+%% for (port, pin) in test_io
+	Gpio{{port ~ pin}}::setOutput();
+	Gpio{{port ~ pin}}::set();
+		TEST_ASSERT_TRUE((DDR{{port}} & (1ul << {{pin}})) == (1ul << {{pin}}));
+		TEST_ASSERT_TRUE((PORT{{port}} & (1ul << {{pin}})) == (1ul << {{pin}}));
+	Gpio{{port ~ pin}}::reset();
+		TEST_ASSERT_TRUE((DDR{{port}} & (1ul << {{pin}})) == (1ul << {{pin}}));
+		TEST_ASSERT_TRUE((PORT{{port}} & (1ul << {{pin}})) == 0ul);
+		TEST_ASSERT_FALSE(Gpio{{port ~ pin}}::isSet());
+	Gpio{{port ~ pin}}::toggle();
+		TEST_ASSERT_TRUE((DDR{{port}} & (1ul << {{pin}})) == (1ul << {{pin}}));
+		TEST_ASSERT_TRUE((PORT{{port}} & (1ul << {{pin}})) == (1ul << {{pin}}));
+		TEST_ASSERT_TRUE(Gpio{{port ~ pin}}::isSet());
+	Gpio{{port ~ pin}}::toggle();
+		TEST_ASSERT_TRUE((DDR{{port}} & (1ul << {{pin}})) == (1ul << {{pin}}));
+		TEST_ASSERT_TRUE((PORT{{port}} & (1ul << {{pin}})) == 0ul);
+		TEST_ASSERT_FALSE(Gpio{{port ~ pin}}::isSet());
+%% endfor
+}
+
+void
+PlatformGpioTest::testInput()
+{
+%% for (port, pin) in test_io
+	Gpio{{port ~ pin}}::setInput(Gpio::InputType::PullUp);
+	modm::delayMilliseconds(1);
+		TEST_ASSERT_TRUE((PIN{{port}} & (1ul << {{pin}})) == (1ul << {{pin}}));
+		TEST_ASSERT_TRUE(Gpio{{port ~ pin}}::read());
+%% endfor
+}
+
+void
+PlatformGpioTest::testAnalog()
+{
+}
+
+void
+PlatformGpioTest::testConnect()
+{
+}
+
+void
+PlatformGpioTest::testLock()
+{
+}

@@ -281,6 +281,10 @@ public:
 	/// and can be used in drivers to assert the correct requirements
 	static constexpr uint8_t width;
 
+	/// This holds the number of unique platform ports that this
+	/// implementation accesses. It's always at least 1.
+	static constexpr uint8_t number_of_ports;
+
 	/// may also be uint8_t, depending on port width
 	using PortType = uint16_t;
 

@@ -47,7 +47,7 @@ def build(env):
     env.template("delay.cpp.in")
     env.copy("delay.hpp")
 
-    if not env.has_module(":test"):
+    if not env.has_module(":test:architecture"):
         env.copy("modm_clock.cpp")
 
     # Systick Timer

@@ -13,10 +13,6 @@
  */
 // ----------------------------------------------------------------------------
 
-// WARNING: This file is generated automatically, do not edit!
-// Please modify the corresponding 'runner_hosted.cpp.in' file instead.
-// ----------------------------------------------------------------------------
-
 #include <unittest/reporter.hpp>
 #include <unittest/controller.hpp>
 

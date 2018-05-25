@@ -19,6 +19,7 @@
 
 #include "../device.hpp"
 #include "base.hpp"
+#include "set.hpp"
 
 
 namespace modm
@@ -37,15 +38,17 @@ using GpioInput{{ port ~ pin }}  = Gpio{{ port ~ pin }};
 /// @ingroup	{{partname}}_gpio
 struct Gpio{{ port ~ pin }} : public Gpio, ::modm::GpioIO
 {
+	template<class... Gpios>
+	friend class GpioSet;
+	using PinSet = GpioSet<Gpio{{ port ~ pin }}>;
 public:
 	using Output = Gpio{{ port ~ pin }};
 	using Input = Gpio{{ port ~ pin }};
 	using IO = Gpio{{ port ~ pin }};
 	using Type = Gpio{{ port ~ pin }};
-	/// Port name.
-	static constexpr Port port = Port::{{port}};
-	/// Pin Number.
-	static constexpr uint8_t pin = {{pin}};
+	static constexpr bool isInverted = false;
+	static constexpr Port port = Port::{{port}}; ///< Port name
+	static constexpr uint8_t pin = {{pin}}; ///< Pin Number
 
 protected:
 	/// Bitmask for registers that contain a 1bit value for every pin.
@@ -58,74 +61,38 @@ protected:
 	/// ExternalInterruptIRQ
 	static constexpr IRQn_Type ExternalInterruptIRQ = EXTI{{ exti_irqn }}_IRQn;
 
-protected:
+public:
 	/// Enable Analog Mode which is needed to use this pin as an ADC input.
-	modm_always_inline static void
-	setAnalogInput() {
-		{{reg}}->{{cr}} &= ~mask4;
-	}
+	inline static void setAnalogInput() { PinSet::setAnalogInput(); }
 
 public:
 	// GpioOutput
 	// start documentation inherited
-	modm_always_inline static void setOutput() {
-		configure(OutputType::PushPull);
-	}
-	modm_always_inline static void setOutput(bool status) {
-		set(status);
-		setOutput();
-	}
-	modm_always_inline static void set() {
-		{{reg}}->BSRR = mask;
-	}
-	modm_always_inline static void set(bool status) {
-		if (status) set();
-		else        reset();
-	}
-	modm_always_inline static void reset() {
-		{{reg}}->BRR = mask;
-	}
-	modm_always_inline static void toggle() {
+	inline static void setOutput() { PinSet::setOutput(); }
+	inline static void setOutput(bool status) { PinSet::setOutput(status); }
+	inline static void set() { PinSet::set(); }
+	inline static void set(bool status) { PinSet::set(status); }
+	inline static void reset() { PinSet::reset(); }
+	inline static void toggle() {
 		if (isSet()) reset();
 		else         set();
 	}
-	modm_always_inline static bool isSet() {
-		return ({{reg}}->ODR & mask);
-	}
+	inline static bool isSet() { return ({{reg}}->ODR & mask); }
 	// stop documentation inherited
-	modm_always_inline static void
-	configure(OutputType type, OutputSpeed speed = OutputSpeed::MHz50) {
-		{{reg}}->{{cr}} = ({{reg}}->{{cr}} & ~mask4) | ((i(type) | i(speed)) << (cr_pin * 4));
-	}
-	modm_always_inline static void
-	setOutput(OutputType type, OutputSpeed speed = OutputSpeed::MHz50) {
-		configure(type, speed);
-		setOutput();
-	}
+	inline static void configure(OutputType type, OutputSpeed speed = OutputSpeed::MHz50) { PinSet::configure(type, speed); }
+	inline static void setOutput(OutputType type, OutputSpeed speed = OutputSpeed::MHz50) { PinSet::setOutput(type, speed); }
 	// GpioInput
 	// start documentation inherited
-	modm_always_inline static void
-	setInput() {
-		configure(InputType::Floating);
-	}
-	modm_always_inline static bool read() {
-		return ({{reg}}->IDR & mask);
-	}
+	inline static void setInput() { PinSet::setInput(); }
+	inline static bool read() { return ({{reg}}->IDR & mask); }
 	// end documentation inherited
-	modm_always_inline static void configure(InputType type) {
-		{{reg}}->{{cr}} = ({{reg}}->{{cr}} & ~mask4) | ((i(type) & 0xc) << (cr_pin * 4));
-		if (type == InputType::PullUp) {{reg}}->BSRR = mask;
-		else                           {{reg}}->BRR = mask;
-	}
-	modm_always_inline static void setInput(InputType type) {
-		configure(type);
-	}
+	inline static void configure(InputType type) { PinSet::configure(type); }
+	inline static void setInput(InputType type) { PinSet::setInput(type); }
 	// External Interrupts
 	// Warning: This will disable any previously enabled interrupt which is
 	// routed to the same interupt line, e.g. PA3 will disable PB3.
 	// This is a hardware limitation by the STM32 EXTI.
-	modm_always_inline static void
-	enableExternalInterrupt()
+	inline static void enableExternalInterrupt()
 	{
 		// PA[x], x =  0 ..  3 maps to EXTICR[0]
 		// PA[x], x =  4 ..  7 maps to EXTICR[1]
@@ -140,22 +107,13 @@ public:
 		AFIO->EXTICR[index] = (AFIO->EXTICR[index] & ~syscfg_mask) | syscfg_value;
 		EXTI->IMR |= mask;
 	}
-	modm_always_inline static void
-	disableExternalInterrupt()
-	{
-		EXTI->IMR &= ~mask;
-	}
-	modm_always_inline static void
-	enableExternalInterruptVector(const uint32_t priority)
+	inline static void disableExternalInterrupt() { EXTI->IMR &= ~mask; }
+	inline static void enableExternalInterruptVector(const uint32_t priority)
 	{
 		NVIC_SetPriority(ExternalInterruptIRQ, priority);
 		NVIC_EnableIRQ(ExternalInterruptIRQ);
 	}
-	modm_always_inline static void
-	disableExternalInterruptVector()
-	{
-		NVIC_DisableIRQ(ExternalInterruptIRQ);
-	}
+	inline static void disableExternalInterruptVector() { NVIC_DisableIRQ(ExternalInterruptIRQ); }
 	inline static void
 	setInputTrigger(const InputTrigger trigger)
 	{
@@ -175,17 +133,8 @@ public:
 			break;
 		}
 	}
-	modm_always_inline static bool
-	getExternalInterruptFlag() {
-		return (EXTI->PR & mask);
-	}
-	/**	\brief	Reset the interrupt flag in the interrupt routine. */
-	modm_always_inline static void
-	acknowledgeExternalInterruptFlag()
-	{
-		// Flags are cleared by writing a one to the flag position.
-		EXTI->PR |= mask;
-	}
+	inline static bool getExternalInterruptFlag() { return (EXTI->PR & mask); }
+	inline static void acknowledgeExternalInterruptFlag() { EXTI->PR |= mask; }
 	// GpioIO
 	// start documentation inherited
 	inline static Direction getDirection() {
@@ -197,19 +146,8 @@ public:
 		return Direction::In;
 	}
 	// end documentation inherited
-	inline static void lock() {
-		{{reg}}->LCKR = 0x10000 | mask;
-		{{reg}}->LCKR = 0x00000 | mask;
-		{{reg}}->LCKR = 0x10000 | mask;
-		(void) {{reg}}->LCKR;
-	}
-	modm_always_inline static void
-	disconnect() {
-		uint32_t cr = {{reg}}->{{cr}};
-		if (cr & (0b0011UL << (cr_pin * 4))) {
-			{{reg}}->{{cr}} = cr & ~(0b1000UL << (cr_pin * 4));
-		}
-	};
+	inline static void lock() { PinSet::lock(); }
+	inline static void disconnect() { setInput(); };
 
 public:
 	template< Peripheral peripheral >

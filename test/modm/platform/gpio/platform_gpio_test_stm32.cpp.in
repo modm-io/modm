@@ -1,0 +1,250 @@
+/*
+ * Copyright (c) 2016, Antal Szabó
+ * Copyright (c) 2016, Kevin Läufer
+ * Copyright (c) 2017, Fabian Greif
+ * Copyright (c) 2018, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include "platform_gpio_test.hpp"
+
+#include <modm/platform/platform.hpp>
+
+using namespace modm::platform;
+
+void
+PlatformGpioTest::setUp()
+{
+%% for (port, pin) in test_io
+	// GPIO{{port}}->MODER &= ~(3ul << {{pin*2}}); GPIO{{port}}->OSPEEDR &= ~(3ul << {{pin*2}}); GPIO{{port}}->PUPDR &= ~(3ul << {{pin*2}});
+	// GPIO{{port}}->OTYPER &= ~(1ul << {{pin}}); GPIO{{port}}->ODR &= ~(1ul << {{pin}});  GPIO{{port}}->AFR[{{pin//8}}] &= ~(15ul << {{(pin % 8) * 4}});
+%% endfor
+}
+
+void
+PlatformGpioTest::testEnabled()
+{
+%% if options["modm:platform:gpio:enable_ports"] | length
+	// checks if the handler in enable.cpp has been called
+	// if this fails, then the function either wasn't found by the linker
+	// or the section was garbage collected, or the startup script has a bug
+%% if target["family"] in ["f1"]
+	TEST_ASSERT_TRUE(RCC->APB2ENR & RCC_APB2ENR_AFIOEN);
+%% else
+	TEST_ASSERT_TRUE(RCC->APB2ENR & RCC_APB2ENR_SYSCFGEN);
+%% endif
+%% if target["family"] in ["f2","f4", "f7"]
+	TEST_ASSERT_TRUE(SYSCFG->CMPCR & SYSCFG_CMPCR_CMP_PD);
+%% endif
+	// check all ports are clock enabled and all GPIOs are reset
+%% for (port, pin) in test_io
+%% if target["family"] in ["f1"]
+	TEST_ASSERT_TRUE((GPIO{{port}}->CR{{"L" if pin<8 else "H"}} & (0xful << {{(pin % 8) * 4}})) == (0b0100ul << {{(pin % 8) * 4}}));
+%% else
+	TEST_ASSERT_TRUE((GPIO{{port}}->MODER & (3ul << {{pin*2}})) == 0ul);
+	TEST_ASSERT_TRUE((GPIO{{port}}->OSPEEDR & (3ul << {{pin*2}})) == 0ul);
+	TEST_ASSERT_TRUE((GPIO{{port}}->PUPDR & (3ul << {{pin*2}})) == 0ul);
+	TEST_ASSERT_TRUE((GPIO{{port}}->OTYPER & (1ul << {{pin}})) == 0ul);
+	TEST_ASSERT_TRUE((GPIO{{port}}->AFR[{{pin//8}}] & (0xful << {{(pin % 8) * 4}})) == 0ul);
+%% endif
+	TEST_ASSERT_TRUE((GPIO{{port}}->ODR & (1ul << {{pin}})) == 0ul);
+	TEST_ASSERT_TRUE((GPIO{{port}}->BSRR & (0x10001ul << {{pin}})) == 0ul);
+	TEST_ASSERT_TRUE((GPIO{{port}}->LCKR & (1ul << {{pin}})) == 0ul);
+%% endfor
+%% endif
+}
+
+void
+PlatformGpioTest::testSetOutput()
+{
+%% for (port, pin) in test_io
+	Gpio{{port ~ pin}}::setOutput(Gpio::OutputType::PushPull, Gpio::OutputSpeed::Low);
+%% if target["family"] in ["f1"]
+		TEST_ASSERT_TRUE((GPIO{{port}}->CR{{"L" if pin<8 else "H"}} & (0xful << {{(pin % 8) * 4}})) == (0b0010ul << {{(pin % 8) * 4}}));
+%% else
+		TEST_ASSERT_TRUE((GPIO{{port}}->MODER & (3ul << {{pin*2}})) == (1ul << {{pin*2}}));
+		TEST_ASSERT_TRUE((GPIO{{port}}->OSPEEDR & (3ul << {{pin*2}})) == 0ul);
+		TEST_ASSERT_TRUE((GPIO{{port}}->OTYPER & (1ul << {{pin}})) == 0ul);
+%% endif
+%% endfor
+
+%% for (port, pin) in test_io
+	Gpio{{port ~ pin}}::setOutput(Gpio::OutputType::OpenDrain, Gpio::OutputSpeed::Medium);
+%% if target["family"] in ["f1"]
+		TEST_ASSERT_TRUE((GPIO{{port}}->CR{{"L" if pin<8 else "H"}} & (0xful << {{(pin % 8) * 4}})) == (0b0101ul << {{(pin % 8) * 4}}));
+%% else
+		TEST_ASSERT_TRUE((GPIO{{port}}->MODER & (3ul << {{pin*2}})) == (1ul << {{pin*2}}));
+		TEST_ASSERT_TRUE((GPIO{{port}}->OSPEEDR & (3ul << {{pin*2}})) == (1ul << {{pin*2}}));
+		TEST_ASSERT_TRUE((GPIO{{port}}->OTYPER & (1ul << {{pin}})) == (1ul << {{pin}}));
+%% endif
+%% endfor
+
+%% for (port, pin) in test_io
+	Gpio{{port ~ pin}}::setOutput(Gpio::OutputType::PushPull, Gpio::OutputSpeed::High);
+%% if target["family"] in ["f1"]
+		TEST_ASSERT_TRUE((GPIO{{port}}->CR{{"L" if pin<8 else "H"}} & (0xful << {{(pin % 8) * 4}})) == (0b0011ul << {{(pin % 8) * 4}}));
+%% else
+		TEST_ASSERT_TRUE((GPIO{{port}}->MODER & (3ul << {{pin*2}})) == (1ul << {{pin*2}}));
+		TEST_ASSERT_TRUE((GPIO{{port}}->OSPEEDR & (3ul << {{pin*2}})) == (2ul << {{pin*2}}));
+		TEST_ASSERT_TRUE((GPIO{{port}}->OTYPER & (1ul << {{pin}})) == 0ul);
+%% endif
+%% endfor
+
+%% if target["family"] in ["f2", "f4", "f7", "l4"]
+%% for (port, pin) in test_io
+	Gpio{{port ~ pin}}::setOutput(Gpio::OutputType::PushPull, Gpio::OutputSpeed::VeryHigh);
+		TEST_ASSERT_TRUE((GPIO{{port}}->MODER & (3ul << {{pin*2}})) == (1ul << {{pin*2}}));
+		TEST_ASSERT_TRUE((GPIO{{port}}->OSPEEDR & (3ul << {{pin*2}})) == (3ul << {{pin*2}}));
+		TEST_ASSERT_TRUE((GPIO{{port}}->OTYPER & (1ul << {{pin}})) == 0ul);
+%% endfor
+%% endif
+	// configure() and setOutput() method are already tested in the above code paths
+}
+
+void
+PlatformGpioTest::testSetInput()
+{
+%% for (port, pin) in test_io
+	Gpio{{port ~ pin}}::setInput(Gpio::InputType::Floating);
+%% if target["family"] in ["f1"]
+		TEST_ASSERT_TRUE((GPIO{{port}}->CR{{"L" if pin<8 else "H"}} & (0xful << {{(pin % 8) * 4}})) == (0b0100ul << {{(pin % 8) * 4}}));
+%% else
+		TEST_ASSERT_TRUE((GPIO{{port}}->MODER & (3ul << {{pin*2}})) == 0ul);
+		TEST_ASSERT_TRUE((GPIO{{port}}->OSPEEDR & (3ul << {{pin*2}})) == 0ul);
+		TEST_ASSERT_TRUE((GPIO{{port}}->OTYPER & (1ul << {{pin}})) == 0ul);
+		TEST_ASSERT_TRUE((GPIO{{port}}->PUPDR & (3ul << {{pin*2}})) == 0ul);
+%% endif
+%% endfor
+
+%% for (port, pin) in test_io
+	Gpio{{port ~ pin}}::setInput(Gpio::InputType::PullUp);
+%% if target["family"] in ["f1"]
+		TEST_ASSERT_TRUE((GPIO{{port}}->CR{{"L" if pin<8 else "H"}} & (0xful << {{(pin % 8) * 4}})) == (0b1000ul << {{(pin % 8) * 4}}));
+		TEST_ASSERT_TRUE((GPIO{{port}}->ODR & (1ul << {{pin}})) == (1ul << {{pin}}));
+%% else
+		TEST_ASSERT_TRUE((GPIO{{port}}->MODER & (3ul << {{pin*2}})) == 0ul);
+		TEST_ASSERT_TRUE((GPIO{{port}}->OSPEEDR & (3ul << {{pin*2}})) == 0ul);
+		TEST_ASSERT_TRUE((GPIO{{port}}->OTYPER & (1ul << {{pin}})) == 0ul);
+		TEST_ASSERT_TRUE((GPIO{{port}}->PUPDR & (3ul << {{pin*2}})) == (1ul << {{pin*2}}));
+%% endif
+%% endfor
+
+%% for (port, pin) in test_io
+	Gpio{{port ~ pin}}::setInput(Gpio::InputType::PullDown);
+%% if target["family"] in ["f1"]
+		TEST_ASSERT_TRUE((GPIO{{port}}->CR{{"L" if pin<8 else "H"}} & (0xful << {{(pin % 8) * 4}})) == (0b1000ul << {{(pin % 8) * 4}}));
+		TEST_ASSERT_TRUE((GPIO{{port}}->ODR & (1ul << {{pin}})) == 0ul);
+%% else
+		TEST_ASSERT_TRUE((GPIO{{port}}->MODER & (3ul << {{pin*2}})) == 0ul);
+		TEST_ASSERT_TRUE((GPIO{{port}}->OSPEEDR & (3ul << {{pin*2}})) == 0ul);
+		TEST_ASSERT_TRUE((GPIO{{port}}->OTYPER & (1ul << {{pin}})) == 0ul);
+		TEST_ASSERT_TRUE((GPIO{{port}}->PUPDR & (3ul << {{pin*2}})) == (2ul << {{pin*2}}));
+%% endif
+%% endfor
+}
+
+void
+PlatformGpioTest::testOutput()
+{
+%% for (port, pin) in test_io
+	Gpio{{port ~ pin}}::setOutput();
+	Gpio{{port ~ pin}}::set();
+		TEST_ASSERT_TRUE((GPIO{{port}}->ODR & (1ul << {{pin}})) == (1ul << {{pin}}));
+		TEST_ASSERT_TRUE(Gpio{{port ~ pin}}::isSet());
+	Gpio{{port ~ pin}}::reset();
+		TEST_ASSERT_TRUE((GPIO{{port}}->ODR & (1ul << {{pin}})) == 0ul);
+		TEST_ASSERT_FALSE(Gpio{{port ~ pin}}::isSet());
+	Gpio{{port ~ pin}}::toggle();
+		TEST_ASSERT_TRUE((GPIO{{port}}->ODR & (1ul << {{pin}})) == (1ul << {{pin}}));
+		TEST_ASSERT_TRUE(Gpio{{port ~ pin}}::isSet());
+	Gpio{{port ~ pin}}::toggle();
+		TEST_ASSERT_TRUE((GPIO{{port}}->ODR & (1ul << {{pin}})) == 0ul);
+		TEST_ASSERT_FALSE(Gpio{{port ~ pin}}::isSet());
+%% endfor
+}
+
+void
+PlatformGpioTest::testInput()
+{
+%% for (port, pin) in test_io
+	Gpio{{port ~ pin}}::setInput(Gpio::InputType::PullUp);
+	modm::delayMilliseconds(1);
+		TEST_ASSERT_TRUE((GPIO{{port}}->IDR & (1ul << {{pin}})) == (1ul << {{pin}}));
+		TEST_ASSERT_TRUE(Gpio{{port ~ pin}}::read());
+	Gpio{{port ~ pin}}::setInput(Gpio::InputType::PullDown);
+	modm::delayMilliseconds(1);
+		TEST_ASSERT_TRUE((GPIO{{port}}->IDR & (1ul << {{pin}})) == 0ul);
+		TEST_ASSERT_FALSE(Gpio{{port ~ pin}}::read());
+%% endfor
+}
+
+void
+PlatformGpioTest::testAnalog()
+{
+%% for (port, pin) in test_io
+	Gpio{{port ~ pin}}::setAnalogInput();
+%% if target["family"] in ["f1"]
+		TEST_ASSERT_TRUE((GPIO{{port}}->CR{{"L" if pin<8 else "H"}} & (0xful << {{(pin % 8) * 4}})) == 0ul);
+%% else
+		TEST_ASSERT_TRUE((GPIO{{port}}->MODER & (3ul << {{pin*2}})) == (3ul << {{pin*2}}));
+	%% if target["family"] in ["l4"] and target["name"] in ["71", "75", "76", "85", "86"]
+		TEST_ASSERT_TRUE((GPIO{{port}}->ASCR & (1ul << {{pin}})) == (1ul << {{pin}}));
+	%% endif
+%% endif
+	Gpio{{port ~ pin}}::disconnect();
+%% if target["family"] in ["f1"]
+		TEST_ASSERT_TRUE((GPIO{{port}}->CR{{"L" if pin<8 else "H"}} & (0xful << {{(pin % 8) * 4}})) == (0b0100ul << {{(pin % 8) * 4}}));
+%% else
+		TEST_ASSERT_TRUE((GPIO{{port}}->MODER & (3ul << {{pin*2}})) == 0ul);
+	%% if target["family"] in ["l4"] and target["name"] in ["71", "75", "76", "85", "86"]
+		TEST_ASSERT_TRUE((GPIO{{port}}->ASCR & (1ul << {{pin}})) == 0ul);
+	%% endif
+%% endif
+%% endfor
+}
+
+void
+PlatformGpioTest::testConnect()
+{
+%% if target["family"] not in ["f1"]
+%% for peripheral, connections in test_connections.items()
+	%% if connections | length
+	using TestConnection{{peripheral}} = GpioConnector<Peripheral::{{peripheral}},
+	%% for (port, pin, signal, _) in connections
+			Gpio{{port~pin}}::{{signal}}{% if loop.last %}>;{% else %},{% endif %}
+	%% endfor
+	TestConnection{{peripheral}}::connect();
+	%% for (port, pin, signal, af) in connections
+		%% if af
+		TEST_ASSERT_TRUE((GPIO{{port}}->MODER & (3ul << {{pin*2}})) == (2ul << {{pin*2}}));
+		TEST_ASSERT_TRUE((GPIO{{port}}->AFR[{{pin//8}}] & (15ul << {{(pin % 8) * 4}})) == ({{af}}ul << {{(pin % 8) * 4}}));
+		%% elif peripheral.startswith("Adc") or peripheral.startswith("Dac")
+		TEST_ASSERT_TRUE((GPIO{{port}}->MODER & (3ul << {{pin*2}})) == (3ul << {{pin*2}}));
+		%% endif
+	%% endfor
+	TestConnection{{peripheral}}::disconnect();
+	%% for (port, pin, signal, af) in connections
+		TEST_ASSERT_TRUE((GPIO{{port}}->MODER & (3ul << {{pin*2}})) == 0ul);
+		TEST_ASSERT_TRUE((GPIO{{port}}->AFR[{{pin//8}}] & (0xful << {{(pin % 8) * 4}})) == 0ul);
+	%% endfor
+	%% endif
+%% endfor
+%% endif
+}
+
+void
+PlatformGpioTest::testLock()
+{
+%% if options["::::test_gpio_lock"]
+%% for (port, pin) in test_io
+	Gpio{{port ~ pin}}::lock();
+		TEST_ASSERT_TRUE((GPIO{{port}}->LCKR & (1ul << {{pin}})) == (1ul << {{pin}}));
+%% endfor
+%% endif
+}

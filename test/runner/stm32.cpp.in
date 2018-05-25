@@ -12,10 +12,6 @@
  */
 // ----------------------------------------------------------------------------
 
-// WARNING: This file is generated automatically, do not edit!
-// Please modify the corresponding 'runner_stm32.cpp.in' file instead.
-// ----------------------------------------------------------------------------
-
 #include <modm/board/board.hpp>
 #include <modm/debug/logger.hpp>
 
@@ -28,33 +24,15 @@ ${names}
 
 using namespace modm::platform;
 
-#ifdef MODM_BOARD_HAS_LOGGER
 // Reuse logger from board
 extern Board::LoggerDevice loggerDevice;
-#else
-
-// Create an IODeviceWrapper around the Uart Peripheral we want to use
-// This requires additonal hardware.
-using LoggerDevice = modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull >;
-LoggerDevice loggerDevice;
-
-// Set all four logger streams to use the UART
-modm::log::Logger modm::log::debug(loggerDevice);
-modm::log::Logger modm::log::info(loggerDevice);
-modm::log::Logger modm::log::warning(loggerDevice);
-modm::log::Logger modm::log::error(loggerDevice);
-#endif
 
 int
 main()
 {
 	Board::initialize();
-
-#ifndef MODM_BOARD_HAS_LOGGER
-	// initialize output device, enable USART 2
-	Usart2::connect<GpioOutputA2::Tx, GpioInputA3::Rx>();
-	Usart2::initialize<Board::systemClock, 115200>(12);
-#endif
+	Board::Leds::setOutput(modm::Gpio::Low);
+	Board::Leds::write(0b100);
 
 	loggerDevice.write("Unittests (" __DATE__ ", " __TIME__")\n");
 
@@ -86,17 +64,18 @@ main()
 	MODM_LOG_INFO << "Deleted:   " << MODM_GIT_DELETED   << modm::endl;
 	MODM_LOG_INFO << "Renamed:   " << MODM_GIT_RENAMED   << modm::endl;
 	MODM_LOG_INFO << "Copied:    " << MODM_GIT_COPIED    << modm::endl;
-	MODM_LOG_INFO << "Untracked: " << MODM_GIT_UNTRACKED << modm::endl;
+	MODM_LOG_INFO << "Untracked: " << MODM_GIT_UNTRACKED << modm::endl << modm::endl;
 
 	unittest::Reporter reporter(loggerDevice);
 	unittest::Controller::instance().setReporter(reporter);
+
+	Board::Leds::write(0b110);
 
 	// run tests
 ${tests}
 
 	unittest::Controller::instance().getReporter().printSummary();
 
-	while (true)
-	{
-	}
+	Board::Leds::write(0b111);
+	while (true) ;
 }

@@ -40,6 +40,7 @@ void
 unittest::Reporter::nextTestSuite(modm::accessor::Flash<char> name)
 {
 	testName = name;
+	outputStream << ">>> " << testName << modm::endl;
 }
 
 void

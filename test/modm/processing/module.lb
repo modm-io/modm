@@ -20,6 +20,7 @@ def prepare(module, options):
     module.depends(
         ":architecture",
         ":math:utils",
+        ":math:filter",
         ":processing:protothread",
         ":processing:resumable",
         ":processing:timer",
