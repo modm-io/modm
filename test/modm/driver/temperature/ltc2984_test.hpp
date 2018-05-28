@@ -18,4 +18,7 @@ public:
 
 	void
 	testDataTemperature();
+
+	void
+	testSpi();
 };

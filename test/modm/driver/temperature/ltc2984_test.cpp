@@ -12,6 +12,9 @@
 #include <modm/driver/temperature/ltc2984.hpp>
 #include <modm/debug/logger/logger.hpp>
 
+#include <modm/platform/spi/mock/spi_master.hpp>
+#include <modm/platform/gpio/unused.hpp>
+
 #include "ltc2984_test.hpp"
 #include "math.h"
 
@@ -98,4 +101,75 @@ Ltc2984Test::testDataTemperature()
 		TEST_ASSERT_EQUALS(temperature.getTemperatureFixed(), temperatureTableFixed[jj]);
 		TEST_ASSERT_EQUALS(temperature.getTemperatureInteger(), temperatureTableInteger[jj]);
 	}
+}
+
+void
+Ltc2984Test::testSpi()
+{
+	// Test Spi with MockSpiMaster
+	using SpiMaster = modm::platform::SpiMasterMock;
+	modm::Ltc2984<SpiMaster, modm::platform::GpioUnused> tempSensor;
+
+	uint32_t channelConfigurationTest = (0b11101ul << 27) | (2000*1024);
+	uint32_t channelConfiguration = modm::ltc2984::Configuration::rsense(modm::ltc2984::Configuration::Rsense::Resistance_t(2000*1024));
+	TEST_ASSERT_EQUALS(channelConfiguration, channelConfigurationTest);
+	RF_CALL_BLOCKING(tempSensor.configureChannel(modm::ltc2984::Channel::Ch2, channelConfiguration));
+
+	constexpr std::size_t txBufferLength = 7;
+	uint8_t txBuffer[txBufferLength];
+
+	uint8_t txBufferCompare[] = {0x02, 0x02, 0x04, 0b11101000, 0b00011111, 0b01000000, 0b00000000};
+	TEST_ASSERT_EQUALS(SpiMaster::getTxBufferLength(), 7u);
+	SpiMaster::popTxBuffer(txBuffer);
+	TEST_ASSERT_EQUALS_ARRAY(txBuffer, txBufferCompare, 7u);
+
+	channelConfigurationTest = 0x00000000;
+	channelConfiguration = modm::ltc2984::Configuration::disabled();
+	TEST_ASSERT_EQUALS(channelConfiguration, channelConfigurationTest);
+	RF_CALL_BLOCKING(tempSensor.configureChannel(modm::ltc2984::Channel::Ch2, channelConfiguration));
+
+	uint8_t txBufferCompare2[] = {0x02, 0x02, 0x04, 0, 0, 0, 0};
+	TEST_ASSERT_EQUALS(SpiMaster::getTxBufferLength(), 7u);
+	SpiMaster::popTxBuffer(txBuffer);
+	TEST_ASSERT_EQUALS_ARRAY(txBuffer, txBufferCompare2, 7u);
+
+	channelConfigurationTest = 0x60A9C000;
+	channelConfiguration = modm::ltc2984::Configuration::rtd(
+		modm::ltc2984::Configuration::SensorType::Pt100,
+		modm::ltc2984::Configuration::Rtd::RsenseChannel::Ch2_Ch1,
+		modm::ltc2984::Configuration::Rtd::Wires::Wire4,
+		modm::ltc2984::Configuration::Rtd::ExcitationMode::Rotation_Sharing,
+		modm::ltc2984::Configuration::Rtd::ExcitationCurrent::Current_500uA,
+		modm::ltc2984::Configuration::Rtd::RtdCurve::European
+	);
+	TEST_ASSERT_EQUALS(channelConfiguration, channelConfigurationTest);
+	RF_CALL_BLOCKING(tempSensor.configureChannel(modm::ltc2984::Channel::Ch4, channelConfiguration));
+
+	uint8_t txBufferCompare3[] = {0x02, 0x02, 0x0C, 0x60, 0xA9, 0xC0, 0x00};
+	TEST_ASSERT_EQUALS(SpiMaster::getTxBufferLength(), 7u);
+	SpiMaster::popTxBuffer(txBuffer);
+	TEST_ASSERT_EQUALS_ARRAY(txBuffer, txBufferCompare3, 7u);
+
+	tempSensor.enableChannel(modm::ltc2984::Configuration::MuxChannel::Ch4);
+	RF_CALL_BLOCKING(tempSensor.setChannels());
+	uint8_t txBufferCompare4[] = {0x02, 0x00, 0xF4, 0x00, 0x00, 0x00, 0x08};
+	TEST_ASSERT_EQUALS(SpiMaster::getTxBufferLength(), 7u);
+	SpiMaster::popTxBuffer(txBuffer);
+	TEST_ASSERT_EQUALS_ARRAY(txBuffer, txBufferCompare4, 7u);
+
+	RF_CALL_BLOCKING(tempSensor.initiateSingleMeasurement(modm::ltc2984::Channel::Ch4));
+	uint8_t txBufferCompare5[] = {0x02, 0x00, 0x00, 0x84};
+	TEST_ASSERT_EQUALS(SpiMaster::getTxBufferLength(), 4u);
+	SpiMaster::popTxBuffer(txBuffer);
+	TEST_ASSERT_EQUALS_ARRAY(txBuffer, txBufferCompare5, 4u);
+
+	modm::ltc2984::Data temperature;
+	uint8_t rxBuffer[] = {0x00, 0x00, 0x00, 0x01, 0x00, 0x08, 0x00}; // valid temperature: 2.000 deg C
+	SpiMaster::appendRxBuffer(rxBuffer, 7u);
+	RF_CALL_BLOCKING(tempSensor.readChannel(modm::ltc2984::Channel::Ch4, temperature));
+	uint8_t txBufferCompare6[] = {0x03, 0x00, 0x1C, 0x00, 0x00, 0x00, 0x00};
+	TEST_ASSERT_EQUALS(SpiMaster::getTxBufferLength(), 7u);
+	SpiMaster::popTxBuffer(txBuffer);
+	TEST_ASSERT_EQUALS_ARRAY(txBuffer, txBufferCompare6, 7u);
+	TEST_ASSERT_EQUALS(temperature.getTemperatureFixed(), 2 * 1024);
 }

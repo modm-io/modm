@@ -26,6 +26,7 @@ def prepare(module, options):
         ":driver:lawicel",
         ":driver:ltc2984",
         ":driver:mcp2515",
+        "modm:test:platform:spi",
         ":platform:gpio")
     return True
 
