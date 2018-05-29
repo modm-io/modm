@@ -25,6 +25,7 @@ def prepare(module, options):
         ":driver:bmp085",
         ":driver:lawicel",
         ":driver:ltc2984",
+        ":driver:drv832x_spi",
         ":driver:mcp2515",
         "modm:test:platform:spi",
         ":platform:gpio")
