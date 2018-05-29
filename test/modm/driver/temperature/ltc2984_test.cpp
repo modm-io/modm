@@ -173,3 +173,8 @@ Ltc2984Test::testSpi()
 	TEST_ASSERT_EQUALS_ARRAY(txBuffer, txBufferCompare6, 7u);
 	TEST_ASSERT_EQUALS(temperature.getTemperatureFixed(), 2 * 1024);
 }
+
+void
+Ltc2984Test::tearDown() {
+	modm::platform::SpiMasterMock::clearBuffers();
+}

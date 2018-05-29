@@ -21,4 +21,7 @@ public:
 
 	void
 	testSpi();
+
+	void
+	tearDown();
 };

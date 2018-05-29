@@ -106,10 +106,21 @@ public:
 			txBuffer.removeFront();
 		}
 	}
+
 	static void appendRxBuffer(uint8_t* data, std::size_t length)
 	{
 		for(std::size_t i = 0; i < length; ++i) {
 			rxBuffer.append(data[i]);
+		}
+	}
+
+	static void clearBuffers()
+	{
+		while(txBuffer.getSize() > 0) {
+			txBuffer.removeFront();
+		}
+		while(rxBuffer.getSize() > 0) {
+			rxBuffer.removeFront();
 		}
 	}
 };
