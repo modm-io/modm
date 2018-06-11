@@ -9,7 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/board/board.hpp>
+#include <modm/board.hpp>
 #include <modm/architecture/interface/unaligned.hpp>
 #include <modm/container/smart_pointer.hpp>
 

@@ -16,7 +16,7 @@
 #ifndef MODM_STM32_OLIMEXINO_STM32_HPP
 #define MODM_STM32_OLIMEXINO_STM32_HPP
 
-#include <modm/platform/platform.hpp>
+#include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
 #include <modm/debug/logger.hpp>
 #define MODM_BOARD_HAS_LOGGER

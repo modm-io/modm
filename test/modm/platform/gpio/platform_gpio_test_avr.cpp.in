@@ -14,7 +14,7 @@
 
 #include "platform_gpio_test.hpp"
 
-#include <modm/platform/platform.hpp>
+#include <modm/platform.hpp>
 
 using namespace modm::platform;
 

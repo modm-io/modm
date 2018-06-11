@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/platform/platform.hpp>
+#include <modm/platform.hpp>
 #include <modm/driver/temperature/ds18b20.hpp>
 #include <modm/io/iostream.hpp>
 

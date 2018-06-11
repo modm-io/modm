@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/platform/platform.hpp>
+#include <modm/platform.hpp>
 #include <modm/debug/logger.hpp>
 
 // Set the log level
@@ -22,11 +22,11 @@ int
 main()
 {
 	// Use the logging streams to print some messages.
-	// Change MODM_LOG_LEVEL above to enable or disable these messages 
+	// Change MODM_LOG_LEVEL above to enable or disable these messages
 	MODM_LOG_DEBUG   << MODM_FILE_INFO << "debug"   << modm::endl;
 	MODM_LOG_INFO    << MODM_FILE_INFO << "info"    << modm::endl;
 	MODM_LOG_WARNING << MODM_FILE_INFO << "warning" << modm::endl;
 	MODM_LOG_ERROR   << MODM_FILE_INFO << "error"   << modm::endl;
-	
+
 	return 0;
 }

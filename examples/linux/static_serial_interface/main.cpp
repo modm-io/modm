@@ -10,8 +10,8 @@
 
 
 #include <modm/debug/logger.hpp>
-#include <modm/architecture/architecture.hpp>
-#include <modm/platform/platform.hpp>
+#include <modm/architecture.hpp>
+#include <modm/platform.hpp>
 
 typedef modm::platform::StaticSerialInterface<42> staticPort;
 // about 42, see documentation of StaticSerialInterface

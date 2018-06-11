@@ -16,8 +16,8 @@
  * Connect a Bosch BME280 sensor and a SSD1306 (128x64) display to I2C.
  */
 
-#include <modm/board/board.hpp>
-#include <modm/processing/processing.hpp>
+#include <modm/board.hpp>
+#include <modm/processing.hpp>
 
 #include <sensor_msgs/Temperature.h>
 #include <sensor_msgs/FluidPressure.h>

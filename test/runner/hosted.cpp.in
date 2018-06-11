@@ -17,7 +17,7 @@
 #include <unittest/controller.hpp>
 
 #include <modm/debug/logger.hpp>
-#include <modm/platform/platform.hpp>
+#include <modm/platform.hpp>
 
 modm::pc::Terminal outputDevice;
 

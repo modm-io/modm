@@ -9,7 +9,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <modm/board/board.hpp>
+#include <modm/board.hpp>
 #include <modm/driver/display/ssd1306.hpp>
 
 /**

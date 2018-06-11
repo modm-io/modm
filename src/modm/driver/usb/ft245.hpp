@@ -31,7 +31,7 @@ namespace modm
 	 * \section ft245_example Example
 	 *
 	 * \code
-	 * #include <modm/architecture/architecture.hpp>
+	 * #include <modm/architecture.hpp>
 	 * #include <modm/driver/usb/ft245.hpp>
 	 *
 	 * typedef modm::platform::GpioPort<modm::platform::GpioD0, 8> myPort;

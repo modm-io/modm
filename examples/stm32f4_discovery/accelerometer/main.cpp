@@ -11,9 +11,9 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/board/board.hpp>
+#include <modm/board.hpp>
 #include <modm/driver/inertial/lis302dl.hpp>
-#include <modm/processing/processing.hpp>
+#include <modm/processing.hpp>
 #include <modm/math/filter.hpp>
 
 

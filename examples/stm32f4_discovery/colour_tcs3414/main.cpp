@@ -10,9 +10,9 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/board/board.hpp>
+#include <modm/board.hpp>
 
-#include <modm/processing/processing.hpp>
+#include <modm/processing.hpp>
 #include <modm/driver/color/tcs3414.hpp>
 
 #include <modm/io/iostream.hpp>

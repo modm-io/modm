@@ -9,9 +9,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <modm/board/board.hpp>
+#include <modm/board.hpp>
 #include <modm/debug/logger.hpp>
-#include <modm/board/board.hpp>
+#include <modm/board.hpp>
 
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
 modm::log::Logger modm::log::info(loggerDevice);

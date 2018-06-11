@@ -29,7 +29,7 @@
 #include <modm/driver/display/hd44780.hpp>
 #include <modm/driver/gpio/pca8574.hpp>
 
-#include <modm/board/board.hpp>
+#include <modm/board.hpp>
 
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
 modm::IOStream stream(device);

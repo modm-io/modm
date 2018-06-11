@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/platform/platform.hpp>
+#include <modm/platform.hpp>
 #include <modm/processing/rtos.hpp>
 #include <modm/debug/logger.hpp>
 
@@ -29,17 +29,17 @@ public:
 		modm::rtos::Thread(2)
 	{
 	}
-	
+
 	virtual void
 	run()
 	{
 		while (1)
 		{
 			MODM_LOG_INFO << "ping" << modm::endl;
-			
+
 			// synchronize with Task2
 			event.release();
-			
+
 			this->sleep(1000 * MILLISECONDS);
 		}
 	}
@@ -52,14 +52,14 @@ public:
 		modm::rtos::Thread(2)
 	{
 	}
-	
+
 	virtual void
 	run()
 	{
 		while (1)
 		{
 			MODM_LOG_INFO << "pong" << modm::endl;
-			
+
 			// wait for the other task
 			event.acquire();
 		}
@@ -75,7 +75,7 @@ int
 main()
 {
 	// start scheduler
-	modm::rtos::Scheduler::schedule();	
-	
+	modm::rtos::Scheduler::schedule();
+
 	return 0;
 }

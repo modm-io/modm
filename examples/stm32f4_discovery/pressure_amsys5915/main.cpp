@@ -10,9 +10,9 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/board/board.hpp>
+#include <modm/board.hpp>
 
-#include <modm/processing/processing.hpp>
+#include <modm/processing.hpp>
 #include <modm/driver/pressure/amsys5915.hpp>
 #include <modm/io/iostream.hpp>
 #include <modm/debug/logger.hpp>

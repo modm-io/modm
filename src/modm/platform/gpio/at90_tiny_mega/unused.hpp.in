@@ -35,7 +35,7 @@ namespace platform
  *
  * Example:
  * @code
- * #include <modm/platform/platform.hpp>
+ * #include <modm/platform.hpp>
  *
  * namespace pin
  * {

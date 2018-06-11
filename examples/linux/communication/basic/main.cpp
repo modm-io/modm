@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/platform/platform.hpp>
+#include <modm/platform.hpp>
 
 #include <modm/communication/xpcc.hpp>
 // #include <modm/communication/xpcc/backend/tipc.hpp>
@@ -54,17 +54,17 @@ main()
 	// Required for TIPC on Linux only
 	// connector.addReceiverId(robot::component::SENDER);
 	// connector.addReceiverId(robot::component::RECEIVER);
-	
-	MODM_LOG_INFO << "Welcome to the communication test!" << modm::endl; 
-	
+
+	MODM_LOG_INFO << "Welcome to the communication test!" << modm::endl;
+
 	while (true)
 	{
 		// deliver received messages
 		dispatcher.update();
-		
+
 		component::receiver.update();
 		component::sender.update();
-		
+
 		modm::delayMicroseconds(100);
 	}
 }

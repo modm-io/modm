@@ -36,7 +36,7 @@ namespace modm
 		 *
 		 * Example:
 		 * \code
-		 * #include <modm/architecture/architecture.hpp>
+		 * #include <modm/architecture.hpp>
 		 * #include <modm/utils/protothread.hpp>
 		 * #include <modm/utils/timeout.hpp>
 		 *

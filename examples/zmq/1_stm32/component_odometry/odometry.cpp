@@ -22,7 +22,7 @@
 
 #include "odometry.hpp"
 
-#include <modm/board/board.hpp>
+#include <modm/board.hpp>
 
 // ----------------------------------------------------------------------------
 component::Odometry::Odometry(uint8_t id, xpcc::Dispatcher &communication) :

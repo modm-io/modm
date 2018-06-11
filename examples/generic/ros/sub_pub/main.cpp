@@ -16,7 +16,7 @@
  * stm32nucleo board.
  */
 
-#include <modm/board/board.hpp>
+#include <modm/board.hpp>
 #include <modm/processing/timer.hpp>
 
 #include <std_msgs/Bool.h>

@@ -11,7 +11,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/debug/logger.hpp>
-#include <modm/platform/platform.hpp>
+#include <modm/platform.hpp>
 
 #include <modm/architecture/interface/can.hpp>
 #include <modm/platform/can/canusb.hpp>

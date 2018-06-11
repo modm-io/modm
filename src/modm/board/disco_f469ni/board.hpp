@@ -20,7 +20,7 @@
 #ifndef MODM_STM32_F469_DISCOVERY_HPP
 #define MODM_STM32_F469_DISCOVERY_HPP
 
-#include <modm/platform/platform.hpp>
+#include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
 #include <modm/ui/display/graphic_display.hpp>
 #include <modm/driver/touch/ft6x06.hpp>

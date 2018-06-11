@@ -1,8 +1,8 @@
 
-#include <modm/platform/platform.hpp>
+#include <modm/platform.hpp>
 
 %% if platform in ["avr"]
-#include <modm/architecture/architecture.hpp>
+#include <modm/architecture.hpp>
 
 using namespace modm::platform;
 

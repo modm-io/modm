@@ -20,7 +20,7 @@
 #ifndef MODM_STM32_F429_DISCOVERY_HPP
 #define MODM_STM32_F429_DISCOVERY_HPP
 
-#include <modm/platform/platform.hpp>
+#include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
 
 using namespace modm::platform;

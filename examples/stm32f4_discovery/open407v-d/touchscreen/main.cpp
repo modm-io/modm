@@ -14,7 +14,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/board/board.hpp>
+#include <modm/board.hpp>
 
 #include <modm/driver/display/parallel_tft.hpp>
 #include <modm/driver/bus/tft_memory_bus.hpp>

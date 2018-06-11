@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/board/board.hpp>
+#include <modm/board.hpp>
 
 // If you use a different SPI instance, you may have to also choose different
 // GPIOs to connect to.

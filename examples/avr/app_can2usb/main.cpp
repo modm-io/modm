@@ -24,7 +24,7 @@
  *
  */
 
-#include <modm/platform/platform.hpp>
+#include <modm/platform.hpp>
 #include <modm/driver/usb/ft245.hpp>
 #include <modm/debug/logger.hpp>
 

@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/platform/platform.hpp>
+#include <modm/platform.hpp>
 #include <modm/driver/display/ea_dog.hpp>
 #include <modm/io/iostream.hpp>
 #include <modm/architecture/interface/clock.hpp>

@@ -8,8 +8,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <modm/board/board.hpp>
-#include <modm/processing/processing.hpp>
+#include <modm/board.hpp>
+#include <modm/processing.hpp>
 #include <modm/architecture/interface/memory.hpp>
 
 using namespace Board;
