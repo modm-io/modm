@@ -23,4 +23,7 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm/src/modm/io"
-    env.copy(".", ignore=env.ignore_files("*.lb"))
+    env.copy(".", ignore=env.ignore_files("*.lb", "io.hpp"))
+    env.outbasepath = "modm/src/modm"
+    env.copy("io.hpp")
+

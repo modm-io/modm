@@ -19,7 +19,7 @@
 #ifndef MODM_DEBUG_HPP
 #define MODM_DEBUG_HPP
 
-#include "logger.hpp"
-#include "error_report.hpp"
+#include "debug/logger.hpp"
+#include "debug/error_report.hpp"
 
 #endif	// MODM_DEBUG_HPP

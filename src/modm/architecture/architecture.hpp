@@ -21,7 +21,7 @@
 #ifndef MODM_ARCHITECTURE_HPP
 #define MODM_ARCHITECTURE_HPP
 
-#include "interface.hpp"
-#include "utils.hpp"
+#include "architecture/interface.hpp"
+#include "architecture/utils.hpp"
 
 #endif	// MODM_ARCHITECTURE_HPP

@@ -24,6 +24,6 @@
 #include "{{header}}"
 %% endfor
 
-#include "task.hpp"
+#include "processing/task.hpp"
 
 #endif	// MODM_PROCESSING_HPP

@@ -32,10 +32,13 @@ def prepare(module, options):
 def build(env):
     env.outbasepath = "modm/src/modm/debug"
 
-    ignore_patterns = ["*.lb"]
+    ignore_patterns = ["*.lb", "debug.hpp"]
     target = env[":target"].identifier
     if target["platform"] != "hosted":
         ignore_patterns.append("*logger/hosted/*")
 
     env.copy(".", ignore=env.ignore_patterns(*ignore_patterns))
+
+    env.outbasepath = "modm/src/modm"
+    env.copy("debug.hpp")
 
