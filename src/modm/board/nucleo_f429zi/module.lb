@@ -12,7 +12,8 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "board.nucleo-f429zi"
+    module.parent = "board"
+    module.name = "nucleo-f429zi"
 
 def prepare(module, options):
     if options[":target"].partname != "stm32f429zit":

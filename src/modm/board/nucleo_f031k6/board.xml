@@ -16,6 +16,6 @@
     <option name=":platform:core:allocator">block</option>
   </options>
   <modules>
-    <module>modm:board.nucleo-f031k6</module>
+    <module>modm:board:nucleo-f031k6</module>
   </modules>
 </library>

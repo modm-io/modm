@@ -11,7 +11,8 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "board.al-avreb-can"
+    module.parent = "board"
+    module.name = "al-avreb-can"
 
 def prepare(module, options):
     if options[":target"].partname != "at90can128":

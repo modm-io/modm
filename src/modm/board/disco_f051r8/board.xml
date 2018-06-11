@@ -12,6 +12,6 @@
     <option name=":target">stm32f051r8t</option>
   </options>
   <modules>
-    <module>modm:board.disco-f051r8</module>
+    <module>modm:board:disco-f051r8</module>
   </modules>
 </library>

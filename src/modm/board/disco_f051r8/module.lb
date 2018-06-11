@@ -12,7 +12,8 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "board.disco-f051r8"
+    module.parent = "board"
+    module.name = "disco-f051r8"
 
 def prepare(module, options):
     if options[":target"].partname != "stm32f051r8t":

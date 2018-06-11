@@ -14,6 +14,6 @@
     <option name=":platform:uart:1:buffer.tx">2048</option>
   </options>
   <modules>
-    <module>modm:board.disco-f769ni</module>
+    <module>modm:board:disco-f769ni</module>
   </modules>
 </library>

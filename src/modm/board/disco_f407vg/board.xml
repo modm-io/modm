@@ -12,6 +12,6 @@
     <option name=":target">stm32f407vgt</option>
   </options>
   <modules>
-    <module>modm:board.disco-f407vg</module>
+    <module>modm:board:disco-f407vg</module>
   </modules>
 </library>

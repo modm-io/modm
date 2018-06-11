@@ -12,7 +12,8 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "board.disco-f303vc"
+    module.parent = "board"
+    module.name = "disco-f303vc"
 
 def prepare(module, options):
     if options[":target"].partname != "stm32f303vct":

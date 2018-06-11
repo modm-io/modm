@@ -12,7 +12,8 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "board.nucleo-l476rg"
+    module.parent = "board"
+    module.name = "nucleo-l476rg"
 
 def prepare(module, options):
     if options[":target"].partname != "stm32l476rgt":

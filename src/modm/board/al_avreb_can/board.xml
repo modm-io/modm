@@ -13,6 +13,6 @@
     <option name=":platform:clock:f_cpu">16000000</option>
   </options>
   <modules>
-    <module>modm:board.al-avreb-can</module>
+    <module>modm:board:al-avreb-can</module>
   </modules>
 </library>
