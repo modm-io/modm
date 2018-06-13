@@ -13,7 +13,7 @@
 
 // Inspired by: http://arduino.cc/en/Tutorial/Blink
 
-#include <modm/board/board.hpp>
+#include <modm/board.hpp>
 
 int
 main()

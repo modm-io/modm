@@ -21,7 +21,8 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm/src/modm/processing"
-    headers = env.get_generated_local_files(filterfunc=lambda path: re.match(r"[^/]+\.hpp", path))
-    env.template("processing.hpp.in", substitutions={"headers": sorted(headers)})
-
     env.copy("task.hpp")
+
+    env.outbasepath = "modm/src/modm"
+    headers = env.get_generated_local_files(filterfunc=lambda path: ".h" in path and not "_impl.h" in path)
+    env.template("processing.hpp.in", substitutions={"headers": sorted(headers)})

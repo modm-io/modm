@@ -12,7 +12,7 @@
 #ifndef ENVIRONMENT_HARDWARE_HPP
 #define ENVIRONMENT_HARDWARE_HPP
 
-#include <modm/board/board.hpp>
+#include <modm/board.hpp>
 
 // ----------------------------------------------------------------------------
 // Sensors at I2C

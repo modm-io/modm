@@ -9,7 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/board/board.hpp>
+#include <modm/board.hpp>
 #include <modm/debug/logger.hpp>
 
 /* This example showcases the hard fault handler LED blinking and UART logging.

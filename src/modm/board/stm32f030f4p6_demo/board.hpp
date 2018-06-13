@@ -23,7 +23,7 @@
 #ifndef MODM_STM32_F030F4P6_DEMO_BOARD_HPP
 #define MODM_STM32_F030F4P6_DEMO_BOARD_HPP
 
-#include <modm/platform/platform.hpp>
+#include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
 
 using namespace modm::platform;

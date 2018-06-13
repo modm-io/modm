@@ -12,7 +12,8 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "board.arduino-uno"
+    module.parent = "board"
+    module.name = "arduino-uno"
 
 def prepare(module, options):
     if options[":target"].partname != "atmega328p":

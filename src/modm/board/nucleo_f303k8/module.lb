@@ -12,7 +12,8 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "board.nucleo-f303k8"
+    module.parent = "board"
+    module.name = "nucleo-f303k8"
 
 def prepare(module, options):
     if options[":target"].partname != "stm32f303k8t":

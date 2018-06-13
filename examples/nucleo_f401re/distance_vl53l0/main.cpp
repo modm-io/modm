@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/board/board.hpp>
+#include <modm/board.hpp>
 
 #include <modm/processing/protothread.hpp>
 #include <modm/driver/position/vl53l0.hpp>

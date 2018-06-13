@@ -17,6 +17,6 @@
  *
  */
 
-#include "iostream.hpp"
-#include "iodevice.hpp"
-#include "iodevice_wrapper.hpp"
+#include "io/iostream.hpp"
+#include "io/iodevice.hpp"
+#include "io/iodevice_wrapper.hpp"

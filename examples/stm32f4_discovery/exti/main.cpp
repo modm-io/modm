@@ -22,7 +22,7 @@
  *
  */
 
-#include <modm/board/board.hpp>
+#include <modm/board.hpp>
 #include <modm/architecture/interface/interrupt.hpp>
 
 using namespace Board;

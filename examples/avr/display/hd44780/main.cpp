@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/platform/platform.hpp>
+#include <modm/platform.hpp>
 #include <modm/driver/display/hd44780.hpp>
 
 using namespace modm::platform;

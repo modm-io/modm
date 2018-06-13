@@ -14,6 +14,6 @@
     <option name=":platform:uart:2:buffer.tx">2048</option>
   </options>
   <modules>
-    <module>modm:board.nucleo-f103rb</module>
+    <module>modm:board:nucleo-f103rb</module>
   </modules>
 </library>

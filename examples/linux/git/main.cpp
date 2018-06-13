@@ -10,7 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/platform/platform.hpp>
+#include <modm/platform.hpp>
 #include <modm/debug/logger.hpp>
 
 // Set the log level

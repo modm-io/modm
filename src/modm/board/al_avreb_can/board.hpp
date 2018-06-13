@@ -16,7 +16,7 @@
 #ifndef MODM_AL_AVREB_CAN_HPP
 #define MODM_AL_AVREB_CAN_HPP
 
-#include <modm/platform/platform.hpp>
+#include <modm/platform.hpp>
 #include <modm/io/iostream.hpp>
 
 using namespace modm::platform;

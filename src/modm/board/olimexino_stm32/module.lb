@@ -12,7 +12,8 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "board.olimexino-stm32"
+    module.parent = "board"
+    module.name = "olimexino-stm32"
 
 def prepare(module, options):
     if options[":target"].partname != "stm32f103rbt":

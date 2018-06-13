@@ -12,7 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/board/board.hpp>
+#include <modm/board.hpp>
 
 #include <unittest/reporter.hpp>
 #include <unittest/controller.hpp>

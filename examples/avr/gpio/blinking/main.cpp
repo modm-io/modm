@@ -10,13 +10,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/platform/platform.hpp>
+#include <modm/platform.hpp>
 
 using namespace modm::platform;
 
 typedef GpioOutputB0 Led;
 
-int 
+int
 main()
 {
 	Led::setOutput();

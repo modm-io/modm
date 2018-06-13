@@ -21,7 +21,7 @@
 #ifndef MODM_STM32_L476_DISCOVERY_HPP
 #define MODM_STM32_L476_DISCOVERY_HPP
 
-#include <modm/platform/platform.hpp>
+#include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
 // #include <modm/driver/inertial/lis3dsh.hpp>
 

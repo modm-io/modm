@@ -93,16 +93,16 @@ every one of it, only a subset which is sufficient for the container.
  - getCapacity
 */
 
-#include "deque.hpp"
-#include "queue.hpp"
-#include "stack.hpp"
+#include "container/deque.hpp"
+#include "container/queue.hpp"
+#include "container/stack.hpp"
 
-#include "linked_list.hpp"
-#include "doubly_linked_list.hpp"
+#include "container/linked_list.hpp"
+#include "container/doubly_linked_list.hpp"
 
-#include "dynamic_array.hpp"
+#include "container/dynamic_array.hpp"
 
-#include "pair.hpp"
-#include "smart_pointer.hpp"
+#include "container/pair.hpp"
+#include "container/smart_pointer.hpp"
 
 

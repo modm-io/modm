@@ -49,6 +49,6 @@
     </option>
   </options>
   <modules>
-    <module>modm:board.disco-f469ni</module>
+    <module>modm:board:disco-f469ni</module>
   </modules>
 </library>

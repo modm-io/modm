@@ -18,7 +18,7 @@
 #endif
 
 #include <stdint.h>
-#include <modm/debug/debug.hpp>
+#include <modm/debug.hpp>
 
 #undef  MODM_LOG_LEVEL
 #define	MODM_LOG_LEVEL modm::log::DEBUG

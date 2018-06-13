@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/platform/platform.hpp>
+#include <modm/platform.hpp>
 #include <modm/communication/xpcc.hpp>
 #include <modm/communication/xpcc/backend/can.hpp>
 #include <modm/debug/logger.hpp>

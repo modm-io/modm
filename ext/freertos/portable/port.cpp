@@ -62,7 +62,7 @@
 #include "../FreeRTOS.h"
 #include "../task.h"
 
-#include <modm/platform/platform.hpp>
+#include <modm/platform.hpp>
 
 /* For backward compatibility, ensure configKERNEL_INTERRUPT_PRIORITY is
 defined.  The value should also ensure backward compatibility.

@@ -14,6 +14,6 @@
     <option name=":platform:uart:3:buffer.tx">2048</option>
   </options>
   <modules>
-    <module>modm:board.nucleo-f429zi</module>
+    <module>modm:board:nucleo-f429zi</module>
   </modules>
 </library>

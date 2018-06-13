@@ -24,7 +24,7 @@
 #include <modm/processing/protothread.hpp>
 #include <modm/driver/display/nokia5110.hpp>
 
-#include <modm/board/board.hpp>
+#include <modm/board.hpp>
 
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
 modm::IOStream stream(device);

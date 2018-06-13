@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/platform/platform.hpp>
+#include <modm/platform.hpp>
 #include <modm/architecture/interface/interrupt.hpp>
 #include <modm/driver/display/ea_dog.hpp>
 #include <modm/processing/timer.hpp>

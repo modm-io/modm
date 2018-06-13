@@ -17,7 +17,7 @@
  * from extern.
  */
 
-#include <modm/platform/platform.hpp>
+#include <modm/platform.hpp>
 #include <modm/communication/sab/slave.hpp>
 
 using namespace modm::platform;

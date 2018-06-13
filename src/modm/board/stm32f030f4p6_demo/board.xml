@@ -12,6 +12,6 @@
     <option name=":target">stm32f030f4p</option>
   </options>
   <modules>
-    <module>modm:board.stm32f030_demo</module>
+    <module>modm:board:stm32f030_demo</module>
   </modules>
 </library>

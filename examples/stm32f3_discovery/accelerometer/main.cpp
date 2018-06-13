@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/board/board.hpp>
-#include <modm/processing/processing.hpp>
+#include <modm/board.hpp>
+#include <modm/processing.hpp>
 #include <modm/math/filter.hpp>
 
 using namespace Board;

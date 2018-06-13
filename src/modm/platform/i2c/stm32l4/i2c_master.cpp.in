@@ -50,7 +50,7 @@
 #include <modm/architecture/driver/atomic/queue.hpp>
 #include <modm/architecture/interface/atomic_lock.hpp>
 #include <modm/architecture/interface/interrupt.hpp>
-#include <modm/container/container.hpp>
+#include <modm/container.hpp>
 
 MODM_ISR_DECL(I2C{{ id }}_ER);
 

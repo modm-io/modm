@@ -92,7 +92,7 @@ def prepare(module, options):
     return True
 
 def build(env):
-    if not (env.has_module(":board.nucleo-*") or env.has_module(":board.al-avr*")):
+    if not (env.has_module(":board:nucleo-*") or env.has_module(":board:al-avr*")):
         env.log.warn("GPIO test has been hardcoded to a Nucleo-64 board. "
                      "When porting make sure this test does not damage your board!")
         return

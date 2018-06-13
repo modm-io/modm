@@ -12,7 +12,8 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "board.stm32f030_demo"
+    module.parent = "board"
+    module.name = "stm32f030_demo"
 
 def prepare(module, options):
     if options[":target"].partname != "stm32f030f4p":

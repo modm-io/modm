@@ -10,8 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/board/board.hpp>
-#include <modm/processing/processing.hpp>
+#include <modm/board.hpp>
+#include <modm/processing.hpp>
 #include <modm/io/iostream.hpp>
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/driver/pressure/bmp085.hpp>

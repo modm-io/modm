@@ -14,7 +14,7 @@
 	#error	"Don't include this file directly, use 'at45db0x1d.hpp' instead!"
 #endif
 
-#include <modm/debug/debug.hpp>
+#include <modm/debug.hpp>
 
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs>

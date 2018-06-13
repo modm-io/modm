@@ -16,7 +16,7 @@
 #define MODM_LPC11_TIMER_{{ id }}_HPP
 
 #include <stdint.h>
-#include <modm/utils/utils.hpp>
+#include <modm/utils.hpp>
 
 #include "timer_registers.hpp"
 #include "../device.hpp"

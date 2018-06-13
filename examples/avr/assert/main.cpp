@@ -9,7 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/board/board.hpp>
+#include <modm/board.hpp>
 #include <modm/architecture/interface/assert.hpp>
 #include <avr/pgmspace.h>
 

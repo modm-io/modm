@@ -9,7 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/board/board.hpp>
+#include <modm/board.hpp>
 #include <modm/debug/logger.hpp>
 #include <modm/processing/timer.hpp>
 #include <modm/driver/adc/adc_sampler.hpp>

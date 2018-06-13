@@ -13,7 +13,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/debug/logger.hpp>
-#include <modm/platform/platform.hpp>
+#include <modm/platform.hpp>
 
 #include <cstdlib>
 
@@ -23,7 +23,7 @@ int
 main()
 {
 	SerialInterface port("/dev/ttyUSB0", 115200);
-	
+
 	if (not port.open()) {
 		MODM_LOG_ERROR << "Could not open port: " << port.getDeviceName().c_str() << modm::endl;
 		exit(EXIT_FAILURE);
@@ -33,12 +33,12 @@ main()
 	{
 		uint8_t a;
 		port.readBytes(&a, 1);
-		MODM_LOG_DEBUG << "Read: " << a << modm::endl; 
+		MODM_LOG_DEBUG << "Read: " << a << modm::endl;
 
 		/*char a;
 		if (port.read(a))
 		{
-			std::cout << "Read: " << a << std::endl; 
+			std::cout << "Read: " << a << std::endl;
 		}*/
 	}
 

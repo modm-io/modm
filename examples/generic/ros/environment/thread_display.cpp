@@ -8,7 +8,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <modm/platform/platform.hpp>
+#include <modm/platform.hpp>
 #include <modm/debug/logger.hpp>
 
 #include "thread_display.hpp"

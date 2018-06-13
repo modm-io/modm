@@ -20,9 +20,9 @@
 
 #include <modm/architecture/utils.hpp>
 
-#include "algorithm.hpp"
-#include "allocator.hpp"
-#include "arithmetic_traits.hpp"
-#include "template_metaprogramming.hpp"
-#include "dummy.hpp"
-#include "bit_constants.hpp"
+#include "utils/algorithm.hpp"
+#include "utils/allocator.hpp"
+#include "utils/arithmetic_traits.hpp"
+#include "utils/template_metaprogramming.hpp"
+#include "utils/dummy.hpp"
+#include "utils/bit_constants.hpp"

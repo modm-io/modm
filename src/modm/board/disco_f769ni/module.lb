@@ -12,7 +12,8 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "board.disco-f769ni"
+    module.parent = "board"
+    module.name = "disco-f769ni"
 
 def prepare(module, options):
     if options[":target"].partname != "stm32f769nih":

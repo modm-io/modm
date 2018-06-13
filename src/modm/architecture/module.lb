@@ -335,5 +335,7 @@ def build(env):
 
     env.copy("utils.hpp")
     env.copy("detect.hpp")
-    env.copy("architecture.hpp")
     env.copy("interface/peripheral.hpp")
+
+    env.outbasepath = "modm/src/modm"
+    env.copy("architecture.hpp")
