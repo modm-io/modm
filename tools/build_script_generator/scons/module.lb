@@ -146,10 +146,10 @@ def post_build(env, buildlog):
     env.template("resources/SConscript.in", "SConscript")
 
     # Copy the scons-build-tools
-    env.copy(localpath("../../../ext/dlr/scons-build-tools"), "ext/dlr/scons-build-tools")
+    env.copy(repopath("ext/dlr/scons-build-tools"), "ext/dlr/scons-build-tools")
     env.copy("site_tools", "scons/site_tools")
     if "system_design" in build_tools:
-        env.copy(localpath("../../../tools/system_design"), "tools/system_design")
+        env.copy(repopath("tools/system_design"), "tools/system_design")
 
     # these are the ONLY files that are allowed to NOT be namespaced with modm!
     env.outbasepath = "."
