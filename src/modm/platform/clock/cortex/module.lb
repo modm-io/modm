@@ -53,3 +53,4 @@ def build(env):
     # Systick Timer
     env.template("systick_timer.hpp.in")
     env.template("systick_timer.cpp.in")
+    env.copy("../common/common_clock.hpp", "common_clock.hpp")
