@@ -195,6 +195,14 @@ public:
    	static inline void
    	clearChannel(const Channel channel);
 
+	/// Helper function for setting the channel from a Pin
+	template< class Gpio >
+	static inline bool
+	setPinChannel(SampleTime sampleTime = static_cast<SampleTime>(0b000))
+	{
+		return setChannel(Channel(Gpio::pin), sampleTime);
+	}
+
 	/**
 	 * Enables free running mode
 	 *
