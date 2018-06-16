@@ -121,26 +121,26 @@ env["CONFIG_AVRDUDE_BAUDRATE"] = "{{options["::avrdude.baudrate"]}}"
 %% endif
 %% endif
 
-env["CONFIG_OPENOCD_SEARCHDIRS"] = [
+env.SetDefault(CONFIG_OPENOCD_SEARCHDIRS = [
 %% if "openocd.configfile" in metadata
     os.path.abspath("openocd")
 %% endif
-]
-env["CONFIG_OPENOCD_CONFIGFILES"] = [
+])
+env.SetDefault(CONFIG_OPENOCD_CONFIGFILES = [
 %% if "openocd.configfile" in metadata
     %% for configfile in metadata["openocd.configfile"]
     "{{ configfile }}",
     %% endfor
 %% endif
-]
-env["CONFIG_OPENOCD_COMMANDS"] = [
+])
+env.SetDefault(CONFIG_OPENOCD_COMMANDS = [
     "init",
     "reset halt",
     "flash write_image erase $SOURCE",
     "reset halt",
     "mww 0xE000EDF0 0xA05F0000",
     "shutdown"
-]
+])
 
 %% if ":platform:clock:f_cpu" in options
 env["CONFIG_CLOCK_F_CPU"] = "{{ options[":platform:clock:f_cpu"] }}"

@@ -68,11 +68,16 @@ for image in Path("{{image_source}}").glob("**/*.pbm"):
 %% if xpcc_source != ""
 # Generating XPCC files
 files += env.XpccCommunication(
-    abspath("{{xpcc_source}}"),
-    "{{xpcc_container}}",
+    xmlfile=abspath("{{xpcc_source}}"),
+    container="{{xpcc_container}}",
     dtdPath=abspath(join(modm_path, "tools", "system_design", "xml", "dtd")),
     path=abspath("{{xpcc_generate}}"),
     namespace="{{xpcc_namespace}}")
+%% endif
+%% if openocd_file != ""
+# Using a custom OpenOCD script
+env.Append(CONFIG_OPENOCD_SEARCHDIRS=[abspath("{{openocd_base_dir}}")])
+env.Append(CONFIG_OPENOCD_CONFIGFILES=["{{openocd_file}}"])
 %% endif
 %#
 # Building application
