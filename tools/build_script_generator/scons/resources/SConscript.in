@@ -7,14 +7,14 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import os
 
 Import("env")
 
 env.Append(CPPPATH=[
-%% for path in metadata.include_path
+%% for path in metadata.include_path | sort
     os.path.abspath("{{ path }}"),
 %% endfor
 ])
@@ -46,6 +46,60 @@ env.Append(CPPDEFINES=[
 ])
 %% endif
 
+# Toolchain configuration
+%# ================================== STM32 ===================================
+%% if platform in ["stm32"]
+env["CPU"] = "{{ core }}"
+env["LINKFLAGS_optimize"] = [
+    "-Wl,--relax",
+    "-Wl,--gc-sections",
+    "-Wl,-wrap,_malloc_r",
+    "-Wl,-wrap,_calloc_r",
+    "-Wl,-wrap,_realloc_r",
+    "-Wl,-wrap,_free_r",
+    "--specs=nano.specs",
+    "--specs=nosys.specs",
+    "-nostartfiles",
+]
+env.Append(LINKFLAGS_other=["-Wl,--no-wchar-size-warning"])
+%# =================================== AVR ====================================
+%% elif platform in ["avr"]
+env["CCFLAGS_target"] = [
+    "-mmcu={{ partname }}",
+    "-DF_CPU=${CONFIG_CLOCK_F_CPU}"
+]
+env.Append(ASFLAGS_target=[
+    "-mmcu={{ partname }}",
+    "-xassembler-with-cpp",
+])
+env["LINKFLAGS_other"] = ["-Wl,--fatal-warnings"]
+%# ================================== HOSTED ==================================
+%% elif platform in ["hosted"]
+%% if family in ["darwin"]
+env["CXXFLAGS_language"] = ["-std=c++1z"] # for clang 4 or earlier
+%% else
+env["CXXFLAGS_language"] = ["-std=c++17"]
+%% endif
+%% endif
+
+%# ============================================================================
+env["CFLAGS_language"] = ["-std=gnu11"]
+%% if platform in ["stm32", "avr"]
+env["CXXFLAGS_language"] = ["-std=c++17", "-fno-exceptions", "-fno-rtti"]
+env.Append(LINKFLAGS_target=[
+    "-Lmodm/link",
+    "-Tlinkerscript.ld"])
+%% endif
+env.RemoveFromList("CCFLAGS_warning", [
+    "-Wshadow",
+    "-Wcast-align",
+    "-Wmissing-declarations",
+    "-Wcast-qual",
+    "-Wredundant-decls",])
+env.RemoveFromList("CXXFLAGS_warning", [
+    "-Wold-style-cast",
+    "-Wnon-virtual-dtor"])
+
 # Device configuration
 env["CONFIG_DEVICE_NAME"] = "{{ partname }}"
 %% if memories | length
@@ -55,6 +109,7 @@ env["CONFIG_DEVICE_MEMORY"] = [
 %% endfor
 ]
 %% endif
+
 # Programming configuration
 %% if platform in ["avr"]
 env["CONFIG_AVRDUDE_DEVICE"] = "{{avrdude_mcu}}"
@@ -65,14 +120,18 @@ env["CONFIG_AVRDUDE_OPTIONS"] = "{{options["::avrdude.options"]}}"
 env["CONFIG_AVRDUDE_BAUDRATE"] = "{{options["::avrdude.baudrate"]}}"
 %% endif
 %% endif
-%% if "openocd.configfile" in metadata
+
 env["CONFIG_OPENOCD_SEARCHDIRS"] = [
+%% if "openocd.configfile" in metadata
     os.path.abspath("openocd")
+%% endif
 ]
 env["CONFIG_OPENOCD_CONFIGFILES"] = [
-%% for configfile in metadata["openocd.configfile"]
+%% if "openocd.configfile" in metadata
+    %% for configfile in metadata["openocd.configfile"]
     "{{ configfile }}",
-%% endfor
+    %% endfor
+%% endif
 ]
 env["CONFIG_OPENOCD_COMMANDS"] = [
     "init",
@@ -82,13 +141,12 @@ env["CONFIG_OPENOCD_COMMANDS"] = [
     "mww 0xE000EDF0 0xA05F0000",
     "shutdown"
 ]
-%% endif
 
 %% if ":platform:clock:f_cpu" in options
 env["CONFIG_CLOCK_F_CPU"] = "{{ options[":platform:clock:f_cpu"] }}"
 %% endif
 
-env['XPCC_SYSTEM_BUILDER'] = os.path.join("modm", "tools", "system_design", "builder")
+env['XPCC_SYSTEM_BUILDER'] = os.path.join(os.path.abspath("."), "tools", "system_design", "builder")
 
 %% if platform not in ["hosted"]
 # We need to link libmodm.a with --whole-archive, so that all weak symbols are visible to the linker.

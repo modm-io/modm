@@ -20,6 +20,7 @@ def init(module):
 
 
 def prepare(module, options):
+    _, default_project_name = os.path.split(os.getcwd())
     module.add_option(
         BooleanOption(name="include_demo_project", default=False,
                       description="Include a demo main file to get a full compilable project."))
@@ -31,7 +32,10 @@ def prepare(module, options):
                       description="Generate SConstruct file for modm unittests."))
 
     module.add_option(
-        StringOption(name="build.path", default="build",
+        StringOption(name="project.name", default=default_project_name,
+                     description="Project name for executable"))
+    module.add_option(
+        StringOption(name="build.path", default="build/"+default_project_name,
                      description="Path to the build folder"))
     module.add_option(
         StringOption(name="image.source", default="",
@@ -79,7 +83,6 @@ def build(env):
 
 
 def post_build(env, buildlog):
-    _, default_project_name = os.path.split(os.getcwd())
     target = env["modm:target"]
     platform = target.identifier["platform"]
     family = target.identifier["family"]
@@ -89,6 +92,14 @@ def post_build(env, buildlog):
     if len(env["image.source"]): build_tools.append("bitmap");
     if env["info.git"] or env["info.build"]: build_tools.append("info");
     if env["is_unittest"]: build_tools.append("unittest")
+    if platform in ["stm32"]:
+        build_tools.extend(["compiler_arm_none_eabi_gcc", "program_openocd", "utils_buildsize"])
+    elif platform in ["avr"]:
+        build_tools.extend(["compiler_avr_gcc", "program_avrdude"])
+    else:
+        build_tools.extend([
+            "compiler_hosted_" + ("llvm" if family == "darwin" else "gcc"),
+            "utils_buildsize"])
 
     # Extract all source code files
     env.outbasepath = "modm"
@@ -121,11 +132,9 @@ def post_build(env, buildlog):
         ])
 
     env.substitutions = {
-        "project_name": default_project_name,
         "partname": target.partname,
         "platform": platform,
         "family": family,
-        "compiler": "llvm" if family == "darwin" else "gcc",
         "core": core,
         "avrdude_mcu": avrdude_mcu,
         "files": files_to_build,
