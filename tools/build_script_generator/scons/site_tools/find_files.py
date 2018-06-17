@@ -28,7 +28,7 @@ class Scanner:
 	def scan(self, basepath, extensions, ignore=None):
 		files = set(str(p) for ext in listify(extensions) for p in Path(basepath).glob("**/*{}".format(ext)))
 		if ignore is not None:
-			files -= set(str(p) for p in Path(basepath).glob(ignore))
+			files -= set(str(p) for ign in listify(ignore) for p in Path(basepath).glob(ign))
 		self.files = sorted(list(files))
 
 	def __str__(self):

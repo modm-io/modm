@@ -76,7 +76,6 @@ env.Append(CONFIG_OPENOCD_CONFIGFILES=["{{openocd_file}}"])
 %#
 # Building application
 program = env.Program(target=project_name+".elf", source=files)
-hexfile = env.Hex(program)
 
 # SCons functions
 env.Alias("symbols", env.Symbols(program))
@@ -94,7 +93,7 @@ env.Alias("program", env.OpenOcd(program))
 env.Alias("program", env.Avrdude(program))
     %% endif
     %#
-env.Alias("build", [hexfile, "listing"])
+env.Alias("build", [program, "listing"])
     %% if platform in ["stm32"]
 env.Alias("all", ["build", "size"])
     %% else
