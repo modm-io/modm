@@ -11,12 +11,9 @@
 
 import os
 from os.path import join, abspath
-from pathlib import Path
 
 # User Configurable Options
 project_name = "{{ options["::project.name"] }}"
-source_dirs = ["."]
-source_endings = ["cpp", "cxx", "cc", "c"]
 build_path = "{{ build_path }}"
 modm_path = "modm"
 
@@ -30,6 +27,7 @@ env = Environment(
 %% endfor
             "settings_buildpath",
             "utils_buildformat",
+            "find_files",
             ],
         ENV=os.environ)
 env["BASEPATH"]  = abspath(modm_path)
@@ -47,22 +45,18 @@ env.InfoBuild()
 
 %% if options["::is_unittest"]
 # Building unit tests
-headers = [env.File(str(f)) for f in Path(modm_path).glob("test/**/*.hpp")]
+headers = env.FindHeaderFiles(join(modm_path, "test"))
 files = env.UnittestRunner(target="main.cpp", source=headers, template="modm/test/runner.cpp.in")
 %% else
 # Finding application sources
-env.Append(CPPPATH=source_dirs)
-files = []
-for path in source_dirs:
-    for ending in source_endings:
-        files.extend(Path(path).glob("**/*.{}".format(ending)))
-files = [env.File(str(f)) for f in files if f.parts[0] != "modm"]
+env.Append(CPPPATH=["."])
+files = env.FindSourceFiles(".", ignore="modm/**/*")
 %% endif
 
 %% if image_source != ""
 # Finding image sources
-for image in Path("{{image_source}}").glob("**/*.pbm"):
-    source, header = env.Bitmap(str(image))
+for image in env.FindFiles("{{image_source}}", ".pbm"):
+    source, _ = env.Bitmap(str(image))
     files.append(source)
 %% endif
 %% if xpcc_source != ""
