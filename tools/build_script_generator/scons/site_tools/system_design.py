@@ -122,7 +122,9 @@ def xpcc_task_caller_emitter(target, source, env):
 	target = [os.path.join(path, "caller.hpp")]
 	return (target, source)
 
-def xpcc_communication_header(env, xmlfile, container, path='.', dtdPath=None, namespace='robot'):
+def xpcc_communication_header(env, xmlfile, container, path='.', dtdPath='default', namespace='robot'):
+	if dtdPath == 'default':
+		dtdPath = os.path.join(env['XPCC_SYSTEM_DESIGN'], "xml/dtd")
 	files  = env.SystemCppPackets(xmlfile, path=path, dtdPath=dtdPath, namespace=namespace)
 	files += env.SystemCppIdentifier(xmlfile, path=path, dtdPath=dtdPath, namespace=namespace)
 	files += env.SystemCppCommunication(xmlfile, path=path, dtdPath=dtdPath, namespace=namespace)
@@ -151,7 +153,7 @@ def generate(env, **kw):
 	env['BUILDERS']['SystemCppPackets'] = \
 		SCons.Script.Builder(
 			action = SCons.Action.Action(
-				'python3 "${XPCC_SYSTEM_BUILDER}/cpp_packets.py" ' \
+				'python3 "${XPCC_SYSTEM_DESIGN}/builder/cpp_packets.py" ' \
 					'--source_path ${TARGETS[0].dir} ' \
 					'--header_path ${TARGETS[1].dir} ' \
 					'--dtdpath "${dtdPath}" ' \
@@ -167,7 +169,7 @@ def generate(env, **kw):
 	env['BUILDERS']['SystemCppIdentifier'] = \
 		SCons.Script.Builder(
 			action = SCons.Action.Action(
-				'python3 "${XPCC_SYSTEM_BUILDER}/cpp_identifier.py" ' \
+				'python3 "${XPCC_SYSTEM_DESIGN}/builder/cpp_identifier.py" ' \
 					'--outpath ${TARGET.dir} ' \
 					'--dtdpath "${dtdPath}" ' \
 					'--namespace "${namespace}" ' \
@@ -182,7 +184,7 @@ def generate(env, **kw):
 	env['BUILDERS']['SystemCppPostman'] = \
 		SCons.Script.Builder(
 			action = SCons.Action.Action(
-				'python3 "${XPCC_SYSTEM_BUILDER}/cpp_postman.py" ' \
+				'python3 "${XPCC_SYSTEM_DESIGN}/builder/cpp_postman.py" ' \
 					'--container "${container}" ' \
 					'--outpath ${TARGET.dir} ' \
 					'--dtdpath "${dtdPath}" ' \
@@ -198,7 +200,7 @@ def generate(env, **kw):
 	env['BUILDERS']['SystemCppCommunication'] = \
 		SCons.Script.Builder(
 			action = SCons.Action.Action(
-				'python3 "${XPCC_SYSTEM_BUILDER}/cpp_communication.py" ' \
+				'python3 "${XPCC_SYSTEM_DESIGN}/builder/cpp_communication.py" ' \
 					'--outpath ${TARGET.dir} ' \
 					'--dtdpath "${dtdPath}" ' \
 					'--namespace "${namespace}" ' \
@@ -213,7 +215,7 @@ def generate(env, **kw):
 	env['BUILDERS']['SystemCppXpccTaskCaller'] = \
 		SCons.Script.Builder(
 			action = SCons.Action.Action(
-				'python3 "${XPCC_SYSTEM_BUILDER}/cpp_xpcc_task_caller.py" ' \
+				'python3 "${XPCC_SYSTEM_DESIGN}/builder/cpp_xpcc_task_caller.py" ' \
 					'--outpath ${TARGET.dir} ' \
 					'--dtdpath "${dtdPath}" ' \
 					'--namespace "${namespace}" ' \
