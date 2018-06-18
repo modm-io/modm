@@ -4,7 +4,7 @@
  * Copyright (c) 2014, 2016, Sascha Schade
  * Copyright (c) 2016, Kevin Läufer
  * Copyright (c) 2017, Marten Junga
- * Copyright (c) 2017, Raphael Lehmann
+ * Copyright (c) 2017-2018, Raphael Lehmann
  *
  * This file is part of the modm project.
  *

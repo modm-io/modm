@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011, Georgi Grinshpun
  * Copyright (c) 2011-2013, Fabian Greif
- * Copyright (c) 2012-2014, Sascha Schade
+ * Copyright (c) 2012-2014, 2017, Sascha Schade
  * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2013-2014, Daniel Krebs
  * Copyright (c) 2013-2018, Niklas Hauser

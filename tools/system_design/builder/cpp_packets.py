@@ -4,7 +4,7 @@
 # Copyright (c) 2010-2012, Fabian Greif
 # Copyright (c) 2012, Sascha Schade
 # Copyright (c) 2013, Martin Rosekeit
-# Copyright (c) 2015, Niklas Hauser
+# Copyright (c) 2015, 2018, Niklas Hauser
 # Copyright (c) 2016, Daniel Krebs
 # Copyright (c) 2017, Michael Thies
 #

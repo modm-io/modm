@@ -1,6 +1,7 @@
 // coding: utf-8
 /*
  * Copyright (c) 2017, Raphael Lehmann
+ * Copyright (c) 2018, Sascha Schade
  *
  * This file is part of the modm project.
  *

@@ -1,7 +1,8 @@
 /*
  * Copyright (c) 2016, Antal Szabó
  * Copyright (c) 2016, Kevin Läufer
- * Copyright (c) 2016, Niklas Hauser
+ * Copyright (c) 2016-2018, Niklas Hauser
+ * Copyright (c) 2018, Christopher Durand
  *
  * This file is part of the modm project.
  *

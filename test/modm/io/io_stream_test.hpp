@@ -4,6 +4,7 @@
  * Copyright (c) 2012-2014, 2017, Niklas Hauser
  * Copyright (c) 2016, Sascha Schade
  * Copyright (c) 2017, Marten Junga
+ * Copyright (c) 2018, Raphael Lehmann
  *
  * This file is part of the modm project.
  *

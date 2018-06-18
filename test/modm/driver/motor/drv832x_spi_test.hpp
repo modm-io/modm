@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Raphael Lehmann
+ * Copyright (c) 2017-2018, Raphael Lehmann
  *
  * This file is part of the modm project.
  *

@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2009-2012, Fabian Greif
-# Copyright (c) 2012, Sascha Schade
-# Copyright (c) 2012, 2014, 2016-2017, Niklas Hauser
-# Copyright (c) 2016, Daniel Krebs
-# Copyright (c) 2017, Michael Thies
+# Copyright (c) 2018, Niklas Hauser
 #
 # This file is part of the modm project.
 #

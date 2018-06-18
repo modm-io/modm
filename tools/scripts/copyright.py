@@ -37,11 +37,13 @@ comment_styles = {
     ".cfg": ".py",
     ".lb": ".py",
     ".sh": ".py",
+    ".cmake": ".py",
     "SConstruct": ".py",
     "SConscript": ".py",
     "SConstruct.in": ".py",
     "SConscript.in": ".py",
     "Makefile": ".py",
+    "Makefile.in": ".py",
 
     ".html": "<!--",
     ".xml": ".html",
@@ -87,6 +89,7 @@ ignored_endings = [
     ".pbm",
     ".font",
     ".xml",
+    ".yml",
     ".txt",
     ".txt.in",
     "doxyfile",
@@ -98,6 +101,7 @@ ignored_beginnings = [
     ".",
     "AUTHORS",
     "LICENSE",
+    "README",
     "doc/examples/SConstruct.template",
     "tools/copyright.py",
     "doc/doxyfile",
@@ -125,6 +129,9 @@ copyright_format = "Copyright (c) {years}, {author}"
 
 # some commits contaminate the history by doing large scale file moves or changes
 ignored_shas = {
+    "dad8e35": [], # [modm] Refactor all include paths
+    "fe33db8": [], # [lbuild] Prefix all output paths with `modm/`
+    "2e8020b": [], # Update copyright headers.
     "9abe715": [], # Update copyright headers.
     # "2814009": ["Fabian Greif"], # Merge changes from xpcc 'develop' into modm
     "b791589": [], # Move all new files since to modm paths.
@@ -155,7 +162,7 @@ included_merges = {
 }
 
 def get_copyright_comment_style(content):
-    cmatch = re.search("(?P<style>\.\.|<!--|\*|//|\%#|#)[ \n\r]*?Copyright[^{}]*?\n", content, re.DOTALL)
+    cmatch = re.search(r"(?P<style>\.\.|<!--|\*|//|\%#|#)[ \n\r]*?Copyright[^{}]*?\n", content, re.DOTALL)
     if not cmatch and "Copyright" in content: return "Unknown";
     return cmatch.group("style") if cmatch else None
 
@@ -197,15 +204,15 @@ def find_copyright_header(filename):
         if style in [None, "Unknown"]: return license, header, start, end, style;
         # build regex match pattern
         header_pattern = {
-            "*": ("(?P<header>/\*.*?", ".*?\*/)"),
-            "#": ("(\-\*\-.*?)?(?P<header># ", ")\r?\n"),
-            "%#": ("(?P<header>\%# ", ")\r?\n"),
-            "//": ("(?P<header>// ?", ")\r?\n"),
-            "<!--": ("(?P<header>\<\!\-\-.*?", ".*?\-\-\>)\r?\n"),
-            "..": ("(?P<header>\.\..*?", ")\r?\n")
+            "*": (r"(?P<header>/\*.*?", r".*?\*/)"),
+            "#": (r"(\-\*\-.*?)?(?P<header># ", r")\r?\n"),
+            "%#": (r"(?P<header>\%# ", r")\r?\n"),
+            "//": (r"(?P<header>// ?", r")\r?\n"),
+            "<!--": (r"(?P<header>\<\!\-\-.*?", r".*?\-\-\>)\r?\n"),
+            "..": (r"(?P<header>\.\..*?", r")\r?\n")
         }
         # Search for the license header
-        regex = "{}Copyright.*?(DAMAGE\.|code\.|MPL/2\.0/\.|licenses/\>\.|02111-1307  USA){}"
+        regex = r"{}Copyright.*?(DAMAGE\.|code\.|MPL/2\.0/\.|licenses/\>\.|02111-1307  USA){}"
         regex = regex.format(header_pattern[style][0], header_pattern[style][1])
         hmatch = re.search(regex, content, re.DOTALL)
         license = "Unknown"
@@ -229,7 +236,7 @@ def parse_copyright_authors(header):
     authors = {}
     if header is None: return authors;
     for line in header.splitlines():
-        match = re.search("Copyright.*?(?P<years>([0-9]{4}[\-,]? ?)+) (?![0-9])(?P<author>.*)", line)
+        match = re.search(r"Copyright.*?(?P<years>([0-9]{4}[\-,]? ?)+) (?![0-9])(?P<author>.*)", line)
         if not match: continue;
         years = []
         for year in [y for y in match.group("years").split(",") if y != ""]:
