@@ -56,9 +56,9 @@ CanBitTimingsTest::testPrecalculatedValues()
 	TEST_TIMING(MHz48, kBps500, 11, 4,  6);
 	TEST_TIMING(MHz48,   MBps1, 11, 4,  3);
 
-	TEST_TIMING(MHz30, kBps125, 10, 4, 16);
-	TEST_TIMING(MHz30, kBps250, 10, 4,  8);
-	TEST_TIMING(MHz30, kBps500, 10, 4,  4);
+	TEST_TIMING(MHz30, kBps125, 14, 5, 12);
+	TEST_TIMING(MHz30, kBps250, 14, 5,  6);
+	TEST_TIMING(MHz30, kBps500, 14, 5,  3);
 	TEST_TIMING(MHz30,   MBps1, 10, 4,  2);
 
 	TEST_TIMING(MHz36, kBps125, 12, 5, 16);
@@ -76,5 +76,14 @@ CanBitTimingsTest::testPrecalculatedValues()
 	TEST_TIMING(MHz32, kBps500, 11, 4,  4);
 	TEST_TIMING(MHz32,   MBps1, 11, 4,  2);
 
+	TEST_TIMING(MHz80,  kBps125, 14, 5, 32);
+	TEST_TIMING(MHz80,  kBps250, 14, 5, 16);
+	TEST_TIMING(MHz80,  kBps500, 14, 5,  8);
+	TEST_TIMING(MHz80,    MBps1, 14, 5,  4);
+
+	TEST_TIMING(MHz180,  kBps125, 14, 5, 72);
+	TEST_TIMING(MHz180,  kBps250, 14, 5, 36);
+	TEST_TIMING(MHz180,  kBps500, 14, 5, 18);
+	TEST_TIMING(MHz180,    MBps1, 14, 5,  9);
 }
 

@@ -195,7 +195,12 @@ modm::platform::{{ name }}::discardReceiveBuffer()
 
 %% if options["buffered"]
 %% set hal = "modm::platform::" ~ hal
+%% if id in shared_irqs
+void
+modm::platform::{{ name }}::irq()
+%% else
 MODM_ISR({{ name | upper }})
+%% endif
 {
 	if ({{ hal }}::isReceiveRegisterNotEmpty()) {
 		// TODO: save the errors

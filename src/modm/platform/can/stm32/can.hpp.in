@@ -119,6 +119,8 @@ public:
 	{
 		using Timings = CanBitTiming<SystemClock::Can{{ id }}, bitrate>;
 
+		Timings::template assertBitrateInTolerance<tolerance>();
+
 		return initializeWithPrescaler(
 			Timings::getPrescaler(),
 			Timings::getBS1(),

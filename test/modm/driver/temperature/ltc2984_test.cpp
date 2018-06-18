@@ -25,8 +25,8 @@ void
 Ltc2984Test::testDataStatus()
 {
 	// Test valid bit
-	TEST_ASSERT_TRUE(modm::ltc2984::Data(0x01 << 24).isValid());
-	TEST_ASSERT_TRUE(modm::ltc2984::Data(0xff << 24).isValid());
+	TEST_ASSERT_TRUE(modm::ltc2984::Data(0x01ul << 24).isValid());
+	TEST_ASSERT_TRUE(modm::ltc2984::Data(0xfful << 24).isValid());
 	TEST_ASSERT_FALSE(modm::ltc2984::Data(0ul).isValid());
 
 	// Test other status bits
@@ -54,7 +54,7 @@ Ltc2984Test::testDataTemperature()
 	// 1024°C
 	dataTable[1] = 0b00000001000100000000000000000000;
 	temperatureTableFloat[1] = 1024;
-	temperatureTableFixed[1] = 1024 * 1024;
+	temperatureTableFixed[1] = 1048576ul;
 	temperatureTableInteger[1] = 1024;
 
 	// 1°C
@@ -110,8 +110,8 @@ Ltc2984Test::testSpi()
 	using SpiMaster = modm::platform::SpiMasterMock;
 	modm::Ltc2984<SpiMaster, modm::platform::GpioUnused> tempSensor;
 
-	uint32_t channelConfigurationTest = (0b11101ul << 27) | (2000*1024);
-	uint32_t channelConfiguration = modm::ltc2984::Configuration::rsense(modm::ltc2984::Configuration::Rsense::Resistance_t(2000*1024));
+	uint32_t channelConfigurationTest = (0b11101ul << 27) | (2000ul*1024);
+	uint32_t channelConfiguration = modm::ltc2984::Configuration::rsense(modm::ltc2984::Configuration::Rsense::Resistance_t(2000ul*1024));
 	TEST_ASSERT_EQUALS(channelConfiguration, channelConfigurationTest);
 	RF_CALL_BLOCKING(tempSensor.configureChannel(modm::ltc2984::Channel::Ch2, channelConfiguration));
 

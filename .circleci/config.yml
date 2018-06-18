@@ -62,7 +62,7 @@ jobs:
       - run:
           name: Examples STM32F1 Series
           command: |
-            (cd examples && ../tools/scripts/examples_compile.py stm32f1_discovery nucleo_f103rb olimexino_stm32 stm32f103c8t6_blue_pill)
+            (cd examples && ../tools/scripts/examples_compile.py stm32f1_discovery nucleo_f103rb olimexino_stm32 stm32f103c8t6_blue_pill stm32f103c8t6_black_pill)
 
   stm32f3-l4-f7-examples:
     docker:
@@ -85,7 +85,7 @@ jobs:
       - run:
           name: Examples STM32L4 Series
           command: |
-            (cd examples && ../tools/scripts/examples_compile.py stm32l476_discovery nucleo_l476rg)
+            (cd examples && ../tools/scripts/examples_compile.py stm32l476_discovery nucleo_l476rg nucleo_l432kc)
 
   stm32f4-examples:
     docker:

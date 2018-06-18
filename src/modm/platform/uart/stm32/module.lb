@@ -11,6 +11,17 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
+shared_irqs = None
+instances = []
+
+def get_shared_irqs(env):
+    global shared_irqs
+    if shared_irqs is None:
+        shared_irqs = [v["name"] for v in env[":target"].get_driver("core")["vector"]]
+        shared_irqs = [v[5:] for v in shared_irqs if v.startswith("USART") and "_" in v]
+        shared_irqs = [int(s) for s in shared_irqs[0].split("_")] if len(shared_irqs) else []
+        shared_irqs = range(shared_irqs[0], shared_irqs[1] + 1) if len(shared_irqs) else []
+    return shared_irqs
 
 class Instance(Module):
     def __init__(self, driver, instance):
@@ -60,6 +71,7 @@ class Instance(Module):
         properties["apb_post"] = "1" if properties["target"]["family"] in ["l4"] and self.instance != 1 else ""
 
         properties["uart_name"] = self.driver["name"].capitalize()
+        properties["shared_irqs"] = get_shared_irqs(env)
 
         env.substitutions = properties
         env.outbasepath = "modm/src/modm/platform/uart"
@@ -68,6 +80,9 @@ class Instance(Module):
         env.template("uart_hal_impl.hpp.in", "uart_hal_{}_impl.hpp".format(self.instance))
         env.template("uart.hpp.in", "uart_{}.hpp".format(self.instance))
         env.template("uart.cpp.in", "uart_{}.cpp".format(self.instance))
+
+        global instances
+        instances.append(self.instance)
 
 
 def init(module):
@@ -103,8 +118,12 @@ def build(env):
     properties["extended_driver"] = ("extended" in drivers[0]["type"])
     properties["over8_sampling"] = ("feature" in drivers[0]) and ("over8" in drivers[0]["feature"])
     properties["tcbgt"] = ("feature" in drivers[0]) and ("tcbgt" in drivers[0]["feature"])
+    properties["shared_irqs"] = get_shared_irqs(env)
+    properties["instances"] = instances
 
     env.substitutions = properties
     env.outbasepath = "modm/src/modm/platform/uart"
     env.template("uart_base.hpp.in")
     env.template("uart_baudrate.hpp.in")
+    if any(i in properties["shared_irqs"] for i in instances):
+        env.template("uart_shared.cpp.in")

@@ -130,6 +130,11 @@ public:
 
 	static std::size_t
 	discardReceiveBuffer();
+
+%% if id in shared_irqs
+	static void
+	irq();
+%% endif
 };
 
 }	// namespace platform

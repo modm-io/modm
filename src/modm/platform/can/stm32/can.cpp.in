@@ -458,13 +458,16 @@ modm::platform::Can{{ id }}::getBusState()
 void
 modm::platform::Can{{ id }}::enableStatusChangeInterrupt(
 		uint32_t interruptEnable,
-		uint32_t interruptPriority)
+%% if target["family"] == "f0"
+		uint32_t
+%% else
+		uint32_t interruptPriority
+%% endif
+)
 {
-%% if not target["family"] == "f0"
+%% if target["family"] != "f0"
 	NVIC_SetPriority({{ reg }}_SCE_IRQn, interruptPriority);
 	nvicEnableInterrupt({{ reg }}_SCE_IRQn);
-%% else
-	(void) interruptPriority;	// Not used for STM32F0
 %% endif
 
 	{{ reg }}->IER = interruptEnable | ({{ reg }}->IER & 0x000000ff);

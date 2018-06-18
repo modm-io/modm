@@ -10,6 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
+#include <inttypes.h>
 #include <modm/board.hpp>
 #include <modm/debug/logger.hpp>
 
@@ -124,7 +125,7 @@ Bmp180Thread::update()
 			MODM_LOG_DEBUG << MODM_FILE_INFO;
 			MODM_LOG_DEBUG.printf("BMP180: Calibrated temperature in 0.1 degree Celsius is : %d\n", temp  );
 			MODM_LOG_DEBUG << MODM_FILE_INFO;
-			MODM_LOG_DEBUG.printf("BMP180: Calibrated pressure in Pa is                    : %d\n", press );
+			MODM_LOG_DEBUG.printf("BMP180: Calibrated pressure in Pa is                    : %" PRId32 "\n", press );
 		}
 
 		start_measurement = false;

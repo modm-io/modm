@@ -10,6 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
+#include <inttypes.h>
 #include <modm/board.hpp>
 #include <modm/processing.hpp>
 #include <modm/io/iostream.hpp>
@@ -88,7 +89,7 @@ public:
 		stream.printf(" mc %d\n", cal.mc);
 		stream.printf(" md %d\n", cal.md);
 
-		while (1)
+		while (true)
 		{
 			static modm::ShortPeriodicTimer timer(250);
 
@@ -101,8 +102,8 @@ public:
 				int16_t temp  = data.getTemperature();
 				int32_t press = data.getPressure();
 
-				stream.printf("Calibrated temperature in 0.1 degree Celsius is: %d\n",   temp  );
-				stream.printf("Calibrated pressure in Pa is                   : %d\n\n", press );
+				stream.printf("Calibrated temperature in 0.1 degree Celsius is: %" PRId16 "\n",   temp  );
+				stream.printf("Calibrated pressure in Pa is                   : %" PRId32 "\n\n", press );
 			}
 		}
 

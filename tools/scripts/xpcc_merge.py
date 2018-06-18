@@ -17,6 +17,7 @@ import os
 
 path_mapping = [
     (r"src/xpcc/", r"src/modm/"),
+    (r"src/modm/architecture/platform/driver/(.+?)/generic/", r"src/modm/platform/\1/common/"),
     (r"src/modm/architecture/platform/driver/", r"src/modm/platform/"),
     (r"src/modm/architecture/platform/board/", r"src/modm/board/"),
     (r"src/modm/architecture/platform/devices/", None),
@@ -31,7 +32,7 @@ path_mapping = [
     (r"tools/device_file_generator/", None),
     (r".*?/build\.cfg", None),
     (r"src/unittest_.*?\.cfg", None),
-    (r"templates/cmake/", r"tools/build_script_generator/cmake/"),
+    (r"templates/cmake/", None),
     (r"scons/", None),
     (r".*?/project.cfg", None),
     (r"README\.md", None),

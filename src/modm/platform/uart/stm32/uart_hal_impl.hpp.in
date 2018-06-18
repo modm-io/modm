@@ -207,12 +207,8 @@ modm::platform::{{ name }}::isTransmitRegisterEmpty()
 void
 modm::platform::{{ name }}::enableInterruptVector(bool enable, uint32_t priority)
 {
-%% if target["family"] == "f0" and id in [3,4,5,6,7,8]
-	%% if target["name"] in ["91", "98"]
-		%% set irq = "USART3_8"
-	%% else
-		%% set irq = "USART3_4"
-	%% endif
+%% if id in shared_irqs
+	%% set irq = "USART" ~ shared_irqs[0] ~ "_" ~ shared_irqs[-1]
 %% else
 	%% set irq = peripheral
 %% endif

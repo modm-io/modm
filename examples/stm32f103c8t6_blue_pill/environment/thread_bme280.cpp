@@ -10,6 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
+#include <inttypes.h>
 #include <modm/board.hpp>
 #include <modm/debug/logger.hpp>
 
@@ -156,11 +157,11 @@ Bme280Thread::update()
 			int32_t press = dataA.getPressure();
 			int32_t hum = dataA.getHumidity();
 			MODM_LOG_DEBUG << MODM_FILE_INFO;
-			MODM_LOG_DEBUG.printf("BME280: Calibrated temperature in 0.01 degree Celsius is: %d\n", temp  );
+			MODM_LOG_DEBUG.printf("BME280: Calibrated temperature in 0.01 degree Celsius is: %" PRId32 "\n", temp  );
 			MODM_LOG_DEBUG << MODM_FILE_INFO;
-			MODM_LOG_DEBUG.printf("BME280: Calibrated pressure in mPa is                   : %d\n", press );
+			MODM_LOG_DEBUG.printf("BME280: Calibrated pressure in mPa is                   : %" PRId32 "\n", press );
 			MODM_LOG_DEBUG << MODM_FILE_INFO;
-			MODM_LOG_DEBUG.printf("BME280: Calibrated humidity in 0.001 %% is               : %d\n", hum );
+			MODM_LOG_DEBUG.printf("BME280: Calibrated humidity in 0.001 %% is               : %" PRId32 "\n", hum );
 		}
 
 

@@ -20,6 +20,18 @@
 #include <stdio.h>	// snprintf
 #include <string.h>	// memset
 
+#if not defined(MODM_CPU_AVR)
+#include <limits>
+#else
+#include <math.h>
+namespace std {
+template <typename T> struct numeric_limits {
+	static constexpr T quiet_NaN() { return NAN; }
+	static constexpr T infinity() { return INFINITY; }
+};
+}
+#endif
+
 // ----------------------------------------------------------------------------
 // simple IODevice which stores all data in a memory buffer
 // used for testing the output of an IOStream
@@ -305,6 +317,28 @@ IoStreamTest::testFloat4()
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 12);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 12U);
+}
+
+void
+IoStreamTest::testFloat5()
+{
+	char string[] = "nan";
+
+	(*stream) << std::numeric_limits<float>::quiet_NaN();
+
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 3);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 3U);
+}
+
+void
+IoStreamTest::testFloat6()
+{
+	char string[] = "inf";
+
+	(*stream) << std::numeric_limits<float>::infinity();
+
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 3);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 3U);
 }
 
 void

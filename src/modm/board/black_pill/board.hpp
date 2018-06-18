@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2016-2017, Sascha Schade
- * Copyright (c) 2017-2018, Niklas Hauser
+ *
+ * Copyright (c) 2018, Nick Sarten
  *
  * This file is part of the modm project.
  *
@@ -11,16 +11,16 @@
 // ----------------------------------------------------------------------------
 
 //
-// STM32F103C8T6 "Blue Pill" Minimum System Development Board
+// STM32F103C8T6 "Black Pill" Minimum System Development Board
 //
 // Cheap and bread-board-friendly board for STM32 F1 series.
 // Sold for less than 2 USD on well known Internet shops from China.
 //
-// http://wiki.stm32duino.com/index.php?title=Blue_Pill
+// http://wiki.stm32duino.com/index.php?title=Black_Pill
 //
 
-#ifndef MODM_STM32_F103C8T6_BLUE_PILL_HPP
-#define MODM_STM32_F103C8T6_BLUE_PILL_HPP
+#ifndef MODM_STM32_F103C8T6_BLACK_PILL_HPP
+#define MODM_STM32_F103C8T6_BLACK_PILL_HPP
 
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
@@ -94,7 +94,7 @@ struct systemClock {
 };
 
 // User LED (inverted, because connected to 3V3)
-using LedGreen = GpioInverted< GpioOutputC13 >;
+using LedGreen = GpioInverted< GpioOutputB12 >;
 using Leds = SoftwareGpioPort< LedGreen >;
 
 using Button = GpioUnused;
@@ -110,4 +110,4 @@ initialize()
 
 } // Board namespace
 
-#endif	// MODM_STM32_F103C8T6_BLUE_PILL_HPP
+#endif	// MODM_STM32_F103C8T6_BLACK_PILL_HPP

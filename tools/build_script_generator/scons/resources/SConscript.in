@@ -50,6 +50,9 @@ env.Append(CPPDEFINES=[
 %# ================================== STM32 ===================================
 %% if platform in ["stm32"]
 env["CPU"] = "{{ core }}"
+env.Append(CCFLAGS_warning=[
+    "-Werror=sign-compare",
+])
 env["LINKFLAGS_optimize"] = [
     "-Wl,--relax",
     "-Wl,--gc-sections",
@@ -64,6 +67,10 @@ env["LINKFLAGS_optimize"] = [
 env.Append(LINKFLAGS_other=["-Wl,--no-wchar-size-warning"])
 %# =================================== AVR ====================================
 %% elif platform in ["avr"]
+env.Append(CCFLAGS_warning=[
+    "-Werror=maybe-uninitialized",
+    "-Werror=overflow",
+])
 env["CCFLAGS_target"] = [
     "-mmcu={{ partname }}",
     "-DF_CPU=${CONFIG_CLOCK_F_CPU}"
@@ -90,6 +97,9 @@ env.Append(LINKFLAGS_target=[
     "-Lmodm/link",
     "-Tlinkerscript.ld"])
 %% endif
+env.Append(CCFLAGS_warning=[
+    "-Werror=format",
+])
 env.RemoveFromList("CCFLAGS_warning", [
     "-Wshadow",
     "-Wcast-align",
