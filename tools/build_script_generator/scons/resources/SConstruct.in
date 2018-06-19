@@ -17,19 +17,7 @@ build_path = "{{ build_path }}"
 modm_path = "modm"
 
 # SCons environment with all tools
-env = Environment(
-        toolpath=[join(modm_path, "scons", "site_tools"),
-                  join(modm_path, "ext", "dlr", "scons-build-tools", "site_tools")],
-        tools=[
-%% for tool in build_tools
-            "{{tool}}",
-%% endfor
-            "settings_buildpath",
-            "utils_buildformat",
-            "find_files",
-            ],
-        ENV=os.environ)
-env["BASEPATH"]  = abspath(modm_path)
+env = Environment(ENV=os.environ)
 env["BUILDPATH"] = abspath(build_path)
 
 # Building all libraries
@@ -63,7 +51,6 @@ for image in env.FindFiles("{{image_source}}", ".pbm"):
 files += env.XpccCommunication(
     xmlfile=abspath("{{xpcc_source}}"),
     container="{{xpcc_container}}",
-    dtdPath=abspath(join(modm_path, "tools", "system_design", "xml", "dtd")),
     path=abspath("{{xpcc_generate}}"),
     namespace="{{xpcc_namespace}}")
 %% endif

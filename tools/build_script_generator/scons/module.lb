@@ -91,7 +91,10 @@ def post_build(env, buildlog):
     platform = target.identifier["platform"]
     family = target.identifier["family"]
 
-    build_tools = []
+    build_tools = [
+        "settings_buildpath",
+        "utils_buildformat",
+        "find_files"]
     if len(env["xpcc.source"]): build_tools.append("system_design");
     if len(env["image.source"]): build_tools.append("bitmap");
     if env["info.git"] or env["info.build"]: build_tools.append("info");

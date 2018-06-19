@@ -12,6 +12,12 @@ from os.path import join, abspath
 
 Import("env")
 
+env.Append(toolpath=[abspath("scons/site_tools"), abspath("ext/dlr/scons-build-tools/site_tools")])
+%% for tool in build_tools | sort
+env.Tool("{{tool}}")
+%% endfor
+env["BASEPATH"] = abspath(".")
+
 env.Append(CPPPATH=[
 %% for path in metadata.include_path | sort
     abspath("{{ path }}"),
@@ -28,18 +34,18 @@ library = env.StaticLibrary(target="modm", source=files)
 
 env.Append(LIBS=[
     library,
-%% for library in metadata.required_library
+%% for library in metadata.required_library | sort
     "{{ library }}",
 %% endfor
 ])
 env.AppendUnique(LIBPATH=[abspath(str(library[0].get_dir()))])
 %% if "required_pkg" in metadata
-env.ParseConfig("pkg-config --cflags --libs {{ metadata.required_pkg | join(" ") }}")
+env.ParseConfig("pkg-config --cflags --libs {{ metadata.required_pkg | sort | join(" ") }}")
 %% endif
 
 %% if "cpp.define" in metadata
 env.Append(CPPDEFINES=[
-%% for define in metadata["cpp.define"]
+%% for define in metadata["cpp.define"] | sort
     "{{ define }}",
 %% endfor
 ])
