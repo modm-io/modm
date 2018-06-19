@@ -92,6 +92,7 @@ def git_info_defines(env):
 def build_info_defines(env):
 	cwd = env.Dir('#').abspath
 	defines = {}
+	defines['MODM_BUILD_PROJECT_NAME'] = env.get('CONFIG_PROJECT_NAME', 'Unknown')
 	defines['MODM_BUILD_MACHINE'] = platform.node()
 	defines['MODM_BUILD_USER'] = getpass.getuser()
 	# Generate OS String

@@ -19,6 +19,7 @@ modm_path = "modm"
 # SCons environment with all tools
 env = Environment(ENV=os.environ)
 env["BUILDPATH"] = abspath(build_path)
+env["CONFIG_PROJECT_NAME"] = project_name
 
 # Building all libraries
 env.SConscript(join(modm_path, "SConscript"), exports="env")
