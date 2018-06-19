@@ -21,48 +21,53 @@ import re
 from collections import defaultdict
 
 def is_git_available():
-	return (subprocess.call(['which', 'git'], stdout=open(os.devnull, 'wb')) is 0)
+	return (subprocess.call(['which', 'git'], cwd=os.getcwd(), stdout=open(os.devnull, 'wb')) is 0)
 
 # -----------------------------------------------------------------------------
-def git_show(format, ref='HEAD'):
+def git_show(cwd, format, ref='HEAD'):
 	""" git_show
 		returns a string containing the output from git show
 	"""
-	r = subprocess.check_output(['git', '--no-pager', 'show', ref, '--quiet', '--pretty=format:"' + format + '"'])
+	r = subprocess.check_output(
+	        ['git', '--no-pager', 'show', ref, '--quiet', '--pretty=format:"' + format + '"'],
+	        cwd=cwd)
 	# only use first line, because quiet does not seem to have the expected
 	# results for older git versions
 	return r.decode(locale.getpreferredencoding()).split('\n', 1)[0][1:-1]
 
-def git_config(key):
-	""" git_show
+def git_config(cwd, key):
+	""" git_config
 		returns a string containing the output from git config
 		returns an empty string if the command fails
 	"""
 	try:
-		return subprocess.check_output(['git', 'config', key]).decode(locale.getpreferredencoding()).split('\n', 1)[0]
+		r = subprocess.check_output(['git', 'config', key], cwd=cwd)
+		return r.decode(locale.getpreferredencoding()).split('\n', 1)[0][1:-1]
 	except subprocess.CalledProcessError:
 		return ""
 
 def git_info_defines(env):
+	cwd = env.Dir('#').abspath
 	defines = {}
 	try:
 		# Last Commit Values
-		defines['MODM_GIT_SHA']             = git_show('%H')
-		defines['MODM_GIT_SHA_ABBR']        = git_show('%h')
-		defines['MODM_GIT_AUTHOR']          = git_show('%an')
-		defines['MODM_GIT_AUTHOR_EMAIL']    = git_show('%ae')
-		defines['MODM_GIT_AUTHOR_DATE']     = git_show('%ad')
-		defines['MODM_GIT_AUTHOR_DATE_TIMESTAMP'] = git_show('%at')
-		defines['MODM_GIT_COMMITTER']       = git_show('%cn')
-		defines['MODM_GIT_COMMITTER_EMAIL'] = git_show('%ce')
-		defines['MODM_GIT_COMMITTER_DATE']  = git_show('%cd')
-		defines['MODM_GIT_COMMITTER_DATE_TIMESTAMP'] = git_show('%ct')
-		defines['MODM_GIT_SUBJECT']         = git_show('%s')
+		defines['MODM_GIT_SHA']             = git_show(cwd, '%H')
+		defines['MODM_GIT_SHA_ABBR']        = git_show(cwd, '%h')
+		defines['MODM_GIT_AUTHOR']          = git_show(cwd, '%an')
+		defines['MODM_GIT_AUTHOR_EMAIL']    = git_show(cwd, '%ae')
+		defines['MODM_GIT_AUTHOR_DATE']     = git_show(cwd, '%ad')
+		defines['MODM_GIT_AUTHOR_DATE_TIMESTAMP'] = git_show(cwd, '%at')
+		defines['MODM_GIT_COMMITTER']       = git_show(cwd, '%cn')
+		defines['MODM_GIT_COMMITTER_EMAIL'] = git_show(cwd, '%ce')
+		defines['MODM_GIT_COMMITTER_DATE']  = git_show(cwd, '%cd')
+		defines['MODM_GIT_COMMITTER_DATE_TIMESTAMP'] = git_show(cwd, '%ct')
+		defines['MODM_GIT_SUBJECT']         = git_show(cwd, '%s')
 		# Git Config
-		defines['MODM_GIT_CONFIG_USER_NAME']  = git_config('user.name')
-		defines['MODM_GIT_CONFIG_USER_EMAIL'] = git_config('user.email')
+		defines['MODM_GIT_CONFIG_USER_NAME']  = git_config(cwd, 'user.name')
+		defines['MODM_GIT_CONFIG_USER_EMAIL'] = git_config(cwd, 'user.email')
 		# Status
-		s = subprocess.check_output(['git', '--no-pager', 'status', '--porcelain']).decode(locale.getpreferredencoding()).split('\n')
+		s = subprocess.check_output(['git', '--no-pager', 'status', '--porcelain'], cwd=cwd)
+		s = s.decode(locale.getpreferredencoding()).split('\n')
 		f = defaultdict(int)
 		for line in s:
 			if len(line.strip()) > 0:
@@ -75,16 +80,17 @@ def git_info_defines(env):
 		defines['MODM_GIT_COPIED']    = f['C']
 		defines['MODM_GIT_UPDATED_NOT_MERGED'] = f['U']
 		defines['MODM_GIT_UNTRACKED'] = f['?']
-		defines = {k:"\\\"{}\\\"".format(v) for k, v in defines.items() }
+		defines = {k:"\\\"{}\\\"".format(str(v).replace("(", "\\(").replace(")", "\\)")) for k, v in defines.items() }
 	except subprocess.CalledProcessError as e:
 		env.Error('failed to run git command: %s' % e)
 
 	# We're not creating a header file for these, because all files are supposed to be checked
 	# in and checking in the header file with the git info utterly defeats the point of this.
 	# Instead we're adding these defines via the command line.
-	env.Append(CPPDEFINES=defines)
+	env.AppendUnique(CPPDEFINES=defines)
 
 def build_info_defines(env):
+	cwd = env.Dir('#').abspath
 	defines = {}
 	defines['MODM_BUILD_MACHINE'] = platform.node()
 	defines['MODM_BUILD_USER'] = getpass.getuser()
@@ -98,19 +104,20 @@ def build_info_defines(env):
 	defines['MODM_BUILD_OS'] = os
 	# This contains the version of the compiler that is used to build the project
 	try:
-		c = subprocess.check_output([env['CXX'], '--version']).decode(locale.getpreferredencoding()).split('\n', 1)[0]
+		c = subprocess.check_output([env['CXX'], '--version'], cwd=cwd)
+		c = c.decode(locale.getpreferredencoding()).split('\n', 1)[0]
 	except Exception as e:
 		env.Error("[CXX] compiler " + env['CXX'] + " is not in path or could not be executed")
 		Exit(1)
 
-	m = re.match("(?P<name>[a-z\-\+]+)[a-zA-Z\(\) ]* (?P<version>\d+\.\d+\.\d+)", c)
+	m = re.match(r"(?P<name>[a-z\-\+]+)[a-zA-Z\(\) ]* (?P<version>\d+\.\d+\.\d+)", c)
 	if m: comp = "{0} {1}".format(m.group('name'), m.group('version'))
 	else: comp = c
 	defines['MODM_BUILD_COMPILER'] = comp
 	defines = {k:"\\\"{}\\\"".format(v) for k, v in defines.items() }
 
 	# CPP defines instead of a header files.
-	env.Append(CPPDEFINES=defines)
+	env.AppendUnique(CPPDEFINES=defines)
 
 
 def generate(env, **kw):
