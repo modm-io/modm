@@ -20,3 +20,7 @@ def prepare(module, options):
 def build(env):
     env.outbasepath = "modm/src/modm/math"
     env.copy("tolerance.hpp")
+
+    env.outbasepath = "modm/src/modm"
+    headers = env.get_generated_local_files(filterfunc=lambda path: ".h" in path and not "_impl.h" in path)
+    env.template("math.hpp.in", substitutions={"headers": sorted(headers)})
