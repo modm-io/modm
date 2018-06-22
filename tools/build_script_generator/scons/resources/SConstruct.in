@@ -22,7 +22,7 @@ env["BUILDPATH"] = abspath(build_path)
 env["CONFIG_PROJECT_NAME"] = project_name
 
 # Building all libraries
-env.SConscript(join(modm_path, "SConscript"), exports="env")
+env.SConscript(dirs=[modm_path], exports="env")
 
 %% if info_git
 env.InfoGit()
@@ -37,8 +37,8 @@ headers = env.FindHeaderFiles(join(modm_path, "test"))
 files = env.UnittestRunner(target="main.cpp", source=headers, template="modm/test/runner.cpp.in")
 %% else
 # Finding application sources
-env.Append(CPPPATH=["."])
-files = env.FindSourceFiles(".", ignore="modm/**/*")
+env.Append(CPPPATH=".")
+files = env.FindSourceFiles(".", ignorePaths="modm")
 %% endif
 
 %% if image_source != ""

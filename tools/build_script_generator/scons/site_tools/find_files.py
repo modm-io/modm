@@ -11,6 +11,7 @@
 # -----------------------------------------------------------------------------
 
 from pathlib import Path
+from os.path import join
 
 def listify(node):
 	return [node,] if not isinstance(node, list) else node
@@ -25,10 +26,12 @@ class Scanner:
 		self.env = env
 		self.files = []
 
-	def scan(self, basepath, extensions, ignore=None):
+	def scan(self, basepath, extensions, ignorePaths=None, ignoreFiles=None):
+		if ignoreFiles is None: ignoreFiles = [];
+		else: ignoreFiles = listify(ignoreFiles);
+		if ignorePaths is not None: ignoreFiles += [join(f, "**/*") for f in listify(ignorePaths)];
 		files = set(str(p) for ext in listify(extensions) for p in Path(basepath).glob("**/*{}".format(ext)))
-		if ignore is not None:
-			files -= set(str(p) for ign in listify(ignore) for p in Path(basepath).glob(ign))
+		files -= set(str(p) for ign in listify(ignoreFiles) for p in Path(basepath).glob(ign))
 		self.files = sorted(list(files))
 
 	def __str__(self):
@@ -38,16 +41,16 @@ class Scanner:
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
-	def find_files(env, basepath, extensions, ignore=None):
+	def find_files(env, basepath, extensions, ignorePaths=None, ignoreFiles=None):
 		scanner = Scanner(env)
-		scanner.scan(basepath, extensions, ignore)
+		scanner.scan(basepath, extensions, ignorePaths, ignoreFiles)
 		return scanner.files
 
-	def find_source_files(env, basepath, ignore=None):
-		return find_files(env, basepath, Scanner.SOURCE, ignore)
+	def find_source_files(env, basepath, ignorePaths=None, ignoreFiles=None):
+		return find_files(env, basepath, Scanner.SOURCE, ignorePaths, ignoreFiles)
 
-	def find_header_files(env, basepath, ignore=None):
-		return find_files(env, basepath, Scanner.HEADER, ignore)
+	def find_header_files(env, basepath, ignorePaths=None, ignoreFiles=None):
+		return find_files(env, basepath, Scanner.HEADER, ignorePaths, ignoreFiles)
 
 	env.AddMethod(find_files, "FindFiles")
 	env.AddMethod(find_source_files, "FindSourceFiles")
