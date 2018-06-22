@@ -11,7 +11,7 @@
 # -----------------------------------------------------------------------------
 
 from pathlib import Path
-from os.path import join
+from os.path import join, relpath, isabs
 
 def listify(node):
 	return [node,] if not isinstance(node, list) else node
@@ -29,7 +29,9 @@ class Scanner:
 	def scan(self, basepath, extensions, ignorePaths=None, ignoreFiles=None):
 		if ignoreFiles is None: ignoreFiles = [];
 		else: ignoreFiles = listify(ignoreFiles);
-		if ignorePaths is not None: ignoreFiles += [join(f, "**/*") for f in listify(ignorePaths)];
+		if ignorePaths is not None:
+			ignorePaths = [relpath(p, basepath) if isabs(p) else p for p in listify(ignorePaths)]
+			ignoreFiles += [join(f, "**/*") for f in ignorePaths];
 		files = set(str(p) for ext in listify(extensions) for p in Path(basepath).glob("**/*{}".format(ext)))
 		files -= set(str(p) for ign in listify(ignoreFiles) for p in Path(basepath).glob(ign))
 		self.files = sorted(list(files))
