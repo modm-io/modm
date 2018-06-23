@@ -33,7 +33,9 @@ def git_show(cwd, format, ref='HEAD'):
 	        cwd=cwd)
 	# only use first line, because quiet does not seem to have the expected
 	# results for older git versions
-	return r.decode(locale.getpreferredencoding()).split('\n', 1)[0][1:-1]
+	r = r.decode(locale.getpreferredencoding()).split('\n', 1)[0]
+	if r.startswith("\""): r = r[1:-1];
+	return r
 
 def git_config(cwd, key):
 	""" git_config
@@ -42,14 +44,17 @@ def git_config(cwd, key):
 	"""
 	try:
 		r = subprocess.check_output(['git', 'config', key], cwd=cwd)
-		return r.decode(locale.getpreferredencoding()).split('\n', 1)[0][1:-1]
+		r = r.decode(locale.getpreferredencoding()).split('\n', 1)[0]
+		if r.startswith("\""): r = r[1:-1];
+		return r
 	except subprocess.CalledProcessError:
 		return ""
 
-def git_info_defines(env):
+def git_info_defines(env, with_status=False):
 	cwd = env.Dir('#').abspath
 	defines = {}
 	try:
+		defines['MODM_GIT_INFO']  = "1"
 		# Last Commit Values
 		defines['MODM_GIT_SHA']             = git_show(cwd, '%H')
 		defines['MODM_GIT_SHA_ABBR']        = git_show(cwd, '%h')
@@ -66,20 +71,23 @@ def git_info_defines(env):
 		defines['MODM_GIT_CONFIG_USER_NAME']  = git_config(cwd, 'user.name')
 		defines['MODM_GIT_CONFIG_USER_EMAIL'] = git_config(cwd, 'user.email')
 		# Status
-		s = subprocess.check_output(['git', '--no-pager', 'status', '--porcelain'], cwd=cwd)
-		s = s.decode(locale.getpreferredencoding()).split('\n')
-		f = defaultdict(int)
-		for line in s:
-			if len(line.strip()) > 0:
-				c = line.strip()[0]
-				f[c] = f[c] + 1
-		defines['MODM_GIT_MODIFIED']  = f['M']
-		defines['MODM_GIT_ADDED']     = f['A']
-		defines['MODM_GIT_DELETED']   = f['D']
-		defines['MODM_GIT_RENAMED']   = f['R']
-		defines['MODM_GIT_COPIED']    = f['C']
-		defines['MODM_GIT_UPDATED_NOT_MERGED'] = f['U']
-		defines['MODM_GIT_UNTRACKED'] = f['?']
+		if with_status:
+			s = subprocess.check_output(['git', '--no-pager', 'status', '--porcelain'], cwd=cwd)
+			s = s.decode(locale.getpreferredencoding()).split('\n')
+			f = defaultdict(int)
+			for line in s:
+				if len(line.strip()) > 0:
+					c = line.strip()[0]
+					f[c] = f[c] + 1
+			defines['MODM_GIT_STATUS']    = "1"
+			defines['MODM_GIT_MODIFIED']  = f['M']
+			defines['MODM_GIT_ADDED']     = f['A']
+			defines['MODM_GIT_DELETED']   = f['D']
+			defines['MODM_GIT_RENAMED']   = f['R']
+			defines['MODM_GIT_COPIED']    = f['C']
+			defines['MODM_GIT_UPDATED_NOT_MERGED'] = f['U']
+			defines['MODM_GIT_UNTRACKED'] = f['?']
+		# Format and escape all defines
 		defines = {k:"\\\"{}\\\"".format(str(v).replace("(", "\\(").replace(")", "\\)")) for k, v in defines.items() }
 	except subprocess.CalledProcessError as e:
 		env.Error('failed to run git command: %s' % e)

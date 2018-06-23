@@ -9,7 +9,7 @@
     <option name=":build.scons:include_sconstruct">True</option>
     <option name=":build.scons:is_unittest">True</option>
     <option name=":build.scons:info.build">True</option>
-    <!-- <option name=":build.scons:info.git">True</option> -->
+    <!-- <option name=":build.scons:info.git">Info+Status</option> -->
   </options>
 
   <modules>

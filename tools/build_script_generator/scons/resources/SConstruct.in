@@ -24,8 +24,8 @@ env["CONFIG_PROJECT_NAME"] = project_name
 # Building all libraries
 env.SConscript(dirs=[modm_path], exports="env")
 
-%% if info_git
-env.InfoGit()
+%% if info_git != "Disabled"
+env.InfoGit({{ "True" if "Status" in info_git else "False" }})
 %% endif
 %% if info_build
 env.InfoBuild()

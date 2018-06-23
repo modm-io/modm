@@ -54,8 +54,9 @@ def prepare(module, options):
                      description="Namespace of the generated XPCC communications"))
 
     module.add_option(
-        BooleanOption(name="info.git", default=False,
-                      description="Generate CPP defines about the git repository state"))
+        EnumerationOption(name="info.git", default="Disabled",
+                          enumeration=["Disabled", "Info", "Info+Status"],
+                          description="Generate CPP defines about the git repository state"))
     module.add_option(
         BooleanOption(name="info.build", default=False,
                       description="Generate CPP defines about the build state"))
@@ -97,7 +98,7 @@ def post_build(env, buildlog):
         "find_files"]
     if len(env["xpcc.source"]): build_tools.append("system_design");
     if len(env["image.source"]): build_tools.append("bitmap");
-    if env["info.git"] or env["info.build"]: build_tools.append("info");
+    if env["info.git"] != "Disabled" or env["info.build"]: build_tools.append("info");
     if env["is_unittest"]: build_tools.append("unittest")
     if platform in ["stm32"]:
         build_tools.extend(["compiler_arm_none_eabi_gcc", "program_openocd", "utils_buildsize"])
