@@ -296,7 +296,7 @@ public:
 		channel -= 1;	// 1..2 -> 0..1
 
 		{
-			uint32_t flags = static_cast<uint32_t>(OutputCompareMode::ForceLow);
+			uint32_t flags = static_cast<uint32_t>(OutputCompareMode::ForceInactive);
 
 			if (channel <= 1)
 			{
@@ -327,7 +327,7 @@ public:
 		channel -= 1;	// 1..2 -> 0..1
 
 		{
-			uint32_t flags = static_cast<uint32_t>(OutputCompareMode::ForceHigh);
+			uint32_t flags = static_cast<uint32_t>(OutputCompareMode::ForceActive);
 
 			if (channel <= 1)
 			{
