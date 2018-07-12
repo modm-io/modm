@@ -1,0 +1,34 @@
+/*
+ * Copyright (c) 2009-2010, Martin Rosekeit
+ * Copyright (c) 2009-2011, Fabian Greif
+ * Copyright (c) 2012-2013, 2015, 2018 Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_PWM_LED_TABLE_HPP
+#define MODM_PWM_LED_TABLE_HPP
+
+#include <stdint.h>
+#include <modm/architecture/interface/accessor_flash.hpp>
+
+namespace modm
+{
+
+namespace ui
+{
+%% for t in tables
+	/// {{t.gamma / 10}} gamma correction with {{t.bit}}-bit resolution (0 to {{t.bit_range - 1}}) in {{t.range}} steps at {{t.size}} bytes.
+	extern modm::accessor::Flash<{{t.type}}> table{{t.gamma}}_{{t.bit}}_{{t.range}};
+
+%% endfor
+}
+
+}
+
+#endif	// MODM_PWM_LED_TABLE_HPP

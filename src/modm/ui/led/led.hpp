@@ -53,60 +53,60 @@ namespace ui
 class Led
 {
 public:
-	modm_always_inline Led(): Led(nullptr) {}
+	inline Led(): Led(nullptr) {}
 
 	/// Requires a handler function pointer for value updates.
-	modm_always_inline Led(Animation<uint8_t>::Handler handler):
+	inline Led(Animation<uint8_t>::Handler handler):
 		animation(brightness, handler), brightness(0) {}
 
 	/// @param	brightness
 	///		between 0 and length of lookup-table (usually 255)
-	modm_always_inline void
+	inline void
 	setBrightness(uint8_t brightness)
 	{ animation.setValue(brightness); }
 
 	/// @return brightness of the LED
-	modm_always_inline uint8_t
+	inline uint8_t
 	getBrightness() const
 	{ return animation.getValue(); }
 
 	/// @return `true` if LED is currently fading to another brightness,
 	///			`false` if otherwise
-	modm_always_inline bool
+	inline bool
 	isFading() const
 	{ return animation.isAnimating(); }
 
 	/// Fade from the current brightness to a new brightness in the specified ms.
 	/// Fading times of more than ~32s are not possible. You must control
 	/// fading externally in that case.
-	modm_always_inline void
+	inline void
 	fadeTo(uint8_t brightness, uint16_t time)
 	{ animation.animateTo(brightness, time); }
 
 	/**
-	 * Mimmics the behaviour of normal lamps, which take a small amount
+	 * Mimics the behavior of normal lamps, which take a small amount
 	 * of time until achieving full brightness.
 	 * @param	time
 	 * 		specify the fade up time in ms, `0` to turn the LED on instantly
 	 */
-	modm_always_inline void
+	inline void
 	on(uint16_t time=75)
 	{ fadeTo(255, time); }
 
 	/**
-	 * Mimmics the behaviour of normal lamps, which take a small amount
+	 * Mimics the behavior of normal lamps, which take a small amount
 	 * of time until fully extinguished.
 	 * @param	time
 	 * 		specify the fade up time in ms, `0` to turn the LED off instantly
 	 */
-	modm_always_inline void
+	inline void
 	off(uint16_t time=120)
 	{ fadeTo(0, time); }
 
 	/// Can be called at a interval of 1ms or less.
 	/// If you do not need 1ms response time (e.g. for on(), off()),
 	/// you may call this at intervals < 255ms.
-	modm_always_inline void
+	inline void
 	update()
 	{ animation.update(); }
 

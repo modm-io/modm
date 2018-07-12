@@ -10,11 +10,33 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
+import itertools, math
+
 def init(module):
     module.parent = "ui"
     module.name = "led"
 
 def prepare(module, options):
+
+    module.add_option(
+        SetOption(
+            name="gamma",
+            description="Gamma correction of values",
+            enumeration=[1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5],
+            default=2.2))
+    module.add_option(
+        SetOption(
+            name="bit",
+            description="Resolution of target values",
+            enumeration=[4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+            default=[7, 8, 10, 12, 16]))
+    module.add_option(
+        SetOption(
+            name="range",
+            description="Range of input values",
+            enumeration=[10, 16, 20, 32, 50, 64, 100, 128, 200, 256, 500, 512, 1000, 1024],
+            default=256))
+
     module.depends(
         ":architecture:accessor",
         ":architecture:clock",
@@ -23,7 +45,66 @@ def prepare(module, options):
         ":ui:color")
     return True
 
+tables = []
+
+def pre_build(env):
+    option_table = itertools.product(
+        sorted(env[":::gamma"]), sorted(env[":::bit"]), sorted(env[":::range"]))
+
+    for gamma, bit, length in option_table:
+        env.log.info("Generating led table with gamma: {}, bit: {}, range: {}".format(gamma, bit, length))
+        # specifies how many values are written per line
+        values_per_line = 16
+
+        # check which type width is needed
+        size = 1 if bit <= 8 else 2
+        ttype = "uint{}_t".format(size * 8)
+        size *= length
+
+        values = []
+        bmax = 2 ** bit - 1
+
+        for index in range(length):
+            # generate the value for the index
+            value = int(( bmax / ((length - 1) ** gamma)) * (index ** gamma))
+
+            # 0 only on index 0, otherwise at least 1
+            if index != 0 and value == 0:
+                value = 1
+            # Force last value to be max value
+            if index == length-1:
+                value = bmax
+
+            values.append(value)
+
+        global tables
+        tables.append({
+            "gamma": int(10 * gamma),
+            "type": ttype,
+            "bit": bit,
+            "bit_range": 2 ** bit,
+            "size": size,
+            "range": length,
+
+            "table": values,
+            "line": values_per_line,
+        })
+
 def build(env):
     env.outbasepath = "modm/src/modm/ui/led"
-    env.copy(".", ignore=env.ignore_patterns("*.lb"))
+    env.copy("led.hpp")
+    env.copy("rgb.hpp")
     env.copy("../led.hpp")
+
+    global tables
+    env.substitutions = {"tables": tables}
+    env.template("tables.hpp.in")
+
+    env.outbasepath = "modm/src/modm/ui/led/tables"
+    for table in tables:
+        env.substitutions = table
+        env.template("table.cpp.in", "table{gamma}_{bit}_{range}.cpp".format(**table))
+
+
+
+

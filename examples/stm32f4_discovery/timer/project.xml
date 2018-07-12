@@ -3,6 +3,9 @@
   <extends>../../../src/modm/board/disco_f407vg/board.xml</extends>
   <options>
     <option name=":build.scons:build.path">../../../build/stm32f4_discovery/timer</option>
+    <option name=":ui:led:gamma">2.2,2.0</option>
+    <option name=":ui:led:bit">14,8,16</option>
+    <option name=":ui:led:range">10,100,256</option>
   </options>
   <modules>
     <module>:platform:timer:4</module>
