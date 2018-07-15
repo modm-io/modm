@@ -1,0 +1,84 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2018, Raphael Lehmann
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+class Instance(Module):
+    def __init__(self, instance):
+        self.instance = instance
+
+    def init(self, module):
+        module.name = str(self.instance)
+        module.description = "COMP {} instance".format(self.instance)
+
+    def prepare(self, module, options):
+        module.depends(":platform:comp")
+        return True
+
+    def build(self, env):
+        device = env[":target"]
+        driver = device.get_driver("comp")
+
+        properties = device.properties
+        properties["target"] = device.identifier
+        properties["partname"] = device.partname
+        instance_id = int(self.instance)
+        properties["id"] = instance_id
+        properties["csr"] = "COMP_CSR_" if device.identifier["family"] in ["l4"] else "COMP_CSR_COMPx"
+
+        env.substitutions = properties
+        env.outbasepath = "modm/src/modm/platform/comp"
+
+        env.template("comp.hpp.in", "comp_{}.hpp".format(self.instance))
+
+
+def init(module):
+    module.name = "comp"
+    module.parent = "platform"
+
+def prepare(module, options):
+    device = options[":target"]
+
+    if not device.has_driver("comp:stm32*"):
+        return False
+
+    if not device.get_driver("comp")["type"] in ["stm32-v1.3", "stm32-tsmc90_cube"]:
+        return False
+
+    # Only some STM32F3 and STM32L4
+    if device.identifier["family"] == "f3":
+        if not device.identifier["name"] in ["03", "28", "58", "98"]:
+            return False
+    elif device.identifier["family"] == "l4":
+        if not device.identifier["name"] in ["31", "32", "33", "42", "43", "51", "52", "62"]:
+            return False
+    else:
+        return False
+
+    module.depends(":cmsis:device")
+
+    for instance in listify(device.get_driver("comp")["instance"]):
+        module.add_submodule(Instance(int(instance)))
+
+    return True
+
+def build(env):
+    device = env[":target"]
+    driver = device.get_driver("comp")
+
+    properties = device.properties
+    properties["target"] = device.identifier
+    properties["partname"] = device.partname
+    properties["driver"] = driver
+    properties["csr"] = "COMP_CSR_" if device.identifier["family"] in ["l4"] else "COMP_CSR_COMPx"
+
+    env.substitutions = properties
+    env.outbasepath = "modm/src/modm/platform/comp"
+    env.template("base.hpp.in", "base.hpp")

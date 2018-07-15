@@ -221,7 +221,7 @@ PlatformGpioTest::testConnect()
 		%% if af
 		TEST_ASSERT_TRUE((GPIO{{port}}->MODER & (3ul << {{pin*2}})) == (2ul << {{pin*2}}));
 		TEST_ASSERT_TRUE((GPIO{{port}}->AFR[{{pin//8}}] & (15ul << {{(pin % 8) * 4}})) == ({{af}}ul << {{(pin % 8) * 4}}));
-		%% elif peripheral.startswith("Adc") or peripheral.startswith("Dac")
+		%% elif peripheral.startswith("Adc") or peripheral.startswith("Dac") or peripheral.startswith("Comp")
 		TEST_ASSERT_TRUE((GPIO{{port}}->MODER & (3ul << {{pin*2}})) == (3ul << {{pin*2}}));
 		%% endif
 	%% endfor

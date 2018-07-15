@@ -203,7 +203,8 @@ struct Gpio{{ port ~ pin }}::{{ signal.name }}<Peripheral::{{ signal.driver }}>
 	{
 		%% if signal.af | length
 		setAlternateFunction({{ signal.af[0] }});
-		%% elif signal.driver.startswith("Adc") or signal.driver.startswith("Dac")
+		%% elif ( signal.driver.startswith("Adc") or signal.driver.startswith("Dac")
+			or signal.driver.startswith("Comp") )
 		disconnect();
 		setAnalogInput();
 		%% endif

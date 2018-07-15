@@ -1,0 +1,66 @@
+/*
+ * Copyright (c) 2018, Raphael Lehmann
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32_COMP_BASE_HPP
+#define MODM_STM32_COMP_BASE_HPP
+
+/**
+ * @ingroup 	{{partname}}
+ * @defgroup	{{partname}}_comp Comparator
+ */
+namespace modm::platform
+{
+	class CompBase
+	{
+	public:
+		enum class
+		Mode
+		{
+			{% if driver.type in ["stm32-v1.3"] -%}
+			UltraLowPower	= 0b00 << 2,
+			LowPower		= 0b01 << 2,
+			MediumSpeed		= 0b10 << 2,
+			HighSpeed		= 0b11 << 2,
+			{% elif driver.type in ["stm32-tsmc90_cube"] -%}
+			HighSpeed		= 0b00 << 2,
+			MediumSpeed		= 0b01 << 2,
+			//MediumSpeed2	= 0b10 << 2,
+			UltraLowPower	= 0b11 << 2,
+			{% endif -%}
+		};
+	protected:
+		static constexpr uint32_t ModeMask = 0b11 << 2;
+
+	public:
+		enum class
+		Polarity
+		{
+			NonInverted	= 0b0 << 15,
+			Inverted	= 0b1 << 15,
+		};
+	protected:
+		static constexpr uint32_t PolarityMask = 0b1 << 15;
+
+	public:
+		enum class
+		Hysteresis
+		{
+			NoHysteresis		= 0b00 << 16,
+			LowHysteresis		= 0b01 << 16,
+			MediumHysteresis	= 0b10 << 16,
+			HighHysteresis		= 0b11 << 16,
+		};
+	protected:
+		static constexpr uint32_t HysteresisMask = 0b11 << 16;
+	};
+}
+
+#endif	//  MODM_STM32_COMP_BASE_HPP
