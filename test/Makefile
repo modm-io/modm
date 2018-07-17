@@ -28,6 +28,12 @@ run-hosted-darwin:
 	$(call compile-test,hosted,run,-D":target=hosted-darwin")
 
 
+compile-nucleo-f401:
+	$(call compile-test,nucleo-f401,size)
+run-nucleo-f401:
+	$(call run-test,nucleo-f401,size)
+
+
 compile-nucleo-f411:
 	$(call compile-test,nucleo-f411,size)
 run-nucleo-f411:
