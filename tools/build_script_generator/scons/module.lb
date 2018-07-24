@@ -95,7 +95,9 @@ def post_build(env, buildlog):
     build_tools = [
         "settings_buildpath",
         "utils_buildformat",
-        "find_files"]
+        "find_files",
+        "template",
+        "cmake_wrapper"]
     if len(env["xpcc.source"]): build_tools.append("system_design");
     if len(env["image.source"]): build_tools.append("bitmap");
     if env["info.git"] != "Disabled" or env["info.build"]: build_tools.append("info");

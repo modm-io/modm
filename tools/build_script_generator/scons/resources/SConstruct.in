@@ -34,22 +34,22 @@ env.InfoBuild()
 %% if options["::is_unittest"]
 # Building unit tests
 headers = env.FindHeaderFiles(join(modm_path, "test"))
-files = env.UnittestRunner(target="main.cpp", source=headers, template="modm/test/runner.cpp.in")
+sources = env.UnittestRunner(target="main.cpp", source=headers, template="modm/test/runner.cpp.in")
 %% else
 # Finding application sources
 env.Append(CPPPATH=".")
-files = env.FindSourceFiles(".", ignorePaths="modm")
+sources = env.FindSourceFiles(".", ignorePaths=["modm", "cmake-build-*"])
 %% endif
 
 %% if image_source != ""
 # Finding image sources
 for image in env.FindFiles("{{image_source}}", ".pbm"):
     source, _ = env.Bitmap(str(image))
-    files.append(source)
+    sources.append(source)
 %% endif
 %% if xpcc_source != ""
-# Generating XPCC files
-files += env.XpccCommunication(
+# Generating XPCC sources
+sources += env.XpccCommunication(
     xmlfile=abspath("{{xpcc_source}}"),
     container="{{xpcc_container}}",
     path=abspath("{{xpcc_generate}}"),
@@ -62,9 +62,10 @@ env.Append(CONFIG_OPENOCD_CONFIGFILES=["{{openocd_file}}"])
 %% endif
 %#
 # Building application
-program = env.Program(target=project_name+".elf", source=files)
+program = env.Program(target=project_name+".elf", source=sources)
 
 # SCons functions
+env.Alias("cmakewrapper", env.CMakeWrapper())
 env.Alias("symbols", env.Symbols(program))
 env.Alias("listing", env.Listing(program))
 env.Alias("bin", env.Bin(program))
