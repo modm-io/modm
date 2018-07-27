@@ -58,7 +58,7 @@ jobs:
       - run:
           name: Examples STM32F0 Series
           command: |
-            (cd examples && ../tools/scripts/examples_compile.py stm32f0_discovery stm32f072_discovery nucleo_f031k6 stm32f030f4p6_demo_board)
+            (cd examples && ../tools/scripts/examples_compile.py stm32f0_discovery stm32f072_discovery nucleo_f031k6 nucleo_f042k6 stm32f030f4p6_demo_board)
       - run:
           name: Examples STM32F1 Series
           command: |
