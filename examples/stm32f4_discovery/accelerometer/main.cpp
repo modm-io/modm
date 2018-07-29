@@ -116,7 +116,7 @@ main()
 	Board::lis3::Cs::setOutput(modm::Gpio::High);
 	Board::lis3::Mosi::setOutput(modm::Gpio::High);
 
-	lis::I2cMaster::connect<lis::Scl::BitBang, lis::Sda::BitBang>(MyI2cMaster::PullUps::Internal);
+	lis::I2cMaster::connect<lis::Scl::BitBang, lis::Sda::BitBang>(lis::I2cMaster::PullUps::Internal);
 	lis::I2cMaster::initialize<Board::systemClock, 400000>();
 #else
 	Board::initializeLis3();
