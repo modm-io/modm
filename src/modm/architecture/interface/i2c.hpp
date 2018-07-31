@@ -123,12 +123,11 @@ struct I2c
 	{
 		static_assert(baudrate <= 500000, "I2c::resetDevices() can only do max. 500kHz!");
 		constexpr uint32_t delay = 500000 / baudrate;
-		Scl::setInput();
 
 		for (uint_fast8_t ii = 0; ii < 9; ++ii) {
-			Scl::setOutput(modm::Gpio::Low);
+			Scl::reset();
 			modm::delayMicroseconds(delay);
-			Scl::setInput();
+			Scl::set();
 			modm::delayMicroseconds(delay);
 		}
 	}
