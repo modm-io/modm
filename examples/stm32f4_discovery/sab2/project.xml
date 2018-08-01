@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <extends>../../../src/modm/board/disco_f407vg/board.xml</extends>
+  <options>
+    <option name=":build.scons:build.path">../../../build/stm32f4_discovery/sab2</option>
+  </options>
+  <modules>
+    <module>:platform:gpio</module>
+    <module>:communication:sab2</module>
+    <module>:platform:uart:1</module>
+    <module>:platform:uart:4</module>
+    <module>:build.scons</module>
+  </modules>
+</library>
