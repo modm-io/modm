@@ -1,0 +1,131 @@
+/*
+ * Copyright (c) 2016, 2018, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include <modm/platform/uart/uart_{{ id }}.hpp>
+#include <CrashCatcher.h>
+
+extern "C" modm_weak bool
+modm_hardfault_coredump_start()
+{ return true; }
+
+extern "C" const CrashCatcherMemoryRegion*
+CrashCatcher_GetMemoryRegions(void)
+{
+	static const CrashCatcherMemoryRegion regions[] = {
+%% for m in memory
+		{ {{ m["start"] }}, {{m["start"]}} + {{m["size"]}}, CRASH_CATCHER_BYTE }, // {{ m["name"] | upper }}
+%% endfor
+		{ 0xFFFFFFFF, 0xFFFFFFFF, CRASH_CATCHER_BYTE }
+	};
+	return regions;
+}
+
+MODM_ISR_DECL({{ uart | upper ~ id }});
+using Uart = modm::platform::{{ uart ~ id }};
+using UartHal = modm::platform::{{ uart }}Hal{{ id }};
+// since the hard fault handler cannot be preempted by any other handler or IRQ
+// we have to manually call it here. Not pretty, but it works.
+void flushUart()
+{
+	while(not Uart::isWriteFinished())
+	{
+		if (UartHal::isTransmitRegisterEmpty())
+		{
+			MODM_ISR_CALL({{ uart | upper ~ id }});
+		}
+	}
+}
+
+void printStr(const char *str)
+{
+	while(*str)
+		Uart::write(*str++);
+	flushUart();
+}
+
+extern "C" void
+CrashCatcher_putc(int c)
+{ Uart::write(c); flushUart(); }
+
+extern "C" int
+CrashCatcher_getc(void)
+{ return -1; }
+
+extern "C" void
+CrashCatcher_DumpStart(const CrashCatcherInfo *)
+{
+	if (not modm_hardfault_coredump_start())
+		NVIC_SystemReset();
+	Uart::discardTransmitBuffer();
+	printStr("\n\n>>> HARDFAULT\n\n");
+}
+
+void hexlify(uint8_t byte)
+{
+	CrashCatcher_putc( "0123456789ABCDEF"[byte >> 4] );
+	CrashCatcher_putc( "0123456789ABCDEF"[byte & 0xF] );
+}
+
+void dumpMemory(const uint8_t *buffer, size_t size)
+{
+	for (size_t ii = 1; ii <= size; ii++)
+	{
+		// 16 bytes => line break
+		if (ii % 16 == 0) CrashCatcher_putc('\n');
+		hexlify(*buffer++);
+	}
+}
+
+extern "C" void
+CrashCatcher_DumpMemory(const void* pvMemory,
+						CrashCatcherElementSizes elementSize,
+						size_t elementCount)
+{
+	switch (elementSize)
+	{
+		case CRASH_CATCHER_BYTE:
+			dumpMemory((const uint8_t *) pvMemory, elementCount);
+			break;
+		case CRASH_CATCHER_HALFWORD:
+		{
+			const uint16_t *pMemory = (const uint16_t *) pvMemory;
+			for (size_t ii = 1; ii <= elementCount; ii++)
+			{
+				uint16_t val = *pMemory++;
+				// 8 half words => line break
+				if (ii % 8 == 0) CrashCatcher_putc('\n');
+				dumpMemory((uint8_t *) &val, sizeof(val));
+			}
+			break;
+		}
+		case CRASH_CATCHER_WORD:
+		{
+			const uint32_t *pMemory = (const uint32_t *) pvMemory;
+			for (size_t ii = 1; ii <= elementCount; ii++)
+			{
+				uint32_t val = *pMemory++;
+				// 4 words => line break
+				if (ii % 4 == 0) CrashCatcher_putc('\n');
+				dumpMemory((uint8_t *) &val, sizeof(val));
+			}
+			break;
+		}
+	}
+	CrashCatcher_putc('\n');
+}
+
+extern "C" CrashCatcherReturnCodes
+CrashCatcher_DumpEnd(void)
+{
+	printStr("\n\n<<< HARDFAULT\n\n");
+	NVIC_SystemReset();
+	return CRASH_CATCHER_EXIT;
+}

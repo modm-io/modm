@@ -40,6 +40,10 @@ def prepare(module, options):
 
     return True
 
+def pre_build(env):
+    if env.has_module(":platform:fault.coredump"):
+        raise PreBuildException("Conflict with :platform:fault.coredump module!")
+
 def build(env):
     device = env[":target"]
     driver = device.get_driver("core")

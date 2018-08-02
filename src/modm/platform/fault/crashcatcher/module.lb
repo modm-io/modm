@@ -1,0 +1,75 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2016-2018, Niklas Hauser
+# Copyright (c) 2017, Fabian Greif
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+import os
+
+def init(module):
+    module.parent = "platform"
+    module.name = "fault.coredump"
+
+def prepare(module, options):
+    if not options[":target"].has_driver("core:cortex-m*"):
+        return False
+
+    if options[":target"].identifier["platform"] not in ["stm32"]:
+        return False
+
+    module.depends(
+        ":platform:uart",
+        ":crashcatcher")
+
+    uarts = sorted([i for u in (options[":target"].get_all_drivers("uart") +
+                                options[":target"].get_all_drivers("usart"))
+                      for i in u["instance"]])
+    if len(uarts):
+        module.add_option(
+            EnumerationOption(
+                name="uart",
+                description="Choose the UART instance to dump over",
+                enumeration=uarts,
+                default=uarts[0]))
+
+    module.add_option(
+        EnumerationOption(
+            name="level",
+            description="Dump detail",
+            enumeration=["core", "memory", "peripheral"],
+            default="memory"))
+
+    return True
+
+def pre_build(env):
+    if env.has_module(":platform:fault.minimal"):
+        raise PreBuildException("Conflict with :platform:fault.minimal module!")
+
+def build(env):
+    device = env[":target"]
+    driver = device.get_driver("core")
+    inst = env[":::uart"]
+    uart = "Uart"
+    if inst in [i for u in device.get_all_drivers("usart") for i in u["instance"]]:
+        uart = "Usart"
+
+    properties = device.properties
+    properties["partname"] = device.partname
+    properties["core"] = driver["type"]
+    properties["uart"] = uart
+    properties["id"] = inst
+    properties["memory"] = []
+    if env[":::level"] in ["memory", "peripheral"]:
+        properties["memory"] = [m for m in listify(driver["memory"]) if "w" in m["access"]]
+
+    env.substitutions = properties
+    env.outbasepath = "modm/src/modm/platform/fault"
+
+    env.template("crashcatcher_handler.cpp.in")
