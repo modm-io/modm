@@ -13,3 +13,6 @@
 [submodule "ext/arm/cmsis"]
 	path = ext/arm/cmsis
 	url = https://github.com/modm-io/cmsis-5-partial.git
+[submodule "ext/adamgreen/crashcatcher"]
+	path = ext/adamgreen/crashcatcher
+	url = https://github.com/modm-io/CrashCatcher.git

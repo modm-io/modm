@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2016, Fabian Greif
+# Copyright (c) 2018, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = "crashcatcher"
+
+def prepare(module, options):
+    if not options[":target"].has_driver("core:cortex-m*"):
+        return False
+    return True
+
+def build(env):
+    core = env[":target"].get_driver("core")["type"]
+
+    env.append_metadata_unique("include_path", "ext/crashcatcher/include")
+    env.outbasepath = "modm/ext/crashcatcher"
+
+    env.copy("crashcatcher/include/CrashCatcher.h", "include/CrashCatcher.h")
+    # FIXME: This is a CrashCatcher Bug, which doesn't support a Cortex-M without a FPU
+    ignore = "*armv6m.S" if "f" in core else "*armv7m.S"
+    env.copy("crashcatcher/Core/src", "src", ignore=env.ignore_patterns(ignore))
