@@ -13,21 +13,26 @@ from os.path import join, abspath
 
 # User Configurable Options
 project_name = "{{ options["::project.name"] }}"
-build_path = "{{ build_path }}"
+build_path = "{{ options["::build.path"] }}"
 modm_path = "modm"
+profile = ARGUMENTS.get("profile", "release")
 
 # SCons environment with all tools
 env = Environment(ENV=os.environ)
-env["BUILDPATH"] = abspath(build_path)
+env["BUILDPATH"] = join(abspath(build_path), profile)
 env["CONFIG_PROJECT_NAME"] = project_name
+%% if family == "darwin"
+# Using homebrew gcc-8 on macOS
+env["COMPILERSUFFIX"] = "-8"
+%% endif
 
 # Building all libraries
 env.SConscript(dirs=[modm_path], exports="env")
 
-%% if info_git != "Disabled"
-env.InfoGit({{ "True" if "Status" in info_git else "False" }})
+%% if options["::info.git"] != "Disabled"
+env.InfoGit({{ "True" if "Status" in options["::info.git"] else "False" }})
 %% endif
-%% if info_build
+%% if options["::info.build"]
 env.InfoBuild()
 %% endif
 
@@ -38,23 +43,24 @@ sources = env.UnittestRunner(target="main.cpp", source=headers, template="modm/t
 %% else
 # Finding application sources
 env.Append(CPPPATH=".")
-sources = env.FindSourceFiles(".", ignorePaths=["modm", "cmake-build-*"])
+sources = env.FindSourceFiles(".", ignorePaths=["modm", "cmake-build-*", "build"])
 %% endif
 
-%% if image_source != ""
+%% if options["::image.source"] != ""
 # Finding image sources
-for image in env.FindFiles("{{image_source}}", ".pbm"):
+for image in env.FindFiles("{{ options["::image.source"] }}", ".pbm"):
     source, _ = env.Bitmap(str(image))
     sources.append(source)
 %% endif
-%% if xpcc_source != ""
+%% if options["::xpcc.source"] != ""
 # Generating XPCC sources
 sources += env.XpccCommunication(
-    xmlfile=abspath("{{xpcc_source}}"),
-    container="{{xpcc_container}}",
-    path=abspath("{{xpcc_generate}}"),
-    namespace="{{xpcc_namespace}}")
+    xmlfile=abspath("{{ options["::xpcc.source"] }}"),
+    container="{{ options["::xpcc.container"] }}",
+    path=abspath("{{ options["::xpcc.generate"] }}"),
+    namespace="{{ options["::xpcc.namespace"] }}")
 %% endif
+
 %% if openocd_file != ""
 # Using a custom OpenOCD script
 env.Append(CONFIG_OPENOCD_SEARCHDIRS=[abspath("{{openocd_base_dir}}")])
