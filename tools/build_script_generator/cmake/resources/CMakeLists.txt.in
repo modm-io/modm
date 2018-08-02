@@ -10,8 +10,8 @@ SET_SOURCE_FILES_PROPERTIES(${APP_STARTUP} PROPERTIES LANGUAGE CXX)
 FILE(GLOB APP_SOURCE_FILES *.c *.cpp *.hpp *.h)
 
 SET(SOURCE_FILES
-%% for source_file in files
-    {{ source_file }}
+%% for file in sources
+    modm/{{ file }}
 %% endfor
     ${APP_SOURCE_FILES}
 )
@@ -24,11 +24,9 @@ INCLUDE_DIRECTORIES(
 )
 INCLUDE_DIRECTORIES(SYSTEM include)
 
-%% if "cpp.define" in metadata
-%% for define in metadata["cpp.define"]
+%% for define in flags["CPPDEFINES"]["base"]
 SET_TARGET_PROPERTIES($(CMAKE_PROJECT_NAME).elf PROPERTIES COMPILE_DEFINITIONS "$({{ define }})")
 %% endfor
-%% endif
 
 SET(PROJECT_PLATFORM   {{ platform }})
 SET(PROJECT_COMPILER   {{ compiler }})
@@ -38,7 +36,7 @@ SET(PROJECT_CORE       {{ core     }})
 SET(PROJECT_NAME       {{ project_name }})
 SET(PROJECT_BUILD_PATH {{ build_path }})
 
-INCLUDE(./cmake/configure-{{ platform }}-{{ compiler }}.cmake)
+INCLUDE(./modm/cmake/configure-{{ platform }}-{{ compiler }}.cmake)
 
 if ( APPLE )
     string ( REPLACE "-Wl,-search_paths_first" "" CMAKE_C_LINK_FLAGS ${CMAKE_C_LINK_FLAGS} )

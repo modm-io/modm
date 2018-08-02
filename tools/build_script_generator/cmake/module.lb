@@ -11,14 +11,12 @@
 # -----------------------------------------------------------------------------
 
 import os
-
+# import all common code
+exec(open(localpath("../common.py")).read())
 
 def init(module):
     module.name = "build.cmake"
-    module.description = """CMake Build Script Generator
-
-Generates a CMakeLists.txt file to build the modm library.
-"""
+    module.description = "CMake Build Script Generator"
 
 
 def prepare(module, options):
@@ -37,61 +35,45 @@ def prepare(module, options):
 
 
 def build(env):
-    pass
+    env.append_metadata_unique("include_path", "src")
+    fcpu = env.get_option(":platform:clock:f_cpu", None)
+    if fcpu is not None:
+        env.append_metadata_unique("cpp.define", "F_CPU={}".format(fcpu))
 
 
 def post_build(env, buildlog):
     target = env["modm:target"]
-    platform = target.identifier["platform"]
-    family = target.identifier["family"]
-
+    # get CPU information
+    subs = common_target(target)
     # Extract all source code files
-    files_to_build = []
-    outpath = env.outpath(".")
-    for operations in buildlog:
-        filename = os.path.relpath(operations.filename_out, outpath)
-        _, extension = os.path.splitext(filename)
+    subs["sources"] = common_source_files(env, buildlog)
+    # get memory information
+    subs["memories"] = common_memories(target)
+    # get memory information
+    subs["flags"] = common_compiler_flags("gcc", target, buildlog)
 
-        if extension in [".c", ".cpp", ".cc", ".sx", ".S"]:
-            files_to_build.append(os.path.normpath(filename))
-    files_to_build.sort()
-
-    core_driver = target.get_driver("core")
-    core = core_driver["type"]
-    if core.startswith("cortex-m4"):
-        core = "cortex-m4"
-    elif core.startswith("cortex-m7"):
-        core = "cortex-m7"
-
-    memories = []
-    if "memory" in core_driver:
-        memories.extend([
-            {
-                k:(int(v) if v.isdigit() else (int(v, 16) if v.startswith("0x") else v))
-                for k, v in memory.items()
-            }
-            for memory in core_driver["memory"]
-        ])
-
-    config_file = buildlog.metadata["openocd.configfile"][0]
-
-    env.substitutions = {
-        "partname": target.partname,
-        "target": target,
-        "family": family,
-        "platform": platform,
+    # Add SCons specific data
+    subs.update({
         "project_path": os.getcwd(),
-        "compiler": "llvm" if family == "darwin" else "gcc",
-        "core": core,
-        "files": files_to_build,
         "metadata": buildlog.metadata,
-        "openocd_config" : config_file,
-        "memories": memories,
-        "build_path": env["build.path"],
+        "openocd_config" : buildlog.metadata["openocd.configfile"][0],
+        "compiler": "gcc",
         "project_name": env["project.name"],
-    }
+        "build_path": env["build.path"],
+    })
+    # Set these substitutions for all templates
+    env.substitutions = subs
+
+    def flag_format(flag):
+        subs = {
+            "target_base": "${CMAKE_PROJECT_NAME}",
+            "linkdir": "link"
+        }
+        flag = flag.format(**subs)
+        return flag
 
     env.append_metadata_unique('include_path', 'src')
     env.template("resources/CMakeLists.txt.in", "CMakeLists.txt")
     env.template("resources/Makefile.in", "Makefile")
-    env.copy("cmake_scripts", "cmake")
+    env.copy("cmake_scripts/report-build-options.cmake", "modm/cmake/report-build-options.cmake")
+    env.template("cmake_scripts/configure-stm32-gcc.cmake.in", "modm/cmake/configure-stm32-gcc.cmake", filters={"flag_format": flag_format})

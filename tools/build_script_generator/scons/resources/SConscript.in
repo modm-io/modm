@@ -11,6 +11,7 @@
 from os.path import join, abspath
 
 Import("env")
+profile = ARGUMENTS.get("profile", "release")
 
 env.Append(toolpath=[abspath("scons/site_tools"), abspath("ext/dlr/scons-build-tools/site_tools")])
 %% for tool in build_tools | sort
@@ -25,12 +26,28 @@ env.Append(CPPPATH=[
 ])
 
 files = [
-%% for file in files
+%% for file in sources
     env.File("{{ file }}"),
 %% endfor
 ]
 
 library = env.StaticLibrary(target="modm", source=files)
+
+%% if platform not in ["hosted"]
+# We need to link libmodm.a with --whole-archive, so that all weak symbols are visible to the linker.
+# Functions placed in a linker section list (like modm_section(".hardware_init")) are typically not
+# referenced externally, so the linker will discard them when searching.
+# From https://sourceware.org/binutils/docs/ld/Options.html#Options:
+#     For each archive mentioned on the command line after the --whole-archive option, include every object
+#     file in the archive in the link, rather than searching the archive for the required object files.
+env["_LIBFLAGS"] = "-Wl,--whole-archive " + env["_LIBFLAGS"] + " -Wl,--no-whole-archive"
+# alternative workarounds
+# env["LINKCOM"] = env["LINKCOM"].replace("$_LIBFLAGS", "-Wl,--whole-archive $_LIBFLAGS -Wl,--no-whole-archive")
+# workaround for one individual library
+# whole_archive = env.Command(join(env.Dir("#").path, "-Wl,--whole-archive"), [], "")
+# no_whole_archive = env.Command(join(env.Dir("#").path, "-Wl,--no-whole-archive"), [], "")
+# library = whole_archive + library + no_whole_archive
+%% endif
 
 env.Append(LIBS=[
     library,
@@ -42,78 +59,6 @@ env.AppendUnique(LIBPATH=[abspath(str(library[0].get_dir()))])
 %% if "required_pkg" in metadata
 env.ParseConfig("pkg-config --cflags --libs {{ metadata.required_pkg | sort | join(" ") }}")
 %% endif
-
-%% if "cpp.define" in metadata
-env.Append(CPPDEFINES=[
-%% for define in metadata["cpp.define"] | sort
-    "{{ define }}",
-%% endfor
-])
-%% endif
-
-# Toolchain configuration
-%# ================================== STM32 ===================================
-%% if platform in ["stm32"]
-env["CPU"] = "{{ core }}"
-env.Append(CCFLAGS_warning=[
-    "-Werror=sign-compare",
-])
-env["LINKFLAGS_optimize"] = [
-    "-Wl,--relax",
-    "-Wl,--gc-sections",
-    "-Wl,-wrap,_malloc_r",
-    "-Wl,-wrap,_calloc_r",
-    "-Wl,-wrap,_realloc_r",
-    "-Wl,-wrap,_free_r",
-    "--specs=nano.specs",
-    "--specs=nosys.specs",
-    "-nostartfiles",
-]
-env.Append(LINKFLAGS_other=["-Wl,--no-wchar-size-warning"])
-%# =================================== AVR ====================================
-%% elif platform in ["avr"]
-env.Append(CCFLAGS_warning=[
-    "-Werror=maybe-uninitialized",
-    "-Werror=overflow",
-])
-env["CCFLAGS_target"] = [
-    "-mmcu={{ partname }}",
-    "-DF_CPU=${CONFIG_CLOCK_F_CPU}"
-]
-env.Append(ASFLAGS_target=[
-    "-mmcu={{ partname }}",
-    "-xassembler-with-cpp",
-])
-env["LINKFLAGS_other"] = ["-Wl,--fatal-warnings"]
-%# ================================== HOSTED ==================================
-%% elif platform in ["hosted"]
-%% if family in ["darwin"]
-env["CXXFLAGS_language"] = ["-std=c++1z"] # for clang 4 or earlier
-%% else
-env["CXXFLAGS_language"] = ["-std=c++17"]
-%% endif
-%% endif
-
-%# ============================================================================
-env["CFLAGS_language"] = ["-std=gnu11"]
-%% if platform in ["stm32", "avr"]
-env["CXXFLAGS_language"] = ["-std=c++17", "-fno-exceptions", "-fno-rtti"]
-env.Append(LINKFLAGS_target=[
-    "-L" + abspath("link"),
-    "-Tlinkerscript.ld"])
-%% endif
-env.Append(CCFLAGS_warning=[
-    "-Werror=format",
-])
-env.RemoveFromList("CCFLAGS_warning", [
-    "-Wshadow",
-    "-Wcast-align",
-    "-Wmissing-declarations",
-    "-Wcast-qual",
-    "-Wredundant-decls",])
-env.RemoveFromList("CXXFLAGS_warning", [
-    "-Wold-style-cast",
-    "-Wnon-virtual-dtor"])
 
 # Device configuration
 env["CONFIG_DEVICE_NAME"] = "{{ partname }}"
@@ -127,15 +72,15 @@ env["CONFIG_DEVICE_MEMORY"] = [
 
 # Programming configuration
 %% if platform in ["avr"]
-env["CONFIG_AVRDUDE_DEVICE"] = "{{avrdude_mcu}}"
-env["CONFIG_AVRDUDE_PROGRAMMER"] = "{{options["::avrdude.programmer"]}}"
-env["CONFIG_AVRDUDE_PORT"] = "{{options["::avrdude.port"]}}"
-env["CONFIG_AVRDUDE_OPTIONS"] = "{{options["::avrdude.options"]}}"
+env["CONFIG_AVRDUDE_DEVICE"] = "{{ mcu }}"
+env["CONFIG_AVRDUDE_PROGRAMMER"] = "{{ options["::avrdude.programmer"] }}"
+env["CONFIG_AVRDUDE_PORT"] = "{{ options["::avrdude.port"] }}"
+env["CONFIG_AVRDUDE_OPTIONS"] = "{{ options["::avrdude.options"] }}"
 %% if options["::avrdude.baudrate"] > 0
-env["CONFIG_AVRDUDE_BAUDRATE"] = "{{options["::avrdude.baudrate"]}}"
+env["CONFIG_AVRDUDE_BAUDRATE"] = "{{ options["::avrdude.baudrate"] }}"
 %% endif
 %% endif
-
+%% if platform in ["stm32"]
 env.SetDefault(CONFIG_OPENOCD_SEARCHDIRS = [
 %% if "openocd.configfile" in metadata
     abspath("openocd")
@@ -156,23 +101,42 @@ env.SetDefault(CONFIG_OPENOCD_COMMANDS = [
     "mww 0xE000EDF0 0xA05F0000",
     "shutdown"
 ])
-
-%% if ":platform:clock:f_cpu" in options
-env["CONFIG_CLOCK_F_CPU"] = "{{ options[":platform:clock:f_cpu"] }}"
 %% endif
 
-env['XPCC_SYSTEM_DESIGN'] = join(abspath("."), "tools", "system_design")
+# XPCC generator tool path
+env["XPCC_SYSTEM_DESIGN"] = join(abspath("."), "tools", "system_design")
 
-%% if platform not in ["hosted"]
-# We need to link libmodm.a with --whole-archive, so that all weak symbols are visible to the linker.
-# Functions placed in a linker section list (like modm_section(".hardware_init")) are typically not
-# referenced externally, so the linker will discard them when searching.
-# From https://sourceware.org/binutils/docs/ld/Options.html#Options:
-#     For each archive mentioned on the command line after the --whole-archive option, include every object
-#     file in the archive in the link, rather than searching the archive for the required object files.
-env["_LIBFLAGS"] = '-Wl,--whole-archive ' + env["_LIBFLAGS"] + ' -Wl,--no-whole-archive'
-# alternative workaround
-# env["LINKCOM"] = env["LINKCOM"].replace('$_LIBFLAGS', '-Wl,--whole-archive $_LIBFLAGS -Wl,--no-whole-archive')
+# Toolchain configuration
+%% macro generate_flags_for_profile(name, profile, append=False)
+env{% if append %}.Append({{name}}{% else %}["{{name}}"]{% endif %} = [
+%% for flag in flags[name][profile] | sort
+    {{ flag | flag_format }},
+%% endfor
+]{% if append %}){% endif -%}
+%% endmacro
+
+%% macro generate_flags(name, append=False)
+%% if not append or flags[name].base | length
+{{ generate_flags_for_profile(name, "base", append) }}
 %% endif
+%% for profile in flags[name].keys()
+%% if profile != "base" and flags[name][profile] | length
+if profile == "{{ profile }}":
+    {{ generate_flags_for_profile(name, profile, True) | lbuild.indent(4) }}
+%% endif
+%% endfor
+%% endmacro
+
+{{ generate_flags("CPPDEFINES", True) }}
+{{ generate_flags("CCFLAGS") }}
+{{ generate_flags("CFLAGS") }}
+{{ generate_flags("CXXFLAGS") }}
+{{ generate_flags("ASFLAGS") }}
+{{ generate_flags("ARCHFLAGS") }}
+{{ generate_flags("LINKFLAGS") }}
+# ARCHFLAGS must be known for compiling *and* linking
+env.Append(CCFLAGS="$ARCHFLAGS")
+env.Append(ASFLAGS="$ARCHFLAGS")
+env.Append(LINKFLAGS="$ARCHFLAGS")
 
 Return("library")
