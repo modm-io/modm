@@ -3,13 +3,10 @@
   <extends>../../../src/modm/board/disco_f303vc/board.xml</extends>
   <options>
     <option name=":build:build.path">../../../build/stm32f3_discovery/hard_fault</option>
-    <option name=":platform:fault.cortex:led">E3</option>
+    <option name=":platform:fault.minimal:behavior">E13</option>
   </options>
   <modules>
-    <module>:debug</module>
-    <module>:platform:fault.cortex</module>
-    <module>:platform:gpio</module>
-    <module>:platform:uart:2</module>
+    <module>:platform:fault.minimal</module>
     <module>:build:scons</module>
   </modules>
 </library>

@@ -15,7 +15,7 @@ import os
 
 def init(module):
     module.parent = "platform"
-    module.name = "fault.cortex"
+    module.name = "fault.minimal"
 
 def prepare(module, options):
     if not options[":target"].has_driver("core:cortex-m*"):
@@ -33,10 +33,10 @@ def prepare(module, options):
     pins = [p["port"].upper() + p["pin"] for p in options[":target"].get_driver("gpio")["gpio"]]
     module.add_option(
         EnumerationOption(
-            name="led",
-            description="Toggle an LED on the specified pin",
-            enumeration=pins + ["disabled"],
-            default="disabled"))
+            name="behavior",
+            description="Reset the system, trigger breakpoint, wait forever in a loop or toggle an LED on the specified pin, ",
+            enumeration=["wait", "break", "reset"] + pins,
+            default="reset"))
 
     return True
 
@@ -45,12 +45,11 @@ def build(env):
     driver = device.get_driver("core")
 
     properties = device.properties
-    properties["partname"] = device.partname
     properties["core"] = driver["type"]
 
     env.substitutions = properties
-    env.outbasepath = "modm/src/modm/platform/core"
+    env.outbasepath = "modm/src/modm/platform/fault"
 
     env.template("hard_fault.sx.in")
-    if env[":::led"] != "disabled":
+    if env[":::behavior"] not in ["wait"]:
         env.template("hard_fault_handler.cpp.in")

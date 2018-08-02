@@ -50,8 +50,8 @@ PROVIDE(__ram_end   = ORIGIN(RAM) + LENGTH(RAM));
 PROVIDE(__rom_start = ORIGIN(FLASH));
 PROVIDE(__rom_end   = ORIGIN(FLASH) + LENGTH(FLASH));
 
-/* the thread stack is used only for reporting hard fault conditions! It may therefore be small. */
-PROCESS_STACK_SIZE  = {{ process_stack_size }};
+/* the thread stack is unused. */
+PROCESS_STACK_SIZE  = 0;
 /* the handler stack is used for main program as well as interrupts */
 MAIN_STACK_SIZE     = {{ options.main_stack_size }};
 /* combined stack size */

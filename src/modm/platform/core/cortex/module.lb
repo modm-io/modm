@@ -58,7 +58,7 @@ def prepare(module, options):
             description=FileReader("option/main_stack_size.md"),
             minimum=2 ** 8,
             maximum=2 ** 16,
-            default=2 ** 10 * 3 - 32))
+            default=2 ** 10 * 3))
 
     module.add_option(
         StringOption(
@@ -99,9 +99,6 @@ def build(env):
     # Cortex-M0 does not have remappable vector table, so it will remain in Flash
     properties["vector_table_location"] = env.get_option(":::vector_table_location", "rom")
     properties["core"] = driver["type"]
-    properties["process_stack_size"] = 0
-    if env.get_option(":platform:fault.cortex:led", None):
-        properties["process_stack_size"] = 32
 
     # Add ARM Cortex-M exceptions
     interrupts = {

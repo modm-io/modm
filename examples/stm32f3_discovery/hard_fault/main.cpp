@@ -13,33 +13,12 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-#include <modm/debug/logger.hpp>
-
-// ----------------------------------------------------------------------------
-// Set the log level
-#undef	MODM_LOG_LEVEL
-#define	MODM_LOG_LEVEL modm::log::INFO
-
-// Create an IODeviceWrapper around the Uart Peripheral we want to use
-modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
-
-// Set all four logger streams to use the UART
-modm::log::Logger modm::log::debug(loggerDevice);
-modm::log::Logger modm::log::info(loggerDevice);
-modm::log::Logger modm::log::warning(loggerDevice);
-modm::log::Logger modm::log::error(loggerDevice);
 
 // ----------------------------------------------------------------------------
 int
 main()
 {
 	Board::initialize();
-
-	// initialize Uart2 for MODM_LOG_
-	Usart2::connect<GpioOutputA2::Tx>();
-	Usart2::initialize<Board::systemClock, 115200>();
-
-	MODM_LOG_INFO << "Causing a Hardfault now!" << modm::endl;
 
 	// simulate some stack usage
 	asm volatile ("push {r0-r12}");
@@ -48,9 +27,6 @@ main()
 	asm volatile ("pop {r0-r12}");
 	asm volatile ("pop {r0-r12}");
 	asm volatile ("pop {r0-r12}");
-
-	// execute unused stack
-	asm volatile ("ldr pc, =0x20000247");
 
 	// divide by zero
 	volatile uint8_t number = 42;
