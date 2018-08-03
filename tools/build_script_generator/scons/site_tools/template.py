@@ -20,6 +20,10 @@ def jinja2_template_action(target, source, env):
 	filename = source[0].path
 	loader = jinja2.Environment(loader = jinja2.FileSystemLoader(os.path.dirname(filename)))
 
+	# enable '%%' as prefix for line statements
+	loader.line_statement_prefix = '%%'
+	loader.line_comment_prefix = '%#'
+
 	try:
 		template = loader.get_template(os.path.basename(filename))
 	except Exception as e:
