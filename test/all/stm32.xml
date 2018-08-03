@@ -10,9 +10,9 @@
 
   <options>
     <option name=":build:scons:include_demo_project">True</option>
+    <option name=":platform:core:main_stack_size">1024</option>
   </options>
   <modules>
-    <module>:platform:**</module>
     <module>:build:scons</module>
   </modules>
 </library>

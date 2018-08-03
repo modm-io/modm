@@ -71,8 +71,13 @@ class TestRun:
             lbuild_command = ["-c", "stm32.xml"]
         lbuild_command.append("-D:target={}".format(self.device))
 
+        modules = run_lbuild(lbuild_command + ["discover-modules"]).splitlines()
+        modules = [m for m in modules if m.startswith("modm:platform")]
+        # remove :platform:fault*
+        modules = [m for m in modules if not m.startswith("modm:platform:fault")]
+
         with tempfile.TemporaryDirectory() as tempdir:
-            lbuild_command.extend(["-p", str(tempdir), "build", "--no-log"])
+            lbuild_command.extend(["-p", str(tempdir), "build", "--no-log"] + ["-m={}".format(m) for m in modules])
             try:
                 self.result = TestRunResult.FAIL_BUILD
                 self.output += run_lbuild(lbuild_command)
