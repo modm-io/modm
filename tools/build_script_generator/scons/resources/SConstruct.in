@@ -72,6 +72,7 @@ program = env.Program(target=project_name+".elf", source=sources)
 
 # SCons functions
 env.Alias("cmakewrapper", env.CMakeWrapper())
+env.Alias("qtcreator", env.QtCreatorProject(sources))
 env.Alias("symbols", env.Symbols(program))
 env.Alias("listing", env.Listing(program))
 env.Alias("bin", env.Bin(program))

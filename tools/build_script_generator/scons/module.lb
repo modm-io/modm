@@ -93,6 +93,7 @@ def post_build(env, buildlog):
         "find_files",
         "template",
         "cmake_wrapper",
+        "qtcreator",
     ]
     if len(env[":::xpcc.source"]):
         build_tools += ["system_design"]
