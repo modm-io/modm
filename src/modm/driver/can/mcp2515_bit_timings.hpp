@@ -86,8 +86,8 @@ private:
 	static_assert((Clk / getPrescaler()) / (getSJW() + getProp() + getPS1() + getPS2()) == Bitrate, "Desired baud rate not achived.");
 
 	// Sampling point >= 75%, <= 80% of Nominal Bit Time (NBT)
-	static_assert((double(getSJW() + getProp() + getPS1()) / double(getSJW() + getProp() + getPS1() + getPS2())) >= 0.75 ,"Sampling point is earlier than 75% of nominal bit time.");
-	static_assert((double(getSJW() + getProp() + getPS1()) / double(getSJW() + getProp() + getPS1() + getPS2())) <= 0.80 ,"Sampling point is later than 80% of nominal bit time.");
+	static_assert((double(getSJW() + getProp() + getPS1()) / double(getSJW() + getProp() + getPS1() + getPS2())) >= double(0.75) ,"Sampling point is earlier than 75% of nominal bit time.");
+	static_assert((double(getSJW() + getProp() + getPS1()) / double(getSJW() + getProp() + getPS1() + getPS2())) <= double(0.80) ,"Sampling point is later than 80% of nominal bit time.");
 };
 
 }

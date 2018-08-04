@@ -29,7 +29,9 @@ struct bmp085
 using Calibration = modm::bmp085data::Calibration;
 using Data = modm::bmp085data::Data;
 using DataBase = modm::bmp085data::DataBase;
+#ifndef __AVR__
 using DataDouble = modm::bmp085data::DataDouble;
+#endif
 
 protected:
 	/// @cond
@@ -143,7 +145,7 @@ public:
 
 public:
 	/// Get the data object for this sensor.
-	inline Data&
+	inline DataBase&
 	getData()
 	{ return data; }
 

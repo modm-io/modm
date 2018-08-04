@@ -126,7 +126,7 @@ static inline void _touch(framebuffer_t buffer, int x, int y, uint8_t palette)
 static inline void touch(framebuffer_t buffer)
 {
 	if (touch_updated) {
-		for_i(0, ii, 2) if (p[ii][0] >= 0 and p[ii][0] >= 0) {
+		for_i(0, ii, 2) if (p[ii][0] >= 0 and p[ii][1] >= 0) {
 			_touch(buffer, p[ii][0], p[ii][1], touch_palette);
 			p[ii][0] = -1;
 			p[ii][1] = -1;

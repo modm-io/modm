@@ -98,7 +98,7 @@ jobs:
       - checkout
       - run: git submodule sync && git submodule update --init
       - run:
-          name: Examples STM32F4 Series (except STM32F4 Discovery Board)
+          name: Examples STM32F4 Series
           command: |
             (cd examples && ../tools/scripts/examples_compile.py stm32f4_discovery)
             (cd examples && ../tools/scripts/examples_compile.py stm32f429_discovery stm32f469_discovery nucleo_f401re nucleo_f411re nucleo_f429zi)
@@ -129,7 +129,7 @@ jobs:
       - checkout
       - run: git submodule sync && git submodule update --init
       - run:
-          name: Examples from the generic folder (Mostly STM32 examples)
+          name: Generic Examples
           command: |
             (cd examples && ../tools/scripts/examples_compile.py generic)
 

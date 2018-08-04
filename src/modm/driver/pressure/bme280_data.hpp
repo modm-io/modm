@@ -197,6 +197,7 @@ private:
 	int32_t t_fine;
 };
 
+#ifndef __AVR__
 class modm_packed
 DataDouble : public DataBase
 {
@@ -245,12 +246,15 @@ private:
 	// calculated in calculateCalibratedTemperature, needed for calculateCalibratedPressure and calculateCalibratedHumidity
 	double t_fine;
 };
+#endif
 
 } // bme280data namespace
 
 } // modm namespace
 
 #include "bme280_data_impl_fp.hpp"
+#ifndef __AVR__
 #include "bme280_data_impl_double.hpp"
+#endif
 
 #endif // MODM_BME280_DATA_HPP

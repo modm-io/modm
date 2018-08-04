@@ -91,7 +91,7 @@ DataDouble::calculateCalibratedPressure()
 
 	var1 = (P3 * var1 * var1 / double(524288.0) + P2 * var1) / double(524288.0);
 	var1 = (double(1.0) + var1 / double(32768.0)) * P1;
-	if (var1 == 0.0) {
+	if (var1 == double(0.0)) {
 		calibratedPressureDouble = double(0.0);
 		return;
 	}
