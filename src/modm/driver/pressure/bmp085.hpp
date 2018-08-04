@@ -143,7 +143,7 @@ public:
 
 public:
 	/// Get the data object for this sensor.
-	inline Data&
+	inline DataBase&
 	getData()
 	{ return data; }
 
