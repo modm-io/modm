@@ -2,7 +2,7 @@
 <library>
   <extends>../../../src/modm/board/blue_pill/board.xml</extends>
   <options>
-    <option name=":build.scons:build.path">../../../build/stm32f103c8t6_blue_pill/adns_9800</option>
+    <option name=":build:build.path">../../../build/stm32f103c8t6_blue_pill/adns_9800</option>
   </options>
   <modules>
     <module>:debug</module>
@@ -12,6 +12,6 @@
     <module>:platform:uart:2</module>
     <module>:processing:protothread</module>
     <module>:processing:timer</module>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
   </modules>
 </library>

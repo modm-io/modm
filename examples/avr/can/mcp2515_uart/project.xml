@@ -11,7 +11,7 @@
   <options>
     <option name=":target">atmega644</option>
     <option name=":platform:clock:f_cpu">14745600</option>
-    <option name=":build.scons:build.path">../../../../build/avr/can/mcp2515_uart</option>
+    <option name=":build:build.path">../../../../build/avr/can/mcp2515_uart</option>
   </options>
   <modules>
     <module>:architecture:interrupt</module>
@@ -22,6 +22,6 @@
     <module>:platform:spi.bitbang</module>
     <module>:platform:uart:0</module>
     <module>:processing:timer</module>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
   </modules>
 </library>

@@ -2,12 +2,12 @@
 <library>
   <extends>../../../src/modm/board/nucleo_l476rg/board.xml</extends>
   <options>
-    <option name=":build.scons:build.path">../../../build/generic/resumable</option>
+    <option name=":build:build.path">../../../build/generic/resumable</option>
   </options>
   <modules>
     <module>:processing:protothread</module>
     <module>:processing:resumable</module>
     <module>:processing:timer</module>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
   </modules>
 </library>

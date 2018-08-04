@@ -11,7 +11,7 @@
   <options>
     <option name=":target">atmega644</option>
     <option name=":platform:clock:f_cpu">14745600</option>
-    <option name=":build.scons:build.path">../../../../../build/avr/display/dogm128/caged_ball</option>
+    <option name=":build:build.path">../../../../../build/avr/display/dogm128/caged_ball</option>
   </options>
   <modules>
     <module>:driver:ea_dog</module>
@@ -19,6 +19,6 @@
     <module>:platform:core</module>
     <module>:platform:gpio</module>
     <module>:platform:spi.bitbang</module>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
   </modules>
 </library>

@@ -10,7 +10,7 @@
 
   <options>
     <option name=":target">hosted-linux</option>
-    <option name=":build.scons:build.path">../../../build/zmq/2_zmq_gateway</option>
+    <option name=":build:build.path">../../../build/zmq/2_zmq_gateway</option>
   </options>
   <modules>
     <module>:communication:xpcc</module>
@@ -18,6 +18,6 @@
     <module>:platform:canusb</module>
     <module>:platform:core</module>
     <module>:platform:uart</module>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
   </modules>
 </library>

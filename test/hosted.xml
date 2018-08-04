@@ -9,16 +9,16 @@
   </repositories>
 
   <options>
-    <option name=":build.scons:include_demo_project">False</option>
-    <option name=":build.scons:include_sconstruct">True</option>
-    <option name=":build.scons:is_unittest">True</option>
-    <option name=":build.scons:info.build">True</option>
-    <option name=":build.scons:info.git">Info+Status</option>
+    <option name=":build:scons:include_demo_project">False</option>
+    <option name=":build:scons:include_sconstruct">True</option>
+    <option name=":build:scons:is_unittest">True</option>
+    <option name=":build:scons:info.build">True</option>
+    <option name=":build:scons:info.git">Info+Status</option>
   </options>
 
   <modules>
     <module>:platform:core</module>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
     <module>:test:**</module>
   </modules>
 </library>

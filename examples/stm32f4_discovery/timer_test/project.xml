@@ -2,7 +2,7 @@
 <library>
   <extends>../../../src/modm/board/disco_f407vg/board.xml</extends>
   <options>
-    <option name=":build.scons:build.path">../../../build/stm32f4_discovery/timer_test</option>
+    <option name=":build:build.path">../../../build/stm32f4_discovery/timer_test</option>
   </options>
   <modules>
     <module>:architecture:interrupt</module>
@@ -20,6 +20,6 @@
     <module>:platform:timer:12</module>
     <module>:platform:timer:13</module>
     <module>:platform:timer:14</module>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
   </modules>
 </library>

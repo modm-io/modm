@@ -2,7 +2,7 @@
 <library>
   <extends>../../../src/modm/board/nucleo_l476rg/board.xml</extends>
   <options>
-    <option name=":build.scons:build.path">../../../build/nucleo_l476rg/i2c_test</option>
+    <option name=":build:build.path">../../../build/nucleo_l476rg/i2c_test</option>
   </options>
   <modules>
     <module>:architecture:i2c.device</module>
@@ -10,6 +10,6 @@
     <module>:processing:protothread</module>
     <module>:processing:resumable</module>
     <module>:processing:timer</module>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
   </modules>
 </library>

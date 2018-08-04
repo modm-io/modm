@@ -2,7 +2,7 @@
 <library>
   <extends>../../../src/modm/board/disco_f407vg/board.xml</extends>
   <options>
-    <option name=":build.scons:build.path">../../../build/stm32f4_discovery/distance_vl6180</option>
+    <option name=":build:build.path">../../../build/stm32f4_discovery/distance_vl6180</option>
   </options>
   <modules>
     <module>:debug</module>
@@ -13,6 +13,6 @@
     <module>:platform:i2c:2</module>
     <module>:platform:uart:2</module>
     <module>:processing</module>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
   </modules>
 </library>

@@ -2,7 +2,7 @@
 <library>
   <extends>../../../../src/modm/board/disco_f303vc/board.xml</extends>
   <options>
-    <option name=":build.scons:build.path">../../../../build/stm32f3_discovery/adc/continous</option>
+    <option name=":build:build.path">../../../../build/stm32f3_discovery/adc/continous</option>
   </options>
   <modules>
     <module>:debug</module>
@@ -12,6 +12,6 @@
     <module>:platform:adc:4</module>
     <module>:platform:gpio</module>
     <module>:platform:uart:2</module>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
   </modules>
 </library>
