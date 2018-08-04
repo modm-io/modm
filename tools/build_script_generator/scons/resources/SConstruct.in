@@ -12,8 +12,8 @@ import os
 from os.path import join, abspath
 
 # User Configurable Options
-project_name = "{{ options["::project.name"] }}"
-build_path = "{{ options["::build.path"] }}"
+project_name = "{{ options[":build:project.name"] }}"
+build_path = "{{ options[":build:build.path"] }}"
 modm_path = "modm"
 profile = ARGUMENTS.get("profile", "release")
 
@@ -29,14 +29,14 @@ env["COMPILERSUFFIX"] = "-8"
 # Building all libraries
 env.SConscript(dirs=[modm_path], exports="env")
 
-%% if options["::info.git"] != "Disabled"
-env.InfoGit({{ "True" if "Status" in options["::info.git"] else "False" }})
+%% if options[":::info.git"] != "Disabled"
+env.InfoGit({{ "True" if "Status" in options[":::info.git"] else "False" }})
 %% endif
-%% if options["::info.build"]
+%% if options[":::info.build"]
 env.InfoBuild()
 %% endif
 
-%% if options["::is_unittest"]
+%% if options[":::is_unittest"]
 # Building unit tests
 headers = env.FindHeaderFiles(join(modm_path, "test"))
 sources = env.UnittestRunner(target="main.cpp", source=headers, template="modm/test/runner.cpp.in")
@@ -46,19 +46,19 @@ env.Append(CPPPATH=".")
 sources = env.FindSourceFiles(".", ignorePaths=["modm", "cmake-build-*", "build"])
 %% endif
 
-%% if options["::image.source"] != ""
+%% if options[":::image.source"] != ""
 # Finding image sources
-for image in env.FindFiles("{{ options["::image.source"] }}", ".pbm"):
+for image in env.FindFiles("{{ options[":::image.source"] }}", ".pbm"):
     source, _ = env.Bitmap(str(image))
     sources.append(source)
 %% endif
-%% if options["::xpcc.source"] != ""
+%% if options[":::xpcc.source"] != ""
 # Generating XPCC sources
 sources += env.XpccCommunication(
-    xmlfile=abspath("{{ options["::xpcc.source"] }}"),
-    container="{{ options["::xpcc.container"] }}",
-    path=abspath("{{ options["::xpcc.generate"] }}"),
-    namespace="{{ options["::xpcc.namespace"] }}")
+    xmlfile=abspath("{{ options[":::xpcc.source"] }}"),
+    container="{{ options[":::xpcc.container"] }}",
+    path=abspath("{{ options[":::xpcc.generate"] }}"),
+    namespace="{{ options[":::xpcc.namespace"] }}")
 %% endif
 
 %% if openocd_file != ""

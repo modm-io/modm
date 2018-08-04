@@ -15,7 +15,8 @@ import os
 exec(open(localpath("../common.py")).read())
 
 def init(module):
-    module.name = "build.scons"
+    module.parent = "build"
+    module.name = "scons"
     module.description = "SCons Build Script Generator"
 
 
@@ -30,13 +31,6 @@ def prepare(module, options):
     module.add_option(
         BooleanOption(name="is_unittest", default=False,
                       description="Generate SConstruct file for modm unittests."))
-
-    module.add_option(
-        StringOption(name="project.name", default=default_project_name,
-                     description="Project name for executable"))
-    module.add_option(
-        StringOption(name="build.path", default="build/"+default_project_name,
-                     description="Path to the build folder"))
 
     module.add_option(
         StringOption(name="image.source", default="",
@@ -85,10 +79,8 @@ def prepare(module, options):
 
 
 def build(env):
-    env.append_metadata_unique("include_path", "src")
-    fcpu = env.get_option(":platform:clock:f_cpu", None)
-    if fcpu is not None:
-        env.append_metadata_unique("cpp.define", "F_CPU={}".format(fcpu))
+    pass
+
 
 def post_build(env, buildlog):
     target = env["modm:target"]
@@ -102,13 +94,13 @@ def post_build(env, buildlog):
         "template",
         "cmake_wrapper",
     ]
-    if len(env["xpcc.source"]):
+    if len(env[":::xpcc.source"]):
         build_tools += ["system_design"]
-    if len(env["image.source"]):
+    if len(env[":::image.source"]):
         build_tools += ["bitmap"]
-    if env["info.git"] != "Disabled" or env["info.build"]:
+    if env[":::info.git"] != "Disabled" or env[":::info.build"]:
         build_tools += ["info"]
-    if env["is_unittest"]:
+    if env[":::is_unittest"]:
         build_tools += ["unittest"]
     if subs["platform"] in ["stm32"]:
         build_tools += ["compiler_arm_none_eabi_gcc", "program_openocd", "utils_buildsize"]
@@ -125,8 +117,8 @@ def post_build(env, buildlog):
     subs["flags"] = common_compiler_flags("gcc", target, buildlog)
     # Add SCons specific data
     subs.update({
-        "openocd_base_dir": os.path.dirname(env.get_option("::openocd.cfg", "")),
-        "openocd_file": os.path.basename(env.get_option("::openocd.cfg", "")),
+        "openocd_base_dir": os.path.dirname(env.get_option(":::openocd.cfg", "")),
+        "openocd_file": os.path.basename(env.get_option(":::openocd.cfg", "")),
         "metadata": buildlog.metadata,
         "build_tools": build_tools,
     })

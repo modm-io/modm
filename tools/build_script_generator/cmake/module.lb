@@ -15,30 +15,19 @@ import os
 exec(open(localpath("../common.py")).read())
 
 def init(module):
-    module.name = "build.cmake"
+    module.parent = "build"
+    module.name = "cmake"
     module.description = "CMake Build Script Generator"
 
 
 def prepare(module, options):
-    _, default_project_name = os.path.split(os.getcwd())
-
-    module.add_option(
-        StringOption(name="build.path", default=".",
-                     description="Path to the build folder"))
-    module.add_option(
-        StringOption(name="project.name", default=default_project_name.replace('.', '_'),
-                     description="Project name (required)"))
-
     if options[":target"].identifier["platform"] == "stm32":
         return True
     return False
 
 
 def build(env):
-    env.append_metadata_unique("include_path", "src")
-    fcpu = env.get_option(":platform:clock:f_cpu", None)
-    if fcpu is not None:
-        env.append_metadata_unique("cpp.define", "F_CPU={}".format(fcpu))
+    pass
 
 
 def post_build(env, buildlog):
@@ -58,8 +47,8 @@ def post_build(env, buildlog):
         "metadata": buildlog.metadata,
         "openocd_config" : buildlog.metadata["openocd.configfile"][0],
         "compiler": "gcc",
-        "project_name": env["project.name"],
-        "build_path": env["build.path"],
+        "project_name": env[":build:project.name"],
+        "build_path": env[":build:build.path"],
     })
     # Set these substitutions for all templates
     env.substitutions = subs
