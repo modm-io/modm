@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2017-2018, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+import os
+
+def init(module):
+    module.name = "build"
+
+
+def prepare(module, options):
+    _, default_project_name = os.path.split(os.getcwd())
+    default_project_name = default_project_name.replace(".", "_").replace(" ", "_")
+
+    module.add_option(
+        StringOption(name="project.name", default=default_project_name,
+                     description="Project name for executable"))
+    module.add_option(
+        StringOption(name="build.path", default="build/"+default_project_name,
+                     description="Path to the build folder"))
+
+    return True
+
+
+def build(env):
+    env.append_metadata_unique("include_path", "src")
+    fcpu = env.get_option(":platform:clock:f_cpu", None)
+    if fcpu is not None:
+        env.append_metadata_unique("cpp.define", "F_CPU={}".format(fcpu))
