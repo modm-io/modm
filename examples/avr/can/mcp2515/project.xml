@@ -11,7 +11,7 @@
   <options>
     <option name=":target">atmega644</option>
     <option name=":platform:clock:f_cpu">14745600</option>
-    <option name=":build.scons:build.path">../../../../build/avr/can/mcp2515</option>
+    <option name=":build:build.path">../../../../build/avr/can/mcp2515</option>
   </options>
   <modules>
     <module>:driver:mcp2515</module>
@@ -20,6 +20,6 @@
     <module>:platform:gpio</module>
     <module>:platform:spi</module>
     <module>:platform:spi.bitbang</module>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
   </modules>
 </library>

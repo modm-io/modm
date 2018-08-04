@@ -2,13 +2,13 @@
 <library>
   <extends>../../../src/modm/board/disco_f407vg/board.xml</extends>
   <options>
-    <option name=":build.scons:build.path">../../../build/stm32f4_discovery/led_matrix_display</option>
+    <option name=":build:build.path">../../../build/stm32f4_discovery/led_matrix_display</option>
   </options>
   <modules>
     <module>:driver:max7219</module>
     <module>:platform:gpio</module>
     <module>:platform:spi.bitbang</module>
     <module>:processing:timer</module>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
   </modules>
 </library>

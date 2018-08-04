@@ -3,17 +3,17 @@
          xsd:noNamespaceSchemaLocation="https://github.com/dergraaf/library-builder/lbuild/resources/configuration.xsd">
   <extends>../src/modm/board/al_avreb_can/board.xml</extends>
   <options>
-    <!-- <option name=":build.scons:avrdude.programmer">avrispmkII</option> -->
-    <option name=":build.scons:avrdude.programmer">usbasp-clone</option>
-    <option name=":build.scons:include_demo_project">False</option>
-    <option name=":build.scons:include_sconstruct">True</option>
-    <option name=":build.scons:is_unittest">True</option>
-    <option name=":build.scons:info.build">True</option>
-    <!-- <option name=":build.scons:info.git">Info+Status</option> -->
+    <!-- <option name=":build:scons:avrdude.programmer">avrispmkII</option> -->
+    <option name=":build:scons:avrdude.programmer">usbasp-clone</option>
+    <option name=":build:scons:include_demo_project">False</option>
+    <option name=":build:scons:include_sconstruct">True</option>
+    <option name=":build:scons:is_unittest">True</option>
+    <option name=":build:scons:info.build">True</option>
+    <!-- <option name=":build:scons:info.git">Info+Status</option> -->
   </options>
 
   <modules>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
     <!-- AT90CAN128 only has 128kB of Flash -->
     <module>:test:architecture</module>
     <module>:test:communication</module>

@@ -2,13 +2,13 @@
 <library>
   <extends>../../../src/modm/board/blue_pill/board.xml</extends>
   <options>
-    <option name=":build.scons:build.path">../../../build/stm32f103c8t6_blue_pill/can</option>
+    <option name=":build:build.path">../../../build/stm32f103c8t6_blue_pill/can</option>
   </options>
   <modules>
     <module>:debug</module>
     <module>:platform:can</module>
     <module>:platform:gpio</module>
     <module>:platform:uart:2</module>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
   </modules>
 </library>

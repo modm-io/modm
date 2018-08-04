@@ -2,9 +2,9 @@
 <library>
   <extends>../../../src/modm/board/disco_f469ni/board.xml</extends>
   <options>
-    <option name=":build.scons:build.path">../../../build/stm32f469_discovery/assert</option>
+    <option name=":build:build.path">../../../build/stm32f469_discovery/assert</option>
   </options>
   <modules>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
   </modules>
 </library>

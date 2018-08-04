@@ -2,7 +2,7 @@
 <library>
   <extends>../../../src/modm/board/disco_f407vg/board.xml</extends>
   <options>
-    <option name=":build.scons:build.path">../../../build/stm32f4_discovery/accelerometer</option>
+    <option name=":build:build.path">../../../build/stm32f4_discovery/accelerometer</option>
   </options>
   <modules>
     <module>:driver:lis302dl</module>
@@ -12,6 +12,6 @@
     <module>:platform:i2c.bitbang</module>
     <module>:processing:timer</module>
     <module>:processing:protothread</module>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
   </modules>
 </library>

@@ -11,12 +11,12 @@
   <options>
     <option name=":target">atmega644</option>
     <option name=":platform:clock:f_cpu">14745600</option>
-    <option name=":build.scons:build.path">../../../../build/avr/display/hd44780</option>
+    <option name=":build:build.path">../../../../build/avr/display/hd44780</option>
   </options>
   <modules>
     <module>:driver:hd44780</module>
     <module>:platform:gpio</module>
     <module>:platform:core</module>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
   </modules>
 </library>

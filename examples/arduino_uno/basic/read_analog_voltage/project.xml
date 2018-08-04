@@ -2,10 +2,10 @@
 <library>
   <extends>../../../../src/modm/board/arduino_uno/board.xml</extends>
   <options>
-    <option name=":build.scons:build.path">../../../../build/arduino_uno/basic/read_analog_voltage</option>
+    <option name=":build:build.path">../../../../build/arduino_uno/basic/read_analog_voltage</option>
   </options>
   <modules>
     <module>:platform:adc</module>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
   </modules>
 </library>

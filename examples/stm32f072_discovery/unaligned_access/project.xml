@@ -2,12 +2,12 @@
 <library>
   <extends>../../../src/modm/board/disco_f072rb/board.xml</extends>
   <options>
-    <option name=":build.scons:build.path">../../../build/stm32f072_discovery/unaligned_access</option>
+    <option name=":build:build.path">../../../build/stm32f072_discovery/unaligned_access</option>
   </options>
   <modules>
     <module>:architecture:unaligned</module>
     <module>:container</module>
     <module>:platform:gpio</module>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
   </modules>
 </library>

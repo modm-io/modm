@@ -2,10 +2,10 @@
 <library>
   <extends>../../../src/modm/board/disco_f303vc/board.xml</extends>
   <options>
-    <option name=":build.scons:build.path">../../../build/stm32f3_discovery/gdb</option>
+    <option name=":build:build.path">../../../build/stm32f3_discovery/gdb</option>
   </options>
   <modules>
     <module>:platform:can</module>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
   </modules>
 </library>
