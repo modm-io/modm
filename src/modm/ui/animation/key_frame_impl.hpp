@@ -199,7 +199,7 @@ template< typename T, class... Args >
 modm::ui::KeyFrameAnimationMode
 modm::ui::KeyFrameAnimationBase<T, Args...>::getMode() const
 {
-	return mode;
+	return static_cast<KeyFrameAnimationMode>(mode);
 }
 
 template< typename T, class... Args >
