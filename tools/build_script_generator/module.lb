@@ -32,6 +32,3 @@ def prepare(module, options):
 
 def build(env):
     env.append_metadata_unique("include_path", "src")
-    fcpu = env.get_option(":platform:clock:f_cpu", None)
-    if fcpu is not None:
-        env.append_metadata_unique("cpp.define", "F_CPU={}".format(fcpu))

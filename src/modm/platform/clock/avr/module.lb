@@ -34,6 +34,7 @@ def prepare(module, options):
 def build(env):
     device = env[":target"]
     driver = device.get_driver("clock")
+    env.append_metadata_unique("cpp.define", "F_CPU={}".format(env[":::f_cpu"]))
 
     properties = device.properties
     properties["target"] = target = device.identifier
