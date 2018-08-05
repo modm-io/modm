@@ -137,10 +137,14 @@ modm::platform::Adc{{ id }}::setLeftAdjustResult(const bool enable)
 	}
 }
 
-void
+bool
 modm::platform::Adc{{ id }}::setChannel(	const Channel channel,
 										const SampleTime sampleTime)
 {
+	if(static_cast<uint8_t>(channel) > 18) {
+		return false;
+	}
+
 	uint32_t tmpreg;
 	// SQR1[10:6] contain SQ1[4:0]
 	ADC{{ id }}->SQR1 = (static_cast<uint8_t>(channel) & 0b11111) << 6;
@@ -159,6 +163,7 @@ modm::platform::Adc{{ id }}::setChannel(	const Channel channel,
 						((static_cast<uint8_t>(channel)-10) * 3);
 		ADC{{ id }}->SMPR2 = tmpreg;
 	}
+	return true;
 }
 
 void
