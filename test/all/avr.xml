@@ -9,11 +9,11 @@
   </repositories>
 
   <options>
-    <option name=":build.scons:include_demo_project">True</option>
+    <option name=":build:scons:include_demo_project">True</option>
     <option name=":platform:clock:f_cpu">8000000</option>
   </options>
   <modules>
     <module>:platform:**</module>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
   </modules>
 </library>

@@ -11,10 +11,12 @@
 # -----------------------------------------------------------------------------
 
 import os
-
+# import all common code
+exec(open(localpath("../common.py")).read())
 
 def init(module):
-    module.name = "build.scons"
+    module.parent = "build"
+    module.name = "scons"
     module.description = "SCons Build Script Generator"
 
 
@@ -29,13 +31,6 @@ def prepare(module, options):
     module.add_option(
         BooleanOption(name="is_unittest", default=False,
                       description="Generate SConstruct file for modm unittests."))
-
-    module.add_option(
-        StringOption(name="project.name", default=default_project_name,
-                     description="Project name for executable"))
-    module.add_option(
-        StringOption(name="build.path", default="build/"+default_project_name,
-                     description="Path to the build folder"))
 
     module.add_option(
         StringOption(name="image.source", default="",
@@ -89,86 +84,65 @@ def build(env):
 
 def post_build(env, buildlog):
     target = env["modm:target"]
-    platform = target.identifier["platform"]
-    family = target.identifier["family"]
+    # get CPU information
+    subs = common_target(target)
 
     build_tools = [
         "settings_buildpath",
         "utils_buildformat",
         "find_files",
         "template",
-        "cmake_wrapper"]
-    if len(env["xpcc.source"]): build_tools.append("system_design");
-    if len(env["image.source"]): build_tools.append("bitmap");
-    if env["info.git"] != "Disabled" or env["info.build"]: build_tools.append("info");
-    if env["is_unittest"]: build_tools.append("unittest")
-    if platform in ["stm32"]:
-        build_tools.extend(["compiler_arm_none_eabi_gcc", "program_openocd", "utils_buildsize"])
-    elif platform in ["avr"]:
-        build_tools.extend(["compiler_avr_gcc", "program_avrdude"])
+        "cmake_wrapper",
+    ]
+    if len(env[":::xpcc.source"]):
+        build_tools += ["system_design"]
+    if len(env[":::image.source"]):
+        build_tools += ["bitmap"]
+    if env[":::info.git"] != "Disabled" or env[":::info.build"]:
+        build_tools += ["info"]
+    if env[":::is_unittest"]:
+        build_tools += ["unittest"]
+    if subs["platform"] in ["stm32"]:
+        build_tools += ["compiler_arm_none_eabi_gcc", "program_openocd", "utils_buildsize"]
+    elif subs["platform"] in ["avr"]:
+        build_tools += ["compiler_avr_gcc", "program_avrdude"]
     else:
-        build_tools.extend([
-            "compiler_hosted_" + ("llvm" if family == "darwin" else "gcc"),
-            "utils_buildsize"])
+        build_tools += ["utils_buildsize", "compiler_hosted_gcc"]
 
     # Extract all source code files
-    env.outbasepath = "modm"
-    files_to_build = []
-    outpath = env.outpath(".")
-    for operations in buildlog:
-        filename = os.path.relpath(operations.filename_out, outpath)
-        _, extension = os.path.splitext(filename)
-
-        if extension in [".c", ".cpp", ".cc", ".sx", ".S"]:
-            files_to_build.append(os.path.normpath(filename))
-    files_to_build.sort()
-
-    core_driver = target.get_driver("core")
-    core = core_driver["type"]
-    if core.startswith("cortex-m4"):
-        core = "cortex-m4"
-    elif core.startswith("cortex-m7"):
-        core = "cortex-m7"
-    avrdude_mcu = target._properties["mcu"] if "mcu" in target._properties else ""
-
-    memories = []
-    if "memory" in core_driver:
-        memories.extend([
-            {
-                k:(int(v) if v.isdigit() else (int(v, 16) if v.startswith("0x") else v))
-                for k, v in memory.items()
-            }
-            for memory in core_driver["memory"]
-        ])
-
-    env.substitutions = {
-        "partname": target.partname,
-        "platform": platform,
-        "family": family,
-        "core": core,
-        "avrdude_mcu": avrdude_mcu,
-        "openocd_base_dir": os.path.dirname(env.get_option("::openocd.cfg", "")),
-        "openocd_file": os.path.basename(env.get_option("::openocd.cfg", "")),
-        "files": files_to_build,
+    subs["sources"] = common_source_files(env, buildlog)
+    # get memory information
+    subs["memories"] = common_memories(target)
+    # get memory information
+    subs["flags"] = common_compiler_flags("gcc", target, buildlog)
+    # Add SCons specific data
+    subs.update({
+        "openocd_base_dir": os.path.dirname(env.get_option(":::openocd.cfg", "")),
+        "openocd_file": os.path.basename(env.get_option(":::openocd.cfg", "")),
         "metadata": buildlog.metadata,
-        "memories": memories,
         "build_tools": build_tools,
-        "info_build": env["info.build"],
-        "info_git": env["info.git"],
-        "build_path": env["build.path"],
-        "image_source": env["image.source"],
-        "xpcc_source": env["xpcc.source"],
-        "xpcc_container": env["xpcc.container"],
-        "xpcc_generate": env["xpcc.generate"],
-        "xpcc_namespace": env["xpcc.namespace"],
-    }
+    })
+    # Set these substitutions for all templates
+    env.substitutions = subs
 
-    env.append_metadata_unique('include_path', 'src')
-    env.template("resources/SConscript.in", "SConscript")
+    def flag_format(flag):
+        subs = {
+            "target_base": "\"${TARGET.base}\"",
+            "linkdir": "abspath(\"link\")"
+        }
+        flag = "\"{}\"".format(flag)
+        vals = ["{}={}".format(t, r) for t, r in subs.items() if "{{{}}}".format(t) in flag]
+        if len(vals):
+            flag = "{}.format({})".format(flag, ", ".join(vals))
+        return flag
 
+    # Generate library SConscript
+    env.outbasepath = "modm"
+    env.template("resources/SConscript.in", "SConscript", filters={"flag_format": flag_format})
     # Copy the scons-build-tools
     env.copy(repopath("ext/dlr/scons-build-tools"), "ext/dlr/scons-build-tools")
     env.copy("site_tools", "scons/site_tools")
+    # Copy XPCC tools
     if "system_design" in build_tools:
         env.copy(repopath("tools/system_design"), "tools/system_design")
 

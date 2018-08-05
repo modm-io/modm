@@ -2,7 +2,7 @@
 <library>
   <extends>../../../../src/modm/board/disco_f407vg/board.xml</extends>
   <options>
-    <option name=":build.scons:build.path">../../../../build/stm32f4_discovery/radio/nrf24-phy-test</option>
+    <option name=":build:build.path">../../../../build/stm32f4_discovery/radio/nrf24-phy-test</option>
   </options>
   <modules>
     <module>:debug</module>
@@ -10,6 +10,6 @@
     <module>:platform:gpio</module>
     <module>:platform:spi:2</module>
     <module>:platform:uart:2</module>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
   </modules>
 </library>

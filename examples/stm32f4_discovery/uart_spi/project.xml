@@ -2,11 +2,11 @@
 <library>
   <extends>../../../src/modm/board/disco_f407vg/board.xml</extends>
   <options>
-    <option name=":build.scons:build.path">../../../build/stm32f4_discovery/uart_spi</option>
+    <option name=":build:build.path">../../../build/stm32f4_discovery/uart_spi</option>
   </options>
   <modules>
     <module>:platform:gpio</module>
     <module>:platform:uart.spi:2</module>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
   </modules>
 </library>

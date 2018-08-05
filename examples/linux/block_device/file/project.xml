@@ -10,12 +10,12 @@
 
   <options>
     <option name=":target">hosted-linux</option>
-    <option name=":build.scons:build.path">../../../../build/linux/block_device/file</option>
+    <option name=":build:build.path">../../../../build/linux/block_device/file</option>
   </options>
   <modules>
     <module>:platform:core</module>
     <module>:debug</module>
     <module>:driver:block.device:file</module>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
   </modules>
 </library>

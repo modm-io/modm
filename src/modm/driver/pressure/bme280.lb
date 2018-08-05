@@ -31,4 +31,5 @@ def build(env):
     env.copy("bme280_impl.hpp")
     env.copy("bme280_data.hpp")
     env.copy("bme280_data_impl_fp.hpp")
-    env.copy("bme280_data_impl_double.hpp")
+    if env[":target"].identifier["platform"] != "avr":
+        env.copy("bme280_data_impl_double.hpp")

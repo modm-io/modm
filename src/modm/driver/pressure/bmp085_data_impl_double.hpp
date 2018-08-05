@@ -37,10 +37,10 @@ DataDouble::calculateCalibratedTemperature()
 		double c4 = ::pow(10, -3) * ::pow(2, -15) * calibration.ac4;
 		double b1 = ::pow(160, 2) * ::pow(2, -30) * calibration.b1;
 
-		c5 = (::pow(2, -15) / 160.0) * double(calibration.ac5);
+		c5 = (::pow(2, -15) / double(160.0)) * double(calibration.ac5);
 		c6 = calibration.ac6;
 		mc = (::pow(2, 11) / ::pow(160, 2)) * double(calibration.mc);
-		md = calibration.md / 160.0;
+		md = calibration.md / double(160.0);
 		x0 = calibration.ac1;
 		x1 = double(160.0) * ::pow(2, -13) * double(calibration.ac2);
 		x2 = ::pow(160, 2) * ::pow(2, -25) * double(calibration.b2);

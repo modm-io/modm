@@ -49,7 +49,7 @@ Drv832xSpiTest::testRegister()
 	TEST_ASSERT_FALSE(bool(gateDriver.driverControl() & modm::drv832xSpi::DriverControl::DisableChargePumpUVLO));
 	TEST_ASSERT_FALSE(gateDriver.driverControl().any(modm::drv832xSpi::DriverControl::Coast | modm::drv832xSpi::DriverControl::PwmMode1 | modm::drv832xSpi::DriverControl::PwmMode2 | modm::drv832xSpi::DriverControl::DisableChargePumpUVLO));
 	uint16_t value = gateDriver.driverControl().value;
-	TEST_ASSERT_EQUALS(value, 0b0110011011);
+	TEST_ASSERT_EQUALS(value, 0b0110011011u);
 
 	gateDriver.driverControl() |= modm::drv832xSpi::PwmMode_t(modm::drv832xSpi::PwmMode::PwmModeIndependent);
 	TEST_ASSERT_TRUE(bool(gateDriver.driverControl() & modm::drv832xSpi::DriverControl::PwmMode1));

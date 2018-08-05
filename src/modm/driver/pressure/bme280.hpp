@@ -33,7 +33,9 @@ struct bme280
 using Calibration = modm::bme280data::Calibration;
 using Data = modm::bme280data::Data;
 using DataBase = modm::bme280data::DataBase;
+#ifndef __AVR__
 using DataDouble = modm::bme280data::DataDouble;
+#endif
 
 protected:
 	/// @cond

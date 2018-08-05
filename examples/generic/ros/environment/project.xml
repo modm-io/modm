@@ -2,7 +2,7 @@
 <library>
   <extends>../../../../src/modm/board/nucleo_l476rg/board.xml</extends>
   <options>
-    <option name=":build.scons:build.path">../../../../build/generic/ros/environment</option>
+    <option name=":build:build.path">../../../../build/generic/ros/environment</option>
     <option name=":platform:uart:2:buffer.tx">512</option>
     <option name=":platform:uart:2:buffer.rx">512</option>
   </options>
@@ -14,6 +14,6 @@
     <module>:processing:timer</module>
     <module>:processing:protothread</module>
     <module>:platform:i2c:1</module>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
   </modules>
 </library>

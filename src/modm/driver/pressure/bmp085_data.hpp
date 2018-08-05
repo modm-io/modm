@@ -168,6 +168,7 @@ private:
 	int32_t b5; // calculated in calculateCalibratedTemperature, needed for calculateCalibratedPressure
 };
 
+#ifndef __AVR__
 class modm_packed
 DataDouble : public DataBase
 {
@@ -209,12 +210,15 @@ private:
 	// Stored pressure in double precision in hPa
 	double calibratedPressureDouble;
 };
+#endif
 
 } // bmp085data namespace
 
 } // modm namespace
 
 #include "bmp085_data_impl_fp.hpp"
+#ifndef __AVR__
 #include "bmp085_data_impl_double.hpp"
+#endif
 
 #endif // MODM_BMP085_DATA_HPP

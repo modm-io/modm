@@ -11,11 +11,11 @@
   <options>
     <option name=":target">attiny85</option>
     <option name=":platform:clock:f_cpu">8000000</option>
-    <option name=":build.scons:build.path">../../../../build/avr/gpio/basic</option>
+    <option name=":build:build.path">../../../../build/avr/gpio/basic</option>
   </options>
   <modules>
     <module>:platform:core</module>
     <module>:platform:gpio</module>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
   </modules>
 </library>

@@ -2,7 +2,7 @@
 <library>
   <extends>../../../src/modm/board/disco_f407vg/board.xml</extends>
   <options>
-    <option name=":build.scons:build.path">../../../build/stm32f4_discovery/protothreads</option>
+    <option name=":build:build.path">../../../build/stm32f4_discovery/protothreads</option>
   </options>
   <modules>
     <module>:driver:tmp102</module>
@@ -11,6 +11,6 @@
     <module>:platform:i2c:1</module>
     <module>:platform:uart:2</module>
     <module>:processing:protothread</module>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
   </modules>
 </library>

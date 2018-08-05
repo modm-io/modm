@@ -2,7 +2,7 @@
 <library>
   <extends>../../../../src/modm/board/disco_f407vg/board.xml</extends>
   <options>
-    <option name=":build.scons:build.path">../../../../build/stm32f4_discovery/open407v-d/touchscreen</option>
+    <option name=":build:build.path">../../../../build/stm32f4_discovery/open407v-d/touchscreen</option>
   </options>
   <modules>
     <module>:driver</module>
@@ -13,6 +13,6 @@
     <module>:platform:gpio</module>
     <module>:platform:spi:2</module>
     <module>:ui:display</module>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
   </modules>
 </library>

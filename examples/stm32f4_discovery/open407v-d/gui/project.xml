@@ -2,8 +2,8 @@
 <library>
   <extends>../../../../src/modm/board/disco_f407vg/board.xml</extends>
   <options>
-    <option name=":build.scons:build.path">../../../../build/stm32f4_discovery/open407v-d/gui</option>
-    <option name=":build.scons:image.source">images</option>
+    <option name=":build:build.path">../../../../build/stm32f4_discovery/open407v-d/gui</option>
+    <option name=":build:scons:image.source">images</option>
   </options>
   <modules>
     <module>:container</module>
@@ -17,6 +17,6 @@
     <module>:ui:display</module>
     <module>:ui:gui</module>
     <module>:utils</module>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
   </modules>
 </library>

@@ -11,7 +11,7 @@
   <options>
     <option name=":target">atmega644</option>
     <option name=":platform:clock:f_cpu">14745600</option>
-    <option name=":build.scons:build.path">../../../../build/avr/1-wire/ds18b20</option>
+    <option name=":build:build.path">../../../../build/avr/1-wire/ds18b20</option>
   </options>
   <modules>
     <module>:driver:ds18b20</module>
@@ -21,6 +21,6 @@
     <module>:platform:core</module>
     <module>:platform:gpio</module>
     <module>:platform:uart:0</module>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
   </modules>
 </library>

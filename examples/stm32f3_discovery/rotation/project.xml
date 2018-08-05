@@ -2,13 +2,13 @@
 <library>
   <extends>../../../src/modm/board/disco_f303vc/board.xml</extends>
   <options>
-    <option name=":build.scons:build.path">../../../build/stm32f3_discovery/rotation</option>
+    <option name=":build:build.path">../../../build/stm32f3_discovery/rotation</option>
   </options>
   <modules>
     <module>:math:filter</module>
     <module>:platform:gpio</module>
     <module>:processing:timer</module>
     <module>:processing:protothread</module>
-    <module>:build.scons</module>
+    <module>:build:scons</module>
   </modules>
 </library>

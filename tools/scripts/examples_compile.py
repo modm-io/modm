@@ -29,9 +29,9 @@ for project in projects:
 	print("Building: {}".format(project.parent))
 	result = run(project.parent, "lbuild build")
 	if result: continue;
-	if "build.scons" in project.read_text():
+	if ":build:scons" in project.read_text():
 		run(project.parent, "scons build")
-	elif "build.cmake" in project.read_text():
+	elif ":build:cmake" in project.read_text():
 		run(project.parent, "make")
 
 exit(results)

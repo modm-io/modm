@@ -178,7 +178,7 @@ else:
     project_file = None
 
 files = get_files([Path(p) for p in sys.argv[1:] if not p.startswith("-")])
-modules = ["modm:build.scons", "modm:platform:core"]
+modules = ["modm:build:scons", "modm:platform:core"]
 
 for file in files:
     content = file.read_text()
@@ -190,10 +190,10 @@ modules = sorted(list(set(modules)))
 if project_file:
     # gather the build data from old config
     subs = {"options": {
-        "modm:build.scons:build.path": config["build"].get("buildpath", "build/")\
+        "modm:build:build.path": config["build"].get("buildpath", "build/")\
             .replace("${name}", config["build"].get("name", ""))\
             .replace("${xpccpath}", "."),
-        "modm:build.scons:include_sconstruct": False,
+        "modm:build:scons:include_sconstruct": False,
     }}
     if config["build"].get("board", None):
         board = config["build"]["board"]
