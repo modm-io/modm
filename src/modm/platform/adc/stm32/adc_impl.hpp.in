@@ -113,7 +113,7 @@ bool
 modm::platform::Adc{{ id }}::setChannel(const Channel channel,
 									 const SampleTime sampleTime)
 {
-	if (uint32_t(channel) >= 18) return false;
+	if (uint32_t(channel) > 18) return false;
 	// clear number of conversions in the sequence
 	// and set number of conversions to 1
 	ADC{{ id }}->SQR1 = 0;
