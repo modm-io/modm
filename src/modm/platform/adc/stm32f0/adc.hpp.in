@@ -189,7 +189,7 @@ public:
 	 * @pre The ADC clock must be started and the ADC switched on with
 	 * 		initialize()
 	 */
-	static inline void
+	static inline bool
 	setChannel(const Channel channel,
 			   const SampleTime sampleTime=static_cast<SampleTime>(0b000));
 

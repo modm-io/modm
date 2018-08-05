@@ -97,10 +97,14 @@ modm::stm32::Adc::setDataAlignmentAndResolution(const DataAlignment align,
                   (ADC1->CFGR1 & ~(ADC_CFGR1_ALIGN | ADC_CFGR1_RES));
 }
 
-void
+bool
 modm::stm32::Adc::setChannel(const Channel channel,
                              const SampleTime sampleTime)
 {
+    if(static_cast<uint32_t>(channel) > 18) {
+        return false;
+    }
+
     ADC1->CHSELR |= 1 << static_cast<uint32_t>(channel);
     ADC1->SMPR   = static_cast<uint32_t>(sampleTime);
 
@@ -109,6 +113,8 @@ modm::stm32::Adc::setChannel(const Channel channel,
     } else if (channel == Channel::Temperature) {
         ADC1_COMMON->CCR |= ADC_CCR_TSEN;
     }
+
+    return true;
 }
 
 void
