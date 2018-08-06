@@ -50,4 +50,7 @@ def build(env):
         "boost_thread" if env[":target"].identifier["family"] == "linux" else
         "boost_thread-mt")
 
+    if env[":target"].identifier["family"] == "linux":
+        env.append_metadata_unique("required_library", "pthread")
+
     env.copy(".", ignore=env.ignore_patterns(*ignore))
