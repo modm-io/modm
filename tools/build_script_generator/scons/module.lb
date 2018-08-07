@@ -35,22 +35,7 @@ def prepare(module, options):
         BooleanOption(name="info.build", default=False,
                       description="Generate CPP defines about the build state"))
 
-    if options[":target"].identifier["platform"] == "avr":
-        # we need the clock:f_cpu option!
-        module.depends(":platform:clock")
-        module.add_option(
-            StringOption(name="avrdude.programmer", default="avrispmkII",
-                         description="AvrDude programmer"))
-        module.add_option(
-            StringOption(name="avrdude.port", default="usb",
-                         description="AvrDude programmer port"))
-        module.add_option(
-            NumericOption(name="avrdude.baudrate", default=-1,
-                          description="AvrDude programmer baudrate"))
-        module.add_option(
-            StringOption(name="avrdude.options", default="",
-                         description="AvrDude programmer options"))
-    elif options[":target"].identifier["platform"] == "stm32":
+    if options[":target"].identifier["platform"] == "stm32":
         module.add_option(
             StringOption(name="openocd.cfg", default="",
                          description="Path to the OpenOCD configuration file"))
@@ -112,6 +97,10 @@ def post_build(env, buildlog):
         "generator_container": env.get_option(":communication:xpcc:generator:container", ""),
         "generator_path": env.get_option(":communication:xpcc:generator:path", ""),
         "generator_namespace": env.get_option(":communication:xpcc:generator:namespace", ""),
+        "avrdude_programmer": env.get_option(":build:avrdude.programmer", ""),
+        "avrdude_port": env.get_option(":build:avrdude.port", ""),
+        "avrdude_options": env.get_option(":build:avrdude.options", ""),
+        "avrdude_baudrate": env.get_option(":build:avrdude.baudrate", 0),
     })
     # Set these substitutions for all templates
     env.substitutions = subs

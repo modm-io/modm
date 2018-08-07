@@ -27,6 +27,21 @@ def prepare(module, options):
         StringOption(name="build.path", default="build/"+default_project_name,
                      description="Path to the build folder"))
 
+    if platform in ["avr"]:
+        # we need the clock:f_cpu option!
+        module.depends(":platform:clock")
+        module.add_option(
+            StringOption(name="avrdude.programmer", default="avrispmkII",
+                         description="AvrDude programmer"))
+        module.add_option(
+            StringOption(name="avrdude.port", default="usb",
+                         description="AvrDude programmer port"))
+        module.add_option(
+            NumericOption(name="avrdude.baudrate", default=-1,
+                          description="AvrDude programmer baudrate"))
+        module.add_option(
+            StringOption(name="avrdude.options", default="",
+                         description="AvrDude programmer options"))
     return True
 
 
