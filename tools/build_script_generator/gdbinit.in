@@ -1,0 +1,35 @@
+%% for profile in ["release", "debug"]
+%% if "elf." ~ profile in metadata
+define file_{{profile}}
+    file
+    file {{ metadata["elf." ~ profile][0] }}
+end
+%% endif
+%% endfor
+
+layout split
+focus cmd
+set print pretty
+set print asm-demangle on
+set mem inaccessible-by-default off
+
+# Doesn't work correctly since Ctrl-C will kill openocd
+# See https://github.com/RIOT-OS/RIOT/pull/3619
+# Launch with `openocd -f openocd.cfg & arm-none-eabi-gdb; kill $!` in shell instead
+# target extended-remote | openocd -f openocd.cfg -c "gdb_port pipe"
+
+target extended-remote :3333
+
+define restart
+  mon reset halt
+end
+
+define rerun
+  mon reset halt
+  c
+end
+
+mon init
+mon poll on
+refresh
+c

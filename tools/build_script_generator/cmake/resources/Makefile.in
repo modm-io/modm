@@ -40,7 +40,11 @@ upload-release: build-release
 	@openocd -f openocd.cfg -c "program_release"
 
 gdb: build-debug
-	@arm-none-eabi-gdb --command=$(GDB_INIT)  $(EXECUTABLE_PATH)
+	@arm-none-eabi-gdb -x gdbinit $(BUILD_DIR)/cmake-build-debug/{{ project_name }}.elf
+	@killall openocd || true
+
+gdb-release: build-release
+	@arm-none-eabi-gdb -x gdbinit $(BUILD_DIR)/cmake-build-release/{{ project_name }}.elf
 	@killall openocd || true
 
 killopenocd:

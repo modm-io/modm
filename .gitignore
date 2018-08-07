@@ -22,7 +22,6 @@ project.xml.log
 
 # CMake
 CMakeLists.txt
-**/cmake-build-debug/
 
 #Clion
 **/.idea/
@@ -32,4 +31,5 @@ examples/**/modm
 examples/**/SConstruct
 examples/**/Makefile
 examples/**/generated
+examples/**/gdbinit
 examples/**/openocd.cfg

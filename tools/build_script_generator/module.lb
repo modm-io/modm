@@ -49,10 +49,14 @@ def prepare(module, options):
             BooleanOption(name="include_openocd", default=True,
                           description="Generate a default openocd.cfg file"))
         module.add_option(
+            BooleanOption(name="include_gdbinit", default=True,
+                          description="Generate a default .gdbinit file"))
+        module.add_option(
             StringOption(name="openocd.cfg", default="",
                          description="Path to a custom OpenOCD configuration file"))
 
     return True
+
 
 def build(env):
     env.append_metadata_unique("include_path", "src")
@@ -65,6 +69,7 @@ def build(env):
     # Append common search paths to metadata
     env.append_metadata_unique("openocd.search", "modm/openocd")
 
+
 def post_build(env, buildlog):
     target = env[":target"]
     subs = {
@@ -76,3 +81,6 @@ def post_build(env, buildlog):
 
     if env.get_option("::include_openocd", False):
         env.template("openocd.cfg.in")
+
+    if env.get_option("::include_gdbinit", False):
+        env.template("gdbinit.in")
