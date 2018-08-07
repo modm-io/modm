@@ -10,7 +10,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-import os
+from os.path import join
 # import all common code
 exec(open(localpath("../common.py")).read())
 
@@ -35,15 +35,14 @@ def prepare(module, options):
         BooleanOption(name="info.build", default=False,
                       description="Generate CPP defines about the build state"))
 
-    if options[":target"].identifier["platform"] == "stm32":
-        module.add_option(
-            StringOption(name="openocd.cfg", default="",
-                         description="Path to the OpenOCD configuration file"))
     return True
 
 
 def build(env):
-    pass
+    project_name = env[":build:project.name"]
+    build_path = env[":build:build.path"]
+    env.append_metadata_unique("elf.release", join(build_path, "release", project_name + ".elf"))
+    env.append_metadata_unique("elf.debug",   join(build_path, "debug",   project_name + ".elf"))
 
 
 def post_build(env, buildlog):
@@ -85,8 +84,6 @@ def post_build(env, buildlog):
     subs["flags"] = common_compiler_flags("gcc", target, buildlog)
     # Add SCons specific data
     subs.update({
-        "openocd_base_dir": os.path.dirname(env.get_option(":::openocd.cfg", "")),
-        "openocd_file": os.path.basename(env.get_option(":::openocd.cfg", "")),
         "metadata": buildlog.metadata,
         "build_tools": build_tools,
         "is_unittest": is_unittest,

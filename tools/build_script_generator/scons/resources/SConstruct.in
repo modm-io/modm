@@ -73,12 +73,6 @@ sources += env.FindSourceFiles(".", ignorePaths=ignored)
 # Building application
 program = env.Program(target=project_name+".elf", source=sources)
 
-%% if openocd_file != ""
-# Using a custom OpenOCD script
-env.Append(CONFIG_OPENOCD_SEARCHDIRS=[abspath("{{openocd_base_dir}}")])
-env.Append(CONFIG_OPENOCD_CONFIGFILES=["{{openocd_file}}"])
-%% endif
-
 # SCons functions
 env.Alias("cmakewrapper", env.CMakeWrapper())
 env.Alias("qtcreator", env.QtCreatorProject(sources))
@@ -92,7 +86,7 @@ env.Alias("all", ["build", "run"])
 %% else
     %% if platform in ["stm32"]
 env.Alias("size", env.Size(program))
-env.Alias("program", env.OpenOcd(program))
+env.Alias("program", env.OpenOcd(program, commands=["program_{}".format(profile)]))
     %% elif platform in ["avr"]
 env.Alias("program", env.Avrdude(program))
     %% endif

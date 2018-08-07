@@ -2,9 +2,6 @@
 CMAKE_BUILD_TYPE = Debug
 BUILD_DIR = {{ build_path }}
 
-OPENOCD_CONFIG = {{ openocd_config }}
-OPENOCD_INCLUDE = modm/openocd
-
 CMAKE_GENERATOR = Unix Makefiles
 CMAKE_FLAGS = -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON -DCMAKE_RULE_MESSAGES:BOOL=ON -DCMAKE_VERBOSE_MAKEFILE:BOOL=OFF
 
@@ -37,10 +34,10 @@ cleanall:
 	@rm -rf $(BUILD_DIR)/cmake-build-debug
 
 upload-debug: build-debug
-	@openocd -s $(OPENOCD_INCLUDE) -f $(OPENOCD_CONFIG) -c "program $(BUILD_DIR)/cmake-build-debug/{{ project_name }}.elf verify reset exit"
+	@openocd -f openocd.cfg -c "program_debug"
 
 upload-release: build-release
-	@openocd -s $(OPENOCD_INCLUDE) -f $(OPENOCD_CONFIG) -c "program $(BUILD_DIR)/cmake-build-release/{{ project_name }}.elf verify reset exit"
+	@openocd -f openocd.cfg -c "program_release"
 
 gdb: build-debug
 	@arm-none-eabi-gdb --command=$(GDB_INIT)  $(EXECUTABLE_PATH)

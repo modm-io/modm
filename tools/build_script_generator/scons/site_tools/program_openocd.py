@@ -21,22 +21,30 @@ import platform
 from SCons.Script import *
 
 # -----------------------------------------------------------------------------
-def openocd_run(env, source, alias="openocd_run"):
+def openocd_run(env, source, commands=[], alias="openocd_run"):
 	# Provide additional search paths via the OPENOCD_SCRIPTS environment variable
 	# See http://openocd.org/doc/html/Running.html
 	env["ENV"]["OPENOCD_SCRIPTS"] = os.environ.get("OPENOCD_SCRIPTS", "")
 
-	openocdcmd = "$OPENOCD {} {} {}".format(
-		" ".join(map("-s \"{}\"".format, env.get("CONFIG_OPENOCD_SEARCHDIRS", []))),
-		" ".join(map("-f \"{}\"".format, env.get("CONFIG_OPENOCD_CONFIGFILES", []))),
-		" ".join(map("-c \"{}\"".format, env.get("CONFIG_OPENOCD_COMMANDS", [])))
+	search = env.get("MODM_OPENOCD_SEARCHDIRS", [])
+	config = env.get("MODM_OPENOCD_CONFIGFILES", [])
+
+	openocdcmd = "$OPENOCD -f openocd.cfg {} {} {}".format(
+		" ".join(map("-s \"{}\"".format, search)),
+		" ".join(map("-f \"{}\"".format, config)),
+		" ".join(map("-c \"{}\"".format, commands))
 	)
-	action = Action(openocdcmd, cmdstr="$INSTALLSTR")
+	action = Action(openocdcmd, cmdstr="$OPENOCDSTR")
 	return env.AlwaysBuild(env.Alias(alias, source, action))
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
 	env["OPENOCD"] = "openocd"
+	if ARGUMENTS.get('verbose') != '1':
+		env["OPENOCDSTR"] = "%s.----OpenOCD--- %s$SOURCE\n" \
+	                        "%s'-------------> %s$CONFIG_DEVICE_NAME%s" % \
+	                        ("\033[;0;32m", "\033[;0;33m", "\033[;0;32m", "\033[;1;33m", "\033[;0;0m")
+
 	env.AddMethod(openocd_run, "OpenOcd")
 
 def exists(env):

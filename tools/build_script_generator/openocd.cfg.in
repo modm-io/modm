@@ -1,0 +1,22 @@
+%% for path in metadata.get("openocd.search", []) | sort
+add_script_search_dir {{ path }}
+%% endfor
+%% for file in metadata.get("openocd.configfile", []) | sort
+source [find {{ file }}]
+%% endfor
+
+proc modm_program { SOURCE } {
+	program $SOURCE verify
+	reset halt
+	mww 0xE000EDF0 0xA05F0000
+	shutdown
+}
+
+%% for profile in ["release", "debug"]
+%% if "elf." ~ profile in metadata
+proc program_{{ profile }} {} {
+	modm_program {{ metadata["elf." ~ profile][0] }}
+}
+%% endif
+%% endfor
+

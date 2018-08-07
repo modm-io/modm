@@ -19,6 +19,7 @@ def init(module):
 def prepare(module, options):
     _, default_project_name = os.path.split(os.getcwd())
     default_project_name = default_project_name.replace(".", "_").replace(" ", "_")
+    platform = options[":target"].identifier["platform"]
 
     module.add_option(
         StringOption(name="project.name", default=default_project_name,
@@ -42,8 +43,36 @@ def prepare(module, options):
         module.add_option(
             StringOption(name="avrdude.options", default="",
                          description="AvrDude programmer options"))
-    return True
 
+    if options[":target"].has_driver("core:cortex-m*"):
+        module.add_option(
+            BooleanOption(name="include_openocd", default=True,
+                          description="Generate a default openocd.cfg file"))
+        module.add_option(
+            StringOption(name="openocd.cfg", default="",
+                         description="Path to a custom OpenOCD configuration file"))
+
+    return True
 
 def build(env):
     env.append_metadata_unique("include_path", "src")
+
+    # Append custom openocd config file to metadata
+    openocd_cfg = env.get_option(":build:openocd.cfg", "")
+    if len(openocd_cfg):
+        env.append_metadata_unique("openocd.configfile", openocd_cfg)
+
+    # Append common search paths to metadata
+    env.append_metadata_unique("openocd.search", "modm/openocd")
+
+def post_build(env, buildlog):
+    target = env[":target"]
+    subs = {
+        "metadata": buildlog.metadata,
+    }
+    # these are the ONLY files that are allowed to NOT be namespaced with modm!
+    env.outbasepath = "."
+    env.substitutions = subs
+
+    if env.get_option("::include_openocd", False):
+        env.template("openocd.cfg.in")

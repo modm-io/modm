@@ -32,3 +32,4 @@ examples/**/modm
 examples/**/SConstruct
 examples/**/Makefile
 examples/**/generated
+examples/**/openocd.cfg

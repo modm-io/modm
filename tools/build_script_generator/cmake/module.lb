@@ -11,6 +11,7 @@
 # -----------------------------------------------------------------------------
 
 import os
+from os.path import join
 # import all common code
 exec(open(localpath("../common.py")).read())
 
@@ -27,7 +28,10 @@ def prepare(module, options):
 
 
 def build(env):
-    pass
+    project_name = env[":build:project.name"]
+    build_path = env[":build:build.path"]
+    env.append_metadata_unique("elf.release", join(build_path, "cmake-build-release", project_name + ".elf"))
+    env.append_metadata_unique("elf.debug",   join(build_path, "cmake-build-debug",   project_name + ".elf"))
 
 
 def post_build(env, buildlog):
@@ -45,7 +49,6 @@ def post_build(env, buildlog):
     subs.update({
         "project_path": os.getcwd(),
         "metadata": buildlog.metadata,
-        "openocd_config" : buildlog.metadata["openocd.configfile"][0],
         "compiler": "gcc",
         "project_name": env[":build:project.name"],
         "build_path": env[":build:build.path"],
