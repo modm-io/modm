@@ -104,7 +104,7 @@ env.SetDefault(CONFIG_OPENOCD_COMMANDS = [
 %% endif
 
 # XPCC generator tool path
-env["XPCC_SYSTEM_DESIGN"] = join(abspath("."), "tools", "system_design")
+env["XPCC_SYSTEM_DESIGN"] = join(abspath("."), "tools", "xpcc_generator")
 
 # Toolchain configuration
 %% macro generate_flags_for_profile(name, profile, append=False)

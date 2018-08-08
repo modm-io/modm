@@ -1,0 +1,35 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2018, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.parent = "communication:xpcc"
+    module.name = "generator"
+
+def prepare(module, options):
+    module.add_option(
+        StringOption(name="source", default="",
+                     description="Path to the XPCC source file"))
+    module.add_option(
+        StringOption(name="container", default="",
+                     description="Name of the XPCC container to generate for"))
+    module.add_option(
+        StringOption(name="path", default="generated/xpcc",
+                     description="Path to the XPCC generated folder"))
+    module.add_option(
+        StringOption(name="namespace", default="robot",
+                     description="Namespace of the generated XPCC communications"))
+
+    return True
+
+def build(env):
+    env.outbasepath = "modm/tools/xpcc_generator"
+    env.copy(".", ignore=env.ignore_patterns("*.lb"))

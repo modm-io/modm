@@ -54,15 +54,15 @@ for image in env.FindFiles("{{ image_source }}", ".pbm"):
     source, _ = env.Bitmap(str(image))
     sources.append(source)
 %% endif
-%% if options[":::xpcc.source"] != ""
+%% if has_xpcc_generator
 # Generating XPCC sources
-env.Append(CPPPATH="{{ options[":::xpcc.generate"] }}")
-ignored.append("{{ options[":::xpcc.generate"] }}")
+env.Append(CPPPATH="{{ generator_path }}")
+ignored.append("{{ generator_path }}")
 sources += env.XpccCommunication(
-    xmlfile=abspath("{{ options[":::xpcc.source"] }}"),
-    container="{{ options[":::xpcc.container"] }}",
-    path=abspath("{{ options[":::xpcc.generate"] }}"),
-    namespace="{{ options[":::xpcc.namespace"] }}")
+    xmlfile=abspath("{{ generator_source }}"),
+    container="{{ generator_container }}",
+    path=abspath("{{ generator_path }}"),
+    namespace="{{ generator_namespace }}")
 %% endif
 
 %% if not is_unittest

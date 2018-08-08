@@ -3,7 +3,7 @@
  * Copyright (c) 2009, 2011, Georgi Grinshpun
  * Copyright (c) 2010, Martin Rosekeit
  * Copyright (c) 2012-2013, 2016, Sascha Schade
- * Copyright (c) 2012, 2015, 2017, Niklas Hauser
+ * Copyright (c) 2017, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -13,32 +13,33 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef COMPONENT_SENDER_HPP
-#define COMPONENT_SENDER_HPP
+#ifndef COMPONENT_RECEIVER_HPP
+#define COMPONENT_RECEIVER_HPP
 
 #include <modm/communication/xpcc/abstract_component.hpp>
-#include <modm/processing/timer.hpp>
 
-#include "communication/packets.hpp"
+#include <packets.hpp>
 
 namespace component
 {
-	class Sender : public xpcc::AbstractComponent
+	class Receiver : public xpcc::AbstractComponent
 	{
 	public:
-		Sender(uint8_t id, xpcc::Dispatcher &communication);
+		Receiver(uint8_t id, xpcc::Dispatcher &communication);
+		
+		void
+		actionSetPosition(const xpcc::ResponseHandle& handle,
+				const robot::packet::Position *parameter);
+		
+		void
+		actionGetPosition(const xpcc::ResponseHandle& handle);
 		
 		void
 		update();
 		
 	private:
-		void
-		getPositionCallback(const xpcc::Header& header,
-				const robot::packet::Position *parameter);
-		
-		xpcc::ResponseCallback positionCallback;
-		modm::ShortPeriodicTimer timer;
+		robot::packet::Position position;
 	};
 }
 
-#endif // COMPONENT_SENDER_HPP
+#endif // COMPONENT_RECEIVER_HPP

@@ -19,8 +19,8 @@
 
 #include "component_odometry/odometry.hpp"
 
-#include "communication/postman.hpp"
-#include "communication/identifier.hpp"
+#include <postman.hpp>
+#include <identifier.hpp>
 
 using namespace Board;
 

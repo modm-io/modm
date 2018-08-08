@@ -12,9 +12,9 @@
 
 #include <modm/debug/logger.hpp>
 
-#include "communication/identifier.hpp"
-#include "communication/packets.hpp"
-#include "communication/communication.hpp"
+#include <identifier.hpp>
+#include <packets.hpp>
+#include <communication.hpp>
 
 #include "gui.hpp"
 

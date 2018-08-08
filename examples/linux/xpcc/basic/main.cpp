@@ -26,8 +26,8 @@
 #include "component_receiver/receiver.hpp"
 #include "component_sender/sender.hpp"
 
-#include "communication/postman.hpp"
-#include "communication/identifier.hpp"
+#include <postman.hpp>
+#include <identifier.hpp>
 
 // Use TIPC on Linux only
 // xpcc::TipcConnector connector;
