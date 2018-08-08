@@ -41,19 +41,23 @@ env.InfoBuild()
 headers = env.FindHeaderFiles(join(modm_path, "test"))
 sources = env.UnittestRunner(target="main.cpp", source=headers, template="modm/test/runner.cpp.in")
 %% else
-# Finding application sources
 env.Append(CPPPATH=".")
-sources = env.FindSourceFiles(".", ignorePaths=["modm", "cmake-build-*", "build"])
+ignored = ["modm", "cmake-build-*", "build"]
+sources = []
 %% endif
 
-%% if options[":::image.source"] != ""
-# Finding image sources
-for image in env.FindFiles("{{ options[":::image.source"] }}", ".pbm"):
+%% if has_image_source
+# Generating image sources
+env.Append(CPPPATH="{{ image_source }}")
+ignored.append("{{ image_source }}")
+for image in env.FindFiles("{{ image_source }}", ".pbm"):
     source, _ = env.Bitmap(str(image))
     sources.append(source)
 %% endif
 %% if options[":::xpcc.source"] != ""
 # Generating XPCC sources
+env.Append(CPPPATH="{{ options[":::xpcc.generate"] }}")
+ignored.append("{{ options[":::xpcc.generate"] }}")
 sources += env.XpccCommunication(
     xmlfile=abspath("{{ options[":::xpcc.source"] }}"),
     container="{{ options[":::xpcc.container"] }}",
@@ -61,14 +65,19 @@ sources += env.XpccCommunication(
     namespace="{{ options[":::xpcc.namespace"] }}")
 %% endif
 
+%% if not is_unittest
+# Finding application sources
+sources += env.FindSourceFiles(".", ignorePaths=ignored)
+%% endif
+
+# Building application
+program = env.Program(target=project_name+".elf", source=sources)
+
 %% if openocd_file != ""
 # Using a custom OpenOCD script
 env.Append(CONFIG_OPENOCD_SEARCHDIRS=[abspath("{{openocd_base_dir}}")])
 env.Append(CONFIG_OPENOCD_CONFIGFILES=["{{openocd_file}}"])
 %% endif
-%#
-# Building application
-program = env.Program(target=project_name+".elf", source=sources)
 
 # SCons functions
 env.Alias("cmakewrapper", env.CMakeWrapper())

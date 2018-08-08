@@ -76,6 +76,7 @@ def build(env):
 
 def post_build(env, buildlog):
     is_unittest = env.has_module(":test")
+    has_image_source = len(env[":::image.source"])
 
     target = env["modm:target"]
     subs = common_target(target)
@@ -90,7 +91,7 @@ def post_build(env, buildlog):
     ]
     if len(env[":::xpcc.source"]):
         build_tools += ["system_design"]
-    if len(env[":::image.source"]):
+    if has_image_source:
         build_tools += ["bitmap"]
     if env[":::info.git"] != "Disabled" or env[":::info.build"]:
         build_tools += ["info"]
@@ -116,6 +117,8 @@ def post_build(env, buildlog):
         "metadata": buildlog.metadata,
         "build_tools": build_tools,
         "is_unittest": is_unittest,
+        "has_image_source": has_image_source,
+        "image_source": env[":::image.source"],
     })
     # Set these substitutions for all templates
     env.substitutions = subs
