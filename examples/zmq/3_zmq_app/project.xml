@@ -10,7 +10,7 @@
   <options>
     <option name=":target">hosted-linux</option>
     <option name=":build:build.path">../../../build/zmq/3_zmq_app</option>
-    <option name=":communication:xpcc:generator:source">../../communication/xml/communication.xml</option>
+    <option name=":communication:xpcc:generator:source">../../xpcc/xml/communication.xml</option>
     <option name=":communication:xpcc:generator:container">gui</option>
   </options>
   <modules>

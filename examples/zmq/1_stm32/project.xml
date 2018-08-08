@@ -3,7 +3,7 @@
   <extends>../../../src/modm/board/disco_f407vg/board.xml</extends>
   <options>
     <option name=":build:build.path">../../../build/zmq/1_stm32</option>
-    <option name=":communication:xpcc:generator:source">../../communication/xml/communication.xml</option>
+    <option name=":communication:xpcc:generator:source">../../xpcc/xml/communication.xml</option>
     <option name=":communication:xpcc:generator:container">odometry</option>
   </options>
   <modules>

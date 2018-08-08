@@ -10,9 +10,9 @@
   <options>
     <option name=":target">atmega644</option>
     <option name=":platform:clock:f_cpu">14745600</option>
-    <option name=":build:build.path">../../../../build/avr/communication/sender</option>
-    <option name="::xpcc:generator:source">../../../communication/xml/communication.xml</option>
-    <option name="::xpcc:generator:container">sender</option>
+    <option name=":build:build.path">../../../../build/avr/xpcc/receiver</option>
+    <option name="::xpcc:generator:source">../../../xpcc/xml/communication.xml</option>
+    <option name="::xpcc:generator:container">receiver</option>
   </options>
   <modules>
     <module>:communication:xpcc:generator</module>
