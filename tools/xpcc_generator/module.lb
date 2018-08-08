@@ -31,5 +31,5 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "modm/tools/system_design"
+    env.outbasepath = "modm/tools/xpcc_generator"
     env.copy(".", ignore=env.ignore_patterns("*.lb"))

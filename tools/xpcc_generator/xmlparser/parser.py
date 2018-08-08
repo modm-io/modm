@@ -309,8 +309,8 @@ class Parser(object):
 # -----------------------------------------------------------------------------
 if __name__ == "__main__":
 	parser = Parser()
-	parser.parse("../../../../season/common/robot.xml", dtdPath="../../../tools/system_design/xml/dtd")
 	
+	parser.parse("../../../../season/common/robot.xml", dtdPath="../../../tools/xpcc_generator/xml/dtd")
 	tree = parser.tree
 	
 	#print tree.dump()

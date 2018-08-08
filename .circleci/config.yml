@@ -42,8 +42,8 @@ jobs:
           command: |
             python2 tools/scripts/authors.py --handles --count --shoutout --since 2017-01-01
             python3 tools/scripts/authors.py --handles --count --shoutout --since 2017-01-01
-            python2 tools/system_design/builder/system_layout.py examples/communication/xml/communication.xml -o /tmp
-            python3 tools/system_design/builder/system_layout.py examples/communication/xml/communication.xml -o /tmp
+            python2 tools/xpcc_generator/builder/system_layout.py examples/communication/xml/communication.xml -o /tmp
+            python3 tools/xpcc_generator/builder/system_layout.py examples/communication/xml/communication.xml -o /tmp
 
   stm32f0-f1-examples:
     docker:

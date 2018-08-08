@@ -78,7 +78,7 @@ def post_build(env, buildlog):
         "qtcreator",
     ]
     if has_xpcc_generator:
-        build_tools += ["system_design"]
+        build_tools += ["xpcc_generator"]
     if has_image_source:
         build_tools += ["bitmap"]
     if env[":::info.git"] != "Disabled" or env[":::info.build"]:
