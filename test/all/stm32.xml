@@ -8,7 +8,6 @@
   </repositories>
 
   <options>
-    <option name=":build:scons:include_demo_project">True</option>
   </options>
   <modules>
     <module>:platform:**</module>

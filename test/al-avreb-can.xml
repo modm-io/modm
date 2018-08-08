@@ -5,7 +5,6 @@
   <options>
     <!-- <option name=":build:scons:avrdude.programmer">avrispmkII</option> -->
     <option name=":build:scons:avrdude.programmer">usbasp-clone</option>
-    <option name=":build:scons:include_demo_project">False</option>
     <option name=":build:scons:include_sconstruct">True</option>
     <option name=":build:scons:is_unittest">True</option>
     <option name=":build:scons:info.build">True</option>

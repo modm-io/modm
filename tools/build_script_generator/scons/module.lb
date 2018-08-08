@@ -21,10 +21,6 @@ def init(module):
 
 
 def prepare(module, options):
-    _, default_project_name = os.path.split(os.getcwd())
-    module.add_option(
-        BooleanOption(name="include_demo_project", default=False,
-                      description="Include a demo main file to get a full compilable project."))
     module.add_option(
         BooleanOption(name="include_sconstruct", default=True,
                       description="Generate modm specific SConstruct file."))
@@ -149,7 +145,5 @@ def post_build(env, buildlog):
 
     # these are the ONLY files that are allowed to NOT be namespaced with modm!
     env.outbasepath = "."
-    if env["include_demo_project"]:
-        env.template("resources/main.cpp.in", "main.cpp")
-    if env["include_demo_project"] or env["include_sconstruct"]:
+    if env["include_sconstruct"]:
         env.template("resources/SConstruct.in", "SConstruct")

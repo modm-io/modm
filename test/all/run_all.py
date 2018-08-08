@@ -65,14 +65,19 @@ class TestRun:
 
     def run(self):
         start_time = time.time()
-        if self.device.startswith("at"):
-            lbuild_command = ["-c", "avr.xml"]
-        elif self.device.startswith("stm32"):
-            lbuild_command = ["-c", "stm32.xml"]
-        lbuild_command.append("-D:target={}".format(self.device))
 
         with tempfile.TemporaryDirectory() as tempdir:
-            lbuild_command.extend(["-p", str(tempdir), "build", "--no-log"])
+            if self.device.startswith("at"):
+                lbuild_command = ["-c", "avr.xml"]
+                shutil.copyfile("avr.cpp", os.path.join(tempdir, "main.cpp"))
+            elif self.device.startswith("stm32"):
+                lbuild_command = ["-c", "stm32.xml"]
+                shutil.copyfile("stm32.cpp", os.path.join(tempdir, "main.cpp"))
+
+            lbuild_command.extend(["-D:target={}".format(self.device),
+                                   "-p", str(tempdir),
+                                   "build",
+                                   "--no-log"])
             try:
                 self.result = TestRunResult.FAIL_BUILD
                 self.output += run_lbuild(lbuild_command)

@@ -10,28 +10,7 @@
 
 
 #include <modm/platform.hpp>
-
-%% if platform in ["avr"]
-#include <modm/architecture.hpp>
-
-using namespace modm::platform;
-
-using LedRed = GpioOutputB0;
-
-int
-main(void)
-{
-    LedRed::setOutput();
-    while(1)
-    {
-        LedRed::toggle();
-        modm::delayMilliseconds(500);
-    }
-
-    return 0;
-}
-
-%% else
+#include <modm/architecture/interface/delay.hpp>
 
 int
 main(void)
@@ -43,5 +22,3 @@ main(void)
 
     return 0;
 }
-
-%% endif
