@@ -25,10 +25,6 @@ def prepare(module, options):
         BooleanOption(name="include_sconstruct", default=True,
                       description="Generate modm specific SConstruct file."))
     module.add_option(
-        BooleanOption(name="is_unittest", default=False,
-                      description="Generate SConstruct file for modm unittests."))
-
-    module.add_option(
         StringOption(name="image.source", default="",
                      description="Path to the image folder"))
     module.add_option(
@@ -79,8 +75,9 @@ def build(env):
 
 
 def post_build(env, buildlog):
+    is_unittest = env.has_module(":test")
+
     target = env["modm:target"]
-    # get CPU information
     subs = common_target(target)
 
     build_tools = [
@@ -97,7 +94,7 @@ def post_build(env, buildlog):
         build_tools += ["bitmap"]
     if env[":::info.git"] != "Disabled" or env[":::info.build"]:
         build_tools += ["info"]
-    if env[":::is_unittest"]:
+    if is_unittest:
         build_tools += ["unittest"]
     if subs["platform"] in ["stm32"]:
         build_tools += ["compiler_arm_none_eabi_gcc", "program_openocd", "utils_buildsize"]
@@ -118,6 +115,7 @@ def post_build(env, buildlog):
         "openocd_file": os.path.basename(env.get_option(":::openocd.cfg", "")),
         "metadata": buildlog.metadata,
         "build_tools": build_tools,
+        "is_unittest": is_unittest,
     })
     # Set these substitutions for all templates
     env.substitutions = subs

@@ -36,7 +36,7 @@ env.InfoGit({{ "True" if "Status" in options[":::info.git"] else "False" }})
 env.InfoBuild()
 %% endif
 
-%% if options[":::is_unittest"]
+%% if is_unittest
 # Building unit tests
 headers = env.FindHeaderFiles(join(modm_path, "test"))
 sources = env.UnittestRunner(target="main.cpp", source=headers, template="modm/test/runner.cpp.in")
