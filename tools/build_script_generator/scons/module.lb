@@ -28,19 +28,6 @@ def prepare(module, options):
         StringOption(name="image.source", default="",
                      description="Path to the image folder"))
     module.add_option(
-        StringOption(name="xpcc.source", default="",
-                     description="Path to the XPCC source file"))
-    module.add_option(
-        StringOption(name="xpcc.container", default="",
-                     description="Name of the XPCC container to generate for"))
-    module.add_option(
-        StringOption(name="xpcc.generate", default="communication",
-                     description="Path to the XPCC generated folder"))
-    module.add_option(
-        StringOption(name="xpcc.namespace", default="robot",
-                     description="Namespace of the generated XPCC communications"))
-
-    module.add_option(
         EnumerationOption(name="info.git", default="Disabled",
                           enumeration=["Disabled", "Info", "Info+Status"],
                           description="Generate CPP defines about the git repository state"))
@@ -76,6 +63,7 @@ def build(env):
 
 def post_build(env, buildlog):
     is_unittest = env.has_module(":test")
+    has_xpcc_generator = env.has_module(":communication:xpcc:generator")
     has_image_source = len(env[":::image.source"])
 
     target = env["modm:target"]
@@ -89,7 +77,7 @@ def post_build(env, buildlog):
         "cmake_wrapper",
         "qtcreator",
     ]
-    if len(env[":::xpcc.source"]):
+    if has_xpcc_generator:
         build_tools += ["system_design"]
     if has_image_source:
         build_tools += ["bitmap"]
@@ -119,6 +107,11 @@ def post_build(env, buildlog):
         "is_unittest": is_unittest,
         "has_image_source": has_image_source,
         "image_source": env[":::image.source"],
+        "has_xpcc_generator": has_xpcc_generator,
+        "generator_source": env.get_option(":communication:xpcc:generator:source", ""),
+        "generator_container": env.get_option(":communication:xpcc:generator:container", ""),
+        "generator_path": env.get_option(":communication:xpcc:generator:path", ""),
+        "generator_namespace": env.get_option(":communication:xpcc:generator:namespace", ""),
     })
     # Set these substitutions for all templates
     env.substitutions = subs
@@ -140,9 +133,6 @@ def post_build(env, buildlog):
     # Copy the scons-build-tools
     env.copy(repopath("ext/dlr/scons-build-tools"), "ext/dlr/scons-build-tools")
     env.copy("site_tools", "scons/site_tools")
-    # Copy XPCC tools
-    if "system_design" in build_tools:
-        env.copy(repopath("tools/system_design"), "tools/system_design")
 
     # these are the ONLY files that are allowed to NOT be namespaced with modm!
     env.outbasepath = "."
