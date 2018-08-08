@@ -5,7 +5,6 @@
     <repository>
       <path>../repo.lb</path>
     </repository>
-    <cache>.lbuild_cache</cache>
   </repositories>
 
   <options>
