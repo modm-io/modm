@@ -17,8 +17,8 @@
 
 #include "component_gui/gui.hpp"
 
-#include "communication/postman.hpp"
-#include "communication/identifier.hpp"
+#include <postman.hpp>
+#include <identifier.hpp>
 
 /**
  * Simple subscriber with zeromq.

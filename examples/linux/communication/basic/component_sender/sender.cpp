@@ -17,8 +17,7 @@
 #undef MODM_LOG_LEVEL
 #define	MODM_LOG_LEVEL modm::log::DEBUG
 
-#include "communication/identifier.hpp"
-#include "communication/packets.hpp"
+#include <identifier.hpp>
 
 #include "sender.hpp"
 

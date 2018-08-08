@@ -16,9 +16,9 @@
 #undef MODM_LOG_LEVEL
 #define	MODM_LOG_LEVEL modm::log::DISABLED
 
-#include "communication/identifier.hpp"
-#include "communication/packets.hpp"
-#include "communication/communication.hpp"
+#include <identifier.hpp>
+#include <packets.hpp>
+#include <communication.hpp>
 
 #include "odometry.hpp"
 

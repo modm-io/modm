@@ -11,11 +11,11 @@
     <option name=":target">atmega644</option>
     <option name=":platform:clock:f_cpu">14745600</option>
     <option name=":build:build.path">../../../../build/avr/communication/receiver</option>
-    <option name=":build:scons:xpcc.source">../../../communication/xml/communication.xml</option>
-    <option name=":build:scons:xpcc.container">receiver</option>
+    <option name="::xpcc:generator:source">../../../communication/xml/communication.xml</option>
+    <option name="::xpcc:generator:container">receiver</option>
   </options>
   <modules>
-    <module>:communication:xpcc</module>
+    <module>:communication:xpcc:generator</module>
     <module>:debug</module>
     <module>:driver:mcp2515</module>
     <module>:platform:clock</module>
