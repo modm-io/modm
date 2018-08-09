@@ -72,12 +72,16 @@ def build(env):
 
 def post_build(env, buildlog):
     target = env[":target"]
-    subs = {
+    env.substitutions = {
         "metadata": buildlog.metadata,
     }
+
+    if len(buildlog.metadata.get("modm.gitignore", [])):
+        env.outbasepath = "modm"
+        env.template("gitignore.in", ".gitignore")
+
     # these are the ONLY files that are allowed to NOT be namespaced with modm!
     env.outbasepath = "."
-    env.substitutions = subs
 
     if env.get_option("::include_openocd", False):
         env.template("openocd.cfg.in")
