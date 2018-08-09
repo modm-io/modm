@@ -18,6 +18,9 @@
 #include <unittest/reporter.hpp>
 #include <unittest/controller.hpp>
 
+#include <info_git.h>
+#include <info_build.h>
+
 ${includes}
 
 ${names}

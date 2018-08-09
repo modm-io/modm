@@ -44,6 +44,11 @@ def build(env):
     env.append_metadata_unique("elf.release", join(build_path, "release", project_name + ".elf"))
     env.append_metadata_unique("elf.debug",   join(build_path, "debug",   project_name + ".elf"))
 
+    if env[":::info.git"] != "Disabled":
+        env.append_metadata_unique("modm.gitignore", "src/info_git.h")
+    if env[":::info.build"]:
+        env.append_metadata_unique("modm.gitignore", "src/info_build.h")
+
 
 def post_build(env, buildlog):
     is_unittest = env.has_module(":test")

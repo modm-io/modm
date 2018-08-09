@@ -19,6 +19,9 @@
 #include <modm/debug/logger.hpp>
 #include <modm/platform.hpp>
 
+#include <info_git.h>
+#include <info_build.h>
+
 modm::pc::Terminal outputDevice;
 
 modm::log::StyleWrapper< modm::log::Prefix< char[10] > > loggerDeviceDebug( \

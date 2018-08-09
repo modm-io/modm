@@ -30,7 +30,7 @@ env["COMPILERSUFFIX"] = "-8"
 env.SConscript(dirs=[modm_path], exports="env")
 
 %% if options[":::info.git"] != "Disabled"
-env.InfoGit({{ "True" if "Status" in options[":::info.git"] else "False" }})
+env.InfoGit(with_status={{ "True" if "Status" in options[":::info.git"] else "False" }})
 %% endif
 %% if options[":::info.build"]
 env.InfoBuild()

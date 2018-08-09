@@ -12,6 +12,7 @@
 
 #include <modm/platform.hpp>
 #include <modm/debug/logger.hpp>
+#include <info_git.h>
 
 // Set the log level
 #undef	MODM_LOG_LEVEL

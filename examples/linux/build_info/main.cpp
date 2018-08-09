@@ -12,6 +12,7 @@
 
 #include <modm/platform.hpp>
 #include <modm/debug/logger.hpp>
+#include <info_build.h>
 
 // Set the log level
 #undef	MODM_LOG_LEVEL
@@ -21,10 +22,11 @@ int
 main()
 {
 	// Let's print some information that is provided in the modm_build_info.hpp
-	MODM_LOG_INFO << "Machine:  " << MODM_BUILD_MACHINE  << modm::endl;
-	MODM_LOG_INFO << "User:     " << MODM_BUILD_USER     << modm::endl;
-	MODM_LOG_INFO << "Os:       " << MODM_BUILD_OS       << modm::endl;
-	MODM_LOG_INFO << "Compiler: " << MODM_BUILD_COMPILER << modm::endl;
+	MODM_LOG_INFO << "Project:  " << MODM_BUILD_PROJECT_NAME << modm::endl;
+	MODM_LOG_INFO << "Machine:  " << MODM_BUILD_MACHINE      << modm::endl;
+	MODM_LOG_INFO << "User:     " << MODM_BUILD_USER         << modm::endl;
+	MODM_LOG_INFO << "Os:       " << MODM_BUILD_OS           << modm::endl;
+	MODM_LOG_INFO << "Compiler: " << MODM_BUILD_COMPILER     << modm::endl;
 
 	return 0;
 }

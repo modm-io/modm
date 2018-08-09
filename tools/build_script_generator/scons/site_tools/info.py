@@ -19,9 +19,14 @@ import getpass
 import locale
 import re
 from collections import defaultdict
+from os.path import join, dirname, abspath
+
+TEMPLATE_SOURCE = join(dirname(abspath(__file__)), "info.h.in")
 
 def is_git_available():
-	return (subprocess.call(['which', 'git'], cwd=os.getcwd(), stdout=open(os.devnull, 'wb')) is 0)
+	git_exists = subprocess.call(['which', 'git'], cwd=os.getcwd(), stdout=open(os.devnull, 'wb')) is 0
+	is_git_repo = subprocess.call(['git', 'status'], cwd=os.getcwd(), stdout=open(os.devnull, 'wb')) is 0
+	return git_exists and is_git_repo
 
 # -----------------------------------------------------------------------------
 def git_show(cwd, format, ref='HEAD'):
@@ -53,23 +58,25 @@ def git_config(cwd, key):
 def git_info_defines(env, with_status=False):
 	cwd = env.Dir('#').abspath
 	defines = {}
+	subs = {}
 	try:
-		defines['MODM_GIT_INFO']  = "1"
+		defines['MODM_GIT_INFO'] = "1"
 		# Last Commit Values
-		defines['MODM_GIT_SHA']             = git_show(cwd, '%H')
-		defines['MODM_GIT_SHA_ABBR']        = git_show(cwd, '%h')
-		defines['MODM_GIT_AUTHOR']          = git_show(cwd, '%an')
-		defines['MODM_GIT_AUTHOR_EMAIL']    = git_show(cwd, '%ae')
-		defines['MODM_GIT_AUTHOR_DATE']     = git_show(cwd, '%ad')
-		defines['MODM_GIT_AUTHOR_DATE_TIMESTAMP'] = git_show(cwd, '%at')
-		defines['MODM_GIT_COMMITTER']       = git_show(cwd, '%cn')
-		defines['MODM_GIT_COMMITTER_EMAIL'] = git_show(cwd, '%ce')
-		defines['MODM_GIT_COMMITTER_DATE']  = git_show(cwd, '%cd')
-		defines['MODM_GIT_COMMITTER_DATE_TIMESTAMP'] = git_show(cwd, '%ct')
-		defines['MODM_GIT_SUBJECT']         = git_show(cwd, '%s')
+		subs['MODM_GIT_SHA']                      = git_show(cwd, '%H')
+		subs['MODM_GIT_SHA_ABBR']                 = git_show(cwd, '%h')
+		subs['MODM_GIT_AUTHOR']                   = git_show(cwd, '%an')
+		subs['MODM_GIT_AUTHOR_EMAIL']             = git_show(cwd, '%ae')
+		subs['MODM_GIT_AUTHOR_DATE']              = git_show(cwd, '%ad')
+		subs['MODM_GIT_AUTHOR_DATE_TIMESTAMP']    = git_show(cwd, '%at')
+		subs['MODM_GIT_COMMITTER']                = git_show(cwd, '%cn')
+		subs['MODM_GIT_COMMITTER_EMAIL']          = git_show(cwd, '%ce')
+		subs['MODM_GIT_COMMITTER_DATE']           = git_show(cwd, '%cd')
+		subs['MODM_GIT_COMMITTER_DATE_TIMESTAMP'] = git_show(cwd, '%ct')
+		subs['MODM_GIT_SUBJECT']                  = git_show(cwd, '%s')
 		# Git Config
-		defines['MODM_GIT_CONFIG_USER_NAME']  = git_config(cwd, 'user.name')
-		defines['MODM_GIT_CONFIG_USER_EMAIL'] = git_config(cwd, 'user.email')
+		subs['MODM_GIT_CONFIG_USER_NAME']  = git_config(cwd, 'user.name')
+		subs['MODM_GIT_CONFIG_USER_EMAIL'] = git_config(cwd, 'user.email')
+
 		# Status
 		if with_status:
 			s = subprocess.check_output(['git', '--no-pager', 'status', '--porcelain'], cwd=cwd)
@@ -78,39 +85,42 @@ def git_info_defines(env, with_status=False):
 			for line in s:
 				if len(line.strip()) > 0:
 					c = line.strip()[0]
-					f[c] = f[c] + 1
-			defines['MODM_GIT_STATUS']    = "1"
-			defines['MODM_GIT_MODIFIED']  = f['M']
-			defines['MODM_GIT_ADDED']     = f['A']
-			defines['MODM_GIT_DELETED']   = f['D']
-			defines['MODM_GIT_RENAMED']   = f['R']
-			defines['MODM_GIT_COPIED']    = f['C']
-			defines['MODM_GIT_UPDATED_NOT_MERGED'] = f['U']
-			defines['MODM_GIT_UNTRACKED'] = f['?']
-		# Format and escape all defines
-		defines = {k:"\\\"{}\\\"".format(str(v).replace("(", "\\(").replace(")", "\\)")) for k, v in defines.items() }
+					f[c] += 1
+			defines['MODM_GIT_STATUS'] = "1"
+			subs['MODM_GIT_MODIFIED']  = f['M']
+			subs['MODM_GIT_ADDED']     = f['A']
+			subs['MODM_GIT_DELETED']   = f['D']
+			subs['MODM_GIT_RENAMED']   = f['R']
+			subs['MODM_GIT_COPIED']    = f['C']
+			subs['MODM_GIT_UPDATED_NOT_MERGED'] = f['U']
+			subs['MODM_GIT_UNTRACKED'] = f['?']
+
 	except subprocess.CalledProcessError as e:
 		env.Error('failed to run git command: %s' % e)
+		return
 
-	# We're not creating a header file for these, because all files are supposed to be checked
-	# in and checking in the header file with the git info utterly defeats the point of this.
-	# Instead we're adding these defines via the command line.
 	env.AppendUnique(CPPDEFINES=defines)
+	target = join(env['BASEPATH'], 'src', 'info_git.h')
+	subs = {"type": "git", "defines": {k:"\"{}\"".format(v) for k, v in subs.items()}}
+	return env.Jinja2Template(target=target, source=TEMPLATE_SOURCE, substitutions=subs)
+
 
 def build_info_defines(env):
 	cwd = env.Dir('#').abspath
 	defines = {}
-	defines['MODM_BUILD_PROJECT_NAME'] = env.get('CONFIG_PROJECT_NAME', 'Unknown')
-	defines['MODM_BUILD_MACHINE'] = platform.node()
-	defines['MODM_BUILD_USER'] = getpass.getuser()
+	subs = {}
+	defines['MODM_BUILD_INFO'] = "1"
+	subs['MODM_BUILD_PROJECT_NAME'] = env.get('CONFIG_PROJECT_NAME', 'Unknown')
+	subs['MODM_BUILD_MACHINE'] = platform.node()
+	subs['MODM_BUILD_USER'] = getpass.getuser()
 	# Generate OS String
-	if platform.system() == 'Linux':
+	if platform.system() == 'Linux' and "linux_distribution" in dir(platform):
 		os = " ".join(platform.linux_distribution())
 	elif platform.system() == 'Darwin':
-		os = "Mac {0} ({2})".format(*platform.mac_ver())
+		os = "macOS {0} ({2})".format(*platform.mac_ver())
 	else:
-		os = platform.system()
-	defines['MODM_BUILD_OS'] = os
+		os = platform.platform(terse=True)
+	subs['MODM_BUILD_OS'] = os
 	# This contains the version of the compiler that is used to build the project
 	try:
 		c = subprocess.check_output([env['CXX'], '--version'], cwd=cwd)
@@ -122,11 +132,12 @@ def build_info_defines(env):
 	m = re.match(r"(?P<name>[a-z\-\+]+)[a-zA-Z\(\) ]* (?P<version>\d+\.\d+\.\d+)", c)
 	if m: comp = "{0} {1}".format(m.group('name'), m.group('version'))
 	else: comp = c
-	defines['MODM_BUILD_COMPILER'] = comp
-	defines = {k:"\\\"{}\\\"".format(v) for k, v in defines.items() }
+	subs['MODM_BUILD_COMPILER'] = comp
 
-	# CPP defines instead of a header files.
 	env.AppendUnique(CPPDEFINES=defines)
+	target = join(env['BASEPATH'], 'src', 'info_build.h')
+	subs = {"type": "build", "defines": {k:"\"{}\"".format(v) for k, v in subs.items()}}
+	return env.Jinja2Template(target=target, source=TEMPLATE_SOURCE, substitutions=subs)
 
 
 def generate(env, **kw):
