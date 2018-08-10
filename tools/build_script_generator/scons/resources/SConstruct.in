@@ -42,7 +42,7 @@ headers = env.FindHeaderFiles(join(modm_path, "test"))
 sources = env.UnittestRunner(target="main.cpp", source=headers, template="modm/test/runner.cpp.in")
 %% else
 env.Append(CPPPATH=".")
-ignored = ["modm", "cmake-build-*", "build"]
+ignored = [modm_path, "cmake-*", build_path]
 sources = []
 %% endif
 
@@ -86,8 +86,8 @@ env.Alias("all", ["build", "run"])
 %% else
     %% if platform in ["stm32"]
 env.Alias("size", env.Size(program))
-env.Alias("program", env.OpenOcd(program, commands=["program_{}".format(profile)]))
-env.Alias("gdb", env.OpenocdGdb(program))
+env.Alias("program", env.OpenOcd(program, commands=["modm_program $SOURCE"]))
+env.Alias("gdb", env.OpenOcdGdb(program))
     %% elif platform in ["avr"]
 env.Alias("program", env.Avrdude(program))
     %% endif

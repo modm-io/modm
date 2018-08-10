@@ -29,7 +29,7 @@ def openocd_run(env, source, commands=[], alias="openocd_run"):
 	search = env.get("MODM_OPENOCD_SEARCHDIRS", [])
 	config = env.get("MODM_OPENOCD_CONFIGFILES", [])
 
-	openocdcmd = "$OPENOCD -f openocd.cfg {} {} {}".format(
+	openocdcmd = "$OPENOCD {} {} {}".format(
 		" ".join(map("-s \"{}\"".format, search)),
 		" ".join(map("-f \"{}\"".format, config)),
 		" ".join(map("-c \"{}\"".format, commands))
