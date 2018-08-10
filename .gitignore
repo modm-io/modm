@@ -31,5 +31,3 @@ examples/**/modm
 examples/**/SConstruct
 examples/**/Makefile
 examples/**/generated
-examples/**/gdbinit
-examples/**/openocd.cfg

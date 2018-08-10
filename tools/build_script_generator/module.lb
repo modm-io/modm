@@ -46,12 +46,6 @@ def prepare(module, options):
 
     if options[":target"].has_driver("core:cortex-m*"):
         module.add_option(
-            BooleanOption(name="include_openocd", default=True,
-                          description="Generate a default openocd.cfg file"))
-        module.add_option(
-            BooleanOption(name="include_gdbinit", default=True,
-                          description="Generate a default .gdbinit file"))
-        module.add_option(
             StringOption(name="openocd.cfg", default="",
                          description="Path to a custom OpenOCD configuration file"))
 
@@ -75,16 +69,11 @@ def post_build(env, buildlog):
     env.substitutions = {
         "metadata": buildlog.metadata,
     }
+    env.outbasepath = "modm"
 
     if len(buildlog.metadata.get("modm.gitignore", [])):
-        env.outbasepath = "modm"
         env.template("gitignore.in", ".gitignore")
 
-    # these are the ONLY files that are allowed to NOT be namespaced with modm!
-    env.outbasepath = "."
-
-    if env.get_option("::include_openocd", False):
+    if env[":target"].has_driver("core:cortex-m*"):
         env.template("openocd.cfg.in")
-
-    if env.get_option("::include_gdbinit", False):
         env.template("gdbinit.in")
