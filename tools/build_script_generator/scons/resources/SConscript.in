@@ -154,4 +154,20 @@ env.Append(LINKFLAGS="$ARCHFLAGS")
 %% endif
 
 
+for flags in ["CCFLAGS", "CFLAGS", "CXXFLAGS", "ASFLAGS", "ARCHFLAGS", "LINKFLAGS"]:
+	flags_str = ARGUMENTS.get(flags)
+	if flags_str is not None:
+		flags_list = flags_str.split(",")
+		for flag in flags_list:
+			if len(flag) > 1 and flag[0] == "~":
+				try:
+					env[flags].remove(flag[1:])
+				except ValueError:
+					print("'" + flag[1:] + "' does not exist in " + flags +
+						" and therefore can not be removed.")
+					print("Info: " + flags + ": " + ", ".join(env[flags]))
+					exit(1)
+			else:
+				env[flags].append(flag)
+
 Return("library")
