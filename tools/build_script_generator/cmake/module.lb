@@ -22,9 +22,14 @@ def init(module):
 
 
 def prepare(module, options):
-    if options[":target"].identifier["platform"] == "stm32":
-        return True
-    return False
+    if options[":target"].identifier["platform"] != "stm32":
+        return False
+
+    module.add_option(
+        BooleanOption(name="include_makefile", default=True,
+                      description="Generate a wrapper Makefile"))
+
+    return True
 
 
 def build(env):
@@ -64,8 +69,12 @@ def post_build(env, buildlog):
         flag = flag.format(**subs)
         return flag
 
-    env.append_metadata_unique('include_path', 'src')
+    env.outbasepath = "modm/cmake"
+    env.copy("cmake_scripts/report-build-options.cmake", "report-build-options.cmake")
+    env.template("cmake_scripts/configure-stm32-gcc.cmake.in", "configure-stm32-gcc.cmake", filters={"flag_format": flag_format})
+
+    # these are the ONLY files that are allowed to NOT be namespaced with modm!
+    env.outbasepath = "."
     env.template("resources/CMakeLists.txt.in", "CMakeLists.txt")
-    env.template("resources/Makefile.in", "Makefile")
-    env.copy("cmake_scripts/report-build-options.cmake", "modm/cmake/report-build-options.cmake")
-    env.template("cmake_scripts/configure-stm32-gcc.cmake.in", "modm/cmake/configure-stm32-gcc.cmake", filters={"flag_format": flag_format})
+    if env[":::include_makefile"]:
+        env.template("resources/Makefile.in", "Makefile")
