@@ -58,17 +58,9 @@ bprops = {}
 def pre_build(env):
     device = env[":target"]
 
-    core = {
-        "cortex-m0": "cm0",
-        "cortex-m0+": "cm0plus",
-        "cortex-m3": "cm3",
-        "cortex-m4": "cm4",
-        "cortex-m4f": "cm4",
-        "cortex-m7": "cm7",
-        "cortex-m7f": "cm7",
-        "cortex-m7fd": "cm7",
-    }[device.get_driver("core")["type"]]
-    core_header = "core_{}.h".format(core)
+    core = device.get_driver("core")["type"]
+    core = core.replace("cortex-m", "").replace("+", "plus").replace("f", "").replace("d", "")
+    core_header = "core_cm{}.h".format(core)
     core_header = localpath("..", "arm", "cmsis", "CMSIS", "Core", "Include", core_header)
 
     folder = "stm32{}xx".format(device.identifier["family"])
@@ -77,7 +69,7 @@ def pre_build(env):
     define = None
 
     with open(localpath(folder, family_header), "r", errors="replace") as headerFile:
-        match = re.findall("if defined\((?P<define>STM32[F|L].....)\)", headerFile.read())
+        match = re.findall(r"if defined\((?P<define>STM32[F|L].....)\)", headerFile.read())
         if match:
             define = getDefineForDevice(device.identifier, match)
     if define is None:
@@ -114,8 +106,12 @@ def pre_build(env):
             peripherals.extend([(p[0],p[1],symbols[p[2]]) for p in mperipherals])
     # filter out MPU and/or FPU if required
     peripherals = list(filter(lambda p: p[0] not in core_features or core_features[p[0]], peripherals))
-    # print("\n".join([s+" -> "+hex(k) for s,k in symbols.items()]))
-    # print("\n".join([s+" -> "+hex(k) for s,k in peripherals.items()]))
+    # filter out duplicate addresses
+    peripherals = {p[2]: p for p in peripherals}
+    peripherals = [p for p in peripherals.values()]
+    peripherals = sorted(peripherals, key=lambda p: int(p[2]))
+
+    # print("\n".join([s+" -> "+hex(a) for (s,k,a) in peripherals]))
 
     bprops.update({
         "folder": folder,

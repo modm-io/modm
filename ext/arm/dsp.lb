@@ -17,11 +17,10 @@ def init(module):
 
 def prepare(module, options):
     device = options[":target"]
-    core = device.get_driver("core")
-    if not core or not core["type"].startswith("cortex"):
+    if not device.has_driver("core:cortex-m*"):
         return False
 
-    if not core["type"].startswith("cortex-m0"):
+    if not device.has_driver("core:cortex-m0*"):
         module.add_option(
             BooleanOption(
                 name="unaligned_data",
@@ -31,7 +30,7 @@ def prepare(module, options):
         BooleanOption(
             name="check_matrix_sizes",
             description="Check the input and output sizes of matrices and return ARM_MATH_SIZE_MISMATCH on fail.",
-            default=True))
+            default=False))
     module.add_option(
         BooleanOption(
             name="round_float_inputs",
@@ -47,6 +46,8 @@ def build(env):
 
     if env[":::check_matrix_sizes"]:
         env.append_metadata_unique("cpp.define", "ARM_MATH_MATRIX_CHECK")
+    else:
+        env.append_metadata_unique("cpp.define.debug", "ARM_MATH_MATRIX_CHECK")
 
     if env[":::round_float_inputs"]:
         env.append_metadata_unique("cpp.define", "ARM_MATH_ROUNDING")

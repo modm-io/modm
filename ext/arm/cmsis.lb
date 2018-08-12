@@ -15,11 +15,7 @@ def init(module):
     module.name = "cmsis"
 
 def prepare(module, options):
-    device = options[":target"]
-    core = device.get_driver("core")
-    if not core or not core["type"].startswith("cortex"):
-        return False
-    return True
+    return options[":target"].has_driver("core:cortex-m*")
 
 def build(env):
     pass

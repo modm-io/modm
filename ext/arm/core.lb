@@ -16,14 +16,18 @@ def init(module):
     module.name = "core"
 
 def prepare(module, options):
-    device = options[":target"]
-    core = device.get_driver("core")
-    if not core or not core["type"].startswith("cortex"):
-        return False
-    return True
+    return options[":target"].has_driver("core:cortex-m*")
 
 def build(env):
-    env.append_metadata_unique("include_path", "ext/cmsis/core")
+    core = env[":target"].get_driver("core")["type"]
+    core = core.replace("cortex-m", "").replace("+", "plus").replace("f", "").replace("d", "")
 
-    env.outbasepath = "modm/ext/cmsis"
-    env.copy("cmsis/CMSIS/Core/Include", "core")
+    env.outbasepath = "modm/ext/cmsis/core"
+    env.copy("cmsis/CMSIS/Core/Include/core_cm{}.h".format(core), "core_cm{}.h".format(core))
+    env.copy("cmsis/CMSIS/Core/Include/cmsis_version.h", "cmsis_version.h")
+    env.copy("cmsis/CMSIS/Core/Include/cmsis_compiler.h", "cmsis_compiler.h")
+    env.copy("cmsis/CMSIS/Core/Include/cmsis_gcc.h", "cmsis_gcc.h")
+    if "m0" not in core:
+        env.copy("cmsis/CMSIS/Core/Include/mpu_armv7.h", "mpu_armv7.h")
+
+    env.append_metadata_unique("include_path", "ext/cmsis/core")
