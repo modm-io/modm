@@ -1,0 +1,33 @@
+!!! warning "These module docs are in beta and may be incomplete."
+
+# {{module.name}}{% if module.title %}: {{module.title}}{% endif %}
+
+{{module.description}}
+
+{% if module.options | length %}
+## Options
+{% for o in module.options %}
+#### {{o.name | replace(module.name + ":", "")}}
+
+{{o.title if o.title else ("Default" if o.default else "Values")}}: {% if o.default %}`{{o.default}}` ∈ {% endif %}`{ {{ o.possibles }} }`
+
+{{o.description}}
+{% endfor %}
+{% endif %}
+
+{% if objects | length %}
+## Content
+
+```cpp
+{% for kind, objs in objects.items() %}
+// {{ kind | capitalize }}{% for obj in objs %}
+{{ obj }}{% endfor %}
+{% endfor %}
+```
+{% endif %}
+
+{% if (module.dependencies | length or module.dependents | length) %}
+## Dependencies
+
+{{module.graph}}
+{% endif %}
