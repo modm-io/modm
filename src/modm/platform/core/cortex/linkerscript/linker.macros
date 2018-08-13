@@ -17,8 +17,6 @@
 %% set ram_sizes = []
 %% set ram_origin = []
 
-INCLUDE peripherals.ld
-
 MEMORY
 {
 %% for memory in driver["memory"]

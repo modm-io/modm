@@ -44,7 +44,6 @@ SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 SET(LINKER_SCRIPT_NAME linkerscript.ld)
 SET(LINKER_SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/${LINKER_SCRIPT_NAME})
 CONFIGURE_FILE(modm/link/${LINKER_SCRIPT_NAME} ${LINKER_SCRIPT})
-CONFIGURE_FILE(modm/link/peripherals.ld ${CMAKE_CURRENT_BINARY_DIR}/peripherals.ld)
 
 # Toolchain configuration
 %% macro generate_flags_for_profile(name, profile, suffix="")

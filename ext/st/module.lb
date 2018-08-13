@@ -86,31 +86,12 @@ def pre_build(env):
             features = re.findall(r"#define +__([MF]PU)_PRESENT +([01])", deviceFileContent)
             core_features.update({f[0]:bool(int(f[1])) for f in features})
             # find all peripherals
-            mperipherals = re.findall(r"#define +(.*?) +\(\((.*?_Type(?:Def)?) *?\*\) *?([A-Z].*?_BASE)", deviceFileContent)
-            pnames = [p[0] for p in mperipherals]
-            # reduce search window to only Peripheral_memory_map section or CMSIS_core_base
-            memmapContent = re.search(r"(Peripheral_memory_map|CMSIS_core_base).*?@\}", deviceFileContent, re.DOTALL | re.MULTILINE).group()
-            # find all memory mappings
-            mall = re.findall(r"#define +(.*?) +\(?(?:\( *?uint32_t *?\))?(.*?)U?L?\)? *?(?:\n|/)", memmapContent)
-            symbols = {}
-            # resolve all symbols via simple find/replace
-            for (symbol, value) in [(m[0], m[1]) for m in mall]:
-                if symbol in pnames: continue;
-                values = value.split(" ")
-                for sym, val in symbols.items():
-                    values = [(val if v == sym else v) for v in values]
-                symbols[symbol] = " ".join(values)
-            # evaluate all symbol addresses
-            symbols = {s:eval(v) for s,v in symbols.items()}
+            mperipherals = re.findall(r"#define +(.*?) +\(\((.*?_Type(?:Def)?)", deviceFileContent)
             # We only care about the absolute peripheral addresses
-            peripherals.extend([(p[0],p[1],symbols[p[2]]) for p in mperipherals])
+            peripherals.extend([(p[0],p[1]) for p in mperipherals])
     # filter out MPU and/or FPU if required
-    peripherals = list(filter(lambda p: p[0] not in core_features or core_features[p[0]], peripherals))
-    # filter out duplicate addresses
-    peripherals = {p[2]: p for p in peripherals}
-    peripherals = [p for p in peripherals.values()]
-    peripherals = sorted(peripherals, key=lambda p: int(p[2]))
-
+    peripherals = filter(lambda p: p[0] not in core_features or core_features[p[0]], peripherals)
+    peripherals = sorted(peripherals, key=lambda p: p[0])
     # print("\n".join([s+" -> "+hex(a) for (s,k,a) in peripherals]))
 
     bprops.update({
@@ -129,15 +110,10 @@ def build(env):
     env.copy(localpath(bprops["folder"], bprops["device_header"]), bprops["device_header"])
     env.copy(localpath(bprops["folder"], bprops["system_header"]), bprops["system_header"])
 
-    env.substitutions = {
+    env.substitutions = bprops
+    env.substitutions.update({
         "headers": [bprops["device_header"], bprops["system_header"]],
         "defines": [bprops["define"]],
-        "peripherals": bprops["peripherals"],
-        "min_addr": min([a for (_, _,a) in bprops["peripherals"]]),
-        "max_addr": max([a for (_, _,a) in bprops["peripherals"]])
-    }
-    env.template("../peripherals.c.in", "peripherals.c")
-    env.outbasepath = "modm/link"
-    env.template("../peripherals.ld.in", "peripherals.ld")
+    })
     env.outbasepath = "modm/src/modm/platform"
     env.template("device.hpp.in")
