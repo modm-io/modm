@@ -141,7 +141,10 @@ def common_compiler_flags(compiler, target, buildlog):
     # C Preprocessor defines
     flags["CPPDEFINES"]["base"] = \
         buildlog.metadata.get("cpp.define", [])
-    flags["CPPDEFINES"]["debug"] = [
+    flags["CPPDEFINES"]["release"] = \
+        buildlog.metadata.get("cpp.define.release", [])
+    flags["CPPDEFINES"]["debug"] = \
+        buildlog.metadata.get("cpp.define.debug", []) + [
         "MODM_DEBUG_BUILD",
     ]
     # Architecture flags for C, C++, Assembly and **Linker**
