@@ -30,6 +30,10 @@ except Exception as e:
           "then build again.")
     exit(1)
 
+if sys.version_info[1] < 6:
+    print("modm will require Python 3.6 in the near future.\n"
+          "Please check if you can upgrade your installation!\n")
+
 def init(repo):
     repo.name = "modm"
 
