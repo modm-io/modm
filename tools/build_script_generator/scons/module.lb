@@ -66,6 +66,7 @@ def post_build(env, buildlog):
         "cmake_wrapper",
         "qtcreator",
         "gdb",
+        "build_target",
     ]
     if has_xpcc_generator:
         build_tools += ["xpcc_generator"]
@@ -125,6 +126,9 @@ def post_build(env, buildlog):
     # Copy the scons-build-tools
     env.copy(repopath("ext/dlr/scons-build-tools"), "ext/dlr/scons-build-tools")
     env.copy("site_tools", "scons/site_tools")
+    # Generate the env.BuildTarget tool
+    env.outbasepath = "modm/scons/site_tools"
+    env.template("resources/build_target.py.in", "build_target.py")
 
     # these are the ONLY files that are allowed to NOT be namespaced with modm!
     env.outbasepath = "."
