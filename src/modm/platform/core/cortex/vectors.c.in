@@ -46,7 +46,7 @@ extern uint32_t __main_stack_top[];
 extern uint32_t __process_stack_top[];
 
 // Define the vector table
-modm_section(".reset")
+modm_section(".vector_rom")
 FunctionPointer vectorsRom[] =
 {
 	(FunctionPointer)__main_stack_top,		// -16: stack pointer
@@ -63,6 +63,6 @@ FunctionPointer vectorsRom[] =
 };
 %% if vector_table_location == "ram"
 // reserve space for the remapped vector table in RAM
-modm_section(".vectors")
+modm_section(".vector_ram")
 FunctionPointer vectorsRam[sizeof(vectorsRom) / sizeof(FunctionPointer)];
 %% endif

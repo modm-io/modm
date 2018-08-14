@@ -122,32 +122,39 @@ def build(env):
     # Append `_IRQHandler` to all
     for vector in driver["vector"]:
         interrupts[int(vector["position"])] = vector["name"] + "_IRQHandler"
-    properties["interrupt_table"] = interrupts
-    properties["number_of_interrupts"] = max(interrupts.keys()) + 1
 
-    env.substitutions = properties
-    env.outbasepath = "modm/link"
+    memories = [m for m in listify(driver["memory"]) if m["name"] != "backup"]
+    properties.update({
+        "interrupt_table": interrupts,
+        "number_of_interrupts": max(interrupts.keys()) + 1,
+        "memories": memories,
+        "regions": [m["name"] for m in memories],
+        "ram_origin": min(int(m["start"], 16) for m in memories if "sram" in m["name"]),
+        "ram_size": sum(int(m["size"]) for m in memories if "sram" in m["name"]),
+    })
+    if target["family"] in ["l4"]: # FIXME!
+        properties["regions"].remove("sram2")
 
-    for memory in listify(driver["memory"]):
+    linkerscript = "ram"
+    for memory in memories:
         if memory["name"] == "ccm":
             if "x" in memory["access"]:
                 if properties["vector_table_location"] == "fastest":
                     properties["vector_table_location"] = "ram"
                 # Executable CCM (Instruction Core-Coupled Memory)
-                env.template("linkerscript/stm32_iccm.ld.in", "linkerscript.ld")
-                break
+                linkerscript = "iccm"
             else:
                 # Non-executable CCM (Data Core-Coupled Memory)
-                env.template("linkerscript/stm32_dccm.ld.in", "linkerscript.ld")
-                break
+                linkerscript = "dccm"
         elif memory["name"] == "dtcm":
             if properties["vector_table_location"] == "fastest":
                 properties["vector_table_location"] = "ram"
             # Executable ITCM and DTCM (Tightly-Coupled Memory)
-            env.template("linkerscript/stm32_idtcm.ld.in", "linkerscript.ld")
-            break
-    else:
-        env.template("linkerscript/stm32_ram.ld.in", "linkerscript.ld")
+            linkerscript = "idtcm"
+
+    env.substitutions = properties
+    env.outbasepath = "modm/link"
+    env.template("linkerscript/stm32_{}.ld.in".format(linkerscript), "linkerscript.ld")
 
     env.outbasepath = "modm/src/modm/platform/core"
 

@@ -1,52 +1,34 @@
-%# Copyright (c) 2011-2012, Fabian Greif
-%# Copyright (c) 2012, 2015-2018, Niklas Hauser
-%# Copyright (c) 2013, Sascha Schade
-%# Copyright (c) 2013, 2015, Kevin Läufer
-%#
-%# This file is part of the modm project.
-%#
-%# This Source Code Form is subject to the terms of the Mozilla Public
-%# License, v. 2.0. If a copy of the MPL was not distributed with this
-%# file, You can obtain one at http://mozilla.org/MPL/2.0/.
-%# ----------------------------------------------------------------------------
-
 %# This File includes platform independent macros for Cortex-M linkerscripts
+%% macro copyright()
+/*
+ * Copyright (c) 2011-2012, Fabian Greif
+ * Copyright (c) 2012, 2015-2018, Niklas Hauser
+ * Copyright (c) 2013, Sascha Schade
+ * Copyright (c) 2013, 2015, Kevin Läufer
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * ------------------------------------------------------------------------- */
+%% endmacro
 
-
-%% macro prefix(regions)
-%% set ram_sizes = []
-%% set ram_origin = []
-
+%% macro prefix()
 MEMORY
 {
-%% for memory in driver["memory"]
-	{{ memory["name"] | upper }} ({{ memory["access"] }}) : ORIGIN = {{ memory["start"] }}, LENGTH = {{ memory["size"] }}
-	%% do regions.append(memory["name"])
-	%% if 'sram1' == memory["name"]
-		%% do ram_origin.append(memory["start"])
-	%% endif
-	%% if 'sram' in memory["name"]
-		%% do ram_sizes.append(memory["size"] | int)
-	%% endif
+%% for memory in memories
+	{{ memory.name | upper }} ({{ memory.access }}) : ORIGIN = {{ memory.start }}, LENGTH = {{ memory.size }}
 %% endfor
-	RAM (rwx) : ORIGIN = {{ ram_origin[0] }}, LENGTH = {{ ram_sizes | sum }}
-	{{ options["linkerscript.memory"] }}
+	RAM (rwx) : ORIGIN = 0x{{ "%08x" % ram_origin }}, LENGTH = {{ ram_size }}
+{{ options["linkerscript.memory"] }}
 }
 
-OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
+OUTPUT_FORMAT("elf32-littlearm")
 OUTPUT_ARCH(arm)
 
 /* First executable instruction in an output file */
 ENTRY(Reset_Handler)
-
-/* force linker to include the syscalls from libmodm.a */
-EXTERN(_sbrk_r)
-EXTERN(_init)
-
-PROVIDE(__ram_start = ORIGIN(RAM));
-PROVIDE(__ram_end   = ORIGIN(RAM) + LENGTH(RAM));
-PROVIDE(__rom_start = ORIGIN(FLASH));
-PROVIDE(__rom_end   = ORIGIN(FLASH) + LENGTH(FLASH));
 
 /* the thread stack is used only for reporting hard fault conditions! It may therefore be small. */
 PROCESS_STACK_SIZE  = {{ process_stack_size }};
@@ -57,25 +39,25 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 %% endmacro
 
 
-%% macro section_reset(memory)
-	.reset :
+%% macro section_vector_rom(memory)
+	.vector_rom :
 	{
 		__vector_table_rom_start = .;
 		__vector_table_ram_load = .;
 		/* Initial stack address, Reset and NMI handler */
-		KEEP(*(.reset))
+		KEEP(*(.vector_rom))
 		. = ALIGN(4);
 	} >{{memory}}
 %% endmacro
 
 
-%% macro section_vectors(memory)
-	.vectors :  /* Vector table in RAM, only if remapped */
+%% macro section_vector_ram(memory)
+	.vector_ram :  /* Vector table in RAM, only if remapped */
 	{
 		__vector_table_ram_start = .;
 
 		/* used for vectors remapped to RAM */
-		KEEP(*(.vectors))
+		KEEP(*(.vector_ram))
 
 		. = ALIGN(4);
 		__vector_table_ram_end = .;
@@ -86,34 +68,12 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 %% macro section_fastcode_in_flash()
 	.fastcode : ALIGN(4)
 	{
-		/* From the Cortex-M3 Technical Reference Manual:
-		 *
-		 * """
-		 * 14.5 System Interface:
-		 *
-		 * The system interface is a 32-bit AHB-Lite bus. Instruction and vector fetches, and data and debug accesses to
-		 * the System memory space, 0x20000000 - 0xDFFFFFFF, 0xE0100000 - 0xFFFFFFFF, are performed over this bus.
-		 *
-		 * 14.5.6 Pipelined instruction fetches:
-		 *
-		 * To provide a clean timing interface on the System bus, instruction and vector fetch requests to this bus are
-		 * registered. This results in an additional cycle of latency because instructions fetched from the System bus
-		 * take two cycles. This also means that back-to-back instruction fetches from the System bus are not possible.
-		 *
-		 *  Note:
-		 *    Instruction fetch requests to the ICode bus are not registered.
-		 *    Performance critical code must run from the ICode interface.
-		 *
-		 * """
-		 *
-		 * So for STM32's where the CCM is _not_ connected to the I-Bus, we execute .fastcode from Flash.
-		 */
 		*(.fastcode)
 	} >FLASH
 %% endmacro
 
 
-%% macro section_stack(memory, start)
+%% macro section_stack(memory, start=None)
 	.stack (NOLOAD) :
 	{
 	%% if start != None
@@ -165,14 +125,14 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 	.table.zero.extern : ALIGN(4)
 	{
 		__table_zero_extern_start = .;
-		{{ options["linkerscript.table_extern.zero"] }}
+{{ options["linkerscript.table_extern.zero"] }}
 		__table_zero_extern_end = .;
 	} >FLASH
 
 	.table.copy.extern : ALIGN(4)
 	{
 		__table_copy_extern_start = .;
-		{{ options["linkerscript.table_extern.copy"] }}
+{{ options["linkerscript.table_extern.copy"] }}
 		__table_copy_extern_end = .;
 	} >FLASH
 %% endmacro
@@ -197,11 +157,11 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 	{
 		__table_heap_start = .;
 	%% for section in sections
-		LONG({{ section['prop'] }})
-		LONG(__{{ section['name'] }}_start)
-		LONG(__{{ section['name'] }}_end)
+		LONG({{ section.prop }})
+		LONG(__{{ section.name }}_start)
+		LONG(__{{ section.name }}_end)
 	%% endfor
-		{{ options["linkerscript.table_extern.heap"] }}
+{{ options["linkerscript.table_extern.heap"] }}
 		__table_heap_end = .;
 	} >FLASH
 %% endmacro
@@ -241,8 +201,6 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 	.rodata : ALIGN(4)
 	{
 		*(.rodata .rodata.* .gnu.linkonce.r.*)
-
-		. = ALIGN(4);
 		KEEP(*(.init))
 
 		. = ALIGN(4);
@@ -256,15 +214,7 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		KEEP(*(.init_array))
 		PROVIDE_HIDDEN(__init_array_end = .);
 
-		. = ALIGN(4);
-		KEEP(*(.fini))
-
-		. = ALIGN(4);
-		PROVIDE_HIDDEN(__fini_array_start = .);
-		KEEP(*(.fini_array))
-		KEEP(*(SORT(.fini_array.*)))
-		PROVIDE_HIDDEN(__fini_array_end = .);
-
+%% if 0
 		/* These are for static constructors and destructors under ELF */
 		PROVIDE(__ctors_start__ = .);
 		KEEP(*crtbegin.o(.ctors))
@@ -273,21 +223,26 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		KEEP(*crtend.o(.ctors))
 		PROVIDE(__ctors_end__ = .);
 
-		/* We never call static constructors
+		%# We never call destructors
+		KEEP(*(.fini))
+
+		PROVIDE_HIDDEN(__fini_array_start = .);
+		KEEP(*(.fini_array))
+		KEEP(*(SORT(.fini_array.*)))
+		PROVIDE_HIDDEN(__fini_array_end = .);
+
 		PROVIDE(__dtors_start__ = .);
 		KEEP(*crtbegin.o(.dtors))
 		KEEP(*(EXCLUDE_FILE (*crtend.o) .dtors))
 		KEEP(*(SORT(.dtors.*)))
 		KEEP(*crtend.o(.dtors))
 		PROVIDE(__dtors_end__ = .);
-		*/
-
-		*(.init .init.*)
-		*(.fini .fini.*)
+%% endif
 	} >{{memory}}
 
-	/* Unwind tables are used to unwind the stack for C++ exceptions.
-	 * On modm these are disabled by default, so these sections are empty.
+%% if 0
+	/* Unwind tables are used to unwind the stack for C++ exceptions. */
+	%# On modm these are disabled by default, so these sections are empty.
 	.ARM.extab : ALIGN(4)
 	{
 		*(.ARM.extab* .gnu.linkonce.armextab.*)
@@ -304,7 +259,7 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 	{
 		KEEP(*(.eh_frame*))
 	} >{{memory}}
-	 */
+%% endif
 
 	/* Hardware init table */
 	.hardware_init : ALIGN(4)
@@ -357,12 +312,12 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 
 
 %% macro section_end()
-/*
+%% if 0
 	. = ALIGN(4);
 	_end = . ;
 	__end = . ;
 	PROVIDE(end = .);
-*/
+%% endif
 %% endmacro
 
 

@@ -1,223 +1,72 @@
-/*
- * Copyright (c) 2011-2012, Fabian Greif
- * Copyright (c) 2012, 2015-2016, Niklas Hauser
- * Copyright (c) 2013, Sascha Schade
- * Copyright (c) 2013, 2015, Kevin Läufer
- *
- * This file is part of the modm project.
- *
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- */
-/* ------------------------------------------------------------------------- */
+%% import "linker.macros" as linker with context
+{{ linker.copyright() }}
 
-/*
- *                           LINKER  SCRIPT
- *
- * The Linker Script defines how the code and data emitted by the GNU C compiler
- * and assembler are  to be loaded into memory (code goes into FLASH, variables
- * go into RAM).
- *
- * Any symbols defined in the Linker Script are automatically global and
- * available to the rest of the program.
- *
- * Example for STM32F427:
- *
- *                        MEMORY MAP (BACKUP)
- *
- * Backup internal SRAM (4 kB):
- *                |                                 | 0x4002 5000 <---- __backup_end
- *      +-------> |---------------------------------| 0x4002 4FFF
- *      |         |                                 |
- *   .backup      |                                 |
- *      |         |                                 |
- *      +-------> |---------------------------------| 0x4002 4000 <--- __backup_start
- *
- *                          MEMORY MAP (RAM)
- *
- * Auxiliary internal SRAM3 (64 kB):
- *   only accessible by CPU via S-Bus (less efficient than I-Bus), otherwise fully DMA capable
- *                |                                 | 0x2003 0000 <---- __ram_end, __heap3_end
- *      +-------> |---------------------------------| 0x2002 FFFF
- *      |         |                                 |
- *   .heap3       |         not available on        |
- *      |         |        F40./F41. devices!       |
- *      +-------> |---------------------------------| 0x2002 0000 <--- __heap3_start
- *
- * Auxiliary internal SRAM2 (16 kB):
- *   only accessible by CPU via S-Bus (less efficient than I-Bus), otherwise fully DMA capable
- *                |                                 | 0x2002 0000 <---- (__ram_end, __heap_end), __heap2_end
- *      +-------> |---------------------------------| 0x2001 FFFF
- *      |         |                                 |
- *   .heap2       |                                 |
- *      |         |                                 |
- *      +-------> |---------------------------------| 0x2001 C000 <--- __heap2_start
- *
- *
- * Main internal SRAM1 (112 kB):
- *                |                                 | 0x2001 C000 <---- __heap1_end
- *      +-------> |---------------------------------| 0x2001 BFFF
- *      |         |                                 |
- *      |         |               ^                 |
- *   .heap1       |               |                 |
- *      |         |            Heap Area            |
- *      |         |         (grows upwards)         | <------- __heap1_start
- *      +-------> |---------------------------------| <------- __noinit_end
- *      |         |                                 |
- *   .noinit      |     Global data not cleared     |
- *      |         |           after reset           | <------- __noinit_start
- *      +-------> |---------------------------------| <------- __bss_end
- *      |         |                                 |
- *    .bss        |     uninitialized variables     |
- *      |         |                                 | <------- __bss_start
- *      +-------> |---------------------------------| <------- __data_end
- *      |         |                                 |
- *      |         |                                 |
- *    .data       |     initialized variables       |
- *      |         |                                 |
- *      |         |                                 | <------- __data_start
- *      +-------> |---------------------------------| <------- __vector_table_ram_end
- *      |         |                                 |
- *  .vectors      |    Interrupt Vectors (in RAM)   |
- *      |         |        (if re-mapped)           | <------- __vector_table_ram_start
- *      +-------> |---------------------------------| 0x2000 0000 <--- __ram_start
- *
- *
- * CCM (Core Coupled memory) (64 kB):
- *   only accessible by the CPU (no DMA) via D-Bus, not I-Bus!
- *                |                                 | 0x1001 0000 <---- __heap0_end
- *      +-------> |---------------------------------| 0x1000 FFFF
- *      |         |                                 |
- *   .heap0       |           Unused RAM            |
- *      |         |                                 | <------- __heap0_start
- *      +-------> |---------------------------------| <------- __fastdata_end
- *      |         |                                 |
- *  .fastdata     |     initialized variables       |
- *      |         |                                 | <------- __fastdata_start
- *      +-------> |---------------------------------| <------- __process_stack_top, __stack_end
- *      |         |       Process Stack (psp)       |
- *      |         |       (grows downwards)         |
- *      |         |               |                 |
- *      |         |               v                 |
- *   .stack       |---------------------------------| <------- __main_stack_top
- *      |         |        Main Stack (msp)         |
- *      |         |       (grows downwards)         |
- *      |         |               |                 |
- *      |         |               v                 | <------- __stack_start
- *      +-------> |---------------------------------| 0x1000 0000
- *
- *
- *                          MEMORY MAP (Flash)
- *
- *                |                                 | 0x0802 0000 <--- __rom_end
- *                |---------------------------------| 0x0801 FFFF
- *                |                                 |
- *                |                                 |
- *                |                                 |
- *                |          Unused flash           |
- *                |                                 |
- *                |                                 |
- *                |                                 |
- *      +-------> |---------------------------------|
- *      |         |                                 |
- *      |         |                                 |
- *      |         |                                 |
- *    .data       |      copy of .data area         |
- *      |         |                                 |
- *      |         |                                 |
- *      |         |                                 | <------- __data_load
- *      +-------> |---------------------------------|
- *      |         |    Static Constructors (C++)    |
- *      |         | ------------------------------- |
- *      |         |                                 |
- *    .text       |                                 |
- *      |         |          C/C++ code             |
- *      |         |     (contains .fastcode)        |
- *      |         |                                 | <------- __fastcode_load, __fastcode_start, __fastcode_end
- *      +-------> |---------------------------------|
- *      |         |                                 |
- *  .fastdata     |     Variables to be loaded      |
- *      |         |         into CCM RAM            | <------- __fastdata_load
- *      +-------> |---------------------------------|
- *      |         |                                 |
- *   .reset       |   Interrupt Vectors (in FLASH)  |
- *      |         |       (copy of .vectors)        | <------- __vector_table_rom_start, __vector_table_ram_load
- *      +-------> |---------------------------------| 0x0800 0000 <--- __rom_start
- *
- * The first two words (32-bit) in the Flash defines the initial stack pointer
- * location and the reset handler location.
- */
-
-%% import 'linker.macros' as linker with context
-%% set regions = []
-
-{{ linker.prefix(regions) }}
+{{ linker.prefix() }}
 
 
 SECTIONS
 {
-	{{ linker.section_reset("FLASH") }}
+{{ linker.section_vector_rom("FLASH") }}
 
-	{{ linker.section_vectors("RAM") }}
+{{ linker.section_vector_ram("RAM") }}
 
-	{{ linker.section_stack("CCM", None) }}
+{{ linker.section_stack("CCM") }}
 
-	{{ linker.section("CCM AT >FLASH", "fastdata") }}
+{{ linker.section("CCM AT >FLASH", "fastdata") }}
 
-	{{ linker.section_heap("CCM", "heap0") }}
+{{ linker.section_heap("CCM", "heap0") }}
 
-%% if 'backup' in regions
-	{{ linker.section("BACKUP AT >FLASH", "backup") }}
+%% if "backup" in regions
+{{ linker.section("BACKUP AT >FLASH", "backup") }}
 
-	{{ linker.section_heap("BACKUP", "heap5") }}
+{{ linker.section_heap("BACKUP", "heap5") }}
 %% endif
 
-	{{ linker.section_rom("FLASH") }}
+{{ linker.section_rom("FLASH") }}
 
-	{{ linker.section_fastcode_in_flash() }}
+{{ linker.section_fastcode_in_flash() }}
 
-	{{ linker.section_ram("RAM") }}
+{{ linker.section_ram("RAM") }}
 
-	{{ linker.section_heap("SRAM1", "heap1") }}
+{{ linker.section_heap("SRAM1", "heap1") }}
 
-%% if 'sram2' in regions
-	{{ linker.section_heap("SRAM2", "heap2") }}
+%% if "sram2" in regions
+{{ linker.section_heap("SRAM2", "heap2") }}
 %% endif
 
-%% if 'sram3' in regions
-	{{ linker.section_heap("SRAM3", "heap3") }}
+%% if "sram3" in regions
+{{ linker.section_heap("SRAM3", "heap3") }}
 %% endif
 
-	{{ options["linkerscript.sections"] }}
+{{ options["linkerscript.sections"] }}
 
 	/* TABLES! TABLES! ALL THE TABLES YOU COULD EVER WANT! TABLES! */
-	{{ linker.section_table_zero(["bss"]) }}
+{{ linker.section_table_zero(["bss"]) }}
 
 %% set copy_table = ["data", "fastdata"]
-%% if 'backup' in regions
+%% if "backup" in regions
 	%% do copy_table.append("backup")
 %% endif
 %% if vector_table_location == "ram"
 	%% do copy_table.append("vector_table_ram")
 %% endif
-	{{ linker.section_table_copy(copy_table) }}
+{{ linker.section_table_copy(copy_table) }}
 
-	{{ linker.section_table_extern() }}
+{{ linker.section_table_extern() }}
 
-%% set heap_table = [{'name': 'heap1', 'prop': '0x001f'}, {'name': 'heap0', 'prop': '0x2002'}]
-%% if 'sram3' in regions
-	%% do heap_table.insert(1, {'name': 'heap3', 'prop': '0x0019'})
+%% set heap_table = [{"name": "heap1", "prop": "0x001f"}, {"name": "heap0", "prop": "0x2002"}]
+%% if "sram3" in regions
+	%% do heap_table.insert(1, {"name": "heap3", "prop": "0x0019"})
 %% endif
-%% if 'sram2' in regions
-	%% do heap_table.insert(1, {'name': 'heap2', 'prop': '0x0019'})
+%% if "sram2" in regions
+	%% do heap_table.insert(1, {"name": "heap2", "prop": "0x0019"})
 %% endif
-%% if 'backup' in regions
-	%% do heap_table.insert(1, {'name': 'heap5', 'prop': '0x4009'})
+%% if "backup" in regions
+	%% do heap_table.insert(1, {"name": "heap5", "prop": "0x4009"})
 %% endif
-	{{ linker.section_table_heap(heap_table) }}
+{{ linker.section_table_heap(heap_table) }}
 
-	{{ linker.section_end() }}
+{{ linker.section_end() }}
 
-	{{ linker.section_debug() }}
+{{ linker.section_debug() }}
 }

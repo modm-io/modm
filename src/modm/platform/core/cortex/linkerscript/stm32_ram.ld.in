@@ -1,121 +1,11 @@
-/*
- * Copyright (c) 2011-2012, Fabian Greif
- * Copyright (c) 2012, 2015-2016, Niklas Hauser
- * Copyright (c) 2013, Sascha Schade
- * Copyright (c) 2013, 2015, Kevin Läufer
- *
- * This file is part of the modm project.
- *
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- */
-/* ------------------------------------------------------------------------- */
+%% import "linker.macros" as linker with context
+{{ linker.copyright() }}
 
-/*
- *                           LINKER  SCRIPT
- *
- * The Linker Script defines how the code and data emitted by the GNU C compiler
- * and assembler are  to be loaded into memory (code goes into FLASH, variables
- * go into RAM).
- *
- * Any symbols defined in the Linker Script are automatically global and
- * available to the rest of the program.
- *
- * Example for STM32F401:
- *
- *                          MEMORY MAP (RAM)
- *
- *                |                                 | 0x2001 0000 <---- __ram_end, __heap1_end
- *      +-------> |---------------------------------| 0x2000 FFFF
- *      |         |                                 |
- *      |         |               ^                 |
- *   .heap1       |               |                 |
- *      |         |            Heap Area            |
- *      |         |         (grows upwards)         | <------- __heap1_start
- *      +-------> |---------------------------------| <------- __noinit_end
- *      |         |                                 |
- *   .noinit      |     Global data not cleared     |
- *      |         |           after reset           | <------- __noinit_start
- *      +-------> |---------------------------------| <------- __bss_end
- *      |         |                                 |
- *    .bss        |     uninitialized variables     |
- *      |         |                                 | <------- __bss_start
- *      +-------> |---------------------------------| <------- __data_end
- *      |         |                                 |
- *      |         |                                 |
- *    .data       |     initialized variables       |
- *      |         |     (contains .fastdata)        |
- *      |         |                                 | <------- __data_start, __fastdata_start, __fastdata_end
- *      +-------> |---------------------------------| <------- __vector_table_ram_end
- *      |         |                                 |
- *  .vectors      |    Interrupt Vectors (in RAM)   |
- *      |         |        (if re-mapped)           | <------- __vector_table_ram_start
- *      +-------> |---------------------------------| <------- __process_stack_top, __stack_end
- *      |         |       Process Stack (psp)       |
- *      |         |       (grows downwards)         |
- *      |         |               |                 |
- *      |         |               v                 |
- *      |         |---------------------------------| <------- __main_stack_top
- *      |         |        Main Stack (msp)         |
- *   .stack       |       (grows downwards)         |
- *      |         |               |                 |
- *      |         |               v                 |
- *      |         |---------------------------------|
- *      |         |  Alignment buffer for .vectors  |
- *      |         |   (overwritten by main stack!)  | <------- __stack_start
- *      +-------> |---------------------------------| 0x2000 0000 <--- __ram_start
- *
- *
- *                          MEMORY MAP (Flash)
- *
- *                |                                 | 0x0802 0000 <--- __rom_end
- *                |---------------------------------| 0x0801 FFFF
- *                |                                 |
- *                |                                 |
- *                |                                 |
- *                |          Unused flash           |
- *                |                                 |
- *                |                                 |
- *                |                                 |
- *      +-------> |---------------------------------|
- *      |         |                                 |
- *      |         |                                 |
- *      |         |                                 |
- *    .data       |      copy of .data area         |
- *      |         |                                 |
- *      |         |                                 |
- *      |         |                                 | <------- __data_load, __fastdata_load
- *      +-------> |---------------------------------|
- *      |         |    Static Constructors (C++)    |
- *      |         | ------------------------------- |
- *      |         |                                 |
- *    .text       |                                 |
- *      |         |          C/C++ code             |
- *      |         |     (contains .fastcode)        |
- *      |         |                                 | <------- __fastcode_load, __fastcode_start, __fastcode_end
- *      +-------> |---------------------------------|
- *      |         |                                 |
- *   .reset       |   Interrupt Vectors (in FLASH)  |
- *      |         |       (copy of .vectors)        | <------- __vector_table_rom_start, __vector_table_ram_load
- *      +-------> |---------------------------------| 0x0800 0000 <--- __rom_start
- *
- * The first two words (32-bit) in the Flash defines the initial stack pointer
- * location and the reset handler location.
- */
-
-%% import 'linker.macros' as linker with context
-%% set regions = []
-
-{{ linker.prefix(regions) }}
+{{ linker.prefix() }}
 
 %% if vector_table_location == "ram"
-	%% set i = {}
-	%% for vector in vectors
-		%% do i.update({vector.position | int : ""})
-	%% endfor
 /* Round up the number of vector table entries to the nearest power-of-two and multiply by 8. */
-VECTOR_TABLE_ALIGNMENT = (1 << LOG2CEIL({{ i.keys()|sort|last + 16 }})) * 8;
+VECTOR_TABLE_ALIGNMENT = (1 << LOG2CEIL({{ number_of_interrupts + 16 }})) * 8;
 /* compute the vector table offset from start of RAM */
 VECTOR_TABLE_OFFSET = ALIGN(TOTAL_STACK_SIZE, VECTOR_TABLE_ALIGNMENT);
 %% else
@@ -124,44 +14,44 @@ VECTOR_TABLE_OFFSET = TOTAL_STACK_SIZE;
 
 SECTIONS
 {
-	{{ linker.section_reset("FLASH") }}
+{{ linker.section_vector_rom("FLASH") }}
 
-	{{ linker.section_stack("RAM", "VECTOR_TABLE_OFFSET - TOTAL_STACK_SIZE") }}
+{{ linker.section_stack("RAM", "VECTOR_TABLE_OFFSET - TOTAL_STACK_SIZE") }}
 
-	{{ linker.section_vectors("RAM") }}
+{{ linker.section_vector_ram("RAM") }}
 
-	{{ linker.section_rom("FLASH") }}
+{{ linker.section_rom("FLASH") }}
 
-	{{ linker.section_fastcode_in_flash() }}
+{{ linker.section_fastcode_in_flash() }}
 
-	{{ linker.section_ram("RAM") }}
+{{ linker.section_ram("RAM") }}
 
-	{{ linker.section_heap("SRAM1", "heap1") }}
+{{ linker.section_heap("SRAM1", "heap1") }}
 
-%% if 'sram2' in regions and target["family"] not in ["l4"]
-	{{ linker.section_heap("SRAM2", "heap2") }}
+%% if "sram2" in regions
+{{ linker.section_heap("SRAM2", "heap2") }}
 %% endif
 
-	{{ options["linkerscript.sections"] }}
+{{ options["linkerscript.sections"] }}
 
 	/* TABLES! TABLES! ALL THE TABLES YOU COULD EVER WANT! TABLES! */
-	{{ linker.section_table_zero(["bss"]) }}
+{{ linker.section_table_zero(["bss"]) }}
 
 %% set copy_table = ["data"]
 %% if vector_table_location == "ram"
 	%% do copy_table.append("vector_table_ram")
 %% endif
-	{{ linker.section_table_copy(copy_table) }}
+{{ linker.section_table_copy(copy_table) }}
 
-	{{ linker.section_table_extern() }}
+{{ linker.section_table_extern() }}
 
-%% set heap_table = [{'name': 'heap1', 'prop': '0x000f'}]
-%% if 'sram2' in regions and target["family"] not in ["l4"]
-	%% do heap_table.append({'name': 'heap2', 'prop': '0x000f'})
+%% set heap_table = [{"name": "heap1", "prop": "0x000f"}]
+%% if "sram2" in regions
+	%% do heap_table.append({"name": "heap2", "prop": "0x000f"})
 %% endif
-	{{ linker.section_table_heap(heap_table) }}
+{{ linker.section_table_heap(heap_table) }}
 
-	{{ linker.section_end() }}
+{{ linker.section_end() }}
 
-	{{ linker.section_debug() }}
+{{ linker.section_debug() }}
 }
