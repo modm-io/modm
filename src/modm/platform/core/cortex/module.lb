@@ -164,9 +164,6 @@ def build(env):
     # dealing with C++
     env.copy("cxxabi.cpp")
 
-    # dealing with newlib
-    env.copy("syscalls.c")
-
     # startup script
     env.template("startup.c.in")
     env.template("vectors.c.in")
@@ -178,6 +175,8 @@ def build(env):
         env.template("heap_newlib.c.in")
     if env[":::allocator"] == "tlsf":
         env.template("heap_tlsf.c.in")
+        if not env.has_module(":tlsf"):
+            env.log.error("When using `:::allocator == tlsf`, you must also include the `:tlsf` module!")
     if env[":::allocator"] == "block":
         env.template("heap_block_allocator.cpp.in")
 
