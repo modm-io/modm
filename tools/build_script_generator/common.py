@@ -24,7 +24,7 @@ def common_source_files(env, buildlog):
         _, extension = os.path.splitext(filename)
 
         if extension in [".c", ".cpp", ".cc", ".sx", ".S"]:
-            files_to_build.append(os.path.normpath(filename))
+            files_to_build.append(os.path.normpath(filename).replace('\\','\\\\')) #windows path compatibility hack
 
     env.outbasepath = prev
     return sorted(files_to_build)

@@ -2,7 +2,7 @@
 %% if "elf." ~ profile in metadata
 define file_{{profile}}
     file
-    file {{ metadata["elf." ~ profile][0] }}
+    file {{ metadata["elf." ~ profile][0] | windowsify }}
 end
 %% endif
 %% endfor
