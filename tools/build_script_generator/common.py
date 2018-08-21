@@ -81,6 +81,7 @@ def common_compiler_flags(compiler, target, buildlog):
         "-ffunction-sections",
         "-fshort-wchar",
         "-funsigned-char",
+        "-fwrapv",
         # "-fmerge-all-constants",
 
         "-g3",
