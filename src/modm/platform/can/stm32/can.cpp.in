@@ -4,6 +4,7 @@
  * Copyright (c) 2013-2014, 2016, Kevin Läufer
  * Copyright (c) 2014, Georgi Grinshpun
  * Copyright (c) 2014, 2016-2018, Niklas Hauser
+ * Copyright (c) 2018, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -42,27 +43,33 @@ static modm::atomic::Queue<modm::can::Message, {{ options["buffer.rx"] }}> rxQue
 
 
 // ----------------------------------------------------------------------------
-// Re-implemented here to save some code space. As all arguments in the calls
-// below are constant the compiler is able to calculate everything at
-// compile time.
-static modm_always_inline void
-nvicEnableInterrupt(IRQn_Type IRQn)
-{
-	NVIC->ISER[((uint32_t)(IRQn) >> 5)] = (1UL << ((uint32_t)(IRQn) & 0x1F));
-}
-
-// ----------------------------------------------------------------------------
 void
 modm::platform::Can{{ id }}::initializeWithPrescaler(
 		uint16_t prescaler, uint8_t bs1, uint8_t bs2,
 		uint32_t interruptPriority, Mode startupMode, bool overwriteOnOverrun)
 {
+%% macro enable_reset(instance)
 	// enable clock
-	RCC->APB1ENR{{ apb_post }}  |=  RCC_APB1ENR{{ apb_post }}_{{ reg }}EN;
+	RCC->APB1ENR{{ apb_post }}  |=  RCC_APB1ENR{{ apb_post }}_{{ instance }}EN;
 
 	// reset controller
-	RCC->APB1RSTR{{ apb_post }} |=  RCC_APB1RSTR{{ apb_post }}_{{ reg }}RST;
-	RCC->APB1RSTR{{ apb_post }} &= ~RCC_APB1RSTR{{ apb_post }}_{{ reg }}RST;
+	RCC->APB1RSTR{{ apb_post }} |=  RCC_APB1RSTR{{ apb_post }}_{{ instance }}RST;
+	RCC->APB1RSTR{{ apb_post }} &= ~RCC_APB1RSTR{{ apb_post }}_{{ instance }}RST;
+%% endmacro
+%% if type == "Slave"
+	// enable and reset master if disabled
+	if (!(RCC->APB1ENR{{ apb_post }} & RCC_APB1ENR{{ apb_post }}_{{ reg_other }}EN)) {
+	{{ enable_reset(reg_other) | lbuild.indent(4) }}
+	}
+%% endif
+%% if type == "Master"
+	// skip enable and reset if device has already been enabled by slave
+	if (!(RCC->APB1ENR{{ apb_post }} & RCC_APB1ENR{{ apb_post }}_{{ reg }}EN)) {
+	{{ enable_reset(reg) | lbuild.indent(4) }}
+	}
+%% else
+	{{ enable_reset(reg) }}
+%% endif
 
 	// CAN Master Reset
 	// FMP bits and CAN_MCR register are initialized to the reset values
@@ -109,18 +116,18 @@ modm::platform::Can{{ id }}::initializeWithPrescaler(
 	NVIC_SetPriority(CEC_CAN_IRQn, interruptPriority);
 
 	// Register Interrupts at the NVIC
-	nvicEnableInterrupt(CEC_CAN_IRQn);
+	NVIC_EnableIRQ(CEC_CAN_IRQn);
 %% else
 	// Set vector priority
 	NVIC_SetPriority({{ reg }}_RX0_IRQn, interruptPriority);
 	NVIC_SetPriority({{ reg }}_RX1_IRQn, interruptPriority);
 
 	// Register Interrupts at the NVIC
-	nvicEnableInterrupt({{ reg }}_RX0_IRQn);
-	nvicEnableInterrupt({{ reg }}_RX1_IRQn);
+	NVIC_EnableIRQ({{ reg }}_RX0_IRQn);
+	NVIC_EnableIRQ({{ reg }}_RX1_IRQn);
 
 	%% if options["buffer.tx"] > 0
-	nvicEnableInterrupt({{ reg }}_TX_IRQn);
+	NVIC_EnableIRQ({{ reg }}_TX_IRQn);
 	NVIC_SetPriority({{ reg }}_TX_IRQn, interruptPriority);
 	%% endif
 %% endif
@@ -144,7 +151,7 @@ modm::platform::Can{{ id }}::initializeWithPrescaler(
 	while ((({{ reg }}->MSR & CAN_MSR_INAK) == CAN_MSR_INAK) and (deadlockPreventer-- > 0))  {
 		// wait for the normal mode
 	}
-	modm_assert(deadlockPreventer > 0, "can", "init", "timeout", {{ 0 if id == '' else id }});
+	modm_assert(deadlockPreventer > 0, "can", "init", "timeout2", {{ 0 if id == '' else id }});
 }
 
 // ----------------------------------------------------------------------------
@@ -467,7 +474,7 @@ modm::platform::Can{{ id }}::enableStatusChangeInterrupt(
 {
 %% if target["family"] != "f0"
 	NVIC_SetPriority({{ reg }}_SCE_IRQn, interruptPriority);
-	nvicEnableInterrupt({{ reg }}_SCE_IRQn);
+	NVIC_EnableIRQ({{ reg }}_SCE_IRQn);
 %% endif
 
 	{{ reg }}->IER = interruptEnable | ({{ reg }}->IER & 0x000000ff);
