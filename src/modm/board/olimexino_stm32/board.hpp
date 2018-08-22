@@ -121,6 +121,7 @@ using LedD13 = D13;
 using LedD3 = D3;
 
 using Leds = SoftwareGpioPort< LedD13, LedD3 >;
+using Button = GpioUnused;
 
 namespace uext
 {
