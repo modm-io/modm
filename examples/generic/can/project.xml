@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <!--
+    ..ci:
+        incompatible = ["avr", "uno", "k", "f030", "f051", "f100", "f401", "f411", "olimex"]
+        for board in [b for b in boards if all(f not in b for f in incompatible)]:
+            nc = config.replace("/can", "/can/" + board) \
+                       .replace("blue_pill", board)
+            if any(f in board for f in ["f4", "l4", "f7"]):
+                nc = nc.replace(":can", ":can:1")
+            yield (nc, ["scons"], board)
+  -->
+  <extends>../../../src/modm/board/blue_pill/board.xml</extends>
+  <options>
+    <option name=":build:build.path">../../../build/generic/can</option>
+  </options>
+  <modules>
+    <module>:debug</module>
+    <module>:platform:can</module>
+    <module>:platform:gpio</module>
+    <module>:platform:uart:1</module>
+    <module>:build:scons</module>
+  </modules>
+</library>

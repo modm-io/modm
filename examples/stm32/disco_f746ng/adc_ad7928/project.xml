@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <extends>../../../../src/modm/board/disco_f746ng/board.xml</extends>
+  <options>
+    <option name=":build:build.path">../../../../build/stm32f746g_discovery/blink</option>
+  </options>
+  <modules>
+    <module>:driver:ad7928</module>
+    <module>:platform:gpio</module>
+    <module>:platform:spi:2</module>
+    <module>:processing:protothread</module>
+    <module>:processing:timer</module>
+    <module>:build:scons</module>
+  </modules>
+</library>

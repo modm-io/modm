@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <!--
+    ..ci:
+        nucleos = [b for b in boards if b.startswith("nucleo_")]
+        for board in nucleos:
+            new_config = config.replace("/pwm_advanced", "/pwm_advanced/" + board) \
+                               .replace("nucleo_l432kc", board)
+            yield (new_config, ["scons"], board)
+  -->
+  <extends>../../../../src/modm/board/nucleo_l432kc/board.xml</extends>
+  <options>
+    <option name=":build:build.path">../../../../build/generic/pwm_advanced</option>
+  </options>
+  <modules>
+    <module>:build:scons</module>
+    <module>:platform:timer:1</module>
+  </modules>
+</library>

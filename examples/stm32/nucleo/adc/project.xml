@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <!--
+    ..ci:
+        nucleos = [b for b in boards if b.startswith("nucleo_l")]
+        for board in nucleos:
+            new_config = config.replace("/adc", "/adc/" + board) \
+                               .replace("nucleo_l476rg", board)
+            yield (new_config, ["scons"], board)
+  -->
+  <extends>../../../../src/modm/board/nucleo_l476rg/board.xml</extends>
+  <options>
+    <option name=":build:build.path">../../../../build/generic/adc</option>
+  </options>
+  <modules>
+    <module>:platform:adc:1</module>
+    <module>:platform:clock</module>
+    <module>:platform:gpio</module>
+    <module>:build:scons</module>
+  </modules>
+</library>

@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <!--
+    ..ci:
+        nucleos = [b for b in boards if b.startswith("nucleo_") and "l432" not in b]
+        for board in nucleos:
+            new_config = config.replace("/i2c_test", "/i2c_test/" + board) \
+                               .replace("nucleo_l476rg", board)
+            if "303" in board or "f0" in board:
+                new_config = new_config.replace(":i2c:1", ":i2c.bitbang")
+            yield (new_config, ["scons"], board)
+  -->
+  <extends>../../../../src/modm/board/nucleo_l476rg/board.xml</extends>
+  <options>
+    <option name=":build:build.path">../../../../build/generic/i2c_test</option>
+  </options>
+  <modules>
+    <module>:architecture:i2c.device</module>
+    <module>:platform:i2c:1</module>
+    <module>:processing:protothread</module>
+    <module>:processing:resumable</module>
+    <module>:processing:timer</module>
+    <module>:build:scons</module>
+  </modules>
+</library>

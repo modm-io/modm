@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <!--
+    ..ci:
+        for board in [b for b in boards if "avr" not in b]:
+            new_config = config.replace("/logger", "/logger/" + board) \
+                               .replace("disco_f100rb", board)
+            if "arduino" in board:
+                new_config = new_config.replace(":uart:1", ":uart")
+            yield (new_config, ["scons"], board)
+  -->
+  <extends>../../../src/modm/board/disco_f100rb/board.xml</extends>
+  <options>
+    <option name=":build:build.path">../../../build/generic/logger</option>
+  </options>
+  <modules>
+    <module>:debug</module>
+    <module>:platform:gpio</module>
+    <module>:platform:uart:1</module>
+    <module>:processing:timer</module>
+    <module>:build:scons</module>
+  </modules>
+</library>

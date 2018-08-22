@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <!--
+    ..ci:
+        nucleos = [b for b in boards if b.startswith("nucleo_")]
+        for board in nucleos:
+            new_config = config.replace("/spi_flash", "/spi_flash/" + board) \
+                               .replace("nucleo_f429zi", board)
+            yield (new_config, ["scons"], board)
+  -->
+  <extends>../../../../src/modm/board/nucleo_f429zi/board.xml</extends>
+  <options>
+    <option name=":build:build.path">../../../../build/generic/spi_flash</option>
+  </options>
+  <modules>
+  	<module>:driver:block.device:spi.flash</module>
+  	<module>:platform:spi:1</module>
+    <module>:build:scons</module>
+  </modules>
+</library>

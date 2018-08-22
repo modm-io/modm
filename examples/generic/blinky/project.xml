@@ -1,5 +1,12 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <library>
+  <!--
+    ..ci:
+        for board in boards:
+            new_config = config.replace("/blinky", "/blinky/" + board) \
+                               .replace("nucleo_l476rg", board)
+            yield (new_config, ["scons"], board)
+  -->
   <extends>../../../src/modm/board/nucleo_l476rg/board.xml</extends>
   <options>
     <option name=":build:build.path">../../../build/generic/blinky</option>
