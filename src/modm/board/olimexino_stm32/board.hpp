@@ -22,6 +22,8 @@
 #define MODM_BOARD_HAS_LOGGER
 
 using namespace modm::platform;
+#define MODM_BOARD_OLIMEXINO_STM32
+
 
 namespace Board
 {

@@ -26,6 +26,8 @@
 #define MODM_BOARD_HAS_LOGGER
 
 using namespace modm::platform;
+#define MODM_BOARD_NUCLEO_F411RE
+#define MODM_BOARD_NUCLEO_64
 
 
 namespace Board

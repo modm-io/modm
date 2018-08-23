@@ -21,6 +21,8 @@
 #include <modm/io/iostream.hpp>
 
 using namespace modm::platform;
+#define MODM_BOARD_AL_AVREB_CAN
+
 
 namespace Board
 {

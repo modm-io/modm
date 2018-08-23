@@ -27,6 +27,8 @@
 #define MODM_BOARD_HAS_LOGGER
 
 using namespace modm::platform;
+#define MODM_BOARD_DISCO_F769NI
+
 
 namespace Board
 {

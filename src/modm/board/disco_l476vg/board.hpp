@@ -26,6 +26,7 @@
 // #include <modm/driver/inertial/lis3dsh.hpp>
 
 using namespace modm::platform;
+#define MODM_BOARD_DISCO_L476VG
 
 
 namespace Board
@@ -40,6 +41,17 @@ struct systemClock {
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency;
 	static constexpr uint32_t Apb2 = Frequency;
+
+	static constexpr uint32_t I2c1 = Apb1;
+	static constexpr uint32_t I2c2 = Apb1;
+	static constexpr uint32_t I2c3 = Apb1;
+
+	static constexpr uint32_t Spi1 = Apb2;
+
+	static constexpr uint32_t Spi2 = Apb1;
+	static constexpr uint32_t Spi3 = Apb1;
+
+	static constexpr uint32_t Can1 = Apb1;
 
 	static constexpr uint32_t Usart1 = Apb2;
 

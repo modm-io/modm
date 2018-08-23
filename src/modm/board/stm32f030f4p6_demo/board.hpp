@@ -27,6 +27,7 @@
 #include <modm/architecture/interface/clock.hpp>
 
 using namespace modm::platform;
+#define MODM_BOARD_DEMO_F030F4
 
 
 namespace Board

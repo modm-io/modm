@@ -26,6 +26,9 @@
 #define MODM_BOARD_HAS_LOGGER
 
 using namespace modm::platform;
+#define MODM_BOARD_NUCLEO_L476RG
+#define MODM_BOARD_NUCLEO_64
+
 
 namespace Board
 {
@@ -80,10 +83,8 @@ struct systemClock {
 
 // Button connects to GND
 using Button = GpioInverted<GpioInputC13>;
-
-// User LD2
-using LedGreen = GpioOutputA5;
-using Leds = SoftwareGpioPort< LedGreen >;
+using LedD13 = D13;
+using Leds = SoftwareGpioPort< LedD13 >;
 
 namespace stlink
 {
@@ -104,7 +105,7 @@ initialize()
 	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
 	stlink::Uart::initialize<systemClock, 115200>();
 
-	LedGreen::setOutput(modm::Gpio::Low);
+	LedD13::setOutput(modm::Gpio::Low);
 
 	Button::setInput();
 }

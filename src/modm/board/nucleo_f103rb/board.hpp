@@ -25,6 +25,8 @@
 #define MODM_BOARD_HAS_LOGGER
 
 using namespace modm::platform;
+#define MODM_BOARD_NUCLEO_F103RB
+#define MODM_BOARD_NUCLEO_64
 
 
 namespace Board
@@ -52,7 +54,7 @@ struct systemClock {
 	static constexpr uint32_t Uart4  = Apb1;
 	static constexpr uint32_t Uart5  = Apb1;
 
-	static constexpr uint32_t Can1   = Apb1;
+	static constexpr uint32_t Can    = Apb1;
 
 	static constexpr uint32_t I2c1   = Apb1;
 	static constexpr uint32_t I2c2   = Apb1;

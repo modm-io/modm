@@ -26,6 +26,7 @@
 #include <modm/architecture/interface/clock.hpp>
 
 using namespace modm::platform;
+#define MODM_BOARD_BLACK_PILL
 
 
 namespace Board

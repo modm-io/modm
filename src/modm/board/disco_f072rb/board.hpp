@@ -26,6 +26,7 @@
 #include <modm/driver/inertial/l3gd20.hpp>
 
 using namespace modm::platform;
+#define MODM_BOARD_DISCO_F072RB
 
 
 namespace Board

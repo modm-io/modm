@@ -23,6 +23,7 @@
 #include <modm/architecture/interface/clock.hpp>
 
 using namespace modm::platform;
+#define MODM_BOARD_DISCO_F100RB
 
 
 namespace Board

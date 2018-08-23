@@ -26,6 +26,7 @@
 #include <modm/driver/inertial/lis3dsh.hpp>
 
 using namespace modm::platform;
+#define MODM_BOARD_DISCO_F407VG
 
 
 namespace Board

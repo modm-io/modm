@@ -24,6 +24,8 @@
 #include <modm/architecture/interface/clock.hpp>
 
 using namespace modm::platform;
+#define MODM_BOARD_DISCO_F429ZI
+
 
 namespace Board
 {

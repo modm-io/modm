@@ -26,6 +26,7 @@
 #include <modm/driver/inertial/lsm303a.hpp>
 
 using namespace modm::platform;
+#define MODM_BOARD_DISCO_F303VC
 
 
 namespace Board
