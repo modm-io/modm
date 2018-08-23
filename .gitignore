@@ -31,3 +31,6 @@ examples/**/modm
 examples/**/SConstruct
 examples/**/Makefile
 examples/**/generated
+
+# repo.lb cache file
+ext/modm-devices.cache
