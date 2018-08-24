@@ -33,21 +33,33 @@ def run_command(cmdline):
     try:
         p = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         output, _ = p.communicate()
-
-        if p.returncode != 0:
-            raise CommandException(output.decode("utf-8"))
-        return output.decode("utf-8")
+        return (output.decode("utf-8"), p.returncode)
     except KeyboardInterrupt:
         raise multiprocessing.ProcessError()
 
 def run_lbuild(command):
     cmdline = LBUILD_COMMAND + command
     LOGGER.debug(" ".join(cmdline))
+    output, retval = run_command(cmdline)
+    if retval != 0:
+        raise CommandException(output)
+    return output
+
+def run_scons(tempdir):
+    cmdline = ["scons", "-C", tempdir]
     return run_command(cmdline)
 
 def build_code(tempdir):
-    cmdline = ["scons", "-C", tempdir]
-    return run_command(cmdline)
+    count = 0
+    while count < 20:
+        output, retval = run_scons(tempdir)
+        if retval != 0:
+            if "Cannot allocate memory" in output:
+                # CircleCI is running out of memory
+                count += 1
+                continue
+            raise CommandException(output)
+        return output
 
 
 class TestRunResult(enum.Enum):
