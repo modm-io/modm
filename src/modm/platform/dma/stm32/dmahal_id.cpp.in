@@ -1,0 +1,220 @@
+/*
+ * Copyright (c) 2018, Christopher Durand
+ * Copyright (c) 2018, Raphael Lehmann
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include "dmahal.hpp"
+
+using Interface = modm::platform::DmaHalSlotInterface;
+
+%% for slot_id in slots
+
+%% set instance = "DMA" ~ id
+%% if type == "stm32-stream-channel"
+	%% set slot = instance ~ "_Stream" ~ slot_id
+	%% set reg = slot ~ "->CR"
+	%% set mem = slot ~ "->M0AR"
+	%% set per = slot ~ "->PAR"
+	%% set length = slot ~ "->NDTR"
+%% elif type == "stm32-channel-request" or type == "stm32-channel"
+	%% set slot = instance ~ "_Channel" ~ slot_id
+	%% set reg = slot ~ "->CCR"
+	%% set mem = slot ~ "->CMAR"
+	%% set per = slot ~ "->CPAR"
+	%% set length = slot ~ "->CNDTR"
+	%% set cselr = instance ~ "_CSELR->CSELR"
+%% endif
+
+%% set pointer_types = [8, 16, 32]
+%% for type in pointer_types
+void
+modm::platform::DmaHal{{ id }}::Slot{{ slot_id }}::memoryToPeripheral{{ type }}(uint{{ type }}_t* memory, volatile uint32_t* peripheral)
+{
+	{{ mem }} = reinterpret_cast<uint32_t>(memory);
+	{{ per }} = reinterpret_cast<uint32_t>(peripheral);
+	{{ reg }} = ({{ reg }} & ~DataTransferDirectionMask) | static_cast<uint32_t>(DataTransferDirection::MemoryToPeripheral);
+}
+
+void
+modm::platform::DmaHal{{ id }}::Slot{{ slot_id }}::peripheralToMemory{{ type }}(volatile uint32_t* peripheral, uint{{ type }}_t* memory)
+{
+	{{ mem }} = reinterpret_cast<uint32_t>(memory);
+	{{ per }} = reinterpret_cast<uint32_t>(peripheral);
+	{{ reg }} = ({{ reg }} & ~DataTransferDirectionMask) | static_cast<uint32_t>(DataTransferDirection::PeripheralToMemory);
+}
+void
+modm::platform::DmaHal{{ id }}::Slot{{ slot_id }}::memoryToMemory{{ type }}(uint{{ type }}_t* m1, uint{{ type }}_t* m2)
+{
+	{{ mem }} = reinterpret_cast<uint32_t>(m1);
+	{{ per }} = reinterpret_cast<uint32_t>(m2); // ???
+	{{ reg }} = ({{ reg }} & ~DataTransferDirectionMask) | static_cast<uint32_t>(DataTransferDirection::MemoryToMemory);
+}
+%% if feature["double_buffer"]
+void
+modm::platform::DmaHal{{ id }}::Slot{{ slot_id }}::memoryToPeripheral{{ type }}(uint{{ type }}_t* memory1, uint{{ type }}_t* memory2, volatile uint32_t* peripheral)
+{
+	// TODO
+	{{ mem }} = reinterpret_cast<uint32_t>(memory);
+	{{ per }} = reinterpret_cast<uint32_t>(peripheral);
+	{{ reg }} = ({{ reg }} & ~DataTransferDirectionMask) | static_cast<uint32_t>(DataTransferDirection::MemoryToPeripheral);
+}
+
+void
+modm::platform::DmaHal{{ id }}::Slot{{ slot_id }}::peripheralToMemory{{ type }}(volatile uint32_t* peripheral, uint{{ type }}_t* memory1, uint{{ type }}_t* memory2)
+{
+	// TODO
+	{{ mem }} = reinterpret_cast<uint32_t>(memory);
+	{{ per }} = reinterpret_cast<uint32_t>(peripheral);
+	{{ reg }} = ({{ reg }} & ~DataTransferDirectionMask) | static_cast<uint32_t>(DataTransferDirection::PeripheralToMemory)
+}
+%% endif
+%% endfor
+
+void
+modm::platform::DmaHal{{ id }}::Slot{{ slot_id }}::reset()
+{
+	// TODO
+}
+
+void
+modm::platform::DmaHal{{ id }}::Slot{{ slot_id }}::setTransferLength(uint16_t length)
+{
+	{{ length }} = length;
+}
+
+void
+modm::platform::DmaHal{{ id }}::Slot{{ slot_id }}::setIncrement(Interface::PeripheralIncrementMode p, Interface::MemoryIncrementMode m)
+{
+	{{ reg }} = ({{ reg }} & ~({{ reg_prefix }}_PINC_Msk | {{ reg_prefix }}_MINC_Msk)) | static_cast<uint32_t>(p) | static_cast<uint32_t>(m);
+}
+
+void
+modm::platform::DmaHal{{ id }}::Slot{{ slot_id }}::setPriority(Interface::Priority p)
+{
+	uint8_t priorityValues[4] = {0b00, 0b01, 0b10, 0b11};
+	{{ reg }} = ({{ reg }} & ~{{ reg_prefix }}_PINC_Msk) | (priorityValues[static_cast<uint32_t>(p)] << {{ reg_prefix }}_PL_Pos);
+}
+
+void
+modm::platform::DmaHal{{ id }}::Slot{{ slot_id }}::setMode(Interface::Mode m)
+{
+	{{ reg }} &= ~{{ reg_prefix }}_CIRC_Msk;
+	switch(m) {
+		%% if feature["circular_mode"]
+		case Mode::CircularMode:
+			{{ reg }} |= {{ reg_prefix }}_CIRC;
+			break;
+		%% endif
+		case Mode::Normal:
+		default:
+			// nothing to do
+			break;
+	}
+}
+
+bool
+modm::platform::DmaHal{{ id }}::Slot{{ slot_id }}::acquire(Interface::Context* context)
+{
+	(void) context;
+	return true;
+	// waits until isFinished() (if any transfer has ever been started)
+	// stores the context once another driver acquires
+}
+
+void
+modm::platform::DmaHal{{ id }}::Slot{{ slot_id }}::releaseLater()
+{
+	// releases instantly, DMA transfer may still be active
+}
+
+void
+modm::platform::DmaHal{{ id }}::Slot{{ slot_id }}::stop()
+{
+	{{ reg }} &= ~{{ reg_prefix }}_EN;
+	while({{ reg }} & {{ reg_prefix }}_EN); // wait for slot to be stopped
+}
+
+void
+modm::platform::DmaHal{{ id }}::Slot{{ slot_id }}::start()
+{
+	// Reset TCIF
+%% if type == "stm32-stream-channel"
+%% if slot_id <= 3
+	{{ instance }}->LISR &= ~DMA_LISR_TCIF{{ slot_id }}; 
+%% else
+	{{ instance }}->HISR &= ~DMA_HISR_TCIF{{ slot_id }}; 
+%% endif
+%% else
+	// TODO
+%% endif
+
+	{{ reg }} |= {{ reg_prefix }}_EN;
+}
+
+bool
+modm::platform::DmaHal{{ id }}::Slot{{ slot_id }}::isFinished()
+{
+%% if type == "stm32-stream-channel"
+%% if slot_id <= 3
+	return ({{ instance }}->LISR & DMA_LISR_TCIF{{ slot_id }}); 
+%% else
+	return ({{ instance }}->HISR & DMA_HISR_TCIF{{ slot_id }}); 
+%% endif
+%% else
+	// TODO L4/F3/...
+	return false;
+%% endif
+/* old code:
+%% if target["family"] == "f4"
+	return !({{ reg }} & {{ reg_prefix }}_EN);
+%% else
+	return (DMA{{ id }}->ISR & DMA_ISR_TCIF{{ slot_id }});
+%% endif
+*/
+}
+
+void
+modm::platform::DmaHal{{ id }}::Slot{{ slot_id }}::connect(Interface::Peripheral p)
+{
+%% if not type == "stm32-channel"
+	switch(p) {
+		%% for p, r in peripherals_available[slot_id].items()
+		case Peripheral::{{ p }}:
+			%% if type == "stm32-stream-channel"
+			{{ reg }} = ({{ reg }} & ~{{ reg_prefix }}_CHSEL_Msk) | ({{ r }} << {{ reg_prefix }}_CHSEL_Pos);
+			%% elif type == "stm32-channel-request"
+			{{ cselr }} = ({{ cselr }} & ~DMA_CSELR_C{{ slot_id }}S_Msk) | ({{ r }} << DMA_CSELR_C{{ slot_id }}S_Pos);
+			%% endif
+			break;
+		%% endfor
+		default:
+			break;
+	}
+%% else
+	(void) p;
+	// this STM32 device has an OR-gate instead of a programmable request mux
+%% endif
+}
+
+bool
+modm::platform::DmaHal{{ id }}::Slot{{ slot_id }}::isAvailable(Interface::Peripheral p, Interface::FeatureMap_t features)
+{
+	(void) features;
+	switch(p) {
+		%% for p in peripherals_available[slot_id]
+		case Peripheral::{{ p }}:
+		%% endfor
+			return true;
+		default:
+			return false;
+	}
+}
+
+%% endfor

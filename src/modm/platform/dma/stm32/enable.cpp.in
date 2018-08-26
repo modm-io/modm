@@ -1,0 +1,33 @@
+/*
+ * Copyright (c) 2018, Christopher Durand
+ * Copyright (c) 2018, Raphael Lehmann
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include "../device.hpp"
+
+void
+modm_dma_enable(void)
+{
+%% for dma_id in dma_ids
+%% if target["family"] == "f4"
+	RCC->AHB1ENR  |=  RCC_AHB1ENR_DMA{{ id }}EN;
+	RCC->AHB1RSTR |=  RCC_AHB1RSTR_DMA{{ id }}RST;
+	RCC->AHB1RSTR &= ~RCC_AHB1RSTR_DMA{{ id }}RST;
+%% elif target["family"] == "f3"
+	RCC->AHBENR  |= RCC_AHBENR_DMA{{ id }}EN;
+%% endif
+%% endfor
+}
+
+
+// .A000101 postfix since .hardware_init is sorted alphabetically and
+// this should be executed before application inits. Totally not a hack.
+modm_section(".hardware_init.A000101_modm_dma_enable")
+uint32_t modm_dma_enable_ptr = (uint32_t) &modm_dma_enable;

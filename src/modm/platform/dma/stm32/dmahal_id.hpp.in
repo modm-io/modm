@@ -1,0 +1,104 @@
+/*
+ * Copyright (c) 2018, Christopher Durand
+ * Copyright (c) 2018, Raphael Lehmann
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32_DMAHAL_HPP
+#	error 	"Don't include this file directly, use 'dmahal.hpp' instead!"
+#endif
+
+#ifndef MODM_STM32_DMAHAL{{ id }}_HPP
+#define MODM_STM32_DMAHAL{{ id }}_HPP
+
+#include <stdint.h>
+#include "../device.hpp"
+#include "dmahal_slotbase.hpp"
+
+/**
+ * @ingroup 	{{partname}}
+ * @defgroup	{{partname}}_dma DMA
+ */
+
+namespace modm::platform
+{
+
+class DmaHal{{ id }}
+{
+
+public:
+%% for slot in slots
+	class Slot{{ slot }} : public DmaHalSlotBase
+	{
+	public:
+		void
+		reset() override;
+
+	%% set pointer_types = [8, 16, 32]
+	%% for type in pointer_types
+		void
+		memoryToPeripheral{{ type }}(uint{{ type }}_t* memory, volatile uint32_t* peripheral) override;
+		void
+		peripheralToMemory{{ type }}(volatile uint32_t* peripheral, uint{{ type }}_t* memory) override;
+		void
+		memoryToMemory{{ type }}(uint{{ type }}_t*, uint{{ type }}_t*) override;
+		%% if feature["double_buffer"]
+		void
+		memoryToPeripheral{{ type }}(uint{{ type }}_t* memory1, uint{{ type }}_t* memory2, volatile uint32_t* peripheral) override;
+		void
+		peripheralToMemory{{ type }}(volatile uint32_t* peripheral, uint{{ type }}_t* memory1, uint{{ type }}_t* memory2) override;
+		%% endif
+	%% endfor
+
+		void
+		setTransferLength(uint16_t length) override;
+
+		void
+		setIncrement(PeripheralIncrementMode p, MemoryIncrementMode m) override;
+
+		void
+		setPriority(Priority p) override;
+
+		void
+		setMode(Mode m) override;
+
+		bool
+		acquire(Context* context) override;
+		// waits until isFinished() (if any transfer has ever been started)
+		// stores the context once another driver acquires
+
+		void
+		releaseLater() override;
+		// DMA transfer may still be active
+
+		void
+		stop() override;
+
+		void
+		start() override;
+
+		bool
+		isFinished() override;
+
+		void
+		connect(Peripheral p) override;
+
+		bool
+		isAvailable(Peripheral p, FeatureMap_t features) override;
+	};
+%% endfor
+%% for slot in slots
+       Slot{{ slot }} slot{{ slot }};
+%% endfor
+
+};
+
+}	// namespace modm::platform
+
+#endif	// MODM_STM32_DMAHAL{{ id }}_HPP

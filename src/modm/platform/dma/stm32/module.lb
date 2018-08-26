@@ -11,30 +11,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-class Instance(Module):
-    def __init__(self, instance):
-        self.instance = instance
-
-    def init(self, module):
-        module.name = str(self.instance)
-        module.description = "Instance {}".format(self.instance)
-
-    def prepare(self, module, options):
-        module.depends(":platform:dma")
-        return True
-
-    def build(self, env):
-        device = env[":target"]
-
-        properties = device.properties
-        properties["target"] = device.identifier
-        properties["id"] = self.instance
-
-        env.substitutions = properties
-        env.outbasepath = "modm/src/modm/platform/dma"
-
-        env.template("dma.hpp.in", "dma_{}.hpp".format(self.instance))
-        env.template("dma_impl.hpp.in", "dma_{}_impl.hpp".format(self.instance))
+import collections
 
 def init(module):
     module.name = ":platform:dma"
@@ -51,18 +28,112 @@ def prepare(module, options):
 
     module.depends(":cmsis:device", ":platform:rcc")
 
-    for instance in device.get_driver("dma")["instance"]:
-        module.add_submodule(Instance(int(instance)))
-
     return True
 
 def build(env):
     device = env[":target"]
+    driver = device.get_driver("dma")
 
     properties = device.properties
     properties["target"] = device.identifier
 
+    properties["ids"] = driver["instance"]
+    properties["slots"] = None
+    properties["type"] = driver["type"]
+    properties["id"] = None
+
+    features = {
+        "double_buffer": False,
+        "circular_mode": False,
+        "request_mux": True,
+        "burst": False,
+    }
+    properties["feature"] = features
+
+    def findInstance(stream, id):
+        for s in stream:
+            if s["instance"] == str(id):
+                return s
+        return None
+
+    mux = {}
+    if driver["type"] == "stm32-stream-channel":
+        for dma_id in properties["ids"]:
+            streamlist = findInstance(driver["streams"], dma_id)["stream"]
+            for stream in streamlist:
+                for channel in stream["channel"]:
+                    for signal in channel["signal"]:
+                        name = signal["driver"].capitalize() + (signal["instance"] if "instance" in signal else "") + signal["name"].capitalize()
+                        if name not in mux:
+                            mux[name] = []
+                        mux[name].append(dict(instance=int(dma_id), slot=int(stream["position"]), request=int(channel["position"])))
+    elif driver["type"] == "stm32-channel-request":
+        for dma_id in properties["ids"]:
+            channellist = findInstance(driver["channels"], dma_id)["channel"]
+            for channel in channellist:
+                for request in channel["request"]:
+                    for signal in request["signal"]:
+                        name = signal["driver"].capitalize() + (signal["instance"] if "instance" in signal else "") + signal["name"].capitalize()
+                        if name not in mux:
+                            mux[name] = []
+                        mux[name].append(dict(instance=int(dma_id), slot=int(channel["position"]), request=int(request["position"])))
+    elif driver["type"] == "stm32-channel":
+        for dma_id in properties["ids"]:
+            channellist = driver["channels"][0]["channel"]
+            for channel in channellist:
+                for signal in channel["signal"]:
+                    name = signal["driver"].capitalize() + (signal["instance"] if "instance" in signal else "") + signal["name"].capitalize()
+                    if name not in mux:
+                        mux[name] = []
+                    mux[name].append(dict(instance=int(dma_id), slot=int(channel["position"])))
+    else:
+        print("DMA driver type: " + driver["type"])
+        raise NotImplementedError
+
+    mux = collections.OrderedDict(sorted(mux.items()))
+    properties["peripherals"] = list(mux.keys())
+
+    if driver["type"] == "stm32-stream-channel":
+        properties["reg_prefix"] = "DMA_SxCR"
+    elif driver["type"] == "stm32-channel-request":
+        properties["reg_prefix"] = "DMA_CCR"
+    elif driver["type"] == "stm32-channel":
+        properties["reg_prefix"] = "DMA_CCR"
+    else:
+        print("DMA driver type: " + driver["type"])
+        raise NotImplementedError
+
     env.substitutions = properties
     env.outbasepath = "modm/src/modm/platform/dma"
 
-    env.template("dma_base.hpp.in")
+    env.template("dmahal.hpp.in")
+    env.template("dmahal_slotbase.hpp.in")
+    for dma_id in properties["ids"]:
+        slots = []
+        for _, l in mux.items():
+            for i in l:
+                if i["instance"] == int(dma_id):
+                    slots.append(i["slot"])
+        slots = sorted(set(slots))
+
+        peripherals_available = {}
+        for slot_id in slots:
+            _peripherals_available = {}
+            for p_name, p_data in mux.items():
+                available = False
+                for r in p_data:
+                    if r["instance"] == int(dma_id) and r["slot"] == slot_id:
+                        available = True
+                if available:
+                    if not driver["type"] == "stm32-channel":
+                        _peripherals_available[p_name] = r["request"]
+                    else:
+                        _peripherals_available[p_name] = True
+            peripherals_available[slot_id] = _peripherals_available
+
+        properties["id"] = int(dma_id)
+        properties["slots"] = slots
+        properties["peripherals_available"] = peripherals_available
+
+        env.template("dmahal_id.hpp.in", "dmahal_{}.hpp".format(dma_id))
+        env.template("dmahal_id.cpp.in", "dmahal_{}.cpp".format(dma_id))
