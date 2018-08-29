@@ -25,7 +25,7 @@ def prepare(module, options):
 
 
 def build(env):
-    env.append_metadata_unique("include_path", "src/stdc++")
+    env.append_metadata_unique("include_path", "src/stdc++/include")
 
     env.outbasepath = "modm/src/stdc++"
     env.copy(".", ignore=env.ignore_files("*.lb"))
