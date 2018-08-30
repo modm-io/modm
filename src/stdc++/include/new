@@ -27,6 +27,22 @@
 extern "C++"
 {
 	//@{
+	namespace std
+	{
+#if __cpp_aligned_new
+	enum class align_val_t: size_t {};
+#endif
+
+	struct nothrow_t
+	{
+#if __cplusplus >= 201103L
+	explicit nothrow_t() = default;
+#endif
+	};
+
+	extern const nothrow_t nothrow;
+	}
+
 	/**
 	 * These are replaceable signatures:
 	 * 
@@ -47,6 +63,18 @@ extern "C++"
 	
 	void
 	operator delete[](void*);
+
+	void*
+	operator new(std::size_t, const std::nothrow_t&) noexcept;
+
+	void*
+	operator new[](std::size_t, const std::nothrow_t&) noexcept;
+
+	void
+	operator delete(void*, const std::nothrow_t&) noexcept;
+
+	void
+	operator delete[](void*, const std::nothrow_t&) noexcept;
 
 	// Default placement versions of operator new.
 	inline void*
