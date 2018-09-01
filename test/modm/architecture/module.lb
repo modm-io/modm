@@ -30,7 +30,7 @@ def prepare(module, options):
 def build(env):
     env.outbasepath = "modm/test/modm/architecture"
 
-    ignore_patterns = ["*.lb", "*.cfg", "*.xml"]
+    ignore_patterns = []
     target = env[":target"].identifier
     if target["platform"] == "hosted":
         # Test does not work on hosted

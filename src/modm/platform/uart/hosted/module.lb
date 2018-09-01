@@ -41,7 +41,7 @@ def build(env):
     env.outbasepath = "modm/src/modm/platform/uart"
 
     # FIXME: Ignore serial_interface, serial_port for windows
-    ignore = ["*.lb"]
+    ignore = []
     if env[":target"].identifier["family"] == "windows":
         ignore.extend(["*/serial_interface*", "*/serial_port*"])
 

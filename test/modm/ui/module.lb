@@ -25,4 +25,4 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm/test/modm/ui"
-    env.copy('.', ignore=env.ignore_patterns("*.lb"))
+    env.copy('.')

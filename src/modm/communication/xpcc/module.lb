@@ -43,7 +43,7 @@ def prepare(module, options):
 def build(env):
     env.outbasepath = "modm/src/modm/communication/xpcc"
 
-    ignore = ["*.lb", "*.in", "*backend/tipc*"]
+    ignore = ["*.in", "*backend/tipc*"]
 
     if env[":target"].identifier["platform"] in ["avr"]:
         ignore.append("*postman/dynamic*")

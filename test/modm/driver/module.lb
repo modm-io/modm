@@ -35,7 +35,7 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm/test/modm/driver"
-    patterns = ["*.lb"]
+    patterns = []
     if env[":target"].identifier["platform"] == "avr":
         patterns += ["*pressure*"]
     env.copy('.', ignore=env.ignore_patterns(*patterns))

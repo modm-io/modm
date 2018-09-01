@@ -21,7 +21,7 @@ def prepare(module, options):
 def build(env):
     env.outbasepath = "modm/src/modm/math/utils"
 
-    ignore = ["*.lb", "*operator_*"]
+    ignore = ["*operator_*"]
     if "avr" in env[":target"].identifier["platform"]:
         ignore.append("*pc*")
         env.copy("operator_avr_impl.hpp", "operator_impl.hpp")

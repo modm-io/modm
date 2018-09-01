@@ -156,6 +156,7 @@ def init(repo):
     repo.description = FileReader("README.md")
     repo.format_description = modm_format_description
     repo.format_short_description = modm_format_short_description
+    repo.add_ignore_patterns("*/*.lb", "*/board.xml")
 
     devices = DevicesCache()
     try:
@@ -170,4 +171,4 @@ def init(repo):
                           enumeration=devices))
 
 def prepare(repo, options):
-    repo.find_modules_recursive(".", modulefile="*.lb", ignore="repo.lb")
+    repo.add_modules_recursive(".", modulefile="*.lb")

@@ -20,4 +20,4 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm/src/modm/ui/time"
-    env.copy(".", ignore=env.ignore_patterns("*.lb"))
+    env.copy(".")
