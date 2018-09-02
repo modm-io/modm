@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <library>
-  <extends>../../../src/modm/board/disco_f469ni/board.xml</extends>
+  <extends>modm:board:disco-f469ni</extends>
   <options>
     <option name=":build:build.path">../../../build/stm32f469_discovery/can</option>
   </options>

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <library>
-  <extends>../../../src/modm/board/disco_f407vg/board.xml</extends>
+  <extends>modm:board:disco-f407vg</extends>
   <options>
     <option name=":build:build.path">../../../build/stm32f4_discovery/sab2</option>
   </options>

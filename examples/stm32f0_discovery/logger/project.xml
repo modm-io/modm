@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <library>
-  <extends>../../../src/modm/board/disco_f100rb/board.xml</extends>
+  <extends>modm:board:disco-f100rb</extends>
   <options>
     <option name=":build:build.path">../../../build/stm32f1_discovery/logger</option>
   </options>

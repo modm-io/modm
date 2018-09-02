@@ -3,8 +3,8 @@
          xsd:noNamespaceSchemaLocation="https://github.com/dergraaf/library-builder/lbuild/resources/configuration.xsd">
   <extends>../src/modm/board/al_avreb_can/board.xml</extends>
   <options>
-    <!-- <option name=":build:scons:avrdude.programmer">avrispmkII</option> -->
-    <option name=":build:scons:avrdude.programmer">usbasp-clone</option>
+    <!-- <option name=":build:avrdude.programmer">avrispmkII</option> -->
+    <option name=":build:avrdude.programmer">usbasp-clone</option>
     <option name=":build:scons:include_sconstruct">True</option>
     <option name=":build:scons:info.build">True</option>
     <!-- <option name=":build:scons:info.git">Info+Status</option> -->

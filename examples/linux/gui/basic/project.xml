@@ -1,12 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <library xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance"
          xsd:noNamespaceSchemaLocation="https://github.com/dergraaf/library-builder/lbuild/resources/configuration.xsd">
-  <repositories>
-    <repository>
-      <path>../../../../repo.lb</path>
-    </repository>
-  </repositories>
-
   <options>
     <option name=":target">hosted-linux</option>
     <option name=":build:build.path">../../../../build/linux/gui/basic</option>

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <library>
-  <extends>../../../../src/modm/board/disco_f303vc/board.xml</extends>
+  <extends>modm:board:disco-f303vc</extends>
   <options>
     <option name=":build:build.path">../../../../build/stm32f3_discovery/adc/simple</option>
   </options>

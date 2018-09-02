@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <library>
-  <extends>../../../src/modm/board/nucleo_f042k6/board.xml</extends>
+  <extends>modm:board:nucleo-f042k6</extends>
   <options>
     <option name=":build:build.path">../../../build/nucleo_f042k6/blink</option>
   </options>

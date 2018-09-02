@@ -1,0 +1,10 @@
+<library>
+  <!-- This is the default lbuild configuration file for every
+       example in this folder. It only sets the repository path,
+       so that this isn't duplicated in every single example.
+       When you write your own application, you must set this
+       path yourself! -->
+  <repositories>
+  	<repository><path>../repo.lb</path></repository>
+  </repositories>
+</library>

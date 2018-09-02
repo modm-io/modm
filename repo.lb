@@ -158,6 +158,11 @@ def init(repo):
     repo.format_short_description = modm_format_short_description
     repo.add_ignore_patterns("*/*.lb", "*/board.xml")
 
+    # Add the board configuration files as their module name aliases
+    for config in Path(repopath("src/modm/board")).glob("*/board.xml"):
+        name = re.search("<module>(modm:board:.*?)</module>", config.read_text())[1].replace("modm:", "")
+        repo.add_configuration(name, config)
+
     devices = DevicesCache()
     try:
         devices.build()

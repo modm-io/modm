@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <library>
-  <extends>../../../src/modm/board/al_avreb_can/board.xml</extends>
+  <extends>modm:board:al-avreb-can</extends>
   <options>
     <option name=":build:build.path">../../../build/avr/assert</option>
   </options>
