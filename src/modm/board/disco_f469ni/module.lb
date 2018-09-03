@@ -29,7 +29,6 @@ def prepare(module, options):
         ":platform:gpio",
         ":platform:i2c:1",
         ":platform:uart:3",
-        ":tlsf",
         ":ui:display")
     return True
 
