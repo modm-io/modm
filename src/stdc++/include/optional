@@ -35,7 +35,6 @@
 
 #include <utility>
 #include <type_traits>
-#include <stdexcept>
 #include <new>
 #include <initializer_list>
 #include <bits/functexcept.h>
@@ -72,32 +71,6 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 
   /// Tag to disengage optional objects.
   inline constexpr nullopt_t nullopt { nullopt_t::_Construct::_Token };
-
-  /**
-   *  @brief Exception class thrown when a disengaged optional object is
-   *  dereferenced.
-   *  @ingroup exceptions
-   */
-  class bad_optional_access : public exception
-  {
-  public:
-    bad_optional_access() { }
-
-    virtual const char* what() const noexcept override
-    { return "bad optional access"; }
-
-    virtual ~bad_optional_access() noexcept = default;
-  };
-
-  void
-  __throw_bad_optional_access()
-  __attribute__((__noreturn__));
-
-  // XXX Does not belong here.
-  inline void
-  __throw_bad_optional_access()
-  { _GLIBCXX_THROW_OR_ABORT(bad_optional_access()); }
-
 
   // Payload for optionals with non-trivial destructor.
   template <typename _Tp,

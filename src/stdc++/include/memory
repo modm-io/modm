@@ -67,7 +67,6 @@
 #include <bits/stl_raw_storage_iter.h>
 
 #if __cplusplus >= 201103L
-#  include <exception>        	  // std::exception
 #ifdef __cpp_rtti
   #include <typeinfo>         	  // std::type_info in get_deleter
 #endif

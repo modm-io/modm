@@ -567,7 +567,9 @@ namespace std
 // translation.  It is primarily used for messages in thrown exceptions; see
 // src/functexcept.cc.  We use __N because the more traditional _N is used
 // for something else under certain OSes (see BADNAMES).
-#define __N(msgid)     (msgid)
+
+// modm avr port: remove exception strings to save RAM
+#define __N(msgid)     ("")
 
 // For example, <windows.h> is known to #define min and max as macros...
 #undef min

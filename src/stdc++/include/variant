@@ -1014,25 +1014,6 @@ namespace __variant
 		   && (is_swappable_v<_Types> && ...))>
     swap(variant<_Types...>&, variant<_Types...>&) = delete;
 
-  class bad_variant_access : public exception
-  {
-  public:
-    bad_variant_access() noexcept : _M_reason("Unknown reason") { }
-    const char* what() const noexcept override
-    { return _M_reason; }
-
-  private:
-    bad_variant_access(const char* __reason) : _M_reason(__reason) { }
-
-    const char* _M_reason;
-
-    friend void __throw_bad_variant_access(const char* __what);
-  };
-
-  inline void
-  __throw_bad_variant_access(const char* __what)
-  { _GLIBCXX_THROW_OR_ABORT(bad_variant_access(__what)); }
-
   template<typename... _Types>
     class variant
     : private __detail::__variant::_Variant_base<_Types...>,

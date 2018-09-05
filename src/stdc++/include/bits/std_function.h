@@ -49,19 +49,6 @@ namespace std _GLIBCXX_VISIBILITY(default)
 _GLIBCXX_BEGIN_NAMESPACE_VERSION
 
   /**
-   *  @brief Exception class thrown when class template function's
-   *  operator() is called with an empty target.
-   *  @ingroup exceptions
-   */
-  class bad_function_call : public std::exception
-  {
-  public:
-    virtual ~bad_function_call() noexcept;
-
-    const char* what() const noexcept;
-  };
-
-  /**
    *  Trait identifying "location-invariant" types, meaning that the
    *  address of the object (or any of its members) will not escape.
    *  Trivially copyable types are location-invariant and users can
