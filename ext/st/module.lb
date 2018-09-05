@@ -55,7 +55,7 @@ def prepare(module, options):
     return True
 
 bprops = {}
-def pre_build(env):
+def validate(env):
     device = env[":target"]
 
     core = device.get_driver("core")["type"]
@@ -73,7 +73,7 @@ def pre_build(env):
         if match:
             define = getDefineForDevice(device.identifier, match)
     if define is None:
-        raise PreBuildException("No device define found for '{}'!".format(device.partname))
+        raise ValidateException("No device define found for '{}'!".format(device.partname))
 
     device_header = define.lower() + ".h"
     peripherals = []

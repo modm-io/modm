@@ -47,7 +47,7 @@ def prepare(module, options):
 
 tables = []
 
-def pre_build(env):
+def validate(env):
     option_table = itertools.product(
         sorted(env[":::gamma"]), sorted(env[":::bit"]), sorted(env[":::range"]))
 
