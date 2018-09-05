@@ -104,7 +104,7 @@ _GLIBCXX_END_NAMESPACE_CONTAINER
       return __last - __first;
     }
 
-#if _GLIBCXX_USE_CXX11_ABI
+#ifdef _GLIBCXX_USE_CXX11_ABI
   // Forward declaration because of the qualified call in distance.
   template<typename _Tp>
     ptrdiff_t

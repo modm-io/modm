@@ -30,7 +30,7 @@
 #ifndef _EXCEPTION_DEFINES_H
 #define _EXCEPTION_DEFINES_H 1
 
-#if ! __cpp_exceptions
+#if ! defined(__cpp_exceptions)
 // Iff -fno-exceptions, transform error handling code to work without it.
 # define __try      if (true)
 # define __catch(X) if (false)

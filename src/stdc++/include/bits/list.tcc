@@ -176,7 +176,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
     _M_resize_pos(size_type& __new_size) const
     {
       const_iterator __i;
-#if _GLIBCXX_USE_CXX11_ABI
+#ifdef _GLIBCXX_USE_CXX11_ABI
       const size_type __len = size();
       if (__new_size < __len)
 	{

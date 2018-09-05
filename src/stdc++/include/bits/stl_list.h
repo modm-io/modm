@@ -102,7 +102,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
     /// The %list node header.
     struct _List_node_header : public _List_node_base
     {
-#if _GLIBCXX_USE_CXX11_ABI
+#ifdef _GLIBCXX_USE_CXX11_ABI
       std::size_t _M_size;
 #endif
 
@@ -112,7 +112,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 #if __cplusplus >= 201103L
       _List_node_header(_List_node_header&& __x) noexcept
       : _List_node_base{ __x._M_next, __x._M_prev }
-# if _GLIBCXX_USE_CXX11_ABI
+# ifdef _GLIBCXX_USE_CXX11_ABI
       , _M_size(__x._M_size)
 # endif
       {
@@ -137,7 +137,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 	    __node->_M_next = __xnode->_M_next;
 	    __node->_M_prev = __xnode->_M_prev;
 	    __node->_M_next->_M_prev = __node->_M_prev->_M_next = __node;
-# if _GLIBCXX_USE_CXX11_ABI
+# ifdef _GLIBCXX_USE_CXX11_ABI
 	    _M_size = __x._M_size;
 # endif
 	    __x._M_init();
@@ -149,7 +149,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
       _M_init() _GLIBCXX_NOEXCEPT
       {
 	this->_M_next = this->_M_prev = this;
-#if _GLIBCXX_USE_CXX11_ABI
+#ifdef _GLIBCXX_USE_CXX11_ABI
 	this->_M_size = 0;
 #endif
       }
@@ -407,7 +407,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CXX11
 
       _List_impl _M_impl;
 
-#if _GLIBCXX_USE_CXX11_ABI
+#ifdef _GLIBCXX_USE_CXX11_ABI
       size_t _M_get_size() const { return _M_impl._M_node._M_size; }
 
       void _M_set_size(size_t __n) { _M_impl._M_node._M_size = __n; }
@@ -648,7 +648,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CXX11
 	}
 #endif
 
-#if _GLIBCXX_USE_CXX11_ABI
+#ifdef _GLIBCXX_USE_CXX11_ABI
       static size_t
       _S_distance(const_iterator __first, const_iterator __last)
       { return std::distance(__first, __last); }
@@ -1985,7 +1985,7 @@ _GLIBCXX_END_NAMESPACE_CXX11
     inline bool
     operator==(const list<_Tp, _Alloc>& __x, const list<_Tp, _Alloc>& __y)
     {
-#if _GLIBCXX_USE_CXX11_ABI
+#ifdef _GLIBCXX_USE_CXX11_ABI
       if (__x.size() != __y.size())
 	return false;
 #endif
@@ -2054,7 +2054,7 @@ _GLIBCXX_END_NAMESPACE_CXX11
 
 _GLIBCXX_END_NAMESPACE_CONTAINER
 
-#if _GLIBCXX_USE_CXX11_ABI
+#ifdef _GLIBCXX_USE_CXX11_ABI
 
   // Detect when distance is used to compute the size of the whole list.
   template<typename _Tp>
