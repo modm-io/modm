@@ -1437,7 +1437,7 @@ namespace std
 #define _GLIBCXX_MANGLE_SIZE_T j
 
 /* Define if C99 llrint and llround functions are missing from <math.h>. */
-/* #undef _GLIBCXX_NO_C99_ROUNDING_FUNCS */
+#define _GLIBCXX_NO_C99_ROUNDING_FUNCS
 
 /* Define if ptrdiff_t is int. */
 #define _GLIBCXX_PTRDIFF_T_IS_INT 1

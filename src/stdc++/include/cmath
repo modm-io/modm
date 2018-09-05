@@ -533,31 +533,6 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 #if __cplusplus >= 201103L
 
 #ifndef __CORRECT_ISO_CPP11_MATH_H_PROTO_FP
-  constexpr int
-  fpclassify(float __x)
-  { return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL,
-				FP_SUBNORMAL, FP_ZERO, __x); }
-
-  constexpr int
-  fpclassify(double __x)
-  { return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL,
-				FP_SUBNORMAL, FP_ZERO, __x); }
-
-  constexpr int
-  fpclassify(long double __x)
-  { return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL,
-				FP_SUBNORMAL, FP_ZERO, __x); }
-#endif
-
-#ifndef __CORRECT_ISO_CPP11_MATH_H_PROTO_INT
-  template<typename _Tp>
-    constexpr typename __gnu_cxx::__enable_if<__is_integer<_Tp>::__value,
-                                              int>::__type
-    fpclassify(_Tp __x)
-    { return __x != 0 ? FP_NORMAL : FP_ZERO; }
-#endif
-
-#ifndef __CORRECT_ISO_CPP11_MATH_H_PROTO_FP
   constexpr bool
   isfinite(float __x)
   { return __builtin_isfinite(__x); }
@@ -1062,73 +1037,31 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 #undef truncl
 
   // types
-  using ::double_t;
-  using ::float_t;
+  using double_t = double;
+  using float_t = float;
 
   // functions
-  using ::acosh;
-  using ::acoshf;
-  using ::acoshl;
-
-  using ::asinh;
-  using ::asinhf;
-  using ::asinhl;
-
-  using ::atanh;
-  using ::atanhf;
-  using ::atanhl;
 
   using ::cbrt;
-  using ::cbrtf;
-  using ::cbrtl;
+  inline float cbrtf(float __x) { return ::cbrt(__x); }
 
   using ::copysign;
-  using ::copysignf;
-  using ::copysignl;
-
-  using ::erf;
-  using ::erff;
-  using ::erfl;
-
-  using ::erfc;
-  using ::erfcf;
-  using ::erfcl;
-
-  using ::exp2;
-  using ::exp2f;
-  using ::exp2l;
-
-  using ::expm1;
-  using ::expm1f;
-  using ::expm1l;
+  inline float copysignf(float __x, float __y) { return ::copysign(__x, __y); }
 
   using ::fdim;
-  using ::fdimf;
-  using ::fdiml;
+  inline float fdimf(float __x, float __y) { return ::fdim(__x, __y); }
 
   using ::fma;
-  using ::fmaf;
-  using ::fmal;
+  inline float fmaf(float __x, float __y, float __z) { return ::fma(__x, __y, __z); }
 
   using ::fmax;
-  using ::fmaxf;
-  using ::fmaxl;
+  inline float fmaxf(float __x, float __y) { return ::fmax(__x, __y); }
 
   using ::fmin;
-  using ::fminf;
-  using ::fminl;
+  inline float fminf(float __x, float __y) { return ::fmin(__x, __y); }
 
   using ::hypot;
-  using ::hypotf;
-  using ::hypotl;
-
-  using ::ilogb;
-  using ::ilogbf;
-  using ::ilogbl;
-
-  using ::lgamma;
-  using ::lgammaf;
-  using ::lgammal;
+  inline float hypotf(float __x, float __y) { return ::hypot(__x, __y); }
 
 #ifndef _GLIBCXX_NO_C99_ROUNDING_FUNCS
   using ::llrint;
@@ -1140,73 +1073,17 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
   using ::llroundl;
 #endif
 
-  using ::log1p;
-  using ::log1pf;
-  using ::log1pl;
-
-  using ::log2;
-  using ::log2f;
-  using ::log2l;
-
-  using ::logb;
-  using ::logbf;
-  using ::logbl;
-
   using ::lrint;
-  using ::lrintf;
-  using ::lrintl;
+  inline float lrintf(float __x) { return ::lrint(__x); }
 
   using ::lround;
-  using ::lroundf;
-  using ::lroundl;
-
-  using ::nan;
-  using ::nanf;
-  using ::nanl;
-
-  using ::nearbyint;
-  using ::nearbyintf;
-  using ::nearbyintl;
-
-  using ::nextafter;
-  using ::nextafterf;
-  using ::nextafterl;
-
-  using ::nexttoward;
-  using ::nexttowardf;
-  using ::nexttowardl;
-
-  using ::remainder;
-  using ::remainderf;
-  using ::remainderl;
-
-  using ::remquo;
-  using ::remquof;
-  using ::remquol;
-
-  using ::rint;
-  using ::rintf;
-  using ::rintl;
+  inline float lroundf(float __x) { return ::lround(__x); }
 
   using ::round;
-  using ::roundf;
-  using ::roundl;
-
-  using ::scalbln;
-  using ::scalblnf;
-  using ::scalblnl;
-
-  using ::scalbn;
-  using ::scalbnf;
-  using ::scalbnl;
-
-  using ::tgamma;
-  using ::tgammaf;
-  using ::tgammal;
+  inline float roundf(float __x) { return ::round(__x); }
 
   using ::trunc;
-  using ::truncf;
-  using ::truncl;
+  inline float truncf(float __x) { return ::trunc(__x); }
 
   /// Additional overloads.
 #ifndef __CORRECT_ISO_CPP11_MATH_H_PROTO_FP

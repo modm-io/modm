@@ -40,6 +40,7 @@
 #include <limits>
 #include <ctime>
 #include <bits/parse_numbers.h> // for literals support.
+#include <cmath>
 
 #ifdef _GLIBCXX_USE_C99_STDINT_TR1
 

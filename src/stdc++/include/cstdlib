@@ -192,66 +192,6 @@ _GLIBCXX_END_NAMESPACE_VERSION
 #undef strtof
 #undef strtold
 
-namespace __gnu_cxx _GLIBCXX_VISIBILITY(default)
-{
-_GLIBCXX_BEGIN_NAMESPACE_VERSION
-
-#if !_GLIBCXX_USE_C99_LONG_LONG_DYNAMIC
-  using ::lldiv_t;
-#endif
-#if _GLIBCXX_USE_C99_CHECK || _GLIBCXX_USE_C99_DYNAMIC
-  extern "C" void (_Exit)(int) throw () _GLIBCXX_NORETURN;
-#endif
-#if !_GLIBCXX_USE_C99_DYNAMIC
-  using ::_Exit;
-#endif
-
-#if !_GLIBCXX_USE_C99_LONG_LONG_DYNAMIC
-  using ::llabs;
-
-  inline lldiv_t
-  div(long long __n, long long __d)
-  { lldiv_t __q; __q.quot = __n / __d; __q.rem = __n % __d; return __q; }
-
-  using ::lldiv;
-#endif
-
-#if _GLIBCXX_USE_C99_LONG_LONG_CHECK || _GLIBCXX_USE_C99_LONG_LONG_DYNAMIC
-  extern "C" long long int (atoll)(const char *) throw ();
-  extern "C" long long int
-    (strtoll)(const char * __restrict, char ** __restrict, int) throw ();
-  extern "C" unsigned long long int
-    (strtoull)(const char * __restrict, char ** __restrict, int) throw ();
-#endif
-#if !_GLIBCXX_USE_C99_LONG_LONG_DYNAMIC
-  using ::atoll;
-  using ::strtoll;
-  using ::strtoull;
-#endif
-  using ::strtof;
-  using ::strtold;
-
-_GLIBCXX_END_NAMESPACE_VERSION
-} // namespace __gnu_cxx
-
-namespace std
-{
-#if !_GLIBCXX_USE_C99_LONG_LONG_DYNAMIC
-  using ::__gnu_cxx::lldiv_t;
-#endif
-  using ::__gnu_cxx::_Exit;
-#if !_GLIBCXX_USE_C99_LONG_LONG_DYNAMIC
-  using ::__gnu_cxx::llabs;
-  using ::__gnu_cxx::div;
-  using ::__gnu_cxx::lldiv;
-#endif
-  using ::__gnu_cxx::atoll;
-  using ::__gnu_cxx::strtof;
-  using ::__gnu_cxx::strtoll;
-  using ::__gnu_cxx::strtoull;
-  using ::__gnu_cxx::strtold;
-} // namespace std
-
 #endif // _GLIBCXX_USE_C99_STDLIB
 
 } // extern "C++"

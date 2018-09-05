@@ -50,32 +50,6 @@
 # endif
 #endif
 
-#ifdef _GLIBCXX_USE_C99_INTTYPES_TR1
-
-namespace std
-{
-  // types
-  using ::imaxdiv_t;
-
-  // functions
-  using ::imaxabs;
-  using ::imaxdiv;
-
-  // GCC does not support extended integer types
-  // intmax_t abs(intmax_t)
-  // imaxdiv_t div(intmax_t, intmax_t)
-
-  using ::strtoimax;
-  using ::strtoumax;
-
-#if defined(_GLIBCXX_USE_WCHAR_T) && _GLIBCXX_USE_C99_INTTYPES_WCHAR_T_TR1
-  using ::wcstoimax;
-  using ::wcstoumax;
-#endif
-} // namespace std
-
-#endif // _GLIBCXX_USE_C99_INTTYPES_TR1
-
 #endif // C++11
 
 #endif // _GLIBCXX_CINTTYPES
