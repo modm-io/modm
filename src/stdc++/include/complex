@@ -42,7 +42,6 @@
 #include <bits/cpp_type_traits.h>
 #include <ext/type_traits.h>
 #include <cmath>
-#include <sstream>
 
 // Get rid of a macro possibly defined in <complex.h>
 #undef complex
@@ -486,73 +485,6 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
     operator!=(const _Tp& __x, const complex<_Tp>& __y)
     { return __x != __y.real() || _Tp() != __y.imag(); }
   //@}
-
-  ///  Extraction operator for complex values.
-  template<typename _Tp, typename _CharT, class _Traits>
-    basic_istream<_CharT, _Traits>&
-    operator>>(basic_istream<_CharT, _Traits>& __is, complex<_Tp>& __x)
-    {
-      bool __fail = true;
-      _CharT __ch;
-      if (__is >> __ch)
-	{
-	  if (_Traits::eq(__ch, __is.widen('(')))
-	    {
-	      _Tp __u;
-	      if (__is >> __u >> __ch)
-		{
-		  const _CharT __rparen = __is.widen(')');
-		  if (_Traits::eq(__ch, __rparen))
-		    {
-		      __x = __u;
-		      __fail = false;
-		    }
-		  else if (_Traits::eq(__ch, __is.widen(',')))
-		    {
-		      _Tp __v;
-		      if (__is >> __v >> __ch)
-			{
-			  if (_Traits::eq(__ch, __rparen))
-			    {
-			      __x = complex<_Tp>(__u, __v);
-			      __fail = false;
-			    }
-			  else
-			    __is.putback(__ch);
-			}
-		    }
-		  else
-		    __is.putback(__ch);
-		}
-	    }
-	  else
-	    {
-	      __is.putback(__ch);
-	      _Tp __u;
-	      if (__is >> __u)
-		{
-		  __x = __u;
-		  __fail = false;
-		}
-	    }
-	}
-      if (__fail)
-	__is.setstate(ios_base::failbit);
-      return __is;
-    }
-
-  ///  Insertion operator for complex values.
-  template<typename _Tp, typename _CharT, class _Traits>
-    basic_ostream<_CharT, _Traits>&
-    operator<<(basic_ostream<_CharT, _Traits>& __os, const complex<_Tp>& __x)
-    {
-      basic_ostringstream<_CharT, _Traits> __s;
-      __s.flags(__os.flags());
-      __s.imbue(__os.getloc());
-      __s.precision(__os.precision());
-      __s << '(' << __x.real() << ',' << __x.imag() << ')';
-      return __os << __s.str();
-    }
 
   // Values
 #if __cplusplus >= 201103L
@@ -1530,27 +1462,6 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
   inline _GLIBCXX_CONSTEXPR
   complex<double>::complex(const complex<long double>& __z)
   : _M_value(__z.__rep()) { }
-
-  // Inhibit implicit instantiations for required instantiations,
-  // which are defined via explicit instantiations elsewhere.
-  // NB:  This syntax is a GNU extension.
-#if _GLIBCXX_EXTERN_TEMPLATE
-  extern template istream& operator>>(istream&, complex<float>&);
-  extern template ostream& operator<<(ostream&, const complex<float>&);
-  extern template istream& operator>>(istream&, complex<double>&);
-  extern template ostream& operator<<(ostream&, const complex<double>&);
-  extern template istream& operator>>(istream&, complex<long double>&);
-  extern template ostream& operator<<(ostream&, const complex<long double>&);
-
-#ifdef _GLIBCXX_USE_WCHAR_T
-  extern template wistream& operator>>(wistream&, complex<float>&);
-  extern template wostream& operator<<(wostream&, const complex<float>&);
-  extern template wistream& operator>>(wistream&, complex<double>&);
-  extern template wostream& operator<<(wostream&, const complex<double>&);
-  extern template wistream& operator>>(wistream&, complex<long double>&);
-  extern template wostream& operator<<(wostream&, const complex<long double>&);
-#endif
-#endif
 
   // @} group complex_numbers
 

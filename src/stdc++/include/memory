@@ -68,8 +68,9 @@
 
 #if __cplusplus >= 201103L
 #  include <exception>        	  // std::exception
-#  include <typeinfo>         	  // std::type_info in get_deleter
-#  include <iosfwd>           	  // std::basic_ostream
+#ifdef __cpp_rtti
+  #include <typeinfo>         	  // std::type_info in get_deleter
+#endif
 #  include <ext/atomicity.h>
 #  include <ext/concurrence.h>
 #  include <bits/functexcept.h>

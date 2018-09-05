@@ -33,7 +33,10 @@
 
 #if __cplusplus >= 201703L
 
-#include <typeinfo>
+#ifdef __cpp_rtti
+  #include <typeinfo>
+#endif
+
 #include <new>
 #include <utility>
 #include <type_traits>
