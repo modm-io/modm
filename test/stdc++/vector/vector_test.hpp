@@ -1,8 +1,5 @@
 /*
- * Copyright (c) 2009, Martin Rosekeit
- * Copyright (c) 2009-2010, 2017, Fabian Greif
- * Copyright (c) 2012, Niklas Hauser
- * Copyright (c) 2012, Sascha Schade
+ * Copyright (c) 2018, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -14,12 +11,18 @@
 
 #include <unittest/testsuite.hpp>
 
-class AlgorithmBaseTest : public unittest::TestSuite
+class VectorTest : public unittest::TestSuite
 {
 public:
 	void
-	testMin();
-	
+	testInsertion();
+
 	void
-	testMax();
+	testIteration();
+
+	void
+	testEmplace();
+
+	void
+	testRemove();
 };
