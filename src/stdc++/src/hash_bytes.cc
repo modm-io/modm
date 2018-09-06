@@ -33,6 +33,11 @@
 // FNV is provided primarily for backward compatibility.
 
 #include <bits/hash_bytes.h>
+#include <type_traits>
+
+#ifdef __AVR__
+#include <util/crc16.h>
+#endif
 
 namespace
 {
@@ -174,7 +179,21 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
       }
     return hash;
   }
+#elif __SIZEOF_SIZE_T__ == 2 && defined(__AVR__)
+  size_t
+  _Hash_bytes(const void* ptr, size_t len, size_t seed)
+  {
+    static_assert(is_same_v<uint16_t, size_t>);
+    size_t hash = seed;
+    const char* cptr = reinterpret_cast<const char*>(ptr);
+    for (; len; --len)
+      hash = _crc_ccitt_update(hash, *cptr++);
+    return hash;
+  }
 
+  size_t
+  _Fnv_hash_bytes(const void* ptr, size_t len, size_t seed)
+  { return _Hash_bytes(ptr, len, seed); }
 #else
 
   // Dummy hash implementation for unusual sizeof(size_t).
