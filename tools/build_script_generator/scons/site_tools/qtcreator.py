@@ -19,7 +19,7 @@
 This tool makes it possible to automatically generate a QtCreator project for
 applications using modm.
 
-You need to add something like this to your application"s `SConstruct`:
+You need to add something like this to your application's `SConstruct`:
 
 ~~~{.py}
 
