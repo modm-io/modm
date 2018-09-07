@@ -21,11 +21,18 @@ def prepare(module, options):
     if target["platform"] != "avr":
         return False
 
+    module.add_option(
+        BooleanOption(
+            name="use_modm_assert",
+            description="Assert on error in stdlib. Set to False to save flash.",
+            default=True))
+
     return True
 
 
 def build(env):
-    env.append_metadata_unique("include_path", "src/stdc++")
+    env.append_metadata_unique("include_path", "src/stdc++/include")
 
     env.outbasepath = "modm/src/stdc++"
-    env.copy(".", ignore=env.ignore_files("*.lb"))
+    env.copy(".", ignore=env.ignore_files("*.lb", "*.in"))
+    env.template("src/functexcept.cc.in", "src/functexcept.cc")

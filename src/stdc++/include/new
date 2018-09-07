@@ -1,0 +1,144 @@
+/*
+ * Copyright (c) 2009-2010, 2012, Fabian Greif
+ * Copyright (c) 2010, Martin Rosekeit
+ * Copyright (c) 2012, Niklas Hauser
+ * Copyright (c) 2018, Christopher Durand
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+/**
+ * @file new
+ * This is a Standard C++ Library header.
+ *
+ * The header @c new defines several functions to manage dynamic memory and
+ * handling memory allocation errors; see
+ * http://gcc.gnu.org/onlinedocs/libstdc++/18_support/howto.html#4 for more.
+ */
+
+#ifndef NEW
+#define NEW
+
+#include <cstddef>
+
+extern "C++"
+{
+	//@{
+	namespace std
+	{
+#if __cpp_aligned_new
+	enum class align_val_t: size_t {};
+#endif
+
+	struct nothrow_t
+	{
+#if __cplusplus >= 201103L
+	explicit nothrow_t() = default;
+#endif
+	};
+
+	extern const nothrow_t nothrow;
+	}
+
+	/**
+	 * These are replaceable signatures:
+	 * 
+	 *  - single new and delete (no arguments, return @c NULL on error)
+	 *  - array new and delete (same)
+	 *
+	 * Placement new and delete signatures (take a memory address argument,
+	 * does nothing) may not be replaced by a user's program.
+	*/
+	void*
+	operator new(std::size_t);
+	
+	void*
+	operator new[](std::size_t);
+	
+	void
+	operator delete(void*);
+	
+	void
+	operator delete[](void*);
+
+	void*
+	operator new(std::size_t, const std::nothrow_t&) noexcept;
+
+	void*
+	operator new[](std::size_t, const std::nothrow_t&) noexcept;
+
+	void
+	operator delete(void*, const std::nothrow_t&) noexcept;
+
+	void
+	operator delete[](void*, const std::nothrow_t&) noexcept;
+
+	// Default placement versions of operator new.
+	inline void*
+	operator new(std::size_t, void* __p)
+	{
+		return __p;
+	}
+	
+	inline void*
+	operator new[](std::size_t, void* __p)
+	{
+		return __p;
+	}
+	
+	// Default placement versions of operator delete.
+	inline void
+	operator delete(void*, void*)
+	{
+	}
+	
+	inline void
+	operator delete[](void*, void*)
+	{
+	}
+
+	#if __cplusplus >= 201703L
+	#if __GNUC__ >= 7
+	#  define _GLIBCXX_HAVE_BUILTIN_LAUNDER 1
+	#elif defined __has_builtin
+	// For non-GNU compilers:
+	# if __has_builtin(__builtin_launder)
+	#  define _GLIBCXX_HAVE_BUILTIN_LAUNDER 1
+	# endif
+	#endif
+
+	#ifdef _GLIBCXX_HAVE_BUILTIN_LAUNDER
+	namespace std
+	{
+	#define __cpp_lib_launder 201606
+	/// Pointer optimization barrier [ptr.launder]
+	template<typename _Tp>
+		[[nodiscard]] constexpr _Tp*
+		launder(_Tp* __p) noexcept
+		{ return __builtin_launder(__p); }
+
+	// The program is ill-formed if T is a function type or
+	// (possibly cv-qualified) void.
+
+	template<typename _Ret, typename... _Args _GLIBCXX_NOEXCEPT_PARM>
+		void launder(_Ret (*)(_Args...) _GLIBCXX_NOEXCEPT_QUAL) = delete;
+	template<typename _Ret, typename... _Args _GLIBCXX_NOEXCEPT_PARM>
+		void launder(_Ret (*)(_Args......) _GLIBCXX_NOEXCEPT_QUAL) = delete;
+
+	void launder(void*) = delete;
+	void launder(const void*) = delete;
+	void launder(volatile void*) = delete;
+	void launder(const volatile void*) = delete;
+	}
+	#endif // _GLIBCXX_HAVE_BUILTIN_LAUNDER
+	#undef _GLIBCXX_HAVE_BUILTIN_LAUNDER
+	#endif // C++17
+
+	//@}
+} // extern "C++"
+
+#endif
