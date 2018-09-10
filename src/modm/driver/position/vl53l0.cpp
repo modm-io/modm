@@ -107,3 +107,29 @@ modm::accessor::Flash<BinaryConfiguration> configuration(configurationFlash);
 }	// namespace vl53l0_private
 
 }	// namespace modm
+
+// ----------------------------------------------------------------------------
+modm::IOStream&
+modm::operator << (modm::IOStream& s, const vl53l0::RangeErrorCode& c)
+{
+	switch(c)
+	{
+		case vl53l0::RangeErrorCode::NoError: s << "NoError"; break;
+		case vl53l0::RangeErrorCode::VCSEL_ContinuityTest: s << "VCSEL_ContinuityTest"; break;
+		case vl53l0::RangeErrorCode::VCSEL_WatchdogTest: s << "VCSEL_WatchdogTest"; break;
+		case vl53l0::RangeErrorCode::VHV_NoValueFound: s << "VHV_NoValueFound"; break;
+		case vl53l0::RangeErrorCode::MSRC_NoTarget: s << "MSRC_NoTarget"; break;
+		case vl53l0::RangeErrorCode::SNR_Check: s << "SNR_Check"; break;
+		case vl53l0::RangeErrorCode::RangePhaseCheck: s << "RangePhaseCheck"; break;
+		case vl53l0::RangeErrorCode::SigmaThresholdCheck: s << "SigmaThresholdCheck"; break;
+		case vl53l0::RangeErrorCode::TCC: s << "TCC"; break;
+		case vl53l0::RangeErrorCode::PhaseConsistency: s << "PhaseConsistency"; break;
+		case vl53l0::RangeErrorCode::MinClip: s << "MinClip"; break;
+		case vl53l0::RangeErrorCode::RangeComplete: s << "RangeComplete"; break;
+		case vl53l0::RangeErrorCode::RangingAlgoUnderflow: s << "RangingAlgoUnderflow"; break;
+		case vl53l0::RangeErrorCode::RangingAlgoOverflow: s << "RangingAlgoOverflow"; break;
+		case vl53l0::RangeErrorCode::RangeIgnoreThreshold: s << "RangeIgnoreThreshold"; break;
+	}
+
+	return s;
+}

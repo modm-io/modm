@@ -327,6 +327,10 @@ public:
 	};
 }; // struct vl53l0
 
+// Output operators
+IOStream&
+operator << (IOStream& os, const vl53l0::RangeErrorCode& c);
+
 /**
  * VL53L0X: Proximity sensor module
  *
