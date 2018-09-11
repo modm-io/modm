@@ -9,7 +9,7 @@ jobs:
       - SCONSFLAGS: "-j3"
     steps:
       - checkout
-      - run: git submodule sync && git submodule update --init
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
       - run:
           name: Check environment
           command: |
@@ -54,7 +54,7 @@ jobs:
       - SCONSFLAGS: "-j3"
     steps:
       - checkout
-      - run: git submodule sync && git submodule update --init
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
       - run:
           name: Examples STM32F0 Series
           command: |
@@ -73,7 +73,7 @@ jobs:
       - SCONSFLAGS: "-j3"
     steps:
       - checkout
-      - run: git submodule sync && git submodule update --init
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
       - run:
           name: Examples STM32F3 Series
           command: |
@@ -96,7 +96,7 @@ jobs:
       - SCONSFLAGS: "-j3"
     steps:
       - checkout
-      - run: git submodule sync && git submodule update --init
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
       - run:
           name: Examples STM32F4 Series
           command: |
@@ -112,7 +112,7 @@ jobs:
       - SCONSFLAGS: "-j3"
     steps:
       - checkout
-      - run: git submodule sync && git submodule update --init
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
       - run:
           name: Examples AVR Series
           command: |
@@ -127,7 +127,7 @@ jobs:
       - SCONSFLAGS: "-j3"
     steps:
       - checkout
-      - run: git submodule sync && git submodule update --init
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
       - run:
           name: Generic Examples
           command: |
@@ -142,7 +142,7 @@ jobs:
       - SCONSFLAGS: "-j3"
     steps:
       - checkout
-      - run: git submodule sync && git submodule update --init
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
       - run:
           name: Examples Linux
           command: |
@@ -157,7 +157,7 @@ jobs:
       - SCONSFLAGS: "-j3"
     steps:
       - checkout
-      - run: git submodule sync && git submodule update --init
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
       - run:
           name: Compile HAL for all AVRs
           command: |
@@ -175,7 +175,7 @@ jobs:
       - SCONSFLAGS: "-j3"
     steps:
       - checkout
-      - run: git submodule sync && git submodule update --init
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
       - run:
           name: Compile HAL for all STM32F0
           command: |
@@ -193,7 +193,7 @@ jobs:
       - SCONSFLAGS: "-j3"
     steps:
       - checkout
-      - run: git submodule sync && git submodule update --init
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
       - run:
           name: Compile HAL for all STM32F1
           command: |
@@ -211,7 +211,7 @@ jobs:
       - SCONSFLAGS: "-j3"
     steps:
       - checkout
-      - run: git submodule sync && git submodule update --init
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
       - run:
           name: Compile HAL for all STM32F2
           command: |
@@ -229,7 +229,7 @@ jobs:
       - SCONSFLAGS: "-j3"
     steps:
       - checkout
-      - run: git submodule sync && git submodule update --init
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
       - run:
           name: Compile HAL for all STM32F3
           command: |
@@ -247,7 +247,7 @@ jobs:
       - SCONSFLAGS: "-j3"
     steps:
       - checkout
-      - run: git submodule sync && git submodule update --init
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
       - run:
           name: Compile HAL for all STM32F4
           command: |
@@ -265,7 +265,7 @@ jobs:
       - SCONSFLAGS: "-j3"
     steps:
       - checkout
-      - run: git submodule sync && git submodule update --init
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
       - run:
           name: Compile HAL for all STM32F7
           command: |
@@ -283,7 +283,7 @@ jobs:
       - SCONSFLAGS: "-j3"
     steps:
       - checkout
-      - run: git submodule sync && git submodule update --init
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
       - run:
           name: Compile HAL for all STM32L4
           command: |
