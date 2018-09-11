@@ -25,5 +25,5 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm/src/modm/math/geometry"
-    env.copy(".", ignore=env.ignore_patterns("*.lb"))
+    env.copy(".")
     env.copy("../geometry.hpp")

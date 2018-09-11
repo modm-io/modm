@@ -1,6 +1,5 @@
-<?xml version='1.0' encoding='UTF-8'?>
 <library>
-  <extends>../../../src/modm/board/nucleo_f429zi/board.xml</extends>
+  <extends>modm:board:nucleo-f429zi</extends>
   <options>
     <option name=":build:build.path">../../../build/nucleo_f429zi/spi_flash</option>
   </options>

@@ -158,7 +158,7 @@ def prepare(module, options):
         ":platform:gpio.common")
     return True
 
-def pre_build(env):
+def validate(env):
     device = env[":target"]
     driver = device.get_driver("gpio")
     # Not an issue anymore, but kept here for future issues
@@ -199,10 +199,10 @@ def pre_build(env):
     extimap = {}
     for vec in [v["name"][4:] for v in device.get_driver("core")["vector"] if "EXTI" in v["name"]]:
         if vec not in all_exti:
-            raise PreBuildException("Unknown EXTI vector: '{}'".format(vec))
+            raise ValidateException("Unknown EXTI vector: '{}'".format(vec))
         for num in all_exti[vec]:
             if str(num) in extimap:
-                raise PreBuildException("Pin '{}' already in EXTI map!".format(str(num)))
+                raise ValidateException("Pin '{}' already in EXTI map!".format(str(num)))
             extimap[str(num)] = vec
 
     all_signals = {}

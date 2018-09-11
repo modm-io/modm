@@ -1,6 +1,5 @@
-<?xml version='1.0' encoding='UTF-8'?>
 <library>
-  <extends>../../../src/modm/board/nucleo_l476rg/board.xml</extends>
+  <extends>modm:board:nucleo-l476rg</extends>
   <options>
     <option name=":build:build.path">../../../build/generic/rtc_ds1302</option>
   </options>

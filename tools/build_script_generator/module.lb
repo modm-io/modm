@@ -64,8 +64,6 @@ def prepare(module, options):
 
 
 def build(env):
-    env.append_metadata_unique("include_path", "src")
-
     # Append custom openocd config file to metadata
     openocd_cfg = env.get_option(":build:openocd.cfg", "")
     if len(openocd_cfg):

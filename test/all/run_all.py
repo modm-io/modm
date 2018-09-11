@@ -31,9 +31,9 @@ class CommandException(Exception):
 
 def run_command(cmdline):
     try:
-        p = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        output, _ = p.communicate()
-        return (output.decode("utf-8"), p.returncode)
+        cmdline = " ".join(cmdline)
+        p = subprocess.run(cmdline, shell=True, stdout=subprocess.PIPE, universal_newlines = True)
+        return (p.stdout, p.returncode)
     except KeyboardInterrupt:
         raise multiprocessing.ProcessError()
 
@@ -128,8 +128,8 @@ def main():
             devices = failed_file.read().strip().split("\n")
     else:
         try:
-            stdout = run_lbuild(["-c", "avr.xml", "discover-option-values", "--option=:target"])
-            devices = stdout.strip().split("\n")
+            stdout = run_lbuild(["-c", "avr.xml", "discover", "--values", "--name :target"])
+            devices = stdout.strip().splitlines()
             # filter for only the devices specified
             for arg in sys.argv[1:]:
                 devices = [d for d in devices if d.startswith(arg)]

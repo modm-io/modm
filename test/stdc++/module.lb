@@ -27,4 +27,4 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm/test/stdc++"
-    env.copy('.', ignore=env.ignore_patterns("*.lb"))
+    env.copy('.')

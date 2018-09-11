@@ -19,4 +19,4 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm/ext/fatfs"
-    env.copy(".", ignore=env.ignore_files("*.lb", "*.in"))
+    env.copy(".", ignore=env.ignore_files("*.in"))

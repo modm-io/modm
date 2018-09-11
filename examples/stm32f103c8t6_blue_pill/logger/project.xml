@@ -1,6 +1,5 @@
-<?xml version='1.0' encoding='UTF-8'?>
 <library>
-  <extends>../../../src/modm/board/blue_pill/board.xml</extends>
+  <extends>modm:board:blue-pill</extends>
   <options>
     <option name=":build:build.path">../../../build/stm32f103c8t6_blue_pill/logger</option>
   </options>

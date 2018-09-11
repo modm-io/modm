@@ -16,17 +16,13 @@ from collections import defaultdict
 def common_source_files(env, buildlog):
     files_to_build = []
 
-    prev = env.outbasepath
-    env.outbasepath = "."
-    outpath = env.outpath("modm")
     for operations in buildlog:
-        filename = os.path.relpath(operations.filename_out, outpath)
+        filename = operations.local_filename_out("modm/")
         _, extension = os.path.splitext(filename)
 
         if extension in [".c", ".cpp", ".cc", ".sx", ".S"]:
-            files_to_build.append(os.path.normpath(filename).replace('\\','\\\\')) #windows path compatibility hack
+            files_to_build.append(filename.replace('\\','\\\\')) #windows path compatibility hack
 
-    env.outbasepath = prev
     return sorted(files_to_build)
 
 def common_target(target):

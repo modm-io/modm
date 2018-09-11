@@ -25,7 +25,7 @@ class Instance(Module):
         module.depends(":platform:adc")
         return True
 
-    def pre_build(self, env):
+    def validate(self, env):
         instances.append(self.instance)
 
     def build(self, env):

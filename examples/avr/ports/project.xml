@@ -1,9 +1,8 @@
-<?xml version='1.0' encoding='UTF-8'?>
 <library>
-  <extends>../../../src/modm/board/al_avreb_can/board.xml</extends>
+  <extends>modm:board:al-avreb-can</extends>
   <options>
     <option name=":build:build.path">../../../build/avr/ports</option>
-    <option name=":build:scons:avrdude.programmer">usbasp-clone</option>
+    <option name=":build:avrdude.programmer">usbasp-clone</option>
   </options>
   <modules>
     <module>:build:scons</module>

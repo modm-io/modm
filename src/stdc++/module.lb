@@ -28,4 +28,4 @@ def build(env):
     env.append_metadata_unique("include_path", "src/stdc++")
 
     env.outbasepath = "modm/src/stdc++"
-    env.copy(".", ignore=env.ignore_files("*.lb"))
+    env.copy(".")

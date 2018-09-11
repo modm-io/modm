@@ -1,12 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<library xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance"
-         xsd:noNamespaceSchemaLocation="https://github.com/dergraaf/library-builder/lbuild/resources/configuration.xsd">
-  <repositories>
-    <repository>
-      <path>../../../repo.lb</path>
-    </repository>
-  </repositories>
-
+<library>
   <options>
     <option name=":target">at90can128</option>
     <option name=":platform:clock:f_cpu">16000000</option>

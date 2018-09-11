@@ -12,6 +12,7 @@
 # -----------------------------------------------------------------------------
 
 import os
+import re
 import sys
 import glob
 import hashlib
@@ -38,9 +39,10 @@ if sys.version_info[1] < 6:
           "Please check if you can upgrade your installation!\n")
 
 import lbuild
-min_lbuild_version = "0.3.6"
-if StrictVersion(lbuild.__version__) < StrictVersion(min_lbuild_version):
-    print("modm requires at least lbuild v{}, please upgrade lbuild!".format(min_lbuild_version))
+min_lbuild_version = "1.1.0"
+if StrictVersion(getattr(lbuild, "__version__", "0.1.0")) < StrictVersion(min_lbuild_version):
+    print("modm requires at least lbuild v{}, please upgrade!\n"
+          "    pip install -U lbuild".format(min_lbuild_version))
     exit(1)
 
 
@@ -133,9 +135,34 @@ class DevicesCache(dict):
         return value
 
 
+from lbuild.format import ansi_escape as c
+def modm_format_description(node, description):
+    # Remove the HTML comments we use for describing doc tests
+    description = re.sub(r"\n?<!--.*?-->", "", description, flags=re.S)
+    # Indent code content
+    for block in re.finditer(r"\n```.*?(\n.*?)\n```", description, flags=re.M|re.S):
+        description = description.replace(block.group(0), block.group(1).replace("\n", "\n    "))
+    # format any markdown headers bold
+    description = re.sub(r"^(#+.*)", r"{}\g<1>{}".format(str(c("bold")), str(c("no_bold"))), description, flags=re.M)
+    return node.format_description(node, description)
+
+def modm_format_short_description(node, description):
+    # All docs use Markdown, so they might start with a `# Header`
+    description = re.sub(r"\n?<!--.*?-->", "", description, flags=re.S)
+    return node.format_short_description(node, description.replace("#", ""))
+
 # =============================================================================
 def init(repo):
     repo.name = "modm"
+    repo.description = FileReader("README.md")
+    repo.format_description = modm_format_description
+    repo.format_short_description = modm_format_short_description
+    repo.add_ignore_patterns("*/*.lb", "*/board.xml")
+
+    # Add the board configuration files as their module name aliases
+    for config in Path(repopath("src/modm/board")).glob("*/board.xml"):
+        name = re.search("<module>(modm:board:.*?)</module>", config.read_text())[1].replace("modm:", "")
+        repo.add_configuration(name, config)
 
     devices = DevicesCache()
     try:
@@ -150,4 +177,7 @@ def init(repo):
                           enumeration=devices))
 
 def prepare(repo, options):
-    repo.find_modules_recursive(".", modulefile="*.lb", ignore="repo.lb")
+    repo.add_modules_recursive(".", modulefile="*.lb")
+
+def build(env):
+    env.append_metadata_unique("include_path", "src")

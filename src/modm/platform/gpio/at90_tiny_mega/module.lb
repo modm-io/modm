@@ -58,7 +58,7 @@ def prepare(module, options):
     return True
 
 bprops = {}
-def pre_build(env):
+def validate(env):
     device = env[":target"]
     driver = device.get_driver("gpio")
 
@@ -75,8 +75,8 @@ def pre_build(env):
         exints = list(filter(lambda p: p["driver"] == "exint", signals))
         pcint = list(filter(lambda p: p["name"].startswith("pcint"), exints))
         extint = list(filter(lambda p: not p["name"].startswith("pcint"), exints))
-        if len(pcint) > 1: raise PreBuildException("More than one Pin Change interrupt on pin '{}'!".format(key.upper()));
-        if len(extint) > 1: raise PreBuildException("More than one External interrupt on pin '{}'!".format(key.upper()));
+        if len(pcint) > 1: raise ValidateException("More than one Pin Change interrupt on pin '{}'!".format(key.upper()));
+        if len(extint) > 1: raise ValidateException("More than one External interrupt on pin '{}'!".format(key.upper()));
         bprops[key] = {
             "gpio": gpio,
             "pcint": int(pcint[0]["name"].replace("pcint", "")) if len(pcint) else -1,
@@ -85,12 +85,12 @@ def pre_build(env):
         }
 
     if not len(all_signals):
-        raise PreBuildException("The device file for '{}' does not contain any signals!".format(device.partname))
+        raise ValidateException("The device file for '{}' does not contain any signals!".format(device.partname))
 
     # check if any signal names start with a digit
     faults = [(af["driver"], af["name"]) for af in all_signals.values() if af["name"].isdigit()]
     if len(faults):
-        raise PreBuildException("These signal names are starting with a digit!\n{}".format(
+        raise ValidateException("These signal names are starting with a digit!\n{}".format(
                 ", ".join(["{}::{}".format(d, n) for (d, n) in faults])))
 
     all_peripherals = [s["driver"] for s in all_signals.values()]

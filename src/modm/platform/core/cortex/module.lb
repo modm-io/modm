@@ -44,7 +44,8 @@ def prepare(module, options):
             name="allocator",
             description=FileReader("option/allocator.md"),
             enumeration=["newlib", "block", "tlsf"],
-            default="newlib"))
+            default="newlib",
+            dependencies=lambda value: ":tlsf" if value == "tlsf" else None))
     if not options[":target"].has_driver("core:cortex-m0*"):
         module.add_option(
             EnumerationOption(
@@ -175,8 +176,6 @@ def build(env):
         env.template("heap_newlib.c.in")
     if env[":::allocator"] == "tlsf":
         env.template("heap_tlsf.c.in")
-        if not env.has_module(":tlsf"):
-            env.log.error("When using `:::allocator == tlsf`, you must also include the `:tlsf` module!")
     if env[":::allocator"] == "block":
         env.template("heap_block_allocator.cpp.in")
 

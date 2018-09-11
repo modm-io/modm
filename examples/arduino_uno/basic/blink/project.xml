@@ -1,6 +1,5 @@
-<?xml version='1.0' encoding='UTF-8'?>
 <library>
-  <extends>../../../../src/modm/board/arduino_uno/board.xml</extends>
+  <extends>modm:board:arduino-uno</extends>
   <options>
     <option name=":build:build.path">../../../../build/arduino_uno/basic/blink</option>
   </options>

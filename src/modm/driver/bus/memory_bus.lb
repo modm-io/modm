@@ -22,4 +22,4 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm/src/modm/driver/bus"
-    env.copy(".", ignore=env.ignore_files("*.lb"))
+    env.copy(".")

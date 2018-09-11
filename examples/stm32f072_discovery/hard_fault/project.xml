@@ -1,6 +1,5 @@
-<?xml version='1.0' encoding='UTF-8'?>
 <library>
-  <extends>../../../src/modm/board/disco_f072rb/board.xml</extends>
+  <extends>modm:board:disco-f072rb</extends>
   <options>
     <option name=":build:build.path">../../../build/stm32f072_discovery/hard_fault</option>
   </options>
