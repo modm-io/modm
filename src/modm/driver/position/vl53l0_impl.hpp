@@ -611,7 +611,7 @@ modm::Vl53l0<I2cMaster>::read(Register reg, uint8_t *buffer, uint8_t length)
 template < class I2cMaster >
 template < typename Predicate >
 modm::ResumableResult<bool>
-modm::Vl53l0<I2cMaster>::poll(Register reg, Predicate pred, uint16_t timeoutMs, uint16_t waitMs)
+modm::Vl53l0<I2cMaster>::poll(Register reg, Predicate pred, const uint16_t timeoutMs, const uint16_t stepMs)
 {
 	RF_BEGIN();
 
@@ -628,15 +628,15 @@ modm::Vl53l0<I2cMaster>::poll(Register reg, Predicate pred, uint16_t timeoutMs, 
 		}
 
 		if(index == 0) {
-			MODM_LOG_ERROR << "Timeout" << modm::endl;
+			MODM_LOG_ERROR << "Timeout after " << timeoutMs << " msec" << modm::endl;
 			break;
 		}
 
-		timeout.restart(waitMs);
+		timeout.restart(stepMs);
 		RF_WAIT_UNTIL(timeout.isExpired());
 
-		if(index >= waitMs) {
-			index -= waitMs;
+		if(index >= stepMs) {
+			index -= stepMs;
 		} else {
 			index = 0;
 		}
