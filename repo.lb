@@ -161,7 +161,7 @@ def init(repo):
 
     # Add the board configuration files as their module name aliases
     for config in Path(repopath("src/modm/board")).glob("*/board.xml"):
-        name = re.search("<module>(modm:board:.*?)</module>", config.read_text())[1].replace("modm:", "")
+        name = re.search("<module>(modm:board:.*?)</module>", config.read_text()).group(1).replace("modm:", "")
         repo.add_configuration(name, config)
 
     devices = DevicesCache()
