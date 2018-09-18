@@ -351,6 +351,10 @@ public:
 	modm::ResumableResult<bool>
 	ping();
 
+	/// Soft reset of device.
+	modm::ResumableResult<bool>
+	reset();
+
 	modm::ResumableResult<bool>
 	initialize();
 

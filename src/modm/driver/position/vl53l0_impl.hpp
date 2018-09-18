@@ -41,6 +41,32 @@ modm::Vl53l0<I2cMaster>::ping()
 
 template < typename I2cMaster >
 modm::ResumableResult<bool>
+modm::Vl53l0<I2cMaster>::reset()
+{
+	RF_BEGIN();
+
+	// Set Reset
+	VL53L0_RF_CALL(write(Register::SOFT_RESE_O2_SOFT_RESET_N, 0x00));
+
+	// Wait until the device is in reset
+	VL53L0_RF_CALL(poll(Register::IDENTIFICATIO_ODEL_ID, [](uint8_t value) {
+		return value == 0x00;
+	}));
+
+	// Release Reset
+	VL53L0_RF_CALL(write(Register::SOFT_RESE_O2_SOFT_RESET_N, 0x01));
+
+	// Wait until the device responds again
+	// After releasing reset it does not accept any I2C transactions
+	// for some time and will respond with NACKs
+	timeout.restart(500);
+	RF_WAIT_UNTIL(RF_CALL(ping()) or timeout.isExpired());
+
+	RF_END_RETURN(not timeout.isExpired());
+}
+
+template < typename I2cMaster >
+modm::ResumableResult<bool>
 modm::Vl53l0<I2cMaster>::initialize()
 {
 	using namespace vl53l0_private;
@@ -218,7 +244,7 @@ modm::Vl53l0<I2cMaster>::checkModelID()
 
 	VL53L0_RF_CALL(read(Register::IDENTIFICATIO_ODEL_ID, &i2cBuffer[1], 2));
 
-	RF_END_RETURN(i2cBuffer[1] == ModelID[0] && i2cBuffer[2] == ModelID[1]);
+	RF_END_RETURN((i2cBuffer[1] == ModelID[0]) and (i2cBuffer[2] == ModelID[1]));
 }
 
 // MARK: checkRevisionID
