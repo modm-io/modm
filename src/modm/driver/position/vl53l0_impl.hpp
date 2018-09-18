@@ -46,15 +46,15 @@ modm::Vl53l0<I2cMaster>::reset()
 	RF_BEGIN();
 
 	// Set Reset
-	VL53L0_RF_CALL(write(Register::SOFT_RESE_O2_SOFT_RESET_N, 0x00));
+	VL53L0_RF_CALL(write(Register::SOFT_RESET__GO2_SOFT_RESET_N, 0x00));
 
 	// Wait until the device is in reset
-	VL53L0_RF_CALL(poll(Register::IDENTIFICATIO_ODEL_ID, [](uint8_t value) {
+	VL53L0_RF_CALL(poll(Register::IDENTIFICATION__MODEL_ID, [](uint8_t value) {
 		return value == 0x00;
 	}));
 
 	// Release Reset
-	VL53L0_RF_CALL(write(Register::SOFT_RESE_O2_SOFT_RESET_N, 0x01));
+	VL53L0_RF_CALL(write(Register::SOFT_RESET__GO2_SOFT_RESET_N, 0x01));
 
 	// Wait until the device responds again
 	// After releasing reset it does not accept any I2C transactions
@@ -87,7 +87,7 @@ modm::Vl53l0<I2cMaster>::initialize()
 	VL53L0_RF_CALL(readSequenceInfo());
 
 	// "Set I2C standard mode"
-	VL53L0_RF_CALL(write(Register::UNDOCUMENTE_2C_MODE, 0x00));
+	VL53L0_RF_CALL(write(Register::UNDOCUMENTED__I2C_MODE, 0x00));
 
 	// magic is happening here ...
 	VL53L0_RF_CALL(write(Register(0x80), 0x01));
@@ -98,12 +98,12 @@ modm::Vl53l0<I2cMaster>::initialize()
 	VL53L0_RF_CALL(write(Register(0xFF), 0x00));
 	VL53L0_RF_CALL(write(Register(0x80), 0x00));
 
-	VL53L0_RF_CALL(updateControlRegister(Register::MSR_ONFIG_CONTROL, msrcConfig, Control_t(0)));
+	VL53L0_RF_CALL(updateControlRegister(Register::MSRC__CONFIG_CONTROL, msrcConfig, Control_t(0)));
 
-	VL53L0_RF_CALL(writeUInt16(Register::FINAL_RANG_ONFIG_MIN_COUNT_RATE_RTN_LIMIT, DefaultSignalRateLimit));
+	VL53L0_RF_CALL(writeUInt16(Register::FINAL_RANGE__CONFIG_MIN_COUNT_RATE_RTN_LIMIT, DefaultSignalRateLimit));
 
 	// finish "data init" phase
-	VL53L0_RF_CALL(write(Register::SYSTE_EQUENCE_CONFIG, 0xFF));
+	VL53L0_RF_CALL(write(Register::SYSTEM__SEQUENCE_CONFIG, 0xFF));
 
 	// load SPAD calibration data from NVM and initialize dynamic SPAD configuration
 	VL53L0_RF_CALL(initializeSpadConfig());
@@ -111,33 +111,33 @@ modm::Vl53l0<I2cMaster>::initialize()
 	VL53L0_RF_CALL(loadTuningSettings());
 
 	// enable "new sample ready" interrupt flag
-	VL53L0_RF_CALL(write(Register::SYSTE_NTERRUPT_CONFIG_GPIO, InterruptConfig::NewSampleReady));
-	VL53L0_RF_CALL(updateControlRegister(Register::GPI_V_MUX_ACTIVE_HIGH,
+	VL53L0_RF_CALL(write(Register::SYSTEM__INTERRUPT_CONFIG_GPIO, InterruptConfig::NewSampleReady));
+	VL53L0_RF_CALL(updateControlRegister(Register::GPIO__HV_MUX_ACTIVE_HIGH,
 										 Control_t(0), GpioConfig::InterruptPolarityHigh));
-	VL53L0_RF_CALL(write(Register::SYSTE_NTERRUPT_CLEAR, InterruptClear::Range));
+	VL53L0_RF_CALL(write(Register::SYSTEM__INTERRUPT_CLEAR, InterruptClear::Range));
 
 	// set default measurement sequence (TCC and MSRC disabled)
-	VL53L0_RF_CALL(write(Register::SYSTE_EQUENCE_CONFIG, standardSequence));
+	VL53L0_RF_CALL(write(Register::SYSTEM__SEQUENCE_CONFIG, standardSequence));
 
 	// recalculate measurement timings
 	VL53L0_RF_CALL(setMaxMeasurementTime(this->measurementTimeUs));
 
 	// VHV calibration
-	VL53L0_RF_CALL(write(Register::SYSTE_EQUENCE_CONFIG, MeasurementSequenceStep::VhvCalibration));
+	VL53L0_RF_CALL(write(Register::SYSTEM__SEQUENCE_CONFIG, MeasurementSequenceStep::VhvCalibration));
 	if(not RF_CALL(performReferenceCalibration(Start::VhvCalibrationMode))) {
 		MODM_LOG_ERROR << "VHV calibration failed." << modm::endl;
 		RF_RETURN(false);
 	}
 
 	// phase calibration
-	VL53L0_RF_CALL(write(Register::SYSTE_EQUENCE_CONFIG, MeasurementSequenceStep::PhaseCalibration));
+	VL53L0_RF_CALL(write(Register::SYSTEM__SEQUENCE_CONFIG, MeasurementSequenceStep::PhaseCalibration));
 	if(not RF_CALL(performReferenceCalibration())) {
 		MODM_LOG_ERROR << "Phase calibration failed." << modm::endl;
 		RF_RETURN(false);
 	}
 
 	// restore measurement sequence settings
-	VL53L0_RF_CALL(write(Register::SYSTE_EQUENCE_CONFIG, standardSequence));
+	VL53L0_RF_CALL(write(Register::SYSTEM__SEQUENCE_CONFIG, standardSequence));
 
 	RF_END_RETURN(true);
 }
@@ -181,28 +181,28 @@ modm::Vl53l0<I2cMaster>::readSensor()
 	VL53L0_RF_CALL(write(Register(0x80), 0x00));
 
 	// start range measurement
-	VL53L0_RF_CALL(write(Register::SYSRANG_TART, Start::StartStop));
+	VL53L0_RF_CALL(write(Register::SYSRANGE__START, Start::StartStop));
 
 	// wait for the start flag to be cleared, use default timeout
-	VL53L0_RF_CALL(poll(Register::SYSRANG_TART, [](uint8_t value) {
+	VL53L0_RF_CALL(poll(Register::SYSRANGE__START, [](uint8_t value) {
 		return not (value & uint8_t(Start::StartStop));
 	}));
 
 	// wait for the measurement to finish, timeout of 2 * this->measurementTimeUs
-	VL53L0_RF_CALL(poll(Register::RESUL_NTERRUPT_STATUS, [](uint8_t value) {
+	VL53L0_RF_CALL(poll(Register::RESULT__INTERRUPT_STATUS, [](uint8_t value) {
 		return value & (InterruptStatus::NewSampleReady | InterruptStatus::OutOfWindow).value;
 	}, measurementTimeUs / 1000 * 2));
 
 	// read 16 bit range value
-	VL53L0_RF_CALL(read(Register::RESUL_ANGE_VALUE0, &i2cBuffer[1], 2));
+	VL53L0_RF_CALL(read(Register::RESULT__RANGE_VALUE0, &i2cBuffer[1], 2));
 	data.distanceBuffer[0] = i2cBuffer[1];
 	data.distanceBuffer[1] = i2cBuffer[2];
 
 	// clear interrupt flag
-	VL53L0_RF_CALL(write(Register::SYSTE_NTERRUPT_CLEAR, InterruptClear::Range));
+	VL53L0_RF_CALL(write(Register::SYSTEM__INTERRUPT_CLEAR, InterruptClear::Range));
 
 	// read error code
-	VL53L0_RF_CALL(read(Register::RESUL_ANGE_STATUS, i2cBuffer[1]));
+	VL53L0_RF_CALL(read(Register::RESULT__RANGE_STATUS, i2cBuffer[1]));
 	data.error = RangeErrorCode_t::get(RangeStatus_t(i2cBuffer[1]));
 
 	RF_END_RETURN(true);
@@ -228,7 +228,7 @@ modm::Vl53l0<I2cMaster>::setMaxMeasurementTime(uint32_t timeUs)
 		RF_RETURN(false);
 	}
 
-	VL53L0_RF_CALL(writeUInt16(Register::FINAL_RANG_ONFIG_TIMEOUT_MACROP_HI, sequenceInfo.finalRangeTimeout));
+	VL53L0_RF_CALL(writeUInt16(Register::FINAL_RANGE__CONFIG_TIMEOUT_MACROP_HI, sequenceInfo.finalRangeTimeout));
 
 	this->measurementTimeUs = timeUs;
 
@@ -242,7 +242,7 @@ modm::Vl53l0<I2cMaster>::checkModelID()
 {
 	RF_BEGIN();
 
-	VL53L0_RF_CALL(read(Register::IDENTIFICATIO_ODEL_ID, &i2cBuffer[1], 2));
+	VL53L0_RF_CALL(read(Register::IDENTIFICATION__MODEL_ID, &i2cBuffer[1], 2));
 
 	RF_END_RETURN((i2cBuffer[1] == ModelID[0]) and (i2cBuffer[2] == ModelID[1]));
 }
@@ -254,7 +254,7 @@ modm::Vl53l0<I2cMaster>::checkRevisionID()
 {
 	RF_BEGIN();
 
-	VL53L0_RF_CALL(read(Register::IDENTIFICATIO_EVISION_ID, i2cBuffer[1]));
+	VL53L0_RF_CALL(read(Register::IDENTIFICATION__REVISION_ID, i2cBuffer[1]));
 
 	RF_END_RETURN(i2cBuffer[1] == RevisionID);
 }
@@ -265,7 +265,7 @@ modm::Vl53l0<I2cMaster>::setDeviceAddress(uint8_t address)
 {
 	RF_BEGIN();
 
-	if(RF_CALL(write(Register::I2C_SLAV_EVICE_ADDRESS, (address & 0x7F))))
+	if(RF_CALL(write(Register::I2C_SLAVE__DEVICE_ADDRESS, (address & 0x7F))))
 	{
 		this->setAddress(address);
 		RF_RETURN(true);
@@ -312,14 +312,14 @@ modm::Vl53l0<I2cMaster>::initializeSpadConfig()
 	VL53L0_RF_CALL(write(Register(0x80), 0x00));
 
 	// read map of SPADs available for reference calibration
-	VL53L0_RF_CALL(read(Register::GLOBA_ONFIG_SPAD_ENABLES_REF_0, spadInfo.map, 6));
+	VL53L0_RF_CALL(read(Register::GLOBAL__CONFIG_SPAD_ENABLES_REF_0, spadInfo.map, 6));
 
 	// prepare setting SPAD config
 	VL53L0_RF_CALL(write(Register(0xFF), 0x01));
-	VL53L0_RF_CALL(write(Register::DYNAMIC_SPA_EF_EN_START_OFFSET, 0x00));
-	VL53L0_RF_CALL(write(Register::DYNAMIC_SPA_UM_REQUESTED_REF_SPAD, 0x2C));
+	VL53L0_RF_CALL(write(Register::DYNAMIC_SPAD__REF_EN_START_OFFSET, 0x00));
+	VL53L0_RF_CALL(write(Register::DYNAMIC_SPAD__NUM_REQUESTED_REF_SPAD, 0x2C));
 	VL53L0_RF_CALL(write(Register(0xFF), 0x00));
-	VL53L0_RF_CALL(write(Register::GLOBA_ONFIG_REF_EN_START_SELECT, 0xB4));
+	VL53L0_RF_CALL(write(Register::GLOBAL__CONFIG_REF_EN_START_SELECT, 0xB4));
 
 	if(not setupReferenceSpadMap(spadInfo.map, &i2cBuffer[1]))
 	{
@@ -332,7 +332,7 @@ modm::Vl53l0<I2cMaster>::initializeSpadConfig()
 	}
 
 	// Write SPAD config to the device. This will not be written to NVM.
-	VL53L0_RF_CALL(writeI2CBuffer(Register::GLOBA_ONFIG_SPAD_ENABLES_REF_0, 6));
+	VL53L0_RF_CALL(writeI2CBuffer(Register::GLOBAL__CONFIG_SPAD_ENABLES_REF_0, 6));
 
 	RF_END_RETURN(true);
 }
@@ -347,16 +347,16 @@ modm::Vl53l0<I2cMaster>::performReferenceCalibration(Start_t mode)
 	RF_BEGIN();
 
 	// start measurement
-	VL53L0_RF_CALL(write(Register::SYSRANG_TART, Start::StartStop | mode));
+	VL53L0_RF_CALL(write(Register::SYSRANGE__START, Start::StartStop | mode));
 
 	// wait for the measurement to finish
-	VL53L0_RF_CALL(poll(Register::RESUL_NTERRUPT_STATUS, [](uint8_t value) {
+	VL53L0_RF_CALL(poll(Register::RESULT__INTERRUPT_STATUS, [](uint8_t value) {
 		return value & (InterruptStatus::NewSampleReady | InterruptStatus::OutOfWindow).value;
 	}, measurementTimeUs / 1000 * 2));
 	
 	// clear interrupt flags
-	VL53L0_RF_CALL(write(Register::SYSTE_NTERRUPT_CLEAR, InterruptClear::Range));
-	VL53L0_RF_CALL(write(Register::SYSRANG_TART, Start::SingleShotMode));
+	VL53L0_RF_CALL(write(Register::SYSTEM__INTERRUPT_CLEAR, InterruptClear::Range));
+	VL53L0_RF_CALL(write(Register::SYSRANGE__START, Start::SingleShotMode));
 
 	RF_END_RETURN(true);
 }
@@ -405,8 +405,8 @@ modm::Vl53l0<I2cMaster>::readSequenceInfo()
 	RF_BEGIN();
 
 	// read vcsel periods
-	VL53L0_RF_CALL(read(Register::PRE_RANG_ONFIG_VCSEL_PERIOD, sequenceInfo.vcselPeriodPreRange));
-	VL53L0_RF_CALL(read(Register::FINAL_RANG_ONFIG_VCSEL_PERIOD, sequenceInfo.vcselPeriodFinalRange));
+	VL53L0_RF_CALL(read(Register::PRE_RANGE__CONFIG_VCSEL_PERIOD, sequenceInfo.vcselPeriodPreRange));
+	VL53L0_RF_CALL(read(Register::FINAL_RANGE__CONFIG_VCSEL_PERIOD, sequenceInfo.vcselPeriodFinalRange));
 
 	// decode vcsel period values
 	sequenceInfo.vcselPeriodPreRange += 1;
@@ -414,16 +414,16 @@ modm::Vl53l0<I2cMaster>::readSequenceInfo()
 	sequenceInfo.vcselPeriodFinalRange += 1;
 	sequenceInfo.vcselPeriodFinalRange <<= 1;
 
-	VL53L0_RF_CALL(read(Register::SYSTE_EQUENCE_CONFIG, i2cBuffer[1]));
+	VL53L0_RF_CALL(read(Register::SYSTEM__SEQUENCE_CONFIG, i2cBuffer[1]));
 	sequenceInfo.enabledSteps = static_cast<MeasurementSequenceStep>(i2cBuffer[1]);
 
-	VL53L0_RF_CALL(read(Register::MSR_ONFIG_TIMEOUT_MACROP, sequenceInfo.msrcDssTccTimeout));
+	VL53L0_RF_CALL(read(Register::MSRC__CONFIG_TIMEOUT_MACROP, sequenceInfo.msrcDssTccTimeout));
 	sequenceInfo.msrcDssTccTimeout += 1;
 
-	VL53L0_RF_CALL(read(Register::PRE_RANG_ONFIG_TIMEOUT_MACROP_HI, &i2cBuffer[1], 2));
+	VL53L0_RF_CALL(read(Register::PRE_RANGE__CONFIG_TIMEOUT_MACROP_HI, &i2cBuffer[1], 2));
 	sequenceInfo.preRangeTimeout = decodeTimeout((i2cBuffer[1] << 8) + i2cBuffer[2]);
 
-	VL53L0_RF_CALL(read(Register::FINAL_RANG_ONFIG_TIMEOUT_MACROP_HI, &i2cBuffer[1], 2));	
+	VL53L0_RF_CALL(read(Register::FINAL_RANGE__CONFIG_TIMEOUT_MACROP_HI, &i2cBuffer[1], 2));
 	sequenceInfo.finalRangeTimeout = decodeTimeout((i2cBuffer[1] << 8) + i2cBuffer[2]);
 
 	RF_END_RETURN(true);
