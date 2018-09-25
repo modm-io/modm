@@ -128,10 +128,8 @@ class DevicesCache(dict):
             parser = modm.parser.DeviceParser()
             device_file = parser.parse(repopath(self.device_to_file[item]))
             for device in device_file.get_devices():
-                if device.partname == item:
-                    # Store the real device now
-                    self[item] = device
-                    return device
+                self[device.partname] = device
+            return self[item]
         return value
 
 
