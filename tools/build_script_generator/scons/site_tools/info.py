@@ -101,7 +101,7 @@ def git_info_defines(env, with_status=False):
 
 	env.AppendUnique(CPPDEFINES=defines)
 	target = join(env['BASEPATH'], 'src', 'info_git.h')
-	subs = {"type": "git", "defines": {k:"\"{}\"".format(v) for k, v in subs.items()}}
+	subs = {"type": "git", "defines": {k:u"\"{}\"".format(v) for k, v in subs.items()}}
 	return env.Jinja2Template(target=target, source=TEMPLATE_SOURCE, substitutions=subs)
 
 
@@ -136,7 +136,7 @@ def build_info_defines(env):
 
 	env.AppendUnique(CPPDEFINES=defines)
 	target = join(env['BASEPATH'], 'src', 'info_build.h')
-	subs = {"type": "build", "defines": {k:"\"{}\"".format(v) for k, v in subs.items()}}
+	subs = {"type": "build", "defines": {k:u"\"{}\"".format(v) for k, v in subs.items()}}
 	return env.Jinja2Template(target=target, source=TEMPLATE_SOURCE, substitutions=subs)
 
 
