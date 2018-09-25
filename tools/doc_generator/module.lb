@@ -18,7 +18,10 @@ import json
 import fnmatch
 import traceback
 import subprocess
-import graphviz as gv
+try:
+    import graphviz as gv
+except:
+    pass
 
 from lxml import etree
 from pathlib import Path
