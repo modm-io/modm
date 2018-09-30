@@ -20,5 +20,5 @@ def build(env):
     env.append_metadata_unique("include_path", "ext/ros")
 
     env.outbasepath = "modm/ext"
-    env.copy("ros_lib/ros_lib", "ros")
+    env.copy("ros-lib/ros_lib", "ros")
 
