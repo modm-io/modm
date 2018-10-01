@@ -1,0 +1,55 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2018, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+license_warning = """\
+The Invensense Embedded Motion Drivers (eMD) are licensed under a \
+PROPRIETARY license, which you should definitely verify yourself:
+    modm/ext/invensense/eMD/License.txt
+"""
+
+def init(module):
+    module.name = "emd"
+
+def prepare(module, options):
+    if not options[":target"].has_driver("core:cortex-m*"):
+        return False
+    module.depends(":architecture:clock",
+                   ":architecture:delay",
+                   ":architecture:i2c.device")
+    return True
+
+def validate(env):
+    env.log.warning(license_warning)
+
+def build(env):
+    core = env[":target"].get_driver("core")["type"]
+    core = core.replace("cortex-m", "").replace("+", "").replace("f", "").replace("d", "")
+
+    env.outbasepath = "modm/ext/invensense"
+    env.copy("eMD.hpp")
+    env.outbasepath = "modm/ext/invensense/eMD"
+    env.copy("port.cpp")
+    env.copy("eMD", ".", ignore=env.ignore_paths("*/stm32L/*", "*/lib/*"))
+    env.extract("eMD/lib/arm/liblibmplmpu_m{}.zip".format(core.replace("4", "4_hardfp")),
+                "liblibmplmpu.a", "lib/libmpl.a")
+
+    env.append_metadata_unique("include_path", "ext/invensense/eMD/core/driver/eMPL",
+                                               "ext/invensense/eMD/core/driver/include",
+                                               "ext/invensense/eMD/core/eMPL-hal",
+                                               "ext/invensense/eMD/core/mllite",
+                                               "ext/invensense/eMD/core/mpl")
+
+    env.append_metadata_unique("required_library", "mpl.a")
+    env.append_metadata_unique("required_library_path", "modm/ext/invensense/eMD/lib/")
+
+    env.append_metadata_unique("cpp.define", "MPU9250",
+                                             "REMOVE_LOGGING")
