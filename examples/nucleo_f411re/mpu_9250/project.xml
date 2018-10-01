@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:board:nucleo-f411re</extends>
+  <options>
+    <option name=":build:build.path">../../../build/nucleo_f411re/mpu_9250</option>
+  </options>
+  <modules>
+    <module>:build:scons</module>
+    <module>:emd</module>
+    <module>:platform:i2c:1</module>
+  </modules>
+</library>
