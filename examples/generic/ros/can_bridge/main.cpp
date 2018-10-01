@@ -25,8 +25,8 @@ messageRosToModm(const can_msgs::Frame& source, modm::can::Message& destination)
 
 	destination.setIdentifier(source.id);
 	destination.setLength(source.dlc);
-	if (source.is_extended) { destination.setExtended(true); }
-	if (source.is_rtr)      { destination.setRemoteTransmitRequest(true);	}
+	destination.setExtended(source.is_extended);
+	destination.setRemoteTransmitRequest(source.is_rtr);
 	memcpy(destination.data, source.data, source.dlc);
 
 	return true;
