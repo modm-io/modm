@@ -56,7 +56,7 @@ def build(env):
     if not env.get_option(":::unaligned_data", False):
         env.append_metadata_unique("cpp.define", "UNALIGNED_SUPPORT_DISABLE")
 
-    env.append_metadata_unique("include_path", "ext/cmsis/dsp")
+    env.append_metadata_unique("include_path", "modm/ext/cmsis/dsp")
 
     env.outbasepath = "modm/ext/cmsis/dsp"
     env.copy("cmsis/CMSIS/DSP/Include", ".")
