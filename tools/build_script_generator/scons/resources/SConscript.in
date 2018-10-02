@@ -62,13 +62,18 @@ env["_LIBFLAGS"] = "-Wl,--whole-archive " + env["_LIBFLAGS"] + " -Wl,--no-whole-
 # library = whole_archive + library + no_whole_archive
 %% endif
 
-env.Append(LIBS=[
+env.AppendUnique(LIBS=[
     library,
 %% for library in metadata.required_library | sort
     "{{ library }}",
 %% endfor
 ])
-env.AppendUnique(LIBPATH=[abspath(str(library[0].get_dir()))])
+env.AppendUnique(LIBPATH=[
+    abspath(str(library[0].get_dir())),
+%% for library in metadata.required_library_path | sort
+    "{{ library }}",
+%% endfor
+])
 %% if "required_pkg" in metadata
 env.ParseConfig("pkg-config --cflags --libs {{ metadata.required_pkg | sort | join(" ") }}")
 %% endif
