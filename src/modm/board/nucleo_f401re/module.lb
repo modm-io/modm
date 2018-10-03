@@ -29,4 +29,4 @@ def build(env):
     env.template("../board.cpp.in", "board.cpp")
     env.copy('.')
     env.copy("../nucleo64_arduino.hpp", "nucleo64_arduino.hpp")
-    env.append_metadata_unique("openocd.configfile", "board/st_nucleo_f4.cfg");
+    env.add_metadata("openocd.configfile", "board/st_nucleo_f4.cfg");

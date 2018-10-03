@@ -31,7 +31,7 @@ def build(env):
     elif env[":target"].identifier["platform"] in ["hosted"]:
         env.copy("stdlib", "rtos")
         if env[":target"].identifier["family"] in ["linux"]:
-            env.append_metadata("required_library", "pthread")
+            env.add_metadata("required_library", "pthread")
     else:
         raise BuildException("No RTOS implementation matches your requirements!")
     env.copy("../rtos.hpp", "rtos.hpp")

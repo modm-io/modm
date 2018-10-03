@@ -43,20 +43,20 @@ def prepare(module, options):
 def build(env):
     core = env[":target"].get_driver("core")["type"]
     core = core.replace("cortex-m", "CM").replace("+", "PLUS").replace("f", "").replace("d", "")
-    env.append_metadata_unique("cpp.define", "ARM_MATH_{}".format(core))
+    env.add_metadata("cpp.define", "ARM_MATH_{}".format(core))
 
     if env[":::check_matrix_sizes"]:
-        env.append_metadata_unique("cpp.define", "ARM_MATH_MATRIX_CHECK")
+        env.add_metadata("cpp.define", "ARM_MATH_MATRIX_CHECK")
     else:
-        env.append_metadata_unique("cpp.define.debug", "ARM_MATH_MATRIX_CHECK")
+        env.add_metadata("cpp.define.debug", "ARM_MATH_MATRIX_CHECK")
 
     if env[":::round_float_inputs"]:
-        env.append_metadata_unique("cpp.define", "ARM_MATH_ROUNDING")
+        env.add_metadata("cpp.define", "ARM_MATH_ROUNDING")
 
     if not env.get_option(":::unaligned_data", False):
-        env.append_metadata_unique("cpp.define", "UNALIGNED_SUPPORT_DISABLE")
+        env.add_metadata("cpp.define", "UNALIGNED_SUPPORT_DISABLE")
 
-    env.append_metadata_unique("include_path", "modm/ext/cmsis/dsp")
+    env.add_metadata("include_path", "modm/ext/cmsis/dsp")
 
     env.outbasepath = "modm/ext/cmsis/dsp"
     env.copy("cmsis/CMSIS/DSP/Include", ".")

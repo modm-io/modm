@@ -31,4 +31,4 @@ def build(env):
     if "m0" not in core:
         env.copy("cmsis/CMSIS/Core/Include/mpu_armv7.h", "mpu_armv7.h")
 
-    env.append_metadata_unique("include_path", "modm/ext/cmsis/core")
+    env.add_metadata("include_path", "modm/ext/cmsis/core")

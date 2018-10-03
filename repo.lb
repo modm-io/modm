@@ -178,4 +178,4 @@ def prepare(repo, options):
     repo.add_modules_recursive(".", modulefile="*.lb")
 
 def build(env):
-    env.append_metadata_unique("include_path", "modm/src")
+    env.add_metadata("include_path", "modm/src")

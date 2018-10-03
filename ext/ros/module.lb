@@ -17,7 +17,7 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.append_metadata_unique("include_path", "modm/ext/ros")
+    env.add_metadata("include_path", "modm/ext/ros")
 
     env.outbasepath = "modm/ext"
     env.copy("ros-lib/ros_lib", "ros")

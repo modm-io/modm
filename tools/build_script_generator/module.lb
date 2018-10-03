@@ -68,10 +68,10 @@ def build(env):
     # Append custom openocd config file to metadata
     openocd_cfg = env.get_option(":build:openocd.cfg", "")
     if len(openocd_cfg):
-        env.append_metadata_unique("openocd.configfile", openocd_cfg)
+        env.add_metadata("openocd.configfile", openocd_cfg)
 
     # Append common search paths to metadata
-    env.append_metadata_unique("openocd.search", "modm/openocd")
+    env.add_metadata("openocd.search", "modm/openocd")
 
 
 

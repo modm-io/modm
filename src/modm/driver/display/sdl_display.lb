@@ -23,9 +23,9 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.append_metadata_unique("required_pkg", "gtkmm-2.4")
-    env.append_metadata_unique("required_pkg", "cairomm-1.0")
-    env.append_metadata_unique("required_pkg", "sdl")
+    env.add_metadata("required_pkg", "gtkmm-2.4")
+    env.add_metadata("required_pkg", "cairomm-1.0")
+    env.add_metadata("required_pkg", "sdl")
 
     env.outbasepath = "modm/src/modm/driver/display"
     env.copy("sdl_display.hpp")

@@ -45,12 +45,12 @@ def build(env):
     if env[":target"].identifier["family"] == "windows":
         ignore.extend(["*/serial_interface*", "*/serial_port*"])
 
-    env.append_metadata_unique("required_library", "boost_system")
-    env.append_metadata_unique("required_library",
+    env.add_metadata("required_library", "boost_system")
+    env.add_metadata("required_library",
         "boost_thread" if env[":target"].identifier["family"] == "linux" else
         "boost_thread-mt")
 
     if env[":target"].identifier["family"] == "linux":
-        env.append_metadata_unique("required_library", "pthread")
+        env.add_metadata("required_library", "pthread")
 
     env.copy(".", ignore=env.ignore_patterns(*ignore))

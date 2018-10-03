@@ -30,8 +30,8 @@ def prepare(module, options):
 def build(env):
     env.outbasepath = "modm/src/modm/board"
     env.copy('.')
-    env.append_metadata_unique("avrdude.port", "usb");
-    env.append_metadata_unique("avrdude.programmer", "avrispmkII");
-    env.append_metadata_unique("avrdude.efuse", "0xff");
-    env.append_metadata_unique("avrdude.hfuse", "0xd9");
-    env.append_metadata_unique("avrdude.lfuse", "0xfe");
+    env.add_metadata("avrdude.port", "usb");
+    env.add_metadata("avrdude.programmer", "avrispmkII");
+    env.add_metadata("avrdude.efuse", "0xff");
+    env.add_metadata("avrdude.hfuse", "0xd9");
+    env.add_metadata("avrdude.lfuse", "0xfe");

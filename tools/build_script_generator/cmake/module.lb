@@ -35,8 +35,8 @@ def prepare(module, options):
 def build(env):
     project_name = env[":build:project.name"]
     build_path = env[":build:build.path"]
-    env.append_metadata_unique("elf.release", join(build_path, "cmake-build-release", project_name + ".elf"))
-    env.append_metadata_unique("elf.debug",   join(build_path, "cmake-build-debug",   project_name + ".elf"))
+    env.add_metadata("elf.release", join(build_path, "cmake-build-release", project_name + ".elf"))
+    env.add_metadata("elf.debug",   join(build_path, "cmake-build-debug",   project_name + ".elf"))
 
 
 def post_build(env, buildlog):
