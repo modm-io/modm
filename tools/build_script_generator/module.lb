@@ -79,10 +79,12 @@ def post_build(env, buildlog):
     target = env[":target"]
     env.substitutions = {
         "metadata": buildlog.metadata,
+        "gitignore": [env.reloutpath(i, "modm") for i in buildlog.repo_metadata["gitignore"]["modm"]],
     }
     env.outbasepath = "modm"
 
-    if len(buildlog.metadata.get("modm.gitignore", [])):
+    # Currently a modm only feature
+    if len(env.substitutions["gitignore"]):
         env.template("gitignore.in", ".gitignore")
 
     if env[":target"].has_driver("core:cortex-m*"):

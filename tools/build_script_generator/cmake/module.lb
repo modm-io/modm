@@ -44,7 +44,7 @@ def post_build(env, buildlog):
     # get CPU information
     subs = common_target(target)
     # Extract all source code files
-    subs["sources"] = common_source_files(env, buildlog)
+    subs["sources"] = sorted(p for sources in common_source_files(env, buildlog).values() for p in sources)
     # get memory information
     subs["memories"] = common_memories(target)
     # get memory information

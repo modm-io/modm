@@ -11,6 +11,7 @@
 from os.path import join, abspath
 
 Import("env")
+%% if repo == "modm"
 profile = ARGUMENTS.get("profile", "release")
 env["BUILDPATH"] = join(env["CONFIG_BUILD_BASE"], profile)
 
@@ -25,15 +26,17 @@ env.Tool("{{tool}}")
 %% endfor
 env["BASEPATH"] = abspath(".")
 
-%% if options[":::info.git"] != "Disabled"
-env.InfoGit(with_status={{ "True" if "Status" in options[":::info.git"] else "False" }})
+%% if options["info.git"] != "Disabled"
+env.InfoGit(with_status={{ "True" if "Status" in options["info.git"] else "False" }})
 %% endif
-%% if options[":::info.build"]
+%% if options["info.build"]
 env.InfoBuild()
 %% endif
+%% endif
+
 
 env.Append(CPPPATH=[
-%% for path in metadata.include_path | sort
+%% for path in include_paths | sort
     abspath("{{ path }}"),
 %% endfor
 ])
@@ -44,8 +47,26 @@ files = [
 %% endfor
 ]
 
-library = env.StaticLibrary(target="modm", source=files)
+library = env.StaticLibrary(target="{{ repo }}", source=files)
 
+env.AppendUnique(LIBS=[
+    library,
+%% for library in libraries | sort
+    "{{ library }}",
+%% endfor
+])
+env.AppendUnique(LIBPATH=[
+    abspath(str(library[0].get_dir())),
+%% for library in library_paths | sort
+    abspath("{{ library }}"),
+%% endfor
+])
+%% if "required_pkg" in metadata
+env.ParseConfig("pkg-config --cflags --libs {{ metadata.required_pkg | sort | join(" ") }}")
+%% endif
+
+
+%% if repo == "modm"
 %% if platform not in ["hosted"]
 # We need to link libmodm.a with --whole-archive, so that all weak symbols are visible to the linker.
 # Functions placed in a linker section list (like modm_section(".hardware_init")) are typically not
@@ -60,17 +81,6 @@ env["_LIBFLAGS"] = "-Wl,--whole-archive " + env["_LIBFLAGS"] + " -Wl,--no-whole-
 # whole_archive = env.Command(join(env.Dir("#").path, "-Wl,--whole-archive"), [], "")
 # no_whole_archive = env.Command(join(env.Dir("#").path, "-Wl,--no-whole-archive"), [], "")
 # library = whole_archive + library + no_whole_archive
-%% endif
-
-env.Append(LIBS=[
-    library,
-%% for library in metadata.required_library | sort
-    "{{ library }}",
-%% endfor
-])
-env.AppendUnique(LIBPATH=[abspath(str(library[0].get_dir()))])
-%% if "required_pkg" in metadata
-env.ParseConfig("pkg-config --cflags --libs {{ metadata.required_pkg | sort | join(" ") }}")
 %% endif
 
 # Device configuration
@@ -132,5 +142,7 @@ if profile == "{{ profile }}":
 env.Append(CCFLAGS="$ARCHFLAGS")
 env.Append(ASFLAGS="$ARCHFLAGS")
 env.Append(LINKFLAGS="$ARCHFLAGS")
+%% endif
+
 
 Return("library")

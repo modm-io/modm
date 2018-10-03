@@ -15,7 +15,7 @@ FILE(GLOB APP_SOURCE_FILES *.c *.cpp *.hpp *.h)
 
 SET(SOURCE_FILES
 %% for file in sources
-    modm/{{ file }}
+    {{ file }}
 %% endfor
     ${APP_SOURCE_FILES}
 )
@@ -23,7 +23,7 @@ SET(SOURCE_FILES
 INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_SOURCE_DIR}
 %% for path in metadata.include_path
-    modm/{{ path }}
+    {{ path }}
 %% endfor
 )
 INCLUDE_DIRECTORIES(SYSTEM include)

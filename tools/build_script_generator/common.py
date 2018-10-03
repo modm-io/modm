@@ -14,16 +14,19 @@ import os
 from collections import defaultdict
 
 def common_source_files(env, buildlog):
-    files_to_build = []
+    files_to_build = defaultdict(list)
 
-    for operations in buildlog:
-        filename = operations.local_filename_out("modm/")
+    for operation in buildlog:
+        repo = operation.module_name.split(":")[0]
+        filename = operation.local_filename_out()
         _, extension = os.path.splitext(filename)
 
         if extension in [".c", ".cpp", ".cc", ".sx", ".S"]:
-            files_to_build.append(filename.replace('\\','\\\\')) #windows path compatibility hack
+            files_to_build[repo].append(filename.replace('\\','\\\\')) #windows path compatibility hack
 
-    return sorted(files_to_build)
+    for repo in files_to_build:
+        files_to_build[repo].sort()
+    return files_to_build
 
 def common_target(target):
     core = target.get_driver("core")["type"]

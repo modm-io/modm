@@ -10,7 +10,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-from os.path import join
+from os.path import join, relpath
 # import all common code
 exec(open(localpath("../common.py")).read())
 
@@ -44,19 +44,23 @@ def build(env):
     env.add_metadata("elf.release", join(build_path, "release", project_name + ".elf"))
     env.add_metadata("elf.debug",   join(build_path, "debug",   project_name + ".elf"))
 
-    if env[":::info.git"] != "Disabled":
-        env.add_metadata("modm.gitignore", "src/info_git.h")
-    if env[":::info.build"]:
-        env.add_metadata("modm.gitignore", "src/info_build.h")
+    if env["info.git"] != "Disabled":
+        env.add_metadata("gitignore", "modm/src/info_git.h")
+    if env["info.build"]:
+        env.add_metadata("gitignore", "modm/src/info_build.h")
 
 
 def post_build(env, buildlog):
     is_unittest = env.has_module(":test")
     has_xpcc_generator = env.has_module(":communication:xpcc:generator")
-    has_image_source = len(env[":::image.source"])
+    has_image_source = len(env["image.source"])
+    generated_paths = sorted(set(o.local_filename_out().split("/")[0] for o in buildlog))
+    generated_paths.remove("modm")
+    generated_paths.insert(0, "modm")
 
     target = env["modm:target"]
     subs = common_target(target)
+    sources = common_source_files(env, buildlog)
 
     build_tools = [
         "settings_buildpath",
@@ -72,7 +76,7 @@ def post_build(env, buildlog):
         build_tools += ["xpcc_generator"]
     if has_image_source:
         build_tools += ["bitmap"]
-    if env[":::info.git"] != "Disabled" or env[":::info.build"]:
+    if env["info.git"] != "Disabled" or env["info.build"]:
         build_tools += ["info"]
     if is_unittest:
         build_tools += ["unittest"]
@@ -83,8 +87,6 @@ def post_build(env, buildlog):
     else:
         build_tools += ["utils_buildsize", "compiler_hosted_gcc"]
 
-    # Extract all source code files
-    subs["sources"] = common_source_files(env, buildlog)
     # get memory information
     subs["memories"] = common_memories(target)
     # get memory information
@@ -92,10 +94,11 @@ def post_build(env, buildlog):
     # Add SCons specific data
     subs.update({
         "metadata": buildlog.metadata,
+        "generated_paths": generated_paths,
         "build_tools": build_tools,
         "is_unittest": is_unittest,
         "has_image_source": has_image_source,
-        "image_source": env[":::image.source"],
+        "image_source": env["image.source"],
         "has_xpcc_generator": has_xpcc_generator,
         "generator_source": env.get_option(":communication:xpcc:generator:source", ""),
         "generator_container": env.get_option(":communication:xpcc:generator:container", ""),
@@ -120,9 +123,19 @@ def post_build(env, buildlog):
             flag = "{}.format({})".format(flag, ", ".join(vals))
         return flag
 
-    # Generate library SConscript
+    for repo in generated_paths:
+        subs.update({
+            "repo": repo,
+            "sources": [env.reloutpath(s, repo) for s in sources[repo]],
+            "libraries": buildlog.repo_metadata["required_library"][repo],
+            "library_paths": [env.reloutpath(p, repo) for p in buildlog.repo_metadata["required_library_path"][repo]],
+            "include_paths": [env.reloutpath(p, repo) for p in buildlog.repo_metadata["include_path"][repo]],
+        })
+        # Generate library SConscript
+        env.outbasepath = repo
+        env.template("resources/SConscript.in", "SConscript", filters={"flag_format": flag_format})
+
     env.outbasepath = "modm"
-    env.template("resources/SConscript.in", "SConscript", filters={"flag_format": flag_format})
     # Copy the scons-build-tools
     env.copy(repopath("ext/dlr/scons-build-tools"), "ext/dlr/scons-build-tools")
     env.copy("site_tools", "scons/site_tools")

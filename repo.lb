@@ -19,11 +19,8 @@ import hashlib
 from pathlib import Path
 from distutils.version import StrictVersion
 
-rootpath = repopath("ext/modm-devices/tools/device")
-sys.path.append(rootpath)
-
+sys.path.append(repopath("ext/modm-devices/tools/device"))
 try:
-    import modm.pkg
     import modm.parser
 except Exception as e:
     print(e, "\n")
@@ -39,7 +36,7 @@ if sys.version_info[1] < 6:
           "Please check if you can upgrade your installation!\n")
 
 import lbuild
-min_lbuild_version = "1.1.0"
+min_lbuild_version = "1.4.0"
 if StrictVersion(getattr(lbuild, "__version__", "0.1.0")) < StrictVersion(min_lbuild_version):
     print("modm requires at least lbuild v{}, please upgrade!\n"
           "    pip install -U lbuild".format(min_lbuild_version))
