@@ -20,6 +20,7 @@
 /// @cond
 namespace modm::platform
 {
+uint32_t modm_fastdata fcpu({{ "{0:,}".format((1e6 * hsi_frequency)|int).replace(',', "'") }});
 uint16_t modm_fastdata delay_fcpu_MHz({{ hsi_frequency }});
 uint16_t modm_fastdata delay_ns_per_loop({{ "{0:,}".format((loops * 1000.0 / hsi_frequency)|int).replace(',', "'") }});
 }

@@ -1,0 +1,111 @@
+/*
+ * Copyright (c) 2018, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_TEST_LOGIC_ANALYZER_SAMPLER_HPP
+#define MODM_TEST_LOGIC_ANALYZER_SAMPLER_HPP
+
+#include <stdint.h>
+#include <stddef.h>
+#include <modm/platform/device.hpp>
+
+namespace modm
+{
+
+class GpioSampler
+{
+public:
+	using Type = int32_t;
+
+	class Channel
+	{
+		friend class GpioSampler;
+		size_t max_count = 0;
+		volatile size_t count = 0;
+		Type *data = nullptr;
+		Channel();
+		void allocate(size_t max_samples);
+		void add(Type time);
+		void reset();
+
+	public:
+		~Channel();
+
+		inline size_t max() const { return max_count; }
+		inline size_t size() const { return count; }
+
+		void dump() const;
+
+		Type diff(size_t index) const;
+		bool read(size_t index) const;
+
+		const Type& operator[](size_t index) const;
+
+		inline const Type* begin() const { return data; }
+		inline const Type* end() const { return &data[count]; }
+	};
+
+	template<size_t channels>
+	class Handle
+	{
+		friend class GpioSampler;
+		using CleanupHandler = void(*)();
+		using StartHandler = void(*)(Handle<channels> &);
+
+		const CleanupHandler cleanup;
+		const StartHandler start;
+		Channel data[channels];
+
+		Handle(size_t max_samples, StartHandler start, CleanupHandler cleanup);
+		void set_start_time(const Type *start);
+	public:
+		static constexpr size_t Channels = channels;
+
+	public:
+		~Handle();
+
+		void
+		restart();
+
+		const Channel&
+		operator[](size_t channel) const;
+	};
+
+	template< class... Gpios >
+	static auto Create(size_t max_samples);
+
+protected:
+	static void *context;
+
+	enum class
+	Interrupt : uint8_t
+	{
+%% for vector in extis
+		{{ vector | capitalize }} = {{ loop.index0 }},
+%% endfor
+	};
+
+	template< size_t channels, size_t pin_count, uint8_t pin, class Gpio, class... Gpios >
+	static void sampleGpio(Channel *data, Type time);
+	template< size_t channels, size_t pin_count, uint8_t pin >
+	static void sampleGpio(Channel *, Type) {}
+
+	static void reset(Interrupt vector);
+	static void setHandler(Interrupt vector, void(*handler)());
+	static inline Type getTime() {
+		return Type(DWT->CYCCNT & ~(1ul << 31));
+	}
+};
+
+} // namespace modm
+
+#include "gpio_sampler_impl.hpp"
+
+#endif // MODM_TEST_LOGIC_ANALYZER_SAMPLER_HPP

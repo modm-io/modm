@@ -1,0 +1,128 @@
+/*
+ * Copyright (c) 2018, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_TEST_LOGIC_ANALYZER_SAMPLER_HPP
+#	error  "Don't include this file directly, use 'gpio_sampler.hpp' instead!"
+#endif
+
+#include <modm/architecture/interface/memory.hpp>
+#include <modm/architecture/interface/atomic_lock.hpp>
+#include <modm/platform/device.hpp>
+
+namespace modm
+{
+
+template<size_t channels>
+GpioSampler::Handle<channels>::~Handle()
+{
+	cleanup();
+	GpioSampler::context = nullptr;
+}
+
+template<size_t channels>
+GpioSampler::Handle<channels>::Handle(size_t max_samples, StartHandler start, CleanupHandler cleanup):
+	cleanup(cleanup), start(start)
+{
+	for (auto &ch : data) ch.allocate(max_samples);
+}
+
+template<size_t channels>
+void
+GpioSampler::Handle<channels>::set_start_time(const Type *start)
+{
+	for (size_t ii=0; ii<channels; ii++) data[ii].add(start[ii]);
+}
+
+template<size_t channels>
+void
+GpioSampler::Handle<channels>::restart()
+{
+	modm::atomic::Lock l;
+	for (auto &ch : data) ch.reset();
+	start(*this);
+}
+
+template<size_t channels>
+const GpioSampler::Channel&
+GpioSampler::Handle<channels>::operator[](size_t channel) const
+{
+	return data[(channel < channels) ? channel : (channels - 1)];
+}
+
+template< size_t channels, size_t pin_count, uint8_t pin, class Gpio, class... Gpios >
+void
+GpioSampler::sampleGpio(Channel *data, Type time)
+{
+	if constexpr (Gpio::pin == pin)
+	{
+		if ((pin_count == 1) or Gpio::getExternalInterruptFlag())
+		{
+			if (not Gpio::read()) time = -time;
+			constexpr size_t channel = channels - sizeof...(Gpios) - 1;
+			data[channel].add(time);
+			Gpio::acknowledgeExternalInterruptFlag();
+		}
+	}
+	sampleGpio<channels, pin_count, pin, Gpios...>(data, time);
+}
+
+template< class... Gpios >
+auto
+GpioSampler::Create(size_t max_samples)
+{
+	// Count the pins per interrupt and
+	// only reset the vectors that contain at least one GPIO
+%% for vector, pos_map in extis.items()
+	constexpr size_t pin_count_{{vector | lower}} =
+%% for pos in pos_map
+		((Gpios::pin == {{pos}} ? 1 : 0) + ...){% if loop.last %};{% else %} +{% endif %}
+%% endfor
+	if constexpr (pin_count_{{vector | lower}}) reset(Interrupt::{{ vector | capitalize }});
+%% endfor
+
+	Handle<sizeof...(Gpios)> handle(max_samples,
+		[](Handle<sizeof...(Gpios)> &h) {
+			// prime the data logger
+			const Type time = getTime();
+			const Type start[] = {(Gpios::read() ? time : -time)...};
+			h.set_start_time(start);
+		},
+		[]() {
+			(Gpios::disableExternalInterrupt(), ...);
+			// only reset the vectors that contain at least one GPIO
+%% for vector in extis
+			if constexpr (pin_count_{{vector | lower}}) reset(Interrupt::{{ vector | capitalize }});
+%% endfor
+		});
+	GpioSampler::context = reinterpret_cast<void*>(&handle);
+%% for vector, pos_map in extis.items()
+	// only reset the vectors that contain at least one GPIO
+	if constexpr (pin_count_{{vector | lower}}) {
+		setHandler(Interrupt::{{ vector | capitalize }}, []()
+		{
+			const Type time = getTime();
+			auto *h = reinterpret_cast<Handle<sizeof...(Gpios)>*>(GpioSampler::context);
+	%% for pos in pos_map
+			sampleGpio< sizeof...(Gpios), pin_count_{{vector | lower}}, {{pos}}, Gpios... >(h->data, time);
+	%% endfor
+		});
+	}
+%% endfor
+	// trigger on both edges
+	(Gpios::setInputTrigger(Gpios::InputTrigger::BothEdges), ...);
+	// enabled all GPIO interrupts
+	(Gpios::enableExternalInterrupt(), ...);
+	// prime the logger with initial measurement
+	handle.restart();
+	return handle;
+}
+
+} // namespace modm
