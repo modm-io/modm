@@ -49,6 +49,20 @@ def build(env):
     if env["info.build"]:
         env.add_metadata("gitignore", "modm/src/info_build.h")
 
+    def flag_format(flag):
+        subs = {
+            "target_base": "\"${TARGET.base}\"",
+            "linkdir": "abspath(\"link\")"
+        }
+        flag = '"{}"'.format(flag)
+        vals = ["{}={}".format(t, r) for t, r in subs.items() if "{{{}}}".format(t) in flag]
+        if len(vals):
+            flag = "{}.format({})".format(flag, ", ".join(vals))
+            return flag
+        return None
+
+    env.add_metadata("flag_format", flag_format)
+
 
 def post_build(env, buildlog):
     is_unittest = env.has_module(":test")
@@ -89,8 +103,6 @@ def post_build(env, buildlog):
 
     # get memory information
     subs["memories"] = common_memories(target)
-    # get memory information
-    subs["flags"] = common_compiler_flags("gcc", target, buildlog)
     # Add SCons specific data
     subs.update({
         "metadata": buildlog.metadata,
@@ -112,28 +124,23 @@ def post_build(env, buildlog):
     # Set these substitutions for all templates
     env.substitutions = subs
 
-    def flag_format(flag):
-        subs = {
-            "target_base": "\"${TARGET.base}\"",
-            "linkdir": "abspath(\"link\")"
-        }
-        flag = "\"{}\"".format(flag)
-        vals = ["{}={}".format(t, r) for t, r in subs.items() if "{{{}}}".format(t) in flag]
-        if len(vals):
-            flag = "{}.format({})".format(flag, ", ".join(vals))
-        return flag
-
     for repo in generated_paths:
         subs.update({
             "repo": repo,
+            "flags": common_metadata_flags(buildlog, repo),
             "sources": [env.reloutpath(s, repo) for s in sources[repo]],
             "libraries": buildlog.repo_metadata["required_library"][repo],
             "library_paths": [env.reloutpath(p, repo) for p in buildlog.repo_metadata["required_library_path"][repo]],
             "include_paths": [env.reloutpath(p, repo) for p in buildlog.repo_metadata["include_path"][repo]],
         })
+        def flags_format(flag):
+            for fmt in buildlog.metadata["flag_format"]:
+                nflag = fmt(flag)
+                if nflag: return nflag;
+            return '"{}"'.format(flag)
         # Generate library SConscript
         env.outbasepath = repo
-        env.template("resources/SConscript.in", "SConscript", filters={"flag_format": flag_format})
+        env.template("resources/SConscript.in", "SConscript", filters={"flags_format": flags_format})
 
     env.outbasepath = "modm"
     # Copy the scons-build-tools

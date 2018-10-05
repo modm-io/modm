@@ -55,9 +55,9 @@ SET({{name}}{{ "_" ~ (suffix | upper) if suffix | length else "" }} "\
 %% endmacro
 
 %% macro generate_flags(name)
-{{ generate_flags_for_profile(name, "base") }}
+{{ generate_flags_for_profile(name, "") }}
 %% for profile in flags[name].keys()
-%% if profile != "base"
+%% if profile != ""
 {{ generate_flags_for_profile(name, profile, suffix=profile) }}
 %% endif
 %% endfor

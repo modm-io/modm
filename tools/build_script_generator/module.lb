@@ -13,6 +13,9 @@
 import os
 import platform
 
+# import all common code
+exec(open(localpath("common.py")).read())
+
 #filter to windowsify paths separators
 def windowsify(path):
 	if 'Windows' in platform.platform():
@@ -73,6 +76,9 @@ def build(env):
     # Append common search paths to metadata
     env.add_metadata("openocd.search", "modm/openocd")
 
+    # Add compiler flags to metadata
+    for flag, values in common_compiler_flags("gcc", env[":target"]).items():
+        env.add_metadata(flag, *values)
 
 
 def post_build(env, buildlog):

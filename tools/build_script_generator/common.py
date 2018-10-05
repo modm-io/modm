@@ -54,11 +54,20 @@ def common_memories(target):
         ])
     return memories
 
-
-def common_compiler_flags(compiler, target, buildlog):
+def common_metadata_flags(buildlog, repo=None):
     flags = defaultdict(lambda: defaultdict(list))
+    metadata = buildlog.metadata if repo is None else buildlog.repo_metadata
+    for key, values in metadata.items():
+        if key.startswith("flags."):
+            key = key.split(".")[1:]
+            if repo: values = values[repo];
+            flags[key[0].upper()]["" if len(key) < 2 else key[1]] = list(values)
+    return flags
+
+def common_compiler_flags(compiler, target):
+    flags = defaultdict(list)
     # flags for C **and** C++
-    flags["CCFLAGS"]["base"] = [
+    flags["flags.ccflags"] = [
         "-W",
         "-Wall",
         "-Wduplicated-cond",
@@ -87,25 +96,25 @@ def common_compiler_flags(compiler, target, buildlog):
         "-gdwarf",
     ]
     if compiler.startswith("gcc"):
-        flags["CCFLAGS"]["base"] += [
+        flags["flags.ccflags"] += [
             "-finline-limit=10000",
             "-funsigned-bitfields",
         ]
-    flags["CCFLAGS"]["release"] = [
+    flags["flags.ccflags.release"] = [
         "-Os",
     ]
     # not a valid profile
-    # flags["CCFLAGS"]["fast"] = [
+    # flags["flags.ccflags.fast"] = [
     #     "-O3",
     # ]
-    flags["CCFLAGS"]["debug"] = [
+    flags["flags.ccflags.debug"] = [
         "-Og",
         "-fno-split-wide-types",
         "-fno-tree-loop-optimize",
         "-fno-move-loop-invariants",
     ]
     # flags only for C
-    flags["CFLAGS"]["base"] = [
+    flags["flags.cflags"] = [
         "-Wimplicit",
         "-Wnested-externs",
         "-Wredundant-decls",
@@ -115,7 +124,7 @@ def common_compiler_flags(compiler, target, buildlog):
         # "-pedantic",
     ]
     # flags only for C++
-    flags["CXXFLAGS"]["base"] = [
+    flags["flags.cxxflags"] = [
         "-Woverloaded-virtual",
         # "-Wctor-dtor-privacy",
         # "-Wnon-virtual-dtor",
@@ -125,36 +134,32 @@ def common_compiler_flags(compiler, target, buildlog):
         # "-pedantic",
     ]
     # flags only for Assembly
-    flags["ASFLAGS"]["base"] = [
+    flags["flags.asflags"] = [
         "-g3",
         "-gdwarf",
         # "-xassembler-with-cpp",
     ]
     # flags for the linker
     if target.identifier["family"] != "darwin":
-        flags["LINKFLAGS"]["base"] = [
+        flags["flags.linkflags"] = [
             "-Wl,--fatal-warnings",
             "-Wl,--gc-sections",
             "-Wl,--relax",
             "-Wl,-Map,{target_base}.map,--cref",
         ]
     # C Preprocessor defines
-    flags["CPPDEFINES"]["base"] = \
-        buildlog.metadata.get("cpp.define", [])
-    flags["CPPDEFINES"]["release"] = \
-        buildlog.metadata.get("cpp.define.release", [])
-    flags["CPPDEFINES"]["debug"] = \
-        buildlog.metadata.get("cpp.define.debug", []) + [
+    flags["flags.cppdefines"] = []
+    flags["flags.cppdefines.debug"] = [
         "MODM_DEBUG_BUILD",
     ]
     # Architecture flags for C, C++, Assembly and **Linker**
-    flags["ARCHFLAGS"]["base"] = []
+    flags["flags.archflags"] = []
 
     # Target specific flags
     core = target.get_driver("core")["type"]
     if core.startswith("cortex-m"):
         cpu = core.replace("fd", "").replace("f", "")
-        flags["ARCHFLAGS"]["base"] += [
+        flags["flags.archflags"] += [
             "-mcpu={}".format(cpu),
             "-mthumb",
         ]
@@ -166,24 +171,24 @@ def common_compiler_flags(compiler, target, buildlog):
                 "7f": "-mfpu=fpv5-sp-d16",
                 "7fd": "-mfpu=fpv5-d16",
             }[fpu]
-            flags["ARCHFLAGS"]["base"] += [
+            flags["flags.archflags"] += [
                 "-mfloat-abi=hard",
                 fpu_spec
             ]
             single_precision = ("-sp-" in fpu_spec)
         if single_precision:
-            flags["CCFLAGS"]["base"] += [
+            flags["flags.ccflags"] += [
                 "-fsingle-precision-constant",
                 "-Wdouble-promotion",
             ]
-        flags["CXXFLAGS"]["base"] += [
+        flags["flags.cxxflags"] += [
             "-fno-exceptions",
             "-fno-unwind-tables",
             "-fno-rtti",
             "-fno-threadsafe-statics",
             "-fuse-cxa-atexit",
         ]
-        flags["LINKFLAGS"]["base"] += [
+        flags["flags.linkflags"] += [
             "-Wl,--no-wchar-size-warning",
             "-Wl,-wrap,_calloc_r",
             "-Wl,-wrap,_free_r",
@@ -197,16 +202,16 @@ def common_compiler_flags(compiler, target, buildlog):
         ]
 
     elif core.startswith("avr"):
-        flags["ARCHFLAGS"]["base"] += [
+        flags["flags.archflags"] += [
             "-mmcu={}".format(target.partname),
         ]
-        flags["CXXFLAGS"]["base"] += [
+        flags["flags.cxxflags"] += [
             "-fno-exceptions",
             "-fno-unwind-tables",
             "-fno-rtti",
             "-fno-threadsafe-statics",
         ]
-        flags["LINKFLAGS"]["base"] += [
+        flags["flags.linkflags"] += [
             "-L{linkdir}",
             "-Tlinkerscript.ld",
         ]

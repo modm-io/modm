@@ -11,8 +11,8 @@
 from os.path import join, abspath
 
 Import("env")
-%% if repo == "modm"
 profile = ARGUMENTS.get("profile", "release")
+%% if repo == "modm"
 env["BUILDPATH"] = join(env["CONFIG_BUILD_BASE"], profile)
 
 %% if family == "darwin"
@@ -65,6 +65,34 @@ env.AppendUnique(LIBPATH=[
 env.ParseConfig("pkg-config --cflags --libs {{ metadata.required_pkg | sort | join(" ") }}")
 %% endif
 
+%% macro generate_flags_for_profile(name, profile, append=False)
+env{% if append %}.Append({{name}}{% else %}["{{name}}"]{% endif %} = [
+%% for flag in flags[name][profile] | sort
+    {{ flag | flags_format }},
+%% endfor
+]{% if append %}){% endif -%}
+%% endmacro
+
+%% macro generate_flags(name, append=False)
+%% if not append or flags[name][""] | length
+{{ generate_flags_for_profile(name, "", append) }}
+%% endif
+%% for profile in flags[name].keys()
+%% if profile != "" and flags[name][profile] | length
+if profile == "{{ profile }}":
+    {{ generate_flags_for_profile(name, profile, True) | lbuild.indent(4) }}
+%% endif
+%% endfor
+%% endmacro
+
+# Toolchain configuration
+{{ generate_flags("CPPDEFINES", True) }}
+{{ generate_flags("CCFLAGS", repo != "modm") }}
+{{ generate_flags("CFLAGS", repo != "modm") }}
+{{ generate_flags("CXXFLAGS", repo != "modm") }}
+{{ generate_flags("ASFLAGS", repo != "modm") }}
+{{ generate_flags("LINKFLAGS", repo != "modm") }}
+{{ generate_flags("ARCHFLAGS", repo != "modm") }}
 
 %% if repo == "modm"
 %% if platform not in ["hosted"]
@@ -110,34 +138,6 @@ env.SetDefault(MODM_GDBINIT=["$BASEPATH/gdbinit"])
 # XPCC generator tool path
 env["XPCC_SYSTEM_DESIGN"] = join(abspath("."), "tools", "xpcc_generator")
 
-# Toolchain configuration
-%% macro generate_flags_for_profile(name, profile, append=False)
-env{% if append %}.Append({{name}}{% else %}["{{name}}"]{% endif %} = [
-%% for flag in flags[name][profile] | sort
-    {{ flag | flag_format }},
-%% endfor
-]{% if append %}){% endif -%}
-%% endmacro
-
-%% macro generate_flags(name, append=False)
-%% if not append or flags[name].base | length
-{{ generate_flags_for_profile(name, "base", append) }}
-%% endif
-%% for profile in flags[name].keys()
-%% if profile != "base" and flags[name][profile] | length
-if profile == "{{ profile }}":
-    {{ generate_flags_for_profile(name, profile, True) | lbuild.indent(4) }}
-%% endif
-%% endfor
-%% endmacro
-
-{{ generate_flags("CPPDEFINES", True) }}
-{{ generate_flags("CCFLAGS") }}
-{{ generate_flags("CFLAGS") }}
-{{ generate_flags("CXXFLAGS") }}
-{{ generate_flags("ASFLAGS") }}
-{{ generate_flags("ARCHFLAGS") }}
-{{ generate_flags("LINKFLAGS") }}
 # ARCHFLAGS must be known for compiling *and* linking
 env.Append(CCFLAGS="$ARCHFLAGS")
 env.Append(ASFLAGS="$ARCHFLAGS")
