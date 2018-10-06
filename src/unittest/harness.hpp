@@ -117,16 +117,20 @@ namespace unittest
 	}
 
 	// ------------------------------------------------------------------------
-	inline void
-	printString(modm::IOStream& stream, const char* a, const char* b, size_t pos)
+	template <typename A, typename B>
+	void
+	printString(modm::IOStream& stream, const A& a, const B& b, size_t pos)
 	{
-		stream << modm::endl << a << modm::endl << b << modm::endl;
+		stream << modm::endl;
+		size_t ii=0; while(a[ii]) stream << a[ii++]; stream << modm::endl;
+		       ii=0; while(b[ii]) stream << b[ii++]; stream << modm::endl;
 		for(size_t ii = 0; ii < pos; ++ii) { stream << " "; }
 		stream << "^" << modm::endl;
 	}
 
-	inline bool
-	checkString(const char* a, const char* b, unsigned int line)
+	template <typename A, typename B>
+	bool
+	checkString(const A& a, const B& b, unsigned int line)
 	{
 		size_t ii = 0;
 		while(a[ii] != '\0' && b[ii] != '\0') {
