@@ -48,12 +48,16 @@ def prepare(module, options):
             default="newlib",
             dependencies=lambda value: ":tlsf" if value == "tlsf" else None))
     if not options[":target"].has_driver("core:cortex-m0*"):
+        memories = listify(options[":target"].get_driver("core")["memory"])
+        default_location = "rom"
+        if any((m["name"] == "ccm" and "x" in m["access"]) or m["name"] == "dtcm" for m in memories):
+            default_location = "ram"
         module.add_option(
             EnumerationOption(
                 name="vector_table_location",
                 description=FileReader("option/vector_table_location.md"),
-                enumeration=["rom", "ram", "fastest"],
-                default="fastest"))
+                enumeration=["rom", "ram"],
+                default=default_location))
     module.add_option(
         NumericOption(
             name="main_stack_size",
@@ -99,7 +103,7 @@ def build(env):
     properties["partname"] = device.partname
     properties["driver"] = driver
     # Cortex-M0 does not have remappable vector table, so it will remain in Flash
-    properties["vector_table_location"] = env.get_option(":::vector_table_location", "rom")
+    properties["vector_table_location"] = env.get("vector_table_location", "rom")
     properties["core"] = driver["type"]
     properties["process_stack_size"] = 0
     if env.get_option(":platform:fault.cortex:led", None):
@@ -141,16 +145,12 @@ def build(env):
     for memory in memories:
         if memory["name"] == "ccm":
             if "x" in memory["access"]:
-                if properties["vector_table_location"] == "fastest":
-                    properties["vector_table_location"] = "ram"
                 # Executable CCM (Instruction Core-Coupled Memory)
                 linkerscript = "iccm"
             else:
                 # Non-executable CCM (Data Core-Coupled Memory)
                 linkerscript = "dccm"
         elif memory["name"] == "dtcm":
-            if properties["vector_table_location"] == "fastest":
-                properties["vector_table_location"] = "ram"
             # Executable ITCM and DTCM (Tightly-Coupled Memory)
             linkerscript = "idtcm"
 
