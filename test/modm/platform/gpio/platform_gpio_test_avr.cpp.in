@@ -79,7 +79,7 @@ PlatformGpioTest::testInput()
 {
 %% for (port, pin) in test_io
 	Gpio{{port ~ pin}}::setInput(Gpio::InputType::PullUp);
-	modm::delayMilliseconds(1);
+	modm::delay_ms(1);
 		TEST_ASSERT_TRUE((PIN{{port}} & (1ul << {{pin}})) == (1ul << {{pin}}));
 		TEST_ASSERT_TRUE(Gpio{{port ~ pin}}::read());
 %% endfor

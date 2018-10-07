@@ -171,11 +171,11 @@ PlatformGpioTest::testInput()
 {
 %% for (port, pin) in test_io
 	Gpio{{port ~ pin}}::setInput(Gpio::InputType::PullUp);
-	modm::delayMilliseconds(1);
+	modm::delay_ms(1);
 		TEST_ASSERT_TRUE((GPIO{{port}}->IDR & (1ul << {{pin}})) == (1ul << {{pin}}));
 		TEST_ASSERT_TRUE(Gpio{{port ~ pin}}::read());
 	Gpio{{port ~ pin}}::setInput(Gpio::InputType::PullDown);
-	modm::delayMilliseconds(1);
+	modm::delay_ms(1);
 		TEST_ASSERT_TRUE((GPIO{{port}}->IDR & (1ul << {{pin}})) == 0ul);
 		TEST_ASSERT_FALSE(Gpio{{port ~ pin}}::read());
 %% endfor

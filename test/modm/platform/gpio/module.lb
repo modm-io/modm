@@ -79,8 +79,18 @@ def init(module):
     module.name = ":test:platform:gpio"
 
 def prepare(module, options):
-    target = options[":target"].identifier
-    if target["platform"] in ["stm32"]:
+    target = options[":target"]
+    core = target.get_driver("core:cortex-m*")
+    # Cortex-M0 doesn't have the DWT->CYCCNT and Cortex-M7 support is broken
+    if not core or "m0" in core["type"] or "m7" in core["type"]:
+        return False
+    if target.identifier.platform != "stm32":
+        return False
+    # Only 64-pin TQFP package
+    if target.identifier.pin != "r" or target.identifier.package != "t":
+        return False
+
+    if target.identifier.platform in ["stm32"]:
         module.add_option(
             BooleanOption(
                 name="test_gpio_lock",

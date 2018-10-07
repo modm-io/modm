@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2018, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+from collections import OrderedDict
+
+def init(module):
+    module.parent = ":test:platform"
+    module.name = "gpio_sampler"
+
+
+def prepare(module, options):
+    target = options[":target"]
+    core = target.get_driver("core:cortex-m*")
+    # Cortex-M0 doesn't have the DWT->CYCCNT and Cortex-M7 support is broken
+    if not core or "m0" in core["type"] or "m7" in core["type"]:
+        return False
+    if target.identifier.platform != "stm32":
+        return False
+    # Only 64-pin TQFP package
+    if target.identifier.pin != "r" or target.identifier.package != "t":
+        return False
+
+    module.depends(":driver:gpio_sampler", ":mock:logic_analyzer")
+    return True
+
+
+def build(env):
+    if not env.has_module(":board:nucleo-*"):
+        env.log.warn("`:test:platform:gpio_sampler` has been hardcoded to a Nucleo-64 board!")
+        # When porting make sure this test does not damage your board!
+        return
+
+    env.outbasepath = "modm-test/src/modm-test/platform/gpio"
+    # The tests for the implementation
+    env.copy("gpio_sampler_test.hpp")
+    env.copy("gpio_sampler_test.cpp")
