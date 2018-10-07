@@ -52,7 +52,7 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 
 
 %% macro section_vector_ram(memory)
-	.vector_ram :  /* Vector table in RAM, only if remapped */
+	.vector_ram (NOLOAD) :  /* Vector table in RAM, only if remapped */
 	{
 		__vector_table_ram_start = .;
 
