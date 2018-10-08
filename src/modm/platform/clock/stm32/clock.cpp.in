@@ -252,6 +252,8 @@ modm::platform::ClockControl::enablePll(PllSource source,
 	// Pll multiplication factor
 	tmp |= (static_cast<uint32_t>(pllMul - 2) << 18) & {{pullmul}};
 
+	RCC->CFGR = tmp;
+
 %% if pllprediv
 	%% set mask = 'RCC_CFGR2_PREDIV1' if target["family"] == "f1" else 'RCC_CFGR2_PREDIV'
 #ifdef {{mask}}
@@ -261,7 +263,6 @@ modm::platform::ClockControl::enablePll(PllSource source,
 	if (uint32_t(pllPrediv - 1) & 0x1) tmp |= RCC_CFGR_PLLXTPRE;
 #endif
 %% endif
-	RCC->CFGR = tmp;
 %% if pllprediv2
 	RCC->CFGR2 = (RCC->CFGR2 & ~(RCC_CFGR2_PREDIV2)) | ((uint32_t(pllPrediv2 - 1) << 4) & RCC_CFGR2_PREDIV2);
 %% endif
