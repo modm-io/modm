@@ -74,6 +74,23 @@ class SharedMedium(Module):
         env.outbasepath = "modm-test/src/modm-test/mock"
         env.copy("shared_medium.hpp")
 
+class LogicAnalyzer(Module):
+    def init(self, module):
+        module.name = "logic_analyzer"
+
+    def prepare(self, module, options):
+        core = options[":target"].get_driver("core:cortex-m*")
+        # Cortex-M0 doesn't have the DWT->CYCCNT and Cortex-M7 support is broken
+        if not core or "m0" in core["type"] or "m7" in core["type"]:
+            return False
+
+        module.depends(":stdc++", ":driver:gpio_sampler", ":debug")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "modm-test/src/modm-test/mock"
+        env.copy("logic_analyzer.hpp")
+
 
 def init(module):
     module.name = ":mock"
@@ -84,6 +101,7 @@ def prepare(module, options):
     module.add_submodule(SpiMaster())
     module.add_submodule(IoDevice())
     module.add_submodule(SharedMedium())
+    module.add_submodule(LogicAnalyzer())
     return True
 
 def build(env):
