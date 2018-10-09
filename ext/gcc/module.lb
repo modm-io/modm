@@ -22,6 +22,12 @@ def prepare(module, options):
     if target["platform"] != "avr":
         return False
 
+    module.add_option(
+        BooleanOption(
+            name="use_modm_assert",
+            description="Assert on error in stdlib. Set to False to save flash.",
+            default=True))
+
     return True
 
 
@@ -29,4 +35,5 @@ def build(env):
     env.add_metadata("include_path", "modm/ext/gcc/libstdc++/include")
 
     env.outbasepath = "modm/ext/gcc"
-    env.copy(".", ignore=env.ignore_files("*.lb", "*.md", "examples"))
+    env.copy(".", ignore=env.ignore_files("*.lb", "*.md", "*.in", "examples"))
+    env.template("assert.cpp.in", "assert.cpp")
