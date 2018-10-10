@@ -1,7 +1,5 @@
 /*
- * Copyright (c) 2009, Martin Rosekeit
- * Copyright (c) 2009-2010, 2012, Fabian Greif
- * Copyright (c) 2012, Niklas Hauser
+ * Copyright (c) 2018, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -11,9 +9,20 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef STDCPP_ALGORITHM
-#define STDCPP_ALGORITHM
+#include <unittest/testsuite.hpp>
 
-#include "internal/algorithm_base.hpp"
+class VectorTest : public unittest::TestSuite
+{
+public:
+	void
+	testInsertion();
 
-#endif	// STDCPP_ALGORITHM
+	void
+	testIteration();
+
+	void
+	testEmplace();
+
+	void
+	testRemove();
+};

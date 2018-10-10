@@ -16,6 +16,7 @@
     <module>:test:communication</module>
     <module>:test:container</module>
     <module>:test:driver</module>
+    <module>:test:stdc++</module>
 
     <!-- <module>:test:io</module>
     <module>:test:platform:**</module>

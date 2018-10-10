@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2016-2017, Niklas Hauser
 # Copyright (c) 2017-2018, Fabian Greif
+# Copyright (c) 2018, Christopher Durand
 #
 # This file is part of the modm project.
 #
@@ -21,11 +22,18 @@ def prepare(module, options):
     if target["platform"] != "avr":
         return False
 
+    module.add_option(
+        BooleanOption(
+            name="use_modm_assert",
+            description="Assert on error in stdlib. Set to False to save flash.",
+            default=True))
+
     return True
 
 
 def build(env):
-    env.add_metadata("include_path", "modm/src/stdc++")
+    env.add_metadata("include_path", "modm/ext/gcc/libstdc++/include")
 
-    env.outbasepath = "modm/src/stdc++"
-    env.copy(".")
+    env.outbasepath = "modm/ext/gcc"
+    env.copy(".", ignore=env.ignore_files("*.lb", "*.md", "*.in", "examples"))
+    env.template("assert.cpp.in", "assert.cpp")

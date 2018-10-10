@@ -49,6 +49,18 @@ operator new[](size_t size, modm::MemoryTraits)
 	return ptr;
 }
 
+void*
+operator new(std::size_t size, const std::nothrow_t&) noexcept
+{
+	return modm::platform::allocateMemory(size);
+}
+
+void*
+operator new[](std::size_t size, const std::nothrow_t&) noexcept
+{
+	return modm::platform::allocateMemory(size);
+}
+
 void
 operator delete(void* ptr)
 {
@@ -69,6 +81,18 @@ operator delete[](void* ptr)
 
 void
 operator delete[](void* ptr, size_t)
+{
+	modm::platform::freeMemory(ptr);
+}
+
+void
+operator delete(void* ptr, const std::nothrow_t&) noexcept
+{
+	modm::platform::freeMemory(ptr);
+}
+
+void
+operator delete[](void* ptr, const std::nothrow_t&) noexcept
 {
 	modm::platform::freeMemory(ptr);
 }
