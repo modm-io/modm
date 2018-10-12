@@ -32,7 +32,7 @@ modm::LinkedList<T, Allocator>::~LinkedList()
 	{
 		Node *node = this->front;
 		this->front = this->front->next;
-		
+
 		Allocator::destroy(&node->value);
 		this->nodeAllocator.deallocate(node);
 	}
@@ -51,7 +51,7 @@ modm::LinkedList<T, Allocator>::getSize() const
 {
 	std::size_t count = 0;
 	for (const_iterator it = this->begin(); it != this->end(); ++it) {
-		count++; 
+		count++;
 	}
 	return count;
 }
@@ -64,16 +64,16 @@ modm::LinkedList<T, Allocator>::prepend(const T& value)
 	// allocate memory for the new node and copy the value into it
 	Node *node = this->nodeAllocator.allocate(1);
 	Allocator::construct(&node->value, value);
-	
+
 	// hook the node into the list
 	node->next = this->front;
 	this->front = node;
-	
+
 	if (this->back == 0) {
 		// first entry in the list
 		this->back = node;
 	}
-	
+
 	return true;
 }
 
@@ -84,7 +84,7 @@ modm::LinkedList<T, Allocator>::append(const T& value)
 	// allocate memory for the new node and copy the value into it
 	Node *node = this->nodeAllocator.allocate(1);
 	Allocator::construct(&node->value, value);
-	
+
 	// hook the node into the list
 	node->next = 0;
 	if (this->front == 0)
@@ -139,7 +139,7 @@ modm::LinkedList<T, Allocator>::removeFront()
 	else {
 		this->front = this->front->next;
 	}
-	
+
 	// call destructor and free memory
 	Allocator::destroy(&node->value);
 	this->nodeAllocator.deallocate(node);
@@ -197,7 +197,7 @@ modm::LinkedList<T, Allocator>::remove(const iterator& iter)
 		this->removeFront();
 		return this->begin();
 	}
-	
+
 	Node *node = this->front;
 	while (node->next != 0)
 	{
@@ -207,15 +207,15 @@ modm::LinkedList<T, Allocator>::remove(const iterator& iter)
 				this->back = node;
 			}
 			node->next = iter.node->next;
-			
+
 			// call destructor and free memory
 			Allocator::destroy(&iter.node->value);
 			this->nodeAllocator.deallocate(iter.node);
-			
+
 			return iterator(node->next);
 		}
 		node = node->next;
 	}
-	
+
 	return iter;
 }

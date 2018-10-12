@@ -17,7 +17,7 @@
 // ----------------------------------------------------------------------------
 
 template<typename T, std::size_t N>
-modm::BoundedDeque<T, N>::BoundedDeque() : 
+modm::BoundedDeque<T, N>::BoundedDeque() :
 	head(0), tail(N == 1 ? 0 : 1), size(0)
 {
 	static_assert(N > 0, "size = 0 is not allowed");
@@ -168,14 +168,14 @@ modm::BoundedDeque<T, N>::append(const T& value)
 	if (this->isFull()) {
 		return false;
 	}
-	
+
 	if (this->head >= (N - 1)) {
 		this->head = 0;
 	}
 	else {
 		this->head++;
 	}
-	
+
 	this->buffer[this->head] = value;
 	this->size++;
 	return true;
@@ -196,14 +196,14 @@ modm::BoundedDeque<T, N>::appendOverwrite(const T& value)
 	else {
 		this->size++;
 	}
-	
+
 	if (this->head >= (N - 1)) {
 		this->head = 0;
 	}
 	else {
 		this->head++;
 	}
-	
+
 	this->buffer[this->head] = value;
 	return;
 }
@@ -232,14 +232,14 @@ modm::BoundedDeque<T, N>::prepend(const T& value)
 	if (this->isFull()) {
 		return false;
 	}
-	
+
 	if (this->tail == 0) {
 		this->tail = N - 1;
 	}
 	else {
 		this->tail--;
 	}
-	
+
 	this->buffer[this->tail] = value;
 	this->size++;
 	return true;
@@ -260,14 +260,14 @@ modm::BoundedDeque<T, N>::prependOverwrite(const T& value)
 	else {
 		this->size++;
 	}
-	
+
 	if (this->tail == 0) {
 		this->tail = N - 1;
 	}
 	else {
 		this->tail--;
 	}
-	
+
 	this->buffer[this->tail] = value;
 	return;
 }
@@ -284,7 +284,7 @@ modm::BoundedDeque<T, N>::removeFront()
 	else {
 		this->tail++;
 	}
-	
+
 	this->size--;
 }
 
@@ -316,7 +316,7 @@ modm::BoundedDeque<T, N>::const_iterator::operator = (const const_iterator& othe
 	this->index = other.index;
 	this->count = other.count;
 	this->parent = other.parent;
-	
+
 	return *this;
 }
 

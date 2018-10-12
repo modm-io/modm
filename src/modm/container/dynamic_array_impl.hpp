@@ -82,7 +82,7 @@ modm::DynamicArray<T, Allocator>::operator = (const DynamicArray& other)
 		this->allocator.destroy(&this->values[i]);
 	}
 	this->allocator.deallocate(this->values);
-	
+
 	this->allocator = other.allocator;
 	this->size = other.size;
 	this->capacity = other.capacity;
@@ -118,7 +118,7 @@ modm::DynamicArray<T, Allocator>::clear()
 	}
 	this->allocator.deallocate(this->values);
 	this->values = 0;
-	
+
 	this->size = 0;
 	this->capacity = 0;
 }
@@ -148,7 +148,7 @@ modm::DynamicArray<T, Allocator>::append(const T& value)
 		}
 		this->relocate(n);
 	}
-	
+
 	this->allocator.construct(&this->values[this->size], value);
 	++this->size;
 }
@@ -170,20 +170,20 @@ void
 modm::DynamicArray<T, Allocator>::relocate(SizeType n)
 {
 	this->capacity = n;
-	
+
 	T* newBuffer = allocator.allocate(n);
 	for (SizeType i = 0; i < this->size; ++i) {
 		this->allocator.construct(&newBuffer[i], this->values[i]);
 		this->allocator.destroy(&this->values[i]);
 	}
 	this->allocator.deallocate(this->values);
-	
+
 	this->values = newBuffer;
 }
 
 // ----------------------------------------------------------------------------
 template <typename T, typename Allocator>
-typename modm::DynamicArray<T, Allocator>::iterator 
+typename modm::DynamicArray<T, Allocator>::iterator
 modm::DynamicArray<T, Allocator>::begin()
 {
 	return iterator(this, 0);
@@ -214,7 +214,7 @@ modm::DynamicArray<T, Allocator>::find(const T& value)
 }
 
 template <typename T, typename Allocator>
-typename modm::DynamicArray<T, Allocator>::const_iterator 
+typename modm::DynamicArray<T, Allocator>::const_iterator
 modm::DynamicArray<T, Allocator>::begin() const
 {
 	return const_iterator(this, 0);

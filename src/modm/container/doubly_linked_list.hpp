@@ -23,9 +23,9 @@ namespace modm
 {
 	/**
 	 * \brief	doubly-linked list
-	 * 
+	 *
 	 * \tparam	T	type of list entries
-	 * 
+	 *
 	 * \author	Fabian Greif
 	 * \ingroup	modm_container
 	 */
@@ -34,16 +34,16 @@ namespace modm
 	{
 	public:
 		DoublyLinkedList(const Allocator& allocator = Allocator());
-		
+
 		~DoublyLinkedList();
-		
+
 		/// check if there are any nodes in the list
 		inline bool
 		isEmpty() const;
-		
+
 		/**
 		 * \brief	Get number of items in the list
-		 * 
+		 *
 		 * Very slow for a long list as it needs to iterate through all
 		 * items in the list.
 		 */
@@ -57,14 +57,14 @@ namespace modm
 		/// Insert at the end of the list
 		void
 		append(const T& value);
-		
+
 		/// Remove the first entry
 		void
 		removeFront();
-		
+
 		void
 		removeBack();
-		
+
 		/**
 		 * \return the first node in the list
 		 */
@@ -76,43 +76,43 @@ namespace modm
 		 */
 		inline const T&
 		getBack() const;
-		
+
 	protected:
 		struct Node
 		{
 			T value;
-			
+
 			Node *previous;
 			Node *next;
 		};
-		
+
 		// The stored instance is not actually of type Allocator. Instead we
 		// rebind the type to Allocator<Node<T>>. Node<T> is not the same
 		// size as T (it's one pointer larger), and specializations on T may go
 		// unused because Node<T> is being bound instead.
 		typedef typename Allocator::template rebind< Node >::other NodeAllocator;
-		
+
 		NodeAllocator nodeAllocator;
-		
+
 		Node *front;
 		Node *back;
-		
+
 	public:
 		/**
 		 * \brief	Forward iterator
-		 * 
+		 *
 		 * \todo	decrement operator doesn't work correctly
 		 */
 		class iterator
 		{
 			friend class DoublyLinkedList;
 			friend class const_iterator;
-			
+
 		public:
 			/// Default constructor
 			iterator();
 			iterator(const iterator& other);
-			
+
 			iterator& operator = (const iterator& other);
 			iterator& operator ++ ();
 			iterator& operator -- ();
@@ -120,39 +120,39 @@ namespace modm
 			bool operator != (const iterator& other) const;
 			T& operator * ();
 			T* operator -> ();
-		
+
 		private:
 			iterator(Node* node);
-			
+
 			Node* node;
 		};
-		
+
 		/**
 		 * \brief	forward const iterator
-		 * 
+		 *
 		 * \todo	decrement operator doesn't work correctly
 		 */
 		class const_iterator
 		{
 			friend class DoublyLinkedList;
-			
+
 		public:
 			/// Default constructor
 			const_iterator();
-			
+
 			/**
 			 * \brief	Copy constructor
-			 * 
+			 *
 			 * Used to convert a normal iterator to a const iterator.
 			 * The other way is not possible.
 			 */
 			const_iterator(const iterator& other);
-			
+
 			/**
 			 * \brief	Copy constructor
 			 */
 			const_iterator(const const_iterator& other);
-			
+
 			const_iterator& operator = (const const_iterator& other);
 			const_iterator& operator ++ ();
 			const_iterator& operator -- ();
@@ -160,20 +160,20 @@ namespace modm
 			bool operator != (const const_iterator& other) const;
 			const T& operator * () const;
 			const T* operator -> () const;
-		
+
 		private:
 			const_iterator(const Node* node);
-			
+
 			const Node* node;
 		};
-		
+
 		/**
 		 * Returns a read/write iterator that points to the first element in      the
 		 * list.  Iteration is done in ordinary element order.
 		 */
 		iterator
 		begin();
-		
+
 		/**
 		 * Returns a read-only (constant) iterator that points to the
 		 * first element in the list.  Iteration is done in ordinary
@@ -181,7 +181,7 @@ namespace modm
 		 */
 		const_iterator
 		begin() const;
-		
+
 		/**
 		 * Returns a read/write iterator that points one past the last
 		 * element in the list. Iteration is done in ordinary element
@@ -189,7 +189,7 @@ namespace modm
 		 */
 		iterator
 		end();
-		
+
 		/**
 		 * Returns a read-only (constant) iterator that points one past
 		 * the last element in the list.  Iteration is done in ordinary
@@ -197,7 +197,7 @@ namespace modm
 		 */
 		const_iterator
 		end() const;
-		
+
 		/**
 		 * Deletes element pointed to by iterator and returns an iterator
 		 * to the next element behind the deleted one.
@@ -209,10 +209,10 @@ namespace modm
 
 	private:
 		friend class const_iterator;
-		friend class iterator;		
-		
+		friend class iterator;
+
 		DoublyLinkedList(const DoublyLinkedList& other);
-		
+
 		DoublyLinkedList&
 		operator = (const DoublyLinkedList& other);
 	};

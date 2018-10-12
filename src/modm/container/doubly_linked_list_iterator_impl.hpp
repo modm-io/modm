@@ -96,7 +96,7 @@ modm::DoublyLinkedList<T, Allocator>::const_iterator::operator * () const
 }
 
 template <typename T, typename Allocator>
-const T* 
+const T*
 modm::DoublyLinkedList<T, Allocator>::const_iterator::operator -> () const
 {
 	return &this->node->value;
@@ -171,7 +171,7 @@ modm::DoublyLinkedList<T, Allocator>::iterator::operator * ()
 }
 
 template <typename T, typename Allocator>
-T* 
+T*
 modm::DoublyLinkedList<T, Allocator>::iterator::operator -> ()
 {
 	return &this->node->value;

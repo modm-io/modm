@@ -23,14 +23,14 @@ namespace modm
 {
 	/**
 	 * \brief	FIFO queue
-	 * 
+	 *
 	 * getFront(), removeFront(), append()
-	 * 
+	 *
 	 * \tparam	T			type
 	 * \tparam	Container	container
-	 * 
+	 *
 	 * \see		Deque()
-	 * 
+	 *
 	 * \author	Fabian Greif
 	 * \ingroup	modm_container
 	 */
@@ -40,7 +40,7 @@ namespace modm
 	{
 	public:
 		typedef typename Container::Size Size;
-		
+
 	public:
 		inline bool
 		isEmpty() const
@@ -50,7 +50,7 @@ namespace modm
 
 		inline bool
 		isNotEmpty() const { return not isEmpty(); };
-		
+
 		inline bool
 		isFull() const
 		{
@@ -62,39 +62,39 @@ namespace modm
 		{
 			return not isFull();
 		}
-		
+
 		inline Size
 		getSize() const
 		{
 			return c.getSize();
 		}
-		
+
 		inline Size
 		getMaxSize() const
 		{
 			return c.getMaxSize();
 		}
-		
+
 		/// Access first element
 		inline T&
 		get()
 		{
 			return c.getFront();
 		}
-		
+
 		/// Access first element
 		inline const T&
 		get() const
 		{
 			return c.getFront();
 		}
-		
+
 		inline bool
 		push(const T& value)
 		{
 			return c.append(value);
 		}
-		
+
 		inline void
 		pop()
 		{
@@ -111,7 +111,7 @@ namespace modm
 	 * \brief	Bounded queue
 	 * \ingroup	modm_container
 	 */
-	template<typename T, 
+	template<typename T,
 			 std::size_t N,
 			 typename Container = BoundedDeque<T, N> >
 	class BoundedQueue : public Queue<T, Container>

@@ -16,7 +16,7 @@ them.
 adapters are not full container classes, but classes that provide a specific
 interface relying on an object of one of the container classes (such as
 `modm::BoundedDeque` or `modm::LinkedList`) to handle the elements.
-The underlying container is encapsulated in such a way that its elements are 
+The underlying container is encapsulated in such a way that its elements are
 accessed by the members of the container class independently of the underlying
 container class used.
 

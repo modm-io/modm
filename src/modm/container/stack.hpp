@@ -22,15 +22,15 @@ namespace modm
 {
 	/**
 	 * \brief	LIFO stack
-	 * 
+	 *
 	 * Elements are pushed/popped from the "back" of the specific container,
 	 * which is known as the top of the stack.
-	 * 
+	 *
 	 * getFront(), removeFront(), prepend()
-	 * 
+	 *
 	 * \see		Deque()
-	 * 
-	 * \author	Fabian Greif 
+	 *
+	 * \author	Fabian Greif
 	 * \ingroup		modm_container
 	 */
 	template<typename T,
@@ -39,56 +39,56 @@ namespace modm
 	{
 	public:
 		typedef typename Container::Size Size;
-		
+
 	public:
 		bool
 		isEmpty()
 		{
 			return c.isEmpty();
 		}
-		
+
 		bool
 		isFull()
 		{
 			return c.isFull();
 		}
-		
+
 		Size
 		getSize()
 		{
 			return c.getSize();
 		}
-		
+
 		Size
 		getMaxSize()
 		{
 			return c.getMaxSize();
 		}
-		
+
 		T&
 		get()
 		{
 			return c.getFront();
 		}
-		
+
 		const T&
 		get() const
 		{
 			return c.getFront();
 		}
-		
+
 		bool
 		push(const T& value)
 		{
 			return c.prepend(value);
 		}
-		
+
 		void
 		pop()
 		{
 			c.removeFront();
 		}
-	
+
 	protected:
 		Container c;
 	};
@@ -96,10 +96,10 @@ namespace modm
 	// ------------------------------------------------------------------------
 	/**
 	 * \brief		Bounded stack
-	 * 
+	 *
 	 * \ingroup		modm_container
 	 */
-	template<typename T, 
+	template<typename T,
 			 std::size_t N,
 			 typename Container = BoundedDeque<T, N> >
 	class BoundedStack : public Stack<T, Container>
