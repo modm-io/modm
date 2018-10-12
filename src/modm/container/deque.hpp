@@ -49,7 +49,7 @@ namespace modm
 	 * 			a pop-operation. You have to do this by yourself!
 	 * 
 	 * \author		Fabian Greif
-	 * \ingroup		container
+	 * \ingroup		modm_container
 	 */
 	template<typename T,
 			 std::size_t N>

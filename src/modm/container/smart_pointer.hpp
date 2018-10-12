@@ -35,7 +35,7 @@ namespace modm
 	 * records when it is copied - when the last copy is destroyed the
 	 * memory is released.
 	 *
-	 * \ingroup container
+	 * \ingroup modm_container
 	 */
 	class SmartPointer
 	{
@@ -132,9 +132,6 @@ namespace modm
 		operator <<( IOStream&, const SmartPointer&);
 	} modm_packed;
 
-	/**
-	 * \ingroup container
-	 */
 	modm::IOStream&
 	operator <<( modm::IOStream& s, const modm::SmartPointer& sPtr);
 };
