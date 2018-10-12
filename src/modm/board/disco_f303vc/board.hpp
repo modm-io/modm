@@ -11,12 +11,6 @@
  */
 // ----------------------------------------------------------------------------
 
-//
-// STM32F3DISCOVERY
-// Discovery kit for STM32 F3 series
-// http://www.st.com/en/evaluation-tools/stm32f3discovery.html
-//
-
 #ifndef MODM_STM32_F3_DISCOVERY_HPP
 #define MODM_STM32_F3_DISCOVERY_HPP
 
@@ -27,17 +21,10 @@
 
 using namespace modm::platform;
 
-
+/// @ingroup modm_board_disco_f303vc
 namespace Board
 {
 
-/* SystemClock generator is only available for selected STM32F4 devices.
- * The idea is that it is generated automatically for you like the rest of the
- * HAL, however, modm does not have this capability yet. See PR #36.
- */
-// using systemClock = SystemClock<Pll<ExternalClock<MHz8>, MHz72> >;
-
-// Instead this manual implementation of the system clock is used:
 /// STM32F303 running at 72MHz generated from the external 8MHz clock
 /// supplied by the on-board st-link
 struct systemClock {

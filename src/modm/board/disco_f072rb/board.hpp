@@ -12,12 +12,6 @@
  */
 // ----------------------------------------------------------------------------
 
-//
-// 32F072DISCOVERY
-// Discovery kit for STM32F072 series
-// http://www.st.com/en/evaluation-tools/32f072bdiscovery.html
-//
-
 #ifndef MODM_STM32_F072_DISCOVERY_HPP
 #define MODM_STM32_F072_DISCOVERY_HPP
 
@@ -27,7 +21,7 @@
 
 using namespace modm::platform;
 
-
+/// @ingroup modm_board_disco_f072rb
 namespace Board
 {
 

@@ -14,6 +14,12 @@
 def init(module):
     module.parent = "board"
     module.name = "disco-l476vg"
+    module.description = """\
+# STM32L476DISCOVERY
+
+Discovery kit for STM32L476
+http://www.st.com/en/evaluation-tools/32l476gdiscovery.html
+"""
 
 def prepare(module, options):
     if options[":target"].partname != "stm32l476vgt":

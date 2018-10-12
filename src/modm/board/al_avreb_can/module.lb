@@ -13,6 +13,12 @@
 def init(module):
     module.parent = "board"
     module.name = "al-avreb-can"
+    module.description = """\
+# AL-AVREB_CAN Board
+
+AVR breakout board with AT90CAN128:
+https://www.alvidi.de/products/DE/AVR_Entwicklungsboards/avr_modul_avreb_can.phpAl-avreb-can
+"""
 
 def prepare(module, options):
     if options[":target"].partname != "at90can128":

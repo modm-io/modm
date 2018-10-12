@@ -1,4 +1,6 @@
-Discovery kit with STM32F469NI MCU
+# STM32F469IDISCOVERY
+
+Discovery kit with STM32F469NI MCU.
 
 This BSPs `Board::initialize()` sets the board up with these settings:
 

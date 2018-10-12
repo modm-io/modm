@@ -22,12 +22,12 @@
 
 using namespace modm::platform;
 
+/// @ingroup modm_board_al_avreb_can
 namespace Board
 {
 
 using systemClock = modm::platform::SystemClock;
 
-// Arduino Footprint
 using Led0 = GpioInverted<GpioOutputF0>;
 using Led1 = GpioInverted<GpioOutputF1>;
 using Led2 = GpioInverted<GpioOutputF2>;

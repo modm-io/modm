@@ -11,12 +11,6 @@
  */
 // ----------------------------------------------------------------------------
 
-//
-// STM32F0DISCOVERY
-// Discovery kit for STM32F0 series
-// http://www.st.com/en/evaluation-tools/stm32f0discovery.html
-//
-
 #ifndef MODM_STM32_F0_DISCOVERY_HPP
 #define MODM_STM32_F0_DISCOVERY_HPP
 
@@ -25,12 +19,11 @@
 
 using namespace modm::platform;
 
-
+/// @ingroup modm_board_disco_f051r8
 namespace Board
 {
 
 /// STM32F0 running at 48MHz generated from the internal 8MHz with PLL.
-
 struct systemClock
 {
 	static constexpr int Frequency = MHz48;

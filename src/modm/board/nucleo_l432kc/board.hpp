@@ -9,22 +9,18 @@
  */
 // ----------------------------------------------------------------------------
 
-//
-// NUCLEO-L432KC
-// Nucleo kit for STM32L432KC
-// http://www.st.com/en/evaluation-tools/nucleo-l432kc.html
-//
-
 #ifndef MODM_STM32_NUCLEO_L432KC_HPP
 #define MODM_STM32_NUCLEO_L432KC_HPP
 
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
 #include <modm/debug/logger.hpp>
+/// @ingroup modm_board_nucleo_l432kc
 #define MODM_BOARD_HAS_LOGGER
 
 using namespace modm::platform;
 
+/// @ingroup modm_board_nucleo_l432kc
 namespace Board
 {
 

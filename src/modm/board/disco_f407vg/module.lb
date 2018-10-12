@@ -14,6 +14,12 @@
 def init(module):
     module.parent = "board"
     module.name = "disco-f407vg"
+    module.description = """\
+# STM32F4DISCOVERY
+
+Discovery kit for STM32F407/417 lines
+http://www.st.com/en/evaluation-tools/stm32f4discovery.html
+"""
 
 def prepare(module, options):
     if options[":target"].partname != "stm32f407vgt":

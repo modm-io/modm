@@ -14,6 +14,12 @@
 def init(module):
     module.parent = "board"
     module.name = "nucleo-f429zi"
+    module.description = """\
+# NUCLEO-F429ZI
+
+Nucleo kit for STM32F429ZI
+http://www.st.com/en/evaluation-tools/nucleo-f429zi.html
+"""
 
 def prepare(module, options):
     if options[":target"].partname != "stm32f429zit":
