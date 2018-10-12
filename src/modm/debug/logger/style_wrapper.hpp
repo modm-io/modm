@@ -25,7 +25,7 @@ namespace modm
 		/**
 		 * \brief 	Wrapper to use the Style as a IODevice in the Logger
 		 *
-		 * \ingroup logger
+		 * \ingroup modm_debug
 		 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 		 */
 		template < typename STYLE >
