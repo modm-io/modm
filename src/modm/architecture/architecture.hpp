@@ -12,12 +12,6 @@
  */
 // ----------------------------------------------------------------------------
 
-/**
- * \defgroup architecture	Architecture
- *
- * Supported platforms
- */
-
 #ifndef MODM_ARCHITECTURE_HPP
 #define MODM_ARCHITECTURE_HPP
 

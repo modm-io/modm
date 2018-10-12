@@ -21,22 +21,22 @@
 #include <modm/architecture/utils.hpp>
 #include <modm/utils/arithmetic_traits.hpp>
 
-/**
- * Memory allocator.
- * 
- * 
- * \tparam	T
- * 		TODO
- * 
- * \tparam	BLOCK_SIZE
- * 		Size of one allocatable block in words (sizeof(T) bytes)
- *		(BLOCKSIZE * sizeof(T) * n) - 4 has to be dividable by 4 for every n
- * 
- * \author	Fabian Greif
- */
-
 namespace modm
 {
+	/**
+	 * Memory allocator.
+	 *
+	 *
+	 * \tparam	T
+	 * 		TODO
+	 *
+	 * \tparam	BLOCK_SIZE
+	 * 		Size of one allocatable block in words (sizeof(T) bytes)
+	 *		(BLOCKSIZE * sizeof(T) * n) - 4 has to be dividable by 4 for every n
+	 *
+	 * \author	Fabian Greif
+	 * \ingroup modm_architecture_heap
+	 */
 	template <typename T, unsigned int BLOCK_SIZE >
 	class BlockAllocator
 	{

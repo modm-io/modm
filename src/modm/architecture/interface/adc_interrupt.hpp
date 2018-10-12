@@ -44,7 +44,7 @@ namespace modm
  * @see Adc			for the synchronous method.
  *
  * @author	Niklas Hauser
- * @ingroup adc
+ * @ingroup modm_architecture_adc
  */
 class AdcInterrupt : public modm::Adc
 {

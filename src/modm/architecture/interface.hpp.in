@@ -14,13 +14,6 @@
 
 #include <stdint.h>
 
-/**
- * @ingroup 	architecture
- * @defgroup	interface	Architecture Interfaces
- *
- * All hardware peripherals with common interfaces.
- */
-
 %% for header in headers
 #include "{{header}}"
 %% endfor

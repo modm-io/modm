@@ -20,23 +20,23 @@
 #ifdef	__DOXYGEN__
 
 /// Define a flash variable
-/// @ingroup	accessor
+/// @ingroup modm_architecture_accessor
 #define	FLASH_STORAGE(var)
 
 /// Define a flash variable with external linkage
-/// @ingroup	accessor
+/// @ingroup modm_architecture_accessor
 #define	EXTERN_FLASH_STORAGE(var)
 
 /// Define a flash string
-/// @ingroup	accessor
+/// @ingroup modm_architecture_accessor
 #define	FLASH_STORAGE_STRING(s)
 
 /// Declare a flash string with external linkage
-/// @ingroup	accessor
+/// @ingroup modm_architecture_accessor
 #define	EXTERN_FLASH_STORAGE_STRING(s)
 
 /// Declare a flash string inline
-/// @ingroup	accessor
+/// @ingroup modm_architecture_accessor
 #define PSTR(s) ((const char *)(s))
 
 #else // !__DOXYGEN__
@@ -62,7 +62,7 @@ namespace accessor
  * Based on a implementation of Rolf Magnus, see
  * http://www.mikrocontroller.net/topic/78610#656695
  *
- * @ingroup	accessor
+ * @ingroup modm_architecture_accessor
  * @author	Fabian Greif
  */
 template<typename T>
@@ -170,7 +170,7 @@ private:
 };
 
 /// Convert a normal pointer to a accessor::Flash
-/// @ingroup	accessor
+/// @ingroup modm_architecture_accessor
 template<typename T>
 modm_always_inline ::modm::accessor::Flash<T>
 asFlash(const T* ptr)
@@ -191,7 +191,7 @@ operator << (modm::IOStream& os, modm::accessor::Flash<T> ptr);
 
 /**
  * Streamoperator - specialization for `char`
- * @ingroup accessor
+ * @ingroup modm_architecture_accessor
  */
 static inline modm::IOStream&
 operator << (modm::IOStream& os, modm::accessor::Flash<char> ptr)

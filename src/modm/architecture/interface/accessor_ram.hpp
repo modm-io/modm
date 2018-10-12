@@ -26,7 +26,7 @@ namespace accessor
 /**
  * Pointer to RAM
  *
- * @ingroup	accessor
+ * @ingroup modm_architecture_accessor
  * @author	Fabian Greif
  */
 template<typename T>

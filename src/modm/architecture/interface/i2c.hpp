@@ -19,15 +19,10 @@
 #include <modm/architecture/interface/delay.hpp>
 #include <modm/io/iostream.hpp>
 
-/**
- * @ingroup		interface
- * @defgroup	i2c		Inter-Integrated Circuit (I2C)
- */
-
 namespace modm
 {
 
-/// @ingroup	i2c
+/// @ingroup modm_architecture_i2c
 struct I2c
 {
 	static constexpr uint8_t Write = 0x00;	///< Add the Write bit to the slave address

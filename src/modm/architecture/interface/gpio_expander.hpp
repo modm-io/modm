@@ -42,7 +42,7 @@ namespace modm
  * @see modm::GpioIO
  *
  * @author  Niklas Hauser
- * @ingroup gpio
+ * @ingroup modm_architecture_gpio_expander
  */
 class GpioExpander
 {
@@ -190,7 +190,7 @@ public:
  * @tparam  expander        instance of the expander
  * @tparam  pin             pin identifier of desired expander pin
  *
- * @ingroup gpio
+ * @ingroup modm_architecture_gpio_expander
  * @author  Sascha Schade
  * @author  Niklas Hauser
  */
@@ -335,7 +335,7 @@ public:
  * @tparam  Width           width of the entire port in bits
  * @tparam  DataOrder       the bit order mapping of data
  *
- * @ingroup gpio
+ * @ingroup modm_architecture_gpio_expander
  * @author  Niklas Hauser
  */
 template <

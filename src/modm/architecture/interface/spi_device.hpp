@@ -25,7 +25,7 @@ namespace modm
  *
  * @author	Georgi Grinshpun
  * @author	Niklas Hauser
- * @ingroup spi
+ * @ingroup modm_architecture_spi_device
  */
 template < class SpiMaster >
 class SpiDevice

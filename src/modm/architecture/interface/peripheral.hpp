@@ -39,13 +39,12 @@ namespace modm
  * There is no need to document the platform specific implementation, since
  * it is taken from the base class.
  *
- * @ingroup peripheral
+ * @ingroup modm_architecture
  * @author	Niklas Hauser
  */
 class PeripheralDriver
 {
 #ifdef __DOXYGEN__
-	/// @cond
 	/// initializes the peripheral, must be called before use.
 	static void
 	initialize();
@@ -74,7 +73,6 @@ class PeripheralDriver
 	 */
 	static void
 	acknowledgeInterruptFlag();
-	/// @endcond
 #endif
 
 public:

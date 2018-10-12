@@ -26,7 +26,7 @@ namespace modm
  * synchronize multiple drivers requesting hardware access.
  *
  * @author	Niklas Hauser
- * @ingroup	spi
+ * @ingroup	modm_architecture_spi
  */
 class SpiMaster : public ::modm::PeripheralDriver, public Spi
 {

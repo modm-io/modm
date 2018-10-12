@@ -29,7 +29,7 @@ namespace modm
  *
  * @author	Georgi Grinshpun
  * @author	Niklas Hauser
- * @ingroup	i2c
+ * @ingroup	modm_architecture_i2c
  */
 class I2cTransaction : public ::modm::I2c
 {
@@ -236,7 +236,7 @@ protected:
  *
  * @author	Georgi Grinshpun
  * @author	Niklas Hauser
- * @ingroup	i2c
+ * @ingroup	modm_architecture_i2c
  */
 class I2cWriteReadTransaction : public I2cTransaction
 {
@@ -404,7 +404,7 @@ protected:
  *
  * @author	Georgi Grinshpun
  * @author	Niklas Hauser
- * @ingroup	i2c
+ * @ingroup	modm_architecture_i2c
  */
 class I2cWriteTransaction : public I2cTransaction
 {
@@ -479,7 +479,7 @@ protected:
  *
  * @author	Georgi Grinshpun
  * @author	Niklas Hauser
- * @ingroup	i2c
+ * @ingroup	modm_architecture_i2c
  */
 class I2cReadTransaction : public I2cTransaction
 {

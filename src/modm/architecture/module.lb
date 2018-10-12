@@ -14,6 +14,7 @@
 class Accessor(Module):
     def init(self, module):
         module.name = "accessor"
+        module.description = "Memory Accessors"
 
     def prepare(self, module, options):
         module.depends(":io")
@@ -30,6 +31,7 @@ class Accessor(Module):
 class Adc(Module):
     def init(self, module):
         module.name = "adc"
+        module.description = "Analog-to-Digital Converters"
 
     def prepare(self, module, options):
         return True
@@ -43,6 +45,7 @@ class Adc(Module):
 class Assert(Module):
     def init(self, module):
         module.name = "assert"
+        module.description = FileReader("interface/assert.md")
 
     def prepare(self, module, options):
         module.depends(":utils", ":architecture:accessor")
@@ -57,6 +60,7 @@ class Assert(Module):
 class Atomic(Module):
     def init(self, module):
         module.name = "atomic"
+        module.description = "Atomic Operations and Containers"
 
     def prepare(self, module, options):
         module.depends(":utils", ":architecture:accessor")
@@ -73,6 +77,7 @@ class Atomic(Module):
 class BlockDevice(Module):
     def init(self, module):
         module.name = "block.device"
+        module.description = "Block Devices"
 
     def prepare(self, module, options):
         module.depends(":processing:resumable")
@@ -86,6 +91,7 @@ class BlockDevice(Module):
 class Can(Module):
     def init(self, module):
         module.name = "can"
+        module.description = FileReader("interface/can.md")
 
     def prepare(self, module, options):
         module.depends(":io")
@@ -102,6 +108,7 @@ class Can(Module):
 class Clock(Module):
     def init(self, module):
         module.name = "clock"
+        module.description = "System Tick"
 
     def prepare(self, module, options):
         module.depends(":processing:timer")
@@ -115,6 +122,7 @@ class Clock(Module):
 class Delay(Module):
     def init(self, module):
         module.name = "delay"
+        module.description = FileReader("interface/delay.md")
 
     def prepare(self, module, options):
         # module.depends(":platform:core")
@@ -141,6 +149,7 @@ class Gpio(Module):
 class GpioExpander(Module):
     def init(self, module):
         module.name = "gpio.expander"
+        module.description = "GPIO Expanders"
 
     def prepare(self, module, options):
         module.depends(":architecture:gpio", ":architecture:register", ":processing:resumable", ":math:utils")
@@ -154,6 +163,7 @@ class GpioExpander(Module):
 class Heap(Module):
     def init(self, module):
         module.name = "heap"
+        module.description = "Memory Allocators"
 
     def prepare(self, module, options):
         module.depends(":utils")
@@ -168,6 +178,7 @@ class Heap(Module):
 class I2c(Module):
     def init(self, module):
         module.name = "i2c"
+        module.description = "Inter-Integrated Circuit (I²C)"
 
     def prepare(self, module, options):
         module.depends(":architecture:gpio", ":architecture:delay", ":io")
@@ -184,6 +195,7 @@ class I2c(Module):
 class I2cDevice(Module):
     def init(self, module):
         module.name = "i2c.device"
+        module.description = "I²C Devices"
 
     def prepare(self, module, options):
         module.depends(":architecture:i2c", ":processing:resumable")
@@ -197,6 +209,7 @@ class I2cDevice(Module):
 class Interrupt(Module):
     def init(self, module):
         module.name = "interrupt"
+        module.description = "Interrupt Service Routines"
 
     def prepare(self, module, options):
         return True
@@ -209,6 +222,7 @@ class Interrupt(Module):
 class Memory(Module):
     def init(self, module):
         module.name = "memory"
+        module.description = "Memory Traits"
 
     def prepare(self, module, options):
         module.depends(":architecture:register")
@@ -222,6 +236,7 @@ class Memory(Module):
 class OneWire(Module):
     def init(self, module):
         module.name = "1-wire"
+        module.description = FileReader("interface/one_wire.md")
 
     def prepare(self, module, options):
         return True
@@ -234,6 +249,7 @@ class OneWire(Module):
 class Register(Module):
     def init(self, module):
         module.name = "register"
+        module.description = FileReader("interface/register.md")
 
     def prepare(self, module, options):
         module.depends(":io", ":math:utils")
@@ -247,6 +263,7 @@ class Register(Module):
 class Spi(Module):
     def init(self, module):
         module.name = "spi"
+        module.description = "Serial Peripheral Interface (SPI)"
 
     def prepare(self, module, options):
         module.depends(":processing:resumable")
@@ -261,6 +278,7 @@ class Spi(Module):
 class SpiDevice(Module):
     def init(self, module):
         module.name = "spi.device"
+        module.description = "SPI Devices"
 
     def prepare(self, module, options):
         module.depends(":architecture:spi")
@@ -274,6 +292,7 @@ class SpiDevice(Module):
 class Uart(Module):
     def init(self, module):
         module.name = "uart"
+        module.description = "Universal Asynchronous Receiver/Transmitter (UART)"
 
     def prepare(self, module, options):
         return True
@@ -286,6 +305,7 @@ class Uart(Module):
 class Unaligned(Module):
     def init(self, module):
         module.name = "unaligned"
+        module.description = "Unaligned Memory Accessor"
 
     def prepare(self, module, options):
         # module.depends(":platform:core")
@@ -300,6 +320,11 @@ import re
 
 def init(module):
     module.name = "architecture"
+    module.description = """\
+# Architecture Interfaces
+
+All hardware peripherals with common interfaces.
+"""
 
 def prepare(module, options):
     module.depends(":math") # for tolerance.hpp

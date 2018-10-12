@@ -41,7 +41,7 @@ namespace modm
 		 * }
 		 * \endcode
 		 * 
-		 * \ingroup	atomic
+		 * \ingroup	modm_architecture_atomic
 		 * \author	Fabian Greif
 		 */
 		class Flag

@@ -17,11 +17,6 @@
 
 #include <modm/architecture/interface/peripheral.hpp>
 
-/**
- * @ingroup		interface
- * @defgroup	uart	Universal Asynchronous Receiver/Transmitter (UART)
- */
-
 namespace modm
 {
 
@@ -31,7 +26,7 @@ namespace modm
  * Asynchronous and synchronous, buffered access to the Uart.
  *
  * @author	Niklas Hauser
- * @ingroup	uart
+ * @ingroup	modm_architecture_uart
  */
 class Uart : public ::modm::PeripheralDriver
 {

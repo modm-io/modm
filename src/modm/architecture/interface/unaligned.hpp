@@ -38,7 +38,7 @@ namespace modm
  * output = *u32;
  * @endcode
  *
- * @ingroup	interface
+ * @ingroup	modm_architecture_unaligned
  * @author	Niklas Hauser
  */
 template< typename T >
@@ -62,7 +62,7 @@ protected:
 /**
  * Accesses a memory location using a unaligned-safe method.
  *
- * @ingroup	interface
+ * @ingroup	modm_architecture_unaligned
  */
 template< typename T, typename U>
 modm_always_inline unaligned_t<T>*

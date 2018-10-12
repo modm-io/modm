@@ -3,9 +3,6 @@
 GPIOs are modeled as individual classes with an interface consisting out of a
 common set of static methods.
 
-
-
-
 ## Using GPIOs
 
 These classes are used to create architecture independent
@@ -59,4 +56,3 @@ Led::reset();
     Call `Gpio::setInput()` or `Gpio::setOutput()` before the first use,
     otherwise the GPIO state may be undefined!
 
-## Passing GPIOs to drivers

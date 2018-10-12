@@ -17,61 +17,12 @@
 #include <modm/utils/bit_constants.hpp>
 #include <modm/architecture/interface/accessor.hpp>
 
-/**
- * @ingroup		interface
- * @defgroup	assert	Assertions
- *
- * These functions allow you to assert a condition at runtime and define
- * failure handlers in your application that can decide what to do with this
- * assertion and provide custom functionality.
- *
- * Each assertion has the form `modm_assert(condition, module, location, failure)`,
- * where the condition is a boolean and rest are strings, so that a simple
- * string compare can be used to match for module, location or failure.
- * For example, the identifier `"can", "init", "timeout"` describes a timeout
- * failure in the CAN initializer function.
- * The assert `modm_assert_debug(condition, module, location, failure)` is only
- * available on debug builds and is removed from the code for a release build.
- *
- * The user can define one or multiple assertion handlers in any part of the
- * application using the `MODM_ASSERTION_HANDLER(function)` macro.
- * All assertion handlers will be executed when an assertion fails anywhere in
- * the code and get passed the identifier string.
- *
- * @note The order of assertion handler execution is undefined and must not be
- *       relied upon for any functionality!
- * @warning Assertion handlers may be executed in interrupt context!
- *
- * Depending on the information in the failure identifier, the assertion handler
- * returns `Abandonment::DontCare` if the failure is not of interest, or
- * `Abandonment::Ignore` for recoverable failures, or `Abandonment::Fail` for
- * failures that do not allow normal program continuation.
- * The program is aborted, if any assertion handler returns `Abandonment::Fail`,
- * all assertion handlers return `Abandonment::DontCare` or no assertion
- * handlers have been defined in the application.
- * Only if one or many assertion handlers return `Abandonment::Ignore` and the
- * remainder returns `Abandonment::DontCare`, only then is the assertion ignored.
- *
- * @note It is intended that the assertion handlers do not block (forever), so
- *       that all assertion handlers can get called.
- *
- * On program abandonment `modm_abandon(module, location, failure)` is called,
- * which exits the program silently by default.
- * Only on hosted an formatted error string is output by default.
- * It is therefore recommended to overwrite this function on embedded targets
- * for custom behavior like blinking an LED and printing to a serial connection.
- *
- * @warning The abandonment handler may also be executed in interrupt context!
- *
- * @see		driver
- * @author	Niklas Hauser
- */
 
 namespace modm
 {
 
 /// Describes abandonment type of assertions.
-/// @ingroup assert
+/// @ingroup modm_architecture_assert
 enum class
 Abandonment : uint8_t
 {
@@ -81,7 +32,7 @@ Abandonment : uint8_t
 };
 
 /// Signature of the assertion handlers
-/// @ingroup assert
+/// @ingroup modm_architecture_assert
 using AssertionHandler = Abandonment (*)(const char * module,
 										 const char * location,
 										 const char * failure,
@@ -101,7 +52,7 @@ using AssertionHandler = Abandonment (*)(const char * module,
  *
  * @param handler A function of signature `AssertionHandler`.
  *
- * @ingroup assert
+ * @ingroup modm_architecture_assert
  */
 #define MODM_ASSERTION_HANDLER(handler)
 
@@ -112,7 +63,7 @@ using AssertionHandler = Abandonment (*)(const char * module,
  *
  * @note On AVR targets the failure identifier string is placed in Flash memory!
  *
- * @ingroup assert
+ * @ingroup modm_architecture_assert
  */
 modm_extern_c bool
 modm_assert(bool condition, const char * module, const char * location, const char * failure);
@@ -124,7 +75,7 @@ modm_assert(bool condition, const char * module, const char * location, const ch
  *
  * @note On AVR targets the failure identifier string is placed in Flash memory!
  *
- * @ingroup assert
+ * @ingroup modm_architecture_assert
  */
 modm_extern_c bool
 modm_assert(bool condition, const char * module, const char * location, const char * failure, uintptr_t context);
@@ -136,7 +87,7 @@ modm_assert(bool condition, const char * module, const char * location, const ch
  *
  * @note On AVR targets the strings are placed in Flash memory!
  *
- * @ingroup assert
+ * @ingroup modm_architecture_assert
  */
 modm_extern_c bool
 modm_assert_debug(bool condition, const char * module, const char * location, const char * failure);
@@ -148,7 +99,7 @@ modm_assert_debug(bool condition, const char * module, const char * location, co
  *
  * @note On AVR targets the strings are placed in Flash memory!
  *
- * @ingroup assert
+ * @ingroup modm_architecture_assert
  */
 modm_extern_c bool
 modm_assert_debug(bool condition, const char * module, const char * location, const char * failure, uintptr_t context);
@@ -159,7 +110,7 @@ modm_assert_debug(bool condition, const char * module, const char * location, co
  * You should overwrite this handler for custom failure behaviour like blinking
  * LEDs and outputting the failure string via a serial connection.
  *
- * @ingroup assert
+ * @ingroup modm_architecture_assert
  */
 modm_extern_c void
 modm_abandon(const char * module,

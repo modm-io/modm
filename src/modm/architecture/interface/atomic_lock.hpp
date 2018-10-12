@@ -15,11 +15,6 @@
 #ifndef	MODM_INTERFACE_ATOMIC_LOCK_HPP
 #define	MODM_INTERFACE_ATOMIC_LOCK_HPP
 
-/**
- * @ingroup	interface
- * @defgroup	atomic	Atomic operations and container
- */
-
 #ifdef __DOXYGEN__
 
 namespace modm
@@ -49,7 +44,7 @@ namespace atomic
  *     // other code with interrupts enabled
  * }
  * @endcode
- * @ingroup	atomic
+ * @ingroup	modm_architecture_atomic
  */
 class Lock
 {
@@ -66,7 +61,7 @@ public:
  *
  * Most of the time you won't need this class. But on some rare
  * times it is useful. The modm::Scheduler is an example for that.
- * @ingroup	atomic
+ * @ingroup	modm_architecture_atomic
  */
 class Unlock
 {
