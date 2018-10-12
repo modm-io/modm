@@ -1,23 +1,32 @@
 PROJECT_NAME           = modm
-INPUT                  = ../src/
+INPUT                  = dox/ \
+                         ../src/
 STRIP_FROM_INC_PATH    = ../src/
 RECURSIVE              = YES
 FILE_PATTERNS          = *.hpp \
                          *.h \
                          *.dox
-QUIET                  = YES
+EXCLUDE_PATTERNS       = *_impl.hpp
+INPUT                 += README.md
+USE_MDFILE_AS_MAINPAGE = README.md
+
+
+QUIET                  = {{ "YES" if xml else "NO" }}
 WARN_LOGFILE           = doxygen_warnings.txt
 
-GENERATE_HTML          = NO
+GENERATE_HTML          = YES
 GENERATE_LATEX         = NO
 GENERATE_MAN           = NO
 GENERATE_RTF           = NO
 CASE_SENSE_NAMES       = NO
-GENERATE_XML           = YES
+GENERATE_XML           = {{ "YES" if xml else "NO" }}
 XML_PROGRAMLISTING     = NO
 
+INLINE_SIMPLE_STRUCTS  = YES
 BRIEF_MEMBER_DESC      = NO
-EXTRACT_ALL            = NO
+EXTRACT_ALL            = YES
+SHOW_FILES             = YES
+SHOW_USED_FILES        = NO
 
 MACRO_EXPANSION        = YES
 EXPAND_ONLY_PREDEF     = YES
@@ -25,10 +34,11 @@ PREDEFINED             = __DOXYGEN__ \
                          __cplusplus \
                          "EXTERN_FLASH_STORAGE(x):=const x" \
                          modm_always_inline=inline \
-                         "MODM_FLAGS8(x):=typedef modm::Flags8< x > x ## _t" \
-                         "MODM_FLAGS16(x):=typedef modm::Flags16< x > x ## _t" \
-                         "MODM_FLAGS32(x):=typedef modm::Flags32< x > x ## _t" \
+                         "MODM_FLAGS8(x):=using x ## _t = modm::Flags8< x >" \
+                         "MODM_FLAGS16(x):=using x ## _t = modm::Flags16< x >" \
+                         "MODM_FLAGS32(x):=using x ## _t = modm::Flags32< x >" \
                          MODM_TYPE_FLAGS(x)= \
                          MODM_INT_TYPE_FLAGS(x)= \
                          __attribute__(x)= \
-                         modm_packed=
+                         modm_packed= \
+                         modm_extern_c="extern \"C\""
