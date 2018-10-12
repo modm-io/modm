@@ -27,7 +27,7 @@ namespace modm
 		/**
 		 * \internal
 		 * \brief	Interface used to transmit data through a slave object
-		 * 
+		 *
 		 * \ingroup	amnb
 		 */
 		class Transmitter
@@ -36,68 +36,68 @@ namespace modm
 			virtual void
 			send(bool acknowledge, const void *payload, uint8_t payloadLength) = 0;
 		};
-		
+
 		/**
 		 * \brief	Response object for an action call
-		 * 
+		 *
 		 * \ingroup	amnb
 		 */
 		class Response
 		{
 			template <typename I>
 			friend class Node;
-			
+
 		public:
 			/**
 			 * \brief	Signal an error condition
-			 * 
+			 *
 			 * \param 	errorCode	Error code. Values below 0x20 are reserved
 			 * 						for the system, feel free to use any other
 			 * 						value for specific error conditions.
-			 * 
+			 *
 			 * \see		modm::amnb::Error
 			 */
 			void
 			error(uint8_t errorCode = ERROR_GENERAL_ERROR);
-			
+
 			/**
 			 * \brief	Send a response without any data
 			 */
 			void
 			send();
-			
+
 			/**
 			 * \brief	Send a response with an attached payload
-			 * 
+			 *
 			 * \param	payload		Pointer to the payload
 			 * \param	length		Number of bytes
 			 */
 			void
 			send(const void *payload, std::size_t length);
-			
+
 			/**
 			 * \brief	Send a response with an attached payload
 			 */
 			template <typename T>
 			modm_always_inline void
 			send(const T& payload);
-			
+
 		protected:
 			Response(Transmitter *parent);
-			
+
 			Response(const Response&);
-			
+
 			Response&
 			operator = (const Response&);
-			
+
 			Transmitter *transmitter;
 			bool triggered;				///< is used by amnp::Node to check that a response was send
 		};
-		
+
 		/**
 		 * \brief	Base-class for every object which should be used inside
 		 * 			a callback.
-		 * 
+		 *
 		 * Example:
 		 * \code
 		 * class Sensor : public modm::amnb::Callable
@@ -108,86 +108,86 @@ namespace modm
 		 *     {
 		 *         response.send(this->value);
 		 *     }
-		 *     
+		 *
 		 *     // ...
-		 *     
+		 *
 		 * private:
 		 *     int8_t value;
 		 * };
 		 * \endcode
-		 * 
+		 *
 		 * A complete example is available in the \c example/amnb folder.
-		 * 
+		 *
 		 * \see		modm::amnb::Node
 		 * \ingroup	amnb
 		 */
 		struct Callable
 		{
 		};
-		
+
 		/**
 		 * \brief	Possible Action
-		 * 
+		 *
 		 * \see		AMNB_ACTION()
 		 * \ingroup	amnb
 		 */
 		struct Action
 		{
 			typedef void (Callable::*Callback)(Response& response, const void *payload);
-			
+
 			inline void
 			call(Response& response, const void *payload);
-			
+
 			uint8_t command;
 			uint8_t payloadLength;		//!< Payload length in bytes
 			Callable *object;
 			Callback function;			//!< Method callActionback
 		};
-		
+
 		/**
 		 * \brief	Possible Listener
-		 * 
+		 *
 		 * \see		AMNB_LISTEN()
 		 * \ingroup	amnb
 		 */
 		struct Listener
 		{
 			typedef void (Callable::*Callback)(const void *payload, const uint8_t length, const uint8_t sender);
-			
+
 			inline void
 			call(const void *payload, const uint8_t length, const uint8_t sender);
-			
+
 			uint8_t address;			//!< Address of transmitting node
 			uint8_t command;
 			Callable *object;
 			Callback function;			//!< Method callActionback
 		};
-		
+
 		/**
 		 * \brief	Possible Error
-		 * 
+		 *
 		 * \see		AMNB_ERROR()
 		 * \ingroup	amnb
 		 */
 		struct ErrorHandler
 		{
 			typedef void (Callable::*Callback)(Flags type, const uint8_t errorCode);
-			
+
 			inline void
 			call(Flags type, const uint8_t errorCode);
-			
+
 			uint8_t address;			//!< Node address of message
 			uint8_t command;			//!< Command of message
 			Callable *object;
 			Callback function;			//!< Method callActionback
 		};
-		
+
 		/**
 		 * \brief	AMNB Node
-		 * 
+		 *
 		 * \code
 		 * typedef modm::amnb::Node< modm::amnb::Interface< modm::BufferedUart0 > > Node;
-		 * 
+		 *
 		 * FLASH_STORAGE(modm::amnb::Action actionList[]) =
 		 * {
 		 *     AMNB_ACTION(0x57, object, Object::method1,  0),
@@ -203,7 +203,7 @@ namespace modm
 		 * {
 		 *     AMNB_LISTEN(0x29, 0x46,	object, Object::method)
 		 * };
-		 * 
+		 *
 		 * int
 		 * main()
 		 * {
@@ -216,16 +216,16 @@ namespace modm
 		 *               sizeof(listenList) / sizeof(modm::amnb::Listener),
 		 *               modm::accessor::asFlash(errorHandlerList),
 		 *               sizeof(errorHandlerList) / sizeof(modm::amnb::ErrorHandler));
-		 *     
+		 *
 		 *     while(1)
 		 *     {
 		 *         node.update();
 		 *     }
 		 * }
 		 * \endcode
-		 * 
+		 *
 		 * A complete example is available in the \c example/amnb folder.
-		 * 
+		 *
 		 * \author	Fabian Greif, Niklas Hauser
 		 * \ingroup	amnb
 		 */
@@ -235,7 +235,7 @@ namespace modm
 		public:
 			/**
 			 * \brief	Initialize the node
-			 * 
+			 *
 			 * \param	address		Own address
 			 * \param	actionList	List of all action callbacks, need to be
 			 * 						stored in flash-memory
@@ -254,22 +254,22 @@ namespace modm
 			Node(uint8_t address, modm::accessor::Flash<Action> actionList, uint8_t actionCount,
 				 modm::accessor::Flash<Listener> listenList, uint8_t listenCount,
 				 modm::accessor::Flash<ErrorHandler> errorHandlerList, uint8_t errorHandlerCount);
-			
+
 			/**
 			 * \brief	Initialize the node without error handlers
 			 */
 			Node(uint8_t address, modm::accessor::Flash<Action> actionList, uint8_t actionCount,
 				 modm::accessor::Flash<Listener> listenList, uint8_t listenCount);
-			
+
 			/**
 			 * \brief	Initialize the node without listeners or error handlers
 			 */
 			Node(uint8_t address, modm::accessor::Flash<Action> actionList, uint8_t actionCount);
-			
+
 			/**
 			 * \brief	Start a new query with a payload
-			 * 
-			 * \param slaveAddress	
+			 *
+			 * \param slaveAddress
 			 * \param command
 			 * \param payload
 			 * \param responseLength	Expected payload length of the response
@@ -279,12 +279,12 @@ namespace modm
 			bool
 			query(uint8_t slaveAddress, uint8_t command,
 				  const T& payload, uint8_t responseLength);
-			
+
 			template <typename T>
 			bool
 			query(uint8_t slaveAddress, uint8_t command,
 				  const void *payload, uint8_t payloadLength, uint8_t responseLength);
-			
+
 			/**
 			 * \brief	Start a new query without any payload
 			 *
@@ -292,7 +292,7 @@ namespace modm
 			 */
 			bool
 			query(uint8_t slaveAddress, uint8_t command, uint8_t responseLength);
-			
+
 			/**
 			 * \brief	Start a new broadcast with a payload
 			 *
@@ -303,7 +303,7 @@ namespace modm
 			template <typename T>
 			bool
 			broadcast(uint8_t command, const T& payload);
-			
+
 			/**
 			 * \brief	Start a new broadcast with a payload
 			 *
@@ -314,7 +314,7 @@ namespace modm
 			 */
 			bool
 			broadcast(uint8_t command, const void *payload, uint8_t payloadLength);
-			
+
 			/**
 			 * \brief	Start a new broadcast without any payload
 			 *
@@ -322,59 +322,59 @@ namespace modm
 			 */
 			bool
 			broadcast(uint8_t command);
-			
+
 			bool
 			isQueryCompleted();
-			
+
 			/**
 			 * \brief	Check if the last query could be performed successful
-			 * 
+			 *
 			 * Only valid if isQueryCompleted() returns \c true.
-			 * 
+			 *
 			 * \return	\c true if the query was successful. Use getResponse() to
 			 * 			access the result.
 			 */
 			bool
 			isSuccess();
-			
+
 			/**
 			 * \brief	Check error code
-			 * 
+			 *
 			 * Only valid if isQueryCompleted() returns \c true while
 			 * isSuccess() returns \c false.
-			 * 
+			 *
 			 * \return	Error code
 			 * \see		modm::amnb::Error
 			 */
 			uint8_t
 			getErrorCode();
-			
-			
+
+
 			template <typename T>
 			inline const T *
 			getResponse();
-			
+
 			inline const void *
 			getResponse();
-			
+
 			/**
 			 * \brief	Receive and process messages
-			 * 
+			 *
 			 * This method will decode the incoming messages and call the
 			 * corresponding callback methods from the action list. It must
 			 * be called periodically, best in every main loop cycle.
 			 */
 			void
 			update();
-			
+
 		protected:
 			void
 			send(bool acknowledge, const void *payload, uint8_t payloadLength);
-			
+
 			bool
 			checkErrorHandlers(uint8_t address, uint8_t command, Flags type, uint8_t errorCode);
-			
-			
+
+
 			uint8_t ownAddress;
 			modm::accessor::Flash<Action> actionList;
 			uint8_t actionCount;
@@ -382,10 +382,10 @@ namespace modm
 			uint8_t listenCount;
 			modm::accessor::Flash<ErrorHandler> errorHandlerList;
 			uint8_t errorHandlerCount;
-			
+
 			uint8_t currentCommand;
 			Response response;
-			
+
 			enum QueryStatus
 			{
 				IN_PROGRESS,			///< Query in progress
@@ -394,12 +394,12 @@ namespace modm
 				ERROR_TIMEOUT = 0x41,	///< No message received within the timeout window
 				ERROR_PAYLOAD = 0x42,	///< Wrong payload size
 			};
-			
+
 			QueryStatus queryStatus;
 			uint8_t expectedAddress;
 			uint8_t expectedResponseLength;
 			modm::ShortTimeout timer;
-			
+
 			static const uint8_t timeout = 10;		///< timeout value in milliseconds
 		};
 	}
@@ -408,7 +408,7 @@ namespace modm
 #ifdef __DOXYGEN__
 	/**
 	 * \brief	Define a amnb::Action
-	 * 
+	 *
 	 * Example:
 	 * \code
 	 * class Sensor : public modm::amnb::Callable
@@ -419,37 +419,37 @@ namespace modm
 	 *     {
 	 *         response.send(this->value);
 	 *     }
-	 *     
+	 *
 	 *     void
 	 *     doSomething(modm::amnb::Response& response, const uint32_t* parameter)
 	 *     {
 	 *         // ... do something useful ...
-	 *         
+	 *
 	 *         response.send();
 	 *     }
-	 *     
+	 *
 	 *     // ...
-	 *     
+	 *
 	 * private:
 	 *     int8_t value;
 	 * };
-	 * 
+	 *
 	 * Sensor sensor;
-	 * 
+	 *
 	 * FLASH_STORAGE(modm::amnb::Action actionList[]) =
 	 * {
 	 *     AMNB_ACTION(0x57, sensor, Sensor::sendValue,   0),
 	 *     AMNB_ACTION(0x03, sensor, Sensor::doSomething, sizeof(uint32_t)),
 	 * };
 	 * \endcode
-	 * 
+	 *
 	 * A complete example is available in the \c example/amnb folder.
-	 * 
+	 *
 	 * \param	command		Command byte
-	 * \param	object		
+	 * \param	object
 	 * \param	function	Member function of object
 	 * \param	length		Parameter size in bytes
-	 * 
+	 *
 	 * \see		modm::amnb::Action
 	 * \ingroup	amnb
 	 */
@@ -467,7 +467,7 @@ namespace modm
 #ifdef __DOXYGEN__
 	/**
 	 * \brief	Define a amnb::Listener
-	 * 
+	 *
 	 * Example:
 	 * \code
 	 * class ListenToNodes : public modm::amnb::Callable
@@ -477,34 +477,34 @@ namespace modm
 	 *     listenToCommand(uint8_t *payload, const uint8_t length, uint8_t sender)
 	 *     {
 	 *         // ... do something useful ...
-	 *         
+	 *
 	 *     }
 	 *
 	 *     void
 	 *     listenToCommandWithOutCaringForSender(uint8_t *payload, const uint8_t length)
 	 *     {
 	 *         // ... do something useful ...
-	 *         
+	 *
 	 *     }
-	 *     
+	 *
 	 *     // ...
 	 * };
-	 * 
+	 *
 	 * ListenToNodes listen;
-	 * 
+	 *
 	 * FLASH_STORAGE(modm::amnb::Listener listenList[]) =
 	 * {
 	 *     AMNB_LISTEN(0x46, 0x03, listen, ListenToNodes::listenToCommand),
 	 * };
 	 * \endcode
-	 * 
+	 *
 	 * A complete example is available in the \c example/amnb folder.
-	 * 
+	 *
 	 * \param	address		Address of the transmitting node
 	 * \param	command		Command byte
-	 * \param	object		
+	 * \param	object
 	 * \param	function	Member function of object
-	 * 
+	 *
 	 * \see		modm::amnb::Listener
 	 * \ingroup	amnb
 	 */
@@ -521,7 +521,7 @@ namespace modm
 #ifdef __DOXYGEN__
 	/**
 	 * \brief	Define a amnb::ErrorHandler
-	 * 
+	 *
 	 * Example:
 	 * \code
 	 * class handleErrors : public modm::amnb::Callable
@@ -531,27 +531,27 @@ namespace modm
 	 *     errorForCommand(modm::amnb::Flags type, const uint8_t errorCode)
 	 *     {
 	 *         // ... do something useful with that information ...
-	 *         
+	 *
 	 *     }
-	 *     
+	 *
 	 *     // ...
 	 * };
-	 * 
+	 *
 	 * handleErrors errorhandler;
-	 * 
+	 *
 	 * FLASH_STORAGE(modm::amnb::Listener listenList[]) =
 	 * {
 	 *     AMNB_LISTEN(0x37, 0x57, errorhandler, handleErrors::errorForCommand),
 	 * };
 	 * \endcode
-	 * 
+	 *
 	 * A complete example is available in the \c example/amnb folder.
-	 * 
+	 *
 	 * \param	address		Node address of message
 	 * \param	command		Command of message
-	 * \param	object		
+	 * \param	object
 	 * \param	function	Member function of object
-	 * 
+	 *
 	 * \see		modm::amnb::ErrorHandler
 	 * \ingroup	amnb
 	 */

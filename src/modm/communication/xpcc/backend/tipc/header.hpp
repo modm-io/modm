@@ -25,13 +25,13 @@ namespace xpcc
 		 * \ingroup tipc
 		 */
 		static const unsigned int TYPE_ID_OFFSET = 64;
-		
+
 		/// \ingroup tipc
 		static const unsigned int EVENT_OFFSET   = 0x10000;
-		
+
 		/// \ingroup tipc
 		static const unsigned int REQUEST_OFFSET = 0x20000;
-		
+
 		/**
 		 * \brief		The header, that are send over the tipc.
 		 *

@@ -25,11 +25,11 @@ namespace modm
 	namespace sab
 	{
 		/**
-		 * 
+		 *
 		 * Requires modm::Clock to be implemented.
-		 * 
+		 *
 		 * \see	modm::Clock
-		 * 
+		 *
 		 * \author	Fabian Greif
 		 * \ingroup modm_communication_sab
 		 */
@@ -39,70 +39,70 @@ namespace modm
 		public:
 			static void
 			initialize();
-			
+
 			/**
 			 * \brief	Start a new query with a payload
-			 * 
-			 * \param slaveAddress	
-			 * \param command		
-			 * \param payload		
+			 *
+			 * \param slaveAddress
+			 * \param command
+			 * \param payload
 			 * \param responseLength	Expected payload length of the response
 			 */
 			template <typename T>
 			static void
 			query(uint8_t slaveAddress, uint8_t command,
 					const T& payload, uint8_t responseLength);
-			
-			
+
+
 			static void
 			query(uint8_t slaveAddress, uint8_t command,
 				  const void *payload, uint8_t payloadLength, uint8_t responseLength);
-			
+
 			/**
 			 * \brief	Start a new query without any payload
-			 * 
+			 *
 			 */
 			static void
 			query(uint8_t slaveAddress, uint8_t command, uint8_t responseLength);
-			
+
 			static bool
 			isQueryCompleted();
-			
+
 			/**
 			 * \brief	Check if the last query could be performed successfully
-			 * 
+			 *
 			 * Only valid if isQueryCompleted() returns \c true.
-			 * 
+			 *
 			 * \return	\c true if the query was successful. Use getResponse() to
 			 * 			access the result.
 			 */
 			static bool
 			isSuccess();
-			
+
 			/**
 			 * \brief	Check error code
-			 * 
+			 *
 			 * Only valid if isQueryCompleted() returns \c true while
 			 * isSuccess() returns \c false.
-			 * 
+			 *
 			 * \return	Error code
 			 * \see		modm::sab::Error
 			 */
 			static uint8_t
 			getErrorCode();
-			
-			
+
+
 			template <typename T>
 			static inline const T *
 			getResponse();
-			
+
 			static inline const uint8_t *
 			getResponse();
-			
-			
+
+
 			static void
 			update();
-			
+
 		protected:
 			enum QueryStatus
 			{
@@ -112,13 +112,13 @@ namespace modm
 				ERROR_TIMEOUT = 0x41,	///< No message received within the timeout window
 				ERROR_PAYLOAD = 0x42,	///< Wrong payload size
 			};
-			
+
 			static Interface interface;
-			
+
 			static QueryStatus queryStatus;
 			static uint8_t expectedResponseLength;
 			static modm::ShortTimeout timer;
-			
+
 			static const uint8_t timeout = 10;		///< timeout value in milliseconds
 		};
 	}

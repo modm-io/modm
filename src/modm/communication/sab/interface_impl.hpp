@@ -49,12 +49,12 @@ modm::sab::Interface<Device>::initialize()
 
 template <typename Device>
 void
-modm::sab::Interface<Device>::sendMessage(uint8_t address, Flags flags, 
+modm::sab::Interface<Device>::sendMessage(uint8_t address, Flags flags,
 		uint8_t command,
 		const void *payload, uint8_t payloadLength)
 {
 	uint8_t crcSend;
-	
+
 	Device::write(syncByte);
 	Device::write(payloadLength);
 	crcSend = crcUpdate(crcInitialValue, payloadLength);
@@ -62,7 +62,7 @@ modm::sab::Interface<Device>::sendMessage(uint8_t address, Flags flags,
 	crcSend = crcUpdate(crcSend, address | flags);
 	Device::write(command);
 	crcSend = crcUpdate(crcSend, command);
-	
+
 	const uint8_t *ptr = static_cast<const uint8_t *>(payload);
 	for (uint_fast8_t i = 0; i < payloadLength; ++i)
 	{
@@ -70,7 +70,7 @@ modm::sab::Interface<Device>::sendMessage(uint8_t address, Flags flags,
 		Device::write(*ptr);
 		ptr++;
 	}
-	
+
 	Device::write(crcSend);
 }
 
@@ -169,7 +169,7 @@ modm::sab::Interface<Device>::update()
 					state = LENGTH;
 				}
 				break;
-			
+
 			case LENGTH:
 				if (byte > maxPayloadLength) {
 					state = SYNC;
@@ -181,11 +181,11 @@ modm::sab::Interface<Device>::update()
 					state = DATA;
 				}
 				break;
-			
+
 			case DATA:
 				buffer[position] = byte;
 				crc = crcUpdate(crc, byte);
-				
+
 				position += 1;
 				if (position >= length) {
 					if (crc == 0) {
@@ -198,7 +198,7 @@ modm::sab::Interface<Device>::update()
 					state = SYNC;
 				}
 				break;
-			
+
 			default:
 				state = SYNC;
 				break;

@@ -28,7 +28,7 @@ modm::amnb::Clock::now()
 		atomic::Lock lock;
 		tempTime = time;
 	}
-	
+
 	return Timestamp(tempTime);
 }
 
@@ -61,10 +61,10 @@ modm::amnb::crcUpdate(uint8_t crc, uint8_t data)
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT> typename modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::State \
 	modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::state = SYNC;
 
-template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT> 
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 uint8_t modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::rx_buffer[maxPayloadLength + 3];
 
-template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT> 
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 uint8_t modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::tx_buffer[maxPayloadLength + 4];
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
@@ -131,14 +131,14 @@ modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::writeMessage()
 	uint8_t check;
 	transmitting = true;
 	Device::resetErrorFlags();
-	
+
 	for (uint_fast8_t i=0; i < lengthOfTransmitMessage; ++i) {
 		Device::write(tx_buffer[i]);
-		
+
 		// try and read the transmitted byte back but do not wait infinity
 		uint16_t count(0);
 		while (!Device::read(check) && (++count <= 1000)) ;
-		
+
 		// if the read timed out or framing error occurred or content mismatch
 		if ((count > 1000) || Device::readErrorFlags() || (check != tx_buffer[i])) {
 			// stop transmitting, signal the collision
@@ -153,11 +153,11 @@ modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::writeMessage()
 			return false;
 		}
 	}
-	
+
 #if AMNB_TIMING_DEBUG
 	latency = modm::Clock::now() - latency;
 #endif
-	
+
 	messageSent = true;
 	hasMessageToSend = false;
 	transmitting = false;
@@ -166,13 +166,13 @@ modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::writeMessage()
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 bool
-modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::sendMessage(uint8_t address, Flags flags, 
+modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::sendMessage(uint8_t address, Flags flags,
 		uint8_t command,
 		const void *payload, uint8_t payloadLength)
 {
 	 // dont overwrite the buffer when transmitting
 	if (transmitting) return false;
-	
+
 	hasMessageToSend = false;
 	messageSent = false;
 	uint8_t crc;
@@ -180,16 +180,16 @@ modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::sendMessage(uint8_t address, 
 #if AMNB_TIMING_DEBUG
 	latency = modm::Clock::now();
 #endif
-	
+
 	tx_buffer[0] = syncByte;
 	tx_buffer[1] = payloadLength;
 	tx_buffer[2] = address | flags;
 	tx_buffer[3] = command;
-	
+
 	crc = crcUpdate(crcInitialValue, payloadLength);
 	crc = crcUpdate(crc, address | flags);
 	crc = crcUpdate(crc, command);
-	
+
 	const uint8_t *ptr = static_cast<const uint8_t *>(payload);
 	uint_fast8_t i=0;
 	for (; i < payloadLength; ++i)
@@ -198,9 +198,9 @@ modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::sendMessage(uint8_t address, 
 		tx_buffer[i+4] = *ptr;
 		ptr++;
 	}
-	
+
 	tx_buffer[i+4] = crc;
-	
+
 	lengthOfTransmitMessage = payloadLength + 5;
 	hasMessageToSend = true;
 	return true;
@@ -333,10 +333,10 @@ modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::update()
 			// collision has been detected
 			rescheduleTransmit = true;
 			Device::resetErrorFlags();
-			
+
 			// erase the message in the buffer
 			Device::flushReceiveBuffer();
-			
+
 			// and wait for a random amount of time before sending again
 			rescheduleTimeout = static_cast<uint8_t>(rand());
 			rescheduleTimer.restart(rescheduleTimeout % TIMEOUT);
@@ -346,13 +346,13 @@ modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::update()
 #endif
 			return;
 		}
-		
+
 		switch (state)
 		{
 			case SYNC:
 				if (byte == syncByte) state = LENGTH;
 				break;
-			
+
 			case LENGTH:
 				if (byte > maxPayloadLength) {
 					state = SYNC;
@@ -364,30 +364,30 @@ modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::update()
 					state = DATA;
 				}
 				break;
-			
+
 			case DATA:
 				rx_buffer[position++] = byte;
 				crc = crcUpdate(crc, byte);
-				
+
 				if (position >= length)
 				{
 					if (crc == 0) lengthOfReceivedMessage = length;
 					state = SYNC;
 				}
 				break;
-			
+
 			default:
 				state = SYNC;
 				break;
 		}
-		
+
 		resetTimer.restart(resetTimeout);
 	}
 	if ((state != SYNC) && resetTimer.isExpired()) state = SYNC;
-	
+
 	// check if we have waited for a random amount of time
 	if (rescheduleTransmit && rescheduleTimer.isExpired()) rescheduleTransmit = false;
-	
+
 	if (hasMessageToSend && !rescheduleTransmit && !transmitting && (state == SYNC)) {
 		// if channel is free, send with probability P
 		if (rescheduleTimeout < static_cast<uint8_t>(2.56f * PROBABILITY)) {

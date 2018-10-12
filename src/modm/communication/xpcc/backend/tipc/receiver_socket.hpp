@@ -24,37 +24,37 @@ namespace xpcc {
 		/**
 		 * \class		ReceiverSocket
 		 * \brief		Provide the handling of the socket interface from TIPC.
-		 * 
+		 *
 		 * \ingroup		tipc
 		 * \author		Carsten Schmitt < >
 		 */
 		class ReceiverSocket {
-			public:	
+			public:
 				ReceiverSocket();
 				~ReceiverSocket();
-		
-				void 
+
+				void
 				registerOnPacket(	unsigned int typeId,
 									unsigned int lowerInstance,
 									unsigned int upperInstance);
-		
+
 				/**
 				 * \param transmitterPortId the id of the tipc port, that transmitted the message is returned
 				 * \param tipcHeader the tipc header is returned
 				 */
-				bool 
+				bool
 				receiveHeader(
 						uint32_t & transmitterPortId,
 						tipc::Header & tipcHeader );
-				
-				bool 
+
+				bool
 				receivePayload(
 						uint8_t* payloadPointer,
 						size_t payloadLength);
-				
-				bool 
+
+				bool
 				popPayload();
-		
+
 			private:
 				const int socketDescriptor_;
 		};

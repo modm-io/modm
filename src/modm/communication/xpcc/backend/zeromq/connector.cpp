@@ -97,7 +97,7 @@ ZeroMQConnector::sendPacket(const Header &header, modm::SmartPointer payload)
 #	if ZMQPP_VERSION_MAJOR >= 4
 	/**
 	* Breaking change in 4.1.1:
-	* Removed message::add(pointer, size_t) as there were situations it conflicts with the new easier 
+	* Removed message::add(pointer, size_t) as there were situations it conflicts with the new easier
 	* to use templated add. This has been replaced with a message::add_raw(pointer, size_t) method.
 	* https://github.com/zeromq/zmqpp/blob/develop/CHANGES.md
 	*/

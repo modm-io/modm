@@ -91,14 +91,14 @@ modm::rpr::Interface<Device, N>::sendMessage(uint16_t destination,
 											   std::size_t payloadLength)
 {
 	Message message;
-	
+
 	message.type = type;
 	message.destination = destination;
 	message.source = _address;
 	message.command = command;
 	message.payload = static_cast<uint8_t *>(const_cast<void *>(payload));
 	message.length = payloadLength;
-	
+
 	return sendMessage(&message);
 }
 
@@ -146,28 +146,28 @@ void
 modm::rpr::Interface<Device, N>::update()
 {
 	uint8_t data;
-	
+
 	if (status & STATUS_END_DELIMITER_RECEIVED && !messagesToSend.isEmpty())
 	{
 		writeMessage(getMessage(messagesToSend));
 		popMessage(messagesToSend);
 	}
-	
+
 	while (Device::read(data))
 	{
 		MODM_RPR_LOG("receiving raw " << modm::hex << data << modm::ascii);
-		
+
 		if (data == startDelimiterByte)
 		{
 			status &= ~STATUS_END_DELIMITER_RECEIVED;
 			status |= STATUS_START_DELIMITER_RECEIVED;
 
 			MODM_RPR_LOG("start delimiter");
-			
+
 			crc = crcInitialValue;
 			length = 0;
 			nextEscaped = false;
-			
+
 			// we do not send the frame boundaries here, but wait for the AC.
 		}
 		else if (data == endDelimiterByte)
@@ -176,14 +176,14 @@ modm::rpr::Interface<Device, N>::update()
 			{
 				status &= ~STATUS_START_DELIMITER_RECEIVED;
 				status |= STATUS_END_DELIMITER_RECEIVED;
-				
+
 				if (!(status & STATUS_SOURCE_RECOGNISED) && (receiveBuffer.type != MESSAGE_TYPE_UNICAST))
 				{
 					MODM_RPR_LOG("tx: forwarding endDelimiterByte");
 					Device::write(endDelimiterByte);
 				}
 				MODM_RPR_LOG("end delimiter with length=" << length);
-				
+
 				if (status & STATUS_DESTINATION_RECOGNISED)
 				{
 					if (crc == 0)
@@ -224,11 +224,11 @@ modm::rpr::Interface<Device, N>::update()
 				MODM_RPR_LOG("data escaped");
 			}
 			// all data is now escaped
-			
+
 			// make sure we actually received a start delimiter before the payload
 			if (!(status & STATUS_START_DELIMITER_RECEIVED))
 				return;
-			
+
 			switch (length++)
 			{
 				// LSB of destination address
@@ -236,7 +236,7 @@ modm::rpr::Interface<Device, N>::update()
 					MODM_RPR_LOG("rx: LSB dest");
 					addressBuffer = data;
 					break;
-					
+
 					// MSB of destination address
 				case 1:
 				{
@@ -247,7 +247,7 @@ modm::rpr::Interface<Device, N>::update()
 					receiveBuffer.type = MESSAGE_TYPE_ANY;
 					receiveBuffer.destination = dest;
 					receiveBuffer.length = 0;
-					
+
 					// it is a broadcast, we need to listen
 					if (receiveBuffer.destination == ADDRESS_BROADCAST)
 					{
@@ -277,7 +277,7 @@ modm::rpr::Interface<Device, N>::update()
 							}
 						}
 					}
-					
+
 					if (status & STATUS_DESTINATION_RECOGNISED)
 					{
 						crc = crcUpdate(crc, addressBuffer);
@@ -285,13 +285,13 @@ modm::rpr::Interface<Device, N>::update()
 					}
 				}
 					break;
-					
+
 					// LSB of source address
 				case 2:
 					MODM_RPR_LOG("rx: LSB source");
 					addressBuffer = data;
 					break;
-					
+
 					// MSB of Source Address
 				case 3:
 				{
@@ -299,25 +299,25 @@ modm::rpr::Interface<Device, N>::update()
 					// check the source address against our own
 					uint16_t source = (data << 8) | addressBuffer;
 					receiveBuffer.source = (source & ADDRESS_VALUE);
-					
+
 					if (_address == receiveBuffer.source)
 					{
 						status |= STATUS_SOURCE_RECOGNISED;
 					}
-					
+
 					if (status & STATUS_DESTINATION_RECOGNISED)
 					{
 						crc = crcUpdate(crc, addressBuffer);
 						crc = crcUpdate(crc, data);
 					}
-					
+
 					if (!(status & STATUS_SOURCE_RECOGNISED) && (receiveBuffer.type != MESSAGE_TYPE_UNICAST))
 					{
 						MODM_RPR_LOG("tx: forwarding destination");
 						Device::write(startDelimiterByte);
 						writeByteEscaped(receiveBuffer.destination);
 						writeByteEscaped(receiveBuffer.destination >> 8);
-						
+
 						MODM_RPR_LOG("tx: forwarding source");
 						writeByteEscaped(addressBuffer);
 						writeByteEscaped(data);
@@ -328,7 +328,7 @@ modm::rpr::Interface<Device, N>::update()
 
 				}
 					break;
-					
+
 				default:
 					if (status & STATUS_DESTINATION_RECOGNISED)
 					{
@@ -346,7 +346,7 @@ modm::rpr::Interface<Device, N>::update()
 							MODM_RPR_LOG("rx: buffer overflow!!!");
 						}
 					}
-					
+
 					if (!(status & STATUS_SOURCE_RECOGNISED) && (receiveBuffer.type != MESSAGE_TYPE_UNICAST))
 					{
 						MODM_RPR_LOG("forwarding payload");
@@ -382,10 +382,10 @@ void
 modm::rpr::Interface<Device, N>::writeMessage(Message *message)
 {
 	uint16_t crc = crcInitialValue;
-	
+
 	// Start Delimiter
 	Device::write(startDelimiterByte);
-	
+
 	// HEADER
 	uint16_t destination = message->destination;
 	// Destination Address
@@ -398,24 +398,24 @@ modm::rpr::Interface<Device, N>::writeMessage(Message *message)
 		if (message->type == MESSAGE_TYPE_MULTICAST)
 			destination |= ADDRESS_INDIVIDUAL_GROUP;
 	}
-	
+
 	writeByteEscaped(destination);
 	crc = crcUpdate(crc, destination);
 	writeByteEscaped(destination >> 8);
 	crc = crcUpdate(crc, destination >> 8);
-	
+
 	// Source Address
 	// LSB first
 	writeByteEscaped(message->source);
 	crc = crcUpdate(crc, message->source);
 	writeByteEscaped(message->source >> 8);
 	crc = crcUpdate(crc, message->source >> 8);
-	
+
 	// PAYLOAD
 	// Command
 	writeByteEscaped(message->command);
 	crc = crcUpdate(crc, message->command);
-	
+
 	// Optional Payload
 	std::size_t i = 0;
 	while (i < message->length)
@@ -424,14 +424,14 @@ modm::rpr::Interface<Device, N>::writeMessage(Message *message)
 		crc = crcUpdate(crc, message->payload[i]);
 		i++;
 	}
-	
+
 	// FCS
 	writeByteEscaped(crc);
 	writeByteEscaped(crc >> 8);
-	
+
 	// End Delimiter
 	Device::write(endDelimiterByte);
-	
+
 	popMessage(messagesToSend);
 }
 
@@ -484,7 +484,7 @@ modm::rpr::Interface<Device, N>::getMessage(Queue &queue)
 {
 	if (queue.isEmpty())
 		return 0;
-	
+
 	return &queue.get();
 }
 
@@ -496,7 +496,7 @@ modm::rpr::Interface<Device, N>::moveMessage(Queue &destination, Queue &source)
 	// just move what is essential
 	if (source.isEmpty())
 		return false;
-	
+
 	MODM_RPR_LOG("moving");
 	destination.push(source.get());
 	source.pop();

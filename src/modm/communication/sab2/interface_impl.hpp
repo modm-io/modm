@@ -45,19 +45,19 @@ modm::sab2::Interface<Device, N>::initialize()
 
 template <typename Device, std::size_t N>
 void
-modm::sab2::Interface<Device, N>::sendMessage(uint8_t address, Flags flags, 
+modm::sab2::Interface<Device, N>::sendMessage(uint8_t address, Flags flags,
 		uint8_t command,
 		const void *payload, Size payloadLength)
 {
 	uint16_t crcSend = crcInitialValue;
-	
+
 	Device::write(frameBounderyByte);
-	
+
 	writeByteEscaped(address | flags);
 	crcSend = crcUpdate(crcSend, address | flags);
 	writeByteEscaped(command);
 	crcSend = crcUpdate(crcSend, command);
-	
+
 	const uint8_t *ptr = static_cast<const uint8_t *>(payload);
 	for (uint_fast8_t i = 0; i < payloadLength; ++i)
 	{
@@ -65,10 +65,10 @@ modm::sab2::Interface<Device, N>::sendMessage(uint8_t address, Flags flags,
 		writeByteEscaped(*ptr);
 		ptr++;
 	}
-	
+
 	writeByteEscaped(crcSend & 0xff);
 	writeByteEscaped(crcSend >> 8);
-	
+
 	Device::write(frameBounderyByte);
 }
 
@@ -159,7 +159,7 @@ modm::sab2::Interface<Device, N>::update()
 	while ((lengthOfReceivedMessage == 0) && Device::read(data))
 	{
 		//MODM_LOG_DEBUG.printf("%02x ", data);
-		
+
 		if (data == frameBounderyByte) {
 			if (nextEscaped) {
 				//MODM_LOG_ERROR << "framing error" << modm::endl;
@@ -174,7 +174,7 @@ modm::sab2::Interface<Device, N>::update()
 					}
 				}
 			}
-			
+
 			crc = crcInitialValue;
 			length = 0;
 			nextEscaped = false;
@@ -189,7 +189,7 @@ modm::sab2::Interface<Device, N>::update()
 				nextEscaped = false;
 				data = data ^ 0x20;	// toggle bit 5
 			}
-			
+
 			if (length >= (N+4)) {
 				// Error message to long
 				length = 0;
@@ -198,7 +198,7 @@ modm::sab2::Interface<Device, N>::update()
 			else {
 				buffer[length] = data;
 				length += 1;
-				
+
 				crc = crcUpdate(crc, data);
 			}
 		}
