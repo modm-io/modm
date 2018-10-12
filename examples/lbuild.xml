@@ -7,4 +7,7 @@
   <repositories>
   	<repository><path>../repo.lb</path></repository>
   </repositories>
+  <modules>
+  	<module>modm:docs</module>
+  </modules>
 </library>
