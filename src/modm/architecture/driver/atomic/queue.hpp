@@ -30,7 +30,7 @@ namespace modm
 		 * \brief	Interrupt save queue
 		 *
 		 * A maximum size of 254 is allowed for 8-bit mikrocontrollers.
-		 * 
+		 *
 		 * \todo	This implementation should work but could be improved
 		 */
 		template<typename T,
@@ -42,23 +42,23 @@ namespace modm
 			typedef typename modm::tmp::Select< (N >= 254),
 												uint16_t,
 												uint8_t >::Result Index;
-			
+
 			typedef Index Size;
-			
+
 		public:
 			Queue();
-			
+
 			modm_always_inline bool
 			isFull() const;
-			
+
 			modm_always_inline bool
 			isNotFull() const { return not isFull(); }
 
 			/**
 			 * \returns	\c false if less than three elements
 			 * 			can be stored in queue.
-			 * 
-			 * Only works with queue with more than three elements. 
+			 *
+			 * Only works with queue with more than three elements.
 			 */
 			bool
 			isNearlyFull() const;
@@ -68,10 +68,10 @@ namespace modm
 
 			modm_always_inline bool
 			isNotEmpty() const { return not isEmpty(); }
-			
+
 			/**
 			 * Check if the queue is nearly empty.
-			 * 
+			 *
 			 * \returns	\c true if less than three elements are stored
 			 * 			in the queue, \c false otherwise.
 			 *
@@ -80,23 +80,23 @@ namespace modm
 			 */
 			bool
 			isNearlyEmpty() const;
-			
+
 			modm_always_inline Size
 			getMaxSize() const;
-			
+
 			const T&
 			get() const;
-			
+
 			bool
 			push(const T& value);
-			
+
 			void
 			pop();
-	
+
 		private:
 			Index head;
 			Index tail;
-			
+
 			T buffer[N+1];
 		};
 	}

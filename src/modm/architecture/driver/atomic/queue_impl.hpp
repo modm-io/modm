@@ -33,7 +33,7 @@ modm::atomic::Queue<T, N>::isFull() const
 	if (tmphead >= (N+1)) {
 		tmphead = 0;
 	}
-	
+
 	return (tmphead == modm::accessor::asVolatile(this->tail));
 }
 
@@ -42,7 +42,7 @@ bool
 modm::atomic::Queue<T, N>::isNearlyFull() const
 {
 	static_assert(N > 3, "Not possible the check for 'nearly full' of such a small queue.");
-	
+
 	Index tmphead = modm::accessor::asVolatile(this->head);
 	Index tmptail = modm::accessor::asVolatile(this->tail);
 

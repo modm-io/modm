@@ -20,38 +20,38 @@
 /*
  * Align heapStart to two bytes after a four byte boundary. When using two
  * bytes for management the payload is aligned to four bytes.
- * 
+ *
  * (__heap_start % 4) -->  heapStart
  *             0      -->  __heap_start + 2
  *             1      -->  __heap_start + 1
  *             2      -->  __heap_start + 0
  *             3      -->  __heap_start + 3
- * 
+ *
  * In the consecutive blocks a four byte aligned word is shared by two
  * adjacent block for their management data. Consider the following example:
- * 
+ *
  * address:  0123 4567 89ab cdef 0123 4567 89ab cdef 0123 4567 89ab cdef 01
  *           UUmm pppp pppp pppp mmMM PPPP PPPP PPPP PPPP PPPP PPPP PPPP MM
- * 
+ *
  * 'U' = Unused
  * 'm' = Management data for block with payload 'pppp pppp pppp'
- * 'M' = Management data for double block with payload 
+ * 'M' = Management data for double block with payload
  * 			'PPPP PPPP PPPP PPPP PPPP PPPP PPPP'
- * 
+ *
  * Example:
  * heapStart = 0x0000 0000
  * heapEnd   = 0x0000 0040 (64 bytes)
  * blocksize = 16
- * 
+ *
  * start     = 0x0000 0002
  * memory    = 60
  * size      = 3
  * end       = 0x0000 0002 + 3 * 16 = 0x0000 0032
- * 
+ *
  * Memory Map:
  *       0123 4567 89ab cdef 0123 4567 89ab cdef
  * start --\
- *         v  
+ *         v
  *    0  UUmm pppp pppp pppp mmMM PPPP PPPP PPPP
  *    2  MMmm pppp pppp pppp mm
  *                             ^
@@ -62,57 +62,57 @@ modm_always_inline void
 modm::BlockAllocator<T, BLOCK_SIZE>::initialize(void * heapStart, void * heapEnd)
 {
 	start = alignPointer(heapStart);
-	
+
 	// 2(4) bytes needed for the management data at the end
 	uintptr_t memory = (uintptr_t) heapEnd - (uintptr_t) start - sizeof(T);
-	
+
 	// integer division which will automatically round down
 	std::size_t size = memory / (BLOCK_SIZE * sizeof(T));
-	 
+
 	end = (uint16_t *)((uintptr_t) start + (size * BLOCK_SIZE * sizeof(T)));
-	
+
 	*start = -size;
 	*(end - 1) = -size;
-	
+
 	freeHint = start;
 }
 
 // ----------------------------------------------------------------------------
-/* 
- * 
- * 
+/*
+ *
+ *
  */
 template <typename T, unsigned int BLOCK_SIZE >
 modm_always_inline void *
 modm::BlockAllocator<T, BLOCK_SIZE>::allocate(std::size_t requestedSize)
 {
 	requestedSize += 4;	// bytes needed for the management
-	
-	std::size_t neededSlots = (requestedSize + (BLOCK_SIZE * sizeof(T) - 1)) / 
+
+	std::size_t neededSlots = (requestedSize + (BLOCK_SIZE * sizeof(T) - 1)) /
 			(BLOCK_SIZE * sizeof(T));
-	
+
 	T *p = freeHint;
 	do
 	{
 		SignedType slots = *p;
-		
+
 		if (slots < 0)
 		{
 			// slots < 0 => free slots
 			slots = -slots;
-			
+
 			T freeSlots = slots;
 			if (freeSlots >= neededSlots)
 			{
-				// write the marker on the first an last slot of the field of 
+				// write the marker on the first an last slot of the field of
 				// new allocated slots
 				*p = neededSlots;
 				*(p + neededSlots * BLOCK_SIZE - 1) = neededSlots;
-				
+
 				if (freeSlots > neededSlots)
 				{
 					// if the allocated space are smaller than original one,
-					// than we get a new slice of free slots and need set the 
+					// than we get a new slice of free slots and need set the
 					// new marker for this field
 					*(p + neededSlots * BLOCK_SIZE) = -(freeSlots - neededSlots);
 					*(p + freeSlots  * BLOCK_SIZE - 1) = -(freeSlots - neededSlots);
@@ -120,11 +120,11 @@ modm::BlockAllocator<T, BLOCK_SIZE>::allocate(std::size_t requestedSize)
 				return (void *) (p + 1);
 			}
 		}
-		
+
 		p += slots * BLOCK_SIZE;
 	}
 	while (p < end);
-	
+
 	return 0;
 }
 
@@ -136,13 +136,13 @@ modm::BlockAllocator<T, BLOCK_SIZE>::free(void *ptr)
 	if (ptr == 0) {
 		return;
 	}
-	
+
 	T *p = (T *) ptr;
 	p -= 1;
-	
+
 	SignedType slots = *p;
 	T freeSlots = slots;
-	
+
 	// check whether the slots above are free
 	if (p + slots * BLOCK_SIZE < end) {
 		slots = *(p + slots * BLOCK_SIZE);
@@ -150,7 +150,7 @@ modm::BlockAllocator<T, BLOCK_SIZE>::free(void *ptr)
 			freeSlots += -slots;
 		}
 	}
-	
+
 	// check the slots below
 	if (p - 1 >= start) {
 		slots = *(p - 1);
@@ -159,14 +159,14 @@ modm::BlockAllocator<T, BLOCK_SIZE>::free(void *ptr)
 			freeSlots += -slots;
 		}
 	}
-	
+
 	// write the markers
 //	if (freeSlots > MAX_BLOCK_PARTS)
 //	{
 //		// memory area is to big, split it in two parts
 //		*p = -MAX_BLOCK_PARTS;
 //		*(p + MAX_BLOCK_PARTS * BLOCK_SIZE - 1) = -MAX_BLOCK_PARTS;
-//		
+//
 //		*(p + MAX_BLOCK_PARTS * BLOCK_SIZE) = -(freeSlots - MAX_BLOCK_PARTS);
 //		*(p + freeSlots * BLOCK_SIZE - 1) = -(freeSlots - MAX_BLOCK_PARTS);
 //	}
@@ -175,7 +175,7 @@ modm::BlockAllocator<T, BLOCK_SIZE>::free(void *ptr)
 		*p = -freeSlots;
 		*(p + freeSlots * BLOCK_SIZE - 1) = -freeSlots;
 //	}
-	
+
 	if (p < freeHint) {
 		freeHint = p;
 	}
@@ -188,21 +188,21 @@ modm::BlockAllocator<T, BLOCK_SIZE>::getAvailableSize() const
 {
 	T *p = start;
 	std::size_t size = 0;
-	
+
 	do {
 		SignedType slots = *p;
-		
+
 		if (slots < 0)
 		{
 			// slots < 0 => free slots
 			slots = -slots;
 			size += slots * BLOCK_SIZE * sizeof(T);
 		}
-		
+
 		p += slots * BLOCK_SIZE;
 	}
 	while (p < end);
-	
+
 	return size;
 }
 
@@ -218,6 +218,6 @@ modm::BlockAllocator<T, BLOCK_SIZE>::alignPointer(void * ptr) const
 #else
 	const uint8_t offset[4] = { 2, 1, 0, 3 };
 #endif
-	
+
 	return (T *) (((uintptr_t) ptr) + offset[misalignment]);
 }

@@ -41,14 +41,14 @@ namespace modm
 	class BlockAllocator
 	{
 		typedef typename modm::ArithmeticTraits<T>::SignedType SignedType;
-		
+
 	public:
 		/**
 		 * Initialize the raw memory.
-		 * 
+		 *
 		 * Needs to called before any calls to allocate() or free(). Must
 		 * be called only once!
-		 * 
+		 *
 		 * \param	heapStart
 		 * 		Needs to point to the first available byte
 		 * \param	heapEnd
@@ -57,38 +57,38 @@ namespace modm
 		 */
 		modm_always_inline void
 		initialize(void * heapStart, void * heapEnd);
-		
+
 		/**
 		 * Allocate memory
-		 * 
+		 *
 		 */
 		modm_always_inline void *
 		allocate(std::size_t requestedSize);
-		
+
 		/**
 		 * Free memory in O(1)
-		 * 
+		 *
 		 * \param	ptr
 		 * 		Must be the same pointer previously acquired by
 		 * 		allocate().
 		 */
 		modm_always_inline void
 		free(void *ptr);
-		
+
 	public:
 		std::size_t
 		getAvailableSize() const;
-		
+
 	private:
 		// Align the pointer to a multiple of MODM_ALIGNMENT
 		modm_always_inline T *
 		alignPointer(void * ptr) const;
-		
+
 		//static const int MAX_BLOCK_PARTS = 2048;
-		
+
 		T* start;
 		T* end;
-		
+
 		T* freeHint;
 	};
 }
