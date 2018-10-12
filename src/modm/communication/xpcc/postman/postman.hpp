@@ -28,7 +28,7 @@ namespace xpcc
 	 * The Postman class is responsible of delivering messages the the
 	 * components.
 	 *
-	 * \ingroup	xpcc_comm
+	 * \ingroup	modm_communication_xpcc
 	 */
 	class Postman
 	{

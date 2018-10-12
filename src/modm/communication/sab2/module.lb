@@ -13,6 +13,10 @@
 def init(module):
     module.parent = "communication"
     module.name = "sab2"
+    description = str(FileReader("../sab/module.md")).replace(
+                      "# Sensor Actuator Bus (SAB)",
+                      "# Sensor Actuator Bus Version 2 (SAB2)")
+    module.description = description
 
 def prepare(module, options):
     module.depends(

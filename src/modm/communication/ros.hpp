@@ -11,9 +11,4 @@
  */
 // ----------------------------------------------------------------------------
 
-/**
- * @ingroup		communication
- * @defgroup	ros_comm	ROS communication (rosserial)
- */
-
 #include "ros/ros_modm_hardware.hpp"

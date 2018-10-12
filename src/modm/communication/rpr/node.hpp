@@ -27,7 +27,7 @@ namespace modm
 		 * \internal
 		 * \brief	Interface used to transmit data through a slave object
 		 * 
-		 * \ingroup	rpr
+		 * \ingroup	modm_communication_rpr
 		 */
 		class Transmitter
 		{
@@ -58,7 +58,7 @@ namespace modm
 		 * \brief	Possible Listener
 		 * 
 		 * \see		RPR_LISTEN()
-		 * \ingroup	rpr
+		 * \ingroup	modm_communication_rpr
 		 */
 		struct Listener
 		{
@@ -78,7 +78,7 @@ namespace modm
 		 * \brief	Possible Error
 		 * 
 		 * \see		RPR_ERROR()
-		 * \ingroup	rpr
+		 * \ingroup	modm_communication_rpr
 		 */
 		struct Error
 		{
@@ -96,7 +96,7 @@ namespace modm
 		 * \brief	Token Ring Node
 		 * 
 		 * \author	Niklas Hauser
-		 * \ingroup	rpr
+		 * \ingroup	modm_communication_rpr
 		 */
 		template <typename Interface>
 		class Node : protected Transmitter
@@ -200,7 +200,7 @@ namespace modm
 	 * \param	function	Member function of object
 	 * 
 	 * \see		modm::rpr::Listener
-	 * \ingroup	rpr
+	 * \ingroup	modm_communication_rpr
 	 */
 	#define	RPR_LISTEN(type, source, command, object, function)
 #else
@@ -223,7 +223,7 @@ namespace modm
 	 * \param	function	Member function of object
 	 * 
 	 * \see		modm::rpr::ErrorHandler
-	 * \ingroup	rpr
+	 * \ingroup	modm_communication_rpr
 	 */
 	#define	RPR_ERROR(address, command, object, function)
 #else

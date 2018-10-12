@@ -13,6 +13,7 @@
 def init(module):
     module.parent = "communication"
     module.name = "xpcc"
+    module.description = "Cross Platform Component Communication (XPCC)"
 
 def prepare(module, options):
     module.depends(

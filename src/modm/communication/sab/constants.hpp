@@ -27,7 +27,7 @@ namespace modm
 		 * Error codes below 0x20 are reserved for the system. Every other
 		 * code may be used by user.
 		 * 
-		 * \ingroup	sab
+		 * \ingroup modm_communication_sab
 		 */
 		enum Error
 		{
@@ -60,7 +60,7 @@ namespace modm
 		
 		/**
 		 * \brief	Flags
-		 * \ingroup	sab
+		 * \ingroup modm_communication_sab
 		 */
 		enum Flags
 		{
@@ -71,21 +71,21 @@ namespace modm
 		
 		/**
 		 * \brief	Maximum length for the payload
-		 * \ingroup	sab
+		 * \ingroup modm_communication_sab
 		 */
 		const uint8_t maxPayloadLength = 32;
 		
 		/**
 		 * \internal
 		 * \brief	Universal base class for the SAB interface
-		 * \ingroup	sab
+		 * \ingroup modm_communication_sab
 		 */
 		const uint8_t syncByte = 0x54;
 		
 		/**
 		 * \internal
 		 * \brief	Initial value for the CRC8 calculation
-		 * \ingroup	sab
+		 * \ingroup modm_communication_sab
 		 */
 		const uint8_t crcInitialValue = 0x00;
 	}

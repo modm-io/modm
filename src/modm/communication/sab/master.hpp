@@ -31,7 +31,7 @@ namespace modm
 		 * \see	modm::Clock
 		 * 
 		 * \author	Fabian Greif
-		 * \ingroup	sab
+		 * \ingroup modm_communication_sab
 		 */
 		template <typename Interface>
 		class Master

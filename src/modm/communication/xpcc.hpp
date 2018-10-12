@@ -11,12 +11,6 @@
  */
 // ----------------------------------------------------------------------------
 
-/**
- * @ingroup		communication
- * @defgroup	modm_comm	Cross Platform Component Communication (XPCC)
- * @brief 		XPCC communication system
- */
-
 #include "xpcc/communicatable.hpp"
 #include "xpcc/abstract_component.hpp"
 #include "xpcc/dispatcher.hpp"

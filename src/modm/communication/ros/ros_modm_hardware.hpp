@@ -31,6 +31,7 @@
  *   unsigend long time()
  *     Get time in milliseconds since start. Monotonic increasing clock.
  *
+ * @ingroup modm_communication_ros
  */
 template < class Uart >
 class ModmHardware

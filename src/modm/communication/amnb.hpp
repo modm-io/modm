@@ -11,7 +11,7 @@
 // ----------------------------------------------------------------------------
 
 /**
- * @ingroup		communication
+ * @ingroup		modm_communication
  * @defgroup	amnb		Asynchronous Multi-Node Bus (AMNB)
  *
  * @section amnb_intro	Introduction

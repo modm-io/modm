@@ -20,7 +20,7 @@ namespace modm
 	{
 		/**
 		 * \brief	Message Types
-		 * \ingroup	token
+		 * \ingroup	modm_communication_rpr
 		 */
 		enum MessageType
 		{
@@ -65,7 +65,7 @@ namespace modm
 //		private: // ?
 		/**
 		 * \brief	Bit Masks for the higher address byte
-		 * \ingroup	token
+		 * \ingroup	modm_communication_rpr
 		 */
 		enum Address
 		{
@@ -76,13 +76,13 @@ namespace modm
 		
 		/**
 		 * \brief	Maximum length for the payload
-		 * \ingroup	token
+		 * \ingroup	modm_communication_rpr
 		 */
 		const uint8_t maxPayloadLength = 48;
 		
 		/**
 		 * \internal
-		 * \ingroup	token
+		 * \ingroup	modm_communication_rpr
 		 */
 		const uint8_t startDelimiterByte = 0x7e;
 		const uint8_t endDelimiterByte = 0x7c;
@@ -91,7 +91,7 @@ namespace modm
 		/**
 		 * \internal
 		 * \brief	Initial value for the CRC16 calculation
-		 * \ingroup	token
+		 * \ingroup	modm_communication_rpr
 		 */
 		const uint16_t crcInitialValue = 0xffff;
 	}

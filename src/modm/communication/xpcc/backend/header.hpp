@@ -24,7 +24,7 @@ namespace xpcc
 	/**
 	 * \brief 	Header of a packet
 	 *
-	 * \ingroup	backend
+	 * \ingroup	modm_communication_xpcc_backend
 	 * \author	Martin Rosekeit
 	 * \author	Fabian Greif
 	 */

@@ -12,7 +12,7 @@
 // ----------------------------------------------------------------------------
 
 /**
- * \ingroup		backend
+ * \ingroup		modm_communication_xpcc_backend
  * \defgroup 	tipc	(TIPC) Transparent Inter-Process Communication
  * \brief 		Interface to the Linux-TIPC.
  *

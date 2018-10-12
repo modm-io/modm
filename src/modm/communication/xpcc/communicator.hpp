@@ -34,7 +34,7 @@ namespace xpcc
 	 * This class is just a forwarder to the Dispatcher like AbstractComponent
 	 * it also does.
 	 *
-	 * \ingroup	xpcc_comm
+	 * \ingroup	modm_communication_xpcc
 	 */
 	class Communicator : public Communicatable
 	{

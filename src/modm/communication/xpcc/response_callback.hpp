@@ -31,7 +31,7 @@ namespace xpcc
 	 *
 	 * Is a \b Functor.
 	 *
-	 * \ingroup		xpcc_comm
+	 * \ingroup		modm_communication_xpcc
 	 */
 	class ResponseCallback
 	{

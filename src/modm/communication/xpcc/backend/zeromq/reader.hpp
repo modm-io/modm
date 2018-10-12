@@ -34,7 +34,7 @@ namespace xpcc
 /**
  * @brief	Reads packets from a zmqpp socket in a background thread
  *
- * @ingroup	backend
+ * @ingroup	modm_communication_xpcc_backend
  *
  * @author	Christopher Durand <christopher.durand@rwth-aachen.de>
  * @author	strongly-typed
