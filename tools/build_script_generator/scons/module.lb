@@ -71,6 +71,7 @@ def post_build(env, buildlog):
     generated_paths = sorted(set(o.local_filename_out().split("/")[0] for o in buildlog))
     generated_paths.remove("modm")
     generated_paths.insert(0, "modm")
+    generated_paths = [p for p in generated_paths if os.path.isdir(env.outpath(p, basepath="."))]
 
     target = env["modm:target"]
     subs = common_target(target)
