@@ -12,6 +12,12 @@
 
 def init(module):
     module.name = "ros"
+    module.description = """\
+# ROS Library
+
+Repository of generated messages headers for rosserial.
+See https://github.com/modm-io/ros-lib.
+"""
 
 def prepare(module, options):
     return True

@@ -15,6 +15,12 @@
 
 def init(module):
     module.name = "stdc++"
+    module.description = """\
+# C++ Standard Library
+
+A partial port of GCC 8 libstdc++ for AVR.
+See https://github.com/modm-io/avr-libstdcpp.
+"""
 
 
 def prepare(module, options):

@@ -13,6 +13,14 @@
 
 def init(module):
     module.name = "freertos"
+    module.description = """\
+# FreeRTOS
+
+Imported v7.0.1 of FreeRTOS with custom modifications.
+
+!!! warning
+    Please be aware this version is quite outdated and modified for modm.
+"""
 
 def prepare(module, options):
     device = options[":target"]

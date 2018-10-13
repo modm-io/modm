@@ -13,6 +13,15 @@
 
 def init(module):
     module.name = "fatfs"
+    module.description = """\
+# FatFS
+
+Generic FAT Filesystem Module.
+See http://elm-chan.org/fsw/ff/00index_e.html.
+
+!!! warning
+    This version of FatFS is outdated and rarely used in modm.
+"""
 
 def prepare(module, options):
     return True
