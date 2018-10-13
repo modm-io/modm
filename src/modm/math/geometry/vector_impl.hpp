@@ -343,6 +343,6 @@ modm::Vector<T, N>::getLengthSquared() const
 	for (uint_fast8_t i = 0; i < N; ++i) {
 		len2 += (*this)[i]*(*this)[i];
 	}
-	
+
 	return len2;
 }

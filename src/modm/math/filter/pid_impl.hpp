@@ -67,7 +67,7 @@ void
 modm::Pid<T, ScaleFactor>::update(const T& input, bool externalLimitation)
 {
 	bool limitation = externalLimitation;
-	
+
 	T tempErrorSum = errorSum + input;
 	if (tempErrorSum > this->parameter.maxErrorSum) {
 		tempErrorSum = this->parameter.maxErrorSum;
@@ -75,14 +75,14 @@ modm::Pid<T, ScaleFactor>::update(const T& input, bool externalLimitation)
 	else if (tempErrorSum < -this->parameter.maxErrorSum) {
 		tempErrorSum = -this->parameter.maxErrorSum;
 	}
-	
+
 	WideType tmp = 0;
 	tmp += static_cast<WideType>(this->parameter.kp) * input;
 	tmp += static_cast<WideType>(this->parameter.ki) * (tempErrorSum);
 	tmp += static_cast<WideType>(this->parameter.kd) * (input - this->lastError);
-	
+
 	tmp = tmp / ScaleFactor;
-	
+
 	if (tmp > this->parameter.maxOutput) {
 		this->output = this->parameter.maxOutput;
 		limitation = true;
@@ -94,7 +94,7 @@ modm::Pid<T, ScaleFactor>::update(const T& input, bool externalLimitation)
 	else {
 		this->output = tmp;
 	}
-	
+
 	// If an external limitation (saturation somewhere in the control loop) is
 	// applied the error sum will only be decremented, never incremented.
 	// This is done to help the system to leave the saturated state.
@@ -102,7 +102,7 @@ modm::Pid<T, ScaleFactor>::update(const T& input, bool externalLimitation)
 	{
 		this->errorSum = tempErrorSum;
 	}
-	
+
 	this->lastError = input;
 }
 

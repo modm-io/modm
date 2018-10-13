@@ -23,9 +23,9 @@ namespace modm
 	 * \brief	A finit impulse response (FIR) filter implementation
 	 *
 	 * g[n] = SUM(h[k]x[n-k])
-	 * 
-	 * \todo	
-	 * 
+	 *
+	 * \todo
+	 *
 	 * \author	Kevin Laeufer
 	 * \ingroup modm_math_filter
 	 */
@@ -40,7 +40,7 @@ namespace modm
 			 * \param	coeff	array containing the coefficients
 			 **/
 			Fir(const float (&coeff)[N]);
-		
+
 			/**
 			 * Reset the coefficients.
 			 *
@@ -48,7 +48,7 @@ namespace modm
 			 **/
 			void
 			setCoefficients(const float (&coeff)[N]);
-		
+
 			/**
 			 * \brief	Resets the tap buffer
 			 */
@@ -60,14 +60,14 @@ namespace modm
 			 */
 			void
 			append(const T& input);
-		
+
 			/**
 			 * \brief	Calculates g[0]
-			 * 
+			 *
 			 */
 			void
 			update();
-		
+
 			/**
 			 * \brief	Returns g[0].
 			 */
@@ -76,9 +76,9 @@ namespace modm
 			{
 				return output;
 			}
-		
+
 		private:
-			T output;	
+			T output;
 			T taps[N+BLOCK_SIZE];
 			T coefficients[N];
 			int taps_index;

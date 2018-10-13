@@ -25,7 +25,7 @@
 // ----------------------------------------------------------------------------
 template<typename T>
 modm::SCurveController<T>::Parameter::Parameter(
-		const T& targetArea, const T& increment, const T& decreaseFactor, const T& kp, 
+		const T& targetArea, const T& increment, const T& decreaseFactor, const T& kp,
 		const T& speedMaximum, const T& speedMinimum, const T& speedTarget) :
 	targetArea(targetArea), increment(increment), decreaseFactor(decreaseFactor), kp(kp),
 	speedMaximum(speedMaximum), speedMinimum(speedMinimum),
@@ -98,7 +98,7 @@ modm::SCurveController<T>::update(T error, const T& speed)
 		error = -error;
 		currentValue = -currentValue;
 	}
-	
+
 	T outputIncrement = currentValue + parameter.increment;
 	T outputDecrement;
 
@@ -112,15 +112,15 @@ modm::SCurveController<T>::update(T error, const T& speed)
 	else {
 		outputDecrement = std::sqrt(error * parameter.decreaseFactor * 2);
 	}
-	
+
 	output = modm::min(outputIncrement, outputDecrement);
 	// TODO smooth breaking if the speedMaximum has changed to a lower value
 	output = modm::min(output, parameter.speedMaximum);
-	
+
 	if (output < parameter.speedMinimum) {
 		output = parameter.speedMinimum;
 	}
-	
+
 	// revert sign
 	if (invert) {
 		output = -output;

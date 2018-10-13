@@ -31,7 +31,7 @@ modm::Angle::normalize(float angle)
 			angle += 2 * M_PI;
 		}
 	}
-	
+
 	return angle;
 }
 
@@ -46,7 +46,7 @@ modm::Angle::reverse(float angle)
 	else {
 		angle += M_PI;
 	}
-	
+
 	return angle;
 }
 

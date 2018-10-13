@@ -20,16 +20,16 @@ namespace modm
 		{
 		public:
 			Median(const T& initialValue = 0);
-			
+
 			void
 			append(const T& input);
-			
+
 			void
 			update();
-			
+
 			const T
 			getValue() const;
-		
+
 		private:
 			uint_fast8_t index;
 			T buffer[9];
@@ -62,7 +62,7 @@ modm::filter::Median<T, 9>::append(const T& input)
 			break;
 		}
 	}
-	
+
 	this->buffer[index] = input;
 	if (++index >= 9) {
 		index = 0;

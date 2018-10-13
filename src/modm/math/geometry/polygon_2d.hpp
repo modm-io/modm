@@ -22,19 +22,19 @@ namespace modm
 	// forward declaration
 	template <typename T>
 	class Circle2D;
-	
+
 	template <typename T>
 	class LineSegment2D;
-	
+
 	template <typename T>
 	class Ray2D;
-	
+
 	/**
 	 * \brief	Polygon
 	 *
 	 * The Polygon class provides a vector of points. The polygon is
 	 * implicit closed, which means the first and the last point are connected.
-	 * 
+	 *
 	 * \author	Fabian Greif
 	 * \ingroup	modm_math_geometry
 	 */
@@ -52,49 +52,49 @@ namespace modm
 		Polygon2D(std::initializer_list<PointType> init);
 
 		Polygon2D(const Polygon2D& other);
-		
+
 		Polygon2D&
 		operator = (const Polygon2D& other);
-		
+
 		/// append a point to the polygon
 		Polygon2D&
 		operator << (const PointType& point);
-		
+
 		/**
 		 * \brief	Check if a intersection exists
-		 * 
+		 *
 		 * \todo	Currently a brute force approach is used here,
 		 * 			needs to be optimized
 		 */
 		bool
 		intersects(const Polygon2D& other) const;
-		
+
 		/// Check if a intersection exists
 		bool
 		intersects(const Circle2D<T>& circle) const;
-		
+
 		/// Check if a intersection exists
 		bool
 		intersects(const LineSegment2D<T>& segment) const;
-		
+
 		/// Check if a intersection exists
 		bool
 		intersects(const Ray2D<T>& segment) const;
-		
+
 		/**
 		 * \brief	Calculate the intersection point(s)
 		 */
 		bool
 		getIntersections(const LineSegment2D<T>& segment,
 				PointSet2D<T>& intersectionPoints) const;
-		
+
 		/**
 		 * Check if the point is contained inside the area of the polygon.
-		 * 
+		 *
 		 * The borders of the polygon are included in the area of the polygon.
-		 * 
-		 * @warning Only works for convex polygons! 
-		 * 
+		 *
+		 * @warning Only works for convex polygons!
+		 *
 		 * @return  `true` if point is contained in the area, `false` if
 		 *          it is outside.
 		 */

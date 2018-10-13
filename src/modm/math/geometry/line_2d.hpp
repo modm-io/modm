@@ -23,10 +23,10 @@ namespace modm
 	// forward declaration
 	template <typename T>
 	class Circle2D;
-	
+
 	/**
 	 * \brief	Line
-	 * 
+	 *
 	 * \author	Fabian Greif
 	 * \ingroup	modm_math_geometry
 	 */
@@ -36,63 +36,63 @@ namespace modm
 	public:
 		typedef typename GeometricTraits<T>::WideType WideType;
 		typedef typename GeometricTraits<T>::FloatType FloatType;
-		
+
 	public:
 		/**
 		 * \brief	Default-Constructor
 		 */
 		Line2D();
-		
+
 		/**
 		 * \brief	Construct a line
-		 * 
+		 *
 		 * \param	point			a point on the line
 		 * \param	directionVector	direction vector, the length doesn't matter
 		 */
 		Line2D(const Vector<T, 2>& point, const Vector<T, 2>& directionVector);
-		
-		
+
+
 		inline void
 		setPoint(const Vector<T, 2>& point);
-		
+
 		inline const Vector<T, 2>&
 		getPoint() const;
-		
+
 		inline void
 		setDirectionVector(const Vector<T, 2>& vector);
-		
+
 		inline const Vector<T, 2>&
 		getDirectionVector() const;
-		
+
 		inline void
 		set(const Vector<T, 2>& point, const Vector<T, 2>& directionVector);
-		
+
 		/// Shortest distance to a point
 		T
 		getDistanceTo(const Vector<T, 2>& point) const;
-		
+
 		/**
 		 * \brief	Calculate intersection point(s)
-		 * 
+		 *
 		 * \param[in]	other	Other line
 		 * \param[out]	intersections	Intersection point
 		 */
 		bool
 		getIntersections(const Line2D& other,
 				PointSet2D<T>& intersections) const;
-		
+
 		/**
 		 * \brief	Calculate intersection point(s)
-		 * 
+		 *
 		 * \param[in]	circle	A circle
 		 * \param[out]	intersections	Intersection points
-		 * 
+		 *
 		 * \see		http://local.wasp.uwa.edu.au/~pbourke/geometry/sphereline/
 		 */
 		bool
 		getIntersections(const Circle2D<T>& circle,
 				PointSet2D<T>& intersections) const;
-		
+
 	protected:
 		Vector<T, 2> point;
 		Vector<T, 2> directionVector;

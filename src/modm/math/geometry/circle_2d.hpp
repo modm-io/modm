@@ -24,16 +24,16 @@ namespace modm
 	// forward declarations
 	template <typename T>
 	class Line2D;
-	
+
 	template <typename T>
 	class LineSegment2D;
-	
+
 	template <typename T>
 	class Polygon2D;
-	
+
 	/**
 	 * \brief	Circle
-	 * 
+	 *
 	 * \author	Fabian Greif
 	 * \ingroup	modm_math_geometry
 	 */
@@ -42,60 +42,60 @@ namespace modm
 	{
 		typedef typename GeometricTraits<T>::WideType WideType;
 		typedef typename GeometricTraits<T>::FloatType FloatType;
-		
+
 	public:
 		Circle2D();
-		
+
 		Circle2D(const Vector<T, 2>& center, T radius);
-		
+
 		inline const Vector<T, 2>&
 		getCenter() const;
-		
+
 		inline void
 		setCenter(const Vector<T, 2>& point);
-		
+
 		inline T
 		getRadius() const;
-		
+
 		inline void
 		setRadius(T radius);
-		
+
 		/// Check if a intersection exists
 		bool
 		intersects(const Polygon2D<T>& polygon) const;
-		
+
 		/**
 		 * \brief	Calculate intersection point(s)
-		 * 
+		 *
 		 * \param[in]	other			Other Circle
 		 * \param[out]	intersections	Intersection points
-		 * 
+		 *
 		 * \see		http://local.wasp.uwa.edu.au/~pbourke/geometry/2circle/
 		 */
 		bool
 		getIntersections(const Circle2D& other,
 				PointSet2D<T>& intersections) const;
-		
+
 		/**
 		 * \brief	Calculate intersection point(s)
-		 * 
+		 *
 		 * \param[in]	line			Other line
 		 * \param[out]	intersections	Intersection points
-		 * 
+		 *
 		 * \see		Line2D::intersect()
 		 */
 		bool
 		getIntersections(const Line2D<T>& line,
 				PointSet2D<T>& intersections) const;
-		
+
 		bool
 		getIntersections(const LineSegment2D<T>& line,
 				PointSet2D<T>& intersections) const;
-		
+
 	protected:
 		Vector<T, 2> center;
 		T radius;
-		
+
 	protected:
 		friend class Line2D<T>;
 		friend class LineSegment2D<T>;

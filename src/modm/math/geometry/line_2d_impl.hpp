@@ -72,15 +72,15 @@ modm::Line2D<T>::getDistanceTo(const Vector<T, 2>& point) const
 {
 	// vector from the base point of the line to the new point
 	Vector<T, 2> startToPoint = point - this->point;
-	
+
 	FloatType c1 = startToPoint.dot(this->directionVector);
 	FloatType c2 = this->directionVector.getLengthSquared();
-	
+
 	FloatType d = c1 / c2;
-	
+
 	// calculate the closest point
 	Vector<T, 2> closestPoint = this->point + d * this->directionVector;
-	
+
 	// return the length of the vector from the closest point on the line
 	// to the given point
 	return (point - closestPoint).getLength();
@@ -93,13 +93,13 @@ modm::Line2D<T>::getIntersections(const Line2D& other,
 		PointSet2D<T>& intersections) const
 {
 	modm::Vector<T, 2> connectionVector = this->point - other.point;
-	
+
 	WideType d = this->directionVector.cross(other.directionVector);
 	if (d)
 	{
 		FloatType t1 = static_cast<FloatType>(other.directionVector.cross(connectionVector)) /
 					   static_cast<FloatType>(d);
-		
+
 		intersections.append(this->point + this->directionVector * t1);
 		return true;
 	}
@@ -114,14 +114,14 @@ modm::Line2D<T>::getIntersections(const Circle2D<T>& circle,
 {
 	// vector from the center of the circle to line start
 	modm::Vector<T, 2> circleToLine = this->point - circle.center;
-	
+
 	WideType a = 2 * this->directionVector.dot(this->directionVector);
 	WideType b = 2 * circleToLine.dot(this->directionVector);
-	WideType c = circleToLine.dot(circleToLine) - 
+	WideType c = circleToLine.dot(circleToLine) -
 			static_cast<WideType>(circle.radius) * static_cast<WideType>(circle.radius);
-	
+
 	WideType discriminant = (b * b - 2 * a * c);
-	
+
 	if (discriminant < 0)
 	{
 		// no intersections
@@ -130,19 +130,19 @@ modm::Line2D<T>::getIntersections(const Circle2D<T>& circle,
 	else
 	{
 		FloatType e = std::sqrt(discriminant);
-		
+
 		FloatType t1 = static_cast<FloatType>(-b - e) / static_cast<FloatType>(a);
 		intersections.append(this->point + this->directionVector * t1);
-		
+
 		if (discriminant == 0) {
 			// the line is a tangent to the circle intersecting
 			// it at only one point
 			return true;
 		}
-		
+
 		FloatType t2 = static_cast<FloatType>(-b + e) / static_cast<FloatType>(a);
 		intersections.append(this->point + this->directionVector * t2);
-		
+
 		return true;
 	}
 }

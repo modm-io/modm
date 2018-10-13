@@ -36,7 +36,7 @@ modm::math::mul(uint16_t a, uint16_t b)
 		: "=&r" (result)
 		: "r" (a), "r" (b)
 	);
-	
+
 	return result;
 }
 
@@ -45,35 +45,35 @@ modm::math::mul(int16_t a, int16_t b)
 {
 	int32_t result;
 	int8_t help_reg;
-	
+
 	// %1 is used like as __zero_reg__ because the original one (r1) contains
 	// the result of the mul-operations
 	asm(
 		"clr	%1"					"\n\t"
-		
-		"muls	%B2, %B3"			"\n\t"	// (signed) a.high x (signed) b.high  
+
+		"muls	%B2, %B3"			"\n\t"	// (signed) a.high x (signed) b.high
 		"movw	%C0, r0"			"\n\t"
-		
+
 		"mul	%A2, %A3"			"\n\t"	// a.low x b.low
 		"movw	%A0, r0"			"\n\t"
-		
+
 		"mulsu	%B2, %A3"			"\n\t"	// (signed) a.high x b.low
 		"sbc	%D0, %1"			"\n\t"	// correct sign
 		"add	%B0, r0"			"\n\t"
 		"adc	%C0, r1"			"\n\t"
 		"adc	%D0, %1"			"\n\t"	// add carry
-		
+
 		"mulsu	%B3, %A2"			"\n\t"	// (signed) b.high x a.low
 		"sbc	%D0, %1"			"\n\t"	// correct sign
 		"add	%B0, r0"			"\n\t"
 		"adc	%C0, r1"			"\n\t"
 		"adc	%D0, %1"			"\n\t"	// add carry
-		
+
 		"clr	__zero_reg__"   	"\n\t"	// clear r1
 		: "=&r" (result), "=&r" (help_reg)
 		: "a" (a), "a" (b)
 	);
-	
+
 	return result;
 }
 
@@ -81,38 +81,38 @@ inline int32_t
 modm::math::mac(int32_t result, int16_t a, int16_t b)
 {
 	int8_t help_reg;
-	
+
 	// %1 is used like as __zero_reg__ because the original one (r1) contains
 	// the result of the mul-operations
 	asm(
 		"clr	%1"					"\n\t"
-		
-		"muls	%B2, %B3"			"\n\t"	// (signed) a.high x (signed) b.high  
+
+		"muls	%B2, %B3"			"\n\t"	// (signed) a.high x (signed) b.high
 		"add	%C0, r0"			"\n\t"
 		"adc	%D0, r1"			"\n\t"
-		
+
 		"mul	%A2, %A3"			"\n\t"	// a.low x b.low
 		"add	%A0, r0"			"\n\t"
 		"adc	%B0, r1"			"\n\t"
 		"adc	%C0, %1"			"\n\t"
 		"adc	%D0, %1"			"\n\t"
-		
+
 		"mulsu	%B2, %A3"			"\n\t"	// (signed) a.high x b.low
 		"sbc	%D0, %1"			"\n\t"	// correct sign
 		"add	%B0, r0"			"\n\t"
 		"adc	%C0, r1"			"\n\t"
 		"adc	%D0, %1"			"\n\t"	// add carry
-		
+
 		"mulsu	%B3, %A2"			"\n\t"	// (signed) b.high x a.low
 		"sbc	%D0, %1"			"\n\t"	// correct sign
 		"add	%B0, r0"			"\n\t"
 		"adc	%C0, r1"			"\n\t"
 		"adc	%D0, %1"			"\n\t"	// add carry
-		
+
 		"clr __zero_reg__"	"\n\t"	// clear r1
 		: "+r" (result), "=&r" (help_reg)
 		: "a" (a), "a" (b)
 	);
-	
+
 	return result;
 }

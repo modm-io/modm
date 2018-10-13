@@ -24,20 +24,20 @@ namespace modm
 {
 	/**
 	 * \brief	S-Curve trajectory generation with feedback
-	 * 
+	 *
 	 * closed-loop
-	 * 
+	 *
 	 * \code
 	 * SCurveController<int16_t> controller;
-	 * 
-	 * controller.update(positionTarget - currentPosition, currentSpeed); 
+	 *
+	 * controller.update(positionTarget - currentPosition, currentSpeed);
 	 * \endcode
-	 * 
+	 *
 	 * \todo	documentation
-	 * 
+	 *
 	 * \author	Fabian Greif
 	 * \author	Georgi Grinshpun
-	 * 
+	 *
 	 * \ingroup	modm_math_filter
 	 */
 	template<typename T>
@@ -47,7 +47,7 @@ namespace modm
 		/**
 		 * \todo	some helper programs/formula to choose the right
 		 * 			parameter values (e.g. the java tool from the last year)
-		 * 
+		 *
 		 * \param	increment	=> increment per timestep
 		 * \param	decreaseFactor => decrease per second
 		 */
@@ -60,7 +60,7 @@ namespace modm
 					const T& speedMaximum = T(),
 					const T& speedMinimum = T(),
 					const T& speedTarget = T());
-			
+
 			T targetArea;
 			T increment;
 			T decreaseFactor;
@@ -69,7 +69,7 @@ namespace modm
 			T speedMinimum;
 			T speedTarget;
 		};
-		
+
 	public:
 		SCurveController(const Parameter& parameter);
 
@@ -80,7 +80,7 @@ namespace modm
 		 **/
 		void
 		setParameter(const Parameter& parameter);
-		
+
 		inline void
 		setSpeedMaximum(const T& speed);
 
@@ -92,18 +92,18 @@ namespace modm
 
 		inline bool
 		isTargetReached() const;
-		
+
 		void
 		update(T error, const T& speed);
-		
+
 		/// setpoint output for the speed value
 		inline const T&
 		getValue() const;
-		
+
 	private:
 		T output;
 		bool targetReached;
-		
+
 		Parameter parameter;
 		/// distance to add to the current error for speed calculation. This is automatically calculated from
 		/// speedtarget parameter.

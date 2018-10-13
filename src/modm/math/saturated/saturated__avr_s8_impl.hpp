@@ -33,7 +33,7 @@ namespace modm
 			: [x] "+d" (this->value)
 			: [y] "r"  (other.value)
 		);
-		
+
 		return *this;
 	}
 
@@ -51,7 +51,7 @@ namespace modm
 			: [x] "+d" (this->value)
 			: [y] "r"  (other.value)
 		);
-		
+
 		return *this;
 	}*/
 
@@ -71,7 +71,7 @@ namespace modm
 			: [x] "+d" (this->value)
 			: [y] "r"  (other.value)
 		);
-		
+
 		return *this;
 	}
 
@@ -89,7 +89,7 @@ namespace modm
 			: [x] "+d" (this->value)
 			: [y] "r"  (other.value)
 		);
-		
+
 		return *this;
 	}*/
 
@@ -119,7 +119,7 @@ namespace modm
 			"sbrc %[x], 7"	"\n\t"
 			"neg  %[x]"		"\n\t"	// x < 0: negieren
 			"sbrc %[x], 7"	"\n\t"
-			"dec  %[x]"		"\n\t"	// R0 ist immer noch < 0 (also 0x80), 
+			"dec  %[x]"		"\n\t"	// R0 ist immer noch < 0 (also 0x80),
 									// lade 0x7f
 			: [x] "+d" (temp.value)
 		);

@@ -49,7 +49,7 @@ modm::Quaternion<T>::Quaternion(const Vector<T, 3> &axis, T angle)
 	z()
 {
 	float sinAngleOver2 = std::sin(angle / 2);
-	
+
 	w = std::cos(angle / 2);
 	x = reinterpret_cast<const T*>(&axis)[0]*sinAngleOver2;
 	y = reinterpret_cast<const T*>(&axis)[1]*sinAngleOver2;
@@ -97,7 +97,7 @@ modm::Quaternion<T>& modm::Quaternion<T>::operator = (const Quaternion<T> &rhs)
 	x = rhs.x;
 	y = rhs.y;
 	z = rhs.z;
-	
+
 	return *this;
 }
 
@@ -289,7 +289,7 @@ modm::Quaternion<T>::scale(float newLength)
 	x *= s;
 	y *= s;
 	z *= s;
-	
+
 	return *this;
 }
 
@@ -309,7 +309,7 @@ modm::Quaternion<T>::conjugate()
 	x = -x;
 	y = -y;
 	z = -z;
-	
+
 	return *this;
 }
 
@@ -361,7 +361,7 @@ modm::Quaternion<T>::to4x4Matrix(Matrix<T, 4, 4> *outMatrix)
 {
 	// avoid depending on Matrix.h
 	T* m = reinterpret_cast<T*>(outMatrix);
-	
+
 	float xx = x*x;	float xy = x*y;
 	float xz = x*z;	float xw = x*w;
 
