@@ -26,7 +26,7 @@ namespace modm
 		 * 
 		 * \internal
 		 * 
-		 * \ingroup	allocator
+		 * \ingroup	modm_utils_allocator
 		 * \author	Fabian Greif
 		 */
 		template <typename T>

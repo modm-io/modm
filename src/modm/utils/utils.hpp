@@ -12,12 +12,6 @@
  */
 // ----------------------------------------------------------------------------
 
-/**
- * \defgroup 	utils Utilities
- * \brief 		Some Utilities
- *
- */
-
 #include <modm/architecture/utils.hpp>
 
 #include "utils/algorithm.hpp"

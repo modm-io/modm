@@ -18,6 +18,9 @@
 namespace modm
 {
 
+/// @ingroup modm_utils
+/// @{
+
 constexpr uint8_t  Bit0  = (1ul <<  0);
 constexpr uint8_t  Bit1  = (1ul <<  1);
 constexpr uint8_t  Bit2  = (1ul <<  2);
@@ -50,6 +53,8 @@ constexpr uint32_t Bit28 = (1ul << 28);
 constexpr uint32_t Bit29 = (1ul << 29);
 constexpr uint32_t Bit30 = (1ul << 30);
 constexpr uint32_t Bit31 = (1ul << 31);
+
+/// @}
 
 };	// namespace modm
 

@@ -21,11 +21,9 @@
 namespace modm
 {
 	/**
-	 * \ingroup	utils
-	 * \defgroup allocator
-	 * 
-	 * \brief	Memory allocators
-	 * 
+	 * \ingroup	modm_utils
+	 * \defgroup modm_utils_allocator Memory allocators
+	 *
 	 * \author	Fabian Greif
 	 */
 	namespace allocator
