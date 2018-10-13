@@ -18,71 +18,10 @@
 
 #include "controller.hpp"
 
-#define	TEST_FLOAT_EPISLON		0.00001f
+/// @ingroup modm_unittest
+/// @{
 
-#ifdef __DOXYGEN__
-
-/**
- * \brief	Verify (expr) is true
- * 
- * \ingroup	unittest
- */
-#define	TEST_ASSERT_TRUE(expr)
-
-/**
- * \brief	Verify (expr) is false
- * 
- * \ingroup	unittest
- */
-#define	TEST_ASSERT_FALSE(expr)
-
-/**
- * \brief	Verify (x==y)
- * 
- * Shortcut with extended output message for `TEST_ASSERT_TRUE(x == y);`
- * 
- * \ingroup	unittest
- */
-#define	TEST_ASSERT_EQUALS(x, y)
-
-/**
- * \brief	Verify (x==y) for floating point values
- * \ingroup	unittest
- */
-#define	TEST_ASSERT_EQUALS_FLOAT(x, y)
-
-/**
- * \brief	Verify (x==y) up to d
- *
- * This macro verifies two values are equal up to a delta
- * 
- * \ingroup	unittest
- */
-#define	TEST_ASSERT_EQUALS_DELTA(x, y, d)
-
-/**
- * \brief	Verify (lower <= value <= upper)
- * \ingroup	unittest
- */
-#define	TEST_ASSERT_EQUALS_RANGE(value, lower, upper)
-
-/**
- * \brief	Check if the arrays contains the same data
- * 
- * start is optional (default = 0).
- * 
- * \ingroup	unittest
- */
-#define	TEST_ASSERT_EQUALS_ARRAY(array1, array2, count, start)
-
-/**
- * \brief	Fail unconditionally  
- * \ingroup	unittest
- */
-#define	TEST_FAIL(msg)
-
-#else // !__DOXYGEN__
-
+/// @cond
 #include <modm/architecture/interface/accessor_flash.hpp>
 
 namespace unittest
@@ -245,40 +184,56 @@ namespace unittest
 		return true;
 	}
 }
+/// @endcond
 
+/// Verify (expr) is true
 #define	TEST_ASSERT_TRUE(expr)	\
 	TEST_RETURN_(::unittest::checkExpression((expr), __LINE__))
 
+/// Verify (expr) is false
 #define	TEST_ASSERT_FALSE(expr)	\
 	TEST_RETURN_(::unittest::checkExpression(!static_cast<bool>(expr), __LINE__))
 
+/// Verify (x == y)
 #define	TEST_ASSERT_EQUALS(x, y) \
 	TEST_RETURN_(::unittest::checkEqual((x), (y), __LINE__))
 
+/// Verify (x != y)
 #define TEST_ASSERT_DIFFERS(x, y) \
 	TEST_RETURN_(::unittest::checkDiffer((x), (y), __LINE__))
 
+/// Verify (x == y) for floating point values
 #define	TEST_ASSERT_EQUALS_FLOAT(x, y) \
 	TEST_RETURN_(::unittest::checkEqual(static_cast<float>(x), static_cast<float>(y), __LINE__))
 
+/// Verify (x == y) up to delta d
 #define	TEST_ASSERT_EQUALS_DELTA(x, y, d) \
 	TEST_RETURN_(::unittest::checkEqualDelta((x), (y), (d), __LINE__))
 
+/// Verify (lower <= value <= upper)
 #define	TEST_ASSERT_EQUALS_RANGE(value, lower, upper) \
 	TEST_RETURN_(::unittest::checkRange((value), (lower), (upper), __LINE__))
 
+/// Verify two strings as equal
 #define	TEST_ASSERT_EQUALS_STRING(x, y) \
 	TEST_RETURN_(::unittest::checkString((x), (y), __LINE__))
 
+#ifdef __DOXYGEN__
+/// Verify two arrays as equal
+/// start is optional (default = 0).
+#define	TEST_ASSERT_EQUALS_ARRAY(x, y, count, start=0)
+#else
 #define	TEST_ASSERT_EQUALS_ARRAY(x, y, ...) \
 	TEST_RETURN_(::unittest::checkArray((x), (y), __LINE__, __VA_ARGS__))
+#endif
 
+/// Fail unconditionally
 #define	TEST_FAIL(msg) \
 	do {	TEST_REPORTER_.reportFailure(__LINE__) \
 			<< msg << '\n'; \
 	} while (0); \
 	TEST_RETURN_((void) false)
 
-#endif	// __DOXYGEN__
+/// @}
 
 #endif	// UNITTEST_HARNESS_HPP

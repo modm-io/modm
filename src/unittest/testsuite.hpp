@@ -22,7 +22,7 @@ namespace unittest
 	 * \brief	Base class for every test suite
 	 * 
 	 * \author	Fabian Greif
-	 * \ingroup	unittest
+	 * \ingroup	modm_unittest
 	 */
 	class TestSuite
 	{

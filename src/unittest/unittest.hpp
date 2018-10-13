@@ -11,12 +11,6 @@
  */
 // ----------------------------------------------------------------------------
 
-/**
- * \defgroup unittest Unit tests
- * \brief	Perform a unit test
- *
- */
-
 #include "unittest/testsuite.hpp"
 #include "unittest/harness.hpp"
 #include "unittest/controller.hpp"

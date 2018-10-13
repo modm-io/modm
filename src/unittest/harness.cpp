@@ -14,6 +14,8 @@
 
 #include "harness.hpp"
 
+#define	TEST_FLOAT_EPSILON		0.00001f
+
 namespace unittest
 {
 	FLASH_STORAGE_STRING(stringEqual) = " == ";
@@ -38,7 +40,7 @@ unittest::checkExpression(bool expr, unsigned int line)
 bool
 unittest::checkEqual(const float& a, const float& b, unsigned int line)
 {
-	if (((a + TEST_FLOAT_EPISLON) >= b) and ((a - TEST_FLOAT_EPISLON) <= b))
+	if (((a + TEST_FLOAT_EPSILON) >= b) and ((a - TEST_FLOAT_EPSILON) <= b))
 	{
 		TEST_REPORTER_.reportPass();
 		return true;
