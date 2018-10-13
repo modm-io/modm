@@ -46,11 +46,11 @@ namespace unittest
 	// ------------------------------------------------------------------------
 	bool
 	checkExpression(bool expr, unsigned int line);
-	
+
 	// ------------------------------------------------------------------------
 	bool
 	checkEqual(const float& a, const float& b, unsigned int line);
-	
+
 	// ------------------------------------------------------------------------
 	template <typename A, typename B>
 	inline bool
@@ -66,7 +66,7 @@ namespace unittest
 			return false;
 		}
 	}
-	
+
 	// ------------------------------------------------------------------------
 	template <typename A, typename B>
 	inline bool
@@ -98,7 +98,7 @@ namespace unittest
 			return false;
 		}
 	}
-	
+
 	template <typename T, typename B>
 	bool
 	checkRange(const T& value, const B& lower, const B& upper, unsigned int line)
@@ -161,7 +161,7 @@ namespace unittest
 		}
 		stream << ']' << '\n';
 	}
-	
+
 	template <typename A, typename B>
 	bool
 	checkArray(const A& a, const B& b, unsigned int line, std::size_t count, std::size_t start = 0)
@@ -171,15 +171,15 @@ namespace unittest
 			if (a[i] != b[i])
 			{
 				modm::IOStream& stream = TEST_REPORTER_.reportFailure(line);
-				
+
 				stream << '\n';
-				
+
 				printArray(stream, start, count, a);
 				printArray(stream, start, count, b);
 				return false;
 			}
 		}
-		
+
 		TEST_REPORTER_.reportPass();
 		return true;
 	}

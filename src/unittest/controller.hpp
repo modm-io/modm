@@ -28,7 +28,7 @@ namespace unittest
 	 * All macros form 'harness.hpp' use this class to determine the
 	 * active reporter.
 	 *
-	 * \author	Fabian Greif 
+	 * \author	Fabian Greif
 	 * \ingroup	modm_unittest
 	 */
 	class Controller
@@ -40,15 +40,15 @@ namespace unittest
 			static Controller controller;
 			return controller;
 		}
-		
+
 		/// Set a new reporter
 		void
 		setReporter(Reporter& reporter);
-		
+
 		/// Get currently active reporter
 		Reporter&
 		getReporter() const;
-		
+
 		/**
 		 * \brief	Switch to the next test suite
 		 *
@@ -57,15 +57,15 @@ namespace unittest
 		 */
 		void
 		nextTestSuite(modm::accessor::Flash<char> name) const;
-	
+
 	private:
 		Controller();
-		
+
 		Controller(const Controller&);
-		
+
 		Controller&
 		operator =(const Controller&);
-		
+
 		Reporter *reporter;		//!< active reporter
 	};
 }

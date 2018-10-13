@@ -18,7 +18,7 @@
 unittest::TestSuite::~TestSuite()
 {
 }
-		
+
 // ----------------------------------------------------------------------------
 void
 unittest::TestSuite::setUp()

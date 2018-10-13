@@ -20,7 +20,7 @@ namespace unittest
 {
 	/**
 	 * \brief	Base class for every test suite
-	 * 
+	 *
 	 * \author	Fabian Greif
 	 * \ingroup	modm_unittest
 	 */
@@ -29,10 +29,10 @@ namespace unittest
 	public:
 		virtual
 		~TestSuite();
-		
+
 		virtual void
 		setUp();
-		
+
 		virtual void
 		tearDown();
 	};

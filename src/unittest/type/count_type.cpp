@@ -48,7 +48,7 @@ unittest::CountType::operator = (const CountType&)
 {
 	++numberOfAssignments;
 	++numberOfOperations;
-	
+
 	return *this;
 }
 
@@ -60,6 +60,6 @@ unittest::CountType::reset()
 	numberOfAssignments = 0;
 	numberOfDestructorCalls = 0;
 	numberOfReallocs = 0;
-	
+
 	numberOfOperations = 0;
 }

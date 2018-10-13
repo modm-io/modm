@@ -18,10 +18,10 @@
 namespace
 {
 	FLASH_STORAGE_STRING(invaildName) = "invalid";
-	
+
 	FLASH_STORAGE_STRING(failHeader) = "FAIL: ";
 	FLASH_STORAGE_STRING(failColon) = " : ";
-	
+
 	FLASH_STORAGE_STRING(reportPassed) = "\nPassed ";
 	FLASH_STORAGE_STRING(reportFailed) = "\nFailed ";
 	FLASH_STORAGE_STRING(reportOf) = " of ";
