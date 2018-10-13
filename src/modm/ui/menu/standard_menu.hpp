@@ -31,7 +31,7 @@ namespace modm
 	/**
  	* \brief Menu Entry of Standard Menu
 	*
-	* \ingroup	display_menu
+	* \ingroup	modm_ui_menu
 	* \author	Thorsten Lajewski
 	*/
 	struct MenuEntry
@@ -57,7 +57,7 @@ namespace modm
 	*  Left - remove Standard Menu from stack
 	*  Right - select chosen entry.
 	*
-	* \ingroup	display_menu
+	* \ingroup	modm_ui_menu
 	* \author	Thorsten Lajewski
 	*/
 

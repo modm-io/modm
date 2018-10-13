@@ -34,6 +34,9 @@ namespace modm
 namespace gui
 {
 
+/// @ingroup modm_ui_gui
+/// @{
+
 // forward declare so that everything compiles. can this be done better?
 class View;
 class Widget;
@@ -47,7 +50,6 @@ typedef void (*genericCallback)(void*);
 /**
  * Input event that is collected when some input happens. Will be processed by View
  *
- * @ingroup	gui
  * @author	Daniel Krebs
  */
 class InputEvent
@@ -89,7 +91,6 @@ public:
  * is_expired() must be called repeatedly for the callback to get called. It is
  * garantueed that the callback will only be called once.
  *
- * @ingroup	gui
  * @author	Daniel Krebs
  */
 class AsyncEvent
@@ -149,6 +150,8 @@ typedef struct Dimension
 } Dimension;
 
 typedef modm::glcd::Point Point;
+
+/// @}
 
 }	// namespace gui
 

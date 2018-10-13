@@ -31,7 +31,7 @@ namespace modm
 	 *        handled by the ViewStack class
 	 *
 	 *\author Thorsten Lajewski
-	 *\ingroup display_menu
+	 *\ingroup modm_ui_menu
 	 */
 
 	class AbstractView

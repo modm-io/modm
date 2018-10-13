@@ -21,6 +21,7 @@ namespace modm
 namespace ui
 {
 
+/// @ingroup modm_ui_animation
 enum class
 KeyFrameAnimationMode
 {
@@ -67,7 +68,7 @@ using KeyFrame = typename KeyFrameHelper<T, N>::type;
  * @tparam	N	the number of values in this frame
  *
  * @author	Niklas Hauser
- * @ingroup animation
+ * @ingroup modm_ui_animation
  */
 template<typename T = uint8_t, uint8_t N = 1>
 struct KeyFrame
@@ -164,7 +165,7 @@ using KeyFrameAnimation = typename KeyFrameAnimationHelper<T, N>::type;
  * This class takes an array of keyframes and applies them to an animation.
  *
  * @author	Niklas Hauser
- * @ingroup animation
+ * @ingroup modm_ui_animation
  */
 template<typename T = uint8_t, uint8_t N = 1>
 class KeyFrameAnimation

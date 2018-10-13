@@ -23,7 +23,7 @@ namespace modm
 	 * 
 	 * \todo	Implementation is incomplete
 	 * 
-	 * \ingroup	ui
+	 * \ingroup	modm_ui_button
 	 * \author	Fabian Greif
 	 */
 	template <typename PIN>

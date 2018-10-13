@@ -25,15 +25,15 @@ namespace modm
  * About this implementation:
  *
  * In contrast to other drivers which use static methods,
- * this class is directly derived from IODevice with all the virtual
+ * this class is directly derived from `modm::IODevice` with all the virtual
  * methods because it will be most likely used to create a IOStream
  * which then handles the output to the display.
  *
  * Therefore creating this class with static methods and using a wrapper
- * class to create a IODevice seems unnecessary complicated.
+ * class to create a `modm::IODevice` seems unnecessary complicated.
  *
  * @author	Fabian Greif
- * @ingroup	graphics
+ * @ingroup	modm_ui_display
  */
 class CharacterDisplay : public IOStream
 {

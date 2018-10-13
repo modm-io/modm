@@ -13,6 +13,11 @@
 def init(module):
     module.parent = "ui"
     module.name = "color"
+    module.description = """\
+# Color
+
+RGB and HSV containers and converters.
+"""
 
 def prepare(module, options):
     module.depends(

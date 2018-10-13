@@ -24,6 +24,7 @@ namespace ui
 {
 %% for t in tables
 	/// {{t.gamma / 10}} gamma correction with {{t.bit}}-bit resolution (0 to {{t.bit_range - 1}}) in {{t.range}} steps at {{t.size}} bytes.
+	/// @ingroup modm_ui_led
 	extern modm::accessor::Flash<{{t.type}}> table{{t.gamma}}_{{t.bit}}_{{t.range}};
 
 %% endfor

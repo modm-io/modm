@@ -31,7 +31,7 @@ namespace modm
 	 * \tparam	Height	Height of the display. Must be a multiple of 8!
 	 *
 	 * \author	Fabian Greif
-	 * \ingroup	graphics
+	 * \ingroup	modm_ui_display
 	 */
 	template <uint16_t Width, uint16_t Height>
 	class BufferedGraphicDisplay : public GraphicDisplay

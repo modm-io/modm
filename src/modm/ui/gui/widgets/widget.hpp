@@ -35,7 +35,7 @@ static int16_t uid_global = 0;
 class View;
 
 /**
- * @ingroup	gui
+ * @ingroup modm_ui_gui
  * @author	Daniel Krebs
  */
 class Widget
@@ -332,7 +332,7 @@ public:
 };
 
 /**
- * @ingroup	gui
+ * @ingroup modm_ui_gui
  * @author	Daniel Krebs
  */
 class WidgetGroup : public Widget

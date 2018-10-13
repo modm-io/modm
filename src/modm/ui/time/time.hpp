@@ -25,7 +25,7 @@ namespace modm
 	 * Number of Seconds since 00:00, Jan 1 1970 UTC
 	 *
 	 * @author	Fabian Greif
-	 * @ingroup	ui
+	 * @ingroup	modm_ui_time
 	 */
 	class UnixTime
 	{
@@ -55,7 +55,7 @@ namespace modm
 	 * @brief	Calender Date and Time
 	 *
 	 * @author	Fabian Greif
-	 * @ingroup	ui
+	 * @ingroup	modm_ui_time
 	 */
 	class Date
 	{

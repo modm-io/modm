@@ -52,7 +52,7 @@ namespace bitmap
 	 * - Width  : ${width}
 	 * - Height : ${height}
 	 *
-	 * \\ingroup	image
+	 * \\ingroup	modm_ui_display_image
 	 */
 	EXTERN_FLASH_STORAGE(uint8_t ${name}[]);
 }

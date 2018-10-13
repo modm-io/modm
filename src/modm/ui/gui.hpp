@@ -11,13 +11,6 @@
  */
 // ----------------------------------------------------------------------------
 
-/**
- * @defgroup	gui		Graphical User Interface
- * @brief		Various classes for creating GUI applications.
- *
- * @ingroup		ui
- */
-
 #include "gui/types.hpp"
 #include "gui/colorpalette.hpp"
 #include "gui/view_stack.hpp"

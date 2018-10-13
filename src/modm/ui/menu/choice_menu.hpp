@@ -34,7 +34,7 @@ namespace modm{
 	 *        RIGHT - put next screen on stack
 	 *
 	 *    \author Thorsten Lajewski
-	 *    \ingroup display_menu
+	 *    \ingroup modm_ui_menu
 	 *
 	 */
 	class  ChoiceMenu: public AbstractMenu

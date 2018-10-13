@@ -31,7 +31,7 @@ namespace ui
  * @todo add RGB specific functions to this class.
  *
  * @author	Niklas Hauser
- * @ingroup led
+ * @ingroup modm_ui_led
  */
 class RgbLed
 {

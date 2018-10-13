@@ -13,6 +13,11 @@
 def init(module):
     module.parent = "ui"
     module.name = "gui"
+    module.description = """\
+# Graphical User Interface
+
+Various classes for creating GUI applications.
+"""
 
 def prepare(module, options):
     module.depends(

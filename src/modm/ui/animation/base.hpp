@@ -26,16 +26,16 @@ namespace ui
 /**
  * This class allows the linear animation of one value over time.
  *
- * Be aware that the algortihm for 8bit types is optimized for low computational costs,
- * developed for fast LED fading (@see modm::ui::Led).
- * Therefore the animation length is limited to `128ms * value_difference`, which is
- * about 32s over the full 8bit range.
+ * Be aware that the algorithm for 8-bit types is optimized for low computational
+ * costs, developed for fast LED fading (@see `modm::ui::Led`).
+ * Therefore the animation length is limited to `128ms * value_difference`,
+ * which is about 32s over the full 8-bit range.
  * If you specify a longer time in this case, the animation simply finishes before.
- * If this is a problem, consider using a 16bit type, which does not have
+ * If this is a problem, consider using a 16-bit type, which does not have
  * this limitation.
  *
  * @author	Niklas Hauser
- * @ingroup animation
+ * @ingroup modm_ui_animation
  */
 template< typename T = uint8_t >
 class Animation

@@ -35,7 +35,7 @@ namespace ui
  * @endcode
  *
  * @author	Niklas Hauser
- * @ingroup animation
+ * @ingroup modm_ui_animation
  */
 template< typename T = uint8_t >
 class Indicator

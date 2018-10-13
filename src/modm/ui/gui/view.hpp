@@ -38,7 +38,7 @@ class GuiViewStack;
 /**
  * The View class is the base class for all screens handled by the ViewStack class
  *
- * @ingroup	gui
+ * @ingroup modm_ui_gui
  * @author	Thorsten Lajewski
  */
 class View : public modm::AbstractView

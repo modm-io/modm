@@ -26,7 +26,7 @@ namespace bitmap
 	 * - Width  : 16
 	 * - Height : 16
 	 *
-	 * \ingroup	image
+	 * \ingroup	modm_ui_display_image
 	 */
 	EXTERN_FLASH_STORAGE(uint8_t home_16x16[]);
 }

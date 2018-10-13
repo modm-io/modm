@@ -88,7 +88,7 @@ namespace modm
 		 * - number of chars : ${count}
 		 * - size in bytes   : ${size}
 		 * 
-		 * \\ingroup	font
+		 * \\ingroup	modm_ui_display_font
 		 */
 		EXTERN_FLASH_STORAGE(uint8_t ${array_name}[]);
 	}

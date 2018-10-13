@@ -32,7 +32,7 @@ namespace modm
 	* This class also deallocates the views passed
 	* to the stack.
 	*
-	* \ingroup	display_menu
+	* \ingroup	modm_ui_menu
 	* \author	Thorsten Lajewski
 	*/
 

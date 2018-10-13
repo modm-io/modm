@@ -46,9 +46,9 @@ namespace ui
  * This is just a very, very thin wrapper around modm::ui::Animation<uint8_t>.
  * If you need more advanced features, have a look there.
  *
- * @see Animation
+ * @see modm_ui_animation
  * @author	Niklas Hauser
- * @ingroup led
+ * @ingroup modm_ui_led
  */
 class Led
 {

@@ -1,9 +1,0 @@
-// coding: utf-8
-//
-
-/**
- * \defgroup	ui			User interface
- *
- * Interfacing with human users.
- * Contains code for Graphics, Buttons, LEDs, Animations, Menu Structures.
- */
