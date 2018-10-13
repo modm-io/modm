@@ -11,10 +11,14 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-import re
-
 def init(module):
     module.name = "processing"
+    module.description = """\
+# Processing
+
+Constructs to influence program flow execution, timing, synchronization
+and delegation.
+"""
 
 def prepare(module, options):
     return True

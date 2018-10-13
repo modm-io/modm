@@ -38,7 +38,7 @@
  * \see		MILLISECONDS
  * 
  * \hideinitializer
- * \ingroup	stdlib_rtos
+ * \ingroup	modm_processing_rtos
  */
 /*#define	TIME_LOOP(frequency)										\
 		for(portTickType lastTime = xTaskGetTickCount() ;			\
@@ -55,7 +55,7 @@
  * \endcode
  * 
  * \hideinitializer
- * \ingroup	stdlib_rtos
+ * \ingroup	modm_processing_rtos
  */
 #define	MILLISECONDS		1
 
@@ -69,7 +69,7 @@ namespace modm
 		/**
 		 * \brief	Thread
 		 * 
-		 * \ingroup	stdlib_rtos
+		 * \ingroup	modm_processing_rtos
 		 */
 		class Thread
 		{

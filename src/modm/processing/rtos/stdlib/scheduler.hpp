@@ -21,6 +21,7 @@ namespace modm
 {
 	namespace rtos
 	{
+		/// @ingroup modm_processing_rtos
 		class Scheduler
 		{
 		public:

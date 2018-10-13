@@ -16,11 +16,13 @@
 
 #include <modm/architecture/utils.hpp>
 
+/// @ingroup modm_processing_protothread
+/// @{
+
 /**
  * Declare start of protothread
  *
  * \warning	Use at start of the run() implementation!
- * \ingroup	protothread
  * \hideinitializer
  */
 #define PT_BEGIN() \
@@ -31,7 +33,6 @@
  * Stop protothread and end it
  *
  * \warning	Use at end of the run() implementation!
- * \ingroup	protothread
  * \hideinitializer
  */
 #define PT_END() \
@@ -40,12 +41,8 @@
 	this->stop(); \
 	return false;
 
-/**
- * Yield protothread till next call to its run().
- *
- * \ingroup	protothread
- * \hideinitializer
- */
+/// Yield protothread till next call to its run().
+/// \hideinitializer
 #define PT_YIELD() \
     do { \
 		this->ptState = __LINE__; \
@@ -53,12 +50,8 @@
 		case __LINE__: ; \
 	} while (0)
 
-/**
- * Cause protothread to wait **while** given condition is true.
- *
- * \ingroup	protothread
- * \hideinitializer
- */
+/// Cause protothread to wait **while** given condition is true.
+/// \hideinitializer
 #define PT_WAIT_WHILE(condition) \
     do { \
 		this->ptState = __LINE__; \
@@ -68,29 +61,17 @@
 				return true; \
     } while (0)
 
-/**
- * Cause protothread to wait **until** given condition is true.
- *
- * \ingroup	protothread
- * \hideinitializer
- */
+/// Cause protothread to wait **until** given condition is true.
+/// \hideinitializer
 #define PT_WAIT_UNTIL(condition) \
 	PT_WAIT_WHILE(!(condition))
 
-/**
- * Cause protothread to wait until given child protothread completes.
- *
- * \ingroup	protothread
- * \hideinitializer
- */
+/// Cause protothread to wait until given child protothread completes.
+/// \hideinitializer
 #define PT_WAIT_THREAD(child) 	PT_WAIT_UNTIL(!(child).run())
 
-/**
- * Restart and spawn given child protothread and wait until it completes.
- *
- * \ingroup	protothread
- * \hideinitializer
- */
+/// Restart and spawn given child protothread and wait until it completes.
+/// \hideinitializer
 #define PT_SPAWN(child) \
     do { \
 		(child).restart(); \
@@ -101,8 +82,6 @@
 /**
  * Calls a given resumable function and returns
  * whether it completed successfully or not.
- *
- * \ingroup	protothread
  * \hideinitializer
  */
 #define PT_CALL(resumable) \
@@ -122,8 +101,6 @@
  *
  * In the next executing cycle the protothread will restart its execution at
  * its PT_BEGIN.
- *
- * \ingroup	protothread
  * \hideinitializer
  */
 #define PT_RESTART() \
@@ -132,16 +109,14 @@
 		return true; \
 	} while (0)
 
-/**
- * Stop and exit from protothread.
- *
- * \ingroup	protothread
- * \hideinitializer
- */
+/// Stop and exit from protothread.
+/// \hideinitializer
 #define PT_EXIT() \
 	do { \
 		this->stop(); \
 		return false; \
 	} while (0)
+
+/// @}
 
 #endif // MODM_PT_MACROS_HPP

@@ -39,7 +39,7 @@
  * \see		vTaskDelayUntil() from FreeRTOS
  * 
  * \hideinitializer
- * \ingroup	freertos
+ * \ingroup	modm_processing_rtos
  */
 #define	TIME_LOOP(frequency)										\
 		for(portTickType lastTime = xTaskGetTickCount() ;			\
@@ -67,7 +67,7 @@
  * first which will lead to wrong results.
  * 
  * \hideinitializer
- * \ingroup	freertos
+ * \ingroup	modm_processing_rtos
  */
 #define	MILLISECONDS		(configTICK_RATE_HZ / 1000.0)
 
@@ -103,7 +103,7 @@ namespace modm
          * Sideeffects: 
          * Thread constructor disables the SysTickTimer until the Scheduler is called.
 		 * 
-		 * \ingroup	freertos
+		 * \ingroup	modm_processing_rtos
 		 */
 		class Thread
 		{

@@ -11,6 +11,14 @@
  */
 // ----------------------------------------------------------------------------
 
+namespace modm
+{
+	/// @ingroup modm_processing_rtos
+	namespace rtos
+	{
+	}
+}
+
 #include "rtos/scheduler.hpp"
 #include "rtos/thread.hpp"
 #include "rtos/mutex.hpp"

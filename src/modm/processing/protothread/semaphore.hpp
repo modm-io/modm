@@ -55,7 +55,7 @@ namespace modm
 		 * 
 		 * Therefore there's no Mutex implementation, it isn't needed.
 		 * 
-		 * \ingroup	protothread
+		 * \ingroup	modm_processing_protothread
 		 */
 		class Semaphore
 		{

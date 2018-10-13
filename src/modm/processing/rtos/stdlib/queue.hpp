@@ -25,7 +25,7 @@ namespace modm
 		/**
 		 * Thread-safe Queue.
 		 * 
-		 * \ingroup	rtos_boost
+		 * \ingroup	modm_processing_rtos
 		 */
 		template<typename T>
 		class Queue

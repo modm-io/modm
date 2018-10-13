@@ -24,15 +24,13 @@
 namespace modm
 {
 	/**
-	 * \ingroup	processing
-	 * \brief	%Scheduler
+	 * \ingroup	modm_processing_scheduler
+	 * \brief	Scheduler
 	 *
 	 * If the schedule() method is call from a timer interrupt, this scheduler
 	 * is a priority based preemptive scheduler, meaning that always the task
 	 * with the highest priority is executed. It will only change tasks if a
 	 * task with a higher priority becomes ready or the current task ends.
-	 *
-	 * \image	html	scheduler.png
 	 *
 	 * \warning	Works for ATmega, but currently not for the ATxmega!
 	 *
@@ -45,7 +43,7 @@ namespace modm
 		typedef uint8_t Priority;
 
 		/**
-		 * \brief	%Scheduler task
+		 * \brief	Scheduler task
 		 */
 		class Task
 		{

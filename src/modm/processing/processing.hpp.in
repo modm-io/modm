@@ -11,12 +11,6 @@
  */
 // ----------------------------------------------------------------------------
 
-/**
- * @defgroup 	processing Processing
- * @brief 		Constructs to influence program flow execution, timing,
- * 				synchronisation and delegation.
- */
-
 #ifndef MODM_PROCESSING_HPP
 #define	MODM_PROCESSING_HPP
 

@@ -30,7 +30,7 @@ namespace modm
  *
  * @author	Fabian Greif
  * @author	Niklas Hauser
- * @ingroup	software_timer
+ * @ingroup	modm_processing_timer
  */
 template< typename T >
 class GenericTimestamp
@@ -110,11 +110,11 @@ private:
 };
 
 /// 16bit timestamp, which can hold up to 65 seconds at millisecond resolution.
-/// @ingroup	software_timer
+/// @ingroup	modm_processing_timer
 using ShortTimestamp = GenericTimestamp<uint16_t>;
 
 /// 32bit timestamp, which can hold up to 49 days at millisecond resolution.
-/// @ingroup	software_timer
+/// @ingroup	modm_processing_timer
 using Timestamp      = GenericTimestamp<uint32_t>;
 
 // ------------------------------------------------------------------------

@@ -18,7 +18,6 @@
 #include <stdint.h>
 #include <initializer_list>
 
-/// @ingroup	resumable
 #define MODM_RESUMABLE_MODULE_NAME "resumable"
 
 namespace modm
@@ -54,7 +53,7 @@ static constexpr State Stopped = State(0);
 
 /// All resumable functions return an encapsulated result type.
 /// @warning The result type **must** have a default constructor!
-/// @ingroup	resumable
+/// @ingroup	modm_processing_resumable
 template < typename T >
 struct ResumableResult
 {
@@ -102,7 +101,7 @@ private:
 /// @endcond
 
 /**
- * @ingroup	resumable
+ * @ingroup	modm_processing_resumable
  * @author	Niklas Hauser
  * @tparam	Functions	the number of resumable functions that are available in this class. Must be non-zero!
  */

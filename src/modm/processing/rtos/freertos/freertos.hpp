@@ -12,9 +12,8 @@
 // ----------------------------------------------------------------------------
 
 /**
- * \ingroup		processing
- * \defgroup	freertos	FreeRTOS
- * 
+ * \ingroup		modm_processing_rtos
+ *
  * FreeRTOS is a real-time operating system for embedded devices, being ported
  * to several microcontrollers. It is distributed under the GPL with an
  * optional exception.
@@ -30,11 +29,3 @@
  * 
  * \see	http://www.freertos.org/
  */
-
-namespace modm
-{
-	/// \ingroup	freertos
-	namespace freertos
-	{	
-	}
-}

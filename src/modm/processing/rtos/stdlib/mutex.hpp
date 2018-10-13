@@ -26,7 +26,7 @@ namespace modm
 		/**
 		 * \brief	Mutex
 		 * 
-		 * \ingroup	stdlib_rtos
+		 * \ingroup	modm_processing_rtos
 		 */
 		class Mutex
 		{
@@ -70,6 +70,7 @@ namespace modm
 		 * Implements a RAII-style locking.
 		 * 
 		 * Locks the Mutex when created and unlocks it on destruction.
+		 * \ingroup modm_processing_rtos
 		 */
 		class MutexGuard : std::lock_guard<std::timed_mutex>
 		{
