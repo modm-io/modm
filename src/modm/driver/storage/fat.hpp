@@ -21,6 +21,7 @@
 
 namespace modm
 {
+	/// @ingroup modm_driver_fat
 	namespace fat
 	{
 		typedef DRESULT Result;

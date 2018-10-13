@@ -14,6 +14,12 @@
 def init(module):
     module.parent = "driver"
     module.name = "itg3200"
+    module.description = """\
+# ITG3200 Digital Gyroscope
+
+For further information on the special sensing functions, consult the
+[datasheet](http://invensense.com/mems/gyro/documents/PS-ITG-3200-00-01.4.pdf).
+"""
 
 def prepare(module, options):
     module.depends(

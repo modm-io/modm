@@ -21,6 +21,7 @@
 namespace modm
 {
 
+/// @ingroup modm_driver_nrf24
 struct Nrf24Register
 {
 	/* Commands */

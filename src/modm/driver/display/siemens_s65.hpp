@@ -40,7 +40,7 @@ namespace modm
 	 * In portrait mode the connector is at the bottom.
 	 * In landscape mode the connector is at the right border.
 	 *
-	 * \ingroup	driver_display
+	 * \ingroup	modm_driver_siemens_s65
 	 */
 
 	// common for landscape and portrait
@@ -65,6 +65,7 @@ namespace modm
 
 	};
 
+	/// \ingroup	modm_driver_siemens_s65
 	template <typename SPI, typename CS, typename RS, typename Reset>
 	class SiemensS65Portrait :
 		public BufferedGraphicDisplay<132, 176>,
@@ -82,12 +83,12 @@ namespace modm
 
 	};
 
-		/**
-		 * The display in landscape mode does not match the required
-		 * alignment of BufferedGraphicDisplay which requests that
-		 * the vertical resolution can be divided by 8.
-		 *
-		 */
+	/**
+	 * The display in landscape mode does not match the required
+	 * alignment of BufferedGraphicDisplay which requests that
+	 * the vertical resolution can be divided by 8.
+	 * \ingroup	modm_driver_siemens_s65
+	 */
 	template <typename SPI, typename CS, typename RS, typename Reset>
 	class SiemensS65Landscape :
 		public BufferedGraphicDisplay<176, 136>,

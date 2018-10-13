@@ -13,13 +13,10 @@
 #ifndef MODM_DS1302_HPP
 #define MODM_DS1302_HPP
 
-/**
- * \ingroup		driver_rtc
- * \defgroup	ds1302			DS1302
- */
-
 namespace modm
 {
+
+/// @ingroup modm_driver_ds1302
 struct ds1302
 {
 	struct Config
@@ -110,7 +107,7 @@ protected:
 /**
  * Realtime clock DS1302
  *
- * @ingroup  ds1302
+ * @ingroup  modm_driver_ds1302
  * @author   Sascha Schade (strongly-typed)
  */
 template < class PinSet >

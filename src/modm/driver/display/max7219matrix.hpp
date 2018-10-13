@@ -28,7 +28,7 @@ namespace modm
  * An arbitrary number of these chips can be daisy-chained
  *
  * @author	Sascha Schade
- * @ingroup	driver_display
+ * @ingroup	modm_driver_max7219
  */
 template < typename SPI, typename CS, uint8_t MODULES = 1 >
 class Max7219
@@ -153,7 +153,7 @@ private:
  * @tparam	ROW		Number of modules placed vertically
  *
  * 8x8 LED modules with MAX7219 are easily and cheaply available.
- *
+ * @ingroup modm_driver_max7219
  */
 template < typename SPI, typename CS, uint8_t COLUMNS = 1, uint8_t ROWS = 1 >
 class Max7219matrix : public BufferedGraphicDisplay< 8 * COLUMNS, 8 * ROWS >

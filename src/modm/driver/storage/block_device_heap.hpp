@@ -29,7 +29,7 @@ namespace modm
  * \tparam	DeviceSize The size of the block device
  * \tparam	externalMemory Set to true to use an external supplied memory block (see `initialize(uint8_t*)`)
  *
- * \ingroup	driver_storage
+ * \ingroup	modm_driver_block_device_heap
  * \author	Raphael Lehmann
  */
 template <size_t DeviceSize_, bool externalMemory = false>

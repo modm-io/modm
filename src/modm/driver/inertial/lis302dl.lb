@@ -14,6 +14,13 @@
 def init(module):
     module.parent = "driver"
     module.name = "lis302dl"
+    module.description = """\
+# LIS302DL 3-Axis Accelerometer
+
+The LIS302DL is an ultra compact low-power three axes linear accelerometer.
+It includes a sensing element and an IC interface able to provide the measured
+acceleration to the external world through an I2C/SPI serial interface.
+"""
 
 def prepare(module, options):
     module.depends(

@@ -21,6 +21,7 @@
 namespace modm
 {
 
+/// @ingroup modm_driver_drv832x_spi
 struct drv832xSpi
 {
 	enum class
@@ -292,13 +293,7 @@ struct drv832xSpi
 };
 
 /**
- * \brief	DRV832xS: 6 to 60-V Three-Phase Smart Gate Driver
- *
- * This driver only covers the gate driver configuration accessible via SPI interface.
- *
- * \see		<a href="http://www.ti.com/lit/ds/symlink/drv8320.pdf">DRV832x Datasheet</a>
- *
- * \ingroup	driver_motor
+ * \ingroup	modm_driver_drv832x_spi
  * \author	Raphael Lehmann
  */
 template < class SpiMaster, class Cs >

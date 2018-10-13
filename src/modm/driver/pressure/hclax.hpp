@@ -24,6 +24,7 @@ namespace modm
 template < typename I2cMaster >
 class HclaX;
 
+/// @ingroup modm_driver_hclax
 struct hclax
 {
 	struct modm_packed
@@ -59,12 +60,7 @@ struct hclax
 };
 
 /**
- * Driver for the HCLA differential pressure sensors.
- *
- * The device runs a cyclic program, which will store a corrected pressure value with
- * 12 bit resolution about every 250 μs within the output registers of the internal ASIC.
- *
- * @ingroup driver_pressure
+ * @ingroup modm_driver_hclax
  * @author	Niklas Hauser
  */
 template < typename I2cMaster >

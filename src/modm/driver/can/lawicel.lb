@@ -14,7 +14,17 @@
 def init(module):
     module.parent = "driver"
     module.name = "lawicel"
+    module.description = """\
+# Lawicel Format Converter
 
+Converts `modm::can::Message` to and from the Lawicel string format (`char *`).
+
+Lawicel AB (http://www.lawicel.com) offers medium sized CAN to USB and CAN to
+RS232 converters. Their data format is widely used.
+
+This converter only understands messages of type 'r', 't', 'R' and 'T' which
+transmits CAN frames. It does not understand commands to change the baud rate.
+"""
 
 def prepare(module, options):
     module.depends(":architecture:can")

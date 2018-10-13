@@ -22,6 +22,7 @@ namespace modm
 template < class I2cMaster >
 class Hmc6343;
 
+/// @ingroup modm_driver_hmc6343
 struct hmc6343
 {
 	enum class
@@ -202,16 +203,7 @@ protected:
 }; // struct hmc6343
 
 /**
- * HMC6343 3-Axis Compass with algorithms driver.
- *
- * The Honeywell HMC6343 is a fully integrated compass module that
- * includes firmware for heading computation and calibration for
- * magnetic distortions. The module combines 3-axis magneto-resistive
- * sensors and 3-axis MEMS accelerometers, analog and digital
- * support circuits, microprocessor and algorithms required for
- * heading computation.
- *
- * @ingroup driver_inertial
+ * @ingroup modm_driver_hmc6343
  * @author	Niklas Hauser
  */
 template < class I2cMaster >

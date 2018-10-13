@@ -21,19 +21,7 @@
 namespace modm
 {
 
-/**
- * Converts MODM CAN messages (modm::can::Message) to and from the Lawicel string format (char *).
- *
- * Lawicel AB offers medium sized CAN to USB
- * and CAN to RS232 converters. Their data format is widely used, including
- * RCA's BotControl Java GUI and Fabian's USB2CAN dongle.
- *
- * This converter only understands messages of type 'r', 't', 'R' and 'T' which
- * transmits CAN frames. It does not understand commands to change the baud rate et cetera.
- *
- * @ingroup driver_can
- * @see http://www.lawicel.com/
- */
+/// @ingroup modm_driver_lawicel
 class CanLawicelFormatter
 {
 public:

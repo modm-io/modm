@@ -32,7 +32,7 @@ namespace modm
  * @see Lis302dl
  * @see Lis3dsh
  *
- * @ingroup driver_inertial
+ * @ingroup modm_driver_lis3_transport
  * @author	Niklas Hauser
  */
 template < class I2cMaster >
@@ -79,7 +79,7 @@ private:
  *
  * @tparam	Cs	connected Chip Select Pin
  *
- * @ingroup driver_inertial
+ * @ingroup modm_driver_lis3_transport
  * @author	Niklas Hauser
  */
 template < class SpiMaster, class Cs >

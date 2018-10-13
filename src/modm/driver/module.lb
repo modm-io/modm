@@ -13,10 +13,10 @@
 
 def init(module):
     module.name = "driver"
+    module.description = "External Device Drivers"
 
 def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "modm/src/modm/driver"
-    env.copy("driver.dox")
+    pass

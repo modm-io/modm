@@ -18,6 +18,7 @@
 namespace modm
 {
 
+/// @ingroup modm_driver_pca9685
 struct pca9685
 {
 	enum Register
@@ -142,7 +143,7 @@ struct pca9685
  * @tparam I2cMaster I2C interface
  *
  * @author Christian Menard
- * @ingroup driver_pwm
+ * @ingroup modm_driver_pca9685
  */
 template<typename I2cMaster>
 class Pca9685 : public pca9685, public modm::I2cDevice< I2cMaster, 1, I2cWriteTransaction >

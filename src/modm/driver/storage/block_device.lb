@@ -10,6 +10,7 @@
 class BlockDeviceFile(Module):
     def init(self, module):
         module.name = "file"
+        module.description = "File Block Device"
 
     def prepare(self, module, options):
         module.depends(":architecture:block.device")
@@ -24,6 +25,7 @@ class BlockDeviceFile(Module):
 class BlockDeviceHeap(Module):
     def init(self, module):
         module.name = "heap"
+        module.description = "Heap Block Device"
 
     def prepare(self, module, options):
         module.depends(":architecture:block.device", ":utils")
@@ -38,6 +40,7 @@ class BlockDeviceHeap(Module):
 class BlockDeviceMirror(Module):
     def init(self, module):
         module.name = "mirror"
+        module.description = "Mirroring Block Device"
 
     def prepare(self, module, options):
         module.depends(":architecture:block.device")
@@ -52,6 +55,11 @@ class BlockDeviceMirror(Module):
 class BlockDeviceSpiFlash(Module):
     def init(self, module):
         module.name = "spi.flash"
+        module.description = """\
+# SPI Flash Block Device
+
+Microchip SST26VF064B 64MBit flash chip in SOIJ-8, WDFN-8 or SOIC-16.
+"""
 
     def prepare(self, module, options):
         module.depends(":architecture:block.device", ":architecture:spi.device", ":architecture:register")
@@ -66,6 +74,7 @@ class BlockDeviceSpiFlash(Module):
 def init(module):
     module.parent = "driver"
     module.name = "block.device"
+    module.description = "Block Devices"
 
 def prepare(module, options):
     module.add_submodule(BlockDeviceFile())

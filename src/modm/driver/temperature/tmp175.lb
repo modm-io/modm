@@ -14,6 +14,19 @@
 def init(module):
     module.parent = "driver"
     module.name = "tmp175"
+    module.description = """\
+# TMP175 Thermometer
+
+TMP175 digital temperature sensor driver.
+
+The TMP175 is a digital temperature sensor with a two-wire interface
+and measures temperature over a range of -40 to +125 deg Celsius with a
+resolution of 1/16 (0.0625) deg C and an accuracy of up to 1.5 deg C.
+
+The sensor has a default refresh rate of 4Hz but can be raised up to
+30Hz by repeatedly manually starting a conversion (with startConversion()),
+which lasts between 30ms and 240ms depending on resolution.
+"""
 
 def prepare(module, options):
     module.depends(

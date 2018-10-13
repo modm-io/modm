@@ -32,7 +32,7 @@ namespace modm
 	 *
 	 * \see		<a href="http://ww1.microchip.com/downloads/en/devicedoc/21897a.pdf">Datasheet</a>
 	 *
-	 * \ingroup	driver_dac
+	 * \ingroup	modm_driver_mcp4922
 	 * \author	Fabian Greif
 	 */
 	template <typename Spi, typename Cs, typename Ldac>

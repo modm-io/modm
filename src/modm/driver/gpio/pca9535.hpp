@@ -20,6 +20,7 @@
 namespace modm
 {
 
+/// @ingroup modm_driver_pca9535
 struct pca9535
 {
 protected:
@@ -66,37 +67,8 @@ public:
 }; // struct pca9535
 
 /**
- * PCA9535 I2C GPIO expander.
- *
- * Also software-compatible with PCA9555.
- * The lower three address bits can be configured: 0100abc.
- *
- * Notice that you can specify multiple pins at the same time for functions
- * with argument type `Pins`, either by ORing the according pins, or
- * converting a 16bit value using the `Pins(uint16_t)` converting constructor.
- *
- * Other functions with argument type `Pin` can only take one pin.
- * If you want to operate on all 16bit, use the `get(Inputs|Outputs|Directions|Polarities)()`
- * getters.
- *
- * @code
- * typedef modm::pca9535::Pin Pin;
- * typedef modm::pca9535::Pins Pins;
- *
- * RF_CALL_BLOCKING(expander.setOutput(Pins(0xff));	// set all lower 8 pins to output
- * RF_CALL_BLOCKING(expander.set(Pin::P0_0));		// set only pin 00 high
- * RF_CALL_BLOCKING(expander.reset(Pin::P0_1 | Pin::P0_2));	// reset 2 pins
- * RF_CALL_BLOCKING(expander.toggle(Pin::P0_3 | Pin::P0_4 | Pin::P0_5));	// toggle 3 pins
- *
- * RF_CALL_BLOCKING(expander.readInput());	// transfer input states from the external chip
- * bool high = expander.read(Pin::P1_0);	// check a single pin
- *
- * Pins input = expander.getInputs();	// get all 16 input states
- * bool isAnyPinHigh = input.any(Pin::P1_1 | Pin::P1_2 | Pin::P1_3); // check if any of 3 pins is high
- * @endcode
- *
  * @author	Niklas Hauser
- * @ingroup driver_gpio
+ * @ingroup modm_driver_pca9535
  */
 template < typename I2cMaster >
 class Pca9535 : public pca9535, public modm::I2cDevice< I2cMaster, 2 >, public modm::GpioExpander

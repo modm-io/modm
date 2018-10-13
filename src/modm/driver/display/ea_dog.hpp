@@ -32,7 +32,7 @@ namespace modm
 	 * SPI needs to operate in Mode 3. Maximum SPI frequency is 33 MHz.
 	 *
 	 * \see		<a href="http://www.lcd-module.de/eng/pdf/grafik/dogs102-6e.pdf">Datasheet</a>
-	 * \ingroup	driver_display
+	 * \ingroup	modm_driver_ea_dog
 	 */
 	template <typename SPI, typename CS, typename A0, typename Reset, bool TopView = false>
 	class DogS102 : public St7565<SPI, CS, A0, Reset, 102, 64, TopView>
@@ -57,7 +57,7 @@ namespace modm
 	 * \brief	EA DOGM132x-5
 	 *
 	 * \see		<a href="http://www.lcd-module.de/eng/pdf/grafik/dogm132-5e.pdf">Datasheet</a>
-	 * \ingroup	lcd
+	 * \ingroup	modm_driver_ea_dog
 	 */
 	template <typename SPI, typename CS, typename A0, typename Reset, bool TopView = false>
 	class DogM132 : public St7565<SPI, CS, A0, Reset, 132, 32, TopView>
@@ -82,7 +82,7 @@ namespace modm
 	 * \brief	EA DOGM128x-6
 	 *
 	 * \see		<a href="http://www.lcd-module.de/pdf/grafik/dogm128.pdf">Datasheet</a>
-	 * \ingroup	lcd
+	 * \ingroup	modm_driver_ea_dog
 	 */
 	template <typename SPI, typename CS, typename A0, typename Reset, bool TopView = false>
 	class DogM128 : public St7565<SPI, CS, A0, Reset, 128, 64, TopView>
@@ -107,7 +107,7 @@ namespace modm
 	 * \brief	EA DOGL128x-6
 	 *
 	 * \see		<a href="http://www.lcd-module.de/pdf/grafik/dogl128-6.pdf">Datasheet</a>
-	 * \ingroup	lcd
+	 * \ingroup	modm_driver_ea_dog
 	 */
 	template <typename SPI, typename CS, typename A0, typename Reset, bool TopView = false>
 	class DogL128 : public St7565<SPI, CS, A0, Reset, 128, 64, TopView>
@@ -137,7 +137,7 @@ namespace modm
 	 *
 	 * \todo	Initialization
 	 * \see		<a href="http://www.lcd-module.de/eng/pdf/doma/dog-me.pdf">Datasheet</a>
-	 * \ingroup	lcd
+	 * \ingroup	modm_driver_ea_dog
 	 */
 	template <typename SPI, typename CS, typename RS>
 	class DogM081 : public St7036<SPI, CS, RS, 8, 1>
@@ -149,7 +149,7 @@ namespace modm
 	 *
 	 * \todo	Initialization
 	 * \see		<a href="http://www.lcd-module.de/eng/pdf/doma/dog-me.pdf">Datasheet</a>
-	 * \ingroup	lcd
+	 * \ingroup	modm_driver_ea_dog
 	 */
 	template <typename SPI, typename CS, typename RS>
 	class DogM162 : public St7036<SPI, CS, RS, 16, 2>
@@ -161,7 +161,7 @@ namespace modm
 	 *
 	 * \todo	Initialization
 	 * \see		<a href="http://www.lcd-module.de/eng/pdf/doma/dog-me.pdf">Datasheet</a>
-	 * \ingroup	lcd
+	 * \ingroup	modm_driver_ea_dog
 	 */
 	template <typename SPI, typename CS, typename RS>
 	class DogM163 : public St7036<SPI, CS, RS, 16, 3>

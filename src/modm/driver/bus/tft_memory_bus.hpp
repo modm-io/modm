@@ -20,7 +20,7 @@ namespace modm
 {
 /**
  * @author	Fabian Greif
- * @ingroup	driver_bus
+ * @ingroup	modm_driver_memory_bus
  */
 class TftMemoryBus16Bit
 {
@@ -69,7 +69,7 @@ private:
 	volatile uint16_t * const ptrData;
 };
 
-/// @ingroup	driver_bus
+/// @ingroup	modm_driver_memory_bus
 class TftMemoryBus8Bit
 {
 public:
@@ -123,7 +123,7 @@ private:
  * 8080-style parallel bus made of a parallel PORT, chip select CS, read strobe RD and write strobe WR
  *
  * @author	Sascha Schade
- * @ingroup	driver_bus
+ * @ingroup	modm_driver_memory_bus
  */
 template <
 	typename PORT,	/* Port */
@@ -186,7 +186,7 @@ public:
 	}
 };
 
-/// @ingroup	driver_bus
+/// @ingroup	modm_driver_memory_bus
 template <
 	typename PORT,	/* Port */
 	typename CS,	/* Chip select */

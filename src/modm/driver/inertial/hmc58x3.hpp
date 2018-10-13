@@ -28,6 +28,7 @@ class Hmc5843;
 template < class I2cMaster >
 class Hmc5883;
 
+/// @ingroup modm_driver_hmc58x
 struct hmc58x3
 {
 protected:
@@ -180,16 +181,7 @@ public:
 }; // struct hmc58x3
 
 /**
- * HMC58x3 3-axis digital magnetometer family driver.
- *
- * The HMC58x3 is a surface-mount, multi-chip module designed for low-field
- * magnetic sensing with a digital interface for applications such as
- * low-cost compassing and magnetometry. The HMC58x3 includes high-resolution
- * magneto-resistive sensors plus an ASIC containing amplification,
- * automatic degaussing strap drivers, offset cancellation, and a 12-bit
- * ADC that enables 1-2 degrees compass heading accuracy.
- *
- * @ingroup driver_inertial
+ * @ingroup modm_driver_hmc58x
  * @author	Niklas Hauser
  */
 template < typename I2cMaster >

@@ -22,6 +22,9 @@
 
 namespace modm
 {
+	/// @ingroup modm_driver_ea_dog
+	/// @{
+
 	// (1) Display ON/OFF
 	#define ST7565_ON       			0xAF
 	#define ST7565_OFF      			0xAE
@@ -103,6 +106,8 @@ namespace modm
 	
 	// (22) NOP
 	#define ST7565_NOP					0xE3
+
+	/// @}
 }
 
 #endif // MODM_ST7565_DEFINES_HPP

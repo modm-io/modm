@@ -30,7 +30,7 @@ namespace modm
 	 * \see		Lcd
 	 *
 	 * \author	Fabian Greif
-	 * \ingroup	driver_display
+	 * \ingroup	modm_driver_ea_dog
 	 */
 	template <typename SPI, typename CS, typename RS, unsigned int Width, unsigned int Heigth>
 	class St7036 : public CharacterDisplay

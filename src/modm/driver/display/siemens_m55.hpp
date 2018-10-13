@@ -26,7 +26,7 @@ namespace modm
 	 *
 	 * (also shared with A60, A65, C60, MC60 and S55 models)
 	 *
-	 * \ingroup	driver_display
+	 * \ingroup	modm_driver_siemens_m55
 	 */
 	template <typename SPI, typename CS, typename RS, typename Reset>
 	class SiemensM55 : public BufferedGraphicDisplay<101, 80>

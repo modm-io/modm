@@ -29,7 +29,7 @@ namespace modm
  * readPageFromMemory(pos, buffer, sizeof(buffer) method.
  * Appropriate data sources can be external SPI flashes.
  *
- * @ingroup driver_other
+ * @ingroup modm_driver_spartan_3
  */
 template <	typename Cclk,			///< Clock output to FPGA
 			typename Din,			///< Data output to FPGA

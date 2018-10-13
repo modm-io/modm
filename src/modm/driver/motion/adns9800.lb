@@ -14,6 +14,12 @@
 def init(module):
     module.parent = "driver"
     module.name = "adns9800"
+    module.description = """\
+# ADNS-9800 Laser Motion Sensor
+
+Based on work of Alexander Entinger, MSc / LXRobotics
+Based on https://github.com/mrjohnk/ADNS-9800
+"""
 
 def prepare(module, options):
     module.add_option(
@@ -33,4 +39,4 @@ def build(env):
     env.outbasepath = "modm/src/modm/driver/motion"
     env.copy("adns9800.hpp")
     env.copy("adns9800_impl.hpp")
-    env.copy("adns9800_srom_{}.hpp".format(env[":::firmware"]), "adns9800_srom.hpp")
+    env.copy("adns9800_srom_{}.hpp".format(env["firmware"]), "adns9800_srom.hpp")

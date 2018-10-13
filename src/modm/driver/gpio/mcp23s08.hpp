@@ -25,7 +25,7 @@ namespace modm
 	 * A1 and A0 need to be tided low.
 	 * 
 	 * \author	Fabian Greif
-	 * \ingroup	driver_gpio
+	 * \ingroup	modm_driver_mcp23s08
 	 */
 	template <typename Spi, typename Cs, typename Int>
 	class Mcp23s08

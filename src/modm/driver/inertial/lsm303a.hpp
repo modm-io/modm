@@ -24,6 +24,7 @@ namespace modm
 template < class I2cMaster >
 class Lsm303a;
 
+/// @ingroup modm_driver_lsm303a
 struct lsm303a
 {
 	enum class
@@ -369,23 +370,9 @@ protected:
 }; // struct lsm303a
 
 /**
- * LSM303DLHC 3-Axis accelerometer.
- *
- * The LSM303DLHC is a system-in-package featuring a 3D digital linear
- * acceleration sensor and a 3D digital magnetic sensor.
- * The sensor has linear acceleration full scales of ±2g/±4g/±8g/±16g and a
- * magnetic field full scale of ±1.3/±1.9/±2.5/±4.0/±4.7/±5.6/±8.1 gauss.
- * The LSM303DLHC includes an I2C serial bus interface that supports standard and fast mode 100 kHz and 400 kHz.
- *
- * Since the device actually features two I2C devices which are just placed in the same
- * package, this class only implements the acceleration sensor.
- * For the magnetic field sensor see the `Lsm303m` class!
- *
- * @see	Lsm303m
- *
  * @tparam	I2cMaster	A class conforming to the I2cMaster interface
  *
- * @ingroup driver_inertial
+ * @ingroup modm_driver_lsm303a
  * @author	Niklas Hauser
  */
 template < class I2cMaster >

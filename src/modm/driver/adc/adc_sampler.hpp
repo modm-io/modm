@@ -21,33 +21,11 @@ namespace modm
 {
 
 /**
- * Generic ADC wrapper for (over-)sampling analog inputs.
- *
- * This template class stores 8, 16 or 32bit ADC values in a buffer and
- * provides an easy interface for managing that data.
- *
- * The code will read the ADC channels you specify in an array.
- * This means you can remap the ADC channels in the order that they
- * should appear in the buffer.
- * The array must obviously have as many elements as channels!
- * For example, if channels 0,2,7 are connected, but the sensors
- * are in the wrong order, just remap them with the array {7,0,2}.
- *
- * To make use of oversampling and averaging, set `Oversamples > 0`.
- * This will loop `Oversamples` times through the ADC channels, adding
- * the average of each result to the buffer.
- *
- * This class will choose the smallest data width for you.
- * It decides this by adding the ADC resolution and the oversample size
- * and choosing the next smallest size (not larger than 32bit though!).
- *
- * @warning	The averaging algorithm only works for unsigned ADC data!
- *
  * @tparam AdcInterrupt	a class implementing the AdcInterrupt interface
  * @tparam Channels		number of ADC channels connected to sensor(s) >= 1
  * @tparam Oversamples	# of samples to average for each channel
  *
- * @ingroup driver_adc
+ * @ingroup modm_driver_adc_sampler
  * @author	Niklas Hauser
  */
 template < class AdcInterrupt, uint8_t Channels, uint32_t Oversamples=1 >

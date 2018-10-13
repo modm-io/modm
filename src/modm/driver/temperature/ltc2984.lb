@@ -14,6 +14,16 @@
 def init(module):
     module.parent = "driver"
     module.name = "ltc2984"
+    module.description = """\
+# LTC298x Thermometer
+
+LTC2983/LTC2984: Integrated temperature measurement system (20 channel)
+
+The integrated EEPROM of the LTC2984 is not supported by now.
+LTC2984 and LTC2983 are 100%% compatible except the LTC2983 has no integrated EEPROM.
+
+[Datasheet](http://cds.linear.com/docs/en/datasheet/2984fb.pdf)
+"""
 
 def prepare(module, options):
     module.depends(

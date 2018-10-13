@@ -32,6 +32,7 @@ class Tmp102;
 template < class I2cMaster >
 class Tmp175;
 
+/// @ingroup modm_driver_lm75
 struct lm75
 {
 protected:
@@ -114,16 +115,7 @@ public:
 };
 
 /**
- * LM75 digital temperature sensor driver.
- *
- * The LM75 is a digital temperature sensor with an I2C interface
- * and measures temperature over a range of -55 to +125 deg Celsius with
- * a resolution of 0.5 deg C and an accuracy of up to 2 deg C.
- *
- * The sensor has a default refresh rate between 3Hz and 10Hz which is
- * hardcoded into the sensor and cannot be changed.
- *
- * @ingroup	driver_temperature
+ * @ingroup	modm_driver_lm75
  *
  * @author	Fabian Greif
  * @author	Niklas Hauser

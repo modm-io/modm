@@ -19,6 +19,7 @@
 namespace modm
 {
 
+/// @ingroup modm_driver_mcp23x17
 struct mcp23x17
 {
 protected:
@@ -84,19 +85,6 @@ public:
 }; // struct mcp23x17
 
 /**
- * MCP23X15 16-Bit I/O Expander with Serial Interface.
- *
- * GPB is the high byte, GPA the low byte.
- * The lower three address bits can be configured: 0100abc.
- *
- * Notice that you can specify multiple pins at the same time for functions
- * with argument type `Pins`, either by ORing the according pins, or
- * converting a 16bit value using the `Pins(uint16_t)` converting constructor.
- *
- * Other functions with argument type `Pin` can only take one pin.
- * If you want to operate on all 16bit, use the `get(Inputs|Outputs|Directions|Polarities)()`
- * getters.
- *
  * @see Mcp23TransportI2c
  * @see Mcp23TransportSpi
  *
@@ -105,7 +93,7 @@ public:
  * @author	Fabian Greif
  * @author	Niklas Hauser
  *
- * @ingroup driver_gpio
+ * @ingroup modm_driver_mcp23x17
  */
 template <class Transport>
 class Mcp23x17 : public mcp23x17, public Transport, public modm::GpioExpander

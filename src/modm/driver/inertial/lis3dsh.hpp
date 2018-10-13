@@ -24,6 +24,7 @@ namespace modm
 template < class Transport >
 class Lis3dsh;
 
+/// @ingroup modm_driver_lis3dsh
 struct lis3dsh
 {
 	enum class
@@ -503,18 +504,11 @@ protected:
 }; // struct lis3dsh
 
 /**
- * LIS3DSH 3-Axis accelerometer.
- *
- * The LIS3DSH is an ultra low-power high performance three-axis linear accelerometer belonging to the
- * "nano" family with embedded state machine that can be programmed to implement autonomous applications.
- * The LIS3DSH has dynamically selectable full scales of ±2g/±4g/±6g/±8g/±16g and it is capable
- * of measuring accelerations with output data rates from 3.125 Hz to 1.6 kHz.
- *
  * @tparam	Transport	Either the I2C or SPI Transport Layer.
  * @see Lis3TransportI2c
  * @see Lis3TransportSpi
  *
- * @ingroup driver_inertial
+ * @ingroup modm_driver_lis3dsh
  * @author	Niklas Hauser
  */
 template < class Transport >

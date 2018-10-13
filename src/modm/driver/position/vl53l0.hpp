@@ -41,6 +41,7 @@ namespace vl53l0_private
 template < class I2cMaster >
 class Vl53l0;
 
+/// @ingroup modm_driver_vl53l0
 struct vl53l0
 {
 public:
@@ -332,12 +333,10 @@ IOStream&
 operator << (IOStream& os, const vl53l0::RangeErrorCode& c);
 
 /**
- * VL53L0X: Proximity sensor module
- *
  * The class is build for single-shot measurements.
  *
  * @author	Christopher Durand
- * @ingroup driver_position
+ * @ingroup modm_driver_vl53l0
  */
 template < typename I2cMaster >
 class Vl53l0 : public vl53l0, public modm::I2cDevice< I2cMaster, 5 >

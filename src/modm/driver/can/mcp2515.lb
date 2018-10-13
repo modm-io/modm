@@ -14,15 +14,15 @@
 def init(module):
     module.parent = "driver"
     module.name = "mcp2515"
+    module.description = "MPC2515 External CAN Controller"
 
 
 def prepare(module, options):
     module.add_option(
         EnumerationOption(
-            name="MCP2515_clock",
+            name="clock",
             enumeration=["16MHz", "20MHz"],
-            description=
-                "Used clock for the MCP2515. The device configuration "
+            description="Used clock for the MCP2515. The device configuration "
                 "is selected according to the clock speed.",
             default="16MHz"))
 

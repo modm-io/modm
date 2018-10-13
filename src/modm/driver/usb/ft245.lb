@@ -14,6 +14,47 @@
 def init(module):
     module.parent = "driver"
     module.name = "ft245"
+    module.description = """\
+# FT245 USB FIFO
+
+The FT245R USB FIFO from Future Technology Devices International is a
+single chip USB to parallel FIFO bidirectional data transfer interface.
+
+Wr and Rd must be GpioOutputs and set to output mode before.
+Rxf and Txe must be GpioInputs.
+Port is switched between input and output mode.
+
+## Example
+
+```cpp
+#include <modm/architecture.hpp>
+#include <modm/driver/usb/ft245.hpp>
+using namespace modm::platform;
+
+using myPort = GpioPort<GpioD0, 8>;
+using Rxf    = GpioInputC11;
+using Txe    = GpioInputC10;
+using Rd     = GpioOutputA15;
+using Wr     = GpioOutputA9;
+
+using myFt = modm::Ft245<myPort, Rd, Wr, Rxf, Txe>;
+
+int
+main()
+{
+    Rd::setOutput(modm::Gpio::High);
+    Wr::setOutput(modm::Gpio::Low);
+
+    while (1)
+    {
+        uint8_t c;
+        if (myFt::read(c)) {
+            myFt::write(c + 1);
+        }
+    }
+}
+```
+"""
 
 def prepare(module, options):
     module.depends(":architecture:gpio")

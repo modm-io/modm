@@ -35,7 +35,7 @@ namespace modm
  * The `read()`, `erase()`,`program()` and `write()` methodes wait for
  * the chip to finish writing to the flash.
  *
- * \ingroup	driver_storage
+ * \ingroup	modm_driver_block_device_spi_flash
  * \author	Raphael Lehmann
  */
 template <typename Spi, typename Cs, uint32_t flashSize>

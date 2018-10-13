@@ -29,7 +29,7 @@ namespace modm
  * @see modm::Mcp23x08
  * @see modm::Mcp23x17
  *
- * @ingroup driver_gpio
+ * @ingroup modm_driver_mcp23x17
  * @author	Niklas Hauser
  */
 template < class I2cMaster >
@@ -74,7 +74,7 @@ private:
  *
  * @tparam	Cs	connected Chip Select Pin
  *
- * @ingroup driver_gpio
+ * @ingroup modm_driver_mcp23x17
  * @author	Niklas Hauser
  */
 template < class SpiMaster, class Cs >

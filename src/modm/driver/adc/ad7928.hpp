@@ -26,6 +26,7 @@
 namespace modm
 {
 
+/// @ingroup modm_driver_ad7928
 struct ad7928
 {
 public:
@@ -147,17 +148,11 @@ public:
 }; // struct ad7928
 
 /**
- * Driver for AD7928/AD7918/AD7908 ADC
- *
- * The AD7928/AD7918/AD7908 are, respectively, 12/10/8 bit analog-digital converters.
- * The conversion time is determined by the Spi clock frequency. A maximum Spi clock
- * of 20 Mhz is supported.
- *
  * @tparam	SpiMaster	SpiMaster interface
  * @tparam	Cs			Chip-select pin
  *
  * @author	Christopher Durand
- * @ingroup driver_adc
+ * @ingroup modm_driver_ad7928
  */
 template <typename SpiMaster, typename Cs>
 class Ad7928 : public ad7928, public modm::SpiDevice<SpiMaster>, protected modm::NestedResumable<3>

@@ -20,6 +20,7 @@
 
 namespace modm
 {
+	/// @ingroup modm_driver_max6966
 	namespace max6966
 	{
 		static const uint8_t WRITE = 0x00;
@@ -112,7 +113,7 @@ namespace modm
 	 * \tparam	DRIVERS	Number of daisy-chained chips
 	 *
 	 * \author	Niklas Hauser
-	 * \ingroup	driver_pwm
+	 * \ingroup	modm_driver_max6966
 	 */
 	template<
 		typename Spi,

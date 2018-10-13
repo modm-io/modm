@@ -14,6 +14,18 @@
 def init(module):
     module.parent = "driver"
     module.name = "lm75"
+    module.description = """\
+# LM75 Thermometer
+
+LM75 digital temperature sensor driver.
+
+The LM75 is a digital temperature sensor with an I2C interface
+and measures temperature over a range of -55 to +125 deg Celsius with
+a resolution of 0.5 deg C and an accuracy of up to 2 deg C.
+
+The sensor has a default refresh rate between 3Hz and 10Hz which is
+hardcoded into the sensor and cannot be changed.
+"""
 
 def prepare(module, options):
     module.depends(

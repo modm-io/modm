@@ -30,7 +30,7 @@ namespace modm
  * \tparam BlockDeviceA		First block device of the mirrored block devices
  * \tparam BlockDeviceB		Second block device
  *
- * \ingroup	driver_storage
+ * \ingroup	modm_driver_block_device_mirror
  * \author	Raphael Lehmann
  */
 template <typename BlockDeviceA, typename BlockDeviceB>

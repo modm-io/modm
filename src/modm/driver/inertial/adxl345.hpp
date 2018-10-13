@@ -18,6 +18,7 @@
 
 namespace modm
 {
+	/// @ingroup modm_driver_adxl345
 	namespace adxl345
 	{
 		/// The addresses of the Configuration and Data Registers
@@ -152,7 +153,7 @@ namespace modm
 	 * datasheet</a>.
 	 *
 	 * \author	Niklas Hauser
-	 * \ingroup driver_inertial
+	 * \ingroup modm_driver_adxl345
 	 *
 	 * \tparam I2cMaster Asynchronous Two Wire interface
 	 */

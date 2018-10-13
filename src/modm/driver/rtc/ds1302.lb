@@ -14,6 +14,7 @@
 def init(module):
     module.parent = "driver"
     module.name = "ds1302"
+    module.description = "DS1302 Real-Time Clock"
 
 def prepare(module, options):
     module.depends(

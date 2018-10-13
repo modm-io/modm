@@ -22,6 +22,7 @@ namespace modm
 template < class I2cMaster >
 class Itg3200;
 
+/// @ingroup modm_driver_itg3200
 struct itg3200
 {
 protected:
@@ -185,14 +186,8 @@ public:
 }; // struct itg3200
 
 /**
- * Basic ITG3200 digital gyroscope sensor driver
- *
- * For further information on the special sensing functions, consult the
- * <a href="http://invensense.com/mems/gyro/documents/PS-ITG-3200-00-01.4.pdf">
- * datasheet</a>.
- *
  * @author	Niklas Hauser
- * @ingroup driver_inertial
+ * @ingroup modm_driver_itg3200
  */
 template < typename I2cMaster >
 class Itg3200 : public itg3200, public modm::I2cDevice< I2cMaster, 2 >

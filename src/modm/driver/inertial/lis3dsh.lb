@@ -14,6 +14,15 @@
 def init(module):
     module.parent = "driver"
     module.name = "lis3dsh"
+    module.description = """\
+# LIS3DSH 3-Axis Accelerometer
+
+The LIS3DSH is an ultra low-power high performance three-axis linear
+accelerometer belonging to the "nano" family with embedded state machine
+that can be programmed to implement autonomous applications. The LIS3DSH has
+dynamically selectable full scales of ±2g/±4g/±6g/±8g/±16g and it is capable
+of measuring accelerations with output data rates from 3.125 Hz to 1.6 kHz.
+"""
 
 def prepare(module, options):
     module.depends(

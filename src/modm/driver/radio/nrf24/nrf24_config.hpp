@@ -33,7 +33,7 @@ namespace modm
  * wireless modules. It doesn't implement every aspect, but hopefully
  * all the often used ones.
  *
- * @ingroup	nrf24
+ * @ingroup	modm_driver_nrf24
  * @author		Daniel Krebs
  */
 template<typename Nrf24Phy>

@@ -21,6 +21,7 @@
 namespace modm
 {
 
+/// @ingroup modm_driver_ltc2984
 struct ltc2984
 {
 	struct modm_packed
@@ -335,14 +336,7 @@ inline ltc2984::CommandStatus operator |(ltc2984::CommandStatus r, ltc2984::Chan
 }
 
 /**
- * \brief	LTC2983/LTC2984: Integrated temperature measurement system (20 channel)
- *
- * The integrated EEPROM of the LTC2984 is not supported by now.
- * LTC2984 and LTC2983 are 100% compatible except the LTC2983 has no integrated EEPROM.
- *
- * \see		<a href="http://cds.linear.com/docs/en/datasheet/2984fb.pdf">Datasheet</a>
- *
- * \ingroup	driver_temperature
+ * \ingroup	modm_driver_ltc2984
  * \author	Raphael Lehmann
  */
 template < class SpiMaster, class Cs >

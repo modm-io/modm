@@ -21,6 +21,7 @@
 namespace modm
 {
 
+/// @ingroup modm_driver_ssd1306
 struct ssd1306
 {
 protected:
@@ -149,7 +150,7 @@ public:
  * the frame rate to about 40Hz.
  *
  * @author	Niklas Hauser
- * @ingroup	driver_display
+ * @ingroup	modm_driver_ssd1306
  */
 template < class I2cMaster, uint8_t Height = 64 >
 class Ssd1306 : public ssd1306, public BufferedGraphicDisplay<128, Height>,
