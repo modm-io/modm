@@ -23,9 +23,9 @@ namespace modm
 	{
 		/**
 		 * \brief	Base class for all allocator types
-		 * 
+		 *
 		 * \internal
-		 * 
+		 *
 		 * \ingroup	modm_utils_allocator
 		 * \author	Fabian Greif
 		 */
@@ -35,11 +35,11 @@ namespace modm
 		public:
 			/**
 			 * \brief	Construct an object
-			 * 
+			 *
 			 * Constructs an object of type T (the template parameter) on the
 			 * location pointed by p using its copy constructor to initialize
 			 * its value to \p value.
-			 * 
+			 *
 			 * Notice that this does not allocate space for the element, it
 			 * should already be available at p.
 			 */
@@ -49,13 +49,13 @@ namespace modm
 				// placement new
 				::new((void *) p) T(value);
 			}
-			
+
 			/**
 			 * \brief	Destroy an object
-			 * 
+			 *
 			 * Destroys the object of type T (the template parameter) pointed
 			 * by p.
-			 * 
+			 *
 			 * Notice that this does not deallocate space for the element.
 			 */
 			static inline void
@@ -63,7 +63,7 @@ namespace modm
 			{
 				p->~T();
 			}
-			
+
 		protected:
 			AllocatorBase()
 			{

@@ -26,7 +26,7 @@
  * metaprogramming is a programming technique in which templates are used by a
  * compiler to generate temporary source code, which is merged by the compiler
  * with the rest of the source code and then compiled.
- * 
+ *
  * \see		http://en.wikipedia.org/wiki/Template_metaprogramming
  */
 
@@ -45,7 +45,7 @@ namespace modm
 		class NullType
 		{
 		};
-		
+
 		// --------------------------------------------------------------------
 		/**
 		 * \brief	Selects type Result = (flag == true) ? T : U
@@ -56,13 +56,13 @@ namespace modm
 		{
 			typedef T Result;
 		};
-		
+
 		template <typename T, typename U>
 		struct Select<false, T, U>
 		{
 			typedef U Result;
 		};
-		
+
 		// --------------------------------------------------------------------
 		/**
 		 * \brief	SameType<T,U>::value is true when T=U
@@ -75,7 +75,7 @@ namespace modm
 				value = false
 			};
 		};
-		
+
 		template <typename T>
 		struct SameType<T, T>
 		{
@@ -83,11 +83,11 @@ namespace modm
 				value = true
 			};
 		};
-		
+
 		// --------------------------------------------------------------------
 		/**
 		 * \brief Checks for conversion possibilities between T and U
-		 * 
+		 *
 		 * - \c Conversion<T,U>::exists is \c true if \c T is convertible to \c U
 		 * - \c Conversion<T,U>::existsBothWays is \c true if \c U is also convertible to \c T
 		 * - \c Conversion<T,U>::isSameType is \c true if \c U is \c T
@@ -108,12 +108,12 @@ namespace modm
 			// Only works if sizeof(char) != sizeof(int)
 			typedef char ConversionPossible;
 			typedef int ConversionNotPossible;
-			
+
 			static ConversionPossible Test(U);
 			static ConversionNotPossible Test(...);
-			
+
 			static T CreateT(void);
-			
+
 		public:
 			enum {
 				exists = (sizeof(ConversionPossible) == sizeof(Test(CreateT()))),
@@ -122,7 +122,7 @@ namespace modm
 			};
 #endif
 		};
-		
+
 		template <typename T>
 		struct Conversion<T, T>
 		{
@@ -132,7 +132,7 @@ namespace modm
 				isSameType = true
 			};
 		};
-		
+
 		template <typename T>
 		struct Conversion<void, T>
 		{
@@ -142,7 +142,7 @@ namespace modm
 				isSameType = false
 			};
 		};
-		
+
 		template <typename T>
 		struct Conversion<T, void>
 		{
@@ -152,7 +152,7 @@ namespace modm
 				isSameType = false
 			};
 		};
-		
+
 		template <>
 		struct Conversion<void, void>
 		{
@@ -162,14 +162,14 @@ namespace modm
 				isSameType = true
 			};
 		};
-		
+
 		// --------------------------------------------------------------------
 		/**
 		 * \brief	Check if U is derived from T or if U is T
-		 * 
-		 * \c SuperSubclass<T,U>::value is \c true when \c U is derived 
+		 *
+		 * \c SuperSubclass<T,U>::value is \c true when \c U is derived
 		 * from \c T, or when \c U is \c T.
-		 * 
+		 *
 		 * \ingroup modm_utils_tmp
 		 */
 		template <typename T, typename U>
@@ -184,7 +184,7 @@ namespace modm
 				dontUseWithIncompleteTypes = (sizeof(T) == sizeof(U))
 			};
 		};
-		
+
 		template <>
 		struct SuperSubclass<void, void>
 		{
@@ -192,7 +192,7 @@ namespace modm
 				value = false
 			};
 		};
-		
+
 		template <typename U>
 		struct SuperSubclass<void, U>
 		{
@@ -203,7 +203,7 @@ namespace modm
 				dontUseWithIncompleteTypes = (0 == sizeof(U))
 			};
 		};
-		
+
 		template <typename T>
 		struct SuperSubclass<T, void>
 		{
@@ -214,13 +214,13 @@ namespace modm
 				dontUseWithIncompleteTypes = (0 == sizeof(T))
 			};
 		};
-		
+
 		// --------------------------------------------------------------------
 		/**
 		 * \brief	Check if U is derived from T
-		 * 
+		 *
 		 * \c SuperSubclassStrict<T,U>::value is \c true when \c U is derived from \c T
-		 * 
+		 *
 		 * \ingroup modm_utils_tmp
 		 */
 		template <typename T, typename U>
@@ -231,14 +231,14 @@ namespace modm
 					   !Conversion<const volatile T*, const volatile U*>::isSameType
 			};
 		};
-		
+
 		// --------------------------------------------------------------------
 		/**
 		 * \brief	These templates are a set of tools to allow a function
 		 * 			template or a class template specialization to include or
 		 * 			exclude itself from a set of matching functions or specializations
 		 * 			based on properties of its template arguments.
-		 * 
+		 *
 		 * Example:
 		 * \code
 		 * struct FloatingPointTraits
@@ -249,7 +249,7 @@ namespace modm
 		 *     {
 		 *         return 3.40282e+38;
 		 *     }
-		 *     
+		 *
 		 *     template <typename T>
 		 *     static typename tm::EnableIfCondition<sizeof(T) == 8, T>::type
 		 *     max()
@@ -257,12 +257,12 @@ namespace modm
 		 *         return 1.79769e+308;
 		 *     }
 		 * };
-		 * 
+		 *
 		 * // Usage:
 		 * FloatingPointTraits::max<float>();
 		 * FloatingPointTraits::max<double>();
 		 * \endcode
-		 * 
+		 *
 		 * \ingroup modm_utils_tmp
 		 */
 		template <bool B, class T = void>
@@ -270,7 +270,7 @@ namespace modm
 		{
 			typedef T type;
 		};
-		
+
 		/**
 		 * \internal
 		 */
@@ -278,7 +278,7 @@ namespace modm
 		struct EnableIfCondition<false, T>
 		{
 		};
-		
+
 		/**
 		 * \ingroup modm_utils_tmp
 		 */
@@ -286,12 +286,12 @@ namespace modm
 		struct EnableIf : public EnableIfCondition< Conditional::value, T >
 		{
 		};
-		
+
 		// --------------------------------------------------------------------
 		// helper classes for the static assert macro
 		template <bool x>
 		struct STATIC_ASSERTION_FAILURE;
-		
+
 		template <>
 		struct STATIC_ASSERTION_FAILURE<true>
 		{
@@ -299,17 +299,17 @@ namespace modm
 				value = 1
 			};
 		};
-		
+
 		template <int x>
 		struct static_assert_test
 		{
 		};
-		
+
 		/**
 		 * \brief		Static assert support
 		 *
 		 * Inspired by the BOOST_STATIC_ASSERT macro.
-		 * 
+		 *
 		 * \see	http://www.boost.org/doc/libs/1_43_0/doc/html/boost_staticassert.html
 		 * \ingroup modm_utils_tmp
 		 * \deprecated Use static_assert(bool_constexpr, string) (since C++11) instead.

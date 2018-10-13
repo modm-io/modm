@@ -22,10 +22,10 @@ namespace modm
 	{
 		/**
 		 * \brief	Static memory allocator
-		 * 
+		 *
 		 * Allocates a big static block and distributes pieces of it during
 		 * run-time. No reallocation is done when no more pieces are available.
-		 * 
+		 *
 		 * \ingroup	modm_utils_allocator
 		 * \author	Fabian Greif
 		 */
@@ -39,31 +39,31 @@ namespace modm
 			{
 				typedef Static<U, N> other;
 			};
-			
+
 		public:
 			Static() :
 				AllocatorBase<T>()
 			{
 			}
-			
+
 			Static(const Static& other) :
 				AllocatorBase<T>(other)
 			{
 			}
-			
+
 			template <typename U>
 			Static(const Static<U, N>&) :
 				AllocatorBase<T>()
 			{
 			}
-			
+
 			// TODO
 			T*
 			allocate(std::size_t other);
-			
+
 			void
 			deallocate(T*);
-			
+
 		private:
 			T memory[N];
 		};
