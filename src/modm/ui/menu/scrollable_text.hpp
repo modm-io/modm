@@ -38,22 +38,22 @@ namespace modm
 		 * @param space number of letters, which can be displayed at once
 		 */
 		ScrollableText(const char* text, uint16_t space);
-		
+
 		ScrollableText(const ScrollableText& text);
 
 		ScrollableText& operator=(const ScrollableText& text);
 
 		~ScrollableText();
-	
+
 		/**
 		 *determines if the text can be displayed without scrolling
 		 */
-		inline bool 
+		inline bool
 		needsScrolling()
 		{
 			return length > space;
 		}
-		
+
 		/**
 		 * @brief getText return the part of the text which should be displayed next
 		 *
@@ -64,7 +64,7 @@ namespace modm
 		 */
 		const char*
 		getText();
-		
+
 		/**
 		 * @brief toogle the scrolling
 		 */
@@ -109,14 +109,14 @@ namespace modm
 		}
 
 	private:
-	
+
 		bool paused;
 		const char* text;
 		uint16_t startPosition;
 		uint16_t length;
 		uint16_t space;
 		char* print;
-	
+
 	};
 }
 #endif // MODM_SCROLLABLE_TEXT_HPP

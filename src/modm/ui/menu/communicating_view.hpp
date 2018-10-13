@@ -30,7 +30,7 @@ namespace modm
 		CommunicatingView(modm::CommunicatingViewStack* /*stack*/)
 		{
 		}
-		
+
 	protected:
 		inline modm::CommunicatingViewStack*
 		getCommunicatingViewStack(modm::ViewStack* viewStack)

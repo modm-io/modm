@@ -25,7 +25,7 @@ namespace modm
 	{
 		/**
 		 * \brief	Numbers 14x32
-		 * 
+		 *
 		 * - fixed width     : 14
 		 * - height          : 32
 		 * - hspace          : 3
@@ -34,7 +34,7 @@ namespace modm
 		 * - last char       : 58
 		 * - number of chars : 10
 		 * - size in bytes   : 578
-		 * 
+		 *
 		 * \ingroup	modm_ui_display_font
 		 */
 		EXTERN_FLASH_STORAGE(uint8_t Numbers14x32[]);

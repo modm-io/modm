@@ -43,11 +43,11 @@ namespace modm
 		 * @param func  callback, which is called when entry is chosen
 		 */
 		MenuEntry(const char* text, uint16_t space, MenuEntryCallback func);
-		
+
 		ScrollableText text;
 		MenuEntryCallback callback;
 	};
-	
+
 	/**
 	* \brief StandardMenu provides a vertical list of entry.
 	*
@@ -66,7 +66,7 @@ namespace modm
 	public:
 
 		StandardMenu(modm::ViewStack* stack, uint8_t identifier);
-		
+
 		virtual ~StandardMenu() = 0;
 
 		StandardMenu(modm::ViewStack* stack, uint8_t identifier, const char* title);

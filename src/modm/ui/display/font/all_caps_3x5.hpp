@@ -25,7 +25,7 @@ namespace modm
 	{
 		/**
 		 * \brief	All Caps 3x5
-		 * 
+		 *
 		 * - preferred width : 3
 		 * - height          : 5
 		 * - hspace          : 1
@@ -34,7 +34,7 @@ namespace modm
 		 * - last char       : 128
 		 * - number of chars : 96
 		 * - size in bytes   : 370
-		 * 
+		 *
 		 * \ingroup	modm_ui_display_font
 		 */
 		EXTERN_FLASH_STORAGE(uint8_t AllCaps3x5[]);

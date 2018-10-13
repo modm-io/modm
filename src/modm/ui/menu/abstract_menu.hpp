@@ -21,7 +21,7 @@
 #include "abstract_view.hpp"
 
 namespace modm{
-	
+
 	 /**
 	 * @brief The AbstractMenu class is the same as the AbstractView class,
 	 *        except it forces the developer to reimplement the handling
@@ -35,13 +35,13 @@ namespace modm{
 		public:
 
 			AbstractMenu(modm::ViewStack* stack, uint8_t identifier);
-			
+
 
 			virtual void
 			shortButtonPress(modm::MenuButtons::Button button) = 0;
 
 		private:
-			
+
 
 	};
 

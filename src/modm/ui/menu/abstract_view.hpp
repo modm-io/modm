@@ -25,7 +25,7 @@ namespace modm
 {
 	// forward declaration
 	class ViewStack;
-	
+
 	/**
 	 * @brief The AbstractView class is the base class for all screens
 	 *        handled by the ViewStack class
@@ -37,7 +37,7 @@ namespace modm
 	class AbstractView
 	{
 		friend class ViewStack;
-		
+
 	public:
 		/**
 		 * @param stack pointer to the stack, the screen should be displayed on.
@@ -45,7 +45,7 @@ namespace modm
 		 *        displayed on the graphicDisplay
 		 */
 		AbstractView(modm::ViewStack* stack, uint8_t identifier);
-		
+
 		virtual ~AbstractView() = 0;
 
 		/**
@@ -63,18 +63,18 @@ namespace modm
 		 */
 		virtual bool
 		hasChanged() = 0;
-		
+
 		/**
 		 * @brief draw determine the output on the Graphic Display
 		 */
 		virtual void
 		draw() = 0;
-		
+
 
 		/**
 		 * @brief shortButtonPress handle the action for the pressed button
 		 */
-		virtual void 
+		virtual void
 		shortButtonPress(modm::MenuButtons::Button button);
 
 		/**
@@ -101,20 +101,20 @@ namespace modm
 
 		modm::GraphicDisplay&
 		display();
-		
+
 		/**
 		 * @brief onRemove will be called right before the view gets deleted,
 		 *        can be reimplemented to reset external data.
 		 */
 		virtual void
 		onRemove();
-		
+
 		inline modm::ViewStack*
 		getViewStack()
 		{
 			return stack;
 		}
-		
+
 	private:
 		modm::ViewStack* stack;
 

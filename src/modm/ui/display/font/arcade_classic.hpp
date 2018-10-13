@@ -25,7 +25,7 @@ namespace modm
 	{
 		/**
 		 * \brief	Arcade Classic
-		 * 
+		 *
 		 * - fixed width     : 7
 		 * - height          : 8
 		 * - hspace          : 0
@@ -34,7 +34,7 @@ namespace modm
 		 * - last char       : 128
 		 * - number of chars : 96
 		 * - size in bytes   : 776
-		 * 
+		 *
 		 * \ingroup	modm_ui_display_font
 		 */
 		EXTERN_FLASH_STORAGE(uint8_t ArcadeClassic[]);

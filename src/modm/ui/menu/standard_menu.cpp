@@ -90,7 +90,7 @@ modm::StandardMenu::draw()
 		else {
 				(*display) << " ";
 		}
-		
+
 		(*display) << iter->text.getText();
 		++iter;
 	}

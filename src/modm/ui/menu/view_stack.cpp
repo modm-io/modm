@@ -33,7 +33,7 @@ modm::ViewStack::pop()
 {
 	modm::AbstractView *topElement = this->stack.get();
 	this->stack.pop();
-	
+
 	delete topElement;
 }
 
@@ -60,7 +60,7 @@ modm::ViewStack::update()
 		// Remove old view
 		top->onRemove();
 		this->pop();
-		
+
 		// Get new screen
 		top = this->get();
 		top->update();

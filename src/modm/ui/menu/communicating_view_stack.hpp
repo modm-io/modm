@@ -34,13 +34,13 @@ namespace modm
 			communicator(communicator)
 		{
 		}
-		
+
 		inline xpcc::Communicator*
 		getCommunicator()
 		{
 			return communicator;
 		}
-		
+
 	protected:
 		xpcc::Communicator* communicator;
 	};
