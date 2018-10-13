@@ -51,7 +51,7 @@ namespace modm
 		 * \tparam	T	Input type
 		 * \tparam	N	Number of samples (maximum is 65356 or 2**16)
 		 *
-		 * \ingroup	filter
+		 * \ingroup	modm_math_filter
 		 */
 		template<typename T, std::size_t N>
 		class MovingAverage

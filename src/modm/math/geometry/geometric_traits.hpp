@@ -23,7 +23,7 @@ namespace modm
 	 * \brief	Traits for all geometric classes
 	 * 
 	 * 
-	 * \ingroup	geometry
+	 * \ingroup	modm_math_geometry
 	 * \author	Fabian Greif
 	 */
 	template <typename T>

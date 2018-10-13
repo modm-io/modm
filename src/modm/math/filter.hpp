@@ -12,12 +12,13 @@
  */
 // ----------------------------------------------------------------------------
 
-/**
- * \ingroup		math
- * \defgroup	filter	Filter
- * \brief		Filters, Interpolators, Averages, PID controller
- *
- */
+namespace modm
+{
+	/// @ingroup modm_math_filter
+	namespace filter
+	{
+	}
+}
 
 #include "filter/debounce.hpp"
 #include "filter/fir.hpp"

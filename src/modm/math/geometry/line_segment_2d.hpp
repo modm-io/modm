@@ -32,7 +32,7 @@ namespace modm
 	 * \brief	Line segment
 	 * 
 	 * \author	Fabian Greif
-	 * \ingroup	geometry
+	 * \ingroup	modm_math_geometry
 	 */
 	template <typename T = int16_t>
 	class LineSegment2D

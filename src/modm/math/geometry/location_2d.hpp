@@ -31,7 +31,7 @@ namespace modm
 	 * on the field. The robot has a position (x- and y-coordinate) and a
 	 * orientation (absolute angle in the range (-pi, pi)).
 	 * 
-	 * \ingroup	geometry
+	 * \ingroup	modm_math_geometry
 	 */
 	template <typename T = int16_t>
 	class Location2D
@@ -123,7 +123,7 @@ namespace modm
 	/**
 	 * \brief	Stream operator to \b modm::Location<T>
 	 * 
-	 * \ingroup	geometry
+	 * \ingroup	modm_math_geometry
 	 */
 	template<typename T>
 	IOStream&

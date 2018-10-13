@@ -37,7 +37,7 @@ namespace modm
 	 * A ray is composed of a starting point and a direction vector.
 	 * 
 	 * \author	Fabian Greif
-	 * \ingroup	geometry
+	 * \ingroup	modm_math_geometry
 	 */
 	template <typename T = int16_t>
 	class Ray2D

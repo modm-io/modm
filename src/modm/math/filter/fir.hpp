@@ -27,7 +27,7 @@ namespace modm
 	 * \todo	
 	 * 
 	 * \author	Kevin Laeufer
-	 * \ingroup	filter
+	 * \ingroup modm_math_filter
 	 */
 	namespace filter
 	{

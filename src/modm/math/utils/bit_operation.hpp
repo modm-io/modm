@@ -24,14 +24,15 @@
 
 namespace modm
 {
+	/// @ingroup modm_math_utils
+	/// @{
+
 	/**
 	 * \brief	Exchange the two nibbles of a byte
 	 *
 	 * \code
 	 * 0xab => 0xba
 	 * \endcode
-	 *
-	 * \ingroup	math
 	 */
 	modm_always_inline uint8_t
 	swap(uint8_t n)
@@ -50,11 +51,7 @@ namespace modm
 #endif
 	}
 
-	/**
-	 * \brief	Exchange two byte
-	 *
-	 * \ingroup	math
-	 */
+	/// Exchange two byte
 	modm_always_inline void
 	swap(uint8_t& a, uint8_t& b)
 	{
@@ -69,8 +66,6 @@ namespace modm
 	 * \code
 	 * 0xabcd => 0xcdab
 	 * \endcode
-	 *
-	 * \ingroup	math
 	 */
 	modm_always_inline uint16_t
 	swap(uint16_t n)
@@ -108,8 +103,6 @@ namespace modm
 	 * \code
 	 * 0xabcdefgh => 0xghefcdab
 	 * \endcode
-	 *
-	 * \ingroup	math
 	 */
 	modm_always_inline uint32_t
 	swap(uint32_t n)
@@ -144,8 +137,6 @@ namespace modm
 	 * \endcode
 	 *
 	 * 15 clock cycles on an AVR, without call + return.
-	 *
-	 * \ingroup	math
 	 */
 	inline uint8_t
 	bitReverse(uint8_t n)
@@ -168,8 +159,6 @@ namespace modm
 
 	/**
 	 * \brief	Reverse the bits in a 16-bit integer
-	 *
-	 * \ingroup	math
 	 */
 	inline uint16_t
 	bitReverse(uint16_t n)
@@ -194,8 +183,6 @@ namespace modm
 
 	/**
 	 * \brief	Reverse the bits in a 32-bit integer
-	 *
-	 * \ingroup	math
 	 */
 	inline uint32_t
 	bitReverse(uint32_t n)
@@ -229,7 +216,6 @@ namespace modm
 	/// Returns position of leftmost bit at compile time.
 	/// @retval -1  if no bit set in value
 	/// @retval n   position of leftmost bit
-	/// @ingroup math
 	constexpr int8_t
 	leftmostBit(uint32_t value)
 	{
@@ -241,8 +227,6 @@ namespace modm
 	 * \brief	Count the number of bits set
 	 *
 	 * 16 clock cycles on an AVR, without call + return.
-	 *
-	 * \ingroup	math
 	 */
 	std::size_t
 	bitCount(uint8_t n);
@@ -251,19 +235,15 @@ namespace modm
 	 * \brief	Count the number of bits set
 	 *
 	 * 33 clock cycles on an AVR, without call + return.
-	 *
-	 * \ingroup	math
 	 */
 	std::size_t
 	bitCount(uint16_t n);
 
-	/**
-	 * \brief	Count the number of bits set
-	 *
-	 * \ingroup	math
-	 */
+	/// Count the number of bits set
 	std::size_t
 	bitCount(uint32_t n);
+
+	/// @}
 }
 
 #endif	// MODM_BIT_OPERATION_HPP

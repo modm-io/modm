@@ -35,7 +35,7 @@ namespace modm
 	 * \see <a href"http://www-etud.iro.umontreal.ca/~petitg/cpp/quat.html">Homepage</a>
 	 * 
 	 * \author	Fabian Greif
-	 * \ingroup	geometry
+	 * \ingroup	modm_math_geometry
 	 */
 	template<class T>
 	class Quaternion

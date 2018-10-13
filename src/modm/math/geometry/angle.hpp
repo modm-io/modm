@@ -51,12 +51,14 @@
 
 namespace modm
 {
+	/// @ingroup modm_math_geometry
 	static constexpr float
 	toRadian(float angle)
 	{
 		return (angle * M_PI) / 180.f;
 	}
 
+	/// @ingroup modm_math_geometry
 	static constexpr float
 	toDegree(float angle)
 	{
@@ -69,7 +71,7 @@ namespace modm
 	 * Angles are always represented by float values in the range
 	 * from -Pi to Pi.
 	 *
-	 * \ingroup	geometry
+	 * @ingroup modm_math_geometry
 	 */
 	class Angle
 	{

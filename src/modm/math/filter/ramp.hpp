@@ -32,7 +32,7 @@ namespace modm
 		 * \todo	example
 		 * 
 		 * \todo	documentation
-		 * \ingroup	filter
+		 * \ingroup	modm_math_filter
 		 */
 		template<typename T>
 		class Ramp
