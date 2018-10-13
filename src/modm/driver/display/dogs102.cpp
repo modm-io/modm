@@ -23,23 +23,23 @@ namespace modm
 		{
 			0x40,	// Display start line 0
 			0xa4,	// Display -> Set All Pixel to ON
-			
+
 			// Normal / Inverted
 			ST7565_NORMAL,				// Display normal
-			
+
 			// Hardware options
 			ST7565_BIAS_1_9,			// Set bias 1/9 (Duty 1/65)
 			ST7565_POWER_WIDE_RANGE,	// Booster, Regulator and Follower on
-			
+
 			// Contrast options
 			0x25,						// Contrast set
 			ST7565_VOLUME_MODE_1,
 			27,
-			
+
 			// Set Temperature compensation
 			0xfa,
 			0x90,
-			
+
 			// (Init done)
 			ST7565_ON, 					// Display on
 		};

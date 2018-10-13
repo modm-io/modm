@@ -33,28 +33,28 @@ modm::SpiRam<Spi, Cs, Hold>::initialize()
 {
 	cs.set();
 	cs.setOutput();
-	
+
 	spi.initialize();
-	
+
 	hold.set();
 	hold.setOutput();
-	
+
 	modm::delayMicroseconds(1);
-	
+
 	cs.reset();
 	spi.write(WRITE_STATUS_REGISTER);
 	spi.write(SEQUENTIAL_MODE);
 	cs.set();
-	
+
 	modm::delayMicroseconds(1);
-	
+
 	// Check if the status register has the right content. This also used
 	// as a general check that the device is available.
 	cs.reset();
 	spi.write(READ_STATUS_REGISTER);
 	bool result = (spi.write(0) == (SEQUENTIAL_MODE));
 	cs.set();
-	
+
 	return result;
 }
 
@@ -66,7 +66,7 @@ modm::SpiRam<Spi, Cs, Hold>::startRead(uint16_t address)
 	cs.reset();
 	spi.write(READ);
 	spi.write(address >> 8);
-	spi.write(address & 0xff);	
+	spi.write(address & 0xff);
 }
 
 // ----------------------------------------------------------------------------
@@ -151,7 +151,7 @@ modm::SpiRam<Spi, Cs, Hold>::writeData(uint16_t address,
 	write(data, size);
 	finish();
 }
-	
+
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Hold>
 void

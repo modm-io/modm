@@ -18,9 +18,9 @@
 // ----------------------------------------------------------------------------
 /*
  * 74HC595
- * 
+ *
  * Data is moved to the output registers on a low-to-high transition of
- * RCLK (= Store). 
+ * RCLK (= Store).
  */
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Store, size_t N>
@@ -39,7 +39,7 @@ modm::ShiftRegisterOutput<Spi, Store, N>::initialize()
 {
 	spi.initialize();
 	store.setOutput(modm::Gpio::Low);
-	
+
 	for (uint_fast8_t i = 0; i < N; ++i) {
 		cache[i] = 0;
 	}
@@ -69,7 +69,7 @@ modm::ShiftRegisterOutput<Spi, Store, N>::update()
 	for (int_fast8_t i = N-1; i >= 0; --i) {
 		spi.write(cache[i]);
 	}
-	
+
 	// Pulse the hc595 store clock to load the shifted bits
 	store.set();
 	// FIXME delay 20-100ns

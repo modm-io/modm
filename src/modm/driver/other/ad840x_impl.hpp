@@ -58,10 +58,10 @@ void
 modm::AD840x<Spi, Cs, Rs, Shdn>::setValue(ad840x::Channel channel, uint8_t data)
 {
 	Cs::reset();
-	
+
 	// only the last 10 bits shifted in are used
 	Spi::write(channel & 0x03);
 	Spi::write(data);
-	
+
 	Cs::set();
 }

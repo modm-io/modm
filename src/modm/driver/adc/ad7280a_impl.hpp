@@ -13,39 +13,39 @@
 
 /*
  * The AD7280A supports only 32-bit SPI operations.
- * 
+ *
  * 5-Bit Device Address
  * 6-Bit Register Address
- * 
+ *
  * Write cycle:
  *    3                   2                   1
  *  1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * | Device  |  Register |     Data      |A|0|      CRC      |0|1|0|
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * 
+ *
  * A = Address All
- * 
+ *
  * Read register cycle:
  *    3                   2                   1
  *  1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * | Device  |  Register |     Data      |0|0|C|      CRC      |0|0|
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * 
+ *
  * C = Acknowledge
- * 
+ *
  * Read conversion result cycle:
  *    3                   2                   1
  *  1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * | Device  |Channel|         Data          |C|      CRC      |0|0|
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * 
+ *
  * C = Acknowledge
- * 
+ *
  * Device Address is send LSB first, all other data is send MSB first.
- * 
+ *
  * The CRC is calculated over Bit 31-11 on write and Bit 31-10 on read
  * (everything before the CRC).
  */
@@ -141,9 +141,9 @@ void
 modm::Ad7280a<Spi, Cs, Cnvst, N>::initialize(ad7280a::Average average)
 {
 	static_assert(N == 1, "Daisy chain length is currently limited to 1!");
-	
+
 	controlHighByte = average;
-	
+
 	Cs::setOutput(modm::Gpio::High);
 	Cnvst::setOutput(modm::Gpio::High);
 }
@@ -159,7 +159,7 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::chainSetup()
 			AD7280A_CTRL_LB_MUST_SET |
 			AD7280A_CTRL_LB_LOCK_DEV_ADDR |
 			AD7280A_CTRL_LB_DAISY_CHAIN_RB_EN);
-	
+
 	// A single command should be sent to all devices in the
 	// chain to assert the lock device address bit (D2), to deassert
 	// the increment device address bit (D1), and to assert the
@@ -168,12 +168,12 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::chainSetup()
 			AD7280A_CTRL_LB_MUST_SET |
 			AD7280A_CTRL_LB_LOCK_DEV_ADDR |
 			AD7280A_CTRL_LB_DAISY_CHAIN_RB_EN);
-	
+
 	// A second command should be sent to all devices in the
 	// chain to write the address of the lower byte of the control
 	// register, 0x0E, to the read register on all devices.
 	write(ad7280a::MASTER, ad7280a::READ, true, ad7280a::CTRL_LB << 2);
-	
+
 	//MODM_LOG_DEBUG << "chain setup" << modm::endl;
 	// To verify that all AD7280As in the chain have received and
 	// locked their unique device address, a daisy-chain register read
@@ -182,7 +182,7 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::chainSetup()
 	// the lower byte of the control register of each device in the
 	// daisy chain has been read back. The user should confirm
 	// that all device addresses are in sequence.
-	// 
+	//
 	// This command should be repeated until the control
 	// register data has been read back from all devices in the
 	// daisy chain.
@@ -191,12 +191,12 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::chainSetup()
 	{
 		ad7280a::RegisterValue reg;
 		readRegister(&reg);
-		
+
 		// TODO check result
 	}
 	// -> 11 c2 65 dc
 	// -> f9 c2 61 84
-	
+
 	return success;
 }
 
@@ -220,30 +220,30 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::performSelftest()
 			AD7280A_CTRL_LB_MUST_SET |
 			AD7280A_CTRL_LB_LOCK_DEV_ADDR |
 			AD7280A_CTRL_LB_DAISY_CHAIN_RB_EN);
-	
+
 	// To select the self-test conversion, set Bits[D15:D14] of the
 	// control register to 1, and set Bits[D13:D12] of the control
 	// register to 0 on all parts.
 	write(0, ad7280a::CTRL_HB, true,
 			AD7280A_CTRL_HB_CONV_INPUT_SELF_TEST |
 			AD7280A_CTRL_HB_CONV_START_CS);
-	
+
 	// Allow sufficient time for the self-test conversions to be
 	// completed plus tWAIT.
 	modm::delayMilliseconds(50);		// TODO
-	
+
 	// The register address corresponding to the self-test
 	// conversion should be written to the read register of all
 	// parts (see Table 13 for register addresses). The 32-bit write
 	// command is 0x03 86 17 CA (see Table 29, Write 3).
 	write(0, ad7280a::READ, true, static_cast<uint8_t>(ad7280a::SELF_TEST << 2));
-	
+
 	//MODM_LOG_DEBUG << "result:" << modm::endl;
 	// Apply a CS low pulse that frames 32 SCLKs to read back
 	// the desired voltage. This frame should simultaneously
 	// write the 32-bit command 0xF800030A, as described in
 	// the Serial Interface section (see Table 29, Write 6).
-	// 
+	//
 	// The self-test conversion
 	// result typically varies between Code 970 and Code 990.
 	ad7280a::ConversionValue conversion;
@@ -267,7 +267,7 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::softwareReset()
 			AD7280A_CTRL_LB_MUST_SET |
 			AD7280A_CTRL_LB_LOCK_DEV_ADDR |
 			AD7280A_CTRL_LB_DAISY_CHAIN_RB_EN);
-	
+
 	// Clear reset bit
 	write(ad7280a::MASTER, ad7280a::CTRL_LB, true,
 			AD7280A_CTRL_LB_MUST_SET |
@@ -284,18 +284,18 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::readChannel(uint8_t device,
 	write(ad7280a::MASTER, ad7280a::CTRL_HB, true,
 			AD7280A_CTRL_HB_CONV_INPUT_ALL |
 			AD7280A_CTRL_HB_CONV_RES_READ_NO);
-	
+
 	write(device, ad7280a::CTRL_HB, false,
 			AD7280A_CTRL_HB_CONV_INPUT_ALL |
 			AD7280A_CTRL_HB_CONV_RES_READ_ALL |
 			AD7280A_CTRL_HB_CONV_START_CS);
-	
+
 	// Wait for the conversion to finish
 	modm::delayMilliseconds(5);
-	
+
 	// Read one channel
 	write(device, ad7280a::READ, false, channel);
-	
+
 	ad7280a::ConversionValue conversion;
 	if (readConversionResult(&conversion) &&
 			(conversion.device == device) &&
@@ -304,7 +304,7 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::readChannel(uint8_t device,
 		*value = conversion.value;
 		return true;
 	}
-	
+
 	return false;
 }
 
@@ -317,15 +317,15 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::readAllChannels(uint16_t *values)
 	// parts. A device address of 0x00 is used when computing
 	// the CRC for commands to write to all parts.
 	write(0, ad7280a::READ, true, static_cast<uint8_t>(ad7280a::CELL_VOLTAGE_1));
-	
+
 	write(0, ad7280a::CTRL_HB, true,
 			AD7280A_CTRL_HB_CONV_INPUT_6CELL |
 			AD7280A_CTRL_HB_CONV_RES_READ_6CELL |
 			AD7280A_CTRL_HB_CONV_START_CS);
-	
+
 	// Allow sufficient time for all conversions to be completed plus tWAIT.
 	modm::delayMilliseconds(5);
-	
+
 	// Apply a CS low pulse that frames 32 SCLKs to read back
 	// the desired voltage. This frame should simultaneously
 	// write the 32-bit command 0xF800030A, as described in
@@ -343,7 +343,7 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::readAllChannels(uint16_t *values)
 		}
 		values++;
 	}
-	
+
 	return success;
 }
 
@@ -362,7 +362,7 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::updateCrc(uint8_t data)
 			data ^= 0x2F;
 		}
 	}
-	
+
 	return data;
 }
 
@@ -372,10 +372,10 @@ uint8_t
 modm::Ad7280a<Spi, Cs, Cnvst, N>::calculateCrc(uint32_t data)
 {
 	uint8_t crc;
-	
+
 	crc = updateCrc((data >> 16) & 0xFF);
 	crc = updateCrc(crc ^ ((data >> 8) & 0xFF));
-	
+
 	return  crc ^ (data & 0xFF);
 }
 
@@ -391,16 +391,16 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::write(uint8_t device, ad7280a::Register reg,
 			 static_cast<uint32_t>(reg) << 21L |
 			 static_cast<uint32_t>(value) << 13 |
 			 addressAll << 12);
-	
+
 	t |= calculateCrc(t >> 11) << 3 | 0x2;
-	
+
 	Cs::reset();
 	Spi::write((t >> 24) & 0xff);
 	Spi::write((t >> 16) & 0xff);
 	Spi::write((t >> 8) & 0xff);
 	Spi::write((t >> 0) & 0xff);
 	Cs::set();
-	
+
 	// TODO remove this
 	modm::delayMicroseconds(1);
 	return true;
@@ -417,9 +417,9 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::read(uint32_t *value)
 	*value |= static_cast<uint32_t>(Spi::write(0x03)) << 8;
 	*value |= static_cast<uint32_t>(Spi::write(0x0A));
 	Cs::set();
-	
+
 	//MODM_LOG_DEBUG << "read = " << modm::hex << *value << modm::ascii << modm::endl;
-	
+
 	uint8_t crc = calculateCrc(*value >> 10);
 	if (crc == ((*value >> 2) & 0xff)) {
 		return true;
@@ -442,10 +442,10 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::readRegister(ad7280a::RegisterValue* result)
 		result->registerAddress = (value >> 21) & 0x3f;
 		result->value = (value >> 13) & 0xff;
 		result->acknowledge = (value & 0x400);
-		
+
 		return true;
 	}
-	
+
 	return false;
 }
 
@@ -461,9 +461,9 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::readConversionResult(ad7280a::ConversionValue*
 		result->channel = (value >> 23) & 0x0f;
 		result->value = (value >> 11) & 0xfff;
 		result->acknowledge = (value & 0x400);
-		
+
 		return true;
 	}
-	
+
 	return false;
 }

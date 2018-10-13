@@ -21,7 +21,7 @@ modm::operator << (modm::IOStream& s, const ad7280a::RegisterValue& c)
 		<< ", reg=" << c.registerAddress
 		<< ", val=" << c.value
 		<< ", ack=" << c.acknowledge << ")";
-	
+
 	return s;
 }
 
@@ -33,6 +33,6 @@ modm::operator << (modm::IOStream& s, const ad7280a::ConversionValue& c)
 		<< ", ch =" << c.channel
 		<< ", val=" << c.value
 		<< ", ack=" << c.acknowledge << ")";
-	
+
 	return s;
 }

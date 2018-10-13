@@ -37,7 +37,7 @@ void
 modm::Ds18b20<OneWire>::startConversion()
 {
 	selectDevice();
-	
+
 	ow.writeByte(CONVERT_T);
 }
 
@@ -53,7 +53,7 @@ modm::Ds18b20<OneWire>::startConversions()
 
 	// Send this to everybody
 	ow.writeByte(one_wire::SKIP_ROM);
-	
+
 	// Issue Convert Temperature command
 	ow.writeByte(this->CONVERT_T);
 }
@@ -72,33 +72,33 @@ modm::Ds18b20<OneWire>::readTemperature()
 {
 	selectDevice();
 	ow.writeByte(this->READ_SCRATCHPAD);
-	
+
 	// Read the first bytes of the scratchpad memory
 	// and then send a reset because we do not want the other bytes
-	
+
 	int16_t temp = ow.readByte();
 	temp |= (ow.readByte() << 8);
-	
+
 	// ignore next two bytes
 	ow.readByte();
 	ow.readByte();
-	
+
 	// read config register byte
 	uint8_t config = (ow.readByte() >> 5) & 0x03;
-	
+
 	ow.touchReset();
-	
+
 	// Calculate conversion factor depending on the sensors resolution
 	//  9 bit = 0.5 °C steps
 	// 10 bit = 0.25 °C steps
 	// etc.
 	(void) config;
-	
+
 	int32_t convertedTemperature = 625L * temp;
-	
+
 	// round to centi-degree
 	convertedTemperature = (convertedTemperature + 50) / 100;
-	
+
 	return (static_cast<int16_t>(convertedTemperature));
 }
 
@@ -112,12 +112,12 @@ modm::Ds18b20<OneWire>::selectDevice()
 		// no devices detected
 		return false;
 	}
-	
+
 	ow.writeByte(one_wire::MATCH_ROM);
-	
+
 	for (uint8_t i = 0; i < 8; ++i) {
 		ow.writeByte(this->identifier[i]);
 	}
-	
+
 	return true;
 }

@@ -21,10 +21,10 @@ namespace modm
 	{
 		/**
 		 * \brief	Adressen der Register des MCP2515
-		 * 
-		 * Die Redundanten Adressen von z.B. dem Register CANSTAT 
+		 *
+		 * Die Redundanten Adressen von z.B. dem Register CANSTAT
 		 * (0x0E, 0x1E, 0x2E, ...) wurden dabei nicht mit aufgelistet.
-		 * 
+		 *
 		 * \ingroup	modm_driver_mcp2515
 		 */
 		enum Register
@@ -45,7 +45,7 @@ namespace modm
 			TXRTSCTRL = 0x0D,
 			CANSTAT = 0x0E,
 			CANCTRL = 0x0F,
-			
+
 			RXF3SIDH = 0x10,
 			RXF3SIDL = 0x11,
 			RXF3EID8 = 0x12,
@@ -60,7 +60,7 @@ namespace modm
 			RXF5EID0 = 0x1B,
 			TEC =  0x1C,
 			REC = 0x1D,
-			
+
 			RXM0SIDH = 0x20,
 			RXM0SIDL = 0x21,
 			RXM0EID8 = 0x22,
@@ -75,7 +75,7 @@ namespace modm
 			CANINTE = 0x2B,
 			CANINTF = 0x2C,
 			EFLG = 0x2D,
-			
+
 			TXB0CTRL = 0x30,
 			TXB0SIDH = 0x31,
 			TXB0SIDL = 0x32,
@@ -90,7 +90,7 @@ namespace modm
 			TXB0D5 = 0x3B,
 			TXB0D6 = 0x3C,
 			TXB0D7 = 0x3D,
-			
+
 			TXB1CTRL = 0x40,
 			TXB1SIDH = 0x41,
 			TXB1SIDL = 0x42,
@@ -105,7 +105,7 @@ namespace modm
 			TXB1D5 = 0x4B,
 			TXB1D6 = 0x4C,
 			TXB1D7 = 0x4D,
-			
+
 			TXB2CTRL = 0x50,
 			TXB2SIDH = 0x51,
 			TXB2SIDL = 0x52,
@@ -120,7 +120,7 @@ namespace modm
 			TXB2D5 = 0x5B,
 			TXB2D6 = 0x5C,
 			TXB2D7 = 0x5D,
-			
+
 			RXB0CTRL = 0x60,
 			RXB0SIDH = 0x61,
 			RXB0SIDL = 0x62,
@@ -135,7 +135,7 @@ namespace modm
 			RXB0D5 = 0x6B,
 			RXB0D6 = 0x6C,
 			RXB0D7 = 0x6D,
-			
+
 			RXB1CTRL = 0x70,
 			RXB1SIDH = 0x71,
 			RXB1SIDL = 0x72,
@@ -151,7 +151,7 @@ namespace modm
 			RXB1D6 = 0x7C,
 			RXB1D7 = 0x7D
 		};
-		
+
 		/**
 		 * \brief	Bitdefinition von BFPCTRL
 		 * \ingroup	modm_driver_mcp2515
@@ -165,7 +165,7 @@ namespace modm
 			B1BFM = (1 << 1),
 			B0BFM = (1 << 0)
 		};
-		
+
 		/**
 		 * \brief	Bitdefinition von TXRTSCTRL
 		 * \ingroup	modm_driver_mcp2515
@@ -179,7 +179,7 @@ namespace modm
 			B1RTSM = (1 << 1),
 			B0RTSM = (1 << 0)
 		};
-		
+
 		/**
 		 * \brief	Bitdefinition von CANSTAT
 		 * \ingroup	modm_driver_mcp2515
@@ -193,7 +193,7 @@ namespace modm
 			ICOD1 = (1 << 2),
 			ICOD0 = (1 << 1)
 		};
-		
+
 		/**
 		 * \brief	Bitdefinition von CANCTRL
 		 * \ingroup	modm_driver_mcp2515
@@ -208,7 +208,7 @@ namespace modm
 			CLKPRE1 = (1 << 1),
 			CLKPRE0 = (1 << 0)
 		};
-		
+
 		/**
 		 * \brief	Bitdefinition von CNF3
 		 * \ingroup	modm_driver_mcp2515
@@ -220,7 +220,7 @@ namespace modm
 			PHSEG21 = (1 << 1),
 			PHSEG20 = (1 << 0)
 		};
-		
+
 		/**
 		 * \brief	Bitdefinition von CNF2
 		 * \ingroup	modm_driver_mcp2515
@@ -236,7 +236,7 @@ namespace modm
 			PHSEG1 = (1 << 1),
 			PHSEG0 = (1 << 0)
 		};
-		
+
 		/**
 		 * \brief	Bitdefinition von CNF1
 		 * \ingroup	modm_driver_mcp2515
@@ -252,7 +252,7 @@ namespace modm
 			MCP2515_BRP1 = (1 << 1),
 			MCP2515_BRP0 = (1 << 0)
 		};
-		
+
 		/**
 		 * \brief	Bitdefinition von CANINTE
 		 * \ingroup	modm_driver_mcp2515
@@ -268,7 +268,7 @@ namespace modm
 			RX1IE = (1 << 1),
 			RX0IE = (1 << 0)
 		};
-		
+
 		/**
 		 * \brief	Bitdefinition von CANINTF
 		 * \ingroup	modm_driver_mcp2515
@@ -284,7 +284,7 @@ namespace modm
 			RX1IF = (1 << 1),
 			RX0IF = (1 << 0)
 		};
-		
+
 		/**
 		 * \brief	Bitdefinition von EFLG
 		 * \ingroup	modm_driver_mcp2515
@@ -300,7 +300,7 @@ namespace modm
 			RXWAR = (1 << 1),
 			EWARN = (1 << 0)
 		};
-		
+
 		/**
 		 * \brief	Bitdefinition von TXBnCTRL (n = 0, 1), 2)
 		 * \ingroup	modm_driver_mcp2515
@@ -314,7 +314,7 @@ namespace modm
 			TXP1 = (1 << 1),
 			TXP0 = (1 << 0)
 		};
-		
+
 		/**
 		 * \brief	Bitdefinition von RXB0CTRL
 		 * \ingroup	modm_driver_mcp2515
@@ -328,7 +328,7 @@ namespace modm
 			BUKT1 = (1 << 1),
 			FILHIT0 = (1 << 0)
 		};
-		
+
 		/**
 		 * \brief	Bitdefinition von TXBnSIDL (n = 0, 1)
 		 * \ingroup	modm_driver_mcp2515
@@ -337,10 +337,10 @@ namespace modm
 		{
 			EXIDE = (1 << 3)
 		};
-		
+
 		/**
 		 * \brief	Bitdefinition von RXB1CTRL
-		 * 
+		 *
 		 * \see		RXM1, RXM0, RXRTR und FILHIT0 sind schon
 		 * 			für RXB0CTRL definiert
 		 * \ingroup	modm_driver_mcp2515
@@ -350,7 +350,7 @@ namespace modm
 			FILHIT2 = (1 << 2),
 			FILHIT1 = (1 << 1)
 		};
-		
+
 		/**
 		 * \brief	Bitdefinition von RXBnSIDL (n = 0, 1)
 		 * \ingroup	modm_driver_mcp2515
@@ -360,10 +360,10 @@ namespace modm
 			MCP2515_SRR = (1 << 4),	// also defined by the AT90CAN
 			MCP2515_IDE = (1 << 3)
 		};
-		
+
 		/**
 		 * \brief	Bitdefinition von RXBnDLC (n = 0, 1)
-		 * 
+		 *
 		 * \see		TXBnDLC (gleiche Bits)
 		 * \ingroup	modm_driver_mcp2515
 		 */
@@ -375,7 +375,7 @@ namespace modm
 			MCP2515_DLC1 = (1 << 1),
 			MCP2515_DLC0 = (1 << 0)
 		};
-		
+
 		/**
 		 * \brief	Definition of the status register
 		 * \ingroup	modm_driver_mcp2515
@@ -391,7 +391,7 @@ namespace modm
 			CANINTF_RX1IF = (1 << 1),
 			CANINTF_RX0IF = (1 << 0)
 		};
-		
+
 		/**
 		 * \brief	Definition of the receive status register
 		 * \ingroup	modm_driver_mcp2515
@@ -400,15 +400,15 @@ namespace modm
 		{
 			FLAG_RXB1_FULL = (1 << 7),
 			FLAG_RXB0_FULL = (1 << 6),
-			
+
 			FLAG_EXTENDED = (1 << 4),
 			FLAG_RTR = (1 << 3),
-			
+
 			TYPE_EXTENDED_REMOTE_FRAME = (1 << 4) | (1 << 3),
 			TYPE_EXTENDED_DATA_FRAME = (1 << 4),
 			TYPE_STANDARD_REMOTE_FRAME = (1 << 3),
 			TYPE_STANDARD_DATA_FRAME = 0,
-					
+
 			MATCH_RXF1_ROLLOVER_TO_RXB1 = 7,
 			MATCH_RXF0_ROLLOVER_TO_RXB1 = 6,
 			MATCH_RXF5 = 5,

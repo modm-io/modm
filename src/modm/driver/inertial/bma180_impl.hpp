@@ -36,7 +36,7 @@ modm::Bma180<I2cMaster>::configure(bma180::Range range, bma180::Bandwidth bandwi
 	ok &= writeMaskedRegister(bma180::REGISTER_TRF_Z, bma180::MODE_CONFIG, mode);
 	// set interrupt
 	if (interrupt) ok &= writeRegister(bma180::REGISTER_CTRL3, bma180::NEW_DATA_INT);
-	
+
 	return ok;
 }
 
@@ -75,7 +75,7 @@ modm::Bma180<I2cMaster>::update()
 	{
 		buffer[0] = bma180::REGISTER_DATA_X0;
 		configureWriteRead(buffer, 1, data, 7);
-		
+
 		if (I2cMaster::start(this)) {
 			status &= ~READ_ACCELEROMETER_PENDING;
 			status |= READ_ACCELEROMETER_RUNNING;
@@ -108,7 +108,7 @@ modm::Bma180<I2cMaster>::writeRegister(bma180::Register reg, uint8_t value)
 	buffer[0] = reg;
 	buffer[1] = value;
 	configureWriteRead(buffer, 2, data, 0);
-	
+
 	return I2cMaster::startBlocking(this);
 }
 
@@ -120,7 +120,7 @@ modm::Bma180<I2cMaster>::readRegister(bma180::Register reg)
 		;
 	buffer[0] = reg;
 	configureWriteRead(buffer, 1, buffer, 1);
-	
+
 	while (!I2cMaster::startBlocking(this))
 		;
 	return buffer[0];

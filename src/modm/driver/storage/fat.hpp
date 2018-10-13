@@ -26,7 +26,7 @@ namespace modm
 	{
 		typedef DRESULT Result;
 		typedef DSTATUS Status;
-		
+
 		/**
 		 * \brief	Interface to a SD Card, Dataflash, etc.
 		 */
@@ -42,41 +42,41 @@ namespace modm
 			 */
 			virtual Status
 			initialize() = 0;
-			
+
 			/**
-			 * \brief	
-			 * \return	
+			 * \brief
+			 * \return
 			 */
 			virtual Status
 			getStatus() = 0;
-			
+
 			/**
 			 * \brief	Read sectors
-			 * 
+			 *
 			 * \param buffer		Pointer to the data buffer to store read data
 			 * \param sectorNumber	Start sector number (LBA)
 			 * \param sectorCount	Sector count (1..255)
-			 * 
+			 *
 			 * \return	TODO
 			 */
 			virtual Result
 			read(uint8_t *buffer, int32_t sectorNumber, uint8_t sectorCount) = 0;
-			
+
 			/**
 			 * \brief	Write Sectors
-			 * 
+			 *
 			 * \param buffer		Pointer to the data to be written
 			 * \param sectorNumber	Start sector number (LBA)
 			 * \param sectorCount	Sector count (1..255)
-			 * 
+			 *
 			 * \return	TODO
 			 */
 			virtual Result
 			write(const uint8_t *buffer, int32_t sectorNumber, uint8_t sectorCount) = 0;
-			
+
 			/**
 			 * \brief	Execute a command
-			 * 
+			 *
 			 * \param command			Command
 			 * \param[in,out] buffer	Contains the parameters for the command
 			 * 							and will be overwritten with the result.
@@ -84,72 +84,72 @@ namespace modm
 			virtual Result
 			ioctl(uint8_t command, uint32_t *buffer) = 0;
 		};
-		
+
 		class FileSystem
 		{
 		public:
 			FileSystem(PhysicalVolume *volume, uint8_t drive = 0);
-			
+
 			~FileSystem();
-			
+
 		protected:
 			FATFS fileSystem;
 		};
-		
+
 		class FileInfo
 		{
 		public:
 			FileInfo();
-			
+
 			inline uint32_t
 			getSize() const;
-			
+
 			inline int16_t
 			getModifiedDate() const;
-			
+
 			inline int16_t
 			getModifiedTime() const;
-			
+
 			inline const char*
 			getName();
-			
+
 			/// Name in 8.3 format
 			inline const char*
 			getShortName();
-			
+
 		protected:
 			FILINFO info;
 		};
-		
+
 		class Directory
 		{
 		public:
-			
+
 		protected:
 			DIR directory;
 		};
-		
+
 		class File
 		{
 		public:
 			void
 			open();
-			
+
 			void
 			close();
-			
+
 			void
 			read();
-			
+
 			void
 			lseek();
-			
+
 			void
 			truncate();
-			
+
 			void
 			flush();
-			
+
 		protected:
 			FIL file;
 		};

@@ -35,9 +35,9 @@ modm::Mcp23s08<Spi, Cs, Int>::initialize()
 	cs.set();
 	cs.setOutput();
 	interrupt.setInput();
-	
+
 	modm::delayMicroseconds(1);
-	
+
 	// disable address pins (as they are by default) and enable the
 	// open-drain output from the interrupt line
 	cs.reset();
@@ -45,7 +45,7 @@ modm::Mcp23s08<Spi, Cs, Int>::initialize()
 	spi.write(MCP_IOCON);
 	spi.write(1 << 2);
 	cs.set();
-	
+
 	modm::delayMicroseconds(1);
 }
 
@@ -58,15 +58,15 @@ modm::Mcp23s08<Spi, Cs, Int>::configure(uint8_t inputMask, uint8_t pullupMask)
 	spi.write(MCP_IODIR);
 	spi.write(inputMask);
 	cs.set();
-	
+
 	modm::delayMicroseconds(1);
-	
+
 	cs.reset();
 	spi.write(deviceAddress | WRITE);
 	spi.write(MCP_GPPU);
 	spi.write(pullupMask);
 	cs.set();
-	
+
 	modm::delayMicroseconds(1);
 }
 
@@ -81,12 +81,12 @@ modm::Mcp23s08<Spi, Cs, Int>::read()
 	cs.reset();
 	spi.write(deviceAddress | READ);
 	spi.write(MCP_GPIO);
-	
+
 	uint8_t value = spi.write(0x00);
 	cs.set();
-	
+
 	modm::delayMicroseconds(1);
-	
+
 	return value;
 }
 
@@ -99,6 +99,6 @@ modm::Mcp23s08<Spi, Cs, Int>::write(uint8_t output)
 	spi.write(MCP_GPIO);
 	spi.write(output);
 	cs.set();
-	
+
 	modm::delayMicroseconds(1);
 }

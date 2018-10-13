@@ -21,9 +21,9 @@ namespace modm
 {
 	/**
 	 * \brief	Shift register
-	 * 
+	 *
 	 * TODO Untested!
-	 * 
+	 *
 	\verbatim
 	         74HC165
 	          _____
@@ -36,18 +36,18 @@ namespace modm
 	  !Dout -|     |- Din
 	    Gnd -|_____|- Dout (MISO)
 	\endverbatim
-	 * 
+	 *
 	 * f_clk max. is 25 MHz at 4,5V and 5 MHz at 2V.
-	 * 
+	 *
 	 * TODO
-	 * 
+	 *
 	 * \warning	The SPI interface must operate at mode 1! For most other
 	 * 			devices you need mode 0.
-	 * 
+	 *
 	 * \tparam	Spi			SPI interface
 	 * \tparam	Load		HC165 load input (Pin 1)
 	 * \tparam	N			Number of HC165 Chips
-	 * 
+	 *
 	 * \author	Fabian Greif
 	 * \ingroup	modm_driver_shift_register
 	 */
@@ -57,20 +57,20 @@ namespace modm
 	public:
 		void
 		initialize();
-		
+
 		inline const uint8_t&
 		operator [] (uint_fast8_t port) const;
-		
+
 		inline uint8_t&
 		operator [] (uint_fast8_t port);
-		
+
 		void
 		update();
-		
+
 	protected:
 		static Spi spi;
 		static Load load;
-		
+
 		static uint8_t cache[N];
 	};
 }

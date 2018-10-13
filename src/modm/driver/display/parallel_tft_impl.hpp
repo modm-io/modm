@@ -26,12 +26,12 @@
 #if  ( DISP_ORIENTATION == 90 ) || ( DISP_ORIENTATION == 270 )
 
 #define  MAX_X  320
-#define  MAX_Y  240   
+#define  MAX_Y  240
 
 #elif  ( DISP_ORIENTATION == 0 ) || ( DISP_ORIENTATION == 180 )
 
 #define  MAX_X  240
-#define  MAX_Y  320   
+#define  MAX_Y  320
 
 #endif
 
@@ -47,10 +47,10 @@ modm::ParallelTft<INTERFACE>::initialize()
 {
 	// Read LCD ID
 	//uint16_t code = interface.readRegister(0x0000);
-	
+
 	// TODO
 	deviceCode = Device::SSD1289;
-	
+
 	interface.writeRegister(0x0000, 0x0001);
 	/* Enable LCD Oscillator */
 	interface.writeRegister(0x0003, 0xA8A4);
@@ -92,12 +92,12 @@ modm::ParallelTft<INTERFACE>::initialize()
 	interface.writeRegister(0x0023, 0x0000);
 	interface.writeRegister(0x0024, 0x0000);
 	interface.writeRegister(0x0025, 0x8000);
-	
+
 	interface.writeRegister(0x004f, 0);
 	interface.writeRegister(0x004e, 0);
-	
+
 	interface.writeRegister(0x0011, 0x6068);
-	
+
 	clear();
 }
 
@@ -122,7 +122,7 @@ void
 modm::ParallelTft<INTERFACE>::clear()
 {
 	writeCursor(0, 0);
-	
+
 	interface.writeIndex(0x0022);
 	for (uint32_t i = 0; i < MAX_X * MAX_Y; i++)
 	{
@@ -137,7 +137,7 @@ modm::ParallelTft<INTERFACE>::setPixel(int16_t x, int16_t y)
 	if (x >= MAX_X || y >= MAX_Y) {
 		return;
 	}
-	
+
 	writeCursor(x, y);
 	interface.writeRegister(0x0022, foregroundColor.getValue());
 }
@@ -148,11 +148,11 @@ modm::ParallelTft<INTERFACE>::clearPixel(int16_t x, int16_t y)
 {
 	(void) x;
 	(void) y;
-	
+
 //	if (x >= MAX_X || y >= MAX_Y) {
 //		return;
 //	}
-//	
+//
 //	writeCursor(x, y);
 //	interface.writeRegister(0x0022, color.getValue());
 }
@@ -163,7 +163,7 @@ modm::ParallelTft<INTERFACE>::getPixel(int16_t x, int16_t y)
 {
 	(void) x;
 	(void) y;
-	
+
 	return false;
 }
 
@@ -199,14 +199,14 @@ modm::ParallelTft<INTERFACE>::writeCursor(uint16_t x, uint16_t y)
 
 #endif
 
-	
+
 	switch (deviceCode)
 	{
 	default:
 		interface.writeRegister(0x0020, x);
 		interface.writeRegister(0x0021, y);
 		break;
-		
+
 	case Device::SSD1298:
 	case Device::SSD1289:
 		interface.writeRegister(0x004e, x);

@@ -327,7 +327,7 @@ modm::Vl53l0<I2cMaster>::initializeSpadConfig()
 		MODM_LOG_ERROR << "A full 'SPAD management' recalibration has to be performed.\n";
 		MODM_LOG_ERROR << "This procedure is not implemented in this driver.\n";
 		MODM_LOG_ERROR << "Please use the VL53L0X API provided by ST." << modm::endl;
-		
+
 		RF_RETURN(false);
 	}
 
@@ -353,7 +353,7 @@ modm::Vl53l0<I2cMaster>::performReferenceCalibration(Start_t mode)
 	VL53L0_RF_CALL(poll(Register::RESULT__INTERRUPT_STATUS, [](uint8_t value) {
 		return value & (InterruptStatus::NewSampleReady | InterruptStatus::OutOfWindow).value;
 	}, measurementTimeUs / 1000 * 2));
-	
+
 	// clear interrupt flags
 	VL53L0_RF_CALL(write(Register::SYSTEM__INTERRUPT_CLEAR, InterruptClear::Range));
 	VL53L0_RF_CALL(write(Register::SYSRANGE__START, Start::SingleShotMode));
@@ -381,7 +381,7 @@ modm::Vl53l0<I2cMaster>::setupReferenceSpadMap(const uint8_t availableSpadMap[6]
 	{
 		const uint8_t byteIndex = spadIndex / 8;
 		const uint8_t bitIndex = spadIndex % 8;
-		
+
 		if(spadIndex < offset || spadCount == 0) {
 			calibrationSpadMap[byteIndex] &= ~(1 << bitIndex);
 		} else if(availableSpadMap[byteIndex] & (1 << bitIndex)) {
@@ -394,7 +394,7 @@ modm::Vl53l0<I2cMaster>::setupReferenceSpadMap(const uint8_t availableSpadMap[6]
 	if(spadCount > 0) {
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -460,7 +460,7 @@ modm::Vl53l0<I2cMaster>::calculateFinalRangeTimeout(uint32_t measurementTime, ui
 		}
 
 		finalRangeTime -= stepTime;
-	
+
 	} // additional time for msrc is only needed if dss is disabled
 	else if(sequenceInfo.enabledSteps & MeasurementSequenceStep::MSRC)
 	{
@@ -584,7 +584,7 @@ modm::Vl53l0<I2cMaster>::write(Register reg, uint8_t value)
 {
 	RF_BEGIN();
 	i2cBuffer[1] = value;
-	
+
 	RF_END_RETURN_CALL(writeI2CBuffer(reg, 1));
 }
 

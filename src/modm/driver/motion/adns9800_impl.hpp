@@ -79,7 +79,7 @@ modm::Adns9800< Spi, Cs>::readReg(Register const reg)
 	// send adress of the register, with MSBit = 0 to indicate it's a read
 	Spi::transferBlocking(address & 0x7f);
 	modm::delayMicroseconds(100); // tSRAD
-	
+
 	// read data
 	uint8_t data = Spi::transferBlocking(0);
 
@@ -87,7 +87,7 @@ modm::Adns9800< Spi, Cs>::readReg(Register const reg)
 	Cs::set();
 	modm::delayMicroseconds(19); // tSRW/tSRR (=20us) minus tSCLK-NCS
 
-	return data; 
+	return data;
 }
 
 template < typename Spi, typename Cs >
@@ -106,7 +106,7 @@ modm::Adns9800< Spi, Cs>::writeReg(Register const reg, uint8_t const data)
 
 	modm::delayMicroseconds(20); // tSCLK-NCS for write operation
 	Cs::set();
-	modm::delayMicroseconds(100); // tSWW/tSWR (=120us) minus tSCLK-NCS. Could be shortened, but is looks like a safe lower bound 
+	modm::delayMicroseconds(100); // tSWW/tSWR (=120us) minus tSCLK-NCS. Could be shortened, but is looks like a safe lower bound
 }
 
 template < typename Spi, typename Cs >
@@ -114,18 +114,18 @@ void
 modm::Adns9800< Spi, Cs >::uploadFirmware()
 {
 	// set the configuration_IV register in 3k firmware mode
-	writeReg(Register::Configuration_IV, 0x02); // bit 1 = 1 for 3k mode, other bits are reserved 
+	writeReg(Register::Configuration_IV, 0x02); // bit 1 = 1 for 3k mode, other bits are reserved
 
 	// write 0x1d in SROM_enable reg for initializing
-	writeReg(Register::SROM_Enable, 0x1d); 
+	writeReg(Register::SROM_Enable, 0x1d);
 
 	// wait for more than one frame period
 	modm::delayMilliseconds(10); // assume that the frame rate is as low as 100fps... even if it should never be that low
 
 	// write 0x18 to SROM_enable to start SROM download
-	writeReg(Register::SROM_Enable, 0x18); 
+	writeReg(Register::SROM_Enable, 0x18);
 
-	// write the SROM file (=firmware data) 
+	// write the SROM file (=firmware data)
 	Cs::reset();
 
 	// write burst destination address
@@ -135,12 +135,12 @@ modm::Adns9800< Spi, Cs >::uploadFirmware()
 
 	// send all bytes of the firmware
 	for(int ii = 0; ii < firmware_length; ++ii)
-	{ 
+	{
 		Spi::transferBlocking(firmware_data[ii]);
 		modm::delayMicroseconds(15);
 	}
 
-	Cs::set(); 
+	Cs::set();
 }
 
 template < typename Spi, typename Cs >
@@ -150,7 +150,7 @@ modm::Adns9800< Spi, Cs >::initialise()
 	bool success = true;
 
 	// ensure that the serial port is reset
-	Cs::set(); 
+	Cs::set();
 	Cs::reset();
 	Cs::set();
 

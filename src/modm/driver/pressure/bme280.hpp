@@ -214,7 +214,7 @@ public:
 	/// Reads out and stores the calibration bytes
 	modm::ResumableResult<bool>
 	initialize(
-			Mode mode = Mode::Normal, 
+			Mode mode = Mode::Normal,
 			Oversampling temperature = Oversampling::Single,
 			Oversampling pressure = Oversampling::Single,
 			Oversampling humidity = Oversampling::Single);

@@ -120,7 +120,7 @@ public:
 		GLOBAL__CONFIG_SPAD_ENABLES_REF_4 = 0xB4,
 		GLOBAL__CONFIG_SPAD_ENABLES_REF_5 = 0xB5,
 		GLOBAL__CONFIG_REF_EN_START_SELECT = 0xB6,
-		
+
 		DYNAMIC_SPAD__NUM_REQUESTED_REF_SPAD = 0x4E, /* 0x14E */
 		DYNAMIC_SPAD__REF_EN_START_OFFSET = 0x4F, /* 0x14F */
 
@@ -209,7 +209,7 @@ public:
 		NewSampleReady = 4,
 	};
 	MODM_FLAGS8(InterruptStatus);
-	
+
 	/// RESULT__RANGE_STATUS
 	enum class
 	RangeStatus : uint8_t
@@ -226,7 +226,7 @@ public:
 		VCSEL_ContinuityTest = 0x1,
 		VCSEL_WatchdogTest = 0x2,
 		VHV_NoValueFound = 0x3,
-		MSRC_NoTarget = 0x4, 
+		MSRC_NoTarget = 0x4,
 		SNR_Check = 0x5,
 		RangePhaseCheck = 0x6,
 		SigmaThresholdCheck = 0x7,
@@ -280,7 +280,7 @@ public:
 		static constexpr uint16_t TCC = 590;
 		static constexpr uint16_t DSS = 690;
 		static constexpr uint16_t PreRange = 660;
-		static constexpr uint16_t FinalRange = 550; 
+		static constexpr uint16_t FinalRange = 550;
 	};
 
 public:
@@ -311,7 +311,7 @@ public:
 			return (error == RangeErrorCode::RangeComplete
 				|| error == RangeErrorCode::NoError);
 		}
-		
+
 		inline RangeErrorCode
 		getRangeError() { return error; }
 
