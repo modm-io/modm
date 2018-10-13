@@ -23,44 +23,44 @@ namespace modm
 	{
 		/**
 		 * \brief	Mutex
-		 * 
+		 *
 		 * Mutexes and binary semaphores are very similar but have some subtle
 		 * differences: Mutexes include a priority inheritance mechanism,
 		 * binary semaphores do not.
-		 * 
+		 *
 		 * This makes binary semaphores the better choice for implementing
 		 * synchronisation (between threads or between threads and an interrupt),
 		 * and mutexes the better choice for implementing simple mutual exclusion.
-		 * 
+		 *
 		 * \ingroup	modm_processing_rtos
 		 */
 		class Mutex
 		{
 		public:
 			Mutex();
-			
+
 			~Mutex();
-			
+
 			bool
 			acquire(portTickType timeout = portMAX_DELAY);
-			
+
 			void
 			release();
-			
+
 		private:
 			// disable copy constructor
 			Mutex(const Mutex& other);
-			
+
 			// disable assignment operator
 			Mutex&
 			operator = (const Mutex& other);
-			
+
 			xSemaphoreHandle handle;
 		};
-		
+
 		/**
 		 * Implements a RAII-style locking.
-		 * 
+		 *
 		 * Locks the Mutex when created and unlocks it on destruction.
 		 *
 		 * \ingroup modm_processing_rtos
@@ -73,12 +73,12 @@ namespace modm
 			{
 				mutex.acquire();
 			}
-			
+
 			~MutexGuard()
 			{
 				mutex.release();
 			}
-			
+
 		private:
 			Mutex& mutex;
 		};

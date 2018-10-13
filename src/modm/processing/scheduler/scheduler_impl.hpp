@@ -18,7 +18,7 @@
 
 /* item is element of two lists (schedule list and ready list).
  * ready list is order by its priority.
- * 
+ *
  * ALGORITHM:
  * ----------------------------------------------------------------------------
  * foreach item
@@ -26,7 +26,7 @@
  *     if time = 0
  *         reload time
  *         set as ready
- * 
+ *
  * foreach item is ready (ordered by priority)
  *     run item
  *     mark as waiting
@@ -39,14 +39,14 @@ modm::Scheduler::scheduleInterupt()
 		// nothing to schedule right now
 		return;
 	}
-	
+
 	// update all tasks
 	TaskListItem *item = taskList;
 	do {
 		item->time--;
 		if (item->time == 0) {
 			item->time = item->period;
-			
+
 			// add to ready list
 			if ((readyList == 0) ||
 				(readyList->priority < item->priority))
@@ -56,7 +56,7 @@ modm::Scheduler::scheduleInterupt()
 			}
 			else {
 				TaskListItem *list = readyList;
-				
+
 				while (1)
 				{
 					if ((list->nextReady == 0) ||
@@ -73,7 +73,7 @@ modm::Scheduler::scheduleInterupt()
 		}
 	}
 	while ((item = item->nextTask) != 0);
-	
+
 	// now execute the tasks which are ready
 	while (((item = modm::accessor::asVolatile(readyList)) != 0) &&
 			(item->priority > currentPriority))
@@ -83,7 +83,7 @@ modm::Scheduler::scheduleInterupt()
 		currentPriority = item->priority;
 		{
 			modm::atomic::Unlock();
-			
+
 			// the actual execution of the task happens with interrupts
 			// enabled
 			item->task.run();

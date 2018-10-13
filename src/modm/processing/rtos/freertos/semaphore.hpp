@@ -28,56 +28,56 @@ namespace modm
 		{
 		public:
 			~SemaphoreBase();
-			
+
 			/**
 			 * \brief	Aquire the semaphore
-			 * 
+			 *
 			 * Decrements the internal count. This function might be called
 			 * 'take' or 'wait' in other implementations.
 			 */
 			bool
 			acquire(portTickType timeout = portMAX_DELAY);
-			
+
 			/**
 			 * \brief	Release the semaphore
-			 * 
+			 *
 			 * Increments the internal count. This function might be called
 			 * 'give' or 'signal' in other implementations.
 			 */
 			void
 			release();
-			
+
 			/**
 			 * \brief	Release the Semaphore from within an interrupt context
-			 * 
+			 *
 			 * Might request an context switch after finishing the interrupt
 			 * if a higher priority thread has been woken through the release.
 			 */
 			void
 			releaseFromInterrupt();
-			
+
 		protected:
 			SemaphoreBase()
 			{
 			}
-			
+
 			xSemaphoreHandle handle;
-			
+
 		private:
 			// disable copy constructor
 			SemaphoreBase(const SemaphoreBase&);
-			
+
 			// disable assignment operator
 			SemaphoreBase &
 			operator = (const SemaphoreBase&);
 		};
-		
+
 		// --------------------------------------------------------------------
 		/**
 		 * \brief	Counting semaphore
-		 * 
+		 *
 		 * Counting semaphores are typically used for two things:
-		 * 
+		 *
 		 * -# Counting events. \n
 		 *    In this usage scenario an event handler will 'release' a semaphore
 		 *    each time an event occurs (incrementing the semaphore count
@@ -87,7 +87,7 @@ namespace modm
 		 *    events that have occurred and the number that have been
 		 *    processed. In this case it is desirable for the initial count
 		 *    value to be zero.
-		 * 
+		 *
 		 * -# Resource management.
 		 *    In this usage scenario the count value indicates the number of
 		 *    resources available. To obtain control of a resource a thread must
@@ -98,7 +98,7 @@ namespace modm
 		 *    In this case it is desirable for the initial count value to be
 		 *    equal to the maximum count value, indicating that all resources
 		 *    are free.
-		 * 
+		 *
 		 * \ingroup	modm_processing_rtos
 		 */
 		class Semaphore : public SemaphoreBase
@@ -106,39 +106,39 @@ namespace modm
 		public:
 			/**
 			 * \brief	Create a counting semaphore
-			 * 
+			 *
 			 * \param	max		Maximum count value
 			 * \param	initial	Initial value
 			 */
 			Semaphore(unsigned portBASE_TYPE max,
 					unsigned portBASE_TYPE initial);
-			
+
 		private:
 			// disable copy constructor
 			Semaphore(const Semaphore&);
-			
+
 			// disable assignment operator
 			Semaphore &
 			operator = (const Semaphore&);
 		};
-		
+
 		// --------------------------------------------------------------------
 		/**
 		 * \brief	Binary semaphore
-		 * 
+		 *
 		 * The semaphore is released by default.
-		 * 
+		 *
 		 * \ingroup	modm_processing_rtos
 		 */
 		class BinarySemaphore : public SemaphoreBase
 		{
 		public:
 			BinarySemaphore();
-			
+
 		private:
 			// disable copy constructor
 			BinarySemaphore(const BinarySemaphore&);
-			
+
 			// disable assignment operator
 			BinarySemaphore &
 			operator = (const BinarySemaphore&);

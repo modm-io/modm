@@ -24,7 +24,7 @@ namespace modm
 	{
 		/**
 		 * Thread-safe Queue.
-		 * 
+		 *
 		 * \ingroup	modm_processing_rtos
 		 */
 		template<typename T>
@@ -33,53 +33,53 @@ namespace modm
 		public:
 			/**
 			 * Create a Queue.
-			 * 
+			 *
 			 * \param length
 			 * 			The maximum number of items the queue can contain.
 			 */
 			Queue(uint32_t length);
-			
+
 			~Queue();
-			
+
 			/**
 			 * Get the number of items stored in the queue
 			 */
 			std::size_t
 			getSize() const;
-			
+
 			bool
 			append(const T& item, uint32_t timeout = -1);
-			
+
 			bool
 			prepend(const T& item, uint32_t timeout = -1);
-			
-			
+
+
 			bool
 			peek(T& item, uint32_t timeout = -1) const;
-			
+
 			bool
 			get(T& item, uint32_t timeout = -1);
-			
-			
+
+
 			inline bool
 			appendFromInterrupt(const T& item);
-			
+
 			inline bool
 			prependFromInterrupt(const T& item);
-			
+
 			inline bool
 			getFromInterrupt(T& item);
-			
+
 		private:
 			// disable copy constructor
 			Queue(const Queue& other);
-			
+
 			// disable assignment operator
 			Queue&
 			operator = (const Queue& other);
-			
+
 			mutable std::timed_mutex mutex;
-			
+
 			uint32_t maxSize;
 			std::deque<T> deque;
 		};

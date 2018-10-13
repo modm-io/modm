@@ -44,7 +44,7 @@ modm::rtos::Queue<T>::append(const T& item, uint32_t timeout = -1)
 			deque.size() >= maxSize) {
 		return false;
 	}
-	
+
 	deque.push_back(item);
 	mutex.unlock();
 }
@@ -56,15 +56,15 @@ modm::rtos::Queue<T>::prepend(const T& item, uint32_t timeout = -1)
 	if (!mutex.try_lock_for(std::chrono::milliseconds(timeout))) {
 		return false;
 	}
-	
+
 	if (deque.empty()) {
 		mutex.unlock();
 		return false;
 	}
-	
+
 	deque.push_front(item);
 	mutex.unlock();
-	
+
 	return false;
 }
 
@@ -76,14 +76,14 @@ modm::rtos::Queue<T>::peek(T& item, uint32_t timeout = -1) const
 	if (!mutex.try_lock_for(std::chrono::milliseconds(timeout))) {
 		return false;
 	}
-	
+
 	if (deque.empty()) {
 		mutex.unlock();
 		return false;
 	}
-	
+
 	item = deque.front();
-	
+
 	mutex.unlock();
 	return true;
 }
@@ -95,15 +95,15 @@ modm::rtos::Queue<T>::get(T& item, uint32_t timeout = -1)
 	if (!mutex.try_lock_for(std::chrono::milliseconds(timeout))) {
 		return false;
 	}
-	
+
 	if (deque.empty()) {
 		mutex.unlock();
 		return false;
 	}
-	
+
 	item = deque.front();
 	deque.pop_front();
-	
+
 	mutex.unlock();
 	return true;
 }

@@ -25,7 +25,7 @@ modm::Scheduler::scheduleTask(Task& task,
 		Priority priority)
 {
 	TaskListItem *item = new TaskListItem(task, period, priority);
-	
+
 	if (taskList == 0) {
 		taskList = item;
 	}

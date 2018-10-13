@@ -22,9 +22,9 @@ namespace modm
 	{
 		/**
 		 * Counting semaphore.
-		 * 
+		 *
 		 * Counting semaphores are typically used for two things:
-		 * 
+		 *
 		 * -# Counting events. \n
 		 *    In this usage scenario an event handler will 'release' a semaphore
 		 *    each time an event occurs (incrementing the semaphore count
@@ -34,7 +34,7 @@ namespace modm
 		 *    events that have occurred and the number that have been
 		 *    processed. In this case it is desirable for the initial count
 		 *    value to be zero.
-		 * 
+		 *
 		 * -# Resource management.
 		 *    In this usage scenario the count value indicates the number of
 		 *    resources available. To obtain control of a resource a thread must
@@ -45,7 +45,7 @@ namespace modm
 		 *    In this case it is desirable for the initial count value to be
 		 *    equal to the maximum count value, indicating that all resources
 		 *    are free.
-		 * 
+		 *
 		 * \ingroup	modm_processing_rtos
 		 */
 		class Semaphore
@@ -53,31 +53,31 @@ namespace modm
 		public:
 			/**
 			 * \brief	Create a counting semaphore
-			 * 
+			 *
 			 * \param	max		Maximum count value
 			 * \param	initial	Initial value
 			 */
 			Semaphore(uint32_t max,
 					uint32_t initial);
-			
+
 			/**
 			 * \brief	Aquire the semaphore
-			 * 
+			 *
 			 * Decrements the internal count. This function might be called
 			 * 'take' or 'wait' in other implementations.
 			 */
 			bool
 			acquire(uint32_t timeout = -1);
-			
+
 			/**
 			 * \brief	Release the semaphore
-			 * 
+			 *
 			 * Increments the internal count. This function might be called
 			 * 'give' or 'signal' in other implementations.
 			 */
 			void
 			release();
-			
+
 			/**
 			 * \brief	Release the Semaphore from within an interrupt context
 			 */
@@ -86,46 +86,46 @@ namespace modm
 			{
 				release();
 			}
-			
+
 		private:
 			// disable copy constructor
 			Semaphore(const Semaphore&);
-			
+
 			// disable assignment operator
 			Semaphore &
 			operator = (const Semaphore&);
-			
+
 			// The current semaphore count.
 			unsigned int count;
 			unsigned int maxCount;
-			
+
 			// Mutex protects count.
-			// 
+			//
 			// Any code that reads or writes the count_ data must hold a lock
 			// on the mutex.
 			mutable std::mutex mutex;
-			
+
 			// Code that increments count_ must notify the condition variable.
 			mutable std::condition_variable condition;
 
 		};
-		
+
 		/**
 		 * \brief	Binary semaphore
-		 * 
+		 *
 		 * The semaphore is released by default.
-		 * 
+		 *
 		 * \ingroup	modm_processing_rtos
 		 */
 		class BinarySemaphore : public Semaphore
 		{
 		public:
 			BinarySemaphore();
-			
+
 		private:
 			// disable copy constructor
 			BinarySemaphore(const BinarySemaphore&);
-			
+
 			// disable assignment operator
 			BinarySemaphore &
 			operator = (const BinarySemaphore&);

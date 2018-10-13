@@ -20,7 +20,7 @@
 
 /**
  * \brief	Create a timed periodic loop
- * 
+ *
  * Example:
  * \code
  * void
@@ -32,11 +32,11 @@
  *     }
  * }
  * \endcode
- * 
+ *
  * \param	frequency	Frequency in ticks
- * 
+ *
  * \see		MILLISECONDS
- * 
+ *
  * \hideinitializer
  * \ingroup	modm_processing_rtos
  */
@@ -48,12 +48,12 @@
 
 /**
  * \brief	Convert between scheduler ticks and milliseconds
- * 
+ *
  * For example 20 ms in scheduler ticks might be written as:
  * \code
  * 20 * MILLISECONDS
  * \endcode
- * 
+ *
  * \hideinitializer
  * \ingroup	modm_processing_rtos
  */
@@ -65,10 +65,10 @@ namespace modm
 	{
 		// forward declaration
 		class Scheduler;
-		
+
 		/**
 		 * \brief	Thread
-		 * 
+		 *
 		 * \ingroup	modm_processing_rtos
 		 */
 		class Thread
@@ -76,11 +76,11 @@ namespace modm
 		public:
 			/**
 			 * \brief	Create a Thread
-			 * 
+			 *
 			 * \param	priority	unused for std::thread
 			 * \param	stackDepth	unused for std::thread
 			 * \param	name		unused for std::thread
-			 * 
+			 *
 			 * \warning	Threads may not be created while the scheduler is running!
 			 * 			Create them be before calling Scheduler::schedule() or
 			 * 			stop the scheduler and restart it afterwards.
@@ -88,20 +88,20 @@ namespace modm
 			Thread(uint32_t priority = 0,
 					uint16_t stackDepth = 0,
 					const char* name = NULL);
-			
+
 			/// Delete the thread
 			virtual ~Thread();
-			
+
 			/// Obtain the priority of the thread
 			uint_fast32_t
 			getPriority() const
 			{
 				return 0;
 			}
-			
+
 			/**
 			 * \brief	Set the priority of the thread
-			 * 
+			 *
 			 * Does nothing for std::thread.
 			 */
 			void
@@ -110,13 +110,13 @@ namespace modm
 				// avoid compiler warnings
 				(void) priority;
 			}
-			
+
 			/**
 			 * If a thread wishes to avoid being interrupted, it can create an
 			 * instance of Lock. Objects of this class disable interruption
 			 * for the thread that created them on construction, and restore
 			 * the interruption state to whatever it was before on destruction.
-			 * 
+			 *
 			 * @warning std::thread cannot be interrupted, so this implementation is empty!
 			 */
 			class Lock
@@ -125,7 +125,7 @@ namespace modm
 				inline Lock() {}
 				inline ~Lock() {}
 			};
-			
+
 		protected:
 			/**
 			 * \brief	Delay for the number of Milliseconds
@@ -135,10 +135,10 @@ namespace modm
 			{
 				std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 			}
-			
+
 			/**
 			 * \brief	Force a context switch
-			 * 
+			 *
 			 * Gives control to other threads ready to run.
 			 */
 			static inline void
@@ -146,25 +146,25 @@ namespace modm
 			{
 				std::this_thread::yield();
 			}
-			
+
 			/**
 			 * \brief	Worker function
-			 * 
+			 *
 			 * Must be implemented to never return (i.e. continuous loop)
 			 */
 			virtual void
 			run() = 0;
-			
+
 		private:
 			friend class Scheduler;
-			
+
 			// start the execution of the thread
 			void
 			start();
-			
+
 			Thread *next;
 			static Thread* head;
-			
+
 			std::mutex mutex;
 			std::unique_ptr<std::thread> thread;
 		};
