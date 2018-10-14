@@ -10,7 +10,7 @@
 %# file, You can obtain one at http://mozilla.org/MPL/2.0/.
 %# ----------------------------------------------------------------------------
 /*
- * WARNING: This file is generated automatically from java_identifier.tpl. 
+ * WARNING: This file is generated automatically from java_identifier.tpl.
  * Do not edit! Please modify the corresponding XML file instead.
  */
 // ----------------------------------------------------------------------------
@@ -28,7 +28,7 @@ public class Identifier
 		{{ item.name | enumElement }}({{ item.id }}){% if loop.last %};{% else %},{% endif %}
 	{%- endfor %}
 		;
-		
+
 		public final int id;
 		private Domain(int id) {
 			this.id = id;
@@ -68,7 +68,7 @@ public class Identifier
 			}
 		}
 	}
-	
+
 	public static enum Action
 	{
 	{%- for element in actions.iter() %}
@@ -91,7 +91,7 @@ public class Identifier
 			}
 		}
 	}
-	
+
 	public static enum Event
 	{
 	{%- for element in events.iter() %}
@@ -108,7 +108,7 @@ public class Identifier
 			this.id = id;
 			this.eventType = eventType;
 		}
-		
+
 		@SuppressWarnings("unchecked")
 		public <T extends Packets.Packet> T getPayload(byte[] payload){
 			if (eventType == null)

@@ -21,7 +21,7 @@ import builder_base
 import filter.cpp as filter
 
 class IdentifierBuilder(builder_base.Builder):
-	
+
 	VERSION = "0.1"
 
 	def setup(self, optparser):
@@ -46,13 +46,13 @@ class IdentifierBuilder(builder_base.Builder):
 			'enumElementStrong': filter.typeName,
 			'enumValue': filter.toHexValue,
 		}
-		
+
 		template = self.template('templates/robot_identifier.tpl', filter=cppFilter)
-			
+
 		components = []
 		for component in self.tree.components.iter(abstract=False):
 			components.append(component.flattened())
-		
+
 		substitutions = {
 			'domains' : self.tree.domains,
 			'containers' : self.tree.containers,
@@ -61,7 +61,7 @@ class IdentifierBuilder(builder_base.Builder):
 			'events': self.tree.events,
 			'namespace': namespace
 		}
-					
+
 		if os.path.splitext(self.options.outpath)[1] == '':
 			file = os.path.join(self.options.outpath, 'identifier.hpp')
 		else:

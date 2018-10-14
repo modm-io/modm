@@ -27,28 +27,28 @@ class JavaCommunicationBuilder(builder_base.Builder):
 	Each Component provides it's name, description and a list of Actions.
 	Each Action provides it's name, description, type of parameter and
 	a generic call mechanism.
-	
+
 	This is intended to be used in a generic user interface.
-	
+
 	A common call would be like:
 	$python3 java_meta_communication.py  --outpath source/rca/robot --package rca.robot robot.xml;
 	"""
-	
-	
+
+
 	VERSION = "0.1"
-	
+
 	def setup(self, optparser):
 		optparser.add_option(
 				"--package",
 				dest = "package",
 				default = '',
 				help = "name of package")
-				
+
 	def generate(self):
 		# check the commandline options
 		if not self.options.outpath:
 			raise builder_base.BuilderException("You need to provide an output path!")
-		
+
 		javaFilter = {
 			'enumElement': filter.enumElement,
 			'typeName': filter.typeName,
@@ -58,18 +58,18 @@ class JavaCommunicationBuilder(builder_base.Builder):
 		}
 		template = self.template('templates/java_meta_communication.tpl',
 								filter = javaFilter)
-		
+
 		# Bool has a special status because its primitive but user generated
 		# and the only not numerical type
 		components = self.tree.components
-		
+
 		primitives = sorted(filter.PRIMITIVES.values())
-		
+
 		substitutions = {
 			'package' : self.options.package,
 			'components': components,
 		}
-		
+
 		file = os.path.join(self.options.outpath, 'MetaCommunication.java')
 		self.write(file, template.render(substitutions))
 

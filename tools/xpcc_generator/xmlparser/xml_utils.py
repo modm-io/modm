@@ -31,15 +31,15 @@ def get_description(node):
 			value = node.find('description').text
 		except AttributeError:
 			return None
-	
+
 	if value == "" or value == None:
 		return None
-	
+
 	# Entferne die Tabs die durch das Einrücken innerhalb der
 	# XML Datei entstanden sind
 	str = '\n'.join([line.strip('\t') for line in value.split('\n')])
 	str = str.strip('\n')
-	
+
 	return str
 
 def get_string(node):
@@ -50,7 +50,7 @@ def get_string(node):
 			value = node.find('string').text
 		except AttributeError:
 			return None
-		
+
 	if value == "" or value == None:
 		return None
 
@@ -58,7 +58,7 @@ def get_string(node):
 	# XML Datei entstanden sind
 	str = '\n'.join([line.strip('\t') for line in value.split('\n')])
 	str = str.strip('\n')
-	
+
 	return str
 
 def get_identifier(node):

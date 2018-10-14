@@ -22,10 +22,10 @@ import xpcc.Sender;
 public class Communication {
 	private final Identifier.Component me;
 	private final Sender sender;
-	
+
 	/** Using this member you can publish events.*/
 	public final EventPublisher eventPublisher = new EventPublisher();
-	
+
 	{% for component in components.iter() %}
 	{% if component.description %}/** {{ component.description | modm.wordwrap(72) | modm.indent(1) }} */{% endif %}
 	public final {{ component.name | typeName }} {{ component.name | variableName }} = new {{ component.name | typeName }}();
@@ -35,12 +35,12 @@ public class Communication {
 		this.me = me;
 		this.sender = sender;
 	}
-	
+
 	/** Using this class you can publish events.*/
 	public class EventPublisher {
 		private EventPublisher() {
 		}
-		
+
 	{%- for event in events.iter() %}
 		{% if event.type -%}
 		{% if event.description %}/** {{ event.description | modm.wordwrap(72) | modm.indent(1) }}
@@ -68,20 +68,20 @@ public class Communication {
 	public abstract class Component{
 		/** The Identifier of Component */
 		public final Identifier.Component id;
-		
+
 		private Component(Identifier.Component id) {
 			this.id = id;
 		}
 	}
-	
+
 {%- for component in components.iter() %}
-	
+
 	{% if component.description %}/** {{ component.description | modm.wordwrap(72) | modm.indent(1) }} */{% endif %}
 	public class {{ component.name | typeName }} extends Component {
 		private {{ component.name | typeName }}() {
 			super (Identifier.Component.{{ component.flattened().name | enumElement }});
 		}
-		
+
 		{% for action in component.flattened().actions %}
 		{% if action.description -%}
 		{% if action.parameterType -%}
@@ -101,14 +101,14 @@ public class Communication {
 		{% if action.parameterType -%}
 		public void {{ action.name | variableName }} (Packets.{{ action.parameterType.flattened().name | typeObjectName }} packet) {
 			Header header = new Header(HeaderType.REQUEST, false, this.id.id, me.id, Identifier.Action.{{ action.name | enumElement }}.id);
-			
+
 			DefaultXpccMessage message = new DefaultXpccMessage(header, packet.getBytes());
 			sender.sendPacket(message);
 		}
 		{% else -%}
 		public void {{ action.name | variableName }} () {
 			Header header = new Header(HeaderType.REQUEST, false, this.id.id, me.id, Identifier.Action.{{ action.name | enumElement }}.id);
-			
+
 			DefaultXpccMessage message = new DefaultXpccMessage(header, null);
 			sender.sendPacket(message);
 		}
@@ -117,9 +117,9 @@ public class Communication {
 		}
 		{% endif %}
 		{%- endfor %}
-		
+
 	}
 
-	
+
 {%- endfor %}
 }

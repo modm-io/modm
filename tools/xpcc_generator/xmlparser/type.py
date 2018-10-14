@@ -30,7 +30,7 @@ VALID_UNDERLYING_TYPES_FOR_ENUMS = [
 
 class BaseType(object):
 	""" Abstract base class for all types
-	
+
 	Attributes:
 	name		--	Type name. Must be unique.
 	reference	--	True if the type is only used as reference for other
@@ -47,45 +47,45 @@ class BaseType(object):
 	"""
 	def __init__(self, node):
 		self.node = node
-		
+
 		self.name = node.get('name')
 		self._check_name()
 		self.description = None
 		self.string = None
-		
+
 		self.isEnum = False
 		self.isStruct = False
 		self.isTypedef = False
 		self.isBuiltIn = False
-		
+
 		self.level = None
 		self.size = None
-	
+
 	def _check_name(self):
 		utils.check_name(self.name)
-	
+
 	def evaluate(self, tree):
 		""" Load the state of the class from the corresponding XML node
-		
+
 		Keyword arguments:
 		tree	--	current tree of the communcation structure. Must contain
 					every available type, but some types may not be fully
 					evaluated
 		"""
 		pass
-	
+
 	def create_hierarchy(self):
 		"""	Create the type hierarchy
-		
+
 		This method calculates the values for self.size and self.level. Must
 		not be called before all types are fully created.
 		"""
 		pass
-	
+
 	def flattened(self):
 		""" Access the version with the flattened hierarchy """
 		return self
-	
+
 	def __cmp__(self, other):
 		return 1 - self.__eq__(other) - 2 * self.__lt__(other)
 
@@ -110,33 +110,33 @@ class BaseType(object):
 
 class BuiltIn(BaseType):
 	""" Built-in types
-	
+
 	These types correspond directly to types available by default in the
 	target environment. The hierarchy level will always be -1 (lowest level).
 	"""
 	def __init__(self, node):
 		BaseType.__init__(self, node)
-		
+
 		self.isBuiltIn = True
 		self.level = -1
-	
+
 	def evaluate(self, tree):
 		if self.node is None:
 			return
-		
+
 		self.description = xml_utils.get_description(self.node)
 		self.string = xml_utils.get_string(self.node)
 		self.size = int(self.node.get('size'))
-		
+
 		self.node = None
-	
+
 	def _check_name(self):
 		""" Built-in types need no check """
 		pass
-	
+
 	def dump(self):
 		return "%s : built-in|%i [%i]" % (self.name, self.level, self.size)
-	
+
 	def __str__(self):
 		return "%s : built-in" % self.name
 
@@ -252,16 +252,16 @@ class Enum(BaseType):
 
 class SubType:
 	""" Subordinate type for struct and typedefs.
-	
+
 	Used to distinguish between normal and array types for the subtype of
 	struct elements and typedefs.
-	
+
 	Attributes:
 	raw		--	raw typename.
 	name	--	type without a possible array definition.
 	count	--	Number of array elements. Defaults to 1 if the type is no array.
 	isArray	--	Subtype is an array
-	
+
 	Example:
 	type = SubType("uint8_t")
 	=> .raw = "uint8_t"
@@ -269,18 +269,18 @@ class SubType:
 	   .isArray = False
 	   .count = 1
 	   .type = BuiltIn("uint8_t")
-	
+
 	type = SubType("char[8])
 	=> .raw = "char[8]"
 	   .name = "char"
 	   .isArray = True
 	   .count = 8
 	   .type = BuiltIn("char")
-	
+
 	"""
 	def __init__(self, value, types):
 		""" Constructor
-		
+
 		Keyword Arguments:
 		value	-- type name
 		types	-- list of all available types
@@ -294,71 +294,71 @@ class SubType:
 			self.isArray = False
 			self.count = 1
 			self.name = value
-		
+
 		try:
 			self.type = types[self.name]
 		except KeyError:
 			raise ParserException("Unknown type '%s'" % self.name)
 		self.size = None
-	
+
 	def __str__(self):
 		return self.raw
 
 
 class Struct(BaseType):
 	""" Representation of a Struct
-	
+
 	Attributes:
 	size	--	Size of the struct in bytes. Will always return the total size
 				of the flattened struct if the struct is part of inheritence
 				structure.
 	"""
 	class Element(object):
-		
+
 		def __init__(self, node, tree):
 			self.name = node.get('name')
-			
+
 			self.description = xml_utils.get_description(node)
 			self.string = xml_utils.get_string(node)
 			self.subtype = SubType(node.get('type'), tree.types)
 			self.unit = node.get('unit')
 			self.value = node.get('value')
-			
+
 			self.level = None
 			self.size = None
-		
+
 		def create_hierarchy(self):
 			subtype = self.subtype.type
 			if subtype.level is None:
 				subtype.create_hierarchy()
-			
+
 			self.level = subtype.level
 			self.size = subtype.size
-		
+
 		def __str__(self):
 			return "%s : %s" % (self.name, self.subtype)
-	
+
 	def __init__(self, node):
 		BaseType.__init__(self, node)
-		
+
 		self.isStruct = True
 		self.elements = []
 		self.extends = None
 		self.extending = []
 		self.typeIdentifier = None
-		
+
 		self.__flattened = None
 		self.__typeIdentifierName = None
-	
+
 	def iter(self):
 		""" Iterate over all sub-elements of the enum """
 		for element in self.elements:
 			yield element
-	
+
 	def evaluate(self, tree):
 		if self.node is None:
 			return
-		
+
 		self.description = xml_utils.get_description(self.node)
 		self.string = xml_utils.get_string(self.node)
 		for node in self.node.findall('element'):
@@ -366,7 +366,7 @@ class Struct(BaseType):
 				self.elements.append(self.Element(node, tree))
 			except ParserException as e:
 				raise ParserException("Error in definition of struct '%s': %s!" % (self.name, e))
-		
+
 		basetype = self.node.get('extends')
 		if basetype is not None:
 			try:
@@ -382,17 +382,17 @@ class Struct(BaseType):
 			except KeyError:
 				raise ParserException("Unknown super type '%s' in struct '%s'!" % (basetype, self.name))
 		self.node = None
-	
+
 	def create_hierarchy(self):
 		""" Create hierarchy
-		
+
 		For this method self.size = 0 is used as sepecial value to detect
 		loops in the definition of types. In normal operation size will never be
 		zero, only during hierarchy creation.
 		"""
 		if self.level is not None:
 			return
-		
+
 		self.size = 0
 		size = 0
 		self.level = 0
@@ -400,10 +400,10 @@ class Struct(BaseType):
 			if element.size == 0:
 				raise ParserException("Loop in the definition of '%s' and '%s' detected!" % (self.name, self.element.name))
 			element.create_hierarchy()
-			
+
 			size += element.size
 			self.level = max(self.level, element.level)
-		
+
 		if self.extends is not None:
 			if self.extends.size == 0:
 				raise ParserException("Loop in the definition of '%s' and '%s' detected!" % (self.name, self.extends.name))
@@ -420,7 +420,7 @@ class Struct(BaseType):
 					"which are extended by other must have an element named 'type' as" \
 					"their first element! It is used for type distinguishing at runtime." \
 						% (self.extends.name, self.name))
-			
+
 			for enumElement in typeIdentifierStructElement.subtype.type.elements:
 				if enumElement.name == self.__typeIdentifierName:
 					self.typeIdentifier = enumElement
@@ -431,18 +431,18 @@ class Struct(BaseType):
 					"type of '%s.type'."
 						% (self.name, self.extends.name, self.__typeIdentifierName,
 							typeIdentifierStructElement.subtype.type.name, self.extends.name))
-			
+
 			self.extends.__addExtending(self)
 			size += self.extends.size
 			self.level = max(self.level, self.extends.level)
-		
+
 		if size > 48:
 			raise ParserException("Struct '%s' is with %i Byte too big. The maximum " \
 				"packet size is 48 Byte!" % (self.name, size))
-		
+
 		self.size = size
 		self.level += 1
-	
+
 	def flattened(self):
 		if self.__flattened is None:
 			if self.extends is None:
@@ -450,19 +450,19 @@ class Struct(BaseType):
 			else:
 				self.__flattened = copy.copy(self)
 				self.__flattened.elements = self.elements[:]
-				
+
 				# prepend all elements for the super type
 				self.__flattened.elements[0:0] = self.extends.flattened().elements
-		
+
 		return self.__flattened
-	
+
 	def dump(self):
 		str = "%s : struct|%i [%i]\n" % \
 			(self.name, self.level, self.size)
 		for element in self.iter():
 			str += "  + %s\n" % element
 		return str[:-1]
-	
+
 	def __str__(self):
 		return "%s : struct|%i" % (self.name, self.level)
 
@@ -473,15 +473,15 @@ class Struct(BaseType):
 		self.extending.append(extending)
 
 class Typedef(BaseType):
-	
+
 	def __init__(self, node):
 		BaseType.__init__(self, node)
-		
+
 		self.subtype = None
 		self.unit = None
-		
+
 		self.isTypedef = True
-	
+
 	def evaluate(self, tree):
 		self.description = xml_utils.get_description(self.node)
 		self.string = xml_utils.get_string(self.node)
@@ -490,28 +490,28 @@ class Typedef(BaseType):
 			self.subtype = SubType(self.node.get('type'), tree.types)
 		except ParserException as e:
 			raise ParserException("Error in definition of typedef '%s': %s" % (self.name, e))
-	
+
 	def create_hierarchy(self):
 		""" Create hierarchy
-		
+
 		See Struct.create_hierarchy() for a detailed description of this
 		method.
 		"""
 		if self.level is not None:
 			return
-		
+
 		self.size = 0
 		subtype = self.subtype.type
 		if subtype.level is None:
 			if self.subtype.size == 0:
 				raise ParserException("Loop in the definition of '%s' and '%s' detected!" % (self.name, self.subtype.name))
 			subtype.create_hierarchy()
-		
+
 		self.level = subtype.level + 1
 		self.size = subtype.size
-	
+
 	def dump(self):
 		return "%s : typedef|%i [%i]\n  -> %s" % (self.name, self.level, self.size, self.subtype)
-	
+
 	def __str__(self):
 		return "%s : typedef|%i" % (self.name, self.level)

@@ -34,12 +34,12 @@ public class MetaPackets
 			this.description = description;
 			this.type = type;
 		}
-		
+
 		@Override
 		public String toString(){
 			return "" + getClass().getSimpleName();
 		}
-		
+
 		/**
 		 * @param values Packets, from which the packet can be created.
 		 * @return a new created Packet from given Values, or passed value, in
@@ -47,7 +47,7 @@ public class MetaPackets
 		 * @throws NullPointerException if one of values is null.
 		 */
 		public abstract T getPacket(Packets.Packet ...values);
-		
+
 		/**
 		 * @param packet
 		 * @return Array of sub Packets, from which this packet can be re created, or
@@ -56,15 +56,15 @@ public class MetaPackets
 		 */
 		public abstract Packets.Packet[] getValues(T packet);
 	}
-	
+
 	public static abstract class Primitive<T extends Packets.Packet> extends Packet<T> {
 		public Primitive(String name, String description, Class<T> type) {
 			super(name, description, type);
 		}
-		
+
 		public abstract T getPacketFromPrimitive(Object value);
 	}
-	
+
 	public static abstract class Struct<T extends Packets.Packet> extends Packet<T> {
 		private final List<StructElement<?>> elements;
 		public Struct(String name, String description, Class<T> type, StructElement<?> ... packets) {
@@ -77,27 +77,27 @@ public class MetaPackets
 			return Collections.unmodifiableList(elements);
 		}
 	}
-	
+
 	public static abstract class Enum<T extends Packets.Packet> extends Packet<T> {
 		public Enum(String name, String description, Class<T> type) {
 			super(name, description, type);
 		}
-		
+
 		public abstract Iterable<T> elements();
 	}
-	
+
 	private static class EnumImpl<T extends java.lang.Enum<T> & Packets.Packet> extends Enum<T> {
 		public EnumImpl(String name, String description, Class<T> type) {
 			super(name, description, type);
 		}
-		
+
 		@Override
 		public Packets.Packet[] getValues(T packet) {
 			if (packet == null)
 				throw new NullPointerException();
 			return new Packets.Packet[] {packet};
 		}
-		
+
 		@Override
 		public T getPacket(Packets.Packet... values) {
 			@SuppressWarnings("unchecked")
@@ -106,13 +106,13 @@ public class MetaPackets
 				throw new NullPointerException();
 			return t;
 		}
-		
+
 		@Override
 		public Iterable<T> elements() {
 			return EnumSet.allOf(type);
 		}
 	}
-	
+
 	public static class StructElement<T extends Packets.Packet>
 	{
 		/** Name of the Field */
@@ -123,14 +123,14 @@ public class MetaPackets
 			this.packet = packet;
 		}
 	}
-	
+
 	// ------------------------------------------------------------------------
 	//                        Primitive types
 	// ------------------------------------------------------------------------
-	
+
 	//TODO: some structs are extending others
-	
-	
+
+
 	public static Primitive<Packets.Void> Void = new Primitive<Packets.Void>("Void", "", Packets.Void.class) {
 		@Override
 		public Packets.Void getPacket(Packets.Packet... values) {
@@ -140,7 +140,7 @@ public class MetaPackets
 		public Packets.Packet[] getValues(Packets.Void packet) {
 			return new Packets.Packet[]{};
 		};
-		
+
 		@Override
 		public rca.robot.Packets.Void getPacketFromPrimitive(Object value) {
 			return new Packets.Void();
@@ -156,18 +156,18 @@ public class MetaPackets
 		public Packets.Packet[] getValues(Packets.{{ primitive.name }} packet) {
 			return new Packets.Packet[]{packet};
 		};
-		
+
 		@Override
 		public Packets.{{ primitive.name }} getPacketFromPrimitive(Object value) {
 			return new Packets.{{ primitive.name }}(({{ primitive.javaWrapper }})value);
 		}
 	};
 	{%- endfor %}
-	
+
 	// ------------------------------------------------------------------------
 	//                       User defined types
 	// ------------------------------------------------------------------------
-	
+
 {% for packet in packets %}
 	{% if packet.description %}
 	/** {{ packet.description | inStringDescription }} */{%- endif %}
@@ -200,7 +200,7 @@ public class MetaPackets
 		public Packets.Packet[] getValues(Packets.{{ packet.name | typeObjectName }} packet) {
 			if (packet == null)
 				throw new NullPointerException();
-		
+
 			return new Packets.Packet[]{
 			{%- for element in packet.iter() %}
 			{%- if element.subtype.type.isBuiltIn or element.subtype.type.name == 'Bool' %}
@@ -218,9 +218,9 @@ public class MetaPackets
 						"{%- if packet.description -%}{{ packet.description | inStringDescription }}{%- endif -%}",
 						Packets.{{ packet.name | typeObjectName }}.class
 						);
-						
+
 	{%- elif packet.isTypedef %}
-	public static Struct<Packets.{{ packet.name | typeObjectName }}> {{ packet.name | typeObjectName }} = new Struct<Packets.{{ packet.name | typeObjectName }}>(// packet.isTypedef 
+	public static Struct<Packets.{{ packet.name | typeObjectName }}> {{ packet.name | typeObjectName }} = new Struct<Packets.{{ packet.name | typeObjectName }}>(// packet.isTypedef
 						"{{ packet.flattened().name }}",
 						"{%- if packet.description -%}{{ packet.description | inStringDescription }}{%- endif -%}",
 						Packets.{{ packet.name | typeObjectName }}.class,
@@ -243,7 +243,7 @@ public class MetaPackets
 		public Packets.Packet[] getValues(Packets.{{ packet.name | typeObjectName }} packet) {
 			if (packet == null)
 				throw new NullPointerException();
-		
+
 			return new Packets.Packet[]{
 			{%- if packet.subtype.type.isBuiltIn or packet.subtype.type.name == 'Bool' %}
 				new Packets.{{ packet.subtype.name | typeObjectName }} (packet.value)
@@ -254,7 +254,7 @@ public class MetaPackets
 		}
 	};
 	{%- endif %}
-	
+
 {%- endfor %}
 
 

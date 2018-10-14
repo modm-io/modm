@@ -23,26 +23,26 @@ import filter.java as filter
 class JavaPacketsJaxbIndexBuilder(builder_base.Builder):
 	"""
 	Generate jaxb.index file, which allows to marchal and unmarshal a packet with jaxb to and from a xml string.
-	
+
 	A common call would be like:
 	$python3 java_packets.py  --outpath source/rca/robot --package rca.robot robot.xml;
 	"""
-	
-	
+
+
 	VERSION = "0.1"
-	
+
 	def setup(self, optparser):
 		optparser.add_option(
 				"--package",
 				dest = "package",
 				default = '',
 				help = "name of package")
-				
+
 	def generate(self):
 		# check the commandline options
 		if not self.options.outpath:
 			raise builder_base.BuilderException("You need to provide an output path!")
-		
+
 		javaFilter = {
 			'enumElement': filter.enumElement,
 			'typeName': filter.typeName,
@@ -51,20 +51,20 @@ class JavaPacketsJaxbIndexBuilder(builder_base.Builder):
 		}
 		template = self.template('templates/java_packets_jaxb_index.tpl',
 								filter = javaFilter)
-		
+
 		# Bool has a special status because its primitive but user generated
 		# and the only not numerical type
 		packets = self.tree.types
 		packets.remove('Bool')
-		
+
 		primitives = sorted(filter.PRIMITIVES.values())
-		
+
 		substitutions = {
 			'package' : self.options.package,
 			'packets': packets,
 			'primitives': primitives,
 		}
-		
+
 		file = os.path.join(self.options.outpath, 'jaxb.index')
 		self.write(file, template.render(substitutions))
 

@@ -24,32 +24,32 @@ class JavaGeneratorBuilder(builder_base.Builder):
 	"""
 	Generate one Static method which is able to retrieve a Package from bytebuffer in
 	a typesafe manner based on xml communication definitions.
-	
+
 	A common call would be like:
 	$python3 java_generator.py --outpath source/rca/robot --package rca.robot robot.xml;
 	"""
 
 	VERSION = "0.1"
-	
+
 	def setup(self, optparser):
 		optparser.add_option(
 				"--package",
 				dest = "package",
 				default = '',
 				help = "name of package")
-				
+
 	def generate(self):
 		# check the commandline options
 		if not self.options.outpath:
 			raise builder_base.BuilderException("You need to provide an output path!")
-		
+
 		javaFilter = {
 			'enumElement': filter.enumElement,
 			'typeObjectName': filter.typeObjectName,
 		}
-		
+
 		template = self.template('templates/java_generator.tpl', filter=javaFilter)
-		
+
 		substitutions = {
 			'package' : self.options.package,
 			'domains':	self.tree.domains,
@@ -57,7 +57,7 @@ class JavaGeneratorBuilder(builder_base.Builder):
 			'actions': self.tree.components.actions,
 			'events': self.tree.events,
 		}
-		
+
 		file = os.path.join(self.options.outpath, 'Generator.java')
 		self.write(file, template.render(substitutions))
 
