@@ -16,10 +16,6 @@
 #include <stdint.h>
 #include "../device.hpp"
 
-/**
- * @ingroup 	{{partname}}
- * @defgroup	{{partname}}_random Random
- */
 
 namespace modm
 {
@@ -33,7 +29,7 @@ namespace platform
  * @todo check error status
  *
  * @author	Fabian Greif
- * @ingroup	{{partname}}_random
+ * @ingroup	modm_platform_random
  */
 class RandomNumberGenerator
 {

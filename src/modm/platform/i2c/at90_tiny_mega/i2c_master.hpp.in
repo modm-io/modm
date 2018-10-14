@@ -32,7 +32,7 @@ namespace platform
  * Interrupts must be enabled.
  *
  * @author Niklas Hauser
- * @ingroup	{{partname}}_i2c
+ * @ingroup	modm_platform_i2c
  */
 class I2cMaster : public ::modm::I2cMaster, I2c
 {

@@ -30,7 +30,7 @@ namespace modm
 		 *          specialization number) will generate a shared object!
 		 *
 		 * @author  Fabian Greif
-		 * @ingroup	linux
+		 * @ingroup	modm_platform_uart
 		 */
 		template<int N>
 		class StaticSerialInterface : public modm::Uart

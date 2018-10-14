@@ -16,7 +16,7 @@ class Instance(Module):
 
     def init(self, module):
         module.name = str(self.instance)
-        module.description = "I2C {} instance".format(self.instance)
+        module.description = "Instance {}".format(self.instance)
 
     def prepare(self, module, options):
         module.depends(":platform:i2c")
@@ -54,6 +54,7 @@ class Instance(Module):
 def init(module):
     module.name = "i2c"
     module.parent = "platform"
+    module.description = "Inter-Integrated Circuit (I²C)"
 
 def prepare(module, options):
     device = options[":target"]

@@ -31,7 +31,7 @@ namespace platform
  *			Therefore the data is bit reversed in software for DataOrder::MsbFirst.
  *
  * @author		Niklas Hauser
- * @ingroup		{{partname}}_spi
+ * @ingroup		modm_platform_uart_spi modm_platform_uart_spi_{{id}}
  */
 class UartSpiMaster{{ id }} : public modm::SpiMaster, public UartBase
 {

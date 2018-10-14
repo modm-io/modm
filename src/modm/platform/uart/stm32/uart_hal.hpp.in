@@ -34,7 +34,7 @@ namespace platform
  * the regular Usart classes.
  *
  * @author		Kevin Laeufer
- * @ingroup		{{partname}}_uart
+ * @ingroup		modm_platform_uart
  */
 class {{ uart_name ~ "Hal" ~ id }} : public UartBase
 {

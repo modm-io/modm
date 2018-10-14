@@ -71,7 +71,7 @@ namespace platform
  *
  * @author		Fabian Greif
  * @author		Kevin Laeufer
- * @ingroup		{{partname}}_timer
+ * @ingroup		modm_platform_timer
  */
 class Timer{{ id }} : public AdvancedControlTimer
 {

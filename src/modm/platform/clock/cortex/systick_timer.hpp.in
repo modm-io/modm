@@ -27,7 +27,7 @@ typedef void (*InterruptHandler)(void);
 
 /**
  * @brief		SysTick Timer
- * @ingroup		cortex
+ * @ingroup		modm_platform_clock_cortex
  */
 class SysTickTimer
 {

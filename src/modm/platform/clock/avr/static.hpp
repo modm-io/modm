@@ -23,7 +23,7 @@ namespace modm
 namespace platform
 {
 
-/// @ingroup avr
+/// @ingroup modm_platform_clock
 class
 SystemClock
 {

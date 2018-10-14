@@ -15,6 +15,7 @@
 
 #include <avr/io.h>
 
+/// @cond
 %% if partname in ["attiny40"]
 // The avr-libc Header files for the ATtiny40 is missing the following
 // defines although they are meantioned in the datasheet.
@@ -48,11 +49,7 @@
 #define SPIF    SPIF0
 #define SPDR    SPDR0
 %% endif
-
-/**
- * @ingroup 	{{partname}}
- * @defgroup	{{partname}}_spi SPI
- */
+/// @endcond
 
 namespace modm
 {
@@ -60,7 +57,7 @@ namespace modm
 namespace platform
 {
 
-/// @ingroup	{{partname}}_spi
+/// @ingroup	modm_platform_spi
 struct Spi
 {
 	enum class

@@ -16,19 +16,13 @@
 
 #include <modm/platform/gpio/connector.hpp>
 
-/**
- * @ingroup 	{{partname}}
- * @defgroup	{{partname}}_comp Comparator
- */
-
-
 namespace modm::platform
 {
 	/**
 	 * @brief		Comparator Class for STM32
 	 *
 	 * @internal
-	 * @ingroup		{{partname}}_comp
+	 * @ingroup		modm_platform_comp modm_platform_comp_{{id}}
 	 */
 	class Comp{{ id }} : public CompBase
 	{

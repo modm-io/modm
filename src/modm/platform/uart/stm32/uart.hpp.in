@@ -37,7 +37,7 @@ namespace platform
  *
  * @author		Kevin Laeufer
  * @author		Niklas Hauser
- * @ingroup		{{partname}}_uart
+ * @ingroup		modm_platform_uart modm_platform_uart_{{id}}
  */
 class {{ name }} : public UartBase, public ::modm::Uart
 {

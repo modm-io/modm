@@ -35,7 +35,7 @@ using GpioInput{{ port ~ pin }}  = Gpio{{ port ~ pin }};
 /// @endcond
 
 /// IO class for Pin {{port ~ pin}}
-/// @ingroup	{{partname}}_gpio
+/// @ingroup	modm_platform_gpio
 struct Gpio{{ port ~ pin }} : public Gpio, ::modm::GpioIO
 {
 	template<class... Gpios>
@@ -62,8 +62,10 @@ protected:
 	static constexpr IRQn_Type ExternalInterruptIRQ = EXTI{{ exti_irqn }}_IRQn;
 
 public:
+	/// @cond
 	/// Enable Analog Mode which is needed to use this pin as an ADC input.
 	inline static void setAnalogInput() { PinSet::setAnalogInput(); }
+	/// @endcond
 
 public:
 	// GpioOutput
@@ -150,6 +152,17 @@ public:
 	inline static void disconnect() { setInput(); };
 
 public:
+#ifdef __DOXYGEN__
+	/// @{
+	/// Connect to any software peripheral
+	using BitBang = GpioSignal;
+	%% for name, group in signals.items()
+	/// Connect to {% for sig in group %}{{ sig.driver }}{{ "" if loop.last else " or "}}{% endfor %}
+	using {{ name }} = GpioSignal;
+	%% endfor
+	/// @}
+#endif
+	/// @cond
 	template< Peripheral peripheral >
 	struct BitBang { static void connect();
 		static_assert(
@@ -166,8 +179,10 @@ public:
 			"Gpio{{ port ~ pin }}::{{ signal_name }} only connects to {% for signal in signal_group %}{{signal.driver}}{% if not loop.last %} or {% endif %}{% endfor %}!");
 	};
 	%% endfor
+	/// @endcond
 };
 
+/// @cond
 template<>
 struct Gpio{{ port ~ pin }}::BitBang<Peripheral::BitBang>
 {
@@ -202,6 +217,7 @@ struct Gpio{{ port ~ pin }}::{{ signal.name }}<Peripheral::{{ signal.driver }}>
 };
 	%% endfor
 %% endfor
+/// @endcond
 
 } // namespace platform
 

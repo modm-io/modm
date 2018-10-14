@@ -17,11 +17,6 @@
 #include "../device.hpp"
 #include "dma_base.hpp"
 
-/**
- * @ingroup 	{{partname}}
- * @defgroup	{{partname}}_dma DMA
- */
-
 %% if target["family"] == "f4"
 	%% set streams = range(0,8)
 %% elif target["family"] == "f3"
@@ -44,7 +39,7 @@ namespace platform
  * Does not support - among other things - double buffering or FIFO usage
  *
  * @author	Kevin Laeufer
- * @ingroup	{{partname}}_dma
+ * @ingroup	modm_platform_dma modm_platform_dma_{{id}}
  */
 class Dma{{ id }}
 {

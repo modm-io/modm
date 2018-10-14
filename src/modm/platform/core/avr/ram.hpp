@@ -23,11 +23,13 @@ namespace modm
 namespace platform
 {
 
+/// @cond
 void *
 allocateMemory(std::size_t requestedSize);
 
 void
 freeMemory(void *ptr);
+/// @endcond
 
 // TODO functions to retrieve status informations about used memory
 

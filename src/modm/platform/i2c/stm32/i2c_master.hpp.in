@@ -18,11 +18,6 @@
 #include <modm/platform/gpio/connector.hpp>
 #include <modm/architecture/interface/i2c_master.hpp>
 
-/**
- * @ingroup 	{{partname}}
- * @defgroup	{{partname}}_i2c I2C
- */
-
 namespace modm
 {
 
@@ -36,7 +31,7 @@ namespace platform
  *
  * @author		Georgi Grinshpun
  * @author		Niklas Hauser
- * @ingroup		{{partname}}_i2c
+ * @ingroup		modm_platform_i2c modm_platform_i2c_{{id}}
  */
 class I2cMaster{{ id }} : public ::modm::I2cMaster
 {

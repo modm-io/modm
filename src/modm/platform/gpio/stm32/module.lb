@@ -135,6 +135,7 @@ bprops = {}
 def init(module):
     module.name = "gpio"
     module.parent = "platform"
+    module.description = "General Purpose I/O (GPIO)"
 
 def prepare(module, options):
     device = options[":target"]

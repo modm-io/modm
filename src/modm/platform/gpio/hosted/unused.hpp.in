@@ -46,13 +46,13 @@ namespace platform
  *
  * modm::SoftwareSpiMaster< pin::Clk, pin::Mosi, GpioUnused > Spi;
  *
- * ...partname
+ * ...
  * Spi::write(0xaa);
  * @endcode
  *
  * @author	Fabian Greif
  * @author	Niklas Hauser
- * @ingroup	{{target.family}}_gpio
+ * @ingroup	modm_platform_gpio
  */
 class GpioUnused : public Gpio, public ::modm::GpioIO
 {

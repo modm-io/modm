@@ -14,6 +14,7 @@
 #ifndef	MODM_PLATFORM_FLASH_READER_HPP
 #define	MODM_PLATFORM_FLASH_READER_HPP
 
+/// @cond
 #include <modm/architecture/utils.hpp>
 #include <cstring>
 
@@ -47,4 +48,5 @@ struct FlashReader
 
 }	// namespace modm
 
+/// @endcond
 #endif	// MODM_PLATFORM_FLASH_READER_HPP

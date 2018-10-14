@@ -21,6 +21,7 @@ namespace modm
 namespace platform
 {
 
+/// @ingroup modm_platform_gpio
 template< class... Gpios >
 class GpioSet : public Gpio
 {

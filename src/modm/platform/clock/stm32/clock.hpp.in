@@ -16,11 +16,6 @@
 #ifndef MODM_STM32_CLOCK_HPP
 #define MODM_STM32_CLOCK_HPP
 
-/**
- * @ingroup 	{{partname}}
- * @defgroup	{{partname}}_clock System Clock
- */
-
 #include <stdint.h>
 #include "../device.hpp"
 #include "common_clock.hpp"
@@ -42,7 +37,7 @@ namespace platform
  * Don't forget to set the flash latencies.
  *
  * @author		Niklas Hauser
- * @ingroup		{{partname}}_clock
+ * @ingroup		modm_platform_clock
  */
 class ClockControl
 {

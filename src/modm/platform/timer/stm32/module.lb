@@ -41,7 +41,7 @@ class Instance(Module):
 
     def init(self, module):
         module.name = str(self.instance)
-        module.description = "Timer {} instance".format(self.instance)
+        module.description = "Instance {}".format(self.instance)
 
     def prepare(self, module, options):
         module.depends(":platform:timer")
@@ -70,6 +70,7 @@ class Instance(Module):
 def init(module):
     module.name = "timer"
     module.parent = "platform"
+    module.description = "Timers (TIM)"
 
 def prepare(module, options):
     device = options[":target"]

@@ -15,6 +15,7 @@
 #ifndef	MODM_PLATFORM_ATOMIC_LOCK_HPP
 #define	MODM_PLATFORM_ATOMIC_LOCK_HPP
 
+/// @cond
 #include "../device.hpp"
 #include <modm/architecture/utils.hpp>
 
@@ -66,4 +67,5 @@ private:
 
 }	// namespace modm
 
+/// @endcond
 #endif	// MODM_PLATFORM_ATOMIC_LOCK_HPP

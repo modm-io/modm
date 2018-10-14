@@ -23,6 +23,7 @@ namespace modm
 namespace platform
 {
 
+/// @cond
 template< Gpio::Port port >
 struct GpioPortInfo;
 template< class StartGpio, int8_t Width >
@@ -30,9 +31,11 @@ struct GpioSetShim
 {
 	static typename GpioPortInfo<StartGpio::port>::template check<StartGpio::pin, Width> check;
 };
+/// @endcond
 
+/// @ingroup modm_platform_gpio
 template< class StartGpio, int8_t Width >
-class GpioPort : public ::modm::GpioPort, public GpioSetShim<StartGpio, Width>
+class GpioPort : public ::modm::GpioPort/** @cond */, public GpioSetShim<StartGpio, Width>/** @endcond */
 {
 	using PinSet = GpioSetShim<StartGpio, Width>;
 public:
@@ -81,6 +84,7 @@ public:
 	}
 };
 
+/// @cond
 // ------ Port Width Information ------
 %% for port in ranges
 template<>
@@ -131,6 +135,7 @@ struct GpioSetShim<StartGpio, {{width}}> : public GpioSet<
 	%% endfor
 		> { static typename GpioPortInfo<StartGpio::port>::template check<StartGpio::pin, {{width}}> check; };
 %% endfor
+/// @endcond
 
 } // namespace platform
 

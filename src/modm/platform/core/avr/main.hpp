@@ -16,7 +16,9 @@
 
 #include <stdint.h>
 
+/// @cond
 // saves a couple of bytes of stack and program.
 int main(void) __attribute__((OS_main));
+/// @endcond
 
 #endif	// MODM_AVR_MAIN_HPP

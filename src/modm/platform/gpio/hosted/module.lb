@@ -15,6 +15,7 @@
 def init(module):
     module.name = "gpio"
     module.parent = "platform"
+    module.description = "Hosted GPIO"
 
 
 def prepare(module, options):

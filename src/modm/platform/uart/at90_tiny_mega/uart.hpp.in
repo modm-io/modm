@@ -11,11 +11,6 @@
  */
 // ----------------------------------------------------------------------------
 
-/**
- * @ingroup 	avr
- * @defgroup	avr_uart UART
- */
-
 #ifndef MODM_AVR_UART{{ id }}_HPP
 #define MODM_AVR_UART{{ id }}_HPP
 
@@ -34,22 +29,11 @@ namespace platform
  * (Non-)Buffered Uart{{ id }}
  *
  * This implementation uses a ringbuffer. The size of the ringbuffer
- * can be changed in the `project.cfg` file.
- *
- * Just add add a value for `tx_buffer` and/or `rx_buffer` in the
- * `parameters` section. The size can be any value between 1 and 254
- * for buffered and 0 for non-buffered operation.
- *
- * Example:
- * @code
- * [parameters]
- * uart.at90_tiny_mega.{{ id }}.tx_buffer = 20
- * uart.at90_tiny_mega.{{ id }}.rx_buffer = 30
- * @endcode
+ * can be changed in the options.
  *
  * @author	Fabian Greif
  * @author	Niklas Hauser
- * @ingroup	{{partname}}_uart
+ * @ingroup	modm_platform_uart modm_platform_uart_{{id}}
  */
 class Uart{{ id }} : public ::modm::Uart
 {

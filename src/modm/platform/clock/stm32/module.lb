@@ -14,6 +14,7 @@
 def init(module):
     module.name = "clock"
     module.parent = "platform"
+    module.description = "Reset and Clock Control (RCC)"
 
 def prepare(module, options):
     if not options[":target"].has_driver("rcc:stm32*"):

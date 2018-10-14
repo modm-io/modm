@@ -36,7 +36,7 @@ namespace platform
  *
  * \author	Kevin Laeufer
  * \author	Sascha Schade (strongly-typed)
- * \ingroup	stm32
+ * \ingroup	modm_platform_adc modm_platform_adc_{{id}}
  */
 class Adc{{ id }}
 {

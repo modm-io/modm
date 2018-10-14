@@ -51,7 +51,7 @@ namespace platform
  {%- endif %}
  *
  * @author		Fabian Greif
- * @ingroup		{{partname}}_timer
+ * @ingroup		modm_platform_timer
  */
 class Timer{{ id }} : public BasicTimer
 {

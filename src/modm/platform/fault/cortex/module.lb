@@ -16,6 +16,11 @@ import os
 def init(module):
     module.parent = "platform"
     module.name = "fault.cortex"
+    module.description = """\
+# ARM Cortex-M Fault Handling
+
+Dealing with Fault handlers.
+"""
 
 def prepare(module, options):
     if not options[":target"].has_driver("core:cortex-m*"):

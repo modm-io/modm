@@ -34,7 +34,7 @@ namespace platform
  *
  * @see		http://www.canusb.com/
  * @see		http://www.can232.com/
- * @ingroup	hosted
+ * @ingroup	modm_platform_canusb
  */
 template <typename SerialPort>
 class CanUsb : public ::modm::Can

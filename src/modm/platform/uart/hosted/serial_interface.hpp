@@ -37,7 +37,7 @@ namespace modm
 		 *	- close()
 		 *
 		 * @author	Philipp & Metty
-		 * @ingroup	linux
+		 * @ingroup	modm_platform_uart
 		 */
 		class SerialInterface : public IODevice
 		{

@@ -32,7 +32,7 @@ namespace platform
  * DMA
  *
  * @author	Kevin Laeufer
- * @ingroup	{{partname}}_dma
+ * @ingroup	modm_platform_dma
  */
 class DmaBase
 {

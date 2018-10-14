@@ -34,7 +34,7 @@ namespace platform
  * @endcode
  *
  * @author	Fabian Greif
- * @ingroup	gpio
+ * @ingroup	modm_platform_gpio
  */
 template < class Pin >
 class GpioInverted : public Pin

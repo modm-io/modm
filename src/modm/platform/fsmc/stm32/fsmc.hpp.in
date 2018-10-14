@@ -21,11 +21,6 @@
 #include <stdint.h>
 #include "../device.hpp"
 
-/**
- * @ingroup 	{{partname}}
- * @defgroup	{{partname}}_fsmc FSMC
- */
-
 namespace modm
 {
 	namespace platform
@@ -97,7 +92,7 @@ namespace modm
 			 * Synchronous => burst mode?
 			 * NOR Flash and burst write?
 			 *
-			 * @ingroup {{partname}}_fsmc
+			 * @ingroup modm_platform_fsmc
 			 */
 			class NorSram
 			{
@@ -288,6 +283,7 @@ namespace modm
 		 *
 		 *
 		 * \author	Fabian Greif
+		 * \ingroup modm_platform_fsmc
 		 */
 		class Fsmc
 		{

@@ -42,7 +42,7 @@ namespace platform
  * 			It might be expanded in the future.
  *
  * @author		Fabian Greif
- * @ingroup		{{partname}}_timer
+ * @ingroup		modm_platform_timer
  */
 class Timer{{ id }} : public GeneralPurposeTimer
 {

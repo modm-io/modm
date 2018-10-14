@@ -20,7 +20,7 @@ namespace modm
 {
 	namespace platform
 	{
-		/// @ingroup {{partname}}_can
+		/// @ingroup modm_platform_can
 		enum ErrorCode
 		{
 			CAN_ERROR_PASSIVE_MODE = 0x0010,

@@ -29,7 +29,7 @@ namespace platform
 /**
  * Implementation of the SimpleSpi of the Uart in Spi Master mode.
  *
- * @ingroup		{{partname}}_spi
+ * @ingroup		modm_platform_uart_spi modm_platform_uart_spi_{{id}}
  * @author		Niklas Hauser
  */
 class UartSpiMaster{{ id }} : public ::modm::SpiMaster

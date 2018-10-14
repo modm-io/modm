@@ -11,11 +11,6 @@
  */
 // ----------------------------------------------------------------------------
 
-/**
- * @ingroup 	{{partname}}
- * @defgroup	{{partname}}_adc ADC
- */
-
 #ifndef MODM_ATMEGA_ADC_HPP
 #define MODM_ATMEGA_ADC_HPP
 
@@ -69,7 +64,7 @@ namespace platform
  * needed the frequency can be higher.
  *
  * @author	Niklas Hauser
- * @ingroup	{{partname}}_adc
+ * @ingroup	modm_platform_adc
  */
 class Adc : public modm::Adc
 {

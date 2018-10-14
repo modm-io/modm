@@ -25,7 +25,7 @@ namespace modm
 		 * 
 		 * Uses the STL IOStream for in- and output.
 		 * 
-		 * \ingroup	hosted
+		 * \ingroup	modm_platform_uart
 		 */
 		class Terminal : public IODevice
 		{

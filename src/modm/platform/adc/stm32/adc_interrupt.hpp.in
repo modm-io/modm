@@ -35,7 +35,7 @@ namespace platform
  *
  * @see AnalogSensors uses this implemenation.
  *
- * @ingroup		{{partname}}_adc
+ * @ingroup		modm_platform_adc_{{id}}
  * @author		Niklas Hauser
  */
 class AdcInterrupt{{ id }} : public Adc{{ id }}, public modm::AdcInterrupt

@@ -33,7 +33,7 @@ namespace platform
  * Simple unbuffered implementation.
  *
  * @author	Niklas Hauser
- * @ingroup	{{partname}}_spi
+ * @ingroup	modm_platform_spi modm_platform_spi_{{id}}
  */
 class SpiMaster{{ id }} : public modm::SpiMaster
 {

@@ -13,6 +13,7 @@
 def init(module):
     module.name = "random"
     module.parent = "platform"
+    module.description = "Random Number Generator (RNG)"
 
 def prepare(module, options):
     if not options[":target"].has_driver("rng:stm32"):

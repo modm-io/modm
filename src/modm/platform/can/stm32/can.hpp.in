@@ -26,11 +26,6 @@
 
 using namespace modm::clock; // for MHzxx
 
-/**
- * @ingroup 	{{partname}}
- * @defgroup	{{partname}}_can CAN
- */
-
 namespace modm
 {
 
@@ -57,7 +52,7 @@ namespace platform
  * You can set the buffer size using the `tx_buffer` and `rx_buffer` parameters.
  *
  * @author		Fabian Greif <fabian.greif@rwth-aachen.de>
- * @ingroup		{{partname}}_can
+ * @ingroup		modm_platform_can{% if id | length %} modm_platform_can_{{id}}{% endif %}
  */
 class Can{{ id }} : public ::modm::Can
 {
