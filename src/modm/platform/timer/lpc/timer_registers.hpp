@@ -16,7 +16,7 @@
 
 namespace modm
 {
-	///< 
+	///<
 	namespace platform
 	{
 		enum TMR_TCR

@@ -22,9 +22,9 @@ namespace modm
 	{
 		/**
 		 * \brief	Standard text terminal
-		 * 
+		 *
 		 * Uses the STL IOStream for in- and output.
-		 * 
+		 *
 		 * \ingroup	modm_platform_uart
 		 */
 		class Terminal : public IODevice
@@ -32,13 +32,13 @@ namespace modm
 		public :
 			virtual void
 			write(char c);
-			
+
 			virtual void
 			write(const char* s);
-			
+
 			virtual void
 			flush();
-			
+
 			virtual bool
 			read(char& value);
 		};
