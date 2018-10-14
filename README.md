@@ -15,15 +15,17 @@ process that you can fine-tune to your needs.
 - [This project has a homepage](http://modm.io).<!--/webignore-->
 - Check out our [install instructions][install] and our [getting started guide][guide].
 - Feast your eyes on [lots of working examples][examples].
-<!-- - [API reference is available here][reference]. -->
-<!-- - [Check out our latest quarterly release][releases] with a [beautiful changelog][changelog]. -->
 - Our CI checks every contribution for regressions: <a href="https://circleci.com/gh/modm-io/workflows/modm/tree/develop" style="border-bottom:none">![Build Status](https://circleci.com/gh/modm-io/modm/tree/develop.svg?style=shield)</a>
 - We care [about testing modm][testing].
+
+<!-- - [API reference is available here][reference]. -->
+<!-- - [Check out our latest quarterly release][releases] with a [beautiful changelog][changelog]. -->
 
 This project also has a [technical blog][blog] to document larger design concepts.
 
 - You found a bug? [Open up an issue, we don't bite][issues].
-- You want to contribute? [Read the contribution guidelines][contributing] and [open a pull request][prs].
+- You want to contribute? [Read the contribution guidelines][contrib] and [open a pull request][prs].
+
 <!-- - You want to port modm? [Read our porting guide][porting]. -->
 
 modm is optimized for the harsh requirements of the [Eurobot competition][eurobot],
@@ -66,29 +68,30 @@ git clone --recurse-submodules https://github.com/modm-io/modm.git
 
 ## Targets
 
-modm can generate code for <!--avrcount-->76<!--/avrcount--> AVR and <!--stmcount-->865<!--/stmcount--> STM32 devices, however, there are different levels of support and testing.
+modm can generate code for <!--avrcount-->76<!--/avrcount--> AVR and <!--stmcount-->865<!--/stmcount-->
+STM32 devices, however, there are different levels of support and testing.
 
 <center>
 
-| Device Family | Support                             | Device Family | Support                             |
-|:--------------|:------------------------------------|:--------------|:------------------------------------|
-| AVR           | &#9733;&#9733;&#9733;               | STM32F3       | &#9733;&#9733;&#9733;&#9733;&#9733; |
-| STM32F0       | &#9733;&#9733;&#9733;&#9733;        | STM32F4       | &#9733;&#9733;&#9733;&#9733;&#9733; |
-| STM32F1       | &#9733;&#9733;&#9733;&#9733;        | STM32F7       | &#9733;&#9733;&#9733;&#9733;        |
-| STM32F2       | &#9733;&#9733;&#9733;               | STM32L4       | &#9733;&#9733;&#9733;&#9733;        |
+| Device Family | Support | Device Family | Support |
+|:--------------|:--------|:--------------|:--------|
+| AVR           | ★★★     | STM32F3       | ★★★★★   |
+| STM32F0       | ★★★★    | STM32F4       | ★★★★★   |
+| STM32F1       | ★★★★    | STM32F7       | ★★★★    |
+| STM32F2       | ★★★     | STM32L4       | ★★★★    |
 
 </center>
 
 All of these targets are compiling and booting correctly
-(&#9733;)
+(★)
 and have GPIO and UART working
-(&#9733;&#9733;).
+(★★).
 Most targets have support for basic peripherals, like I2C, SPI and ADC
-(&#9733;&#9733;&#9733;)
+(★★★)
 as well as complicated peripherals, like Timers, CAN and external memory
-(&#9733;&#9733;&#9733;&#9733;).
+(★★★★).
 We also use a few targets in everyday development, which are very well tested
-(&#9733;&#9733;&#9733;&#9733;&#9733;).
+(★★★★★).
 
 We are only a small team of developers and are limited in the amount of targets
 we can support and test in hardware. We have prepared, but currently not finished
@@ -144,9 +147,9 @@ documentation.
 
 ### Drivers
 
-We also have a number of completely target-independent [drivers for external 
+We also have a number of completely target-independent [drivers for external
 devices][drivers] connected via I<sup>2</sup>C, SPI, UART, BitBang, etc.
-Most of these also give you access to the entire device so you 
+Most of these also give you access to the entire device so you
 can easily configure them for you specific needs.
 
 <center>
@@ -218,22 +221,22 @@ Please see [our examples for a complete list][examples] of tested targets and dr
 
 ## How can I contribute?
 
-The easiest way for you and the best way for us to see if something is unclear 
-or missing, is if you use the library and give us some feedback by 
+The easiest way for you and the best way for us to see if something is unclear
+or missing, is if you use the library and give us some feedback by
 [filing a bug report][issues] or if you have a fix already, [opening a pull request][prs].
 
-See [CONTRIBUTING.md][contributing] for our contribution guidelines.
+See [CONTRIBUTING.md][contrib] for our contribution guidelines.
 
 <!--authors-->
 The modm project is maintained by
-Niklas Hauser ([@salkinium](https://github.com/salkinium)) with significant contributions from
-Sascha Schade ([@strongly-typed](https://github.com/strongly-typed)),
-Fabian Greif ([@dergraaf](https://github.com/dergraaf)),
-Kevin Läufer ([@ekiwi](https://github.com/ekiwi)),
-Martin Rosekeit ([@thundernail](https://github.com/thundernail)),
-Daniel Krebs ([@daniel-k](https://github.com/daniel-k)),
-Georgi Grinshpun ([@georgi-g](https://github.com/georgi-g)) and 
-[<!--authorcount-->20<!--/authorcount--> more contributors](https://github.com/modm-io/modm/blob/develop/AUTHORS).
+Niklas Hauser ([\@salkinium](https://github.com/salkinium)) with significant contributions from
+Sascha Schade ([\@strongly-typed](https://github.com/strongly-typed)),
+Fabian Greif ([\@dergraaf](https://github.com/dergraaf)),
+Kevin Läufer ([\@ekiwi](https://github.com/ekiwi)),
+Martin Rosekeit ([\@thundernail](https://github.com/thundernail)),
+Daniel Krebs ([\@daniel-k](https://github.com/daniel-k)),
+Georgi Grinshpun ([\@georgi-g](https://github.com/georgi-g)) and
+[<!--authorcount-->20<!--/authorcount-->  more contributors](https://github.com/modm-io/modm/blob/develop/AUTHORS).
 <!--/authors-->
 
 ## Folder structure
@@ -275,7 +278,7 @@ Georgi Grinshpun ([@georgi-g](https://github.com/georgi-g)) and
 [blog]:            http://blog.salkinium.com
 [changelog]:       https://github.com/modm-io/modm/tree/develop/docs/CHANGELOG.md
 [circle_ci]:       https://circleci.com/gh/modm-io/workflows/modm/tree/develop
-[contributing]:    https://github.com/modm-io/modm/tree/develop/CONTRIBUTING.md
+[contrib]:         https://github.com/modm-io/modm/tree/develop/CONTRIBUTING.md
 [devboards]:       https://github.com/modm-io/modm/tree/develop/src/modm/board
 [drivers]:         https://github.com/modm-io/modm/tree/develop/src/modm/driver
 [eurobot]:         http://www.eurobot.org/
