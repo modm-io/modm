@@ -13,7 +13,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 <!-- DTD for the communication structure description -->
 
 <!ELEMENT rca (description|builtin|typedef|struct|enum|event|component|container)*>
-<!ATTLIST rca 
+<!ATTLIST rca
 	version    CDATA    #REQUIRED
 >
 

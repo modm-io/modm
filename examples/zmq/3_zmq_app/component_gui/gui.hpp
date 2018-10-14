@@ -24,7 +24,7 @@ namespace component
 	{
 	public:
 		Gui(uint8_t id, xpcc::Dispatcher &communication);
-		
+
 		void
 		update();
 

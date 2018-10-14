@@ -3,7 +3,7 @@
 ## Setup
 
  * STM32F4 Discovery Board
- * CAN transceiver breakout board with SN65HVD230 
+ * CAN transceiver breakout board with SN65HVD230
  * CAN2USB
 
 Connect the CAN2USB to your computer and to the CAN transceiver.
@@ -23,7 +23,7 @@ Start ZeroMQ Gateway on PC
 
     cd 2_zmq_gateway
     scons
-    
+
 This will connect to the CAN2USB and receives the CAN frames, reassembles them with MODM CAN Connector and creates MODM Header and MODM Payload. This data is printed on the console. You may need to update the hardcoded USB device (`/dev/tty.usbserial-14112`).
 
      Debug:   Payload is:      0xDEADBEEF112233445566778802
@@ -53,14 +53,14 @@ There is a C++ MODM subscriber
 
 	cd 3_zmq_app
 	scons
-	
+
 It will parse the ZeroMQ message into MODM Header and MODM Payload.
-	
+
     Debug:   0MQ size is 17
     Debug:   Header is:       (t=0,a=false,d=05,s=07,i=0B)
     Debug:   Payload size is: 13
     Debug:   Payload is:      0xDEADBEEF112233445566778819
-    
+
 ## ToDo
 
 * Add a back channel with `PUSH/PULL` ports in ZeroMQ

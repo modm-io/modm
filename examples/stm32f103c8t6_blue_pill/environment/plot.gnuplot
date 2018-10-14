@@ -4,7 +4,7 @@ set output 'temperature.svg'
 plot 'log.csv' using 0:2 title 'BMP180 A Temperature', \
      'log.csv' using 0:4 title 'BMP180 B Temperature', \
      'log.csv' using 0:6 title 'BME280 A Temperature', \
-     'log.csv' using 0:9 title 'BME280 B Temperature', 
+     'log.csv' using 0:9 title 'BME280 B Temperature',
 
 set terminal svg size 800, 600
 set output 'pressure.svg'

@@ -20,7 +20,7 @@
 <!-- Aggregated data types -->
 <struct name="position">
 	<description>Position of the Robot on the Playground.</description>
-	
+
 	<element name="x" type="int16_t" unit="mm" />
 	<element name="y" type="int16_t" unit="mm" />
 </struct>
@@ -39,7 +39,7 @@
 
 <!-- Components -->
 <component name="sender" id="0x01">
-	
+
 </component>
 
 <component name="receiver" id="0x02">
