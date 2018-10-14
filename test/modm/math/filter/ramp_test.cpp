@@ -19,7 +19,7 @@ void
 RampTest::testConstructor()
 {
 	modm::filter::Ramp<int16_t> ramp(3, 4);
-	
+
 	TEST_ASSERT_TRUE(ramp.isTargetReached());
 	TEST_ASSERT_EQUALS(ramp.getValue(), 0);
 }
@@ -28,44 +28,44 @@ void
 RampTest::testRamp()
 {
 	modm::filter::Ramp<int16_t> ramp(3, 4);
-	
+
 	ramp.update();
 	TEST_ASSERT_EQUALS(ramp.getValue(), 0);
-	
+
 	ramp.setTarget(20);
 	TEST_ASSERT_EQUALS(ramp.getValue(), 0);
 	TEST_ASSERT_FALSE(ramp.isTargetReached());
-	
+
 	for (int i = 0; i < 6; ++i) {
 		ramp.update();
 		TEST_ASSERT_EQUALS(ramp.getValue(), i * 3 + 3);
 	}
 	TEST_ASSERT_FALSE(ramp.isTargetReached());
-	
+
 	ramp.update();
 	TEST_ASSERT_EQUALS(ramp.getValue(), 20);
 	TEST_ASSERT_TRUE(ramp.isTargetReached());
-	
+
 	ramp.update();
 	TEST_ASSERT_EQUALS(ramp.getValue(), 20);
 	TEST_ASSERT_TRUE(ramp.isTargetReached());
-	
+
 	ramp.setTarget(-50);
 	TEST_ASSERT_EQUALS(ramp.getValue(), 20);
 	TEST_ASSERT_FALSE(ramp.isTargetReached());
-	
+
 	for (int i = 0; i < 17; ++i) {
 		ramp.update();
 		TEST_ASSERT_EQUALS(ramp.getValue(), 20 - (i + 1) * 4);
 	}
 	TEST_ASSERT_FALSE(ramp.isTargetReached());
-	
+
 	ramp.update();
 	TEST_ASSERT_EQUALS(ramp.getValue(), -50);
 	TEST_ASSERT_TRUE(ramp.isTargetReached());
-	
+
 	ramp.update();
 	TEST_ASSERT_EQUALS(ramp.getValue(), -50);
 	TEST_ASSERT_TRUE(ramp.isTargetReached());
-	
+
 }

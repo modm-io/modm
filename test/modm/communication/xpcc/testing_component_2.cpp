@@ -73,7 +73,7 @@ TestingComponent2::responseCallAction(const xpcc::Header& header)
 {
 	timeline->events.append(
 			Timeline::Event(Timeline::RESPONSE, 2, 0x32, header.source));
-	
+
 	xpcc::ResponseCallback callback(this, &TestingComponent2::responseNoParameter);
 	this->callAction(1, 0x12, callback);
 }

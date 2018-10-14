@@ -25,7 +25,7 @@ namespace
 		uint8_t median7;
 		uint8_t median9;
 	};
-	
+
 	static const TestData testData[] =
 	{
 		{ 5,	5, 5, 5, 5 },
@@ -62,7 +62,7 @@ MedianTest::testDefaultConstructor()
 	modm::filter::Median<uint8_t, 5> filter5;
 	modm::filter::Median<uint8_t, 7> filter7;
 	modm::filter::Median<uint8_t, 9> filter9;
-	
+
 	TEST_ASSERT_EQUALS(filter3.getValue(), 0);
 	TEST_ASSERT_EQUALS(filter5.getValue(), 0);
 	TEST_ASSERT_EQUALS(filter7.getValue(), 0);
@@ -76,24 +76,24 @@ MedianTest::testMedian()
 	modm::filter::Median<uint8_t, 5> filter5(5);
 	modm::filter::Median<uint8_t, 7> filter7(5);
 	modm::filter::Median<uint8_t, 9> filter9(5);
-	
+
 	TEST_ASSERT_EQUALS(filter3.getValue(), 5);
 	TEST_ASSERT_EQUALS(filter5.getValue(), 5);
 	TEST_ASSERT_EQUALS(filter7.getValue(), 5);
 	TEST_ASSERT_EQUALS(filter9.getValue(), 5);
-	
+
 	for (unsigned int i = 0; i < (sizeof(testData) / sizeof(TestData)); ++i)
 	{
 		filter3.append(testData[i].inputValue);
 		filter5.append(testData[i].inputValue);
 		filter7.append(testData[i].inputValue);
 		filter9.append(testData[i].inputValue);
-		
+
 		filter3.update();
 		filter5.update();
 		filter7.update();
 		filter9.update();
-		
+
 		TEST_ASSERT_EQUALS(filter3.getValue(), testData[i].median3);
 		TEST_ASSERT_EQUALS(filter5.getValue(), testData[i].median5);
 		TEST_ASSERT_EQUALS(filter7.getValue(), testData[i].median7);

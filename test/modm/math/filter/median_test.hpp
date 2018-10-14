@@ -18,7 +18,7 @@ class MedianTest : public unittest::TestSuite
 public:
 	void
 	testDefaultConstructor();
-	
+
 	void
 	testMedian();
 };

@@ -20,12 +20,12 @@ void
 BlockAllocatorTest::testAvailableSize()
 {
 	uint8_t *heap = new uint8_t[512];
-	
+
 	modm::BlockAllocator<uint16_t, 8> allocator;
 	allocator.initialize(heap, heap + 512);
-	
+
 	TEST_ASSERT_EQUALS(allocator.getAvailableSize(), 496U);
-	
+
 	delete[] heap;
 }
 
@@ -33,25 +33,25 @@ void
 BlockAllocatorTest::testAllocate()
 {
 	uint8_t *heap = new uint8_t[512];
-	
+
 	modm::BlockAllocator<uint16_t, 8> allocator;
 	allocator.initialize(heap, heap + 512);
-	
+
 	TEST_ASSERT_EQUALS(allocator.getAvailableSize(), 496U);
-	
+
 	allocator.allocate(12);
-	
+
 	TEST_ASSERT_EQUALS(allocator.getAvailableSize(), 480U);
-	
+
 	allocator.allocate(13);
-	
+
 	TEST_ASSERT_EQUALS(allocator.getAvailableSize(), 448U);
-	
+
 	allocator.allocate(440);
-	
+
 	TEST_ASSERT_EQUALS(allocator.getAvailableSize(), 0U);
 	TEST_ASSERT_EQUALS(allocator.allocate(1), (void *) 0);
-	
+
 	delete[] heap;
 }
 
@@ -59,23 +59,23 @@ void
 BlockAllocatorTest::testFree()
 {
 	uint8_t *heap = new uint8_t[512];
-	
+
 	modm::BlockAllocator<uint16_t, 8> allocator;
 	allocator.initialize(heap, heap + 512);
-	
+
 	TEST_ASSERT_EQUALS(allocator.getAvailableSize(), 496U);
-	
+
 	void* firstBlock = allocator.allocate(12);
 	void* secondBlock = allocator.allocate(12);
-	
+
 	TEST_ASSERT_FALSE(firstBlock == secondBlock);
-	
+
 	allocator.free(firstBlock);
-	
+
 	void *thirdBlock = allocator.allocate(12);
-	
+
 	TEST_ASSERT_TRUE(firstBlock == thirdBlock);
-	
+
 	delete[] heap;
 }
 

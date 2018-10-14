@@ -25,7 +25,7 @@ public:
 
 	void
 	testAllocate();
-	
+
 	void
 	testFree();
 

@@ -21,9 +21,9 @@ void
 FlashTest::testIntegerAccess()
 {
 	modm::accessor::Flash<int> intPointer(&intValue);
-	
+
 	TEST_ASSERT_EQUALS(*intPointer, 12345);
-}	
+}
 
 FLASH_STORAGE_STRING(stringValue) = "Hallo Welt!";
 
@@ -32,6 +32,6 @@ FlashTest::testStringAccess()
 {
 	char string[] = "Hallo Welt!";
 	modm::accessor::Flash<char> stringPointer(stringValue);
-	
+
 	TEST_ASSERT_EQUALS_ARRAY(stringPointer, string, sizeof(string));
 }

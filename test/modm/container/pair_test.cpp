@@ -29,15 +29,15 @@ void
 PairTest::testPair()
 {
 	modm::accessor::Flash<myPair> ptr(values);
-	
+
 	TEST_ASSERT_EQUALS(ptr[1].getFirst(), 5);
 	TEST_ASSERT_EQUALS(ptr[1].getSecond(), 30);
-	
+
 	TEST_ASSERT_EQUALS(ptr[2].getFirst(), 27);
 	TEST_ASSERT_EQUALS(ptr[2].getSecond(), 100);
-	
+
 	modm::Pair<int16_t, int16_t> pair = { 124, -1523 };
-	
+
 	TEST_ASSERT_EQUALS(pair.getFirst(), 124);
 	TEST_ASSERT_EQUALS(pair.getSecond(), -1523);
 }

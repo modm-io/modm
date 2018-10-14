@@ -41,13 +41,13 @@ OperatorTest::testMultiplication()
 	TEST_ASSERT_EQUALS(modm::math::mul((uint16_t) 1000, (uint16_t) 1000), 1000000U);
 	TEST_ASSERT_EQUALS(modm::math::mul((uint16_t) 10000, (uint16_t) 10000), 100000000U);
 	TEST_ASSERT_EQUALS(modm::math::mul((uint16_t) 60000, (uint16_t) 60000), 3600000000U);
-	
+
 	TEST_ASSERT_EQUALS(modm::math::mul((int16_t) 1, (int16_t) 1), 1);
 	TEST_ASSERT_EQUALS(modm::math::mul((int16_t) 10, (int16_t) 10), 100);
 	TEST_ASSERT_EQUALS(modm::math::mul((int16_t) 100, (int16_t) 100), 10000);
 	TEST_ASSERT_EQUALS(modm::math::mul((int16_t) 1000, (int16_t) 1000), 1000000);
 	TEST_ASSERT_EQUALS(modm::math::mul((int16_t) 10000, (int16_t) 10000), 100000000);
-	
+
 	TEST_ASSERT_EQUALS(modm::math::mul((int16_t) -1, (int16_t) -1), 1);
 	TEST_ASSERT_EQUALS(modm::math::mul((int16_t) -10, (int16_t) 10), -100);
 	TEST_ASSERT_EQUALS(modm::math::mul((int16_t) 100, (int16_t) -100), -10000);
@@ -60,16 +60,16 @@ void
 OperatorTest::testMultiplyAccumulate()
 {
 	int32_t offset = -2130;
-	
+
 	TEST_ASSERT_EQUALS(modm::math::mac(offset, (int16_t) 1, (int16_t) 1), 1 - 2130);
 	TEST_ASSERT_EQUALS(modm::math::mac(offset, (int16_t) 10, (int16_t) 10), 100 - 2130);
 	TEST_ASSERT_EQUALS(modm::math::mac(offset, (int16_t) 100, (int16_t) 100), 10000 - 2130);
 	TEST_ASSERT_EQUALS(modm::math::mac(offset, (int16_t) 1000, (int16_t) 1000), 1000000 - 2130);
 	TEST_ASSERT_EQUALS(modm::math::mac(offset, (int16_t) 10000, (int16_t) 10000), 100000000 - 2130);
 	TEST_ASSERT_EQUALS(modm::math::mac(offset, (int16_t) -10000, (int16_t) -10000), 100000000 - 2130);
-	
+
 	offset = 1235678;
-	
+
 	TEST_ASSERT_EQUALS(modm::math::mac(offset, (int16_t) -1, (int16_t) -1), 1 + 1235678);
 	TEST_ASSERT_EQUALS(modm::math::mac(offset, (int16_t) -10, (int16_t) 10), -100 + 1235678);
 	TEST_ASSERT_EQUALS(modm::math::mac(offset, (int16_t) 100, (int16_t) -100), -10000 + 1235678);

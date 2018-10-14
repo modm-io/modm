@@ -38,10 +38,10 @@ CanConnectorTest::checkFragmentedMessage(const modm::can::Message& message,
 {
 	uint8_t offset = fragmentId * 6;
 	uint8_t payloadLength = getPayloadLength(offset);
-    
+
 	TEST_ASSERT_EQUALS(message.identifier, fragmentedIdentifier);
 	TEST_ASSERT_EQUALS(message.length, payloadLength + 2);
-	
+
 	TEST_ASSERT_EQUALS(message.data[0], fragmentId | messageCounter);
 	TEST_ASSERT_EQUALS(message.data[1], sizeof(fragmentedPayload));
 	TEST_ASSERT_EQUALS_ARRAY(&message.data[2],
@@ -54,10 +54,10 @@ CanConnectorTest::createMessage(modm::can::Message& message,
 {
 	uint8_t offset = fragmentId * 6;
 	uint8_t payloadLength = getPayloadLength(offset);
-	
+
 	message.identifier = fragmentedIdentifier;
 	message.length = payloadLength + 2;
-	
+
 	message.data[0] = fragmentId | messageCounter;
 	message.data[1] = sizeof(fragmentedPayload);
 	memcpy(	&message.data[2],
@@ -89,7 +89,7 @@ CanConnectorTest::CanConnectorTest() :
 	for (uint8_t i = 0; i < sizeof(shortPayload); ++i) {
 		shortPayload[i] = i;
 	}
-	
+
 	for (uint8_t i = 0; i < sizeof(fragmentedPayload); ++i) {
 		fragmentedPayload[i] = i * 2;
 	}
@@ -100,10 +100,10 @@ void
 CanConnectorTest::testSendShortMessageDirect()
 {
 	driver->sendSlots = 1;
-	
+
 	modm::SmartPointer payload(&shortPayload);
 	connector->sendPacket(xpccHeader, payload);
-	
+
 	// short messages might be send directly without any call to update
 	TEST_ASSERT_EQUALS(driver->sendList.getSize(), 1U);
 	checkShortMessage(driver->sendList.getFront());
@@ -114,12 +114,12 @@ CanConnectorTest::testSendShortMessage()
 {
 	modm::SmartPointer payload(&shortPayload);
 	connector->sendPacket(xpccHeader, payload);
-	
+
 	TEST_ASSERT_EQUALS(driver->sendList.getSize(), 0U);
-	
+
 	driver->sendSlots = 1;
 	connector->update();
-	
+
 	TEST_ASSERT_EQUALS(driver->sendList.getSize(), 1U);
 	checkShortMessage(driver->sendList.getFront());
 }
@@ -129,33 +129,33 @@ CanConnectorTest::testSendFragmentedMessage()
 {
 	driver->sendSlots = 2;
 	this->messageCounter = connector->messageCounter = 0x30;
-	
+
 	modm::SmartPointer payload(&fragmentedPayload);
 	connector->sendPacket(xpccHeader, payload);
-	
+
 	// fragmented messages aren't send directly but queued immediately
 	TEST_ASSERT_EQUALS(driver->sendList.getSize(), 0U);
-	
+
 	// with two send slots two message should be send
 	connector->update();
 	TEST_ASSERT_EQUALS(driver->sendList.getSize(), 1U);
 	connector->update();
 	TEST_ASSERT_EQUALS(driver->sendList.getSize(), 2U);
-	
+
 	checkFragmentedMessage(driver->sendList.getFront(), 0);
 	driver->sendList.removeFront();
-	
+
 	checkFragmentedMessage(driver->sendList.getFront(), 1);
 	driver->sendList.removeFront();
-	
+
 	driver->sendSlots = 1;
 	connector->update();
 	connector->update();
 	TEST_ASSERT_EQUALS(driver->sendList.getSize(), 1U);
-	
+
 	checkFragmentedMessage(driver->sendList.getFront(), 2);
 	driver->sendList.removeFront();
-	
+
 	TEST_ASSERT_EQUALS(connector->messageCounter, 0x40);
 }
 
@@ -163,18 +163,18 @@ void
 CanConnectorTest::testReceiveShortMessage()
 {
 	TEST_ASSERT_FALSE(connector->isPacketAvailable());
-	
+
 	// create a new can message
 	modm::can::Message message(normalIdentifier, 8);
 	memcpy(&message.data, shortPayload, 8);
-	
+
 	driver->receiveList.append(message);
-	
+
 	// let it be received by the connector
 	connector->update();
-	
+
 	TEST_ASSERT_TRUE(connector->isPacketAvailable());
-	
+
 	TEST_ASSERT_EQUALS(connector->getPacketHeader(), xpccHeader);
 	TEST_ASSERT_EQUALS(connector->getPacketPayload().getSize(), 8U);
 	TEST_ASSERT_EQUALS_ARRAY(
@@ -182,7 +182,7 @@ CanConnectorTest::testReceiveShortMessage()
 			shortPayload,
 			8);
 	connector->dropPacket();
-	
+
 	TEST_ASSERT_FALSE(connector->isPacketAvailable());
 }
 
@@ -190,36 +190,36 @@ void
 CanConnectorTest::testReceiveFragmentedMessage()
 {
 	TEST_ASSERT_FALSE(connector->isPacketAvailable());
-	
+
 	this->messageCounter = 0x50;
 	modm::can::Message message;
-	
+
 	createMessage(message, 0);
 	driver->receiveList.append(message);
-	
+
 	createMessage(message, 1);
 	driver->receiveList.append(message);
-	
+
 	connector->update();
 	TEST_ASSERT_FALSE(connector->isPacketAvailable());
-	
+
 	// Send the matching fragment with a wrong message counter.
 	// This should be treated as a new message and not append to the peding one.
 	this->messageCounter = 0xf0;
 	createMessage(message, 2);
 	driver->receiveList.append(message);
-	
+
 	connector->update();
 	TEST_ASSERT_FALSE(connector->isPacketAvailable());
-	
+
 	// Now the last fragment with the correct counter
 	this->messageCounter = 0x50;
 	createMessage(message, 2);
 	driver->receiveList.append(message);
-	
+
 	connector->update();
 	TEST_ASSERT_TRUE(connector->isPacketAvailable());
-	
+
 	// check if the message is correct
 	TEST_ASSERT_EQUALS(connector->getPacketHeader(), xpccHeader);
 	TEST_ASSERT_EQUALS(connector->getPacketPayload().getSize(), sizeof(fragmentedPayload));
@@ -228,24 +228,24 @@ CanConnectorTest::testReceiveFragmentedMessage()
 			fragmentedPayload,
 			sizeof(fragmentedPayload));
 	connector->dropPacket();
-	
+
 	TEST_ASSERT_FALSE(connector->isPacketAvailable());
-	
+
 	// send the first two fragments for the message with the different
 	// message counter
 	this->messageCounter = 0xf0;
 	createMessage(message, 1);
 	driver->receiveList.append(message);
-	
+
 	connector->update();
 	TEST_ASSERT_FALSE(connector->isPacketAvailable());
-	
+
 	createMessage(message, 0);
 	driver->receiveList.append(message);
-	
+
 	connector->update();
 	TEST_ASSERT_TRUE(connector->isPacketAvailable());
-	
+
 	// check if the message is correct
 	TEST_ASSERT_EQUALS(connector->getPacketHeader(), xpccHeader);
 	TEST_ASSERT_EQUALS(connector->getPacketPayload().getSize(), sizeof(fragmentedPayload));
@@ -254,6 +254,6 @@ CanConnectorTest::testReceiveFragmentedMessage()
 			fragmentedPayload,
 			sizeof(fragmentedPayload));
 	connector->dropPacket();
-	
+
 	TEST_ASSERT_FALSE(connector->isPacketAvailable());
 }

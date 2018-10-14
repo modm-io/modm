@@ -18,7 +18,7 @@ struct LagrangeInterpolationTest : public unittest::TestSuite
 {
 	void
 	testCreation();
-	
+
 	void
 	testInterpolation();
 };

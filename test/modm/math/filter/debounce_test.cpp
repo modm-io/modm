@@ -22,7 +22,7 @@ namespace
 		bool input;
 		bool output;
 	};
-	
+
 	static const TestData testData[] =
 	{
 		{ true, false },
@@ -45,9 +45,9 @@ void
 DebounceTest::testDebounce()
 {
 	modm::filter::Debounce<> filter(4);
-	
+
 	TEST_ASSERT_FALSE(filter.getValue());
-	
+
 	for (unsigned int i = 0; i < (sizeof(testData) / sizeof(TestData)); ++i)
 	{
 		filter.update(testData[i].input);

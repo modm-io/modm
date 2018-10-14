@@ -51,7 +51,7 @@ TestingComponent1::actionDirectResponse(const xpcc::ResponseHandle& handle)
 {
 	timeline->events.append(
 			Timeline::Event(Timeline::ACTION, 1, 0x12, handle.getDestination()));
-	
+
 	this->sendResponse(handle);
 }
 
@@ -60,7 +60,7 @@ TestingComponent1::actionDelayedResponse(const xpcc::ResponseHandle& handle)
 {
 	timeline->events.append(
 			Timeline::Event(Timeline::ACTION, 1, 0x13, handle.getDestination()));
-	
+
 	this->delayedResponseHandle = handle;
 	this->isDelayedResponseActive = true;
 }
@@ -71,7 +71,7 @@ TestingComponent1::actionUint16CallAction(const xpcc::ResponseHandle& handle,
 {
 	timeline->events.append(
 			Timeline::Event(Timeline::ACTION, 1, 0x14, handle.getDestination(), parameter));
-	
+
 	this->callAction(2, 0x11, *parameter);
 }
 

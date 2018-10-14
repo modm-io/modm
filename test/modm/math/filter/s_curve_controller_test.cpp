@@ -19,18 +19,18 @@ void
 SCurveControllerTest::testConstructor()
 {
 	modm::SCurveController<int16_t>::Parameter parameter;
-	
+
 	modm::SCurveController<int16_t> controller(parameter);
-	
+
 	int16_t target = 200;
 	int16_t input = 200;
-	
+
 	TEST_ASSERT_FALSE(controller.isTargetReached());
-	
+
 	controller.update(target - input, 0);
-	
+
 	TEST_ASSERT_EQUALS(controller.getValue(), 0);
 	TEST_ASSERT_TRUE(controller.isTargetReached());
-	
+
 	// FIXME some useful tests are needed here
 }

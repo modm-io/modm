@@ -27,29 +27,29 @@ public:
 		ACTION,
 		RESPONSE
 	};
-	
+
 	struct Event
 	{
 		Event(Type type, uint8_t component, uint8_t id, uint8_t source);
-		
+
 		template <typename T>
 		Event(Type type, uint8_t component, uint8_t id, uint8_t source,
 				const T *parameter);
-		
+
 		Event(const Event& other);
-		
+
 		Type type;
 		uint8_t component;
 		uint8_t id;
 		uint8_t source;
-		
+
 		modm::SmartPointer payload;
-		
+
 	private:
 		Event&
 		operator = (const Event& other);
 	};
-	
+
 	modm::LinkedList<Event> events;
 };
 

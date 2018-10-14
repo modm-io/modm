@@ -26,14 +26,14 @@ public:
 		order(0)
 	{
 	}
-	
+
 	virtual void
 	run()
 	{
 		order = count;
 		count++;
 	}
-	
+
 	uint8_t order;
 };
 
@@ -43,48 +43,48 @@ void
 SchedulerTest::testScheduler()
 {
 	modm::Scheduler scheduler;
-	
+
 	TestTask task1;
 	TestTask task2;
 	TestTask task3;
 	TestTask task4;
-	
+
 	scheduler.scheduleTask(task1, 3, 10);
 	scheduler.scheduleTask(task2, 3);
 	scheduler.scheduleTask(task3, 3, 20);
 	scheduler.scheduleTask(task4, 3, 200);
-	
+
 	scheduler.schedule();
 	scheduler.schedule();
-	
+
 	TEST_ASSERT_EQUALS(task1.order, 0);
 	TEST_ASSERT_EQUALS(task2.order, 0);
 	TEST_ASSERT_EQUALS(task3.order, 0);
 	TEST_ASSERT_EQUALS(task4.order, 0);
-	
+
 	scheduler.schedule();
-	
+
 	TEST_ASSERT_EQUALS(task1.order, 4);
 	TEST_ASSERT_EQUALS(task2.order, 2);
 	TEST_ASSERT_EQUALS(task3.order, 3);
 	TEST_ASSERT_EQUALS(task4.order, 1);
-	
+
 	count = 1;
 	task1.order = 0;
 	task2.order = 0;
 	task3.order = 0;
 	task4.order = 0;
-	
+
 	scheduler.schedule();
 	scheduler.schedule();
-	
+
 	TEST_ASSERT_EQUALS(task1.order, 0);
 	TEST_ASSERT_EQUALS(task2.order, 0);
 	TEST_ASSERT_EQUALS(task3.order, 0);
 	TEST_ASSERT_EQUALS(task4.order, 0);
-	
+
 	scheduler.schedule();
-	
+
 	TEST_ASSERT_EQUALS(task1.order, 4);
 	TEST_ASSERT_EQUALS(task2.order, 2);
 	TEST_ASSERT_EQUALS(task3.order, 3);

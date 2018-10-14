@@ -19,35 +19,35 @@ void
 AtomicQueueTest::testQueue()
 {
 	modm::atomic::Queue<int16_t, 3> queue;
-	
+
 	TEST_ASSERT_TRUE(queue.isEmpty());
 	TEST_ASSERT_EQUALS(queue.getMaxSize(), 3);
-	
+
 	TEST_ASSERT_TRUE(queue.push(1));
 	TEST_ASSERT_TRUE(queue.push(2));
 	TEST_ASSERT_TRUE(queue.push(3));
-	
+
 	TEST_ASSERT_FALSE(queue.push(4));
 	TEST_ASSERT_TRUE(queue.isFull());
-	
+
 	TEST_ASSERT_EQUALS(queue.get(), 1);
 	queue.pop();
-	
+
 	TEST_ASSERT_EQUALS(queue.get(), 2);
 	queue.pop();
-	
+
 	TEST_ASSERT_TRUE(queue.push(4));
 	TEST_ASSERT_TRUE(queue.push(5));
 	TEST_ASSERT_TRUE(queue.isFull());
-	
+
 	TEST_ASSERT_EQUALS(queue.get(), 3);
 	queue.pop();
-	
+
 	TEST_ASSERT_EQUALS(queue.get(), 4);
 	queue.pop();
-	
+
 	TEST_ASSERT_EQUALS(queue.get(), 5);
 	queue.pop();
-	
+
 	TEST_ASSERT_TRUE(queue.isEmpty());
 }

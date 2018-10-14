@@ -53,7 +53,7 @@ void
 test::SpiDevice::deselect()
 {
 	std::size_t expectedLength = 0;
-	
+
 	if (selected)
 	{
 		if (!complete)
@@ -62,7 +62,7 @@ test::SpiDevice::deselect()
 			if (bytesWritten != expectedLength) {
 				error |= WRONG_LENGTH;
 			}
-			
+
 			if (currentTransmission + 1 == transmissionCount) {
 				complete = true;
 			}
@@ -71,12 +71,12 @@ test::SpiDevice::deselect()
 			error |= MAX_TRANSMISSION_COUNT_EXCEEDED;
 		}
 	}
-	
+
 	selected = false;
-	
+
 	if (reportErrors)
 	{
-		unittest::Reporter& reporter = unittest::Controller::instance().getReporter(); 
+		unittest::Reporter& reporter = unittest::Controller::instance().getReporter();
 		if (error == NO_ERROR) {
 			reporter.reportPass();
 		}
@@ -102,7 +102,7 @@ test::SpiDevice::deselect()
 			unittest::printArray(os, 0, length, transmissions[currentTransmission].tx);
 		}
 	}
-	
+
 	currentTransmission++;
 }
 
@@ -110,11 +110,11 @@ uint8_t
 test::SpiDevice::write(uint8_t data)
 {
 	uint8_t out = 0xff;
-	
+
 	if (selected && !complete)
 	{
 		const Transmission* t = &transmissions[currentTransmission];
-		
+
 		if (bytesWritten < t->length) {
 			if (data != t->rx[bytesWritten]) {
 				error |= WRONG_DATA_RECEIVED;
@@ -127,7 +127,7 @@ test::SpiDevice::write(uint8_t data)
 		}
 		bytesWritten++;
 	}
-	
+
 	return out;
 }
 
@@ -138,28 +138,28 @@ test::SpiDevice::start(const Transmission* transmissions,
 {
 	complete = (transmissionCount == 0);
 	error = NO_ERROR;
-	
+
 	this->transmissions = transmissions;
 	this->transmissionCount = transmissionCount;
 	this->lineNumber = lineNumber;
 	this->reportErrors = reportErrors;
-	
+
 	currentTransmission = 0;
 	bytesWritten = 0;
 	selected = false;
-	
+
 	std::size_t maxSize = 0;
 	for (std::size_t i = 0; i < transmissionCount; ++i) {
 		if (transmissions[i].length > maxSize) {
 			maxSize = transmissions[i].length;
 		}
 	}
-	
+
 	if (rxBuffer != nullptr) {
 		delete rxBuffer;
 		rxBuffer = nullptr;
 	}
-	
+
 	if (maxSize) {
 		rxBuffer = new uint8_t[maxSize];
 	}
@@ -170,15 +170,15 @@ void
 test::SpiDevice::finish()
 {
 	unittest::Reporter& reporter = unittest::Controller::instance().getReporter();
-	
+
 	if (reportErrors)
 	{
 		if (selected) {
 			deselect();
-			
+
 			reporter.reportFailure(lineNumber) << "Device still selected\n";
 		}
-		
+
 		if ((error & MAX_TRANSMISSION_COUNT_EXCEEDED) || !complete) {
 			error &= ~MAX_TRANSMISSION_COUNT_EXCEEDED;
 			reporter.reportFailure(lineNumber)

@@ -23,8 +23,8 @@
 #include "message.hpp"
 
 /**
- * 
- * 
+ *
+ *
  * \see	DispatcherTest
  */
 class FakePostman : public xpcc::Postman
@@ -36,13 +36,13 @@ public:
 	virtual DeliverInfo
 	deliverPacket(const xpcc::Header& header,
 			const modm::SmartPointer& payload);
-	
+
 	virtual bool
 	isComponentAvailable(uint8_t component) const;
-	
+
 public:
 	modm::LinkedList<Message> messagesToDeliver;
-	
+
 	TestingComponent1 *component1;	///< must be created external!
 	TestingComponent2 *component2;	///< must be created external!
 };

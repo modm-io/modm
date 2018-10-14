@@ -29,9 +29,9 @@ CanLawicelFormatterTest::testIdentifierToStringExtended()
 	for (int i = 0; i < 128; ++i) {
 		buffer[i] = 'a';
 	}
-	
+
 	TEST_ASSERT_TRUE(modm::CanLawicelFormatter::convertToString(msg, buffer));
-	
+
 	TEST_ASSERT_EQUALS(std::strlen(buffer), 10U);
 	/*              \0-terminatation of string >-+
 	 *                                           |
@@ -46,14 +46,14 @@ CanLawicelFormatterTest::testIdentifierToStringStandard()
 {
 	modm::can::Message msg(0x123, 0);
 	msg.flags.extended = false;
-	
+
 	char buffer[128];
 	for (int i = 0; i < 128; ++i) {
 		buffer[i] = 'a';
 	}
-	
+
 	TEST_ASSERT_TRUE(modm::CanLawicelFormatter::convertToString(msg, buffer));
-	
+
 	TEST_ASSERT_EQUALS(std::strlen(buffer), 5U);
 	TEST_ASSERT_EQUALS_ARRAY(buffer, "t1230\0", 6);
 }
@@ -67,14 +67,14 @@ CanLawicelFormatterTest::testMessageToStringStandard()
 	msg.data[1] = 0xff;
 	msg.data[2] = 0x1A;
 	msg.data[3] = 0x12;
-	
+
 	char buffer[128];
 	for (int i = 0; i < 128; ++i) {
 		buffer[i] = 'a';
 	}
-	
+
 	TEST_ASSERT_TRUE(modm::CanLawicelFormatter::convertToString(msg, buffer));
-	
+
 	TEST_ASSERT_EQUALS(std::strlen(buffer), 13U);
 	/*                 \0-terminatation of string >-+
 	 *                                              |
@@ -93,14 +93,14 @@ CanLawicelFormatterTest::testMessageToStringExtended()
 	msg.data[1] = 0xff;
 	msg.data[2] = 0x1A;
 	msg.data[3] = 0x12;
-	
+
 	char buffer[128];
 	for (int i = 0; i < 128; ++i) {
 		buffer[i] = 'a';
 	}
-	
+
 	TEST_ASSERT_TRUE(modm::CanLawicelFormatter::convertToString(msg, buffer));
-	
+
 	TEST_ASSERT_EQUALS(std::strlen(buffer), 18U);
 	TEST_ASSERT_EQUALS_ARRAY(buffer, "T00000123444FF1A12\0", 19);
 }
@@ -110,14 +110,14 @@ CanLawicelFormatterTest::testStringToMessage()
 {
 	const char *input = "T000016108F8FF00002394883D";
 	modm::can::Message output;
-	
+
 	TEST_ASSERT_TRUE(modm::CanLawicelFormatter::convertToCanMessage(input, output));
 
 	TEST_ASSERT_EQUALS(output.identifier, 0x00001610U);
 	TEST_ASSERT_EQUALS(output.length, 8U);
 	TEST_ASSERT_EQUALS(output.flags.extended, true);
 	TEST_ASSERT_EQUALS(output.flags.rtr, false);
-	
+
 	TEST_ASSERT_EQUALS(output.data[0], 0xf8);
 	TEST_ASSERT_EQUALS(output.data[1], 0xff);
 	TEST_ASSERT_EQUALS(output.data[2], 0x00);

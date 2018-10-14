@@ -18,24 +18,24 @@ VectorTest::testConstructor()
 {
 	int16_t array[2] = {1, 2};
 	modm::Matrix<int16_t, 2, 1> m(array);
-	
+
 	modm::Vector<int16_t, 2> a;
 	TEST_ASSERT_EQUALS(a[0], 0);
 	TEST_ASSERT_EQUALS(a[1], 0);
-	
+
 	a[0] = 1;
 	a[1] = 2;
 	TEST_ASSERT_EQUALS(a[0], 1);
 	TEST_ASSERT_EQUALS(a[1], 2);
-	
+
 	modm::Vector<int16_t, 2> c(array);
 	TEST_ASSERT_EQUALS(c[0], 1);
 	TEST_ASSERT_EQUALS(c[1], 2);
-	
+
 	modm::Vector<int16_t, 2> p(a);
 	TEST_ASSERT_EQUALS(p[0], 1);
 	TEST_ASSERT_EQUALS(p[1], 2);
-	
+
 	modm::Vector<int16_t, 2> q(m);
 	TEST_ASSERT_EQUALS(q[0], 1);
 	TEST_ASSERT_EQUALS(q[1], 2);
@@ -46,18 +46,18 @@ VectorTest::testAssign()
 {
 	int16_t array1[4] = {1, 2, 3, 4};
 	modm::Vector<int16_t, 4> a(array1);
-	
+
 	int16_t array2[4] = {5, 6, 7, 8};
 	modm::Matrix<int16_t, 4, 1> m(array2);
-	
+
 	modm::Vector<int16_t, 4> b;
-	
+
 	b = a;
 	TEST_ASSERT_EQUALS(b[0], 1);
 	TEST_ASSERT_EQUALS(b[1], 2);
 	TEST_ASSERT_EQUALS(b[2], 3);
 	TEST_ASSERT_EQUALS(b[3], 4);
-	
+
 	b = m;
 	TEST_ASSERT_EQUALS(b[0], 5);
 	TEST_ASSERT_EQUALS(b[1], 6);
@@ -70,11 +70,11 @@ VectorTest::testCompare()
 {
 	int16_t array1[4] = {4, 5, 2, 1};
 	modm::Vector<int16_t, 4> a(array1);
-	
+
 	int16_t array2[4] = {4, 5, 2, 3};
 	modm::Vector<int16_t, 4> b(array2);
 	modm::Vector<int16_t, 4> c(array2);
-	
+
 	// ==
 	TEST_ASSERT_TRUE(b == c);
 	TEST_ASSERT_FALSE(a == c);
@@ -105,7 +105,7 @@ VectorTest::testRawDataAccess()
 	int16_t array[4] = {0, 1, 2, 3};
 	modm::Vector<int16_t,4> a(array);
 	int16_t *pointer = a.ptr();
-	
+
 	TEST_ASSERT_EQUALS(a[0], 0);
 	TEST_ASSERT_EQUALS(a[1], 1);
 	TEST_ASSERT_EQUALS(a[2], 2);
@@ -121,37 +121,37 @@ VectorTest::testOperators()
 {
 	int16_t array1[4] = {1, 2, 3, 4};
 	modm::Vector<int16_t,4> a(array1);
-	
+
 	int16_t array2[4] = {4, 5, 6, 7};
 	modm::Vector<int16_t,4> b(array2);
-	
+
 	TEST_ASSERT_EQUALS((a + b)[0], 1+4);
 	TEST_ASSERT_EQUALS((a + b)[1], 2+5);
 	TEST_ASSERT_EQUALS((a + b)[2], 3+6);
 	TEST_ASSERT_EQUALS((a + b)[3], 4+7);
-	
+
 	TEST_ASSERT_EQUALS((a - b)[0], 1-4);
 	TEST_ASSERT_EQUALS((a - b)[1], 2-5);
 	TEST_ASSERT_EQUALS((a - b)[2], 3-6);
 	TEST_ASSERT_EQUALS((a - b)[3], 4-7);
-	
+
 	TEST_ASSERT_EQUALS((a * b), 1*4 + 2*5 + 3*6 + 4*7);
-	
+
 	TEST_ASSERT_EQUALS((a * 3)[0], 1*3);
 	TEST_ASSERT_EQUALS((a * 3)[1], 2*3);
 	TEST_ASSERT_EQUALS((a * 3)[2], 3*3);
 	TEST_ASSERT_EQUALS((a * 3)[3], 4*3);
-	
+
 	//	TEST_ASSERT_EQUALS((3 * a)[0], 3*1);
 	//	TEST_ASSERT_EQUALS((3 * a)[1], 3*2);
 	//	TEST_ASSERT_EQUALS((3 * a)[2], 3*3);
 	//	TEST_ASSERT_EQUALS((3 * a)[3], 3*4);
-	
+
 	TEST_ASSERT_EQUALS((b / 2)[0], 4/2);
 	TEST_ASSERT_EQUALS((b / 2)[1], 5/2);
 	TEST_ASSERT_EQUALS((b / 2)[2], 6/2);
 	TEST_ASSERT_EQUALS((b / 2)[3], 7/2);
-	
+
 	-b;
 	TEST_ASSERT_EQUALS(b[0], 4);
 	TEST_ASSERT_EQUALS(b[1], 5);
@@ -187,9 +187,9 @@ VectorTest::testOperators()
 void
 VectorTest::testLength()
 {
-	float array[4] = {1.f, 2.f, 3.f, 4.f}; 
+	float array[4] = {1.f, 2.f, 3.f, 4.f};
 	modm::Vector<float, 4> a(array);
-	
+
 	TEST_ASSERT_EQUALS_FLOAT(a.getLengthSquared(), 1.f*1.f + 2.f*2.f + 3.f*3.f + 4.f*4.f);
 	TEST_ASSERT_EQUALS_FLOAT(a.getLength(), 5.477225575);
 }

@@ -20,16 +20,16 @@ void
 LinearInterpolationTest::testInterpolationRam()
 {
 	typedef modm::Pair<int16_t, uint16_t> Point;
-	
+
 	Point points[3] =
 	{
 		{ -10, 50 },
 		{  50, 10 },
 		{ 100,  0 }
 	};
-	
+
 	modm::interpolation::Linear<Point> value(points, 3);
-	
+
 	TEST_ASSERT_EQUALS(value.interpolate(-20), 50U);
 	TEST_ASSERT_EQUALS(value.interpolate( 10), 37U);
 	TEST_ASSERT_EQUALS(value.interpolate( 30), 24U);
@@ -49,12 +49,12 @@ FLASH_STORAGE(MyPair flashValues[6]) =
 	{ 220, 20000 }
 };
 
-void 
+void
 LinearInterpolationTest::testInterpolationFlash()
 {
 	modm::interpolation::Linear<MyPair, modm::accessor::Flash> \
 		value(modm::accessor::asFlash(flashValues), 6);
-	
+
 	TEST_ASSERT_EQUALS(value.interpolate(  0),  -200);
 	TEST_ASSERT_EQUALS(value.interpolate( 10),  -200);
 	TEST_ASSERT_EQUALS(value.interpolate( 30),  -200);

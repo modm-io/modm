@@ -21,38 +21,38 @@ QuaternionTest::testConstructor()
 	modm::Vector<float,3> v(1,2,3);
 	float mData[] = {1,2,3,4};
 	modm::Matrix<float, 4, 1> m(mData);
-	
+
 	modm::Quaternion<float> q0;
 	modm::Quaternion<float> q1(1,2,3,4);
 	modm::Quaternion<float> q2(v, M_PI/4);
 	modm::Quaternion<float> q3(m);
 	modm::Quaternion<float> q4(q1);
-	
+
 	TEST_ASSERT_EQUALS(q0.w, 0);
 	TEST_ASSERT_EQUALS(q0.x, 0);
 	TEST_ASSERT_EQUALS(q0.y, 0);
 	TEST_ASSERT_EQUALS(q0.z, 0);
-	
+
 	TEST_ASSERT_EQUALS(q1.w, 1);
 	TEST_ASSERT_EQUALS(q1.x, 2);
 	TEST_ASSERT_EQUALS(q1.y, 3);
 	TEST_ASSERT_EQUALS(q1.z, 4);
-	
+
 	TEST_ASSERT_EQUALS_FLOAT(q2.w, cos(M_PI/8));
 	TEST_ASSERT_EQUALS_FLOAT(q2.x, 1*sin(M_PI/8));
 	TEST_ASSERT_EQUALS_FLOAT(q2.y, 2*sin(M_PI/8));
 	TEST_ASSERT_EQUALS_FLOAT(q2.z, 3*sin(M_PI/8));
-	
+
 	TEST_ASSERT_EQUALS(q3.w, 1);
 	TEST_ASSERT_EQUALS(q3.x, 2);
 	TEST_ASSERT_EQUALS(q3.y, 3);
 	TEST_ASSERT_EQUALS(q3.z, 4);
-	
+
 	TEST_ASSERT_EQUALS(q4.w, 1);
 	TEST_ASSERT_EQUALS(q4.x, 2);
 	TEST_ASSERT_EQUALS(q4.y, 3);
 	TEST_ASSERT_EQUALS(q4.z, 4);
-	
+
 	q0.w = 1;
 	q0.x = 2;
 	q0.y = 3;
@@ -61,7 +61,7 @@ QuaternionTest::testConstructor()
 	TEST_ASSERT_EQUALS(q0.x, 2);
 	TEST_ASSERT_EQUALS(q0.y, 3);
 	TEST_ASSERT_EQUALS(q0.z, 4);
-	
+
 }
 
 void
@@ -74,8 +74,8 @@ QuaternionTest::testAssign()
 	TEST_ASSERT_EQUALS(q5.x, 2);
 	TEST_ASSERT_EQUALS(q5.y, 3);
 	TEST_ASSERT_EQUALS(q5.z, 4);
-	
-	
+
+
 	float mData[] = {1,2,3,4};
 	modm::Matrix<float, 4, 1> m(mData);
 	modm::Quaternion<float> q6;

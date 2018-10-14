@@ -18,19 +18,19 @@ class Location2DTest : public unittest::TestSuite
 public:
 	void
 	testDefaultConstructor();
-	
+
 	void
 	testConstructor();
-	
+
 	void
 	testAccessors();
 
 	void
 	testOperators();
-	
+
 	void
 	testMove();
-	
+
 	void
 	testConvert();
 };

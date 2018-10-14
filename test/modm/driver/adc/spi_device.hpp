@@ -20,17 +20,17 @@ namespace test
 {
 	#ifdef ENABLE_MACRO_EXPORT
 	#	define ANONYMOUS_ARRAY(type, ...)	((type []) { __VA_ARGS__ })
-	#	define ARRAY_SIZE(a)	(sizeof(a) / sizeof(a[0]))	
+	#	define ARRAY_SIZE(a)	(sizeof(a) / sizeof(a[0]))
 	#	define RX_DATA(...)		ANONYMOUS_ARRAY(uint8_t, __VA_ARGS__)
 	#	define TX_DATA(...)		ANONYMOUS_ARRAY(uint8_t, __VA_ARGS__)
 	#endif
-	
+
 	/**
 	 * Single SPI transmission
-	 * 
+	 *
 	 * Example:
 	 * \code
-	 * 
+	 *
 	 * \endcode
 	 */
 	struct Transmission
@@ -39,40 +39,40 @@ namespace test
 			length(length), rx(rx), tx(tx)
 		{
 		}
-		
+
 		std::size_t length;
-		
+
 		uint8_t *rx;
 		uint8_t *tx;
 	};
-	
+
 	/**
 	 * Mock-Up class to simulate SPI devices.
-	 * 
+	 *
 	 * It has a separate start() function instead of using the Constructor
 	 * to allow the usage with static classes.
-	 * 
+	 *
 	 * \author	Fabian Greif
 	 */
 	class SpiDevice
 	{
 	public:
 		SpiDevice();
-		
+
 		~SpiDevice();
-		
+
 		void
 		select();
-		
+
 		void
 		deselect();
-		
+
 		uint8_t
 		write(uint8_t data);
-		
+
 		/**
 		 * Start a new set of transmissions.
-		 * 
+		 *
 		 * Sets the expected transmissions and resets the internal state.
 		 */
 		void
@@ -80,37 +80,37 @@ namespace test
 				std::size_t transmissionCount,
 				std::size_t line,
 				bool reportErrors = true);
-		
+
 		/**
 		 * Check if all transmission were finished successful (content &
 		 * size correct).
 		 */
 		void
 		finish();
-		
+
 		bool
 		isSuccessful()
 		{
 			return (complete && (error == NO_ERROR));
 		}
-		
+
 	private:
 		/// Transmission data
 		const Transmission* transmissions;
-		
+
 		/// Total number of expected transmissions
 		std::size_t transmissionCount;
-		
+
 		std::size_t currentTransmission;
-		
+
 		/// Number of Bytes written during the current transmission
 		std::size_t bytesWritten;
-		
+
 		/// Device is selected via the CS pin
 		bool selected;
-		
+
 		bool complete;
-		
+
 		enum Error
 		{
 			NO_ERROR = 0,
@@ -120,7 +120,7 @@ namespace test
 			WRONG_DATA_RECEIVED = (1 << 4),			///< Other data bytes received
 		};
 		uint8_t error;
-		
+
 		std::size_t lineNumber;
 		bool reportErrors;
 		uint8_t *rxBuffer;

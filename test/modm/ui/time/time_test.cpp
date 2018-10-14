@@ -19,7 +19,7 @@ void
 TimeTest::testConversionToUnixTime()
 {
 	modm::Date date;
-	
+
 	// 01:46:40 UTC on 9 September 2001
 	date.second = 40;
 	date.minute = 46;
@@ -29,7 +29,7 @@ TimeTest::testConversionToUnixTime()
 	date.year = 2001 - 1900;
 	date.dayOfTheWeek = 0;
 	date.dayOfTheYear = 251;
-	
+
 	TEST_ASSERT_EQUALS(date.toUnixTimestamp(), static_cast<uint32_t>(1000000000UL));
 }
 
@@ -38,7 +38,7 @@ void
 TimeTest::testConversionToUnixTime2()
 {
 	modm::Date date;
-	
+
 	//13:37:04 UTC on 10 January 2004
 	date.second = 4;
 	date.minute = 37;
@@ -48,7 +48,7 @@ TimeTest::testConversionToUnixTime2()
 	date.year = 2004 - 1900;
 	date.dayOfTheWeek = 6;
 	date.dayOfTheYear = 9;
-	
+
 	TEST_ASSERT_EQUALS(date.toUnixTimestamp(), static_cast<uint32_t>(1073741824UL));
 }
 
@@ -57,7 +57,7 @@ void
 TimeTest::testConversionToUnixTime3()
 {
 	modm::Date date;
-	
+
 	// 03:42:01 UTC on 27 July 2011
 	date.second = 1;
 	date.minute = 42;
@@ -67,7 +67,7 @@ TimeTest::testConversionToUnixTime3()
 	date.year = 2011 - 1900;
 	date.dayOfTheWeek = 3;
 	date.dayOfTheYear = 207;
-	
+
 	TEST_ASSERT_EQUALS(date.toUnixTimestamp(), static_cast<uint32_t>(1311738121UL));
 }
 
@@ -76,7 +76,7 @@ void
 TimeTest::testConversionToUnixTime4()
 {
 	modm::Date date;
-	
+
 	date.second = 44;
 	date.minute = 14;
 	date.hour = 1;
@@ -85,7 +85,7 @@ TimeTest::testConversionToUnixTime4()
 	date.year = 2012 - 1900;
 	date.dayOfTheWeek = 1;
 	date.dayOfTheYear = 92;
-	
+
 	TEST_ASSERT_EQUALS(date.toUnixTimestamp(), static_cast<uint32_t>(1333329284UL));
 }
 
@@ -94,7 +94,7 @@ void
 TimeTest::testConversionToUnixTime5()
 {
 	modm::Date date;
-	
+
 	// 00:37:33 UTC on 21 July 2069
 	date.second = 33;
 	date.minute = 37;
@@ -104,7 +104,7 @@ TimeTest::testConversionToUnixTime5()
 	date.year = 2069 - 1900;
 	date.dayOfTheWeek = 0;
 	date.dayOfTheYear = 201;
-	
+
 	TEST_ASSERT_EQUALS(date.toUnixTimestamp(), static_cast<uint32_t>(3141592653UL));
 }
 
@@ -116,7 +116,7 @@ TimeTest::testConversionToDate()
 {
 	modm::Date date;
 	modm::UnixTime(1000000000UL).toDate(&date);
-	
+
 	TEST_ASSERT_EQUALS(date.second, 40);
 	TEST_ASSERT_EQUALS(date.minute, 46);
 	TEST_ASSERT_EQUALS(date.hour, 1);
@@ -133,7 +133,7 @@ TimeTest::testConversionToDate2()
 {
 	modm::Date date;
 	modm::UnixTime(1073741824UL).toDate(&date);
-	
+
 	TEST_ASSERT_EQUALS(date.second, 4);
 	TEST_ASSERT_EQUALS(date.minute, 37);
 	TEST_ASSERT_EQUALS(date.hour, 13);
@@ -150,7 +150,7 @@ TimeTest::testConversionToDate3()
 {
 	modm::Date date;
 	modm::UnixTime(1311738121UL).toDate(&date);
-	
+
 	TEST_ASSERT_EQUALS(date.second, 1);
 	TEST_ASSERT_EQUALS(date.minute, 42);
 	TEST_ASSERT_EQUALS(date.hour, 3);
@@ -167,7 +167,7 @@ TimeTest::testConversionToDate4()
 {
 	modm::Date date;
 	modm::UnixTime(1333329284UL).toDate(&date);
-	
+
 	TEST_ASSERT_EQUALS(date.second, 44);
 	TEST_ASSERT_EQUALS(date.minute, 14);
 	TEST_ASSERT_EQUALS(date.hour, 1);
@@ -184,7 +184,7 @@ TimeTest::testConversionToDate5()
 {
 	modm::Date date;
 	modm::UnixTime(3141592653UL).toDate(&date);
-	
+
 	// 00:37:33 UTC on 21 July 2069
 	TEST_ASSERT_EQUALS(date.second, 33);
 	TEST_ASSERT_EQUALS(date.minute, 37);

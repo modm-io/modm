@@ -18,7 +18,7 @@ class FlashTest : public unittest::TestSuite
 public:
 	void
 	testIntegerAccess();
-	
+
 	void
 	testStringAccess();
 };
