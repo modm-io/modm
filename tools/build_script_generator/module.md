@@ -129,7 +129,7 @@ You have to use the support of the specific build system.
 
 ## Compiler Options
 
-We maintain a common set of compiler options for all build system generator, so 
+We maintain a common set of compiler options for all build system generator, so
 that they all have feature parity. We currently only support compiling modm
 with GCC for AVR, ARM Cortex-M and x86/posix with the options mentioned in the
 [offical GCC options documentation][options].
