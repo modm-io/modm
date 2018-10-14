@@ -28,7 +28,6 @@ def build(env):
 
     properties = device.properties
     properties["target"] = device.identifier
-    properties["partname"] = device.partname
 
     target = device.identifier
     if device.has_driver("fsmc:stm32*"):

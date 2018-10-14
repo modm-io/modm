@@ -40,7 +40,7 @@ modm_gpio_enable(void)
 
 	// Enable GPIO clock
 	RCC->{{ clock_tree }}ENR  |=
-%% for port in options[":::enable_ports"]
+%% for port in options["enable_ports"]
 %%	if not loop.last
 		RCC_{{ clock_tree }}ENR_{{ prefix }}{{ port | upper }}EN |
 %%	else
@@ -50,7 +50,7 @@ modm_gpio_enable(void)
 
 	// Reset GPIO peripheral
 	RCC->{{ clock_tree }}RSTR |=
-%% for port in options[":::enable_ports"]
+%% for port in options["enable_ports"]
 %%	if not loop.last
 		RCC_{{ clock_tree }}RSTR_{{ prefix }}{{ port | upper }}RST |
 %%	else
@@ -59,7 +59,7 @@ modm_gpio_enable(void)
 %% endfor
 
 	RCC->{{ clock_tree }}RSTR &= ~(
-%% for port in options[":::enable_ports"]
+%% for port in options["enable_ports"]
 %%	if not loop.last
 		RCC_{{ clock_tree }}RSTR_{{ prefix }}{{ port | upper }}RST |
 %%	else

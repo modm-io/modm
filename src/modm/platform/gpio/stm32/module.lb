@@ -251,7 +251,6 @@ def build(env):
     driver = device.get_driver("gpio")
     properties = device.properties
     properties["target"] = device.identifier
-    properties["partname"] = device.partname
     properties["driver"] = driver
     properties.update(bprops)
 
@@ -272,5 +271,5 @@ def build(env):
         env.template("connector_specialized.hpp.in", filters={"formatPeripheral": get_driver, "printSignalMap": print_remap_group_table})
     env.template("base.hpp.in", filters={"letterToNum": letter_to_num})
     env.template("unused.hpp.in")
-    if len(env[":::enable_ports"]):
+    if len(env["enable_ports"]):
         env.template("enable.cpp.in")

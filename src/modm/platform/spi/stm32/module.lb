@@ -16,7 +16,6 @@ def get_properties(env):
     driver = device.get_driver("spi")
     properties = device.properties
     properties["target"] = device.identifier
-    properties["partname"] = device.partname
     properties["driver"] = driver
     properties["features"] = driver["feature"] if "feature" in driver else []
     return properties

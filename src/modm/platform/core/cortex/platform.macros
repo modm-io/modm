@@ -14,7 +14,7 @@
 
 %% macro defines()
 
-%% if partname.startswith("stm32f3")
+%% if target.family == "f3"
 // Remove strange defines from the ST headers (e.g. see stm32f373xc.h at the bottom)
 #undef USBWakeUp_IRQHandler
 #undef CEC_IRQHandler
@@ -34,14 +34,14 @@
 %#          In that case, consider using inline assembly to manage stack access
 %#          manually, until the memory is enabled.
 
-%% if partname.startswith("stm32f3")
+%% if target.family == "f3"
 	// enable clock
 	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
 	%% if target["name"] in ["02"] or (target["name"] in ["03"] and target["size"] in ["c", "e"])
 	// Remap USB Interrupts
 	SYSCFG->CFGR1 |= SYSCFG_CFGR1_USB_IT_RMP;
 	%% endif
-%% elif partname.startswith("stm32f4")
+%% elif target.family == "f4"
 // Only the more powerful F4 targets have CCM or Backup SRAM
 #ifdef RCC_AHB1ENR_CCMDATARAMEN
 	// Enable power to backup domain
@@ -51,7 +51,7 @@
 	// Enable Core Coupled Memory (CCM) and backup SRAM (BKPSRAM)
 	RCC->AHB1ENR |= RCC_AHB1ENR_CCMDATARAMEN | RCC_AHB1ENR_BKPSRAMEN;
 #endif
-%% elif partname.startswith("stm32f7")
+%% elif target.family == "f7"
 	// Reset from DFU settings to reset values.
 	RCC->DCKCFGR2 = 0;
 	// Enable power to backup domain

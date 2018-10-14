@@ -28,7 +28,6 @@ class Instance(Module):
 
         properties = device.properties
         properties["target"] = device.identifier
-        properties["partname"] = device.partname
         properties["id"] = self.instance
 
         env.substitutions = properties
@@ -62,7 +61,6 @@ def build(env):
 
     properties = device.properties
     properties["target"] = device.identifier
-    properties["partname"] = device.partname
 
     env.substitutions = properties
     env.outbasepath = "modm/src/modm/platform/dma"

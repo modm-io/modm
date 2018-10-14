@@ -41,7 +41,6 @@ class Instance(Module):
 
         properties = device.properties
         properties["target"] = target = device.identifier
-        properties["partname"] = device.partname
         properties["id"] = self.instance
         properties["aid"] = "2" if self.instance == 4 else "1"
 

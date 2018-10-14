@@ -100,7 +100,6 @@ def build(env):
 
     properties = device.properties
     properties["target"] = target = device.identifier
-    properties["partname"] = device.partname
     properties["driver"] = driver
     # Cortex-M0 does not have remappable vector table, so it will remain in Flash
     properties["vector_table_location"] = env.get("vector_table_location", "rom")
@@ -173,11 +172,11 @@ def build(env):
 
     # everything to do with dynamic memory
     env.copy("heap_table.c")
-    if env[":::allocator"] == "newlib":
+    if env["allocator"] == "newlib":
         env.template("heap_newlib.c.in")
-    if env[":::allocator"] == "tlsf":
+    if env["allocator"] == "tlsf":
         env.template("heap_tlsf.c.in")
-    if env[":::allocator"] == "block":
+    if env["allocator"] == "block":
         env.template("heap_block_allocator.cpp.in")
 
     env.copy("atomic_lock.hpp")

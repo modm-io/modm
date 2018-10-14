@@ -24,7 +24,6 @@ def build(env):
 
     properties = device.properties
     properties["target"] = target = device.identifier
-    properties["partname"] = device.partname
 
     if target["family"] in ["f2", "f3", "f4"]:
         properties["address"] = "0x1FFF7A10"

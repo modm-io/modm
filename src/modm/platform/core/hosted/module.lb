@@ -37,7 +37,6 @@ def build(env):
     device = env[":target"]
     properties = device.properties
     properties["target"] = target = device.identifier
-    properties["partname"] = device.partname
     properties["driver"] = device.get_driver("core")
 
     env.substitutions = properties

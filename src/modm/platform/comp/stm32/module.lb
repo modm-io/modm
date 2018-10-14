@@ -28,7 +28,6 @@ class Instance(Module):
 
         properties = device.properties
         properties["target"] = device.identifier
-        properties["partname"] = device.partname
         instance_id = int(self.instance)
         properties["id"] = instance_id
         properties["csr"] = "COMP_CSR_" if device.identifier["family"] in ["l4"] else "COMP_CSR_COMPx"
@@ -75,7 +74,6 @@ def build(env):
 
     properties = device.properties
     properties["target"] = device.identifier
-    properties["partname"] = device.partname
     properties["driver"] = driver
     properties["csr"] = "COMP_CSR_" if device.identifier["family"] in ["l4"] else "COMP_CSR_COMPx"
 

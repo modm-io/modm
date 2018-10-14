@@ -22,7 +22,7 @@ modm::platform::AdcInterrupt::Handler
 modm::platform::AdcInterrupt::handler(modm::dummy);
 
 // ----------------------------------------------------------------------------
-%% if partname == "attiny20"
+%% if target.family == "tiny" and target.name == "20"
 MODM_ISR(ADC_ADC, modm_weak)
 %% else
 MODM_ISR(ADC, modm_weak)

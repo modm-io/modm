@@ -104,7 +104,7 @@ Reset_Handler(void)
 %# Enables all required internal memories
 {{ platform.enableInternalMemory() }}
 
-%% if options[":::stack_execution_guard"]
+%% if options["stack_execution_guard"]
 	// fill the stack with relative branches to __stack_start
 	// where the undefined instruction is waiting to trigger the hard fault
 	asm volatile (

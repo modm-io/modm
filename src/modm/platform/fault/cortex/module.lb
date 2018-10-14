@@ -45,12 +45,12 @@ def build(env):
     driver = device.get_driver("core")
 
     properties = device.properties
-    properties["partname"] = device.partname
     properties["core"] = driver["type"]
+    properties["target"] = device.identifier
 
     env.substitutions = properties
     env.outbasepath = "modm/src/modm/platform/core"
 
     env.template("hard_fault.sx.in")
-    if env[":::led"] != "disabled":
+    if env["led"] != "disabled":
         env.template("hard_fault_handler.cpp.in")

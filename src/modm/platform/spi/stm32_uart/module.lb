@@ -15,7 +15,6 @@ def get_properties(env):
     driver = device.get_driver("usart:stm32")
     properties = device.properties
     properties["target"] = device.identifier
-    properties["partname"] = device.partname
     properties["driver"] = driver
     return properties
 

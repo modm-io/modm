@@ -37,7 +37,6 @@ def build(env):
 
     properties = device.properties
     properties["target"] = device.identifier
-    properties["partname"] = device.partname
     properties["driver"] = driver
 
     env.substitutions = properties

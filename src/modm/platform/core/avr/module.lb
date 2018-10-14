@@ -53,7 +53,6 @@ def build(env):
 
     properties = device.properties
     properties["target"] = target = device.identifier
-    properties["partname"] = device.partname
     properties["driver"] = driver
 
     env.outbasepath = "modm/link"

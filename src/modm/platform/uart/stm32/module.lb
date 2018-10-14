@@ -59,7 +59,6 @@ class Instance(Module):
         device = env[":target"]
         properties = device.properties
         properties["target"] = device.identifier
-        properties["partname"] = device.partname
         properties["id"] = self.instance
         properties["driver"] = self.driver
         properties["features"] = self.driver["feature"] if "feature" in self.driver else []
@@ -112,7 +111,6 @@ def build(env):
     device = env[":target"]
     properties = device.properties
     properties["target"] = device.identifier
-    properties["partname"] = device.partname
 
     drivers = (device.get_all_drivers("usart") + device.get_all_drivers("uart"))
     properties["extended_driver"] = ("extended" in drivers[0]["type"])
