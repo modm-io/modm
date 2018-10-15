@@ -14,7 +14,6 @@
 
 #include <modm/architecture/utils.hpp>
 
-#include "utils/algorithm.hpp"
 #include "utils/allocator.hpp"
 #include "utils/arithmetic_traits.hpp"
 #include "utils/dummy.hpp"
