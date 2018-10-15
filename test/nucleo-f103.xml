@@ -19,5 +19,6 @@
     <module>:test:processing</module>
     <module>:test:ui</module>
     <module>:test:math</module>
+    <module>:test:utils</module>
   </modules>
 </library>
