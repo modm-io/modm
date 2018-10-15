@@ -18,7 +18,7 @@ Microcontrollers) to resolve the confusion when talking about the XPCC (Cross Pl
 
 ## Changes
 
-We‘ve created a Python3 script to automate as much of the refactoring as possible. 
+We‘ve created a Python3 script to automate as much of the refactoring as possible.
 It will rewrite the source code in the folders you provide as arguments.
 If a `project.cfg` file is present, it will translate this to a `project.xml` file,
 otherwise it'll output the detected modm modules on the command line.
@@ -28,7 +28,7 @@ python3 /path/to/modm/tools/scripts/xpcc_porting.py src_folder ../other/src/fold
 ```
 
 However, this script may not have enough information in the sources to port
-everything, so please read on to see what you still need to fix manually. 
+everything, so please read on to see what you still need to fix manually.
 
 modm continues to support AVR and STM32 targets as well as all three major desktop operating systems. However, support for LPC, Xmega and some custom STM32 boards has been removed.
 **Please note that STM32 device identifiers in modm have an additional character denoting the package id!** You must provide this information, the porting script does not have enough information.

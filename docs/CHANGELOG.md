@@ -53,7 +53,7 @@ pay attention to. Medium impact changes are also worth looking at.
 ## 2018-01-07: 2017q4 release
 
 This release covers everything from the 2017q3 release on 2017-10-01 and has been
-tested with avr-gcc v5.4.0 from Atmel and arm-none-eabi-gcc 2017q4 from Arm. 
+tested with avr-gcc v5.4.0 from Atmel and arm-none-eabi-gcc 2017q4 from Arm.
 
 Breaking changes:
 

@@ -8,9 +8,9 @@ Three of these projects form the heart of modm:
 - *[modm][]* provides configurable modules to translate this data into code, tests and documentation.
 - *[lbuild][]* links these two together using the Jinja2 template engine in Python to create a custom library for your target.
 
-As a developer you can use lbuild to explore the modm modules, configure them 
+As a developer you can use lbuild to explore the modm modules, configure them
 specifically for your targets and needs and generate a custom library.
-You can generate more than just code, in this example, lbuild also generates a 
+You can generate more than just code, in this example, lbuild also generates a
 build system which then compiles and links the application into a executable.
 
 <center>
@@ -40,7 +40,7 @@ modm you really like.
 
 A lbuild module is just a few lines of Python code. Here we can see the code for
 the `modm:platform:uart` module from the example above. It declares its name,
-its dependencies and then which files it wants to generate where to using the 
+its dependencies and then which files it wants to generate where to using the
 data from modm-devices, by just setting the `env.substitutions` to the device's
 properties and calling `env.template` with the input and output file names.
 
@@ -50,7 +50,7 @@ def init(module):
     module.parent = "platform"
 
 def prepare(module, options):
-    module.depends(":architecture:interrupt", ":architecture:register", 
+    module.depends(":architecture:interrupt", ":architecture:register",
                    ":architecture:atomic", ":architecture:uart", ":platform:gpio")
     return True
 
@@ -64,7 +64,7 @@ def build(env):
 ```
 
 The input template then can access all the devices properties, and generate
-the correct code for this device. Here the template on left is passed to the 
+the correct code for this device. Here the template on left is passed to the
 [Jinja2 engine][jinja2] which outputs the code on the right.
 
 <center>
@@ -94,7 +94,7 @@ void Uart4::write(uint8_t data)
 </table>
 </center>
 
-This example is simple, but since it's based on Python, [anything more 
+This example is simple, but since it's based on Python, [anything more
 complicated is possible](https://xkcd.com/353).
 Looking at the data excerpt from a STM32 device the above module will generate a
 only three classes of this type for this target. However, a similar driver will
@@ -143,9 +143,9 @@ Consider this data from the GPIO peripheral, which shows the signal map for the
     ...
 ```
 
-We use this data in the `modm:platform:gpio` module to generate type-safe 
+We use this data in the `modm:platform:gpio` module to generate type-safe
 signal connections, which will then assert that the signal you want to connect
-actually exists on this pin and even gives you a helpful (!) error message at 
+actually exists on this pin and even gives you a helpful (!) error message at
 compile time.
 
 ```cpp
@@ -177,8 +177,8 @@ class GpioA0
 };
 ```
 
-Continuing with this technique, we can even check if your signal groups are 
-conflict free of overlaps or invalid configurations and again give you a 
+Continuing with this technique, we can even check if your signal groups are
+conflict free of overlaps or invalid configurations and again give you a
 helpful error message!
 
 <center>
@@ -188,9 +188,9 @@ helpful error message!
 ```cpp
 Uart4::connect<GpioA0::Tx>();
 Adc1::connect<GpioA0::In0, GpioA1::In1>();
-Tim2::connect<GpioA0::Ch1, GpioA1::Ch2, 
+Tim2::connect<GpioA0::Ch1, GpioA1::Ch2,
               GpioA2::Ch3, GpioA3::Ch4>();
-Tim5::connect<GpioA0::Ch1, GpioA1::Ch2, 
+Tim5::connect<GpioA0::Ch1, GpioA1::Ch2,
               GpioA2::Ch3, GpioA3::Ch4>();
 ```
 </td>
@@ -200,9 +200,9 @@ Maps to GpioA0::setAlternateFunction(8);
 Maps to GpioAx::setAnalogInput();
 Each pin in group called with their
     respective Alternate Function ID
-Same API, but for Timer5 different 
+Same API, but for Timer5 different
     Alternate Function IDs are used
-``` 
+```
 </td>
 </tr>
 <tr>
@@ -339,9 +339,9 @@ statically allocated or must explicitly be allocated by the user.
 This is a strong requirement for running modm on AVRs, which have
 little if any memory to spare for dynamic allocations.
 
-We took great care to make sure this constraint remains usable, making 
+We took great care to make sure this constraint remains usable, making
 configuration options first-class citizens in lbuild for you to easily discover
-and safely change. When we do need to allocate static memory, we choose a 
+and safely change. When we do need to allocate static memory, we choose a
 sensible default size for its purpose.
 
 ```
