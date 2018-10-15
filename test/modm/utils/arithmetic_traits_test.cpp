@@ -166,15 +166,15 @@ ArithmeticTraitsTest::testSignedUnsigned()
 	static_assert(Same_v<Signed_t<long>,		long>);
 	static_assert(Same_v<Signed_t<long long>,	long long>);
 
-	static_assert(Same_v<Signed_t<int8_t>,	int8_t>);
-	static_assert(Same_v<Signed_t<int16_t>,	int16_t>);
-	static_assert(Same_v<Signed_t<int32_t>,	int32_t>);
-	static_assert(Same_v<Signed_t<int64_t>,	int64_t>);
+	static_assert(Same_v<Signed_t<uint8_t>,		int8_t>);
+	static_assert(Same_v<Signed_t<uint16_t>,	int16_t>);
+	static_assert(Same_v<Signed_t<uint32_t>,	int32_t>);
+	static_assert(Same_v<Signed_t<uint64_t>,	int64_t>);
 
-	static_assert(Same_v<Signed_t<short>,		short>);
-	static_assert(Same_v<Signed_t<int>,			int>);
-	static_assert(Same_v<Signed_t<long>,		long>);
-	static_assert(Same_v<Signed_t<long long>,	long long>);
+	static_assert(Same_v<Signed_t<unsigned short>,		short>);
+	static_assert(Same_v<Signed_t<unsigned int>,		int>);
+	static_assert(Same_v<Signed_t<unsigned long>,		long>);
+	static_assert(Same_v<Signed_t<unsigned long long>,	long long>);
 
 	static_assert(Same_v<Unsigned_t<int8_t>,	uint8_t>);
 	static_assert(Same_v<Unsigned_t<int16_t>,	uint16_t>);
