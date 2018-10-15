@@ -1,7 +1,7 @@
 <library>
   <extends>modm:board:nucleo-l432kc</extends>
   <options>
-    <option name=":build:build.path">../../../build/nucleo_l432kc/blink</option>
+    <option name=":build:build.path">../../../build/nucleo_l432kc/pwm</option>
   </options>
   <modules>
     <module>:build:scons</module>
