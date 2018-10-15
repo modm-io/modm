@@ -14,6 +14,7 @@
 def init(module):
     module.name = "adc"
     module.parent = "platform"
+    module.description = "Analog-to-Digital Converter (ADC)"
 
 def prepare(module, options):
     device = options[":target"]

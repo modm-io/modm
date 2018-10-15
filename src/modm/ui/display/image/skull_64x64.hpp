@@ -26,7 +26,7 @@ namespace bitmap
 	 * - Width  : 64
 	 * - Height : 64
 	 *
-	 * \ingroup	image
+	 * \ingroup	modm_ui_display_image
 	 */
 	EXTERN_FLASH_STORAGE(uint8_t skull_64x64[]);
 }

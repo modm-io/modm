@@ -29,7 +29,7 @@ namespace platform
  * the regular Spi classes.
  *
  * @author		Kevin Laeufer
- * @ingroup		{{partname}}_spi
+ * @ingroup		modm_platform_spi modm_platform_spi_{{id}}
  */
 class SpiHal{{ id }} : public SpiBase
 {

@@ -21,6 +21,7 @@ namespace modm
 namespace platform
 {
 
+/// @cond
 template< Peripheral peripheral, template<Peripheral _> class... Signals >
 struct GpioConnector
 {
@@ -42,6 +43,7 @@ struct GpioConnector
 		detail::GpioSignalConnect<peripheral, Signals...>::disconnect();
 	}
 };
+/// @endcond
 
 } // namespace platform
 

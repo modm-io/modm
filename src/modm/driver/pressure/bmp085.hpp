@@ -23,6 +23,7 @@
 namespace modm
 {
 
+/// @ingroup modm_driver_bmp085
 struct bmp085
 {
 
@@ -96,23 +97,9 @@ protected:
 };
 
 /**
- * BMP085 digital absolute pressure sensor driver
- *
- * The BMP085 is a high precision digital pressure sensor with I2C interface.
- * Unfortunately this sensor is so sensitive, it will give you wrong results
- * when there is traffic on the I2C during either temperature or pressure
- * conversion. So during that time make sure no other sensors on the bus
- * are read out.
- *
- * For further information, consult the
- * <a href="http://www.bosch-sensortec.com/content/language1/downloads/BST-BMP085-DS000-06.pdf">
- * datasheet</a>.
- *
- * Also compatible to and tested with BMP180.
- *
  * @author	Niklas Hauser
  * @author  Sascha Schade
- * @ingroup driver_pressure
+ * @ingroup modm_driver_bmp085
  *
  * @tparam I2cMaster I2C interface
  */

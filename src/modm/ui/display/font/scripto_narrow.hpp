@@ -35,7 +35,7 @@ namespace modm
 		 * - number of chars : 95
 		 * - size in bytes   : 382
 		 * 
-		 * \ingroup	font
+		 * \ingroup	modm_ui_display_font
 		 */
 		EXTERN_FLASH_STORAGE(uint8_t ScriptoNarrow[]);
 	}

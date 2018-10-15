@@ -25,11 +25,6 @@
 #include "mcp2515_definitions.hpp"
 
 /**
- * \defgroup	mcp2515	MCP2515
- * \ingroup		driver_can
- */
-
-/**
  * \name	Restructure filter and mask bits for the MCP2515
  *
  * \code
@@ -59,7 +54,7 @@
  *
  * \warning	Do not use this macro for variables, only for static values
  *			known at compile-time.
- * \ingroup	mcp2515
+ * \ingroup	modm_driver_mcp2515
  */
 //\{
 #if defined(__DOXYGEN__)
@@ -115,7 +110,7 @@ namespace modm
 	 * need to do this by yourself before calling the initialize method!
 	 *
 	 * \author	Fabian Greif
-	 * \ingroup	mcp2515
+	 * \ingroup	modm_driver_mcp2515
 	 */
 	template < typename SPI,
 			   typename CS,

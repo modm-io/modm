@@ -39,7 +39,7 @@
  * @param vector
  *        The name of the interrupt without any suffix (neither `_vect`, nor `_IRQHandler`).
  *
- * @ingroup	platform
+ * @ingroup	modm_architecture_interrupt
  */
 #define MODM_ISR_NAME(vector)
 
@@ -52,7 +52,7 @@
  * @param vector
  *        The name of the interrupt without any suffix (neither `_vect`, nor `_IRQHandler`).
  *
- * @ingroup	platform
+ * @ingroup	modm_architecture_interrupt
  */
 #define MODM_ISR_DECL(vector)
 
@@ -65,7 +65,7 @@
  * @param vector
  *        The name of the interrupt without any suffix (neither `_vect`, nor `_IRQHandler`).
  *
- * @ingroup	platform
+ * @ingroup	modm_architecture_interrupt
  */
 #define MODM_ISR_CALL(vector)
 
@@ -84,7 +84,7 @@
  * @param ...
  *        Multiple compiler attributes can be added to an interrupt. For example `modm_fastcode`.
  *
- * @ingroup	platform
+ * @ingroup	modm_architecture_interrupt
  */
 #define MODM_ISR(vector, ...)
 

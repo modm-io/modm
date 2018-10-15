@@ -14,11 +14,6 @@
 
 #include <modm/architecture/interface/peripheral.hpp>
 
-/**
- * @ingroup		interface
- * @defgroup	adc		Analog-to-Digital Converter
- */
-
 namespace modm
 {
 
@@ -51,7 +46,7 @@ namespace modm
  * @see AdcInterrupt	for the asynchronous method.
  *
  * @author	Niklas Hauser
- * @ingroup adc
+ * @ingroup modm_architecture_adc
  */
 class Adc : public ::modm::PeripheralDriver
 {

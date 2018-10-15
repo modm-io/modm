@@ -17,6 +17,7 @@
 
 namespace modm
 {
+	/// @ingroup modm_driver_bma180
 	namespace bma180
 	{
 		// MARK: Registers
@@ -386,7 +387,7 @@ namespace modm
 	 * datasheet</a>.
 	 *
 	 * \author	Niklas Hauser
-	 * \ingroup driver_inertial
+	 * \ingroup modm_driver_bma180
 	 *
 	 * \tparam I2cMaster Asynchronous Two Wire interface
 	 */

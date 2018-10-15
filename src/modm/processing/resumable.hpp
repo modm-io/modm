@@ -13,10 +13,5 @@
  */
 // ----------------------------------------------------------------------------
 
-/**
- * @ingroup		processing
- * @defgroup	resumable		Resumables
- */
-
 #include "resumable/resumable.hpp"
 #include "resumable/nested_resumable.hpp"

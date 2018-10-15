@@ -21,6 +21,7 @@ namespace modm
 template < class I2cMaster >
 class Ft6x06;
 
+/// @ingroup modm_driver_ft6x06
 struct ft6x06
 {
 protected:
@@ -163,7 +164,7 @@ public:
  * descriptive.
  *
  * @author	Niklas Hauser
- * @ingroup driver_touch
+ * @ingroup modm_driver_ft6x06
  */
 template < typename I2cMaster >
 class Ft6x06 : public ft6x06, public modm::I2cDevice< I2cMaster, 3 >

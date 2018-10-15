@@ -46,7 +46,7 @@ namespace platform
  *			hardware will switch into SPI slave mode. It is therefore necessary
  *			to configure the pin either in output mode or to pull it high.
  *
- * @ingroup		{{partname}}_spi
+ * @ingroup		modm_platform_spi modm_platform_spi_{{id}}
  * @author		Niklas Hauser
  */
 class SpiMaster{{ id }} : public ::modm::SpiMaster, private Spi

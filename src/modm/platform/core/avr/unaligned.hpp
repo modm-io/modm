@@ -12,6 +12,9 @@
 #ifndef MODM_PLATFORM_ACCESSOR_UNALIGNED_HPP
 #define MODM_PLATFORM_ACCESSOR_UNALIGNED_HPP
 
+// already documented in :architecture:unaligned
+/// @cond
+
 #include <modm/architecture/utils.hpp>
 
 namespace modm
@@ -49,5 +52,7 @@ protected:
 } modm_packed;
 
 }	// namespace modm
+
+/// @endcond
 
 #endif	// MODM_PLATFORM_ACCESSOR_UNALIGNED_HPP

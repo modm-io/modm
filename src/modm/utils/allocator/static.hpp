@@ -26,7 +26,7 @@ namespace modm
 		 * Allocates a big static block and distributes pieces of it during
 		 * run-time. No reallocation is done when no more pieces are available.
 		 * 
-		 * \ingroup	allocator
+		 * \ingroup	modm_utils_allocator
 		 * \author	Fabian Greif
 		 */
 		template <typename T,

@@ -10,23 +10,18 @@
  */
 // ----------------------------------------------------------------------------
 
-//
-// NUCLEO-F103RB
-// Nucleo kit for STM32F103RB
-// http://www.st.com/en/evaluation-tools/nucleo-f103rb.html
-//
-
 #ifndef MODM_STM32_NUCLEO_F103RB_HPP
 #define MODM_STM32_NUCLEO_F103RB_HPP
 
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
 #include <modm/debug/logger.hpp>
+/// @ingroup modm_board_nucleo_f103rb
 #define MODM_BOARD_HAS_LOGGER
 
 using namespace modm::platform;
 
-
+/// @ingroup modm_board_nucleo_f103rb
 namespace Board
 {
 

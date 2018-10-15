@@ -14,6 +14,16 @@
 def init(module):
     module.parent = "driver"
     module.name = "bme280"
+    module.description = """\
+# BME280 Pressure Sensor
+
+The BME280 is a high precision digital temperature, pressure and humidity
+sensor with I2C interface.
+
+It is known that many BME280-modules suffer from self-heating (I2C pull-ups?).
+So the reported temperature is about 1 to 3 degree higher than with other sensors.
+Forced ventilation can drop the temperature by 2 to 3 degrees.
+"""
 
 def prepare(module, options):
     module.depends(

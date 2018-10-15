@@ -49,7 +49,7 @@ namespace modm
 		 * 			FreeRTOS therefore no stop() method is implemented here.
 		 * 			See the README file in ext/freertos/port for more details.
 		 * 
-		 * \ingroup	freertos
+		 * \ingroup	modm_processing_rtos
 		 */
 		class Scheduler
 		{

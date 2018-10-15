@@ -51,7 +51,7 @@ namespace platform
  *
  * @author	Fabian Greif
  * @author	Niklas Hauser
- * @ingroup	{{partname}}_gpio
+ * @ingroup	modm_platform_gpio
  */
 class GpioUnused : public Gpio, public ::modm::GpioIO
 {
@@ -66,8 +66,10 @@ public:
 	static constexpr uint16_t mask = 0;
 
 protected:
+	/// @cond
 	static void setAlternateFunction(uint8_t) {}
 	static void setAnalogInput() {}
+	/// @endcond
 
 public:
 	// GpioOutput
@@ -108,6 +110,7 @@ public:
 	static void disconnect() {}
 
 public:
+	/// @cond
 %% for name in all_signals
 	template< Peripheral _ >
 	struct {{ name }}
@@ -117,6 +120,7 @@ public:
 		static void connect() {}
 	};
 %% endfor
+	/// @endcond
 };
 
 } // namespace platform

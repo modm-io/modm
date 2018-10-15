@@ -41,7 +41,7 @@ namespace modm
 	 * function DynamicArray::reserve().
 	 * 
 	 * \author	Fabian Greif <fabian.greif@rwth-aachen.de>
-	 * \ingroup	container
+	 * \ingroup	modm_container
 	 */
 	template <typename T, typename Allocator = allocator::Dynamic<T> >
 	class DynamicArray

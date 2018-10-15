@@ -28,7 +28,7 @@ namespace modm
 	 * \brief	Line
 	 * 
 	 * \author	Fabian Greif
-	 * \ingroup	geometry
+	 * \ingroup	modm_math_geometry
 	 */
 	template <typename T>
 	class Line2D

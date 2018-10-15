@@ -23,7 +23,7 @@ namespace unittest
 	/**
 	 * \brief	Data type to count the number of constructor etc. calls
 	 * 
-	 * \ingroup	unittest
+	 * \ingroup	modm_unittest
 	 */
 	class CountType
 	{

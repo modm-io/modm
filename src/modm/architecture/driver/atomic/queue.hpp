@@ -26,7 +26,7 @@ namespace modm
 	namespace atomic
 	{
 		/**
-		 * \ingroup	atomic
+		 * \ingroup	modm_architecture_atomic
 		 * \brief	Interrupt save queue
 		 *
 		 * A maximum size of 254 is allowed for 8-bit mikrocontrollers.

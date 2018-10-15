@@ -14,6 +14,20 @@
 def init(module):
     module.parent = "driver"
     module.name = "bmp085"
+    module.description = """\
+# BMP085 Pressure Sensor
+
+The BMP085 is a high precision digital pressure sensor with I2C interface.
+Unfortunately this sensor is so sensitive, it will give you wrong results
+when there is traffic on the I2C during either temperature or pressure
+conversion. So during that time make sure no other sensors on the bus
+are read out.
+
+For further information, consult the [datasheet][].
+Also compatible to and tested with BMP180.
+
+[datasheet]: http://www.bosch-sensortec.com/content/language1/downloads/BST-BMP085-DS000-06.pdf
+"""
 
 def prepare(module, options):
     module.depends(

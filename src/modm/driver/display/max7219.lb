@@ -14,6 +14,7 @@
 def init(module):
     module.parent = "driver"
     module.name = "max7219"
+    module.description = "MAX7219 Display"
 
 def prepare(module, options):
     module.depends(

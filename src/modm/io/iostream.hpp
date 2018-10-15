@@ -36,7 +36,7 @@ namespace modm
  * output or it reads values from a input and converts them to
  * a given type;
  *
- * @ingroup io
+ * @ingroup modm_io
  * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
  */
 class IOStream
@@ -388,83 +388,6 @@ public:
 	}
 
 	/**
-	 * Simple printf() implemenation
-	 *
-	 * The format string is composed of zero or more directives: ordinary
-	 * characters (not %), which are copied unchanged to the output stream;
-	 * and conversion specifications, each of which results in fetching zero
-	 * or more subsequent arguments. Each conversion specification is
-	 * introduced by the % character. The arguments must properly correspond
-	 * (after type promotion) with the conversion specifier. After the %,
-	 * the following appear in sequence:
-	 *
-	 * - Zero or more of the following flags:
-	 *   - `-` A negative field width flag; the converted value is to be
-	 *     left adjusted on the field boundary. The converted value is
-	 *     padded on the right with blanks, rather than on the left with
-	 *     blanks.
-	 *   - `' '` (space) A blank should be left before a positive number
-	 *     produced by a signed conversion (d).
-	 *   - `+` A sign must always be placed before a number produced by a
-	 *     signed conversion. A `+` overrides a space if both are used.
-	 *   - An optional decimal digit string specifying a minimum field width.
-	 *     If the converted value has fewer characters than the field width,
-	 *     it will be padded with spaces on the left (or right, if the
-	 *     left-adjustment flag has been given) to fill out the field width.
-	 *   - An optional `h`, `l` or `ll` length modifier, that specifies that the argument
-	 *     for the `d`, `u`, or `x` conversion is a 8-bit ("h"), 32-bit ("l") or
-	 *     64-bit ("ll") rather than 16-bit.
-	 *
-	 * The conversion specifiers and their meanings are:
-	 * - `c`	char (8-bit)
-	 * - `s`	string (char *)
-	 * - `p`	pointer (void *)
-	 * - `d`	signed  decimal
-	 * - `u`	unsigned decimal
-	 * - `x`	hex
-	 * - `f`	float
-	 * - `%`	%
-	 *
-	 * Combined with the length modifiers you get:
-	 * - `d`	signed 16-bit
-	 * - `ld`	signed 32-bit
-	 * - `lld`	signed 64-bit (not yet)
-	 * - `u`	unsigned 16-bit
-	 * - `lu`	unsigned 32-bit
-	 * - `llu`	unsigned 64-bit (not yet)
-	 * - `hx`	 8-bit hex
-	 * - `x`	16-bit hex
-	 * - `lx`	32-bit hex
-	 * - `llx`	64-bit hex (not yet)
-	 *
-	 * Examples, given `-100` as argument in the right type:
-	 * \code
-	 * %c:
-	 * %s:
-	 * %p:  0x0100
-	 * %d:  -100
-	 * %ld: -100
-	 * %u:  65436
-	 * %lu:
-	 * %hx: 0x9c
-	 * %x:  0xff9c
-	 * %lx: 0xffffff9c
-	 * \endcode
-	 *
-	 * - `s` The "char *" argument is expected to be a pointer to an array
-	 *   of character type (pointer to a string). Characters from the array
-	 *   are written up to (but not including) a terminating NULL character;
-	 *   if a precision is specified, no more than the number specified are
-	 *   written. If a precision is given, no null character need be present;
-	 *   if the precision is not specified, or is greater than the size of
-	 *   the array, the array must contain a terminating NULL character.
-	 * - `%` A `%` is written. No argument is converted. The complete conversion
-	 *   specification is "%%".
-	 *
-	 * In no case does a non-existent or small field width cause truncation
-	 * of a numeric field; if the result of a conversion is wider than the
-	 * field width, the field is expanded to contain the conversion result.
-	 *
 	 * @param	fmt		Format string
 	 */
 	IOStream&
@@ -542,9 +465,11 @@ private:
 	Mode mode;
 };
 
+/// @ingroup modm_io
+/// @{
+
 /// Flushes the output stream.
 /// This manipulator simply calls the stream's flush() member function.
-/// @ingroup io
 inline IOStream&
 flush(IOStream& ios)
 {
@@ -552,7 +477,6 @@ flush(IOStream& ios)
 }
 
 //// Write a newline and flush the stream.
-/// @ingroup io
 inline IOStream&
 endl(IOStream& ios)
 {
@@ -560,7 +484,6 @@ endl(IOStream& ios)
 }
 
 /// set the output mode to binary style for `char` and `char*`
-/// @ingroup io
 inline IOStream&
 bin(IOStream& ios)
 {
@@ -568,7 +491,6 @@ bin(IOStream& ios)
 }
 
 /// set the output mode to hexadecimal style for `char` and `char*`
-/// @ingroup io
 inline IOStream&
 hex(IOStream& ios)
 {
@@ -576,16 +498,13 @@ hex(IOStream& ios)
 }
 
 /// set the output mode to ASCII style for `char` and `char*`
-/// @ingroup io
 inline IOStream&
 ascii(IOStream& ios)
 {
 	return ios.ascii();
 }
 
-/// @{
 /// Set the foreground colour on ANSI terminals.
-/// @ingroup io
 inline IOStream&
 black(IOStream& ios)
 {

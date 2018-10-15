@@ -1,0 +1,9 @@
+# Controller Area Network
+
+Controller–area network (CAN or CAN-bus) is a vehicle bus standard designed
+to allow microcontrollers and devices to communicate with each other within
+a vehicle without a host computer.
+
+CAN is a message based protocol, designed specifically for automotive
+applications but now also used in other areas such as industrial automation
+and medical equipment.

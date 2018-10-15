@@ -28,7 +28,7 @@ namespace modm
 		 * \internal
 		 * \brief	Interface used to transmit data through a slave object
 		 *
-		 * \ingroup	sab
+		 * \ingroup modm_communication_sab
 		 */
 		class Transmitter
 		{
@@ -43,7 +43,7 @@ namespace modm
 		/**
 		 * \brief	Response object for an action call
 		 *
-		 * \ingroup	sab
+		 * \ingroup modm_communication_sab
 		 */
 		class Response
 		{
@@ -122,7 +122,7 @@ namespace modm
 		 * A complete example is available in the \c example/avr/sab folder.
 		 *
 		 * \see		modm::sab::Slave
-		 * \ingroup	sab
+		 * \ingroup modm_communication_sab
 		 */
 		struct Callable
 		{
@@ -132,7 +132,7 @@ namespace modm
 		 * \brief	Possible Action
 		 *
 		 * \see		SAB_ACTION()
-		 * \ingroup	sab
+		 * \ingroup modm_communication_sab
 		 */
 		struct Action
 		{
@@ -177,7 +177,7 @@ namespace modm
 		 * A complete example is available in the \c example/sab folder.
 		 *
 		 * \author	Fabian Greif
-		 * \ingroup	sab
+		 * \ingroup modm_communication_sab
 		 */
 		template <typename Interface>
 		class Slave : protected Transmitter
@@ -266,7 +266,7 @@ namespace modm
 	 * \param	length		Parameter size in bytes
 	 *
 	 * \see		modm::sab::Action
-	 * \ingroup	sab
+	 * \ingroup modm_communication_sab
 	 */
 	#define	SAB_ACTION(command, object, function, length)
 #else

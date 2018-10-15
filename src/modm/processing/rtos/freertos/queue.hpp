@@ -24,8 +24,6 @@ namespace modm
 	{
 		/**
 		 * \brief	Queue base class
-		 * 
-		 * \ingroup	freertos
 		 */
 		class QueueBase
 		{
@@ -94,7 +92,7 @@ namespace modm
 		 * 
 		 * This is a type-safe wrapper around QueueBase
 		 * 
-		 * \ingroup	freertos
+		 * \ingroup	modm_processing_rtos
 		 */
 		template<typename T>
 		class Queue : private QueueBase

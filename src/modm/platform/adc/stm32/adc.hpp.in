@@ -20,11 +20,6 @@
 #include <modm/architecture/interface/register.hpp>
 #include <modm/platform/gpio/connector.hpp>
 
-/**
- * @ingroup 	{{partname}}
- * @defgroup	{{partname}}_adc ADC
- */
-
 namespace modm
 {
 
@@ -43,7 +38,7 @@ namespace platform
  * @author	Stephan Kugelmann
  * @author	David Hebbeker
  * @author	ekiwi
- * @ingroup	{{partname}}_adc
+ * @ingroup	modm_platform_adc modm_platform_adc_{{id}}
  */
 class Adc{{ id }} : public modm::Adc
 {

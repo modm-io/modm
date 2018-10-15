@@ -23,7 +23,7 @@ namespace modm
 	 * 
 	 * Used to report severe errors at one place.
 	 * 
-	 * @ingroup	debug
+	 * @ingroup	modm_debug
 	 * @author	Fabian Greif
 	 */
 	class ErrorReport

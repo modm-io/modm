@@ -30,7 +30,7 @@ namespace modm
 		 * 
 		 * This technique is known as "memory pool".
 		 * 
-		 * \ingroup	allocator
+		 * \ingroup	modm_utils_allocator
 		 * \author	Fabian Greif
 		 */
 		template <typename T,

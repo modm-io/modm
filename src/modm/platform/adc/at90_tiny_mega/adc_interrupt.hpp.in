@@ -27,7 +27,7 @@ namespace platform
 /**
  * @author		Niklas Hauser
  *
- * @ingroup		{{partname}}_adc
+ * @ingroup		modm_platform_adc
  */
 class AdcInterrupt : public modm::platform::Adc, public modm::AdcInterrupt
 {

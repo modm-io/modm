@@ -31,7 +31,7 @@ namespace modm
 		 * 
 		 * \see		<a href="http://www.maxim-ic.com/app-notes/index.mvp/id/27" target="_blank">
 		 * 			Understanding and Using Cyclic Redundancy Checks with Maxim iButton Products</a>
-		 * \ingroup	sab
+		 * \ingroup modm_communication_sab
 		 */
 		uint8_t
 		crcUpdate(uint8_t crc, uint8_t data);
@@ -43,7 +43,7 @@ namespace modm
 		 * \include sab_interface.cpp
 		 * 
 		 * \author	Fabian Greif
-		 * \ingroup	sab
+		 * \ingroup modm_communication_sab
 		 */
 		template <typename Device>
 		class Interface

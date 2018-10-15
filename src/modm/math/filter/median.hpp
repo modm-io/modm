@@ -48,7 +48,7 @@ namespace modm
 		 * \tparam	T	Input type
 		 * \tparam	N	Number of samples
 		 * 
-		 * \ingroup	filter
+		 * \ingroup	modm_math_filter
 		 */
 		template<typename T, int N>
 		class Median

@@ -19,6 +19,7 @@
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/interrupt.hpp>
 
+/// @cond
 %% if not extended_driver
 // STM has some weird ideas about continuity
 #define	USART_BRR_DIV_MANTISSA	USART_BRR_DIV_Mantissa
@@ -30,11 +31,8 @@
 #define USART_ISR_RXNE    USART_ISR_RXNE_RXFNE
 #define USART_ISR_TXE     USART_ISR_TXE_TXFNF
 %% endif
+/// @endcond
 
-/**
-* @ingroup 	{{partname}}
-* @defgroup	{{partname}}_uart UART
-*/
 
 namespace modm
 {
@@ -46,8 +44,7 @@ namespace platform
  * Provides some common enum that do not depend on the specific UART.
  *
  * @author Kevin Laeufer
- * @internal
- * @ingroup		{{partname}}_uart
+ * @ingroup		modm_platform_uart
  */
 class UartBase
 {

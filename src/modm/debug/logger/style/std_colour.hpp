@@ -41,7 +41,7 @@ namespace modm
 		 *
 		 * \see http://mathias-kettner.de/lw_farbige_ausgabe_auf_der_konsole.html
 		 *
-		 * \ingroup logger
+		 * \ingroup modm_debug
 		 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 		 */
 		template <Colour TEXT, Colour BACKGROUND, typename STYLE = DefaultStyle >

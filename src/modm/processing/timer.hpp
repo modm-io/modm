@@ -11,13 +11,6 @@
  */
 // ----------------------------------------------------------------------------
 
-/**
- * @ingroup		processing
- * @defgroup	software_timer		Software Timers
- *
- * An implementation of lightweight software timeouts and periodic timers.
- */
-
 #include "timer/timestamp.hpp"
 #include "timer/timeout.hpp"
 #include "timer/periodic_timer.hpp"

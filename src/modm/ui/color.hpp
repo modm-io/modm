@@ -22,6 +22,7 @@
 namespace modm
 {
 
+/// @ingroup modm_ui_color
 namespace color
 {
 
@@ -31,6 +32,7 @@ class HsvT;
 template<typename T>
 class RgbT;
 
+/// @ingroup modm_ui_color
 template<class UnderlyingType = uint8_t>
 class RgbT
 {
@@ -95,8 +97,10 @@ private:
 	operator << ( IOStream& os, const RgbT<T>&);
 };
 
+/// @ingroup modm_ui_color
 typedef RgbT<>	Rgb;
 
+/// @ingroup modm_ui_color
 template<class UnderlyingType = uint8_t>
 class HsvT
 {
@@ -120,6 +124,7 @@ public:
 	toRgb(RgbT<T>* color) const;
 };
 
+/// @ingroup modm_ui_color
 typedef HsvT<>	Hsv;
 
 template <typename UnderlyingType>

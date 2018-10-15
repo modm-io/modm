@@ -44,6 +44,7 @@ namespace vl6180_private
 template < class I2cMaster >
 class Vl6180;
 
+/// @ingroup modm_driver_vl6180
 struct vl6180
 {
 public:
@@ -349,7 +350,7 @@ public:
  * For custom settings use the `updateRegister()` function.
  *
  * @author	Niklas Hauser
- * @ingroup driver_position
+ * @ingroup modm_driver_vl6180
  */
 template < typename I2cMaster >
 class Vl6180 : public vl6180, public modm::I2cDevice< I2cMaster, 2 >

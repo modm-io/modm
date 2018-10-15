@@ -56,6 +56,7 @@ Calibration
 	int16_t  md;
 };
 
+/// @ingroup modm_driver_bmp085
 class modm_packed
 DataBase
 {
@@ -108,6 +109,7 @@ protected:
 	};
 };
 
+/// @ingroup modm_driver_bmp085
 class modm_packed
 Data : public DataBase
 {
@@ -169,6 +171,7 @@ private:
 };
 
 #ifndef __AVR__
+/// @ingroup modm_driver_bmp085
 class modm_packed
 DataDouble : public DataBase
 {

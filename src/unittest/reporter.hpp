@@ -24,12 +24,12 @@
 namespace unittest
 {
 	/**
-	 * \brief	%Reporter
+	 * \brief	Reporter
 	 *
 	 * Used to generate the visible output.
 	 * 
 	 * \author	Fabian Greif
-	 * \ingroup	unittest
+	 * \ingroup	modm_unittest
 	 */
 	class Reporter
 	{

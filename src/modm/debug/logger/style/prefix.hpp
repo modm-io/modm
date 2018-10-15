@@ -33,7 +33,7 @@ namespace modm
 		 * 	modm::log::Logger loggerPrefix( loggerDevicePrefix );
 		 * \endcode
 		 *
-		 * \ingroup logger
+		 * \ingroup modm_debug
 		 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 		 */
 		template <typename T, typename STYLE = DefaultStyle>

@@ -24,53 +24,11 @@
 namespace modm
 {
 /**
- * Debouncing signals
- *
- * This class is able to debounce eight buttons at the same time. The
- * buttons have to be low-active. If this isn't the case invert their signal
- * before passing it to the `update()` method.
- *
- * The `update()` method needs to be called periodically for example
- * every 10ms. Preferred in a timer interrupt function.
- *
- * Example:
- * @include gpio/button_group/main.cpp
- *
- * The detection for long or repeated presses works only correctly for
- * one key at a time. This constraint only applies to buttons listed in the
- * `mask` variable.
- *
- * Mode 1:
-@verbatim
-                 Timeline ---->
-                      __      _________________      __
-getState()       ____/  \____/                 \____/  \____
-isPressed()      ----X-------X----------------------X-------
-isRepeated()     --------------------X--X--X--X-------------
-isReleased()     -------X----------------------X-------X----
-                             |       |__|__|
-                             |_______| \ /
-                                  \    interval
-                                  timeout
-@endverbatim
-	 *
-	 * Mode 2:
-@verbatim
-                      __      _________________      __
-getState()       ____/  \____/                 \____/  \____
-isPressedShort() -------X------------------------------X----
-isPressedLong()  --------------------X----------------------
-isReleased()     -------X----------------------X-------X----
-@endverbatim
- *
- * This implementation is based on the C functions written
- * by Peter Dannegger (see http://www.mikrocontroller.net/topic/48465).
- *
  * @tparam	T
  * 		Container type: `uint8_t` for eight buttons or `uint16_t` for
  * 		up to 16 buttons
  *
- * @ingroup	ui
+ * @ingroup	modm_ui_button
  */
 template <typename T = uint8_t>
 class ButtonGroup

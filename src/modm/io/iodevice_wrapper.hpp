@@ -23,7 +23,7 @@ namespace modm
 {
 
 /// The preferred behavior when the IODevice buffer is full
-/// @ingroup	io
+/// @ingroup	modm_io
 enum class
 IOBuffer
 {
@@ -32,51 +32,7 @@ IOBuffer
 };
 
 /**
- * Wrapper to use any peripheral device that supports static
- * write() and read() as an IODevice.
- *
- * You have to decide what happens when the device buffer is full
- * and you cannot write to it at the moment.
- * There are two options:
- *  1. busy wait until the buffer is free, or
- *  2. discard the bytes that cannot be written.
- *
- * Option 1 has the advantage, that none of your data will be lost,
- * however, busy-waiting can take a long time and can mess up your
- * program timings.
- * There is also a **high risk of deadlock**, when writing to a
- * IODevice inside of an interrupt and then busy-waiting forever
- * because the IODevice requires interrupts itself to send out
- * the data.
- *
- * It is therefore highly recommended to use option 2, where surplus
- * data will be discarded.
- * You should increase the IODevice buffer size, if you experience
- * missing data from your connection.
- * This behavior is also deadlock safe when called from inside another
- * interrupt, and your program timing is minimally affected (essentially
- * only coping data into the buffer).
- *
- * There is no default template argument, so that you hopefully make
- * a concious decision and be aware of this behavior.
- *
- * Example:
- * @code
- * // configure a UART
- * Uart0 uart;
- *
- * // wrap it into an IODevice
- * modm::IODeviceWrapper<Uart0, modm::IOBuffer::DiscardIfFull> device;
- *
- * // use this device to print a message
- * device.write("Hello");
- *
- * // or create a IOStream and use the stream to print something
- * modm::IOStream stream(device);
- * stream << " World!";
- * @endcode
- *
- * @ingroup		io
+ * @ingroup		modm_io
  * @tparam		Device		Peripheral which should be wrapped
  * @tparam		behavior	preferred behavior when the Device buffer is full
  */

@@ -25,6 +25,7 @@
 
 namespace modm
 {
+	/// @ingroup modm_ui_menu
 	class CommunicatingViewStack : public ViewStack
 	{
 	public:

@@ -20,7 +20,7 @@ namespace modm
 /**
  * Abstract calls of IO devices
  *
- * @ingroup io
+ * @ingroup modm_io
  * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
  */
 class IODevice

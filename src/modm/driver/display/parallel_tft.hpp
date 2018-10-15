@@ -27,7 +27,7 @@ namespace modm
 	 * - WaveShare 3,2" TFT (Model B), Controller SSD1289
 	 *
 	 * @author	Fabian Greif
-	 * @ingroup	driver_display
+	 * @ingroup	modm_driver_parallel_tft_display
 	 */
 	template <typename INTERFACE>
 	class ParallelTft : public GraphicDisplay

@@ -50,7 +50,7 @@ namespace modm
 	 * \todo	use the faster avr::mul and avr::mac functions
 	 * 
 	 * \author	Fabian Greif
-	 * \ingroup	filter
+	 * \ingroup	modm_math_filter
 	 */
 	template<typename T, unsigned int ScaleFactor = 1>
 	class Pid

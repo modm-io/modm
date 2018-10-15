@@ -24,6 +24,7 @@ namespace modm
 template < typename I2cMaster >
 class Amsys5915;
 
+/// @ingroup modm_driver_amsys5915
 struct amsys5915
 {
 	struct modm_packed
@@ -91,14 +92,7 @@ struct amsys5915
 };
 
 /**
- * Driver for the AMSYS 5915 differential and absolute pressure sensors.
- *
- * The device runs a cyclic program, which will store a corrected pressure value with
- * 12 bit resolution about every 500 μs within the output registers of the internal ASIC.
- *
- * Datasheet: http://www.amsys.de/sheets/amsys.de.ams5915.pdf
- *
- * @ingroup driver_pressure
+ * @ingroup modm_driver_amsys5915
  * @author	Raphael Lehman, Niklas Hauser
  */
 template < typename I2cMaster >

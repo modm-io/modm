@@ -68,7 +68,7 @@ namespace modm
 		 * as it is the case here!
 		 * 
 		 * \author	Fabian Greif
-		 * \ingroup	atomic
+		 * \ingroup	modm_architecture_atomic
 		 */
 		template<typename T>
 		class Container

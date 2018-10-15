@@ -32,7 +32,7 @@ namespace modm
 	 * \see		Deque()
 	 * 
 	 * \author	Fabian Greif
-	 * \ingroup	container
+	 * \ingroup	modm_container
 	 */
 	template<typename T,
 			 typename Container>
@@ -109,7 +109,7 @@ namespace modm
 	// ------------------------------------------------------------------------
 	/**
 	 * \brief	Bounded queue
-	 * \ingroup	container
+	 * \ingroup	modm_container
 	 */
 	template<typename T, 
 			 std::size_t N,

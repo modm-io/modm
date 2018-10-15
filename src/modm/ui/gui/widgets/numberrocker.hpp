@@ -24,7 +24,7 @@ namespace gui
 {
 
 /**
- * @ingroup	gui
+ * @ingroup modm_ui_gui
  * @author	Daniel Krebs
  */
 template<typename T = int16_t>
@@ -79,7 +79,9 @@ private:
 	NumberField<T> num_field;
 };
 
+/// @ingroup modm_ui_gui
 typedef NumberRocker<int16_t> IntegerRocker;
+/// @ingroup modm_ui_gui
 typedef NumberRocker<float> FloatRocker;
 
 

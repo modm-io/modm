@@ -12,13 +12,12 @@
 // ----------------------------------------------------------------------------
 
 /**
- * \ingroup		graphics
- * \defgroup	image	Images
+ * \ingroup		modm_ui_display
+ * \defgroup	modm_ui_display_image	Images
  *
  * Images are generated out of PBM format, see \c tools/bitmap.
  */
 
-#include "image/logo_xpcc_90x64.hpp"
 #include "image/logo_rca_90x64.hpp"
 #include "image/logo_eurobot_90x64.hpp"
 #include "image/skull_64x64.hpp"

@@ -28,12 +28,14 @@
 
 namespace modm
 {
-	/// @ingroup	graphics
+	/// @ingroup	modm_ui_display
 	namespace glcd
 	{
+		/// @ingroup modm_ui_display
 		typedef Vector<int16_t, 2> Point;
 
 		// RGB16 (565) Format
+		/// @ingroup modm_ui_display
 		class Color
 		{
 		public:
@@ -105,27 +107,7 @@ namespace modm
 	/**
 	 * Base class for graphical displays.
 	 *
-	 * Coordinate System:
-	 * \code
-	 * (0, 0)
-	 *    +---------------------+
-	 *    |  ----> X            |
-	 *    | |                   |
-	 *    | |                   |
-	 *    | V Y                 |
-	 *    |                     |
-	 *    |                     |
-	 *    |                     |
-	 *    +---------------------+
-	 *                e.g. (127, 63)
-	 * \endcode
-	 *
-	 * The size (width and height) of a graphics primitive always correspond
-	 * to its mathematical model, ignoring the rendered with. As everything
-	 * is drawn one pixel wide, the pixels will be rendered to the right and
-	 * below the mathematically defined points.
-	 *
-	 * \ingroup	graphics
+	 * \ingroup	modm_ui_display
 	 */
 	/*
 	 * TODO

@@ -25,8 +25,8 @@ namespace modm
 {
 
 /**
- * @ingroup		utils
- * @defgroup	arithmetic_trais	Arithmetic Traits
+ * @ingroup		modm_utils
+ * @defgroup	arithmetic_traits	Arithmetic Traits
  *
  * Traits to give numbers more information then they have by
  * default in C++
@@ -56,9 +56,10 @@ namespace modm
  * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
  * @author	Fabian Greif <fabian.greif@rwth-aachen.de>
  * @author	Niklas Hauser
+ *
+ * @{
  */
 // ------------------------------------------------------------------------
-/*\{*/
 template<typename T>
 struct ArithmeticTraits
 {
@@ -294,7 +295,7 @@ struct ArithmeticTraits<double>
 	static constexpr double epsilon = __DBL_EPSILON__;
 };
 
-//// @}
+/// @}
 } // namespace modm
 
 #endif	// MODM_ARITHMETIC_TRAITS_HPP

@@ -25,7 +25,7 @@ namespace modm
 		 * Die Redundanten Adressen von z.B. dem Register CANSTAT 
 		 * (0x0E, 0x1E, 0x2E, ...) wurden dabei nicht mit aufgelistet.
 		 * 
-		 * \ingroup	mcp2515
+		 * \ingroup	modm_driver_mcp2515
 		 */
 		enum Register
 		{
@@ -154,7 +154,7 @@ namespace modm
 		
 		/**
 		 * \brief	Bitdefinition von BFPCTRL
-		 * \ingroup	mcp2515
+		 * \ingroup	modm_driver_mcp2515
 		 */
 		enum BFPCTRL
 		{
@@ -168,7 +168,7 @@ namespace modm
 		
 		/**
 		 * \brief	Bitdefinition von TXRTSCTRL
-		 * \ingroup	mcp2515
+		 * \ingroup	modm_driver_mcp2515
 		 */
 		enum TXRTSCTRL
 		{
@@ -182,7 +182,7 @@ namespace modm
 		
 		/**
 		 * \brief	Bitdefinition von CANSTAT
-		 * \ingroup	mcp2515
+		 * \ingroup	modm_driver_mcp2515
 		 */
 		enum CANSTAT
 		{
@@ -196,7 +196,7 @@ namespace modm
 		
 		/**
 		 * \brief	Bitdefinition von CANCTRL
-		 * \ingroup	mcp2515
+		 * \ingroup	modm_driver_mcp2515
 		 */
 		enum CANCTRL
 		{
@@ -211,7 +211,7 @@ namespace modm
 		
 		/**
 		 * \brief	Bitdefinition von CNF3
-		 * \ingroup	mcp2515
+		 * \ingroup	modm_driver_mcp2515
 		 */
 		enum CNF3
 		{
@@ -223,7 +223,7 @@ namespace modm
 		
 		/**
 		 * \brief	Bitdefinition von CNF2
-		 * \ingroup	mcp2515
+		 * \ingroup	modm_driver_mcp2515
 		 */
 		enum CNF2
 		{
@@ -239,7 +239,7 @@ namespace modm
 		
 		/**
 		 * \brief	Bitdefinition von CNF1
-		 * \ingroup	mcp2515
+		 * \ingroup	modm_driver_mcp2515
 		 */
 		enum CNF1
 		{
@@ -255,7 +255,7 @@ namespace modm
 		
 		/**
 		 * \brief	Bitdefinition von CANINTE
-		 * \ingroup	mcp2515
+		 * \ingroup	modm_driver_mcp2515
 		 */
 		enum CANINTE
 		{
@@ -271,7 +271,7 @@ namespace modm
 		
 		/**
 		 * \brief	Bitdefinition von CANINTF
-		 * \ingroup	mcp2515
+		 * \ingroup	modm_driver_mcp2515
 		 */
 		enum CANINTF
 		{
@@ -287,7 +287,7 @@ namespace modm
 		
 		/**
 		 * \brief	Bitdefinition von EFLG
-		 * \ingroup	mcp2515
+		 * \ingroup	modm_driver_mcp2515
 		 */
 		enum EFLG
 		{
@@ -303,7 +303,7 @@ namespace modm
 		
 		/**
 		 * \brief	Bitdefinition von TXBnCTRL (n = 0, 1), 2)
-		 * \ingroup	mcp2515
+		 * \ingroup	modm_driver_mcp2515
 		 */
 		enum TXBnCTRL
 		{
@@ -317,7 +317,7 @@ namespace modm
 		
 		/**
 		 * \brief	Bitdefinition von RXB0CTRL
-		 * \ingroup	mcp2515
+		 * \ingroup	modm_driver_mcp2515
 		 */
 		enum RXB0CTRL
 		{
@@ -331,7 +331,7 @@ namespace modm
 		
 		/**
 		 * \brief	Bitdefinition von TXBnSIDL (n = 0, 1)
-		 * \ingroup	mcp2515
+		 * \ingroup	modm_driver_mcp2515
 		 */
 		enum TXBnSIDL
 		{
@@ -343,7 +343,7 @@ namespace modm
 		 * 
 		 * \see		RXM1, RXM0, RXRTR und FILHIT0 sind schon
 		 * 			für RXB0CTRL definiert
-		 * \ingroup	mcp2515
+		 * \ingroup	modm_driver_mcp2515
 		 */
 		enum RXB1CTRL
 		{
@@ -353,7 +353,7 @@ namespace modm
 		
 		/**
 		 * \brief	Bitdefinition von RXBnSIDL (n = 0, 1)
-		 * \ingroup	mcp2515
+		 * \ingroup	modm_driver_mcp2515
 		 */
 		enum RXBnSIDL
 		{
@@ -365,7 +365,7 @@ namespace modm
 		 * \brief	Bitdefinition von RXBnDLC (n = 0, 1)
 		 * 
 		 * \see		TXBnDLC (gleiche Bits)
-		 * \ingroup	mcp2515
+		 * \ingroup	modm_driver_mcp2515
 		 */
 		enum RXBnDLC
 		{
@@ -378,7 +378,7 @@ namespace modm
 		
 		/**
 		 * \brief	Definition of the status register
-		 * \ingroup	mcp2515
+		 * \ingroup	modm_driver_mcp2515
 		 */
 		enum Status
 		{
@@ -394,7 +394,7 @@ namespace modm
 		
 		/**
 		 * \brief	Definition of the receive status register
-		 * \ingroup	mcp2515
+		 * \ingroup	modm_driver_mcp2515
 		 */
 		enum RxStatus
 		{

@@ -16,50 +16,41 @@
 
 #ifdef __DOXYGEN__
 
-/**
- * \brief	Compiler description
- * \ingroup	platform
- */
+
+/// Compiler description
+/// @ingroup modm_architecture
 #define	MODM_COMPILER_STRING
 
-/**
- * \brief	Possible compilers
- * \ingroup	platform
- */
-//@{
+/// Possible compilers
+/// @ingroup modm_architecture
+/// @{
 #define	MODM_COMPILER_GCC
 #define	MODM_COMPILER_MSVC
-//@}
+/// @}
 
-/**
- * \brief	Operating system description
- * \ingroup	platform
- */
+/// Operating system description
+/// @ingroup modm_architecture
 #define	MODM_OS_STRING
 
-/**
- * \brief	Possible operating systems
- * \ingroup	platform
- */
-//@{
+/// Possible operating systems
+/// @ingroup modm_architecture
+/// @{
 #define	MODM_OS_UNIX
 #define	MODM_OS_LINUX
 #define	MODM_OS_OSX
 #define	MODM_OS_WIN32
 #define	MODM_OS_WIN64
-//@}
+#define	MODM_OS_HOSTED
+#define	MODM_OS_HOSTED_64
+/// @}
 
-/**
- * \brief	CPU description
- * \ingroup	platform
- */
+/// CPU description
+/// @ingroup modm_architecture
 #define	MODM_CPU_STRING
 
-//@{
-/**
- * \brief	Possible CPU definitions
- * \ingroup	platform
- */
+/// Possible CPU definitions
+/// @ingroup modm_architecture
+/// @{
 #define	MODM_CPU_AVR
 #define	MODM_CPU_ATXMEGA
 #define	MODM_CPU_ATMEGA
@@ -68,17 +59,13 @@
 #define	MODM_CPU_ARM
 #define	MODM_CPU_ARM7TDMI
 #define	MODM_CPU_CORTEX_M0
+#define	MODM_CPU_CORTEX_M3
 #define	MODM_CPU_CORTEX_M4
-#define	MODM_CPU_CORTEX_M4
+/// @}
 
-#define	MODM_OS_HOSTED
-#define	MODM_OS_HOSTED_64
-
-//@{
-/**
- * \brief	Memory descriptions
- * \ingroup	platform
- */
+///	Memory descriptions
+/// @ingroup modm_architecture
+/// @{
 #define MODM_ALIGNMENT
 
 #define MODM_ORDER_BIG_ENDIAN
@@ -91,7 +78,7 @@
 #define MODM_IS_LITTLE_ENDIAN
 
 #define	MODM_SIZEOF_POINTER
-//@}
+/// @}
 
 #else //!__DOXYGEN__
 

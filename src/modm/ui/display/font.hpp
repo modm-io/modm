@@ -14,8 +14,8 @@
 // ----------------------------------------------------------------------------
 
 /**
- * \ingroup		graphics
- * \defgroup	font	Fonts
+ * \ingroup		modm_ui_display
+ * \defgroup	modm_ui_display_font	Fonts
  *
  * Various fonts for graphical displays.
  * The fonts are created with the "FontCreator 3.0", see \c tools/font_creator.

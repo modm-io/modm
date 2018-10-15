@@ -13,6 +13,7 @@
 def init(module):
     module.parent = "communication"
     module.name = "sab"
+    module.description = FileReader("module.md")
 
 def prepare(module, options):
     module.depends(

@@ -25,11 +25,13 @@ namespace gui
 {
 
 class ColorPalette;
+/// @ingroup modm_ui_gui
 extern ColorPalette DefaultColorPalette;
 
 /*
  * TODO: find a way so that color options can be defined in user program
  */
+/// @ingroup modm_ui_gui
 enum
 Color {
 	BLACK,
@@ -50,7 +52,7 @@ Color {
 };
 
 /// @author	Niklas Hauser
-/// @ingroup	gui
+/// @ingroup modm_ui_gui
 class ColorPalette
 {
 public:

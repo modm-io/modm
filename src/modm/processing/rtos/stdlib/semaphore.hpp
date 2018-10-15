@@ -46,7 +46,7 @@ namespace modm
 		 *    equal to the maximum count value, indicating that all resources
 		 *    are free.
 		 * 
-		 * \ingroup	rtos_boost
+		 * \ingroup	modm_processing_rtos
 		 */
 		class Semaphore
 		{
@@ -115,7 +115,7 @@ namespace modm
 		 * 
 		 * The semaphore is released by default.
 		 * 
-		 * \ingroup	rtos_boost
+		 * \ingroup	modm_processing_rtos
 		 */
 		class BinarySemaphore : public Semaphore
 		{

@@ -10,19 +10,17 @@
  */
 // ----------------------------------------------------------------------------
 
-//
-// Arduino UNO
-//
-
 #ifndef MODM_ARDUINO_UNO_HPP
 #define MODM_ARDUINO_UNO_HPP
 
 #include <modm/platform.hpp>
 #include <modm/debug/logger.hpp>
+/// @ingroup modm_board_arduino_uno
 #define MODM_BOARD_HAS_LOGGER
 
 using namespace modm::platform;
 
+/// @ingroup modm_board_arduino_uno
 namespace Board
 {
 

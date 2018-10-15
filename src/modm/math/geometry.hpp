@@ -11,13 +11,6 @@
  */
 // ----------------------------------------------------------------------------
 
-/**
- * \ingroup		math
- * \defgroup	geometry Geometry
- * \brief 		Geometric classes and operations
- * 
- */
-
 #ifndef	MODM_GEOMETRY_HPP
 #define	MODM_GEOMETRY_HPP
 

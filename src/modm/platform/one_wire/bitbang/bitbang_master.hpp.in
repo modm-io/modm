@@ -40,7 +40,7 @@ namespace platform
  * 1-Wire Search Algorithm based on AppNote 187 at
  * http://www.maxim-ic.com/appnotes.cfm/appnote_number/187
  *
- * \ingroup	1-wire
+ * \ingroup	modm_platform_1_wire_bitbang
  */
 template <typename Pin>
 class BitBangOneWireMaster
@@ -159,14 +159,6 @@ public:
 	searchSkipCurrentFamily();
 
 protected:
-	/**
-	 * \internal
-	 * Universal base class for the SAB interface
-	 *
-	 * \see		<a href="http://www.maxim-ic.com/app-notes/index.mvp/id/27" target="_blank">
-	 * 			Understanding and Using Cyclic Redundancy Checks with Maxim iButton Products</a>
-	 * \ingroup	sab
-	 */
 	static uint8_t
 	crcUpdate(uint8_t crc, uint8_t data);
 

@@ -24,7 +24,7 @@ namespace gui
 {
 
 /**
- * @ingroup	gui
+ * @ingroup modm_ui_gui
  * @author	Daniel Krebs
  */
 class TabPanel : public WidgetGroup

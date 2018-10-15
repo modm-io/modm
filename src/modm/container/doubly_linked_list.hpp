@@ -27,7 +27,7 @@ namespace modm
 	 * \tparam	T	type of list entries
 	 * 
 	 * \author	Fabian Greif
-	 * \ingroup	container
+	 * \ingroup	modm_container
 	 */
 	template <typename T, typename Allocator = allocator::Dynamic<T> >
 	class DoublyLinkedList

@@ -60,7 +60,7 @@ namespace modm
 	 * 			Until then just ignore that you can access them directly ;-)
 	 * 
 	 * \author		Fabian Greif
-	 * \ingroup		container
+	 * \ingroup		modm_container
 	 */
 	template<typename T1, typename T2>
 	class Pair

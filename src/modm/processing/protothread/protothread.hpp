@@ -34,60 +34,13 @@ namespace modm
 		 * protothread will run until it blocks or exits. Thus the scheduling of
 		 * protothreads is done by the application that uses protothreads.
 		 *
-		 * Example:
-		 * \code
-		 * #include <modm/architecture.hpp>
-		 * #include <modm/utils/protothread.hpp>
-		 * #include <modm/utils/timeout.hpp>
-		 *
-		 * typedef GpioOutputB0 Led;
-		 *
-		 * class BlinkingLight : public modm::pt::Protothread
-		 * {
-		 * public:
-		 *     bool
-		 *     run()
-		 *     {
-		 *         PT_BEGIN();
-		 *
-		 *         // set everything up
-		 *         Led::setOutput();
-		 *         Led::set();
-		 *
-		 *         while (true)
-		 *         {
-		 *             timeout.restart(100);
-		 *             Led::set();
-		 *             PT_WAIT_UNTIL(timeout.isExpired());
-		 *
-		 *             timeout.restart(200);
-		 *             Led::reset();
-		 *             PT_WAIT_UNTIL(timeout.isExpired());
-		 *         }
-		 *
-		 *         PT_END();
-		 *     }
-		 *
-		 * private:
-		 *     modm::ShortTimeout timeout;
-		 * };
-		 *
-		 *
-		 * ...
-		 * BlinkingLight light;
-		 *
-		 * while (...) {
-		 *     light.run();
-		 * }
-		 * \endcode
-		 *
 		 * For other examples take a look in the \c examples folder in the MODM
 		 * root folder.
 		 *
 		 * \warning	The names \c ptState and \c ptYield are reserved and may not
 		 * 			be used as variables or function names!
 		 *
-		 * \ingroup	protothread
+		 * \ingroup	modm_processing_protothread
 		 */
 		class Protothread
 		{
@@ -135,8 +88,8 @@ namespace modm
 				return (this->ptState != Invalid);
 			}
 
-#ifdef __DOXYGEN__
 			/// @cond
+#ifdef __DOXYGEN__
 			/**
 			 * \brief	Run the protothread
 			 *

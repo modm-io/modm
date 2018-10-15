@@ -14,6 +14,11 @@
 
 def init(module):
     module.name = "unittest"
+    module.description = """\
+# Unit Tests
+
+Lightweight library for on-device unit testing.
+"""
 
 
 def prepare(module, options):

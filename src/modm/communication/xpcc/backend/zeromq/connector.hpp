@@ -41,7 +41,7 @@ public:
 /**
  * @brief	ZeroMQ communication backend for hosted
  *
- * @ingroup	backend
+ * @ingroup	modm_communication_xpcc_backend
  *
  * @author	strongly-typed
  * @author	Christopher Durand <christopher.durand@rwth-aachen.de>

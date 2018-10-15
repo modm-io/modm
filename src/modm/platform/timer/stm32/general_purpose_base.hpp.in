@@ -22,7 +22,7 @@ namespace modm
 namespace platform
 {
 
-/// @ingroup	{{partname}}_timer
+/// @ingroup	modm_platform_timer
 class GeneralPurposeTimer : public BasicTimer
 {
 public:

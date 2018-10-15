@@ -38,7 +38,7 @@ namespace modm
 	 * \author	Fabian Greif
 	 * \author	Georgi Grinshpun
 	 * 
-	 * \ingroup	filter
+	 * \ingroup	modm_math_filter
 	 */
 	template<typename T>
 	class SCurveController

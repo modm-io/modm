@@ -30,7 +30,7 @@ class Instance(Module):
 
     def init(self, module):
         module.name = str(self.instance)
-        module.description = "UART {} instance".format(self.instance)
+        module.description = "Instance {}".format(self.instance)
 
     def prepare(self, module, options):
         module.depends(":platform:uart")
@@ -87,6 +87,7 @@ class Instance(Module):
 def init(module):
     module.name = "uart"
     module.parent = "platform"
+    module.description = "Universal Asynchronous Receiver Transmitter (UART)"
 
 def prepare(module, options):
     device = options[":target"]

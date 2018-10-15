@@ -29,7 +29,7 @@ namespace modm
 	{
 		/**
 		 * \internal
-		 * \ingroup	sab2
+		 * \ingroup	modm_communication_sab2
 		 */
 		uint16_t
 		crcUpdate(uint16_t crc, uint8_t data);
@@ -41,7 +41,7 @@ namespace modm
 		 * See http://en.wikipedia.org/wiki/High-Level_Data_Link_Control#Asynchronous_framing
 		 * 
 		 * \author	Fabian Greif
-		 * \ingroup	sab2
+		 * \ingroup	modm_communication_sab2
 		 */
 		template <typename Device, std::size_t N = maxPayloadLength>
 		class Interface

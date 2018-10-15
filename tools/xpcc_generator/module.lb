@@ -13,6 +13,7 @@
 def init(module):
     module.parent = "communication:xpcc"
     module.name = "generator"
+    module.description = "XPCC Generator"
 
 def prepare(module, options):
     module.add_option(

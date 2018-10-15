@@ -14,6 +14,12 @@
 def init(module):
     module.parent = "board"
     module.name = "nucleo-l432kc"
+    module.description = """\
+# NUCLEO-L432KC
+
+Nucleo kit for STM32L432KC
+http://www.st.com/en/evaluation-tools/nucleo-l432kc.html
+"""
 
 def prepare(module, options):
     if options[":target"].partname != "stm32l432kcu":

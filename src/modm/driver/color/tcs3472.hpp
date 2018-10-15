@@ -30,7 +30,7 @@ namespace modm
 /**
  * \brief 	Settings to configure the ams digital color sensor family tcs34721, -13, -15, 17
  * \see		tcs3472
- * \ingroup	driver_other
+ * \ingroup	modm_driver_tcs3472
  *
  * Device   Address
  * tcs34721  0x39 (with IR filter)
@@ -110,7 +110,7 @@ struct tcs3472
  * 						modm::i2c::Master
  * \see		tcs3472
  * \author	David Hebbeker, Arjun Sarin
- * \ingroup	driver_other
+ * \ingroup	modm_driver_tcs3472
  */
 template < typename I2cMaster >
 class Tcs3472 : public tcs3472, public modm::I2cDevice< I2cMaster, 2 >

@@ -35,7 +35,7 @@ namespace platform
  *
  * @author	Kevin Laeufer
  * @author	Niklas Hauser
- * @ingroup	{{partname}}_uart
+ * @ingroup	modm_platform_uart
  */
 class UartBaudrate : /** @cond */protected modm::PeripheralDriver /** @endcond */
 {

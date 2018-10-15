@@ -19,9 +19,9 @@
 #include <modm/architecture/utils.hpp>
 
 /**
- * \ingroup		utils
- * \defgroup	tmp		Template Metaprogramming
- * 
+ * \ingroup		modm_utils
+ * \defgroup	modm_utils_tmp		Template Metaprogramming
+ *
  * Helper classes for some basic template metaprogramming. Template
  * metaprogramming is a programming technique in which templates are used by a
  * compiler to generate temporary source code, which is merged by the compiler
@@ -34,13 +34,13 @@ namespace modm
 {
 	/**
 	 * \brief	Template Metaprogramming
-	 * \ingroup	tmp
+	 * \ingroup modm_utils_tmp
 	 */
 	namespace tmp
 	{
 		/**
 		 * \brief	An empty type useful as a placeholder.
-		 * \ingroup	tmp
+		 * \ingroup modm_utils_tmp
 		 */
 		class NullType
 		{
@@ -49,7 +49,7 @@ namespace modm
 		// --------------------------------------------------------------------
 		/**
 		 * \brief	Selects type Result = (flag == true) ? T : U
-		 * \ingroup	tmp
+		 * \ingroup modm_utils_tmp
 		 */
 		template <bool flag, typename T, typename U>
 		struct Select
@@ -66,7 +66,7 @@ namespace modm
 		// --------------------------------------------------------------------
 		/**
 		 * \brief	SameType<T,U>::value is true when T=U
-		 * \ingroup	tmp
+		 * \ingroup modm_utils_tmp
 		 */
 		template <typename T, typename U>
 		struct SameType
@@ -92,7 +92,7 @@ namespace modm
 		 * - \c Conversion<T,U>::existsBothWays is \c true if \c U is also convertible to \c T
 		 * - \c Conversion<T,U>::isSameType is \c true if \c U is \c T
 		 *
-		 * \ingroup	tmp
+		 * \ingroup modm_utils_tmp
 		 */
 		template <typename T, typename U>
 		class Conversion
@@ -170,7 +170,7 @@ namespace modm
 		 * \c SuperSubclass<T,U>::value is \c true when \c U is derived 
 		 * from \c T, or when \c U is \c T.
 		 * 
-		 * \ingroup	tmp
+		 * \ingroup modm_utils_tmp
 		 */
 		template <typename T, typename U>
 		struct SuperSubclass
@@ -221,7 +221,7 @@ namespace modm
 		 * 
 		 * \c SuperSubclassStrict<T,U>::value is \c true when \c U is derived from \c T
 		 * 
-		 * \ingroup	tmp
+		 * \ingroup modm_utils_tmp
 		 */
 		template <typename T, typename U>
 		struct SuperSubclassStrict
@@ -263,7 +263,7 @@ namespace modm
 		 * FloatingPointTraits::max<double>();
 		 * \endcode
 		 * 
-		 * \ingroup	tmp
+		 * \ingroup modm_utils_tmp
 		 */
 		template <bool B, class T = void>
 		struct EnableIfCondition
@@ -280,7 +280,7 @@ namespace modm
 		};
 		
 		/**
-		 * \ingroup	tmp
+		 * \ingroup modm_utils_tmp
 		 */
 		template <class Conditional, class T = void>
 		struct EnableIf : public EnableIfCondition< Conditional::value, T >
@@ -311,7 +311,7 @@ namespace modm
 		 * Inspired by the BOOST_STATIC_ASSERT macro.
 		 * 
 		 * \see	http://www.boost.org/doc/libs/1_43_0/doc/html/boost_staticassert.html
-		 * \ingroup	tmp
+		 * \ingroup modm_utils_tmp
 		 * \deprecated Use static_assert(bool_constexpr, string) (since C++11) instead.
 		 */
 #ifdef __DOXYGEN__

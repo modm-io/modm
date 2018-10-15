@@ -27,6 +27,7 @@ namespace modm
 template < typename I2cMaster >
 class Bme280;
 
+/// @ingroup modm_driver_bme280
 struct bme280
 {
 
@@ -194,16 +195,8 @@ protected:
 };
 
 /**
- * BME280 digital absolute pressure sensor driver
- *
- * The BME280 is a high precision digital temperature, pressure and humidity sensor with I2C interface.
- *
- * It is known that many BME280-modules suffer from self-heating (I2C pull-ups?). 
- * So the reported temperature is about 1 to 3 degree higher than with other sensors.
- * Forced ventilation can drop the temperature by 2 to 3 degrees.
- *
  * @author  Sascha Schade
- * @ingroup driver_pressure
+ * @ingroup modm_driver_bme280
  *
  * @tparam I2cMaster I2C interface
  */

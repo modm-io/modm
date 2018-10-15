@@ -13,6 +13,7 @@
 
 #ifndef	MODM_AT90_ATTINY_ATMEGA_UART_DEFINES_H
 #define	MODM_AT90_ATTINY_ATMEGA_UART_DEFINES_H
+/// @cond
 
 // Atmel made a mess with the register names for UART0 between the "old" devices.
 // To avoid to much conditional compiling we try to mimic the new names for
@@ -118,5 +119,6 @@
 #	define USART0_TX_vect		USART_TXC_vect
 #endif
 
+/// @endcond
 #endif	// MODM_AT90_ATTINY_ATMEGA_UART_DEFINES_H
 

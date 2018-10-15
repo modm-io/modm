@@ -56,7 +56,7 @@ struct i2cEeprom
  * I2C eeprom with an 16-bit address pointer.
  * Base address for most 24xxyyyy eeproms is 0x50.
  *
- * @ingroup	driver_storage
+ * @ingroup	modm_driver_i2c_eeprom
  * @author	Fabian Greif
  * @author	Niklas Hauser
  */

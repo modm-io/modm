@@ -18,8 +18,8 @@
 namespace modm
 {
 	/**
-	 * \ingroup	utils
-	 * 
+	 * \ingroup	modm_utils
+	 *
 	 * Dummy function for default function pointers.
 	 */
 	void

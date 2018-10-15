@@ -28,7 +28,7 @@ namespace modm
 	 *
 	 * \see		<a href="http://ww1.microchip.com/downloads/en/DeviceDoc/22100D.pdf">Datasheet</a>
 	 *
-	 * \ingroup	driver_storage
+	 * \ingroup	modm_driver_spi_ram
 	 * \author	Fabian Greif
 	 */
 	template <typename Spi, typename Cs, typename Hold>

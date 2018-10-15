@@ -14,6 +14,16 @@
 def init(module):
     module.parent = "board"
     module.name = "blue-pill"
+    module.description = """\
+# Blue Pill
+
+STM32F103C8T6 "Blue Pill" Minimum System Development Board
+
+Cheap and bread-board-friendly board for STM32 F1 series.
+Sold for less than 2 USD on well known Internet shops from China.
+
+http://wiki.stm32duino.com/index.php?title=Blue_Pill
+"""
 
 def prepare(module, options):
     if options[":target"].partname != "stm32f103c8t":

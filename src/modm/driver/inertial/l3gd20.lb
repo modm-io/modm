@@ -14,6 +14,13 @@
 def init(module):
     module.parent = "driver"
     module.name = "l3gd20"
+    module.description = """\
+# L3GD20 3-Axis Gyroscope
+
+The L3GD20 is a low-power three-axis angular rate sensor.
+The L3GD20 has a full scale of ±250/±500/±2000 dps and is capable of
+measuring rates with a user-selectable bandwidth.
+"""
 
 def prepare(module, options):
     module.depends(

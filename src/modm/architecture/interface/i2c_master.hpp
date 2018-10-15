@@ -29,7 +29,7 @@ namespace modm
  *
  * @author	Georgi Grinshpun
  * @author	Niklas Hauser
- * @ingroup i2c
+ * @ingroup modm_architecture_i2c
  */
 class I2cMaster : public ::modm::PeripheralDriver, public ::modm::I2c
 {

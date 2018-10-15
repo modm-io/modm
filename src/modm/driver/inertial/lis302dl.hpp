@@ -23,6 +23,7 @@ namespace modm
 template < class Transport >
 class Lis302dl;
 
+/// @ingroup modm_driver_lis302dl
 struct lis302dl
 {
 protected:
@@ -297,17 +298,11 @@ protected:
 }; // struct lis302
 
 /**
- * LIS302DL 3-Axis accelerometer.
- *
- * The LIS302DL is an ultra compact low-power three axes linear accelerometer.
- * It includes a sensing element and an IC interface able to provide the measured
- * acceleration to the external world through an I2C/SPI serial interface.
- *
  * @tparam	Transport	Either the I2C or SPI Transport Layer.
  * @see Lis3TransportI2c
  * @see Lis3TransportSpi
  *
- * @ingroup driver_inertial
+ * @ingroup modm_driver_lis302dl
  * @author	Niklas Hauser
  */
 template < class Transport >

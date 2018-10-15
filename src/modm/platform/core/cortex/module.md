@@ -1,6 +1,12 @@
-# ARM Cortex-M startup
+# ARM Cortex-M Core
+
+This module generates the startup code, the vector table, the linkerscript and
+provides runtime support for dynamic memory allocations on the heap and
+assertion handling.
 
 ## Linkerscript
+
+The linkerscript is generated for the devices memory map.
 
 ### Placement of `.fastcode` section
 

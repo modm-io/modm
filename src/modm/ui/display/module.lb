@@ -13,6 +13,32 @@
 def init(module):
     module.parent = "ui"
     module.name = "display"
+    module.description = """\
+# Display Graphics
+
+Code for writing and drawing on character and graphical displays.
+
+## Coordinate System
+
+```
+(0, 0)
+   +---------------------+
+   |  ----> X            |
+   | |                   |
+   | |                   |
+   | V Y                 |
+   |                     |
+   |                     |
+   |                     |
+   +---------------------+
+               e.g. (127, 63)
+```
+
+The size (width and height) of a graphics primitive always correspond
+to its mathematical model, ignoring the rendered with. As everything
+is drawn one pixel wide, the pixels will be rendered to the right and
+below the mathematically defined points.
+"""
 
 def prepare(module, options):
     module.depends(

@@ -11,12 +11,6 @@
  */
 // ----------------------------------------------------------------------------
 
-//
-// STM32F429IDISCOVERY
-// Discovery kit for STM32F429 line
-// http://www.st.com/en/evaluation-tools/32f429idiscovery.html
-//
-
 #ifndef MODM_STM32_F429_DISCOVERY_HPP
 #define MODM_STM32_F429_DISCOVERY_HPP
 
@@ -25,6 +19,7 @@
 
 using namespace modm::platform;
 
+/// @ingroup modm_board_disco_f429zi
 namespace Board
 {
 

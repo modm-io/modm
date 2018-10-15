@@ -34,7 +34,7 @@ namespace platform
  * @tparam Gpios	Up to 16 GpioIO classes, ordered MSB to LSB
  *
  * @author	Niklas Hauser
- * @ingroup	gpio
+ * @ingroup	modm_platform_gpio
  */
 template< class... Gpios >
 class SoftwareGpioPort : public ::modm::GpioPort, public GpioSet<Gpios...>

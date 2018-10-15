@@ -28,7 +28,7 @@
 namespace modm
 {
 	/**
-	 * \ingroup	logger
+	 * \ingroup	modm_debug
 	 * \brief	Logger
 	 */
 	namespace log
@@ -40,7 +40,7 @@ namespace modm
 		 * the shift-operator so that it is possible to write different
 		 * message types to the logger.
 		 * 
-		 * \ingroup logger
+		 * \ingroup modm_debug
 		 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 		 */
 		class Logger : public ::modm::IOStream
@@ -96,7 +96,7 @@ namespace modm
 		 * MODM_LOG_DEBUG, MODM_LOG_INFO, MODM_LOG_WARNING and
 		 * MODM_LOG_ERROR macros.
 		 * 
-		 * \ingroup logger
+		 * \ingroup modm_debug
 		 */
 		//\{
 		extern Logger debug;	///< log device to take messages on DEBUG level
@@ -115,7 +115,7 @@ namespace modm
 
 /**
  * \brief	Turn off messages print
- * \ingroup logger
+ * \ingroup modm_debug
  */
 #define MODM_LOG_OFF \
 	if ( true ){}	\
@@ -123,7 +123,7 @@ namespace modm
 
 /**
  * \brief	Output stream for debug messages
- * \ingroup logger
+ * \ingroup modm_debug
  */
 #define MODM_LOG_DEBUG \
 	if (MODM_LOG_LEVEL > modm::log::DEBUG){} \
@@ -131,7 +131,7 @@ namespace modm
 
 /**
  * \brief	Output stream for info messages
- * \ingroup logger
+ * \ingroup modm_debug
  */
 #define MODM_LOG_INFO \
 	if (MODM_LOG_LEVEL > modm::log::INFO){}	\
@@ -139,7 +139,7 @@ namespace modm
 
 /**
  * \brief	Output stream for warnings
- * \ingroup logger
+ * \ingroup modm_debug
  */
 #define MODM_LOG_WARNING \
 	if (MODM_LOG_LEVEL > modm::log::WARNING){}	\
@@ -147,7 +147,7 @@ namespace modm
 
 /**
  * \brief	Output stream for error messages
- * \ingroup logger
+ * \ingroup modm_debug
  */
 #define MODM_LOG_ERROR \
 	if (MODM_LOG_LEVEL > modm::log::ERROR){}	\
@@ -161,7 +161,7 @@ namespace modm
  * In contrast to \c __FILE__ the path to the file is omitted (if this feature
  * is available, otherwise this macro will resolve to \c __FILE__).
  * 
- * \ingroup	logger
+ * \ingroup	modm_debug
  */
 #define FILENAME
 
@@ -185,7 +185,7 @@ namespace modm
  * file.cpp (123) >> ... something has happened ...
  * \endcode
  * 
- * \ingroup	logger
+ * \ingroup	modm_debug
  */
 #define	MODM_FILE_INFO
 

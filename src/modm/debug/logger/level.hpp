@@ -27,7 +27,7 @@ namespace modm
 		 *
 		 * DEBUG < INFO < WARNING < ERROR < DISABLED
 		 *
-		 * \ingroup logger
+		 * \ingroup modm_debug
 		 */
 		enum Level
 		{
@@ -54,7 +54,7 @@ namespace modm
 	 * 
 	 * DEBUG < INFO < WARNING < ERROR < DISABLED
 	 * 
-	 * \ingroup logger
+	 * \ingroup modm_debug
 	 */
 	#define MODM_LOG_LEVEL modm::log::DEBUG
 #endif // MODM_LOG_LEVEL

@@ -23,6 +23,7 @@ namespace modm
 namespace platform
 {
 
+/// @ingroup modm_platform_socketcan
 class SocketCan : public ::modm::Can
 {
 public:

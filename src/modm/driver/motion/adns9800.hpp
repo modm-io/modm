@@ -9,17 +9,13 @@
  */
 // ----------------------------------------------------------------------------
 
-/**
- * Based on work of Alexander Entinger, MSc / LXRobotics
- * Based on https://github.com/mrjohnk/ADNS-9800
- */
-
 #ifndef MODM_ADNS9800_HPP
 #define MODM_ADNS9800_HPP
 
 namespace modm
 {
 
+/// @ingroup modm_driver_adns9800
 struct adns9800
 {
 public:
@@ -75,6 +71,7 @@ public:
 	};
 };
 
+/// @ingroup modm_driver_adns9800
 template < typename Spi, typename Cs >
 class Adns9800 : public adns9800
 {

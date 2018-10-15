@@ -26,7 +26,6 @@ namespace modm
  * Interface to the system wide tick timer.
  *
  * This class maintains a 32-bit counter which is incremented every 1ms.
- * This
  *
  * Example:
  * @code
@@ -36,6 +35,7 @@ namespace modm
  *     modm::Clock::increment();
  * }
  * @endcode
+ * @ingroup modm_architecture_clock
  */
 class Clock
 {
@@ -70,6 +70,7 @@ namespace clock
 /**
  * Frequencies enum to make code more readable for common
  * frequencies (in kHz).
+ * @ingroup modm_architecture_clock
  */
 enum Frequency
 {
@@ -119,6 +120,8 @@ enum Frequency
 	MHz432      =  432 * MHz1,
 };
 
+/// @ingroup modm_architecture_clock
+/// @{
 static constexpr int
 MHz(int f) { return (f == HzDontCare)? HzDontCare : (f / MHz1); }
 
@@ -136,6 +139,7 @@ u32kHz(int f) { return static_cast<uint32_t>(kHz(f)); }
 modm_unused
 static constexpr int
 Hz(int f)  { return (f == HzDontCare)? HzDontCare : (f / Hz1); }
+/// @}
 
 }	// namespace clock
 

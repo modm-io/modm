@@ -11,21 +11,12 @@
  */
 // ----------------------------------------------------------------------------
 
-/**
- * \ingroup		math
- * \defgroup	interpolation	Interpolation
- * \brief		Interpolation methods
- * 
- */
-
 #ifndef MODM_INTERPOLATION_HPP
 #define MODM_INTERPOLATION_HPP
 
 namespace modm
 {
-	/**
-	 * \ingroup	interpolation
-	 */
+	/// @ingroup modm_math_interpolation
 	namespace interpolation
 	{
 	}

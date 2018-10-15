@@ -13,10 +13,15 @@
 
 def init(module):
     module.name = "ui"
+    module.description = """\
+# User interface
+
+Interfacing with human users.
+Contains code for Graphics, Buttons, LEDs, Animations, Menu Structures.
+"""
 
 def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "modm/src/modm/ui"
     pass

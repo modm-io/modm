@@ -45,7 +45,7 @@ namespace modm
 	 * \tparam	N		Number of HC595 Chips
 	 * 
 	 * \author	Fabian Greif
-	 * \ingroup	driver_gpio
+	 * \ingroup	modm_driver_shift_register
 	 */
 	template <typename Spi, typename Store, size_t N>
 	class ShiftRegisterOutput

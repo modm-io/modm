@@ -16,23 +16,13 @@
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/math/utils/bit_operation.hpp>
 
-/**
- * @ingroup 	platform
- * @defgroup	{{partname}}
- */
-
-/**
- * @ingroup 	{{partname}}
- * @defgroup	{{partname}}_gpio GPIO
- */
-
 namespace modm
 {
 
 namespace platform
 {
 
-/// @ingroup {{partname}}_gpio
+/// @cond
 enum class
 Peripheral
 {
@@ -41,8 +31,9 @@ Peripheral
 	{{ per }},
 %% endfor
 };
+/// @endcond
 
-/// @ingroup {{partname}}_gpio
+/// @ingroup modm_platform_gpio
 struct Gpio
 {
 	enum class
@@ -116,6 +107,7 @@ struct Gpio
 %% endfor
 	};
 
+	/// @cond
 	enum class
 	Signal
 	{
@@ -124,6 +116,7 @@ struct Gpio
 		{{ signal }},
 %% endfor
 	};
+	/// @endcond
 
 protected:
 	/// @cond

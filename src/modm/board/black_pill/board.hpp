@@ -10,15 +10,6 @@
  */
 // ----------------------------------------------------------------------------
 
-//
-// STM32F103C8T6 "Black Pill" Minimum System Development Board
-//
-// Cheap and bread-board-friendly board for STM32 F1 series.
-// Sold for less than 2 USD on well known Internet shops from China.
-//
-// http://wiki.stm32duino.com/index.php?title=Black_Pill
-//
-
 #ifndef MODM_STM32_F103C8T6_BLACK_PILL_HPP
 #define MODM_STM32_F103C8T6_BLACK_PILL_HPP
 
@@ -27,7 +18,7 @@
 
 using namespace modm::platform;
 
-
+/// @ingroup modm_board_black_pill
 namespace Board
 {
 

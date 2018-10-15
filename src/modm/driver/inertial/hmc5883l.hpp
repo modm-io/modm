@@ -20,6 +20,7 @@
 namespace modm
 {
 
+/// @ingroup modm_driver_hmc58x
 struct hmc5883 : public hmc58x3
 {
 	enum class
@@ -69,7 +70,7 @@ struct hmc5883 : public hmc58x3
  *
  * @see Hmc58x3
  *
- * @ingroup driver_inertial
+ * @ingroup modm_driver_hmc58x
  * @author	Niklas Hauser
  */
 template < typename I2cMaster >

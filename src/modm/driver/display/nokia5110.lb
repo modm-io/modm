@@ -14,6 +14,7 @@
 def init(module):
     module.parent = "driver"
     module.name = "nokia5110"
+    module.description = "Nokia 5110 Displays"
 
 def prepare(module, options):
     module.depends(

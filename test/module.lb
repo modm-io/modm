@@ -13,6 +13,7 @@
 
 def init(module):
     module.name = "test"
+    module.description = "Tests for modm"
 
 
 def prepare(module, options):

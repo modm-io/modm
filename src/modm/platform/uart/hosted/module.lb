@@ -15,6 +15,7 @@
 def init(module):
     module.name = "uart"
     module.parent = "platform"
+    module.description = "UART and Serial"
 
 
 def prepare(module, options):

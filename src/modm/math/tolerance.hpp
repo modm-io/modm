@@ -23,7 +23,7 @@ namespace modm
  * This can be used to guarantee the quality of certain parameters,
  * mostly baudrate or datarate.
  *
- * @ingroup	math
+ * @ingroup	modm_math
  */
 class
 Tolerance

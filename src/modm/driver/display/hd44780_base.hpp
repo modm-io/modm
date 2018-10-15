@@ -36,7 +36,7 @@ namespace modm
  * @see		http://en.wikipedia.org/wiki/HD44780_Character_LCD
  *
  * @author	Niklas Hauser
- * @ingroup	lcd
+ * @ingroup	modm_driver_hd44780
  */
 template <typename DATA, typename RW, typename RS, typename E>
 class Hd44780Base

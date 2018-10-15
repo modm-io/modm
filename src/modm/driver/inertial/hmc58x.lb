@@ -14,6 +14,16 @@
 def init(module):
     module.parent = "driver"
     module.name = "hmc58x"
+    module.description = """\
+# HMC58x3 3-Axis Digital Magnetometer
+
+The HMC58x3 is a surface-mount, multi-chip module designed for low-field
+magnetic sensing with a digital interface for applications such as
+low-cost compassing and magnetometry. The HMC58x3 includes high-resolution
+magneto-resistive sensors plus an ASIC containing amplification,
+automatic degaussing strap drivers, offset cancellation, and a 12-bit
+ADC that enables 1-2 degrees compass heading accuracy.
+"""
 
 def prepare(module, options):
     module.depends(

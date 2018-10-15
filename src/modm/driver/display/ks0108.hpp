@@ -37,7 +37,7 @@ namespace modm
 	 * 					GPIO_PORT() for more details.
 	 *
 	 * \author	Fabian Greif
-	 * \ingroup	driver_display
+	 * \ingroup	modm_driver_ks0108
 	 */
 	template < typename E, typename RW, typename RS,
 			   typename PIN_CS1, typename PIN_CS2, typename PORT >

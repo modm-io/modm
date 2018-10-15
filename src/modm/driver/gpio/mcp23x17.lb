@@ -14,6 +14,20 @@
 def init(module):
     module.parent = "driver"
     module.name = "mcp23x17"
+    module.description = """\
+# MCP23x17 16-Bit I/O Expander
+
+Port GPB is the high byte, GPA the low byte.
+The lower three address bits can be configured: `0100abc`.
+
+Notice that you can specify multiple pins at the same time for functions
+with argument type `Pins`, either by ORing the according pins, or
+converting a 16bit value using the `Pins(uint16_t)` converting constructor.
+
+Other functions with argument type `Pin` can only take one pin.
+If you want to operate on all 16bit, use the `get(Inputs|Outputs|Directions|Polarities)()`
+getters.
+"""
 
 def prepare(module, options):
     module.depends(

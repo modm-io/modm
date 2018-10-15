@@ -11,23 +11,18 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-//
-// NUCLEO-F042K6
-// Nucleo kit for STM32F042K6
-// http://www.st.com/en/evaluation-tools/nucleo-f042k6.html
-//
-
 #ifndef MODM_STM32_NUCLEO_F042K6_HPP
 #define MODM_STM32_NUCLEO_F042K6_HPP
 
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
 #include <modm/debug/logger.hpp>
+/// @ingroup modm_board_nucleo_f042k6
 #define MODM_BOARD_HAS_LOGGER
 
 using namespace modm::platform;
 
-
+/// @ingroup modm_board_nucleo_f042k6
 namespace Board
 {
 

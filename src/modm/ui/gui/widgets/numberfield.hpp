@@ -23,7 +23,7 @@ namespace gui
 {
 
 /**
- * @ingroup	gui
+ * @ingroup modm_ui_gui
  * @author	Daniel Krebs
  */
 template<typename T>
@@ -58,9 +58,10 @@ private:
 	T value;
 };
 
+/// @ingroup modm_ui_gui
 typedef NumberField<int16_t> IntegerField;
 
-
+/// @ingroup modm_ui_gui
 class FloatField : public NumberField<float>
 {
 public:

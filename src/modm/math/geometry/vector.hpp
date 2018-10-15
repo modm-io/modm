@@ -50,7 +50,7 @@ namespace modm
 	 *
 	 * \see <a href"http://www-etud.iro.umontreal.ca/~petitg/cpp/point.html">Homepage</a>
 	 * 
-	 * \ingroup	geometry
+	 * \ingroup	modm_math_geometry
 	 * \author	Niklas Hauser
 	 */
 	template<typename T, uint8_t N>

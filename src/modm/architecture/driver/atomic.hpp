@@ -10,17 +10,6 @@
  */
 // ----------------------------------------------------------------------------
 
-namespace modm
-{
-	/**
-	 * \ingroup	atomic
-	 * \brief	Atomic operations and container
-	 */
-	namespace atomic
-	{
-	}
-}
-
 #include "atomic/flag.hpp"
 #include "atomic/container.hpp"
 #include "atomic/queue.hpp"

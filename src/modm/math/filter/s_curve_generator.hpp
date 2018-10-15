@@ -22,7 +22,7 @@ namespace modm
 	 * 
 	 * \todo	documentation
 	 * \todo	implementation
-	 * \ingroup	filter
+	 * \ingroup	modm_math_filter
 	 */
 	template<typename T>
 	class SCurveGenerator

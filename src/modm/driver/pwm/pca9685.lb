@@ -14,6 +14,11 @@
 def init(module):
     module.parent = "driver"
     module.name = "pca9685"
+    module.description = """\
+# PCA9685 12-bit PWM Driver
+
+PCA9685 16-channel, 12-bit PWM LED controller via I2C-Bus.
+"""
 
 def prepare(module, options):
     module.depends(

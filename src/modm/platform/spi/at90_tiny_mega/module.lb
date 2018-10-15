@@ -34,7 +34,7 @@ class Instance(Module):
 
     def init(self, module):
         module.name = str(self.instance)
-        module.description = "SPI {} instance".format(self.instance)
+        module.description = "Instance {}".format(self.instance)
 
     def prepare(self, module, options):
         module.depends(":platform:spi")
@@ -55,6 +55,7 @@ class Instance(Module):
 def init(module):
     module.name = "spi"
     module.parent = "platform"
+    module.description = "Serial Peripheral Interface (SPI)"
 
 def prepare(module, options):
     device = options[":target"]

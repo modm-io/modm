@@ -10,23 +10,18 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-//
-// NUCLEO-F401RE
-// Nucleo kit for STM32F401RE
-// http://www.st.com/en/evaluation-tools/nucleo-f401re.html
-//
-
 #ifndef MODM_STM32_NUCLEO_F401RE_HPP
 #define MODM_STM32_NUCLEO_F401RE_HPP
 
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
 #include <modm/debug/logger.hpp>
+/// @ingroup modm_board_nucleo_f401re
 #define MODM_BOARD_HAS_LOGGER
 
 using namespace modm::platform;
 
-
+/// @ingroup modm_board_nucleo_f401re
 namespace Board
 {
 

@@ -14,6 +14,12 @@
 def init(module):
     module.parent = "board"
     module.name = "disco-f100rb"
+    module.description = """\
+# STM32VLDISCOVERY
+
+Discovery kit for STM32 F1 series
+http://www.st.com/en/evaluation-tools/stm32vldiscovery.html
+"""
 
 def prepare(module, options):
     if options[":target"].partname != "stm32f100rbt":

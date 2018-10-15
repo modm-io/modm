@@ -12,12 +12,6 @@
  */
 // ----------------------------------------------------------------------------
 
-//
-// STM32F4DISCOVERY
-// Discovery kit for STM32F407/417 lines
-// http://www.st.com/en/evaluation-tools/stm32f4discovery.html
-//
-
 #ifndef MODM_STM32_F4_DISCOVERY_HPP
 #define MODM_STM32_F4_DISCOVERY_HPP
 
@@ -27,17 +21,10 @@
 
 using namespace modm::platform;
 
-
+/// @ingroup modm_board_disco_f407vg
 namespace Board
 {
 
-/* SystemClock generator is only available for selected STM32F4 devices.
- * The idea is that it is generated automatically for you like the rest of the
- * HAL, however, modm does not have this capability yet. See PR #36.
- */
-// using systemClock = SystemClock<Pll<ExternalCrystal<MHz8>, MHz168, MHz48> >;
-
-// Instead this manual implementation of the system clock is used:
 /// STM32F407 running at 168MHz generated from the external 8MHz crystal
 struct systemClock {
 	static constexpr uint32_t Frequency = 168 * MHz1;

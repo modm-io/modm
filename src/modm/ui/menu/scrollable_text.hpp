@@ -26,7 +26,7 @@ namespace modm
 	 *        available.
 	 *
 	 *\author Thorsten Lajewski
-	 *\ingroup display_menu
+	 *\ingroup modm_ui_menu
 	 *\warning This class only works in combination with modm::font::FixedWidth5x8
 	 *\todo A better implementation is needed.
 	 */

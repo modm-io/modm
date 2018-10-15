@@ -26,7 +26,7 @@ namespace modm
 		 *
 		 * \author Thorsten Lajewski
 		 *
-		 * \ingroup display_menu
+		 * \ingroup modm_ui_menu
 		 */
 		enum Button
 		{

@@ -36,7 +36,7 @@ namespace modm
 	 * implicit closed, which means the first and the last point are connected.
 	 * 
 	 * \author	Fabian Greif
-	 * \ingroup	geometry
+	 * \ingroup	modm_math_geometry
 	 */
 	template <typename T>
 	class Polygon2D : public PointSet2D<T>

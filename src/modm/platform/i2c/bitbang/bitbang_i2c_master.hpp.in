@@ -30,7 +30,7 @@ namespace platform
 /**
  * Software emulation of a I2C master implementation
  *
- * @ingroup	i2c
+ * @ingroup	modm_platform_i2c_bitbang
  * @author	Niklas Hauser
  * @see		gpio
  */

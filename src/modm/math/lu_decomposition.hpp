@@ -33,7 +33,7 @@ namespace modm
 	 * 
 	 * \see <a href"http://www-etud.iro.umontreal.ca/~petitg/cpp/ludecomposition.html">Homepage</a>
 	 * 
-	 * \ingroup	matrix
+	 * \ingroup	modm_math_matrix
 	 * \author	Niklas Hauser
 	 */
 	class LUDecomposition

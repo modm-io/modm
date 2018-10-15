@@ -57,7 +57,7 @@ namespace modm
  * @tparam	Xerr	Error pin, use modm::platform::GpioUnused if not connected
  *
  * @author	Niklas Hauser
- * @ingroup	driver_pwm
+ * @ingroup	modm_driver_tlc594x
  */
 template<
 	uint16_t CHANNELS,

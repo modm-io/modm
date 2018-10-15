@@ -19,10 +19,7 @@
 #include "../../../device.hpp"
 #include <modm/architecture/interface/register.hpp>
 
-/**
- * @ingroup 	{{target.string}}
- * @defgroup	{{target.string}}_adc ADC
-*/
+
 namespace modm
 {
 namespace stm32
@@ -39,7 +36,7 @@ namespace stm32
  * This API is designed for the internal ADCs of STM32F0x1/STM32F0x2/STM32F0x8
  *
  * \author	Álan Crístoffer
- * \ingroup	{{target.string}}_adc
+ * \ingroup	modm_platform_adc
  */
 class Adc
 {

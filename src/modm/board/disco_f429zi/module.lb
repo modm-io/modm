@@ -14,6 +14,12 @@
 def init(module):
     module.parent = "board"
     module.name = "disco-f429zi"
+    module.description = """\
+# STM32F429IDISCOVERY
+
+Discovery kit for STM32F429 line
+http://www.st.com/en/evaluation-tools/32f429idiscovery.html
+"""
 
 def prepare(module, options):
     if options[":target"].partname != "stm32f429zit":

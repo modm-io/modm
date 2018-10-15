@@ -11,13 +11,6 @@
  */
 // ----------------------------------------------------------------------------
 
-/**
- * \ingroup		math
- * \defgroup	matrix	Matrix
- * \brief		Common matrix operations
- *
- */
-
 #ifndef MODM_MATRIX_HPP
 #define MODM_MATRIX_HPP
 
@@ -52,7 +45,7 @@ namespace modm
 	 * \tparam	ROWS		Number of rows
 	 * \tparam	COLUMNS		Number of columns
 	 * 
-	 * \ingroup	matrix
+	 * \ingroup	modm_math_matrix
 	 * \author	Niklas Hauser
 	 * \author	Fabian Greif
 	 */
@@ -258,7 +251,7 @@ namespace modm
 	 * \brief	Calculate the determinant
 	 * 
 	 * \param	m	Matrix
-	 * \ingroup	matrix
+	 * \ingroup	modm_math_matrix
 	 */
 	template<typename T, uint8_t N>
 	T

@@ -22,7 +22,7 @@ namespace modm
 {
 
 /**
- * Driver for HD447800 compatible displays
+ * Driver for HD44780 compatible displays
  *
  * This driver supports only one controller, with any configuration up to 80
  * characters (most common: 8x1, 16x2, 20x4).
@@ -38,7 +38,7 @@ namespace modm
  *
  * @author	Fabian Greif
  * @author	Niklas Hauser
- * @ingroup	driver_display
+ * @ingroup	modm_driver_hd44780
  */
 template <typename DATA, typename RW, typename RS, typename E>
 class Hd44780 : public CharacterDisplay
@@ -98,7 +98,7 @@ public:
  * @see		http://en.wikipedia.org/wiki/HD44780_Character_LCD
  *
  * @author	Niklas Hauser
- * @ingroup	driver_display
+ * @ingroup	modm_driver_hd44780
  */
 template <typename DATA, typename RW, typename RS, typename E1, typename E2>
 class Hd44780Dual : public CharacterDisplay

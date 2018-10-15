@@ -11,12 +11,6 @@
  */
 // ----------------------------------------------------------------------------
 
-/**
- * \defgroup io IO-Classes
- * \brief A modul of IOStream and IODevices
- *
- */
-
 #include "io/iostream.hpp"
 #include "io/iodevice.hpp"
 #include "io/iodevice_wrapper.hpp"

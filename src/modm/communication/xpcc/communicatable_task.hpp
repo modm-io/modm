@@ -29,7 +29,7 @@ namespace xpcc
  * @see		xpcc::Communicator
  * @see		xpcc::Communicatable
  *
- * @ingroup	xpcc_com
+ * @ingroup	modm_communication_xpcc
  * @author	Fabian Greif
  */
 class CommunicatableTask : public modm::Task, public Communicatable

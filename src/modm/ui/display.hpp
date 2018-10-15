@@ -12,13 +12,6 @@
  */
 // ----------------------------------------------------------------------------
 
-/**
- * \defgroup	graphics		Graphics
- * \brief		Code for writing and drawing on displays.
- *
- * \ingroup		ui
- */
-
 #include "display/font.hpp"
 #include "display/image.hpp"
 

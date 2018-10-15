@@ -12,13 +12,6 @@
  */
 // ----------------------------------------------------------------------------
 
-/**
- * @defgroup	led		LED Indicators
- * @brief		Various classes for controlling the brightness of LEDs.
- *
- * @ingroup		ui
- */
-
 #include "led/tables.hpp"
 #include "led/led.hpp"
 #include "led/rgb.hpp"

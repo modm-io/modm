@@ -30,7 +30,7 @@ namespace modm
 /**
  * \brief 	Settings to configure the digital color sensor TCS3414 / TCS3413 / TCS3415 / TCS3416.
  * \see		Tcs3414
- * \ingroup	driver_other
+ * \ingroup	modm_driver_tcs3414
  *
  * Device   Address
  * TCS3413  0x29
@@ -148,7 +148,7 @@ struct tcs3414
  * 						modm::i2c::Master
  * \see		tcs3414
  * \author	David Hebbeker
- * \ingroup	driver_other
+ * \ingroup	modm_driver_tcs3414
  */
 template < typename I2cMaster >
 class Tcs3414 : public tcs3414, public modm::I2cDevice< I2cMaster, 2 >

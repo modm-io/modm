@@ -26,6 +26,7 @@ namespace modm
 template < class I2cMaster >
 class Tmp175;
 
+/// @ingroup modm_driver_tmp175
 struct tmp175 : public lm75
 {
 protected:
@@ -59,17 +60,7 @@ protected:
 };
 
 /**
- * TMP175 digital temperature sensor driver.
- *
- * The TMP175 is a digital temperature sensor with a two-wire interface
- * and measures temperature over a range of -40 to +125 deg Celsius with a
- * resolution of 1/16 (0.0625) deg C and an accuracy of up to 1.5 deg C.
- *
- * The sensor has a default refresh rate of 4Hz but can be raised up to
- * 30Hz by repeatedly manually starting a conversion (with startConversion()),
- * which lasts between 30ms and 240ms depending on resolution.
- *
- * @ingroup driver_temperature
+ * @ingroup modm_driver_tmp175
  * @author	Niklas Hauser
  *
  * @tparam I2cMaster Asynchronous Interface

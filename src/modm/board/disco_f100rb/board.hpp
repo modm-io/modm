@@ -10,12 +10,6 @@
  */
 // ----------------------------------------------------------------------------
 
-//
-// STM32F1DISCOVERY
-// Discovery kit for STM32 F1 series
-// http://www.st.com/en/evaluation-tools/stm32vldiscovery.html
-//
-
 #ifndef MODM_STM32_F1_DISCOVERY_HPP
 #define MODM_STM32_F1_DISCOVERY_HPP
 
@@ -25,19 +19,12 @@
 using namespace modm::platform;
 
 
+/// @ingroup modm_board_disco_f100rb
 namespace Board
 {
 
-
-/// supplied by the on-board st-link
-/* SystemClock generator is only available for selected STM32F1 devices.
- * The idea is that it is generated automatically for you like the rest of the
- * HAL, however, modm does not have this capability yet. See PR #36.
- */
-// using systemClock = SystemClock<Pll<ExternalCrystal<MHz8>, MHz24> >;
-
-// Instead this manual implementation of the system clock is used:
 /// STM32F100 running at 24MHz generated from the external 8MHz crystal
+/// supplied by the on-board st-link
 struct systemClock {
 	static constexpr uint32_t Frequency = 24 * MHz1;
 	static constexpr uint32_t Ahb = Frequency;

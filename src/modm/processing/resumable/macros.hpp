@@ -18,21 +18,19 @@
 #include <modm/architecture/interface/assert.hpp>
 #include <modm/architecture/utils.hpp>
 
+/// @ingroup modm_processing_resumable
+/// @{
+
 #ifdef __DOXYGEN__
-/**
- * Declare start of resumable function with index.
- *
- * @warning	Use at start of the `resumable()` implementation!
- * @ingroup	resumable
- */
+/// Declare start of resumable function with index.
+/// @warning Use at start of the `resumable()` implementation!
 #define RF_BEGIN(index)
 
 /**
  * Declare start of a nested resumable function.
- * This will immidiately return if the nesting is too deep.
+ * This will immediately return if the nesting is too deep.
  *
- * @warning	Use at start of the `resumable()` implementation!
- * @ingroup	resumable
+ * @warning Use at start of the `resumable()` implementation!
  */
 #define RF_BEGIN()
 #endif
@@ -41,7 +39,6 @@
  * End the resumable function and return a result.
  *
  * @warning	Use at end of the `resumable()` implementation only!
- * @ingroup	resumable
  * @hideinitializer
  */
 #define RF_END_RETURN(result) \
@@ -57,7 +54,6 @@
  * End the resumable function. You can use this to return `void`, or if the result does not matter.
  *
  * @warning	Use at end of the `resumable()` implementation only!
- * @ingroup	resumable
  * @hideinitializer
  */
 #define RF_END() \
@@ -74,7 +70,6 @@
  * End the resumable function by calling another resumable function and returning its result.
  *
  * @warning	Use at end of the `resumable()` implementation only!
- * @ingroup	resumable
  * @hideinitializer
  */
 #define RF_END_RETURN_CALL(resumable) \
@@ -86,29 +81,17 @@
 	} \
 	static_assert(uint16_t(__COUNTER__) - rfCounter < 256, "You have too many states in this resumable function!")
 
-/**
- * Yield resumable function until next invocation.
- *
- * @ingroup	resumable
- * @hideinitializer
- */
+/// Yield resumable function until next invocation.
+/// @hideinitializer
 #define RF_YIELD() \
 			RF_INTERNAL_SET_CASE_YIELD(__COUNTER__)
 
-/**
- * Cause resumable function to wait until given child protothread completes.
- *
- * @ingroup	resumable
- * @hideinitializer
- */
+/// Cause resumable function to wait until given child protothread completes.
+/// @hideinitializer
 #define RF_WAIT_THREAD(child) 	RF_WAIT_UNTIL(!(child).run())
 
-/**
- * Cause resumable function to wait **while** given `condition` is true.
- *
- * @ingroup	resumable
- * @hideinitializer
- */
+/// Cause resumable function to wait **while** given `condition` is true.
+/// @hideinitializer
 #define RF_WAIT_WHILE(condition) \
 		do { \
 			RF_INTERNAL_SET_CASE(__COUNTER__); \
@@ -118,21 +101,13 @@
 			} \
 		} while(0)
 
-/**
- * Cause resumable function to wait **until** given `condition` is true.
- *
- * @ingroup	resumable
- * @hideinitializer
- */
+/// Cause resumable function to wait **until** given `condition` is true.
+/// @hideinitializer
 #define RF_WAIT_UNTIL(condition) \
 	RF_WAIT_WHILE(!(condition))
 
-/**
- * Calls a resumable function and returns its result.
- *
- * @ingroup	resumable
- * @hideinitializer
- */
+/// Calls a resumable function and returns its result.
+/// @hideinitializer
 #define RF_CALL(resumable) \
 	({ \
 			RF_INTERNAL_SET_CASE(__COUNTER__); \
@@ -148,7 +123,6 @@
  * Calls a resumable function, busy-waits and returns its result.
  *
  * @warning	Use this with extreme caution, this can cause deadlocks!
- * @ingroup	resumable
  * @hideinitializer
  */
 #define RF_CALL_BLOCKING(resumable) \
@@ -159,12 +133,8 @@
 			rfResult.getResult(); \
 	})
 
-/**
-* Exits a resumable function and returns another resumable function's result.
-*
-* @ingroup	resumable
-* @hideinitializer
-*/
+/// Exits a resumable function and returns another resumable function's result.
+/// @hideinitializer
 #define RF_RETURN_CALL(resumable) \
 		do { \
 			RF_INTERNAL_SET_CASE(__COUNTER__); \
@@ -179,33 +149,25 @@
 		} while(0)
 
 #ifdef __DOXYGEN__
-/**
- * Stop and exit from resumable function with a result.
- *
- * @ingroup	resumable
- * @hideinitializer
- */
+/// Stop and exit from resumable function with a result.
+/// @hideinitializer
 #define RF_RETURN(result)
 
-/**
- * Stop and exit from resumable function of `void` return type.
- *
- * @ingroup	resumable
- * @hideinitializer
- */
+/// Stop and exit from resumable function of `void` return type.
+/// @hideinitializer
 #define RF_RETURN()
-
 #endif
 
+/// @}
 
 #ifndef __DOXYGEN__
-/// Required macro to set the same unique number twice
+// Required macro to set the same unique number twice
 #define RF_INTERNAL_SET_CASE(counter) \
 			this->setRf((counter % 255) + 1, rfIndex); \
 			MODM_FALLTHROUGH; \
 		case ((counter % 255) + 1): ;
 
-/// Internal macro for yield
+// Internal macro for yield
 #define RF_INTERNAL_SET_CASE_YIELD(counter) \
 			this->setRf((counter % 255) + 1, rfIndex); \
 			this->popRf(); \
@@ -226,7 +188,7 @@
 			return {modm::rf::Stop, (result)}; \
 	} while(0)
 
-/// Beginner structure for nested resumable functions
+// Beginner structure for nested resumable functions
 #define RF_BEGIN_1() \
 	constexpr uint16_t rfCounter = __COUNTER__; \
 	this->template checkRfType<true>(); \
@@ -239,7 +201,7 @@
 		case (::modm::rf::Stopped): \
 			RF_INTERNAL_SET_CASE(__COUNTER__);
 
-/// Beginner structure for conventional resumable functions
+// Beginner structure for conventional resumable functions
 #define RF_BEGIN_0(index) \
 	constexpr uint16_t rfCounter = __COUNTER__; \
 	this->template checkRfFunctions<index>(); \

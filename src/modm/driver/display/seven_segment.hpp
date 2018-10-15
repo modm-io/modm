@@ -64,7 +64,7 @@ namespace modm
 		 * It because the Load signal must be strobe when all data is shifted out
 		 * this blocks until the SPI has finished.
 		 *
-		 * \ingroup	driver_display
+		 * \ingroup	modm_driver_seven_segment
 		 */
 		template<
 			typename Spi,

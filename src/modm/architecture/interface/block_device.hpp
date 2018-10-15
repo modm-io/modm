@@ -16,11 +16,6 @@
 #include <stdint.h>
 #include <modm/processing/resumable.hpp>
 
-/**
- * @ingroup		interface
- * @defgroup	storage	Data storage
- */
-
 namespace modm
 {
 
@@ -30,7 +25,7 @@ namespace modm
  * Access to storage devices like flash chips
  *
  * @author	Raphael Lehmann
- * @ingroup	storage
+ * @ingroup	modm_architecture_block_device
  */
 class BlockDevice
 {

@@ -32,7 +32,7 @@ namespace modm
 	 * 						classes from modm::allocator namespace.
 	 * 
 	 * \author	Fabian Greif
-	 * \ingroup	container
+	 * \ingroup	modm_container
 	 */
 	template <typename T, typename Allocator = allocator::Dynamic<T> >
 	class LinkedList

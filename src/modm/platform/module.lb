@@ -15,6 +15,11 @@ from os.path import join
 
 def init(module):
     module.name = "platform"
+    module.description = """\
+# Platform HAL
+
+Target-specific implementation of the Hardware Abstraction Layer.
+"""
 
 def prepare(module, options):
     return True

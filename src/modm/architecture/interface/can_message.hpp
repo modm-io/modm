@@ -24,7 +24,7 @@ namespace can
 {
 
 /// Representation of a CAN message
-/// @ingroup	can
+/// @ingroup modm_architecture_can
 struct Message
 {
 	Message(const uint32_t& inIdentifier = 0, uint8_t inLength = 0) :

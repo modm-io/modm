@@ -15,24 +15,13 @@
 #include "define.h"
 #include <modm/architecture/interface/gpio.hpp>
 
-/**
- * @ingroup 	platform
- * @defgroup	{{partname}}
- */
-
-/**
- * @ingroup 	{{partname}}
- * @defgroup	{{partname}}_gpio GPIO
- */
-
-
 namespace modm
 {
 
 namespace platform
 {
 
-/// @ingroup {{partname}}_gpio
+/// @ingroup modm_platform_gpio
 enum class
 Peripheral
 {
@@ -42,7 +31,7 @@ Peripheral
 %% endfor
 };
 
-/// @ingroup	{{partname}}_gpio
+/// @ingroup	modm_platform_gpio
 struct Gpio
 {
 	/// Each Input Pin can be configured in one of these states.
@@ -101,8 +90,7 @@ protected:
  * simulate an open-drain output (with internal pullups if needed).
  *
  * @see BitBangI2cMaster
- * @ingroup	{{partname}}_gpio
- * @{
+ * @ingroup	modm_platform_gpio
  */
 template< class Pin >
 class GpioOpenDrain : public Pin
@@ -154,8 +142,6 @@ public:
 		return modm::Gpio::Direction::Out;
 	}
 };
-
-/// @}
 
 }	// namespace platform
 

@@ -13,6 +13,27 @@
 def init(module):
     module.parent = "ui"
     module.name = "menu"
+    module.description = """\
+# Display Menu
+
+Simple to use classes for implementing menu structures on graphic displays.
+
+Some convenience classes for implementing menus. The menus are
+using a stack to allow stepping forward and backwards through the
+screens.
+
+The menus are based on the usage of five buttons. Inside most of the
+screens these buttons have the following functions:
+
+- Left: Go back one screen.
+- Right: Go to next screen.
+- Up: Go to previous selected entry on screen
+- Down: Go to next entry on screen
+- OK: Edit selected entry
+
+!!! warning
+    Some classes currently only work with the font `modm::font::FixedWidth5x8`!
+"""
 
 def prepare(module, options):
     module.depends(

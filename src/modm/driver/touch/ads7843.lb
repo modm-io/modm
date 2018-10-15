@@ -14,6 +14,16 @@
 def init(module):
     module.parent = "driver"
     module.name = "ads7843"
+    module.description = """\
+# ADS7843 Resistive Touch Controller
+
+The ADS7843 by Texas Instruments is the de-facto standard for cheap
+resistive touch screens.
+
+There are many compatible devices from other manufacturers available,
+such as the UH7843 by Zilltek, the TSC2046 and the XPT2046 by XPTEK.
+All of these are 100%% compatible with the ADS7843.
+"""
 
 def prepare(module, options):
     module.depends(

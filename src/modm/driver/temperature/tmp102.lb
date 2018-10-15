@@ -14,6 +14,22 @@
 def init(module):
     module.parent = "driver"
     module.name = "tmp102"
+    module.description = """\
+# TMP102 Thermometer
+
+The TMP102 is a digital temperature sensor with an I2C interface
+and measures temperature over a range of -40 to +125 deg Celsius with a
+resolution of 1/16 (0.0625) deg C and an accuracy of up to 0.5 deg C.
+
+The sensor has a default refresh rate of 4Hz but can be set from
+0.25Hz up to 33Hz using `setUpdateRate(rate)`.
+The sensor will then read itself when calling the `update()` method
+frequently.
+
+However, you may manually start a conversion with `startConversion()`, wait
+for 30ms and then `readTemperature()` to achieve other (less frequent)
+update rates.
+"""
 
 def prepare(module, options):
     module.depends(

@@ -36,7 +36,7 @@ namespace modm
 		 * \see		<a href="http://members.chello.nl/j.beentjes3/Ruud/sqrt32avr.htm" target="_blank">
 		 * 			Original implementation</a>
 		 *
-		 * \ingroup	math
+		 * \ingroup	modm_math_utils
 		 */
 		inline uint16_t
 		sqrt(uint32_t a)
@@ -48,7 +48,7 @@ namespace modm
 		 * \brief	unsigned 16bit x 16bit = 32bit multiplication
 		 *
 		 * \see		AVR201
-		 * \ingroup	math
+		 * \ingroup	modm_math_utils
 		 */
 		inline uint32_t
 		mul(uint16_t a, uint16_t b);
@@ -57,7 +57,7 @@ namespace modm
 		 * \brief	signed 16bit x 16bit = 32bit multiplication
 		 *
 		 * \see		AVR201
-		 * \ingroup	math
+		 * \ingroup	modm_math_utils
 		 */
 		inline int32_t
 		mul(int16_t a, int16_t b);
@@ -71,7 +71,7 @@ namespace modm
 		 * \endcode
 		 *
 		 * \see		AVR201
-		 * \ingroup	math
+		 * \ingroup	modm_math_utils
 		 */
 		inline int32_t
 		mac(int32_t result, int16_t a, int16_t b);

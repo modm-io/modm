@@ -41,7 +41,7 @@ namespace modm
  *
  *
  * @author	Kevin Laeufer
- * @ingroup	can
+ * @ingroup	modm_platform_can_common
  */
 template<int32_t Clk, int32_t Bitrate>
 class CanBitTiming

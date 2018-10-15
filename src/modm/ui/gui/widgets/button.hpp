@@ -24,7 +24,7 @@ namespace gui
 {
 
 /**
- * @ingroup	gui
+ * @ingroup modm_ui_gui
  * @author	Daniel Krebs
  */
 class ButtonWidget : public Widget
@@ -50,7 +50,7 @@ private:
 };
 
 /**
- * @ingroup	gui
+ * @ingroup modm_ui_gui
  * @author	Daniel Krebs
  */
 class ArrowButton : public Widget
@@ -71,7 +71,7 @@ private:
 };
 
 /**
- * @ingroup	gui
+ * @ingroup modm_ui_gui
  * @author	Daniel Krebs
  */
 class FilledAreaButton : public Widget

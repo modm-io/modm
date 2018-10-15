@@ -24,6 +24,7 @@ namespace modm
 template < class Transport >
 class L3gd20;
 
+/// @ingroup modm_driver_l3gd20
 struct l3gd20
 {
 	enum class
@@ -319,17 +320,11 @@ protected:
 }; // struct l3gd20
 
 /**
- * L3GD20 3-Axis gyroscope.
- *
- * The L3GD20 is a low-power three-axis angular rate sensor.
- * The L3GD20 has a full scale of ±250/±500/±2000 dps and is capable of
- * measuring rates with a user-selectable bandwidth.
- *
  * @tparam	Transport	Either the I2C or SPI Transport Layer.
  * @see Lis3TransportI2c
  * @see Lis3TransportSpi
  *
- * @ingroup driver_inertial
+ * @ingroup modm_driver_l3gd20
  * @author	Niklas Hauser
  */
 template < class Transport >

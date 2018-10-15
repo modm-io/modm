@@ -24,7 +24,7 @@ namespace modm
 		/**
 		 * \brief 	This is an empty style.
 		 *
-		 * \ingroup logger
+		 * \ingroup modm_debug
 		 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 		 */
 		class DefaultStyle
@@ -72,7 +72,7 @@ namespace modm
 		 * the given way and pass it to the next style class or device.
 		 *
 		 *
-		 * \ingroup logger
+		 * \ingroup modm_debug
 		 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 		 */
 		template < typename STYLE = DefaultStyle >

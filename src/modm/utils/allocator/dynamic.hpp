@@ -26,7 +26,7 @@ namespace modm
 		 * Wrapper for the underlying memory management. No additional
 		 * management is done.
 		 * 
-		 * \ingroup	allocator
+		 * \ingroup	modm_utils_allocator
 		 * \author	Fabian Greif
 		 */
 		template <typename T>

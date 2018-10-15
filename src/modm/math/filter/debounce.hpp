@@ -23,7 +23,7 @@ namespace modm
 		/**
 		 * \brief	Debouncing binary signals 
 		 * 
-		 * \ingroup	filter
+		 * \ingroup	modm_math_filter
 		 */
 		template<typename T = uint8_t>
 		class Debounce

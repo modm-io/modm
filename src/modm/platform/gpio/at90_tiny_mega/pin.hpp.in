@@ -18,17 +18,6 @@
 #include "base.hpp"
 #include "set.hpp"
 
-/**
- * @ingroup 	platform
- * @defgroup	{{partname}}
- */
-
-/**
- * @ingroup 	{{partname}}
- * @defgroup	{{partname}}_gpio GPIO
- */
-
-
 namespace modm
 {
 
@@ -42,7 +31,7 @@ using GpioInput{{ port ~ pin }}  = Gpio{{ port ~ pin }};
 /// @endcond
 
 /// IO class for Pin {{port ~ pin}}
-/// @ingroup	{{partname}}_gpio
+/// @ingroup	modm_platform_gpio
 class Gpio{{ port ~ pin }} : public Gpio, public ::modm::GpioIO
 {
 	template< class... Gpios >
@@ -151,6 +140,17 @@ public:
 	}
 
 public:
+#ifdef __DOXYGEN__
+	/// @{
+	/// Connect to any software peripheral
+	struct BitBang;
+	%% for name, group in signals.items()
+	/// Connect to {% for sig in group %}{{ sig.driver }}{{ "" if loop.last else " or "}}{% endfor %}
+	using {{ name }} = GpioSignal;
+	%% endfor
+	/// @}
+#endif
+	/// @cond
 	template< Peripheral peripheral >
 	struct BitBang { static void connect();
 		static_assert(
@@ -167,8 +167,10 @@ public:
 			"Gpio{{ port ~ pin }}::{{ signal_name }} only connects to {% for signal in signal_group %}{{signal.driver}}{% if not loop.last %} or {% endif %}{% endfor %}!");
 	};
 	%% endfor
+	/// @endcond
 };
 
+/// @cond
 template<>
 struct Gpio{{ port ~ pin }}::BitBang<Peripheral::BitBang>
 {
@@ -187,6 +189,7 @@ struct Gpio{{ port ~ pin }}::{{ signal.name }}<Peripheral::{{ signal.driver }}>
 };
 	%% endfor
 %% endfor
+/// @endcond
 
 }	// namespace platform
 

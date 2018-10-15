@@ -30,6 +30,7 @@ namespace modm
      *
      * \warning SDL_Init( SDL_INIT_EVERYTHING ); needs to be  called, before
      *          any instance of the SDLDisplay can be used
+     * @ingroup modm_driver_sdl_display
      */
 	class SDLDisplay: public modm::GraphicDisplay
 	{

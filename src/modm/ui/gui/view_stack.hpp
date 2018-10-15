@@ -38,7 +38,7 @@ namespace gui
  * This class also deallocates the views passed
  * to the stack.
  *
- * @ingroup	gui
+ * @ingroup modm_ui_gui
  * @author	Thorsten Lajewski
  */
 class GuiViewStack : public modm::ViewStack

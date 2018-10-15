@@ -49,7 +49,7 @@ namespace modm
 	 * \tparam	N			Number of HC165 Chips
 	 * 
 	 * \author	Fabian Greif
-	 * \ingroup	driver_gpio
+	 * \ingroup	modm_driver_shift_register
 	 */
 	template <typename Spi,	typename Load, size_t N>
 	class ShiftRegisterInput

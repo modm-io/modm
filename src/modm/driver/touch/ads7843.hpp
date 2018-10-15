@@ -22,17 +22,8 @@
 namespace modm
 {
 	/**
-	 * ADS7843 Touch Screen Controller.
-	 *
-	 * The ADS7843 by Texas Instruments is the de-facto standard for cheap
-	 * resistive touch screens.
-	 *
-	 * There are many compatible devices from other manufacturers available,
-	 * such as the UH7843 by Zilltek, the TSC2046 and the XPT2046 by XPTEK.
-	 * All of these are 100% compatible with the ADS7843.
-	 *
 	 * @author	Fabian Greif <fabian.greif@rwth-aachen.de>
-	 * @ingroup driver_touch
+	 * @ingroup modm_driver_ads7843
 	 */
 	template <typename Spi, typename Cs, typename Int>
 	class Ads7843

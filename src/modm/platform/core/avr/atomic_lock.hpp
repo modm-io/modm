@@ -25,6 +25,8 @@ namespace modm
 namespace atomic
 {
 
+// documented in :architecture:atomic
+/// @cond
 class Lock
 {
 public:
@@ -64,6 +66,7 @@ public:
 private:
 	uint8_t sreg;
 };
+/// @endcond
 
 }	// namespace atomic
 

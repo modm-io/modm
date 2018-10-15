@@ -1,0 +1,10 @@
+/**
+
+%% if module.pref != "modm"
+@ingroup {{ module.pref }}
+%% endif
+@defgroup {{ module.ref }} {{ module.title if module.title else module.name }}
+
+{{ module.description | doxify }}
+
+ */

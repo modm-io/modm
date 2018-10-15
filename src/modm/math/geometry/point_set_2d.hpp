@@ -30,7 +30,7 @@ namespace modm
 	 * is an expensive operation it should be avoid if possible.
 	 * 
 	 * \author	Fabian Greif
-	 * \ingroup	geometry
+	 * \ingroup	modm_math_geometry
 	 */
 	template <typename T>
 	class PointSet2D

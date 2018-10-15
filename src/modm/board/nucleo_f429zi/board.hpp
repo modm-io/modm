@@ -10,21 +10,18 @@
  */
 // ----------------------------------------------------------------------------
 
-// NUCLEO-F429ZI
-// Nucleo kit for STM32F429ZI
-// http://www.st.com/en/evaluation-tools/nucleo-f429zi.html
-//
-
 #ifndef MODM_STM32_NUCLEO_F429ZI_HPP
 #define MODM_STM32_NUCLEO_F429ZI_HPP
 
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
 #include <modm/debug/logger.hpp>
+/// @ingroup modm_board_nucleo_f429zi
 #define MODM_BOARD_HAS_LOGGER
 
 using namespace modm::platform;
 
+/// @ingroup modm_board_nucleo_f429zi
 namespace Board
 {
 

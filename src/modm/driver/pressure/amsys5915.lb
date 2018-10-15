@@ -14,6 +14,15 @@
 def init(module):
     module.parent = "driver"
     module.name = "amsys5915"
+    module.description = """\
+# AMSYS 5915 Pressure Sensor
+
+Driver for the AMSYS 5915 differential and absolute pressure sensors.
+The device runs a cyclic program, which will store a corrected pressure value with
+12 bit resolution about every 500 μs within the output registers of the internal ASIC.
+
+[Datasheet](http://www.amsys.de/sheets/amsys.de.ams5915.pdf)
+"""
 
 def prepare(module, options):
     module.depends(

@@ -25,6 +25,7 @@ class Ad7280aTest;
 
 namespace modm
 {
+	/// @ingroup modm_driver_ad7280a
 	namespace ad7280a
 	{
 		enum Cell
@@ -135,30 +136,12 @@ namespace modm
 	}
 
 	/**
-	 * Lithium Ion Battery Monitoring System.
-	 *
-	 * The AD7280A is monitor for lithium ion battery packs with up to six
-	 * cells. It contains six 12-ADCs with 1µs conversion per channel and
-	 * a cell balancing interface.
-	 * Up to 7 devices can be added through a Daisy-Chain interface (chain of
-	 * 8 devices).
-	 *
-	 * - cell voltage accuracy of ±1.6 mV.
-	 * - Supply voltage 8-30V
-	 * - six auxiliary ADC input channels
-	 *
-	 * Recommended SPI Clk frequency is 1 MHz. With a 1 MHz Clk, it takes
-	 * approximately 1.54 ms to read back the voltage conversions on 48 channels.
-	 *
-	 * When addressing devices in the chain directly the frequency needs to
-	 * be lower than 1 MHz because delays introduced in each stage of the chain.
-	 *
 	 * \tparam	Spi		SPI interface
 	 * \tparam	Cs		Chip-Select Pin
 	 * \tparam	Cnvst	Conversion Start Pin
 	 * \tparam	N		Number of devices in a daisy chain (1..8)
 	 *
-	 * @ingroup driver_adc
+	 * @ingroup modm_driver_ad7280a
 	 */
 	template <typename Spi, typename Cs, typename Cnvst, int N>
 	class Ad7280a

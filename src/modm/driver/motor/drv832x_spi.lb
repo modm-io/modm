@@ -14,6 +14,12 @@
 def init(module):
     module.parent = "driver"
     module.name = "drv832x_spi"
+    module.description = """\
+# DRV832xS: Three-Phase Smart Gate Driver
+
+This driver only covers the gate driver configuration accessible via SPI interface.
+[DRV832x Datasheet](http://www.ti.com/lit/ds/symlink/drv8320.pdf).
+"""
 
 def prepare(module, options):
     module.depends(

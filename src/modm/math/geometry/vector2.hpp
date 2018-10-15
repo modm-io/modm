@@ -50,7 +50,7 @@ namespace modm
 	 * \author	Fabian Greif
 	 * \author	Niklas Hauser
 	 * 
-	 * \ingroup	geometry
+	 * \ingroup	modm_math_geometry
 	 */
 	template<typename T>
 	class Vector<T, 2>
@@ -319,7 +319,7 @@ namespace modm
 	// ------------------------------------------------------------------------
 	/**
 	 * \brief	Stream operator for \b modm::Vector<U, 2>
-	 * \ingroup	geometry
+	 * \ingroup	modm_math_geometry
 	 */
 	template<typename U>
 	IOStream&
@@ -327,7 +327,7 @@ namespace modm
 	
 	/**
 	 * \brief	Scalar multiplication
-	 * \ingroup	geometry
+	 * \ingroup	modm_math_geometry
 	 */
 	template<typename U>
 	Vector<U, 2>
@@ -335,7 +335,7 @@ namespace modm
 	
 	/**
 	 * \brief	Scalar division
-	 * \ingroup	geometry
+	 * \ingroup	modm_math_geometry
 	 */
 	template<typename U>
 	Vector<U, 2>

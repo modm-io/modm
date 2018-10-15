@@ -13,6 +13,7 @@
 
 def init(module):
     module.name = "communication"
+    module.description = "Communication Protocols"
 
 def prepare(module, options):
     return True

@@ -16,6 +16,7 @@ import os
 def init(module):
     module.parent = "platform"
     module.name = "clock.cortex"
+    module.description = "ARM Cortex-M SysTick"
 
 def prepare(module, options):
     if not options[":target"].has_driver("core:cortex-m*"):

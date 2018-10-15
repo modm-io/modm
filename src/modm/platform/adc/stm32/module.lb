@@ -19,7 +19,7 @@ class Instance(Module):
 
     def init(self, module):
         module.name = str(self.instance)
-        module.description = "ADC {} instance".format(self.instance)
+        module.description = "Instance {}".format(self.instance)
 
     def prepare(self, module, options):
         module.depends(":platform:adc")
@@ -64,6 +64,7 @@ class Instance(Module):
 def init(module):
     module.name = "adc"
     module.parent = "platform"
+    module.description = "Analog-to-Digital Converter (ADC)"
 
 def prepare(module, options):
     device = options[":target"]

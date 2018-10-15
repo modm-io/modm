@@ -14,6 +14,11 @@
 def init(module):
     module.parent = "processing"
     module.name = "scheduler"
+    module.description = """\
+# Generic Scheduler
+
+Priority task scheduling
+"""
 
 def prepare(module, options):
     module.depends(

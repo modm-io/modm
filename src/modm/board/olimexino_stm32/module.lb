@@ -14,6 +14,12 @@
 def init(module):
     module.parent = "board"
     module.name = "olimexino-stm32"
+    module.description = """\
+# Olimexino STM32
+
+Modified Maple board with STM32F103RBT6:
+https://www.olimex.com/Products/Duino/STM32/OLIMEXINO-STM32/open-source-hardware
+"""
 
 def prepare(module, options):
     if options[":target"].partname != "stm32f103rbt":

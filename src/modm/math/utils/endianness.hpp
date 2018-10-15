@@ -20,8 +20,10 @@
 namespace modm
 {
 
+/// @ingroup modm_math_utils
+/// @{
+
 /// checks if current architecture is big endian
-/// @ingroup	math
 constexpr bool
 isBigEndian()
 {
@@ -29,7 +31,6 @@ isBigEndian()
 }
 
 /// checks if current architecture is little endian
-/// @ingroup	math
 constexpr bool
 isLittleEndian()
 {
@@ -37,8 +38,6 @@ isLittleEndian()
 }
 
 // MARK: - to host
-/// @{
-/// @ingroup	math
 inline uint16_t
 fromLittleEndian(uint16_t value)
 {
@@ -167,6 +166,7 @@ toBigEndian(int32_t value)
 {
 	return int32_t(toBigEndian(uint32_t(value)));
 }
+
 /// @}
 
 } // namespace modm

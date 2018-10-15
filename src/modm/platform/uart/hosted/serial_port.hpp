@@ -33,7 +33,7 @@ namespace modm
 		 *
 		 * Port is closed right after construction.
 		 *
-		 * \ingroup	linux
+		 * \ingroup	modm_platform_uart
 		 */
 		class SerialPort : IODevice
 		{

@@ -19,45 +19,7 @@
 namespace modm
 {
 	/**
-	 * FT245 USB FIFO
-	 *
-	 * The FT245R USB FIFO from Future Technology Devices International is a
-	 * single chip USB to parallel FIFO bidirectional data transfer interface.
-	 *
-	 * Wr and Rd must be GpioOutputs and set to output mode before.
-	 * Rxf and Txe must be GpioInputs.
-	 * Port is switched between input and output mode.
-	 *
-	 * \section ft245_example Example
-	 *
-	 * \code
-	 * #include <modm/architecture.hpp>
-	 * #include <modm/driver/usb/ft245.hpp>
-	 *
-	 * typedef modm::platform::GpioPort<modm::platform::GpioD0, 8> myPort;
-	 * typedef modm::platform::GpioInputC11  Rxf;
-	 * typedef modm::platform::GpioInputC10  Txe;
-	 * typedef modm::platform::GpioOutputA15 Rd;
-	 * typedef modm::platform::GpioOutputA9  Wr;
-	 *
-	 * typedef modm::Ft245<myPort, Rd, Wr, Rxf, Txe> myFt;
-	 *
-	 * int
-	 * main()
-	 * {
-	 *   Rd::setOutput(modm::Gpio::High);
-	 *   Wr::setOutput(modm::Gpio::Low);
-	 *
-	 *   while (1)
-	 *   {
-	 *     uint8_t c;
-	 *     if (myFt::read(c)) {
-	 *     myFt::write(c + 1);
-	 *   }
-	 * }
-	 * \endcode
-	 *
-	 * \ingroup	driver_other
+	 * \ingroup	modm_driver_ft245
 	 */
 	template < typename PORT,
 	           typename RD,

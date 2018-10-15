@@ -42,7 +42,7 @@ namespace modm
  *
  * Adapter between SPI flash and DataSource
  *
- * @ingroup driver_other
+ * @ingroup modm_driver_spartan_6
  */
 template <	typename Cclk,			///< Clock output to FPGA
 			typename DataLow,		///< Data  output to FPGA, 8 bit parallel port

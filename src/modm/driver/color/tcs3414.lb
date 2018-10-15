@@ -14,6 +14,7 @@
 def init(module):
     module.parent = "driver"
     module.name = "tcs3414"
+    module.description = "TCS3414 Digital Color Sensor"
 
 
 def prepare(module, options):

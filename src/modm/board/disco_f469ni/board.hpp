@@ -11,12 +11,6 @@
  */
 // ----------------------------------------------------------------------------
 
-//
-// STM32F469I-DISCO
-// Discovery kit for STM32F469 line
-// http://www.st.com/en/evaluation-tools/32f469idiscovery.html
-//
-
 #ifndef MODM_STM32_F469_DISCOVERY_HPP
 #define MODM_STM32_F469_DISCOVERY_HPP
 
@@ -25,10 +19,13 @@
 #include <modm/ui/display/graphic_display.hpp>
 #include <modm/driver/touch/ft6x06.hpp>
 #include <modm/debug/logger.hpp>
+
+/// @ingroup modm_board_disco_f469ni
 #define MODM_BOARD_HAS_LOGGER
 
 using namespace modm::platform;
 
+/// @ingroup modm_board_disco_f469ni
 namespace Board
 {
 

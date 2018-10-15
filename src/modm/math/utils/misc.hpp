@@ -24,12 +24,13 @@
 namespace modm
 {
 
+/// @addtogroup modm_math_utils
+/// @{
+
 /**
  * Fast check if a float variable is positive
  *
  * Checks only the sign bit for the AVR.
- *
- * @ingroup	math
  */
 inline bool
 isPositive(const float& a)
@@ -49,8 +50,6 @@ isPositive(const float& a)
  * @code
  * constexpr int value = modm::pow(10, 2);
  * @endcode
- *
- * @ingroup	math
  */
 constexpr uint32_t
 pow(uint32_t base, uint8_t exponent)
@@ -60,7 +59,7 @@ pow(uint32_t base, uint8_t exponent)
 
 /**
  * @brief This does what you think it does.
- * @ingroup sorting_algorithms
+ *
  * @param  a  A thing of arbitrary type.
  * @param  b  Another thing of arbitrary type.
  * @return   The lesser of the parameters.
@@ -81,7 +80,7 @@ min(const T& a, const T& b)
 
 /**
  * @brief This does what you think it does.
- * @ingroup sorting_algorithms
+ *
  * @param  a  A thing of arbitrary type.
  * @param  b  Another thing of arbitrary type.
  * @return   The greater of the parameters.
@@ -102,7 +101,7 @@ max(const T& a, const T& b)
 
 /**
  * @brief This does what you think it does.
- * @ingroup sorting_algorithms
+ *
  * @param  a  A thing of arbitrary type.
  * @param  b  Another thing of arbitrary type.
  * @param  c  Something else of arbitrary type.
@@ -122,7 +121,7 @@ max(const T a, const T b, const T c)
 
 /**
  * @brief This does what you think it does.
- * @ingroup sorting_algorithms
+ *
  * @param  a  A thing of arbitrary type.
  * @param  b  Another thing of arbitrary type.
  * @param  compare  A comparison functor.
@@ -143,7 +142,7 @@ min(const T& a, const T& b, Compare compare)
 
 /**
  * @brief This does what you think it does.
- * @ingroup sorting_algorithms
+ *
  * @param  a  A thing of arbitrary type.
  * @param  b  Another thing of arbitrary type.
  * @param  compare  A comparison functor.
@@ -161,6 +160,8 @@ max(const T& a, const T& b, Compare compare)
 	else
 		return a;
 }
+
+/// @}
 
 }	// namespace modm
 

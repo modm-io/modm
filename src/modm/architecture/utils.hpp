@@ -21,7 +21,7 @@
 #include "detect.hpp"
 
 #ifdef __DOXYGEN__
-	/// @ingroup	platform
+	/// @ingroup	modm_architecture
 	/// @{
 
 	/// Convert the argument into a C-String
@@ -33,15 +33,16 @@
 	/// Concatenate three arguments
 	#define	MODM_CONCAT3(a,b,c)		a ## b ## c
 
-	/// Concatenate three arguments
+	/// Concatenate four arguments
 	#define	MODM_CONCAT4(a,b,c,d)		a ## b ## c ## d
 
-	/// Concatenate three arguments
+	/// Concatenate five arguments
 	#define	MODM_CONCAT5(a,b,c,d,e)		a ## b ## c ## d ## e
 
 	/// Compute the size of a static (!) array.
 	#define MODM_ARRAY_SIZE(x)	(sizeof(x) / sizeof(x[0]))
 
+	/// @{
 	/**
 	 * Force inlining on functions if needed. Compiling with -Os  does not
 	 * always inline them when declared only `inline`
@@ -77,7 +78,7 @@
 	#define modm_unlikely(x) (x)
 
 	/// @}
-
+	/// @}
 #else // !__DOXYGEN__
 
 	#define	MODM_STRINGIFY(s)	MODM_STRINGIFYx(s)

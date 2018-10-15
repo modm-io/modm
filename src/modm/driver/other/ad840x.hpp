@@ -25,8 +25,8 @@ namespace modm
 		 * \brief	Definition of the AD8400/2/3 channels
 		 * 
 		 * \see		AD840x
-		 * \ingroup	driver_other
 		 * 
+		 * \ingroup	modm_driver_ad840x
 		 * \hideinitializer
 		 */
 		enum Channel
@@ -91,7 +91,7 @@ namespace modm
 	 * 
 	 * \see		ad840x
 	 * \author	Fabian Greif
-	 * \ingroup	driver_other
+	 * \ingroup	modm_driver_ad840x
 	 */
 	template< typename Spi,
 			  typename Cs,

@@ -13,6 +13,11 @@
 def init(module):
     module.parent = "ui"
     module.name = "animation"
+    module.description = """\
+# Animators
+
+Various classes for animating values.
+"""
 
 def prepare(module, options):
     module.depends(":architecture:clock", ":utils")

@@ -22,14 +22,14 @@
 namespace unittest
 {
 	/**
-	 * \brief	%Controller singleton
+	 * \brief	Controller singleton
 	 *
 	 * Used to forward information from the test suites to the reporters.
 	 * All macros form 'harness.hpp' use this class to determine the
 	 * active reporter.
 	 *
 	 * \author	Fabian Greif 
-	 * \ingroup	unittest
+	 * \ingroup	modm_unittest
 	 */
 	class Controller
 	{

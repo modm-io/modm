@@ -23,6 +23,7 @@
 
 namespace modm
 {
+	/// @ingroup modm_ui_menu
 	class CommunicatingView : public xpcc::Communicatable
 	{
 	public:

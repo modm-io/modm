@@ -64,6 +64,7 @@ Calibration
 	int8_t   H6; // e7
 };
 
+/// @ingroup modm_driver_bme280
 struct modm_packed
 DataBase
 {
@@ -125,6 +126,7 @@ protected:
 	};
 };
 
+/// @ingroup modm_driver_bme280
 class modm_packed
 Data : public DataBase
 {
@@ -198,6 +200,7 @@ private:
 };
 
 #ifndef __AVR__
+/// @ingroup modm_driver_bme280
 class modm_packed
 DataDouble : public DataBase
 {

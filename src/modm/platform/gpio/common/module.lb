@@ -13,6 +13,7 @@
 def init(module):
     module.name = "gpio.common"
     module.parent = "platform"
+    module.description = "GPIO Common"
 
 def prepare(module, options):
     if not options[":target"].has_driver("gpio"):

@@ -18,6 +18,7 @@
 
 namespace modm
 {
+	/// @ingroup modm_driver_scp1000
 	namespace scp1000
 	{
 		/// The addresses of the Direct Access Registers.
@@ -104,7 +105,7 @@ Ultra Low Power :   ~1Hz  |  15bit   |   14bit
 	 * datasheet</a>.
 	 *
 	 * \author	Niklas Hauser
-	 * \ingroup driver_pressure
+	 * \ingroup modm_driver_scp1000
 	 *
 	 * \tparam Spi	software or hardware Spi interface
 	 * \tparam Cs	Chip Select pin

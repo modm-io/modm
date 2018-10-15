@@ -14,6 +14,12 @@
 def init(module):
     module.parent = "processing"
     module.name = "rtos"
+    module.description = """\
+# RTOS Abstractions
+
+Basic building blocks of an RTOS abstracted as C++ classes and implemented
+either with FreeRTOS or stdlibc++.
+"""
 
 def prepare(module, options):
     if options[":target"].identifier["platform"] not in ["hosted", "stm32"]:

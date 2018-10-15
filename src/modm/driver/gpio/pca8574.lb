@@ -14,6 +14,7 @@
 def init(module):
     module.parent = "driver"
     module.name = "pca8574"
+    module.description = "PCA8574 8-Bit I/O Expander"
 
 def prepare(module, options):
     module.depends(

@@ -17,15 +17,10 @@
 
 #include <modm/architecture/interface/peripheral.hpp>
 
-/**
- * @ingroup		interface
- * @defgroup	spi		Serial Peripheral Interface (SPI)
- */
-
 namespace modm
 {
 
-/// @ingroup spi
+/// @ingroup modm_architecture_spi
 struct Spi
 {
 	/// The signature of the configuration function.

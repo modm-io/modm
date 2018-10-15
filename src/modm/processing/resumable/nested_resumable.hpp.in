@@ -21,7 +21,7 @@ namespace modm
 {
 
 /**
- * @ingroup	resumable
+ * @ingroup	modm_processing_resumable
  * @author	Niklas Hauser
  * @tparam	Levels	maximum number of nesting levels (should be <128):
  * 					max(number of resumable functions that are called within resumable functions) + 1
@@ -69,7 +69,6 @@ public:
 	}
 
 #ifdef __DOXYGEN__
-	/// @cond
 	/**
 	 * Run the resumable function.
 	 *
@@ -79,7 +78,6 @@ public:
 	 */
 	modm::ResumableResult< ReturnType >
 	resumable function(...);
-	/// @endcond
 #endif
 
 protected:

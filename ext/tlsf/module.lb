@@ -14,6 +14,7 @@ import math
 
 def init(module):
     module.name = "tlsf"
+    module.description = FileReader("README.md")
 
 def prepare(module, options):
     device = options[":target"]

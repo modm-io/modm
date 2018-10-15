@@ -23,6 +23,7 @@
 namespace modm
 {
 
+/// @ingroup modm_driver_ds1631
 struct ds1631
 {
 protected:
@@ -103,7 +104,7 @@ public:
  *
  * @see	ds1631
  *
- * @ingroup	driver_temperature
+ * @ingroup	modm_driver_ds1631
  * @author	Fabian Greif
  * @author	Niklas Hauser
  */

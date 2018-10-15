@@ -9,11 +9,6 @@
  */
 // ----------------------------------------------------------------------------
 
-/**
- * @ingroup 	{{partname}}
- * @defgroup	{{partname}}_core Core
- */
-
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>

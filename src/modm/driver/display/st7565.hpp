@@ -25,7 +25,7 @@ namespace modm
 	 * \brief	Driver for ST7565 based LC-displays
 	 *
 	 * \author	Fabian Greif
-	 * \ingroup	driver_display
+	 * \ingroup	modm_driver_ea_dog
 	 */
 	template <typename SPI, typename CS, typename A0, typename Reset,
 			  unsigned int Width, unsigned int Height, bool TopView>

@@ -28,6 +28,7 @@ namespace modm
 template < class I2cMaster >
 class Tmp102;
 
+/// @ingroup modm_driver_tmp102
 struct tmp102 : public lm75
 {
 protected:
@@ -105,22 +106,7 @@ public:
 };
 
 /**
- * TMP102 digital temperature sensor driver
- *
- * The TMP102 is a digital temperature sensor with an I2C interface
- * and measures temperature over a range of -40 to +125 deg Celsius with a
- * resolution of 1/16 (0.0625) deg C and an accuracy of up to 0.5 deg C.
- *
- * The sensor has a default refresh rate of 4Hz but can be set from
- * 0.25Hz up to 33Hz using `setUpdateRate(rate)`.
- * The sensor will then read itself when calling the `update()` method
- * frequently.
- *
- * However, you may manually start a conversion with `startConversion()`, wait
- * for 30ms and then `readTemperature()` to achieve other (less frequent)
- * update rates.
- *
- * @ingroup driver_temperature
+ * @ingroup modm_driver_tmp102
  * @author	Niklas Hauser
  */
 template < class I2cMaster >

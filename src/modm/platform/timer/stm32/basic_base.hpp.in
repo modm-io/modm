@@ -17,18 +17,13 @@
 #include "../device.hpp"
 #include <modm/architecture/interface/register.hpp>
 
-/**
- * @ingroup 	{{partname}}
- * @defgroup	{{partname}}_timer Timer
- */
-
 namespace modm
 {
 
 namespace platform
 {
 
-/// @ingroup	{{partname}}_timer
+/// @ingroup	modm_platform_timer
 class BasicTimer
 {
 public:

@@ -19,7 +19,6 @@
 namespace modm
 {
 	/**
-	 * \ingroup	math
 	 * \brief	Saturated arithmetics
 	 *  
 	 * \see http://www.mikrocontroller.net/articles/AVR_Arithmetik/Saturierung
@@ -29,6 +28,7 @@ namespace modm
 	 * \todo	extend implementation (multiplication etc.)
 	 * \todo	add 16-bit datetype assembler implementations for AVRs
 	 * \todo	documentation
+	 * \ingroup modm_math_saturated
 	 */
 	template<typename T>
 	class Saturated

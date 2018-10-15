@@ -29,7 +29,7 @@ namespace modm
 	{
 		/**
 		 * \internal
-		 * \ingroup	token
+		 * \ingroup	modm_communication_rpr
 		 */
 		uint16_t
 		crcUpdate(uint16_t crc, uint8_t data);
@@ -39,7 +39,7 @@ namespace modm
 		 *
 		 * \author	Fabian Greif
 		 * \author	Niklas Hauser
-		 * \ingroup	token
+		 * \ingroup	modm_communication_rpr
 		 */
 		template <typename Device, std::size_t N = maxPayloadLength>
 		class Interface

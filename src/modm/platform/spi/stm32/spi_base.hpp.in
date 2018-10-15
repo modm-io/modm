@@ -18,11 +18,6 @@
 #include "../device.hpp"
 #include <modm/architecture/interface/register.hpp>
 
-/**
- * @ingroup 	{{partname}}
- * @defgroup	{{partname}}_spi SPI
- */
-
 namespace modm
 {
 
@@ -35,8 +30,7 @@ namespace platform
  * Provides some common enum that do not depend on the specific SPI.
  *
  * @author Kevin Laeufer
- * @internal
- * @ingroup		{{partname}}_spi
+ * @ingroup	modm_platform_spi
  */
 class SpiBase
 {

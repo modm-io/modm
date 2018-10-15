@@ -12,12 +12,6 @@
  */
 // ----------------------------------------------------------------------------
 
-//
-// STM32L476DISCOVERY
-// Discovery kit for STM32L476
-// http://www.st.com/en/evaluation-tools/32l476gdiscovery.html
-//
-
 #ifndef MODM_STM32_L476_DISCOVERY_HPP
 #define MODM_STM32_L476_DISCOVERY_HPP
 
@@ -27,7 +21,7 @@
 
 using namespace modm::platform;
 
-
+/// @ingroup modm_board_disco_l476vg
 namespace Board
 {
 

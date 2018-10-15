@@ -10,16 +10,6 @@
  */
 // ----------------------------------------------------------------------------
 
-//
-// STM32F030F4P6 "Demo Board" Minimum System Development Board
-//
-// Cheap and bread-board-friendly board for STM32 F0 series.
-// Sold for less than 1.5 USD on well known Internet shops from China.
-//
-// http://www.hotmcu.com/stm32f030f4p6-minimum-systerm-boardcortexm0-p-208.html
-// http://www.haoyuelectronics.com/Attachment/STM32F030-Dev-Board/STM32F030F4P6.pdf
-//
-
 #ifndef MODM_STM32_F030F4P6_DEMO_BOARD_HPP
 #define MODM_STM32_F030F4P6_DEMO_BOARD_HPP
 
@@ -29,6 +19,7 @@
 using namespace modm::platform;
 
 
+/// @ingroup modm_board_stm32f030_demo
 namespace Board
 {
 

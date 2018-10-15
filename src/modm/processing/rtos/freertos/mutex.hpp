@@ -32,7 +32,7 @@ namespace modm
 		 * synchronisation (between threads or between threads and an interrupt),
 		 * and mutexes the better choice for implementing simple mutual exclusion.
 		 * 
-		 * \ingroup	freertos
+		 * \ingroup	modm_processing_rtos
 		 */
 		class Mutex
 		{
@@ -62,6 +62,8 @@ namespace modm
 		 * Implements a RAII-style locking.
 		 * 
 		 * Locks the Mutex when created and unlocks it on destruction.
+		 *
+		 * \ingroup modm_processing_rtos
 		 */
 		class MutexGuard
 		{

@@ -20,7 +20,7 @@
 
 namespace modm
 {
-	/// @ingroup	graphics
+	/// @ingroup modm_ui_display
 	class VirtualGraphicDisplay:
 			public modm::GraphicDisplay
 	{

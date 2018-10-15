@@ -21,6 +21,7 @@
 namespace modm
 {
 
+/// @ingroup modm_driver_pca8574
 struct pca8574
 {
 public:
@@ -45,7 +46,7 @@ public:
  *
  * This IO-Expander only has open-drain outputs with weak internal pull-ups.
  *
- * @ingroup driver_gpio
+ * @ingroup modm_driver_pca8574
  *
  * @author  Sascha Schade
  * @author  Niklas Hauser

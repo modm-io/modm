@@ -12,22 +12,19 @@
  */
 // ----------------------------------------------------------------------------
 
-//
-// STM32F769I-DISCOVERY (MB1225B)
-// Discovery kit for STM32F769 line
-// http://www.st.com/en/evaluation-tools/32f769idiscovery.html
-//
-
 #ifndef MODM_STM32_F769I_DISCOVERY_HPP
 #define MODM_STM32_F769I_DISCOVERY_HPP
 
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
 #include <modm/debug/logger.hpp>
+
+/// @ingroup modm_board_disco_f769ni
 #define MODM_BOARD_HAS_LOGGER
 
 using namespace modm::platform;
 
+/// @ingroup modm_board_disco_f769ni
 namespace Board
 {
 

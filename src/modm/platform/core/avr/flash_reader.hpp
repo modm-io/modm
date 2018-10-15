@@ -13,6 +13,8 @@
 #ifndef	MODM_PLATFORM_FLASH_READER_HPP
 #define	MODM_PLATFORM_FLASH_READER_HPP
 
+// Already documented in :architecture:accessor
+/// @cond
 #include <cstddef>
 #include <avr/pgmspace.h>
 
@@ -95,5 +97,7 @@ struct FlashReader<T, 4>
 };
 
 }	// namespace modm
+
+/// @endcond
 
 #endif	// MODM_PLATFORM_FLASH_READER_HPP

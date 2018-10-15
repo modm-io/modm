@@ -31,7 +31,7 @@ namespace modm
 	 *
 	 * GE12 not implemented yet
 	 *
-	 * \ingroup	driver_display
+	 * \ingroup	modm_driver_nokia6610
 	 */
 	template <typename SPI, typename CS, typename Reset, bool GE12>
 	class Nokia6610 : public BufferedGraphicDisplay<130, 128>

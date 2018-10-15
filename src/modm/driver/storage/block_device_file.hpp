@@ -28,7 +28,7 @@ namespace modm
  *
  * Persistant and useful for testing and hosted code
  *
- * \ingroup	driver_storage
+ * \ingroup	modm_driver_block_device_file
  * \author	Raphael Lehmann
  */
 template <class Filename, size_t DeviceSize_>

@@ -23,7 +23,7 @@
  * Provides some defines and functions which are missing in a default
  * windows environment.
  *
- * \ingroup	windows
+ * \ingroup	modm_platform_core
  */
 #include <ciso646>
 #include <stdarg.h>

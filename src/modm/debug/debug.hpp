@@ -12,10 +12,6 @@
  */
 // ----------------------------------------------------------------------------
 
-/**
- * \defgroup	debug	Debugging utilities
- * \brief		Logging etc.
- */
 #ifndef MODM_DEBUG_HPP
 #define MODM_DEBUG_HPP
 

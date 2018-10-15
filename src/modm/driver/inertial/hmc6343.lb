@@ -14,6 +14,16 @@
 def init(module):
     module.parent = "driver"
     module.name = "hmc6343"
+    module.description = """\
+# HMC6343 3-Axis Compass
+
+The Honeywell HMC6343 is a fully integrated compass module that
+includes firmware for heading computation and calibration for
+magnetic distortions. The module combines 3-axis magneto-resistive
+sensors and 3-axis MEMS accelerometers, analog and digital
+support circuits, microprocessor and algorithms required for
+heading computation.
+"""
 
 def prepare(module, options):
     module.depends(

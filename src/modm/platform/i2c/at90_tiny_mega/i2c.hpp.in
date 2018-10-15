@@ -15,18 +15,13 @@
 
 #include <avr/io.h>
 
-/**
- * @ingroup 	{{partname}}
- * @defgroup	{{partname}}_i2c I2C
- */
-
 namespace modm
 {
 
 namespace platform
 {
 
-/// @ingroup	{{partname}}_i2c
+/// @ingroup	modm_platform_i2c
 struct I2c
 {
 	enum class

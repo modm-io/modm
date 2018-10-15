@@ -27,29 +27,6 @@ namespace modm
 	namespace interpolation
 	{
 		/**
-		 * \brief	Lagrange Interpolation
-		 * 
-		 * Example:
-		 * \code
-		 * typedef modm::Pair<float, float> Point;
-		 * 
-		 * // interpolate x^2 over the range of 1 <= x <= 3
-		 * Point points[3] =
-		 * {
-		 *     { 1, 1 },
-		 *     { 2, 4 },
-		 *     { 3, 9 }
-		 * };
-		 * 
-		 * modm::interpolation::Lagrange<Point> value(points, 3);
-		 * 
-		 * ...
-		 * float output = value.interpolate(1.5f);
-		 * // output => 2.25;
-		 * \endcode
-		 * 
-		 * \see http://en.wikipedia.org/wiki/Lagrange_interpolation
-		 * 
 		 * \warning	Only floating points types are allowed as second type of
 		 * 			modm::Pair, otherwise the calculation will deliver wrong
 		 * 			results!
@@ -61,7 +38,7 @@ namespace modm
 		 * 						accessor class.
 		 * 						Default is modm::accessor::Ram.
 		 * 
-		 * \ingroup	interpolation
+		 * \ingroup	modm_math_interpolation
 		 */
 		template <typename T,
 				  template <typename> class Accessor = ::modm::accessor::Ram>

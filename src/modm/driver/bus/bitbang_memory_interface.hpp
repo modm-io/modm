@@ -30,7 +30,7 @@ namespace modm
 	 * \tparam	WR		Write strobe GPIO pin
 	 *
 	 * \author	strongly typed
-	 * \ingroup	driver_bus
+	 * \ingroup	modm_driver_memory_bus
 	 */
 	template < typename PORT,
 				typename CS,

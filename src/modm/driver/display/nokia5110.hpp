@@ -25,7 +25,7 @@ namespace modm
  * Cheap, monochrome graphical display with SPI interface.
  * Maximum SPI frequency is 4 MHz.
  *
- * \ingroup driver_display
+ * \ingroup modm_driver_nokia5110
  */
 template < typename Spi, typename Ce, typename Dc, typename Reset >
 class Nokia5110 : public BufferedGraphicDisplay< 84, 48 >

@@ -34,7 +34,7 @@ namespace platform
  * @tparam	Mosi		master out slave in pin [output]
  * @tparam	Miso		master in slave out pin [input]
  *
- * @ingroup	spi
+ * @ingroup	modm_platform_spi_bitbang
  * @author	Niklas Hauser
  * @see		gpio
  */

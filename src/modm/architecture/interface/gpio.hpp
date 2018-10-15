@@ -19,6 +19,7 @@
 namespace modm
 {
 
+/// @ingroup modm_architecture_gpio
 struct Gpio
 {
 	/**
@@ -46,6 +47,7 @@ struct Gpio
  *
  * The pin is not automatically set as an input after startup,
  * so remember to call `setInput()` after startup!
+ * @ingroup modm_architecture_gpio
  */
 class GpioInput : public Gpio
 {
@@ -69,6 +71,7 @@ public:
  *
  * The pin is not automatically set as an output after startup,
  * so remember to call `setOutput()` after startup!
+ * @ingroup modm_architecture_gpio
  */
 class GpioOutput : public Gpio
 {
@@ -110,6 +113,7 @@ public:
 
 /**
  * Input/Output interface of an I/O pin.
+ * @ingroup modm_architecture_gpio
  */
 class GpioIO : public GpioOutput, public GpioInput
 {
@@ -132,6 +136,7 @@ public:
  * mapping of the IOs.
  * For example, when a high octet `0xf400` is physically configured, the
  * data will still be written and read as a low octet `0x00f4`.
+ * @ingroup modm_architecture_gpio
  */
 class GpioPort
 {

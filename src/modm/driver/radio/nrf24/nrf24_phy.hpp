@@ -33,7 +33,7 @@ namespace modm
 /**
  * Hardware abstraction layer for nRF24L01+
  *
- * @ingroup  nrf24
+ * @ingroup  modm_driver_nrf24
  * @author   Daniel Krebs
  */
 template <typename Spi, typename Csn, typename Ce>

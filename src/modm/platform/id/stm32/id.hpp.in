@@ -26,6 +26,7 @@ namespace platform
  *
  * @param offset	0..2
  * @return	32-bit of the unique id
+ * @ingroup modm_platform_id
  */
 static inline uint32_t
 getUniqueId(uint8_t offset)

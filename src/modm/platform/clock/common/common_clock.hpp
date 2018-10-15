@@ -23,6 +23,7 @@ namespace clock
 
 /**
  * Errors that might prevent using a certain clock configuration
+ * @ingroup modm_platform_clock
  */
 enum class
 StartupError : uint8_t
@@ -41,10 +42,12 @@ StartupError : uint8_t
 	WatchdogClock
 };
 
+/// @cond
 extern uint32_t modm_fastdata fcpu;
 extern uint32_t modm_fastdata fcpu_kHz;
 extern uint16_t modm_fastdata fcpu_MHz;
 extern uint16_t modm_fastdata ns_per_loop;
+/// @endcond
 
 }	// namespace clock
 

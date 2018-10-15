@@ -14,6 +14,7 @@
 def init(module):
     module.name = "fsmc"
     module.parent = "platform"
+    module.description = "Flexible (Static) Memory Controller (FSMC/FMC)"
 
 def prepare(module, options):
     device = options[":target"]

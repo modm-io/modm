@@ -11,23 +11,18 @@
  */
 // ----------------------------------------------------------------------------
 
-//
-// NUCLEO-F411RE
-// Nucleo kit for STM32F411RE
-// http://www.st.com/en/evaluation-tools/nucleo-f411re.html
-//
-
 #ifndef MODM_STM32_NUCLEO_F411RE_HPP
 #define MODM_STM32_NUCLEO_F411RE_HPP
 
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
 #include <modm/debug/logger.hpp>
+/// @ingroup modm_board_nucleo_f411re
 #define MODM_BOARD_HAS_LOGGER
 
 using namespace modm::platform;
 
-
+/// @ingroup modm_board_nucleo_f411re
 namespace Board
 {
 

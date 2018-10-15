@@ -17,8 +17,8 @@
 #ifndef	MODM_PLATFORM_DELAY_HPP
 #define	MODM_PLATFORM_DELAY_HPP
 
+/// @cond
 #include <stdint.h>
-
 #include <modm/architecture/utils.hpp>
 
 %% if target["family"] in ["darwin", "linux"]
@@ -92,4 +92,5 @@ delayMilliseconds(int)
 
 }	// namespace modm
 
+/// @endcond
 #endif	// MODM_PLATFORM_DELAY_HPP

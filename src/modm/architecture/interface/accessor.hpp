@@ -20,19 +20,12 @@
 namespace modm
 {
 
-/**
- * @defgroup	accessor	Accessor classes
- * @ingroup		interface
- *
- * @author	Fabian Greif
- */
 namespace accessor
 {
 
 /**
  * Add volatile modifier to T
- *
- * @ingroup	accessor
+ * @ingroup modm_architecture_accessor
  */
 template<typename T>
 modm_always_inline volatile T&
