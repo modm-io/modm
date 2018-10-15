@@ -17,7 +17,6 @@
 #include <cstring>
 
 #include "../style.hpp"
-#include <modm/utils/template_metaprogramming.hpp>
 
 namespace modm
 {

@@ -17,6 +17,5 @@
 #include "utils/algorithm.hpp"
 #include "utils/allocator.hpp"
 #include "utils/arithmetic_traits.hpp"
-#include "utils/template_metaprogramming.hpp"
 #include "utils/dummy.hpp"
 #include "utils/bit_constants.hpp"

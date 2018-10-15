@@ -3,6 +3,7 @@
  * Copyright (c) 2010, Martin Rosekeit
  * Copyright (c) 2012, 2016-2017, Niklas Hauser
  * Copyright (c) 2016, Sascha Schade
+ * Copyright (c) 2018, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -16,10 +17,10 @@
 #define	MODM_ATOMIC_QUEUE_HPP
 
 #include <cstddef>
-#include <stdint.h>
+#include <cstdint>
+#include <type_traits>
 #include <modm/architecture/utils.hpp>
 #include <modm/architecture/interface/accessor.hpp>
-#include <modm/utils/template_metaprogramming.hpp>
 
 namespace modm
 {
@@ -29,7 +30,7 @@ namespace modm
 		 * \ingroup	modm_architecture_atomic
 		 * \brief	Interrupt save queue
 		 *
-		 * A maximum size of 254 is allowed for 8-bit mikrocontrollers.
+		 * A maximum size of 254 is allowed for 8-bit microcontrollers.
 		 *
 		 * \todo	This implementation should work but could be improved
 		 */
@@ -39,11 +40,9 @@ namespace modm
 		{
 		public:
 			// select the type of the index variables with some template magic :-)
-			typedef typename modm::tmp::Select< (N >= 254),
-												uint16_t,
-												uint8_t >::Result Index;
+			using Index = std::conditional_t< (N >= 254), uint16_t, uint8_t >;
 
-			typedef Index Size;
+			using Size = Index;
 
 		public:
 			Queue();

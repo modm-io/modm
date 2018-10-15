@@ -3,6 +3,7 @@
  * Copyright (c) 2009-2010, Fabian Greif
  * Copyright (c) 2012, Niklas Hauser
  * Copyright (c) 2015, Thorsten Lajewski
+ * Copyright (c) 2018, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -23,10 +24,11 @@ namespace modm
 		class MovingAverage<double, N >
 		{
 		private:
-			typedef typename ::modm::tmp::Select<
+			using Index = std::conditional_t<
 				(N >= 256),
 				uint_fast16_t,
-				uint_fast8_t >::Result Index;
+				uint_fast8_t
+			>;
 
 		public:
 

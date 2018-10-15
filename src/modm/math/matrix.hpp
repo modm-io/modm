@@ -19,7 +19,6 @@
 #include <stdint.h>
 
 #include <modm/io/iostream.hpp>
-#include <modm/utils/template_metaprogramming.hpp>
 
 namespace modm
 {

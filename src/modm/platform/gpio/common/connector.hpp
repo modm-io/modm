@@ -28,7 +28,7 @@ struct GpioConnector
 	template< class GpioQuery >
 	static constexpr bool Contains = detail::GpioContains<peripheral, GpioQuery, Signals...>::value;
 	template< class GpioQuery >
-	static constexpr bool IsValid = not tmp::SameType<typename GpioQuery::Type, GpioUnused>::value;
+	static constexpr bool IsValid = not std::is_same_v<typename GpioQuery::Type, GpioUnused>;
 	template< Gpio::Signal signal >
 	using GetSignal = typename detail::GpioGetSignal<peripheral, signal, Signals...>::Gpio;
 

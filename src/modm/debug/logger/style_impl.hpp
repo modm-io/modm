@@ -2,6 +2,7 @@
  * Copyright (c) 2009, Martin Rosekeit
  * Copyright (c) 2009-2011, Fabian Greif
  * Copyright (c) 2012, 2014, Niklas Hauser
+ * Copyright (c) 2018, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -14,6 +15,8 @@
 #ifndef MODM_LOG_STYLE_HPP
 	#error "Don't include this file directly, use 'style.hpp' instead!"
 #endif
+
+#include <type_traits>
 
 // -----------------------------------------------------------------------------
 
@@ -53,7 +56,7 @@ template < typename STYLE >
 void
 modm::log::Style<STYLE>::write( char c )
 {
-	if ( tmp::SameType<STYLE, DefaultStyle >::value ) {
+	if ( std::is_same_v<STYLE, DefaultStyle > ) {
 		this->device->write( c );
 	}
 	else {
@@ -67,7 +70,7 @@ template < typename STYLE >
 void
 modm::log::Style<STYLE>::write( const char* s )
 {
-	if ( tmp::SameType<STYLE, DefaultStyle>::value ) {
+	if ( std::is_same_v<STYLE, DefaultStyle> ) {
 		this->device->write( s );
 	}
 	else {
@@ -81,7 +84,7 @@ template < typename STYLE >
 void
 modm::log::Style<STYLE>::flush()
 {
-	if ( tmp::SameType<STYLE, DefaultStyle >::value ) {
+	if ( std::is_same_v<STYLE, DefaultStyle > ) {
 		this->device->flush();
 	}
 	else {

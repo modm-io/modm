@@ -14,7 +14,7 @@
 
 #include "base.hpp"
 #include "set.hpp"
-#include <modm/utils/template_metaprogramming.hpp>
+#include <type_traits>
 #include <modm/math/utils/bit_operation.hpp>
 
 namespace modm
@@ -41,9 +41,9 @@ class GpioPort : public ::modm::GpioPort/** @cond */, public GpioSetShim<StartGp
 public:
 	using PinSet::width;
 	static_assert(width <= 16, "Only a maximum of 16 pins are supported by GpioPort!");
-	using PortType = typename modm::tmp::Select< (width > 8),
-												 uint16_t,
-												 uint8_t >::Result;
+	using PortType = std::conditional_t< (width > 8),
+										 uint16_t,
+										 uint8_t >;
 	static constexpr DataOrder getDataOrder()
 	{ return Width > 0 ? GpioPort::DataOrder::Normal : GpioPort::DataOrder::Reversed; }
 

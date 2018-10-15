@@ -13,7 +13,7 @@
 #define MODM_AVR_GPIO_SOFTWARE_PORT_HPP
 
 #include "set.hpp"
-#include <modm/utils/template_metaprogramming.hpp>
+#include <type_traits>
 
 namespace modm
 {
@@ -43,9 +43,9 @@ class SoftwareGpioPort : public ::modm::GpioPort, public GpioSet<Gpios...>
 public:
 	using Set::width;
 	static_assert(width <= 16, "Only a maximum of 16 pins are supported by this Port!");
-	using PortType = typename modm::tmp::Select< (width > 8),
-												 uint16_t,
-												 uint8_t >::Result;
+	using PortType = std::conditional_t< (width > 8),
+										 uint16_t,
+										 uint8_t >;
 
 protected:
 	static constexpr int8_t shift_masks[{{ ports | length }}][width] = {

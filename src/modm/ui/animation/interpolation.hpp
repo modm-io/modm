@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Niklas Hauser
+ * Copyright (c) 2018, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -12,9 +13,9 @@
 #ifndef MODM_UI_LINEAR_INTERPOLATION_HPP
 #define MODM_UI_LINEAR_INTERPOLATION_HPP
 
-#include <stdint.h>
+#include <cstdint>
 #include <modm/utils/arithmetic_traits.hpp>
-#include <modm/utils/template_metaprogramming.hpp>
+#include <type_traits>
 
 namespace modm
 {
@@ -47,14 +48,14 @@ template< typename T = uint8_t >
 class FastRamp
 {
 private:
-	typedef typename modm::ArithmeticTraits<T>::UnsignedType UnsignedType;
+	using UnsignedType = typename modm::ArithmeticTraits<T>::UnsignedType;
 public:
 	/// for 8bit value types, the steps are limited to 2^15 anyway,
 	/// so we do not need uint32_t for the steps, but we can use uint16_t
-	typedef typename modm::tmp::Select<
-			modm::tmp::SameType<UnsignedType, uint8_t>::value,
+	using StepType = std::conditional_t<
+			(modm::ArithmeticTraits<UnsignedType>::max <= 255),
 			uint16_t,
-			uint32_t >::Result StepType;
+			uint32_t >;
 private:
 	/// the default implementation uses floating-point arithmetic
 	template< typename Type, typename Unsigned >

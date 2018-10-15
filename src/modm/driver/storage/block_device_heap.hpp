@@ -14,7 +14,7 @@
 #define MODM_BLOCK_DEVICE_HEAP_HPP
 
 #include <modm/architecture/interface/block_device.hpp>
-#include <modm/utils/template_metaprogramming.hpp>
+#include <type_traits>
 #include <modm/processing/resumable.hpp>
 
 namespace modm
@@ -104,7 +104,7 @@ public:
 	setMemoryAddress(uint8_t* memory);
 
 private:
-	typename modm::tmp::Select<externalMemory, uint8_t*, uint8_t[DeviceSize]>::Result data;
+	std::conditional_t<externalMemory, uint8_t*, uint8_t[DeviceSize]> data;
 };
 
 }

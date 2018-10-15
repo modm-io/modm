@@ -16,7 +16,6 @@
 #include <stdint.h>
 
 #include <modm/architecture/utils.hpp>
-#include <modm/utils/template_metaprogramming.hpp>
 #include <modm/container/queue.hpp>
 #include <modm/processing/timer.hpp>
 #include <modm/utils/allocator/dynamic.hpp>

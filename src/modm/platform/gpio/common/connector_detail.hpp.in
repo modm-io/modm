@@ -13,7 +13,7 @@
 #define MODM_PLATFORM_GPIO_CONNECTOR_DETAIL_HPP
 
 #include "unused.hpp"
-#include <modm/utils/template_metaprogramming.hpp>
+#include <type_traits>
 
 namespace modm
 {
@@ -32,7 +32,7 @@ struct GpioContains<peripheral, GpioQ, SignalT, Signals...>
 {
 	using SGpio = typename SignalT<peripheral>::Gpio;
 	static constexpr bool value = (
-				tmp::SameType<typename SGpio::Type, typename GpioQ::Type>::value ?
+				std::is_same_v<typename SGpio::Type, typename GpioQ::Type> ?
 				true :
 				GpioContains<peripheral, GpioQ, Signals...>::value
 			);
@@ -48,11 +48,11 @@ struct GpioGetSignal;
 template< Peripheral peripheral, Gpio::Signal signal, template<Peripheral _> class SignalT, template<Peripheral _> class... Signals >
 struct GpioGetSignal<peripheral, signal, SignalT, Signals...>
 {
-	using Gpio = typename tmp::Select<
+	using Gpio = std::conditional_t<
 				(SignalT<peripheral>::Signal == signal),
 				typename SignalT<peripheral>::Gpio,
 				typename GpioGetSignal<peripheral, signal, Signals...>::Gpio
-			>::Result;
+			>;
 };
 template< Peripheral peripheral, Gpio::Signal signal >
 struct GpioGetSignal<peripheral, signal>

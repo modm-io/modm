@@ -6,6 +6,7 @@
  * Copyright (c) 2012, Sascha Schade
  * Copyright (c) 2015, Thorsten Lajewski
  * Copyright (c) 2017, Daniel Krebs
+ * Copyright (c) 2018, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -19,8 +20,8 @@
 #define MODM_MOVING_AVERAGE_HPP
 
 #include <cstddef>
-#include <stdint.h>
-#include <modm/utils/template_metaprogramming.hpp>
+#include <cstdint>
+#include <type_traits>
 
 namespace modm
 {
@@ -57,10 +58,11 @@ namespace modm
 		class MovingAverage
 		{
 		private:
-			typedef typename ::modm::tmp::Select<
+			using Index = std::conditional_t<
 				(N >= 256),
 				uint_fast16_t,
-				uint_fast8_t >::Result Index;
+				uint_fast8_t
+			>;
 
 		public:
 			MovingAverage(const T& initialValue = 0);

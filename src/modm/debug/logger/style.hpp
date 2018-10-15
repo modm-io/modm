@@ -15,7 +15,6 @@
 #define MODM_LOG_STYLE_HPP
 
 #include <modm/io/iodevice.hpp>
-#include <modm/utils/template_metaprogramming.hpp>
 
 namespace modm
 {

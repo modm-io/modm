@@ -3,6 +3,7 @@
  * Copyright (c) 2009-2012, Fabian Greif
  * Copyright (c) 2012-2013, 2016, Niklas Hauser
  * Copyright (c) 2013, Sascha Schade
+ * Copyright (c) 2018, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -16,10 +17,10 @@
 #define	MODM_SAB2_INTERFACE_HPP
 
 #include <cstddef>
-#include <stdint.h>
+#include <cstdint>
 
 #include <modm/architecture/utils.hpp>
-#include <modm/utils/template_metaprogramming.hpp>
+#include <type_traits>
 
 #include "constants.hpp"
 
@@ -48,11 +49,9 @@ namespace modm
 		{
 		public:
 			// select the type of the index variables with some template magic :-)
-			typedef typename modm::tmp::Select< (N >= 255),
-												uint16_t,
-												uint8_t >::Result Index;
+			using Index = std::conditional_t< (N >= 255), uint16_t, uint8_t >;
 
-			typedef Index Size;
+			using Size = Index;
 
 		public:
 			/**

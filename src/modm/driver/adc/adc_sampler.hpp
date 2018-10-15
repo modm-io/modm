@@ -13,9 +13,8 @@
 #define MODM_ADC_SAMPLER_HPP
 
 #include <modm/architecture/interface/adc_interrupt.hpp>
-#include <modm/utils/template_metaprogramming.hpp>
 #include <modm/math/utils/misc.hpp>
-
+#include <type_traits>
 
 namespace modm
 {
@@ -40,26 +39,26 @@ public:
 	static_assert(Channels > 0, "There must be at least one Channel to be sampled!");
 	static_assert(Oversamples > 0, "Must sample each channel at least once (Oversamples must be > 0)!");
 
-	typedef typename AdcInterrupt::Channel Channel;
+	using Channel = typename AdcInterrupt::Channel;
 
 	static constexpr uint32_t totalSamples = Oversamples * Channels;
 
-	typedef typename modm::tmp::Select<
+	using SampleType = std::conditional_t<
 			totalSamples < modm::pow(2, 16),
-			typename modm::tmp::Select<
+			std::conditional_t<
 					totalSamples < 256,
 					uint8_t,
-					uint16_t >::Result,
-			uint32_t >::Result SampleType;
+					uint16_t >,
+			uint32_t >;
 
 public:
-	typedef typename modm::tmp::Select<
+	using DataType = std::conditional_t<
 			(modm::pow(2, AdcInterrupt::Resolution) * Oversamples) < modm::pow(2, 16),
-			typename modm::tmp::Select<
+			std::conditional_t<
 					(modm::pow(2, AdcInterrupt::Resolution) * Oversamples) < 256,
 					uint8_t,
-					uint16_t >::Result,
-			uint32_t >::Result DataType;
+					uint16_t >,
+			uint32_t >;
 #endif
 
 public:

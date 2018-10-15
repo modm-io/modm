@@ -16,9 +16,8 @@
 #define	MODM_DEQUE_HPP
 
 #include <cstddef>
-
-#include <stdint.h>
-#include <modm/utils/template_metaprogramming.hpp>
+#include <cstdint>
+#include <type_traits>
 
 namespace modm
 {
@@ -57,11 +56,11 @@ namespace modm
 	{
 	public:
 		// select the type of the index variables with some template magic :-)
-		typedef typename modm::tmp::Select< (N >= 255),
-											uint_fast16_t,
-											uint_fast8_t >::Result Index;
+		using Index = std::conditional_t< (N >= 255),
+										  uint_fast16_t,
+										  uint_fast8_t >;
 
-		typedef Index Size;
+		using Size = Index;
 
 	public:
 		BoundedDeque();

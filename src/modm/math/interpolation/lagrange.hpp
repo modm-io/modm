@@ -20,8 +20,6 @@
 #include <modm/container/pair.hpp>
 #include <modm/architecture/interface/accessor.hpp>
 
-#include <modm/utils/template_metaprogramming.hpp>
-
 namespace modm
 {
 	namespace interpolation

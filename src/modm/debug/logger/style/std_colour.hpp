@@ -15,7 +15,6 @@
 #define MODM_LOG_STD_COLOUR_HPP
 
 #include "../style.hpp"
-#include <modm/utils/template_metaprogramming.hpp>
 
 namespace modm
 {

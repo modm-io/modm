@@ -14,7 +14,6 @@
 
 #include "base.hpp"
 #include "set.hpp"
-#include <modm/utils/template_metaprogramming.hpp>
 #include <modm/math/utils/bit_operation.hpp>
 
 namespace modm

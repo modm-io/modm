@@ -14,6 +14,7 @@
 
 #include "base.hpp"
 #include "connector.hpp"
+#include <type_traits>
 
 namespace modm
 {
@@ -42,7 +43,7 @@ struct GpioConnector<Peripheral::{{ per }}, Signals...>
 	template< class GpioQuery >
 	static constexpr bool Contains = detail::GpioContains<Peripheral::{{ per }}, GpioQuery, Signals...>::value;
 	template< class GpioQuery >
-	static constexpr bool IsValid = not tmp::SameType<typename GpioQuery::Type, GpioUnused>::value;
+	static constexpr bool IsValid = not std::is_same_v<typename GpioQuery::Type, GpioUnused>;
 	template< Gpio::Signal signal >
 	using GetSignal = typename detail::GpioGetSignal<Peripheral::{{ per }}, signal, Signals...>::Gpio;
 

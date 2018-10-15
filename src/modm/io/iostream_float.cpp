@@ -20,7 +20,6 @@
 #include <cmath>
 
 #include <modm/utils/arithmetic_traits.hpp>
-#include <modm/utils/template_metaprogramming.hpp>
 
 #include "iostream.hpp"
 

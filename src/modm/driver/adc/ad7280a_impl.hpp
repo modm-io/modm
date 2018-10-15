@@ -55,7 +55,6 @@
 #endif
 
 #include <modm/math/utils/bit_operation.hpp>
-#include <modm/utils/template_metaprogramming.hpp>
 
 /*// TODO DEBUG!
 #include <modm/debug/logger.hpp>
