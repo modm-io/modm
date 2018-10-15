@@ -45,7 +45,7 @@ jobs:
             python2 tools/xpcc_generator/builder/system_layout.py examples/xpcc/xml/communication.xml -o /tmp
             python3 tools/xpcc_generator/builder/system_layout.py examples/xpcc/xml/communication.xml -o /tmp
 
-  stm32f0-f1-examples:
+  stm32-examples:
     docker:
       - image: modm/modm-build:latest
     environment:
@@ -63,17 +63,6 @@ jobs:
           name: Examples STM32F1 Series
           command: |
             (cd examples && ../tools/scripts/examples_compile.py stm32f1_discovery nucleo_f103rb olimexino_stm32 stm32f103c8t6_blue_pill stm32f103c8t6_black_pill)
-
-  stm32f3-l4-f7-examples:
-    docker:
-      - image: modm/modm-build:latest
-    environment:
-      - LANG: "en_US.UTF-8"
-      - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j4"
-    steps:
-      - checkout
-      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
       - run:
           name: Examples STM32F3 Series
           command: |
@@ -118,7 +107,7 @@ jobs:
           command: |
             (cd examples && ../tools/scripts/examples_compile.py avr arduino_uno)
 
-  generic-examples:
+  linux-generic-examples:
     docker:
       - image: modm/modm-build:latest
     environment:
@@ -128,25 +117,14 @@ jobs:
     steps:
       - checkout
       - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+      - run:
+          name: Linux Examples
+          command: |
+            (cd examples && ../tools/scripts/examples_compile.py linux zmq)
       - run:
           name: Generic Examples
           command: |
             (cd examples && ../tools/scripts/examples_compile.py generic)
-
-  linux-examples:
-    docker:
-      - image: modm/modm-build:latest
-    environment:
-      - LANG: "en_US.UTF-8"
-      - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j4"
-    steps:
-      - checkout
-      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
-      - run:
-          name: Examples Linux
-          command: |
-            (cd examples && ../tools/scripts/examples_compile.py linux zmq)
 
   avr-compile-all:
     docker:
@@ -297,12 +275,10 @@ workflows:
   build:
     jobs:
       - stm32f4-examples
-      - linux-examples
+      - linux-generic-examples
       - unittests
-      - stm32f3-l4-f7-examples
       - avr-examples
-      - stm32f0-f1-examples
-      - generic-examples
+      - stm32-examples
 
       - avr-compile-all:
           requires:
@@ -311,18 +287,18 @@ workflows:
       - stm32f0-compile-all:
           requires:
             - unittests
-            - stm32f0-f1-examples
+            - stm32-examples
       - stm32f1-compile-all:
           requires:
             - unittests
-            - stm32f0-f1-examples
+            - stm32-examples
       - stm32f2-compile-all:
           requires:
             - unittests
       - stm32f3-compile-all:
           requires:
             - unittests
-            - stm32f3-l4-f7-examples
+            - stm32-examples
       - stm32f4-compile-all:
           requires:
             - unittests
@@ -330,8 +306,8 @@ workflows:
       - stm32f7-compile-all:
           requires:
             - unittests
-            - stm32f3-l4-f7-examples
+            - stm32-examples
       - stm32l4-compile-all:
           requires:
             - unittests
-            - stm32f3-l4-f7-examples
+            - stm32-examples
