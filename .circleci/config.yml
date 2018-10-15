@@ -6,7 +6,7 @@ jobs:
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j3"
+      - SCONSFLAGS: "-j4"
     steps:
       - checkout
       - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
@@ -51,7 +51,7 @@ jobs:
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j3"
+      - SCONSFLAGS: "-j4"
     steps:
       - checkout
       - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
@@ -70,7 +70,7 @@ jobs:
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j3"
+      - SCONSFLAGS: "-j4"
     steps:
       - checkout
       - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
@@ -93,7 +93,7 @@ jobs:
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j3"
+      - SCONSFLAGS: "-j4"
     steps:
       - checkout
       - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
@@ -109,7 +109,7 @@ jobs:
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j3"
+      - SCONSFLAGS: "-j4"
     steps:
       - checkout
       - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
@@ -124,7 +124,7 @@ jobs:
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j3"
+      - SCONSFLAGS: "-j4"
     steps:
       - checkout
       - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
@@ -139,7 +139,7 @@ jobs:
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j3"
+      - SCONSFLAGS: "-j4"
     steps:
       - checkout
       - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
@@ -154,7 +154,7 @@ jobs:
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j3"
+      - SCONSFLAGS: "-j4"
     steps:
       - checkout
       - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
@@ -172,7 +172,7 @@ jobs:
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j3"
+      - SCONSFLAGS: "-j4"
     steps:
       - checkout
       - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
@@ -190,7 +190,7 @@ jobs:
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j3"
+      - SCONSFLAGS: "-j4"
     steps:
       - checkout
       - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
@@ -208,7 +208,7 @@ jobs:
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j3"
+      - SCONSFLAGS: "-j4"
     steps:
       - checkout
       - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
@@ -226,7 +226,7 @@ jobs:
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j3"
+      - SCONSFLAGS: "-j4"
     steps:
       - checkout
       - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
@@ -244,7 +244,7 @@ jobs:
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j3"
+      - SCONSFLAGS: "-j4"
     steps:
       - checkout
       - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
@@ -262,7 +262,7 @@ jobs:
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j3"
+      - SCONSFLAGS: "-j4"
     steps:
       - checkout
       - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
@@ -280,7 +280,7 @@ jobs:
     environment:
       - LANG: "en_US.UTF-8"
       - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j3"
+      - SCONSFLAGS: "-j4"
     steps:
       - checkout
       - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
