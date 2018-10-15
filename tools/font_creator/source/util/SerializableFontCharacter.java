@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 /**
- * 
+ *
  * @author Fabian Maximilian Thiele
  * @author Fabian Greif
  */
@@ -40,7 +40,7 @@ public class SerializableFontCharacter implements Serializable {
 		height = fc.getHeight();
 		asciiIndex = fc.getAsciiIndex();
 		comment = fc.getComment();
-		
+
 		BufferedImage image = fc.getImage();
 		if (image != null) {
 			Raster data = image.getRaster();
@@ -49,21 +49,21 @@ public class SerializableFontCharacter implements Serializable {
 					image.getHeight(), temp);
 		}
 	}
-	
+
 	public SerializableFontCharacter(BufferedReader reader, int index, int height) throws IOException {
 		this.asciiIndex = index;
 		this.height = height;
 		width = -1;
-		
+
 		Pattern p = Pattern.compile("^\\[([ #]*)\\].*");
 		for (int i = 0; i < height; i++) {
 			String line = reader.readLine();
 			Matcher m = p.matcher(line);
-			
+
 			if (m.matches()) {
 				String pixels = m.group(1);
 				int length = pixels.length();
-				
+
 				if (width == -1) {
 					width = length;
 					imageData = new int[width * height];
@@ -71,7 +71,7 @@ public class SerializableFontCharacter implements Serializable {
 				else if (width != length) {
 					throw new IOException("Width differs inside the character " + index);
 				}
-				
+
 				int k = 0;
 				for (char c: pixels.toCharArray()) {
 					int value = 0;
@@ -87,7 +87,7 @@ public class SerializableFontCharacter implements Serializable {
 			}
 		}
 	}
-	
+
 	public FontCharacter getFontCharacter(int index, Font parentFont) {
 		FontCharacter fc = new FontCharacter(width, height, index, parentFont);
 		fc.setComment(comment);
@@ -113,7 +113,7 @@ public class SerializableFontCharacter implements Serializable {
 
 		return fc;
 	}
-	
+
 	public void writeToFile(Writer writer) throws IOException {
 		if (asciiIndex >= 32 && asciiIndex < 127) {
 			writer.write("\n#char : " + asciiIndex + " '" + (char) asciiIndex + "'\n");
@@ -121,20 +121,20 @@ public class SerializableFontCharacter implements Serializable {
 		else {
 			writer.write("\n#char : " + asciiIndex + "\n");
 		}
-		
+
 		int i = 0;
 		for (int pixel: imageData) {
 			if (i == 0) {
 				writer.write("[");
 			}
-			
+
 			if (pixel == 0) {
 				writer.write(" ");
 			}
 			else {
 				writer.write("#");
 			}
-			
+
 			i++;
 			if (i >= width) {
 				i = 0;

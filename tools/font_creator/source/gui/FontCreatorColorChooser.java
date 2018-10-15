@@ -39,17 +39,17 @@ public class FontCreatorColorChooser extends JComponent implements
 	private FontCreatorColorChooserFrame chooser;
 	private IndexColorModel cm;
 	private int color;
-	
+
 	public FontCreatorColorChooser(MainWindow mainWindow) {
 		this.mainWindow = mainWindow;
 		color = -1;
-		
+
 		setPreferredSize(new Dimension(40, 30));
 		setMaximumSize(new Dimension(40, 35));
 		addMouseListener(this);
 		chooser = new FontCreatorColorChooserFrame(this);
 	}
-	
+
 	public void paint(Graphics g) {
 		g.setColor(Color.GRAY);
 		g.drawRect(5, 5, 30, 20);
@@ -65,20 +65,20 @@ public class FontCreatorColorChooser extends JComponent implements
 			g.fillRect(6, 6, 29, 19);
 		}
 	}
-	
+
 	public void setChoosedColor(int color) {
 		this.color = color;
 		mainWindow.setActiveEditorColor(color);
 		repaint();
 	}
-	
+
 	public void setColor(int color, IndexColorModel model) {
 		this.color = color;
 		cm = model;
-		
+
 		chooser.setColors(model);
 		chooser.setCurrentColor(color);
-		
+
 		if (chooser.isVisible()) {
 			chooser.repaint();
 		}
@@ -93,7 +93,7 @@ public class FontCreatorColorChooser extends JComponent implements
 				color = (color == 1) ? 0 : 1;
 				chooser.setCurrentColor(color);
 				mainWindow.setActiveEditorColor(color);
-				
+
 				if (chooser.isVisible()) {
 					chooser.repaint();
 				}
@@ -104,19 +104,19 @@ public class FontCreatorColorChooser extends JComponent implements
 			}
 		}
 	}
-	
+
 	public void mousePressed(MouseEvent arg0) {
 	// unused
 	}
-	
+
 	public void mouseReleased(MouseEvent arg0) {
 	// unused
 	}
-	
+
 	public void mouseEntered(MouseEvent arg0) {
 	// unused
 	}
-	
+
 	public void mouseExited(MouseEvent arg0) {
 	// unused
 	}

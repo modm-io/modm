@@ -57,7 +57,7 @@ public class FontCreatorColorChooserFrame extends JFrame implements
 				d.height / 2 - getHeight() / 2);
 		addMouseListener(this);
 		addMouseMotionListener(this);
-		
+
 		this.setLayout(null);
 
 		JLabel indexL1 = new JLabel("Index:");
@@ -218,7 +218,7 @@ public class FontCreatorColorChooserFrame extends JFrame implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * java.awt.event.MouseMotionListener#mouseDragged(java.awt.event.MouseEvent
 	 * )
@@ -229,7 +229,7 @@ public class FontCreatorColorChooserFrame extends JFrame implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * java.awt.event.MouseMotionListener#mouseMoved(java.awt.event.MouseEvent)
 	 */

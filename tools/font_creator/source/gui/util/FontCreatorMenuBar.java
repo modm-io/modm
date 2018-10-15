@@ -126,7 +126,7 @@ public class FontCreatorMenuBar extends JMenuBar implements ActionListener {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */

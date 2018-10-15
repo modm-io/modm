@@ -32,7 +32,7 @@ public class CharTableModel extends DefaultTableModel {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javax.swing.table.DefaultTableModel#isCellEditable(int, int)
 	 */
 	public boolean isCellEditable(int row, int column) {

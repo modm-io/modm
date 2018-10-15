@@ -53,10 +53,10 @@ static uint8_t %name[] PROGMEM = {
     %binHeight, // height
     %binFirstChar, // first char
     %binCharCount, // char count
-    
+
     // char widths
     %fontWidthData
-    
+
     // font data
     %fontData
 };
