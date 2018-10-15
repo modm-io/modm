@@ -4,6 +4,7 @@
  * Copyright (c) 2012, 2014, Niklas Hauser
  * Copyright (c) 2013, 2015, Sascha Schade
  * Copyright (c) 2015, Kevin Läufer
+ * Copyright (c) 2018, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -16,10 +17,10 @@
 #ifndef MODM_ARITHMETIC_TRAITS_HPP
 #define MODM_ARITHMETIC_TRAITS_HPP
 
-#include <stdint.h>
-
-#include <modm/architecture/utils.hpp>
-#include <modm/utils/template_metaprogramming.hpp>
+#include <cstdint>
+#include <limits>
+#include <type_traits>
+#include <cmath>
 
 namespace modm
 {
@@ -56,243 +57,149 @@ namespace modm
  * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
  * @author	Fabian Greif <fabian.greif@rwth-aachen.de>
  * @author	Niklas Hauser
+ * @author	Christopher Durand
  *
  * @{
  */
-// ------------------------------------------------------------------------
+
+/// @cond
+namespace detail
+{
+	// type trait to determine next possibly larger int type
+	// char <= short <= int <= long <= long long
+	template<typename T>
+	struct NextInt
+	{ using type = T; };
+
+	// char is a distinct type, not identical with signed char or unsigned char
+	template<>
+	struct NextInt<char>
+	{
+		using type = std::conditional_t<
+			std::is_signed_v<char>,
+			short,
+			unsigned short
+		>;
+	};
+
+	template<>
+	struct NextInt<signed char>
+	{ using type = short; };
+
+	template<>
+	struct NextInt<unsigned char>
+	{ using type = unsigned short; };
+
+	template<>
+	struct NextInt<short>
+	{ using type = int; };
+
+	template<>
+	struct NextInt<unsigned short>
+	{ using type = unsigned int; };
+
+	template<>
+	struct NextInt<int>
+	{ using type = long; };
+
+	template<>
+	struct NextInt<unsigned int>
+	{ using type = unsigned long; };
+
+	template<>
+	struct NextInt<long>
+	{ using type = long long; };
+
+	template<>
+	struct NextInt<unsigned long>
+	{ using type = unsigned long long; };
+
+	// ------------------------------------------------------------------------
+
+	// implement ArithmeticTraits<T>::WideType
+	template<typename T>
+	struct WideType
+	{ using type = T; };
+
+	template<>
+	struct WideType<bool>
+	{ using type = char; };
+
+	template<>
+	struct WideType<long long>
+	{ using type = double; };
+
+	template<>
+	struct WideType<unsigned long long>
+	{ using type = double; };
+
+	template<typename T, typename = std::enable_if_t<
+		std::is_integral_v<T> && !std::is_same_v<std::decay_t<T>, bool>
+	>>
+	using enable_if_int = T;
+
+	template<typename T>
+	struct WideType<enable_if_int<T>>
+	{
+		static constexpr bool isNextIntLarger =
+			std::numeric_limits<typename NextInt<T>::type>::max() > std::numeric_limits<T>::max();
+
+		using type = std::conditional_t<
+			isNextIntLarger,
+			typename NextInt<T>::type,
+			typename WideType<typename NextInt<T>::type>::type
+		>;
+	};
+
+	// ------------------------------------------------------------------------
+
+	template<typename T>
+	struct MakeSigned
+	{
+		using type = T;
+	};
+
+	template<typename T>
+	struct MakeSigned<enable_if_int<T>>
+	{
+		using type = std::make_signed_t<T>;
+	};
+
+	template<typename T>
+	struct MakeUnsigned
+	{
+		using type = T;
+	};
+
+	template<typename T>
+	struct MakeUnsigned<enable_if_int<T>>
+	{
+		using type = std::make_unsigned_t<T>;
+	};
+}
+/// @endcond
+
+template<typename T>
+using WideType = typename detail::WideType<T>::type;
+
 template<typename T>
 struct ArithmeticTraits
 {
-};
+	static constexpr bool isFloatingPoint = std::is_floating_point_v<T>;
+	static constexpr bool isInteger = std::is_integral_v<T>
+		&& !std::is_same_v<std::decay_t<T>, bool>;
 
-// ------------------------------------------------------------------------
+	using WideType = modm::WideType<T>;
 
-template<>
-struct ArithmeticTraits<char>
-{
-	typedef int16_t WideType;
-	typedef signed char SignedType;
-	typedef unsigned char UnsignedType;
+	using SignedType   = typename detail::MakeSigned<T>::type;
+	using UnsignedType = typename detail::MakeUnsigned<T>::type;
 
-	static constexpr unsigned char decimalDigits = 4; // inc sign
-	static constexpr bool isFloatingPoint = false;
-	static constexpr bool isInteger = true;
-};
+	static constexpr unsigned char decimalDigits =
+		std::ceil(std::numeric_limits<T>::digits * log10(2)) + (std::is_signed_v<T> ? 1 : 0);
 
-// ------------------------------------------------------------------------
-
-template<>
-struct ArithmeticTraits<signed char>
-{
-	typedef int16_t WideType;
-	typedef int8_t SignedType;
-	typedef uint8_t UnsignedType;
-
-	static constexpr unsigned char decimalDigits = 4; // inc sign
-	static constexpr bool isSigned = true;
-	static constexpr bool isFloatingPoint = false;
-	static constexpr bool isInteger = true;
-
-	static constexpr signed char min = -127 - 1;
-	static constexpr signed char max = 127;
-};
-
-// ------------------------------------------------------------------------
-template<>
-struct ArithmeticTraits<unsigned char>
-{
-	typedef uint16_t WideType;
-	typedef int8_t SignedType;
-	typedef uint8_t UnsignedType;
-
-	static constexpr uint8_t decimalDigits = 3;
-	static constexpr bool isSigned = false;
-	static constexpr bool isFloatingPoint = false;
-	static constexpr bool isInteger = true;
-
-	static constexpr unsigned char min = 0;
-	static constexpr unsigned char max = 255;
-};
-
-// ------------------------------------------------------------------------
-template<>
-struct ArithmeticTraits<int16_t>
-{
-	typedef int32_t WideType;
-	typedef int16_t SignedType;
-	typedef uint16_t UnsignedType;
-
-	static constexpr uint8_t decimalDigits = 6; // inc. sign
-	static constexpr bool isSigned = true;
-	static constexpr bool isFloatingPoint = false;
-	static constexpr bool isInteger = true;
-
-	static constexpr int16_t min = -32767 - 1;
-	static constexpr int16_t max = 32767;
-};
-
-// ------------------------------------------------------------------------
-template<>
-struct ArithmeticTraits<uint16_t>
-{
-	typedef uint32_t WideType;
-	typedef int16_t SignedType;
-	typedef uint16_t UnsignedType;
-
-	static constexpr uint8_t decimalDigits = 5;
-	static constexpr bool isSigned = false;
-	static constexpr bool isFloatingPoint = false;
-	static constexpr bool isInteger = true;
-
-	static constexpr uint16_t min = 0;
-	static constexpr uint16_t max = 65535;
-};
-
-// ------------------------------------------------------------------------
-template<>
-struct ArithmeticTraits<int32_t>
-{
-#if defined(MODM_CPU_AVR)
-	typedef float WideType; // int64_t is on AVRs only a int32_t
-#else
-	typedef int64_t WideType;
-#endif
-	typedef int32_t SignedType;
-	typedef uint32_t UnsignedType;
-
-	static constexpr uint8_t decimalDigits = 11; // inc. sign
-	static constexpr bool isSigned = true;
-	static constexpr bool isFloatingPoint = false;
-	static constexpr bool isInteger = true;
-
-	static constexpr int32_t min = -2147483647L - 1;
-	static constexpr int32_t max = 2147483647L;
-};
-
-// ------------------------------------------------------------------------
-template<>
-struct ArithmeticTraits<uint32_t>
-{
-#if defined(MODM_CPU_AVR)
-	typedef float WideType; // int64_t is on AVRs only a int32_t
-#else
-	typedef uint64_t WideType;
-#endif
-	typedef int32_t SignedType;
-	typedef uint32_t UnsignedType;
-
-	static constexpr uint8_t decimalDigits = 10;
-	static constexpr bool isSigned = false;
-	static constexpr bool isFloatingPoint = false;
-	static constexpr bool isInteger = true;
-
-	static constexpr uint32_t min = 0;
-	static constexpr uint32_t max = 4294967295UL;
-};
-
-#if defined(MODM_CPU_ARM) && defined(MODM_OS_NONE)
-// ------------------------------------------------------------------------
-// For ARM 'int32_t' is of type 'long'. Therefore there is no
-// class here for the default type 'int'.
-template<>
-struct ArithmeticTraits<int>
-{
-	typedef int64_t WideType;
-	typedef int32_t SignedType;
-	typedef uint32_t UnsignedType;
-
-	static constexpr uint8_t decimalDigits = 11; // inc. sign
-	static constexpr bool isSigned = true;
-	static constexpr bool isFloatingPoint = false;
-	static constexpr bool isInteger = true;
-
-	static constexpr int32_t min = -2147483647L - 1;
-	static constexpr int32_t max = 2147483647L;
-};
-
-template<>
-struct ArithmeticTraits<unsigned int>
-{
-	typedef uint64_t WideType;
-	typedef int32_t SignedType;
-	typedef uint32_t UnsignedType;
-
-	static constexpr uint8_t decimalDigits = 10;
-	static constexpr bool isSigned = false;
-	static constexpr bool isFloatingPoint = false;
-	static constexpr bool isInteger = true;
-
-	static constexpr uint32_t min = 0;
-	static constexpr uint32_t max = 4294967295UL;
-};
-#endif
-
-// ------------------------------------------------------------------------
-template<>
-struct ArithmeticTraits<int64_t>
-{
-	typedef double WideType;
-	typedef int64_t SignedType;
-	typedef uint64_t UnsignedType;
-
-	static constexpr uint8_t decimalDigits = 20; // inc. sign
-	static constexpr bool isSigned = true;
-	static constexpr bool isFloatingPoint = false;
-	static constexpr bool isInteger = true;
-
-	static constexpr int64_t min = -9223372036854775807LL - 1;
-	static constexpr uint64_t max = 9223372036854775807LL;
-};
-
-// ------------------------------------------------------------------------
-template<>
-struct ArithmeticTraits<uint64_t>
-{
-	typedef double WideType;
-	typedef int64_t SignedType;
-	typedef uint64_t UnsignedType;
-
-	static constexpr uint8_t decimalDigits = 20;
-	static constexpr bool isSigned = false;
-	static constexpr bool isFloatingPoint = false;
-	static constexpr bool isInteger = true;
-
-	static constexpr uint64_t min = 0;
-	static constexpr uint64_t max = 18446744073709551615ULL;
-};
-
-// ------------------------------------------------------------------------
-template<>
-struct ArithmeticTraits<float>
-{
-	typedef float WideType;
-	typedef float SignedType;
-	typedef float UnsignedType;
-
-	static constexpr bool isSigned = true;
-	static constexpr bool isFloatingPoint = true;
-	static constexpr bool isInteger = false;
-
-	static constexpr float min = __FLT_MIN__;
-	static constexpr float max = __FLT_MAX__;
-	static constexpr float epsilon = __FLT_EPSILON__;
-};
-
-// ------------------------------------------------------------------------
-template<>
-struct ArithmeticTraits<double>
-{
-	typedef double WideType;
-	typedef double SignedType;
-	typedef double UnsignedType;
-
-	static constexpr bool isSigned = true;
-	static constexpr bool isFloatingPoint = true;
-	static constexpr bool isInteger = false;
-
-	static constexpr double min = __DBL_MIN__;
-	static constexpr double max = __DBL_MAX__;
-	static constexpr double epsilon = __DBL_EPSILON__;
+	static constexpr T min = std::numeric_limits<T>::min();
+	static constexpr T max = std::numeric_limits<T>::max();
+	static constexpr T epsilon = std::numeric_limits<T>::epsilon();
 };
 
 /// @}
