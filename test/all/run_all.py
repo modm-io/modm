@@ -148,7 +148,7 @@ def main():
 
     try:
         #devices = [device for device in devices if device.startswith("atx")]
-        with multiprocessing.Pool() as pool:
+        with multiprocessing.Pool(2) as pool:
             test_runs = pool.map(build_device, [TestRun(x) for x in devices])
 
         succeded = []
