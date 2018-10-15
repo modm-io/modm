@@ -19,26 +19,26 @@ namespace modm
 {
 	/**
 	 * \brief		Pair<FirstType, SecondType> is a heterogeneous pair
-	 * 
+	 *
 	 * This class holds one object of type FirstType and one object of type
 	 * SecondType.
-	 * 
+	 *
 	 * It provides only the default constructors and public variables to enable
 	 * usage as POD (plain old data) object. Only with this characteristic it
 	 * is possible to storage objects of this type inside the flash-memory
 	 * which is desirable for example for the interpolation classes.
-	 * 
+	 *
 	 * \see	modm::interpolation::Linear
-	 * 
+	 *
 	 * This constraint make a the usage rather unusual. See this example:
 	 * \code
 	 * // construction
 	 * modm::Pair<uint8_t, uint16_t> pair = { 12, -12345 };
-	 * 
+	 *
 	 * // this typedef is necessary to be able to use
 	 * // the type inside the FLASH macro
 	 * typedef modm::Pair<int8_t, int8_t> MyPair;
-	 * 
+	 *
 	 * // put some values into the flash memory
 	 * FLASH_STORAGE(MyPair pairs[3]) =
 	 * {
@@ -47,18 +47,18 @@ namespace modm
 	 *     { 5, 60 }
 	 * };
 	 * \endcode
-	 * 
+	 *
 	 * As this class has no constructor you need to use the following syntax
-	 * to initialize an instance of this class: 
+	 * to initialize an instance of this class:
 	 * \code
 	 *	modm::Pair<int, float> pair = { 1203, 1035.234 };
 	 * \endcode
-	 * 
+	 *
 	 * \note	Even if this class provides public attributes it is recommend to use
 	 * 			the access methods, because as soon as C++0x is available the
 	 * 			implementation will be changed and the attributes will be made private.
 	 * 			Until then just ignore that you can access them directly ;-)
-	 * 
+	 *
 	 * \author		Fabian Greif
 	 * \ingroup		modm_container
 	 */
@@ -68,7 +68,7 @@ namespace modm
 	public:
 		typedef T1 FirstType;
 		typedef T2 SecondType;
-		
+
 	public:
 		// No non-trivial constructor is allowed, otherwise this class
 		// won't be POD (plain old data) :-(
@@ -77,31 +77,31 @@ namespace modm
 			first(first), second(second)
 		{
 		}*/
-		
+
 		FirstType&
 		getFirst()
 		{
 			return first;
 		}
-		
+
 		const FirstType&
 		getFirst() const
 		{
 			return first;
 		}
-		
+
 		SecondType&
 		getSecond()
 		{
 			return second;
 		}
-		
+
 		const SecondType&
 		getSecond() const
 		{
 			return second;
 		}
-		
+
 	// ... not allowed either, only public attributes :-(
 	//private:
 		FirstType first;

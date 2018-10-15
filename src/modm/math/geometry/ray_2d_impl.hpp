@@ -71,7 +71,7 @@ modm::Ray2D<T>::getDirectionVector() const
 //modm::Ray2D<T>::getLength() const
 //{
 //	Vector<T, 2> directionVector = this->endPoint - this->startPoint;
-//	
+//
 //	return directionVector.getLength();
 //}
 //
@@ -83,14 +83,14 @@ modm::Ray2D<T>::getDirectionVector() const
 //	// vector from the base point of the line to the new point
 //	Vector<T, 2> startToPoint = point - this->startPoint;
 //	Vector<T, 2> directionVector = this->endPoint - this->startPoint;
-//	
+//
 //	FloatType c1 = startToPoint.dot(directionVector);
 //	if (c1 <= 0)
 //	{
 //		// point is before the start point => calculate distance to start point
 //		return startToPoint.getLength();
 //	}
-//	
+//
 //	FloatType c2 = directionVector.getLengthSquared();
 //	if (c2 <= c1)
 //	{
@@ -98,12 +98,12 @@ modm::Ray2D<T>::getDirectionVector() const
 //		Vector<T, 2> endToPoint = point - this->endPoint;
 //		return endToPoint.getLength();
 //	}
-//	
+//
 //	FloatType d = c1 / c2;
-//	
+//
 //	// calculate the closest point
 //	Vector<T, 2> closestPoint = this->startPoint + d * directionVector;
-//	
+//
 //	// return the length of the vector from the closest point on the line
 //	// to the given point
 //	Vector<T, 2> closestPointToPoint = point - closestPoint;
@@ -118,23 +118,23 @@ modm::Ray2D<T>::getDirectionVector() const
 //	// vector from the base point of the line to the new point
 //	Vector<T, 2> startToPoint = point - this->startPoint;
 //	Vector<T, 2> directionVector = this->endPoint - this->startPoint;
-//	
+//
 //	FloatType c1 = startToPoint.dot(directionVector);
 //	if (c1 <= 0)
 //	{
 //		// point is before the start point
 //		return this->startPoint;
 //	}
-//	
+//
 //	FloatType c2 = directionVector.getLengthSquared();
 //	if (c2 <= c1)
 //	{
 //		// point is after the end point
 //		return this->endPoint;
 //	}
-//	
+//
 //	FloatType d = c1 / c2;
-//	
+//
 //	// calculate the closest point
 //	return (this->startPoint + d * directionVector);
 //}
@@ -148,19 +148,19 @@ modm::Ray2D<T>::intersects(const LineSegment2D<T>& line) const
 	Vector<T, 2> startToPoint = line.getStartPoint() - this->basePoint;
 	Vector<T, 2> endToPoint = line.getEndPoint() - this->basePoint;
 	Vector<T, 2> dt = this->direction.toOrthogonalVector();
-	
+
 	if ((startToPoint.dot(dt) * endToPoint.dot(dt)) < 0) {
 		// Points are on different sides of the ray (interpreted as
 		// continuous line)
-		
+
 		Vector<T, 2> pointToStart = this->basePoint - line.getStartPoint();
 		Vector<T, 2> lt = line.getDirectionVector().toOrthogonalVector();
 		if ((pointToStart.dot(lt) * this->direction.dot(lt)) < 0) {
-			// Point and 
+			// Point and
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 
@@ -182,18 +182,18 @@ modm::Ray2D<T>::intersects(const LineSegment2D<T>& line) const
 //	modm::Vector<T, 2> ownDirectionVector = this->endPoint - this->startPoint;
 //	modm::Vector<T, 2> otherDirectionVector = other.endPoint - other.startPoint;
 //	modm::Vector<T, 2> connectionVector = this->startPoint - other.startPoint;
-//	
+//
 //	WideType d = ownDirectionVector.cross(otherDirectionVector);
 //	if (d)
 //	{
 //		FloatType t2 = static_cast<FloatType>(ownDirectionVector.cross(connectionVector)) /
 //					   static_cast<FloatType>(d);
-//		
+//
 //		if (0.f <= t2 and t2 <= 1.f)
 //		{
 //			FloatType t1 = static_cast<FloatType>(otherDirectionVector.cross(connectionVector)) /
 //					   static_cast<FloatType>(d);
-//			
+//
 //			if (0.f <= t1 and t1 <= 1.f)
 //			{
 //				intersectionPoints.append(this->startPoint + ownDirectionVector * t1);
@@ -212,17 +212,17 @@ modm::Ray2D<T>::intersects(const LineSegment2D<T>& line) const
 //{
 //	// Direction vector of line, from start to end
 //	modm::Vector<T, 2> directionVector = this->endPoint - this->startPoint;
-//	
+//
 //	// vector from the center of the circle to line start
 //	modm::Vector<T, 2> circleToLine = this->startPoint - circle.center;
-//	
+//
 //	WideType a = directionVector.dot(directionVector);
 //	WideType b = 2 * circleToLine.dot(directionVector);
-//	WideType c = circleToLine.dot(circleToLine) - 
+//	WideType c = circleToLine.dot(circleToLine) -
 //			static_cast<WideType>(circle.radius) * static_cast<WideType>(circle.radius);;
-//	
+//
 //	WideType discriminant = (b * b - 4 * a * c);
-//	
+//
 //	if (discriminant < 0)
 //	{
 //		// no intersections
@@ -232,20 +232,20 @@ modm::Ray2D<T>::intersects(const LineSegment2D<T>& line) const
 //	{
 //		bool result = false;
 //		FloatType e = std::sqrt(discriminant);
-//		
+//
 //		FloatType t1 = static_cast<FloatType>(-b - e) / static_cast<FloatType>(2 * a);
 //		if (0.f <= t1 and t1 <= 1.f) {
 //			intersectionPoints.append(this->startPoint + directionVector * t1);
 //			result = true;
 //		}
-//		
+//
 //		if (discriminant == 0)
 //		{
 //			// the line is a tangent to the circle intersecting
 //			// it at only one point
 //			return result;
 //		}
-//		
+//
 //		FloatType t2 = static_cast<FloatType>(-b + e) / static_cast<FloatType>(2 * a);
 //		if (0.f <= t2 and t2 <= 1.f) {
 //			intersectionPoints.append(this->startPoint + directionVector * t2);
@@ -273,9 +273,9 @@ modm::Ray2D<T>::ccw(const modm::Vector<T, 2>& point)
 	// vector from the base point of the line to the new point
 	Vector<T, 2> startToPoint = point - this->basePoint;
 	Vector<T, 2> t = direction.toOrthogonalVector();
-	
+
 	FloatType c1 = startToPoint.dot(t);
-	
+
 	return (c1 <= 0);
 }
 

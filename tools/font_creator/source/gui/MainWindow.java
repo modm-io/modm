@@ -34,7 +34,7 @@ import util.FontExport;
 import util.SerializableFont;
 
 /**
- * 
+ *
  * @author Fabian Maximilian Thiele
  * @author Fabian Greif
  */
@@ -79,11 +79,11 @@ public class MainWindow extends JFrame {
 	private void initFrame() {
 		setTitle("GLCD FontCreator 3.0");
 		setSize(800, 600);
-		
+
 		Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
 		setLocation(d.width / 2 - getWidth() / 2,
 				d.height / 2 - getHeight() / 2);
-		
+
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
 	}
@@ -93,7 +93,7 @@ public class MainWindow extends JFrame {
 		int retVal = dialog.showNewFontDialog();
 		if (retVal == NewFontDialog.APPROVE_OPTION) {
 			Font font = dialog.getNewFont();
-			
+
 			newFontEditor(font, "");
 		}
 	}
@@ -110,10 +110,10 @@ public class MainWindow extends JFrame {
 	public void saveFont() {
 		if (desktop.getSelectedFrame() instanceof FontEditor) {
 			FontEditor editor = (FontEditor) desktop.getSelectedFrame();
-			
+
 			JFileChooser chooser = new JFileChooser(".");
 			chooser.setSelectedFile(new File(editor.getFilename()));
-			
+
 			int rv = chooser.showSaveDialog(this);
 			if (rv == JFileChooser.APPROVE_OPTION) {
 				File file = chooser.getSelectedFile();
@@ -136,7 +136,7 @@ public class MainWindow extends JFrame {
 			File file = chooser.getSelectedFile();
 			try {
 				SerializableFont sFont = new SerializableFont(file);
-				
+
 				Font font = new Font(sFont);
 				newFontEditor(font, file.getAbsolutePath());
 			} catch (Exception e) {

@@ -19,7 +19,7 @@ class AngleTest : public unittest::TestSuite
 public:
 	void
 	testNormalize();
-	
+
 	void
 	testReverse();
 

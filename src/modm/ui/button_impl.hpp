@@ -27,10 +27,10 @@ modm::Button<T>::update()
 	else {
 		i = 1;
 	}
-	
+
 	i = i ^ state;
 	i = i << 1 | 0xc0;
-	
+
 	// FIXME
 	if (i == 0xef)
 	{
@@ -38,7 +38,7 @@ modm::Button<T>::update()
 	}
 	else
 	{
-		
+
 	}
 }
 

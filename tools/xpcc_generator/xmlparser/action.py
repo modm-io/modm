@@ -21,14 +21,14 @@ from . import xml_utils
 from .parser_exception import ParserException
 
 class Action(object):
-	
+
 	def __init__(self, node, tree):
 		self.name = node.get('name')
 		utils.check_name(self.name)
-		
+
 		self.description = xml_utils.get_description(node)
 		self.id = xml_utils.get_identifier(node)
-		
+
 		self.parameterType = self.__get_type(node, "parameterType", tree)
 		self.returnType = self.__get_type(node, "returnType", tree)
 
@@ -43,9 +43,9 @@ class Action(object):
 				type = tree.types[type]
 			except KeyError as e:
 				raise ParserException("Type '%s' is not defined. Used by Action '%s')" % (type, self.name))
-				
+
 		return type
-	
+
 	def __cmp__(self, other):
 		return 1 - self.__eq__(other) - 2 * self.__lt__(other)
 
@@ -64,7 +64,7 @@ class Action(object):
 		for key, value in self.__dict__.items():
 			if value == None:
 				self.__dict__[key] = top.__dict__[key]
-	
+
 	def __str__(self):
 		parameterType = self.parameterType or ""
 		returnType = (" : %s" % self.returnType) if (self.returnType) else ""

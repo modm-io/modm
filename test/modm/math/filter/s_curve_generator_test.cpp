@@ -20,12 +20,12 @@ void
 SCurveGeneratorTest::testConstructor()
 {
 	modm::SCurveGenerator<int16_t> generator;
-	
+
 	generator.setTarget(200);
-	
+
 	TEST_ASSERT_FALSE(generator.isTargetReached());
-	
+
 	generator.update();
-	
+
 	// FIXME some useful tests are needed here
 }

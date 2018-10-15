@@ -20,9 +20,9 @@ namespace modm
 {
 	/**
 	 * \brief	Simple Button
-	 * 
+	 *
 	 * \todo	Implementation is incomplete
-	 * 
+	 *
 	 * \ingroup	modm_ui_button
 	 * \author	Fabian Greif
 	 */
@@ -32,17 +32,17 @@ namespace modm
 	public:
 		static bool
 		getState();
-		
+
 		static bool
 		isPressed();
-		
+
 		static bool
 		isReleased();
-		
-		
+
+
 		static void
 		update();
-		
+
 	private:
 		static uint8_t state;
 	};

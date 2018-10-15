@@ -25,7 +25,7 @@ namespace modm
 	{
 		/**
 		 * \brief	Matrix 8x8
-		 * 
+		 *
 		 * - fixed width     : 8
 		 * - height          : 8
 		 * - hspace          : 0
@@ -34,7 +34,7 @@ namespace modm
 		 * - last char       : 58
 		 * - number of chars : 10
 		 * - size in bytes   : 98
-		 * 
+		 *
 		 * \ingroup	modm_ui_display_font
 		 */
 		EXTERN_FLASH_STORAGE(uint8_t Matrix8x8[]);

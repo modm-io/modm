@@ -21,33 +21,33 @@ class SlaveTest : public unittest::TestSuite
 public:
 	virtual void
 	setUp();
-	
+
 	virtual void
 	tearDown();
-	
-	
+
+
 	void
 	testEmptyMethod();
-	
+
 	void
 	testResponseMethod();
-	
+
 	void
 	testErrorResponse();
-	
+
 	void
 	testParameterMethod();
-	
+
 	void
 	testWrongParameterSize();
-	
+
 	void
 	testNoMethod();
-	
-	
+
+
 protected:
 	typedef modm::sab::Interface< FakeIODevice > TestingInterface;
 	typedef modm::sab::Slave< TestingInterface > TestingSlave;
-	
+
 	TestingSlave *slave;
 };

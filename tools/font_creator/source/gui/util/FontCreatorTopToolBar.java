@@ -58,7 +58,7 @@ public class FontCreatorTopToolBar extends JToolBar implements ActionListener,
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
@@ -68,7 +68,7 @@ public class FontCreatorTopToolBar extends JToolBar implements ActionListener,
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * javax.swing.event.ChangeListener#stateChanged(javax.swing.event.ChangeEvent
 	 * )

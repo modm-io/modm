@@ -21,9 +21,9 @@ namespace modm
 {
 	/**
 	 * \brief	8-Bit I/O Expander with Serial Interface
-	 * 
+	 *
 	 * A1 and A0 need to be tided low.
-	 * 
+	 *
 	 * \author	Fabian Greif
 	 * \ingroup	modm_driver_mcp23s08
 	 */
@@ -33,25 +33,25 @@ namespace modm
 	public:
 		static void
 		initialize();
-		
+
 		/**
 		 * @brief	Configure pins
-		 * 
+		 *
 		 * @param	inputMask	1=Input, 0=Output
 		 * @param	pullupMask	1=Pullup, 0=Pullup-Disabled
 		 */
 		static void
 		configure(uint8_t inputMask, uint8_t pullupMask);
-		
+
 		//void
 		//configureInterrupt();
-		
+
 		static uint8_t
 		read();
-		
+
 		static void
 		write(uint8_t output);
-		
+
 	protected:
 		enum RegisterAddress
 		{
@@ -67,15 +67,15 @@ namespace modm
 			MCP_GPIO = 0x09,		///< Port values
 			MCP_OLAT = 0x0a			///< Output latch register
 		};
-		
+
 		enum RW
 		{
 			WRITE = 0,
 			READ = 1
 		};
-		
+
 		static const uint8_t deviceAddress = 0x40;
-		
+
 		static Spi spi;
 		static Cs cs;
 		static Int interrupt;

@@ -20,11 +20,11 @@ namespace modm
 {
 	/**
 	 * \brief	Saturated arithmetics
-	 *  
+	 *
 	 * \see http://www.mikrocontroller.net/articles/AVR_Arithmetik/Saturierung
-	 * 
+	 *
 	 * \author	Fabian Greif <fabian.greif@rwth-aachen.de>
-	 *  
+	 *
 	 * \todo	extend implementation (multiplication etc.)
 	 * \todo	add 16-bit datetype assembler implementations for AVRs
 	 * \todo	documentation
@@ -35,36 +35,36 @@ namespace modm
 	{
 		typedef typename ArithmeticTraits<T>::SignedType SignedType;
 		typedef typename ArithmeticTraits<SignedType>::WideType WideType;
-		
+
 	public:
 		Saturated();
-		
+
 		Saturated(const T& initialValue);
-		
+
 		inline const T&
 		getValue() const
 		{
 			return value;
 		}
-		
+
 		Saturated&
 		operator += (const Saturated& other);
-		
+
 		Saturated&
 		operator -= (const Saturated& other);
-		
+
 		void
 		absolute();
-	
+
 	public:
 		template<typename U>
 		friend Saturated<U>
 		operator - (const Saturated<U>& x);
-		
+
 		template<typename U>
 		friend Saturated<U>
 		abs(const Saturated<U>& x);
-		
+
 		template<typename U>
 		friend Saturated<U>
 		operator - (const Saturated<U>& a, const Saturated<U>& b);
@@ -72,31 +72,31 @@ namespace modm
 		template<typename U>
 		friend Saturated<U>
 		operator + (const Saturated<U>& a, const Saturated<U>& b);
-		
+
 		template<typename U>
 		friend bool
 		operator == (const Saturated<U>& a, const Saturated<U>& b);
-		
+
 		template<typename U>
 		friend bool
 		operator != (const Saturated<U>& a, const Saturated<U>& b);
-		
+
 		// TODO > >= < <=
-	
+
 	private:
 		void
 		setValue(WideType value);
-		
+
 		T value;
 	};
-	
+
 	// ------------------------------------------------------------------------
-	
+
 	/// \brief	Invert value
 	template<typename U>
 	Saturated<U>
 	operator - (const Saturated<U>& x);
-	
+
 	/// \brief	Calculate the absolute value
 	template<typename U>
 	Saturated<U>
@@ -109,11 +109,11 @@ namespace modm
 	template<typename U>
 	Saturated<U>
 	operator + (const Saturated<U>& a, const Saturated<U>& b);
-	
+
 	template<typename U>
 	inline bool
 	operator == (const Saturated<U>& a, const Saturated<U>& b);
-	
+
 	template<typename U>
 	inline bool
 	operator != (const Saturated<U>& a, const Saturated<U>& b);

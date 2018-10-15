@@ -21,13 +21,13 @@ class SpiDeviceTest : public unittest::TestSuite
 public:
 	void
 	testInitialState();
-	
+
 	void
 	testEmptyTransmission();
-	
+
 	void
 	testSingleTransmission();
-	
+
 	void
 	testMultipleTransmissions();
 };

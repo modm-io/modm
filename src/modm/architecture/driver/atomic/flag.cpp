@@ -14,7 +14,7 @@
 
 #include "flag.hpp"
 
-modm::atomic::Flag::Flag(bool inState) : 
+modm::atomic::Flag::Flag(bool inState) :
 	state(inState)
 {
 }

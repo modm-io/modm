@@ -19,7 +19,7 @@ class DynamicArrayTest : public unittest::TestSuite
 public:
 	void
 	setUp();
-	
+
 	void
 	testDefaultConstrutor();
 
@@ -43,25 +43,25 @@ public:
 
 	void
 	testRemove();
-	
+
 	void
 	testClear();
-	
+
 	void
 	testRemoveAll();
-	
+
 	// iterators
 	void
 	testConstIterator();
-	
+
 	void
 	testConstIteratorAccess();
-	
+
 	void
 	testIterator();
-	
+
 	void
 	testIteratorAccess();
-	
-	// TODO test decrement operator for iterators 
+
+	// TODO test decrement operator for iterators
 };

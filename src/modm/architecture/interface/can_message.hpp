@@ -37,7 +37,7 @@ struct Message
 	{
 		return identifier;
 	}
-	
+
 	inline void
 	setIdentifier(uint32_t id)
 	{
@@ -73,7 +73,7 @@ struct Message
 	{
 		return length;
 	}
-	
+
 	inline void
 	setLength(uint8_t len)
 	{

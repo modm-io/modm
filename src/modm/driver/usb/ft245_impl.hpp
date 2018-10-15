@@ -87,7 +87,7 @@ modm::Ft245<PORT, RD, WR, RXF, TXE>::write(uint8_t c)
 	// When TXE is high do not write data into the FIFO
 	while (txe.read())
 		;
-	
+
 	wr.set();
 	port.setOutput();
 	port.write(c);
@@ -103,7 +103,7 @@ void
 modm::Ft245<PORT, RD, WR, RXF, TXE>::write(const uint8_t *buffer, uint8_t n)
 {
 	port.setOutput();
-	
+
 	for (uint_fast8_t i = 0; i < n; ++i)
 	{
 		wr.set();
@@ -112,7 +112,7 @@ modm::Ft245<PORT, RD, WR, RXF, TXE>::write(const uint8_t *buffer, uint8_t n)
 		// When TXE is high do not write data into the FIFO
 		while (txe.read())
 			;
-		
+
 		// data is written to the FIFO on the falling edge of WR
 		wr.reset();
 	}

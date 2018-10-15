@@ -22,10 +22,10 @@ namespace modm
 	{
 		/**
 		 * \brief	Dynamic memory allocator
-		 * 
+		 *
 		 * Wrapper for the underlying memory management. No additional
 		 * management is done.
-		 * 
+		 *
 		 * \ingroup	modm_utils_allocator
 		 * \author	Fabian Greif
 		 */
@@ -38,24 +38,24 @@ namespace modm
 			{
 				typedef Dynamic<U> other;
 			};
-			
+
 		public:
 			Dynamic() :
 				AllocatorBase<T>()
 			{
 			}
-			
+
 			Dynamic(const Dynamic& other) :
 				AllocatorBase<T>(other)
 			{
 			}
-			
+
 			template <typename U>
 			Dynamic(const Dynamic<U>&) :
 				AllocatorBase<T>()
 			{
 			}
-			
+
 			T*
 			allocate(size_t n)
 			{
@@ -63,7 +63,7 @@ namespace modm
 				// of the associated data-type.
 				return static_cast<T*>(::operator new(n * sizeof(T)));
 			}
-			
+
 			void
 			deallocate(T* p)
 			{

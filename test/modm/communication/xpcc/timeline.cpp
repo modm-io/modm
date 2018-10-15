@@ -15,7 +15,7 @@
 #include <cstring>	// for std::memcpy
 #include "timeline.hpp"
 
-Timeline::Event::Event(Type type, uint8_t component, uint8_t id, 
+Timeline::Event::Event(Type type, uint8_t component, uint8_t id,
 		uint8_t source) :
 	type(type),
 	component(component),

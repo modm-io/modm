@@ -17,9 +17,9 @@ namespace modm
 {
 	/**
 	 * \brief	Trapezoidal S-Curve Trajectory
-	 * 
+	 *
 	 * open-loop control
-	 * 
+	 *
 	 * \todo	documentation
 	 * \todo	implementation
 	 * \ingroup	modm_math_filter
@@ -29,22 +29,22 @@ namespace modm
 	{
 	public:
 		SCurveGenerator(const T& initialValue = T());
-		
+
 		inline void
 		setTarget(const T& target);
-		
+
 		void
 		update();
-		
+
 		inline const T&
 		getValue() const
 		{
 			return value;
 		}
-		
+
 		inline bool
 		isTargetReached() const;
-	
+
 	private:
 		T target;
 		T value;

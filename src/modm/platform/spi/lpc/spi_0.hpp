@@ -14,7 +14,7 @@
 
 /*
  * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.in file instead and rebuild this file. 
+ * Please modify the corresponding *.in file instead and rebuild this file.
  */
 // ----------------------------------------------------------------------------
 
@@ -244,14 +244,14 @@ namespace modm
 			 * \brief	Write a single byte with the SPI.
 			 *
 			 * The data is put into the FIFO but it blocks until the data
-			 * was sent and data from the device is available.  
+			 * was sent and data from the device is available.
 			 */
 			static uint8_t
 			write(uint8_t data);
 
 			// static void
 			// write(uint8_t * data, uint8_t size);
-			
+
 			static bool
 			setBuffer(uint16_t length,
 					  uint8_t* transmit=0, uint8_t* receive=0,
@@ -259,10 +259,10 @@ namespace modm
 
 			static bool
 			transfer(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
-			
+
 			static modm_always_inline bool
 			transferSync(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
-			
+
 			static bool
 			isFinished();
 

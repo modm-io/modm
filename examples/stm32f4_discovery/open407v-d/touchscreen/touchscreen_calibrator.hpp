@@ -21,16 +21,16 @@ namespace modm
 	{
 	public:
 		TouchscreenCalibrator();
-		
+
 		/**
-		 * 
+		 *
 		 */
 		bool
 		calibrate(modm::glcd::Point * display, modm::glcd::Point * sample);
-		
+
 		void
 		translate(modm::glcd::Point * raw, modm::glcd::Point * translated);
-		
+
 	private:
 		float An;
 		float Bn;
@@ -60,11 +60,11 @@ modm::TouchscreenCalibrator::calibrate(
 	// K��(X0��X2) (Y1��Y2)��(X1��X2) (Y0��Y2)
 	scale =	((sample[0].x - sample[2].x) * (sample[1].y - sample[2].y)) -
 			((sample[1].x - sample[2].x) * (sample[0].y - sample[2].y));
-	
+
 	if (scale == 0) {
 		return false;
 	}
-	
+
 	// A��((XD0��XD2) (Y1��Y2)��(XD1��XD2) (Y0��Y2))��K
 	An =	((display[0].x - display[2].x) * (sample[1].y - sample[2].y)) -
 			((display[1].x - display[2].x) * (sample[0].y - sample[2].y));
@@ -75,7 +75,7 @@ modm::TouchscreenCalibrator::calibrate(
 	Cn =	(sample[2].x * display[1].x - sample[1].x * display[2].x) * sample[0].y +
 			(sample[0].x * display[2].x - sample[2].x * display[0].x) * sample[1].y +
 			(sample[1].x * display[0].x - sample[0].x * display[1].x) * sample[2].y;
-	
+
 	// D��((YD0��YD2) (Y1��Y2)��(YD1��YD2) (Y0��Y2))��K	*/
 	Dn =	((display[0].y - display[2].y) * (sample[1].y - sample[2].y)) -
 			((display[1].y - display[2].y) * (sample[0].y - sample[2].y));
@@ -86,7 +86,7 @@ modm::TouchscreenCalibrator::calibrate(
 	Fn =	(sample[2].x * display[1].y - sample[1].x * display[2].y) * sample[0].y +
 			(sample[0].x * display[2].y - sample[2].x * display[0].y) * sample[1].y +
 			(sample[1].x * display[0].y - sample[0].x * display[1].y) * sample[2].y;
-	
+
 	return true;
 }
 

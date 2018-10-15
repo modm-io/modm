@@ -100,7 +100,7 @@ modm::fat::FileSystem::FileSystem(PhysicalVolume *volume,
 {
 	globalVolume = volume;
 	this->fileSystem.drv = drive;
-	
+
 	f_mount(drive, &this->fileSystem);
 }
 

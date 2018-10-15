@@ -30,14 +30,14 @@ namespace modm
 		 * \warning	Only floating points types are allowed as second type of
 		 * 			modm::Pair, otherwise the calculation will deliver wrong
 		 * 			results!
-		 * 
+		 *
 		 * \tparam	T	Any specialization of modm::Pair<> with a floating
 		 * 				point type as second template argument.
 		 * \tparam	Accessor	Accessor class. Can be modm::accessor::Ram,
 		 * 						modm::accessor::Flash or any self defined
 		 * 						accessor class.
 		 * 						Default is modm::accessor::Ram.
-		 * 
+		 *
 		 * \ingroup	modm_math_interpolation
 		 */
 		template <typename T,
@@ -47,34 +47,34 @@ namespace modm
 		public:
 			typedef typename T::FirstType InputType;
 			typedef typename T::SecondType OutputType;
-			
+
 			// WARNING:
 			// Only floating point types are allowed as second type of modm::Pair
 			// because the calculation will deliver wrong results otherwise!
-			static_assert(modm::ArithmeticTraits<OutputType>::isFloatingPoint, 
+			static_assert(modm::ArithmeticTraits<OutputType>::isFloatingPoint,
 					"Only floating point types are allowed as second type of modm::Pair");
 		public:
 			/**
 			 * \brief	Constructor
-			 * 
+			 *
 			 * \param	supportingPoints	Supporting points of the curve.
 			 * 								Needs to be an Array of modm::Pair<>.
 			 * \param	numberOfPoints		length of \p supportingPoints
 			 */
 			Lagrange(Accessor<T> supportingPoints, uint8_t numberOfPoints);
-			
+
 			/**
 			 * \brief	Perform a Lagrange-interpolation
-			 * 
+			 *
 			 * \param 	value	input value
 			 * \return	interpolated value
 			 */
-			OutputType 
+			OutputType
 			interpolate(const InputType& value) const;
-			
+
 		private:
 			const Accessor<T> supportingPoints;
-			const uint8_t numberOfPoints; 
+			const uint8_t numberOfPoints;
 		};
 	}
 }

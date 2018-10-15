@@ -33,22 +33,22 @@ namespace modm
 	 *
 	 * With the template parameter \c ScaleFactor this class provides an
 	 * fix point capability with integer types.
-	 * 
+	 *
 	 * Example for a motor speed control with a 10-bit PWM output.
 	 * \code
 	 * Pid<int16_t, 10> pid(0.4, 0.5, 0, 200, 512);
-	 * 
+	 *
 	 * ...
-	 * 
+	 *
 	 * v_target = ... // setpoint
-	 * v_input  = ... // input value 
-	 * 
+	 * v_input  = ... // input value
+	 *
 	 * pid.update(v_target - v_input);
 	 * pwm = pid.getValue();
 	 * \endcode
-	 * 
+	 *
 	 * \todo	use the faster avr::mul and avr::mac functions
-	 * 
+	 *
 	 * \author	Fabian Greif
 	 * \ingroup	modm_math_filter
 	 */
@@ -56,7 +56,7 @@ namespace modm
 	class Pid
 	{
 		typedef typename ArithmeticTraits<T>::WideType WideType;
-		
+
 	public:
 		typedef T ValueType;
 
@@ -69,38 +69,38 @@ namespace modm
 			/// \todo	calculate maxErrorSum from the parameters
 			Parameter(const float& kp = 0, const float& ki = 0, const float& kd = 0,
 					  const T& maxErrorSum = 0, const T& maxOutput = 0);
-			
+
 			inline void
 			setKp(float kp) {
 				this->kp = static_cast<T>(kp * ScaleFactor);
 			}
-			
+
 			inline void
 			setKi(float ki) {
 				this->ki = static_cast<T>(ki * ScaleFactor);
 			}
-			
+
 			inline void
 			setKd(float kd) {
 				this->kd = static_cast<T>(kd * ScaleFactor);
 			}
-			
+
 			inline void
 			setMaxErrorSum(float maxErrorSum) {
 				this->maxErrorSum = static_cast<T>(maxErrorSum * ScaleFactor);
 			}
-			
+
 		private:
 			T kp;		///< Proportional gain multiplied with ScaleFactor
 			T ki;		///< Integral gain multiplied with ScaleFactor
 			T kd;		///< Differential gain multiplied with ScaleFactor
-			
+
 			T maxErrorSum;	///< integral will be limited to this value
 			T maxOutput;	///< output will be limited to this value
-			
+
 			friend class Pid;
 		};
-		
+
 	public:
 		/**
 		 * \param	kp	proportional gain
@@ -111,12 +111,12 @@ namespace modm
 		 **/
 		Pid(const float& kp = 0, const float& ki = 0, const float& kd = 0,
 				const T& maxErrorSum = 0, const T& maxOutput = 0);
-		
+
 		/**
 		 * \param	parameter	list of parameters to the controller
 		 **/
 		Pid(Parameter& parameter);
-		
+
 		/**
 		 * Reset the parameters of the controller.
 		 *
@@ -124,23 +124,23 @@ namespace modm
 		 **/
 		void
 		setParameter(const Parameter& parameter);
-		
+
 		/**
 		 * \brief	Reset all values
 		 */
 		void
 		reset();
-		
+
 		/**
 		 * \brief	Calculate a new output value
-		 * 
+		 *
 		 * \param	input				Error
 		 * \param	externalLimitation	If true an external limitation is applied,
 		 * 								this disables integral summation.
 		 */
 		void
 		update(const T& input, bool externalLimitation = false);
-		
+
 		/**
 		 * \brief	Returns the calculated actuating variable.
 		 */
@@ -149,12 +149,12 @@ namespace modm
 		{
 			return output;
 		}
-		
+
 		/**
 		 * \brief	Get last error
-		 * 
+		 *
 		 * This function is provided for debugging purposes only.
-		 * 
+		 *
 		 * The differential term is calculated via:
 		 * \code
 		 * Kd * (input - this->lastError);
@@ -165,10 +165,10 @@ namespace modm
 		{
 			return this->lastError;
 		}
-		
+
 		/**
 		 * \brief	Get integrated error
-		 * 
+		 *
 		 * This function is provided for debugging purposes only.
 		 */
 		inline const T&
@@ -176,10 +176,10 @@ namespace modm
 		{
 			return this->errorSum;
 		}
-		
+
 	private:
 		Parameter parameter;
-		
+
 		T errorSum;
 		T lastError;
 		T output;

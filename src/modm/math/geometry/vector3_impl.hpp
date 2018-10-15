@@ -236,7 +236,7 @@ modm::Vector<T, 3>::operator = (const modm::Matrix<T, 3, 1> &rhs)
 	x = reinterpret_cast<const T*>(&rhs)[0];
 	y = reinterpret_cast<const T*>(&rhs)[1];
 	z = reinterpret_cast<const T*>(&rhs)[2];
-	
+
 	return *this;
 }
 
@@ -248,7 +248,7 @@ modm::Vector<T, 3>::operator = (const Vector &rhs)
 	x = rhs.x;
 	y = rhs.y;
 	z = rhs.z;
-	
+
 	return *this;
 }
 
@@ -389,7 +389,7 @@ modm::Vector<T, 3>::operator += (const modm::Vector<T, 3> &rhs)
 	x += rhs.x;
 	y += rhs.y;
 	z += rhs.z;
-	
+
 	return *this;
 }
 
@@ -401,7 +401,7 @@ modm::Vector<T, 3>::operator -= (const modm::Vector<T, 3> &rhs)
 	x -= rhs.x;
 	y -= rhs.y;
 	z -= rhs.z;
-	
+
 	return *this;
 }
 
@@ -413,7 +413,7 @@ modm::Vector<T, 3>::operator *= (const T &rhs)
 	x *= rhs;
 	y *= rhs;
 	z *= rhs;
-	
+
 	return *this;
 }
 
@@ -425,7 +425,7 @@ modm::Vector<T, 3>::operator /= (const T &rhs)
 	x /= rhs;
 	y /= rhs;
 	z /= rhs;
-	
+
 	return *this;
 }
 

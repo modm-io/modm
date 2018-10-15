@@ -74,7 +74,7 @@ modm::Circle2D<T>::getIntersections(const Circle2D& other,
 {
 	Vector<T, 2> circleToCircle = other.center - this->center;
 	WideType distanceSquared = circleToCircle.getLengthSquared();
-	
+
 	if (distanceSquared == 0 and (this->radius == other.radius))
 	{
 		// circles are equal and infinite intersections exist
@@ -89,38 +89,38 @@ modm::Circle2D<T>::getIntersections(const Circle2D& other,
 	else if (distanceSquared == (this->radius + other.radius) * (this->radius + other.radius))
 	{
 		// one solution, circles touch each other
-		
+
 		// calculate the intersection point
 		float scale = static_cast<float>(this->radius) / static_cast<float>(this->radius + other.radius);
-		
+
 		intersections.append(this->center + scale * circleToCircle);
 		return true;
 	}
-	
+
 	T distance = circleToCircle.getLength();
-	
+
 	// 'point C' is the point where the line through the circle
 	// intersection points crosses the line between the circle
 	// centers.
-	
+
 	// Determine the distance from the center of this circle to point C
 	float a = ((this->radius * this->radius) - (other.radius * other.radius) + distanceSquared) /
 			(2.0f * distance);
-	
+
 	// Determine the coordinates of point C
 	Vector<T, 2> c = this->center + circleToCircle * (a / distance);
-	
+
 	// Determine the distance from point 2 to either of the intersection points
 	float h = std::sqrt((this->radius * this->radius) - (a * a));
-	
+
 	// Now determine the offsets of the intersection points from point 2
 	Vector<T, 2> r = circleToCircle * (h / distance);	// TODO check this
 	r = r.toOrthogonalVector();
-	
+
 	// Determine the absolute intersection points
 	intersections.append(c + r);
 	intersections.append(c - r);
-	
+
 	return true;
 }
 

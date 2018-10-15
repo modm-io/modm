@@ -20,10 +20,10 @@ FakePostman::deliverPacket(const xpcc::Header& header,
 			const modm::SmartPointer& payload)
 {
 	this->messagesToDeliver.append(Message(header, payload));
-	
+
 	if (header.type != xpcc::Header::Type::REQUEST)
 		return ERROR;
-	
+
 	if (header.destination == 0)
 	{
 		// Event
@@ -33,15 +33,15 @@ FakePostman::deliverPacket(const xpcc::Header& header,
 				component1->eventNoParameter(header);
 				component2->eventNoParameter(header);
 				break;
-				
+
 			case 0x21:
 				component1->eventUint32(header, &payload.get<uint32_t>());
 				break;
-				
+
 			default:
 				return NO_EVENT;
 		}
-		
+
 		return OK;
 	}
 	else if (header.destination == 1)
@@ -52,27 +52,27 @@ FakePostman::deliverPacket(const xpcc::Header& header,
 			case 0x10:
 				component1->actionNoParameter(response);
 				break;
-			
+
 			case 0x11:
 				component1->actionUint16(response, &payload.get<uint16_t>());
 				break;
-				
+
 			case 0x12:
 				component1->actionDirectResponse(response);
 				break;
-				
+
 			case 0x13:
 				component1->actionDelayedResponse(response);
 				break;
-				
+
 			case 0x14:
 				component1->actionUint16CallAction(response, &payload.get<uint16_t>());
 				break;
-				
+
 			default:
 				return NO_ACTION;
 		}
-		
+
 		return OK;
 	}
 	else if (header.destination == 2)
@@ -83,18 +83,18 @@ FakePostman::deliverPacket(const xpcc::Header& header,
 			case 0x10:
 				component2->actionNoParameter(response);
 				break;
-			
+
 			case 0x11:
 				component2->actionUint16(response, &payload.get<uint16_t>());
 				break;
-				
+
 			default:
 				return NO_ACTION;
 		}
-		
+
 		return OK;
 	}
-	
+
 	return NO_COMPONENT;
 }
 

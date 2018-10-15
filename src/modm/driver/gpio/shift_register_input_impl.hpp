@@ -19,14 +19,14 @@
 // ----------------------------------------------------------------------------
 /*
  * 74HC165
- * 
+ *
  * Low level at SH/!LD (= Load) loads input into shift registers. Low-to-high
  * transition shifts values into the next stage.
- * 
+ *
  * Load must be low for at least 20n at 4,5V and 100ns at 2V
- * 
+ *
  * ClkInh (= CS) must be held low for clk to be active.
- * 
+ *
  * 74HC125 can be used to disable the Dout Output (Tri-State).
  */
 // ----------------------------------------------------------------------------
@@ -46,7 +46,7 @@ modm::ShiftRegisterInput<Spi, Load, N>::initialize()
 {
 	spi.initialize();
 	store.setOutput(modm::Gpio::Low);
-	
+
 	for (uint_fast8_t i = 0; i < N; ++i) {
 		cache[i] = 0;
 	}
@@ -77,7 +77,7 @@ modm::ShiftRegisterInput<Spi, Load, N>::update()
 	store.set();
 	// FIXME delay 20-100ns
 	store.reset();
-	
+
 	for (int_fast8_t i = N-1; i >= 0; --i) {
 		cache[i] = spi.write(0);
 	}

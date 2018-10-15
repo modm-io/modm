@@ -19,10 +19,10 @@ public:
 	// uses an empty protothread to test the basic methods of the class
 	void
 	testClassMethods();
-	
+
 	void
 	testMacros();
-	
+
 	void
 	testRestartAndExit();
 };

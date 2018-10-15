@@ -74,11 +74,11 @@ modm::Adxl345<I2cMaster>::update()
 		status &= ~READ_ACCELEROMETER_RUNNING;
 		status |= NEW_ACCELEROMETER_DATA;
 	}
-	else if (status & READ_ACCELEROMETER_PENDING) 
+	else if (status & READ_ACCELEROMETER_PENDING)
 	{
 		buffer[0] = adxl345::REGISTER_DATA_X0;
 		configureWriteRead(buffer, 1, data, 6);
-		
+
 		if (I2cMaster::start(this)) {
 			status &= ~READ_ACCELEROMETER_PENDING;
 			status |= READ_ACCELEROMETER_RUNNING;
@@ -96,7 +96,7 @@ modm::Adxl345<I2cMaster>::writeRegister(adxl345::Register reg, uint8_t value)
 	buffer[0] = reg;
 	buffer[1] = value;
 	configureWriteRead(buffer, 2, data, 0);
-	
+
 	return I2cMaster::startBlocking(this);
 }
 
@@ -108,7 +108,7 @@ modm::Adxl345<I2cMaster>::readRegister(adxl345::Register reg)
 		;
 	buffer[0] = reg;
 	configureWriteRead(buffer, 1, buffer, 1);
-	
+
 	while (!I2cMaster::startBlocking(this))
 		;
 	return buffer[0];

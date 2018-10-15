@@ -57,5 +57,5 @@ void FirTest::testFilter(const float (&coeff)[N],
 			filter.append(0);
 		filter.update();
 		TEST_ASSERT_EQUALS(filter.getValue(), results[i]);
-	} 
+	}
 }

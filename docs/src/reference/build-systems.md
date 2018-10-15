@@ -1,6 +1,6 @@
 # Build Systems
 
-Before modm our HAL code generation was done as a SCons tool during 
+Before modm our HAL code generation was done as a SCons tool during
 compilation. This worked for us, however, made it very difficult to include
 our code into other build systems.
 We therefore made the code generation a separate step with lbuild.

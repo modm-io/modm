@@ -27,10 +27,10 @@ import util.ImageTransferHandler;
 
 /**
  * Font editor window.
- * 
+ *
  * Consits of a list of all characters (CharTable) and an editor for a
  * single Character (CharEditor).
- * 
+ *
  * @author Fabian Maximilian Thiele
  */
 public class FontEditor extends JInternalFrame implements InternalFrameListener {
@@ -42,9 +42,9 @@ public class FontEditor extends JInternalFrame implements InternalFrameListener 
 	private Font font;
 	private MainWindow mainWindow;
 	private String filename;
-	
+
 	/**
-	 * 
+	 *
 	 * @param font
 	 * @param mainWindow
 	 * @param filename		Filename from which the font was loaded
@@ -57,10 +57,10 @@ public class FontEditor extends JInternalFrame implements InternalFrameListener 
 		initInternalFrame();
 		addInternalFrameListener(this);
 	}
-	
+
 	private void initGUI() {
 		this.setLayout(new BorderLayout());
-		
+
 		charEditor = new CharEditor(font.getCharacter(0), this,
 				font.getEditorColorModel(), mainWindow);
 		charEditor.setChar(font.getCharacter(0));
@@ -95,15 +95,15 @@ public class FontEditor extends JInternalFrame implements InternalFrameListener 
 	public Font getEditedFont() {
 		return font;
 	}
-	
+
 	public String getFilename() {
 		return filename;
 	}
-	
+
 	public void setFilename(String filename) {
 		this.filename = filename;
 	}
-	
+
 	public void setEditingChar(int index) {
 		charEditor.setChar(font.getCharacter(index));
 		editingCharSizeChanged();
@@ -138,11 +138,11 @@ public class FontEditor extends JInternalFrame implements InternalFrameListener 
 	public void internalFrameDeiconified(InternalFrameEvent arg0) {
 		// unused
 	}
-	
+
 	public void internalFrameActivated(InternalFrameEvent arg0) {
 		mainWindow.selectedEditorChanged(charEditor);
 	}
-	
+
 	public void internalFrameDeactivated(InternalFrameEvent arg0) {
 		// unused
 	}

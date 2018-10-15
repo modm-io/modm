@@ -59,20 +59,20 @@ modm::Polygon2D<T>::intersects(const Polygon2D& other) const
 {
 	SizeType n = this->points.getSize();
 	SizeType m = other.points.getSize();
-	
+
 	for (SizeType i = 0; i < n; ++i)
 	{
 		for (SizeType k = 0; k < m; ++k)
 		{
 			LineSegment2D<T> lineSegmentOwn(this->points[i], this->points[(i + 1) % n]);
 			LineSegment2D<T> lineSegmentOther(other.points[k], other.points[(k + 1) % m]);
-			
+
 			if (lineSegmentOwn.intersects(lineSegmentOther)) {
 				return true;
 			}
 		}
 	}
-	
+
 	return false;
 }
 
@@ -85,13 +85,13 @@ modm::Polygon2D<T>::intersects(const Circle2D<T>& circle) const
 	for (SizeType i = 0; i < n; ++i)
 	{
 		LineSegment2D<T> segment(this->points[i], this->points[(i + 1) % n]);
-		
+
 		T distance = segment.getDistanceTo(circle.getCenter());
 		if (distance <= circle.getRadius()) {
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 
@@ -104,12 +104,12 @@ modm::Polygon2D<T>::intersects(const LineSegment2D<T>& segment) const
 	for (SizeType i = 0; i < n; ++i)
 	{
 		LineSegment2D<T> ownSegment(this->points[i], this->points[(i + 1) % n]);
-		
+
 		if (segment.intersects(ownSegment)) {
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 
@@ -122,12 +122,12 @@ modm::Polygon2D<T>::intersects(const Ray2D<T>& segment) const
 	for (SizeType i = 0; i < n; ++i)
 	{
 		LineSegment2D<T> ownSegment(this->points[i], this->points[(i + 1) % n]);
-		
+
 		if (segment.intersects(ownSegment)) {
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 
@@ -137,17 +137,17 @@ bool
 modm::Polygon2D<T>::getIntersections(const LineSegment2D<T>& segment, PointSet2D<T>& intersectionPoints) const
 {
 	bool intersectionFound = false;
-	
+
 	SizeType n = this->points.getSize();
 	for (SizeType i = 0; i < n; ++i)
 	{
 		LineSegment2D<T> ownSegment(this->points[i], this->points[(i + 1) % n]);
-		
+
 		if (segment.getIntersections(ownSegment, intersectionPoints)) {
 			intersectionFound = true;
 		}
 	}
-	
+
 	return intersectionFound;
 }
 
@@ -158,26 +158,26 @@ modm::Polygon2D<T>::isInside(const modm::Polygon2D<T>::PointType& point)
 {
 	bool cw = true;
 	bool ccw = true;
-	
+
 	SizeType n = this->points.getSize();
 	for (SizeType i = 0; i < n; ++i) {
 		int_fast8_t r = Vector<T, 2>::ccw(this->points[i], this->points[(i + 1) % n], point);
-		
+
 		switch (r) {
 		case 0:
 			// point is one of the lines on the edge of the polygon.
 			return true;
 			break;
-			
+
 		case 1:
 			cw = false;
 			break;
-			
+
 		case -1:
 			ccw = false;
 			break;
 		}
 	}
-	
+
 	return (cw || ccw);
 }

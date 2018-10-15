@@ -14,7 +14,7 @@
 
 #ifndef XPCC_TIPC_TRANSMITTER_SOCKET_H_
 #define XPCC_TIPC_TRANSMITTER_SOCKET_H_
- 
+
 #include <cstring>
 #include <stdint.h>
 #include "header.hpp"
@@ -24,7 +24,7 @@ namespace xpcc {
 		/**
 		 * \class		TransmitterSocket
 		 * \brief		Proviede the handling of the socket interface from TIPC.
-		 * 
+		 *
 		 * \ingroup		tipc
 		 * \author		Carsten Schmitt < >
 		 */
@@ -32,8 +32,8 @@ namespace xpcc {
 			public:
 				TransmitterSocket();
 				~TransmitterSocket();
-		
-				void 
+
+				void
 				transmitPayload(	unsigned int typeId,
 									unsigned int instanceId,
 									const uint8_t* packet,
@@ -53,7 +53,7 @@ namespace xpcc {
 				 */
 				uint32_t
 				getPortId();
-		
+
 			private:
 				const int socketDescriptor_;
 		};

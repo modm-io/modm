@@ -64,27 +64,27 @@ modm::GraphicDisplay::write(char c)
 {
 	if (!this->font.isValid())
 		return;
-	
+
 	const uint8_t character = static_cast<uint8_t>(c);
 	const uint8_t height = font[3];
 	const uint8_t hspace = font[4];
 	const uint8_t vspace = font[5];
-	
+
 	if (character == '\n') {
 		this->cursor.set(0, this->cursor.getY() + height + hspace);
 		return;
 	}
-	
+
 	const uint8_t first = font[6];
 	const uint8_t count = font[7];
-	
+
 	if (character >= (first + count) || character < first) {
 		// character is not contained in this font set
 		return;
 	}
-	
+
 	const uint8_t offsetWidthTable = 8;
-	
+
 	uint16_t offset = count + offsetWidthTable;
 	uint8_t position = character - first + offsetWidthTable;
 	const uint8_t usedRows = (height + 7) / 8;	// round up
@@ -93,23 +93,23 @@ modm::GraphicDisplay::write(char c)
 		offset += font[i] * usedRows;
 	}
 	uint8_t width = font[position];
-	
+
 	this->drawImageRaw(cursor, width, height,
 			accessor::asFlash(font.getPointer() + offset));
-	
+
 	cursor.setX(cursor.getX() + width);
-	
+
 	// all characters below 128 have whitespace afterwards (number given
 	// by vspace).
 	if (character < 128) {
 		//glcd::Color oldColor = this->color;
-		
+
 		//this->setColor(glcd::Color::white());
 		for (uint_fast8_t i = 0; i < vspace; ++i) {
 			//this->drawVerticalLine(cursor, height);
 			cursor.setX(cursor.getX() + 1);
 		}
-		
+
 		// restore color
 		//this->setColor(oldColor);
 	}

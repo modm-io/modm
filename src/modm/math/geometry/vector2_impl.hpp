@@ -128,7 +128,7 @@ modm::Vector<T, 2>::getLength() const
 {
 	float tx = this->x;
 	float ty = this->y;
-	
+
 	return GeometricTraits<T>::round(std::sqrt(tx*tx + ty*ty));
 }
 
@@ -139,7 +139,7 @@ modm::Vector<T, 2>::getLengthSquared() const
 {
 	WideType tx = static_cast<WideType>(this->x);
 	WideType ty = static_cast<WideType>(this->y);
-	
+
 	return tx * tx + ty * ty;
 }
 
@@ -157,10 +157,10 @@ modm::Vector<T, 2>&
 modm::Vector<T, 2>::normalize()
 {
 	T length = this->getLength();
-	
+
 	this->x = this->x / length;
 	this->y = this->y / length;
-	
+
 	return *this;
 }
 
@@ -180,10 +180,10 @@ modm::Vector<T, 2>&
 modm::Vector<T, 2>::scale(float length)
 {
 	float factor = length / getLength();
-	
+
 	this->x = this->x * factor;
 	this->y = this->y * factor;
-	
+
 	return *this;
 }
 
@@ -204,12 +204,12 @@ modm::Vector<T, 2>::rotate(float phi)
 {
 	float c = std::cos(phi);
 	float s = std::sin(phi);
-	
+
 	// without rounding the result might be false for T = integer
 	T tx =    GeometricTraits<T>::round(c * this->x - s * this->y);
 	this->y = GeometricTraits<T>::round(s * this->x + c * this->y);
 	this->x = tx;
-	
+
 	return *this;
 }
 
@@ -220,7 +220,7 @@ modm::Vector<T, 2>::translate(const Vector<T, 2>& vector)
 {
 	this->x += vector.x;
 	this->y += vector.y;
-	
+
 	return *this;
 }
 
@@ -292,10 +292,10 @@ modm::Vector<T, 2>::ccw(const Vector& a, const Vector& b,
 	WideType dy1 = b.y - a.y;
 	WideType dx2 = c.x - a.x;
 	WideType dy2 = c.y - a.y;
-	
+
 	WideType d1 = dx1 * dy2;
 	WideType d2 = dy1 * dx2;
-	
+
 	if (d1 > d2) {
 		return 1;
 	}
@@ -477,7 +477,7 @@ modm::Vector<T, 2>::operator += (const modm::Vector<T, 2> &rhs)
 {
 	x += rhs.x;
 	y += rhs.y;
-	
+
 	return *this;
 }
 
@@ -488,7 +488,7 @@ modm::Vector<T, 2>::operator -= (const modm::Vector<T, 2> &rhs)
 {
 	x -= rhs.x;
 	y -= rhs.y;
-	
+
 	return *this;
 }
 
@@ -499,7 +499,7 @@ modm::Vector<T, 2>::operator *= (const T &rhs)
 {
 	x *= rhs;
 	y *= rhs;
-	
+
 	return *this;
 }
 
@@ -510,7 +510,7 @@ modm::Vector<T, 2>::operator /= (const T &rhs)
 {
 	x /= rhs;
 	y /= rhs;
-	
+
 	return *this;
 }
 

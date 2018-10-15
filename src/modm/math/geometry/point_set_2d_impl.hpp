@@ -84,7 +84,7 @@ modm::PointSet2D<T>::removeAll()
 
 // ----------------------------------------------------------------------------
 template <typename T>
-typename modm::PointSet2D<T>::iterator 
+typename modm::PointSet2D<T>::iterator
 modm::PointSet2D<T>::begin()
 {
 	return points.begin();
@@ -98,7 +98,7 @@ modm::PointSet2D<T>::end()
 }
 
 template <typename T>
-typename modm::PointSet2D<T>::const_iterator 
+typename modm::PointSet2D<T>::const_iterator
 modm::PointSet2D<T>::begin() const
 {
 	return points.begin();

@@ -12,9 +12,9 @@
 
 ;------------------------------------------------------------------------------
 ; Fast and short 32 bits AVR sqrt routine, avr-gcc ABI compliant
-; R25:R24 = SQRT (R25:R24:R23:R22) 
+; R25:R24 = SQRT (R25:R24:R23:R22)
 ; rounded to the nearest integer (0.5 rounds up)
-; 
+;
 ; Destroys R18-R19,R22-R23,R26-R27
 ; Cycles incl call & ret = 265-310
 ; Stack incl call = 2-3

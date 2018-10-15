@@ -30,14 +30,14 @@ class CppCommunicationBuilder(builder_base.Builder):
 	Generate the whole communication tree. The Output is a class named
 	Communication, which contains all concrete Components. They all contain
 	methods, which are corresponding to Actions of given Components.
-	
+
 	A common call would be like:
 	$python3 java_communication.py  --outpath source/rca/robot --package rca.robot robot.xml;
 	"""
-	
-	
+
+
 	VERSION = "0.1"
-	
+
 	def setup(self, optparser):
 		optparser.add_option(
 				"--namespace",
@@ -63,17 +63,17 @@ class CppCommunicationBuilder(builder_base.Builder):
 		}
 		template = self.template('templates/cpp_communication.tpl',
 								filter = cppFilter)
-		
+
 		# Bool has a special status because its primitive but user generated
 		# and the only not numerical type
 		components = self.tree.components
-		
+
 		substitutions = {
 			'components': components,
 			'events': self.tree.events,
 			'namespace': namespace
 		}
-		
+
 		file = os.path.join(self.options.outpath, 'communication.hpp')
 		self.write(file, template.render(substitutions))
 

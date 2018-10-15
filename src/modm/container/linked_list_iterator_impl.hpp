@@ -88,7 +88,7 @@ modm::LinkedList<T, Allocator>::const_iterator::operator * () const
 }
 
 template <typename T, typename Allocator>
-const T* 
+const T*
 modm::LinkedList<T, Allocator>::const_iterator::operator -> () const
 {
 	return &this->node->value;
@@ -96,7 +96,7 @@ modm::LinkedList<T, Allocator>::const_iterator::operator -> () const
 
 
 template <typename T, typename Allocator>
-typename modm::LinkedList<T, Allocator>::const_iterator 
+typename modm::LinkedList<T, Allocator>::const_iterator
 modm::LinkedList<T, Allocator>::begin() const
 {
 	return const_iterator(this->front);
@@ -169,7 +169,7 @@ modm::LinkedList<T, Allocator>::iterator::operator * ()
 }
 
 template <typename T, typename Allocator>
-T* 
+T*
 modm::LinkedList<T, Allocator>::iterator::operator -> ()
 {
 	return &this->node->value;
@@ -177,7 +177,7 @@ modm::LinkedList<T, Allocator>::iterator::operator -> ()
 
 
 template <typename T, typename Allocator>
-typename modm::LinkedList<T, Allocator>::iterator 
+typename modm::LinkedList<T, Allocator>::iterator
 modm::LinkedList<T, Allocator>::begin()
 {
 	return iterator(this->front);

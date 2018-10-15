@@ -60,6 +60,6 @@ FakeIODevice::moveSendToReceiveBuffer()
 	std::memcpy(receiveBuffer, sendBuffer, bytesSend);
 	bytesReceived = bytesSend;
 	receivePosition = 0;
-	
+
 	bytesSend = 0;
 }

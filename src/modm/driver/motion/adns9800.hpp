@@ -85,7 +85,7 @@ public:
 	static void
 	getDeltaXY(int16_t &delta_x, int16_t &delta_y);
 
-protected:       
+protected:
 	static uint8_t
 	readReg(Register const reg);
 

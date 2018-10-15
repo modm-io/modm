@@ -20,12 +20,12 @@
  * The exception permits users' proprietary code to remain closed source while
  * maintaining the kernel itself as open source, thereby facilitating the use
  * of FreeRTOS in proprietary applications.
- * 
+ *
  * Key features:
  * - Small and simple. Very good for hobbyists who are new to OSes.
  * - Scheduler can be configured for both preemptive or cooperative operation.
  * - Coroutine support (Coroutine in FreeRTOS is a very simple and lightweight
  *   thread that has very limited use of stack)
- * 
+ *
  * \see	http://www.freertos.org/
  */

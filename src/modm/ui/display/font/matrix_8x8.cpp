@@ -31,11 +31,11 @@ namespace modm
 			0, 	// vspace
 			48,	// first char
 			10,	// char count
-			
+
 			// char widths
 			// for each character the separate width in pixels
-			 8,  8,  8,  8,  8,  8,  8,  8,  8,  8, 
-			
+			 8,  8,  8,  8,  8,  8,  8,  8,  8,  8,
+
 			// font data
 			// bit field of all characters
 			0x3E, 0x7F, 0x71, 0x59, 0x4D, 0x7F, 0x3E, 0x00, // 48

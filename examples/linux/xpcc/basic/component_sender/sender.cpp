@@ -46,14 +46,14 @@ component::Sender::update()
 	if (timer.execute())
 	{
 		MODM_LOG_INFO << MODM_FILE_INFO << "sender update" << modm::endl;
-		
+
 		robot::packet::Position position(10, 20);
-		
+
 		this->callAction(
 				robot::component::RECEIVER,
 				robot::action::SET_POSITION,
 				position);
-		
+
 		this->callAction(
 				robot::component::RECEIVER,
 				robot::action::GET_POSITION,

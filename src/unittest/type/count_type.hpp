@@ -22,30 +22,30 @@ namespace unittest
 {
 	/**
 	 * \brief	Data type to count the number of constructor etc. calls
-	 * 
+	 *
 	 * \ingroup	modm_unittest
 	 */
 	class CountType
 	{
 	public:
 		CountType();
-		
+
 		CountType(const CountType& other);
-		
+
 		~CountType();
-		
+
 		CountType&
 		operator = (const CountType& other);
-		
+
 		static void
 		reset();
-		
+
 		static std::size_t numberOfDefaultConstructorCalls;
 		static std::size_t numberOfCopyConstructorCalls;
 		static std::size_t numberOfAssignments;
 		static std::size_t numberOfDestructorCalls;
 		static std::size_t numberOfReallocs;
-		
+
 		static std::size_t numberOfOperations;
 	};
 }

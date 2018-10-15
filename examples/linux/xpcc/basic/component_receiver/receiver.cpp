@@ -33,7 +33,7 @@ component::Receiver::actionSetPosition(const xpcc::ResponseHandle&,
 	MODM_LOG_INFO << MODM_FILE_INFO
 			<< "action set position: x=" << parameter->x
 			<< ", y=" << parameter->y << modm::endl;
-	
+
 	position = *parameter;
 }
 
@@ -42,7 +42,7 @@ void
 component::Receiver::actionGetPosition(const xpcc::ResponseHandle& handle)
 {
 	MODM_LOG_INFO << MODM_FILE_INFO << "action get position" << modm::endl;
-	
+
 	this->sendResponse(handle, position);
 }
 

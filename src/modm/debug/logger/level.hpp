@@ -43,17 +43,17 @@ namespace modm
 #ifndef MODM_LOG_LEVEL
 	/**
 	 * \brief	Default log level
-	 * 
+	 *
 	 * Define to set the level of the logging to a defined value for each file.
 	 * To change the logging level in a source file use \c \#undef
-	 * 
+	 *
 	 * \code
 	 * #undef  MODM_LOG_LEVEL
 	 * #define MODM_LOG_LEVEL modm::log::INFO
 	 * \endcode
-	 * 
+	 *
 	 * DEBUG < INFO < WARNING < ERROR < DISABLED
-	 * 
+	 *
 	 * \ingroup modm_debug
 	 */
 	#define MODM_LOG_LEVEL modm::log::DEBUG

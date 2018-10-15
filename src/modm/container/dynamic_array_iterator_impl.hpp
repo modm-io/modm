@@ -104,7 +104,7 @@ modm::DynamicArray<T, Allocator>::const_iterator::operator * () const
 }
 
 template <typename T, typename Allocator>
-const T* 
+const T*
 modm::DynamicArray<T, Allocator>::const_iterator::operator -> () const
 {
 	return &parent->values[index];
@@ -204,7 +204,7 @@ modm::DynamicArray<T, Allocator>::iterator::operator * ()
 }
 
 template <typename T, typename Allocator>
-T* 
+T*
 modm::DynamicArray<T, Allocator>::iterator::operator -> ()
 {
 	return &parent->values[index];

@@ -25,28 +25,28 @@ class FakeBackend : public xpcc::BackendInterface
 public:
 	virtual void
 	update();
-	
+
 	virtual void
 	sendPacket(const xpcc::Header &header,
 			modm::SmartPointer payload = modm::SmartPointer());
-	
-	
+
+
 	virtual bool
 	isPacketAvailable() const;
-	
+
 	virtual const xpcc::Header&
 	getPacketHeader() const;
-	
+
 	virtual const modm::SmartPointer
 	getPacketPayload() const;
-	
+
 	virtual void
 	dropPacket();
 
 public:
 	/// Messages send by the dispatcher via sendPacket
 	modm::LinkedList<Message> messagesSend;
-	
+
 	/// Messages which should be received. isPacketAvailable(), getPacketHeader(),
 	/// getPacketPayload() and dropPacket() operate on this list.
 	modm::LinkedList<Message> messagesToReceive;

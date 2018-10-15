@@ -24,22 +24,22 @@ namespace modm
 {
 	/**
 	 * \brief	Dynamic Arrays
-	 * 
+	 *
 	 * Dynamic Arrays are a kind of sequence containers. As such, their
 	 * elements are ordered following a strict linear sequence.
-	 * 
+	 *
 	 * Just as regular arrays, dynamic arrays containers have their elements
 	 * stored in contiguous storage locations, which means that their elements
 	 * can be accessed not only using iterators but also using offsets on
 	 * regular pointers to elements.
-	 * 
+	 *
 	 * Reallocations may be a costly operation in terms of performance, since
 	 * they generally involve the entire storage space used by the
 	 * dynamic array to be copied to a new location. Therefore, whenever large
 	 * increases in size are planned for a dynamic array, it is recommended to
 	 * explicitly indicate a capacity for the dynamic array using member
 	 * function DynamicArray::reserve().
-	 * 
+	 *
 	 * \author	Fabian Greif <fabian.greif@rwth-aachen.de>
 	 * \ingroup	modm_container
 	 */
@@ -85,9 +85,9 @@ namespace modm
 			const Allocator& allocator = Allocator());
 
 		DynamicArray(const DynamicArray& other);
-		
+
 		~DynamicArray();
-		
+
 		DynamicArray&
 		operator = (const DynamicArray& other);
 
@@ -149,21 +149,21 @@ namespace modm
 		 */
 		void
 		reserve(SizeType n);
-		
+
 		/**
 		 * \brief	Remove all elements and set capacity to zero
-		 * 
+		 *
 		 * Frees all allocated memory and sets the capacity of the container
 		 * to zero.
-		 * 
+		 *
 		 * \warning	This will discard all the items in the container
 		 */
 		void
 		clear();
-		
+
 		/**
 		 * \brief	Remove all elements
-		 * 
+		 *
 		 * Keeps the capacity at its current level.
 		 */
 		void
@@ -174,10 +174,10 @@ namespace modm
 		 *
 		 * Returns a reference to the element at position n in the
 		 * dynamic array container.
-		 * 
-		 * \warning Do not use this operator to access an element the 
-		 * first time. Use the append methode to create it. 
-		 * 
+		 *
+		 * \warning Do not use this operator to access an element the
+		 * first time. Use the append methode to create it.
+		 *
 		 * \see	append()
 		 */
 		inline T&
@@ -253,7 +253,7 @@ namespace modm
 		{
 			return this->values[this->size - 1];
 		}
-		
+
 	public:
 		/**
 		 * \brief	Forward iterator
@@ -262,12 +262,12 @@ namespace modm
 		{
 			friend class DynamicArray;
 			friend class const_iterator;
-			
+
 		public:
 			/// Default constructor
 			iterator();
 			iterator(const iterator& other);
-			
+
 			iterator& operator = (const iterator& other);
 			iterator& operator ++ ();
 			iterator& operator -- ();
@@ -277,38 +277,38 @@ namespace modm
 			bool operator >  (const iterator& other) const;
 			T& operator * ();
 			T* operator -> ();
-			
+
 		private:
 			iterator(DynamicArray* parent, SizeType index);
-			
+
 			DynamicArray *parent;
 			SizeType index;
 		};
-		
+
 		/**
 		 * \brief	forward const iterator
 		 */
 		class const_iterator
 		{
 			friend class DynamicArray;
-			
+
 		public:
 			/// Default constructor
 			const_iterator();
-			
+
 			/**
 			 * \brief	Copy constructor
-			 * 
+			 *
 			 * Used to convert a normal iterator to a const iterator.
 			 * The other way is not possible.
 			 */
 			const_iterator(const iterator& other);
-			
+
 			/**
 			 * \brief	Copy constructor
 			 */
 			const_iterator(const const_iterator& other);
-			
+
 			const_iterator& operator = (const const_iterator& other);
 			const_iterator& operator ++ ();
 			const_iterator& operator -- ();
@@ -316,21 +316,21 @@ namespace modm
 			bool operator != (const const_iterator& other) const;
 			const T& operator * () const;
 			const T* operator -> () const;
-		
+
 		private:
 			const_iterator(const DynamicArray* parent, SizeType index);
-			
+
 			const DynamicArray *parent;
 			SizeType index;
 		};
-		
+
 		/**
 		 * Returns a read/write iterator that points to the first element in the
 		 * list.  Iteration is done in ordinary element order.
 		 */
 		iterator
 		begin();
-		
+
 		/**
 		 * Returns a read-only (constant) iterator that points to the
 		 * first element in the list.  Iteration is done in ordinary
@@ -338,7 +338,7 @@ namespace modm
 		 */
 		const_iterator
 		begin() const;
-		
+
 		/**
 		 * Returns a read/write iterator that points one past the last
 		 * element in the list. Iteration is done in ordinary element
@@ -346,7 +346,7 @@ namespace modm
 		 */
 		iterator
 		end();
-		
+
 		/**
 		 * Returns a read-only (constant) iterator that points one past
 		 * the last element in the list.  Iteration is done in ordinary
@@ -354,7 +354,7 @@ namespace modm
 		 */
 		const_iterator
 		end() const;
-		
+
 		/**
 		 * Returns a read/write iterator that points to the first element
 		 * that contains value. If value is not found, it points to the
@@ -373,8 +373,8 @@ namespace modm
 
 	private:
 		friend class const_iterator;
-		friend class iterator;	
-		
+		friend class iterator;
+
 	private:
 		/*
 		 * Allocate a new buffer of size n and copy the elements from the
@@ -382,9 +382,9 @@ namespace modm
 		 */
 		void
 		relocate(SizeType n);
-		
+
 		Allocator allocator;
-		
+
 		SizeType size;
 		SizeType capacity;
 		T* values;

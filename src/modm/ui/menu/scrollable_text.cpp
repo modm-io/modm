@@ -80,7 +80,7 @@ modm::ScrollableText::operator=(const ScrollableText& text)
 
 const char*
 modm::ScrollableText::getText()
-{	
+{
 	if(this->needsScrolling())
 	{
 		if(!this->isPaused())

@@ -21,7 +21,7 @@ namespace modm
 {
 	/**
 	 * \brief	Class for handling common vector operations (4D)
-	 * 
+	 *
 	 *	+ : addition of points
 	 *	- : different of points
 	 *	* : dot product or scalar multiplication
@@ -30,7 +30,7 @@ namespace modm
 	 * Adapted from the implementation of Gaspard Petit (gaspardpetit@gmail.com).
 	 *
 	 * \see <a href"http://www-etud.iro.umontreal.ca/~petitg/cpp/point.html">Homepage</a>
-	 * 
+	 *
 	 * \ingroup	modm_math_geometry
 	 * \author	Niklas Hauser
 	 */
@@ -39,10 +39,10 @@ namespace modm
 	{
 	public:
 		Vector();
-		
+
 		explicit Vector(T inVal);
 		Vector(T inX, T inY, T inZ, T inW);
-		
+
 		Vector(const Vector<T, 1> &inX, const Vector<T, 1> &inY, const Vector<T, 1> &inZ, const Vector<T, 1> &inW);
 		Vector(const Vector<T, 1> &inX, const Vector<T, 1> &inY, const Vector<T, 1> &inZ, const T &inW);
 		Vector(const Vector<T, 1> &inX, const Vector<T, 1> &inY, const T &inZ, const T &inW);
@@ -57,118 +57,118 @@ namespace modm
 		Vector(const Vector<T, 1> &inX, const T &inY, const Vector<T, 1> &inZ, const Vector<T, 1> &inW);
 		Vector(const T &inX, const T &inY, const Vector<T, 1> &inZ, const Vector<T, 1> &inW);
 		Vector(const T &inX, const Vector<T, 1> &inY, const Vector<T, 1> &inZ, const Vector<T, 1> &inW);
-		
+
 		Vector(const Vector<T, 2> &inXY, const Vector<T, 1> &inZ, const Vector<T, 1> &inW);
 		Vector(const Vector<T, 2> &inXY, const Vector<T, 1> &inZ, const T &inW);
 		Vector(const Vector<T, 2> &inXY, const T &inZ, const T &inW);
 		Vector(const Vector<T, 2> &inXY, const T &inZ, const Vector<T, 1> &inW);
-		
+
 		Vector(const Vector<T, 1> &inX, const Vector<T, 2> &inYZ, const Vector<T, 1> &inW);
 		Vector(const Vector<T, 1> &inX, const Vector<T, 2> &inYZ, const T &inW);
 		Vector(const T &inX, const Vector<T, 2> &inYZ, const T &inW);
 		Vector(const T &inX, const Vector<T, 2> &inYZ, const Vector<T, 1> &inW);
-		
+
 		Vector(const Vector<T, 1> &inX, const Vector<T, 1> &inY, const Vector<T, 2> &inZW);
 		Vector(const Vector<T, 1> &inX, const T &inY, const Vector<T, 2> &inZW);
 		Vector(const T &inX, const T &inY, const Vector<T, 2> &inZW);
 		Vector(const T &inX, const Vector<T, 1> &inY, const Vector<T, 2> &inZW);
-		
+
 		Vector(const Vector<T, 2> &inXY, const Vector<T, 2> &inZW);
-		
+
 		Vector(const Vector<T, 3> &inXYZ, const Vector<T, 1> &inW);
 		Vector(const Vector<T, 3> &inXYZ, const T &inW);
-		
+
 		Vector(const Vector<T, 1> &inX, const Vector<T, 3> &inYZW);
 		Vector(const T &inX, const Vector<T, 3> &inYZW);
-		
+
 		Vector(const Matrix<T, 4, 1> &rhs);
 		Vector(const Vector &rhs);
-		
-		
+
+
 		inline void
 		set(const T& x, const T& y, const T& z, const T& w);
-		
-		
+
+
 		inline void
 		setX(const T& value);
-		
+
 		inline void
 		setY(const T& value);
-		
+
 		inline void
 		setZ(const T& value);
-		
+
 		inline void
 		setW(const T& value);
-		
-		
+
+
 		inline const T&
 		getX() const;
-		
+
 		inline const T&
 		getY() const;
-		
+
 		inline const T&
 		getZ() const;
-		
+
 		inline const T&
 		getW() const;
-		
-		
+
+
 		Vector& operator = (const Matrix<T, 4, 1> &rhs);
 		Vector& operator = (const Vector &rhs);
-		
+
 		bool operator == (const Vector &rhs) const;
 		bool operator != (const Vector &rhs) const;
 		bool operator < (const Vector &rhs) const;
 		bool operator <= (const Vector &rhs) const;
 		bool operator > (const Vector &rhs) const;
 		bool operator >= (const Vector &rhs) const;
-		
+
 		const T& operator [] (uint8_t index) const;
 		T& operator [] (uint8_t index);
 		T* ptr();
 		const T* ptr() const;
-		
+
 		Vector operator - () const;
 		Vector operator + (const Vector &rhs) const;
 		Vector operator - (const Vector &rhs) const;
 		T operator * (const Vector &rhs) const;
 		Vector operator * (const T &rhs) const;
 		Vector operator / (const T &rhs) const;
-		
+
 		Vector& operator += (const Vector &rhs);
 		Vector& operator -= (const Vector &rhs);
 		Vector& operator *= (const T &rhs);
 		Vector& operator /= (const T &rhs);
-		
+
 		float getLength() const;
 		float getLengthSquared() const;
-		
+
 		void scale(float newLength);
 		Vector scaled(float newLength) const;
-		
+
 		void normalize();
 		Vector normalized() const;
-		
+
 		Matrix<T, 4, 1>&
 		asMatrix();
-		
+
 		const Matrix<T, 4, 1>&
 		asMatrix() const;
-		
+
 		Matrix<T, 1, 4>&
 		asTransposedMatrix();
-		
+
 		const Matrix<T, 1, 4>&
 		asTransposedMatrix() const;
-		
+
 	#ifndef __DOXYGEN__
 		IMPLEMENT_VECTOR_ACCESSOR2(x,x)	IMPLEMENT_VECTOR_ACCESSOR2(x,y)	IMPLEMENT_VECTOR_ACCESSOR2(x,z)	IMPLEMENT_VECTOR_ACCESSOR2(x,w)
 		IMPLEMENT_VECTOR_ACCESSOR2(y,x)	IMPLEMENT_VECTOR_ACCESSOR2(y,y)	IMPLEMENT_VECTOR_ACCESSOR2(y,z)	IMPLEMENT_VECTOR_ACCESSOR2(y,w)
 		IMPLEMENT_VECTOR_ACCESSOR2(z,x)	IMPLEMENT_VECTOR_ACCESSOR2(z,y)	IMPLEMENT_VECTOR_ACCESSOR2(z,z)	IMPLEMENT_VECTOR_ACCESSOR2(z,w)
 		IMPLEMENT_VECTOR_ACCESSOR2(w,x)	IMPLEMENT_VECTOR_ACCESSOR2(w,y)	IMPLEMENT_VECTOR_ACCESSOR2(w,z)	IMPLEMENT_VECTOR_ACCESSOR2(w,w)
-		
+
 		IMPLEMENT_VECTOR_ACCESSOR3(x,x,x) IMPLEMENT_VECTOR_ACCESSOR3(x,x,y) IMPLEMENT_VECTOR_ACCESSOR3(x,x,z) IMPLEMENT_VECTOR_ACCESSOR3(x,x,w)
 		IMPLEMENT_VECTOR_ACCESSOR3(x,y,x) IMPLEMENT_VECTOR_ACCESSOR3(x,y,y) IMPLEMENT_VECTOR_ACCESSOR3(x,y,z) IMPLEMENT_VECTOR_ACCESSOR3(x,y,w)
 		IMPLEMENT_VECTOR_ACCESSOR3(x,z,x) IMPLEMENT_VECTOR_ACCESSOR3(x,z,y) IMPLEMENT_VECTOR_ACCESSOR3(x,z,z) IMPLEMENT_VECTOR_ACCESSOR3(x,z,w)
@@ -180,8 +180,8 @@ namespace modm
 		IMPLEMENT_VECTOR_ACCESSOR3(z,z,x) IMPLEMENT_VECTOR_ACCESSOR3(z,z,y) IMPLEMENT_VECTOR_ACCESSOR3(z,z,z) IMPLEMENT_VECTOR_ACCESSOR3(z,z,w)
 		IMPLEMENT_VECTOR_ACCESSOR3(w,x,x) IMPLEMENT_VECTOR_ACCESSOR3(w,x,y) IMPLEMENT_VECTOR_ACCESSOR3(w,x,z) IMPLEMENT_VECTOR_ACCESSOR3(w,x,w)
 		IMPLEMENT_VECTOR_ACCESSOR3(w,y,x) IMPLEMENT_VECTOR_ACCESSOR3(w,y,y) IMPLEMENT_VECTOR_ACCESSOR3(w,y,z) IMPLEMENT_VECTOR_ACCESSOR3(w,y,w)
-		IMPLEMENT_VECTOR_ACCESSOR3(w,z,x) IMPLEMENT_VECTOR_ACCESSOR3(w,z,y) IMPLEMENT_VECTOR_ACCESSOR3(w,z,z) IMPLEMENT_VECTOR_ACCESSOR3(w,z,w) 
-		
+		IMPLEMENT_VECTOR_ACCESSOR3(w,z,x) IMPLEMENT_VECTOR_ACCESSOR3(w,z,y) IMPLEMENT_VECTOR_ACCESSOR3(w,z,z) IMPLEMENT_VECTOR_ACCESSOR3(w,z,w)
+
 		IMPLEMENT_VECTOR_ACCESSOR4(x,x,x,x) IMPLEMENT_VECTOR_ACCESSOR4(x,x,x,y) IMPLEMENT_VECTOR_ACCESSOR4(x,x,x,z) IMPLEMENT_VECTOR_ACCESSOR4(x,x,x,w)
 		IMPLEMENT_VECTOR_ACCESSOR4(x,x,y,x) IMPLEMENT_VECTOR_ACCESSOR4(x,x,y,y) IMPLEMENT_VECTOR_ACCESSOR4(x,x,y,z) IMPLEMENT_VECTOR_ACCESSOR4(x,x,y,w)
 		IMPLEMENT_VECTOR_ACCESSOR4(x,x,z,x) IMPLEMENT_VECTOR_ACCESSOR4(x,x,z,y) IMPLEMENT_VECTOR_ACCESSOR4(x,x,z,z) IMPLEMENT_VECTOR_ACCESSOR4(x,x,z,w)
@@ -194,7 +194,7 @@ namespace modm
 		IMPLEMENT_VECTOR_ACCESSOR4(x,w,x,x) IMPLEMENT_VECTOR_ACCESSOR4(x,w,x,y) IMPLEMENT_VECTOR_ACCESSOR4(x,w,x,z) IMPLEMENT_VECTOR_ACCESSOR4(x,w,x,w)
 		IMPLEMENT_VECTOR_ACCESSOR4(x,w,y,x) IMPLEMENT_VECTOR_ACCESSOR4(x,w,y,y) IMPLEMENT_VECTOR_ACCESSOR4(x,w,y,z) IMPLEMENT_VECTOR_ACCESSOR4(x,w,y,w)
 		IMPLEMENT_VECTOR_ACCESSOR4(x,w,z,x) IMPLEMENT_VECTOR_ACCESSOR4(x,w,z,y) IMPLEMENT_VECTOR_ACCESSOR4(x,w,z,z) IMPLEMENT_VECTOR_ACCESSOR4(x,w,z,w)
-		
+
 		IMPLEMENT_VECTOR_ACCESSOR4(y,x,x,x) IMPLEMENT_VECTOR_ACCESSOR4(y,x,x,y) IMPLEMENT_VECTOR_ACCESSOR4(y,x,x,z) IMPLEMENT_VECTOR_ACCESSOR4(y,x,x,w)
 		IMPLEMENT_VECTOR_ACCESSOR4(y,x,y,x) IMPLEMENT_VECTOR_ACCESSOR4(y,x,y,y) IMPLEMENT_VECTOR_ACCESSOR4(y,x,y,z) IMPLEMENT_VECTOR_ACCESSOR4(y,x,y,w)
 		IMPLEMENT_VECTOR_ACCESSOR4(y,x,z,x) IMPLEMENT_VECTOR_ACCESSOR4(y,x,z,y) IMPLEMENT_VECTOR_ACCESSOR4(y,x,z,z) IMPLEMENT_VECTOR_ACCESSOR4(y,x,z,w)
@@ -207,7 +207,7 @@ namespace modm
 		IMPLEMENT_VECTOR_ACCESSOR4(y,w,x,x) IMPLEMENT_VECTOR_ACCESSOR4(y,w,x,y) IMPLEMENT_VECTOR_ACCESSOR4(y,w,x,z) IMPLEMENT_VECTOR_ACCESSOR4(y,w,x,w)
 		IMPLEMENT_VECTOR_ACCESSOR4(y,w,y,x) IMPLEMENT_VECTOR_ACCESSOR4(y,w,y,y) IMPLEMENT_VECTOR_ACCESSOR4(y,w,y,z) IMPLEMENT_VECTOR_ACCESSOR4(y,w,y,w)
 		IMPLEMENT_VECTOR_ACCESSOR4(y,w,z,x) IMPLEMENT_VECTOR_ACCESSOR4(y,w,z,y) IMPLEMENT_VECTOR_ACCESSOR4(y,w,z,z) IMPLEMENT_VECTOR_ACCESSOR4(y,w,z,w)
-		
+
 		IMPLEMENT_VECTOR_ACCESSOR4(z,x,x,x) IMPLEMENT_VECTOR_ACCESSOR4(z,x,x,y) IMPLEMENT_VECTOR_ACCESSOR4(z,x,x,z) IMPLEMENT_VECTOR_ACCESSOR4(z,x,x,w)
 		IMPLEMENT_VECTOR_ACCESSOR4(z,x,y,x) IMPLEMENT_VECTOR_ACCESSOR4(z,x,y,y) IMPLEMENT_VECTOR_ACCESSOR4(z,x,y,z) IMPLEMENT_VECTOR_ACCESSOR4(z,x,y,w)
 		IMPLEMENT_VECTOR_ACCESSOR4(z,x,z,x) IMPLEMENT_VECTOR_ACCESSOR4(z,x,z,y) IMPLEMENT_VECTOR_ACCESSOR4(z,x,z,z) IMPLEMENT_VECTOR_ACCESSOR4(z,x,z,w)
@@ -220,7 +220,7 @@ namespace modm
 		IMPLEMENT_VECTOR_ACCESSOR4(z,w,x,x) IMPLEMENT_VECTOR_ACCESSOR4(z,w,x,y) IMPLEMENT_VECTOR_ACCESSOR4(z,w,x,z) IMPLEMENT_VECTOR_ACCESSOR4(z,w,x,w)
 		IMPLEMENT_VECTOR_ACCESSOR4(z,w,y,x) IMPLEMENT_VECTOR_ACCESSOR4(z,w,y,y) IMPLEMENT_VECTOR_ACCESSOR4(z,w,y,z) IMPLEMENT_VECTOR_ACCESSOR4(z,w,y,w)
 		IMPLEMENT_VECTOR_ACCESSOR4(z,w,z,x) IMPLEMENT_VECTOR_ACCESSOR4(z,w,z,y) IMPLEMENT_VECTOR_ACCESSOR4(z,w,z,z) IMPLEMENT_VECTOR_ACCESSOR4(z,w,z,w)
-		
+
 		IMPLEMENT_VECTOR_ACCESSOR4(w,x,x,x) IMPLEMENT_VECTOR_ACCESSOR4(w,x,x,y) IMPLEMENT_VECTOR_ACCESSOR4(w,x,x,z) IMPLEMENT_VECTOR_ACCESSOR4(w,x,x,w)
 		IMPLEMENT_VECTOR_ACCESSOR4(w,x,y,x) IMPLEMENT_VECTOR_ACCESSOR4(w,x,y,y) IMPLEMENT_VECTOR_ACCESSOR4(w,x,y,z) IMPLEMENT_VECTOR_ACCESSOR4(w,x,y,w)
 		IMPLEMENT_VECTOR_ACCESSOR4(w,x,z,x) IMPLEMENT_VECTOR_ACCESSOR4(w,x,z,y) IMPLEMENT_VECTOR_ACCESSOR4(w,x,z,z) IMPLEMENT_VECTOR_ACCESSOR4(w,x,z,w)
@@ -234,26 +234,26 @@ namespace modm
 		IMPLEMENT_VECTOR_ACCESSOR4(w,w,y,x) IMPLEMENT_VECTOR_ACCESSOR4(w,w,y,y) IMPLEMENT_VECTOR_ACCESSOR4(w,w,y,z) IMPLEMENT_VECTOR_ACCESSOR4(w,w,y,w)
 		IMPLEMENT_VECTOR_ACCESSOR4(w,w,z,x) IMPLEMENT_VECTOR_ACCESSOR4(w,w,z,y) IMPLEMENT_VECTOR_ACCESSOR4(w,w,z,z) IMPLEMENT_VECTOR_ACCESSOR4(w,w,z,w)
 	#endif
-		
+
 	public:
 		T x;
 		T y;
 		T z;
 		T w;
 	};
-	
+
 	template<typename U, typename T>
 	static inline Vector<T,4> operator * (const U &lhs, const Vector<T,4> &rhs)
 	{
 		return rhs * lhs;
 	}
-	
+
 	template<typename T, typename U>
 	static inline Vector<U,4> operator * (const Matrix<T, 4, 4> &lhs, const Vector<U,4> &rhs)
 	{
 		return lhs * rhs.asTMatrix();
 	}
-	
+
 	typedef Vector<float, 4> 	Vector4f;
 	typedef Vector<int16_t, 4>	Vector4i;
 	typedef Vector<uint16_t, 4>	Vector4u;

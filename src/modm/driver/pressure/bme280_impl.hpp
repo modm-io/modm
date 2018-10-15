@@ -39,7 +39,7 @@ modm::Bme280<I2cMaster>::initialize(Mode mode, Oversampling pressure, Oversampli
 	// {
 	// 	buffer[0] = i(Register::CHIP_ID);
 	// 	uint8_t chid;
-		
+
 	// 	this->transaction.configureWriteRead(buffer, 1, &chid, 1);
 
 	// 	if (RF_CALL( this->runTransaction() ))
@@ -54,7 +54,7 @@ modm::Bme280<I2cMaster>::initialize(Mode mode, Oversampling pressure, Oversampli
 	// 	}
 	// }
 
-	// First configure humidity sampling because 
+	// First configure humidity sampling because
 	// Changes to this register only become effective after a write operation to “ctrl_meas”.
 	{
 		CtrlHum_t ctrl_hum = Humidity(humidity);
@@ -67,7 +67,7 @@ modm::Bme280<I2cMaster>::initialize(Mode mode, Oversampling pressure, Oversampli
 		RF_RETURN(false);
 	}
 
-	
+
 	// Now hardcoded to Normal mode (which may be inaccurate due to bus traffic)
 	{
 		CtrlMeas_t ctrl_meas = Mode_t(mode);
@@ -83,7 +83,7 @@ modm::Bme280<I2cMaster>::initialize(Mode mode, Oversampling pressure, Oversampli
 		RF_RETURN(false);
 	}
 
-	
+
 	// Configure the standby time
 	{
 		Config_t config = TimeStandby_t(TimeStandby::S1);

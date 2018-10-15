@@ -31,7 +31,7 @@ FakeCanDriver::getMessage(modm::can::Message& message)
 	{
 		message = receiveList.getFront();
 		receiveList.removeFront();
-		
+
 		return true;
 	}
 	else {

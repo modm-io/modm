@@ -27,7 +27,7 @@ namespace unittest
 	 * \brief	Reporter
 	 *
 	 * Used to generate the visible output.
-	 * 
+	 *
 	 * \author	Fabian Greif
 	 * \ingroup	modm_unittest
 	 */
@@ -40,24 +40,24 @@ namespace unittest
 		 * \param	device	IODevice used for printing
 		 */
 		Reporter(modm::IODevice& device);
-		
+
 		/**
 		 * \brief	Switch to the next test suite
-		 * 
+		 *
 		 * \param	name	Name of the test suite
 		 */
 		void
 		nextTestSuite(modm::accessor::Flash<char> name);
-		
+
 		/**
 		 * \brief	Report a passed test
-		 * 
+		 *
 		 * Doesn't generate any output, but increments the number of
 		 * passed tests
 		 */
 		void
 		reportPass();
-		
+
 		/**
 		 * \brief	Reported a failed test
 		 *
@@ -66,21 +66,21 @@ namespace unittest
 		 */
 		modm::IOStream&
 		reportFailure(unsigned int lineNumber);
-		
+
 		/**
 		 * \brief	Writes a summary of all the tests
-		 * 
-		 * Basically the total number of failed and passed tests and then 
+		 *
+		 * Basically the total number of failed and passed tests and then
 		 * 'OK' if there was no failure or 'FAIL' otherwise.
 		 * @return 0 if all tests passed
 		 */
 		uint8_t
 		printSummary();
-		
+
 	private:
 		modm::IOStream outputStream;
 		modm::accessor::Flash<char> testName;
-		
+
 		int_fast16_t testsPassed;
 		int_fast16_t testsFailed;
 	};

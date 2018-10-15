@@ -19,35 +19,35 @@ void
 BoundedStackTest::testStack()
 {
 	modm::BoundedStack<int16_t, 3> stack;
-	
+
 	TEST_ASSERT_TRUE(stack.isEmpty());
 	TEST_ASSERT_EQUALS(stack.getMaxSize(), 3U);
-	
+
 	TEST_ASSERT_TRUE(stack.push(1));
 	TEST_ASSERT_TRUE(stack.push(2));
 	TEST_ASSERT_TRUE(stack.push(3));
-	
+
 	TEST_ASSERT_FALSE(stack.push(4));
 	TEST_ASSERT_TRUE(stack.isFull());
-	
+
 	TEST_ASSERT_EQUALS(stack.get(), 3);
 	stack.pop();
-	
+
 	TEST_ASSERT_EQUALS(stack.get(), 2);
 	stack.pop();
-	
+
 	TEST_ASSERT_TRUE(stack.push(4));
 	TEST_ASSERT_TRUE(stack.push(5));
 	TEST_ASSERT_TRUE(stack.isFull());
-	
+
 	TEST_ASSERT_EQUALS(stack.get(), 5);
 	stack.pop();
-	
+
 	TEST_ASSERT_EQUALS(stack.get(), 4);
 	stack.pop();
-	
+
 	TEST_ASSERT_EQUALS(stack.get(), 1);
 	stack.pop();
-	
+
 	TEST_ASSERT_TRUE(stack.isEmpty());
 }

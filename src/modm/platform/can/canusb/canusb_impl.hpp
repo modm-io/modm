@@ -70,7 +70,7 @@ modm::platform::CanUsb<SerialPort>::open(modm::Can::Bitrate canBitrate)
 
 		// Set CAN bitrate
 		MODM_LOG_DEBUG << MODM_FILE_INFO << "Set CAN bitrate" << modm::endl;
-		
+
 		switch (canBitrate)
 		{
 			case kBps10:
@@ -99,7 +99,7 @@ modm::platform::CanUsb<SerialPort>::open(modm::Can::Bitrate canBitrate)
 			break;
 		}
 
-		
+
 
 		timeout.restart(500);
 		while (not this->serialPort.read(a))
@@ -115,7 +115,7 @@ modm::platform::CanUsb<SerialPort>::open(modm::Can::Bitrate canBitrate)
 			MODM_LOG_ERROR << MODM_FILE_INFO << "Wrong answer on set CAN bitrate: " << modm::hex << (int) a	<< modm::endl;
 			return false;
 		}
-		
+
 		// Open CAN channel
 		this->serialPort.write("O\r");
 		MODM_LOG_DEBUG << MODM_FILE_INFO << "written 'O'" << modm::endl;

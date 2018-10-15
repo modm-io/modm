@@ -22,7 +22,7 @@ void
 SpiDeviceTest::testInitialState()
 {
 	test::SpiDevice device;
-	
+
 	TEST_ASSERT_TRUE(device.isSuccessful());
 }
 
@@ -30,9 +30,9 @@ void
 SpiDeviceTest::testEmptyTransmission()
 {
 	test::SpiDevice device;
-	
+
 	device.start(0, 0, __LINE__, false);
-	
+
 	TEST_ASSERT_TRUE(device.isSuccessful());
 }
 
@@ -45,26 +45,26 @@ SpiDeviceTest::testSingleTransmission()
 	test::Transmission transmissions[] = {
 		test::Transmission(MODM_ARRAY_SIZE(arg1Rx), arg1Rx, arg1Tx),
 	};
-	
+
 	test::SpiDevice device;
 	device.start(transmissions, ARRAY_SIZE(transmissions), __LINE__, false);
-	
+
 	TEST_ASSERT_FALSE(device.isSuccessful());
-	
+
 	device.select();
 	TEST_ASSERT_EQUALS(device.write(1), 4);
 	TEST_ASSERT_EQUALS(device.write(2), 3);
 	TEST_ASSERT_EQUALS(device.write(3), 2);
 	TEST_ASSERT_EQUALS(device.write(4), 1);
 	device.deselect();
-	
+
 	TEST_ASSERT_TRUE(device.isSuccessful());
-	
+
 	device.select();
 	device.deselect();
-	
+
 	TEST_ASSERT_FALSE(device.isSuccessful());
-	
+
 	// Restart transmission
 	device.start(transmissions, ARRAY_SIZE(transmissions), __LINE__, false);
 	device.select();
@@ -74,7 +74,7 @@ SpiDeviceTest::testSingleTransmission()
 	TEST_ASSERT_EQUALS(device.write(4), 1);
 	TEST_ASSERT_EQUALS(device.write(5), 0xff);		// one byte to much
 	device.deselect();
-	
+
 	TEST_ASSERT_FALSE(device.isSuccessful());
 }
 
@@ -91,23 +91,23 @@ SpiDeviceTest::testMultipleTransmissions()
 		test::Transmission(MODM_ARRAY_SIZE(arg1Rx), arg1Rx, arg1Tx),
 		test::Transmission(MODM_ARRAY_SIZE(arg2Rx), arg2Rx, arg2Tx),
 	};
-	
+
 	test::SpiDevice device;
 	device.start(transmissions, ARRAY_SIZE(transmissions), __LINE__, false);
-	
+
 	TEST_ASSERT_FALSE(device.isSuccessful());
-	
+
 	device.select();
 	TEST_ASSERT_EQUALS(device.write(1), 4);
 	TEST_ASSERT_EQUALS(device.write(2), 3);
 	TEST_ASSERT_EQUALS(device.write(3), 2);
 	TEST_ASSERT_EQUALS(device.write(4), 1);
 	device.deselect();
-	
+
 	device.select();
 	TEST_ASSERT_EQUALS(device.write(5), 100);
 	TEST_ASSERT_EQUALS(device.write(6), 101);
 	device.deselect();
-	
+
 	TEST_ASSERT_TRUE(device.isSuccessful());
 }

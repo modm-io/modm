@@ -16,23 +16,23 @@
 	.syntax	unified
 	.align	4
 	.thumb
-	
+
 // ----------------------------------------------------------------------------
-// Default functions which does nothing more than to return	
+// Default functions which does nothing more than to return
 	.weak	_defaultHandler
 	.type	_defaultHandler, %function
 	.func   _defaultHandler
 _defaultHandler:
 	bx		lr
 	.endfunc
-	
+
 // ----------------------------------------------------------------------------
 // Needed by __libc_init_array, can be overwritten by user code
 	.weak	_init
 	.type	_init, %function
 	.thumb_func
 	.set	_init, _defaultHandler
-	
+
 	.weak	_fini
 	.type	_fini, %function
 	.thumb_func
@@ -47,14 +47,14 @@ _defaultHandler:
 exit:
 	// Disable Interrupts
 	// TODO
-	
+
 	// Enter an infinite loop
     b    	.
     .endfunc
-    
+
 	.weak	_exit
 	.type	_exit, %function
 	.thumb_func
 	.set	_exit, exit
-	
+
 	.end

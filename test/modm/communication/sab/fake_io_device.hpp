@@ -12,7 +12,7 @@
 // ----------------------------------------------------------------------------
 
 #ifndef FAKE_IO_DEVICE_HPP
-#define FAKE_IO_DEVICE_HPP 
+#define FAKE_IO_DEVICE_HPP
 
 #include <stdint.h>
 
@@ -21,23 +21,23 @@ class FakeIODevice
 public:
 	static void
 	setBaudrate(uint32_t);
-	
+
 	static void
 	write(uint8_t data);
-	
+
 	static bool
 	read(uint8_t& byte);
-	
+
 	static void
 	reset();
-	
-	
+
+
 	static void
 	moveSendToReceiveBuffer();
-	
+
 	static uint8_t sendBuffer[40];
 	static uint8_t bytesSend;
-	
+
 	static uint8_t receiveBuffer[40];
 	static uint8_t receivePosition;
 	static uint8_t bytesReceived;

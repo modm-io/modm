@@ -24,17 +24,17 @@
 namespace modm
 {
 	template<typename T>
-	Saturated<T>::Saturated() : 
+	Saturated<T>::Saturated() :
 		value()
 	{
 	}
-	
+
 	template<typename T>
-	Saturated<T>::Saturated(const T& initialValue) : 
+	Saturated<T>::Saturated(const T& initialValue) :
 		value(initialValue)
 	{
 	}
-	
+
 	template<typename T>
 	void
 	Saturated<T>::setValue(WideType in)
@@ -49,7 +49,7 @@ namespace modm
 			value = static_cast<T>(in);
 		}
 	}
-	
+
 	template<typename T>
 	Saturated<T>&
 	Saturated<T>::operator += (const Saturated& other)
@@ -57,10 +57,10 @@ namespace modm
 		WideType temp = static_cast<WideType>(this->value) +
 						static_cast<WideType>(other.value);
 		setValue(temp);
-		
+
 		return *this;
 	}
-	
+
 	template<typename T>
 	Saturated<T>&
 	Saturated<T>::operator -= (const Saturated& other)
@@ -68,10 +68,10 @@ namespace modm
 		WideType temp = static_cast<WideType>(value) -
 						static_cast<WideType>(other.value);
 		setValue(temp);
-		
+
 		return *this;
 	}
-	
+
 	template<typename T>
 	void
 	Saturated<T>::absolute()
@@ -83,16 +83,16 @@ namespace modm
 			}
 		}
 	}
-	
+
 	// ----------------------------------------------------------------------------
 	template<typename U>
 	Saturated<U>
 	operator - (const Saturated<U>& x)
 	{
 		typedef typename ArithmeticTraits<U>::WideType WideType;
-		
+
 		WideType temp = - static_cast<WideType>(x.value);
-		
+
 		Saturated<U> result;
 		result.setValue(temp);
 		return result;
@@ -104,7 +104,7 @@ namespace modm
 	abs(const Saturated<U>& x)
 	{
 		Saturated<U> result(x);
-		
+
 		if (ArithmeticTraits<U>::isSigned) {
 			result.absolute();
 		}
@@ -120,7 +120,7 @@ namespace modm
 		t -= b;
 		return t;
 	}
-	
+
 	// ----------------------------------------------------------------------------
 	template<typename U>
 	Saturated<U>
@@ -130,7 +130,7 @@ namespace modm
 		t += b;
 		return t;
 	}
-	
+
 	// ----------------------------------------------------------------------------
 	template<typename U>
 	inline bool
@@ -146,21 +146,21 @@ namespace modm
 	{
 		return (a.value != b.value);
 	}
-	
+
 	// ----------------------------------------------------------------------------
-	
+
 	template<>
 	void
 	Saturated<uint8_t>::absolute()
 	{
 	}
-	
+
 	template<>
 	void
 	Saturated<uint16_t>::absolute()
 	{
 	}
-	
+
 	template<>
 	void
 	Saturated<uint32_t>::absolute()

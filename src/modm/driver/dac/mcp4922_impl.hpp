@@ -23,7 +23,7 @@ void
 modm::Mcp4922<Spi, Cs, Ldac>::initialize()
 {
 	//spi.initialize();
-	
+
 	Cs::setOutput(modm::Gpio::High);
 	Ldac::setOutput(modm::Gpio::High);
 }
@@ -70,9 +70,9 @@ void
 modm::Mcp4922<Spi, Cs, Ldac>::writeRegister(uint16_t value)
 {
 	Cs::reset();
-	
+
 	Spi::write(static_cast<uint8_t>(value >> 8));
 	Spi::write(static_cast<uint8_t>(value & 0xff));
-	
+
 	Cs::set();
 }

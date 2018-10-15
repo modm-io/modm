@@ -32,7 +32,7 @@ modm::DoublyLinkedList<T, Allocator>::~DoublyLinkedList()
 	{
 		Node *node = this->front;
 		this->front = this->front->next;
-		
+
 		Allocator::destroy(&node->value);
 		this->nodeAllocator.deallocate(node);
 	}
@@ -64,11 +64,11 @@ modm::DoublyLinkedList<T, Allocator>::prepend(const T& value)
 	// allocate memory for the new node and copy the value into it
 	Node *node = this->nodeAllocator.allocate(1);
 	Allocator::construct(&node->value, value);
-	
+
 	// hook the node into the list
 	node->next = this->front;
 	node->previous = 0;
-	
+
 	if (this->front == 0)
 	{
 		// node it the first entry
@@ -78,7 +78,7 @@ modm::DoublyLinkedList<T, Allocator>::prepend(const T& value)
 		this->front->previous = node;
 	}
 	this->front = node;
-	
+
 	return true;
 }
 
@@ -89,11 +89,11 @@ modm::DoublyLinkedList<T, Allocator>::append(const T& value)
 	// allocate memory for the new node and copy the value into it
 	Node *node = this->nodeAllocator.allocate(1);
 	Allocator::construct(&node->value, value);
-	
+
 	// hook the node into the list
 	node->next = 0;
 	node->previous = this->back;
-	
+
 	if (this->back == 0)
 	{
 		// first entry in the list
@@ -112,7 +112,7 @@ modm::DoublyLinkedList<T, Allocator>::removeFront()
 {
 	// remove node from the list
 	Node *node = this->front;
-	
+
 	if (this->front->next == 0)
 	{
 		// last entry in the list
@@ -123,7 +123,7 @@ modm::DoublyLinkedList<T, Allocator>::removeFront()
 		this->front = this->front->next;
 		this->front->previous = 0;
 	}
-	
+
 	// call destructor and free memory
 	Allocator::destroy(&node->value);
 	this->nodeAllocator.deallocate(node);
@@ -135,7 +135,7 @@ modm::DoublyLinkedList<T, Allocator>::removeBack()
 {
 	// remove node from the list
 	Node *node = this->back;
-	
+
 	if (this->back->previous == 0)
 	{
 		// last entry in the list
@@ -146,7 +146,7 @@ modm::DoublyLinkedList<T, Allocator>::removeBack()
 		this->back = this->back->previous;
 		this->back->next = 0;
 	}
-	
+
 	// call destructor and free memory
 	Allocator::destroy(&node->value);
 	this->nodeAllocator.deallocate(node);
@@ -169,7 +169,7 @@ modm::DoublyLinkedList<T, Allocator>::getBack() const
 
 // ----------------------------------------------------------------------------
 template <typename T, typename Allocator>
-typename modm::DoublyLinkedList<T, Allocator>::iterator 
+typename modm::DoublyLinkedList<T, Allocator>::iterator
 modm::DoublyLinkedList<T, Allocator>::begin()
 {
 	return iterator(this->front);
@@ -183,7 +183,7 @@ modm::DoublyLinkedList<T, Allocator>::end()
 }
 
 template <typename T, typename Allocator>
-typename modm::DoublyLinkedList<T, Allocator>::const_iterator 
+typename modm::DoublyLinkedList<T, Allocator>::const_iterator
 modm::DoublyLinkedList<T, Allocator>::begin() const
 {
 	return const_iterator(this->front);

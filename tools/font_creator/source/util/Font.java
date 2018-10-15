@@ -26,12 +26,12 @@ public class Font {
 	private final int startIndex;
 	private int hspace;
 	private int vspace;
-	
+
 	private Vector<FontCharacter> chars;
 	private String name;
-	
+
 	private IndexColorModel editorColorModel;
-	
+
 	public Font(int width, int initWidth, int height, int startIdx,
 			int charCount, String name, int bits, java.awt.Font importFont) {
 		chars = new Vector<FontCharacter>(charCount);
@@ -48,12 +48,12 @@ public class Font {
 		if (importFont != null) {
 			this.height = height = importFont.getSize() * 2;
 		}
-		
+
 		int cropTop = height;
 		int cropBottom = height;
 		for (int i = 0; i < charCount; i++) {
 			FontCharacter c = new FontCharacter(initWidth, height, startIndex + i, this);
-			
+
 			if (importFont != null) {
 				Rectangle rect = c.importChar(importFont);
 				if ((char) c.getAsciiIndex() != ' ') {
@@ -65,19 +65,19 @@ public class Font {
 			}
 			chars.addElement(c);
 		}
-		
+
 		if (importFont != null) {
 			for (int i = 0; i < charCount; i++) {
 				chars.get(i).changeSize(-cropTop, -cropBottom, 0, 0);
 			}
-			this.height = height - cropTop - cropBottom; 
+			this.height = height - cropTop - cropBottom;
 		}
 		else {
 			cropTop = 0;
 			cropBottom = 0;
 		}
 	}
-	
+
 	public Font(SerializableFont sFont) {
 		width = sFont.getWidth();
 		height = sFont.getHeight();
@@ -86,20 +86,20 @@ public class Font {
 		hspace = sFont.getHorizontalSpace();
 		vspace = sFont.getVerticalSpace();
 		bits = sFont.getBits();
-		
+
 		editorColorModel = IndexColorModelUtils.getColorModel(bits);
-		
+
 		SerializableFontCharacter[] c = sFont.getChars();
 		chars = new Vector<FontCharacter>(c.length);
 		for (int i = 0; i < c.length; i++) {
 			chars.add(c[i].getFontCharacter(startIndex + i, this));
 		}
 	}
-	
+
 	public FontCharacter getCharacter(int index) {
 		return chars.get(index);
 	}
-	
+
 	public FontCharacter[] getAllCharacters() {
 		FontCharacter[] c = new FontCharacter[chars.size()];
 		for (int i = 0; i < chars.size(); i++) {
@@ -135,18 +135,18 @@ public class Font {
 	public int getStartIndex() {
 		return startIndex;
 	}
-	
+
 	public int getCharCount() {
 		return chars.size();
 	}
-	
+
 	/**
 	 * Horizontal spacing between two characters
 	 */
 	public int getHorizontalSpace() {
 		return hspace;
 	}
-	
+
 	/**
 	 * Vertical spacing between two characters
 	 */
@@ -157,11 +157,11 @@ public class Font {
 	public void setHorizontalSpace(int i) {
 		hspace = i;
 	}
-	
+
 	public void setVerticalSpace(int i) {
 		vspace = i;
 	}
-	
+
 	public IndexColorModel getEditorColorModel() {
 		return editorColorModel;
 	}

@@ -358,7 +358,7 @@ modm::Vector<T, 4>::Vector(const modm::Vector<T, 2> &inXY, const modm::Vector<T,
 {
 }
 
-	
+
 // ----------------------------------------------------------------------------
 template<typename T>
 modm::Vector<T, 4>::Vector(const modm::Vector<T, 3> &inXYZ, const modm::Vector<T, 1> &inW)
@@ -518,7 +518,7 @@ modm::Vector<T, 4>::operator = (const modm::Matrix<T, 4, 1> &rhs)
 	y = reinterpret_cast<const T*>(&rhs)[1];
 	z = reinterpret_cast<const T*>(&rhs)[2];
 	w = reinterpret_cast<const T*>(&rhs)[3];
-	
+
 	return *this;
 }
 
@@ -531,7 +531,7 @@ modm::Vector<T, 4>::operator = (const modm::Vector<T, 4> &rhs)
 	y = rhs.y;
 	z = rhs.z;
 	w = rhs.w;
-	
+
 	return *this;
 }
 
@@ -664,7 +664,7 @@ modm::Vector<T, 4>::operator += (const modm::Vector<T, 4> &rhs)
 	y += rhs.y;
 	z += rhs.z;
 	w += rhs.w;
-	
+
 	return *this;
 }
 
@@ -677,7 +677,7 @@ modm::Vector<T, 4>::operator -= (const modm::Vector<T, 4> &rhs)
 	y -= rhs.y;
 	z -= rhs.z;
 	w -= rhs.w;
-	
+
 	return *this;
 }
 
@@ -690,7 +690,7 @@ modm::Vector<T, 4>::operator *= (const T &rhs)
 	y *= rhs;
 	z *= rhs;
 	w *= rhs;
-	
+
 	return *this;
 }
 
@@ -703,7 +703,7 @@ modm::Vector<T, 4>::operator /= (const T &rhs)
 	y /= rhs;
 	z /= rhs;
 	w /= rhs;
-	
+
 	return *this;
 }
 

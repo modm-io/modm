@@ -27,7 +27,7 @@ namespace modm
 		public:
 			/**
 			 * \brief	Starts the real time kernel
-			 * 
+			 *
 			 * \warning	This function will never return.
 			 */
 			static void

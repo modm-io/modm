@@ -22,53 +22,53 @@ namespace modm
 	{
 		// forward declaration
 		class MutexGuard;
-		
+
 		/**
 		 * \brief	Mutex
-		 * 
+		 *
 		 * \ingroup	modm_processing_rtos
 		 */
 		class Mutex
 		{
 			friend class MutexGuard;
-			
+
 		public:
 			Mutex();
-			
+
 			~Mutex();
-			
+
 			/**
 			 * \param	timeout		Timeout in Milliseconds
 			 */
 			bool
 			acquire(uint32_t timeout);
-			
+
 			inline void
 			acquire()
 			{
 				mutex.lock();
 			}
-			
+
 			inline void
 			release()
 			{
 				mutex.unlock();
 			}
-			
+
 		private:
 			// disable copy constructor
 			Mutex(const Mutex& other);
-			
+
 			// disable assignment operator
 			Mutex&
 			operator = (const Mutex& other);
-			
+
 			std::timed_mutex mutex;
 		};
-		
+
 		/**
 		 * Implements a RAII-style locking.
-		 * 
+		 *
 		 * Locks the Mutex when created and unlocks it on destruction.
 		 * \ingroup modm_processing_rtos
 		 */
@@ -79,7 +79,7 @@ namespace modm
 				std::lock_guard<std::timed_mutex>(m.mutex)
 			{
 			}
-			
+
 			~MutexGuard()
 			{
 			}

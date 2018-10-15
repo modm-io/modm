@@ -40,20 +40,20 @@ namespace modm
 	{
 	public:
 		ViewStack(modm::GraphicDisplay* display);
-		
+
 		virtual ~ViewStack();
-		
+
 		/**
 		 * @brief get the top view from the stack
 		 * @return pointer to view from stack
 		 */
 
-		inline modm::AbstractView* 
+		inline modm::AbstractView*
 		get()
 		{
 			return this->stack.get();
 		}
-		
+
 		/**
 		 * @brief push new view on top of stack the new
 		 *        view will be displayed instead of the old
@@ -79,7 +79,7 @@ namespace modm
 		{
 			return *this->display;
 		}
-		
+
 		/**
 		 * @brief pop remove top view from the stack. The removed
 		 *        view is deleted
@@ -87,7 +87,7 @@ namespace modm
 
 		void
 		pop();
-		
+
 		virtual void
 		update();
 
@@ -95,7 +95,7 @@ namespace modm
 		 * @brief shortButtonPress pass the button press to the current top view
 		 * @param button the pressed button
 		 */
-		
+
 		void
 		shortButtonPress(modm::MenuButtons::Button button);
 

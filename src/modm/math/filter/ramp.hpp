@@ -22,15 +22,15 @@ namespace modm
 	{
 		/**
 		 * \brief	Ramp
-		 * 
+		 *
 		 * The output value is incremented or decremented at every call to update
 		 * until target has been reached by increment or decrement.
-		 * 
+		 *
 		 * The final value is always set to target after several calls to update.
-		 * 
+		 *
 		 * Example:
 		 * \todo	example
-		 * 
+		 *
 		 * \todo	documentation
 		 * \ingroup	modm_math_filter
 		 */
@@ -40,40 +40,40 @@ namespace modm
 		public:
 			/**
 			 * \brief	Create a ramp generator
-			 * 
+			 *
 			 * \param	increment		Step size for positive direction
 			 * \param	decrement		Step size for the negative direction.
 			 * 							<b>Needs to be positive!</b>
 			 * \param	initialValue	Starting value
-			 * 
+			 *
 			 * \warning	Both values for increment and decrement needs to
 			 * 			be positive!
 			 */
 			Ramp(const T& increment,
 				 const T& decrement,
 				 const T& initialValue = T());
-			
+
 			inline void
 			setTarget(const T& target);
-			
+
 			/// Calculate the next step
 			void
 			update();
-			
+
 			inline void
 			reset(const T& value = T());
-			
+
 			inline const T&
 			getValue() const;
-			
+
 			inline bool
 			isTargetReached() const;
-		
+
 		private:
 			T target;
 			T value;
 			bool targetReached;
-			
+
 			T increment;
 			T decrement;
 		};

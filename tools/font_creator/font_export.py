@@ -49,11 +49,11 @@ namespace modm
 			${vspace}, 	// vspace
 			${first},	// first char
 			${count},	// char count
-			
+
 			// char widths
 			// for each character the separate width in pixels
 			${char_width}
-			
+
 			// font data
 			// bit field of all characters
 			${font_data}
@@ -78,7 +78,7 @@ namespace modm
 	{
 		/**
 		 * \\brief	${font_name}
-		 * 
+		 *
 		 * - ${width_string} : ${width}
 		 * - height          : ${height}
 		 * - hspace          : ${hspace}
@@ -87,7 +87,7 @@ namespace modm
 		 * - last char       : ${last}
 		 * - number of chars : ${count}
 		 * - size in bytes   : ${size}
-		 * 
+		 *
 		 * \\ingroup	modm_ui_display_font
 		 */
 		EXTERN_FLASH_STORAGE(uint8_t ${array_name}[]);
@@ -119,7 +119,7 @@ class Char:
 		self.width = None
 		self.height = height
 		self.data = []
-		
+
 		self.rows = int(math.ceil(height / 8.0))
 
 # -----------------------------------------------------------------------------
@@ -129,16 +129,16 @@ def read_font_file(filename):
 	char_line_index = 0
 	char_last_number = None	# TODO
 	char = None
-	
+
 	font = Font()
-	
+
 	lines = open(filename).readlines()
 	for line_number, line in enumerate(lines):
 		if char_mode:
 			result = re.match("^\[([ #]+)\]\n", line)
 			if not result:
 				raise ParseException("Illegal Format in: %s" % line[:-1], line_number)
-			
+
 			width = len(result.group(1))
 			if char.width is None:
 				char.data = [0] * (char.rows * width)
@@ -146,7 +146,7 @@ def read_font_file(filename):
 				if width != char.width:
 					raise ParseException("Illegal width for char %i" % char.number, line_number)
 			char.width = width
-			
+
 			index = 0
 			for c in result.group(1):
 				if c == " ":
@@ -158,9 +158,9 @@ def read_font_file(filename):
 				else:
 					raise ParseException("Illegal character in line: %s" % line, line_number)
 				index += 1
-			
+
 			char_line_index += 1
-			
+
 			char_line_count -= 1
 			if char_line_count == 0:
 				char_mode = False
@@ -172,7 +172,7 @@ def read_font_file(filename):
 			else:
 				key = result.group(1)
 				value = result.group(2)
-				
+
 				if key == "font":
 					font.name = value
 				elif key == "width":
@@ -188,20 +188,20 @@ def read_font_file(filename):
 					if not charMatch:
 						raise ParseException("Illegal Format in: %s" % line[:-1], line_number)
 					number = int(charMatch.group(1))
-					
+
 					if font.first_char is None:
 						font.first_char = number
 					else:
 						if number != (char_last_number + 1):
 							raise ParseException("Unexpected character id %i" % number, line_number)
 					char_last_number = number
-					
+
 					if font.height is None:
 						raise ParseException("'height' not set!")
 					char_mode = True
 					char_line_count = font.height
 					char_line_index = 0
-					
+
 					char = Char(number, font.height)
 					font.chars.append(char)
 				else:
@@ -211,7 +211,7 @@ def read_font_file(filename):
 		else:
 			# TODO better error message
 			raise ParseException("Illegal Format: %s" % line[:-1], line_number)
-	
+
 	return font
 
 # -----------------------------------------------------------------------------
@@ -224,51 +224,51 @@ if __name__ == '__main__':
 	except:
 		print("usage: %s *.font outfile" % os.sys.argv[0])
 		exit(1)
-	
+
 	try:
 		font = read_font_file(filename)
 	except ParseException as e:
 		print("Error in line %i: " % e.line, e)
 		exit(1)
-	
+
 	width_histogram = {}
 	char_width = []
 	char_width_line = ""
 	char_line_count = 0
 	font_data = []
-	
+
 	# 8 byte header, width table
 	size = 8 + len(font.chars)
 	for char in font.chars:
 		size += len(char.data)
-		
+
 		char_width_line += "%2i, " % char.width
-		
+
 		char_line_count += 1
 		if char_line_count >= 10:
 			char_line_count = 0
-			
+
 			char_width.append(char_width_line)
 			char_width_line = ""
-		
+
 		data = ""
 		for c in char.data:
 			data += "0x%02X, " % c
 		data += "// %i" % char.index
 		font_data.append(data)
-		
+
 		width_histogram[char.width] = width_histogram.get(char.width, 0) + 1
-	
+
 	if char_width_line != "":
 		char_width.append(char_width_line)
-	
+
 	preferred_width = 0
 	max = 0
 	for key, value in width_histogram.items():
 		if value > max:
 			preferred_width = key
 			max = value
-	
+
 	substitutions = {
 		'copyright': template_copyright,
 		'font_name': font.name,
@@ -288,9 +288,9 @@ if __name__ == '__main__':
 		'font_data': "\n\t\t\t".join(font_data),
 		'include_guard': "MODM_FONT__" + os.path.basename(outfile).upper().replace(" ", "_") + "_HPP"
 	}
-	
+
 	output = string.Template(template_source).safe_substitute(substitutions)
 	open(outfile + ".cpp", 'w').write(output)
-	
+
 	output = string.Template(template_header).safe_substitute(substitutions)
 	open(outfile + ".hpp", 'w').write(output)

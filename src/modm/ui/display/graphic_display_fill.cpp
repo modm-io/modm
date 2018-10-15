@@ -40,9 +40,9 @@ modm::GraphicDisplay::fillCircle(glcd::Point center, uint16_t radius)
 	int16_t ddF_y = -2 * radius;
 	uint16_t x = 0;
 	uint16_t y = radius;
-	
+
 	this->drawVerticalLine(glcd::Point(center.getX(), center.getY() - radius), 2 * radius);
-	
+
 	while(x < y)
 	{
 		if (f >= 0)
@@ -54,7 +54,7 @@ modm::GraphicDisplay::fillCircle(glcd::Point center, uint16_t radius)
 		x++;
 		ddF_x += 2;
 		f += ddF_x + 1;
-		
+
 		this->drawVerticalLine(glcd::Point(center.getX() + x, center.getY() - y), 2 * y);
 		this->drawVerticalLine(glcd::Point(center.getX() + y, center.getY() - x), 2 * x);
 		this->drawVerticalLine(glcd::Point(center.getX() - x, center.getY() - y), 2 * y);

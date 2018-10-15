@@ -21,7 +21,7 @@ class CanConnectorBaseTest : public unittest::TestSuite
 public:
 	void
 	testConversionToIdentifier();
-	
+
 	void
 	testConversionToHeader();
 };

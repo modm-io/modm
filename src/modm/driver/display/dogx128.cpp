@@ -22,25 +22,25 @@ namespace modm
 		FLASH_STORAGE(uint8_t configuration_dogx128[12]) =
 		{
 			0x40, // Display start line 0
-			
+
 			// Normal / Inverted
 			ST7565_NORMAL,				// Display normal
-			
+
 			// Hardware options
 			ST7565_BIAS_1_9,			// Set bias 1/9 (Duty 1/65)
 			ST7565_POWER_WIDE_RANGE,	// Booster, Regulator and Follower on
 			ST7565_BOOSTER_SET,			// Set internal Booster to 4x
 			ST7565_VOLUME_MODE_2,
-			
+
 			// Contrast options
 			0x27,						// Contrast set
 			ST7565_VOLUME_MODE_1,
 			0x16,
-			
+
 			// Indicator options
 			ST7565_INDICATOR_OFF, 		// No indicator
 			ST7565_VOLUME_MODE_2,
-			
+
 			// (Init done)
 			ST7565_ON, 					// Display on
 		};

@@ -25,14 +25,14 @@ namespace modm
 
 	/**
 	 * \brief	Class for decomposing matrices
-	 * 
+	 *
 	 * Factorise a matrix A into an L(ower) and U(pper) matrix such that
 	 * A = L*U or P*A = L*U where P is a pivot matrix (changes the row order).
-	 * 
+	 *
 	 * Adapted from the implementation of Gaspard Petit (gaspardpetit@gmail.com).
-	 * 
+	 *
 	 * \see <a href"http://www-etud.iro.umontreal.ca/~petitg/cpp/ludecomposition.html">Homepage</a>
-	 * 
+	 *
 	 * \ingroup	modm_math_matrix
 	 * \author	Niklas Hauser
 	 */
@@ -71,7 +71,7 @@ namespace modm
 		solve(const Matrix<T, N, N> &A,
 				Matrix<T, N, BXWIDTH> *xb);
 
-		
+
 	private:
 		template<typename T, uint8_t OFFSET, uint8_t HEIGHT, uint8_t WIDTH>
 		class LUSubDecomposition
@@ -79,13 +79,13 @@ namespace modm
 		public:
 			static bool
 			decomposeRecur(T * u, T * l);
-			
+
 			static bool
 			decompose(T * u, T * l);
-			
+
 			static bool
 			decomposeRecur(T *u, T *l, int8_t *p);
-			
+
 			static bool
 			decompose(T *u, T *l, int8_t *p);
 
@@ -118,11 +118,11 @@ namespace modm
 
 			static void
 			addRowTimesFactor(
-					T *intoRow, 
-					const T *srcRow, 
-					const T *addRow, 
+					T *intoRow,
+					const T *srcRow,
+					const T *addRow,
 					const T &timesFactor);
-			
+
 			static void
 			swap(T *row1, T *row2);
 		};
@@ -136,9 +136,9 @@ namespace modm
 
 			static void
 			addRowTimesFactor(
-					T *intoRow, 
-					const T *srcRow, 
-					const T *addRow, 
+					T *intoRow,
+					const T *srcRow,
+					const T *addRow,
 					const T &timesFactor);
 
 			static void
@@ -151,16 +151,16 @@ namespace modm
 		public:
 			static bool
 			decomposeRecur(T *u, T *l, int8_t *p);
-			
+
 			static bool
 			decomposeRecur(T *u, T *l);
-			
+
 			template<uint8_t BXWIDTH>
 			static bool
 			solveUxEqualsY(
 					Matrix<T, WIDTH, OFFSET> *u,
 					Matrix<T, OFFSET, BXWIDTH> *bx);
-			
+
 			template<uint8_t BXWIDTH>
 			static bool
 			solveLyEqualsB(

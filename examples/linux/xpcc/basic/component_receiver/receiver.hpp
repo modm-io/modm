@@ -26,17 +26,17 @@ namespace component
 	{
 	public:
 		Receiver(uint8_t id, xpcc::Dispatcher &communication);
-		
+
 		void
 		actionSetPosition(const xpcc::ResponseHandle& handle,
 				const robot::packet::Position *parameter);
-		
+
 		void
 		actionGetPosition(const xpcc::ResponseHandle& handle);
-		
+
 		void
 		update();
-		
+
 	private:
 		robot::packet::Position position;
 	};

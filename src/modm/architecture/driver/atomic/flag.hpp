@@ -21,26 +21,26 @@ namespace modm
 	namespace atomic
 	{
 		/**
-		 * \brief		Flag to signal events between interrupts and the 
+		 * \brief		Flag to signal events between interrupts and the
 		 *				main-loop
-		 * 
+		 *
 		 * This class is quite handy when exchanging flags between a interrupt
-		 * routine and the main-loop. 
-		 * 
+		 * routine and the main-loop.
+		 *
 		 * \code
 		 * modm::atomic::Flag isrFlag;
-		 * 
+		 *
 		 * ISR() {
 		 *     ...
 		 *     isrFlag.set();
 		 * }
-		 * 
+		 *
 		 * function() {
 		 *     bool flag = isrFlag.testAndSet(false);
 		 *     ...
 		 * }
 		 * \endcode
-		 * 
+		 *
 		 * \ingroup	modm_architecture_atomic
 		 * \author	Fabian Greif
 		 */
@@ -48,12 +48,12 @@ namespace modm
 		{
 		public:
 			Flag(bool state = false);
-			
+
 			Flag(const Flag& other);
-			
+
 			Flag&
 			operator = (const Flag& other);
-			
+
 			/**
 			 * \brief	Check state of the flag
 			 */
@@ -62,7 +62,7 @@ namespace modm
 			{
 				return this->state;
 			}
-			
+
 			/**
 			 * \brief	Set flag
 			 */
@@ -71,7 +71,7 @@ namespace modm
 			{
 				this->state = true;
 			}
-			
+
 			/**
 			 * \brief	Clear flag
 			 */
@@ -80,7 +80,7 @@ namespace modm
 			{
 				this->state = false;
 			}
-			
+
 			/**
 			 * \brief	Sets the flag to a new value and returns the old one
 			 */
@@ -88,13 +88,13 @@ namespace modm
 			testAndSet(bool value)
 			{
 				Lock lock;
-				
+
 				bool oldValue = this->state;
 				this->state = value;
-				
+
 				return oldValue;
 			}
-		
+
 		private:
 			volatile bool state;
 		};

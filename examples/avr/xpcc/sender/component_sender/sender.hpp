@@ -30,7 +30,7 @@ namespace component
 
 		void
 		update();
-		
+
 	private:
 		void
 		getPositionCallback(const xpcc::Header& header,

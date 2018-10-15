@@ -72,7 +72,7 @@ namespace modm
 			/// Get filtered value
 			const T
 			getValue() const;
-		
+
 		private:
 			Index index;
 			T buffer[N];
@@ -99,9 +99,9 @@ modm::filter::MovingAverage<T, N>::update(const T& input)
 {
 	sum -= buffer[index];
 	sum += input;
-	
+
 	buffer[index] = input;
-	
+
 	index++;
 	if (index >= N) {
 		index = 0;

@@ -34,12 +34,12 @@ def check_and_print_results(old, new):
 	"""
 	flash, ram = new
 	oldFlash, oldRam = old
-	
+
 	divFlash = flash - oldFlash
 	divRam = ram - oldRam
 	percentFlash = 0 if oldFlash == 0 else divFlash * 100.0 / oldFlash
 	precentRam = 0 if oldRam == 0 else divRam * 100.0 / oldRam
-	
+
 	if (oldFlash < flash) or (oldRam < ram):
 		set_color(COLOR_RED)
 		print("WARNING: Regression at %s" % path)
@@ -49,7 +49,7 @@ def check_and_print_results(old, new):
 			print("  RAM   : %i -> %i (%+i => %i%%)" % (oldRam, ram, divRam, precentRam))
 		set_color(COLOR_DEFAULT)
 		return True
-		
+
 	elif (oldFlash > flash) or (oldRam > ram):
 		set_color(COLOR_GREEN)
 		print("IMPROVEMENT at %s" % path)
@@ -59,7 +59,7 @@ def check_and_print_results(old, new):
 			print("  RAM   : %i -> %i (%+i => %i%%)" % (oldRam, ram, divRam, precentRam))
 		set_color(COLOR_DEFAULT)
 		return True
-	
+
 	return False
 
 def check_symbols(file_old_symbols, file_new_symbols):
@@ -71,19 +71,19 @@ def check_symbols(file_old_symbols, file_new_symbols):
 				type = m.group(2)
 				name = m.group(3)
 				size = int(m.group(1))
-				
+
 				# some symbols may appear multiple times
 				value = old_symbols.get(name, [])
 				value.append((type, size))
 				old_symbols[name] = value
-		
+
 		for line in open(file_new_symbols).readlines():
 			m = re.match("\d{8} (\d{8}) (\w) (.+)", line)
 			if m:
 				type = m.group(2)
 				name = m.group(3)
 				size = int(m.group(1))
-				
+
 				try:
 					values = old_symbols.pop(name)
 					if len(values) > 1:
@@ -92,20 +92,20 @@ def check_symbols(file_old_symbols, file_new_symbols):
 						for (i, (old_type, old_size)) in enumerate(values):
 							if (type == old_type and size == old_size):
 								index = i
-						
+
 						(old_type, old_size) = values[index]
 						del values[index]
-						
+
 						# restore other symbols
 						old_symbols[name] = values
 					else:
 						(old_type, old_size) = values[0]
-					
+
 					if old_size > size:
 						set_color(COLOR_GREEN)
 						print("    %c %4i -> %4i (%4i) %s" % (type, old_size, size, (size - old_size), name))
 						set_color(COLOR_DEFAULT)
-						
+
 					elif old_size < size:
 						set_color(COLOR_RED)
 						print("    %c %4i -> %4i (%4i) %s" % (type, old_size, size, (size - old_size), name))
@@ -115,12 +115,12 @@ def check_symbols(file_old_symbols, file_new_symbols):
 					set_color(COLOR_RED)
 					print("    %c %4i added          %s" % (type, size, name))
 					set_color(COLOR_DEFAULT)
-		
+
 		for name, values in old_symbols.items():
 			# symbol was not removed => symbol is not in the new set
 			for value in values:
 				(type, size) = value
-				
+
 				set_color(COLOR_GREEN)
 				print("    %c %4i removed        %s" % (type, size, name))
 				set_color(COLOR_DEFAULT)
@@ -130,13 +130,13 @@ def check_symbols(file_old_symbols, file_new_symbols):
 def update_files():
 	"""
 	Save current status as reference for the next run
-	
+
 	- Remove all *.txt files
 	- Rename *.2.txt -> *.txt
 	"""
 	remove = ["regression.txt"]
 	rename = [("regression.2.txt", "regression.txt")]
-	
+
 	for path, directories, files in os.walk('regression'):
 		for file in files:
 			if file.endswith(".2.txt"):
@@ -145,13 +145,13 @@ def update_files():
 							   os.path.join(path, file[:-6] + ".txt")))
 			elif file.endswith(".txt"):
 				remove.append(os.path.join(path, file))
-	
+
 	for file in remove:
 		try:
 			os.remove(file)
 		except OSError:
 			pass
-	
+
 	for (old, new) in rename:
 		try:
 			os.rename(old, new)
@@ -162,14 +162,14 @@ if __name__ == '__main__':
 	parser = optparse.OptionParser()
 	parser.add_option("-v", "--verbose", action="store_true", dest="verbose")
 	parser.add_option("-u", "--update", action="store_true", dest="update")
-	
+
 	(options, args) = parser.parse_args()
-	
+
 	if len(args) == 0:
 		dir = '../examples'
 	else:
 		dir = args[0]
-	
+
 	results = {}
 	try:
 		for line in open("regression.txt"):
@@ -177,7 +177,7 @@ if __name__ == '__main__':
 			results[path] = [int(flash), int(ram)]
 	except IOError:
 		pass
-	
+
 	newData = []
 
 	#for path, directories, files in os.walk('../examples'):
@@ -186,7 +186,7 @@ if __name__ == '__main__':
 			cmd = ['scons', '-C%s' % path, 'size']
 			p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
 			stdout, stderr = p.communicate()
-			
+
 			print("check: %s" % path)
 			if stderr is not None:
 				set_color(COLOR_YELLOW)
@@ -198,14 +198,14 @@ if __name__ == '__main__':
 					result = stdout.decode(locale.getpreferredencoding())
 					flash = int(re.search("\nProgram:\s+(\d+)", result).group(1))
 					ram = int(re.search("\nData:\s+(\d+)", result).group(1))
-					
+
 					newData.append([path, flash, ram])
-					
+
 					uid = "_".join(path.split("/")[2:])
 					symbols_new = "regression/%s.2.txt" % uid
 					symbols_old = "regression/%s.txt" % uid
 					os.system("scons -C%s symbols > %s" % (path, symbols_new))
-					
+
 					try:
 						if check_and_print_results(results[path], (flash, ram)):
 							if options.verbose:
@@ -222,7 +222,7 @@ if __name__ == '__main__':
 	for result in newData:
 		file.write("%s %s %s\n" % (result[0], result[1], result[2]))
 	file.close()
-	
+
 	# save current status as reference for the next run
 	if options.update:
 		update_files()

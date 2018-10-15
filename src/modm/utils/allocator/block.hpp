@@ -22,14 +22,14 @@ namespace modm
 	{
 		/**
 		 * \brief	Block allocator
-		 * 
+		 *
 		 * Allocates a big block of memory and then distribute small pieces of
 		 * it. The memory is not released until the destruction of the
 		 * allocator.
 		 * If more memory is needed a new block is allocated.
-		 * 
+		 *
 		 * This technique is known as "memory pool".
-		 * 
+		 *
 		 * \ingroup	modm_utils_allocator
 		 * \author	Fabian Greif
 		 */
@@ -43,28 +43,28 @@ namespace modm
 			{
 				typedef Block<U, BLOCKSIZE> other;
 			};
-		
+
 		public:
 			Block() :
 				AllocatorBase<T>()
 			{
 			}
-			
+
 			Block(const Block& other) :
 				AllocatorBase<T>(other)
 			{
 			}
-			
+
 			template <typename U>
 			Block(const Block<U, BLOCKSIZE>&) :
 				AllocatorBase<T>()
 			{
 			}
-			
+
 			// TODO
 			T*
 			allocate();
-			
+
 			void
 			deallocate(T*);
 		};

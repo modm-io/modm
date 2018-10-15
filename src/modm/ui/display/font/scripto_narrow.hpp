@@ -25,7 +25,7 @@ namespace modm
 	{
 		/**
 		 * \brief	Scripto Narrow
-		 * 
+		 *
 		 * - preferred width : 3
 		 * - height          : 7
 		 * - hspace          : 0
@@ -34,7 +34,7 @@ namespace modm
 		 * - last char       : 127
 		 * - number of chars : 95
 		 * - size in bytes   : 382
-		 * 
+		 *
 		 * \ingroup	modm_ui_display_font
 		 */
 		EXTERN_FLASH_STORAGE(uint8_t ScriptoNarrow[]);

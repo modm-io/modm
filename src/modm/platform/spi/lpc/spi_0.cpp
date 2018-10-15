@@ -13,7 +13,7 @@
 
 /*
  * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.in file instead and rebuild this file. 
+ * Please modify the corresponding *.in file instead and rebuild this file.
  */
 // ----------------------------------------------------------------------------
 
@@ -120,14 +120,14 @@ modm::platform::SpiMaster0::setBuffer(uint16_t length, uint8_t* transmit, uint8_
 	if (!isFinished()) {
 		return false;
 	}
-	
+
 	transmitBuffer = transmit;
 	receiveBuffer = receive ? receive : transmit;
 	bufferLength = length;
-	
+
 	status &= ~(BUFFER_TRANSMIT_INCR_bm | BUFFER_RECEIVE_INCR_bm);
 	status |= bufferIncrease;
-	
+
 	return true;
 }
 
@@ -137,17 +137,17 @@ modm::platform::SpiMaster0::transfer(TransferOptions options)
 	if (status & BUFFER_IS_BUSY_SYNC_bm) {
 		return false;
 	}
-	
+
 	uint8_t rx = 0;
 	uint8_t tx = 0xff;
-		
+
 	// send the buffer out, blocking
 	status |= BUFFER_IS_BUSY_SYNC_bm;
-	
+
 	// check if we have to use a dummy buffer
 	bool transmit = (options & TRANSFER_SEND_BUFFER_DISCARD_RECEIVE) & static_cast<bool>(transmitBuffer);
 	bool receive = (options & TRANSFER_SEND_DUMMY_SAVE_RECEIVE) & static_cast<bool>(receiveBuffer);
-	
+
 	// If this is not a write-only transfer
 	if (receive) {
 		// This is an SPI master, so all data in the Rx FIFO can be discarded
@@ -157,11 +157,11 @@ modm::platform::SpiMaster0::transfer(TransferOptions options)
 			(void) dummy;
 		}
 	}
-	
-	while (bufferLength) 
+
+	while (bufferLength)
 	{
 		// Put as many bytes of the buffer into the hardware Tx FIFO
-		// until it is full or all bytes from the buffer were sent. 
+		// until it is full or all bytes from the buffer were sent.
 		uint_fast16_t ii = 0;
 		while ((LPC_SSP0->SR & SPI_SRn_TNF) && (ii < bufferLength))
 		{
@@ -171,14 +171,14 @@ modm::platform::SpiMaster0::transfer(TransferOptions options)
 			LPC_SSP0->DR = tx;
 			++ii;
 		}
-		
+
 		// ii is the number of bytes just written to FIFO
-		// For every byte written one byte is received. 
-		
+		// For every byte written one byte is received.
+
 		// Get corresponding number of bits from Rx FIFO if this is not a
 		// Tx-only transfer
 		if (receive) {
-			uint16_t jj = 0; // number of bytes received. 
+			uint16_t jj = 0; // number of bytes received.
 			while (jj < ii) {
 				// Busy-waiting for data until all data received.
 				while (!(LPC_SSP0->SR & SPI_SRn_RNE));
@@ -186,22 +186,22 @@ modm::platform::SpiMaster0::transfer(TransferOptions options)
 				++jj;
 			}
 		}
-		
+
 		// Block until all transfers finished
 		// TODO Do not block here, use interrupts
 		while (LPC_SSP0->SR & SPI_SRn_BSY);
-		
+
 		// Finished?
 		if (ii >= bufferLength) {
 			break;
-		}	
+		}
 	}
 
 	// TODO Do not block here, use interrupt to clear BUFFER_IS_BUSY_SYNC_bm
 	// flag when SPI is not busy any more
 	while (LPC_SSP0->SR & SPI_SRn_BSY);
 	status &= ~BUFFER_IS_BUSY_SYNC_bm;
-	
+
 	return true;
 }
 
@@ -226,9 +226,9 @@ modm::platform::SpiMaster0::write(uint8_t data)
 
 	/* Put data into FIFO */
 	LPC_SSP0->DR = data;
-	
+
 	/* Wait until data is received */
 	while (LPC_SSP0->SR & SPI_SRn_BSY);
-	
+
 	return LPC_SSP0->DR;
 }

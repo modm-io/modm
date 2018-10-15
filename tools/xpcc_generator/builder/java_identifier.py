@@ -26,32 +26,32 @@ class JavaIdentifierBuilder(builder_base.Builder):
 	which contains as subclasses three enums called Component, Action and Event.
 	Each contains a get by id method. Events have a possibility to create a
 	Packet from bytebuffer.
-	
+
 	A common call would be like:
 	$ python3 java_identifier.py  --outpath source/rca/robot --package rca.robot robot.xml;
 	"""
-	
+
 	VERSION = "0.1"
-	
+
 	def setup(self, optparser):
 		optparser.add_option(
 				"--package",
 				dest = "package",
 				default = '',
 				help = "name of package")
-				
+
 	def generate(self):
 		# check the commandline options
 		if not self.options.outpath:
 			raise builder_base.BuilderException("You need to provide an output path!")
-		
+
 		javaFilter = {
 			'enumElement': filter.enumElement,
 			'typeObjectName': filter.typeObjectName,
 		}
-		
+
 		template = self.template('templates/java_identifier.tpl', filter=javaFilter)
-		
+
 		substitutions = {
 			'domains' : self.tree.domains,
 			'package' : self.options.package,
@@ -59,7 +59,7 @@ class JavaIdentifierBuilder(builder_base.Builder):
 			'actions': self.tree.components.actions,
 			'events': self.tree.events,
 		}
-		
+
 		file = os.path.join(self.options.outpath, 'Identifier.java')
 		self.write(file, template.render(substitutions))
 

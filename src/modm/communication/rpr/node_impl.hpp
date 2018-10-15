@@ -101,9 +101,9 @@ modm::rpr::Node<Interface>::broadcastMessage(uint8_t command,
 template <typename Interface>
 void
 modm::rpr::Node<Interface>::update()
-{	
+{
 	Interface::update();
-	
+
 	Message *rx;
 	while ( (rx = Interface::getReceivedMessage()) )
 	{
@@ -119,7 +119,7 @@ modm::rpr::Node<Interface>::checkErrorCallbacks(ErrorMessage *errorMessage)
 {
 	if (errorCallbackCount == 0)
 		return false;
-	
+
 	modm::accessor::Flash<Error> list = errorCallbackList;
 	for (uint_fast8_t i = 0; i < errorCallbackCount; ++i, ++list)
 	{
@@ -140,12 +140,12 @@ modm::rpr::Node<Interface>::checkListenerCallbacks(Message *message)
 {
 	if (listenerCallbackCount == 0)
 		return false;
-	
+
 	modm::accessor::Flash<Listener> list = listenerCallbackList;
 	for (uint_fast8_t i = 0; i < listenerCallbackCount; ++i, ++list)
 	{
 		Listener handler(*list);
-		
+
 		if (handler.type == MESSAGE_TYPE_ANY || handler.type == message->type)
 		{
 			if (handler.source == ADDRESS_ANY || handler.source == message->source)

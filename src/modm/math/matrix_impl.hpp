@@ -31,7 +31,7 @@ modm::Matrix<T, ROWS, COLUMNS>::Matrix(const T *data)
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS> 
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 modm::Matrix<T, ROWS, COLUMNS>::Matrix(const Matrix &m)
 {
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
@@ -42,13 +42,13 @@ modm::Matrix<T, ROWS, COLUMNS>::Matrix(const Matrix &m)
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 template<typename U>
-modm::Matrix<T, ROWS, COLUMNS>& 
+modm::Matrix<T, ROWS, COLUMNS>&
 modm::Matrix<T, ROWS, COLUMNS>::operator = (const modm::Matrix<U, ROWS, COLUMNS> &m)
 {
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		element[i] = m.element[i];
 	}
-	
+
 	return *this;
 }
 
@@ -59,7 +59,7 @@ modm::Matrix<T, ROWS, COLUMNS>::identityMatrix()
 {
 	static modm::Matrix<T, ROWS, COLUMNS> matrix = zeroMatrix();
 	static bool hasIdentityMatrix = false;
-	
+
 	if (!hasIdentityMatrix)
 	{
 		if (ROWS < COLUMNS)
@@ -74,10 +74,10 @@ modm::Matrix<T, ROWS, COLUMNS>::identityMatrix()
 				matrix[i][i] = 1;
 			}
 		}
-		
+
 		hasIdentityMatrix = true;
 	}
-	
+
 	return matrix;
 }
 
@@ -88,13 +88,13 @@ modm::Matrix<T, ROWS, COLUMNS>::zeroMatrix()
 {
 	static modm::Matrix<T, ROWS, COLUMNS> matrix;
 	static bool hasZeroMatrix = false;
-	
+
 	if (!hasZeroMatrix)
 	{
 		memset(matrix.ptr(), 0, matrix.getSize());
 		hasZeroMatrix = true;
 	}
-	
+
 	return matrix;
 }
 
@@ -148,7 +148,7 @@ modm::Matrix<T, ROWS, COLUMNS>::operator [] (uint8_t row) const
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 uint8_t
-modm::Matrix<T, ROWS, COLUMNS>::getNumberOfRows() const	
+modm::Matrix<T, ROWS, COLUMNS>::getNumberOfRows() const
 {
 	return ROWS;
 }
@@ -156,7 +156,7 @@ modm::Matrix<T, ROWS, COLUMNS>::getNumberOfRows() const
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 uint8_t
-modm::Matrix<T, ROWS, COLUMNS>::getNumberOfColumns() const	
+modm::Matrix<T, ROWS, COLUMNS>::getNumberOfColumns() const
 {
 	return COLUMNS;
 }
@@ -185,7 +185,7 @@ modm::Matrix<T, ROWS, COLUMNS>::operator - ()
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		m.element[i] = -this->element[i];
 	}
-	
+
 	return m;
 }
 
@@ -195,11 +195,11 @@ modm::Matrix<T, ROWS, COLUMNS>
 modm::Matrix<T, ROWS, COLUMNS>::operator - (const modm::Matrix<T, ROWS, COLUMNS> &rhs) const
 {
 	modm::Matrix<T, ROWS, COLUMNS> m;
-	
+
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		m.element[i] = element[i] - rhs.element[i];
 	}
-	
+
 	return m;
 }
 
@@ -209,11 +209,11 @@ modm::Matrix<T, ROWS, COLUMNS>
 modm::Matrix<T, ROWS, COLUMNS>::operator + (const modm::Matrix<T, ROWS, COLUMNS> &rhs) const
 {
 	modm::Matrix<T, ROWS, COLUMNS> m;
-	
+
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		m.element[i] = element[i] + rhs.element[i];
 	}
-	
+
 	return m;
 }
 
@@ -225,7 +225,7 @@ modm::Matrix<T, ROWS, COLUMNS>::operator += (const modm::Matrix<T, ROWS, COLUMNS
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		element[i] += rhs.element[i];
 	}
-	
+
 	return *this;
 }
 
@@ -237,7 +237,7 @@ modm::Matrix<T, ROWS, COLUMNS>::operator -= (const modm::Matrix<T, ROWS, COLUMNS
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		element[i] -= rhs.element[i];
 	}
-	
+
 	return *this;
 }
 
@@ -248,7 +248,7 @@ modm::Matrix<T, ROWS, RHSCOL>
 modm::Matrix<T, ROWS, COLUMNS>::operator * (const Matrix<T, COLUMNS, RHSCOL> &rhs) const
 {
 	modm::Matrix<T, ROWS, RHSCOL> m;
-	
+
 	for (uint_fast8_t i = 0; i < ROWS; ++i)
 	{
 		for (uint_fast8_t j = 0; j < RHSCOL; ++j)
@@ -281,7 +281,7 @@ modm::Matrix<T, ROWS, COLUMNS>::operator * (const T &rhs) const
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		m.element[i] = element[i] * rhs;
 	}
-	
+
 	return m;
 }
 
@@ -293,7 +293,7 @@ modm::Matrix<T, ROWS, COLUMNS>::operator *= (const T &rhs)
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		element[i] *= rhs;
 	}
-	
+
 	return *this;
 }
 
@@ -303,13 +303,13 @@ modm::Matrix<T, ROWS, COLUMNS>
 modm::Matrix<T, ROWS, COLUMNS>::operator / (const T &rhs) const
 {
 	modm::Matrix<T, ROWS, COLUMNS> m;
-	
+
 	float oneOverRhs = 1.0f / rhs;
-	
+
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		m.element[i] = element[i] * oneOverRhs;
 	}
-	
+
 	return m;
 }
 
@@ -319,11 +319,11 @@ modm::Matrix<T, ROWS, COLUMNS>&
 modm::Matrix<T, ROWS, COLUMNS>::operator /= (const T &rhs)
 {
 	float oneOverRhs = 1.0f / rhs;
-	
+
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		element[i] *= oneOverRhs;
 	}
-	
+
 	return *this;
 }
 
@@ -333,13 +333,13 @@ modm::Matrix<T, COLUMNS, ROWS>
 modm::Matrix<T, ROWS, COLUMNS>::asTransposed() const
 {
 	modm::Matrix<T, COLUMNS, ROWS> m;
-	
+
 	for (uint_fast8_t i = 0; i < ROWS; ++i) {
 		for (uint_fast8_t j = 0; j < COLUMNS; ++j) {
 			m.element[j * ROWS + i] = element[i * COLUMNS + j];
 		}
 	}
-	
+
 	return m;
 }
 
@@ -349,7 +349,7 @@ void
 modm::Matrix<T, ROWS, COLUMNS>::transpose()
 {
 	static_assert(ROWS == COLUMNS, "transpose() only possible for square matrices");
-	
+
 	*this = asTransposed();
 }
 
@@ -359,7 +359,7 @@ inline T
 modm::Matrix<T, ROWS, COLUMNS>::determinant() const
 {
 	static_assert(ROWS == COLUMNS, "determinant() only possible for square matrices");
-	
+
 	return modm::determinant(*this);
 }
 
@@ -373,7 +373,7 @@ modm::Matrix<T, ROWS, COLUMNS>::hasNan() const
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 
@@ -387,10 +387,10 @@ modm::Matrix<T, ROWS, COLUMNS>::hasInf() const
 			return true;
 		}
 	}
-	
+
 	return false;
 }
- 
+
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
 modm::Matrix<T, WIDTH, HEIGHT>
@@ -449,14 +449,14 @@ modm::Matrix<T, ROWS, COLUMNS>::subMatrix(uint8_t row, uint8_t column) const
 {
 	static_assert(MR <= ROWS, "sub matrix must be smaller than the original");
 	static_assert(MC <= COLUMNS, "sub matrix must be smaller than the original");
-	
+
 	Matrix<T, MR, MC> sub;
 	for (uint_fast8_t i = 0; i < MR; ++i) {
 		for (uint_fast8_t j = 0; j < MC; ++j) {
 			sub[i][j] = (*this)[i + row][j + column];
 		}
 	}
-	
+
 	return sub;
 }
 
@@ -468,7 +468,7 @@ modm::Matrix<T, ROWS, COLUMNS>::replace(const U *data)
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		element[i] = data[i];
 	}
-	
+
 	return *this;
 }
 
@@ -480,7 +480,7 @@ modm::Matrix<T, ROWS, COLUMNS>::replace(uint8_t row, uint8_t column, const modm:
 {
 	static_assert(MR <= ROWS, "replacement matrix can't be larger than the original");
 	static_assert(MC <= COLUMNS, "replacement matrix can't be larger than the original");
-	
+
 	for (uint_fast8_t i = 0; i < MR && (i + row) < ROWS; ++i)
 	{
 		for (uint_fast8_t j = 0; j < MC && (j + column) < COLUMNS; ++j)
@@ -488,7 +488,7 @@ modm::Matrix<T, ROWS, COLUMNS>::replace(uint8_t row, uint8_t column, const modm:
 			element[(i + row) * COLUMNS + (j + column)] = m[i][j];
 		}
 	}
-	
+
 	return *this;
 }
 
@@ -515,7 +515,7 @@ modm::Matrix<T, ROWS, COLUMNS>::addRow(uint8_t index, const modm::Matrix<T, 1, C
 {
 	modm::Matrix<T, ROWS+1, COLUMNS> m;
 	uint_fast8_t i = 0, ri = 0;
-	
+
 	for (; i < index; ++i) {
 		m.replaceRow(ri++, getRow(i));
 	}
@@ -523,7 +523,7 @@ modm::Matrix<T, ROWS, COLUMNS>::addRow(uint8_t index, const modm::Matrix<T, 1, C
 	for (; i < ROWS+1; ++i) {
 		m.replaceRow(ri++, getRow(i));
 	}
-	
+
 	return m;
 }
 
@@ -534,7 +534,7 @@ modm::Matrix<T, ROWS, COLUMNS>::addColumn(uint8_t index, const modm::Matrix<T, R
 {
 	modm::Matrix<T, ROWS, COLUMNS+1> m;
 	uint_fast8_t i = 0, ci = 0;
-	
+
 	for (; i < index; ++i) {
 		m.replaceColumn(ci++, getColumn(i));
 	}
@@ -542,7 +542,7 @@ modm::Matrix<T, ROWS, COLUMNS>::addColumn(uint8_t index, const modm::Matrix<T, R
 	for (; i < COLUMNS+1; ++i) {
 		m.replaceColumn(ci++, getColumn(i));
 	}
-	
+
 	return m;
 }
 
@@ -563,7 +563,7 @@ modm::Matrix<T, ROWS, COLUMNS>::removeRow(uint8_t index ) const
 	{
 		Matrix<T, ROWS-1, COLUMNS> m;
 		uint_fast8_t i = 0, ri = 0;
-		
+
 		for (; i < index; ++i) {
 			m.replaceRow(ri++, getRow(i));
 		}
@@ -571,7 +571,7 @@ modm::Matrix<T, ROWS, COLUMNS>::removeRow(uint8_t index ) const
 		for (; i < ROWS; ++i) {
 			m.replaceRow(ri++, getRow(i));
 		}
-		
+
 		return m;
 	}
 }
@@ -593,7 +593,7 @@ modm::Matrix<T, ROWS, COLUMNS>::removeColumn(uint8_t index) const
 	{
 		Matrix<T, ROWS, COLUMNS-1> m;
 		uint_fast8_t i = 0, ci = 0;
-		
+
 		for (; i < index; ++i) {
 			m.replaceColumn(ci++, getColumn(i));
 		}
@@ -601,7 +601,7 @@ modm::Matrix<T, ROWS, COLUMNS>::removeColumn(uint8_t index) const
 		for (; i < COLUMNS; ++i) {
 			m.replaceColumn(ci++, getColumn(i));
 		}
-		
+
 		return m;
 	}
 }
@@ -612,7 +612,7 @@ modm::IOStream&
 modm::operator << (modm::IOStream& os, const modm::Matrix<T, ROWS, COLUMNS> &m)
 {
 	os << "{ ";
-	
+
 	for (uint_fast8_t i = 0; i < ROWS; ++i)
 	{
 		os << "{ ";
@@ -625,7 +625,7 @@ modm::operator << (modm::IOStream& os, const modm::Matrix<T, ROWS, COLUMNS> &m)
 			}
 		}
 		os << " }";
-		
+
 		if (i < ROWS-1)
 		{
 			os << ", \n";
@@ -663,23 +663,23 @@ modm::determinant(const modm::Matrix<T, N, N> &m)
 	{
 		T coeff = m[0][i];
 		modm::Matrix<T, N-1, N-1> subM;
-		
+
 		for (uint_fast8_t x = 0; x < i; ++x) {
 			for (uint_fast8_t y = 1; y < N; ++y) {
 				subM[y-1][x] = m[y][x];
 			}
 		}
-		
+
 		for (uint_fast8_t x = i+1; x < N; ++x) {
 			for (uint_fast8_t y = 1; y < N; ++y) {
 				subM[y-1][x-1] = m[y][x];
 			}
 		}
-		
+
 		value += coeff * factor * determinant(subM);
 		factor *= -1;
 	}
-	
+
 	return value;
 }
 

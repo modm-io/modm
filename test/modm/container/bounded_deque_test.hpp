@@ -19,16 +19,16 @@ class BoundedDequeTest : public unittest::TestSuite
 public:
 	void
 	testForward();
-	
+
 	void
 	testBackward();
-	
+
 	void
 	testBoth();
-	
+
 	void
 	testClear();
-	
+
 	void
 	testConstIterator();
 
@@ -39,10 +39,10 @@ public:
 	// Test if queue of length one is handled properly
 	void
 	testOneElementQueue();
-	
+
 	void
 	testOverwrite();
-	
+
 	void
 	testElementAccess();
 };

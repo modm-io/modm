@@ -22,51 +22,51 @@ class CanConnectorTest : public unittest::TestSuite
 {
 	void
 	checkShortMessage(const modm::can::Message& message) const;
-	
+
 	uint8_t
     getPayloadLength(uint8_t offset) const;
-	
+
 	void
 	checkFragmentedMessage(const modm::can::Message& message,
 			uint8_t fragmentId) const;
-	
+
 	void
 	createMessage(modm::can::Message& message,
 			uint8_t fragmentId) const;
 public:
     virtual void
     setUp();
-    
+
     virtual void
     tearDown();
-    
+
 public:
     CanConnectorTest();
-    
+
     void
     testSendShortMessageDirect();
-    
+
     void
     testSendShortMessage();
-    
+
     void
     testSendFragmentedMessage();
-    
+
     void
     testReceiveShortMessage();
-    
+
     void
     testReceiveFragmentedMessage();
-    
+
 private:
 	TestingCanConnector *connector;
 	FakeCanDriver *driver;
-	
+
 	xpcc::Header xpccHeader;
 	uint32_t normalIdentifier;
 	uint32_t fragmentedIdentifier;
 	uint8_t messageCounter;
-	
+
 	uint8_t shortPayload[8];
 	uint8_t fragmentedPayload[14];
 };

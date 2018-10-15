@@ -27,15 +27,15 @@ namespace component
 	{
 	public:
 		Sender(uint8_t id, xpcc::Dispatcher &communication);
-		
+
 		void
 		update();
-		
+
 	private:
 		void
 		getPositionCallback(const xpcc::Header& header,
 				const robot::packet::Position *parameter);
-		
+
 		xpcc::ResponseCallback positionCallback;
 		modm::ShortPeriodicTimer timer;
 	};

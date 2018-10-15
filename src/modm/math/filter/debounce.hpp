@@ -21,8 +21,8 @@ namespace modm
 	namespace filter
 	{
 		/**
-		 * \brief	Debouncing binary signals 
-		 * 
+		 * \brief	Debouncing binary signals
+		 *
 		 * \ingroup	modm_math_filter
 		 */
 		template<typename T = uint8_t>
@@ -31,7 +31,7 @@ namespace modm
 		public:
 			/**
 			 * \brief	Constructor
-			 * 
+			 *
 			 * \param	maxValue	maximal value of the sum
 			 * \param	lowerBound	lower bound for the schmitt-trigger
 			 * \param	upperBound	upper bound for the schmitt-trigger. If
@@ -40,20 +40,20 @@ namespace modm
 			Debounce(const T& maxValue,
 					 const T& lowerBound = 0,
 					 const T& upperBound = 0);
-			
+
 			void
 			update(bool input);
-			
+
 			bool
 			getValue() const;
-			
+
 			void
 			reset(const bool state);
-			
+
 		private:
 			const T maxValue;
 			T sum;
-			
+
 			const T lowerBound;
 			const T upperBound;
 			bool state;

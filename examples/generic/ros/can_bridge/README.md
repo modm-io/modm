@@ -47,7 +47,7 @@ Build and program the binary to the microcontroller:
 
     lbuild build && scons program
 
-To run the node with a different port and baud rate, for example on `/dev/ttyACM0`, you must specify the `~port` and `~baud` parameters on the command line. 
+To run the node with a different port and baud rate, for example on `/dev/ttyACM0`, you must specify the `~port` and `~baud` parameters on the command line.
 
     rosrun rosserial_python serial_node.py _port:=/dev/ttyACM0 _baud:=250000
 

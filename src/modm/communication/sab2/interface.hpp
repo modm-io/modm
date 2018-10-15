@@ -33,13 +33,13 @@ namespace modm
 		 */
 		uint16_t
 		crcUpdate(uint16_t crc, uint8_t data);
-		
+
 		/**
 		 * \brief	SAB2 interface
-		 * 
+		 *
 		 * The framing is adapted from the HDLC asynchronous framing.
 		 * See http://en.wikipedia.org/wiki/High-Level_Data_Link_Control#Asynchronous_framing
-		 * 
+		 *
 		 * \author	Fabian Greif
 		 * \ingroup	modm_communication_sab2
 		 */
@@ -51,21 +51,21 @@ namespace modm
 			typedef typename modm::tmp::Select< (N >= 255),
 												uint16_t,
 												uint8_t >::Result Index;
-			
+
 			typedef Index Size;
-			
+
 		public:
 			/**
 			 * \brief	Initialize the interface
-			 * 
+			 *
 			 * The UART has the be configured before calling this method.
 			 */
 			static void
 			initialize();
-			
+
 			/**
 			 * \brief	Send a message
-			 * 
+			 *
 			 * \param	address			receiver address
 			 * \param	flags			see modm::sab::Flags
 			 * \param	command			command byte
@@ -75,7 +75,7 @@ namespace modm
 			static void
 			sendMessage(uint8_t address, Flags flags, uint8_t command,
 					const void *payload, Size payloadLength);
-			
+
 			/**
 			 * \brief	Send a message
 			 */
@@ -83,71 +83,71 @@ namespace modm
 			static void modm_always_inline
 			sendMessage(uint8_t address, Flags flags, uint8_t command,
 					const T& payload);
-			
+
 			/**
 			 * \brief	Send a empty message
 			 */
 			static void modm_always_inline
 			sendMessage(uint8_t address, Flags flags, uint8_t command);
-			
+
 			/**
 			 * \brief	Check if a message was received
-			 * 
+			 *
 			 * Reset the status with a call of dropMessage().
 			 */
 			static inline bool
 			isMessageAvailable();
-			
+
 			static inline uint8_t
 			getAddress();
-			
+
 			static inline uint8_t
 			getCommand();
-			
+
 			static inline bool
 			isResponse();
-			
+
 			/**
 			 * \brief	Check if the message is an ACK or NACK
 			 * \return	\c true if the message is an ACK, \c false on NACK.
 			 */
 			static inline bool
 			isAcknowledge();
-			
+
 			/**
 			 * \brief	Access the data of a received message
-			 * 
+			 *
 			 * Data access is only valid after isMessageAvailable() returns
 			 * \c true and before any call of dropMessage() or update()
 			 */
 			static inline const uint8_t *
 			getPayload();
-			
+
 			/**
 			 * \return	Size of the received message. Zero if no message
 			 * 			is available at the moment.
 			 */
 			static inline Size
 			getPayloadLength();
-			
+
 			/**
 			 * \brief	End procession of the current message
 			 */
 			static void
 			dropMessage();
-			
+
 			/**
 			 * \brief	Update internal status
-			 * 
+			 *
 			 * Has to be called periodically. Encodes received messages.
 			 */
 			static void
 			update();
-			
+
 		private:
 			static void
 			writeByteEscaped(uint8_t data);
-			
+
 			static uint8_t buffer[N + 4];
 			static uint16_t crc;
 			static Size length;

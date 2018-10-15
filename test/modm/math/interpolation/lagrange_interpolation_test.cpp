@@ -20,22 +20,22 @@ void
 LagrangeInterpolationTest::testCreation()
 {
 	typedef modm::Pair<uint8_t, float> Point;
-	
+
 	Point points[3] =
 	{
 		{  10, -50 },
 		{  50,   0 },
 		{ 100,  50 }
 	};
-	
+
 	modm::interpolation::Lagrange<Point> value(points, 3);
 }
 
-void 
+void
 LagrangeInterpolationTest::testInterpolation()
 {
 	typedef modm::Pair<float, float> Point;
-	
+
 	// interpolate x^2 over the range of 1 <= x <= 3
 	Point points[3] =
 	{
@@ -43,9 +43,9 @@ LagrangeInterpolationTest::testInterpolation()
 		{ 2, 4 },
 		{ 3, 9 }
 	};
-	
+
 	modm::interpolation::Lagrange<Point> value(points, 3);
-	
+
 	TEST_ASSERT_EQUALS_FLOAT(value.interpolate(1.f),   1.f);
 	TEST_ASSERT_EQUALS_FLOAT(value.interpolate(1.5f),  2.25f);
 	TEST_ASSERT_EQUALS_FLOAT(value.interpolate(2.f),   4.f);

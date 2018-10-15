@@ -24,26 +24,26 @@ class JavaPacketsBuilder(builder_base.Builder):
 	"""
 	Generate the whole packageset. The Output is a Java Class named Packages.java,
 	which contains as subclasses all the Packages.
-	
+
 	A common call would be like:
 	$python3 java_packets.py  --outpath source/rca/robot --package rca.robot robot.xml;
 	"""
-	
-	
+
+
 	VERSION = "0.1"
-	
+
 	def setup(self, optparser):
 		optparser.add_option(
 				"--package",
 				dest = "package",
 				default = '',
 				help = "name of package")
-				
+
 	def generate(self):
 		# check the commandline options
 		if not self.options.outpath:
 			raise builder_base.BuilderException("You need to provide an output path!")
-		
+
 		javaFilter = {
 			'enumElement': filter.enumElement,
 			'typeName': filter.typeName,
@@ -54,20 +54,20 @@ class JavaPacketsBuilder(builder_base.Builder):
 		}
 		template = self.template('templates/java_meta_packets.tpl',
 								filter = javaFilter)
-		
+
 		# Bool has a special status because its primitive but user generated
 		# and the only not numerical type
 		packets = self.tree.types
 		packets.remove('Bool')
-		
+
 		primitives = sorted(filter.PRIMITIVES.values())
-		
+
 		substitutions = {
 			'package' : self.options.package,
 			'packets': packets,
 			'primitives': primitives,
 		}
-		
+
 		file = os.path.join(self.options.outpath, 'MetaPackets.java')
 		self.write(file, template.render(substitutions))
 

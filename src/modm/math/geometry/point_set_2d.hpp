@@ -21,14 +21,14 @@ namespace modm
 {
 	/**
 	 * \brief	Point set
-	 * 
+	 *
 	 * Collection of points, represented by their corresponding vectors.
 	 * Used for example to hold the result of a intersection-operation.
-	 * 
+	 *
 	 * Based on the modm::DynamicArray class, therefore grows automatically
 	 * if more space than currently allocated is needed. But because this
 	 * is an expensive operation it should be avoid if possible.
-	 * 
+	 *
 	 * \author	Fabian Greif
 	 * \ingroup	modm_math_geometry
 	 */
@@ -48,15 +48,15 @@ namespace modm
 		PointSet2D(std::initializer_list<PointType> init);
 
 		PointSet2D(const PointSet2D& other);
-		
+
 		PointSet2D&
 		operator = (const PointSet2D& other);
-		
+
 		/// Number of points contained in the set
 		inline SizeType
 		getNumberOfPoints() const;
-		
-		
+
+
 		inline void
 		append(const PointType& point);
 
@@ -65,29 +65,29 @@ namespace modm
 
 		inline const PointType&
 		operator [](SizeType index) const;
-		
+
 		/**
 		 * \brief	Remove all points
 		 */
 		inline void
 		removeAll();
-		
+
 	public:
 		typedef typename modm::DynamicArray< PointType >::iterator iterator;
 		typedef typename modm::DynamicArray< PointType >::const_iterator const_iterator;
-		
+
 		inline iterator
 		begin();
-		
+
 		inline const_iterator
 		begin() const;
-		
+
 		inline iterator
 		end();
-		
+
 		inline const_iterator
 		end() const;
-		
+
 	protected:
 		modm::DynamicArray< PointType > points;
 	};

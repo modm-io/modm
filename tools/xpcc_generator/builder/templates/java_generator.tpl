@@ -49,7 +49,7 @@ public class Generator {
 							{%- endif %}
 					{%- endfor %}
 					}
-				
+
 				}
 				break;
 			case RESPONSE:

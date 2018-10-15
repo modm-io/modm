@@ -169,7 +169,7 @@ public class NewFontDialog extends JDialog implements ActionListener,
 		colorPanel.setLocation(173, 5);
 		colorPanel.setSize(195, 45);
 		this.add(colorPanel);
-		
+
 		JPanel fontPanel = new JPanel(null);
 		fontPanel.setBorder(BorderFactory.createTitledBorder("Import Font"));
 
@@ -234,7 +234,7 @@ public class NewFontDialog extends JDialog implements ActionListener,
 		cancel.setSize(75, 25);
 		this.add(cancel);
 	}
-	
+
 	private void initDialog() {
 		setSize(380, 252);
 		Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
@@ -296,7 +296,7 @@ public class NewFontDialog extends JDialog implements ActionListener,
 				} else if (varColors.getSelectedItem().equals(colorChoices[3])) {
 					bits = 8;
 				}
-				
+
 				java.awt.Font importFont = null;
 				if (!fontChooser.getSelectedItem().equals("None")) {
 					int style = java.awt.Font.PLAIN;
@@ -335,7 +335,7 @@ public class NewFontDialog extends JDialog implements ActionListener,
 	public Font getNewFont() {
 		return font;
 	}
-	
+
 	public void propertyChange(PropertyChangeEvent arg0) {
 		repaint();
 	}

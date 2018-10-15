@@ -20,7 +20,7 @@ struct TestPin
 	static bool
 	read()
 	{
-		
+
 		return false;
 	}
 };
@@ -29,26 +29,26 @@ void
 ButtonTest::testButton()
 {
 	modm::Button<TestPin> button;
-	
+
 	TEST_ASSERT_FALSE(button.isPressed());
-	
+
 	// TODO
 	/*button.update();
 	button.update();
 	button.update();
 	button.update();
 	button.update();
-	
+
 	TEST_ASSERT_FALSE(button.isPressed());
-	
+
 	button.update();
 	button.update();
 	button.update();
-	
+
 	TEST_ASSERT_FALSE(button.isPressed());
-	
+
 	button.update();
-	
+
 	TEST_ASSERT_TRUE(button.isPressed());
 	TEST_ASSERT_FALSE(button.isPressed());
 	TEST_ASSERT_FALSE(button.isPressed());*/

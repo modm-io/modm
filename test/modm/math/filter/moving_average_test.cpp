@@ -25,7 +25,7 @@ namespace
     struct TestData
 	{
 		typedef int16_t Type;
-		
+
 		Type input;
 		Type output;
 	};

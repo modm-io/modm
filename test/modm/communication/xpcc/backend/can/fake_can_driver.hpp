@@ -21,16 +21,16 @@ class FakeCanDriver : public modm::Can
 {
 public:
 	FakeCanDriver();
-	
+
 	bool
 	isMessageAvailable();
-	
+
 	bool
 	getMessage(modm::can::Message& message);
-	
+
 	bool
 	isReadyToSend();
-	
+
 	bool
 	sendMessage(const modm::can::Message& message);
 
@@ -42,14 +42,14 @@ public:
 
 	static BusState
 	getBusState();
-	
+
 public:
 	/// Messages which should be received
 	modm::LinkedList<modm::can::Message> receiveList;
-	
+
 	/// List of all messages send
 	modm::LinkedList<modm::can::Message> sendList;
-	
+
 	/// number of messages which could be send
 	uint8_t sendSlots;
 };

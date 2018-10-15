@@ -92,9 +92,9 @@ def filter_constexpr_constructor(class_, default=True):
 
 # -----------------------------------------------------------------------------
 class TypeBuilder(builder_base.Builder):
-	
+
 	VERSION = "0.1"
-	
+
 	def setup(self, optparser):
 		optparser.add_option(
 				"--namespace",
@@ -121,7 +121,7 @@ class TypeBuilder(builder_base.Builder):
 				dest = "system_include_path",
 				default = None,
 				help = "Include directive for the source file")
-	
+
 	def generate(self):
 		# check the commandline options
 		if self.options.outpath:
@@ -132,7 +132,7 @@ class TypeBuilder(builder_base.Builder):
 			header_path = self.options.header_path
 		else:
 			raise builder_base.BuilderException("You need to provide an output path!")
-		
+
 		if self.options.system_include_path:
 			includeDirective = '<%s>' % os.path.join(self.options.system_include_path, 'packets.hpp')
 		elif self.options.quote_include_path:
@@ -156,10 +156,10 @@ class TypeBuilder(builder_base.Builder):
 			'generateInitializationList': filter_initialization_list,
 			'isConstexprConstructor': filter_constexpr_constructor
 		}
-		
+
 		template_header = self.template('templates/robot_packets.hpp.tpl', filter=cppFilter)
 		template_source = self.template('templates/robot_packets.cpp.tpl', filter=cppFilter)
-		
+
 		substitutions = {
 			'components': self.tree.components,
 			'actions': self.tree.components.actions,
@@ -168,10 +168,10 @@ class TypeBuilder(builder_base.Builder):
 			'includeDirective': includeDirective,
 			'namespace': namespace
 		}
-		
+
 		file = os.path.join(header_path, 'packets.hpp')
 		self.write(file, template_header.render(substitutions) + "\n")
-		
+
 		file = os.path.join(source_path, 'packets.cpp')
 		self.write(file, template_source.render(substitutions) + "\n")
 

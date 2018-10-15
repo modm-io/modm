@@ -24,14 +24,14 @@ namespace component
 	{
 	public:
 		Odometry(uint8_t id, xpcc::Dispatcher &communication);
-		
+
 		void
 		update();
 
 	public:
 		// Callback for modm
 		void actionSetLedRed(const xpcc::ResponseHandle& responseHandle, const robot::packet::Bool *payload);
-		
+
 	private:
 		modm::ShortPeriodicTimer timer;
 	};

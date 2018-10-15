@@ -97,7 +97,7 @@ modm::Location2D<T>::move(const Location2D<T>& diff)
 {
 	Vector<T, 2> movement = diff.position;
 	movement.rotate(this->orientation);
-	
+
 	this->position.translate(movement);
 	this->orientation = Angle::normalize(this->orientation + diff.orientation);
 }
@@ -108,7 +108,7 @@ modm::Location2D<T>::move(const Vector<T, 2>& diff)
 {
 	Vector<T, 2> movement(diff);
 	movement.rotate(this->orientation);
-	
+
 	this->position.translate(movement);
 }
 
@@ -119,7 +119,7 @@ modm::Location2D<T>::move(T x, float phi)
 	Vector<T, 2> vector(GeometricTraits<T>::round(x * std::cos(this->orientation)),
 					   GeometricTraits<T>::round(x * std::sin(this->orientation)));
 	position.translate(vector);
-	
+
 	this->orientation = Angle::normalize(this->orientation + phi);
 }
 
@@ -131,7 +131,7 @@ modm::Location2D<T>::translated(const Vector<T, 2>& vector) const
 	Vector<T, 2> result(vector);
 	result.rotate(this->orientation);
 	result.translate(this->position);
-	
+
 	return result;
 }
 

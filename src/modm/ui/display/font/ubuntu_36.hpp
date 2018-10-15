@@ -25,7 +25,7 @@ namespace modm
 	{
 		/**
 		 * \brief	Ubuntu_36
-		 * 
+		 *
 		 * - preferred width : 16
 		 * - height          : 35
 		 * - hspace          : 1
@@ -34,7 +34,7 @@ namespace modm
 		 * - last char       : 128
 		 * - number of chars : 96
 		 * - size in bytes   : 7389
-		 * 
+		 *
 		 * \ingroup	modm_ui_display_font
 		 */
 		EXTERN_FLASH_STORAGE(uint8_t Ubuntu_36[]);

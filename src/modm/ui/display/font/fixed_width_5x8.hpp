@@ -25,7 +25,7 @@ namespace modm
 	{
 		/**
 		 * \brief	Fixed Width 5x8
-		 * 
+		 *
 		 * - fixed width     : 5
 		 * - height          : 8
 		 * - hspace          : 0
@@ -34,7 +34,7 @@ namespace modm
 		 * - last char       : 128
 		 * - number of chars : 96
 		 * - size in bytes   : 584
-		 * 
+		 *
 		 * \ingroup	modm_ui_display_font
 		 */
 		EXTERN_FLASH_STORAGE(uint8_t FixedWidth5x8[]);

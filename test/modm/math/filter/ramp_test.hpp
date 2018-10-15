@@ -18,7 +18,7 @@ class RampTest : public unittest::TestSuite
 public:
 	void
 	testConstructor();
-	
+
 	void
 	testRamp();
 };

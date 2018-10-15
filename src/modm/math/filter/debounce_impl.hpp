@@ -17,7 +17,7 @@
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::filter::Debounce<T>::Debounce(const T& maxValue, const T& lowerBound, const T& upperBound) : 
+modm::filter::Debounce<T>::Debounce(const T& maxValue, const T& lowerBound, const T& upperBound) :
 	maxValue(maxValue),
 	sum(maxValue / 2),
 	lowerBound(lowerBound),
@@ -36,7 +36,7 @@ modm::filter::Debounce<T>::update(bool input)
 	else if (!input && (sum > 0)) {
 		sum--;
 	}
-	
+
 	if (state && (sum <= lowerBound)) {
 		state = false;
 	}

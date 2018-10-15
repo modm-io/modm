@@ -45,10 +45,10 @@ modm::sab::Master<Interface>::query(uint8_t slaveAddress, uint8_t command,
 		interface.dropMessage();
 	}
 	interface.sendMessage(slaveAddress, REQUEST, command, payload, payloadLength);
-	
+
 	queryStatus = IN_PROGRESS;
 	expectedResponseLength = responseLength;
-	
+
 	timer.restart(timeout);
 }
 
@@ -61,10 +61,10 @@ modm::sab::Master<Interface>::query(uint8_t slaveAddress, uint8_t command,
 		interface.dropMessage();
 	}
 	interface.sendMessage(slaveAddress, REQUEST, command, payload);
-	
+
 	queryStatus = IN_PROGRESS;
 	expectedResponseLength = responseLength;
-	
+
 	timer.restart(timeout);
 }
 
@@ -77,10 +77,10 @@ modm::sab::Master<Interface>::query(uint8_t slaveAddress, uint8_t command,
 		interface.dropMessage();
 	}
 	interface.sendMessage(slaveAddress, REQUEST, command, 0, 0);
-	
+
 	queryStatus = IN_PROGRESS;
 	expectedResponseLength = responseLength;
-	
+
 	timer.restart(timeout);
 }
 
@@ -135,11 +135,11 @@ void
 modm::sab::Master<Interface>::update()
 {
 	interface.update();
-	
+
 	if (queryStatus != IN_PROGRESS) {
 		return;
 	}
-	
+
 	if (interface.isMessageAvailable())
 	{
 		if (!interface.isResponse())

@@ -33,7 +33,7 @@ void
 modm::amnb::Response::error(uint8_t errorCode)
 {
 	triggered = true;
-	
+
 	uint8_t error = errorCode;
 	transmitter->send(false, &error, 1);
 }
@@ -142,7 +142,7 @@ modm::amnb::Node<Interface>::query(uint8_t slaveAddress, uint8_t command,
 		checkErrorHandlers(slaveAddress, command, REQUEST, ERROR_QUERY_IN_PROGRESS);
 		return false;
 	}
-	
+
 	bool noError(true);
 	if (!Interface::messageTransmitted()) {
 		checkErrorHandlers(Interface::getTransmittedAddress(),
@@ -155,11 +155,11 @@ modm::amnb::Node<Interface>::query(uint8_t slaveAddress, uint8_t command,
 		checkErrorHandlers(slaveAddress, command, REQUEST, ERROR_TRANSMITTER_BUSY);
 		noError = false;
 	}
-	
+
 	queryStatus = IN_PROGRESS;
 	expectedResponseLength = responseLength;
 	expectedAddress = slaveAddress;
-	
+
 	timer.restart(timeout);
 	return noError;
 }
@@ -173,7 +173,7 @@ modm::amnb::Node<Interface>::query(uint8_t slaveAddress, uint8_t command,
 		checkErrorHandlers(slaveAddress, command, REQUEST, ERROR_QUERY_IN_PROGRESS);
 		return false;
 	}
-	
+
 	bool noError(true);
 	if (!Interface::messageTransmitted()) {
 		checkErrorHandlers(Interface::getTransmittedAddress(),
@@ -186,11 +186,11 @@ modm::amnb::Node<Interface>::query(uint8_t slaveAddress, uint8_t command,
 		checkErrorHandlers(slaveAddress, command, REQUEST, ERROR_TRANSMITTER_BUSY);
 		noError = false;
 	}
-	
+
 	queryStatus = IN_PROGRESS;
 	expectedResponseLength = responseLength;
 	expectedAddress = slaveAddress;
-	
+
 	timer.restart(timeout);
 	return noError;
 }
@@ -204,7 +204,7 @@ modm::amnb::Node<Interface>::query(uint8_t slaveAddress, uint8_t command,
 		checkErrorHandlers(slaveAddress, command, REQUEST, ERROR_QUERY_IN_PROGRESS);
 		return false;
 	}
-	
+
 	bool noError(true);
 	if (!Interface::messageTransmitted()) {
 		checkErrorHandlers(Interface::getTransmittedAddress(),
@@ -217,11 +217,11 @@ modm::amnb::Node<Interface>::query(uint8_t slaveAddress, uint8_t command,
 		checkErrorHandlers(slaveAddress, command, REQUEST, ERROR_TRANSMITTER_BUSY);
 		noError = false;
 	}
-	
+
 	queryStatus = IN_PROGRESS;
 	expectedResponseLength = responseLength;
 	expectedAddress = slaveAddress;
-	
+
 	timer.restart(timeout);
 	return noError;
 }
@@ -238,7 +238,7 @@ modm::amnb::Node<Interface>::broadcast(uint8_t command, const T& payload)
 						   Interface::getTransmittedFlags(),
 						   ERROR_MESSAGE_OVERWRITTEN);
 		noError = false;
-		
+
 	}
 	if (!Interface::sendMessage(this->ownAddress, BROADCAST, command, payload)) {
 		checkErrorHandlers(this->ownAddress, command, BROADCAST, ERROR_TRANSMITTER_BUSY);
@@ -334,9 +334,9 @@ modm::amnb::Node<Interface>::getResponse()
 template <typename Interface>
 void
 modm::amnb::Node<Interface>::update()
-{	
+{
 	Interface::update();
-	
+
 	if (Interface::isMessageAvailable())
 	{
 		uint8_t messageAddress = Interface::getAddress();
@@ -352,7 +352,7 @@ modm::amnb::Node<Interface>::update()
 				{
 					if (Interface::getPayloadLength() == expectedResponseLength) {
 						queryStatus = SUCCESS;
-						
+
 						checkListeners = true;
 					}
 					else {
@@ -379,7 +379,7 @@ modm::amnb::Node<Interface>::update()
 				{
 					this->response.triggered = false;
 					this->currentCommand = messageCommand;
-					
+
 					modm::accessor::Flash<Action> list = actionList;
 					for (uint8_t i = 0; i < actionCount; ++i, ++list)
 					{
@@ -390,7 +390,7 @@ modm::amnb::Node<Interface>::update()
 							{
 								// execute callback function
 								action.call(this->response, Interface::getPayload());
-								
+
 								if (!this->response.triggered) {
 									this->response.error(ERROR_ACTION_NO_RESPONSE);
 									checkErrorHandlers(messageAddress, messageCommand, NACK, ERROR_ACTION_NO_RESPONSE);
@@ -409,14 +409,14 @@ modm::amnb::Node<Interface>::update()
 			else {
 				checkListeners = true;
 			}
-			
+
 			if (!this->response.triggered) {
 				this->response.error(ERROR_ACTION_NO_ACTION);
 				checkErrorHandlers(messageAddress, messageCommand, NACK, ERROR_ACTION_NO_ACTION);
 			}
 		}
 		// --------------------------------------------------------------------
-		
+
 		if (checkListeners && (listenCount > 0))
 		{	// check if we want to listen to it
 			modm::accessor::Flash<Listener> list = listenList;
@@ -448,7 +448,7 @@ bool
 modm::amnb::Node<Interface>::checkErrorHandlers(uint8_t address, uint8_t command, Flags type, uint8_t errorCode)
 {
 	if (errorHandlerCount == 0) return false;
-	
+
 	modm::accessor::Flash<ErrorHandler> list = errorHandlerList;
 	for (uint8_t i = 0; i < errorHandlerCount; ++i, ++list)
 	{
@@ -476,7 +476,7 @@ modm::amnb::Node<Interface>::send(bool acknowledge,
 	else {
 		flags = modm::amnb::NACK;
 	}
-	
+
 	Interface::sendMessage(this->ownAddress, flags, this->currentCommand,
 						   payload, payloadLength);
 }

@@ -20,7 +20,7 @@ void
 Location2DTest::testDefaultConstructor()
 {
 	modm::Location2D<int16_t> location;
-	
+
 	TEST_ASSERT_EQUALS(location.getPosition(), modm::Vector2i(0, 0));
 	TEST_ASSERT_EQUALS_FLOAT(location.getOrientation(), 0.f);
 }
@@ -31,7 +31,7 @@ Location2DTest::testConstructor()
 	modm::Location2D<int16_t> location(
 			modm::Vector2i(10, 20),
 			M_PI);
-	
+
 	TEST_ASSERT_EQUALS(location.getPosition(), modm::Vector2i(10, 20));
 	TEST_ASSERT_EQUALS_FLOAT(location.getOrientation(), M_PI);
 }
@@ -40,17 +40,17 @@ void
 Location2DTest::testAccessors()
 {
 	modm::Location2D<int16_t> location;
-	
+
 	location.setPosition(modm::Vector2i(30, 40));
-	
+
 	TEST_ASSERT_EQUALS(location.getPosition(), modm::Vector2i(30, 40));
-	
+
 	location.setPosition(50, 60);
-	
+
 	TEST_ASSERT_EQUALS(location.getPosition(), modm::Vector2i(50, 60));
-	
+
 	location.setOrientation(M_PI / 2);
-	
+
 	TEST_ASSERT_EQUALS_FLOAT(location.getOrientation(), M_PI / 2);
 }
 
@@ -91,18 +91,18 @@ Location2DTest::testMove()
 	modm::Location2D<int16_t> location(
 			modm::Vector2i(-10, 20),
 			M_PI);
-	
+
 	modm::Location2D<int16_t> movement(
 			modm::Vector2i(10, 10),
 			M_PI / 2);
-	
+
 	location.move(movement);
-	
+
 	TEST_ASSERT_EQUALS(location.getPosition(), modm::Vector2i(-20, 10));
 	TEST_ASSERT_EQUALS_FLOAT(location.getOrientation(), -M_PI / 2);
-	
+
 	location.move(30, M_PI / 2);
-	
+
 	TEST_ASSERT_EQUALS(location.getPosition(), modm::Vector2i(-20, -20));
 	TEST_ASSERT_EQUALS_FLOAT(location.getOrientation(), 0.f);
 }
@@ -113,9 +113,9 @@ Location2DTest::testConvert()
 	modm::Location2D<float> a(
 			modm::Vector<float, 2>(-10.65, 20.31),
 			M_PI);
-	
+
 	modm::Location2D<int16_t> b = a.convert<int16_t>();
-	
+
 	TEST_ASSERT_EQUALS(b.getX(), -11);
 	TEST_ASSERT_EQUALS(b.getY(), 20);
 }

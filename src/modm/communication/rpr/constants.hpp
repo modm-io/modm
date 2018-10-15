@@ -29,39 +29,39 @@ namespace modm
 			MESSAGE_TYPE_MULTICAST,
 			MESSAGE_TYPE_BROADCAST,
 		};
-		
+
 		enum CommandType
 		{
 			COMMAND_ANY = 0xff,
 		};
-		
+
 		enum AddressType
 		{
 			ADDRESS_ANY = 0xffff,
 		};
-		
+
 		typedef struct
 		{
 			// Destination Address
 			MessageType type;
 			uint16_t destination;
-			
+
 			// Source Address
 			uint16_t source;
-			
+
 			// Payload
 			uint8_t command;
 			uint8_t *payload;
 			std::size_t length;
 		}
 		Message;
-		
+
 		typedef struct
 		{
 			Message *message;
 		}
 		ErrorMessage;
-		
+
 //		private: // ?
 		/**
 		 * \brief	Bit Masks for the higher address byte
@@ -73,13 +73,13 @@ namespace modm
 			ADDRESS_BROADCAST = 0xffff,
 			ADDRESS_VALUE = 0x7fff,
 		};
-		
+
 		/**
 		 * \brief	Maximum length for the payload
 		 * \ingroup	modm_communication_rpr
 		 */
 		const uint8_t maxPayloadLength = 48;
-		
+
 		/**
 		 * \internal
 		 * \ingroup	modm_communication_rpr
@@ -87,7 +87,7 @@ namespace modm
 		const uint8_t startDelimiterByte = 0x7e;
 		const uint8_t endDelimiterByte = 0x7c;
 		const uint8_t controlEscapeByte = 0x7d;
-		
+
 		/**
 		 * \internal
 		 * \brief	Initial value for the CRC16 calculation

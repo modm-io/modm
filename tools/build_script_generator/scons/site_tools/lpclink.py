@@ -21,7 +21,7 @@ import glob
 from SCons.Script import *
 
 # -----------------------------------------------------------------------------
-# Support for the NXP/Code Red LPC-Link Debugger. 
+# Support for the NXP/Code Red LPC-Link Debugger.
 # The LPCXpresso toolchain is needed for the firmware for the device.
 # -----------------------------------------------------------------------------
 
@@ -66,7 +66,7 @@ def generate(env, **kw):
 
 	# CPU for LPCLINK must be upper-case and underscore must be replace by slash
 	env['CPU_STRING'] = env['ARM_DEVICE'].upper().replace("_","/")
-	
+
 	env.AddMethod(lpclink_init, 'LpcLinkInit')
 	env.AddMethod(lpclink_flash, 'LpcLinkFlash')
 	env.AddMethod(lpclink_debug, 'LpcLinkDebug')

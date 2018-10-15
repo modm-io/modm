@@ -15,7 +15,7 @@
 // * Description    : Calculate K A B C D E F
 // * Input          : None
 // * Output         : None
-// * Return         : 
+// * Return         :
 // * Attention		 : None
 // *******************************************************************************/
 //FunctionalState setCalibrationMatrix(Coordinate * display,
@@ -24,10 +24,10 @@
 //
 //	FunctionalState retTHRESHOLD = ENABLE;
 //	/* K��(X0��X2) (Y1��Y2)��(X1��X2) (Y0��Y2) */
-//	matrix->scale = 
+//	matrix->scale =
 //			((screen[0].x - screen[2].x) * (screen[1].y - screen[2].y)) -
 //			((screen[1].x - screen[2].x) * (screen[0].y - screen[2].y));
-//	
+//
 //	if (matrix->scale == 0)
 //	{
 //		retTHRESHOLD = DISABLE;
@@ -39,15 +39,15 @@
 //				((display[0].x - display[2].x) * (screen[1].y - screen[2].y)) -
 //				((display[1].x - display[2].x) * (screen[0].y - screen[2].y));
 //		/* B��((X0��X2) (XD1��XD2)��(XD0��XD2) (X1��X2))��K	*/
-//		matrix->Bn = 
+//		matrix->Bn =
 //				((screen[0].x - screen[2].x) * (display[1].x - display[2].x)) -
 //				((display[0].x - display[2].x) * (screen[1].x - screen[2].x));
 //		/* C��(Y0(X2XD1��X1XD2)+Y1(X0XD2��X2XD0)+Y2(X1XD0��X0XD1))��K */
-//		matrix->Cn = 
+//		matrix->Cn =
 //				(screen[2].x * display[1].x - screen[1].x * display[2].x) * screen[0].y +
 //				(screen[0].x * display[2].x - screen[2].x * display[0].x) * screen[1].y +
 //				(screen[1].x * display[0].x - screen[0].x * display[1].x) * screen[2].y;
-//		
+//
 //		/* D��((YD0��YD2) (Y1��Y2)��(YD1��YD2) (Y0��Y2))��K	*/
 //		matrix->Dn =
 //				((display[0].y - display[2].y) * (screen[1].y - screen[2].y)) -
@@ -70,7 +70,7 @@
 // * Description    : Touch panel X Y to display X Y
 // * Input          : None
 // * Output         : None
-// * Return         : 
+// * Return         :
 // * Attention		 : None
 // *******************************************************************************/
 //FunctionalState getDisplayPoint(Coordinate * displayPtr, Coordinate * screenPtr,

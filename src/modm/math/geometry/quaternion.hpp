@@ -22,18 +22,16 @@ namespace modm
 	// forward declaration
 	template<class T, uint8_t N>
 	class Vector;
-	
+
 	template<class T, uint8_t ROWS, uint8_t COLUMNS>
 	class Matrix;
-	
+
 	/**
 	 * \brief	Quaternion
-	 * 
-	 * 
-	 * 
+	 *
 	 * Adapted from the implementation of Gaspard Petit (gaspardpetit@gmail.com).
 	 * \see <a href"http://www-etud.iro.umontreal.ca/~petitg/cpp/quat.html">Homepage</a>
-	 * 
+	 *
 	 * \author	Fabian Greif
 	 * \ingroup	modm_math_geometry
 	 */
@@ -45,12 +43,12 @@ namespace modm
 		Quaternion(T inW, T inX, T inY, T inZ);
 		Quaternion(const Vector<T, 3> &axis, T angle);
 		Quaternion(const Matrix<T, 4, 1> &rhs);
-		
+
 		Quaternion(const Quaternion &rhs);
-		
+
 		Quaternion& operator = (const Matrix<T, 4, 1> &rhs);
 		Quaternion& operator = (const Quaternion &rhs);
-		
+
 		bool operator == (const Quaternion &rhs) const;
 		bool operator != (const Quaternion &rhs) const;
 		bool operator < (const Quaternion &rhs) const;
@@ -58,53 +56,53 @@ namespace modm
 		bool operator > (const Quaternion &rhs) const;
 		bool operator >= (const Quaternion &rhs) const;
 		const T& operator [] (int index) const;
-		
+
 		T*
 		ptr();
-		
+
 		const T*
 		ptr() const;
-		
+
 		Quaternion operator - ();
 		Quaternion operator + (const Quaternion &rhs) const;
 		Quaternion operator - (const Quaternion &rhs) const;
 		Quaternion operator * (const Quaternion &rhs) const;
-		
+
 		Quaternion operator * (const T &rhs) const;
 		Quaternion operator / (const T &rhs) const;
 		Quaternion& operator += (const Quaternion &rhs);
 		Quaternion& operator -= (const Quaternion &rhs);
 		Quaternion& operator *= (const T &rhs);
 		Quaternion& operator /= (const T &rhs);
-		
+
 		float getLength() const;
 		float getLengthSquared() const;
-		
+
 		Quaternion& scale(float newLength);
-		
+
 		/** Rescale to length = 1 */
 		Quaternion& normalize();
 		Quaternion& conjugate();
 
 		Quaternion scaled(float newLength) const;
-		
+
 		/** Return a new quaternion with the same direction by the length 1 */
 		Quaternion normalized() const;
 		Quaternion conjugated() const;
-		
+
 		Quaternion unitInverse();	//	assumes we have a unit quaternion
 		Quaternion inverse();
-		
+
 		void to4x4Matrix(Matrix<T, 4, 4> *outMatrix);
 		void to3x3Matrix(Matrix<T, 3, 3> *outMatrix);
-	
+
 	public:
 		T w;
 		T x;
 		T y;
 		T z;
 	};
-	
+
 	template<class T>
 	Quaternion<T>
 	operator * (const T &lhs, const Quaternion<T> &rhs);

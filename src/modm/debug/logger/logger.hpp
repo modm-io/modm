@@ -35,11 +35,11 @@ namespace modm
 	{
 		/**
 		 * \brief 	Interface to the Logger.
-		 * 
+		 *
 		 * It is used by the macros defined below. This class overloads
 		 * the shift-operator so that it is possible to write different
 		 * message types to the logger.
-		 * 
+		 *
 		 * \ingroup modm_debug
 		 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 		 */
@@ -50,14 +50,14 @@ namespace modm
 					IOStream(outputDevice)
 				{
 				}
-				
+
 				/**
 				 * @brief	Output forwarding
-				 * 
+				 *
 				 * We must use modm_always_inline here to prevent the generation of
 				 * specialized functions for every type. Especially for strings
 				 * this might cause a lot of code size bloat.
-				 * 
+				 *
 				 * Example without modm_always_inline or only \c inline:
 				 * \code
 				 * $ scons symbols | grep "Logger"
@@ -71,7 +71,7 @@ namespace modm
 				 * 01050712 00000016 W modm::log::Logger& modm::log::Logger::operator<< <char [26]>(char const (&) [26])
 				 * ...
 				 * \endcode
-				 * 
+				 *
 				 * With modm_always_inline all these functions are gone.
 				 */
 				template<typename T>
@@ -91,11 +91,11 @@ namespace modm
 
 		/**
 		 * \name	Output streams
-		 * 
+		 *
 		 * Don't use this instances directly! Prefer an access through the
 		 * MODM_LOG_DEBUG, MODM_LOG_INFO, MODM_LOG_WARNING and
 		 * MODM_LOG_ERROR macros.
-		 * 
+		 *
 		 * \ingroup modm_debug
 		 */
 		//\{
@@ -157,34 +157,34 @@ namespace modm
 
 /**
  * \brief	Filename of the current file
- * 
+ *
  * In contrast to \c __FILE__ the path to the file is omitted (if this feature
  * is available, otherwise this macro will resolve to \c __FILE__).
- * 
+ *
  * \ingroup	modm_debug
  */
 #define FILENAME
 
 /**
  * \brief	String containing the filename and the current line
- * 
+ *
  * Will generate something like:
  * \code
  * "file.cpp (123) >> "
  * \endcode
- * 
+ *
  * This can be very useful the track the origin of log-messages:
  * \code
  * MODM_LOG_DEBUG   << MODM_FILE_INFO
  *                  << "... something has happened ..."
  *                  << modm::endl;
  * \endcode
- * 
+ *
  * This will result into:
  * \code
  * file.cpp (123) >> ... something has happened ...
  * \endcode
- * 
+ *
  * \ingroup	modm_debug
  */
 #define	MODM_FILE_INFO

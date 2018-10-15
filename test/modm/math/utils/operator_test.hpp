@@ -18,10 +18,10 @@ class OperatorTest : public unittest::TestSuite
 public:
 	void
 	testSqrt();
-	
+
 	void
 	testMultiplication();
-	
+
 	void
 	testMultiplyAccumulate();
 };

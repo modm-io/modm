@@ -13,7 +13,7 @@ manually whenever a developer executes an example on their hardware or works
 on the HAL. Nevertheless, the quality is still fairly high, mostly due to the
 relative simplicity of our HAL driver code.
 
-Here are some guidelines and tips on how to make the best of what testing 
+Here are some guidelines and tips on how to make the best of what testing
 abilities we have available today.
 
 
@@ -90,7 +90,7 @@ for ALL targets we support and compile it with a simple GPIO example.
 This doesn't catch everything, but it does make sure that these modules are at
 least compilable, which is particularly interesting when writing new peripheral
 drivers which may have different implementations on other targets.
-You may call 
+You may call
 
 ```sh
  $ cd test/all
@@ -111,7 +111,7 @@ Total:  209
 ```
 
 !!! info "Target Compilation Logs"
-	The individual compilation logs are all saved as artifacts, so that when 
+	The individual compilation logs are all saved as artifacts, so that when
 	something fails, it‘s easy to understand why.
 	You can access them in [the Artifacts tab of a build][logs].
 
@@ -119,8 +119,8 @@ Total:  209
 ## Continous Integration
 
 modm uses [CircleCI as a Continous Integration service][circleci]. It compiles
-all the examples and executes the unit tests on Linux, then generates and 
-compiles the full library for a blinky example for all targets that we support. 
+all the examples and executes the unit tests on Linux, then generates and
+compiles the full library for a blinky example for all targets that we support.
 
 In the future we would like to execute the unit tests as well as the examples
 automatically on the target hardware as well. However, there isn‘t any

@@ -24,32 +24,32 @@ namespace modm
 {
 	// forward declaration
 	template<typename T, uint8_t W, uint8_t H> class Matrix;
-	
+
 	/**
 	 * \brief	Class for handling common point operations
-	 * 
+	 *
 	 * Basic data type of all geometric operations. Used to represent vectors
 	 * as well as particular points in the coordinate system.
-	 * 
+	 *
 	 * \section	point_vector	Point vs. vector
-	 * 
+	 *
 	 * In geometry, it is often convenient to use vector arithmetic to
 	 * represent points.
-	 * 
+	 *
 	 * A vector, by its definition, has no fixed starting point, but if we
 	 * imagine the starting point of a vector to be the origin, then the
 	 * endpoint of the vector represents a particular point.
-	 * 
+	 *
 	 * In this manner, every vector can be said to identify a unique point,
 	 * which is the endpoint of the vector when its starting point is the
 	 * origin.
-	 * 
+	 *
 	 * Therefore there isn't a Point-class, but only a Vector class.
-	 * 
+	 *
 	 * Adapted from the implementation of Gaspard Petit (gaspardpetit@gmail.com).
 	 *
 	 * \see <a href"http://www-etud.iro.umontreal.ca/~petitg/cpp/point.html">Homepage</a>
-	 * 
+	 *
 	 * \ingroup	modm_math_geometry
 	 * \author	Niklas Hauser
 	 */
@@ -59,26 +59,26 @@ namespace modm
 	public:
 		Vector();
 		Vector(const T *ptData);
-		
+
 		Vector(const Matrix<T, N, 1> &rhs);
 		Vector(const Vector &rhs);
-		
+
 		Vector& operator = (const Matrix<T, N, 1> &rhs);
 		Vector& operator = (const Vector &rhs);
-		
+
 		bool operator == (const Vector &rhs) const;
 		bool operator != (const Vector &rhs) const;
 		bool operator < (const Vector &rhs) const;
 		bool operator <= (const Vector &rhs) const;
 		bool operator > (const Vector &rhs) const;
 		bool operator >= (const Vector &rhs) const;
-		
+
 		const T& operator [] (uint8_t index) const;
 		T& operator [] (uint8_t index);
-		
+
 		T* ptr();
 		const T* ptr() const;
-		
+
 		Vector operator + (const Vector &rhs) const;
 		Vector operator - (const Vector &rhs) const;
 		T operator * (const Vector &rhs) const;
@@ -89,26 +89,26 @@ namespace modm
 		Vector& operator *= (const T &rhs);
 		Vector& operator /= (const T &rhs);
 		Vector& operator - ();		// FIXME
-		
+
 		T getLength() const;
 		T getLengthSquared() const;
-		
+
 		Matrix<T, N, 1>&
 		asMatrix();
-		
+
 		const Matrix<T, N, 1>&
 		asMatrix() const;
-		
+
 		Matrix<T, 1, N>&
 		asTransposedMatrix();
-		
+
 		const Matrix<T, 1, N>&
 		asTransposedMatrix() const;
-		
+
 	public:
 		static inline uint8_t
 		getSize();
-		
+
 		T coords[N];
 	};
 }

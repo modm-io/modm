@@ -23,16 +23,16 @@ namespace modm
 		{
 		public:
 			Median(const T& initialValue = 0);
-			
+
 			void
 			append(const T& input);
-			
+
 			void
 			update();
-			
+
 			const T
 			getValue() const;
-		
+
 		private:
 			uint_fast8_t index;
 			T buffer[5];
@@ -69,7 +69,7 @@ modm::filter::Median<T, 5>::update()
 	// for small sample sizes it is the fastest way to just copy the
 	// buffer and sort it afterwards
 	std::memcpy((void *) sorted, (const void * const) buffer, sizeof(sorted));
-	
+
 	MODM_MEDIAN_SORT(sorted[0], sorted[1]);
 	MODM_MEDIAN_SORT(sorted[3], sorted[4]);
 	MODM_MEDIAN_SORT(sorted[0], sorted[3]);

@@ -22,12 +22,12 @@ struct Message
 		header(header), payload(payload)
 	{
 	}
-	
+
 	bool
 	operator == (const Message& other) {
 		return ((header == other.header) && (payload == other.payload));
 	}
-	
+
 	xpcc::Header header;
 	modm::SmartPointer payload;
 };
