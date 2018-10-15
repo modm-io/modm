@@ -51,7 +51,7 @@ def build(project):
 cpus = 4 if os.getenv("CIRCLECI") else os.cpu_count()
 print("Using {}x parallelism".format(cpus))
 # Create build folder to prevent process race
-(Path(__file__).parents[3] / "build").mkdir(exist_ok=True)
+(Path(os.path.abspath(__file__)).parents[2] / "build").mkdir(exist_ok=True)
 # Find all project files
 projects = [p for path in sys.argv[1:] for p in Path(path).glob("**/project.xml")]
 # first generate all projects
