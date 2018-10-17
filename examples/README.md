@@ -25,7 +25,7 @@ scons gdb profile=debug     # launch OpenOCD and GDB for debugging
 To generate your target specific Doxygen documentation:
 
 ```
-(cd modm/docs && doxygen doxygen.cfg)  # may take a minute or two
+(cd modm/docs && doxygen doxyfile.cfg)  # may take a minute or two
 # open modm/docs/html/index.html
 ```
 
