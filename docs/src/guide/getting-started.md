@@ -246,9 +246,9 @@ project repository so that you don't have issues reproducing the build.
 
 !!! tip "Generate custom documentation"
     Include the `modm:docs` module (or execute `lbuild build --module "modm:docs"`),
-    then call `doxygen doxyfile` inside the generated `docs`folder.
+    then call `doxygen doxyfile` inside the generated `modm/docs`folder.
     The documentation for your target and configuration will then be available
-    in `docs/api/index.html`.
+    in `modm/docs/html/index.html`.
 
 For this project we included the `modm:build:scons` generator, so we can just
 call `scons build size`, which will compile the entire source code and output
