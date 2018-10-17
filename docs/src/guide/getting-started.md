@@ -1,62 +1,7 @@
 # Getting Started
 
-The easiest way for you to learn about modm's APIs is to look at and
-experiment with [our examples][examples], especially if you have a development
-board that modm supports out-of-box.
-
-Make sure you've [installed all tools required for building modm](installation).
-
-Here are our favorite examples for our supported development boards:
-
-<!--checkrepourls-->
-- Arduino Uno:
-[Blinky](https://github.com/modm-io/modm/blob/develop/examples/arduino_uno/basic/blink/main.cpp),
-[Button & Serial](https://github.com/modm-io/modm/blob/develop/examples/arduino_uno/basic/digital_read_serial/main.cpp),
-[Analog & Serial](https://github.com/modm-io/modm/blob/develop/examples/arduino_uno/basic/read_analog_voltage/main.cpp).
-- NUCLEO-F031K6:
-[Blinky & Serial](https://github.com/modm-io/modm/tree/develop/examples/nucleo_f031k6/blink).
-- NUCLEO-F103RB:
-[Blinky & Serial](https://github.com/modm-io/modm/blob/develop/examples/nucleo_f103rb/blink/main.cpp).
-- STM32F072 Discovery:
-[Blinky](https://github.com/modm-io/modm/blob/develop/examples/stm32f072_discovery/blink/main.cpp),
-[CAN](https://github.com/modm-io/modm/blob/develop/examples/stm32f072_discovery/can/main.cpp),
-[Gyroscope](https://github.com/modm-io/modm/blob/develop/examples/stm32f072_discovery/rotation/main.cpp).
-- STM32F3 Discovery:
-[Blinky](https://github.com/modm-io/modm/blob/develop/examples/stm32f3_discovery/blink/main.cpp),
-[CAN](https://github.com/modm-io/modm/blob/develop/examples/stm32f3_discovery/can/main.cpp),
-[Accelerometer](https://github.com/modm-io/modm/blob/develop/examples/stm32f3_discovery/accelerometer/main.cpp),
-[Gyroscope](https://github.com/modm-io/modm/blob/develop/examples/stm32f3_discovery/rotation/main.cpp),
-[Debugging with GDB](https://github.com/modm-io/modm/tree/develop/examples/stm32f3_discovery/gdb).
-- STM32F4 Discovery:
-[Blinky](https://github.com/modm-io/modm/blob/develop/examples/stm32f4_discovery/blink/main.cpp),
-[CAN](https://github.com/modm-io/modm/blob/develop/examples/stm32f4_discovery/can/main.cpp),
-[Accelerometer](https://github.com/modm-io/modm/blob/develop/examples/stm32f4_discovery/accelerometer/main.cpp),
-[Timer & LED Animations](https://github.com/modm-io/modm/blob/develop/examples/stm32f4_discovery/timer/main.cpp),
-[Debugging hard faults](https://github.com/modm-io/modm/blob/develop/examples/stm32f4_discovery/hard_fault/main.cpp).
-- STM32F469 Discovery:
-[Blinky](https://github.com/modm-io/modm/blob/develop/examples/stm32f469_discovery/blink/main.cpp),
-[Drawing on display](https://github.com/modm-io/modm/blob/develop/examples/stm32f469_discovery/display/main.cpp),
-[Touchscreen inputs](https://github.com/modm-io/modm/blob/develop/examples/stm32f469_discovery/touchscreen/main.cpp),
-[Multi-heap with external 16MB memory](https://github.com/modm-io/modm/blob/develop/examples/stm32f469_discovery/tlsf-allocator/main.cpp),
-[Game of Life in Color with Multitouch](https://github.com/modm-io/modm/tree/develop/examples/stm32f469_discovery/game_of_life)
-- STM32F769 Discovery:
-[FPU with double precision](https://github.com/modm-io/modm/blob/develop/examples/stm32f769i_discovery/blink/main.cpp)
-
-
-Here are some additional examples of displays and sensors we like:
-
-- [SSD1306 OLED display](https://github.com/modm-io/modm/blob/develop/examples/stm32f4_discovery/oled_display/main.cpp): Draws text and graphics onto I2C display.
-- [BMP085/BMP180 barometer](https://github.com/modm-io/modm/blob/develop/examples/stm32f4_discovery/barometer_bmp085_bmp180/main.cpp): Reads atmospheric pressure and temperature from I2C sensor.
-- [BMP180/BME280 barometer](https://github.com/modm-io/modm/tree/develop/examples/stm32f103c8t6_blue_pill/environment): Reads atmospheric pressure and temperature from multiple I2C sensors.
-- [VL6180 time-of-flight distance sensor](https://github.com/modm-io/modm/blob/develop/examples/stm32f4_discovery/distance_vl6180/main.cpp): Reads distance and ambient light from I2C sensor.
-- [VL53L0  time-of-flight distance sensor](https://github.com/modm-io/modm/tree/develop/examples/nucleo_f401re/distance_vl53l0/main.cpp): Much improved version of the VL6180 sensor.
-- [ADNS9800 motion sensor](https://github.com/modm-io/modm/tree/develop/examples/stm32f103c8t6_blue_pill/adns_9800/main.cpp): Reads 2D motion from SPI sensor used in gaming mice.
-- [TCS3414 color sensor](https://github.com/modm-io/modm/blob/develop/examples/stm32f4_discovery/colour_tcs3414/main.cpp): Reads RGB color from I2C sensor.
-- [HD44780 over I2C-GPIO expander](https://github.com/modm-io/modm/blob/develop/examples/stm32f4_discovery/display/hd44780/main.cpp): Draws text via native GPIO port or I2C-GPIO expander port onto character display.
-<!--/checkrepourls-->
-
-Have a look at the [build system references](../reference/build-systems) to
-see how to compile and program your targets.
+<!--examples-->
+<!--/examples-->
 
 
 ## Your own Project

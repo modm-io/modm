@@ -12,9 +12,10 @@
 from pathlib import Path
 from jinja2 import Environment
 import re
+import os
 import subprocess
 from os import listdir
-from os.path import isfile, join
+from os.path import isfile, join, abspath
 import lbuild
 
 
@@ -73,25 +74,21 @@ def format_table(items, width, align=None):
     return Environment().from_string(TABLE_TEMPLATE).render(subs)
 
 def get_lbuild_in(path):
-    config = lbuild.config.ConfigNode.from_file(join(path, "project.xml"))
-    config.extend_last(lbuild.config.ConfigNode.from_filesystem(path))
-    parser = lbuild.parser.Parser(config)
-    parser.load_repositories()
-    parser.config.add_commandline_options()
-    repo_options = parser.merge_repository_options()
-    modules = parser.prepare_repositories(repo_options)
-    parser.merge_module_options()
-    return parser, repo_options, modules
+    builder = lbuild.api.Builder(cwd=path, config="project.xml")
+    builder.load()
+    return builder.parser
 
 
 # All the paths
-root = Path.cwd().parents[1]
+root = Path(abspath(__file__)).parents[2]
 board_path = root / "src/modm/board"
 example_path = root / "examples"
 ignored_path = root / "test/all/ignored.txt"
 author_path = root / "AUTHORS"
 
+examples_readme_path = root / "examples/README.md"
 readme_path = root / "README.md"
+getting_started_path = root / "docs/src/guide/getting-started.md"
 index_in_path = root / "docs/index.md.in"
 index_path = root / "docs/src/index.md"
 whoweare_in_path = root / "docs/who-we-are.md.in"
@@ -102,16 +99,18 @@ modules_path = root / "docs/src/reference/modules.md"
 # We cannot use lbuild to enumerate the boards since they only make themselves available for certain devices
 # boards = [{"name": name(x.name), "url": url(x.relative_to(root))} for x in board_path.iterdir() if x.is_dir() and name(x.name)]
 boards = [{"name": name(x.name), "url": None} for x in board_path.iterdir() if x.is_dir() and name(x.name)]
+boards.sort(key=lambda b: b["name"])
 bsp_table = format_table(boards, 4)
 
 # Get all the example directory paths
 examples = [e.relative_to(example_path) for e in example_path.glob('**/project.xml')]
 examples = [{"name": "{}: {}".format(name(str(e.parts[0])), e.parent.relative_to(e.parts[0])), "url": url(Path("examples") / e.parent / "main.cpp")} for e in examples]
+examples.sort(key=lambda b: b["name"])
 example_table = format_table(examples, 2, "left")
 
 # Get all supported targets
-lbuild_parser, lbuild_repo_options, lbuild_modules = get_lbuild_in("{}/examples/stm32f4_discovery/blink/".format(root))
-targets = set(lbuild_repo_options["modm:target"]._enumeration.keys())
+lbuild_parser = get_lbuild_in("{}/examples/stm32f4_discovery/blink/".format(root))
+targets = set(lbuild_parser.find_option("modm:target").values)
 ignored_devices = set(d for d in ignored_path.read_text().strip().splitlines() if "#" not in d)
 targets -= ignored_devices
 avr_count = len([t for t in targets if t.startswith("at")])
@@ -122,9 +121,19 @@ author_count = len(author_path.read_text().strip().splitlines())
 
 # Get all the modules that are available for the STM32
 # Get all drivers, we assume they are available for all devices
-drivers = sorted([m.fullname.replace("modm:driver:", "") for m in lbuild_modules if m.fullname.startswith("modm:driver:")])
+drivers = sorted([m.replace("modm:driver:", "") for m in lbuild_parser.modules if m.startswith("modm:driver:")])
 drivers = [{"name": name(d), "url": None} for d in drivers if name(d)]
 driver_table = format_table(drivers, 6)
+
+# Read the examples README.md and replace these keys
+readme = examples_readme_path.read_text()
+readme = replace(readme, "examplecount", len(examples))
+examples_readme_path.write_text(readme)
+
+# Copy the getting started guide from example readme
+getting_started = getting_started_path.read_text()
+getting_started = replace(getting_started, "examples", extract(readme, "examples"))
+getting_started_path.write_text(getting_started)
 
 # Read the repo README.md and replace these keys
 readme = readme_path.read_text()
