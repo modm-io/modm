@@ -98,7 +98,9 @@ namespace modm
 		class Queue : private QueueBase
 		{
 		public:
-			Queue(unsigned portBASE_TYPE length);
+			inline Queue(unsigned portBASE_TYPE length):
+			    QueueBase(length,sizeof(T))
+			{};
 
 			using QueueBase::getSize;
 
