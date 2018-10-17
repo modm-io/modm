@@ -26,5 +26,5 @@ def prepare(module, options):
 
 
 def build(env):
-    env.outbasepath = "modm/test/modm/utils"
+    env.outbasepath = "modm-test/src/modm/utils"
     env.copy('.')

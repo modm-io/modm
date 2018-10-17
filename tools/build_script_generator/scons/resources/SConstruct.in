@@ -26,8 +26,8 @@ env.SConscript(dirs=generated_paths, exports="env")
 
 %% if is_unittest
 # Building unit tests
-headers = env.FindHeaderFiles("modm/test")
-sources = env.UnittestRunner(target="main.cpp", source=headers, template="modm/test/runner.cpp.in")
+headers = env.FindHeaderFiles("modm-test/src/modm")
+sources = env.UnittestRunner(target="main.cpp", source=headers, template="modm-test/src/runner.cpp.in")
 %% else
 env.Append(CPPPATH=".")
 ignored = ["cmake-*", ".lbuild_cache", build_path] + generated_paths

@@ -28,7 +28,7 @@ def prepare(module, options):
 
 
 def build(env):
-    env.outbasepath = "modm/test/modm/architecture"
+    env.outbasepath = "modm-test/src/modm/architecture"
 
     ignore_patterns = []
     target = env[":target"].identifier

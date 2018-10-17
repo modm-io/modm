@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <modules>
+    <module>:platform:core</module>
+    <module>:test:**</module>
+  </modules>
+</library>

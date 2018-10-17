@@ -35,7 +35,10 @@ env.InfoBuild()
 %% endif
 
 
-env.Append(CPPPATH=[
+env.AppendUnique(CPPPATH=[
+%% if family == "darwin"
+	"/usr/local/include",
+%% endif
 %% for path in include_paths | sort
     abspath("{{ path }}"),
 %% endfor
@@ -56,6 +59,9 @@ env.AppendUnique(LIBS=[
 %% endfor
 ])
 env.AppendUnique(LIBPATH=[
+%% if family == "darwin"
+	"/usr/local/lib",
+%% endif
     abspath(str(library[0].get_dir())),
 %% for library in library_paths | sort
     abspath("{{ library }}"),
@@ -95,6 +101,9 @@ if profile == "{{ profile }}":
 {{ generate_flags("ARCHFLAGS", repo != "modm") }}
 
 %% if repo == "modm"
+%% if family != "darwin"
+env["_LIBFLAGS"] = "-Wl,--start-group " + env["_LIBFLAGS"] + " -Wl,--end-group"
+%% endif
 %% if platform not in ["hosted"]
 # We need to link libmodm.a with --whole-archive, so that all weak symbols are visible to the linker.
 # Functions placed in a linker section list (like modm_section(".hardware_init")) are typically not

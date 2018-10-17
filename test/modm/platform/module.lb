@@ -25,6 +25,6 @@ def prepare(module, options):
 
 
 def build(env):
-    env.outbasepath = "modm/test/modm/platform"
+    env.outbasepath = "modm-test/src/modm/platform"
     env.copy("can_bit_timings_test.hpp")
     env.copy("can_bit_timings_test.cpp")

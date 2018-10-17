@@ -28,13 +28,13 @@ def prepare(module, options):
         ":driver:ltc2984",
         ":driver:drv832x_spi",
         ":driver:mcp2515",
-        "modm:test:platform:spi",
+        "modm-test:test:platform:spi",
         ":platform:gpio")
     return True
 
 
 def build(env):
-    env.outbasepath = "modm/test/modm/driver"
+    env.outbasepath = "modm-test/src/modm/driver"
     patterns = []
     if env[":target"].identifier["platform"] == "avr":
         patterns += ["*pressure*"]

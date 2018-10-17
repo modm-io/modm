@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2018, Raphael Lehmann
+# Copyright (c) 2017, Fabian Greif
+# Copyright (c) 2017-2018, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -10,18 +11,10 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-def init(module):
-    module.name = "spi"
-    module.parent = "test:platform"
+def init(repo):
+    repo.name = "modm-test"
+    repo.description = "Testing modm"
 
-def prepare(module, options):
-    module.depends(
-		"modm:architecture:spi",
-        "modm:container")
+def prepare(repo, options):
+    repo.add_modules_recursive(".", modulefile="*.lb")
 
-    return True
-
-def build(env):
-    env.outbasepath = "modm-test/src/modm/platform/spi/mock"
-    env.copy("spi_master.hpp")
-    env.copy("spi_master.cpp")

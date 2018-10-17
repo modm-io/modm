@@ -172,7 +172,9 @@ def init(repo):
                           enumeration=devices))
 
 def prepare(repo, options):
-    repo.add_modules_recursive(".", modulefile="*.lb")
+    repo.add_modules_recursive("ext", modulefile="*.lb")
+    repo.add_modules_recursive("src", modulefile="*.lb")
+    repo.add_modules_recursive("tools", modulefile="*.lb")
 
 def build(env):
     env.add_metadata("include_path", "modm/src")
