@@ -263,7 +263,7 @@ public:
 	setDeadTime(uint8_t deadTime)
 	{
 		uint32_t flags = TIM{{ id }}->BDTR;
-		flags &= TIM_BDTR_DTG;
+		flags &= ~TIM_BDTR_DTG;
 		flags |= deadTime;
 		TIM{{ id }}->BDTR = flags;
 	}
@@ -297,7 +297,7 @@ public:
 				break;
 		}
 		uint32_t flags = TIM{{ id }}->BDTR;
-		flags &= TIM_BDTR_DTG;
+		flags &= ~TIM_BDTR_DTG;
 		flags |= (deadTime & bitmask) | static_cast<uint32_t>(resolution);
 		TIM{{ id }}->BDTR = flags;
 	}
