@@ -41,6 +41,7 @@ struct Gpio{{ port ~ pin }} : public Gpio, ::modm::GpioIO
 	template<class... Gpios>
 	friend class GpioSet;
 	using PinSet = GpioSet<Gpio{{ port ~ pin }}>;
+	friend class Adc1; friend class Adc2; friend class Adc3;
 public:
 	using Output = Gpio{{ port ~ pin }};
 	using Input = Gpio{{ port ~ pin }};
@@ -180,6 +181,9 @@ public:
 	};
 	%% endfor
 	/// @endcond
+private:
+	template< Peripheral peripheral >
+	static constexpr int8_t AdcChannel = -1;
 };
 
 /// @cond
@@ -215,7 +219,13 @@ struct Gpio{{ port ~ pin }}::{{ signal.name }}<Peripheral::{{ signal.driver }}>
 			%% endif
 	}
 };
+		%% if signal.driver.startswith("Adc") and signal.name.startswith("In")
+template<>
+constexpr int8_t
+Gpio{{ port ~ pin }}::AdcChannel<Peripheral::{{ signal.driver }}> = {{ signal.name.replace("In", "") }};
+		%% endif
 	%% endfor
+
 %% endfor
 /// @endcond
 
@@ -223,4 +233,4 @@ struct Gpio{{ port ~ pin }}::{{ signal.name }}<Peripheral::{{ signal.driver }}>
 
 } // namespace modm
 
-#endif // MODM_STM32_GPIO_PIN_HPP
+#endif // MODM_STM32_GPIO_{{ port ~ pin }}_HPP

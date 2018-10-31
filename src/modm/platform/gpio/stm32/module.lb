@@ -245,6 +245,11 @@ def validate(env):
     bprops["all_signals"] = sorted(list(set(s["name"] for s in all_signals.values())))
     bprops["pf"] = "1" if device.identifier["family"] in ["l4"] else ""
 
+    # Check the max number of ADC instances
+    max_adc_instance = max(map(int, device.get_driver("adc").get("instance", [1])))
+    if (max_adc_instance > (3 if device.identifier["family"] == "f1" else 4)):
+        raise ValidateException("Too many ADC instances: '{}'".format(max_adc_instance))
+
     return True
 
 def build(env):

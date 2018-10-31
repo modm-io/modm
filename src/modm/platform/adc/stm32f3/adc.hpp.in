@@ -301,12 +301,21 @@ public:
 	setChannel(const Channel channel,
 			const SampleTime sampleTime=static_cast<SampleTime>(0b000));
 
-	/// Helper function for setting the channel from a Pin
+	/// Setting the channel for a Pin
 	template< class Gpio >
 	static inline bool
 	setPinChannel(SampleTime sampleTime = static_cast<SampleTime>(0b000))
 	{
-		return setChannel(Channel(Gpio::pin), sampleTime);
+		return setChannel(getPinChannel<Gpio>(), sampleTime);
+	}
+	/// Get the channel for a Pin
+	template< class Gpio >
+	static inline constexpr Channel
+	getPinChannel()
+	{
+		constexpr int8_t channel{Gpio::template AdcChannel<Peripheral::Adc{{ id }}>};
+		static_assert(channel >= 0, "Adc{{id}} does not have a channel for this pin!");
+		return Channel(channel);
 	}
 
 	/**

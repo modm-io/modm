@@ -39,6 +39,8 @@ class Gpio{{ port ~ pin }} : public Gpio, public ::modm::GpioIO
 	template<class... Gpios>
 	friend class GpioSet;
 	using PinSet = GpioSet<Gpio{{ port ~ pin }}>;
+	friend class Adc1; friend class Adc2;
+	friend class Adc3; friend class Adc4;
 public:
 	using Output = Gpio{{ port ~ pin }};
 	using Input = Gpio{{ port ~ pin }};
@@ -169,7 +171,7 @@ public:
 #ifdef __DOXYGEN__
 	/// @{
 	/// Connect to any software peripheral
-	struct BitBang;
+	using BitBang = GpioSignal;
 	%% for name, group in signals.items()
 	/// Connect to {% for sig in group %}{{ sig.driver }}{{ "" if loop.last else " or "}}{% endfor %}
 	using {{ name }} = GpioSignal;
@@ -194,6 +196,9 @@ public:
 	};
 	%% endfor
 	/// @endcond
+private:
+	template< Peripheral peripheral >
+	static constexpr int8_t AdcChannel = -1;
 };
 
 /// @cond
@@ -225,8 +230,16 @@ struct Gpio{{ port ~ pin }}::{{ signal.name }}<Peripheral::{{ signal.driver }}>
 		%% endif
 	}
 };
+		%% if signal.driver.startswith("Adc") and signal.name.startswith("In")
+template<>
+constexpr int8_t
+Gpio{{ port ~ pin }}::AdcChannel<Peripheral::{{ signal.driver }}> = {{ signal.name.replace("In", "") }};
+		%% endif
 	%% endfor
+
 %% endfor
+
+
 /// @endcond
 
 } // namespace platform
