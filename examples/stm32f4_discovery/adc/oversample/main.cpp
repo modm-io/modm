@@ -28,9 +28,9 @@ modm::log::Logger modm::log::info(loggerDevice);
 
 // the three sensors are mapped: x = ch1, y = ch2, z = ch0
 Adc2::Channel sensorMapping[3] = {
-		Adc2::Channel::Channel7,
-		Adc2::Channel::Channel4,
-		Adc2::Channel::Channel2
+	Adc2::getPinChannel<AdcIn0>(),
+	Adc2::getPinChannel<AdcIn1>(),
+	Adc2::getPinChannel<AdcIn2>(),
 };
 // the results are up to 16 bit wide
 uint32_t sensorData[3];

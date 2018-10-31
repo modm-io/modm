@@ -34,7 +34,7 @@ main()
 					Adc1::Prescaler::Disabled,
 					Adc1::CalibrationMode::SingleEndedInputsMode, true);
 	Adc1::connect<GpioInputA0::In5>();
-	Adc1::setChannel(Adc1::Channel::Channel5, Adc1::SampleTime::Cycles182);
+	Adc1::setPinChannel<GpioInputA0>(Adc1::SampleTime::Cycles182);
 
 	int loop(0);
 	while (true)

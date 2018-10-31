@@ -34,10 +34,10 @@ main()
 	Usart2::connect<GpioOutputA2::Tx>();
 	Usart2::initialize<Board::systemClock, 115200>();
 
-	// initialize Adc4
+	// initialize Adc2
 	Adc2::connect<AdcIn::In7>();
 	Adc2::initialize<Board::systemClock>();
-	Adc2::setChannel(Adc2::Channel::Channel7);
+	Adc2::setPinChannel<AdcIn>();
 
 	while (1)
 	{

@@ -69,28 +69,28 @@ main()
 					Adc1::CalibrationMode::SingleEndedInputsMode, true);
 	Adc1::setFreeRunningMode(true);
 	Adc1::connect<Adc1In::In6>();
-	Adc1::setChannel(Adc1::Channel::Channel6, Adc1::SampleTime::Cycles2);
+	Adc1::setPinChannel<Adc1In>(Adc1::SampleTime::Cycles2);
 	Adc1::startConversion();
 
 	Adc2::initialize(Adc2::ClockMode::Asynchronous, Adc2::Prescaler::Div128,
 					Adc2::CalibrationMode::SingleEndedInputsMode, true);
 	Adc2::setFreeRunningMode(true);
 	Adc2::connect<Adc2In::In8>();
-	Adc2::setChannel(Adc2::Channel::Channel8, Adc2::SampleTime::Cycles2);
+	Adc2::setPinChannel<Adc2In>(Adc2::SampleTime::Cycles2);
 	Adc2::startConversion();
 
 	Adc3::initialize(Adc3::ClockMode::Asynchronous, Adc3::Prescaler::Div128,
 					Adc3::CalibrationMode::SingleEndedInputsMode, true);
 	Adc3::setFreeRunningMode(true);
 	Adc3::connect<Adc3In::In5>();
-	Adc3::setChannel(Adc3::Channel::Channel5, Adc3::SampleTime::Cycles2);
+	Adc3::setPinChannel<Adc3In>(Adc3::SampleTime::Cycles2);
 	Adc3::startConversion();
 
 	Adc4::initialize(Adc4::ClockMode::Asynchronous, Adc4::Prescaler::Div128,
 					Adc4::CalibrationMode::SingleEndedInputsMode, true);
 	Adc4::setFreeRunningMode(true);
 	Adc4::connect<Adc4In::In3>();
-	Adc4::setChannel(Adc4::Channel::Channel3, Adc4::SampleTime::Cycles2);
+	Adc4::setPinChannel<Adc4In>(Adc4::SampleTime::Cycles2);
 	Adc4::startConversion();
 
 	while (1)

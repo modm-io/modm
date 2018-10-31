@@ -38,7 +38,7 @@ main()
 	Adc4::initialize(Adc4::ClockMode::Asynchronous, Adc4::Prescaler::Div256,
 					Adc4::CalibrationMode::SingleEndedInputsMode, true);
 	Adc4::connect<AdcIn0::In3>();
-	Adc4::setChannel(Adc4::Channel::Channel3, Adc4::SampleTime::Cycles182);
+	Adc4::setPinChannel<AdcIn0>(Adc4::SampleTime::Cycles182);
 
 	while (1)
 	{

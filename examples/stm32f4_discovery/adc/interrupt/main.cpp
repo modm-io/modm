@@ -51,7 +51,7 @@ main()
 	// initialize Adc2
 	Adc2::initialize<Board::systemClock>();
 	Adc2::connect<AdcIn::In7>();
-	Adc2::setChannel(Adc2::Channel::Channel7);
+	Adc2::setPinChannel<AdcIn>();
 
 	Adc2::enableInterruptVector(5);
 	Adc2::enableInterrupt(Adc2::Interrupt::EndOfRegularConversion);
