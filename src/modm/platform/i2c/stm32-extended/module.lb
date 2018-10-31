@@ -45,7 +45,6 @@ class Instance(Module):
         env.template("i2c_master.cpp.in", "i2c_master_{}.cpp".format(self.instance))
         env.template("i2c_master.hpp.in", "i2c_master_{}.hpp".format(self.instance))
 
-
 def init(module):
     module.name = "i2c"
     module.parent = "platform"
@@ -72,4 +71,6 @@ def prepare(module, options):
     return True
 
 def build(env):
-    pass
+    env.outbasepath = "modm/src/modm/platform/i2c"
+    env.copy("i2c_timing_calculator.hpp")
+

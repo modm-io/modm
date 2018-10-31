@@ -460,7 +460,7 @@ MODM_ISR(I2C{{ id }}_ER)
 // ----------------------------------------------------------------------------
 
 void
-modm::platform::I2cMaster{{ id }}::initializeWithPrescaler(/* uint8_t peripheralFrequency, uint8_t riseTime, uint16_t prescaler */)
+modm::platform::I2cMaster{{ id }}::initializeWithPrescaler(uint32_t timingRegisterValue)
 {
 	// Enable clock
 	RCC->APB1ENR{{aid}} |= RCC_APB1ENR{{aid}}_I2C{{ id }}EN;
@@ -476,16 +476,8 @@ modm::platform::I2cMaster{{ id }}::initializeWithPrescaler(/* uint8_t peripheral
 	// 39.4.8: Before enabling the peripheral, the I2C master clock must be configured by setting the
 	// SCLH and SCLL bits in the I2C_TIMINGR register.
 
-	// PRESC  = 0x02 // 48 MHz / 3 = 16 MHz 62.5 nsec
-	// SCLDEL = 0x03 // Data setup time   ( 3 + 1) * 62.5 nsec =    250 nsec
-	// SDADEL = 0x00 // Data hold time  = ( 0 + 1) * 62.5 nsec =    625 nsec
-	// SCLH   = 0x3e // SCL high period = (62 + 1) * 62.5 nsec = 3.9375 msec
-	// SCLL   = 0x5d // SCL low period  = (93 + 1) * 62.5 nsec = 5.8750 msec
-	//                                                         = 9.8125 msec
-	// FIXME Hard-coded values for 100 kHz at 48 MHz
-	static constexpr uint32_t timing = 0x20303E5D;
 	static constexpr uint32_t TIMING_CLEAR_MASK = 0xF0FFFFFF;
-	I2C{{ id }}->TIMINGR = timing & TIMING_CLEAR_MASK;
+	I2C{{ id }}->TIMINGR = timingRegisterValue & TIMING_CLEAR_MASK;
 
 	// Disable Own Address1 before set the Own Address1 configuration
 	I2C{{ id }}->OAR1 &= ~I2C_OAR1_OA1EN;
