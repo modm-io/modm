@@ -52,13 +52,19 @@ struct I2cParameters
 class I2cTimingCalculator
 {
 public:
-	constexpr I2cTimingCalculator(const I2cParameters& parameters) : params{parameters} {}
+	explicit constexpr I2cTimingCalculator(const I2cParameters& parameters)
+		: params{parameters} {}
 
 	constexpr std::optional<I2cMasterTimings>
 	calculateTimings() const
 	{
 		uint16_t prescalerMask{findValidPrescalers()};
 		if(prescalerMask == 0) {
+			return std::nullopt;
+		}
+
+		if((params.fallTime > ModeConstants::tFallMax[modeIndex()])
+			|| (params.riseTime > ModeConstants::tRiseMax[modeIndex()])) {
 			return std::nullopt;
 		}
 
@@ -74,20 +80,27 @@ public:
 				continue;
 			}
 
-			for(uint16_t sclLow = 0; sclLow <= 255; ++sclLow) {
-				for(uint16_t sclHigh = 0; sclHigh <= 255; ++sclHigh) {
-					std::optional<float> speed = calculateSpeed(prescaler, sclLow, sclHigh);
-					if(speed) {
-						auto error = std::fabs((speed.value() / params.targetSpeed) - 1.0f);
-						// modm::Tolerance value is in unit [1/1000]
-						if((error * 1000) < params.tolerance && error <= lastError && prescaler <= bestPrescaler) {
-							lastError = error;
-							bestPrescaler = prescaler;
-							bestSclLow = sclLow;
-							bestSclHigh = sclHigh;
-							found = true;
-						}
-					}
+			auto [valid, sclLowMin, sclHighMin] = minimumSclLowHigh(prescaler);
+			if(!valid) {
+				continue;
+			}
+
+			const uint16_t sclSumMax = maximumSclSum(prescaler);
+			const uint16_t sclLowMax = std::min<uint16_t>(sclSumMax, 255);
+
+			for(uint16_t sclLow = sclLowMin; sclLow <= sclLowMax; ++sclLow) {
+				auto sclHighMax = std::min(sclSumMax - sclLow, 255);
+
+				auto sclHigh = findBestSclHigh(prescaler, sclLow, sclHighMin, sclHighMax);
+				float speed = calculateSpeed(prescaler, sclLow, sclHigh);
+				auto error = std::fabs((speed / params.targetSpeed) - 1.0f);
+				// modm::Tolerance value is in unit [1/1000]
+				if (((error*1000) < params.tolerance) && (error <= lastError) && (prescaler<=bestPrescaler)) {
+					lastError = error;
+					bestPrescaler = prescaler;
+					bestSclLow = sclLow;
+					bestSclHigh = sclHigh;
+					found = true;
 				}
 			}
 		}
@@ -122,6 +135,11 @@ public:
 
 private:
 	I2cParameters params;
+
+	const float FilterDelay = (params.enableAnalogFilter ? AnalogFilterDelayMin : 0)
+			+ float(params.digitalFilterLength) / params.peripheralClock;
+
+	const float SyncTime = FilterDelay + (2.0f / params.peripheralClock);
 
 	struct ModeConstants
 	{
@@ -166,8 +184,8 @@ private:
 		};
 	};
 
-	static constexpr auto FastThreshold = 125'000.f;
-	static constexpr auto FastPlusThreshold = 500'000.f;
+	static constexpr auto FastThreshold = 250'000.f;
+	static constexpr auto FastPlusThreshold = 700'000.f;
 
 	static constexpr auto AnalogFilterDelayMin = 50.0e-9f;
 	static constexpr auto AnalogFilterDelayMax = 260.0e-9f;
@@ -237,31 +255,73 @@ private:
 		return prescalerMask;
 	}
 
-	constexpr std::optional<float>
+	constexpr std::tuple<bool, uint8_t, uint8_t>
+	minimumSclLowHigh(uint8_t prescaler) const
+	{
+		auto clockPeriod = float(prescaler + 1) / params.peripheralClock;
+
+		float lowMinFloat = std::max(
+			((ModeConstants::tLowMin[modeIndex()] - SyncTime) / clockPeriod) - 1,
+			((4.0f / params.peripheralClock) + FilterDelay - SyncTime) / clockPeriod - 1
+		);
+
+		float highMinFloat = std::max(
+			((ModeConstants::tHighMin[modeIndex()] - SyncTime) / clockPeriod) - 1,
+			((1.0f / params.peripheralClock) - SyncTime) / clockPeriod - 1
+		);
+
+		lowMinFloat  = std::ceil(lowMinFloat);
+		highMinFloat = std::ceil(highMinFloat);
+
+		if(lowMinFloat > 255 || highMinFloat > 255) {
+			return {false, 255, 255};
+		}
+
+		uint8_t lowMin  = (uint8_t) std::max(lowMinFloat, 0.f);
+		uint8_t highMin = (uint8_t) std::max(highMinFloat, 0.f);
+		return {true, lowMin, highMin};
+	}
+
+	constexpr uint16_t
+	maximumSclSum(uint8_t prescaler) const
+	{
+		auto clockPeriod = float(prescaler + 1) / params.peripheralClock;
+
+		auto targetSclTime = 1.f / params.targetSpeed;
+		auto sclTimeMax = targetSclTime * (1.f + params.tolerance / 1000.f);
+		auto maxSclSum = ((sclTimeMax - params.riseTime - params.fallTime - 2*SyncTime)
+				/ clockPeriod) - 2;
+
+		return (uint16_t) std::max(0.0f, std::min(maxSclSum, 255.0f * 2));
+	}
+
+	constexpr uint8_t
+	findBestSclHigh(uint8_t prescaler, uint8_t sclLow, uint8_t min, uint8_t max) const
+	{
+		auto clockPeriod = float(prescaler + 1) / params.peripheralClock;
+		auto sclLowTime = (sclLow + 1) * clockPeriod + SyncTime;
+
+		auto targetSclTime = 1.f / params.targetSpeed;
+		auto targetSclHighTime = targetSclTime - sclLowTime
+				- params.riseTime - params.fallTime;
+
+		auto targetSclHigh = std::round((targetSclHighTime - SyncTime) / clockPeriod - 1);
+
+		return (uint8_t) std::max<float>(min, std::min<float>(targetSclHigh, max));
+	}
+
+	constexpr float
 	calculateSpeed(uint8_t prescaler, uint16_t sclLow, uint16_t sclHigh) const
 	{
 		auto clockPeriod = float(prescaler + 1) / params.peripheralClock;
 
-		auto filterDelay = (params.enableAnalogFilter ? AnalogFilterDelayMin : 0)
-			+ float(params.digitalFilterLength) / params.peripheralClock;
-
-		auto syncTime = filterDelay + (2.0f / params.peripheralClock);
-
-		auto sclLowTime = (sclLow + 1) * clockPeriod + syncTime;
-		auto sclHighTime = (sclHigh + 1) * clockPeriod + syncTime;
+		auto sclLowTime = (sclLow + 1) * clockPeriod + SyncTime;
+		auto sclHighTime = (sclHigh + 1) * clockPeriod + SyncTime;
 
 		auto sclTime = sclLowTime + sclHighTime + params.riseTime + params.fallTime;
 		auto speed = 1.0f / sclTime;
 
-		if(sclLowTime >= ModeConstants::tLowMin[modeIndex()]
-			&& sclHighTime >= ModeConstants::tHighMin[modeIndex()]
-			&& ((1.0f / params.peripheralClock) < ((sclLowTime - filterDelay) / 4))
-			&& ((1.0f / params.peripheralClock) < sclHighTime)) {
-
-			return speed;
-		} else {
-			return std::nullopt;
-		}
+		return speed;
 	}
 };
 
