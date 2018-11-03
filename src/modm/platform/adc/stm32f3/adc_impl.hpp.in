@@ -19,7 +19,7 @@
 
 void
 modm::platform::Adc{{ id }}::initialize(const ClockMode clk,
-%% if target["family"] in ["l4"]
+%% if clock_mux
 		const ClockSource clk_src,
 %% endif
 		const Prescaler pre,
@@ -27,14 +27,19 @@ modm::platform::Adc{{ id }}::initialize(const ClockMode clk,
 {
 	uint32_t tmp = 0;
 
-%% if target["family"] in ["f3"]
 	// enable clock
+%% if target["family"] in ["f3"]
 	RCC->AHBENR |= RCC_AHBENR_ADC{{ id_common }}EN;
 %% elif target["family"] in ["l4"]
-	// enable and select clock
 	RCC->AHB2ENR |= RCC_AHB2ENR_ADCEN;
-	RCC->CCIPR |= static_cast<uint32_t>(clk_src);
+%% endif
 
+%% if clock_mux
+	// select clock source
+	RCC->CCIPR |= static_cast<uint32_t>(clk_src);
+%% endif
+
+%% if target["family"] in ["l4"]
 	// Disable deep power down
 	ADC{{ id }}->CR &= ~ADC_CR_DEEPPWD;
 %% endif

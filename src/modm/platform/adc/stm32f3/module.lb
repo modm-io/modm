@@ -76,15 +76,19 @@ class Instance(Module):
                 properties["adc_pre"] = "ADCPRE34"
                 properties["id_common"] = "34"
                 properties["id_common_u"] = "3_4_COMMON"
-        else:
+            properties["clock_mux"] = False
+        else: # L4
             properties["adc_ccr"] = "ADC_CCR"
             if len(driver["instance"]) == 1:
                 properties["id_common"] = "1"
                 properties["id_common_u"] = "1_COMMON"
+            elif len(driver["instance"]) == 2:
+                properties["id_common"] = "12"
+                properties["id_common_u"] = "12_COMMON"
             else:
                 properties["id_common"] = "123"
                 properties["id_common_u"] = "123_COMMON"
-
+            properties["clock_mux"] = (target["name"] not in ("12", "22"))
 
         env.substitutions = properties
         env.outbasepath = "modm/src/modm/platform/adc"
