@@ -52,7 +52,9 @@
 #include <modm/architecture/interface/interrupt.hpp>
 #include <modm/container.hpp>
 
+%% if not shared_interrupt
 MODM_ISR_DECL(I2C{{ id }}_ER);
+%% endif
 
 namespace
 {
@@ -257,12 +259,86 @@ namespace
 			callStarting();
 		}
 	}
+
+	bool modm_always_inline
+	handleError()
+	{
+		uint16_t sr1 = I2C{{ id }}->ISR;
+
+		if (sr1 & I2C_ISR_BERR)
+		{
+			DEBUG_STREAM("BUS ERROR");
+			I2C{{ id }}->ICR |= I2C_ICR_BERRCF;
+			error = modm::I2cMaster::Error::BusCondition;
+		}
+		else if (sr1 & I2C_ISR_NACKF)
+		{	// acknowledge fail
+			I2C{{ id }}->ICR |= I2C_ICR_NACKCF;
+			DEBUG_STREAM("ACK FAIL");
+			// may also be ADDRESS_NACK
+			error = starting.address ? modm::I2cMaster::Error::AddressNack : modm::I2cMaster::Error::DataNack;
+		}
+		else if (sr1 & I2C_ISR_ARLO)
+		{	// arbitration lost
+			I2C{{ id }}->ICR |= I2C_ICR_ARLOCF;
+			DEBUG_STREAM("ARBITRATION LOST");
+			error = modm::I2cMaster::Error::ArbitrationLost;
+		}
+		else if ((sr1 & I2C_ISR_TIMEOUT) || (sr1 & I2C_ISR_ALERT) || (sr1 & I2C_ISR_PECERR))
+		{
+			// should only occur in unsupported SMBus mode
+			DEBUG_STREAM("UNKNOWN, SMBUS");
+			I2C{{ id }}->ICR |= I2C_ICR_ALERTCF;
+			I2C{{ id }}->ICR |= I2C_ICR_TIMOUTCF;
+			I2C{{ id }}->ICR |= I2C_ICR_PECCF;
+			error = modm::I2cMaster::Error::Unknown;
+		}
+		else if (sr1 & I2C_ISR_OVR)
+		{
+			// should not occur in master mode
+			DEBUG_STREAM("UNKNOWN");
+			I2C{{ id }}->ICR |= I2C_ICR_OVRCF;
+			error = modm::I2cMaster::Error::Unknown;
+		}
+		else
+		{
+			return false;
+		}
+
+		if (transaction) transaction->detaching(modm::I2c::DetachCause::ErrorCondition);
+		transaction = nullptr;
+
+		// Clear flags and interrupts
+		writing.length = 0;
+		reading.length = 0;
+
+		DEBUG_STREAM("disable interrupts");
+		I2C{{ id }}->CR1 &= ~(
+			I2C_CR1_STOPIE |
+			I2C_CR1_TCIE   |
+			I2C_CR1_RXIE   |
+			I2C_CR1_TXIE   |
+			I2C_CR1_RXIE);
+
+		callNextTransaction();
+		return true;
+	}
+
 }
 
 // ----------------------------------------------------------------------------
+%% if shared_interrupt
+MODM_ISR(I2C{{ id }})
+%% else
 MODM_ISR(I2C{{ id }}_EV)
+%% endif
 {
 	DEBUG_STREAM("\n=== IRQ ===");
+
+%% if shared_interrupt
+	handleError();
+%% endif
+
 	uint16_t isr = I2C{{ id }}->ISR;
 
 	I2C{{ id }}->CR1 &= ~(I2C_CR1_STOPIE | I2C_CR1_TCIE | I2C_CR1_RXIE | I2C_CR1_TXIE);
@@ -407,55 +483,12 @@ MODM_ISR(I2C{{ id }}_EV)
 }
 
 // ----------------------------------------------------------------------------
+%% if not shared_interrupt
 MODM_ISR(I2C{{ id }}_ER)
 {
-	DEBUG_STREAM("ERROR!");
-	uint16_t sr1 = I2C{{ id }}->ISR;
-
-	if (sr1 & I2C_ISR_BERR)
-	{
-		DEBUG_STREAM("BUS ERROR");
-		I2C{{ id }}->ICR |= I2C_ICR_BERRCF;
-		error = modm::I2cMaster::Error::BusCondition;
-	}
-	else if (sr1 & I2C_ISR_NACKF)
-	{	// acknowledge fail
-		I2C{{ id }}->ICR |= I2C_ICR_NACKCF;
-		DEBUG_STREAM("ACK FAIL");
-		// may also be ADDRESS_NACK
-		error = starting.address ? modm::I2cMaster::Error::AddressNack : modm::I2cMaster::Error::DataNack;
-	}
-	else if (sr1 & I2C_ISR_ARLO)
-	{	// arbitration lost
-		I2C{{ id }}->ICR |= I2C_ICR_ARLOCF;
-		DEBUG_STREAM("ARBITRATION LOST");
-		error = modm::I2cMaster::Error::ArbitrationLost;
-	}
-	else if (error == modm::I2cMaster::Error::NoError)
-	{
-		DEBUG_STREAM("UNKNOWN");
-		error = modm::I2cMaster::Error::Unknown;
-	}
-
-	if (transaction) transaction->detaching(modm::I2c::DetachCause::ErrorCondition);
-	transaction = nullptr;
-
-	// Overrun error is not handled here separately
-
-	// Clear flags and interrupts
-	writing.length = 0;
-	reading.length = 0;
-
-	DEBUG_STREAM("disable interrupts");
-	I2C{{ id }}->CR1 &= ~(
-		I2C_CR1_STOPIE |
-		I2C_CR1_TCIE   |
-		I2C_CR1_RXIE   |
-		I2C_CR1_TXIE   |
-		I2C_CR1_RXIE);
-
-	callNextTransaction();
+	handleError();
 }
+%% endif
 
 // ----------------------------------------------------------------------------
 
@@ -510,6 +543,11 @@ modm::platform::I2cMaster{{ id }}::initializeWithPrescaler(uint32_t timingRegist
 	// Configure Generalcall and NoStretch mode
 	I2C{{ id }}->CR1 = (0 | I2C_CR1_NOSTRETCH);
 
+%% if shared_interrupt
+	// Enable Interrupt
+	NVIC_SetPriority(I2C{{ id }}_IRQn, 10);
+	NVIC_EnableIRQ(I2C{{ id }}_IRQn);
+%% else
 	// Enable Error Interrupt
 	NVIC_SetPriority(I2C{{ id }}_ER_IRQn, 10);
 	NVIC_EnableIRQ(I2C{{ id }}_ER_IRQn);
@@ -517,6 +555,7 @@ modm::platform::I2cMaster{{ id }}::initializeWithPrescaler(uint32_t timingRegist
 	// Enable Event Interrupt
 	NVIC_SetPriority(I2C{{ id }}_EV_IRQn, 10);
 	NVIC_EnableIRQ(I2C{{ id }}_EV_IRQn);
+%% endif
 
 	// Enable peripheral
 	I2C{{ id }}->CR1 |= I2C_CR1_PE;
