@@ -85,7 +85,7 @@ modm::platform::Uart{{ id }}::read(uint8_t *buffer, std::size_t length)
 	for (std::size_t i = 0; i < length; ++i)
 	{
 		if (rxBuffer.isEmpty()) {
-			return length;
+			return i;
 		}
 		else {
 			*buffer++ = rxBuffer.get();
