@@ -1,0 +1,13 @@
+<library>
+  <extends>modm:board:disco-f746ng</extends>
+  <options>
+    <option name=":build:build.path">../../../build/stm32f746g_discovery/tmp102</option>
+  </options>
+  <modules>
+    <module>:driver:tmp102</module>
+    <module>:io</module>
+    <module>:platform:i2c:1</module>
+    <module>:processing:protothread</module>
+    <module>:build:scons</module>
+  </modules>
+</library>
