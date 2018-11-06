@@ -32,9 +32,32 @@ namespace Board
 struct systemClock
 {
 	static constexpr int Frequency = MHz48;
-	static constexpr int Usart1 = Frequency;
-	static constexpr int Can = Frequency;
-	static constexpr int Spi2 = Frequency;
+	static constexpr uint32_t Ahb = Frequency;
+	static constexpr uint32_t Apb = Frequency;
+
+	static constexpr uint32_t Adc   = Apb;
+	static constexpr uint32_t Can   = Apb;
+
+	static constexpr uint32_t Spi1   = Apb;
+	static constexpr uint32_t Spi2   = Apb;
+
+	static constexpr uint32_t Usart1 = Apb;
+	static constexpr uint32_t Usart2 = Apb;
+	static constexpr uint32_t Usart3 = Apb;
+	static constexpr uint32_t Usart4 = Apb;
+
+	static constexpr uint32_t I2c1   = Apb;
+	static constexpr uint32_t I2c2   = Apb;
+
+	static constexpr uint32_t Timer1  = Apb;
+	static constexpr uint32_t Timer2  = Apb;
+	static constexpr uint32_t Timer3  = Apb;
+	static constexpr uint32_t Timer6  = Apb;
+	static constexpr uint32_t Timer7  = Apb;
+	static constexpr uint32_t Timer14 = Apb;
+	static constexpr uint32_t Timer15 = Apb;
+	static constexpr uint32_t Timer16 = Apb;
+	static constexpr uint32_t Timer17 = Apb;
 
 	static bool inline
 	enable()

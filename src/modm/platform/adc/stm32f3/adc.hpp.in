@@ -96,7 +96,7 @@ public:
 		SynchronousPrescaler4 = {{ adc_ccr }}_CKMODE_1 | {{ adc_ccr }}_CKMODE_0,
 	};
 
-%% if target["family"] in ["l4"]
+%% if clock_mux
 	// ADCs clock source selection
 	enum class ClockSource : uint32_t
 	{
@@ -235,7 +235,7 @@ public:
 	 */
 	static inline void
 	initialize(	const ClockMode clk = ClockMode::DoNotChange,
-%% if target["family"] in ["l4"]
+%% if clock_mux
 				const ClockSource clk_src = ClockSource::SystemClock,
 %% endif
 				const Prescaler pre = Prescaler::Disabled,

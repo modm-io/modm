@@ -149,9 +149,7 @@ using Int2 = GpioInputE5;	// MEMS_INT4 [LSM303DLHC_INT2]: GPXTI5
 using Scl = GpioB6;	// I2C1_SCL [LSM303DLHC_SCL]: I2C1_SCL
 using Sda = GpioB7;	// I2C1_SDA [LSM303DLHC_SDA]: I2C1_SDA
 
-// Hardware I2C not yet implemented for F3!
-//using I2cMaster = I2cMaster1;
-using I2cMaster = BitBangI2cMaster<Scl, Sda>;
+using I2cMaster = I2cMaster1;
 using Accelerometer = modm::Lsm303a< I2cMaster >;
 }
 
@@ -225,7 +223,7 @@ initializeLsm3()
 	lsm3::Drdy::enableExternalInterrupt();
 //	lsm3::Drdy::enableExternalInterruptVector(12);
 
-	lsm3::I2cMaster::connect<lsm3::Scl::BitBang, lsm3::Sda::BitBang>();
+	lsm3::I2cMaster::connect<lsm3::Scl::Scl, lsm3::Sda::Sda>();
 	lsm3::I2cMaster::initialize<systemClock, 400000>();
 }
 

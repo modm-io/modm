@@ -110,6 +110,31 @@ using LedD13 = GpioOutputI1;	// User LED 1 (Arduino D13)
 
 using Leds = SoftwareGpioPort< LedD13 >;
 
+// Arduino footprint
+using A0 = GpioA0;
+using A1 = GpioF10;
+using A2 = GpioF9;
+using A3 = GpioF8;
+using A4 = GpioF7;
+using A5 = GpioF6;
+
+using D0  = GpioC7;
+using D1  = GpioC6;
+using D2  = GpioG6;
+using D3  = GpioB4;
+using D4  = GpioG7;
+using D5  = GpioA8;
+using D6  = GpioH6;
+using D7  = GpioI3;
+using D8  = GpioI2;
+using D9  = GpioA15;
+using D10 = GpioI0;
+using D11 = GpioB15;
+using D12 = GpioB14;
+using D13 = GpioI1;
+using D14 = GpioB9;
+using D15 = GpioB8;
+
 
 namespace stlink
 {

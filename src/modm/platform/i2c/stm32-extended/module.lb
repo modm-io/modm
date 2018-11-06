@@ -28,11 +28,6 @@ class Instance(Module):
                 maximum=2 ** 16 - 2,
                 default=8))
 
-        # FIXME STM32F7 have a different I2C peripherial
-        device = options[":target"]
-        if device.partname.startswith("stm32f7"):
-            return False
-
         return True
 
     def build(self, env):
@@ -42,14 +37,22 @@ class Instance(Module):
         properties = device.properties
         properties["target"] = target = device.identifier
         properties["id"] = self.instance
-        properties["aid"] = "2" if self.instance == 4 else "1"
+
+        if target["family"] == "l4":
+            properties["aid"] = "2" if self.instance == 4 else "1"
+        else:
+            properties["aid"] = ""
+
+        if target["family"] == "f0" or target["family"] == "l0":
+            properties["shared_interrupt"] = True
+        else:
+            properties["shared_interrupt"] = False
 
         env.substitutions = properties
         env.outbasepath = "modm/src/modm/platform/i2c"
 
         env.template("i2c_master.cpp.in", "i2c_master_{}.cpp".format(self.instance))
         env.template("i2c_master.hpp.in", "i2c_master_{}.hpp".format(self.instance))
-
 
 def init(module):
     module.name = "i2c"
@@ -58,7 +61,7 @@ def init(module):
 
 def prepare(module, options):
     device = options[":target"]
-    if not device.has_driver("i2c:stm32l4"):
+    if not device.has_driver("i2c:stm32-extended"):
         return False
 
     module.depends(
@@ -77,4 +80,6 @@ def prepare(module, options):
     return True
 
 def build(env):
-    pass
+    env.outbasepath = "modm/src/modm/platform/i2c"
+    env.copy("i2c_timing_calculator.hpp")
+

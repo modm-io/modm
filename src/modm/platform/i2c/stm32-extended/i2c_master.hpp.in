@@ -18,6 +18,8 @@
 #include <modm/architecture/interface/clock.hpp>
 #include <modm/platform/gpio/connector.hpp>
 
+#include "i2c_timing_calculator.hpp"
+
 namespace modm
 {
 
@@ -38,6 +40,31 @@ class I2cMaster{{ id }} : public ::modm::I2cMaster
 {
 public:
 	static constexpr size_t TransactionBufferSize = {{ options["buffer.transaction"] }};
+
+private:
+	template<class SystemClock, uint32_t baudrate, uint16_t tolerance>
+	static constexpr std::optional<uint32_t>
+	calculateTimings()
+	{
+		constexpr I2cParameters parameters = {
+			.peripheralClock = SystemClock::I2c{{ id }},
+			.targetSpeed = baudrate,
+			.tolerance = tolerance,
+			.digitalFilterLength = 0,
+			.enableAnalogFilter = true,
+			.riseTime = 0,
+			.fallTime = 0
+		};
+
+		auto calculator = I2cTimingCalculator{parameters};
+
+		std::optional<I2cMasterTimings> timings = calculator.calculateTimings();
+		if(timings) {
+			return I2cTimingCalculator::timingsToRegisterValue(timings.value());
+		} else {
+			return std::nullopt;
+		}
+	}
 
 public:
 	template< template<Peripheral _> class... Signals, ResetDevices reset = ResetDevices::Standard>
@@ -73,10 +100,10 @@ public:
 	static modm_always_inline void
 	initialize()
 	{
-		// FIXME: Hard coded to 100 kHz at 48 MHz CPU
-		static_assert(baudrate == Baudrate::Standard, "FIXME: Hard coded to 100 kHz at 48 MHz CPU.");
-		static_assert(SystemClock::I2c{{ id }} == modm::clock::MHz48, "FIXME: Hard coded to 100 kHz at 48 MHz CPU.");
-		initializeWithPrescaler(/* freq, trise, prescaler */);
+		constexpr std::optional<uint32_t> timingRegisterValue = calculateTimings<SystemClock, baudrate, tolerance>();
+		static_assert(bool(timingRegisterValue), "Could not find a valid clock configuration for the requested baudrate");
+
+		initializeWithPrescaler(timingRegisterValue.value());
 	}
 
 	// start documentation inherited
@@ -92,8 +119,9 @@ public:
 
 private:
 	static void
-	initializeWithPrescaler(/* uint8_t peripheralFrequency, uint8_t riseTime, uint16_t prescaler */);
+	initializeWithPrescaler(uint32_t timingRegisterValue);
 };
+
 
 } // namespace platform
 

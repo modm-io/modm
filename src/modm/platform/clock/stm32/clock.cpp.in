@@ -182,7 +182,11 @@ modm::platform::ClockControl::enablePll(PllSource source, uint8_t pllM,
 
 	// Read reserved values and clear all other values
 	tmp = RCC->PLLCFGR & ~(RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLM
-			| RCC_PLLCFGR_PLLN | RCC_PLLCFGR_PLLPEN | RCC_PLLCFGR_PLLP
+			| RCC_PLLCFGR_PLLN
+%% if pll_p
+			| RCC_PLLCFGR_PLLPEN
+			| RCC_PLLCFGR_PLLP
+%% endif
 %% if sai2clkdiv is defined
 			| RCC_PLLCFGR_PLLPDIV
 %% endif
