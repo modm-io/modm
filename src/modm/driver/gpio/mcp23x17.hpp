@@ -62,23 +62,23 @@ public:
 	enum class
 	Pin : uint16_t
 	{
-		A0 = (1 << 0),
-		A1 = (1 << 1),
-		A2 = (1 << 2),
-		A3 = (1 << 3),
-		A4 = (1 << 4),
-		A5 = (1 << 5),
-		A6 = (1 << 6),
-		A7 = (1 << 7),
+		A0 = Bit0,
+		A1 = Bit1,
+		A2 = Bit2,
+		A3 = Bit3,
+		A4 = Bit4,
+		A5 = Bit5,
+		A6 = Bit6,
+		A7 = Bit7,
 
-		B0 = (1 << 8),
-		B1 = (1 << 9),
-		B2 = (1 << 10),
-		B3 = (1 << 11),
-		B4 = (1 << 12),
-		B5 = (1 << 13),
-		B6 = (1 << 14),
-		B7 = (1 << 15)
+		B0 = Bit8,
+		B1 = Bit9,
+		B2 = Bit10,
+		B3 = Bit11,
+		B4 = Bit12,
+		B5 = Bit13,
+		B6 = Bit14,
+		B7 = Bit15
 	};
 	typedef modm::Flags16<Pin> Pins;
 	MODM_INT_TYPE_FLAGS(Pins);
@@ -255,7 +255,7 @@ private:
 			interruptEnable(0),
 			interruptDefault(0),
 			interruptControl(0),
-			controlA(IoCon(0)), controlB(IoCon(0)),
+			controlA(0), controlB(0),
 			pullup(0),
 			interruptFlag(0),
 			interruptCapture(0),
@@ -268,8 +268,8 @@ private:
 		Pins interruptEnable;	// GPINTEN
 		Pins interruptDefault;	// DEFVAL
 		Pins interruptControl;	// INTCON
-		IoCon controlA;			// IOCONA
-		IoCon controlB;			// IOCONB
+		IoCon_t controlA;		// IOCONA
+		IoCon_t controlB;		// IOCONB
 		Pins pullup;			// GPPU
 		Pins interruptFlag;		// INTF
 		Pins interruptCapture;	// INTCAP

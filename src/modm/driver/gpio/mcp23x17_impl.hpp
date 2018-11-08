@@ -26,7 +26,18 @@ modm::Mcp23x17<Transport>::initialize()
 {
 	RF_BEGIN();
 
-	RF_CALL(this->write(i(Register::IOCON), uint8_t(memory.controlA)));
+	memory = Memory(); // reset local register cache
+	RF_CALL(this->write(i(Register::IOCON), memory.controlA.value));
+
+	RF_CALL(this->write16(i(Register::IODIR), memory.direction.value));
+	RF_CALL(this->write16(i(Register::IPOL), memory.polarity.value));
+	RF_CALL(this->write16(i(Register::GPINTEN), memory.interruptEnable.value));
+	RF_CALL(this->write16(i(Register::DEFVAL), memory.interruptDefault.value));
+	RF_CALL(this->write16(i(Register::INTCON), memory.interruptControl.value));
+	RF_CALL(this->write16(i(Register::GPPU), memory.pullup.value));
+	RF_CALL(this->write16(i(Register::GPIO), memory.gpio.value));
+	RF_CALL(this->write16(i(Register::OLAT), memory.outputLatch.value));
+	RF_CALL(Transport::read(i(Register::INTF), buffer + 14, 4));
 
 	RF_END_RETURN_CALL( Transport::read(i(Register::IODIR), buffer, sizeof(buffer)) );
 }
