@@ -25,6 +25,13 @@
 void
 modm::platform::{{ name }}::setParity(const Parity parity)
 {
+%% if "extended" in driver["type"]
+	const bool usartEnabled = ({{ peripheral }}->CR1 & USART_CR1_UE);
+	if(usartEnabled) {
+		disableOperation();
+	}
+%% endif
+
 	uint32_t flags = {{ peripheral }}->CR1;
 	flags &= ~(USART_CR1_PCE | USART_CR1_PS | USART_CR1_M);
 	flags |= static_cast<uint32_t>(parity);
@@ -33,6 +40,12 @@ modm::platform::{{ name }}::setParity(const Parity parity)
 		flags |= USART_CR1_M;
 	}
 	{{ peripheral }}->CR1 = flags;
+
+%% if "extended" in driver["type"]
+	if(usartEnabled) {
+		enableOperation();
+	}
+%% endif
 }
 
 void
@@ -109,11 +122,24 @@ modm::platform::{{ name }}::initializeWithBrr(uint16_t brr, Parity parity)
 void
 modm::platform::{{ name }}::setOversamplingMode(OversamplingMode mode)
 {
+%% if "extended" in driver["type"]
+	const bool usartEnabled = ({{ peripheral }}->CR1 & USART_CR1_UE);
+	if(usartEnabled) {
+		disableOperation();
+	}
+%% endif
+
 	if(mode == OversamplingMode::By16) {
 		{{ peripheral }}->CR1 &= ~static_cast<uint32_t>(OversamplingMode::By8);
 	} else {
 		{{ peripheral }}->CR1 |=  static_cast<uint32_t>(OversamplingMode::By8);
 	}
+
+%% if "extended" in driver["type"]
+	if(usartEnabled) {
+		enableOperation();
+	}
+%% endif
 }
 %% endif
 %% if uart_name == "Usart"
@@ -121,29 +147,68 @@ modm::platform::{{ name }}::setOversamplingMode(OversamplingMode mode)
 void
 modm::platform::{{ name }}::setSpiClock(SpiClock clk)
 {
+%% if "extended" in driver["type"]
+	const bool usartEnabled = ({{ peripheral }}->CR1 & USART_CR1_UE);
+	if(usartEnabled) {
+		disableOperation();
+	}
+%% endif
+
 	if(clk == SpiClock::Disabled) {
 		{{ peripheral }}->CR2 &= ~static_cast<uint32_t>(SpiClock::Enabled);
 	} else {
 		{{ peripheral }}->CR2 |=  static_cast<uint32_t>(SpiClock::Enabled);
 	}
+
+	%% if "extended" in driver["type"]
+	if(usartEnabled) {
+		enableOperation();
+	}
+	%% endif
 }
 
 void
 modm::platform::{{ name }}::setSpiDataMode(SpiDataMode mode)
 {
+%% if "extended" in driver["type"]
+	const bool usartEnabled = ({{ peripheral }}->CR1 & USART_CR1_UE);
+	if(usartEnabled) {
+		disableOperation();
+	}
+%% endif
+
 	{{ peripheral }}->CR2 =
 		({{ peripheral }}->CR2 & ~static_cast<uint32_t>(SpiDataMode::Mode3))
 		| static_cast<uint32_t>(mode);
+
+%% if "extended" in driver["type"]
+	if(usartEnabled) {
+		enableOperation();
+	}
+%% endif
 }
 
 void
 modm::platform::{{ name }}::setLastBitClockPulse(LastBitClockPulse pulse)
 {
+%% if "extended" in driver["type"]
+	const bool usartEnabled = ({{ peripheral }}->CR1 & USART_CR1_UE);
+	if(usartEnabled) {
+		disableOperation();
+	}
+%% endif
+
 	if(pulse == LastBitClockPulse::DoNotOutput) {
 		{{ peripheral }}->CR2 &= ~static_cast<uint32_t>(LastBitClockPulse::Output);
 	} else {
 		{{ peripheral }}->CR2 |=  static_cast<uint32_t>(LastBitClockPulse::Output);
 	}
+
+%% if "extended" in driver["type"]
+	if(usartEnabled) {
+		enableOperation();
+	}
+%% endif
 }
 %% endif
 
@@ -185,6 +250,18 @@ modm::platform::{{ name }}::setReceiverEnable(bool enable)
 	} else {
 		{{ peripheral }}->CR1 &= ~USART_CR1_RE;
 	}
+}
+
+void
+modm::platform::{{ name }}::enableOperation()
+{
+	{{ peripheral }}->CR1 |= USART_CR1_UE;
+}
+
+void
+modm::platform::{{ name }}::disableOperation()
+{
+	{{ peripheral }}->CR1 &= ~USART_CR1_UE;
 }
 
 bool

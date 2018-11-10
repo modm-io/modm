@@ -90,8 +90,15 @@ public:
 				oversample);
 %% endif
 
+%% if extended
+		UsartHal{{ id }}::disableOperation();
+%% endif
 		UsartHal{{ id }}::setLastBitClockPulse(UsartHal{{ id }}::LastBitClockPulse::Output);
 		UsartHal{{ id }}::setSpiClock(UsartHal{{ id }}::SpiClock::Enabled);
+%% if extended
+		UsartHal{{ id }}::enableOperation();
+%% endif
+
 		UsartHal{{ id }}::setTransmitterEnable(true);
 		UsartHal{{ id }}::setReceiverEnable(true);
 		dataOrder = DataOrder::MsbFirst;

@@ -139,6 +139,14 @@ public:
 	static inline void
 	setReceiverEnable(bool enable);
 
+	/// Set the UE (USART enable) bit
+	static inline void
+	enableOperation();
+
+	/// Clear the UE (USART enable) bit
+	static inline void
+	disableOperation();
+
 	/// Returns true if data has been received
 	static inline bool
 	isReceiveRegisterNotEmpty();

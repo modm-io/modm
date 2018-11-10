@@ -19,8 +19,9 @@ def get_properties(env):
     return properties
 
 class Instance(Module):
-    def __init__(self, instance):
+    def __init__(self, instance, is_extended = False):
         self.instance = instance
+        self.is_extended = is_extended
 
     def init(self, module):
         module.name = str(self.instance)
@@ -33,6 +34,7 @@ class Instance(Module):
     def build(self, env):
         properties = get_properties(env)
         properties["id"] = self.instance
+        properties["extended"] = self.is_extended
 
         env.substitutions = properties
         env.outbasepath = "modm/src/modm/platform/spi"
@@ -47,7 +49,7 @@ def init(module):
 
 def prepare(module, options):
     device = options[":target"]
-    if not device.has_driver("usart:stm32"):
+    if not device.has_driver("usart:stm32") and not device.has_driver("usart:stm32-extended"):
         return False
 
     module.depends(
@@ -56,8 +58,13 @@ def prepare(module, options):
         ":platform:gpio",
         ":platform:uart")
 
-    for instance in device.get_driver("usart:stm32")["instance"]:
-        module.add_submodule(Instance(int(instance)))
+    if device.get_driver("usart:stm32-extended"):
+        for instance in device.get_driver("usart:stm32-extended")["instance"]:
+            module.add_submodule(Instance(int(instance), True))
+
+    if device.get_driver("usart:stm32"):
+        for instance in device.get_driver("usart:stm32")["instance"]:
+            module.add_submodule(Instance(int(instance)))
 
     return True
 
