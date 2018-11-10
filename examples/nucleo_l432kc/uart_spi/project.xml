@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:board:nucleo-l432kc</extends>
+  <options>
+    <option name=":build:build.path">../../../build/nucleo_l432kc/uart_spi</option>
+  </options>
+  <modules>
+    <module>:platform:gpio</module>
+    <module>:platform:uart.spi:1</module>
+    <module>:build:scons</module>
+  </modules>
+</library>
