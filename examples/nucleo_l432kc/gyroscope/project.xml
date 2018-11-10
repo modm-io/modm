@@ -1,0 +1,14 @@
+<library>
+  <extends>modm:board:nucleo-l432kc</extends>
+  <options>
+    <option name=":build:build.path">../../../build/nucleo_l432kc/gyroscope</option>
+  </options>
+  <modules>
+    <module>:driver:l3gd20</module>
+    <module>:math:filter</module>
+    <module>:platform:uart.spi:1</module>
+    <module>:processing:timer</module>
+    <module>:processing:protothread</module>
+    <module>:build:scons</module>
+  </modules>
+</library>
