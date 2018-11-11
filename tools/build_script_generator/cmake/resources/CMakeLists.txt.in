@@ -2,6 +2,9 @@
 # Do not modify!
 
 CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
+
+INCLUDE(./modm/cmake/configure-{{ platform }}-{{ compiler }}.cmake)
+
 PROJECT({{ project_name }})
 
 IF(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
@@ -36,7 +39,7 @@ SET(PROJECT_CORE       {{ core     }})
 SET(PROJECT_NAME       {{ project_name }})
 SET(PROJECT_BUILD_PATH {{ build_path }})
 
-INCLUDE(./modm/cmake/configure-{{ platform }}-{{ compiler }}.cmake)
+INCLUDE(./modm/cmake/report-build-options.cmake)
 
 if ( APPLE )
     string ( REPLACE "-Wl,-search_paths_first" "" CMAKE_C_LINK_FLAGS ${CMAKE_C_LINK_FLAGS} )
