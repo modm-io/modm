@@ -11,6 +11,7 @@
 # -----------------------------------------------------------------------------
 
 import os
+import platform
 from collections import defaultdict
 
 def common_source_files(env, buildlog):
@@ -22,7 +23,10 @@ def common_source_files(env, buildlog):
         _, extension = os.path.splitext(filename)
 
         if extension in [".c", ".cpp", ".cc", ".sx", ".S"]:
-            files_to_build[repo].append(filename.replace('\\','\\\\')) #windows path compatibility hack
+            # Windows path compatibility hack
+            if platform.system() == "Windows":
+                filename = filename.replace('\\', '/')
+            files_to_build[repo].append(filename)
 
     for repo in files_to_build:
         files_to_build[repo].sort()
