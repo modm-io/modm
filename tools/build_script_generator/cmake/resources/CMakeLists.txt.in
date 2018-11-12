@@ -18,7 +18,7 @@ FILE(GLOB APP_SOURCE_FILES *.c *.cpp *.hpp *.h)
 
 SET(SOURCE_FILES
 %% for file in sources
-    {{ file }}
+    {{ file | modm.windowsify }}
 %% endfor
     ${APP_SOURCE_FILES}
 )
@@ -26,7 +26,7 @@ SET(SOURCE_FILES
 INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_SOURCE_DIR}
 %% for path in metadata.include_path
-    {{ path }}
+    {{ path | modm.windowsify }}
 %% endfor
 )
 INCLUDE_DIRECTORIES(SYSTEM include)

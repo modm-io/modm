@@ -29,6 +29,7 @@ def windowsify(path):
 def init(module):
     module.name = "build"
     module.description = FileReader("module.md")
+    module.add_filter("windowsify", windowsify)
 
 
 def prepare(module, options):
@@ -94,8 +95,8 @@ def post_build(env, buildlog):
         env.template("gitignore.in", ".gitignore")
 
     if env[":target"].has_driver("core:cortex-m*"):
-        env.template("openocd.cfg.in", filters={"windowsify": windowsify})
-        env.template("gdbinit.in", filters={"windowsify": windowsify})
+        env.template("openocd.cfg.in")
+        env.template("gdbinit.in")
 
 
 # ============================ Option Descriptions ============================
