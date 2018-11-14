@@ -20,6 +20,8 @@ jobs:
             python3 --version || true
             which scons
             scons --version
+            which g++
+            g++ --version
             which avr-g++
             avr-g++ --version
             which arm-none-eabi-g++
