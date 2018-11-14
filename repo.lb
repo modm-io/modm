@@ -21,7 +21,7 @@ from distutils.version import StrictVersion
 
 sys.path.append(repopath("ext/modm-devices/tools/device"))
 try:
-    import modm.parser
+    import modm_devices.parser
 except Exception as e:
     print(e, "\n")
     print("You might be missing the git submodules in `ext/`.\n"
@@ -31,12 +31,8 @@ except Exception as e:
           "then build again.")
     exit(1)
 
-if sys.version_info[1] < 6:
-    print("modm will require Python 3.6 in the near future.\n"
-          "Please check if you can upgrade your installation!\n")
-
 import lbuild
-min_lbuild_version = "1.4.0"
+min_lbuild_version = "1.5.0"
 if StrictVersion(getattr(lbuild, "__version__", "0.1.0")) < StrictVersion(min_lbuild_version):
     print("modm requires at least lbuild v{}, please upgrade!\n"
           "    pip install -U lbuild".format(min_lbuild_version))
@@ -75,7 +71,7 @@ class DevicesCache(dict):
         device_file_names = [dfn for dfn in device_file_names if any(s in dfn for s in supported)]
 
         # Parse the files and build the :target enumeration
-        parser = modm.parser.DeviceParser()
+        parser = modm_devices.parser.DeviceParser()
         for device_file_name in device_file_names:
             device_file = parser.parse(device_file_name)
             for device in device_file.get_devices():
@@ -122,7 +118,7 @@ class DevicesCache(dict):
         value = dict.__getitem__(self, item)
         if value is None:
             # Parse the device file and build its devices
-            parser = modm.parser.DeviceParser()
+            parser = modm_devices.parser.DeviceParser()
             device_file = parser.parse(repopath(self.device_to_file[item]))
             for device in device_file.get_devices():
                 self[device.partname] = device
@@ -162,7 +158,7 @@ def init(repo):
     devices = DevicesCache()
     try:
         devices.build()
-    except (modm.ParserException) as e:
+    except (modm_devices.ParserException) as e:
         print(e)
         exit(1)
 
