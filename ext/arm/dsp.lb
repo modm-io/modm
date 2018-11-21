@@ -11,6 +11,8 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
+from collections import defaultdict
+
 def init(module):
     module.parent = "cmsis"
     module.name = "dsp"
@@ -41,26 +43,32 @@ def prepare(module, options):
     return True
 
 def build(env):
+    metadata = defaultdict(list)
+    metadata["flags.cflags"].append("-fno-strict-aliasing")
+
     core = env[":target"].get_driver("core")["type"]
+    if "f" in core:
+        metadata["flags.cppdefines"].append("__FPU_PRESENT=1")
+
     core = core.replace("cortex-m", "CM").replace("+", "PLUS").replace("f", "").replace("d", "")
     env.add_metadata("flags.cppdefines", "ARM_MATH_{}".format(core))
 
     if env["check_matrix_sizes"]:
-        env.add_metadata("flags.cppdefines", "ARM_MATH_MATRIX_CHECK")
+        metadata["flags.cppdefines"].append("ARM_MATH_MATRIX_CHECK")
     else:
-        env.add_metadata("flags.cppdefines.debug", "ARM_MATH_MATRIX_CHECK")
+        metadata["flags.cppdefines.debug"].append("ARM_MATH_MATRIX_CHECK")
 
     if env["round_float_inputs"]:
-        env.add_metadata("flags.cppdefines", "ARM_MATH_ROUNDING")
+        metadata["flags.cppdefines"].append("ARM_MATH_ROUNDING")
 
     if not env.get("unaligned_data", False):
-        env.add_metadata("flags.cppdefines", "UNALIGNED_SUPPORT_DISABLE")
+        metadata["flags.cppdefines"].append("UNALIGNED_SUPPORT_DISABLE")
 
     env.add_metadata("include_path", "modm/ext/cmsis/dsp")
 
     env.outbasepath = "modm/ext/cmsis/dsp"
     env.copy("cmsis/CMSIS/DSP/Include", ".")
-    env.copy("cmsis/CMSIS/DSP/Source", ".")
+    env.copy("cmsis/CMSIS/DSP/Source", ".", metadata=metadata)
 
 
 # ============================ Option Descriptions ============================
