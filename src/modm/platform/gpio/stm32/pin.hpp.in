@@ -39,6 +39,7 @@ class Gpio{{ port ~ pin }} : public Gpio, public ::modm::GpioIO
 	template<class... Gpios>
 	friend class GpioSet;
 	using PinSet = GpioSet<Gpio{{ port ~ pin }}>;
+	friend class Adc;
 	friend class Adc1; friend class Adc2;
 	friend class Adc3; friend class Adc4;
 public:

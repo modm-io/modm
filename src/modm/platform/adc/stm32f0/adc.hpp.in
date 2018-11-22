@@ -2,6 +2,7 @@
 /*
  * Copyright (c) 2018, Niklas Hauser
  * Copyright (c) 2018, Álan Crístoffer
+ * Copyright (c) 2018, Carl Treudler
  *
  * This file is part of the modm project.
  *
@@ -15,14 +16,13 @@
 #define MODM_STM32F0_ADC_HPP
 
 #include <stdint.h>
-#include "../../../type_ids.hpp"
-#include "../../../device.hpp"
+#include "../device.hpp"
 #include <modm/architecture/interface/register.hpp>
-
+#include <modm/platform/gpio/connector.hpp>
 
 namespace modm
 {
-namespace stm32
+namespace platform
 {
 /**
  * Analog/Digital-Converter module (ADC1).
@@ -46,15 +46,11 @@ public:
  * This code was generated using the family datasheet, but not all devices in the
  * family have 16 channels.
  */
-%% for channel in range(0,16)
-	/// TypeId used to connect GPIO pins to this adc's Channel{{ channel }}.
-	static const TypeId::AdcChannel{{ channel }} Channel{{ channel }};
-%% endfor
 
 	/// Channels, which can be used with this ADC.
 	enum class Channel : uint8_t
 	{
-%% for channel in range(0,16)
+%% for channel in channels
 		Channel{{ channel }} = {{ channel }},
 %% endfor
 %#
@@ -122,6 +118,17 @@ public:
 		AnalogWatchdog = ADC_ISR_AWD1
 	};
 	MODM_FLAGS32(InterruptFlag);
+
+  public:
+  	// start inherited documentation
+  	template< template<Peripheral _> class... Signals >
+  	static void
+  	connect()
+  	{
+  		using Connector = GpioConnector<Peripheral::Adc, Signals...>;
+  		Connector::connect();
+  	}
+
 
 	/**
 	 * Initialize and enable the A/D converter.
@@ -205,8 +212,8 @@ public:
 	static inline constexpr Channel
 	getPinChannel()
 	{
-		constexpr int8_t channel{Gpio::template AdcChannel<Peripheral::Adc{{ id }}>};
-		static_assert(channel >= 0, "Adc{{id}} does not have a channel for this pin!");
+		constexpr int8_t channel{Gpio::template AdcChannel<Peripheral::Adc>};
+		static_assert(channel >= 0, "Adc does not have a channel for this pin!");
 		return Channel(channel);
 	}
 

@@ -1,6 +1,7 @@
 // coding: utf-8
 /*
  * Copyright (c) 2018, Álan Crístoffer
+ * Copyright (c) 2018, Carl Treudler
  *
  * This file is part of the modm project.
  *
@@ -11,13 +12,11 @@
 // ----------------------------------------------------------------------------
 
 #ifndef MODM_STM32F0_ADC_HPP
-#    error     "Don't include this file directly, use 'adc_{{ id }}.hpp' instead!"
+#    error     "Don't include this file directly, use 'adc.hpp' instead!"
 #endif
 
-#include <modm/architecture/driver/delay.hpp>    // modm::delayMicroseconds
-
 uint16_t
-modm::stm32::Adc::initialize(const ClockMode clk,
+modm::platform::Adc::initialize(const ClockMode clk,
                              const CalibrationMode cal)
 {
     RCC->APB2ENR |= RCC_APB2ENR_ADC1EN;
@@ -31,7 +30,7 @@ modm::stm32::Adc::initialize(const ClockMode clk,
         ADC1->CFGR2 |= static_cast<uint32_t>(clk);
     }
 
-    uint16_t calibrationResult = modm::stm32::Adc::calibrate(cal);
+    uint16_t calibrationResult = modm::platform::Adc::calibrate(cal);
 
     ADC1->ISR |= ADC_ISR_ADRDY; // ISR is cleared by setting 1 to the bit
     ADC1->CR  |= ADC_CR_ADEN;
@@ -43,7 +42,7 @@ modm::stm32::Adc::initialize(const ClockMode clk,
 }
 
 void
-modm::stm32::Adc::disable(const bool blocking)
+modm::platform::Adc::disable(const bool blocking)
 {
     ADC1->CR |= ADC_CR_ADDIS;
     while ( blocking && (ADC1->CR & ADC_CR_ADEN) != 0 )
@@ -51,7 +50,7 @@ modm::stm32::Adc::disable(const bool blocking)
 }
 
 void
-modm::stm32::Adc::setAutoOffMode(const bool enable)
+modm::platform::Adc::setAutoOffMode(const bool enable)
 {
     if (enable) {
         ADC1->CFGR1 |= ADC_CFGR1_AUTOFF;
@@ -61,13 +60,13 @@ modm::stm32::Adc::setAutoOffMode(const bool enable)
 }
 
 bool
-modm::stm32::Adc::isReady()
+modm::platform::Adc::isReady()
 {
     return static_cast<bool>(getInterruptFlags() & InterruptFlag::Ready);
 }
 
 uint16_t
-modm::stm32::Adc::calibrate(const CalibrationMode mode)
+modm::platform::Adc::calibrate(const CalibrationMode mode)
 {
     if (mode != CalibrationMode::DoNotCalibrate) {
         if ( (ADC1->CR & ADC_CR_ADEN) != 0 ) {
@@ -89,7 +88,7 @@ modm::stm32::Adc::calibrate(const CalibrationMode mode)
 }
 
 void
-modm::stm32::Adc::setDataAlignmentAndResolution(const DataAlignment align,
+modm::platform::Adc::setDataAlignmentAndResolution(const DataAlignment align,
                                                 const Resolution res)
 {
     ADC1->CFGR1 = static_cast<uint32_t>(align) |
@@ -98,7 +97,7 @@ modm::stm32::Adc::setDataAlignmentAndResolution(const DataAlignment align,
 }
 
 bool
-modm::stm32::Adc::setChannel(const Channel channel,
+modm::platform::Adc::setChannel(const Channel channel,
                              const SampleTime sampleTime)
 {
     if(static_cast<uint32_t>(channel) > 18) {
@@ -118,7 +117,7 @@ modm::stm32::Adc::setChannel(const Channel channel,
 }
 
 void
-modm::stm32::Adc::clearChannel(const Channel channel)
+modm::platform::Adc::clearChannel(const Channel channel)
 {
     ADC1->CHSELR &= ~(1 << static_cast<uint32_t>(channel));
     if (channel == Channel::InternalReference) {
@@ -129,7 +128,7 @@ modm::stm32::Adc::clearChannel(const Channel channel)
 }
 
 void
-modm::stm32::Adc::setFreeRunningMode(const bool enable)
+modm::platform::Adc::setFreeRunningMode(const bool enable)
 {
     if (enable) {
         ADC1->CFGR1 |= ADC_CFGR1_CONT;
@@ -139,7 +138,7 @@ modm::stm32::Adc::setFreeRunningMode(const bool enable)
 }
 
 void
-modm::stm32::Adc::startConversion(void)
+modm::platform::Adc::startConversion(void)
 {
     acknowledgeInterruptFlag(InterruptFlag::EndOfConversion |
                              InterruptFlag::EndOfSampling   |
@@ -151,13 +150,13 @@ modm::stm32::Adc::startConversion(void)
 }
 
 bool
-modm::stm32::Adc::isConversionFinished(void)
+modm::platform::Adc::isConversionFinished(void)
 {
     return static_cast<bool>(getInterruptFlags() & InterruptFlag::EndOfSampling);
 }
 
 void
-modm::stm32::Adc::enableInterruptVector(const uint32_t priority,
+modm::platform::Adc::enableInterruptVector(const uint32_t priority,
                                                 const bool enable)
 {
     if (enable) {
@@ -169,25 +168,25 @@ modm::stm32::Adc::enableInterruptVector(const uint32_t priority,
 }
 
 void
-modm::stm32::Adc::enableInterrupt(const Interrupt_t interrupt)
+modm::platform::Adc::enableInterrupt(const Interrupt_t interrupt)
 {
     ADC1->IER |= interrupt.value;
 }
 
 void
-modm::stm32::Adc::disableInterrupt(const Interrupt_t interrupt)
+modm::platform::Adc::disableInterrupt(const Interrupt_t interrupt)
 {
     ADC1->IER &= ~interrupt.value;
 }
 
-modm::stm32::Adc::InterruptFlag_t
-modm::stm32::Adc::getInterruptFlags()
+modm::platform::Adc::InterruptFlag_t
+modm::platform::Adc::getInterruptFlags()
 {
     return InterruptFlag_t(ADC1->ISR);
 }
 
 void
-modm::stm32::Adc::acknowledgeInterruptFlag(const InterruptFlag_t flags)
+modm::platform::Adc::acknowledgeInterruptFlag(const InterruptFlag_t flags)
 {
     // Flags are cleared by writing a one to the flag position.
     // Writing a zero is ignored.
@@ -195,7 +194,7 @@ modm::stm32::Adc::acknowledgeInterruptFlag(const InterruptFlag_t flags)
 }
 
 void
-modm::stm32::Adc::setWaitMode(const bool enable)
+modm::platform::Adc::setWaitMode(const bool enable)
 {
     if (enable) {
         ADC1->CFGR1 |= ADC_CFGR1_WAIT;
