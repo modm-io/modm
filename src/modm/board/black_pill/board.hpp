@@ -49,6 +49,13 @@ struct systemClock {
 	static constexpr uint32_t I2c1   = Apb1;
 	static constexpr uint32_t I2c2   = Apb1;
 
+	static constexpr uint32_t Apb1Timer = Apb1 * 2;
+	static constexpr uint32_t Apb2Timer = Apb2 * 1;
+	static constexpr uint32_t Timer1  = Apb2Timer;
+	static constexpr uint32_t Timer2  = Apb1Timer;
+	static constexpr uint32_t Timer3  = Apb1Timer;
+	static constexpr uint32_t Timer4  = Apb1Timer;
+
 	static bool inline
 	enable()
 	{
