@@ -6,9 +6,9 @@
   </repositories>
 
   <options>
-    <option name=":target">stm32f401ret</option>
+    <option name="modm:target">stm32f401ret</option>
 
-    <option name=":platform:uart:2:buffer.tx">2048</option>
+    <option name="modm:platform:uart:2:buffer.tx">2048</option>
   </options>
   <modules>
     <module>modm:board:nucleo-f401re</module>

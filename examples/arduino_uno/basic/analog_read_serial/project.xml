@@ -1,10 +1,10 @@
 <library>
   <extends>modm:board:arduino-uno</extends>
   <options>
-    <option name=":build:build.path">../../../../build/arduino_uno/basic/analog_read_serial</option>
+    <option name="modm:build:build.path">../../../../build/arduino_uno/basic/analog_read_serial</option>
   </options>
   <modules>
-    <module>:platform:adc</module>
-    <module>:build:scons</module>
+    <module>modm:platform:adc</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

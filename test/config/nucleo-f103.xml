@@ -3,16 +3,16 @@
   <extends>modm:board:nucleo-f103rb</extends>
   <modules>
     <!-- Not everything fits -->
-    <!-- <module>:test:architecture</module>
-    <module>:test:communication</module>
-    <module>:test:container</module>
-    <module>:test:driver</module> -->
+    <!-- <module>modm-test:test:architecture</module>
+    <module>modm-test:test:communication</module>
+    <module>modm-test:test:container</module>
+    <module>modm-test:test:driver</module> -->
 
-    <module>:test:io</module>
-    <module>:test:platform:**</module>
-    <module>:test:processing</module>
-    <module>:test:ui</module>
-    <module>:test:math</module>
-    <module>:test:utils</module>
+    <module>modm-test:test:io</module>
+    <module>modm-test:test:platform:**</module>
+    <module>modm-test:test:processing</module>
+    <module>modm-test:test:ui</module>
+    <module>modm-test:test:math</module>
+    <module>modm-test:test:utils</module>
   </modules>
 </library>

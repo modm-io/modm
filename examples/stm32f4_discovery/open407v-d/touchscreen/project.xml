@@ -1,17 +1,17 @@
 <library>
   <extends>modm:board:disco-f407vg</extends>
   <options>
-    <option name=":build:build.path">../../../../build/stm32f4_discovery/open407v-d/touchscreen</option>
+    <option name="modm:build:build.path">../../../../build/stm32f4_discovery/open407v-d/touchscreen</option>
   </options>
   <modules>
-    <module>:driver</module>
-    <module>:driver:ads7843</module>
-    <module>:driver:parallel_tft_display</module>
-    <module>:driver:memory_bus</module>
-    <module>:platform:fsmc</module>
-    <module>:platform:gpio</module>
-    <module>:platform:spi:2</module>
-    <module>:ui:display</module>
-    <module>:build:scons</module>
+    <module>modm:driver</module>
+    <module>modm:driver:ads7843</module>
+    <module>modm:driver:parallel_tft_display</module>
+    <module>modm:driver:memory_bus</module>
+    <module>modm:platform:fsmc</module>
+    <module>modm:platform:gpio</module>
+    <module>modm:platform:spi:2</module>
+    <module>modm:ui:display</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

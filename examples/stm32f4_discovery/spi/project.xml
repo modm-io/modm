@@ -1,12 +1,12 @@
 <library>
   <extends>modm:board:disco-f407vg</extends>
   <options>
-    <option name=":build:build.path">../../../build/stm32f4_discovery/spi</option>
+    <option name="modm:build:build.path">../../../build/stm32f4_discovery/spi</option>
   </options>
   <modules>
-    <module>:platform:gpio</module>
-    <module>:platform:spi.bitbang</module>
-    <module>:platform:spi:2</module>
-    <module>:build:scons</module>
+    <module>modm:platform:gpio</module>
+    <module>modm:platform:spi.bitbang</module>
+    <module>modm:platform:spi:2</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

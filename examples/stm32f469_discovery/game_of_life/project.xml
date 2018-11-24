@@ -1,12 +1,12 @@
 <library>
   <extends>modm:board:disco-f469ni</extends>
   <options>
-    <option name=":build:build.path">../../../build/stm32f469_discovery/game_of_life</option>
+    <option name="modm:build:build.path">../../../build/stm32f469_discovery/game_of_life</option>
   </options>
   <modules>
-    <module>:architecture:memory</module>
-    <module>:processing:timer</module>
-    <module>:processing:resumable</module>
-    <module>:build:scons</module>
+    <module>modm:architecture:memory</module>
+    <module>modm:processing:timer</module>
+    <module>modm:processing:resumable</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

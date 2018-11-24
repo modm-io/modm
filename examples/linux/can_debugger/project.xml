@@ -1,12 +1,12 @@
 <library>
   <options>
-    <option name=":target">hosted-linux</option>
-    <option name=":build:build.path">../../../build/linux/can_debugger</option>
+    <option name="modm:target">hosted-linux</option>
+    <option name="modm:build:build.path">../../../build/linux/can_debugger</option>
   </options>
   <modules>
-    <module>:debug</module>
-    <module>:platform:canusb</module>
-    <module>:platform:core</module>
-    <module>:build:scons</module>
+    <module>modm:debug</module>
+    <module>modm:platform:canusb</module>
+    <module>modm:platform:core</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

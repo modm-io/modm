@@ -1,13 +1,13 @@
 <library>
   <options>
-    <option name=":target">atmega644</option>
-    <option name=":platform:clock:f_cpu">14745600</option>
-    <option name=":build:build.path">../../../../build/avr/sab/master</option>
+    <option name="modm:target">atmega644</option>
+    <option name="modm:platform:clock:f_cpu">14745600</option>
+    <option name="modm:build:build.path">../../../../build/avr/sab/master</option>
   </options>
   <modules>
-    <module>:communication:sab</module>
-    <module>:platform:core</module>
-    <module>:platform:uart:0</module>
-    <module>:build:scons</module>
+    <module>modm:communication:sab</module>
+    <module>modm:platform:core</module>
+    <module>modm:platform:uart:0</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

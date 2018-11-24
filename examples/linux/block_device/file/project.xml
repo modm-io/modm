@@ -1,12 +1,12 @@
 <library>
   <options>
-    <option name=":target">hosted-linux</option>
-    <option name=":build:build.path">../../../../build/linux/block_device/file</option>
+    <option name="modm:target">hosted-linux</option>
+    <option name="modm:build:build.path">../../../../build/linux/block_device/file</option>
   </options>
   <modules>
-    <module>:platform:core</module>
-    <module>:debug</module>
-    <module>:driver:block.device:file</module>
-    <module>:build:scons</module>
+    <module>modm:platform:core</module>
+    <module>modm:debug</module>
+    <module>modm:driver:block.device:file</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

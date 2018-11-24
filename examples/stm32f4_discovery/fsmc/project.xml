@@ -1,11 +1,11 @@
 <library>
   <extends>modm:board:disco-f407vg</extends>
   <options>
-    <option name=":build:build.path">../../../build/stm32f4_discovery/fsmc</option>
+    <option name="modm:build:build.path">../../../build/stm32f4_discovery/fsmc</option>
   </options>
   <modules>
-    <module>:platform:gpio</module>
-    <module>:platform:fsmc</module>
-    <module>:build:scons</module>
+    <module>modm:platform:gpio</module>
+    <module>modm:platform:fsmc</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

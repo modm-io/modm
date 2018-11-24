@@ -1,18 +1,18 @@
 <library>
   <extends>modm:board:disco-f407vg</extends>
   <options>
-    <option name=":build:build.path">../../../build/stm32f4_discovery/pressure_amsys5915</option>
+    <option name="modm:build:build.path">../../../build/stm32f4_discovery/pressure_amsys5915</option>
   </options>
   <modules>
-    <module>:driver:amsys5915</module>
-    <module>:io</module>
-    <module>:debug</module>
-    <module>:platform:gpio</module>
-    <module>:platform:i2c.bitbang</module>
-    <module>:platform:i2c:2</module>
-    <module>:platform:uart:2</module>
-    <module>:processing:protothread</module>
-    <module>:processing:timer</module>
-    <module>:build:scons</module>
+    <module>modm:driver:amsys5915</module>
+    <module>modm:io</module>
+    <module>modm:debug</module>
+    <module>modm:platform:gpio</module>
+    <module>modm:platform:i2c.bitbang</module>
+    <module>modm:platform:i2c:2</module>
+    <module>modm:platform:uart:2</module>
+    <module>modm:processing:protothread</module>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

@@ -1,10 +1,10 @@
 <library>
   <extends>modm:board:disco-f429zi</extends>
   <options>
-    <option name=":build:build.path">../../../build/stm32f429_discovery/blink</option>
+    <option name="modm:build:build.path">../../../build/stm32f429_discovery/blink</option>
   </options>
   <modules>
-    <module>:platform:gpio</module>
-    <module>:build:scons</module>
+    <module>modm:platform:gpio</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

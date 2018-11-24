@@ -1,14 +1,14 @@
 <library>
   <extends>modm:board:nucleo-f401re</extends>
   <options>
-    <option name=":build:build.path">../../../build/nucleo_f401re/distance_vl53l0</option>
+    <option name="modm:build:build.path">../../../build/nucleo_f401re/distance_vl53l0</option>
   </options>
   <modules>
-    <module>:debug</module>
-    <module>:driver:vl53l0</module>
-    <module>:platform:gpio</module>
-    <module>:platform:i2c:1</module>
-    <module>:processing:protothread</module>
-    <module>:build:scons</module>
+    <module>modm:debug</module>
+    <module>modm:driver:vl53l0</module>
+    <module>modm:platform:gpio</module>
+    <module>modm:platform:i2c:1</module>
+    <module>modm:processing:protothread</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

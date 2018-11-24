@@ -1,14 +1,14 @@
 <library>
   <extends>modm:board:nucleo-l476rg</extends>
   <options>
-    <option name=":build:build.path">../../../build/nucleo_l476rg/i2c_test</option>
+    <option name="modm:build:build.path">../../../build/nucleo_l476rg/i2c_test</option>
   </options>
   <modules>
-    <module>:architecture:i2c.device</module>
-    <module>:platform:i2c:1</module>
-    <module>:processing:protothread</module>
-    <module>:processing:resumable</module>
-    <module>:processing:timer</module>
-    <module>:build:scons</module>
+    <module>modm:architecture:i2c.device</module>
+    <module>modm:platform:i2c:1</module>
+    <module>modm:processing:protothread</module>
+    <module>modm:processing:resumable</module>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

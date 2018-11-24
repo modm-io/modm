@@ -6,9 +6,9 @@
   </repositories>
 
   <options>
-    <option name=":target">stm32f429zit</option>
+    <option name="modm:target">stm32f429zit</option>
 
-    <option name=":platform:uart:3:buffer.tx">2048</option>
+    <option name="modm:platform:uart:3:buffer.tx">2048</option>
   </options>
   <modules>
     <module>modm:board:nucleo-f429zi</module>

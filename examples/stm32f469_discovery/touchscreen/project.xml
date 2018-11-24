@@ -1,10 +1,10 @@
 <library>
   <extends>modm:board:disco-f469ni</extends>
   <options>
-    <option name=":build:build.path">../../../build/stm32f469_discovery/touchscreen</option>
+    <option name="modm:build:build.path">../../../build/stm32f469_discovery/touchscreen</option>
   </options>
   <modules>
-    <module>:processing:protothread</module>
-    <module>:build:scons</module>
+    <module>modm:processing:protothread</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

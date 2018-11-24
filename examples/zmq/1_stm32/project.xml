@@ -1,16 +1,16 @@
 <library>
   <extends>modm:board:disco-f407vg</extends>
   <options>
-    <option name=":build:build.path">../../../build/zmq/1_stm32</option>
-    <option name=":communication:xpcc:generator:source">../../xpcc/xml/communication.xml</option>
-    <option name=":communication:xpcc:generator:container">odometry</option>
+    <option name="modm:build:build.path">../../../build/zmq/1_stm32</option>
+    <option name="modm:communication:xpcc:generator:source">../../xpcc/xml/communication.xml</option>
+    <option name="modm:communication:xpcc:generator:container">odometry</option>
   </options>
   <modules>
-    <module>:communication:xpcc:generator</module>
-    <module>:platform:can:1</module>
-    <module>:platform:gpio</module>
-    <module>:platform:timer:1</module>
-    <module>:processing:timer</module>
-    <module>:build:scons</module>
+    <module>modm:communication:xpcc:generator</module>
+    <module>modm:platform:can:1</module>
+    <module>modm:platform:gpio</module>
+    <module>modm:platform:timer:1</module>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

@@ -1,11 +1,11 @@
 <library>
   <extends>modm:board:nucleo-l476rg</extends>
   <options>
-    <option name=":build:build.path">../../../build/generic/rtc_ds1302</option>
+    <option name="modm:build:build.path">../../../build/generic/rtc_ds1302</option>
   </options>
   <modules>
-    <module>:driver:ds1302</module>
-    <module>:processing:timer</module>
-    <module>:build:scons</module>
+    <module>modm:driver:ds1302</module>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

@@ -1,10 +1,10 @@
 <library>
   <extends>modm:board:nucleo-l432kc</extends>
   <options>
-    <option name=":build:build.path">../../../build/nucleo_l432kc/pwm</option>
+    <option name="modm:build:build.path">../../../build/nucleo_l432kc/pwm</option>
   </options>
   <modules>
-    <module>:build:scons</module>
-    <module>:platform:timer:1</module>
+    <module>modm:build:scons</module>
+    <module>modm:platform:timer:1</module>
   </modules>
 </library>

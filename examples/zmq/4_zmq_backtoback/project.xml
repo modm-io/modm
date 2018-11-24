@@ -1,13 +1,13 @@
 <library>
   <options>
-    <option name=":target">hosted-linux</option>
-    <option name=":build:build.path">../../../build/zmq/4_zmq_backtoback</option>
+    <option name="modm:target">hosted-linux</option>
+    <option name="modm:build:build.path">../../../build/zmq/4_zmq_backtoback</option>
   </options>
   <modules>
-    <module>:communication:xpcc</module>
-    <module>:debug</module>
-    <module>:platform:core</module>
-    <module>:processing:timer</module>
-    <module>:build:scons</module>
+    <module>modm:communication:xpcc</module>
+    <module>modm:debug</module>
+    <module>modm:platform:core</module>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

@@ -1,9 +1,9 @@
 <library>
   <extends>modm:board:blue-pill</extends>
   <options>
-    <option name=":build:build.path">../../../build/stm32f103c8t6_blue_pill/blink.cmake</option>
+    <option name="modm:build:build.path">../../../build/stm32f103c8t6_blue_pill/blink.cmake</option>
   </options>
   <modules>
-    <module>:build:cmake</module>
+    <module>modm:build:cmake</module>
   </modules>
 </library>

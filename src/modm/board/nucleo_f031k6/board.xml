@@ -6,11 +6,11 @@
   </repositories>
 
   <options>
-    <option name=":target">stm32f031k6t</option>
+    <option name="modm:target">stm32f031k6t</option>
 
-    <option name=":platform:uart:1:buffer.tx">256</option>
-    <option name=":platform:core:main_stack_size">992</option>
-    <option name=":platform:core:allocator">block</option>
+    <option name="modm:platform:uart:1:buffer.tx">256</option>
+    <option name="modm:platform:core:main_stack_size">992</option>
+    <option name="modm:platform:core:allocator">block</option>
   </options>
   <modules>
     <module>modm:board:nucleo-f031k6</module>

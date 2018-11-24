@@ -1,15 +1,15 @@
 <library>
   <extends>modm:board:disco-f407vg</extends>
   <options>
-    <option name=":build:build.path">../../../build/stm32f4_discovery/app_uart_sniffer</option>
+    <option name="modm:build:build.path">../../../build/stm32f4_discovery/app_uart_sniffer</option>
   </options>
   <modules>
-    <module>:debug</module>
-    <module>:platform:gpio</module>
-    <module>:platform:uart:1</module>
-    <module>:platform:uart:2</module>
-    <module>:platform:uart:3</module>
-    <module>:processing:timer</module>
-    <module>:build:scons</module>
+    <module>modm:debug</module>
+    <module>modm:platform:gpio</module>
+    <module>modm:platform:uart:1</module>
+    <module>modm:platform:uart:2</module>
+    <module>modm:platform:uart:3</module>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

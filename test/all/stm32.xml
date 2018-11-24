@@ -9,7 +9,7 @@
   <options>
   </options>
   <modules>
-    <module>:platform:**</module>
-    <module>:build:scons</module>
+    <module>modm:platform:**</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

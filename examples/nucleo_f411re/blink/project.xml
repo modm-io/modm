@@ -1,9 +1,9 @@
 <library>
   <extends>modm:board:nucleo-f411re</extends>
   <options>
-    <option name=":build:build.path">../../../build/nucleo_f411re/blink</option>
+    <option name="modm:build:build.path">../../../build/nucleo_f411re/blink</option>
   </options>
   <modules>
-    <module>:build:scons</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

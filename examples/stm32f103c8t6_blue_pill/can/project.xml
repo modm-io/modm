@@ -1,13 +1,13 @@
 <library>
   <extends>modm:board:blue-pill</extends>
   <options>
-    <option name=":build:build.path">../../../build/stm32f103c8t6_blue_pill/can</option>
+    <option name="modm:build:build.path">../../../build/stm32f103c8t6_blue_pill/can</option>
   </options>
   <modules>
-    <module>:debug</module>
-    <module>:platform:can</module>
-    <module>:platform:gpio</module>
-    <module>:platform:uart:2</module>
-    <module>:build:scons</module>
+    <module>modm:debug</module>
+    <module>modm:platform:can</module>
+    <module>modm:platform:gpio</module>
+    <module>modm:platform:uart:2</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

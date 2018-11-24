@@ -2,6 +2,6 @@
 <library>
   <extends>modm:board:nucleo-f401re</extends>
   <modules>
-    <module>:test:**</module>
+    <module>modm-test:test:**</module>
   </modules>
 </library>

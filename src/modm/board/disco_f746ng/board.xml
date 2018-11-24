@@ -6,9 +6,9 @@
   </repositories>
 
   <options>
-    <option name=":target">stm32f746ngh</option>
+    <option name="modm:target">stm32f746ngh</option>
 
-    <option name=":platform:uart:1:buffer.tx">2048</option>
+    <option name="modm:platform:uart:1:buffer.tx">2048</option>
   </options>
   <modules>
     <module>modm:board:disco-f746ng</module>

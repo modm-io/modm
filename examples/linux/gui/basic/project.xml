@@ -1,13 +1,13 @@
 <library>
   <options>
-    <option name=":target">hosted-linux</option>
-    <option name=":build:build.path">../../../../build/linux/gui/basic</option>
+    <option name="modm:target">hosted-linux</option>
+    <option name="modm:build:build.path">../../../../build/linux/gui/basic</option>
   </options>
   <modules>
-    <module>:debug</module>
-    <module>:ui:gui</module>
-    <module>:driver:sdl_display</module>
-    <module>:platform:core</module>
-    <module>:build:scons</module>
+    <module>modm:debug</module>
+    <module>modm:ui:gui</module>
+    <module>modm:driver:sdl_display</module>
+    <module>modm:platform:core</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

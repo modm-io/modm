@@ -1,14 +1,14 @@
 <library>
   <options>
-    <option name=":target">atmega644</option>
-    <option name=":platform:clock:f_cpu">14745600</option>
-    <option name=":build:build.path">../../../build/avr/protothread</option>
+    <option name="modm:target">atmega644</option>
+    <option name="modm:platform:clock:f_cpu">14745600</option>
+    <option name="modm:build:build.path">../../../build/avr/protothread</option>
   </options>
   <modules>
-    <module>:platform:core</module>
-    <module>:platform:gpio</module>
-    <module>:processing:protothread</module>
-    <module>:processing:timer</module>
-    <module>:build:scons</module>
+    <module>modm:platform:core</module>
+    <module>modm:platform:gpio</module>
+    <module>modm:processing:protothread</module>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

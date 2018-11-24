@@ -1,18 +1,18 @@
 <library>
   <options>
-    <option name=":target">atmega644</option>
-    <option name=":platform:clock:f_cpu">14745600</option>
-    <option name=":build:build.path">../../../../build/avr/adc/oversample</option>
+    <option name="modm:target">atmega644</option>
+    <option name="modm:platform:clock:f_cpu">14745600</option>
+    <option name="modm:build:build.path">../../../../build/avr/adc/oversample</option>
   </options>
   <modules>
-    <module>:driver:adc_sampler</module>
-    <module>:io</module>
-    <module>:platform:adc</module>
-    <module>:platform:clock</module>
-    <module>:platform:core</module>
-    <module>:platform:gpio</module>
-    <module>:platform:uart:0</module>
-    <module>:processing:timer</module>
-    <module>:build:scons</module>
+    <module>modm:driver:adc_sampler</module>
+    <module>modm:io</module>
+    <module>modm:platform:adc</module>
+    <module>modm:platform:clock</module>
+    <module>modm:platform:core</module>
+    <module>modm:platform:gpio</module>
+    <module>modm:platform:uart:0</module>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

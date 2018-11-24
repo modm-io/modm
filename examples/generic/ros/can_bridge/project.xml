@@ -1,15 +1,15 @@
 <library>
   <extends>modm:board:blue-pill</extends>
   <options>
-    <option name=":build:build.path">../../../../build/generic/ros/can_bridge</option>
-    <option name=":platform:uart:2:buffer.tx">512</option>
-    <option name=":platform:uart:2:buffer.rx">512</option>
+    <option name="modm:build:build.path">../../../../build/generic/ros/can_bridge</option>
+    <option name="modm:platform:uart:2:buffer.tx">512</option>
+    <option name="modm:platform:uart:2:buffer.rx">512</option>
   </options>
   <modules>
-    <module>:build:scons</module>
-    <module>:communication:ros</module>
-    <module>:platform:can</module>
-    <module>:platform:uart:2</module>
-    <module>:ros</module>
+    <module>modm:build:scons</module>
+    <module>modm:communication:ros</module>
+    <module>modm:platform:can</module>
+    <module>modm:platform:uart:2</module>
+    <module>modm:ros</module>
   </modules>
 </library>

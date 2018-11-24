@@ -1,12 +1,12 @@
 <library>
   <extends>modm:board:nucleo-l476rg</extends>
   <options>
-    <option name=":build:build.path">../../../build/generic/resumable</option>
+    <option name="modm:build:build.path">../../../build/generic/resumable</option>
   </options>
   <modules>
-    <module>:processing:protothread</module>
-    <module>:processing:resumable</module>
-    <module>:processing:timer</module>
-    <module>:build:scons</module>
+    <module>modm:processing:protothread</module>
+    <module>modm:processing:resumable</module>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

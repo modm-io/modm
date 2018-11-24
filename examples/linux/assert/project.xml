@@ -1,11 +1,11 @@
 <library>
   <options>
-    <option name=":target">hosted-linux</option>
-    <option name=":build:build.path">../../../build/linux/assert</option>
+    <option name="modm:target">hosted-linux</option>
+    <option name="modm:build:build.path">../../../build/linux/assert</option>
   </options>
   <modules>
-    <module>:platform:core</module>
-    <module>:debug</module>
-    <module>:build:scons</module>
+    <module>modm:platform:core</module>
+    <module>modm:debug</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

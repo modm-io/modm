@@ -1,9 +1,9 @@
 <library>
   <extends>modm:board:disco-l476vg</extends>
   <options>
-    <option name=":build:build.path">../../../build/stm32l476_discovery/blink</option>
+    <option name="modm:build:build.path">../../../build/stm32l476_discovery/blink</option>
   </options>
   <modules>
-    <module>:build:scons</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

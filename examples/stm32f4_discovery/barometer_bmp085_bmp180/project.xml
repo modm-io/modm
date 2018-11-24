@@ -1,16 +1,16 @@
 <library>
   <extends>modm:board:disco-f407vg</extends>
   <options>
-    <option name=":build:build.path">../../../build/stm32f4_discovery/barometer_bmp085_bmp180</option>
+    <option name="modm:build:build.path">../../../build/stm32f4_discovery/barometer_bmp085_bmp180</option>
   </options>
   <modules>
-    <module>:driver:bmp085</module>
-    <module>:io</module>
-    <module>:platform:gpio</module>
-    <module>:platform:i2c:1</module>
-    <module>:platform:uart:2</module>
-    <module>:processing:protothread</module>
-    <module>:processing:timer</module>
-    <module>:build:scons</module>
+    <module>modm:driver:bmp085</module>
+    <module>modm:io</module>
+    <module>modm:platform:gpio</module>
+    <module>modm:platform:i2c:1</module>
+    <module>modm:platform:uart:2</module>
+    <module>modm:processing:protothread</module>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

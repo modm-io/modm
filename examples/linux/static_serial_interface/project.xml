@@ -1,12 +1,12 @@
 <library>
   <options>
-    <option name=":target">hosted-linux</option>
-    <option name=":build:build.path">../../../build/linux/static_serial_interface</option>
+    <option name="modm:target">hosted-linux</option>
+    <option name="modm:build:build.path">../../../build/linux/static_serial_interface</option>
   </options>
   <modules>
-    <module>:platform:core</module>
-    <module>:platform:uart</module>
-    <module>:debug</module>
-    <module>:build:scons</module>
+    <module>modm:platform:core</module>
+    <module>modm:platform:uart</module>
+    <module>modm:debug</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

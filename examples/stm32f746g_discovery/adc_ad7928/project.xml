@@ -1,14 +1,14 @@
 <library>
   <extends>modm:board:disco-f746ng</extends>
   <options>
-    <option name=":build:build.path">../../../build/stm32f746g_discovery/adc_ad7928</option>
+    <option name="modm:build:build.path">../../../build/stm32f746g_discovery/adc_ad7928</option>
   </options>
   <modules>
-    <module>:driver:ad7928</module>
-    <module>:platform:gpio</module>
-    <module>:platform:spi:2</module>
-    <module>:processing:protothread</module>
-    <module>:processing:timer</module>
-    <module>:build:scons</module>
+    <module>modm:driver:ad7928</module>
+    <module>modm:platform:gpio</module>
+    <module>modm:platform:spi:2</module>
+    <module>modm:processing:protothread</module>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

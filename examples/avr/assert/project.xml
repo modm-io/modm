@@ -1,9 +1,9 @@
 <library>
   <extends>modm:board:al-avreb-can</extends>
   <options>
-    <option name=":build:build.path">../../../build/avr/assert</option>
+    <option name="modm:build:build.path">../../../build/avr/assert</option>
   </options>
   <modules>
-    <module>:build:scons</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

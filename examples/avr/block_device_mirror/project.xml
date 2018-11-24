@@ -1,15 +1,15 @@
 <library>
   <options>
-    <option name=":target">atmega644</option>
-    <option name=":platform:clock:f_cpu">14745600</option>
-    <option name=":build:build.path">../../../build/avr/block_device_mirror</option>
+    <option name="modm:target">atmega644</option>
+    <option name="modm:platform:clock:f_cpu">14745600</option>
+    <option name="modm:build:build.path">../../../build/avr/block_device_mirror</option>
   </options>
   <modules>
-    <module>:debug</module>
-    <module>:driver:block.device:heap</module>
-    <module>:driver:block.device:mirror</module>
-    <module>:platform:core</module>
-    <module>:platform:uart:0</module>
-    <module>:build:scons</module>
+    <module>modm:debug</module>
+    <module>modm:driver:block.device:heap</module>
+    <module>modm:driver:block.device:mirror</module>
+    <module>modm:platform:core</module>
+    <module>modm:platform:uart:0</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

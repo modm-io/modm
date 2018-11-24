@@ -1,11 +1,11 @@
 <library>
   <options>
-    <option name=":target">hosted-windows</option>
-    <option name=":build:build.path">../../../build/windows/build_info</option>
+    <option name="modm:target">hosted-windows</option>
+    <option name="modm:build:build.path">../../../build/windows/build_info</option>
   </options>
   <modules>
-    <module>:debug</module>
-    <module>:platform:core</module>
-    <module>:build:scons</module>
+    <module>modm:debug</module>
+    <module>modm:platform:core</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

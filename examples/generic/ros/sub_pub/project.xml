@@ -1,16 +1,16 @@
 <library>
   <extends>modm:board:nucleo-l476rg</extends>
   <options>
-    <option name=":build:build.path">../../../../build/generic/ros/sub_pub</option>
-    <option name=":platform:uart:2:buffer.tx">512</option>
-    <option name=":platform:uart:2:buffer.rx">512</option>
+    <option name="modm:build:build.path">../../../../build/generic/ros/sub_pub</option>
+    <option name="modm:platform:uart:2:buffer.tx">512</option>
+    <option name="modm:platform:uart:2:buffer.rx">512</option>
   </options>
   <modules>
-    <module>:communication:ros</module>
-    <module>:driver</module>
-    <module>:platform:i2c:1</module>
-    <module>:processing:timer</module>
-    <module>:ros</module>
-    <module>:build:scons</module>
+    <module>modm:communication:ros</module>
+    <module>modm:driver</module>
+    <module>modm:platform:i2c:1</module>
+    <module>modm:processing:timer</module>
+    <module>modm:ros</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

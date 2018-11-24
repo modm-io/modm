@@ -1,13 +1,13 @@
 <library>
   <extends>modm:board:disco-f407vg</extends>
   <options>
-    <option name=":build:build.path">../../../build/stm32f4_discovery/sab2</option>
+    <option name="modm:build:build.path">../../../build/stm32f4_discovery/sab2</option>
   </options>
   <modules>
-    <module>:platform:gpio</module>
-    <module>:communication:sab2</module>
-    <module>:platform:uart:1</module>
-    <module>:platform:uart:4</module>
-    <module>:build:scons</module>
+    <module>modm:platform:gpio</module>
+    <module>modm:communication:sab2</module>
+    <module>modm:platform:uart:1</module>
+    <module>modm:platform:uart:4</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

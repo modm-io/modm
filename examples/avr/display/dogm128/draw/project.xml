@@ -1,15 +1,15 @@
 <library>
   <options>
-    <option name=":target">atmega644</option>
-    <option name=":platform:clock:f_cpu">14745600</option>
-    <option name=":build:build.path">../../../../../build/avr/display/dogm128/draw</option>
+    <option name="modm:target">atmega644</option>
+    <option name="modm:platform:clock:f_cpu">14745600</option>
+    <option name="modm:build:build.path">../../../../../build/avr/display/dogm128/draw</option>
   </options>
   <modules>
-    <module>:driver:ea_dog</module>
-    <module>:platform:clock</module>
-    <module>:platform:core</module>
-    <module>:platform:gpio</module>
-    <module>:platform:spi.bitbang</module>
-    <module>:build:scons</module>
+    <module>modm:driver:ea_dog</module>
+    <module>modm:platform:clock</module>
+    <module>modm:platform:core</module>
+    <module>modm:platform:gpio</module>
+    <module>modm:platform:spi.bitbang</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

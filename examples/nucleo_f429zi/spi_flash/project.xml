@@ -1,11 +1,11 @@
 <library>
   <extends>modm:board:nucleo-f429zi</extends>
   <options>
-    <option name=":build:build.path">../../../build/nucleo_f429zi/spi_flash</option>
+    <option name="modm:build:build.path">../../../build/nucleo_f429zi/spi_flash</option>
   </options>
   <modules>
-  	<module>:driver:block.device:spi.flash</module>
-  	<module>:platform:spi:1</module>
-    <module>:build:scons</module>
+    <module>modm:driver:block.device:spi.flash</module>
+    <module>modm:platform:spi:1</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

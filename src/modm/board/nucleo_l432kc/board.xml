@@ -6,9 +6,9 @@
   </repositories>
 
   <options>
-    <option name=":target">stm32l432kcu</option>
+    <option name="modm:target">stm32l432kcu</option>
 
-    <option name=":platform:uart:2:buffer.tx">2048</option>
+    <option name="modm:platform:uart:2:buffer.tx">2048</option>
   </options>
   <modules>
     <module>modm:board:nucleo-l432kc</module>
