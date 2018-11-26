@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:board:nucleo-f042k6</extends>
+  <options>
+    <option name=":build:build.path">../../../build/nucleo_f042k6/adc</option>
+  </options>
+  <modules>
+    <module>:build:scons</module>
+    <module>:platform:adc</module>
+  </modules>
+</library>
