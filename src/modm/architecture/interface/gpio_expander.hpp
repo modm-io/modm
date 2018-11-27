@@ -141,7 +141,7 @@ public:
 	/// Returns the input bits: 0 for low, 1 for high
 	Pins
 	getInputs() const;
-#endif
+#endif // __DOXYGEN__
 };
 
 /**
