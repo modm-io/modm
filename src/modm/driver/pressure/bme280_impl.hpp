@@ -36,23 +36,23 @@ modm::Bme280<I2cMaster>::initialize(Mode mode, Oversampling pressure, Oversampli
 	RF_BEGIN();
 
 	// Very first verify Chip Id
-	// {
-	// 	buffer[0] = i(Register::CHIP_ID);
-	// 	uint8_t chid;
+	{
+		buffer[0] = i(Register::CHIP_ID);
+		uint8_t chid;
 
-	// 	this->transaction.configureWriteRead(buffer, 1, &chid, 1);
+		this->transaction.configureWriteRead(buffer, 1, &chid, 1);
 
-	// 	if (RF_CALL( this->runTransaction() ))
-	// 	{
-	// 		MODM_LOG_DEBUG.printf("BME280 Chip Id check. Read %02x, expected %02x\n", chid, ChipId);
-	// 		if (chid != ChipId) {
-	// 			MODM_LOG_ERROR.printf("BME280 Chip Id mismatch. Read %02x, expected %02x\n", chid, ChipId);
-	// 			RF_RETURN(false);
-	// 		}
-	// 	} else {
-	// 		RF_RETURN(false);
-	// 	}
-	// }
+		if (RF_CALL( this->runTransaction() ))
+		{
+			MODM_LOG_DEBUG.printf("BME280 Chip Id check. Read %02x, expected %02x\n", chid, ChipId);
+			if (chid != ChipId) {
+				MODM_LOG_ERROR.printf("BME280 Chip Id mismatch. Read %02x, expected %02x\n", chid, ChipId);
+				RF_RETURN(false);
+			}
+		} else {
+			RF_RETURN(false);
+		}
+	}
 
 	// First configure humidity sampling because
 	// Changes to this register only become effective after a write operation to “ctrl_meas”.
