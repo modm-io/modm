@@ -184,3 +184,24 @@ modm::Bme280<I2cMaster>::readout()
 
 	RF_END_RETURN_CALL( this->runTransaction() );
 }
+
+template < typename I2cMaster >
+modm::ResumableResult<bool>
+modm::Bme280<I2cMaster>::startMeasurement(Oversampling pressure, Oversampling temperature)
+{
+	RF_BEGIN();
+
+	{
+		Mode mode = Mode::Forced;
+
+		CtrlMeas_t ctrl_meas = Mode_t(mode);
+		ctrl_meas |= Pressure(pressure);
+		ctrl_meas |= Temperature(temperature);
+
+		buffer[0] = i(Register::CTRL_MEAS);
+		buffer[1] = ctrl_meas.value;
+	}
+
+	this->transaction.configureWrite(buffer, 2);
+	RF_END_RETURN_CALL( this->runTransaction() );
+}

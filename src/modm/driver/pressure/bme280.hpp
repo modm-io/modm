@@ -223,6 +223,14 @@ public:
 	modm::ResumableResult<bool>
 	readout();
 
+	/// Start a single measurement in forced mode. Sensor will go to standby after this.
+	/// To reduce bus traffic only the absolute necessary register (CTRL_MEAS) is written.
+	/// If oversampling of humidity shall be changed, another method must be used.
+	modm::ResumableResult<bool>
+	startMeasurement(
+			Oversampling temperature = Oversampling::Single,
+			Oversampling pressure = Oversampling::Single);
+
 public:
 	/// Get the data object for this sensor.
 	inline Data&
