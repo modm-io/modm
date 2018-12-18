@@ -11,13 +11,14 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-import os
 import re
 import sys
 import glob
 import hashlib
+
 from pathlib import Path
 from distutils.version import StrictVersion
+from git import Repo
 
 sys.path.append(repopath("ext/modm-devices/tools/device"))
 try:
@@ -82,19 +83,24 @@ class DevicesCache(dict):
 
     def build(self):
         cache = Path(repopath("ext/modm-devices.cache"))
-        recompute_required = False
+        repos = {p:None for p in [".", "ext/modm-devices"]}
+        recompute_required = not cache.exists()
 
         if cache.exists():
             # Read cache file and populate :target
             for line in cache.read_text().splitlines():
                 line = line.split(" ")
                 if line[0].startswith("/"):
-                    # If any file has changed, recompute
-                    file = Path(repopath(line[0][1:]))
-                    if not file.exists():
-                        recompute_required = True
-                        break
-                    if line[1] != hashlib.md5(file.read_bytes()).hexdigest():
+                    file = line[0][1:]
+
+                    # Store repo shas
+                    if file in repos.keys():
+                        repos[file] = line[1]
+                        continue
+
+                    # Check normal files
+                    file = Path(repopath(file))
+                    if not file.exists() or (line[1] != hashlib.md5(file.read_bytes()).hexdigest()):
                         recompute_required = True
                         break
                 else:
@@ -102,7 +108,16 @@ class DevicesCache(dict):
                     self.device_to_file[line[0]] = line[1]
                     self[line[0]] = None
 
-        if not cache.exists() or recompute_required:
+        try:
+            # Check with real repository shas
+            real_repos = {path:Repo(repopath(path)).commit().hexsha for path in repos}
+            if any(real_repos[path] != sha for path, sha in repos.items()):
+                recompute_required = True
+            repos = real_repos
+        except:
+            recompute_required = True
+
+        if recompute_required:
             print("Recomputing device cache...")
             content = self.parse_all()
             # prefix the files with a / so we can distinguish them from partnames
@@ -111,7 +126,8 @@ class DevicesCache(dict):
                      for f in set(content.values())]
             content = ["{} {}".format(d, Path(f).relative_to(repopath(".")))
                        for (d, f) in content.items()]
-            content = sorted(content) + sorted(files)
+            repos = ["/{} {}".format(path, sha) for path, sha in repos.items()]
+            content = sorted(content) + sorted(files + repos)
             cache.write_text("\n".join(content))
 
     def __getitem__(self, item):
