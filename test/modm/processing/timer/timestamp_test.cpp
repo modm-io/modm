@@ -12,7 +12,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/processing/timer/timestamp.hpp>
-#include <modm/utils/arithmetic_traits.hpp>
+#include <type_traits>
 
 #include "timestamp_test.hpp"
 
@@ -70,8 +70,8 @@ TimestampTest::testComparisons()
 	TEST_ASSERT_TRUE(t1 == t2);
 	TEST_ASSERT_FALSE(t1 != t2);
 
-	t1Short = modm::ArithmeticTraits<modm::ShortTimestamp::Type>::max / 2;
-	t1 = modm::ArithmeticTraits<modm::Timestamp::Type>::max / 2;
+	t1Short = std::numeric_limits<modm::ShortTimestamp::Type>::max() / 2;
+	t1 = std::numeric_limits<modm::Timestamp::Type>::max() / 2;
 
 	TEST_ASSERT_FALSE(t1Short == t2Short);
 	TEST_ASSERT_TRUE(t1Short != t2Short);
@@ -83,8 +83,8 @@ TimestampTest::testComparisons()
 	TEST_ASSERT_TRUE(t1 > t2);
 	TEST_ASSERT_TRUE(t1 >= t2);
 
-	t1Short = modm::ArithmeticTraits<modm::ShortTimestamp::Type>::max / 2 + 1;
-	t1 = modm::ArithmeticTraits<modm::Timestamp::Type>::max / 2 + 1;
+	t1Short = std::numeric_limits<modm::ShortTimestamp::Type>::max() / 2 + 1;
+	t1 = std::numeric_limits<modm::Timestamp::Type>::max() / 2 + 1;
 
 	TEST_ASSERT_TRUE(t1Short < t2Short);
 	TEST_ASSERT_TRUE(t1Short <= t2Short);

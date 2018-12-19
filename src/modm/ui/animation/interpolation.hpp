@@ -15,7 +15,7 @@
 
 #include <cstdint>
 #include <modm/utils/arithmetic_traits.hpp>
-#include <type_traits>
+#include <cmath>
 
 namespace modm
 {
@@ -53,7 +53,7 @@ public:
 	/// for 8bit value types, the steps are limited to 2^15 anyway,
 	/// so we do not need uint32_t for the steps, but we can use uint16_t
 	using StepType = std::conditional_t<
-			(modm::ArithmeticTraits<UnsignedType>::max <= 255),
+			(std::numeric_limits<UnsignedType>::max() <= 255),
 			uint16_t,
 			uint32_t >;
 private:
@@ -75,7 +75,7 @@ private:
 			float delta = (static_cast<float>(end) - begin);
 			deltaValue = delta / steps;
 			if (deltaValue == 0)
-				deltaValue = delta > 0 ? modm::ArithmeticTraits<float>::epsilon : -modm::ArithmeticTraits<float>::epsilon;
+				deltaValue = std::copysignf(std::numeric_limits<float>::epsilon(), delta);
 			accumulatedValue = static_cast<float>(begin) + deltaValue / 2;
 		}
 

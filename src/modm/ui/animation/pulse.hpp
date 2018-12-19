@@ -14,7 +14,7 @@
 
 #include <stdint.h>
 #include "key_frame.hpp"
-#include <modm/utils/arithmetic_traits.hpp>
+#include <type_traits>
 
 namespace modm
 {
@@ -44,8 +44,8 @@ class Pulse
 public:
 	Pulse(Animation<T> &animator)
 	:	animator(animator), frames{
-			modm::ui::KeyFrame<T>(500, modm::ArithmeticTraits<T>::max),
-			modm::ui::KeyFrame<T>(500, modm::ArithmeticTraits<T>::min)
+			modm::ui::KeyFrame<T>(500, std::numeric_limits<T>::max()),
+			modm::ui::KeyFrame<T>(500, std::numeric_limits<T>::min())
 		}
 	{
 		this->animator.setKeyFrames(frames, 2);

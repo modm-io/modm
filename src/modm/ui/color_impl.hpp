@@ -13,7 +13,8 @@
 #	error	"Don't include this file directly, use 'color.hpp' instead!"
 #endif
 
-#include <modm/math/utils.hpp>
+#include <type_traits>
+#include <algorithm>
 
 /**
  * @see http://de.wikipedia.org/wiki/HSV-Farbraum#Umrechnung_RGB_in_HSV.2FHSL
@@ -24,12 +25,12 @@ inline void
 modm::color::RgbT<UnderlyingType>::toHsv(HsvT<T>* color) const
 {
 	typedef float CalcType;
-	const CalcType maxValue = modm::ArithmeticTraits<T>::max;
+	const CalcType maxValue = std::numeric_limits<T>::max();
 	const CalcType _red		= static_cast<CalcType>(red) / maxValue;
 	const CalcType _blue	= static_cast<CalcType>(blue) / maxValue;
 	const CalcType _green	= static_cast<CalcType>(green) / maxValue;
-	const CalcType _max = max(_red, max(_green, _blue));
-	const CalcType _min = min(_red, min(_green, _blue));
+	const CalcType _max = std::max(_red, std::max(_green, _blue));
+	const CalcType _min = std::min(_red, std::min(_green, _blue));
 	const CalcType _diff = _max - _min;
 
 	CalcType hue_temp;

@@ -17,10 +17,10 @@
 #include <climits>
 
 template<typename T>
-constexpr T Min_v = modm::ArithmeticTraits<T>::min;
+constexpr T Min_v = std::numeric_limits<T>::min();
 
 template<typename T>
-constexpr T Max_v = modm::ArithmeticTraits<T>::max;
+constexpr T Max_v = std::numeric_limits<T>::max();
 
 void
 ArithmeticTraitsTest::testMinMax()

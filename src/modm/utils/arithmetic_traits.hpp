@@ -185,7 +185,7 @@ using WideType = typename detail::WideType<T>::type;
 template<typename T>
 struct ArithmeticTraits
 {
-	static constexpr bool isFloatingPoint = std::is_floating_point_v<T>;
+	static constexpr bool isFloatingPoint [[deprecated("use std::is_floating_point_v<T> instead!")]] = std::is_floating_point_v<T>;
 	static constexpr bool isInteger = std::is_integral_v<T>
 		&& !std::is_same_v<std::decay_t<T>, bool>;
 
@@ -197,9 +197,9 @@ struct ArithmeticTraits
 	static constexpr unsigned char decimalDigits =
 		std::ceil(std::numeric_limits<T>::digits * log10(2)) + (std::is_signed_v<T> ? 1 : 0);
 
-	static constexpr T min = std::numeric_limits<T>::min();
-	static constexpr T max = std::numeric_limits<T>::max();
-	static constexpr T epsilon = std::numeric_limits<T>::epsilon();
+	static constexpr T min [[deprecated("use std::numeric_limits<T>::min() instead!")]] = std::numeric_limits<T>::min();
+	static constexpr T max [[deprecated("use std::numeric_limits<T>::max() instead!")]] = std::numeric_limits<T>::max();
+	static constexpr T epsilon [[deprecated("use std::numeric_limits<T>::epsilon() instead!")]] = std::numeric_limits<T>::epsilon();
 };
 
 /// @}

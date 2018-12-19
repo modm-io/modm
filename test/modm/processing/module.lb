@@ -24,8 +24,7 @@ def prepare(module, options):
         ":processing:protothread",
         ":processing:resumable",
         ":processing:timer",
-        ":processing:scheduler",
-        ":utils")
+        ":processing:scheduler")
     return True
 
 

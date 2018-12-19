@@ -13,6 +13,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/processing/timer.hpp>
+#include <type_traits>
 
 #include "clock_dummy.hpp"
 #include "timeout_test.hpp"
@@ -142,7 +143,7 @@ TimeoutTest::testBasics()
 void
 TimeoutTest::testTimeOverflow()
 {
-	modm::ShortTimestamp::Type time = modm::ArithmeticTraits<modm::ShortTimestamp::Type>::max;
+	modm::ShortTimestamp::Type time = std::numeric_limits<modm::ShortTimestamp::Type>::max();
 	TEST_ASSERT_EQUALS(time, 65535);
 
 	// overflow after 65535 for uint16_t => 32767+100 = 32867

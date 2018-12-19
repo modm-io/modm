@@ -17,7 +17,6 @@
 
 #include <stdint.h>
 #include <modm/io/iostream.hpp>
-#include <modm/utils/arithmetic_traits.hpp>
 
 namespace modm
 {

@@ -14,7 +14,7 @@
 
 #include <stdint.h>
 #include "key_frame.hpp"
-#include <modm/utils/arithmetic_traits.hpp>
+#include <type_traits>
 
 namespace modm
 {
@@ -43,14 +43,14 @@ class Strobe
 public:
 	Strobe(Animation<T> &animator)
 	:	animator(animator), frames{
-			modm::ui::KeyFrame<T>(60, modm::ArithmeticTraits<T>::max),
-			modm::ui::KeyFrame<T>(40, modm::ArithmeticTraits<T>::max),
-			modm::ui::KeyFrame<T>(90, modm::ArithmeticTraits<T>::min),
-			modm::ui::KeyFrame<T>(110, modm::ArithmeticTraits<T>::min),
-			modm::ui::KeyFrame<T>(60, modm::ArithmeticTraits<T>::max),
-			modm::ui::KeyFrame<T>(40, modm::ArithmeticTraits<T>::max),
-			modm::ui::KeyFrame<T>(90, modm::ArithmeticTraits<T>::min),
-			modm::ui::KeyFrame<T>(510, modm::ArithmeticTraits<T>::min),
+			modm::ui::KeyFrame<T>(60, std::numeric_limits<T>::max()),
+			modm::ui::KeyFrame<T>(40, std::numeric_limits<T>::max()),
+			modm::ui::KeyFrame<T>(90, std::numeric_limits<T>::min()),
+			modm::ui::KeyFrame<T>(110, std::numeric_limits<T>::min()),
+			modm::ui::KeyFrame<T>(60, std::numeric_limits<T>::max()),
+			modm::ui::KeyFrame<T>(40, std::numeric_limits<T>::max()),
+			modm::ui::KeyFrame<T>(90, std::numeric_limits<T>::min()),
+			modm::ui::KeyFrame<T>(510, std::numeric_limits<T>::min()),
 		}
 	{
 		this->animator.setKeyFrames(frames, 8);
