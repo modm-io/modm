@@ -19,6 +19,7 @@
 #include <stdint.h>
 
 #include <modm/math/matrix.hpp>
+#include <modm/math/utils/arithmetic_traits.hpp>
 
 namespace modm
 {
@@ -111,6 +112,18 @@ namespace modm
 
 		T coords[N];
 	};
+
+	template< typename T, uint8_t N >
+	struct detail::MakeSigned< Vector<T, N> >
+	{ using type = Vector< SignedType<T>, N >; };
+
+	template< typename T, uint8_t N >
+	struct detail::MakeUnsigned< Vector<T, N> >
+	{ using type = Vector< UnsignedType<T>, N >; };
+
+	template< typename T, uint8_t N >
+	struct detail::WideType< Vector<T, N> >
+	{ using type = Vector< WideType<T>, N >; };
 }
 
 #define IMPLEMENT_VECTOR_ACCESSOR2(a,b)			\
