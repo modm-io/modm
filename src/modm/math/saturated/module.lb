@@ -16,7 +16,7 @@ def init(module):
     module.description = "Saturated Arithmetics"
 
 def prepare(module, options):
-    module.depends(":utils")
+    module.depends(":math:utils")
     return True
 
 def build(env):

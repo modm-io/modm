@@ -14,8 +14,8 @@
 #define MODM_UI_LINEAR_INTERPOLATION_HPP
 
 #include <cstdint>
-#include <modm/utils/arithmetic_traits.hpp>
 #include <cmath>
+#include <modm/math/utils/arithmetic_traits.hpp>
 
 namespace modm
 {

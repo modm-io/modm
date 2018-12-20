@@ -14,7 +14,7 @@
 #ifndef	MODM_SATURATED_HPP
 #define	MODM_SATURATED_HPP
 
-#include <modm/utils/arithmetic_traits.hpp>
+#include <modm/math/utils/arithmetic_traits.hpp>
 
 namespace modm
 {

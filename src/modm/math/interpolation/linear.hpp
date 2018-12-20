@@ -16,7 +16,7 @@
 
 #include <stdint.h>
 
-#include <modm/utils/arithmetic_traits.hpp>
+#include <modm/math/utils/arithmetic_traits.hpp>
 #include <modm/container/pair.hpp>
 #include <modm/architecture/interface/accessor.hpp>
 

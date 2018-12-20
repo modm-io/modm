@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <cmath>
 
-#include <modm/utils/arithmetic_traits.hpp>
+#include <modm/math/utils/arithmetic_traits.hpp>
 
 #include "iostream.hpp"
 

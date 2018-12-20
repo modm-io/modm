@@ -26,7 +26,7 @@ namespace modm
 {
 
 /**
- * @ingroup		modm_utils
+ * @ingroup		modm_math_utils
  * @defgroup	arithmetic_traits	Arithmetic Traits
  *
  * Traits to give numbers more information then they have by

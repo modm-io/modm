@@ -20,7 +20,7 @@ def prepare(module, options):
     module.depends(
         ":architecture:clock",
         ":io",
-        ":utils")
+        ":math:utils")
     return True
 
 def build(env):

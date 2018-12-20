@@ -11,7 +11,7 @@
 
 #include "arithmetic_traits_test.hpp"
 
-#include <modm/utils/arithmetic_traits.hpp>
+#include <modm/math/utils/arithmetic_traits.hpp>
 #include <stdint.h>
 #include <cstdint>
 #include <climits>

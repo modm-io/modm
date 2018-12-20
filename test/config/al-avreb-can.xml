@@ -14,7 +14,6 @@
     <module>modm-test:test:container</module>
     <module>modm-test:test:driver</module>
     <module>modm-test:test:stdc++</module>
-    <module>modm-test:test:utils</module>
 
     <!-- <module>modm-test:test:io</module>
     <module>modm-test:test:platform:**</module>

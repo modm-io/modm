@@ -16,6 +16,7 @@
 #define MODM_MATH_UTILS_HPP
 
 #include "utils/misc.hpp"
+#include "utils/arithmetic_traits.hpp"
 #include "utils/bit_operation.hpp"
 #include "utils/bit_constants.hpp"
 #include "utils/operator.hpp"
