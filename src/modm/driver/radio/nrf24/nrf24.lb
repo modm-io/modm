@@ -23,7 +23,7 @@ def prepare(module, options):
         ":architecture:spi",
         ":debug",
         ":processing:timer",
-        ":utils")
+        ":math:utils")
     return True
 
 def build(env):

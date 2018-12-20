@@ -25,7 +25,7 @@ def prepare(module, options):
     module.depends(
         ":architecture:i2c.device",
         ":architecture:register",
-        ":utils")
+        ":math:utils")
     return True
 
 def build(env):

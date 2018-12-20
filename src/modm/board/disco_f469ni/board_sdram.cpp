@@ -10,7 +10,7 @@
 // ----------------------------------------------------------------------------
 
 #include "board.hpp"
-#include <modm/utils/bit_constants.hpp>
+#include <modm/math/utils/bit_constants.hpp>
 
 // ----------------------------------- SDRAM -----------------------------------
 static void

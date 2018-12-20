@@ -17,6 +17,7 @@
 
 #include "utils/misc.hpp"
 #include "utils/bit_operation.hpp"
+#include "utils/bit_constants.hpp"
 #include "utils/operator.hpp"
 #include "utils/endianness.hpp"
 

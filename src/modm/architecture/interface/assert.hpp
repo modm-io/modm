@@ -14,7 +14,7 @@
 
 #include <stdint.h>
 #include <modm/architecture/utils.hpp>
-#include <modm/utils/bit_constants.hpp>
+#include <modm/math/utils/bit_constants.hpp>
 #include <modm/architecture/interface/accessor.hpp>
 
 

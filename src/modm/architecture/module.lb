@@ -48,7 +48,7 @@ class Assert(Module):
         module.description = FileReader("interface/assert.md")
 
     def prepare(self, module, options):
-        module.depends(":utils", ":architecture:accessor")
+        module.depends(":math:utils", ":architecture:accessor")
         return True
 
     def build(self, env):
