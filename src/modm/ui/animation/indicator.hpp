@@ -14,7 +14,7 @@
 
 #include <stdint.h>
 #include "key_frame.hpp"
-#include <modm/utils/arithmetic_traits.hpp>
+#include <type_traits>
 
 namespace modm
 {
@@ -45,10 +45,10 @@ public:
 	/// constructs an indicator with a period of 1s
 	Indicator(Animation<T> &animator)
 	:	animator(animator), frames{
-			modm::ui::KeyFrame<T>(75, modm::ArithmeticTraits<T>::max),
-			modm::ui::KeyFrame<T>(375, modm::ArithmeticTraits<T>::max),
-			modm::ui::KeyFrame<T>(115, modm::ArithmeticTraits<T>::min),
-			modm::ui::KeyFrame<T>(435, modm::ArithmeticTraits<T>::min)
+			modm::ui::KeyFrame<T>(75, std::numeric_limits<T>::max()),
+			modm::ui::KeyFrame<T>(375, std::numeric_limits<T>::max()),
+			modm::ui::KeyFrame<T>(115, std::numeric_limits<T>::min()),
+			modm::ui::KeyFrame<T>(435, std::numeric_limits<T>::min())
 		}
 	{
 		this->animator.setKeyFrames(frames, 4);

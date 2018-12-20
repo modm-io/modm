@@ -22,8 +22,7 @@ RGB and HSV containers and converters.
 def prepare(module, options):
     module.depends(
         ":io",
-        ":math:utils",
-        ":utils")
+        ":math:utils")
     return True
 
 def build(env):

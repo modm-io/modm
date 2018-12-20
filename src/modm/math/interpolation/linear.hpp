@@ -16,7 +16,7 @@
 
 #include <stdint.h>
 
-#include <modm/utils/arithmetic_traits.hpp>
+#include <modm/math/utils/arithmetic_traits.hpp>
 #include <modm/container/pair.hpp>
 #include <modm/architecture/interface/accessor.hpp>
 
@@ -41,8 +41,8 @@ namespace modm
 			typedef typename T::FirstType InputType;
 			typedef typename T::SecondType OutputType;
 
-			typedef typename ArithmeticTraits< OutputType >::SignedType OutputSignedType;
-			typedef typename ArithmeticTraits< OutputSignedType >::WideType WideType;
+			typedef modm::SignedType< OutputType > OutputSignedType;
+			typedef modm::WideType< OutputSignedType > WideType;
 
 		public:
 			/**

@@ -15,7 +15,7 @@
 
 #include <stdlib.h>
 
-#include <modm/utils/arithmetic_traits.hpp>
+#include <modm/math/utils/arithmetic_traits.hpp>
 #include <modm/architecture/interface/accessor_flash.hpp>
 
 #include "iostream.hpp"

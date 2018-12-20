@@ -95,8 +95,7 @@ def prepare(module, options):
         ":architecture:spi",
         ":math:utils",
         ":platform:gpio",
-        ":platform:uart",
-        ":utils")
+        ":platform:uart")
 
     for instance in listify(device.get_driver("spi:avr_uart")["instance"]):
         module.add_submodule(Instance(int(instance)))

@@ -39,11 +39,11 @@ namespace modm
 	void
 	Saturated<T>::setValue(WideType in)
 	{
-		if (in > ArithmeticTraits<T>::max) {
-			value = ArithmeticTraits<T>::max;
+		if (in > std::numeric_limits<T>::max()) {
+			value = std::numeric_limits<T>::max();
 		}
-		else if (in < ArithmeticTraits<T>::min) {
-			value = ArithmeticTraits<T>::min;
+		else if (in < std::numeric_limits<T>::min()) {
+			value = std::numeric_limits<T>::min();
 		}
 		else {
 			value = static_cast<T>(in);
@@ -76,7 +76,7 @@ namespace modm
 	void
 	Saturated<T>::absolute()
 	{
-		if (ArithmeticTraits<T>::isSigned)
+		if (std::is_signed_v<T>)
 		{
 			if (value < 0) {
 				value = -value;
@@ -89,7 +89,7 @@ namespace modm
 	Saturated<U>
 	operator - (const Saturated<U>& x)
 	{
-		typedef typename ArithmeticTraits<U>::WideType WideType;
+		using WideType = modm::WideType<U>;
 
 		WideType temp = - static_cast<WideType>(x.value);
 
@@ -105,7 +105,7 @@ namespace modm
 	{
 		Saturated<U> result(x);
 
-		if (ArithmeticTraits<U>::isSigned) {
+		if (std::is_signed_v<U>) {
 			result.absolute();
 		}
 		return result;

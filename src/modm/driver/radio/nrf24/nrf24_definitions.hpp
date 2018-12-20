@@ -16,7 +16,7 @@
 
 #include <stdint.h>
 #include <modm/architecture/interface/register.hpp>
-#include <modm/utils/bit_constants.hpp>
+#include <modm/math/utils/bit_constants.hpp>
 
 namespace modm
 {

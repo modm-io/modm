@@ -18,7 +18,6 @@
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/accessor.hpp>
 #include <modm/processing/timer.hpp>
-#include <modm/utils/arithmetic_traits.hpp>
 
 namespace modm
 {

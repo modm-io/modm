@@ -11,16 +11,16 @@
 
 #include "arithmetic_traits_test.hpp"
 
-#include <modm/utils/arithmetic_traits.hpp>
+#include <modm/math/utils/arithmetic_traits.hpp>
 #include <stdint.h>
 #include <cstdint>
 #include <climits>
 
 template<typename T>
-constexpr T Min_v = modm::ArithmeticTraits<T>::min;
+constexpr T Min_v = std::numeric_limits<T>::min();
 
 template<typename T>
-constexpr T Max_v = modm::ArithmeticTraits<T>::max;
+constexpr T Max_v = std::numeric_limits<T>::max();
 
 void
 ArithmeticTraitsTest::testMinMax()
@@ -111,7 +111,7 @@ ArithmeticTraitsTest::testDigits()
 }
 
 template<typename T>
-using Wide_t = typename modm::ArithmeticTraits<T>::WideType;
+using Wide_t = modm::WideType<T>;
 
 // check if U and V represent compatible types
 template<typename U, typename V>
@@ -147,10 +147,10 @@ ArithmeticTraitsTest::testWideType()
 }
 
 template<typename T>
-using Signed_t = typename modm::ArithmeticTraits<T>::SignedType;
+using Signed_t = modm::SignedType<T>;
 
 template<typename T>
-using Unsigned_t = typename modm::ArithmeticTraits<T>::UnsignedType;
+using Unsigned_t = modm::UnsignedType<T>;
 
 void
 ArithmeticTraitsTest::testSignedUnsigned()

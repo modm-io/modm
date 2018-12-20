@@ -19,7 +19,7 @@ def prepare(module, options):
     module.depends(
         ":architecture:accessor",
         ":container",
-        ":utils")
+        ":math:utils")
     return True
 
 def build(env):

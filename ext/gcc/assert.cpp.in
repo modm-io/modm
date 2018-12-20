@@ -11,7 +11,7 @@
 
 #include <cstdint>
 #include <bits/functexcept.h>
-#include <modm/utils/bit_constants.hpp>
+#include <modm/math/utils/bit_constants.hpp>
 
 %% if options["use_modm_assert"]
 #include <modm/architecture/interface/assert.hpp>

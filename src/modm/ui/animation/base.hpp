@@ -14,7 +14,7 @@
 
 #include <stdint.h>
 #include <modm/architecture/interface/clock.hpp>
-#include <modm/utils/arithmetic_traits.hpp>
+#include <modm/math/utils/arithmetic_traits.hpp>
 #include "interpolation.hpp"
 
 namespace modm

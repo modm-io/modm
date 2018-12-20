@@ -20,7 +20,7 @@
 #include <stdint.h>
 
 #include <modm/io/iostream.hpp>
-#include <modm/utils/arithmetic_traits.hpp>
+#include <modm/math/utils/arithmetic_traits.hpp>
 
 namespace modm
 {
@@ -37,7 +37,7 @@ class GenericTimestamp
 {
 public:
 	typedef T Type;
-	typedef typename modm::ArithmeticTraits<T>::SignedType SignedType;
+	typedef modm::SignedType<T> SignedType;
 
 public:
 	/// @param time in ms

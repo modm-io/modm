@@ -19,7 +19,7 @@
 #include <cmath>
 #include <stdint.h>
 
-#include <modm/utils/arithmetic_traits.hpp>
+#include <modm/math/utils/arithmetic_traits.hpp>
 
 namespace modm
 {
@@ -55,7 +55,7 @@ namespace modm
 	template<typename T, unsigned int ScaleFactor = 1>
 	class Pid
 	{
-		typedef typename ArithmeticTraits<T>::WideType WideType;
+		typedef modm::WideType<T> WideType;
 
 	public:
 		typedef T ValueType;

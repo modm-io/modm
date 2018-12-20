@@ -15,6 +15,7 @@
 #endif
 
 #include <modm/debug/logger.hpp>
+#include <type_traits>
 
 #define VL53L0_RF_CALL(rf) if(not RF_CALL(rf)) { RF_RETURN(false); }
 
@@ -164,7 +165,7 @@ template < typename I2cMaster >
 modm::ResumableResult<bool>
 modm::Vl53l0<I2cMaster>::readSensor()
 {
-	static_assert(MaxMeasurementTimeUs / 1000 * 2 <= ArithmeticTraits<uint16_t>::max,
+	static_assert(MaxMeasurementTimeUs / 1000 * 2 <= std::numeric_limits<uint16_t>::max(),
 				"MaxMeasurementTimeUs out of range");
 
 	RF_BEGIN();
@@ -341,7 +342,7 @@ template < typename I2cMaster >
 modm::ResumableResult<bool>
 modm::Vl53l0<I2cMaster>::performReferenceCalibration(Start_t mode)
 {
-	static_assert(MaxMeasurementTimeUs / 1000 * 2 <= ArithmeticTraits<uint16_t>::max,
+	static_assert(MaxMeasurementTimeUs / 1000 * 2 <= std::numeric_limits<uint16_t>::max(),
 				"MaxMeasurementTimeUs out of range");
 
 	RF_BEGIN();

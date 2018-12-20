@@ -30,7 +30,8 @@ def prepare(module, options):
         ":platform:gpio",
         ":platform:i2c:1",
         ":platform:uart:3",
-        ":ui:display")
+        ":ui:display",
+        ":math:utils")
     return True
 
 def build(env):

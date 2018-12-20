@@ -16,7 +16,7 @@
 
 #include <stdint.h>
 
-#include <modm/utils/arithmetic_traits.hpp>
+#include <type_traits>
 #include <modm/container/pair.hpp>
 #include <modm/architecture/interface/accessor.hpp>
 
@@ -49,7 +49,7 @@ namespace modm
 			// WARNING:
 			// Only floating point types are allowed as second type of modm::Pair
 			// because the calculation will deliver wrong results otherwise!
-			static_assert(modm::ArithmeticTraits<OutputType>::isFloatingPoint,
+			static_assert(std::is_floating_point_v<OutputType>,
 					"Only floating point types are allowed as second type of modm::Pair");
 		public:
 			/**

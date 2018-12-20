@@ -73,7 +73,7 @@ def prepare(module, options):
         ":architecture:atomic",
         ":architecture:spi",
         ":platform:gpio",
-        ":utils")
+        ":math:utils")
     return True
 
 def build(env):

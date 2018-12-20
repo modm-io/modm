@@ -15,7 +15,7 @@
 #define MODM_REGISTER_HPP
 
 #include <stdint.h>
-#include <modm/utils/bit_constants.hpp>
+#include <modm/math/utils/bit_constants.hpp>
 #include <modm/architecture/detect.hpp>
 #include <modm/io/iostream.hpp>
 

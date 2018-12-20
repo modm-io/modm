@@ -15,6 +15,4 @@
 #include <modm/architecture/utils.hpp>
 
 #include "utils/allocator.hpp"
-#include "utils/arithmetic_traits.hpp"
 #include "utils/dummy.hpp"
-#include "utils/bit_constants.hpp"
