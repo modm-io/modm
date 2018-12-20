@@ -40,7 +40,7 @@ namespace modm
 	template <typename T, unsigned int BLOCK_SIZE >
 	class BlockAllocator
 	{
-		typedef typename modm::ArithmeticTraits<T>::SignedType SignedType;
+		typedef modm::SignedType<T> SignedType;
 
 	public:
 		/**

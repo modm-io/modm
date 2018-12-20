@@ -41,8 +41,8 @@ namespace modm
 			typedef typename T::FirstType InputType;
 			typedef typename T::SecondType OutputType;
 
-			typedef typename ArithmeticTraits< OutputType >::SignedType OutputSignedType;
-			typedef typename ArithmeticTraits< OutputSignedType >::WideType WideType;
+			typedef modm::SignedType< OutputType > OutputSignedType;
+			typedef modm::WideType< OutputSignedType > WideType;
 
 		public:
 			/**

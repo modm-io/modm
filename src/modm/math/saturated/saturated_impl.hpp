@@ -89,7 +89,7 @@ namespace modm
 	Saturated<U>
 	operator - (const Saturated<U>& x)
 	{
-		typedef typename ArithmeticTraits<U>::WideType WideType;
+		using WideType = modm::WideType<U>;
 
 		WideType temp = - static_cast<WideType>(x.value);
 

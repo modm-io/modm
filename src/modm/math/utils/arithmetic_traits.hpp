@@ -183,16 +183,21 @@ template<typename T>
 using WideType = typename detail::WideType<T>::type;
 
 template<typename T>
+using SignedType = typename detail::MakeSigned<T>::type;
+
+template<typename T>
+using UnsignedType = typename detail::MakeUnsigned<T>::type;
+
+template<typename T>
 struct ArithmeticTraits
 {
 	static constexpr bool isFloatingPoint [[deprecated("use std::is_floating_point_v<T> instead!")]] = std::is_floating_point_v<T>;
 	static constexpr bool isInteger = std::is_integral_v<T>
 		&& !std::is_same_v<std::decay_t<T>, bool>;
 
-	using WideType = modm::WideType<T>;
-
-	using SignedType   = typename detail::MakeSigned<T>::type;
-	using UnsignedType = typename detail::MakeUnsigned<T>::type;
+	using WideType     [[deprecated("use modm::WideType<T> instead!")]]     = modm::WideType<T>;
+	using SignedType   [[deprecated("use modm::SignedType<T> instead!")]]   = modm::SignedType<T> ;
+	using UnsignedType [[deprecated("use modm::UnsignedType<T> instead!")]] = modm::UnsignedType<T>;
 
 	static constexpr unsigned char decimalDigits =
 		std::ceil(std::numeric_limits<T>::digits * log10(2)) + (std::is_signed_v<T> ? 1 : 0);

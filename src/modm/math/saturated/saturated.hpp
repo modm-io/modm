@@ -33,8 +33,8 @@ namespace modm
 	template<typename T>
 	class Saturated
 	{
-		typedef typename ArithmeticTraits<T>::SignedType SignedType;
-		typedef typename ArithmeticTraits<SignedType>::WideType WideType;
+		typedef modm::SignedType<T> SignedType;
+		typedef modm::WideType<SignedType> WideType;
 
 	public:
 		Saturated();

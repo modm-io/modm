@@ -37,7 +37,7 @@ class GenericTimestamp
 {
 public:
 	typedef T Type;
-	typedef typename modm::ArithmeticTraits<T>::SignedType SignedType;
+	typedef modm::SignedType<T> SignedType;
 
 public:
 	/// @param time in ms

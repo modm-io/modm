@@ -48,7 +48,7 @@ template< typename T = uint8_t >
 class FastRamp
 {
 private:
-	using UnsignedType = typename modm::ArithmeticTraits<T>::UnsignedType;
+	using UnsignedType = modm::UnsignedType<T>;
 public:
 	/// for 8bit value types, the steps are limited to 2^15 anyway,
 	/// so we do not need uint32_t for the steps, but we can use uint16_t

@@ -55,7 +55,7 @@ namespace modm
 	template<typename T, unsigned int ScaleFactor = 1>
 	class Pid
 	{
-		typedef typename ArithmeticTraits<T>::WideType WideType;
+		typedef modm::WideType<T> WideType;
 
 	public:
 		typedef T ValueType;
