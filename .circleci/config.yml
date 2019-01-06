@@ -50,6 +50,10 @@ jobs:
           name: Check for Trailing Whitespace
           command: |
             python3 tools/scripts/rm_whitespace.py
+      - run:
+          name: Synchronize Documentation
+          command: |
+            python3 tools/scripts/synchronize_docs.py -d
 
   stm32-examples:
     docker:

@@ -9,14 +9,11 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
+import re, os, sys, subprocess, lbuild
 from pathlib import Path
 from jinja2 import Environment
-import re
-import os
-import subprocess
 from os import listdir
 from os.path import isfile, join, abspath
-import lbuild
 
 
 TABLE_TEMPLATE = \
@@ -31,6 +28,16 @@ r"""
 </table>
 
 """
+
+def repopath(path):
+  return (Path(os.path.abspath(__file__)).parents[2] / path)
+
+def run(where, command, stdin=None):
+  print(command)
+  result = subprocess.run(command, shell=True, cwd=where, input=stdin, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+  return (result.returncode,
+          result.stdout.decode("utf-8").strip(" \n"),
+          result.stderr.decode("utf-8").strip(" \n"))
 
 def name(raw_name):
     result = []
@@ -74,13 +81,13 @@ def format_table(items, width, align=None):
     return Environment().from_string(TABLE_TEMPLATE).render(subs)
 
 def get_lbuild_in(path):
-    builder = lbuild.api.Builder(cwd=path, config="project.xml")
+    builder = lbuild.api.Builder(cwd=path, config=join(path, "project.xml"))
     builder.load()
     return builder.parser
 
 
 # All the paths
-root = Path(abspath(__file__)).parents[2]
+root = repopath(".")
 board_path = root / "src/modm/board"
 example_path = root / "examples"
 ignored_path = root / "test/all/ignored.txt"
@@ -155,4 +162,14 @@ examples_readme_path.write_text(readme)
 getting_started = Environment().from_string(getting_started_in_path.read_text()).render({"examples": extract(readme, "examples")})
 getting_started_path.write_text(getting_started)
 
+# Check git differences and fail
+if "-d" in sys.argv:
+    differences = run(repopath("."), r"git diff")[1]
+    if len(differences):
+        subprocess.run("git --no-pager diff", shell=True, cwd=repopath("."))
+        print("\nPlease synchronize the modm documentation:\n\n"
+              "    $ python3 tools/scripts/synchronize_docs.py\n\n"
+              " and then commit the results!")
+        exit(1)
 
+exit(0)
