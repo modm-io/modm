@@ -1,4 +1,5 @@
 # ignored because these are generated
 src/index.md
 src/who-we-are.md
+src/guide/getting-started.md
 src/reference/module

@@ -88,6 +88,7 @@ author_path = root / "AUTHORS"
 
 examples_readme_path = root / "examples/README.md"
 readme_path = root / "README.md"
+getting_started_in_path = root / "docs/getting-started.md.in"
 getting_started_path = root / "docs/src/guide/getting-started.md"
 index_in_path = root / "docs/index.md.in"
 index_path = root / "docs/src/index.md"
@@ -125,16 +126,6 @@ drivers = sorted([m.replace("modm:driver:", "") for m in lbuild_parser.modules i
 drivers = [{"name": name(d), "url": None} for d in drivers if name(d)]
 driver_table = format_table(drivers, 6)
 
-# Read the examples README.md and replace these keys
-readme = examples_readme_path.read_text()
-readme = replace(readme, "examplecount", len(examples))
-examples_readme_path.write_text(readme)
-
-# Copy the getting started guide from example readme
-getting_started = getting_started_path.read_text()
-getting_started = replace(getting_started, "examples", extract(readme, "examples"))
-getting_started_path.write_text(getting_started)
-
 # Read the repo README.md and replace these keys
 readme = readme_path.read_text()
 readme = replace(readme, "authorcount", author_count - 7)
@@ -155,5 +146,13 @@ index_path.write_text(index)
 
 whoweare = Environment().from_string(whoweare_in_path.read_text()).render({"authors": authors, "links": links})
 whoweare_path.write_text(whoweare)
+
+# Read the examples README.md and replace these keys
+readme = examples_readme_path.read_text()
+readme = replace(readme, "examplecount", len(examples))
+examples_readme_path.write_text(readme)
+
+getting_started = Environment().from_string(getting_started_in_path.read_text()).render({"examples": extract(readme, "examples")})
+getting_started_path.write_text(getting_started)
 
 
