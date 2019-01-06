@@ -65,7 +65,7 @@ markdown_extensions:
       custom_checkbox: true
   - pymdownx.tilde
 
-pages:
+nav:
   - Home:
     - Introduction: index.md
     - How modm works: how-modm-works.md

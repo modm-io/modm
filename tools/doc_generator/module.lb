@@ -151,8 +151,8 @@ def build(env):
     env.copy(repopath("README.md"), "README.md")
 
 def post_build(env, buildlog):
-    lbuild_plain = lbuild.format.plain
-    lbuild.format.plain = True
+    lbuild_plain = lbuild.format.PLAIN
+    lbuild.format.PLAIN = True
     # FIXME: Get me a proper API for this
     omodules = list(env._env.modules._node.root.all_modules())
     omodules.sort(key=lambda m: m.fullname)
@@ -323,4 +323,4 @@ def post_build(env, buildlog):
     #   - variable
     #   - warning
 
-    lbuild.format.plain = lbuild_plain
+    lbuild.format.PLAIN = lbuild_plain

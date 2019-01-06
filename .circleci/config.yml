@@ -284,6 +284,38 @@ jobs:
           path: test/all/log
           destination: log
 
+  build-docs:
+    docker:
+      - image: modm/modm-build:latest
+    environment:
+      - LANG: "en_US.UTF-8"
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "8c:e7:b6:51:2a:40:66:e6:e9:50:ea:fe:38:49:1d:3f"
+      - run:
+          command: |
+            (git submodule sync && git submodule update --init --jobs 8) &
+            pip3 install -U lbuild &
+            git clone git@github.com:modm-io/modm.io.git ../modm.io &
+            wait
+      - run:
+          name: Build Homepage
+          command: |
+            python3 tools/scripts/synchronize_docs.py
+            (cd examples/stm32f469_discovery/blink; lbuild -D ::generate_module_docs=True build -m "modm:**")
+            (cd docs/src/reference && ln -s ../../../examples/stm32f469_discovery/blink/modm/docs/module)
+            (cd docs && mkdocs build)
+            if [ "$CIRCLE_BRANCH" = "develop" ]; then
+              cd ../modm.io
+              git config user.email "rca@circleci.com"
+              git config user.name "CircleCI Deployment Bot"
+              git add -A
+              git diff-index --quiet HEAD || git commit -m "Update"
+              git push origin master
+            fi
+
 workflows:
   version: 2
   build:
@@ -325,3 +357,14 @@ workflows:
           requires:
             - unittests
             - stm32-examples
+      - build-docs:
+          requires:
+            - avr-compile-all
+            - stm32f0-compile-all
+            - stm32f1-compile-all
+            - stm32f2-compile-all
+            - stm32f3-compile-all
+            - stm32f4-compile-all
+            - stm32f7-compile-all
+            - stm32l4-compile-all
+
