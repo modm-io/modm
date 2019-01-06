@@ -54,6 +54,10 @@ jobs:
           name: Synchronize Documentation
           command: |
             python3 tools/scripts/synchronize_docs.py -d
+      - run:
+          name: Check for Unique Build Paths
+          command: |
+            python3 tools/scripts/examples_check.py examples
 
   stm32-examples:
     docker:
