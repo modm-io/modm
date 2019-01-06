@@ -68,7 +68,7 @@ git clone --recurse-submodules https://github.com/modm-io/modm.git
 
 ## Targets
 
-modm can generate code for <!--avrcount-->76<!--/avrcount--> AVR and <!--stmcount-->865<!--/stmcount-->
+modm can generate code for <!--avrcount-->76<!--/avrcount--> AVR and <!--stmcount-->886<!--/stmcount-->
 STM32 devices, however, there are different levels of support and testing.
 
 <center>
@@ -196,19 +196,22 @@ can easily configure them for you specific needs.
 <td align="center">NOKIA5110</td>
 <td align="center">NRF24</td>
 <td align="center">TFT-DISPLAY</td>
-<td align="center">PCA8574</td>
+<td align="center">PAT9125EL</td>
 </tr><tr>
+<td align="center">PCA8574</td>
 <td align="center">PCA9535</td>
+<td align="center">PCA9548A</td>
 <td align="center">PCA9685</td>
 <td align="center">SIEMENS-S65</td>
 <td align="center">SIEMENS-S75</td>
+</tr><tr>
 <td align="center">SSD1306</td>
 <td align="center">TCS3414</td>
-</tr><tr>
 <td align="center">TCS3472</td>
 <td align="center">TMP102</td>
 <td align="center">TMP175</td>
 <td align="center">VL53L0</td>
+</tr><tr>
 <td align="center">VL6180</td>
 </tr>
 </table>
