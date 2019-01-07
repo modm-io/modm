@@ -230,7 +230,7 @@ voltage range, the maximum frequency should be adapted accordingly:
 			2100: [20, 40, 60, 80, 100, 120, 140, 160, 168] }
 		%}
 	%% endif
-%% elif target["family"] == "f7"
+%% elif target["family"] in ["f7", "h7"]
 /*
 For the stm32f7xx devices, the maximum frequency of the SYSCLK and HCLK is 216 MHz,
 PCLK2 90 MHz and PCLK1 45 MHz. Depending on the device
@@ -351,7 +351,7 @@ modm::platform::ClockControl::setFlashLatency(const uint32_t CPU_Frequency, cons
 	%% if target["family"] in ["f2", "f4", "l4"]
 		// enable flash prefetch and data and instruction cache
 		acr |= FLASH_ACR_PRFTEN | FLASH_ACR_DCEN | FLASH_ACR_ICEN;
-	%% elif target["family"] == "f7"
+	%% elif target["family"] in ["f7", "h7"]
 		// enable flash prefetch and flash accelerator
 		acr |= FLASH_ACR_PRFTEN | FLASH_ACR_ARTEN;
 	%% else
