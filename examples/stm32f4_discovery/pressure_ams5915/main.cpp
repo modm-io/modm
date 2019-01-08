@@ -13,7 +13,7 @@
 #include <modm/board.hpp>
 
 #include <modm/processing.hpp>
-#include <modm/driver/pressure/amsys5915.hpp>
+#include <modm/driver/pressure/ams5915.hpp>
 #include <modm/io/iostream.hpp>
 #include <modm/debug/logger.hpp>
 
@@ -43,8 +43,8 @@ modm::log::Logger modm::log::error(device);
 typedef I2cMaster2 MyI2cMaster;
 // typedef modm::SoftwareI2cMaster<GpioB10, GpioB11> MyI2cMaster;
 
-modm::amsys5915::Data data;
-modm::Amsys5915<MyI2cMaster> pressureSensor(data);
+modm::ams5915::Data data;
+modm::Ams5915<MyI2cMaster> pressureSensor(data);
 
 class ThreadOne : public modm::pt::Protothread
 {

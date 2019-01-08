@@ -160,7 +160,7 @@ can easily configure them for you specific needs.
 <td align="center">AD7928</td>
 <td align="center">ADNS9800</td>
 <td align="center">ADS7843</td>
-<td align="center">AMSYS5915</td>
+<td align="center">AMS5915</td>
 <td align="center">SPI-FLASH</td>
 </tr><tr>
 <td align="center">BME280</td>

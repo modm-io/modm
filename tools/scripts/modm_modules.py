@@ -62,7 +62,7 @@ modm_modules = [
     (r"modm/driver/motor/drv832x_spi\.hpp", r"modm:driver:drv832x_spi"),
     (r"modm/driver/position/vl53l0\.hpp", r"modm:driver:vl53l0"),
     (r"modm/driver/position/vl6180\.hpp", r"modm:driver:vl6180"),
-    (r"modm/driver/pressure/amsys5915\.hpp", r"modm:driver:amsys5915"),
+    (r"modm/driver/pressure/ams5915\.hpp", r"modm:driver:ams5915"),
     (r"modm/driver/pressure/bme280.*", r"modm:driver:bme280"),
     (r"modm/driver/pressure/bmp085.*", r"modm:driver:bmp085"),
     (r"modm/driver/pressure/hclax\.hpp", r"modm:driver:hclax"),

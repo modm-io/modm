@@ -1,10 +1,10 @@
 <library>
   <extends>modm:board:disco-f407vg</extends>
   <options>
-    <option name="modm:build:build.path">../../../build/stm32f4_discovery/pressure_amsys5915</option>
+    <option name="modm:build:build.path">../../../build/stm32f4_discovery/pressure_ams5915</option>
   </options>
   <modules>
-    <module>modm:driver:amsys5915</module>
+    <module>modm:driver:ams5915</module>
     <module>modm:io</module>
     <module>modm:debug</module>
     <module>modm:platform:gpio</module>

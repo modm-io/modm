@@ -11,8 +11,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_AMSYS5915_HPP
-#define MODM_AMSYS5915_HPP
+#ifndef MODM_AMS5915_HPP
+#define MODM_AMS5915_HPP
 
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/math/utils/endianness.hpp>
@@ -20,18 +20,18 @@
 namespace modm
 {
 
-// forward declaration for friending with amsys5915::Data
+// forward declaration for friending with ams5915::Data
 template < typename I2cMaster >
-class Amsys5915;
+class Ams5915;
 
-/// @ingroup modm_driver_amsys5915
-struct amsys5915
+/// @ingroup modm_driver_ams5915
+struct ams5915
 {
 	struct modm_packed
 	Data
 	{
 		template < typename I2cMaster >
-		friend class Amsys5915;
+		friend class Ams5915;
 
 	public:
 		uint16_t
@@ -92,17 +92,17 @@ struct amsys5915
 };
 
 /**
- * @ingroup modm_driver_amsys5915
+ * @ingroup modm_driver_ams5915
  * @author	Raphael Lehman, Niklas Hauser
  */
 template < typename I2cMaster >
-class Amsys5915 : public amsys5915, public modm::I2cDevice<I2cMaster, 1, I2cReadTransaction>
+class Ams5915 : public ams5915, public modm::I2cDevice<I2cMaster, 1, I2cReadTransaction>
 {
 public:
 	/**
-	 * @param	data	a amsys5915::Data object
+	 * @param	data	a ams5915::Data object
 	 */
-	Amsys5915(Data &data, uint8_t i2cAddress = 0x28)
+	Ams5915(Data &data, uint8_t i2cAddress = 0x28)
 	:	I2cDevice<I2cMaster,1,I2cReadTransaction>(i2cAddress), data(data)
 	{
 		this->transaction.configureRead(data.data, 4);
@@ -142,4 +142,4 @@ private:
 
 }	// namespace modm
 
-#endif // MODM_AMSYS5915_HPP
+#endif // MODM_AMS5915_HPP
