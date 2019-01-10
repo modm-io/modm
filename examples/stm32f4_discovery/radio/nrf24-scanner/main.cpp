@@ -88,11 +88,11 @@ main()
 	 * puts("\033[5A");  // move cursor up 5 lines
 	 */
 
-	nrf24hal::setBits(nrf24hal::NrfRegister::CONFIG, nrf24hal::Config::PWR_UP);
-	nrf24hal::setBits(nrf24hal::NrfRegister::CONFIG, nrf24hal::Config::PRIM_RX);
+	nrf24phy::setBits(nrf24phy::NrfRegister::CONFIG, nrf24phy::Config::PWR_UP);
+	nrf24phy::setBits(nrf24phy::NrfRegister::CONFIG, nrf24phy::Config::PRIM_RX);
 
-	nrf24hal::writeRegister(nrf24hal::NrfRegister::EN_AA, 0x00);
-	nrf24hal::writeRegister(nrf24hal::NrfRegister::RF_SETUP, 0x0f);
+	nrf24phy::writeRegister(nrf24phy::NrfRegister::EN_AA, 0x00);
+	nrf24phy::writeRegister(nrf24phy::NrfRegister::RF_SETUP, 0x0f);
 
 
 	constexpr const uint8_t channel_start = 25;
@@ -130,13 +130,13 @@ main()
 		max = 0;
 		for(i = 0; i < max_channel; i++)
 		{
-			nrf24hal::writeRegister(nrf24hal::NrfRegister::RF_CH, i + channel_start);
+			nrf24phy::writeRegister(nrf24phy::NrfRegister::RF_CH, i + channel_start);
 
 			Ce::set();
 			modm::delayMicroseconds(rx_settle);
 			Ce::reset();
 			modm::delayMicroseconds(2);
-			channel_info[i] += 5*nrf24hal::readRegister(nrf24hal::NrfRegister::RPD);
+			channel_info[i] += 5*nrf24phy::readRegister(nrf24phy::NrfRegister::RPD);
 
 			if(channel_info[i] > max)
 				max = channel_info[i];
