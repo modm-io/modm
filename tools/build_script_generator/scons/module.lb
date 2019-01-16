@@ -68,10 +68,8 @@ def post_build(env, buildlog):
     is_unittest = env.has_module(":test")
     has_xpcc_generator = env.has_module(":communication:xpcc:generator")
     has_image_source = len(env["image.source"])
-    generated_paths = sorted(set(o.local_filename_out().split("/")[0] for o in buildlog))
-    generated_paths.remove("modm")
-    generated_paths.insert(0, "modm")
-    generated_paths = [p for p in generated_paths if os.path.isdir(env.outpath(p, basepath="."))]
+    repositories = [p for p in buildlog.repositories if os.path.isdir(env.outpath(p, basepath="."))]
+    repositories = sorted(repositories, key=lambda name: "0" if name == "modm" else name)
 
     target = env["modm:target"]
     subs = common_target(target)
@@ -107,7 +105,7 @@ def post_build(env, buildlog):
     # Add SCons specific data
     subs.update({
         "metadata": buildlog.metadata,
-        "generated_paths": generated_paths,
+        "generated_paths": repositories,
         "build_tools": build_tools,
         "is_unittest": is_unittest,
         "has_image_source": has_image_source,
@@ -125,7 +123,7 @@ def post_build(env, buildlog):
     # Set these substitutions for all templates
     env.substitutions = subs
 
-    for repo in generated_paths:
+    for repo in repositories:
         subs.update({
             "repo": repo,
             "flags": common_metadata_flags(buildlog, repo),
