@@ -25,6 +25,7 @@ We do not intend to serve every possible use-case with this module.
 starting by modifying ours.**
 Remember to set `modm:build:scons:include_sconstruct` to `False`, so that your
 custom `SConstruct` does not get overwritten.
+See the instructions inside our generated default `SConstruct`.
 
 
 ## SCons Methods

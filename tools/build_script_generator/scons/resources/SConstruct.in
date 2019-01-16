@@ -58,4 +58,23 @@ sources += env.XpccCommunication(
 sources += env.FindSourceFiles(".", ignorePaths=ignored)
 %% endif
 
+# So you want to add or remove compile options?
+#   0. Check what options you want to add to GCC:
+#      https://gcc.gnu.org/onlinedocs/gcc/Option-Summary.html
+#   1. Check what the environment variables are called in SCons:
+#      https://www.scons.org/doc/latest/HTML/scons-user/apa.html
+#   2. You can append one or multiple options like this
+#       env.Append(CCFLAGS="-pedantic")
+#       env.Append(CCFLAGS=["-pedantic", "-pedantic-errors"])
+#   3. If you need to remove options, you need to do this:
+#       env["CCFLAGS"].remove("-pedantic")
+#      Note that a lot of options also have a "-no-{option}" option
+#      that may overwrite previous options.
+#   4. Add your environment changes below these instructions
+#      inside this SConstruct file.
+#   5. COMMIT THIS SCONSTRUCT FILE NOW!
+#   6. Tell lbuild not to overwrite this SConstruct file anymore:
+#       <option name="modm:build:scons:include_sconstruct">False</option>
+#   7. Anyone using your project now also benefits from your environment changes.
+
 env.BuildTarget(sources)
