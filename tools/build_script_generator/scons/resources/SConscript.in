@@ -34,43 +34,6 @@ env.InfoBuild()
 %% endif
 %% endif
 
-
-env.AppendUnique(CPPPATH=[
-%% if family == "darwin"
-	"/usr/local/include",
-%% endif
-%% for path in include_paths | sort
-    abspath("{{ path }}"),
-%% endfor
-])
-
-files = [
-%% for file in sources
-    env.File("{{ file }}"),
-%% endfor
-]
-
-library = env.StaticLibrary(target="{{ repo }}", source=files)
-
-env.AppendUnique(LIBS=[
-    library,
-%% for library in libraries | sort
-    "{{ library }}",
-%% endfor
-])
-env.AppendUnique(LIBPATH=[
-%% if family == "darwin"
-	"/usr/local/lib",
-%% endif
-    abspath(str(library[0].get_dir())),
-%% for library in library_paths | sort
-    abspath("{{ library }}"),
-%% endfor
-])
-%% if "required_pkg" in metadata
-env.ParseConfig("pkg-config --cflags --libs {{ metadata.required_pkg | sort | join(" ") }}")
-%% endif
-
 %% macro generate_flags_for_profile(name, profile, append=False)
 env{% if append %}.Append({{name}}{% else %}["{{name}}"]{% endif %} = [
 %% for flag in flags[name][profile] | sort
@@ -101,6 +64,11 @@ if profile == "{{ profile }}":
 {{ generate_flags("ARCHFLAGS", repo != "modm") }}
 
 %% if repo == "modm"
+# ARCHFLAGS must be known for compiling *and* linking
+env.Append(CCFLAGS="$ARCHFLAGS")
+env.Append(ASFLAGS="$ARCHFLAGS")
+env.Append(LINKFLAGS="$ARCHFLAGS")
+
 %% if family != "darwin"
 env["_LIBFLAGS"] = "-Wl,--start-group " + env["_LIBFLAGS"] + " -Wl,--end-group"
 %% endif
@@ -146,12 +114,54 @@ env.SetDefault(MODM_GDBINIT=["$BASEPATH/gdbinit"])
 
 # XPCC generator tool path
 env["XPCC_SYSTEM_DESIGN"] = join(abspath("."), "tools", "xpcc_generator")
-
-# ARCHFLAGS must be known for compiling *and* linking
-env.Append(CCFLAGS="$ARCHFLAGS")
-env.Append(ASFLAGS="$ARCHFLAGS")
-env.Append(LINKFLAGS="$ARCHFLAGS")
 %% endif
 
+
+env.AppendUnique(CPPPATH=[
+%% if family == "darwin"
+	"/usr/local/include",
+%% endif
+%% for path in include_paths | sort
+    abspath("{{ path }}"),
+%% endfor
+])
+
+files = [
+%% for file, flags in sources if not flags | length
+    env.File("{{ file }}"),
+%% endfor
+]
+%% for file, flags in sources
+    %% if flags | length
+flags = { {%- for key, profiles in flags.items() if "" in profiles %}"{{key}}": {{profiles[""]}}, {% endfor -%} }
+    %% for key, profiles in flags.items()
+        %% for profile, flags in profiles.items() if "" != profile
+if profile == "{{profile}}": flags["{{key}}"].extend({{flags}});
+        %% endfor
+    %% endfor
+files.append(env.Object("{{ file }}", **flags))
+    %% endif
+%% endfor
+
+library = env.StaticLibrary(target="{{ repo }}", source=files)
+
+env.AppendUnique(LIBS=[
+    library,
+%% for library in libraries | sort
+    "{{ library }}",
+%% endfor
+])
+env.AppendUnique(LIBPATH=[
+%% if family == "darwin"
+	"/usr/local/lib",
+%% endif
+    abspath(str(library[0].get_dir())),
+%% for library in library_paths | sort
+    abspath("{{ library }}"),
+%% endfor
+])
+%% if "required_pkg" in metadata
+env.ParseConfig("pkg-config --cflags --libs {{ metadata.required_pkg | sort | join(" ") }}")
+%% endif
 
 Return("library")

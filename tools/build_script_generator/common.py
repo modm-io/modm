@@ -54,14 +54,23 @@ def common_memories(target):
         ])
     return memories
 
-def common_metadata_flags(buildlog, repo=None):
+def common_metadata_flags(metadata, repo=None):
     flags = defaultdict(lambda: defaultdict(list))
-    metadata = buildlog.metadata if repo is None else buildlog.repo_metadata
     for key, values in metadata.items():
         if key.startswith("flags."):
             key = key.split(".")[1:]
             if repo: values = values[repo];
-            flags[key[0].upper()]["" if len(key) < 2 else key[1]] = list(values)
+            flags[key[0].upper()]["" if len(key) < 2 else key[1]].extend(list(values))
+    return flags
+
+def common_file_flags(buildlog, filename):
+    flags = defaultdict(lambda: defaultdict(list))
+    for key, data in buildlog.operation_metadata.items():
+        if key.startswith("flags."):
+            key = key.split(".")[1:]
+            for mfilename, values in data.items():
+                if mfilename == filename:
+                    flags[key[0].upper()]["" if len(key) < 2 else key[1]].extend(list(values))
     return flags
 
 def common_compiler_flags(compiler, target):

@@ -48,7 +48,7 @@ def post_build(env, buildlog):
     # get memory information
     subs["memories"] = common_memories(target)
     # get memory information
-    subs["flags"] = common_metadata_flags(buildlog)
+    subs["flags"] = common_metadata_flags(buildlog.repo_metadata, "modm")
 
     # Add SCons specific data
     subs.update({
