@@ -40,6 +40,7 @@ def git_show(cwd, format, ref='HEAD'):
 	# results for older git versions
 	r = r.decode(locale.getpreferredencoding()).split('\n', 1)[0]
 	if r.startswith("\""): r = r[1:-1];
+	r = r.replace('"', '\\"')
 	return r
 
 def git_config(cwd, key):
@@ -51,6 +52,7 @@ def git_config(cwd, key):
 		r = subprocess.check_output(['git', 'config', key], cwd=cwd)
 		r = r.decode(locale.getpreferredencoding()).split('\n', 1)[0]
 		if r.startswith("\""): r = r[1:-1];
+		r = r.replace('"', '\\"')
 		return r
 	except subprocess.CalledProcessError:
 		return ""
