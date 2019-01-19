@@ -298,7 +298,7 @@ jobs:
           command: |
             (git submodule sync && git submodule update --init --jobs 8) &
             pip3 install -U lbuild &
-            git clone git@github.com:modm-io/modm.io.git ../modm.io &
+            git clone git@github.com:modm-io/modm.io.git docs/modm.io &
             wait
       - run:
           name: Build Homepage
@@ -308,7 +308,8 @@ jobs:
             (cd docs/src/reference && ln -s ../../../examples/stm32f469_discovery/blink/modm/docs/module)
             (cd docs && mkdocs build)
             if [ "$CIRCLE_BRANCH" = "develop" ]; then
-              cd ../modm.io
+              cd docs/modm.io
+
               git config user.email "rca@circleci.com"
               git config user.name "CircleCI Deployment Bot"
               git add -A

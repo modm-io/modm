@@ -13,7 +13,7 @@ copyright: 'Copyright &copy 2009-2019 Niklas Hauser & modm authors'
 
 # Turn around for GitHub Hosting in /docs
 docs_dir: 'src'
-site_dir: '../../modm.io/docs'
+site_dir: 'modm.io/docs'
 extra_css: [extra.css]
 
 theme:
