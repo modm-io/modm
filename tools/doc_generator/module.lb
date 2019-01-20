@@ -119,6 +119,9 @@ def node_name(name):
 def doxify(content):
     content = re.sub(r"```(.+)\n", r"~~~{.\1}\n", content)
     content = re.sub(r"```", "~~~", content)
+    content = re.sub(r"!!! danger", "@warning", content)
+    content = re.sub(r"!!! tip", "@note", content)
+    content = re.sub(r"!!! info", "@note", content)
     content = re.sub(r"!!! *", "@", content)
     return content
 

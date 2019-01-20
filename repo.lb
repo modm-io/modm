@@ -36,7 +36,7 @@ import lbuild
 min_lbuild_version = "1.6.0"
 if StrictVersion(getattr(lbuild, "__version__", "0.1.0")) < StrictVersion(min_lbuild_version):
     print("modm requires at least lbuild v{}, please upgrade!\n"
-          "    pip install -U lbuild".format(min_lbuild_version))
+          "    pip3 install -U lbuild".format(min_lbuild_version))
     exit(1)
 
 

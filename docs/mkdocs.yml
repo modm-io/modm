@@ -1,5 +1,5 @@
 site_name: 'modm barebone embedded library'
-site_description: 'A modular C++14 library for barebone programming'
+site_description: 'A modular C++17 library generator for barebone embedded programming'
 site_author: 'Niklas Hauser'
 site_url: 'http://modm.io'
 
@@ -9,7 +9,7 @@ repo_url: 'https://github.com/modm-io/modm'
 edit_uri: ""
 # dev_addr: 192.168.1.2:8000
 
-copyright: 'Copyright &copy 2018 Niklas Hauser & modm authors'
+copyright: 'Copyright &copy 2009-2019 Niklas Hauser & modm authors'
 
 # Turn around for GitHub Hosting in /docs
 docs_dir: 'src'

@@ -57,7 +57,7 @@ git clone --recurse-submodules https://github.com/modm-io/modm.git
     - GPIO and GPIO expanders.
     - ADC and Analog.
     - UART, I<sup>2</sup>C, SPI, CAN.
-- Interfaces and drivers for many external I2C and SPI sensors and devices.
+- Interfaces and drivers for many external I<sup>2</sup>C and SPI sensors and devices.
 - Debug/logging system with IOStream interface.
 - Lightweight, stackless threads and resumable functions using cooperative multitasking.
 - Useful filter, interpolation and geometric algorithms.

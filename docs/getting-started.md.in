@@ -24,17 +24,19 @@ You can then add all the modules you need and configure them as you want.
 <library>
   <repositories>
     <!-- path to modm repository -->
-    <repository><path>../modm/repo.lb</path><repository>
+    <repository>
+      <path>../modm/repo.lb</path>
+    </repository>
   </repositories>
   <!-- extend this board configuration -->
   <extends>modm:board:disco-f469ni</extends>
   <options>
     <!-- give this project a custom name -->
-    <option name=":build:project.name">test</option>
+    <option name="modm:build:project.name">test</option>
   </options>
   <modules>
     <!-- include the SCons build module -->
-    <module>:build:scons</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>
 ```
