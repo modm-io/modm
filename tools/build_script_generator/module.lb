@@ -14,7 +14,8 @@ import os
 import platform
 
 # import all common code
-exec(open(localpath("common.py")).read())
+with open(localpath("common.py")) as common:
+    exec(common.read())
 
 #filter to windowsify paths separators
 def windowsify(path):
