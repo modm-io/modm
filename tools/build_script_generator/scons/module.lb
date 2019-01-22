@@ -26,6 +26,9 @@ def prepare(module, options):
         BooleanOption(name="include_sconstruct", default=True,
                       description=descr_include_sconstruct))
     module.add_option(
+        StringOption(name="cache_dir", default="/cache",
+                     description=descr_cache_dir))
+    module.add_option(
         StringOption(name="image.source", default="",
                      description=descr_image_source))
     module.add_option(
@@ -35,6 +38,7 @@ def prepare(module, options):
     module.add_option(
         BooleanOption(name="info.build", default=False,
                       description=descr_info_build))
+
 
     return True
 
@@ -101,6 +105,11 @@ def post_build(env, buildlog):
     else:
         build_tools += ["utils_buildsize", "compiler_hosted_gcc"]
 
+    cache_dir = env["cache_dir"]
+    if cache_dir == "/cache":
+        cache_dir = env[":build:build.path"] + "/cache"
+        if "build/" in cache_dir:
+            cache_dir = "{}build/cache".format(cache_dir.split("build/")[0])
     # get memory information
     subs["memories"] = common_memories(target)
     # Add SCons specific data
@@ -111,6 +120,7 @@ def post_build(env, buildlog):
         "is_unittest": is_unittest,
         "has_image_source": has_image_source,
         "image_source": env["image.source"],
+        "cache_dir": cache_dir,
         "has_xpcc_generator": has_xpcc_generator,
         "generator_source": env.get_option(":communication:xpcc:generator:source", ""),
         "generator_container": env.get_option(":communication:xpcc:generator:container", ""),
@@ -168,6 +178,12 @@ def post_build(env, buildlog):
 globals()["descr_include_sconstruct"] = """# Generate a SConstruct file
 
 !!! warning "This overwrites any top-level `SConstruct` file!"
+"""
+
+globals()["descr_cache_dir"] = """# Path to SConstruct CacheDir
+
+If value is `/cache`, the cache is placed into the top-level `build/` folder.
+You can disable CacheDir by setting an empty string.
 """
 
 globals()["descr_image_source"] = """# Path to directory containing .pbm files"""
