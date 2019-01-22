@@ -89,6 +89,7 @@ class Builder(object):
 				"-I", "--include_path",
 				dest = "includePath",
 				default = None,
+				action = "append",
 				help = "Include Search Path [optional]")
 
 		self.setup(optparser)

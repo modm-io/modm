@@ -50,7 +50,8 @@ sources += env.XpccCommunication(
     xmlfile=abspath("{{ generator_source }}"),
     container="{{ generator_container }}",
     path=abspath("{{ generator_path }}"),
-    namespace="{{ generator_namespace }}")
+    namespace="{{ generator_namespace }}",
+    include_paths=["."])
 %% endif
 
 %% if not is_unittest

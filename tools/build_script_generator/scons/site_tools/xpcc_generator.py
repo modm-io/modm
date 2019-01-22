@@ -19,41 +19,44 @@
 
 import os
 import re
+import sys
 import SCons
 import SCons.Errors
 
-# TODO make this more robust against whitespace etc.
-includeExpression = re.compile(r'<include>(\S+)</include>', re.M)
+# -----------------------------------------------------------------------------
+# FIXME: Copied directly from `xmlparser/parser.py:222:Parser.find_include_file
+def find_include_file(filename, include_file, include_paths, line_count):
+	# 1.) include file name can be absolute
+	if os.path.isabs(filename):
+		return filename
+	# 2.) it could be a path relative to the file's path
+	#     this works just like #include "{filename}" in C/C++
+	relative_to_file = os.path.abspath(os.path.join(os.path.dirname(include_file), filename))
+	if os.path.isfile(relative_to_file):
+		return relative_to_file
+	# 3.) it could be a path relative to the include path
+	for path in include_paths:
+		relative_to_include_path = os.path.abspath(os.path.join(path, filename))
+		if os.path.isfile(relative_to_include_path):
+			return relative_to_include_path
+	# 4.) Error!
+	raise SCons.Errors.UserError("Could not find include file '%s' in '%s:%s'" % (filename, include_file, line_count))
 
 # -----------------------------------------------------------------------------
-def find_includes(env, file, include_path):
+def find_includes(env, file, include_paths):
 	""" Find include directives in an XML file """
+	includeExpression = re.compile(r'<include>(\S+)</include>', re.M)
 	files = []
-	line_count = 0
-	for line in open(file).readlines():
-		line_count = line_count + 1
+	for line_number, line in enumerate(open(file).readlines()):
 		match = includeExpression.search(line)
 		if match:
-			filename = match.group(1)
-			relative_to_file = os.path.join(os.path.dirname(os.path.abspath(file)), filename)
-			relative_to_include_path = os.path.join(include_path, filename)
-			# 1.) include file name can be absolute
-			if os.path.isabs(filename):
-				files.append(filename)
-			# 2.) it could be a path relative to the file's path
-			#     this works just like #include "{filename}" in C/C++
-			elif os.path.isfile(relative_to_file):
-				files.append(relative_to_file)
-			# 3.) it could be a path relative to the include path
-			elif os.path.isfile(relative_to_include_path):
-				files.append(relative_to_include_path)
-			# 4.) Error!
-			else:
-				env.Error("Could not find include file '%s' in '%s:%s'" % (filename, file, line_count))
+			files.append(find_include_file(match.group(1).strip(), file, include_paths, line_number))
 	return files
 
+global_include_paths = []
 def xml_include_scanner(node, env, path, arg=None):
 	""" Generates the dependencies for the XML files """
+	global global_include_paths
 	abspath, targetFilename = os.path.split(node.get_abspath())
 
 	stack = [targetFilename]
@@ -61,7 +64,7 @@ def xml_include_scanner(node, env, path, arg=None):
 
 	while stack:
 		nextFile = stack.pop()
-		files = find_includes(env, os.path.join(abspath, nextFile), abspath)
+		files = find_includes(env, os.path.join(abspath, nextFile), [abspath] + global_include_paths)
 		for file in files:
 			if file not in dependencies:
 				stack.append(file)
@@ -72,70 +75,55 @@ def xml_include_scanner(node, env, path, arg=None):
 
 # -----------------------------------------------------------------------------
 def packet_emitter(target, source, env):
-	try:
-		path = env['path']
-	except KeyError:
-		path = '.'
-
+	path = env.get('path', '.')
 	target = [os.path.join(path, "packets.cpp"),
 			  os.path.join(path, "packets.hpp")]
 
 	return (target, source)
 
 def identifier_emitter(target, source, env):
-	try:
-		path = env['path']
-	except KeyError:
-		path = '.'
-
+	path = env.get('path', '.')
 	target = [os.path.join(path, "identifier.hpp")]
 
 	return (target, source)
 
 def postman_emitter(target, source, env):
-	try:
-		path = env['path']
-	except KeyError:
-		path = '.'
-
+	path = env.get('path', '.')
 	target = [os.path.join(path, "postman.cpp"),
 			  os.path.join(path, "postman.hpp")]
-
 	return (target, source)
 
 def communication_emitter(target, source, env):
-	try:
-		path = env['path']
-	except KeyError:
-		path = '.'
-
+	path = env.get('path', '.')
 	target = [os.path.join(path, "communication.hpp")]
-
 	return (target, source)
 
 def xpcc_task_caller_emitter(target, source, env):
-	try:
-		path = env['path']
-	except KeyError:
-		path = '.'
-
+	path = env.get('path', '.')
 	target = [os.path.join(path, "caller.hpp")]
 	return (target, source)
 
-def xpcc_communication_header(env, xmlfile, container, path='.', dtdPath='default', namespace='robot'):
-	if dtdPath == 'default':
+def xpcc_communication_header(env, xmlfile, container, path=None, dtdPath=None, namespace=None, include_paths=None):
+	global global_include_paths
+	if path is None:
+		path = '.';
+	if dtdPath is None:
 		dtdPath = os.path.join(env['XPCC_SYSTEM_DESIGN'], "xml/dtd")
-	files  = env.SystemCppPackets(xmlfile, path=path, dtdPath=dtdPath, namespace=namespace)
-	files += env.SystemCppIdentifier(xmlfile, path=path, dtdPath=dtdPath, namespace=namespace)
-	files += env.SystemCppCommunication(xmlfile, path=path, dtdPath=dtdPath, namespace=namespace)
-	files += env.SystemCppXpccTaskCaller(xmlfile, path=path, dtdPath=dtdPath, namespace=namespace)
-	files += env.SystemCppPostman(
-			target='postman',
-			source=xmlfile,
-			container=container,
-			path=path,
-			dtdPath=dtdPath,
-			namespace=namespace)
+	if namespace is None:
+		namespace = 'robot'
+	if include_paths is None:
+		include_paths = [os.path.abspath('.')]
+	else:
+		include_paths = [os.path.abspath(p) for p in include_paths]
+	global_include_paths = include_paths
+	include_paths = " ".join(['--include_path "{}"'.format(p) for p in include_paths])
+
+	files  = env.SystemCppPackets(xmlfile, path=path, dtdPath=dtdPath, namespace=namespace, include_paths=include_paths)
+	files += env.SystemCppIdentifier(xmlfile, path=path, dtdPath=dtdPath, namespace=namespace, include_paths=include_paths)
+	files += env.SystemCppCommunication(xmlfile, path=path, dtdPath=dtdPath, namespace=namespace, include_paths=include_paths)
+	files += env.SystemCppXpccTaskCaller(xmlfile, path=path, dtdPath=dtdPath, namespace=namespace, include_paths=include_paths)
+	files += env.SystemCppPostman(source=xmlfile, path=path, dtdPath=dtdPath, namespace=namespace, include_paths=include_paths,
+	                              target='postman', container=container)
 
 	source = []
 	for file in files:
@@ -158,6 +146,7 @@ def generate(env, **kw):
 					'--header_path ${TARGETS[1].dir} ' \
 					'--dtdpath "${dtdPath}" ' \
 					'--namespace "${namespace}" ' \
+					'${include_paths} ' \
 					'$SOURCE',
 				cmdstr="$SYSTEM_CPP_PACKETS_COMSTR"),
 			emitter = packet_emitter,
@@ -173,6 +162,7 @@ def generate(env, **kw):
 					'--outpath ${TARGET.dir} ' \
 					'--dtdpath "${dtdPath}" ' \
 					'--namespace "${namespace}" ' \
+					'${include_paths} ' \
 					'$SOURCE',
 				cmdstr="$SYSTEM_CPP_IDENTIFIER_COMSTR"),
 			emitter = identifier_emitter,
@@ -189,6 +179,7 @@ def generate(env, **kw):
 					'--outpath ${TARGET.dir} ' \
 					'--dtdpath "${dtdPath}" ' \
 					'--namespace "${namespace}" ' \
+					'${include_paths} ' \
 					'$SOURCE',
 				cmdstr="$SYSTEM_CPP_POSTMAN_COMSTR"),
 			emitter = postman_emitter,
@@ -204,6 +195,7 @@ def generate(env, **kw):
 					'--outpath ${TARGET.dir} ' \
 					'--dtdpath "${dtdPath}" ' \
 					'--namespace "${namespace}" ' \
+					'${include_paths} ' \
 					'$SOURCE',
 				cmdstr="$SYSTEM_CPP_COMMUNICATION_COMSTR"),
 			emitter = communication_emitter,
@@ -219,6 +211,7 @@ def generate(env, **kw):
 					'--outpath ${TARGET.dir} ' \
 					'--dtdpath "${dtdPath}" ' \
 					'--namespace "${namespace}" ' \
+					'${include_paths} ' \
 					'$SOURCE',
 				cmdstr="$SYSTEM_CPP_XPCC_TASK_CALLER_COMSTR"),
 			emitter = xpcc_task_caller_emitter,
