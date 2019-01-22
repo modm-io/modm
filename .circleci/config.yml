@@ -9,7 +9,10 @@ jobs:
       - SCONSFLAGS: "-j4"
     steps:
       - checkout
-      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & ls -aR1 test > cache_checksum_unittests & wait
+      - restore_cache:
+          keys:
+            - scons-cache-unittests-{{ checksum "cache_checksum_unittests" }}
       - run:
           name: Check environment
           command: |
@@ -58,6 +61,10 @@ jobs:
           name: Check for Unique Build Paths
           command: |
             python3 tools/scripts/examples_check.py examples
+      - save_cache:
+          key: scons-cache-unittests-{{ checksum "cache_checksum_unittests" }}
+          paths:
+            - "build/cache"
 
   stm32-examples:
     docker:
@@ -68,7 +75,10 @@ jobs:
       - SCONSFLAGS: "-j4"
     steps:
       - checkout
-      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & ls -aR1 examples > cache_checksum_examples & wait
+      - restore_cache:
+          keys:
+            - scons-cache-stm32-examples-{{ checksum "cache_checksum_examples" }}
       - run:
           name: Examples STM32F0 Series
           command: |
@@ -89,6 +99,10 @@ jobs:
           name: Examples STM32L4 Series
           command: |
             (cd examples && ../tools/scripts/examples_compile.py stm32l476_discovery nucleo_l476rg nucleo_l432kc)
+      - save_cache:
+          key: scons-cache-stm32-examples-{{ checksum "cache_checksum_examples" }}
+          paths:
+            - "build/cache"
 
   stm32f4-examples:
     docker:
@@ -99,12 +113,19 @@ jobs:
       - SCONSFLAGS: "-j4"
     steps:
       - checkout
-      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & ls -aR1 examples > cache_checksum_examples & wait
+      - restore_cache:
+          keys:
+            - scons-cache-stm32f4-examples-{{ checksum "cache_checksum_examples" }}
       - run:
           name: Examples STM32F4 Series
           command: |
             (cd examples && ../tools/scripts/examples_compile.py stm32f4_discovery)
             (cd examples && ../tools/scripts/examples_compile.py stm32f429_discovery stm32f469_discovery nucleo_f401re nucleo_f411re nucleo_f429zi)
+      - save_cache:
+          key: scons-cache-stm32f4-examples-{{ checksum "cache_checksum_examples" }}
+          paths:
+            - "build/cache"
 
   avr-examples:
     docker:
@@ -115,11 +136,18 @@ jobs:
       - SCONSFLAGS: "-j4"
     steps:
       - checkout
-      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & ls -aR1 examples > cache_checksum_examples & wait
+      - restore_cache:
+          keys:
+            - scons-cache-avr-examples-{{ checksum "cache_checksum_examples" }}
       - run:
           name: Examples AVR Series
           command: |
             (cd examples && ../tools/scripts/examples_compile.py avr arduino_uno)
+      - save_cache:
+          key: scons-cache-avr-examples-{{ checksum "cache_checksum_examples" }}
+          paths:
+            - "build/cache"
 
   linux-generic-examples:
     docker:
@@ -130,7 +158,10 @@ jobs:
       - SCONSFLAGS: "-j4"
     steps:
       - checkout
-      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & ls -aR1 examples > cache_checksum_examples & wait
+      - restore_cache:
+          keys:
+            - scons-cache-linux-generic-examples-{{ checksum "cache_checksum_examples" }}
       - run:
           name: Linux Examples
           command: |
@@ -139,6 +170,10 @@ jobs:
           name: Generic Examples
           command: |
             (cd examples && ../tools/scripts/examples_compile.py generic)
+      - save_cache:
+          key: scons-cache-linux-generic-examples-{{ checksum "cache_checksum_examples" }}
+          paths:
+            - "build/cache"
 
   avr-compile-all:
     docker:
@@ -149,7 +184,10 @@ jobs:
       - SCONSFLAGS: "-j4"
     steps:
       - checkout
-      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & ls -aR1 test > cache_checksum_test & wait
+      - restore_cache:
+          keys:
+            - scons-cache-avr-all-{{ checksum "cache_checksum_test" }}
       - run:
           name: Compile HAL for all AVRs
           command: |
@@ -157,6 +195,10 @@ jobs:
       - store_artifacts:
           path: test/all/log
           destination: log
+      - save_cache:
+          key: scons-cache-avr-all-{{ checksum "cache_checksum_test" }}
+          paths:
+            - "build/cache"
 
   stm32f0-compile-all:
     docker:
@@ -167,7 +209,10 @@ jobs:
       - SCONSFLAGS: "-j4"
     steps:
       - checkout
-      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & ls -aR1 test > cache_checksum_test & wait
+      - restore_cache:
+          keys:
+            - scons-cache-stm32f0-all-{{ checksum "cache_checksum_test" }}
       - run:
           name: Compile HAL for all STM32F0
           command: |
@@ -175,6 +220,10 @@ jobs:
       - store_artifacts:
           path: test/all/log
           destination: log
+      - save_cache:
+          key: scons-cache-stm32f0-all-{{ checksum "cache_checksum_test" }}
+          paths:
+            - "build/cache"
 
   stm32f1-compile-all:
     docker:
@@ -185,7 +234,10 @@ jobs:
       - SCONSFLAGS: "-j4"
     steps:
       - checkout
-      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & ls -aR1 test > cache_checksum_test & wait
+      - restore_cache:
+          keys:
+            - scons-cache-stm32f1-all-{{ checksum "cache_checksum_test" }}
       - run:
           name: Compile HAL for all STM32F1
           command: |
@@ -193,6 +245,10 @@ jobs:
       - store_artifacts:
           path: test/all/log
           destination: log
+      - save_cache:
+          key: scons-cache-stm32f1-all-{{ checksum "cache_checksum_test" }}
+          paths:
+            - "build/cache"
 
   stm32f2-compile-all:
     docker:
@@ -203,7 +259,10 @@ jobs:
       - SCONSFLAGS: "-j4"
     steps:
       - checkout
-      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & ls -aR1 test > cache_checksum_test & wait
+      - restore_cache:
+          keys:
+            - scons-cache-stm32f2-all-{{ checksum "cache_checksum_test" }}
       - run:
           name: Compile HAL for all STM32F2
           command: |
@@ -211,6 +270,10 @@ jobs:
       - store_artifacts:
           path: test/all/log
           destination: log
+      - save_cache:
+          key: scons-cache-stm32f2-all-{{ checksum "cache_checksum_test" }}
+          paths:
+            - "build/cache"
 
   stm32f3-compile-all:
     docker:
@@ -221,7 +284,10 @@ jobs:
       - SCONSFLAGS: "-j4"
     steps:
       - checkout
-      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & ls -aR1 test > cache_checksum_test & wait
+      - restore_cache:
+          keys:
+            - scons-cache-stm32f3-all-{{ checksum "cache_checksum_test" }}
       - run:
           name: Compile HAL for all STM32F3
           command: |
@@ -229,6 +295,10 @@ jobs:
       - store_artifacts:
           path: test/all/log
           destination: log
+      - save_cache:
+          key: scons-cache-stm32f3-all-{{ checksum "cache_checksum_test" }}
+          paths:
+            - "build/cache"
 
   stm32f4-compile-all:
     docker:
@@ -239,7 +309,10 @@ jobs:
       - SCONSFLAGS: "-j4"
     steps:
       - checkout
-      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & ls -aR1 test > cache_checksum_test & wait
+      - restore_cache:
+          keys:
+            - scons-cache-stm32f4-all-{{ checksum "cache_checksum_test" }}
       - run:
           name: Compile HAL for all STM32F4
           command: |
@@ -247,6 +320,10 @@ jobs:
       - store_artifacts:
           path: test/all/log
           destination: log
+      - save_cache:
+          key: scons-cache-stm32f4-all-{{ checksum "cache_checksum_test" }}
+          paths:
+            - "build/cache"
 
   stm32f7-compile-all:
     docker:
@@ -257,7 +334,10 @@ jobs:
       - SCONSFLAGS: "-j4"
     steps:
       - checkout
-      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & ls -aR1 test > cache_checksum_test & wait
+      - restore_cache:
+          keys:
+            - scons-cache-stm32f7-all-{{ checksum "cache_checksum_test" }}
       - run:
           name: Compile HAL for all STM32F7
           command: |
@@ -265,6 +345,10 @@ jobs:
       - store_artifacts:
           path: test/all/log
           destination: log
+      - save_cache:
+          key: scons-cache-stm32f7-all-{{ checksum "cache_checksum_test" }}
+          paths:
+            - "build/cache"
 
   stm32l4-compile-all:
     docker:
@@ -275,7 +359,10 @@ jobs:
       - SCONSFLAGS: "-j4"
     steps:
       - checkout
-      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & ls -aR1 test > cache_checksum_test & wait
+      - restore_cache:
+          keys:
+            - scons-cache-stm32l4-all-{{ checksum "cache_checksum_test" }}
       - run:
           name: Compile HAL for all STM32L4
           command: |
@@ -283,6 +370,10 @@ jobs:
       - store_artifacts:
           path: test/all/log
           destination: log
+      - save_cache:
+          key: scons-cache-stm32l4-all-{{ checksum "cache_checksum_test" }}
+          paths:
+            - "build/cache"
 
   build-docs:
     docker:
@@ -309,7 +400,6 @@ jobs:
             (cd docs && mkdocs build)
             if [ "$CIRCLE_BRANCH" = "develop" ]; then
               cd docs/modm.io
-
               git config user.email "rca@circleci.com"
               git config user.name "CircleCI Deployment Bot"
               git add -A
