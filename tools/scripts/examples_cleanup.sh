@@ -16,3 +16,4 @@ find ${@:1} -name gdbinit -delete
 
 find ${@:1} -type d -name modm -exec rm -rf "{}" \;
 find ${@:1} -type d -name generated -exec rm -rf "{}" \;
+find ${@:1} -type d -name build -exec rm -rf "{}" \;
