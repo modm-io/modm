@@ -14,6 +14,15 @@ import subprocess
 import multiprocessing
 from pathlib import Path
 
+is_running_in_ci = os.getenv("CIRCLECI") is not None
+cpus = 4 if is_running_in_ci else os.cpu_count()
+build_dir = (Path(os.path.abspath(__file__)).parents[2] / "build")
+cache_dir = build_dir / "cache"
+global_options = {}
+if is_running_in_ci:
+	global_options["::build.path"] = "build/"
+	global_options[":::cache_dir"] = str(cache_dir)
+
 def run(where, command):
 	result = subprocess.run(command, shell=True, cwd=where, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	output = ""
@@ -25,7 +34,8 @@ def run(where, command):
 def generate(project):
 	path = project.parent
 	output = ["=" * 90, "Generating: {}".format(path)]
-	rc, ro = run(path, "lbuild build")
+	options = " ".join("-D{}={}".format(k, v) for k,v in global_options.items())
+	rc, ro = run(path, "lbuild {} build".format(options))
 	print("\n".join(output + [ro]))
 	return None if rc else project
 
@@ -34,7 +44,7 @@ def build(project):
 	project_cfg = project.read_text()
 	commands = []
 	if ":build:scons" in project_cfg:
-		commands.append("scons build")
+		commands.append("scons build --cache-show --random")
 	if ":build:cmake" in project_cfg:
 		commands.append("make")
 
@@ -48,10 +58,9 @@ def build(project):
 	return None if rcs else project
 
 
-cpus = 4 if os.getenv("CIRCLECI") else os.cpu_count()
 print("Using {}x parallelism".format(cpus))
 # Create build folder to prevent process race
-(Path(os.path.abspath(__file__)).parents[2] / "build").mkdir(exist_ok=True)
+cache_dir.mkdir(exist_ok=True, parents=True)
 # Find all project files
 projects = [p for path in sys.argv[1:] for p in Path(path).glob("**/project.xml")]
 # first generate all projects
