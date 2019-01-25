@@ -3,10 +3,6 @@ jobs:
   unittests:
     docker:
       - image: modm/modm-build:latest
-    environment:
-      - LANG: "en_US.UTF-8"
-      - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j4"
     steps:
       - checkout
       - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
@@ -62,10 +58,6 @@ jobs:
   stm32-examples:
     docker:
       - image: modm/modm-build:latest
-    environment:
-      - LANG: "en_US.UTF-8"
-      - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j4"
     steps:
       - checkout
       - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
@@ -93,10 +85,6 @@ jobs:
   stm32f4-examples:
     docker:
       - image: modm/modm-build:latest
-    environment:
-      - LANG: "en_US.UTF-8"
-      - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j4"
     steps:
       - checkout
       - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
@@ -109,10 +97,6 @@ jobs:
   avr-examples:
     docker:
       - image: modm/modm-build:latest
-    environment:
-      - LANG: "en_US.UTF-8"
-      - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j4"
     steps:
       - checkout
       - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
@@ -124,10 +108,6 @@ jobs:
   linux-generic-examples:
     docker:
       - image: modm/modm-build:latest
-    environment:
-      - LANG: "en_US.UTF-8"
-      - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j4"
     steps:
       - checkout
       - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
@@ -143,10 +123,6 @@ jobs:
   avr-compile-all:
     docker:
       - image: modm/modm-build:latest
-    environment:
-      - LANG: "en_US.UTF-8"
-      - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j4"
     steps:
       - checkout
       - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
@@ -161,10 +137,6 @@ jobs:
   stm32f0-compile-all:
     docker:
       - image: modm/modm-build:latest
-    environment:
-      - LANG: "en_US.UTF-8"
-      - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j4"
     steps:
       - checkout
       - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
@@ -179,10 +151,6 @@ jobs:
   stm32f1-compile-all:
     docker:
       - image: modm/modm-build:latest
-    environment:
-      - LANG: "en_US.UTF-8"
-      - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j4"
     steps:
       - checkout
       - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
@@ -197,10 +165,6 @@ jobs:
   stm32f2-compile-all:
     docker:
       - image: modm/modm-build:latest
-    environment:
-      - LANG: "en_US.UTF-8"
-      - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j4"
     steps:
       - checkout
       - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
@@ -215,10 +179,6 @@ jobs:
   stm32f3-compile-all:
     docker:
       - image: modm/modm-build:latest
-    environment:
-      - LANG: "en_US.UTF-8"
-      - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j4"
     steps:
       - checkout
       - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
@@ -233,10 +193,6 @@ jobs:
   stm32f4-compile-all:
     docker:
       - image: modm/modm-build:latest
-    environment:
-      - LANG: "en_US.UTF-8"
-      - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j4"
     steps:
       - checkout
       - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
@@ -251,10 +207,6 @@ jobs:
   stm32f7-compile-all:
     docker:
       - image: modm/modm-build:latest
-    environment:
-      - LANG: "en_US.UTF-8"
-      - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j4"
     steps:
       - checkout
       - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
@@ -269,10 +221,6 @@ jobs:
   stm32l4-compile-all:
     docker:
       - image: modm/modm-build:latest
-    environment:
-      - LANG: "en_US.UTF-8"
-      - SCONS_LIB_DIR: "/usr/local/lib/python3.6/dist-packages/scons-3.0.1"
-      - SCONSFLAGS: "-j4"
     steps:
       - checkout
       - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
@@ -287,8 +235,6 @@ jobs:
   build-docs:
     docker:
       - image: modm/modm-build:latest
-    environment:
-      - LANG: "en_US.UTF-8"
     steps:
       - checkout
       - add_ssh_keys:
