@@ -145,11 +145,14 @@ def prepare(module, options):
     module.add_option(BooleanOption(name="generate_module_docs",
                                     description="Generate the module docs (alpha)",
                                     default=False))
+    module.add_option(BooleanOption(name="generate_module_docs_as_qch",
+                                    description="Generate the module docs as qch (Qt Help format) (alpha)",
+                                    default=False))
     return True
 
 def build(env):
     env.outbasepath = "modm/docs"
-    env.substitutions = {"xml": env["generate_module_docs"]}
+    env.substitutions = {"xml": env["generate_module_docs"], "qch": env["generate_module_docs_as_qch"]}
     env.template("doxyfile.cfg.in")
     env.copy(repopath("README.md"), "README.md")
 

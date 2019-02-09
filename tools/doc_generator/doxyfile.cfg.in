@@ -15,6 +15,11 @@ QUIET                  = {{ "YES" if xml else "NO" }}
 WARN_LOGFILE           = doxygen_warnings.txt
 
 GENERATE_HTML          = YES
+{% if qch %}
+GENERATE_QHP           = YES
+QHP_NAMESPACE          = org.modm
+QHG_LOCATION           = /usr/bin/qhelpgenerator
+{% endif %}
 GENERATE_LATEX         = NO
 GENERATE_MAN           = NO
 GENERATE_RTF           = NO
