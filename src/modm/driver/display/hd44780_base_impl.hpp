@@ -40,6 +40,7 @@ modm::Hd44780Base<DATA, RW, RS, E>::initialize(LineMode lineMode)
 	if (DATA::width == 4) {
 		while(isBusy())
 			;
+		RW::set(RW_Write);
 		Bus<DATA, E, DATA::width>::writeHighNibble(Set4BitBus);
 	}
 
