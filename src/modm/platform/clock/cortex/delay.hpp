@@ -20,9 +20,9 @@
 #include <stdint.h>
 #include <modm/architecture/utils.hpp>
 
-extern "C" void _delay_ns(uint32_t ns);
-extern "C" void _delay_us(uint32_t us);
-extern "C" void _delay_ms(uint32_t ms);
+extern "C" void _delay_ns(uint16_t ns);
+extern "C" void _delay_us(uint16_t us);
+extern "C" void _delay_ms(uint16_t ms);
 
 namespace modm
 {
