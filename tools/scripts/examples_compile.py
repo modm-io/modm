@@ -57,24 +57,26 @@ def build(project):
 
 	return None if rcs else project
 
+def compile_examples(paths):
+	print("Using {}x parallelism".format(cpus))
+	# Create build folder to prevent process race
+	cache_dir.mkdir(exist_ok=True, parents=True)
+	# Find all project files
+	projects = [p for path in paths for p in Path(path).glob("**/project.xml")]
+	# first generate all projects
+	with multiprocessing.Pool(cpus) as pool:
+		projects = pool.map(generate, projects)
+	results = projects.count(None)
 
-print("Using {}x parallelism".format(cpus))
-# Create build folder to prevent process race
-cache_dir.mkdir(exist_ok=True, parents=True)
-# Find all project files
-projects = [p for path in sys.argv[1:] for p in Path(path).glob("**/project.xml")]
-# first generate all projects
-with multiprocessing.Pool(cpus) as pool:
-    projects = pool.map(generate, projects)
-results = projects.count(None)
+	# Filter projects for successful generation
+	projects = [p for p in projects if p is not None]
+	# Then build the successfully generated ones
+	with multiprocessing.Pool(cpus) as pool:
+		projects = pool.map(build, projects)
+	results += projects.count(None)
 
-# Filter projects for successful generation
-projects = [p for p in projects if p is not None]
-# Then build the successfully generated ones
-with multiprocessing.Pool(cpus) as pool:
-    projects = pool.map(build, projects)
-results += projects.count(None)
-
-exit(results)
+	return results
 
 
+if __name__ == '__main__':
+	exit(compile_examples(sys.argv[1:]))

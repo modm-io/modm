@@ -37,11 +37,12 @@ def check_unique_paths(projects):
 	return result
 
 
-# Find all project files
-projects = [p for path in sys.argv[1:] for p in Path(path).glob("**/project.xml")]
+if __name__ == "__main__":
+	# Find all project files
+	projects = [p for path in sys.argv[1:] for p in Path(path).glob("**/project.xml")]
 
-result = check_unique_paths(projects)
+	result = check_unique_paths(projects)
 
-exit(result)
+	exit(result)
 
 
