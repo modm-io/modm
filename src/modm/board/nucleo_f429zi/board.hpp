@@ -80,10 +80,9 @@ struct systemClock
 		ClockControl::enableExternalClock(); // 8 MHz
 		ClockControl::enablePll(
 			ClockControl::PllSource::ExternalClock,
-			4,      // 8MHz / N=4 -> 2MHz
-			180,    // 2MHz * M=180 -> 360MHz
-			2,      // 360MHz / P=2 -> 180MHz = F_cpu
-			7       // 360MHz / Q=7 -> ~51MHz = F_usb => bad for USB
+			4,		// 8MHz / N=4 -> 2MHz
+			180,	// 2MHz * M=180 -> 360MHz
+			2		// 360MHz / P=2 -> 180MHz = F_cpu
 		);
 		ClockControl::setFlashLatency(Frequency);
 		ClockControl::enableSystemClock(ClockControl::SystemClockSource::Pll);

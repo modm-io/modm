@@ -86,7 +86,6 @@ struct systemClock {
 		ClockControl::enableExternalClock();	// 8MHz
 		ClockControl::enablePll(
 			ClockControl::PllSource::ExternalClock,
-			ClockControl::UsbPrescaler::Div1_5,
 			9,
 			1
 		);

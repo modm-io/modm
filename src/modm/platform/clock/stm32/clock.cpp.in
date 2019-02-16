@@ -137,14 +137,10 @@ modm::platform::ClockControl::enableLowSpeedExternalCrystal(uint32_t waitCycles)
 %% if target["family"] in ["f2", "f4", "f7"]
 // ----------------------------------------------------------------------------
 bool
-modm::platform::ClockControl::enablePll(PllSource source, uint8_t pllM,
-	uint16_t pllN, uint8_t pllP, uint8_t pllQ, uint32_t waitCycles)
+modm::platform::ClockControl::enablePll(PllSource source, uint8_t pllM, uint16_t pllN, uint8_t pllP, uint32_t waitCycles)
 {
-	uint32_t tmp = 0;
-
-
 	// Read reserved values and clear all other values
-	tmp = RCC->PLLCFGR & ~(RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLM
+	uint32_t tmp = RCC->PLLCFGR & ~(RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLM
 			| RCC_PLLCFGR_PLLN | RCC_PLLCFGR_PLLP | RCC_PLLCFGR_PLLQ);
 
 	// PLLSRC source for pll and for plli2s
@@ -154,13 +150,13 @@ modm::platform::ClockControl::enablePll(PllSource source, uint8_t pllM,
 	tmp |= ((uint32_t) pllM) & RCC_PLLCFGR_PLLM;
 
 	// PLLN (6) = factor is user defined
-	tmp |= (((uint32_t) pllN) << 6) & RCC_PLLCFGR_PLLN;
+	tmp |= (((uint32_t) pllN) << RCC_PLLCFGR_PLLN_Pos) & RCC_PLLCFGR_PLLN;
 
 	// PLLP (16) divider for CPU frequency; (00: PLLP = 2, 01: PLLP = 4, etc.)
-	tmp |= (((uint32_t) (pllP / 2) - 1) << 16) & RCC_PLLCFGR_PLLP;
+	tmp |= (((uint32_t) (pllP / 2) - 1) << RCC_PLLCFGR_PLLP_Pos) & RCC_PLLCFGR_PLLP;
 
 	// PLLQ (24) divider for USB frequency; (0-15)
-	tmp |= (((uint32_t) pllQ) << 24) & RCC_PLLCFGR_PLLQ;
+	// tmp |= (((uint32_t) pllQ) << RCC_PLLCFGR_PLLQ_Pos) & RCC_PLLCFGR_PLLQ;
 
 	RCC->PLLCFGR = tmp;
 
@@ -175,44 +171,36 @@ modm::platform::ClockControl::enablePll(PllSource source, uint8_t pllM,
 %% elif target["family"] in ["l4"]
 // ----------------------------------------------------------------------------
 bool
-modm::platform::ClockControl::enablePll(PllSource source, uint8_t pllM,
-	uint16_t pllN, uint8_t pllR, uint8_t pllQ, uint32_t waitCycles)
+modm::platform::ClockControl::enablePll(PllSource source,
+	uint8_t pllM, uint16_t pllN, uint8_t pllR, uint32_t waitCycles)
 {
-	uint32_t tmp = 0;
-
 	// Read reserved values and clear all other values
-	tmp = RCC->PLLCFGR & ~(RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLM
-			| RCC_PLLCFGR_PLLN
+	uint32_t tmp = RCC->PLLCFGR & ~(
+			RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLM | RCC_PLLCFGR_PLLN |
 %% if pll_p
-			| RCC_PLLCFGR_PLLPEN
-			| RCC_PLLCFGR_PLLP
+			// RCC_PLLCFGR_PLLPEN | RCC_PLLCFGR_PLLP |
 %% endif
-%% if sai2clkdiv is defined
-			| RCC_PLLCFGR_PLLPDIV
-%% endif
-			| RCC_PLLCFGR_PLLQEN | RCC_PLLCFGR_PLLQ
-			| RCC_PLLCFGR_PLLREN | RCC_PLLCFGR_PLLR);
+			// RCC_PLLCFGR_PLLQEN | RCC_PLLCFGR_PLLQ |
+			RCC_PLLCFGR_PLLREN | RCC_PLLCFGR_PLLR);
 
-	// PLLSRC source for pll and for pllsai1
+	// PLLSRC source for pll
 	tmp |= static_cast<uint32_t>(source);
 
-	// PLLM (4) = factor is user defined VCO input frequency must be configured between 4MHz and 16Mhz
-	tmp |= ((uint32_t) (pllM - 1) << 4) & RCC_PLLCFGR_PLLM;
+	// PLLM factor is user defined VCO input frequency must be configured between 4MHz and 16Mhz
+	tmp |= (uint32_t(pllM - 1) << RCC_PLLCFGR_PLLM_Pos) & RCC_PLLCFGR_PLLM;
 
-	// PLLN (8) = factor is user defined
-	tmp |= (((uint32_t) pllN) << 8) & RCC_PLLCFGR_PLLN;
+	// PLLN factor is user defined: between 64 and 344 MHz
+	tmp |= (uint32_t(pllN) << RCC_PLLCFGR_PLLN_Pos) & RCC_PLLCFGR_PLLN;
 
+	// PLLR divider for CPU frequency
+	tmp |= ((uint32_t(pllR / 2) - 1) << RCC_PLLCFGR_PLLR_Pos) & RCC_PLLCFGR_PLLR;
 	// PLLQ (21) divider for USB frequency; (00: PLLQ = 2, 01: PLLQ = 4, etc.)
-	tmp |= (((uint32_t) (pllQ / 2) - 1) << 21) & RCC_PLLCFGR_PLLQ;
-
-	// PLLR (25) divider for CPU frequency; (00: PLLR = 2, 01: PLLR = 4, etc.)
-	tmp |= (((uint32_t) (pllR / 2) - 1) << 25) & RCC_PLLCFGR_PLLR;
+	// tmp |= (((uint32_t) (pllQ / 2) - 1) << RCC_PLLCFGR_PLLQ_Pos) & RCC_PLLCFGR_PLLQ;
+	// enable pll USB clock output
+	// tmp |= RCC_PLLCFGR_PLLQEN;
 
 	// enable pll CPU clock output
 	tmp |= RCC_PLLCFGR_PLLREN;
-
-	// enable pll USB clock output
-	tmp |= RCC_PLLCFGR_PLLQEN;
 
 	RCC->PLLCFGR = tmp;
 
@@ -228,9 +216,6 @@ modm::platform::ClockControl::enablePll(PllSource source, uint8_t pllM,
 // ----------------------------------------------------------------------------
 bool
 modm::platform::ClockControl::enablePll(PllSource source,
-%% if usbprescaler
-			UsbPrescaler usb,
-%% endif
 %% if pllprediv2
 			uint8_t pllMul, uint8_t pllPrediv, uint8_t pllPrediv2, uint32_t waitCycles)
 %% elif pllprediv
@@ -245,7 +230,7 @@ modm::platform::ClockControl::enablePll(PllSource source,
 	uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_USBPRE | {{pullmul}} | RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE);
 
 	// Divide Output for USB Clock by 1.5?
-	tmp |= static_cast<uint32_t>(usb);
+	// tmp |= static_cast<uint32_t>(usb);
 %% else
 	uint32_t tmp = RCC->CFGR & ~({{pullmul}} | RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE);
 %% endif

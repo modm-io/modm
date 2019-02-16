@@ -54,7 +54,7 @@ struct systemClock {
 	{
 		ClockControl::enableInternalClock();	// 8MHz
 		// (internal clock / 2) * 12 = 48MHz
-		ClockControl::enablePll(ClockControl::PllSource::InternalClock, ClockControl::UsbPrescaler::Div1, 12, 2, 1);
+		ClockControl::enablePll(ClockControl::PllSource::InternalClock, 12, 2, 1);
 		// set flash latency for 48MHz
 		ClockControl::setFlashLatency(Frequency);
 		// switch system clock to PLL output

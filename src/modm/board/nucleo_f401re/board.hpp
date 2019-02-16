@@ -67,8 +67,7 @@ struct systemClock {
 			ClockControl::PllSource::InternalClock,
 			4,	//  16MHz / N= 4 -> 4MHz
 			84,	//   4MHz * M=84 -> 336MHz
-			4,	// 336MHz / P= 4 -> 84MHz = F_cpu
-			8	// 336MHz / Q= 7 -> 48MHz = F_usb
+			4	// 336MHz / P= 4 -> 84MHz = F_cpu
 		);
 		// set flash latency for 96MHz
 		ClockControl::setFlashLatency(Frequency);

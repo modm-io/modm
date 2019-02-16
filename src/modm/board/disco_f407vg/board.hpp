@@ -82,8 +82,7 @@ struct systemClock {
 			ClockControl::PllSource::ExternalCrystal,
 			4,		// 8MHz / N=2 -> 2MHz
 			168,	// 2MHz * M=168 -> 336MHz
-			2,		// 336MHz / P=2 -> 168MHz = F_cpu
-			7		// 336MHz / Q=7 -> 48MHz = F_usb
+			2		// 336MHz / P=2 -> 168MHz = F_cpu
 		);
 		// set flash latency for 168MHz
 		ClockControl::setFlashLatency(Frequency);

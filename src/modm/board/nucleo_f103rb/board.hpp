@@ -68,7 +68,7 @@ struct systemClock {
 	{
 		ClockControl::enableInternalClock();	// 8MHz
 		// internal clock / 2 * 16 = 64MHz, => 64/1.5 = 42.6 => bad for USB
-		ClockControl::enablePll(ClockControl::PllSource::InternalClock, ClockControl::UsbPrescaler::Div1_5, 16);
+		ClockControl::enablePll(ClockControl::PllSource::InternalClock, 16);
 		// set flash latency for 64MHz
 		ClockControl::setFlashLatency(Frequency);
 		// switch system clock to PLL output

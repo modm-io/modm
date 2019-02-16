@@ -23,7 +23,7 @@ main()
 	// 48 MHz / 16 = 3 MHz expected at PA8
 	ClockControl::enableClockOutput(
 		ClockControl::ClockOutputSource::MultiSpeedInternalClock,
-		ClockControl::ClockOutputSourcePrescaler::Div16);
+		ClockControl::ClockOutputPrescaler::Div16);
 
 	GpioConnector<Peripheral::Rcc, GpioA8::Mco>::connect();
 

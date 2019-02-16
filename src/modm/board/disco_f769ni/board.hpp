@@ -85,8 +85,7 @@ struct systemClock
 			ClockControl::PllSource::ExternalClock,
 			25,		// 25MHz / N=25 -> 1MHz
 			432,	// 1MHz * M=432 -> 432MHz
-			2,		// 432MHz / P=2 -> 216MHz = F_cpu
-			9		// 432MHz / Q=9 -> 48MHz = F_usb
+			2		// 432MHz / P=2 -> 216MHz = F_cpu
 		);
 		ClockControl::setFlashLatency(Frequency);
 		ClockControl::enableSystemClock(ClockControl::SystemClockSource::Pll);

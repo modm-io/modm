@@ -191,14 +191,14 @@ public:
 	ClockOutputSource : uint32_t
 	{
 		Disable = 0,
-		SystemClock = RCC_CFGR_MCOSEL_0, // SYSCLK
-		MultiSpeedInternalClock = RCC_CFGR_MCOSEL_1, // MSI
-		InternalClock = RCC_CFGR_MCOSEL_1 | RCC_CFGR_MCOSEL_0, // HSI16
-		ExternalClock = RCC_CFGR_MCOSEL_2, // HSE
-		ExternalCrystal = RCC_CFGR_MCOSEL_2, // HSE
-		Pll = RCC_CFGR_MCOSEL_2 | RCC_CFGR_MCOSEL_0, // Main PLL
-		// LSI
-		// LSE
+		SystemClock = (1 << RCC_CFGR_MCOSEL_Pos), // SYSCLK
+		MultiSpeedInternalClock = (2 << RCC_CFGR_MCOSEL_Pos), // MSI
+		InternalClock = (3 << RCC_CFGR_MCOSEL_Pos), // HSI16
+		ExternalClock = (4 << RCC_CFGR_MCOSEL_Pos), // HSE
+		ExternalCrystal = (4 << RCC_CFGR_MCOSEL_Pos), // HSE
+		Pll = (5 << RCC_CFGR_MCOSEL_Pos), // Main PLL
+		LowSpeedInternalClock = (6 << RCC_CFGR_MCOSEL_Pos), // LSI
+		LowSpeedExternalClock = (7 << RCC_CFGR_MCOSEL_Pos), // LSE
 	};
 %% else
 	enum class
@@ -219,14 +219,6 @@ public:
 	%% else
 		Pll = RCC_CFGR_MCO_PLL,	///< divided by 2
 	%% endif
-	};
-%% endif
-%% if usbprescaler
-	enum class
-	UsbPrescaler : uint32_t
-	{
-		Div1 = RCC_CFGR_USBPRE,	///< do not divide
-		Div1_5 = 0,	///< divide by 1.5
 	};
 %% endif
 public:
@@ -313,21 +305,23 @@ public:
 	 *
 	 */
 	static bool
-	enablePll(PllSource source, uint8_t pllM,
-					uint16_t pllN, uint8_t pllP, uint8_t pllQ, uint32_t waitCycles = 2048);
+	enablePll(PllSource source, uint8_t pllM, uint16_t pllN,
+%% if target["family"] in ["l4"]
+	          uint8_t pllR,
+%% else
+			  uint8_t pllP,
+%% endif
+			  uint32_t waitCycles = 2048);
 %% else
 	static bool
 	enablePll(PllSource source,
-%% if usbprescaler
-				UsbPrescaler usb,
-%% endif
+	          uint8_t pllMul,
 	%% if pllprediv2
-				uint8_t pllMul, uint8_t pllPrediv, uint8_t pllPrediv2, uint32_t waitCycles = 2048);
+				uint8_t pllPrediv, uint8_t pllPrediv2,
 	%% elif pllprediv
-				uint8_t pllMul, uint8_t pllPrediv, uint32_t waitCycles = 2048);
-	%% else
-				uint8_t pllMul, uint32_t waitCycles = 2048);
+				uint8_t pllPrediv,
 	%% endif
+				uint32_t waitCycles = 2048);
 %% endif
 
 	// sinks
@@ -367,17 +361,17 @@ public:
 	%% endif
 %% elif target["family"] in ["l4"]
 	enum class
-	ClockOutputSourcePrescaler
+	ClockOutputPrescaler : uint32_t
 	{
-		Div1  = RCC_CFGR_MCOPRE_DIV1,
-		Div2  = RCC_CFGR_MCOPRE_DIV2,
-		Div4  = RCC_CFGR_MCOPRE_DIV4,
-		Div8  = RCC_CFGR_MCOPRE_DIV8,
-		Div16 = RCC_CFGR_MCOPRE_DIV16,
+		Div1 = 0,
+		Div2 = (1 << RCC_CFGR_MCOPRE_Pos),
+		Div4 = (2 << RCC_CFGR_MCOPRE_Pos),
+		Div8 = (3 << RCC_CFGR_MCOPRE_Pos),
+		Div16 = (4 << RCC_CFGR_MCOPRE_Pos),
 	};
 
 	static inline bool
-	enableClockOutput(ClockOutputSource src, ClockOutputSourcePrescaler div = ClockOutputSourcePrescaler::Div1)
+	enableClockOutput(ClockOutputSource src, ClockOutputPrescaler div = ClockOutputPrescaler::Div1)
 	{
 		RCC->CFGR = (RCC->CFGR & ~(RCC_CFGR_MCOSEL)) | uint32_t(src) | uint32_t(div);
 		return true;

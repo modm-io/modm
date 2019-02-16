@@ -62,7 +62,7 @@ struct systemClock {
 		ClockControl::enableExternalCrystal();
 
 		// external clock * 9 = 72MHz, => 72/1.5 = 48 => good for USB
-		ClockControl::enablePll(ClockControl::PllSource::ExternalCrystal, ClockControl::UsbPrescaler::Div1_5, 9);
+		ClockControl::enablePll(ClockControl::PllSource::ExternalCrystal, 9);
 
 		// set flash latency for 72MHz
 		ClockControl::setFlashLatency(Frequency);

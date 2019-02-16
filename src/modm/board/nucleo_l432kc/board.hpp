@@ -46,8 +46,7 @@ struct systemClock {
 			ClockControl::PllSource::MultiSpeedInternalClock,
 			1,	// 4MHz / M=1 -> 4MHz
 			40,	// 4MHz * N=40 -> 160MHz <= 344MHz = PLL VCO output max, >= 64 MHz = PLL VCO out min
-			2,	// 160MHz / P=2 -> 80MHz = F_cpu
-			2	// 80MHz / Q=2 -> 40MHz = F_usb
+			2	// 160MHz / P=2 -> 80MHz = F_cpu
 		);
 		ClockControl::setFlashLatency(Frequency);
 
