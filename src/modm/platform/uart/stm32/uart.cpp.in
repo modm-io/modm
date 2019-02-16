@@ -196,7 +196,7 @@ modm::platform::{{ name }}::discardReceiveBuffer()
 
 %% if options["buffered"]
 %% set hal = "modm::platform::" ~ hal
-%% if id in shared_irqs
+%% if id in shared_irq_ids
 void
 modm::platform::{{ name }}::irq()
 %% else

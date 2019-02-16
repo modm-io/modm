@@ -287,8 +287,8 @@ modm::platform::{{ name }}::isTransmitRegisterEmpty()
 void
 modm::platform::{{ name }}::enableInterruptVector(bool enable, uint32_t priority)
 {
-%% if id in shared_irqs
-	%% set irq = "USART" ~ shared_irqs[0] ~ "_" ~ shared_irqs[-1]
+%% if id in shared_irq_ids
+	%% set irq = shared_irq
 %% else
 	%% set irq = peripheral
 %% endif

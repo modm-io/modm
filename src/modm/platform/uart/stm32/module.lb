@@ -11,17 +11,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-shared_irqs = None
-instances = []
-
-def get_shared_irqs(env):
-    global shared_irqs
-    if shared_irqs is None:
-        shared_irqs = [v["name"] for v in env[":target"].get_driver("core")["vector"]]
-        shared_irqs = [v[5:] for v in shared_irqs if v.startswith("USART") and "_" in v]
-        shared_irqs = [int(s) for s in shared_irqs[0].split("_")] if len(shared_irqs) else []
-        shared_irqs = range(shared_irqs[0], shared_irqs[1] + 1) if len(shared_irqs) else []
-    return shared_irqs
+props = {}
 
 class Instance(Module):
     def __init__(self, driver, instance):
@@ -56,23 +46,21 @@ class Instance(Module):
         return True
 
     def build(self, env):
-        device = env[":target"]
-        properties = device.properties
-        properties["target"] = device.identifier
-        properties["id"] = self.instance
-        properties["driver"] = self.driver
-        properties["features"] = self.driver["feature"] if "feature" in self.driver else []
+        device = env[":target"].identifier
+        global props
+        props["id"] = self.instance
+        props["driver"] = self.driver
+        props["features"] = self.driver["feature"] if "feature" in self.driver else []
 
-        if properties["target"]["family"] == "f0":
-            properties["apb"] = "2" if self.instance in [1, 6, 7, 8] else "1"
+        if device.family == "f0":
+            props["apb"] = "2" if self.instance in [1, 6, 7, 8] else "1"
         else:
-            properties["apb"] = "2" if self.instance in [1, 6, 9, 10] else "1"
-        properties["apb_post"] = "1" if properties["target"]["family"] in ["l4"] and self.instance != 1 else ""
+            props["apb"] = "2" if self.instance in [1, 6, 9, 10] else "1"
+        props["apb_post"] = "1" if device.family in ["l4"] and self.instance != 1 else ""
 
-        properties["uart_name"] = self.driver["name"].capitalize()
-        properties["shared_irqs"] = get_shared_irqs(env)
+        props["uart_name"] = self.driver["name"].capitalize()
 
-        env.substitutions = properties
+        env.substitutions = props
         env.outbasepath = "modm/src/modm/platform/uart"
 
         env.template("uart_hal.hpp.in", "uart_hal_{}.hpp".format(self.instance))
@@ -80,8 +68,7 @@ class Instance(Module):
         env.template("uart.hpp.in", "uart_{}.hpp".format(self.instance))
         env.template("uart.cpp.in", "uart_{}.cpp".format(self.instance))
 
-        global instances
-        instances.append(self.instance)
+        props["instances"].append(self.instance)
 
 
 def init(module):
@@ -102,27 +89,37 @@ def prepare(module, options):
         ":cmsis:device",
         ":platform:gpio")
 
-    for driver in (device.get_all_drivers("uart") + device.get_all_drivers("usart")):
+    global props
+    drivers = (device.get_all_drivers("uart") + device.get_all_drivers("usart"))
+    props["extended_driver"] = ("extended" in drivers[0]["type"])
+    props["over8_sampling"] = ("feature" in drivers[0]) and ("over8" in drivers[0]["feature"])
+    props["tcbgt"] = ("feature" in drivers[0]) and ("tcbgt" in drivers[0]["feature"])
+    props["instances"] = []
+
+    for driver in drivers:
         for instance in driver["instance"]:
             module.add_submodule(Instance(driver, instance))
+
+    shared_irqs = [v["name"] for v in device.get_driver("core")["vector"]]
+    shared_irqs = [v for v in shared_irqs if v.startswith("USART") and "_" in v]
+    if len(shared_irqs):
+        props["shared_irq"] = name = shared_irqs[0]
+        parts = name[5:].split("_")
+        props["shared_irq_ids"] = range(int(parts[0]), int(parts[1]) + 1)
+    else:
+        props["shared_irq_ids"] = []
+
+    props["target"] = device.identifier
 
     return True
 
 def build(env):
     device = env[":target"]
-    properties = device.properties
-    properties["target"] = device.identifier
 
-    drivers = (device.get_all_drivers("usart") + device.get_all_drivers("uart"))
-    properties["extended_driver"] = ("extended" in drivers[0]["type"])
-    properties["over8_sampling"] = ("feature" in drivers[0]) and ("over8" in drivers[0]["feature"])
-    properties["tcbgt"] = ("feature" in drivers[0]) and ("tcbgt" in drivers[0]["feature"])
-    properties["shared_irqs"] = get_shared_irqs(env)
-    properties["instances"] = instances
-
-    env.substitutions = properties
+    global props
+    env.substitutions = props
     env.outbasepath = "modm/src/modm/platform/uart"
     env.template("uart_base.hpp.in")
     env.template("uart_baudrate.hpp.in")
-    if any(i in properties["shared_irqs"] for i in instances):
+    if any(i in props["shared_irq_ids"] for i in props["instances"]):
         env.template("uart_shared.cpp.in")
