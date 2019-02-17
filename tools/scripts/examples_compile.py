@@ -61,6 +61,7 @@ def compile_examples(paths):
 	print("Using {}x parallelism".format(cpus))
 	# Create build folder to prevent process race
 	cache_dir.mkdir(exist_ok=True, parents=True)
+	(cache_dir / "config").write_text('{"prefix_len": 2}')
 	# Find all project files
 	projects = [p for path in paths for p in Path(path).glob("**/project.xml")]
 	# first generate all projects

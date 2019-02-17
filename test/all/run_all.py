@@ -144,10 +144,13 @@ def main():
     devices = [d for d in devices if d not in ignored_devices]
 
     os.makedirs("log", exist_ok=True)
-    cache_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../build/cache"))
-    Path(cache_dir).mkdir(exist_ok=True, parents=True)
+
     if "no-cache" in sys.argv:
         cache_dir = None
+    else:
+        cache_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../build/cache"))
+        Path(cache_dir).mkdir(exist_ok=True, parents=True)
+        (Path(cache_dir) / "config").write_text('{"prefix_len": 2}')
 
     try:
         #devices = [device for device in devices if device.startswith("atx")]
