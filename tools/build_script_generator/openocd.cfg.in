@@ -15,7 +15,7 @@ proc modm_program { SOURCE } {
 %% for profile in ["release", "debug"]
 %% if "elf." ~ profile in metadata
 proc program_{{ profile }} {} {
-	modm_program {{ metadata["elf." ~ profile][0]  | windowsify }}
+	modm_program {{ metadata["elf." ~ profile][0]  | modm.windowsify }}
 }
 %% endif
 %% endfor

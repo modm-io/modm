@@ -103,7 +103,7 @@ struct Gpio
 	Port
 	{
 %% for port in ports
-		{{ port | upper }} = {{ port | letterToNum }},
+		{{ port | upper }} = {{ port | modm.ord }},
 %% endfor
 	};
 

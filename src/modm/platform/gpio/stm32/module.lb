@@ -25,12 +25,6 @@ def port_ranges(gpios):
     ports.sort(key=lambda p: p["name"])
     return ports
 
-def letter_to_num(letter):
-    return ord(letter[0].lower()) - ord("a")
-
-def num_to_letter(num):
-    return chr(num + ord("A"))
-
 def translate(s):
     name = ""
     for part in s.split("_"):
@@ -275,7 +269,7 @@ def build(env):
     env.template("set.hpp.in")
     if "f1" in driver["type"]:
         env.template("connector_specialized.hpp.in", filters={"formatPeripheral": get_driver, "printSignalMap": print_remap_group_table})
-    env.template("base.hpp.in", filters={"letterToNum": letter_to_num})
+    env.template("base.hpp.in")
     env.template("unused.hpp.in")
     if len(env["enable_ports"]):
         env.template("enable.cpp.in")

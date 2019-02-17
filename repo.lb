@@ -15,6 +15,7 @@ import re
 import sys
 import glob
 import hashlib
+import platform
 
 from pathlib import Path
 from distutils.version import StrictVersion
@@ -171,6 +172,16 @@ def init(repo):
         name = re.search("<module>(modm:board:.*?)</module>", config.read_text()).group(1).replace("modm:", "")
         repo.add_configuration(name, config)
 
+    # Add Jinja2 filters commonly used in this repository
+    def windowsify(path):
+        if 'Windows' in platform.platform():
+            path = path.replace('/','\\').replace("\\", "\\\\")
+        return path
+    repo.add_filter("windowsify", windowsify)
+    repo.add_filter("ord", lambda letter: ord(letter[0].lower()) - ord("a"))
+    repo.add_filter("chr", lambda num: chr(num + ord("A")))
+
+    # Compute the available data from modm-devices
     devices = DevicesCache()
     try:
         devices.build()
