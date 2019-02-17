@@ -11,6 +11,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
+
 def init(module):
     module.name = "clock"
     module.parent = "platform"
@@ -20,7 +21,7 @@ def prepare(module, options):
     if not options[":target"].has_driver("rcc:stm32*"):
         return False
 
-    module.depends(":cmsis:device", ":utils", ":platform:clock.cortex")
+    module.depends(":cmsis:device", ":utils", ":platform:clock.cortex", ":platform:rcc")
     if "stm32f100" in options[":target"].partname:
         module.depends(":architecture:clock")
     return True
@@ -29,10 +30,9 @@ def build(env):
     device = env[":target"]
     driver = device.get_driver("rcc")
 
-    properties = device.properties
+    properties = {}
     properties["target"] = target = device.identifier
     properties["partname"] = device.partname
-    properties["driver"] = driver
     properties["core"] = device.get_driver("core")["type"]
 
     if target["family"] in ["f1", "f3", "f4"]:

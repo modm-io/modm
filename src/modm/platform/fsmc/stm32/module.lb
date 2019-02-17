@@ -21,13 +21,13 @@ def prepare(module, options):
     if not device.has_driver("fsmc:stm32*"):
         return False
 
-    module.depends(":cmsis:device")
+    module.depends(":cmsis:device", ":platform:rcc")
     return True
 
 def build(env):
     device = env[":target"]
 
-    properties = device.properties
+    properties = {}
     properties["target"] = device.identifier
 
     target = device.identifier

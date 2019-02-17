@@ -15,6 +15,7 @@
 
 #include <stdint.h>
 #include "../device.hpp"
+#include <modm/platform/clock/rcc.hpp>
 
 
 namespace modm
@@ -37,6 +38,8 @@ public:
 	static inline void
 	enable()
 	{
+		Rcc::enable<Peripheral::Rng>();
+		Rcc::reset<Peripheral::Rng>();
 		RNG->CR = RNG_CR_RNGEN;
 	}
 

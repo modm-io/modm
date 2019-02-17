@@ -20,6 +20,7 @@
 #ifndef MODM_STM32_UARTHAL_{{ id }}_HPP
 #	error 	"Don't include this file directly, use uart_hal_{{ id }}.hpp instead!"
 #endif
+#include <modm/platform/clock/rcc.hpp>
 
 // ----------------------------------------------------------------------------
 void
@@ -51,14 +52,8 @@ modm::platform::{{ name }}::setParity(const Parity parity)
 void
 modm::platform::{{ name }}::enable()
 {
-	// FIXME: there seems to be a bug in the stm32f3xxlib which does not provide
-	//        the necessary RCC_APB1ENR_UART5EN define and probably defines
-	//        RCC_APB1ENR_UART4EN incorrectly (0x00100000 instead of 0x00080000)
-	// enable clock
-	RCC->APB{{ apb }}ENR{{ apb_post }} |= RCC_APB{{ apb }}ENR{{ apb_post }}_{{ peripheral }}EN;
-	// reset uart
-	RCC->APB{{ apb }}RSTR{{ apb_post }} |=  RCC_APB{{ apb }}RSTR{{ apb_post }}_{{ peripheral }}RST;
-	RCC->APB{{ apb }}RSTR{{ apb_post }} &= ~RCC_APB{{ apb }}RSTR{{ apb_post }}_{{ peripheral }}RST;
+	Rcc::enable<Peripheral::{{ uart_name ~ id }}>();
+	Rcc::reset<Peripheral::{{ uart_name ~ id }}>();
 	{{ peripheral }}->CR1 |= USART_CR1_UE;		// Uart Enable
 }
 
@@ -67,11 +62,7 @@ modm::platform::{{ name }}::disable()
 {
 	// TX, RX, Uart, etc. Disable
 	{{ peripheral }}->CR1 = 0;
-	// FIXME: there seems to be a bug in the stm32f3xxlib which does not provide
-	//        the necessary RCC_APB1ENR_UART5EN define and probably defines
-	//        RCC_APB1ENR_UART4EN incorrectly (0x00100000 instead of 0x00080000)
-	// disable clock
-	RCC->APB{{ apb }}ENR{{ apb_post }} &= ~RCC_APB{{ apb }}ENR{{ apb_post }}_{{ peripheral }}EN;
+	Rcc::disable<Peripheral::{{ uart_name ~ id }}>();
 }
 %% if target["family"] != "f1"
 template<class SystemClock, uint32_t baudrate,

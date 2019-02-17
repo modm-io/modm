@@ -51,13 +51,6 @@ class Instance(Module):
         props["id"] = self.instance
         props["driver"] = self.driver
         props["features"] = self.driver["feature"] if "feature" in self.driver else []
-
-        if device.family == "f0":
-            props["apb"] = "2" if self.instance in [1, 6, 7, 8] else "1"
-        else:
-            props["apb"] = "2" if self.instance in [1, 6, 9, 10] else "1"
-        props["apb_post"] = "1" if device.family in ["l4"] and self.instance != 1 else ""
-
         props["uart_name"] = self.driver["name"].capitalize()
 
         env.substitutions = props
@@ -87,7 +80,8 @@ def prepare(module, options):
         ":architecture:register",
         ":architecture:uart",
         ":cmsis:device",
-        ":platform:gpio")
+        ":platform:gpio",
+        ":platform:rcc")
 
     global props
     drivers = (device.get_all_drivers("uart") + device.get_all_drivers("usart"))

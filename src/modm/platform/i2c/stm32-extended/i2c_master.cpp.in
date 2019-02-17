@@ -51,6 +51,7 @@
 #include <modm/architecture/interface/atomic_lock.hpp>
 #include <modm/architecture/interface/interrupt.hpp>
 #include <modm/container.hpp>
+#include <modm/platform/clock/rcc.hpp>
 
 %% if not shared_interrupt
 MODM_ISR_DECL(I2C{{ id }}_ER);
@@ -495,12 +496,8 @@ MODM_ISR(I2C{{ id }}_ER)
 void
 modm::platform::I2cMaster{{ id }}::initializeWithPrescaler(uint32_t timingRegisterValue)
 {
-	// Enable clock
-	RCC->APB1ENR{{aid}} |= RCC_APB1ENR{{aid}}_I2C{{ id }}EN;
-
-	// reset module
-	RCC->APB1RSTR{{aid}} |=  RCC_APB1RSTR{{aid}}_I2C{{ id }}RST;
-	RCC->APB1RSTR{{aid}} &= ~RCC_APB1RSTR{{aid}}_I2C{{ id }}RST;
+	Rcc::enable<Peripheral::I2c{{id}}>();
+	Rcc::reset<Peripheral::I2c{{id}}>();
 
 	// Disable the I2C peripheral which causes a software reset
 	I2C{{ id }}->CR1 &= ~I2C_CR1_PE;

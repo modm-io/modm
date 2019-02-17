@@ -13,6 +13,7 @@
 #ifndef MODM_STM32_DMA{{ id }}_HPP
 #	error 	"Don't include this file directly, use 'dma_{{ id }}.hpp' instead!"
 #endif
+#include <modm/platform/clock/rcc.hpp>
 
 %% if target["family"] == "f4"
 	%% set streams = range(0,8)
@@ -27,24 +28,14 @@
 void
 modm::platform::Dma{{ id }}::enable()
 {
-%% if target["family"] == "f4"
-	RCC->AHB1ENR  |= RCC_AHB1ENR_DMA{{ id }}EN;
-	RCC->AHB1RSTR |=  RCC_AHB1RSTR_DMA{{ id }}RST;
-	RCC->AHB1RSTR &= ~RCC_AHB1RSTR_DMA{{ id }}RST;
-%% elif target["family"] == "f3"
-	RCC->AHBENR  |= RCC_AHBENR_DMA{{ id }}EN;
-%% endif
+	Rcc::enable<Peripheral::Dma{{id}}>();
+	Rcc::reset<Peripheral::Dma{{id}}>();
 }
 
 void
 modm::platform::Dma{{ id }}::disable()
 {
-%% if target["family"] == "f4"
-	RCC->AHB1ENR &= ~RCC_AHB1ENR_DMA{{ id }}EN;
-%% elif target["family"] == "f3"
-	RCC->AHBENR &= ~RCC_AHBENR_DMA{{ id }}EN;
-%% endif
-
+	Rcc::disable<Peripheral::Dma{{id}}>();
 }
 
 

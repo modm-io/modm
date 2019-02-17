@@ -20,6 +20,7 @@
 
 #include <stdint.h>
 #include "../device.hpp"
+#include <modm/platform/clock/rcc.hpp>
 
 namespace modm
 {
@@ -298,21 +299,14 @@ namespace modm
 			static inline void
 			enable()
 			{
-%% if target["family"] in ["f2", "f4", "f7"]
-				RCC->AHB3ENR |= RCC_AHB3ENR_{{ FMC }}EN;
-%% else
-				RCC->AHBENR |= RCC_AHBENR_{{ FMC }}EN;
-%% endif
+				Rcc::enable<Peripheral::{{ FMC | capitalize }}>();
+				Rcc::reset<Peripheral::{{ FMC | capitalize }}>();
 			}
 
 			static inline void
 			disable()
 			{
-%% if target["family"] in ["f2", "f4", "f7"]
-				RCC->AHB3ENR &= ~RCC_AHB3ENR_{{ FMC }}EN;
-%% else
-				RCC->AHBENR &= ~RCC_AHBENR_{{ FMC }}EN;
-%% endif
+				Rcc::disable<Peripheral::{{ FMC | capitalize }}>();
 			}
 		};
 	}

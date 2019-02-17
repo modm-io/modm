@@ -14,28 +14,24 @@
 // ----------------------------------------------------------------------------
 
 #include "timer_{{ id }}.hpp"
+#include <modm/platform/clock/rcc.hpp>
 
 // ----------------------------------------------------------------------------
 void
 modm::platform::Timer{{ id }}::enable()
 {
-	// enable clock
-	RCC->APB2ENR  |=  RCC_APB2ENR_TIM{{ id }}EN;
-
-	// reset timer
-	RCC->APB2RSTR |=  RCC_APB2RSTR_TIM{{ id }}RST;
-	RCC->APB2RSTR &= ~RCC_APB2RSTR_TIM{{ id }}RST;
+	Rcc::enable<Peripheral::Tim{{id}}>();
+	Rcc::reset<Peripheral::Tim{{id}}>();
 }
 
 void
 modm::platform::Timer{{ id }}::disable()
 {
-	// disable clock
-	RCC->APB2ENR &= ~RCC_APB2ENR_TIM{{ id }}EN;
-
 	TIM{{ id }}->CR1 = 0;
 	TIM{{ id }}->DIER = 0;
 	TIM{{ id }}->CCER = 0;
+
+	Rcc::disable<Peripheral::Tim{{id}}>();
 }
 
 // ----------------------------------------------------------------------------

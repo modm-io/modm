@@ -37,16 +37,7 @@ class Instance(Module):
         properties = device.properties
         properties["target"] = target = device.identifier
         properties["id"] = self.instance
-
-        if target["family"] == "l4":
-            properties["aid"] = "2" if self.instance == 4 else "1"
-        else:
-            properties["aid"] = ""
-
-        if target["family"] == "f0" or target["family"] == "l0":
-            properties["shared_interrupt"] = True
-        else:
-            properties["shared_interrupt"] = False
+        properties["shared_interrupt"] = "0" in target.family
 
         env.substitutions = properties
         env.outbasepath = "modm/src/modm/platform/i2c"

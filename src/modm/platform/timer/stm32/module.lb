@@ -44,7 +44,6 @@ class Instance(Module):
         module.description = "Instance {}".format(self.instance)
 
     def prepare(self, module, options):
-        module.depends(":platform:timer")
         return True
 
     def validate(self, env):
@@ -74,7 +73,6 @@ class Instance(Module):
         global props
         props["id"] = self.instance
         props["connectors"] = get_connectors(self.instance)
-        props["apb_post"] = "1" if props["target"].family in ["l4"] else ""
         props["vectors"] = self.vectors
 
         env.substitutions = props
@@ -96,7 +94,8 @@ def prepare(module, options):
     module.depends(
         ":architecture:register",
         ":cmsis:device",
-        ":platform:gpio")
+        ":platform:gpio",
+        ":platform:rcc")
 
     timers = device.get_all_drivers("tim")
     instances = []

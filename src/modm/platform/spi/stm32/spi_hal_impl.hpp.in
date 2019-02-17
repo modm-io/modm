@@ -14,23 +14,21 @@
 #ifndef MODM_STM32_SPI_HAL{{ id }}_HPP
 #	error 	"Don't include this file directly, use 'spi_hal{{ id }}.hpp' instead!"
 #endif
+#include <modm/platform/clock/rcc.hpp>
 
 void inline
 modm::platform::SpiHal{{ id }}::enable()
 {
-	// enable clock
-	RCC->APB{{ apb }}ENR{{ apb_post }} |= RCC_APB{{ apb }}ENR{{ apb_post }}_SPI{{ id }}EN;
-	// reset spi
-	RCC->APB{{ apb }}RSTR{{ apb_post }} |=  RCC_APB{{ apb }}RSTR{{ apb_post }}_SPI{{ id }}RST;
-	RCC->APB{{ apb }}RSTR{{ apb_post }} &= ~RCC_APB{{ apb }}RSTR{{ apb_post }}_SPI{{ id }}RST;
+	Rcc::enable<Peripheral::Spi{{id}}>();
+	Rcc::reset<Peripheral::Spi{{id}}>();
 	SPI{{ id }}->CR1 |= SPI_CR1_SPE;		// SPI Enable
 }
 
 void inline
 modm::platform::SpiHal{{ id }}::disable()
 {
-	// disable clock
-	RCC->APB{{ apb }}ENR{{ apb_post }} &= ~RCC_APB{{ apb }}ENR{{ apb_post }}_SPI{{ id }}EN;
+	SPI{{ id }}->CR1 = 0;
+	Rcc::disable<Peripheral::Spi{{id}}>();
 }
 
 void inline
