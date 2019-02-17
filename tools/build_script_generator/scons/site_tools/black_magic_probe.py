@@ -16,8 +16,10 @@ from SCons.Script import *
 
 # -----------------------------------------------------------------------------
 def black_magic_probe_run(env, source, alias='black_magic_probe_run'):
+	black_magic_probe_port = ARGUMENTS.get("port", '')
+
 	action = Action('$ARM_NONE_EABI_GDB '
-		'-ex "target extended-remote $BLACK_MAGIC_PROBE_PORT" '
+		'-ex "target extended-remote ' + black_magic_probe_port + '" '
 		'-ex "monitor swdp_scan" '
 		'-ex "attach 1" '
 		'-ex "load $SOURCE" '

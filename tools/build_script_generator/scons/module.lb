@@ -99,7 +99,7 @@ def post_build(env, buildlog):
     if is_unittest:
         build_tools += ["unittest"]
     if subs["platform"] in ["stm32"]:
-        build_tools += ["compiler_arm_none_eabi_gcc", "program_openocd", "utils_buildsize"]
+        build_tools += ["compiler_arm_none_eabi_gcc", "program_openocd", "black_magic_probe", "utils_buildsize"]
     elif subs["platform"] in ["avr"]:
         build_tools += ["compiler_avr_gcc", "program_avrdude"]
     else:

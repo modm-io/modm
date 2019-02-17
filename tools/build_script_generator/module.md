@@ -4,7 +4,7 @@ This parent module defines a common set of functionality that is independent of
 the specific build system generator implementation.
 This includes straight-forward options like project name and build path
 but also more complicated configuration for programming your target via
-AvrDude/OpenOCD and debugging via GDB.
+AvrDude/OpenOCD/Black Magic Probe and debugging via GDB.
 
 **Note that this module does not compile your project, you will need to choose
 the `modm:build:scons` or `modm:build:cmake` submodule for that, or provide
@@ -12,7 +12,7 @@ your own build system.**
 
 ## Using OpenOCD
 
-For accessing your ARM Cortex-M based device, we use OpenOCD and generate a
+For accessing your ARM Cortex-M based device, we use OpenOCD by default and generate a
 `modm/openocd.cfg` file with the target specific configuration:
 
 - Search directories passed via the `openocd.search` metadata key.
@@ -120,6 +120,49 @@ Program received signal SIGINT, Interrupt.
     milliseconds to hundreds. Make sure your hardware can handle that!
 
 
+## Using Black Magic Probe
+
+[Black Magic Probe][bmp] is convenient tool to convert cheap USB ST-LINK V2 clones to a fully functional GDB compatible debug adaptor for ARM Cortex microcontrollers. GDB can directly communicate with the debug adaptor making debugging easy and accessible. Currently, only uploading code to the target is supported with this modm module.
+
+Black Magic Probe creates two serial devices, the first being the GDB interface and the second a plain serial adaptor for debugging purposes.
+
+```
+$ ls -l /dev/tty.usb*
+crw-rw-rw-  1 root  wheel   21, 104 Feb 19 09:46 /dev/tty.usbmodemDEADBEEF
+crw-rw-rw-  1 root  wheel   21, 106 Feb 19 09:46 /dev/tty.usbmodemDEADBEF1
+```
+
+You can upload your code using a Black Magic Probe with specifying the GDB interface as `port` parameter.
+
+```
+$ scons bmp port=/dev/cu.usbmodemDEADBEEF verbose=1
+scons: Reading SConscript files ...
+bmp port iss = /dev/cu.usbmodemDEADBEEF
+scons: done reading SConscript files.
+scons: Building targets ...
+arm-none-eabi-gdb -ex "target extended-remote /dev/cu.usbmodemDEADBEEF" -ex "monitor swdp_scan" -ex "attach 1" -ex "load path/to/project.elf" -ex "detach" -ex "quit"
+[...]
+Remote debugging using /dev/cu.usbmodemDEADBEEF
+Target voltage: unknown
+Available Targets:
+No. Att Driver
+ 1      STM32F1 medium density
+Attaching to Remote target
+warning: No executable has been specified and target does not support
+determining executable automatically.  Try using the "file" command.
+0x0800038e in ?? ()
+Loading section .vector_rom, size 0xec lma 0x8000000
+[...]
+Loading section .table.section_heap, size 0xc lma 0x80013f8
+Start address 0x8000e6c, load size 5120
+Transfer rate: 10 KB/sec, 365 bytes/write.
+Detaching from program: , Remote target
+[Inferior 1 (Remote target) detached]
+scons: done building targets.
+
+```
+
+
 ## Using AvrDude
 
 Unfortunately AvrDude does not support a user configuration file like OpenOCD
@@ -190,3 +233,6 @@ In addition, these linker options are added:
 
 
 [options]: https://gcc.gnu.org/onlinedocs/gcc/Option-Summary.html
+
+<!--Links-->
+[bmp]: https://github.com/blacksphere/blackmagic
