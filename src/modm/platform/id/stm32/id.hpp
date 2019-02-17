@@ -14,6 +14,7 @@
 #define MODM_PLATFORM_ID_HPP
 
 #include <stdint.h>
+#include "../device.hpp"
 
 namespace modm
 {
@@ -32,7 +33,7 @@ static inline uint32_t
 getUniqueId(uint8_t offset)
 {
 	if (offset > 2) return 0;
-	return *(((uint32_t *) {{ address }}) + offset);
+	return *(((uint32_t *) UID_BASE) + offset);
 }
 
 }
