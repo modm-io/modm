@@ -273,3 +273,7 @@ def build(env):
     env.template("unused.hpp.in")
     if len(env["enable_ports"]):
         env.template("enable.cpp.in")
+
+    # FIXME: Move to modm:platform:core!
+    env.outbasepath = "modm/src/modm/platform/core"
+    env.template("peripherals.hpp.in")

@@ -11,15 +11,19 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-import os
 import re
+from pathlib import Path
+from collections import defaultdict
 
 def getDefineForDevice(device_id, familyDefines):
+    """
+    Returns the STM32 specific define from an identifier
+    """
     # get all defines for this device name
-    devName = "STM32{}{}".format(device_id["family"].upper(), device_id["name"].upper())
+    devName = "STM32{}{}".format(device_id.family.upper(), device_id.name.upper())
 
     # Map STM32F7x8 -> STM32F7x7
-    if device_id["family"] == "f7" and devName[8] == "8":
+    if device_id.family == "f7" and devName[8] == "8":
         devName = devName[:8] + "7"
 
     deviceDefines = sorted([define for define in familyDefines if define.startswith(devName)])
@@ -28,18 +32,71 @@ def getDefineForDevice(device_id, familyDefines):
         return deviceDefines[0]
 
     # now we match for the size-id.
-    devNameMatch = devName + "x{}".format(device_id["size"].upper())
+    devNameMatch = devName + "x{}".format(device_id.size.upper())
     for define in deviceDefines:
         if devNameMatch <= define:
             return define
 
     # now we match for the pin-id.
-    devNameMatch = devName + "{}x".format(device_id["pin"].upper())
+    devNameMatch = devName + "{}x".format(device_id.pin.upper())
     for define in deviceDefines:
         if devNameMatch <= define:
             return define
 
     return None
+
+bprops = {}
+def common_rcc_map(env):
+    device = env[":target"]
+
+    core = device.get_driver("core")["type"]
+    core = core.replace("cortex-m", "").replace("+", "plus").replace("f", "").replace("d", "")
+    core_header = "core_cm{}.h".format(core)
+    core_header = repopath("ext/arm/cmsis/CMSIS/Core/Include", core_header)
+
+    folder = "stm32{}xx".format(device.identifier.family)
+    family_header = folder + ".h"
+    folder = "stm32/{}/Include".format(folder)
+    define = None
+
+    content = Path(localpath(folder, family_header)).read_text(encoding="utf-8", errors="replace")
+    match = re.findall(r"if defined\((?P<define>STM32[F|L].....)\)", content)
+    define = getDefineForDevice(device.identifier, match)
+    if define is None or match is None:
+        raise ValidateException("No device define found for '{}'!".format(device.partname))
+    device_header = define.lower() + ".h"
+
+    content = ""
+    for header_path in [core_header, localpath(folder, device_header)]:
+        content += Path(header_path).read_text(encoding="utf-8", errors="replace")
+
+    # find mpu and fpu features
+    features = re.findall(r"#define +__([MF]PU)_PRESENT +([01])", content)
+    core_features = {f[0]:bool(int(f[1])) for f in features}
+    # find all peripherals
+    mperipherals = re.findall(r"#define +(.*?) +\(\((.*?_Type(?:Def)?)", content)
+    # We only care about the absolute peripheral addresses
+    peripherals = [(p[0],p[1]) for p in mperipherals]
+    # filter out MPU and/or FPU if required
+    peripherals = filter(lambda p: p[0] not in core_features or core_features[p[0]], peripherals)
+    peripherals = sorted(peripherals, key=lambda p: p[0])
+    # print("\n".join([s+" -> "+hex(a) for (s,k,a) in peripherals]))
+
+    # Find all RCC enable and reset definitions
+    match = re.findall(r"RCC_([A-Z0-9]+?)_([A-Z0-9]+?)_(EN|RST) ", content)
+    rcc_map = defaultdict(dict)
+    for (reg, per, typ) in match:
+        rcc_map[per][typ] = reg
+
+    bprops.update({
+        "folder": folder,
+        "define": define,
+        "device_header": device_header,
+        "system_header": "system_" + family_header,
+        "peripherals": peripherals,
+    })
+    return rcc_map
+
 
 # -----------------------------------------------------------------------------
 def init(module):
@@ -52,56 +109,14 @@ def prepare(module, options):
     if device.identifier["platform"] != "stm32":
         return False
 
+    module.add_query(
+        EnvironmentQuery(name="rcc-map", factory=common_rcc_map))
+
     module.depends(":cmsis:core")
     return True
 
-bprops = {}
 def validate(env):
-    device = env[":target"]
-
-    core = device.get_driver("core")["type"]
-    core = core.replace("cortex-m", "").replace("+", "plus").replace("f", "").replace("d", "")
-    core_header = "core_cm{}.h".format(core)
-    core_header = localpath("..", "arm", "cmsis", "CMSIS", "Core", "Include", core_header)
-
-    folder = "stm32{}xx".format(device.identifier["family"])
-    family_header = folder + ".h"
-    folder = os.path.join("stm32", folder, "Include")
-    define = None
-
-    with open(localpath(folder, family_header), "r", errors="replace") as headerFile:
-        match = re.findall(r"if defined\((?P<define>STM32[F|L].....)\)", headerFile.read())
-        if match:
-            define = getDefineForDevice(device.identifier, match)
-    if define is None:
-        raise ValidateException("No device define found for '{}'!".format(device.partname))
-
-    device_header = define.lower() + ".h"
-    peripherals = []
-    core_features = {}
-
-    for header_path in [core_header, localpath(folder, device_header)]:
-        with open(header_path, "r", errors="replace") as deviceFile:
-            deviceFileContent = deviceFile.read()
-            # find mpu and fpu features
-            features = re.findall(r"#define +__([MF]PU)_PRESENT +([01])", deviceFileContent)
-            core_features.update({f[0]:bool(int(f[1])) for f in features})
-            # find all peripherals
-            mperipherals = re.findall(r"#define +(.*?) +\(\((.*?_Type(?:Def)?)", deviceFileContent)
-            # We only care about the absolute peripheral addresses
-            peripherals.extend([(p[0],p[1]) for p in mperipherals])
-    # filter out MPU and/or FPU if required
-    peripherals = filter(lambda p: p[0] not in core_features or core_features[p[0]], peripherals)
-    peripherals = sorted(peripherals, key=lambda p: p[0])
-    # print("\n".join([s+" -> "+hex(a) for (s,k,a) in peripherals]))
-
-    bprops.update({
-        "folder": folder,
-        "define": define,
-        "device_header": device_header,
-        "system_header": "system_" + family_header,
-        "peripherals": peripherals
-    })
+    env.query("rcc-map")
 
 def build(env):
     env.collect(":build:path.include", "modm/ext")

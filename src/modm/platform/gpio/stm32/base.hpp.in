@@ -15,23 +15,13 @@
 #include "../device.hpp"
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/math/utils/bit_operation.hpp>
+#include <modm/platform/core/peripherals.hpp>
 
 namespace modm
 {
 
 namespace platform
 {
-
-/// @cond
-enum class
-Peripheral
-{
-	BitBang,
-%% for per in all_peripherals
-	{{ per }},
-%% endfor
-};
-/// @endcond
 
 /// @ingroup modm_platform_gpio
 struct Gpio
