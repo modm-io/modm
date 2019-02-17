@@ -234,106 +234,21 @@ uint32_t modeOutputPorts)
 }
 
 // ----------------------------------------------------------------------------
-// Re-implemented here to save some code space. As all arguments in the calls
-// below are constant the compiler is able to calculate everything at
-// compile time.
-static modm_always_inline void
-nvicEnableInterrupt(IRQn_Type IRQn)
-{
-	NVIC->ISER[((uint32_t)(IRQn) >> 5)] = (1 << ((uint32_t)(IRQn) & 0x1F));
-}
-
-static modm_always_inline void
-nvicDisableInterrupt(IRQn_Type IRQn)
-{
-	NVIC_DisableIRQ(IRQn);
-}
-%% if target["family"] in ["f2", "f4", "f7"]
-	%% if id == 1
-#	define TIM1_BRK_IRQn		TIM1_BRK_TIM9_IRQn
-%% if not partname.startswith("stm32f410")
-#	define TIM1_UP_IRQn			TIM1_UP_TIM10_IRQn
-%% endif
-#	define TIM1_TRG_COM_IRQn	TIM1_TRG_COM_TIM11_IRQn
-	%% elif id == 8
-#	define TIM8_BRK_IRQn		TIM8_BRK_TIM12_IRQn
-#	define TIM8_UP_IRQn			TIM8_UP_TIM13_IRQn
-#	define TIM8_TRG_COM_IRQn	TIM8_TRG_COM_TIM14_IRQn
-	%% endif
-%% elif target["family"] in ["l4"]
-	%% if id == 1
-#	define TIM1_BRK_IRQn		TIM1_BRK_TIM15_IRQn
-#	define TIM1_UP_IRQn			TIM1_UP_TIM16_IRQn
-	%% elif id == 8
-#	define TIM8_BRK_IRQn		TIM8_BRK_IRQn
-#	define TIM8_UP_IRQn			TIM8_UP_IRQn
-#	define TIM8_TRG_COM_IRQn	TIM8_TRG_COM_IRQn
-	%% endif
-%% elif target["family"] == "f3"
-	%% if id == 1
-#	define TIM1_BRK_IRQn		TIM1_BRK_TIM15_IRQn
-#	define TIM1_UP_IRQn			TIM1_UP_TIM16_IRQn
-#	define TIM1_TRG_COM_IRQn	TIM1_TRG_COM_TIM17_IRQn
-	%% endif
-%% endif
-
-// ----------------------------------------------------------------------------
 void
 modm::platform::Timer{{ id }}::enableInterruptVector(Interrupt interrupt, bool enable, uint32_t priority)
 {
-	if (enable)
+%% for vector, flags in vectors.items()
+	if(interrupt & ({% for flag in flags %}Interrupt::{{ flag }}{% if not loop.last %} | {% endif %}{% endfor %}))
 	{
-%% if target["family"] == "f0"
-		if(interrupt & (Interrupt::Update | Interrupt::Break | Interrupt::COM | Interrupt::Trigger)) {
-			NVIC_SetPriority(TIM{{ id }}_BRK_UP_TRG_COM_IRQn, priority);
-			nvicEnableInterrupt(TIM{{ id }}_BRK_UP_TRG_COM_IRQn);
+		if (enable)
+		{
+			NVIC_SetPriority({{ vector }}_IRQn, priority);
+			NVIC_EnableIRQ({{ vector }}_IRQn);
 		}
-%% else
-		if (interrupt & Interrupt::Update) {
-			NVIC_SetPriority(TIM{{ id }}_UP_IRQn, priority);
-			nvicEnableInterrupt(TIM{{ id }}_UP_IRQn);
-		}
-
-		if (interrupt & Interrupt::Break) {
-			NVIC_SetPriority(TIM{{ id }}_BRK_IRQn, priority);
-			nvicEnableInterrupt(TIM{{ id }}_BRK_IRQn);
-		}
-
-		if (interrupt & (Interrupt::COM | Interrupt::Trigger)) {
-			NVIC_SetPriority(TIM{{ id }}_TRG_COM_IRQn, priority);
-			nvicEnableInterrupt(TIM{{ id }}_TRG_COM_IRQn);
-		}
-%% endif
-		if (interrupt &
-				(Interrupt::CaptureCompare1 | Interrupt::CaptureCompare2 |
-				 Interrupt::CaptureCompare3 | Interrupt::CaptureCompare4)) {
-			NVIC_SetPriority(TIM{{ id }}_CC_IRQn, priority);
-			nvicEnableInterrupt(TIM{{ id }}_CC_IRQn);
+		else
+		{
+			NVIC_DisableIRQ({{ vector }}_IRQn);
 		}
 	}
-	else
-	{
-%% if target["family"] == "f0"
-		if(interrupt & (Interrupt::Update | Interrupt::Break | Interrupt::COM | Interrupt::Trigger)) {
-			nvicDisableInterrupt(TIM{{ id }}_BRK_UP_TRG_COM_IRQn);
-		}
-%% else
-		if (interrupt & Interrupt::Update) {
-			nvicDisableInterrupt(TIM{{ id }}_UP_IRQn);
-		}
-
-		if (interrupt & Interrupt::Break) {
-			nvicDisableInterrupt(TIM{{ id }}_BRK_IRQn);
-		}
-
-		if (interrupt & (Interrupt::COM | Interrupt::Trigger)) {
-			nvicDisableInterrupt(TIM{{ id }}_TRG_COM_IRQn);
-		}
-%% endif
-		if (interrupt &
-				(Interrupt::CaptureCompare1 | Interrupt::CaptureCompare2 |
-				 Interrupt::CaptureCompare3 | Interrupt::CaptureCompare4)) {
-			nvicDisableInterrupt(TIM{{ id }}_CC_IRQn);
-		}
-	}
+%% endfor
 }

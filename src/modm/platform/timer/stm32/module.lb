@@ -10,14 +10,8 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-def get_properties(env):
-    device = env[":target"]
-    driver = device.get_driver("tim")
-    properties = device.properties
-    properties["target"] = device.identifier
-    properties["partname"] = device.partname
-    properties["driver"] = driver
-    return properties
+from collections import defaultdict
+props = {}
 
 def get_connectors(instance):
     if instance in [1, 8]:
@@ -38,6 +32,12 @@ class Instance(Module):
     def __init__(self, driver, instance):
         self.driver = driver
         self.instance = int(instance)
+        self.vectors = None
+        self.type = "general_purpose"
+        if self.instance in [1, 8, 20]:
+            self.type = "advanced"
+        elif self.instance in [6, 7, 18]:
+            self.type = "basic"
 
     def init(self, module):
         module.name = str(self.instance)
@@ -47,24 +47,40 @@ class Instance(Module):
         module.depends(":platform:timer")
         return True
 
+    def validate(self, env):
+        vecmap = {
+            "_UP": ["Update"],
+            "_TRG": ["Trigger"],
+            "_BRK": ["Break"],
+            "_COM": ["COM"],
+            "_CC": ["CaptureCompare1", "CaptureCompare2",
+                     "CaptureCompare3", "CaptureCompare4"],
+        }
+        self.vectors = {irq:[] for irq in props["timer_vectors"][self.instance]}
+        for irq in self.vectors.keys():
+            for part, flags in vecmap.items():
+                if part in irq:
+                    self.vectors[irq].extend(flags)
+
+        if len(self.vectors) == 0:
+            raise ValidateException("No interrupts found for Timer{}! Possible IRQs are {}"
+                                    .format(self.instance, props["timer_vectors"]))
+        if self.type != "advanced":
+            if len(self.vectors) != 1:
+                raise ValidateException("Timer{} is only allowed to have one IRQ! Found {}"
+                                    .format(self.instance, self.vectors))
+
     def build(self, env):
-        properties = get_properties(env)
-        properties["id"] = int(self.instance)
+        global props
+        props["id"] = self.instance
+        props["connectors"] = get_connectors(self.instance)
+        props["apb_post"] = "1" if props["target"].family in ["l4"] else ""
+        props["vectors"] = self.vectors
 
-        properties["connectors"] = get_connectors(self.instance)
-        properties["apb_post"] = "1" if properties["target"]["family"] in ["l4"] else ""
-
-        env.substitutions = properties
+        env.substitutions = props
         env.outbasepath = "modm/src/modm/platform/timer"
-
-        source_timer = "general_purpose"
-        if self.instance in [1, 8]:
-            source_timer = "advanced"
-        elif self.instance in [6, 7, 18]:
-            source_timer = "basic"
-
-        env.template(source_timer + ".hpp.in", "timer_{}.hpp".format(self.instance))
-        env.template(source_timer + ".cpp.in", "timer_{}.cpp".format(self.instance))
+        env.template("{}.hpp.in".format(self.type), "timer_{}.hpp".format(self.instance))
+        env.template("{}.cpp.in".format(self.type), "timer_{}.cpp".format(self.instance))
 
 
 def init(module):
@@ -82,14 +98,31 @@ def prepare(module, options):
         ":cmsis:device",
         ":platform:gpio")
 
-    for driver in device.get_all_drivers("tim"):
+    timers = device.get_all_drivers("tim")
+    instances = []
+    for driver in timers:
         for instance in driver["instance"]:
             module.add_submodule(Instance(driver, instance))
+            instances.append(int(instance))
+
+    global props
+    device = options[":target"]
+    props["target"] = device.identifier
+
+    props["timer_vectors"] = tim_vectors = defaultdict(list)
+    vectors = [v["name"] for v in device.get_driver("core")["vector"] if "TIM" in v["name"]]
+    for instance in instances:
+        timstr = "TIM{}".format(instance)
+        for vector in vectors:
+            if (vector == timstr or ("_"+timstr+"_") in vector or
+                vector.startswith(timstr+"_") or vector.endswith("_"+timstr)):
+                tim_vectors[instance].append(vector)
 
     return True
 
 def build(env):
-    env.substitutions = get_properties(env)
+    global props
+    env.substitutions = props
     env.outbasepath = "modm/src/modm/platform/timer"
 
     env.template("basic_base.hpp.in")

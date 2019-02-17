@@ -44,25 +44,18 @@ modm::platform::Timer{{ id }}::setMode(Mode mode)
 	TIM{{ id }}->CR2 = 0;
 }
 
-%% if (id == 6) and (target["family"] in ["f2", "f3", "f4", "f7", "l4"]) and not partname.startswith("stm32f412")
-%%   set interrupt_vector = "TIM6_DAC_IRQn"
-%% elif (id == 7) and (target["family"] == "f3" and ((target["name"] in ["28", "34"]) or (target["name"] in ["03"] and target["size"] in ["8"])))
-%%   set interrupt_vector = "TIM7_DAC2_IRQn"
-%% elif (id == 18) and (target["family"] == "f3" and target["name"] in ["73", "78"])
-%%   set interrupt_vector = "TIM18_DAC2_IRQn"
-%% else
-%%   set interrupt_vector = "TIM" ~ id ~ "_IRQn"
-%% endif
 void
 modm::platform::Timer{{ id }}::enableInterruptVector(bool enable, uint32_t priority)
 {
-	if (enable) {
-		// Set vector priority
-		NVIC_SetPriority({{ interrupt_vector }}, priority);
-		// register IRQ at the NVIC
-		NVIC_EnableIRQ({{ interrupt_vector }});
+%% for vector in vectors
+	if (enable)
+	{
+		NVIC_SetPriority({{ vector }}_IRQn, priority);
+		NVIC_EnableIRQ({{ vector }}_IRQn);
 	}
-	else {
-		NVIC_DisableIRQ({{ interrupt_vector }});
+	else
+	{
+		NVIC_DisableIRQ({{ vector }}_IRQn);
 	}
+%% endfor
 }

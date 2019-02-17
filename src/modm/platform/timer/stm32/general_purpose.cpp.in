@@ -34,34 +34,6 @@
 %%   endif
 %% endif
 
-%% if (target["family"] == "f3" and target["name"] in ["73", "78"]) or target["family"] == "f0"
-%%   set irq_name = id
-%% else
-%%   if id == 9
-%%     set irq_name = "1_BRK_TIM9"
-%%   elif id == 10
-%%     set irq_name = "1_UP_TIM10"
-%%   elif id == 11
-%%     set irq_name = "1_TRG_COM_TIM11"
-%%   elif id == 12
-%%     set irq_name = "8_BRK_TIM12"
-%%   elif id == 13
-%%     set irq_name = "8_UP_TIM13"
-%%   elif id == 14 and not target["family"] == "f0"
-%%     set irq_name = "8_TRG_COM_TIM14"
-%%   elif id == 15
-%%     set irq_name = "1_BRK_TIM15"
-%%   elif id == 16
-%%     set irq_name = "1_UP_TIM16"
-%%   elif id == 17
-%%     set irq_name = "1_TRG_COM_TIM17"
-%%   elif id == 20
-%%     set irq_name = "20_UP"
-%%   else
-%%     set irq_name = id
-%%   endif
-%% endif
-
 #include "timer_{{ id }}.hpp"
 
 // ----------------------------------------------------------------------------
@@ -214,14 +186,15 @@ modm::platform::Timer{{ id }}::configureOutputChannel(uint32_t channel,
 void
 modm::platform::Timer{{ id }}::enableInterruptVector(bool enable, uint32_t priority)
 {
-	if (enable) {
-		// Set priority for the interrupt vector
-		NVIC_SetPriority(TIM{{ irq_name }}_IRQn, priority);
-
-		// register IRQ at the NVIC
-		NVIC_EnableIRQ(TIM{{ irq_name }}_IRQn);
+%% for vector in vectors
+	if (enable)
+	{
+		NVIC_SetPriority({{ vector }}_IRQn, priority);
+		NVIC_EnableIRQ({{ vector }}_IRQn);
 	}
-	else {
-		NVIC_DisableIRQ(TIM{{ irq_name }}_IRQn);
+	else
+	{
+		NVIC_DisableIRQ({{ vector }}_IRQn);
 	}
+%% endfor
 }
