@@ -55,6 +55,17 @@ def prepare(module, options):
             StringOption(name="openocd.cfg", default="",
                          description=descr_openocd_cfg))
 
+    module.add_query(
+        Query(name="source_files", function=common_source_files))
+    module.add_query(
+        EnvironmentQuery(name="device", factory=common_target))
+    module.add_query(
+        EnvironmentQuery(name="memories", factory=common_memories))
+    module.add_query(
+        Query(name="metadata_flags", function=common_metadata_flags))
+    module.add_query(
+        Query(name="file_flags", function=common_file_flags))
+
     return True
 
 

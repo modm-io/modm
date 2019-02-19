@@ -12,9 +12,6 @@
 
 import os
 from os.path import join
-# import all common code
-with open(localpath("../common.py")) as common:
-    exec(common.read())
 
 def init(module):
     module.parent = "build"
@@ -43,13 +40,13 @@ def build(env):
 def post_build(env, buildlog):
     target = env["modm:target"]
     # get CPU information
-    subs = common_target(target)
+    subs = env.query("::device")
     # Extract all source code files
-    subs["sources"] = sorted(p for sources in common_source_files(env, buildlog).values() for p in sources)
+    subs["sources"] = sorted(p for sources in env.query("::source_files")(buildlog).values() for p in sources)
     # get memory information
-    subs["memories"] = common_memories(target)
+    subs["memories"] = env.query("::memories")
     # get memory information
-    subs["flags"] = common_metadata_flags(buildlog.repo_metadata, "modm")
+    subs["flags"] = env.query("::metadata_flags")(buildlog, "modm")
 
     # Add SCons specific data
     subs.update({

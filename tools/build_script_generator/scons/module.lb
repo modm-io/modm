@@ -10,10 +10,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-from os.path import join, relpath
-# import all common code
-with open(localpath("../common.py")) as common:
-    exec(common.read())
+from os.path import join, relpath, isdir
 
 def init(module):
     module.parent = "build"
@@ -73,12 +70,12 @@ def post_build(env, buildlog):
     is_unittest = env.has_module(":test")
     has_xpcc_generator = env.has_module(":communication:xpcc:generator")
     has_image_source = len(env["image.source"])
-    repositories = [p for p in buildlog.repositories if os.path.isdir(env.outpath(p, basepath="."))]
+    repositories = [p for p in buildlog.repositories if isdir(env.outpath(p, basepath="."))]
     repositories = sorted(repositories, key=lambda name: "0" if name == "modm" else name)
 
     target = env["modm:target"]
-    subs = common_target(target)
-    sources = common_source_files(env, buildlog)
+    subs = env.query("::device")
+    sources = env.query("::source_files")(buildlog)
 
     build_tools = [
         "settings_buildpath",
@@ -111,7 +108,7 @@ def post_build(env, buildlog):
         if "build/" in cache_dir:
             cache_dir = "{}build/cache".format(cache_dir.split("build/")[0])
     # get memory information
-    subs["memories"] = common_memories(target)
+    subs["memories"] = env.query("::memories")
     # Add SCons specific data
     subs.update({
         "metadata": buildlog.metadata,
@@ -134,6 +131,8 @@ def post_build(env, buildlog):
     # Set these substitutions for all templates
     env.substitutions = subs
 
+    common_file_flags = env.query("::file_flags")
+    common_metadata_flags = env.query("::metadata_flags")
     for repo in repositories:
         files = []
         for f in sources[repo]:
@@ -145,7 +144,7 @@ def post_build(env, buildlog):
 
         subs.update({
             "repo": repo,
-            "flags": common_metadata_flags(buildlog.repo_metadata, repo),
+            "flags": common_metadata_flags(buildlog, repo),
             "sources": files,
             "libraries": buildlog.repo_metadata["required_library"][repo],
             "library_paths": [env.reloutpath(p, repo) for p in buildlog.repo_metadata["required_library_path"][repo]],

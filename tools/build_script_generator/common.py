@@ -13,7 +13,13 @@
 import os
 from collections import defaultdict
 
-def common_source_files(env, buildlog):
+def common_source_files(buildlog):
+    """
+    Builds a list of files that need to be compiled per repository.
+
+    :param buildlog: the buildlog object available in the post_build step
+    :returns: a dictionary of sorted lists of filenames, keyed by repository.
+    """
     files_to_build = defaultdict(list)
 
     for operation in buildlog:
@@ -28,21 +34,43 @@ def common_source_files(env, buildlog):
         files_to_build[repo].sort()
     return files_to_build
 
-def common_target(target):
-    core = target.get_driver("core")["type"]
+def common_target(env):
+    """
+    Extracts common properties from a modm:target device:
+      - platform
+      - family
+      - partname
+      - core
+      - mcu (AVR only)
+
+    :returns: a dictionary of common properties.
+    """
+    device = env["modm:target"]
+    core = device.get_driver("core")["type"]
     core = core.replace("fd", "").replace("f", "")
-    mcu = target._properties.get("mcu", "")
+    mcu = device._properties.get("mcu", "")
     p = {
         "core": core,
         "mcu": mcu,
-        "platform": target.identifier["platform"],
-        "family": target.identifier["family"],
-        "partname": target.partname,
+        "platform": device.identifier["platform"],
+        "family": device.identifier["family"],
+        "partname": device.partname,
     }
     return p
 
-def common_memories(target):
-    core_driver = target.get_driver("core")
+def common_memories(env):
+    """
+    Extracts the memory map of the device.
+    A memory region is a dictionary containing:
+      - `name` of region
+      - `start` address of region
+      - `size` of region
+      - `access` of region
+
+    :returns: a list of memory regions.
+    """
+    device = env["modm:target"]
+    core_driver = device.get_driver("core")
     memories = []
     if "memory" in core_driver:
         memories.extend([
@@ -54,16 +82,34 @@ def common_memories(target):
         ])
     return memories
 
-def common_metadata_flags(metadata, repo=None):
+def common_metadata_flags(buildlog, repo):
+    """
+    Scans the metadata for module compile flags.
+    Converts them into SCons-compatible names and places them into a dictionary
+    of the form: flags[name][profile] = list(values).
+
+    :param buildlog: the post_build step buildlog
+    :param repo: the repository to search for
+    :returns: compile flags dictionary
+    """
     flags = defaultdict(lambda: defaultdict(list))
-    for key, values in metadata.items():
+    for key, values in buildlog.repo_metadata.items():
         if key.startswith("flags."):
             key = key.split(".")[1:]
-            if repo: values = values[repo];
+            values = values[repo];
             flags[key[0].upper()]["" if len(key) < 2 else key[1]].extend(list(values))
     return flags
 
 def common_file_flags(buildlog, filename):
+    """
+    Scans the metadata for file compile flags.
+    Converts them into SCons-compatible names and places them into a dictionary
+    of the form: flags[name][profile] = list(values).
+
+    :param buildlog: the post_build step buildlog
+    :param filename: the operation filename to search for
+    :returns: compile flags dictionary
+    """
     flags = defaultdict(lambda: defaultdict(list))
     for key, data in buildlog.operation_metadata.items():
         if key.startswith("flags."):
